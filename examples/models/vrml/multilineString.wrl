@@ -1,0 +1,24 @@
+#VRML V2.0 utf8
+WorldInfo { title "Multi-line string literal test" }
+NavigationInfo { type "EXAMINE" }
+Background { skyColor [ 0.2 0.2 0.3 ] }
+
+Transform {
+	translation 0 0 0
+	children [
+		Shape {
+			appearance Appearance {
+				material Material { diffuseColor 0.2 0.8 0.4 }
+			}
+			geometry Box { size 1 1 1 }
+		}
+	]
+}
+
+DEF S Script {
+	url "javascript:
+function touched(value) {
+	console.log('Box was touched at ' + value);
+}
+"
+}

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ClusteredLighting - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Lighting.html">Lighting</a> → </p>
+	<h1 translate="no">ClusteredLighting</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A custom lighting implementation based on Forward+ Clustered Shading that
+overwrites the default lighting system in <a href="WebGPURenderer.html">WebGPURenderer</a>. Suitable
+for 3D scenes with many point lights and real depth complexity — the view
+frustum is partitioned into a 3D cluster grid so only the lights actually
+reaching each fragment are evaluated.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const lighting = new ClusteredLighting();
+renderer.lighting = lighting; // set lighting system
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">ClusteredLighting</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { ClusteredLighting } from 'three/addons/lighting/ClusteredLighting.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ClusteredLighting" translate="no">new <a href="#ClusteredLighting">ClusteredLighting</a><span class="signature">( maxLights : <span class="param-type">number</span>, tileSize : <span class="param-type">number</span>, zSlices : <span class="param-type">number</span>, maxLightsPerCluster : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new clustered lighting system.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">maxLights</strong>
+									</td>
+									<td class="description last">
+										<p>Maximum number of point lights.</p>
+										<p>Default is <code>1024</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">tileSize</strong>
+									</td>
+									<td class="description last">
+										<p>Screen tile size in pixels (cluster XY size).</p>
+										<p>Default is <code>32</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">zSlices</strong>
+									</td>
+									<td class="description last">
+										<p>Number of exponential depth slices.</p>
+										<p>Default is <code>24</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">maxLightsPerCluster</strong>
+									</td>
+									<td class="description last">
+										<p>Per-cluster light-list capacity.</p>
+										<p>Default is <code>64</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Classes</h2>
+				<dl>
+					<dt><a href="ClusteredLighting.html">ClusteredLighting</a></dt>
+					<dd></dd>
+				</dl>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="createNode" translate="no">.<a href="#createNode">createNode</a><span class="signature">( lights : <span class="param-type">Array.&lt;<a href="Light.html">Light</a>></span> )</span><span class="type-signature"> : <a href="ClusteredLightsNode.html">ClusteredLightsNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a new clustered lights node for the given array of lights.</p>
+<p>This method is called internally by the renderer and must be overwritten by
+all custom lighting implementations.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">lights</strong>
+									</td>
+									<td class="description last">
+										<p>The lights.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Lighting.html#createNode">Lighting#createNode</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The clustered lights node.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/lighting/ClusteredLighting.js" translate="no" target="_blank" rel="noopener">examples/jsm/lighting/ClusteredLighting.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

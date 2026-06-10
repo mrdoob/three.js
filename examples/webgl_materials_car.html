@@ -4,6 +4,10 @@
 		<title>three.js webgl - materials - car</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - materials - car">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_materials_car.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_materials_car.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
@@ -50,7 +54,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { DRACOLoader, DRACO_GLTF_CONFIG } from 'three/addons/loaders/DRACOLoader.js';
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			let camera, scene, renderer;
@@ -141,7 +145,7 @@
 				const shadow = new THREE.TextureLoader().load( 'models/gltf/ferrari_ao.png' );
 
 				const dracoLoader = new DRACOLoader();
-				dracoLoader.setDecoderPath( 'jsm/libs/draco/gltf/' );
+				dracoLoader.setDecoderPath( DRACO_GLTF_CONFIG );
 
 				const loader = new GLTFLoader();
 				loader.setDRACOLoader( dracoLoader );

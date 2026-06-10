@@ -388,11 +388,27 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.LIGHT_MAP ) {
 
-			node = this.getTexture( scope ).rgb.mul( this.getFloat( 'lightMapIntensity' ) );
+			if ( material.lightMap ) {
+
+				node = this.getTexture( scope ).rgb.mul( this.getFloat( 'lightMapIntensity' ) );
+
+			} else {
+
+				node = vec3( 0.0 );
+
+			}
 
 		} else if ( scope === MaterialNode.AO ) {
 
-			node = this.getTexture( scope ).r.sub( 1.0 ).mul( this.getFloat( 'aoMapIntensity' ) ).add( 1.0 );
+			if ( material.aoMap ) {
+
+				node = this.getTexture( scope ).r.sub( 1.0 ).mul( this.getFloat( 'aoMapIntensity' ) ).add( 1.0 );
+
+			} else {
+
+				node = float( 1.0 );
+
+			}
 
 		} else if ( scope === MaterialNode.LINE_DASH_OFFSET ) {
 

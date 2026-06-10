@@ -877,6 +877,9 @@ class WebGLTextureUtils {
 			const srcFramebuffer = srcRenderContextData.framebuffers[ srcTextureData.cacheKey ];
 			const dstFramebuffer = dstRenderContextData.framebuffers[ dstTextureData.cacheKey ];
 
+			const prevReadFramebuffer = state.currentBoundFramebuffers[ gl.READ_FRAMEBUFFER ] ?? null;
+			const prevDrawFramebuffer = state.currentBoundFramebuffers[ gl.DRAW_FRAMEBUFFER ] ?? null;
+
 			state.bindFramebuffer( gl.READ_FRAMEBUFFER, srcFramebuffer );
 			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, dstFramebuffer );
 
@@ -894,8 +897,8 @@ class WebGLTextureUtils {
 
 			}
 
-			state.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
-			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, null );
+			state.bindFramebuffer( gl.READ_FRAMEBUFFER, prevReadFramebuffer );
+			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, prevDrawFramebuffer );
 
 		} else if ( srcLevel !== 0 || srcTexture.isRenderTargetTexture || backend.has( srcTexture ) ) {
 
@@ -904,6 +907,9 @@ class WebGLTextureUtils {
 
 			if ( this._srcFramebuffer === null ) this._srcFramebuffer = gl.createFramebuffer();
 			if ( this._dstFramebuffer === null ) this._dstFramebuffer = gl.createFramebuffer();
+
+			const prevReadFramebuffer = state.currentBoundFramebuffers[ gl.READ_FRAMEBUFFER ] ?? null;
+			const prevDrawFramebuffer = state.currentBoundFramebuffers[ gl.DRAW_FRAMEBUFFER ] ?? null;
 
 			// bind the frame buffer targets
 			state.bindFramebuffer( gl.READ_FRAMEBUFFER, this._srcFramebuffer );
@@ -949,9 +955,9 @@ class WebGLTextureUtils {
 
 			}
 
-			// unbind read, draw buffers
-			state.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
-			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, null );
+			// restore previous read, draw framebuffer bindings
+			state.bindFramebuffer( gl.READ_FRAMEBUFFER, prevReadFramebuffer );
+			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, prevDrawFramebuffer );
 
 		} else {
 
@@ -1253,7 +1259,7 @@ class WebGLTextureUtils {
 		if ( glType === gl.HALF_FLOAT ) return Uint16Array;
 		if ( glType === gl.FLOAT ) return Float32Array;
 
-		throw new Error( `Unsupported WebGL type: ${glType}` );
+		throw new Error( `THREE.WebGLTextureUtils: Unsupported WebGL type: ${glType}` );
 
 	}
 

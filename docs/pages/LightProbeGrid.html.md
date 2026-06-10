@@ -2,6 +2,8 @@
 
 A 3D grid of L2 Spherical Harmonic irradiance probes that provides position-dependent diffuse global illumination.
 
+Note that this class can only be used with [WebGLRenderer](WebGLRenderer.html). A version for [WebGPURenderer](WebGPURenderer.html) will be added at a later point.
+
 All seven packed SH sub-volumes are stored in a **single** RGBA `WebGL3DRenderTarget` using a texture-atlas layout along the Z axis. Each sub-volume occupies `( nz + 2 )` atlas slices: one padding slice at each end (a copy of the nearest edge data slice) to prevent color bleeding when the hardware trilinear filter reads across a sub-volume boundary.
 
 Atlas layout (nz = resolution.z, PADDING = 1):

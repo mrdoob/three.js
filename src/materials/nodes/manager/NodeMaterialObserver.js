@@ -242,8 +242,8 @@ class NodeMaterialObserver {
 			const attribute = attributes[ name ];
 
 			attributesData[ name ] = {
-				id: attribute.id,
-				version: attribute.version,
+				id: attribute.isInterleavedBufferAttribute ? attribute.data.uuid : attribute.id,
+				version: attribute.isInterleavedBufferAttribute ? attribute.data.version : attribute.version,
 			};
 
 		}
@@ -501,10 +501,13 @@ class NodeMaterialObserver {
 
 				}
 
-				if ( storedAttributeData.id !== attribute.id || storedAttributeData.version !== attribute.version ) {
+				const id = attribute.isInterleavedBufferAttribute ? attribute.data.uuid : attribute.id;
+				const version = attribute.isInterleavedBufferAttribute ? attribute.data.version : attribute.version;
 
-					storedAttributeData.id = attribute.id;
-					storedAttributeData.version = attribute.version;
+				if ( storedAttributeData.id !== id || storedAttributeData.version !== version ) {
+
+					storedAttributeData.id = id;
+					storedAttributeData.version = version;
 
 					geometryData._equal = false;
 					return false;

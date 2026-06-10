@@ -83,6 +83,9 @@ class Textures extends DataMap {
 
 		let textureNeedsUpdate = false;
 
+		const hasArrayDepthTexture = depthTexture !== undefined && depthTexture.image !== undefined && depthTexture.image.depth > 1;
+		const useArrayDepth = size.depth > 1 && ( renderTarget.useArrayDepthTexture || renderTarget.multiview || hasArrayDepthTexture );
+
 		if ( depthTexture === undefined && useDepthTexture ) {
 
 			depthTexture = new DepthTexture();
@@ -93,9 +96,14 @@ class Textures extends DataMap {
 			depthTexture.image.height = mipHeight;
 			depthTexture.image.depth = size.depth;
 			depthTexture.renderTarget = renderTarget;
-			depthTexture.isArrayTexture = renderTarget.multiview === true && size.depth > 1;
 
 			depthTextureMips[ activeMipmapLevel ] = depthTexture;
+
+		}
+
+		if ( depthTexture ) {
+
+			depthTexture.isArrayTexture = useArrayDepth;
 
 		}
 
@@ -108,7 +116,7 @@ class Textures extends DataMap {
 				depthTexture.needsUpdate = true;
 				depthTexture.image.width = mipWidth;
 				depthTexture.image.height = mipHeight;
-				depthTexture.image.depth = depthTexture.isArrayTexture ? depthTexture.image.depth : 1;
+				depthTexture.image.depth = useArrayDepth ? size.depth : 1;
 
 			}
 
@@ -419,11 +427,12 @@ class Textures extends DataMap {
 	 * them when the texture parameters match.
 	 *
 	 * @param {Texture} texture - The texture to update the sampler for.
+	 * @param {TextureNode} textureNode - The texture node to update the sampler with.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler( texture ) {
+	updateSampler( texture, textureNode ) {
 
-		return this.backend.updateSampler( texture );
+		return this.backend.updateSampler( texture, textureNode );
 
 	}
 
@@ -609,6 +618,19 @@ class Textures extends DataMap {
 
 					bindingsData.groups = undefined;
 					bindingsData.versions = undefined;
+
+					// go through all bindings and if one points to the destroyed texture, trigger dispose as well
+
+					for ( const binding of bindGroup.bindings ) {
+
+						if ( binding.isSampler && binding.texture === texture ) {
+
+							binding.reset();
+							binding.release();
+
+						}
+
+					}
 
 				}
 

@@ -97,7 +97,7 @@ class FunctionOverloadingNode extends Node {
 
 				if ( layout === null ) {
 
-					throw new Error( 'FunctionOverloadingNode: FunctionNode must be a layout.' );
+					throw new Error( 'THREE.FunctionOverloadingNode: FunctionNode must be a layout.' );
 
 				}
 

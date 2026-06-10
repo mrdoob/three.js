@@ -1,7 +1,7 @@
 import { Tab } from '../ui/Tab.js';
 import { List } from '../ui/List.js';
 import { Item } from '../ui/Item.js';
-import { createValueSpan } from '../ui/utils.js';
+import { createValueSpan, info } from '../ui/utils.js';
 import { ValueString, ValueNumber, ValueSlider, ValueSelect, ValueCheckbox, ValueColor, ValueButton } from '../ui/Values.js';
 
 class ParametersGroup {
@@ -66,15 +66,36 @@ class ParametersGroup {
 
 	}
 
+	_addInfo( editor, itemNode ) {
+
+		editor.info = ( text ) => {
+
+			info( itemNode, text );
+			return editor;
+
+		};
+
+	}
+
 	_addParameter( object, property, editor, subItem ) {
 
 		editor.name = ( name ) => {
 
-			subItem.data[ 0 ].textContent = name;
+			if ( subItem.data[ 0 ].childNodes.length > 0 && subItem.data[ 0 ].firstChild.nodeType === 3 /* Node.TEXT_NODE */ ) {
+
+				subItem.data[ 0 ].firstChild.textContent = name;
+
+			} else {
+
+				subItem.data[ 0 ].insertBefore( document.createTextNode( name ), subItem.data[ 0 ].firstChild );
+
+			}
 
 			return editor;
 
 		};
+
+		this._addInfo( editor, subItem.data[ 0 ] );
 
 		editor.listen = () => {
 
@@ -328,11 +349,23 @@ class ParametersGroup {
 
 		editor.name = ( name ) => {
 
-			editor.domElement.childNodes[ 0 ].textContent = name;
+			const buttonNode = editor.domElement.childNodes[ 0 ];
+
+			if ( buttonNode.childNodes.length > 0 && buttonNode.firstChild.nodeType === 3 /* Node.TEXT_NODE */ ) {
+
+				buttonNode.firstChild.textContent = name;
+
+			} else {
+
+				buttonNode.insertBefore( document.createTextNode( name ), buttonNode.firstChild );
+
+			}
 
 			return editor;
 
 		};
+
+		this._addInfo( editor, editor.domElement.childNodes[ 0 ] );
 
 		this._registerParameter( object, property, editor, subItem );
 

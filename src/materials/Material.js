@@ -3,6 +3,7 @@ import { EventDispatcher } from '../core/EventDispatcher.js';
 import { FrontSide, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor, AlwaysStencilFunc, KeepStencilOp } from '../constants.js';
 import { generateUUID } from '../math/MathUtils.js';
 import { warn } from '../utils.js';
+import { Vector2 } from '../math/Vector2.js';
 
 let _materialId = 0;
 
@@ -580,7 +581,11 @@ class Material extends EventDispatcher {
 
 				currentValue.set( newValue );
 
-			} else if ( ( currentValue && currentValue.isVector3 ) && ( newValue && newValue.isVector3 ) ) {
+			} else if (
+				( ( currentValue && currentValue.isVector2 ) && ( newValue && newValue.isVector2 ) ) ||
+				( ( currentValue && currentValue.isEuler ) && ( newValue && newValue.isEuler ) ) ||
+				( ( currentValue && currentValue.isVector3 ) && ( newValue && newValue.isVector3 ) )
+			) {
 
 				currentValue.copy( newValue );
 
@@ -878,6 +883,196 @@ class Material extends EventDispatcher {
 		}
 
 		return data;
+
+	}
+
+	/**
+	 * Deserializes the material from the given JSON.
+	 *
+	 * @param {Object} json - The JSON holding the serialized material.
+	 * @param {Object<string,Texture>} textures - A dictionary holding textures referenced by the material.
+	 * @return {Material} A reference to this material.
+	 */
+	fromJSON( json, textures ) {
+
+		if ( json.uuid !== undefined ) this.uuid = json.uuid;
+		if ( json.name !== undefined ) this.name = json.name;
+		if ( json.color !== undefined && this.color !== undefined ) this.color.setHex( json.color );
+		if ( json.roughness !== undefined ) this.roughness = json.roughness;
+		if ( json.metalness !== undefined ) this.metalness = json.metalness;
+		if ( json.sheen !== undefined ) this.sheen = json.sheen;
+		if ( json.sheenColor !== undefined ) this.sheenColor = new Color().setHex( json.sheenColor );
+		if ( json.sheenRoughness !== undefined ) this.sheenRoughness = json.sheenRoughness;
+		if ( json.emissive !== undefined && this.emissive !== undefined ) this.emissive.setHex( json.emissive );
+		if ( json.specular !== undefined && this.specular !== undefined ) this.specular.setHex( json.specular );
+		if ( json.specularIntensity !== undefined ) this.specularIntensity = json.specularIntensity;
+		if ( json.specularColor !== undefined && this.specularColor !== undefined ) this.specularColor.setHex( json.specularColor );
+		if ( json.shininess !== undefined ) this.shininess = json.shininess;
+		if ( json.clearcoat !== undefined ) this.clearcoat = json.clearcoat;
+		if ( json.clearcoatRoughness !== undefined ) this.clearcoatRoughness = json.clearcoatRoughness;
+		if ( json.dispersion !== undefined ) this.dispersion = json.dispersion;
+		if ( json.iridescence !== undefined ) this.iridescence = json.iridescence;
+		if ( json.iridescenceIOR !== undefined ) this.iridescenceIOR = json.iridescenceIOR;
+		if ( json.iridescenceThicknessRange !== undefined ) this.iridescenceThicknessRange = json.iridescenceThicknessRange;
+		if ( json.transmission !== undefined ) this.transmission = json.transmission;
+		if ( json.thickness !== undefined ) this.thickness = json.thickness;
+		if ( json.attenuationDistance !== undefined ) this.attenuationDistance = json.attenuationDistance;
+		if ( json.attenuationColor !== undefined && this.attenuationColor !== undefined ) this.attenuationColor.setHex( json.attenuationColor );
+		if ( json.anisotropy !== undefined ) this.anisotropy = json.anisotropy;
+		if ( json.anisotropyRotation !== undefined ) this.anisotropyRotation = json.anisotropyRotation;
+		if ( json.fog !== undefined ) this.fog = json.fog;
+		if ( json.flatShading !== undefined ) this.flatShading = json.flatShading;
+		if ( json.blending !== undefined ) this.blending = json.blending;
+		if ( json.combine !== undefined ) this.combine = json.combine;
+		if ( json.side !== undefined ) this.side = json.side;
+		if ( json.shadowSide !== undefined ) this.shadowSide = json.shadowSide;
+		if ( json.opacity !== undefined ) this.opacity = json.opacity;
+		if ( json.transparent !== undefined ) this.transparent = json.transparent;
+		if ( json.alphaTest !== undefined ) this.alphaTest = json.alphaTest;
+		if ( json.alphaHash !== undefined ) this.alphaHash = json.alphaHash;
+		if ( json.depthFunc !== undefined ) this.depthFunc = json.depthFunc;
+		if ( json.depthTest !== undefined ) this.depthTest = json.depthTest;
+		if ( json.depthWrite !== undefined ) this.depthWrite = json.depthWrite;
+		if ( json.colorWrite !== undefined ) this.colorWrite = json.colorWrite;
+		if ( json.blendSrc !== undefined ) this.blendSrc = json.blendSrc;
+		if ( json.blendDst !== undefined ) this.blendDst = json.blendDst;
+		if ( json.blendEquation !== undefined ) this.blendEquation = json.blendEquation;
+		if ( json.blendSrcAlpha !== undefined ) this.blendSrcAlpha = json.blendSrcAlpha;
+		if ( json.blendDstAlpha !== undefined ) this.blendDstAlpha = json.blendDstAlpha;
+		if ( json.blendEquationAlpha !== undefined ) this.blendEquationAlpha = json.blendEquationAlpha;
+		if ( json.blendColor !== undefined && this.blendColor !== undefined ) this.blendColor.setHex( json.blendColor );
+		if ( json.blendAlpha !== undefined ) this.blendAlpha = json.blendAlpha;
+		if ( json.stencilWriteMask !== undefined ) this.stencilWriteMask = json.stencilWriteMask;
+		if ( json.stencilFunc !== undefined ) this.stencilFunc = json.stencilFunc;
+		if ( json.stencilRef !== undefined ) this.stencilRef = json.stencilRef;
+		if ( json.stencilFuncMask !== undefined ) this.stencilFuncMask = json.stencilFuncMask;
+		if ( json.stencilFail !== undefined ) this.stencilFail = json.stencilFail;
+		if ( json.stencilZFail !== undefined ) this.stencilZFail = json.stencilZFail;
+		if ( json.stencilZPass !== undefined ) this.stencilZPass = json.stencilZPass;
+		if ( json.stencilWrite !== undefined ) this.stencilWrite = json.stencilWrite;
+
+		if ( json.wireframe !== undefined ) this.wireframe = json.wireframe;
+		if ( json.wireframeLinewidth !== undefined ) this.wireframeLinewidth = json.wireframeLinewidth;
+		if ( json.wireframeLinecap !== undefined ) this.wireframeLinecap = json.wireframeLinecap;
+		if ( json.wireframeLinejoin !== undefined ) this.wireframeLinejoin = json.wireframeLinejoin;
+
+		if ( json.rotation !== undefined ) this.rotation = json.rotation;
+
+		if ( json.linewidth !== undefined ) this.linewidth = json.linewidth;
+		if ( json.dashSize !== undefined ) this.dashSize = json.dashSize;
+		if ( json.gapSize !== undefined ) this.gapSize = json.gapSize;
+		if ( json.scale !== undefined ) this.scale = json.scale;
+
+		if ( json.polygonOffset !== undefined ) this.polygonOffset = json.polygonOffset;
+		if ( json.polygonOffsetFactor !== undefined ) this.polygonOffsetFactor = json.polygonOffsetFactor;
+		if ( json.polygonOffsetUnits !== undefined ) this.polygonOffsetUnits = json.polygonOffsetUnits;
+
+		if ( json.dithering !== undefined ) this.dithering = json.dithering;
+
+		if ( json.alphaToCoverage !== undefined ) this.alphaToCoverage = json.alphaToCoverage;
+		if ( json.premultipliedAlpha !== undefined ) this.premultipliedAlpha = json.premultipliedAlpha;
+		if ( json.forceSinglePass !== undefined ) this.forceSinglePass = json.forceSinglePass;
+		if ( json.allowOverride !== undefined ) this.allowOverride = json.allowOverride;
+
+		if ( json.visible !== undefined ) this.visible = json.visible;
+
+		if ( json.toneMapped !== undefined ) this.toneMapped = json.toneMapped;
+
+		if ( json.userData !== undefined ) this.userData = json.userData;
+
+		if ( json.vertexColors !== undefined ) {
+
+			if ( typeof json.vertexColors === 'number' ) {
+
+				this.vertexColors = json.vertexColors > 0;
+
+			} else {
+
+				this.vertexColors = json.vertexColors;
+
+			}
+
+		}
+
+		// for PointsMaterial
+
+		if ( json.size !== undefined ) this.size = json.size;
+		if ( json.sizeAttenuation !== undefined ) this.sizeAttenuation = json.sizeAttenuation;
+
+		// maps
+
+		if ( json.map !== undefined ) this.map = textures[ json.map ] || null;
+		if ( json.matcap !== undefined ) this.matcap = textures[ json.matcap ] || null;
+
+		if ( json.alphaMap !== undefined ) this.alphaMap = textures[ json.alphaMap ] || null;
+
+		if ( json.bumpMap !== undefined ) this.bumpMap = textures[ json.bumpMap ] || null;
+		if ( json.bumpScale !== undefined ) this.bumpScale = json.bumpScale;
+
+		if ( json.normalMap !== undefined ) this.normalMap = textures[ json.normalMap ] || null;
+		if ( json.normalMapType !== undefined ) this.normalMapType = json.normalMapType;
+		if ( json.normalScale !== undefined ) {
+
+			let normalScale = json.normalScale;
+
+			if ( Array.isArray( normalScale ) === false ) {
+
+				// Blender exporter used to export a scalar. See #7459
+
+				normalScale = [ normalScale, normalScale ];
+
+			}
+
+			this.normalScale = new Vector2().fromArray( normalScale );
+
+		}
+
+		if ( json.displacementMap !== undefined ) this.displacementMap = textures[ json.displacementMap ] || null;
+		if ( json.displacementScale !== undefined ) this.displacementScale = json.displacementScale;
+		if ( json.displacementBias !== undefined ) this.displacementBias = json.displacementBias;
+
+		if ( json.roughnessMap !== undefined ) this.roughnessMap = textures[ json.roughnessMap ] || null;
+		if ( json.metalnessMap !== undefined ) this.metalnessMap = textures[ json.metalnessMap ] || null;
+
+		if ( json.emissiveMap !== undefined ) this.emissiveMap = textures[ json.emissiveMap ] || null;
+		if ( json.emissiveIntensity !== undefined ) this.emissiveIntensity = json.emissiveIntensity;
+
+		if ( json.specularMap !== undefined ) this.specularMap = textures[ json.specularMap ] || null;
+		if ( json.specularIntensityMap !== undefined ) this.specularIntensityMap = textures[ json.specularIntensityMap ] || null;
+		if ( json.specularColorMap !== undefined ) this.specularColorMap = textures[ json.specularColorMap ] || null;
+
+		if ( json.envMap !== undefined ) this.envMap = textures[ json.envMap ] || null;
+		if ( json.envMapRotation !== undefined ) this.envMapRotation.fromArray( json.envMapRotation );
+		if ( json.envMapIntensity !== undefined ) this.envMapIntensity = json.envMapIntensity;
+
+		if ( json.reflectivity !== undefined ) this.reflectivity = json.reflectivity;
+		if ( json.refractionRatio !== undefined ) this.refractionRatio = json.refractionRatio;
+
+		if ( json.lightMap !== undefined ) this.lightMap = textures[ json.lightMap ] || null;
+		if ( json.lightMapIntensity !== undefined ) this.lightMapIntensity = json.lightMapIntensity;
+
+		if ( json.aoMap !== undefined ) this.aoMap = textures[ json.aoMap ] || null;
+		if ( json.aoMapIntensity !== undefined ) this.aoMapIntensity = json.aoMapIntensity;
+
+		if ( json.gradientMap !== undefined ) this.gradientMap = textures[ json.gradientMap ] || null;
+
+		if ( json.clearcoatMap !== undefined ) this.clearcoatMap = textures[ json.clearcoatMap ] || null;
+		if ( json.clearcoatRoughnessMap !== undefined ) this.clearcoatRoughnessMap = textures[ json.clearcoatRoughnessMap ] || null;
+		if ( json.clearcoatNormalMap !== undefined ) this.clearcoatNormalMap = textures[ json.clearcoatNormalMap ] || null;
+		if ( json.clearcoatNormalScale !== undefined ) this.clearcoatNormalScale = new Vector2().fromArray( json.clearcoatNormalScale );
+
+		if ( json.iridescenceMap !== undefined ) this.iridescenceMap = textures[ json.iridescenceMap ] || null;
+		if ( json.iridescenceThicknessMap !== undefined ) this.iridescenceThicknessMap = textures[ json.iridescenceThicknessMap ] || null;
+
+		if ( json.transmissionMap !== undefined ) this.transmissionMap = textures[ json.transmissionMap ] || null;
+		if ( json.thicknessMap !== undefined ) this.thicknessMap = textures[ json.thicknessMap ] || null;
+
+		if ( json.anisotropyMap !== undefined ) this.anisotropyMap = textures[ json.anisotropyMap ] || null;
+
+		if ( json.sheenColorMap !== undefined ) this.sheenColorMap = textures[ json.sheenColorMap ] || null;
+		if ( json.sheenRoughnessMap !== undefined ) this.sheenRoughnessMap = textures[ json.sheenRoughnessMap ] || null;
+
+		return this;
 
 	}
 

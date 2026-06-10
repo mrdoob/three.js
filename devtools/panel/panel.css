@@ -85,6 +85,31 @@ hr {
 	margin-left: 0;
 }
 
+/* Collapsible scene tree nodes */
+details.tree-node > summary.tree-item {
+	list-style: none;
+}
+details.tree-node > summary.tree-item::-webkit-details-marker {
+	display: none;
+}
+
+.tree-toggle,
+.tree-toggle-placeholder {
+	display: inline-block;
+	width: 1em;
+	margin-right: 2px;
+	text-align: center;
+	flex-shrink: 0;
+}
+.tree-toggle::before {
+	content: '▶';
+	font-size: 0.7em;
+	opacity: 0.6;
+}
+details.tree-node[open] > summary.tree-item .tree-toggle::before {
+	content: '▼';
+}
+
 /* Style for clickable renderer summary */
 .renderer-summary {
 	cursor: pointer;

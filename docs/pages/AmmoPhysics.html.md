@@ -2,16 +2,14 @@
 
 Can be used to include Ammo.js as a Physics engine into `three.js` apps. Make sure to include `ammo.wasm.js` first:
 
+```js
+<script src="jsm/libs/ammo.wasm.js"></script>
+```
+
 It is then possible to initialize the API via:
 
 ```js
 const physics = await AmmoPhysics();
-```
-
-## Code Example
-
-```js
-<script src="jsm/libs/ammo.wasm.js"></script>
 ```
 
 ## Import

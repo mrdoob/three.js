@@ -23,7 +23,7 @@ import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
 
 import BindGroup from '../../renderers/common/BindGroup.js';
 
-import { REVISION, IntType, UnsignedIntType, LinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapLinearFilter, NormalBlending } from '../../constants.js';
+import { REVISION, IntType, UnsignedIntType, LinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapLinearFilter, NormalBlending, RedFormat, RGFormat, RGBFormat, RedIntegerFormat, RGIntegerFormat, RGBIntegerFormat } from '../../constants.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { Color } from '../../math/Color.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -35,6 +35,7 @@ import { warn, error, yieldToMain } from '../../utils.js';
 let _id = 0;
 
 const _bindingGroupsCache = new WeakMap();
+const _functionNodeCache = new WeakMap();
 
 const sharedNodeData = new WeakMap();
 
@@ -48,7 +49,7 @@ const typeFromArray = new Map( [
 	[ Float32Array, 'float' ]
 ] );
 
-const toFloat = ( value ) => {
+const _toFloat = ( value ) => {
 
 	if ( /e/g.test( value ) ) {
 
@@ -61,6 +62,28 @@ const toFloat = ( value ) => {
 		return value + ( value % 1 ? '' : '.0' );
 
 	}
+
+};
+
+const _checkWriteUsage = ( data ) => {
+
+	if ( data.writeUsageCount > 0 ) return true;
+
+	if ( data.subBuildsCache !== undefined ) {
+
+		for ( const subBuild in data.subBuildsCache ) {
+
+			if ( _checkWriteUsage( data.subBuildsCache[ subBuild ] ) ) {
+
+				return true;
+
+			}
+
+		}
+
+	}
+
+	return false;
 
 };
 
@@ -134,9 +157,9 @@ class NodeBuilder {
 		 * A list of all nodes the builder is processing
 		 * for this 3D object.
 		 *
-		 * @type {Array<Node>}
+		 * @type {Set<Node>}
 		 */
-		this.nodes = [];
+		this.nodes = new Set();
 
 		/**
 		 * A list of all nodes the builder is processing in sequential order.
@@ -144,9 +167,9 @@ class NodeBuilder {
 		 * This is used to determine the update order of nodes, which is important for
 		 * {@link NodeUpdateType#UPDATE_BEFORE} and {@link NodeUpdateType#UPDATE_AFTER}.
 		 *
-		 * @type {Array<Node>}
+		 * @type {Set<Node>}
 		 */
-		this.sequentialNodes = [];
+		this.sequentialNodes = new Set();
 
 		/**
 		 * A list of all nodes which {@link Node#update} method should be executed.
@@ -214,6 +237,14 @@ class NodeBuilder {
 		 * @type {?ClippingContext}
 		 */
 		this.clippingContext = null;
+
+		/**
+		 * Whether the built material uses hardware clipping or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.hardwareClipping = false;
 
 		/**
 		 * The generated vertex shader.
@@ -530,7 +561,62 @@ class NodeBuilder {
 	 */
 	includes( node ) {
 
-		return this.nodes.includes( node );
+		return this.nodes.has( node );
+
+	}
+
+	/**
+	 * Returns the type of the color output based on the renderer's render target.
+	 *
+	 * @param {number} [index=0] - The index of the render target texture.
+	 * @return {string} The type.
+	 */
+	getOutputType( index = 0 ) {
+
+		let type = 'vec4';
+
+		const renderTarget = this.renderer.getRenderTarget();
+
+		if ( renderTarget !== null ) {
+
+			const renderTargetType = renderTarget.textures[ index ].type;
+			const renderTargetFormat = renderTarget.textures[ index ].format;
+
+			let typeStr = 'vec';
+
+			if ( renderTargetType === IntType ) {
+
+				typeStr = 'ivec';
+
+			} else if ( renderTargetType === UnsignedIntType ) {
+
+				typeStr = 'uvec';
+
+			}
+
+			if ( renderTargetFormat === RedFormat || renderTargetFormat === RedIntegerFormat ) {
+
+				if ( renderTargetType === IntType ) type = 'int';
+				else if ( renderTargetType === UnsignedIntType ) type = 'uint';
+				else type = 'float';
+
+			} else if ( renderTargetFormat === RGFormat || renderTargetFormat === RGIntegerFormat ) {
+
+				type = `${ typeStr }2`;
+
+			} else if ( renderTargetFormat === RGBFormat || renderTargetFormat === RGBIntegerFormat ) {
+
+				type = `${ typeStr }3`;
+
+			} else {
+
+				type = `${ typeStr }4`;
+
+			}
+
+		}
+
+		return type;
 
 	}
 
@@ -760,9 +846,9 @@ class NodeBuilder {
 	 */
 	addNode( node ) {
 
-		if ( this.nodes.includes( node ) === false ) {
+		if ( this.nodes.has( node ) === false ) {
 
-			this.nodes.push( node );
+			this.nodes.add( node );
 
 			this.setHashNode( node, node.getHash( this ) );
 
@@ -784,11 +870,7 @@ class NodeBuilder {
 
 		if ( updateBeforeType !== NodeUpdateType.NONE || updateAfterType !== NodeUpdateType.NONE ) {
 
-			if ( this.sequentialNodes.includes( node ) === false ) {
-
-				this.sequentialNodes.push( node );
-
-			}
+			this.sequentialNodes.add( node );
 
 		}
 
@@ -899,7 +981,7 @@ class NodeBuilder {
 
 		if ( lastChain !== node ) {
 
-			throw new Error( 'NodeBuilder: Invalid node chaining!' );
+			throw new Error( 'THREE.NodeBuilder: Invalid node chaining!' );
 
 		}
 
@@ -1149,6 +1231,17 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns whether the builder is currently in an assignment context.
+	 *
+	 * @return {boolean} Whether the builder is in an assignment context.
+	 */
+	isContextAssign() {
+
+		return this.context.assign === true;
+
+	}
+
+	/**
 	 * Calling this method increases the usage count for the given node by one.
 	 *
 	 * @param {Node} node - The node to increase the usage count for.
@@ -1159,7 +1252,47 @@ class NodeBuilder {
 		const nodeData = this.getDataFromNode( node );
 		nodeData.usageCount = nodeData.usageCount === undefined ? 1 : nodeData.usageCount + 1;
 
+		if ( this.isContextAssign() ) {
+
+			nodeData.writeUsageCount = nodeData.writeUsageCount === undefined ? 1 : nodeData.writeUsageCount + 1;
+
+		} else {
+
+			nodeData.readUsageCount = nodeData.readUsageCount === undefined ? 1 : nodeData.readUsageCount + 1;
+
+		}
+
 		return nodeData.usageCount;
+
+	}
+
+	/**
+	 * Returns whether the given node has been written to in any shader stage.
+	 *
+	 * @param {Node} node - The node to check.
+	 * @return {boolean} Whether the node has been written to.
+	 */
+	hasWriteUsage( node ) {
+
+		const refNode = node.getShared( this );
+		const cache = refNode.isGlobal( this ) ? this.globalCache : this.cache;
+		const nodeData = cache.getData( refNode );
+
+		if ( nodeData !== undefined ) {
+
+			for ( const shaderStage in nodeData ) {
+
+				if ( _checkWriteUsage( nodeData[ shaderStage ] ) ) {
+
+					return true;
+
+				}
+
+			}
+
+		}
+
+		return false;
 
 	}
 
@@ -1296,11 +1429,11 @@ class NodeBuilder {
 
 		}
 
-		if ( type === 'float' ) return toFloat( value );
+		if ( type === 'float' ) return _toFloat( value );
 		if ( type === 'int' ) return `${ Math.round( value ) }`;
 		if ( type === 'uint' ) return value >= 0 ? `${ Math.round( value ) }u` : '0u';
 		if ( type === 'bool' ) return value ? 'true' : 'false';
-		if ( type === 'color' ) return `${ this.getType( 'vec3' ) }( ${ toFloat( value.r ) }, ${ toFloat( value.g ) }, ${ toFloat( value.b ) } )`;
+		if ( type === 'color' ) return `${ this.getType( 'vec3' ) }( ${ _toFloat( value.r ) }, ${ _toFloat( value.g ) }, ${ _toFloat( value.b ) } )`;
 
 		const typeLength = this.getTypeLength( type );
 
@@ -1330,7 +1463,7 @@ class NodeBuilder {
 
 		}
 
-		throw new Error( `NodeBuilder: Type '${type}' not found in generate constant attempt.` );
+		throw new Error( `THREE.NodeBuilder: Type '${type}' not found in generate constant attempt.` );
 
 	}
 
@@ -1468,12 +1601,10 @@ class NodeBuilder {
 
 		const type = texture.type;
 
-		if ( texture.isDataTexture ) {
+		if ( texture.isDepthTexture === true ) return 'float';
 
-			if ( type === IntType ) return 'int';
-			if ( type === UnsignedIntType ) return 'uint';
-
-		}
+		if ( type === IntType ) return 'int';
+		if ( type === UnsignedIntType ) return 'uint';
 
 		return 'float';
 
@@ -1699,7 +1830,7 @@ class NodeBuilder {
 
 		} else {
 
-			throw new Error( 'NodeBuilder: Invalid active stack removal.' );
+			throw new Error( 'THREE.NodeBuilder: Invalid active stack removal.' );
 
 		}
 
@@ -1797,6 +1928,8 @@ class NodeBuilder {
 		//
 
 		let data = nodeData[ shaderStage ];
+
+		if ( this.subBuildLayers.length === 0 ) return data;
 
 		const subBuilds = nodeData.any ? nodeData.any.subBuilds : null;
 		const subBuild = this.getClosestSubBuild( subBuilds );
@@ -2378,15 +2511,34 @@ class NodeBuilder {
 	 */
 	buildFunctionNode( shaderNode ) {
 
-		const fn = new FunctionNode();
+		const backend = this.renderer.backend;
 
-		const previous = this.currentFunctionNode;
+		let cache = _functionNodeCache.get( backend );
 
-		this.currentFunctionNode = fn;
+		if ( cache === undefined ) {
 
-		fn.code = this.buildFunctionCode( shaderNode );
+			cache = new WeakMap();
+			_functionNodeCache.set( backend, cache );
 
-		this.currentFunctionNode = previous;
+		}
+
+		let fn = cache.get( shaderNode );
+
+		if ( fn === undefined ) {
+
+			fn = new FunctionNode();
+
+			const previous = this.currentFunctionNode;
+
+			this.currentFunctionNode = fn;
+
+			fn.code = this.buildFunctionCode( shaderNode );
+
+			this.currentFunctionNode = previous;
+
+			cache.set( shaderNode, fn );
+
+		}
 
 		return fn;
 
@@ -3172,7 +3324,7 @@ class NodeBuilder {
 			else if ( type === 'mat4' ) node = new Matrix4NodeUniform( uniformNode );
 			else {
 
-				throw new Error( `Uniform "${ type }" not implemented.` );
+				throw new Error( `THREE.NodeBuilder: Uniform "${ type }" not implemented.` );
 
 			}
 

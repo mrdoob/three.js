@@ -43,7 +43,8 @@ function _loadState() {
 	_state = {
 		forceWebGL: settings.forceWebGL !== undefined ? settings.forceWebGL : false,
 		captureStackTrace: settings.captureStackTrace !== undefined ? settings.captureStackTrace : false,
-		activeExtensions: settings.activeExtensions !== undefined ? settings.activeExtensions : {}
+		activeExtensions: settings.activeExtensions !== undefined ? settings.activeExtensions : {},
+		storage: settings.storage !== undefined ? settings.storage : 'url'
 	};
 
 	if ( _state.forceWebGL ) {
@@ -67,7 +68,8 @@ function _saveState() {
 	setItem( 'settings', {
 		forceWebGL: _state.forceWebGL,
 		captureStackTrace: _state.captureStackTrace,
-		activeExtensions: _state.activeExtensions
+		activeExtensions: _state.activeExtensions,
+		storage: _state.storage
 	} );
 
 }
@@ -113,6 +115,35 @@ class Settings extends Parameters {
 	init() {
 
 		const extensionsGroup = this.createGroup( 'Extensions' );
+
+		const storageGroup = this.createGroup( 'Storage' );
+
+		const currentState = _loadState();
+
+		storageGroup.add( currentState, 'storage', { 'URL Session': 'url', 'Keep across Origin': 'origin' } )
+			.name( 'Save Settings' )
+			.onChange( () => {
+
+				_saveState();
+
+			} ).info( `
+Defines how the **Inspector** preferences and states are stored in the browser.
+
+**URL Session**
+Saves state based on the exact URL. It will reset the settings whenever the URL changes.
+
+**Keep across Origin**
+Shares the same state across any page within the current origin.` );
+
+		storageGroup.add( {
+			clear: () => {
+
+				localStorage.removeItem( 'threejs-inspector' );
+
+				location.reload();
+
+			}
+		}, 'clear' ).name( 'Clear Settings' );
 
 		this._getExtensions().then( extensions => {
 

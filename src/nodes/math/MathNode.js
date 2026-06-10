@@ -181,25 +181,23 @@ class MathNode extends TempNode {
 
 		} else if ( method === MathNode.TRANSFORM_DIRECTION ) {
 
-			// dir can be either a direction vector or a normal vector
-			// upper-left 3x3 of matrix is assumed to be orthogonal
+			// pre-multiplies the direction by the matrix and normalizes the result
 
-			let tA = aNode;
-			let tB = bNode;
+			let matrixNode, directionNode;
 
-			if ( builder.isMatrix( tA.getNodeType( builder ) ) ) {
+			if ( builder.isMatrix( aNode.getNodeType( builder ) ) ) {
 
-				tB = vec4( vec3( tB ), 0.0 );
+				matrixNode = aNode;
+				directionNode = bNode;
 
 			} else {
 
-				tA = vec4( vec3( tA ), 0.0 );
+				matrixNode = bNode;
+				directionNode = aNode;
 
 			}
 
-			const mulNode = mul( tA, tB ).xyz;
-
-			outputNode = normalize( mulNode );
+			outputNode = normalize( mul( matrixNode, vec4( vec3( directionNode ), 0.0 ) ).xyz );
 
 		}
 
@@ -989,6 +987,34 @@ export const pow4 = ( x ) => mul( x, x, x, x );
 export const transformDirection = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TRANSFORM_DIRECTION ).setParameterLength( 2 );
 
 /**
+ * Transforms a normal vector by the view matrix and then normalizes the result.
+ *
+ * The upper-left 3x3 of the view matrix is assumed to be orthonormal, so the
+ * normal can be transformed directly without involving the normal matrix.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec3>} normal - The normal vector, given in world space.
+ * @param {Node<mat3|mat4>} viewMatrix - The view matrix.
+ * @returns {Node<vec3>} The normal vector in view space.
+ */
+export const transformNormalByViewMatrix = ( normal, viewMatrix ) => normalize( mul( viewMatrix, vec4( vec3( normal ), 0.0 ) ).xyz );
+
+/**
+ * Transforms a normal vector by the inverse of the view matrix and then normalizes the result.
+ *
+ * The upper-left 3x3 of the view matrix is assumed to be orthonormal, so post-multiplying
+ * by the view matrix is equivalent to pre-multiplying by its inverse.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec3>} normal - The normal vector, given in view space.
+ * @param {Node<mat3|mat4>} viewMatrix - The view matrix.
+ * @returns {Node<vec3>} The normal vector in world space.
+ */
+export const transformNormalByInverseViewMatrix = ( normal, viewMatrix ) => normalize( vec4( vec3( normal ), 0.0 ).mul( viewMatrix ).xyz );
+
+/**
  * Returns the cube root of a number.
  *
  * @tsl
@@ -1188,6 +1214,8 @@ addMethodChaining( 'pow2', pow2 );
 addMethodChaining( 'pow3', pow3 );
 addMethodChaining( 'pow4', pow4 );
 addMethodChaining( 'transformDirection', transformDirection );
+addMethodChaining( 'transformNormalByViewMatrix', transformNormalByViewMatrix );
+addMethodChaining( 'transformNormalByInverseViewMatrix', transformNormalByInverseViewMatrix );
 addMethodChaining( 'mix', mixElement );
 addMethodChaining( 'clamp', clamp );
 addMethodChaining( 'refract', refract );

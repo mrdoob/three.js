@@ -35,7 +35,7 @@ class WorkgroupInfoElementNode extends ArrayElementNode {
 
 		let snippet;
 
-		const isAssignContext = builder.context.assign;
+		const isAssignContext = builder.isContextAssign();
 		snippet = super.generate( builder );
 
 		if ( isAssignContext !== true ) {

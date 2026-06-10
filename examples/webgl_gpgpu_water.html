@@ -4,6 +4,10 @@
 		<title>three.js webgl - gpgpu - water</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - gpgpu - water">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_gpgpu_water.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_gpgpu_water.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -147,7 +151,7 @@
 			import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
-			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { DRACOLoader, DRACO_GLTF_CONFIG } from 'three/addons/loaders/DRACOLoader.js';
 
 			// Texture width for simulation
 			const WIDTH = 128;
@@ -238,7 +242,7 @@
 
 				const hdrLoader = new HDRLoader().setPath( './textures/equirectangular/' );
 				const glbloader = new GLTFLoader().setPath( 'models/gltf/' );
-				glbloader.setDRACOLoader( new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' ) );
+				glbloader.setDRACOLoader( new DRACOLoader().setDecoderPath( DRACO_GLTF_CONFIG ) );
 
 				const [ env, model ] = await Promise.all( [ hdrLoader.loadAsync( 'blouberg_sunrise_2_1k.hdr' ), glbloader.loadAsync( 'duck.glb' ) ] );
 				env.mapping = THREE.EquirectangularReflectionMapping;

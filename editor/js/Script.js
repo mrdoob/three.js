@@ -3,6 +3,8 @@ import { UIElement, UIPanel, UIText } from './libs/ui.js';
 import { SetScriptValueCommand } from './commands/SetScriptValueCommand.js';
 import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
 
+import buildThreeDefs from './libs/tern-threejs/build-defs.js';
+
 function Script( editor ) {
 
 	const signals = editor.signals;
@@ -291,9 +293,34 @@ function Script( editor ) {
 	// tern js autocomplete
 
 	const server = new CodeMirror.TernServer( {
-		caseInsensitive: true,
-		plugins: { threejs: null }
+		caseInsensitive: true
 	} );
+
+	// The three.js API definitions are built lazily from the JSDoc in the library
+	// build the first time the script editor is opened.
+
+	let threeDefsRequested = false;
+
+	async function loadThreeDefs() {
+
+		if ( threeDefsRequested ) return;
+		threeDefsRequested = true;
+
+		try {
+
+			const url = new URL( '../build/three.core.js', document.baseURI ).href;
+			const source = await ( await fetch( url ) ).text();
+
+			server.server.defs.push( buildThreeDefs( source ) );
+			server.server.reset();
+
+		} catch ( error ) {
+
+			console.warn( 'Script: Failed to build three.js autocomplete defs.', error );
+
+		}
+
+	}
 
 	codemirror.setOption( 'extraKeys', {
 		'Ctrl-Space': function ( cm ) {
@@ -447,6 +474,8 @@ function Script( editor ) {
 		currentMode = mode;
 		currentScript = script;
 		currentObject = object;
+
+		if ( mode === 'javascript' ) loadThreeDefs();
 
 		container.setDisplay( '' );
 		codemirror.setValue( source );

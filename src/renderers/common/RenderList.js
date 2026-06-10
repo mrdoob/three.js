@@ -1,5 +1,7 @@
 import { DoubleSide } from '../../constants.js';
 
+const _emptyArray = /*@__PURE__*/ Object.freeze( [] );
+
 /**
  * Default sorting function for opaque render items.
  *
@@ -145,13 +147,20 @@ class RenderList {
 		this.bundles = [];
 
 		/**
+		 * The lighting management component.
+		 *
+		 * @type {Lighting}
+		 */
+		this.lighting = lighting;
+
+		/**
 		 * The render list's lights node. This node is later
 		 * relevant for the actual analytical light nodes which
 		 * compute the scene's lighting in the shader.
 		 *
 		 * @type {LightsNode}
 		 */
-		this.lightsNode = lighting.getNode( scene, camera );
+		this.lightsNode = lighting.getNode( scene );
 
 		/**
 		 * The scene's lights stored in an array. This array
@@ -358,12 +367,21 @@ class RenderList {
 	 *
 	 * @param {?function(any, any): number} customOpaqueSort - A custom sort function for opaque objects.
 	 * @param {?function(any, any): number} customTransparentSort -  A custom sort function for transparent objects.
+	 * @param {boolean} reversedDepth - Whether a reversed depth buffer is used or not.
 	 */
-	sort( customOpaqueSort, customTransparentSort ) {
+	sort( customOpaqueSort, customTransparentSort, reversedDepth ) {
 
 		if ( this.opaque.length > 1 ) this.opaque.sort( customOpaqueSort || painterSortStable );
 		if ( this.transparentDoublePass.length > 1 ) this.transparentDoublePass.sort( customTransparentSort || reversePainterSortStable );
 		if ( this.transparent.length > 1 ) this.transparent.sort( customTransparentSort || reversePainterSortStable );
+
+		if ( reversedDepth ) {
+
+			this.opaque.reverse();
+			this.transparentDoublePass.reverse();
+			this.transparent.reverse();
+
+		}
 
 	}
 
@@ -375,7 +393,7 @@ class RenderList {
 
 		// update lights
 
-		this.lightsNode.setLights( this.lightsArray );
+		this.lightsNode.setLights( this.lighting.enabled ? this.lightsArray : _emptyArray );
 
 		// Clear references from inactive renderItems in the list
 

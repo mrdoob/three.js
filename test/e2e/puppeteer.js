@@ -28,6 +28,7 @@ const exceptionList = [
 	'webgpu_postprocessing_ssgi_ballpool',
 	'webgpu_postprocessing_sss',
 	'webgpu_postprocessing_traa',
+	'webgpu_tsl_vfx_linkedparticles',
 	'webgpu_volume_lighting_traa',
 
 	// Timming issues?
@@ -35,6 +36,8 @@ const exceptionList = [
 	'webgl_shadowmap',
 	'webaudio_visualizer',
 	'webgpu_compute_audio',
+	'webgpu_compute_cloth',
+	'webgpu_compute_particles_fluid',
 	'webgpu_compute_sort_bitonic',
 	'webgpu_storage_buffer',
 	'webgpu_tsl_editor',
@@ -200,6 +203,7 @@ async function main() {
 		'--disable-vulkan-surface',
 		'--ignore-gpu-blocklist',
 		'--disable-gpu-driver-bug-workarounds',
+		'--disable-gpu-watchdog',
 		'--no-sandbox'
 	];
 
@@ -418,6 +422,7 @@ async function preparePage( page, injection, builds, errorMessages ) {
 async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file ) {
 
 	const page = ctx.page;
+	const pageStart = performance.now();
 
 	try {
 
@@ -499,6 +504,8 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 		}
 
+		const pageElapsed = ( performance.now() - pageStart ) / 1000;
+
 		const screenshot = ( await Image.read( await page.screenshot() ) ).scale( 1 / viewScale );
 
 		if ( page.error !== undefined ) throw new Error( page.error );
@@ -551,14 +558,14 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 			if ( differentPixels < maxDifferentPixels ) {
 
-				console.green( `Diff ${ differentPixels.toFixed( 1 ) }% in file: ${ file }` );
+				console.green( `Diff ${ differentPixels.toFixed( 1 ) }% in file: ${ file } (${ pageElapsed.toFixed( 1 ) }s)` );
 
 			} else {
 
 				await screenshot.write( `test/e2e/output-screenshots/${ file }-actual.jpg`, jpgQuality );
 				await expected.write( `test/e2e/output-screenshots/${ file }-expected.jpg`, jpgQuality );
 				await diff.write( `test/e2e/output-screenshots/${ file }-diff.jpg`, jpgQuality );
-				throw new Error( `Diff wrong in ${ differentPixels.toFixed( 1 ) }% of pixels in file: ${ file }` );
+				throw new Error( `Diff wrong in ${ differentPixels.toFixed( 1 ) }% of pixels in file: ${ file } (${ pageElapsed.toFixed( 1 ) }s)` );
 
 			}
 

@@ -1,5 +1,4 @@
-import { Color } from '../../../../src/math/Color.js';
-import { ColorManagement } from '../../../../src/math/ColorManagement.js';
+import { Color, ColorManagement } from 'three';
 import * as ColorUtils from '../../../../examples/jsm/utils/ColorUtils.js';
 
 export default QUnit.module( 'Addons', () => {

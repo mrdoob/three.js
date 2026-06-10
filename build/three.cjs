@@ -2677,7 +2677,7 @@ function denormalize( value, array ) {
 
 		default:
 
-			throw new Error( 'Invalid component type.' );
+			throw new Error( 'THREE.MathUtils: Invalid component type.' );
 
 	}
 
@@ -2724,7 +2724,7 @@ function normalize( value, array ) {
 
 		default:
 
-			throw new Error( 'Invalid component type.' );
+			throw new Error( 'THREE.MathUtils: Invalid component type.' );
 
 	}
 
@@ -3150,7 +3150,7 @@ class Vector2 {
 
 			case 0: this.x = value; break;
 			case 1: this.y = value; break;
-			default: throw new Error( 'index is out of range: ' + index );
+			default: throw new Error( 'THREE.Vector2: index is out of range: ' + index );
 
 		}
 
@@ -3170,7 +3170,7 @@ class Vector2 {
 
 			case 0: return this.x;
 			case 1: return this.y;
-			default: throw new Error( 'index is out of range: ' + index );
+			default: throw new Error( 'THREE.Vector2: index is out of range: ' + index );
 
 		}
 
@@ -4925,7 +4925,7 @@ class Vector3 {
 			case 0: this.x = value; break;
 			case 1: this.y = value; break;
 			case 2: this.z = value; break;
-			default: throw new Error( 'index is out of range: ' + index );
+			default: throw new Error( 'THREE.Vector3: index is out of range: ' + index );
 
 		}
 
@@ -4946,7 +4946,7 @@ class Vector3 {
 			case 0: return this.x;
 			case 1: return this.y;
 			case 2: return this.z;
-			default: throw new Error( 'index is out of range: ' + index );
+			default: throw new Error( 'THREE.Vector3: index is out of range: ' + index );
 
 		}
 
@@ -8220,7 +8220,7 @@ class Vector4 {
 			case 1: this.y = value; break;
 			case 2: this.z = value; break;
 			case 3: this.w = value; break;
-			default: throw new Error( 'index is out of range: ' + index );
+			default: throw new Error( 'THREE.Vector4: index is out of range: ' + index );
 
 		}
 
@@ -8243,7 +8243,7 @@ class Vector4 {
 			case 1: return this.y;
 			case 2: return this.z;
 			case 3: return this.w;
-			default: throw new Error( 'index is out of range: ' + index );
+			default: throw new Error( 'THREE.Vector4: index is out of range: ' + index );
 
 		}
 
@@ -9094,7 +9094,8 @@ class RenderTarget extends EventDispatcher {
 	 * @property {number} [samples=0] - The MSAA samples count.
 	 * @property {number} [count=1] - Defines the number of color attachments . Must be at least `1`.
 	 * @property {number} [depth=1] - The texture depth.
-	 * @property {boolean} [multiview=false] - Whether this target is used for multiview rendering.
+	 * @property {boolean} [multiview=false] - Whether this target is used for multiview rendering (WebGL OVR_multiview2 extension).
+	 * @property {boolean} [useArrayDepthTexture=false] - Whether to create the depth texture as an array texture for per-layer depth testing. This is separate from multiview so layered render targets can use array depth without the multiview extension.
 	 */
 
 	/**
@@ -9120,7 +9121,8 @@ class RenderTarget extends EventDispatcher {
 			samples: 0,
 			count: 1,
 			depth: 1,
-			multiview: false
+			multiview: false,
+			useArrayDepthTexture: false
 		}, options );
 
 		/**
@@ -9256,6 +9258,16 @@ class RenderTarget extends EventDispatcher {
 		 * @default false
 		 */
 		this.multiview = options.multiview;
+
+		/**
+		 * Whether to create the depth texture as an array texture for per-layer depth testing.
+		 * This is separate from multiview so layered render targets can use array depth without
+		 * the multiview extension.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.useArrayDepthTexture = options.useArrayDepthTexture;
 
 	}
 
@@ -9428,6 +9440,7 @@ class RenderTarget extends EventDispatcher {
 
 		this.samples = source.samples;
 		this.multiview = source.multiview;
+		this.useArrayDepthTexture = source.useArrayDepthTexture;
 
 		return this;
 
@@ -12876,8 +12889,10 @@ class Object3D extends EventDispatcher {
 	 *
 	 * @param {boolean} [updateParents=false] Whether ancestor nodes should be updated or not.
 	 * @param {boolean} [updateChildren=false] Whether descendant nodes should be updated or not.
+	 * @param {boolean} [force=false] - When set to `true`, a recomputation of world matrices is forced even
+	 * when {@link Object3D#matrixWorldNeedsUpdate} is `false`.
 	 */
-	updateWorldMatrix( updateParents, updateChildren ) {
+	updateWorldMatrix( updateParents, updateChildren, force = false ) {
 
 		const parent = this.parent;
 
@@ -12889,17 +12904,25 @@ class Object3D extends EventDispatcher {
 
 		if ( this.matrixAutoUpdate ) this.updateMatrix();
 
-		if ( this.matrixWorldAutoUpdate === true ) {
+		if ( this.matrixWorldNeedsUpdate || force ) {
 
-			if ( this.parent === null ) {
+			if ( this.matrixWorldAutoUpdate === true ) {
 
-				this.matrixWorld.copy( this.matrix );
+				if ( this.parent === null ) {
 
-			} else {
+					this.matrixWorld.copy( this.matrix );
 
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+				} else {
+
+					this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+
+				}
 
 			}
+
+			this.matrixWorldNeedsUpdate = false;
+
+			force = true;
 
 		}
 
@@ -12913,7 +12936,7 @@ class Object3D extends EventDispatcher {
 
 				const child = children[ i ];
 
-				child.updateWorldMatrix( false, true );
+				child.updateWorldMatrix( false, true, force );
 
 			}
 
@@ -15782,6 +15805,11 @@ class Box3 {
 	 * (including its children), accounting for the object's, and children's,
 	 * world transforms. The function may result in a larger box than strictly necessary.
 	 *
+	 * Note: To compute the correct bounding box, make sure the given 3D object
+	 * has an up-to-date world matrix that reflects the current transformation of its
+	 * ancestor nodes. Call `object.updateWorldMatrix( true, false )` beforehand if
+	 * you're unsure.
+	 *
 	 * @param {Object3D} object - The 3D object to compute the bounding box for.
 	 * @param {boolean} [precise=false] - If set to `true`, the method computes the smallest
 	 * world-axis-aligned bounding box at the expense of more computation.
@@ -18287,6 +18315,19 @@ class BufferGeometry extends EventDispatcher {
 		 */
 		this.userData = {};
 
+		/**
+		 * `true` when the geometry has been transformed since construction
+		 * (e.g. via {@link BufferGeometry#applyMatrix4}). Only relevant for
+		 * geometry generators (subclasses that populate `parameters`): when set,
+		 * {@link BufferGeometry#toJSON} omits `parameters` since they no longer
+		 * describe the geometry.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._transformed = false;
+
 	}
 
 	/**
@@ -18497,6 +18538,8 @@ class BufferGeometry extends EventDispatcher {
 			this.computeBoundingSphere();
 
 		}
+
+		this._transformed = true;
 
 		return this;
 
@@ -18933,13 +18976,14 @@ class BufferGeometry extends EventDispatcher {
 		const normalAttribute = attributes.normal;
 		const uvAttribute = attributes.uv;
 
-		if ( this.hasAttribute( 'tangent' ) === false ) {
+		let tangentAttribute = this.getAttribute( 'tangent' );
 
-			this.setAttribute( 'tangent', new BufferAttribute( new Float32Array( 4 * positionAttribute.count ), 4 ) );
+		if ( tangentAttribute === undefined || tangentAttribute.count !== positionAttribute.count ) {
+
+			tangentAttribute = new BufferAttribute( new Float32Array( 4 * positionAttribute.count ), 4 );
+			this.setAttribute( 'tangent', tangentAttribute );
 
 		}
-
-		const tangentAttribute = this.getAttribute( 'tangent' );
 
 		const tan1 = [], tan2 = [];
 
@@ -19068,6 +19112,8 @@ class BufferGeometry extends EventDispatcher {
 
 		}
 
+		this._transformed = true;
+
 	}
 
 	/**
@@ -19085,7 +19131,7 @@ class BufferGeometry extends EventDispatcher {
 
 			let normalAttribute = this.getAttribute( 'normal' );
 
-			if ( normalAttribute === undefined ) {
+			if ( normalAttribute === undefined || normalAttribute.count !== positionAttribute.count ) {
 
 				normalAttribute = new BufferAttribute( new Float32Array( positionAttribute.count * 3 ), 3 );
 				this.setAttribute( 'normal', normalAttribute );
@@ -19314,11 +19360,11 @@ class BufferGeometry extends EventDispatcher {
 		// standard BufferGeometry serialization
 
 		data.uuid = this.uuid;
-		data.type = this.type;
+		data.type = ( this.parameters !== undefined && this._transformed === true ) ? 'BufferGeometry' : this.type;
 		if ( this.name !== '' ) data.name = this.name;
 		if ( Object.keys( this.userData ).length > 0 ) data.userData = this.userData;
 
-		if ( this.parameters !== undefined ) {
+		if ( this.parameters !== undefined && this._transformed !== true ) {
 
 			const parameters = this.parameters;
 
@@ -19528,6 +19574,10 @@ class BufferGeometry extends EventDispatcher {
 		// user data
 
 		this.userData = source.userData;
+
+		// transformed flag
+
+		this._transformed = source._transformed;
 
 		return this;
 
@@ -20952,7 +21002,11 @@ class Material extends EventDispatcher {
 
 				currentValue.set( newValue );
 
-			} else if ( ( currentValue && currentValue.isVector3 ) && ( newValue && newValue.isVector3 ) ) {
+			} else if (
+				( ( currentValue && currentValue.isVector2 ) && ( newValue && newValue.isVector2 ) ) ||
+				( ( currentValue && currentValue.isEuler ) && ( newValue && newValue.isEuler ) ) ||
+				( ( currentValue && currentValue.isVector3 ) && ( newValue && newValue.isVector3 ) )
+			) {
 
 				currentValue.copy( newValue );
 
@@ -21254,6 +21308,196 @@ class Material extends EventDispatcher {
 	}
 
 	/**
+	 * Deserializes the material from the given JSON.
+	 *
+	 * @param {Object} json - The JSON holding the serialized material.
+	 * @param {Object<string,Texture>} textures - A dictionary holding textures referenced by the material.
+	 * @return {Material} A reference to this material.
+	 */
+	fromJSON( json, textures ) {
+
+		if ( json.uuid !== undefined ) this.uuid = json.uuid;
+		if ( json.name !== undefined ) this.name = json.name;
+		if ( json.color !== undefined && this.color !== undefined ) this.color.setHex( json.color );
+		if ( json.roughness !== undefined ) this.roughness = json.roughness;
+		if ( json.metalness !== undefined ) this.metalness = json.metalness;
+		if ( json.sheen !== undefined ) this.sheen = json.sheen;
+		if ( json.sheenColor !== undefined ) this.sheenColor = new Color().setHex( json.sheenColor );
+		if ( json.sheenRoughness !== undefined ) this.sheenRoughness = json.sheenRoughness;
+		if ( json.emissive !== undefined && this.emissive !== undefined ) this.emissive.setHex( json.emissive );
+		if ( json.specular !== undefined && this.specular !== undefined ) this.specular.setHex( json.specular );
+		if ( json.specularIntensity !== undefined ) this.specularIntensity = json.specularIntensity;
+		if ( json.specularColor !== undefined && this.specularColor !== undefined ) this.specularColor.setHex( json.specularColor );
+		if ( json.shininess !== undefined ) this.shininess = json.shininess;
+		if ( json.clearcoat !== undefined ) this.clearcoat = json.clearcoat;
+		if ( json.clearcoatRoughness !== undefined ) this.clearcoatRoughness = json.clearcoatRoughness;
+		if ( json.dispersion !== undefined ) this.dispersion = json.dispersion;
+		if ( json.iridescence !== undefined ) this.iridescence = json.iridescence;
+		if ( json.iridescenceIOR !== undefined ) this.iridescenceIOR = json.iridescenceIOR;
+		if ( json.iridescenceThicknessRange !== undefined ) this.iridescenceThicknessRange = json.iridescenceThicknessRange;
+		if ( json.transmission !== undefined ) this.transmission = json.transmission;
+		if ( json.thickness !== undefined ) this.thickness = json.thickness;
+		if ( json.attenuationDistance !== undefined ) this.attenuationDistance = json.attenuationDistance;
+		if ( json.attenuationColor !== undefined && this.attenuationColor !== undefined ) this.attenuationColor.setHex( json.attenuationColor );
+		if ( json.anisotropy !== undefined ) this.anisotropy = json.anisotropy;
+		if ( json.anisotropyRotation !== undefined ) this.anisotropyRotation = json.anisotropyRotation;
+		if ( json.fog !== undefined ) this.fog = json.fog;
+		if ( json.flatShading !== undefined ) this.flatShading = json.flatShading;
+		if ( json.blending !== undefined ) this.blending = json.blending;
+		if ( json.combine !== undefined ) this.combine = json.combine;
+		if ( json.side !== undefined ) this.side = json.side;
+		if ( json.shadowSide !== undefined ) this.shadowSide = json.shadowSide;
+		if ( json.opacity !== undefined ) this.opacity = json.opacity;
+		if ( json.transparent !== undefined ) this.transparent = json.transparent;
+		if ( json.alphaTest !== undefined ) this.alphaTest = json.alphaTest;
+		if ( json.alphaHash !== undefined ) this.alphaHash = json.alphaHash;
+		if ( json.depthFunc !== undefined ) this.depthFunc = json.depthFunc;
+		if ( json.depthTest !== undefined ) this.depthTest = json.depthTest;
+		if ( json.depthWrite !== undefined ) this.depthWrite = json.depthWrite;
+		if ( json.colorWrite !== undefined ) this.colorWrite = json.colorWrite;
+		if ( json.blendSrc !== undefined ) this.blendSrc = json.blendSrc;
+		if ( json.blendDst !== undefined ) this.blendDst = json.blendDst;
+		if ( json.blendEquation !== undefined ) this.blendEquation = json.blendEquation;
+		if ( json.blendSrcAlpha !== undefined ) this.blendSrcAlpha = json.blendSrcAlpha;
+		if ( json.blendDstAlpha !== undefined ) this.blendDstAlpha = json.blendDstAlpha;
+		if ( json.blendEquationAlpha !== undefined ) this.blendEquationAlpha = json.blendEquationAlpha;
+		if ( json.blendColor !== undefined && this.blendColor !== undefined ) this.blendColor.setHex( json.blendColor );
+		if ( json.blendAlpha !== undefined ) this.blendAlpha = json.blendAlpha;
+		if ( json.stencilWriteMask !== undefined ) this.stencilWriteMask = json.stencilWriteMask;
+		if ( json.stencilFunc !== undefined ) this.stencilFunc = json.stencilFunc;
+		if ( json.stencilRef !== undefined ) this.stencilRef = json.stencilRef;
+		if ( json.stencilFuncMask !== undefined ) this.stencilFuncMask = json.stencilFuncMask;
+		if ( json.stencilFail !== undefined ) this.stencilFail = json.stencilFail;
+		if ( json.stencilZFail !== undefined ) this.stencilZFail = json.stencilZFail;
+		if ( json.stencilZPass !== undefined ) this.stencilZPass = json.stencilZPass;
+		if ( json.stencilWrite !== undefined ) this.stencilWrite = json.stencilWrite;
+
+		if ( json.wireframe !== undefined ) this.wireframe = json.wireframe;
+		if ( json.wireframeLinewidth !== undefined ) this.wireframeLinewidth = json.wireframeLinewidth;
+		if ( json.wireframeLinecap !== undefined ) this.wireframeLinecap = json.wireframeLinecap;
+		if ( json.wireframeLinejoin !== undefined ) this.wireframeLinejoin = json.wireframeLinejoin;
+
+		if ( json.rotation !== undefined ) this.rotation = json.rotation;
+
+		if ( json.linewidth !== undefined ) this.linewidth = json.linewidth;
+		if ( json.dashSize !== undefined ) this.dashSize = json.dashSize;
+		if ( json.gapSize !== undefined ) this.gapSize = json.gapSize;
+		if ( json.scale !== undefined ) this.scale = json.scale;
+
+		if ( json.polygonOffset !== undefined ) this.polygonOffset = json.polygonOffset;
+		if ( json.polygonOffsetFactor !== undefined ) this.polygonOffsetFactor = json.polygonOffsetFactor;
+		if ( json.polygonOffsetUnits !== undefined ) this.polygonOffsetUnits = json.polygonOffsetUnits;
+
+		if ( json.dithering !== undefined ) this.dithering = json.dithering;
+
+		if ( json.alphaToCoverage !== undefined ) this.alphaToCoverage = json.alphaToCoverage;
+		if ( json.premultipliedAlpha !== undefined ) this.premultipliedAlpha = json.premultipliedAlpha;
+		if ( json.forceSinglePass !== undefined ) this.forceSinglePass = json.forceSinglePass;
+		if ( json.allowOverride !== undefined ) this.allowOverride = json.allowOverride;
+
+		if ( json.visible !== undefined ) this.visible = json.visible;
+
+		if ( json.toneMapped !== undefined ) this.toneMapped = json.toneMapped;
+
+		if ( json.userData !== undefined ) this.userData = json.userData;
+
+		if ( json.vertexColors !== undefined ) {
+
+			if ( typeof json.vertexColors === 'number' ) {
+
+				this.vertexColors = json.vertexColors > 0;
+
+			} else {
+
+				this.vertexColors = json.vertexColors;
+
+			}
+
+		}
+
+		// for PointsMaterial
+
+		if ( json.size !== undefined ) this.size = json.size;
+		if ( json.sizeAttenuation !== undefined ) this.sizeAttenuation = json.sizeAttenuation;
+
+		// maps
+
+		if ( json.map !== undefined ) this.map = textures[ json.map ] || null;
+		if ( json.matcap !== undefined ) this.matcap = textures[ json.matcap ] || null;
+
+		if ( json.alphaMap !== undefined ) this.alphaMap = textures[ json.alphaMap ] || null;
+
+		if ( json.bumpMap !== undefined ) this.bumpMap = textures[ json.bumpMap ] || null;
+		if ( json.bumpScale !== undefined ) this.bumpScale = json.bumpScale;
+
+		if ( json.normalMap !== undefined ) this.normalMap = textures[ json.normalMap ] || null;
+		if ( json.normalMapType !== undefined ) this.normalMapType = json.normalMapType;
+		if ( json.normalScale !== undefined ) {
+
+			let normalScale = json.normalScale;
+
+			if ( Array.isArray( normalScale ) === false ) {
+
+				// Blender exporter used to export a scalar. See #7459
+
+				normalScale = [ normalScale, normalScale ];
+
+			}
+
+			this.normalScale = new Vector2().fromArray( normalScale );
+
+		}
+
+		if ( json.displacementMap !== undefined ) this.displacementMap = textures[ json.displacementMap ] || null;
+		if ( json.displacementScale !== undefined ) this.displacementScale = json.displacementScale;
+		if ( json.displacementBias !== undefined ) this.displacementBias = json.displacementBias;
+
+		if ( json.roughnessMap !== undefined ) this.roughnessMap = textures[ json.roughnessMap ] || null;
+		if ( json.metalnessMap !== undefined ) this.metalnessMap = textures[ json.metalnessMap ] || null;
+
+		if ( json.emissiveMap !== undefined ) this.emissiveMap = textures[ json.emissiveMap ] || null;
+		if ( json.emissiveIntensity !== undefined ) this.emissiveIntensity = json.emissiveIntensity;
+
+		if ( json.specularMap !== undefined ) this.specularMap = textures[ json.specularMap ] || null;
+		if ( json.specularIntensityMap !== undefined ) this.specularIntensityMap = textures[ json.specularIntensityMap ] || null;
+		if ( json.specularColorMap !== undefined ) this.specularColorMap = textures[ json.specularColorMap ] || null;
+
+		if ( json.envMap !== undefined ) this.envMap = textures[ json.envMap ] || null;
+		if ( json.envMapRotation !== undefined ) this.envMapRotation.fromArray( json.envMapRotation );
+		if ( json.envMapIntensity !== undefined ) this.envMapIntensity = json.envMapIntensity;
+
+		if ( json.reflectivity !== undefined ) this.reflectivity = json.reflectivity;
+		if ( json.refractionRatio !== undefined ) this.refractionRatio = json.refractionRatio;
+
+		if ( json.lightMap !== undefined ) this.lightMap = textures[ json.lightMap ] || null;
+		if ( json.lightMapIntensity !== undefined ) this.lightMapIntensity = json.lightMapIntensity;
+
+		if ( json.aoMap !== undefined ) this.aoMap = textures[ json.aoMap ] || null;
+		if ( json.aoMapIntensity !== undefined ) this.aoMapIntensity = json.aoMapIntensity;
+
+		if ( json.gradientMap !== undefined ) this.gradientMap = textures[ json.gradientMap ] || null;
+
+		if ( json.clearcoatMap !== undefined ) this.clearcoatMap = textures[ json.clearcoatMap ] || null;
+		if ( json.clearcoatRoughnessMap !== undefined ) this.clearcoatRoughnessMap = textures[ json.clearcoatRoughnessMap ] || null;
+		if ( json.clearcoatNormalMap !== undefined ) this.clearcoatNormalMap = textures[ json.clearcoatNormalMap ] || null;
+		if ( json.clearcoatNormalScale !== undefined ) this.clearcoatNormalScale = new Vector2().fromArray( json.clearcoatNormalScale );
+
+		if ( json.iridescenceMap !== undefined ) this.iridescenceMap = textures[ json.iridescenceMap ] || null;
+		if ( json.iridescenceThicknessMap !== undefined ) this.iridescenceThicknessMap = textures[ json.iridescenceThicknessMap ] || null;
+
+		if ( json.transmissionMap !== undefined ) this.transmissionMap = textures[ json.transmissionMap ] || null;
+		if ( json.thicknessMap !== undefined ) this.thicknessMap = textures[ json.thicknessMap ] || null;
+
+		if ( json.anisotropyMap !== undefined ) this.anisotropyMap = textures[ json.anisotropyMap ] || null;
+
+		if ( json.sheenColorMap !== undefined ) this.sheenColorMap = textures[ json.sheenColorMap ] || null;
+		if ( json.sheenRoughnessMap !== undefined ) this.sheenRoughnessMap = textures[ json.sheenRoughnessMap ] || null;
+
+		return this;
+
+	}
+
+	/**
 	 * Returns a new material with copied values from this instance.
 	 *
 	 * @return {Material} A clone of this instance.
@@ -21439,6 +21683,10 @@ class SpriteMaterial extends Material {
 		 * with {@link Material#transparent} or {@link Material#alphaTest}. The texture map
 		 * color is modulated by the diffuse `color`.
 		 *
+		 * `map` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `map` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -21453,6 +21701,9 @@ class SpriteMaterial extends Material {
 		 * when sampling this texture due to the extra bit of precision provided for
 		 * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
 		 * luminance/alpha textures will also still work as expected.
+		 *
+		 * `alphaMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -22774,6 +23025,10 @@ class MeshBasicMaterial extends Material {
 		 * with {@link Material#transparent} or {@link Material#alphaTest}. The texture map
 		 * color is modulated by the diffuse `color`.
 		 *
+		 * `map` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `map` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -22781,6 +23036,11 @@ class MeshBasicMaterial extends Material {
 
 		/**
 		 * The light map. Requires a second set of UVs.
+		 *
+		 * `lightMap` represents pre-baked illuminance data, and the texture must be assigned
+		 * a {@link Texture#colorSpace}. Most `lightMap` textures set
+		 * `texture.colorSpace = LinearSRGBColorSpace` and use float-type formats
+		 * such as `.exr` or `.hdr`.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -22798,6 +23058,9 @@ class MeshBasicMaterial extends Material {
 		/**
 		 * The red channel of this texture is used as the ambient occlusion map.
 		 * Requires a second set of UVs.
+		 *
+		 * `aoMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -22817,6 +23080,10 @@ class MeshBasicMaterial extends Material {
 		/**
 		 * Specular map used by the material.
 		 *
+		 * `specularMap` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `specularMap` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -22832,6 +23099,9 @@ class MeshBasicMaterial extends Material {
 		 * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
 		 * luminance/alpha textures will also still work as expected.
 		 *
+		 * `alphaMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -22839,6 +23109,11 @@ class MeshBasicMaterial extends Material {
 
 		/**
 		 * The environment map.
+		 *
+		 * `envMap` represents luminance data, and the texture must be assigned
+		 * a {@link Texture#colorSpace}. Most `envMap` textures set
+		 * `texture.colorSpace = LinearSRGBColorSpace` and use float-type formats
+		 * such as `.exr` or `.hdr`.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -23998,15 +24273,6 @@ class Skeleton {
 		this.boneMatrices = null;
 
 		/**
-		 * An array buffer holding the bone data of the previous frame.
-		 * Required for computing velocity. Maintained in {@link SkinningNode}.
-		 *
-		 * @type {?Float32Array}
-		 * @default null
-		 */
-		this.previousBoneMatrices = null;
-
-		/**
 		 * A texture holding the bone data for use
 		 * in the vertex shader.
 		 *
@@ -24432,15 +24698,6 @@ class InstancedMesh extends Mesh {
 		this.instanceMatrix = new InstancedBufferAttribute( new Float32Array( count * 16 ), 16 );
 
 		/**
-		 * Represents the local transformation of all instances of the previous frame.
-		 * Required for computing velocity. Maintained in {@link InstanceNode}.
-		 *
-		 * @type {?InstancedBufferAttribute}
-		 * @default null
-		 */
-		this.previousInstanceMatrix = null;
-
-		/**
 		 * Represents the color of all instances. You have to set its
 		 * {@link BufferAttribute#needsUpdate} flag to true if you modify instanced data
 		 * via {@link InstancedMesh#setColorAt}.
@@ -24568,8 +24825,6 @@ class InstancedMesh extends Mesh {
 		super.copy( source, recursive );
 
 		this.instanceMatrix.copy( source.instanceMatrix );
-
-		if ( source.previousInstanceMatrix !== null ) this.previousInstanceMatrix = source.previousInstanceMatrix.clone();
 
 		if ( source.morphTexture !== null ) this.morphTexture = source.morphTexture.clone();
 		if ( source.instanceColor !== null ) this.instanceColor = source.instanceColor.clone();
@@ -26953,7 +27208,7 @@ class BatchedMesh extends Mesh {
 		// throw an error if it can't be shrunk to the desired size
 		if ( maxInstanceCount < instanceInfo.length ) {
 
-			throw new Error( `BatchedMesh: Instance ids outside the range ${ maxInstanceCount } are being used. Cannot shrink instance count.` );
+			throw new Error( `THREE.BatchedMesh: Instance ids outside the range ${ maxInstanceCount } are being used. Cannot shrink instance count.` );
 
 		}
 
@@ -27005,7 +27260,7 @@ class BatchedMesh extends Mesh {
 		const requiredVertexLength = Math.max( ...validRanges.map( range => range.vertexStart + range.reservedVertexCount ) );
 		if ( requiredVertexLength > maxVertexCount ) {
 
-			throw new Error( `BatchedMesh: Geometry vertex values are being used outside the range ${ maxIndexCount }. Cannot shrink further.` );
+			throw new Error( `THREE.BatchedMesh: Geometry vertex values are being used outside the range ${ maxIndexCount }. Cannot shrink further.` );
 
 		}
 
@@ -27015,7 +27270,7 @@ class BatchedMesh extends Mesh {
 			const requiredIndexLength = Math.max( ...validRanges.map( range => range.indexStart + range.reservedIndexCount ) );
 			if ( requiredIndexLength > maxIndexCount ) {
 
-				throw new Error( `BatchedMesh: Geometry index values are being used outside the range ${ maxIndexCount }. Cannot shrink further.` );
+				throw new Error( `THREE.BatchedMesh: Geometry index values are being used outside the range ${ maxIndexCount }. Cannot shrink further.` );
 
 			}
 
@@ -27403,6 +27658,10 @@ class LineBasicMaterial extends Material {
 		/**
 		 * Sets the color of the lines using data from a texture. The texture map
 		 * color is modulated by the diffuse `color`.
+		 *
+		 * `map` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `map` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -27957,6 +28216,10 @@ class PointsMaterial extends Material {
 		 * with {@link Material#transparent} or {@link Material#alphaTest}. The texture map
 		 * color is modulated by the diffuse `color`.
 		 *
+		 * `map` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `map` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -27971,6 +28234,9 @@ class PointsMaterial extends Material {
 		 * when sampling this texture due to the extra bit of precision provided for
 		 * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
 		 * luminance/alpha textures will also still work as expected.
+		 *
+		 * `alphaMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -28949,7 +29215,7 @@ class DepthTexture extends Texture {
 
 		if ( format !== DepthFormat && format !== DepthStencilFormat ) {
 
-			throw new Error( 'DepthTexture format must be either THREE.DepthFormat or THREE.DepthStencilFormat' );
+			throw new Error( 'THREE.DepthTexture: format must be either THREE.DepthFormat or THREE.DepthStencilFormat' );
 
 		}
 
@@ -36223,6 +36489,10 @@ class SphereGeometry extends BufferGeometry {
 			const verticesRow = [];
 
 			const v = iy / heightSegments;
+			const theta = thetaStart + v * thetaLength;
+
+			const y = radius * Math.cos( theta );
+			const ringRadius = Math.sqrt( radius * radius - y * y );
 
 			// special case for the poles
 
@@ -36241,12 +36511,13 @@ class SphereGeometry extends BufferGeometry {
 			for ( let ix = 0; ix <= widthSegments; ix ++ ) {
 
 				const u = ix / widthSegments;
+				const phi = phiStart + u * phiLength;
 
 				// vertex
 
-				vertex.x = - radius * Math.cos( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
-				vertex.y = radius * Math.cos( thetaStart + v * thetaLength );
-				vertex.z = radius * Math.sin( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
+				vertex.x = - ringRadius * Math.cos( phi );
+				vertex.y = y;
+				vertex.z = ringRadius * Math.sin( phi );
 
 				vertices.push( vertex.x, vertex.y, vertex.z );
 
@@ -37817,6 +38088,86 @@ class ShaderMaterial extends Material {
 
 	}
 
+	/**
+	 * Deserializes the material from the given JSON.
+	 *
+	 * @param {Object} json - The JSON holding the serialized material.
+	 * @param {Object<string,Texture>} textures - A dictionary holding textures referenced by the material.
+	 * @return {ShaderMaterial} A reference to this material.
+	 */
+	fromJSON( json, textures ) {
+
+		super.fromJSON( json, textures );
+
+		if ( json.uniforms !== undefined ) {
+
+			for ( const name in json.uniforms ) {
+
+				const uniform = json.uniforms[ name ];
+
+				this.uniforms[ name ] = {};
+
+				switch ( uniform.type ) {
+
+					case 't':
+						this.uniforms[ name ].value = textures[ uniform.value ] || null;
+						break;
+
+					case 'c':
+						this.uniforms[ name ].value = new Color().setHex( uniform.value );
+						break;
+
+					case 'v2':
+						this.uniforms[ name ].value = new Vector2().fromArray( uniform.value );
+						break;
+
+					case 'v3':
+						this.uniforms[ name ].value = new Vector3().fromArray( uniform.value );
+						break;
+
+					case 'v4':
+						this.uniforms[ name ].value = new Vector4().fromArray( uniform.value );
+						break;
+
+					case 'm3':
+						this.uniforms[ name ].value = new Matrix3().fromArray( uniform.value );
+						break;
+
+					case 'm4':
+						this.uniforms[ name ].value = new Matrix4().fromArray( uniform.value );
+						break;
+
+					default:
+						this.uniforms[ name ].value = uniform.value;
+
+				}
+
+			}
+
+		}
+
+		if ( json.defines !== undefined ) this.defines = json.defines;
+		if ( json.vertexShader !== undefined ) this.vertexShader = json.vertexShader;
+		if ( json.fragmentShader !== undefined ) this.fragmentShader = json.fragmentShader;
+		if ( json.glslVersion !== undefined ) this.glslVersion = json.glslVersion;
+
+		if ( json.extensions !== undefined ) {
+
+			for ( const key in json.extensions ) {
+
+				this.extensions[ key ] = json.extensions[ key ];
+
+			}
+
+		}
+
+		if ( json.lights !== undefined ) this.lights = json.lights;
+		if ( json.clipping !== undefined ) this.clipping = json.clipping;
+
+		return this;
+
+	}
+
 }
 
 /**
@@ -37954,6 +38305,10 @@ class MeshStandardMaterial extends Material {
 		 * with {@link Material#transparent} or {@link Material#alphaTest}. The texture map
 		 * color is modulated by the diffuse `color`.
 		 *
+		 * `map` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `map` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -37961,6 +38316,11 @@ class MeshStandardMaterial extends Material {
 
 		/**
 		 * The light map. Requires a second set of UVs.
+		 *
+		 * `lightMap` represents pre-baked illuminance data, and the texture must be assigned
+		 * a {@link Texture#colorSpace}. Most `lightMap` textures set
+		 * `texture.colorSpace = LinearSRGBColorSpace` and use float-type formats
+		 * such as `.exr` or `.hdr`.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -37978,6 +38338,9 @@ class MeshStandardMaterial extends Material {
 		/**
 		 * The red channel of this texture is used as the ambient occlusion map.
 		 * Requires a second set of UVs.
+		 *
+		 * `aoMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -38016,6 +38379,10 @@ class MeshStandardMaterial extends Material {
 		 * emissive color and the emissive intensity. If you have an emissive map,
 		 * be sure to set the emissive color to something other than black.
 		 *
+		 * `emissiveMap` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `emissiveMap` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -38026,6 +38393,9 @@ class MeshStandardMaterial extends Material {
 		 * perceived depth in relation to the lights. Bump doesn't actually affect
 		 * the geometry of the object, only the lighting. If a normal map is defined
 		 * this will be ignored.
+		 *
+		 * `bumpMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -38047,6 +38417,9 @@ class MeshStandardMaterial extends Material {
 		 * case the material has a normal map authored using the left handed
 		 * convention, the `y` component of `normalScale` should be negated to compensate
 		 * for the different handedness.
+		 *
+		 * `normalMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -38075,7 +38448,12 @@ class MeshStandardMaterial extends Material {
 		 * displaced vertices can cast shadows, block other objects, and otherwise
 		 * act as real geometry. The displacement texture is an image where the value
 		 * of each pixel (white being the highest) is mapped against, and
-		 * repositions, the vertices of the mesh.
+		 * repositions, the vertices of the mesh. For best results, pair a
+		 * displacement map with a matching normal map, since the renderer can
+		 * not recompute surface normals from the displaced vertices.
+		 *
+		 * `displacementMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -38106,6 +38484,9 @@ class MeshStandardMaterial extends Material {
 		 * The green channel of this texture is used to alter the roughness of the
 		 * material.
 		 *
+		 * `roughnessMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -38114,6 +38495,9 @@ class MeshStandardMaterial extends Material {
 		/**
 		 * The blue channel of this texture is used to alter the metalness of the
 		 * material.
+		 *
+		 * `metalnessMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -38130,6 +38514,9 @@ class MeshStandardMaterial extends Material {
 		 * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
 		 * luminance/alpha textures will also still work as expected.
 		 *
+		 * `alphaMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -38138,6 +38525,11 @@ class MeshStandardMaterial extends Material {
 		/**
 		 * The environment map. To ensure a physically correct rendering, environment maps
 		 * are internally pre-processed with {@link PMREMGenerator}.
+		 *
+		 * `envMap` represents luminance data, and the texture must be assigned
+		 * a {@link Texture#colorSpace}. Most `envMap` textures set
+		 * `texture.colorSpace = LinearSRGBColorSpace` and use float-type formats
+		 * such as `.exr` or `.hdr`.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -38350,6 +38742,9 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		 * bitangent space, to be rotated by `anisotropyRotation`. The blue channel
 		 * contains strength as `[0, 1]` to be multiplied by `anisotropy`.
 		 *
+		 * `anisotropyMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -38358,6 +38753,9 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		/**
 		 * The red channel of this texture is multiplied against `clearcoat`,
 		 * for per-pixel control over a coating's intensity.
+		 *
+		 * `clearcoatMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -38376,6 +38774,9 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		 * The green channel of this texture is multiplied against
 		 * `clearcoatRoughness`, for per-pixel control over a coating's roughness.
 		 *
+		 * `clearcoatRoughnessMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -38392,6 +38793,9 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		/**
 		 * Can be used to enable independent normals for the clear coat layer.
+		 *
+		 * `clearcoatNormalMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -38434,6 +38838,9 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		 * The red channel of this texture is multiplied against `iridescence`, for per-pixel
 		 * control over iridescence.
 		 *
+		 * `iridescenceMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -38464,6 +38871,9 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		 * - `1.0` in the green channel will result in thickness equal to second element of the array.
 		 * - Values in-between will linearly interpolate between the elements of the array.
 		 *
+		 * `iridescenceThicknessMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -38480,6 +38890,10 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		/**
 		 * The RGB channels of this texture are multiplied against  `sheenColor`, for per-pixel control
 		 * over sheen tint.
+		 *
+		 * `sheenColorMap` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `sheenColorMap` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -38498,6 +38912,9 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		 * The alpha channel of this texture is multiplied against `sheenRoughness`, for per-pixel control
 		 * over sheen roughness.
 		 *
+		 * `sheenRoughnessMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -38506,6 +38923,9 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		/**
 		 * The red channel of this texture is multiplied against `transmission`, for per-pixel control over
 		 * optical transparency.
+		 *
+		 * `transmissionMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -38525,6 +38945,9 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		/**
 		 * A texture that defines the thickness, stored in the green channel. This will
 		 * be multiplied by `thickness`.
+		 *
+		 * `thicknessMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -38563,6 +38986,9 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		 * The alpha channel of this texture is multiplied against `specularIntensity`,
 		 * for per-pixel control over specular intensity.
 		 *
+		 * `specularIntensityMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -38579,6 +39005,10 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		/**
 		 * The RGB channels of this texture are multiplied against `specularColor`,
 		 * for per-pixel control over specular color.
+		 *
+		 * `specularColorMap` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `specularColorMap` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -38877,6 +39307,10 @@ class MeshPhongMaterial extends Material {
 		 * with {@link Material#transparent} or {@link Material#alphaTest}. The texture map
 		 * color is modulated by the diffuse `color`.
 		 *
+		 * `map` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `map` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -38884,6 +39318,11 @@ class MeshPhongMaterial extends Material {
 
 		/**
 		 * The light map. Requires a second set of UVs.
+		 *
+		 * `lightMap` represents pre-baked illuminance data, and the texture must be assigned
+		 * a {@link Texture#colorSpace}. Most `lightMap` textures set
+		 * `texture.colorSpace = LinearSRGBColorSpace` and use float-type formats
+		 * such as `.exr` or `.hdr`.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -38901,6 +39340,9 @@ class MeshPhongMaterial extends Material {
 		/**
 		 * The red channel of this texture is used as the ambient occlusion map.
 		 * Requires a second set of UVs.
+		 *
+		 * `aoMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -38939,6 +39381,10 @@ class MeshPhongMaterial extends Material {
 		 * emissive color and the emissive intensity. If you have an emissive map,
 		 * be sure to set the emissive color to something other than black.
 		 *
+		 * `emissiveMap` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `emissiveMap` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -38949,6 +39395,9 @@ class MeshPhongMaterial extends Material {
 		 * perceived depth in relation to the lights. Bump doesn't actually affect
 		 * the geometry of the object, only the lighting. If a normal map is defined
 		 * this will be ignored.
+		 *
+		 * `bumpMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -38970,6 +39419,9 @@ class MeshPhongMaterial extends Material {
 		 * case the material has a normal map authored using the left handed
 		 * convention, the `y` component of `normalScale` should be negated to compensate
 		 * for the different handedness.
+		 *
+		 * `normalMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -38998,7 +39450,12 @@ class MeshPhongMaterial extends Material {
 		 * displaced vertices can cast shadows, block other objects, and otherwise
 		 * act as real geometry. The displacement texture is an image where the value
 		 * of each pixel (white being the highest) is mapped against, and
-		 * repositions, the vertices of the mesh.
+		 * repositions, the vertices of the mesh. For best results, pair a
+		 * displacement map with a matching normal map, since the renderer can
+		 * not recompute surface normals from the displaced vertices.
+		 *
+		 * `displacementMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -39030,6 +39487,10 @@ class MeshPhongMaterial extends Material {
 		 * highlight contributes and how much of the environment map affects the
 		 * surface.
 		 *
+		 * `specularMap` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `specularMap` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -39045,6 +39506,9 @@ class MeshPhongMaterial extends Material {
 		 * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
 		 * luminance/alpha textures will also still work as expected.
 		 *
+		 * `alphaMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -39052,6 +39516,11 @@ class MeshPhongMaterial extends Material {
 
 		/**
 		 * The environment map.
+		 *
+		 * `envMap` represents luminance data, and the texture must be assigned
+		 * a {@link Texture#colorSpace}. Most `envMap` textures set
+		 * `texture.colorSpace = LinearSRGBColorSpace` and use float-type formats
+		 * such as `.exr` or `.hdr`.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -39267,6 +39736,10 @@ class MeshToonMaterial extends Material {
 		 * with {@link Material#transparent} or {@link Material#alphaTest}. The texture map
 		 * color is modulated by the diffuse `color`.
 		 *
+		 * `map` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `map` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -39277,6 +39750,9 @@ class MeshToonMaterial extends Material {
 		 * {@link Texture#minFilter} and {@link Texture#magFilter} to {@link NearestFilter}
 		 * when using this type of texture.
 		 *
+		 * `gradientMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -39284,6 +39760,11 @@ class MeshToonMaterial extends Material {
 
 		/**
 		 * The light map. Requires a second set of UVs.
+		 *
+		 * `lightMap` represents pre-baked illuminance data, and the texture must be assigned
+		 * a {@link Texture#colorSpace}. Most `lightMap` textures set
+		 * `texture.colorSpace = LinearSRGBColorSpace` and use float-type formats
+		 * such as `.exr` or `.hdr`.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -39301,6 +39782,9 @@ class MeshToonMaterial extends Material {
 		/**
 		 * The red channel of this texture is used as the ambient occlusion map.
 		 * Requires a second set of UVs.
+		 *
+		 * `aoMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -39339,6 +39823,10 @@ class MeshToonMaterial extends Material {
 		 * emissive color and the emissive intensity. If you have an emissive map,
 		 * be sure to set the emissive color to something other than black.
 		 *
+		 * `emissiveMap` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `emissiveMap` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -39349,6 +39837,9 @@ class MeshToonMaterial extends Material {
 		 * perceived depth in relation to the lights. Bump doesn't actually affect
 		 * the geometry of the object, only the lighting. If a normal map is defined
 		 * this will be ignored.
+		 *
+		 * `bumpMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -39370,6 +39861,9 @@ class MeshToonMaterial extends Material {
 		 * case the material has a normal map authored using the left handed
 		 * convention, the `y` component of `normalScale` should be negated to compensate
 		 * for the different handedness.
+		 *
+		 * `normalMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -39398,7 +39892,12 @@ class MeshToonMaterial extends Material {
 		 * displaced vertices can cast shadows, block other objects, and otherwise
 		 * act as real geometry. The displacement texture is an image where the value
 		 * of each pixel (white being the highest) is mapped against, and
-		 * repositions, the vertices of the mesh.
+		 * repositions, the vertices of the mesh. For best results, pair a
+		 * displacement map with a matching normal map, since the renderer can
+		 * not recompute surface normals from the displaced vertices.
+		 *
+		 * `displacementMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -39434,6 +39933,9 @@ class MeshToonMaterial extends Material {
 		 * when sampling this texture due to the extra bit of precision provided for
 		 * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
 		 * luminance/alpha textures will also still work as expected.
+		 *
+		 * `alphaMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -39573,6 +40075,9 @@ class MeshNormalMaterial extends Material {
 		 * the geometry of the object, only the lighting. If a normal map is defined
 		 * this will be ignored.
 		 *
+		 * `bumpMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -39593,6 +40098,9 @@ class MeshNormalMaterial extends Material {
 		 * case the material has a normal map authored using the left handed
 		 * convention, the `y` component of `normalScale` should be negated to compensate
 		 * for the different handedness.
+		 *
+		 * `normalMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -39621,7 +40129,9 @@ class MeshNormalMaterial extends Material {
 		 * displaced vertices can cast shadows, block other objects, and otherwise
 		 * act as real geometry. The displacement texture is an image where the value
 		 * of each pixel (white being the highest) is mapped against, and
-		 * repositions, the vertices of the mesh.
+		 * repositions, the vertices of the mesh. For best results, pair a
+		 * displacement map with a matching normal map, since the renderer can
+		 * not recompute surface normals from the displaced vertices.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -39761,6 +40271,10 @@ class MeshLambertMaterial extends Material {
 		 * with {@link Material#transparent} or {@link Material#alphaTest}. The texture map
 		 * color is modulated by the diffuse `color`.
 		 *
+		 * `map` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `map` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -39768,6 +40282,11 @@ class MeshLambertMaterial extends Material {
 
 		/**
 		 * The light map. Requires a second set of UVs.
+		 *
+		 * `lightMap` represents pre-baked illuminance data, and the texture must be assigned
+		 * a {@link Texture#colorSpace}. Most `lightMap` textures set
+		 * `texture.colorSpace = LinearSRGBColorSpace` and use float-type formats
+		 * such as `.exr` or `.hdr`.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -39785,6 +40304,9 @@ class MeshLambertMaterial extends Material {
 		/**
 		 * The red channel of this texture is used as the ambient occlusion map.
 		 * Requires a second set of UVs.
+		 *
+		 * `aoMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -39823,6 +40345,10 @@ class MeshLambertMaterial extends Material {
 		 * emissive color and the emissive intensity. If you have an emissive map,
 		 * be sure to set the emissive color to something other than black.
 		 *
+		 * `emissiveMap` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `emissiveMap` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -39833,6 +40359,9 @@ class MeshLambertMaterial extends Material {
 		 * perceived depth in relation to the lights. Bump doesn't actually affect
 		 * the geometry of the object, only the lighting. If a normal map is defined
 		 * this will be ignored.
+		 *
+		 * `bumpMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -39854,6 +40383,9 @@ class MeshLambertMaterial extends Material {
 		 * case the material has a normal map authored using the left handed
 		 * convention, the `y` component of `normalScale` should be negated to compensate
 		 * for the different handedness.
+		 *
+		 * `normalMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -39882,7 +40414,12 @@ class MeshLambertMaterial extends Material {
 		 * displaced vertices can cast shadows, block other objects, and otherwise
 		 * act as real geometry. The displacement texture is an image where the value
 		 * of each pixel (white being the highest) is mapped against, and
-		 * repositions, the vertices of the mesh.
+		 * repositions, the vertices of the mesh. For best results, pair a
+		 * displacement map with a matching normal map, since the renderer can
+		 * not recompute surface normals from the displaced vertices.
+		 *
+		 * `displacementMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -39912,6 +40449,10 @@ class MeshLambertMaterial extends Material {
 		/**
 		 * Specular map used by the material.
 		 *
+		 * `specularMap` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `specularMap` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -39927,6 +40468,9 @@ class MeshLambertMaterial extends Material {
 		 * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
 		 * luminance/alpha textures will also still work as expected.
 		 *
+		 * `alphaMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -39934,6 +40478,11 @@ class MeshLambertMaterial extends Material {
 
 		/**
 		 * The environment map.
+		 *
+		 * `envMap` represents luminance data, and the texture must be assigned
+		 * a {@link Texture#colorSpace}. Most `envMap` textures set
+		 * `texture.colorSpace = LinearSRGBColorSpace` and use float-type formats
+		 * such as `.exr` or `.hdr`.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -40145,6 +40694,10 @@ class MeshDepthMaterial extends Material {
 		 * The color map. May optionally include an alpha channel, typically combined
 		 * with {@link Material#transparent} or {@link Material#alphaTest}.
 		 *
+		 * `map` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `map` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -40160,6 +40713,9 @@ class MeshDepthMaterial extends Material {
 		 * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
 		 * luminance/alpha textures will also still work as expected.
 		 *
+		 * `alphaMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -40172,6 +40728,9 @@ class MeshDepthMaterial extends Material {
 		 * act as real geometry. The displacement texture is an image where the value
 		 * of each pixel (white being the highest) is mapped against, and
 		 * repositions, the vertices of the mesh.
+		 *
+		 * `displacementMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -40285,6 +40844,10 @@ class MeshDistanceMaterial extends Material {
 		 * The color map. May optionally include an alpha channel, typically combined
 		 * with {@link Material#transparent} or {@link Material#alphaTest}.
 		 *
+		 * `map` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `map` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -40300,6 +40863,9 @@ class MeshDistanceMaterial extends Material {
 		 * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
 		 * luminance/alpha textures will also still work as expected.
 		 *
+		 * `alphaMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -40312,6 +40878,9 @@ class MeshDistanceMaterial extends Material {
 		 * act as real geometry. The displacement texture is an image where the value
 		 * of each pixel (white being the highest) is mapped against, and
 		 * repositions, the vertices of the mesh.
+		 *
+		 * `displacementMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -40411,6 +40980,12 @@ class MeshMatcapMaterial extends Material {
 		/**
 		 * The matcap map.
 		 *
+		 * `matcap` represents luminance data, and the texture must be assigned
+		 * a {@link Texture#colorSpace}. HDR `matcap` textures (e.g. `.exr`)
+		 * typically set `texture.colorSpace = LinearSRGBColorSpace`, while LDR
+		 * `matcap` textures (e.g. `.png`, `.jpg`, `.webp`) typically set
+		 * `texture.colorSpace = SRGBColorSpace`.
+		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
@@ -40420,6 +40995,10 @@ class MeshMatcapMaterial extends Material {
 		 * The color map. May optionally include an alpha channel, typically combined
 		 * with {@link Material#transparent} or {@link Material#alphaTest}. The texture map
 		 * color is modulated by the diffuse `color`.
+		 *
+		 * `map` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `map` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -40431,6 +41010,9 @@ class MeshMatcapMaterial extends Material {
 		 * perceived depth in relation to the lights. Bump doesn't actually affect
 		 * the geometry of the object, only the lighting. If a normal map is defined
 		 * this will be ignored.
+		 *
+		 * `bumpMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -40452,6 +41034,9 @@ class MeshMatcapMaterial extends Material {
 		 * case the material has a normal map authored using the left handed
 		 * convention, the `y` component of `normalScale` should be negated to compensate
 		 * for the different handedness.
+		 *
+		 * `normalMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -40480,7 +41065,12 @@ class MeshMatcapMaterial extends Material {
 		 * displaced vertices can cast shadows, block other objects, and otherwise
 		 * act as real geometry. The displacement texture is an image where the value
 		 * of each pixel (white being the highest) is mapped against, and
-		 * repositions, the vertices of the mesh.
+		 * repositions, the vertices of the mesh. For best results, pair a
+		 * displacement map with a matching normal map, since the renderer can
+		 * not recompute surface normals from the displaced vertices.
+		 *
+		 * `displacementMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -40516,6 +41106,9 @@ class MeshMatcapMaterial extends Material {
 		 * when sampling this texture due to the extra bit of precision provided for
 		 * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
 		 * luminance/alpha textures will also still work as expected.
+		 *
+		 * `alphaMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -41462,7 +42055,7 @@ class Interpolant {
 	 */
 	interpolate_( /* i1, t0, t, t1 */ ) {
 
-		throw new Error( 'call to abstract method' );
+		throw new Error( 'THREE.Interpolant: Call to abstract method.' );
 		// implementations shall return this.resultBuffer
 
 	}
@@ -41721,9 +42314,8 @@ class DiscreteInterpolant extends Interpolant {
  * each keyframe has explicit in/out tangent control points specified as
  * 2D coordinates (time, value).
  *
- * The tangent data must be provided via the `settings` object:
- * - `settings.inTangents`: Float32Array with [time, value] pairs per keyframe per component
- * - `settings.outTangents`: Float32Array with [time, value] pairs per keyframe per component
+ * Tangent data is read from `inTangents` and `outTangents` on the interpolant
+ * (populated by `KeyframeTrack.InterpolantFactoryMethodBezier`).
  *
  * For a track with N keyframes and stride S:
  * - Each tangent array has N * S * 2 values
@@ -41743,9 +42335,8 @@ class BezierInterpolant extends Interpolant {
 		const offset1 = i1 * stride;
 		const offset0 = offset1 - stride;
 
-		const settings = this.settings || this.DefaultSettings_;
-		const inTangents = settings.inTangents;
-		const outTangents = settings.outTangents;
+		const inTangents = this.inTangents;
+		const outTangents = this.outTangents;
 
 		// If no tangent data, fall back to linear interpolation
 		if ( ! inTangents || ! outTangents ) {
@@ -41966,10 +42557,10 @@ class KeyframeTrack {
 
 		const interpolant = new BezierInterpolant( this.times, this.values, this.getValueSize(), result );
 
-		// Pass tangent data from track settings to interpolant
 		if ( this.settings ) {
 
-			interpolant.settings = this.settings;
+			interpolant.inTangents = this.settings.inTangents;
+			interpolant.outTangents = this.settings.outTangents;
 
 		}
 
@@ -44797,70 +45388,7 @@ class DataTextureLoader extends Loader {
 
 			}
 
-			if ( texData.image !== undefined ) {
-
-				texture.image = texData.image;
-
-			} else if ( texData.data !== undefined ) {
-
-				texture.image.width = texData.width;
-				texture.image.height = texData.height;
-				texture.image.data = texData.data;
-
-			}
-
-			texture.wrapS = texData.wrapS !== undefined ? texData.wrapS : ClampToEdgeWrapping;
-			texture.wrapT = texData.wrapT !== undefined ? texData.wrapT : ClampToEdgeWrapping;
-
-			texture.magFilter = texData.magFilter !== undefined ? texData.magFilter : LinearFilter;
-			texture.minFilter = texData.minFilter !== undefined ? texData.minFilter : LinearFilter;
-
-			texture.anisotropy = texData.anisotropy !== undefined ? texData.anisotropy : 1;
-
-			if ( texData.colorSpace !== undefined ) {
-
-				texture.colorSpace = texData.colorSpace;
-
-			}
-
-			if ( texData.flipY !== undefined ) {
-
-				texture.flipY = texData.flipY;
-
-			}
-
-			if ( texData.format !== undefined ) {
-
-				texture.format = texData.format;
-
-			}
-
-			if ( texData.type !== undefined ) {
-
-				texture.type = texData.type;
-
-			}
-
-			if ( texData.mipmaps !== undefined ) {
-
-				texture.mipmaps = texData.mipmaps;
-				texture.minFilter = LinearMipmapLinearFilter; // presumably...
-
-			}
-
-			if ( texData.mipmapCount === 1 ) {
-
-				texture.minFilter = LinearFilter;
-
-			}
-
-			if ( texData.generateMipmaps !== undefined ) {
-
-				texture.generateMipmaps = texData.generateMipmaps;
-
-			}
-
-			texture.needsUpdate = true;
+			scope._applyTexData( texture, texData );
 
 			if ( onLoad ) onLoad( texture, texData );
 
@@ -44868,6 +45396,100 @@ class DataTextureLoader extends Loader {
 
 
 		return texture;
+
+	}
+
+	/**
+	 * Parses the given buffer and returns a configured data texture. Use this method
+	 * for parsing texture data that is already in memory (e.g. drag and drop or data
+	 * loaded from a server) without going through {@link DataTextureLoader#load}.
+	 *
+	 * @param {ArrayBuffer} buffer - The raw texture data.
+	 * @return {DataTexture} The data texture.
+	 */
+	createDataTexture( buffer ) {
+
+		const texture = new DataTexture();
+
+		this._applyTexData( texture, this.parse( buffer ) );
+
+		return texture;
+
+	}
+
+	/**
+	 * Applies the given parsed texture data to the given data texture.
+	 *
+	 * @private
+	 * @param {DataTexture} texture - The data texture.
+	 * @param {DataTextureLoader~TexData} texData - The parsed texture data.
+	 */
+	_applyTexData( texture, texData ) {
+
+		if ( texData.image !== undefined ) {
+
+			texture.image = texData.image;
+
+		} else if ( texData.data !== undefined ) {
+
+			texture.image.width = texData.width;
+			texture.image.height = texData.height;
+			texture.image.data = texData.data;
+
+		}
+
+		texture.wrapS = texData.wrapS !== undefined ? texData.wrapS : ClampToEdgeWrapping;
+		texture.wrapT = texData.wrapT !== undefined ? texData.wrapT : ClampToEdgeWrapping;
+
+		texture.magFilter = texData.magFilter !== undefined ? texData.magFilter : LinearFilter;
+		texture.minFilter = texData.minFilter !== undefined ? texData.minFilter : LinearFilter;
+
+		texture.anisotropy = texData.anisotropy !== undefined ? texData.anisotropy : 1;
+
+		if ( texData.colorSpace !== undefined ) {
+
+			texture.colorSpace = texData.colorSpace;
+
+		}
+
+		if ( texData.flipY !== undefined ) {
+
+			texture.flipY = texData.flipY;
+
+		}
+
+		if ( texData.format !== undefined ) {
+
+			texture.format = texData.format;
+
+		}
+
+		if ( texData.type !== undefined ) {
+
+			texture.type = texData.type;
+
+		}
+
+		if ( texData.mipmaps !== undefined ) {
+
+			texture.mipmaps = texData.mipmaps;
+			texture.minFilter = LinearMipmapLinearFilter; // presumably...
+
+		}
+
+		if ( texData.mipmapCount === 1 ) {
+
+			texture.minFilter = LinearFilter;
+
+		}
+
+		if ( texData.generateMipmaps !== undefined ) {
+
+			texture.generateMipmaps = texData.generateMipmaps;
+
+		}
+
+		texture.needsUpdate = true;
 
 	}
 
@@ -45557,9 +46179,9 @@ class Camera extends Object3D {
 
 	}
 
-	updateWorldMatrix( updateParents, updateChildren ) {
+	updateWorldMatrix( updateParents, updateChildren, force = false ) {
 
-		super.updateWorldMatrix( updateParents, updateChildren );
+		super.updateWorldMatrix( updateParents, updateChildren, force );
 
 		// exclude scale from view matrix to be glTF conform
 
@@ -47341,6 +47963,8 @@ class LightProbe extends Light {
 
 }
 
+const _customMaterials = {};
+
 /**
  * Class for loading materials. The files are internally
  * loaded via {@link FileLoader}.
@@ -47423,265 +48047,9 @@ class MaterialLoader extends Loader {
 	 */
 	parse( json ) {
 
-		const textures = this.textures;
-
-		function getTexture( name ) {
-
-			if ( textures[ name ] === undefined ) {
-
-				warn( 'MaterialLoader: Undefined texture', name );
-
-			}
-
-			return textures[ name ];
-
-		}
-
 		const material = this.createMaterialFromType( json.type );
 
-		if ( json.uuid !== undefined ) material.uuid = json.uuid;
-		if ( json.name !== undefined ) material.name = json.name;
-		if ( json.color !== undefined && material.color !== undefined ) material.color.setHex( json.color );
-		if ( json.roughness !== undefined ) material.roughness = json.roughness;
-		if ( json.metalness !== undefined ) material.metalness = json.metalness;
-		if ( json.sheen !== undefined ) material.sheen = json.sheen;
-		if ( json.sheenColor !== undefined ) material.sheenColor = new Color().setHex( json.sheenColor );
-		if ( json.sheenRoughness !== undefined ) material.sheenRoughness = json.sheenRoughness;
-		if ( json.emissive !== undefined && material.emissive !== undefined ) material.emissive.setHex( json.emissive );
-		if ( json.specular !== undefined && material.specular !== undefined ) material.specular.setHex( json.specular );
-		if ( json.specularIntensity !== undefined ) material.specularIntensity = json.specularIntensity;
-		if ( json.specularColor !== undefined && material.specularColor !== undefined ) material.specularColor.setHex( json.specularColor );
-		if ( json.shininess !== undefined ) material.shininess = json.shininess;
-		if ( json.clearcoat !== undefined ) material.clearcoat = json.clearcoat;
-		if ( json.clearcoatRoughness !== undefined ) material.clearcoatRoughness = json.clearcoatRoughness;
-		if ( json.dispersion !== undefined ) material.dispersion = json.dispersion;
-		if ( json.iridescence !== undefined ) material.iridescence = json.iridescence;
-		if ( json.iridescenceIOR !== undefined ) material.iridescenceIOR = json.iridescenceIOR;
-		if ( json.iridescenceThicknessRange !== undefined ) material.iridescenceThicknessRange = json.iridescenceThicknessRange;
-		if ( json.transmission !== undefined ) material.transmission = json.transmission;
-		if ( json.thickness !== undefined ) material.thickness = json.thickness;
-		if ( json.attenuationDistance !== undefined ) material.attenuationDistance = json.attenuationDistance;
-		if ( json.attenuationColor !== undefined && material.attenuationColor !== undefined ) material.attenuationColor.setHex( json.attenuationColor );
-		if ( json.anisotropy !== undefined ) material.anisotropy = json.anisotropy;
-		if ( json.anisotropyRotation !== undefined ) material.anisotropyRotation = json.anisotropyRotation;
-		if ( json.fog !== undefined ) material.fog = json.fog;
-		if ( json.flatShading !== undefined ) material.flatShading = json.flatShading;
-		if ( json.blending !== undefined ) material.blending = json.blending;
-		if ( json.combine !== undefined ) material.combine = json.combine;
-		if ( json.side !== undefined ) material.side = json.side;
-		if ( json.shadowSide !== undefined ) material.shadowSide = json.shadowSide;
-		if ( json.opacity !== undefined ) material.opacity = json.opacity;
-		if ( json.transparent !== undefined ) material.transparent = json.transparent;
-		if ( json.alphaTest !== undefined ) material.alphaTest = json.alphaTest;
-		if ( json.alphaHash !== undefined ) material.alphaHash = json.alphaHash;
-		if ( json.depthFunc !== undefined ) material.depthFunc = json.depthFunc;
-		if ( json.depthTest !== undefined ) material.depthTest = json.depthTest;
-		if ( json.depthWrite !== undefined ) material.depthWrite = json.depthWrite;
-		if ( json.colorWrite !== undefined ) material.colorWrite = json.colorWrite;
-		if ( json.blendSrc !== undefined ) material.blendSrc = json.blendSrc;
-		if ( json.blendDst !== undefined ) material.blendDst = json.blendDst;
-		if ( json.blendEquation !== undefined ) material.blendEquation = json.blendEquation;
-		if ( json.blendSrcAlpha !== undefined ) material.blendSrcAlpha = json.blendSrcAlpha;
-		if ( json.blendDstAlpha !== undefined ) material.blendDstAlpha = json.blendDstAlpha;
-		if ( json.blendEquationAlpha !== undefined ) material.blendEquationAlpha = json.blendEquationAlpha;
-		if ( json.blendColor !== undefined && material.blendColor !== undefined ) material.blendColor.setHex( json.blendColor );
-		if ( json.blendAlpha !== undefined ) material.blendAlpha = json.blendAlpha;
-		if ( json.stencilWriteMask !== undefined ) material.stencilWriteMask = json.stencilWriteMask;
-		if ( json.stencilFunc !== undefined ) material.stencilFunc = json.stencilFunc;
-		if ( json.stencilRef !== undefined ) material.stencilRef = json.stencilRef;
-		if ( json.stencilFuncMask !== undefined ) material.stencilFuncMask = json.stencilFuncMask;
-		if ( json.stencilFail !== undefined ) material.stencilFail = json.stencilFail;
-		if ( json.stencilZFail !== undefined ) material.stencilZFail = json.stencilZFail;
-		if ( json.stencilZPass !== undefined ) material.stencilZPass = json.stencilZPass;
-		if ( json.stencilWrite !== undefined ) material.stencilWrite = json.stencilWrite;
-
-		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
-		if ( json.wireframeLinewidth !== undefined ) material.wireframeLinewidth = json.wireframeLinewidth;
-		if ( json.wireframeLinecap !== undefined ) material.wireframeLinecap = json.wireframeLinecap;
-		if ( json.wireframeLinejoin !== undefined ) material.wireframeLinejoin = json.wireframeLinejoin;
-
-		if ( json.rotation !== undefined ) material.rotation = json.rotation;
-
-		if ( json.linewidth !== undefined ) material.linewidth = json.linewidth;
-		if ( json.dashSize !== undefined ) material.dashSize = json.dashSize;
-		if ( json.gapSize !== undefined ) material.gapSize = json.gapSize;
-		if ( json.scale !== undefined ) material.scale = json.scale;
-
-		if ( json.polygonOffset !== undefined ) material.polygonOffset = json.polygonOffset;
-		if ( json.polygonOffsetFactor !== undefined ) material.polygonOffsetFactor = json.polygonOffsetFactor;
-		if ( json.polygonOffsetUnits !== undefined ) material.polygonOffsetUnits = json.polygonOffsetUnits;
-
-		if ( json.dithering !== undefined ) material.dithering = json.dithering;
-
-		if ( json.alphaToCoverage !== undefined ) material.alphaToCoverage = json.alphaToCoverage;
-		if ( json.premultipliedAlpha !== undefined ) material.premultipliedAlpha = json.premultipliedAlpha;
-		if ( json.forceSinglePass !== undefined ) material.forceSinglePass = json.forceSinglePass;
-		if ( json.allowOverride !== undefined ) material.allowOverride = json.allowOverride;
-
-		if ( json.visible !== undefined ) material.visible = json.visible;
-
-		if ( json.toneMapped !== undefined ) material.toneMapped = json.toneMapped;
-
-		if ( json.userData !== undefined ) material.userData = json.userData;
-
-		if ( json.vertexColors !== undefined ) {
-
-			if ( typeof json.vertexColors === 'number' ) {
-
-				material.vertexColors = json.vertexColors > 0;
-
-			} else {
-
-				material.vertexColors = json.vertexColors;
-
-			}
-
-		}
-
-		// Shader Material
-
-		if ( json.uniforms !== undefined ) {
-
-			for ( const name in json.uniforms ) {
-
-				const uniform = json.uniforms[ name ];
-
-				material.uniforms[ name ] = {};
-
-				switch ( uniform.type ) {
-
-					case 't':
-						material.uniforms[ name ].value = getTexture( uniform.value );
-						break;
-
-					case 'c':
-						material.uniforms[ name ].value = new Color().setHex( uniform.value );
-						break;
-
-					case 'v2':
-						material.uniforms[ name ].value = new Vector2().fromArray( uniform.value );
-						break;
-
-					case 'v3':
-						material.uniforms[ name ].value = new Vector3().fromArray( uniform.value );
-						break;
-
-					case 'v4':
-						material.uniforms[ name ].value = new Vector4().fromArray( uniform.value );
-						break;
-
-					case 'm3':
-						material.uniforms[ name ].value = new Matrix3().fromArray( uniform.value );
-						break;
-
-					case 'm4':
-						material.uniforms[ name ].value = new Matrix4().fromArray( uniform.value );
-						break;
-
-					default:
-						material.uniforms[ name ].value = uniform.value;
-
-				}
-
-			}
-
-		}
-
-		if ( json.defines !== undefined ) material.defines = json.defines;
-		if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
-		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;
-		if ( json.glslVersion !== undefined ) material.glslVersion = json.glslVersion;
-
-		if ( json.extensions !== undefined ) {
-
-			for ( const key in json.extensions ) {
-
-				material.extensions[ key ] = json.extensions[ key ];
-
-			}
-
-		}
-
-		if ( json.lights !== undefined ) material.lights = json.lights;
-		if ( json.clipping !== undefined ) material.clipping = json.clipping;
-
-		// for PointsMaterial
-
-		if ( json.size !== undefined ) material.size = json.size;
-		if ( json.sizeAttenuation !== undefined ) material.sizeAttenuation = json.sizeAttenuation;
-
-		// maps
-
-		if ( json.map !== undefined ) material.map = getTexture( json.map );
-		if ( json.matcap !== undefined ) material.matcap = getTexture( json.matcap );
-
-		if ( json.alphaMap !== undefined ) material.alphaMap = getTexture( json.alphaMap );
-
-		if ( json.bumpMap !== undefined ) material.bumpMap = getTexture( json.bumpMap );
-		if ( json.bumpScale !== undefined ) material.bumpScale = json.bumpScale;
-
-		if ( json.normalMap !== undefined ) material.normalMap = getTexture( json.normalMap );
-		if ( json.normalMapType !== undefined ) material.normalMapType = json.normalMapType;
-		if ( json.normalScale !== undefined ) {
-
-			let normalScale = json.normalScale;
-
-			if ( Array.isArray( normalScale ) === false ) {
-
-				// Blender exporter used to export a scalar. See #7459
-
-				normalScale = [ normalScale, normalScale ];
-
-			}
-
-			material.normalScale = new Vector2().fromArray( normalScale );
-
-		}
-
-		if ( json.displacementMap !== undefined ) material.displacementMap = getTexture( json.displacementMap );
-		if ( json.displacementScale !== undefined ) material.displacementScale = json.displacementScale;
-		if ( json.displacementBias !== undefined ) material.displacementBias = json.displacementBias;
-
-		if ( json.roughnessMap !== undefined ) material.roughnessMap = getTexture( json.roughnessMap );
-		if ( json.metalnessMap !== undefined ) material.metalnessMap = getTexture( json.metalnessMap );
-
-		if ( json.emissiveMap !== undefined ) material.emissiveMap = getTexture( json.emissiveMap );
-		if ( json.emissiveIntensity !== undefined ) material.emissiveIntensity = json.emissiveIntensity;
-
-		if ( json.specularMap !== undefined ) material.specularMap = getTexture( json.specularMap );
-		if ( json.specularIntensityMap !== undefined ) material.specularIntensityMap = getTexture( json.specularIntensityMap );
-		if ( json.specularColorMap !== undefined ) material.specularColorMap = getTexture( json.specularColorMap );
-
-		if ( json.envMap !== undefined ) material.envMap = getTexture( json.envMap );
-		if ( json.envMapRotation !== undefined ) material.envMapRotation.fromArray( json.envMapRotation );
-		if ( json.envMapIntensity !== undefined ) material.envMapIntensity = json.envMapIntensity;
-
-		if ( json.reflectivity !== undefined ) material.reflectivity = json.reflectivity;
-		if ( json.refractionRatio !== undefined ) material.refractionRatio = json.refractionRatio;
-
-		if ( json.lightMap !== undefined ) material.lightMap = getTexture( json.lightMap );
-		if ( json.lightMapIntensity !== undefined ) material.lightMapIntensity = json.lightMapIntensity;
-
-		if ( json.aoMap !== undefined ) material.aoMap = getTexture( json.aoMap );
-		if ( json.aoMapIntensity !== undefined ) material.aoMapIntensity = json.aoMapIntensity;
-
-		if ( json.gradientMap !== undefined ) material.gradientMap = getTexture( json.gradientMap );
-
-		if ( json.clearcoatMap !== undefined ) material.clearcoatMap = getTexture( json.clearcoatMap );
-		if ( json.clearcoatRoughnessMap !== undefined ) material.clearcoatRoughnessMap = getTexture( json.clearcoatRoughnessMap );
-		if ( json.clearcoatNormalMap !== undefined ) material.clearcoatNormalMap = getTexture( json.clearcoatNormalMap );
-		if ( json.clearcoatNormalScale !== undefined ) material.clearcoatNormalScale = new Vector2().fromArray( json.clearcoatNormalScale );
-
-		if ( json.iridescenceMap !== undefined ) material.iridescenceMap = getTexture( json.iridescenceMap );
-		if ( json.iridescenceThicknessMap !== undefined ) material.iridescenceThicknessMap = getTexture( json.iridescenceThicknessMap );
-
-		if ( json.transmissionMap !== undefined ) material.transmissionMap = getTexture( json.transmissionMap );
-		if ( json.thicknessMap !== undefined ) material.thicknessMap = getTexture( json.thicknessMap );
-
-		if ( json.anisotropyMap !== undefined ) material.anisotropyMap = getTexture( json.anisotropyMap );
-
-		if ( json.sheenColorMap !== undefined ) material.sheenColorMap = getTexture( json.sheenColorMap );
-		if ( json.sheenRoughnessMap !== undefined ) material.sheenRoughnessMap = getTexture( json.sheenRoughnessMap );
+		material.fromJSON( json, this.textures );
 
 		return material;
 
@@ -47740,10 +48108,40 @@ class MaterialLoader extends Loader {
 			MeshMatcapMaterial,
 			LineDashedMaterial,
 			LineBasicMaterial,
-			Material
+			Material,
+			... _customMaterials
 		};
 
-		return new materialLib[ type ]();
+		const MaterialType = materialLib[ type ];
+
+		let materialInstance;
+
+		if ( MaterialType === undefined ) {
+
+			warnOnce( `MaterialLoader: Unknown material type "${ type }". Use .registerMaterial() before starting the deserialization process.` );
+			materialInstance = new Material();
+
+		} else {
+
+			materialInstance = new MaterialType();
+
+		}
+
+		return materialInstance;
+
+	}
+
+	/**
+	 * Registers the given material at the internal
+	 * material library.
+	 *
+	 * @static
+	 * @param {string} type - The material type.
+	 * @param {Material.constructor} materialClass - The material class.
+	 */
+	static registerMaterial( type, materialClass ) {
+
+		_customMaterials[ type ] = materialClass;
 
 	}
 
@@ -48209,7 +48607,7 @@ class ObjectLoader extends Loader {
 
 		} catch ( e ) {
 
-			throw new Error( 'ObjectLoader: Can\'t parse ' + url + '. ' + e.message );
+			throw new Error( 'THREE.ObjectLoader: Can\'t parse ' + url + '. ' + e.message );
 
 		}
 
@@ -48487,6 +48885,8 @@ class ObjectLoader extends Loader {
 		let loader;
 
 		function loadImage( url ) {
+
+			url = scope.manager.resolveURL( url );
 
 			scope.manager.itemStart( url );
 
@@ -49822,8 +50222,11 @@ class StereoCamera {
 
 		}
 
-		this.cameraL.matrixWorld.copy( camera.matrixWorld ).multiply( _eyeLeft );
-		this.cameraR.matrixWorld.copy( camera.matrixWorld ).multiply( _eyeRight );
+		this.cameraL.matrix.copy( camera.matrixWorld ).multiply( _eyeLeft );
+		this.cameraL.matrixWorldNeedsUpdate = true;
+
+		this.cameraR.matrix.copy( camera.matrixWorld ).multiply( _eyeRight );
+		this.cameraR.matrixWorldNeedsUpdate = true;
 
 	}
 
@@ -52240,7 +52643,7 @@ class PropertyBinding {
 
 		if ( matches === null ) {
 
-			throw new Error( 'PropertyBinding: Cannot parse trackName: ' + trackName );
+			throw new Error( 'THREE.PropertyBinding: Cannot parse trackName: ' + trackName );
 
 		}
 
@@ -52274,7 +52677,7 @@ class PropertyBinding {
 
 		if ( results.propertyName === null || results.propertyName.length === 0 ) {
 
-			throw new Error( 'PropertyBinding: can not parse propertyName from trackName: ' + trackName );
+			throw new Error( 'THREE.PropertyBinding: can not parse propertyName from trackName: ' + trackName );
 
 		}
 
@@ -53265,15 +53668,6 @@ class AnimationAction {
 
 			const interpolant = tracks[ i ].createInterpolant( null );
 			interpolants[ i ] = interpolant;
-
-			// preserve interpolant settings (like tangent data from BezierInterpolant)
-
-			if ( interpolant.settings ) {
-
-				Object.assign( interpolantSettings, interpolant.settings );
-
-			}
-
 			interpolant.settings = interpolantSettings;
 
 		}
@@ -53289,6 +53683,7 @@ class AnimationAction {
 		this._byClipCacheIndex = null; // for the memory manager
 
 		this._timeScaleInterpolant = null;
+		this._restoreTimeScale = null;
 		this._weightInterpolant = null;
 
 		/**
@@ -53576,6 +53971,10 @@ class AnimationAction {
 				startEndRatio = fadeOutDuration / fadeInDuration,
 				endStartRatio = fadeInDuration / fadeOutDuration;
 
+
+			fadeOutAction._restoreTimeScale = fadeOutAction.timeScale;
+			this._restoreTimeScale = this.timeScale;
+
 			fadeOutAction.warp( 1.0, startEndRatio, duration );
 			this.warp( endStartRatio, 1.0, duration );
 
@@ -53743,6 +54142,8 @@ class AnimationAction {
 			this._mixer._takeBackControlInterpolant( timeScaleInterpolant );
 
 		}
+
+		this._restoreTimeScale = null;
 
 		return this;
 
@@ -53916,8 +54317,6 @@ class AnimationAction {
 
 				if ( time > interpolant.parameterPositions[ 1 ] ) {
 
-					this.stopWarping();
-
 					if ( timeScale === 0 ) {
 
 						// motion has halted, pause
@@ -53925,10 +54324,18 @@ class AnimationAction {
 
 					} else {
 
+						if ( this._restoreTimeScale !== null ) {
+
+							timeScale = this._restoreTimeScale;
+
+						}
+
 						// warp done - apply final time scale
 						this.timeScale = timeScale;
 
 					}
+
+					this.stopWarping();
 
 				}
 
@@ -55642,7 +56049,7 @@ class Raycaster {
 
 		} else if ( camera.isOrthographicCamera ) {
 
-			this.ray.origin.set( coords.x, coords.y, ( camera.near + camera.far ) / ( camera.near - camera.far ) ).unproject( camera ); // set origin in plane of camera
+			this.ray.origin.set( coords.x, coords.y, camera.projectionMatrix.elements[ 14 ] ).unproject( camera ); // set origin in plane of camera
 			this.ray.direction.set( 0, 0, -1 ).transformDirection( camera.matrixWorld );
 			this.camera = camera;
 
@@ -57130,7 +57537,7 @@ class SpotLightHelper extends Object3D {
 
 		}
 
-		this.matrixWorld.copy( this.light.matrixWorld );
+		this.matrixWorldNeedsUpdate = true;
 
 		const coneLength = this.light.distance ? this.light.distance : 1000;
 		const coneWidth = coneLength * Math.tan( this.light.angle );
@@ -57413,6 +57820,8 @@ class PointLightHelper extends Mesh {
 	 */
 	update() {
 
+		this.matrixWorldNeedsUpdate = true;
+
 		this.light.updateWorldMatrix( true, false );
 
 		if ( this.color !== undefined ) {
@@ -57555,6 +57964,8 @@ class HemisphereLightHelper extends Object3D {
 			colors.needsUpdate = true;
 
 		}
+
+		this.matrixWorldNeedsUpdate = true;
 
 		this.light.updateWorldMatrix( true, false );
 
@@ -57866,6 +58277,8 @@ class DirectionalLightHelper extends Object3D {
 	 * light being visualized.
 	 */
 	update() {
+
+		this.matrixWorldNeedsUpdate = true;
 
 		this.light.updateWorldMatrix( true, false );
 		this.light.target.updateWorldMatrix( true, false );
@@ -58820,6 +59233,14 @@ class ShapePath {
 		 */
 		this.currentPath = null;
 
+		/**
+		 * An object that can be used to store custom data about the shape path.
+		 * Mainly used by SVGLoader to store style information.
+		 *
+		 * @type {Object}
+		 */
+		this.userData = {};
+
 	}
 
 	/**
@@ -58911,234 +59332,211 @@ class ShapePath {
 	/**
 	 * Converts the paths into an array of shapes.
 	 *
-	 * @param {boolean} isCCW - By default solid shapes are  defined clockwise (CW) and holes are defined counterclockwise (CCW).
-	 * If this flag is set to `true`, then those are flipped.
 	 * @return {Array<Shape>} An array of shapes.
 	 */
-	toShapes( isCCW ) {
+	toShapes() {
 
-		function toShapesNoHoles( inSubpaths ) {
+		// Point-in-polygon test using the even-odd ray-casting rule. Valid for
+		// simple (non self-intersecting) polygons.
+		function pointInPolygon( p, polygon ) {
 
-			const shapes = [];
-
-			for ( let i = 0, l = inSubpaths.length; i < l; i ++ ) {
-
-				const tmpPath = inSubpaths[ i ];
-
-				const tmpShape = new Shape();
-				tmpShape.curves = tmpPath.curves;
-
-				shapes.push( tmpShape );
-
-			}
-
-			return shapes;
-
-		}
-
-		function isPointInsidePolygon( inPt, inPolygon ) {
-
-			const polyLen = inPolygon.length;
-
-			// inPt on polygon contour => immediate success    or
-			// toggling of inside/outside at every single! intersection point of an edge
-			//  with the horizontal line through inPt, left of inPt
-			//  not counting lowerY endpoints of edges and whole edges on that line
 			let inside = false;
-			for ( let p = polyLen - 1, q = 0; q < polyLen; p = q ++ ) {
+			const n = polygon.length;
 
-				let edgeLowPt = inPolygon[ p ];
-				let edgeHighPt = inPolygon[ q ];
+			for ( let i = 0, j = n - 1; i < n; j = i ++ ) {
 
-				let edgeDx = edgeHighPt.x - edgeLowPt.x;
-				let edgeDy = edgeHighPt.y - edgeLowPt.y;
+				const a = polygon[ i ];
+				const b = polygon[ j ];
 
-				if ( Math.abs( edgeDy ) > Number.EPSILON ) {
+				if ( ( a.y > p.y ) !== ( b.y > p.y ) &&
+							p.x < ( b.x - a.x ) * ( p.y - a.y ) / ( b.y - a.y ) + a.x ) {
 
-					// not parallel
-					if ( edgeDy < 0 ) {
-
-						edgeLowPt = inPolygon[ q ]; edgeDx = - edgeDx;
-						edgeHighPt = inPolygon[ p ]; edgeDy = - edgeDy;
-
-					}
-
-					if ( ( inPt.y < edgeLowPt.y ) || ( inPt.y > edgeHighPt.y ) ) 		continue;
-
-					if ( inPt.y === edgeLowPt.y ) {
-
-						if ( inPt.x === edgeLowPt.x )		return	true;		// inPt is on contour ?
-						// continue;				// no intersection or edgeLowPt => doesn't count !!!
-
-					} else {
-
-						const perpEdge = edgeDy * ( inPt.x - edgeLowPt.x ) - edgeDx * ( inPt.y - edgeLowPt.y );
-						if ( perpEdge === 0 )				return	true;		// inPt is on contour ?
-						if ( perpEdge < 0 ) 				continue;
-						inside = ! inside;		// true intersection left of inPt
-
-					}
-
-				} else {
-
-					// parallel or collinear
-					if ( inPt.y !== edgeLowPt.y ) 		continue;			// parallel
-					// edge lies on the same horizontal line as inPt
-					if ( ( ( edgeHighPt.x <= inPt.x ) && ( inPt.x <= edgeLowPt.x ) ) ||
-						 ( ( edgeLowPt.x <= inPt.x ) && ( inPt.x <= edgeHighPt.x ) ) )		return	true;	// inPt: Point on contour !
-					// continue;
+					inside = ! inside;
 
 				}
 
 			}
 
-			return	inside;
+			return inside;
 
 		}
 
-		const isClockWise = ShapeUtils.isClockWise;
+		// Returns a point guaranteed to be strictly inside the given simple
+		// polygon. First tries the bounding-box center; if that falls outside
+		// the polygon, casts a horizontal ray at the center's y and picks the
+		// midpoint between the first two sorted intercepts.
+		//
+		// Port of paper.js' Path#getInteriorPoint()
+		// https://github.com/paperjs/paper.js/blob/develop/src/path/PathItem.Boolean.js
+		function getInteriorPoint( polygon, boundingBox ) {
 
-		const subPaths = this.subPaths;
-		if ( subPaths.length === 0 ) return [];
+			const point = boundingBox.getCenter( new Vector2() );
 
-		let solid, tmpPath, tmpShape;
+			if ( pointInPolygon( point, polygon ) ) return point;
+
+			const y = point.y;
+			const intercepts = [];
+			const n = polygon.length;
+
+			for ( let i = 0; i < n; i ++ ) {
+
+				const a = polygon[ i ];
+				const b = polygon[ ( i + 1 ) % n ];
+
+				// Half-open crossing rule — counts each vertex exactly once and
+				// skips horizontal edges.
+				if ( ( a.y > y ) !== ( b.y > y ) ) {
+
+					const x = a.x + ( y - a.y ) * ( b.x - a.x ) / ( b.y - a.y );
+					intercepts.push( x );
+
+				}
+
+			}
+
+			if ( intercepts.length > 1 ) {
+
+				intercepts.sort( ( a, b ) => a - b );
+				point.x = ( intercepts[ 0 ] + intercepts[ 1 ] ) / 2;
+
+			}
+
+			return point;
+
+		}
+
+		// Resolve fill-rule. Defaults to 'nonzero'.
+		let fillRule = ( this.userData.style && this.userData.style.fillRule ) || 'nonzero';
+
+		if ( fillRule !== 'nonzero' && fillRule !== 'evenodd' ) {
+
+			warn( 'Fill-rule "' + fillRule + '" is not supported, falling back to "nonzero".' );
+			fillRule = 'nonzero';
+
+		}
+
+		// Predicate that decides whether a winding number falls inside the fill
+		// region, per the SVG fill-rule spec. Works for negative windings too,
+		// because JavaScript's bitwise AND preserves odd/even under two's
+		// complement.
+		const isInside = fillRule === 'nonzero'
+			? ( w => w !== 0 )
+			: ( w => ( w & 1 ) !== 0 );
+
+		// Build an entry per usable subpath. Self-winding follows the standard
+		// convention used by ShapeUtils: counter-clockwise (signed area > 0)
+		// contributes +1 to the winding number at an interior point,
+		// clockwise contributes -1.
+		const entries = [];
+
+		for ( const subPath of this.subPaths ) {
+
+			const points = subPath.getPoints();
+			if ( points.length < 3 ) continue;
+
+			const area = ShapeUtils.area( points );
+			if ( area === 0 ) continue;
+
+			const boundingBox = new Box2();
+			for ( let i = 0; i < points.length; i ++ ) boundingBox.expandByPoint( points[ i ] );
+
+			entries.push( {
+				subPath: subPath,
+				points: points,
+				boundingBox: boundingBox,
+				interiorPoint: getInteriorPoint( points, boundingBox ),
+				absArea: Math.abs( area ),
+				winding: area < 0 ? -1 : 1,
+				container: null,
+				exclude: false,
+				role: null
+			} );
+
+		}
+
+		// Sort by area descending. This guarantees that any subpath that could
+		// contain `entries[i]` is located at a smaller index and has already
+		// been processed when it's entries[i]'s turn. Port of paper.js'
+		// reorientPaths() algorithm.
+		entries.sort( ( a, b ) => b.absArea - a.absArea );
+
+		// Walk already-processed entries from closest-in-size to largest,
+		// stopping at the innermost container. Accumulate the container's
+		// cumulative winding into this entry's winding so that the final value
+		// equals the winding number at this entry's interior point.
+		//
+		// A subpath only contributes to the fill boundary when crossing it
+		// actually flips the "insideness" per the fill rule; otherwise it's a
+		// redundant overlap and gets excluded to avoid double-counting.
+		for ( let i = 0; i < entries.length; i ++ ) {
+
+			const entry = entries[ i ];
+			let containerWinding = 0;
+
+			for ( let j = i - 1; j >= 0; j -- ) {
+
+				const candidate = entries[ j ];
+				if ( ! candidate.boundingBox.containsPoint( entry.interiorPoint ) ) continue;
+				if ( ! pointInPolygon( entry.interiorPoint, candidate.points ) ) continue;
+
+				entry.container = candidate.exclude ? candidate.container : candidate;
+				containerWinding = candidate.winding;
+				entry.winding += containerWinding;
+				break;
+
+			}
+
+			if ( isInside( entry.winding ) === isInside( containerWinding ) ) {
+
+				entry.exclude = true;
+
+			}
+
+		}
+
+		// Classify retained entries. An entry is an outer shape if it has no
+		// container or if its container is itself a hole (a solid nested inside
+		// a hole becomes a new top-level shape); otherwise it's a hole in its
+		// container. Entries were already sorted outermost-first, so each
+		// container's role is known by the time we look at it.
+		for ( const entry of entries ) {
+
+			if ( entry.exclude ) continue;
+			entry.role = ( entry.container === null || entry.container.role === 'hole' ) ? 'outer' : 'hole';
+
+		}
+
+		// Build Shapes for outers first, then attach holes to their container's
+		// Shape.
 		const shapes = [];
+		const shapeByEntry = new Map();
 
-		if ( subPaths.length === 1 ) {
+		for ( const entry of entries ) {
 
-			tmpPath = subPaths[ 0 ];
-			tmpShape = new Shape();
-			tmpShape.curves = tmpPath.curves;
-			shapes.push( tmpShape );
-			return shapes;
+			if ( entry.exclude || entry.role !== 'outer' ) continue;
 
-		}
-
-		let holesFirst = ! isClockWise( subPaths[ 0 ].getPoints() );
-		holesFirst = isCCW ? ! holesFirst : holesFirst;
-
-		// log("Holes first", holesFirst);
-
-		const betterShapeHoles = [];
-		const newShapes = [];
-		let newShapeHoles = [];
-		let mainIdx = 0;
-		let tmpPoints;
-
-		newShapes[ mainIdx ] = undefined;
-		newShapeHoles[ mainIdx ] = [];
-
-		for ( let i = 0, l = subPaths.length; i < l; i ++ ) {
-
-			tmpPath = subPaths[ i ];
-			tmpPoints = tmpPath.getPoints();
-			solid = isClockWise( tmpPoints );
-			solid = isCCW ? ! solid : solid;
-
-			if ( solid ) {
-
-				if ( ( ! holesFirst ) && ( newShapes[ mainIdx ] ) )	mainIdx ++;
-
-				newShapes[ mainIdx ] = { s: new Shape(), p: tmpPoints };
-				newShapes[ mainIdx ].s.curves = tmpPath.curves;
-
-				if ( holesFirst )	mainIdx ++;
-				newShapeHoles[ mainIdx ] = [];
-
-				//log('cw', i);
-
-			} else {
-
-				newShapeHoles[ mainIdx ].push( { h: tmpPath, p: tmpPoints[ 0 ] } );
-
-				//log('ccw', i);
-
-			}
+			const shape = new Shape();
+			shape.curves = entry.subPath.curves;
+			shapes.push( shape );
+			shapeByEntry.set( entry, shape );
 
 		}
 
-		// only Holes? -> probably all Shapes with wrong orientation
-		if ( ! newShapes[ 0 ] )	return	toShapesNoHoles( subPaths );
+		for ( const entry of entries ) {
 
+			if ( entry.exclude || entry.role !== 'hole' ) continue;
 
-		if ( newShapes.length > 1 ) {
+			const shape = shapeByEntry.get( entry.container );
+			if ( ! shape ) continue;
 
-			let ambiguous = false;
-			let toChange = 0;
-
-			for ( let sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
-
-				betterShapeHoles[ sIdx ] = [];
-
-			}
-
-			for ( let sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
-
-				const sho = newShapeHoles[ sIdx ];
-
-				for ( let hIdx = 0; hIdx < sho.length; hIdx ++ ) {
-
-					const ho = sho[ hIdx ];
-					let hole_unassigned = true;
-
-					for ( let s2Idx = 0; s2Idx < newShapes.length; s2Idx ++ ) {
-
-						if ( isPointInsidePolygon( ho.p, newShapes[ s2Idx ].p ) ) {
-
-							if ( sIdx !== s2Idx )	toChange ++;
-
-							if ( hole_unassigned ) {
-
-								hole_unassigned = false;
-								betterShapeHoles[ s2Idx ].push( ho );
-
-							} else {
-
-								ambiguous = true;
-
-							}
-
-						}
-
-					}
-
-					if ( hole_unassigned ) {
-
-						betterShapeHoles[ sIdx ].push( ho );
-
-					}
-
-				}
-
-			}
-
-			if ( toChange > 0 && ambiguous === false ) {
-
-				newShapeHoles = betterShapeHoles;
-
-			}
+			const hole = new Path();
+			hole.curves = entry.subPath.curves;
+			shape.holes.push( hole );
 
 		}
-
-		let tmpHoles;
-
-		for ( let i = 0, il = newShapes.length; i < il; i ++ ) {
-
-			tmpShape = newShapes[ i ].s;
-			shapes.push( tmpShape );
-			tmpHoles = newShapeHoles[ i ];
-
-			for ( let j = 0, jl = tmpHoles.length; j < jl; j ++ ) {
-
-				tmpShape.holes.push( tmpHoles[ j ].h );
-
-			}
-
-		}
-
-		//log("shape", shapes);
 
 		return shapes;
+
 
 	}
 
@@ -59484,7 +59882,7 @@ function getTextureTypeByteLength( type ) {
 
 	}
 
-	throw new Error( `Unknown texture type ${type}.` );
+	throw new Error( `THREE.TextureUtils: Unknown texture type ${type}.` );
 
 }
 
@@ -59970,7 +60368,7 @@ var lights_physical_fragment = "PhysicalMaterial material;\nmaterial.diffuseColo
 
 var lights_physical_pars_fragment = "uniform sampler2D dfgLUT;\nstruct PhysicalMaterial {\n\tvec3 diffuseColor;\n\tvec3 diffuseContribution;\n\tvec3 specularColor;\n\tvec3 specularColorBlended;\n\tfloat roughness;\n\tfloat metalness;\n\tfloat specularF90;\n\tfloat dispersion;\n\t#ifdef USE_CLEARCOAT\n\t\tfloat clearcoat;\n\t\tfloat clearcoatRoughness;\n\t\tvec3 clearcoatF0;\n\t\tfloat clearcoatF90;\n\t#endif\n\t#ifdef USE_IRIDESCENCE\n\t\tfloat iridescence;\n\t\tfloat iridescenceIOR;\n\t\tfloat iridescenceThickness;\n\t\tvec3 iridescenceFresnel;\n\t\tvec3 iridescenceF0;\n\t\tvec3 iridescenceFresnelDielectric;\n\t\tvec3 iridescenceFresnelMetallic;\n\t#endif\n\t#ifdef USE_SHEEN\n\t\tvec3 sheenColor;\n\t\tfloat sheenRoughness;\n\t#endif\n\t#ifdef IOR\n\t\tfloat ior;\n\t#endif\n\t#ifdef USE_TRANSMISSION\n\t\tfloat transmission;\n\t\tfloat transmissionAlpha;\n\t\tfloat thickness;\n\t\tfloat attenuationDistance;\n\t\tvec3 attenuationColor;\n\t#endif\n\t#ifdef USE_ANISOTROPY\n\t\tfloat anisotropy;\n\t\tfloat alphaT;\n\t\tvec3 anisotropyT;\n\t\tvec3 anisotropyB;\n\t#endif\n};\nvec3 clearcoatSpecularDirect = vec3( 0.0 );\nvec3 clearcoatSpecularIndirect = vec3( 0.0 );\nvec3 sheenSpecularDirect = vec3( 0.0 );\nvec3 sheenSpecularIndirect = vec3(0.0 );\nvec3 Schlick_to_F0( const in vec3 f, const in float f90, const in float dotVH ) {\n    float x = clamp( 1.0 - dotVH, 0.0, 1.0 );\n    float x2 = x * x;\n    float x5 = clamp( x * x2 * x2, 0.0, 0.9999 );\n    return ( f - vec3( f90 ) * x5 ) / ( 1.0 - x5 );\n}\nfloat V_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {\n\tfloat a2 = pow2( alpha );\n\tfloat gv = dotNL * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );\n\tfloat gl = dotNV * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );\n\treturn 0.5 / max( gv + gl, EPSILON );\n}\nfloat D_GGX( const in float alpha, const in float dotNH ) {\n\tfloat a2 = pow2( alpha );\n\tfloat denom = pow2( dotNH ) * ( a2 - 1.0 ) + 1.0;\n\treturn RECIPROCAL_PI * a2 / pow2( denom );\n}\n#ifdef USE_ANISOTROPY\n\tfloat V_GGX_SmithCorrelated_Anisotropic( const in float alphaT, const in float alphaB, const in float dotTV, const in float dotBV, const in float dotTL, const in float dotBL, const in float dotNV, const in float dotNL ) {\n\t\tfloat gv = dotNL * length( vec3( alphaT * dotTV, alphaB * dotBV, dotNV ) );\n\t\tfloat gl = dotNV * length( vec3( alphaT * dotTL, alphaB * dotBL, dotNL ) );\n\t\treturn 0.5 / max( gv + gl, EPSILON );\n\t}\n\tfloat D_GGX_Anisotropic( const in float alphaT, const in float alphaB, const in float dotNH, const in float dotTH, const in float dotBH ) {\n\t\tfloat a2 = alphaT * alphaB;\n\t\thighp vec3 v = vec3( alphaB * dotTH, alphaT * dotBH, a2 * dotNH );\n\t\thighp float v2 = dot( v, v );\n\t\tfloat w2 = a2 / v2;\n\t\treturn RECIPROCAL_PI * a2 * pow2 ( w2 );\n\t}\n#endif\n#ifdef USE_CLEARCOAT\n\tvec3 BRDF_GGX_Clearcoat( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material) {\n\t\tvec3 f0 = material.clearcoatF0;\n\t\tfloat f90 = material.clearcoatF90;\n\t\tfloat roughness = material.clearcoatRoughness;\n\t\tfloat alpha = pow2( roughness );\n\t\tvec3 halfDir = normalize( lightDir + viewDir );\n\t\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\t\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\t\tfloat dotNH = saturate( dot( normal, halfDir ) );\n\t\tfloat dotVH = saturate( dot( viewDir, halfDir ) );\n\t\tvec3 F = F_Schlick( f0, f90, dotVH );\n\t\tfloat V = V_GGX_SmithCorrelated( alpha, dotNL, dotNV );\n\t\tfloat D = D_GGX( alpha, dotNH );\n\t\treturn F * ( V * D );\n\t}\n#endif\nvec3 BRDF_GGX( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material ) {\n\tvec3 f0 = material.specularColorBlended;\n\tfloat f90 = material.specularF90;\n\tfloat roughness = material.roughness;\n\tfloat alpha = pow2( roughness );\n\tvec3 halfDir = normalize( lightDir + viewDir );\n\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tfloat dotNH = saturate( dot( normal, halfDir ) );\n\tfloat dotVH = saturate( dot( viewDir, halfDir ) );\n\tvec3 F = F_Schlick( f0, f90, dotVH );\n\t#ifdef USE_IRIDESCENCE\n\t\tF = mix( F, material.iridescenceFresnel, material.iridescence );\n\t#endif\n\t#ifdef USE_ANISOTROPY\n\t\tfloat dotTL = dot( material.anisotropyT, lightDir );\n\t\tfloat dotTV = dot( material.anisotropyT, viewDir );\n\t\tfloat dotTH = dot( material.anisotropyT, halfDir );\n\t\tfloat dotBL = dot( material.anisotropyB, lightDir );\n\t\tfloat dotBV = dot( material.anisotropyB, viewDir );\n\t\tfloat dotBH = dot( material.anisotropyB, halfDir );\n\t\tfloat V = V_GGX_SmithCorrelated_Anisotropic( material.alphaT, alpha, dotTV, dotBV, dotTL, dotBL, dotNV, dotNL );\n\t\tfloat D = D_GGX_Anisotropic( material.alphaT, alpha, dotNH, dotTH, dotBH );\n\t#else\n\t\tfloat V = V_GGX_SmithCorrelated( alpha, dotNL, dotNV );\n\t\tfloat D = D_GGX( alpha, dotNH );\n\t#endif\n\treturn F * ( V * D );\n}\nvec2 LTC_Uv( const in vec3 N, const in vec3 V, const in float roughness ) {\n\tconst float LUT_SIZE = 64.0;\n\tconst float LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;\n\tconst float LUT_BIAS = 0.5 / LUT_SIZE;\n\tfloat dotNV = saturate( dot( N, V ) );\n\tvec2 uv = vec2( roughness, sqrt( 1.0 - dotNV ) );\n\tuv = uv * LUT_SCALE + LUT_BIAS;\n\treturn uv;\n}\nfloat LTC_ClippedSphereFormFactor( const in vec3 f ) {\n\tfloat l = length( f );\n\treturn max( ( l * l + f.z ) / ( l + 1.0 ), 0.0 );\n}\nvec3 LTC_EdgeVectorFormFactor( const in vec3 v1, const in vec3 v2 ) {\n\tfloat x = dot( v1, v2 );\n\tfloat y = abs( x );\n\tfloat a = 0.8543985 + ( 0.4965155 + 0.0145206 * y ) * y;\n\tfloat b = 3.4175940 + ( 4.1616724 + y ) * y;\n\tfloat v = a / b;\n\tfloat theta_sintheta = ( x > 0.0 ) ? v : 0.5 * inversesqrt( max( 1.0 - x * x, 1e-7 ) ) - v;\n\treturn cross( v1, v2 ) * theta_sintheta;\n}\nvec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in mat3 mInv, const in vec3 rectCoords[ 4 ] ) {\n\tvec3 v1 = rectCoords[ 1 ] - rectCoords[ 0 ];\n\tvec3 v2 = rectCoords[ 3 ] - rectCoords[ 0 ];\n\tvec3 lightNormal = cross( v1, v2 );\n\tif( dot( lightNormal, P - rectCoords[ 0 ] ) < 0.0 ) return vec3( 0.0 );\n\tvec3 T1, T2;\n\tT1 = normalize( V - N * dot( V, N ) );\n\tT2 = - cross( N, T1 );\n\tmat3 mat = mInv * transpose( mat3( T1, T2, N ) );\n\tvec3 coords[ 4 ];\n\tcoords[ 0 ] = mat * ( rectCoords[ 0 ] - P );\n\tcoords[ 1 ] = mat * ( rectCoords[ 1 ] - P );\n\tcoords[ 2 ] = mat * ( rectCoords[ 2 ] - P );\n\tcoords[ 3 ] = mat * ( rectCoords[ 3 ] - P );\n\tcoords[ 0 ] = normalize( coords[ 0 ] );\n\tcoords[ 1 ] = normalize( coords[ 1 ] );\n\tcoords[ 2 ] = normalize( coords[ 2 ] );\n\tcoords[ 3 ] = normalize( coords[ 3 ] );\n\tvec3 vectorFormFactor = vec3( 0.0 );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 0 ], coords[ 1 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 1 ], coords[ 2 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 2 ], coords[ 3 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 3 ], coords[ 0 ] );\n\tfloat result = LTC_ClippedSphereFormFactor( vectorFormFactor );\n\treturn vec3( result );\n}\n#if defined( USE_SHEEN )\nfloat D_Charlie( float roughness, float dotNH ) {\n\tfloat alpha = pow2( roughness );\n\tfloat invAlpha = 1.0 / alpha;\n\tfloat cos2h = dotNH * dotNH;\n\tfloat sin2h = max( 1.0 - cos2h, 0.0078125 );\n\treturn ( 2.0 + invAlpha ) * pow( sin2h, invAlpha * 0.5 ) / ( 2.0 * PI );\n}\nfloat V_Neubelt( float dotNV, float dotNL ) {\n\treturn saturate( 1.0 / ( 4.0 * ( dotNL + dotNV - dotNL * dotNV ) ) );\n}\nvec3 BRDF_Sheen( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, vec3 sheenColor, const in float sheenRoughness ) {\n\tvec3 halfDir = normalize( lightDir + viewDir );\n\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tfloat dotNH = saturate( dot( normal, halfDir ) );\n\tfloat D = D_Charlie( sheenRoughness, dotNH );\n\tfloat V = V_Neubelt( dotNV, dotNL );\n\treturn sheenColor * ( D * V );\n}\n#endif\nfloat IBLSheenBRDF( const in vec3 normal, const in vec3 viewDir, const in float roughness ) {\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tfloat r2 = roughness * roughness;\n\tfloat rInv = 1.0 / ( roughness + 0.1 );\n\tfloat a = -1.9362 + 1.0678 * roughness + 0.4573 * r2 - 0.8469 * rInv;\n\tfloat b = -0.6014 + 0.5538 * roughness - 0.4670 * r2 - 0.1255 * rInv;\n\tfloat DG = exp( a * dotNV + b );\n\treturn saturate( DG );\n}\nvec3 EnvironmentBRDF( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float roughness ) {\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tvec2 fab = texture2D( dfgLUT, vec2( roughness, dotNV ) ).rg;\n\treturn specularColor * fab.x + specularF90 * fab.y;\n}\n#ifdef USE_IRIDESCENCE\nvoid computeMultiscatteringIridescence( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float iridescence, const in vec3 iridescenceF0, const in float roughness, inout vec3 singleScatter, inout vec3 multiScatter ) {\n#else\nvoid computeMultiscattering( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float roughness, inout vec3 singleScatter, inout vec3 multiScatter ) {\n#endif\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tvec2 fab = texture2D( dfgLUT, vec2( roughness, dotNV ) ).rg;\n\t#ifdef USE_IRIDESCENCE\n\t\tvec3 Fr = mix( specularColor, iridescenceF0, iridescence );\n\t#else\n\t\tvec3 Fr = specularColor;\n\t#endif\n\tvec3 FssEss = Fr * fab.x + specularF90 * fab.y;\n\tfloat Ess = fab.x + fab.y;\n\tfloat Ems = 1.0 - Ess;\n\tvec3 Favg = Fr + ( 1.0 - Fr ) * 0.047619;\tvec3 Fms = FssEss * Favg / ( 1.0 - Ems * Favg );\n\tsingleScatter += FssEss;\n\tmultiScatter += Fms * Ems;\n}\nvec3 BRDF_GGX_Multiscatter( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material ) {\n\tvec3 singleScatter = BRDF_GGX( lightDir, viewDir, normal, material );\n\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tvec2 dfgV = texture2D( dfgLUT, vec2( material.roughness, dotNV ) ).rg;\n\tvec2 dfgL = texture2D( dfgLUT, vec2( material.roughness, dotNL ) ).rg;\n\tvec3 FssEss_V = material.specularColorBlended * dfgV.x + material.specularF90 * dfgV.y;\n\tvec3 FssEss_L = material.specularColorBlended * dfgL.x + material.specularF90 * dfgL.y;\n\tfloat Ess_V = dfgV.x + dfgV.y;\n\tfloat Ess_L = dfgL.x + dfgL.y;\n\tfloat Ems_V = 1.0 - Ess_V;\n\tfloat Ems_L = 1.0 - Ess_L;\n\tvec3 Favg = material.specularColorBlended + ( 1.0 - material.specularColorBlended ) * 0.047619;\n\tvec3 Fms = FssEss_V * FssEss_L * Favg / ( 1.0 - Ems_V * Ems_L * Favg + EPSILON );\n\tfloat compensationFactor = Ems_V * Ems_L;\n\tvec3 multiScatter = Fms * compensationFactor;\n\treturn singleScatter + multiScatter;\n}\n#if NUM_RECT_AREA_LIGHTS > 0\n\tvoid RE_Direct_RectArea_Physical( const in RectAreaLight rectAreaLight, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n\t\tvec3 normal = geometryNormal;\n\t\tvec3 viewDir = geometryViewDir;\n\t\tvec3 position = geometryPosition;\n\t\tvec3 lightPos = rectAreaLight.position;\n\t\tvec3 halfWidth = rectAreaLight.halfWidth;\n\t\tvec3 halfHeight = rectAreaLight.halfHeight;\n\t\tvec3 lightColor = rectAreaLight.color;\n\t\tfloat roughness = material.roughness;\n\t\tvec3 rectCoords[ 4 ];\n\t\trectCoords[ 0 ] = lightPos + halfWidth - halfHeight;\t\trectCoords[ 1 ] = lightPos - halfWidth - halfHeight;\n\t\trectCoords[ 2 ] = lightPos - halfWidth + halfHeight;\n\t\trectCoords[ 3 ] = lightPos + halfWidth + halfHeight;\n\t\tvec2 uv = LTC_Uv( normal, viewDir, roughness );\n\t\tvec4 t1 = texture2D( ltc_1, uv );\n\t\tvec4 t2 = texture2D( ltc_2, uv );\n\t\tmat3 mInv = mat3(\n\t\t\tvec3( t1.x, 0, t1.y ),\n\t\t\tvec3(    0, 1,    0 ),\n\t\t\tvec3( t1.z, 0, t1.w )\n\t\t);\n\t\tvec3 fresnel = ( material.specularColorBlended * t2.x + ( material.specularF90 - material.specularColorBlended ) * t2.y );\n\t\treflectedLight.directSpecular += lightColor * fresnel * LTC_Evaluate( normal, viewDir, position, mInv, rectCoords );\n\t\treflectedLight.directDiffuse += lightColor * material.diffuseContribution * LTC_Evaluate( normal, viewDir, position, mat3( 1.0 ), rectCoords );\n\t\t#ifdef USE_CLEARCOAT\n\t\t\tvec3 Ncc = geometryClearcoatNormal;\n\t\t\tvec2 uvClearcoat = LTC_Uv( Ncc, viewDir, material.clearcoatRoughness );\n\t\t\tvec4 t1Clearcoat = texture2D( ltc_1, uvClearcoat );\n\t\t\tvec4 t2Clearcoat = texture2D( ltc_2, uvClearcoat );\n\t\t\tmat3 mInvClearcoat = mat3(\n\t\t\t\tvec3( t1Clearcoat.x, 0, t1Clearcoat.y ),\n\t\t\t\tvec3(             0, 1,             0 ),\n\t\t\t\tvec3( t1Clearcoat.z, 0, t1Clearcoat.w )\n\t\t\t);\n\t\t\tvec3 fresnelClearcoat = material.clearcoatF0 * t2Clearcoat.x + ( material.clearcoatF90 - material.clearcoatF0 ) * t2Clearcoat.y;\n\t\t\tclearcoatSpecularDirect += lightColor * fresnelClearcoat * LTC_Evaluate( Ncc, viewDir, position, mInvClearcoat, rectCoords );\n\t\t#endif\n\t}\n#endif\nvoid RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n\tfloat dotNL = saturate( dot( geometryNormal, directLight.direction ) );\n\tvec3 irradiance = dotNL * directLight.color;\n\t#ifdef USE_CLEARCOAT\n\t\tfloat dotNLcc = saturate( dot( geometryClearcoatNormal, directLight.direction ) );\n\t\tvec3 ccIrradiance = dotNLcc * directLight.color;\n\t\tclearcoatSpecularDirect += ccIrradiance * BRDF_GGX_Clearcoat( directLight.direction, geometryViewDir, geometryClearcoatNormal, material );\n\t#endif\n\t#ifdef USE_SHEEN\n \n \t\tsheenSpecularDirect += irradiance * BRDF_Sheen( directLight.direction, geometryViewDir, geometryNormal, material.sheenColor, material.sheenRoughness );\n \n \t\tfloat sheenAlbedoV = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );\n \t\tfloat sheenAlbedoL = IBLSheenBRDF( geometryNormal, directLight.direction, material.sheenRoughness );\n \n \t\tfloat sheenEnergyComp = 1.0 - max3( material.sheenColor ) * max( sheenAlbedoV, sheenAlbedoL );\n \n \t\tirradiance *= sheenEnergyComp;\n \n \t#endif\n\treflectedLight.directSpecular += irradiance * BRDF_GGX_Multiscatter( directLight.direction, geometryViewDir, geometryNormal, material );\n\treflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseContribution );\n}\nvoid RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n\tvec3 diffuse = irradiance * BRDF_Lambert( material.diffuseContribution );\n\t#ifdef USE_SHEEN\n\t\tfloat sheenAlbedo = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );\n\t\tfloat sheenEnergyComp = 1.0 - max3( material.sheenColor ) * sheenAlbedo;\n\t\tdiffuse *= sheenEnergyComp;\n\t#endif\n\treflectedLight.indirectDiffuse += diffuse;\n}\nvoid RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradiance, const in vec3 clearcoatRadiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight) {\n\t#ifdef USE_CLEARCOAT\n\t\tclearcoatSpecularIndirect += clearcoatRadiance * EnvironmentBRDF( geometryClearcoatNormal, geometryViewDir, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );\n\t#endif\n\t#ifdef USE_SHEEN\n\t\tsheenSpecularIndirect += irradiance * material.sheenColor * IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness ) * RECIPROCAL_PI;\n \t#endif\n\tvec3 singleScatteringDielectric = vec3( 0.0 );\n\tvec3 multiScatteringDielectric = vec3( 0.0 );\n\tvec3 singleScatteringMetallic = vec3( 0.0 );\n\tvec3 multiScatteringMetallic = vec3( 0.0 );\n\t#ifdef USE_IRIDESCENCE\n\t\tcomputeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.iridescence, material.iridescenceFresnelDielectric, material.roughness, singleScatteringDielectric, multiScatteringDielectric );\n\t\tcomputeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.diffuseColor, material.specularF90, material.iridescence, material.iridescenceFresnelMetallic, material.roughness, singleScatteringMetallic, multiScatteringMetallic );\n\t#else\n\t\tcomputeMultiscattering( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.roughness, singleScatteringDielectric, multiScatteringDielectric );\n\t\tcomputeMultiscattering( geometryNormal, geometryViewDir, material.diffuseColor, material.specularF90, material.roughness, singleScatteringMetallic, multiScatteringMetallic );\n\t#endif\n\tvec3 singleScattering = mix( singleScatteringDielectric, singleScatteringMetallic, material.metalness );\n\tvec3 multiScattering = mix( multiScatteringDielectric, multiScatteringMetallic, material.metalness );\n\tvec3 totalScatteringDielectric = singleScatteringDielectric + multiScatteringDielectric;\n\tvec3 diffuse = material.diffuseContribution * ( 1.0 - totalScatteringDielectric );\n\tvec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;\n\tvec3 indirectSpecular = radiance * singleScattering;\n\tindirectSpecular += multiScattering * cosineWeightedIrradiance;\n\tvec3 indirectDiffuse = diffuse * cosineWeightedIrradiance;\n\t#ifdef USE_SHEEN\n\t\tfloat sheenAlbedo = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );\n\t\tfloat sheenEnergyComp = 1.0 - max3( material.sheenColor ) * sheenAlbedo;\n\t\tindirectSpecular *= sheenEnergyComp;\n\t\tindirectDiffuse *= sheenEnergyComp;\n\t#endif\n\treflectedLight.indirectSpecular += indirectSpecular;\n\treflectedLight.indirectDiffuse += indirectDiffuse;\n}\n#define RE_Direct\t\t\t\tRE_Direct_Physical\n#define RE_Direct_RectArea\t\tRE_Direct_RectArea_Physical\n#define RE_IndirectDiffuse\t\tRE_IndirectDiffuse_Physical\n#define RE_IndirectSpecular\t\tRE_IndirectSpecular_Physical\nfloat computeSpecularOcclusion( const in float dotNV, const in float ambientOcclusion, const in float roughness ) {\n\treturn saturate( pow( dotNV + ambientOcclusion, exp2( - 16.0 * roughness - 1.0 ) ) - 1.0 + ambientOcclusion );\n}";
 
-var lights_fragment_begin = "\nvec3 geometryPosition = - vViewPosition;\nvec3 geometryNormal = normal;\nvec3 geometryViewDir = ( isOrthographic ) ? vec3( 0, 0, 1 ) : normalize( vViewPosition );\nvec3 geometryClearcoatNormal = vec3( 0.0 );\n#ifdef USE_CLEARCOAT\n\tgeometryClearcoatNormal = clearcoatNormal;\n#endif\n#ifdef USE_IRIDESCENCE\n\tfloat dotNVi = saturate( dot( normal, geometryViewDir ) );\n\tif ( material.iridescenceThickness == 0.0 ) {\n\t\tmaterial.iridescence = 0.0;\n\t} else {\n\t\tmaterial.iridescence = saturate( material.iridescence );\n\t}\n\tif ( material.iridescence > 0.0 ) {\n\t\tmaterial.iridescenceFresnelDielectric = evalIridescence( 1.0, material.iridescenceIOR, dotNVi, material.iridescenceThickness, material.specularColor );\n\t\tmaterial.iridescenceFresnelMetallic = evalIridescence( 1.0, material.iridescenceIOR, dotNVi, material.iridescenceThickness, material.diffuseColor );\n\t\tmaterial.iridescenceFresnel = mix( material.iridescenceFresnelDielectric, material.iridescenceFresnelMetallic, material.metalness );\n\t\tmaterial.iridescenceF0 = Schlick_to_F0( material.iridescenceFresnel, 1.0, dotNVi );\n\t}\n#endif\nIncidentLight directLight;\n#if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )\n\tPointLight pointLight;\n\t#if defined( USE_SHADOWMAP ) && NUM_POINT_LIGHT_SHADOWS > 0\n\tPointLightShadow pointLightShadow;\n\t#endif\n\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {\n\t\tpointLight = pointLights[ i ];\n\t\tgetPointLightInfo( pointLight, geometryPosition, directLight );\n\t\t#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_POINT_LIGHT_SHADOWS ) && ( defined( SHADOWMAP_TYPE_PCF ) || defined( SHADOWMAP_TYPE_BASIC ) )\n\t\tpointLightShadow = pointLightShadows[ i ];\n\t\tdirectLight.color *= ( directLight.visible && receiveShadow ) ? getPointShadow( pointShadowMap[ i ], pointLightShadow.shadowMapSize, pointLightShadow.shadowIntensity, pointLightShadow.shadowBias, pointLightShadow.shadowRadius, vPointShadowCoord[ i ], pointLightShadow.shadowCameraNear, pointLightShadow.shadowCameraFar ) : 1.0;\n\t\t#endif\n\t\tRE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );\n\t}\n\t#pragma unroll_loop_end\n#endif\n#if ( NUM_SPOT_LIGHTS > 0 ) && defined( RE_Direct )\n\tSpotLight spotLight;\n\tvec4 spotColor;\n\tvec3 spotLightCoord;\n\tbool inSpotLightMap;\n\t#if defined( USE_SHADOWMAP ) && NUM_SPOT_LIGHT_SHADOWS > 0\n\tSpotLightShadow spotLightShadow;\n\t#endif\n\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {\n\t\tspotLight = spotLights[ i ];\n\t\tgetSpotLightInfo( spotLight, geometryPosition, directLight );\n\t\t#if ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS_WITH_MAPS )\n\t\t#define SPOT_LIGHT_MAP_INDEX UNROLLED_LOOP_INDEX\n\t\t#elif ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS )\n\t\t#define SPOT_LIGHT_MAP_INDEX NUM_SPOT_LIGHT_MAPS\n\t\t#else\n\t\t#define SPOT_LIGHT_MAP_INDEX ( UNROLLED_LOOP_INDEX - NUM_SPOT_LIGHT_SHADOWS + NUM_SPOT_LIGHT_SHADOWS_WITH_MAPS )\n\t\t#endif\n\t\t#if ( SPOT_LIGHT_MAP_INDEX < NUM_SPOT_LIGHT_MAPS )\n\t\t\tspotLightCoord = vSpotLightCoord[ i ].xyz / vSpotLightCoord[ i ].w;\n\t\t\tinSpotLightMap = all( lessThan( abs( spotLightCoord * 2. - 1. ), vec3( 1.0 ) ) );\n\t\t\tspotColor = texture2D( spotLightMap[ SPOT_LIGHT_MAP_INDEX ], spotLightCoord.xy );\n\t\t\tdirectLight.color = inSpotLightMap ? directLight.color * spotColor.rgb : directLight.color;\n\t\t#endif\n\t\t#undef SPOT_LIGHT_MAP_INDEX\n\t\t#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS )\n\t\tspotLightShadow = spotLightShadows[ i ];\n\t\tdirectLight.color *= ( directLight.visible && receiveShadow ) ? getShadow( spotShadowMap[ i ], spotLightShadow.shadowMapSize, spotLightShadow.shadowIntensity, spotLightShadow.shadowBias, spotLightShadow.shadowRadius, vSpotLightCoord[ i ] ) : 1.0;\n\t\t#endif\n\t\tRE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );\n\t}\n\t#pragma unroll_loop_end\n#endif\n#if ( NUM_DIR_LIGHTS > 0 ) && defined( RE_Direct )\n\tDirectionalLight directionalLight;\n\t#if defined( USE_SHADOWMAP ) && NUM_DIR_LIGHT_SHADOWS > 0\n\tDirectionalLightShadow directionalLightShadow;\n\t#endif\n\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\n\t\tdirectionalLight = directionalLights[ i ];\n\t\tgetDirectionalLightInfo( directionalLight, directLight );\n\t\t#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_DIR_LIGHT_SHADOWS )\n\t\tdirectionalLightShadow = directionalLightShadows[ i ];\n\t\tdirectLight.color *= ( directLight.visible && receiveShadow ) ? getShadow( directionalShadowMap[ i ], directionalLightShadow.shadowMapSize, directionalLightShadow.shadowIntensity, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;\n\t\t#endif\n\t\tRE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );\n\t}\n\t#pragma unroll_loop_end\n#endif\n#if ( NUM_RECT_AREA_LIGHTS > 0 ) && defined( RE_Direct_RectArea )\n\tRectAreaLight rectAreaLight;\n\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_RECT_AREA_LIGHTS; i ++ ) {\n\t\trectAreaLight = rectAreaLights[ i ];\n\t\tRE_Direct_RectArea( rectAreaLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );\n\t}\n\t#pragma unroll_loop_end\n#endif\n#if defined( RE_IndirectDiffuse )\n\tvec3 iblIrradiance = vec3( 0.0 );\n\tvec3 irradiance = getAmbientLightIrradiance( ambientLightColor );\n\t#if defined( USE_LIGHT_PROBES )\n\t\tirradiance += getLightProbeIrradiance( lightProbe, geometryNormal );\n\t#endif\n\t#if ( NUM_HEMI_LIGHTS > 0 )\n\t\t#pragma unroll_loop_start\n\t\tfor ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {\n\t\t\tirradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometryNormal );\n\t\t}\n\t\t#pragma unroll_loop_end\n\t#endif\n\t#ifdef USE_LIGHT_PROBES_GRID\n\t\tvec3 probeWorldPos = ( ( vec4( geometryPosition, 1.0 ) - viewMatrix[ 3 ] ) * viewMatrix ).xyz;\n\t\tvec3 probeWorldNormal = inverseTransformDirection( geometryNormal, viewMatrix );\n\t\tirradiance += getLightProbeGridIrradiance( probeWorldPos, probeWorldNormal );\n\t#endif\n#endif\n#if defined( RE_IndirectSpecular )\n\tvec3 radiance = vec3( 0.0 );\n\tvec3 clearcoatRadiance = vec3( 0.0 );\n#endif";
+var lights_fragment_begin = "\nvec3 geometryPosition = - vViewPosition;\nvec3 geometryNormal = normal;\nvec3 geometryViewDir = ( isOrthographic ) ? vec3( 0, 0, 1 ) : normalize( vViewPosition );\nvec3 geometryClearcoatNormal = vec3( 0.0 );\n#ifdef USE_CLEARCOAT\n\tgeometryClearcoatNormal = clearcoatNormal;\n#endif\n#ifdef USE_IRIDESCENCE\n\tfloat dotNVi = saturate( dot( normal, geometryViewDir ) );\n\tif ( material.iridescenceThickness == 0.0 ) {\n\t\tmaterial.iridescence = 0.0;\n\t} else {\n\t\tmaterial.iridescence = saturate( material.iridescence );\n\t}\n\tif ( material.iridescence > 0.0 ) {\n\t\tmaterial.iridescenceFresnelDielectric = evalIridescence( 1.0, material.iridescenceIOR, dotNVi, material.iridescenceThickness, material.specularColor );\n\t\tmaterial.iridescenceFresnelMetallic = evalIridescence( 1.0, material.iridescenceIOR, dotNVi, material.iridescenceThickness, material.diffuseColor );\n\t\tmaterial.iridescenceFresnel = mix( material.iridescenceFresnelDielectric, material.iridescenceFresnelMetallic, material.metalness );\n\t\tmaterial.iridescenceF0 = Schlick_to_F0( material.iridescenceFresnel, 1.0, dotNVi );\n\t}\n#endif\nIncidentLight directLight;\n#if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )\n\tPointLight pointLight;\n\t#if defined( USE_SHADOWMAP ) && NUM_POINT_LIGHT_SHADOWS > 0\n\tPointLightShadow pointLightShadow;\n\t#endif\n\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {\n\t\tpointLight = pointLights[ i ];\n\t\tgetPointLightInfo( pointLight, geometryPosition, directLight );\n\t\t#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_POINT_LIGHT_SHADOWS ) && ( defined( SHADOWMAP_TYPE_PCF ) || defined( SHADOWMAP_TYPE_BASIC ) )\n\t\tpointLightShadow = pointLightShadows[ i ];\n\t\tdirectLight.color *= ( directLight.visible && receiveShadow ) ? getPointShadow( pointShadowMap[ i ], pointLightShadow.shadowMapSize, pointLightShadow.shadowIntensity, pointLightShadow.shadowBias, pointLightShadow.shadowRadius, vPointShadowCoord[ i ], pointLightShadow.shadowCameraNear, pointLightShadow.shadowCameraFar ) : 1.0;\n\t\t#endif\n\t\tRE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );\n\t}\n\t#pragma unroll_loop_end\n#endif\n#if ( NUM_SPOT_LIGHTS > 0 ) && defined( RE_Direct )\n\tSpotLight spotLight;\n\tvec4 spotColor;\n\tvec3 spotLightCoord;\n\tbool inSpotLightMap;\n\t#if defined( USE_SHADOWMAP ) && NUM_SPOT_LIGHT_SHADOWS > 0\n\tSpotLightShadow spotLightShadow;\n\t#endif\n\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {\n\t\tspotLight = spotLights[ i ];\n\t\tgetSpotLightInfo( spotLight, geometryPosition, directLight );\n\t\t#if ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS_WITH_MAPS )\n\t\t#define SPOT_LIGHT_MAP_INDEX UNROLLED_LOOP_INDEX\n\t\t#elif ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS )\n\t\t#define SPOT_LIGHT_MAP_INDEX NUM_SPOT_LIGHT_MAPS\n\t\t#else\n\t\t#define SPOT_LIGHT_MAP_INDEX ( UNROLLED_LOOP_INDEX - NUM_SPOT_LIGHT_SHADOWS + NUM_SPOT_LIGHT_SHADOWS_WITH_MAPS )\n\t\t#endif\n\t\t#if ( SPOT_LIGHT_MAP_INDEX < NUM_SPOT_LIGHT_MAPS )\n\t\t\tspotLightCoord = vSpotLightCoord[ i ].xyz / vSpotLightCoord[ i ].w;\n\t\t\tinSpotLightMap = all( lessThan( abs( spotLightCoord * 2. - 1. ), vec3( 1.0 ) ) );\n\t\t\tspotColor = texture2D( spotLightMap[ SPOT_LIGHT_MAP_INDEX ], spotLightCoord.xy );\n\t\t\tdirectLight.color = inSpotLightMap ? directLight.color * spotColor.rgb : directLight.color;\n\t\t#endif\n\t\t#undef SPOT_LIGHT_MAP_INDEX\n\t\t#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS )\n\t\tspotLightShadow = spotLightShadows[ i ];\n\t\tdirectLight.color *= ( directLight.visible && receiveShadow ) ? getShadow( spotShadowMap[ i ], spotLightShadow.shadowMapSize, spotLightShadow.shadowIntensity, spotLightShadow.shadowBias, spotLightShadow.shadowRadius, vSpotLightCoord[ i ] ) : 1.0;\n\t\t#endif\n\t\tRE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );\n\t}\n\t#pragma unroll_loop_end\n#endif\n#if ( NUM_DIR_LIGHTS > 0 ) && defined( RE_Direct )\n\tDirectionalLight directionalLight;\n\t#if defined( USE_SHADOWMAP ) && NUM_DIR_LIGHT_SHADOWS > 0\n\tDirectionalLightShadow directionalLightShadow;\n\t#endif\n\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\n\t\tdirectionalLight = directionalLights[ i ];\n\t\tgetDirectionalLightInfo( directionalLight, directLight );\n\t\t#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_DIR_LIGHT_SHADOWS )\n\t\tdirectionalLightShadow = directionalLightShadows[ i ];\n\t\tdirectLight.color *= ( directLight.visible && receiveShadow ) ? getShadow( directionalShadowMap[ i ], directionalLightShadow.shadowMapSize, directionalLightShadow.shadowIntensity, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;\n\t\t#endif\n\t\tRE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );\n\t}\n\t#pragma unroll_loop_end\n#endif\n#if ( NUM_RECT_AREA_LIGHTS > 0 ) && defined( RE_Direct_RectArea )\n\tRectAreaLight rectAreaLight;\n\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_RECT_AREA_LIGHTS; i ++ ) {\n\t\trectAreaLight = rectAreaLights[ i ];\n\t\tRE_Direct_RectArea( rectAreaLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );\n\t}\n\t#pragma unroll_loop_end\n#endif\n#if defined( RE_IndirectDiffuse )\n\tvec3 iblIrradiance = vec3( 0.0 );\n\tvec3 irradiance = getAmbientLightIrradiance( ambientLightColor );\n\t#if defined( USE_LIGHT_PROBES )\n\t\tirradiance += getLightProbeIrradiance( lightProbe, geometryNormal );\n\t#endif\n\t#if ( NUM_HEMI_LIGHTS > 0 )\n\t\t#pragma unroll_loop_start\n\t\tfor ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {\n\t\t\tirradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometryNormal );\n\t\t}\n\t\t#pragma unroll_loop_end\n\t#endif\n\t#ifdef USE_LIGHT_PROBES_GRID\n\t\tvec3 probeWorldPos = ( ( vec4( geometryPosition, 1.0 ) - viewMatrix[ 3 ] ) * viewMatrix ).xyz;\n\t\tvec3 probeWorldNormal = transformNormalByInverseViewMatrix( geometryNormal, viewMatrix );\n\t\tirradiance += getLightProbeGridIrradiance( probeWorldPos, probeWorldNormal );\n\t#endif\n#endif\n#if defined( RE_IndirectSpecular )\n\tvec3 radiance = vec3( 0.0 );\n\tvec3 clearcoatRadiance = vec3( 0.0 );\n#endif";
 
 var lights_fragment_maps = "#if defined( RE_IndirectDiffuse )\n\t#ifdef USE_LIGHTMAP\n\t\tvec4 lightMapTexel = texture2D( lightMap, vLightMapUv );\n\t\tvec3 lightMapIrradiance = lightMapTexel.rgb * lightMapIntensity;\n\t\tirradiance += lightMapIrradiance;\n\t#endif\n\t#if defined( USE_ENVMAP ) && defined( ENVMAP_TYPE_CUBE_UV )\n\t\t#if defined( STANDARD ) || defined( LAMBERT ) || defined( PHONG )\n\t\t\tiblIrradiance += getIBLIrradiance( geometryNormal );\n\t\t#endif\n\t#endif\n#endif\n#if defined( USE_ENVMAP ) && defined( RE_IndirectSpecular )\n\t#ifdef USE_ANISOTROPY\n\t\tradiance += getIBLAnisotropyRadiance( geometryViewDir, geometryNormal, material.roughness, material.anisotropyB, material.anisotropy );\n\t#else\n\t\tradiance += getIBLRadiance( geometryViewDir, geometryNormal, material.roughness );\n\t#endif\n\t#ifdef USE_CLEARCOAT\n\t\tclearcoatRadiance += getIBLRadiance( geometryViewDir, geometryClearcoatNormal, material.clearcoatRoughness );\n\t#endif\n#endif";
 
@@ -60098,7 +60496,7 @@ const fragment$e = "#if DEPTH_PACKING == 3200\n\tuniform float opacity;\n#endif\
 
 const vertex$d = "#define DISTANCE\nvarying vec3 vWorldPosition;\n#include <common>\n#include <batching_pars_vertex>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <batching_vertex>\n\t#include <skinbase_vertex>\n\t#include <morphinstance_vertex>\n\t#ifdef USE_DISPLACEMENTMAP\n\t\t#include <beginnormal_vertex>\n\t\t#include <morphnormal_vertex>\n\t\t#include <skinnormal_vertex>\n\t#endif\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <worldpos_vertex>\n\t#include <clipping_planes_vertex>\n\tvWorldPosition = worldPosition.xyz;\n}";
 
-const fragment$d = "#define DISTANCE\nuniform vec3 referencePosition;\nuniform float nearDistance;\nuniform float farDistance;\nvarying vec3 vWorldPosition;\n#include <common>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <alphatest_pars_fragment>\n#include <alphahash_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main () {\n\tvec4 diffuseColor = vec4( 1.0 );\n\t#include <clipping_planes_fragment>\n\t#include <map_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <alphahash_fragment>\n\tfloat dist = length( vWorldPosition - referencePosition );\n\tdist = ( dist - nearDistance ) / ( farDistance - nearDistance );\n\tdist = saturate( dist );\n\tgl_FragColor = vec4( dist, 0.0, 0.0, 1.0 );\n}";
+const fragment$d = "#define DISTANCE\nuniform vec3 referencePosition;\nuniform float nearDistance;\nuniform float farDistance;\nvarying vec3 vWorldPosition;\n#include <common>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <alphatest_pars_fragment>\n#include <alphahash_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\tvec4 diffuseColor = vec4( 1.0 );\n\t#include <clipping_planes_fragment>\n\t#include <map_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <alphahash_fragment>\n\tfloat dist = length( vWorldPosition - referencePosition );\n\tdist = ( dist - nearDistance ) / ( farDistance - nearDistance );\n\tdist = saturate( dist );\n\tgl_FragColor = vec4( dist, 0.0, 0.0, 1.0 );\n}";
 
 const vertex$c = "varying vec3 vWorldDirection;\n#include <common>\nvoid main() {\n\tvWorldDirection = transformDirection( position, modelMatrix );\n\t#include <begin_vertex>\n\t#include <project_vertex>\n}";
 
@@ -62309,8 +62707,9 @@ class PMREMGenerator {
 
 	/**
 	 * Generates a PMREM from an equirectangular texture, which can be either LDR
-	 * or HDR. The ideal input image size is 1k (1024 x 512),
-	 * as this matches best with the 256 x 256 cubemap output.
+	 * or HDR. The ideal input image size is 1k (1024 x 512), as this matches best
+	 * with the 256 x 256 cubemap output. The minimum supported input image size
+	 * is 64 x 32.
 	 *
 	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
 	 * @param {?WebGLRenderTarget} [renderTarget=null] - The render target to use.
@@ -62324,8 +62723,9 @@ class PMREMGenerator {
 
 	/**
 	 * Generates a PMREM from an cubemap texture, which can be either LDR
-	 * or HDR. The ideal input cube size is 256 x 256,
-	 * as this matches best with the 256 x 256 cubemap output.
+	 * or HDR. The ideal input cube size is 256 x 256, as this matches best
+	 * with the 256 x 256 cubemap output. The minimum supported input cube
+	 * size is 16 x 16 per face.
 	 *
 	 * @param {Texture} cubemap - The cubemap texture to be converted.
 	 * @param {?WebGLRenderTarget} [renderTarget=null] - The render target to use.
@@ -64363,13 +64763,14 @@ const toneMappingMap = {
 	[ CustomToneMapping ]: 'CUSTOM_TONE_MAPPING'
 };
 
-function WebGLOutput( type, width, height, depth, stencil ) {
+function WebGLOutput( type, width, height, antialias, depth, stencil ) {
 
 	// render targets for scene and post-processing
 	const targetA = new WebGLRenderTarget( width, height, {
 		type: type,
 		depthBuffer: depth,
 		stencilBuffer: stencil,
+		samples: antialias ? 4 : 0,
 		depthTexture: depth ? new DepthTexture( width, height ) : undefined
 	} );
 
@@ -66066,7 +66467,7 @@ function includeReplacer( match, include ) {
 
 		} else {
 
-			throw new Error( 'Can not resolve #include <' + include + '>' );
+			throw new Error( 'THREE.WebGLProgram: Can not resolve #include <' + include + '>' );
 
 		}
 
@@ -66689,7 +67090,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 					const fragmentErrors = getShaderErrors( gl, glFragmentShader, 'fragment' );
 
 					error(
-						'THREE.WebGLProgram: Shader Error ' + gl.getError() + ' - ' +
+						'WebGLProgram: Shader Error ' + gl.getError() + ' - ' +
 						'VALIDATE_STATUS ' + gl.getProgramParameter( program, gl.VALIDATE_STATUS ) + '\n\n' +
 						'Material Name: ' + self.name + '\n' +
 						'Material Type: ' + self.type + '\n\n' +
@@ -67835,11 +68236,19 @@ function WebGLRenderList() {
 
 	}
 
-	function sort( customOpaqueSort, customTransparentSort ) {
+	function sort( customOpaqueSort, customTransparentSort, reversedDepth ) {
 
 		if ( opaque.length > 1 ) opaque.sort( customOpaqueSort || painterSortStable );
 		if ( transmissive.length > 1 ) transmissive.sort( customTransparentSort || reversePainterSortStable );
 		if ( transparent.length > 1 ) transparent.sort( customTransparentSort || reversePainterSortStable );
+
+		if ( reversedDepth ) {
+
+			opaque.reverse();
+			transmissive.reverse();
+			transparent.reverse();
+
+		}
 
 	}
 
@@ -72309,7 +72718,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( ! ( renderTarget.depthTexture && renderTarget.depthTexture.isDepthTexture ) ) {
 
-			throw new Error( 'renderTarget.depthTexture must be an instance of THREE.DepthTexture' );
+			throw new Error( 'THREE.WebGLTextures: renderTarget.depthTexture must be an instance of THREE.DepthTexture.' );
 
 		}
 
@@ -72407,7 +72816,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else {
 
-			throw new Error( 'Unknown depthTexture format' );
+			throw new Error( 'THREE.WebGLTextures: Unknown depthTexture format.' );
 
 		}
 
@@ -75206,73 +75615,101 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		for ( let i = 0, il = uniforms.length; i < il; i ++ ) {
 
-			const uniformArray = Array.isArray( uniforms[ i ] ) ? uniforms[ i ] : [ uniforms[ i ] ];
+			const uniformItem = uniforms[ i ];
 
-			for ( let j = 0, jl = uniformArray.length; j < jl; j ++ ) {
+			if ( Array.isArray( uniformItem ) ) {
 
-				const uniform = uniformArray[ j ];
+				for ( let j = 0, jl = uniformItem.length; j < jl; j ++ ) {
 
-				if ( hasUniformChanged( uniform, i, j, cache ) === true ) {
-
-					const offset = uniform.__offset;
-
-					const values = Array.isArray( uniform.value ) ? uniform.value : [ uniform.value ];
-
-					let arrayOffset = 0;
-
-					for ( let k = 0; k < values.length; k ++ ) {
-
-						const value = values[ k ];
-
-						const info = getUniformSize( value );
-
-						// TODO add integer and struct support
-						if ( typeof value === 'number' || typeof value === 'boolean' ) {
-
-							uniform.__data[ 0 ] = value;
-							gl.bufferSubData( gl.UNIFORM_BUFFER, offset + arrayOffset, uniform.__data );
-
-						} else if ( value.isMatrix3 ) {
-
-							// manually converting 3x3 to 3x4
-
-							uniform.__data[ 0 ] = value.elements[ 0 ];
-							uniform.__data[ 1 ] = value.elements[ 1 ];
-							uniform.__data[ 2 ] = value.elements[ 2 ];
-							uniform.__data[ 3 ] = 0;
-							uniform.__data[ 4 ] = value.elements[ 3 ];
-							uniform.__data[ 5 ] = value.elements[ 4 ];
-							uniform.__data[ 6 ] = value.elements[ 5 ];
-							uniform.__data[ 7 ] = 0;
-							uniform.__data[ 8 ] = value.elements[ 6 ];
-							uniform.__data[ 9 ] = value.elements[ 7 ];
-							uniform.__data[ 10 ] = value.elements[ 8 ];
-							uniform.__data[ 11 ] = 0;
-
-						} else if ( ArrayBuffer.isView( value ) ) {
-
-							// copy the buffer data using "set"
-							uniform.__data.set( new value.constructor( value.buffer, value.byteOffset, uniform.__data.length ) );
-
-						} else {
-
-							value.toArray( uniform.__data, arrayOffset );
-
-							arrayOffset += info.storage / Float32Array.BYTES_PER_ELEMENT;
-
-						}
-
-					}
-
-					gl.bufferSubData( gl.UNIFORM_BUFFER, offset, uniform.__data );
+					updateUniform( uniformItem[ j ], i, j, cache );
 
 				}
+
+			} else {
+
+				updateUniform( uniformItem, i, 0, cache );
 
 			}
 
 		}
 
 		gl.bindBuffer( gl.UNIFORM_BUFFER, null );
+
+	}
+
+	function updateUniform( uniform, index, indexArray, cache ) {
+
+		if ( hasUniformChanged( uniform, index, indexArray, cache ) === true ) {
+
+			const offset = uniform.__offset;
+			const value = uniform.value;
+
+			if ( Array.isArray( value ) ) {
+
+				let arrayOffset = 0;
+
+				for ( let k = 0; k < value.length; k ++ ) {
+
+					const val = value[ k ];
+					const info = getUniformSize( val );
+
+					writeUniformValue( val, uniform.__data, arrayOffset );
+
+					// only toArray() values advance arrayOffset
+					if ( typeof val !== 'number' && typeof val !== 'boolean' && ! val.isMatrix3 && ! ArrayBuffer.isView( val ) ) {
+
+						arrayOffset += info.storage / Float32Array.BYTES_PER_ELEMENT;
+
+					}
+
+				}
+
+			} else {
+
+				writeUniformValue( value, uniform.__data, 0 );
+
+			}
+
+			gl.bufferSubData( gl.UNIFORM_BUFFER, offset, uniform.__data );
+
+		}
+
+	}
+
+	function writeUniformValue( value, data, offset ) {
+
+		// TODO add integer and struct support
+		if ( typeof value === 'number' || typeof value === 'boolean' ) {
+
+			data[ 0 ] = value;
+
+		} else if ( value.isMatrix3 ) {
+
+			// manually converting 3x3 to 3x4
+
+			data[ 0 ] = value.elements[ 0 ];
+			data[ 1 ] = value.elements[ 1 ];
+			data[ 2 ] = value.elements[ 2 ];
+			data[ 3 ] = 0;
+			data[ 4 ] = value.elements[ 3 ];
+			data[ 5 ] = value.elements[ 4 ];
+			data[ 6 ] = value.elements[ 5 ];
+			data[ 7 ] = 0;
+			data[ 8 ] = value.elements[ 6 ];
+			data[ 9 ] = value.elements[ 7 ];
+			data[ 10 ] = value.elements[ 8 ];
+			data[ 11 ] = 0;
+
+		} else if ( ArrayBuffer.isView( value ) ) {
+
+			// copy the buffer data using "set"
+			data.set( new value.constructor( value.buffer, value.byteOffset, data.length ) );
+
+		} else {
+
+			value.toArray( data, offset );
+
+		}
 
 	}
 
@@ -75805,6 +76242,10 @@ class WebGLRenderer {
 		let _isContextLost = false;
 		let _nodesHandler = null;
 
+		let _scratchFramebuffer = null;
+		let _srcFramebuffer = null;
+		let _dstFramebuffer = null;
+
 		// internal state cache
 
 		this._outputColorSpace = SRGBColorSpace;
@@ -75904,11 +76345,11 @@ class WebGLRenderer {
 
 					if ( getContext( contextName ) ) {
 
-						throw new Error( 'Error creating WebGL context with your selected attributes.' );
+						throw new Error( 'THREE.WebGLRenderer: Error creating WebGL context with your selected attributes.' );
 
 					} else {
 
-						throw new Error( 'Error creating WebGL context.' );
+						throw new Error( 'THREE.WebGLRenderer: Error creating WebGL context.' );
 
 					}
 
@@ -75947,6 +76388,10 @@ class WebGLRenderer {
 				state.buffers.depth.setReversed( true );
 
 			}
+
+			_scratchFramebuffer = _gl.createFramebuffer();
+			_srcFramebuffer = _gl.createFramebuffer();
+			_dstFramebuffer = _gl.createFramebuffer();
 
 			info = new WebGLInfo( _gl );
 			properties = new WebGLProperties();
@@ -76054,7 +76499,7 @@ class WebGLRenderer {
 
 		if ( _outputBufferType !== UnsignedByteType ) {
 
-			output = new WebGLOutput( _outputBufferType, canvas.width, canvas.height, depth, stencil );
+			output = new WebGLOutput( _outputBufferType, canvas.width, canvas.height, antialias, depth, stencil );
 
 		}
 
@@ -76238,7 +76683,7 @@ class WebGLRenderer {
 
 			if ( _outputBufferType === UnsignedByteType ) {
 
-				error( 'THREE.WebGLRenderer: setEffects() requires outputBufferType set to HalfFloatType or FloatType.' );
+				error( 'WebGLRenderer: setEffects() requires outputBufferType set to HalfFloatType or FloatType.' );
 				return;
 
 			}
@@ -76249,7 +76694,7 @@ class WebGLRenderer {
 
 					if ( effects[ i ].isOutputPass === true ) {
 
-						warn( 'THREE.WebGLRenderer: OutputPass is not needed in setEffects(). Tone mapping and color space conversion are applied automatically.' );
+						warn( 'WebGLRenderer: OutputPass is not needed in setEffects(). Tone mapping and color space conversion are applied automatically.' );
 						break;
 
 					}
@@ -77186,7 +77631,7 @@ class WebGLRenderer {
 
 			if ( _this.sortObjects === true ) {
 
-				currentRenderList.sort( _opaqueSort, _transparentSort );
+				currentRenderList.sort( _opaqueSort, _transparentSort, camera.reversedDepth );
 
 			}
 
@@ -77201,6 +77646,8 @@ class WebGLRenderer {
 
 			this.info.render.frame ++;
 
+			if ( this.info.autoReset === true ) this.info.reset();
+
 			if ( _clippingEnabled === true ) clipping.beginShadows();
 
 			const shadowsArray = currentRenderState.state.shadowsArray;
@@ -77210,8 +77657,6 @@ class WebGLRenderer {
 			if ( _clippingEnabled === true ) clipping.endShadows();
 
 			//
-
-			if ( this.info.autoReset === true ) this.info.reset();
 
 			// render scene (skip if first effect is a render pass - it will render the scene itself)
 
@@ -78380,8 +78825,6 @@ class WebGLRenderer {
 
 		};
 
-		const _scratchFrameBuffer = _gl.createFramebuffer();
-
 		/**
 		 * Sets the active rendertarget.
 		 *
@@ -78445,7 +78888,7 @@ class WebGLRenderer {
 							( renderTarget.width !== depthTexture.image.width || renderTarget.height !== depthTexture.image.height )
 						) {
 
-							throw new Error( 'WebGLRenderTarget: Attached DepthTexture is initialized to the incorrect size.' );
+							throw new Error( 'THREE.WebGLRenderer: Attached DepthTexture is initialized to the incorrect size.' );
 
 						}
 
@@ -78514,7 +78957,7 @@ class WebGLRenderer {
 			// being bound that are different sizes.
 			if ( activeMipmapLevel !== 0 ) {
 
-				framebuffer = _scratchFrameBuffer;
+				framebuffer = _scratchFramebuffer;
 
 			}
 
@@ -78757,8 +79200,6 @@ class WebGLRenderer {
 
 		};
 
-		const _srcFramebuffer = _gl.createFramebuffer();
-		const _dstFramebuffer = _gl.createFramebuffer();
 
 		/**
 		 * Copies data of the given source texture into a destination texture.

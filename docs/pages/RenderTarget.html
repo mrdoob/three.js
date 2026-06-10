@@ -162,6 +162,15 @@ Has at least a single entry for the default color attachment.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="useArrayDepthTexture" translate="no">.<a href="#useArrayDepthTexture">useArrayDepthTexture</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to create the depth texture as an array texture for per-layer depth testing.
+This is separate from multiview so layered render targets can use array depth without
+the multiview extension.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="viewport" translate="no">.<a href="#viewport">viewport</a><span class="type-signature"> : <a href="Vector4.html">Vector4</a></span> </h3>
 					<div class="description">
 						<p>A rectangular area representing the render target's viewport.</p>
@@ -467,7 +476,18 @@ method whenever this instance is no longer used in your app.</p>
 <span class="param-type">boolean</span>
 				</td>
 			<td class="description last">
-				<p>Whether this target is used for multiview rendering.</p>
+				<p>Whether this target is used for multiview rendering (WebGL OVR_multiview2 extension).</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>useArrayDepthTexture</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to create the depth texture as an array texture for per-layer depth testing. This is separate from multiview so layered render targets can use array depth without the multiview extension.</p>
 						<p>Default is <code>false</code>.</p>
 			</td>
 		</tr>

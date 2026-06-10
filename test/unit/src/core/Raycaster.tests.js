@@ -7,6 +7,7 @@ import { Line } from '../../../../src/objects/Line.js';
 import { Points } from '../../../../src/objects/Points.js';
 import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera.js';
 import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera.js';
+import { WebGPUCoordinateSystem } from '../../../../src/constants.js';
 
 function checkRayDirectionAgainstReferenceVector( rayDirection, refVector, assert ) {
 
@@ -187,6 +188,106 @@ export default QUnit.module( 'Core', () => {
 				assert.ok( intersections[ i ].distance <= intersections[ i + 1 ].distance, 'intersections are sorted' );
 
 			}
+
+		} );
+
+		QUnit.test( 'intersectObject (Perspective, WebGPU coordinate system)', ( assert ) => {
+
+			const camera = new PerspectiveCamera( 90, 1, 0.1, 100 );
+			camera.coordinateSystem = WebGPUCoordinateSystem;
+			camera.updateProjectionMatrix();
+
+			const front = getSphere();
+			front.position.set( 0, 0, - 5 );
+			front.updateMatrixWorld();
+
+			const behind = getSphere();
+			behind.position.set( 0, 0, 5 );
+			behind.updateMatrixWorld();
+
+			const raycaster = new Raycaster();
+			raycaster.setFromCamera( { x: 0, y: 0 }, camera );
+
+			assert.strictEqual( raycaster.intersectObject( front ).length, 1,
+				'Sphere in front of the perspective camera is intersected under WebGPU coordinate system.' );
+
+			assert.strictEqual( raycaster.intersectObject( behind ).length, 0,
+				'Sphere behind the perspective camera is not intersected under WebGPU coordinate system.' );
+
+		} );
+
+		QUnit.test( 'intersectObject (Orthographic, WebGPU coordinate system)', ( assert ) => {
+
+			const camera = new OrthographicCamera( - 1, 1, 1, - 1, 0.1, 10 );
+			camera.coordinateSystem = WebGPUCoordinateSystem;
+			camera.updateProjectionMatrix();
+
+			const front = getSphere();
+			front.position.set( 0, 0, - 5 );
+			front.updateMatrixWorld();
+
+			const behind = getSphere();
+			behind.position.set( 0, 0, 5 );
+			behind.updateMatrixWorld();
+
+			const raycaster = new Raycaster();
+			raycaster.setFromCamera( { x: 0, y: 0 }, camera );
+
+			assert.strictEqual( raycaster.intersectObject( front ).length, 1,
+				'Sphere in front of the orthographic camera is intersected under WebGPU coordinate system.' );
+
+			assert.strictEqual( raycaster.intersectObject( behind ).length, 0,
+				'Sphere behind the orthographic camera is not intersected under WebGPU coordinate system.' );
+
+		} );
+
+		QUnit.test( 'intersectObject (Perspective, reversed depth)', ( assert ) => {
+
+			const camera = new PerspectiveCamera( 90, 1, 0.1, 100 );
+			camera._reversedDepth = true;
+			camera.updateProjectionMatrix();
+
+			const front = getSphere();
+			front.position.set( 0, 0, - 5 );
+			front.updateMatrixWorld();
+
+			const behind = getSphere();
+			behind.position.set( 0, 0, 5 );
+			behind.updateMatrixWorld();
+
+			const raycaster = new Raycaster();
+			raycaster.setFromCamera( { x: 0, y: 0 }, camera );
+
+			assert.strictEqual( raycaster.intersectObject( front ).length, 1,
+				'Sphere in front of the perspective camera is intersected with reversed depth.' );
+
+			assert.strictEqual( raycaster.intersectObject( behind ).length, 0,
+				'Sphere behind the perspective camera is not intersected with reversed depth.' );
+
+		} );
+
+		QUnit.test( 'intersectObject (Orthographic, reversed depth)', ( assert ) => {
+
+			const camera = new OrthographicCamera( - 1, 1, 1, - 1, 0.1, 10 );
+			camera._reversedDepth = true;
+			camera.updateProjectionMatrix();
+
+			const front = getSphere();
+			front.position.set( 0, 0, - 5 );
+			front.updateMatrixWorld();
+
+			const behind = getSphere();
+			behind.position.set( 0, 0, 5 );
+			behind.updateMatrixWorld();
+
+			const raycaster = new Raycaster();
+			raycaster.setFromCamera( { x: 0, y: 0 }, camera );
+
+			assert.strictEqual( raycaster.intersectObject( front ).length, 1,
+				'Sphere in front of the orthographic camera is intersected with reversed depth.' );
+
+			assert.strictEqual( raycaster.intersectObject( behind ).length, 0,
+				'Sphere behind the orthographic camera is not intersected with reversed depth.' );
 
 		} );
 

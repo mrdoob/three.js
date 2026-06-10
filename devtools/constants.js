@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // Shared protocol constants for Three.js DevTools
 
 var MESSAGE_ID = 'three-devtools';
@@ -20,3 +21,4 @@ var EVENT_SCENE = 'scene';
 var EVENT_OBJECT_DETAILS = 'object-details';
 var EVENT_DEVTOOLS_READY = 'devtools-ready';
 var EVENT_COMMITTED = 'committed';
+var EVENT_SCENE_REMOVED = 'scene-removed';

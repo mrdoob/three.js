@@ -32,18 +32,6 @@ The camera to render the scene with.
 
 ## Properties
 
-### .clearAlpha : number
-
-The clear alpha of the pass.
-
-Default is `0`.
-
-### .clearColor : Color
-
-The clear color of the pass.
-
-Default is `0x000000`.
-
 ### .isSSAAPassNode : boolean (readonly)
 
 This flag can be used for type testing.

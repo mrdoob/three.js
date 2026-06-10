@@ -55,10 +55,10 @@ class StorageBufferNode extends BufferNode {
 
 		let nodeType, structTypeNode = null;
 
-		if ( bufferType && bufferType.isStruct ) {
+		if ( bufferType && bufferType.isStructTypeNode ) {
 
 			nodeType = 'struct';
-			structTypeNode = bufferType.layout;
+			structTypeNode = bufferType;
 
 			if ( value.isStorageBufferAttribute || value.isStorageInstancedBufferAttribute ) {
 

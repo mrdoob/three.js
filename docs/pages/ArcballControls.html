@@ -74,6 +74,9 @@ animation loop when animations are on.</p></div>
 						<p>If set to <code>true</code>, the camera's near and far values will be adjusted every time zoom is
 performed trying to maintain the same visible portion given by initial near and far
 values. Only works with perspective cameras.</p>
+<p>This feature only works as expected if the camera's initial state (position, near and far values)
+is correctly configured before creating the controls. Otherwise <a href="ArcballControls.html#setCamera">ArcballControls#setCamera</a>
+must be called by the application.</p>
 						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>

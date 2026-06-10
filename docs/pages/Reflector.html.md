@@ -61,6 +61,16 @@ Default is `true`.
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 
+### .getReflectionCamera( camera : Camera ) : Camera
+
+Returns a reflection camera for the given camera. The reflection camera is used to render the scene from the reflector's view so correct reflections can be produced.
+
+**camera**
+
+The scene's camera.
+
+**Returns:** The corresponding reflection camera.
+
 ### .getRenderTarget() : WebGLRenderTarget
 
 Returns the reflector's internal render target.

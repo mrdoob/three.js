@@ -1,5 +1,5 @@
 import { TempNode, NodeMaterial, NodeUpdateType, RenderTarget, Vector2, HalfFloatType, RedFormat, QuadMesh, RendererUtils } from 'three/webgpu';
-import { convertToTexture, nodeObject, Fn, uniform, smoothstep, step, texture, max, uniformArray, outputStruct, property, vec4, vec3, uv, Loop, min, mix } from 'three/tsl';
+import { convertToTexture, nodeObject, Fn, uniform, smoothstep, step, texture, max, uniformArray, outputStruct, property, vec4, vec3, uv, Loop, min, mix, float } from 'three/tsl';
 import { gaussianBlur } from './GaussianBlurNode.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -368,7 +368,7 @@ class DepthOfFieldNode extends TempNode {
 			nearField.assign( step( signedDist, 0 ).mul( CoC ) );
 			farField.assign( step( 0, signedDist ).mul( CoC ) );
 
-			return vec4( 0 );
+			return float( 0 );
 
 		} );
 

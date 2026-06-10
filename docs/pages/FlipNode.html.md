@@ -4,16 +4,14 @@
 
 This module is part of the TSL core and usually not used in app level code. It represents a flip operation during the shader generation process meaning it flips normalized values with the following formula:
 
+```js
+x = 1 - x;
+```
+
 `FlipNode` is internally used to implement any `flipXYZW()`, `flipRGBA()` and `flipSTPQ()` method invocations on node objects. For example:
 
 ```js
 uvNode = uvNode.flipY();
-```
-
-## Code Example
-
-```js
-x = 1 - x;
 ```
 
 ## Constructor

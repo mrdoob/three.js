@@ -7,15 +7,16 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { WebXRController } from '../webxr/WebXRController.js';
-import { AddEquation, BackSide, CustomBlending, DepthFormat, DepthStencilFormat, FrontSide, RGBAFormat, UnsignedByteType, UnsignedInt248Type, UnsignedIntType, ZeroFactor } from '../../constants.js';
+import { AddEquation, BackSide, CustomBlending, DepthFormat, DepthStencilFormat, FrontSide, RGBAFormat, UnsignedByteType, UnsignedInt248Type, UnsignedIntType, ZeroFactor, LinearFilter } from '../../constants.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { XRRenderTarget } from './XRRenderTarget.js';
 import { CylinderGeometry } from '../../geometries/CylinderGeometry.js';
 import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial.js';
 import { Mesh } from '../../objects/Mesh.js';
-import { warn } from '../../utils.js';
+import { warn, warnOnce } from '../../utils.js';
 import { renderOutput } from '../../nodes/display/RenderOutputNode.js';
+import { RenderTarget } from '../../core/RenderTarget.js';
 
 const _cameraLPos = /*@__PURE__*/ new Vector3();
 const _cameraRPos = /*@__PURE__*/ new Vector3();
@@ -24,9 +25,7 @@ const _contextNodeLib = /*@__PURE__*/ new WeakMap();
 
 /**
  * The XR manager is built on top of the WebXR Device API to
- * manage XR sessions with `WebGPURenderer`.
- *
- * XR is currently only supported with a WebGL 2 backend.
+ * manage XR sessions with renderer backends.
  *
  * @augments EventDispatcher
  */
@@ -85,6 +84,7 @@ class XRManager extends EventDispatcher {
 		 */
 		this._cameraL = new PerspectiveCamera();
 		this._cameraL.viewport = new Vector4();
+		this._cameraL.matrixWorldAutoUpdate = false;
 
 		/**
 		 * Represents the camera for the right eye.
@@ -94,6 +94,7 @@ class XRManager extends EventDispatcher {
 		 */
 		this._cameraR = new PerspectiveCamera();
 		this._cameraR.viewport = new Vector4();
+		this._cameraR.matrixWorldAutoUpdate = false;
 
 		/**
 		 * A list of cameras used for rendering the XR views.
@@ -182,6 +183,7 @@ class XRManager extends EventDispatcher {
 		 * @readonly
 		 */
 		this._supportsGlBinding = typeof XRWebGLBinding !== 'undefined';
+		this._supportsWebGPUBinding = typeof globalThis.XRGPUBinding !== 'undefined';
 
 		/**
 		 * Helper function to create native WebXR Layer.
@@ -226,6 +228,15 @@ class XRManager extends EventDispatcher {
 		 * @default null
 		 */
 		this._currentPixelRatio = null;
+
+		/**
+		 * The renderer's sample count before XR temporarily overrides it.
+		 *
+		 * @private
+		 * @type {?number}
+		 * @default null
+		 */
+		this._currentSamples = null;
 
 		/**
 		 * The current size of the renderer's canvas
@@ -343,6 +354,16 @@ class XRManager extends EventDispatcher {
 		this._glBinding = null;
 
 		/**
+		 * A reference to the current XR WebGPU binding.
+		 *
+		 * @private
+		 * @type {?XRGPUBinding}
+		 * @default null
+		 */
+
+		this._webgpuBinding = null;
+
+		/**
 		 * A reference to the current XR projection layer.
 		 *
 		 * @private
@@ -445,15 +466,9 @@ class XRManager extends EventDispatcher {
 	/**
 	 * Returns the foveation value.
 	 *
-	 * @return {number|undefined} The foveation value. Returns `undefined` if no base or projection layer is defined.
+	 * @return {number|undefined} The foveation value.
 	 */
 	getFoveation() {
-
-		if ( this._glProjLayer === null && this._glBaseLayer === null ) {
-
-			return undefined;
-
-		}
 
 		return this._foveation;
 
@@ -591,6 +606,20 @@ class XRManager extends EventDispatcher {
 
 	}
 
+	/**
+	 * Returns the current base layer.
+	 *
+	 * This is an `XRProjectionLayer` when the targeted XR device supports the
+	 * WebXR Layers API, or an `XRWebGLLayer` otherwise.
+	 *
+	 * @return {?(XRWebGLLayer|XRProjectionLayer)} The XR base layer.
+	 */
+	getBaseLayer() {
+
+		return this._glProjLayer !== null ? this._glProjLayer : this._glBaseLayer;
+
+	}
+
 
 	/**
 	 * Returns the current XR binding.
@@ -609,6 +638,258 @@ class XRManager extends EventDispatcher {
 		}
 
 		return this._glBinding;
+
+	}
+
+	/**
+	 * Applies WebXR fixed foveation to the internal post-processing render target
+	 * used by the first XR render pass before compositing into a projection layer.
+	 *
+	 * Browser-side `XRWebGLBinding.foveateBoundTexture()` failures are treated as
+	 * non-fatal so they do not interrupt rendering.
+	 *
+	 * @param {RenderTarget} renderTarget - The internal render target.
+	 */
+	foveateBoundTexture( renderTarget ) {
+
+		if ( renderTarget.isPostProcessingRenderTarget !== true ) return;
+		if ( this.isPresenting !== true ) return;
+		if ( this._glProjLayer === null ) return;
+
+		const backend = this._renderer.backend;
+
+		if ( backend === undefined || backend.isWebGLBackend !== true ) return;
+		if ( backend.state === null ) return;
+
+		const outputRenderTarget = this._renderer.getOutputRenderTarget();
+
+		if ( outputRenderTarget === null || outputRenderTarget.isXRRenderTarget !== true ) return;
+
+		const glBinding = this.getBinding();
+
+		if ( glBinding === null || typeof glBinding.foveateBoundTexture !== 'function' ) return;
+
+		this._renderer._textures.updateRenderTarget( renderTarget );
+
+		const { textureGPU, glTextureType } = backend.get( renderTarget.texture );
+
+		if ( textureGPU === undefined || glTextureType === undefined ) return;
+		if ( renderTarget._xrFoveationTextureGPU === textureGPU ) return;
+
+		renderTarget._xrFoveationTextureGPU = textureGPU;
+
+		backend.state.bindTexture( glTextureType, textureGPU );
+
+		try {
+
+			glBinding.foveateBoundTexture( glTextureType, this.getFoveation() );
+
+		} catch ( error ) {
+
+			warnOnce( `XRManager: Unable to foveate bound XR post-processing texture. ${error.name}: ${error.message}` );
+
+		} finally {
+
+			backend.state.unbindTexture();
+
+		}
+
+	}
+
+	/**
+	 * Returns the current XR WebGPU binding.
+	 *
+	 * Creates a new binding if needed and the browser is
+	 * capable of doing so.
+	 *
+	 * @return {?XRGPUBinding} The XR WebGPU binding. Returns `null` if one cannot be created.
+	 */
+	getWebGPUBinding() {
+
+		if ( this._webgpuBinding === null && this._supportsWebGPUBinding ) {
+
+			this._webgpuBinding = new globalThis.XRGPUBinding( this._session, this._renderer.backend.device );
+
+		}
+
+		return this._webgpuBinding;
+
+	}
+
+	/**
+	 * Returns whether the current XR session is using WebGPU.
+	 *
+	 * @private
+	 * @return {boolean} Whether the current session uses the WebGPU backend and the `webgpu` session feature.
+	 */
+	_isWebGPUSession() {
+
+		return this._renderer.backend.isWebGPUBackend === true &&
+			this._session !== null &&
+			this._session.enabledFeatures.includes( 'webgpu' );
+
+	}
+
+	/**
+	 * Validates the current WebGPU XR session requirements.
+	 *
+	 * @private
+	 */
+	_validateWebGPUSession() {
+
+		const renderer = this._renderer;
+
+		if ( renderer.backend.isWebGPUBackend !== true ) return;
+
+		if ( this._session.enabledFeatures.includes( 'webgpu' ) === false ) {
+
+			throw new Error( 'THREE.XRManager: WebGPU XR sessions require the "webgpu" session feature. Use VRButtonGPU/XRButton with "webgpu" enabled or use a WebGL backend.' );
+
+		}
+
+		if ( renderer.samples > 0 ) {
+
+			warnOnce( 'THREE.XRManager: WebGPU XR does not support MSAA yet. Disabling MSAA for this XR session.' );
+
+			if ( this._currentSamples === null ) this._currentSamples = renderer.samples;
+			renderer._samples = 0;
+
+		}
+
+	}
+
+	/**
+	 * Initializes the WebGPU XR projection layer and render target.
+	 *
+	 * @private
+	 * @async
+	 * @param {XRSession} session - The XR session.
+	 * @return {Promise<void>}
+	 */
+	async _initWebGPUSession( session ) {
+
+		const webgpuBinding = this.getWebGPUBinding();
+		const glProjLayer = webgpuBinding.createProjectionLayer( {
+			colorFormat: webgpuBinding.getPreferredColorFormat(),
+			depthStencilFormat: 'depth24plus'
+		} );
+
+		this._glProjLayer = glProjLayer;
+
+		session.updateRenderState( { layers: [ glProjLayer ] } );
+
+		this._referenceSpace = await session.requestReferenceSpace( this.getReferenceSpaceType() );
+
+		this._xrRenderTarget = new RenderTarget( glProjLayer.textureWidth, glProjLayer.textureHeight, {
+			depth: 2,
+			minFilter: LinearFilter,
+			magFilter: LinearFilter,
+			depthBuffer: true,
+			multiview: false,
+			useArrayDepthTexture: true,
+			samples: 0
+		} );
+
+		this._xrRenderTarget.texture.isArrayTexture = true;
+
+		if ( this._useMultiviewIfPossible === true ) {
+
+			warnOnce( 'THREE.XRManager: WebGPU XR does not support multiview yet. Disabling multiview for this XR session.' );
+
+		}
+
+		this._useMultiview = false;
+
+	}
+
+	/**
+	 * Releases WebGPU XR resources associated with the current session.
+	 *
+	 * @private
+	 */
+	_disposeWebGPUSession() {
+
+		const renderer = this._renderer;
+		const xrRenderTarget = this._xrRenderTarget;
+
+		if ( xrRenderTarget === null || renderer.backend.isWebGPUBackend !== true ) return;
+
+		// XR textures are external (from XRGPUBinding), so clear cached state before disposal.
+		const backend = renderer.backend;
+		const texturesModule = renderer._textures;
+
+		const renderTargetData = backend.get ? backend.get( xrRenderTarget ) : null;
+		if ( renderTargetData ) {
+
+			renderTargetData.descriptors = undefined;
+
+		}
+
+		const deleteResource = ( resource ) => {
+
+			if ( resource === null || resource === undefined ) return;
+
+			if ( backend.delete ) backend.delete( resource );
+			if ( texturesModule.delete ) texturesModule.delete( resource );
+
+		};
+
+		for ( let i = 0; i < xrRenderTarget.textures.length; i ++ ) {
+
+			deleteResource( xrRenderTarget.textures[ i ] );
+
+		}
+
+		deleteResource( xrRenderTarget.depthTexture );
+		deleteResource( xrRenderTarget );
+
+		if ( renderer._renderContexts && renderer._renderContexts.dispose ) {
+
+			renderer._renderContexts.dispose();
+
+		}
+
+		xrRenderTarget.dispose();
+
+	}
+
+	/**
+	 * Collects WebGPU XR sub-image data for the current frame.
+	 *
+	 * @private
+	 * @param {Array<XRView>} views - The XR views for the current pose.
+	 * @return {{colorTexture:?GPUTexture, viewDescriptors:Array<Object>, viewports:Array<XRViewport>}} The WebGPU XR view data.
+	 */
+	_getWebGPUViewData( views ) {
+
+		const webgpuBinding = this.getWebGPUBinding();
+		const viewData = {
+			colorTexture: null,
+			viewDescriptors: [],
+			viewports: []
+		};
+
+		for ( let i = 0; i < views.length; i ++ ) {
+
+			const gpuSubImage = webgpuBinding.getViewSubImage( this._glProjLayer, views[ i ] );
+
+			if ( viewData.colorTexture === null ) {
+
+				viewData.colorTexture = gpuSubImage.colorTexture;
+
+			}
+
+			viewData.viewports.push( gpuSubImage.viewport );
+
+			if ( gpuSubImage.getViewDescriptor ) {
+
+				viewData.viewDescriptors.push( gpuSubImage.getViewDescriptor() );
+
+			}
+
+		}
+
+		return viewData;
 
 	}
 
@@ -925,17 +1206,15 @@ class XRManager extends EventDispatcher {
 	async setSession( session ) {
 
 		const renderer = this._renderer;
-		const backend = renderer.backend;
+
+		if ( renderer.initialized === false ) await renderer.init();
 
 		this._gl = renderer.getContext();
 		const gl = this._gl;
-		const attributes = gl.getContextAttributes();
 
 		this._session = session;
 
 		if ( session !== null ) {
-
-			if ( backend.isWebGPUBackend === true ) throw new Error( 'THREE.XRManager: XR is currently not supported with a WebGPU backend. Use WebGL by passing "{ forceWebGL: true }" to the constructor of the renderer.' );
 
 			session.addEventListener( 'select', this._onSessionEvent );
 			session.addEventListener( 'selectstart', this._onSessionEvent );
@@ -946,7 +1225,7 @@ class XRManager extends EventDispatcher {
 			session.addEventListener( 'end', this._onSessionEnd );
 			session.addEventListener( 'inputsourceschange', this._onInputSourcesChange );
 
-			await backend.makeXRCompatible();
+			this._validateWebGPUSession();
 
 			this._currentPixelRatio = renderer.getPixelRatio();
 			renderer.getSize( this._currentSize );
@@ -957,13 +1236,21 @@ class XRManager extends EventDispatcher {
 
 			//
 
-			if ( this._supportsLayers === true ) {
+			if ( this._isWebGPUSession() ) {
+
+				await this._initWebGPUSession( session );
+
+			} else if ( this._supportsLayers === true ) {
 
 				// default path using XRProjectionLayer
 
 				let depthFormat = null;
 				let depthType = null;
 				let glDepthFormat = null;
+
+				const attributes = gl.getContextAttributes();
+				await renderer.backend.makeXRCompatible();
+				this.setFoveation( this.getFoveation() );
 
 				if ( renderer.depth ) {
 
@@ -1047,6 +1334,8 @@ class XRManager extends EventDispatcher {
 			} else {
 
 				// fallback to XRWebGLLayer
+				await renderer.backend.makeXRCompatible();
+				this.setFoveation( this.getFoveation() );
 
 				const layerInit = {
 					antialias: renderer.currentSamples > 0,
@@ -1083,8 +1372,6 @@ class XRManager extends EventDispatcher {
 			}
 
 			//
-
-			this.setFoveation( this.getFoveation() );
 
 			renderer._animation.setAnimationLoop( this._onAnimationFrame );
 			renderer._animation.setContext( session );
@@ -1383,13 +1670,23 @@ function onSessionEnd() {
 	this._currentDepthNear = null;
 	this._currentDepthFar = null;
 
+	if ( this._currentSamples !== null ) {
+
+		renderer._samples = this._currentSamples;
+		this._currentSamples = null;
+
+	}
+
 	// restore framebuffer/rendering state
 
 	renderer._resetXRState();
 
+	this._disposeWebGPUSession();
+
 	this._session = null;
 	this._xrRenderTarget = null;
 	this._glBinding = null;
+	this._webgpuBinding = null;
 	this._glBaseLayer = null;
 	this._glProjLayer = null;
 
@@ -1573,7 +1870,9 @@ function onAnimationFrame( time, frame ) {
 
 		const views = pose.views;
 
-		if ( this._glBaseLayer !== null ) {
+		const webgpuViewData = this._isWebGPUSession() ? this._getWebGPUViewData( views ) : null;
+
+		if ( this._glBaseLayer !== null && webgpuViewData === null ) {
 
 			backend.setXRTarget( glBaseLayer.framebuffer );
 
@@ -1596,8 +1895,13 @@ function onAnimationFrame( time, frame ) {
 
 			let viewport;
 
-			if ( this._supportsLayers === true ) {
+			if ( webgpuViewData !== null ) {
 
+				viewport = webgpuViewData.viewports[ i ];
+
+			} else if ( this._supportsLayers === true ) {
+
+				// WebGL path: Use XRWebGLBinding
 				const glSubImage = this._glBinding.getViewSubImage( this._glProjLayer, view );
 				viewport = glSubImage.viewport;
 
@@ -1625,6 +1929,7 @@ function onAnimationFrame( time, frame ) {
 				camera = new PerspectiveCamera();
 				camera.layers.enable( i );
 				camera.viewport = new Vector4();
+				camera.matrixWorldAutoUpdate = false;
 				this._cameras[ i ] = camera;
 
 			}
@@ -1650,7 +1955,20 @@ function onAnimationFrame( time, frame ) {
 
 		}
 
+		if ( webgpuViewData !== null && webgpuViewData.colorTexture !== null ) {
+
+			backend.setXRRenderTargetTextures(
+				this._xrRenderTarget,
+				webgpuViewData.colorTexture,
+				webgpuViewData.viewDescriptors
+			);
+
+		}
+
 		renderer.setOutputRenderTarget( this._xrRenderTarget );
+
+		const frameBufferTarget = renderer._getFrameBufferTarget();
+		renderer.xr.foveateBoundTexture( frameBufferTarget );
 
 	}
 

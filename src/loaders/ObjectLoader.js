@@ -180,7 +180,7 @@ class ObjectLoader extends Loader {
 
 		} catch ( e ) {
 
-			throw new Error( 'ObjectLoader: Can\'t parse ' + url + '. ' + e.message );
+			throw new Error( 'THREE.ObjectLoader: Can\'t parse ' + url + '. ' + e.message );
 
 		}
 
@@ -458,6 +458,8 @@ class ObjectLoader extends Loader {
 		let loader;
 
 		function loadImage( url ) {
+
+			url = scope.manager.resolveURL( url );
 
 			scope.manager.itemStart( url );
 

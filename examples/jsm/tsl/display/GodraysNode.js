@@ -434,7 +434,7 @@ class GodraysNode extends TempNode {
 
 			} else {
 
-				throw new Error( 'GodraysNode: Unsupported light type.' );
+				throw new Error( 'THREE.GodraysNode: Unsupported light type.' );
 
 			}
 

@@ -1403,8 +1403,8 @@ const matcap = texture( matcapMap, matcapUV );
 
 | Variable | Description | Type |
 | -- | -- | -- |
-| `directionToColor( value )` | Converts direction vector to color. | `color` |
-| `colorToDirection( value )` | Converts color to direction vector. | `vec3` |
+| `packNormalToRGB( value )` | Converts normal vector to color. | `color` |
+| `unpackRGBToNormal(  value )` | Converts color to normal vector. | `vec3` |
 
 ## Render Pipeline
 
@@ -1442,18 +1442,18 @@ MRT allows capturing multiple outputs from a single render pass. Instead of rend
 Use `setMRT()` with the `mrt()` function to define which outputs to capture:
 
 ```js
-import { pass, mrt, output, normalView, velocity, directionToColor } from 'three/tsl';
+import { pass, mrt, output, normalView, velocity, packNormalToRGB } from 'three/tsl';
 
 const scenePass = pass( scene, camera );
 
 scenePass.setMRT( mrt( {
 	output: output,                          // Final color output
-	normal: directionToColor( normalView ),  // View-space normals encoded as colors
+	normal: packNormalToRGB( normalView ),  // View-space normals encoded as colors
 	velocity: velocity                       // Motion vectors for temporal effects
 } ) );
 ```
 
-Each MRT entry accepts any TSL node, allowing you to customize outputs using formulas, encoders, or material accessors. For example, `directionToColor( normalView )` encodes view-space normals into RGB values. You can use any TSL function to transform, combine, or encode data before writing to the render target.
+Each MRT entry accepts any TSL node, allowing you to customize outputs using formulas, encoders, or material accessors. For example, `packNormalToRGB( normalView )` encodes view-space normals into RGB values. You can use any TSL function to transform, combine, or encode data before writing to the render target.
 
 Within a TSL function `Fn( ( { material, object } ) => { ... } )`, you have complete access to the current material and object being rendered, enabling full customization of outputs.
 
@@ -1921,6 +1921,7 @@ The following documentation pages are available in markdown format at `https://t
 - [CinquefoilKnot](https://threejs.org/docs/pages/CinquefoilKnot.html.md)
 - [ClippingGroup](https://threejs.org/docs/pages/ClippingGroup.html.md)
 - [Clock](https://threejs.org/docs/pages/Clock.html.md)
+- [ClusteredLighting](https://threejs.org/docs/pages/ClusteredLighting.html.md)
 - [ColladaComposer](https://threejs.org/docs/pages/ColladaComposer.html.md)
 - [ColladaParser](https://threejs.org/docs/pages/ColladaParser.html.md)
 - [ColorConverter](https://threejs.org/docs/pages/ColorConverter.html.md)
@@ -2508,6 +2509,7 @@ The following documentation pages are available in markdown format at `https://t
 - [CSMShadowNode](https://threejs.org/docs/pages/CSMShadowNode.html.md)
 - [ChromaticAberrationNode](https://threejs.org/docs/pages/ChromaticAberrationNode.html.md)
 - [ClippingNode](https://threejs.org/docs/pages/ClippingNode.html.md)
+- [ClusteredLightsNode](https://threejs.org/docs/pages/ClusteredLightsNode.html.md)
 - [CodeNode](https://threejs.org/docs/pages/CodeNode.html.md)
 - [ColorSpaceNode](https://threejs.org/docs/pages/ColorSpaceNode.html.md)
 - [ComputeBuiltinNode](https://threejs.org/docs/pages/ComputeBuiltinNode.html.md)
@@ -2611,6 +2613,7 @@ The following documentation pages are available in markdown format at `https://t
 - [StackNode](https://threejs.org/docs/pages/StackNode.html.md)
 - [StorageArrayElementNode](https://threejs.org/docs/pages/StorageArrayElementNode.html.md)
 - [StorageBufferNode](https://threejs.org/docs/pages/StorageBufferNode.html.md)
+- [StorageTexture3DNode](https://threejs.org/docs/pages/StorageTexture3DNode.html.md)
 - [StorageTextureNode](https://threejs.org/docs/pages/StorageTextureNode.html.md)
 - [StructNode](https://threejs.org/docs/pages/StructNode.html.md)
 - [StructTypeNode](https://threejs.org/docs/pages/StructTypeNode.html.md)

@@ -264,6 +264,32 @@ is defined, the texture node is generated as normal texture.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The input type.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="getTransformedUV" translate="no">.<a href="#getTransformedUV">getTransformedUV</a><span class="signature">( uvNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwrites the default implementation since storage texture
+coordinates are texel coordinates and should not be transformed
+by the texture uv matrix.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>The uv node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TextureNode.html#getTransformedUV">TextureNode#getTransformedUV</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The unmodified uv node.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="setAccess" translate="no">.<a href="#setAccess">setAccess</a><span class="signature">( value : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="StorageTextureNode.html">StorageTextureNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -304,6 +330,36 @@ is defined, the texture node is generated as normal texture.</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="store" translate="no">.<a href="#store">store</a><span class="signature">( uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;(vec2|vec3)></span>, storeNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="StorageTextureNode.html">StorageTextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Stores a value in this storage texture at the given coordinates.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>The storage texture coordinates.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">storeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The value node that should be stored in the texture.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A storage texture node representing the store operation.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="toReadOnly" translate="no">.<a href="#toReadOnly">toReadOnly</a><span class="signature">()</span><span class="type-signature"> : <a href="StorageTextureNode.html">StorageTextureNode</a></span> </h3>

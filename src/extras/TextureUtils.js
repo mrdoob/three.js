@@ -224,7 +224,7 @@ function getTextureTypeByteLength( type ) {
 
 	}
 
-	throw new Error( `Unknown texture type ${type}.` );
+	throw new Error( `THREE.TextureUtils: Unknown texture type ${type}.` );
 
 }
 

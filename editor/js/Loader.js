@@ -716,7 +716,7 @@ function Loader( editor ) {
 
 						if ( fillMaterial ) {
 
-							const shapes = SVGLoader.createShapes( path );
+							const shapes = path.toShapes();
 
 							for ( let j = 0; j < shapes.length; j ++ ) {
 
@@ -780,10 +780,12 @@ function Loader( editor ) {
 					const { USDLoader } = await import( 'three/addons/loaders/USDLoader.js' );
 
 					const loader = new USDLoader( manager );
-					const group = loader.parse( contents );
-					group.name = filename;
+					loader.parse( contents, '', function ( group ) {
 
-					editor.execute( new AddObjectCommand( editor, group ) );
+						group.name = filename;
+						editor.execute( new AddObjectCommand( editor, group ) );
+
+					} );
 
 				}, false );
 				reader.readAsArrayBuffer( file );

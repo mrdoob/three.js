@@ -110,6 +110,12 @@ The texture representing the default color attachment.
 
 An array of textures. Each color attachment is represented as a separate texture. Has at least a single entry for the default color attachment.
 
+### .useArrayDepthTexture : boolean
+
+Whether to create the depth texture as an array texture for per-layer depth testing. This is separate from multiview so layered render targets can use array depth without the multiview extension.
+
+Default is `false`.
+
 ### .viewport : Vector4
 
 A rectangular area representing the render target's viewport.
@@ -301,7 +307,14 @@ Default is `1`.
 **multiview**  
 boolean
 
-Whether this target is used for multiview rendering.
+Whether this target is used for multiview rendering (WebGL OVR\_multiview2 extension).
+
+Default is `false`.
+
+**useArrayDepthTexture**  
+boolean
+
+Whether to create the depth texture as an array texture for per-layer depth testing. This is separate from multiview so layered render targets can use array depth without the multiview extension.
 
 Default is `false`.
 

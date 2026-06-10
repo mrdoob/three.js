@@ -15,6 +15,8 @@ function Config() {
 		'project/editable': false,
 		'project/vr': false,
 
+		'project/camera': 'perspective',
+
 		'project/renderer/type': 'WebGLRenderer',
 		'project/renderer/antialias': true,
 		'project/renderer/shadows': true,
@@ -28,7 +30,9 @@ function Config() {
 		'settings/shortcuts/rotate': 'e',
 		'settings/shortcuts/scale': 'r',
 		'settings/shortcuts/undo': 'z',
-		'settings/shortcuts/focus': 'f'
+		'settings/shortcuts/focus': 'f',
+		'settings/shortcuts/perspective': 'p',
+		'settings/shortcuts/orthographic': 'o'
 	};
 
 	if ( window.localStorage[ name ] === undefined ) {

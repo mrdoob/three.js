@@ -1859,6 +1859,36 @@ TSL function for setting up the default clipping logic.
 
 TSL function for setting up alpha to coverage.
 
+### .clusteredLights( maxLights : number, tileSize : number, zSlices : number, maxLightsPerCluster : number ) : ClusteredLightsNode
+
+TSL function that creates a clustered lights node.
+
+**maxLights**
+
+Maximum number of point lights.
+
+Default is `1024`.
+
+**tileSize**
+
+Screen tile size in pixels.
+
+Default is `32`.
+
+**zSlices**
+
+Depth slice count.
+
+Default is `24`.
+
+**maxLightsPerCluster**
+
+Per-cluster light-list capacity.
+
+Default is `64`.
+
+**Returns:** The clustered lights node.
+
 ### .code( code : string, includes : Array.<Node>, language : 'js' | 'wgsl' | 'glsl' ) : CodeNode
 
 TSL function for creating a code node.
@@ -3444,18 +3474,6 @@ The first input.
 **b**
 
 The second input.
-
-### .modInt( a : Node, b : Node ) : OperatorNode
-
-**a**
-
-The first input.
-
-**b**
-
-The second input.
-
-**Deprecated:** since r175. Use [mod](TSL.html#mod) instead.
 
 ### .morphReference( mesh : Mesh ) : MorphNode
 
@@ -5133,6 +5151,26 @@ The value node that should be stored in the texture.
 
 Default is `null`.
 
+### .storageTexture3D( value : Storage3DTexture, uvNode : Node.<vec3>, storeNode : Node ) : StorageTexture3DNode
+
+TSL function for creating a 3D storage texture node.
+
+**value**
+
+The 3D storage texture.
+
+**uvNode**
+
+The uv node.
+
+Default is `null`.
+
+**storeNode**
+
+The value node that should be stored in the texture.
+
+Default is `null`.
+
 ### .struct( membersLayout : Object, name : string ) : function
 
 TSL function for creating a struct node.
@@ -5643,7 +5681,7 @@ A level node which defines the requested mip.
 
 Default is `null`.
 
-### .textureStore( value : StorageTexture, uvNode : Node.<(vec2|vec3)>, storeNode : Node ) : StorageTextureNode
+### .textureStore( value : StorageTexture | StorageTextureNode, uvNode : Node.<(vec2|vec3)>, storeNode : Node ) : StorageTextureNode
 
 TODO: Explain difference to `storageTexture()`.
 

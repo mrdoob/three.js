@@ -13,7 +13,6 @@ import {
 	MirroredRepeatWrapping,
 	Path,
 	RepeatWrapping,
-	Shape,
 	ShapePath,
 	ShapeUtils,
 	SRGBColorSpace,
@@ -1658,7 +1657,7 @@ class SVGLoader extends Loader {
 				const tx = parseFloatWithUnits( node.getAttribute( 'x' ) || 0 );
 				const ty = parseFloatWithUnits( node.getAttribute( 'y' ) || 0 );
 
-				transform.translate( tx, ty );
+				transform.makeTranslation( tx, ty );
 
 			}
 
@@ -1710,7 +1709,7 @@ class SVGLoader extends Loader {
 
 								}
 
-								currentTransform.translate( tx, ty );
+								currentTransform.makeTranslation( tx, ty );
 
 							}
 
@@ -1759,7 +1758,7 @@ class SVGLoader extends Loader {
 
 								}
 
-								currentTransform.scale( scaleX, scaleY );
+								currentTransform.makeScale( scaleX, scaleY );
 
 							}
 
@@ -2238,211 +2237,15 @@ class SVGLoader extends Loader {
 	/**
 	 * Creates from the given shape path and array of shapes.
 	 *
+	 * @deprecated since 185.
 	 * @param {ShapePath} shapePath - The shape path.
 	 * @return {Array<Shape>} An array of shapes.
 	 */
 	static createShapes( shapePath ) {
 
-		// Point-in-polygon test using the even-odd ray-casting rule. Valid for
-		// simple (non self-intersecting) polygons.
-		function pointInPolygon( p, polygon ) {
+		console.warn( 'SVGLoader: createShapes() is deprecated. Use shapePath.toShapes() instead.' ); // @deprecated, r185
 
-			let inside = false;
-			const n = polygon.length;
-
-			for ( let i = 0, j = n - 1; i < n; j = i ++ ) {
-
-				const a = polygon[ i ];
-				const b = polygon[ j ];
-
-				if ( ( a.y > p.y ) !== ( b.y > p.y ) &&
-					p.x < ( b.x - a.x ) * ( p.y - a.y ) / ( b.y - a.y ) + a.x ) {
-
-					inside = ! inside;
-
-				}
-
-			}
-
-			return inside;
-
-		}
-
-		// Returns a point guaranteed to be strictly inside the given simple
-		// polygon. First tries the bounding-box center; if that falls outside
-		// the polygon, casts a horizontal ray at the center's y and picks the
-		// midpoint between the first two sorted intercepts.
-		//
-		// Port of paper.js' Path#getInteriorPoint()
-		// https://github.com/paperjs/paper.js/blob/develop/src/path/PathItem.Boolean.js
-		function getInteriorPoint( polygon, boundingBox ) {
-
-			const point = boundingBox.getCenter( new Vector2() );
-
-			if ( pointInPolygon( point, polygon ) ) return point;
-
-			const y = point.y;
-			const intercepts = [];
-			const n = polygon.length;
-
-			for ( let i = 0; i < n; i ++ ) {
-
-				const a = polygon[ i ];
-				const b = polygon[ ( i + 1 ) % n ];
-
-				// Half-open crossing rule — counts each vertex exactly once and
-				// skips horizontal edges.
-				if ( ( a.y > y ) !== ( b.y > y ) ) {
-
-					const x = a.x + ( y - a.y ) * ( b.x - a.x ) / ( b.y - a.y );
-					intercepts.push( x );
-
-				}
-
-			}
-
-			if ( intercepts.length > 1 ) {
-
-				intercepts.sort( ( a, b ) => a - b );
-				point.x = ( intercepts[ 0 ] + intercepts[ 1 ] ) / 2;
-
-			}
-
-			return point;
-
-		}
-
-		// Resolve fill-rule. SVG defaults to 'nonzero'.
-		let fillRule = ( shapePath.userData && shapePath.userData.style && shapePath.userData.style.fillRule ) || 'nonzero';
-
-		if ( fillRule !== 'nonzero' && fillRule !== 'evenodd' ) {
-
-			console.warn( 'THREE.SVGLoader: fill-rule "' + fillRule + '" is not supported, falling back to "nonzero".' );
-			fillRule = 'nonzero';
-
-		}
-
-		// Predicate that decides whether a winding number falls inside the fill
-		// region, per the SVG fill-rule spec. Works for negative windings too,
-		// because JavaScript's bitwise AND preserves odd/even under two's
-		// complement.
-		const isInside = fillRule === 'nonzero'
-			? ( w => w !== 0 )
-			: ( w => ( w & 1 ) !== 0 );
-
-		// Build an entry per usable subpath. Self-winding follows the standard
-		// convention used by ShapeUtils: counter-clockwise (signed area > 0)
-		// contributes +1 to the winding number at an interior point,
-		// clockwise contributes -1.
-		const entries = [];
-
-		for ( const subPath of shapePath.subPaths ) {
-
-			const points = subPath.getPoints();
-			if ( points.length < 3 ) continue;
-
-			const area = ShapeUtils.area( points );
-			if ( area === 0 ) continue;
-
-			const boundingBox = new Box2();
-			for ( let i = 0; i < points.length; i ++ ) boundingBox.expandByPoint( points[ i ] );
-
-			entries.push( {
-				subPath: subPath,
-				points: points,
-				boundingBox: boundingBox,
-				interiorPoint: getInteriorPoint( points, boundingBox ),
-				absArea: Math.abs( area ),
-				winding: area < 0 ? - 1 : 1,
-				container: null,
-				exclude: false,
-				role: null
-			} );
-
-		}
-
-		// Sort by area descending. This guarantees that any subpath that could
-		// contain `entries[i]` is located at a smaller index and has already
-		// been processed when it's entries[i]'s turn. Port of paper.js'
-		// reorientPaths() algorithm.
-		entries.sort( ( a, b ) => b.absArea - a.absArea );
-
-		// Walk already-processed entries from closest-in-size to largest,
-		// stopping at the innermost container. Accumulate the container's
-		// cumulative winding into this entry's winding so that the final value
-		// equals the winding number at this entry's interior point.
-		//
-		// A subpath only contributes to the fill boundary when crossing it
-		// actually flips the "insideness" per the fill rule; otherwise it's a
-		// redundant overlap and gets excluded to avoid double-counting.
-		for ( let i = 0; i < entries.length; i ++ ) {
-
-			const entry = entries[ i ];
-			let containerWinding = 0;
-
-			for ( let j = i - 1; j >= 0; j -- ) {
-
-				const candidate = entries[ j ];
-				if ( ! candidate.boundingBox.containsPoint( entry.interiorPoint ) ) continue;
-				if ( ! pointInPolygon( entry.interiorPoint, candidate.points ) ) continue;
-
-				entry.container = candidate.exclude ? candidate.container : candidate;
-				containerWinding = candidate.winding;
-				entry.winding += containerWinding;
-				break;
-
-			}
-
-			if ( isInside( entry.winding ) === isInside( containerWinding ) ) {
-
-				entry.exclude = true;
-
-			}
-
-		}
-
-		// Classify retained entries. An entry is an outer shape if it has no
-		// container or if its container is itself a hole (a solid nested inside
-		// a hole becomes a new top-level shape); otherwise it's a hole in its
-		// container. Entries were already sorted outermost-first, so each
-		// container's role is known by the time we look at it.
-		for ( const entry of entries ) {
-
-			if ( entry.exclude ) continue;
-			entry.role = ( entry.container === null || entry.container.role === 'hole' ) ? 'outer' : 'hole';
-
-		}
-
-		// Build Shapes for outers first, then attach holes to their container's
-		// Shape.
-		const shapes = [];
-		const shapeByEntry = new Map();
-
-		for ( const entry of entries ) {
-
-			if ( entry.exclude || entry.role !== 'outer' ) continue;
-
-			const shape = new Shape();
-			shape.curves = entry.subPath.curves;
-			shapes.push( shape );
-			shapeByEntry.set( entry, shape );
-
-		}
-
-		for ( const entry of entries ) {
-
-			if ( entry.exclude || entry.role !== 'hole' ) continue;
-
-			const shape = shapeByEntry.get( entry.container );
-			if ( ! shape ) continue;
-
-			const hole = new Path();
-			hole.curves = entry.subPath.curves;
-			shape.holes.push( hole );
-
-		}
-
-		return shapes;
+		return shapePath.toShapes();
 
 	}
 

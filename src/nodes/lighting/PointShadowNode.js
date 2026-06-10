@@ -12,7 +12,7 @@ import { CubeDepthTexture } from '../../textures/CubeDepthTexture.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
 import { interleavedGradientNoise, vogelDiskSample } from '../utils/PostProcessingUtils.js';
 import { abs, normalize, cross } from '../math/MathNode.js';
-import { viewZToPerspectiveDepth, viewZToReversedPerspectiveDepth } from '../display/ViewportDepthNode.js';
+import { viewZToLogarithmicDepth, viewZToPerspectiveDepth, viewZToReversedPerspectiveDepth } from '../display/ViewportDepthNode.js';
 
 const _clearColor = /*@__PURE__*/ new Color();
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
@@ -116,6 +116,11 @@ const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCo
 
 			dp = viewZToReversedPerspectiveDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
 			dp.subAssign( bias );
+
+		} else if ( builder.renderer.logarithmicDepthBuffer ) {
+
+			dp = viewZToLogarithmicDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
+			dp.addAssign( bias );
 
 		} else {
 

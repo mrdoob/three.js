@@ -595,6 +595,17 @@ class Renderer {
 		this.onDeviceLost = this._onDeviceLost;
 
 		/**
+		 * A callback function that defines what should happen when an uncaptured
+		 * backend error is reported (e.g. a WebGPU validation/out-of-memory/internal
+		 * error raised outside an error scope). Applications can override this to
+		 * surface errors in their own UI without letting them escalate to a device
+		 * loss. The default implementation logs to the console.
+		 *
+		 * @type {Function}
+		 */
+		this.onError = this._onError;
+
+		/**
 		 * Defines the type of output buffers. The default `HalfFloatType` is recommend for
 		 * best quality. To save memory and bandwidth, `UnsignedByteType` might be used.
 		 * This will reduce rendering quality though.
@@ -649,6 +660,16 @@ class Renderer {
 		 * @default null
 		 */
 		this._compilationPromises = null;
+
+		/**
+		 * When an override material is in use, this property points to the current
+		 * source material during the rendering of a render object.
+		 *
+		 * @private
+		 * @type {?Material}
+		 * @default null
+		 */
+		this._currentSourceMaterial = null;
 
 		/**
 		 * Whether the renderer should render transparent render objects or not.
@@ -716,10 +737,13 @@ class Renderer {
 			onShaderError: null,
 			getShaderAsync: async ( scene, camera, object ) => {
 
-				await this.compileAsync( scene, camera );
+				await this.compileAsync( object, camera, scene );
+
+				const useFrameBufferTarget = this.needsFrameBufferTarget && this._renderTarget === null;
+				const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : ( this._renderTarget || this._outputRenderTarget );
 
 				const renderList = this._renderLists.get( scene, camera );
-				const renderContext = this._renderContexts.get( this._renderTarget, this._mrt );
+				const renderContext = this._renderContexts.get( renderTarget, this._mrt );
 
 				const material = scene.overrideMaterial || object.material;
 
@@ -912,9 +936,24 @@ class Renderer {
 
 		//
 
+		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
+
+		camera = this._updateCamera( camera );
+
+		//
+
 		sceneRef.onBeforeRender( this, scene, camera, renderTarget );
 
 		//
+
+		const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
+
+		if ( ! camera.isArrayCamera ) {
+
+			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+			frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
+
+		}
 
 		// Use sceneRef for render list to ensure lightsNode matches between compileAsync and render
 		const renderList = this._renderLists.get( sceneRef, camera );
@@ -1197,6 +1236,26 @@ class Renderer {
 	}
 
 	/**
+	 * Default implementation of the uncaptured backend error callback.
+	 *
+	 * @private
+	 * @param {Object} info - Information about the uncaptured error.
+	 */
+	_onError( info ) {
+
+		let errorMessage = `WebGPURenderer: Uncaptured ${ info.api } ${ info.type }`;
+
+		if ( info.message ) {
+
+			errorMessage += `: ${ info.message }`;
+
+		}
+
+		error( errorMessage );
+
+	}
+
+	/**
 	 * Renders the given render bundle.
 	 *
 	 * @private
@@ -1293,7 +1352,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			throw new Error( 'Renderer: .render() called before the backend is initialized. Use "await renderer.init();" before rendering.' );
+			throw new Error( 'THREE.Renderer: .render() called before the backend is initialized. Use "await renderer.init();" before rendering.' );
 
 		}
 
@@ -1310,6 +1369,37 @@ class Renderer {
 	get initialized() {
 
 		return this._initialized;
+
+	}
+
+	_renderOutputLayers( quad, renderTarget ) {
+
+		if ( renderTarget.texture.isArrayTexture !== true || renderTarget.texture.image.depth <= 1 ) {
+
+			this._renderScene( quad, quad.camera, false );
+			return;
+
+		}
+
+		const currentActiveCubeFace = this._activeCubeFace;
+
+		try {
+
+			for ( let layer = 0; layer < renderTarget.texture.image.depth; layer ++ ) {
+
+				this._nodes.setOutputLayerIndex( layer );
+				this._activeCubeFace = layer;
+
+				this._renderScene( quad, quad.camera, false );
+
+			}
+
+		} finally {
+
+			this._nodes.setOutputLayerIndex( 0 );
+			this._activeCubeFace = currentActiveCubeFace;
+
+		}
 
 	}
 
@@ -1398,6 +1488,7 @@ class Renderer {
 		frameBufferTarget.scissor.multiplyScalar( pixelRatio );
 		frameBufferTarget.scissorTest = scissorTest;
 		frameBufferTarget.multiview = outputRenderTarget !== null ? outputRenderTarget.multiview : false;
+		frameBufferTarget.useArrayDepthTexture = outputRenderTarget !== null ? outputRenderTarget.useArrayDepthTexture : false;
 		frameBufferTarget.resolveDepthBuffer = outputRenderTarget !== null ? outputRenderTarget.resolveDepthBuffer : true;
 		frameBufferTarget._autoAllocateDepthBuffer = outputRenderTarget !== null ? outputRenderTarget._autoAllocateDepthBuffer : false;
 
@@ -1430,6 +1521,8 @@ class Renderer {
 		const previousRenderContext = this._currentRenderContext;
 		const previousRenderObjectFunction = this._currentRenderObjectFunction;
 		const previousHandleObjectFunction = this._handleObjectFunction;
+
+		this.lighting.beginRender( scene );
 
 		//
 
@@ -1504,87 +1597,9 @@ class Renderer {
 
 		//
 
-
-		const xr = this.xr;
-
-		if ( xr.isPresenting === false ) {
-
-			let projectionMatrixNeedsUpdate = false;
-
-			// reversed depth
-
-			if ( this.reversedDepthBuffer === true && camera.reversedDepth !== true ) {
-
-				camera._reversedDepth = true;
-
-				if ( camera.isArrayCamera ) {
-
-					for ( const subCamera of camera.cameras ) {
-
-						subCamera._reversedDepth = true;
-
-					}
-
-				}
-
-				projectionMatrixNeedsUpdate = true;
-
-			}
-
-			// WebGPU/WebGL coordinate system
-
-			const coordinateSystem = this.coordinateSystem;
-
-			if ( camera.coordinateSystem !== coordinateSystem ) {
-
-				camera.coordinateSystem = coordinateSystem;
-
-				if ( camera.isArrayCamera ) {
-
-					for ( const subCamera of camera.cameras ) {
-
-						subCamera.coordinateSystem = coordinateSystem;
-
-					}
-
-				}
-
-				projectionMatrixNeedsUpdate = true;
-
-			}
-
-			// camera update
-
-			if ( projectionMatrixNeedsUpdate === true ) {
-
-				camera.updateProjectionMatrix();
-
-				if ( camera.isArrayCamera ) {
-
-					for ( const subCamera of camera.cameras ) {
-
-						subCamera.updateProjectionMatrix();
-
-					}
-
-				}
-
-			}
-
-		}
-
-		//
-
 		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
-		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
-
-		if ( xr.enabled === true && xr.isPresenting === true ) {
-
-			if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
-			camera = xr.getCamera(); // use XR camera for rendering
-
-		}
+		camera = this._updateCamera( camera );
 
 		//
 
@@ -1648,7 +1663,7 @@ class Renderer {
 
 		if ( this.sortObjects === true ) {
 
-			renderList.sort( this._opaqueSort, this._transparentSort );
+			renderList.sort( this._opaqueSort, this._transparentSort, camera.reversedDepth );
 
 		}
 
@@ -1731,10 +1746,11 @@ class Renderer {
 		// restore render tree
 
 		nodeFrame.renderId = previousRenderId;
-
 		this._currentRenderContext = previousRenderContext;
 		this._currentRenderObjectFunction = previousRenderObjectFunction;
 		this._handleObjectFunction = previousHandleObjectFunction;
+
+		this.lighting.finishRender( scene );
 
 		//
 
@@ -1837,8 +1853,7 @@ class Renderer {
 
 		this.autoClear = false;
 		this.xr.enabled = false;
-
-		this._renderScene( quad, quad.camera, false );
+		this._renderOutputLayers( quad, renderTarget );
 
 		this.autoClear = currentAutoClear;
 		this.xr.enabled = currentXR;
@@ -2269,7 +2284,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			throw new Error( 'Renderer: .clear() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
+			throw new Error( 'THREE.Renderer: .clear() called before the backend is initialized. Use "await renderer.init();" before using this method.' );
 
 		}
 
@@ -2842,7 +2857,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			throw new Error( 'Renderer: .hasFeature() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
+			throw new Error( 'THREE.Renderer: .hasFeature() called before the backend is initialized. Use "await renderer.init();" before using this method.' );
 
 		}
 
@@ -2892,7 +2907,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			throw new Error( 'Renderer: .initTexture() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
+			throw new Error( 'THREE.Renderer: .initTexture() called before the backend is initialized. Use "await renderer.init();" before using this method.' );
 
 		}
 
@@ -2909,7 +2924,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			throw new Error( 'Renderer: .initRenderTarget() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
+			throw new Error( 'THREE.Renderer: .initRenderTarget() called before the backend is initialized. Use "await renderer.init();" before using this method.' );
 
 		}
 
@@ -3372,6 +3387,98 @@ class Renderer {
 	}
 
 	/**
+	 * Updates the camera so it's prepared for rendering operations.
+	 *
+	 * @private
+	 * @param {Camera} camera - The camera to update.
+	 * @return {Camera} The returned camera might be different depending on whether XR is used or not.
+	 */
+	_updateCamera( camera ) {
+
+		const xr = this.xr;
+
+		if ( xr.isPresenting === false ) {
+
+			let projectionMatrixNeedsUpdate = false;
+
+			// reversed depth
+
+			if ( this.reversedDepthBuffer === true && camera.reversedDepth !== true ) {
+
+				camera._reversedDepth = true;
+
+				if ( camera.isArrayCamera ) {
+
+					for ( const subCamera of camera.cameras ) {
+
+						subCamera._reversedDepth = true;
+
+					}
+
+				}
+
+				projectionMatrixNeedsUpdate = true;
+
+			}
+
+			// WebGPU/WebGL coordinate system
+
+			const coordinateSystem = this.coordinateSystem;
+
+			if ( camera.coordinateSystem !== coordinateSystem ) {
+
+				camera.coordinateSystem = coordinateSystem;
+
+				if ( camera.isArrayCamera ) {
+
+					for ( const subCamera of camera.cameras ) {
+
+						subCamera.coordinateSystem = coordinateSystem;
+
+					}
+
+				}
+
+				projectionMatrixNeedsUpdate = true;
+
+			}
+
+			// camera update
+
+			if ( projectionMatrixNeedsUpdate === true ) {
+
+				camera.updateProjectionMatrix();
+
+				if ( camera.isArrayCamera ) {
+
+					for ( const subCamera of camera.cameras ) {
+
+						subCamera.updateProjectionMatrix();
+
+					}
+
+				}
+
+			}
+
+		}
+
+		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
+
+		// handle XR
+
+		if ( xr.enabled === true && xr.isPresenting === true ) {
+
+			if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
+			camera = xr.getCamera(); // use XR camera for rendering
+
+		}
+
+		return camera;
+
+	}
+
+	/**
 	 * This method represents the default render object function that manages the render lifecycle
 	 * of the object.
 	 *
@@ -3393,6 +3500,8 @@ class Renderer {
 		let materialPositionNode;
 		let materialSide;
 
+		const previousSourceMaterial = this._currentSourceMaterial;
+
 		//
 
 		object.onBeforeRender( this, scene, camera, geometry, material, group );
@@ -3400,6 +3509,8 @@ class Renderer {
 		//
 
 		if ( material.allowOverride === true && scene.overrideMaterial !== null ) {
+
+			this._currentSourceMaterial = material;
 
 			const overrideMaterial = scene.overrideMaterial;
 
@@ -3476,6 +3587,8 @@ class Renderer {
 
 		}
 
+		this._currentSourceMaterial = previousSourceMaterial;
+
 		//
 
 		object.onAfterRender( this, scene, camera, geometry, material, group );
@@ -3492,7 +3605,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			throw new Error( 'Renderer: .hasCompatibility() called before the backend is initialized. Use "await renderer.init();" before using this method.' );
+			throw new Error( 'THREE.Renderer: .hasCompatibility() called before the backend is initialized. Use "await renderer.init();" before using this method.' );
 
 		}
 

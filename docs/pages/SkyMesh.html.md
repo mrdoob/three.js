@@ -11,6 +11,12 @@ More references:
 *   [http://simonwallner.at/project/atmospheric-scattering/](http://simonwallner.at/project/atmospheric-scattering/)
 *   [http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR](http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR)
 
+```js
+const sky = new SkyMesh();
+sky.scale.setScalar( 10000 );
+scene.add( sky );
+```
+
 It can be useful to hide the sun disc when generating an environment map to avoid artifacts
 
 ```js
@@ -19,14 +25,6 @@ sky.showSunDisc.value = false;
 // ...
 // re-enable before scene sky box rendering
 sky.showSunDisc.value = true;
-```
-
-## Code Example
-
-```js
-const sky = new SkyMesh();
-sky.scale.setScalar( 10000 );
-scene.add( sky );
 ```
 
 ## Import

@@ -1,9 +1,7 @@
-export function createValueSpan( id = null ) {
+export function createValueSpan() {
 
 	const span = document.createElement( 'span' );
 	span.className = 'value';
-
-	if ( id !== null ) span.id = id;
 
 	return span;
 
@@ -11,11 +9,9 @@ export function createValueSpan( id = null ) {
 
 export function setText( element, text ) {
 
-	const el = element instanceof HTMLElement ? element : document.getElementById( element );
+	if ( element && element.textContent !== text ) {
 
-	if ( el && el.textContent !== text ) {
-
-		el.textContent = text;
+		element.textContent = text;
 
 	}
 
@@ -23,9 +19,7 @@ export function setText( element, text ) {
 
 export function getText( element ) {
 
-	const el = element instanceof HTMLElement ? element : document.getElementById( element );
-
-	return el ? el.textContent : null;
+	return element ? element.textContent : null;
 
 }
 
@@ -67,3 +61,88 @@ export function formatBytes( bytes, decimals = 2 ) {
 	return parseFloat( ( bytes / Math.pow( k, i ) ).toFixed( dm ) ) + ' ' + sizes[ i ];
 
 }
+
+export function info( parentNode, text ) {
+
+	let infoIcon = parentNode.querySelector( '.info-icon' );
+
+	if ( ! infoIcon ) {
+
+		infoIcon = document.createElement( 'span' );
+		infoIcon.className = 'info-icon';
+		infoIcon.textContent = 'i';
+		parentNode.appendChild( infoIcon );
+
+	} else {
+
+		const newInfoIcon = infoIcon.cloneNode( true );
+		infoIcon.replaceWith( newInfoIcon );
+		infoIcon = newInfoIcon;
+
+	}
+
+	const showTooltip = () => {
+
+		const container = infoIcon.closest( '.three-inspector' ) || document.body;
+		let tooltip = container.querySelector( '.three-inspector-info-tooltip' );
+
+		if ( ! tooltip ) {
+
+			tooltip = document.createElement( 'div' );
+			tooltip.className = 'info-tooltip three-inspector-info-tooltip';
+			container.appendChild( tooltip );
+
+		}
+
+		const html = text.trim().replace( /### (.*?)(?:\r?\n|$)/g, '<h3>$1</h3>' )
+					   .replace( /\*\*(.*?)\*\*/g, '<strong>$1</strong>' )
+					   .replace( /\n/g, '<br/>' );
+
+		tooltip.innerHTML = html;
+
+		const rect = infoIcon.getBoundingClientRect();
+
+		tooltip.style.left = ( rect.left + rect.width / 2 ) + 'px';
+		tooltip.style.top = ( rect.top - 8 ) + 'px';
+
+		tooltip.style.opacity = '1';
+		tooltip.style.visibility = 'visible';
+
+	};
+
+	const hideTooltip = () => {
+
+		const container = infoIcon.closest( '.three-inspector' ) || document.body;
+		const tooltip = container.querySelector( '.three-inspector-info-tooltip' );
+		if ( tooltip ) {
+
+			tooltip.style.opacity = '0';
+			tooltip.style.visibility = 'hidden';
+
+		}
+
+	};
+
+	infoIcon.addEventListener( 'mouseenter', showTooltip );
+	infoIcon.addEventListener( 'mouseleave', hideTooltip );
+	infoIcon.addEventListener( 'click', ( e ) => {
+
+		e.stopPropagation();
+		const container = infoIcon.closest( '.three-inspector' ) || document.body;
+		const tooltip = container.querySelector( '.three-inspector-info-tooltip' );
+		if ( tooltip && tooltip.style.visibility === 'visible' ) {
+
+			hideTooltip();
+
+		} else {
+
+			showTooltip();
+
+		}
+
+	} );
+
+	return infoIcon;
+
+}
+

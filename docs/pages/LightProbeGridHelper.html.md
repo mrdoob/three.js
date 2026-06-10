@@ -2,7 +2,7 @@
 
 # LightProbeGridHelper
 
-Visualizes an [LightProbeGrid](LightProbeGrid.html) by rendering a sphere at each probe position, shaded with the probe's L1 spherical harmonics.
+Visualizes an [LightProbeGrid](LightProbeGrid.html) by rendering a sphere at each probe position, shaded with the probe's L2 spherical harmonics.
 
 Uses a single `InstancedMesh` draw call for all probes.
 
