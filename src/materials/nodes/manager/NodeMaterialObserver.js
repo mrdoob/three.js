@@ -22,6 +22,7 @@ const refreshUniforms = [
 	'emissiveMap',
 	'envMap',
 	'envMapIntensity',
+	'envMapRotation',
 	'gradientMap',
 	'ior',
 	'iridescence',
@@ -216,6 +217,11 @@ class NodeMaterialObserver {
 
 			}
 
+			const { environmentIntensity, environmentRotation } = renderObject.scene;
+
+			data.environmentIntensity = environmentIntensity;
+			data.environmentRotation = environmentRotation.clone();
+
 			data.lights = this.getLightsData( renderObject.lightsNode.getLights(), [] );
 
 			this.renderObjects.set( renderObject, data );
@@ -363,7 +369,7 @@ class NodeMaterialObserver {
 	 * @param {RenderObject} renderObject - The render object.
 	 * @param {Array<Light>} lightsData - The current material lights.
 	 * @param {number} renderId - The current render ID.
-	 * @return {boolean} Whether the given render object has changed its state or not.
+	 * @return {boolean} Whether the given render object is equal to its cached state or not.
 	 */
 	equals( renderObject, lightsData, renderId ) {
 
@@ -600,6 +606,24 @@ class NodeMaterialObserver {
 
 		}
 
+		// scene
+
+		const scene = renderObject.scene;
+
+		if ( scene.environment !== null && material.envMap === null ) {
+
+			if ( renderObjectData.environmentIntensity !== scene.environmentIntensity ||
+					renderObjectData.environmentRotation.equals( scene.environmentRotation ) === false ) {
+
+				renderObjectData.environmentIntensity = scene.environmentIntensity;
+				renderObjectData.environmentRotation.copy( scene.environmentRotation );
+
+				return false;
+
+			}
+
+		}
+
 		// center
 
 		if ( renderObjectData.center ) {
@@ -608,7 +632,7 @@ class NodeMaterialObserver {
 
 				renderObjectData.center.copy( object.center );
 
-				return true;
+				return false;
 
 			}
 
