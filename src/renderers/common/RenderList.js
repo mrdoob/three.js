@@ -225,7 +225,6 @@ class RenderList {
 		this.lightsArray.length = 0;
 
 		this.occlusionQueryCount = 0;
-		this._lastOcclusionObject = null;
 
 		return this;
 
@@ -432,6 +431,8 @@ class RenderList {
 			renderItem.clippingContext = null;
 
 		}
+
+		this._lastOcclusionObject = null;
 
 	}
 
