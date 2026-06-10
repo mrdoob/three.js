@@ -1,5 +1,5 @@
 import { RenderTarget, HalfFloatType, TempNode, QuadMesh, NodeMaterial, RendererUtils, Vector2, Vector3, Vector4, Color, DataTexture, RGBAFormat, FloatType, RepeatWrapping, NearestFilter } from 'three/webgpu';
-import { Fn, float, vec2, vec3, vec4, int, uv, uniform, uniformArray, Loop, texture, passTexture, NodeUpdateType, If, abs, max, min, exp, sqrt, pow, mix, dot, cross, normalize, clamp } from 'three/tsl';
+import { Fn, float, vec2, vec3, vec4, int, uv, uniform, uniformArray, Loop, texture, passTexture, NodeUpdateType, If, abs, max, min, exp, sqrt, pow, mix, dot, cross, normalize, clamp, fract, cos, sin, screenCoordinate } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -70,16 +70,17 @@ function _precomputeSamples( numSamples ) {
 }
 
 /**
- * Generates a tiling texture of random 2D unit vectors (cos θ, sin θ) used to
- * rotate the sample disk per pixel, breaking up structured blur patterns.
+ * Generates a tiling texture of per-texel white-noise scalars in `[0, 1)`, stored
+ * in every channel. The value seeds the per-pixel rotation of the sample disk,
+ * breaking up structured blur patterns.
  *
- * This is the "random kernel rotations" optimization from the Optimizations
- * section of [Golubev 2018]. It trades structured undersampling artifacts for
- * less objectionable noise, which a temporal resolve (e.g. `TRAANode`, enabled
- * via the {@link SSSSNode#jitter} flag) cleans up over successive frames.
+ * Animating the value over time with a golden-ratio value offset (see
+ * {@link SSSSNode#jitter}) gives each pixel a low-discrepancy temporal sequence, so a
+ * temporal resolve (`TRAANode`) accumulates it into a clean image over successive
+ * frames while allowing a reduced tap count.
  *
  * @param {number} [size=64] - Width and height of the square texture in texels.
- * @returns {DataTexture} RGBA Float texture with rotation vectors in the RG channels.
+ * @returns {DataTexture} RGBA Float texture with the scalar replicated across channels.
  */
 function _generateWhiteNoiseTexture( size = 64 ) {
 
@@ -87,10 +88,10 @@ function _generateWhiteNoiseTexture( size = 64 ) {
 
 	for ( let i = 0; i < size * size; i ++ ) {
 
-		const angle = Math.random() * Math.PI * 2;
-		data[ i * 4 ] = Math.cos( angle );
-		data[ i * 4 + 1 ] = Math.sin( angle );
-		data[ i * 4 + 2 ] = 0;
+		const v = Math.random();
+		data[ i * 4 ] = v;
+		data[ i * 4 + 1 ] = v;
+		data[ i * 4 + 2 ] = v;
 		data[ i * 4 + 3 ] = 1;
 
 	}
@@ -303,15 +304,6 @@ class SSSSNode extends TempNode {
 		this._resolution = uniform( new Vector2() );
 
 		/**
-		 * Resolution at which the per-pixel noise rotation tiles, i.e.
-		 * `resolutionScale * resolution`.
-		 *
-		 * @private
-		 * @type {UniformNode<vec2>}
-		 */
-		this._lowResolution = uniform( new Vector2() );
-
-		/**
 		 * Effective number of blur taps per pixel: `round( samples * resolutionScale )`,
 		 * recomputed each frame. This is the knob `resolutionScale` turns on the
 		 * expensive path.
@@ -339,8 +331,8 @@ class SSSSNode extends TempNode {
 		this._projScale = uniform( 1.0 );
 
 		/**
-		 * Golden-ratio noise UV shift applied when temporal filtering is enabled,
-		 * kept in the [0, 1) range. Stays 0 when temporal filtering is disabled.
+		 * Golden-ratio offset added to the per-pixel rotation seed when jitter is enabled,
+		 * kept in the [0, 1) range. Stays 0 when jitter is disabled.
 		 *
 		 * @private
 		 * @type {UniformNode<float>}
@@ -385,6 +377,8 @@ class SSSSNode extends TempNode {
 		this._maxR = allSamples[ _MAX_SAMPLES - 1 ].z;
 
 		/**
+		 * White-noise rotation seed.
+		 *
 		 * @private
 		 * @type {TextureNode}
 		 */
@@ -577,12 +571,9 @@ class SSSSNode extends TempNode {
 
 		this._resolution.value.set( width, height );
 
-		// The output stays full resolution (single pass). `resolutionScale` only
-		// tiles the noise rotation at a lower frequency; the matching reduction in
-		// the per-pixel tap count is applied via `_effectiveSamples` in updateBefore.
-		const w = Math.max( 1, Math.round( this.resolutionScale * width ) );
-		const h = Math.max( 1, Math.round( this.resolutionScale * height ) );
-		this._lowResolution.value.set( w, h );
+		// The output stays full resolution (single pass). `resolutionScale` only reduces
+		// the per-pixel tap count (applied via `_effectiveSamples` in updateBefore); the
+		// noise rotation is always evaluated at full resolution.
 		this._sssRenderTarget.setSize( width, height );
 
 	}
@@ -643,7 +634,7 @@ class SSSSNode extends TempNode {
 		const { outputMode } = this;
 		const { fogType, fogNear, fogFar, fogDensity } = this;
 		const fogColorUniform = this.fogColor;
-		const { _lowResolution, _projScale, _cameraNear, _resolution, _cameraProjectionMatrix, _projDepthParams, _projScaleXY, _samplesU, _noiseNode, _temporalNoiseOffset, _effectiveSamples, _sampleStride } = this;
+		const { _projScale, _cameraNear, _resolution, _cameraProjectionMatrix, _projDepthParams, _projScaleXY, _samplesU, _noiseNode, _temporalNoiseOffset, _effectiveSamples, _sampleStride } = this;
 		const maxR = this._maxR;
 
 		const sampleColor = ( uvCoord ) => colorNode.sample( uvCoord );
@@ -721,12 +712,15 @@ class SSSSNode extends TempNode {
 					const clampedRadius = min( screenRadius, effectiveMaxRadius ).toVar();
 					const radiusScale = clampedRadius.div( float( maxR ) ).toVar();
 
+					// Per-pixel white-noise rotation seed in [0,1), tiling every 64 px at full resolution.
+					const base01 = _noiseNode.sample( screenCoordinate.xy.div( 64.0 ) ).r.toVar();
 
-					// Temporal offset (0 unless temporal filtering is enabled) shifts the noise lookup each frame.
-					const noiseUV = vuv.mul( _lowResolution ).div( 64.0 ).add( vec2( _temporalNoiseOffset ) );
-					const noiseVal = _noiseNode.sample( noiseUV );
-					const cosA = noiseVal.r.toVar();
-					const sinA = noiseVal.g.toVar();
+					// Advance the seed along a golden-ratio low-discrepancy sequence each frame
+					// (offset is 0 unless `jitter` is enabled) so a temporal resolve accumulates
+					// evenly distributed rotations while every frame stays spatially well distributed.
+					const angle = fract( base01.add( _temporalNoiseOffset ) ).mul( 6.283185307179586 ).toVar();
+					const cosA = cos( angle ).toVar();
+					const sinA = sin( angle ).toVar();
 
 					// Tangent-plane disk basis; falls back to screen-aligned disk when no normalNode.
 					const centerNormal = normalNode
