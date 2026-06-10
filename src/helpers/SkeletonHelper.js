@@ -87,6 +87,8 @@ class SkeletonHelper extends LineSegments {
 		this.matrix = object.matrixWorld;
 		this.matrixAutoUpdate = false;
 
+		this.frustumCulled = false;
+
 		// colors
 
 		const color1 = new Color( 0x0000ff );
