@@ -84,6 +84,19 @@ class SSGINode extends TempNode {
 		this.normalNode = normalNode;
 
 		/**
+		 * An optional node that supplies the per-pixel sampling jitter as a `vec2`: `x`
+		 * drives the slice rotation and `y` the initial ray step, both in `[0, 1)`. The
+		 * node is expected to vary over time when temporal filtering is used — an animated
+		 * blue-noise node converges faster and with less visible noise than the default.
+		 * When `null`, interleaved gradient noise with the GTAO spatial/temporal offset
+		 * tables is used instead.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.noiseNode = null;
+
+		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
 		 * its effect once per frame in `updateBefore()`.
 		 *
@@ -562,10 +575,26 @@ class SSGINode extends TempNode {
 
 			//
 
-			const noiseOffset = spatialOffsets( screenCoordinate );
-			const noiseDirection = interleavedGradientNoise( screenCoordinate );
-			const noiseJitterIdx = this._temporalDirection.mul( 0.02 ); // Port: Add noiseJitterIdx here for slightly better noise convergence with TRAA (see #31890 for more details)
-			const initialRayStep = fract( noiseOffset.add( this._temporalOffset ) ).add( rand( uvNode.add( noiseJitterIdx ).mul( 2 ).sub( 1 ) ) );
+			// Per-pixel sampling jitter: the slice rotation ( noiseDirection ) and the initial ray step.
+
+			let noiseDirection, initialRayStep;
+
+			if ( this.noiseNode !== null ) {
+
+				const noise = vec2( this.noiseNode );
+
+				noiseDirection = noise.x;
+				initialRayStep = noise.y;
+
+			} else {
+
+				const noiseOffset = spatialOffsets( screenCoordinate );
+				const noiseJitterIdx = this._temporalDirection.mul( 0.02 ); // Port: Add noiseJitterIdx here for slightly better noise convergence with TRAA (see #31890 for more details)
+
+				noiseDirection = interleavedGradientNoise( screenCoordinate ).add( this._temporalDirection );
+				initialRayStep = fract( noiseOffset.add( this._temporalOffset ) ).add( rand( uvNode.add( noiseJitterIdx ).mul( 2 ).sub( 1 ) ) );
+
+			}
 
 			const ao = float( 0 );
 			const color = vec3( 0 );
@@ -595,7 +624,7 @@ class SSGINode extends TempNode {
 
 			Loop( { start: uint( 0 ), end: ROTATION_COUNT, type: 'uint', condition: '<' }, ( { i } ) => {
 
-				const rotationAngle = mul( float( i ).add( noiseDirection ).add( this._temporalDirection ), PI.div( float( ROTATION_COUNT ) ) ).toConst();
+				const rotationAngle = mul( float( i ).add( noiseDirection ), PI.div( float( ROTATION_COUNT ) ) ).toConst();
 				const sliceDir = vec3( vec2( cos( rotationAngle ), sin( rotationAngle ) ), 0 ).toConst();
 				const slideDirTexelSize = sliceDir.xy.mul( float( 1 ).div( this._resolution ) ).toConst();
 
