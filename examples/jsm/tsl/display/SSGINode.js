@@ -99,6 +99,16 @@ class SSGINode extends TempNode {
 		this.noiseNode = null;
 
 		/**
+		 * The resolution scale. By default the effect is rendered in full resolution
+		 * for best quality but a value of `0.5` is an effective way of improving
+		 * performance, especially when the result is denoised and upsampled anyway.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.resolutionScale = 1;
+
+		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
 		 * its effect once per frame in `updateBefore()`.
 		 *
@@ -327,6 +337,9 @@ class SSGINode extends TempNode {
 	 * @param {number} height - The height of the effect.
 	 */
 	setSize( width, height ) {
+
+		width = Math.round( width * this.resolutionScale );
+		height = Math.round( height * this.resolutionScale );
 
 		this._resolution.value.set( width, height );
 		this._ssgiRenderTarget.setSize( width, height );
