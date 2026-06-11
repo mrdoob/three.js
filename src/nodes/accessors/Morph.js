@@ -198,11 +198,12 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ] ) => {
 
 	let morphInfluenceData = _morphInfluencesData.get( mesh );
 
-	if ( morphInfluenceData === undefined ) {
+	if ( morphInfluenceData === undefined || morphInfluenceData.count !== morphTargetsCount ) {
 
 		morphInfluenceData = {
 			base: uniform( 1 ),
-			influences: buffer( new Float32Array( morphTargetsCount ), 'float', morphTargetsCount )
+			influences: buffer( new Float32Array( morphTargetsCount ), 'float', morphTargetsCount ),
+			count: morphTargetsCount
 		};
 
 		_morphInfluencesData.set( mesh, morphInfluenceData );
