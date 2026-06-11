@@ -167,6 +167,17 @@ class SVGFNode extends TempNode {
 		 */
 		this.lumaPhi = uniform( 4 );
 
+		/**
+		 * Clamps the luminance of each incoming sample to this multiple of its local
+		 * neighborhood mean before accumulation. Suppresses isolated bright outliers
+		 * ( fireflies ) that would otherwise blink in dark regions. Lower values suppress
+		 * more aggressively at the cost of dimming small bright details.
+		 *
+		 * @type {UniformNode<float>}
+		 * @default 2
+		 */
+		this.fireflyFactor = uniform( 2 );
+
 		// private uniforms
 
 		/**
@@ -510,6 +521,14 @@ class SVGFNode extends TempNode {
 				}
 
 				blurredLuma.mulAssign( 1 / 9 );
+
+				// suppress fireflies: clamp the sample against its neighborhood mean so isolated
+				// bright outliers cannot blink in and out of the accumulated result
+
+				const currentLuma = luminance( current.rgb ).toVar();
+				const maxLuma = blurredLuma.mul( this.fireflyFactor );
+
+				current.rgb.mulAssign( currentLuma.greaterThan( maxLuma ).select( maxLuma.div( currentLuma ), float( 1.0 ) ) );
 
 				const historyLuma = luminance( history.rgb );
 				const gradient = abs( blurredLuma.sub( historyLuma ) ).div( max( blurredLuma, historyLuma ).add( 0.01 ) );
