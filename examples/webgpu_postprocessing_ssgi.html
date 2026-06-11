@@ -39,6 +39,7 @@
 			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec3, vec4, packNormalToRGB, unpackRGBToNormal, sample } from 'three/tsl';
 			import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
+			import { blueNoise } from 'three/addons/tsl/math/BlueNoise.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -115,6 +116,9 @@
 				const giPass = ssgi( scenePassColor, scenePassDepth, sceneNormal, camera );
 				giPass.sliceCount.value = 2;
 				giPass.stepCount.value = 8;
+
+				const noiseNode = blueNoise( 2 );
+				giPass.noiseNode = noiseNode;
 
 				// composite
 
@@ -220,7 +224,8 @@
 				//
 
 				const params = {
-					output: 0
+					output: 0,
+					blueNoise: true
 				};
 
 				const types = { Combined: 0, Direct: 3, AO: 1, GI: 2 };
@@ -238,6 +243,12 @@
 				gui.add( giPass.useLinearThickness, 'value' ).name( 'use linear thickness' );
 				gui.add( giPass.useScreenSpaceSampling, 'value' ).name( 'screen-space sampling' );
 				gui.add( giPass, 'useTemporalFiltering' ).name( 'temporal filtering' ).onChange( updatePostprocessing );
+				gui.add( params, 'blueNoise' ).name( 'blue noise' ).onChange( ( value ) => {
+
+					giPass.noiseNode = ( value === true ) ? noiseNode : null;
+					updatePostprocessing( params.output );
+
+				} );
 
 				function updatePostprocessing( value ) {
 

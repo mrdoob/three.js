@@ -46,6 +46,7 @@
 			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec4, packNormalToRGB, unpackRGBToNormal, sample } from 'three/tsl';
 			import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
+			import { blueNoise } from 'three/addons/tsl/math/BlueNoise.js';
 			import { World } from '@perplexdotgg/bounce';
 
 			const BALL_RADIUS = 0.4;
@@ -131,6 +132,7 @@
 				const giPass = ssgi( scenePassColor, scenePassDepth, sceneNormal, camera );
 				giPass.sliceCount.value = 2;
 				giPass.stepCount.value = 8;
+				giPass.noiseNode = blueNoise( 2 );
 
 				// composite
 
