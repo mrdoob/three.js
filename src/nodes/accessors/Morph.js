@@ -11,7 +11,7 @@ import { DataArrayTexture } from '../../textures/DataArrayTexture.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { FloatType } from '../../constants.js';
-import { buffer } from './BufferNode.js';
+import { uniformArray } from './UniformArrayNode.js';
 
 const _morphTextures = /*@__PURE__*/ new WeakMap();
 const _morphVec4 = /*@__PURE__*/ new Vector4();
@@ -202,7 +202,7 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ] ) => {
 
 		morphInfluenceData = {
 			base: uniform( 1 ),
-			influences: mesh.morphTargetInfluences ? buffer( new Float32Array( mesh.morphTargetInfluences ), 'float', morphTargetsCount ) : null,
+			influences: mesh.morphTargetInfluences ? uniformArray( mesh.morphTargetInfluences, 'float' ) : null,
 			count: morphTargetsCount
 		};
 
@@ -285,7 +285,7 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ] ) => {
 
 		if ( influences ) {
 
-			influences.value.set( object.morphTargetInfluences );
+			influences.array = object.morphTargetInfluences;
 
 		}
 
