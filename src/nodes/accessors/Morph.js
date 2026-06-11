@@ -1,6 +1,5 @@
 
 import { float, Fn, ivec2, int, If, uniform } from '../tsl/TSLBase.js';
-import { reference } from './ReferenceNode.js';
 import { Loop } from '../utils/LoopNode.js';
 import { OnObjectUpdate } from '../utils/EventNode.js';
 import { textureLoad } from './TextureNode.js';
@@ -12,10 +11,11 @@ import { DataArrayTexture } from '../../textures/DataArrayTexture.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { FloatType } from '../../constants.js';
+import { buffer } from './BufferNode.js';
 
 const _morphTextures = /*@__PURE__*/ new WeakMap();
 const _morphVec4 = /*@__PURE__*/ new Vector4();
-const _morphBaseInfluences = /*@__PURE__*/ new WeakMap();
+const _morphInfluencesData = /*@__PURE__*/ new WeakMap();
 
 /**
  * TSL function that retrieves and scales the morphed attribute (position or normal) texel value.
@@ -175,13 +175,6 @@ function getEntry( geometry ) {
 }
 
 /**
- * TSL object representing a reference to the mesh's morphTargetInfluences array.
- *
- * @type {ReferenceNode<float>}
- */
-export const morphTargetInfluences = /*@__PURE__*/ reference( 'morphTargetInfluences', 'float' );
-
-/**
  * TSL function representing the vertex shader morph targets blend setup.
  * Dynamically computes morph targets weights and updates positionLocal and normalLocal in-place.
  *
@@ -201,33 +194,29 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ] ) => {
 
 	if ( morphTargetsCount === 0 ) return;
 
-	let morphBaseInfluence = _morphBaseInfluences.get( mesh );
+	// Init
 
-	if ( ! morphBaseInfluence ) {
+	let morphInfluenceData = _morphInfluencesData.get( mesh );
 
-		morphBaseInfluence = uniform( 1 );
-		_morphBaseInfluences.set( mesh, morphBaseInfluence );
+	if ( morphInfluenceData === undefined ) {
 
-		OnObjectUpdate( ( { object } ) => {
+		morphInfluenceData = {
+			base: uniform( 1 ),
+			influences: buffer( new Float32Array( morphTargetsCount ), 'float', morphTargetsCount )
+		};
 
-			if ( object.geometry.morphTargetsRelative ) {
-
-				morphBaseInfluence.value = 1;
-
-			} else {
-
-				morphBaseInfluence.value = 1 - object.morphTargetInfluences.reduce( ( a, b ) => a + b, 0 );
-
-			}
-
-		} );
+		_morphInfluencesData.set( mesh, morphInfluenceData );
 
 	}
 
+	const { base, influences } = morphInfluenceData;
+
+	// Shader
+
 	const { texture: bufferMap, stride, size } = getEntry( geometry );
 
-	if ( hasMorphPosition === true ) positionLocal.mulAssign( morphBaseInfluence );
-	if ( hasMorphNormals === true ) normalLocal.mulAssign( morphBaseInfluence );
+	if ( hasMorphPosition === true ) positionLocal.mulAssign( base );
+	if ( hasMorphNormals === true ) normalLocal.mulAssign( base );
 
 	const width = int( size.width );
 
@@ -241,7 +230,7 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ] ) => {
 
 		} else {
 
-			influence.assign( morphTargetInfluences.element( i ).toVar() );
+			influence.assign( influences.element( i ).toVar() );
 
 		}
 
@@ -274,6 +263,26 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ] ) => {
 			}
 
 		} );
+
+	} );
+
+	// Update
+
+	OnObjectUpdate( ( { object } ) => {
+
+		const { base, influences } = morphInfluenceData;
+
+		if ( object.geometry.morphTargetsRelative ) {
+
+			base.value = 1;
+
+		} else {
+
+			base.value = 1 - object.morphTargetInfluences.reduce( ( a, b ) => a + b, 0 );
+
+		}
+
+		influences.value.set( object.morphTargetInfluences );
 
 	} );
 
