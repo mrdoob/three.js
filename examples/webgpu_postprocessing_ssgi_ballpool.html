@@ -45,8 +45,12 @@
 			import * as THREE from 'three/webgpu';
 			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec4, packNormalToRGB, unpackRGBToNormal, sample } from 'three/tsl';
 			import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
+			import { svgf } from 'three/addons/tsl/display/SVGFNode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
+			import { blueNoise } from 'three/addons/tsl/math/BlueNoise.js';
 			import { World } from '@perplexdotgg/bounce';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const BALL_RADIUS = 0.4;
 			const FILL_RATIO = 0.4;
@@ -92,6 +96,7 @@
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 0.5;
 				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -131,11 +136,16 @@
 				const giPass = ssgi( scenePassColor, scenePassDepth, sceneNormal, camera );
 				giPass.sliceCount.value = 2;
 				giPass.stepCount.value = 8;
+				giPass.noiseNode = blueNoise( 2 );
+
+				// svgf denoise
+
+				const svgfPass = svgf( giPass, scenePassDepth, sceneNormal, scenePassVelocity, camera );
 
 				// composite
 
-				const gi = giPass.rgb;
-				const ao = giPass.a;
+				const gi = svgfPass.rgb.toInspector( 'SSGI' );
+				const ao = svgfPass.a.toInspector( 'AO' );
 
 				const compositePass = vec4(
 					add( scenePassColor.rgb.mul( ao ), scenePassDiffuse.rgb.mul( gi ) ),

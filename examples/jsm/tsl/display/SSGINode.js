@@ -1,5 +1,5 @@
-import { HalfFloatType, RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, MathUtils } from 'three/webgpu';
-import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise } from 'three/tsl';
+import { HalfFloatType, RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, MathUtils, WebGPUCoordinateSystem } from 'three/webgpu';
+import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, logarithmicDepthToViewZ, viewZToPerspectiveDepth, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, getNormalFromDepth, countOneBits, interleavedGradientNoise } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -82,6 +82,31 @@ class SSGINode extends TempNode {
 		 * @type {TextureNode}
 		 */
 		this.normalNode = normalNode;
+
+		/**
+		 * An optional node that supplies the per-pixel sampling jitter as a `vec2`: `x`
+		 * drives the slice rotation and `y` the initial ray step, both in `[0, 1)`. The
+		 * node is expected to vary over time when temporal filtering is used — an animated
+		 * blue-noise node converges faster and with less visible noise than the default.
+		 * Keep the source static when `useTemporalFiltering` is disabled (e.g. via
+		 * `BlueNoiseNode.animated = false`).
+		 * When `null`, interleaved gradient noise with the GTAO spatial/temporal offset
+		 * tables is used instead.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.noiseNode = null;
+
+		/**
+		 * The resolution scale. By default the effect is rendered in full resolution
+		 * for best quality but a value of `0.5` is an effective way of improving
+		 * performance, especially when the result is denoised and upsampled anyway.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.resolutionScale = 1;
 
 		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
@@ -313,6 +338,9 @@ class SSGINode extends TempNode {
 	 */
 	setSize( width, height ) {
 
+		width = Math.round( width * this.resolutionScale );
+		height = Math.round( height * this.resolutionScale );
+
 		this._resolution.value.set( width, height );
 		this._ssgiRenderTarget.setSize( width, height );
 
@@ -403,6 +431,37 @@ class SSGINode extends TempNode {
 		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.sample( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
 		const sampleBeauty = ( uv ) => this.beautyNode.sample( uv );
 
+		// optimized version of getViewPosition() that exploits the sparsity of the inverse projection matrix
+
+		const getViewPosition = ( screenPosition, depth ) => {
+
+			let ndc;
+
+			if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem ) {
+
+				ndc = vec3( vec2( screenPosition.x, screenPosition.y.oneMinus() ).mul( 2.0 ).sub( 1.0 ), depth ).toConst();
+
+			} else {
+
+				ndc = vec3( screenPosition.x, screenPosition.y.oneMinus(), depth ).mul( 2.0 ).sub( 1.0 ).toConst();
+
+			}
+
+			const c0 = this._cameraProjectionMatrixInverse.element( 0 );
+			const c1 = this._cameraProjectionMatrixInverse.element( 1 );
+			const c2 = this._cameraProjectionMatrixInverse.element( 2 );
+			const c3 = this._cameraProjectionMatrixInverse.element( 3 );
+
+			const viewSpacePosition = vec3(
+				ndc.x.mul( c0.x ).add( c3.x ),
+				ndc.y.mul( c1.y ).add( c3.y ),
+				ndc.z.mul( c2.z ).add( c3.z )
+			);
+
+			return viewSpacePosition.div( ndc.z.mul( c2.w ).add( c3.w ) );
+
+		};
+
 		// From Activision GTAO paper: https://www.activision.com/cdn/research/s2016_pbs_activision_occlusion.pptx
 
 		const spatialOffsets = Fn( ( [ position ] ) => {
@@ -435,27 +494,13 @@ class SSGINode extends TempNode {
 			]
 		} );
 
-		const horizonSampling = Fn( ( [ directionIsRight, RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ] ) => {
+		const horizonSampling = Fn( ( [ directionIsRight, stepRadius, radiusVS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ] ) => {
 
 			const STEP_COUNT = this.stepCount.toConst();
 			const EXP_FACTOR = this.expFactor.toConst();
 			const THICKNESS = this.thickness.toConst();
 			const BACKFACE_LIGHTING = this.backfaceLighting.toConst();
 
-			const stepRadius = float( 0 );
-
-			If( this.useScreenSpaceSampling.equal( true ), () => {
-
-				stepRadius.assign( RADIUS.mul( this._resolution.x.div( 2 ) ).div( float( 16 ) ) ); // SSRT3 has a bug where stepRadius is divided by STEP_COUNT twice; fix here
-
-			} ).Else( () => {
-
-				stepRadius.assign( max( RADIUS.mul( this._halfProjScale ).div( viewPosition.z.negate() ), float( STEP_COUNT ) ) ); // Port note: viewZ is negative so a negate is required
-
-			} );
-
-			stepRadius.divAssign( float( STEP_COUNT ).add( 1 ) );
-			const radiusVS = max( 1, float( STEP_COUNT.sub( 1 ) ) ).mul( stepRadius );
 			const uvDirection = directionIsRight.equal( true ).select( vec2( 1, - 1 ), vec2( - 1, 1 ) ); // Port note: Because of different uv conventions, uv-y has a different sign
 			const samplingDirection = directionIsRight.equal( true ).select( 1, - 1 );
 
@@ -473,7 +518,7 @@ class SSGINode extends TempNode {
 
 				} );
 
-				const sampleViewPosition = getViewPosition( sampleUV, sampleDepth( sampleUV ), this._cameraProjectionMatrixInverse ).toConst();
+				const sampleViewPosition = getViewPosition( sampleUV, sampleDepth( sampleUV ) ).toConst();
 				const pixelToSample = sampleViewPosition.sub( viewPosition ).normalize().toConst();
 				const linearThicknessMultiplier = this.useLinearThickness.equal( true ).select( sampleViewPosition.z.negate().div( this._cameraFar ).clamp().mul( 100 ), float( 1 ) );
 				const pixelToSampleBackface = normalize( sampleViewPosition.sub( linearThicknessMultiplier.mul( viewDir ).mul( THICKNESS ) ).sub( viewPosition ) );
@@ -539,28 +584,62 @@ class SSGINode extends TempNode {
 
 			depth.greaterThanEqual( 1.0 ).discard();
 
-			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toVar();
+			const viewPosition = getViewPosition( uvNode, depth ).toVar();
 			const viewNormal = sampleNormal( uvNode ).toVar();
 			const viewDir = normalize( viewPosition.xyz.negate() ).toVar();
 
 			//
 
-			const noiseOffset = spatialOffsets( screenCoordinate );
-			const noiseDirection = interleavedGradientNoise( screenCoordinate );
-			const noiseJitterIdx = this._temporalDirection.mul( 0.02 ); // Port: Add noiseJitterIdx here for slightly better noise convergence with TRAA (see #31890 for more details)
-			const initialRayStep = fract( noiseOffset.add( this._temporalOffset ) ).add( rand( uvNode.add( noiseJitterIdx ).mul( 2 ).sub( 1 ) ) );
+			// Per-pixel sampling jitter: the slice rotation ( noiseDirection ) and the initial ray step.
+
+			let noiseDirection, initialRayStep;
+
+			if ( this.noiseNode !== null ) {
+
+				const noise = vec2( this.noiseNode );
+
+				noiseDirection = noise.x;
+				initialRayStep = noise.y;
+
+			} else {
+
+				const noiseOffset = spatialOffsets( screenCoordinate );
+				const noiseJitterIdx = this._temporalDirection.mul( 0.02 ); // Port: Add noiseJitterIdx here for slightly better noise convergence with TRAA (see #31890 for more details)
+
+				noiseDirection = interleavedGradientNoise( screenCoordinate ).add( this._temporalDirection );
+				initialRayStep = fract( noiseOffset.add( this._temporalOffset ) ).add( rand( uvNode.add( noiseJitterIdx ).mul( 2 ).sub( 1 ) ) );
+
+			}
 
 			const ao = float( 0 );
 			const color = vec3( 0 );
 
 			const ROTATION_COUNT = this.sliceCount.toConst();
+			const STEP_COUNT = this.stepCount.toConst();
 			const AO_INTENSITY = this.aoIntensity.toConst();
 			const GI_INTENSITY = this.giIntensity.toConst();
 			const RADIUS = this.radius.toConst();
 
+			// the step radius only depends on per-pixel values so it can be computed once for all slice directions
+
+			const stepRadius = float( 0 );
+
+			If( this.useScreenSpaceSampling.equal( true ), () => {
+
+				stepRadius.assign( RADIUS.mul( this._resolution.x.div( 2 ) ).div( float( 16 ) ) ); // SSRT3 has a bug where stepRadius is divided by STEP_COUNT twice; fix here
+
+			} ).Else( () => {
+
+				stepRadius.assign( max( RADIUS.mul( this._halfProjScale ).div( viewPosition.z.negate() ), float( STEP_COUNT ) ) ); // Port note: viewZ is negative so a negate is required
+
+			} );
+
+			stepRadius.divAssign( float( STEP_COUNT ).add( 1 ) );
+			const radiusVS = max( 1, float( STEP_COUNT.sub( 1 ) ) ).mul( stepRadius ).toConst();
+
 			Loop( { start: uint( 0 ), end: ROTATION_COUNT, type: 'uint', condition: '<' }, ( { i } ) => {
 
-				const rotationAngle = mul( float( i ).add( noiseDirection ).add( this._temporalDirection ), PI.div( float( ROTATION_COUNT ) ) ).toConst();
+				const rotationAngle = mul( float( i ).add( noiseDirection ), PI.div( float( ROTATION_COUNT ) ) ).toConst();
 				const sliceDir = vec3( vec2( cos( rotationAngle ), sin( rotationAngle ) ), 0 ).toConst();
 				const slideDirTexelSize = sliceDir.xy.mul( float( 1 ).div( this._resolution ) ).toConst();
 
@@ -574,8 +653,13 @@ class SSGINode extends TempNode {
 
 				globalOccludedBitfield.assign( 0 );
 
-				color.addAssign( horizonSampling( bool( true ), RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ) );
-				color.addAssign( horizonSampling( bool( false ), RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ) );
+				Loop( { start: uint( 0 ), end: uint( 2 ), type: 'uint', condition: '<', name: 'side' }, ( { side } ) => {
+
+					const directionIsRight = side.equal( uint( 0 ) );
+
+					color.addAssign( horizonSampling( directionIsRight, stepRadius, radiusVS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ) );
+
+				} );
 
 				ao.addAssign( float( countOneBits( globalOccludedBitfield ) ).div( float( MAX_RAY ) ) );
 
