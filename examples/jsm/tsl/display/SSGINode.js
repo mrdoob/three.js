@@ -1,5 +1,5 @@
-import { HalfFloatType, RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, MathUtils } from 'three/webgpu';
-import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, getNormalFromDepth, countOneBits, interleavedGradientNoise } from 'three/tsl';
+import { HalfFloatType, RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, MathUtils, WebGPUCoordinateSystem } from 'three/webgpu';
+import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, logarithmicDepthToViewZ, viewZToPerspectiveDepth, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, getNormalFromDepth, countOneBits, interleavedGradientNoise } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -403,6 +403,37 @@ class SSGINode extends TempNode {
 		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.sample( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
 		const sampleBeauty = ( uv ) => this.beautyNode.sample( uv );
 
+		// optimized version of getViewPosition() that exploits the sparsity of the inverse projection matrix
+
+		const getViewPosition = ( screenPosition, depth ) => {
+
+			let ndc;
+
+			if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem ) {
+
+				ndc = vec3( vec2( screenPosition.x, screenPosition.y.oneMinus() ).mul( 2.0 ).sub( 1.0 ), depth ).toConst();
+
+			} else {
+
+				ndc = vec3( screenPosition.x, screenPosition.y.oneMinus(), depth ).mul( 2.0 ).sub( 1.0 ).toConst();
+
+			}
+
+			const c0 = this._cameraProjectionMatrixInverse.element( 0 );
+			const c1 = this._cameraProjectionMatrixInverse.element( 1 );
+			const c2 = this._cameraProjectionMatrixInverse.element( 2 );
+			const c3 = this._cameraProjectionMatrixInverse.element( 3 );
+
+			const viewSpacePosition = vec3(
+				ndc.x.mul( c0.x ).add( c3.x ),
+				ndc.y.mul( c1.y ).add( c3.y ),
+				ndc.z.mul( c2.z ).add( c3.z )
+			);
+
+			return viewSpacePosition.div( ndc.z.mul( c2.w ).add( c3.w ) );
+
+		};
+
 		// From Activision GTAO paper: https://www.activision.com/cdn/research/s2016_pbs_activision_occlusion.pptx
 
 		const spatialOffsets = Fn( ( [ position ] ) => {
@@ -459,7 +490,7 @@ class SSGINode extends TempNode {
 
 				} );
 
-				const sampleViewPosition = getViewPosition( sampleUV, sampleDepth( sampleUV ), this._cameraProjectionMatrixInverse ).toConst();
+				const sampleViewPosition = getViewPosition( sampleUV, sampleDepth( sampleUV ) ).toConst();
 				const pixelToSample = sampleViewPosition.sub( viewPosition ).normalize().toConst();
 				const linearThicknessMultiplier = this.useLinearThickness.equal( true ).select( sampleViewPosition.z.negate().div( this._cameraFar ).clamp().mul( 100 ), float( 1 ) );
 				const pixelToSampleBackface = normalize( sampleViewPosition.sub( linearThicknessMultiplier.mul( viewDir ).mul( THICKNESS ) ).sub( viewPosition ) );
@@ -525,7 +556,7 @@ class SSGINode extends TempNode {
 
 			depth.greaterThanEqual( 1.0 ).discard();
 
-			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toVar();
+			const viewPosition = getViewPosition( uvNode, depth ).toVar();
 			const viewNormal = sampleNormal( uvNode ).toVar();
 			const viewDir = normalize( viewPosition.xyz.negate() ).toVar();
 
