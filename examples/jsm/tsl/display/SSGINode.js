@@ -435,27 +435,13 @@ class SSGINode extends TempNode {
 			]
 		} );
 
-		const horizonSampling = Fn( ( [ directionIsRight, RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ] ) => {
+		const horizonSampling = Fn( ( [ directionIsRight, stepRadius, radiusVS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ] ) => {
 
 			const STEP_COUNT = this.stepCount.toConst();
 			const EXP_FACTOR = this.expFactor.toConst();
 			const THICKNESS = this.thickness.toConst();
 			const BACKFACE_LIGHTING = this.backfaceLighting.toConst();
 
-			const stepRadius = float( 0 );
-
-			If( this.useScreenSpaceSampling.equal( true ), () => {
-
-				stepRadius.assign( RADIUS.mul( this._resolution.x.div( 2 ) ).div( float( 16 ) ) ); // SSRT3 has a bug where stepRadius is divided by STEP_COUNT twice; fix here
-
-			} ).Else( () => {
-
-				stepRadius.assign( max( RADIUS.mul( this._halfProjScale ).div( viewPosition.z.negate() ), float( STEP_COUNT ) ) ); // Port note: viewZ is negative so a negate is required
-
-			} );
-
-			stepRadius.divAssign( float( STEP_COUNT ).add( 1 ) );
-			const radiusVS = max( 1, float( STEP_COUNT.sub( 1 ) ) ).mul( stepRadius );
 			const uvDirection = directionIsRight.equal( true ).select( vec2( 1, - 1 ), vec2( - 1, 1 ) ); // Port note: Because of different uv conventions, uv-y has a different sign
 			const samplingDirection = directionIsRight.equal( true ).select( 1, - 1 );
 
@@ -554,9 +540,27 @@ class SSGINode extends TempNode {
 			const color = vec3( 0 );
 
 			const ROTATION_COUNT = this.sliceCount.toConst();
+			const STEP_COUNT = this.stepCount.toConst();
 			const AO_INTENSITY = this.aoIntensity.toConst();
 			const GI_INTENSITY = this.giIntensity.toConst();
 			const RADIUS = this.radius.toConst();
+
+			// the step radius only depends on per-pixel values so it can be computed once for all slice directions
+
+			const stepRadius = float( 0 );
+
+			If( this.useScreenSpaceSampling.equal( true ), () => {
+
+				stepRadius.assign( RADIUS.mul( this._resolution.x.div( 2 ) ).div( float( 16 ) ) ); // SSRT3 has a bug where stepRadius is divided by STEP_COUNT twice; fix here
+
+			} ).Else( () => {
+
+				stepRadius.assign( max( RADIUS.mul( this._halfProjScale ).div( viewPosition.z.negate() ), float( STEP_COUNT ) ) ); // Port note: viewZ is negative so a negate is required
+
+			} );
+
+			stepRadius.divAssign( float( STEP_COUNT ).add( 1 ) );
+			const radiusVS = max( 1, float( STEP_COUNT.sub( 1 ) ) ).mul( stepRadius ).toConst();
 
 			Loop( { start: uint( 0 ), end: ROTATION_COUNT, type: 'uint', condition: '<' }, ( { i } ) => {
 
@@ -574,8 +578,8 @@ class SSGINode extends TempNode {
 
 				globalOccludedBitfield.assign( 0 );
 
-				color.addAssign( horizonSampling( bool( true ), RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ) );
-				color.addAssign( horizonSampling( bool( false ), RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ) );
+				color.addAssign( horizonSampling( bool( true ), stepRadius, radiusVS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ) );
+				color.addAssign( horizonSampling( bool( false ), stepRadius, radiusVS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ) );
 
 				ao.addAssign( float( countOneBits( globalOccludedBitfield ) ).div( float( MAX_RAY ) ) );
 
