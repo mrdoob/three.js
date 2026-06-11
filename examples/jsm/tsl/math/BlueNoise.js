@@ -375,6 +375,16 @@ class BlueNoiseNode extends TempNode {
 		this.animated = true;
 
 		/**
+		 * Length of the animation loop in frames. A short loop lets temporally accumulated
+		 * results converge to a stable image instead of drifting, while still providing
+		 * enough decorrelated patterns for typical accumulation windows.
+		 *
+		 * @type {number}
+		 * @default 12
+		 */
+		this.cycle = 12;
+
+		/**
 		 * The lazily generated blue-noise texture.
 		 *
 		 * @private
@@ -403,10 +413,7 @@ class BlueNoiseNode extends TempNode {
 
 		const steps = ( this.channels === 1 ) ? float( R1[ 0 ] ) : ( this.channels === 2 ) ? vec2( ...R2 ) : vec4( ...R4 );
 
-		// The frame index is bounded to keep the scroll term well within float precision.
-		// The wrap is just another quasirandom offset, so it is seamless under accumulation.
-
-		const frame = uniform( 0, 'float' ).onRenderUpdate( ( nodeFrame ) => ( this.animated === true ) ? nodeFrame.frameId % 4096 : 0 );
+		const frame = uniform( 0, 'float' ).onRenderUpdate( ( nodeFrame ) => ( this.animated === true ) ? nodeFrame.frameId % this.cycle : 0 );
 
 		return fract( value.add( frame.mul( steps ) ) );
 
