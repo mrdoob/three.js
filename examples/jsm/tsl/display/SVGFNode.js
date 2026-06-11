@@ -474,8 +474,7 @@ class SVGFNode extends TempNode {
 		const temporal = Fn( () => {
 
 			const uvNode = uv();
-			const size = this.beautyNode.size();
-			const texel = ivec2( uvNode.mul( size ) );
+			const texel = ivec2( uvNode.mul( this.velocityNode.size() ) ); // texel coordinates of the velocity texture, whose resolution can differ from the input
 
 			const current = this.beautyNode.sample( uvNode ).toVar();
 			const depth = sampleDepth( uvNode ).toVar();
