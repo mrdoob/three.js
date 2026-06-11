@@ -79,107 +79,12 @@ const mousePosition = { x: 0, y: 0 };
 
 
 let backgroundPageConnection = null;
-let pollIntervalId = null;
-
-// Post a message to the background page, ignoring failures while the port is
-// briefly disconnected (connect() re-establishes it shortly)
-function postToBackground( message ) {
-
-	try {
-
-		backgroundPageConnection.postMessage( message );
-
-	} catch ( error ) {
-
-		// Port is disconnected
-
-	}
-
-}
-
-// Create a connection to the background page and initialize it. The connection
-// is re-established if the service worker is terminated - with polling off
-// there are no messages keeping it alive.
-function connect() {
-
-	backgroundPageConnection = chrome.runtime.connect( {
-		name: CONNECTION_NAME
-	} );
-
-	// Listen for messages from the background page
-	backgroundPageConnection.onMessage.addListener( function ( message ) {
-
-		if ( message.id === MESSAGE_ID ) {
-
-			handleThreeEvent( message );
-
-		}
-
-	} );
-
-	backgroundPageConnection.onDisconnect.addListener( () => {
-
-		stopPolling();
-
-		// Reconnect after a short delay, keeping the current state snapshot
-		setTimeout( () => {
-
-			try {
-
-				connect();
-
-			} catch ( error ) {
-
-				// Extension was disabled or updated - give up
-				stopPolling();
-
-			}
-
-		}, 1000 );
-
-	} );
-
-	// Initialize the connection with the inspected tab ID
-	backgroundPageConnection.postMessage( {
-		name: MESSAGE_INIT,
-		tabId: chrome.devtools.inspectedWindow.tabId
-	} );
-
-	// The background syncs the page with the persisted monitoring state in
-	// response to the init message. When enabled the bridge responds with a
-	// full state refresh.
-	if ( monitoringEnabled ) startPolling();
-
-}
-
-function startPolling() {
-
-	if ( pollIntervalId !== null ) return;
-
-	pollIntervalId = setInterval( () => {
-
-		postToBackground( {
-			name: MESSAGE_REQUEST_STATE,
-			tabId: chrome.devtools.inspectedWindow.tabId
-		} );
-
-	}, STATE_POLLING_INTERVAL );
-
-}
-
-function stopPolling() {
-
-	if ( pollIntervalId === null ) return;
-
-	clearInterval( pollIntervalId );
-	pollIntervalId = null;
-
-}
+let intervalId = null;
 
 // Function to scroll to canvas element
 function scrollToCanvas( rendererUuid ) {
 
-	postToBackground( {
+	backgroundPageConnection.postMessage( {
 		name: MESSAGE_SCROLL_TO_CANVAS,
 		uuid: rendererUuid,
 		tabId: chrome.devtools.inspectedWindow.tabId
@@ -190,9 +95,7 @@ function scrollToCanvas( rendererUuid ) {
 // Function to request object details from the bridge
 function requestObjectDetails( uuid ) {
 
-	if ( ! monitoringEnabled ) return;
-
-	postToBackground( {
+	backgroundPageConnection.postMessage( {
 		name: MESSAGE_REQUEST_OBJECT_DETAILS,
 		uuid: uuid,
 		tabId: chrome.devtools.inspectedWindow.tabId
@@ -203,9 +106,7 @@ function requestObjectDetails( uuid ) {
 // Function to highlight object in 3D scene
 function requestObjectHighlight( uuid ) {
 
-	if ( ! monitoringEnabled ) return;
-
-	postToBackground( {
+	backgroundPageConnection.postMessage( {
 		name: MESSAGE_HIGHLIGHT_OBJECT,
 		uuid: uuid,
 		tabId: chrome.devtools.inspectedWindow.tabId
@@ -216,10 +117,7 @@ function requestObjectHighlight( uuid ) {
 // Function to remove highlight from 3D scene
 function requestObjectUnhighlight() {
 
-	// No highlight can be active while off - the bridge clears it on disable
-	if ( ! monitoringEnabled ) return;
-
-	postToBackground( {
+	backgroundPageConnection.postMessage( {
 		name: MESSAGE_UNHIGHLIGHT_OBJECT,
 		tabId: chrome.devtools.inspectedWindow.tabId
 	} );
@@ -411,7 +309,6 @@ function handleThreeEvent( message ) {
 			break;
 
 		case EVENT_OBJECT_DETAILS:
-			if ( ! monitoringEnabled ) break;
 			state.selectedObject = message.detail;
 			showFloatingDetails( message.detail );
 			break;
@@ -428,9 +325,6 @@ function handleThreeEvent( message ) {
 			break;
 
 		case EVENT_COMMITTED:
-			// While off there is no polling to repopulate the snapshot, so
-			// don't let unrelated iframe navigations wipe it
-			if ( ! monitoringEnabled && message.frameId !== 0 ) break;
 			clearState();
 			updateRenderers();
 			updateSceneTree();
@@ -683,51 +577,19 @@ function renderObject( obj, container, level = 0, parentInvisible = false ) {
 
 }
 
-// Toggle monitoring on/off. Off makes the extension inert: no polling and no
-// hover messages, so the inspected page does no devtools work. The background
-// reacts to the storage change and syncs the badge, menu and page bridges.
-function setMonitoring( enabled ) {
-
-	chrome.storage.local.set( { [ STORAGE_KEY_MONITORING ]: enabled } );
-
-	applyMonitoring( enabled );
-
-}
-
-// Apply the monitoring state locally
-function applyMonitoring( enabled ) {
-
-	monitoringEnabled = enabled;
-
-	if ( enabled ) {
-
-		// The bridge sends a fresh state on re-enable; just resume polling
-		startPolling();
-
-	} else {
-
-		stopPolling();
-
-		if ( floatingPanel ) {
-
-			floatingPanel.classList.remove( 'visible' );
-
-		}
-
-	}
-
-	updateMonitoringUI();
-
-}
-
-// Apply monitoring changes made elsewhere (toolbar icon context menu)
+// Reflect the monitoring state in the panel. Pausing itself is enforced by the
+// background/bridge (which discard state requests while off); here we only
+// update the toggle button and dim the panel. Fires for changes from the
+// panel's own button and from the toolbar context menu alike.
 chrome.storage.onChanged.addListener( ( changes, area ) => {
 
 	if ( area !== 'local' || ! ( STORAGE_KEY_MONITORING in changes ) ) return;
 
-	const enabled = changes[ STORAGE_KEY_MONITORING ].newValue === true;
+	monitoringEnabled = changes[ STORAGE_KEY_MONITORING ].newValue === true;
 
-	if ( enabled !== monitoringEnabled ) applyMonitoring( enabled );
+	updateMonitoringUI();
+
+	if ( ! monitoringEnabled && floatingPanel ) floatingPanel.classList.remove( 'visible' );
 
 } );
 
@@ -768,7 +630,7 @@ function initUI() {
 	monitoringToggleButton.className = 'monitoring-toggle';
 	monitoringToggleButton.addEventListener( 'click', () => {
 
-		setMonitoring( ! monitoringEnabled );
+		chrome.storage.local.set( { [ STORAGE_KEY_MONITORING ]: ! monitoringEnabled } );
 
 	} );
 
@@ -938,22 +800,57 @@ document.addEventListener( 'mouseover', ( event ) => {
 
 } );
 
-// Clear state on top-level navigation. This also covers navigations whose
-// 'committed' message is lost while the service worker is restarting.
-chrome.devtools.network.onNavigated.addListener( () => {
-
-	clearState();
-	updateRenderers();
-	updateSceneTree();
-
-} );
-
 // Restore the persisted monitoring state, then build the UI and connect
 chrome.storage.local.get( { [ STORAGE_KEY_MONITORING ]: true } ).then( ( items ) => {
 
 	monitoringEnabled = items[ STORAGE_KEY_MONITORING ] === true;
 
 	initUI();
-	connect();
+
+	// Create a connection to the background page
+	backgroundPageConnection = chrome.runtime.connect( {
+		name: CONNECTION_NAME
+	} );
+
+	// Listen for messages from the background page
+	backgroundPageConnection.onMessage.addListener( function ( message ) {
+
+		if ( message.id === MESSAGE_ID ) {
+
+			handleThreeEvent( message );
+
+		}
+
+	} );
+
+	backgroundPageConnection.onDisconnect.addListener( () => {
+
+		clearInterval( intervalId );
+		clearState();
+
+	} );
+
+	// Initialize the connection with the inspected tab ID and request the
+	// initial state from the bridge script
+	backgroundPageConnection.postMessage( {
+		name: MESSAGE_INIT,
+		tabId: chrome.devtools.inspectedWindow.tabId
+	} );
+	backgroundPageConnection.postMessage( {
+		name: MESSAGE_REQUEST_STATE,
+		tabId: chrome.devtools.inspectedWindow.tabId
+	} );
+
+	// Poll for state continuously. While monitoring is paused the bridge
+	// discards these requests, so the page stays idle but the service worker
+	// and this port stay alive - no reconnect needed.
+	intervalId = setInterval( () => {
+
+		backgroundPageConnection.postMessage( {
+			name: MESSAGE_REQUEST_STATE,
+			tabId: chrome.devtools.inspectedWindow.tabId
+		} );
+
+	}, STATE_POLLING_INTERVAL );
 
 } );
