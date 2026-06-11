@@ -369,11 +369,11 @@ class SVGFNode extends TempNode {
 
 		this._cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
 
-		// keep the effect in sync with the dimensions of the beauty node
+		// keep the effect in sync with the dimensions of the beauty texture
 
-		const beautyRenderTarget = ( this.beautyNode.isRTTNode ) ? this.beautyNode.renderTarget : this.beautyNode.passNode.renderTarget;
-		const width = beautyRenderTarget.texture.width;
-		const height = beautyRenderTarget.texture.height;
+		const beautyTexture = this.beautyNode.value;
+		const width = beautyTexture.image.width;
+		const height = beautyTexture.image.height;
 
 		const needsRestart = this._historyRenderTarget.width !== width || this._historyRenderTarget.height !== height;
 
@@ -387,7 +387,7 @@ class SVGFNode extends TempNode {
 			// not fade in from black
 
 			renderer.initRenderTarget( this._historyRenderTarget );
-			renderer.copyTextureToTexture( beautyRenderTarget.texture, this._historyRenderTarget.texture );
+			renderer.copyTextureToTexture( beautyTexture, this._historyRenderTarget.texture );
 
 		}
 
@@ -669,4 +669,17 @@ export default SVGFNode;
  * @param {PerspectiveCamera} camera - The camera the scene is rendered with.
  * @returns {SVGFNode}
  */
-export const svgf = ( beautyNode, depthNode, normalNode, velocityNode, camera ) => new SVGFNode( convertToTexture( beautyNode ), depthNode, normalNode, velocityNode, camera );
+export const svgf = ( beautyNode, depthNode, normalNode, velocityNode, camera ) => {
+
+	// effects that render into an internal target expose it via getTextureNode(), which
+	// avoids re-rendering the input into an intermediate texture
+
+	if ( beautyNode.isTextureNode !== true && typeof beautyNode.getTextureNode === 'function' ) {
+
+		beautyNode = beautyNode.getTextureNode();
+
+	}
+
+	return new SVGFNode( convertToTexture( beautyNode ), depthNode, normalNode, velocityNode, camera );
+
+};
