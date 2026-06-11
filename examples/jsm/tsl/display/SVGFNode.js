@@ -531,7 +531,12 @@ class SVGFNode extends TempNode {
 				current.rgb.mulAssign( currentLuma.greaterThan( maxLuma ).select( maxLuma.div( currentLuma ), float( 1.0 ) ) );
 
 				const historyLuma = luminance( history.rgb );
-				const gradient = abs( blurredLuma.sub( historyLuma ) ).div( max( blurredLuma, historyLuma ).add( 0.01 ) );
+
+				// the luminance floor in the denominator keeps the relative gradient from amplifying
+				// sub-noise changes in dark regions, where it would otherwise keep rejecting history
+				// and let the raw noise blink through
+
+				const gradient = abs( blurredLuma.sub( historyLuma ) ).div( max( blurredLuma, historyLuma ).add( 0.25 ) );
 				const adaptiveAlpha = max( this.temporalAlpha, gradient.sub( 0.1 ).mul( this.antiGhosting ).clamp() );
 
 				const alpha = validHistory.select( adaptiveAlpha, float( 1.0 ) );
