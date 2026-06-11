@@ -50,6 +50,8 @@
 			import { blueNoise } from 'three/addons/tsl/math/BlueNoise.js';
 			import { World } from '@perplexdotgg/bounce';
 
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			const BALL_RADIUS = 0.4;
 			const FILL_RATIO = 0.4;
 			const PACKING = 0.6;
@@ -94,6 +96,7 @@
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 0.5;
 				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -141,8 +144,8 @@
 
 				// composite
 
-				const gi = svgfPass.rgb;
-				const ao = svgfPass.a;
+				const gi = svgfPass.rgb.toInspector( 'SSGI' );
+				const ao = svgfPass.a.toInspector( 'AO' );
 
 				const compositePass = vec4(
 					add( scenePassColor.rgb.mul( ao ), scenePassDiffuse.rgb.mul( gi ) ),
