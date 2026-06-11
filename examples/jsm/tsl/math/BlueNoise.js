@@ -1,5 +1,5 @@
 import { DataTexture, RedFormat, RGFormat, RGBAFormat, UnsignedByteType, RepeatWrapping, TempNode } from 'three/webgpu';
-import { texture, screenCoordinate, frameId, fract, float, vec2, vec4, mod } from 'three/tsl';
+import { texture, screenCoordinate, uniform, fract, float, vec2, vec4 } from 'three/tsl';
 
 /**
  * @module BlueNoise
@@ -399,22 +399,16 @@ class BlueNoiseNode extends TempNode {
 
 		const noise = texture( this._texture, screenCoordinate.div( this.size ) );
 
-		let value = ( this.channels === 1 ) ? noise.r : ( this.channels === 2 ) ? noise.rg : noise;
+		const value = ( this.channels === 1 ) ? noise.r : ( this.channels === 2 ) ? noise.rg : noise;
 
-		if ( this.animated === true ) {
+		const steps = ( this.channels === 1 ) ? float( R1[ 0 ] ) : ( this.channels === 2 ) ? vec2( ...R2 ) : vec4( ...R4 );
 
-			const steps = ( this.channels === 1 ) ? float( R1[ 0 ] ) : ( this.channels === 2 ) ? vec2( ...R2 ) : vec4( ...R4 );
+		// The frame index is bounded to keep the scroll term well within float precision.
+		// The wrap is just another quasirandom offset, so it is seamless under accumulation.
 
-			// The frame index is bounded to keep the scroll term well within float precision.
-			// The wrap is just another quasirandom offset, so it is seamless under accumulation.
+		const frame = uniform( 0, 'float' ).onRenderUpdate( ( nodeFrame ) => ( this.animated === true ) ? nodeFrame.frameId % 4096 : 0 );
 
-			const frame = float( mod( frameId, 4096 ) );
-
-			value = fract( value.add( frame.mul( steps ) ) );
-
-		}
-
-		return value;
+		return fract( value.add( frame.mul( steps ) ) );
 
 	}
 
