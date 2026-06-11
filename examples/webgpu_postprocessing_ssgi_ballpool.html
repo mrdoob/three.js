@@ -45,6 +45,7 @@
 			import * as THREE from 'three/webgpu';
 			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec4, packNormalToRGB, unpackRGBToNormal, sample } from 'three/tsl';
 			import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
+			import { svgf } from 'three/addons/tsl/display/SVGFNode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { blueNoise } from 'three/addons/tsl/math/BlueNoise.js';
 			import { World } from '@perplexdotgg/bounce';
@@ -134,10 +135,14 @@
 				giPass.stepCount.value = 8;
 				giPass.noiseNode = blueNoise( 2 );
 
+				// svgf denoise
+
+				const svgfPass = svgf( giPass, scenePassDepth, sceneNormal, scenePassVelocity, camera );
+
 				// composite
 
-				const gi = giPass.rgb;
-				const ao = giPass.a;
+				const gi = svgfPass.rgb;
+				const ao = svgfPass.a;
 
 				const compositePass = vec4(
 					add( scenePassColor.rgb.mul( ao ), scenePassDiffuse.rgb.mul( gi ) ),
