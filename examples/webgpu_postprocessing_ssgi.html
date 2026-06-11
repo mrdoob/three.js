@@ -242,13 +242,16 @@
 				gui.add( giPass.giIntensity, 'value', 0, 100 ).name( 'GI intensity' );
 				gui.add( giPass.useLinearThickness, 'value' ).name( 'use linear thickness' );
 				gui.add( giPass.useScreenSpaceSampling, 'value' ).name( 'screen-space sampling' );
-				gui.add( giPass, 'useTemporalFiltering' ).name( 'temporal filtering' ).onChange( updatePostprocessing );
-				gui.add( params, 'blueNoise' ).name( 'blue noise' ).onChange( ( value ) => {
+				gui.add( giPass, 'useTemporalFiltering' ).name( 'temporal filtering' ).onChange( updateNoise );
+				gui.add( params, 'blueNoise' ).name( 'blue noise' ).onChange( updateNoise );
 
-					giPass.noiseNode = ( value === true ) ? noiseNode : null;
+				function updateNoise() {
+
+					noiseNode.animated = giPass.useTemporalFiltering;
+					giPass.noiseNode = ( params.blueNoise === true ) ? noiseNode : null;
 					updatePostprocessing( params.output );
 
-				} );
+				}
 
 				function updatePostprocessing( value ) {
 

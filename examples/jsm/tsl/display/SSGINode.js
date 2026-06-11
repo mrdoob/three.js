@@ -88,6 +88,8 @@ class SSGINode extends TempNode {
 		 * drives the slice rotation and `y` the initial ray step, both in `[0, 1)`. The
 		 * node is expected to vary over time when temporal filtering is used — an animated
 		 * blue-noise node converges faster and with less visible noise than the default.
+		 * Keep the source static when `useTemporalFiltering` is disabled (e.g. via
+		 * `BlueNoiseNode.animated = false`).
 		 * When `null`, interleaved gradient noise with the GTAO spatial/temporal offset
 		 * tables is used instead.
 		 *
