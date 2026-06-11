@@ -286,6 +286,7 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ] ) => {
 		if ( influences ) {
 
 			influences.array = object.morphTargetInfluences;
+			influences.update();
 
 		}
 
