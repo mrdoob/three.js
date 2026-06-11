@@ -256,7 +256,10 @@ class SVGFNode extends TempNode {
 		this._geometryRenderTarget = new RenderTarget( 1, 1, rtOptions );
 		this._geometryRenderTarget.texture.name = 'SVGF.geometry';
 
-		for ( const rt of [ this._historyRenderTarget, this._temporalRenderTarget, this._resolveRenderTarget, this._geometryRenderTarget, ...this._atrousRenderTargets ] ) {
+		// the resolve target keeps linear filtering so the result upsamples smoothly when the
+		// effect runs at a lower resolution than the output
+
+		for ( const rt of [ this._historyRenderTarget, this._temporalRenderTarget, this._geometryRenderTarget, ...this._atrousRenderTargets ] ) {
 
 			rt.texture.minFilter = NearestFilter;
 			rt.texture.magFilter = NearestFilter;
