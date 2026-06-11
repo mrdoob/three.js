@@ -1213,8 +1213,7 @@ class NodeMaterial extends Material {
 
 		for ( const key in descriptors ) {
 
-			if ( Object.getOwnPropertyDescriptor( this.constructor.prototype, key ) === undefined &&
-			     descriptors[ key ].get !== undefined ) {
+			if ( Object.getOwnPropertyDescriptor( this.constructor.prototype, key ) === undefined && descriptors[ key ].get !== undefined ) {
 
 				Object.defineProperty( this.constructor.prototype, key, descriptors[ key ] );
 
@@ -1295,37 +1294,58 @@ class NodeMaterial extends Material {
 	 */
 	copy( source ) {
 
-		this.lightsNode = source.lightsNode;
-		this.envNode = source.envNode;
-		this.aoNode = source.aoNode;
+		const descriptors = Object.getOwnPropertyDescriptors( this.constructor.prototype );
 
-		this.colorNode = source.colorNode;
-		this.normalNode = source.normalNode;
-		this.opacityNode = source.opacityNode;
-		this.backdropNode = source.backdropNode;
-		this.backdropAlphaNode = source.backdropAlphaNode;
-		this.alphaTestNode = source.alphaTestNode;
-		this.maskNode = source.maskNode;
-		this.maskShadowNode = source.maskShadowNode;
+		for ( const property in descriptors ) {
 
-		this.positionNode = source.positionNode;
-		this.geometryNode = source.geometryNode;
+			if ( descriptors[ property ].set !== undefined && source[ property ] !== undefined ) {
 
-		this.depthNode = source.depthNode;
-		this.receivedShadowPositionNode = source.receivedShadowPositionNode;
-		this.castShadowPositionNode = source.castShadowPositionNode;
-		this.receivedShadowNode = source.receivedShadowNode;
-		this.castShadowNode = source.castShadowNode;
+				const value = source[ property ];
 
-		this.outputNode = source.outputNode;
-		this.mrtNode = source.mrtNode;
+				if ( this[ property ] && this[ property ].copy !== undefined ) {
 
-		this.fragmentNode = source.fragmentNode;
-		this.vertexNode = source.vertexNode;
+					this[ property ].copy( value );
 
-		this.contextNode = source.contextNode;
+				} else {
 
-		return super.copy( source );
+					this[ property ] = value;
+
+				}
+
+			}
+
+		}
+
+		for ( const property in this ) {
+
+			// Skip internal/private properties (starting with '_'), flags (starting with 'is' + uppercase),
+			// and properties that are handled separately or should not be copied (id, uuid, version, type, userData, clippingPlanes).
+
+			if ( /^(?:is[A-Z]|_)|^(?:id|uuid|version|type|userData|clippingPlanes)$/.test( property ) ) continue;
+
+			if ( this[ property ] !== undefined && source[ property ] !== undefined ) {
+
+				const value = source[ property ];
+
+				if ( this[ property ] && this[ property ].copy !== undefined ) {
+
+					this[ property ].copy( value );
+
+				} else {
+
+					this[ property ] = value;
+
+				}
+
+			}
+
+		}
+
+		this.clippingPlanes = source.clippingPlanes ? source.clippingPlanes.map( ( plane ) => plane.clone() ) : null;
+
+		this.userData = JSON.parse( JSON.stringify( source.userData ) );
+
+		return this;
 
 	}
 
