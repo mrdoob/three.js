@@ -1287,9 +1287,9 @@ class NodeMaterial extends Material {
 	}
 
 	/**
-	 * Copies the properties of the given node material to this instance.
+	 * Copies the common properties of the given material to this instance.
 	 *
-	 * @param {NodeMaterial} source - The material to copy.
+	 * @param {Material} source - The material to copy.
 	 * @return {NodeMaterial} A reference to this node material.
 	 */
 	copy( source ) {
