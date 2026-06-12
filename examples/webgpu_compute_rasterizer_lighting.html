@@ -36,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Fn, If, Loop, vec2, vec3, vec4, uvec4, mat4, uint, float, int, min, max, mix, clamp, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, uv, instanceIndex, vertexIndex, distance, screenSize, screenCoordinate, time, texture, varyingProperty, sqrt, normalize, cross, sign, positionGeometry, cameraViewMatrix, Discard } from 'three/tsl';
+			import { Fn, If, Loop, vec2, vec3, vec4, uvec2, uvec4, mat4, uint, float, int, min, max, mix, clamp, ceil, log2, length, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, uv, instanceIndex, vertexIndex, distance, screenSize, screenCoordinate, time, texture, varyingProperty, sqrt, normalize, cross, sign, positionGeometry, cameraViewMatrix, Discard } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -70,18 +70,26 @@
 			let jitterIndex = 0;
 			let historyReset = true;
 
+			// Hierarchical Z pyramid (max depth per tile) for occlusion culling
+			let depthSourceTexNode;
+			let hzbBuffer, hzbRead, hzbLevelTable, hzbLevelCountUniform, hzbLevelCount = 0;
+			let occlusionUniform, prevCameraPosUniform;
+			const hzbKernels = [];
+			const MAX_HZB_LEVELS = 16;
+
 			// Halton (2, 3) sub-pixel jitter sequence
 			const jitterOffsets = [
 				[ 0.5, 0.333333 ], [ 0.25, 0.666667 ], [ 0.75, 0.111111 ], [ 0.125, 0.444444 ],
 				[ 0.625, 0.777778 ], [ 0.375, 0.222222 ], [ 0.875, 0.555556 ], [ 0.0625, 0.888889 ]
 			];
 
-			const rows = 360;
-			const cols = 360;
-			const instanceCount = rows * cols;
+			const gridX = 60;
+			const gridY = 36;
+			const gridZ = 60;
+			const instanceCount = gridX * gridY * gridZ;
 
 			const MAX_RASTER_SIZE = 16;
-			const options = { Mode: 'Shaded', Rasterizer: 'Both', TAA: true };
+			const options = { Mode: 'Shaded', Rasterizer: 'Both', TAA: true, Occlusion: true };
 
 			// Buffer visibility packaging configuration — depth occupies the bits above each payload
 			const TRIANGLE_INDEX_BITS = 15; 			// 2^15 = 32768 max triangles in the LOD mega buffer
@@ -106,14 +114,12 @@
 				await renderer.init();
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, .25, 1000000 );
-				camera.position.set( 0, 8, 30 );
+				camera.position.set( 2, 2, 40 );
 
 				controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.y = - 1;
 				controls.enableDamping = true;
 				controls.zoomSpeed = .5;
 				controls.maxDistance = 1000;
-				controls.maxPolarAngle = Math.PI / 2;
 
 				// Load assets
 				const [ gltf, envTexture ] = await Promise.all( [
@@ -180,7 +186,7 @@
 				if ( instanceCount > INSTANCE_INDEX_MASK + 1 ) throw new Error( 'Instance count exceeds payload bit budget' );
 
 				const maxTrianglesPerInstance = lods[ 0 ].numTriangles;
-				const totalTriangles = rows * cols * maxTrianglesPerInstance;
+				const totalTriangles = instanceCount * maxTrianglesPerInstance;
 				document.getElementById( 'triangleCount' ).innerText = new Intl.NumberFormat().format( totalTriangles );
 
 				const vertexArray = new Float32Array( totalVertices * 4 ); // vec4 padded
@@ -306,17 +312,8 @@
 
 				}
 
-				// Upload LOD offsets to GPU (uvec4: triangleStart, numTriangles, chunkStart, 0)
-				const lodOffsetsData = new Uint32Array( lods.length * 4 );
-				for ( let i = 0; i < lods.length; i ++ ) {
-
-					lodOffsetsData[ i * 4 + 0 ] = lods[ i ].indexOffset / 3;
-					lodOffsetsData[ i * 4 + 1 ] = lods[ i ].numTriangles;
-					lodOffsetsData[ i * 4 + 2 ] = lods[ i ].chunkStart;
-
-				}
-
-				const lodOffsetsBuffer = storage( new THREE.StorageBufferAttribute( lodOffsetsData, 4 ), 'uvec4', lods.length ).toReadOnly();
+				// Upload LOD offsets to GPU (vec4: triangleStart, numTriangles, chunkStart, 0)
+				const lodOffsetsUniform = uniformArray( lods.map( ( lod ) => new THREE.Vector4( lod.indexOffset / 3, lod.numTriangles, lod.chunkStart, 0 ) ), 'vec4' );
 				const chunkBoundsBuffer = storage( new THREE.StorageBufferAttribute( chunkBoundsData, 4 ), 'vec4', totalChunks ).toReadOnly();
 
 				// Storage Buffers
@@ -335,6 +332,8 @@
 
 				parameterGroup.add( options, 'TAA' );
 
+				parameterGroup.add( options, 'Occlusion' );
+
 				parameterGroup.add( timeScale, 'value', 0.0, 1.0 ).name( 'Animation Speed' );
 
 				// Packed visibility buffers — depth in the high bits, payload in the low bits,
@@ -347,14 +346,18 @@
 				const staticInstanceData = new Float32Array( instanceCount * 4 );
 				let dataIndex = 0;
 
-				for ( let i = 0; i < rows; i ++ ) {
+				for ( let x = 0; x < gridX; x ++ ) {
 
-					for ( let j = 0; j < cols; j ++ ) {
+					for ( let y = 0; y < gridY; y ++ ) {
 
-						staticInstanceData[ dataIndex ++ ] = ( i - rows / 2 ) * 4.0;
-						staticInstanceData[ dataIndex ++ ] = - 1;
-						staticInstanceData[ dataIndex ++ ] = ( j - cols / 2 ) * 4.0;
-						staticInstanceData[ dataIndex ++ ] = 1.0; // scale
+						for ( let z = 0; z < gridZ; z ++ ) {
+
+							staticInstanceData[ dataIndex ++ ] = ( x - gridX / 2 ) * 4.0;
+							staticInstanceData[ dataIndex ++ ] = ( y - gridY / 2 ) * 4.0;
+							staticInstanceData[ dataIndex ++ ] = ( z - gridZ / 2 ) * 4.0;
+							staticInstanceData[ dataIndex ++ ] = 1.0; // scale
+
+						}
 
 					}
 
@@ -418,6 +421,129 @@
 				const pixelErrorThresholdUniform = uniform( 1.0 );
 				const maxRasterSizeUniform = uniform( MAX_RASTER_SIZE, 'int' ); // Max bounding box size in pixels for SW rasterizer
 
+				occlusionUniform = uniform( 1, 'uint' );
+				prevCameraPosUniform = uniform( new THREE.Vector3() );
+
+				depthSourceTexNode = texture( sceneRT.depthTexture );
+
+				// One kernel per pyramid level — each texel keeps the max (farthest)
+				// depth of the 2x2 it covers, so a sphere is occluded when its nearest
+				// depth is farther than the stored value
+				for ( let k = 0; k < MAX_HZB_LEVELS; k ++ ) {
+
+					const initialInfo = hzbLevelTable.array[ Math.min( k, hzbLevelCount - 1 ) ];
+
+					hzbKernels.push( Fn( () => {
+
+						const info = hzbLevelTable.element( k );
+						const levelWidth = uint( info.y );
+						const levelHeight = uint( info.z );
+						const levelOffset = uint( info.x );
+
+						If( instanceIndex.lessThan( levelWidth.mul( levelHeight ) ), () => {
+
+							const x = instanceIndex.mod( levelWidth );
+							const y = instanceIndex.div( levelWidth );
+
+							const sx = x.mul( 2 );
+							const sy = y.mul( 2 );
+
+							const depthMax = float( 0.0 ).toVar();
+
+							if ( k === 0 ) {
+
+								// Source: the full resolution scene depth
+								const sw = uint( screenSize.x ).sub( 1 );
+								const sh = uint( screenSize.y ).sub( 1 );
+
+								for ( let dy = 0; dy < 2; dy ++ ) {
+
+									for ( let dx = 0; dx < 2; dx ++ ) {
+
+										depthMax.assign( max( depthMax, depthSourceTexNode.load( uvec2( min( sx.add( dx ), sw ), min( sy.add( dy ), sh ) ) ).r ) );
+
+									}
+
+								}
+
+							} else {
+
+								// Source: the previous pyramid level
+								const src = hzbLevelTable.element( k - 1 );
+								const srcWidth = uint( src.y );
+								const srcOffset = uint( src.x );
+								const swMax = srcWidth.sub( 1 );
+								const shMax = uint( src.z ).sub( 1 );
+
+								for ( let dy = 0; dy < 2; dy ++ ) {
+
+									for ( let dx = 0; dx < 2; dx ++ ) {
+
+										const tx = min( sx.add( dx ), swMax );
+										const ty = min( sy.add( dy ), shMax );
+										depthMax.assign( max( depthMax, hzbBuffer.element( srcOffset.add( ty.mul( srcWidth ) ).add( tx ) ) ) );
+
+									}
+
+								}
+
+							}
+
+							hzbBuffer.element( levelOffset.add( y.mul( levelWidth ) ).add( x ) ).assign( depthMax );
+
+						} );
+
+					} )().compute( initialInfo.y * initialInfo.z, [ 64 ] ).setName( `HZB Level ${ k }` ) );
+
+				}
+
+				// Conservative sphere vs pyramid test, using the previous frame's
+				// depth and matrices (the helmets only rotate in place, so their
+				// bounding spheres are identical between frames)
+				const sphereOccluded = ( center, radius ) => {
+
+					const toCamera = prevCameraPosUniform.sub( center );
+					const dist = length( toCamera );
+
+					// Closest point on the sphere toward the camera
+					const nearPoint = center.add( toCamera.div( dist ).mul( radius ) );
+					const nearClip = prevProjScreenUniform.mul( vec4( nearPoint, 1.0 ) );
+					const centerClip = prevProjScreenUniform.mul( vec4( center, 1.0 ) );
+
+					const nearestZ = nearClip.z.div( nearClip.w );
+					const ndc = centerClip.xy.div( centerClip.w );
+
+					// Footprint in half resolution pyramid texels picks the level where
+					// the sphere's diameter fits one texel, so the 2x2 window always covers it.
+					// The 4 combines the NDC half-screen factor with the half resolution pyramid.
+					const radiusTexels = radius.mul( cotHalfFovUniform ).mul( float( screenSize.y ) ).div( 4.0 ).div( dist );
+					const level = int( clamp( ceil( log2( max( radiusTexels.mul( 2.0 ), 1.0 ) ) ), 0.0, hzbLevelCountUniform.sub( 1.0 ) ) );
+
+					const info = hzbLevelTable.element( level );
+					const levelWidth = uint( info.y );
+					const levelHeight = uint( info.z );
+					const levelOffset = uint( info.x );
+
+					const px = ndc.x.mul( 0.5 ).add( 0.5 ).mul( float( levelWidth ) );
+					const py = float( 0.5 ).sub( ndc.y.mul( 0.5 ) ).mul( float( levelHeight ) );
+
+					const x0 = uint( clamp( px.sub( 0.5 ), 0.0, float( levelWidth.sub( 1 ) ) ) );
+					const y0 = uint( clamp( py.sub( 0.5 ), 0.0, float( levelHeight.sub( 1 ) ) ) );
+					const x1 = min( x0.add( 1 ), levelWidth.sub( 1 ) );
+					const y1 = min( y0.add( 1 ), levelHeight.sub( 1 ) );
+
+					const maxZ = max(
+						max( hzbRead.element( levelOffset.add( y0.mul( levelWidth ) ).add( x0 ) ), hzbRead.element( levelOffset.add( y0.mul( levelWidth ) ).add( x1 ) ) ),
+						max( hzbRead.element( levelOffset.add( y1.mul( levelWidth ) ).add( x0 ) ), hzbRead.element( levelOffset.add( y1.mul( levelWidth ) ).add( x1 ) ) )
+					);
+
+					return dist.greaterThan( radius.mul( 2.0 ) ) // skip spheres close to the camera
+						.and( nearClip.w.greaterThan( 0.0 ) )
+						.and( centerClip.w.greaterThan( 0.0 ) )
+						.and( nearestZ.greaterThan( maxZ ) );
+
+				};
+
 				// Compute Clear
 				computeClear = Fn( () => {
 
@@ -474,6 +600,13 @@
 
 					} );
 
+					// Occlusion cull the whole instance against the depth pyramid
+					If( visible.and( occlusionUniform.equal( uint( 1 ) ) ), () => {
+
+						visible.assign( sphereOccluded( pos, radius ).not() );
+
+					} );
+
 					If( visible, () => {
 
 						const distToCamera = distance( cameraPos, pos );
@@ -509,10 +642,10 @@
 
 						}
 
-						const lodData = lodOffsetsBuffer.element( lodLevel );
-						const lodTriStart = lodData.x;
-						const lodNumTriangles = lodData.y;
-						const lodChunkStart = lodData.z;
+						const lodData = lodOffsetsUniform.element( lodLevel );
+						const lodTriStart = uint( lodData.x );
+						const lodNumTriangles = uint( lodData.y );
+						const lodChunkStart = uint( lodData.z );
 
 						// Calculate Work Items (64 triangles per item)
 						const workItems = lodNumTriangles.add( 63 ).div( 64 );
@@ -542,6 +675,15 @@
 									chunkVisible.assign( false );
 
 								} );
+
+							} );
+
+							// Occlusion cull the chunk, using its previous frame position
+							// to stay consistent with the previous frame depth pyramid
+							If( chunkVisible.and( occlusionUniform.equal( uint( 1 ) ) ), () => {
+
+								const chunkCenterPrev = instancePrevWorldBuffer.element( instanceIndex ).mul( vec4( chunkCenterLocal, 1.0 ) ).xyz.toVar();
+								chunkVisible.assign( sphereOccluded( chunkCenterPrev, chunkRadiusWorld ).not() );
 
 							} );
 
@@ -857,6 +999,7 @@
 				// by the same environment through the standard material pipeline
 				scene = new THREE.Scene();
 				scene.background = envTexture;
+				scene.backgroundBlurriness = 0.5;
 				scene.environment = envTexture;
 
 				// HW Rasterizer Mesh (renders big triangles via the GPU hardware pipeline)
@@ -1242,6 +1385,7 @@
 
 				updateMode();
 
+
 				window.addEventListener( 'resize', onWindowResize );
 
 			}
@@ -1267,6 +1411,13 @@
 
 				if ( screenTriAttr ) screenTriAttr.dispose();
 				if ( screenInstAttr ) screenInstAttr.dispose();
+
+				if ( hzbLevelTable === undefined ) {
+
+					hzbLevelTable = uniformArray( Array.from( { length: MAX_HZB_LEVELS }, () => new THREE.Vector4() ), 'vec4' );
+					hzbLevelCountUniform = uniform( 0.0 );
+
+				}
 
 				const screenTriData = new Uint32Array( maxPixels );
 				screenTriAttr = new THREE.StorageBufferAttribute( screenTriData, 1 );
@@ -1323,6 +1474,9 @@
 				}
 
 				sceneRT = new THREE.RenderTarget( size.x, size.y, { type: THREE.HalfFloatType } );
+				sceneRT.depthTexture = new THREE.DepthTexture( size.x, size.y );
+				sceneRT.depthTexture.type = THREE.FloatType;
+
 				historyReadRT = new THREE.RenderTarget( size.x, size.y, { type: THREE.HalfFloatType, depthBuffer: false } );
 				historyWriteRT = new THREE.RenderTarget( size.x, size.y, { type: THREE.HalfFloatType, depthBuffer: false } );
 
@@ -1331,10 +1485,60 @@
 					sceneTexNode.value = sceneRT.texture;
 					historyTexNode.value = historyReadRT.texture;
 					blitTexNode.value = historyWriteRT.texture;
+					depthSourceTexNode.value = sceneRT.depthTexture;
 
 				}
 
 				historyReset = true;
+
+				// HZB pyramid — all mip levels packed into one storage buffer,
+				// level 0 at half resolution, each level the max (farthest) of 2x2 below
+				let levelWidth = Math.ceil( size.x / 2 );
+				let levelHeight = Math.ceil( size.y / 2 );
+				let totalTexels = 0;
+
+				hzbLevelCount = 0;
+
+				while ( hzbLevelCount < MAX_HZB_LEVELS ) {
+
+					hzbLevelTable.array[ hzbLevelCount ].set( totalTexels, levelWidth, levelHeight, 0 );
+					totalTexels += levelWidth * levelHeight;
+					hzbLevelCount ++;
+
+					if ( levelWidth === 1 && levelHeight === 1 ) break;
+
+					levelWidth = Math.max( 1, Math.ceil( levelWidth / 2 ) );
+					levelHeight = Math.max( 1, Math.ceil( levelHeight / 2 ) );
+
+				}
+
+				hzbLevelCountUniform.value = hzbLevelCount;
+
+				const hzbData = new Float32Array( totalTexels ).fill( 1 ); // far plane — occludes nothing
+				const hzbAttr = new THREE.StorageBufferAttribute( hzbData, 1 );
+
+				if ( hzbBuffer === undefined ) {
+
+					hzbBuffer = storage( hzbAttr, 'float', totalTexels );
+					hzbRead = storage( hzbAttr, 'float', totalTexels ).toReadOnly();
+
+				} else {
+
+					hzbBuffer.value = hzbAttr;
+					hzbBuffer.bufferCount = totalTexels;
+
+					hzbRead.value = hzbAttr;
+					hzbRead.bufferCount = totalTexels;
+
+				}
+
+				for ( let k = 0; k < hzbKernels.length; k ++ ) {
+
+					const info = hzbLevelTable.array[ Math.min( k, hzbLevelCount - 1 ) ];
+					hzbKernels[ k ].count = info.y * info.z;
+					hzbKernels[ k ].dispose();
+
+				}
 
 			}
 
@@ -1354,6 +1558,8 @@
 			const projScreenUnjittered = new THREE.Matrix4();
 			const cameraInverse = new THREE.Matrix4();
 			const drawingSize = new THREE.Vector2();
+			const prevCameraPos = new THREE.Vector3();
+			let prevValid = false;
 
 			function animate() {
 
@@ -1363,12 +1569,27 @@
 
 				camera.updateMatrixWorld();
 
+				// Seed the previous frame state on the first frame
+				if ( prevValid === false ) {
+
+					camera.clearViewOffset();
+					cameraInverse.copy( camera.matrixWorld ).invert();
+					projScreenUnjittered.multiplyMatrices( camera.projectionMatrix, cameraInverse );
+					prevCameraPos.copy( camera.position );
+					prevValid = true;
+
+				}
+
 				// Last frame's unjittered matrix becomes the reprojection source
 				prevProjScreenUniform.value.copy( projScreenUnjittered );
+				prevCameraPosUniform.value.copy( prevCameraPos );
+
+				occlusionUniform.value = options.Occlusion ? 1 : 0;
 
 				camera.clearViewOffset();
 				cameraInverse.copy( camera.matrixWorld ).invert();
 				projScreenUnjittered.multiplyMatrices( camera.projectionMatrix, cameraInverse );
+				prevCameraPos.copy( camera.position );
 
 				invProjScreenUniform.value.copy( projScreenUnjittered ).invert();
 
@@ -1416,14 +1637,21 @@
 				resolveMesh.visible = ( rasterMode === 'SW Only' || rasterMode === 'Both' );
 				hwMesh.visible = ( rasterMode === 'HW Only' || rasterMode === 'Both' );
 
+				// Current frame in linear HDR
+				renderer.setRenderTarget( sceneRT );
+				renderer.render( scene, camera );
+
+				// Build the depth pyramid for next frame's occlusion culling
+				for ( let k = 0; k < hzbLevelCount; k ++ ) {
+
+					renderer.compute( hzbKernels[ k ] );
+
+				}
+
 				if ( options.TAA ) {
 
 					blendUniform.value = historyReset ? 1.0 : 0.1;
 					historyReset = false;
-
-					// Current frame in linear HDR
-					renderer.setRenderTarget( sceneRT );
-					renderer.render( scene, camera );
 
 					// Accumulate into history
 					historyTexNode.value = historyReadRT.texture;
@@ -1444,8 +1672,11 @@
 
 					historyReset = true;
 
+					// Present (tone mapping + output color space apply on the canvas)
+					blitTexNode.value = sceneRT.texture;
+
 					renderer.setRenderTarget( null );
-					renderer.render( scene, camera );
+					blitQuad.render( renderer );
 
 				}
 
