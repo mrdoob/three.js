@@ -31,9 +31,6 @@ const exceptionList = [
 	'webgpu_tsl_vfx_linkedparticles',
 	'webgpu_volume_lighting_traa',
 
-	// Temporal accumulation diverges across GPUs
-	'webgpu_compute_rasterizer_lighting',
-
 	// Timming issues?
 	'physics_rapier_instancing',
 	'webgl_shadowmap',

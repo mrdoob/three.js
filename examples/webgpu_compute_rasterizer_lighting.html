@@ -36,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Fn, If, Loop, vec2, vec3, vec4, uvec2, uvec4, mat4, uint, float, int, min, max, mix, clamp, ceil, log2, length, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, uv, instanceIndex, vertexIndex, distance, screenSize, screenCoordinate, time, texture, varyingProperty, sqrt, normalize, cross, sign, positionGeometry, cameraViewMatrix, Discard } from 'three/tsl';
+			import { Fn, If, Loop, vec2, vec4, uvec2, uvec4, mat4, uint, float, int, min, max, clamp, ceil, log2, length, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, instanceIndex, vertexIndex, distance, screenSize, screenCoordinate, time, texture, varyingProperty, sqrt, normalize, cross, sign, positionGeometry, cameraViewMatrix, Discard } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -59,16 +59,13 @@
 			let computeRasterize, computeClear, computeFrustum, computeDispatch, computeHWArgs;
 			let resolveMesh, hwMesh;
 			let cameraPos, projScreenMatrixUniform, frustumPlanesUniform, cotHalfFovUniform;
-			let prevProjScreenUniform, invProjScreenUniform, blendUniform;
+			let prevProjScreenUniform;
 
 			let screenTriAttr, screenTriAtomic, screenTriRead;
 			let screenInstAttr, screenInstAtomic, screenInstRead;
 			let maxPixels;
 
-			let sceneRT, historyReadRT, historyWriteRT;
-			let taaQuad, blitQuad, sceneTexNode, historyTexNode, blitTexNode;
-			let jitterIndex = 0;
-			let historyReset = true;
+			let sceneRT, blitQuad, blitTexNode;
 
 			// Hierarchical Z pyramid (max depth per tile) for occlusion culling
 			let depthSourceTexNode;
@@ -77,19 +74,13 @@
 			const hzbKernels = [];
 			const MAX_HZB_LEVELS = 16;
 
-			// Halton (2, 3) sub-pixel jitter sequence
-			const jitterOffsets = [
-				[ 0.5, 0.333333 ], [ 0.25, 0.666667 ], [ 0.75, 0.111111 ], [ 0.125, 0.444444 ],
-				[ 0.625, 0.777778 ], [ 0.375, 0.222222 ], [ 0.875, 0.555556 ], [ 0.0625, 0.888889 ]
-			];
-
 			const gridX = 60;
 			const gridY = 36;
 			const gridZ = 60;
 			const instanceCount = gridX * gridY * gridZ;
 
 			const MAX_RASTER_SIZE = 16;
-			const options = { Mode: 'Shaded', Rasterizer: 'Both', TAA: true, Occlusion: true };
+			const options = { Mode: 'Shaded', Rasterizer: 'Both', Occlusion: true };
 
 			// Buffer visibility packaging configuration — depth occupies the bits above each payload
 			const TRIANGLE_INDEX_BITS = 15; 			// 2^15 = 32768 max triangles in the LOD mega buffer
@@ -330,8 +321,6 @@
 
 				parameterGroup.add( options, 'Rasterizer', { 'SW Only': 'SW Only', 'HW Only': 'HW Only', 'Both': 'Both' } );
 
-				parameterGroup.add( options, 'TAA' );
-
 				parameterGroup.add( options, 'Occlusion' );
 
 				parameterGroup.add( timeScale, 'value', 0.0, 1.0 ).name( 'Animation Speed' );
@@ -375,10 +364,9 @@
 				const instanceMvpBuffer = storage( instanceMvpAttr, 'mat4', instanceCount );
 				const instanceWorldRead = storage( instanceWorldAttr, 'mat4', instanceCount ).toReadOnly();
 
-				// Previous frame world matrices — give every pixel an exact motion vector for TAA
+				// Previous frame world matrices for the occlusion test
 				const instancePrevWorldAttr = new THREE.StorageBufferAttribute( new Float32Array( instanceCount * 16 ), 16 );
 				const instancePrevWorldBuffer = storage( instancePrevWorldAttr, 'mat4', instanceCount );
-				const instancePrevWorldRead = storage( instancePrevWorldAttr, 'mat4', instanceCount ).toReadOnly();
 
 				const workQueueCountData = new Uint32Array( 1 );
 				const workQueueCountAttr = new THREE.StorageBufferAttribute( workQueueCountData, 1 );
@@ -410,8 +398,6 @@
 
 				projScreenMatrixUniform = uniform( new THREE.Matrix4() );
 				prevProjScreenUniform = uniform( new THREE.Matrix4() );
-				invProjScreenUniform = uniform( new THREE.Matrix4() );
-				blendUniform = uniform( 0.1 );
 				frustumPlanesUniform = uniformArray( [
 					new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4(),
 					new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4()
@@ -1275,108 +1261,9 @@
 
 					scene.add( resolveMesh );
 
-					// TAA — temporal accumulation over the jittered frames. The visibility
-					// buffer provides exact motion vectors: each pixel's surface point is
-					// reprojected through the instance's previous frame world matrix.
-					sceneTexNode = texture( sceneRT.texture );
-					historyTexNode = texture( historyReadRT.texture );
-					blitTexNode = texture( historyWriteRT.texture );
+					// Presents the scene to the canvas (tone mapping applies here)
+					blitTexNode = texture( sceneRT.texture );
 
-					const taaMaterial = new THREE.NodeMaterial();
-					taaMaterial.colorNode = Fn( () => {
-
-						const screenUv = uv();
-						const current = sceneTexNode.sample( screenUv ).rgb;
-
-						// NDC is y-up, texture coordinates are y-down
-						const uvFromNdc = ( ndc ) => vec2( ndc.x.mul( 0.5 ).add( 0.5 ), ndc.y.mul( - 0.5 ).add( 0.5 ) );
-						const ndcFromUv = ( uvCoord ) => vec2( uvCoord.x.mul( 2.0 ).sub( 1.0 ), uvCoord.y.mul( - 2.0 ).add( 1.0 ) );
-
-						// Reproject: surface pixels via the visibility buffer, background via the view ray
-						const uvPrev = vec2( 0.0 ).toVar();
-
-						If( packedTri.shiftRight( TRIANGLE_INDEX_BITS ).greaterThan( 0 ), () => {
-
-							const localPos = vertexBuffer.element( i0 ).xyz.mul( b0_p )
-								.add( vertexBuffer.element( i1 ).xyz.mul( b1_p ) )
-								.add( vertexBuffer.element( i2 ).xyz.mul( b2_p ) );
-
-							const prevClip = prevProjScreenUniform.mul( instancePrevWorldRead.element( instId ).mul( vec4( localPos, 1.0 ) ) );
-							uvPrev.assign( uvFromNdc( prevClip.xy.div( prevClip.w ) ) );
-
-						} ).Else( () => {
-
-							const ndc = ndcFromUv( screenUv );
-							const farPoint = invProjScreenUniform.mul( vec4( ndc, 1.0, 1.0 ) );
-							const viewDir = farPoint.xyz.div( farPoint.w ).sub( cameraPos );
-
-							const prevClip = prevProjScreenUniform.mul( vec4( viewDir, 0.0 ) );
-							uvPrev.assign( uvFromNdc( prevClip.xy.div( prevClip.w ) ) );
-
-						} );
-
-						// Clamp history to the current frame's neighborhood to reject stale samples
-						const texel = vec2( 1.0 ).div( screenSize );
-						const minColor = vec3( 1e5 ).toVar();
-						const maxColor = vec3( - 1e5 ).toVar();
-
-						for ( let x = - 1; x <= 1; x ++ ) {
-
-							for ( let y = - 1; y <= 1; y ++ ) {
-
-								const c = sceneTexNode.sample( screenUv.add( texel.mul( vec2( x, y ) ) ) ).rgb;
-								minColor.assign( min( minColor, c ) );
-								maxColor.assign( max( maxColor, c ) );
-
-							}
-
-						}
-
-						// Catmull-Rom history sampling — plain bilinear resampling blurs the
-						// accumulation a little more every frame; the negative lobes keep it sharp
-						const samplePos = uvPrev.mul( screenSize );
-						const texPos1 = floor( samplePos.sub( 0.5 ) ).add( 0.5 );
-
-						const f = samplePos.sub( texPos1 );
-
-						const w0 = f.mul( f.mul( f.mul( - 0.5 ).add( 1.0 ) ).sub( 0.5 ) );
-						const w1 = f.mul( f ).mul( f.mul( 1.5 ).sub( 2.5 ) ).add( 1.0 );
-						const w2 = f.mul( f.mul( f.mul( - 1.5 ).add( 2.0 ) ).add( 0.5 ) );
-						const w3 = f.mul( f ).mul( f.mul( 0.5 ).sub( 0.5 ) );
-
-						const w12 = w1.add( w2 );
-
-						const texPos0 = texPos1.sub( 1.0 ).div( screenSize );
-						const texPos3 = texPos1.add( 2.0 ).div( screenSize );
-						const texPos12 = texPos1.add( w2.div( w12 ) ).div( screenSize );
-
-						const historyRaw = vec3( 0.0 ).toVar();
-
-						historyRaw.addAssign( historyTexNode.sample( vec2( texPos0.x, texPos0.y ) ).rgb.mul( w0.x.mul( w0.y ) ) );
-						historyRaw.addAssign( historyTexNode.sample( vec2( texPos12.x, texPos0.y ) ).rgb.mul( w12.x.mul( w0.y ) ) );
-						historyRaw.addAssign( historyTexNode.sample( vec2( texPos3.x, texPos0.y ) ).rgb.mul( w3.x.mul( w0.y ) ) );
-
-						historyRaw.addAssign( historyTexNode.sample( vec2( texPos0.x, texPos12.y ) ).rgb.mul( w0.x.mul( w12.y ) ) );
-						historyRaw.addAssign( historyTexNode.sample( vec2( texPos12.x, texPos12.y ) ).rgb.mul( w12.x.mul( w12.y ) ) );
-						historyRaw.addAssign( historyTexNode.sample( vec2( texPos3.x, texPos12.y ) ).rgb.mul( w3.x.mul( w12.y ) ) );
-
-						historyRaw.addAssign( historyTexNode.sample( vec2( texPos0.x, texPos3.y ) ).rgb.mul( w0.x.mul( w3.y ) ) );
-						historyRaw.addAssign( historyTexNode.sample( vec2( texPos12.x, texPos3.y ) ).rgb.mul( w12.x.mul( w3.y ) ) );
-						historyRaw.addAssign( historyTexNode.sample( vec2( texPos3.x, texPos3.y ) ).rgb.mul( w3.x.mul( w3.y ) ) );
-
-						const history = clamp( max( historyRaw, vec3( 0.0 ) ), minColor, maxColor );
-
-						// Take the current frame when the reprojection leaves the screen
-						const valid = uvPrev.x.greaterThanEqual( 0.0 ).and( uvPrev.x.lessThanEqual( 1.0 ) ).and( uvPrev.y.greaterThanEqual( 0.0 ) ).and( uvPrev.y.lessThanEqual( 1.0 ) );
-						const blend = valid.select( blendUniform, float( 1.0 ) );
-
-						return vec4( mix( history, current, blend ), 1.0 );
-
-					} )();
-
-					taaQuad = new THREE.QuadMesh( taaMaterial );
-
-					// Presents the accumulated history to the canvas (tone mapping applies here)
 					const blitMaterial = new THREE.NodeMaterial();
 					blitMaterial.colorNode = blitTexNode;
 					blitQuad = new THREE.QuadMesh( blitMaterial );
@@ -1460,16 +1347,12 @@
 					hwMesh.userData.shadedMaterial.dispose();
 					hwMesh.userData.debugMaterial.dispose();
 
-					taaQuad.material.dispose();
-
 				}
 
-				// TAA render targets
+				// Scene render target (also provides the depth for the pyramid)
 				if ( sceneRT ) {
 
 					sceneRT.dispose();
-					historyReadRT.dispose();
-					historyWriteRT.dispose();
 
 				}
 
@@ -1477,19 +1360,13 @@
 				sceneRT.depthTexture = new THREE.DepthTexture( size.x, size.y );
 				sceneRT.depthTexture.type = THREE.FloatType;
 
-				historyReadRT = new THREE.RenderTarget( size.x, size.y, { type: THREE.HalfFloatType, depthBuffer: false } );
-				historyWriteRT = new THREE.RenderTarget( size.x, size.y, { type: THREE.HalfFloatType, depthBuffer: false } );
 
-				if ( sceneTexNode ) {
+				if ( blitTexNode ) {
 
-					sceneTexNode.value = sceneRT.texture;
-					historyTexNode.value = historyReadRT.texture;
-					blitTexNode.value = historyWriteRT.texture;
+					blitTexNode.value = sceneRT.texture;
 					depthSourceTexNode.value = sceneRT.depthTexture;
 
 				}
-
-				historyReset = true;
 
 				// HZB pyramid — all mip levels packed into one storage buffer,
 				// level 0 at half resolution, each level the max (farthest) of 2x2 below
@@ -1555,9 +1432,8 @@
 
 			const frustum = new THREE.Frustum();
 			const projScreenMatrix = new THREE.Matrix4();
-			const projScreenUnjittered = new THREE.Matrix4();
+			const prevProjScreen = new THREE.Matrix4();
 			const cameraInverse = new THREE.Matrix4();
-			const drawingSize = new THREE.Vector2();
 			const prevCameraPos = new THREE.Vector3();
 			let prevValid = false;
 
@@ -1569,46 +1445,28 @@
 
 				camera.updateMatrixWorld();
 
+				cameraInverse.copy( camera.matrixWorld ).invert();
+				projScreenMatrix.multiplyMatrices( camera.projectionMatrix, cameraInverse );
+
 				// Seed the previous frame state on the first frame
 				if ( prevValid === false ) {
 
-					camera.clearViewOffset();
-					cameraInverse.copy( camera.matrixWorld ).invert();
-					projScreenUnjittered.multiplyMatrices( camera.projectionMatrix, cameraInverse );
+					prevProjScreen.copy( projScreenMatrix );
 					prevCameraPos.copy( camera.position );
 					prevValid = true;
 
 				}
 
-				// Last frame's unjittered matrix becomes the reprojection source
-				prevProjScreenUniform.value.copy( projScreenUnjittered );
+				// Last frame's matrices drive the occlusion test
+				prevProjScreenUniform.value.copy( prevProjScreen );
 				prevCameraPosUniform.value.copy( prevCameraPos );
+
+				prevProjScreen.copy( projScreenMatrix );
+				prevCameraPos.copy( camera.position );
 
 				occlusionUniform.value = options.Occlusion ? 1 : 0;
 
-				camera.clearViewOffset();
-				cameraInverse.copy( camera.matrixWorld ).invert();
-				projScreenUnjittered.multiplyMatrices( camera.projectionMatrix, cameraInverse );
-				prevCameraPos.copy( camera.position );
-
-				invProjScreenUniform.value.copy( projScreenUnjittered ).invert();
-
-				// Cull with the unjittered frustum
-				frustum.setFromProjectionMatrix( projScreenUnjittered );
-
-				// Sub-pixel jitter so TAA accumulates different samples each frame
-				if ( options.TAA ) {
-
-					renderer.getDrawingBufferSize( drawingSize );
-
-					const jitter = jitterOffsets[ jitterIndex ];
-					jitterIndex = ( jitterIndex + 1 ) % jitterOffsets.length;
-
-					camera.setViewOffset( drawingSize.x, drawingSize.y, jitter[ 0 ] - 0.5, jitter[ 1 ] - 0.5, drawingSize.x, drawingSize.y );
-
-				}
-
-				projScreenMatrix.multiplyMatrices( camera.projectionMatrix, cameraInverse );
+				frustum.setFromProjectionMatrix( projScreenMatrix );
 
 				// Update GPU uniforms
 				projScreenMatrixUniform.value.copy( projScreenMatrix );
@@ -1648,37 +1506,9 @@
 
 				}
 
-				if ( options.TAA ) {
-
-					blendUniform.value = historyReset ? 1.0 : 0.1;
-					historyReset = false;
-
-					// Accumulate into history
-					historyTexNode.value = historyReadRT.texture;
-					blitTexNode.value = historyWriteRT.texture;
-
-					renderer.setRenderTarget( historyWriteRT );
-					taaQuad.render( renderer );
-
-					// Present (tone mapping + output color space apply on the canvas)
-					renderer.setRenderTarget( null );
-					blitQuad.render( renderer );
-
-					const swap = historyReadRT;
-					historyReadRT = historyWriteRT;
-					historyWriteRT = swap;
-
-				} else {
-
-					historyReset = true;
-
-					// Present (tone mapping + output color space apply on the canvas)
-					blitTexNode.value = sceneRT.texture;
-
-					renderer.setRenderTarget( null );
-					blitQuad.render( renderer );
-
-				}
+				// Present (tone mapping + output color space apply on the canvas)
+				renderer.setRenderTarget( null );
+				blitQuad.render( renderer );
 
 			}
 
