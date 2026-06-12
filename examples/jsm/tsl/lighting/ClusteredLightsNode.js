@@ -212,7 +212,7 @@ class ClusteredLightsNode extends LightsNode {
 
 		for ( const light of lights ) {
 
-			if ( light.isPointLight === true ) {
+			if ( light.isPointLight === true && light.castShadow !== true ) {
 
 				clusteredLights[ clusteredIndex ++ ] = light;
 
