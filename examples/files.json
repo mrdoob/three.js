@@ -344,6 +344,7 @@
 		"webgpu_equirectangular",
 		"webgpu_fog_height",
 		"webgpu_furnace_test",
+		"webgpu_geometry_loft",
 		"webgpu_hdr",
 		"webgpu_instance_mesh",
 		"webgpu_instance_path",
