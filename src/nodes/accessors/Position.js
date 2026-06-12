@@ -34,6 +34,10 @@ export const positionGeometry = /*@__PURE__*/ attribute( 'position', 'vec3' );
 
 /**
  * TSL object that represents the vertex position in local space of the current rendered object.
+ * Depending on the properties of the current object, positionLocal will be reassigned to
+ * the object's transformed local space position. Properties that transform the value of positionLocal
+ * include the object's instance matrix, skinning matrix, batching matrix, and displacement map.
+ * To use the pre-transformed local space position of the object, use {@link positionGeometry}.
  *
  * @tsl
  * @type {AttributeNode<vec3>}
