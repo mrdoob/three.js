@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - compute ambient occlusion</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - compute ambient occlusion">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_postprocessing_ao_compute.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_postprocessing_ao_compute.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a>
+				<span>Compute AO</span>
+			</div>
+
+			<small>
+				Ground Truth Ambient Occlusion via GPU compute shader.<br />
+				Uses <code>renderer.compute()</code> instead of fragment shader quad rendering.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { pass, mrt, normalView, vec3, vec4, mix, float, uniform, texture, packNormalToRGB, unpackRGBToNormal, sample, positionView, convertToTexture } from 'three/tsl';
+			import { aoCompute } from 'three/addons/tsl/display/GTAOComputeNode.js';
+			import { denoise } from 'three/addons/tsl/display/DenoiseNode.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			let camera, scene, renderer, renderPipeline, controls;
+			let depthRT, depthMaterial, aoPass;
+
+			const resScale = 0.5;
+
+			const params = {
+				enabled: true,
+				aoOnly: false,
+				intensity: 1.04
+			};
+
+			init();
+
+			async function init() {
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 20 );
+				camera.position.set( 2, 3, 6 );
+
+				scene = new THREE.Scene();
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				// controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.target.set( 0, 0.5, 0 );
+
+				// environment
+
+				const environment = new RoomEnvironment();
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				scene.background = new THREE.Color( 0x666666 );
+				scene.environment = pmremGenerator.fromScene( environment, 0.04 ).texture;
+				scene.environmentIntensity = 0.4;
+				environment.dispose();
+				pmremGenerator.dispose();
+
+				// render pipeline
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				// pre-pass for normals
+
+				const prePass = pass( scene, camera ).toInspector( 'Normal' );
+				prePass.name = 'Pre-Pass';
+				prePass.transparent = false;
+				prePass.setMRT( mrt( { output: packNormalToRGB( normalView ) } ) );
+
+				const prePassNormal = sample( ( uv ) => unpackRGBToNormal( prePass.getTextureNode().sample( uv ) ) );
+				const prePassDepth = prePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => prePass.getLinearDepthNode() );
+
+				const normalTexture = prePass.getTexture( 'output' );
+				normalTexture.type = THREE.UnsignedByteType;
+
+				// scene pass
+
+				const scenePass = pass( scene, camera ).toInspector( 'Color' );
+
+				// --- depth render target ---
+				// PERFORMANCE: This is an extra scene render pass. It exists because
+				// compute shaders in the current Three.js WebGPU backend cannot sample
+				// from DepthTexture or PassNode internal render targets. The depth is
+				// rendered as linear view-Z to a float32 color target that compute CAN
+				// read. This pass adds roughly one scene draw call of vertex cost.
+				// It can be eliminated when Three.js adds native compute depth access.
+
+				const drawSize = renderer.getDrawingBufferSize( new THREE.Vector2() );
+				const aoW = Math.round( drawSize.x * resScale );
+				const aoH = Math.round( drawSize.y * resScale );
+
+				depthRT = new THREE.RenderTarget( aoW, aoH, {
+					type: THREE.FloatType,
+					minFilter: THREE.NearestFilter,
+					magFilter: THREE.NearestFilter,
+				} );
+
+				depthMaterial = new THREE.NodeMaterial();
+				depthMaterial.name = 'LinearDepthToColor';
+				depthMaterial.blending = THREE.NoBlending;
+				depthMaterial.colorNode = vec4( positionView.z.negate(), 0, 0, 1 );
+
+				// --- compute AO ---
+
+				const depthTexNode = texture( depthRT.texture );
+				const normalTexNode = texture( normalTexture );
+
+				aoPass = aoCompute( depthTexNode, normalTexNode, camera );
+				aoPass.setDepthPass( depthRT, depthMaterial, scene );
+
+				// LIMITATION: StorageTexture compute writes are not directly readable
+				// by RenderPipeline texture() bindings in the same frame.
+				// convertToTexture() renders a fullscreen quad copy that materializes
+				// the compute output as a standard texture. This is a framework-level
+				// synchronization gap — negligible performance cost (one quad blit).
+
+				const aoResolved = convertToTexture( aoPass.getTextureNode() );
+
+				// Spatial denoise (optional — for smoother output)
+
+				const denoisePass = denoise( aoResolved, prePassDepth, prePassNormal, camera );
+
+				// composite
+
+				const aoIntensity = uniform( params.intensity );
+				const aoOutput = mix( float( 1.0 ), denoisePass.r, aoIntensity );
+
+				renderPipeline.outputNode = scenePass.mul( vec4( vec3( aoOutput ), 1 ) );
+
+				// --- scene geometry ---
+
+				const whiteMat = new THREE.MeshStandardMaterial( { color: 0xffffff, roughness: 0.5 } );
+
+				// Chunky disc platform with chamfered edges (lathe geometry for the profile)
+				const discProfile = [];
+				const discRadius = 4;
+				const discHeight = 0.4;
+				const chamfer = 0.012;
+				// Profile: bottom-inner edge → bottom-outer chamfer → outer wall → top-outer chamfer → top surface → center
+				discProfile.push( new THREE.Vector2( 0, 0 ) );
+				discProfile.push( new THREE.Vector2( discRadius - chamfer, 0 ) );
+				discProfile.push( new THREE.Vector2( discRadius, chamfer ) );
+				discProfile.push( new THREE.Vector2( discRadius, discHeight - chamfer ) );
+				discProfile.push( new THREE.Vector2( discRadius - chamfer, discHeight ) );
+				discProfile.push( new THREE.Vector2( 0, discHeight ) );
+
+				const disc = new THREE.Mesh(
+					new THREE.LatheGeometry( discProfile, 64 ),
+					whiteMat
+				);
+				disc.position.y = - 1;
+				scene.add( disc );
+
+				// Boxes arrayed on the disc
+				for ( let i = 0; i < 12; i ++ ) {
+
+					const w = 0.3 + Math.random() * 0.7;
+					const h = 0.5 + Math.random() * 1.5;
+					const d = 0.3 + Math.random() * 0.7;
+					const box = new THREE.Mesh( new RoundedBoxGeometry( w, h, d, 4, 0.05 ), whiteMat );
+					const angle = ( i / 12 ) * Math.PI * 2;
+					const r = 0.8 + Math.random() * 2.2;
+					box.position.set( Math.cos( angle ) * r, h / 2 - 1 + discHeight, Math.sin( angle ) * r );
+					box.rotation.y = Math.random() * Math.PI;
+					scene.add( box );
+
+				}
+
+				// Sphere on the disc
+				const sphere = new THREE.Mesh(
+					new THREE.SphereGeometry( 0.6, 64, 64 ),
+					new THREE.MeshStandardMaterial( { color: 0xffffff, roughness: 0.3, metalness: 0.1 } )
+				);
+				sphere.position.y = 0.1 + discHeight;
+				scene.add( sphere );
+
+				// events
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				// GUI
+
+				const gui = renderer.inspector.createParameters( 'Compute AO' );
+
+				gui.add( params, 'enabled' ).name( 'enable AO' ).onChange( ( value ) => {
+
+					renderPipeline.outputNode = value
+						? scenePass.mul( vec4( vec3( aoOutput ), 1 ) )
+						: scenePass;
+					renderPipeline.needsUpdate = true;
+
+				} );
+
+				gui.add( aoIntensity, 'value', 0, 2 ).name( 'intensity' );
+				gui.add( aoPass.radius, 'value', 0.01, 4 ).name( 'radius' );
+				gui.add( aoPass.scale, 'value', 0.1, 5 ).name( 'scale (power)' );
+				gui.add( aoPass.thickness, 'value', 0.1, 5 ).name( 'thickness' );
+				gui.add( aoPass.distanceExponent, 'value', 1, 4 ).name( 'distance exponent' );
+				gui.add( aoPass.distanceFallOff, 'value', 0, 1 ).name( 'distance falloff' );
+				gui.add( aoPass, 'directions', 2, 16, 1 ).name( 'directions' );
+				gui.add( aoPass, 'steps', 2, 12, 1 ).name( 'steps' );
+				gui.add( params, 'aoOnly' ).onChange( ( value ) => {
+
+					renderPipeline.outputNode = value
+						? vec4( vec3( denoisePass.r ), 1 )
+						: ( params.enabled ? scenePass.mul( vec4( vec3( aoOutput ), 1 ) ) : scenePass );
+					renderPipeline.needsUpdate = true;
+
+				} );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+				depthRT.setSize( Math.round( size.x * resScale ), Math.round( size.y * resScale ) );
+
+			}
+
+			function animate() {
+
+				controls.update();
+
+				// Everything happens inside renderPipeline.render():
+				// 1. aoPass.updateBefore renders depth + dispatches compute
+				// 2. DenoiseNode.updateBefore reads the StorageTexture (same frame)
+				// 3. Scene + composite renders
+				renderPipeline.render();
+
+			}
+
+		</script>
+	</body>
+</html>
