@@ -539,7 +539,13 @@ class SVGFNode extends TempNode {
 				// and let the raw noise blink through
 
 				const gradient = abs( blurredLuma.sub( historyLuma ) ).div( max( blurredLuma, historyLuma ).add( 0.25 ) );
-				const adaptiveAlpha = max( this.temporalAlpha, gradient.sub( 0.1 ).mul( this.antiGhosting ).clamp() );
+
+				// the gradient compares a single jittered frame against the accumulated history, so it
+				// cannot distinguish sampling jitter from real lighting change. The deadzone must stay
+				// above the per-frame deviation the jitter produces, otherwise the accumulation tracks
+				// the jitter cycle instead of averaging it and the result never settles
+
+				const adaptiveAlpha = max( this.temporalAlpha, gradient.sub( 0.35 ).mul( this.antiGhosting ).clamp() );
 
 				const alpha = validHistory.select( adaptiveAlpha, float( 1.0 ) );
 
