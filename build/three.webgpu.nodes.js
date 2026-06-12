@@ -30,6 +30,7 @@ const refreshUniforms = [
 	'emissiveMap',
 	'envMap',
 	'envMapIntensity',
+	'envMapRotation',
 	'gradientMap',
 	'ior',
 	'iridescence',
@@ -224,6 +225,11 @@ class NodeMaterialObserver {
 
 			}
 
+			const { environmentIntensity, environmentRotation } = renderObject.scene;
+
+			data.environmentIntensity = environmentIntensity;
+			data.environmentRotation = environmentRotation.clone();
+
 			data.lights = this.getLightsData( renderObject.lightsNode.getLights(), [] );
 
 			this.renderObjects.set( renderObject, data );
@@ -371,7 +377,7 @@ class NodeMaterialObserver {
 	 * @param {RenderObject} renderObject - The render object.
 	 * @param {Array<Light>} lightsData - The current material lights.
 	 * @param {number} renderId - The current render ID.
-	 * @return {boolean} Whether the given render object has changed its state or not.
+	 * @return {boolean} Whether the given render object is equal to its cached state or not.
 	 */
 	equals( renderObject, lightsData, renderId ) {
 
@@ -608,6 +614,24 @@ class NodeMaterialObserver {
 
 		}
 
+		// scene
+
+		const scene = renderObject.scene;
+
+		if ( scene.environment !== null && material.envMap === null ) {
+
+			if ( renderObjectData.environmentIntensity !== scene.environmentIntensity ||
+					renderObjectData.environmentRotation.equals( scene.environmentRotation ) === false ) {
+
+				renderObjectData.environmentIntensity = scene.environmentIntensity;
+				renderObjectData.environmentRotation.copy( scene.environmentRotation );
+
+				return false;
+
+			}
+
+		}
+
 		// center
 
 		if ( renderObjectData.center ) {
@@ -616,7 +640,7 @@ class NodeMaterialObserver {
 
 				renderObjectData.center.copy( object.center );
 
-				return true;
+				return false;
 
 			}
 
@@ -15964,6 +15988,7 @@ class ReferenceNode extends Node {
 		} else if ( Array.isArray( this.getValueFromReference() ) ) {
 
 			node = uniformArray( null, uniformType );
+			node.updateType = NodeUpdateType.OBJECT;
 
 		} else if ( uniformType === 'texture' ) {
 
@@ -16709,7 +16734,12 @@ class BumpMapNode extends TempNode {
 
 	}
 
-	setup() {
+	setup( builder ) {
+
+		// Screen-space derivatives are unreliable on thin lines, so the bump
+		// effect is disabled for wireframe rendering.
+
+		if ( builder.material.wireframe === true ) return normalView;
 
 		const bumpScale = this.scaleNode !== null ? this.scaleNode : 1;
 		const dHdxy = dHdxy_fwd( { textureNode: this.textureNode, bumpScale } );
@@ -19158,7 +19188,7 @@ const Break = () => expression( 'break' ).toStack();
 
 const _morphTextures = /*@__PURE__*/ new WeakMap();
 const _morphVec4 = /*@__PURE__*/ new Vector4();
-const _morphBaseInfluences = /*@__PURE__*/ new WeakMap();
+const _morphInfluencesData = /*@__PURE__*/ new WeakMap();
 
 /**
  * TSL function that retrieves and scales the morphed attribute (position or normal) texel value.
@@ -19318,13 +19348,6 @@ function getEntry( geometry ) {
 }
 
 /**
- * TSL object representing a reference to the mesh's morphTargetInfluences array.
- *
- * @type {ReferenceNode<float>}
- */
-const morphTargetInfluences = /*@__PURE__*/ reference( 'morphTargetInfluences', 'float' );
-
-/**
  * TSL function representing the vertex shader morph targets blend setup.
  * Dynamically computes morph targets weights and updates positionLocal and normalLocal in-place.
  *
@@ -19344,33 +19367,30 @@ const morphReference = /*@__PURE__*/ Fn( ( [ mesh ] ) => {
 
 	if ( morphTargetsCount === 0 ) return;
 
-	let morphBaseInfluence = _morphBaseInfluences.get( mesh );
+	// Init
 
-	if ( ! morphBaseInfluence ) {
+	let morphInfluenceData = _morphInfluencesData.get( mesh );
 
-		morphBaseInfluence = uniform( 1 );
-		_morphBaseInfluences.set( mesh, morphBaseInfluence );
+	if ( morphInfluenceData === undefined || morphInfluenceData.count !== morphTargetsCount ) {
 
-		OnObjectUpdate( ( { object } ) => {
+		morphInfluenceData = {
+			base: uniform( 1 ),
+			influences: mesh.morphTargetInfluences ? uniformArray( mesh.morphTargetInfluences, 'float' ) : null,
+			count: morphTargetsCount
+		};
 
-			if ( object.geometry.morphTargetsRelative ) {
-
-				morphBaseInfluence.value = 1;
-
-			} else {
-
-				morphBaseInfluence.value = 1 - object.morphTargetInfluences.reduce( ( a, b ) => a + b, 0 );
-
-			}
-
-		} );
+		_morphInfluencesData.set( mesh, morphInfluenceData );
 
 	}
 
+	const { base, influences } = morphInfluenceData;
+
+	// Shader
+
 	const { texture: bufferMap, stride, size } = getEntry( geometry );
 
-	if ( hasMorphPosition === true ) positionLocal.mulAssign( morphBaseInfluence );
-	if ( hasMorphNormals === true ) normalLocal.mulAssign( morphBaseInfluence );
+	if ( hasMorphPosition === true ) positionLocal.mulAssign( base );
+	if ( hasMorphNormals === true ) normalLocal.mulAssign( base );
 
 	const width = int( size.width );
 
@@ -19384,7 +19404,7 @@ const morphReference = /*@__PURE__*/ Fn( ( [ mesh ] ) => {
 
 		} else {
 
-			influence.assign( morphTargetInfluences.element( i ).toVar() );
+			influence.assign( influences.element( i ).toVar() );
 
 		}
 
@@ -19417,6 +19437,31 @@ const morphReference = /*@__PURE__*/ Fn( ( [ mesh ] ) => {
 			}
 
 		} );
+
+	} );
+
+	// Update
+
+	OnObjectUpdate( ( { object } ) => {
+
+		const { base, influences } = morphInfluenceData;
+
+		if ( object.geometry.morphTargetsRelative ) {
+
+			base.value = 1;
+
+		} else {
+
+			base.value = 1 - object.morphTargetInfluences.reduce( ( a, b ) => a + b, 0 );
+
+		}
+
+		if ( influences ) {
+
+			influences.array = object.morphTargetInfluences;
+			influences.update();
+
+		}
 
 	} );
 
@@ -30332,7 +30377,7 @@ class RenderObject {
 
 		}
 
-		if ( object.isInstancedMesh || object.count > 1 || Array.isArray( object.morphTargetInfluences ) ) {
+		if ( object.isInstancedMesh || object.count > 1 ) {
 
 			// TODO: https://github.com/mrdoob/three.js/pull/29066#issuecomment-2269400850
 
@@ -33162,6 +33207,18 @@ class RenderList {
 		 */
 		this.occlusionQueryCount = 0;
 
+		/**
+		 * The last object that was counted for occlusion query testing. Used to
+		 * avoid counting an object more than once when it produces multiple render
+		 * items (e.g. a mesh with multiple material groups), since such an object
+		 * is covered by a single occlusion query.
+		 *
+		 * @private
+		 * @type {?Object3D}
+		 * @default null
+		 */
+		this._lastOcclusionObject = null;
+
 	}
 
 	/**
@@ -33260,7 +33317,12 @@ class RenderList {
 
 		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext );
 
-		if ( object.occlusionTest === true ) this.occlusionQueryCount ++;
+		if ( object.occlusionTest === true && this._lastOcclusionObject !== object ) {
+
+			this.occlusionQueryCount ++;
+			this._lastOcclusionObject = object;
+
+		}
 
 		if ( material.transparent === true || material.transmission > 0 ||
 			( material.transmissionNode && material.transmissionNode.isNode ) ||
@@ -33384,6 +33446,8 @@ class RenderList {
 			renderItem.clippingContext = null;
 
 		}
+
+		this._lastOcclusionObject = null;
 
 	}
 
@@ -48238,7 +48302,6 @@ var TSL = /*#__PURE__*/Object.freeze({
 	modelWorldMatrix: modelWorldMatrix,
 	modelWorldMatrixInverse: modelWorldMatrixInverse,
 	morphReference: morphReference,
-	morphTargetInfluences: morphTargetInfluences,
 	mrt: mrt,
 	mul: mul,
 	mx_aastep: mx_aastep,
@@ -62378,6 +62441,9 @@ class Renderer {
 		let materialDepthNode;
 		let materialPositionNode;
 		let materialSide;
+		let materialDisplacementMap;
+		let materialDisplacementScale;
+		let materialDisplacementBias;
 
 		const previousSourceMaterial = this._currentSourceMaterial;
 
@@ -62400,6 +62466,9 @@ class Renderer {
 			materialDepthNode = ( overrideMaterial.isNodeMaterial ) ? overrideMaterial.depthNode : null;
 			materialPositionNode = ( overrideMaterial.isNodeMaterial ) ? overrideMaterial.positionNode : null;
 			materialSide = scene.overrideMaterial.side;
+			materialDisplacementMap = overrideMaterial.displacementMap;
+			materialDisplacementScale = overrideMaterial.displacementScale;
+			materialDisplacementBias = overrideMaterial.displacementBias;
 
 			if ( material.positionNode && material.positionNode.isNode ) {
 
@@ -62409,6 +62478,9 @@ class Renderer {
 
 			overrideMaterial.alphaTest = material.alphaTest;
 			overrideMaterial.alphaMap = material.alphaMap;
+			overrideMaterial.displacementMap = material.displacementMap;
+			overrideMaterial.displacementScale = material.displacementScale;
+			overrideMaterial.displacementBias = material.displacementBias;
 			overrideMaterial.transparent = material.transparent || material.transmission > 0 ||
 				( material.transmissionNode && material.transmissionNode.isNode ) ||
 				( material.backdropNode && material.backdropNode.isNode );
@@ -62463,6 +62535,9 @@ class Renderer {
 			scene.overrideMaterial.depthNode = materialDepthNode;
 			scene.overrideMaterial.positionNode = materialPositionNode;
 			scene.overrideMaterial.side = materialSide;
+			scene.overrideMaterial.displacementMap = materialDisplacementMap;
+			scene.overrideMaterial.displacementScale = materialDisplacementScale;
+			scene.overrideMaterial.displacementBias = materialDisplacementBias;
 
 		}
 
