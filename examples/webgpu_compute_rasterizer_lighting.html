@@ -36,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Fn, If, Loop, vec2, vec4, uvec2, uvec4, mat4, uint, float, int, min, max, clamp, ceil, log2, length, dFdx, dFdy, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, instanceIndex, vertexIndex, distance, screenSize, screenCoordinate, time, texture, varyingProperty, sqrt, normalize, cross, sign, positionGeometry, cameraViewMatrix, Discard } from 'three/tsl';
+			import { Fn, If, Loop, vec2, vec4, uvec2, uvec4, mat4, uint, float, int, min, max, clamp, ceil, log2, length, dFdx, dFdy, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, instanceIndex, vertexIndex, distance, screenSize, screenCoordinate, time, texture, varyingProperty, sqrt, normalize, cross, sign, positionGeometry, cameraViewMatrix, Discard, context } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -60,6 +60,7 @@
 			let resolveMesh, hwMesh;
 			let cameraPos, projScreenMatrixUniform, frustumPlanesUniform, cotHalfFovUniform;
 			let prevProjScreenUniform;
+			let outputModeUniform;
 
 			let screenTriAttr, screenTriAtomic, screenTriRead;
 			let screenInstAttr, screenInstAtomic, screenInstRead;
@@ -82,7 +83,7 @@
 			// both rasterizer paths so their roughness matches at path boundaries
 			const SPECULAR_AA_VARIANCE = 2.0;
 			const SPECULAR_AA_MAX = 0.2;
-			const options = { Mode: 'Shaded', Rasterizer: 'Both', Occlusion: true, Grid: 'XZ' };
+			const options = { Mode: 'Shaded', Output: 'Default', Rasterizer: 'Both', Occlusion: true, Grid: 'XZ' };
 
 			// Buffer visibility packaging configuration — depth occupies the bits above each payload
 			const TRIANGLE_INDEX_BITS = 15; 			// 2^15 = 32768 max triangles in the LOD mega buffer
@@ -91,6 +92,55 @@
 			const INSTANCE_INDEX_MASK = 2 ** INSTANCE_INDEX_BITS - 1;
 			const DEPTH_TRI_MAX = 2 ** ( 32 - TRIANGLE_INDEX_BITS ) - 1; 	// 17-bit depth packed above the triangle index
 			const DEPTH_INST_MAX = 2 ** ( 32 - INSTANCE_INDEX_BITS ) - 1; 	// 15-bit depth packed above the instance id
+
+			const getVisColor = ( outputMode, normal, normalMap, uv, roughness, metalness, ao, emissive ) => {
+
+				return Fn( () => {
+
+					const result = vec4( 0.0 ).toVar();
+
+					If( outputMode.equal( 1 ), () => {
+
+						// Geometry Normal: map [-1, 1] to [0, 1]
+						result.assign( vec4( normal.mul( 0.5 ).add( 0.5 ), 1.0 ) );
+
+					} ).ElseIf( outputMode.equal( 2 ), () => {
+
+						// Normal Map: map [-1, 1] to [0, 1]
+						result.assign( vec4( normalMap.mul( 0.5 ).add( 0.5 ), 1.0 ) );
+
+					} ).ElseIf( outputMode.equal( 3 ), () => {
+
+						// UV
+						result.assign( vec4( uv, 0.0, 1.0 ) );
+
+					} ).ElseIf( outputMode.equal( 4 ), () => {
+
+						// Roughness
+						result.assign( vec4( roughness, roughness, roughness, 1.0 ) );
+
+					} ).ElseIf( outputMode.equal( 5 ), () => {
+
+						// Metalness
+						result.assign( vec4( metalness, metalness, metalness, 1.0 ) );
+
+					} ).ElseIf( outputMode.equal( 6 ), () => {
+
+						// AO
+						result.assign( vec4( ao, ao, ao, 1.0 ) );
+
+					} ).ElseIf( outputMode.equal( 7 ), () => {
+
+						// Emissive
+						result.assign( vec4( emissive, 1.0 ) );
+
+					} );
+
+					return result;
+
+				} )();
+
+			};
 
 			init();
 
@@ -320,6 +370,17 @@
 				const parameterGroup = renderer.inspector.createParameters( 'Parameters' );
 				parameterGroup.add( options, 'Mode', { 'Shaded': 'Shaded', 'Meshlet Debug': 'Meshlet Debug' } ).addEventListener( 'change', updateMode );
 
+				parameterGroup.add( options, 'Output', {
+					'Default': 'Default',
+					'Geometry Normal': 'Geometry Normal',
+					'Normal Map': 'Normal Map',
+					'UV': 'UV',
+					'Roughness': 'Roughness',
+					'Metalness': 'Metalness',
+					'AO': 'AO',
+					'Emissive': 'Emissive'
+				} ).addEventListener( 'change', updateMode );
+
 				parameterGroup.add( options, 'Rasterizer', { 'SW Only': 'SW Only', 'HW Only': 'HW Only', 'Both': 'Both' } );
 
 				parameterGroup.add( options, 'Occlusion' );
@@ -447,6 +508,7 @@
 
 				occlusionUniform = uniform( 1, 'uint' );
 				prevCameraPosUniform = uniform( new THREE.Vector3() );
+				outputModeUniform = uniform( 0, 'uint' );
 
 				depthSourceTexNode = texture( sceneRT.depthTexture );
 
@@ -1122,9 +1184,24 @@
 
 					} )();
 
+					// Vis material: unlit visualization of channels
+					const hwVisMaterial = new THREE.NodeMaterial();
+					hwVisMaterial.positionNode = hwPosition;
+					hwVisMaterial.fragmentNode = getVisColor(
+						outputModeUniform,
+						hwNormal,
+						applyNormalMap( hwNormal, normalize( vTangent ), sampleMapHW( sourceMaterial.normalMap ) ),
+						vUv,
+						metalRoughHW.g,
+						metalRoughHW.b,
+						sampleMapHW( sourceMaterial.aoMap ).r,
+						sampleMapHW( sourceMaterial.emissiveMap ).rgb
+					);
+
 					hwMesh = new THREE.Mesh( hwGeometry, hwShadedMaterial );
 					hwMesh.userData.shadedMaterial = hwShadedMaterial;
 					hwMesh.userData.debugMaterial = hwDebugMaterial;
+					hwMesh.userData.visMaterial = hwVisMaterial;
 					hwMesh.frustumCulled = false;
 					hwMesh.renderOrder = 2;
 
@@ -1213,6 +1290,10 @@
 
 					const normal_interp = normalize( n0.mul( b0_p ).add( n1.mul( b1_p ) ).add( n2.mul( b2_p ) ) );
 
+					const worldPosition = w0.mul( b0_p ).add( w1.mul( b1_p ) ).add( w2.mul( b2_p ) );
+					const positionViewHelmet = cameraViewMatrix.mul( vec4( worldPosition, 1.0 ) ).xyz;
+					const positionViewDirectionHelmet = positionViewHelmet.negate().normalize();
+
 					// Compute screen-space derivatives analytically (neighboring pixels can
 					// belong to different triangles, so hardware derivatives are unusable)
 					const dw0_dx = s2.y.sub( s1.y );
@@ -1294,6 +1375,10 @@
 
 					// Shaded: feed the reconstructed surface into the standard material pipeline
 					const resolveShadedMaterial = new THREE.MeshStandardNodeMaterial();
+					resolveShadedMaterial.contextNode = context( {
+						positionView: positionViewHelmet,
+						positionViewDirection: positionViewDirectionHelmet
+					} );
 					resolveShadedMaterial.vertexNode = fullscreenVertex;
 					resolveShadedMaterial.depthNode = resolveDepth;
 					resolveShadedMaterial.colorNode = coveredColor( sampleMap( sourceMaterial.map ) );
@@ -1314,9 +1399,29 @@
 					resolveDebugMaterial.depthNode = resolveDepth;
 					resolveDebugMaterial.fragmentNode = coveredColor( hashColor( meshletIdBuffer.element( megaTriangleIndex ).add( instId.mul( 1000 ) ) ) );
 
+					// Vis material: unlit visualization of channels
+					const resolveVisMaterial = new THREE.NodeMaterial();
+					resolveVisMaterial.contextNode = context( {
+						positionView: positionViewHelmet,
+						positionViewDirection: positionViewDirectionHelmet
+					} );
+					resolveVisMaterial.vertexNode = fullscreenVertex;
+					resolveVisMaterial.depthNode = resolveDepth;
+					resolveVisMaterial.fragmentNode = coveredColor( getVisColor(
+						outputModeUniform,
+						normal_interp,
+						applyNormalMap( normal_interp, computeTangent( w0, w1, w2, t_uv0, t_uv1, t_uv2, normal_interp ), sampleMap( sourceMaterial.normalMap ) ),
+						uv_interp,
+						metalRough.g,
+						metalRough.b,
+						sampleMap( sourceMaterial.aoMap ).r,
+						sampleMap( sourceMaterial.emissiveMap ).rgb
+					) );
+
 					resolveMesh = new THREE.Mesh( resolveGeometry, resolveShadedMaterial );
 					resolveMesh.userData.shadedMaterial = resolveShadedMaterial;
 					resolveMesh.userData.debugMaterial = resolveDebugMaterial;
+					resolveMesh.userData.visMaterial = resolveVisMaterial;
 					resolveMesh.frustumCulled = false;
 					resolveMesh.renderOrder = 1;
 
@@ -1341,9 +1446,37 @@
 			function updateMode() {
 
 				const debug = options.Mode === 'Meshlet Debug';
+				const outputVal = options.Output;
 
-				resolveMesh.material = debug ? resolveMesh.userData.debugMaterial : resolveMesh.userData.shadedMaterial;
-				hwMesh.material = debug ? hwMesh.userData.debugMaterial : hwMesh.userData.shadedMaterial;
+				const outputModes = {
+					'Default': 0,
+					'Geometry Normal': 1,
+					'Normal Map': 2,
+					'UV': 3,
+					'Roughness': 4,
+					'Metalness': 5,
+					'AO': 6,
+					'Emissive': 7
+				};
+
+				outputModeUniform.value = outputModes[ outputVal ];
+
+				if ( debug ) {
+
+					resolveMesh.material = resolveMesh.userData.debugMaterial;
+					hwMesh.material = hwMesh.userData.debugMaterial;
+
+				} else if ( outputVal !== 'Default' ) {
+
+					resolveMesh.material = resolveMesh.userData.visMaterial;
+					hwMesh.material = hwMesh.userData.visMaterial;
+
+				} else {
+
+					resolveMesh.material = resolveMesh.userData.shadedMaterial;
+					hwMesh.material = hwMesh.userData.shadedMaterial;
+
+				}
 
 			}
 
@@ -1405,8 +1538,10 @@
 
 					resolveMesh.userData.shadedMaterial.dispose();
 					resolveMesh.userData.debugMaterial.dispose();
+					resolveMesh.userData.visMaterial.dispose();
 					hwMesh.userData.shadedMaterial.dispose();
 					hwMesh.userData.debugMaterial.dispose();
+					hwMesh.userData.visMaterial.dispose();
 
 				}
 

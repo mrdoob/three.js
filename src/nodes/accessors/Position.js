@@ -83,6 +83,12 @@ export const positionWorldDirection = /*@__PURE__*/ ( Fn( () => {
  */
 export const positionView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
+	if ( builder.context.positionView ) {
+
+		return builder.context.positionView;
+
+	}
+
 	if ( builder.shaderStage === 'fragment' && builder.material.vertexNode ) {
 
 		// reconstruct view position from clip space
@@ -104,6 +110,12 @@ export const positionView = /*@__PURE__*/ ( Fn( ( builder ) => {
  * @type {VaryingNode<vec3>}
  */
 export const positionViewDirection = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	if ( builder.context.positionViewDirection ) {
+
+		return builder.context.positionViewDirection;
+
+	}
 
 	let output;
 
