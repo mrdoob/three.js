@@ -74,10 +74,7 @@
 			const hzbKernels = [];
 			const MAX_HZB_LEVELS = 16;
 
-			const gridX = 60;
-			const gridY = 36;
-			const gridZ = 60;
-			const instanceCount = gridX * gridY * gridZ;
+			const instanceCount = 129600; // 360x360 plane or 60x36x60 volume
 
 			const MAX_RASTER_SIZE = 16;
 
@@ -85,7 +82,7 @@
 			// both rasterizer paths so their roughness matches at path boundaries
 			const SPECULAR_AA_VARIANCE = 2.0;
 			const SPECULAR_AA_MAX = 0.2;
-			const options = { Mode: 'Shaded', Rasterizer: 'Both', Occlusion: true };
+			const options = { Mode: 'Shaded', Rasterizer: 'Both', Occlusion: true, Grid: 'XZ' };
 
 			// Buffer visibility packaging configuration — depth occupies the bits above each payload
 			const TRIANGLE_INDEX_BITS = 15; 			// 2^15 = 32768 max triangles in the LOD mega buffer
@@ -110,7 +107,6 @@
 				await renderer.init();
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, .25, 1000000 );
-				camera.position.set( 2, 2, 40 );
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
@@ -338,26 +334,63 @@
 				createScreenBuffers();
 
 				const staticInstanceData = new Float32Array( instanceCount * 4 );
-				let dataIndex = 0;
+				const instanceDataAttr = new THREE.StorageBufferAttribute( staticInstanceData, 4 );
+				const instanceDataBuffer = storage( instanceDataAttr, 'vec4', instanceCount );
 
-				for ( let x = 0; x < gridX; x ++ ) {
+				// Lay the instances out as a plane or a volume (same instance count)
+				const updateGrid = () => {
 
-					for ( let y = 0; y < gridY; y ++ ) {
+					let dataIndex = 0;
 
-						for ( let z = 0; z < gridZ; z ++ ) {
+					if ( options.Grid === 'XZ' ) {
 
-							staticInstanceData[ dataIndex ++ ] = ( x - gridX / 2 ) * 4.0;
-							staticInstanceData[ dataIndex ++ ] = ( y - gridY / 2 ) * 4.0;
-							staticInstanceData[ dataIndex ++ ] = ( z - gridZ / 2 ) * 4.0;
-							staticInstanceData[ dataIndex ++ ] = 1.0; // scale
+						for ( let x = 0; x < 360; x ++ ) {
+
+							for ( let z = 0; z < 360; z ++ ) {
+
+								staticInstanceData[ dataIndex ++ ] = ( x - 180 ) * 4.0;
+								staticInstanceData[ dataIndex ++ ] = - 1;
+								staticInstanceData[ dataIndex ++ ] = ( z - 180 ) * 4.0;
+								staticInstanceData[ dataIndex ++ ] = 1.0; // scale
+
+							}
 
 						}
 
+						camera.position.set( 0, 8, 30 );
+						controls.target.set( 0, - 1, 0 );
+
+					} else {
+
+						for ( let x = 0; x < 60; x ++ ) {
+
+							for ( let y = 0; y < 36; y ++ ) {
+
+								for ( let z = 0; z < 60; z ++ ) {
+
+									staticInstanceData[ dataIndex ++ ] = ( x - 30 ) * 4.0;
+									staticInstanceData[ dataIndex ++ ] = ( y - 18 ) * 4.0;
+									staticInstanceData[ dataIndex ++ ] = ( z - 30 ) * 4.0;
+									staticInstanceData[ dataIndex ++ ] = 1.0; // scale
+
+								}
+
+							}
+
+						}
+
+						camera.position.set( 2, 2, 40 );
+						controls.target.set( 0, 0, 0 );
+
 					}
 
-				}
+					instanceDataAttr.needsUpdate = true;
 
-				const instanceDataBuffer = storage( new THREE.StorageBufferAttribute( staticInstanceData, 4 ), 'vec4', instanceCount );
+				};
+
+				updateGrid();
+
+				parameterGroup.add( options, 'Grid', { 'XZ': 'XZ', 'XYZ': 'XYZ' } ).addEventListener( 'change', updateGrid );
 
 				const instanceWorldData = new Float32Array( instanceCount * 16 );
 				const instanceMvpData = new Float32Array( instanceCount * 16 );
