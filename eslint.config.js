@@ -63,6 +63,7 @@ export default [
 				GPUTexture: 'readonly',
 				GPUMapMode: 'readonly',
 				QUnit: 'readonly',
+				Ammo: 'readonly',
 				XRRigidTransform: 'readonly',
 				XRMediaBinding: 'readonly',
 				CodeMirror: 'readonly',
