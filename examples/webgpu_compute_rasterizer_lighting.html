@@ -36,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Fn, If, Loop, vec2, vec4, uvec2, uvec4, mat4, uint, float, int, min, max, clamp, ceil, log2, length, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, instanceIndex, vertexIndex, distance, screenSize, screenCoordinate, time, texture, varyingProperty, sqrt, normalize, cross, sign, positionGeometry, cameraViewMatrix, Discard } from 'three/tsl';
+			import { Fn, If, Loop, vec2, vec4, uvec2, uvec4, mat4, uint, float, int, min, max, clamp, ceil, log2, length, dFdx, dFdy, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, instanceIndex, vertexIndex, distance, screenSize, screenCoordinate, time, texture, varyingProperty, sqrt, normalize, cross, sign, positionGeometry, cameraViewMatrix, Discard } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -80,6 +80,11 @@
 			const instanceCount = gridX * gridY * gridZ;
 
 			const MAX_RASTER_SIZE = 16;
+
+			// Specular antialiasing — kernel roughness from normal variance, shared by
+			// both rasterizer paths so their roughness matches at path boundaries
+			const SPECULAR_AA_VARIANCE = 2.0;
+			const SPECULAR_AA_MAX = 0.2;
 			const options = { Mode: 'Shaded', Rasterizer: 'Both', Occlusion: true };
 
 			// Buffer visibility packaging configuration — depth occupies the bits above each payload
@@ -1054,12 +1059,18 @@
 
 					const sampleMapHW = ( map ) => texture( map, vUv );
 
+					// Specular antialiasing from hardware derivatives of the geometric normal
+					const hwNormal = normalize( vNormal );
+					const hwDNdx = dFdx( hwNormal );
+					const hwDNdy = dFdy( hwNormal );
+					const hwKernelRoughness = min( hwDNdx.dot( hwDNdx ).add( hwDNdy.dot( hwDNdy ) ).mul( SPECULAR_AA_VARIANCE ), SPECULAR_AA_MAX );
+
 					const hwShadedMaterial = new THREE.MeshStandardNodeMaterial();
 					hwShadedMaterial.positionNode = hwPosition;
 					hwShadedMaterial.colorNode = sampleMapHW( sourceMaterial.map );
-					hwShadedMaterial.normalNode = applyNormalMap( normalize( vNormal ), normalize( vTangent ), sampleMapHW( sourceMaterial.normalMap ) ).transformDirection( cameraViewMatrix );
+					hwShadedMaterial.normalNode = applyNormalMap( hwNormal, normalize( vTangent ), sampleMapHW( sourceMaterial.normalMap ) ).transformDirection( cameraViewMatrix );
 					const metalRoughHW = sampleMapHW( sourceMaterial.roughnessMap ); // glTF packs roughness (g) and metalness (b) in one texture
-					hwShadedMaterial.roughnessNode = metalRoughHW.g;
+					hwShadedMaterial.roughnessNode = sqrt( metalRoughHW.g.mul( metalRoughHW.g ).add( hwKernelRoughness ) );
 					hwShadedMaterial.metalnessNode = metalRoughHW.b;
 					hwShadedMaterial.aoNode = sampleMapHW( sourceMaterial.aoMap ).r;
 					hwShadedMaterial.emissiveNode = sampleMapHW( sourceMaterial.emissiveMap ).rgb;
@@ -1202,6 +1213,23 @@
 
 					const sampleMap = ( map ) => texture( map, uv_interp ).grad( dUvDx, dUvDy );
 
+					// Specular antialiasing (Tokuyoshi & Kaplanyan) — widen roughness by the
+					// normal's screen-space variance so sub-pixel geometry does not alias
+					// into fireflies. The derivatives are analytic, like the UV gradients.
+					const dNdx = (
+						dw0_dx.mul( q0 ).mul( n0.sub( normal_interp ) )
+							.add( dw1_dx.mul( q1 ).mul( n1.sub( normal_interp ) ) )
+							.add( dw2_dx.mul( q2 ).mul( n2.sub( normal_interp ) ) )
+					).div( safe_sum_w_q );
+
+					const dNdy = (
+						dw0_dy.mul( q0 ).mul( n0.sub( normal_interp ) )
+							.add( dw1_dy.mul( q1 ).mul( n1.sub( normal_interp ) ) )
+							.add( dw2_dy.mul( q2 ).mul( n2.sub( normal_interp ) ) )
+					).div( safe_sum_w_q );
+
+					const kernelRoughness = min( dNdx.dot( dNdx ).add( dNdy.dot( dNdy ) ).mul( SPECULAR_AA_VARIANCE ), SPECULAR_AA_MAX );
+
 					// Discard pixels the rasterizer did not cover so the background shows through
 					const coveredColor = ( colorNode ) => Fn( () => {
 
@@ -1242,7 +1270,7 @@
 						sampleMap( sourceMaterial.normalMap )
 					).transformDirection( cameraViewMatrix );
 					const metalRough = sampleMap( sourceMaterial.roughnessMap ); // glTF packs roughness (g) and metalness (b) in one texture
-					resolveShadedMaterial.roughnessNode = metalRough.g;
+					resolveShadedMaterial.roughnessNode = sqrt( metalRough.g.mul( metalRough.g ).add( kernelRoughness ) );
 					resolveShadedMaterial.metalnessNode = metalRough.b;
 					resolveShadedMaterial.aoNode = sampleMap( sourceMaterial.aoMap ).r;
 					resolveShadedMaterial.emissiveNode = sampleMap( sourceMaterial.emissiveMap ).rgb;
