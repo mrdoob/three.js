@@ -136,6 +136,8 @@
 				const giPass = ssgi( scenePassColor, scenePassDepth, sceneNormal, camera );
 				giPass.sliceCount.value = 2;
 				giPass.stepCount.value = 8;
+				giPass.giIntensity.value = 18;
+				giPass.aoIntensity.value = 0.55;
 				giPass.noiseNode = blueNoise( 2 );
 
 				// svgf denoise

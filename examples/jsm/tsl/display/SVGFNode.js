@@ -1,5 +1,5 @@
 import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, HalfFloatType, NearestFilter, DepthTexture, FloatType } from 'three/webgpu';
-import { Fn, float, vec2, vec4, uv, uniform, texture, passTexture, convertToTexture, luminance, dot, max, abs, pow, mix, If, ivec2, getViewPosition, getNormalFromDepth, NodeUpdateType } from 'three/tsl';
+import { Fn, If, float, vec2, vec4, uv, uniform, texture, passTexture, convertToTexture, luminance, dot, min, max, abs, pow, mix, outputStruct, property, sqrt, ivec2, perspectiveDepthToViewZ, getNormalFromDepth, NodeUpdateType } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -10,6 +10,16 @@ let _rendererState;
 // keeps each level cheap, while the increasing per-level step still covers a wide area across levels.
 const _kernel = [ 1 / 4, 1 / 2, 1 / 4 ];
 
+// deadzone of the temporal gradient, in units of the local standard deviation: sampling jitter
+// moves the neighborhood mean by about one deviation per frame ( the jitter is spatially
+// coherent ) while a real lighting change moves it by many
+const _gradientDeadzone = 3;
+
+// fixed accumulation weight of the luminance moments, decoupled from the adaptive alpha: if the
+// moments followed it, a fully rejected history would collapse the variance to zero, which in
+// turn pins the gradient and the alpha at their maximum with no way to recover
+const _momentsAlpha = 0.2;
+
 /**
  * Post processing node that denoises a noisy screen-space signal (such as the raw output of
  * {@link SSGINode}) using a spatiotemporal filter in the spirit of SVGF (Spatiotemporal
@@ -18,19 +28,19 @@ const _kernel = [ 1 / 4, 1 / 2, 1 / 4 ];
  * The pipeline is:
  * - **Temporal accumulation**: the current frame is reprojected against history using the
  *   velocity buffer and blended, with a depth-based disocclusion test that resets history where
- *   the reprojection is invalid. This is an alternative to denoising via {@link TRAANode}.
- * - **Adaptive temporal alpha** (A-SVGF-style): a temporal gradient raises the accumulation weight
- *   towards the current frame where the signal changed, rejecting stale history to limit ghosting
- *   under motion. The gradient is derived here from the current-vs-history difference rather than
- *   from re-shaded forward-projected samples as in the original A-SVGF.
- * - **Edge-avoiding à-trous**: a multi-level wavelet filter (increasing step size per level)
- *   spatially denoises the accumulated signal while preserving edges via depth, normal and
- *   luminance edge-stopping functions.
+ *   the reprojection is invalid. Luminance moments are accumulated alongside the signal, giving
+ *   a per-pixel variance estimate of the incoming noise.
+ * - **Adaptive temporal alpha**: a temporal gradient measured in units of the local standard
+ *   deviation raises the accumulation weight towards the current frame where the signal changed,
+ *   rejecting stale history to limit ghosting. Expressing the gradient in deviation units
+ *   separates sampling jitter (about one deviation by construction) from real lighting change
+ *   (many deviations).
+ * - **Variance-guided à-trous**: a multi-level edge-avoiding wavelet filter (increasing step size
+ *   per level) spatially denoises the accumulated signal. The luminance edge-stop scales with the
+ *   local deviation, so noisy regions are smoothed aggressively while converged regions keep
+ *   their edges; the variance estimate is filtered along with the signal.
  * - **Feedback**: the first à-trous level is fed back as the color history for the next frame,
  *   which keeps the temporal signal denoised without over-blurring (the SVGF feedback trick).
- *
- * It does not include SVGF's variance-guided luminance weighting (per-pixel variance from temporal
- * moments driving the à-trous luminance edge-stop); the luminance weight uses a fixed `lumaPhi`.
  *
  * References:
  * - {@link https://cg.ivd.kit.edu/publications/2017/svgf/svgf_preprint.pdf} (SVGF, Schied et al.)
@@ -124,11 +134,11 @@ class SVGFNode extends TempNode {
 		this.temporalAlpha = uniform( 0.1 );
 
 		/**
-		 * Strength of the adaptive temporal alpha (A-SVGF-style anti-ghosting). The temporal gradient
-		 * (how much the signal changed vs reprojected history) is scaled by this value to raise the
-		 * accumulation weight towards the current frame where change is detected, rejecting stale
-		 * history under motion. `0` disables it (fixed `temporalAlpha`); higher reduces ghosting at
-		 * the cost of more noise on moving regions.
+		 * Strength of the adaptive temporal alpha (anti-ghosting). The temporal gradient — how much
+		 * the signal changed versus the reprojected history, in units of the local standard
+		 * deviation — is scaled by this value to raise the accumulation weight towards the current
+		 * frame, rejecting stale history where the lighting changed. `0` disables it (fixed
+		 * `temporalAlpha`); higher reduces ghosting at the cost of more noise on changing regions.
 		 *
 		 * @type {UniformNode<float>}
 		 * @default 4
@@ -160,7 +170,9 @@ class SVGFNode extends TempNode {
 		this.normalPhi = uniform( 128 );
 
 		/**
-		 * Luminance edge-stopping strength of the à-trous filter.
+		 * Luminance edge-stopping strength of the à-trous filter, in units of the local standard
+		 * deviation. Differences below `lumaPhi` deviations are smoothed; larger differences are
+		 * treated as edges and preserved.
 		 *
 		 * @type {UniformNode<float>}
 		 * @default 4
@@ -204,28 +216,35 @@ class SVGFNode extends TempNode {
 		 */
 		this._cameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse );
 
-		// render targets
+		/**
+		 * The camera's near and far values.
+		 *
+		 * @private
+		 * @type {UniformNode<vec2>}
+		 */
+		this._cameraNearFar = uniform( new Vector2() );
 
-		const rtOptions = { depthBuffer: false, type: HalfFloatType };
+		// render targets. The signal targets carry two attachments: the filtered signal, and
+		// the luminance moments with the variance derived from them
+
+		const rtOptions = { depthBuffer: false, type: HalfFloatType, count: 2 };
 
 		/**
-		 * Holds the previous frame's filtered result (the color history fed back each frame). Its
-		 * depth texture stores the previous frame's depth for the disocclusion test.
+		 * Holds the previous frame's filtered result and luminance moments (the history fed back
+		 * each frame). Its depth texture stores the previous frame's depth for the disocclusion test.
 		 *
 		 * @private
 		 * @type {RenderTarget}
 		 */
 		this._historyRenderTarget = new RenderTarget( 1, 1, { ...rtOptions, depthTexture: new DepthTexture() } );
-		this._historyRenderTarget.texture.name = 'SVGF.history';
 
 		/**
-		 * Holds the temporally accumulated signal before spatial filtering.
+		 * Holds the temporally accumulated signal and moments before spatial filtering.
 		 *
 		 * @private
 		 * @type {RenderTarget}
 		 */
 		this._temporalRenderTarget = new RenderTarget( 1, 1, rtOptions );
-		this._temporalRenderTarget.texture.name = 'SVGF.temporal';
 
 		/**
 		 * Ping-pong targets for the à-trous iterations.
@@ -234,8 +253,6 @@ class SVGFNode extends TempNode {
 		 * @type {Array<RenderTarget>}
 		 */
 		this._atrousRenderTargets = [ new RenderTarget( 1, 1, rtOptions ), new RenderTarget( 1, 1, rtOptions ) ];
-		this._atrousRenderTargets[ 0 ].texture.name = 'SVGF.atrous0';
-		this._atrousRenderTargets[ 1 ].texture.name = 'SVGF.atrous1';
 
 		/**
 		 * Holds the final filtered result.
@@ -244,7 +261,6 @@ class SVGFNode extends TempNode {
 		 * @type {RenderTarget}
 		 */
 		this._resolveRenderTarget = new RenderTarget( 1, 1, rtOptions );
-		this._resolveRenderTarget.texture.name = 'SVGF.resolve';
 
 		/**
 		 * Holds a packed geometry buffer ( view-space normal in rgb, linear view-space Z in a )
@@ -253,16 +269,31 @@ class SVGFNode extends TempNode {
 		 * @private
 		 * @type {RenderTarget}
 		 */
-		this._geometryRenderTarget = new RenderTarget( 1, 1, rtOptions );
+		this._geometryRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 		this._geometryRenderTarget.texture.name = 'SVGF.geometry';
 
-		// the resolve target keeps linear filtering so the result upsamples smoothly when the
+		this._historyRenderTarget.textures[ 0 ].name = 'SVGF.history';
+		this._historyRenderTarget.textures[ 1 ].name = 'SVGF.history.moments';
+		this._temporalRenderTarget.textures[ 0 ].name = 'SVGF.temporal';
+		this._temporalRenderTarget.textures[ 1 ].name = 'SVGF.temporal.moments';
+		this._atrousRenderTargets[ 0 ].textures[ 0 ].name = 'SVGF.atrous0';
+		this._atrousRenderTargets[ 0 ].textures[ 1 ].name = 'SVGF.atrous0.moments';
+		this._atrousRenderTargets[ 1 ].textures[ 0 ].name = 'SVGF.atrous1';
+		this._atrousRenderTargets[ 1 ].textures[ 1 ].name = 'SVGF.atrous1.moments';
+		this._resolveRenderTarget.textures[ 0 ].name = 'SVGF.resolve';
+		this._resolveRenderTarget.textures[ 1 ].name = 'SVGF.resolve.moments';
+
+		// the resolve output keeps linear filtering so the result upsamples smoothly when the
 		// effect runs at a lower resolution than the output
 
 		for ( const rt of [ this._historyRenderTarget, this._temporalRenderTarget, this._geometryRenderTarget, ...this._atrousRenderTargets ] ) {
 
-			rt.texture.minFilter = NearestFilter;
-			rt.texture.magFilter = NearestFilter;
+			for ( const tex of rt.textures ) {
+
+				tex.minFilter = NearestFilter;
+				tex.magFilter = NearestFilter;
+
+			}
 
 		}
 
@@ -303,15 +334,31 @@ class SVGFNode extends TempNode {
 		 * @private
 		 * @type {TextureNode}
 		 */
-		this._historyNode = texture( this._historyRenderTarget.texture );
+		this._historyNode = texture( this._historyRenderTarget.textures[ 0 ] );
 
 		/**
-		 * Texture node holding the current à-trous input (swapped per iteration).
+		 * Texture node holding the history luminance moments.
 		 *
 		 * @private
 		 * @type {TextureNode}
 		 */
-		this._atrousInputNode = texture( this._temporalRenderTarget.texture );
+		this._historyMomentsNode = texture( this._historyRenderTarget.textures[ 1 ] );
+
+		/**
+		 * Texture node holding the current à-trous color input (swapped per iteration).
+		 *
+		 * @private
+		 * @type {TextureNode}
+		 */
+		this._atrousInputNode = texture( this._temporalRenderTarget.textures[ 0 ] );
+
+		/**
+		 * Texture node holding the current à-trous variance input (swapped per iteration).
+		 *
+		 * @private
+		 * @type {TextureNode}
+		 */
+		this._atrousVarianceNode = texture( this._temporalRenderTarget.textures[ 1 ] );
 
 		/**
 		 * Texture node holding the packed geometry buffer ( view normal + linear view Z ).
@@ -327,7 +374,7 @@ class SVGFNode extends TempNode {
 		 * @private
 		 * @type {PassTextureNode}
 		 */
-		this._textureNode = passTexture( this, this._resolveRenderTarget.texture );
+		this._textureNode = passTexture( this, this._resolveRenderTarget.textures[ 0 ] );
 
 	}
 
@@ -371,6 +418,7 @@ class SVGFNode extends TempNode {
 		const { renderer } = frame;
 
 		this._cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
+		this._cameraNearFar.value.set( this.camera.near, this.camera.far );
 
 		// keep the effect in sync with the dimensions of the beauty texture
 
@@ -390,7 +438,7 @@ class SVGFNode extends TempNode {
 			// not fade in from black
 
 			renderer.initRenderTarget( this._historyRenderTarget );
-			renderer.copyTextureToTexture( beautyTexture, this._historyRenderTarget.texture );
+			renderer.copyTextureToTexture( beautyTexture, this._historyRenderTarget.textures[ 0 ] );
 
 		}
 
@@ -408,10 +456,14 @@ class SVGFNode extends TempNode {
 		_quadMesh.name = 'SVGF.temporal';
 		_quadMesh.render( renderer );
 
+		// the integrated moments become next frame's moments history
+
+		renderer.copyTextureToTexture( this._temporalRenderTarget.textures[ 1 ], this._historyRenderTarget.textures[ 1 ] );
+
 		// edge-avoiding à-trous, ping-pong between targets, last level into the resolve target
 
 		const iterations = this.atrousIterations;
-		let inputTexture = this._temporalRenderTarget.texture;
+		let inputTarget = this._temporalRenderTarget;
 
 		_quadMesh.material = this._atrousMaterial;
 		_quadMesh.name = 'SVGF.atrous';
@@ -421,7 +473,8 @@ class SVGFNode extends TempNode {
 			const target = ( i === iterations - 1 ) ? this._resolveRenderTarget : this._atrousRenderTargets[ i % 2 ];
 
 			this._stepSize.value = 1 << i; // 1, 2, 4, 8, 16, ...
-			this._atrousInputNode.value = inputTexture;
+			this._atrousInputNode.value = inputTarget.textures[ 0 ];
+			this._atrousVarianceNode.value = inputTarget.textures[ 1 ];
 
 			renderer.setRenderTarget( target );
 			_quadMesh.render( renderer );
@@ -430,11 +483,11 @@ class SVGFNode extends TempNode {
 
 			if ( i === 0 ) {
 
-				renderer.copyTextureToTexture( target.texture, this._historyRenderTarget.texture );
+				renderer.copyTextureToTexture( target.textures[ 0 ], this._historyRenderTarget.textures[ 0 ] );
 
 			}
 
-			inputTexture = target.texture;
+			inputTarget = target;
 
 		}
 
@@ -472,7 +525,14 @@ class SVGFNode extends TempNode {
 		const sampleDepth = ( uvNode ) => this.depthNode.sample( uvNode ).r;
 		const sampleNormal = ( uvNode ) => ( this.normalNode !== null ) ? this.normalNode.sample( uvNode ).rgb.normalize() : getNormalFromDepth( uvNode, this.depthNode.value, this._cameraProjectionMatrixInverse );
 
+		const sharedContext = builder.getSharedContext();
+
 		// --- temporal accumulation pass ---
+		// outputs the accumulated signal and the integrated luminance moments
+		// ( μ1, μ2 ) with the variance derived from them
+
+		const temporalColor = property( 'vec4' );
+		const temporalMoments = property( 'vec4' );
 
 		const temporal = Fn( () => {
 
@@ -482,7 +542,8 @@ class SVGFNode extends TempNode {
 			const current = this.beautyNode.sample( uvNode ).toVar();
 			const depth = sampleDepth( uvNode ).toVar();
 
-			const result = vec4( current ).toVar();
+			temporalColor.assign( current );
+			temporalMoments.assign( vec4( 0.0 ) );
 
 			If( depth.lessThan( 1.0 ), () => {
 
@@ -495,76 +556,90 @@ class SVGFNode extends TempNode {
 
 				// depth-based disocclusion test ( compare linear view-space Z )
 
-				const currentZ = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).z;
-				const previousZ = getViewPosition( historyUV, this._previousDepthNode.sample( historyUV ).r, this._cameraProjectionMatrixInverse ).z;
+				const { x: near, y: far } = this._cameraNearFar;
+				const currentZ = perspectiveDepthToViewZ( depth, near, far );
+				const previousZ = perspectiveDepthToViewZ( this._previousDepthNode.sample( historyUV ).r, near, far );
 				const validDepth = abs( currentZ.sub( previousZ ) ).lessThan( abs( currentZ ).mul( this.depthRejection ) );
 
 				const validHistory = inBounds.and( validDepth );
 
-				const history = this._historyNode.sample( historyUV );
+				const history = this._historyNode.sample( historyUV ).toVar();
+				const historyMoments = this._historyMomentsNode.sample( historyUV ).rg.toVar();
 
-				// A-SVGF-style adaptive temporal alpha. The temporal gradient measures how much the
-				// signal changed versus the reprojected ( denoised ) history. Because the input is
-				// noisy, the current luminance is averaged over a 3×3 neighborhood and a small noise
-				// floor is subtracted, so only real change ( motion, disocclusion, lighting ) raises
-				// alpha towards 1 and rejects stale history. A true A-SVGF gradient would instead
-				// re-shade forward-projected samples with the same random sequence.
+				// 3×3 spatial luminance moments of the incoming frame: used by the firefly clamp, as
+				// the change estimate for the temporal gradient and as variance fallback on disocclusion
 
-				const blurredLuma = float( 0 ).toVar();
+				const currentLuma = luminance( current.rgb ).toVar();
+
+				const blurredLuma = float( currentLuma ).toVar();
+				const blurredLuma2 = currentLuma.mul( currentLuma ).toVar();
 
 				for ( let y = - 1; y <= 1; y ++ ) {
 
 					for ( let x = - 1; x <= 1; x ++ ) {
 
-						blurredLuma.addAssign( luminance( this.beautyNode.sample( uvNode.add( vec2( x, y ).mul( this._invSize ) ) ).rgb ) );
+						if ( x === 0 && y === 0 ) continue; // the center tap is already in currentLuma
+
+						const tapLuma = luminance( this.beautyNode.sample( uvNode.add( vec2( x, y ).mul( this._invSize ) ) ).rgb );
+
+						blurredLuma.addAssign( tapLuma );
+						blurredLuma2.addAssign( tapLuma.mul( tapLuma ) );
 
 					}
 
 				}
 
 				blurredLuma.mulAssign( 1 / 9 );
+				blurredLuma2.mulAssign( 1 / 9 );
 
 				// suppress fireflies: clamp the sample against its neighborhood mean so isolated
 				// bright outliers cannot blink in and out of the accumulated result
 
-				const currentLuma = luminance( current.rgb ).toVar();
 				const maxLuma = blurredLuma.mul( this.fireflyFactor );
 
 				current.rgb.mulAssign( currentLuma.greaterThan( maxLuma ).select( maxLuma.div( currentLuma ), float( 1.0 ) ) );
 
+				// temporal gradient in units of the local standard deviation
+
+				const historyVariance = max( historyMoments.y.sub( historyMoments.x.mul( historyMoments.x ) ), 0.0 );
+				const deviation = sqrt( historyVariance.add( 1e-4 ) );
 				const historyLuma = luminance( history.rgb );
+				const gradient = abs( blurredLuma.sub( historyLuma ) ).div( deviation );
 
-				// the luminance floor in the denominator keeps the relative gradient from amplifying
-				// sub-noise changes in dark regions, where it would otherwise keep rejecting history
-				// and let the raw noise blink through
-
-				const gradient = abs( blurredLuma.sub( historyLuma ) ).div( max( blurredLuma, historyLuma ).add( 0.25 ) );
-
-				// the gradient compares a single jittered frame against the accumulated history, so it
-				// cannot distinguish sampling jitter from real lighting change. The deadzone must stay
-				// above the per-frame deviation the jitter produces, otherwise the accumulation tracks
-				// the jitter cycle instead of averaging it and the result never settles
-
-				const adaptiveAlpha = max( this.temporalAlpha, gradient.sub( 0.35 ).mul( this.antiGhosting ).clamp() );
+				const adaptiveAlpha = max( this.temporalAlpha, gradient.sub( _gradientDeadzone ).mul( this.antiGhosting ).clamp() );
 
 				const alpha = validHistory.select( adaptiveAlpha, float( 1.0 ) );
 
-				result.assign( mix( history, current, alpha ) );
+				temporalColor.assign( mix( history, current, alpha ) );
+
+				// the luminance moments are accumulated with the same reprojection; on disocclusion
+				// the spatial moments take over as an immediate estimate
+
+				const clampedLuma = min( currentLuma, maxLuma ); // the firefly clamp limits the luminance to maxLuma
+				const currentMoments = vec2( clampedLuma, clampedLuma.mul( clampedLuma ) );
+				const integratedMoments = validHistory.select( mix( historyMoments, currentMoments, _momentsAlpha ), vec2( blurredLuma, blurredLuma2 ) ).toVar();
+				const variance = max( integratedMoments.y.sub( integratedMoments.x.mul( integratedMoments.x ) ), 0.0 );
+
+				temporalMoments.assign( vec4( integratedMoments, variance, 0.0 ) );
 
 			} );
 
-			return result;
+			return vec4( 0 ); // temporary solution until TSL does not complain anymore
 
 		} );
+
+		this._temporalMaterial.colorNode = temporal().context( sharedContext );
+		this._temporalMaterial.outputNode = outputStruct( temporalColor, temporalMoments );
+		this._temporalMaterial.needsUpdate = true;
 
 		// --- geometry prepare pass ( view normal + linear view Z, packed once per frame ) ---
 
 		const prepare = Fn( () => {
 
 			const uvNode = uv();
-			const depth = this.depthNode.sample( uvNode ).r;
+			const depth = sampleDepth( uvNode );
 			const normal = sampleNormal( uvNode );
-			const viewZ = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).z;
+			const viewZ = perspectiveDepthToViewZ( depth, this._cameraNearFar.x, this._cameraNearFar.y );
 
 			// valid view Z is negative; store a positive sentinel for background so the filter skips it
 
@@ -572,27 +647,36 @@ class SVGFNode extends TempNode {
 
 		} );
 
-		// --- edge-avoiding à-trous pass ---
+		this._geometryMaterial.fragmentNode = prepare().context( sharedContext );
+		this._geometryMaterial.needsUpdate = true;
+
+		// --- variance-guided à-trous pass ---
+
+		const atrousColor = property( 'vec4' );
+		const atrousMoments = property( 'vec4' );
 
 		const atrous = Fn( () => {
 
 			const uvNode = uv();
 
 			const centerColor = this._atrousInputNode.sample( uvNode ).toVar();
+			const centerVariance = this._atrousVarianceNode.sample( uvNode ).b.toVar();
 			const centerGeometry = this._geometryNode.sample( uvNode ).toVar();
 			const centerZ = centerGeometry.w.toVar();
 
-			const result = vec4( centerColor ).toVar();
+			atrousColor.assign( centerColor );
+			atrousMoments.assign( vec4( 0.0, 0.0, centerVariance, 0.0 ) );
 
 			If( centerZ.lessThan( 0.0 ), () => { // valid geometry only
 
 				const centerNormal = centerGeometry.xyz.toVar();
 				const centerLuma = luminance( centerColor.rgb ).toVar();
 
-				const sum = vec4( centerColor ).toVar(); // center tap has weight 1
-				const totalWeight = float( 1.0 ).toVar();
-
 				const step = this._invSize.mul( this._stepSize );
+
+				// gather the neighborhood once; the taps drive both the variance prefilter and the filter itself
+
+				const taps = [];
 
 				for ( let y = - 1; y <= 1; y ++ ) {
 
@@ -600,43 +684,66 @@ class SVGFNode extends TempNode {
 
 						if ( x === 0 && y === 0 ) continue;
 
-						const kernelWeight = _kernel[ x + 1 ] * _kernel[ y + 1 ];
-
 						const sampleUV = uvNode.add( vec2( x, y ).mul( step ) ).toVar();
 
-						const sampleColor = this._atrousInputNode.sample( sampleUV );
-						const sampleGeometry = this._geometryNode.sample( sampleUV );
-
-						// edge-stopping weights ( normal, linear depth, luminance )
-
-						const normalWeight = pow( max( dot( centerNormal, sampleGeometry.xyz ), 0.0 ), this.normalPhi );
-						const depthWeight = max( float( 1.0 ).sub( abs( centerZ.sub( sampleGeometry.w ) ).div( this.depthPhi ) ), 0.0 );
-						const lumaWeight = max( float( 1.0 ).sub( abs( luminance( sampleColor.rgb ).sub( centerLuma ) ).div( this.lumaPhi ) ), 0.0 );
-
-						const weight = float( kernelWeight ).mul( normalWeight ).mul( depthWeight ).mul( lumaWeight );
-
-						sum.addAssign( sampleColor.mul( weight ) );
-						totalWeight.addAssign( weight );
+						taps.push( {
+							kernelWeight: _kernel[ x + 1 ] * _kernel[ y + 1 ],
+							color: this._atrousInputNode.sample( sampleUV ).toVar(),
+							geometry: this._geometryNode.sample( sampleUV ).toVar(),
+							variance: this._atrousVarianceNode.sample( sampleUV ).b.toVar()
+						} );
 
 					}
 
 				}
 
-				result.assign( sum.div( totalWeight ) );
+				// the variance estimate is itself noisy: a kernel-prefiltered variance stabilizes the
+				// luminance edge-stop
+
+				const prefilteredVariance = centerVariance.mul( _kernel[ 1 ] * _kernel[ 1 ] ).toVar();
+
+				for ( const tap of taps ) {
+
+					prefilteredVariance.addAssign( tap.variance.mul( tap.kernelWeight ) );
+
+				}
+
+				// luminance differences are weighted in units of the local deviation: noisy regions
+				// get smoothed aggressively while converged regions keep their edges
+
+				const lumaScale = sqrt( prefilteredVariance ).mul( this.lumaPhi ).add( 1e-3 ).toVar();
+
+				const sum = centerColor.toVar(); // center tap has weight 1
+				const totalWeight = float( 1.0 ).toVar();
+				const varianceSum = centerVariance.toVar();
+
+				for ( const tap of taps ) {
+
+					// edge-stopping weights ( normal, linear depth, luminance )
+
+					const normalWeight = pow( max( dot( centerNormal, tap.geometry.xyz ), 0.0 ), this.normalPhi );
+					const depthWeight = max( float( 1.0 ).sub( abs( centerZ.sub( tap.geometry.w ) ).div( this.depthPhi ) ), 0.0 );
+					const lumaWeight = max( float( 1.0 ).sub( abs( luminance( tap.color.rgb ).sub( centerLuma ) ).div( lumaScale ) ), 0.0 );
+
+					const weight = float( tap.kernelWeight ).mul( normalWeight ).mul( depthWeight ).mul( lumaWeight ).toVar();
+
+					sum.addAssign( tap.color.mul( weight ) );
+					totalWeight.addAssign( weight );
+					varianceSum.addAssign( tap.variance.mul( weight.mul( weight ) ) );
+
+				}
+
+				atrousColor.assign( sum.div( totalWeight ) );
+				atrousMoments.assign( vec4( 0.0, 0.0, varianceSum.div( totalWeight.mul( totalWeight ) ), 0.0 ) );
 
 			} );
 
-			return result;
+			return vec4( 0 ); // temporary solution until TSL does not complain anymore
 
 		} );
 
-		this._geometryMaterial.fragmentNode = prepare().context( builder.getSharedContext() );
-		this._geometryMaterial.needsUpdate = true;
-
-		this._temporalMaterial.fragmentNode = temporal().context( builder.getSharedContext() );
-		this._temporalMaterial.needsUpdate = true;
-
-		this._atrousMaterial.fragmentNode = atrous().context( builder.getSharedContext() );
+		this._atrousMaterial.colorNode = atrous().context( sharedContext );
+		this._atrousMaterial.outputNode = outputStruct( atrousColor, atrousMoments );
 		this._atrousMaterial.needsUpdate = true;
 
 		return this._textureNode;

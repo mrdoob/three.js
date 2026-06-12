@@ -1,4 +1,4 @@
-import { DataTexture, RedFormat, RGFormat, RGBAFormat, UnsignedByteType, RepeatWrapping, TempNode } from 'three/webgpu';
+import { DataTexture, MathUtils, RedFormat, RGFormat, RGBAFormat, UnsignedByteType, RepeatWrapping, TempNode } from 'three/webgpu';
 import { texture, screenCoordinate, uniform, fract, float, vec2, vec4 } from 'three/tsl';
 
 /**
@@ -63,7 +63,7 @@ class BlueNoiseGenerator {
 		this.majorityPointsRatio = 0.1;
 
 		/**
-		 * Seed for the internal LCG, for reproducible output.
+		 * Seed of the random initial pattern, for reproducible output.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -105,14 +105,8 @@ class BlueNoiseGenerator {
 		const binaryPattern = new Uint8Array( total );
 		const energy = new Float32Array( total );
 
-		// Linear-congruential PRNG, seeded for reproducibility.
-		let rngState = ( this.seed | 0 ) || 1;
-		const random = () => {
-
-			rngState = ( Math.imul( rngState, 1664525 ) + 1013904223 ) | 0;
-			return ( rngState >>> 0 ) / 0x100000000;
-
-		};
+		MathUtils.seededRandom( this.seed );
+		const random = () => MathUtils.seededRandom();
 
 		// Place `targetOnes` 1s at random positions via Fisher–Yates.
 		const targetOnes = Math.max( 1, Math.floor( total * this.majorityPointsRatio ) );
@@ -447,4 +441,4 @@ export default BlueNoiseNode;
  */
 export const blueNoise = ( channels, size ) => new BlueNoiseNode( channels, size );
 
-export { BlueNoiseGenerator, BlueNoiseNode };
+export { BlueNoiseGenerator };
