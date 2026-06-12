@@ -59,7 +59,7 @@
 			let cameraPos, projScreenMatrixUniform, frustumPlanesUniform, cotHalfFovUniform;
 
 			let screenTriAttr, screenTriAtomic, screenTriRead;
-			let screenInstAttr, screenInstBuffer, screenInstRead;
+			let screenInstAttr, screenInstAtomic, screenInstRead;
 			let maxPixels;
 
 			const rows = 400;
@@ -72,7 +72,10 @@
 			// Buffer visibility packaging configuration
 			const TRIANGLE_INDEX_BITS = 14; 			// Bits allocated for triangle index (2^14 = 16384 max triangles)
 			const TRIANGLE_INDEX_MASK = 0x3FFF; 		// Bitmask to extract triangle index (14 bits)
-			const DEPTH_PRECISION_MAX = 4294967295.0; 	// Maximum value of the 32-bit depth (2^32 - 1)
+			const INSTANCE_INDEX_BITS = 18; 			// Bits allocated for instance id (2^18 = 262144 max instances)
+			const INSTANCE_INDEX_MASK = 0x3FFFF; 		// Bitmask to extract instance id (18 bits)
+			const DEPTH_TRI_MAX = 262143.0; 			// Maximum 18-bit depth packed above the triangle index
+			const DEPTH_INST_MAX = 16383.0; 			// Maximum 14-bit depth packed above the instance id
 
 			const background = new THREE.Color( .1, .1, .1 );
 
@@ -298,10 +301,11 @@
 
 				parameterGroup.add( timeScale, 'value', 0.0, 1.0 ).name( 'Animation Speed' );
 
-				// Visibility buffers
-				// screenTri: 32-bit depth — the closest fragment wins via atomicMax
-				// screenInst: payload — instId (18 high bits) | megaTriangleIndex (14 low bits),
-				// written by the depth test winner (best effort; not atomic with the depth update)
+				// Packed visibility buffers — depth in the high bits, payload in the low bits,
+				// so a single atomicMax resolves the depth test and the payload write together
+				// and the winner is order-independent (no frame-to-frame flicker).
+				// screenTri: depth(18) | megaTriangleIndex(14)
+				// screenInst: depth(14) | instId(18)
 				createScreenBuffers();
 
 				const staticInstanceData = new Float32Array( instanceCount * 4 );
@@ -374,7 +378,7 @@
 				computeClear = Fn( () => {
 
 					atomicStore( screenTriAtomic.element( instanceIndex ), uint( 0 ) );
-					screenInstBuffer.element( instanceIndex ).assign( uint( 0 ) );
+					atomicStore( screenInstAtomic.element( instanceIndex ), uint( 0 ) );
 
 					If( instanceIndex.equal( 0 ), () => {
 
@@ -683,24 +687,24 @@
 
 														If( z.greaterThanEqual( 0.0 ).and( z.lessThanEqual( 1.0 ) ), () => {
 
-															// Calculate 32-bit depth value (fourth-root distribution to maximize depth precision)
-															const depth32 = uint( sqrt( sqrt( float( 1.0 ).sub( z ) ) ).mul( DEPTH_PRECISION_MAX ) );
+															// Depth (fourth-root distribution) packed above each payload's bits
+															const zEncoded = sqrt( sqrt( float( 1.0 ).sub( z ) ) );
+															const depthTri = uint( zEncoded.mul( DEPTH_TRI_MAX ) );
+															const depthInst = uint( zEncoded.mul( DEPTH_INST_MAX ) );
+
+															const packedTri = depthTri.shiftLeft( TRIANGLE_INDEX_BITS ).bitOr( megaTriangleIndex.bitAnd( TRIANGLE_INDEX_MASK ) );
+															const packedInst = depthInst.shiftLeft( INSTANCE_INDEX_BITS ).bitOr( instId );
 
 															const pixelIndex = uint( y ).mul( uint( screenSize.x ) ).add( uint( x ) );
 
-															// Early depth pre-check: skip atomicMax if pixel already has closer fragment
-															const currentDepth = atomicLoad( screenTriAtomic.element( pixelIndex ) );
-															If( depth32.greaterThan( currentDepth ), () => {
+															// Early depth pre-check: skip the atomics if the pixel already has a closer fragment
+															const currentDepth = atomicLoad( screenTriAtomic.element( pixelIndex ) ).shiftRight( TRIANGLE_INDEX_BITS );
+															If( depthTri.greaterThanEqual( currentDepth ), () => {
 
-																// Atomic depth test
-																const prevDepth = atomicMax( screenTriAtomic.element( pixelIndex ), depth32 );
-
-																// If we successfully wrote the closest depth, write the payload
-																If( depth32.greaterThan( prevDepth ), () => {
-
-																	screenInstBuffer.element( pixelIndex ).assign( payload32 );
-
-																} );
+																// Depth occupies the high bits, so atomicMax resolves the depth
+																// test and the payload write in one order-independent step
+																atomicMax( screenTriAtomic.element( pixelIndex ), packedTri );
+																atomicMax( screenInstAtomic.element( pixelIndex ), packedInst );
 
 															} );
 
@@ -875,11 +879,11 @@
 
 					const pixelIndex = getPixelIndex();
 
-					// Read 32-bit depth from buffer
-					const depth32 = screenTriRead.element( pixelIndex );
+					// Depth lives in the high 18 bits of the packed value
+					const depthTri = screenTriRead.element( pixelIndex ).shiftRight( TRIANGLE_INDEX_BITS );
 
-					// Reconstruct NDC Z from non-linear depth32 (fourth-root distribution)
-					const y = float( depth32 ).div( DEPTH_PRECISION_MAX );
+					// Reconstruct NDC Z from non-linear depth (fourth-root distribution)
+					const y = float( depthTri ).div( DEPTH_TRI_MAX );
 					const y2 = y.mul( y );
 					const v = y2.mul( y2 ); // raise to the fourth power (y^4) to get original v
 					return float( 1.0 ).sub( v );
@@ -890,18 +894,17 @@
 
 					const pixelIndex = getPixelIndex();
 
-					// Single buffer read — check for background immediately (using 32-bit depth)
-					const depth32 = screenTriRead.element( pixelIndex );
+					// Check for background immediately (depth in the high bits)
+					const packedTri = screenTriRead.element( pixelIndex );
 
 					// Background color for pixels with no geometry
 					const outColor = vec4( background, 1.0 ).toVar();
 
-					If( depth32.greaterThan( 0 ), () => {
+					If( packedTri.shiftRight( TRIANGLE_INDEX_BITS ).greaterThan( 0 ), () => {
 
-						// Read the single packed payload
-						const payload32 = screenInstRead.element( pixelIndex );
-						const megaTriangleIndex = payload32.bitAnd( TRIANGLE_INDEX_MASK );
-						const instId = payload32.shiftRight( TRIANGLE_INDEX_BITS );
+						// Unpack the two payloads from their depth-packed buffers
+						const megaTriangleIndex = packedTri.bitAnd( TRIANGLE_INDEX_MASK );
+						const instId = screenInstRead.element( pixelIndex ).bitAnd( INSTANCE_INDEX_MASK );
 
 						// Visibility Buffer: Fetch exact vertices and UVs
 						const i0 = indexBuffer.element( megaTriangleIndex.mul( 3 ).add( 0 ) );
@@ -1031,7 +1034,7 @@
 					screenTriAtomic = storage( screenTriAttr, 'uint', maxPixels ).toAtomic();
 					screenTriRead = storage( screenTriAttr, 'uint', maxPixels ).toReadOnly();
 
-					screenInstBuffer = storage( screenInstAttr, 'uint', maxPixels );
+					screenInstAtomic = storage( screenInstAttr, 'uint', maxPixels ).toAtomic();
 					screenInstRead = storage( screenInstAttr, 'uint', maxPixels ).toReadOnly();
 
 				} else {
@@ -1042,8 +1045,8 @@
 					screenTriRead.value = screenTriAttr;
 					screenTriRead.bufferCount = maxPixels;
 
-					screenInstBuffer.value = screenInstAttr;
-					screenInstBuffer.bufferCount = maxPixels;
+					screenInstAtomic.value = screenInstAttr;
+					screenInstAtomic.bufferCount = maxPixels;
 
 					screenInstRead.value = screenInstAttr;
 					screenInstRead.bufferCount = maxPixels;
