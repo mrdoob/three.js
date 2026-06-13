@@ -1578,6 +1578,7 @@ class WebGPUBackend extends Backend {
 
 		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( _commandEncoderDescriptor );
 		groupGPU.passEncoderGPU = groupGPU.cmdEncoderGPU.beginComputePass( _computePassDescriptor );
+		groupGPU.currentPipeline = null;
 
 		_commandEncoderDescriptor.reset();
 		_computePassDescriptor.reset();
@@ -1599,13 +1600,19 @@ class WebGPUBackend extends Backend {
 	compute( computeGroup, computeNode, bindings, pipeline, dispatchSize = null ) {
 
 		const computeNodeData = this.get( computeNode );
-		const { passEncoderGPU } = this.get( computeGroup );
+		const groupGPU = this.get( computeGroup );
+		const { passEncoderGPU } = groupGPU;
 
 		// pipeline
 
 		const pipelineGPU = this.get( pipeline ).pipeline;
 
-		this.pipelineUtils.setPipeline( passEncoderGPU, pipelineGPU );
+		if ( groupGPU.currentPipeline !== pipelineGPU ) {
+
+			passEncoderGPU.setPipeline( pipelineGPU );
+			groupGPU.currentPipeline = pipelineGPU;
+
+		}
 
 		// bind groups
 
@@ -1727,16 +1734,25 @@ class WebGPUBackend extends Backend {
 		const hasIndex = ( index !== null );
 
 		// pipeline
-		this.pipelineUtils.setPipeline( passEncoderGPU, pipelineGPU );
-		currentSets.pipeline = pipelineGPU;
+
+		if ( currentSets.pipeline !== pipelineGPU ) {
+
+			passEncoderGPU.setPipeline( pipelineGPU );
+			currentSets.pipeline = pipelineGPU;
+
+		}
 
 		// bind groups
+
 		const currentBindingGroups = currentSets.bindingGroups;
+
 		for ( let i = 0, l = bindings.length; i < l; i ++ ) {
 
 			const bindGroup = bindings[ i ];
-			const bindingsData = this.get( bindGroup );
+
 			if ( currentBindingGroups[ i ] !== bindGroup.id ) {
+
+				const bindingsData = this.get( bindGroup );
 
 				passEncoderGPU.setBindGroup( i, bindingsData.group );
 				currentBindingGroups[ i ] = bindGroup.id;
