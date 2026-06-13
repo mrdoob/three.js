@@ -193,8 +193,8 @@
 					{ ratio: 0.55, error: 0.004, weights: [ 0.2, 0.2, 0.2, 0.35, 0.35 ], flags: [ 'RegularizeLight' ] },
 					{ ratio: 0.25, error: 0.015, weights: [ 0.12, 0.12, 0.12, 0.2, 0.2 ], flags: [ 'RegularizeLight' ] },
 					{ ratio: 0.1, error: 0.05, weights: [ 0.08, 0.08, 0.08, 0.12, 0.12 ], flags: [ 'RegularizeLight' ] },
-					{ ratio: 0.04, error: 0.14, weights: [ 0.04, 0.04, 0.04, 0.06, 0.06 ], flags: [ 'Regularize' ] },
-					{ ratio: 0.015, error: 0.3, weights: [ 0.02, 0.02, 0.02, 0.03, 0.03 ], flags: [ 'Regularize' ] }
+					{ ratio: 0.04, error: 0.14, weights: [ 0.04, 0.04, 0.04, 0.06, 0.06 ], flags: [ 'Regularize', 'Permissive' ] },
+					{ ratio: 0.015, error: 0.3, weights: [ 0.02, 0.02, 0.02, 0.03, 0.03 ], flags: [ 'Regularize', 'Permissive' ] }
 				];
 
 				const geom = sourceMesh.geometry;
@@ -404,7 +404,8 @@
 
 				const timeScale = uniform( 1.0 );
 
-				const occlusionBiasUniform = uniform( 0.0000 );
+				const occlusionBiasUniform = uniform( 0.0008 );
+				const lodThresholdUniform = uniform( 3.0 );
 
 				const parameterGroup = renderer.inspector.createParameters( 'Parameters' );
 
@@ -423,6 +424,8 @@
 				parameterGroup.add( options, 'Rasterizer', { 'SW Only': 'SW Only', 'HW Only': 'HW Only', 'Both': 'Both' } );
 
 				parameterGroup.add( occlusionBiasUniform, 'value', 0.0, 0.0008 ).name( 'Occlusion Bias' ).step( 0.000001 );
+
+				parameterGroup.add( lodThresholdUniform, 'value', 1, 15.0 ).name( 'LOD Threshold' ).step( 0.1 );
 
 				parameterGroup.add( timeScale, 'value', 0.0, 1.0 ).name( 'Animation Speed' );
 
@@ -457,6 +460,7 @@
 
 						}
 
+						//camera.position.set( 0, 800, 3000 );
 						camera.position.set( 0, 8, 30 );
 						controls.target.set( 0, - 1, 0 );
 
@@ -746,8 +750,7 @@
 						let lodSelection = null;
 						for ( let i = lods.length - 1; i > 0; i -- ) {
 
-							const pixelErrorThreshold = 1.0;
-							const checkLod = float( lods[ i ].error ).mul( scale ).mul( pixelFactor ).lessThanEqual( pixelErrorThreshold );
+							const checkLod = float( lods[ i ].error ).mul( scale ).mul( pixelFactor ).lessThanEqual( lodThresholdUniform );
 
 							if ( lodSelection === null ) {
 
