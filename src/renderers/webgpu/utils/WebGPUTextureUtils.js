@@ -650,6 +650,8 @@ class WebGPUTextureUtils {
 
 			if ( device.queue.copyElementImageToTexture.length === 2 ) {
 
+				// Chrome 150+
+
 				device.queue.copyElementImageToTexture(
 					{ source: image },
 					{
@@ -660,6 +662,8 @@ class WebGPUTextureUtils {
 				);
 
 			} else {
+
+				// Chrome 138 - 149
 
 				device.queue.copyElementImageToTexture(
 					image, width, height,

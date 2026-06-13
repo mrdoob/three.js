@@ -1297,9 +1297,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					if ( _gl.texElementImage2D.length === 3 ) {
 
+						// Chrome 150+
+
 						_gl.texElementImage2D( _gl.TEXTURE_2D, _gl.RGBA8, image );
 
 					} else {
+
+						// Chrome 138 - 149
 
 						const level = 0;
 						const internalFormat = _gl.RGBA;
