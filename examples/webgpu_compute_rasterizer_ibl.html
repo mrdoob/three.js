@@ -423,19 +423,6 @@
 
 				parameterGroup.add( options, 'Rasterizer', { 'SW Only': 'SW Only', 'HW Only': 'HW Only', 'Both': 'Both' } );
 
-				parameterGroup.add( occlusionBiasUniform, 'value', 0.0, 0.0008 ).name( 'Occlusion Bias' ).step( 0.000001 );
-
-				parameterGroup.add( lodThresholdUniform, 'value', 1, 15.0 ).name( 'LOD Threshold' ).step( 0.1 );
-
-				parameterGroup.add( timeScale, 'value', 0.0, 1.0 ).name( 'Animation Speed' );
-
-				// Packed visibility buffers — depth in the high bits, payload in the low bits,
-				// so a single atomicMax resolves the depth test and the payload write together
-				// and the winner is order-independent (no frame-to-frame flicker).
-				// screenTri: depth(17) | megaTriangleIndex(15)
-				// screenInst: depth(15) | instId(17)
-				createScreenBuffers();
-
 				const staticInstanceData = new Float32Array( instanceCount * 4 );
 				const instanceDataAttr = new THREE.StorageBufferAttribute( staticInstanceData, 4 );
 				const instanceDataBuffer = storage( instanceDataAttr, 'vec4', instanceCount );
@@ -495,6 +482,19 @@
 				updateGrid();
 
 				parameterGroup.add( options, 'Grid', { 'XZ': 'XZ', 'XYZ': 'XYZ' } ).addEventListener( 'change', updateGrid );
+
+				parameterGroup.add( occlusionBiasUniform, 'value', 0.0, 0.0008 ).name( 'Occlusion Bias' ).step( 0.000001 );
+
+				parameterGroup.add( lodThresholdUniform, 'value', 1, 15.0 ).name( 'LOD Threshold' ).step( 0.1 );
+
+				parameterGroup.add( timeScale, 'value', 0.0, 1.0 ).name( 'Animation Speed' );
+
+				// Packed visibility buffers — depth in the high bits, payload in the low bits,
+				// so a single atomicMax resolves the depth test and the payload write together
+				// and the winner is order-independent (no frame-to-frame flicker).
+				// screenTri: depth(17) | megaTriangleIndex(15)
+				// screenInst: depth(15) | instId(17)
+				createScreenBuffers();
 
 				const instanceWorldData = new Float32Array( instanceCount * 16 );
 				const instanceMvpData = new Float32Array( instanceCount * 16 );
