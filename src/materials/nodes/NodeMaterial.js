@@ -1157,6 +1157,26 @@ class NodeMaterial extends Material {
 	/**
 	 * Setups the output node.
 	 *
+	 * This method can be implemented by derived materials to extend the functionality
+	 * of the material's output or replace it altogether.
+	 *
+	 * ```js
+	 * class ColoredShadowMaterial extends MeshPhongNodeMaterial {
+	 *   constructor( parameters ) {
+	 *     super( parameters );
+	 *     this._shadeColor = uniform( new Color( parameters.shadeColor ?? 0xff0000 ) );
+	 *   }
+	 *
+	 *   setupOutput( builder, outputNode ) {
+	 *	   // Modify the native output of the MeshPhongNodeMaterial fragment shader
+	 *     const brightness = min( outputNode.r, 1.0 );
+	 *     const mixedColor = mix( this._shadeColor, diffuseColor.rgb, brightness );
+	 *	   // Return new output back into NodeMaterial flow
+	 *     return super.setupOutput( builder, vec4( mixedColor, outputNode.a ) );
+	 *   }
+	 * }
+	 * ```
+	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {Node<vec4>} outputNode - The existing output node.
 	 * @return {Node<vec4>} The output node.
