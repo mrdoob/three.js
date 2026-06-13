@@ -327,7 +327,7 @@
 		"webgpu_compute_particles_snow",
 		"webgpu_compute_points",
 		"webgpu_compute_rasterizer",
-		"webgpu_compute_rasterizer_lighting",
+		"webgpu_compute_rasterizer_ibl",
 		"webgpu_compute_reduce",
 		"webgpu_compute_sort_bitonic",
 		"webgpu_compute_texture",
