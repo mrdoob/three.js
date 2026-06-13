@@ -220,6 +220,9 @@
 
 				scenePass = pass( scene, camera );
 				clusterInfluence = uniform( 0 );
+
+				// the large far plane spreads the exponential z-slices out, so the orb
+				// field falls around slices 7–11; default into that range
 				debugZSliceNode = uniform( 10, 'int' );
 
 				renderPipeline = new THREE.RenderPipeline( renderer );
