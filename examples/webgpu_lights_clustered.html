@@ -38,7 +38,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { instancedBufferAttribute } from 'three/tsl';
+			import { instancedBufferAttribute, pass, uniform, vec3, float, mix, step } from 'three/tsl';
 
 			import { ClusteredLighting } from 'three/addons/lighting/ClusteredLighting.js';
 
@@ -56,7 +56,8 @@
 			const BIG_RADIUS = 6;
 			const BASE_POWER = 45;
 
-			let camera, scene, renderer, controls, spheresMesh;
+			let camera, scene, renderer, controls, spheresMesh, lighting;
+			let renderPipeline, scenePass, clusterInfluence, debugZSliceNode;
 
 			const balls = [];
 			const dummy = new THREE.Object3D();
@@ -89,7 +90,8 @@
 				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.NeutralToneMapping;
 				renderer.toneMappingExposure = 1;
-				renderer.lighting = new ClusteredLighting(); // set lighting system
+				lighting = new ClusteredLighting();
+				renderer.lighting = lighting; // set lighting system
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
@@ -213,6 +215,17 @@
 				controls.maxDistance = 400;
 				controls.update();
 
+				// post-processing: a debug overlay that tints each screen tile by how many
+				// lights its cluster holds, for the selected depth slice
+
+				scenePass = pass( scene, camera );
+				clusterInfluence = uniform( 0 );
+				debugZSliceNode = uniform( 10, 'int' );
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				updatePostProcessing();
+
 				// gui
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
@@ -222,6 +235,8 @@
 
 				} );
 				gui.add( params, 'animate' );
+				gui.add( clusterInfluence, 'value', 0, .7 ).name( 'lights per tile' );
+				gui.add( debugZSliceNode, 'value', 0, lighting.zSlices - 1, 1 ).name( 'z-slice' );
 
 				// events
 
@@ -235,6 +250,31 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				updatePostProcessing();
+
+			}
+
+			function updatePostProcessing() {
+
+				// the overlay samples the cluster grid at the current resolution, so it
+				// is rebuilt whenever the renderer size changes
+
+				const lightingNode = lighting.getNode( scene ).setSize( window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio );
+
+				// map the light count of each cluster ( 0 … maxLightsPerCluster ) to a
+				// blue → green → red gradient
+				const lightCount = lightingNode.getClusterLightCount( debugZSliceNode );
+				const heatmap = float( lightCount ).div( float( lighting.maxLightsPerCluster ) );
+
+				let heatColor = mix( vec3( 0.0, 0.0, 1.0 ), vec3( 0.0, 1.0, 0.0 ), heatmap.mul( 2.0 ).saturate() );
+				heatColor = mix( heatColor, vec3( 1.0, 0.0, 0.0 ), heatmap.sub( 0.5 ).mul( 2.0 ).saturate() );
+
+				// blend the heatmap over the scene by the slider amount; step() keeps
+				// empty clusters transparent
+				const finalInfluence = clusterInfluence.mul( step( 0.0001, heatmap ) );
+				renderPipeline.outputNode = mix( scenePass, heatColor, finalInfluence );
+				renderPipeline.needsUpdate = true;
 
 			}
 
@@ -263,7 +303,7 @@
 
 				controls.update();
 
-				renderer.render( scene, camera );
+				renderPipeline.render();
 
 			}
 
