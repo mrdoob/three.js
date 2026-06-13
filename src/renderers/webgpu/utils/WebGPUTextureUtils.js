@@ -148,13 +148,14 @@ class WebGPUTextureUtils {
 	/**
 	 * Creates a GPU sampler for the given texture.
 	 *
-	 * @param {Texture} texture - The texture to create the sampler for.
-	 * @param {TextureNode} textureNode - The texture node to update the sampler with.
+	 * @param {Sampler} binding - The sampler binding to update.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler( texture, textureNode ) {
+	updateSampler( binding ) {
 
 		const backend = this.backend;
+		const texture = binding.texture;
+		const textureNode = binding.textureNode;
 
 		const samplerKey = texture.minFilter + '-' + texture.magFilter + '-' +
 			texture.wrapS + '-' + texture.wrapT + '-' + ( texture.wrapR || '0' ) + '-' +
@@ -205,20 +206,20 @@ class WebGPUTextureUtils {
 
 		}
 
-		const textureData = backend.get( texture );
+		const bindingData = backend.get( binding );
 
-		if ( textureData.sampler !== samplerData.sampler ) {
+		if ( bindingData.sampler !== samplerData.sampler ) {
 
 			// check if previous sampler is unused so it can be deleted
 
-			if ( textureData.sampler !== undefined ) {
+			if ( bindingData.sampler !== undefined ) {
 
-				const oldSamplerData = this._samplerCache.get( textureData.samplerKey );
+				const oldSamplerData = this._samplerCache.get( bindingData.samplerKey );
 				oldSamplerData.usedTimes --;
 
 				if ( oldSamplerData.usedTimes === 0 ) {
 
-					this._samplerCache.delete( textureData.samplerKey );
+					this._samplerCache.delete( bindingData.samplerKey );
 
 				}
 
@@ -226,8 +227,8 @@ class WebGPUTextureUtils {
 
 			// update to new sampler data
 
-			textureData.samplerKey = samplerKey;
-			textureData.sampler = samplerData.sampler;
+			bindingData.samplerKey = samplerKey;
+			bindingData.sampler = samplerData.sampler;
 
 			samplerData.usedTimes ++;
 
