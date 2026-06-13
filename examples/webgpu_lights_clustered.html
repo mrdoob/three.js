@@ -38,29 +38,33 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, uniform, vec3, float, mix, step, uv, instancedBufferAttribute } from 'three/tsl';
+			import { instancedBufferAttribute } from 'three/tsl';
 
 			import { ClusteredLighting } from 'three/addons/lighting/ClusteredLighting.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
-			const MODEL_INDEX_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/model-index.json';
-			const SAMPLE_ASSETS_BASE_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/';
+			const GRID = 30; // GRID x GRID spheres
+			const SPACING = 5;
+			const RADIUS = 0.5;
+			const WAVE_HEIGHT = 4;
+			const BIG_RADIUS = 6;
+			const BASE_POWER = 45;
 
-			let camera, scene, renderer,
-				lights, lightDummy,
-				lightPositionAttribute,
-				controls,
-				scenePass, clusterInfluence, debugZSliceNode,
-				lighting,
-				maxCount,
-				count,
-				renderPipeline;
+			let camera, scene, renderer, controls, spheresMesh;
+
+			const balls = [];
+			const dummy = new THREE.Object3D();
+
+			const params = {
+				intensity: 1,
+				animate: true
+			};
 
 			init();
 
@@ -74,224 +78,154 @@
 
 				}
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 70 );
-				camera.position.set( - 10, 5, 0 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera.position.set( 36, 18, 36 );
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x111111, 30, 80 );
-				scene.background = new THREE.Color( 0x111111 );
-
-				maxCount = 1000;
-				count = 700;
-
-				// sponza
-
-				const loader = new GLTFLoader();
-				const modelURL = await getSponzaModelURL();
-				const gltf = await loader.loadAsync( modelURL );
-				const model = gltf.scene;
-
-				model.traverse( ( child ) => {
-
-					if ( child.isLight && child.parent ) child.parent.remove( child );
-
-				} );
-
-				scene.add( model );
-
-				const box = new THREE.Box3().setFromObject( model );
-				const modelSize = box.getSize( new THREE.Vector3() );
-				const modelCenter = box.getCenter( new THREE.Vector3() );
-
-				const lightPositions = new Float32Array( maxCount * 3 );
-				const lightColors = new Float32Array( maxCount * 3 );
-
-				lightPositionAttribute = new THREE.InstancedBufferAttribute( lightPositions, 3 );
-				lightPositionAttribute.setUsage( THREE.DynamicDrawUsage );
-
-				const lightColorAttribute = new THREE.InstancedBufferAttribute( lightColors, 3 );
-
-				// Physical 1/r² point-source falloff (Plummer profile): I = peak * r0² / ( r² + r0² )
-				// Subtract the value at r = 0.5 so the soft tail reaches exactly 0 at the sprite edge.
-				const coreRadius = 0.02;
-				const peak = 16;
-				const r0sq = coreRadius * coreRadius;
-				const edgeBias = r0sq / ( 0.25 + r0sq );
-
-				const offset = uv().sub( 0.5 );
-				const r2 = offset.dot( offset );
-				const glow = float( r0sq ).div( r2.add( r0sq ) ).sub( edgeBias ).max( 0 ).mul( peak );
-
-				const spriteMaterial = new THREE.SpriteNodeMaterial( {
-					transparent: true,
-					depthWrite: false,
-					blending: THREE.AdditiveBlending
-				} );
-				spriteMaterial.positionNode = instancedBufferAttribute( lightPositionAttribute );
-				spriteMaterial.colorNode = glow.mul( instancedBufferAttribute( lightColorAttribute ) );
-				spriteMaterial.scaleNode = uniform( 0.2 );
-
-				lightDummy = new THREE.Sprite( spriteMaterial );
-				lightDummy.count = count;
-				lightDummy.frustumCulled = false;
-				scene.add( lightDummy );
-
-				// lights
-
-				lights = new THREE.Group();
-				scene.add( lights );
-
-				const addLight = ( hexColor, power = 10, distance = 1 ) => {
-
-					const light = new THREE.PointLight( hexColor, 1, distance );
-					light.position.set(
-						modelCenter.x + ( Math.random() - 0.5 ) * modelSize.x * 0.7,
-						( box.min.y + Math.random() * modelSize.y * 0.7 ) + 0.4,
-						modelCenter.z + ( Math.random() - 0.5 ) * modelSize.z * 0.5
-					);
-
-					light.power = power;
-					light.userData.fixedPosition = light.position.clone();
-					light.visible = ( lights.children.length < count );
-
-					const i = lights.children.length;
-					lightPositions[ i * 3 + 0 ] = light.position.x;
-					lightPositions[ i * 3 + 1 ] = light.position.y;
-					lightPositions[ i * 3 + 2 ] = light.position.z;
-
-					lights.add( light );
-
-					return light;
-
-				};
-
-				const color = new THREE.Color();
-
-				for ( let i = 0; i < maxCount; i ++ ) {
-
-					const hex = ( Math.random() * 0x888888 ) + 0x888888;
-
-					color.setHex( hex );
-					lightColors[ i * 3 + 0 ] = color.r;
-					lightColors[ i * 3 + 1 ] = color.g;
-					lightColors[ i * 3 + 2 ] = color.b;
-
-					addLight( hex );
-
-				}
-
-				//
-
-				const lightAmbient = new THREE.AmbientLight( 0xffffff, .1 );
-				scene.add( lightAmbient );
-
-				// renderer
-
-				lighting = new ClusteredLighting(); // ( maxLights = 1024, tileSize = 32, zSlices = 24, maxLightsPerCluster = 64 )
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.lighting = lighting; // set lighting system
 				renderer.toneMapping = THREE.NeutralToneMapping;
-				renderer.toneMappingExposure = 1.5;
+				renderer.toneMappingExposure = 1;
+				renderer.lighting = new ClusteredLighting(); // set lighting system
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				// a physical sky drives the backdrop and the image-based lighting; the
+				// sun sits just below the horizon for an almost-night mood
+
+				const sky = new SkyMesh();
+				sky.scale.setScalar( 10000 );
+				sky.turbidity.value = 10;
+				sky.rayleigh.value = 3;
+				sky.mieCoefficient.value = 0.005;
+				sky.mieDirectionalG.value = 0.7;
+
+				const sun = new THREE.Vector3().setFromSphericalCoords(
+					1,
+					THREE.MathUtils.degToRad( 92 ), // elevation: 2° below the horizon (almost night)
+					THREE.MathUtils.degToRad( 225 ) // azimuth
+				);
+				sky.sunPosition.value.copy( sun );
+
+				scene.add( sky );
+
+				// the sun sits below the horizon, so keep its disc hidden; bake the sky
+				// into an environment map for the faint ambient colour it still casts
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				sky.showSunDisc.value = false;
+				scene.environment = pmremGenerator.fromScene( scene ).texture;
+				scene.environmentIntensity = 0.75;
+
+				// ground
+
+				const ground = new THREE.Mesh(
+					new THREE.PlaneGeometry( 1000, 1000 ).rotateX( - Math.PI / 2 ),
+					new THREE.MeshStandardNodeMaterial( { color: 0x2a2a2a, roughness: 0.6, metalness: 0 } )
+				);
+				scene.add( ground );
+
+				// four big spheres in the middle for the surrounding lights to play across
+
+				const bigPositions = [
+					new THREE.Vector3( - 9, BIG_RADIUS, - 9 ),
+					new THREE.Vector3( 9, BIG_RADIUS, - 9 ),
+					new THREE.Vector3( - 9, BIG_RADIUS, 9 ),
+					new THREE.Vector3( 9, BIG_RADIUS, 9 )
+				];
+
+				const bigGeometry = new THREE.SphereGeometry( BIG_RADIUS, 64, 32 );
+				const bigMaterial = new THREE.MeshStandardNodeMaterial( { color: 0xdddddd, roughness: 0.5, metalness: 0 } );
+
+				for ( const position of bigPositions ) {
+
+					const bigSphere = new THREE.Mesh( bigGeometry, bigMaterial );
+					bigSphere.position.copy( position );
+					scene.add( bigSphere );
+
+				}
+
+				// a grid of coloured spheres drawn as a single InstancedMesh; each is
+				// unlit in its own colour and holds a matching point light at its centre
+
+				const maxCount = GRID * GRID;
+				const colorAttribute = new THREE.InstancedBufferAttribute( new Float32Array( maxCount * 3 ), 3 );
+
+				const material = new THREE.MeshBasicNodeMaterial();
+				material.colorNode = instancedBufferAttribute( colorAttribute );
+
+				spheresMesh = new THREE.InstancedMesh( new THREE.SphereGeometry( RADIUS, 32, 16 ), material, maxCount );
+				spheresMesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
+				scene.add( spheresMesh );
+
+				const color = new THREE.Color();
+				const span = ( GRID - 1 ) * SPACING;
+
+				let i = 0;
+
+				for ( let ix = 0; ix < GRID; ix ++ ) {
+
+					for ( let iz = 0; iz < GRID; iz ++ ) {
+
+						const x = ix * SPACING - span / 2;
+						const z = iz * SPACING - span / 2;
+
+						// leave a clearing where a big sphere sits
+						if ( bigPositions.some( ( position ) => Math.hypot( x - position.x, z - position.z ) < BIG_RADIUS + 1 ) ) continue;
+
+						const phase = ( ix + iz ) * 0.5;
+
+						dummy.position.set( x, RADIUS, z );
+						dummy.updateMatrix();
+						spheresMesh.setMatrixAt( i, dummy.matrix );
+
+						color.setHSL( ( ix * GRID + iz ) / ( GRID * GRID ), 1.0, 0.5 );
+						colorAttribute.setXYZ( i, color.r, color.g, color.b );
+
+						const light = new THREE.PointLight( color, 1, 9 );
+						light.power = BASE_POWER;
+						light.position.set( x, RADIUS, z );
+						scene.add( light );
+
+						balls.push( { x, z, phase, light } );
+
+						i ++;
+
+					}
+
+				}
+
+				spheresMesh.count = i;
 
 				// controls
 
 				controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 5, 0 );
-				controls.maxDistance = 60;
+				controls.enableDamping = true;
+				controls.target.set( 0, 6, 0 );
+				controls.maxPolarAngle = Math.PI * 0.49;
+				controls.minDistance = 4;
+				controls.maxDistance = 400;
 				controls.update();
-
-				// events
-
-				window.addEventListener( 'resize', onWindowResize );
-
-				// post processing
-
-				scenePass = pass( scene, camera );
-				clusterInfluence = uniform( 0 );
-
-				renderPipeline = new THREE.RenderPipeline( renderer );
-
-				debugZSliceNode = uniform( 15, 'int' );
-
-				updatePostProcessing();
 
 				// gui
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( params, 'intensity', 0, 3 ).name( 'light intensity' ).onChange( ( value ) => {
 
-				const params = {
-					count
-				};
-
-				gui.add( params, 'count', 0, maxCount, 1 ).name( 'light count' ).onChange( ( value ) => {
-
-					lightDummy.count = value;
-
-					for ( let i = 0; i < lights.children.length; i ++ ) {
-
-						lights.children[ i ].visible = ( i < value );
-
-					}
+					for ( const ball of balls ) ball.light.power = BASE_POWER * value;
 
 				} );
+				gui.add( params, 'animate' );
 
-				gui.add( clusterInfluence, 'value', 0, .7 ).name( 'lights per tile' );
-				gui.add( debugZSliceNode, 'value', 0, lighting.zSlices - 1, 1 ).name( 'z-slice' );
+				// events
 
-			}
-
-			function updatePostProcessing() {
-
-				// cluster light count debug overlay; needs to be updated every time the renderer size changes
-
-				const lightingNode = lighting.getNode( scene ).setSize( window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio );
-
-				// Calculate a color mapping based on the actual number of lights directly affecting the cluster.
-				// We map between 0 and maxLightsPerCluster to a gradient
-				const lightCount = lightingNode.getClusterLightCount( debugZSliceNode );
-				const heatmap = float( lightCount ).div( float( lighting.maxLightsPerCluster ) );
-
-				// Gradient mapping: Blue (0.0) -> Green (0.5) -> Red (1.0)
-				let heatColor = mix( vec3( 0.0, 0.0, 1.0 ), vec3( 0.0, 1.0, 0.0 ), heatmap.mul( 2.0 ).saturate() );
-				heatColor = mix( heatColor, vec3( 1.0, 0.0, 0.0 ), heatmap.sub( 0.5 ).mul( 2.0 ).saturate() );
-
-				// Blend the heatmap over the original scene based on the slider value
-				// The `step` drops opacity to 0.0 if there are strictly no lights in the cluster
-				const finalInfluence = clusterInfluence.mul( step( 0.0001, heatmap ) );
-				renderPipeline.outputNode = mix( scenePass, heatColor, finalInfluence );
-				renderPipeline.needsUpdate = true;
-
-			}
-
-			async function getSponzaModelURL() {
-
-				const response = await fetch( MODEL_INDEX_URL );
-				const models = await response.json();
-				const sponzaInfo = models.find( ( model ) => model.name === 'Sponza' );
-
-				if ( ! sponzaInfo ) {
-
-					throw new Error( 'Sponza entry was not found in the glTF sample model index.' );
-
-				}
-
-				const variants = sponzaInfo.variants || {};
-				const variantName = variants[ 'glTF-Binary' ] || variants[ 'glTF' ] || variants[ 'glTF-Embedded' ] || Object.values( variants )[ 0 ];
-
-				if ( ! variantName ) {
-
-					throw new Error( 'Sponza has no supported glTF variant in the model index.' );
-
-				}
-
-				const variantFolder = variantName.endsWith( '.glb' ) ? 'glTF-Binary' : 'glTF';
-				return `${ SAMPLE_ASSETS_BASE_URL }${ sponzaInfo.name }/${ variantFolder }/${ variantName }`;
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -302,34 +236,34 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				updatePostProcessing();
-
 			}
 
 			function animate() {
 
-				const time = performance.now() / 1000;
-				const positions = lightPositionAttribute.array;
+				if ( params.animate === true ) {
 
-				for ( let i = 0; i < lights.children.length; i ++ ) {
+					const time = performance.now() / 1000;
 
-					const light = lights.children[ i ];
-					const lightTime = ( time * 0.5 ) + light.id;
+					for ( let i = 0; i < balls.length; i ++ ) {
 
-					light.position.copy( light.userData.fixedPosition );
-					light.position.x += Math.sin( lightTime * 0.7 ) * 1.5;
-					light.position.y += Math.cos( lightTime * 0.5 ) * .3;
-					light.position.z += Math.cos( lightTime * 0.3 ) * 1.5;
+						const ball = balls[ i ];
+						const y = RADIUS + ( 0.5 + 0.5 * Math.sin( time * 1.5 + ball.phase ) ) * WAVE_HEIGHT;
 
-					positions[ i * 3 + 0 ] = light.position.x;
-					positions[ i * 3 + 1 ] = light.position.y;
-					positions[ i * 3 + 2 ] = light.position.z;
+						dummy.position.set( ball.x, y, ball.z );
+						dummy.updateMatrix();
+						spheresMesh.setMatrixAt( i, dummy.matrix );
+
+						ball.light.position.y = y;
+
+					}
+
+					spheresMesh.instanceMatrix.needsUpdate = true;
 
 				}
 
-				lightPositionAttribute.needsUpdate = true;
+				controls.update();
 
-				renderPipeline.render();
+				renderer.render( scene, camera );
 
 			}
 
