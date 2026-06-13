@@ -87,7 +87,7 @@
 			const options = { Output: 'Default', Rasterizer: 'Both', Occlusion: true, Grid: 'XZ' };
 
 			// Buffer visibility packaging configuration — depth occupies the bits above each payload
-			const TRIANGLE_INDEX_BITS = 15; 			// 2^15 = 32768 max triangles in the LOD mega buffer
+			const TRIANGLE_INDEX_BITS = 16; 			// 2^16 = 65536 max triangles in the LOD mega buffer
 			const INSTANCE_INDEX_BITS = 17; 			// 2^17 = 131072 max instances
 			const TRIANGLE_INDEX_MASK = 2 ** TRIANGLE_INDEX_BITS - 1;
 			const INSTANCE_INDEX_MASK = 2 ** INSTANCE_INDEX_BITS - 1;
@@ -190,8 +190,11 @@
 				// Generate LOD geometries and meshlets using Meshopt
 				const lodTargets = [
 					{ ratio: 1.0, error: 0.0, weights: [ 0.25, 0.25, 0.25, 0.5, 0.5 ], flags: [] },
-					{ ratio: 0.12, error: 0.03, weights: [ 0.1, 0.1, 0.1, 0.15, 0.15 ], flags: [ 'RegularizeLight' ] },
-					{ ratio: 0.02, error: 0.15, weights: [ 0.02, 0.02, 0.02, 0.03, 0.03 ], flags: [ 'Regularize' ] }
+					{ ratio: 0.55, error: 0.004, weights: [ 0.2, 0.2, 0.2, 0.35, 0.35 ], flags: [ 'RegularizeLight' ] },
+					{ ratio: 0.25, error: 0.015, weights: [ 0.12, 0.12, 0.12, 0.2, 0.2 ], flags: [ 'RegularizeLight' ] },
+					{ ratio: 0.1, error: 0.05, weights: [ 0.08, 0.08, 0.08, 0.12, 0.12 ], flags: [ 'RegularizeLight' ] },
+					{ ratio: 0.04, error: 0.14, weights: [ 0.04, 0.04, 0.04, 0.06, 0.06 ], flags: [ 'Regularize' ] },
+					{ ratio: 0.015, error: 0.3, weights: [ 0.02, 0.02, 0.02, 0.03, 0.03 ], flags: [ 'Regularize' ] }
 				];
 
 				const geom = sourceMesh.geometry;
@@ -518,11 +521,11 @@
 				// HW Rasterizer Buffers (for large triangles that exceed SW raster budget)
 				const MAX_HW_TRIANGLES = 100000;
 
-				// HW queue: index 0 is atomic counter, indices 1..MAX store payload32
-				const hwQueueData = new Uint32Array( MAX_HW_TRIANGLES + 1 );
+				// HW queue: index 0 is atomic counter, then stride-2 entries [instId, triIdx]
+				const hwQueueData = new Uint32Array( 1 + MAX_HW_TRIANGLES * 2 );
 				const hwQueueAttr = new THREE.StorageBufferAttribute( hwQueueData, 1 );
-				const hwQueueAtomic = storage( hwQueueAttr, 'uint', MAX_HW_TRIANGLES + 1 ).toAtomic();
-				const hwQueueRead = storage( hwQueueAttr, 'uint', MAX_HW_TRIANGLES + 1 ).toReadOnly();
+				const hwQueueAtomic = storage( hwQueueAttr, 'uint', 1 + MAX_HW_TRIANGLES * 2 ).toAtomic();
+				const hwQueueRead = storage( hwQueueAttr, 'uint', 1 + MAX_HW_TRIANGLES * 2 ).toReadOnly();
 
 				// Draw indirect buffer: vertexCount, instanceCount, firstVertex, firstInstance
 				const hwDrawData = new Uint32Array( 4 );
@@ -538,6 +541,7 @@
 				cameraPos = uniform( new THREE.Vector3() );
 				cotHalfFovUniform = uniform( 1.0 );
 				const pixelErrorThresholdUniform = uniform( 1.0 );
+				parameterGroup.add( pixelErrorThresholdUniform, 'value', 0.1, 8.0 ).name( 'LOD Pixel Error' );
 				const maxRasterSizeUniform = uniform( MAX_RASTER_SIZE, 'int' ); // Max bounding box size in pixels for SW rasterizer
 
 				occlusionUniform = uniform( 1, 'uint' );
@@ -811,10 +815,14 @@
 
 								const itemIndex = atomicAdd( workQueueCountAtomic.element( 0 ), 1 );
 
-								// uvec4( instanceIndex, triangleStart, lodNumTriangles, chunkIndex )
-								workQueueBuffer.element( itemIndex ).assign(
-									uvec4( instanceIndex, lodTriStart, lodNumTriangles, uint( chunkIndex ) )
-								);
+								If( itemIndex.lessThan( MAX_WORK_ITEMS ), () => {
+
+									// uvec4( instanceIndex, triangleStart, lodNumTriangles, chunkIndex )
+									workQueueBuffer.element( itemIndex ).assign(
+										uvec4( instanceIndex, lodTriStart, lodNumTriangles, uint( chunkIndex ) )
+									);
+
+								} );
 
 							} );
 
@@ -937,9 +945,8 @@
 										const bbWidth = endX.sub( startX );
 										const bbHeight = endY.sub( startY );
 
-										// Compute payload32 for HW path (full precision)
-										// payload32: instId (17 bits) | megaTriangleIndex (15 bits)
-										const payload32 = instId.shiftLeft( TRIANGLE_INDEX_BITS ).bitOr( megaTriangleIndex.bitAnd( TRIANGLE_INDEX_MASK ) );
+										// HW path payloads — stored as two separate uint entries to
+										// avoid the 32-bit packing limit of instId + triIdx
 
 										// Sub-pixel / Valid bounds rejection + big triangle guard
 										If( startX.lessThanEqual( endX ).and( startY.lessThanEqual( endY ) ).and( bbWidth.lessThanEqual( maxRasterSizeUniform ) ).and( bbHeight.lessThanEqual( maxRasterSizeUniform ) ), () => {
@@ -1041,8 +1048,14 @@
 											If( startX.lessThanEqual( endX ).and( startY.lessThanEqual( endY ) ), () => {
 
 												const hwCount = atomicAdd( hwQueueAtomic.element( 0 ), 1 );
-												const hwSlot = hwCount.add( 1 );
-												atomicStore( hwQueueAtomic.element( hwSlot ), payload32 );
+
+												If( hwCount.lessThan( MAX_HW_TRIANGLES ), () => {
+
+													const hwSlot = hwCount.mul( 2 ).add( 1 );
+													atomicStore( hwQueueAtomic.element( hwSlot ), instId );
+													atomicStore( hwQueueAtomic.element( hwSlot.add( 1 ) ), megaTriangleIndex );
+
+												} );
 
 											} );
 
@@ -1135,7 +1148,8 @@
 					hwGeometry.boundingSphere = new THREE.Sphere().set( new THREE.Vector3(), Infinity );
 
 					// Varyings from the vertex pulling stage
-					const vPayload = varyingProperty( 'uint', 'vPayload' );
+					const vInstId = varyingProperty( 'uint', 'vInstId' );
+					const vMegaTriIdx = varyingProperty( 'uint', 'vMegaTriIdx' );
 					const vUv = varyingProperty( 'vec2', 'vUv' );
 					const vNormal = varyingProperty( 'vec3', 'vNormal' );
 					const vTangent = varyingProperty( 'vec3', 'vTangent' );
@@ -1147,9 +1161,9 @@
 						const triIndex = vertexIndex.div( 3 ); // which triangle in HW queue
 						const localVert = vertexIndex.mod( 3 ); // which vertex (0, 1, 2)
 
-						const payload32 = hwQueueRead.element( triIndex.add( 1 ) );
-						const instId = payload32.shiftRight( TRIANGLE_INDEX_BITS );
-						const megaTriIdx = payload32.bitAnd( TRIANGLE_INDEX_MASK );
+						const hwSlot = triIndex.mul( 2 ).add( 1 );
+						const instId = hwQueueRead.element( hwSlot );
+						const megaTriIdx = hwQueueRead.element( hwSlot.add( 1 ) );
 
 						const matrixWorld = instanceWorldRead.element( instId );
 						const indexOffset = megaTriIdx.mul( 3 );
@@ -1174,7 +1188,8 @@
 						const uv2 = uvBuffer.element( i2 );
 						const uvVal = localVert.equal( 1 ).select( uv1, localVert.equal( 2 ).select( uv2, uv0 ) );
 
-						vPayload.assign( payload32 );
+						vInstId.assign( instId );
+						vMegaTriIdx.assign( megaTriIdx );
 						vUv.assign( uvVal );
 						vNormal.assign( worldNormal );
 						vTangent.assign( computeTangent( w0, w1, w2, uv0, uv1, uv2, worldNormal ) );
@@ -1209,10 +1224,7 @@
 					hwDebugMaterial.positionNode = hwPosition;
 					hwDebugMaterial.fragmentNode = Fn( () => {
 
-						const instId = vPayload.shiftRight( TRIANGLE_INDEX_BITS );
-						const megaTriangleIndex = vPayload.bitAnd( TRIANGLE_INDEX_MASK );
-
-						const meshletId = meshletIdBuffer.element( megaTriangleIndex ).add( instId.mul( 1000 ) );
+						const meshletId = meshletIdBuffer.element( vMegaTriIdx ).add( vInstId.mul( 1000 ) );
 
 						return hashColor( meshletId );
 
