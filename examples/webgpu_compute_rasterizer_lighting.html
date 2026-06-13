@@ -41,7 +41,8 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
-			import { SimplifyModifier } from 'three/addons/modifiers/SimplifyModifier.js';
+			import { MeshoptClusterizer } from 'three/addons/libs/meshopt_clusterizer.module.js';
+			import { MeshoptSimplifier } from 'three/addons/libs/meshopt_simplifier.module.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -166,7 +167,9 @@
 				// Load assets
 				const [ gltf, envTexture ] = await Promise.all( [
 					new GLTFLoader().loadAsync( 'models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf' ),
-					new UltraHDRLoader().loadAsync( 'textures/equirectangular/royal_esplanade_2k.hdr.jpg' )
+					new UltraHDRLoader().loadAsync( 'textures/equirectangular/royal_esplanade_2k.hdr.jpg' ),
+					MeshoptClusterizer.ready,
+					MeshoptSimplifier.ready
 				] );
 
 				envTexture.mapping = THREE.EquirectangularReflectionMapping;
@@ -184,45 +187,111 @@
 				gltf.scene.updateMatrixWorld( true );
 				sourceMesh.geometry.applyMatrix4( sourceMesh.matrixWorld );
 
-				// Generate LOD Geometries by progressively halving the vertex count
-				const modifier = new SimplifyModifier();
-				const lodErrors = [ 0.0, 0.005, 0.015, 0.04, 0.1 ];
+				// Generate LOD geometries and meshlets using Meshopt
+				const lodTargets = [
+					{ ratio: 1.0, error: 0.0, weights: [ 0.25, 0.25, 0.25, 0.5, 0.5 ], flags: [] },
+					{ ratio: 0.12, error: 0.03, weights: [ 0.1, 0.1, 0.1, 0.15, 0.15 ], flags: [ 'RegularizeLight' ] },
+					{ ratio: 0.02, error: 0.15, weights: [ 0.02, 0.02, 0.02, 0.03, 0.03 ], flags: [ 'Regularize' ] }
+				];
 
-				const lods = [ { geometry: sourceMesh.geometry, error: lodErrors[ 0 ] } ];
+				const geom = sourceMesh.geometry;
+				geom.computeBoundingSphere();
+				const boundingRadius = geom.boundingSphere.radius * 1.05;
 
-				for ( let i = 1; i < lodErrors.length; i ++ ) {
+				const posAttr = geom.attributes.position;
+				const normAttr = geom.attributes.normal;
+				const uvAttr = geom.attributes.uv;
+				const vertexCount = posAttr.count;
 
-					const previous = lods[ i - 1 ].geometry;
-					const geometry = modifier.modify( previous, Math.floor( previous.attributes.position.count * 0.5 ) );
-					lods.push( { geometry, error: lodErrors[ i ] } );
+				const simplifierAttributes = new Float32Array( vertexCount * 5 );
+				for ( let i = 0; i < vertexCount; i ++ ) {
+
+					simplifierAttributes[ i * 5 + 0 ] = normAttr.getX( i );
+					simplifierAttributes[ i * 5 + 1 ] = normAttr.getY( i );
+					simplifierAttributes[ i * 5 + 2 ] = normAttr.getZ( i );
+					simplifierAttributes[ i * 5 + 3 ] = uvAttr.getX( i );
+					simplifierAttributes[ i * 5 + 4 ] = uvAttr.getY( i );
+
+				}
+
+				const sourceIndices = geom.index ? new Uint32Array( geom.index.array ) : new Uint32Array( Array.from( { length: vertexCount }, ( _, i ) => i ) );
+				const sourceScale = MeshoptSimplifier.getScale( posAttr.array, 3 );
+
+				const lods = [];
+				let totalChunks = 0;
+
+				let indices = sourceIndices;
+				let previousError = 0;
+
+				for ( let i = 0; i < lodTargets.length; i ++ ) {
+
+					let error = 0;
+
+					if ( i > 0 ) {
+
+						const target = lodTargets[ i ];
+						const targetIndexCount = Math.max( 3, Math.floor( sourceIndices.length * target.ratio / 3 ) * 3 );
+						const simplified = MeshoptSimplifier.simplifyWithAttributes(
+							indices,
+							posAttr.array,
+							3,
+							simplifierAttributes,
+							5,
+							target.weights,
+							null,
+							targetIndexCount,
+							target.error,
+							target.flags
+						);
+
+						if ( simplified[ 0 ].length >= 3 ) {
+
+							indices = simplified[ 0 ];
+							error = previousError + simplified[ 1 ] * sourceScale;
+
+						} else {
+
+							error = previousError;
+
+						}
+
+					}
+
+					previousError = error;
+
+					const meshletBuffers = MeshoptClusterizer.buildMeshlets(
+						indices,
+						posAttr.array,
+						3,
+						64,
+						64,
+						0.25
+					);
+
+					const bounds = MeshoptClusterizer.computeMeshletBounds( meshletBuffers, posAttr.array, 3 );
+
+					const lod = {
+						meshletBuffers,
+						bounds,
+						error,
+						numChunks: meshletBuffers.meshletCount,
+						numTriangles: meshletBuffers.meshletCount * 64, // Padded to exactly 64 triangles per chunk
+						numVertices: vertexCount,
+						vertexOffset: i * vertexCount,
+						positions: posAttr,
+						normals: normAttr,
+						uvs: uvAttr
+					};
+
+					lods.push( lod );
+					totalChunks += lod.numChunks;
 
 				}
 
-				lods[ 0 ].geometry.computeBoundingSphere();
-				const boundingRadius = lods[ 0 ].geometry.boundingSphere.radius * 1.05;
+				console.info( 'LOD Meshlets count: ', lods.map( l => l.numChunks ) );
 
-				let totalVertices = 0;
-				let totalIndices = 0;
-
-				for ( const lod of lods ) {
-
-					const geom = lod.geometry;
-					const pos = geom.attributes.position;
-					const idx = geom.index ? Array.from( geom.index.array ) : Array.from( { length: pos.count }, ( _, i ) => i );
-
-					lod.numVertices = pos.count;
-					lod.numTriangles = idx.length / 3;
-					lod.vertexOffset = totalVertices;
-					lod.indexOffset = totalIndices;
-					lod.positions = pos;
-					lod.normals = geom.attributes.normal;
-					lod.uvs = geom.attributes.uv;
-					lod.indices = idx;
-
-					totalVertices += pos.count;
-					totalIndices += idx.length;
-
-				}
+				const totalVertices = lods.length * vertexCount;
+				const totalIndices = totalChunks * 64 * 3;
 
 				if ( totalIndices / 3 > TRIANGLE_INDEX_MASK + 1 ) throw new Error( 'Triangle count exceeds payload bit budget' );
 				if ( instanceCount > INSTANCE_INDEX_MASK + 1 ) throw new Error( 'Instance count exceeds payload bit budget' );
@@ -236,121 +305,86 @@
 				const uvArray = new Float32Array( totalVertices * 2 );
 				const indexArray = new Uint32Array( totalIndices );
 				const meshletTriangleArray = new Uint32Array( totalIndices / 3 ); // 1 meshlet ID per triangle
+				const chunkBoundsData = new Float32Array( totalChunks * 4 ); // vec4: cx, cy, cz, radius
 
 				let currentMeshletId = 1;
+				let currentChunkId = 0;
+				let currentIndexOffset = 0;
 
-				for ( const lod of lods ) {
+				for ( let i = 0; i < lods.length; i ++ ) {
 
-					for ( let i = 0; i < lod.numVertices; i ++ ) {
+					const lod = lods[ i ];
+					lod.chunkStart = currentChunkId;
+					lod.indexOffset = currentIndexOffset;
 
-						const vIdx = lod.vertexOffset + i;
-						vertexArray[ vIdx * 4 + 0 ] = lod.positions.getX( i );
-						vertexArray[ vIdx * 4 + 1 ] = lod.positions.getY( i );
-						vertexArray[ vIdx * 4 + 2 ] = lod.positions.getZ( i );
+					// Fill vertex buffers for this LOD level
+					for ( let v = 0; v < vertexCount; v ++ ) {
+
+						const vIdx = lod.vertexOffset + v;
+						vertexArray[ vIdx * 4 + 0 ] = lod.positions.getX( v );
+						vertexArray[ vIdx * 4 + 1 ] = lod.positions.getY( v );
+						vertexArray[ vIdx * 4 + 2 ] = lod.positions.getZ( v );
 						vertexArray[ vIdx * 4 + 3 ] = 1.0;
 
-						normalArray[ vIdx * 4 + 0 ] = lod.normals.getX( i );
-						normalArray[ vIdx * 4 + 1 ] = lod.normals.getY( i );
-						normalArray[ vIdx * 4 + 2 ] = lod.normals.getZ( i );
+						normalArray[ vIdx * 4 + 0 ] = lod.normals.getX( v );
+						normalArray[ vIdx * 4 + 1 ] = lod.normals.getY( v );
+						normalArray[ vIdx * 4 + 2 ] = lod.normals.getZ( v );
 
-						uvArray[ vIdx * 2 + 0 ] = lod.uvs.getX( i );
-						uvArray[ vIdx * 2 + 1 ] = lod.uvs.getY( i );
-
-					}
-
-					let currentTriCount = 0;
-					for ( let i = 0; i < lod.numTriangles; i ++ ) {
-
-						const triIdx = ( lod.indexOffset / 3 ) + i;
-						indexArray[ triIdx * 3 + 0 ] = lod.vertexOffset + lod.indices[ i * 3 + 0 ];
-						indexArray[ triIdx * 3 + 1 ] = lod.vertexOffset + lod.indices[ i * 3 + 1 ];
-						indexArray[ triIdx * 3 + 2 ] = lod.vertexOffset + lod.indices[ i * 3 + 2 ];
-
-						if ( currentTriCount >= 126 ) {
-
-							currentMeshletId ++;
-							currentTriCount = 0;
-
-						}
-
-						meshletTriangleArray[ triIdx ] = currentMeshletId;
-						currentTriCount ++;
+						uvArray[ vIdx * 2 + 0 ] = lod.uvs.getX( v );
+						uvArray[ vIdx * 2 + 1 ] = lod.uvs.getY( v );
 
 					}
 
-					currentMeshletId ++;
+					// Process and pack meshlets
+					const meshletBuffers = lod.meshletBuffers;
+					const bounds = lod.bounds;
 
-				}
+					for ( let m = 0; m < lod.numChunks; m ++ ) {
 
-				// Precompute Bounding Spheres for each 64-triangle Chunk (Cluster)
-				let totalChunks = 0;
-				for ( const lod of lods ) {
+						const meshlet = MeshoptClusterizer.extractMeshlet( meshletBuffers, m );
+						const meshletTriangles = meshlet.triangles.length / 3;
 
-					lod.numChunks = Math.ceil( lod.numTriangles / 64 );
-					lod.chunkStart = totalChunks;
-					totalChunks += lod.numChunks;
+						// Pack 64 triangles (with degenerate padding if needed)
+						for ( let t = 0; t < 64; t ++ ) {
 
-				}
+							const triIdx = ( lod.indexOffset / 3 ) + ( m * 64 ) + t;
 
-				const chunkBoundsData = new Float32Array( totalChunks * 4 ); // vec4: cx, cy, cz, radius
-				let currentChunkId = 0;
+							if ( t < meshletTriangles ) {
 
-				for ( const lod of lods ) {
+								const a_local = meshlet.triangles[ t * 3 + 0 ];
+								const b_local = meshlet.triangles[ t * 3 + 1 ];
+								const c_local = meshlet.triangles[ t * 3 + 2 ];
 
-					const positions = lod.positions;
-					const indices = lod.indices;
+								indexArray[ triIdx * 3 + 0 ] = lod.vertexOffset + meshlet.vertices[ a_local ];
+								indexArray[ triIdx * 3 + 1 ] = lod.vertexOffset + meshlet.vertices[ b_local ];
+								indexArray[ triIdx * 3 + 2 ] = lod.vertexOffset + meshlet.vertices[ c_local ];
 
-					for ( let c = 0; c < lod.numChunks; c ++ ) {
+							} else {
 
-						const startTri = c * 64;
-						const endTri = Math.min( startTri + 64, lod.numTriangles );
-
-						// 1. Calculate Center
-						let cx = 0, cy = 0, cz = 0;
-						const vertCount = ( endTri - startTri ) * 3;
-						for ( let t = startTri; t < endTri; t ++ ) {
-
-							for ( let v = 0; v < 3; v ++ ) {
-
-								const idx = indices[ t * 3 + v ];
-								cx += positions.getX( idx );
-								cy += positions.getY( idx );
-								cz += positions.getZ( idx );
+								// Pad with degenerate triangle using the first vertex of the meshlet
+								const a_local = meshlet.vertices[ 0 ];
+								indexArray[ triIdx * 3 + 0 ] = lod.vertexOffset + a_local;
+								indexArray[ triIdx * 3 + 1 ] = lod.vertexOffset + a_local;
+								indexArray[ triIdx * 3 + 2 ] = lod.vertexOffset + a_local;
 
 							}
 
-						}
-
-						cx /= vertCount;
-						cy /= vertCount;
-						cz /= vertCount;
-
-						// 2. Calculate Radius
-						let maxDistSq = 0;
-						for ( let t = startTri; t < endTri; t ++ ) {
-
-							for ( let v = 0; v < 3; v ++ ) {
-
-								const idx = indices[ t * 3 + v ];
-								const dx = positions.getX( idx ) - cx;
-								const dy = positions.getY( idx ) - cy;
-								const dz = positions.getZ( idx ) - cz;
-								const distSq = dx * dx + dy * dy + dz * dz;
-								if ( distSq > maxDistSq ) maxDistSq = distSq;
-
-							}
+							meshletTriangleArray[ triIdx ] = currentMeshletId;
 
 						}
 
-						const radius = Math.sqrt( maxDistSq );
+						currentMeshletId ++;
 
-						chunkBoundsData[ currentChunkId * 4 + 0 ] = cx;
-						chunkBoundsData[ currentChunkId * 4 + 1 ] = cy;
-						chunkBoundsData[ currentChunkId * 4 + 2 ] = cz;
-						chunkBoundsData[ currentChunkId * 4 + 3 ] = radius;
+						// Bounding sphere
+						chunkBoundsData[ currentChunkId * 4 + 0 ] = bounds[ m ].centerX;
+						chunkBoundsData[ currentChunkId * 4 + 1 ] = bounds[ m ].centerY;
+						chunkBoundsData[ currentChunkId * 4 + 2 ] = bounds[ m ].centerZ;
+						chunkBoundsData[ currentChunkId * 4 + 3 ] = bounds[ m ].radius;
 						currentChunkId ++;
 
 					}
+
+					currentIndexOffset += lod.numTriangles * 3;
 
 				}
 
