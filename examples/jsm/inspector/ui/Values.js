@@ -276,6 +276,7 @@ class ValueSlider extends Value {
 
 		this.slider.step = value;
 		this.numberInput.step = value;
+		this.slider.value = parseFloat( this.numberInput.value );
 
 		return this;
 
