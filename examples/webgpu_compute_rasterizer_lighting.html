@@ -84,7 +84,7 @@
 			// both rasterizer paths so their roughness matches at path boundaries
 			const SPECULAR_AA_VARIANCE = 2.0;
 			const SPECULAR_AA_MAX = 0.2;
-			const options = { Mode: 'Shaded', Output: 'Default', Rasterizer: 'Both', Occlusion: true, Grid: 'XZ' };
+			const options = { Output: 'Default', Rasterizer: 'Both', Occlusion: true, Grid: 'XZ' };
 
 			// Buffer visibility packaging configuration — depth occupies the bits above each payload
 			const TRIANGLE_INDEX_BITS = 15; 			// 2^15 = 32768 max triangles in the LOD mega buffer
@@ -402,10 +402,10 @@
 				const timeScale = uniform( 1.0 );
 
 				const parameterGroup = renderer.inspector.createParameters( 'Parameters' );
-				parameterGroup.add( options, 'Mode', { 'Shaded': 'Shaded', 'Meshlet Debug': 'Meshlet Debug' } ).addEventListener( 'change', updateMode );
 
 				parameterGroup.add( options, 'Output', {
 					'Default': 'Default',
+					'Meshlet Debug': 'Meshlet Debug',
 					'Geometry Normal': 'Geometry Normal',
 					'Normal Map': 'Normal Map',
 					'UV': 'UV',
@@ -1479,7 +1479,6 @@
 
 			function updateMode() {
 
-				const debug = options.Mode === 'Meshlet Debug';
 				const outputVal = options.Output;
 
 				const outputModes = {
@@ -1493,19 +1492,21 @@
 					'Emissive': 7
 				};
 
-				outputModeUniform.value = outputModes[ outputVal ];
-
-				if ( debug ) {
+				if ( outputVal === 'Meshlet Debug' ) {
 
 					resolveMesh.material = resolveMesh.userData.debugMaterial;
 					hwMesh.material = hwMesh.userData.debugMaterial;
 
 				} else if ( outputVal !== 'Default' ) {
 
+					outputModeUniform.value = outputModes[ outputVal ];
+
 					resolveMesh.material = resolveMesh.userData.visMaterial;
 					hwMesh.material = hwMesh.userData.visMaterial;
 
 				} else {
+
+					outputModeUniform.value = 0;
 
 					resolveMesh.material = resolveMesh.userData.shadedMaterial;
 					hwMesh.material = hwMesh.userData.shadedMaterial;
