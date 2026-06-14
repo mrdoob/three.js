@@ -1624,7 +1624,15 @@ export class Profiler extends EventDispatcher {
 
 		if ( this.tabs[ id ] ) {
 
-			this.tabs[ id ].setActive( true );
+			const tab = this.tabs[ id ];
+
+			if ( ! tab.isVisible ) {
+
+				tab.show();
+
+			}
+
+			tab.setActive( true );
 
 		}
 
