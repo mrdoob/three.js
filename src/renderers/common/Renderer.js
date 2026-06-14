@@ -1255,6 +1255,21 @@ class Renderer {
 	}
 
 	/**
+	 * Returns `true` if the cached GPU render bundle for the given bundle group is
+	 * out-of-date and must be recorded again.
+	 *
+	 * @private
+	 * @param {BundleGroup} bundleGroup - The bundle group.
+	 * @param {Object} renderBundleData - The backend data of the render bundle.
+	 * @return {boolean} Whether the cached render bundle needs an update.
+	 */
+	_bundleNeedsUpdate( bundleGroup, renderBundleData ) {
+
+		return renderBundleData.bundleGPU === undefined || bundleGroup.version !== renderBundleData.version;
+
+	}
+
+	/**
 	 * Renders the given render bundle.
 	 *
 	 * @private
@@ -1272,19 +1287,11 @@ class Renderer {
 
 		const renderBundle = this._bundles.get( bundleGroup, camera, renderContext );
 		const renderBundleData = this.backend.get( renderBundle );
-
-		const needsUpdate = bundleGroup.version !== renderBundleData.version;
-		const renderBundleNeedsUpdate = needsUpdate || renderBundleData.bundleGPU === undefined;
+		const renderBundleNeedsUpdate = this._bundleNeedsUpdate( bundleGroup, renderBundleData );
 
 		if ( renderBundleNeedsUpdate ) {
 
 			this.backend.beginBundle( renderContext );
-
-			if ( renderBundleData.renderObjects === undefined || needsUpdate ) {
-
-				renderBundleData.renderObjects = [];
-
-			}
 
 			this._currentRenderBundle = renderBundle;
 
@@ -3162,9 +3169,40 @@ class Renderer {
 			const baseRenderList = renderList;
 
 			// replace render list
+
 			renderList = this._renderLists.get( object, camera );
 
-			renderList.begin();
+			const renderBundle = this._bundles.get( object, camera, this._currentRenderContext );
+			const renderBundleData = this.backend.get( renderBundle );
+			const renderBundleNeedsUpdate = this._bundleNeedsUpdate( object, renderBundleData );
+
+			if ( renderBundleNeedsUpdate ) {
+
+				// update render list if necessary
+
+				renderList.begin();
+
+				if ( renderBundleData.renderObjects === undefined ) {
+
+					renderBundleData.renderObjects = [];
+
+				} else {
+
+					renderBundleData.renderObjects.length = 0;
+
+				}
+
+				const children = object.children;
+
+				for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+					this._projectObject( children[ i ], camera, groupOrder, renderList, clippingContext );
+
+				}
+
+				renderList.finish();
+
+			}
 
 			baseRenderList.pushBundle( {
 				bundleGroup: object,
@@ -3172,9 +3210,11 @@ class Renderer {
 				renderList,
 			} );
 
-			renderList.finish();
+			return;
 
 		}
+
+		//
 
 		const children = object.children;
 
