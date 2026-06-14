@@ -22,7 +22,7 @@ export class Style {
 		--font-mono: 'Courier New', Courier, monospace;
 	}
 
-	.profiler-panel *, .profiler-toggle * {
+	.profiler-panel *, .profiler-toggle *, .detached-tab-panel * {
 		text-transform: initial;
 		line-height: normal;
 		box-sizing: border-box;
@@ -1581,6 +1581,8 @@ export class Style {
 		opacity: 1;
 		visibility: visible;
 		transition: opacity 0.2s, visibility 0.2s;
+		font-family: var(--font-mono);
+		font-size: 13px;
 	}
 
 	.profiler-panel:not(.visible) ~ * .detached-tab-panel,
