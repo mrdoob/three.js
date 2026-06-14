@@ -31,6 +31,18 @@ export class Profiler extends EventDispatcher {
 		// Setup orientation change listener for mobile devices
 		this.setupOrientationListener();
 
+		this.checkHeaderScroll();
+
+		this.panel.addEventListener( 'transitionend', ( e ) => {
+
+			if ( e.target === this.panel && ( e.propertyName === 'width' || e.propertyName === 'height' || e.propertyName === 'transform' ) ) {
+
+				this.checkHeaderScroll();
+
+			}
+
+		} );
+
 	}
 
 	getSize() {
@@ -181,6 +193,7 @@ export class Profiler extends EventDispatcher {
 
 			constrainDetachedWindows();
 			constrainMainPanel();
+			this.checkHeaderScroll();
 
 		} );
 
@@ -397,6 +410,7 @@ export class Profiler extends EventDispatcher {
 				}
 
 				this.dispatchEvent( { type: 'resize' } );
+				this.checkHeaderScroll();
 
 			};
 
@@ -774,7 +788,7 @@ export class Profiler extends EventDispatcher {
 			// No tabs visible - set to minimum size
 			if ( this.position === 'bottom' ) {
 
-				this.panel.style.height = '38px';
+				this.panel.style.height = '32px';
 
 			} else if ( this.position === 'right' ) {
 
@@ -793,7 +807,7 @@ export class Profiler extends EventDispatcher {
 				if ( this.position === 'bottom' ) {
 
 					const currentHeight = parseInt( this.panel.style.height );
-					if ( currentHeight === 38 ) {
+					if ( currentHeight === 32 || currentHeight === 38 ) {
 
 						this.panel.style.height = `${ this.lastHeightBottom }px`;
 
@@ -815,6 +829,29 @@ export class Profiler extends EventDispatcher {
 		}
 
 		this.dispatchEvent( { type: 'resize' } );
+		this.checkHeaderScroll();
+
+	}
+
+	checkHeaderScroll() {
+
+		const header = this.panel.querySelector( '.profiler-header' );
+
+		if ( header ) {
+
+			const hasScroll = header.scrollWidth > header.clientWidth + 1;
+
+			if ( hasScroll ) {
+
+				this.panel.classList.add( 'has-horizontal-scroll' );
+
+			} else {
+
+				this.panel.classList.remove( 'has-horizontal-scroll' );
+
+			}
+
+		}
 
 	}
 
@@ -1624,11 +1661,20 @@ export class Profiler extends EventDispatcher {
 
 		if ( this.tabs[ id ] ) {
 
-			this.tabs[ id ].setActive( true );
+			const tab = this.tabs[ id ];
+
+			if ( ! tab.isVisible ) {
+
+				tab.show();
+
+			}
+
+			tab.setActive( true );
 
 		}
 
 		this.saveLayout();
+		this.checkHeaderScroll();
 
 	}
 
