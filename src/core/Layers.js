@@ -26,6 +26,17 @@ class Layers {
 		 */
 		this.mask = 1 | 0;
 
+		/**
+		 * When set to `true`, this object's layer mask is propagated to all
+		 * descendants during rendering and raycasting traversal. If the layer
+		 * test fails, the entire subtree is skipped. If it passes, children
+		 * inherit this object's layers instead of using their own.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.recursive = false;
+
 	}
 
 	/**

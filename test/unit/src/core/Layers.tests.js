@@ -123,6 +123,23 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( 'recursive', ( assert ) => {
+
+			const a = new Layers();
+
+			// Default value should be false
+			assert.strictEqual( a.recursive, false, 'Default recursive is false' );
+
+			// Can be set to true
+			a.recursive = true;
+			assert.strictEqual( a.recursive, true, 'Can set recursive to true' );
+
+			// Can be set back to false
+			a.recursive = false;
+			assert.strictEqual( a.recursive, false, 'Can set recursive to false' );
+
+		} );
+
 	} );
 
 } );
