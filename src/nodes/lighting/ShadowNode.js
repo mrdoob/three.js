@@ -48,7 +48,7 @@ export const getShadowRenderObjectFunction = ( renderer, shadow, shadowType, use
 
 	if ( renderObjectFunction === undefined || ( renderObjectFunction.shadowType !== shadowType || renderObjectFunction.useVelocity !== useVelocity ) ) {
 
-		renderObjectFunction = ( object, scene, _camera, geometry, material, group, ...params ) => {
+		renderObjectFunction = ( object, scene, _camera, geometry, material, group, lightsNode, clippingContext, passId ) => {
 
 			if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
 
@@ -60,7 +60,7 @@ export const getShadowRenderObjectFunction = ( renderer, shadow, shadowType, use
 
 				object.onBeforeShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
 
-				renderer.renderObject( object, scene, _camera, geometry, material, group, ...params );
+				renderer.renderObject( object, scene, _camera, geometry, material, group, lightsNode, clippingContext, passId );
 
 				object.onAfterShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
 

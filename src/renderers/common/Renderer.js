@@ -1036,12 +1036,11 @@ class Renderer {
 			renderObject.drawRange = item.object.geometry.drawRange;
 			renderObject.group = item.group;
 
-			this._geometries.updateForRender( renderObject );
-
 			// Use async node building to yield to main thread
 			await this._nodes.getForRenderAsync( renderObject );
 
 			this._nodes.updateBefore( renderObject );
+			this._geometries.updateForRender( renderObject );
 			this._nodes.updateForRender( renderObject );
 			this._bindings.updateForRender( renderObject );
 

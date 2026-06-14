@@ -2,11 +2,16 @@ import ContextNode from './ContextNode.js';
 import { addMethodChaining } from '../tsl/TSLCore.js';
 
 /**
- * A context node that overrides a target node within another node using a callback function.
+ * A specialized context node designed to override specific target nodes within a
+ * node sub-graph or flow. This allows replacing specific inputs (e.g., normal
+ * and position vectors) dynamically during compilation for a specific flow node,
+ * without having to reconstruct or duplicate the source nodes.
  *
  * ```js
+ * // Method chaining example:
  * node.overrideNode( positionLocal, () => positionLocal.add( vec3( 1, 0, 0 ) ) );
- * // or
+ *
+ * // Context assignment example:
  * material.contextNode = overrideNode( positionLocal, () => positionLocal.add( vec3( 1, 0, 0 ) ) );
  * ```
  *
@@ -14,6 +19,13 @@ import { addMethodChaining } from '../tsl/TSLCore.js';
  */
 class OverrideContextNode extends ContextNode {
 
+	/**
+	 * Returns the type of the node.
+	 *
+	 * @type {string}
+	 * @readonly
+	 * @static
+	 */
 	static get type() {
 
 		return 'OverrideContextNode';
@@ -23,8 +35,8 @@ class OverrideContextNode extends ContextNode {
 	/**
 	 * Constructs a new override context node.
 	 *
-	 * @param {Map<Node, Function>} overrideNodes - A map containing target nodes to override and their respective override callback functions.
-	 * @param {Node} [flowNode=null] - The node whose context should be modified.
+	 * @param {Map<Node, Function>} overrideNodes - A map mapping target nodes to their respective override callback functions.
+	 * @param {Node|null} [flowNode=null] - The node whose context should be modified.
 	 */
 	constructor( overrideNodes, flowNode = null ) {
 
@@ -44,9 +56,10 @@ class OverrideContextNode extends ContextNode {
 	}
 
 	/**
-	 * Gathers the context data from all parent context nodes.
+	 * Gathers the context data from all parent context nodes by traversing the hierarchy,
+	 * merging the `overrideNodes` maps from all encountered `OverrideContextNode` instances.
 	 *
-	 * @return {Object} The gathered context data.
+	 * @return {Object} The gathered context data, containing the merged `overrideNodes` map.
 	 */
 	getFlowContextData() {
 
@@ -76,18 +89,18 @@ class OverrideContextNode extends ContextNode {
 export default OverrideContextNode;
 
 /**
- * Creates an OverrideContextNode that overrides a target node within a callback function.
+ * TSL function for creating an `OverrideContextNode` to override a single target node.
  *
  * ```js
- * material.contextNode = overrideNode( positionLocal, () => positionLocal.add( vec3( 1, 0, 0 ) ) );
+ * material.contextNode = overrideNode( positionLocal, ( builder ) => positionLocal.add( vec3( 1, 0, 0 ) ) );
  * ```
  *
  * @tsl
  * @function
- * @param {Node} targetNode - The target node to override.
- * @param {Function|Node} [callback=null] - A callback function that returns the overriding node, or the overriding node itself.
- * @param {Node} [flowNode=null] - An optional flow node.
- * @return {OverrideContextNode} The created OverrideContextNode.
+ * @param {Node} targetNode - The target node that should be overridden.
+ * @param {Function|Node|null} [callback=null] - A callback function returning the overriding node (which receives the builder as its argument), or the overriding node itself.
+ * @param {Node|null} [flowNode=null] - The node whose context should be modified.
+ * @return {OverrideContextNode} The created override context node.
  */
 export function overrideNode( targetNode, callback = null, flowNode = null ) {
 
@@ -106,20 +119,20 @@ export function overrideNode( targetNode, callback = null, flowNode = null ) {
 addMethodChaining( 'overrideNode', ( flowNode, node, callback ) => overrideNode( node, callback, flowNode ) );
 
 /**
- * Creates an OverrideContextNode that overrides multiple target nodes.
+ * TSL function for creating an `OverrideContextNode` to override multiple target nodes.
  *
  * ```js
  * material.contextNode = overrideNodes( [
  * 	[ positionView, customPositionView ],
- * 	[ positionViewDirection, customPositionViewDirection ]
+ * 	[ positionViewDirection, ( builder ) => customPositionViewDirection ]
  * ] );
  * ```
  *
  * @tsl
  * @function
- * @param {Map|Array} overrides - The overrides mapping target nodes to callback functions or overriding nodes.
- * @param {Node} [flowNode=null] - An optional flow node.
- * @return {OverrideContextNode} The created OverrideContextNode.
+ * @param {Map<Node, (Function|Node)>|Array<Array<Node|Function|Node>>} overrides - The overrides mapping target nodes to callback functions or overriding nodes.
+ * @param {Node|null} [flowNode=null] - The node whose context should be modified.
+ * @return {OverrideContextNode} The created override context node.
  */
 export function overrideNodes( overrides, flowNode = null ) {
 

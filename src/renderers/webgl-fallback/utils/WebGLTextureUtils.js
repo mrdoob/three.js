@@ -638,7 +638,19 @@ class WebGLTextureUtils {
 
 			if ( typeof gl.texElementImage2D === 'function' ) {
 
-				gl.texElementImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, options.image );
+				if ( gl.texElementImage2D.length === 3 ) {
+
+					// Chrome 150+
+
+					gl.texElementImage2D( gl.TEXTURE_2D, gl.RGBA8, options.image );
+
+				} else {
+
+					// Chrome 138 - 149
+
+					gl.texElementImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, options.image );
+
+				}
 
 			}
 

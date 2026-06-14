@@ -33,7 +33,11 @@ export const clipSpace = /*@__PURE__*/ ( Fn( ( builder ) => {
 export const positionGeometry = /*@__PURE__*/ attribute( 'position', 'vec3' );
 
 /**
- * TSL object that represents the vertex position in local space of the current rendered object.
+ * TSL object that represents the transformed vertex position in local space of the current rendered object.
+ *
+ * The term "transformed" indicates that an object or material's properties, such as skinning, batch,
+ * instancing, or displacement mapping, will change the vertex position of the node when present.
+ * To use the pre-transformed local space position of the object, use {@link positionGeometry}.
  *
  * @tsl
  * @type {AttributeNode<vec3>}

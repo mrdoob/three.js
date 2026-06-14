@@ -22,7 +22,7 @@ export class Style {
 		--font-mono: 'Courier New', Courier, monospace;
 	}
 
-	.profiler-panel *, .profiler-toggle * {
+	.profiler-panel *, .profiler-toggle *, .detached-tab-panel * {
 		text-transform: initial;
 		line-height: normal;
 		box-sizing: border-box;
@@ -699,31 +699,35 @@ export class Style {
 
 		overflow-x: auto;
 		overflow-y: hidden;
-		width: calc(100% - 134px);
-		height: 38px;
+		width: calc(100% - 120px);
+		height: 32px;
 		user-select: none;
 		-webkit-user-select: none;
+	}
+
+	.profiler-panel.has-horizontal-scroll .profiler-header {
+		height: 38px;
 	}
 
 	/* Adjust header width based on panel position */
 	.profiler-panel.position-right .profiler-header,
 	.profiler-panel.position-left .profiler-header {
-		width: calc(100% - 134px);
+		width: calc(100% - 120px);
 	}
 
 	.profiler-panel.position-bottom .profiler-header,
 	.profiler-panel.position-top .profiler-header {
-		width: calc(100% - 134px);
+		width: calc(100% - 120px);
 	}
 
 	/* Adjust header width when position toggle button is hidden (mobile) */
 	.profiler-panel.hide-position-toggle .profiler-header {
-		width: calc(100% - 90px);
+		width: calc(100% - 80px);
 	}
 
 	/* Adjust header width when maximized (floating position toggle button is hidden) */
 	.profiler-panel.maximized .profiler-header {
-		width: calc(100% - 90px);
+		width: calc(100% - 80px);
 	}
 
 	/* ===== RULES FOR WHEN THERE ARE NO TABS ===== */
@@ -731,14 +735,14 @@ export class Style {
 	/* Horizontal mode (bottom/top) without tabs */
 	.profiler-panel.position-bottom.no-tabs:not(.maximized),
 	.profiler-panel.position-top.no-tabs:not(.maximized) {
-		height: 38px !important;
-		min-height: 38px !important;
+		height: 32px !important;
+		min-height: 32px !important;
 	}
 
 	.profiler-panel.position-bottom.no-tabs .profiler-header,
 	.profiler-panel.position-top.no-tabs .profiler-header {
 		width: 100%;
-		height: 38px;
+		height: 32px;
 		border-bottom: none;
 	}
 
@@ -755,8 +759,8 @@ export class Style {
 	/* Vertical mode (right/left) without tabs */
 	.profiler-panel.position-right.no-tabs:not(.maximized),
 	.profiler-panel.position-left.no-tabs:not(.maximized) {
-		width: 45px !important;
-		min-width: 45px !important;
+		width: 40px !important;
+		min-width: 40px !important;
 	}
 
 	/* Vertical layout for header when no tabs */
@@ -784,7 +788,7 @@ export class Style {
 	.profiler-panel.position-right.no-tabs .profiler-controls button,
 	.profiler-panel.position-left.no-tabs .profiler-controls button {
 		width: 100%;
-		height: 45px;
+		height: 40px;
 		border-left: none;
 		border-top: none;
 		border-bottom: 1px solid var(--profiler-border);
@@ -808,8 +812,8 @@ export class Style {
 	/* Hide position toggle on mobile without tabs */
 	.profiler-panel.hide-position-toggle.position-right.no-tabs:not(.maximized),
 	.profiler-panel.hide-position-toggle.position-left.no-tabs:not(.maximized) {
-		width: 45px !important;
-		min-width: 45px !important;
+		width: 40px !important;
+		min-width: 40px !important;
 	}
 
 	/* Hide drag indicator on mobile devices */
@@ -817,27 +821,67 @@ export class Style {
 		display: none;
 	}
 
-	.profiler-header::-webkit-scrollbar {
-		width: 8px;
-		height: 8px;
+	.profiler-header::-webkit-scrollbar,
+	.profiler-tabs::-webkit-scrollbar,
+	.profiler-content::-webkit-scrollbar,
+	.detached-tab-content::-webkit-scrollbar,
+	.console-log::-webkit-scrollbar,
+	.timelineTrack::-webkit-scrollbar,
+	.list-scroll-wrapper::-webkit-scrollbar {
+		width: 4px;
+		height: 4px;
 	}
 
-	.profiler-header::-webkit-scrollbar-track {
+	.profiler-header::-webkit-scrollbar-track,
+	.profiler-tabs::-webkit-scrollbar-track,
+	.profiler-content::-webkit-scrollbar-track,
+	.detached-tab-content::-webkit-scrollbar-track,
+	.console-log::-webkit-scrollbar-track,
+	.timelineTrack::-webkit-scrollbar-track,
+	.list-scroll-wrapper::-webkit-scrollbar-track {
 		background: transparent;
 	}
 
-	.profiler-header::-webkit-scrollbar-thumb {
-		background-color: rgba(0, 0, 0, 0.25);
-		border-radius: 10px;
-		transition: background 0.3s ease;
+	.profiler-header::-webkit-scrollbar-thumb,
+	.profiler-tabs::-webkit-scrollbar-thumb,
+	.profiler-content::-webkit-scrollbar-thumb,
+	.detached-tab-content::-webkit-scrollbar-thumb,
+	.console-log::-webkit-scrollbar-thumb,
+	.timelineTrack::-webkit-scrollbar-thumb,
+	.list-scroll-wrapper::-webkit-scrollbar-thumb {
+		background-color: rgba(255, 255, 255, 0.15);
+		border-radius: 2px;
 	}
 
-	.profiler-header::-webkit-scrollbar-thumb:hover {
-		background-color: rgba(0, 0, 0, 0.4);
+	.profiler-header::-webkit-scrollbar-thumb:hover,
+	.profiler-tabs::-webkit-scrollbar-thumb:hover,
+	.profiler-content::-webkit-scrollbar-thumb:hover,
+	.detached-tab-content::-webkit-scrollbar-thumb:hover,
+	.console-log::-webkit-scrollbar-thumb:hover,
+	.timelineTrack::-webkit-scrollbar-thumb:hover,
+	.list-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+		background-color: rgba(255, 255, 255, 0.3);
 	}
 
-	.profiler-header::-webkit-scrollbar-corner {
+	.profiler-header::-webkit-scrollbar-corner,
+	.profiler-tabs::-webkit-scrollbar-corner,
+	.profiler-content::-webkit-scrollbar-corner,
+	.detached-tab-content::-webkit-scrollbar-corner,
+	.console-log::-webkit-scrollbar-corner,
+	.timelineTrack::-webkit-scrollbar-corner,
+	.list-scroll-wrapper::-webkit-scrollbar-corner {
 		background: transparent;
+	}
+
+	.profiler-header,
+	.profiler-tabs,
+	.profiler-content,
+	.detached-tab-content,
+	.console-log,
+	.timelineTrack,
+	.list-scroll-wrapper {
+		scrollbar-width: thin;
+		scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
 	}
 
 	.profiler-panel.dragging .profiler-header {
@@ -858,37 +902,19 @@ export class Style {
 		cursor: grabbing;
 	}
 
-	.profiler-tabs::-webkit-scrollbar {
-		width: 8px;
-		height: 8px;
-	}
-
-	.profiler-tabs::-webkit-scrollbar-track {
-		background: transparent;
-	}
-
-	.profiler-tabs::-webkit-scrollbar-thumb {
-		background-color: rgba(0, 0, 0, 0.25);
-		border-radius: 10px;
-		transition: background 0.3s ease;
-	}
-
-	.profiler-tabs::-webkit-scrollbar-thumb:hover {
-		background-color: rgba(0, 0, 0, 0.4);
-	}
-
-	.profiler-tabs::-webkit-scrollbar-corner {
-		background: transparent;
-	}
 
 	.profiler-controls {
 		display: flex;
 		position: absolute;
 		right: 0;
 		top: 0;
-		height: 38px;
+		height: 32px;
 		background: var(--profiler-header-background);
 		border-bottom: 1px solid var(--profiler-border);
+	}
+
+	.profiler-panel.has-horizontal-scroll .profiler-controls {
+		height: 38px;
 	}
 
 	.tab-btn {
@@ -897,13 +923,15 @@ export class Style {
 		border: none;
 		/*border-right: 1px solid var(--profiler-border);*/
 		color: var(--text-secondary);
-		padding: 8px 18px;
+		padding: 0 15px 2px 15px;
+		height: 100%;
+		box-sizing: border-box;
 		cursor: default;
 		display: flex;
 		align-items: center;
 		font-family: var(--font-family);
 		font-weight: 600;
-		font-size: 14px;
+		font-size: 13px;
 		user-select: none;
 		transition: opacity 0.2s, transform 0.2s;
 		touch-action: pan-x;
@@ -918,7 +946,7 @@ export class Style {
 	.tab-btn.active::before {
 		content: '⋮⋮';
 		position: absolute;
-		left: 3px;
+		left: 2px;
 		top: calc(50% - .1rem);
 		transform: translateY(-50%);
 		color: var(--profiler-border);
@@ -938,7 +966,7 @@ export class Style {
 		border: none;
 		border-left: 1px solid var(--profiler-border);
 		color: var(--text-secondary);
-		width: 45px;
+		width: 40px;
 		height: 100%;
 		cursor: pointer;
 		transition: all 0.2s;
@@ -1011,33 +1039,6 @@ export class Style {
 		overflow: auto; /* make sure scrollbars can appear */
 	}
 
-	.profiler-content::-webkit-scrollbar {
-		width: 8px;
-		height: 8px;
-	}
-
-	.profiler-content::-webkit-scrollbar-track {
-		background: transparent;
-	}
-
-	.profiler-content::-webkit-scrollbar-thumb {
-		background-color: rgba(0, 0, 0, 0.25);
-		border-radius: 10px;
-		transition: background 0.3s ease;
-	}
-
-	.profiler-content::-webkit-scrollbar-thumb:hover {
-		background-color: rgba(0, 0, 0, 0.4);
-	}
-
-	.profiler-content::-webkit-scrollbar-corner {
-		background: transparent;
-	}
-
-	.profiler-content {
-		scrollbar-width: thin; /* "auto" | "thin" */
-		scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
-	}
 
 	.list-item-row {
 		display: grid;
@@ -1590,6 +1591,8 @@ export class Style {
 		opacity: 1;
 		visibility: visible;
 		transition: opacity 0.2s, visibility 0.2s;
+		font-family: var(--font-mono);
+		font-size: 13px;
 	}
 
 	.profiler-panel:not(.visible) ~ * .detached-tab-panel,
@@ -1601,9 +1604,9 @@ export class Style {
 
 	.detached-tab-header {
 		background: var(--profiler-header-background);
-		padding: 0 7px 0 15px;
+		padding: 0 3px 0 10px;
 		font-family: var(--font-family);
-		font-size: 14px;
+		font-size: 13px;
 		color: var(--text-primary);
 		font-weight: 600;
 		display: flex;
@@ -1612,7 +1615,7 @@ export class Style {
 		border-bottom: 1px solid var(--profiler-border);
 		cursor: grab;
 		user-select: none;
-		height: 38px;
+		height: 32px;
 		flex-shrink: 0;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
@@ -1653,36 +1656,15 @@ export class Style {
 
 	.detached-tab-content {
 		flex: 1;
-		overflow: auto;
+		overflow: hidden;
 		position: relative;
 		background: var(--profiler-background);
 	}
 
-	.detached-tab-content::-webkit-scrollbar {
-		width: 8px;
-		height: 8px;
-	}
-
-	.detached-tab-content::-webkit-scrollbar-track {
-		background: transparent;
-	}
-
-	.detached-tab-content::-webkit-scrollbar-thumb {
-		background-color: rgba(0, 0, 0, 0.25);
-		border-radius: 10px;
-		transition: background 0.3s ease;
-	}
-
-	.detached-tab-content::-webkit-scrollbar-thumb:hover {
-		background-color: rgba(0, 0, 0, 0.4);
-	}
-
-	.detached-tab-content::-webkit-scrollbar-corner {
-		background: transparent;
-	}
 
 	.detached-tab-content .profiler-content {
-		display: block !important;
+		display: flex !important;
+		flex-direction: column !important;
 		height: 100%;
 		visibility: visible !important;
 		opacity: 1 !important;

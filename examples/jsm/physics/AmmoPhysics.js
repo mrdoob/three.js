@@ -1,13 +1,13 @@
+const AMMO_PATH = 'https://cdn.jsdelivr.net/gh/kripken/ammo.js@79190a1f03845794b1bba1777f30037349967658/builds/ammo.wasm.js';
+
 /**
  * @classdesc Can be used to include Ammo.js as a Physics engine into
- * `three.js` apps. Make sure to include `ammo.wasm.js` first:
- * ```
- * <script src="jsm/libs/ammo.wasm.js"></script>
- * ```
- * It is then possible to initialize the API via:
+ * `three.js` apps. The API can be initialized via:
  * ```js
  * const physics = await AmmoPhysics();
  * ```
+ * The component automatically imports Ammo.js from a CDN so make sure
+ * to use the component with an active Internet connection.
  *
  * @name AmmoPhysics
  * @class
@@ -16,10 +16,17 @@
  */
 async function AmmoPhysics() {
 
-	if ( 'Ammo' in window === false ) {
+	if ( typeof Ammo === 'undefined' ) {
 
-		console.error( 'AmmoPhysics: Couldn\'t find Ammo.js' );
-		return;
+		await new Promise( ( resolve, reject ) => {
+
+			const script = document.createElement( 'script' );
+			script.src = AMMO_PATH;
+			script.onload = resolve;
+			script.onerror = reject;
+			document.head.appendChild( script );
+
+		} );
 
 	}
 
