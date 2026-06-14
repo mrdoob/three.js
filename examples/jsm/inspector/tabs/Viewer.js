@@ -2,6 +2,7 @@ import { Tab } from '../ui/Tab.js';
 import { List } from '../ui/List.js';
 import { Item } from '../ui/Item.js';
 import { splitPath, splitCamelCase } from '../ui/utils.js';
+import { getItem, setItem } from '../Inspector.js';
 
 import { RendererUtils, NoToneMapping, LinearSRGBColorSpace, QuadMesh, NodeMaterial, CanvasTarget, Vector2 } from 'three/webgpu';
 import { renderOutput, vec2, vec3, vec4, Fn, screenUV, step, OnMaterialUpdate, uniform, float } from 'three/tsl';
@@ -108,6 +109,7 @@ class Viewer extends Tab {
 		this.select = select;
 		this.backBtn = backBtn;
 		this.activeFullNodeId = null;
+		this.pendingRestoreView = true;
 
 		backBtn.addEventListener( 'click', () => {
 
@@ -126,6 +128,8 @@ class Viewer extends Tab {
 
 			}
 
+			this.saveLastView();
+
 		} );
 
 		select.addEventListener( 'change', () => {
@@ -141,6 +145,8 @@ class Viewer extends Tab {
 				this.showNodeView( val );
 
 			}
+
+			this.saveLastView();
 
 		} );
 
@@ -243,6 +249,7 @@ class Viewer extends Tab {
 				e.stopPropagation();
 				this.select.value = canvasData.id;
 				this.showNodeView( canvasData.id );
+				this.saveLastView();
 
 			};
 
@@ -275,6 +282,8 @@ class Viewer extends Tab {
 					}
 
 				}
+
+				this.saveLastView();
 
 			};
 
@@ -475,6 +484,8 @@ class Viewer extends Tab {
 
 		if ( canvasData ) {
 
+			this.addNodeItem( canvasData );
+
 			this.activeFullNodeId = nodeId;
 			this.backBtn.style.display = 'flex';
 
@@ -625,25 +636,61 @@ class Viewer extends Tab {
 
 			}
 
-			// Restore selection if still valid
-			let hasSelectedValue = false;
+			// Try to restore from saved view first on initial load
+			let restored = false;
 
-			for ( let i = 0; i < this.select.options.length; i ++ ) {
+			if ( this.pendingRestoreView ) {
 
-				if ( this.select.options[ i ].value === currentSelectedValue ) {
+				const savedView = getItem( 'viewerLastView' );
 
-					this.select.selectedIndex = i;
-					hasSelectedValue = true;
-					break;
+				if ( savedView && savedView !== 'list' ) {
+
+					for ( let i = 0; i < this.select.options.length; i ++ ) {
+
+						if ( this.select.options[ i ].textContent === savedView ) {
+
+							this.select.selectedIndex = i;
+							const nodeId = this.select.options[ i ].value;
+							this.showNodeView( nodeId );
+							restored = true;
+							this.pendingRestoreView = false;
+							break;
+
+						}
+
+					}
+
+				} else {
+
+					this.pendingRestoreView = false;
 
 				}
 
 			}
 
-			if ( ! hasSelectedValue ) {
+			if ( ! restored ) {
 
-				this.select.value = 'list';
-				this.showListView();
+				// Restore selection if still valid
+				let hasSelectedValue = false;
+
+				for ( let i = 0; i < this.select.options.length; i ++ ) {
+
+					if ( this.select.options[ i ].value === currentSelectedValue ) {
+
+						this.select.selectedIndex = i;
+						hasSelectedValue = true;
+						break;
+
+					}
+
+				}
+
+				if ( ! hasSelectedValue ) {
+
+					this.select.value = 'list';
+					this.showListView();
+
+				}
 
 			}
 
@@ -801,6 +848,28 @@ class Viewer extends Tab {
 	setActive( isActive ) {
 
 		super.setActive( isActive );
+
+	}
+
+	saveLastView() {
+
+		const selectedValue = this.select.value;
+
+		if ( selectedValue === 'list' ) {
+
+			setItem( 'viewerLastView', 'list' );
+
+		} else {
+
+			const selectedOption = this.select.options[ this.select.selectedIndex ];
+
+			if ( selectedOption ) {
+
+				setItem( 'viewerLastView', selectedOption.textContent );
+
+			}
+
+		}
 
 	}
 
