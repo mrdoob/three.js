@@ -175,6 +175,14 @@ class VarNode extends Node {
 
 		const builder = params[ 0 ];
 
+		const refNode = this.getShared( builder );
+
+		if ( this !== refNode ) {
+
+			return refNode.build( ...params );
+
+		}
+
 		if ( this._hasStack( builder ) === false && builder.buildStage === 'setup' ) {
 
 			if ( builder.context.nodeLoop || builder.context.nodeBlock ) {
