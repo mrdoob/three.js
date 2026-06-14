@@ -699,31 +699,35 @@ export class Style {
 
 		overflow-x: auto;
 		overflow-y: hidden;
-		width: calc(100% - 134px);
-		height: 38px;
+		width: calc(100% - 120px);
+		height: 32px;
 		user-select: none;
 		-webkit-user-select: none;
+	}
+
+	.profiler-panel.has-horizontal-scroll .profiler-header {
+		height: 38px;
 	}
 
 	/* Adjust header width based on panel position */
 	.profiler-panel.position-right .profiler-header,
 	.profiler-panel.position-left .profiler-header {
-		width: calc(100% - 134px);
+		width: calc(100% - 120px);
 	}
 
 	.profiler-panel.position-bottom .profiler-header,
 	.profiler-panel.position-top .profiler-header {
-		width: calc(100% - 134px);
+		width: calc(100% - 120px);
 	}
 
 	/* Adjust header width when position toggle button is hidden (mobile) */
 	.profiler-panel.hide-position-toggle .profiler-header {
-		width: calc(100% - 90px);
+		width: calc(100% - 80px);
 	}
 
 	/* Adjust header width when maximized (floating position toggle button is hidden) */
 	.profiler-panel.maximized .profiler-header {
-		width: calc(100% - 90px);
+		width: calc(100% - 80px);
 	}
 
 	/* ===== RULES FOR WHEN THERE ARE NO TABS ===== */
@@ -731,14 +735,14 @@ export class Style {
 	/* Horizontal mode (bottom/top) without tabs */
 	.profiler-panel.position-bottom.no-tabs:not(.maximized),
 	.profiler-panel.position-top.no-tabs:not(.maximized) {
-		height: 38px !important;
-		min-height: 38px !important;
+		height: 32px !important;
+		min-height: 32px !important;
 	}
 
 	.profiler-panel.position-bottom.no-tabs .profiler-header,
 	.profiler-panel.position-top.no-tabs .profiler-header {
 		width: 100%;
-		height: 38px;
+		height: 32px;
 		border-bottom: none;
 	}
 
@@ -755,8 +759,8 @@ export class Style {
 	/* Vertical mode (right/left) without tabs */
 	.profiler-panel.position-right.no-tabs:not(.maximized),
 	.profiler-panel.position-left.no-tabs:not(.maximized) {
-		width: 45px !important;
-		min-width: 45px !important;
+		width: 40px !important;
+		min-width: 40px !important;
 	}
 
 	/* Vertical layout for header when no tabs */
@@ -784,7 +788,7 @@ export class Style {
 	.profiler-panel.position-right.no-tabs .profiler-controls button,
 	.profiler-panel.position-left.no-tabs .profiler-controls button {
 		width: 100%;
-		height: 45px;
+		height: 40px;
 		border-left: none;
 		border-top: none;
 		border-bottom: 1px solid var(--profiler-border);
@@ -808,8 +812,8 @@ export class Style {
 	/* Hide position toggle on mobile without tabs */
 	.profiler-panel.hide-position-toggle.position-right.no-tabs:not(.maximized),
 	.profiler-panel.hide-position-toggle.position-left.no-tabs:not(.maximized) {
-		width: 45px !important;
-		min-width: 45px !important;
+		width: 40px !important;
+		min-width: 40px !important;
 	}
 
 	/* Hide drag indicator on mobile devices */
@@ -904,9 +908,13 @@ export class Style {
 		position: absolute;
 		right: 0;
 		top: 0;
-		height: 38px;
+		height: 32px;
 		background: var(--profiler-header-background);
 		border-bottom: 1px solid var(--profiler-border);
+	}
+
+	.profiler-panel.has-horizontal-scroll .profiler-controls {
+		height: 38px;
 	}
 
 	.tab-btn {
@@ -915,13 +923,15 @@ export class Style {
 		border: none;
 		/*border-right: 1px solid var(--profiler-border);*/
 		color: var(--text-secondary);
-		padding: 8px 18px;
+		padding: 0 15px 2px 15px;
+		height: 100%;
+		box-sizing: border-box;
 		cursor: default;
 		display: flex;
 		align-items: center;
 		font-family: var(--font-family);
 		font-weight: 600;
-		font-size: 14px;
+		font-size: 13px;
 		user-select: none;
 		transition: opacity 0.2s, transform 0.2s;
 		touch-action: pan-x;
@@ -936,7 +946,7 @@ export class Style {
 	.tab-btn.active::before {
 		content: '⋮⋮';
 		position: absolute;
-		left: 3px;
+		left: 2px;
 		top: calc(50% - .1rem);
 		transform: translateY(-50%);
 		color: var(--profiler-border);
@@ -956,7 +966,7 @@ export class Style {
 		border: none;
 		border-left: 1px solid var(--profiler-border);
 		color: var(--text-secondary);
-		width: 45px;
+		width: 40px;
 		height: 100%;
 		cursor: pointer;
 		transition: all 0.2s;
@@ -1594,9 +1604,9 @@ export class Style {
 
 	.detached-tab-header {
 		background: var(--profiler-header-background);
-		padding: 0 7px 0 15px;
+		padding: 0 3px 0 10px;
 		font-family: var(--font-family);
-		font-size: 14px;
+		font-size: 13px;
 		color: var(--text-primary);
 		font-weight: 600;
 		display: flex;
@@ -1605,7 +1615,7 @@ export class Style {
 		border-bottom: 1px solid var(--profiler-border);
 		cursor: grab;
 		user-select: none;
-		height: 38px;
+		height: 32px;
 		flex-shrink: 0;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
