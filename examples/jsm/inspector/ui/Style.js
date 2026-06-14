@@ -1653,7 +1653,7 @@ export class Style {
 
 	.detached-tab-content {
 		flex: 1;
-		overflow: auto;
+		overflow: hidden;
 		position: relative;
 		background: var(--profiler-background);
 	}
@@ -1682,7 +1682,8 @@ export class Style {
 	}
 
 	.detached-tab-content .profiler-content {
-		display: block !important;
+		display: flex !important;
+		flex-direction: column !important;
 		height: 100%;
 		visibility: visible !important;
 		opacity: 1 !important;
