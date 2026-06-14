@@ -817,27 +817,67 @@ export class Style {
 		display: none;
 	}
 
-	.profiler-header::-webkit-scrollbar {
-		width: 8px;
-		height: 8px;
+	.profiler-header::-webkit-scrollbar,
+	.profiler-tabs::-webkit-scrollbar,
+	.profiler-content::-webkit-scrollbar,
+	.detached-tab-content::-webkit-scrollbar,
+	.console-log::-webkit-scrollbar,
+	.timelineTrack::-webkit-scrollbar,
+	.list-scroll-wrapper::-webkit-scrollbar {
+		width: 4px;
+		height: 4px;
 	}
 
-	.profiler-header::-webkit-scrollbar-track {
+	.profiler-header::-webkit-scrollbar-track,
+	.profiler-tabs::-webkit-scrollbar-track,
+	.profiler-content::-webkit-scrollbar-track,
+	.detached-tab-content::-webkit-scrollbar-track,
+	.console-log::-webkit-scrollbar-track,
+	.timelineTrack::-webkit-scrollbar-track,
+	.list-scroll-wrapper::-webkit-scrollbar-track {
 		background: transparent;
 	}
 
-	.profiler-header::-webkit-scrollbar-thumb {
-		background-color: rgba(0, 0, 0, 0.25);
-		border-radius: 10px;
-		transition: background 0.3s ease;
+	.profiler-header::-webkit-scrollbar-thumb,
+	.profiler-tabs::-webkit-scrollbar-thumb,
+	.profiler-content::-webkit-scrollbar-thumb,
+	.detached-tab-content::-webkit-scrollbar-thumb,
+	.console-log::-webkit-scrollbar-thumb,
+	.timelineTrack::-webkit-scrollbar-thumb,
+	.list-scroll-wrapper::-webkit-scrollbar-thumb {
+		background-color: rgba(255, 255, 255, 0.15);
+		border-radius: 2px;
 	}
 
-	.profiler-header::-webkit-scrollbar-thumb:hover {
-		background-color: rgba(0, 0, 0, 0.4);
+	.profiler-header::-webkit-scrollbar-thumb:hover,
+	.profiler-tabs::-webkit-scrollbar-thumb:hover,
+	.profiler-content::-webkit-scrollbar-thumb:hover,
+	.detached-tab-content::-webkit-scrollbar-thumb:hover,
+	.console-log::-webkit-scrollbar-thumb:hover,
+	.timelineTrack::-webkit-scrollbar-thumb:hover,
+	.list-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+		background-color: rgba(255, 255, 255, 0.3);
 	}
 
-	.profiler-header::-webkit-scrollbar-corner {
+	.profiler-header::-webkit-scrollbar-corner,
+	.profiler-tabs::-webkit-scrollbar-corner,
+	.profiler-content::-webkit-scrollbar-corner,
+	.detached-tab-content::-webkit-scrollbar-corner,
+	.console-log::-webkit-scrollbar-corner,
+	.timelineTrack::-webkit-scrollbar-corner,
+	.list-scroll-wrapper::-webkit-scrollbar-corner {
 		background: transparent;
+	}
+
+	.profiler-header,
+	.profiler-tabs,
+	.profiler-content,
+	.detached-tab-content,
+	.console-log,
+	.timelineTrack,
+	.list-scroll-wrapper {
+		scrollbar-width: thin;
+		scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
 	}
 
 	.profiler-panel.dragging .profiler-header {
@@ -858,28 +898,6 @@ export class Style {
 		cursor: grabbing;
 	}
 
-	.profiler-tabs::-webkit-scrollbar {
-		width: 8px;
-		height: 8px;
-	}
-
-	.profiler-tabs::-webkit-scrollbar-track {
-		background: transparent;
-	}
-
-	.profiler-tabs::-webkit-scrollbar-thumb {
-		background-color: rgba(0, 0, 0, 0.25);
-		border-radius: 10px;
-		transition: background 0.3s ease;
-	}
-
-	.profiler-tabs::-webkit-scrollbar-thumb:hover {
-		background-color: rgba(0, 0, 0, 0.4);
-	}
-
-	.profiler-tabs::-webkit-scrollbar-corner {
-		background: transparent;
-	}
 
 	.profiler-controls {
 		display: flex;
@@ -1011,33 +1029,6 @@ export class Style {
 		overflow: auto; /* make sure scrollbars can appear */
 	}
 
-	.profiler-content::-webkit-scrollbar {
-		width: 8px;
-		height: 8px;
-	}
-
-	.profiler-content::-webkit-scrollbar-track {
-		background: transparent;
-	}
-
-	.profiler-content::-webkit-scrollbar-thumb {
-		background-color: rgba(0, 0, 0, 0.25);
-		border-radius: 10px;
-		transition: background 0.3s ease;
-	}
-
-	.profiler-content::-webkit-scrollbar-thumb:hover {
-		background-color: rgba(0, 0, 0, 0.4);
-	}
-
-	.profiler-content::-webkit-scrollbar-corner {
-		background: transparent;
-	}
-
-	.profiler-content {
-		scrollbar-width: thin; /* "auto" | "thin" */
-		scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
-	}
 
 	.list-item-row {
 		display: grid;
@@ -1658,28 +1649,6 @@ export class Style {
 		background: var(--profiler-background);
 	}
 
-	.detached-tab-content::-webkit-scrollbar {
-		width: 8px;
-		height: 8px;
-	}
-
-	.detached-tab-content::-webkit-scrollbar-track {
-		background: transparent;
-	}
-
-	.detached-tab-content::-webkit-scrollbar-thumb {
-		background-color: rgba(0, 0, 0, 0.25);
-		border-radius: 10px;
-		transition: background 0.3s ease;
-	}
-
-	.detached-tab-content::-webkit-scrollbar-thumb:hover {
-		background-color: rgba(0, 0, 0, 0.4);
-	}
-
-	.detached-tab-content::-webkit-scrollbar-corner {
-		background: transparent;
-	}
 
 	.detached-tab-content .profiler-content {
 		display: flex !important;
