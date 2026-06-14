@@ -25,9 +25,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.webgpu.js",
-					"three/webgpu": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.tsl.js",
+					"three": "../src/three.webgpu.js",
+					"three/webgpu": "../src/three.webgpu.js",
+					"three/tsl": "../src/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -36,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Fn, If, Loop, vec2, vec4, uvec2, uvec4, mat4, uint, float, int, min, max, clamp, ceil, log2, length, dFdx, dFdy, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, instanceIndex, vertexIndex, distance, screenSize, screenCoordinate, time, texture, varyingProperty, sqrt, normalize, cross, sign, positionGeometry, cameraViewMatrix, Discard, context } from 'three/tsl';
+			import { Fn, If, Loop, vec2, vec4, uvec2, uvec4, mat4, uint, float, int, min, max, clamp, ceil, log2, length, dFdx, dFdy, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, instanceIndex, vertexIndex, distance, screenSize, screenCoordinate, time, texture, varyingProperty, sqrt, normalize, cross, sign, positionGeometry, cameraViewMatrix, Discard, context, positionView, positionViewDirection, overrideNodes } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -1427,10 +1427,13 @@
 
 					// Shaded: feed the reconstructed surface into the standard material pipeline
 					const resolveShadedMaterial = new THREE.MeshStandardNodeMaterial();
-					resolveShadedMaterial.contextNode = context( {
-						positionView: positionViewHelmet,
-						positionViewDirection: positionViewDirectionHelmet
-					} );
+					resolveShadedMaterial.name = 'TEST';
+					resolveShadedMaterial.contextNode =
+						overrideNodes( [
+							[ positionView, positionViewHelmet ],
+							[ positionViewDirection, positionViewDirectionHelmet ]
+						] );
+
 					resolveShadedMaterial.vertexNode = fullscreenVertex;
 					resolveShadedMaterial.depthNode = resolveDepth;
 					resolveShadedMaterial.colorNode = coveredColor( sampleMap( sourceMaterial.map ) );
