@@ -643,7 +643,7 @@ class Viewer extends Tab {
 
 				const savedView = getItem( 'viewerLastView' );
 
-				if ( savedView && savedView !== 'list' ) {
+				if ( savedView !== 'list' ) {
 
 					for ( let i = 0; i < this.select.options.length; i ++ ) {
 
