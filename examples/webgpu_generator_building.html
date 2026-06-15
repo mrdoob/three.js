@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - building generator</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - building generator">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_generator_building.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_generator_building.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Building Generator</span>
+			</div>
+
+			<small>
+				A single procedurally generated Neo-Gothic terracotta skyscraper at sunset.			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { uniform } from 'three/tsl';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
+			import { SkyscraperGenerator, createSkyscraperMaterial } from 'three/addons/generators/city/SkyscraperGenerator.js';
+
+			let camera, scene, renderer, controls, generator, building, material;
+			let sky, sunLight, pmremGenerator, envScene;
+
+			// reused by updateSun(): the current sun direction and the key-light
+			// colours it blends between as the sun nears the horizon or climbs high
+			const sun = new THREE.Vector3();
+			const sunHorizonColor = new THREE.Color( 0xffb072 );
+			const sunMiddayColor = new THREE.Color( 0xfff4e8 );
+
+			// every building takes one flat masonry colour; a uniform lets the seed
+			// repick it without recompiling the shared material
+			const baseColor = uniform( new THREE.Color( 0xc6c0b2 ) );
+
+			// NYC palette: limestone / granite-dominant, with the odd brick or dark stone
+			const palette = [
+				0xc6c0b2, 0xc6c0b2, 0xbdb7a8, 0xd1ccbe, 0xb4afa1, // limestone / pale dressed stone
+				0x9a988f, 0x8b8983, 0xa5a39a, // grey granite / concrete
+				0xb1a484, 0xbcae8b, // buff / tan brick
+				0x80705b, 0x786755, // brownstone
+				0x946d5b, 0x885f4e, // weathered brick
+				0xdbd6cb, // pale glazed
+				0x7c868d, // steel / glass
+				0x4c4943 // dark stone ( rare )
+			];
+
+			const parameters = {
+				seed: 7,
+				height: 100,
+				width: 34,
+				depth: 28,
+				floorHeight: 4,
+				bayWidth: 2.6,
+				chamfer: 5,
+				setback: 1.5,
+				timeOfDay: 17 // hours: 6 sunrise, 12 noon, 18 sunset
+			};
+
+			init();
+
+			async function init() {
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 0.25;
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				scene = new THREE.Scene();
+				scene.environmentIntensity = 0.25; // sky as a soft fill; the sun is the key
+
+				// a physical sky drives both the backdrop and the image-based lighting;
+				// updateSun() positions the sun and bakes it into the IBL environment
+
+				sky = new SkyMesh();
+				sky.scale.setScalar( 10000 );
+				sky.turbidity.value = 8;
+				sky.rayleigh.value = 3;
+				sky.mieCoefficient.value = 0.008;
+				sky.mieDirectionalG.value = 0.88;
+
+				// the sky is baked into the environment map from this scene, then moved
+				// to the main scene as the backdrop ( see updateSun )
+				envScene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera.position.set( 120, 95, 155 );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.target.set( 0, 58, 0 );
+				controls.maxPolarAngle = Math.PI * 0.495;
+				controls.minDistance = 30;
+				controls.maxDistance = 600;
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = 0.3;
+				controls.update();
+
+				// a single directional key aligned with the sky's sun, for the crisp
+				// relief shadows the IBL alone can't give. updateSun() and
+				// fitShadowCamera() drive its colour, intensity and shadow frustum
+
+				sunLight = new THREE.DirectionalLight();
+				sunLight.castShadow = true;
+				sunLight.shadow.mapSize.set( 2048, 2048 );
+				sunLight.shadow.bias = - 0.0004;
+				scene.add( sunLight );
+				scene.add( sunLight.target );
+
+				// place the sun ( sky, IBL, key light and shadow ) for the current time
+				updateSun();
+
+				// an invisible ground that only catches the tower's shadow, large
+				// enough to hold the long shadow the low sun casts
+				const ground = new THREE.Mesh(
+					new THREE.PlaneGeometry( 2000, 2000 ).rotateX( - Math.PI / 2 ),
+					new THREE.ShadowMaterial( { color: 0x000000, opacity: 0.35 } )
+				);
+				ground.receiveShadow = true;
+				scene.add( ground );
+
+				material = createSkyscraperMaterial( baseColor );
+				generate();
+
+				const gui = renderer.inspector.createParameters( 'Building' );
+				gui.add( parameters, 'seed', 0, 100, 1 ).onChange( generate );
+				gui.add( parameters, 'height', 60, 200, 1 ).onChange( generate );
+				gui.add( parameters, 'width', 18, 60, 1 ).onChange( generate );
+				gui.add( parameters, 'depth', 16, 50, 1 ).onChange( generate );
+				gui.add( parameters, 'floorHeight', 3, 6, 0.1 ).onChange( generate );
+				gui.add( parameters, 'bayWidth', 1.8, 4.5, 0.1 ).onChange( generate );
+				gui.add( parameters, 'chamfer', 0, 10, 0.5 ).onChange( generate );
+				gui.add( parameters, 'setback', 0, 4, 0.1 ).onChange( generate );
+				gui.add( parameters, 'timeOfDay', 6, 18, 0.1 ).name( 'time of day' ).onChange( updateSun );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function pickBaseColor( seed ) {
+
+				const h = Math.abs( Math.sin( seed * 12.9898 ) * 43758.5453 );
+				return palette[ Math.floor( ( h - Math.floor( h ) ) * palette.length ) ];
+
+			}
+
+			function generate() {
+
+				if ( building ) {
+
+					scene.remove( building );
+					building.geometry.dispose();
+
+				}
+
+				baseColor.value.setHex( pickBaseColor( parameters.seed ) );
+
+				generator = new SkyscraperGenerator( {
+					seed: parameters.seed,
+					totalHeight: parameters.height,
+					footprint: { width: parameters.width, depth: parameters.depth },
+					floorHeight: parameters.floorHeight,
+					bayWidth: parameters.bayWidth,
+					chamferWidth: parameters.chamfer,
+					setbackDepth: parameters.setback
+				}, material );
+				building = generator.build();
+				building.castShadow = building.receiveShadow = true;
+				scene.add( building );
+
+				fitShadowCamera();
+
+			}
+
+			function updateSun() {
+
+				// map the time of day to a sun arc: low and warm at dawn / dusk, high and
+				// bright at noon, sweeping east → west across the day
+
+				const t = parameters.timeOfDay;
+				const u = ( t - 12 ) / 6; // -1 at sunrise, 0 at noon, +1 at sunset
+				const elevation = Math.max( 0, 1 - u * u ) * 72; // degrees above the horizon, peaks at noon
+				const azimuth = 90 - u * 55; // the sun swings east → west across the day
+
+				sun.setFromSphericalCoords( 1, THREE.MathUtils.degToRad( 90 - elevation ), THREE.MathUtils.degToRad( azimuth ) );
+				sky.sunPosition.value.copy( sun );
+
+				// physically-motivated key light: real sunlight is far brighter than the
+				// sky, so the sun stays the dominant source and cast shadows read clearly
+				// against the soft sky fill. the longer air path near the horizon dims and
+				// warms it ( the fill dims with it, as the environment is re-baked below ).
+
+				const sinElevation = Math.sin( THREE.MathUtils.degToRad( elevation ) );
+				const transmittance = Math.sqrt( Math.max( sinElevation, 0 ) ); // 0 at the horizon → 1 at the zenith
+				sunLight.color.copy( sunHorizonColor ).lerp( sunMiddayColor, transmittance );
+				sunLight.intensity = 6 * transmittance; // illuminance perpendicular to the rays; the renderer applies N·L per surface
+
+				// re-bake the sky ( without the sun disc ) into the environment map for IBL
+
+				sky.showSunDisc.value = false;
+				envScene.add( sky );
+				const env = pmremGenerator.fromScene( envScene ).texture;
+				if ( scene.environment ) scene.environment.dispose();
+				scene.environment = env;
+				sky.showSunDisc.value = true;
+				scene.add( sky );
+
+				fitShadowCamera();
+
+			}
+
+			function fitShadowCamera() {
+
+				// fit the directional light's shadow frustum to the tower and the full
+				// ground shadow it casts, so a low sun's long shadow isn't clipped
+
+				const height = parameters.height;
+				const tipDistance = height / Math.max( sun.y, 0.05 ); // shadow tip on the ground
+				const centerX = - sun.x * tipDistance * 0.5;
+				const centerZ = - sun.z * tipDistance * 0.5;
+
+				const radius = Math.hypot( parameters.width, parameters.depth ) * 0.5;
+				const half = Math.hypot( centerX, centerZ ) + radius + 20;
+				const distance = half + height; // place the light clear of the whole scene
+
+				sunLight.target.position.set( centerX, 0, centerZ );
+				sunLight.target.updateMatrixWorld();
+				sunLight.position.set( centerX + sun.x * distance, sun.y * distance, centerZ + sun.z * distance );
+
+				const shadowCamera = sunLight.shadow.camera;
+				shadowCamera.left = - half;
+				shadowCamera.right = half;
+				shadowCamera.top = half;
+				shadowCamera.bottom = - half;
+				shadowCamera.near = 1;
+				shadowCamera.far = distance * 2;
+				shadowCamera.updateProjectionMatrix();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				controls.update();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

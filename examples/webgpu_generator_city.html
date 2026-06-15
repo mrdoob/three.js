@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - city generator</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - city generator">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_generator_city.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_generator_city.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>City Generator</span>
+			</div>
+
+			<small>
+				A few procedurally generated city blocks of Neo-Gothic terracotta skyscrapers at sunset.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { color, floor, fract, mix, positionWorld, sin, step, varying } from 'three/tsl';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
+			import { CityGenerator, createRoadMaterial } from 'three/addons/generators/CityGenerator.js';
+			import { createSkyscraperMaterial } from 'three/addons/generators/city/SkyscraperGenerator.js';
+
+			let camera, scene, renderer, controls;
+			let cityGroup, materials, city;
+			let sky, sun, sunLight, pmremGenerator, envScene;
+
+			const parameters = {
+				seed: 1,
+				timeOfDay: 6.4 // hours: 6 sunrise, 12 noon, 18 sunset
+			};
+
+			init();
+
+			async function init() {
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 0.35;
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				scene = new THREE.Scene();
+				scene.environmentIntensity = 0.25; // sky as a soft fill; the sun is the key
+
+				// a physical sky drives both the backdrop and the image-based
+				// lighting; the time-of-day slider walks the sun along its arc
+
+				sky = new SkyMesh();
+				sky.scale.setScalar( 10000 );
+				sky.turbidity.value = 8;
+				sky.rayleigh.value = 3;
+				sky.mieCoefficient.value = 0.008;
+				sky.mieDirectionalG.value = 0.88;
+
+				sun = new THREE.Vector3();
+				envScene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera.position.set( - 55, 60, - 100 );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.target.set( 25, 60, 0 );
+				controls.maxPolarAngle = Math.PI * 0.5;
+				controls.minDistance = 20;
+				controls.maxDistance = 1200;
+				controls.update();
+
+				city = new CityGenerator( { seed: parameters.seed } );
+
+				// road: wet asphalt with sidewalks, lane lines and crosswalks, all
+				// aligned to the city grid via TSL. sized to the city footprint plus
+				// one street ( a crosswalk's width ) of margin all round
+
+				const floorW = city.layout.cityW + 2 * city.layout.street;
+				const floorD = city.layout.cityD + 2 * city.layout.street;
+				const ground = new THREE.Mesh( new THREE.PlaneGeometry( floorW, floorD ).rotateX( - Math.PI / 2 ), createRoadMaterial( city.layout ) );
+				ground.receiveShadow = true;
+				scene.add( ground );
+
+				// a single directional key aligned with the sky's sun, for the crisp
+				// relief shadows the IBL alone can't give. its colour, intensity and
+				// position — and the baked environment — are set by updateSun()
+
+				sunLight = new THREE.DirectionalLight();
+				sunLight.castShadow = true;
+				sunLight.shadow.camera.left = - 280;
+				sunLight.shadow.camera.right = 280;
+				sunLight.shadow.camera.top = 360;
+				sunLight.shadow.camera.bottom = - 40;
+				sunLight.shadow.camera.far = 2400;
+				sunLight.shadow.mapSize.set( 4096, 4096 );
+				sunLight.shadow.bias = - 0.0004;
+				scene.add( sunLight );
+
+				updateSun();
+
+				materials = { building: buildBuildingMaterial( city.layout ) };
+				generateCity();
+
+				// parameters
+
+				const gui = renderer.inspector.createParameters( 'City' );
+				gui.add( parameters, 'seed', 0, 100, 1 ).onChange( generateCity );
+				gui.add( parameters, 'timeOfDay', 6, 18, 0.1 ).name( 'time of day' ).onChange( updateSun );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function updateSun() {
+
+				const t = parameters.timeOfDay;
+				const u = ( t - 12 ) / 6; // -1 at sunrise, 0 at noon, +1 at sunset
+				const elevation = Math.max( 0, 1 - u * u ) * 72; // degrees above the horizon, peaks at noon
+				const azimuth = 90 - u * 55; // the sun swings east → west across the day
+
+				sun.setFromSphericalCoords(
+					1,
+					THREE.MathUtils.degToRad( 90 - elevation ),
+					THREE.MathUtils.degToRad( azimuth )
+				);
+				sky.sunPosition.value.copy( sun );
+
+				// physically-motivated key light: real sunlight is far brighter than the
+				// sky, so the sun stays the dominant source and cast shadows read clearly
+				// against the soft sky fill. the longer air path near the horizon dims and
+				// warms it ( the fill dims with it, as the environment is re-baked below ).
+
+				const sinElevation = Math.sin( THREE.MathUtils.degToRad( elevation ) );
+				const transmittance = Math.sqrt( Math.max( sinElevation, 0 ) ); // 0 at the horizon → 1 at the zenith
+				sunLight.color.set( 0xffb072 ).lerp( new THREE.Color( 0xfff4e8 ), transmittance );
+				sunLight.intensity = 6 * transmittance; // illuminance perpendicular to the rays; the renderer applies N·L per surface
+				sunLight.position.copy( sun ).multiplyScalar( 600 );
+
+				// re-bake the sky ( without the sun disc ) into the environment map for IBL
+
+				sky.showSunDisc.value = false;
+				envScene.add( sky );
+				const env = pmremGenerator.fromScene( envScene ).texture;
+				if ( scene.environment ) scene.environment.dispose();
+				scene.environment = env;
+				sky.showSunDisc.value = true;
+				scene.add( sky );
+
+			}
+
+			function buildBuildingMaterial( layout ) {
+
+				// NYC palette: every building takes one flat colour, chosen by hashing
+				// its lot in the city grid. a single shared material still dresses the
+				// whole skyline ( no per-building shaders ) — only the picked colour differs.
+				// common materials are repeated so an equal-probability pick feels like a real block.
+
+				const palette = [
+					color( 0xc6c0b2 ), color( 0xc6c0b2 ), color( 0xbdb7a8 ), color( 0xd1ccbe ), color( 0xb4afa1 ), // limestone / pale dressed stone — the Manhattan default
+					color( 0x9a988f ), color( 0x8b8983 ), color( 0xa5a39a ), // grey granite / concrete
+					color( 0xb1a484 ), color( 0xbcae8b ), // buff / tan brick ( muted )
+					color( 0x80705b ), color( 0x786755 ), // brownstone ( muted grey-brown )
+					color( 0x946d5b ), color( 0x885f4e ), // weathered brick ( desaturated )
+					color( 0xdbd6cb ), // pale glazed
+					color( 0x7c868d ), // steel / glass ( muted cool )
+					color( 0x4c4943 ) // dark stone ( rare )
+				];
+
+				const periodX = layout.blockW + layout.street;
+				const periodZ = layout.blockD + layout.street;
+				const gx = positionWorld.x.add( layout.cityW / 2 );
+				const gz = positionWorld.z.add( layout.cityD / 2 );
+				const blockIX = floor( gx.div( periodX ) );
+				const blockIZ = floor( gz.div( periodZ ) );
+				const cellX = blockIX.mul( layout.lotsX ).add( floor( gx.sub( blockIX.mul( periodX ) ).div( layout.lot ) ) );
+				const cellZ = blockIZ.mul( layout.lotsZ ).add( floor( gz.sub( blockIZ.mul( periodZ ) ).div( layout.lot ) ) );
+				const cellHash = ( a, b ) => fract( sin( cellX.mul( a ).add( cellZ.mul( b ) ).add( parameters.seed ) ).mul( 43758.5453 ) );
+
+				const pick = cellHash( 127.1, 311.7 );
+				let buildingBase = palette[ 0 ];
+				for ( let i = 1; i < palette.length; i ++ ) buildingBase = mix( buildingBase, palette[ i ], step( i / palette.length, pick ) );
+				buildingBase = buildingBase.mul( cellHash( 269.5, 183.3 ).mul( 0.12 ).add( 0.94 ) ); // subtle per-building brightness
+
+				// buildingBase is constant across each tower's footprint, so resolve the palette pick
+				// once per vertex ( varying ) instead of per fragment — the interpolated constant is identical
+				return createSkyscraperMaterial( varying( buildingBase ) );
+
+			}
+
+			function generateCity() {
+
+				if ( cityGroup ) scene.remove( cityGroup );
+
+				city.parameters.seed = parameters.seed;
+				cityGroup = city.build( materials );
+				scene.add( cityGroup );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				controls.update();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
