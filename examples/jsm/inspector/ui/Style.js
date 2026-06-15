@@ -940,7 +940,7 @@ export class Style {
 		border: none;
 		/*border-right: 1px solid var(--profiler-border);*/
 		color: var(--text-secondary);
-		padding: 1px 15px 1px 15px;
+		padding: 0 15px 2px 15px;
 		height: 100%;
 		box-sizing: border-box;
 		cursor: default;
