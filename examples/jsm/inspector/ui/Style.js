@@ -959,14 +959,16 @@ export class Style {
 	}
 
 	.tab-btn.active::before {
-		content: '⋮⋮';
+		content: '';
 		position: absolute;
-		left: 2px;
-		top: calc(50% - .1rem);
+		left: 4px;
+		top: calc(50% - 2px);
 		transform: translateY(-50%);
-		color: var(--profiler-border);
-		font-size: 18px;
-		letter-spacing: -2px;
+		width: 6px;
+		height: 12px;
+		background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='6' height='12' viewBox='0 0 6 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='2' r='1' fill='%234a4a5a'/%3E%3Ccircle cx='1' cy='6' r='1' fill='%234a4a5a'/%3E%3Ccircle cx='1' cy='10' r='1' fill='%234a4a5a'/%3E%3Ccircle cx='5' cy='2' r='1' fill='%234a4a5a'/%3E%3Ccircle cx='5' cy='6' r='1' fill='%234a4a5a'/%3E%3Ccircle cx='5' cy='10' r='1' fill='%234a4a5a'/%3E%3C/svg%3E");
+		background-repeat: no-repeat;
+		background-position: center;
 		opacity: 0.6;
 	}
 
