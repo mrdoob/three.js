@@ -429,30 +429,42 @@ class WebGLTextureUtils {
 	createTexture( texture, options ) {
 
 		const { gl, backend } = this;
-		const { levels, width, height, depth } = options;
 
-		const glFormat = backend.utils.convert( texture.format, texture.colorSpace );
-		const glType = backend.utils.convert( texture.type );
-		const glInternalFormat = this.getInternalFormat( texture.internalFormat, glFormat, glType, texture.normalized, texture.colorSpace, texture.isVideoTexture );
+		let textureGPU, glTextureType, glFormat, glType, glInternalFormat;
 
-		const textureGPU = gl.createTexture();
-		const glTextureType = this.getGLTextureType( texture );
+		if ( texture.isExternalTexture === true ) {
 
-		backend.state.bindTexture( glTextureType, textureGPU );
+			textureGPU = texture.sourceTexture;
+			glTextureType = this.getGLTextureType( texture );
 
-		this.setTextureParameters( glTextureType, texture );
+		} else {
 
-		if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.isCompressedArrayTexture ) {
+			const { levels, width, height, depth } = options;
 
-			gl.texStorage3D( gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, width, height, depth );
+			glFormat = backend.utils.convert( texture.format, texture.colorSpace );
+			glType = backend.utils.convert( texture.type );
+			glInternalFormat = this.getInternalFormat( texture.internalFormat, glFormat, glType, texture.normalized, texture.colorSpace, texture.isVideoTexture );
 
-		} else if ( texture.isData3DTexture ) {
+			textureGPU = gl.createTexture();
+			glTextureType = this.getGLTextureType( texture );
 
-			gl.texStorage3D( gl.TEXTURE_3D, levels, glInternalFormat, width, height, depth );
+			backend.state.bindTexture( glTextureType, textureGPU );
 
-		} else if ( ! texture.isVideoTexture ) {
+			this.setTextureParameters( glTextureType, texture );
 
-			gl.texStorage2D( glTextureType, levels, glInternalFormat, width, height );
+			if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.isCompressedArrayTexture ) {
+
+				gl.texStorage3D( gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, width, height, depth );
+
+			} else if ( texture.isData3DTexture ) {
+
+				gl.texStorage3D( gl.TEXTURE_3D, levels, glInternalFormat, width, height, depth );
+
+			} else if ( ! texture.isVideoTexture ) {
+
+				gl.texStorage2D( glTextureType, levels, glInternalFormat, width, height );
+
+			}
 
 		}
 
@@ -774,7 +786,7 @@ class WebGLTextureUtils {
 
 		this.deallocateRenderBuffers( renderTarget );
 
-		if ( isDefaultTexture === false ) {
+		if ( isDefaultTexture === false && texture.isExternalTexture !== true ) {
 
 			gl.deleteTexture( textureGPU );
 
