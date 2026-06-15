@@ -224,6 +224,7 @@ class Timeline extends Tab {
 		this.graphSlider.style.margin = '0 10px';
 		this.graphSlider.style.position = 'relative';
 		this.graphSlider.style.cursor = 'crosshair';
+		this.graphSlider.style.touchAction = 'none';
 
 		graphContainer.appendChild( this.graphSlider );
 
@@ -277,7 +278,7 @@ class Timeline extends Tab {
 		this.graphSlider.tabIndex = 0;
 		this.graphSlider.style.outline = 'none';
 
-		// Mouse interactivity on the graph
+		// Pointer interactivity on the graph
 		let isDragging = false;
 
 		const updatePlayheadFromEvent = ( e ) => {
@@ -326,7 +327,7 @@ class Timeline extends Tab {
 
 		};
 
-		this.graphSlider.addEventListener( 'mousedown', ( e ) => {
+		this.graphSlider.addEventListener( 'pointerdown', ( e ) => {
 
 			if ( this.isRecording ) return;
 
@@ -337,7 +338,7 @@ class Timeline extends Tab {
 
 		} );
 
-		this.graphSlider.addEventListener( 'mouseenter', () => {
+		this.graphSlider.addEventListener( 'pointerenter', () => {
 
 			if ( this.frames.length > 0 && ! this.isRecording ) {
 
@@ -347,13 +348,13 @@ class Timeline extends Tab {
 
 		} );
 
-		this.graphSlider.addEventListener( 'mouseleave', () => {
+		this.graphSlider.addEventListener( 'pointerleave', () => {
 
 			this.hoverIndicator.style.display = 'none';
 
 		} );
 
-		this.graphSlider.addEventListener( 'mousemove', ( e ) => {
+		this.graphSlider.addEventListener( 'pointermove', ( e ) => {
 
 			if ( this.frames.length === 0 || this.isRecording ) return;
 
@@ -437,7 +438,7 @@ class Timeline extends Tab {
 
 		} );
 
-		window.addEventListener( 'mousemove', ( e ) => {
+		window.addEventListener( 'pointermove', ( e ) => {
 
 			if ( isDragging ) {
 
@@ -472,7 +473,7 @@ class Timeline extends Tab {
 
 		} );
 
-		window.addEventListener( 'mouseup', () => {
+		window.addEventListener( 'pointerup', () => {
 
 			isDragging = false;
 			this.isManualScrubbing = false;
