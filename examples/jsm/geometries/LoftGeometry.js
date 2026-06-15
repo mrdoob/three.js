@@ -122,18 +122,53 @@ class LoftGeometry extends BufferGeometry {
 		const vertices = [];
 		const uvs = [];
 
+		// uvs follow arc length so uneven sections and points map evenly
+
+		const rowU = [ 0 ];
+
+		for ( let i = 1; i < rows; i ++ ) {
+
+			let distance = 0;
+
+			for ( let j = 0; j < columns; j ++ ) {
+
+				distance += sections[ i ][ j ].distanceTo( sections[ i - 1 ][ j ] );
+
+			}
+
+			rowU.push( rowU[ i - 1 ] + distance / columns );
+
+		}
+
+		const totalU = rowU[ rows - 1 ];
+
 		// generate vertices and uvs
 
 		for ( let i = 0; i < rows; i ++ ) {
 
 			const section = sections[ i ];
 
+			// distance around the section
+
+			const colV = [ 0 ];
+
+			for ( let j = 1; j < pointsPerRow; j ++ ) {
+
+				colV.push( colV[ j - 1 ] + section[ j % columns ].distanceTo( section[ ( j - 1 ) % columns ] ) );
+
+			}
+
+			const totalV = colV[ pointsPerRow - 1 ];
+
 			for ( let j = 0; j < pointsPerRow; j ++ ) {
 
 				const point = section[ j % columns ];
 
 				vertices.push( point.x, point.y, point.z );
-				uvs.push( i / ( rows - 1 ), j / ( pointsPerRow - 1 ) );
+				uvs.push(
+					totalU > 0 ? rowU[ i ] / totalU : i / ( rows - 1 ),
+					totalV > 0 ? colV[ j ] / totalV : j / ( pointsPerRow - 1 )
+				);
 
 			}
 
