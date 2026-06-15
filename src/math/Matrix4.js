@@ -650,6 +650,28 @@ class Matrix4 {
 	}
 
 	/**
+	 * Computes and returns the determinant of the upper-left 3x3 submatrix.
+	 *
+	 * For affine matrices (like an object's world matrix), this value equals the
+	 * full 4x4 {@link Matrix4#determinant} but is cheaper to compute.
+	 *
+	 * @return {number} The determinant of the upper-left 3x3 submatrix.
+	 */
+	determinant3x3() {
+
+		const te = this.elements;
+
+		const n11 = te[ 0 ], n12 = te[ 4 ], n13 = te[ 8 ];
+		const n21 = te[ 1 ], n22 = te[ 5 ], n23 = te[ 9 ];
+		const n31 = te[ 2 ], n32 = te[ 6 ], n33 = te[ 10 ];
+
+		return n11 * ( n22 * n33 - n23 * n32 ) -
+			n12 * ( n21 * n33 - n23 * n31 ) +
+			n13 * ( n21 * n32 - n22 * n31 );
+
+	}
+
+	/**
 	 * Transposes this matrix in place.
 	 *
 	 * @return {Matrix4} A reference to this matrix.
