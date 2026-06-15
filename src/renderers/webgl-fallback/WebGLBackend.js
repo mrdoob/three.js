@@ -1934,16 +1934,34 @@ class WebGLBackend extends Backend {
 				const isTyped = isTypedArray( array );
 				const byteOffsetFactor = isTyped ? 1 : array.BYTES_PER_ELEMENT;
 
+				// Update ranges arrive sorted and non-overlapping which makes
+				// it easy to merge contiguous ranges.
+
+				let start = updateRanges[ 0 ].start; // start of the current merged range
+
 				for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
 
 					const range = updateRanges[ i ];
+					const next = updateRanges[ i + 1 ];
 
-					const dataOffset = range.start * byteOffsetFactor;
-					const size = range.count * byteOffsetFactor;
+					const end = range.start + range.count; // exclusive end of the current range
+
+					// keep merging while the next range is contiguous
+
+					if ( next !== undefined && next.start === end ) continue;
+
+					// write the merged range
+
+					const dataOffset = start * byteOffsetFactor;
+					const size = ( end - start ) * byteOffsetFactor;
 
 					const bufferOffset = dataOffset * ( isTyped ? array.BYTES_PER_ELEMENT : 1 ); // bufferOffset is always in bytes
 
 					gl.bufferSubData( gl.UNIFORM_BUFFER, bufferOffset, array, dataOffset, size );
+
+					// start next if possible
+
+					if ( next !== undefined ) start = next.start;
 
 				}
 
