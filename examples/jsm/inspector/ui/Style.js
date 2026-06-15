@@ -22,12 +22,14 @@ export class Style {
 		--font-mono: 'Courier New', Courier, monospace;
 	}
 
+	.profiler-panel, .profiler-toggle, .detached-tab-panel,
 	.profiler-panel *, .profiler-toggle *, .detached-tab-panel * {
 		text-transform: initial;
 		line-height: normal;
 		box-sizing: border-box;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
+		-webkit-tap-highlight-color: transparent;
 	}
 
 	.profiler-toggle {
@@ -238,6 +240,8 @@ export class Style {
 		font-family: var(--font-family);
 		font-size: 11px;
 		width: 350px;
+		max-width: calc(100vw - 30px);
+		min-width: 170px;
 		max-height: calc(100vh - 100px);
 		overflow-y: auto;
 		overflow-x: hidden;
@@ -339,6 +343,19 @@ export class Style {
 		padding: 4px;
 	}
 
+	@media screen and (max-width: 340px) {
+
+		.mini-panel-content .parameters {
+			min-width: 0 !important;
+		}
+
+		.mini-panel-content .list-container.parameters .list-item-row,
+		.mini-panel-content .list-container.parameters .list-header {
+			grid-template-columns: minmax(0, .5fr) minmax(0, 1fr) !important;
+		}
+
+	}
+
 	.mini-panel-content .list-container.parameters {
 		padding: 2px 6px 0px 6px !important;
 	}
@@ -386,9 +403,16 @@ export class Style {
 		position: relative;
 	}
 
-	.info-icon:hover {
+	.info-icon.active {
 		background-color: var(--color-accent);
 		color: white;
+	}
+
+	@media (hover: hover) {
+		.info-icon:hover {
+			background-color: var(--color-accent);
+			color: white;
+		}
 	}
 
 	.info-tooltip {
@@ -403,7 +427,6 @@ export class Style {
 		width: max-content;
 		max-width: 250px;
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-		pointer-events: none;
 		opacity: 0;
 		visibility: hidden;
 		transition: opacity 0.2s, visibility 0.2s;
@@ -802,6 +825,7 @@ export class Style {
 	.profiler-panel.position-right.no-tabs .profiler-tabs,
 	.profiler-panel.position-left.no-tabs .profiler-tabs {
 		display: none;
+		padding-left: 2px;
 	}
 
 	.profiler-panel.position-right.no-tabs .panel-resizer,
@@ -896,6 +920,7 @@ export class Style {
 		display: flex;
 		cursor: grab;
 		position: relative;
+		margin-left: 2px;
 	}
 
 	.profiler-tabs:active {
@@ -944,14 +969,16 @@ export class Style {
 	}
 
 	.tab-btn.active::before {
-		content: '⋮⋮';
+		content: '';
 		position: absolute;
 		left: 2px;
-		top: calc(50% - .1rem);
+		top: 50%;
 		transform: translateY(-50%);
-		color: var(--profiler-border);
-		font-size: 18px;
-		letter-spacing: -2px;
+		width: 8px;
+		height: 14px;
+		background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='14' viewBox='0 0 8 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='3' r='1' fill='%234a4a5a'/%3E%3Ccircle cx='2' cy='7' r='1' fill='%234a4a5a'/%3E%3Ccircle cx='2' cy='11' r='1' fill='%234a4a5a'/%3E%3Ccircle cx='6' cy='3' r='1' fill='%234a4a5a'/%3E%3Ccircle cx='6' cy='7' r='1' fill='%234a4a5a'/%3E%3Ccircle cx='6' cy='11' r='1' fill='%234a4a5a'/%3E%3C/svg%3E");
+		background-repeat: no-repeat;
+		background-position: center;
 		opacity: 0.6;
 	}
 
@@ -1498,6 +1525,30 @@ export class Style {
 		position: relative;
 		top: 1px;
 		margin-left: 2px;
+	}
+
+	@media screen and (max-width: 340px) {
+
+		.mini-panel-content .list-item-cell:first-child {
+			display: flex;
+			align-items: center;
+			min-width: 0;
+			overflow: hidden;
+			width: 100%;
+		}
+
+		.mini-panel-content .list-item-cell:first-child .value {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			flex: 1 1 0%;
+			min-width: 0;
+		}
+
+		.mini-panel-content .list-item-cell:first-child .info-icon {
+			flex-shrink: 0;
+		}
+
 	}
 
 	.mini-panel-content .custom-checkbox .checkmark {
