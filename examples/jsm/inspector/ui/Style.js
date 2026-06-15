@@ -238,6 +238,8 @@ export class Style {
 		font-family: var(--font-family);
 		font-size: 11px;
 		width: 350px;
+		max-width: calc(100vw - 30px);
+		min-width: 170px;
 		max-height: calc(100vh - 100px);
 		overflow-y: auto;
 		overflow-x: hidden;
@@ -337,6 +339,19 @@ export class Style {
 		border: none;
 		box-shadow: none;
 		padding: 4px;
+	}
+
+	@media screen and (max-width: 340px) {
+
+		.mini-panel-content .parameters {
+			min-width: 0 !important;
+		}
+
+		.mini-panel-content .list-container.parameters .list-item-row,
+		.mini-panel-content .list-container.parameters .list-header {
+			grid-template-columns: minmax(0, .5fr) minmax(0, 1fr) !important;
+		}
+
 	}
 
 	.mini-panel-content .list-container.parameters {
@@ -1498,6 +1513,30 @@ export class Style {
 		position: relative;
 		top: 1px;
 		margin-left: 2px;
+	}
+
+	@media screen and (max-width: 340px) {
+
+		.mini-panel-content .list-item-cell:first-child {
+			display: flex;
+			align-items: center;
+			min-width: 0;
+			overflow: hidden;
+			width: 100%;
+		}
+
+		.mini-panel-content .list-item-cell:first-child .value {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			flex: 1 1 0%;
+			min-width: 0;
+		}
+
+		.mini-panel-content .list-item-cell:first-child .info-icon {
+			flex-shrink: 0;
+		}
+
 	}
 
 	.mini-panel-content .custom-checkbox .checkmark {
