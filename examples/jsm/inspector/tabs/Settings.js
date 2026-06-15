@@ -9,7 +9,6 @@ const _extensions = [
 	}
 ];
 
-
 const _init = WebGPURenderer.prototype.init;
 
 function forceWebGL( enable ) {
