@@ -22,12 +22,14 @@ export class Style {
 		--font-mono: 'Courier New', Courier, monospace;
 	}
 
+	.profiler-panel, .profiler-toggle, .detached-tab-panel,
 	.profiler-panel *, .profiler-toggle *, .detached-tab-panel * {
 		text-transform: initial;
 		line-height: normal;
 		box-sizing: border-box;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
+		-webkit-tap-highlight-color: transparent;
 	}
 
 	.profiler-toggle {
@@ -401,9 +403,16 @@ export class Style {
 		position: relative;
 	}
 
-	.info-icon:hover {
+	.info-icon.active {
 		background-color: var(--color-accent);
 		color: white;
+	}
+
+	@media (hover: hover) {
+		.info-icon:hover {
+			background-color: var(--color-accent);
+			color: white;
+		}
 	}
 
 	.info-tooltip {
@@ -418,7 +427,6 @@ export class Style {
 		width: max-content;
 		max-width: 250px;
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-		pointer-events: none;
 		opacity: 0;
 		visibility: hidden;
 		transition: opacity 0.2s, visibility 0.2s;

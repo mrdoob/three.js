@@ -123,20 +123,54 @@ export function info( parentNode, text ) {
 
 	};
 
-	infoIcon.addEventListener( 'mouseenter', showTooltip );
-	infoIcon.addEventListener( 'mouseleave', hideTooltip );
-	infoIcon.addEventListener( 'click', ( e ) => {
+	let isClickedOpen = false;
 
-		e.stopPropagation();
-		const container = infoIcon.closest( '.three-inspector' ) || document.body;
-		const tooltip = container.querySelector( '.three-inspector-info-tooltip' );
-		if ( tooltip && tooltip.style.visibility === 'visible' ) {
+	const onDocumentPointerDown = ( e ) => {
+
+		if ( ! infoIcon.contains( e.target ) ) {
+
+			isClickedOpen = false;
+			infoIcon.classList.remove( 'active' );
+			hideTooltip();
+			document.removeEventListener( 'pointerdown', onDocumentPointerDown );
+
+		}
+
+	};
+
+	infoIcon.addEventListener( 'pointerenter', () => {
+
+		showTooltip();
+
+	} );
+
+	infoIcon.addEventListener( 'pointerleave', () => {
+
+		if ( ! isClickedOpen ) {
 
 			hideTooltip();
 
+		}
+
+	} );
+
+	infoIcon.addEventListener( 'click', ( e ) => {
+
+		e.stopPropagation();
+
+		isClickedOpen = ! isClickedOpen;
+
+		if ( isClickedOpen ) {
+
+			infoIcon.classList.add( 'active' );
+			showTooltip();
+			document.addEventListener( 'pointerdown', onDocumentPointerDown );
+
 		} else {
 
-			showTooltip();
+			infoIcon.classList.remove( 'active' );
+			hideTooltip();
+			document.removeEventListener( 'pointerdown', onDocumentPointerDown );
 
 		}
 
