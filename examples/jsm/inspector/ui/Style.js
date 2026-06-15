@@ -817,6 +817,7 @@ export class Style {
 	.profiler-panel.position-right.no-tabs .profiler-tabs,
 	.profiler-panel.position-left.no-tabs .profiler-tabs {
 		display: none;
+		padding-left: 2px;
 	}
 
 	.profiler-panel.position-right.no-tabs .panel-resizer,
@@ -911,6 +912,7 @@ export class Style {
 		display: flex;
 		cursor: grab;
 		position: relative;
+		margin-left: 2px;
 	}
 
 	.profiler-tabs:active {
@@ -938,7 +940,7 @@ export class Style {
 		border: none;
 		/*border-right: 1px solid var(--profiler-border);*/
 		color: var(--text-secondary);
-		padding: 0 15px 2px 15px;
+		padding: 1px 15px 1px 15px;
 		height: 100%;
 		box-sizing: border-box;
 		cursor: default;
@@ -961,12 +963,12 @@ export class Style {
 	.tab-btn.active::before {
 		content: '';
 		position: absolute;
-		left: 4px;
-		top: calc(50% - 2px);
+		left: 2px;
+		top: 50%;
 		transform: translateY(-50%);
-		width: 6px;
-		height: 12px;
-		background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='6' height='12' viewBox='0 0 6 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='2' r='1' fill='%234a4a5a'/%3E%3Ccircle cx='1' cy='6' r='1' fill='%234a4a5a'/%3E%3Ccircle cx='1' cy='10' r='1' fill='%234a4a5a'/%3E%3Ccircle cx='5' cy='2' r='1' fill='%234a4a5a'/%3E%3Ccircle cx='5' cy='6' r='1' fill='%234a4a5a'/%3E%3Ccircle cx='5' cy='10' r='1' fill='%234a4a5a'/%3E%3C/svg%3E");
+		width: 8px;
+		height: 14px;
+		background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='14' viewBox='0 0 8 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='3' r='1' fill='%234a4a5a'/%3E%3Ccircle cx='2' cy='7' r='1' fill='%234a4a5a'/%3E%3Ccircle cx='2' cy='11' r='1' fill='%234a4a5a'/%3E%3Ccircle cx='6' cy='3' r='1' fill='%234a4a5a'/%3E%3Ccircle cx='6' cy='7' r='1' fill='%234a4a5a'/%3E%3Ccircle cx='6' cy='11' r='1' fill='%234a4a5a'/%3E%3C/svg%3E");
 		background-repeat: no-repeat;
 		background-position: center;
 		opacity: 0.6;
