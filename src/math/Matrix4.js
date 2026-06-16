@@ -238,7 +238,7 @@ class Matrix4 {
 	 */
 	extractBasis( xAxis, yAxis, zAxis ) {
 
-		if ( this.determinant() === 0 ) {
+		if ( this.determinant3x3() === 0 ) {
 
 			xAxis.set( 1, 0, 0 );
 			yAxis.set( 0, 1, 0 );
@@ -288,7 +288,7 @@ class Matrix4 {
 	 */
 	extractRotation( m ) {
 
-		if ( m.determinant() === 0 ) {
+		if ( m.determinant3x3() === 0 ) {
 
 			return this.identity();
 
@@ -1080,7 +1080,7 @@ class Matrix4 {
 		position.y = te[ 13 ];
 		position.z = te[ 14 ];
 
-		const det = this.determinant();
+		const det = this.determinant3x3();
 
 		if ( det === 0 ) {
 
