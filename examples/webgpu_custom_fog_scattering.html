@@ -38,11 +38,12 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { positionWorld, densityFogFactor, pass, vec2, uniform, mix, color } from 'three/tsl';
+			import { densityFogFactor, mix, pass, uniform, vec2 } from 'three/tsl';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { TreeGenerator } from 'three/addons/generators/TreeGenerator.js';
 
 			let camera, scene, renderer, renderPipeline, controls;
 
@@ -54,69 +55,108 @@
 
 			async function init() {
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 600 );
-				camera.position.set( 30, 10, 30 );
+				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.5, 600 );
+				camera.position.set( 2, 1.7, 48 ); // ~human eye height
 
 				scene = new THREE.Scene();
 
-				// fog
+				// fog: a bright, cool haze. the background matches it so the trunks read
+				// as dark silhouettes that dissolve into depth — the scattering subject
 
-				scene.fog = new THREE.FogExp2( 0xcccccc, 0.014 );
-				scene.background = new THREE.Color( 0xcccccc );
+				scene.fog = new THREE.FogExp2( 0xc6cace, 0.021 );
+				scene.background = new THREE.Color( 0xc6cace );
 
-				// builds
+				// everything is a flat black silhouette — the fog and the scattering blur
+				// do all the shaping, so no lights are needed ( MeshBasicMaterial is unlit )
 
-				const buildWindows = positionWorld.y.mul( 10 ).floor().mod( 4 ).sign().mix( color( 0x000066 ), color( 0xffffff ) );
+				const material = new THREE.MeshBasicMaterial( { color: 0x000000 } );
 
-				const buildGeometry = new THREE.BoxGeometry( 1, 1, 1 );
-				const buildMaterial = new THREE.MeshPhongNodeMaterial( {
-					colorNode: buildWindows
-				} );
+				// a few seeded variants of a tall scots pine: a clean bole rising into a
+				// high, open crown of fine bare branches
 
-				const buildMesh = new THREE.InstancedMesh( buildGeometry, buildMaterial, 4000 );
-				scene.add( buildMesh );
+				const variants = [];
 
-				const dummy = new THREE.Object3D();
-				const center = new THREE.Vector3();
+				for ( let v = 0; v < 6; v ++ ) {
 
-				for ( let i = 0; i < buildMesh.count; i ++ ) {
+					const mesh = new TreeGenerator( material )
+						.setSeed( v + 1 )
+						.setTrunkLength( 14 + v * 1.6 ) // the crowns ride high in the fog
+						.setTrunkRadius( 0.32 )
+						.setTaper( 0.28 ) // slender, tapers slowly
+						.setLevels( 4 )
+						.setChildren( [ 7, 5, 4 ] ) // a wide whorl of limbs ramifying into many fine twigs
+						.setBranchAngle( [ 55, 50, 46 ] ) // a rounded crown that turns up
+						.setAngleVariance( 22 )
+						.setLengthRatio( 0.46 ) // short crown limbs ( a modest pine crown )
+						.setMinLength( 0.22 )
+						.setDroop( 0.05 )
+						.setUpPull( 0.42 ) // crown branches reach up toward the light
+						.setGnarl( [ 0, 0.14, 0.24, 0.34 ] ) // dead-straight trunk, wispier twigs
+						.setSectionLength( 1.8 )
+						.setRadialSegments( 7 )
+						.setRadiusExponent( 2.5 ) // slender bole, whippy thin twigs
+						.setMinRadius( 0.012 ) // very fine twigs
+						.setTrunkClear( 0.72 ) // tall clean bole; the crown sits only at the top
+						.build();
 
-					const scaleY = Math.random() * 7 + .5;
-
-					dummy.position.x = Math.random() * 600 - 300;
-					dummy.position.z = Math.random() * 600 - 300;
-
-					const distance = Math.max( dummy.position.distanceTo( center ) * .012, 1 );
-
-					dummy.position.y = .5 * scaleY * distance;
-
-					dummy.scale.x = dummy.scale.z = Math.random() * 3 + .5;
-					dummy.scale.y = scaleY * distance;
-
-					dummy.updateMatrix();
-
-					buildMesh.setMatrixAt( i, dummy.matrix );
+					variants.push( mesh.geometry );
 
 				}
 
-				// lights
+				const placements = variants.map( () => [] );
 
-				scene.add( new THREE.HemisphereLight( 0xf0f5f5, 0xd0dee7, 0.5 ) );
+				const dummy = new THREE.Object3D();
+				const cols = 13, rows = 12, spacing = 10;
 
-				// geometry
+				for ( let i = 0; i < cols; i ++ ) {
 
-				const planeGeometry = new THREE.PlaneGeometry( 200, 200 );
-				const planeMaterial = new THREE.MeshPhongMaterial( {
-					color: 0x999999
+					for ( let j = 0; j < rows; j ++ ) {
+
+						const v = Math.floor( Math.random() * variants.length );
+
+						const x = ( i - cols / 2 ) * spacing + ( Math.random() - 0.5 ) * spacing * 0.8;
+						const z = j * spacing - rows * spacing + 22 + ( Math.random() - 0.5 ) * spacing * 0.8;
+
+						dummy.position.set( x, 0, z );
+
+						const scale = 0.85 + Math.random() * 0.4;
+						dummy.rotation.set( ( Math.random() - 0.5 ) * 0.05, Math.random() * Math.PI * 2, ( Math.random() - 0.5 ) * 0.05 ); // slight lean
+						dummy.scale.set( scale, scale * ( 0.9 + Math.random() * 0.3 ), scale );
+						dummy.updateMatrix();
+
+						placements[ v ].push( dummy.matrix.clone() );
+
+					}
+
+				}
+
+				variants.forEach( ( geometry, v ) => {
+
+					const list = placements[ v ];
+					const mesh = new THREE.InstancedMesh( geometry, material, list.length );
+					for ( let k = 0; k < list.length; k ++ ) mesh.setMatrixAt( k, list[ k ] );
+					mesh.instanceMatrix.needsUpdate = true;
+					scene.add( mesh );
+
 				} );
 
-				const ground = new THREE.Mesh( planeGeometry, planeMaterial );
-				ground.rotation.x = - Math.PI / 2;
-				ground.scale.multiplyScalar( 3 );
-				ground.castShadow = true;
-				ground.receiveShadow = true;
+				// a couple of dominant trunks close to the camera to anchor the depth
+
+				[ [ - 6, 26, 1.5, 1.1 ], [ 8, 21, 1.2, 0.3 ] ].forEach( ( [ x, z, s, ry ] ) => {
+
+					const hero = new THREE.Mesh( variants[ variants.length - 1 ], material );
+					hero.position.set( x, 0, z );
+					hero.rotation.y = ry;
+					hero.scale.setScalar( s );
+					scene.add( hero );
+
+				} );
+
+				// ground
+
+				const ground = new THREE.Mesh( new THREE.PlaneGeometry( 600, 600 ).rotateX( - Math.PI / 2 ), material );
 				scene.add( ground );
-			
+
 				// renderer
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
@@ -129,20 +169,18 @@
 				// controls
 
 				controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 2, 0 );
-				controls.minDistance = 7;
-				controls.maxDistance = 100;
+				controls.target.set( - 1, 9, - 42 );
+				controls.minDistance = 4;
+				controls.maxDistance = 160;
 				controls.maxPolarAngle = Math.PI / 2;
 				controls.enableDamping = true;
 				controls.update();
-
-				//
 
 				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				// uniforms
 
-				const density = uniform( 0.014 );
+				const density = uniform( 0.021 );
 				const scattering = uniform( 2 );
 
 				// scene pass
