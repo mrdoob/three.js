@@ -4,6 +4,7 @@ import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 import { Frustum } from '../math/Frustum.js';
 import { UnsignedByteType, WebGPUCoordinateSystem } from '../constants.js';
+import { Layers } from '../core/Layers.js';
 
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld = /*@__PURE__*/ new Vector3();
@@ -156,6 +157,14 @@ class LightShadow {
 		 * @default false
 		 */
 		this.needsUpdate = false;
+		/**
+		 * Layer used to compare with other object layer to check if it needs to be rendered on its shadow map pass
+		 *
+		 * @type {Layers}
+		 */
+		this.shadowLayers = new Layers();
+
+		this.shadowLayers.enableAll();
 
 		this._frustum = new Frustum();
 		this._frameExtents = new Vector2( 1, 1 );

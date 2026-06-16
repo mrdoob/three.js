@@ -509,8 +509,11 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 		if ( object.visible === false ) return;
 
 		const visible = object.layers.test( camera.layers );
+		const shadowLayerVisible = ! light.shadow.shadowLayers || object.layers.test(
+			light.shadow.shadowLayers
+		);
 
-		if ( visible && ( object.isMesh || object.isLine || object.isPoints ) ) {
+		if ( visible && shadowLayerVisible && ( object.isMesh || object.isLine || object.isPoints ) ) {
 
 			if ( ( object.castShadow || ( object.receiveShadow && type === VSMShadowMap ) ) && ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) ) {
 
