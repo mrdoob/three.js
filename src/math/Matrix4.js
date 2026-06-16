@@ -238,7 +238,7 @@ class Matrix4 {
 	 */
 	extractBasis( xAxis, yAxis, zAxis ) {
 
-		if ( this.determinant3x3() === 0 ) {
+		if ( this.determinantAffine() === 0 ) {
 
 			xAxis.set( 1, 0, 0 );
 			yAxis.set( 0, 1, 0 );
@@ -288,7 +288,7 @@ class Matrix4 {
 	 */
 	extractRotation( m ) {
 
-		if ( m.determinant3x3() === 0 ) {
+		if ( m.determinantAffine() === 0 ) {
 
 			return this.identity();
 
@@ -650,14 +650,17 @@ class Matrix4 {
 	}
 
 	/**
-	 * Computes and returns the determinant of the upper-left 3x3 submatrix.
+	 * Computes and returns the determinant of the 4x4 matrix, but assumes the
+	 * matrix is affine, saving some computations.
 	 *
 	 * For affine matrices (like an object's world matrix), this value equals the
 	 * full 4x4 {@link Matrix4#determinant} but is cheaper to compute.
+	 * 
+	 * Assumes the bottom row is [0, 0, 0, 1].
 	 *
-	 * @return {number} The determinant of the upper-left 3x3 submatrix.
+	 * @return {number} The determinant of the matrix.
 	 */
-	determinant3x3() {
+	determinantAffine() {
 
 		const te = this.elements;
 
@@ -1080,7 +1083,7 @@ class Matrix4 {
 		position.y = te[ 13 ];
 		position.z = te[ 14 ];
 
-		const det = this.determinant3x3();
+		const det = this.determinantAffine();
 
 		if ( det === 0 ) {
 
