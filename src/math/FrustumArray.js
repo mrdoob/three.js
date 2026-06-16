@@ -186,13 +186,40 @@ class FrustumArray {
 	}
 
 	/**
+	 * Copies the values of the given frustum array to this instance.
+	 *
+	 * @param {FrustumArray} frustumArray - The frustum array to copy.
+	 * @return {FrustumArray} A reference to this frustum array.
+	 */
+	copy( source ) {
+
+		this.coordinateSystem = source.coordinateSystem;
+
+		const frustums = this._frustums;
+		const sourceFrustums = source._frustums;
+
+		for ( let i = 0; i < source._count; i ++ ) {
+
+			if ( frustums[ i ] === undefined ) frustums[ i ] = new Frustum();
+
+			frustums[ i ].copy( sourceFrustums[ i ] );
+
+		}
+
+		this._count = source._count;
+
+		return this;
+
+	}
+
+	/**
 	 * Returns a new frustum array with copied values from this instance.
 	 *
 	 * @return {FrustumArray} A clone of this instance.
 	 */
 	clone() {
 
-		return new FrustumArray();
+		return new FrustumArray().copy( this );
 
 	}
 
