@@ -1,5 +1,5 @@
 import { RenderTarget, HalfFloatType, TempNode, QuadMesh, NodeMaterial, RendererUtils, Vector2, Vector3, Vector4, Color, DataTexture, RGBAFormat, FloatType, RepeatWrapping, NearestFilter } from 'three/webgpu';
-import { Fn, float, vec2, vec3, vec4, int, uv, uniform, uniformArray, Loop, texture, passTexture, NodeUpdateType, If, abs, max, min, exp, sqrt, pow, mix, dot, cross, normalize, clamp, fract, cos, sin, screenCoordinate } from 'three/tsl';
+import { Fn, float, vec2, vec3, vec4, ivec2, int, uv, uniform, uniformArray, Loop, texture, passTexture, NodeUpdateType, If, abs, max, min, exp, sqrt, pow, mix, dot, cross, normalize, clamp, fract, cos, sin, screenCoordinate } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -283,21 +283,21 @@ class SSSSNode extends TempNode {
 		 */
 		this._previousRenderObjectFunction = null;
 
-		/**
-		 * Snapshot of the builder's shared context, captured in {@link SSSSNode#setup} so the
-		 * SSS shader can be rebuilt (when the parameter buffer grows) without a `NodeBuilder`.
-		 *
-		 * @private
-		 * @type {?Object}
-		 */
-		this._sharedContext = null;
-
 		// Per-material SSS registry.
 		this._sssSlots = [ null ]; // sparse array indexed by slot (slot 0 = dummy for non-SSS pixels).
 		this._materialSlots = new WeakMap(); // WeakMap(material → slot) for O(1) lookup and GC-friendly storage.
 		this._freeSSSSlots = []; // recycled slots from disposed materials.
-		this._sssBuffer = null; // parameter buffer; grows as new SSS materials register.
-		this._sssBufferNeedsRebuild = true;
+
+		/**
+		 * Per-material SSS parameters, stored in a data texture indexed by slot (2 texels per
+		 * slot). A texture's size is not baked into the shader, so growth just swaps in a larger
+		 * texture with no recompile; `_sssCapacity` is how many slots the current texture holds.
+		 *
+		 * @private
+		 */
+		this._sssCapacity = 4;
+		this._sssParamsTexture = this._createParamsTexture( this._sssCapacity );
+		this._sssParamsNode = texture( this._sssParamsTexture );
 
 		/**
 		 * @private
@@ -406,11 +406,6 @@ class SSSSNode extends TempNode {
 		 */
 		this._textureNode = passTexture( this, this._sssRenderTarget.texture );
 
-		// Allocate the initial parameter buffer so `setup()` has something to read. It is rebuilt
-		// (and the shader regenerated) as SSS materials register lazily during rendering; see the
-		// render-object hook in `setup()`.
-		this._rebuildSSSBuffer();
-
 	}
 
 	/**
@@ -468,15 +463,11 @@ class SSSSNode extends TempNode {
 
 	_registerSSS( material ) {
 
-		const reusingSlot = this._freeSSSSlots.length > 0;
-		const slot = reusingSlot ? this._freeSSSSlots.pop() : this._sssSlots.length;
+		const slot = this._freeSSSSlots.length > 0 ? this._freeSSSSlots.pop() : this._sssSlots.length;
 		this._sssSlots[ slot ] = material;
 		this._materialSlots.set( material, slot );
 		material.subsurfaceSlotNode.value = slot;
 		material.addEventListener( 'dispose', () => this._unregisterSSS( material ) );
-
-		// A brand-new slot grows the buffer, so it (and the shader that indexes it) must be rebuilt.
-		if ( ! reusingSlot ) this._sssBufferNeedsRebuild = true;
 
 	}
 
@@ -491,36 +482,47 @@ class SSSSNode extends TempNode {
 
 	}
 
-	_rebuildSSSBuffer() {
+	_createParamsTexture( capacity ) {
 
-		// Two vec4 entries per slot (scattering distance/strength + scattering color/texturing mode).
-		const entries = [];
-		for ( let i = 0; i < this._sssSlots.length * 2; i ++ ) entries.push( new Vector4() );
-		this._sssBuffer = uniformArray( entries, 'vec4' );
-		this._sssBufferNeedsRebuild = false;
-
-		// Regenerate the shader so it indexes the new buffer node (the previous shader captured the
-		// smaller buffer). Skipped until `setup()` has provided the shared context.
-		if ( this._sharedContext !== null ) this._buildSSSMaterial();
+		// 2 RGBA texels per slot (p0 = scattering distance + strength, p1 = scattering color +
+		// texturing mode), in a single row. Read via texelFetch (`.load`), so nearest, no mips.
+		const dataTexture = new DataTexture( new Float32Array( capacity * 2 * 4 ), capacity * 2, 1, RGBAFormat, FloatType );
+		dataTexture.minFilter = NearestFilter;
+		dataTexture.magFilter = NearestFilter;
+		dataTexture.needsUpdate = true;
+		return dataTexture;
 
 	}
 
-	_syncSSSBuffer() {
+	_growParamsTexture() {
 
-		const buf = this._sssBuffer.array;
+		while ( this._sssCapacity < this._sssSlots.length ) this._sssCapacity *= 2;
+
+		// Swap in a larger texture. The texture node's bindings re-resolve to the new texture
+		// object next frame (see Bindings/NodeSampledTexture), so the shader is untouched.
+		const previous = this._sssParamsTexture;
+		this._sssParamsTexture = this._createParamsTexture( this._sssCapacity );
+		this._sssParamsNode.value = this._sssParamsTexture;
+		previous.dispose();
+
+	}
+
+	_syncParamsTexture() {
+
+		const data = this._sssParamsTexture.image.data;
 		for ( let slot = 1; slot < this._sssSlots.length; slot ++ ) {
 
 			const mat = this._sssSlots[ slot ];
 			if ( mat === null ) continue;
 			const sd = mat.scatteringDistanceNode.value;
 			const sc = mat.scatteringColorNode.value;
-			const i = slot * 2;
-			buf[ i ].set( sd.r, sd.g, sd.b, mat.strengthNode.value );
-			buf[ i + 1 ].set( sc.r, sc.g, sc.b, mat.texturingModeNode.value );
+			const o = slot * 8; // two RGBA texels (8 floats) per slot
+			data[ o ] = sd.r; data[ o + 1 ] = sd.g; data[ o + 2 ] = sd.b; data[ o + 3 ] = mat.strengthNode.value;
+			data[ o + 4 ] = sc.r; data[ o + 5 ] = sc.g; data[ o + 6 ] = sc.b; data[ o + 7 ] = mat.texturingModeNode.value;
 
 		}
 
-		this._sssBuffer.needsUpdate = true;
+		this._sssParamsTexture.needsUpdate = true;
 
 	}
 
@@ -573,8 +575,8 @@ class SSSSNode extends TempNode {
 		this._projDepthParams.value.set( pe[ 10 ], pe[ 14 ], pe[ 11 ], pe[ 15 ] );
 		this._projScaleXY.value.set( 1 / pe[ 0 ], 1 / pe[ 5 ] );
 
-		if ( this._sssBufferNeedsRebuild ) this._rebuildSSSBuffer();
-		this._syncSSSBuffer();
+		if ( this._sssSlots.length > this._sssCapacity ) this._growParamsTexture();
+		this._syncParamsTexture();
 
 		_quadMesh.material = this._sssMaterial;
 		renderer.setRenderTarget( this._sssRenderTarget );
@@ -592,9 +594,10 @@ class SSSSNode extends TempNode {
 	 */
 	setup( builder ) {
 
-		// Assign each subsurface material its SSS slot the first time it is drawn (after frustum culling), by intercepting
-		// the renderer's per-object draw. The scene pass writes the slot into `albedo.a` and runs
-		// before this pass, so the hook is installed once at setup and restored on dispose.
+		// Assign each subsurface material its SSS slot the first time it is drawn (after frustum
+		// culling) by intercepting the renderer's per-object draw. The scene pass writes the slot
+		// into `albedo.a` and runs before this pass, so the hook is installed once at setup and
+		// restored on dispose.
 		if ( this._renderer === null ) {
 
 			const renderer = builder.renderer;
@@ -616,27 +619,8 @@ class SSSSNode extends TempNode {
 
 		}
 
-		// Snapshot the shared context so the shader can be rebuilt later (on buffer growth)
-		// without a NodeBuilder, then build it for the first time.
-		this._sharedContext = builder.getSharedContext();
-
-		this._buildSSSMaterial();
-
-		return this._textureNode;
-
-	}
-
-	/**
-	 * Builds (or rebuilds) the SSS blur pass shader, wiring it to the current `_sssBuffer`.
-	 * Called from {@link SSSSNode#setup} and again from {@link SSSSNode#_rebuildSSSBuffer}
-	 * whenever the buffer grows, so the shader never references a stale buffer node.
-	 *
-	 * @private
-	 */
-	_buildSSSMaterial() {
-
 		const { colorNode, depthNode, albedoNode, normalNode } = this;
-		const sssBuffer = this._sssBuffer;
+		const sssParams = this._sssParamsNode;
 		const { outputMode } = this;
 		const { fogType, fogNear, fogFar, fogDensity } = this;
 		const fogColorUniform = this.fogColor;
@@ -699,8 +683,8 @@ class SSSSNode extends TempNode {
 					const centerColorDefogged = defog( centerColor.rgb, centerFF ).toVar();
 
 					const slot = int( sssMask ).toVar();
-					const _p0 = sssBuffer.element( slot.mul( 2 ) ).toVar();
-					const _p1 = sssBuffer.element( slot.mul( 2 ).add( 1 ) ).toVar();
+					const _p0 = sssParams.load( ivec2( slot.mul( 2 ), 0 ) ).toVar();
+					const _p1 = sssParams.load( ivec2( slot.mul( 2 ).add( 1 ), 0 ) ).toVar();
 					const pixelScatteringDistance = _p0.rgb;
 					const pixelStrength = _p0.a;
 					const pixelScatteringColor = _p1.rgb;
@@ -858,8 +842,10 @@ class SSSSNode extends TempNode {
 
 		} );
 
-		this._sssMaterial.fragmentNode = sssFn().context( this._sharedContext );
+		this._sssMaterial.fragmentNode = sssFn().context( builder.getSharedContext() );
 		this._sssMaterial.needsUpdate = true;
+
+		return this._textureNode;
 
 	}
 
@@ -877,6 +863,7 @@ class SSSSNode extends TempNode {
 
 		this._sssRenderTarget.dispose();
 		this._sssMaterial.dispose();
+		this._sssParamsTexture.dispose();
 
 	}
 
