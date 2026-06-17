@@ -2624,15 +2624,33 @@ class WebGLRenderer {
 
 				}
 
+				if ( lights.state.directionalStaticShadowMap.length > 0 ) {
+
+					p_uniforms.setValue( _gl, 'directionalStaticShadowMap', lights.state.directionalStaticShadowMap, textures );
+
+				}
+
 				if ( lights.state.spotShadowMap.length > 0 ) {
 
 					p_uniforms.setValue( _gl, 'spotShadowMap', lights.state.spotShadowMap, textures );
 
 				}
 
+				if ( lights.state.spotStaticShadowMap.length > 0 ) {
+
+					p_uniforms.setValue( _gl, 'spotStaticShadowMap', lights.state.spotStaticShadowMap, textures );
+
+				}
+
 				if ( lights.state.pointShadowMap.length > 0 ) {
 
 					p_uniforms.setValue( _gl, 'pointShadowMap', lights.state.pointShadowMap, textures );
+
+				}
+
+				if ( lights.state.pointStaticShadowMap.length > 0 ) {
+
+					p_uniforms.setValue( _gl, 'pointStaticShadowMap', lights.state.pointStaticShadowMap, textures );
 
 				}
 

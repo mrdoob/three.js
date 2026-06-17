@@ -184,11 +184,13 @@ function WebGLLights( extensions ) {
 		directional: [],
 		directionalShadow: [],
 		directionalShadowMap: [],
+		directionalStaticShadowMap: [],
 		directionalShadowMatrix: [],
 		spot: [],
 		spotLightMap: [],
 		spotShadow: [],
 		spotShadowMap: [],
+		spotStaticShadowMap: [],
 		spotLightMatrix: [],
 		rectArea: [],
 		rectAreaLTC1: null,
@@ -196,6 +198,7 @@ function WebGLLights( extensions ) {
 		point: [],
 		pointShadow: [],
 		pointShadowMap: [],
+		pointStaticShadowMap: [],
 		pointShadowMatrix: [],
 		hemi: [],
 		numSpotLightShadowsWithMaps: 0,
@@ -241,6 +244,7 @@ function WebGLLights( extensions ) {
 			const distance = light.distance;
 
 			let shadowMap = null;
+			let staticShadowMap = null;
 
 			if ( light.shadow && light.shadow.map ) {
 
@@ -253,6 +257,22 @@ function WebGLLights( extensions ) {
 
 					// Other types use depth texture
 					shadowMap = light.shadow.map.depthTexture || light.shadow.map.texture;
+
+				}
+
+			}
+
+			if ( light.shadow && light.shadow.staticMap ) {
+
+				if ( light.shadow.staticMap.texture.format === RGFormat ) {
+
+					// VSM uses color texture with blurred mean/std_dev
+					staticShadowMap = light.shadow.staticMap.texture;
+
+				} else {
+
+					// Other types use depth texture
+					staticShadowMap = light.shadow.staticMap.depthTexture || light.shadow.staticMap.texture;
 
 				}
 
@@ -291,9 +311,11 @@ function WebGLLights( extensions ) {
 					shadowUniforms.shadowNormalBias = shadow.normalBias;
 					shadowUniforms.shadowRadius = shadow.radius;
 					shadowUniforms.shadowMapSize = shadow.mapSize;
+					shadowUniforms.requireDualPass = shadow.requireDualPass;
 
 					state.directionalShadow[ directionalLength ] = shadowUniforms;
 					state.directionalShadowMap[ directionalLength ] = shadowMap;
+					state.directionalStaticShadowMap[ directionalLength ] = ( shadow.requireDualPass > 0 ) ? staticShadowMap : shadowMap;
 					state.directionalShadowMatrix[ directionalLength ] = light.shadow.matrix;
 
 					numDirectionalShadows ++;
@@ -348,6 +370,7 @@ function WebGLLights( extensions ) {
 
 					state.spotShadow[ spotLength ] = shadowUniforms;
 					state.spotShadowMap[ spotLength ] = shadowMap;
+					state.spotStaticShadowMap[ spotLength ] = ( shadow.requireDualPass > 0 ) ? staticShadowMap : shadowMap;
 
 					numSpotShadows ++;
 
@@ -392,6 +415,7 @@ function WebGLLights( extensions ) {
 
 					state.pointShadow[ pointLength ] = shadowUniforms;
 					state.pointShadowMap[ pointLength ] = shadowMap;
+					state.pointStaticShadowMap[ pointLength ] = ( shadow.requireDualPass > 0 ) ? staticShadowMap : shadowMap;
 					state.pointShadowMatrix[ pointLength ] = light.shadow.matrix;
 
 					numPointShadows ++;

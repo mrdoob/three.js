@@ -18,10 +18,14 @@ export default /* glsl */`
 		#if defined( SHADOWMAP_TYPE_PCF )
 
 			uniform sampler2DShadow directionalShadowMap[ NUM_DIR_LIGHT_SHADOWS ];
+			uniform sampler2DShadow directionalStaticShadowMap[ NUM_DIR_LIGHT_SHADOWS ];
+
 
 		#else
 
 			uniform sampler2D directionalShadowMap[ NUM_DIR_LIGHT_SHADOWS ];
+			uniform sampler2D directionalStaticShadowMap[ NUM_DIR_LIGHT_SHADOWS ];
+
 
 		#endif
 
@@ -33,6 +37,8 @@ export default /* glsl */`
 			float shadowNormalBias;
 			float shadowRadius;
 			vec2 shadowMapSize;
+			float requireDualPass;
+
 		};
 
 		uniform DirectionalLightShadow directionalLightShadows[ NUM_DIR_LIGHT_SHADOWS ];
@@ -44,10 +50,12 @@ export default /* glsl */`
 		#if defined( SHADOWMAP_TYPE_PCF )
 
 			uniform sampler2DShadow spotShadowMap[ NUM_SPOT_LIGHT_SHADOWS ];
+			uniform sampler2DShadow spotStaticShadowMap[ NUM_SPOT_LIGHT_SHADOWS ];
 
 		#else
 
 			uniform sampler2D spotShadowMap[ NUM_SPOT_LIGHT_SHADOWS ];
+			uniform sampler2D spotStaticShadowMap[ NUM_SPOT_LIGHT_SHADOWS ];
 
 		#endif
 
@@ -57,6 +65,7 @@ export default /* glsl */`
 			float shadowNormalBias;
 			float shadowRadius;
 			vec2 shadowMapSize;
+			float requireDualPass;
 		};
 
 		uniform SpotLightShadow spotLightShadows[ NUM_SPOT_LIGHT_SHADOWS ];
@@ -68,10 +77,13 @@ export default /* glsl */`
 		#if defined( SHADOWMAP_TYPE_PCF )
 
 			uniform samplerCubeShadow pointShadowMap[ NUM_POINT_LIGHT_SHADOWS ];
+			uniform samplerCubeShadow pointStaticShadowMap[ NUM_POINT_LIGHT_SHADOWS ];
+
 
 		#elif defined( SHADOWMAP_TYPE_BASIC )
 
 			uniform samplerCube pointShadowMap[ NUM_POINT_LIGHT_SHADOWS ];
+			uniform samplerCube pointStaticShadowMap[ NUM_POINT_LIGHT_SHADOWS ];
 
 		#endif
 
@@ -85,6 +97,8 @@ export default /* glsl */`
 			vec2 shadowMapSize;
 			float shadowCameraNear;
 			float shadowCameraFar;
+			float requireDualPass;
+
 		};
 
 		uniform PointLightShadow pointLightShadows[ NUM_POINT_LIGHT_SHADOWS ];
@@ -185,7 +199,7 @@ export default /* glsl */`
 					float hard_shadow = step( shadowCoord.z, mean );
 
 				#endif
-				
+
 				// Early return if fully lit
 				if ( hard_shadow == 1.0 ) {
 

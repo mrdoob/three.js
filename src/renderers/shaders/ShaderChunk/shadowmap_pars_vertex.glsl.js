@@ -20,6 +20,7 @@ export default /* glsl */`
 			float shadowNormalBias;
 			float shadowRadius;
 			vec2 shadowMapSize;
+			float requireDualPass;
 		};
 
 		uniform DirectionalLightShadow directionalLightShadows[ NUM_DIR_LIGHT_SHADOWS ];
@@ -34,6 +35,7 @@ export default /* glsl */`
 			float shadowNormalBias;
 			float shadowRadius;
 			vec2 shadowMapSize;
+			float requireDualPass;
 		};
 
 		uniform SpotLightShadow spotLightShadows[ NUM_SPOT_LIGHT_SHADOWS ];
@@ -53,6 +55,8 @@ export default /* glsl */`
 			vec2 shadowMapSize;
 			float shadowCameraNear;
 			float shadowCameraFar;
+			float requireDualPass;
+
 		};
 
 		uniform PointLightShadow pointLightShadows[ NUM_POINT_LIGHT_SHADOWS ];
