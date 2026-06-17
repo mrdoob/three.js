@@ -9,13 +9,7 @@ class WebGLShaderCache {
 
 	}
 
-	update( material ) {
-
-		const vertexShader = material.vertexShader;
-		const fragmentShader = material.fragmentShader;
-
-		const vertexShaderStage = this._getShaderStage( vertexShader );
-		const fragmentShaderStage = this._getShaderStage( fragmentShader );
+	update( material, vertexShaderStage, fragmentShaderStage ) {
 
 		const materialShaders = this._getShaderCacheForMaterial( material );
 
@@ -55,15 +49,15 @@ class WebGLShaderCache {
 
 	}
 
-	getVertexShaderID( material ) {
+	getVertexShaderStage( material ) {
 
-		return this._getShaderStage( material.vertexShader ).id;
+		return this._getShaderStage( material.vertexShader );
 
 	}
 
-	getFragmentShaderID( material ) {
+	getFragmentShaderStage( material ) {
 
-		return this._getShaderStage( material.fragmentShader ).id;
+		return this._getShaderStage( material.fragmentShader );
 
 	}
 

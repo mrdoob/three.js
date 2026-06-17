@@ -108,10 +108,13 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			vertexShader = material.vertexShader;
 			fragmentShader = material.fragmentShader;
 
-			_customShaders.update( material );
+			const vertexShaderStage = _customShaders.getVertexShaderStage( material );
+			const fragmentShaderStage = _customShaders.getFragmentShaderStage( material );
 
-			customVertexShaderID = _customShaders.getVertexShaderID( material );
-			customFragmentShaderID = _customShaders.getFragmentShaderID( material );
+			_customShaders.update( material, vertexShaderStage, fragmentShaderStage );
+
+			customVertexShaderID = vertexShaderStage.id;
+			customFragmentShaderID = fragmentShaderStage.id;
 
 		}
 
