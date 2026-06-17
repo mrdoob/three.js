@@ -655,7 +655,7 @@ class Matrix4 {
 	 *
 	 * For affine matrices (like an object's world matrix), this value equals the
 	 * full 4x4 {@link Matrix4#determinant} but is cheaper to compute.
-	 * 
+	 *
 	 * Assumes the bottom row is [0, 0, 0, 1].
 	 *
 	 * @return {number} The determinant of the matrix.
