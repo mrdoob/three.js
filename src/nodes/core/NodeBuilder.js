@@ -38,6 +38,8 @@ const _bindingGroupsCache = new WeakMap();
 const _functionNodeCache = new WeakMap();
 
 const sharedNodeData = new WeakMap();
+const _componentTypeCache = new Map();
+const _typeLengthCache = new Map();
 
 const typeFromArray = new Map( [
 	[ Int8Array, 'int' ],
@@ -1634,19 +1636,33 @@ class NodeBuilder {
 	 */
 	getComponentType( type ) {
 
-		type = this.getVectorType( type );
+		let res = _componentTypeCache.get( type );
 
-		if ( type === 'float' || type === 'bool' || type === 'int' || type === 'uint' ) return type;
+		if ( res === undefined ) {
 
-		const componentType = /(b|i|u|)(vec|mat)([2-4])/.exec( type );
+			const vecType = this.getVectorType( type );
 
-		if ( componentType === null ) return null;
+			if ( vecType === 'float' || vecType === 'bool' || vecType === 'int' || vecType === 'uint' ) {
 
-		if ( componentType[ 1 ] === 'b' ) return 'bool';
-		if ( componentType[ 1 ] === 'i' ) return 'int';
-		if ( componentType[ 1 ] === 'u' ) return 'uint';
+				res = vecType;
 
-		return 'float';
+			} else {
+
+				const componentType = /(b|i|u|)(vec|mat)([2-4])/.exec( vecType );
+
+				if ( componentType === null ) res = null;
+				else if ( componentType[ 1 ] === 'b' ) res = 'bool';
+				else if ( componentType[ 1 ] === 'i' ) res = 'int';
+				else if ( componentType[ 1 ] === 'u' ) res = 'uint';
+				else res = 'float';
+
+			}
+
+			_componentTypeCache.set( type, res );
+
+		}
+
+		return res;
 
 	}
 
@@ -1750,16 +1766,25 @@ class NodeBuilder {
 	 */
 	getTypeLength( type ) {
 
-		const vecType = this.getVectorType( type );
-		const vecNum = /vec([2-4])/.exec( vecType );
+		let res = _typeLengthCache.get( type );
 
-		if ( vecNum !== null ) return Number( vecNum[ 1 ] );
-		if ( vecType === 'float' || vecType === 'bool' || vecType === 'int' || vecType === 'uint' ) return 1;
-		if ( /mat2/.test( type ) === true ) return 4;
-		if ( /mat3/.test( type ) === true ) return 9;
-		if ( /mat4/.test( type ) === true ) return 16;
+		if ( res === undefined ) {
 
-		return 0;
+			const vecType = this.getVectorType( type );
+			const vecNum = /vec([2-4])/.exec( vecType );
+
+			if ( vecNum !== null ) res = Number( vecNum[ 1 ] );
+			else if ( vecType === 'float' || vecType === 'bool' || vecType === 'int' || vecType === 'uint' ) res = 1;
+			else if ( /mat2/.test( type ) === true ) res = 4;
+			else if ( /mat3/.test( type ) === true ) res = 9;
+			else if ( /mat4/.test( type ) === true ) res = 16;
+			else res = 0;
+
+			_typeLengthCache.set( type, res );
+
+		}
+
+		return res;
 
 	}
 
