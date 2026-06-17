@@ -447,6 +447,7 @@
 		"webgpu_postprocessing_ssgi_ballpool",
 		"webgpu_postprocessing_ssr",
 		"webgpu_postprocessing_sss",
+		"webgpu_postprocessing_ssss",
 		"webgpu_postprocessing_traa",
 		"webgpu_postprocessing_transition",
 		"webgpu_postprocessing",
