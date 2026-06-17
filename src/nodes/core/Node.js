@@ -631,7 +631,8 @@ class Node extends EventDispatcher {
 	 * This method is used during the build process of a node and ensures
 	 * equal nodes are not built multiple times but just once. For example if
 	 * `attribute( 'uv' )` is used multiple times by the user, the build
-	 * process makes sure to process just the first node.
+	 * process makes sure to process just the first node. It also handles
+	 * node overrides if an override context is set.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {Node} The shared node if possible. Otherwise `this` is returned.
@@ -641,7 +642,43 @@ class Node extends EventDispatcher {
 		const hash = this.getHash( builder );
 		const nodeFromHash = builder.getNodeFromHash( hash );
 
-		return nodeFromHash || this;
+		let sharedNode = null;
+
+		if ( nodeFromHash && nodeFromHash !== this ) {
+
+			sharedNode = nodeFromHash;
+
+		} else if ( builder.context.overrideNodes ) {
+
+			const callback = builder.context.overrideNodes.get( this );
+
+			if ( callback ) {
+
+				const nodeData = builder.getDataFromNode( this );
+
+				if ( nodeData.isOverwritten !== true ) {
+
+					nodeData.isOverwritten = true;
+
+					// cancel the override for use the same node inside the callback
+
+					sharedNode = callback( builder ).overrideNode( this, null );
+
+					nodeData.sharedNode = sharedNode;
+
+				} else {
+
+					// avoid recursive override calls
+
+					sharedNode = nodeData.sharedNode;
+
+				}
+
+			}
+
+		}
+
+		return sharedNode || this;
 
 	}
 

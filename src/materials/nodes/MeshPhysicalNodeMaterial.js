@@ -486,36 +486,6 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	}
 
-	copy( source ) {
-
-		this.clearcoatNode = source.clearcoatNode;
-		this.clearcoatRoughnessNode = source.clearcoatRoughnessNode;
-		this.clearcoatNormalNode = source.clearcoatNormalNode;
-
-		this.sheenNode = source.sheenNode;
-		this.sheenRoughnessNode = source.sheenRoughnessNode;
-
-		this.iridescenceNode = source.iridescenceNode;
-		this.iridescenceIORNode = source.iridescenceIORNode;
-		this.iridescenceThicknessNode = source.iridescenceThicknessNode;
-
-		this.specularIntensityNode = source.specularIntensityNode;
-		this.specularColorNode = source.specularColorNode;
-
-		this.iorNode = source.iorNode;
-
-		this.transmissionNode = source.transmissionNode;
-		this.thicknessNode = source.thicknessNode;
-		this.attenuationDistanceNode = source.attenuationDistanceNode;
-		this.attenuationColorNode = source.attenuationColorNode;
-		this.dispersionNode = source.dispersionNode;
-
-		this.anisotropyNode = source.anisotropyNode;
-
-		return super.copy( source );
-
-	}
-
 }
 
 export default MeshPhysicalNodeMaterial;

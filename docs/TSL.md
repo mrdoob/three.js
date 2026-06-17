@@ -1133,8 +1133,8 @@ const matcap = texture( matcapMap, matcapUV );
 
 | Variable | Description | Type |
 | -- | -- | -- |
-| `directionToColor( value )` | Converts direction vector to color. | `color` |
-| `colorToDirection( value )` | Converts color to direction vector. | `vec3` |
+| `packNormalToRGB( value )` | Converts normal vector to color. | `color` |
+| `unpackRGBToNormal( value )` | Converts color to normal vector. | `vec3` |
 
 ## Render Pipeline
 
@@ -1172,18 +1172,18 @@ MRT allows capturing multiple outputs from a single render pass. Instead of rend
 Use `setMRT()` with the `mrt()` function to define which outputs to capture:
 
 ```js
-import { pass, mrt, output, normalView, velocity, directionToColor } from 'three/tsl';
+import { pass, mrt, output, normalView, velocity, packNormalToRGB } from 'three/tsl';
 
 const scenePass = pass( scene, camera );
 
 scenePass.setMRT( mrt( {
 	output: output,                          // Final color output
-	normal: directionToColor( normalView ),  // View-space normals encoded as colors
+	normal: packNormalToRGB( normalView ),   // View-space normals encoded as colors
 	velocity: velocity                       // Motion vectors for temporal effects
 } ) );
 ```
 
-Each MRT entry accepts any TSL node, allowing you to customize outputs using formulas, encoders, or material accessors. For example, `directionToColor( normalView )` encodes view-space normals into RGB values. You can use any TSL function to transform, combine, or encode data before writing to the render target.
+Each MRT entry accepts any TSL node, allowing you to customize outputs using formulas, encoders, or material accessors. For example, `packNormalToRGB( normalView )` encodes view-space normals into RGB values. You can use any TSL function to transform, combine, or encode data before writing to the render target.
 
 Within a TSL function `Fn( ( { material, object } ) => { ... } )`, you have complete access to the current material and object being rendered, enabling full customization of outputs.
 

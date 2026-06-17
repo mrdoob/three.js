@@ -406,7 +406,7 @@ class WebGPUTextureUtils {
 		const backend = this.backend;
 		const textureData = backend.get( texture );
 
-		if ( textureData.texture !== undefined && isDefaultTexture === false ) textureData.texture.destroy();
+		if ( textureData.texture !== undefined && isDefaultTexture === false && texture.isExternalTexture !== true ) textureData.texture.destroy();
 
 		if ( textureData.msaaTexture !== undefined ) textureData.msaaTexture.destroy();
 
@@ -648,10 +648,29 @@ class WebGPUTextureUtils {
 			const width = textureDescriptorGPU.size.width;
 			const height = textureDescriptorGPU.size.height;
 
-			device.queue.copyElementImageToTexture(
-				image, width, height,
-				{ texture: textureData.texture }
-			);
+			if ( device.queue.copyElementImageToTexture.length === 2 ) {
+
+				// Chrome 150+
+
+				device.queue.copyElementImageToTexture(
+					{ source: image },
+					{
+						destination: { texture: textureData.texture },
+						width: width,
+						height: height
+					}
+				);
+
+			} else {
+
+				// Chrome 138 - 149
+
+				device.queue.copyElementImageToTexture(
+					image, width, height,
+					{ texture: textureData.texture }
+				);
+
+			}
 
 			if ( texture.flipY ) {
 

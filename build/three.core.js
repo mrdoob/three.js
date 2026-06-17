@@ -6449,11 +6449,14 @@ class Matrix3 {
 	/**
 	 * Scales this matrix with the given scalar values.
 	 *
+	 * @deprecated
 	 * @param {number} sx - The amount to scale in the X axis.
 	 * @param {number} sy - The amount to scale in the Y axis.
 	 * @return {Matrix3} A reference to this matrix.
 	 */
 	scale( sx, sy ) {
+
+		warnOnce( 'Matrix3: .scale() is deprecated. Use .makeScale() instead.' ); // @deprecated r185
 
 		this.premultiply( _m3.makeScale( sx, sy ) );
 
@@ -6464,10 +6467,13 @@ class Matrix3 {
 	/**
 	 * Rotates this matrix by the given angle.
 	 *
+	 * @deprecated
 	 * @param {number} theta - The rotation in radians.
 	 * @return {Matrix3} A reference to this matrix.
 	 */
 	rotate( theta ) {
+
+		warnOnce( 'Matrix3: .rotate() is deprecated. Use .makeRotation() instead.' ); // @deprecated r185
 
 		this.premultiply( _m3.makeRotation( - theta ) );
 
@@ -6478,11 +6484,14 @@ class Matrix3 {
 	/**
 	 * Translates this matrix by the given scalar values.
 	 *
+	 * @deprecated
 	 * @param {number} tx - The amount to translate in the X axis.
 	 * @param {number} ty - The amount to translate in the Y axis.
 	 * @return {Matrix3} A reference to this matrix.
 	 */
 	translate( tx, ty ) {
+
+		warnOnce( 'Matrix3: .translate() is deprecated. Use .makeTranslation() instead.' ); // @deprecated r185
 
 		this.premultiply( _m3.makeTranslation( tx, ty ) );
 
@@ -12909,8 +12918,10 @@ class Object3D extends EventDispatcher {
 	 *
 	 * @param {boolean} [updateParents=false] Whether ancestor nodes should be updated or not.
 	 * @param {boolean} [updateChildren=false] Whether descendant nodes should be updated or not.
+	 * @param {boolean} [force=false] - When set to `true`, a recomputation of world matrices is forced even
+	 * when {@link Object3D#matrixWorldNeedsUpdate} is `false`.
 	 */
-	updateWorldMatrix( updateParents, updateChildren ) {
+	updateWorldMatrix( updateParents, updateChildren, force = false ) {
 
 		const parent = this.parent;
 
@@ -12922,17 +12933,25 @@ class Object3D extends EventDispatcher {
 
 		if ( this.matrixAutoUpdate ) this.updateMatrix();
 
-		if ( this.matrixWorldAutoUpdate === true ) {
+		if ( this.matrixWorldNeedsUpdate || force ) {
 
-			if ( this.parent === null ) {
+			if ( this.matrixWorldAutoUpdate === true ) {
 
-				this.matrixWorld.copy( this.matrix );
+				if ( this.parent === null ) {
 
-			} else {
+					this.matrixWorld.copy( this.matrix );
 
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+				} else {
+
+					this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+
+				}
 
 			}
+
+			this.matrixWorldNeedsUpdate = false;
+
+			force = true;
 
 		}
 
@@ -12946,7 +12965,7 @@ class Object3D extends EventDispatcher {
 
 				const child = children[ i ];
 
-				child.updateWorldMatrix( false, true );
+				child.updateWorldMatrix( false, true, force );
 
 			}
 
@@ -46189,9 +46208,9 @@ class Camera extends Object3D {
 
 	}
 
-	updateWorldMatrix( updateParents, updateChildren ) {
+	updateWorldMatrix( updateParents, updateChildren, force = false ) {
 
-		super.updateWorldMatrix( updateParents, updateChildren );
+		super.updateWorldMatrix( updateParents, updateChildren, force );
 
 		// exclude scale from view matrix to be glTF conform
 
@@ -50232,8 +50251,11 @@ class StereoCamera {
 
 		}
 
-		this.cameraL.matrixWorld.copy( camera.matrixWorld ).multiply( _eyeLeft );
-		this.cameraR.matrixWorld.copy( camera.matrixWorld ).multiply( _eyeRight );
+		this.cameraL.matrix.copy( camera.matrixWorld ).multiply( _eyeLeft );
+		this.cameraL.matrixWorldNeedsUpdate = true;
+
+		this.cameraR.matrix.copy( camera.matrixWorld ).multiply( _eyeRight );
+		this.cameraR.matrixWorldNeedsUpdate = true;
 
 	}
 
@@ -57544,7 +57566,7 @@ class SpotLightHelper extends Object3D {
 
 		}
 
-		this.matrixWorld.copy( this.light.matrixWorld );
+		this.matrixWorldNeedsUpdate = true;
 
 		const coneLength = this.light.distance ? this.light.distance : 1000;
 		const coneWidth = coneLength * Math.tan( this.light.angle );
@@ -57827,6 +57849,8 @@ class PointLightHelper extends Mesh {
 	 */
 	update() {
 
+		this.matrixWorldNeedsUpdate = true;
+
 		this.light.updateWorldMatrix( true, false );
 
 		if ( this.color !== undefined ) {
@@ -57969,6 +57993,8 @@ class HemisphereLightHelper extends Object3D {
 			colors.needsUpdate = true;
 
 		}
+
+		this.matrixWorldNeedsUpdate = true;
 
 		this.light.updateWorldMatrix( true, false );
 
@@ -58280,6 +58306,8 @@ class DirectionalLightHelper extends Object3D {
 	 * light being visualized.
 	 */
 	update() {
+
+		this.matrixWorldNeedsUpdate = true;
 
 		this.light.updateWorldMatrix( true, false );
 		this.light.target.updateWorldMatrix( true, false );

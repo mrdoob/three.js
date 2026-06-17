@@ -1,7 +1,7 @@
 import { Tab } from '../ui/Tab.js';
 import { List } from '../ui/List.js';
 import { Item } from '../ui/Item.js';
-import { createValueSpan } from '../ui/utils.js';
+import { createValueSpan, info } from '../ui/utils.js';
 import { ValueString, ValueNumber, ValueSlider, ValueSelect, ValueCheckbox, ValueColor, ValueButton } from '../ui/Values.js';
 
 class ParametersGroup {
@@ -70,60 +70,7 @@ class ParametersGroup {
 
 		editor.info = ( text ) => {
 
-			let infoIcon = itemNode.querySelector( '.info-icon' );
-
-			if ( ! infoIcon ) {
-
-				infoIcon = document.createElement( 'span' );
-				infoIcon.className = 'info-icon';
-				infoIcon.textContent = 'i';
-
-				itemNode.appendChild( infoIcon );
-
-				infoIcon.addEventListener( 'mouseenter', () => {
-
-					const container = infoIcon.closest( '.three-inspector' ) || document.body;
-					let tooltip = container.querySelector( '.three-inspector-info-tooltip' );
-
-					if ( ! tooltip ) {
-
-						tooltip = document.createElement( 'div' );
-						tooltip.className = 'info-tooltip three-inspector-info-tooltip';
-						container.appendChild( tooltip );
-
-					}
-
-					const html = text.trim().replace( /### (.*?)(?:\r?\n|$)/g, '<h3>$1</h3>' )
-								   .replace( /\*\*(.*?)\*\*/g, '<strong>$1</strong>' )
-								   .replace( /\n/g, '<br/>' );
-
-					tooltip.innerHTML = html;
-
-					const rect = infoIcon.getBoundingClientRect();
-
-					tooltip.style.left = ( rect.left + rect.width / 2 ) + 'px';
-					tooltip.style.top = ( rect.top - 8 ) + 'px';
-
-					tooltip.style.opacity = '1';
-					tooltip.style.visibility = 'visible';
-
-				} );
-
-				infoIcon.addEventListener( 'mouseleave', () => {
-
-					const container = infoIcon.closest( '.three-inspector' ) || document.body;
-					const tooltip = container.querySelector( '.three-inspector-info-tooltip' );
-					if ( tooltip ) {
-
-						tooltip.style.opacity = '0';
-						tooltip.style.visibility = 'hidden';
-
-					}
-
-				} );
-
-			}
-
+			info( itemNode, text );
 			return editor;
 
 		};

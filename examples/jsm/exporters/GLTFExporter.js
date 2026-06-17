@@ -2702,9 +2702,33 @@ class GLTFWriter {
 
 		}
 
-		for ( let i = 0; i < options.animations.length; ++ i ) {
+		// animations
 
-			this.processAnimation( options.animations[ i ], input[ 0 ] );
+		if ( input.length === 1 ) {
+
+			// default: single input, flat animations array
+
+			for ( let i = 0; i < options.animations.length; ++ i ) {
+
+				this.processAnimation( options.animations[ i ], input[ 0 ] );
+
+			}
+
+		} else {
+
+			// multi-input with multi-dimensional animations array
+
+			for ( let i = 0; i < input.length; i ++ ) {
+
+				const animations = options.animations[ i ] || [];
+
+				for ( let j = 0; j < animations.length; ++ j ) {
+
+					this.processAnimation( animations[ j ], input[ i ] );
+
+				}
+
+			}
 
 		}
 
@@ -3717,7 +3741,8 @@ GLTFExporter.Utils = {
  * @property {boolean} [onlyVisible=true] - Export only visible 3D objects.
  * @property {boolean} [binary=false] - Export in binary (.glb) format, returning an ArrayBuffer.
  * @property {number} [maxTextureSize=Infinity] - Restricts the image maximum size (both width and height) to the given value.
- * @property {Array<AnimationClip>} [animations=[]] - List of animations to be included in the export.
+ * @property {Array<AnimationClip>|Array<Array<AnimationClip>>} [animations=[]] - List of animations to be included in the export. When exporting a single 3D object or scene, this is a flat list of clips.
+ * When exporting an array of multiple scenes, this must be a nested array with one list of clips per scene, matched to the input by index.
  * @property {boolean} [includeCustomExtensions=false] - Export custom glTF extensions defined on an object's `userData.gltfExtensions` property.
  **/
 

@@ -108,25 +108,55 @@ class WebGPUAttributeUtils {
 
 			bufferAttribute.array = array;
 
+			let paddedItemSize;
+
 			if ( ( bufferAttribute.isStorageBufferAttribute || bufferAttribute.isStorageInstancedBufferAttribute ) && bufferAttribute.itemSize === 3 ) {
 
-				array = new array.constructor( bufferAttribute.count * 4 );
+				// WGSL does not support packed vec3 data in storage buffers, pad to vec4
 
-				for ( let i = 0; i < bufferAttribute.count; i ++ ) {
+				paddedItemSize = 4;
 
-					array.set( bufferAttribute.array.subarray( i * 3, i * 3 + 3 ), i * 4 );
+			} else if ( bufferAttribute.itemSize > 1 && ( bufferAttribute.itemSize * array.BYTES_PER_ELEMENT ) % 4 !== 0 ) {
 
-				}
+				// arrayStride must be a multiple of 4
 
-				// Update BufferAttribute
-				bufferAttribute.itemSize = 4;
-				bufferAttribute.array = array;
+				const byteStride = bufferAttribute.itemSize * array.BYTES_PER_ELEMENT;
 
-				bufferData._force3to4BytesAlignment = true;
+				paddedItemSize = ( Math.floor( ( byteStride + 3 ) / 4 ) * 4 ) / array.BYTES_PER_ELEMENT;
 
 			}
 
-			// ensure 4 byte alignment
+			if ( paddedItemSize !== undefined ) {
+
+				const itemSize = bufferAttribute.itemSize;
+
+				const paddedArray = new array.constructor( bufferAttribute.count * paddedItemSize );
+
+				for ( let i = 0; i < bufferAttribute.count; i ++ ) {
+
+					paddedArray.set( array.subarray( i * itemSize, i * itemSize + itemSize ), i * paddedItemSize );
+
+				}
+
+				if ( bufferAttribute.isStorageBufferAttribute || bufferAttribute.isStorageInstancedBufferAttribute ) {
+
+					// update the storage attribute so storage bindings access the padded layout
+
+					bufferAttribute.itemSize = paddedItemSize;
+					bufferAttribute.array = paddedArray;
+
+				}
+
+				array = paddedArray;
+
+				// save the original and padded item size so buffer updates can apply the same padding
+
+				bufferData._itemSize = itemSize;
+				bufferData._paddedItemSize = paddedItemSize;
+
+			}
+
+			// total buffer size must be a multiple of 4
 			const byteLength = array.byteLength;
 			const size = byteLength + ( ( 4 - ( byteLength % 4 ) ) % 4 );
 
@@ -166,18 +196,28 @@ class WebGPUAttributeUtils {
 
 		let array = bufferAttribute.array;
 
-		//  if storage buffer ensure 4 byte alignment
-		if ( bufferData._force3to4BytesAlignment === true ) {
+		const itemSize = bufferData._itemSize;
+		const paddedItemSize = bufferData._paddedItemSize;
 
-			array = new array.constructor( bufferAttribute.count * 4 );
+		if ( paddedItemSize !== undefined ) {
+
+			// if the attribute data were padded on upload, apply the same padding on updates.
+
+			array = new array.constructor( bufferAttribute.count * paddedItemSize );
 
 			for ( let i = 0; i < bufferAttribute.count; i ++ ) {
 
-				array.set( bufferAttribute.array.subarray( i * 3, i * 3 + 3 ), i * 4 );
+				array.set( bufferAttribute.array.subarray( i * itemSize, i * itemSize + itemSize ), i * paddedItemSize );
 
 			}
 
-			bufferAttribute.array = array;
+			if ( bufferAttribute.isStorageBufferAttribute || bufferAttribute.isStorageInstancedBufferAttribute ) {
+
+				// keep the storage attribute in sync with the padded layout
+
+				bufferAttribute.array = array;
+
+			}
 
 		}
 
@@ -205,12 +245,12 @@ class WebGPUAttributeUtils {
 				const range = updateRanges[ i ];
 				let dataOffset, size;
 
-				if ( bufferData._force3to4BytesAlignment === true ) {
+				if ( paddedItemSize !== undefined ) {
 
-					const vertexStart = Math.floor( range.start / 3 );
-					const vertexCount = Math.ceil( range.count / 3 );
-					dataOffset = vertexStart * 4 * byteOffsetFactor;
-					size = vertexCount * 4 * byteOffsetFactor;
+					const vertexStart = Math.floor( range.start / itemSize );
+					const vertexCount = Math.ceil( ( range.start + range.count ) / itemSize ) - vertexStart;
+					dataOffset = vertexStart * paddedItemSize * byteOffsetFactor;
+					size = vertexCount * paddedItemSize * byteOffsetFactor;
 
 				} else {
 
@@ -270,6 +310,14 @@ class WebGPUAttributeUtils {
 
 					arrayStride = geometryAttribute.itemSize * bytesPerElement;
 					stepMode = geometryAttribute.isInstancedBufferAttribute ? GPUInputStepMode.Instance : GPUInputStepMode.Vertex;
+
+					if ( geometryAttribute.itemSize > 1 && arrayStride % 4 !== 0 ) {
+
+						// packed attribute data are padded per vertex on upload
+
+						arrayStride = Math.floor( ( arrayStride + 3 ) / 4 ) * 4;
+
+					}
 
 				}
 

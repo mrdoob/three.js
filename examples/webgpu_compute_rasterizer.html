@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - compute rasterizer</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - compute rasterizer">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_compute_rasterizer.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_compute_rasterizer.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>GPU-Driven Compute Rasterizer</span>
+			</div>
+
+			<small>Rendering <span id="triangleCount"></span> triangles.</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { Fn, If, Loop, vec4, vec2, uvec4, mat4, uint, float, int, min, max, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, uv, instanceIndex, vertexIndex, distance, screenSize, time, texture, varyingProperty, sqrt } from 'three/tsl';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			if ( WebGPU.isAvailable() === false ) {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+
+				throw new Error( 'No WebGPU support' );
+
+			}
+
+			let camera, renderer, controls;
+			let computeRasterize, computeClear, computeFrustum, computeDispatch, computeHWArgs;
+			let quadMesh, hwScene, hwMesh;
+			let cameraPos, projScreenMatrixUniform, frustumPlanesUniform, cotHalfFovUniform;
+
+			let screenTriAttr, screenTriAtomic, screenTriRead;
+			let screenInstAttr, screenInstBuffer, screenInstRead;
+			let maxPixels;
+
+			const rows = 400;
+			const cols = 400;
+			const instanceCount = rows * cols;
+
+			const MAX_RASTER_SIZE = 16;
+			const options = { Mode: 'Meshlet Debug', Rasterizer: 'Both' };
+
+			// Buffer visibility packaging configuration
+			const TRIANGLE_INDEX_BITS = 14; 			// Bits allocated for triangle index (2^14 = 16384 max triangles)
+			const TRIANGLE_INDEX_MASK = 0x3FFF; 		// Bitmask to extract triangle index (14 bits)
+			const DEPTH_PRECISION_MAX = 4294967295.0; 	// Maximum value of the 32-bit depth (2^32 - 1)
+
+			const background = new THREE.Color( .1, .1, .1 );
+
+			init();
+
+			async function init() {
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, .25, 1000000 );
+				camera.position.set( 0, 15, 50 );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.y = - 1.5;
+				controls.enableDamping = true;
+				controls.zoomSpeed = .5;
+				controls.maxDistance = 1000;
+				controls.maxPolarAngle = Math.PI / 2;
+
+				// Generate LOD Geometries
+				const lods = [
+					{ geometry: new TeapotGeometry( 1, 10 ), error: 0.0 },
+					{ geometry: new TeapotGeometry( 1, 8 ), error: 0.005 },
+					{ geometry: new TeapotGeometry( 1, 6 ), error: 0.015 },
+					{ geometry: new TeapotGeometry( 1, 5 ), error: 0.03 },
+					{ geometry: new TeapotGeometry( 1, 4 ), error: 0.06 },
+					{ geometry: new TeapotGeometry( 1, 3 ), error: 0.1 },
+					{ geometry: new TeapotGeometry( 1, 2 ), error: 0.2 }
+				];
+
+				let totalVertices = 0;
+				let totalIndices = 0;
+
+				for ( const lod of lods ) {
+
+					const geom = lod.geometry;
+					const pos = geom.attributes.position;
+					const uvs = geom.attributes.uv;
+					const idx = geom.index ? Array.from( geom.index.array ) : Array.from( { length: pos.count }, ( _, i ) => i );
+
+					lod.numVertices = pos.count;
+					lod.numTriangles = idx.length / 3;
+					lod.vertexOffset = totalVertices;
+					lod.indexOffset = totalIndices;
+					lod.positions = pos;
+					lod.uvs = uvs;
+					lod.indices = idx;
+
+					totalVertices += pos.count;
+					totalIndices += idx.length;
+
+				}
+
+				const maxTrianglesPerInstance = lods[ 0 ].numTriangles;
+				const totalTriangles = rows * cols * maxTrianglesPerInstance;
+				document.getElementById( 'triangleCount' ).innerText = new Intl.NumberFormat().format( totalTriangles );
+
+				const vertexArray = new Float32Array( totalVertices * 4 ); // vec4 padded
+				const uvArray = new Float32Array( totalVertices * 2 );
+				const indexArray = new Uint32Array( totalIndices );
+				const meshletTriangleArray = new Uint32Array( totalIndices / 3 ); // 1 meshlet ID per triangle
+
+				let currentMeshletId = 1;
+
+				for ( const lod of lods ) {
+
+					for ( let i = 0; i < lod.numVertices; i ++ ) {
+
+						const vIdx = lod.vertexOffset + i;
+						vertexArray[ vIdx * 4 + 0 ] = lod.positions.getX( i );
+						vertexArray[ vIdx * 4 + 1 ] = lod.positions.getY( i );
+						vertexArray[ vIdx * 4 + 2 ] = lod.positions.getZ( i );
+						vertexArray[ vIdx * 4 + 3 ] = 1.0;
+
+						if ( lod.uvs ) {
+
+							uvArray[ vIdx * 2 + 0 ] = lod.uvs.getX( i );
+							uvArray[ vIdx * 2 + 1 ] = lod.uvs.getY( i );
+
+						}
+
+					}
+
+					let currentTriCount = 0;
+					for ( let i = 0; i < lod.numTriangles; i ++ ) {
+
+						const triIdx = ( lod.indexOffset / 3 ) + i;
+						indexArray[ triIdx * 3 + 0 ] = lod.vertexOffset + lod.indices[ i * 3 + 0 ];
+						indexArray[ triIdx * 3 + 1 ] = lod.vertexOffset + lod.indices[ i * 3 + 1 ];
+						indexArray[ triIdx * 3 + 2 ] = lod.vertexOffset + lod.indices[ i * 3 + 2 ];
+
+						if ( currentTriCount >= 126 ) {
+
+							currentMeshletId ++;
+							currentTriCount = 0;
+
+						}
+
+						meshletTriangleArray[ triIdx ] = currentMeshletId;
+						currentTriCount ++;
+
+					}
+
+					currentMeshletId ++;
+
+				}
+
+				// Precompute Bounding Spheres for each 64-triangle Chunk (Cluster)
+				let totalChunks = 0;
+				for ( const lod of lods ) {
+
+					lod.numChunks = Math.ceil( lod.numTriangles / 64 );
+					lod.chunkStart = totalChunks;
+					totalChunks += lod.numChunks;
+
+				}
+
+				const chunkBoundsData = new Float32Array( totalChunks * 4 ); // vec4: cx, cy, cz, radius
+				let currentChunkId = 0;
+
+				for ( const lod of lods ) {
+
+					const positions = lod.positions;
+					const indices = lod.indices;
+
+					for ( let c = 0; c < lod.numChunks; c ++ ) {
+
+						const startTri = c * 64;
+						const endTri = Math.min( startTri + 64, lod.numTriangles );
+
+						// 1. Calculate Center
+						let cx = 0, cy = 0, cz = 0;
+						const vertCount = ( endTri - startTri ) * 3;
+						for ( let t = startTri; t < endTri; t ++ ) {
+
+							for ( let v = 0; v < 3; v ++ ) {
+
+								const idx = indices[ t * 3 + v ];
+								cx += positions.getX( idx );
+								cy += positions.getY( idx );
+								cz += positions.getZ( idx );
+
+							}
+
+						}
+
+						cx /= vertCount;
+						cy /= vertCount;
+						cz /= vertCount;
+
+						// 2. Calculate Radius
+						let maxDistSq = 0;
+						for ( let t = startTri; t < endTri; t ++ ) {
+
+							for ( let v = 0; v < 3; v ++ ) {
+
+								const idx = indices[ t * 3 + v ];
+								const dx = positions.getX( idx ) - cx;
+								const dy = positions.getY( idx ) - cy;
+								const dz = positions.getZ( idx ) - cz;
+								const distSq = dx * dx + dy * dy + dz * dz;
+								if ( distSq > maxDistSq ) maxDistSq = distSq;
+
+							}
+
+						}
+
+						const radius = Math.sqrt( maxDistSq );
+
+						chunkBoundsData[ currentChunkId * 4 + 0 ] = cx;
+						chunkBoundsData[ currentChunkId * 4 + 1 ] = cy;
+						chunkBoundsData[ currentChunkId * 4 + 2 ] = cz;
+						chunkBoundsData[ currentChunkId * 4 + 3 ] = radius;
+						currentChunkId ++;
+
+					}
+
+				}
+
+				// Upload LOD offsets to GPU (uvec4: triangleStart, numTriangles, chunkStart, 0)
+				const lodOffsetsData = new Uint32Array( lods.length * 4 );
+				for ( let i = 0; i < lods.length; i ++ ) {
+
+					lodOffsetsData[ i * 4 + 0 ] = lods[ i ].indexOffset / 3;
+					lodOffsetsData[ i * 4 + 1 ] = lods[ i ].numTriangles;
+					lodOffsetsData[ i * 4 + 2 ] = lods[ i ].chunkStart;
+
+				}
+
+				const lodOffsetsBuffer = storage( new THREE.StorageBufferAttribute( lodOffsetsData, 4 ), 'uvec4', lods.length ).toReadOnly();
+				const chunkBoundsBuffer = storage( new THREE.StorageBufferAttribute( chunkBoundsData, 4 ), 'vec4', totalChunks ).toReadOnly();
+
+				// Storage Buffers
+				const vertexBuffer = storage( new THREE.StorageBufferAttribute( vertexArray, 4 ), 'vec4', totalVertices ).toReadOnly();
+				const uvBuffer = storage( new THREE.StorageBufferAttribute( uvArray, 2 ), 'vec2', totalVertices ).toReadOnly();
+				const indexBuffer = storage( new THREE.StorageBufferAttribute( indexArray, 1 ), 'uint', totalIndices ).toReadOnly();
+				const meshletIdBuffer = storage( new THREE.StorageBufferAttribute( meshletTriangleArray, 1 ), 'uint', totalIndices / 3 ).toReadOnly();
+
+				const materialModeUniform = uniform( 0, 'uint' );
+
+				const textureMap = new THREE.TextureLoader().load( 'textures/uv_grid_directx.jpg' );
+				textureMap.colorSpace = THREE.SRGBColorSpace;
+				textureMap.wrapS = THREE.RepeatWrapping;
+				textureMap.wrapT = THREE.RepeatWrapping;
+
+				const timeScale = uniform( 1.0 );
+
+				const parameterGroup = renderer.inspector.createParameters( 'Parameters' );
+				parameterGroup.add( options, 'Mode', { 'Meshlet Debug': 'Meshlet Debug', 'Texture': 'Texture' } ).addEventListener( 'change', ( e ) => {
+
+					materialModeUniform.value = e.value === 'Texture' ? 1 : 0;
+
+				} );
+
+				parameterGroup.add( options, 'Rasterizer', { 'SW Only': 'SW Only', 'HW Only': 'HW Only', 'Both': 'Both' } );
+
+				parameterGroup.add( timeScale, 'value', 0.0, 1.0 ).name( 'Animation Speed' );
+
+				// Visibility buffers
+				// screenTri: 32-bit depth — the closest fragment wins via atomicMax
+				// screenInst: payload — instId (18 high bits) | megaTriangleIndex (14 low bits),
+				// written by the depth test winner (best effort; not atomic with the depth update)
+				createScreenBuffers();
+
+				const staticInstanceData = new Float32Array( instanceCount * 4 );
+				let dataIndex = 0;
+
+				for ( let i = 0; i < rows; i ++ ) {
+
+					for ( let j = 0; j < cols; j ++ ) {
+
+						staticInstanceData[ dataIndex ++ ] = ( i - rows / 2 ) * 4.0;
+						staticInstanceData[ dataIndex ++ ] = - 1;
+						staticInstanceData[ dataIndex ++ ] = ( j - cols / 2 ) * 4.0;
+						staticInstanceData[ dataIndex ++ ] = 1.0; // scale
+
+					}
+
+				}
+
+				const instanceDataBuffer = storage( new THREE.StorageBufferAttribute( staticInstanceData, 4 ), 'vec4', instanceCount );
+
+				const instanceWorldData = new Float32Array( instanceCount * 16 );
+				const instanceMvpData = new Float32Array( instanceCount * 16 );
+
+				const instanceWorldAttr = new THREE.StorageBufferAttribute( instanceWorldData, 16 );
+				const instanceMvpAttr = new THREE.StorageBufferAttribute( instanceMvpData, 16 );
+
+				const instanceWorldBuffer = storage( instanceWorldAttr, 'mat4', instanceCount );
+				const instanceMvpBuffer = storage( instanceMvpAttr, 'mat4', instanceCount );
+				const instanceWorldRead = storage( instanceWorldAttr, 'mat4', instanceCount ).toReadOnly();
+
+				const workQueueCountData = new Uint32Array( 1 );
+				const workQueueCountAttr = new THREE.StorageBufferAttribute( workQueueCountData, 1 );
+				const workQueueCountAtomic = storage( workQueueCountAttr, 'uint', 1 ).toAtomic();
+				const workQueueCountRead = storage( workQueueCountAttr, 'uint', 1 ).toReadOnly();
+
+				const dispatchData = new Uint32Array( 3 );
+				const dispatchAttr = new THREE.IndirectStorageBufferAttribute( dispatchData, 3 );
+				const dispatchBuffer = storage( dispatchAttr, 'uint', 3 );
+
+				// Work queue budget — one item is a 64-triangle chunk of one visible instance
+				const MAX_WORK_ITEMS = 2820000;
+				const workQueueData = new Uint32Array( MAX_WORK_ITEMS * 4 );
+				const workQueueBuffer = storage( new THREE.StorageBufferAttribute( workQueueData, 4 ), 'uvec4', MAX_WORK_ITEMS );
+
+				// HW Rasterizer Buffers (for large triangles that exceed SW raster budget)
+				const MAX_HW_TRIANGLES = 100000;
+
+				// HW queue: index 0 is atomic counter, indices 1..MAX store payload32
+				const hwQueueData = new Uint32Array( MAX_HW_TRIANGLES + 1 );
+				const hwQueueAttr = new THREE.StorageBufferAttribute( hwQueueData, 1 );
+				const hwQueueAtomic = storage( hwQueueAttr, 'uint', MAX_HW_TRIANGLES + 1 ).toAtomic();
+				const hwQueueRead = storage( hwQueueAttr, 'uint', MAX_HW_TRIANGLES + 1 ).toReadOnly();
+
+				// Draw indirect buffer: vertexCount, instanceCount, firstVertex, firstInstance
+				const hwDrawData = new Uint32Array( 4 );
+				const hwDrawAttr = new THREE.IndirectStorageBufferAttribute( hwDrawData, 4 );
+				const hwDrawBuffer = storage( hwDrawAttr, 'uint', 4 );
+
+				projScreenMatrixUniform = uniform( new THREE.Matrix4() );
+				frustumPlanesUniform = uniformArray( [
+					new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4(),
+					new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4()
+				], 'vec4' );
+				cameraPos = uniform( new THREE.Vector3() );
+				cotHalfFovUniform = uniform( 1.0 );
+				const pixelErrorThresholdUniform = uniform( 4.0 );
+				const maxRasterSizeUniform = uniform( MAX_RASTER_SIZE, 'int' ); // Max bounding box size in pixels for SW rasterizer
+
+				// Compute Clear
+				computeClear = Fn( () => {
+
+					atomicStore( screenTriAtomic.element( instanceIndex ), uint( 0 ) );
+					screenInstBuffer.element( instanceIndex ).assign( uint( 0 ) );
+
+					If( instanceIndex.equal( 0 ), () => {
+
+						atomicStore( workQueueCountAtomic.element( 0 ), uint( 0 ) );
+						atomicStore( hwQueueAtomic.element( 0 ), uint( 0 ) );
+
+					} );
+
+				} )().compute( maxPixels, [ 256 ] ).setName( 'Compute Clear' );
+
+				// Compute Frustum (GPU Culling, LOD & Work Allocation)
+				computeFrustum = Fn( () => {
+
+					const data = instanceDataBuffer.element( instanceIndex );
+					const pos = data.xyz;
+					const scale = data.w;
+					const i = float( instanceIndex );
+
+					// Rotation
+					const rotY = time.mul( timeScale ).add( i );
+					const c = cos( rotY );
+					const s = sin( rotY );
+
+					// Compose MatrixWorld
+					const matrixWorld = mat4(
+						vec4( c.mul( scale ), 0.0, s.mul( scale ), 0.0 ),
+						vec4( 0.0, scale, 0.0, 0.0 ),
+						vec4( s.negate().mul( scale ), 0.0, c.mul( scale ), 0.0 ),
+						vec4( pos, 1.0 )
+					);
+
+					const visible = bool( true ).toVar();
+					const radius = scale.mul( 2.0 ); // bounding sphere radius
+
+					// Frustum culling using the 6 extracted world-space planes
+					Loop( { start: 0, end: 6 }, ( { i: planeIndex } ) => {
+
+						const plane = frustumPlanesUniform.element( planeIndex );
+						const dist = dot( plane.xyz, pos ).add( plane.w );
+
+						If( dist.lessThan( radius.negate() ), () => {
+
+							visible.assign( false );
+
+						} );
+
+					} );
+
+					If( visible, () => {
+
+						const distToCamera = distance( cameraPos, pos );
+
+						// Precompute projection factor once (Screen-Space Projected Error)
+						// pixelError = cotHalfFov * errorWorld / dist * screenH / 2
+						const pixelFactor = cotHalfFovUniform.div( max( 0.01, distToCamera ) ).mul( float( screenSize.y ) ).div( 2.0 );
+
+						const lodLevel = uint( 0 ).toVar();
+
+						let lodSelection = null;
+						for ( let i = lods.length - 1; i > 0; i -- ) {
+
+							const checkLod = float( lods[ i ].error ).mul( scale ).mul( pixelFactor ).lessThanEqual( pixelErrorThresholdUniform );
+
+							if ( lodSelection === null ) {
+
+								lodSelection = If( checkLod, () => {
+
+									lodLevel.assign( i );
+
+								} );
+
+							} else {
+
+								lodSelection = lodSelection.ElseIf( checkLod, () => {
+
+									lodLevel.assign( i );
+
+								} );
+
+							}
+
+						}
+
+						const lodData = lodOffsetsBuffer.element( lodLevel );
+						const lodTriStart = lodData.x;
+						const lodNumTriangles = lodData.y;
+						const lodChunkStart = lodData.z;
+
+						// Calculate Work Items (64 triangles per item)
+						const workItems = lodNumTriangles.add( 63 ).div( 64 );
+
+						// Evaluate each Chunk (Cluster)
+						Loop( { name: 'cIdx', type: 'uint', start: uint( 0 ), end: workItems, condition: '<' }, ( { cIdx: chunkIndex } ) => {
+
+							const globalChunkId = lodChunkStart.add( uint( chunkIndex ) );
+							const chunkBounds = chunkBoundsBuffer.element( globalChunkId );
+							const chunkCenterLocal = chunkBounds.xyz;
+							const chunkRadiusLocal = chunkBounds.w;
+
+							// Transform chunk bounding sphere to world space and store as var to prevent inlining
+							const chunkCenterWorld = matrixWorld.mul( vec4( chunkCenterLocal, 1.0 ) ).xyz.toVar();
+							const chunkRadiusWorld = chunkRadiusLocal.mul( scale ).toVar();
+
+							const chunkVisible = bool( true ).toVar();
+
+							// Frustum cull the chunk
+							Loop( { name: 'pIdx', start: 0, end: 6 }, ( { pIdx: planeIndex } ) => {
+
+								const plane = frustumPlanesUniform.element( planeIndex );
+								const chunkDist = dot( plane.xyz, chunkCenterWorld ).add( plane.w );
+
+								If( chunkDist.lessThan( chunkRadiusWorld.negate() ), () => {
+
+									chunkVisible.assign( false );
+
+								} );
+
+							} );
+
+							If( chunkVisible, () => {
+
+								const itemIndex = atomicAdd( workQueueCountAtomic.element( 0 ), 1 );
+
+								// uvec4( instanceIndex, triangleStart, lodNumTriangles, chunkIndex )
+								workQueueBuffer.element( itemIndex ).assign(
+									uvec4( instanceIndex, lodTriStart, lodNumTriangles, uint( chunkIndex ) )
+								);
+
+							} );
+
+						} );
+
+						// Store transform for this instance
+						instanceWorldBuffer.element( instanceIndex ).assign( matrixWorld );
+						instanceMvpBuffer.element( instanceIndex ).assign( projScreenMatrixUniform.mul( matrixWorld ) );
+
+					} );
+
+				} )().compute( instanceCount ).setName( 'Compute Frustum' );
+
+				// Compute Dispatch (Indirect arguments)
+				computeDispatch = Fn( () => {
+
+					const totalWorkgroups = workQueueCountRead.element( 0 );
+
+					const maxDim = uint( 65535 );
+
+					// Split totalWorkgroups into 2D dispatch if it exceeds 65535
+					const dispatchX = min( totalWorkgroups, maxDim );
+					const dispatchY = totalWorkgroups.add( maxDim ).sub( 1 ).div( maxDim );
+
+					dispatchBuffer.element( 0 ).assign( dispatchX );
+					dispatchBuffer.element( 1 ).assign( dispatchY );
+					dispatchBuffer.element( 2 ).assign( 1 );
+
+				} )().compute( 1 ).setName( 'Compute Dispatch' );
+
+				// Edge function for barycentric coordinates
+				const edgeFunction = Fn( ( [ a, b, c ] ) => {
+
+					// (c.y - a.y) * (b.x - a.x) - (c.x - a.x) * (b.y - a.y)
+					return c.y.sub( a.y ).mul( b.x.sub( a.x ) ).sub( c.x.sub( a.x ).mul( b.y.sub( a.y ) ) );
+
+				} );
+
+				// Compute Rasterizer
+				computeRasterize = Fn( () => {
+
+					const totalWorkgroups = workQueueCountRead.element( 0 );
+					const totalThreads = totalWorkgroups.mul( 64 );
+
+					If( instanceIndex.lessThan( totalThreads ), () => {
+
+						const workItemId = instanceIndex.div( 64 );
+						const localTriangleIndex = instanceIndex.mod( 64 );
+
+						const workItem = workQueueBuffer.element( workItemId );
+						const instId = workItem.x;
+						const lodTriStart = workItem.y;
+						const lodNumTriangles = workItem.z;
+						const chunkIndex = workItem.w;
+
+						const globalTriangleIndex = chunkIndex.mul( 64 ).add( localTriangleIndex );
+
+						If( globalTriangleIndex.lessThan( lodNumTriangles ), () => {
+
+							const megaTriangleIndex = lodTriStart.add( globalTriangleIndex );
+							const indexOffset = megaTriangleIndex.mul( 3 );
+
+							const i0 = indexBuffer.element( indexOffset );
+							const i1 = indexBuffer.element( indexOffset.add( 1 ) );
+							const i2 = indexBuffer.element( indexOffset.add( 2 ) );
+
+							const v0 = vertexBuffer.element( i0 );
+							const v1 = vertexBuffer.element( i1 );
+							const v2 = vertexBuffer.element( i2 );
+
+							const instMvpMatrix = instanceMvpBuffer.element( instId );
+
+							// MVP
+							const p0 = instMvpMatrix.mul( v0 );
+							const p1 = instMvpMatrix.mul( v1 );
+							const p2 = instMvpMatrix.mul( v2 );
+
+							// Near plane clipping
+							If( p0.w.greaterThan( 0.0 ).and( p1.w.greaterThan( 0.0 ) ).and( p2.w.greaterThan( 0.0 ) ), () => {
+
+								const ndc0 = p0.xyz.div( p0.w );
+								const ndc1 = p1.xyz.div( p1.w );
+								const ndc2 = p2.xyz.div( p2.w );
+
+								// Early Backface Culling in NDC
+								const areaNdc = edgeFunction( ndc0, ndc1, ndc2 );
+
+								If( areaNdc.greaterThan( 0.0 ), () => {
+
+									// NDC guard: skip triangles entirely outside clip volume
+									const ndcMinX = min( ndc0.x, min( ndc1.x, ndc2.x ) );
+									const ndcMaxX = max( ndc0.x, max( ndc1.x, ndc2.x ) );
+									const ndcMinY = min( ndc0.y, min( ndc1.y, ndc2.y ) );
+									const ndcMaxY = max( ndc0.y, max( ndc1.y, ndc2.y ) );
+
+									If( ndcMaxX.greaterThan( - 1.0 ).and( ndcMinX.lessThan( 1.0 ) ).and( ndcMaxY.greaterThan( - 1.0 ) ).and( ndcMinY.lessThan( 1.0 ) ), () => {
+
+										// Map to screen coordinates
+										const w = screenSize.x;
+										const h = screenSize.y;
+										const s0 = ndc0.xy.add( 1.0 ).mul( 0.5 ).mul( vec2( w, h ) );
+										const s1 = ndc1.xy.add( 1.0 ).mul( 0.5 ).mul( vec2( w, h ) );
+										const s2 = ndc2.xy.add( 1.0 ).mul( 0.5 ).mul( vec2( w, h ) );
+
+										// Bounding Box
+										const minX = max( 0.0, min( s0.x, min( s1.x, s2.x ) ) );
+										const maxX = min( w.sub( 1.0 ), max( s0.x, max( s1.x, s2.x ) ) );
+										const minY = max( 0.0, min( s0.y, min( s1.y, s2.y ) ) );
+										const maxY = min( h.sub( 1.0 ), max( s0.y, max( s1.y, s2.y ) ) );
+
+										const startX = int( floor( minX ) );
+										const endX = int( floor( maxX ) );
+										const startY = int( floor( minY ) );
+										const endY = int( floor( maxY ) );
+
+										// Big triangle guard: skip triangles larger than maxRasterSize
+										// This is the key performance safeguard — software rasterizers
+										// should only handle small triangles. Large triangles cause O(n²)
+										// pixel iteration per thread, which kills performance when close.
+										const bbWidth = endX.sub( startX );
+										const bbHeight = endY.sub( startY );
+
+										// Compute payload32 for HW path (full precision)
+										// payload32: instId (18 bits) | megaTriangleIndex (14 bits)
+										const payload32 = instId.shiftLeft( TRIANGLE_INDEX_BITS ).bitOr( megaTriangleIndex.bitAnd( TRIANGLE_INDEX_MASK ) );
+
+										// Sub-pixel / Valid bounds rejection + big triangle guard
+										If( startX.lessThanEqual( endX ).and( startY.lessThanEqual( endY ) ).and( bbWidth.lessThanEqual( maxRasterSizeUniform ) ).and( bbHeight.lessThanEqual( maxRasterSizeUniform ) ), () => {
+
+											const area = edgeFunction( s0, s1, s2 );
+
+											const stepX_w0 = s1.y.sub( s2.y );
+											const stepY_w0 = s2.x.sub( s1.x );
+
+											const stepX_w1 = s2.y.sub( s0.y );
+											const stepY_w1 = s0.x.sub( s2.x );
+
+											const stepX_w2 = s0.y.sub( s1.y );
+											const stepY_w2 = s1.x.sub( s0.x );
+
+											// Top-Left rule check for each edge to guarantee watertightness
+											const isTopLeft0 = stepX_w0.lessThan( 0.0 ).or( stepX_w0.equal( 0.0 ).and( stepY_w0.greaterThan( 0.0 ) ) );
+											const isTopLeft1 = stepX_w1.lessThan( 0.0 ).or( stepX_w1.equal( 0.0 ).and( stepY_w1.greaterThan( 0.0 ) ) );
+											const isTopLeft2 = stepX_w2.lessThan( 0.0 ).or( stepX_w2.equal( 0.0 ).and( stepY_w2.greaterThan( 0.0 ) ) );
+
+											const bias0 = isTopLeft0.select( 0.0, - 1e-5 );
+											const bias1 = isTopLeft1.select( 0.0, - 1e-5 );
+											const bias2 = isTopLeft2.select( 0.0, - 1e-5 );
+
+											const pStart = vec2( float( startX ).add( 0.5 ), float( startY ).add( 0.5 ) );
+
+											const row_w0 = edgeFunction( s1, s2, pStart ).toVar();
+											const row_w1 = edgeFunction( s2, s0, pStart ).toVar();
+											const row_w2 = edgeFunction( s0, s1, pStart ).toVar();
+
+											row_w0.addAssign( bias0 );
+											row_w1.addAssign( bias1 );
+											row_w2.addAssign( bias2 );
+
+											// Incremental Z Math (ALU Optimization)
+											const b0_start = row_w0.div( area );
+											const b1_start = row_w1.div( area );
+											const b2_start = row_w2.div( area );
+											const row_z = b0_start.mul( ndc0.z ).add( b1_start.mul( ndc1.z ) ).add( b2_start.mul( ndc2.z ) ).toVar();
+
+											const stepX_z = stepX_w0.div( area ).mul( ndc0.z ).add( stepX_w1.div( area ).mul( ndc1.z ) ).add( stepX_w2.div( area ).mul( ndc2.z ) );
+											const stepY_z = stepY_w0.div( area ).mul( ndc0.z ).add( stepY_w1.div( area ).mul( ndc1.z ) ).add( stepY_w2.div( area ).mul( ndc2.z ) );
+
+											Loop( { name: 'y', type: 'int', start: startY, end: endY, condition: '<=' }, ( { y } ) => {
+
+												const w0 = row_w0.toVar();
+												const w1 = row_w1.toVar();
+												const w2 = row_w2.toVar();
+												const z = row_z.toVar();
+
+												Loop( { name: 'x', type: 'int', start: startX, end: endX, condition: '<=' }, ( { x } ) => {
+
+													If( w0.greaterThanEqual( 0.0 ).and( w1.greaterThanEqual( 0.0 ) ).and( w2.greaterThanEqual( 0.0 ) ), () => {
+
+														If( z.greaterThanEqual( 0.0 ).and( z.lessThanEqual( 1.0 ) ), () => {
+
+															// Calculate 32-bit depth value (fourth-root distribution to maximize depth precision)
+															const depth32 = uint( sqrt( sqrt( float( 1.0 ).sub( z ) ) ).mul( DEPTH_PRECISION_MAX ) );
+
+															const pixelIndex = uint( y ).mul( uint( screenSize.x ) ).add( uint( x ) );
+
+															// Early depth pre-check: skip atomicMax if pixel already has closer fragment
+															const currentDepth = atomicLoad( screenTriAtomic.element( pixelIndex ) );
+															If( depth32.greaterThan( currentDepth ), () => {
+
+																// Atomic depth test
+																const prevDepth = atomicMax( screenTriAtomic.element( pixelIndex ), depth32 );
+
+																// If we successfully wrote the closest depth, write the payload
+																If( depth32.greaterThan( prevDepth ), () => {
+
+																	screenInstBuffer.element( pixelIndex ).assign( payload32 );
+
+																} );
+
+															} );
+
+														} );
+
+													} );
+
+													w0.addAssign( stepX_w0 );
+													w1.addAssign( stepX_w1 );
+													w2.addAssign( stepX_w2 );
+													z.addAssign( stepX_z );
+
+												} );
+
+												row_w0.addAssign( stepY_w0 );
+												row_w1.addAssign( stepY_w1 );
+												row_w2.addAssign( stepY_w2 );
+												row_z.addAssign( stepY_z );
+
+											} );
+
+										} ).Else( () => {
+
+											// Big triangle → enqueue for HW rasterization
+											If( startX.lessThanEqual( endX ).and( startY.lessThanEqual( endY ) ), () => {
+
+												const hwCount = atomicAdd( hwQueueAtomic.element( 0 ), 1 );
+												const hwSlot = hwCount.add( 1 );
+												atomicStore( hwQueueAtomic.element( hwSlot ), payload32 );
+
+											} );
+
+										} );
+
+									} );
+
+								} ); // End Early Backface Culling
+
+							} ); // End Near Plane Clipping
+
+						} ); // End globalTriangleIndex bounds check
+
+					} ); // End instanceIndex bounds check
+
+				} )().compute( dispatchAttr ).setName( 'Compute Rasterize' );
+
+				// Compute HW Draw Indirect Args
+				computeHWArgs = Fn( () => {
+
+					const hwCount = atomicLoad( hwQueueAtomic.element( 0 ) );
+
+					// Non-indexed draw: vertexCount = hwCount * 3 (3 verts per triangle)
+					hwDrawBuffer.element( 0 ).assign( hwCount.mul( 3 ) ); // vertexCount
+					hwDrawBuffer.element( 1 ).assign( uint( 1 ) ); // instanceCount
+					hwDrawBuffer.element( 2 ).assign( uint( 0 ) ); // firstVertex
+					hwDrawBuffer.element( 3 ).assign( uint( 0 ) ); // firstInstance
+
+				} )().compute( 1 ).setName( 'Compute HW Args' );
+
+				// Hash function for meshlet colors (shared between HW mesh and fullscreen quad)
+				const hashColor = Fn( ( [ id_in ] ) => {
+
+					let id = uint( id_in ).toVar();
+					id = id.mul( uint( 747796405 ) ).add( uint( 289559509 ) );
+					id = id.shiftRight( 16 ).bitXor( id ).mul( uint( 277803737 ) );
+					id = id.shiftRight( 16 ).bitXor( id );
+
+					const r = float( id.bitAnd( uint( 255 ) ) ).div( 255.0 );
+					const g = float( id.shiftRight( 8 ).bitAnd( uint( 255 ) ) ).div( 255.0 );
+					const b = float( id.shiftRight( 16 ).bitAnd( uint( 255 ) ) ).div( 255.0 );
+
+					return vec4( r.mul( 0.8 ).add( 0.2 ), g.mul( 0.8 ).add( 0.2 ), b.mul( 0.8 ).add( 0.2 ), 1.0 );
+
+				} );
+
+				// HW Rasterizer Mesh (renders big triangles via GPU hardware pipeline)
+				// Unlike the SW rasterizer which writes to an atomic screen buffer,
+				// the HW mesh renders directly with real colors and hardware depth testing.
+				// It renders AFTER the fullscreen quad, overlaying HW-rasterized triangles.
+				{
+
+					// Geometry: dummy positions, vertex count driven by indirect draw
+					const hwGeometry = new THREE.BufferGeometry();
+					hwGeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( new Float32Array( MAX_HW_TRIANGLES * 3 * 3 ), 3 ) );
+					hwGeometry.setIndirect( hwDrawAttr );
+					hwGeometry.boundingSphere = new THREE.Sphere().set( new THREE.Vector3(), Infinity );
+
+					// Varying to pass payload and UVs from vertex to fragment
+					const vPayload = varyingProperty( 'uint', 'vPayload' );
+					const vUv = varyingProperty( 'vec2', 'vUv' );
+
+					const hwMaterial = new THREE.NodeMaterial();
+					hwMaterial.depthWrite = true;
+					hwMaterial.depthTest = true;
+
+					// Vertex shader: vertex pulling from HW queue
+					hwMaterial.positionNode = Fn( () => {
+
+						// vertexIndex: 0,1,2, 3,4,5, 6,7,8, ...
+						const triIndex = vertexIndex.div( 3 ); // which triangle in HW queue
+						const localVert = vertexIndex.mod( 3 ); // which vertex (0, 1, 2)
+
+						const payload32 = hwQueueRead.element( triIndex.add( 1 ) );
+						const instId = payload32.shiftRight( TRIANGLE_INDEX_BITS );
+						const megaTriIdx = payload32.bitAnd( TRIANGLE_INDEX_MASK );
+
+						// Fetch actual vertex index from the mega index buffer
+						const vertGlobalIdx = indexBuffer.element( megaTriIdx.mul( 3 ).add( localVert ) );
+						const v = vertexBuffer.element( vertGlobalIdx );
+
+						// Transform to world space
+						const worldPos = instanceWorldRead.element( instId ).mul( v );
+
+						const uvVal = uvBuffer.element( vertGlobalIdx );
+						vUv.assign( uvVal );
+
+						vPayload.assign( payload32 );
+
+						return worldPos.xyz;
+
+					} )();
+
+					// Fragment shader: directly output final color (no storage buffer writes)
+					hwMaterial.fragmentNode = Fn( () => {
+
+						const payload32 = vPayload;
+						const instId = payload32.shiftRight( TRIANGLE_INDEX_BITS );
+						const megaTriangleIndex = payload32.bitAnd( TRIANGLE_INDEX_MASK );
+
+						const outColor = vec4( 0.0 ).toVar();
+
+						If( materialModeUniform.equal( 0 ), () => {
+
+							const meshletId = meshletIdBuffer.element( megaTriangleIndex ).add( instId.mul( 1000 ) );
+							outColor.assign( hashColor( meshletId ) );
+
+						} ).Else( () => {
+
+							// Hardware interpolated UV!
+							outColor.assign( texture( textureMap, vUv ) );
+
+						} );
+
+						return outColor;
+
+					} )();
+
+					hwMesh = new THREE.Mesh( hwGeometry, hwMaterial );
+					hwMesh.frustumCulled = false;
+
+					hwScene = new THREE.Scene();
+					hwScene.add( hwMesh );
+
+				}
+
+
+				// Fullscreen Presentation Pass
+				const material = new THREE.NodeMaterial();
+				material.depthWrite = true;
+
+				// Shared screen-coordinate helper
+				const getPixelIndex = () => {
+
+					const screenX = uint( floor( uv().x.mul( screenSize.x ) ) );
+					const screenY = uint( floor( uv().y.oneMinus().mul( screenSize.y ) ) );
+					return screenY.mul( uint( screenSize.x ) ).add( screenX );
+
+				};
+
+				// Output depth from the SW rasterizer so HW mesh can depth test against it
+				material.depthNode = Fn( () => {
+
+					const pixelIndex = getPixelIndex();
+
+					// Read 32-bit depth from buffer
+					const depth32 = screenTriRead.element( pixelIndex );
+
+					// Reconstruct NDC Z from non-linear depth32 (fourth-root distribution)
+					const y = float( depth32 ).div( DEPTH_PRECISION_MAX );
+					const y2 = y.mul( y );
+					const v = y2.mul( y2 ); // raise to the fourth power (y^4) to get original v
+					return float( 1.0 ).sub( v );
+
+				} )();
+
+				material.colorNode = Fn( () => {
+
+					const pixelIndex = getPixelIndex();
+
+					// Single buffer read — check for background immediately (using 32-bit depth)
+					const depth32 = screenTriRead.element( pixelIndex );
+
+					// Background color for pixels with no geometry
+					const outColor = vec4( background, 1.0 ).toVar();
+
+					If( depth32.greaterThan( 0 ), () => {
+
+						// Read the single packed payload
+						const payload32 = screenInstRead.element( pixelIndex );
+						const megaTriangleIndex = payload32.bitAnd( TRIANGLE_INDEX_MASK );
+						const instId = payload32.shiftRight( TRIANGLE_INDEX_BITS );
+
+						// Visibility Buffer: Fetch exact vertices and UVs
+						const i0 = indexBuffer.element( megaTriangleIndex.mul( 3 ).add( 0 ) );
+						const i1 = indexBuffer.element( megaTriangleIndex.mul( 3 ).add( 1 ) );
+						const i2 = indexBuffer.element( megaTriangleIndex.mul( 3 ).add( 2 ) );
+
+						const v0 = vertexBuffer.element( i0 );
+						const v1 = vertexBuffer.element( i1 );
+						const v2 = vertexBuffer.element( i2 );
+
+						const t_uv0 = uvBuffer.element( i0 );
+						const t_uv1 = uvBuffer.element( i1 );
+						const t_uv2 = uvBuffer.element( i2 );
+
+						// Project Vertices to Screen Space
+						const mvpMatrix = instanceMvpBuffer.element( instId );
+
+						const p0 = mvpMatrix.mul( v0 );
+						const p1 = mvpMatrix.mul( v1 );
+						const p2 = mvpMatrix.mul( v2 );
+
+						const ndc0 = p0.xyz.div( p0.w );
+						const ndc1 = p1.xyz.div( p1.w );
+						const ndc2 = p2.xyz.div( p2.w );
+
+						const w = screenSize.x;
+						const h = screenSize.y;
+						const s0 = ndc0.xy.add( 1.0 ).mul( 0.5 ).mul( vec2( w, h ) );
+						const s1 = ndc1.xy.add( 1.0 ).mul( 0.5 ).mul( vec2( w, h ) );
+						const s2 = ndc2.xy.add( 1.0 ).mul( 0.5 ).mul( vec2( w, h ) );
+
+						const p = vec2( uv().x.mul( screenSize.x ), uv().y.oneMinus().mul( screenSize.y ) );
+
+						// Compute Barycentrics
+						const area = edgeFunction( s0, s1, s2 );
+						const w0 = edgeFunction( s1, s2, p );
+						const w1 = edgeFunction( s2, s0, p );
+						const w2 = edgeFunction( s0, s1, p );
+
+						// Guard against division by zero for safe execution
+						const safeArea = area.equal( 0.0 ).select( 1.0, area );
+						const b0 = w0.div( safeArea );
+						const b1 = w1.div( safeArea );
+						const b2 = w2.div( safeArea );
+
+						// Perspective correct UV interpolation (32-bit floats!)
+						const z_inv = b0.div( p0.w ).add( b1.div( p1.w ) ).add( b2.div( p2.w ) );
+						const safeZInv = z_inv.equal( 0.0 ).select( 1.0, z_inv );
+						const b0_p = b0.div( p0.w ).div( safeZInv );
+						const b1_p = b1.div( p1.w ).div( safeZInv );
+						const b2_p = b2.div( p2.w ).div( safeZInv );
+
+						const uv_interp = t_uv0.mul( b0_p ).add( t_uv1.mul( b1_p ) ).add( t_uv2.mul( b2_p ) );
+
+						// Compute screen-space derivatives analytically (extremely clean, no helper fragment issues)
+						const dw0_dx = s2.y.sub( s1.y );
+						const dw1_dx = s0.y.sub( s2.y );
+						const dw2_dx = s1.y.sub( s0.y );
+
+						const dw0_dy = s1.x.sub( s2.x );
+						const dw1_dy = s2.x.sub( s0.x );
+						const dw2_dy = s0.x.sub( s1.x );
+
+						const q0 = float( 1.0 ).div( p0.w );
+						const q1 = float( 1.0 ).div( p1.w );
+						const q2 = float( 1.0 ).div( p2.w );
+
+						const sum_w_q = w0.mul( q0 ).add( w1.mul( q1 ) ).add( w2.mul( q2 ) );
+						const safe_sum_w_q = sum_w_q.equal( 0.0 ).select( 1.0, sum_w_q );
+
+						const dUvDx = (
+							dw0_dx.mul( q0 ).mul( t_uv0.sub( uv_interp ) )
+								.add( dw1_dx.mul( q1 ).mul( t_uv1.sub( uv_interp ) ) )
+								.add( dw2_dx.mul( q2 ).mul( t_uv2.sub( uv_interp ) ) )
+						).div( safe_sum_w_q );
+
+						const dUvDy = (
+							dw0_dy.mul( q0 ).mul( t_uv0.sub( uv_interp ) )
+								.add( dw1_dy.mul( q1 ).mul( t_uv1.sub( uv_interp ) ) )
+								.add( dw2_dy.mul( q2 ).mul( t_uv2.sub( uv_interp ) ) )
+						).div( safe_sum_w_q );
+
+						If( materialModeUniform.equal( 0 ), () => {
+
+							const meshletId = meshletIdBuffer.element( megaTriangleIndex ).add( instId.mul( 1000 ) );
+							outColor.assign( hashColor( meshletId ) );
+
+						} ).Else( () => {
+
+							outColor.assign( texture( textureMap, uv_interp ).grad( dUvDx, dUvDy ) );
+
+						} );
+
+					} );
+
+					return outColor;
+
+				} )();
+
+				quadMesh = new THREE.QuadMesh( material );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function createScreenBuffers() {
+
+				const size = new THREE.Vector2();
+				renderer.getDrawingBufferSize( size );
+				const newMaxPixels = size.x * size.y;
+
+				if ( newMaxPixels === maxPixels ) return;
+
+				maxPixels = newMaxPixels;
+
+				if ( screenTriAttr ) screenTriAttr.dispose();
+				if ( screenInstAttr ) screenInstAttr.dispose();
+
+				const screenTriData = new Uint32Array( maxPixels );
+				screenTriAttr = new THREE.StorageBufferAttribute( screenTriData, 1 );
+
+				const screenInstData = new Uint32Array( maxPixels );
+				screenInstAttr = new THREE.StorageBufferAttribute( screenInstData, 1 );
+
+				if ( screenTriAtomic === undefined ) {
+
+					screenTriAtomic = storage( screenTriAttr, 'uint', maxPixels ).toAtomic();
+					screenTriRead = storage( screenTriAttr, 'uint', maxPixels ).toReadOnly();
+
+					screenInstBuffer = storage( screenInstAttr, 'uint', maxPixels );
+					screenInstRead = storage( screenInstAttr, 'uint', maxPixels ).toReadOnly();
+
+				} else {
+
+					screenTriAtomic.value = screenTriAttr;
+					screenTriAtomic.bufferCount = maxPixels;
+
+					screenTriRead.value = screenTriAttr;
+					screenTriRead.bufferCount = maxPixels;
+
+					screenInstBuffer.value = screenInstAttr;
+					screenInstBuffer.bufferCount = maxPixels;
+
+					screenInstRead.value = screenInstAttr;
+					screenInstRead.bufferCount = maxPixels;
+
+					computeClear.count = maxPixels;
+					computeClear.dispose();
+
+					computeRasterize.dispose();
+					computeFrustum.dispose();
+					computeDispatch.dispose();
+					computeHWArgs.dispose();
+
+					quadMesh.material.dispose();
+					hwMesh.material.dispose();
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				createScreenBuffers();
+
+			}
+
+			const frustum = new THREE.Frustum();
+			const projScreenMatrix = new THREE.Matrix4();
+			const cameraInverse = new THREE.Matrix4();
+
+			function animate() {
+
+				controls.update();
+
+				camera.updateMatrixWorld();
+
+				cameraInverse.copy( camera.matrixWorld ).invert();
+				projScreenMatrix.multiplyMatrices( camera.projectionMatrix, cameraInverse );
+				frustum.setFromProjectionMatrix( projScreenMatrix );
+
+				// Update GPU uniforms
+				projScreenMatrixUniform.value.copy( projScreenMatrix );
+				cameraPos.value.copy( camera.position );
+				cotHalfFovUniform.value = camera.projectionMatrix.elements[ 5 ];
+
+				// Pack frustum planes into the uniform array
+				const planes = frustum.planes;
+				const planesArray = frustumPlanesUniform.array;
+				for ( let i = 0; i < 6; i ++ ) {
+
+					const p = planes[ i ];
+					planesArray[ i ].set( p.normal.x, p.normal.y, p.normal.z, p.constant );
+
+				}
+
+				// Compute & Render
+				renderer.compute( computeClear );
+				renderer.compute( computeFrustum );
+				renderer.compute( computeDispatch );
+				renderer.compute( computeRasterize );
+				renderer.compute( computeHWArgs );
+
+				const rasterMode = options.Rasterizer;
+
+				// SW presentation (fullscreen quad reads atomic buffer)
+				if ( rasterMode === 'SW Only' || rasterMode === 'Both' ) {
+
+					quadMesh.render( renderer );
+
+				}
+
+				// HW mesh renders with real depth testing + colors
+				if ( rasterMode === 'HW Only' || rasterMode === 'Both' ) {
+
+					hwScene.background = ( rasterMode === 'HW Only' ) ? background : null;
+					renderer.autoClear = ( rasterMode === 'HW Only' );
+					renderer.render( hwScene, camera );
+					renderer.autoClear = true;
+
+				}
+
+			}
+
+		</script>
+	</body>
+</html>

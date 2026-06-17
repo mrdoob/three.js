@@ -38,7 +38,7 @@ class Console extends Tab {
 	buildHeader() {
 
 		const header = document.createElement( 'div' );
-		header.className = 'console-header';
+		header.className = 'toolbar';
 
 		const filterInput = document.createElement( 'input' );
 		filterInput.type = 'text';
@@ -259,7 +259,7 @@ class Console extends Tab {
 
 			if ( this.unreadErrors > 0 ) {
 
-				errorBadge.textContent = this.unreadErrors;
+				errorBadge.textContent = this.unreadErrors > 99 ? '+99' : this.unreadErrors;
 				errorBadge.style.display = '';
 
 			} else {
@@ -274,7 +274,7 @@ class Console extends Tab {
 
 			if ( this.unreadWarns > 0 ) {
 
-				warnBadge.textContent = this.unreadWarns;
+				warnBadge.textContent = this.unreadWarns > 99 ? '+99' : this.unreadWarns;
 				warnBadge.style.display = '';
 
 			} else {
@@ -289,7 +289,7 @@ class Console extends Tab {
 
 			if ( this.unreadErrors > 0 ) {
 
-				this.tabErrorBadge.textContent = this.unreadErrors;
+				this.tabErrorBadge.textContent = this.unreadErrors > 99 ? '+99' : this.unreadErrors;
 				this.tabErrorBadge.style.display = '';
 
 			} else {
@@ -304,7 +304,7 @@ class Console extends Tab {
 
 			if ( this.unreadWarns > 0 ) {
 
-				this.tabWarnBadge.textContent = this.unreadWarns;
+				this.tabWarnBadge.textContent = this.unreadWarns > 99 ? '+99' : this.unreadWarns;
 				this.tabWarnBadge.style.display = '';
 
 			} else {
