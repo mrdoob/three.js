@@ -177,7 +177,7 @@
 				const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
 
 				const subsurfaceScatteringPass = subsurfaceScattering(
-					scenePassColor, scenePassDepth, scenePassAlbedo, camera, scene,
+					scenePassColor, scenePassDepth, scenePassAlbedo, camera,
 				);
 				subsurfaceScatteringPass.samples.value = 32;
 				subsurfaceScatteringPass.resolutionScale = 0.5; // running the blur at half the tap count is often sufficient

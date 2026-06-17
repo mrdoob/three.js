@@ -116,7 +116,9 @@ const TEXTURING_MODE = {
  * Requires the scene to be rendered with an MRT that exposes a separate albedo
  * attachment (rgb = base color, a = SSS slot index, 0 = no SSS). Declare the
  * attachment with `a = 0` as the non-SSS default; {@link MeshSubsurfaceNodeMaterial}
- * writes its assigned slot into `albedo.a` automatically.
+ * writes its assigned slot into `albedo.a` automatically. Slots are assigned lazily the
+ * first time each material is rendered (via a render-object hook installed on the
+ * renderer), so there is no scene-graph scan and only visible materials consume a slot.
  *
  * ```js
  * const renderPipeline = new RenderPipeline( renderer );
@@ -130,7 +132,7 @@ const TEXTURING_MODE = {
  * 	scenePass.getTextureNode( 'output' ),
  * 	scenePass.getTextureNode( 'depth' ),
  * 	scenePass.getTextureNode( 'albedo' ),
- * 	camera, scene
+ * 	camera
  * );
  *
  * renderPipeline.outputNode = sss.getTextureNode();
@@ -158,15 +160,12 @@ class SSSSNode extends TempNode {
 	 * @param {TextureNode} depthNode - Scene depth texture.
 	 * @param {TextureNode} albedoNode - MRT albedo attachment (rgb = base color, a = SSS slot index, 0 = no SSS).
 	 * @param {PerspectiveCamera} camera - The scene camera.
-	 * @param {Scene} scene - The scene to scan for {@link MeshSubsurfaceNodeMaterial} instances.
-	 *   SSSSNode listens to `childadded` / `childremoved` events so materials are discovered
-	 *   automatically as objects enter or leave the scene graph.
 	 * @param {TextureNode|null} [normalNode=null] - Optional MRT view-space normals texture. When provided,
 	 *   the blur disk is oriented on each pixel's tangent plane instead of screen-space, which improves
 	 *   accuracy on oblique surfaces. Requires adding a `normals` slot to the scene MRT and passing
 	 *   `scenePass.getTextureNode('normals')` here.
 	 */
-	constructor( colorNode, depthNode, albedoNode, camera, scene, normalNode = null ) {
+	constructor( colorNode, depthNode, albedoNode, camera, normalNode = null ) {
 
 		super( 'vec4' );
 
@@ -268,24 +267,37 @@ class SSSSNode extends TempNode {
 		this._camera = camera;
 
 		/**
+		 * The renderer the SSS-slot hook is installed on. Captured in {@link SSSSNode#setup}
+		 * and used to restore the previous render-object function on dispose.
+		 *
 		 * @private
-		 * @type {Scene}
+		 * @type {?Renderer}
 		 */
-		this._scene = scene;
+		this._renderer = null;
+
+		/**
+		 * The render-object function that was installed before ours, restored on dispose.
+		 *
+		 * @private
+		 * @type {?Function}
+		 */
+		this._previousRenderObjectFunction = null;
+
+		/**
+		 * Snapshot of the builder's shared context, captured in {@link SSSSNode#setup} so the
+		 * SSS shader can be rebuilt (when the parameter buffer grows) without a `NodeBuilder`.
+		 *
+		 * @private
+		 * @type {?Object}
+		 */
+		this._sharedContext = null;
 
 		// Per-material SSS registry.
-		// _sssSlots: sparse array indexed by slot (slot 0 = dummy for non-SSS pixels).
-		// _materialSlots: WeakMap(material → slot) for O(1) lookup and GC-friendly storage.
-		// _freeSSSSlots: recycled slots from disposed/removed materials.
-		this._sssSlots = [ null ];
-		this._materialSlots = new WeakMap();
-		this._freeSSSSlots = [];
-		this._sssBuffer = null;
+		this._sssSlots = [ null ]; // sparse array indexed by slot (slot 0 = dummy for non-SSS pixels).
+		this._materialSlots = new WeakMap(); // WeakMap(material → slot) for O(1) lookup and GC-friendly storage.
+		this._freeSSSSlots = []; // recycled slots from disposed materials.
+		this._sssBuffer = null; // parameter buffer; grows as new SSS materials register.
 		this._sssBufferNeedsRebuild = true;
-
-		// Bind handlers so they can be added and removed by reference.
-		this._onChildAdded = this._onChildAdded.bind( this );
-		this._onChildRemoved = this._onChildRemoved.bind( this );
 
 		/**
 		 * @private
@@ -394,23 +406,9 @@ class SSSSNode extends TempNode {
 		 */
 		this._textureNode = passTexture( this, this._sssRenderTarget.texture );
 
-		// Initial scan: register existing SSS materials and attach childadded/childremoved
-		// listeners to every existing node. Three.js has no 'descendantadded' event, so we
-		// must propagate the listener manually to catch future nested additions/removals.
-		scene.addEventListener( 'childadded', this._onChildAdded );
-		scene.addEventListener( 'childremoved', this._onChildRemoved );
-		scene.traverse( ( obj ) => {
-
-			this._checkObject( obj );
-			if ( obj !== scene ) {
-
-				obj.addEventListener( 'childadded', this._onChildAdded );
-				obj.addEventListener( 'childremoved', this._onChildRemoved );
-
-			}
-
-		} );
-
+		// Allocate the initial parameter buffer so `setup()` has something to read. It is rebuilt
+		// (and the shader regenerated) as SSS materials register lazily during rendering; see the
+		// render-object hook in `setup()`.
 		this._rebuildSSSBuffer();
 
 	}
@@ -468,43 +466,6 @@ class SSSSNode extends TempNode {
 
 	}
 
-	_checkObject( obj ) {
-
-		if ( obj.isMesh && obj.material && obj.material.isMeshSubsurfaceNodeMaterial ) {
-
-			if ( ! this._materialSlots.has( obj.material ) ) {
-
-				this._registerSSS( obj.material );
-
-			}
-
-		}
-
-	}
-
-	_onChildAdded( { child } ) {
-
-		child.traverse( ( obj ) => {
-
-			this._checkObject( obj );
-			obj.addEventListener( 'childadded', this._onChildAdded );
-			obj.addEventListener( 'childremoved', this._onChildRemoved );
-
-		} );
-
-	}
-
-	_onChildRemoved( { child } ) {
-
-		child.traverse( ( obj ) => {
-
-			obj.removeEventListener( 'childadded', this._onChildAdded );
-			obj.removeEventListener( 'childremoved', this._onChildRemoved );
-
-		} );
-
-	}
-
 	_registerSSS( material ) {
 
 		const reusingSlot = this._freeSSSSlots.length > 0;
@@ -513,6 +474,8 @@ class SSSSNode extends TempNode {
 		this._materialSlots.set( material, slot );
 		material.subsurfaceSlotNode.value = slot;
 		material.addEventListener( 'dispose', () => this._unregisterSSS( material ) );
+
+		// A brand-new slot grows the buffer, so it (and the shader that indexes it) must be rebuilt.
 		if ( ! reusingSlot ) this._sssBufferNeedsRebuild = true;
 
 	}
@@ -530,12 +493,15 @@ class SSSSNode extends TempNode {
 
 	_rebuildSSSBuffer() {
 
-		const count = this._sssSlots.length;
+		// Two vec4 entries per slot (scattering distance/strength + scattering color/texturing mode).
 		const entries = [];
-		for ( let i = 0; i < count * 2; i ++ ) entries.push( new Vector4() );
+		for ( let i = 0; i < this._sssSlots.length * 2; i ++ ) entries.push( new Vector4() );
 		this._sssBuffer = uniformArray( entries, 'vec4' );
 		this._sssBufferNeedsRebuild = false;
-		if ( this._sssMaterial ) this._sssMaterial.needsUpdate = true;
+
+		// Regenerate the shader so it indexes the new buffer node (the previous shader captured the
+		// smaller buffer). Skipped until `setup()` has provided the shared context.
+		if ( this._sharedContext !== null ) this._buildSSSMaterial();
 
 	}
 
@@ -619,12 +585,55 @@ class SSSSNode extends TempNode {
 	}
 
 	/**
-	 * Builds the TSL shader graph for the SSS blur pass.
+	 * Installs the render-object hook (once) and builds the SSS blur pass shader.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {PassTextureNode}
 	 */
 	setup( builder ) {
+
+		// Assign each subsurface material its SSS slot the first time it is drawn (after frustum culling), by intercepting
+		// the renderer's per-object draw. The scene pass writes the slot into `albedo.a` and runs
+		// before this pass, so the hook is installed once at setup and restored on dispose.
+		if ( this._renderer === null ) {
+
+			const renderer = builder.renderer;
+
+			this._renderer = renderer;
+			this._previousRenderObjectFunction = renderer.getRenderObjectFunction();
+
+			renderer.setRenderObjectFunction( ( object, scene, camera, geometry, material, group, lightsNode, clippingContext, passId ) => {
+
+				if ( material.isMeshSubsurfaceNodeMaterial === true && this._materialSlots.has( material ) === false ) {
+
+					this._registerSSS( material );
+
+				}
+
+				renderer.renderObject( object, scene, camera, geometry, material, group, lightsNode, clippingContext, passId );
+
+			} );
+
+		}
+
+		// Snapshot the shared context so the shader can be rebuilt later (on buffer growth)
+		// without a NodeBuilder, then build it for the first time.
+		this._sharedContext = builder.getSharedContext();
+
+		this._buildSSSMaterial();
+
+		return this._textureNode;
+
+	}
+
+	/**
+	 * Builds (or rebuilds) the SSS blur pass shader, wiring it to the current `_sssBuffer`.
+	 * Called from {@link SSSSNode#setup} and again from {@link SSSSNode#_rebuildSSSBuffer}
+	 * whenever the buffer grows, so the shader never references a stale buffer node.
+	 *
+	 * @private
+	 */
+	_buildSSSMaterial() {
 
 		const { colorNode, depthNode, albedoNode, normalNode } = this;
 		const sssBuffer = this._sssBuffer;
@@ -849,10 +858,8 @@ class SSSSNode extends TempNode {
 
 		} );
 
-		this._sssMaterial.fragmentNode = sssFn().context( builder.getSharedContext() );
+		this._sssMaterial.fragmentNode = sssFn().context( this._sharedContext );
 		this._sssMaterial.needsUpdate = true;
-
-		return this._textureNode;
 
 	}
 
@@ -861,18 +868,12 @@ class SSSSNode extends TempNode {
 	 */
 	dispose() {
 
-		this._scene.removeEventListener( 'childadded', this._onChildAdded );
-		this._scene.removeEventListener( 'childremoved', this._onChildRemoved );
-		this._scene.traverse( ( obj ) => {
+		// Restore the render-object function that was installed before our hook.
+		if ( this._renderer !== null ) {
 
-			if ( obj !== this._scene ) {
+			this._renderer.setRenderObjectFunction( this._previousRenderObjectFunction );
 
-				obj.removeEventListener( 'childadded', this._onChildAdded );
-				obj.removeEventListener( 'childremoved', this._onChildRemoved );
-
-			}
-
-		} );
+		}
 
 		this._sssRenderTarget.dispose();
 		this._sssMaterial.dispose();
@@ -892,13 +893,12 @@ export default SSSSNode;
  * @param {TextureNode} depthNode - Scene depth texture.
  * @param {TextureNode} albedoNode - MRT albedo attachment (rgb = base color, a = SSS slot index, 0 = no SSS).
  * @param {PerspectiveCamera} camera - The scene camera.
- * @param {Scene} scene - The scene to scan for {@link MeshSubsurfaceNodeMaterial} instances.
  * @param {TextureNode|null} [normalNode=null] - Optional MRT view-space normals texture. When provided,
  *   the blur disk is oriented on each pixel's tangent plane instead of screen-space, which improves
  *   accuracy on oblique surfaces. Requires adding a `normals` slot to the scene MRT and passing
  *   `scenePass.getTextureNode('normals')` here.
  * @returns {SSSSNode}
  */
-export const subsurfaceScattering = ( colorNode, depthNode, albedoNode, camera, scene, normalNode = null ) => new SSSSNode( colorNode, depthNode, albedoNode, camera, scene, normalNode );
+export const subsurfaceScattering = ( colorNode, depthNode, albedoNode, camera, normalNode = null ) => new SSSSNode( colorNode, depthNode, albedoNode, camera, normalNode );
 
 export { TEXTURING_MODE };
