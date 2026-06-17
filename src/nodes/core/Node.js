@@ -369,12 +369,18 @@ class Node extends EventDispatcher {
 	 */
 	_getChildren( ignores = new Set() ) {
 
+		if ( this._childProps === undefined ) {
+
+			this._childProps = Object.getOwnPropertyNames( this );
+
+		}
+
 		const children = [];
 
 		// avoid circular references
 		ignores.add( this );
 
-		for ( const property of Object.getOwnPropertyNames( this ) ) {
+		for ( const property of this._childProps ) {
 
 			const object = this[ property ];
 
