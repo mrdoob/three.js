@@ -104,6 +104,11 @@ export function getTypeFromLength( length ) {
 
 }
 
+const _typedArrayCache = new Map();
+const _lenCache = new Map();
+const _memCache = new Map();
+const _alignCache = new Map();
+
 /**
  * Returns the typed array for the given data type.
  *
@@ -114,27 +119,43 @@ export function getTypeFromLength( length ) {
  */
 export function getTypedArrayFromType( type ) {
 
-	// Handle component type for vectors and matrices
-	if ( /[iu]?vec\d/.test( type ) ) {
+	let res = _typedArrayCache.get( type );
 
-		// Handle int vectors
-		if ( type.startsWith( 'ivec' ) ) return Int32Array;
-		// Handle uint vectors
-		if ( type.startsWith( 'uvec' ) ) return Uint32Array;
-		// Default to float vectors
-		return Float32Array;
+	if ( res === undefined ) {
+
+		if ( /[iu]?vec\d/.test( type ) ) {
+
+			if ( type.startsWith( 'ivec' ) ) res = Int32Array;
+			else if ( type.startsWith( 'uvec' ) ) res = Uint32Array;
+			else res = Float32Array;
+
+		} else if ( /mat\d/.test( type ) ) {
+
+			res = Float32Array;
+
+		} else if ( /float/.test( type ) ) {
+
+			res = Float32Array;
+
+		} else if ( /uint/.test( type ) ) {
+
+			res = Uint32Array;
+
+		} else if ( /int/.test( type ) ) {
+
+			res = Int32Array;
+
+		} else {
+
+			throw new Error( `THREE.NodeUtils: Unsupported type: ${type}` );
+
+		}
+
+		_typedArrayCache.set( type, res );
 
 	}
 
-	// Handle matrices (always float)
-	if ( /mat\d/.test( type ) ) return Float32Array;
-
-	// Basic types
-	if ( /float/.test( type ) ) return Float32Array;
-	if ( /uint/.test( type ) ) return Uint32Array;
-	if ( /int/.test( type ) ) return Int32Array;
-
-	throw new Error( `THREE.NodeUtils: Unsupported type: ${type}` );
+	return res;
 
 }
 
@@ -148,15 +169,24 @@ export function getTypedArrayFromType( type ) {
  */
 export function getLengthFromType( type ) {
 
-	if ( /float|int|uint|bool/.test( type ) ) return 1;
-	if ( /vec2/.test( type ) ) return 2;
-	if ( /vec3/.test( type ) ) return 3;
-	if ( /vec4/.test( type ) ) return 4;
-	if ( /mat2/.test( type ) ) return 4;
-	if ( /mat3/.test( type ) ) return 9;
-	if ( /mat4/.test( type ) ) return 16;
+	let res = _lenCache.get( type );
 
-	error( `TSL: Unsupported type: ${ type }`, new StackTrace() );
+	if ( res === undefined ) {
+
+		if ( /float|int|uint|bool/.test( type ) ) res = 1;
+		else if ( /vec2/.test( type ) ) res = 2;
+		else if ( /vec3/.test( type ) ) res = 3;
+		else if ( /vec4/.test( type ) ) res = 4;
+		else if ( /mat2/.test( type ) ) res = 4;
+		else if ( /mat3/.test( type ) ) res = 9;
+		else if ( /mat4/.test( type ) ) res = 16;
+		else error( `TSL: Unsupported type: ${ type }`, new StackTrace() );
+
+		if ( res !== undefined ) _lenCache.set( type, res );
+
+	}
+
+	return res;
 
 }
 
@@ -170,15 +200,24 @@ export function getLengthFromType( type ) {
  */
 export function getMemoryLengthFromType( type ) {
 
-	if ( /float|int|uint|bool/.test( type ) ) return 1;
-	if ( /vec2/.test( type ) ) return 2;
-	if ( /vec3/.test( type ) ) return 3;
-	if ( /vec4/.test( type ) ) return 4;
-	if ( /mat2/.test( type ) ) return 4;
-	if ( /mat3/.test( type ) ) return 12;
-	if ( /mat4/.test( type ) ) return 16;
+	let res = _memCache.get( type );
 
-	error( `TSL: Unsupported type: ${ type }`, new StackTrace() );
+	if ( res === undefined ) {
+
+		if ( /float|int|uint|bool/.test( type ) ) res = 1;
+		else if ( /vec2/.test( type ) ) res = 2;
+		else if ( /vec3/.test( type ) ) res = 3;
+		else if ( /vec4/.test( type ) ) res = 4;
+		else if ( /mat2/.test( type ) ) res = 4;
+		else if ( /mat3/.test( type ) ) res = 12;
+		else if ( /mat4/.test( type ) ) res = 16;
+		else error( `TSL: Unsupported type: ${ type }`, new StackTrace() );
+
+		if ( res !== undefined ) _memCache.set( type, res );
+
+	}
+
+	return res;
 
 }
 
@@ -192,15 +231,24 @@ export function getMemoryLengthFromType( type ) {
  */
 export function getAlignmentFromType( type ) {
 
-	if ( /float|int|uint|bool/.test( type ) ) return 1;
-	if ( /vec2/.test( type ) ) return 2;
-	if ( /vec3/.test( type ) ) return 4;
-	if ( /vec4/.test( type ) ) return 4;
-	if ( /mat2/.test( type ) ) return 2;
-	if ( /mat3/.test( type ) ) return 4;
-	if ( /mat4/.test( type ) ) return 4;
+	let res = _alignCache.get( type );
 
-	error( `TSL: Unsupported type: ${ type }`, new StackTrace() );
+	if ( res === undefined ) {
+
+		if ( /float|int|uint|bool/.test( type ) ) res = 1;
+		else if ( /vec2/.test( type ) ) res = 2;
+		else if ( /vec3/.test( type ) ) res = 4;
+		else if ( /vec4/.test( type ) ) res = 4;
+		else if ( /mat2/.test( type ) ) res = 2;
+		else if ( /mat3/.test( type ) ) res = 4;
+		else if ( /mat4/.test( type ) ) res = 4;
+		else error( `TSL: Unsupported type: ${ type }`, new StackTrace() );
+
+		if ( res !== undefined ) _alignCache.set( type, res );
+
+	}
+
+	return res;
 
 }
 
