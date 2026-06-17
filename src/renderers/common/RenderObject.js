@@ -912,17 +912,17 @@ class RenderObject {
 
 		if ( this.camera.isArrayCamera ) {
 
-			cacheKey = hash( cacheKey, this.camera.cameras.length );
+			cacheKey = ( ( cacheKey << 5 ) - cacheKey ) ^ this.camera.cameras.length;
 
 		}
 
 		if ( this.object.receiveShadow ) {
 
-			cacheKey = hash( cacheKey, 1 );
+			cacheKey = ( ( cacheKey << 5 ) - cacheKey ) ^ 1;
 
 		}
 
-		cacheKey = hash( cacheKey, this.renderer.contextNode.id, this.renderer.contextNode.version );
+		cacheKey = ( ( cacheKey << 5 ) - cacheKey ) ^ this.renderer.contextNode.id ^ this.renderer.contextNode.version;
 
 		return cacheKey;
 
