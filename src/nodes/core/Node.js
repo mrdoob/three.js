@@ -144,6 +144,15 @@ class Node extends EventDispatcher {
 		this._cacheKeyVersion = 0;
 
 		/**
+		 * Cached child properties list.
+		 *
+		 * @private
+		 * @type {?Array<string>}
+		 * @default null
+		 */
+		this._childProps = null;
+
+		/**
 		 * The unique ID of the node.
 		 *
 		 * @type {number}
@@ -369,7 +378,7 @@ class Node extends EventDispatcher {
 	 */
 	_getChildren( ignores = new Set() ) {
 
-		if ( this._childProps === undefined ) {
+		if ( this._childProps === null ) {
 
 			this._childProps = Object.getOwnPropertyNames( this );
 
@@ -921,10 +930,9 @@ class Node extends EventDispatcher {
 
 			if ( properties.initialized !== true ) {
 
-				//const stackNodesBeforeSetup = builder.stack.nodes.length;
-
 				properties.initialized = true;
 				properties.outputNode = this.setup( builder ) || properties.outputNode || null;
+				this._childProps = null;
 
 				/*if ( isNodeOutput && builder.stack.nodes.length !== stackNodesBeforeSetup ) {
 
