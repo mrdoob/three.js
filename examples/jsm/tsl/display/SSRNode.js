@@ -1,10 +1,31 @@
-import { HalfFloatType, RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType, LinearFilter, LinearMipmapLinearFilter } from 'three/webgpu';
-import { texture, reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, mul, div, cross, float, Continue, Break, Loop, int, max, abs, sub, If, dot, reflect, normalize, screenCoordinate, nodeObject, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, vec3, vec4 } from 'three/tsl';
+import { Break, Fn, If, Loop, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, logarithmicDepthToViewZ, luminance, max, min, mix, mul, nodeObject, normalize, orthographicDepthToViewZ, passTexture, perspectiveDepthToViewZ, reference, reflect, sqrt, sub, texture, uniform, uv, vec2, vec3, vec4, viewZToPerspectiveDepth } from 'three/tsl';
+import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, TempNode, Vector2, Vector3 } from 'three/webgpu';
+import { BLUE_NOISE_TEXTURE_SIZE, bindAnalyticNoise, bindBlueNoise, getBlueNoiseTexture } from '../utils/BlueNoise.js';
+import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
 import { boxBlur } from './boxBlur.js';
+import ImportanceSampledEnvironment from './ImportanceSampledEnvironment.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 let _rendererState;
+
+// Maximum ray-march step count; `quality` (0..1) scales it to a fixed per-ray count.
+const MAX_STEPS = 64;
+
+/**
+ * @typedef {'blur' | 'scatter'} SSRReflection
+ */
+
+/**
+ * @typedef {Object} SSRNodeOptions
+ * @property {SSRReflection} [reflection='scatter'] - `blur` traces a mirror reflection and softens roughness with a blur pass; `scatter` varies the reflection direction per pixel.
+ * @property {?import('three/tsl').Node} [metalRoughnessNode=null] - Metalness (R) and roughness (G) packed in a single attachment.
+ * @property {?import('three').Texture} [environmentNode=null] - Equirectangular HDR environment map with CPU-side `image.data` (e.g. from RGBELoader). Not compatible with PMREM / `scene.environment` cubemaps.
+ * @property {boolean} [envImportanceSampling=false] - When `true`, precomputes env-luminance CDF tables and uses MIS for environment misses. Build-time only.
+ * @property {?import('three/tsl').Node} [diffuseNode=null] - Scene diffuse / base color. Defaults to `vec3(1)` in the shader when omitted.
+ * @property {boolean} [binaryRefine=true] - Sub-step binary-search refinement of detected hits. Compile-time constant (baked into the shader at construction).
+ * @property {?import('three').Camera} [camera=null] - Camera the scene is rendered with. Inferred from the color pass when omitted.
+ */
 
 /**
  * Post processing node for computing screen space reflections (SSR).
@@ -28,13 +49,44 @@ class SSRNode extends TempNode {
 	 * @param {Node<vec4>} colorNode - The node that represents the beauty pass.
 	 * @param {Node<float>} depthNode - A node that represents the beauty pass's depth.
 	 * @param {Node<vec3>} normalNode - A node that represents the beauty pass's normals.
-	 * @param {Node<float>} metalnessNode - A node that represents the beauty pass's metalness.
-	 * @param {?Node<float>} [roughnessNode=null] - A node that represents the beauty pass's roughness.
-	 * @param {?Camera} [camera=null] - The camera the scene is rendered with.
+	 * @param {SSRNodeOptions} [options] - Optional inputs for material and environment data.
 	 */
-	constructor( colorNode, depthNode, normalNode, metalnessNode, roughnessNode = null, camera = null ) {
+	constructor( colorNode, depthNode, normalNode, options = {} ) {
 
 		super( 'vec4' );
+
+		const {
+			reflection = 'blur',
+			metalRoughnessNode = null,
+			environmentNode = null,
+			envImportanceSampling = false,
+			diffuseNode = null,
+			binaryRefine = true,
+			camera: cameraNode = null
+		} = options;
+
+		if ( reflection !== 'blur' && reflection !== 'scatter' ) {
+
+			throw new Error( 'SSRNode: `reflection` must be `blur` or `scatter`.' );
+
+		}
+
+		let camera = cameraNode;
+
+		/**
+		 * How the reflection direction and roughness are computed.
+		 *
+		 * @type {SSRReflection}
+		 */
+		this.reflection = reflection;
+
+		/**
+		 * When `true`, env-luminance CDF tables are built and MIS is used for environment misses.
+		 * Fixed at construction time.
+		 *
+		 * @type {boolean}
+		 */
+		this.envImportanceSampling = envImportanceSampling;
 
 		/**
 		 * The node that represents the beauty pass.
@@ -42,6 +94,14 @@ class SSRNode extends TempNode {
 		 * @type {Node<vec4>}
 		 */
 		this.colorNode = colorNode;
+
+		/**
+		 * A node that represents the scene's diffuse color (typically the MRT `diffuseColor` attachment).
+		 * When `null`, the shader uses `vec3(1)`.
+		 *
+		 * @type {?Node<vec4>}
+		 */
+		this.diffuseNode = diffuseNode !== null ? nodeObject( diffuseNode ) : null;
 
 		/**
 		 * A node that represents the beauty pass's depth.
@@ -58,22 +118,14 @@ class SSRNode extends TempNode {
 		this.normalNode = normalNode;
 
 		/**
-		 * A node that represents the beauty pass's metalness.
-		 *
-		 * @type {Node<float>}
-		 */
-		this.metalnessNode = metalnessNode;
-
-		/**
-		 * Whether the SSR reflections should be blurred or not. Blurring is a costly
-		 * operation so turn it off if you encounter performance issues on certain
-		 * devices.
+		 * Metalness (R) and roughness (G) packed in a single attachment, used to drive
+		 * the GGX reflection sampling and the blur mip selection. When `null`, the shader
+		 * treats surfaces as non-metallic and fully smooth.
 		 *
 		 * @private
-		 * @type {Node<float>}
-		 * @default false
+		 * @type {?Node}
 		 */
-		this.roughnessNode = roughnessNode;
+		this.metalRoughnessNode = metalRoughnessNode !== null ? nodeObject( metalRoughnessNode ) : null;
 
 		/**
 		 * The resolution scale. Valid values are in the range
@@ -111,11 +163,42 @@ class SSRNode extends TempNode {
 		this.thickness = uniform( 0.1 );
 
 		/**
-		 * Controls how the SSR reflections are blended with the beauty pass.
+		 * A multiplier for the overall reflection intensity. `1` leaves the
+		 * reflections unchanged, lower values dim them and higher values boost them.
 		 *
 		 * @type {UniformNode<float>}
+		 * @default 1
 		 */
-		this.opacity = uniform( 1 );
+		this.intensity = uniform( 1 );
+
+		/**
+		 * Screen-edge fade width, in UV units. As a screen-space hit approaches a screen
+		 * border, the reflection is faded over this distance — either toward the environment
+		 * reflection ({@link SSRNode#screenEdgeFadeBlack} `false`) or to zero intensity
+		 * (`true`). `0` disables it.
+		 *
+		 * @type {UniformNode<float>}
+		 * @default 0.2
+		 */
+		this.screenEdgeFade = uniform( 0.2 );
+
+		/**
+		 * When `true`, SSR fades to zero near screen borders instead of blending toward
+		 * the environment map. Hits are faded by the reflection sample UV; misses are
+		 * faded by the surface pixel UV.
+		 *
+		 * @type {UniformNode<bool>}
+		 * @default false
+		 */
+		this.screenEdgeFadeBlack = uniform( false, 'bool' );
+
+		/**
+		 * Absolute env luminance cap. HDR env samples above this are scaled down (hue preserved).
+		 *
+		 * @type {UniformNode<float>}
+		 * @default 10
+		 */
+		this.maxLuminance = uniform( 10 );
 
 		/**
 		 * This parameter controls how detailed the raymarching process works.
@@ -131,11 +214,64 @@ class SSRNode extends TempNode {
 		this.quality = uniform( 0.5 );
 
 		/**
+		 * Mirror bias for the stochastic GGX sampling. Concentrates the reflected rays toward
+		 * the lobe's narrow (near-mirror) core, trading a small amount of bias for less noise.
+		 * `0` samples the full VNDF lobe; values toward `1` tighten the cone. Range `[0,1]`.
+		 *
+		 * @type {UniformNode<float>}
+		 * @default 0.5
+		 */
+		this.mirrorBias = uniform( 0.5 );
+
+		/**
 		 * The quality of the blur. Must be an integer in the range `[1,3]`.
 		 *
 		 * @type {UniformNode<int>}
+		 * @default 2
 		 */
 		this.blurQuality = uniform( 2 );
+
+		/**
+		 * Enables sub-step binary-search refinement of a detected hit. When on, a coarse
+		 * crossing is bisected toward the exact intersection (sharper hits, less step
+		 * aliasing) at the cost of extra depth samples. Compile-time constant: it is baked
+		 * into the shader at construction, so changing it requires rebuilding the node.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.binaryRefine = binaryRefine;
+
+		/**
+		 * Non-linear step distribution exponent. `1` = uniform steps; `> 1` concentrates
+		 * samples near the ray origin — where most short-range reflections are missed — and
+		 * spaces them out toward maxDistance, as `s = (i / steps) ^ stepExponent`.
+		 *
+		 * @type {UniformNode<float>}
+		 * @default 2
+		 */
+		this.stepExponent = uniform( 2 );
+
+		/**
+		 * HDR environment map for screen-space misses.
+		 *
+		 * @type {?import('three').Texture}
+		 */
+		this.environmentNode = environmentNode;
+
+		/**
+		 * A node that represents the history texture for multi-bounce reflections.
+		 *
+		 * @type {?Node<vec4>}
+		 */
+		this.historyTexture = null;
+
+		/**
+		 * A node that represents the velocity texture for reprojection.
+		 *
+		 * @type {?Node<vec2>}
+		 */
+		this.velocityTexture = null;
 
 		//
 
@@ -147,7 +283,7 @@ class SSRNode extends TempNode {
 
 			} else {
 
-				throw new Error( 'THREE.SSRNode: No camera found. ssr() requires a camera.' );
+				throw new Error( 'THREE.TSL: No camera found. ssr() requires a camera.' );
 
 			}
 
@@ -208,6 +344,12 @@ class SSRNode extends TempNode {
 		 */
 		this._isPerspectiveCamera = uniform( camera.isPerspectiveCamera === true );
 
+		this._cameraWorldMatrix = uniform( new Matrix4().copy( camera.matrixWorld ) );
+		this._cameraWorldPosition = uniform( new Vector3().copy( camera.position ) );
+
+		this._cameraViewMatrix = uniform( new Matrix4().copy( camera.matrixWorld ) );
+		this._cameraViewMatrixInverse = uniform( new Matrix4().copy( camera.matrixWorldInverse ) );
+
 		/**
 		 * The resolution of the pass.
 		 *
@@ -215,6 +357,36 @@ class SSRNode extends TempNode {
 		 * @type {UniformNode<vec2>}
 		 */
 		this._resolution = uniform( new Vector2() );
+
+		/**
+		 * Noise source. When `true`, uses the shared generated blue-noise texture (best quality);
+		 * when `false`, uses procedural R² noise with the same tile-shift indexing (no texture).
+		 * The blue-noise texture is generated lazily on first use.
+		 *
+		 * @type {UniformNode<bool>}
+		 * @default true
+		 */
+		this.useBlueNoise = uniform( true, 'bool' );
+		this._blueNoiseTextureNode = null;
+		this._blueNoiseSize = uniform( new Vector2( BLUE_NOISE_TEXTURE_SIZE, BLUE_NOISE_TEXTURE_SIZE ) );
+		this._blueNoiseIndex = uniform( 0 );
+
+		/**
+		 * CDF-backed environment sampler. Created when {@link setEnvMap} is called.
+		 *
+		 * @private
+		 * @type {?ImportanceSampledEnvironment}
+		 */
+		this._importanceEnvironment = null;
+
+		/**
+		 * Intensity multiplier applied to environment-map reflections on screen-space
+		 * misses and at screen edges. Defaults to π to match the former hardcoded multiplier.
+		 *
+		 * @type {UniformNode<float>}
+		 * @default Math.PI
+		 */
+		this.environmentIntensity = uniform( Math.PI );
 
 		/**
 		 * The render target the SSR is rendered into.
@@ -272,10 +444,10 @@ class SSRNode extends TempNode {
 
 		let blurredTextureNode = null;
 
-		if ( this.roughnessNode !== null ) {
+		if ( this.reflection === 'blur' && this.metalRoughnessNode !== null ) {
 
 			const mips = this._blurRenderTarget.texture.mipmaps.length - 1;
-			const r = float( this.roughnessNode );
+			const r = this.metalRoughnessNode.g;
 			const lod = r.mul( r ).mul( mips ).clamp( 0, mips );
 
 			blurredTextureNode = passTexture( this, this._blurRenderTarget.texture ).level( lod );
@@ -290,6 +462,12 @@ class SSRNode extends TempNode {
 		 */
 		this._blurredTextureNode = blurredTextureNode;
 
+		if ( environmentNode !== null && environmentNode.isTexture === true ) {
+
+			this.setEnvMap( environmentNode );
+
+		}
+
 	}
 
 	/**
@@ -299,7 +477,7 @@ class SSRNode extends TempNode {
 	 */
 	getTextureNode() {
 
-		return this.roughnessNode !== null ? this._blurredTextureNode : this._textureNode;
+		return ( this.reflection === 'blur' && this.metalRoughnessNode !== null ) ? this._blurredTextureNode : this._textureNode;
 
 	}
 
@@ -321,6 +499,81 @@ class SSRNode extends TempNode {
 	}
 
 	/**
+	 * Wires the feedback inputs for multi-bounce reflections: the previous frame's
+	 * denoised result (`history`) and the velocity buffer used to reproject it
+	 * (`velocity`). `history` accepts the producing node (e.g. a
+	 * {@link RecurrentDenoiseNode}) — its output render target is used — or a raw
+	 * texture. Pass `null` for both to disable multi-bounce.
+	 *
+	 * @param {?(Object|import('three').Texture)} history
+	 * @param {?Node<vec2>} velocity
+	 */
+	setHistory( history, velocity ) {
+
+		this.historyTexture = ( history && typeof history.getRenderTarget === 'function' )
+			? history.getRenderTarget().texture
+			: history;
+		this.velocityTexture = velocity;
+
+	}
+
+	/**
+	 * Sets the environment map for importance-sampled env lighting when
+	 * screen-space rays miss. Call this whenever the scene's env map changes.
+	 *
+	 * Uses {@link ImportanceSampledEnvironment} (CDF + MIS adapted from
+	 * [three-gpu-pathtracer](https://github.com/gkjohnson/three-gpu-pathtracer)).
+	 *
+	 * @param {Texture|null} hdr - The equirectangular HDR environment map, or null to disable.
+	 * @see {@link https://github.com/gkjohnson/three-gpu-pathtracer}
+	 */
+	setEnvMap( hdr ) {
+
+		if ( hdr === null ) {
+
+			if ( this._importanceEnvironment !== null ) {
+
+				this._importanceEnvironment.clear();
+				this._importanceEnvironment = null;
+
+			}
+
+			this._ssrMaterial.needsUpdate = true;
+			return;
+
+		}
+
+		if ( hdr.image === undefined || hdr.image.data === undefined ) {
+
+			console.warn( 'SSRNode: `environmentNode` / `setEnvMap()` expects an equirectangular HDR texture with CPU-side image data (e.g. RGBELoader). PMREM cubemaps and `scene.environment` are not supported.' );
+			return;
+
+		}
+
+		if ( this._importanceEnvironment === null ) {
+
+			this._importanceEnvironment = new ImportanceSampledEnvironment( this.envImportanceSampling );
+
+		}
+
+		this._importanceEnvironment.updateFrom( hdr );
+		this._ssrMaterial.needsUpdate = true;
+
+	}
+
+	/**
+	 * Intensity multiplier for the importance-sampled env contribution.
+	 * Only available after {@link setEnvMap} has been called.
+	 *
+	 * @type {?UniformNode<float>}
+	 */
+	get envMapIntensity() {
+
+		return this._importanceEnvironment !== null ? this._importanceEnvironment.intensity : null;
+
+	}
+
+	/**
 	 * This method is used to render the effect once per frame.
 	 *
 	 * @param {NodeFrame} frame - The current node frame.
@@ -328,6 +581,9 @@ class SSRNode extends TempNode {
 	updateBefore( frame ) {
 
 		const { renderer } = frame;
+
+		this._cameraWorldMatrix.value.copy( this.camera.matrixWorld );
+		this._cameraWorldPosition.value.copy( this.camera.position );
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
@@ -339,6 +595,9 @@ class SSRNode extends TempNode {
 		_quadMesh.material = this._ssrMaterial;
 
 		this.setSize( size.width, size.height );
+
+		// Advance the noise index once per frame (matches SSGI / Denoise).
+		this._blueNoiseIndex.value = ( this._blueNoiseIndex.value + 1 ) % 0x7fffffff;
 
 		// clear
 
@@ -353,7 +612,7 @@ class SSRNode extends TempNode {
 
 		// blur (optional)
 
-		if ( this.roughnessNode !== null ) {
+		if ( this.reflection === 'blur' && this.metalRoughnessNode !== null ) {
 
 			// blur mips but leave the base mip unblurred
 
@@ -386,7 +645,7 @@ class SSRNode extends TempNode {
 
 		const uvNode = uv();
 
-		const pointToLineDistance = Fn( ( [ point, linePointA, linePointB ] )=> {
+		const pointToLineDistance = Fn( ( [ point, linePointA, linePointB ] ) => {
 
 			// https://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
 
@@ -394,15 +653,16 @@ class SSRNode extends TempNode {
 
 		} );
 
-		const pointPlaneDistance = Fn( ( [ point, planePoint, planeNormal ] )=> {
+		const pointPlaneDistance = Fn( ( [ point, planePoint, planeNormal ] ) => {
 
 			// https://mathworld.wolfram.com/Point-PlaneDistance.html
 			// https://en.wikipedia.org/wiki/Plane_(geometry)
 			// http://paulbourke.net/geometry/pointlineplane/
 
-			// planeNormal is already normalized, so denominator is 1
 			const d = mul( planeNormal.x, planePoint.x ).add( mul( planeNormal.y, planePoint.y ) ).add( mul( planeNormal.z, planePoint.z ) ).negate().toVar();
-			const distance = mul( planeNormal.x, point.x ).add( mul( planeNormal.y, point.y ) ).add( mul( planeNormal.z, point.z ) ).add( d );
+
+			const denominator = sqrt( mul( planeNormal.x, planeNormal.x ).add( mul( planeNormal.y, planeNormal.y ) ).add( mul( planeNormal.z, planeNormal.z ) ) ).toVar();
+			const distance = div( mul( planeNormal.x, point.x ).add( mul( planeNormal.y, point.y ) ).add( mul( planeNormal.z, point.z ) ).add( d ), denominator );
 			return distance;
 
 		} );
@@ -441,155 +701,295 @@ class SSRNode extends TempNode {
 
 		};
 
+		const makeNoise = ( seed ) => {
+
+			if ( this._blueNoiseTextureNode === null ) this._blueNoiseTextureNode = texture( getBlueNoiseTexture() );
+
+			const sampleBlueNoise = bindBlueNoise( this._blueNoiseTextureNode, this._resolution, this._blueNoiseSize, seed );
+			const sampleAnalyticNoise = bindAnalyticNoise( this._resolution, seed );
+
+			return Fn( ( [ uvCoord, sampleIndex ] ) => {
+
+				return this.useBlueNoise.equal( true ).select(
+					sampleBlueNoise( uvCoord, sampleIndex ),
+					sampleAnalyticNoise( uvCoord, sampleIndex )
+				);
+
+			} );
+
+		};
+
+		const sampleMarchBlueNoise = makeNoise( 47 );
+		const sampleEnvBlueNoise = this.envImportanceSampling ? makeNoise( 59 ) : null;
+
+		const computeScreenBorderFactor = Fn( ( [ uvCoord, borderWidth ] ) => {
+
+			const border = borderWidth.max( 1e-4 );
+
+			// Distance to the nearest screen edge — uniform falloff at corners.
+			const edgeDist = min(
+				min( uvCoord.x, float( 1 ).sub( uvCoord.x ) ),
+				min( uvCoord.y, float( 1 ).sub( uvCoord.y ) )
+			);
+
+			// Two smoothsteps for a softer ease-in-out than a single ramp.
+			const t = edgeDist.smoothstep( 0, border );
+
+			return t.smoothstep( 0, 1 ).pow( 0.125 );
+
+		} ).setLayout( {
+			name: 'computeScreenBorderFactor',
+			type: 'float',
+			inputs: [
+				{ name: 'uvCoord', type: 'vec2' },
+				{ name: 'borderWidth', type: 'float' }
+			]
+		} );
+
+		const isBlurReflection = this.reflection === 'blur';
+
 		const ssr = Fn( () => {
 
-			const metalness = float( this.metalnessNode );
+			const blueNoise = sampleMarchBlueNoise( uvNode, this._blueNoiseIndex );
+			const uvPos = uvNode.toVar();
 
-			// fragments with no metalness do not reflect their environment
-			metalness.equal( 0.0 ).discard();
+			const depth = sampleDepth( uvPos ).toVar();
 
-			// compute some standard FX entities
-			const depth = sampleDepth( uvNode ).toVar();
-			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toVar();
+			// Skip background pixels (cleared far-plane depth); the target is cleared each frame.
+			depth.greaterThanEqual( 1.0 ).discard();
+
+			const viewPosition = getViewPosition( uvPos, depth, this._cameraProjectionMatrixInverse ).toVar();
+			const worldPosition = this._cameraWorldMatrix.mul( vec4( viewPosition, 1.0 ) ).xyz.toVar();
 			const viewNormal = this.normalNode.rgb.normalize().toVar();
 
-			// compute the direction from the position in view space to the camera
 			const viewIncidentDir = ( ( this.camera.isPerspectiveCamera ) ? normalize( viewPosition ) : vec3( 0, 0, - 1 ) ).toVar();
 
-			// compute the direction in which the light is reflected on the surface
-			const viewReflectDir = reflect( viewIncidentDir, viewNormal ).toVar();
+			const metalRoughness = this.metalRoughnessNode?.sample( uvPos )?.toVar() ?? vec4( 0 );
+			const metalness = metalRoughness.r.toVar();
+			const roughness = metalRoughness.g.toVar();
+			const glossiness = min( roughness.div( 0.25 ), 1 ).oneMinus();
+			const surfaceBorderFactor = computeScreenBorderFactor( uvPos, this.screenEdgeFade );
+			const hitBorderWidth = this.screenEdgeFade.mul( glossiness );
 
-			// adapt maximum distance to the local geometry (see https://www.mathsisfun.com/algebra/vectors-dot-product.html)
+			const V = viewIncidentDir.negate().normalize().toVar();
+
+			let viewReflectDir, finalSampleWeight, specDominantFactor;
+
+			if ( isBlurReflection ) {
+
+				// Mirror reflection: roughness is applied later via the blur mip chain.
+				metalness.equal( 0.0 ).discard();
+
+				viewReflectDir = reflect( viewIncidentDir, viewNormal ).normalize().toVar();
+				finalSampleWeight = vec3( metalness );
+				specDominantFactor = float( 1 );
+
+			} else {
+
+				const Xi = blueNoise.toVar();
+				// Mirror-bias: pull `Xi.y` toward the cap top to tighten the GGX lobe and cut mid-roughness
+				// noise. Unbiased — bounded VNDF keeps brdf·cos/pdf ~constant (EA, "Stochastic SSR").
+				Xi.y.assign( mix( Xi.y, 0.0, this.mirrorBias.mul( Xi.w.sqrt() ) ) );
+
+				const albedo = ( this.diffuseNode !== null ? this.diffuseNode.sample( uvPos ).rgb : vec3( 1 ) ).toVar();
+				const ggxSample = ggxReflectionSample( viewNormal, V, roughness, metalness, albedo, Xi ).toVar();
+
+				If( ggxSample.get( 'reflectDir' ).dot( viewNormal ).lessThan( 0 ), () => {
+
+					ggxSample.assign( ggxReflectionSample( viewNormal, V, roughness, metalness, albedo, Xi.add( Xi.mul( 7 ) ).fract() ) );
+
+				} );
+
+				viewReflectDir = ggxSample.get( 'reflectDir' ).toVar();
+				finalSampleWeight = ggxSample.get( 'sampleWeight' ).toVar();
+				const NdotV = ggxSample.get( 'NdotV' ).toVar();
+				specDominantFactor = getSpecularDominantFactor( NdotV, roughness ).toVar();
+
+			}
+
+			const sampleEnvReflection = () => {
+
+				const envColor = vec3( 0 ).toVar();
+
+				if ( this._importanceEnvironment !== null ) {
+
+					if ( isBlurReflection ) {
+
+						envColor.assign( this._importanceEnvironment.sampleReflect( {
+							cameraWorldMatrix: this._cameraWorldMatrix,
+							viewReflectDir,
+							sampleWeight: metalness
+						} ) );
+
+					} else {
+
+						const ggxAlpha = roughness.mul( roughness ).max( 0.001 );
+						const albedo = ( this.diffuseNode !== null ? this.diffuseNode.sample( uvPos ).rgb : vec3( 1 ) ).toVar();
+						const f0 = mix( vec3( 0.04 ), albedo, metalness );
+
+						if ( this.envImportanceSampling ) {
+
+							const Xi2 = sampleEnvBlueNoise( uvNode, this._blueNoiseIndex );
+							envColor.assign( this._importanceEnvironment.sampleEnvironmentMIS( {
+								cameraWorldMatrix: this._cameraWorldMatrix,
+								viewReflectDir,
+								N: viewNormal,
+								V,
+								alpha: ggxAlpha,
+								f0,
+								Xi2
+							} ) );
+
+						} else {
+
+							envColor.assign( this._importanceEnvironment.sampleEnvironmentBRDF( {
+								cameraWorldMatrix: this._cameraWorldMatrix,
+								viewReflectDir,
+								N: viewNormal,
+								V,
+								alpha: ggxAlpha,
+								f0
+							} ) );
+
+						}
+
+					}
+
+				}
+
+				return envColor;
+
+			};
+
+			// Multi-bounce: fold in the previous frame's reflection at the hit point, reprojected by its
+			// own motion. The (1 - history.a) decay damps the feedback. No-op until both textures are set.
+			const reprojectHitPointHistory = ( uvHit, color ) => {
+
+				if ( ! ( this.historyTexture && this.velocityTexture ) ) return color;
+
+				const velocity = this.velocityTexture.sample( uvHit ).xy;
+				const historyUV = uvHit.sub( velocity );
+				const historyBounce = texture( this.historyTexture, historyUV ).toVar();
+				const sampleDecay = historyBounce.a.oneMinus();
+
+				return color.add( historyBounce.rgb.mul( sampleDecay ) );
+
+			};
+
 			const maxReflectRayLen = this.maxDistance.div( dot( viewIncidentDir.negate(), viewNormal ) ).toVar();
 
-			// compute the maximum point of the reflection ray in view space
 			const d1viewPosition = viewPosition.add( viewReflectDir.mul( maxReflectRayLen ) ).toVar();
 
-			// check if d1viewPosition lies behind the camera near plane
 			If( this._isPerspectiveCamera.and( d1viewPosition.z.greaterThan( this._cameraNear.negate() ) ), () => {
 
-				// if so, ensure d1viewPosition is clamped on the near plane.
-				// this prevents artifacts during the ray marching process
 				const t = sub( this._cameraNear.negate(), viewPosition.z ).div( viewReflectDir.z );
 				d1viewPosition.assign( viewPosition.add( viewReflectDir.mul( t ) ) );
 
 			} );
 
-			// d0 and d1 are the start and maximum points of the reflection ray in screen space
-			const d0 = screenCoordinate.xy.toVar();
+			const d0 = uvPos.mul( this._resolution ).xy.toVar();
 			const d1 = getScreenPosition( d1viewPosition, this._cameraProjectionMatrix ).mul( this._resolution ).toVar();
 
-			// below variables are used to control the raymarching process
-
-			// total length of the ray
-			const totalLen = d1.sub( d0 ).length().toVar();
-
-			// offset in x and y direction
 			const xLen = d1.x.sub( d0.x ).toVar();
 			const yLen = d1.y.sub( d0.y ).toVar();
 
-			// determine the larger delta
-			// The larger difference will help to determine how much to travel in the X and Y direction each iteration and
-			// how many iterations are needed to travel the entire ray
-			const totalStep = int( max( abs( xLen ), abs( yLen ) ).mul( this.quality.clamp() ) ).toConst();
+			// dominant-axis ray length in texels (used for the per-step floor below)
+			const rayLen = max( xLen.abs(), yLen.abs() ).max( 1 ).toVar();
 
-			// step sizes in the x and y directions
+			// Fixed step count for all pixels (bounded iteration, coherent control flow). `quality`
+			// (0..1) maps to the count; each step spans the whole ray as rayVec / totalStep.
+			const totalStep = int( this.quality.clamp().mul( MAX_STEPS ) ).max( int( 1 ) ).toConst();
+
 			const xSpan = xLen.div( totalStep ).toVar();
 			const ySpan = yLen.div( totalStep ).toVar();
 
+			const stepVec = vec2( xSpan, ySpan ).toVar();
+			const invResolution = vec2( float( 1 ), float( 1 ) ).div( this._resolution ).toVar();
+			const uvPixelStepX = vec2( invResolution.x, float( 0 ) ).toVar();
+
 			const output = vec4( 0 ).toVar();
+			const hit = float( 0 ).toVar();
 
-			// the actual ray marching loop
-			// starting from d0, the code gradually travels along the ray and looks for an intersection with the geometry.
-			// it does not exceed d1 (the maximum ray extend)
-			Loop( totalStep, ( { i } ) => {
+			// Per-pixel, per-frame sub-step jitter (∈ [0,1)) so TRAA dissolves step banding.
+			const jitter = isBlurReflection ? 0 : blueNoise.z;
 
-				// advance on the ray by computing a new position in screen coordinates
-				const xy = vec2( d0.x.add( xSpan.mul( float( i ) ) ), d0.y.add( ySpan.mul( float( i ) ) ) ).toVar();
+			// Reflected-ray view-space Z at ray parameter s ∈ [0,1] (linear in 1/z for perspective),
+			// hoisted so the march and refinement evaluate it identically.
+			const recipVPZ = float( 1 ).div( viewPosition.z ).toConst();
+			const recipD1VPZ = float( 1 ).div( d1viewPosition.z ).toConst();
+			// Camera type is known at build time, so branch at compile time rather than via a runtime select.
+			const reflectRayZAt = this.camera.isPerspectiveCamera
+				? ( sVal ) => float( 1 ).div( recipVPZ.add( sVal.mul( recipD1VPZ.sub( recipVPZ ) ) ) )
+				: ( sVal ) => viewPosition.z.add( sVal.mul( d1viewPosition.z.sub( viewPosition.z ) ) );
 
-				// stop processing if the new position lies outside of the screen
+			// Screen-space position along the ray for a given s ∈ [0,1].
+			const screenPosAt = ( sVal ) => d0.add( stepVec.mul( sVal.mul( float( totalStep ) ) ) );
+
+			// Ray parameter s ∈ [0,1] for step `idx`: an exponential remap `(idx/steps)^stepExponent`
+			// concentrates samples near the origin, floored to ≥1 texel/step. `jitter` dissolves banding.
+			const sampleFraction = ( idx ) => max(
+				idx.add( jitter ).div( float( totalStep ) ).pow( this.stepExponent ),
+				idx.add( 1 ).div( rayLen )
+			);
+
+			// Bisection iterations used to refine a detected crossing to a sub-step-accurate hit.
+			const REFINE_ITERATIONS = 4;
+
+			// Carry the hit out of the loop so refinement runs after the march, not nested inside it (a
+			// loop-inside-a-loop tripped shader-compiler bugs on some drivers). hitSLo/hitSHi bracket s.
+			const foundHit = bool( false ).toVar();
+			const hitSLo = float( 0 ).toVar();
+			const hitSHi = float( 0 ).toVar();
+			// Carry the coarse hit's UV/depth to skip a redundant fetch when refinement is off.
+			const hitUvS = vec2( 0 ).toVar();
+			const hitD = float( 0 ).toVar();
+
+			// March from d0 toward d1, looking for an intersection with the depth buffer.
+			Loop( { start: int( 1 ), end: totalStep }, ( { i } ) => {
+
+				// Exponentially-distributed ray parameter, shared by the sample position and ray depth.
+				const s = sampleFraction( float( i ) ).toVar();
+
+				const xy = screenPosAt( s ).toVar();
+
 				If( xy.x.lessThan( 0 ).or( xy.x.greaterThan( this._resolution.x ) ).or( xy.y.lessThan( 0 ) ).or( xy.y.greaterThan( this._resolution.y ) ), () => {
 
 					Break();
 
 				} );
 
-				// compute new uv, depth and viewZ for the next fragment
-				const uvNode = xy.div( this._resolution );
-				const d = sampleDepth( uvNode ).toVar();
+				const uvS = xy.mul( invResolution ).toVar();
+				const d = sampleDepth( uvS ).toVar();
 				const vZ = getViewZ( d ).toVar();
 
-				const viewReflectRayZ = float( 0 ).toVar();
+				const viewReflectRayZ = reflectRayZAt( s ).toVar();
 
-				// normalized distance between the current position xy and the starting point d0
-				const s = xy.sub( d0 ).length().div( totalLen );
-
-				// depending on the camera type, we now compute the z-coordinate of the reflected ray at the current step in view space
-				If( this._isPerspectiveCamera, () => {
-
-					const recipVPZ = float( 1 ).div( viewPosition.z ).toVar();
-					viewReflectRayZ.assign( float( 1 ).div( recipVPZ.add( s.mul( float( 1 ).div( d1viewPosition.z ).sub( recipVPZ ) ) ) ) );
-
-				} ).Else( () => {
-
-					viewReflectRayZ.assign( viewPosition.z.add( s.mul( d1viewPosition.z.sub( viewPosition.z ) ) ) );
-
-				} );
-
-				// if viewReflectRayZ is less or equal than the real z-coordinate at this place, it potentially intersects the geometry
 				If( viewReflectRayZ.lessThanEqual( vZ ), () => {
 
-					// compute the distance of the new location to the ray in view space
-					// to clarify vP is the fragment's view position which is not an exact point on the ray
-					const vP = getViewPosition( uvNode, d, this._cameraProjectionMatrixInverse ).toVar();
+					// Depth crossing: ray went behind the depth buffer. Gate by thickness before stopping
+					// so an occluder gap doesn't end the march prematurely.
+					const vP = getViewPosition( uvS, d, this._cameraProjectionMatrixInverse ).toVar();
 					const away = pointToLineDistance( vP, viewPosition, d1viewPosition ).toVar();
 
-					// compute the minimum thickness between the current fragment and its neighbor in the x-direction.
-					const xyNeighbor = vec2( xy.x.add( 1 ), xy.y ).toVar(); // move one pixel
-					const uvNeighbor = xyNeighbor.div( this._resolution );
+					const uvNeighbor = uvS.add( uvPixelStepX ).toVar();
 					const vPNeighbor = getViewPosition( uvNeighbor, d, this._cameraProjectionMatrixInverse ).toVar();
-					const minThickness = vPNeighbor.x.sub( vP.x ).toVar();
-					minThickness.mulAssign( 3 ); // expand a bit to avoid errors
-
+					const minThickness = vPNeighbor.x.sub( vP.x ).mul( 3 ).toVar();
 					const tk = max( minThickness, this.thickness ).toVar();
 
-					If( away.lessThanEqual( tk ), () => { // hit
+					If( away.lessThanEqual( tk ), () => {
 
-						const vN = this.normalNode.sample( uvNode ).rgb.normalize().toVar();
+						// Record the bracketing s-range and UV/depth, then stop; refine + shade after the loop.
+						foundHit.assign( true );
 
-						If( dot( viewReflectDir, vN ).greaterThanEqual( 0 ), () => {
+						if ( this.binaryRefine ) {
 
-							// the reflected ray is pointing towards the same side as the fragment's normal (current ray position),
-							// which means it wouldn't reflect off the surface. The loop continues to the next step for the next ray sample.
-							Continue();
+							hitSLo.assign( sampleFraction( float( i ).sub( 1 ) ) );
+							hitSHi.assign( s );
 
-						} );
+						}
 
-						// this distance represents the depth of the intersection point between the reflected ray and the scene.
-						const distance = pointPlaneDistance( vP, viewPosition, viewNormal ).toVar();
-
-						If( distance.greaterThan( this.maxDistance ), () => {
-
-							// Distance exceeding limit: The reflection is potentially too far away and
-							// might not contribute significantly to the final color
-							Break();
-
-						} );
-
-						const op = this.opacity.mul( metalness ).toVar();
-
-						// distance attenuation (the reflection should fade out the farther it is away from the surface)
-						const ratio = float( 1 ).sub( distance.div( this.maxDistance ) ).toVar();
-						const attenuation = ratio.mul( ratio );
-						op.mulAssign( attenuation );
-
-						// fresnel (reflect more light on surfaces that are viewed at grazing angles)
-						const fresnelCoe = div( dot( viewIncidentDir, viewReflectDir ).add( 1 ), 2 );
-						op.mulAssign( fresnelCoe );
-
-						// output
-						const reflectColor = this.colorNode.sample( uvNode );
-						output.assign( vec4( reflectColor.rgb.mul( op ), 1 ) );
+						hitUvS.assign( uvS );
+						hitD.assign( d );
 						Break();
 
 					} );
@@ -598,19 +998,130 @@ class SSRNode extends TempNode {
 
 			} );
 
-			return output;
+			If( foundHit, () => {
+
+				// Bisect the bracketed crossing toward the exact intersection. Run after the march, not
+				// nested (a loop-inside-a-loop tripped shader-compiler bugs on some drivers).
+				if ( this.binaryRefine ) {
+
+					Loop( { start: int( 0 ), end: int( REFINE_ITERATIONS ), type: 'int', condition: '<' }, () => {
+
+						const sMid = hitSLo.add( hitSHi ).mul( 0.5 ).toVar();
+						const sceneZMid = getViewZ( sampleDepth( screenPosAt( sMid ).mul( invResolution ) ) );
+
+						If( reflectRayZAt( sMid ).lessThanEqual( sceneZMid ), () => {
+
+							hitSHi.assign( sMid );
+
+						} ).Else( () => {
+
+							hitSLo.assign( sMid );
+
+						} );
+
+					} );
+
+					// Refinement moved the crossing, so re-fetch UV/depth at the refined `s`.
+					hitUvS.assign( screenPosAt( hitSHi ).mul( invResolution ) );
+					hitD.assign( sampleDepth( hitUvS ) );
+
+				}
+
+				// Shade the hit, reusing the depth fetched during the march (or refinement).
+				const uvS = hitUvS;
+				const vP = getViewPosition( uvS, hitD, this._cameraProjectionMatrixInverse ).toVar();
+
+				// In blur mode the ratio² falloff re-grows past maxDistance, so over-range hits fall back
+				// to env. The scatter path bounds reach via ray length, so every hit shades.
+				const distancePointPlane = isBlurReflection ? pointPlaneDistance( vP, viewPosition, viewNormal ).toVar() : float( 0 );
+				const withinRange = isBlurReflection ? distancePointPlane.lessThanEqual( this.maxDistance ) : bool( true );
+
+				If( withinRange, () => {
+
+					const hitWorldPosition = this._cameraWorldMatrix.mul( vec4( vP, 1.0 ) ).xyz.toVar();
+					const worldDistance = distance( worldPosition, hitWorldPosition ).mul( specDominantFactor ).toVar();
+
+					const reflectColor = this.colorNode.sample( uvS ).toVar();
+
+					// Multi-bounce: add the reprojected previous-frame reflection at the hit point.
+					reflectColor.rgb.assign( reprojectHitPointHistory( uvS, reflectColor.rgb ) );
+
+					// Screen-edge fade uses the hit sample UV (where screen-space data was read).
+					If( this.screenEdgeFadeBlack, () => {
+
+						const hitBorderFactor = computeScreenBorderFactor( uvS, this.screenEdgeFade );
+						reflectColor.rgb.mulAssign( hitBorderFactor );
+
+					} ).Else( () => {
+
+						const hitBorderFactor = computeScreenBorderFactor( uvS, hitBorderWidth );
+
+						If( hitBorderFactor.lessThan( 1 ), () => {
+
+							reflectColor.rgb.assign( mix( sampleEnvReflection().mul( this.environmentIntensity ), reflectColor.rgb, hitBorderFactor ) );
+
+						} );
+
+					} );
+
+					// The scatter (GGX) path bakes distance/grazing response into finalSampleWeight.
+					// The mirror/blur path is a plain reflection, so reapply upstream's squared
+					// distance attenuation and grazing Fresnel here to match its falloff.
+					let weightedColor = reflectColor.rgb.mul( finalSampleWeight );
+
+					if ( isBlurReflection ) {
+
+						const ratio = float( 1 ).sub( distancePointPlane.div( this.maxDistance ) ).toVar();
+						const attenuation = ratio.mul( ratio ).toVar();
+						const fresnelCoe = div( dot( viewIncidentDir, viewReflectDir ).add( 1 ), 2 ).toVar();
+						weightedColor = weightedColor.mul( attenuation.mul( fresnelCoe ) );
+
+					}
+
+					hit.assign( 1 );
+					output.assign( vec4( weightedColor, worldDistance ) );
+
+				} );
+
+			} );
+
+			// Screen-space ray missed: environment fallback (MIS when CDF env is set up).
+			If( hit.equal( 0 ), () => {
+
+				output.assign( vec4( sampleEnvReflection().mul( this.environmentIntensity ), float( ENV_RAY_LENGTH ) ) );
+
+				// Misses fade by the surface pixel UV (where the reflection is being shaded).
+				If( this.screenEdgeFadeBlack, () => {
+
+					output.rgb.mulAssign( surfaceBorderFactor );
+
+				} );
+
+			} );
+
+			const envLuminance = luminance( output.rgb ).max( 1e-4 ).toVar();
+			output.rgb.mulAssign( this.maxLuminance.div( envLuminance ).min( 1 ) );
+
+			// scale the reflection color by the user-controlled intensity (alpha holds
+			// parallax-corrected ray length for TRAA/denoise, so only the rgb is affected)
+			output.rgb.mulAssign( this.intensity );
+
+			return output.max( 0 );
 
 		} );
+
 
 		this._ssrMaterial.fragmentNode = ssr().context( builder.getSharedContext() );
 		this._ssrMaterial.needsUpdate = true;
 
-		// below materials are used for blurring
-
 		const reflectionBuffer = texture( this._ssrRenderTarget.texture );
 
-		this._blurMaterial.fragmentNode = boxBlur( reflectionBuffer, { size: this.blurQuality, separation: this._blurSpread } );
-		this._blurMaterial.needsUpdate = true;
+		if ( this.reflection === 'blur' ) {
+
+			this._blurMaterial.fragmentNode = boxBlur( reflectionBuffer, { size: this.blurQuality, separation: this._blurSpread } );
+			this._blurMaterial.needsUpdate = true;
+
+		}
 
 		this._copyMaterial.fragmentNode = reflectionBuffer;
 		this._copyMaterial.needsUpdate = true;
@@ -618,6 +1129,12 @@ class SSRNode extends TempNode {
 		//
 
 		return this.getTextureNode();
+
+	}
+
+	getRenderTarget() {
+
+		return this._ssrRenderTarget;
 
 	}
 
@@ -634,6 +1151,15 @@ class SSRNode extends TempNode {
 		this._blurMaterial.dispose();
 		this._copyMaterial.dispose();
 
+		// _blueNoiseTexture is the shared generated texture — not disposed here.
+
+		if ( this._importanceEnvironment !== null ) {
+
+			this._importanceEnvironment.dispose();
+			this._importanceEnvironment = null;
+
+		}
+
 	}
 
 }
@@ -648,9 +1174,12 @@ export default SSRNode;
  * @param {Node<vec4>} colorNode - The node that represents the beauty pass.
  * @param {Node<float>} depthNode - A node that represents the beauty pass's depth.
  * @param {Node<vec3>} normalNode - A node that represents the beauty pass's normals.
- * @param {Node<float>} metalnessNode - A node that represents the beauty pass's metalness.
- * @param {?Node<float>} [roughnessNode=null] - A node that represents the beauty pass's roughness.
- * @param {?Camera} [camera=null] - The camera the scene is rendered with.
+ * @param {SSRNodeOptions} [options] - Optional inputs for material and environment data.
  * @returns {SSRNode}
  */
-export const ssr = ( colorNode, depthNode, normalNode, metalnessNode, roughnessNode = null, camera = null ) => new SSRNode( nodeObject( colorNode ), nodeObject( depthNode ), nodeObject( normalNode ), nodeObject( metalnessNode ), nodeObject( roughnessNode ), camera );
+export const ssr = ( colorNode, depthNode, normalNode, options = {} ) => nodeObject( new SSRNode(
+	nodeObject( colorNode ),
+	nodeObject( depthNode ),
+	nodeObject( normalNode ),
+	options
+) );

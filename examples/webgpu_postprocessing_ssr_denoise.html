@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<title>three.js webgpu - postprocessing - Screen Space Reflections (SSR) + denoise</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - postprocessing - Screen Space Reflections (SSR) + denoise">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_postprocessing_ssr_denoise.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_postprocessing_ssr_denoise.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			#compare-hint {
+				position: fixed;
+				bottom: 20px;
+				left: 50%;
+				transform: translateX(-50%);
+				z-index: 1001;
+				color: #e0e0e0;
+				font: 400 13px 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+				text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
+				pointer-events: none;
+				opacity: 0.85;
+				white-space: nowrap;
+			}
+		</style>
+	</head>
+
+<body>
+
+	<div id="compare-hint" hidden>Hold Shift and move the mouse to scrub the comparison</div>
+
+	<div id="info">
+		<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+		<div class="title-wrapper">
+			<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>SSR + Denoising</span>
+		</div>
+
+		<small>
+			Screen Space Reflections with Spatiotemporal Denoising by <a href="https://x.com/0beqz" target="_blank" rel="noopener">0beqz</a>.<br />
+			Dungeon - Low Poly Game Level Challenge by
+			<a href="https://sketchfab.com/warkarma" target="_blank" rel="noopener">Warkarma</a>.<br />
+		</small>
+	</div>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.webgpu.js",
+				"three/webgpu": "../build/three.webgpu.js",
+				"three/tsl": "../build/three.tsl.js",
+				"three/addons/": "./jsm/"
+			}
+		}
+	</script>
+
+	<script type="module">
+
+		import * as THREE from 'three/webgpu';
+		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, vec2, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, toneMapping, saturation, workingToColorSpace } from 'three/tsl';
+		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
+		import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
+		import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
+		import { bloom } from 'three/addons/tsl/display/BloomNode.js';
+		import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
+		import { fxaa } from 'three/addons/tsl/display/FXAANode.js';
+
+		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		import Stats from 'three/addons/libs/stats.module.js';
+		import { Inspector } from 'three/addons/inspector/Inspector.js';
+		import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+
+		// Disable env map specular (radiance and clearcoat radiance) for every PBR material
+		// in this scene, since SSR provides the specular reflections instead. Diffuse env
+		// (irradiance) is left untouched. Equivalent to zeroing EnvironmentNode contributions,
+		// but scoped to this example rather than modifying the core library.
+		const _indirectSpecular = THREE.PhysicalLightingModel.prototype.indirectSpecular;
+		THREE.PhysicalLightingModel.prototype.indirectSpecular = function ( builder ) {
+
+			builder.context.radiance = vec3( 0 );
+
+			if ( this.clearcoatRadiance ) {
+
+				this.clearcoatRadiance.assign( vec3( 0 ) );
+
+			}
+
+			_indirectSpecular.call( this, builder );
+
+		};
+
+		const OUTPUT_COMPARE_DENOISE = 8;
+		const OUTPUT_COMPARE_SSR = 9;
+
+		const GRADED_OUTPUTS = new Set( [ 0, 1, 3, 4, OUTPUT_COMPARE_DENOISE, OUTPUT_COMPARE_SSR ] );
+
+		const compareHint = document.getElementById( 'compare-hint' );
+
+		function isCompareMode( output ) {
+
+			return output === OUTPUT_COMPARE_DENOISE || output === OUTPUT_COMPARE_SSR;
+
+		}
+
+		function updateCompareHint( output ) {
+
+			compareHint.hidden = ! isCompareMode( output );
+
+		}
+
+		const compareSplit = uniform( 0.5 );
+		const compareResolution = uniform( new THREE.Vector2( window.innerWidth, window.innerHeight ) );
+
+		function buildCompareNode( noisy, denoised ) {
+
+			const compareColor = mix( noisy, denoised, step( compareSplit, screenUV.x ) );
+			const lineWidth = float( 1 ).div( compareResolution.x );
+			const onLine = float( 1 ).sub( step( lineWidth, abs( screenUV.x.sub( compareSplit ) ) ) );
+
+			return mix( compareColor, vec4( 1 ), onLine );
+
+		}
+
+		const params = {
+			output: 0,
+			roughness: 0.3,
+
+			ssr: {
+				resolutionScale: 1,
+				quality: 0.25,
+				mirrorBias: 0.5,
+				maxDistance: 0.4,
+				intensity: 1,
+				thickness: 0.1,
+				maxLuminance: 35,
+				binaryRefine: false,
+				stepExponent: 3,
+				envImportanceSampling: true,
+				useBlueNoise: false,
+				screenEdgeFade: 0.2,
+				screenEdgeFadeBlack: false, // for indoor scenes, set to true
+				environmentIntensity: 3.14, // not too sure why exactly, but multiplying by ~PI makes the env map reflections match Blender more
+			},
+
+			temporalReproject: {
+				maxFrames: 16,
+				clampIntensity: 0.25,
+				flickerSuppression: 1,
+				hitPointReprojection: true,
+			},
+
+			denoise: {
+				enabled: true,
+				lumaPhi: 0.25,
+				depthPhi: 25,
+				normalPhi: 0,
+				roughnessPhi: 100,
+				radius: 9,
+				alphaPhi: 1,
+				denoisePower: 0.18,
+				adaptRadius: 0.5,
+				denoiseAlpha: true,
+				flickerSuppression: 1,
+				adaptiveTrust: 1,
+				useBlueNoise: false
+			},
+
+			post: {
+				bloom: { enabled: true, strength: 0.04, radius: 1, threshold: 0.3 },
+				sharpen: { sharpness: 0 },
+				grading: { toneMapping: 'AgX', exposure: 1.57, gamma: 0.89, contrast: 1.31, saturation: 1 },
+			},
+		};
+
+		let camera, scene, model, renderer, postProcessing, ssrNode, temporalReprojectNode, denoiseNode;
+		let stats, controls;
+		let scenePassNode, combinedOutputNode;
+		let bloomPass, sharpnessUniform, bloomEnabledUniform;
+		let exposureUniform, gammaUniform, contrastUniform, saturationUniform;
+
+		init();
+
+		async function init() {
+
+			camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 8 );
+
+			camera.position.set( 0.9210513838983053, 0.16195074025403253, 0.431687274895316 );
+
+			scene = new THREE.Scene();
+
+			const loader = new GLTFLoader();
+			loader.load( 'models/gltf/dungeon_warkarma.glb', function ( gltf ) {
+
+				gltf.scene.scale.multiplyScalar( 0.1 );
+
+				gltf.scene.traverse( function ( object ) {
+
+					if ( ! object.material ) return;
+
+					object.castShadow = true;
+					object.receiveShadow = true;
+					object.material.roughness = 0.3;
+					object.material.normalMap = null;
+
+				} );
+
+				model = gltf.scene;
+				scene.add( model );
+
+			} );
+
+			renderer = new THREE.WebGPURenderer();
+			renderer.inspector = new Inspector();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.toneMapping = THREE.AgXToneMapping;
+			renderer.toneMappingExposure = params.post.grading.exposure;
+			renderer.shadowMap.enabled = true;
+			document.body.appendChild( renderer.domElement );
+
+			const hdrLoader = new HDRLoader().setPath( 'textures/equirectangular/' );
+			const hdrTexture = await hdrLoader.loadAsync( 'quarry_01_1k.hdr' );
+			hdrTexture.mapping = THREE.EquirectangularReflectionMapping;
+			scene.background = hdrTexture;
+			scene.environment = hdrTexture;
+			hdrTexture.generateMipmaps = true;
+			hdrTexture.needsUpdate = true;
+
+			const directionalLight = new THREE.DirectionalLight( '#ffffff', 20 );
+			directionalLight.position.set( - 10.9, 2.2, 10.75 );
+			directionalLight.castShadow = true;
+			directionalLight.shadow.autoUpdate = false;
+			directionalLight.shadow.needsUpdate = true;
+			directionalLight.shadow.mapSize.width = 4096;
+			directionalLight.shadow.mapSize.height = 4096;
+			directionalLight.shadow.camera.left = - 1.75;
+			directionalLight.shadow.camera.right = 1.75;
+			directionalLight.shadow.camera.top = 1.75;
+			directionalLight.shadow.camera.bottom = - 1.75;
+			directionalLight.shadow.camera.near = 0.1;
+			directionalLight.shadow.camera.far = 50;
+			directionalLight.shadow.bias = - 0.0005;
+			scene.add( directionalLight );
+
+			await renderer.init();
+
+			scene.environmentIntensity = 1;
+
+			postProcessing = new THREE.RenderPipeline( renderer );
+
+			const scenePass = pass( scene, camera );
+			scenePassNode = scenePass;
+			scenePass.setMRT( mrt( {
+				output: output,
+				// Store base color (albedo) in RGB + metalness in alpha. The albedo is needed for
+				// metal Fresnel f0; do NOT bake in the (1-metalness) diffuse attenuation here, as
+				// that zeroes metals and destroys their specular tint (f0 would become 0 → black).
+				diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
+				// Pack roughness into normal alpha channel to save MRT bandwidth
+				normal: vec4( packNormalToRGB( normalView ).rgb, materialRoughness ),
+				velocity: velocity
+			} ) );
+
+			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
+			const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal' );
+			const scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
+
+				return scenePass.getLinearDepthNode();
+
+			} );
+			const scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
+			const scenePassDiffuseColor = scenePass.getTextureNode( 'diffuseColor' ).toInspector( 'Diffuse Color' );
+
+			const normalTexture = scenePass.getTexture( 'normal' );
+			normalTexture.type = THREE.UnsignedByteType;
+
+			const diffuseTexture = scenePass.getTexture( 'diffuseColor' );
+			diffuseTexture.type = THREE.UnsignedByteType;
+
+			const sceneNormal = sample( ( uv ) => unpackRGBToNormal( scenePassNormal.sample( uv ).rgb ) );
+
+			// metalness in diffuseColor.a, roughness in normal.a (no separate metalrough MRT)
+			const scenePassMetalRough = sample( ( uv ) => vec2(
+				scenePassDiffuseColor.sample( uv ).a,
+				scenePassNormal.sample( uv ).a
+			) ).toInspector( 'Metalness/Roughness' );
+
+			ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+				reflection: 'scatter',
+				diffuseNode: scenePassDiffuseColor,
+				metalRoughnessNode: scenePassMetalRough,
+				environmentNode: hdrTexture,
+				envImportanceSampling: params.ssr.envImportanceSampling,
+				binaryRefine: params.ssr.binaryRefine
+			} );
+			ssrNode.useBlueNoise.value = params.ssr.useBlueNoise;
+			ssrNode.setEnvMap( hdrTexture );
+			ssrNode.toInspector( 'SSR' );
+
+			temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
+				mode: 'specular',
+				accumulate: false
+			} );
+			temporalReprojectNode.toInspector( 'Temporal Reproject' );
+
+			const ssrFullResTexture = ssrNode.getRenderTarget().texture;
+
+			denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
+				depth: scenePassDepth,
+				normal: scenePassNormal,
+				raw: ssrFullResTexture,
+				metalRoughness: scenePassMetalRough,
+				mode: 'specular',
+				accumulate: true,
+			} );
+			denoiseNode.alphaSource = 'raylength'; // SSR alpha channel contains ray length
+			denoiseNode.toInspector( 'Denoise' );
+			// feed the denoised result + velocity back into SSR for multi-bounce reflections
+			ssrNode.setHistory( denoiseNode, scenePassVelocity );
+			temporalReprojectNode.setHistoryTexture( denoiseNode );
+
+			const denoisePassBlend = vec4( denoiseNode.rgb, ssrNode.a.greaterThan( 0 ).toVar() );
+
+			sharpnessUniform = uniform( params.post.sharpen.sharpness );
+			exposureUniform = uniform( params.post.grading.exposure );
+			gammaUniform = uniform( params.post.grading.gamma );
+			contrastUniform = uniform( params.post.grading.contrast );
+			saturationUniform = uniform( params.post.grading.saturation );
+			bloomEnabledUniform = uniform( params.post.bloom.enabled ? 1 : 0 );
+
+			const litColor = scenePassColor.rgb.add( denoisePassBlend.rgb );
+
+			bloomPass = bloom( vec4( litColor, 1 ), params.post.bloom.strength, params.post.bloom.radius, params.post.bloom.threshold );
+			bloomPass.toInspector( 'Bloom' );
+
+			const outputNode = vec4( litColor.add( bloomPass.rgb.mul( bloomEnabledUniform ) ), 1 );
+			outputNode.toInspector( 'Combined SSR' );
+			combinedOutputNode = outputNode;
+
+			postProcessing.outputNode = applyGrading( combinedOutputNode );
+			postProcessing.outputColorTransform = false;
+
+			controls = new OrbitControls( camera, renderer.domElement );
+			controls.enableDamping = true;
+			controls.update();
+
+			// Initial camera transform
+			camera.position.set( 1.259878548682251, 0.5391287340899181, - 0.27217301481427114 );
+			camera.rotation.set( - 0.3158233106804791, 0.26820684188431526, 0.08637696823742165 );
+			controls.target.set( 1.0258536154689288, 0.2746440590977971, - 1.0815876858987743 );
+
+			stats = new Stats();
+			document.body.appendChild( stats.dom );
+
+			window.addEventListener( 'resize', onWindowResize );
+			renderer.domElement.addEventListener( 'pointermove', onComparePointerMove );
+
+			applyParams();
+			applyPost();
+
+			const outputTypes = {
+				Combined: 0,
+				'Denoised SSR': 4,
+				'Compare (Denoise)': OUTPUT_COMPARE_DENOISE,
+				'Compare (Reflections)': OUTPUT_COMPARE_SSR,
+				'SSR (Raw)': 1,
+				'Ray Length': 7,
+				'Accumulation Speed (Alpha)': 6
+			};
+
+			const ssrGui = renderer.inspector.createParameters( 'SSR settings' );
+			ssrGui.add( params, 'output', outputTypes ).onChange( updateOutputNode );
+			ssrGui.add( params.ssr, 'quality', 0, 1 ).name( 'quality' ).onChange( applyParams );
+			ssrGui.add( params.ssr, 'mirrorBias', 0, 1 ).name( 'mirror bias' ).onChange( applyParams );
+			ssrGui.add( params.ssr, 'stepExponent', 1, 4, 0.5 ).name( 'step exponent' ).onChange( applyParams );
+			ssrGui.add( params.ssr, 'maxDistance', 0, 5 ).name( 'max distance' ).onChange( applyParams );
+			ssrGui.add( params.ssr, 'intensity', 0, 4 ).name( 'intensity' ).onChange( applyParams );
+			ssrGui.add( params.ssr, 'thickness', 0, 0.25 ).name( 'thickness' ).onChange( applyParams );
+			ssrGui.add( params.ssr, 'useBlueNoise' ).name( 'blue noise' ).onChange( () => ( ssrNode.useBlueNoise.value = params.ssr.useBlueNoise ) );
+			ssrGui.add( params.ssr, 'environmentIntensity', 0, 10 ).name( 'env intensity' ).onChange( applyParams );
+			ssrGui.add( params, 'roughness', 0, 1 ).onChange( ( value ) => {
+
+				scene.traverse( ( object ) => {
+
+					if ( object.material ) object.material.roughness = value;
+
+				} );
+
+			} );
+
+			const denoiseGui = renderer.inspector.createParameters( 'Denoise settings' );
+			denoiseGui.add( params.denoise, 'enabled' ).name( 'enabled' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'lumaPhi', 0, 5 ).name( 'luma phi' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'depthPhi', 0, 50 ).name( 'depth phi' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'normalPhi', 0.3, 2, 0.0001 ).name( 'normal phi' ).onChange( applyParams );
+
+			// We have uniform roughness in the scene, so we don't need to adjust the roughness phi
+			// denoiseGui.add( params.denoise, 'roughnessPhi', 0, 500 ).name( 'roughness phi' ).onChange( applyParams );
+
+			denoiseGui.add( params.denoise, 'alphaPhi', 0, 4 ).name( 'ray length phi' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'radius', 0, 15 ).name( 'radius' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'denoisePower', 0.01, 0.5 ).name( 'denoise power' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'useBlueNoise' ).name( 'blue noise' ).onChange( () => ( denoiseNode.useBlueNoise.value = params.denoise.useBlueNoise ) );
+
+			// Extra options that are not used in this example
+			// denoiseGui.add( params.denoise, 'adaptRadius', 0, 1 ).name( 'adapt radius' ).onChange( applyParams );
+			// denoiseGui.add( params.denoise, 'denoiseAlpha' ).name( 'denoise alpha' ).onChange( applyParams );
+			// denoiseGui.add( params.denoise, 'flickerSuppression', 0, 1 ).name( 'flicker suppression' ).onChange( applyParams );
+			// denoiseGui.add( params.denoise, 'adaptiveTrust', 0, 1 ).name( 'adaptive trust' ).onChange( applyParams );
+
+			const temporalReprojectGui = renderer.inspector.createParameters( 'Temporal Reproject settings' );
+			temporalReprojectGui.add( params.temporalReproject, 'maxFrames', 1, 128, 1 ).name( 'max frames' ).onChange( applyParams );
+			temporalReprojectGui.add( params.temporalReproject, 'clampIntensity', 0, 1 ).name( 'clamp intensity' ).onChange( applyParams );
+			temporalReprojectGui.add( params.temporalReproject, 'flickerSuppression', 0, 1 ).name( 'flicker suppression' ).onChange( applyParams );
+			temporalReprojectGui.add( params.temporalReproject, 'hitPointReprojection' ).name( 'hit point reprojection' ).onChange( applyParams );
+			temporalReprojectGui.close();
+
+			// Concise UI for Directional Light controls
+			const lightGui = renderer.inspector.createParameters( 'Light' ).close();
+			[ 'x', 'y', 'z' ].forEach( axis => {
+
+				lightGui.add( directionalLight.position, axis, - 30, 30 ).name( axis.toUpperCase() )
+					.onChange( () => directionalLight.shadow.needsUpdate = true );
+
+			} );
+			lightGui.add( directionalLight, 'intensity', 0, 50 ).name( 'Intensity' );
+
+			updateOutputNode();
+			renderer.setAnimationLoop( animate );
+
+		}
+
+		function applyParams() {
+
+			if ( ! ssrNode ) return;
+
+			ssrNode.resolutionScale = params.ssr.resolutionScale;
+			ssrNode.quality.value = params.ssr.quality;
+			ssrNode.mirrorBias.value = params.ssr.mirrorBias;
+			ssrNode.stepExponent.value = params.ssr.stepExponent;
+			ssrNode.maxDistance.value = params.ssr.maxDistance;
+			ssrNode.intensity.value = params.ssr.intensity;
+			ssrNode.thickness.value = params.ssr.thickness;
+			ssrNode.maxLuminance.value = params.ssr.maxLuminance;
+			ssrNode.screenEdgeFade.value = params.ssr.screenEdgeFade;
+			ssrNode.screenEdgeFadeBlack.value = params.ssr.screenEdgeFadeBlack;
+			ssrNode.environmentIntensity.value = params.ssr.environmentIntensity;
+
+			if ( temporalReprojectNode ) {
+
+				temporalReprojectNode.maxFrames.value = params.temporalReproject.maxFrames;
+				temporalReprojectNode.clampIntensity.value = params.temporalReproject.clampIntensity;
+				temporalReprojectNode.flickerSuppression.value = params.temporalReproject.flickerSuppression;
+				temporalReprojectNode.hitPointReprojection.value = params.temporalReproject.hitPointReprojection;
+
+			}
+
+			if ( denoiseNode ) {
+
+				denoiseNode.lumaPhi.value = params.denoise.lumaPhi;
+				denoiseNode.depthPhi.value = params.denoise.depthPhi;
+				denoiseNode.normalPhi.value = params.denoise.normalPhi;
+				denoiseNode.roughnessPhi.value = params.denoise.roughnessPhi;
+				denoiseNode.radius.value = params.denoise.enabled ? params.denoise.radius : 0;
+				denoiseNode.alphaPhi.value = params.denoise.alphaPhi;
+				denoiseNode.denoisePower.value = params.denoise.denoisePower;
+				denoiseNode.adaptRadius.value = params.denoise.adaptRadius;
+				denoiseNode.denoiseAlpha.value = params.denoise.denoiseAlpha;
+				denoiseNode.flickerSuppression.value = params.denoise.flickerSuppression;
+				denoiseNode.adaptiveTrust.value = params.denoise.adaptiveTrust;
+				denoiseNode.useBlueNoise.value = params.denoise.useBlueNoise;
+		
+	}
+
+		}
+
+		function applyGrading( source ) {
+
+			let rgb = source.rgb;
+
+			rgb = rgb.mul( exposureUniform );
+			rgb = toneMapping( THREE.AgXToneMapping, float( 1 ), rgb );
+			rgb = workingToColorSpace( rgb, THREE.SRGBColorSpace );
+			rgb = rgb.sub( 0.5 ).mul( contrastUniform ).add( 0.5 );
+			rgb = saturation( rgb, saturationUniform );
+			rgb = rgb.max( 0.0 ).pow( float( 1 ).div( gammaUniform ) );
+
+			const node = fxaa( vec4( rgb, 1 ) );
+			return sharpen( node, sharpnessUniform );
+
+		}
+
+		function applyPost() {
+
+			if ( ! bloomPass ) return;
+
+			sharpnessUniform.value = params.post.sharpen.sharpness;
+
+			const g = params.post.grading;
+			exposureUniform.value = g.exposure;
+			gammaUniform.value = g.gamma;
+			contrastUniform.value = g.contrast;
+			saturationUniform.value = g.saturation;
+
+			renderer.toneMapping = THREE.AgXToneMapping;
+			renderer.toneMappingExposure = g.exposure;
+
+			bloomEnabledUniform.value = params.post.bloom.enabled ? 1 : 0;
+			bloomPass.strength.value = params.post.bloom.strength;
+			bloomPass.radius.value = params.post.bloom.radius;
+			bloomPass.threshold.value = params.post.bloom.threshold;
+
+		}
+
+		function updateOutputNode() {
+
+			if ( ! postProcessing ) return;
+
+			let node;
+
+			switch ( params.output ) {
+
+				case 0: node = applyGrading( combinedOutputNode ); break; // Combined
+				case 1: node = applyGrading( vec4( ssrNode.rgb, 1 ) ); break; // SSR (Raw)
+				case 4: node = applyGrading( vec4( denoiseNode.rgb, 1 ) ); break; // Denoised SSR
+				case 6: node = vec4( denoiseNode.aaa, 1 ); break; // Samples (Alpha)
+				case 7: node = vec4( ssrNode.aaa, 1 ); break; // Ray Length (Raw)
+				case OUTPUT_COMPARE_DENOISE: { // Compare (denoised | noisy)
+
+					const noisySSR = applyGrading( vec4( ssrNode.rgb, 1 ) );
+					const denoisedSSR = applyGrading( vec4( denoiseNode.rgb, 1 ) );
+					node = buildCompareNode( denoisedSSR, noisySSR );
+					break;
+
+				}
+
+				case OUTPUT_COMPARE_SSR: { // Compare (combined SSR vs. scene only)
+
+					node = buildCompareNode( applyGrading( combinedOutputNode ), applyGrading( scenePassNode ) );
+					break;
+
+				}
+
+	}
+
+			if ( ! isCompareMode( params.output ) ) controls.enabled = true;
+
+			updateCompareHint( params.output );
+
+			postProcessing.outputColorTransform = ! GRADED_OUTPUTS.has( params.output );
+			postProcessing.outputNode = node;
+			postProcessing.needsUpdate = true;
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			compareResolution.value.set( window.innerWidth, window.innerHeight );
+
+		}
+
+		function onComparePointerMove( event ) {
+
+			if ( ! isCompareMode( params.output ) ) return;
+
+			if ( event.shiftKey ) {
+
+				controls.enabled = false;
+
+				const rect = renderer.domElement.getBoundingClientRect();
+				compareSplit.value = Math.max( 0, Math.min( 1, ( event.clientX - rect.left ) / rect.width ) );
+
+			} else {
+
+				controls.enabled = true;
+
+			}
+
+		}
+
+		function animate() {
+
+			controls.update();
+
+			postProcessing.render();
+
+			stats.end();
+
+		}
+
+	</script>
+</body>
+
+</html>
