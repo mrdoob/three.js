@@ -1,5 +1,5 @@
-import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, MathUtils } from 'three/webgpu';
-import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise } from 'three/tsl';
+import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, MathUtils, RGBFormat, RedFormat, UnsignedInt101111Type, UnsignedByteType } from 'three/webgpu';
+import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise, property, outputStruct } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -139,7 +139,7 @@ class SSGINode extends TempNode {
 		 * Makes the sample distance in screen space instead of world-space (helps having more detail up close).
 		 *
 		 * @type {UniformNode<bool>}
-		 * @default false
+		 * @default true
 		 */
 		this.useScreenSpaceSampling = uniform( true, 'bool' );
 
@@ -267,13 +267,23 @@ class SSGINode extends TempNode {
 		this._camera = camera;
 
 		/**
-		 * The render target the GI is rendered into.
+		 * The render target the effect is rendered into. The first texture holds the GI,
+		 * the second one the AO.
 		 *
 		 * @private
 		 * @type {RenderTarget}
 		 */
-		this._ssgiRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false } );
-		this._ssgiRenderTarget.texture.name = 'SSGI';
+		this._ssgiRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, count: 2 } );
+
+		const aoTexture = this._ssgiRenderTarget.textures[ 0 ];
+		aoTexture.name = 'SSGI.AO';
+		aoTexture.type = UnsignedByteType;
+		aoTexture.format = RedFormat;
+
+		const giTexture = this._ssgiRenderTarget.textures[ 1 ];
+		giTexture.name = 'SSGI.GI';
+		giTexture.type = UnsignedInt101111Type;
+		giTexture.format = RGBFormat;
 
 		/**
 		 * The material that is used to render the effect.
@@ -285,23 +295,42 @@ class SSGINode extends TempNode {
 		this._material.name = 'SSGI';
 
 		/**
-		 * The result of the effect is represented as a separate texture node.
+		 * The AO result of the effect is represented as a separate texture node.
 		 *
 		 * @private
 		 * @type {PassTextureNode}
 		 */
-		this._textureNode = passTexture( this, this._ssgiRenderTarget.texture );
+		this._aoNode = passTexture( this, this._ssgiRenderTarget.textures[ 0 ] );
+
+		/**
+		 * The GI result of the effect is represented as a separate texture node.
+		 *
+		 * @private
+		 * @type {PassTextureNode}
+		 */
+		this._giNode = passTexture( this, this._ssgiRenderTarget.textures[ 1 ] );
 
 	}
 
 	/**
-	 * Returns the result of the effect as a texture node.
+	 * Returns the AO result of the effect as a texture node.
 	 *
-	 * @return {PassTextureNode} A texture node that represents the result of the effect.
+	 * @return {PassTextureNode} A texture node that represents the AO result of the effect.
 	 */
-	getTextureNode() {
+	getAONode() {
 
-		return this._textureNode;
+		return this._aoNode;
+
+	}
+
+	/**
+	 * Returns the GI result of the effect as a texture node.
+	 *
+	 * @return {PassTextureNode} A texture node that represents the GI result of the effect.
+	 */
+	getGINode() {
+
+		return this._giNode;
 
 	}
 
@@ -357,9 +386,9 @@ class SSGINode extends TempNode {
 		_quadMesh.material = this._material;
 		_quadMesh.name = 'SSGI';
 
-		// clear
+		// clear (white for the AO attachement)
 
-		renderer.setClearColor( 0x000000, 1 );
+		renderer.setClearColor( 0xffffff, 1 );
 
 		// gi
 
@@ -379,6 +408,14 @@ class SSGINode extends TempNode {
 	 * @return {PassTextureNode}
 	 */
 	setup( builder ) {
+
+		const renderer = builder.renderer;
+
+		if ( renderer.backend.isWebGPUBackend === true && renderer.hasFeature( 'rg11b10ufloat-renderable' ) === false ) {
+
+			console.error( 'THREE.SSGINode: The device does not support the "rg11b10ufloat-renderable" feature which is required for SSGI.' );
+
+		}
 
 		const uvNode = uv();
 		const MAX_RAY = uint( 32 );
@@ -435,29 +472,15 @@ class SSGINode extends TempNode {
 			]
 		} );
 
-		const horizonSampling = Fn( ( [ directionIsRight, RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ] ) => {
+		const horizonSampling = Fn( ( [ directionIsRight, stepRadius, radiusVS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ] ) => {
 
 			const STEP_COUNT = this.stepCount.toConst();
 			const EXP_FACTOR = this.expFactor.toConst();
 			const THICKNESS = this.thickness.toConst();
 			const BACKFACE_LIGHTING = this.backfaceLighting.toConst();
 
-			const stepRadius = float( 0 );
-
-			If( this.useScreenSpaceSampling.equal( true ), () => {
-
-				stepRadius.assign( RADIUS.mul( this._resolution.x.div( 2 ) ).div( float( 16 ) ) ); // SSRT3 has a bug where stepRadius is divided by STEP_COUNT twice; fix here
-
-			} ).Else( () => {
-
-				stepRadius.assign( max( RADIUS.mul( this._halfProjScale ).div( viewPosition.z.negate() ), float( STEP_COUNT ) ) ); // Port note: viewZ is negative so a negate is required
-
-			} );
-
-			stepRadius.divAssign( float( STEP_COUNT ).add( 1 ) );
-			const radiusVS = max( 1, float( STEP_COUNT.sub( 1 ) ) ).mul( stepRadius );
-			const uvDirection = directionIsRight.equal( true ).select( vec2( 1, - 1 ), vec2( - 1, 1 ) ); // Port note: Because of different uv conventions, uv-y has a different sign
-			const samplingDirection = directionIsRight.equal( true ).select( 1, - 1 );
+			const uvDirection = directionIsRight.select( vec2( 1, - 1 ), vec2( - 1, 1 ) ); // Port note: Because of different uv conventions, uv-y has a different sign
+			const samplingDirection = directionIsRight.select( 1, - 1 );
 
 			const color = vec3( 0 );
 
@@ -475,13 +498,13 @@ class SSGINode extends TempNode {
 
 				const sampleViewPosition = getViewPosition( sampleUV, sampleDepth( sampleUV ), this._cameraProjectionMatrixInverse ).toConst();
 				const pixelToSample = sampleViewPosition.sub( viewPosition ).normalize().toConst();
-				const linearThicknessMultiplier = this.useLinearThickness.equal( true ).select( sampleViewPosition.z.negate().div( this._cameraFar ).clamp().mul( 100 ), float( 1 ) );
+				const linearThicknessMultiplier = this.useLinearThickness.select( sampleViewPosition.z.negate().div( this._cameraFar ).clamp().mul( 100 ), float( 1 ) );
 				const pixelToSampleBackface = normalize( sampleViewPosition.sub( linearThicknessMultiplier.mul( viewDir ).mul( THICKNESS ) ).sub( viewPosition ) );
 
 				let frontBackHorizon = vec2( dot( pixelToSample, viewDir ), dot( pixelToSampleBackface, viewDir ) );
 				frontBackHorizon = GTAOFastAcos( clamp( frontBackHorizon, - 1, 1 ) );
 				frontBackHorizon = clamp( div( mul( samplingDirection, frontBackHorizon.negate() ).sub( n.sub( HALF_PI ) ), PI ) ); // Port note: subtract half pi instead of adding it
-				frontBackHorizon = directionIsRight.equal( true ).select( frontBackHorizon.yx, frontBackHorizon.xy ); // Front/Back get inverted depending on angle
+				frontBackHorizon = directionIsRight.select( frontBackHorizon.yx, frontBackHorizon.xy ); // Front/Back get inverted depending on angle
 
 				// inline ComputeOccludedBitfield() for easier debugging
 
@@ -529,9 +552,14 @@ class SSGINode extends TempNode {
 
 			} );
 
-			return vec3( color );
+			return color;
 
 		} );
+
+		const aoField = property( 'float' );
+		const giField = property( 'vec3' );
+
+		const outputNode = outputStruct( aoField, giField );
 
 		const gi = Fn( () => {
 
@@ -554,9 +582,27 @@ class SSGINode extends TempNode {
 			const color = vec3( 0 );
 
 			const ROTATION_COUNT = this.sliceCount.toConst();
+			const STEP_COUNT = this.stepCount.toConst();
 			const AO_INTENSITY = this.aoIntensity.toConst();
 			const GI_INTENSITY = this.giIntensity.toConst();
 			const RADIUS = this.radius.toConst();
+
+			const stepRadius = float( 0 ).toVar();
+
+			If( this.useScreenSpaceSampling, () => {
+
+				stepRadius.assign( RADIUS.mul( this._resolution.x.div( 2 ) ).div( float( 16 ) ) ); // SSRT3 has a bug where stepRadius is divided by STEP_COUNT twice; fix here
+
+			} ).Else( () => {
+
+				stepRadius.assign( max( RADIUS.mul( this._halfProjScale ).div( viewPosition.z.negate() ), float( STEP_COUNT ) ) ); // Port note: viewZ is negative so a negate is required
+
+			} );
+
+			stepRadius.divAssign( float( STEP_COUNT ).add( 1 ) );
+			const radiusVS = max( 1, float( STEP_COUNT.sub( 1 ) ) ).mul( stepRadius ).toConst();
+
+			//
 
 			Loop( { start: uint( 0 ), end: ROTATION_COUNT, type: 'uint', condition: '<' }, ( { i } ) => {
 
@@ -574,8 +620,8 @@ class SSGINode extends TempNode {
 
 				globalOccludedBitfield.assign( 0 );
 
-				color.addAssign( horizonSampling( bool( true ), RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ) );
-				color.addAssign( horizonSampling( bool( false ), RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ) );
+				color.addAssign( horizonSampling( bool( true ), stepRadius, radiusVS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ) );
+				color.addAssign( horizonSampling( bool( false ), stepRadius, radiusVS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ) );
 
 				ao.addAssign( float( countOneBits( globalOccludedBitfield ) ).div( float( MAX_RAY ) ) );
 
@@ -595,16 +641,20 @@ class SSGINode extends TempNode {
 			const scale = currentLuminance.greaterThan( maxLuminance ).select( maxLuminance.div( currentLuminance ), float( 1 ) );
 			color.mulAssign( scale );
 
-			return vec4( color, ao );
+			aoField.assign( ao );
+			giField.assign( color );
+
+			return vec4( 0 );
 
 		} );
 
-		this._material.fragmentNode = gi().context( builder.getSharedContext() );
+		this._material.colorNode = gi().context( builder.getSharedContext() );
+		this._material.outputNode = outputNode;
 		this._material.needsUpdate = true;
 
 		//
 
-		return this._textureNode;
+		return this._aoNode;
 
 	}
 

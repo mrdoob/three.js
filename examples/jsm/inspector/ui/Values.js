@@ -102,7 +102,9 @@ class ValueNumber extends Value {
 		let isDragging = false;
 		let startY, startValue;
 
-		this.input.addEventListener( 'mousedown', ( e ) => {
+		this.input.style.touchAction = 'none';
+
+		this.input.addEventListener( 'pointerdown', ( e ) => {
 
 			isDragging = true;
 			startY = e.clientY;
@@ -111,7 +113,7 @@ class ValueNumber extends Value {
 
 		} );
 
-		document.addEventListener( 'mousemove', ( e ) => {
+		document.addEventListener( 'pointermove', ( e ) => {
 
 			if ( isDragging ) {
 
@@ -144,7 +146,7 @@ class ValueNumber extends Value {
 
 		} );
 
-		document.addEventListener( 'mouseup', () => {
+		document.addEventListener( 'pointerup', () => {
 
 			if ( isDragging ) {
 
@@ -276,6 +278,7 @@ class ValueSlider extends Value {
 
 		this.slider.step = value;
 		this.numberInput.step = value;
+		this.slider.value = parseFloat( this.numberInput.value );
 
 		return this;
 
