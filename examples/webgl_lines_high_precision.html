@@ -53,7 +53,7 @@
 			//
 
 			const ORBIT_RADIUS = 1e7;
-			const SEGMENTS = 2 ** 15;
+			const SEGMENTS = 2 ** 16;
 
 			//
 			// UI
@@ -63,7 +63,7 @@
 
 			const button = document.createElement("button");
 
-			button.textContent = "Rendering: High Precision";
+			button.textContent = "Rendering: High Precision Line";
 
 			button.style.position = "absolute";
 			button.style.top = "10px";
@@ -71,20 +71,6 @@
 			button.style.padding = "10px";
 
 			document.body.appendChild(button);
-
-			const info = document.createElement("div");
-
-			info.style.position = "absolute";
-			info.style.top = "30px";
-			info.style.left = "50%";
-			info.style.color = "#ffffff";
-			info.style.transform = "translateX(-50%)";
-			info.style.fontFamily = "monospace";
-
-			info.textContent =
-				"Camera follows an object moving along a large orbit. Toggle between a standard line and a high precision line.";
-
-			document.body.appendChild(info);
 
 			//
 			// Orbit Points
@@ -172,41 +158,15 @@
 				scene.add(useHighPrecision ? highPrecisionOrbit : normalOrbit);
 
 				button.textContent = useHighPrecision
-					? "Rendering: High Precision"
+					? "Rendering: High Precision Line"
 					: "Rendering: Standard Line";
 			};
 
 			//
-			// Initial State
-			//
-
-			let angle = 0.5;
-
-			pluto.position.set(
-				Math.cos(angle) * ORBIT_RADIUS,
-				0,
-				Math.sin(angle) * ORBIT_RADIUS,
-			);
-
-			camera.position.copy(pluto.position);
-			camera.position.addScalar(5);
-
-			camera.lookAt(pluto.position);
-
-			camera.updateMatrixWorld(true);
-
-			highPrecisionMaterial.setCamera(camera);
-
-			renderer.render(scene, camera);
-
-			// Signal to the E2E runner that the example has rendered
-			// at least one complete frame.
-
-			window._renderFinished = true;
-
-			//
 			// Animation
 			//
+
+			let angle = 0;
 
 			function animate() {
 				requestAnimationFrame(animate);
@@ -228,8 +188,9 @@
 				// !!!!
 				// Required: update the material with the current
 				// camera transform before rendering.
-				// !!!!
 				highPrecisionMaterial.setCamera(camera);
+				// !!!!
+
 				renderer.render(scene, camera);
 			}
 
