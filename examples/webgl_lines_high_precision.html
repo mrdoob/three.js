@@ -41,7 +41,7 @@
 			);
 
 			const renderer = new THREE.WebGLRenderer({
-				// antialias: true,
+				antialias: true,
 			});
 
 			renderer.setSize(window.innerWidth, window.innerHeight);
@@ -177,41 +177,59 @@
 			};
 
 			//
+			// Initial State
+			//
+
+			let angle = 0.5;
+
+			pluto.position.set(
+				Math.cos(angle) * ORBIT_RADIUS,
+				0,
+				Math.sin(angle) * ORBIT_RADIUS,
+			);
+
+			camera.position.copy(pluto.position);
+			camera.position.addScalar(5);
+
+			camera.lookAt(pluto.position);
+
+			camera.updateMatrixWorld(true);
+
+			highPrecisionMaterial.setCamera(camera);
+
+			renderer.render(scene, camera);
+
+			// Signal to the E2E runner that the example has rendered
+			// at least one complete frame.
+
+			window._renderFinished = true;
+
+			//
 			// Animation
 			//
 
-			let angle = 0;
-
 			function animate() {
 				requestAnimationFrame(animate);
-
 				angle += 0.001;
-
 				pluto.position.set(
 					Math.cos(angle) * ORBIT_RADIUS,
 					0,
 					Math.sin(angle) * ORBIT_RADIUS,
 				);
-
 				//
 				// Follow the moving object closely so
 				// floating-point precision issues become visible.
 				//
-
 				camera.position.copy(pluto.position);
 				camera.position.addScalar(5);
-
 				camera.lookAt(pluto.position);
-
 				camera.updateMatrixWorld(true);
 
 				// !!!!
 				// Required: update the material with the current
 				// camera transform before rendering.
 				// !!!!
-
 				highPrecisionMaterial.setCamera(camera);
-
 				renderer.render(scene, camera);
 			}
 
