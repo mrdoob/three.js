@@ -131,6 +131,14 @@
 				color: 0x00ff00,
 			});
 
+			/*
+			 * HighPrecisionLineMaterial requires the active camera
+			 * to be provided every frame. The material uses the
+			 * camera position and orientation to reconstruct
+			 * high precision camera-relative coordinates in
+			 * the vertex shader.
+			 */
+
 			const highPrecisionOrbit = new HighPrecisionLine(
 				highPrecisionGeometry,
 				highPrecisionMaterial,
@@ -196,6 +204,11 @@
 				camera.lookAt(pluto.position);
 
 				camera.updateMatrixWorld(true);
+
+				// !!!!
+				// Required: update the material with the current
+				// camera transform before rendering.
+				// !!!!
 
 				highPrecisionMaterial.setCamera(camera);
 
