@@ -1,6 +1,6 @@
-import { abs, convertToTexture, cos, cross, Discard, dot, EPSILON, exp, float, Fn, getScreenPosition, getViewPosition, If, int, log, Loop, luminance, mix, nodeObject, NodeUpdateType, normalize, passTexture, property, reflect, sin, smoothstep, sqrt, tan, texture, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4 } from 'three/tsl';
+import { abs, convertToTexture, cos, cross, Discard, dot, EPSILON, exp, float, Fn, getScreenPosition, getViewPosition, If, int, log, Loop, luminance, mat2, mix, nodeObject, NodeUpdateType, normalize, passTexture, PI, property, reflect, sin, smoothstep, sqrt, tan, texture, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4 } from 'three/tsl';
 import { HalfFloatType, MathUtils, Matrix4, NodeMaterial, QuadMesh, RendererUtils, RenderTarget, TempNode, Vector2 } from 'three/webgpu';
-import { bindBlueNoiseRotationMatrix, BLUE_NOISE_TEXTURE_SIZE, getBlueNoiseTexture } from '../utils/BlueNoise.js';
+import { bindAnalyticNoise } from '../utils/R2Noise.js';
 import { ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -9,7 +9,7 @@ const _size = /*@__PURE__*/ new Vector2();
 let _rendererState;
 
 const KERNEL_SAMPLES = 8;
-const BLUE_NOISE_ROTATION_SEED = 83;
+const NOISE_ROTATION_SEED = 83;
 const WORLD_RADIUS_SCALE = 0.1;
 
 const NORMAL_WEIGHT_EDGE_MIN = 0.9;
@@ -320,19 +320,7 @@ class RecurrentDenoiseNode extends TempNode {
 		this.roughnessMetalnessNode = metalRoughness !== null ? nodeObject( metalRoughness ) : null;
 		this.diffuseNode = diffuse !== null ? nodeObject( diffuse ) : null;
 
-		/**
-		 * Noise source. When `true`, uses the shared generated blue-noise texture (best quality);
-		 * when `false`, uses procedural R² noise with the same tile-shift indexing (no texture).
-		 *
-		 * @type {UniformNode<bool>}
-		 * @default true
-		 */
-		this.useBlueNoise = uniform( true, 'bool' );
-
-		this._blueNoiseTexture = getBlueNoiseTexture();
-		this._blueNoiseTextureNode = texture( this._blueNoiseTexture );
-		this._blueNoiseSize = uniform( new Vector2( BLUE_NOISE_TEXTURE_SIZE, BLUE_NOISE_TEXTURE_SIZE ) );
-		this._blueNoiseIndex = uniform( 0 );
+		this._noiseIndex = uniform( 0 );
 
 		this.lumaPhi = uniform( 5 );
 		this.depthPhi = uniform( 5 );
@@ -422,7 +410,7 @@ class RecurrentDenoiseNode extends TempNode {
 
 		}
 
-		if ( frame.frameId !== undefined ) this._blueNoiseIndex.value = frame.frameId;
+		if ( frame.frameId !== undefined ) this._noiseIndex.value = frame.frameId;
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
@@ -447,14 +435,14 @@ class RecurrentDenoiseNode extends TempNode {
 
 	setup( builder ) {
 
-		const blueNoiseRotationMatrix = bindBlueNoiseRotationMatrix(
-			this._blueNoiseTextureNode,
-			this._resolution,
-			this._blueNoiseSize,
-			this._blueNoiseIndex,
-			BLUE_NOISE_ROTATION_SEED,
-			this.useBlueNoise
-		);
+		const sampleAnalyticNoise = bindAnalyticNoise( this._resolution, NOISE_ROTATION_SEED );
+
+		const noiseRotationMatrix = Fn( ( [ r ] ) => {
+
+			const angle = r.mul( 2 ).mul( PI );
+			return mat2( cos( angle ), sin( angle ).negate(), sin( angle ), cos( angle ) );
+
+		} );
 
 		const sampleTexture = ( uvCoord ) => texture( this.textureNode, uvCoord ).max( 0 );
 		const sampleRaw = ( uvCoord ) => this.rawNode?.sample( uvCoord )?.max( 0 ) ?? vec3( 0 ).max( 0 );
@@ -542,7 +530,8 @@ class RecurrentDenoiseNode extends TempNode {
 				const roughness = roughnessMetalness.g;
 				const metalness = roughnessMetalness.r;
 
-				const rotationMatrix = blueNoiseRotationMatrix( uvCoord );
+				const noiseTexel = sampleAnalyticNoise( uvCoord, this._noiseIndex );
+				const rotationMatrix = noiseRotationMatrix( noiseTexel.r );
 
 				const frameNum = float( 1 ).div( texel.a );
 				const varianceFactor = getTemporalVarianceFactor( frameNum, this.denoisePower );
@@ -804,7 +793,6 @@ class RecurrentDenoiseNode extends TempNode {
 
 		this._renderTarget.dispose();
 		this._material.dispose();
-		// _blueNoiseTexture is the shared generated texture — not disposed here.
 
 	}
 

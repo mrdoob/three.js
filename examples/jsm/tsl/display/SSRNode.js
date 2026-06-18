@@ -1,6 +1,6 @@
 import { Break, Fn, If, Loop, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, logarithmicDepthToViewZ, luminance, max, min, mix, mul, nodeObject, normalize, orthographicDepthToViewZ, passTexture, perspectiveDepthToViewZ, reference, reflect, sqrt, sub, texture, uniform, uv, vec2, vec3, vec4, viewZToPerspectiveDepth } from 'three/tsl';
 import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, TempNode, Vector2, Vector3 } from 'three/webgpu';
-import { BLUE_NOISE_TEXTURE_SIZE, bindAnalyticNoise, bindBlueNoise, getBlueNoiseTexture } from '../utils/BlueNoise.js';
+import { bindAnalyticNoise } from '../utils/R2Noise.js';
 import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
 import { boxBlur } from './boxBlur.js';
 import ImportanceSampledEnvironment from './ImportanceSampledEnvironment.js';
@@ -358,18 +358,7 @@ class SSRNode extends TempNode {
 		 */
 		this._resolution = uniform( new Vector2() );
 
-		/**
-		 * Noise source. When `true`, uses the shared generated blue-noise texture (best quality);
-		 * when `false`, uses procedural R² noise with the same tile-shift indexing (no texture).
-		 * The blue-noise texture is generated lazily on first use.
-		 *
-		 * @type {UniformNode<bool>}
-		 * @default true
-		 */
-		this.useBlueNoise = uniform( true, 'bool' );
-		this._blueNoiseTextureNode = null;
-		this._blueNoiseSize = uniform( new Vector2( BLUE_NOISE_TEXTURE_SIZE, BLUE_NOISE_TEXTURE_SIZE ) );
-		this._blueNoiseIndex = uniform( 0 );
+		this._noiseIndex = uniform( 0 );
 
 		/**
 		 * CDF-backed environment sampler. Created when {@link setEnvMap} is called.
@@ -597,7 +586,7 @@ class SSRNode extends TempNode {
 		this.setSize( size.width, size.height );
 
 		// Advance the noise index once per frame (matches SSGI / Denoise).
-		this._blueNoiseIndex.value = ( this._blueNoiseIndex.value + 1 ) % 0x7fffffff;
+		this._noiseIndex.value = ( this._noiseIndex.value + 1 ) % 0x7fffffff;
 
 		// clear
 
@@ -701,26 +690,8 @@ class SSRNode extends TempNode {
 
 		};
 
-		const makeNoise = ( seed ) => {
-
-			if ( this._blueNoiseTextureNode === null ) this._blueNoiseTextureNode = texture( getBlueNoiseTexture() );
-
-			const sampleBlueNoise = bindBlueNoise( this._blueNoiseTextureNode, this._resolution, this._blueNoiseSize, seed );
-			const sampleAnalyticNoise = bindAnalyticNoise( this._resolution, seed );
-
-			return Fn( ( [ uvCoord, sampleIndex ] ) => {
-
-				return this.useBlueNoise.equal( true ).select(
-					sampleBlueNoise( uvCoord, sampleIndex ),
-					sampleAnalyticNoise( uvCoord, sampleIndex )
-				);
-
-			} );
-
-		};
-
-		const sampleMarchBlueNoise = makeNoise( 47 );
-		const sampleEnvBlueNoise = this.envImportanceSampling ? makeNoise( 59 ) : null;
+		const sampleMarchNoise = bindAnalyticNoise( this._resolution, 47 );
+		const sampleEnvNoise = this.envImportanceSampling ? bindAnalyticNoise( this._resolution, 59 ) : null;
 
 		const computeScreenBorderFactor = Fn( ( [ uvCoord, borderWidth ] ) => {
 
@@ -750,7 +721,7 @@ class SSRNode extends TempNode {
 
 		const ssr = Fn( () => {
 
-			const blueNoise = sampleMarchBlueNoise( uvNode, this._blueNoiseIndex );
+			const noise = sampleMarchNoise( uvNode, this._noiseIndex );
 			const uvPos = uvNode.toVar();
 
 			const depth = sampleDepth( uvPos ).toVar();
@@ -786,7 +757,7 @@ class SSRNode extends TempNode {
 
 			} else {
 
-				const Xi = blueNoise.toVar();
+				const Xi = noise.toVar();
 				// Mirror-bias: pull `Xi.y` toward the cap top to tighten the GGX lobe and cut mid-roughness
 				// noise. Unbiased — bounded VNDF keeps brdf·cos/pdf ~constant (EA, "Stochastic SSR").
 				Xi.y.assign( mix( Xi.y, 0.0, this.mirrorBias.mul( Xi.w.sqrt() ) ) );
@@ -829,7 +800,7 @@ class SSRNode extends TempNode {
 
 						if ( this.envImportanceSampling ) {
 
-							const Xi2 = sampleEnvBlueNoise( uvNode, this._blueNoiseIndex );
+							const Xi2 = sampleEnvNoise( uvNode, this._noiseIndex );
 							envColor.assign( this._importanceEnvironment.sampleEnvironmentMIS( {
 								cameraWorldMatrix: this._cameraWorldMatrix,
 								viewReflectDir,
@@ -911,7 +882,7 @@ class SSRNode extends TempNode {
 			const hit = float( 0 ).toVar();
 
 			// Per-pixel, per-frame sub-step jitter (∈ [0,1)) so TRAA dissolves step banding.
-			const jitter = isBlurReflection ? 0 : blueNoise.z;
+			const jitter = isBlurReflection ? 0 : noise.z;
 
 			// Reflected-ray view-space Z at ray parameter s ∈ [0,1] (linear in 1/z for perspective),
 			// hoisted so the march and refinement evaluate it identically.
@@ -1150,8 +1121,6 @@ class SSRNode extends TempNode {
 		this._ssrMaterial.dispose();
 		this._blurMaterial.dispose();
 		this._copyMaterial.dispose();
-
-		// _blueNoiseTexture is the shared generated texture — not disposed here.
 
 		if ( this._importanceEnvironment !== null ) {
 

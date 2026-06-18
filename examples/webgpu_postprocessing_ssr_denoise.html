@@ -139,7 +139,6 @@
 				binaryRefine: false,
 				stepExponent: 3,
 				envImportanceSampling: true,
-				useBlueNoise: false,
 				screenEdgeFade: 0.2,
 				screenEdgeFadeBlack: false, // for indoor scenes, set to true
 				environmentIntensity: 3.14, // not too sure why exactly, but multiplying by ~PI makes the env map reflections match Blender more
@@ -164,8 +163,7 @@
 				adaptRadius: 0.5,
 				denoiseAlpha: true,
 				flickerSuppression: 1,
-				adaptiveTrust: 1,
-				useBlueNoise: false
+				adaptiveTrust: 1
 			},
 
 			post: {
@@ -295,7 +293,6 @@
 				envImportanceSampling: params.ssr.envImportanceSampling,
 				binaryRefine: params.ssr.binaryRefine
 			} );
-			ssrNode.useBlueNoise.value = params.ssr.useBlueNoise;
 			ssrNode.setEnvMap( hdrTexture );
 			ssrNode.toInspector( 'SSR' );
 
@@ -378,7 +375,6 @@
 			ssrGui.add( params.ssr, 'maxDistance', 0, 5 ).name( 'max distance' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'intensity', 0, 4 ).name( 'intensity' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'thickness', 0, 0.25 ).name( 'thickness' ).onChange( applyParams );
-			ssrGui.add( params.ssr, 'useBlueNoise' ).name( 'blue noise' ).onChange( () => ( ssrNode.useBlueNoise.value = params.ssr.useBlueNoise ) );
 			ssrGui.add( params.ssr, 'environmentIntensity', 0, 10 ).name( 'env intensity' ).onChange( applyParams );
 			ssrGui.add( params, 'roughness', 0, 1 ).onChange( ( value ) => {
 
@@ -402,7 +398,6 @@
 			denoiseGui.add( params.denoise, 'alphaPhi', 0, 4 ).name( 'ray length phi' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'radius', 0, 15 ).name( 'radius' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'denoisePower', 0.01, 0.5 ).name( 'denoise power' ).onChange( applyParams );
-			denoiseGui.add( params.denoise, 'useBlueNoise' ).name( 'blue noise' ).onChange( () => ( denoiseNode.useBlueNoise.value = params.denoise.useBlueNoise ) );
 
 			// Extra options that are not used in this example
 			// denoiseGui.add( params.denoise, 'adaptRadius', 0, 1 ).name( 'adapt radius' ).onChange( applyParams );
@@ -470,7 +465,6 @@
 				denoiseNode.denoiseAlpha.value = params.denoise.denoiseAlpha;
 				denoiseNode.flickerSuppression.value = params.denoise.flickerSuppression;
 				denoiseNode.adaptiveTrust.value = params.denoise.adaptiveTrust;
-				denoiseNode.useBlueNoise.value = params.denoise.useBlueNoise;
 		
 	}
 
