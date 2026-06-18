@@ -1,12 +1,10 @@
-import { Vector3 } from 'three';
 import { splitDouble } from './splitDouble.js';
 
 /**
  * Splits a Vector3 into high and low precision components.
- *
- * @param {Vector3} v
- * @param {Vector3} high
- * @param {Vector3} low
+ * @param {import('three').Vector3} v
+ * @param {import('three').Vector3} high
+ * @param {import('three').Vector3} low
  */
 export function splitVector3( v, high, low ) {
 
