@@ -80,6 +80,9 @@ export * from './lines/LineSegments2.js';
 export * from './lines/LineSegmentsGeometry.js';
 export * from './lines/Wireframe.js';
 export * from './lines/WireframeGeometry2.js';
+export * from './lines/HighPrecisionLine.js';
+export * from './lines/HighPrecisionLineGeometry.js';
+export * from './lines/HighPrecisionLineMaterial.js';
 
 export * from './loaders/3DMLoader.js';
 export * from './loaders/3MFLoader.js';
