@@ -854,14 +854,15 @@ class TemporalReprojectNode extends TempNode {
 				const confSurf = surfValid.select( surf.get( 'tapConfidence' ), float( 0 ) );
 				const minConfHit = hit.get( 'minConfidence' );
 
-				const reflectionEdgeFactor = stats.get( 'stdDevRayLength' ).pow( 2 ).div( stats.get( 'rayLength' ).pow2().max( EPSILON ) ).toVar();
-				reflectionEdgeFactor.assign( reflectionEdgeFactor.mul( 1.5 ).clamp().oneMinus() );
+				const reflectionEdgeFactor = stats.get( 'stdDevRayLength' ).pow( 2 ).div( stats.get( 'rayLength' ).pow( 2 ).max( EPSILON ) );
+				reflectionEdgeFactor.assign( reflectionEdgeFactor.mul( 10 ).clamp().oneMinus() );
+
 				const curvatureFactor = fwidth( worldNormal.xyz ).length().mul( 50 ).clamp();
 
 				const envProbability = stats.get( 'envProbability' );
 
 				const wHit = minConfHit
-					.mul( envProbability.oneMinus() )
+					.mul( envProbability.pow2().oneMinus() )
 					.mul( reflectionEdgeFactor )
 					.mul( curvatureFactor.oneMinus() )
 					.mul( confHit );
@@ -918,6 +919,7 @@ class TemporalReprojectNode extends TempNode {
 			historyColor.rgb.assign( mix( historyColor.rgb, clippedRGB, clampIntensity ) );
 
 			totalConfidence.mulAssign( exp( originalHistoryColor.sub( clippedRGB ).length().mul( clampIntensity ).mul( 10 ).negate() ) );
+			totalConfidence.mulAssign( mix( float( 1 ), historyTrust.mul( 0.2 ).add( 0.8 ), motionFactor.mul( 100 ).clamp() ) );
 
 			If( totalConfidence.lessThan( EPSILON ), () => {
 
