@@ -327,6 +327,8 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 
 			skinning: object.isSkinnedMesh === true,
 
+			hasPositionAttribute: geometry.attributes.position !== undefined,
+
 			morphTargets: geometry.morphAttributes.position !== undefined,
 			morphNormals: geometry.morphAttributes.normal !== undefined,
 			morphColors: geometry.morphAttributes.color !== undefined,
@@ -588,6 +590,8 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			_programLayers.enable( 21 );
 		if ( parameters.numLightProbeGrids > 0 )
 			_programLayers.enable( 22 );
+		if ( parameters.hasPositionAttribute )
+			_programLayers.enable( 23 );
 
 		array.push( _programLayers.mask );
 
