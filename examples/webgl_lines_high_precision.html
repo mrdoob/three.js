@@ -76,12 +76,12 @@
 			// Orbit Points
 			//
 
-			const points = [];
+			const positions = [];
 
 			for (let i = 0; i <= SEGMENTS; i++) {
 				const angle = (i / SEGMENTS) * Math.PI * 2;
 
-				points.push(
+				positions.push(
 					Math.cos(angle) * ORBIT_RADIUS,
 					0,
 					Math.sin(angle) * ORBIT_RADIUS,
@@ -96,7 +96,7 @@
 
 			normalGeometry.setAttribute(
 				"position",
-				new THREE.Float32BufferAttribute(points, 3),
+				new THREE.Float32BufferAttribute(positions, 3),
 			);
 
 			const normalMaterial = new THREE.LineBasicMaterial({
@@ -110,8 +110,14 @@
 			//
 
 			const highPrecisionGeometry = new HighPrecisionLineGeometry({
-				points,
+				positions,
 			});
+
+			// Or set after creation:
+			// highPrecisionGeometry.setFromPositions( positions );
+
+			// Or create from a Vector3 array:
+			// highPrecisionGeometry.setFromPoints( points );
 
 			const highPrecisionMaterial = new HighPrecisionLineMaterial({
 				color: 0x00ff00,

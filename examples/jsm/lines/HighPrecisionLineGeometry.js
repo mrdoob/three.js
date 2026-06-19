@@ -12,7 +12,7 @@ export class HighPrecisionLineGeometry extends BufferGeometry {
 
 	/**
 	 * @param {Object} [parameters]
-	 * @param {Array<number>} [parameters.points]
+	 * @param {Array<number>} [parameters.positions]
 	 * Flat array of xyz coordinates:
 	 * [ x1, y1, z1, x2, y2, z2, ... ]
 	 * @param {Float32Array} [parameters.positionsHigh]
@@ -22,7 +22,7 @@ export class HighPrecisionLineGeometry extends BufferGeometry {
 
 		super();
 
-		const { points, positionsHigh, positionsLow } = parameters;
+		const { positions, positionsHigh, positionsLow } = parameters;
 
 		if ( positionsHigh && positionsLow ) {
 
@@ -37,9 +37,9 @@ export class HighPrecisionLineGeometry extends BufferGeometry {
 			this.setPositionsHigh( positionsHigh );
 			this.setPositionsLow( positionsLow );
 
-		} else if ( points ) {
+		} else if ( positions !== undefined ) {
 
-			this.setFromPoints( points );
+			this.setFromPositions( positions );
 
 		}
 
@@ -56,29 +56,54 @@ export class HighPrecisionLineGeometry extends BufferGeometry {
 
 	/**
 	 * Creates split high/low precision position buffers
-	 * from a flat array of xyz coordinates.
+	 * from an array of Vector2 or Vector3 points.
 	 *
-	 * @param {Array<number>} points
+	 * This method mirrors BufferGeometry.setFromPoints()
+	 * for API compatibility with existing Three.js geometry
+	 * workflows.
+	 *
+	 * @param {Array<import("three").Vector2|import("three").Vector3>} points
 	 * @return {HighPrecisionLineGeometry}
 	 */
 	setFromPoints( points ) {
 
-		if ( points.length % 3 !== 0 ) {
+		const positions = [];
+
+		for ( const point of points ) {
+
+			positions.push( point.x, point.y, point.z ?? 0 );
+
+		}
+
+		return this.setFromPositions( positions );
+
+	}
+
+	/**
+	 * Creates split high/low precision position buffers
+	 * from a flat array of xyz coordinates.
+	 *
+	 * @param {Array<number>} positions
+	 * @return {HighPrecisionLineGeometry}
+	 */
+	setFromPositions( positions ) {
+
+		if ( positions.length % 3 !== 0 ) {
 
 			throw new Error(
-				'HighPrecisionLineGeometry: points array length must be divisible by 3.',
+				'HighPrecisionLineGeometry: positions array length must be divisible by 3.',
 			);
 
 		}
 
-		const positionsHigh = new Float32Array( points.length );
-		const positionsLow = new Float32Array( points.length );
+		const positionsHigh = new Float32Array( positions.length );
+		const positionsLow = new Float32Array( positions.length );
 
-		for ( let i = 0; i < points.length; i += 3 ) {
+		for ( let i = 0; i < positions.length; i += 3 ) {
 
-			const [ hx, lx ] = splitDouble( points[ i ] );
-			const [ hy, ly ] = splitDouble( points[ i + 1 ] );
-			const [ hz, lz ] = splitDouble( points[ i + 2 ] );
+			const [ hx, lx ] = splitDouble( positions[ i ] );
+			const [ hy, ly ] = splitDouble( positions[ i + 1 ] );
+			const [ hz, lz ] = splitDouble( positions[ i + 2 ] );
 
 			positionsHigh[ i ] = hx;
 			positionsHigh[ i + 1 ] = hy;
