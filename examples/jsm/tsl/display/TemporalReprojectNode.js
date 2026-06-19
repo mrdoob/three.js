@@ -911,13 +911,13 @@ class TemporalReprojectNode extends TempNode {
 				this.flickerSuppression
 			).toVar();
 
-			const clampIntensity = this.clampIntensity.mul( motionFactor.mul( 20 ) ).mul(
+			const clampIntensity = this.clampIntensity.mul( max( motionFactor.mul( 20 ), 0.1 ) ).mul(
 				float( 1 ).add( stretchConfidence.oneMinus().add( historyTrust.oneMinus() ).clamp() )
 			);
 			const originalHistoryColor = vec3( historyColor.rgb );
 			historyColor.rgb.assign( mix( historyColor.rgb, clippedRGB, clampIntensity ) );
 
-			totalConfidence.mulAssign( exp( originalHistoryColor.sub( clippedRGB ).length().mul( clampIntensity ).mul( 8 ).negate() ) );
+			totalConfidence.mulAssign( exp( originalHistoryColor.sub( clippedRGB ).length().mul( clampIntensity ).mul( 10 ).negate() ) );
 
 			If( totalConfidence.lessThan( EPSILON ), () => {
 

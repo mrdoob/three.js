@@ -372,6 +372,7 @@
 			ssrGui.add( params.ssr, 'quality', 0, 1 ).name( 'quality' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'mirrorBias', 0, 1 ).name( 'mirror bias' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'stepExponent', 1, 4, 0.5 ).name( 'step exponent' ).onChange( applyParams );
+			ssrGui.add( params.ssr, 'binaryRefine' ).name( 'binary refine' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'maxDistance', 0, 5 ).name( 'max distance' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'intensity', 0, 4 ).name( 'intensity' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'thickness', 0, 0.25 ).name( 'thickness' ).onChange( applyParams );
@@ -434,9 +435,10 @@
 			ssrNode.resolutionScale = params.ssr.resolutionScale;
 			ssrNode.quality.value = params.ssr.quality;
 			ssrNode.mirrorBias.value = params.ssr.mirrorBias;
-			// stepExponent / screenEdgeFadeBlack are build-time constants: assigning them recompiles
-			// the SSR material (the setters no-op when the value is unchanged).
+			// stepExponent / screenEdgeFadeBlack / binaryRefine are build-time constants: assigning
+			// them recompiles the SSR material (the setters no-op when the value is unchanged).
 			ssrNode.stepExponent = params.ssr.stepExponent;
+			ssrNode.binaryRefine = params.ssr.binaryRefine;
 			ssrNode.maxDistance.value = params.ssr.maxDistance;
 			ssrNode.intensity.value = params.ssr.intensity;
 			ssrNode.thickness.value = params.ssr.thickness;

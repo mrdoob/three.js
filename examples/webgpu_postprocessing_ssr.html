@@ -60,6 +60,7 @@
 			maxDistance: 1,
 			intensity: 1,
 			thickness: 0.03,
+			binaryRefine: false,
 			roughness: 1,
 			enabled: true
 		};
@@ -206,6 +207,7 @@
 			ssrFolder.add( params, 'maxDistance', 0, 1 ).onChange( updateParameters );
 			ssrFolder.add( params, 'intensity', 0, 1 ).onChange( updateParameters );
 			ssrFolder.add( params, 'thickness', 0, 0.05 ).onChange( updateParameters );
+			ssrFolder.add( params, 'binaryRefine' ).name( 'binary refine' ).onChange( updateParameters );
 			ssrFolder.add( params, 'enabled' ).onChange( () => {
 
 				if ( params.enabled === true ) {
@@ -243,10 +245,14 @@
 		function updateParameters() {
 
 			ssrPass.quality.value = params.quality;
-			ssrPass.blurQuality.value = params.blurQuality;
+			// blurQuality is a build-time constant: assigning it recompiles the blur material
+			// (the setter no-ops when the value is unchanged).
+			ssrPass.blurQuality = params.blurQuality;
 			ssrPass.maxDistance.value = params.maxDistance;
 			ssrPass.intensity.value = params.intensity;
 			ssrPass.thickness.value = params.thickness;
+			// build-time constant: assigning it recompiles the SSR material (setter no-ops if unchanged)
+			ssrPass.binaryRefine = params.binaryRefine;
 
 		}
 
