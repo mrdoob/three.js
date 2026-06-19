@@ -138,7 +138,7 @@
 				maxLuminance: 35,
 				binaryRefine: false,
 				stepExponent: 3,
-				envImportanceSampling: true,
+				envImportanceSampling: false,
 				screenEdgeFade: 0.2,
 				screenEdgeFadeBlack: false, // for indoor scenes, set to true
 				environmentIntensity: 3.14, // not too sure why exactly, but multiplying by ~PI makes the env map reflections match Blender more
@@ -157,10 +157,10 @@
 				depthPhi: 25,
 				normalPhi: 0,
 				roughnessPhi: 100,
-				radius: 9,
-				alphaPhi: 1,
-				denoisePower: 0.18,
-				adaptRadius: 0.5,
+				radius: 8,
+				alphaPhi: 1.75,
+				denoisePower: 0.3,
+				radiusAdapt: 0.5,
 				denoiseAlpha: true,
 				flickerSuppression: 1,
 				adaptiveTrust: 1
@@ -329,10 +329,10 @@
 
 			const litColor = scenePassColor.rgb.add( denoisePassBlend.rgb );
 
-			bloomPass = bloom( vec4( litColor, 1 ), params.post.bloom.strength, params.post.bloom.radius, params.post.bloom.threshold );
-			bloomPass.toInspector( 'Bloom' );
+			// bloomPass = bloom( vec4( litColor, 1 ), params.post.bloom.strength, params.post.bloom.radius, params.post.bloom.threshold );
+			// bloomPass.toInspector( 'Bloom' );
 
-			const outputNode = vec4( litColor.add( bloomPass.rgb.mul( bloomEnabledUniform ) ), 1 );
+			const outputNode = vec4( litColor, 1 );
 			outputNode.toInspector( 'Combined SSR' );
 			combinedOutputNode = outputNode;
 
@@ -395,12 +395,12 @@
 			// We have uniform roughness in the scene, so we don't need to adjust the roughness phi
 			// denoiseGui.add( params.denoise, 'roughnessPhi', 0, 500 ).name( 'roughness phi' ).onChange( applyParams );
 
-			denoiseGui.add( params.denoise, 'alphaPhi', 0, 4 ).name( 'ray length phi' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'alphaPhi', 0, 10 ).name( 'ray length phi' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'radius', 0, 15 ).name( 'radius' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'denoisePower', 0.01, 0.5 ).name( 'denoise power' ).onChange( applyParams );
 
 			// Extra options that are not used in this example
-			// denoiseGui.add( params.denoise, 'adaptRadius', 0, 1 ).name( 'adapt radius' ).onChange( applyParams );
+			// denoiseGui.add( params.denoise, 'radiusAdapt', 0, 1 ).name( 'adapt radius' ).onChange( applyParams );
 			// denoiseGui.add( params.denoise, 'denoiseAlpha' ).name( 'denoise alpha' ).onChange( applyParams );
 			// denoiseGui.add( params.denoise, 'flickerSuppression', 0, 1 ).name( 'flicker suppression' ).onChange( applyParams );
 			// denoiseGui.add( params.denoise, 'adaptiveTrust', 0, 1 ).name( 'adaptive trust' ).onChange( applyParams );
@@ -461,11 +461,11 @@
 				denoiseNode.radius.value = params.denoise.enabled ? params.denoise.radius : 0;
 				denoiseNode.alphaPhi.value = params.denoise.alphaPhi;
 				denoiseNode.denoisePower.value = params.denoise.denoisePower;
-				denoiseNode.adaptRadius.value = params.denoise.adaptRadius;
+				denoiseNode.radiusAdapt.value = params.denoise.radiusAdapt;
 				denoiseNode.denoiseAlpha.value = params.denoise.denoiseAlpha;
 				denoiseNode.flickerSuppression.value = params.denoise.flickerSuppression;
 				denoiseNode.adaptiveTrust.value = params.denoise.adaptiveTrust;
-		
+
 	}
 
 		}

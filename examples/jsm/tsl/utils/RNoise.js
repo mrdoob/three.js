@@ -33,7 +33,7 @@ export function bindAnalyticNoise( resolution, seed = 0 ) {
 		const index = int( sampleIndex ).add( seedOffset );
 		const noise = vec4().toVar();
 
-		const tileSize = float( 64 );
+		const tileSize = float( 32 );
 
 		const screenPixel = uvCoord.mul( resolution ).floor();
 		const offset = fract( vec2(

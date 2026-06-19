@@ -1,6 +1,6 @@
 import { abs, convertToTexture, cos, cross, Discard, dot, EPSILON, exp, float, Fn, getScreenPosition, getViewPosition, If, int, log, Loop, luminance, mat2, mix, nodeObject, NodeUpdateType, normalize, passTexture, PI, property, reflect, sin, smoothstep, sqrt, tan, texture, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4 } from 'three/tsl';
 import { HalfFloatType, MathUtils, Matrix4, NodeMaterial, QuadMesh, RendererUtils, RenderTarget, TempNode, Vector2 } from 'three/webgpu';
-import { bindAnalyticNoise } from '../utils/R2Noise.js';
+import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -329,7 +329,7 @@ class RecurrentDenoiseNode extends TempNode {
 		this.alphaPhi = uniform( 1 );
 		this.roughnessPhi = uniform( 100 );
 		this.diffusePhi = uniform( 100 );
-		this.adaptRadius = uniform( 0.95 );
+		this.radiusAdapt = uniform( 0.95 );
 		this.denoiseAlpha = uniform( true, 'bool' );
 		this.denoisePower = uniform( 0.25 );
 		this.maxFrames = uniform( 32 );
@@ -729,7 +729,7 @@ class RecurrentDenoiseNode extends TempNode {
 					} );
 
 					// Feedback to shrink radius based on the weight
-					radiusShrink.assign( mix( radiusShrink, w, this.adaptRadius ) );
+					radiusShrink.assign( mix( radiusShrink, w, this.radiusAdapt ) );
 
 
 				} );

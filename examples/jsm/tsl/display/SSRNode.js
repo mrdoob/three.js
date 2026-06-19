@@ -1,6 +1,6 @@
-import { Break, Fn, If, Loop, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, logarithmicDepthToViewZ, luminance, max, min, mix, mul, nodeObject, normalize, orthographicDepthToViewZ, passTexture, perspectiveDepthToViewZ, reference, reflect, sqrt, sub, texture, uniform, uv, vec2, vec3, vec4, viewZToPerspectiveDepth } from 'three/tsl';
+import { Break, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, floor, getScreenPosition, getViewPosition, int, logarithmicDepthToViewZ, luminance, max, min, mix, mul, nodeObject, normalize, orthographicDepthToViewZ, passTexture, perspectiveDepthToViewZ, reference, reflect, sqrt, sub, texture, trunc, uniform, uv, vec2, vec3, vec4, viewZToPerspectiveDepth } from 'three/tsl';
 import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, TempNode, Vector2, Vector3 } from 'three/webgpu';
-import { bindAnalyticNoise } from '../utils/R2Noise.js';
+import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
 import { boxBlur } from './boxBlur.js';
 import ImportanceSampledEnvironment from './ImportanceSampledEnvironment.js';
@@ -691,7 +691,6 @@ class SSRNode extends TempNode {
 		};
 
 		const sampleMarchNoise = bindAnalyticNoise( this._resolution, 47 );
-		const sampleEnvNoise = this.envImportanceSampling ? bindAnalyticNoise( this._resolution, 59 ) : null;
 
 		const computeScreenBorderFactor = Fn( ( [ uvCoord, borderWidth ] ) => {
 
@@ -800,7 +799,7 @@ class SSRNode extends TempNode {
 
 						if ( this.envImportanceSampling ) {
 
-							const Xi2 = sampleEnvNoise( uvNode, this._noiseIndex );
+							const Xi2 = bindAnalyticNoise( this._resolution, 59 );
 							envColor.assign( this._importanceEnvironment.sampleEnvironmentMIS( {
 								cameraWorldMatrix: this._cameraWorldMatrix,
 								viewReflectDir,
@@ -869,7 +868,8 @@ class SSRNode extends TempNode {
 
 			// Fixed step count for all pixels (bounded iteration, coherent control flow). `quality`
 			// (0..1) maps to the count; each step spans the whole ray as rayVec / totalStep.
-			const totalStep = int( this.quality.clamp().mul( MAX_STEPS ) ).max( int( 1 ) ).toConst();
+			const totalStep = this.quality.clamp().mul( MAX_STEPS ).max( int( 1 ) ).toConst();
+			// const totalStep = trunc( max( abs( xLen ), abs( yLen ) ).mul( this.quality.clamp() ) ).toConst();
 
 			const xSpan = xLen.div( totalStep ).toVar();
 			const ySpan = yLen.div( totalStep ).toVar();
@@ -894,12 +894,12 @@ class SSRNode extends TempNode {
 				: ( sVal ) => viewPosition.z.add( sVal.mul( d1viewPosition.z.sub( viewPosition.z ) ) );
 
 			// Screen-space position along the ray for a given s ∈ [0,1].
-			const screenPosAt = ( sVal ) => d0.add( stepVec.mul( sVal.mul( float( totalStep ) ) ) );
+			const screenPosAt = ( sVal ) => d0.add( stepVec.mul( sVal.mul( totalStep ) ) );
 
 			// Ray parameter s ∈ [0,1] for step `idx`: an exponential remap `(idx/steps)^stepExponent`
 			// concentrates samples near the origin, floored to ≥1 texel/step. `jitter` dissolves banding.
 			const sampleFraction = ( idx ) => max(
-				idx.add( jitter ).div( float( totalStep ) ).pow( this.stepExponent ),
+				idx.add( jitter ).div( totalStep ).pow( this.stepExponent ),
 				idx.add( 1 ).div( rayLen )
 			);
 
