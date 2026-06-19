@@ -1,4 +1,4 @@
-import { abs, convertToTexture, cos, cross, Discard, dot, EPSILON, exp, float, Fn, getScreenPosition, getViewPosition, If, int, log, Loop, luminance, mat2, mix, nodeObject, NodeUpdateType, normalize, passTexture, PI, property, reflect, sin, smoothstep, sqrt, step, tan, texture, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4 } from 'three/tsl';
+import { abs, atan, bool, convertToTexture, cos, cross, Discard, dot, EPSILON, exp, float, Fn, getScreenPosition, getViewPosition, If, int, log, Loop, luminance, mat2, max, mix, nodeObject, NodeUpdateType, normalize, passTexture, PI, property, reflect, sin, smoothstep, sqrt, tan, texture, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4 } from 'three/tsl';
 import { HalfFloatType, MathUtils, Matrix4, NodeMaterial, QuadMesh, RendererUtils, RenderTarget, TempNode, Vector2 } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
@@ -11,10 +11,6 @@ let _rendererState;
 const KERNEL_SAMPLES = 8;
 const NOISE_ROTATION_SEED = 83;
 const WORLD_RADIUS_SCALE = 0.1;
-
-const NORMAL_WEIGHT_EDGE_MIN = 0.9;
-const NORMAL_WEIGHT_EDGE_MAX = 0.99;
-const NORMAL_DOT_SMOOTHSTEP_MAX = 0.999;
 
 const AO_EDGE_STOPPING_BIAS = 0.05;
 const AGGRESSIVITY_RADIUS_MIN = 0.001;
@@ -137,7 +133,7 @@ const computeHitDistFactor = Fn( ( [ worldRayLength, viewZ, tanHalfFovY ] ) => {
 	const frustumSize = computeFrustumSize( viewZ, tanHalfFovY );
 	const factor = worldRayLength.div( frustumSize.max( 1e-6 ) ).clamp( 0, 1 );
 
-	return worldRayLength.lessThan( 0.0001 ).select( float( 1 ), factor.mul( 0.1 ) );
+	return factor;
 
 } ).setLayout( {
 	name: 'computeHitDistFactor',
@@ -172,6 +168,82 @@ const getSpecularDominantDirection = Fn( ( [ N, V, roughness ] ) => {
 		{ name: 'N', type: 'vec3' },
 		{ name: 'V', type: 'vec3' },
 		{ name: 'roughness', type: 'float' }
+	]
+} );
+
+/**
+ * GGX inverse-CDF: half-angle tangent enclosing `percent` of the specular lobe volume.
+ * `roughness` is perceptual (alpha = roughness²).
+ *
+ * @tsl
+ */
+const specularLobeTanHalfAngle = Fn( ( [ roughness, percent ] ) => {
+
+	const alpha = roughness.mul( roughness );
+	return alpha.mul( sqrt( percent.div( float( 1 ).sub( percent ).max( 1e-6 ) ) ) );
+
+} ).setLayout( {
+	name: 'specularLobeTanHalfAngle',
+	type: 'float',
+	inputs: [
+		{ name: 'roughness', type: 'float' },
+		{ name: 'percent', type: 'float' }
+	]
+} );
+
+const EXP_WEIGHT_SCALE = 4;
+const NORMAL_ENCODING_ERROR = 1.5 / 255;
+
+/**
+ * Loop-invariant part of the adaptive normal edge-stopping weight: the Gaussian falloff
+ * constant `2·EXP_WEIGHT_SCALE / lobeHalfAngle²`. `roughness`/`aggressivity`/`invNormalPhi`
+ * are constant across the kernel, so this is hoisted out of the tap loop and evaluated once
+ * per pixel. Lobe half-angle from REBLUR (NRD).
+ *
+ * @tsl
+ */
+const lobeNormalFalloff = Fn( ( [ roughness, aggressivity, invNormalPhi ] ) => {
+
+	const percent = mix( float( 0.925 ), invNormalPhi, aggressivity );
+	const tanHalfAngle = specularLobeTanHalfAngle( roughness, percent );
+	const lobeHalfAngle = max( atan( tanHalfAngle ), float( NORMAL_ENCODING_ERROR ) );
+
+	const invHalfAngle = float( 1 ).div( lobeHalfAngle );
+	return invHalfAngle.mul( invHalfAngle ).mul( 2 * EXP_WEIGHT_SCALE );
+
+} ).setLayout( {
+	name: 'lobeNormalFalloff',
+	type: 'float',
+	inputs: [
+		{ name: 'roughness', type: 'float' },
+		{ name: 'aggressivity', type: 'float' },
+		{ name: 'invNormalPhi', type: 'float' }
+	]
+} );
+
+/**
+ * Adaptive lobe normal edge-stopping weight
+ *
+ * Evaluated entirely in cosine space: with `angle² ≈ 2(1 − cosθ)`, the original
+ * `exp( −SCALE·angle/halfAngle )` becomes a Gaussian `exp( falloff·(cosθ − 1) )`, so a
+ * single `exp` replaces the per-tap `acos`. Matches the original at the half-angle for
+ * narrow lobes and is slightly more permissive for wide (diffuse) ones.
+ *
+ * @tsl
+ */
+const lobeNormalWeight = Fn( ( [ viewNormal, nNormalV, lobeFalloff ] ) => {
+
+	const cosA = dot( viewNormal, nNormalV );
+
+	return exp( cosA.sub( 1 ).mul( lobeFalloff ) );
+
+} ).setLayout( {
+	name: 'lobeNormalWeight',
+	type: 'float',
+	inputs: [
+		{ name: 'viewNormal', type: 'vec3' },
+		{ name: 'nNormalV', type: 'vec3' },
+		{ name: 'lobeFalloff', type: 'float' }
 	]
 } );
 
@@ -460,6 +532,7 @@ class RecurrentDenoiseNode extends TempNode {
 			const meanLuma = float( 0 ).toVar();
 			const m2Luma = float( 0 ).toVar();
 			const lumaCount = float( 0 ).toVar();
+			const hasEnvRay = bool( false ).toVar();
 
 			// 4-tap cross (pre-sampled center + 4 axis neighbors) instead of a full 3×3 — about half the fetches.
 			// The center tap reuses the caller's already-sampled raw texel.
@@ -475,6 +548,7 @@ class RecurrentDenoiseNode extends TempNode {
 					If( sampleRl.greaterThan( ENV_RAY_LENGTH_THRESHOLD ), () => {
 
 						sampleRl.assign( 0.25 );
+						hasEnvRay.assign( true );
 
 					} );
 					const w = float( 1 ).div( sampleRl.add( 0.001 ) );
@@ -505,11 +579,11 @@ class RecurrentDenoiseNode extends TempNode {
 			const stddevLuma = sqrt( m2Luma.div( lumaCount.max( 1 ) ) );
 
 			// vec3( avgRayLength, meanLuma, stddevLuma )
-			return vec3( avgRayLength, meanLuma, stddevLuma );
+			return vec4( avgRayLength, meanLuma, stddevLuma, hasEnvRay.toFloat() );
 
 		} ).setLayout( {
 			name: 'getNeighborhoodStats',
-			type: 'vec3',
+			type: 'vec4',
 			inputs: [
 				{ name: 'uvCoord', type: 'vec2' },
 				{ name: 'centerSample', type: 'vec4' }
@@ -545,6 +619,7 @@ class RecurrentDenoiseNode extends TempNode {
 				const rl = float( 1 ).toVar();
 				const nbhdMeanLuma = float( 0 ).toVar();
 				const nbhdStddevLuma = float( 0 ).toVar();
+				const hasEnvRay = bool( false ).toVar();
 
 				if ( this.alphaSource === 'raylength' ) {
 
@@ -552,6 +627,7 @@ class RecurrentDenoiseNode extends TempNode {
 					rl.assign( stats.x );
 					nbhdMeanLuma.assign( stats.y );
 					nbhdStddevLuma.assign( stats.z );
+					hasEnvRay.assign( stats.w.greaterThan( 0.5 ) );
 
 				} else {
 
@@ -638,13 +714,10 @@ class RecurrentDenoiseNode extends TempNode {
 				const centerDiffuse = sampleDiffuse( uvCoord ).toConst();
 				const radiusShrink = float( 1 ).toVar();
 
-				// Loop-invariant edge-stopping factors (hoisted out of the kernel loop).
-				const normalWInterp = frameNum.div( this.maxFrames ).pow( this.normalPhi.oneMinus().max( 1e-4 ) );
-				const normalWeightEdge = mix( NORMAL_WEIGHT_EDGE_MIN, NORMAL_WEIGHT_EDGE_MAX, normalWInterp.mul( viewNormal.z.abs() ) ).clamp();
-
 				const depthWeightScale = this.depthPhi.mul( mix( 1, 100, aggressivity ) ).div( viewNormal.z.abs() );
 
-				const recipViewZ = float( 1 ).div( viewZ ).toConst();
+				// Lobe geometry depends only on per-pixel terms, so compute its falloff constant once here.
+				const lobeFalloff = lobeNormalFalloff( roughness, aggressivity, this.normalPhi.oneMinus() ).toConst();
 
 				Loop( { start: int( 0 ), end: int( KERNEL_SAMPLES ), type: 'int', condition: '<', name: 'i' }, ( { i } ) => {
 
@@ -695,9 +768,10 @@ class RecurrentDenoiseNode extends TempNode {
 						const neighborHitDistFactor = computeHitDistFactor( rawNeighborColor.a, nViewZ, tanHalfFovY );
 						const hdfDiff = hitDistFactor.sub( neighborHitDistFactor ).abs();
 
-						const rayLengthFactor = hdfDiff.mul( this.alphaPhi ).mul( 20 ).div( viewPosition.z.abs() );
+						const rayLengthFactor = hdfDiff.mul( this.alphaPhi ).div( viewPosition.z.abs() );
 
-						kernelDiff.addAssign( rayLengthFactor );
+						// Env rays are harder to compare so we accept if this sample is an env ray and there is an env ray in the neighborhood
+						kernelDiff.addAssign( rawNeighborColor.a.greaterThan( ENV_RAY_LENGTH_THRESHOLD ).and( hasEnvRay ).select( 1, rayLengthFactor ) );
 
 					}
 
@@ -707,11 +781,10 @@ class RecurrentDenoiseNode extends TempNode {
 					const nViewNormal = sampleNormal( sampleUv );
 					const nWorldNormal = nViewNormal.transformDirection( this._viewMatrix ).toConst();
 					const distToPlane = viewSpacePlaneDistance( viewPosition, nViewPosition, nViewNormal );
-					const normalDot = dot( worldNormal, nWorldNormal ).pow( recipViewZ ).max( 0 );
 
 					// Geometric edge stopping (depth and normal)
 					const depthW = distToPlane.mul( depthWeightScale );
-					const normalW = smoothstep( normalWeightEdge, NORMAL_DOT_SMOOTHSTEP_MAX, normalDot );
+					const normalW = lobeNormalWeight( worldNormal, nWorldNormal, lobeFalloff );
 
 					// Sum every negative-exponent edge-stopping term (kernel + depth/plane, plus the SSR hit-distance term)
 					const w = exp( kernelDiff.mul( aggressivity ).add( depthW ).negate() ).mul( normalW ).toVar();
