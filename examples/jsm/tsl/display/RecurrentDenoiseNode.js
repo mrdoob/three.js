@@ -76,12 +76,12 @@ const diffuseColorDistance = Fn( ( [ a, b, compressLuma ] ) => {
 	]
 } );
 
-const _temporalWeight = Fn( ( [ x, denoisePower ] ) => float( 1 ).div( x.pow( denoisePower ) ) ).setLayout( {
+const _temporalWeight = Fn( ( [ x, strength ] ) => float( 1 ).div( x.pow( strength ) ) ).setLayout( {
 	name: 'temporalWeight',
 	type: 'float',
 	inputs: [
 		{ name: 'x', type: 'float' },
-		{ name: 'denoisePower', type: 'float' }
+		{ name: 'strength', type: 'float' }
 	]
 } );
 
@@ -90,16 +90,16 @@ const _temporalWeight = Fn( ( [ x, denoisePower ] ) => float( 1 ).div( x.pow( de
  *
  * @tsl
  */
-const getTemporalVarianceFactor = Fn( ( [ frameNum, denoisePower ] ) => {
+const getTemporalVarianceFactor = Fn( ( [ frameNum, strength ] ) => {
 
-	return _temporalWeight( frameNum, denoisePower ).max( 0.05 );
+	return _temporalWeight( frameNum, strength ).max( 0.05 );
 
 } ).setLayout( {
 	name: 'getTemporalVarianceFactor',
 	type: 'float',
 	inputs: [
 		{ name: 'frameNum', type: 'float' },
-		{ name: 'denoisePower', type: 'float' }
+		{ name: 'strength', type: 'float' }
 	]
 } );
 
@@ -252,17 +252,17 @@ const lobeNormalWeight = Fn( ( [ viewNormal, nNormalV, lobeFalloff ] ) => {
  *
  * @tsl
  */
-const viewSpacePlaneDistance = Fn( ( [ viewPosition, nViewPosition, viewNormal ] ) => {
+const planeDistance = Fn( ( [ position, nPosition, normal ] ) => {
 
-	return abs( dot( viewPosition.sub( nViewPosition ), viewNormal ) );
+	return abs( dot( position.sub( nPosition ), normal ) );
 
 } ).setLayout( {
-	name: 'viewSpacePlaneDistance',
+	name: 'planeDistance',
 	type: 'float',
 	inputs: [
-		{ name: 'viewPosition', type: 'vec3' },
-		{ name: 'nViewPosition', type: 'vec3' },
-		{ name: 'viewNormal', type: 'vec3' },
+		{ name: 'position', type: 'vec3' },
+		{ name: 'nPosition', type: 'vec3' },
+		{ name: 'normal', type: 'vec3' },
 	]
 } );
 
@@ -401,8 +401,8 @@ class RecurrentDenoiseNode extends TempNode {
 		this.roughnessPhi = uniform( 100 );
 		this.diffusePhi = uniform( 100 );
 		this.radiusAdapt = uniform( 0.95 );
-		this.denoiseAlpha = uniform( true, 'bool' );
-		this.denoisePower = uniform( 0.25 );
+		this.smoothDisocclusions = uniform( true, 'bool' );
+		this.strength = uniform( 0.25 );
 		this.maxFrames = uniform( 32 );
 
 		/**
@@ -595,11 +595,12 @@ class RecurrentDenoiseNode extends TempNode {
 			const result = property( 'vec4' );
 
 			const depth = sampleDepth( uvCoord ).toConst();
-			const viewNormal = sampleNormal( uvCoord ).toConst();
-			const worldNormal = viewNormal.transformDirection( this._viewMatrix ).toConst();
-			const texel = sampleTexture( uvCoord ).max( 0 ).toConst();
 
 			const runDenoise = () => {
+
+				const viewNormal = sampleNormal( uvCoord ).toConst();
+				const worldNormal = viewNormal.transformDirection( this._viewMatrix ).toConst();
+				const texel = sampleTexture( uvCoord ).max( 0 ).toConst();
 
 				const viewPosition = getViewPosition( uvCoord, depth, this._cameraProjectionMatrixInverse ).toConst();
 				const roughnessMetalness = sampleRoughnessMetalness( uvCoord ).toConst();
@@ -610,7 +611,7 @@ class RecurrentDenoiseNode extends TempNode {
 				const rotationMatrix = noiseRotationMatrix( noiseTexel.r );
 
 				const frameNum = float( 1 ).div( texel.a );
-				const varianceFactor = getTemporalVarianceFactor( frameNum, this.denoisePower );
+				const varianceFactor = getTemporalVarianceFactor( frameNum, this.strength.oneMinus() );
 				const aggressivity = varianceFactor.oneMinus();
 
 				const raw = sampleRaw( uvCoord ).toConst();
@@ -714,7 +715,7 @@ class RecurrentDenoiseNode extends TempNode {
 				const centerDiffuse = sampleDiffuse( uvCoord ).toConst();
 				const radiusShrink = float( 1 ).toVar();
 
-				const depthWeightScale = this.depthPhi.mul( mix( 1, 100, aggressivity ) ).div( viewNormal.z.abs() );
+				const depthWeightScale = this.depthPhi.mul( 500 ).mul( viewNormal.z.abs() ).div( viewPosition.z.abs() );
 
 				// Lobe geometry depends only on per-pixel terms, so compute its falloff constant once here.
 				const lobeFalloff = lobeNormalFalloff( roughness, aggressivity, this.normalPhi.oneMinus() ).toConst();
@@ -779,15 +780,15 @@ class RecurrentDenoiseNode extends TempNode {
 					if ( this.mode === 'specular' ) kernelDiff.addAssign( ( abs( roughness.sub( sampleRoughnessMetalness( sampleUv ).g ) ).mul( this.roughnessPhi ) ) );
 
 					const nViewNormal = sampleNormal( sampleUv );
-					const nWorldNormal = nViewNormal.transformDirection( this._viewMatrix ).toConst();
-					const distToPlane = viewSpacePlaneDistance( viewPosition, nViewPosition, nViewNormal );
+					const nWorldNormal = nViewNormal.transformDirection( this._viewMatrix );
+					const distToPlane = planeDistance( viewPosition, nViewPosition, viewNormal );
 
 					// Geometric edge stopping (depth and normal)
-					const depthW = distToPlane.mul( depthWeightScale );
+					const depthDiff = distToPlane.mul( depthWeightScale );
 					const normalW = lobeNormalWeight( worldNormal, nWorldNormal, lobeFalloff );
 
 					// Sum every negative-exponent edge-stopping term (kernel + depth/plane, plus the SSR hit-distance term)
-					const w = exp( kernelDiff.mul( aggressivity ).add( depthW ).negate() ).mul( normalW ).toVar();
+					const w = exp( kernelDiff.mul( aggressivity ).add( depthDiff ).negate() ).mul( normalW ).toVar();
 
 					// to mitigate the effect of fireflies and high variance in recently disoccluded regions, we weigh by the inverse luminance for the first 4 frames
 					// if ( this.mode === 'diffuse' ) w.mulAssign( mix( float( 1 ).div( luminance( neighborColor.rgb ).max( 1e-4 ) ), 1, frameNum.div( 4 ).min( 1 ) ) );
@@ -799,7 +800,7 @@ class RecurrentDenoiseNode extends TempNode {
 					totalWeight.addAssign( w );
 
 					// Denoising the alpha (accumulation speed), to get smoother disocclusion transitions
-					If( this.denoiseAlpha, () => {
+					If( this.smoothDisocclusions, () => {
 
 						const neighborAWeight = neighborColor.a.greaterThan( texel.a ).select( normalW.mul( 0.25 ), 0 );
 						denoisedFrame.addAssign( float( 1 ).div( neighborColor.a ).mul( neighborAWeight ) );
@@ -851,7 +852,7 @@ class RecurrentDenoiseNode extends TempNode {
 
 			};
 
-			If( depth.greaterThanEqual( 1.0 ).or( dot( viewNormal, viewNormal ).equal( 0.0 ) ), () => {
+			If( depth.greaterThanEqual( 1.0 ), () => {
 
 				Discard();
 

@@ -153,20 +153,19 @@
 			denoise: {
 				enabled: true,
 				lumaPhi: 0.75,
-				depthPhi: 25,
+				depthPhi: 20,
 				normalPhi: 0.3,
 				roughnessPhi: 100,
 				radius: 1.5,
-				alphaPhi: 10,
-				denoisePower: 0.2,
+				alphaPhi: 5,
+				strength: 0.8,
 				radiusAdapt: 0.5,
-				denoiseAlpha: true,
+				smoothDisocclusions: true,
 				flickerSuppression: 1,
 				adaptiveTrust: 1
 			},
 
 			post: {
-				sharpen: { sharpness: 0 },
 				grading: { toneMapping: 'AgX', exposure: 1.57, gamma: 0.89, contrast: 1.31, saturation: 1 },
 			},
 		};
@@ -174,7 +173,6 @@
 		let camera, scene, model, renderer, postProcessing, ssrNode, temporalReprojectNode, denoiseNode;
 		let stats, controls;
 		let scenePassNode, combinedOutputNode;
-		let sharpnessUniform;
 		let exposureUniform, gammaUniform, contrastUniform, saturationUniform;
 
 		init();
@@ -318,7 +316,6 @@
 
 			const denoisePassBlend = vec4( denoiseNode.rgb, ssrNode.a.greaterThan( 0 ).toVar() );
 
-			sharpnessUniform = uniform( params.post.sharpen.sharpness );
 			exposureUniform = uniform( params.post.grading.exposure );
 			gammaUniform = uniform( params.post.grading.gamma );
 			contrastUniform = uniform( params.post.grading.contrast );
@@ -392,11 +389,11 @@
 
 			denoiseGui.add( params.denoise, 'alphaPhi', 0, 15 ).name( 'ray length phi' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'radius', 0, 3 ).name( 'radius' ).onChange( applyParams );
-			denoiseGui.add( params.denoise, 'denoisePower', 0.01, 0.5 ).name( 'denoise power' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'strength', 0, 1 ).name( 'strength' ).onChange( applyParams );
 
 			// Extra options that are not used in this example
 			// denoiseGui.add( params.denoise, 'radiusAdapt', 0, 1 ).name( 'adapt radius' ).onChange( applyParams );
-			// denoiseGui.add( params.denoise, 'denoiseAlpha' ).name( 'denoise alpha' ).onChange( applyParams );
+			// denoiseGui.add( params.denoise, 'smoothDisocclusions' ).name( 'smooth disocclusions' ).onChange( applyParams );
 			// denoiseGui.add( params.denoise, 'flickerSuppression', 0, 1 ).name( 'flicker suppression' ).onChange( applyParams );
 			// denoiseGui.add( params.denoise, 'adaptiveTrust', 0, 1 ).name( 'adaptive trust' ).onChange( applyParams );
 
@@ -458,9 +455,9 @@
 				denoiseNode.roughnessPhi.value = params.denoise.roughnessPhi;
 				denoiseNode.radius.value = params.denoise.enabled ? params.denoise.radius : 0;
 				denoiseNode.alphaPhi.value = params.denoise.alphaPhi;
-				denoiseNode.denoisePower.value = params.denoise.denoisePower;
+				denoiseNode.strength.value = params.denoise.strength;
 				denoiseNode.radiusAdapt.value = params.denoise.radiusAdapt;
-				denoiseNode.denoiseAlpha.value = params.denoise.denoiseAlpha;
+				denoiseNode.smoothDisocclusions.value = params.denoise.smoothDisocclusions;
 				denoiseNode.flickerSuppression.value = params.denoise.flickerSuppression;
 				denoiseNode.adaptiveTrust.value = params.denoise.adaptiveTrust;
 
@@ -480,13 +477,11 @@
 			rgb = rgb.max( 0.0 ).pow( float( 1 ).div( gammaUniform ) );
 
 			const node = fxaa( vec4( rgb, 1 ) );
-			return sharpen( node, sharpnessUniform );
+			return sharpen( node, 0 );
 
 		}
 
 		function applyPost() {
-
-			sharpnessUniform.value = params.post.sharpen.sharpness;
 
 			const g = params.post.grading;
 			exposureUniform.value = g.exposure;

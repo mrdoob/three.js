@@ -1119,18 +1119,14 @@ class SSRNode extends TempNode {
 
 							If( dot( viewReflectDir, vN ).greaterThanEqual( 0 ), () => Continue() );
 
-						}
-
-						// this distance represents the depth of the intersection point between the reflected ray and the scene.
-						const distance = pointPlaneDistance( vP, viewPosition, viewNormal ).toVar();
-
-						If( distance.greaterThan( this.maxDistance ), () => {
+							// this distance represents the depth of the intersection point between the reflected ray and the scene.
+							const distance = pointPlaneDistance( vP, viewPosition, viewNormal ).toVar();
 
 							// Distance exceeding limit: The reflection is potentially too far away and
 							// might not contribute significantly to the final color
-							Break();
+							If( distance.greaterThan( this.maxDistance ), () => Break() );
 
-						} );
+						}
 
 						foundHit.assign( true );
 						hitUvS.assign( uvS );
