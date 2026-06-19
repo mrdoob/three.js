@@ -12,6 +12,9 @@ let _rendererState;
 // Maximum ray-march step count; `quality` (0..1) scales it to a fixed per-ray count.
 const MAX_STEPS = 64;
 
+// Bisection iterations used to refine a detected crossing to a sub-step-accurate hit.
+const REFINE_ITERATIONS = 4;
+
 /**
  * @typedef {'blur' | 'scatter'} SSRReflection
  */
@@ -690,7 +693,7 @@ class SSRNode extends TempNode {
 
 		};
 
-		const sampleMarchNoise = bindAnalyticNoise( this._resolution, 47 );
+		const sampleMarchNoise = this.reflection === 'scatter' ? bindAnalyticNoise( this._resolution, 47 ) : null;
 
 		const computeScreenBorderFactor = Fn( ( [ uvCoord, borderWidth ] ) => {
 
@@ -716,11 +719,9 @@ class SSRNode extends TempNode {
 			]
 		} );
 
-		const isBlurReflection = this.reflection === 'blur';
-
 		const ssr = Fn( () => {
 
-			const noise = sampleMarchNoise( uvNode, this._noiseIndex );
+			const noise = this.reflection === 'scatter' ? sampleMarchNoise( uvNode, this._noiseIndex ) : null;
 			const uvPos = uvNode.toVar();
 
 			const depth = sampleDepth( uvPos ).toVar();
@@ -745,7 +746,7 @@ class SSRNode extends TempNode {
 
 			let viewReflectDir, finalSampleWeight, specDominantFactor;
 
-			if ( isBlurReflection ) {
+			if ( this.reflection === 'blur' ) {
 
 				// Mirror reflection: roughness is applied later via the blur mip chain.
 				metalness.equal( 0.0 ).discard();
@@ -783,7 +784,7 @@ class SSRNode extends TempNode {
 
 				if ( this._importanceEnvironment !== null ) {
 
-					if ( isBlurReflection ) {
+					if ( this.reflection === 'blur' ) {
 
 						envColor.assign( this._importanceEnvironment.sampleReflect( {
 							cameraWorldMatrix: this._cameraWorldMatrix,
@@ -866,10 +867,12 @@ class SSRNode extends TempNode {
 			// dominant-axis ray length in texels (used for the per-step floor below)
 			const rayLen = max( xLen.abs(), yLen.abs() ).max( 1 ).toVar();
 
-			// Fixed step count for all pixels (bounded iteration, coherent control flow). `quality`
-			// (0..1) maps to the count; each step spans the whole ray as rayVec / totalStep.
-			const totalStep = this.quality.clamp().mul( MAX_STEPS ).max( int( 1 ) ).toConst();
-			// const totalStep = trunc( max( abs( xLen ), abs( yLen ) ).mul( this.quality.clamp() ) ).toConst();
+			// Blur traces a single mirror ray, so spend steps in proportion to the ray's screen-space
+			// length (cheap for the short rays that dominate). Scatter needs a fixed, bounded count for
+			// coherent stochastic sampling; each step then spans the whole ray as rayVec / totalStep.
+			const totalStep = this.reflection === 'blur'
+				? trunc( max( abs( xLen ), abs( yLen ) ).mul( this.quality.clamp() ) ).max( int( 1 ) ).toConst()
+				: this.quality.clamp().mul( MAX_STEPS ).max( int( 1 ) ).toConst();
 
 			const xSpan = xLen.div( totalStep ).toVar();
 			const ySpan = yLen.div( totalStep ).toVar();
@@ -882,7 +885,7 @@ class SSRNode extends TempNode {
 			const hit = float( 0 ).toVar();
 
 			// Per-pixel, per-frame sub-step jitter (∈ [0,1)) so TRAA dissolves step banding.
-			const jitter = isBlurReflection ? 0 : noise.z;
+			const jitter = this.reflection === 'blur' ? 0 : noise.z;
 
 			// Reflected-ray view-space Z at ray parameter s ∈ [0,1] (linear in 1/z for perspective),
 			// hoisted so the march and refinement evaluate it identically.
@@ -896,15 +899,15 @@ class SSRNode extends TempNode {
 			// Screen-space position along the ray for a given s ∈ [0,1].
 			const screenPosAt = ( sVal ) => d0.add( stepVec.mul( sVal.mul( totalStep ) ) );
 
-			// Ray parameter s ∈ [0,1] for step `idx`: an exponential remap `(idx/steps)^stepExponent`
-			// concentrates samples near the origin, floored to ≥1 texel/step. `jitter` dissolves banding.
-			const sampleFraction = ( idx ) => max(
-				idx.add( jitter ).div( totalStep ).pow( this.stepExponent ),
-				idx.add( 1 ).div( rayLen )
-			);
-
-			// Bisection iterations used to refine a detected crossing to a sub-step-accurate hit.
-			const REFINE_ITERATIONS = 4;
+			// Ray parameter s ∈ [0,1] for step `idx`. Blur marches uniformly (matching the original loop:
+			// one ~texel step per iteration). Scatter uses an exponential remap `(idx/steps)^stepExponent`
+			// that concentrates samples near the origin, floored to ≥1 texel/step; `jitter` dissolves banding.
+			const sampleFraction = this.reflection === 'blur'
+				? ( idx ) => idx.div( totalStep )
+				: ( idx ) => max(
+					idx.add( jitter ).div( totalStep ).pow( this.stepExponent ),
+					idx.add( 1 ).div( rayLen )
+				);
 
 			// Carry the hit out of the loop so refinement runs after the march, not nested inside it (a
 			// loop-inside-a-loop tripped shader-compiler bugs on some drivers). hitSLo/hitSHi bracket s.
@@ -1004,8 +1007,8 @@ class SSRNode extends TempNode {
 
 				// In blur mode the ratio² falloff re-grows past maxDistance, so over-range hits fall back
 				// to env. The scatter path bounds reach via ray length, so every hit shades.
-				const distancePointPlane = isBlurReflection ? pointPlaneDistance( vP, viewPosition, viewNormal ).toVar() : float( 0 );
-				const withinRange = isBlurReflection ? distancePointPlane.lessThanEqual( this.maxDistance ) : bool( true );
+				const distancePointPlane = this.reflection === 'blur' ? pointPlaneDistance( vP, viewPosition, viewNormal ).toVar() : float( 0 );
+				const withinRange = distancePointPlane.lessThanEqual( this.maxDistance );
 
 				If( withinRange, () => {
 
@@ -1040,7 +1043,7 @@ class SSRNode extends TempNode {
 					// distance attenuation and grazing Fresnel here to match its falloff.
 					let weightedColor = reflectColor.rgb.mul( finalSampleWeight );
 
-					if ( isBlurReflection ) {
+					if ( this.reflection === 'blur' ) {
 
 						const ratio = float( 1 ).sub( distancePointPlane.div( this.maxDistance ) ).toVar();
 						const attenuation = ratio.mul( ratio ).toVar();

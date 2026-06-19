@@ -434,13 +434,15 @@
 			ssrNode.resolutionScale = params.ssr.resolutionScale;
 			ssrNode.quality.value = params.ssr.quality;
 			ssrNode.mirrorBias.value = params.ssr.mirrorBias;
-			ssrNode.stepExponent.value = params.ssr.stepExponent;
+			// stepExponent / screenEdgeFadeBlack are build-time constants: assigning them recompiles
+			// the SSR material (the setters no-op when the value is unchanged).
+			ssrNode.stepExponent = params.ssr.stepExponent;
 			ssrNode.maxDistance.value = params.ssr.maxDistance;
 			ssrNode.intensity.value = params.ssr.intensity;
 			ssrNode.thickness.value = params.ssr.thickness;
 			ssrNode.maxLuminance.value = params.ssr.maxLuminance;
 			ssrNode.screenEdgeFade.value = params.ssr.screenEdgeFade;
-			ssrNode.screenEdgeFadeBlack.value = params.ssr.screenEdgeFadeBlack;
+			ssrNode.screenEdgeFadeBlack = params.ssr.screenEdgeFadeBlack;
 			ssrNode.environmentIntensity.value = params.ssr.environmentIntensity;
 
 			if ( temporalReprojectNode ) {
