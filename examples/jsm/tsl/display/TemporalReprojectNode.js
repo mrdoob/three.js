@@ -202,7 +202,7 @@ const sampleBilinearTap = Fn( ( [
 	const planeDiff = abs( dot( reprojWorldPos.sub( worldPosition ), worldNormal ) ).toVar();
 	planeDiff.divAssign( abs( reprojViewPos.z ) );
 	const normalConfidence = smoothstep( 0.95, 0.999, reprojWorldNorm.dot( worldNormal ) );
-	const confidence = smoothstep( 0, 0.005, planeDiff ).oneMinus().mul( normalConfidence );
+	const confidence = smoothstep( 0, 0.01, planeDiff ).oneMinus().mul( normalConfidence );
 	const weight = bilinearWeight.mul( confidence );
 
 	return bilinearTapStruct( color.mul( weight ), weight, confidence );
@@ -898,7 +898,7 @@ class TemporalReprojectNode extends TempNode {
 
 			// Universal stretch guard: reduce confidence where a "small area" is projected over a "large area".
 			const stretchConfidence = reprojectionStretchConfidence( historyUV, this._resolution );
-			totalConfidence.mulAssign( stretchConfidence.pow( 4 ).clamp() );
+			totalConfidence.mulAssign( stretchConfidence.pow( 2 ) );
 
 			const varianceGamma = mix( float( VARIANCE_GAMMA_MIN ), float( VARIANCE_GAMMA_MAX ), motionFactor.oneMinus().pow2() );
 
@@ -911,7 +911,7 @@ class TemporalReprojectNode extends TempNode {
 				this.flickerSuppression
 			).toVar();
 
-			const clampIntensity = this.clampIntensity.mul( max( motionFactor.mul( 20 ), 0.1 ) ).mul(
+			const clampIntensity = this.clampIntensity.mul( max( motionFactor.mul( 10 ).min( 1 ), 0 ) ).mul(
 				float( 1 ).add( stretchConfidence.oneMinus().add( historyTrust.oneMinus() ).clamp() )
 			);
 			const originalHistoryColor = vec3( historyColor.rgb );
