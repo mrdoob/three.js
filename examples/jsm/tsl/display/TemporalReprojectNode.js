@@ -1,4 +1,4 @@
-import { EPSILON, Fn, If, Loop, abs, convertToTexture, dFdx, dFdy, dot, exp, float, floor, fwidth, getViewPosition, int, ivec2, luminance, max, min, mix, nodeObject, normalize, passTexture, screenCoordinate, select, smoothstep, sqrt, struct, texture, textureLoad, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4, velocity } from 'three/tsl';
+import { EPSILON, Fn, If, abs, convertToTexture, dFdx, dFdy, dot, exp, float, floor, fwidth, getViewPosition, ivec2, luminance, max, min, mix, nodeObject, normalize, passTexture, screenCoordinate, select, smoothstep, sqrt, struct, texture, textureLoad, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4, velocity } from 'three/tsl';
 import { DepthTexture, HalfFloatType, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, TempNode, Vector2, Vector3 } from 'three/webgpu';
 import { ENV_RAY_LENGTH, ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
 
@@ -122,12 +122,25 @@ const clipToAABB = Fn( ( [ history, boxMin, boxMax ] ) => {
 	]
 } );
 
+const neighborhoodStruct = struct( {
+	mean: 'vec3',
+	stdColor: 'vec3',
+	rayLength: 'float',
+	envProbability: 'float',
+	stdDevRayLength: 'float'
+} );
+
 /**
- * Variance clipping in YCoCg space (Salvi, GDC 2016).
+ * Single 3×3 neighbourhood pass over the beauty buffer. One textureLoad per tap feeds both the
+ * YCoCg variance-clipping box (colour) and the SSR ray-length statistics (alpha), which previously
+ * required two separate 3×3 fetches of the same texture.
+ *
+ * Sampling is done on the beauty-texel grid (`beautyTexel + offset`), so the taps are distinct
+ * source texels even when the beauty buffer is lower resolution than the resolve pass (upscaling).
  *
  * @tsl
  */
-const varianceClipping = Fn( ( [ beautyTexture, beautyTexel, inputColor, historyColor, gamma, flickerSuppression ] ) => {
+const collectNeighborhood = Fn( ( [ beautyTexture, beautyTexel, inputColor, flickerSuppression ] ) => {
 
 	const offsets = [
 		[ - 1, - 1 ],
@@ -140,32 +153,78 @@ const varianceClipping = Fn( ( [ beautyTexture, beautyTexel, inputColor, history
 		[ - 1, 0 ],
 	];
 
+	// Colour moments (YCoCg) — centre reuses the already-fetched inputColor.
 	const center = rgbToYCoCg( dampenForVarianceClip( inputColor.rgb, flickerSuppression ) );
 	const moment1 = center.toVar();
 	const moment2 = center.pow2().toVar();
 
+	// Ray-length statistics (Welford) over screen-space hits only.
+	const rayLengthSum = float( 0 ).toVar();
+	const rayLengthCount = float( 0 ).toVar();
+	const meanRayLength = float( 0 ).toVar();
+	const m2RayLength = float( 0 ).toVar();
+
+	const accumulateRayLength = ( alpha ) => {
+
+		If( alpha.lessThan( ENV_RAY_LENGTH_THRESHOLD ), () => {
+
+			rayLengthSum.addAssign( alpha );
+			rayLengthCount.addAssign( 1 );
+
+			const delta = alpha.sub( meanRayLength ).toVar();
+			meanRayLength.addAssign( delta.div( rayLengthCount ) );
+			m2RayLength.addAssign( delta.mul( alpha.sub( meanRayLength ) ) );
+
+		} );
+
+	};
+
+	accumulateRayLength( inputColor.a );
+
 	for ( const [ x, y ] of offsets ) {
 
-		const neighbor = textureLoad( beautyTexture, beautyTexel.add( ivec2( x, y ) ) ).max( 0 );
-		const c = rgbToYCoCg( dampenForVarianceClip( neighbor.rgb, flickerSuppression ) );
+		const neighbor = textureLoad( beautyTexture, beautyTexel.add( ivec2( x, y ) ) ).max( 0 ).toVar();
 
+		const c = rgbToYCoCg( dampenForVarianceClip( neighbor.rgb, flickerSuppression ) );
 		moment1.addAssign( c );
 		moment2.addAssign( c.pow2() );
+
+		accumulateRayLength( neighbor.a );
 
 	}
 
 	const N = float( offsets.length + 1 );
 	const mean = moment1.div( N );
-	const stddev = moment2.div( N ).sub( mean.pow2() ).max( 0 ).sqrt().mul( gamma );
+	const stdColor = moment2.div( N ).sub( mean.pow2() ).max( 0 ).sqrt();
+
+	// Continuous environment probability: fraction of the 3×3 neighbourhood that missed in screen space
+	// and fell back to env (0 = all hits, 1 = all env), for smooth reflection/environment transitions.
+	const envProbability = rayLengthCount.div( float( 9 ) ).oneMinus();
+	const rayLength = rayLengthCount.lessThan( 0.5 ).select( float( ENV_RAY_LENGTH ), rayLengthSum.div( max( rayLengthCount, float( 1e-4 ) ) ) );
+	const stdDevRayLength = sqrt( m2RayLength.div( max( rayLengthCount, float( 1.0 ) ) ) ).max( 1e-3 );
+
+	return neighborhoodStruct( mean, stdColor, rayLength, envProbability, stdDevRayLength );
+
+} );
+
+/**
+ * Variance clipping in YCoCg space (Salvi, GDC 2016). Uses the colour moments gathered by
+ * {@link collectNeighborhood}; `gamma` widens the AABB and is kept out of the gather so the
+ * neighbourhood pass stays independent of the per-pixel motion factor.
+ *
+ * @tsl
+ */
+const applyVarianceClipping = Fn( ( [ historyColor, mean, stdColor, gamma, flickerSuppression ] ) => {
+
+	const stddev = stdColor.mul( gamma );
 	const boxMin = mean.sub( stddev );
 	const boxMax = mean.add( stddev );
 
 	const historyRGB = historyColor.rgb.toVar();
 	const historyScale = luminance( historyRGB ).mul( flickerSuppression ).mul( VARIANCE_CLIP_LUMA_SCALE ).add( 1 );
 	const clipped = clipToAABB( rgbToYCoCg( historyRGB.div( historyScale ) ), boxMin, boxMax );
-	const clippedRGB = ycocgToRGB( clipped ).mul( historyScale );
 
-	return clippedRGB;
+	return ycocgToRGB( clipped ).mul( historyScale );
 
 } );
 
@@ -349,62 +408,6 @@ const reprojectHitPoint = Fn( ( [
 	const parallaxHitPoint = rayOrig.add( cameraRay.mul( rayLength ) );
 
 	return projectWorldToUV( parallaxHitPoint, previousViewMatrix, previousProjectionMatrix );
-
-} );
-
-const neighborStatsStruct = struct( {
-	rayLength: 'float',
-	envProbability: 'float',
-	stdDevRayLength: 'float'
-} );
-
-/**
- * 3×3 neighbourhood pass for SSR ray-length statistics.
- *
- * @tsl
- */
-const collectNeighborhoodStats = Fn( ( [
-	sampleTexture,
-	beautySize,
-	resolution,
-	screenTexel
-] ) => {
-
-	const rayLengthSum = float( 0 ).toVar();
-	const rayLengthCount = float( 0 ).toVar();
-	const meanRayLength = float( 0 ).toVar();
-	const m2RayLength = float( 0 ).toVar();
-
-	Loop( { start: int( - 1 ), end: int( 1 ), type: 'int', condition: '<=', name: 'x' }, ( { x } ) => {
-
-		Loop( { start: int( - 1 ), end: int( 1 ), type: 'int', condition: '<=', name: 'y' }, ( { y } ) => {
-
-			const neighborScreenTexel = screenTexel.add( ivec2( x, y ) );
-			const neighborBeautyTexel = beautyTexelFromScreen( neighborScreenTexel, beautySize, resolution );
-			const colorNeighbor = textureLoad( sampleTexture, neighborBeautyTexel ).max( 0 ).toVar();
-
-			If( colorNeighbor.a.lessThan( ENV_RAY_LENGTH_THRESHOLD ), () => {
-
-				rayLengthSum.addAssign( colorNeighbor.a );
-				rayLengthCount.addAssign( 1 );
-
-				const rayLengthDelta = colorNeighbor.a.sub( meanRayLength ).toVar();
-				meanRayLength.addAssign( rayLengthDelta.div( rayLengthCount ) );
-				m2RayLength.addAssign( rayLengthDelta.mul( colorNeighbor.a.sub( meanRayLength ) ) );
-
-			} );
-
-		} );
-
-	} );
-
-	// Continuous environment probability: fraction of the 3×3 neighbourhood that missed in screen space
-	// and fell back to env (0 = all hits, 1 = all env), for smooth reflection/environment transitions.
-	const envProbability = rayLengthCount.div( float( 9 ) ).oneMinus();
-	const rayLength = rayLengthCount.lessThan( 0.5 ).select( float( ENV_RAY_LENGTH ), rayLengthSum.div( max( rayLengthCount, float( 1e-4 ) ) ) );
-	const stdDevRayLength = sqrt( m2RayLength.div( max( rayLengthCount, float( 1.0 ) ) ) ).max( 1e-3 );
-
-	return neighborStatsStruct( rayLength, envProbability, stdDevRayLength );
 
 } );
 
@@ -788,6 +791,9 @@ class TemporalReprojectNode extends TempNode {
 
 			const inputColor = textureLoad( this.beautyNode, beautyTexel ).max( 0 ).toVar();
 			const viewNormal = unpackRGBToNormal( textureLoad( this.normalNode, screenTexel ).rgb ).toVar();
+
+			// Shared 3×3 beauty fetch: feeds both the variance-clip box and the SSR ray-length stats.
+			const neighborhood = collectNeighborhood( this.beautyNode, beautyTexel, inputColor, this.flickerSuppression );
 			const worldNormal = viewNormal.transformDirection( cameraUniforms.viewMatrix ).toVar();
 
 			const viewPosition = getViewPosition( uvNode, depth, cameraUniforms.projectionMatrixInverse ).toVar();
@@ -823,19 +829,12 @@ class TemporalReprojectNode extends TempNode {
 			// color (rgb from the blend, alpha from the surface tap), its confidence, and the hit-vs-surface trust.
 			const resolveSpecularHistory = () => {
 
-				const stats = collectNeighborhoodStats(
-					this.beautyNode,
-					beautySize,
-					this._resolution,
-					screenTexel
-				);
-
 				const surfValid = historyUV.x.greaterThanEqual( 0 ).and( historyUV.x.lessThanEqual( 1 ) )
 					.and( historyUV.y.greaterThanEqual( 0 ) ).and( historyUV.y.lessThanEqual( 1 ) );
 
 				const historyUV_hit = reprojectHitPoint(
 					worldPosition,
-					stats.get( 'rayLength' ),
+					neighborhood.get( 'rayLength' ),
 					cameraUniforms.worldPosition,
 					cameraUniforms.previousViewMatrix,
 					cameraUniforms.previousProjectionMatrix
@@ -854,12 +853,12 @@ class TemporalReprojectNode extends TempNode {
 				const confSurf = surfValid.select( surf.get( 'tapConfidence' ), float( 0 ) );
 				const minConfHit = hit.get( 'minConfidence' );
 
-				const reflectionEdgeFactor = stats.get( 'stdDevRayLength' ).pow( 2 ).div( stats.get( 'rayLength' ).pow( 2 ).max( EPSILON ) );
+				const reflectionEdgeFactor = neighborhood.get( 'stdDevRayLength' ).pow( 2 ).div( neighborhood.get( 'rayLength' ).pow( 2 ).max( EPSILON ) );
 				reflectionEdgeFactor.assign( reflectionEdgeFactor.mul( motionFactor.mul( 100 ).min( 1 ) ).mul( 5 ).min( 1 ).oneMinus() );
 
 				const curvatureFactor = fwidth( worldNormal.xyz ).length().mul( 50 ).clamp();
 
-				const envProbability = stats.get( 'envProbability' );
+				const envProbability = neighborhood.get( 'envProbability' );
 
 				const wHitRaw = minConfHit
 					.mul( reflectionEdgeFactor )
@@ -904,16 +903,15 @@ class TemporalReprojectNode extends TempNode {
 
 			const varianceGamma = mix( float( VARIANCE_GAMMA_MIN ), float( VARIANCE_GAMMA_MAX ), motionFactor.oneMinus().pow2() );
 
-			const clippedRGB = varianceClipping(
-				this.beautyNode,
-				beautyTexel,
-				inputColor,
-				vec4( historyColor ),
+			const clippedRGB = applyVarianceClipping(
+				historyColor,
+				neighborhood.get( 'mean' ),
+				neighborhood.get( 'stdColor' ),
 				varianceGamma,
 				this.flickerSuppression
 			).toVar();
 
-			const clampIntensity = this.clampIntensity.mul( max( motionFactor.mul( 10 ).min( 1 ), 0.1 ) ).mul(
+			const clampIntensity = this.clampIntensity.mul( max( motionFactor.mul( 10 ).min( 1 ), 0.15 ) ).mul(
 				float( 1 ).add( stretchConfidence.oneMinus().add( historyTrust.oneMinus() ).clamp() )
 			);
 			const originalHistoryColor = vec3( historyColor.rgb );
