@@ -68,7 +68,6 @@
 
 		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-		import Stats from 'three/addons/libs/stats.module.js';
 		import { Inspector } from 'three/addons/inspector/Inspector.js';
 		import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
@@ -171,7 +170,7 @@
 		};
 
 		let camera, scene, model, renderer, postProcessing, ssrNode, temporalReprojectNode, denoiseNode;
-		let stats, controls;
+		let controls;
 		let scenePassNode, combinedOutputNode;
 		let exposureUniform, gammaUniform, contrastUniform, saturationUniform;
 
@@ -338,9 +337,6 @@
 			camera.position.set( 1.259878548682251, 0.5391287340899181, - 0.27217301481427114 );
 			camera.rotation.set( - 0.3158233106804791, 0.26820684188431526, 0.08637696823742165 );
 			controls.target.set( 1.0258536154689288, 0.2746440590977971, - 1.0815876858987743 );
-
-			stats = new Stats();
-			document.body.appendChild( stats.dom );
 
 			window.addEventListener( 'resize', onWindowResize );
 			renderer.domElement.addEventListener( 'pointermove', onComparePointerMove );
@@ -569,8 +565,6 @@
 			controls.update();
 
 			postProcessing.render();
-
-			stats.end();
 
 		}
 
