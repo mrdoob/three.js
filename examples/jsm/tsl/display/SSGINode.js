@@ -1,5 +1,5 @@
-import { HalfFloatType, RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, MathUtils } from 'three/webgpu';
-import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise } from 'three/tsl';
+import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, MathUtils, RGBFormat, RedFormat, UnsignedInt101111Type, UnsignedByteType } from 'three/webgpu';
+import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise, property, outputStruct } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -267,13 +267,23 @@ class SSGINode extends TempNode {
 		this._camera = camera;
 
 		/**
-		 * The render target the GI is rendered into.
+		 * The render target the effect is rendered into. The first texture holds the GI,
+		 * the second one the AO.
 		 *
 		 * @private
 		 * @type {RenderTarget}
 		 */
-		this._ssgiRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
-		this._ssgiRenderTarget.texture.name = 'SSGI';
+		this._ssgiRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, count: 2 } );
+
+		const aoTexture = this._ssgiRenderTarget.textures[ 0 ];
+		aoTexture.name = 'SSGI.AO';
+		aoTexture.type = UnsignedByteType;
+		aoTexture.format = RedFormat;
+
+		const giTexture = this._ssgiRenderTarget.textures[ 1 ];
+		giTexture.name = 'SSGI.GI';
+		giTexture.type = UnsignedInt101111Type;
+		giTexture.format = RGBFormat;
 
 		/**
 		 * The material that is used to render the effect.
@@ -285,23 +295,42 @@ class SSGINode extends TempNode {
 		this._material.name = 'SSGI';
 
 		/**
-		 * The result of the effect is represented as a separate texture node.
+		 * The AO result of the effect is represented as a separate texture node.
 		 *
 		 * @private
 		 * @type {PassTextureNode}
 		 */
-		this._textureNode = passTexture( this, this._ssgiRenderTarget.texture );
+		this._aoNode = passTexture( this, this._ssgiRenderTarget.textures[ 0 ] );
+
+		/**
+		 * The GI result of the effect is represented as a separate texture node.
+		 *
+		 * @private
+		 * @type {PassTextureNode}
+		 */
+		this._giNode = passTexture( this, this._ssgiRenderTarget.textures[ 1 ] );
 
 	}
 
 	/**
-	 * Returns the result of the effect as a texture node.
+	 * Returns the AO result of the effect as a texture node.
 	 *
-	 * @return {PassTextureNode} A texture node that represents the result of the effect.
+	 * @return {PassTextureNode} A texture node that represents the AO result of the effect.
 	 */
-	getTextureNode() {
+	getAONode() {
 
-		return this._textureNode;
+		return this._aoNode;
+
+	}
+
+	/**
+	 * Returns the GI result of the effect as a texture node.
+	 *
+	 * @return {PassTextureNode} A texture node that represents the GI result of the effect.
+	 */
+	getGINode() {
+
+		return this._giNode;
 
 	}
 
@@ -357,9 +386,9 @@ class SSGINode extends TempNode {
 		_quadMesh.material = this._material;
 		_quadMesh.name = 'SSGI';
 
-		// clear
+		// clear (white for the AO attachement)
 
-		renderer.setClearColor( 0x000000, 1 );
+		renderer.setClearColor( 0xffffff, 1 );
 
 		// gi
 
@@ -379,6 +408,14 @@ class SSGINode extends TempNode {
 	 * @return {PassTextureNode}
 	 */
 	setup( builder ) {
+
+		const renderer = builder.renderer;
+
+		if ( renderer.backend.isWebGPUBackend === true && renderer.hasFeature( 'rg11b10ufloat-renderable' ) === false ) {
+
+			console.error( 'THREE.SSGINode: The device does not support the "rg11b10ufloat-renderable" feature which is required for SSGI.' );
+
+		}
 
 		const uvNode = uv();
 		const MAX_RAY = uint( 32 );
@@ -519,6 +556,11 @@ class SSGINode extends TempNode {
 
 		} );
 
+		const aoField = property( 'float' );
+		const giField = property( 'vec3' );
+
+		const outputNode = outputStruct( aoField, giField );
+
 		const gi = Fn( () => {
 
 			const depth = sampleDepth( uvNode ).toVar();
@@ -599,16 +641,20 @@ class SSGINode extends TempNode {
 			const scale = currentLuminance.greaterThan( maxLuminance ).select( maxLuminance.div( currentLuminance ), float( 1 ) );
 			color.mulAssign( scale );
 
-			return vec4( color, ao );
+			aoField.assign( ao );
+			giField.assign( color );
+
+			return vec4( 0 );
 
 		} );
 
-		this._material.fragmentNode = gi().context( builder.getSharedContext() );
+		this._material.colorNode = gi().context( builder.getSharedContext() );
+		this._material.outputNode = outputNode;
 		this._material.needsUpdate = true;
 
 		//
 
-		return this._textureNode;
+		return this._aoNode;
 
 	}
 

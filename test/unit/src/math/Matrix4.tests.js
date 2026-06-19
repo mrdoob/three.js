@@ -467,7 +467,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'determinant3x3', ( assert ) => {
+		QUnit.test( 'determinantAffine', ( assert ) => {
 
 			// for affine matrices (the typical object world matrix), the 3x3 result
 			// equals the full 4x4 determinant since the bottom row is [ 0, 0, 0, 1 ]
@@ -479,28 +479,28 @@ export default QUnit.module( 'Maths', () => {
 			// translation + rotation + non-uniform scale
 
 			a.compose( position, quaternion, new Vector3( 2, 3, 0.5 ) );
-			assert.ok( Math.abs( a.determinant3x3() - a.determinant() ) <= eps, 'Affine matrix: Passed!' );
+			assert.ok( Math.abs( a.determinantAffine() - a.determinant() ) <= eps, 'Affine matrix: Passed!' );
 
 			// reflection (negative scale on one axis flips the winding order)
 
 			a.compose( position, quaternion, new Vector3( 2, 3, - 0.5 ) );
-			assert.ok( a.determinant3x3() < 0, 'Reflection produces a negative determinant!' );
-			assert.ok( Math.abs( a.determinant3x3() - a.determinant() ) <= eps, 'Reflection matrix: Passed!' );
+			assert.ok( a.determinantAffine() < 0, 'Reflection produces a negative determinant!' );
+			assert.ok( Math.abs( a.determinantAffine() - a.determinant() ) <= eps, 'Reflection matrix: Passed!' );
 
 			// shear
 
 			a.multiply( new Matrix4().makeShear( 0.5, 0, 0.2, 0, 0.7, 0 ) );
-			assert.ok( Math.abs( a.determinant3x3() - a.determinant() ) <= eps, 'Shear matrix: Passed!' );
+			assert.ok( Math.abs( a.determinantAffine() - a.determinant() ) <= eps, 'Shear matrix: Passed!' );
 
 		} );
 
-		QUnit.test( 'determinant3x3 (projective matrix)', ( assert ) => {
+		QUnit.test( 'determinantAffine (projective matrix)', ( assert ) => {
 
 			// for non-affine (projective) matrices, the bottom row is not [ 0, 0, 0, 1 ]
 			// and so the 3x3 result generally differs from the full 4x4 determinant
 
 			const a = new Matrix4().makePerspective( - 1, 1, 1, - 1, 1, 100 );
-			assert.ok( Math.abs( a.determinant3x3() - a.determinant() ) > eps, 'Passed!' );
+			assert.ok( Math.abs( a.determinantAffine() - a.determinant() ) > eps, 'Passed!' );
 
 		} );
 
