@@ -1237,11 +1237,10 @@ class SSRNode extends TempNode {
 
 			} );
 
-			const envLuminance = luminance( output.rgb ).max( 1e-4 ).toVar();
-			output.rgb.mulAssign( this.maxLuminance.div( envLuminance ).min( 1 ) );
+			const lum = luminance( output.rgb ).max( 1e-4 ).toVar();
+			output.rgb.mulAssign( this.maxLuminance.div( lum ).min( 1 ) );
 
-			// scale the reflection color by the user-controlled intensity (alpha holds
-			// parallax-corrected ray length for TRAA/denoise, so only the rgb is affected)
+			// scale the reflection color by the user-controlled intensity
 			output.rgb.mulAssign( this.intensity );
 
 			return output.max( 0 );

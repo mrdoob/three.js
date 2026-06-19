@@ -204,7 +204,7 @@ const NORMAL_ENCODING_ERROR = 1.5 / 255;
  */
 const lobeNormalFalloff = Fn( ( [ roughness, aggressivity, invNormalPhi ] ) => {
 
-	const percent = mix( float( 0.925 ), invNormalPhi, aggressivity );
+	const percent = mix( invNormalPhi.pow2(), float( 0 ), aggressivity.sqrt() ).clamp( 0.1, 0.99 );
 	const tanHalfAngle = specularLobeTanHalfAngle( roughness, percent );
 	const lobeHalfAngle = max( atan( tanHalfAngle ), float( NORMAL_ENCODING_ERROR ) );
 
@@ -669,7 +669,7 @@ class RecurrentDenoiseNode extends TempNode {
 				if ( this.mode === 'specular' ) {
 
 					worldRadius.mulAssign( rl.mul( viewPosition.z.abs() ) );
-					worldRadius.mulAssign( roughness.pow2() );
+					worldRadius.mulAssign( roughness.sqrt().max( 0.01 ) );
 
 				} else {
 

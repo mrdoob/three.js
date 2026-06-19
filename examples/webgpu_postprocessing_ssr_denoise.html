@@ -154,10 +154,10 @@
 				enabled: true,
 				lumaPhi: 0.75,
 				depthPhi: 25,
-				normalPhi: 1,
+				normalPhi: 0.3,
 				roughnessPhi: 100,
-				radius: 8,
-				alphaPhi: 4,
+				radius: 1.5,
+				alphaPhi: 10,
 				denoisePower: 0.2,
 				radiusAdapt: 0.5,
 				denoiseAlpha: true,
@@ -383,15 +383,15 @@
 
 			const denoiseGui = renderer.inspector.createParameters( 'Denoise settings' );
 			denoiseGui.add( params.denoise, 'enabled' ).name( 'enabled' ).onChange( applyParams );
-			denoiseGui.add( params.denoise, 'lumaPhi', 0, 5 ).name( 'luma phi' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'lumaPhi', 0, 3 ).name( 'luma phi' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'depthPhi', 0, 50 ).name( 'depth phi' ).onChange( applyParams );
-			denoiseGui.add( params.denoise, 'normalPhi', 0.01, 1, 0.0001 ).name( 'normal phi' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'normalPhi', 0.01, 1, 0.01 ).name( 'normal phi' ).onChange( applyParams );
 
 			// We have uniform roughness in the scene, so we don't need to adjust the roughness phi
 			// denoiseGui.add( params.denoise, 'roughnessPhi', 0, 500 ).name( 'roughness phi' ).onChange( applyParams );
 
-			denoiseGui.add( params.denoise, 'alphaPhi', 0, 10 ).name( 'ray length phi' ).onChange( applyParams );
-			denoiseGui.add( params.denoise, 'radius', 0, 15 ).name( 'radius' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'alphaPhi', 0, 15 ).name( 'ray length phi' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'radius', 0, 3 ).name( 'radius' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'denoisePower', 0.01, 0.5 ).name( 'denoise power' ).onChange( applyParams );
 
 			// Extra options that are not used in this example

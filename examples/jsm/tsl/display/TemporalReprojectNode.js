@@ -861,11 +861,12 @@ class TemporalReprojectNode extends TempNode {
 
 				const envProbability = stats.get( 'envProbability' );
 
-				const wHit = minConfHit
-					.mul( envProbability.pow2().oneMinus() )
+				const wHitRaw = minConfHit
 					.mul( reflectionEdgeFactor )
 					.mul( curvatureFactor.oneMinus() )
-					.mul( confHit );
+					.mul( confHit ).toConst();
+
+				const wHit = wHitRaw.mul( envProbability.pow2().oneMinus() );
 				const wSurf = wHit.oneMinus().mul( confSurf );
 				const wSum = max( wHit.add( wSurf ), float( EPSILON ) );
 
@@ -882,7 +883,7 @@ class TemporalReprojectNode extends TempNode {
 
 				} );
 
-				return { color, confidence, trust: wHit };
+				return { color, confidence, trust: wHitRaw }; // without env probability
 
 			};
 
