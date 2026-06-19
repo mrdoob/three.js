@@ -63,7 +63,6 @@
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 		import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
-		import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 		import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
 		import { fxaa } from 'three/addons/tsl/display/FXAANode.js';
 
@@ -167,7 +166,6 @@
 			},
 
 			post: {
-				bloom: { enabled: true, strength: 0.04, radius: 1, threshold: 0.3 },
 				sharpen: { sharpness: 0 },
 				grading: { toneMapping: 'AgX', exposure: 1.57, gamma: 0.89, contrast: 1.31, saturation: 1 },
 			},
@@ -176,7 +174,7 @@
 		let camera, scene, model, renderer, postProcessing, ssrNode, temporalReprojectNode, denoiseNode;
 		let stats, controls;
 		let scenePassNode, combinedOutputNode;
-		let bloomPass, sharpnessUniform, bloomEnabledUniform;
+		let sharpnessUniform;
 		let exposureUniform, gammaUniform, contrastUniform, saturationUniform;
 
 		init();
@@ -325,12 +323,8 @@
 			gammaUniform = uniform( params.post.grading.gamma );
 			contrastUniform = uniform( params.post.grading.contrast );
 			saturationUniform = uniform( params.post.grading.saturation );
-			bloomEnabledUniform = uniform( params.post.bloom.enabled ? 1 : 0 );
 
 			const litColor = scenePassColor.rgb.add( denoisePassBlend.rgb );
-
-			// bloomPass = bloom( vec4( litColor, 1 ), params.post.bloom.strength, params.post.bloom.radius, params.post.bloom.threshold );
-			// bloomPass.toInspector( 'Bloom' );
 
 			const outputNode = vec4( litColor, 1 );
 			outputNode.toInspector( 'Combined SSR' );
@@ -492,8 +486,6 @@
 
 		function applyPost() {
 
-			if ( ! bloomPass ) return;
-
 			sharpnessUniform.value = params.post.sharpen.sharpness;
 
 			const g = params.post.grading;
@@ -504,11 +496,6 @@
 
 			renderer.toneMapping = THREE.AgXToneMapping;
 			renderer.toneMappingExposure = g.exposure;
-
-			bloomEnabledUniform.value = params.post.bloom.enabled ? 1 : 0;
-			bloomPass.strength.value = params.post.bloom.strength;
-			bloomPass.radius.value = params.post.bloom.radius;
-			bloomPass.threshold.value = params.post.bloom.threshold;
 
 		}
 
