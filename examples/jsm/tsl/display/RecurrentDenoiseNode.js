@@ -1,4 +1,4 @@
-import { abs, convertToTexture, cos, cross, Discard, dot, EPSILON, exp, float, Fn, getScreenPosition, getViewPosition, If, int, log, Loop, luminance, mat2, mix, nodeObject, NodeUpdateType, normalize, passTexture, PI, property, reflect, sin, smoothstep, sqrt, tan, texture, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4 } from 'three/tsl';
+import { abs, convertToTexture, cos, cross, Discard, dot, EPSILON, exp, float, Fn, getScreenPosition, getViewPosition, If, int, log, Loop, luminance, mat2, mix, nodeObject, NodeUpdateType, normalize, passTexture, PI, property, reflect, sin, smoothstep, sqrt, step, tan, texture, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4 } from 'three/tsl';
 import { HalfFloatType, MathUtils, Matrix4, NodeMaterial, QuadMesh, RendererUtils, RenderTarget, TempNode, Vector2 } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
@@ -180,9 +180,9 @@ const getSpecularDominantDirection = Fn( ( [ N, V, roughness ] ) => {
  *
  * @tsl
  */
-const viewSpacePlaneDistance = Fn( ( [ viewPosition, nViewPosition, viewNormal, viewZScale ] ) => {
+const viewSpacePlaneDistance = Fn( ( [ viewPosition, nViewPosition, viewNormal ] ) => {
 
-	return abs( dot( viewPosition.sub( nViewPosition ), viewNormal ) ).div( viewZScale.max( 0.001 ) );
+	return abs( dot( viewPosition.sub( nViewPosition ), viewNormal ) );
 
 } ).setLayout( {
 	name: 'viewSpacePlaneDistance',
@@ -191,7 +191,6 @@ const viewSpacePlaneDistance = Fn( ( [ viewPosition, nViewPosition, viewNormal, 
 		{ name: 'viewPosition', type: 'vec3' },
 		{ name: 'nViewPosition', type: 'vec3' },
 		{ name: 'viewNormal', type: 'vec3' },
-		{ name: 'viewZScale', type: 'float' }
 	]
 } );
 
@@ -353,6 +352,7 @@ class RecurrentDenoiseNode extends TempNode {
 		this._fovY = uniform( MathUtils.degToRad( camera.fov ) );
 		this._cameraProjectionMatrixInverse = uniform( new Matrix4().copy( camera.projectionMatrixInverse ) );
 		this._cameraProjectionMatrix = uniform( new Matrix4().copy( camera.projectionMatrix ) );
+		this._viewMatrix = uniform( new Matrix4().copy( camera.matrixWorldInverse ) );
 
 		this._renderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 		this._renderTarget.texture.name = 'RecurrentDenoiseNode.output';
@@ -403,6 +403,7 @@ class RecurrentDenoiseNode extends TempNode {
 
 		this._cameraProjectionMatrix.value.copy( this.camera.projectionMatrix );
 		this._cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
+		this._viewMatrix.value.copy( this.camera.matrixWorldInverse );
 
 		if ( this.camera.isPerspectiveCamera ) {
 
@@ -521,6 +522,7 @@ class RecurrentDenoiseNode extends TempNode {
 
 			const depth = sampleDepth( uvCoord ).toConst();
 			const viewNormal = sampleNormal( uvCoord ).toConst();
+			const worldNormal = viewNormal.transformDirection( this._viewMatrix ).toConst();
 			const texel = sampleTexture( uvCoord ).max( 0 ).toConst();
 
 			const runDenoise = () => {
@@ -637,8 +639,11 @@ class RecurrentDenoiseNode extends TempNode {
 				const radiusShrink = float( 1 ).toVar();
 
 				// Loop-invariant edge-stopping factors (hoisted out of the kernel loop).
-				const normalWeightEdge = mix( NORMAL_WEIGHT_EDGE_MIN, NORMAL_WEIGHT_EDGE_MAX, frameNum.div( this.maxFrames ).pow( this.normalPhi.oneMinus().max( 1e-4 ) ).clamp() );
-				const depthWeightScale = this.depthPhi.mul( mix( 1, 100, aggressivity ) ).div( viewZ.abs() );
+				const normalWInterp = frameNum.div( this.maxFrames ).pow( this.normalPhi.oneMinus().max( 1e-4 ) );
+				const normalWeightEdge = mix( NORMAL_WEIGHT_EDGE_MIN, NORMAL_WEIGHT_EDGE_MAX, normalWInterp.mul( viewNormal.z.abs() ) ).clamp();
+
+				const depthWeightScale = this.depthPhi.mul( mix( 1, 100, aggressivity ) ).div( viewNormal.z.abs() );
+
 				const recipViewZ = float( 1 ).div( viewZ ).toConst();
 
 				Loop( { start: int( 0 ), end: int( KERNEL_SAMPLES ), type: 'int', condition: '<', name: 'i' }, ( { i } ) => {
@@ -700,8 +705,9 @@ class RecurrentDenoiseNode extends TempNode {
 					if ( this.mode === 'specular' ) kernelDiff.addAssign( ( abs( roughness.sub( sampleRoughnessMetalness( sampleUv ).g ) ).mul( this.roughnessPhi ) ) );
 
 					const nViewNormal = sampleNormal( sampleUv );
-					const distToPlane = viewSpacePlaneDistance( viewPosition, nViewPosition, nViewNormal, nViewZ );
-					const normalDot = dot( viewNormal, nViewNormal ).pow( recipViewZ ).max( 0 );
+					const nWorldNormal = nViewNormal.transformDirection( this._viewMatrix ).toConst();
+					const distToPlane = viewSpacePlaneDistance( viewPosition, nViewPosition, nViewNormal );
+					const normalDot = dot( worldNormal, nWorldNormal ).pow( recipViewZ ).max( 0 );
 
 					// Geometric edge stopping (depth and normal)
 					const depthW = distToPlane.mul( depthWeightScale );

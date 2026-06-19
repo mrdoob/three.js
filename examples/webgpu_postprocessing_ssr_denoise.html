@@ -154,7 +154,7 @@
 				enabled: true,
 				lumaPhi: 0.75,
 				depthPhi: 25,
-				normalPhi: 0.2,
+				normalPhi: 1,
 				roughnessPhi: 100,
 				radius: 8,
 				alphaPhi: 2,
@@ -385,7 +385,7 @@
 			denoiseGui.add( params.denoise, 'enabled' ).name( 'enabled' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'lumaPhi', 0, 5 ).name( 'luma phi' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'depthPhi', 0, 50 ).name( 'depth phi' ).onChange( applyParams );
-			denoiseGui.add( params.denoise, 'normalPhi', 0.01, 1, 0.0001 ).name( 'normal phi' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'normalPhi', 0.01, 4, 0.0001 ).name( 'normal phi' ).onChange( applyParams );
 
 			// We have uniform roughness in the scene, so we don't need to adjust the roughness phi
 			// denoiseGui.add( params.denoise, 'roughnessPhi', 0, 500 ).name( 'roughness phi' ).onChange( applyParams );

@@ -855,7 +855,7 @@ class TemporalReprojectNode extends TempNode {
 				const minConfHit = hit.get( 'minConfidence' );
 
 				const reflectionEdgeFactor = stats.get( 'stdDevRayLength' ).pow( 2 ).div( stats.get( 'rayLength' ).pow( 2 ).max( EPSILON ) );
-				reflectionEdgeFactor.assign( reflectionEdgeFactor.mul( 10 ).clamp().oneMinus() );
+				reflectionEdgeFactor.assign( reflectionEdgeFactor.mul( motionFactor.mul( 100 ).min( 1 ) ).mul( 5 ).min( 1 ).oneMinus() );
 
 				const curvatureFactor = fwidth( worldNormal.xyz ).length().mul( 50 ).clamp();
 
@@ -912,7 +912,7 @@ class TemporalReprojectNode extends TempNode {
 				this.flickerSuppression
 			).toVar();
 
-			const clampIntensity = this.clampIntensity.mul( max( motionFactor.mul( 10 ).min( 1 ), 0 ) ).mul(
+			const clampIntensity = this.clampIntensity.mul( max( motionFactor.mul( 10 ).min( 1 ), 0.1 ) ).mul(
 				float( 1 ).add( stretchConfidence.oneMinus().add( historyTrust.oneMinus() ).clamp() )
 			);
 			const originalHistoryColor = vec3( historyColor.rgb );
