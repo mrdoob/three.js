@@ -81,6 +81,31 @@ function _getPMREMFromTexture( texture, renderer, generator ) {
 
 		cacheTexture.pmremVersion = texture.pmremVersion;
 
+		// add dispose event listener for new PMREMs
+
+		if ( cache.has( texture ) === false ) {
+
+			const onDispose = () => {
+
+				texture.removeEventListener( 'dispose', onDispose );
+
+				const pmrem = cache.get( texture );
+
+				if ( pmrem !== undefined ) {
+
+					pmrem.dispose();
+					cache.delete( texture );
+
+				}
+
+			};
+
+			texture.addEventListener( 'dispose', onDispose );
+
+		}
+
+		//
+
 		cache.set( texture, cacheTexture );
 
 	}
