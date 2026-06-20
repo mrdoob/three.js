@@ -290,6 +290,14 @@ class Backend {
 	updateSampler( /*binding*/ ) { }
 
 	/**
+	 * Frees the GPU sampler for the given sampler binding.
+	 *
+	 * @abstract
+	 * @param {Sampler} binding - The sampler binding to free.
+	 */
+	destroySampler( /*binding*/ ) { }
+
+	/**
 	 * Creates a default texture for the given texture that can be used
 	 * as a placeholder until the actual texture is ready for usage.
 	 *

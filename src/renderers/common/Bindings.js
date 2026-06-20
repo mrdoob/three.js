@@ -267,6 +267,12 @@ class Bindings extends DataMap {
 
 					} else if ( binding.isSampler ) {
 
+						if ( binding.isSampledTexture !== true ) {
+
+							this.backend.destroySampler( binding );
+
+						}
+
 						binding.release();
 
 					}
