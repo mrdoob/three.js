@@ -59,6 +59,16 @@
 			import { DragControls } from 'three/addons/controls/DragControls.js';
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			if ( WebGPU.isAvailable() === false ) {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+
+				throw new Error( 'No WebGPU support' );
+
+			}
+
 			// ---------------------------------------------------------------
 			// Globals
 			// ---------------------------------------------------------------
