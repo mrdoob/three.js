@@ -2157,6 +2157,17 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
+	 * Frees the GPU sampler for the given sampler binding.
+	 *
+	 * @param {Sampler} binding - The sampler binding to free.
+	 */
+	destroySampler( binding ) {
+
+		this.textureUtils.destroySampler( binding );
+
+	}
+
+	/**
 	 * Creates a default texture for the given texture that can be used
 	 * as a placeholder until the actual texture is ready for usage.
 	 *
