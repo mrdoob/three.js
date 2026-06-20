@@ -43,9 +43,9 @@
 				screenCoordinate, pass,
 				smoothstep, mix, min, max, floor,
 				mx_noise_float, storage, storageTexture, If, cameraPosition, hue,
-				Loop, positionWorld,
+				Loop, positionWorld, positionLocal,
 				interleavedGradientNoise, frameId, fract,
-				saturation
+				saturation, cos, sin, atan
 			} from 'three/tsl';
 
 			import { snoise, snoiseVec3 } from 'three/addons/tsl/math/CurlNoise.js';
@@ -135,10 +135,15 @@
 			const uPowderStrength = uniform( 0.59 );
 			const uMultiScattering = uniform( 1.0 );
 			const uPointLightVolumeIntensity = uniform( 2.0 );
-			const uPointLightSurfaceIntensity = uniform( 5.0 );
+			const uPointLightSurfaceIntensity = uniform( 10.0 );
 			const uLightNearIntensity = uniform( 0.0 );
 			const uLightFarIntensity = uniform( 8.0 );
 			const uLightFarDistance = uniform( 10.0 );
+			const uPointLightProjectionRadius = uniform( 20.0 );
+			const uPointLightProjectionBoost = uniform( 1.0 );
+			const uPointLightProjectionFrequency = uniform( 0.2 );
+			const uPointLightProjectionNoiseFade = uniform( 17.0 );
+			const uPointLightProjectionCenterFade = uniform( 3.25 );
 
 			const uFlameHeight = uniform( 3.5 );
 			const uSway = uniform( new THREE.Vector3() );
@@ -769,12 +774,52 @@
 					// Choose intensity based on whether we are shading the volume (smoke) or solid surfaces (reflection)
 					const currentIntensity = isVolume.equal( 1.0 ).select( uPointLightVolumeIntensity, uPointLightSurfaceIntensity );
 
-					// 4. Color temperature oscillation: shift color tone slightly over time
+					// 4. Color temperature oscillation: shift color tone slightly over time (uniform for volume)
 					const colorT = uEmitTemperature.div( 8.34 ).mul( 0.5 ).add( 0.20 ).add( uColorNoise ).clamp( 0.0, 1.0 );
 					const fireColor = fireRamp( colorT );
-
-					// Rotate hue based on uFireHue and apply saturation
 					const coloredFire = hue( saturation( fireColor, uSaturation ), uFireHue );
+
+					// 5. Projected fire light color on surfaces
+					// Calculate relative XZ position from teapot center
+					const relP = P.xz.sub( A.xz );
+					const angle = atan( relP.y, relP.x );
+					const distXZ = relP.length();
+
+					// Radial ray/spoke noise that rotates/flickers over time
+					const freqScale = uPointLightProjectionFrequency;
+					const angleNoise = mx_noise_float( vec3( cos( angle ).mul( float( 1.5 ).mul( freqScale ) ), sin( angle ).mul( float( 1.5 ).mul( freqScale ) ), uTime.mul( 0.6 ) ) ).mul( 0.5 ).add( 0.5 );
+
+					// Fade out the angle spoke noise near the center to prevent the atan(0,0) seam singularity
+					const centerFadeFactor = smoothstep( 0.0, uPointLightProjectionCenterFade, distXZ );
+					const cleanAngleNoise = mix( float( 1.0 ), angleNoise, centerFadeFactor );
+
+					// Spatial noise moving outwards/upwards (convective fire behavior)
+					const noiseCoord1 = vec3( P.x.mul( float( 0.6 ).mul( freqScale ) ), uTime.mul( 1.2 ), P.z.mul( float( 0.6 ).mul( freqScale ) ) );
+					const projN1 = mx_noise_float( noiseCoord1 ).mul( 0.5 ).add( 0.5 );
+
+					const noiseCoord2 = vec3( P.x.mul( float( 1.5 ).mul( freqScale ) ), uTime.mul( 2.5 ), P.z.mul( float( 1.5 ).mul( freqScale ) ) );
+					const projN2 = mx_noise_float( noiseCoord2 ).mul( 0.5 ).add( 0.5 );
+
+					// Combine the noises
+					const projNoise = projN1.mul( 0.65 ).add( projN2.mul( 0.35 ) );
+
+					// Modulate by radial spoke pattern
+					const projectionIntensity = projNoise.mul( cleanAngleNoise.mul( 0.5 ).add( 0.5 ) );
+
+					// Fade out the noise over distance (blend to uniform 1.0)
+					const noiseFadeFactor = distToSegment.div( uPointLightProjectionNoiseFade ).clamp( 0.0, 1.0 );
+					const finalIntensity = mix( projectionIntensity, float( 1.0 ), noiseFadeFactor );
+
+					// Create a radial temperature gradient from the fire center to project colors realistically
+					const radialTemp = float( 1.0 ).sub( distToSegment.div( uPointLightProjectionRadius ) ).clamp( 0.0, 1.0 );
+
+					// Map the radial temperature and noise to the fire colors (Start, Mid, End)
+					const colorTProj = radialTemp.mul( finalIntensity.mul( uPointLightProjectionBoost ) ).clamp( 0.0, 1.0 );
+					const fireColorProj = fireRamp( colorTProj );
+					const coloredFireProj = hue( saturation( fireColorProj, uSaturation ), uFireHue );
+
+					// Select either uniform fire color (volume) or projected fire color (surface)
+					const finalFireColor = isVolume.equal( 1.0 ).select( coloredFire, coloredFireProj );
 
 					// Scale intensity by uEmitTemperature (relative to its default 8.34) using Stefan-Boltzmann law (T^4)
 					// to make it physically correct (radiant energy is proportional to T^4)
@@ -787,7 +832,7 @@
 					// Smooth fade-in of point light intensity during the first 3 seconds of the simulation
 					const fadeIn = smoothstep( 0.0, 3.0, uTime );
 
-					const baseColor = coloredFire.mul( tempFactor ).mul( densityScale ).mul( uFireIntensity ).mul( currentIntensity ).mul( uFlicker ).mul( fadeIn );
+					const baseColor = finalFireColor.mul( tempFactor ).mul( densityScale ).mul( uFireIntensity ).mul( currentIntensity ).mul( uFlicker ).mul( fadeIn );
 
 					// Blend between near and far light intensity scales
 					const distRatio = distToSegment.div( uLightFarDistance ).clamp( 0.0, 1.0 );
@@ -893,8 +938,24 @@
 
 				teapot.material.emissiveNode = Fn( () => {
 
-					const colorT = uEmitTemperature.div( 8.34 ).mul( 0.5 ).add( 0.20 ).add( uColorNoise ).clamp( 0.0, 1.0 );
-					const fireColor = fireRamp( colorT );
+					// Lava flow animation using local position for stability when dragging
+					const p = positionLocal.mul( 0.5 );
+					const flow = vec3( 0.0, uTime.negate(), 0.0 );
+
+					// 3 Octaves of MaterialX Noise for organic fractal pattern
+					const n1 = mx_noise_float( p.add( flow ) ).mul( 0.5 ).add( 0.5 );
+					const p2 = p.mul( 2.0 ).sub( flow.mul( 1.5 ) );
+					const n2 = mx_noise_float( p2.add( vec3( n1.mul( 0.4 ) ) ) ).mul( 0.5 ).add( 0.5 );
+					const p3 = p.mul( 4.0 ).add( flow.mul( 2.5 ) );
+					const n3 = mx_noise_float( p3 ).mul( 0.5 ).add( 0.5 );
+
+					const noiseVal = n1.mul( 0.50 ).add( n2.mul( 0.35 ) ).add( n3.mul( 0.15 ) );
+
+					// Apply power function to create sharp glowing lava veins and wide dark crust regions
+					const lavaT = noiseVal.pow( 2.5 ).clamp( 0.0, 1.0 );
+
+					// Use fireRamp to map the lava temperature to the blackbody-like fire colors
+					const fireColor = fireRamp( lavaT );
 					const coloredFire = hue( saturation( fireColor, uSaturation ), uFireHue );
 
 					const tempScale = uEmitTemperature.div( 8.34 ).max( 0.0 );
@@ -902,7 +963,9 @@
 					const densityScale = uEmitDensity.div( 11.02 ).max( 0.0 );
 					const fadeIn = smoothstep( 0.0, 3.0, uTime );
 
-					return coloredFire.mul( tempFactor ).mul( densityScale ).mul( uFireIntensity ).mul( uFlicker ).mul( fadeIn ).mul( uTeapotEmissiveIntensity );
+					// Combine fire parameters with teapot emissive intensity and temporal flicker
+					// Boosted by 10.0 to make the glowing cracks stand out clearly on the dark surface
+					return coloredFire.mul( tempFactor ).mul( densityScale ).mul( uFireIntensity ).mul( uFlicker ).mul( fadeIn ).mul( uTeapotEmissiveIntensity.mul( 10.0 ) );
 
 				} )();
 
@@ -1007,7 +1070,12 @@
 				sceneLights.add( uPointLightVolumeIntensity, 'value', 0.0, 2.0, 0.001 ).name( 'Light Smoke' );
 				sceneLights.add( uLightNearIntensity, 'value', 0.0, 5.0, 0.05 ).name( 'Light Near Scale' );
 				sceneLights.add( uLightFarIntensity, 'value', 0.0, 10.0, 0.05 ).name( 'Light Far Scale' );
-				sceneLights.add( uPointLightSurfaceIntensity, 'value', 0.0, 10.0, 0.001 ).name( 'Light Reflection' );
+				sceneLights.add( uPointLightSurfaceIntensity, 'value', 0.0, 20.0, 0.001 ).name( 'Light Reflection' );
+				sceneLights.add( uPointLightProjectionRadius, 'value', 1.0, 30.0, 0.1 ).name( 'Proj Light Radius' );
+				sceneLights.add( uPointLightProjectionBoost, 'value', 0.0, 5.0, 0.05 ).name( 'Proj Light Boost' );
+				sceneLights.add( uPointLightProjectionFrequency, 'value', 0.1, 1.0, 0.01 ).name( 'Proj Light Freq' );
+				sceneLights.add( uPointLightProjectionNoiseFade, 'value', 1.0, 30.0, 0.1 ).name( 'Proj Noise Fade Dist' );
+				sceneLights.add( uPointLightProjectionCenterFade, 'value', 0.1, 5.0, 0.05 ).name( 'Proj Center Fade' );
 
 				// Tone Mapping & Exposure Folder
 				const toneMappingOptions = {
