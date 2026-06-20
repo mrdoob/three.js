@@ -9,9 +9,9 @@ class ParametersGroup {
 	constructor( parameters, name ) {
 
 		this.parameters = parameters;
-		this.name = name;
 
 		this.paramList = new Item( name );
+		this.paramList.setCollapsible( true );
 
 		this.objects = [];
 
@@ -20,6 +20,30 @@ class ParametersGroup {
 	close() {
 
 		this.paramList.close();
+
+		return this;
+
+	}
+
+	name( name ) {
+
+		this.paramList.setValue( 0, name );
+
+		return this;
+
+	}
+
+	show() {
+
+		this.paramList.show();
+
+		return this;
+
+	}
+
+	hide() {
+
+		this.paramList.hide();
 
 		return this;
 
@@ -128,6 +152,9 @@ class ParametersGroup {
 	_registerParameter( object, property, editor, subItem ) {
 
 		this.objects.push( { object: object, key: property, editor: editor, subItem: subItem } );
+
+		editor.addEventListener( 'show', () => subItem.show() );
+		editor.addEventListener( 'hide', () => subItem.hide() );
 
 	}
 
