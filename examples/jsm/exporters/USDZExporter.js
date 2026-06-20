@@ -1075,8 +1075,13 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 		if ( mapType === 'normal' ) {
 
-			textureNode.addProperty( 'float4 inputs:scale = (2, 2, 2, 1)' );
-			textureNode.addProperty( 'float4 inputs:bias = (-1, -1, -1, 0)' );
+			// Similar to GLTFExporter, only the x component is used so the y-negation that
+			// GLTFLoader applies to tangent-less glTF assets is not baked into the export.
+
+			const scale = material.normalScale.x;
+
+			textureNode.addProperty( `float4 inputs:scale = (${ 2 * scale }, ${ 2 * scale }, 2, 1)` );
+			textureNode.addProperty( `float4 inputs:bias = (${ - scale }, ${ - scale }, -1, 0)` );
 
 		}
 
