@@ -140,7 +140,6 @@
 			const uLightFarIntensity = uniform( 8.0 );
 			const uLightFarDistance = uniform( 10.0 );
 			const uPointLightProjectionRadius = uniform( 20.0 );
-			const uPointLightProjectionBoost = uniform( 1.0 );
 			const uPointLightProjectionFrequency = uniform( 0.2 );
 			const uPointLightProjectionNoiseFade = uniform( 17.0 );
 			const uPointLightProjectionCenterFade = uniform( 3.25 );
@@ -814,7 +813,7 @@
 					const radialTemp = float( 1.0 ).sub( distToSegment.div( uPointLightProjectionRadius ) ).clamp( 0.0, 1.0 );
 
 					// Map the radial temperature and noise to the fire colors (Start, Mid, End)
-					const colorTProj = radialTemp.mul( finalIntensity.mul( uPointLightProjectionBoost ) ).clamp( 0.0, 1.0 );
+					const colorTProj = radialTemp.mul( finalIntensity ).clamp( 0.0, 1.0 );
 					const fireColorProj = fireRamp( colorTProj );
 					const coloredFireProj = hue( saturation( fireColorProj, uSaturation ), uFireHue );
 
@@ -854,6 +853,7 @@
 				// DragControls to drag the teapot
 
 				const dragControls = new DragControls( [ teapot ], camera, renderer.domElement );
+				dragControls.rotateSpeed = 0;
 
 				dragControls.addEventListener( 'dragstart', function () {
 
@@ -955,7 +955,7 @@
 					const lavaT = noiseVal.pow( 2.5 ).clamp( 0.0, 1.0 );
 
 					// Use fireRamp to map the lava temperature to the blackbody-like fire colors
-					const fireColor = fireRamp( lavaT );
+					const fireColor = fireRamp( lavaT.add( .1 ) );
 					const coloredFire = hue( saturation( fireColor, uSaturation ), uFireHue );
 
 					const tempScale = uEmitTemperature.div( 8.34 ).max( 0.0 );
@@ -965,7 +965,7 @@
 
 					// Combine fire parameters with teapot emissive intensity and temporal flicker
 					// Boosted by 10.0 to make the glowing cracks stand out clearly on the dark surface
-					return coloredFire.mul( tempFactor ).mul( densityScale ).mul( uFireIntensity ).mul( uFlicker ).mul( fadeIn ).mul( uTeapotEmissiveIntensity.mul( 10.0 ) );
+					return coloredFire.mul( tempFactor ).mul( densityScale ).mul( uFireIntensity ).mul( uFlicker ).mul( fadeIn ).mul( uTeapotEmissiveIntensity );
 
 				} )();
 
@@ -1072,7 +1072,6 @@
 				sceneLights.add( uLightFarIntensity, 'value', 0.0, 10.0, 0.05 ).name( 'Light Far Scale' );
 				sceneLights.add( uPointLightSurfaceIntensity, 'value', 0.0, 20.0, 0.001 ).name( 'Light Reflection' );
 				sceneLights.add( uPointLightProjectionRadius, 'value', 1.0, 30.0, 0.1 ).name( 'Proj Light Radius' );
-				sceneLights.add( uPointLightProjectionBoost, 'value', 0.0, 5.0, 0.05 ).name( 'Proj Light Boost' );
 				sceneLights.add( uPointLightProjectionFrequency, 'value', 0.1, 1.0, 0.01 ).name( 'Proj Light Freq' );
 				sceneLights.add( uPointLightProjectionNoiseFade, 'value', 1.0, 30.0, 0.1 ).name( 'Proj Noise Fade Dist' );
 				sceneLights.add( uPointLightProjectionCenterFade, 'value', 0.1, 5.0, 0.05 ).name( 'Proj Center Fade' );
