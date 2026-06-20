@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - volumetric fire simulation</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - volumetric fire simulation">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_volume_fire.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_volume_fire.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Volumetric Fire Simulation</span>
+			</div>
+
+			<small>3D fluid simulation (semi-Lagrangian advection + curlNoise, buoyancy, Jacobi projection) on the GPU.</br>Drag the teapot to add turbulence.</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "../examples/jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import {
+				vec3, vec4, uvec3, float, Fn, uniform,
+				texture3D, textureStore, instanceIndex,
+				screenCoordinate, pass,
+				smoothstep, mix, min, max, floor,
+				mx_noise_float, storage, storageTexture, If, cameraPosition, hue,
+				Loop, positionWorld,
+				interleavedGradientNoise, frameId, fract,
+				saturation
+			} from 'three/tsl';
+
+			import { snoise, snoiseVec3 } from 'three/addons/tsl/math/CurlNoise.js';
+			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
+
+			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { DragControls } from 'three/addons/controls/DragControls.js';
+			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
+
+			// ---------------------------------------------------------------
+			// Globals
+			// ---------------------------------------------------------------
+
+			const GRID_SIZE_X = 100;
+			const GRID_SIZE_Y = 100;
+			const GRID_SIZE_Z = 200;
+			const CELL_COUNT = GRID_SIZE_X * GRID_SIZE_Y * GRID_SIZE_Z;
+			const PRESSURE_ITERATIONS = 2; // Jacobi iterations (keep even!) // default 6
+			const VOLUME_WORLD_SIZE_X = 12;
+			const VOLUME_WORLD_SIZE_Y = 12;
+			const VOLUME_WORLD_SIZE_Z = 24;
+			const VOLUME_WORLD_SIZE_DIAGONAL = Math.sqrt( VOLUME_WORLD_SIZE_X ** 2 + VOLUME_WORLD_SIZE_Y ** 2 + VOLUME_WORLD_SIZE_Z ** 2 );
+			const uVolumeWorldSize = uniform( new THREE.Vector3( VOLUME_WORLD_SIZE_X, VOLUME_WORLD_SIZE_Y, VOLUME_WORLD_SIZE_Z ) );
+			const TEXEL_X = 1 / GRID_SIZE_X;
+			const TEXEL_Y = 1 / GRID_SIZE_Y;
+			const TEXEL_Z = 1 / GRID_SIZE_Z;
+
+			let renderer, scene, camera, controls;
+			let volumetricMesh, teapot, keyLight, pointLight;
+			let renderPipeline;
+			let denoiseStrength;
+			let params;
+			let uKeyLightPos;
+
+			let teapotVerticesBuffer, vertexCount;
+			const prevTeapotPos = new THREE.Vector3();
+
+			// sim textures
+			let velTexA, velTexB; // velocity field (xyz)
+			let dyeTexA, dyeTexB; // x = density (smoke), y = temperature (fire)
+			let divTex; // divergence
+			let pressTexA, pressTexB; // pressure (Jacobi ping-pong)
+			let dyeTexNode, dyeTexWriteNode, curlNoiseTex, curlNoiseTexNode;
+
+			// compute passes
+			let advectVelocityPass, divergencePass, jacobiPassAB, jacobiPassBA, projectPass, advectDyePass, emitTeapotPass, computeCurlNoisePass;
+
+			// sim uniforms
+			const uDt = uniform( 0.016 );
+			const uTime = uniform( 0 );
+
+			const uBuoyancy = uniform( 3.5 ); // hot air rises
+			const uWeight = uniform( 0.15 ); // smoke weight (pulls down)
+			const uTurbulence = uniform( 3.2 ); // noise force strength
+			const uTurbulenceDecay = uniform( 0.1 ); // turbulence decay rate over age
+			const uTurbFrequency = uniform( 10.0 ); // noise force frequency
+			const uVelDamping = uniform( 0.25 ); // velocity dissipation /s
+
+			const uCooling = uniform( 1.0 ); // temperature cooling /s (default for 1.0s lifespan)
+			const uDissipation = uniform( 0.4 ); // smoke dissipation /s (default for 2.5s lifespan)
+
+			const uEmitDensity = uniform( 7.0 );
+			const uEmitTemperature = uniform( 5.5 );
+
+			const uTeapotMatrix = uniform( new THREE.Matrix4() );
+			const uTeapotSpeed = uniform( 0.0 );
+			const uMotionBoost = uniform( 0.25 ); // scales fire and smoke emission when moving
+			const uTeapotVelocity = uniform( new THREE.Vector3() );
+			const uWindStrength = uniform( 6.5 ); // strength of the wind effect when moving
+			const uTeapotPosition = uniform( new THREE.Vector3() );
+
+			// render uniforms
+			const uFireIntensity = uniform( 40.0 );
+			const uTeapotEmissiveIntensity = uniform( 0.2 );
+			const uFireGlowSpread = uniform( 5.0 );
+			const uShadowAbsorption = uniform( 2.0 );
+			const uShadowAmbient = uniform( 0.5 );
+			const uFireStartColor = uniform( new THREE.Color( 0xffe68c ) );
+			const uFireMidColor = uniform( new THREE.Color( 0xff7305 ) );
+			const uFireEndColor = uniform( new THREE.Color( 0xff0000 ) );
+			const uFireHue = uniform( 0.0 );
+			const uAsymmetry = uniform( 0.0 );
+			const uPowderStrength = uniform( 0.59 );
+			const uMultiScattering = uniform( 1.0 );
+			const uPointLightVolumeIntensity = uniform( 2.0 );
+			const uPointLightSurfaceIntensity = uniform( 5.0 );
+			const uLightNearIntensity = uniform( 0.0 );
+			const uLightFarIntensity = uniform( 8.0 );
+			const uLightFarDistance = uniform( 10.0 );
+
+			const uFlameHeight = uniform( 3.5 );
+			const uSway = uniform( new THREE.Vector3() );
+			const uFlicker = uniform( 1.0 );
+			const uColorNoise = uniform( 0.0 );
+			const cpuNoise = new ImprovedNoise();
+
+			init();
+
+			// ---------------------------------------------------------------
+			// Storage 3D textures (the "voxels")
+			// ---------------------------------------------------------------
+
+			function createStorage3D( name ) {
+
+				const texture = new THREE.Storage3DTexture( GRID_SIZE_X, GRID_SIZE_Y, GRID_SIZE_Z );
+				texture.name = name;
+				texture.format = THREE.RGBAFormat;
+				texture.type = THREE.HalfFloatType; // rgba16float -> storage-writable + linearly filterable
+				texture.minFilter = THREE.LinearFilter;
+				texture.magFilter = THREE.LinearFilter;
+				texture.wrapS = THREE.ClampToEdgeWrapping;
+				texture.wrapT = THREE.ClampToEdgeWrapping;
+				texture.wrapR = THREE.ClampToEdgeWrapping;
+
+				return texture;
+
+			}
+
+			// ---------------------------------------------------------------
+			// TSL helpers shared by the compute kernels
+			// ---------------------------------------------------------------
+
+			// instanceIndex (1D) -> voxel coordinate (3D)
+			const getVoxelCoord = ( id ) => {
+
+				const x = id.mod( GRID_SIZE_X );
+				const y = id.div( GRID_SIZE_X ).mod( GRID_SIZE_Y );
+				const z = id.div( GRID_SIZE_X * GRID_SIZE_Y );
+
+				return uvec3( x, y, z );
+
+			};
+
+			// voxel coordinate -> normalized uvw at the cell center
+			const coordToUVW = ( coord ) => vec3( coord ).add( 0.5 ).div( vec3( GRID_SIZE_X, GRID_SIZE_Y, GRID_SIZE_Z ) );
+
+			// ---------------------------------------------------------------
+			// Fluid simulation - compute kernels
+			// ---------------------------------------------------------------
+
+			function createComputePasses() {
+
+				// 0) Precompute curl noise into 3D storage texture
+				computeCurlNoisePass = Fn( () => {
+
+					const coord = getVoxelCoord( instanceIndex );
+					const uvw = coordToUVW( coord );
+
+					const freq = uTurbFrequency; // 10.0
+					const e = float( 0.1 ).div( freq );
+					const dx = vec3( e, 0.0, 0.0 );
+					const dy = vec3( 0.0, e, 0.0 );
+					const dz = vec3( 0.0, 0.0, e );
+
+					const p = uvw.mul( vec3( VOLUME_WORLD_SIZE_X / VOLUME_WORLD_SIZE_Y, 1.0, VOLUME_WORLD_SIZE_Z / VOLUME_WORLD_SIZE_Y ) );
+					const p_x0 = snoiseVec3( p.sub( dx ).mul( freq ) );
+					const p_x1 = snoiseVec3( p.add( dx ).mul( freq ) );
+					const p_y0 = snoiseVec3( p.sub( dy ).mul( freq ) );
+					const p_y1 = snoiseVec3( p.add( dy ).mul( freq ) );
+					const p_z0 = snoiseVec3( p.sub( dz ).mul( freq ) );
+					const p_z1 = snoiseVec3( p.add( dz ).mul( freq ) );
+
+					const x = p_y1.z.sub( p_y0.z ).sub( p_z1.y ).add( p_z0.y );
+					const y = p_z1.x.sub( p_z0.x ).sub( p_x1.z ).add( p_x0.z );
+					const z = p_x1.y.sub( p_x0.y ).sub( p_y1.x ).add( p_y0.x );
+
+					// Analytical curlNoise multiplier is 1.0 / (2.0 * e) = 5.0 (since e = 0.1)
+					const noiseVal = vec3( x, y, z ).mul( 5.0 );
+
+					textureStore( curlNoiseTex, coord, vec4( noiseVal, 0.0 ) ).toWriteOnly();
+
+				} )().compute( CELL_COUNT ).setName( 'computeCurlNoise' );
+
+				// 1) Advect velocity + external forces (buoyancy, weight, turbulence)
+				//    read: velTexA, dyeTexNode -> write: velTexB
+
+				advectVelocityPass = Fn( () => {
+
+					const coord = getVoxelCoord( instanceIndex );
+					const uvw = coordToUVW( coord );
+
+					const vel = texture3D( velTexA, uvw, 0 ).xyz;
+
+					// semi-Lagrangian advection: look back along the velocity
+					const velUVW = vel.div( uVolumeWorldSize );
+					const prevPos = uvw.sub( velUVW.mul( uDt ) );
+					const newVel = texture3D( velTexA, prevPos, 0 ).xyz.toVar();
+
+					const dye = dyeTexNode.sample( uvw ).level( 0 );
+					const density = dye.r;
+					const temperature = dye.g;
+					const age = dye.b;
+
+					// buoyancy (hot rises) vs smoke weight (cold falls)
+					const buoyancyForce = temperature.mul( uBuoyancy ).sub( density.mul( uWeight ) ).mul( VOLUME_WORLD_SIZE_Y );
+					newVel.addAssign( vec3( 0, buoyancyForce, 0 ).mul( uDt ) );
+
+					// turbulence: divergence-free noise force
+					// 1) Thermal/Convective turbulence: stronger where it's hot, decaying over age
+					const thermalNoisePos = uvw.add( vec3( 0, age.negate().mul( 0.6 ), age.mul( 0.13 ) ).div( uTurbFrequency ) );
+					const decay = age.mul( uTurbulenceDecay.negate() ).exp();
+					const thermalTurbulence = curlNoiseTexNode.sample( thermalNoisePos ).level( 0 ).xyz.mul( uTurbulence ).mul( temperature ).mul( decay );
+
+					// 2) Ambient/Atmospheric turbulence: lower frequency, weaker, acts on the smoke density (even when cooled down)
+					//    using uTime so it animates continuously regardless of age
+					const ambientNoisePos = uvw.mul( 0.5 ).add( vec3( 0, uTime.mul( 0.25 ), uTime.mul( 0.06 ) ).div( uTurbFrequency ) );
+					const ambientTurbulence = curlNoiseTexNode.sample( ambientNoisePos ).level( 0 ).xyz.mul( uTurbulence.mul( 0.2 ) ).mul( density );
+
+					const turbulence = thermalTurbulence.add( ambientTurbulence ).mul( VOLUME_WORLD_SIZE_Y );
+					newVel.addAssign( turbulence.mul( uDt ) );
+
+					// damping
+					newVel.mulAssign( max( float( 1 ).sub( uVelDamping.mul( uDt ) ), 0 ) );
+
+					// Wind effect: bounding sphere around teapot
+					const worldPos = uvw.sub( 0.5 ).mul( uVolumeWorldSize ).add( vec3( 0, VOLUME_WORLD_SIZE_Y / 2, 0 ) );
+					const dist = worldPos.distance( uTeapotPosition );
+					const teapotRadius = float( 1.0 );
+
+					If( dist.lessThan( teapotRadius ), () => {
+
+						const ratio = dist.div( teapotRadius );
+						const falloff = smoothstep( 0.0, 1.0, float( 1.0 ).sub( ratio ) );
+
+						// Wind turbulence scales with uTurbulence and teapot speed, using curlNoise
+						const windNoisePos = uvw.add( vec3( 0.0, uTime.mul( 0.5 ), 0.0 ).div( uTurbFrequency ) );
+						const windTurbulence = curlNoiseTexNode.sample( windNoisePos ).level( 0 ).xyz.mul( uTurbulence ).mul( uTeapotSpeed );
+
+						const windVel = uTeapotVelocity.mul( uWindStrength ).add( windTurbulence ).mul( uDt ).mul( falloff );
+
+						newVel.addAssign( windVel );
+
+					} );
+
+					// fade velocity near the volume borders (soft boundary condition)
+					const edge = min( uvw, vec3( 1 ).sub( uvw ) );
+					const boundary = smoothstep( 0.0, 0.08, min( edge.x, min( edge.y, edge.z ) ) );
+					newVel.mulAssign( boundary );
+
+					textureStore( velTexB, coord, vec4( newVel, 0 ) ).toWriteOnly();
+
+				} )().compute( CELL_COUNT ).setName( 'advectVelocity' );
+
+				// 2) Divergence of the advected velocity
+				//    read: velTexB -> write: divTex
+
+				divergencePass = Fn( () => {
+
+					const coord = getVoxelCoord( instanceIndex );
+					const uvw = coordToUVW( coord );
+
+					const vR = texture3D( velTexB, uvw.add( vec3( TEXEL_X, 0, 0 ) ), 0 ).x;
+					const vL = texture3D( velTexB, uvw.sub( vec3( TEXEL_X, 0, 0 ) ), 0 ).x;
+					const vU = texture3D( velTexB, uvw.add( vec3( 0, TEXEL_Y, 0 ) ), 0 ).y;
+					const vD = texture3D( velTexB, uvw.sub( vec3( 0, TEXEL_Y, 0 ) ), 0 ).y;
+					const vF = texture3D( velTexB, uvw.add( vec3( 0, 0, TEXEL_Z ) ), 0 ).z;
+					const vB = texture3D( velTexB, uvw.sub( vec3( 0, 0, TEXEL_Z ) ), 0 ).z;
+
+					const divergence = vR.sub( vL ).add( vU.sub( vD ) ).add( vF.sub( vB ) ).mul( 0.5 );
+
+					textureStore( divTex, coord, vec4( divergence, 0, 0, 0 ) ).toWriteOnly();
+
+				} )().compute( CELL_COUNT ).setName( 'divergence' );
+
+				// 3) Jacobi pressure solve (ping-pong A <-> B)
+
+				const jacobi = ( pressRead, pressWrite, name ) => Fn( () => {
+
+					const coord = getVoxelCoord( instanceIndex );
+					const uvw = coordToUVW( coord );
+
+					const pR = texture3D( pressRead, uvw.add( vec3( TEXEL_X, 0, 0 ) ), 0 ).x;
+					const pL = texture3D( pressRead, uvw.sub( vec3( TEXEL_X, 0, 0 ) ), 0 ).x;
+					const pU = texture3D( pressRead, uvw.add( vec3( 0, TEXEL_Y, 0 ) ), 0 ).x;
+					const pD = texture3D( pressRead, uvw.sub( vec3( 0, TEXEL_Y, 0 ) ), 0 ).x;
+					const pF = texture3D( pressRead, uvw.add( vec3( 0, 0, TEXEL_Z ) ), 0 ).x;
+					const pB = texture3D( pressRead, uvw.sub( vec3( 0, 0, TEXEL_Z ) ), 0 ).x;
+
+					const divergence = texture3D( divTex, uvw, 0 ).x;
+
+					const pressure = pR.add( pL ).add( pU ).add( pD ).add( pF ).add( pB ).sub( divergence ).div( 6 );
+
+					textureStore( pressWrite, coord, vec4( pressure, 0, 0, 0 ) ).toWriteOnly();
+
+				} )().compute( CELL_COUNT ).setName( name );
+
+				jacobiPassAB = jacobi( pressTexA, pressTexB, 'jacobiAB' );
+				jacobiPassBA = jacobi( pressTexB, pressTexA, 'jacobiBA' );
+
+				// 4) Project: subtract pressure gradient -> divergence-free velocity
+				//    read: velTexB, pressTexA -> write: velTexA (final velocity of the frame)
+
+				projectPass = Fn( () => {
+
+					const coord = getVoxelCoord( instanceIndex );
+					const uvw = coordToUVW( coord );
+
+					const pR = texture3D( pressTexA, uvw.add( vec3( TEXEL_X, 0, 0 ) ), 0 ).x;
+					const pL = texture3D( pressTexA, uvw.sub( vec3( TEXEL_X, 0, 0 ) ), 0 ).x;
+					const pU = texture3D( pressTexA, uvw.add( vec3( 0, TEXEL_Y, 0 ) ), 0 ).x;
+					const pD = texture3D( pressTexA, uvw.sub( vec3( 0, TEXEL_Y, 0 ) ), 0 ).x;
+					const pF = texture3D( pressTexA, uvw.add( vec3( 0, 0, TEXEL_Z ) ), 0 ).x;
+					const pB = texture3D( pressTexA, uvw.sub( vec3( 0, 0, TEXEL_Z ) ), 0 ).x;
+
+					const gradient = vec3( pR.sub( pL ), pU.sub( pD ), pF.sub( pB ) ).mul( 0.5 );
+
+					const vel = texture3D( velTexB, uvw, 0 ).xyz.sub( gradient );
+
+					textureStore( velTexA, coord, vec4( vel, 0 ) ).toWriteOnly();
+
+				} )().compute( CELL_COUNT ).setName( 'project' );
+
+				// 5) Advect density / temperature
+				//    read: dyeTexNode, velTexA -> write: dyeTexWriteNode
+
+				advectDyePass = Fn( () => {
+
+					const coord = getVoxelCoord( instanceIndex );
+					const uvw = coordToUVW( coord );
+
+					const vel = texture3D( velTexA, uvw, 0 ).xyz;
+					const velUVW = vel.div( uVolumeWorldSize );
+					const prevPos = uvw.sub( velUVW.mul( uDt ) );
+
+					const dye = dyeTexNode.sample( prevPos ).level( 0 );
+
+					const density = dye.r.mul( max( float( 1 ).sub( uDissipation.mul( uDt ) ), 0 ) ).toVar();
+					const temperature = dye.g.mul( max( float( 1 ).sub( uCooling.mul( uDt ) ), 0 ) ).toVar();
+
+					// Nearest neighbor lookup for age to prevent numerical diffusion
+					const gridDims = vec3( GRID_SIZE_X, GRID_SIZE_Y, GRID_SIZE_Z );
+					const nearestUVW = floor( prevPos.mul( gridDims ) ).add( 0.5 ).div( gridDims );
+					const age = dyeTexNode.sample( nearestUVW ).level( 0 ).b.add( uDt ).toVar();
+
+					temperature.assign( temperature.clamp( 0, 12 ) );
+
+					If( density.lessThanEqual( 0.01 ), () => {
+
+						age.assign( 0.0 );
+
+					} );
+
+					textureStore( dyeTexWriteNode, coord, vec4( density, temperature, age, 1.0 ) ).toWriteOnly();
+
+				} )().compute( CELL_COUNT ).setName( 'advectDye' );
+
+				// 6) Emit density/temperature from teapot vertices
+				//    write: dyeTexWriteNode
+
+				emitTeapotPass = Fn( () => {
+
+					const vertexPos = teapotVerticesBuffer.element( instanceIndex );
+					const worldPos = uTeapotMatrix.mul( vec4( vertexPos, 1.0 ) ).xyz;
+
+					// Map world position to volume box UVW space [0..1]
+					const uvw = worldPos.sub( vec3( 0, VOLUME_WORLD_SIZE_Y / 2, 0 ) ).div( uVolumeWorldSize ).add( 0.5 );
+
+					// Check boundary
+					If( uvw.x.greaterThanEqual( 0 ).and( uvw.x.lessThanEqual( 1 ) )
+						.and( uvw.y.greaterThanEqual( 0 ) ).and( uvw.y.lessThanEqual( 1 ) )
+						.and( uvw.z.greaterThanEqual( 0 ) ).and( uvw.z.lessThanEqual( 1 ) ), () => {
+
+						const coord = uvec3( uvw.mul( vec3( GRID_SIZE_X, GRID_SIZE_Y, GRID_SIZE_Z ) ) );
+
+						// Add flicker / animated noise based on local vertex position
+						const flicker = mx_noise_float( vertexPos.mul( 9.0 ).add( vec3( 0.0, uTime.negate().mul( 2.5 ), uTime.mul( 0.7 ) ) ) ).mul( 0.5 ).add( 0.5 );
+
+						// Baseline emission depends on temperature rate (0 if temperature is 0)
+						const baseEmission = uEmitTemperature.greaterThan( 0.0 ).select( float( 1.0 ), float( 0.0 ) );
+
+						// Movement-based emission (boost) scales with speed
+						const movementEmission = uTeapotSpeed.mul( uMotionBoost );
+
+						// Unified emission factor (includes movement boost)
+						const emissionFactor = baseEmission.add( movementEmission );
+
+						const densityVal = uEmitDensity.mul( float( 1 / 120 ) ).mul( flicker.mul( 0.85 ).add( 0.15 ) ).mul( emissionFactor );
+
+						If( densityVal.greaterThan( 0.0 ), () => {
+
+							const tempVal = uEmitTemperature.mul( float( 1 / 120 ) ).mul( flicker.mul( 0.85 ).add( 0.15 ) ).mul( emissionFactor );
+
+							// Read current dye and add emission
+							const currentDye = dyeTexNode.sample( uvw ).level( 0 );
+							const newDensity = currentDye.r.add( densityVal );
+							const newTemp = currentDye.g.add( tempVal ).clamp( 0.0, 12.0 );
+
+							const currentAge = currentDye.b;
+							const newAge = mix( currentAge, float( 0.0 ), densityVal.div( max( newDensity, 0.001 ) ) );
+
+							textureStore( dyeTexWriteNode, coord, vec4( newDensity, newTemp, newAge, 1.0 ) ).toWriteOnly();
+
+						} );
+
+					} );
+
+				} )().compute( vertexCount ).setName( 'emitTeapot' );
+
+			}
+
+			// ---------------------------------------------------------------
+			// Init
+			// ---------------------------------------------------------------
+
+			function init() {
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 2;
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.transmitted = true;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 14, 5.5, 4.4 );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, - VOLUME_WORLD_SIZE_Y / 2 + 3.6 + VOLUME_WORLD_SIZE_Y / 2, 0 );
+				controls.maxDistance = 40;
+				controls.minDistance = 2;
+				controls.update();
+
+				// Simulation resources
+
+				velTexA = createStorage3D( 'velocity A' );
+				velTexB = createStorage3D( 'velocity B' );
+				dyeTexA = createStorage3D( 'dye A' );
+				dyeTexB = createStorage3D( 'dye B' );
+				divTex = createStorage3D( 'divergence' );
+				pressTexA = createStorage3D( 'pressure A' );
+				pressTexB = createStorage3D( 'pressure B' );
+				curlNoiseTex = createStorage3D( 'curlNoise' );
+				curlNoiseTex.wrapS = THREE.RepeatWrapping;
+				curlNoiseTex.wrapT = THREE.RepeatWrapping;
+				curlNoiseTex.wrapR = THREE.RepeatWrapping;
+
+				dyeTexNode = texture3D( dyeTexA );
+				dyeTexWriteNode = storageTexture( dyeTexB ).toWriteOnly();
+				curlNoiseTexNode = texture3D( curlNoiseTex );
+
+				// Teapot geometry & storage buffer for compute stage
+				const teapotGeometry = new TeapotGeometry( 0.8, 28 );
+				teapotGeometry.computeBoundingBox();
+				const teapotMinY = teapotGeometry.boundingBox.min.y;
+				vertexCount = teapotGeometry.attributes.position.count;
+				teapotVerticesBuffer = storage( teapotGeometry.attributes.position, 'vec3', vertexCount ).toReadOnly();
+
+				createComputePasses();
+
+				// Precompute curl noise on the GPU
+				renderer.computeAsync( computeCurlNoisePass );
+
+				// Volumetric material - ray marches the simulated 3D texture
+
+				const volumetricMaterial = new THREE.VolumeNodeMaterial();
+				volumetricMaterial.steps = 16;
+				volumetricMaterial.transparent = true;
+				volumetricMaterial.blending = THREE.AdditiveBlending;
+				volumetricMaterial.depthWrite = false;
+
+				// Dithering to reduce banding
+				volumetricMaterial.offsetNode = fract( interleavedGradientNoise( screenCoordinate ).add( float( frameId ).mul( 0.618033988749895 ) ) );
+
+				// blackbody-style fire ramp: start color -> mid color -> end color
+				const fireRamp = Fn( ( [ t ] ) => {
+
+					const color = vec3( 0 ).toVar();
+					color.assign( mix( vec3( 0.0, 0.0, 0.0 ), uFireEndColor, smoothstep( 0.05, 0.35, t ) ) );
+					color.assign( mix( color, uFireMidColor, smoothstep( 0.35, 0.65, t ) ) );
+					color.assign( mix( color, uFireStartColor, smoothstep( 0.65, 1.0, t ) ) );
+
+					return color;
+
+				} );
+
+				const henyeyGreenstein = Fn( ( [ cosTheta, g ] ) => {
+
+					const g2 = g.mul( g );
+					const denom = float( 1.0 ).add( g2 ).sub( float( 2.0 ).mul( g ).mul( cosTheta ) );
+					const oneMinusG2 = float( 1.0 ).sub( g2 );
+					// Normalization constant 1 / (4 * PI) is approx 0.079577
+					return oneMinusG2.div( denom.pow( 1.5 ) ).mul( 0.079577 );
+
+				} );
+
+				const getVolumeSample = ( { positionRay } ) => {
+
+					// volume box is shifted up -> map ray position to uvw [0..1]
+					const uvw = positionRay.sub( vec3( 0, VOLUME_WORLD_SIZE_Y / 2, 0 ) ).div( uVolumeWorldSize ).add( 0.5 ).toVar();
+
+					// 1) Domain Warping: distort coordinates using velocity field over time to make smoke wispy (Option A)
+					const noiseDistortion = texture3D( velTexA, uvw, 0 ).xyz.div( uVolumeWorldSize ).mul( 0.15 );
+					const distortedUVW = uvw.add( noiseDistortion ).clamp( 0.0, 1.0 ).toVar();
+
+					const sample = dyeTexNode.sample( distortedUVW ).level( 0 );
+
+					const density = sample.r;
+					const age = sample.b;
+					const temperature = sample.g;
+
+					// 2) High-frequency detail noise modulation (using simplex noise instead of mx_noise)
+					const detailNoise = snoise( positionRay.mul( 5.5 ).add( vec3( 0, age.mul( 0.8 ).negate(), 0 ) ) );
+					density.mulAssign( detailNoise.mul( 0.35 ).add( 0.85 ) );
+
+					// soften the box edges
+					const edge = min( distortedUVW, vec3( 1 ).sub( distortedUVW ) );
+					density.mulAssign( smoothstep( 0.0, 0.06, min( edge.x, min( edge.y, edge.z ) ) ) );
+
+					return { density, temperature, age, distortedUVW };
+
+				};
+
+				volumetricMaterial.scatteringNode = Fn( ( { positionRay } ) => {
+
+					const { density } = getVolumeSample( { positionRay } );
+
+					// 3) Key-light Self-Shadowing: raymarch towards uKeyLightPos
+					const lightDir = uKeyLightPos.sub( positionRay ).normalize();
+					const shadowDensitySum = float( 0.0 ).toVar();
+					const shadowStepSize = 0.35;
+
+					for ( let i = 0; i < 2; i ++ ) { // default 5
+
+						const stepDist = ( i + 0.5 ) * shadowStepSize;
+						const shadowPos = positionRay.add( lightDir.mul( stepDist ) );
+						const shadowUVW = shadowPos.sub( vec3( 0, VOLUME_WORLD_SIZE_Y / 2, 0 ) ).div( uVolumeWorldSize ).add( 0.5 );
+
+						// Fade out shadow density near the volume borders to avoid edge artifacts
+						const shadowEdge = min( shadowUVW, vec3( 1 ).sub( shadowUVW ) );
+						const shadowFade = smoothstep( 0.0, 0.06, min( shadowEdge.x, min( shadowEdge.y, shadowEdge.z ) ) );
+
+						const shadowSample = texture3D( dyeTexA, shadowUVW, 0 ).r.mul( shadowFade );
+						shadowDensitySum.addAssign( shadowSample );
+
+					}
+
+					// Calculate optical thickness (tau)
+					const tau = shadowDensitySum.mul( shadowStepSize ).mul( uShadowAbsorption );
+					const beer = tau.negate().exp();
+
+					// Multiple Scattering Approximation (Octave 2): lower absorption (e.g. 0.25x) and scaled down contribution (0.5x)
+					const multiScatter = tau.mul( 0.25 ).negate().exp().mul( 0.5 );
+
+					// Blend between single and multiple scattering
+					const baseTransmittance = mix( beer, beer.add( multiScatter ), uMultiScattering );
+
+					// Apply Beer's Law Powder Effect to simulate edge self-shadowing details
+					const powder = float( 1.0 ).sub( tau.mul( 2.0 ).negate().exp() );
+					const finalTransmittance = mix( baseTransmittance, baseTransmittance.mul( powder ), uPowderStrength );
+
+					// Apply ambient light in shadowed regions
+					const lightTransmittance = finalTransmittance.add( uShadowAmbient ).clamp( 0.0, 1.0 );
+
+					// Henyey-Greenstein Phase Function for directional scattering
+					const viewDir = cameraPosition.sub( positionRay ).normalize();
+					const cosTheta = viewDir.dot( lightDir ).clamp( - 1.0, 1.0 );
+					const phase = henyeyGreenstein( cosTheta, uAsymmetry );
+
+					// Apply shadowing and phase function only to the smoke scattering
+					// Multiply phase function by 4 * PI (approx 12.56637) to maintain standard lighting scale
+					const smokeScattering = vec3( density ).mul( lightTransmittance ).mul( phase.mul( 12.56637 ) );
+
+					return smokeScattering;
+
+				} );
+
+				volumetricMaterial.scatteringEmissiveNode = Fn( ( { positionRay } ) => {
+
+					const { density, temperature } = getVolumeSample( { positionRay } );
+
+					// fire "emission" (boosted scattering tinted by temperature)
+					// Control the spread of the fire core (inverted: higher spread = lower power)
+					const firePower = float( 6.0 ).sub( uFireGlowSpread );
+					const fire = fireRamp( temperature.clamp( 0, 1 ) ).mul( temperature.pow( firePower ) ).mul( uFireIntensity );
+
+					// Apply hue rotation to the fire color
+					const fireColor = hue( fire, uFireHue );
+
+					// Simulate the spotlight distance attenuation (with a constant intensity of 400) to restore the original color/brightness
+					const distance = positionRay.sub( uKeyLightPos ).length();
+					const attenuation = float( 400.0 ).div( distance.pow( 2.0 ) );
+
+					return fireColor.mul( density.add( 0.15 ) ).mul( attenuation );
+
+				} );
+
+				const volumeCastShadow = Fn( () => {
+
+					const startPos = positionWorld;
+					const lightDir = positionWorld.sub( cameraPosition ).normalize();
+
+					const steps = uniform( 'int' ).onRenderUpdate( ( { material, object } ) => material.steps || ( object && object.material && object.material.steps ) || volumetricMaterial.steps );
+					const maxDistance = float( VOLUME_WORLD_SIZE_DIAGONAL ); // Diagonal of volume box
+					const stepSize = maxDistance.div( steps ).toVar();
+					const rayDir = lightDir.toVar();
+
+					const distTravelled = float( 0.0 ).toVar();
+					const transmittance = float( 1.0 ).toVar();
+
+					Loop( steps, () => {
+
+						const positionRay = startPos.add( rayDir.mul( distTravelled ) );
+
+						const { density } = getVolumeSample( { positionRay } );
+
+						const absorption = density.mul( uShadowAbsorption ).mul( 0.01 );
+						const falloff = absorption.negate().mul( stepSize ).exp();
+
+						transmittance.mulAssign( falloff );
+
+						distTravelled.addAssign( stepSize );
+
+					} );
+
+					// If the ray is completely transparent, discard the fragment
+					transmittance.greaterThanEqual( 0.99 ).discard();
+
+					const shadowOpacity = transmittance.oneMinus();
+
+					return vec4( vec3( 0 ), shadowOpacity.mul( 5 ) );
+
+				} );
+
+				volumetricMesh = new THREE.Mesh( new THREE.BoxGeometry( VOLUME_WORLD_SIZE_X, VOLUME_WORLD_SIZE_Y, VOLUME_WORLD_SIZE_Z ), volumetricMaterial );
+				volumetricMesh.position.y = VOLUME_WORLD_SIZE_Y / 2 + 0.4;
+				volumetricMesh.receiveShadow = true;
+				scene.add( volumetricMesh );
+
+				const shadowMaterial = new THREE.VolumeNodeMaterial();
+				shadowMaterial.steps = volumetricMaterial.steps;
+				shadowMaterial.offsetNode = volumetricMaterial.offsetNode;
+				shadowMaterial.castShadowNode = volumeCastShadow();
+				shadowMaterial.shadowSide = THREE.FrontSide;
+				shadowMaterial.colorWrite = false;
+				shadowMaterial.depthWrite = false;
+				shadowMaterial.blending = THREE.CustomBlending;
+				shadowMaterial.blendEquation = THREE.AddEquation;
+				shadowMaterial.blendSrc = THREE.ZeroFactor;
+				shadowMaterial.blendDst = THREE.OneMinusSrcAlphaFactor;
+				shadowMaterial.blendEquationAlpha = THREE.AddEquation;
+				shadowMaterial.blendSrcAlpha = THREE.OneFactor;
+				shadowMaterial.blendDstAlpha = THREE.OneMinusSrcAlphaFactor;
+
+				const volumetricShadowMesh = new THREE.Mesh( new THREE.BoxGeometry( VOLUME_WORLD_SIZE_X, VOLUME_WORLD_SIZE_Y, VOLUME_WORLD_SIZE_Z ), shadowMaterial );
+				volumetricShadowMesh.position.y = VOLUME_WORLD_SIZE_Y / 2 + 0.4;
+				volumetricShadowMesh.castShadow = true;
+				scene.add( volumetricShadowMesh );
+
+				// Floor
+
+				const floorPlane = new THREE.Mesh( new THREE.PlaneGeometry( 80, 80 ), new THREE.MeshStandardMaterial( { color: 0x111115, roughness: 0.8 } ) );
+				floorPlane.rotation.x = - Math.PI / 2;
+				floorPlane.position.y = - VOLUME_WORLD_SIZE_Y / 2 + 0.4 + VOLUME_WORLD_SIZE_Y / 2 + 0.4;
+				floorPlane.receiveShadow = true;
+				scene.add( floorPlane );
+
+				// Teapot - opaque object inside the smoke, to visualize volumetric transparency / occlusion
+
+				teapot = new THREE.Mesh(
+					teapotGeometry,
+					new THREE.MeshStandardMaterial( { color: 0x000000, roughness: 1.0, metalness: 1.0 } )
+				);
+				//teapot.castShadow = true;
+				teapot.receiveShadow = true;
+				teapot.position.set( 0, floorPlane.position.y - teapotMinY, 0 );
+				teapot.visible = true;
+				scene.add( teapot );
+
+				prevTeapotPos.copy( teapot.position );
+				teapot.updateMatrixWorld();
+				uTeapotMatrix.value.copy( teapot.matrixWorld );
+				uTeapotPosition.value.copy( teapot.position );
+
+				const isVolume = Fn( ( { material } ) => {
+
+					const isVolumeMaterial = material && material.isVolumeNodeMaterial;
+
+					return float( isVolumeMaterial ? 1.0 : 0.0 );
+
+				} )();
+
+				const pointLightColor = Fn( () => {
+
+					// Shading point position in world space
+					const P = positionWorld;
+
+					// Light source bottom position (teapot position)
+					const A = uTeapotPosition;
+
+					// 1. Flame column height
+					const H = vec3( 0.0, uFlameHeight, 0.0 ); // Direction of vertical propagation
+
+					// Calculate closest point on vertical segment (displaced by sway)
+					const V = P.sub( A );
+					const t = V.dot( H ).div( H.dot( H ) ).clamp( 0.0, 1.0 );
+					const C = A.add( uSway ).add( H.mul( t ) );
+					const distToSegment = P.sub( C ).length();
+
+					// Calculate soft cylindrical attenuation (with flame thickness radius r = 1.2)
+					const r = float( 1.2 );
+					const softAttenuation = float( 1.0 ).div( distToSegment.pow( 2.0 ).add( r.pow( 2.0 ) ) );
+
+					// Recreate standard PointLight distance attenuation for correction/cancellation
+					const distToLight = P.sub( A ).length();
+					const decayExponent = float( 4.0 ); // Must match PointLight's decay value in the constructor
+					const defaultAttenuation = distToLight.pow( decayExponent ).max( 0.01 ).reciprocal();
+
+					// Correction factor to cancel the default point light attenuation and apply volumetric/capsule decay
+					const attenuationCorrection = softAttenuation.div( defaultAttenuation );
+
+					// Choose intensity based on whether we are shading the volume (smoke) or solid surfaces (reflection)
+					const currentIntensity = isVolume.equal( 1.0 ).select( uPointLightVolumeIntensity, uPointLightSurfaceIntensity );
+
+					// 4. Color temperature oscillation: shift color tone slightly over time
+					const colorT = uEmitTemperature.div( 8.34 ).mul( 0.5 ).add( 0.20 ).add( uColorNoise ).clamp( 0.0, 1.0 );
+					const fireColor = fireRamp( colorT );
+
+					// Rotate hue based on uFireHue and apply saturation
+					const coloredFire = hue( saturation( fireColor, uSaturation ), uFireHue );
+
+					// Scale intensity by uEmitTemperature (relative to its default 8.34) using Stefan-Boltzmann law (T^4)
+					// to make it physically correct (radiant energy is proportional to T^4)
+					const tempScale = uEmitTemperature.div( 8.34 ).max( 0.0 );
+					const tempFactor = tempScale.pow( 4.0 );
+
+					// Scale by uEmitDensity (relative to default 11.02) to represent fire/smoke size
+					const densityScale = uEmitDensity.div( 11.02 ).max( 0.0 );
+
+					// Smooth fade-in of point light intensity during the first 3 seconds of the simulation
+					const fadeIn = smoothstep( 0.0, 3.0, uTime );
+
+					const baseColor = coloredFire.mul( tempFactor ).mul( densityScale ).mul( uFireIntensity ).mul( currentIntensity ).mul( uFlicker ).mul( fadeIn );
+
+					// Blend between near and far light intensity scales
+					const distRatio = distToSegment.div( uLightFarDistance ).clamp( 0.0, 1.0 );
+					const distanceScale = mix( uLightNearIntensity, uLightFarIntensity, smoothstep( 0.0, 1.0, distRatio ) );
+
+					// Apply distance-based scaling only when shading the volumetric smoke
+					const finalScale = isVolume.equal( 1.0 ).select( distanceScale, float( 1.0 ) );
+
+					return baseColor.mul( attenuationCorrection ).mul( finalScale );
+
+				} )();
+
+				pointLight = new THREE.PointLight( 0xffffff, 1, 100, 4 );
+				pointLight.colorNode = pointLightColor;
+				pointLight.position.set( 0, 0, 0 );
+				pointLight.castShadow = false;
+				teapot.add( pointLight );
+
+				// DragControls to drag the teapot
+
+				const dragControls = new DragControls( [ teapot ], camera, renderer.domElement );
+
+				dragControls.addEventListener( 'dragstart', function () {
+
+					controls.enabled = false;
+
+				} );
+
+				dragControls.addEventListener( 'drag', function () {
+
+					// Constraint to volume box boundaries
+					const limitX = VOLUME_WORLD_SIZE_X / 2 - 1.5;
+					const limitZ = VOLUME_WORLD_SIZE_Z / 2 - 1.5;
+					teapot.position.x = Math.max( - limitX, Math.min( limitX, teapot.position.x ) );
+					teapot.position.y = Math.max( floorPlane.position.y - teapotMinY, Math.min( VOLUME_WORLD_SIZE_Y - 1.5, teapot.position.y ) );
+					teapot.position.z = Math.max( - limitZ, Math.min( limitZ, teapot.position.z ) );
+
+				} );
+
+				dragControls.addEventListener( 'dragend', function () {
+
+					controls.enabled = true;
+
+				} );
+
+				// Key light - white spot with shadow, so the smoke receives/shows shadows clearly
+
+				keyLight = new THREE.SpotLight( 0xffffff, 1000 );
+				keyLight.position.set( - 3 * ( VOLUME_WORLD_SIZE_X / 8 ), 6 * ( VOLUME_WORLD_SIZE_Y / 8 ) + VOLUME_WORLD_SIZE_Y / 2 + 0.4, 3 * ( VOLUME_WORLD_SIZE_Z / 8 ) );
+				keyLight.angle = Math.PI / 5;
+				keyLight.penumbra = 1;
+				keyLight.decay = 2;
+				keyLight.distance = 0;
+				keyLight.castShadow = true;
+				keyLight.shadow.intensity = .98;
+				keyLight.shadow.mapSize.width = 1024;
+				keyLight.shadow.mapSize.height = 1024;
+				keyLight.shadow.camera.near = 1;
+				const maxVolumeSize = Math.max( VOLUME_WORLD_SIZE_X, VOLUME_WORLD_SIZE_Y, VOLUME_WORLD_SIZE_Z );
+				keyLight.shadow.camera.far = 20 * ( maxVolumeSize / 8 );
+				keyLight.shadow.bias = - 0.001;
+				keyLight.shadow.focus = 1;
+				keyLight.target.position.set( 1, 0, 0 );
+				scene.add( keyLight );
+				scene.add( keyLight.target );
+
+				uKeyLightPos = uniform( keyLight.position );
+
+				// Render Pipeline (same structure as the volumetric example)
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				// Layers
+
+				const LAYER_VOLUMETRIC_LIGHTING = 10;
+
+				const volumetricLayer = new THREE.Layers();
+				volumetricLayer.disableAll();
+				volumetricLayer.enable( LAYER_VOLUMETRIC_LIGHTING );
+
+				volumetricMesh.layers.disableAll();
+				volumetricMesh.layers.enable( LAYER_VOLUMETRIC_LIGHTING );
+
+				keyLight.layers.enable( LAYER_VOLUMETRIC_LIGHTING );
+				pointLight.layers.enable( LAYER_VOLUMETRIC_LIGHTING );
+
+				// Scene Pass
+
+				const scenePass = pass( scene, camera ).toInspector( 'Scene' );
+				scenePass.name = 'Scene Pass';
+
+				// Volumetric Lighting Pass
+
+				const volumetricPass = pass( scene, camera ).toInspector( 'Volumetric Lighting' );
+				volumetricPass.name = 'Volumetric Lighting';
+				volumetricPass.setLayers( volumetricLayer );
+				volumetricPass.setResolutionScale( 0.5 );
+
+				// Compose and Denoise
+
+				denoiseStrength = uniform( 0.5 );
+				const uSaturation = uniform( 1.1 );
+
+				teapot.material.emissiveNode = Fn( () => {
+
+					const colorT = uEmitTemperature.div( 8.34 ).mul( 0.5 ).add( 0.20 ).add( uColorNoise ).clamp( 0.0, 1.0 );
+					const fireColor = fireRamp( colorT );
+					const coloredFire = hue( saturation( fireColor, uSaturation ), uFireHue );
+
+					const tempScale = uEmitTemperature.div( 8.34 ).max( 0.0 );
+					const tempFactor = tempScale.pow( 4.0 );
+					const densityScale = uEmitDensity.div( 11.02 ).max( 0.0 );
+					const fadeIn = smoothstep( 0.0, 3.0, uTime );
+
+					return coloredFire.mul( tempFactor ).mul( densityScale ).mul( uFireIntensity ).mul( uFlicker ).mul( fadeIn ).mul( uTeapotEmissiveIntensity );
+
+				} )();
+
+				params = {
+					resolution: volumetricPass.getResolutionScale(),
+					denoise: true,
+					simulate: true,
+					fireStartColor: '#ffe68c',
+					fireMidColor: '#ff7305',
+					fireEndColor: '#ff0000',
+					fireHue: 0,
+					simSpeed: 1.2,
+					smokeLifespan: 10.0,
+					fireLifespan: 1.0,
+					turbulence: 3.2,
+					toneMapping: 'ACESFilmic',
+					exposure: 2.0
+				};
+
+				const blurredVolumetricPass = gaussianBlur( volumetricPass, denoiseStrength, 1 ).toInspector( 'Blurred Volumetric' );
+
+				// GUI
+
+				const gui = renderer.inspector.createParameters( 'Fire Simulation' );
+
+				gui.add( params, 'simulate' ).name( 'Simulate Fluid' );
+				gui.add( params, 'simSpeed', 0.0, 2.0, 0.01 ).name( 'Simulation Speed' );
+				gui.add( params, 'resolution', .1, 1 ).name( 'Render Resolution' ).onChange( ( resolution ) => {
+
+					volumetricPass.setResolutionScale( resolution );
+
+				} );
+
+				// Quality & Denoise Folder
+				const qualityFolder = gui.addFolder( 'Quality & Denoise' );
+				qualityFolder.add( volumetricMaterial, 'steps', 4, 42, 1 ).name( 'Raymarch Steps' );
+				qualityFolder.add( params, 'denoise' ).name( 'Denoise Enabled' ).onChange( updatePostProcessing );
+				qualityFolder.add( denoiseStrength, 'value', 0, 1 ).name( 'Denoise Strength' );
+
+				function updatePostProcessing() {
+
+					let volumetric = volumetricPass;
+
+					if ( params.denoise ) {
+
+						volumetric = blurredVolumetricPass;
+
+					}
+
+					const volumetricRGB = volumetric.rgb;
+					const adjustedVolumetricRGB = saturation( volumetricRGB, uSaturation );
+					const adjustedVolumetric = vec4( adjustedVolumetricRGB, volumetric.a ).mul( .5 );
+
+					const scenePassColor = scenePass.max( adjustedVolumetric ).add( adjustedVolumetric );
+
+					renderPipeline.outputNode = scenePassColor;
+					renderPipeline.needsUpdate = true;
+
+				}
+
+				updatePostProcessing();
+
+				// Volume Visuals Folder
+				const volumeVisuals = gui.addFolder( 'Volume Visuals' );
+				//volumeVisuals.add( uFireIntensity, 'value', 0, 20 ).name( 'Fire Intensity' );
+				volumeVisuals.add( uFireGlowSpread, 'value', 1.0, 5.0, 0.1 ).name( 'Glow Spread' );
+				volumeVisuals.add( params, 'fireHue', 0, 360, 1 ).name( 'Fire Hue Shift' );
+				volumeVisuals.add( uSaturation, 'value', 0.0, 2.0, 0.05 ).name( 'Saturation' );
+				volumeVisuals.addColor( params, 'fireStartColor' ).name( 'Fire Start Color' );
+				volumeVisuals.addColor( params, 'fireMidColor' ).name( 'Fire Mid Color' );
+				volumeVisuals.addColor( params, 'fireEndColor' ).name( 'Fire End Color' );
+
+				// Emitter Controls Folder
+				const emitterControls = gui.addFolder( 'Emitter Controls' );
+				emitterControls.add( uEmitTemperature, 'value', 0, 8 ).name( 'Temperature Rate' );
+				emitterControls.add( uEmitDensity, 'value', 0, 20 ).name( 'Density Rate' );
+				emitterControls.add( uMotionBoost, 'value', 0.0, 0.4, 0.01 ).name( 'Movement Boost' );
+				emitterControls.add( uWindStrength, 'value', 0.0, 50.0, 0.01 ).name( 'Movement Wind Strength' );
+				emitterControls.add( uTeapotEmissiveIntensity, 'value', 0.0, 1.0, 0.001 ).name( 'Teapot Emissive' );
+
+				// Scattering & Shadows Folder
+				const scatteringShadows = gui.addFolder( 'Scattering & Shadows' );
+				scatteringShadows.add( uAsymmetry, 'value', - 0.99, 0.99, 0.01 ).name( 'Phase Asymmetry (g)' );
+				scatteringShadows.add( uPowderStrength, 'value', 0.0, 1.0, 0.01 ).name( 'Powder Effect' );
+				scatteringShadows.add( uMultiScattering, 'value', 0.0, 1.0, 0.01 ).name( 'Multi Scattering' );
+				scatteringShadows.add( uShadowAbsorption, 'value', 0, 10 ).name( 'Shadow Absorption' );
+				scatteringShadows.add( uShadowAmbient, 'value', 0, 1.0 ).name( 'Shadow Ambient' );
+
+				// Fluid Physics Folder
+				const fluidPhysics = gui.addFolder( 'Fluid Physics' );
+				fluidPhysics.add( uBuoyancy, 'value', 0, 10 ).name( 'Buoyancy (Rise)' );
+				fluidPhysics.add( uVelDamping, 'value', 0, 2 ).name( 'Velocity Damping' );
+				fluidPhysics.add( params, 'fireLifespan', 0.5, 10.0, 0.1 ).name( 'Fire Lifespan' );
+				fluidPhysics.add( params, 'smokeLifespan', 1.0, 100.0, 0.5 ).name( 'Smoke Lifespan' );
+				fluidPhysics.add( params, 'turbulence', 0, 5 ).name( 'Turbulence Strength' );
+				fluidPhysics.add( uTurbulenceDecay, 'value', 0.0, 1.0, 0.01 ).name( 'Turbulence Decay' );
+				fluidPhysics.add( uTurbFrequency, 'value', 1, 10 ).name( 'Turbulence Frequency' );
+
+				// Scene Lights Folder
+				const sceneLights = gui.addFolder( 'Scene Lights' );
+				sceneLights.add( keyLight, 'intensity', 0, 1500, 1 ).name( 'Key Light Intensity' );
+				sceneLights.add( uPointLightVolumeIntensity, 'value', 0.0, 2.0, 0.001 ).name( 'Light Smoke' );
+				sceneLights.add( uLightNearIntensity, 'value', 0.0, 5.0, 0.05 ).name( 'Light Near Scale' );
+				sceneLights.add( uLightFarIntensity, 'value', 0.0, 10.0, 0.05 ).name( 'Light Far Scale' );
+				sceneLights.add( uPointLightSurfaceIntensity, 'value', 0.0, 10.0, 0.001 ).name( 'Light Reflection' );
+
+				// Tone Mapping & Exposure Folder
+				const toneMappingOptions = {
+					None: THREE.NoToneMapping,
+					Linear: THREE.LinearToneMapping,
+					Reinhard: THREE.ReinhardToneMapping,
+					Cineon: THREE.CineonToneMapping,
+					ACESFilmic: THREE.ACESFilmicToneMapping,
+					AgX: THREE.AgXToneMapping,
+					Neutral: THREE.NeutralToneMapping
+				};
+
+				const toneMappingFolder = gui.addFolder( 'Tone Mapping & Exposure' );
+				toneMappingFolder.add( params, 'toneMapping', Object.keys( toneMappingOptions ) ).name( 'Tone Mapping' ).onChange( ( value ) => {
+
+					renderer.toneMapping = toneMappingOptions[ value ];
+
+				} );
+				toneMappingFolder.add( params, 'exposure', 0.1, 2.0, 0.05 ).name( 'Exposure' ).onChange( ( value ) => {
+
+					renderer.toneMappingExposure = value;
+
+				} );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			// ---------------------------------------------------------------
+			// Animation loop
+			// ---------------------------------------------------------------
+
+			let simulationTime = 0;
+			let lastTime = performance.now();
+
+			function animate() {
+
+				const currentTime = performance.now();
+				const delta = Math.min( ( currentTime - lastTime ) * 0.001, 1 / 30 );
+				lastTime = currentTime;
+
+				// Calculate teapot speed and velocity vector for wind effect
+				const currentPos = teapot.position;
+				const dist = currentPos.distanceTo( prevTeapotPos );
+				const speed = delta > 0 ? dist / delta : 0;
+
+				const teapotVel = new THREE.Vector3();
+				if ( delta > 0 ) {
+
+					teapotVel.subVectors( currentPos, prevTeapotPos ).multiplyScalar( 1 / delta );
+
+				}
+
+				prevTeapotPos.copy( currentPos );
+
+				uTeapotSpeed.value = speed;
+				uTeapotVelocity.value.copy( teapotVel );
+				uTeapotPosition.value.copy( currentPos );
+
+				// Calculate temporal noises on CPU to optimize fragment shader
+				const time = simulationTime;
+
+				const heightNoise = cpuNoise.noise( 0, time * 2.5, 0 );
+				uFlameHeight.value = 3.5 + heightNoise * 0.8;
+
+				const swayX = cpuNoise.noise( time * 3.5, 0, 0 ) * 0.4;
+				const swayZ = cpuNoise.noise( 0, 0, time * 3.5 ) * 0.4;
+				uSway.value.set( swayX, 0, swayZ );
+
+				const slowNoise = cpuNoise.noise( 0, time * 0.8, 0 );
+				const fastNoise = cpuNoise.noise( 0, time * 15.0, 0 );
+				uFlicker.value = slowNoise * 0.12 + fastNoise * 0.06 + 0.82;
+
+				const colorNoise = cpuNoise.noise( time * 5.0, time * 5.0, 0 ) * 0.08;
+				uColorNoise.value = colorNoise;
+
+				// Update teapot rotation and matrix BEFORE simulation so the compute shader is in sync
+				teapot.rotation.y = simulationTime * 0.25;
+				teapot.updateMatrixWorld();
+				uTeapotMatrix.value.copy( teapot.matrixWorld );
+
+				// Update point light range dynamically based on temperature, density (fire size) and fire intensity
+				const tempRatio = uEmitTemperature.value / 8.34;
+				const densityRatio = uEmitDensity.value / 11.02;
+				const intensityRatio = uFireIntensity.value / 5.63;
+				const sizeFactor = Math.sqrt( tempRatio * densityRatio * intensityRatio );
+
+				// Smooth fade-in factor over the first 3 seconds of the simulation
+				const t = Math.min( Math.max( simulationTime / 3.0, 0.0 ), 1.0 );
+				const fadeIn = t * t * ( 3.0 - 2.0 * t );
+
+				pointLight.distance = 40.0 * Math.max( 0.2, sizeFactor ) * fadeIn;
+
+				if ( params.simulate ) {
+
+					const dt = delta * params.simSpeed;
+					const stepTime = 1 / 120;
+					uDt.value = stepTime * params.simSpeed;
+					uTurbulence.value = params.simSpeed > 0 ? params.turbulence / Math.sqrt( params.simSpeed ) : 0;
+
+					simulationTime += dt;
+					uTime.value = simulationTime % 1000;
+
+					if ( params.smokeLifespan >= 100.0 ) {
+
+						uDissipation.value = 0.0;
+
+					} else {
+
+						uDissipation.value = 1.0 / params.smokeLifespan;
+
+					}
+
+					uCooling.value = 1.0 / params.fireLifespan;
+
+					// --- fluid simulation steps (compute shaders) ---
+
+					renderer.compute( advectVelocityPass ); // reads dyeTexNode, writes velTexB
+					renderer.compute( divergencePass ); // velB -> div
+
+					for ( let i = 0; i < PRESSURE_ITERATIONS; i ++ ) {
+
+						renderer.compute( ( i % 2 === 0 ) ? jacobiPassAB : jacobiPassBA );
+
+					}
+
+					renderer.compute( projectPass ); // velB - grad(p) -> velA
+					renderer.compute( advectDyePass ); // reads dyeTexNode, writes dyeTexWriteNode
+					renderer.compute( emitTeapotPass ); // inject from teapot vertices -> dyeTexWriteNode
+
+					// Ping-pong dye textures
+					const temp = dyeTexNode.value;
+					dyeTexNode.value = dyeTexWriteNode.value;
+					dyeTexWriteNode.value = temp;
+
+				}
+
+				uFireStartColor.value.set( params.fireStartColor );
+				uFireMidColor.value.set( params.fireMidColor );
+				uFireEndColor.value.set( params.fireEndColor );
+				uFireHue.value = THREE.MathUtils.degToRad( params.fireHue );
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+
+	</body>
+</html>
