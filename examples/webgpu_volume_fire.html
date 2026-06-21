@@ -1182,6 +1182,31 @@
 
 			let simulationTime = 0;
 			let lastTime = performance.now();
+			let simAccumulator = 0;
+
+			function updateTemporalUniforms( time ) {
+
+				uTime.value = time % 1000;
+
+				const heightNoise = cpuNoise.noise( 0, time * 2.5, 0 );
+				uFlameHeight.value = 3.5 + heightNoise * 0.8;
+
+				const swayX = cpuNoise.noise( time * 3.5, 0, 0 ) * 0.4;
+				const swayZ = cpuNoise.noise( 0, 0, time * 3.5 ) * 0.4;
+				uSway.value.set( swayX, 0, swayZ );
+
+				const slowNoise = cpuNoise.noise( 0, time * 0.8, 0 );
+				const fastNoise = cpuNoise.noise( 0, time * 15.0, 0 );
+				uFlicker.value = slowNoise * 0.12 + fastNoise * 0.06 + 0.82;
+
+				const colorNoise = cpuNoise.noise( time * 5.0, time * 5.0, 0 ) * 0.08;
+				uColorNoise.value = colorNoise;
+
+				teapot.rotation.y = time * 0.25;
+				teapot.updateMatrixWorld();
+				uTeapotMatrix.value.copy( teapot.matrixWorld );
+
+			}
 
 			function animate() {
 
@@ -1207,49 +1232,23 @@
 				uTeapotVelocity.value.copy( teapotVel );
 				uTeapotPosition.value.copy( currentPos );
 
-				// Calculate temporal noises on CPU to optimize fragment shader
-				const time = simulationTime;
-
-				const heightNoise = cpuNoise.noise( 0, time * 2.5, 0 );
-				uFlameHeight.value = 3.5 + heightNoise * 0.8;
-
-				const swayX = cpuNoise.noise( time * 3.5, 0, 0 ) * 0.4;
-				const swayZ = cpuNoise.noise( 0, 0, time * 3.5 ) * 0.4;
-				uSway.value.set( swayX, 0, swayZ );
-
-				const slowNoise = cpuNoise.noise( 0, time * 0.8, 0 );
-				const fastNoise = cpuNoise.noise( 0, time * 15.0, 0 );
-				uFlicker.value = slowNoise * 0.12 + fastNoise * 0.06 + 0.82;
-
-				const colorNoise = cpuNoise.noise( time * 5.0, time * 5.0, 0 ) * 0.08;
-				uColorNoise.value = colorNoise;
-
-				// Update teapot rotation and matrix BEFORE simulation so the compute shader is in sync
-				teapot.rotation.y = simulationTime * 0.25;
-				teapot.updateMatrixWorld();
-				uTeapotMatrix.value.copy( teapot.matrixWorld );
-
-				// Update point light range dynamically based on temperature, density (fire size) and fire intensity
-				const tempRatio = uEmitTemperature.value / 8.34;
-				const densityRatio = uEmitDensity.value / 11.02;
-				const intensityRatio = uFireIntensity.value / 5.63;
-				const sizeFactor = Math.sqrt( tempRatio * densityRatio * intensityRatio );
-
-				// Smooth fade-in factor over the first 3 seconds of the simulation
-				const t = Math.min( Math.max( simulationTime / 3.0, 0.0 ), 1.0 );
-				const fadeIn = t * t * ( 3.0 - 2.0 * t );
-
-				pointLight.distance = Math.max( 0.01, 40.0 * Math.max( 0.2, sizeFactor ) * fadeIn );
-
-				if ( params.simulate ) {
+				if ( params.simulate && params.simSpeed > 0 ) {
 
 					const dt = delta * params.simSpeed;
-					const stepTime = 1 / 120;
-					uDt.value = stepTime * params.simSpeed;
-					uTurbulence.value = params.simSpeed > 0 ? params.turbulence / Math.sqrt( params.simSpeed ) : 0;
+					simAccumulator += dt;
 
-					simulationTime += dt;
-					uTime.value = simulationTime % 1000;
+					const stepTime = 1 / 120;
+					const simStep = stepTime * params.simSpeed;
+
+					const maxAccumulator = simStep * 8;
+					if ( simAccumulator > maxAccumulator ) {
+
+						simAccumulator = maxAccumulator;
+
+					}
+
+					uDt.value = simStep;
+					uTurbulence.value = params.simSpeed > 0 ? params.turbulence / Math.sqrt( params.simSpeed ) : 0;
 
 					if ( params.smokeLifespan >= 100.0 ) {
 
@@ -1263,27 +1262,52 @@
 
 					uCooling.value = 1.0 / params.fireLifespan;
 
-					// --- fluid simulation steps (compute shaders) ---
+					while ( simAccumulator >= simStep ) {
 
-					renderer.compute( advectVelocityPass ); // reads dyeTexNode, writes velTexB
-					renderer.compute( divergencePass ); // velB -> div
+						simulationTime += simStep;
+						updateTemporalUniforms( simulationTime );
 
-					for ( let i = 0; i < PRESSURE_ITERATIONS; i ++ ) {
+						// --- fluid simulation steps (compute shaders) ---
 
-						renderer.compute( ( i % 2 === 0 ) ? jacobiPassAB : jacobiPassBA );
+						renderer.compute( advectVelocityPass ); // reads dyeTexNode, writes velTexB
+						renderer.compute( divergencePass ); // velB -> div
+
+						for ( let i = 0; i < PRESSURE_ITERATIONS; i ++ ) {
+
+							renderer.compute( ( i % 2 === 0 ) ? jacobiPassAB : jacobiPassBA );
+
+						}
+
+						renderer.compute( projectPass ); // velB - grad(p) -> velA
+						renderer.compute( advectDyePass ); // reads dyeTexNode, writes dyeTexWriteNode
+						renderer.compute( emitTeapotPass ); // inject from teapot vertices -> dyeTexWriteNode
+
+						// Ping-pong dye textures
+						const temp = dyeTexNode.value;
+						dyeTexNode.value = dyeTexWriteNode.value;
+						dyeTexWriteNode.value = temp;
+
+						simAccumulator -= simStep;
 
 					}
 
-					renderer.compute( projectPass ); // velB - grad(p) -> velA
-					renderer.compute( advectDyePass ); // reads dyeTexNode, writes dyeTexWriteNode
-					renderer.compute( emitTeapotPass ); // inject from teapot vertices -> dyeTexWriteNode
+				} else {
 
-					// Ping-pong dye textures
-					const temp = dyeTexNode.value;
-					dyeTexNode.value = dyeTexWriteNode.value;
-					dyeTexWriteNode.value = temp;
+					updateTemporalUniforms( simulationTime );
 
 				}
+
+				// Update point light range dynamically based on temperature, density (fire size) and fire intensity
+				const tempRatio = uEmitTemperature.value / 8.34;
+				const densityRatio = uEmitDensity.value / 11.02;
+				const intensityRatio = uFireIntensity.value / 5.63;
+				const sizeFactor = Math.sqrt( tempRatio * densityRatio * intensityRatio );
+
+				// Smooth fade-in factor over the first 3 seconds of the simulation
+				const t = Math.min( Math.max( simulationTime / 3.0, 0.0 ), 1.0 );
+				const fadeIn = t * t * ( 3.0 - 2.0 * t );
+
+				pointLight.distance = Math.max( 0.01, 40.0 * Math.max( 0.2, sizeFactor ) * fadeIn );
 
 				uFireStartColor.value.set( params.fireStartColor );
 				uFireMidColor.value.set( params.fireMidColor );
