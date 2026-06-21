@@ -30,7 +30,7 @@ export const grayscale = /*@__PURE__*/ Fn( ( [ color ] ) => {
  */
 export const saturation = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
-	return adjustment.mix( luminance( color.rgb ), color.rgb );
+	return adjustment.mix( luminance( color.rgb ), color.rgb ).max( 0.0 );
 
 } );
 
@@ -42,17 +42,17 @@ export const saturation = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ]
  * @tsl
  * @function
  * @param {Node<vec3>} color - The input color.
- * @param {Node<float>} [adjustment=1] - Controls the intensity of the vibrance effect.
+ * @param {Node<float>} [adjustment=0] - Controls the intensity of the vibrance effect.
  * @return {Node<vec3>} The updated color.
  */
-export const vibrance = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
+export const vibrance = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 0 ) ] ) => {
 
 	const average = add( color.r, color.g, color.b ).div( 3.0 );
 
 	const mx = color.r.max( color.g.max( color.b ) );
 	const amt = mx.sub( average ).mul( adjustment ).mul( - 3.0 );
 
-	return mix( color.rgb, mx, amt );
+	return mix( color.rgb, mx, amt ).max( 0.0 );
 
 } );
 
@@ -71,7 +71,7 @@ export const hue = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
 	const cosAngle = adjustment.cos();
 
-	return vec3( color.rgb.mul( cosAngle ).add( k.cross( color.rgb ).mul( adjustment.sin() ).add( k.mul( dot( k, color.rgb ).mul( cosAngle.oneMinus() ) ) ) ) );
+	return vec3( color.rgb.mul( cosAngle ).add( k.cross( color.rgb ).mul( adjustment.sin() ).add( k.mul( dot( k, color.rgb ).mul( cosAngle.oneMinus() ) ) ) ) ).max( 0.0 );
 
 } );
 
@@ -123,18 +123,19 @@ export const cdl = /*@__PURE__*/ Fn( ( [
 
 	// NOTE: The ASC CDL v1.2 defines a [0, 1] clamp on the slope+offset term, and another on the
 	// saturation term. Per the ACEScc specification and Filament, limits may be omitted to support
-	// values outside [0, 1], requiring a workaround for negative values in the power expression.
+	// if negative inputs to the power expression are avoided. We use `max( in, 0.0 )`
+	// on final output, but the lower limit may not be required in all cases.
 
 	const luma = color.rgb.dot( vec3( luminanceCoefficients ) );
 
-	const v = max( color.rgb.mul( slope ).add( offset ), 0.0 ).toVar();
-	const pv = v.pow( power ).toVar();
+	const v = max( color.rgb.mul( slope ).add( offset ), 0.0 );
+	const pv = v.pow( power );
 
 	If( v.r.greaterThan( 0.0 ), () => { v.r.assign( pv.r ); } ); // eslint-disable-line
 	If( v.g.greaterThan( 0.0 ), () => { v.g.assign( pv.g ); } ); // eslint-disable-line
 	If( v.b.greaterThan( 0.0 ), () => { v.b.assign( pv.b ); } ); // eslint-disable-line
 
-	v.assign( luma.add( v.sub( luma ).mul( saturation ) ) );
+	v.assign( luma.add( v.sub( luma ).mul( saturation ) ).max( 0 ) );
 
 	return vec4( v.rgb, color.a );
 
