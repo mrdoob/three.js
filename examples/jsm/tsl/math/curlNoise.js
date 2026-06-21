@@ -1,11 +1,6 @@
 import { mod, Fn, vec2, div, vec4, dot, floor, step, sub, min, max, mul, abs, vec3, inverseSqrt, add, float } from 'three/tsl';
 
 /**
- * @module CurlNoise
- * @three_import import { curlNoise, snoise, snoiseVec3 } from 'three/addons/tsl/math/CurlNoise.js';
- */
-
-/**
  * Permutation polynomial for noise generation.
  *
  * @tsl
