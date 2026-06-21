@@ -94,6 +94,7 @@ class Viewer extends Tab {
 		this.content.appendChild( fullViewerContainer );
 
 		const nodes = new Item( 'User Defined' );
+		nodes.setCollapsible( true );
 		nodeList.add( nodes );
 
 		//
@@ -200,6 +201,7 @@ class Viewer extends Tab {
 		if ( folder === undefined ) {
 
 			folder = new Item( name );
+			folder.setCollapsible( true );
 
 			this.folderLibrary.set( name, folder );
 			this.nodeList.add( folder );
