@@ -42,10 +42,10 @@ export const saturation = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ]
  * @tsl
  * @function
  * @param {Node<vec3>} color - The input color.
- * @param {Node<float>} [adjustment=1] - Controls the intensity of the vibrance effect.
+ * @param {Node<float>} [adjustment=0] - Controls the intensity of the vibrance effect.
  * @return {Node<vec3>} The updated color.
  */
-export const vibrance = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
+export const vibrance = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 0 ) ] ) => {
 
 	const average = add( color.r, color.g, color.b ).div( 3.0 );
 
