@@ -137,7 +137,7 @@ export const cdl = /*@__PURE__*/ Fn( ( [
 
 	v.assign( luma.add( v.sub( luma ).mul( saturation ) ).max( 0 ) );
 
-	return vec4( v.rgb, color.a ).max( 0 );
+	return vec4( v.rgb, color.a );
 
 } );
 
