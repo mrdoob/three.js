@@ -26959,6 +26959,31 @@ function _getPMREMFromTexture( texture, renderer, generator ) {
 
 		cacheTexture.pmremVersion = texture.pmremVersion;
 
+		// add dispose event listener for new PMREMs
+
+		if ( cache.has( texture ) === false ) {
+
+			const onDispose = () => {
+
+				texture.removeEventListener( 'dispose', onDispose );
+
+				const pmrem = cache.get( texture );
+
+				if ( pmrem !== undefined ) {
+
+					pmrem.dispose();
+					cache.delete( texture );
+
+				}
+
+			};
+
+			texture.addEventListener( 'dispose', onDispose );
+
+		}
+
+		//
+
 		cache.set( texture, cacheTexture );
 
 	}
@@ -29062,15 +29087,19 @@ class VolumetricLightingModel extends LightingModel {
 		// This approach dynamically changes the direction of the ray,
 		// prioritizing the ray from the camera to the object if it is inside the mesh, and from the object to the camera if it is far away.
 
+		const isFrontToBack = property( 'bool' );
+
 		If( cameraPosition.sub( positionWorld ).length().greaterThan( modelRadius.mul( 2 ) ), () => {
 
 			startPos.assign( cameraPosition );
 			endPos.assign( positionWorld );
+			isFrontToBack.assign( true );
 
 		} ).Else( () => {
 
 			startPos.assign( positionWorld );
 			endPos.assign( cameraPosition );
+			isFrontToBack.assign( false );
 
 		} );
 
@@ -29114,12 +29143,17 @@ class VolumetricLightingModel extends LightingModel {
 			scatteringDensity.assign( 0 );
 
 			let scatteringNode;
+			let scatteringEmissiveNode;
 
 			if ( material.scatteringNode ) {
 
-				scatteringNode = material.scatteringNode( {
-					positionRay
-				} );
+				scatteringNode = material.scatteringNode( { positionRay } );
+
+			}
+
+			if ( material.scatteringEmissiveNode ) {
+
+				scatteringEmissiveNode = material.scatteringEmissiveNode( { positionRay } );
 
 			}
 
@@ -29131,9 +29165,28 @@ class VolumetricLightingModel extends LightingModel {
 
 			}
 
+			const stepLight = scatteringDensity.mul( 0.01 ).toVar();
+
+			if ( scatteringEmissiveNode ) {
+
+				stepLight.addAssign( scatteringEmissiveNode.mul( 0.01 ) );
+
+			}
+
 			// beer's law
 
 			const falloff = scatteringDensity.mul( .01 ).negate().mul( stepSize ).exp();
+
+			If( isFrontToBack, () => {
+
+				outgoingRayLight.addAssign( stepLight.mul( transmittance ).mul( stepSize ) );
+
+			} ).Else( () => {
+
+				outgoingRayLight.assign( outgoingRayLight.mul( falloff ).add( stepLight.mul( stepSize ) ) );
+
+			} );
+
 			transmittance.mulAssign( falloff );
 
 			// move along the ray
@@ -29142,7 +29195,7 @@ class VolumetricLightingModel extends LightingModel {
 
 		} );
 
-		outgoingRayLight.addAssign( transmittance.saturate().oneMinus() );
+
 
 	}
 
@@ -29175,7 +29228,12 @@ class VolumetricLightingModel extends LightingModel {
 		// TODO: We need a viewportOpaque*() ( output, depth ) to fit with modern rendering approaches
 
 		const directLight = lightColor.xyz.toVar();
-		directLight.mulAssign( lightNode.shadowNode ); // it no should be necessary if used in the same render pass
+
+		if ( lightNode.shadowNode !== null ) {
+
+			directLight.mulAssign( lightNode.shadowNode ); // it no should be necessary if used in the same render pass
+
+		}
 
 		this.scatteringLight( directLight, builder );
 
@@ -30307,7 +30365,20 @@ class RenderObject {
 
 				if ( type === 'number' ) {
 
-					valueKey = value !== 0 ? '1' : '0'; // Convert to on/off, important for clearcoat, transmission, etc
+					if ( property === 'side' ) {
+
+						// `side` is an enum (FrontSide/BackSide/DoubleSide) that changes code
+						// generation, so its exact value must be preserved.
+
+						valueKey = String( value );
+
+					} else {
+
+						// Other numbers are reduced to on/off
+
+						valueKey = value !== 0 ? '1' : '0';
+
+					}
 
 				} else if ( type === 'object' ) {
 
@@ -32769,7 +32840,7 @@ class Bindings extends DataMap {
 
 					} else if ( binding.isSampler ) {
 
-						this.textures.updateSampler( binding.texture, binding.textureNode );
+						this.textures.updateSampler( binding );
 
 					} else if ( binding.isStorageBuffer ) {
 
@@ -32825,6 +32896,12 @@ class Bindings extends DataMap {
 						binding.release();
 
 					} else if ( binding.isSampler ) {
+
+						if ( binding.isSampledTexture !== true ) {
+
+							this.backend.destroySampler( binding );
+
+						}
 
 						binding.release();
 
@@ -32981,7 +33058,7 @@ class Bindings extends DataMap {
 
 				if ( updated ) {
 
-					const samplerKey = this.textures.updateSampler( binding.texture, binding.textureNode );
+					const samplerKey = this.textures.updateSampler( binding );
 
 					if ( binding.samplerKey !== samplerKey ) {
 
@@ -34319,13 +34396,12 @@ class Textures extends DataMap {
 	 * In WebGPU, samplers are objects like textures and it's possible to share
 	 * them when the texture parameters match.
 	 *
-	 * @param {Texture} texture - The texture to update the sampler for.
-	 * @param {TextureNode} textureNode - The texture node to update the sampler with.
+	 * @param {Sampler} binding - The sampler binding to update.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler( texture, textureNode ) {
+	updateSampler( binding ) {
 
-		return this.backend.updateSampler( texture, textureNode );
+		return this.backend.updateSampler( binding );
 
 	}
 
@@ -34517,6 +34593,12 @@ class Textures extends DataMap {
 					for ( const binding of bindGroup.bindings ) {
 
 						if ( binding.isSampler && binding.texture === texture ) {
+
+							if ( binding.isSampledTexture !== true ) {
+
+								this.backend.destroySampler( binding );
+
+							}
 
 							binding.reset();
 							binding.release();
@@ -39912,7 +39994,7 @@ const grayscale = /*@__PURE__*/ Fn( ( [ color ] ) => {
  */
 const saturation = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
-	return adjustment.mix( luminance( color.rgb ), color.rgb );
+	return adjustment.mix( luminance( color.rgb ), color.rgb ).max( 0.0 );
 
 } );
 
@@ -39924,17 +40006,17 @@ const saturation = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
  * @tsl
  * @function
  * @param {Node<vec3>} color - The input color.
- * @param {Node<float>} [adjustment=1] - Controls the intensity of the vibrance effect.
+ * @param {Node<float>} [adjustment=0] - Controls the intensity of the vibrance effect.
  * @return {Node<vec3>} The updated color.
  */
-const vibrance = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
+const vibrance = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 0 ) ] ) => {
 
 	const average = add( color.r, color.g, color.b ).div( 3.0 );
 
 	const mx = color.r.max( color.g.max( color.b ) );
 	const amt = mx.sub( average ).mul( adjustment ).mul( -3 );
 
-	return mix( color.rgb, mx, amt );
+	return mix( color.rgb, mx, amt ).max( 0.0 );
 
 } );
 
@@ -39953,7 +40035,7 @@ const hue = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
 	const cosAngle = adjustment.cos();
 
-	return vec3( color.rgb.mul( cosAngle ).add( k.cross( color.rgb ).mul( adjustment.sin() ).add( k.mul( dot( k, color.rgb ).mul( cosAngle.oneMinus() ) ) ) ) );
+	return vec3( color.rgb.mul( cosAngle ).add( k.cross( color.rgb ).mul( adjustment.sin() ).add( k.mul( dot( k, color.rgb ).mul( cosAngle.oneMinus() ) ) ) ) ).max( 0.0 );
 
 } );
 
@@ -40005,18 +40087,19 @@ const cdl = /*@__PURE__*/ Fn( ( [
 
 	// NOTE: The ASC CDL v1.2 defines a [0, 1] clamp on the slope+offset term, and another on the
 	// saturation term. Per the ACEScc specification and Filament, limits may be omitted to support
-	// values outside [0, 1], requiring a workaround for negative values in the power expression.
+	// if negative inputs to the power expression are avoided. We use `max( in, 0.0 )`
+	// on final output, but the lower limit may not be required in all cases.
 
 	const luma = color.rgb.dot( vec3( luminanceCoefficients ) );
 
-	const v = max$1( color.rgb.mul( slope ).add( offset ), 0.0 ).toVar();
-	const pv = v.pow( power ).toVar();
+	const v = max$1( color.rgb.mul( slope ).add( offset ), 0.0 );
+	const pv = v.pow( power );
 
 	If( v.r.greaterThan( 0.0 ), () => { v.r.assign( pv.r ); } ); // eslint-disable-line
 	If( v.g.greaterThan( 0.0 ), () => { v.g.assign( pv.g ); } ); // eslint-disable-line
 	If( v.b.greaterThan( 0.0 ), () => { v.b.assign( pv.b ); } ); // eslint-disable-line
 
-	v.assign( luma.add( v.sub( luma ).mul( saturation ) ) );
+	v.assign( luma.add( v.sub( luma ).mul( saturation ) ).max( 0 ) );
 
 	return vec4( v.rgb, color.a );
 
@@ -66287,11 +66370,18 @@ class Backend {
 	 * Updates a GPU sampler for the given texture.
 	 *
 	 * @abstract
-	 * @param {Texture} texture - The texture to update the sampler for.
-	 * @param {TextureNode} textureNode - The texture node to update the sampler with.
+	 * @param {Sampler} binding - The sampler binding to update.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler( /*texture, textureNode*/ ) { }
+	updateSampler( /*binding*/ ) { }
+
+	/**
+	 * Frees the GPU sampler for the given sampler binding.
+	 *
+	 * @abstract
+	 * @param {Sampler} binding - The sampler binding to free.
+	 */
+	destroySampler( /*binding*/ ) { }
 
 	/**
 	 * Creates a default texture for the given texture that can be used
@@ -72420,11 +72510,10 @@ class WebGLBackend extends Backend {
 	/**
 	 * This method does nothing since WebGL 2 has no concept of samplers.
 	 *
-	 * @param {Texture} texture - The texture to update the sampler for.
-	 * @param {TextureNode} textureNode - The texture node to update the sampler with.
+	 * @param {Sampler} binding - The sampler binding to update.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler( /*texture, textureNode*/ ) {
+	updateSampler( /*binding*/ ) {
 
 		return '';
 
@@ -76312,13 +76401,14 @@ class WebGPUTextureUtils {
 	/**
 	 * Creates a GPU sampler for the given texture.
 	 *
-	 * @param {Texture} texture - The texture to create the sampler for.
-	 * @param {TextureNode} textureNode - The texture node to update the sampler with.
+	 * @param {Sampler} binding - The sampler binding to update.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler( texture, textureNode ) {
+	updateSampler( binding ) {
 
 		const backend = this.backend;
+		const texture = binding.texture;
+		const textureNode = binding.textureNode;
 
 		const samplerKey = texture.minFilter + '-' + texture.magFilter + '-' +
 			texture.wrapS + '-' + texture.wrapT + '-' + ( texture.wrapR || '0' ) + '-' +
@@ -76369,35 +76459,62 @@ class WebGPUTextureUtils {
 
 		}
 
-		const textureData = backend.get( texture );
+		const bindingData = backend.get( binding );
 
-		if ( textureData.sampler !== samplerData.sampler ) {
+		if ( bindingData.sampler !== samplerData.sampler ) {
 
-			// check if previous sampler is unused so it can be deleted
+			// release the previous sampler (if any) so it can be deleted when unused
 
-			if ( textureData.sampler !== undefined ) {
-
-				const oldSamplerData = this._samplerCache.get( textureData.samplerKey );
-				oldSamplerData.usedTimes --;
-
-				if ( oldSamplerData.usedTimes === 0 ) {
-
-					this._samplerCache.delete( textureData.samplerKey );
-
-				}
-
-			}
+			this._releaseSampler( bindingData );
 
 			// update to new sampler data
 
-			textureData.samplerKey = samplerKey;
-			textureData.sampler = samplerData.sampler;
+			bindingData.samplerKey = samplerKey;
+			bindingData.sampler = samplerData.sampler;
 
 			samplerData.usedTimes ++;
 
 		}
 
 		return samplerKey;
+
+	}
+
+	/**
+	 * Frees the GPU sampler referenced by the given sampler binding.
+	 *
+	 * @param {Sampler} binding - The sampler binding to free.
+	 */
+	destroySampler( binding ) {
+
+		this._releaseSampler( this.backend.get( binding ) );
+
+	}
+
+	/**
+	 * Releases the pooled sampler referenced by the given binding data and
+	 * removes it from the cache when no binding references it anymore.
+	 *
+	 * @private
+	 * @param {Object} bindingData - The binding data holding the sampler reference.
+	 */
+	_releaseSampler( bindingData ) {
+
+		if ( bindingData.sampler !== undefined ) {
+
+			const samplerData = this._samplerCache.get( bindingData.samplerKey );
+			samplerData.usedTimes --;
+
+			if ( samplerData.usedTimes === 0 ) {
+
+				this._samplerCache.delete( bindingData.samplerKey );
+
+			}
+
+			bindingData.sampler = undefined;
+			bindingData.samplerKey = undefined;
+
+		}
 
 	}
 
@@ -81775,9 +81892,9 @@ class WebGPUBindingUtils {
 
 			} else if ( binding.isSampler ) {
 
-				const textureGPU = backend.get( binding.texture );
+				const bindingData = backend.get( binding );
 
-				_bindGroupDescriptor.entries.push( { binding: bindingPoint, resource: textureGPU.sampler } );
+				_bindGroupDescriptor.entries.push( { binding: bindingPoint, resource: bindingData.sampler } );
 
 			}
 
@@ -85741,13 +85858,23 @@ class WebGPUBackend extends Backend {
 	/**
 	 * Updates a GPU sampler for the given texture.
 	 *
-	 * @param {Texture} texture - The texture to update the sampler for.
-	 * @param {TextureNode} textureNode - The texture node to update the sampler with.
+	 * @param {Sampler} binding - The sampler binding to update.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler( texture, textureNode ) {
+	updateSampler( binding ) {
 
-		return this.textureUtils.updateSampler( texture, textureNode );
+		return this.textureUtils.updateSampler( binding );
+
+	}
+
+	/**
+	 * Frees the GPU sampler for the given sampler binding.
+	 *
+	 * @param {Sampler} binding - The sampler binding to free.
+	 */
+	destroySampler( binding ) {
+
+		this.textureUtils.destroySampler( binding );
 
 	}
 
