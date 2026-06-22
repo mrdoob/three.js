@@ -39,7 +39,7 @@ float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;
 
 	#endif
 
-	#if defined( DOUBLE_SIDED ) && ! defined( FLAT_SHADED )
+	#ifdef DOUBLE_SIDED
 
 		tbn[0] *= faceDirection;
 		tbn[1] *= faceDirection;
@@ -60,7 +60,7 @@ float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;
 
 	#endif
 
-	#if defined( DOUBLE_SIDED ) && ! defined( FLAT_SHADED )
+	#ifdef DOUBLE_SIDED
 
 		tbn2[0] *= faceDirection;
 		tbn2[1] *= faceDirection;
