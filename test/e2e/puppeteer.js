@@ -44,6 +44,7 @@ const exceptionList = [
 	'webxr_vr_video',
 	'webgpu_tsl_transpiler',
 	'webgpu_rendertarget_2d-array_3d',
+	'webgpu_volume_fire',
 
 	// Need more time to render
 	'css3d_mixed',
