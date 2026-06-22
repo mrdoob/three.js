@@ -53,11 +53,5 @@ transformedNormal = normalMatrix * transformedNormal;
 
 	transformedTangent = ( modelViewMatrix * vec4( transformedTangent, 0.0 ) ).xyz;
 
-	#ifdef FLIP_SIDED
-
-		transformedTangent = - transformedTangent;
-
-	#endif
-
 #endif
 `;
