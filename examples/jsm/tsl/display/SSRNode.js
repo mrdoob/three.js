@@ -118,7 +118,7 @@ class SSRNode extends TempNode {
 		 *
 		 * @type {?Node<float>}
 		 */
-		this.metalnessNode = metalnessNode !== null ? nodeObject( metalnessNode ) : null;
+		this.metalnessNode = metalnessNode;
 
 		/**
 		 * Per-pixel roughness, used to drive the GGX reflection sampling and the blur mip
@@ -126,7 +126,7 @@ class SSRNode extends TempNode {
 		 *
 		 * @type {?Node<float>}
 		 */
-		this.roughnessNode = roughnessNode !== null ? nodeObject( roughnessNode ) : null;
+		this.roughnessNode = roughnessNode;
 
 		/**
 		 * Only used when {@link SSRNode#stochastic} is `false`. When `false`, non-metallic
@@ -904,7 +904,7 @@ class SSRNode extends TempNode {
 
 			// The node system samples the metalness/roughness textures at the current uv,
 			// so no explicit sample() is needed here.
-			const metalness = ( this.metalnessNode !== null ? this.metalnessNode : float( 0 ) ).toVar();
+			const metalness = float( this.metalnessNode );
 
 			if ( this.stochastic === false && this._reflectNonMetals === false ) {
 
@@ -912,7 +912,7 @@ class SSRNode extends TempNode {
 
 			}
 
-			const roughness = ( this.roughnessNode !== null ? this.roughnessNode : float( 0 ) ).toVar();
+			const roughness = float( this.roughnessNode );
 			const glossiness = min( roughness.div( 0.25 ), 1 ).oneMinus();
 			// Only the fade-to-black miss path reads this, and that path is baked out otherwise.
 			const surfaceBorderFactor = this.screenEdgeFadeBlack ? computeScreenBorderFactor( uvPos, this.screenEdgeFade ) : null;
@@ -1142,14 +1142,22 @@ class SSRNode extends TempNode {
 						// which means it wouldn't reflect off the surface. The loop continues to the next step for the next ray sample.
 						if ( this.stochastic === false ) {
 
-							If( dot( viewReflectDir, vN ).greaterThanEqual( 0 ), () => Continue() );
+							If( dot( viewReflectDir, vN ).greaterThanEqual( 0 ), () => {
+
+								Continue();
+
+							} );
 
 							// this distance represents the depth of the intersection point between the reflected ray and the scene.
 							const distance = pointPlaneDistance( vP, viewPosition, viewNormal ).toVar();
 
 							// Distance exceeding limit: The reflection is potentially too far away and
 							// might not contribute significantly to the final color
-							If( distance.greaterThan( this.maxDistance ), () => Break() );
+							If( distance.greaterThan( this.maxDistance ), () => {
+
+								Break();
+
+							} );
 
 						}
 
@@ -1221,7 +1229,7 @@ class SSRNode extends TempNode {
 					// Multi-bounce: add the reprojected previous-frame reflection at the hit point.
 					reflectColor.rgb.assign( reprojectHitPointHistory( uvS, reflectColor.rgb ) );
 
-					applyHitEdgeFade( reflectColor, uvS, hitBorderWidth );
+					if ( this.stochastic === true ) applyHitEdgeFade( reflectColor, uvS, hitBorderWidth );
 
 					// The scatter (GGX) path bakes distance/grazing response into finalSampleWeight.
 					// The mirror/blur path is a plain reflection, so reapply upstream's squared
@@ -1247,12 +1255,16 @@ class SSRNode extends TempNode {
 			// Screen-space ray missed: environment fallback (MIS when CDF env is set up).
 			If( hit.equal( 0 ), () => {
 
-				output.assign( vec4( sampleEnvReflection().mul( this.environmentIntensity ), float( ENV_RAY_LENGTH ) ) );
+				if ( this.stochastic === true ) {
 
-				// Misses fade by the surface pixel UV (where the reflection is being shaded).
-				if ( this.screenEdgeFadeBlack ) {
+					output.assign( vec4( sampleEnvReflection().mul( this.environmentIntensity ), float( ENV_RAY_LENGTH ) ) );
 
-					output.rgb.mulAssign( surfaceBorderFactor );
+					// Misses fade by the surface pixel UV (where the reflection is being shaded).
+					if ( this.screenEdgeFadeBlack ) {
+
+						output.rgb.mulAssign( surfaceBorderFactor );
+
+					}
 
 				}
 

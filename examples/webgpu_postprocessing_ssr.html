@@ -181,7 +181,8 @@
 			//
 
 			ssrPass = ssr( scenePassColor, scenePassDepth, sceneNormal, {
-				metalRoughnessNode: scenePassMetalRough
+				metalnessNode: scenePassMetalRough.r,
+				roughnessNode: scenePassMetalRough.g
 			} ).toInspector( 'SSR' );
 
 			// blend SSR over beauty (SSR outputs premultiplied color, so use additive blending)
