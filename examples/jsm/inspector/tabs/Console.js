@@ -232,7 +232,7 @@ class Console extends Tab {
 
 		super.setActive( isActive );
 
-		if ( isActive && this.profiler && this.profiler.panel.classList.contains( 'visible' ) ) {
+		if ( isActive ) {
 
 			this.clearUnread();
 

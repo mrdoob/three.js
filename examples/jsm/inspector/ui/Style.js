@@ -1646,12 +1646,6 @@ export class Style {
 		font-size: 13px;
 	}
 
-	.profiler-panel:not(.visible) ~ * .detached-tab-panel,
-	body:has(.profiler-panel:not(.visible)) .detached-tab-panel {
-		opacity: 0;
-		visibility: hidden;
-		pointer-events: none;
-	}
 
 	.detached-tab-header {
 		background: var(--profiler-header-background);
