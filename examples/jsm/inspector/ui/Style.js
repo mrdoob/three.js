@@ -1095,6 +1095,10 @@ export class Style {
 		-webkit-user-select: none;
 	}
 
+	.list-item-wrapper:has(> .list-item-row .graph-container) {
+		margin-left: -1.5em;
+	}
+
 	.list-item-wrapper:first-child {
 		/*margin-top: 0;*/
 	}
