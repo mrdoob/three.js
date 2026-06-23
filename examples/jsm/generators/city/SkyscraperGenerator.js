@@ -1276,8 +1276,9 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	const stoneColor = mix( masonry, soot, mix( dirt, roofGrime, roofMask ) );
 
 	// glass: the interior-mapped room is the base colour; the smooth, low-roughness
-	// surface still lets a faint sky reflection ride over it, and lit rooms glow ( emissive )
-	const room = interior();
+	// surface still lets a faint sky reflection ride over it, and lit rooms glow ( emissive ).
+	// toVar so the raymarch runs once, shared by the colour and emissive outputs
+	const room = interior().toVar();
 
 	// grimy glazing: the room shows through, but muted by a dusty film and dirt pooled
 	// along the bottom of each pane, plus a baseline haze, so the panes read as old
