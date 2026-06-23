@@ -42,7 +42,7 @@ export function bindAnalyticNoise( resolution, seed = 0 ) {
 		) ).mul( tileSize ).floor();
 		const coords = screenPixel.add( offset ).mod( tileSize );
 
-		noise.assign( r4( coords, seed ) );
+		noise.assign( r4( coords ) );
 
 		return noise;
 
