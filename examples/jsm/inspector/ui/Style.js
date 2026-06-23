@@ -1304,11 +1304,62 @@ export class Style {
 	}
 
 	.log-message {
-		padding: 2px 5px;
-		white-space: pre-wrap;
-		word-break: break-all;
+		display: flex;
+		align-items: flex-start;
+		gap: 6px;
+		padding: 3px 5px;
 		border-radius: 3px;
 		line-height: 1.5 !important;
+	}
+
+	.log-count-badge {
+		display: inline-block;
+		text-align: center;
+		min-width: 14px;
+		height: 14px;
+		border-radius: 7px;
+		padding: 0 3px;
+		font-size: 9px;
+		font-weight: bold;
+		line-height: 14px;
+		box-sizing: border-box;
+		margin-top: 0;
+		flex-shrink: 0;
+	}
+
+	.log-icon {
+		display: inline-block;
+		text-align: center;
+		width: 14px;
+		height: 14px;
+		font-size: 11px;
+		line-height: 14px;
+		margin-top: 0;
+		flex-shrink: 0;
+	}
+
+	.log-body {
+		flex-grow: 1;
+		white-space: pre-wrap;
+		word-break: break-all;
+	}
+
+	.log-message.info .log-count-badge {
+		background-color: rgba(255, 255, 255, 0.12);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		color: var(--text-secondary);
+	}
+
+	.log-message.warn .log-count-badge {
+		background-color: rgba(255, 193, 7, 0.18);
+		border: 1px solid rgba(255, 193, 7, 0.35);
+		color: var(--color-yellow);
+	}
+
+	.log-message.error .log-count-badge {
+		background-color: rgba(244, 67, 54, 0.18);
+		border: 1px solid rgba(244, 67, 54, 0.35);
+		color: #ff8a80;
 	}
 
 	.log-message.hidden {

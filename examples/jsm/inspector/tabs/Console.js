@@ -33,6 +33,8 @@ class Console extends Tab {
 		this.logContainer.classList.add( 'console-log' );
 		this.content.appendChild( this.logContainer );
 
+		this.lastMessage = null;
+
 	}
 
 	buildHeader() {
@@ -190,10 +192,6 @@ class Console extends Tab {
 			const parts = fullPrefix.slice( 0, - 2 ).split( '.' );
 			const shortPrefix = ( parts.length > 1 ? parts[ parts.length - 1 ] : parts[ 0 ] ) + ':';
 
-			const icon = this._getIcon( type, shortPrefix.split( ':' )[ 0 ].toLowerCase() );
-
-			fragment.appendChild( document.createTextNode( icon + ' ' ) );
-
 			const prefixSpan = document.createElement( 'span' );
 			prefixSpan.className = 'log-prefix';
 			prefixSpan.textContent = shortPrefix;
@@ -319,24 +317,78 @@ class Console extends Tab {
 
 	addMessage( type, text ) {
 
-		const msg = document.createElement( 'div' );
-		msg.className = `log-message ${type}`;
-		msg.dataset.type = type;
-		msg.dataset.rawText = text;
+		if ( this.lastMessage && this.lastMessage.type === type && this.lastMessage.text === text ) {
 
-		msg.appendChild( this._formatMessage( type, text ) );
+			this.lastMessage.count ++;
+			this.lastMessage.countBadge.textContent = this.lastMessage.count;
+			this.lastMessage.countBadge.style.display = '';
 
-		const showByType = this.filters[ type ];
-		const showByText = text.toLowerCase().includes( this.filterText );
-		msg.classList.toggle( 'hidden', ! ( showByType && showByText ) );
+		} else {
 
-		this.logContainer.appendChild( msg );
-		this.logContainer.scrollTop = this.logContainer.scrollHeight;
-		if ( this.logContainer.children.length > 200 ) {
+			const msg = document.createElement( 'div' );
+			msg.className = `log-message ${type}`;
+			msg.dataset.type = type;
+			msg.dataset.rawText = text;
 
-			this.logContainer.removeChild( this.logContainer.firstChild );
+			const countBadge = document.createElement( 'span' );
+			countBadge.className = 'log-count-badge';
+			countBadge.style.display = 'none';
+			msg.appendChild( countBadge );
+
+			let icon = null;
+			const prefixMatch = text.match( /^([\w\.]+:\s)/ );
+			if ( prefixMatch ) {
+
+				const fullPrefix = prefixMatch[ 0 ];
+				const parts = fullPrefix.slice( 0, - 2 ).split( '.' );
+				const shortPrefix = ( parts.length > 1 ? parts[ parts.length - 1 ] : parts[ 0 ] ) + ':';
+				icon = this._getIcon( type, shortPrefix.split( ':' )[ 0 ].toLowerCase() );
+
+			}
+
+			if ( icon ) {
+
+				const iconSpan = document.createElement( 'span' );
+				iconSpan.className = 'log-icon';
+				iconSpan.textContent = icon;
+				msg.appendChild( iconSpan );
+
+			}
+
+			const body = document.createElement( 'span' );
+			body.className = 'log-body';
+			body.appendChild( this._formatMessage( type, text ) );
+			msg.appendChild( body );
+
+			const showByType = this.filters[ type ];
+			const showByText = text.toLowerCase().includes( this.filterText );
+			msg.classList.toggle( 'hidden', ! ( showByType && showByText ) );
+
+			this.logContainer.appendChild( msg );
+
+			if ( this.logContainer.children.length > 200 ) {
+
+				const firstChild = this.logContainer.firstChild;
+				this.logContainer.removeChild( firstChild );
+				if ( this.lastMessage && this.lastMessage.element === firstChild ) {
+
+					this.lastMessage = null;
+
+				}
+
+			}
+
+			this.lastMessage = {
+				type,
+				text,
+				count: 1,
+				element: msg,
+				countBadge
+			};
 
 		}
+
+		this.logContainer.scrollTop = this.logContainer.scrollHeight;
 
 		// Update unread counts if the console is not active/visible
 		const isUnread = ! this.isActive;
