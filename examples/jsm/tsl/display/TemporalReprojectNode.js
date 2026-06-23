@@ -918,7 +918,7 @@ class TemporalReprojectNode extends TempNode {
 			historyColor.rgb.assign( mix( historyColor.rgb, clippedRGB, clampIntensity ) );
 
 			totalConfidence.mulAssign( exp( originalHistoryColor.sub( clippedRGB ).length().mul( clampIntensity ).mul( 10 ).negate() ) );
-			totalConfidence.mulAssign( mix( float( 1 ), historyTrust.mul( 0.2 ).add( 0.8 ), motionFactor.mul( 100 ).clamp() ) );
+			totalConfidence.mulAssign( mix( float( 1 ), historyTrust.mul( 0.05 ).add( 0.95 ), motionFactor.mul( 100 ).clamp() ) );
 
 			If( totalConfidence.lessThan( EPSILON ), () => {
 

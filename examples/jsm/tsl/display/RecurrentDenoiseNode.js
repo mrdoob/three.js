@@ -790,8 +790,11 @@ class RecurrentDenoiseNode extends TempNode {
 					// Sum every negative-exponent edge-stopping term (kernel + depth/plane, plus the SSR hit-distance term)
 					const w = exp( kernelDiff.mul( aggressivity ).add( depthDiff ).negate() ).mul( normalW ).toVar();
 
+					// Feedback to shrink radius based on the weight
+					radiusShrink.assign( mix( radiusShrink, w, this.radiusAdapt ) );
+
 					// to mitigate the effect of fireflies and high variance in recently disoccluded regions, we weigh by the inverse luminance for the first 4 frames
-					// if ( this.mode === 'diffuse' ) w.mulAssign( mix( float( 1 ).div( luminance( neighborColor.rgb ).max( 1e-4 ) ), 1, frameNum.div( 4 ).min( 1 ) ) );
+					w.mulAssign( mix( float( 1 ).div( luminance( rawNeighborColor.rgb ).pow( 2 ).add( 0.01 ) ), 1, frameNum.div( 5 ).min( 1 ) ) );
 
 					denoisedRaw.addAssign( rawNeighborColor.rgb.mul( w ) );
 					totalWeightRaw.addAssign( w );
@@ -807,10 +810,6 @@ class RecurrentDenoiseNode extends TempNode {
 						totalFrameWeight.addAssign( neighborAWeight );
 
 					} );
-
-					// Feedback to shrink radius based on the weight
-					radiusShrink.assign( mix( radiusShrink, w, this.radiusAdapt ) );
-
 
 				} );
 
