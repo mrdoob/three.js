@@ -128,7 +128,7 @@ export class Style {
 
 	.tab-badge-container {
 		position: absolute;
-		top: 2px;
+		top: 1px;
 		right: 3px;
 		display: flex;
 		gap: 2px;
