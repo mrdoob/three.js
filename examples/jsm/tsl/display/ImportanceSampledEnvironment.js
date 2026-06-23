@@ -7,9 +7,9 @@
  * @see {@link https://github.com/gkjohnson/three-gpu-pathtracer}
  */
 
-import { If, dot, float, luminance, max, normalize, texture, uniform, vec2, vec4 } from 'three/tsl';
+import { If, dot, equirectUV, float, luminance, max, normalize, texture, uniform, vec2, vec4 } from 'three/tsl';
 import { ClampToEdgeWrapping, DataTexture, DataUtils, FloatType, HalfFloatType, LinearFilter, RedFormat, RepeatWrapping, Source, Vector2 } from 'three/webgpu';
-import { D_GTR, F_Schlick, GeometryTerm, SmithG, equirectDirPdf, equirectUvToDir, equirectUvToDirection, misPowerHeuristic } from '../utils/SpecularHelpers.js';
+import { D_GTR, F_Schlick, GeometryTerm, SmithG, equirectDirPdf, misPowerHeuristic } from '../utils/SpecularHelpers.js';
 
 function colorToLuminance( r, g, b ) {
 
@@ -396,9 +396,12 @@ class ImportanceSampledEnvironment {
 	sampleReflect( { cameraWorldMatrix, viewReflectDir, sampleWeight = float( 1 ) } ) {
 
 		const worldReflectDir = cameraWorldMatrix.mul( vec4( viewReflectDir, float( 0 ) ) ).xyz.normalize();
-		const envUV = equirectUvToDirection( worldReflectDir );
+		const envUV = equirectUV( worldReflectDir );
 
-		return texture( this._mapNode, envUV ).rgb.mul( this.intensity ).mul( sampleWeight );
+		// Explicit LOD 0: the per-pixel reflected direction is discontinuous at the equirect pole/seam
+		// (atan is undefined at the poles), so derivative-driven mip selection collapses to the coarsest
+		// (near-average) mip there and produces a bright streak. Roughness is handled via direction sampling.
+		return texture( this._mapNode, envUV ).level( 0 ).rgb.mul( this.intensity ).mul( sampleWeight );
 
 	}
 
@@ -428,7 +431,10 @@ class ImportanceSampledEnvironment {
 		const NdotV = max( float( 0 ), dot( worldNormal, worldV ) ).toVar();
 
 		const L1 = cameraWorldMatrix.mul( vec4( viewReflectDir, float( 0 ) ) ).xyz.normalize().toVar();
-		const brdfEnvColor = texture( this._mapNode, equirectUvToDirection( L1 ) ).rgb;
+		// Explicit LOD 0: the equirect mapping is singular at the poles (atan undefined when the reflected
+		// ray points straight up/down, e.g. a flat floor under a top-down camera), so derivative-driven mip
+		// selection picks the coarsest, near-average mip and yields a bright streak. Sample full-res instead.
+		const brdfEnvColor = texture( this._mapNode, equirectUV( L1 ) ).level( 0 ).rgb;
 
 		const H1 = normalize( worldV.add( L1 ) ).toVar();
 		const NdotL1 = max( float( 0 ), dot( worldNormal, L1 ) ).toVar();
@@ -482,7 +488,7 @@ class ImportanceSampledEnvironment {
 
 		// MIS sample 1: the BRDF / reflected-ray direction
 		const L1 = cameraWorldMatrix.mul( vec4( viewReflectDir, float( 0 ) ) ).xyz.normalize().toVar();
-		const brdfEnvColor = texture( mapNode, equirectUvToDirection( L1 ) ).rgb;
+		const brdfEnvColor = texture( mapNode, equirectUV( L1 ) ).level( 0 ).rgb;
 
 		const H1 = normalize( worldV.add( L1 ) ).toVar();
 		const NdotL1 = max( float( 0 ), dot( worldNormal, L1 ) ).toVar();
@@ -510,7 +516,7 @@ class ImportanceSampledEnvironment {
 			const v_cdf = texture( marginalNode, vec2( r_env.x, float( 0 ) ) ).r;
 			const u_cdf = texture( conditionalNode, vec2( r_env.y, v_cdf ) ).r;
 			const isEnvUV = vec2( u_cdf, v_cdf );
-			const envDirWS = equirectUvToDir( isEnvUV );
+			const envDirWS = equirectUV( isEnvUV );
 
 			const envHalf = normalize( worldV.add( envDirWS ) );
 			const envNdotL = max( float( 0 ), dot( worldNormal, envDirWS ) );
@@ -523,7 +529,7 @@ class ImportanceSampledEnvironment {
 				// (both evaluate D(envNdotH)) so the pow is computed once.
 				const D = D_GTR( alpha, envNdotH, float( 2 ) ).toVar();
 
-				const sampledColor = texture( mapNode, isEnvUV ).rgb;
+				const sampledColor = texture( mapNode, isEnvUV ).level( 0 ).rgb;
 				const pdfEnv2 = envW.mul( envH ).mul( luminance( sampledColor ).div( totalSum ) ).mul( equirectDirPdf( envDirWS ) ).max( float( 1e-8 ) );
 				// BRDF technique pdf at the env direction — same solid-angle form as pdfBrdf1 (no V·H).
 				const pdfBrdf2 = D.mul( SmithG( NdotV, alpha ) ).div( max( float( 1e-6 ), float( 4 ).mul( NdotV ) ) ).max( float( 1e-8 ) );

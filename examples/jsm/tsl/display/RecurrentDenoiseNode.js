@@ -722,11 +722,11 @@ class RecurrentDenoiseNode extends TempNode {
 
 				Loop( { start: int( 0 ), end: int( KERNEL_SAMPLES ), type: 'int', condition: '<', name: 'i' }, ( { i } ) => {
 
-					const offsetUv = vogelDisk( float( i ), 1 ).toVar();
-					offsetUv.assign( rotationMatrix.mul( radiusShrink ).mul( offsetUv ) );
+					const offset = vogelDisk( float( i ), 1 ).toVar();
+					offset.assign( rotationMatrix.mul( radiusShrink ).mul( offset ) );
 
 					// Exact per-sample view-space projection (both paths)
-					const sampleViewPos = viewPosition.add( B.mul( offsetUv.x ).add( T.mul( offsetUv.y ) ) );
+					const sampleViewPos = viewPosition.add( B.mul( offset.x ).add( T.mul( offset.y ) ) );
 					const sampleUv = getScreenPosition( sampleViewPos, this._cameraProjectionMatrix ).toVar();
 					sampleUv.assign( sampleUv.abs().oneMinus().abs().oneMinus().clamp() );
 
@@ -793,7 +793,7 @@ class RecurrentDenoiseNode extends TempNode {
 					// Feedback to shrink radius based on the weight
 					radiusShrink.assign( mix( radiusShrink, w, this.radiusAdapt ) );
 
-					// to mitigate the effect of fireflies and high variance in recently disoccluded regions, we weigh by the inverse luminance for the first 4 frames
+					// to mitigate the effect of fireflies and high variance in recently disoccluded regions, we weigh by the inverse luminance for the first 5 frames
 					w.mulAssign( mix( float( 1 ).div( luminance( rawNeighborColor.rgb ).pow( 2 ).add( 0.01 ) ), 1, frameNum.div( 5 ).min( 1 ) ) );
 
 					denoisedRaw.addAssign( rawNeighborColor.rgb.mul( w ) );

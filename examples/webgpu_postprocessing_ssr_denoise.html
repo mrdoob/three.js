@@ -59,7 +59,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, vec2, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, toneMapping, saturation, workingToColorSpace } from 'three/tsl';
+		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, vec2, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 		import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
@@ -172,7 +172,7 @@
 		let camera, scene, model, renderer, postProcessing, ssrNode, temporalReprojectNode, denoiseNode;
 		let controls;
 		let scenePassNode, combinedOutputNode;
-		let exposureUniform, gammaUniform, contrastUniform, saturationUniform;
+		let gammaUniform, contrastUniform, saturationUniform;
 
 		init();
 
@@ -281,9 +281,10 @@
 			) ).toInspector( 'Metalness/Roughness' );
 
 			ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
-				reflection: 'scatter',
+				stochastic: true,
 				diffuseNode: scenePassDiffuseColor,
-				metalRoughnessNode: scenePassMetalRough,
+				metalnessNode: scenePassDiffuseColor.a,
+				roughnessNode: scenePassNormal.a,
 				environmentNode: hdrTexture,
 				envImportanceSampling: params.ssr.envImportanceSampling,
 				binaryRefine: params.ssr.binaryRefine
@@ -315,7 +316,6 @@
 
 			const denoisePassBlend = vec4( denoiseNode.rgb, ssrNode.a.greaterThan( 0 ).toVar() );
 
-			exposureUniform = uniform( params.post.grading.exposure );
 			gammaUniform = uniform( params.post.grading.gamma );
 			contrastUniform = uniform( params.post.grading.contrast );
 			saturationUniform = uniform( params.post.grading.saturation );
@@ -465,9 +465,7 @@
 
 			let rgb = source.rgb;
 
-			rgb = rgb.mul( exposureUniform );
-			rgb = toneMapping( THREE.AgXToneMapping, float( 1 ), rgb );
-			rgb = workingToColorSpace( rgb, THREE.SRGBColorSpace );
+			rgb = renderOutput( vec4( rgb, 1 ), THREE.AgXToneMapping, THREE.SRGBColorSpace ).rgb;
 			rgb = rgb.sub( 0.5 ).mul( contrastUniform ).add( 0.5 );
 			rgb = saturation( rgb, saturationUniform );
 			rgb = rgb.max( 0.0 ).pow( float( 1 ).div( gammaUniform ) );
@@ -480,7 +478,6 @@
 		function applyPost() {
 
 			const g = params.post.grading;
-			exposureUniform.value = g.exposure;
 			gammaUniform.value = g.gamma;
 			contrastUniform.value = g.contrast;
 			saturationUniform.value = g.saturation;

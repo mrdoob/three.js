@@ -1,4 +1,4 @@
-import { Fn, If, PI, asin, atan, clamp, cos, cross, dot, equirectUV, float, log, max, mix, normalize, pow, reflect, sin, sqrt, struct, vec2, vec3 } from 'three/tsl';
+import { Fn, If, PI, clamp, cos, cross, dot, equirectUV, float, log, max, mix, normalize, pow, reflect, sin, sqrt, struct, vec3 } from 'three/tsl';
 
 /**
  * Specular / microfacet BRDF helpers: VNDF sampling, GTR distribution, Smith geometry,
@@ -285,21 +285,10 @@ export const equirectUvToDir = Fn( ( [ uvIn ] ) => {
 	inputs: [ { name: 'uv', type: 'vec2' } ]
 } );
 
-// direction -> uv (via the built-in equirectUV)
-const equirectDirToUv = Fn( ( [ direction ] ) => {
-
-	return equirectUV( direction );
-
-} ).setLayout( {
-	name: 'equirectDirToUv',
-	type: 'vec2',
-	inputs: [ { name: 'direction', type: 'vec3' } ]
-} );
-
 // Solid-angle PDF of a direction under equirectangular parameterization.
 export const equirectDirPdf = Fn( ( [ direction ] ) => {
 
-	const uvDir = equirectDirToUv( direction );
+	const uvDir = equirectUV( direction );
 	const sinTheta = sin( uvDir.y.mul( Math.PI ) );
 	return sinTheta.abs().lessThan( float( 1e-6 ) ).select(
 		float( 0 ),
@@ -334,14 +323,3 @@ export const misPowerHeuristic = Fn( ( [ pdfA, pdfB ] ) => {
 	]
 } );
 
-// direction -> uv (atan/asin form, matching the env lookups used for reflections)
-export const equirectUvToDirection = Fn( ( [ direction ] ) => {
-
-	const dir = direction.normalize().toVar();
-
-	const u = atan( dir.z, dir.x ).mul( float( 1 / ( Math.PI * 2 ) ) ).add( float( 0.5 ) );
-	const v = asin( dir.y.clamp( float( - 1 ), float( 1 ) ) ).mul( float( 1 / Math.PI ) ).add( float( 0.5 ) );
-
-	return vec2( u, v );
-
-} );

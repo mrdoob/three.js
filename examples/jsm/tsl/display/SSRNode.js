@@ -13,18 +13,16 @@ let _rendererState;
 const MAX_STEPS = 64;
 
 /**
- * @typedef {'blur' | 'scatter'} SSRReflection
- */
-
-/**
  * @typedef {Object} SSRNodeOptions
- * @property {SSRReflection} [reflection='scatter'] - `blur` traces a mirror reflection and softens roughness with a blur pass; `scatter` varies the reflection direction per pixel.
- * @property {?import('three/tsl').Node} [metalRoughnessNode=null] - Metalness (R) and roughness (G) packed in a single attachment.
- * @property {?import('three').Texture} [environmentNode=null] - Equirectangular HDR environment map with CPU-side `image.data` (e.g. from RGBELoader). Not compatible with PMREM / `scene.environment` cubemaps.
+ * @property {boolean} [stochastic=false] - When `false`, traces a single mirror reflection and softens roughness with a blur pass (first-generation SSR). When `true`, varies the reflection direction per pixel with stochastic GGX rays (second-generation SSR); higher quality on rough/glossy surfaces but noisier, so it expects a temporal/spatial denoiser downstream.
+ * @property {Node<float>} [metalnessNode=null] - Per-pixel metalness. Drives GGX reflection sampling and, with `reflectNonMetals=false`, the non-metal early-out.
+ * @property {Node<float>} [roughnessNode=null] - Per-pixel roughness. Drives GGX sampling and the blur mip selection.
+ * @property {boolean} [reflectNonMetals=false] - Only used when `stochastic=false`. When `false`, non-metallic surfaces are discarded for a noticeable performance gain; set `true` to also reflect dielectrics (e.g. marble, polished wood, plastic).
+ * @property {Texture} [environmentNode=null] - Equirectangular HDR environment map with CPU-side `image.data` (e.g. from RGBELoader). Not compatible with PMREM / `scene.environment` cubemaps.
  * @property {boolean} [envImportanceSampling=false] - When `true`, precomputes env-luminance CDF tables and uses MIS for environment misses. Build-time only.
- * @property {?import('three/tsl').Node} [diffuseNode=null] - Scene diffuse / base color. Defaults to `vec3(1)` in the shader when omitted.
+ * @property {Node} [diffuseNode=null] - Scene diffuse / base color. Defaults to `vec3(1)` in the shader when omitted.
  * @property {boolean} [binaryRefine=false] - Sub-step binary-search refinement of detected hits. Compile-time constant (baked into the shader at construction).
- * @property {?import('three').Camera} [camera=null] - Camera the scene is rendered with. Inferred from the color pass when omitted.
+ * @property {Camera} [camera=null] - Camera the scene is rendered with. Inferred from the color pass when omitted.
  */
 
 /**
@@ -56,29 +54,26 @@ class SSRNode extends TempNode {
 		super( 'vec4' );
 
 		const {
-			reflection = 'blur',
-			metalRoughnessNode = null,
+			stochastic = false,
+			metalnessNode = null,
+			roughnessNode = null,
+			reflectNonMetals = false,
 			environmentNode = null,
 			envImportanceSampling = false,
 			diffuseNode = null,
-			binaryRefine = false,
-			camera: cameraNode = null
+			binaryRefine = false
 		} = options;
 
-		if ( reflection !== 'blur' && reflection !== 'scatter' ) {
-
-			throw new Error( 'SSRNode: `reflection` must be `blur` or `scatter`.' );
-
-		}
-
-		let camera = cameraNode;
+		let camera = options.camera ?? null;
 
 		/**
-		 * How the reflection direction and roughness are computed.
+		 * When `true`, the reflection direction is varied per pixel with stochastic GGX rays
+		 * (second-generation SSR). When `false`, a single mirror reflection is traced and
+		 * roughness is softened with a blur pass (first-generation SSR).
 		 *
-		 * @type {SSRReflection}
+		 * @type {boolean}
 		 */
-		this.reflection = reflection;
+		this.stochastic = stochastic;
 
 		/**
 		 * When `true`, env-luminance CDF tables are built and MIS is used for environment misses.
@@ -118,14 +113,31 @@ class SSRNode extends TempNode {
 		this.normalNode = normalNode;
 
 		/**
-		 * Metalness (R) and roughness (G) packed in a single attachment, used to drive
-		 * the GGX reflection sampling and the blur mip selection. When `null`, the shader
-		 * treats surfaces as non-metallic and fully smooth.
+		 * Per-pixel metalness, used to drive the GGX reflection sampling and the non-metal
+		 * early-out. When `null`, the shader treats surfaces as non-metallic.
 		 *
-		 * @private
-		 * @type {?Node}
+		 * @type {?Node<float>}
 		 */
-		this.metalRoughnessNode = metalRoughnessNode !== null ? nodeObject( metalRoughnessNode ) : null;
+		this.metalnessNode = metalnessNode !== null ? nodeObject( metalnessNode ) : null;
+
+		/**
+		 * Per-pixel roughness, used to drive the GGX reflection sampling and the blur mip
+		 * selection. When `null`, the shader treats surfaces as fully smooth.
+		 *
+		 * @type {?Node<float>}
+		 */
+		this.roughnessNode = roughnessNode !== null ? nodeObject( roughnessNode ) : null;
+
+		/**
+		 * Only used when {@link SSRNode#stochastic} is `false`. When `false`, non-metallic
+		 * surfaces are discarded for a noticeable performance gain; set `true` to also
+		 * reflect dielectrics. Baked into the shader as a compile-time constant; assigning a
+		 * new value recompiles the SSR material.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._reflectNonMetals = reflectNonMetals;
 
 		/**
 		 * The resolution scale. Valid values are in the range
@@ -255,7 +267,7 @@ class SSRNode extends TempNode {
 		 *
 		 * Baked into the shader as a compile-time constant so `pow()` folds to a few
 		 * multiplies; assigning a new value recompiles the SSR material. Only used by the
-		 * `scatter` reflection path.
+		 * stochastic reflection path.
 		 *
 		 * @type {number}
 		 * @default 2
@@ -265,14 +277,14 @@ class SSRNode extends TempNode {
 		/**
 		 * HDR environment map for screen-space misses.
 		 *
-		 * @type {?import('three').Texture}
+		 * @type {?Texture}
 		 */
 		this.environmentNode = environmentNode;
 
 		/**
 		 * A node that represents the history texture for multi-bounce reflections.
 		 *
-		 * @type {?Node<vec4>}
+		 * @type {?Texture}
 		 */
 		this.historyTexture = null;
 
@@ -293,7 +305,7 @@ class SSRNode extends TempNode {
 
 			} else {
 
-				throw new Error( 'THREE.TSL: No camera found. ssr() requires a camera.' );
+				throw new Error( 'THREE.SSRNode: No camera found. ssr() requires a camera.' );
 
 			}
 
@@ -445,10 +457,10 @@ class SSRNode extends TempNode {
 
 		let blurredTextureNode = null;
 
-		if ( this.reflection === 'blur' && this.metalRoughnessNode !== null ) {
+		if ( this.stochastic === false && this.roughnessNode !== null ) {
 
 			const mips = this._blurRenderTarget.texture.mipmaps.length - 1;
-			const r = this.metalRoughnessNode.g;
+			const r = this.roughnessNode;
 			const lod = r.mul( r ).mul( mips ).clamp( 0, mips );
 
 			blurredTextureNode = passTexture( this, this._blurRenderTarget.texture ).level( lod );
@@ -513,7 +525,7 @@ class SSRNode extends TempNode {
 			this._blurQuality = value;
 
 			// The size is baked into the boxBlur node tree, so rebuild it (recompiles the material).
-			if ( this.reflection === 'blur' ) this._buildBlurMaterial();
+			if ( this.stochastic === false ) this._buildBlurMaterial();
 
 		}
 
@@ -579,6 +591,29 @@ class SSRNode extends TempNode {
 	}
 
 	/**
+	 * Whether dielectrics are reflected in the non-stochastic path (compile-time constant).
+	 * Assigning a new value rebuilds the SSR material.
+	 *
+	 * @type {boolean}
+	 */
+	get reflectNonMetals() {
+
+		return this._reflectNonMetals;
+
+	}
+
+	set reflectNonMetals( value ) {
+
+		if ( value !== this._reflectNonMetals ) {
+
+			this._reflectNonMetals = value;
+			this._buildSSRMaterial();
+
+		}
+
+	}
+
+	/**
 	 * Rebuilds the SSR material's node graph by re-invoking the fragment `Fn`, which
 	 * re-bakes the compile-time constants ({@link SSRNode#binaryRefine},
 	 * {@link SSRNode#stepExponent}, {@link SSRNode#screenEdgeFadeBlack}) at their current
@@ -602,7 +637,7 @@ class SSRNode extends TempNode {
 	 */
 	getTextureNode() {
 
-		return ( this.reflection === 'blur' && this.metalRoughnessNode !== null ) ? this._blurredTextureNode : this._textureNode;
+		return ( this.stochastic === false && this.roughnessNode !== null ) ? this._blurredTextureNode : this._textureNode;
 
 	}
 
@@ -630,8 +665,8 @@ class SSRNode extends TempNode {
 	 * {@link RecurrentDenoiseNode}) — its output render target is used — or a raw
 	 * texture. Pass `null` for both to disable multi-bounce.
 	 *
-	 * @param {?(Object|import('three').Texture)} history
-	 * @param {?Node<vec2>} velocity
+	 * @param {Texture} history
+	 * @param {Node<vec2>} velocity
 	 */
 	setHistory( history, velocity ) {
 
@@ -737,7 +772,7 @@ class SSRNode extends TempNode {
 
 		// blur (optional)
 
-		if ( this.reflection === 'blur' && this.metalRoughnessNode !== null ) {
+		if ( this.stochastic === false && this.roughnessNode !== null ) {
 
 			// blur mips but leave the base mip unblurred
 
@@ -825,7 +860,7 @@ class SSRNode extends TempNode {
 
 		};
 
-		const sampleMarchNoise = this.reflection === 'scatter' ? bindAnalyticNoise( this._resolution, 47 ) : null;
+		const sampleMarchNoise = this.stochastic === true ? bindAnalyticNoise( this._resolution, 47 ) : null;
 
 		const computeScreenBorderFactor = Fn( ( [ uvCoord, borderWidth ] ) => {
 
@@ -853,7 +888,7 @@ class SSRNode extends TempNode {
 
 		const ssr = Fn( () => {
 
-			const noise = this.reflection === 'scatter' ? sampleMarchNoise( uvNode, this._noiseIndex ) : null;
+			const noise = this.stochastic === true ? sampleMarchNoise( uvNode, this._noiseIndex ) : null;
 			const uvPos = uvNode.toVar();
 
 			const depth = sampleDepth( uvPos ).toVar();
@@ -867,9 +902,17 @@ class SSRNode extends TempNode {
 
 			const viewIncidentDir = ( ( this.camera.isPerspectiveCamera ) ? normalize( viewPosition ) : vec3( 0, 0, - 1 ) ).toVar();
 
-			const metalRoughness = this.metalRoughnessNode?.sample( uvPos )?.toVar() ?? vec4( 0 );
-			const metalness = metalRoughness.r.toVar();
-			const roughness = metalRoughness.g.toVar();
+			// The node system samples the metalness/roughness textures at the current uv,
+			// so no explicit sample() is needed here.
+			const metalness = ( this.metalnessNode !== null ? this.metalnessNode : float( 0 ) ).toVar();
+
+			if ( this.stochastic === false && this._reflectNonMetals === false ) {
+
+				metalness.lessThanEqual( 0.0 ).discard();
+
+			}
+
+			const roughness = ( this.roughnessNode !== null ? this.roughnessNode : float( 0 ) ).toVar();
 			const glossiness = min( roughness.div( 0.25 ), 1 ).oneMinus();
 			// Only the fade-to-black miss path reads this, and that path is baked out otherwise.
 			const surfaceBorderFactor = this.screenEdgeFadeBlack ? computeScreenBorderFactor( uvPos, this.screenEdgeFade ) : null;
@@ -878,8 +921,10 @@ class SSRNode extends TempNode {
 			const V = viewIncidentDir.negate().normalize().toVar();
 
 			let viewReflectDir, finalSampleWeight, specDominantFactor;
+			const albedo = vec3( 1 ).toVar();
+			let sampleEnvReflection = null;
 
-			if ( this.reflection === 'blur' ) {
+			if ( this.stochastic === false ) {
 
 				viewReflectDir = reflect( viewIncidentDir, viewNormal ).normalize().toVar();
 				finalSampleWeight = vec3( metalness );
@@ -892,7 +937,7 @@ class SSRNode extends TempNode {
 				// noise. Unbiased — bounded VNDF keeps brdf·cos/pdf ~constant (EA, "Stochastic SSR").
 				Xi.y.assign( mix( Xi.y, 0.0, this.mirrorBias.mul( Xi.w.sqrt() ) ) );
 
-				const albedo = ( this.diffuseNode !== null ? this.diffuseNode.sample( uvPos ).rgb : vec3( 1 ) ).toVar();
+				albedo.assign( ( this.diffuseNode !== null ? this.diffuseNode.sample( uvPos ).rgb : vec3( 1 ) ) );
 				const ggxSample = ggxReflectionSample( viewNormal, V, roughness, metalness, albedo, Xi ).toVar();
 
 				// Sometimes the GGX sample is facing away from the surface, so we need to re-sample.
@@ -904,64 +949,44 @@ class SSRNode extends TempNode {
 
 				viewReflectDir = ggxSample.get( 'reflectDir' ).toVar();
 				finalSampleWeight = ggxSample.get( 'sampleWeight' ).toVar();
-				const NdotV = ggxSample.get( 'NdotV' ).toVar();
-				specDominantFactor = getSpecularDominantFactor( NdotV, roughness ).toVar();
+				specDominantFactor = getSpecularDominantFactor( ggxSample.get( 'NdotV' ), roughness ).toVar();
 
-			}
+				sampleEnvReflection = () => {
 
-			const sampleEnvReflection = () => {
+					const envColor = vec3( 0 ).toVar();
 
-				const envColor = vec3( 0 ).toVar();
+					if ( this.envImportanceSampling ) {
 
-				if ( this._importanceEnvironment !== null ) {
+						const Xi2 = bindAnalyticNoise( this._resolution, 59 )( uvPos, this._noiseIndex );
 
-					if ( this.reflection === 'blur' ) {
-
-						envColor.assign( this._importanceEnvironment.sampleReflect( {
+						envColor.assign( this._importanceEnvironment.sampleEnvironmentMIS( {
 							cameraWorldMatrix: this._cameraWorldMatrix,
 							viewReflectDir,
-							sampleWeight: metalness
+							N: viewNormal,
+							V,
+							alpha: ggxSample.get( 'alpha' ),
+							f0: ggxSample.get( 'f0' ),
+							Xi2
 						} ) );
 
 					} else {
 
-						const ggxAlpha = roughness.mul( roughness ).max( 0.001 );
-						const albedo = ( this.diffuseNode !== null ? this.diffuseNode.sample( uvPos ).rgb : vec3( 1 ) ).toVar();
-						const f0 = mix( vec3( 0.04 ), albedo, metalness );
-
-						if ( this.envImportanceSampling ) {
-
-							const Xi2 = bindAnalyticNoise( this._resolution, 59 );
-							envColor.assign( this._importanceEnvironment.sampleEnvironmentMIS( {
-								cameraWorldMatrix: this._cameraWorldMatrix,
-								viewReflectDir,
-								N: viewNormal,
-								V,
-								alpha: ggxAlpha,
-								f0,
-								Xi2
-							} ) );
-
-						} else {
-
-							envColor.assign( this._importanceEnvironment.sampleEnvironmentBRDF( {
-								cameraWorldMatrix: this._cameraWorldMatrix,
-								viewReflectDir,
-								N: viewNormal,
-								V,
-								alpha: ggxAlpha,
-								f0
-							} ) );
-
-						}
+						envColor.assign( this._importanceEnvironment.sampleEnvironmentBRDF( {
+							cameraWorldMatrix: this._cameraWorldMatrix,
+							viewReflectDir,
+							N: viewNormal,
+							V,
+							alpha: ggxSample.get( 'alpha' ),
+							f0: ggxSample.get( 'f0' )
+						} ) );
 
 					}
 
-				}
+					return envColor;
 
-				return envColor;
+				};
 
-			};
+			}
 
 			// Multi-bounce: fold in the previous frame's reflection at the hit point, reprojected by its
 			// own motion. The (1 - history.a) decay damps the feedback. No-op until both textures are set.
@@ -1031,7 +1056,7 @@ class SSRNode extends TempNode {
 			// Blur traces a single mirror ray, so spend steps in proportion to the ray's screen-space
 			// length (cheap for the short rays that dominate). Scatter needs a fixed, bounded count for
 			// coherent stochastic sampling; each step then spans the whole ray as rayVec / totalStep.
-			const totalStep = this.reflection === 'blur'
+			const totalStep = this.stochastic === false
 				? trunc( max( abs( xLen ), abs( yLen ) ).mul( this.quality.clamp() ) ).max( int( 1 ) ).toConst()
 				: this.quality.clamp().mul( MAX_STEPS ).max( int( 1 ) ).toConst();
 
@@ -1061,7 +1086,7 @@ class SSRNode extends TempNode {
 			// Ray parameter s ∈ [0,1] for step `idx`. Blur marches uniformly (matching the original loop:
 			// one ~texel step per iteration). Scatter uses an exponential remap `(idx/steps)^stepExponent`
 			// that concentrates samples near the origin, floored to ≥1 texel/step; `jitter` dissolves banding.
-			const sampleFraction = this.reflection === 'blur'
+			const sampleFraction = this.stochastic === false
 				? ( idx ) => idx.div( totalStep )
 				: ( idx ) => max(
 					idx.add( noise.z.sub( 0.5 ) ).div( totalStep ).pow( this.stepExponent ),
@@ -1115,7 +1140,7 @@ class SSRNode extends TempNode {
 
 						// the reflected ray is pointing towards the same side as the fragment's normal (current ray position),
 						// which means it wouldn't reflect off the surface. The loop continues to the next step for the next ray sample.
-						if ( this.reflection === 'blur' ) {
+						if ( this.stochastic === false ) {
 
 							If( dot( viewReflectDir, vN ).greaterThanEqual( 0 ), () => Continue() );
 
@@ -1183,7 +1208,7 @@ class SSRNode extends TempNode {
 
 				// In blur mode the ratio² falloff re-grows past maxDistance, so over-range hits fall back
 				// to env. The scatter path bounds reach via ray length, so every hit shades.
-				const distancePointPlane = this.reflection === 'blur' ? pointPlaneDistance( vP, viewPosition, viewNormal ).toVar() : float( 0 );
+				const distancePointPlane = this.stochastic === false ? pointPlaneDistance( vP, viewPosition, viewNormal ).toVar() : float( 0 );
 				const withinRange = distancePointPlane.lessThanEqual( this.maxDistance );
 
 				If( withinRange, () => {
@@ -1203,7 +1228,7 @@ class SSRNode extends TempNode {
 					// distance attenuation and grazing Fresnel here to match its falloff.
 					let weightedColor = reflectColor.rgb.mul( finalSampleWeight );
 
-					if ( this.reflection === 'blur' ) {
+					if ( this.stochastic === false ) {
 
 						const ratio = float( 1 ).sub( distancePointPlane.div( this.maxDistance ) ).toVar();
 						const attenuation = ratio.mul( ratio ).toVar();
@@ -1250,7 +1275,7 @@ class SSRNode extends TempNode {
 
 		const reflectionBuffer = texture( this._ssrRenderTarget.texture );
 
-		if ( this.reflection === 'blur' ) {
+		if ( this.stochastic === false ) {
 
 			this._buildBlurMaterial();
 
