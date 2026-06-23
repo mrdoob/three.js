@@ -1081,7 +1081,7 @@ export class Style {
 	}
 
 	.parameters .list-item-row {
-		min-height: 31px;
+		min-height: 23px;
 	}
 
 	.mini-panel-content .parameters .list-item-row {
@@ -1495,6 +1495,16 @@ export class Style {
 		display: block;
 		transform: scale(0);
 		transition: transform 0.2s;
+	}
+
+	.list-container .custom-checkbox .checkmark {
+		width: 13px;
+		height: 13px;
+	}
+
+	.list-container .custom-checkbox .checkmark::after {
+		width: 7px;
+		height: 7px;
 	}
 
 	.custom-checkbox input:checked+.checkmark {
