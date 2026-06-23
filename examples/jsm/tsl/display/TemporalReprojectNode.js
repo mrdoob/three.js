@@ -853,7 +853,7 @@ class TemporalReprojectNode extends TempNode {
 				const confSurf = surfValid.select( surf.get( 'tapConfidence' ), float( 0 ) );
 				const minConfHit = hit.get( 'minConfidence' );
 
-				const reflectionEdgeFactor = neighborhood.get( 'stdDevRayLength' ).mul( neighborhood.get( 'rayLength' ) );
+				const reflectionEdgeFactor = neighborhood.get( 'stdDevRayLength' );
 				reflectionEdgeFactor.assign( reflectionEdgeFactor.mul( motionFactor.mul( 100 ).min( 1 ) ).mul( 5 ).min( 1 ).oneMinus() );
 
 				const curvatureFactor = fwidth( worldNormal.xyz ).length().mul( 50 ).clamp();
