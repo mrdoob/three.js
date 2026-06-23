@@ -76,9 +76,13 @@ class Console extends Tab {
 			const checkmark = document.createElement( 'span' );
 			checkmark.className = 'checkmark';
 
+			const labelText = document.createElement( 'span' );
+			labelText.className = 'checkbox-text';
+			labelText.textContent = type.charAt( 0 ).toUpperCase() + type.slice( 1 );
+
 			label.appendChild( checkbox );
 			label.appendChild( checkmark );
-			label.append( type.charAt( 0 ).toUpperCase() + type.slice( 1 ) );
+			label.appendChild( labelText );
 			buttonsGroup.appendChild( label );
 
 		} );

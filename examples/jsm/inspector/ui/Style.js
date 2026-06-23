@@ -1258,7 +1258,7 @@ export class Style {
 		border: 1px solid var(--profiler-border);
 		color: var(--text-primary);
 		border-radius: 4px;
-		padding: 4px 8px;
+		padding: 4px 10px 2px 10px;
 		font-family: var(--font-mono);
 		flex-grow: 1;
 		max-width: 300px;
@@ -1462,6 +1462,7 @@ export class Style {
 		cursor: pointer;
 		gap: 8px;
 		will-change: transform;
+		font-size: 12px;
 	}
 
 	.custom-checkbox input {
@@ -1477,6 +1478,12 @@ export class Style {
 		justify-content: center;
 		align-items: center;
 		transition: background-color 0.2s, border-color 0.2s;
+	}
+
+	.custom-checkbox .checkbox-text {
+		font-size: 12px;
+		margin-top: 1px;
+		color: inherit;
 	}
 
 	.custom-checkbox .checkmark::after {
@@ -1941,7 +1948,8 @@ export class Style {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 6px 8px;
+		height: 32px;
+		padding: 4px 6px;
 		border-bottom: 1px solid var(--profiler-border);
 		background: var(--profiler-header-background);
 		flex-shrink: 0;
@@ -1950,10 +1958,15 @@ export class Style {
 	}
 
 	.toolbar span {
-		margin-right: 8px;
 		color: var(--text-secondary);
 		font-size: 12px;
 		font-weight: 600;
+	}
+
+	.toolbar .custom-checkbox .checkmark {
+		width: 12px;
+		height: 12px;
+		border-radius: 4px;
 	}
 
 	.viewer-content .toolbar {
