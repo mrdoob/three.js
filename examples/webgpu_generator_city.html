@@ -38,16 +38,17 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { color, floor, fract, mix, positionWorld, sin, step, varying } from 'three/tsl';
+			import { color, floor, fract, mix, pass, positionWorld, sin, step, varying } from 'three/tsl';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
+			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 			import { CityGenerator, createRoadMaterial } from 'three/addons/generators/CityGenerator.js';
 			import { createSkyscraperMaterial } from 'three/addons/generators/city/SkyscraperGenerator.js';
 
 			let camera, scene, renderer, controls;
-			let cityGroup, materials, city;
+			let cityGroup, materials, city, renderPipeline;
 			let sky, sun, sunLight, pmremGenerator, envScene;
 
 			const parameters = {
@@ -133,11 +134,23 @@
 				materials = { building: buildBuildingMaterial( city.layout ) };
 				generateCity();
 
+				// bloom: a soft glow on the brightest areas, run on the linear HDR scene
+				// colour before tone mapping folds it back to display range
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				const scenePassColor = pass( scene, camera ).getTextureNode( 'output' );
+				const bloomPass = bloom( scenePassColor, 0.1, 0.0, 0.0 );
+
+				renderPipeline.outputNode = scenePassColor.add( bloomPass );
+
 				// parameters
 
 				const gui = renderer.inspector.createParameters( 'City' );
 				gui.add( parameters, 'seed', 0, 100, 1 ).onChange( generateCity );
 				gui.add( parameters, 'timeOfDay', 6, 18, 0.1 ).name( 'time of day' ).onChange( updateSun );
+				gui.add( renderer, 'toneMappingExposure', 0.01, 1 ).name( 'exposure' );
+				gui.add( bloomPass.strength, 'value', 0, 2 ).name( 'bloom' );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -242,7 +255,7 @@
 
 				controls.update();
 
-				renderer.render( scene, camera );
+				renderPipeline.render();
 
 			}
 

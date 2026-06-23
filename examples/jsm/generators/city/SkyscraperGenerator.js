@@ -691,10 +691,13 @@ function slab( footprint, y, thickness ) {
 
 	} );
 
-	// extrude the XZ outline downward by the thickness, capped at height y
+	// extrude the XZ outline downward by the thickness, the top dropped just below height y:
+	// the inset cap would otherwise sit coplanar with the surrounding wall top faces and
+	// z-fight, and the parapet / spandrel bands around the edge hide the shallow recess
+	const drop = 0.2;
 	const geometry = new ExtrudeGeometry( shape, { depth: thickness, bevelEnabled: false } );
 	geometry.rotateX( Math.PI / 2 );
-	geometry.translate( 0, y, 0 );
+	geometry.translate( 0, y - drop, 0 );
 	return geometry;
 
 }
@@ -1031,6 +1034,13 @@ const interior = /*@__PURE__*/ Fn( () => {
 	const seed2 = hash( 39.346, 11.135, 83.155 );
 	const lit = step( 0.8, hash( 63.21, 9.17, 51.43 ) ); // ~20% of rooms have the lights on; the rest sit dark
 
+	// each room's bulb colour. most run warm, drifting from a dim amber ( ~2400K ) up to a
+	// warm white ( ~3200K ); a minority run cool, from a fluorescent / LED daylight to a TV's
+	// bluer glow — so a lit facade reads as a spread of bulb temperatures, not one flat tint
+	const warmLight = mix( color( 0xffb845 ), color( 0xffe49c ), hash( 27.1, 4.9, 61.7 ) );
+	const coolLight = mix( color( 0xdfe8ff ), color( 0x9fb6ff ), hash( 8.3, 51.2, 17.6 ) );
+	const lightCol = select( hash( 44.7, 19.3, 6.1 ).greaterThan( 0.88 ), coolLight, warmLight ); // ~12% of lit rooms run cool
+
 	// depth falloff ( darker toward the back ), and a panel mask on a face given its
 	// two 0..1 coordinates — used for the flat fittings below
 	const depth = roomSize.y.mul( 1.55 );
@@ -1053,7 +1063,7 @@ const interior = /*@__PURE__*/ Fn( () => {
 	// ceiling, lighter than the walls, with a round overhead light in the middle; in a
 	// lit room the fixture reads bright and glows ( the material's emissive = colour × lit )
 	const lamp = smoothstep( 0.16, 0.13, vec2( q.x.sub( 0.5 ), q.z.sub( 0.5 ) ).length() );
-	const ceilCol = mix( mix( wall, color( 0xffffff ), 0.5 ), color( 0xfff0cf ).mul( mix( float( 1.0 ), float( 4.5 ), lit ) ), lamp );
+	const ceilCol = mix( mix( wall, color( 0xffffff ), 0.5 ), lightCol.mul( mix( float( 1.0 ), float( 4.5 ), lit ) ), lamp );
 
 	// back wall: a panelled door to one side, and a framed picture kept on the
 	// opposite half of the wall so it never lands on the door
@@ -1080,6 +1090,7 @@ const interior = /*@__PURE__*/ Fn( () => {
 	// face. consider() keeps whichever surface the ray meets first.
 	let bestT = t;
 	let bestCol = shellCol.mul( shellAO ).mul( falloffAt( hit.z ) );
+	let bestEmit = float( 1 ); // per-hit emissive weight: shell and fittings emit fully, curtains far less
 
 	const boxHit = ( bMin, bMax ) => {
 
@@ -1092,9 +1103,9 @@ const interior = /*@__PURE__*/ Fn( () => {
 
 	};
 
-	const consider = ( h, tN, c ) => {
+	const consider = ( h, tN, c, emit = 1 ) => {
 
-		const near = h.and( tN.lessThan( bestT ) ); bestCol = select( near, c, bestCol ); bestT = select( near, tN, bestT );
+		const near = h.and( tN.lessThan( bestT ) ); bestCol = select( near, c, bestCol ); bestEmit = select( near, float( emit ), bestEmit ); bestT = select( near, tN, bestT );
 
 	};
 
@@ -1128,12 +1139,23 @@ const interior = /*@__PURE__*/ Fn( () => {
 
 	// curtains hung just inside the glass: drapes drawn part-way in from each side,
 	// so some windows read open and others half-covered
-	const fabric = mix( color( 0x8a7a64 ), color( 0x70605a ), seed2 );
+
+	// curtain fabric colour, picked per room from a muted domestic palette — creams and
+	// taupes through warm grey, dusty blue, sage and faded terracotta — with a small
+	// in-family drift so drawn drapes vary window to window instead of all reading beige
+	const swatch = ( a, b ) => mix( color( a ), color( b ), seed2 );
+	const pick = hash( 22.4, 6.7, 91.2 ).mul( 6 ); // 0..6, one bucket per family
+	let fabric = swatch( 0xcabfa6, 0xd8cdb8 ); // cream
+	fabric = select( pick.greaterThan( 1 ), swatch( 0x8a7a64, 0x9b8c72 ), fabric ); // beige / taupe
+	fabric = select( pick.greaterThan( 2 ), swatch( 0x706a64, 0x837d76 ), fabric ); // warm grey
+	fabric = select( pick.greaterThan( 3 ), swatch( 0x5f7079, 0x6f818b ), fabric ); // dusty blue
+	fabric = select( pick.greaterThan( 4 ), swatch( 0x6c7558, 0x79835f ), fabric ); // sage green
+	fabric = select( pick.greaterThan( 5 ), swatch( 0x8c5a44, 0x9a6a52 ), fabric ); // faded terracotta
 	const drape = ( bMin, bMax, gate ) => {
 
 		const h = boxHit( bMin, bMax );
 		const pleat = fabric.mul( mix( float( 0.78 ), float( 1.12 ), fract( h.p.x.mul( 2.5 ) ) ) ); // soft vertical pleats
-		consider( h.hit.and( gate ), h.tN, pleat.mul( falloffAt( h.p.z ) ) );
+		consider( h.hit.and( gate ), h.tN, pleat.mul( falloffAt( h.p.z ) ), 0.2 ); // a drape only transmits a little of the room's glow, never out-glowing the interior
 
 	};
 
@@ -1147,9 +1169,9 @@ const interior = /*@__PURE__*/ Fn( () => {
 	drape( vec3( halfU.negate(), floorY, cz0 ), vec3( halfU.negate().add( lw ), ceilY, cz1 ), lw.greaterThan( 0.05 ) );
 	drape( vec3( halfU.sub( rw ), floorY, cz0 ), vec3( halfU, ceilY, cz1 ), rw.greaterThan( 0.05 ) );
 
-	// lit rooms read brighter and warmer ( the lights are on )
-	const warmth = mix( vec3( 1.0, 1.0, 1.0 ), color( 0xffc081 ), lit.mul( 0.85 ) );
-	return vec4( bestCol.mul( warmth ).mul( mix( float( 1.0 ), float( 1.3 ), lit ) ), lit );
+	// lit rooms read brighter and take on their bulb's colour ( the lights are on )
+	const warmth = mix( vec3( 1.0, 1.0, 1.0 ), lightCol, lit.mul( 0.85 ) );
+	return vec4( bestCol.mul( warmth ).mul( mix( float( 1.0 ), float( 1.3 ), lit ) ), lit.mul( bestEmit ) );
 
 } );
 
@@ -1264,7 +1286,7 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	const filmNoise = mx_fractal_noise_float( vec3( positionWorld.x.mul( 1.3 ), positionWorld.y.mul( 0.06 ), positionWorld.z.mul( 1.3 ) ), 2 );
 	const dustStreak = smoothstep( - 0.15, 0.5, filmNoise ).mul( 0.45 );
 	const pooled = smoothstep( 0.32, 0.0, uv().y ).mul( 0.4 );
-	const grime = float( 0.35 ).add( dustStreak ).add( pooled ).clamp( 0, 0.85 ); // baseline haze so it is never crystal-clear
+	const grime = float( 0.64 ).add( dustStreak ).add( pooled ).clamp( 0, 0.95 ); // baseline haze so the panes read as dirty glass, not open holes
 	const dirtyGlass = mix( color( 0x13161a ), color( 0x232b31 ), mx_noise_float( positionWorld.mul( 0.3 ) ).mul( 0.5 ).add( 0.5 ) );
 	const glassColor = mix( room.xyz.mul( color( 0xb6c6bf ) ), dirtyGlass, grime ); // faint green-grey ( soda-lime ) room tint, dirtied toward grimy glass
 
@@ -1306,7 +1328,7 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	material.colorNode = select( isGlass, glassColor, select( isFrame, frameColor, select( isOrnament, ornamentColor, select( isAC, acColor, stoneColor ) ) ) );
 	material.roughnessNode = select( isGlass, float( 0.18 ), select( isOrnament, float( 0.8 ), select( isAC, acRough, rough ) ) ); // glass kept smooth for a sky reflection, but soft enough not to alias over the interior
 	material.metalnessNode = float( 0 ); // all dielectric — stone, glass and the plastic AC shells
-	material.emissiveNode = select( isGlass, room.xyz.mul( room.w ).mul( 3.5 ).mul( grime.mul( 0.6 ).oneMinus() ), color( 0x000000 ) ); // lit rooms ( room.w = 1 ) glow, muted where the glass is grimiest
+	material.emissiveNode = select( isGlass, room.xyz.mul( room.w ).mul( 4 ).mul( grime.mul( 0.6 ).oneMinus() ), color( 0x000000 ) ); // room.w = emissive weight ( 0 unlit, < 1 behind curtains ), muted further by grime
 	material.normalNode = bumpNormal( select( isGlass.or( isFrame ).or( isOrnament ), float( 0 ), select( isAC, acRelief, reliefHeight ) ) ); // glass / frames / ornament stay flat; AC has its own louvers
 
 	return material;
