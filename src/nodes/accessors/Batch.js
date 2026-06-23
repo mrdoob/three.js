@@ -13,7 +13,7 @@ import { varyingProperty } from '../core/PropertyNode.js';
  *
  * @param {Node<texture>} colorsTexture - The colors texture.
  * @param {Node<int>} id - The instance or batch ID.
- * @returns {Node<vec3>} The retrieved color.
+ * @returns {Node<vec4>} The retrieved color.
  */
 const getBatchingColor = /*@__PURE__*/ Fn( ( [ colorsTexture, id ] ) => {
 
@@ -21,7 +21,7 @@ const getBatchingColor = /*@__PURE__*/ Fn( ( [ colorsTexture, id ] ) => {
 	const j = int( id );
 	const x = j.mod( size ).toConst();
 	const y = j.div( size ).toConst();
-	return textureLoad( colorsTexture, ivec2( x, y ) ).rgb;
+	return textureLoad( colorsTexture, ivec2( x, y ) );
 
 } );
 
@@ -44,9 +44,9 @@ const getIndirectIndex = /*@__PURE__*/ Fn( ( [ indirectTexture, id ] ) => {
 /**
  * TSL object representing a varying property for the batching color vector.
  *
- * @type {VaryingNode<vec3>}
+ * @type {VaryingNode<vec4>}
  */
-export const batchColor = /*@__PURE__*/ varyingProperty( 'vec3', 'vBatchColor' );
+export const batchColor = /*@__PURE__*/ varyingProperty( 'vec4', 'vBatchColor' );
 
 /**
  * TSL function representing the vertex shader batching setup.
