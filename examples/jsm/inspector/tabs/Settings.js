@@ -115,6 +115,16 @@ class Settings extends Parameters {
 
 		} );
 
+		// Render Modes
+
+		const modesGroup = this.createGroup( 'Render Modes' );
+
+		modesGroup.add( { overdraw: false }, 'overdraw' ).name( 'Overdraw' ).onChange( ( enable ) => {
+
+			this.inspector.overdraw = enable;
+
+		} ).info( 'Shows how many times each pixel is shaded.' );
+
 	}
 
 	init() {
