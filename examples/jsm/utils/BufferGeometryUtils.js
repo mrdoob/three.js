@@ -850,18 +850,32 @@ function toTrianglesDrawMode( geometry, drawMode ) {
 
 		//
 
-		const numberOfTriangles = index.count - 2;
+		const restartIndex = getPrimitiveRestartIndex( index.array );
 		const newIndices = [];
 
 		if ( drawMode === TriangleFanDrawMode ) {
 
 			// gl.TRIANGLE_FAN
 
-			for ( let i = 1; i <= numberOfTriangles; i ++ ) {
+			let fanStartIndex = 0;
 
-				newIndices.push( index.getX( 0 ) );
-				newIndices.push( index.getX( i ) );
-				newIndices.push( index.getX( i + 1 ) );
+			for ( let i = 1, il = index.count - 2; i <= il; i ++ ) {
+
+				const a = index.getX( fanStartIndex );
+				const b = index.getX( i );
+				const c = index.getX( i + 1 );
+
+				if ( c === restartIndex ) {
+
+					i++;
+
+					fanStartIndex = i + 1;
+
+				} else {
+
+					newIndices.push( a, b, c );
+
+				}
 
 			}
 
@@ -869,29 +883,27 @@ function toTrianglesDrawMode( geometry, drawMode ) {
 
 			// gl.TRIANGLE_STRIP
 
-			for ( let i = 0; i < numberOfTriangles; i ++ ) {
+			for ( let i = 0, il = index.count - 2; i < il; i ++ ) {
 
-				if ( i % 2 === 0 ) {
+				const a = index.getX( i );
+				const b = index.getX( i + 1 );
+				const c = index.getX( i + 2 );
 
-					newIndices.push( index.getX( i ) );
-					newIndices.push( index.getX( i + 1 ) );
-					newIndices.push( index.getX( i + 2 ) );
+				if ( c === restartIndex ) {
+
+					i += 2;
+
+				} else if ( i % 2 === 0 ) {
+
+					newIndices.push( a, b, c );
 
 				} else {
 
-					newIndices.push( index.getX( i + 2 ) );
-					newIndices.push( index.getX( i + 1 ) );
-					newIndices.push( index.getX( i ) );
+					newIndices.push( c, b, a );
 
 				}
 
 			}
-
-		}
-
-		if ( ( newIndices.length / 3 ) !== numberOfTriangles ) {
-
-			console.error( 'THREE.BufferGeometryUtils.toTrianglesDrawMode(): Unable to generate correct amount of triangles.' );
 
 		}
 
@@ -907,6 +919,36 @@ function toTrianglesDrawMode( geometry, drawMode ) {
 
 		console.error( 'THREE.BufferGeometryUtils.toTrianglesDrawMode(): Unknown draw mode:', drawMode );
 		return geometry;
+
+	}
+
+}
+
+/**
+ * Returns the primitive restart index associated with a given index array type.
+ *
+ * @param {TypedArrayConstructor} array
+ * @returns {number}
+ */
+function getPrimitiveRestartIndex( array ) {
+
+	switch ( array.constructor ) {
+
+		case Uint32Array:
+
+			return 0xffffffff;
+
+		case Uint16Array:
+
+			return 0xffff;
+
+		case Uint8Array:
+
+			return 0xff;
+
+		default:
+
+			throw new Error('THREE.BufferGeometryUtils: Unknown index type: ' + array.constructor.name );
 
 	}
 
