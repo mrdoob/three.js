@@ -297,18 +297,19 @@ class SkyscraperGenerator {
 		const baseTop = baseHeight;
 		const shaftTop = baseHeight + shaftHeight;
 
-		// accumulators. the box shell ( walls, spandrels, cornices, parapets, slabs )
-		// collects only instance matrices; the repeating field ( piers, windows, glass,
-		// finials ) is instanced too. only the base arcade needs real geometry.
+		// one accumulator per kind of part, mostly instance matrices. kept separate so the
+		// bake below can order them by draw order ( which controls overdraw ), not build order.
 
-		const boxes = []; // matrices for the axis-aligned shell boxes
-		const extras = []; // bespoke shell geometry: the base arcade
 		const windows = [];
 		const glass = [];
 		const glassRooms = []; // per-glass interior-mapping room ( centre + size ), aligned with `glass`
-		const finials = [];
-		const acUnits = []; // window air-conditioner boxes on a random subset of shaft windows
+		const backWalls = []; // the thin wall closing the volume behind the glass
+		const bands = []; // spandrel bands, one at each floor line
 		const piers = new Map(); // pier height -> matrices, so each tier's continuous piers share one geometry
+		const trim = []; // cornices and parapets ( axis-aligned unit boxes )
+		const acUnits = []; // window air-conditioner boxes on a random subset of shaft windows
+		const finials = []; // pinnacles along the crown
+		const extras = []; // bespoke geometry: the base arcade and the setback / roof slabs
 
 		const addPier = ( frame, u, vBottom, height ) => {
 
@@ -333,93 +334,81 @@ class SkyscraperGenerator {
 		);
 		const crownFaces = buildFaces( crownFootprint );
 
-		// --- shell ----------------------------------------------------------
+		// --- generate the parts -----------------------------------------------
 
-		// the base is an open arcade (added below); above it a thin backing wall
-		// closes the volume behind the glass, with the facade grid (piers +
-		// spandrel bands) built in front of it
+		const crownCornice = p.stringCourseHeight * 1.6; // the crown's heavy cap; its piers stop below it
 
-		for ( const frame of faces ) addWall( boxes, frame, baseTop, shaftTop, 0.8, - 0.6 );
-		for ( const frame of crownFaces ) addWall( boxes, frame, shaftTop, p.totalHeight, 0.8, - 0.6 );
+		// shaft and crown are the same facade over different faces, spans and pier heights
+		const tiers = [
+			{ faces, bottom: baseTop, height: shaftHeight, pierHeight: shaftHeight, ac: acUnits },
+			{ faces: crownFaces, bottom: shaftTop, height: crownHeight, pierHeight: crownHeight - crownCornice, ac: null }
+		];
 
-		// setback ledge: a thin slab capping the shaft footprint where the
-		// crown steps in, and a roof cap closing the crown
+		for ( const t of tiers ) {
 
-		extras.push( slab( footprint, shaftTop, 0.6 ) );
-		extras.push( slab( crownFootprint, p.totalHeight, 0.6 ) );
+			for ( const frame of t.faces ) {
 
-		// --- base: a gothic arcade with deep pointed openings ---------------
-
-		for ( const frame of faces ) {
-
-			addArcade( extras, frame, baseHeight, p );
-			addCornice( boxes, frame, baseTop - p.stringCourseHeight, p.stringCourseHeight, 0.5 );
-
-		}
-
-		// --- shaft: continuous piers, stacked windows, periodic bands -------
-
-		for ( const frame of faces ) {
-
-			addSpandrelBands( boxes, frame, baseTop, shaftHeight, p );
-			addPiers( frame, baseTop, shaftHeight, p, addPier );
-			addWindows( frame, windows, glass, glassRooms, acUnits, baseTop, shaftHeight, p );
-
-		}
-
-		if ( p.stringCourseEvery > 0 ) {
-
-			const floors = Math.max( 1, Math.round( shaftHeight / p.floorHeight ) );
-			const fh = shaftHeight / floors;
-
-			for ( let f = p.stringCourseEvery; f < floors; f += p.stringCourseEvery ) {
-
-				for ( const frame of faces ) {
-
-					addCornice( boxes, frame, baseTop + f * fh - p.stringCourseHeight * 0.5, p.stringCourseHeight, 0.3 );
-
-				}
+				addWindows( frame, windows, glass, glassRooms, t.ac, t.bottom, t.height, p );
+				addWall( backWalls, frame, t.bottom, t.bottom + t.height, 0.8, - 0.6 );
+				addSpandrelBands( bands, frame, t.bottom, t.height, p );
+				addPiers( frame, t.bottom, t.pierHeight, p, addPier );
 
 			}
 
 		}
 
-		// --- crown: shorter floors, heavy cornice, parapet, finials ---------
+		// the base: a gothic arcade, capped by a string course
+		for ( const frame of faces ) {
 
-		const crownCornice = p.stringCourseHeight * 1.6;
+			addArcade( extras, frame, baseHeight, p );
+			addCornice( trim, frame, baseTop - p.stringCourseHeight, p.stringCourseHeight, 0.5 );
 
+		}
+
+		// periodic string courses banding the shaft
+		if ( p.stringCourseEvery > 0 ) {
+
+			for ( let f = p.stringCourseEvery; f < shaftFloors; f += p.stringCourseEvery ) {
+
+				for ( const frame of faces ) addCornice( trim, frame, baseTop + f * p.floorHeight - p.stringCourseHeight * 0.5, p.stringCourseHeight, 0.3 );
+
+			}
+
+		}
+
+		// the crown's heavy cornice, its parapet and the finials along the top
 		for ( const frame of crownFaces ) {
 
-			addSpandrelBands( boxes, frame, shaftTop, crownHeight, p );
-			addPiers( frame, shaftTop, crownHeight - crownCornice, p, addPier ); // piers terminate at the cornice, not through it
-			addWindows( frame, windows, glass, glassRooms, null, shaftTop, crownHeight, p );
-			addCornice( boxes, frame, p.totalHeight - crownCornice, crownCornice, 0.9 );
-			addParapet( boxes, frame, p.totalHeight, p );
+			addCornice( trim, frame, p.totalHeight - crownCornice, crownCornice, 0.9 );
+			addParapet( trim, frame, p.totalHeight, p );
 			addFinials( frame, finials, shaftTop, crownHeight, p );
 
 		}
 
-		// --- assemble: bake every part into one geometry -------------------
+		// thin slabs capping the setback ledge and the roof
+		extras.push( slab( footprint, shaftTop, 0.6 ) );
+		extras.push( slab( crownFootprint, p.totalHeight, 0.6 ) );
+
+		// --- bake every part into one geometry ---------------------------------
+
+		// one mesh = one draw the renderer can't sort, so bake order is draw order: the
+		// facade front-to-back, the backing wall last so its hidden fragments never shade.
 
 		const groups = [
-			{ geometry: _unitBox, matrices: boxes, partId: WALL }, // walls, spandrels, cornices, parapets, slabs
 			{ geometry: buildWindowGeometry( p ), matrices: windows, partId: FRAME, rigid: true },
 			{ geometry: nonIndexed( buildGlassGeometry( p ) ), matrices: glass, partId: GLASS, rooms: glassRooms, rigid: true },
-			{ geometry: _unitBox, matrices: acUnits, partId: AC },
-			{ geometry: nonIndexed( buildFinialGeometry( p ) ), matrices: finials, partId: ORNAMENT, rigid: true }
+			{ geometry: _unitBox, matrices: bands, partId: WALL }
 		];
 
-		for ( const [ key, matrices ] of piers ) {
+		for ( const [ key, matrices ] of piers ) groups.push( { geometry: buildPierGeometry( p, key / 1000 ), matrices, partId: PIER, rigid: true } );
 
-			groups.push( { geometry: buildPierGeometry( p, key / 1000 ), matrices, partId: PIER, rigid: true } );
+		groups.push( { geometry: _unitBox, matrices: trim, partId: WALL } ); // cornices, parapets
+		groups.push( { geometry: _unitBox, matrices: acUnits, partId: AC } );
+		groups.push( { geometry: nonIndexed( buildFinialGeometry( p ) ), matrices: finials, partId: ORNAMENT, rigid: true } );
 
-		}
+		for ( const geometry of extras ) groups.push( { geometry: nonIndexed( geometry ), matrices: [ _identity ], partId: WALL, rigid: true } ); // base arcade + slabs, in building-local space
 
-		for ( const geometry of extras ) { // the base arcade, already in building-local space
-
-			groups.push( { geometry: nonIndexed( geometry ), matrices: [ _identity ], partId: WALL, rigid: true } );
-
-		}
+		groups.push( { geometry: _unitBox, matrices: backWalls, partId: WALL } ); // last — hidden behind the facade
 
 		const geometry = bakeGroups( groups );
 
