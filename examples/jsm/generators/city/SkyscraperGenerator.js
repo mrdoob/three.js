@@ -997,12 +997,14 @@ const interior = /*@__PURE__*/ Fn( () => {
 	const camLocal = modelWorldMatrixInverse.mul( vec4( cameraPosition, 1 ) ).xyz;
 	const rayLocal = positionLocal.sub( camLocal ).normalize();
 	const origin = vec3( dot( d, uAxis ), d.y, 0 );
-	const dir = vec3( dot( rayLocal, uAxis ), rayLocal.y, dot( rayLocal, n ).negate() );
+	const dir0 = vec3( dot( rayLocal, uAxis ), rayLocal.y, dot( rayLocal, n ).negate() );
+	// keep every component off zero: a zero divisor in the slab test below isn't portable,
+	// and a near-zero one only yields a large finite t that min() discards anyway
+	const dir = dir0.add( select( dir0.lessThan( 0 ), vec3( - 1e-5 ), vec3( 1e-5 ) ) );
 
 	// the room box: the pane-wide × ceiling-height front rectangle ( centred on the pane ),
 	// set back behind the glass and run a little deeper than it is tall. shade the far
-	// side the ray exits ( slab method: nearest of the three far-plane crossings;
-	// dividing by a near-zero direction gives ±inf, which min() harmlessly drops ).
+	// side the ray exits ( slab method: nearest of the three far-plane crossings ).
 	const setback = float( 0.1 ); // the room starts just behind the glass, so it sits flush in the frame opening
 	const boxMax = vec3( roomSize.x.mul( 0.5 ), roomSize.y.mul( 0.5 ), setback.add( roomSize.y.mul( 1.55 ) ) );
 	const boxMin = vec3( boxMax.x.negate(), boxMax.y.negate(), setback );
