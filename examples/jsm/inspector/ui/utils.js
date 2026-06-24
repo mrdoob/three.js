@@ -101,8 +101,15 @@ export function info( parentNode, text ) {
 		tooltip.innerHTML = html;
 
 		const rect = infoIcon.getBoundingClientRect();
+		const tooltipWidth = tooltip.getBoundingClientRect().width;
 
-		tooltip.style.left = ( rect.left + rect.width / 2 ) + 'px';
+		// keep the centered tooltip within the viewport so it isn't clipped near an edge
+
+		const margin = 8;
+		const half = tooltipWidth / 2;
+		const center = Math.max( margin + half, Math.min( window.innerWidth - margin - half, rect.left + rect.width / 2 ) );
+
+		tooltip.style.left = center + 'px';
 		tooltip.style.top = ( rect.top - 8 ) + 'px';
 
 		tooltip.style.opacity = '1';

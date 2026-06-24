@@ -1,5 +1,6 @@
 
-import { InspectorBase, TimestampQuery, warnOnce } from 'three/webgpu';
+import { InspectorBase, TimestampQuery, warnOnce, RendererUtils, MeshBasicNodeMaterial, AdditiveBlending, NoToneMapping, LinearSRGBColorSpace } from 'three/webgpu';
+import { vec3 } from 'three/tsl';
 
 class ObjectStats {
 
@@ -84,6 +85,9 @@ export class RendererInspector extends InspectorBase {
 		this._lastFinishTime = 0;
 		this._resolveTimestampPromise = null;
 
+		this.overdraw = false;
+		this._overdrawMaterial = null;
+
 		this.isRendererInspector = true;
 
 	}
@@ -121,6 +125,66 @@ export class RendererInspector extends InspectorBase {
 		this.currentNodes = null;
 
 		this._lastFinishTime = now;
+
+		if ( this.overdraw === true ) {
+
+			this._renderOverdraw( frame );
+
+		}
+
+	}
+
+	_renderOverdraw( frame ) {
+
+		const renderer = this.getRenderer();
+
+		if ( renderer === null ) return;
+
+		// first scene render of the frame; nested shadow / RTT passes come after
+
+		let primary = null;
+
+		for ( const render of frame.renders ) {
+
+			if ( render.scene.isScene === true ) {
+
+				primary = render;
+				break;
+
+			}
+
+		}
+
+		if ( primary === null ) return;
+
+		if ( this._overdrawMaterial === null ) {
+
+			// additive constant, so each pixel sums the depth-passing fragments it shaded
+
+			this._overdrawMaterial = new MeshBasicNodeMaterial( {
+				colorNode: vec3( 0.25 ),
+				blending: AdditiveBlending,
+				depthTest: true,
+				depthWrite: true,
+				toneMapped: false
+			} );
+
+		}
+
+		const { scene, camera } = primary;
+
+		// raw render against black with no tone mapping, so the count stays linear
+
+		const state = RendererUtils.resetRendererAndSceneState( renderer, scene );
+
+		renderer.toneMapping = NoToneMapping;
+		renderer.outputColorSpace = LinearSRGBColorSpace;
+
+		scene.overrideMaterial = this._overdrawMaterial;
+
+		renderer.render( scene, camera );
+
+		RendererUtils.restoreRendererAndSceneState( renderer, scene, state );
 
 	}
 
