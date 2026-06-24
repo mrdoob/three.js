@@ -1543,6 +1543,20 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns whether the given name is a reserved keyword of the backend's
+	 * shading language. Backends override this method to provide their
+	 * language-specific keywords.
+	 *
+	 * @param {string} name - The name to test.
+	 * @return {boolean} Whether the name is a reserved keyword or not.
+	 */
+	isReservedKeyword( /* name */ ) {
+
+		return false;
+
+	}
+
+	/**
 	 * Whether the given type is a vector type or not.
 	 *
 	 * @param {string} type - The type to check.
@@ -2274,9 +2288,9 @@ class NodeBuilder {
 		let property = this.getPropertyName( node );
 		let index = 1;
 
-		// Automatically renames the property if the name is already in use.
+		// Automatically renames the property if the name is already in use or reserved.
 
-		while ( declarations[ property ] !== undefined ) {
+		while ( this.isReservedKeyword( name ) || declarations[ property ] !== undefined ) {
 
 			name = baseName + '_' + index ++;
 			node.name = name;
@@ -2286,7 +2300,7 @@ class NodeBuilder {
 
 		if ( name !== baseName ) {
 
-			warn( `TSL: Declaration name '${ baseName }' of '${ node.type }' already in use. Renamed to '${ name }'.` );
+			warn( `TSL: Declaration name '${ baseName }' of '${ node.type }' is a reserved keyword or already in use. Renamed to '${ name }'.` );
 
 		}
 
