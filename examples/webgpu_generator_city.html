@@ -38,7 +38,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { color, floor, fract, mix, pass, positionWorld, sin, step, varying } from 'three/tsl';
+			import { color, floor, hash, mix, pass, positionWorld, step, uint, varying } from 'three/tsl';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -219,7 +219,8 @@
 				const blockIZ = floor( gz.div( periodZ ) );
 				const cellX = blockIX.mul( layout.lotsX ).add( floor( gx.sub( blockIX.mul( periodX ) ).div( layout.lot ) ) );
 				const cellZ = blockIZ.mul( layout.lotsZ ).add( floor( gz.sub( blockIZ.mul( periodZ ) ).div( layout.lot ) ) );
-				const cellHash = ( a, b ) => fract( sin( cellX.mul( a ).add( cellZ.mul( b ) ).add( parameters.seed ) ).mul( 43758.5453 ) );
+				const cellKey = uint( cellX.add( 4096 ) ).mul( uint( 73856093 ) ).bitXor( uint( cellZ.add( 4096 ) ).mul( uint( 19349663 ) ) ).bitXor( uint( ( parameters.seed * 2654435761 ) >>> 0 ) ).toVar();
+				const cellHash = ( a, b ) => hash( cellKey.add( uint( Math.round( ( a + b * 7 ) * 100 ) ) ) );
 
 				const pick = cellHash( 127.1, 311.7 );
 				let buildingBase = palette[ 0 ];

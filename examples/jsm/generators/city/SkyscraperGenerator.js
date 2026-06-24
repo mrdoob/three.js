@@ -3,6 +3,8 @@ import {
 	BufferAttribute,
 	BufferGeometry,
 	ExtrudeGeometry,
+	InterpolationSamplingMode,
+	InterpolationSamplingType,
 	LatheGeometry,
 	Matrix3,
 	Matrix4,
@@ -18,7 +20,7 @@ import {
 } from 'three';
 
 import { MeshStandardNodeMaterial } from 'three/webgpu';
-import { attribute, cameraPosition, color, cross, dot, float, floor, Fn, fract, fwidth, mix, mod, modelWorldMatrixInverse, mx_fractal_noise_float, mx_noise_float, normalLocal, normalView, normalWorldGeometry, positionLocal, positionView, positionWorld, select, sin, smoothstep, step, uv, vec2, vec3, vec4 } from 'three/tsl';
+import { attribute, cameraPosition, color, cross, dot, float, floor, Fn, fract, fwidth, hash as ihash, mix, mod, modelWorldMatrixInverse, mx_fractal_noise_float, mx_noise_float, normalLocal, normalView, normalWorldGeometry, positionLocal, positionView, positionWorld, select, smoothstep, step, uint, uv, varying, vec2, vec3, vec4 } from 'three/tsl';
 
 import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
 
@@ -982,7 +984,8 @@ function bumpNormal( height ) {
 // it meets are shaded procedurally, keyed off a per-room hash. returns vec4( colour, lit ).
 const interior = /*@__PURE__*/ Fn( () => {
 
-	const roomCenter = attribute( 'roomCenter', 'vec3' );
+	// flat so floor() below can't split one pane across two cell ids ( centre is per-room )
+	const roomCenter = varying( attribute( 'roomCenter', 'vec3' ) ).setInterpolation( InterpolationSamplingType.FLAT, InterpolationSamplingMode.EITHER );
 	const roomSize = attribute( 'roomSize', 'vec2' );
 
 	// a per-face frame from the geometry normal ( holds on every facade, including the
@@ -997,14 +1000,12 @@ const interior = /*@__PURE__*/ Fn( () => {
 	const camLocal = modelWorldMatrixInverse.mul( vec4( cameraPosition, 1 ) ).xyz;
 	const rayLocal = positionLocal.sub( camLocal ).normalize();
 	const origin = vec3( dot( d, uAxis ), d.y, 0 );
-	const dir0 = vec3( dot( rayLocal, uAxis ), rayLocal.y, dot( rayLocal, n ).negate() );
-	// keep every component off zero: a zero divisor in the slab test below isn't portable,
-	// and a near-zero one only yields a large finite t that min() discards anyway
-	const dir = dir0.add( select( dir0.lessThan( 0 ), vec3( - 1e-5 ), vec3( 1e-5 ) ) );
+	const dir = vec3( dot( rayLocal, uAxis ), rayLocal.y, dot( rayLocal, n ).negate() );
 
 	// the room box: the pane-wide × ceiling-height front rectangle ( centred on the pane ),
 	// set back behind the glass and run a little deeper than it is tall. shade the far
-	// side the ray exits ( slab method: nearest of the three far-plane crossings ).
+	// side the ray exits ( slab method: nearest of the three far-plane crossings;
+	// dividing by a near-zero direction gives ±inf, which min() harmlessly drops ).
 	const setback = float( 0.1 ); // the room starts just behind the glass, so it sits flush in the frame opening
 	const boxMax = vec3( roomSize.x.mul( 0.5 ), roomSize.y.mul( 0.5 ), setback.add( roomSize.y.mul( 1.55 ) ) );
 	const boxMin = vec3( boxMax.x.negate(), boxMax.y.negate(), setback );
@@ -1017,10 +1018,12 @@ const interior = /*@__PURE__*/ Fn( () => {
 	const onCeil = q.y.greaterThan( 0.998 );
 	const onFloor = q.y.lessThan( 0.002 );
 
-	// a per-ROOM hash from the baked centre — bit-identical for every pixel of every
-	// pane in the room, so it can never speckle and all of a room's windows match
-	const cell = floor( roomCenter.mul( 2.0 ) );
-	const hash = ( kx, ky, kz ) => fract( sin( cell.x.mul( kx ).add( cell.y.mul( ky ) ).add( cell.z.mul( kz ) ) ).mul( 43758.5453 ) );
+	// per-room key for a portable integer hash — fract( sin() ) isn't bit-exact across drivers
+	const cell = floor( roomCenter.mul( 2.0 ) ); // + offset before the u32 cast keeps it non-negative
+	const ckey = uint( cell.x.add( 1 << 21 ) ).mul( uint( 73856093 ) )
+		.bitXor( uint( cell.y.add( 1 << 21 ) ).mul( uint( 19349663 ) ) )
+		.bitXor( uint( cell.z.add( 1 << 21 ) ).mul( uint( 83492791 ) ) ).toVar();
+	const hash = ( kx, ky, kz ) => ihash( ckey.add( uint( Math.round( ( kx + ky * 7 + kz * 13 ) * 100 ) ) ) );
 	const seed = hash( 12.9898, 78.233, 37.719 );
 	const seed2 = hash( 39.346, 11.135, 83.155 );
 	const lit = step( 0.8, hash( 63.21, 9.17, 51.43 ) ); // ~20% of rooms have the lights on; the rest sit dark
@@ -1225,8 +1228,9 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	const wallFacing = smoothstep( 0.7, 0.45, nrm.y ); // brick only on vertical walls — not roofs, ledges, cornice tops
 	const joint = lineU.max( lineV ).mul( wallFacing );
 
-	const brickRnd = fract( sin( courseRow.mul( 78.233 ).add( floor( colCoord ).mul( 12.9898 ) ) ).mul( 43758.5453 ) );
-	const brickRnd2 = fract( sin( courseRow.mul( 39.425 ).add( floor( colCoord ).mul( 56.171 ) ) ).mul( 24634.711 ) ); // independent per-brick hash for hue
+	const brickKey = uint( courseRow.add( 1 << 16 ) ).mul( uint( 73856093 ) ).bitXor( uint( floor( colCoord ).add( 1 << 16 ) ).mul( uint( 19349663 ) ) ).toVar();
+	const brickRnd = ihash( brickKey );
+	const brickRnd2 = ihash( brickKey.add( uint( 1 ) ) ); // independent per-brick hash for hue
 
 	// soft brick relief for the bump: each brick is a gently domed mound falling to the
 	// recessed mortar over a bevel ( distU / distV are the distance to the nearest column /
