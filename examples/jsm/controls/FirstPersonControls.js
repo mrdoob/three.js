@@ -138,8 +138,12 @@ class FirstPersonControls extends Controls {
 
 		this._pointerCount = 0;
 
-		this._moveForward = false;
-		this._moveBackward = false;
+		// forward / backward come from keys and the pointer, tracked per source so they don't
+		// clobber: while a forward / backward key is held, a click only looks
+		this._keyForward = false;
+		this._keyBackward = false;
+		this._pointerForward = false;
+		this._pointerBackward = false;
 		this._moveLeft = false;
 		this._moveRight = false;
 
@@ -250,8 +254,11 @@ class FirstPersonControls extends Controls {
 
 		const actualMoveSpeed = delta * this.movementSpeed;
 
-		if ( this._moveForward || ( this.autoForward && ! this._moveBackward ) ) this.object.translateZ( - ( actualMoveSpeed + this._autoSpeedFactor ) );
-		if ( this._moveBackward ) this.object.translateZ( actualMoveSpeed );
+		const moveForward = this._keyForward || this._pointerForward;
+		const moveBackward = this._keyBackward || this._pointerBackward;
+
+		if ( moveForward || ( this.autoForward && ! moveBackward ) ) this.object.translateZ( - ( actualMoveSpeed + this._autoSpeedFactor ) );
+		if ( moveBackward ) this.object.translateZ( actualMoveSpeed );
 
 		if ( this._moveLeft ) this.object.translateX( - actualMoveSpeed );
 		if ( this._moveRight ) this.object.translateX( actualMoveSpeed );
@@ -332,15 +339,15 @@ function onPointerDown( event ) {
 
 	if ( event.pointerType === 'touch' ) {
 
-		this._moveForward = this._pointerCount === 1;
-		this._moveBackward = this._pointerCount >= 2;
+		this._pointerForward = this._pointerCount === 1;
+		this._pointerBackward = this._pointerCount >= 2;
 
 	} else {
 
 		switch ( event.button ) {
 
-			case 0: this._moveForward = true; break;
-			case 2: this._moveBackward = true; break;
+			case 0: if ( ! this._keyForward && ! this._keyBackward ) this._pointerForward = true; break;
+			case 2: if ( ! this._keyForward && ! this._keyBackward ) this._pointerBackward = true; break;
 
 		}
 
@@ -364,15 +371,15 @@ function onPointerUp( event ) {
 
 	if ( event.pointerType === 'touch' ) {
 
-		this._moveForward = this._pointerCount === 1;
-		this._moveBackward = false;
+		this._pointerForward = this._pointerCount === 1;
+		this._pointerBackward = false;
 
 	} else {
 
 		switch ( event.button ) {
 
-			case 0: this._moveForward = false; break;
-			case 2: this._moveBackward = false; break;
+			case 0: this._pointerForward = false; break;
+			case 2: this._pointerBackward = false; break;
 
 		}
 
@@ -399,13 +406,13 @@ function onKeyDown( event ) {
 	switch ( event.code ) {
 
 		case 'ArrowUp':
-		case 'KeyW': this._moveForward = true; break;
+		case 'KeyW': this._keyForward = true; break;
 
 		case 'ArrowLeft':
 		case 'KeyA': this._moveLeft = true; break;
 
 		case 'ArrowDown':
-		case 'KeyS': this._moveBackward = true; break;
+		case 'KeyS': this._keyBackward = true; break;
 
 		case 'ArrowRight':
 		case 'KeyD': this._moveRight = true; break;
@@ -422,13 +429,13 @@ function onKeyUp( event ) {
 	switch ( event.code ) {
 
 		case 'ArrowUp':
-		case 'KeyW': this._moveForward = false; break;
+		case 'KeyW': this._keyForward = false; break;
 
 		case 'ArrowLeft':
 		case 'KeyA': this._moveLeft = false; break;
 
 		case 'ArrowDown':
-		case 'KeyS': this._moveBackward = false; break;
+		case 'KeyS': this._keyBackward = false; break;
 
 		case 'ArrowRight':
 		case 'KeyD': this._moveRight = false; break;
