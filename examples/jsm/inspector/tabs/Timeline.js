@@ -63,7 +63,7 @@ class Timeline extends Tab {
 		// Bind window resize to update graph bounds
 		window.addEventListener( 'resize', () => {
 
-			if ( ! this.isRecording && this.frames.length > 0 ) {
+			if ( this.isActive && ! this.isRecording && this.frames.length > 0 ) {
 
 				this.renderSlider();
 
@@ -79,7 +79,7 @@ class Timeline extends Tab {
 
 		this.profiler.addEventListener( 'resize', () => {
 
-			if ( ! this.isRecording && this.frames.length > 0 ) {
+			if ( this.isActive && ! this.isRecording && this.frames.length > 0 ) {
 
 				this.renderSlider();
 
@@ -89,6 +89,17 @@ class Timeline extends Tab {
 
 	}
 
+	setActive( isActive ) {
+
+		super.setActive( isActive );
+
+		if ( isActive && ! this.isRecording && this.frames.length > 0 ) {
+
+			this.renderSlider();
+
+		}
+
+	}
 
 	buildHeader() {
 

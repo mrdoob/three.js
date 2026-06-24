@@ -1530,6 +1530,8 @@ export class Profiler extends EventDispatcher {
 
 				}
 
+				this.dispatchEvent( { type: 'resize' } );
+
 			};
 
 			const onResizeEnd = () => {
@@ -1685,8 +1687,6 @@ export class Profiler extends EventDispatcher {
 			this.tabs[ this.activeTabId ].setActive( true );
 
 		}
-
-
 
 		this.dispatchEvent( { type: 'resize' } );
 
