@@ -4,9 +4,9 @@ import {
 } from 'three';
 
 import { MeshStandardNodeMaterial } from 'three/webgpu';
-import { cameraPosition, color, float, Fn, fract, fwidth, If, mix, mod, mx_fractal_noise_float, mx_noise_float, normalView, positionView, positionWorld, smoothstep, step, vec4 } from 'three/tsl';
+import { cameraPosition, color, float, floor, Fn, fract, fwidth, hash, If, mix, mod, mx_fractal_noise_float, mx_noise_float, normalView, positionView, positionWorld, smoothstep, step, uint, varying, vec4 } from 'three/tsl';
 
-import { SkyscraperGenerator } from './city/SkyscraperGenerator.js';
+import { SkyscraperGenerator, createSkyscraperMaterial, buildingPalette } from './city/SkyscraperGenerator.js';
 import { SidewalkGenerator } from './city/SidewalkGenerator.js';
 
 /**
@@ -86,15 +86,15 @@ class CityGenerator {
 						const generator = new SkyscraperGenerator( {
 							seed: Math.floor( random() * 100000 ),
 							totalHeight: 38 + tall * tall * 114, // a few tall towers, mostly mid-rise
-							footprint: { width: L.lot - 4 - random() * 8, depth: L.lot - 4 - random() * 8 }, // rectangular: width and depth vary independently
-							floorHeight: 3.6 + random() * 1.2,
-							bayWidth: 2 + random() * 1.7,
+							footprint: { width: L.lot - 1 - random() * 4, depth: L.lot - 1 - random() * 4 }, // nearly fill the lot so neighbours sit close; width and depth vary independently
+							floorHeight: 3.4 + random() * 1.8,
+							bayWidth: 1.9 + random() * 2.1,
 							pierWidth: 0.4 + random() * 0.5,
 							pierDepth: 0.3 + random() * 0.4,
 							chamferWidth: onCorner ? 3 + random() * 4 : 0,
 							chamferCornerX: cornerX,
 							chamferCornerZ: cornerZ,
-							setbackDepth: 0.8 + random() * 2,
+							setbackDepth: random() < 0.4 ? 0.8 + random() * 2 : 0, // only some towers step back at the crown; the rest rise flat
 							stringCourseEvery: random() < 0.85 ? 3 + Math.floor( random() * 6 ) : 0
 						}, materials.building );
 
@@ -218,6 +218,37 @@ function gridLine( coord, period, halfWidth ) {
 }
 
 /**
+ * The shared material every tower in a {@link CityGenerator} is dressed with: one flat
+ * masonry colour per lot, picked from a palette by hashing the lot's grid cell.
+ */
+function createBuildingMaterial( layout, seed = 0 ) {
+
+	// every tower takes one flat colour, picked by hashing its lot — one shared material
+	// dresses the whole skyline; common tones repeat so the equal-probability pick feels real
+	const palette = buildingPalette.map( hex => color( hex ) );
+
+	const periodX = layout.blockW + layout.street;
+	const periodZ = layout.blockD + layout.street;
+	const gx = positionWorld.x.add( layout.cityW / 2 );
+	const gz = positionWorld.z.add( layout.cityD / 2 );
+	const blockIX = floor( gx.div( periodX ) );
+	const blockIZ = floor( gz.div( periodZ ) );
+	const cellX = blockIX.mul( layout.lotsX ).add( floor( gx.sub( blockIX.mul( periodX ) ).div( layout.lot ) ) );
+	const cellZ = blockIZ.mul( layout.lotsZ ).add( floor( gz.sub( blockIZ.mul( periodZ ) ).div( layout.lot ) ) );
+	const cellKey = uint( cellX.add( 4096 ) ).mul( uint( 73856093 ) ).bitXor( uint( cellZ.add( 4096 ) ).mul( uint( 19349663 ) ) ).bitXor( uint( ( seed * 2654435761 ) >>> 0 ) ).toVar();
+	const cellHash = ( a, b ) => hash( cellKey.add( uint( Math.round( ( a + b * 7 ) * 100 ) ) ) );
+
+	const pick = cellHash( 127.1, 311.7 );
+	let buildingBase = palette[ 0 ];
+	for ( let i = 1; i < palette.length; i ++ ) buildingBase = mix( buildingBase, palette[ i ], step( i / palette.length, pick ) );
+	buildingBase = buildingBase.mul( cellHash( 269.5, 183.3 ).mul( 0.12 ).add( 0.94 ) ); // subtle per-building brightness
+
+	// the pick is constant across a tower, so resolve it once per vertex ( varying )
+	return createSkyscraperMaterial( varying( buildingBase ) );
+
+}
+
+/**
  * The road surface: wet asphalt with lane lines and crosswalks aligned to a
  * {@link CityGenerator} layout. Apply it to a ground plane sized to the city.
  */
@@ -312,4 +343,4 @@ function createRoadMaterial( layout ) {
 
 }
 
-export { CityGenerator, createRoadMaterial };
+export { CityGenerator, createBuildingMaterial, createRoadMaterial };

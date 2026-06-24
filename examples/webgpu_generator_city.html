@@ -38,21 +38,20 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { color, floor, hash, mix, pass, positionWorld, step, uint, varying } from 'three/tsl';
+			import { pass } from 'three/tsl';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
-			import { CityGenerator, createRoadMaterial } from 'three/addons/generators/CityGenerator.js';
-			import { createSkyscraperMaterial } from 'three/addons/generators/city/SkyscraperGenerator.js';
+			import { CityGenerator, createBuildingMaterial, createRoadMaterial } from 'three/addons/generators/CityGenerator.js';
 
 			let camera, scene, renderer, controls;
 			let cityGroup, materials, city, renderPipeline;
 			let sky, sun, sunLight, pmremGenerator, envScene;
 
 			const parameters = {
-				seed: 1,
+				seed: 94,
 				timeOfDay: 6.4 // hours: 6 sunrise, 12 noon, 18 sunset
 			};
 
@@ -65,7 +64,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 0.35;
+				renderer.toneMappingExposure = 0.45;
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				renderer.inspector = new Inspector();
@@ -92,11 +91,11 @@
 				envScene = new THREE.Scene();
 
 				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 1, 20000 );
-				camera.position.set( - 55, 60, - 100 );
+				camera.position.set( - 35, 55, - 100 );
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
-				controls.target.set( 25, 60, 0 );
+				controls.target.set( 35, 55, 0 );
 				controls.maxPolarAngle = Math.PI * 0.5;
 				controls.minDistance = 20;
 				controls.maxDistance = 1200;
@@ -131,7 +130,7 @@
 
 				updateSun();
 
-				materials = { building: buildBuildingMaterial( city.layout ) };
+				materials = { building: createBuildingMaterial( city.layout, parameters.seed ) };
 				generateCity();
 
 				// bloom: a soft glow on the brightest areas, run on the linear HDR scene
@@ -190,46 +189,6 @@
 				scene.environment = env;
 				sky.showSunDisc.value = true;
 				scene.add( sky );
-
-			}
-
-			function buildBuildingMaterial( layout ) {
-
-				// NYC palette: every building takes one flat colour, chosen by hashing
-				// its lot in the city grid. a single shared material still dresses the
-				// whole skyline ( no per-building shaders ) — only the picked colour differs.
-				// common materials are repeated so an equal-probability pick feels like a real block.
-
-				const palette = [
-					color( 0xc6c0b2 ), color( 0xc6c0b2 ), color( 0xbdb7a8 ), color( 0xd1ccbe ), color( 0xb4afa1 ), // limestone / pale dressed stone — the Manhattan default
-					color( 0x9a988f ), color( 0x8b8983 ), color( 0xa5a39a ), // grey granite / concrete
-					color( 0xb1a484 ), color( 0xbcae8b ), // buff / tan brick ( muted )
-					color( 0x80705b ), color( 0x786755 ), // brownstone ( muted grey-brown )
-					color( 0x946d5b ), color( 0x885f4e ), // weathered brick ( desaturated )
-					color( 0xdbd6cb ), // pale glazed
-					color( 0x7c868d ), // steel / glass ( muted cool )
-					color( 0x4c4943 ) // dark stone ( rare )
-				];
-
-				const periodX = layout.blockW + layout.street;
-				const periodZ = layout.blockD + layout.street;
-				const gx = positionWorld.x.add( layout.cityW / 2 );
-				const gz = positionWorld.z.add( layout.cityD / 2 );
-				const blockIX = floor( gx.div( periodX ) );
-				const blockIZ = floor( gz.div( periodZ ) );
-				const cellX = blockIX.mul( layout.lotsX ).add( floor( gx.sub( blockIX.mul( periodX ) ).div( layout.lot ) ) );
-				const cellZ = blockIZ.mul( layout.lotsZ ).add( floor( gz.sub( blockIZ.mul( periodZ ) ).div( layout.lot ) ) );
-				const cellKey = uint( cellX.add( 4096 ) ).mul( uint( 73856093 ) ).bitXor( uint( cellZ.add( 4096 ) ).mul( uint( 19349663 ) ) ).bitXor( uint( ( parameters.seed * 2654435761 ) >>> 0 ) ).toVar();
-				const cellHash = ( a, b ) => hash( cellKey.add( uint( Math.round( ( a + b * 7 ) * 100 ) ) ) );
-
-				const pick = cellHash( 127.1, 311.7 );
-				let buildingBase = palette[ 0 ];
-				for ( let i = 1; i < palette.length; i ++ ) buildingBase = mix( buildingBase, palette[ i ], step( i / palette.length, pick ) );
-				buildingBase = buildingBase.mul( cellHash( 269.5, 183.3 ).mul( 0.12 ).add( 0.94 ) ); // subtle per-building brightness
-
-				// buildingBase is constant across each tower's footprint, so resolve the palette pick
-				// once per vertex ( varying ) instead of per fragment — the interpolated constant is identical
-				return createSkyscraperMaterial( varying( buildingBase ) );
 
 			}
 

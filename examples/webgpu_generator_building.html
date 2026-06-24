@@ -42,7 +42,7 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
-			import { SkyscraperGenerator, createSkyscraperMaterial } from 'three/addons/generators/city/SkyscraperGenerator.js';
+			import { SkyscraperGenerator, createSkyscraperMaterial, pickBuildingColor } from 'three/addons/generators/city/SkyscraperGenerator.js';
 
 			let camera, scene, renderer, controls, generator, building, material;
 			let sky, sunLight, pmremGenerator, envScene;
@@ -56,18 +56,6 @@
 			// every building takes one flat masonry colour; a uniform lets the seed
 			// repick it without recompiling the shared material
 			const baseColor = uniform( new THREE.Color( 0xc6c0b2 ) );
-
-			// NYC palette: limestone / granite-dominant, with the odd brick or dark stone
-			const palette = [
-				0xc6c0b2, 0xc6c0b2, 0xbdb7a8, 0xd1ccbe, 0xb4afa1, // limestone / pale dressed stone
-				0x9a988f, 0x8b8983, 0xa5a39a, // grey granite / concrete
-				0xb1a484, 0xbcae8b, // buff / tan brick
-				0x80705b, 0x786755, // brownstone
-				0x946d5b, 0x885f4e, // weathered brick
-				0xdbd6cb, // pale glazed
-				0x7c868d, // steel / glass
-				0x4c4943 // dark stone ( rare )
-			];
 
 			const parameters = {
 				seed: 7,
@@ -171,13 +159,6 @@
 
 			}
 
-			function pickBaseColor( seed ) {
-
-				const h = Math.abs( Math.sin( seed * 12.9898 ) * 43758.5453 );
-				return palette[ Math.floor( ( h - Math.floor( h ) ) * palette.length ) ];
-
-			}
-
 			function generate() {
 
 				if ( building ) {
@@ -187,7 +168,7 @@
 
 				}
 
-				baseColor.value.setHex( pickBaseColor( parameters.seed ) );
+				baseColor.value.setHex( pickBuildingColor( parameters.seed ) );
 
 				generator = new SkyscraperGenerator( {
 					seed: parameters.seed,

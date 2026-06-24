@@ -1170,6 +1170,29 @@ const interior = /*@__PURE__*/ Fn( () => {
 } );
 
 /**
+ * The NYC masonry palette every tower is dressed from ( hex colours ): limestone-dominant
+ * with terracotta accents. Shared by the single-tower example and {@link CityGenerator}'s
+ * building material so both stay in sync.
+ */
+const buildingPalette = [
+	0xa8553c, 0x9c4a34, // terracotta & red brick ( occasional accent )
+	0x8a6a52, 0x7d6450, // warm brick / brownstone ( muted )
+	0xc4a370, 0xb89a6f, 0xc2b183, // buff / tan
+	0xc6c0b2, 0xc6c0b2, 0xbdb7a8, 0xd1ccbe, 0xb4afa1, // limestone / pale dressed stone — the common default
+	0x9a988f, 0x8b8983, 0xa5a39a, // grey granite / concrete
+	0xdbd6cb, // pale glazed ( accent )
+	0x7c868d // steel / glass ( cool accent )
+];
+
+/** Picks one {@link buildingPalette} colour ( a hex number ) for a tower from its seed. */
+function pickBuildingColor( seed ) {
+
+	const h = Math.abs( Math.sin( seed * 12.9898 ) * 43758.5453 );
+	return buildingPalette[ Math.floor( ( h - Math.floor( h ) ) * buildingPalette.length ) ];
+
+}
+
+/**
  * The facade material: a single MeshStandardNodeMaterial that reads the baked
  * per-vertex `partId` and reproduces every zone — procedural terracotta brickwork
  * on the walls and piers, smooth dressed stone on the window frames and ornament,
@@ -1331,4 +1354,4 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 
 }
 
-export { SkyscraperGenerator, createSkyscraperMaterial };
+export { SkyscraperGenerator, createSkyscraperMaterial, buildingPalette, pickBuildingColor };
