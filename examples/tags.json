@@ -136,6 +136,7 @@
 	"webgpu_compute_particles_snow_external": [ "gpgpu" ],
 	"webgpu_compute_points": [ "gpgpu" ],
 	"webgpu_compute_rasterizer": [ "gpgpu", "nanite" ],
+	"webgpu_compute_rasterizer_ibl": [ "gpgpu", "nanite", "pbr", "pmrem", "gltf" ],
 	"webgpu_compute_reduce": [ "gpgpu" ],
 	"webgpu_compute_sort_bitonic": [ "gpgpu" ],
 	"webgpu_compute_texture": [ "gpgpu" ],
