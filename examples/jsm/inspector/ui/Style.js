@@ -128,7 +128,7 @@ export class Style {
 
 	.tab-badge-container {
 		position: absolute;
-		top: 2px;
+		top: 1px;
 		right: 3px;
 		display: flex;
 		gap: 2px;
@@ -1081,7 +1081,7 @@ export class Style {
 	}
 
 	.parameters .list-item-row {
-		min-height: 31px;
+		min-height: 23px;
 	}
 
 	.mini-panel-content .parameters .list-item-row {
@@ -1093,6 +1093,10 @@ export class Style {
 		margin-bottom: 2px;
 		user-select: none;
 		-webkit-user-select: none;
+	}
+
+	.list-item-wrapper:has(> .list-item-row .graph-container) {
+		margin-left: -1.5em;
 	}
 
 	.list-item-wrapper:first-child {
@@ -1258,7 +1262,7 @@ export class Style {
 		border: 1px solid var(--profiler-border);
 		color: var(--text-primary);
 		border-radius: 4px;
-		padding: 4px 8px;
+		padding: 4px 10px 2px 10px;
 		font-family: var(--font-mono);
 		flex-grow: 1;
 		max-width: 300px;
@@ -1304,11 +1308,62 @@ export class Style {
 	}
 
 	.log-message {
-		padding: 2px 5px;
-		white-space: pre-wrap;
-		word-break: break-all;
+		display: flex;
+		align-items: flex-start;
+		gap: 6px;
+		padding: 3px 5px;
 		border-radius: 3px;
 		line-height: 1.5 !important;
+	}
+
+	.log-count-badge {
+		display: inline-block;
+		text-align: center;
+		min-width: 14px;
+		height: 14px;
+		border-radius: 7px;
+		padding: 0 3px;
+		font-size: 9px;
+		font-weight: bold;
+		line-height: 14px;
+		box-sizing: border-box;
+		margin-top: 0;
+		flex-shrink: 0;
+	}
+
+	.log-icon {
+		display: inline-block;
+		text-align: center;
+		width: 14px;
+		height: 14px;
+		font-size: 11px;
+		line-height: 14px;
+		margin-top: 0;
+		flex-shrink: 0;
+	}
+
+	.log-body {
+		flex-grow: 1;
+		white-space: pre-wrap;
+		word-break: break-all;
+	}
+
+	.log-message.info .log-count-badge {
+		background-color: rgba(255, 255, 255, 0.12);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		color: var(--text-secondary);
+	}
+
+	.log-message.warn .log-count-badge {
+		background-color: rgba(255, 193, 7, 0.18);
+		border: 1px solid rgba(255, 193, 7, 0.35);
+		color: var(--color-yellow);
+	}
+
+	.log-message.error .log-count-badge {
+		background-color: rgba(244, 67, 54, 0.18);
+		border: 1px solid rgba(244, 67, 54, 0.35);
+		color: #ff8a80;
 	}
 
 	.log-message.hidden {
@@ -1411,6 +1466,7 @@ export class Style {
 		cursor: pointer;
 		gap: 8px;
 		will-change: transform;
+		font-size: 12px;
 	}
 
 	.custom-checkbox input {
@@ -1428,6 +1484,12 @@ export class Style {
 		transition: background-color 0.2s, border-color 0.2s;
 	}
 
+	.custom-checkbox .checkbox-text {
+		font-size: 12px;
+		margin-top: 1px;
+		color: inherit;
+	}
+
 	.custom-checkbox .checkmark::after {
 		content: '';
 		width: 6px;
@@ -1437,6 +1499,16 @@ export class Style {
 		display: block;
 		transform: scale(0);
 		transition: transform 0.2s;
+	}
+
+	.list-container .custom-checkbox .checkmark {
+		width: 13px;
+		height: 13px;
+	}
+
+	.list-container .custom-checkbox .checkmark::after {
+		width: 7px;
+		height: 7px;
 	}
 
 	.custom-checkbox input:checked+.checkmark {
@@ -1646,12 +1718,6 @@ export class Style {
 		font-size: 13px;
 	}
 
-	.profiler-panel:not(.visible) ~ * .detached-tab-panel,
-	body:has(.profiler-panel:not(.visible)) .detached-tab-panel {
-		opacity: 0;
-		visibility: hidden;
-		pointer-events: none;
-	}
 
 	.detached-tab-header {
 		background: var(--profiler-header-background);
@@ -1896,7 +1962,8 @@ export class Style {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 6px 8px;
+		height: 32px;
+		padding: 4px 6px;
 		border-bottom: 1px solid var(--profiler-border);
 		background: var(--profiler-header-background);
 		flex-shrink: 0;
@@ -1905,10 +1972,15 @@ export class Style {
 	}
 
 	.toolbar span {
-		margin-right: 8px;
 		color: var(--text-secondary);
 		font-size: 12px;
 		font-weight: 600;
+	}
+
+	.toolbar .custom-checkbox .checkmark {
+		width: 12px;
+		height: 12px;
+		border-radius: 4px;
 	}
 
 	.viewer-content .toolbar {

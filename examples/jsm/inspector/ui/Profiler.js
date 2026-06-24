@@ -1175,13 +1175,7 @@ export class Profiler extends EventDispatcher {
 		windowPanel.style.left = `${ constrainedX }px`;
 		windowPanel.style.top = `${ constrainedY }px`;
 
-		if ( ! this.panel.classList.contains( 'visible' ) ) {
 
-			windowPanel.style.opacity = '0';
-			windowPanel.style.visibility = 'hidden';
-			windowPanel.style.pointerEvents = 'none';
-
-		}
 
 		// Hide detached window if tab is not visible
 		if ( ! tab.isVisible ) {
@@ -1692,23 +1686,7 @@ export class Profiler extends EventDispatcher {
 
 		}
 
-		this.detachedWindows.forEach( detachedWindow => {
 
-			if ( isVisible ) {
-
-				detachedWindow.panel.style.opacity = '';
-				detachedWindow.panel.style.visibility = '';
-				detachedWindow.panel.style.pointerEvents = '';
-
-			} else {
-
-				detachedWindow.panel.style.opacity = '0';
-				detachedWindow.panel.style.visibility = 'hidden';
-				detachedWindow.panel.style.pointerEvents = 'none';
-
-			}
-
-		} );
 
 		this.dispatchEvent( { type: 'resize' } );
 
