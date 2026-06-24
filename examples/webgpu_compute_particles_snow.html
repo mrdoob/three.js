@@ -156,7 +156,7 @@
 
 					} );
 
-					const rippleFloorArea = rippleOnSurface.add( scale.x.mul( surfaceOffset ) ).debug();
+					const rippleFloorArea = rippleOnSurface.add( scale.x.mul( surfaceOffset ) );
 
 					If( position.y.greaterThan( rippleFloorArea ), () => {
 
