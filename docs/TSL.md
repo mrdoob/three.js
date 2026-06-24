@@ -1438,14 +1438,12 @@ Example:
 ```js
 import { overrideNode, overrideNodes, positionLocal, positionView, vec3 } from 'three/tsl';
 
-const customPositionView = positionLocal.add( vec3( 1, 0, 0 ) );
-
 // Override a single node through the material context
 material.contextNode = overrideNode( positionLocal, () => positionLocal.add( vec3( 1, 0, 0 ) ) );
 
 // Override multiple nodes at once
 material.contextNode = overrideNodes( [
-	[ positionView, customPositionView ],
+	[ positionView, customPositionView ], // You can use a node directly like customPositionView.
 	[ positionLocal, ( builder ) => positionLocal.add( vec3( 1, 0, 0 ) ) ]
 ] );
 
