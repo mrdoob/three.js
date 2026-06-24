@@ -65,6 +65,10 @@ Default is `0`.
 
 ## Properties
 
+### .highPassFn : function
+
+Can be used to inject a custom high pass filter (e.g., for anamorphic effects).
+
 ### .inputNode : Node.<vec4>
 
 The node that represents the input of the effect.
@@ -101,11 +105,27 @@ Frees internal resources. This method should be called when the effect is no lon
 
 **Overrides:** [TempNode#dispose](TempNode.html#dispose)
 
+### .getResolutionScale() : number
+
+Gets the current resolution scale of the pass.
+
+**Returns:** The current resolution scale. A value of `1` means full resolution.
+
 ### .getTextureNode() : PassTextureNode
 
 Returns the result of the effect as a texture node.
 
 **Returns:** A texture node that represents the result of the effect.
+
+### .setResolutionScale( resolutionScale : number ) : BloomNode
+
+Sets the resolution scale for the pass. The resolution scale is a factor that is multiplied with the renderer's width and height.
+
+**resolutionScale**
+
+The resolution scale to set. A value of `1` means full resolution.
+
+**Returns:** A reference to this node.
 
 ### .setSize( width : number, height : number )
 

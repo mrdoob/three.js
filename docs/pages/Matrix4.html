@@ -336,6 +336,19 @@ may not be decomposable, and this method may not be appropriate.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The determinant.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="determinantAffine" translate="no">.<a href="#determinantAffine">determinantAffine</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes and returns the determinant of the 4x4 matrix, but assumes the
+matrix is affine, saving some computations.</p>
+<p>For affine matrices (like an object's world matrix), this value equals the
+full 4x4 <a href="Matrix4.html#determinant">Matrix4#determinant</a> but is cheaper to compute.</p>
+<p>Assumes the bottom row is [0, 0, 0, 1].</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The determinant of the matrix.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( matrix : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>CityGenerator - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">CityGenerator</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Lays out a grid of city blocks and fills each lot with a <a href="SkyscraperGenerator.html">SkyscraperGenerator</a>
+tower of its own seed, height and footprint, optionally on raised sidewalk
+slabs (curbs). Returns a <code>THREE.Group</code> ready to add to a scene.</p>
+<p>Pass a building material to dress the towers; the sidewalks dress themselves
+via <a href="SidewalkGenerator.html">SidewalkGenerator</a>. The layout is exposed as
+CityGenerator#layout so the surrounding scene (road markings, etc.)
+can align to the same grid.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const city = new CityGenerator( { seed: 1 } );
+scene.add( city.build( materials ) );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="CityGenerator" translate="no">new <a href="#CityGenerator">CityGenerator</a><span class="signature">()</span> </h3>
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/generators/CityGenerator.js" translate="no" target="_blank" rel="noopener">examples/jsm/generators/CityGenerator.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

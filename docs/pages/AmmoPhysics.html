@@ -13,11 +13,11 @@
 		<section>
 			<header>
 				<div class="class-description"><p>Can be used to include Ammo.js as a Physics engine into
-<code>three.js</code> apps. Make sure to include <code>ammo.wasm.js</code> first:</p>
-<pre class="prettyprint source"><code>&lt;script src=&quot;jsm/libs/ammo.wasm.js&quot;>&lt;/script>
-</code></pre>
-<p>It is then possible to initialize the API via:</p>
-<pre><code class="language-js">const physics = await AmmoPhysics();
+<code>three.js</code> apps. The API can be initialized via:</p>
+<p>The component automatically imports Ammo.js from a CDN so make sure
+to use the component with an active Internet connection.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const physics = await AmmoPhysics();
 </code></pre></div>
 			</header>
 			<article>

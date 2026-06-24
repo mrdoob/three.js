@@ -41,6 +41,29 @@ for the respective format.</p></div>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="createDataTexture" translate="no">.<a href="#createDataTexture">createDataTexture</a><span class="signature">( buffer : <span class="param-type">ArrayBuffer</span> )</span><span class="type-signature"> : <a href="DataTexture.html">DataTexture</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses the given buffer and returns a configured data texture. Use this method
+for parsing texture data that is already in memory (e.g. drag and drop or data
+loaded from a server) without going through <a href="DataTextureLoader.html#load">DataTextureLoader#load</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">buffer</strong>
+									</td>
+									<td class="description last">
+										<p>The raw texture data.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The data texture.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span><span class="type-signature"> : <a href="DataTexture.html">DataTexture</a></span> </h3>
 					<div class="method">
 						<div class="description">

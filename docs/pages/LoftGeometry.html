@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>LoftGeometry - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="BufferGeometry.html">BufferGeometry</a> → </p>
+	<h1 translate="no">LoftGeometry</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class can be used to generate a geometry by lofting (skinning) a surface
+through a series of cross sections. Each section is an array of points in 3D
+space and all sections must have the same number of points.</p>
+<p><code>LoftGeometry</code> is the general case of geometries like <a href="LatheGeometry.html">LatheGeometry</a>
+(which revolves a fixed profile around an axis) or <a href="TubeGeometry.html">TubeGeometry</a>
+(which sweeps a circular section along a path): the sections can have any
+shape, and can change shape, size, position and orientation from one
+section to the next.</p>
+<p>Sections wind around the loft so the resulting face normals point outwards
+when each section is ordered counterclockwise as seen from the end of the
+loft, looking back towards the start. If the surface appears inside out,
+reverse the point order of each section.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const sections = [];
+for ( let i = 0; i &lt;= 10; i ++ ) {
+	const points = [];
+	const radius = 2 + Math.sin( i * 0.8 );
+	for ( let j = 0; j &lt; 32; j ++ ) {
+		const angle = j / 32 * Math.PI * 2;
+		points.push( new THREE.Vector3( Math.sin( angle ) * radius, i, Math.cos( angle ) * radius ) );
+	}
+	sections.push( points );
+}
+const geometry = new LoftGeometry( sections, { capStart: true, capEnd: true } );
+const material = new THREE.MeshStandardMaterial( { color: 0x00ff00 } );
+const mesh = new THREE.Mesh( geometry, material );
+scene.add( mesh );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">LoftGeometry</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { LoftGeometry } from 'three/addons/geometries/LoftGeometry.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="LoftGeometry" translate="no">new <a href="#LoftGeometry">LoftGeometry</a><span class="signature">( sections : <span class="param-type">Array.&lt;Array.&lt;<a href="Vector3.html">Vector3</a>>></span>, options : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new loft geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">sections</strong>
+									</td>
+									<td class="description last">
+										<p>The cross sections to skin. At least
+two sections are required and all sections must have the same number of points.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">options</strong>
+									</td>
+									<td class="description last">
+										<p>The loft options.</p>
+										<p>Default is <code>{}</code>.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">closed</strong>
+									</td>
+									<td class="description last">
+										<p>Whether each section is treated as a
+closed ring (e.g. a fuselage) or an open strip (e.g. a ribbon).</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">capStart</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the first section is closed
+with a cap or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">capEnd</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the last section is closed
+with a cap or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="parameters" translate="no">.<a href="#parameters">parameters</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>Holds the constructor parameters that have been
+used to generate the geometry. Any modification
+after instantiation does not change the geometry.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/geometries/LoftGeometry.js" translate="no" target="_blank" rel="noopener">examples/jsm/geometries/LoftGeometry.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

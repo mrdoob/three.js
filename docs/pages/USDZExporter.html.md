@@ -132,6 +132,20 @@ Whether to make the exported USDZ compatible to QuickLook which means the asset 
 
 Default is `false`.
 
+**animations**  
+Array.<[AnimationClip](AnimationClip.html)\>
+
+Animation clips to bake into `xformOp` time samples on the targeted objects. Only `position`, `quaternion`, and `scale` tracks are exported.
+
+Default is `[]`.
+
+**animationFrameRate**  
+number
+
+Time codes per second used when writing animation samples.
+
+Default is `60`.
+
 ## Source
 
 [examples/jsm/exporters/USDZExporter.js](https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/USDZExporter.js)

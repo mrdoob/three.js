@@ -6,11 +6,14 @@ An exporter to compress geometry with the Draco library.
 
 Standalone Draco files have a `.drc` extension, and contain vertex positions, normals, colors, and other attributes. Draco files _do not_ contain materials, textures, animation, or node hierarchies – to use these features, embed Draco geometry inside of a glTF file. A normal glTF file can be converted to a Draco-compressed glTF file using [glTF-Pipeline](https://github.com/AnalyticalGraphicsInc/gltf-pipeline).
 
-## Code Example
+The exporter requires the Draco encoder to be loaded as a global script in advance:
 
 ```js
+<script src="https://cdn.jsdelivr.net/gh/google/draco@1.5.7/javascript/draco_encoder.js"></script>
+```
+```js
 const exporter = new DRACOExporter();
-const data = exporter.parse( mesh, options );
+const data = await exporter.parseAsync( mesh, options );
 ```
 
 ## Import
@@ -41,7 +44,11 @@ Default is `0`.
 
 ## Methods
 
-### .parse( object : Mesh | Points, options : DRACOExporter~Options ) : Int8Array
+### .parse()
+
+**Deprecated:** Use [DRACOExporter#parseAsync](DRACOExporter.html#parseAsync) instead.
+
+### .parseAsync( object : Mesh | Points, options : DRACOExporter~Options ) : Promise.<Int8Array> (async)
 
 Parses the given mesh or point cloud and generates the Draco output.
 
@@ -53,7 +60,7 @@ The mesh or point cloud to export.
 
 The export options.
 
-**Returns:** The exported Draco.
+**Returns:** A Promise that resolves with the exported Draco.
 
 ## Type Definitions
 

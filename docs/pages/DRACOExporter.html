@@ -20,10 +20,12 @@ at the cost of additional decoding time on the client device.</p>
 normals, colors, and other attributes. Draco files <em>do not</em> contain materials,
 textures, animation, or node hierarchies – to use these features, embed Draco geometry
 inside of a glTF file. A normal glTF file can be converted to a Draco-compressed glTF file
-using <a href="https://github.com/AnalyticalGraphicsInc/gltf-pipeline" target="_blank" rel="noopener">glTF-Pipeline</a>.</p></div>
-				<h2>Code Example</h2>
-				<div translate="no"><pre><code class="language-js">const exporter = new DRACOExporter();
-const data = exporter.parse( mesh, options );
+using <a href="https://github.com/AnalyticalGraphicsInc/gltf-pipeline" target="_blank" rel="noopener">glTF-Pipeline</a>.</p>
+<p>The exporter requires the Draco encoder to be loaded as a global script in advance:</p>
+<pre><code class="language-html">&lt;script src=&quot;https://cdn.jsdelivr.net/gh/google/draco@1.5.7/javascript/draco_encoder.js&quot;>&lt;/script>
+</code></pre>
+<pre><code class="language-js">const exporter = new DRACOExporter();
+const data = await exporter.parseAsync( mesh, options );
 </code></pre></div>
 			</header>
 			<article>
@@ -52,7 +54,13 @@ const data = exporter.parse( mesh, options );
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( object : <span class="param-type"><a href="Mesh.html">Mesh</a> | <a href="Points.html">Points</a></span>, options : <span class="param-type"><a href="DRACOExporter.html#~Options">DRACOExporter~Options</a></span> )</span><span class="type-signature"> : Int8Array</span> </h3>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<dl class="details">
+							<dt class="important tag-deprecated"><strong>Deprecated:</strong> Use <a href="DRACOExporter.html#parseAsync">DRACOExporter#parseAsync</a> instead.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="parseAsync" translate="no">.<a href="#parseAsync">parseAsync</a><span class="signature">( object : <span class="param-type"><a href="Mesh.html">Mesh</a> | <a href="Points.html">Points</a></span>, options : <span class="param-type"><a href="DRACOExporter.html#~Options">DRACOExporter~Options</a></span> )</span><span class="type-signature"> : Promise.&lt;Int8Array></span> <span class="type-signature">(async) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Parses the given mesh or point cloud and generates the Draco output.</p>
@@ -78,7 +86,7 @@ const data = exporter.parse( mesh, options );
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The exported Draco.</dt>
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves with the exported Draco.</dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Type Definitions</h2>

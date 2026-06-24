@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Backend - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Backend</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Most of the rendering related logic is implemented in the
+<a href="Renderer.html">Renderer</a> module and related management components.
+Sometimes it is required though to execute commands which are
+specific to the current 3D backend (which is WebGPU or WebGL 2).
+This abstract base class defines an interface that encapsulates
+all backend-related logic. Derived classes for each backend must
+implement the interface.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Backend" translate="no">new <a href="#Backend">Backend</a><span class="signature">( parameters : <span class="param-type">Object</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new backend.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">parameters</strong>
+									</td>
+									<td class="description last">
+										<p>An object holding parameters for the backend.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="coordinateSystem" translate="no">.<a href="#coordinateSystem">coordinateSystem</a><span class="type-signature"> : number</span> <span class="type-signature">(abstract, readonly) </span></h3>
+					<div class="description">
+						<p>The coordinate system of the backend.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="data" translate="no">.<a href="#data">data</a><span class="type-signature"> : WeakMap.&lt;Object, Object></span> </h3>
+					<div class="description">
+						<p>This weak map holds backend-specific data of objects
+like textures, attributes or render targets.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="domElement" translate="no">.<a href="#domElement">domElement</a><span class="type-signature"> : HTMLCanvasElement | OffscreenCanvas</span> </h3>
+					<div class="description">
+						<p>A reference to the canvas element the renderer is drawing to.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="hasTimestamp" translate="no">.<a href="#hasTimestamp">hasTimestamp</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Whether the backend supports query timestamps or not.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="parameters" translate="no">.<a href="#parameters">parameters</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>The parameters of the backend.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="renderer" translate="no">.<a href="#renderer">renderer</a><span class="type-signature"> : <a href="Renderer.html">Renderer</a></span> </h3>
+					<div class="description">
+						<p>A reference to the renderer.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="timestampQueryPool" translate="no">.<a href="#timestampQueryPool">timestampQueryPool</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>A reference to the timestamp query pool.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="trackTimestamp" translate="no">.<a href="#trackTimestamp">trackTimestamp</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to track timestamps with a Timestamp Query API or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="_getQueryPool" translate="no">.<a href="#_getQueryPool">_getQueryPool</a><span class="signature">( uid : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="TimestampQueryPool.html">TimestampQueryPool</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the query pool for the given uid.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">uid</strong>
+									</td>
+									<td class="description last">
+										<p>The unique identifier.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The query pool.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="beginCompute" translate="no">.<a href="#beginCompute">beginCompute</a><span class="signature">( computeGroup : <span class="param-type"><a href="Node.html">Node</a> | Array.&lt;<a href="Node.html">Node</a>></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is executed at the beginning of a compute call and
+can be used by the backend to prepare the state for upcoming
+compute tasks.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">computeGroup</strong>
+									</td>
+									<td class="description last">
+										<p>The compute node(s).</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="beginRender" translate="no">.<a href="#beginRender">beginRender</a><span class="signature">( renderContext : <span class="param-type"><a href="RenderContext.html">RenderContext</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is executed at the beginning of a render call and
+can be used by the backend to prepare the state for upcoming
+draw calls.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderContext</strong>
+									</td>
+									<td class="description last">
+										<p>The render context.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="compute" translate="no">.<a href="#compute">compute</a><span class="signature">( computeGroup : <span class="param-type"><a href="Node.html">Node</a> | Array.&lt;<a href="Node.html">Node</a>></span>, computeNode : <span class="param-type"><a href="Node.html">Node</a></span>, bindings : <span class="param-type">Array.&lt;<a href="BindGroup.html">BindGroup</a>></span>, computePipeline : <span class="param-type"><a href="ComputePipeline.html">ComputePipeline</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Executes a compute command for the given compute node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">computeGroup</strong>
+									</td>
+									<td class="description last">
+										<p>The group of compute nodes of a compute call. Can be a single compute node.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">computeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The compute node.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">bindings</strong>
+									</td>
+									<td class="description last">
+										<p>The bindings.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">computePipeline</strong>
+									</td>
+									<td class="description last">
+										<p>The compute pipeline.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="copyFramebufferToTexture" translate="no">.<a href="#copyFramebufferToTexture">copyFramebufferToTexture</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, renderContext : <span class="param-type"><a href="RenderContext.html">RenderContext</a></span>, rectangle : <span class="param-type"><a href="Vector4.html">Vector4</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the current bound framebuffer to the given texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">texture</strong>
+									</td>
+									<td class="description last">
+										<p>The destination texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderContext</strong>
+									</td>
+									<td class="description last">
+										<p>The render context.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">rectangle</strong>
+									</td>
+									<td class="description last">
+										<p>A four dimensional vector defining the origin and dimension of the copy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="copyTextureToBuffer" translate="no">.<a href="#copyTextureToBuffer">copyTextureToBuffer</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, width : <span class="param-type">number</span>, height : <span class="param-type">number</span>, faceIndex : <span class="param-type">number</span> )</span><span class="type-signature"> : Promise.&lt;TypedArray></span> <span class="type-signature">(async, abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns texture data as a typed array.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture to copy.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">x</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the copy origin.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">y</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the copy origin.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the copy.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the copy.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">faceIndex</strong>
+									</td>
+									<td class="description last">
+										<p>The face index.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves with a typed array when the copy operation has finished.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copyTextureToTexture" translate="no">.<a href="#copyTextureToTexture">copyTextureToTexture</a><span class="signature">( srcTexture : <span class="param-type"><a href="Texture.html">Texture</a></span>, dstTexture : <span class="param-type"><a href="Texture.html">Texture</a></span>, srcRegion : <span class="param-type"><a href="Box3.html">Box3</a> | <a href="Box2.html">Box2</a></span>, dstPosition : <span class="param-type"><a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span>, srcLevel : <span class="param-type">number</span>, dstLevel : <span class="param-type">number</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies data of the given source texture to the given destination texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">srcTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The source texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">dstTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The destination texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">srcRegion</strong>
+									</td>
+									<td class="description last">
+										<p>The region of the source texture to copy.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">dstPosition</strong>
+									</td>
+									<td class="description last">
+										<p>The destination position of the copy.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">srcLevel</strong>
+									</td>
+									<td class="description last">
+										<p>The source mip level to copy from.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">dstLevel</strong>
+									</td>
+									<td class="description last">
+										<p>The destination mip level to copy to.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="createAttribute" translate="no">.<a href="#createAttribute">createAttribute</a><span class="signature">( attribute : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates the GPU buffer of a shader attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">attribute</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer attribute.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="createBindings" translate="no">.<a href="#createBindings">createBindings</a><span class="signature">( bindGroup : <span class="param-type"><a href="BindGroup.html">BindGroup</a></span>, bindings : <span class="param-type">Array.&lt;<a href="BindGroup.html">BindGroup</a>></span>, cacheIndex : <span class="param-type">number</span>, version : <span class="param-type">number</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates bindings from the given bind group definition.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">bindGroup</strong>
+									</td>
+									<td class="description last">
+										<p>The bind group.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">bindings</strong>
+									</td>
+									<td class="description last">
+										<p>Array of bind groups.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">cacheIndex</strong>
+									</td>
+									<td class="description last">
+										<p>The cache index.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">version</strong>
+									</td>
+									<td class="description last">
+										<p>The version.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="createComputePipeline" translate="no">.<a href="#createComputePipeline">createComputePipeline</a><span class="signature">( computePipeline : <span class="param-type"><a href="ComputePipeline.html">ComputePipeline</a></span>, bindings : <span class="param-type">Array.&lt;<a href="BindGroup.html">BindGroup</a>></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a compute pipeline for the given compute node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">computePipeline</strong>
+									</td>
+									<td class="description last">
+										<p>The compute pipeline.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">bindings</strong>
+									</td>
+									<td class="description last">
+										<p>The bindings.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="createDefaultTexture" translate="no">.<a href="#createDefaultTexture">createDefaultTexture</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a default texture for the given texture that can be used
+as a placeholder until the actual texture is ready for usage.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture to create a default texture for.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="createIndexAttribute" translate="no">.<a href="#createIndexAttribute">createIndexAttribute</a><span class="signature">( attribute : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates the GPU buffer of an indexed shader attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">attribute</strong>
+									</td>
+									<td class="description last">
+										<p>The indexed buffer attribute.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="createNodeBuilder" translate="no">.<a href="#createNodeBuilder">createNodeBuilder</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span>, renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span> )</span><span class="type-signature"> : <a href="NodeBuilder.html">NodeBuilder</a></span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a node builder for the given render object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderObject</strong>
+									</td>
+									<td class="description last">
+										<p>The render object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node builder.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="createProgram" translate="no">.<a href="#createProgram">createProgram</a><span class="signature">( program : <span class="param-type"><a href="ProgrammableStage.html">ProgrammableStage</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a shader program from the given programmable stage.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">program</strong>
+									</td>
+									<td class="description last">
+										<p>The programmable stage.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="createRenderPipeline" translate="no">.<a href="#createRenderPipeline">createRenderPipeline</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span>, promises : <span class="param-type">Array.&lt;Promise></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a render pipeline for the given render object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderObject</strong>
+									</td>
+									<td class="description last">
+										<p>The render object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">promises</strong>
+									</td>
+									<td class="description last">
+										<p>An array of compilation promises which are used in <code>compileAsync()</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="createStorageAttribute" translate="no">.<a href="#createStorageAttribute">createStorageAttribute</a><span class="signature">( attribute : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates the GPU buffer of a storage attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">attribute</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer attribute.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="createTexture" translate="no">.<a href="#createTexture">createTexture</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, options : <span class="param-type">Object</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines a texture on the GPU for the given texture object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">options</strong>
+									</td>
+									<td class="description last">
+										<p>Optional configuration parameter.</p>
+										<p>Default is <code>{}</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="createUniformBuffer" translate="no">.<a href="#createUniformBuffer">createUniformBuffer</a><span class="signature">( uniformBuffer : <span class="param-type"><a href="Buffer.html">Buffer</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a uniform buffer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">uniformBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The uniform buffer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="delete" translate="no">.<a href="#delete">delete</a><span class="signature">( object : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Deletes an object from the internal data structure.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">object</strong>
+									</td>
+									<td class="description last">
+										<p>The object to delete.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="deleteBindGroupData" translate="no">.<a href="#deleteBindGroupData">deleteBindGroupData</a><span class="signature">( bindGroup : <span class="param-type"><a href="BindGroup.html">BindGroup</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Delete GPU data associated with a bind group.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">bindGroup</strong>
+									</td>
+									<td class="description last">
+										<p>The bind group.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="destroyAttribute" translate="no">.<a href="#destroyAttribute">destroyAttribute</a><span class="signature">( attribute : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Destroys the GPU buffer of a shader attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">attribute</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer attribute to destroy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="destroyProgram" translate="no">.<a href="#destroyProgram">destroyProgram</a><span class="signature">( program : <span class="param-type"><a href="ProgrammableStage.html">ProgrammableStage</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Destroys the shader program of the given programmable stage.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">program</strong>
+									</td>
+									<td class="description last">
+										<p>The programmable stage.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="destroySampler" translate="no">.<a href="#destroySampler">destroySampler</a><span class="signature">( binding : <span class="param-type"><a href="Sampler.html">Sampler</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the GPU sampler for the given sampler binding.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">binding</strong>
+									</td>
+									<td class="description last">
+										<p>The sampler binding to free.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="destroyTexture" translate="no">.<a href="#destroyTexture">destroyTexture</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, isDefaultTexture : <span class="param-type">boolean</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Destroys the GPU data for the given texture object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">isDefaultTexture</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the texture uses a default GPU texture or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="destroyUniformBuffer" translate="no">.<a href="#destroyUniformBuffer">destroyUniformBuffer</a><span class="signature">( uniformBuffer : <span class="param-type"><a href="Buffer.html">Buffer</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Destroys a uniform buffer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">uniformBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The uniform buffer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees internal resources.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="draw" translate="no">.<a href="#draw">draw</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span>, info : <span class="param-type"><a href="Info.html">Info</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Executes a draw command for the given render object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderObject</strong>
+									</td>
+									<td class="description last">
+										<p>The render object to draw.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">info</strong>
+									</td>
+									<td class="description last">
+										<p>Holds a series of statistical information about the GPU memory and the rendering process.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="finishCompute" translate="no">.<a href="#finishCompute">finishCompute</a><span class="signature">( computeGroup : <span class="param-type"><a href="Node.html">Node</a> | Array.&lt;<a href="Node.html">Node</a>></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is executed at the end of a compute call and
+can be used by the backend to finalize work after compute
+tasks.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">computeGroup</strong>
+									</td>
+									<td class="description last">
+										<p>The compute node(s).</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="finishRender" translate="no">.<a href="#finishRender">finishRender</a><span class="signature">( renderContext : <span class="param-type"><a href="RenderContext.html">RenderContext</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is executed at the end of a render call and
+can be used by the backend to finalize work after draw
+calls.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderContext</strong>
+									</td>
+									<td class="description last">
+										<p>The render context.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="generateMipmaps" translate="no">.<a href="#generateMipmaps">generateMipmaps</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates mipmaps for the given texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="get" translate="no">.<a href="#get">get</a><span class="signature">( object : <span class="param-type">Object</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the dictionary for the given object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">object</strong>
+									</td>
+									<td class="description last">
+										<p>The object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The object's dictionary.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getArrayBufferAsync" translate="no">.<a href="#getArrayBufferAsync">getArrayBufferAsync</a><span class="signature">( attribute : <span class="param-type"><a href="StorageBufferAttribute.html">StorageBufferAttribute</a></span> )</span><span class="type-signature"> : Promise.&lt;ArrayBuffer></span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>This method performs a readback operation by moving buffer data from
+a storage buffer attribute from the GPU to the CPU.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">attribute</strong>
+									</td>
+									<td class="description last">
+										<p>The storage buffer attribute.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A promise that resolves with the buffer data when the data are ready.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getClearColor" translate="no">.<a href="#getClearColor">getClearColor</a><span class="signature">()</span><span class="type-signature"> : <a href="Color4.html">Color4</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the clear color and alpha into a single
+color object.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The clear color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getContext" translate="no">.<a href="#getContext">getContext</a><span class="signature">()</span><span class="type-signature"> : Object</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the backend's rendering context.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The rendering context.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getDomElement" translate="no">.<a href="#getDomElement">getDomElement</a><span class="signature">()</span><span class="type-signature"> : HTMLCanvasElement</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the DOM element. If no DOM element exists, the backend
+creates a new one.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The DOM element.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getDrawingBufferSize" translate="no">.<a href="#getDrawingBufferSize">getDrawingBufferSize</a><span class="signature">()</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the drawing buffer size.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The drawing buffer size.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getRenderCacheKey" translate="no">.<a href="#getRenderCacheKey">getRenderCacheKey</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span> )</span><span class="type-signature"> : string</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a cache key that is used to identify render pipelines.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderObject</strong>
+									</td>
+									<td class="description last">
+										<p>The render object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The cache key.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getTimestamp" translate="no">.<a href="#getTimestamp">getTimestamp</a><span class="signature">( uid : <span class="param-type">string</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the timestamp for the given uid.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">uid</strong>
+									</td>
+									<td class="description last">
+										<p>The unique identifier.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The timestamp.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getTimestampFrames" translate="no">.<a href="#getTimestampFrames">getTimestampFrames</a><span class="signature">( type : <span class="param-type">string</span> )</span><span class="type-signature"> : Array.&lt;number></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns all timestamp frames for the given type.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">type</strong>
+									</td>
+									<td class="description last">
+										<p>The type of the time stamp.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The timestamp frames.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getTimestampUID" translate="no">.<a href="#getTimestampUID">getTimestampUID</a><span class="signature">( abstractRenderContext : <span class="param-type"><a href="RenderContext.html">RenderContext</a> | <a href="ComputeNode.html">ComputeNode</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a unique identifier for the given render context that can be used
+to allocate resources like occlusion queries or timestamp queries.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">abstractRenderContext</strong>
+									</td>
+									<td class="description last">
+										<p>The render context.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The unique identifier.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="has" translate="no">.<a href="#has">has</a><span class="signature">( object : <span class="param-type">Object</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Checks if the given object has a dictionary
+with data defined.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">object</strong>
+									</td>
+									<td class="description last">
+										<p>The object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether a dictionary for the given object as been defined or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="hasCompatibility" translate="no">.<a href="#hasCompatibility">hasCompatibility</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : boolean</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Checks if the backend has the given compatibility.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">name</strong>
+									</td>
+									<td class="description last">
+										<p>The compatibility.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the backend has the given compatibility or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="hasFeature" translate="no">.<a href="#hasFeature">hasFeature</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : boolean</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Checks if the given feature is supported  by the backend.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">name</strong>
+									</td>
+									<td class="description last">
+										<p>The feature's name.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the feature is supported or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="hasFeatureAsync" translate="no">.<a href="#hasFeatureAsync">hasFeatureAsync</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : Promise.&lt;boolean></span> <span class="type-signature">(async, abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Checks if the given feature is supported by the backend.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">name</strong>
+									</td>
+									<td class="description last">
+										<p>The feature's name.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves with a bool that indicates whether the feature is supported or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="hasTimestampQuery" translate="no">.<a href="#hasTimestampQuery">hasTimestampQuery</a><span class="signature">( uid : <span class="param-type">string</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if a timestamp for the given uid is available.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">uid</strong>
+									</td>
+									<td class="description last">
+										<p>The unique identifier.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the timestamp is available or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="init" translate="no">.<a href="#init">init</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span> )</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Initializes the backend so it is ready for usage. Concrete backends
+are supposed to implement their rendering context creation and related
+operations in this method.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the backend has been initialized.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="initRenderTarget" translate="no">.<a href="#initRenderTarget">initRenderTarget</a><span class="signature">( renderContext : <span class="param-type"><a href="RenderContext.html">RenderContext</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Initializes the render target defined in the given render context.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderContext</strong>
+									</td>
+									<td class="description last">
+										<p>The render context.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="isOccluded" translate="no">.<a href="#isOccluded">isOccluded</a><span class="signature">( renderContext : <span class="param-type"><a href="RenderContext.html">RenderContext</a></span>, object : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : boolean</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given 3D object is fully occluded by other
+3D objects in the scene. Backends must implement this method by using
+a Occlusion Query API.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderContext</strong>
+									</td>
+									<td class="description last">
+										<p>The render context.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the 3D object is fully occluded or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="needsRenderUpdate" translate="no">.<a href="#needsRenderUpdate">needsRenderUpdate</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span> )</span><span class="type-signature"> : boolean</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the render pipeline requires an update.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderObject</strong>
+									</td>
+									<td class="description last">
+										<p>The render object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the render pipeline requires an update or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="resolveTimestampsAsync" translate="no">.<a href="#resolveTimestampsAsync">resolveTimestampsAsync</a><span class="signature">( type : <span class="param-type">string</span> )</span><span class="type-signature"> : Promise.&lt;number></span> <span class="type-signature">(async, abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Resolves the time stamp for the given render context and type.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">type</strong>
+									</td>
+									<td class="description last">
+										<p>The type of the time stamp.</p>
+										<p>Default is <code>'render'</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves with the time stamp.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( object : <span class="param-type">Object</span>, value : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets a dictionary for the given object into the
+internal data structure.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">object</strong>
+									</td>
+									<td class="description last">
+										<p>The object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">value</strong>
+									</td>
+									<td class="description last">
+										<p>The dictionary to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setScissorTest" translate="no">.<a href="#setScissorTest">setScissorTest</a><span class="signature">( boolean : <span class="param-type">boolean</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines the scissor test.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">boolean</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the scissor test should be enabled or not.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setXRTarget" translate="no">.<a href="#setXRTarget">setXRTarget</a><span class="signature">( xrTarget : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the XR rendering destination.</p>
+<p>Backends that render directly into XR framebuffers can override this hook.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">xrTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The XR rendering destination.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="updateAttribute" translate="no">.<a href="#updateAttribute">updateAttribute</a><span class="signature">( attribute : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the GPU buffer of a shader attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">attribute</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer attribute to update.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="updateBinding" translate="no">.<a href="#updateBinding">updateBinding</a><span class="signature">( binding : <span class="param-type"><a href="Buffer.html">Buffer</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates a buffer binding.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">binding</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer binding to update.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="updateBindings" translate="no">.<a href="#updateBindings">updateBindings</a><span class="signature">( bindGroup : <span class="param-type"><a href="BindGroup.html">BindGroup</a></span>, bindings : <span class="param-type">Array.&lt;<a href="BindGroup.html">BindGroup</a>></span>, cacheIndex : <span class="param-type">number</span>, version : <span class="param-type">number</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the given bind group definition.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">bindGroup</strong>
+									</td>
+									<td class="description last">
+										<p>The bind group.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">bindings</strong>
+									</td>
+									<td class="description last">
+										<p>Array of bind groups.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">cacheIndex</strong>
+									</td>
+									<td class="description last">
+										<p>The cache index.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">version</strong>
+									</td>
+									<td class="description last">
+										<p>The version.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="updateSampler" translate="no">.<a href="#updateSampler">updateSampler</a><span class="signature">( binding : <span class="param-type"><a href="Sampler.html">Sampler</a></span> )</span><span class="type-signature"> : string</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates a GPU sampler for the given texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">binding</strong>
+									</td>
+									<td class="description last">
+										<p>The sampler binding to update.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The current sampler key.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateSize" translate="no">.<a href="#updateSize">updateSize</a><span class="signature">()</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Backends can use this method if they have to run
+logic when the renderer gets resized.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="updateTexture" translate="no">.<a href="#updateTexture">updateTexture</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, options : <span class="param-type">Object</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Uploads the updated texture data to the GPU.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">options</strong>
+									</td>
+									<td class="description last">
+										<p>Optional configuration parameter.</p>
+										<p>Default is <code>{}</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="updateTimeStampUID" translate="no">.<a href="#updateTimeStampUID">updateTimeStampUID</a><span class="signature">( abstractRenderContext : <span class="param-type"><a href="RenderContext.html">RenderContext</a> | <a href="ComputeNode.html">ComputeNode</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates a unique identifier for the given render context that can be used
+to allocate resources like occlusion queries or timestamp queries.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">abstractRenderContext</strong>
+									</td>
+									<td class="description last">
+										<p>The render context.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="updateViewport" translate="no">.<a href="#updateViewport">updateViewport</a><span class="signature">( renderContext : <span class="param-type"><a href="RenderContext.html">RenderContext</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the viewport with the values from the given render context.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderContext</strong>
+									</td>
+									<td class="description last">
+										<p>The render context.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/common/Backend.js" translate="no" target="_blank" rel="noopener">src/renderers/common/Backend.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

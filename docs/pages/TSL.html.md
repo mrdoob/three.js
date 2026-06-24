@@ -32,9 +32,17 @@ TSL object that represents the TBN matrix in view space.
 
 Represents PI \* 2.
 
+### .alphaLine : Node.<float> (constant)
+
+TSL fragment node that computes the shape/coverage (alpha) of the fat line segment. Handles dash/gap generation, alpha-to-coverage rendering, and round endcaps.
+
 ### .alphaT : PropertyNode.<float> (constant)
 
 TSL object that represents the shader variable `AlphaT`.
+
+### .ambientOcclusion : PropertyNode.<float> (constant)
+
+TSL object that represents the shader variable `AmbientOcclusion`. If no value is assigned to this property, it defaults to a placeholder value of `1.0`.
 
 ### .anisotropy : PropertyNode.<float> (constant)
 
@@ -165,12 +173,6 @@ TSL object that represents the shader variable `DiffuseColor`.
 ### .diffuseContribution : PropertyNode.<vec3> (constant)
 
 TSL object that represents the shader variable `DiffuseContribution`.
-
-### .directionToFaceDirection (constant)
-
-Converts a direction vector to a face direction vector based on the material's side.
-
-If the material is set to `BackSide`, the direction is inverted. If the material is set to `DoubleSide`, the direction is multiplied by `faceDirection`.
 
 ### .dispersion : PropertyNode.<float> (constant)
 
@@ -460,6 +462,10 @@ TSL object that represents the object's world matrix.
 
 TSL object that represents the object's inverse world matrix.
 
+### .mvpLine : Node.<vec4> (constant)
+
+TSL node acting as a custom Model-View-Projection (MVP) for fat lines, expanding 3D segments into screen/world-facing ribbons of a specified width.
+
 ### .normalFlat : Node.<vec3> (constant)
 
 TSL object that represents the flat vertex normal of the current rendered object in view space.
@@ -531,7 +537,9 @@ TSL object that represents the position attribute of the current rendered object
 
 ### .positionLocal : AttributeNode.<vec3> (constant)
 
-TSL object that represents the vertex position in local space of the current rendered object.
+TSL object that represents the transformed vertex position in local space of the current rendered object.
+
+The term "transformed" indicates that an object or material's properties, such as skinning, batch, instancing, or displacement mapping, will change the vertex position of the node when present. To use the pre-transformed local space position of the object, use [positionGeometry](TSL.html#positionGeometry).
 
 ### .positionPrevious : AttributeNode.<vec3> (constant)
 
@@ -937,32 +945,6 @@ The scene to render.
 
 The camera to render the scene with.
 
-### .anamorphic( node : TextureNode, threshold : Node.<float> | number, scale : Node.<float> | number, samples : number ) : AnamorphicNode
-
-TSL function for creating an anamorphic flare effect.
-
-**node**
-
-The node that represents the input of the effect.
-
-**threshold**
-
-The threshold is one option to control the intensity and size of the effect.
-
-Default is `0.9`.
-
-**scale**
-
-Defines the vertical scale of the flares.
-
-Default is `3`.
-
-**samples**
-
-More samples result in larger flares and a more expensive runtime behavior.
-
-Default is `32`.
-
 ### .and( …nodes : Node ) : OperatorNode
 
 Performs a logical AND operation on multiple nodes.
@@ -1263,13 +1245,13 @@ TSL function for creating a barrier node.
 
 The scope defines the behavior of the node..
 
-### .batch( batchMesh : BatchedMesh ) : BatchNode
+### .batch( batchMesh : BatchedMesh )
 
-TSL function for creating a batch node.
+TSL function representing the vertex shader batching setup. Applies the batch transformation matrix to positionLocal, normalLocal, and tangentLocal. Also assigns the batch color if a color texture is present.
 
 **batchMesh**
 
-A reference to batched mesh.
+The batched mesh.
 
 ### .bentNormalView() : Node.<vec3>
 
@@ -1809,28 +1791,6 @@ Default is `uv()`.
 
 **Returns:** 1.0 at center, 0.0 at edges.
 
-### .circleIntersectsAABB( circleCenter : Node.<vec2>, radius : Node.<float>, minBounds : Node.<vec2>, maxBounds : Node.<vec2> ) : Node.<bool>
-
-TSL function that checks if a circle intersects with an axis-aligned bounding box (AABB).
-
-**circleCenter**
-
-The center of the circle.
-
-**radius**
-
-The radius of the circle.
-
-**minBounds**
-
-The minimum bounds of the AABB.
-
-**maxBounds**
-
-The maximum bounds of the AABB.
-
-**Returns:** True if the circle intersects the AABB.
-
 ### .clamp( value : Node | number, low : Node | number, high : Node | number ) : Node
 
 Constrains a value to lie between two further values.
@@ -1939,13 +1899,11 @@ The source color space.
 
 ### .colorToDirection( node : Node.<vec3> ) : Node.<vec3>
 
-Unpacks a color value into a direction vector.
-
 **node**
 
 The color to unpack.
 
-**Returns:** The direction.
+**Deprecated:** since r185. Use [unpackRGBToNormal](TSL.html#unpackRGBToNormal) instead.
 
 ### .compute( node : Node, count : number | Array.<number>, workgroupSize : Array.<number> ) : ComputeNode
 
@@ -1993,9 +1951,9 @@ The workgroup size.
 
 Default is `[64]`.
 
-### .computeSkinning( skinnedMesh : SkinnedMesh, toPosition : Node.<vec3> ) : SkinningNode
+### .computeSkinning( skinnedMesh : SkinnedMesh, toPosition : Node.<vec3> ) : Node.<vec3>
 
-TSL function for computing skinning.
+TSL function that computes skeletal animation for custom compute passes.
 
 **skinnedMesh**
 
@@ -2003,9 +1961,11 @@ The skinned mesh.
 
 **toPosition**
 
-The target position.
+The target position node to assign.
 
 Default is `null`.
+
+**Returns:** The computed skinned position node.
 
 ### .context( nodeOrValue : Node | Object, value : Object ) : ContextNode
 
@@ -2193,6 +2153,16 @@ The bias node.
 
 Default is `null`.
 
+### .curlNoise( p : Node.<vec3> ) : Node.<vec3>
+
+3D Curl noise in TSL. Generates a divergence-free vector field from simplex noise.
+
+**p**
+
+Input coordinate vector.
+
+**Returns:** Curl noise vector.
+
 ### .dFdx( x : Node | number ) : Node
 
 Returns the partial derivative of the parameter with respect to x.
@@ -2321,13 +2291,27 @@ The second parameter.
 
 ### .directionToColor( node : Node.<vec3> ) : Node.<vec3>
 
-Packs a direction vector into a color value.
-
 **node**
 
 The direction to pack.
 
-**Returns:** The color.
+**Deprecated:** since r185. Use [packNormalToRGB](TSL.html#packNormalToRGB) instead.
+
+### .directionToFaceDirection( vector : Node.<vec3> ) : Node.<vec3>
+
+Negates a vector if the rendering occurs on the back side of a face, based on the material's side configuration.
+
+*   If the material's side is `BackSide`, the vector is inverted (negated).
+*   If the material's side is `DoubleSide`, the vector is multiplied by `faceDirection` (negated only for back-facing fragments).
+*   If the material's side is `FrontSide` (default), the vector remains unchanged.
+
+**vector**
+
+The vector to convert.
+
+**Deprecated:** since r185. Use [negateOnBackSide](TSL.html#negateOnBackSide) instead.
+
+**Returns:** The converted vector.
 
 ### .distance( x : Node.<(vec2|vec3|vec4)>, y : Node.<(vec2|vec3|vec4)> ) : Node.<float>
 
@@ -2463,7 +2447,21 @@ The first input.
 
 The second input.
 
-### .equirectUV( dirNode : Node.<vec3> ) : Node.<vec2>
+### .equirectDirection( uv : Node.<vec2> ) : Node.<vec3>
+
+TSL function for creating an equirect direction node.
+
+Can be used to compute a direction vector from the given equirectangular UV coordinates.
+
+**uv**
+
+The equirectangular UV coordinates.
+
+Default is `UV()`.
+
+**Returns:** The computed direction vector.
+
+### .equirectUV( direction : Node.<vec3> ) : Node.<vec2>
 
 TSL function for creating an equirect uv node.
 
@@ -2473,7 +2471,7 @@ Can be used to compute texture coordinates for projecting an equirectangular tex
 scene.backgroundNode = texture( equirectTexture, equirectUV() );
 ```
 
-**dirNode**
+**direction**
 
 A direction vector for sampling which is by default `positionWorldDirection`.
 
@@ -2962,21 +2960,23 @@ Default is `null`.
 
 **Returns:** The inspector node.
 
-### .instance( count : number, instanceMatrix : InstancedBufferAttribute | StorageInstancedBufferAttribute, instanceColor : InstancedBufferAttribute | StorageInstancedBufferAttribute ) : InstanceNode
+### .instance( count : number, matrices : InstancedBufferAttribute | StorageInstancedBufferAttribute, colors : InstancedBufferAttribute | StorageInstancedBufferAttribute )
 
-TSL function for creating an instance node.
+TSL function representing the standard instancing vertex shader setup. Transforms positionLocal and normalLocal, and assigns varying color in-place.
 
 **count**
 
-The number of instances.
+The instance count.
 
-**instanceMatrix**
+**matrices**
 
-Instanced buffer attribute representing the instance transformations.
+The instanced transformation matrices.
 
-**instanceColor**
+**colors**
 
-Instanced buffer attribute representing the instance colors.
+The optional instanced colors.
+
+Default is `null`.
 
 ### .instancedArray( count : number | TypedArray, type : string | Struct ) : StorageBufferNode
 
@@ -3044,13 +3044,13 @@ The buffer offset.
 
 Default is `0`.
 
-### .instancedMesh( instancedMesh : InstancedMesh ) : InstancedMeshNode
+### .instancedMesh( instancedMesh : InstancedMesh )
 
-TSL function for creating an instanced mesh node.
+TSL wrapper for applying instanced mesh rendering setup.
 
 **instancedMesh**
 
-The instancedMesh.
+The instanced mesh.
 
 ### .intBitsToFloat( value : Node.<int> ) : BitcastNode
 
@@ -3475,13 +3475,13 @@ The first input.
 
 The second input.
 
-### .morphReference( mesh : Mesh ) : MorphNode
+### .morphReference( mesh : Mesh )
 
-TSL function for creating a morph node.
+TSL function representing the vertex shader morph targets blend setup. Dynamically computes morph targets weights and updates positionLocal and normalLocal in-place.
 
 **mesh**
 
-The mesh holding the morph targets.
+The mesh.
 
 ### .motionBlur( inputNode : Node.<vec4>, velocity : Node.<vec2>, numSamples : Node.<int> ) : Node.<vec4>
 
@@ -3534,6 +3534,20 @@ Negates the value of the parameter (-x).
 **x**
 
 The parameter.
+
+### .negateOnBackSide( vector : Node.<vec3> ) : Node.<vec3>
+
+Negates a vector if the rendering occurs on the back side of a face, based on the material's side configuration.
+
+*   If the material's side is `BackSide`, the vector is inverted (negated).
+*   If the material's side is `DoubleSide`, the vector is multiplied by `faceDirection` (negated only for back-facing fragments).
+*   If the material's side is `FrontSide` (default), the vector remains unchanged.
+
+**vector**
+
+The vector to process.
+
+**Returns:** The processed vector.
 
 ### .neutralToneMapping( color : Node.<vec3>, exposure : Node.<float> ) : Node.<vec3>
 
@@ -3767,6 +3781,55 @@ TSL function for creating a function overloading node.
 
 Array of `Fn` function definitions.
 
+### .overrideNode( targetNode : Node, callback : function | Node | null, flowNode : Node | null ) : OverrideContextNode
+
+TSL function for creating an `OverrideContextNode` to override a single target node.
+
+```js
+material.contextNode = overrideNode( positionLocal, ( builder ) => positionLocal.add( vec3( 1, 0, 0 ) ) );
+```
+
+**targetNode**
+
+The target node that should be overridden.
+
+**callback**
+
+A callback function returning the overriding node (which receives the builder as its argument), or the overriding node itself.
+
+Default is `null`.
+
+**flowNode**
+
+The node whose context should be modified.
+
+Default is `null`.
+
+**Returns:** The created override context node.
+
+### .overrideNodes( overrides : Map.<Node, (function()|Node)> | Array.<Array.<(Node|function()|Node)>>, flowNode : Node | null ) : OverrideContextNode
+
+TSL function for creating an `OverrideContextNode` to override multiple target nodes.
+
+```js
+material.contextNode = overrideNodes( [
+	[ positionView, customPositionView ],
+	[ positionViewDirection, ( builder ) => customPositionViewDirection ]
+] );
+```
+
+**overrides**
+
+The overrides mapping target nodes to callback functions or overriding nodes.
+
+**flowNode**
+
+The node whose context should be modified.
+
+Default is `null`.
+
+**Returns:** The created override context node.
+
 ### .packHalf2x16( value : Node.<vec2> ) : Node
 
 Converts each component of the vec2 to 16-bit floating-point values. The results are packed into a single unsigned integer.
@@ -3774,6 +3837,16 @@ Converts each component of the vec2 to 16-bit floating-point values. The results
 **value**
 
 The 2-component vector to be packed
+
+### .packNormalToRGB( node : Node.<vec3> ) : Node.<vec3>
+
+Packs a normal vector into a color value.
+
+**node**
+
+The direction to pack.
+
+**Returns:** The color.
 
 ### .packSnorm2x16( value : Node.<vec2> ) : Node
 
@@ -3888,6 +3961,16 @@ First control parameter.
 Second control parameter.
 
 **Returns:** The remapped value.
+
+### .permute( x : Node.<vec4> ) : Node.<vec4>
+
+Permutation polynomial for noise generation.
+
+**x**
+
+Input vector.
+
+**Returns:** Permuted vector.
 
 ### .perspectiveDepthToViewZ( depth : Node.<float>, near : Node.<float>, far : Node.<float> ) : Node.<float>
 
@@ -4051,7 +4134,7 @@ The input color with non-premultiplied alpha.
 
 **Returns:** The color with premultiplied alpha.
 
-### .property( type : string, name : string ) : PropertyNode
+### .property( type : string, name : string, placeholderNode : Node ) : PropertyNode
 
 TSL function for creating a property node.
 
@@ -4062,6 +4145,12 @@ The type of the node.
 **name**
 
 The name of the property in the shader.
+
+Default is `null`.
+
+**placeholderNode**
+
+The placeholder node if not assigned.
 
 Default is `null`.
 
@@ -4864,9 +4953,9 @@ Returns the hyperbolic sine of the parameter.
 
 The parameter.
 
-### .skinning( skinnedMesh : SkinnedMesh ) : SkinningNode
+### .skinning( skinnedMesh : SkinnedMesh )
 
-TSL function for creating a skinning node.
+TSL function representing the standard skeletal animation vertex shader setup. Transforms positionLocal, normalLocal, and tangentLocal in-place.
 
 **skinnedMesh**
 
@@ -4911,6 +5000,26 @@ The value of the lower edge of the Hermite function.
 **high**
 
 The value of the upper edge of the Hermite function.
+
+### .snoise( v : Node.<vec3> ) : Node.<float>
+
+3D Simplex noise implementation in TSL.
+
+**v**
+
+Input coordinate vector.
+
+**Returns:** Simplex noise value.
+
+### .snoiseVec3( x : Node.<vec3> ) : Node.<vec3>
+
+3D Simplex noise vector. Returns a vec3 containing three independent noise samples.
+
+**x**
+
+Input coordinate vector.
+
+**Returns:** Vector of three noise values.
 
 ### .sobel( node : Node.<vec4> ) : SobelOperatorNode
 
@@ -5699,24 +5808,6 @@ The value node that should be stored in the texture.
 
 Default is `null`.
 
-### .tiledLights( maxLights : number, tileSize : number ) : TiledLightsNode
-
-TSL function that creates a tiled lights node.
-
-**maxLights**
-
-The maximum number of lights.
-
-Default is `1024`.
-
-**tileSize**
-
-The tile size.
-
-Default is `32`.
-
-**Returns:** The tiled lights node.
-
 ### .toneMapping( mapping : number, exposure : Node.<float> | number, color : Node.<vec3> | Color ) : ToneMappingNode.<vec3>
 
 TSL function for creating a tone mapping node.
@@ -5793,9 +5884,9 @@ The direction vector.
 
 The transformation matrix.
 
-### .transformNormal( normal : Node.<vec3>, matrix : Node.<mat3> ) : Node.<vec3>
+### .transformNormal( normal : Node.<vec3>, matrix : Node.<(mat3|mat4)> ) : Node.<vec3>
 
-Transforms the normal with the given matrix.
+Transforms the normal by the normal matrix of the given matrix and then normalizes the result.
 
 **normal**
 
@@ -5808,6 +5899,38 @@ The matrix.
 Default is `modelWorldMatrix`.
 
 **Returns:** The transformed normal.
+
+### .transformNormalByInverseViewMatrix( normal : Node.<vec3>, viewMatrix : Node.<(mat3|mat4)> ) : Node.<vec3>
+
+Transforms a normal vector by the inverse of the view matrix and then normalizes the result.
+
+The upper-left 3x3 of the view matrix is assumed to be orthonormal, so post-multiplying by the view matrix is equivalent to pre-multiplying by its inverse.
+
+**normal**
+
+The normal vector, given in view space.
+
+**viewMatrix**
+
+The view matrix.
+
+**Returns:** The normal vector in world space.
+
+### .transformNormalByViewMatrix( normal : Node.<vec3>, viewMatrix : Node.<(mat3|mat4)> ) : Node.<vec3>
+
+Transforms a normal vector by the view matrix and then normalizes the result.
+
+The upper-left 3x3 of the view matrix is assumed to be orthonormal, so the normal can be transformed directly without involving the normal matrix.
+
+**normal**
+
+The normal vector, given in world space.
+
+**viewMatrix**
+
+The view matrix.
+
+**Returns:** The normal vector in view space.
 
 ### .transformNormalToView( normal : Node.<vec3>, builder : NodeBuilder ) : Node.<vec3>
 
@@ -6051,6 +6174,16 @@ The X,Y coordinates of the normal.
 
 **Returns:** The resulting normal.
 
+### .unpackRGBToNormal( node : Node.<vec3> ) : Node.<vec3>
+
+Unpacks a color value into a normal vector.
+
+**node**
+
+The color to unpack.
+
+**Returns:** The direction.
+
 ### .unpackSnorm2x16( value : Node.<uint> ) : Node
 
 Unpacks a 32-bit unsigned integer into two 16-bit values, interpreted as normalized signed integers. Returns a vec2 with both values.
@@ -6119,7 +6252,7 @@ The node for which a varying should be created.
 
 The name of the varying in the shader.
 
-### .varyingProperty( type : string, name : string ) : PropertyNode
+### .varyingProperty( type : string, name : string, placeholderNode : Node ) : PropertyNode
 
 TSL function for creating a varying property node.
 
@@ -6130,6 +6263,12 @@ The type of the node.
 **name**
 
 The name of the varying in the shader.
+
+Default is `null`.
+
+**placeholderNode**
+
+The placeholder node if not assigned.
 
 Default is `null`.
 
@@ -6163,7 +6302,7 @@ The input color.
 
 Controls the intensity of the vibrance effect.
 
-Default is `1`.
+Default is `0`.
 
 **Returns:** The updated color.
 

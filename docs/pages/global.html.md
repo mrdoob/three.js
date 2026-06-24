@@ -1049,6 +1049,18 @@ Zero slope ending for animations.
 
 Sets the stencil buffer value to `0`.
 
+### .batchColor : VaryingNode.<vec4> (constant)
+
+TSL object representing a varying property for the batching color vector.
+
+### .buildingPalette (constant)
+
+The NYC masonry palette every tower is dressed from ( hex colours ): limestone-dominant with terracotta accents. Shared by the single-tower example and [CityGenerator](CityGenerator.html)'s building material so both stay in sync.
+
+### .closestLineToLine (constant)
+
+Calculates the closest points on two 3D lines. Used for perspective-correct line rendering and coordinates interpolation.
+
 ### .depthAwareBlend (constant)
 
 Performs a depth-aware blend between a base scene and a secondary effect (like godrays). This function uses a Poisson disk sampling pattern to detect depth discontinuities in the neighborhood of the current pixel. If an edge is detected, it shifts the sampling coordinate for the blend node away from the edge to prevent light leaking/haloing.
@@ -1057,9 +1069,57 @@ Performs a depth-aware blend between a base scene and a secondary effect (like g
 
 Disposes the shadow material for the given light source.
 
+### .getBatchingColor (constant)
+
+TSL function that retrieves the batching color for a given instance ID from a colors texture.
+
+### .getIndirectIndex (constant)
+
+TSL function that retrieves the indirect index for a given batch ID.
+
+### .getMorph (constant)
+
+TSL function that retrieves and scales the morphed attribute (position or normal) texel value.
+
+### .instanceColor : VaryingNode.<vec3> (constant)
+
+TSL object representing a varying property for the instanced color vector.
+
+### .lineDistance : VaryingNode.<float> (constant)
+
+Varying node representing the accumulated distance along the line. Crucial for correctly computing dashed line intervals in fragment stage.
+
+### .outgoingLight : Node.<vec3> (constant)
+
+A node representing the outgoing light.
+
+### .totalDiffuse : Node.<vec3> (constant)
+
+A node representing the total diffuse light.
+
+### .totalSpecular : Node.<vec3> (constant)
+
+A node representing the total specular light.
+
+### .trimSegmentAlpha (constant)
+
+Trims the line segment to avoid rendering behind the camera near plane. Computes an interpolation factor (alpha) to clamp the segment's coordinate.
+
 ### .viewportResolution (constant)
 
 **Deprecated:** since r169. Use [screenSize](TSL.html#screenSize) instead.
+
+### .worldEnd : VaryingNode.<vec3> (constant)
+
+Varying node representing the world position of the segment end in view space. Used for distance and coordinate calculations across the fragment shader.
+
+### .worldPos : VaryingNode.<vec4> (constant)
+
+Varying node representing the interpolated world/view position of the current fragment. Used for line/ray distance checks under perspective projection.
+
+### .worldStart : VaryingNode.<vec3> (constant)
+
+Varying node representing the world position of the segment start in view space. Used for distance and coordinate calculations across the fragment shader.
 
 ## Methods
 
@@ -1183,6 +1243,26 @@ The shadow coordinates.
 
 **Returns:** The filtering result.
 
+### .addArcade()
+
+The base storey: a wall pierced by tall pointed-arch openings, extruded with thickness so the openings read as deep recesses.
+
+### .addCornice()
+
+A two-step projecting cornice / string-course band wrapping a face.
+
+### .addParapet()
+
+A low parapet wall capping the crown.
+
+### .addSpandrelBands()
+
+Horizontal terracotta bands at every floor line. Together with the projecting piers they form the facade grid; the gaps between them are the window openings, with glass set behind.
+
+### .bakeGroups()
+
+Bakes a list of instance groups into one non-indexed BufferGeometry. Each group is a base geometry ( position + normal + uv ), an array of Matrix4 placements and a `partId` written to a per-vertex attribute. Transforming straight into preallocated typed arrays avoids mergeGeometries' per-instance allocations; the result is one geometry, ready for a single draw call and the compute rasterizer.
+
 ### .buildData3DTexture( chunk : Object ) : Data3DTexture
 
 Builds a 3D texture from a VOX chunk.
@@ -1192,6 +1272,14 @@ Builds a 3D texture from a VOX chunk.
 A VOX chunk loaded via [VOXLoader](VOXLoader.html).
 
 **Returns:** The generated 3D texture.
+
+### .buildFaces()
+
+Builds a face frame per footprint edge. Each frame is an orthonormal basis ( u along the edge, v up, n outward ) plus an origin and length, so all facade layout can happen in flat ( u, v ) space and bake to world with one matrix — the same authored piece then instances onto every face, including the diagonal chamfer.
+
+### .buildFootprint()
+
+A rectangle (centred at the origin in the XZ plane) with one corner cut at 45 degrees, returned as an ordered list of `Vector2( x, z )`. `cornerX` / `cornerZ` ( each ±1 ) pick which corner is cut, so the chamfer can be aimed outward to a block corner.
 
 ### .buildMesh( chunk : Object ) : Mesh
 
@@ -1273,6 +1361,10 @@ The texture's aspect ratio.
 
 **Returns:** The updated texture.
 
+### .createBuildingMaterial()
+
+The shared material every tower in a [CityGenerator](CityGenerator.html) is dressed with: one flat masonry colour per lot, picked from a palette by hashing the lot's grid cell.
+
 ### .createCanvasElement() : HTMLCanvasElement
 
 Creates a canvas element configured for block display.
@@ -1292,6 +1384,52 @@ The event type.
 **callback**
 
 The callback function.
+
+### .createForestMaterial( from : Node, to : Node ) : MeshStandardNodeMaterial
+
+The single material shared by every tree in a [ForestGenerator](ForestGenerator.html). A plain MeshStandardNodeMaterial lit by the scene — only the surface is authored: deep shadowed green in the recesses rising to a bright, yellow-green sunlit crown, mottled into needle clumps by 3D noise, with a matching bump so the clumps catch the light. Half a million instanced blobs makes this mesh vertex-bound, so the regional colour drift is baked to a per-instance attribute ( no shader noise for it ), and the costly clump noise + bump are **gated by distance** — full detail on the near trees ( where it reads ), skipped on the far canopy ( where it is sub-pixel ).
+
+**from**
+
+distance within which every tree is drawn.
+
+**to**
+
+distance past which no tree is drawn.
+
+### .createInstanceMatrixNode( builder : NodeBuilder, instanceMatrix : InstancedBufferAttribute | StorageInstancedBufferAttribute, count : number ) : Node
+
+Creates the appropriate node for instanced matrix transformations. Depending on buffer limits and storage capability, returns either a storage, buffer, or instanced interleaved attribute node.
+
+**builder**
+
+The current node builder.
+
+**instanceMatrix**
+
+The matrix buffer attribute.
+
+**count**
+
+The instance count.
+
+**Returns:** The matrix node.
+
+### .createRoadMaterial()
+
+The road surface: wet asphalt with lane lines and crosswalks aligned to a [CityGenerator](CityGenerator.html) layout. Apply it to a ground plane sized to the city.
+
+### .createSkyscraperMaterial()
+
+The facade material: a single MeshStandardNodeMaterial that reads the baked per-vertex `partId` and reproduces every zone — procedural terracotta brickwork on the walls and piers, smooth dressed stone on the window frames and ornament, dark glazing, and grey AC units — all dressed with world-space weathering. One material covers the whole building ( and a whole city ), which is what makes it compute-rasterizer friendly. `buildingBase` is the tower's flat masonry colour as a TSL node: pass a `uniform( Color )` for a single tower, or a per-fragment palette pick for a city, so the same material dresses both.
+
+### .createTreeMaterial( parameters : Object ) : MeshStandardNodeMaterial
+
+A simple bark material for a [TreeGenerator](TreeGenerator.html) mesh: a low-saturation brown with a faint, vertically-stretched grain, so trunks read near-black against bright fog.
+
+**parameters**
+
+`barkColor` ( a hex, THREE.Color or TSL node ).
 
 ### .damp( x : number, y : number, lambda : number, dt : number ) : number
 
@@ -1515,6 +1653,16 @@ The light's decay exponent.
 
 Utility functions for parsing
 
+### .getEntry( geometry : BufferGeometry ) : Object
+
+Resolves or creates a compiled DataArrayTexture containing encoded vertex morph targets data for WebGL2/WebGPU.
+
+**geometry**
+
+The geometry to parse.
+
+**Returns:** The resolved morph targets texture data mapping entry.
+
 ### .getFilteredStack()
 
 Parses the stack trace and filters out ignored files. Returns an array with function name, file, line, and column.
@@ -1562,6 +1710,118 @@ Generates a layout for struct members. This function takes an object representin
 An object where keys are member names and values are either types (as strings) or objects with type and atomic properties.
 
 **Returns:** An array of member layouts.
+
+### .getPreviousInstance( instancedMesh : InstancedMesh, instanceMatrix : InstancedBufferAttribute | StorageInstancedBufferAttribute, builder : NodeBuilder, count : number ) : Node
+
+Retrieves or initializes the previous frame instance matrix node for motion vectors. Uses a WeakMap to cache previous frame instance matrices and their TSL nodes.
+
+**instancedMesh**
+
+The instanced mesh object.
+
+**instanceMatrix**
+
+The current matrix buffer attribute.
+
+**builder**
+
+The current node builder.
+
+**count**
+
+The instance count.
+
+**Returns:** The previous frame instance matrix node.
+
+### .getPreviousSkinnedPosition( skinnedMesh : SkinnedMesh, bindMatrixNode : Node.<mat4>, bindMatrixInverseNode : Node.<mat4>, skinIndexNode : Node.<uvec4>, skinWeightNode : Node.<vec4> ) : Node.<vec3>
+
+Retrieves or initializes the previous frame skinned position node for motion vectors. Uses a WeakMap to cache previous frame bone matrix arrays and their TSL buffer nodes.
+
+**skinnedMesh**
+
+The skinned mesh.
+
+**bindMatrixNode**
+
+The bind matrix node.
+
+**bindMatrixInverseNode**
+
+The inverse bind matrix node.
+
+**skinIndexNode**
+
+The skin index attribute.
+
+**skinWeightNode**
+
+The skin weight attribute.
+
+**Returns:** The skinned position from the previous frame.
+
+### .getSkinnedNormalAndTangent( boneMatrices : Node, normal : Node.<vec3>, tangent : Node.<vec3>, bindMatrix : Node.<mat4>, bindMatrixInverse : Node.<mat4>, skinIndex : Node.<uvec4>, skinWeight : Node.<vec4> ) : Object
+
+Computes the skinned normal and tangent vectors by applying bone matrices based on weights.
+
+**boneMatrices**
+
+The bone matrices buffer or storage node.
+
+**normal**
+
+The normal vector in local space.
+
+**tangent**
+
+The tangent vector in local space.
+
+**bindMatrix**
+
+The bind matrix node.
+
+**bindMatrixInverse**
+
+The inverse bind matrix node.
+
+**skinIndex**
+
+The skin index attribute.
+
+**skinWeight**
+
+The skin weight attribute.
+
+**Returns:** The skinned normal and tangent.
+
+### .getSkinnedPosition( boneMatrices : Node, position : Node.<vec3>, bindMatrix : Node.<mat4>, bindMatrixInverse : Node.<mat4>, skinIndex : Node.<uvec4>, skinWeight : Node.<vec4> ) : Node.<vec3>
+
+Computes the skinned position by applying bone matrices based on weights.
+
+**boneMatrices**
+
+The bone matrices buffer or storage node.
+
+**position**
+
+The vertex position to transform.
+
+**bindMatrix**
+
+The bind matrix node.
+
+**bindMatrixInverse**
+
+The inverse bind matrix node.
+
+**skinIndex**
+
+The skin index attribute.
+
+**skinWeight**
+
+The skin weight attribute.
+
+**Returns:** The skinned position.
 
 ### .getStrideLength( vectorLength : number ) : number
 
@@ -1759,6 +2019,10 @@ The typed array that defines the data type of the value.
 
 **Returns:** The normalize value.
 
+### .pickBuildingColor()
+
+Picks one [buildingPalette](global.html#buildingPalette) colour ( a hex number ) for a tower from its seed.
+
 ### .pingpong( x : number, length : number ) : number
 
 Returns a value that alternates between `0` and the given `length` parameter.
@@ -1948,6 +2212,10 @@ The group the object belongs to.
 **params**
 
 Additional parameters for rendering.
+
+### .slab()
+
+A thin horizontal cap over a footprint's bounding box at height `y`. Its sides are pulled in behind the facade plane ( into the backing-wall shell ) so they never sit coplanar with the walls, spandrels or piers and z-fight.
 
 ### .smootherstep( x : number, min : number, max : number ) : number
 
