@@ -41,12 +41,12 @@
 			import { pass } from 'three/tsl';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 			import { CityGenerator, createBuildingMaterial, createRoadMaterial } from 'three/addons/generators/CityGenerator.js';
 
-			let camera, scene, renderer, controls;
+			let camera, scene, renderer, controls, timer;
 			let cityGroup, materials, city, renderPipeline;
 			let sky, sun, sunLight, pmremGenerator, envScene;
 
@@ -93,13 +93,12 @@
 				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 1, 20000 );
 				camera.position.set( - 35, 55, - 100 );
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.enableDamping = true;
-				controls.target.set( 35, 55, 0 );
-				controls.maxPolarAngle = Math.PI * 0.5;
-				controls.minDistance = 20;
-				controls.maxDistance = 1200;
-				controls.update();
+				controls = new FirstPersonControls( camera, renderer.domElement );
+				controls.movementSpeed = 15;
+				controls.lookSpeed = 0.25;
+				controls.lookAt( 35, 55, 0 );
+
+				timer = new THREE.Timer();
 
 				city = new CityGenerator( { seed: parameters.seed } );
 
@@ -213,7 +212,8 @@
 
 			function animate() {
 
-				controls.update();
+				timer.update();
+				controls.update( timer.getDelta() );
 
 				renderPipeline.render();
 
