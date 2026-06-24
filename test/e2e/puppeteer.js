@@ -68,7 +68,10 @@ const exceptionList = [
 
 	// Webcam
 	'webgl_materials_video_webcam',
-	'webgl_morphtargets_webcam'
+	'webgl_morphtargets_webcam',
+
+	// Sub-pixel coverage of thin high-contrast geometry edges differs across rasterizers #33817
+	'webgpu_generator_city'
 
 ];
 
