@@ -38,7 +38,7 @@
 			import * as THREE from 'three/webgpu';
 			import { Fn, If, Loop, vec4, vec2, uvec4, mat4, uint, float, int, min, max, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, uv, instanceIndex, vertexIndex, distance, screenSize, time, texture, varyingProperty, sqrt } from 'three/tsl';
 
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -53,7 +53,7 @@
 
 			}
 
-			let camera, renderer, controls;
+			let camera, renderer, controls, timer;
 			let computeRasterize, computeClear, computeFrustum, computeDispatch, computeHWArgs;
 			let quadMesh, hwScene, hwMesh;
 			let cameraPos, projScreenMatrixUniform, frustumPlanesUniform, cotHalfFovUniform;
@@ -95,12 +95,12 @@
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, .25, 1000000 );
 				camera.position.set( 0, 15, 50 );
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.y = - 1.5;
-				controls.enableDamping = true;
-				controls.zoomSpeed = .5;
-				controls.maxDistance = 1000;
-				controls.maxPolarAngle = Math.PI / 2;
+				timer = new THREE.Timer();
+
+				controls = new FirstPersonControls( camera, renderer.domElement );
+				controls.movementSpeed = 30;
+				controls.lookSpeed = 0.2;
+				controls.lookAt( 0, - 1.5, 0 );
 
 				// Generate LOD Geometries
 				const lods = [
@@ -1083,7 +1083,8 @@
 
 			function animate() {
 
-				controls.update();
+				timer.update();
+				controls.update( timer.getDelta() );
 
 				camera.updateMatrixWorld();
 

@@ -38,7 +38,7 @@
 			import * as THREE from 'three/webgpu';
 			import { Fn, If, Loop, vec2, vec4, uvec2, uvec4, mat4, uint, float, int, min, max, clamp, ceil, log2, length, dFdx, dFdy, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, instanceIndex, vertexIndex, distance, screenSize, screenCoordinate, time, texture, varyingProperty, sqrt, normalize, cross, sign, positionGeometry, cameraViewMatrix, Discard, context, positionView, positionViewDirection, overrideNodes } from 'three/tsl';
 
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 			import { MeshoptClusterizer } from 'three/addons/libs/meshopt_clusterizer.module.js';
@@ -56,7 +56,7 @@
 
 			}
 
-			let camera, scene, renderer, controls;
+			let camera, scene, renderer, controls, timer;
 			let computeRasterize, computeClear, computeFrustum, computeDispatch, computeHWArgs;
 			let resolveMesh, hwMesh;
 			let cameraPos, projScreenMatrixUniform, frustumPlanesUniform, cotHalfFovUniform;
@@ -159,10 +159,11 @@
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, .25, 1000000 );
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.enableDamping = true;
-				controls.zoomSpeed = .5;
-				controls.maxDistance = 1000;
+				timer = new THREE.Timer();
+
+				controls = new FirstPersonControls( camera, renderer.domElement );
+				controls.movementSpeed = 10;
+				controls.lookSpeed = 0.2;
 
 				// Load assets
 				const [ gltf, envTexture ] = await Promise.all( [
@@ -449,7 +450,7 @@
 
 						//camera.position.set( 0, 800, 3000 );
 						camera.position.set( 0, 8, 30 );
-						controls.target.set( 0, - 1, 0 );
+						controls.lookAt( 0, - 1, 0 );
 
 					} else {
 
@@ -471,7 +472,7 @@
 						}
 
 						camera.position.set( 2, 2, 40 );
-						controls.target.set( 0, 0, 0 );
+						controls.lookAt( 0, 0, 0 );
 
 					}
 
@@ -1693,9 +1694,11 @@
 
 			function animate() {
 
+				timer.update();
+
 				if ( resolveMesh === undefined ) return; // still loading
 
-				controls.update();
+				controls.update( timer.getDelta() );
 
 				camera.updateMatrixWorld();
 
