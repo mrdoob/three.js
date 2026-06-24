@@ -302,6 +302,8 @@ const karisTemporalBlend = Fn( ( [ denoisedRgb, denoisedRaw, a, flickerSuppressi
 
 const toTextureNode = ( value ) => {
 
+	if ( value === null ) return null;
+
 	if ( value.isTexture === true ) return texture( value );
 
 	return convertToTexture( value.getTextureNode?.() ?? value );

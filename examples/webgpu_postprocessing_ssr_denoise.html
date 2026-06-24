@@ -64,7 +64,7 @@
 		import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 		import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
 		import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
-		import { fxaa } from 'three/addons/tsl/display/FXAANode.js';
+		import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -171,7 +171,7 @@
 
 		let camera, scene, model, renderer, postProcessing, ssrNode, temporalReprojectNode, denoiseNode;
 		let controls;
-		let scenePassNode, combinedOutputNode;
+		let scenePassNode, combinedOutputNode, scenePassDepth, scenePassVelocity;
 		let gammaUniform, contrastUniform, saturationUniform;
 
 		init();
@@ -258,12 +258,12 @@
 
 			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
 			const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal' );
-			const scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
+			scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
 
 				return scenePass.getLinearDepthNode();
 
 			} );
-			const scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
+			scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
 			const scenePassDiffuseColor = scenePass.getTextureNode( 'diffuseColor' ).toInspector( 'Diffuse Color' );
 
 			const normalTexture = scenePass.getTexture( 'normal' );
@@ -324,7 +324,7 @@
 			outputNode.toInspector( 'Combined SSR' );
 			combinedOutputNode = outputNode;
 
-			postProcessing.outputNode = applyGrading( combinedOutputNode );
+			postProcessing.outputNode = applyPostProcessing( combinedOutputNode );
 			postProcessing.outputColorTransform = false;
 
 			controls = new OrbitControls( camera, renderer.domElement );
@@ -468,8 +468,13 @@
 			rgb = saturation( rgb, saturationUniform );
 			rgb = rgb.max( 0.0 ).pow( float( 1 ).div( gammaUniform ) );
 
-			const node = fxaa( vec4( rgb, 1 ) );
-			return sharpen( node, 0 );
+			return vec4( rgb, 1 );
+
+		}
+
+		function applyPostProcessing( source ) {
+
+			return sharpen( traa( applyGrading( source ), scenePassDepth, scenePassVelocity, camera ), 0 );
 
 		}
 
@@ -493,15 +498,15 @@
 
 			switch ( params.output ) {
 
-				case 0: node = applyGrading( combinedOutputNode ); break; // Combined
-				case 1: node = applyGrading( vec4( ssrNode.rgb, 1 ) ); break; // SSR (Raw)
-				case 4: node = applyGrading( vec4( denoiseNode.rgb, 1 ) ); break; // Denoised SSR
+				case 0: node = applyPostProcessing( combinedOutputNode ); break; // Combined
+				case 1: node = applyPostProcessing( vec4( ssrNode.rgb, 1 ) ); break; // SSR (Raw)
+				case 4: node = applyPostProcessing( vec4( denoiseNode.rgb, 1 ) ); break; // Denoised SSR
 				case 6: node = vec4( denoiseNode.aaa, 1 ); break; // Samples (Alpha)
 				case 7: node = vec4( ssrNode.aaa, 1 ); break; // Ray Length (Raw)
 				case OUTPUT_COMPARE_DENOISE: { // Compare (denoised | noisy)
 
-					const noisySSR = applyGrading( vec4( ssrNode.rgb, 1 ) );
-					const denoisedSSR = applyGrading( vec4( denoiseNode.rgb, 1 ) );
+					const noisySSR = applyPostProcessing( vec4( ssrNode.rgb, 1 ) );
+					const denoisedSSR = applyPostProcessing( vec4( denoiseNode.rgb, 1 ) );
 					node = buildCompareNode( denoisedSSR, noisySSR );
 					break;
 
@@ -509,7 +514,7 @@
 
 				case OUTPUT_COMPARE_SSR: { // Compare (combined SSR vs. scene only)
 
-					node = buildCompareNode( applyGrading( combinedOutputNode ), applyGrading( scenePassNode ) );
+					node = buildCompareNode( applyPostProcessing( combinedOutputNode ), applyPostProcessing( scenePassNode ) );
 					break;
 
 				}
