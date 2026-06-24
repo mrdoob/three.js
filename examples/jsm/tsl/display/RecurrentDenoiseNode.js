@@ -300,12 +300,11 @@ const karisTemporalBlend = Fn( ( [ denoisedRgb, denoisedRaw, a, flickerSuppressi
 	]
 } );
 
-const toRawTexture = ( raw ) => {
+const toTextureNode = ( value ) => {
 
-	if ( raw === null ) return null;
-	if ( raw.isTextureNode === true || raw.isSampleNode === true ) return raw;
-	if ( raw.isTexture === true ) return texture( raw );
-	return convertToTexture( raw );
+	if ( value.isTexture === true ) return texture( value );
+
+	return convertToTexture( value.getTextureNode?.() ?? value );
 
 };
 
@@ -387,7 +386,7 @@ class RecurrentDenoiseNode extends TempNode {
 		this.textureNode = inputTexture;
 		this.depthNode = depth !== null ? nodeObject( depth ) : null;
 		this.normalNode = normal !== null ? nodeObject( normal ) : null;
-		this.rawNode = toRawTexture( raw );
+		this.rawNode = toTextureNode( raw );
 		this.roughnessMetalnessNode = metalRoughness !== null ? nodeObject( metalRoughness ) : null;
 		this.diffuseNode = diffuse !== null ? nodeObject( diffuse ) : null;
 
@@ -484,6 +483,12 @@ class RecurrentDenoiseNode extends TempNode {
 		}
 
 		if ( frame.frameId !== undefined ) this._noiseIndex.value = frame.frameId;
+
+		// Denoise renders via an internal _quadMesh, not through the RenderPipeline output graph.
+		// Upstream passes (e.g. TemporalReprojectNode) referenced by a PassTextureNode input are
+		// otherwise never scheduled, their updateBefore() would not run and this pass would sample
+		// a stale/empty render target.
+		if ( this.textureNode.isPassTextureNode === true ) frame.updateBeforeNode( this.textureNode.passNode );
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
@@ -887,7 +892,7 @@ export default RecurrentDenoiseNode;
  * @returns {RecurrentDenoiseNode}
  */
 export const recurrentDenoise = ( inputTexture, camera, options = {} ) => nodeObject( new RecurrentDenoiseNode(
-	convertToTexture( inputTexture ),
+	toTextureNode( inputTexture ),
 	camera,
 	options
 ) );

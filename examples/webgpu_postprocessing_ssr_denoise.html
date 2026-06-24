@@ -298,12 +298,10 @@
 			} );
 			temporalReprojectNode.toInspector( 'Temporal Reproject' );
 
-			const ssrFullResTexture = ssrNode.getRenderTarget().texture;
-
 			denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
 				depth: scenePassDepth,
 				normal: scenePassNormal,
-				raw: ssrFullResTexture,
+				raw: ssrNode,
 				metalRoughness: scenePassMetalRough,
 				mode: 'specular',
 				accumulate: true,
