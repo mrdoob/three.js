@@ -52,6 +52,7 @@ An Approach to Productive and Maintainable Shader Creation.
 - [Storage](#storage)
 - [Struct](#struct)
 - [Flow Control](#flow-control)
+- [Override Node](#override-node)
 - [Fog](#fog)
 - [Color Adjustments](#color-adjustments)
 - [Utilities](#utilities)
@@ -903,6 +904,8 @@ The module also provides `Break()` and `Continue()` TSL expression for loop cont
 | `step( edge, x )` | Generate a step function by comparing two values. |
 | `tan( x )` | Return the tangent of the parameter. |
 | `transformDirection( dir, matrix )` | Transform the direction of a vector by a matrix and then normalize the result. |
+| `transformNormalByViewMatrix( normal, viewMatrix )` | Transform a normal vector (given in world space) by the view matrix and normalize the result. |
+| `transformNormalByInverseViewMatrix( normal, viewMatrix )` | Transform a normal vector (given in view space) by the inverse of the view matrix and normalize the result. |
 | `trunc( x )` | Truncate the parameter, removing the fractional part. |
 
 ```js
@@ -1086,6 +1089,7 @@ Screen nodes will return the values related to the current `frame buffer`, eithe
 | `spherizeUV( uv, strength, centerNode = vec2( 0.5 ) )` | Distorts UV coordinates with a spherical effect around a center point. | `vec2` |
 | `spritesheetUV( count, uv = uv(), frame = float( 0 ) )` | Computes UV coordinates for a sprite sheet based on the number of frames, UV coordinates, and frame index. | `vec2` |
 | `equirectUV( direction = positionWorldDirection )` | Computes UV coordinates for equirectangular mapping based on the direction vector. | `vec2` |
+| `equirectDirection( uv = uv() )` | Computes a direction vector from the given equirectangular UV coordinates (inverse of `equirectUV`). | `vec3` |
 
 ```js
 import { texture, matcapUV } from 'three/tsl';
@@ -1420,6 +1424,35 @@ const customFragment = Fn( () => {
 material.colorNode = customFragment();
 ```
 
+## Override Node
+
+Override nodes allow you to replace specific target nodes within a node sub-graph or flow dynamically during compilation, without having to reconstruct or duplicate the source nodes. This is useful, for example, to inject a custom `positionLocal` or normal into an existing flow through the material's `contextNode`.
+
+| Name | Description |
+| -- | -- |
+| `overrideNode( targetNode, callback = null, flowNode = null )` | Overrides a single target node. `callback` returns the overriding node (receiving the builder as argument) or can be the overriding node itself. |
+| `overrideNodes( overrides, flowNode = null )` | Overrides multiple target nodes at once using a `Map` or an array of `[ targetNode, callback \| node ]` pairs. |
+
+Example:
+
+```js
+import { overrideNode, overrideNodes, positionLocal, positionView, vec3 } from 'three/tsl';
+
+const customPositionView = positionLocal.add( vec3( 1, 0, 0 ) );
+
+// Override a single node through the material context
+material.contextNode = overrideNode( positionLocal, () => positionLocal.add( vec3( 1, 0, 0 ) ) );
+
+// Override multiple nodes at once
+material.contextNode = overrideNodes( [
+	[ positionView, customPositionView ],
+	[ positionLocal, ( builder ) => positionLocal.add( vec3( 1, 0, 0 ) ) ]
+] );
+
+// Method chaining is also supported
+node.overrideNode( positionLocal, () => positionLocal.add( vec3( 1, 0, 0 ) ) );
+```
+
 ## Fog
 
 Functions for creating fog effects in the scene. Assign the fog node to `scene.fogNode`.
@@ -1477,6 +1510,7 @@ Utility functions for common shader tasks.
 | -- | -- | -- |
 | `billboarding( { position, horizontal, vertical } )` | Orients flat meshes always towards the camera. `position`: vertex positions in world space (default: `null`). `horizontal`: follow camera horizontally (default: `true`). `vertical`: follow camera vertically (default: `false`). | `vec3` |
 | `checker( coord )` | Creates a 2x2 checkerboard pattern. | `float` |
+| `negateOnBackSide( vector )` | Negates a vector when rendering the back side of a face, according to the material's `side` configuration (`BackSide`, `DoubleSide` or `FrontSide`). | `vec3` |
 
 Example:
 
