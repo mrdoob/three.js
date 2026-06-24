@@ -44,7 +44,6 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
-			import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 			import { CityGenerator, createBuildingMaterial, createRoadMaterial } from 'three/addons/generators/CityGenerator.js';
 
 			let camera, scene, renderer, controls;
@@ -60,7 +59,7 @@
 
 			async function init() {
 
-				renderer = new THREE.WebGPURenderer( { antialias: false } ); // AA is handled by the SMAA post pass
+				renderer = new THREE.WebGPURenderer( { antialias: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -139,7 +138,7 @@
 
 				renderPipeline = new THREE.RenderPipeline( renderer );
 
-				const scenePassColor = smaa( pass( scene, camera ).getTextureNode( 'output' ) ); // AA first, so bloom isn't built from aliased highlights
+				const scenePassColor = pass( scene, camera ).getTextureNode( 'output' );
 				const bloomPass = bloom( scenePassColor, 0.05, 0.0, 0.0 );
 
 				renderPipeline.outputNode = scenePassColor.add( bloomPass );
