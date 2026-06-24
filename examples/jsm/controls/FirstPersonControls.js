@@ -193,10 +193,14 @@ class FirstPersonControls extends Controls {
 		window.addEventListener( 'keydown', this._onKeyDown );
 		window.addEventListener( 'keyup', this._onKeyUp );
 
-		this.domElement.addEventListener( 'pointermove', this._onPointerMove );
 		this.domElement.addEventListener( 'pointerdown', this._onPointerDown );
-		this.domElement.addEventListener( 'pointerup', this._onPointerUp );
 		this.domElement.addEventListener( 'contextmenu', this._onContextMenu );
+
+		const { ownerDocument } = this.domElement;
+
+		ownerDocument.addEventListener( 'pointermove', this._onPointerMove );
+		ownerDocument.addEventListener( 'pointerup', this._onPointerUp );
+		ownerDocument.addEventListener( 'pointercancel', this._onPointerUp );
 
 		this.domElement.style.touchAction = 'none'; // Disable touch scroll
 
@@ -207,10 +211,14 @@ class FirstPersonControls extends Controls {
 		window.removeEventListener( 'keydown', this._onKeyDown );
 		window.removeEventListener( 'keyup', this._onKeyUp );
 
-		this.domElement.removeEventListener( 'pointermove', this._onPointerMove );
 		this.domElement.removeEventListener( 'pointerdown', this._onPointerDown );
-		this.domElement.removeEventListener( 'pointerup', this._onPointerUp );
 		this.domElement.removeEventListener( 'contextmenu', this._onContextMenu );
+
+		const { ownerDocument } = this.domElement;
+
+		ownerDocument.removeEventListener( 'pointermove', this._onPointerMove );
+		ownerDocument.removeEventListener( 'pointerup', this._onPointerUp );
+		ownerDocument.removeEventListener( 'pointercancel', this._onPointerUp );
 
 		this.domElement.style.touchAction = ''; // Restore touch scroll
 
@@ -384,6 +392,8 @@ function onPointerDown( event ) {
 }
 
 function onPointerUp( event ) {
+
+	if ( this.mouseDragOn === false ) return;
 
 	this.domElement.releasePointerCapture( event.pointerId );
 
