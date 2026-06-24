@@ -76,7 +76,7 @@
 			const hzbKernels = [];
 			const MAX_HZB_LEVELS = 16;
 
-			const instanceCount = 129600; // 360x360 plane or 60x36x60 volume
+			const instanceCount = 15625; // 125x125 plane or 25x25x25 volume
 
 			const MAX_RASTER_SIZE = 32;
 
@@ -434,13 +434,13 @@
 
 					if ( options.Grid === 'XZ' ) {
 
-						for ( let x = 0; x < 360; x ++ ) {
+						for ( let x = 0; x < 125; x ++ ) {
 
-							for ( let z = 0; z < 360; z ++ ) {
+							for ( let z = 0; z < 125; z ++ ) {
 
-								staticInstanceData[ dataIndex ++ ] = ( x - 180 ) * 4.0;
+								staticInstanceData[ dataIndex ++ ] = ( x - 62 ) * 4.0;
 								staticInstanceData[ dataIndex ++ ] = - 1;
-								staticInstanceData[ dataIndex ++ ] = ( z - 180 ) * 4.0;
+								staticInstanceData[ dataIndex ++ ] = ( z - 62 ) * 4.0;
 								staticInstanceData[ dataIndex ++ ] = 1.0; // scale
 
 							}
@@ -453,15 +453,15 @@
 
 					} else {
 
-						for ( let x = 0; x < 60; x ++ ) {
+						for ( let x = 0; x < 25; x ++ ) {
 
-							for ( let y = 0; y < 36; y ++ ) {
+							for ( let y = 0; y < 25; y ++ ) {
 
-								for ( let z = 0; z < 60; z ++ ) {
+								for ( let z = 0; z < 25; z ++ ) {
 
-									staticInstanceData[ dataIndex ++ ] = ( x - 30 ) * 4.0;
-									staticInstanceData[ dataIndex ++ ] = ( y - 18 ) * 4.0;
-									staticInstanceData[ dataIndex ++ ] = ( z - 30 ) * 4.0;
+									staticInstanceData[ dataIndex ++ ] = ( x - 12 ) * 4.0;
+									staticInstanceData[ dataIndex ++ ] = ( y - 12 ) * 4.0;
+									staticInstanceData[ dataIndex ++ ] = ( z - 12 ) * 4.0;
 									staticInstanceData[ dataIndex ++ ] = 1.0; // scale
 
 								}
