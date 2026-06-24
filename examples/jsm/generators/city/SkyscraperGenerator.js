@@ -1270,7 +1270,7 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	// the merged geometry carries a per-vertex partId; this material reads it and
 	// branches to reproduce each zone — no per-part materials, compute-raster friendly
 
-	const partId = attribute( 'partId', 'float' );
+	const partId = varying( attribute( 'partId', 'float' ) ).setInterpolation( InterpolationSamplingType.FLAT, InterpolationSamplingMode.EITHER ); // flat: a per-face id must not interpolate, or equal() below misses on the rounding
 	const isGlass = partId.equal( GLASS );
 	const isFrame = partId.equal( FRAME );
 	const isOrnament = partId.equal( ORNAMENT );
