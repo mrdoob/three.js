@@ -102,32 +102,8 @@ export function info( parentNode, text ) {
 
 		const rect = infoIcon.getBoundingClientRect();
 
-		// Determine the width and height of the tooltip to adjust boundaries
-		const tooltipWidth = tooltip.offsetWidth;
-		const tooltipHeight = tooltip.offsetHeight;
-		const margin = 10;
-
-		// Horizontal alignment
-		const halfWidth = tooltipWidth / 2;
-		const targetLeft = rect.left + rect.width / 2;
-		const clampedLeft = Math.max( margin + halfWidth, Math.min( window.innerWidth - margin - halfWidth, targetLeft ) );
-		tooltip.style.left = clampedLeft + 'px';
-
-		// Vertical alignment: prefer above if it fits, else check if below fits better
-		const fitsAbove = ( rect.top - 8 - tooltipHeight >= margin );
-		const fitsBelow = ( rect.bottom + 8 + tooltipHeight <= window.innerHeight - margin );
-
-		if ( ! fitsAbove && ( fitsBelow || ( window.innerHeight - rect.bottom > rect.top ) ) ) {
-
-			tooltip.style.top = ( rect.bottom + 8 ) + 'px';
-			tooltip.style.transform = 'translate(-50%, 0)';
-
-		} else {
-
-			tooltip.style.top = ( rect.top - 8 ) + 'px';
-			tooltip.style.transform = 'translate(-50%, -100%)';
-
-		}
+		tooltip.style.left = ( rect.left + rect.width / 2 ) + 'px';
+		tooltip.style.top = ( rect.top - 8 ) + 'px';
 
 		tooltip.style.opacity = '1';
 		tooltip.style.visibility = 'visible';
