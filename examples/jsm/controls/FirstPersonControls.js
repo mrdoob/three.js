@@ -9,6 +9,7 @@ const _lookDirection = new Vector3();
 const _spherical = new Spherical();
 const _target = new Vector3();
 const _targetPosition = new Vector3();
+const _targetVelocity = new Vector3();
 
 /**
  * This class is an alternative implementation of {@link FlyControls}.
@@ -43,6 +44,15 @@ class FirstPersonControls extends Controls {
 		 * @default 0.005
 		 */
 		this.lookSpeed = 0.005;
+
+		/**
+		 * How quickly the movement and look velocity catches up to the input. Lower
+		 * values feel heavier (more inertia), `1` disables damping.
+		 *
+		 * @type {number}
+		 * @default 0.1
+		 */
+		this.dampingFactor = 0.1;
 
 		/**
 		 * Whether it's possible to vertically look around or not.
@@ -128,7 +138,7 @@ class FirstPersonControls extends Controls {
 
 		// internals
 
-		this._autoSpeedFactor = 0.0;
+		this._velocity = new Vector3();
 
 		this._pointerX = 0;
 		this._pointerY = 0;
@@ -146,9 +156,14 @@ class FirstPersonControls extends Controls {
 		this._pointerBackward = false;
 		this._moveLeft = false;
 		this._moveRight = false;
+		this._moveUp = false;
+		this._moveDown = false;
 
 		this._lat = 0;
 		this._lon = 0;
+
+		this._lonVelocity = 0;
+		this._latVelocity = 0;
 
 		// event listeners
 
@@ -239,34 +254,35 @@ class FirstPersonControls extends Controls {
 
 		if ( this.enabled === false ) return;
 
-		if ( this.heightSpeed ) {
-
-			const y = MathUtils.clamp( this.object.position.y, this.heightMin, this.heightMax );
-			const heightDelta = y - this.heightMin;
-
-			this._autoSpeedFactor = delta * ( heightDelta * this.heightCoef );
-
-		} else {
-
-			this._autoSpeedFactor = 0.0;
-
-		}
-
-		const actualMoveSpeed = delta * this.movementSpeed;
-
 		const moveForward = this._keyForward || this._pointerForward;
 		const moveBackward = this._keyBackward || this._pointerBackward;
 
-		if ( moveForward || ( this.autoForward && ! moveBackward ) ) this.object.translateZ( - ( actualMoveSpeed + this._autoSpeedFactor ) );
-		if ( moveBackward ) this.object.translateZ( actualMoveSpeed );
+		const forward = moveForward || ( this.autoForward && ! moveBackward );
 
-		if ( this._moveLeft ) this.object.translateX( - actualMoveSpeed );
-		if ( this._moveRight ) this.object.translateX( actualMoveSpeed );
+		// target velocity in the object's local space
 
-		if ( this._moveUp ) this.object.translateY( actualMoveSpeed );
-		if ( this._moveDown ) this.object.translateY( - actualMoveSpeed );
+		_targetVelocity.set(
+			( this._moveRight ? 1 : 0 ) - ( this._moveLeft ? 1 : 0 ),
+			( this._moveUp ? 1 : 0 ) - ( this._moveDown ? 1 : 0 ),
+			( moveBackward ? 1 : 0 ) - ( forward ? 1 : 0 )
+		).multiplyScalar( this.movementSpeed );
 
-		const actualLookSpeed = delta * this.lookSpeed;
+		// faster forward movement the higher the camera is
+
+		if ( forward && this.heightSpeed ) {
+
+			const y = MathUtils.clamp( this.object.position.y, this.heightMin, this.heightMax );
+			_targetVelocity.z -= ( y - this.heightMin ) * this.heightCoef;
+
+		}
+
+		// ease toward the target velocity for smooth acceleration and deceleration
+
+		this._velocity.lerp( _targetVelocity, this.dampingFactor );
+
+		this.object.translateX( this._velocity.x * delta );
+		this.object.translateY( this._velocity.y * delta );
+		this.object.translateZ( this._velocity.z * delta );
 
 		let verticalLookRatio = 1;
 
@@ -276,12 +292,16 @@ class FirstPersonControls extends Controls {
 
 		}
 
-		if ( this.mouseDragOn ) {
+		// target look velocity, zero when not dragging so the view eases to a stop
 
-			this._lon -= this._pointerX * actualLookSpeed;
-			if ( this.lookVertical ) this._lat -= this._pointerY * actualLookSpeed * verticalLookRatio;
+		const targetLon = this.mouseDragOn ? - this._pointerX * this.lookSpeed : 0;
+		const targetLat = ( this.mouseDragOn && this.lookVertical ) ? - this._pointerY * this.lookSpeed * verticalLookRatio : 0;
 
-		}
+		this._lonVelocity = MathUtils.lerp( this._lonVelocity, targetLon, this.dampingFactor );
+		this._latVelocity = MathUtils.lerp( this._latVelocity, targetLat, this.dampingFactor );
+
+		this._lon += this._lonVelocity * delta;
+		this._lat += this._latVelocity * delta;
 
 		this._lat = Math.max( - 85, Math.min( 85, this._lat ) );
 
