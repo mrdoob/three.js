@@ -16,8 +16,6 @@ import {
 	RGIntegerFormat,
 	RGBFormat,
 	RGBIntegerFormat,
-	RGBAFormat,
-	RGBAIntegerFormat,
 	DepthFormat,
 	DepthStencilFormat
 } from '../../constants.js';
