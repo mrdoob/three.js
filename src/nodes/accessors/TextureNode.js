@@ -555,7 +555,7 @@ class TextureNode extends UniformNode {
 
 			const nodeData = builder.getDataFromNode( this );
 
-			let nodeType = this.getNodeType( builder );
+			const nodeType = this.getNodeType( builder );
 
 			let propertyName = nodeData.propertyName;
 
