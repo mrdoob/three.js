@@ -447,8 +447,8 @@ function onKeyDown( event ) {
 		case 'ArrowRight':
 		case 'KeyD': this._moveRight = true; break;
 
-		case 'KeyR': this._moveUp = true; break;
-		case 'KeyF': this._moveDown = true; break;
+		case 'KeyE': this._moveUp = true; break;
+		case 'KeyQ': this._moveDown = true; break;
 
 	}
 
@@ -470,8 +470,8 @@ function onKeyUp( event ) {
 		case 'ArrowRight':
 		case 'KeyD': this._moveRight = false; break;
 
-		case 'KeyR': this._moveUp = false; break;
-		case 'KeyF': this._moveDown = false; break;
+		case 'KeyE': this._moveUp = false; break;
+		case 'KeyQ': this._moveDown = false; break;
 
 	}
 
