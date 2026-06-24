@@ -35,9 +35,13 @@ let _ring = new Float32Array( 0 );
  * Parameters are set with a fluent builder: a `set<Param>()` exists for every default
  * ( `setSeed`, `setLevels`, `setChildren`, … ), each returning `this` for chaining.
  *
+ * Each `build()` returns a fresh, independent mesh that the caller owns, so one
+ * generator can be re-parametrized and built repeatedly to grow a varied stand:
+ *
  * ```js
  * const generator = new TreeGenerator( material );
- * const mesh = generator.setSeed( 1 ).setLevels( 4 ).build();
+ * const oak = generator.setSeed( 1 ).setLevels( 4 ).build();
+ * const pine = generator.setSeed( 2 ).setLevels( 5 ).build();
  * ```
  */
 class TreeGenerator {
@@ -46,8 +50,6 @@ class TreeGenerator {
 
 		this.material = material;
 		this.parameters = {}; // overrides; defaults fill the rest at build time
-
-		this.mesh = null;
 
 	}
 
@@ -79,19 +81,7 @@ class TreeGenerator {
 		const mesh = new Mesh( geometry, this.material || createTreeMaterial() );
 		mesh.name = 'Tree';
 
-		this.dispose();
-		this.mesh = mesh;
-
 		return mesh;
-
-	}
-
-	dispose() {
-
-		if ( this.mesh === null ) return;
-
-		this.mesh.geometry.dispose();
-		this.mesh = null;
 
 	}
 
@@ -150,7 +140,7 @@ function growBranch( tubes, base, dir, length, baseRadius, level, p, random ) {
 	const start = level === 0 ? p.trunkClear : p.childStart; // the trunk carries a clean bole below its crown
 
 	let tangent = dir.clone().normalize();
-	let normal = perpendicular( tangent );
+	const normal = perpendicular( tangent );
 
 	const rings = [];
 	const pos = base.clone();

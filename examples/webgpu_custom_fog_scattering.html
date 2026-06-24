@@ -78,9 +78,11 @@
 
 				const variants = [];
 
+				const generator = new TreeGenerator( material );
+
 				for ( let v = 0; v < 6; v ++ ) {
 
-					const mesh = new TreeGenerator( material )
+					const mesh = generator
 						.setSeed( v + 1 )
 						.setTrunkLength( 2.6 + v * 0.3 ) // the crowns ride high in the fog
 						.setTrunkRadius( 0.06 )
