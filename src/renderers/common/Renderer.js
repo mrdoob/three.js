@@ -2161,7 +2161,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-				throw new Error( 'THREE.Renderer: .resetState() called before the backend is initialized. Use "await renderer.init();" before using this method.' );
+			throw new Error( 'THREE.Renderer: .resetState() called before the backend is initialized. Use "await renderer.init();" before using this method.' );
 
 		}
 
