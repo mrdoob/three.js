@@ -1269,27 +1269,3 @@ export const split = ( node, channels ) => new SplitNode( nodeObject( node ), ch
 
 addMethodChaining( 'element', element );
 addMethodChaining( 'convert', convert );
-
-// deprecated
-
-/**
- * @tsl
- * @function
- * @deprecated since r176. Use {@link Stack} instead.
- *
- * @param {Node} node - The node to add.
- * @returns {Function}
- */
-export const append = ( node ) => { // @deprecated, r176
-
-	warn( 'TSL: append() has been renamed to Stack().', new StackTrace() );
-	return Stack( node );
-
-};
-
-addMethodChaining( 'append', ( node ) => { // @deprecated, r176
-
-	warn( 'TSL: .append() has been renamed to .toStack().', new StackTrace() );
-	return Stack( node );
-
-} );
