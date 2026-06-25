@@ -1,12 +1,9 @@
 import Node from '../core/Node.js';
-import StackTrace from '../core/StackTrace.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
-import { Fn, nodeImmutable, vec2 } from '../tsl/TSLBase.js';
-
+import { nodeImmutable, vec2 } from '../tsl/TSLBase.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
-import { warn } from '../../utils.js';
 
 let _screenSizeVec, _viewportVec;
 
@@ -278,15 +275,3 @@ export const viewportCoordinate = /*@__PURE__*/ screenCoordinate.sub( viewport.x
  */
 export const viewportUV = /*@__PURE__*/ viewportCoordinate.div( viewportSize );
 
-// Deprecated
-
-/**
- * @deprecated since r169. Use {@link screenSize} instead.
- */
-export const viewportResolution = /*@__PURE__*/ ( Fn( () => { // @deprecated, r169
-
-	warn( 'TSL: "viewportResolution" is deprecated. Use "screenSize" instead.', new StackTrace() );
-
-	return screenSize;
-
-}, 'vec2' ).once() )();
