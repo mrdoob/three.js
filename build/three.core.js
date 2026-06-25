@@ -3,7 +3,7 @@
  * Copyright 2010-2026 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '185dev';
+const REVISION = '185';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
