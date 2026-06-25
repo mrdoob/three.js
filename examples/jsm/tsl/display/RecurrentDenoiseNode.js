@@ -401,7 +401,7 @@ class RecurrentDenoiseNode extends TempNode {
 		this.alphaPhi = uniform( 1 );
 		this.roughnessPhi = uniform( 100 );
 		this.diffusePhi = uniform( 100 );
-		this.radiusAdapt = uniform( 0.95 );
+		this.adapt = uniform( 0.5 );
 		this.smoothDisocclusions = uniform( true, 'bool' );
 		this.strength = uniform( 0.25 );
 		this.maxFrames = uniform( 32 );
@@ -722,6 +722,10 @@ class RecurrentDenoiseNode extends TempNode {
 				const centerDiffuse = sampleDiffuse( uvCoord ).toConst();
 				const radiusShrink = float( 1 ).toVar();
 
+				// Directional analog of radiusShrink: an accumulated tangent-space shift that skews
+				// subsequent taps toward directions that yielded high weight (related geometry).
+				const polarBias = vec2( 0 ).toVar();
+
 				const depthWeightScale = this.depthPhi.mul( 500 ).mul( viewNormal.z.abs() ).div( viewPosition.z.abs() );
 
 				// Lobe geometry depends only on per-pixel terms, so compute its falloff constant once here.
@@ -729,8 +733,13 @@ class RecurrentDenoiseNode extends TempNode {
 
 				Loop( { start: int( 0 ), end: int( KERNEL_SAMPLES ), type: 'int', condition: '<', name: 'i' }, ( { i } ) => {
 
-					const offset = vogelDisk( float( i ), 1 ).toVar();
-					offset.assign( rotationMatrix.mul( radiusShrink ).mul( offset ) );
+					const baseOffset = vogelDisk( float( i ), 1 ).toVar();
+					const sampleDir = baseOffset.normalize().toConst();
+
+					// Blend the tap direction toward the polar bias, then restore the Vogel radius and shrink.
+					const skewedDir = mix( sampleDir, polarBias.normalize(), this.adapt.mul( aggressivity )
+						.mul( polarBias.dot( polarBias ).greaterThan( 0.001 ).select( 1, 0 ) ) );
+					const offset = rotationMatrix.mul( skewedDir.mul( baseOffset.length().mul( radiusShrink ) ) ).toVar();
 
 					// Exact per-sample view-space projection (both paths)
 					const sampleViewPos = viewPosition.add( B.mul( offset.x ).add( T.mul( offset.y ) ) );
@@ -798,7 +807,10 @@ class RecurrentDenoiseNode extends TempNode {
 					const w = exp( kernelDiff.mul( aggressivity ).add( depthDiff ).negate() ).mul( normalW ).toVar();
 
 					// Feedback to shrink radius based on the weight
-					radiusShrink.assign( mix( radiusShrink, w, this.radiusAdapt ) );
+					radiusShrink.assign( mix( radiusShrink, w, this.adapt ) );
+
+					// Polar feedback: skew subsequent taps toward high-weight directions (related geometry)
+					polarBias.assign( mix( polarBias, sampleDir.mul( w.sub( 0.5 ) ), 0.5 ) );
 
 					// to mitigate the effect of fireflies and high variance in recently disoccluded regions, we weigh by the inverse luminance for the first 5 frames
 					w.mulAssign( mix( float( 1 ).div( luminance( rawNeighborColor.rgb ).pow( 2 ).add( 0.01 ) ), 1, frameNum.div( 5 ).min( 1 ) ) );

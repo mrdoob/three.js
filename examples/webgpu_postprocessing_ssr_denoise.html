@@ -158,7 +158,7 @@
 				radius: 1.5,
 				alphaPhi: 5,
 				strength: 0.725,
-				radiusAdapt: 0.5,
+				adapt: 0.5,
 				smoothDisocclusions: true,
 				flickerSuppression: 1,
 				adaptiveTrust: 1
@@ -384,9 +384,9 @@
 			denoiseGui.add( params.denoise, 'alphaPhi', 0, 15 ).name( 'ray length phi' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'radius', 0, 3 ).name( 'radius' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'strength', 0.5, 0.95 ).name( 'strength' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'adapt', 0, 1 ).name( 'adapt' ).onChange( applyParams );
 
 			// Extra options that are not used in this example
-			// denoiseGui.add( params.denoise, 'radiusAdapt', 0, 1 ).name( 'adapt radius' ).onChange( applyParams );
 			// denoiseGui.add( params.denoise, 'smoothDisocclusions' ).name( 'smooth disocclusions' ).onChange( applyParams );
 			// denoiseGui.add( params.denoise, 'flickerSuppression', 0, 1 ).name( 'flicker suppression' ).onChange( applyParams );
 			// denoiseGui.add( params.denoise, 'adaptiveTrust', 0, 1 ).name( 'adaptive trust' ).onChange( applyParams );
@@ -450,7 +450,7 @@
 				denoiseNode.radius.value = params.denoise.enabled ? params.denoise.radius : 0;
 				denoiseNode.alphaPhi.value = params.denoise.alphaPhi;
 				denoiseNode.strength.value = params.denoise.strength;
-				denoiseNode.radiusAdapt.value = params.denoise.radiusAdapt;
+				denoiseNode.adapt.value = params.denoise.adapt;
 				denoiseNode.smoothDisocclusions.value = params.denoise.smoothDisocclusions;
 				denoiseNode.flickerSuppression.value = params.denoise.flickerSuppression;
 				denoiseNode.adaptiveTrust.value = params.denoise.adaptiveTrust;

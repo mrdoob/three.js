@@ -854,7 +854,7 @@ class TemporalReprojectNode extends TempNode {
 				const minConfHit = hit.get( 'minConfidence' );
 
 				const reflectionEdgeFactor = neighborhood.get( 'stdDevRayLength' );
-				reflectionEdgeFactor.assign( reflectionEdgeFactor.mul( motionFactor.mul( 100 ).min( 1 ) ).mul( 2 ).min( 1 ).oneMinus() );
+				reflectionEdgeFactor.assign( reflectionEdgeFactor.mul( motionFactor.mul( 100 ).min( 1 ) ).mul( 3.5 ).min( 1 ).oneMinus() );
 
 				const curvatureFactor = fwidth( worldNormal.xyz ).length().mul( 50 ).clamp();
 
