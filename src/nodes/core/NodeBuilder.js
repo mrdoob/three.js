@@ -2281,6 +2281,7 @@ class NodeBuilder {
 
 		const shaderStage = this.shaderStage;
 		const declarations = this.declarations[ shaderStage ] || ( this.declarations[ shaderStage ] = {} );
+		const checkKeywords = this.renderer.debug.diagnostics.keywords;
 
 		const baseName = node.name;
 
@@ -2290,7 +2291,7 @@ class NodeBuilder {
 
 		// Automatically renames the property if the name is already in use or reserved.
 
-		while ( this.isReservedKeyword( name ) || declarations[ property ] !== undefined ) {
+		while ( ( checkKeywords && this.isReservedKeyword( name ) ) || declarations[ property ] !== undefined ) {
 
 			name = baseName + '_' + index ++;
 			node.name = name;
