@@ -104,7 +104,6 @@ export * from './loaders/LUT3dlLoader.js';
 export * from './loaders/LUTCubeLoader.js';
 export * from './loaders/LUTImageLoader.js';
 export * from './loaders/LWOLoader.js';
-export * from './loaders/LottieLoader.js';
 export * from './loaders/MD2Loader.js';
 export * from './loaders/MDDLoader.js';
 export * from './loaders/MTLLoader.js';
