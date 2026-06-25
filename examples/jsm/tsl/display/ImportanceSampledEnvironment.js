@@ -329,7 +329,7 @@ class ImportanceSampledEnvironment {
 	}
 
 	/**
-	 * @param {import('three').Texture} hdr - Equirectangular HDR environment map.
+	 * @param {Texture} hdr - Equirectangular HDR environment map.
 	 */
 	updateFrom( hdr ) {
 
@@ -388,10 +388,10 @@ class ImportanceSampledEnvironment {
 	 * Simple environment lookup along the reflected direction (no MIS).
 	 *
 	 * @param {Object} params
-	 * @param {import('three/tsl').UniformNode<import('three').Matrix4>} params.cameraWorldMatrix
-	 * @param {import('three/tsl').Node<vec3>} params.viewReflectDir
-	 * @param {import('three/tsl').Node<float>} [params.sampleWeight] - Optional radiance scale (defaults to 1).
-	 * @return {import('three/tsl').Node<vec3>}
+	 * @param {UniformNode<Matrix4>} params.cameraWorldMatrix
+	 * @param {Node<vec3>} params.viewReflectDir
+	 * @param {Node<float>} [params.sampleWeight] - Optional radiance scale (defaults to 1).
+	 * @return {Node<vec3>}
 	 */
 	sampleReflect( { cameraWorldMatrix, viewReflectDir, sampleWeight = float( 1 ) } ) {
 
@@ -409,13 +409,13 @@ class ImportanceSampledEnvironment {
 	 * Environment reflection for a screen-space miss using only the BRDF / reflected-ray direction.
 	 *
 	 * @param {Object} params
-	 * @param {import('three/tsl').UniformNode<import('three').Matrix4>} params.cameraWorldMatrix
-	 * @param {import('three/tsl').Node<vec3>} params.viewReflectDir - View-space GGX-sampled reflected ray.
-	 * @param {import('three/tsl').Node<vec3>} params.N - View-space shading normal.
-	 * @param {import('three/tsl').Node<vec3>} params.V - View-space direction to camera.
-	 * @param {import('three/tsl').Node<float>} params.alpha - GGX roughness (alpha).
-	 * @param {import('three/tsl').Node<vec3>} params.f0
-	 * @return {import('three/tsl').Node<vec3>}
+	 * @param {UniformNode<Matrix4>} params.cameraWorldMatrix
+	 * @param {Node<vec3>} params.viewReflectDir - View-space GGX-sampled reflected ray.
+	 * @param {Node<vec3>} params.N - View-space shading normal.
+	 * @param {Node<vec3>} params.V - View-space direction to camera.
+	 * @param {Node<float>} params.alpha - GGX roughness (alpha).
+	 * @param {Node<vec3>} params.f0
+	 * @return {Node<vec3>}
 	 */
 	sampleEnvironmentBRDF( {
 		cameraWorldMatrix,
@@ -455,14 +455,14 @@ class ImportanceSampledEnvironment {
 	 * @see {@link https://github.com/gkjohnson/three-gpu-pathtracer}
 	 *
 	 * @param {Object} params
-	 * @param {import('three/tsl').UniformNode<import('three').Matrix4>} params.cameraWorldMatrix
-	 * @param {import('three/tsl').Node<vec3>} params.viewReflectDir - View-space GGX-sampled reflected ray.
-	 * @param {import('three/tsl').Node<vec3>} params.N - View-space shading normal.
-	 * @param {import('three/tsl').Node<vec3>} params.V - View-space direction to camera.
-	 * @param {import('three/tsl').Node<float>} params.alpha - GGX roughness (alpha).
-	 * @param {import('three/tsl').Node<vec3>} params.f0
-	 * @param {import('three/tsl').Node<vec4>} params.Xi2 - Second blue-noise sample (zw used for the CDF).
-	 * @return {import('three/tsl').Node<vec3>}
+	 * @param {UniformNode<Matrix4>} params.cameraWorldMatrix
+	 * @param {Node<vec3>} params.viewReflectDir - View-space GGX-sampled reflected ray.
+	 * @param {Node<vec3>} params.N - View-space shading normal.
+	 * @param {Node<vec3>} params.V - View-space direction to camera.
+	 * @param {Node<float>} params.alpha - GGX roughness (alpha).
+	 * @param {Node<vec3>} params.f0
+	 * @param {Node<vec4>} params.Xi2 - Second blue-noise sample (zw used for the CDF).
+	 * @return {Node<vec3>}
 	 */
 	sampleEnvironmentMIS( {
 		cameraWorldMatrix,

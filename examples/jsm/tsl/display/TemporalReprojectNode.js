@@ -58,8 +58,8 @@ const projectWorldToUV = Fn( ( [ worldPos, previousViewMatrix, previousProjectio
 // YCoCg variance clipping
 
 /**
- * @param {import('three/tsl').Node<vec3>} c
- * @returns {import('three/tsl').Node<vec3>}
+ * @param {Node<vec3>} c
+ * @returns {Node<vec3>}
  */
 const rgbToYCoCg = ( c ) => vec3(
 	dot( c, vec3( 0.25, 0.5, 0.25 ) ),
@@ -68,8 +68,8 @@ const rgbToYCoCg = ( c ) => vec3(
 );
 
 /**
- * @param {import('three/tsl').Node<vec3>} c
- * @returns {import('three/tsl').Node<vec3>}
+ * @param {Node<vec3>} c
+ * @returns {Node<vec3>}
  */
 const ycocgToRGB = ( c ) => vec3(
 	c.x.add( c.y ).sub( c.z ),
@@ -84,9 +84,9 @@ const VARIANCE_CLIP_LUMA_SCALE = 10;
  * Bright samples contribute less to neighbourhood moments so sun pixels do not
  * inflate the YCoCg AABB and cause aggressive clipping flicker.
  *
- * @param {import('three/tsl').Node<vec3>} rgb
- * @param {import('three/tsl').Node<float>} flickerSuppression
- * @returns {import('three/tsl').Node<vec3>}
+ * @param {Node<vec3>} rgb
+ * @param {Node<float>} flickerSuppression
+ * @returns {Node<vec3>}
  */
 const dampenForVarianceClip = ( rgb, flickerSuppression ) => {
 
@@ -270,8 +270,8 @@ const sampleBilinearTap = Fn( ( [
 
 /**
  * @param {Object} ctx - Shared {@link sampleBilinearTap} inputs plus `reprojICoord`.
- * @param {import('three/tsl').Node<ivec2>} tapOffset
- * @param {import('three/tsl').Node<float>} bilinearWeight
+ * @param {Node<ivec2>} tapOffset
+ * @param {Node<float>} bilinearWeight
  */
 function bilinearHistoryTap( ctx, tapOffset, bilinearWeight ) {
 
@@ -429,7 +429,7 @@ const velocityToUVOffset = Fn( ( [ velocity ] ) => {
 /**
  * Current and previous-frame camera matrices for temporal reprojection passes.
  *
- * @param {import('three').Camera} camera
+ * @param {Camera} camera
  */
 function bindTemporalCameraUniforms( camera ) {
 
@@ -445,7 +445,7 @@ function bindTemporalCameraUniforms( camera ) {
 	const previousProjectionMatrixInverse = uniform( new Matrix4().copy( camera.projectionMatrixInverse ) );
 
 	/**
-	 * @param {import('three').Camera} cam
+	 * @param {Camera} cam
 	 */
 	function updateFromCamera( cam ) {
 
@@ -525,11 +525,11 @@ class TemporalReprojectNode extends TempNode {
 	}
 
 	/**
-	 * @param {import('three/tsl').TextureNode} beautyNode
-	 * @param {import('three/tsl').TextureNode} depthNode
-	 * @param {import('three/tsl').TextureNode} normalNode
-	 * @param {import('three/tsl').TextureNode} velocityNode
-	 * @param {import('three').Camera} camera
+	 * @param {TextureNode} beautyNode
+	 * @param {TextureNode} depthNode
+	 * @param {TextureNode} normalNode
+	 * @param {TextureNode} velocityNode
+	 * @param {Camera} camera
 	 * @param {TemporalReprojectNodeOptions} [options]
 	 */
 	constructor( beautyNode, depthNode, normalNode, velocityNode, camera, options = {} ) {
@@ -966,7 +966,7 @@ class TemporalReprojectNode extends TempNode {
 	 * Supplies an external history source (e.g. a {@link RecurrentDenoiseNode} or its
 	 * texture). Only used when {@link TemporalReprojectNode#accumulate} is `false`.
 	 *
-	 * @param {?(Object|import('three').Texture)} source
+	 * @param {?(Object|Texture)} source
 	 */
 	setHistoryTexture( source ) {
 
@@ -1005,11 +1005,11 @@ class TemporalReprojectNode extends TempNode {
 export default TemporalReprojectNode;
 
 /**
- * @param {import('three/tsl').TextureNode} beautyNode
- * @param {import('three/tsl').TextureNode} depthNode
- * @param {import('three/tsl').TextureNode} normalNode
- * @param {import('three/tsl').TextureNode} velocityNode
- * @param {import('three').Camera} camera
+ * @param {TextureNode} beautyNode
+ * @param {TextureNode} depthNode
+ * @param {TextureNode} normalNode
+ * @param {TextureNode} velocityNode
+ * @param {Camera} camera
  * @param {TemporalReprojectNodeOptions} [options]
  * @returns {TemporalReprojectNode}
  */

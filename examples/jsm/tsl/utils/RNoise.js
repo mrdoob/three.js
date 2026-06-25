@@ -6,7 +6,7 @@ import { float, Fn, fract, int, vec2, vec4 } from 'three/tsl';
  * sequence into a 64×64 period. Values are four independent R² dimensions
  * hashed from the sample coordinates.
  *
- * @param {import('three/tsl').UniformNode<import('three').Vector2>} resolution
+ * @param {UniformNode<Vector2>} resolution
  * @param {number} [seed=0] - Added to the coordinate hash so each pass gets an independent R² phase.
  */
 export function bindAnalyticNoise( resolution, seed = 0 ) {
