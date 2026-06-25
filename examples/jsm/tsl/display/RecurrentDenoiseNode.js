@@ -737,7 +737,7 @@ class RecurrentDenoiseNode extends TempNode {
 					const sampleDir = baseOffset.normalize().toConst();
 
 					// Blend the tap direction toward the polar bias, then restore the Vogel radius and shrink.
-					const skewedDir = mix( sampleDir, polarBias.normalize(), this.adapt.mul( aggressivity )
+					const skewedDir = mix( sampleDir, polarBias.max( EPSILON ).normalize(), this.adapt.mul( aggressivity )
 						.mul( polarBias.dot( polarBias ).greaterThan( 0.001 ).select( 1, 0 ) ) );
 					const offset = rotationMatrix.mul( skewedDir.mul( baseOffset.length().mul( radiusShrink ) ) ).toVar();
 
@@ -824,7 +824,7 @@ class RecurrentDenoiseNode extends TempNode {
 					// Denoising the alpha (accumulation speed), to get smoother disocclusion transitions
 					If( this.smoothDisocclusions, () => {
 
-						const neighborAWeight = neighborColor.a.greaterThan( texel.a ).select( normalW.mul( 0.25 ), 0 );
+						const neighborAWeight = neighborColor.a.greaterThan( texel.a ).select( w.mul( 0.33 ), 0 );
 						denoisedFrame.addAssign( float( 1 ).div( neighborColor.a ).mul( neighborAWeight ) );
 						totalFrameWeight.addAssign( neighborAWeight );
 
