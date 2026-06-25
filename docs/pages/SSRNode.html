@@ -22,7 +22,7 @@
 				<pre><code class="language-js">import { ssr } from 'three/addons/tsl/display/SSRNode.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="SSRNode" translate="no">new <a href="#SSRNode">SSRNode</a><span class="signature">( colorNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span>, depthNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, normalNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, metalnessNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, roughnessNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
+					<h3 class="name name-method" id="SSRNode" translate="no">new <a href="#SSRNode">SSRNode</a><span class="signature">( colorNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span>, depthNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, normalNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, options : <span class="param-type"><a href="global.html#SSRNodeOptions">SSRNodeOptions</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new SSR node.</p>
@@ -55,28 +55,10 @@
 								</tr>
 								<tr>
 									<td class="name">
-										<strong translate="no">metalnessNode</strong>
+										<strong translate="no">options</strong>
 									</td>
 									<td class="description last">
-										<p>A node that represents the beauty pass's metalness.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">roughnessNode</strong>
-									</td>
-									<td class="description last">
-										<p>A node that represents the beauty pass's roughness.</p>
-										<p>Default is <code>null</code>.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">camera</strong>
-									</td>
-									<td class="description last">
-										<p>The camera the scene is rendered with.</p>
-										<p>Default is <code>null</code>.</p>
+										<p>Optional inputs for material and environment data.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -85,9 +67,69 @@
 				</div>
 				<h2 class="subsection-title">Properties</h2>
 				<div class="member">
-					<h3 class="name" id="blurQuality" translate="no">.<a href="#blurQuality">blurQuality</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;int></span> </h3>
+					<h3 class="name" id="_binaryRefine" translate="no">.<a href="#_binaryRefine">_binaryRefine</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Enables sub-step binary-search refinement of a detected hit. When on, a coarse
+crossing is bisected toward the exact intersection (sharper hits, less step
+aliasing) at the cost of extra depth samples. Baked into the shader as a
+compile-time constant; assigning a new value rebuilds the SSR material.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="_blurQuality" translate="no">.<a href="#_blurQuality">_blurQuality</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>The quality of the blur. Must be an integer in the range <code>[1,3]</code>.</p>
+<p>Baked into the blur shader as a compile-time constant so the <code>(size*2+1)²</code>
+sample loop unrolls; assigning a new value recompiles the blur material.</p>
+						<p>Default is <code>2</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="_reflectNonMetals" translate="no">.<a href="#_reflectNonMetals">_reflectNonMetals</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Only used when <a href="SSRNode.html#stochastic">SSRNode#stochastic</a> is <code>false</code>. When <code>false</code>, non-metallic
+surfaces are discarded for a noticeable performance gain; set <code>true</code> to also
+reflect dielectrics. Baked into the shader as a compile-time constant; assigning a
+new value recompiles the SSR material.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="_screenEdgeFadeBlack" translate="no">.<a href="#_screenEdgeFadeBlack">_screenEdgeFadeBlack</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>When <code>true</code>, SSR fades to zero near screen borders instead of blending toward
+the environment map. Hits are faded by the reflection sample UV; misses are
+faded by the surface pixel UV.</p>
+<p>Baked into the shader as a compile-time constant so the unused fade branch is
+eliminated; assigning a new value recompiles the SSR material.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="_stepExponent" translate="no">.<a href="#_stepExponent">_stepExponent</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Non-linear step distribution exponent. <code>1</code> = uniform steps; <code>&gt; 1</code> concentrates
+samples near the ray origin — where most short-range reflections are missed — and
+spaces them out toward maxDistance, as <code>s = (i / steps) ^ stepExponent</code>.</p>
+<p>Baked into the shader as a compile-time constant so <code>pow()</code> folds to a few
+multiplies; assigning a new value recompiles the SSR material. Only used by the
+stochastic reflection path.</p>
+						<p>Default is <code>2</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="binaryRefine" translate="no">.<a href="#binaryRefine">binaryRefine</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether sub-step binary-search hit refinement is enabled (compile-time constant).
+Assigning a new value rebuilds the SSR material.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="blurQuality" translate="no">.<a href="#blurQuality">blurQuality</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Blur kernel size (compile-time constant). Assigning a new value recompiles the
+blur material.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -109,6 +151,55 @@
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="diffuseNode" translate="no">.<a href="#diffuseNode">diffuseNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec4></span> </h3>
+					<div class="description">
+						<p>A node that represents the scene's diffuse color (typically the MRT <code>diffuseColor</code> attachment).
+When <code>null</code>, the shader uses <code>vec3(1)</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="envImportanceSampling" translate="no">.<a href="#envImportanceSampling">envImportanceSampling</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>When <code>true</code>, env-luminance CDF tables are built and MIS is used for environment misses.
+Fixed at construction time.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="envMapIntensity" translate="no">.<a href="#envMapIntensity">envMapIntensity</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Intensity multiplier for the importance-sampled env contribution.
+Only available after setEnvMap has been called.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="environmentIntensity" translate="no">.<a href="#environmentIntensity">environmentIntensity</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Intensity multiplier applied to environment-map reflections on screen-space
+misses and at screen edges. Defaults to π to match the former hardcoded multiplier.</p>
+						<p>Default is <code>Math.PI</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="environmentNode" translate="no">.<a href="#environmentNode">environmentNode</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>HDR environment map for screen-space misses.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="historyTexture" translate="no">.<a href="#historyTexture">historyTexture</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>A node that represents the history texture for multi-bounce reflections.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="intensity" translate="no">.<a href="#intensity">intensity</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>A multiplier for the overall reflection intensity. <code>1</code> leaves the
+reflections unchanged, lower values dim them and higher values boost them.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="maxDistance" translate="no">.<a href="#maxDistance">maxDistance</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
 					<div class="description">
 						<p>Controls how far a fragment can reflect. Increasing this value result in more
@@ -116,21 +207,32 @@ computational overhead but also increases the reflection distance.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="maxLuminance" translate="no">.<a href="#maxLuminance">maxLuminance</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Absolute env luminance cap. HDR env samples above this are scaled down (hue preserved).</p>
+						<p>Default is <code>10</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="metalnessNode" translate="no">.<a href="#metalnessNode">metalnessNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
 					<div class="description">
-						<p>A node that represents the beauty pass's metalness.</p>
+						<p>Per-pixel metalness, used to drive the GGX reflection sampling and the non-metal
+early-out. When <code>null</code>, the shader treats surfaces as non-metallic.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="mirrorBias" translate="no">.<a href="#mirrorBias">mirrorBias</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Mirror bias for the stochastic GGX sampling. Concentrates the reflected rays toward
+the lobe's narrow (near-mirror) core, trading a small amount of bias for less noise.
+<code>0</code> samples the full VNDF lobe; values toward <code>1</code> tighten the cone. Range <code>[0,1]</code>.</p>
+						<p>Default is <code>0.5</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="normalNode" translate="no">.<a href="#normalNode">normalNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
 					<div class="description">
 						<p>A node that represents the beauty pass's normals.</p>
-					</div>
-				</div>
-				<div class="member">
-					<h3 class="name" id="opacity" translate="no">.<a href="#opacity">opacity</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
-					<div class="description">
-						<p>Controls how the SSR reflections are blended with the beauty pass.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -145,6 +247,13 @@ overhead.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="reflectNonMetals" translate="no">.<a href="#reflectNonMetals">reflectNonMetals</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether dielectrics are reflected in the non-stochastic path (compile-time constant).
+Assigning a new value rebuilds the SSR material.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="resolutionScale" translate="no">.<a href="#resolutionScale">resolutionScale</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>The resolution scale. Valid values are in the range
@@ -152,6 +261,45 @@ overhead.</p>
 more computational overhead. Setting to <code>0.5</code> means
 the effect is computed in half-resolution.</p>
 						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="roughnessNode" translate="no">.<a href="#roughnessNode">roughnessNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Per-pixel roughness, used to drive the GGX reflection sampling and the blur mip
+selection. When <code>null</code>, the shader treats surfaces as fully smooth.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="screenEdgeFade" translate="no">.<a href="#screenEdgeFade">screenEdgeFade</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Screen-edge fade width, in UV units. As a screen-space hit approaches a screen
+border, the reflection is faded over this distance — either toward the environment
+reflection (<a href="SSRNode.html#screenEdgeFadeBlack">SSRNode#screenEdgeFadeBlack</a> <code>false</code>) or to zero intensity
+(<code>true</code>). <code>0</code> disables it.</p>
+						<p>Default is <code>0.2</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="screenEdgeFadeBlack" translate="no">.<a href="#screenEdgeFadeBlack">screenEdgeFadeBlack</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether SSR fades to black near screen borders (compile-time constant). Assigning
+a new value recompiles the SSR material.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="stepExponent" translate="no">.<a href="#stepExponent">stepExponent</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Non-linear step distribution exponent (compile-time constant). See the backing
+field for details. Assigning a new value recompiles the SSR material.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="stochastic" translate="no">.<a href="#stochastic">stochastic</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>When <code>true</code>, the reflection direction is varied per pixel with stochastic GGX rays
+(second-generation SSR). When <code>false</code>, a single mirror reflection is traced and
+roughness is softened with a blur pass (first-generation SSR).</p>
 					</div>
 				</div>
 				<div class="member">
@@ -170,6 +318,12 @@ its effect once per frame in <code>updateBefore()</code>.</p>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBeforeType">TempNode#updateBeforeType</a></dt>
 						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="velocityTexture" translate="no">.<a href="#velocityTexture">velocityTexture</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec2></span> </h3>
+					<div class="description">
+						<p>A node that represents the velocity texture for reprojection.</p>
+					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
 					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
@@ -190,6 +344,63 @@ when the effect is no longer required.</p>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> A texture node that represents the result of the effect.</dt>
 						</dl>
+					</div>
+					<h3 class="name name-method" id="setEnvMap" translate="no">.<a href="#setEnvMap">setEnvMap</a><span class="signature">( hdr : <span class="param-type"><a href="Texture.html">Texture</a> | null</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the environment map for importance-sampled env lighting when
+screen-space rays miss. Call this whenever the scene's env map changes.</p>
+<p>Uses <a href="ImportanceSampledEnvironment.html">ImportanceSampledEnvironment</a> (CDF + MIS adapted from
+<a href="https://github.com/gkjohnson/three-gpu-pathtracer" target="_blank" rel="noopener">three-gpu-pathtracer</a>).</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">hdr</strong>
+									</td>
+									<td class="description last">
+										<p>The equirectangular HDR environment map, or null to disable.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-see">See:</dt>
+							<dd class="tag-see">
+								<ul>
+									<li><a href="https://github.com/gkjohnson/three-gpu-pathtracer" target="_blank" rel="noopener">https://github.com/gkjohnson/three-gpu-pathtracer</a></li>
+								</ul>
+							</dd>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setHistory" translate="no">.<a href="#setHistory">setHistory</a><span class="signature">( history : <span class="param-type"><a href="Texture.html">Texture</a></span>, velocity : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Wires the feedback inputs for multi-bounce reflections: the previous frame's
+denoised result (<code>history</code>) and the velocity buffer used to reproject it
+(<code>velocity</code>). <code>history</code> accepts the producing node (e.g. a
+<a href="RecurrentDenoiseNode.html">RecurrentDenoiseNode</a>) — its output render target is used — or a raw
+texture. Pass <code>null</code> for both to disable multi-bounce.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">history</strong>
+									</td>
+									<td class="description last">
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">velocity</strong>
+									</td>
+									<td class="description last">
+									</td>
+								</tr>
+							</tbody>
+						</table>
 					</div>
 					<h3 class="name name-method" id="setSize" translate="no">.<a href="#setSize">setSize</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">

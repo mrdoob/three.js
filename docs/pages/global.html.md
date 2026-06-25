@@ -210,6 +210,14 @@ The contents are intended to be respecified repeatedly by the application, and u
 
 The contents are intended to be respecified repeatedly by reading data from the 3D API, and queried many times by the application.
 
+### .ENV_RAY_LENGTH : number (constant)
+
+Sentinel ray length the SSR pass writes for environment misses (no screen-space hit), set far above any real hit distance so a single magnitude test separates misses from hits and survives `.max( 0 )`.
+
+### .ENV_RAY_LENGTH_THRESHOLD : number (constant)
+
+Classification threshold for [ENV\_RAY\_LENGTH](global.html#ENV_RAY_LENGTH): above this is an env miss, below a real hit. An order of magnitude under the sentinel, robust to fp16 storage and bilinear blending at borders.
+
 ### .EqualCompare : number (constant)
 
 Pass if the incoming value equals the texture value.
@@ -229,6 +237,10 @@ Reflection mapping for equirectangular textures.
 ### .EquirectangularRefractionMapping : number (constant)
 
 Refraction mapping for equirectangular textures.
+
+### .F_Schlick (constant)
+
+Fresnel reflectance for the Schlick approximation.
 
 ### .FloatType : number (constant)
 
@@ -1069,6 +1081,16 @@ Performs a depth-aware blend between a base scene and a secondary effect (like g
 
 Disposes the shadow material for the given light source.
 
+### .equirectUvToDir (constant)
+
+Equirectangular direction / UV / PDF helpers and MIS weighting shared by environment sampling code. Env-miss MIS integration lives in [ImportanceSampledEnvironment](ImportanceSampledEnvironment.html).
+
+Equirectangular parameterization helpers used with CDF importance sampling are adapted from [three-gpu-pathtracer](https://github.com/gkjohnson/three-gpu-pathtracer).
+
+See:
+
+*   [https://github.com/gkjohnson/three-gpu-pathtracer](https://github.com/gkjohnson/three-gpu-pathtracer)
+
 ### .getBatchingColor (constant)
 
 TSL function that retrieves the batching color for a given instance ID from a colors texture.
@@ -1081,6 +1103,18 @@ TSL function that retrieves the indirect index for a given batch ID.
 
 TSL function that retrieves and scales the morphed attribute (position or normal) texel value.
 
+### .getSpecularDominantFactor (constant)
+
+Specular dominant factor for parallax-corrected ray length. From REBLUR: A Hierarchical Recurrent Denoiser (NRD).
+
+### .ggxReflectionSample (constant)
+
+Importance-samples the GGX/VNDF specular lobe for one pixel and returns the reflected ray direction plus the Monte-Carlo weight to apply to the gathered radiance, along with the GGX terms the SSR env-miss MIS fallback needs.
+
+### .ggxReflectionStruct (constant)
+
+Everything a single GGX reflection sample produces. `reflectDir` and `sampleWeight` drive the SSR ray-march and compositing; `pdf`, `NdotV`, `alpha` and `f0` are the GGX terms the env-miss MIS fallback needs so the caller never re-derives microfacet math.
+
 ### .instanceColor : VaryingNode.<vec3> (constant)
 
 TSL object representing a varying property for the instanced color vector.
@@ -1092,6 +1126,8 @@ Varying node representing the accumulated distance along the line. Crucial for c
 ### .outgoingLight : Node.<vec3> (constant)
 
 A node representing the outgoing light.
+
+### .temporalReproject (constant)
 
 ### .totalDiffuse : Node.<vec3> (constant)
 
@@ -1262,6 +1298,34 @@ Horizontal terracotta bands at every floor line. Together with the projecting pi
 ### .bakeGroups()
 
 Bakes a list of instance groups into one non-indexed BufferGeometry. Each group is a base geometry ( position + normal + uv ), an array of Matrix4 placements and a `partId` written to a per-vertex attribute. Transforming straight into preallocated typed arrays avoids mergeGeometries' per-instance allocations; the result is one geometry, ready for a single draw call and the compute rasterizer.
+
+### .bilinearHistoryTap( ctx : Object, tapOffset : Node.<ivec2>, bilinearWeight : Node.<float> )
+
+**ctx**
+
+Shared [sampleBilinearTap](TSL.html#sampleBilinearTap) inputs plus `reprojICoord`.
+
+**tapOffset**
+
+**bilinearWeight**
+
+### .bindAnalyticNoise( resolution : UniformNode.<Vector2>, seed : number )
+
+Returns a TSL function that samples texture-free analytic R² noise. Index 0 uses continuous screen pixels; other indices tile-shift with an R² sequence into a 64×64 period. Values are four independent R² dimensions hashed from the sample coordinates.
+
+**resolution**
+
+**seed**
+
+Added to the coordinate hash so each pass gets an independent R² phase.
+
+Default is `0`.
+
+### .bindTemporalCameraUniforms( camera : Camera )
+
+Current and previous-frame camera matrices for temporal reprojection passes.
+
+**camera**
 
 ### .buildData3DTexture( chunk : Object ) : Data3DTexture
 
@@ -1452,6 +1516,14 @@ A higher lambda value will make the movement more sudden, and a lower value will
 Delta time in seconds.
 
 **Returns:** The interpolated value.
+
+### .dampenForVarianceClip( rgb : Node.<vec3>, flickerSuppression : Node.<float> ) : Node.<vec3>
+
+Inverse-luminance compression for HDR variance clipping (Karis-style). Bright samples contribute less to neighbourhood moments so sun pixels do not inflate the YCoCg AABB and cause aggressive clipping flicker.
+
+**rgb**
+
+**flickerSuppression**
 
 ### .degToRad( degrees : number ) : number
 
@@ -2087,6 +2159,10 @@ The upper value boundary
 
 **Returns:** A random integer.
 
+### .rgbToYCoCg( c : Node.<vec3> ) : Node.<vec3>
+
+**c**
+
 ### .sample( callback : function, uv : Node.<vec2> ) : SampleNode
 
 Helper function to create a SampleNode wrapped as a node object.
@@ -2359,6 +2435,10 @@ This function maintains an internal cache of warning messages and will only outp
 
 The warning message components.
 
+### .ycocgToRGB( c : Node.<vec3> ) : Node.<vec3>
+
+**c**
+
 ### .yieldToMain() : Promise.<void>
 
 Yields execution to the main thread to allow rendering and other tasks. Uses scheduler.yield() when available (Chrome 115+), falls back to requestAnimationFrame.
@@ -2504,6 +2584,126 @@ function
 
 Allows the get the raw shader code for the given scene, camera and 3D object.
 
+### .DenoiseAlphaSource
+
+### .DenoiseMode
+
+### .RecurrentDenoiseNodeOptions
+
+**depth**  
+[Node](Node.html).<float>
+
+Scene depth buffer for view-space edge stopping.
+
+Default is `null`.
+
+**normal**  
+[Node](Node.html).<vec3>
+
+View-space normals for geometric edge stopping.
+
+Default is `null`.
+
+**metalRoughness**  
+[Node](Node.html).<vec4>
+
+Roughness/metalness G-buffer for specular edge stopping.
+
+Default is `null`.
+
+**diffuse**  
+[Node](Node.html).<vec4>
+
+Scene base color (albedo) G-buffer for chromatic edge stopping.
+
+Default is `null`.
+
+**raw**  
+[Node](Node.html).<vec4>
+
+Unfiltered input (e.g. raw SSR/SSGI) for secondary sampling and temporal blend.
+
+Default is `null`.
+
+**mode**  
+[DenoiseMode](global.html#DenoiseMode)
+
+Denoising kernel type.
+
+Default is `'diffuse'`.
+
+**accumulate**  
+boolean
+
+When `true`, temporally blend the spatially-denoised result (Karis-style) and write frame weight to alpha for feedback loops. When `false`, only spatial filtering is applied.
+
+Default is `true`.
+
+### .SSRNodeOptions
+
+**stochastic**  
+boolean
+
+When `false`, traces a single mirror reflection and softens roughness with a blur pass (first-generation SSR). When `true`, varies the reflection direction per pixel with stochastic GGX rays (second-generation SSR); higher quality on rough/glossy surfaces but noisier, so it expects a temporal/spatial denoiser downstream.
+
+Default is `false`.
+
+**metalnessNode**  
+[Node](Node.html).<float>
+
+Per-pixel metalness. Drives GGX reflection sampling and, with `reflectNonMetals=false`, the non-metal early-out.
+
+Default is `null`.
+
+**roughnessNode**  
+[Node](Node.html).<float>
+
+Per-pixel roughness. Drives GGX sampling and the blur mip selection.
+
+Default is `null`.
+
+**reflectNonMetals**  
+boolean
+
+Only used when `stochastic=false`. When `false`, non-metallic surfaces are discarded for a noticeable performance gain; set `true` to also reflect dielectrics (e.g. marble, polished wood, plastic).
+
+Default is `false`.
+
+**environmentNode**  
+[Texture](Texture.html)
+
+Equirectangular HDR environment map with CPU-side `image.data` (e.g. from RGBELoader). Not compatible with PMREM / `scene.environment` cubemaps.
+
+Default is `null`.
+
+**envImportanceSampling**  
+boolean
+
+When `true`, precomputes env-luminance CDF tables and uses MIS for environment misses. Build-time only.
+
+Default is `false`.
+
+**diffuseNode**  
+[Node](Node.html)
+
+Scene diffuse / base color. Defaults to `vec3(1)` in the shader when omitted.
+
+Default is `null`.
+
+**binaryRefine**  
+boolean
+
+Sub-step binary-search refinement of detected hits. Compile-time constant (baked into the shader at construction).
+
+Default is `false`.
+
+**camera**  
+[Camera](Camera.html)
+
+Camera the scene is rendered with. Inferred from the color pass when omitted.
+
+Default is `null`.
+
 ### .ShadowMapConfig
 
 Shadow map configuration
@@ -2522,6 +2722,29 @@ Whether to enable light transmission through non-opaque materials.
 number
 
 The shadow map type.
+
+### .TemporalReprojectMode
+
+### .TemporalReprojectNodeOptions
+
+**mode**  
+[TemporalReprojectMode](global.html#TemporalReprojectMode)
+
+`diffuse` for SSGI/scene colour; `specular` for SSR reflections.
+
+Default is `'diffuse'`.
+
+**hitPointReprojection**  
+boolean
+
+Parallax hit-point reprojection (specular mode only). Defaults to `true` in specular mode.
+
+**accumulate**  
+boolean
+
+When `true`, history is stored in this pass (classic temporal resolve). When `false`, use [TemporalReprojectNode#setHistoryTexture](TemporalReprojectNode.html#setHistoryTexture) to read history from another pass (e.g. denoise output).
+
+Default is `false`.
 
 ### .XRConfig
 

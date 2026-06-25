@@ -101,6 +101,14 @@ If no value is assigned to this property, it defaults to a placeholder value of 
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="applyVarianceClipping" translate="no">.<a href="#applyVarianceClipping">applyVarianceClipping</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Variance clipping in YCoCg space (Salvi, GDC 2016). Uses the colour moments gathered by
+<a href="TSL.html#collectNeighborhood">collectNeighborhood</a>; <code>gamma</code> widens the AABB and is kept out of the gather so the
+neighbourhood pass stays independent of the per-pixel motion factor.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="attenuationColor" translate="no">.<a href="#attenuationColor">attenuationColor</a><span class="type-signature"> : <a href="PropertyNode.html">PropertyNode</a>.&lt;color></span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>TSL object that represents the shader variable <code>AttenuationColor</code>.</p>
@@ -128,6 +136,12 @@ If no value is assigned to this property, it defaults to a placeholder value of 
 					<h3 class="name" id="backgroundRotation" translate="no">.<a href="#backgroundRotation">backgroundRotation</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;mat4></span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>TSL object that represents the scene's background rotation.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="beautyTexelFromScreen" translate="no">.<a href="#beautyTexelFromScreen">beautyTexelFromScreen</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Maps a resolve (screen) texel to the corresponding beauty-input texel when resolutions differ.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -247,6 +261,37 @@ Complements the tangentViewFrame for constructing the tangent space basis.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="clipToAABB" translate="no">.<a href="#clipToAABB">clipToAABB</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Clips the history sample to the neighbourhood AABB by projecting it toward the box centre.
+Reference: https://github.com/playdeadgames/temporal</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="collectNeighborhood" translate="no">.<a href="#collectNeighborhood">collectNeighborhood</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Single 3×3 neighbourhood pass over the beauty buffer. One textureLoad per tap feeds both the
+YCoCg variance-clipping box (colour) and the SSR ray-length statistics (alpha), which previously
+required two separate 3×3 fetches of the same texture.</p>
+<p>Sampling is done on the beauty-texel grid (<code>beautyTexel + offset</code>), so the taps are distinct
+source texels even when the beauty buffer is lower resolution than the resolve pass (upscaling).</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="computeFrustumSize" translate="no">.<a href="#computeFrustumSize">computeFrustumSize</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>World-space frustum height at <code>viewZ</code>. Algorithm originally from REBLUR (NRD).
+<code>tanHalfFovY</code> is <code>tan( verticalFov / 2 )</code>, hoisted by the caller since it is loop-invariant.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="computeHitDistFactor" translate="no">.<a href="#computeHitDistFactor">computeHitDistFactor</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Maps world-space SSR ray length to <code>[0, 1]</code>. Environment rays (<code>worldRayLength == 0</code>) map to <code>1</code>.
+Algorithm originally from REBLUR (NRD).</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="dashSize" translate="no">.<a href="#dashSize">dashSize</a><span class="type-signature"> : <a href="PropertyNode.html">PropertyNode</a>.&lt;float></span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>TSL object that represents the shader variable <code>dashSize</code>.</p>
@@ -268,6 +313,12 @@ Complements the tangentViewFrame for constructing the tangent space basis.</p>
 					<h3 class="name" id="diffuseColor" translate="no">.<a href="#diffuseColor">diffuseColor</a><span class="type-signature"> : <a href="PropertyNode.html">PropertyNode</a>.&lt;vec4></span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>TSL object that represents the shader variable <code>DiffuseColor</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="diffuseColorDistance" translate="no">.<a href="#diffuseColorDistance">diffuseColorDistance</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Chromatic color-similarity distance between two linear base colors (albedo).</p>
 					</div>
 				</div>
 				<div class="member">
@@ -323,6 +374,18 @@ Complements the tangentViewFrame for constructing the tangent space basis.</p>
 					<h3 class="name" id="gapSize" translate="no">.<a href="#gapSize">gapSize</a><span class="type-signature"> : <a href="PropertyNode.html">PropertyNode</a>.&lt;float></span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>TSL object that represents the shader variable <code>gapSize</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="getSpecularDominantDirection" translate="no">.<a href="#getSpecularDominantDirection">getSpecularDominantDirection</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Specular dominant direction — smooth surfaces lean toward reflection, rough toward normal.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="getTemporalVarianceFactor" translate="no">.<a href="#getTemporalVarianceFactor">getTemporalVarianceFactor</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Temporal accumulation variance factor in <code>[0, 1]</code>. Higher values mean more history confidence.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -388,9 +451,40 @@ which is achieved by computing the matrix in JS and not in the shader.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="karisTemporalBlend" translate="no">.<a href="#karisTemporalBlend">karisTemporalBlend</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Inverse-luminance temporal blend with optional adaptive trust (Karis-style).</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="lobeNormalFalloff" translate="no">.<a href="#lobeNormalFalloff">lobeNormalFalloff</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Loop-invariant part of the adaptive normal edge-stopping weight: the Gaussian falloff
+constant <code>2·EXP_WEIGHT_SCALE / lobeHalfAngle²</code>. <code>roughness</code>/<code>aggressivity</code>/<code>invNormalPhi</code>
+are constant across the kernel, so this is hoisted out of the tap loop and evaluated once
+per pixel. Lobe half-angle from REBLUR (NRD).</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="lobeNormalWeight" translate="no">.<a href="#lobeNormalWeight">lobeNormalWeight</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Adaptive lobe normal edge-stopping weight</p>
+<p>Evaluated entirely in cosine space: with <code>angle² ≈ 2(1 − cosθ)</code>, the original
+<code>exp( −SCALE·angle/halfAngle )</code> becomes a Gaussian <code>exp( falloff·(cosθ − 1) )</code>, so a
+single <code>exp</code> replaces the per-tap <code>acos</code>. Matches the original at the half-angle for
+narrow lobes and is slightly more permissive for wide (diffuse) ones.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="localId" translate="no">.<a href="#localId">localId</a><span class="type-signature"> : <a href="ComputeBuiltinNode.html">ComputeBuiltinNode</a>.&lt;uvec3></span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>A non-linearized 3-dimensional representation of the current invocation's position within a 3D workgroup grid.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="mapAo" translate="no">.<a href="#mapAo">mapAo</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Maps an AO factor for edge-stopping comparisons.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -673,6 +767,21 @@ The value is composed via <code>transmission</code> * <code>transmissionMap.r</c
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="misPowerHeuristic" translate="no">.<a href="#misPowerHeuristic">misPowerHeuristic</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>MIS power heuristic with β = 2: <code>pdfA² / (pdfA² + pdfB²)</code>.
+Weights the contribution of the strategy that produced <code>pdfA</code> against the other strategy.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-see">See:</dt>
+							<dd class="tag-see">
+								<ul>
+									<li>Eric Veach, *Optimally Combining Sampling Techniques for Monte Carlo Rendering*</li>
+								</ul>
+							</dd>
+						</dl>
+				</div>
+				<div class="member">
 					<h3 class="name" id="modelDirection" translate="no">.<a href="#modelDirection">modelDirection</a><span class="type-signature"> : <a href="ModelNode.html">ModelNode</a>.&lt;vec3></span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>TSL object that represents the object's direction in world space.</p>
@@ -817,6 +926,12 @@ const computeFn = Fn(() => {
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="planeDistance" translate="no">.<a href="#planeDistance">planeDistance</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>View-space plane distance between two surface points (edge-stopping geometry term).</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="pointUV" translate="no">.<a href="#pointUV">pointUV</a><span class="type-signature"> : <a href="PointUVNode.html">PointUVNode</a></span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>TSL object that represents the uv coordinates of points.</p>
@@ -875,6 +990,15 @@ Used in context of <a href="VelocityNode.html">VelocityNode</a> for rendering mo
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="projectWorldToUV" translate="no">.<a href="#projectWorldToUV">projectWorldToUV</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Projects a world-space position into previous-frame UV coordinates.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="recurrentDenoise" translate="no">.<a href="#recurrentDenoise">recurrentDenoise</a> <span class="type-signature">(constant) </span></h3>
+				</div>
+				<div class="member">
 					<h3 class="name" id="reflectVector" translate="no">.<a href="#reflectVector">reflectVector</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>Used for sampling cube maps when using cube reflection mapping.</p>
@@ -905,9 +1029,43 @@ Used in context of <a href="VelocityNode.html">VelocityNode</a> for rendering mo
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="reprojectHitPoint" translate="no">.<a href="#reprojectHitPoint">reprojectHitPoint</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Parallax-corrected hit-point reprojection into previous-frame UVs.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="reprojectionStretchConfidence" translate="no">.<a href="#reprojectionStretchConfidence">reprojectionStretchConfidence</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Reprojection-stretch confidence — detects history magnification (surface stretching).</p>
+<p>Differentiates the per-pixel history UV with hardware screen-space derivatives to form the
+reprojection Jacobian <code>J = ∂(historyPixel)/∂(screenPixel)</code>, then returns its <strong>minimum
+singular value</strong>, clamped to <code>[0,1]</code>.</p>
+<p><code>σ_min &lt; 1</code> means the most-stretched axis magnifies history — a few history pixels are smeared
+over many current pixels (e.g. a surface seen at grazing in the previous frame, face-on now), so
+history is undersampled and its confidence should be reduced. <code>σ_min ≥ 1</code> (history minified) is
+safe and clamps to 1. Using the minimum singular value rather than the Jacobian determinant
+catches anisotropic 1-D stretch that an area-only measure would smear out.</p>
+<p>Works for any reprojection (surface-velocity or parallax hit-point) since it differentiates the
+final history UV, so the same factor applies to both the diffuse and specular paths.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="roughness" translate="no">.<a href="#roughness">roughness</a><span class="type-signature"> : <a href="PropertyNode.html">PropertyNode</a>.&lt;float></span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>TSL object that represents the shader variable <code>Roughness</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sampleBilinearTap" translate="no">.<a href="#sampleBilinearTap">sampleBilinearTap</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Single bilinear history tap with plane-distance and normal confidence.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sampleHistory4Tap" translate="no">.<a href="#sampleHistory4Tap">sampleHistory4Tap</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Geometrically-weighted 4-tap bilinear history sample.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -974,6 +1132,13 @@ Used in context of <a href="VelocityNode.html">VelocityNode</a> for rendering mo
 					<h3 class="name" id="specularF90" translate="no">.<a href="#specularF90">specularF90</a><span class="type-signature"> : <a href="PropertyNode.html">PropertyNode</a>.&lt;float></span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>TSL object that represents the shader variable <code>SpecularF90</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="specularLobeTanHalfAngle" translate="no">.<a href="#specularLobeTanHalfAngle">specularLobeTanHalfAngle</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>GGX inverse-CDF: half-angle tangent enclosing <code>percent</code> of the specular lobe volume.
+<code>roughness</code> is perceptual (alpha = roughness²).</p>
 					</div>
 				</div>
 				<div class="member">
@@ -1078,6 +1243,12 @@ Useful for normal mapping without precomputed tangents.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="velocityToUVOffset" translate="no">.<a href="#velocityToUVOffset">velocityToUVOffset</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Converts screen-space velocity (NDC derivative) to a UV reprojection offset.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="vertexIndex" translate="no">.<a href="#vertexIndex">vertexIndex</a><span class="type-signature"> : <a href="IndexNode.html">IndexNode</a></span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>TSL object that represents the index of a vertex within a mesh.</p>
@@ -1111,6 +1282,12 @@ Useful for normal mapping without precomputed tangents.</p>
 					<h3 class="name" id="viewportUV" translate="no">.<a href="#viewportUV">viewportUV</a><span class="type-signature"> : <a href="ScreenNode.html">ScreenNode</a>.&lt;vec2></span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>TSL object that represents normalized viewport coordinates, unitless in <code>[0, 1]</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="vogelDisk" translate="no">.<a href="#vogelDisk">vogelDisk</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Golden-angle Vogel disk offset.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -9862,7 +10039,7 @@ material.colorNode = texture( spriteSheet, uvNode );
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="ssr" translate="no">.<a href="#ssr">ssr</a><span class="signature">( colorNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span>, depthNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, normalNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, metalnessNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, roughnessNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span><span class="type-signature"> : <a href="SSRNode.html">SSRNode</a></span> </h3>
+					<h3 class="name name-method" id="ssr" translate="no">.<a href="#ssr">ssr</a><span class="signature">( colorNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span>, depthNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, normalNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, options : <span class="param-type"><a href="global.html#SSRNodeOptions">SSRNodeOptions</a></span> )</span><span class="type-signature"> : <a href="SSRNode.html">SSRNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>TSL function for creating screen space reflections (SSR).</p>
@@ -9895,28 +10072,10 @@ material.colorNode = texture( spriteSheet, uvNode );
 								</tr>
 								<tr>
 									<td class="name">
-										<strong translate="no">metalnessNode</strong>
+										<strong translate="no">options</strong>
 									</td>
 									<td class="description last">
-										<p>A node that represents the beauty pass's metalness.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">roughnessNode</strong>
-									</td>
-									<td class="description last">
-										<p>A node that represents the beauty pass's roughness.</p>
-										<p>Default is <code>null</code>.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">camera</strong>
-									</td>
-									<td class="description last">
-										<p>The camera the scene is rendered with.</p>
-										<p>Default is <code>null</code>.</p>
+										<p>Optional inputs for material and environment data.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -13061,6 +13220,203 @@ complete before the barrier can be surpassed.</p>
 </table>
 				</div>
 				<div class="member">
+					<h3 class="name" id="DenoiseAlphaSource" translate="no">.<a href="#DenoiseAlphaSource">DenoiseAlphaSource</a> </h3>
+				</div>
+				<div class="member">
+					<h3 class="name" id="DenoiseMode" translate="no">.<a href="#DenoiseMode">DenoiseMode</a> </h3>
+				</div>
+				<div class="member">
+					<h3 class="name" id="RecurrentDenoiseNodeOptions" translate="no">.<a href="#RecurrentDenoiseNodeOptions">RecurrentDenoiseNodeOptions</a> </h3>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>depth</strong>
+						<br>
+<span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>
+				</td>
+			<td class="description last">
+				<p>Scene depth buffer for view-space edge stopping.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>normal</strong>
+						<br>
+<span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>
+				</td>
+			<td class="description last">
+				<p>View-space normals for geometric edge stopping.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>metalRoughness</strong>
+						<br>
+<span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span>
+				</td>
+			<td class="description last">
+				<p>Roughness/metalness G-buffer for specular edge stopping.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>diffuse</strong>
+						<br>
+<span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span>
+				</td>
+			<td class="description last">
+				<p>Scene base color (albedo) G-buffer for chromatic edge stopping.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>raw</strong>
+						<br>
+<span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span>
+				</td>
+			<td class="description last">
+				<p>Unfiltered input (e.g. raw SSR/SSGI) for secondary sampling and temporal blend.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>mode</strong>
+						<br>
+<span class="param-type"><a href="global.html#DenoiseMode">DenoiseMode</a></span>
+				</td>
+			<td class="description last">
+				<p>Denoising kernel type.</p>
+						<p>Default is <code>'diffuse'</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>accumulate</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>When <code>true</code>, temporally blend the spatially-denoised result
+(Karis-style) and write frame weight to alpha for feedback loops. When <code>false</code>, only spatial filtering is applied.</p>
+						<p>Default is <code>true</code>.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<div class="member">
+					<h3 class="name" id="SSRNodeOptions" translate="no">.<a href="#SSRNodeOptions">SSRNodeOptions</a> </h3>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>stochastic</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>When <code>false</code>, traces a single mirror reflection and softens roughness with a blur pass (first-generation SSR). When <code>true</code>, varies the reflection direction per pixel with stochastic GGX rays (second-generation SSR); higher quality on rough/glossy surfaces but noisier, so it expects a temporal/spatial denoiser downstream.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>metalnessNode</strong>
+						<br>
+<span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>
+				</td>
+			<td class="description last">
+				<p>Per-pixel metalness. Drives GGX reflection sampling and, with <code>reflectNonMetals=false</code>, the non-metal early-out.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>roughnessNode</strong>
+						<br>
+<span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>
+				</td>
+			<td class="description last">
+				<p>Per-pixel roughness. Drives GGX sampling and the blur mip selection.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>reflectNonMetals</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Only used when <code>stochastic=false</code>. When <code>false</code>, non-metallic surfaces are discarded for a noticeable performance gain; set <code>true</code> to also reflect dielectrics (e.g. marble, polished wood, plastic).</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>environmentNode</strong>
+						<br>
+<span class="param-type"><a href="Texture.html">Texture</a></span>
+				</td>
+			<td class="description last">
+				<p>Equirectangular HDR environment map with CPU-side <code>image.data</code> (e.g. from RGBELoader). Not compatible with PMREM / <code>scene.environment</code> cubemaps.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>envImportanceSampling</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>When <code>true</code>, precomputes env-luminance CDF tables and uses MIS for environment misses. Build-time only.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>diffuseNode</strong>
+						<br>
+<span class="param-type"><a href="Node.html">Node</a></span>
+				</td>
+			<td class="description last">
+				<p>Scene diffuse / base color. Defaults to <code>vec3(1)</code> in the shader when omitted.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>binaryRefine</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Sub-step binary-search refinement of detected hits. Compile-time constant (baked into the shader at construction).</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>camera</strong>
+						<br>
+<span class="param-type"><a href="Camera.html">Camera</a></span>
+				</td>
+			<td class="description last">
+				<p>Camera the scene is rendered with. Inferred from the color pass when omitted.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<div class="member">
 					<h3 class="name" id="ShadowMapConfig" translate="no">.<a href="#ShadowMapConfig">ShadowMapConfig</a> </h3>
 					<div class="description">
 						<p>Shadow map configuration</p>
@@ -13095,6 +13451,49 @@ complete before the barrier can be surpassed.</p>
 				</td>
 			<td class="description last">
 				<p>The shadow map type.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<div class="member">
+					<h3 class="name" id="TemporalReprojectMode" translate="no">.<a href="#TemporalReprojectMode">TemporalReprojectMode</a> </h3>
+				</div>
+				<div class="member">
+					<h3 class="name" id="TemporalReprojectNodeOptions" translate="no">.<a href="#TemporalReprojectNodeOptions">TemporalReprojectNodeOptions</a> </h3>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>mode</strong>
+						<br>
+<span class="param-type"><a href="global.html#TemporalReprojectMode">TemporalReprojectMode</a></span>
+				</td>
+			<td class="description last">
+				<p><code>diffuse</code> for SSGI/scene colour; <code>specular</code> for SSR reflections.</p>
+						<p>Default is <code>'diffuse'</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>hitPointReprojection</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Parallax hit-point reprojection (specular mode only). Defaults to <code>true</code> in specular mode.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>accumulate</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>When <code>true</code>, history is stored in this pass (classic temporal resolve). When <code>false</code>,
+use <a href="TemporalReprojectNode.html#setHistoryTexture">TemporalReprojectNode#setHistoryTexture</a> to read history from another pass (e.g. denoise output).</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
 		</tr>
 	</tbody>

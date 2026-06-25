@@ -391,6 +391,20 @@ many times by the application.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="ENV_RAY_LENGTH" translate="no">.<a href="#ENV_RAY_LENGTH">ENV_RAY_LENGTH</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Sentinel ray length the SSR pass writes for environment misses (no screen-space hit), set far above
+any real hit distance so a single magnitude test separates misses from hits and survives <code>.max( 0 )</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="ENV_RAY_LENGTH_THRESHOLD" translate="no">.<a href="#ENV_RAY_LENGTH_THRESHOLD">ENV_RAY_LENGTH_THRESHOLD</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Classification threshold for <a href="global.html#ENV_RAY_LENGTH">ENV_RAY_LENGTH</a>: above this is an env miss, below a real hit.
+An order of magnitude under the sentinel, robust to fp16 storage and bilinear blending at borders.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="EqualCompare" translate="no">.<a href="#EqualCompare">EqualCompare</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>Pass if the incoming value equals the texture value.</p>
@@ -418,6 +432,12 @@ many times by the application.</p>
 					<h3 class="name" id="EquirectangularRefractionMapping" translate="no">.<a href="#EquirectangularRefractionMapping">EquirectangularRefractionMapping</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>Refraction mapping for equirectangular textures.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="F_Schlick" translate="no">.<a href="#F_Schlick">F_Schlick</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Fresnel reflectance for the Schlick approximation.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -1757,6 +1777,23 @@ sampling coordinate for the blend node away from the edge to prevent light leaki
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="equirectUvToDir" translate="no">.<a href="#equirectUvToDir">equirectUvToDir</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Equirectangular direction / UV / PDF helpers and MIS weighting shared by environment sampling code.
+Env-miss MIS integration lives in <a href="ImportanceSampledEnvironment.html">ImportanceSampledEnvironment</a>.</p>
+<p>Equirectangular parameterization helpers used with CDF importance sampling are adapted from
+<a href="https://github.com/gkjohnson/three-gpu-pathtracer" target="_blank" rel="noopener">three-gpu-pathtracer</a>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-see">See:</dt>
+							<dd class="tag-see">
+								<ul>
+									<li><a href="https://github.com/gkjohnson/three-gpu-pathtracer" target="_blank" rel="noopener">https://github.com/gkjohnson/three-gpu-pathtracer</a></li>
+								</ul>
+							</dd>
+						</dl>
+				</div>
+				<div class="member">
 					<h3 class="name" id="getBatchingColor" translate="no">.<a href="#getBatchingColor">getBatchingColor</a> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>TSL function that retrieves the batching color for a given instance ID from a colors texture.</p>
@@ -1772,6 +1809,29 @@ sampling coordinate for the blend node away from the edge to prevent light leaki
 					<h3 class="name" id="getMorph" translate="no">.<a href="#getMorph">getMorph</a> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>TSL function that retrieves and scales the morphed attribute (position or normal) texel value.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="getSpecularDominantFactor" translate="no">.<a href="#getSpecularDominantFactor">getSpecularDominantFactor</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Specular dominant factor for parallax-corrected ray length.
+From REBLUR: A Hierarchical Recurrent Denoiser (NRD).</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="ggxReflectionSample" translate="no">.<a href="#ggxReflectionSample">ggxReflectionSample</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Importance-samples the GGX/VNDF specular lobe for one pixel and returns the reflected
+ray direction plus the Monte-Carlo weight to apply to the gathered radiance, along with
+the GGX terms the SSR env-miss MIS fallback needs.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="ggxReflectionStruct" translate="no">.<a href="#ggxReflectionStruct">ggxReflectionStruct</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Everything a single GGX reflection sample produces. <code>reflectDir</code> and <code>sampleWeight</code>
+drive the SSR ray-march and compositing; <code>pdf</code>, <code>NdotV</code>, <code>alpha</code> and <code>f0</code> are the GGX
+terms the env-miss MIS fallback needs so the caller never re-derives microfacet math.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -1792,6 +1852,9 @@ Crucial for correctly computing dashed line intervals in fragment stage.</p>
 					<div class="description">
 						<p>A node representing the outgoing light.</p>
 					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="temporalReproject" translate="no">.<a href="#temporalReproject">temporalReproject</a> <span class="type-signature">(constant) </span></h3>
 				</div>
 				<div class="member">
 					<h3 class="name" id="totalDiffuse" translate="no">.<a href="#totalDiffuse">totalDiffuse</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> <span class="type-signature">(constant) </span></h3>
@@ -2140,6 +2203,81 @@ written to a per-vertex attribute. Transforming straight into preallocated typed
 avoids mergeGeometries' per-instance allocations; the result is one geometry, ready for
 a single draw call and the compute rasterizer.</p>
 						</div>
+					</div>
+					<h3 class="name name-method" id="bilinearHistoryTap" translate="no">.<a href="#bilinearHistoryTap">bilinearHistoryTap</a><span class="signature">( ctx : <span class="param-type">Object</span>, tapOffset : <span class="param-type"><a href="Node.html">Node</a>.&lt;ivec2></span>, bilinearWeight : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span> </h3>
+					<div class="method">
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">ctx</strong>
+									</td>
+									<td class="description last">
+										<p>Shared <a href="TSL.html#sampleBilinearTap">sampleBilinearTap</a> inputs plus <code>reprojICoord</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">tapOffset</strong>
+									</td>
+									<td class="description last">
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">bilinearWeight</strong>
+									</td>
+									<td class="description last">
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="bindAnalyticNoise" translate="no">.<a href="#bindAnalyticNoise">bindAnalyticNoise</a><span class="signature">( resolution : <span class="param-type"><a href="UniformNode.html">UniformNode</a>.&lt;<a href="Vector2.html">Vector2</a>></span>, seed : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a TSL function that samples texture-free analytic R² noise.
+Index 0 uses continuous screen pixels; other indices tile-shift with an R²
+sequence into a 64×64 period. Values are four independent R² dimensions
+hashed from the sample coordinates.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">resolution</strong>
+									</td>
+									<td class="description last">
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">seed</strong>
+									</td>
+									<td class="description last">
+										<p>Added to the coordinate hash so each pass gets an independent R² phase.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="bindTemporalCameraUniforms" translate="no">.<a href="#bindTemporalCameraUniforms">bindTemporalCameraUniforms</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Current and previous-frame camera matrices for temporal reprojection passes.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">camera</strong>
+									</td>
+									<td class="description last">
+									</td>
+								</tr>
+							</tbody>
+						</table>
 					</div>
 					<h3 class="name name-method" id="buildData3DTexture" translate="no">.<a href="#buildData3DTexture">buildData3DTexture</a><span class="signature">( chunk : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Data3DTexture.html">Data3DTexture</a></span> </h3>
 					<div class="method">
@@ -2553,6 +2691,32 @@ and a lower value will make the movement more gradual.</p>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The interpolated value.</dt>
 						</dl>
+					</div>
+					<h3 class="name name-method" id="dampenForVarianceClip" translate="no">.<a href="#dampenForVarianceClip">dampenForVarianceClip</a><span class="signature">( rgb : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, flickerSuppression : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Inverse-luminance compression for HDR variance clipping (Karis-style).
+Bright samples contribute less to neighbourhood moments so sun pixels do not
+inflate the YCoCg AABB and cause aggressive clipping flicker.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">rgb</strong>
+									</td>
+									<td class="description last">
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">flickerSuppression</strong>
+									</td>
+									<td class="description last">
+									</td>
+								</tr>
+							</tbody>
+						</table>
 					</div>
 					<h3 class="name name-method" id="degToRad" translate="no">.<a href="#degToRad">degToRad</a><span class="signature">( degrees : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
 					<div class="method">
@@ -3856,6 +4020,20 @@ for the given value. <code>a2</code> must be greater than <code>a1</code>.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A random integer.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="rgbToYCoCg" translate="no">.<a href="#rgbToYCoCg">rgbToYCoCg</a><span class="signature">( c : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">c</strong>
+									</td>
+									<td class="description last">
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="sample" translate="no">.<a href="#sample">sample</a><span class="signature">( callback : <span class="param-type">function</span>, uv : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span> )</span><span class="type-signature"> : <a href="SampleNode.html">SampleNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -4421,6 +4599,20 @@ triggered repeatedly but should only be shown to the user once.</p>
 							</tbody>
 						</table>
 					</div>
+					<h3 class="name name-method" id="ycocgToRGB" translate="no">.<a href="#ycocgToRGB">ycocgToRGB</a><span class="signature">( c : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">c</strong>
+									</td>
+									<td class="description last">
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="yieldToMain" translate="no">.<a href="#yieldToMain">yieldToMain</a><span class="signature">()</span><span class="type-signature"> : Promise.&lt;void></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -4720,6 +4912,203 @@ Uses scheduler.yield() when available (Chrome 115+), falls back to requestAnimat
 </table>
 				</div>
 				<div class="member">
+					<h3 class="name" id="DenoiseAlphaSource" translate="no">.<a href="#DenoiseAlphaSource">DenoiseAlphaSource</a> </h3>
+				</div>
+				<div class="member">
+					<h3 class="name" id="DenoiseMode" translate="no">.<a href="#DenoiseMode">DenoiseMode</a> </h3>
+				</div>
+				<div class="member">
+					<h3 class="name" id="RecurrentDenoiseNodeOptions" translate="no">.<a href="#RecurrentDenoiseNodeOptions">RecurrentDenoiseNodeOptions</a> </h3>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>depth</strong>
+						<br>
+<span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>
+				</td>
+			<td class="description last">
+				<p>Scene depth buffer for view-space edge stopping.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>normal</strong>
+						<br>
+<span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>
+				</td>
+			<td class="description last">
+				<p>View-space normals for geometric edge stopping.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>metalRoughness</strong>
+						<br>
+<span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span>
+				</td>
+			<td class="description last">
+				<p>Roughness/metalness G-buffer for specular edge stopping.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>diffuse</strong>
+						<br>
+<span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span>
+				</td>
+			<td class="description last">
+				<p>Scene base color (albedo) G-buffer for chromatic edge stopping.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>raw</strong>
+						<br>
+<span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span>
+				</td>
+			<td class="description last">
+				<p>Unfiltered input (e.g. raw SSR/SSGI) for secondary sampling and temporal blend.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>mode</strong>
+						<br>
+<span class="param-type"><a href="global.html#DenoiseMode">DenoiseMode</a></span>
+				</td>
+			<td class="description last">
+				<p>Denoising kernel type.</p>
+						<p>Default is <code>'diffuse'</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>accumulate</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>When <code>true</code>, temporally blend the spatially-denoised result
+(Karis-style) and write frame weight to alpha for feedback loops. When <code>false</code>, only spatial filtering is applied.</p>
+						<p>Default is <code>true</code>.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<div class="member">
+					<h3 class="name" id="SSRNodeOptions" translate="no">.<a href="#SSRNodeOptions">SSRNodeOptions</a> </h3>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>stochastic</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>When <code>false</code>, traces a single mirror reflection and softens roughness with a blur pass (first-generation SSR). When <code>true</code>, varies the reflection direction per pixel with stochastic GGX rays (second-generation SSR); higher quality on rough/glossy surfaces but noisier, so it expects a temporal/spatial denoiser downstream.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>metalnessNode</strong>
+						<br>
+<span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>
+				</td>
+			<td class="description last">
+				<p>Per-pixel metalness. Drives GGX reflection sampling and, with <code>reflectNonMetals=false</code>, the non-metal early-out.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>roughnessNode</strong>
+						<br>
+<span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>
+				</td>
+			<td class="description last">
+				<p>Per-pixel roughness. Drives GGX sampling and the blur mip selection.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>reflectNonMetals</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Only used when <code>stochastic=false</code>. When <code>false</code>, non-metallic surfaces are discarded for a noticeable performance gain; set <code>true</code> to also reflect dielectrics (e.g. marble, polished wood, plastic).</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>environmentNode</strong>
+						<br>
+<span class="param-type"><a href="Texture.html">Texture</a></span>
+				</td>
+			<td class="description last">
+				<p>Equirectangular HDR environment map with CPU-side <code>image.data</code> (e.g. from RGBELoader). Not compatible with PMREM / <code>scene.environment</code> cubemaps.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>envImportanceSampling</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>When <code>true</code>, precomputes env-luminance CDF tables and uses MIS for environment misses. Build-time only.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>diffuseNode</strong>
+						<br>
+<span class="param-type"><a href="Node.html">Node</a></span>
+				</td>
+			<td class="description last">
+				<p>Scene diffuse / base color. Defaults to <code>vec3(1)</code> in the shader when omitted.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>binaryRefine</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Sub-step binary-search refinement of detected hits. Compile-time constant (baked into the shader at construction).</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>camera</strong>
+						<br>
+<span class="param-type"><a href="Camera.html">Camera</a></span>
+				</td>
+			<td class="description last">
+				<p>Camera the scene is rendered with. Inferred from the color pass when omitted.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<div class="member">
 					<h3 class="name" id="ShadowMapConfig" translate="no">.<a href="#ShadowMapConfig">ShadowMapConfig</a> </h3>
 					<div class="description">
 						<p>Shadow map configuration</p>
@@ -4754,6 +5143,49 @@ Uses scheduler.yield() when available (Chrome 115+), falls back to requestAnimat
 				</td>
 			<td class="description last">
 				<p>The shadow map type.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<div class="member">
+					<h3 class="name" id="TemporalReprojectMode" translate="no">.<a href="#TemporalReprojectMode">TemporalReprojectMode</a> </h3>
+				</div>
+				<div class="member">
+					<h3 class="name" id="TemporalReprojectNodeOptions" translate="no">.<a href="#TemporalReprojectNodeOptions">TemporalReprojectNodeOptions</a> </h3>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>mode</strong>
+						<br>
+<span class="param-type"><a href="global.html#TemporalReprojectMode">TemporalReprojectMode</a></span>
+				</td>
+			<td class="description last">
+				<p><code>diffuse</code> for SSGI/scene colour; <code>specular</code> for SSR reflections.</p>
+						<p>Default is <code>'diffuse'</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>hitPointReprojection</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Parallax hit-point reprojection (specular mode only). Defaults to <code>true</code> in specular mode.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>accumulate</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>When <code>true</code>, history is stored in this pass (classic temporal resolve). When <code>false</code>,
+use <a href="TemporalReprojectNode.html#setHistoryTexture">TemporalReprojectNode#setHistoryTexture</a> to read history from another pass (e.g. denoise output).</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
 		</tr>
 	</tbody>

@@ -17691,6 +17691,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "EnvMapCDFGenerator",
+			"kind": "class"
+		},
+		{
 			"title": "FBXLoader",
 			"kind": "class"
 		},
@@ -18517,6 +18521,26 @@
 		{
 			"title": "IESLoader#type",
 			"kind": "member"
+		},
+		{
+			"title": "ImportanceSampledEnvironment",
+			"kind": "class"
+		},
+		{
+			"title": "ImportanceSampledEnvironment#sampleEnvironmentBRDF",
+			"kind": "function"
+		},
+		{
+			"title": "ImportanceSampledEnvironment#sampleEnvironmentMIS",
+			"kind": "function"
+		},
+		{
+			"title": "ImportanceSampledEnvironment#sampleReflect",
+			"kind": "function"
+		},
+		{
+			"title": "ImportanceSampledEnvironment#updateFrom",
+			"kind": "function"
 		},
 		{
 			"title": "ImprovedNoise",
@@ -20919,6 +20943,26 @@
 			"kind": "class"
 		},
 		{
+			"title": "RecurrentDenoiseNode",
+			"kind": "class"
+		},
+		{
+			"title": "RecurrentDenoiseNode#accumulate",
+			"kind": "member"
+		},
+		{
+			"title": "RecurrentDenoiseNode#alphaSource",
+			"kind": "member"
+		},
+		{
+			"title": "RecurrentDenoiseNode#getRenderTarget",
+			"kind": "function"
+		},
+		{
+			"title": "RecurrentDenoiseNode#mode",
+			"kind": "member"
+		},
+		{
 			"title": "Reflector",
 			"kind": "class"
 		},
@@ -21475,6 +21519,30 @@
 			"kind": "class"
 		},
 		{
+			"title": "SSRNode#_binaryRefine",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#_blurQuality",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#_reflectNonMetals",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#_screenEdgeFadeBlack",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#_stepExponent",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#binaryRefine",
+			"kind": "member"
+		},
+		{
 			"title": "SSRNode#blurQuality",
 			"kind": "member"
 		},
@@ -21491,15 +21559,47 @@
 			"kind": "member"
 		},
 		{
+			"title": "SSRNode#diffuseNode",
+			"kind": "member"
+		},
+		{
 			"title": "SSRNode#dispose",
 			"kind": "function"
+		},
+		{
+			"title": "SSRNode#envImportanceSampling",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#envMapIntensity",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#environmentIntensity",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#environmentNode",
+			"kind": "member"
 		},
 		{
 			"title": "SSRNode#getTextureNode",
 			"kind": "function"
 		},
 		{
+			"title": "SSRNode#historyTexture",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#intensity",
+			"kind": "member"
+		},
+		{
 			"title": "SSRNode#maxDistance",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#maxLuminance",
 			"kind": "member"
 		},
 		{
@@ -21507,11 +21607,11 @@
 			"kind": "member"
 		},
 		{
-			"title": "SSRNode#normalNode",
+			"title": "SSRNode#mirrorBias",
 			"kind": "member"
 		},
 		{
-			"title": "SSRNode#opacity",
+			"title": "SSRNode#normalNode",
 			"kind": "member"
 		},
 		{
@@ -21519,8 +21619,32 @@
 			"kind": "member"
 		},
 		{
+			"title": "SSRNode#reflectNonMetals",
+			"kind": "member"
+		},
+		{
 			"title": "SSRNode#resolutionScale",
 			"kind": "member"
+		},
+		{
+			"title": "SSRNode#roughnessNode",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#screenEdgeFade",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#screenEdgeFadeBlack",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#setEnvMap",
+			"kind": "function"
+		},
+		{
+			"title": "SSRNode#setHistory",
+			"kind": "function"
 		},
 		{
 			"title": "SSRNode#setSize",
@@ -21529,6 +21653,14 @@
 		{
 			"title": "SSRNode#setup",
 			"kind": "function"
+		},
+		{
+			"title": "SSRNode#stepExponent",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#stochastic",
+			"kind": "member"
 		},
 		{
 			"title": "SSRNode#thickness",
@@ -21540,6 +21672,10 @@
 		},
 		{
 			"title": "SSRNode#updateBeforeType",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#velocityTexture",
 			"kind": "member"
 		},
 		{
@@ -22405,6 +22541,22 @@
 		{
 			"title": "TeapotGeometry",
 			"kind": "class"
+		},
+		{
+			"title": "TemporalReprojectNode",
+			"kind": "class"
+		},
+		{
+			"title": "TemporalReprojectNode#accumulate",
+			"kind": "member"
+		},
+		{
+			"title": "TemporalReprojectNode#mode",
+			"kind": "member"
+		},
+		{
+			"title": "TemporalReprojectNode#setHistoryTexture",
+			"kind": "function"
 		},
 		{
 			"title": "TerrainGenerator",
@@ -24833,6 +24985,14 @@
 			"kind": "member"
 		},
 		{
+			"title": "ENV_RAY_LENGTH",
+			"kind": "member"
+		},
+		{
+			"title": "ENV_RAY_LENGTH_THRESHOLD",
+			"kind": "member"
+		},
+		{
 			"title": "Earcut.triangulate",
 			"kind": "function"
 		},
@@ -24863,6 +25023,10 @@
 		{
 			"title": "ExtrudeGeometry.fromJSON",
 			"kind": "function"
+		},
+		{
+			"title": "F_Schlick",
+			"kind": "member"
 		},
 		{
 			"title": "FloatType",
@@ -26021,6 +26185,18 @@
 			"kind": "member"
 		},
 		{
+			"title": "bilinearHistoryTap",
+			"kind": "function"
+		},
+		{
+			"title": "bindAnalyticNoise",
+			"kind": "function"
+		},
+		{
+			"title": "bindTemporalCameraUniforms",
+			"kind": "function"
+		},
+		{
 			"title": "buildData3DTexture",
 			"kind": "function"
 		},
@@ -26101,6 +26277,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "dampenForVarianceClip",
+			"kind": "function"
+		},
+		{
 			"title": "degToRad",
 			"kind": "function"
 		},
@@ -26119,6 +26299,10 @@
 		{
 			"title": "enhanceLogMessage",
 			"kind": "function"
+		},
+		{
+			"title": "equirectUvToDir",
+			"kind": "member"
 		},
 		{
 			"title": "error",
@@ -26229,6 +26413,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "getSpecularDominantFactor",
+			"kind": "member"
+		},
+		{
 			"title": "getStrideLength",
 			"kind": "function"
 		},
@@ -26247,6 +26435,14 @@
 		{
 			"title": "getViewZNode",
 			"kind": "function"
+		},
+		{
+			"title": "ggxReflectionSample",
+			"kind": "member"
+		},
+		{
+			"title": "ggxReflectionStruct",
+			"kind": "member"
 		},
 		{
 			"title": "instanceColor",
@@ -26369,6 +26565,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "rgbToYCoCg",
+			"kind": "function"
+		},
+		{
 			"title": "sample",
 			"kind": "function"
 		},
@@ -26417,6 +26617,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "temporalReproject",
+			"kind": "member"
+		},
+		{
 			"title": "toHalfFloat",
 			"kind": "function"
 		},
@@ -26463,6 +26667,10 @@
 		{
 			"title": "worldStart",
 			"kind": "member"
+		},
+		{
+			"title": "ycocgToRGB",
+			"kind": "function"
 		},
 		{
 			"title": "yieldToMain",
@@ -26615,6 +26823,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "applyVarianceClipping",
+			"kind": "member"
+		},
+		{
 			"title": "array",
 			"kind": "function"
 		},
@@ -26725,6 +26937,10 @@
 		{
 			"title": "batch",
 			"kind": "function"
+		},
+		{
+			"title": "beautyTexelFromScreen",
+			"kind": "member"
 		},
 		{
 			"title": "bentNormalView",
@@ -26931,6 +27147,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "clipToAABB",
+			"kind": "member"
+		},
+		{
 			"title": "clipping",
 			"kind": "function"
 		},
@@ -26945,6 +27165,10 @@
 		{
 			"title": "code",
 			"kind": "function"
+		},
+		{
+			"title": "collectNeighborhood",
+			"kind": "member"
 		},
 		{
 			"title": "colorBleeding",
@@ -26965,6 +27189,14 @@
 		{
 			"title": "computeBuiltin",
 			"kind": "function"
+		},
+		{
+			"title": "computeFrustumSize",
+			"kind": "member"
+		},
+		{
+			"title": "computeHitDistFactor",
+			"kind": "member"
 		},
 		{
 			"title": "computeKernel",
@@ -27092,6 +27324,10 @@
 		},
 		{
 			"title": "diffuseColor",
+			"kind": "member"
+		},
+		{
+			"title": "diffuseColorDistance",
 			"kind": "member"
 		},
 		{
@@ -27263,6 +27499,14 @@
 			"kind": "function"
 		},
 		{
+			"title": "getSpecularDominantDirection",
+			"kind": "member"
+		},
+		{
+			"title": "getTemporalVarianceFactor",
+			"kind": "member"
+		},
+		{
 			"title": "getViewPosition",
 			"kind": "function"
 		},
@@ -27399,6 +27643,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "karisTemporalBlend",
+			"kind": "member"
+		},
+		{
 			"title": "label",
 			"kind": "function"
 		},
@@ -27459,6 +27707,14 @@
 			"kind": "function"
 		},
 		{
+			"title": "lobeNormalFalloff",
+			"kind": "member"
+		},
+		{
+			"title": "lobeNormalWeight",
+			"kind": "member"
+		},
+		{
 			"title": "localId",
 			"kind": "member"
 		},
@@ -27481,6 +27737,10 @@
 		{
 			"title": "lut3D",
 			"kind": "function"
+		},
+		{
+			"title": "mapAo",
+			"kind": "member"
 		},
 		{
 			"title": "matcapUV",
@@ -27673,6 +27933,10 @@
 		{
 			"title": "min",
 			"kind": "function"
+		},
+		{
+			"title": "misPowerHeuristic",
+			"kind": "member"
 		},
 		{
 			"title": "mix",
@@ -27963,6 +28227,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "planeDistance",
+			"kind": "member"
+		},
+		{
 			"title": "pmremTexture",
 			"kind": "function"
 		},
@@ -28035,6 +28303,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "projectWorldToUV",
+			"kind": "member"
+		},
+		{
 			"title": "property",
 			"kind": "function"
 		},
@@ -28077,6 +28349,10 @@
 		{
 			"title": "reciprocal",
 			"kind": "function"
+		},
+		{
+			"title": "recurrentDenoise",
+			"kind": "member"
 		},
 		{
 			"title": "reference",
@@ -28151,6 +28427,14 @@
 			"kind": "function"
 		},
 		{
+			"title": "reprojectHitPoint",
+			"kind": "member"
+		},
+		{
+			"title": "reprojectionStretchConfidence",
+			"kind": "member"
+		},
+		{
 			"title": "retroPass",
 			"kind": "function"
 		},
@@ -28185,6 +28469,14 @@
 		{
 			"title": "sRGBTransferOETF",
 			"kind": "function"
+		},
+		{
+			"title": "sampleBilinearTap",
+			"kind": "member"
+		},
+		{
+			"title": "sampleHistory4Tap",
+			"kind": "member"
 		},
 		{
 			"title": "sampler",
@@ -28328,6 +28620,10 @@
 		},
 		{
 			"title": "specularF90",
+			"kind": "member"
+		},
+		{
+			"title": "specularLobeTanHalfAngle",
 			"kind": "member"
 		},
 		{
@@ -28731,6 +29027,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "velocityToUVOffset",
+			"kind": "member"
+		},
+		{
 			"title": "vertexColor",
 			"kind": "function"
 		},
@@ -28813,6 +29113,10 @@
 		{
 			"title": "vignette",
 			"kind": "function"
+		},
+		{
+			"title": "vogelDisk",
+			"kind": "member"
 		},
 		{
 			"title": "vogelDiskSample",

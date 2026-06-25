@@ -56,6 +56,10 @@ TSL object that represents the shader variable `AnisotropyB`.
 
 TSL object that represents the shader variable `AnisotropyT`.
 
+### .applyVarianceClipping (constant)
+
+Variance clipping in YCoCg space (Salvi, GDC 2016). Uses the colour moments gathered by [collectNeighborhood](TSL.html#collectNeighborhood); `gamma` widens the AABB and is kept out of the gather so the neighbourhood pass stays independent of the per-pixel motion factor.
+
 ### .attenuationColor : PropertyNode.<color> (constant)
 
 TSL object that represents the shader variable `AttenuationColor`.
@@ -75,6 +79,10 @@ TSL object that represents the scene's background intensity.
 ### .backgroundRotation : Node.<mat4> (constant)
 
 TSL object that represents the scene's background rotation.
+
+### .beautyTexelFromScreen (constant)
+
+Maps a resolve (screen) texel to the corresponding beauty-input texel when resolutions differ.
 
 ### .bitangentGeometry : Node.<vec3> (constant)
 
@@ -154,6 +162,24 @@ TSL object that represents the shader variable `ClearcoatRoughness`.
 
 TSL object that represents the clip space position of the current rendered object.
 
+### .clipToAABB (constant)
+
+Clips the history sample to the neighbourhood AABB by projecting it toward the box centre. Reference: https://github.com/playdeadgames/temporal
+
+### .collectNeighborhood (constant)
+
+Single 3×3 neighbourhood pass over the beauty buffer. One textureLoad per tap feeds both the YCoCg variance-clipping box (colour) and the SSR ray-length statistics (alpha), which previously required two separate 3×3 fetches of the same texture.
+
+Sampling is done on the beauty-texel grid (`beautyTexel + offset`), so the taps are distinct source texels even when the beauty buffer is lower resolution than the resolve pass (upscaling).
+
+### .computeFrustumSize (constant)
+
+World-space frustum height at `viewZ`. Algorithm originally from REBLUR (NRD). `tanHalfFovY` is `tan( verticalFov / 2 )`, hoisted by the caller since it is loop-invariant.
+
+### .computeHitDistFactor (constant)
+
+Maps world-space SSR ray length to `[0, 1]`. Environment rays (`worldRayLength == 0`) map to `1`. Algorithm originally from REBLUR (NRD).
+
 ### .dashSize : PropertyNode.<float> (constant)
 
 TSL object that represents the shader variable `dashSize`.
@@ -169,6 +195,10 @@ TSL object that represents the depth value for the current fragment.
 ### .diffuseColor : PropertyNode.<vec4> (constant)
 
 TSL object that represents the shader variable `DiffuseColor`.
+
+### .diffuseColorDistance (constant)
+
+Chromatic color-similarity distance between two linear base colors (albedo).
 
 ### .diffuseContribution : PropertyNode.<vec3> (constant)
 
@@ -205,6 +235,14 @@ TSL object that represents whether a primitive is front or back facing
 ### .gapSize : PropertyNode.<float> (constant)
 
 TSL object that represents the shader variable `gapSize`.
+
+### .getSpecularDominantDirection (constant)
+
+Specular dominant direction — smooth surfaces lean toward reflection, rough toward normal.
+
+### .getTemporalVarianceFactor (constant)
+
+Temporal accumulation variance factor in `[0, 1]`. Higher values mean more history confidence.
 
 ### .globalId : ComputeBuiltinNode.<uvec3> (constant)
 
@@ -246,9 +284,27 @@ TSL object that represents the shader variable `IridescenceIOR`.
 
 TSL object that represents the shader variable `IridescenceThickness`.
 
+### .karisTemporalBlend (constant)
+
+Inverse-luminance temporal blend with optional adaptive trust (Karis-style).
+
+### .lobeNormalFalloff (constant)
+
+Loop-invariant part of the adaptive normal edge-stopping weight: the Gaussian falloff constant `2·EXP_WEIGHT_SCALE / lobeHalfAngle²`. `roughness`/`aggressivity`/`invNormalPhi` are constant across the kernel, so this is hoisted out of the tap loop and evaluated once per pixel. Lobe half-angle from REBLUR (NRD).
+
+### .lobeNormalWeight (constant)
+
+Adaptive lobe normal edge-stopping weight
+
+Evaluated entirely in cosine space: with `angle² ≈ 2(1 − cosθ)`, the original `exp( −SCALE·angle/halfAngle )` becomes a Gaussian `exp( falloff·(cosθ − 1) )`, so a single `exp` replaces the per-tap `acos`. Matches the original at the half-angle for narrow lobes and is slightly more permissive for wide (diffuse) ones.
+
 ### .localId : ComputeBuiltinNode.<uvec3> (constant)
 
 A non-linearized 3-dimensional representation of the current invocation's position within a 3D workgroup grid.
+
+### .mapAo (constant)
+
+Maps an AO factor for edge-stopping comparisons.
 
 ### .materialAO : Node.<float> (constant)
 
@@ -422,6 +478,14 @@ TSL object that represents the object's model view in `mediump` precision.
 
 TSL object that represents the shader variable `Metalness`.
 
+### .misPowerHeuristic (constant)
+
+MIS power heuristic with β = 2: `pdfA² / (pdfA² + pdfB²)`. Weights the contribution of the strategy that produced `pdfA` against the other strategy.
+
+See:
+
+*   Eric Veach, \*Optimally Combining Sampling Techniques for Monte Carlo Rendering\*
+
 ### .modelDirection : ModelNode.<vec3> (constant)
 
 TSL object that represents the object's direction in world space.
@@ -523,6 +587,10 @@ TSL object that represents the shader variable `Output`.
 
 TSL object that represents the parallax direction.
 
+### .planeDistance (constant)
+
+View-space plane distance between two surface points (edge-stopping geometry term).
+
 ### .pointUV : PointUVNode (constant)
 
 TSL object that represents the uv coordinates of points.
@@ -561,6 +629,12 @@ TSL object that represents the vertex position in world space of the current ren
 
 TSL object that represents the position world direction of the current rendered object.
 
+### .projectWorldToUV (constant)
+
+Projects a world-space position into previous-frame UV coordinates.
+
+### .recurrentDenoise (constant)
+
 ### .reflectVector : Node.<vec3> (constant)
 
 Used for sampling cube maps when using cube reflection mapping.
@@ -581,9 +655,31 @@ The refract vector in view space.
 
 TSL object that represents a shared uniform group node which is updated once per render.
 
+### .reprojectHitPoint (constant)
+
+Parallax-corrected hit-point reprojection into previous-frame UVs.
+
+### .reprojectionStretchConfidence (constant)
+
+Reprojection-stretch confidence — detects history magnification (surface stretching).
+
+Differentiates the per-pixel history UV with hardware screen-space derivatives to form the reprojection Jacobian `J = ∂(historyPixel)/∂(screenPixel)`, then returns its **minimum singular value**, clamped to `[0,1]`.
+
+`σ_min < 1` means the most-stretched axis magnifies history — a few history pixels are smeared over many current pixels (e.g. a surface seen at grazing in the previous frame, face-on now), so history is undersampled and its confidence should be reduced. `σ_min ≥ 1` (history minified) is safe and clamps to 1. Using the minimum singular value rather than the Jacobian determinant catches anisotropic 1-D stretch that an area-only measure would smear out.
+
+Works for any reprojection (surface-velocity or parallax hit-point) since it differentiates the final history UV, so the same factor applies to both the diffuse and specular paths.
+
 ### .roughness : PropertyNode.<float> (constant)
 
 TSL object that represents the shader variable `Roughness`.
+
+### .sampleBilinearTap (constant)
+
+Single bilinear history tap with plane-distance and normal confidence.
+
+### .sampleHistory4Tap (constant)
+
+Geometrically-weighted 4-tap bilinear history sample.
 
 ### .screenCoordinate : ScreenNode.<vec2> (constant)
 
@@ -628,6 +724,10 @@ TSL object that represents the shader variable `SpecularColorBlended`.
 ### .specularF90 : PropertyNode.<float> (constant)
 
 TSL object that represents the shader variable `SpecularF90`.
+
+### .specularLobeTanHalfAngle (constant)
+
+GGX inverse-CDF: half-angle tangent enclosing `percent` of the specular lobe volume. `roughness` is perceptual (alpha = roughness²).
 
 ### .subgroupIndex : IndexNode (constant)
 
@@ -697,6 +797,10 @@ TSL object that represents the shader variable `Transmission`.
 
 TSL object that represents the velocity of a render pass.
 
+### .velocityToUVOffset (constant)
+
+Converts screen-space velocity (NDC derivative) to a UV reprojection offset.
+
 ### .vertexIndex : IndexNode (constant)
 
 TSL object that represents the index of a vertex within a mesh.
@@ -720,6 +824,10 @@ TSL object that represents the viewport resolution in physical pixel units.
 ### .viewportUV : ScreenNode.<vec2> (constant)
 
 TSL object that represents normalized viewport coordinates, unitless in `[0, 1]`.
+
+### .vogelDisk (constant)
+
+Golden-angle Vogel disk offset.
 
 ### .workgroupId : ComputeBuiltinNode.<uvec3> (constant)
 
@@ -5112,7 +5220,7 @@ A texture node that represents the scene's normals.
 
 The camera the scene is rendered with.
 
-### .ssr( colorNode : Node.<vec4>, depthNode : Node.<float>, normalNode : Node.<vec3>, metalnessNode : Node.<float>, roughnessNode : Node.<float>, camera : Camera ) : SSRNode
+### .ssr( colorNode : Node.<vec4>, depthNode : Node.<float>, normalNode : Node.<vec3>, options : SSRNodeOptions ) : SSRNode
 
 TSL function for creating screen space reflections (SSR).
 
@@ -5128,21 +5236,9 @@ A node that represents the beauty pass's depth.
 
 A node that represents the beauty pass's normals.
 
-**metalnessNode**
+**options**
 
-A node that represents the beauty pass's metalness.
-
-**roughnessNode**
-
-A node that represents the beauty pass's roughness.
-
-Default is `null`.
-
-**camera**
-
-The camera the scene is rendered with.
-
-Default is `null`.
+Optional inputs for material and environment data.
 
 ### .sss( depthNode : TextureNode, camera : Camera, mainLight : DirectionalLight ) : SSSNode
 
@@ -6741,6 +6837,126 @@ function
 
 Allows the get the raw shader code for the given scene, camera and 3D object.
 
+### .DenoiseAlphaSource
+
+### .DenoiseMode
+
+### .RecurrentDenoiseNodeOptions
+
+**depth**  
+[Node](Node.html).<float>
+
+Scene depth buffer for view-space edge stopping.
+
+Default is `null`.
+
+**normal**  
+[Node](Node.html).<vec3>
+
+View-space normals for geometric edge stopping.
+
+Default is `null`.
+
+**metalRoughness**  
+[Node](Node.html).<vec4>
+
+Roughness/metalness G-buffer for specular edge stopping.
+
+Default is `null`.
+
+**diffuse**  
+[Node](Node.html).<vec4>
+
+Scene base color (albedo) G-buffer for chromatic edge stopping.
+
+Default is `null`.
+
+**raw**  
+[Node](Node.html).<vec4>
+
+Unfiltered input (e.g. raw SSR/SSGI) for secondary sampling and temporal blend.
+
+Default is `null`.
+
+**mode**  
+[DenoiseMode](global.html#DenoiseMode)
+
+Denoising kernel type.
+
+Default is `'diffuse'`.
+
+**accumulate**  
+boolean
+
+When `true`, temporally blend the spatially-denoised result (Karis-style) and write frame weight to alpha for feedback loops. When `false`, only spatial filtering is applied.
+
+Default is `true`.
+
+### .SSRNodeOptions
+
+**stochastic**  
+boolean
+
+When `false`, traces a single mirror reflection and softens roughness with a blur pass (first-generation SSR). When `true`, varies the reflection direction per pixel with stochastic GGX rays (second-generation SSR); higher quality on rough/glossy surfaces but noisier, so it expects a temporal/spatial denoiser downstream.
+
+Default is `false`.
+
+**metalnessNode**  
+[Node](Node.html).<float>
+
+Per-pixel metalness. Drives GGX reflection sampling and, with `reflectNonMetals=false`, the non-metal early-out.
+
+Default is `null`.
+
+**roughnessNode**  
+[Node](Node.html).<float>
+
+Per-pixel roughness. Drives GGX sampling and the blur mip selection.
+
+Default is `null`.
+
+**reflectNonMetals**  
+boolean
+
+Only used when `stochastic=false`. When `false`, non-metallic surfaces are discarded for a noticeable performance gain; set `true` to also reflect dielectrics (e.g. marble, polished wood, plastic).
+
+Default is `false`.
+
+**environmentNode**  
+[Texture](Texture.html)
+
+Equirectangular HDR environment map with CPU-side `image.data` (e.g. from RGBELoader). Not compatible with PMREM / `scene.environment` cubemaps.
+
+Default is `null`.
+
+**envImportanceSampling**  
+boolean
+
+When `true`, precomputes env-luminance CDF tables and uses MIS for environment misses. Build-time only.
+
+Default is `false`.
+
+**diffuseNode**  
+[Node](Node.html)
+
+Scene diffuse / base color. Defaults to `vec3(1)` in the shader when omitted.
+
+Default is `null`.
+
+**binaryRefine**  
+boolean
+
+Sub-step binary-search refinement of detected hits. Compile-time constant (baked into the shader at construction).
+
+Default is `false`.
+
+**camera**  
+[Camera](Camera.html)
+
+Camera the scene is rendered with. Inferred from the color pass when omitted.
+
+Default is `null`.
+
 ### .ShadowMapConfig
 
 Shadow map configuration
@@ -6759,6 +6975,29 @@ Whether to enable light transmission through non-opaque materials.
 number
 
 The shadow map type.
+
+### .TemporalReprojectMode
+
+### .TemporalReprojectNodeOptions
+
+**mode**  
+[TemporalReprojectMode](global.html#TemporalReprojectMode)
+
+`diffuse` for SSGI/scene colour; `specular` for SSR reflections.
+
+Default is `'diffuse'`.
+
+**hitPointReprojection**  
+boolean
+
+Parallax hit-point reprojection (specular mode only). Defaults to `true` in specular mode.
+
+**accumulate**  
+boolean
+
+When `true`, history is stored in this pass (classic temporal resolve). When `false`, use [TemporalReprojectNode#setHistoryTexture](TemporalReprojectNode.html#setHistoryTexture) to read history from another pass (e.g. denoise output).
+
+Default is `false`.
 
 ### .XRConfig
 
