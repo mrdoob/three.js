@@ -2154,6 +2154,16 @@ class Renderer {
 	}
 
 	/**
+	 * Resets the backend's internal state cache. Useful when the rendering context is shared with
+	 * other libraries that change the state. A no-op for the WebGPU backend.
+	 */
+	resetState() {
+
+		this.backend.resetState();
+
+	}
+
+	/**
 	 * Returns the viewport definition.
 	 *
 	 * @param {Vector4} target - The method writes the result in this target object.

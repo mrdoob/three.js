@@ -1356,6 +1356,128 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Restores the WebGL state to its default and clears the cache so subsequent renderings
+	 * re-apply the required state. Useful when the WebGL context is shared with other libraries.
+	 */
+	reset() {
+
+		const { gl } = this;
+
+		// reset WebGL state
+
+		gl.disable( gl.BLEND );
+		gl.disable( gl.CULL_FACE );
+		gl.disable( gl.DEPTH_TEST );
+		gl.disable( gl.POLYGON_OFFSET_FILL );
+		gl.disable( gl.SCISSOR_TEST );
+		gl.disable( gl.STENCIL_TEST );
+		gl.disable( gl.SAMPLE_ALPHA_TO_COVERAGE );
+
+		gl.blendEquation( gl.FUNC_ADD );
+		gl.blendFunc( gl.ONE, gl.ZERO );
+		gl.blendFuncSeparate( gl.ONE, gl.ZERO, gl.ONE, gl.ZERO );
+		gl.blendColor( 0, 0, 0, 0 );
+
+		gl.colorMask( true, true, true, true );
+		gl.clearColor( 0, 0, 0, 0 );
+
+		gl.depthMask( true );
+		gl.depthFunc( gl.LESS );
+		gl.clearDepth( 1 );
+
+		gl.stencilMask( 0xffffffff );
+		gl.stencilFunc( gl.ALWAYS, 0, 0xffffffff );
+		gl.stencilOp( gl.KEEP, gl.KEEP, gl.KEEP );
+		gl.clearStencil( 0 );
+
+		gl.cullFace( gl.BACK );
+		gl.frontFace( gl.CCW );
+
+		gl.polygonOffset( 0, 0 );
+
+		gl.activeTexture( gl.TEXTURE0 );
+
+		gl.bindFramebuffer( gl.FRAMEBUFFER, null );
+		gl.bindFramebuffer( gl.DRAW_FRAMEBUFFER, null );
+		gl.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
+
+		gl.useProgram( null );
+
+		gl.lineWidth( 1 );
+
+		gl.scissor( 0, 0, gl.canvas.width, gl.canvas.height );
+		gl.viewport( 0, 0, gl.canvas.width, gl.canvas.height );
+
+		gl.pixelStorei( gl.PACK_ALIGNMENT, 4 );
+		gl.pixelStorei( gl.UNPACK_ALIGNMENT, 4 );
+		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, false );
+		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false );
+		gl.pixelStorei( gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.BROWSER_DEFAULT_WEBGL );
+		gl.pixelStorei( gl.PACK_ROW_LENGTH, 0 );
+		gl.pixelStorei( gl.PACK_SKIP_PIXELS, 0 );
+		gl.pixelStorei( gl.PACK_SKIP_ROWS, 0 );
+		gl.pixelStorei( gl.UNPACK_ROW_LENGTH, 0 );
+		gl.pixelStorei( gl.UNPACK_IMAGE_HEIGHT, 0 );
+		gl.pixelStorei( gl.UNPACK_SKIP_PIXELS, 0 );
+		gl.pixelStorei( gl.UNPACK_SKIP_ROWS, 0 );
+		gl.pixelStorei( gl.UNPACK_SKIP_IMAGES, 0 );
+
+		this.resetVertexState();
+
+		// reset internal cache
+
+		this.enabled = {};
+		this.parameters = {};
+		this.currentFlipSided = null;
+		this.currentCullFace = null;
+		this.currentProgram = null;
+		this.currentBlendingEnabled = false;
+		this.currentBlending = null;
+		this.currentBlendEquation = null;
+		this.currentBlendEquationAlpha = null;
+		this.currentBlendSrc = null;
+		this.currentBlendDst = null;
+		this.currentBlendSrcAlpha = null;
+		this.currentBlendDstAlpha = null;
+		this.currentPremultipledAlpha = null;
+		this.currentPolygonOffsetFactor = null;
+		this.currentPolygonOffsetUnits = null;
+		this.currentColorMask = null;
+		this.currentDepthFunc = null;
+		this.currentDepthMask = null;
+		this.currentStencilFunc = null;
+		this.currentStencilRef = null;
+		this.currentStencilFuncMask = null;
+		this.currentStencilFail = null;
+		this.currentStencilZFail = null;
+		this.currentStencilZPass = null;
+		this.currentStencilMask = null;
+		this.currentLineWidth = null;
+		this.currentClippingPlanes = 0;
+
+		this.currentBoundFramebuffers = {};
+		this.currentDrawbuffers = new WeakMap();
+
+		this.currentTextureSlot = null;
+		this.currentBoundTextures = {};
+		this.currentBoundBufferBases = {};
+
+		this.currentScissor.set( 0, 0, gl.canvas.width, gl.canvas.height );
+		this.currentViewport.set( 0, 0, gl.canvas.width, gl.canvas.height );
+
+		// re-apply reversed depth if used by the renderer
+
+		this.currentDepthReversed = false;
+
+		if ( this.backend.renderer.reversedDepthBuffer === true ) {
+
+			this.setReversedDepth( true );
+
+		}
+
+	}
+
 }
 
 export default WebGLState;
