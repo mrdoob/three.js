@@ -291,6 +291,3 @@ import './src/textures/VideoTexture.tests.js';
 //src/nodes/display
 import './src/nodes/display/ViewportTextureNode.tests.js';
 import './src/nodes/display/ViewportDepthTextureNode.tests.js';
-
-//src/nodes/pmrem
-import './src/nodes/pmrem/PMREMNode.tests.js';
