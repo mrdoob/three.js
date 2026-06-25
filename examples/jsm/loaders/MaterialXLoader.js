@@ -886,17 +886,39 @@ class MaterialXNode {
 		material.specularIntensityNode = specularIntensityNode || float( 0.5 );
 		material.specularColorNode = specularColorNode || color( 1.0, 1.0, 1.0 );
 		material.iorNode = iorNode || float( 1.5 );
-		material.anisotropyNode = anisotropyNode || float( 0 );
-		material.anisotropyRotationNode = anisotropyRotationNode || float( 0 );
-		material.transmissionNode = transmissionNode || float( 0 );
-		material.transmissionColorNode = transmissionColorNode || color( 1.0, 1.0, 1.0 );
+
+		if ( anisotropyNode !== null ) {
+
+			material.anisotropyNode = anisotropyNode;
+			material.anisotropyRotationNode = anisotropyRotationNode || float( 0 );
+
+		}
+
+		if ( transmissionNode !== null ) {
+
+			material.transmissionNode = transmissionNode;
+			material.transmissionColorNode = transmissionColorNode || color( 1.0, 1.0, 1.0 );
+
+		}
+
 		material.thinFilmThicknessNode = thinFilmThicknessNode || float( 0 );
 		material.thinFilmIorNode = thinFilmIorNode || float( 1.5 );
-		material.sheenNode = sheenNode || float( 0 );
-		material.sheenColorNode = sheenColorNode || color( 1.0, 1.0, 1.0 );
-		material.sheenRoughnessNode = sheenRoughnessNode || float( 0.5 );
-		material.clearcoatNode = clearcoatNode || float( 0 );
-		material.clearcoatRoughnessNode = clearcoatRoughnessNode || float( 0 );
+
+		if ( sheenNode !== null ) {
+
+			material.sheenNode = sheenNode;
+			material.sheenColorNode = sheenColorNode || color( 1.0, 1.0, 1.0 );
+			material.sheenRoughnessNode = sheenRoughnessNode || float( 0.5 );
+
+		}
+
+		if ( clearcoatNode !== null ) {
+
+			material.clearcoatNode = clearcoatNode;
+			material.clearcoatRoughnessNode = clearcoatRoughnessNode || float( 0 );
+
+		}
+
 		if ( normalNode ) material.normalNode = normalNode;
 		if ( emissiveNode ) material.emissiveNode = emissiveNode;
 

@@ -24,11 +24,15 @@ The alpha map is a grayscale texture that controls the opacity across the surfac
 
 Only the color of the texture is used, ignoring the alpha channel if one exists. For RGB and RGBA textures, the renderer will use the green channel when sampling this texture due to the extra bit of precision provided for green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and luminance/alpha textures will also still work as expected.
 
+`alphaMap` represents non-color data. Any texture assigned must have `texture.colorSpace = NoColorSpace` (default).
+
 Default is `null`.
 
 ### .bumpMap : Texture
 
 The texture to create a bump map. The black and white values map to the perceived depth in relation to the lights. Bump doesn't actually affect the geometry of the object, only the lighting. If a normal map is defined this will be ignored.
+
+`bumpMap` represents non-color data. Any texture assigned must have `texture.colorSpace = NoColorSpace` (default).
 
 Default is `null`.
 
@@ -52,7 +56,9 @@ Default is `0`.
 
 ### .displacementMap : Texture
 
-The displacement map affects the position of the mesh's vertices. Unlike other maps which only affect the light and shade of the material the displaced vertices can cast shadows, block other objects, and otherwise act as real geometry. The displacement texture is an image where the value of each pixel (white being the highest) is mapped against, and repositions, the vertices of the mesh.
+The displacement map affects the position of the mesh's vertices. Unlike other maps which only affect the light and shade of the material the displaced vertices can cast shadows, block other objects, and otherwise act as real geometry. The displacement texture is an image where the value of each pixel (white being the highest) is mapped against, and repositions, the vertices of the mesh. For best results, pair a displacement map with a matching normal map, since the renderer can not recompute surface normals from the displaced vertices.
+
+`displacementMap` represents non-color data. Any texture assigned must have `texture.colorSpace = NoColorSpace` (default).
 
 Default is `null`.
 
@@ -84,17 +90,23 @@ Default is `true`.
 
 The color map. May optionally include an alpha channel, typically combined with [Material#transparent](Material.html#transparent) or [Material#alphaTest](Material.html#alphaTest). The texture map color is modulated by the diffuse `color`.
 
+`map` represents color data, and the texture must be assigned a [Texture#colorSpace](Texture.html#colorSpace). Most `map` textures set `texture.colorSpace = SRGBColorSpace`.
+
 Default is `null`.
 
 ### .matcap : Texture
 
 The matcap map.
 
+`matcap` represents luminance data, and the texture must be assigned a [Texture#colorSpace](Texture.html#colorSpace). HDR `matcap` textures (e.g. `.exr`) typically set `texture.colorSpace = LinearSRGBColorSpace`, while LDR `matcap` textures (e.g. `.png`, `.jpg`, `.webp`) typically set `texture.colorSpace = SRGBColorSpace`.
+
 Default is `null`.
 
 ### .normalMap : Texture
 
 The texture to create a normal map. The RGB values affect the surface normal for each pixel fragment and change the way the color is lit. Normal maps do not change the actual shape of the surface, only the lighting. In case the material has a normal map authored using the left handed convention, the `y` component of `normalScale` should be negated to compensate for the different handedness.
+
+`normalMap` represents non-color data. Any texture assigned must have `texture.colorSpace = NoColorSpace` (default).
 
 Default is `null`.
 

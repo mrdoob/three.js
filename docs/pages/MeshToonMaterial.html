@@ -53,6 +53,8 @@ exists. For RGB and RGBA textures, the renderer will use the green channel
 when sampling this texture due to the extra bit of precision provided for
 green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
 luminance/alpha textures will also still work as expected.</p>
+<p><code>alphaMap</code> represents non-color data. Any texture assigned must have
+<code>texture.colorSpace = NoColorSpace</code> (default).</p>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
@@ -61,6 +63,8 @@ luminance/alpha textures will also still work as expected.</p>
 					<div class="description">
 						<p>The red channel of this texture is used as the ambient occlusion map.
 Requires a second set of UVs.</p>
+<p><code>aoMap</code> represents non-color data. Any texture assigned must have
+<code>texture.colorSpace = NoColorSpace</code> (default).</p>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
@@ -80,6 +84,8 @@ red channel is also <code>1</code>, ambient light is fully occluded on a surface
 perceived depth in relation to the lights. Bump doesn't actually affect
 the geometry of the object, only the lighting. If a normal map is defined
 this will be ignored.</p>
+<p><code>bumpMap</code> represents non-color data. Any texture assigned must have
+<code>texture.colorSpace = NoColorSpace</code> (default).</p>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
@@ -114,7 +120,11 @@ other maps which only affect the light and shade of the material the
 displaced vertices can cast shadows, block other objects, and otherwise
 act as real geometry. The displacement texture is an image where the value
 of each pixel (white being the highest) is mapped against, and
-repositions, the vertices of the mesh.</p>
+repositions, the vertices of the mesh. For best results, pair a
+displacement map with a matching normal map, since the renderer can
+not recompute surface normals from the displaced vertices.</p>
+<p><code>displacementMap</code> represents non-color data. Any texture assigned must have
+<code>texture.colorSpace = NoColorSpace</code> (default).</p>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
@@ -148,6 +158,9 @@ unaffected by other lighting.</p>
 						<p>Set emissive (glow) map. The emissive map color is modulated by the
 emissive color and the emissive intensity. If you have an emissive map,
 be sure to set the emissive color to something other than black.</p>
+<p><code>emissiveMap</code> represents color data, and the texture must be assigned a
+<a href="Texture.html#colorSpace">Texture#colorSpace</a>. Most <code>emissiveMap</code> textures set
+<code>texture.colorSpace = SRGBColorSpace</code>.</p>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
@@ -164,6 +177,8 @@ be sure to set the emissive color to something other than black.</p>
 						<p>Gradient map for toon shading. It's required to set
 <a href="Texture.html#minFilter">Texture#minFilter</a> and <a href="Texture.html#magFilter">Texture#magFilter</a> to <a href="global.html#NearestFilter">NearestFilter</a>
 when using this type of texture.</p>
+<p><code>gradientMap</code> represents non-color data. Any texture assigned must have
+<code>texture.colorSpace = NoColorSpace</code> (default).</p>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
@@ -178,6 +193,10 @@ when using this type of texture.</p>
 					<h3 class="name" id="lightMap" translate="no">.<a href="#lightMap">lightMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
 					<div class="description">
 						<p>The light map. Requires a second set of UVs.</p>
+<p><code>lightMap</code> represents pre-baked illuminance data, and the texture must be assigned
+a <a href="Texture.html#colorSpace">Texture#colorSpace</a>. Most <code>lightMap</code> textures set
+<code>texture.colorSpace = LinearSRGBColorSpace</code> and use float-type formats
+such as <code>.exr</code> or <code>.hdr</code>.</p>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
@@ -194,6 +213,9 @@ when using this type of texture.</p>
 						<p>The color map. May optionally include an alpha channel, typically combined
 with <a href="Material.html#transparent">Material#transparent</a> or <a href="Material.html#alphaTest">Material#alphaTest</a>. The texture map
 color is modulated by the diffuse <code>color</code>.</p>
+<p><code>map</code> represents color data, and the texture must be assigned a
+<a href="Texture.html#colorSpace">Texture#colorSpace</a>. Most <code>map</code> textures set
+<code>texture.colorSpace = SRGBColorSpace</code>.</p>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
@@ -206,6 +228,8 @@ maps do not change the actual shape of the surface, only the lighting. In
 case the material has a normal map authored using the left handed
 convention, the <code>y</code> component of <code>normalScale</code> should be negated to compensate
 for the different handedness.</p>
+<p><code>normalMap</code> represents non-color data. Any texture assigned must have
+<code>texture.colorSpace = NoColorSpace</code> (default).</p>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>

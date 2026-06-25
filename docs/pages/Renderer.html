@@ -247,6 +247,16 @@ If this is the case, the renderer allocates an internal render target for that p
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="onError" translate="no">.<a href="#onError">onError</a><span class="type-signature"> : function</span> </h3>
+					<div class="description">
+						<p>A callback function that defines what should happen when an uncaptured
+backend error is reported (e.g. a WebGPU validation/out-of-memory/internal
+error raised outside an error scope). Applications can override this to
+surface errors in their own UI without letting them escalate to a device
+loss. The default implementation logs to the console.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="opaque" translate="no">.<a href="#opaque">opaque</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>Whether the renderer should render opaque render objects or not.</p>

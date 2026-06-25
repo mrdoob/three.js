@@ -433,7 +433,12 @@ class HDRLoader extends DataTextureLoader {
 			header: rgbe_header_info.string,
 			gamma: rgbe_header_info.gamma,
 			exposure: rgbe_header_info.exposure,
-			type: type
+			type: type,
+			colorSpace: LinearSRGBColorSpace,
+			minFilter: LinearFilter,
+			magFilter: LinearFilter,
+			generateMipmaps: false,
+			flipY: true
 		};
 
 	}
@@ -448,33 +453,6 @@ class HDRLoader extends DataTextureLoader {
 
 		this.type = value;
 		return this;
-
-	}
-
-	load( url, onLoad, onProgress, onError ) {
-
-		function onLoadCallback( texture, texData ) {
-
-			switch ( texture.type ) {
-
-				case FloatType:
-				case HalfFloatType:
-
-					texture.colorSpace = LinearSRGBColorSpace;
-					texture.minFilter = LinearFilter;
-					texture.magFilter = LinearFilter;
-					texture.generateMipmaps = false;
-					texture.flipY = true;
-
-					break;
-
-			}
-
-			if ( onLoad ) onLoad( texture, texData );
-
-		}
-
-		return super.load( url, onLoadCallback, onProgress, onError );
 
 	}
 

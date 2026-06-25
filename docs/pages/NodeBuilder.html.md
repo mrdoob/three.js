@@ -138,6 +138,12 @@ Since the [NodeBuilder#cache](NodeBuilder.html#cache) might be temporarily overw
 
 Default is `this.cache`.
 
+### .hardwareClipping : boolean
+
+Whether the built material uses hardware clipping or not.
+
+Default is `false`.
+
 ### .hashNodes : Object.<number, Node>
 
 A dictionary that assigns each node to a unique hash.
@@ -152,7 +158,7 @@ Default is `null`.
 
 The material of the 3D object.
 
-### .nodes : Array.<Node>
+### .nodes : Set.<Node>
 
 A list of all nodes the builder is processing for this 3D object.
 
@@ -180,7 +186,7 @@ The scene the 3D object belongs to.
 
 Default is `null`.
 
-### .sequentialNodes : Array.<Node>
+### .sequentialNodes : Set.<Node>
 
 A list of all nodes the builder is processing in sequential order.
 
@@ -766,7 +772,7 @@ Returns a list bindings of all shader stages separated by groups.
 
 **Returns:** The list of bindings.
 
-### .getBufferAttributeFromNode( node : BufferAttributeNode, type : string ) : NodeAttribute
+### .getBufferAttributeFromNode( node : BufferAttributeNode, type : string, name : string ) : NodeAttribute
 
 Returns an instance of [NodeAttribute](NodeAttribute.html) for the given buffer attribute node.
 
@@ -777,6 +783,12 @@ The buffer attribute node.
 **type**
 
 The node type.
+
+**name**
+
+The name of the buffer attribute.
+
+Default is `null`.
 
 **Returns:** The node attribute.
 
@@ -1041,6 +1053,18 @@ The output struct node.
 The output struct types.
 
 **Returns:** The struct type attribute.
+
+### .getOutputType( index : number ) : string
+
+Returns the type of the color output based on the renderer's render target.
+
+**index**
+
+The index of the render target texture.
+
+Default is `0`.
+
+**Returns:** The type.
 
 ### .getPropertyName( node : Node, shaderStage : 'vertex' | 'fragment' | 'compute' | 'any' ) : string
 
@@ -1420,6 +1444,16 @@ The attribute name.
 
 **Returns:** Whether the given attribute name is defined in the geometry.
 
+### .hasWriteUsage( node : Node ) : boolean
+
+Returns whether the given node has been written to in any shader stage.
+
+**node**
+
+The node to check.
+
+**Returns:** Whether the node has been written to.
+
 ### .includes( node : Node ) : boolean
 
 Whether the given node is included in the internal array of nodes or not.
@@ -1449,6 +1483,12 @@ Whether the requested feature is available or not.
 The requested feature.
 
 **Returns:** Whether the requested feature is supported or not.
+
+### .isContextAssign() : boolean
+
+Returns whether the builder is currently in an assignment context.
+
+**Returns:** Whether the builder is in an assignment context.
 
 ### .isDeterministic( node : Node ) : boolean
 

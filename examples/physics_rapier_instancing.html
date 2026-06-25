@@ -4,12 +4,17 @@
 		<title>three.js physics - rapier3d instancing</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<meta property="og:title" content="three.js physics - rapier3d instancing">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/physics_rapier_instancing.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/physics_rapier_instancing.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> physics - <a href="https://github.com/dimforge/rapier.js" target="_blank">rapier</a> instancing
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> physics - <a href="https://github.com/dimforge/rapier.js" target="_blank">rapier</a> instancing<br />
+			<button id="shake" style="margin-top: 25px;">SHAKE</button>
 		</div>
 
 		<script type="importmap">
@@ -139,6 +144,28 @@
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.y = 0.5;
 				controls.update();
+
+				document.querySelector( 'button#shake' ).addEventListener( 'click', () => {
+
+					const impulse = new THREE.Vector3();
+
+					for ( let i = 0; i < spheres.count; i ++ ) {
+
+						impulse.set( ( Math.random() - 0.5 ) * 5, Math.random() * 5, ( Math.random() - 0.5 ) * 5 );
+
+						physics.applyImpulse( spheres, impulse, i );
+
+					}
+
+					for ( let i = 0; i < boxes.count; i ++ ) {
+
+						impulse.set( ( Math.random() - 0.5 ) * 5, Math.random() * 5, ( Math.random() - 0.5 ) * 5 );
+
+						physics.applyImpulse( boxes, impulse, i );
+
+					}
+
+				} );
 
 				setInterval( () => {
 

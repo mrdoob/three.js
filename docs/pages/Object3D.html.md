@@ -765,7 +765,7 @@ When set to `true`, a recomputation of world matrices is forced even when [Objec
 
 Default is `false`.
 
-### .updateWorldMatrix( updateParents : boolean, updateChildren : boolean )
+### .updateWorldMatrix( updateParents : boolean, updateChildren : boolean, force : boolean )
 
 An alternative version of [Object3D#updateMatrixWorld](Object3D.html#updateMatrixWorld) with more control over the update of ancestor and descendant nodes.
 
@@ -778,6 +778,12 @@ Default is `false`.
 **updateChildren**
 
 Whether descendant nodes should be updated or not.
+
+Default is `false`.
+
+**force**
+
+When set to `true`, a recomputation of world matrices is forced even when [Object3D#matrixWorldNeedsUpdate](Object3D.html#matrixWorldNeedsUpdate) is `false`.
 
 Default is `false`.
 

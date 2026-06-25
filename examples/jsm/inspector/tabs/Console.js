@@ -9,18 +9,38 @@ class Console extends Tab {
 		this.filters = { info: true, warn: true, error: true };
 		this.filterText = '';
 
+		this.unreadErrors = 0;
+		this.unreadWarns = 0;
+
+		this.tabBadgeContainer = document.createElement( 'span' );
+		this.tabBadgeContainer.className = 'tab-badge-container';
+
+		this.tabErrorBadge = document.createElement( 'span' );
+		this.tabErrorBadge.className = 'tab-badge error';
+		this.tabErrorBadge.style.display = 'none';
+
+		this.tabWarnBadge = document.createElement( 'span' );
+		this.tabWarnBadge.className = 'tab-badge warn';
+		this.tabWarnBadge.style.display = 'none';
+
+		this.tabBadgeContainer.appendChild( this.tabErrorBadge );
+		this.tabBadgeContainer.appendChild( this.tabWarnBadge );
+		this.button.appendChild( this.tabBadgeContainer );
+
 		this.buildHeader();
 
 		this.logContainer = document.createElement( 'div' );
-		this.logContainer.id = 'console-log';
+		this.logContainer.classList.add( 'console-log' );
 		this.content.appendChild( this.logContainer );
+
+		this.lastMessage = null;
 
 	}
 
 	buildHeader() {
 
 		const header = document.createElement( 'div' );
-		header.className = 'console-header';
+		header.className = 'toolbar';
 
 		const filterInput = document.createElement( 'input' );
 		filterInput.type = 'text';
@@ -56,9 +76,13 @@ class Console extends Tab {
 			const checkmark = document.createElement( 'span' );
 			checkmark.className = 'checkmark';
 
+			const labelText = document.createElement( 'span' );
+			labelText.className = 'checkbox-text';
+			labelText.textContent = type.charAt( 0 ).toUpperCase() + type.slice( 1 );
+
 			label.appendChild( checkbox );
 			label.appendChild( checkmark );
-			label.append( type.charAt( 0 ).toUpperCase() + type.slice( 1 ) );
+			label.appendChild( labelText );
 			buttonsGroup.appendChild( label );
 
 		} );
@@ -172,10 +196,6 @@ class Console extends Tab {
 			const parts = fullPrefix.slice( 0, - 2 ).split( '.' );
 			const shortPrefix = ( parts.length > 1 ? parts[ parts.length - 1 ] : parts[ 0 ] ) + ':';
 
-			const icon = this._getIcon( type, shortPrefix.split( ':' )[ 0 ].toLowerCase() );
-
-			fragment.appendChild( document.createTextNode( icon + ' ' ) );
-
 			const prefixSpan = document.createElement( 'span' );
 			prefixSpan.className = 'log-prefix';
 			prefixSpan.textContent = shortPrefix;
@@ -210,24 +230,186 @@ class Console extends Tab {
 
 	}
 
+	setActive( isActive ) {
+
+		super.setActive( isActive );
+
+		if ( isActive ) {
+
+			this.clearUnread();
+
+		}
+
+	}
+
+	clearUnread() {
+
+		this.unreadErrors = 0;
+		this.unreadWarns = 0;
+		this.updateBadges();
+
+	}
+
+	updateBadges() {
+
+		if ( ! this.profiler ) return;
+
+		const errorBadge = this.profiler.toggleButton.querySelector( '.console-badge.error' );
+		const warnBadge = this.profiler.toggleButton.querySelector( '.console-badge.warn' );
+
+		if ( errorBadge ) {
+
+			if ( this.unreadErrors > 0 ) {
+
+				errorBadge.textContent = this.unreadErrors > 99 ? '+99' : this.unreadErrors;
+				errorBadge.style.display = '';
+
+			} else {
+
+				errorBadge.style.display = 'none';
+
+			}
+
+		}
+
+		if ( warnBadge ) {
+
+			if ( this.unreadWarns > 0 ) {
+
+				warnBadge.textContent = this.unreadWarns > 99 ? '+99' : this.unreadWarns;
+				warnBadge.style.display = '';
+
+			} else {
+
+				warnBadge.style.display = 'none';
+
+			}
+
+		}
+
+		if ( this.tabErrorBadge ) {
+
+			if ( this.unreadErrors > 0 ) {
+
+				this.tabErrorBadge.textContent = this.unreadErrors > 99 ? '+99' : this.unreadErrors;
+				this.tabErrorBadge.style.display = '';
+
+			} else {
+
+				this.tabErrorBadge.style.display = 'none';
+
+			}
+
+		}
+
+		if ( this.tabWarnBadge ) {
+
+			if ( this.unreadWarns > 0 ) {
+
+				this.tabWarnBadge.textContent = this.unreadWarns > 99 ? '+99' : this.unreadWarns;
+				this.tabWarnBadge.style.display = '';
+
+			} else {
+
+				this.tabWarnBadge.style.display = 'none';
+
+			}
+
+		}
+
+	}
+
 	addMessage( type, text ) {
 
-		const msg = document.createElement( 'div' );
-		msg.className = `log-message ${type}`;
-		msg.dataset.type = type;
-		msg.dataset.rawText = text;
+		if ( this.lastMessage && this.lastMessage.type === type && this.lastMessage.text === text ) {
 
-		msg.appendChild( this._formatMessage( type, text ) );
+			this.lastMessage.count ++;
+			this.lastMessage.countBadge.textContent = this.lastMessage.count;
+			this.lastMessage.countBadge.style.display = '';
 
-		const showByType = this.filters[ type ];
-		const showByText = text.toLowerCase().includes( this.filterText );
-		msg.classList.toggle( 'hidden', ! ( showByType && showByText ) );
+		} else {
 
-		this.logContainer.appendChild( msg );
+			const msg = document.createElement( 'div' );
+			msg.className = `log-message ${type}`;
+			msg.dataset.type = type;
+			msg.dataset.rawText = text;
+
+			const countBadge = document.createElement( 'span' );
+			countBadge.className = 'log-count-badge';
+			countBadge.style.display = 'none';
+			msg.appendChild( countBadge );
+
+			let icon = null;
+			const prefixMatch = text.match( /^([\w\.]+:\s)/ );
+			if ( prefixMatch ) {
+
+				const fullPrefix = prefixMatch[ 0 ];
+				const parts = fullPrefix.slice( 0, - 2 ).split( '.' );
+				const shortPrefix = ( parts.length > 1 ? parts[ parts.length - 1 ] : parts[ 0 ] ) + ':';
+				icon = this._getIcon( type, shortPrefix.split( ':' )[ 0 ].toLowerCase() );
+
+			}
+
+			if ( icon ) {
+
+				const iconSpan = document.createElement( 'span' );
+				iconSpan.className = 'log-icon';
+				iconSpan.textContent = icon;
+				msg.appendChild( iconSpan );
+
+			}
+
+			const body = document.createElement( 'span' );
+			body.className = 'log-body';
+			body.appendChild( this._formatMessage( type, text ) );
+			msg.appendChild( body );
+
+			const showByType = this.filters[ type ];
+			const showByText = text.toLowerCase().includes( this.filterText );
+			msg.classList.toggle( 'hidden', ! ( showByType && showByText ) );
+
+			this.logContainer.appendChild( msg );
+
+			if ( this.logContainer.children.length > 200 ) {
+
+				const firstChild = this.logContainer.firstChild;
+				this.logContainer.removeChild( firstChild );
+				if ( this.lastMessage && this.lastMessage.element === firstChild ) {
+
+					this.lastMessage = null;
+
+				}
+
+			}
+
+			this.lastMessage = {
+				type,
+				text,
+				count: 1,
+				element: msg,
+				countBadge
+			};
+
+		}
+
 		this.logContainer.scrollTop = this.logContainer.scrollHeight;
-		if ( this.logContainer.children.length > 200 ) {
 
-			this.logContainer.removeChild( this.logContainer.firstChild );
+		// Update unread counts if the console is not active/visible
+		const isUnread = ! this.isActive;
+
+		if ( isUnread ) {
+
+			if ( type === 'error' ) {
+
+				this.unreadErrors ++;
+				this.updateBadges();
+
+			} else if ( type === 'warn' ) {
+
+				this.unreadWarns ++;
+				this.updateBadges();
+
+			}
 
 		}
 

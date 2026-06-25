@@ -215,6 +215,17 @@ class TransformControls extends Controls {
 		defineProperty( 'size', 1 );
 
 		/**
+		 * The viewport rectangle, in logical (CSS) pixels with the origin at the lower-left
+		 * of the canvas. Set this when the renderer uses a sub-canvas viewport so pointer
+		 * coordinates map to the correct region. If `null`, the full canvas is used.
+		 *
+		 * @name TransformControls#viewport
+		 * @type {?Vector4}
+		 * @default null
+		 */
+		this.viewport = null;
+
+		/**
 		 * Whether dragging is currently performed or not.
 		 *
 		 * @name TransformControls#dragging
@@ -277,6 +288,24 @@ class TransformControls extends Controls {
 		 * @default true
 		 */
 		defineProperty( 'showXZ', true );
+
+		/**
+		 * Whether the xyze rotation helper should be visible or not.
+		 *
+		 * @name TransformControls#showXYZE
+		 * @type {boolean}
+		 * @default true
+		 */
+		defineProperty( 'showXYZE', true );
+
+		/**
+		 * Whether the e rotation helper should be visible or not.
+		 *
+		 * @name TransformControls#showE
+		 * @type {boolean}
+		 * @default true
+		 */
+		defineProperty( 'showE', true );
 
 		/**
 		 * The minimum allowed X position during translation.
@@ -567,35 +596,27 @@ class TransformControls extends Controls {
 
 				if ( space === 'world' ) {
 
-					if ( object.parent ) {
-
-						object.position.add( _tempVector.setFromMatrixPosition( object.parent.matrixWorld ) );
-
-					}
+					object.getWorldPosition( _tempVector );
 
 					if ( axis.search( 'X' ) !== - 1 ) {
 
-						object.position.x = Math.round( object.position.x / this.translationSnap ) * this.translationSnap;
+						_tempVector.x = Math.round( _tempVector.x / this.translationSnap ) * this.translationSnap;
 
 					}
 
 					if ( axis.search( 'Y' ) !== - 1 ) {
 
-						object.position.y = Math.round( object.position.y / this.translationSnap ) * this.translationSnap;
+						_tempVector.y = Math.round( _tempVector.y / this.translationSnap ) * this.translationSnap;
 
 					}
 
 					if ( axis.search( 'Z' ) !== - 1 ) {
 
-						object.position.z = Math.round( object.position.z / this.translationSnap ) * this.translationSnap;
+						_tempVector.z = Math.round( _tempVector.z / this.translationSnap ) * this.translationSnap;
 
 					}
 
-					if ( object.parent ) {
-
-						object.position.sub( _tempVector.setFromMatrixPosition( object.parent.matrixWorld ) );
-
-					}
+					object.position.copy( object.parent.worldToLocal( _tempVector ) );
 
 				}
 
@@ -966,10 +987,29 @@ function getPointer( event ) {
 	} else {
 
 		const rect = this.domElement.getBoundingClientRect();
+		const viewport = this.viewport;
+
+		let originX, originY, regionWidth, regionHeight;
+
+		if ( viewport !== null ) {
+
+			originX = viewport.x;
+			originY = rect.height - viewport.y - viewport.w;
+			regionWidth = viewport.z;
+			regionHeight = viewport.w;
+
+		} else {
+
+			originX = 0;
+			originY = 0;
+			regionWidth = rect.width;
+			regionHeight = rect.height;
+
+		}
 
 		return {
-			x: ( event.clientX - rect.left ) / rect.width * 2 - 1,
-			y: - ( event.clientY - rect.top ) / rect.height * 2 + 1,
+			x: ( event.clientX - rect.left - originX ) / regionWidth * 2 - 1,
+			y: - ( event.clientY - rect.top - originY ) / regionHeight * 2 + 1,
 			button: event.button
 		};
 
@@ -1117,6 +1157,15 @@ class TransformControlsRoot extends Object3D {
 		} else {
 
 			controls.eye.copy( controls.cameraPosition ).sub( controls.worldPosition ).normalize();
+
+		}
+
+		// Cancel out the parent's transform so the gizmo stays world-aligned.
+
+		if ( this.parent ) {
+
+			_tempMatrix.copy( this.parent.matrixWorld ).invert();
+			_tempMatrix.decompose( this.position, this.quaternion, this.scale );
 
 		}
 
@@ -1815,6 +1864,10 @@ class TransformControlsGizmo extends Object3D {
 			handle.visible = handle.visible && ( handle.name.indexOf( 'XY' ) === - 1 || this.showXY );
 			handle.visible = handle.visible && ( handle.name.indexOf( 'YZ' ) === - 1 || this.showYZ );
 			handle.visible = handle.visible && ( handle.name.indexOf( 'XZ' ) === - 1 || this.showXZ );
+
+			// Hide disabled rotation helpers
+			handle.visible = handle.visible && ( handle.name !== 'E' || this.showE );
+			handle.visible = handle.visible && ( handle.name !== 'XYZE' || this.showXYZE );
 
 			// highlight selected axis
 

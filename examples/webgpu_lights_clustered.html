@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - clustered lighting</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - clustered lighting">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_lights_clustered.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_lights_clustered.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Clustered Lighting</span>
+			</div>
+
+			<small>
+				Forward+ clustered lighting.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { instancedBufferAttribute, pass, uniform, vec3, float, mix, step } from 'three/tsl';
+
+			import { ClusteredLighting } from 'three/addons/lighting/ClusteredLighting.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			const GRID = 30; // GRID x GRID spheres
+			const SPACING = 5;
+			const RADIUS = 0.5;
+			const WAVE_HEIGHT = 4;
+			const BIG_RADIUS = 6;
+			const BASE_POWER = 45;
+
+			let camera, scene, renderer, controls, spheresMesh, lighting;
+			let renderPipeline, scenePass, clusterInfluence, debugZSliceNode;
+
+			const balls = [];
+			const dummy = new THREE.Object3D();
+
+			const params = {
+				intensity: 1,
+				animate: true
+			};
+
+			init();
+
+			async function init() {
+
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU support' );
+
+				}
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera.position.set( 36, 18, 36 );
+
+				scene = new THREE.Scene();
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.toneMappingExposure = 1;
+				lighting = new ClusteredLighting();
+				renderer.lighting = lighting; // set lighting system
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				// a physical sky drives the backdrop and the image-based lighting; the
+				// sun sits just below the horizon for an almost-night mood
+
+				const sky = new SkyMesh();
+				sky.scale.setScalar( 10000 );
+				sky.turbidity.value = 10;
+				sky.rayleigh.value = 3;
+				sky.mieCoefficient.value = 0.005;
+				sky.mieDirectionalG.value = 0.7;
+
+				const sun = new THREE.Vector3().setFromSphericalCoords(
+					1,
+					THREE.MathUtils.degToRad( 92 ), // elevation: 2° below the horizon (almost night)
+					THREE.MathUtils.degToRad( 225 ) // azimuth
+				);
+				sky.sunPosition.value.copy( sun );
+
+				scene.add( sky );
+
+				// the sun sits below the horizon, so keep its disc hidden; bake the sky
+				// into an environment map for the faint ambient colour it still casts
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				sky.showSunDisc.value = false;
+				scene.environment = pmremGenerator.fromScene( scene ).texture;
+				scene.environmentIntensity = 0.75;
+
+				// ground
+
+				const ground = new THREE.Mesh(
+					new THREE.PlaneGeometry( 1000, 1000 ).rotateX( - Math.PI / 2 ),
+					new THREE.MeshStandardNodeMaterial( { color: 0x2a2a2a, roughness: 0.6, metalness: 0 } )
+				);
+				scene.add( ground );
+
+				// four big spheres in the middle for the surrounding lights to play across
+
+				const bigPositions = [
+					new THREE.Vector3( - 9, BIG_RADIUS, - 9 ),
+					new THREE.Vector3( 9, BIG_RADIUS, - 9 ),
+					new THREE.Vector3( - 9, BIG_RADIUS, 9 ),
+					new THREE.Vector3( 9, BIG_RADIUS, 9 )
+				];
+
+				const bigGeometry = new THREE.SphereGeometry( BIG_RADIUS, 64, 32 );
+				const bigMaterial = new THREE.MeshStandardNodeMaterial( { color: 0xdddddd, roughness: 0.5, metalness: 0 } );
+
+				for ( const position of bigPositions ) {
+
+					const bigSphere = new THREE.Mesh( bigGeometry, bigMaterial );
+					bigSphere.position.copy( position );
+					scene.add( bigSphere );
+
+				}
+
+				// a grid of coloured spheres drawn as a single InstancedMesh; each is
+				// unlit in its own colour and holds a matching point light at its centre
+
+				const maxCount = GRID * GRID;
+				const colorAttribute = new THREE.InstancedBufferAttribute( new Float32Array( maxCount * 3 ), 3 );
+
+				const material = new THREE.MeshBasicNodeMaterial();
+				material.colorNode = instancedBufferAttribute( colorAttribute );
+
+				spheresMesh = new THREE.InstancedMesh( new THREE.SphereGeometry( RADIUS, 32, 16 ), material, maxCount );
+				spheresMesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
+				scene.add( spheresMesh );
+
+				const color = new THREE.Color();
+				const span = ( GRID - 1 ) * SPACING;
+
+				let i = 0;
+
+				for ( let ix = 0; ix < GRID; ix ++ ) {
+
+					for ( let iz = 0; iz < GRID; iz ++ ) {
+
+						const x = ix * SPACING - span / 2;
+						const z = iz * SPACING - span / 2;
+
+						// leave a clearing where a big sphere sits
+						if ( bigPositions.some( ( position ) => Math.hypot( x - position.x, z - position.z ) < BIG_RADIUS + 1 ) ) continue;
+
+						const phase = ( ix + iz ) * 0.5;
+
+						dummy.position.set( x, RADIUS, z );
+						dummy.updateMatrix();
+						spheresMesh.setMatrixAt( i, dummy.matrix );
+
+						color.setHSL( ( ix * GRID + iz ) / ( GRID * GRID ), 1.0, 0.5 );
+						colorAttribute.setXYZ( i, color.r, color.g, color.b );
+
+						const light = new THREE.PointLight( color, 1, 9 );
+						light.power = BASE_POWER;
+						light.position.set( x, RADIUS, z );
+						scene.add( light );
+
+						balls.push( { x, z, phase, light } );
+
+						i ++;
+
+					}
+
+				}
+
+				spheresMesh.count = i;
+
+				// controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.target.set( 0, 6, 0 );
+				controls.maxPolarAngle = Math.PI * 0.49;
+				controls.minDistance = 4;
+				controls.maxDistance = 400;
+				controls.update();
+
+				// post-processing: a debug overlay that tints each screen tile by how many
+				// lights its cluster holds, for the selected depth slice
+
+				scenePass = pass( scene, camera );
+				clusterInfluence = uniform( 0 );
+
+				// the large far plane spreads the exponential z-slices out, so the orb
+				// field falls around slices 7–11; default into that range
+				debugZSliceNode = uniform( 10, 'int' );
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				updatePostProcessing();
+
+				// gui
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( params, 'intensity', 0, 3 ).name( 'light intensity' ).onChange( ( value ) => {
+
+					for ( const ball of balls ) ball.light.power = BASE_POWER * value;
+
+				} );
+				gui.add( params, 'animate' );
+				gui.add( clusterInfluence, 'value', 0, .7 ).name( 'lights per tile' );
+				gui.add( debugZSliceNode, 'value', 0, lighting.zSlices - 1, 1 ).name( 'z-slice' );
+
+				// events
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				updatePostProcessing();
+
+			}
+
+			function updatePostProcessing() {
+
+				// the overlay samples the cluster grid at the current resolution, so it
+				// is rebuilt whenever the renderer size changes
+
+				const lightingNode = lighting.getNode( scene ).setSize( window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio );
+
+				// map the light count of each cluster ( 0 … maxLightsPerCluster ) to a
+				// blue → green → red gradient
+				const lightCount = lightingNode.getClusterLightCount( debugZSliceNode );
+				const heatmap = float( lightCount ).div( float( lighting.maxLightsPerCluster ) );
+
+				let heatColor = mix( vec3( 0.0, 0.0, 1.0 ), vec3( 0.0, 1.0, 0.0 ), heatmap.mul( 2.0 ).saturate() );
+				heatColor = mix( heatColor, vec3( 1.0, 0.0, 0.0 ), heatmap.sub( 0.5 ).mul( 2.0 ).saturate() );
+
+				// blend the heatmap over the scene by the slider amount; step() keeps
+				// empty clusters transparent
+				const finalInfluence = clusterInfluence.mul( step( 0.0001, heatmap ) );
+				renderPipeline.outputNode = mix( scenePass, heatColor, finalInfluence );
+				renderPipeline.needsUpdate = true;
+
+			}
+
+			function animate() {
+
+				if ( params.animate === true ) {
+
+					const time = performance.now() / 1000;
+
+					for ( let i = 0; i < balls.length; i ++ ) {
+
+						const ball = balls[ i ];
+						const y = RADIUS + ( 0.5 + 0.5 * Math.sin( time * 1.5 + ball.phase ) ) * WAVE_HEIGHT;
+
+						dummy.position.set( ball.x, y, ball.z );
+						dummy.updateMatrix();
+						spheresMesh.setMatrixAt( i, dummy.matrix );
+
+						ball.light.position.y = y;
+
+					}
+
+					spheresMesh.instanceMatrix.needsUpdate = true;
+
+				}
+
+				controls.update();
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+	</body>
+</html>

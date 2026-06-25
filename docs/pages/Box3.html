@@ -686,6 +686,10 @@ depth to the given size values.</p>
 							<p>Computes the world-axis-aligned bounding box for the given 3D object
 (including its children), accounting for the object's, and children's,
 world transforms. The function may result in a larger box than strictly necessary.</p>
+<p>Note: To compute the correct bounding box, make sure the given 3D object
+has an up-to-date world matrix that reflects the current transformation of its
+ancestor nodes. Call <code>object.updateWorldMatrix( true, false )</code> beforehand if
+you're unsure.</p>
 						</div>
 						<table class="params">
 							<tbody>

@@ -115,7 +115,7 @@ class Reflector extends Mesh {
 
 		this.onBeforeRender = function ( renderer, scene, camera ) {
 
-			const reflectionCamera = this._getReflectionCamera( camera );
+			const reflectionCamera = this.getReflectionCamera( camera );
 
 			reflectorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
 			cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
@@ -278,11 +278,10 @@ class Reflector extends Mesh {
 		 * Returns a reflection camera for the given camera. The reflection camera is used to
 		 * render the scene from the reflector's view so correct reflections can be produced.
 		 *
-		 * @private
 		 * @param {Camera} camera - The scene's camera.
 		 * @return {Camera} The corresponding reflection camera.
 		 */
-		this._getReflectionCamera = function ( camera ) {
+		this.getReflectionCamera = function ( camera ) {
 
 			let reflectionCamera = this._reflectionCameras.get( camera );
 

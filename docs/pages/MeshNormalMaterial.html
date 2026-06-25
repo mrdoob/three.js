@@ -50,6 +50,8 @@ by <a href="Color.html#set">Color#set</a>.</p>
 perceived depth in relation to the lights. Bump doesn't actually affect
 the geometry of the object, only the lighting. If a normal map is defined
 this will be ignored.</p>
+<p><code>bumpMap</code> represents non-color data. Any texture assigned must have
+<code>texture.colorSpace = NoColorSpace</code> (default).</p>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
@@ -77,7 +79,9 @@ other maps which only affect the light and shade of the material the
 displaced vertices can cast shadows, block other objects, and otherwise
 act as real geometry. The displacement texture is an image where the value
 of each pixel (white being the highest) is mapped against, and
-repositions, the vertices of the mesh.</p>
+repositions, the vertices of the mesh. For best results, pair a
+displacement map with a matching normal map, since the renderer can
+not recompute surface normals from the displaced vertices.</p>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
@@ -113,6 +117,8 @@ maps do not change the actual shape of the surface, only the lighting. In
 case the material has a normal map authored using the left handed
 convention, the <code>y</code> component of <code>normalScale</code> should be negated to compensate
 for the different handedness.</p>
+<p><code>normalMap</code> represents non-color data. Any texture assigned must have
+<code>texture.colorSpace = NoColorSpace</code> (default).</p>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>

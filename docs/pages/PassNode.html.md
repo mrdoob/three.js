@@ -240,14 +240,6 @@ The MRT object.
 
 **Returns:** A reference to this pass.
 
-### .setPixelRatio( pixelRatio : number )
-
-Sets the pixel ratio the pass's render target and updates the size.
-
-**pixelRatio**
-
-The pixel ratio to set.
-
 ### .setResolution( resolution : number ) : PassNode
 
 Sets the resolution for the pass. The resolution is a factor that is multiplied with the renderer's width and height.

@@ -31,14 +31,14 @@ export class Tab extends EventDispatcher {
 
 		super();
 
-		this.id = title.toLowerCase();
+		this.id = title.toLowerCase().replace( /\s+/g, '-' );
 		this.button = document.createElement( 'button' );
 		this.button.className = 'tab-btn';
 		this.button.textContent = title;
 
 		this.content = document.createElement( 'div' );
-		this.content.id = `${this.id}-content`;
 		this.content.className = 'profiler-content';
+		this.content.classList.add( `${this.id}-content` );
 
 		this._isActive = false;
 		this.isVisible = true;
@@ -62,11 +62,13 @@ export class Tab extends EventDispatcher {
 
 	get isActive() {
 
+		if ( this.isDetached && this.isVisible ) return true;
+
 		const isProfilerVisible = this.profiler && this.profiler.panel.classList.contains( 'visible' );
 
 		if ( ! isProfilerVisible ) return false;
 
-		return this.isDetached || this._isActive;
+		return this._isActive;
 
 	}
 

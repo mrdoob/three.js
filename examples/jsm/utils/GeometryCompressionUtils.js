@@ -509,7 +509,7 @@ function quantizedEncodeUV( array, bytes ) {
 
 	}
 
-	decodeMat.scale(
+	decodeMat.makeScale(
 		( max[ 0 ] - min[ 0 ] ) / segments,
 		( max[ 1 ] - min[ 1 ] ) / segments
 	);

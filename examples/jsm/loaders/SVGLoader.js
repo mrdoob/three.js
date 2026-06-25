@@ -1,12 +1,18 @@
 import {
 	Box2,
 	BufferGeometry,
+	CanvasTexture,
+	ClampToEdgeWrapping,
+	Color,
+	DoubleSide,
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
 	Matrix3,
+	MeshBasicMaterial,
+	MirroredRepeatWrapping,
 	Path,
-	Shape,
+	RepeatWrapping,
 	ShapePath,
 	ShapeUtils,
 	SRGBColorSpace,
@@ -144,6 +150,12 @@ class SVGLoader extends Loader {
 
 			if ( node.nodeType !== 1 ) return;
 
+			if ( node.hasAttribute( 'filter' ) ) {
+
+				console.warn( 'THREE.SVGLoader: Filters are not supported.' );
+
+			}
+
 			const transform = getNodeTransform( node );
 
 			let isDefsNode = false;
@@ -228,7 +240,7 @@ class SVGLoader extends Loader {
 
 			if ( path ) {
 
-				if ( style.fill !== undefined && style.fill !== 'none' ) {
+				if ( style.fill !== undefined && style.fill !== 'none' && ! style.fill.startsWith( 'url' ) ) {
 
 					path.color.setStyle( style.fill, COLOR_SPACE_SVG );
 
@@ -238,7 +250,10 @@ class SVGLoader extends Loader {
 
 				paths.push( path );
 
-				path.userData = { node: node, style: style };
+				const pathStyle = Object.assign( {}, style );
+				pathStyle.strokeWidth = style.strokeWidth * getTransformScale( currentTransform );
+
+				path.userData = { node: node, style: pathStyle, transform: currentTransform.clone(), gradients: gradients };
 
 			}
 
@@ -1044,6 +1059,146 @@ class SVGLoader extends Loader {
 
 		//
 
+		function parseGradients( xml ) {
+
+			const HREF_NS = 'http://www.w3.org/1999/xlink';
+			const gradientNodes = xml.querySelectorAll( 'linearGradient, radialGradient' );
+			const ATTRS = [ 'x1', 'y1', 'x2', 'y2', 'cx', 'cy', 'r', 'fx', 'fy', 'gradientUnits', 'gradientTransform', 'spreadMethod' ];
+
+			const parsed = {};
+
+			for ( const node of gradientNodes ) {
+
+				const id = node.getAttribute( 'id' );
+				if ( ! id ) continue;
+
+				const entry = {
+					type: node.nodeName === 'radialGradient' ? 'radialGradient' : 'linearGradient',
+					attrs: {},
+					stops: null,
+					href: null,
+				};
+
+				const href = node.getAttributeNS( HREF_NS, 'href' ) || node.getAttribute( 'href' ) || '';
+				if ( href.startsWith( '#' ) ) entry.href = href.substring( 1 );
+
+				for ( const name of ATTRS ) {
+
+					if ( node.hasAttribute( name ) ) entry.attrs[ name ] = node.getAttribute( name );
+
+				}
+
+				const stopNodes = node.querySelectorAll( 'stop' );
+				if ( stopNodes.length > 0 ) {
+
+					entry.stops = [];
+					for ( const s of stopNodes ) {
+
+						let color = s.getAttribute( 'stop-color' );
+						if ( ! color && s.style ) color = s.style[ 'stop-color' ];
+						if ( ! color ) color = '#000';
+
+						let opacity = s.getAttribute( 'stop-opacity' );
+						if ( ( opacity === null || opacity === '' ) && s.style ) opacity = s.style[ 'stop-opacity' ];
+						opacity = ( opacity === null || opacity === '' || opacity === undefined )
+							? 1
+							: Math.max( 0, Math.min( 1, parseFloat( opacity ) ) );
+
+						const offset = Math.max( 0, Math.min( 1, parseFloat( s.getAttribute( 'offset' ) || '0' ) ) );
+						entry.stops.push( { offset, color, opacity } );
+
+					}
+
+				}
+
+				parsed[ id ] = entry;
+
+			}
+
+			function inherit( id, visited ) {
+
+				const entry = parsed[ id ];
+				if ( ! entry || visited.has( id ) ) return entry;
+				visited.add( id );
+
+				if ( entry.href && parsed[ entry.href ] ) {
+
+					const parent = inherit( entry.href, visited );
+					if ( parent ) {
+
+						if ( ! entry.stops ) entry.stops = parent.stops;
+						for ( const key in parent.attrs ) {
+
+							if ( ! ( key in entry.attrs ) ) entry.attrs[ key ] = parent.attrs[ key ];
+
+						}
+
+					}
+
+				}
+
+				return entry;
+
+			}
+
+			for ( const id in parsed ) inherit( id, new Set() );
+
+			for ( const id in parsed ) {
+
+				const entry = parsed[ id ];
+				const a = entry.attrs;
+				const units = a.gradientUnits === 'userSpaceOnUse' ? 'userSpaceOnUse' : 'objectBoundingBox';
+
+				const gradient = {
+					type: entry.type,
+					gradientUnits: units,
+					spreadMethod: a.spreadMethod === 'reflect' || a.spreadMethod === 'repeat' ? a.spreadMethod : 'pad',
+					gradientTransform: null,
+					stops: ( entry.stops || [] ).slice().sort( ( x, y ) => x.offset - y.offset ),
+				};
+
+				if ( a.gradientTransform ) {
+
+					gradient.gradientTransform = new Matrix3();
+					parseTransformString( a.gradientTransform, gradient.gradientTransform );
+
+				}
+
+				function coord( str ) {
+
+					if ( typeof str !== 'string' ) return 0;
+					if ( str.endsWith( '%' ) ) return parseFloat( str ) / 100;
+					return parseFloatWithUnits( str );
+
+				}
+
+				if ( entry.type === 'linearGradient' ) {
+
+					gradient.x1 = a.x1 !== undefined ? coord( a.x1 ) : 0;
+					gradient.y1 = a.y1 !== undefined ? coord( a.y1 ) : 0;
+					gradient.x2 = a.x2 !== undefined ? coord( a.x2 ) : ( units === 'objectBoundingBox' ? 1 : 0 );
+					gradient.y2 = a.y2 !== undefined ? coord( a.y2 ) : 0;
+
+				} else {
+
+					const defCenter = units === 'objectBoundingBox' ? 0.5 : 0;
+					const defR = units === 'objectBoundingBox' ? 0.5 : 0;
+					gradient.cx = a.cx !== undefined ? coord( a.cx ) : defCenter;
+					gradient.cy = a.cy !== undefined ? coord( a.cy ) : defCenter;
+					gradient.r = a.r !== undefined ? coord( a.r ) : defR;
+					gradient.fx = a.fx !== undefined ? coord( a.fx ) : gradient.cx;
+					gradient.fy = a.fy !== undefined ? coord( a.fy ) : gradient.cy;
+
+				}
+
+				gradients[ id ] = gradient;
+
+			}
+
+		}
+
+		//
+
 		function parseStyle( node, style ) {
 
 			style = Object.assign( {}, style ); // clone style
@@ -1074,8 +1229,6 @@ class SVGLoader extends Loader {
 			function addStyle( svgName, jsName, adjustFunction ) {
 
 				if ( adjustFunction === undefined ) adjustFunction = function copy( v ) {
-
-					if ( v.startsWith( 'url' ) ) console.warn( 'SVGLoader: url access in attributes is not implemented.' );
 
 					return v;
 
@@ -1498,151 +1651,160 @@ class SVGLoader extends Loader {
 		function parseNodeTransform( node ) {
 
 			const transform = new Matrix3();
-			const currentTransform = tempTransform0;
 
 			if ( node.nodeName === 'use' && ( node.hasAttribute( 'x' ) || node.hasAttribute( 'y' ) ) ) {
 
 				const tx = parseFloatWithUnits( node.getAttribute( 'x' ) || 0 );
 				const ty = parseFloatWithUnits( node.getAttribute( 'y' ) || 0 );
 
-				transform.translate( tx, ty );
+				transform.makeTranslation( tx, ty );
 
 			}
 
 			if ( node.hasAttribute( 'transform' ) ) {
 
-				const transformsTexts = node.getAttribute( 'transform' ).split( ')' );
+				parseTransformString( node.getAttribute( 'transform' ), transform );
 
-				for ( let tIndex = transformsTexts.length - 1; tIndex >= 0; tIndex -- ) {
+			}
 
-					const transformText = transformsTexts[ tIndex ].trim();
+			return transform;
 
-					if ( transformText === '' ) continue;
+		}
 
-					const openParPos = transformText.indexOf( '(' );
-					const closeParPos = transformText.length;
+		function parseTransformString( text, transform ) {
 
-					if ( openParPos > 0 && openParPos < closeParPos ) {
+			const currentTransform = tempTransform0;
 
-						const transformType = transformText.slice( 0, openParPos );
+			const transformsTexts = text.split( ')' );
 
-						const array = parseFloats( transformText.slice( openParPos + 1 ) );
+			for ( let tIndex = transformsTexts.length - 1; tIndex >= 0; tIndex -- ) {
 
-						currentTransform.identity();
+				const transformText = transformsTexts[ tIndex ].trim();
 
-						switch ( transformType ) {
+				if ( transformText === '' ) continue;
 
-							case 'translate':
+				const openParPos = transformText.indexOf( '(' );
+				const closeParPos = transformText.length;
 
-								if ( array.length >= 1 ) {
+				if ( openParPos > 0 && openParPos < closeParPos ) {
 
-									const tx = array[ 0 ];
-									let ty = 0;
+					const transformType = transformText.slice( 0, openParPos );
 
-									if ( array.length >= 2 ) {
+					const array = parseFloats( transformText.slice( openParPos + 1 ) );
 
-										ty = array[ 1 ];
+					currentTransform.identity();
 
-									}
+					switch ( transformType ) {
 
-									currentTransform.translate( tx, ty );
+						case 'translate':
 
-								}
+							if ( array.length >= 1 ) {
 
-								break;
+								const tx = array[ 0 ];
+								let ty = 0;
 
-							case 'rotate':
+								if ( array.length >= 2 ) {
 
-								if ( array.length >= 1 ) {
-
-									let angle = 0;
-									let cx = 0;
-									let cy = 0;
-
-									// Angle
-									angle = array[ 0 ] * Math.PI / 180;
-
-									if ( array.length >= 3 ) {
-
-										// Center x, y
-										cx = array[ 1 ];
-										cy = array[ 2 ];
-
-									}
-
-									// Rotate around center (cx, cy)
-									tempTransform1.makeTranslation( - cx, - cy );
-									tempTransform2.makeRotation( angle );
-									tempTransform3.multiplyMatrices( tempTransform2, tempTransform1 );
-									tempTransform1.makeTranslation( cx, cy );
-									currentTransform.multiplyMatrices( tempTransform1, tempTransform3 );
+									ty = array[ 1 ];
 
 								}
 
-								break;
+								currentTransform.makeTranslation( tx, ty );
 
-							case 'scale':
+							}
 
-								if ( array.length >= 1 ) {
+							break;
 
-									const scaleX = array[ 0 ];
-									let scaleY = scaleX;
+						case 'rotate':
 
-									if ( array.length >= 2 ) {
+							if ( array.length >= 1 ) {
 
-										scaleY = array[ 1 ];
+								let angle = 0;
+								let cx = 0;
+								let cy = 0;
 
-									}
+								// Angle
+								angle = array[ 0 ] * Math.PI / 180;
 
-									currentTransform.scale( scaleX, scaleY );
+								if ( array.length >= 3 ) {
 
-								}
-
-								break;
-
-							case 'skewX':
-
-								if ( array.length === 1 ) {
-
-									currentTransform.set(
-										1, Math.tan( array[ 0 ] * Math.PI / 180 ), 0,
-										0, 1, 0,
-										0, 0, 1
-									);
+									// Center x, y
+									cx = array[ 1 ];
+									cy = array[ 2 ];
 
 								}
 
-								break;
+								// Rotate around center (cx, cy)
+								tempTransform1.makeTranslation( - cx, - cy );
+								tempTransform2.makeRotation( angle );
+								tempTransform3.multiplyMatrices( tempTransform2, tempTransform1 );
+								tempTransform1.makeTranslation( cx, cy );
+								currentTransform.multiplyMatrices( tempTransform1, tempTransform3 );
 
-							case 'skewY':
+							}
 
-								if ( array.length === 1 ) {
+							break;
 
-									currentTransform.set(
-										1, 0, 0,
-										Math.tan( array[ 0 ] * Math.PI / 180 ), 1, 0,
-										0, 0, 1
-									);
+						case 'scale':
 
-								}
+							if ( array.length >= 1 ) {
 
-								break;
+								const scaleX = array[ 0 ];
+								let scaleY = scaleX;
 
-							case 'matrix':
+								if ( array.length >= 2 ) {
 
-								if ( array.length === 6 ) {
-
-									currentTransform.set(
-										array[ 0 ], array[ 2 ], array[ 4 ],
-										array[ 1 ], array[ 3 ], array[ 5 ],
-										0, 0, 1
-									);
+									scaleY = array[ 1 ];
 
 								}
 
-								break;
+								currentTransform.makeScale( scaleX, scaleY );
 
-						}
+							}
+
+							break;
+
+						case 'skewX':
+
+							if ( array.length === 1 ) {
+
+								currentTransform.set(
+									1, Math.tan( array[ 0 ] * Math.PI / 180 ), 0,
+									0, 1, 0,
+									0, 0, 1
+								);
+
+							}
+
+							break;
+
+						case 'skewY':
+
+							if ( array.length === 1 ) {
+
+								currentTransform.set(
+									1, 0, 0,
+									Math.tan( array[ 0 ] * Math.PI / 180 ), 1, 0,
+									0, 0, 1
+								);
+
+							}
+
+							break;
+
+						case 'matrix':
+
+							if ( array.length === 6 ) {
+
+								currentTransform.set(
+									array[ 0 ], array[ 2 ], array[ 4 ],
+									array[ 1 ], array[ 3 ], array[ 5 ],
+									0, 0, 1
+								);
+
+							}
+
+							break;
 
 					}
 
@@ -1875,6 +2037,14 @@ class SVGLoader extends Loader {
 
 		}
 
+		function getTransformScale( m ) {
+
+			const te = m.elements;
+			const det = te[ 0 ] * te[ 4 ] - te[ 1 ] * te[ 3 ];
+			return Math.sqrt( Math.abs( det ) );
+
+		}
+
 		// Calculates the eigensystem of a real symmetric 2x2 matrix
 		//    [ A  B ]
 		//    [ B  C ]
@@ -1958,6 +2128,7 @@ class SVGLoader extends Loader {
 
 		const paths = [];
 		const stylesheets = {};
+		const gradients = {};
 
 		const transformStack = [];
 
@@ -1972,6 +2143,8 @@ class SVGLoader extends Loader {
 
 		const xml = new DOMParser().parseFromString( text, 'image/svg+xml' ); // application/xml
 
+		parseGradients( xml );
+
 		parseNode( xml.documentElement, {
 			fill: '#000',
 			fillOpacity: 1,
@@ -1982,7 +2155,7 @@ class SVGLoader extends Loader {
 			strokeMiterLimit: 4
 		} );
 
-		const data = { paths: paths, xml: xml.documentElement };
+		const data = { paths: paths, gradients: gradients, xml: xml.documentElement };
 
 		// console.log( paths );
 		return data;
@@ -1990,449 +2163,89 @@ class SVGLoader extends Loader {
 	}
 
 	/**
+	 * Creates a material for rendering the fill of the given path.
+	 *
+	 * @param {ShapePath} shapePath - The shape path.
+	 * @return {?MeshBasicMaterial} The fill material. `null` if the path has no fill.
+	 */
+	static createFillMaterial( shapePath ) {
+
+		const style = shapePath.userData.style;
+		if ( style.fill === undefined || style.fill === 'none' ) return null;
+
+		const color = shapePath.color;
+		let texture = null;
+
+		const urlMatch = GRADIENT_URL_RE.exec( style.fill );
+
+		if ( urlMatch ) {
+
+			const gradient = shapePath.userData.gradients && shapePath.userData.gradients[ urlMatch[ 1 ] ];
+			texture = buildGradientTexture( gradient, shapePath );
+
+		}
+
+		const material = new MeshBasicMaterial( {
+			opacity: style.fillOpacity * ( style.opacity || 1 ),
+			transparent: true,
+			side: DoubleSide,
+			depthWrite: false,
+		} );
+
+		if ( texture !== null ) {
+
+			material.map = texture;
+
+		} else {
+
+			material.color = color;
+
+		}
+
+		return material;
+
+	}
+
+	/**
+	 * Creates a material for rendering the stroke of the given path.
+	 *
+	 * @param {ShapePath} shapePath - The shape path.
+	 * @return {?MeshBasicMaterial} The stroke material. `null` if the path has no stroke.
+	 */
+	static createStrokeMaterial( shapePath ) {
+
+		const style = shapePath.userData.style;
+
+		if ( style.stroke === undefined || style.stroke === 'none' ) return null;
+
+		if ( GRADIENT_URL_RE.test( style.stroke ) ) {
+
+			console.warn( 'THREE.SVGLoader: Gradient strokes are not supported.' );
+
+		}
+
+		return new MeshBasicMaterial( {
+			color: new Color().setStyle( style.stroke, COLOR_SPACE_SVG ),
+			opacity: style.strokeOpacity * ( style.opacity || 1 ),
+			transparent: true,
+			side: DoubleSide,
+			depthWrite: false,
+		} );
+
+	}
+
+	/**
 	 * Creates from the given shape path and array of shapes.
 	 *
+	 * @deprecated since 185.
 	 * @param {ShapePath} shapePath - The shape path.
 	 * @return {Array<Shape>} An array of shapes.
 	 */
 	static createShapes( shapePath ) {
 
-		const BIGNUMBER = 999999999;
+		console.warn( 'SVGLoader: createShapes() is deprecated. Use shapePath.toShapes() instead.' ); // @deprecated, r185
 
-		const IntersectionLocationType = {
-			ORIGIN: 0,
-			DESTINATION: 1,
-			BETWEEN: 2,
-			LEFT: 3,
-			RIGHT: 4,
-			BEHIND: 5,
-			BEYOND: 6
-		};
-
-		const classifyResult = {
-			loc: IntersectionLocationType.ORIGIN,
-			t: 0
-		};
-
-		function findEdgeIntersection( a0, a1, b0, b1 ) {
-
-			const x1 = a0.x;
-			const x2 = a1.x;
-			const x3 = b0.x;
-			const x4 = b1.x;
-			const y1 = a0.y;
-			const y2 = a1.y;
-			const y3 = b0.y;
-			const y4 = b1.y;
-			const nom1 = ( x4 - x3 ) * ( y1 - y3 ) - ( y4 - y3 ) * ( x1 - x3 );
-			const nom2 = ( x2 - x1 ) * ( y1 - y3 ) - ( y2 - y1 ) * ( x1 - x3 );
-			const denom = ( y4 - y3 ) * ( x2 - x1 ) - ( x4 - x3 ) * ( y2 - y1 );
-			const t1 = nom1 / denom;
-			const t2 = nom2 / denom;
-
-			if ( ( ( denom === 0 ) && ( nom1 !== 0 ) ) || ( t1 <= 0 ) || ( t1 >= 1 ) || ( t2 < 0 ) || ( t2 > 1 ) ) {
-
-				//1. lines are parallel or edges don't intersect
-
-				return null;
-
-			} else if ( ( nom1 === 0 ) && ( denom === 0 ) ) {
-
-				//2. lines are colinear
-
-				//check if endpoints of edge2 (b0-b1) lies on edge1 (a0-a1)
-				for ( let i = 0; i < 2; i ++ ) {
-
-					classifyPoint( i === 0 ? b0 : b1, a0, a1 );
-					//find position of this endpoints relatively to edge1
-					if ( classifyResult.loc == IntersectionLocationType.ORIGIN ) {
-
-						const point = ( i === 0 ? b0 : b1 );
-						return { x: point.x, y: point.y, t: classifyResult.t };
-
-					} else if ( classifyResult.loc == IntersectionLocationType.BETWEEN ) {
-
-						const x = + ( ( x1 + classifyResult.t * ( x2 - x1 ) ).toPrecision( 10 ) );
-						const y = + ( ( y1 + classifyResult.t * ( y2 - y1 ) ).toPrecision( 10 ) );
-						return { x: x, y: y, t: classifyResult.t, };
-
-					}
-
-				}
-
-				return null;
-
-			} else {
-
-				//3. edges intersect
-
-				for ( let i = 0; i < 2; i ++ ) {
-
-					classifyPoint( i === 0 ? b0 : b1, a0, a1 );
-
-					if ( classifyResult.loc == IntersectionLocationType.ORIGIN ) {
-
-						const point = ( i === 0 ? b0 : b1 );
-						return { x: point.x, y: point.y, t: classifyResult.t };
-
-					}
-
-				}
-
-				const x = + ( ( x1 + t1 * ( x2 - x1 ) ).toPrecision( 10 ) );
-				const y = + ( ( y1 + t1 * ( y2 - y1 ) ).toPrecision( 10 ) );
-				return { x: x, y: y, t: t1 };
-
-			}
-
-		}
-
-		function classifyPoint( p, edgeStart, edgeEnd ) {
-
-			const ax = edgeEnd.x - edgeStart.x;
-			const ay = edgeEnd.y - edgeStart.y;
-			const bx = p.x - edgeStart.x;
-			const by = p.y - edgeStart.y;
-			const sa = ax * by - bx * ay;
-
-			if ( ( p.x === edgeStart.x ) && ( p.y === edgeStart.y ) ) {
-
-				classifyResult.loc = IntersectionLocationType.ORIGIN;
-				classifyResult.t = 0;
-				return;
-
-			}
-
-			if ( ( p.x === edgeEnd.x ) && ( p.y === edgeEnd.y ) ) {
-
-				classifyResult.loc = IntersectionLocationType.DESTINATION;
-				classifyResult.t = 1;
-				return;
-
-			}
-
-			if ( sa < - Number.EPSILON ) {
-
-				classifyResult.loc = IntersectionLocationType.LEFT;
-				return;
-
-			}
-
-			if ( sa > Number.EPSILON ) {
-
-				classifyResult.loc = IntersectionLocationType.RIGHT;
-				return;
-
-
-			}
-
-			if ( ( ( ax * bx ) < 0 ) || ( ( ay * by ) < 0 ) ) {
-
-				classifyResult.loc = IntersectionLocationType.BEHIND;
-				return;
-
-			}
-
-			if ( ( Math.sqrt( ax * ax + ay * ay ) ) < ( Math.sqrt( bx * bx + by * by ) ) ) {
-
-				classifyResult.loc = IntersectionLocationType.BEYOND;
-				return;
-
-			}
-
-			let t;
-
-			if ( ax !== 0 ) {
-
-				t = bx / ax;
-
-			} else {
-
-				t = by / ay;
-
-			}
-
-			classifyResult.loc = IntersectionLocationType.BETWEEN;
-			classifyResult.t = t;
-
-		}
-
-		function getIntersections( path1, path2 ) {
-
-			const intersectionsRaw = [];
-			const intersections = [];
-
-			for ( let index = 1; index < path1.length; index ++ ) {
-
-				const path1EdgeStart = path1[ index - 1 ];
-				const path1EdgeEnd = path1[ index ];
-
-				for ( let index2 = 1; index2 < path2.length; index2 ++ ) {
-
-					const path2EdgeStart = path2[ index2 - 1 ];
-					const path2EdgeEnd = path2[ index2 ];
-
-					const intersection = findEdgeIntersection( path1EdgeStart, path1EdgeEnd, path2EdgeStart, path2EdgeEnd );
-
-					if ( intersection !== null && intersectionsRaw.find( i => i.t <= intersection.t + Number.EPSILON && i.t >= intersection.t - Number.EPSILON ) === undefined ) {
-
-						intersectionsRaw.push( intersection );
-						intersections.push( new Vector2( intersection.x, intersection.y ) );
-
-					}
-
-				}
-
-			}
-
-			return intersections;
-
-		}
-
-		function getScanlineIntersections( scanline, boundingBox, paths ) {
-
-			const center = new Vector2();
-			boundingBox.getCenter( center );
-
-			const allIntersections = [];
-
-			paths.forEach( path => {
-
-				// check if the center of the bounding box is in the bounding box of the paths.
-				// this is a pruning method to limit the search of intersections in paths that can't envelop of the current path.
-				// if a path envelops another path. The center of that other path, has to be inside the bounding box of the enveloping path.
-				if ( path.boundingBox.containsPoint( center ) ) {
-
-					const intersections = getIntersections( scanline, path.points );
-
-					intersections.forEach( p => {
-
-						allIntersections.push( { identifier: path.identifier, isCW: path.isCW, point: p } );
-
-					} );
-
-				}
-
-			} );
-
-			allIntersections.sort( ( i1, i2 ) => {
-
-				return i1.point.x - i2.point.x;
-
-			} );
-
-			return allIntersections;
-
-		}
-
-		function isHoleTo( simplePath, allPaths, scanlineMinX, scanlineMaxX, _fillRule ) {
-
-			if ( _fillRule === null || _fillRule === undefined || _fillRule === '' ) {
-
-				_fillRule = 'nonzero';
-
-			}
-
-			const centerBoundingBox = new Vector2();
-			simplePath.boundingBox.getCenter( centerBoundingBox );
-
-			const scanline = [ new Vector2( scanlineMinX, centerBoundingBox.y ), new Vector2( scanlineMaxX, centerBoundingBox.y ) ];
-
-			const scanlineIntersections = getScanlineIntersections( scanline, simplePath.boundingBox, allPaths );
-
-			scanlineIntersections.sort( ( i1, i2 ) => {
-
-				return i1.point.x - i2.point.x;
-
-			} );
-
-			const baseIntersections = [];
-			const otherIntersections = [];
-
-			scanlineIntersections.forEach( i => {
-
-				if ( i.identifier === simplePath.identifier ) {
-
-					baseIntersections.push( i );
-
-				} else {
-
-					otherIntersections.push( i );
-
-				}
-
-			} );
-
-			const firstXOfPath = baseIntersections[ 0 ].point.x;
-
-			// build up the path hierarchy
-			const stack = [];
-			let i = 0;
-
-			while ( i < otherIntersections.length && otherIntersections[ i ].point.x < firstXOfPath ) {
-
-				if ( stack.length > 0 && stack[ stack.length - 1 ] === otherIntersections[ i ].identifier ) {
-
-					stack.pop();
-
-				} else {
-
-					stack.push( otherIntersections[ i ].identifier );
-
-				}
-
-				i ++;
-
-			}
-
-			stack.push( simplePath.identifier );
-
-			if ( _fillRule === 'evenodd' ) {
-
-				const isHole = stack.length % 2 === 0 ? true : false;
-				const isHoleFor = stack[ stack.length - 2 ];
-
-				return { identifier: simplePath.identifier, isHole: isHole, for: isHoleFor };
-
-			} else if ( _fillRule === 'nonzero' ) {
-
-				// check if path is a hole by counting the amount of paths with alternating rotations it has to cross.
-				let isHole = true;
-				let isHoleFor = null;
-				let lastCWValue = null;
-
-				for ( let i = 0; i < stack.length; i ++ ) {
-
-					const identifier = stack[ i ];
-					if ( isHole ) {
-
-						lastCWValue = allPaths[ identifier ].isCW;
-						isHole = false;
-						isHoleFor = identifier;
-
-					} else if ( lastCWValue !== allPaths[ identifier ].isCW ) {
-
-						lastCWValue = allPaths[ identifier ].isCW;
-						isHole = true;
-
-					}
-
-				}
-
-				return { identifier: simplePath.identifier, isHole: isHole, for: isHoleFor };
-
-			} else {
-
-				console.warn( 'fill-rule: "' + _fillRule + '" is currently not implemented.' );
-
-			}
-
-		}
-
-		// check for self intersecting paths
-		// TODO
-
-		// check intersecting paths
-		// TODO
-
-		// prepare paths for hole detection
-		let scanlineMinX = BIGNUMBER;
-		let scanlineMaxX = - BIGNUMBER;
-
-		let simplePaths = shapePath.subPaths.map( p => {
-
-			const points = p.getPoints();
-			let maxY = - BIGNUMBER;
-			let minY = BIGNUMBER;
-			let maxX = - BIGNUMBER;
-			let minX = BIGNUMBER;
-
-	      	//points.forEach(p => p.y *= -1);
-
-			for ( let i = 0; i < points.length; i ++ ) {
-
-				const p = points[ i ];
-
-				if ( p.y > maxY ) {
-
-					maxY = p.y;
-
-				}
-
-				if ( p.y < minY ) {
-
-					minY = p.y;
-
-				}
-
-				if ( p.x > maxX ) {
-
-					maxX = p.x;
-
-				}
-
-				if ( p.x < minX ) {
-
-					minX = p.x;
-
-				}
-
-			}
-
-			//
-			if ( scanlineMaxX <= maxX ) {
-
-				scanlineMaxX = maxX + 1;
-
-			}
-
-			if ( scanlineMinX >= minX ) {
-
-				scanlineMinX = minX - 1;
-
-			}
-
-			return { curves: p.curves, points: points, isCW: ShapeUtils.isClockWise( points ), identifier: - 1, boundingBox: new Box2( new Vector2( minX, minY ), new Vector2( maxX, maxY ) ) };
-
-		} );
-
-		simplePaths = simplePaths.filter( sp => sp.points.length > 1 );
-
-		for ( let identifier = 0; identifier < simplePaths.length; identifier ++ ) {
-
-			simplePaths[ identifier ].identifier = identifier;
-
-		}
-
-		// check if path is solid or a hole
-		const isAHole = simplePaths.map( p => isHoleTo( p, simplePaths, scanlineMinX, scanlineMaxX, ( shapePath.userData ? shapePath.userData.style.fillRule : undefined ) ) );
-
-
-		const shapesToReturn = [];
-		simplePaths.forEach( p => {
-
-			const amIAHole = isAHole[ p.identifier ];
-
-			if ( ! amIAHole.isHole ) {
-
-				const shape = new Shape();
-				shape.curves = p.curves;
-				const holes = isAHole.filter( h => h.isHole && h.for === p.identifier );
-				holes.forEach( h => {
-
-					const hole = simplePaths[ h.identifier ];
-					const path = new Path();
-					path.curves = hole.curves;
-					shape.holes.push( path );
-
-				} );
-				shapesToReturn.push( shape );
-
-			}
-
-		} );
-
-		return shapesToReturn;
+		return shapePath.toShapes();
 
 	}
 
@@ -2652,6 +2465,22 @@ class SVGLoader extends Loader {
 
 					outerPoint.copy( tempV2_5 ).add( currentPoint );
 					innerPoint.add( currentPoint );
+
+					// in-loop fold detection to mitigate #25326
+					if ( innerSideModified ) {
+
+						//  when the second triangle's signed area would flip, snap innerPoint to the previous inner-side vertex
+
+						const refPt = joinIsOnLeftSide ? lastPointR : lastPointL;
+						const foldCross = ( outerPoint.x - refPt.x ) * ( innerPoint.y - refPt.y )
+							- ( outerPoint.y - refPt.y ) * ( innerPoint.x - refPt.x );
+						if ( ( joinIsOnLeftSide && foldCross < 0 ) || ( ! joinIsOnLeftSide && foldCross > 0 ) ) {
+
+							innerPoint.copy( refPt );
+
+						}
+
+					}
 
 					isMiter = false;
 
@@ -2924,6 +2753,32 @@ class SVGLoader extends Loader {
 						lastOuter.toArray( vertices, 0 * 3 );
 
 					}
+
+				}
+
+			}
+
+		}
+
+		// Second fix for #25326: Scan for reamining flipped (CW) triangles and collapse them to
+		// degenerated ones. This is safe and leaves no "holes" in the stroke because the flipped
+		// triangle's area is covered by neighbouring (CCW) triangles.
+
+		if ( vertices ) {
+
+			const tri = [ new Vector2(), new Vector2(), new Vector2() ];
+			const startFloat = vertexOffset * 3;
+
+			for ( let t = startFloat; t < currentCoordinate; t += 9 ) {
+
+				tri[ 0 ].set( vertices[ t ], vertices[ t + 1 ] );
+				tri[ 1 ].set( vertices[ t + 3 ], vertices[ t + 4 ] );
+				tri[ 2 ].set( vertices[ t + 6 ], vertices[ t + 7 ] );
+
+				if ( ShapeUtils.area( tri ) < 0 ) {
+
+					vertices[ t + 3 ] = tri[ 0 ].x;
+					vertices[ t + 4 ] = tri[ 0 ].y;
 
 				}
 
@@ -3261,6 +3116,203 @@ class SVGLoader extends Loader {
 
 	}
 
+}
+
+const GRADIENT_URL_RE = /^\s*url\(\s*(?:["']\s*)?#([^)'"\s]+)(?:\s*["'])?\s*\)\s*$/;
+
+// Bakes a gradient into a CanvasTexture in its own local frame and configures
+// `texture.matrix` (with `matrixAutoUpdate = false`) so that shape-space UVs —
+// which, because transformPath bakes the world matrix into geometry vertex
+// positions, equal world xy — sample the correct gradient color. The caller
+// just sets `material.map = texture`; no bounding box, no geometry, no
+// per-vertex UV work required.
+function buildGradientTexture( gradient, shapePath, resolution = 256 ) {
+
+	if ( ! gradient || ! Array.isArray( gradient.stops ) || gradient.stops.length === 0 ) return null;
+
+	const worldTransform = shapePath.userData.transform;
+	const isBBoxUnits = gradient.gradientUnits === 'objectBoundingBox';
+
+	// For objectBoundingBox gradients we need the element's local bounding
+	// box. Path points are in world space (transformPath already applied the
+	// world transform), so invert that first.
+	let localBBox = null;
+
+	if ( isBBoxUnits ) {
+
+		localBBox = computeLocalBBox( shapePath, worldTransform );
+		if ( localBBox === null ) return null;
+
+	}
+
+	// Resolves a gradient-space point to the geometry's (world) coordinate
+	// space: gradient coord → gradientTransform → target coord → (for
+	// objectBoundingBox: bbox → local) → worldTransform → world.
+	function resolvePoint( x, y, out ) {
+
+		out.set( x, y, 1 );
+		if ( gradient.gradientTransform ) out.applyMatrix3( gradient.gradientTransform );
+		if ( isBBoxUnits ) out.set(
+			localBBox.minX + out.x * localBBox.width,
+			localBBox.minY + out.y * localBBox.height,
+			1,
+		);
+		if ( worldTransform ) out.applyMatrix3( worldTransform );
+
+	}
+
+	const canvas = document.createElement( 'canvas' );
+	let textureMatrix;
+
+	if ( gradient.type === 'linearGradient' ) {
+
+		// 1D bake along the gradient vector.
+		canvas.width = resolution;
+		canvas.height = 1;
+		const ctx = canvas.getContext( '2d' );
+
+		const grad = ctx.createLinearGradient( 0, 0, resolution, 0 );
+		addStops( grad, gradient.stops );
+		ctx.fillStyle = grad;
+		ctx.fillRect( 0, 0, resolution, 1 );
+
+		const p1 = new Vector3();
+		const p2 = new Vector3();
+		resolvePoint( gradient.x1, gradient.y1, p1 );
+		resolvePoint( gradient.x2, gradient.y2, p2 );
+
+		const dx = p2.x - p1.x;
+		const dy = p2.y - p1.y;
+		const len2 = dx * dx + dy * dy || 1e-20;
+		const a = dx / len2;
+		const b = dy / len2;
+		const c = - ( a * p1.x + b * p1.y );
+
+		// M * (vx, vy, 1) = (t, 0.5, 1)
+		textureMatrix = new Matrix3().set(
+			a, b, c,
+			0, 0, 0.5,
+			0, 0, 1,
+		);
+
+	} else {
+
+		// Resolve cx/cy/fx/fy into local space and scale r per the SVG spec
+		// (objectBoundingBox scales lengths by sqrt((w² + h²) / 2)). The canvas
+		// only draws circular radial gradients, so any ellipticity induced by
+		// a non-uniform world transform is picked up later via the UV matrix.
+		let cx = gradient.cx, cy = gradient.cy;
+		let fx = gradient.fx, fy = gradient.fy;
+		let r = gradient.r;
+
+		if ( gradient.gradientTransform ) {
+
+			const tmp = new Vector3();
+			tmp.set( cx, cy, 1 ).applyMatrix3( gradient.gradientTransform );
+			cx = tmp.x; cy = tmp.y;
+			tmp.set( fx, fy, 1 ).applyMatrix3( gradient.gradientTransform );
+			fx = tmp.x; fy = tmp.y;
+
+		}
+
+		if ( isBBoxUnits ) {
+
+			cx = localBBox.minX + cx * localBBox.width;
+			cy = localBBox.minY + cy * localBBox.height;
+			fx = localBBox.minX + fx * localBBox.width;
+			fy = localBBox.minY + fy * localBBox.height;
+			r = r * Math.sqrt( ( localBBox.width * localBBox.width + localBBox.height * localBBox.height ) / 2 );
+
+		}
+
+		if ( r <= 0 ) return null;
+
+		// 2D bake in the gradient's local frame, covering [cx-r, cx+r]².
+		canvas.width = resolution;
+		canvas.height = resolution;
+		const ctx = canvas.getContext( '2d' );
+
+		const localMinX = cx - r;
+		const localMinY = cy - r;
+		const localSpan = 2 * r;
+		const scale = resolution / localSpan;
+
+		// Canvas pixel = (local - localMin) * scale.
+		ctx.setTransform( scale, 0, 0, scale, - localMinX * scale, - localMinY * scale );
+
+		const grad = ctx.createRadialGradient( fx, fy, 0, cx, cy, r );
+		addStops( grad, gradient.stops );
+		ctx.fillStyle = grad;
+		ctx.fillRect( localMinX, localMinY, localSpan, localSpan );
+
+		// UV matrix: world → local (via worldTransform⁻¹) → normalized canvas UV.
+		const inv = worldTransform ? worldTransform.clone().invert() : new Matrix3();
+		const norm = new Matrix3().set(
+			1 / localSpan, 0, - localMinX / localSpan,
+			0, 1 / localSpan, - localMinY / localSpan,
+			0, 0, 1,
+		);
+		textureMatrix = norm.multiply( inv );
+
+	}
+
+	const texture = new CanvasTexture( canvas );
+	texture.colorSpace = COLOR_SPACE_SVG;
+	texture.flipY = false;
+	texture.matrixAutoUpdate = false;
+	texture.matrix = textureMatrix;
+
+	const wrap = gradient.spreadMethod === 'reflect' ? MirroredRepeatWrapping
+		: gradient.spreadMethod === 'repeat' ? RepeatWrapping
+			: ClampToEdgeWrapping;
+	texture.wrapS = wrap;
+	texture.wrapT = wrap;
+
+	return texture;
+
+}
+
+function computeLocalBBox( shapePath, worldTransform ) {
+
+	const inv = worldTransform ? worldTransform.clone().invert() : null;
+	const tmp = new Vector2();
+	const box = new Box2();
+
+	for ( const subPath of shapePath.subPaths ) {
+
+		for ( const p of subPath.getPoints() ) {
+
+			tmp.copy( p );
+			if ( inv ) tmp.applyMatrix3( inv );
+			box.expandByPoint( tmp );
+
+		}
+
+	}
+
+	if ( box.isEmpty() ) return null;
+
+	return { minX: box.min.x, minY: box.min.y, width: box.max.x - box.min.x, height: box.max.y - box.min.y };
+
+}
+
+function addStops( canvasGradient, stops ) {
+
+	const tmpColor = new Color();
+	for ( const stop of stops ) {
+
+		let css = stop.color;
+		if ( stop.opacity < 1 ) {
+
+			tmpColor.setStyle( stop.color, COLOR_SPACE_SVG );
+			const m = /rgb\(([^)]+)\)/.exec( tmpColor.getStyle( COLOR_SPACE_SVG ) );
+			if ( m ) css = `rgba(${m[ 1 ]},${stop.opacity})`;
+
+		}
+
+		canvasGradient.addColorStop( Math.max( 0, Math.min( 1, stop.offset ) ), css );
+
+	}
 
 }
 

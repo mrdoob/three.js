@@ -35,7 +35,7 @@
 			}
 		</script>
 
-		<script src="../examples/jsm/libs/draco/draco_encoder.js"></script>
+		<script src="https://cdn.jsdelivr.net/gh/google/draco@1.5.7/javascript/draco_encoder.js"></script>
 
 		<link rel="stylesheet" href="js/libs/codemirror/codemirror.css">
 		<link rel="stylesheet" href="js/libs/codemirror/theme/monokai.css">
@@ -63,7 +63,6 @@
 		<script src="js/libs/ternjs/comment.js"></script>
 		<script src="js/libs/ternjs/infer.js"></script>
 		<script src="js/libs/ternjs/doc_comment.js"></script>
-		<script src="js/libs/tern-threejs/threejs.js"></script>
 		<script src="js/libs/signals.min.js"></script>
 
 		<script type="module">
@@ -205,6 +204,7 @@
 
 				const signals = editor.signals;
 
+				signals.cameraResetted.add( saveState );
 				signals.geometryChanged.add( saveState );
 				signals.objectAdded.add( saveState );
 				signals.objectChanged.add( saveState );

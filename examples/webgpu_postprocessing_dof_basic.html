@@ -4,6 +4,10 @@
 		<title>three.js webgpu - postprocessing dof - basic</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - postprocessing dof - basic">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_postprocessing_dof_basic.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_postprocessing_dof_basic.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
@@ -43,7 +47,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
-			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { DRACOLoader, DRACO_GLTF_CONFIG } from 'three/addons/loaders/DRACOLoader.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import TWEEN from 'three/addons/libs/tween.module.js';
@@ -74,7 +78,7 @@
 				timer = new THREE.Timer();
 
 				const dracoLoader = new DRACOLoader();
-				dracoLoader.setDecoderPath( 'jsm/libs/draco/gltf/' );
+				dracoLoader.setDecoderPath( DRACO_GLTF_CONFIG );
 			
 				const loader = new GLTFLoader();
 				loader.setDRACOLoader( dracoLoader );

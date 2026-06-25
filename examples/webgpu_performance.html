@@ -4,6 +4,10 @@
 		<title>three.js webgpu - performance</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - performance">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_performance.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_performance.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
@@ -43,7 +47,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { DRACOLoader, DRACO_GLTF_CONFIG } from 'three/addons/loaders/DRACOLoader.js';
 
 			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 
@@ -101,7 +105,7 @@
 						// model
 
 						const dracoLoader = new DRACOLoader();
-						dracoLoader.setDecoderPath( 'jsm/libs/draco/gltf/' );
+						dracoLoader.setDecoderPath( DRACO_GLTF_CONFIG );
 
 						const loader = new GLTFLoader().setPath( 'models/gltf/' );
 						loader.setDRACOLoader( dracoLoader );

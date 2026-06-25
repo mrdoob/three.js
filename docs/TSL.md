@@ -52,6 +52,7 @@ An Approach to Productive and Maintainable Shader Creation.
 - [Storage](#storage)
 - [Struct](#struct)
 - [Flow Control](#flow-control)
+- [Override Node](#override-node)
 - [Fog](#fog)
 - [Color Adjustments](#color-adjustments)
 - [Utilities](#utilities)
@@ -490,7 +491,7 @@ It's possible use `xyzw`, `rgba` or `stpq`.
 | Name | Description |
 | -- | -- |
 | `.add( node \| value, ... )` | Return the addition of two or more value. |
-| `.sub( node \| value )` | Return the subraction of two or more value. |
+| `.sub( node \| value )` | Return the subtraction of two or more value. |
 | `.mul( node \| value )` | Return the multiplication of two or more value. |
 | `.div( node \| value )` | Return the division of two or more value. |
 | `.mod( node \| value )` | Computes the remainder of dividing the first node by the second. |
@@ -903,6 +904,8 @@ The module also provides `Break()` and `Continue()` TSL expression for loop cont
 | `step( edge, x )` | Generate a step function by comparing two values. |
 | `tan( x )` | Return the tangent of the parameter. |
 | `transformDirection( dir, matrix )` | Transform the direction of a vector by a matrix and then normalize the result. |
+| `transformNormalByViewMatrix( normal, viewMatrix )` | Transform a normal vector (given in world space) by the view matrix and normalize the result. |
+| `transformNormalByInverseViewMatrix( normal, viewMatrix )` | Transform a normal vector (given in view space) by the inverse of the view matrix and normalize the result. |
 | `trunc( x )` | Truncate the parameter, removing the fractional part. |
 
 ```js
@@ -1086,6 +1089,7 @@ Screen nodes will return the values related to the current `frame buffer`, eithe
 | `spherizeUV( uv, strength, centerNode = vec2( 0.5 ) )` | Distorts UV coordinates with a spherical effect around a center point. | `vec2` |
 | `spritesheetUV( count, uv = uv(), frame = float( 0 ) )` | Computes UV coordinates for a sprite sheet based on the number of frames, UV coordinates, and frame index. | `vec2` |
 | `equirectUV( direction = positionWorldDirection )` | Computes UV coordinates for equirectangular mapping based on the direction vector. | `vec2` |
+| `equirectDirection( uv = uv() )` | Computes a direction vector from the given equirectangular UV coordinates (inverse of `equirectUV`). | `vec3` |
 
 ```js
 import { texture, matcapUV } from 'three/tsl';
@@ -1133,8 +1137,8 @@ const matcap = texture( matcapMap, matcapUV );
 
 | Variable | Description | Type |
 | -- | -- | -- |
-| `directionToColor( value )` | Converts direction vector to color. | `color` |
-| `colorToDirection( value )` | Converts color to direction vector. | `vec3` |
+| `packNormalToRGB( value )` | Converts normal vector to color. | `color` |
+| `unpackRGBToNormal( value )` | Converts color to normal vector. | `vec3` |
 
 ## Render Pipeline
 
@@ -1172,18 +1176,18 @@ MRT allows capturing multiple outputs from a single render pass. Instead of rend
 Use `setMRT()` with the `mrt()` function to define which outputs to capture:
 
 ```js
-import { pass, mrt, output, normalView, velocity, directionToColor } from 'three/tsl';
+import { pass, mrt, output, normalView, velocity, packNormalToRGB } from 'three/tsl';
 
 const scenePass = pass( scene, camera );
 
 scenePass.setMRT( mrt( {
 	output: output,                          // Final color output
-	normal: directionToColor( normalView ),  // View-space normals encoded as colors
+	normal: packNormalToRGB( normalView ),   // View-space normals encoded as colors
 	velocity: velocity                       // Motion vectors for temporal effects
 } ) );
 ```
 
-Each MRT entry accepts any TSL node, allowing you to customize outputs using formulas, encoders, or material accessors. For example, `directionToColor( normalView )` encodes view-space normals into RGB values. You can use any TSL function to transform, combine, or encode data before writing to the render target.
+Each MRT entry accepts any TSL node, allowing you to customize outputs using formulas, encoders, or material accessors. For example, `packNormalToRGB( normalView )` encodes view-space normals into RGB values. You can use any TSL function to transform, combine, or encode data before writing to the render target.
 
 Within a TSL function `Fn( ( { material, object } ) => { ... } )`, you have complete access to the current material and object being rendered, enabling full customization of outputs.
 
@@ -1420,6 +1424,33 @@ const customFragment = Fn( () => {
 material.colorNode = customFragment();
 ```
 
+## Override Node
+
+Override nodes allow you to replace specific target nodes within a node sub-graph or flow dynamically during compilation, without having to reconstruct or duplicate the source nodes. This is useful, for example, to inject a custom `positionLocal` or normal into an existing flow through the material's `contextNode`.
+
+| Name | Description |
+| -- | -- |
+| `overrideNode( targetNode, callback = null, flowNode = null )` | Overrides a single target node. `callback` returns the overriding node (receiving the builder as argument) or can be the overriding node itself. |
+| `overrideNodes( overrides, flowNode = null )` | Overrides multiple target nodes at once using a `Map` or an array of `[ targetNode, callback \| node ]` pairs. |
+
+Example:
+
+```js
+import { overrideNode, overrideNodes, positionLocal, positionView, vec3 } from 'three/tsl';
+
+// Override a single node through the material context
+material.contextNode = overrideNode( positionLocal, () => positionLocal.add( vec3( 1, 0, 0 ) ) );
+
+// Override multiple nodes at once
+material.contextNode = overrideNodes( [
+	[ positionView, customPositionView ], // You can use a node directly like customPositionView.
+	[ positionLocal, ( builder ) => positionLocal.add( vec3( 1, 0, 0 ) ) ]
+] );
+
+// Method chaining is also supported
+node.overrideNode( positionLocal, () => positionLocal.add( vec3( 1, 0, 0 ) ) );
+```
+
 ## Fog
 
 Functions for creating fog effects in the scene. Assign the fog node to `scene.fogNode`.
@@ -1477,6 +1508,7 @@ Utility functions for common shader tasks.
 | -- | -- | -- |
 | `billboarding( { position, horizontal, vertical } )` | Orients flat meshes always towards the camera. `position`: vertex positions in world space (default: `null`). `horizontal`: follow camera horizontally (default: `true`). `vertical`: follow camera vertically (default: `false`). | `vec3` |
 | `checker( coord )` | Creates a 2x2 checkerboard pattern. | `float` |
+| `negateOnBackSide( vector )` | Negates a vector when rendering the back side of a face, according to the material's `side` configuration (`BackSide`, `DoubleSide` or `FrontSide`). | `vec3` |
 
 Example:
 

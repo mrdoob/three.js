@@ -6,7 +6,7 @@ import {
 	SRGBColorSpace
 } from 'three';
 
-import lottie from '../libs/lottie_canvas.module.js';
+import lottie from 'https://cdn.jsdelivr.net/npm/lottie-web@5.13.0/+esm';
 
 /**
  * A loader for the Lottie texture animation format.

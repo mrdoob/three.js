@@ -4,6 +4,10 @@
 		<title>three.js webgpu - SSGI</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - SSGI">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_postprocessing_ssgi.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_postprocessing_ssgi.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
@@ -32,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec3, vec4, directionToColor, colorToDirection, sample } from 'three/tsl';
+			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec3, vec4, packNormalToRGB, unpackRGBToNormal, sample } from 'three/tsl';
 			import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
@@ -77,7 +81,7 @@
 				scenePass.setMRT( mrt( {
 					output: output,
 					diffuseColor: diffuseColor,
-					normal: directionToColor( normalView ),
+					normal: packNormalToRGB( normalView ),
 					velocity: velocity
 				} ) );
 
@@ -102,7 +106,7 @@
 
 				const sceneNormal = sample( ( uv ) => {
 
-					return colorToDirection( scenePassNormal.sample( uv ) );
+					return unpackRGBToNormal( scenePassNormal.sample( uv ) );
 
 				} );
 
@@ -114,10 +118,10 @@
 
 				// composite
 
-				const gi = giPass.rgb.toInspector( 'SSGI' );
-				const ao = giPass.a.toInspector( 'AO' );
+				const ao = giPass.getAONode().toInspector( 'SSGI.AO' );
+				const gi = giPass.getGINode().toInspector( 'SSGI.GI' );
 
-				const compositePass = vec4( add( scenePassColor.rgb.mul( ao ), ( scenePassDiffuse.rgb.mul( gi ) ) ), scenePassColor.a );
+				const compositePass = vec4( add( scenePassColor.rgb.mul( ao.r ), ( scenePassDiffuse.rgb.mul( gi.rgb ) ) ), scenePassColor.a );
 				compositePass.name = 'Composite';
 
 				// traa

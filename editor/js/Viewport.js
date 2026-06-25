@@ -39,7 +39,7 @@ function Viewport( editor ) {
 	let pmremGenerator = null;
 	let pathtracer = null;
 
-	const camera = editor.camera;
+	let camera = editor.camera;
 	const scene = editor.scene;
 	const sceneHelpers = editor.sceneHelpers;
 
@@ -166,8 +166,10 @@ function Viewport( editor ) {
 
 			} else {
 
-				camera.left = - aspect;
-				camera.right = aspect;
+				const frustumHeight = camera.top - camera.bottom;
+
+				camera.left = - frustumHeight * aspect / 2;
+				camera.right = frustumHeight * aspect / 2;
 
 			}
 
@@ -498,6 +500,20 @@ function Viewport( editor ) {
 
 		}
 
+		// update light helper when light target is changed
+
+		for ( const id in editor.helpers ) {
+
+			const helper = editor.helpers[ id ];
+
+			if ( helper.light && helper.light.target === object ) {
+
+				helper.update();
+
+			}
+
+		}
+
 		initPT();
 		render();
 
@@ -798,7 +814,22 @@ function Viewport( editor ) {
 
 	} );
 
-	signals.cameraResetted.add( updateAspectRatio );
+	signals.cameraResetted.add( function () {
+
+		if ( camera !== editor.camera ) {
+
+			camera = editor.camera;
+
+			controls.setCamera( camera );
+			transformControls.camera = camera;
+			viewHelper.camera = camera;
+
+		}
+
+		updateAspectRatio();
+		render();
+
+	} );
 
 	// animations
 

@@ -45,8 +45,8 @@ let _batchTargetProbes = 0;
 // Reusable temp objects
 const _position = /*@__PURE__*/ new Vector3();
 const _size = /*@__PURE__*/ new Vector3();
-const _savedViewport = /*@__PURE__*/ new Vector4();
-const _savedScissor = /*@__PURE__*/ new Vector4();
+const _currentViewport = /*@__PURE__*/ new Vector4();
+const _currentScissor = /*@__PURE__*/ new Vector4();
 
 // Number of padding texels added at each boundary of every sub-volume in the atlas.
 const ATLAS_PADDING = 1;
@@ -54,6 +54,9 @@ const ATLAS_PADDING = 1;
 /**
  * A 3D grid of L2 Spherical Harmonic irradiance probes that provides
  * position-dependent diffuse global illumination.
+ *
+ * Note that this class can only be used with {@link WebGLRenderer}.
+ * A version for {@link WebGPURenderer} will be added at a later point.
  *
  * All seven packed SH sub-volumes are stored in a **single** RGBA
  * `WebGL3DRenderTarget` using a texture-atlas layout along the Z axis.
@@ -202,7 +205,10 @@ class LightProbeGrid extends Object3D {
 
 	/**
 	 * Bakes all probes by rendering cubemaps at each probe position
-	 * and projecting to L2 SH. Fully GPU-resident with zero CPU readback.
+	 * and projecting to L2 SH. Optionally iterates additional passes to
+	 * capture indirect bounces — each extra pass samples the previous pass's
+	 * atlas as indirect light, so a grid added to the scene before baking
+	 * accumulates one bounce per extra pass.
 	 *
 	 * @param {WebGLRenderer} renderer - The renderer.
 	 * @param {Scene} scene - The scene to render.
@@ -210,16 +216,15 @@ class LightProbeGrid extends Object3D {
 	 * @param {number} [options.cubemapSize=8] - Resolution of each cubemap face.
 	 * @param {number} [options.near=0.1] - Near plane for the cube camera.
 	 * @param {number} [options.far=100] - Far plane for the cube camera.
+	 * @param {number} [options.bounces=0] - Additional bounce passes after the initial direct pass.
 	 */
 	bake( renderer, scene, options = {} ) {
 
+		const { bounces = 0 } = options;
 		const { cubeRenderTarget, cubeCamera } = _ensureBakeResources( options );
 
 		this._ensureTextures();
 		this.updateBoundingBox();
-
-		// Prevent feedback: temporarily hide the volume during baking
-		this.visible = false;
 
 		const res = this.resolution;
 		const totalProbes = res.x * res.y * res.z;
@@ -228,109 +233,134 @@ class LightProbeGrid extends Object3D {
 		const batchTarget = _ensureBatchTarget( totalProbes );
 
 		// Save renderer state
-		const savedRenderTarget = renderer.getRenderTarget();
-		renderer.getViewport( _savedViewport );
-		renderer.getScissor( _savedScissor );
-		const savedScissorTest = renderer.getScissorTest();
+		const currentRenderTarget = renderer.getRenderTarget();
+		renderer.getViewport( _currentViewport );
+		renderer.getScissor( _currentScissor );
+		const currentScissorTest = renderer.getScissorTest();
 
-		// Clear pooled batch target so skipped probes read as zero
-		batchTarget.scissorTest = false;
-		batchTarget.viewport.set( 0, 0, 9, totalProbes );
-		renderer.setRenderTarget( batchTarget );
-		renderer.clear();
+		// Scene is static across the bake — update once and disable per-render auto updates.
+		const currentMatrixWorldAutoUpdate = scene.matrixWorldAutoUpdate;
+		if ( currentMatrixWorldAutoUpdate === true ) {
 
-		// const t0 = performance.now();
-
-		// Phase 1: Render cubemaps and project to SH into batch target
-		// Note: set viewport/scissor on the render target directly to avoid pixel ratio scaling
-		batchTarget.scissorTest = true;
-
-		// Disable shadow map auto-update during bake — lights don't move between probes.
-		// Force one shadow update on the first render so maps are initialized.
-		const savedShadowAutoUpdate = renderer.shadowMap.autoUpdate;
-		renderer.shadowMap.autoUpdate = false;
-		renderer.shadowMap.needsUpdate = true;
-
-		for ( let iz = 0; iz < res.z; iz ++ ) {
-
-			for ( let iy = 0; iy < res.y; iy ++ ) {
-
-				for ( let ix = 0; ix < res.x; ix ++ ) {
-
-					const probeIndex = ix + iy * res.x + iz * res.x * res.y;
-
-					this.getProbePosition( ix, iy, iz, _position );
-					cubeCamera.position.copy( _position );
-					cubeCamera.update( renderer, scene );
-
-					// SH projection
-					_shMaterial.uniforms.envMap.value = cubeRenderTarget.texture;
-					_mesh.material = _shMaterial;
-					batchTarget.viewport.set( 0, probeIndex, 9, 1 );
-					batchTarget.scissor.set( 0, probeIndex, 9, 1 );
-					renderer.setRenderTarget( batchTarget );
-					renderer.render( _scene, _camera );
-
-				}
-
-			}
+			scene.updateMatrixWorld( true );
+			scene.matrixWorldAutoUpdate = false;
 
 		}
 
-		renderer.shadowMap.autoUpdate = savedShadowAutoUpdate;
-
-		// Phase 2: Repack SH data from batch target into the atlas 3D texture (GPU-to-GPU).
-		//
-		// For each of the 7 packed sub-volumes (texture index t) we write:
-		//   - A leading padding slice  (copy of data slice iz = 0)
-		//   - All nz data slices       (iz = 0 … nz-1)
-		//   - A trailing padding slice (copy of data slice iz = nz-1)
-		//
-		// In the atlas the slices for sub-volume t occupy the range:
-		//   [ t * paddedSlices, t * paddedSlices + paddedSlices - 1 ]
-		// where paddedSlices = nz + 2 * ATLAS_PADDING.
+		// Disable shadow map auto-update across all passes — lights don't move.
+		// Force a single shadow update on the first render so maps are initialized.
+		const currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
+		renderer.shadowMap.autoUpdate = false;
+		renderer.shadowMap.needsUpdate = true;
 
 		_ensureRepackResources();
 
 		const paddedSlices = res.z + 2 * ATLAS_PADDING;
 		const rt = this._renderTarget;
-		rt.scissorTest = false;
-		rt.viewport.set( 0, 0, res.x, res.y );
 
-		for ( let t = 0; t < 7; t ++ ) {
+		// const t0 = performance.now();
 
-			_repackMaterials[ t ].uniforms.batchTexture.value = batchTarget.texture;
-			_repackMaterials[ t ].uniforms.resolution.value.copy( res );
+		// Pass 0 captures direct light only (grid hidden, so probesSH is not sampled
+		// — the atlas at this point may be uninitialized or hold a prior bake).
+		// Each subsequent pass keeps the grid visible so the cube cameras read the
+		// previous pass's atlas as indirect light, accumulating one bounce per pass.
+		// Phase 1 writes to the batch target and Phase 2 only swaps it into the atlas
+		// at the very end of each pass, which gives an implicit ping-pong for free.
 
-			// Write data slices
+		for ( let pass = 0; pass <= bounces; pass ++ ) {
+
+			this.visible = pass > 0;
+
+			// Clear pooled batch target so skipped probes read as zero
+			batchTarget.scissorTest = false;
+			batchTarget.viewport.set( 0, 0, 9, totalProbes );
+			renderer.setRenderTarget( batchTarget );
+			renderer.clear();
+
+			// Phase 1: Render cubemaps and project to SH into batch target
+			// Note: set viewport/scissor on the render target directly to avoid pixel ratio scaling
+			batchTarget.scissorTest = true;
+
 			for ( let iz = 0; iz < res.z; iz ++ ) {
 
-				_repackMaterials[ t ].uniforms.sliceZ.value = iz;
+				for ( let iy = 0; iy < res.y; iy ++ ) {
+
+					for ( let ix = 0; ix < res.x; ix ++ ) {
+
+						const probeIndex = ix + iy * res.x + iz * res.x * res.y;
+
+						this.getProbePosition( ix, iy, iz, _position );
+						cubeCamera.position.copy( _position );
+						cubeCamera.update( renderer, scene );
+
+						// SH projection
+						_shMaterial.uniforms.envMap.value = cubeRenderTarget.texture;
+						_mesh.material = _shMaterial;
+						batchTarget.viewport.set( 0, probeIndex, 9, 1 );
+						batchTarget.scissor.set( 0, probeIndex, 9, 1 );
+						renderer.setRenderTarget( batchTarget );
+						renderer.render( _scene, _camera );
+
+					}
+
+				}
+
+			}
+
+			// Phase 2: Repack SH data from batch target into the atlas 3D texture (GPU-to-GPU).
+			//
+			// For each of the 7 packed sub-volumes (texture index t) we write:
+			//   - A leading padding slice  (copy of data slice iz = 0)
+			//   - All nz data slices       (iz = 0 … nz-1)
+			//   - A trailing padding slice (copy of data slice iz = nz-1)
+			//
+			// In the atlas the slices for sub-volume t occupy the range:
+			//   [ t * paddedSlices, t * paddedSlices + paddedSlices - 1 ]
+			// where paddedSlices = nz + 2 * ATLAS_PADDING.
+
+			rt.scissorTest = false;
+			rt.viewport.set( 0, 0, res.x, res.y );
+
+			for ( let t = 0; t < 7; t ++ ) {
+
+				_repackMaterials[ t ].uniforms.batchTexture.value = batchTarget.texture;
+				_repackMaterials[ t ].uniforms.resolution.value.copy( res );
+
+				// Write data slices
+				for ( let iz = 0; iz < res.z; iz ++ ) {
+
+					_repackMaterials[ t ].uniforms.sliceZ.value = iz;
+					_mesh.material = _repackMaterials[ t ];
+					renderer.setRenderTarget( rt, t * paddedSlices + ATLAS_PADDING + iz );
+					renderer.render( _scene, _camera );
+
+				}
+
+				// Leading padding: copy of data slice iz = 0
+				_repackMaterials[ t ].uniforms.sliceZ.value = 0;
 				_mesh.material = _repackMaterials[ t ];
-				renderer.setRenderTarget( rt, t * paddedSlices + ATLAS_PADDING + iz );
+				renderer.setRenderTarget( rt, t * paddedSlices );
+				renderer.render( _scene, _camera );
+
+				// Trailing padding: copy of data slice iz = nz - 1
+				_repackMaterials[ t ].uniforms.sliceZ.value = res.z - 1;
+				_mesh.material = _repackMaterials[ t ];
+				renderer.setRenderTarget( rt, t * paddedSlices + ATLAS_PADDING + res.z );
 				renderer.render( _scene, _camera );
 
 			}
 
-			// Leading padding: copy of data slice iz = 0
-			_repackMaterials[ t ].uniforms.sliceZ.value = 0;
-			_mesh.material = _repackMaterials[ t ];
-			renderer.setRenderTarget( rt, t * paddedSlices );
-			renderer.render( _scene, _camera );
-
-			// Trailing padding: copy of data slice iz = nz - 1
-			_repackMaterials[ t ].uniforms.sliceZ.value = res.z - 1;
-			_mesh.material = _repackMaterials[ t ];
-			renderer.setRenderTarget( rt, t * paddedSlices + ATLAS_PADDING + res.z );
-			renderer.render( _scene, _camera );
-
 		}
 
+		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
+
 		// Restore renderer state
-		renderer.setRenderTarget( savedRenderTarget );
-		renderer.setViewport( _savedViewport );
-		renderer.setScissor( _savedScissor );
-		renderer.setScissorTest( savedScissorTest );
+		renderer.setRenderTarget( currentRenderTarget );
+		renderer.setViewport( _currentViewport );
+		renderer.setScissor( _currentScissor );
+		renderer.setScissorTest( currentScissorTest );
+
+		scene.matrixWorldAutoUpdate = currentMatrixWorldAutoUpdate;
 
 		// console.log( `LightProbeGrid: bake complete ${ ( performance.now() - t0 ).toFixed( 1 ) }ms` );
 

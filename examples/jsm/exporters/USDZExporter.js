@@ -2,6 +2,7 @@ import {
 	NoColorSpace,
 	DoubleSide,
 	Color,
+	PropertyBinding,
 } from 'three';
 
 import {
@@ -76,7 +77,7 @@ class USDNode {
 
 		const properties = this.properties.map( ( l ) => {
 
-			const property = l.property;
+			const property = l.property.replace( /\n/g, '\n' + pad + '\t' );
 			const metadata = l.metadata.length
 				? ` (\n${l.metadata.map( ( m ) => `${pad}\t\t${m}` ).join( '\n' )}\n${pad}\t)`
 				: '';
@@ -199,6 +200,8 @@ class USDZExporter {
 				onlyVisible: true,
 				quickLookCompatible: false,
 				maxTextureSize: 1024,
+				animations: [],
+				animationFrameRate: 60,
 			},
 			options
 		);
@@ -210,6 +213,9 @@ class USDZExporter {
 
 		// model file should be first in USDZ archive so we init it here
 		files[ modelFileName ] = null;
+
+		const animationTracks = buildAnimationTracks( scene, options.animations );
+		options.animationTracks = animationTracks;
 
 		const root = new USDNode( 'Root', 'Xform' );
 		const scenesNode = new USDNode( 'Scenes', 'Scope' );
@@ -241,7 +247,15 @@ class USDZExporter {
 		const materials = {};
 		const textures = {};
 
-		buildHierarchy( scene, sceneNode, materials, usedNames, files, options );
+		if ( scene.isScene ) {
+
+			buildHierarchy( scene, sceneNode, materials, usedNames, files, options );
+
+		} else {
+
+			buildNode( scene, sceneNode, materials, usedNames, files, options );
+
+		}
 
 		const materialsNode = buildMaterials(
 			materials,
@@ -249,8 +263,12 @@ class USDZExporter {
 			options.quickLookCompatible
 		);
 
+		const timeRange = animationTracks.size > 0
+			? { fps: options.animationFrameRate, endTimeCode: getMaxClipDuration( options.animations ) * options.animationFrameRate }
+			: null;
+
 		output =
-			buildHeader() +
+			buildHeader( timeRange ) +
 			'\n' +
 			root.toString() +
 			'\n\n' +
@@ -284,11 +302,14 @@ class USDZExporter {
 				texture.flipY,
 				options.maxTextureSize
 			);
+
+			const mimeType = ( texture.userData.mimeType === 'image/jpeg' ) ? 'image/jpeg' : 'image/png';
+
 			const blob = await new Promise( ( resolve ) =>
-				canvas.toBlob( resolve, 'image/png', 1 )
+				canvas.toBlob( resolve, mimeType )
 			);
 
-			files[ `textures/Texture_${id}.png` ] = new Uint8Array(
+			files[ `textures/Texture_${id}.${getTextureExtension( texture )}` ] = new Uint8Array(
 				await blob.arrayBuffer()
 			);
 
@@ -363,6 +384,12 @@ function getName( object, namesSet ) {
 
 }
 
+function getTextureExtension( texture ) {
+
+	return texture.userData.mimeType === 'image/jpeg' ? 'jpg' : 'png';
+
+}
+
 function imageToCanvas( image, flipY, maxTextureSize ) {
 
 	if (
@@ -410,7 +437,15 @@ function imageToCanvas( image, flipY, maxTextureSize ) {
 
 const PRECISION = 7;
 
-function buildHeader() {
+function buildHeader( timeRange = null ) {
+
+	const timeMetadata = timeRange
+		? `
+	startTimeCode = 0
+	endTimeCode = ${timeRange.endTimeCode}
+	timeCodesPerSecond = ${timeRange.fps}
+	framesPerSecond = ${timeRange.fps}`
+		: '';
 
 	return `#usda 1.0
 (
@@ -419,9 +454,95 @@ function buildHeader() {
 	}
 	defaultPrim = "Root"
 	metersPerUnit = 1
-	upAxis = "Y"
+	upAxis = "Y"${timeMetadata}
 )
 `;
+
+}
+
+function buildAnimationTracks( scene, clips ) {
+
+	// Map<Object3D, { position?: KeyframeTrack, quaternion?: KeyframeTrack, scale?: KeyframeTrack }>
+	const tracksByObject = new Map();
+
+	for ( let c = 0; c < clips.length; c ++ ) {
+
+		const clip = clips[ c ];
+
+		for ( let t = 0; t < clip.tracks.length; t ++ ) {
+
+			const track = clip.tracks[ t ];
+			const binding = PropertyBinding.parseTrackName( track.name );
+			const target = PropertyBinding.findNode( scene, binding.nodeName );
+
+			if ( target === null || target === undefined ) continue;
+
+			const property = binding.propertyName;
+			if ( property !== 'position' && property !== 'quaternion' && property !== 'scale' ) continue;
+
+			let entry = tracksByObject.get( target );
+			if ( entry === undefined ) {
+
+				entry = {};
+				tracksByObject.set( target, entry );
+
+			}
+
+			entry[ property ] = track;
+
+		}
+
+	}
+
+	return tracksByObject;
+
+}
+
+function getMaxClipDuration( clips ) {
+
+	let max = 0;
+	for ( let i = 0; i < clips.length; i ++ ) {
+
+		if ( clips[ i ].duration > max ) max = clips[ i ].duration;
+
+	}
+
+	return max;
+
+}
+
+function buildVector3TimeSamples( opName, opType, track, fps ) {
+
+	const times = track.times;
+	const values = track.values;
+	const samples = [];
+
+	for ( let i = 0; i < times.length; i ++ ) {
+
+		const o = i * 3;
+		samples.push( `${( times[ i ] * fps ).toPrecision( PRECISION )}: (${values[ o ].toPrecision( PRECISION )}, ${values[ o + 1 ].toPrecision( PRECISION )}, ${values[ o + 2 ].toPrecision( PRECISION )})` );
+
+	}
+
+	return `${opType} ${opName}.timeSamples = {\n\t${samples.join( ',\n\t' )},\n}`;
+
+}
+
+function buildQuaternionTimeSamples( track, fps ) {
+
+	const times = track.times;
+	const values = track.values;
+	const samples = [];
+
+	// three.js quaternion order: (x, y, z, w); USD quatf order: (w, x, y, z)
+	for ( let i = 0; i < times.length; i ++ ) {
+
+		const o = i * 4;
+		samples.push( `${( times[ i ] * fps ).toPrecision( PRECISION )}: (${values[ o + 3 ].toPrecision( PRECISION )}, ${values[ o ].toPrecision( PRECISION )}, ${values[ o + 1 ].toPrecision( PRECISION )}, ${values[ o + 2 ].toPrecision( PRECISION )})` );
+
+	}
+
+	return `quatf xformOp:orient.timeSamples = {\n\t${samples.join( ',\n\t' )},\n}`;
 
 }
 
@@ -431,74 +552,155 @@ function buildHierarchy( object, parentNode, materials, usedNames, files, option
 
 	for ( let i = 0, l = object.children.length; i < l; i ++ ) {
 
-		const child = object.children[ i ];
-
-		if ( child.visible === false && options.onlyVisible === true ) continue;
-
-		let childNode;
-
-		if ( child.isMesh ) {
-
-			const geometry = child.geometry;
-			const material = child.material;
-
-			if ( material.isMeshStandardMaterial ) {
-
-				const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usda';
-
-				if ( ! ( geometryFileName in files ) ) {
-
-					const meshObject = buildMeshObject( geometry );
-					files[ geometryFileName ] = strToU8(
-						buildHeader() + '\n' + meshObject.toString()
-					);
-
-				}
-
-				if ( ! ( material.uuid in materials ) ) {
-
-					materials[ material.uuid ] = material;
-
-				}
-
-				childNode = buildMesh(
-					child,
-					geometry,
-					materials[ material.uuid ],
-					usedNames
-				);
-
-			} else {
-
-				console.warn(
-					'THREE.USDZExporter: Unsupported material type (USDZ only supports MeshStandardMaterial)',
-					child
-				);
-
-			}
-
-		} else if ( child.isCamera ) {
-
-			childNode = buildCamera( child, usedNames );
-
-		} else {
-
-			childNode = buildXform( child, usedNames );
-
-		}
-
-		if ( childNode ) {
-
-			parentNode.addChild( childNode );
-			buildHierarchy( child, childNode, materials, usedNames, files, options );
-
-		}
+		buildNode( object.children[ i ], parentNode, materials, usedNames, files, options );
 
 	}
 
 }
 
-function buildXform( object, usedNames ) {
+function buildNode( object, parentNode, materials, usedNames, files, options ) {
+
+	if ( object.visible === false && options.onlyVisible === true ) return;
+
+	let childNode;
+
+	if ( object.isMesh ) {
+
+		const geometry = object.geometry;
+		const isMultiMaterial = Array.isArray( object.material );
+
+		const meshMaterials = isMultiMaterial ? object.material : [ object.material ];
+
+		for ( let i = 0; i < meshMaterials.length; i ++ ) {
+
+			const material = meshMaterials[ i ];
+
+			if ( ! material.isMeshStandardMaterial ) {
+
+				console.warn( 'THREE.USDZExporter: Use MeshStandardMaterial for best results.' );
+
+			}
+
+			if ( ! ( material.uuid in materials ) ) {
+
+				materials[ material.uuid ] = material;
+
+			}
+
+		}
+
+		const resolvedMaterials = meshMaterials.map( ( m ) => materials[ m.uuid ] );
+
+		if ( isMultiMaterial === false ) {
+
+			const geometryFileName = `geometries/Geometry_${geometry.id}.usda`;
+
+			if ( ! ( geometryFileName in files ) ) {
+
+				const meshObject = buildMeshObject( geometry );
+				files[ geometryFileName ] = strToU8(
+					buildHeader() + '\n' + meshObject.toString()
+				);
+
+			}
+
+		}
+
+		childNode = buildMesh(
+			object,
+			geometry,
+			resolvedMaterials,
+			usedNames,
+			options
+		);
+
+	} else if ( object.isCamera ) {
+
+		childNode = buildCamera( object, usedNames, options );
+
+	} else {
+
+		childNode = buildXform( object, usedNames, options );
+
+	}
+
+	parentNode.addChild( childNode );
+	buildHierarchy( object, childNode, materials, usedNames, files, options );
+
+}
+
+function addTransformProperties( node, object, options ) {
+
+	const animTracks = options.animationTracks.get( object );
+	const hasPivot = object.pivot !== null;
+
+	if ( ! hasPivot && animTracks === undefined ) {
+
+		const transform = buildMatrix( object.matrix );
+		node.addProperty( `matrix4d xformOp:transform = ${transform}` );
+		node.addProperty( 'uniform token[] xformOpOrder = ["xformOp:transform"]' );
+		return;
+
+	}
+
+	// Per-op layout: animated channels use timeSamples, others stay static.
+	// Pivot ops (when present) are always static.
+
+	const fps = options.animationFrameRate;
+	const p = object.position;
+	const q = object.quaternion;
+	const s = object.scale;
+
+	if ( animTracks !== undefined && animTracks.position !== undefined ) {
+
+		node.addProperty( buildVector3TimeSamples( 'xformOp:translate', 'float3', animTracks.position, fps ) );
+
+	} else {
+
+		node.addProperty( `float3 xformOp:translate = (${p.x.toPrecision( PRECISION )}, ${p.y.toPrecision( PRECISION )}, ${p.z.toPrecision( PRECISION )})` );
+
+	}
+
+	if ( hasPivot ) {
+
+		const piv = object.pivot;
+		node.addProperty( `float3 xformOp:translate:pivot = (${piv.x.toPrecision( PRECISION )}, ${piv.y.toPrecision( PRECISION )}, ${piv.z.toPrecision( PRECISION )})` );
+
+	}
+
+	if ( animTracks !== undefined && animTracks.quaternion !== undefined ) {
+
+		node.addProperty( buildQuaternionTimeSamples( animTracks.quaternion, fps ) );
+
+	} else {
+
+		node.addProperty( `quatf xformOp:orient = (${q.w.toPrecision( PRECISION )}, ${q.x.toPrecision( PRECISION )}, ${q.y.toPrecision( PRECISION )}, ${q.z.toPrecision( PRECISION )})` );
+
+	}
+
+	if ( animTracks !== undefined && animTracks.scale !== undefined ) {
+
+		node.addProperty( buildVector3TimeSamples( 'xformOp:scale', 'float3', animTracks.scale, fps ) );
+
+	} else {
+
+		node.addProperty( `float3 xformOp:scale = (${s.x.toPrecision( PRECISION )}, ${s.y.toPrecision( PRECISION )}, ${s.z.toPrecision( PRECISION )})` );
+
+	}
+
+	if ( hasPivot ) {
+
+		node.addProperty( 'uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:translate:pivot", "xformOp:orient", "xformOp:scale", "!invert!xformOp:translate:pivot"]' );
+
+	} else {
+
+		node.addProperty( 'uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]' );
+
+	}
+
+}
+
+function buildXform( object, usedNames, options ) {
 
 	const name = getName( object, usedNames );
 
@@ -512,47 +714,32 @@ function buildXform( object, usedNames ) {
 	}
 
 	const node = new USDNode( name, 'Xform' );
-
-	if ( object.pivot !== null ) {
-
-		// Export with pivot using separate transform ops
-		const p = object.position;
-		const q = object.quaternion;
-		const s = object.scale;
-		const piv = object.pivot;
-
-		node.addProperty( `float3 xformOp:translate = (${p.x.toPrecision( PRECISION )}, ${p.y.toPrecision( PRECISION )}, ${p.z.toPrecision( PRECISION )})` );
-		node.addProperty( `float3 xformOp:translate:pivot = (${piv.x.toPrecision( PRECISION )}, ${piv.y.toPrecision( PRECISION )}, ${piv.z.toPrecision( PRECISION )})` );
-		node.addProperty( `quatf xformOp:orient = (${q.w.toPrecision( PRECISION )}, ${q.x.toPrecision( PRECISION )}, ${q.y.toPrecision( PRECISION )}, ${q.z.toPrecision( PRECISION )})` );
-		node.addProperty( `float3 xformOp:scale = (${s.x.toPrecision( PRECISION )}, ${s.y.toPrecision( PRECISION )}, ${s.z.toPrecision( PRECISION )})` );
-		node.addProperty( 'uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:translate:pivot", "xformOp:orient", "xformOp:scale", "!invert!xformOp:translate:pivot"]' );
-
-	} else {
-
-		// Export as single transform matrix
-		const transform = buildMatrix( object.matrix );
-		node.addProperty( `matrix4d xformOp:transform = ${transform}` );
-		node.addProperty( 'uniform token[] xformOpOrder = ["xformOp:transform"]' );
-
-	}
+	addTransformProperties( node, object, options );
 
 	return node;
 
 }
 
-function buildMesh( object, geometry, material, usedNames ) {
+function buildMesh( object, geometry, materials, usedNames, options ) {
 
-	const node = buildXform( object, usedNames );
+	const node = buildXform( object, usedNames, options );
 
-	node.addMetadata(
-		'prepend references',
-		`@./geometries/Geometry_${geometry.id}.usda@</Geometry>`
-	);
-	node.addMetadata( 'prepend apiSchemas', '["MaterialBindingAPI"]' );
+	if ( materials.length === 1 ) {
 
-	node.addProperty(
-		`rel material:binding = </Materials/Material_${material.id}>`
-	);
+		node.addMetadata(
+			'prepend references',
+			`@./geometries/Geometry_${geometry.id}.usda@</Geometry>`
+		);
+		node.addMetadata( 'prepend apiSchemas', '["MaterialBindingAPI"]' );
+		node.addProperty(
+			`rel material:binding = </Materials/Material_${materials[ 0 ].id}>`
+		);
+
+	} else {
+
+		node.addChild( buildMeshNode( geometry, materials ) );
+
+	}
 
 	return node;
 
@@ -590,7 +777,7 @@ function buildMeshObject( geometry ) {
 
 }
 
-function buildMeshNode( geometry ) {
+function buildMeshNode( geometry, materials = null ) {
 
 	const name = 'Geometry';
 	const attributes = geometry.attributes;
@@ -641,6 +828,41 @@ function buildMeshNode( geometry ) {
 	}
 
 	node.addProperty( 'uniform token subdivisionScheme = "none"' );
+
+	if ( materials !== null ) {
+
+		const groups = geometry.groups;
+
+		const totalFaces = ( geometry.index !== null
+			? geometry.index.count
+			: attributes.position.count ) / 3;
+
+		for ( let i = 0; i < groups.length; i ++ ) {
+
+			const group = groups[ i ];
+			const material = materials[ group.materialIndex ];
+
+			if ( material === undefined ) continue;
+
+			const startFace = Math.floor( group.start / 3 );
+			const endFace = Math.min( startFace + Math.floor( group.count / 3 ), totalFaces );
+
+			const indices = [];
+			for ( let j = startFace; j < endFace; j ++ ) indices.push( j );
+
+			const subsetNode = new USDNode( `subset_${i}`, 'GeomSubset' );
+			subsetNode.addMetadata( 'prepend apiSchemas', '["MaterialBindingAPI"]' );
+			subsetNode.addProperty( 'uniform token elementType = "face"' );
+			subsetNode.addProperty( 'uniform token familyName = "materialBind"' );
+			subsetNode.addProperty( `int[] indices = [${indices.join( ', ' )}]` );
+			subsetNode.addProperty(
+				`rel material:binding = </Materials/Material_${material.id}>`
+			);
+			node.addChild( subsetNode );
+
+		}
+
+	}
 
 	return node;
 
@@ -839,21 +1061,27 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 			'Shader'
 		);
 		textureNode.addProperty( 'uniform token info:id = "UsdUVTexture"' );
-		textureNode.addProperty( `asset inputs:file = @textures/Texture_${id}.png@` );
+		textureNode.addProperty( `asset inputs:file = @textures/Texture_${id}.${getTextureExtension( texture )}@` );
 		textureNode.addProperty(
 			`float2 inputs:st.connect = </Materials/Material_${material.id}/Transform2d_${mapType}.outputs:result>`
 		);
 
 		if ( color !== undefined ) {
 
-			textureNode.addProperty( `float4 inputs:scale = ${buildColor4( color )}` );
+			const alpha = ( mapType === 'diffuse' ) ? material.opacity : 1;
+			textureNode.addProperty( `float4 inputs:scale = ${buildColor4( color, alpha )}` );
 
 		}
 
 		if ( mapType === 'normal' ) {
 
-			textureNode.addProperty( 'float4 inputs:scale = (2, 2, 2, 1)' );
-			textureNode.addProperty( 'float4 inputs:bias = (-1, -1, -1, 0)' );
+			// Similar to GLTFExporter, only the x component is used so the y-negation that
+			// GLTFLoader applies to tangent-less glTF assets is not baked into the export.
+
+			const scale = material.normalScale.x;
+
+			textureNode.addProperty( `float4 inputs:scale = (${ 2 * scale }, ${ 2 * scale }, 2, 1)` );
+			textureNode.addProperty( `float4 inputs:bias = (${ - scale }, ${ - scale }, -1, 0)` );
 
 		}
 
@@ -933,33 +1161,39 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 	}
 
-	if ( material.emissiveMap !== null ) {
+	if ( material.emissive ) {
 
-		previewSurfaceNode.addProperty(
-			`color3f inputs:emissiveColor.connect = </Materials/Material_${material.id}/Texture_${material.emissiveMap.id}_emissive.outputs:rgb>`
-		);
+		const emissiveIntensity = material.emissiveIntensity ?? 1;
 
-		const emissiveColor = new Color(
-			material.emissive.r * material.emissiveIntensity,
-			material.emissive.g * material.emissiveIntensity,
-			material.emissive.b * material.emissiveIntensity
-		);
-		const textureNodes = buildTextureNodes(
-			material.emissiveMap,
-			'emissive',
-			emissiveColor
-		);
-		textureNodes.forEach( ( node ) => materialNode.addChild( node ) );
+		if ( material.emissiveMap ) {
 
-	} else if ( material.emissive.getHex() > 0 ) {
+			previewSurfaceNode.addProperty(
+				`color3f inputs:emissiveColor.connect = </Materials/Material_${material.id}/Texture_${material.emissiveMap.id}_emissive.outputs:rgb>`
+			);
 
-		previewSurfaceNode.addProperty(
-			`color3f inputs:emissiveColor = ${buildColor( material.emissive )}`
-		);
+			const emissiveColor = new Color(
+				material.emissive.r * emissiveIntensity,
+				material.emissive.g * emissiveIntensity,
+				material.emissive.b * emissiveIntensity
+			);
+			const textureNodes = buildTextureNodes(
+				material.emissiveMap,
+				'emissive',
+				emissiveColor
+			);
+			textureNodes.forEach( ( node ) => materialNode.addChild( node ) );
+
+		} else if ( material.emissive.getHex() > 0 ) {
+
+			previewSurfaceNode.addProperty(
+				`color3f inputs:emissiveColor = ${buildColor( material.emissive )}`
+			);
+
+		}
 
 	}
 
-	if ( material.normalMap !== null ) {
+	if ( material.normalMap ) {
 
 		previewSurfaceNode.addProperty(
 			`normal3f inputs:normal.connect = </Materials/Material_${material.id}/Texture_${material.normalMap.id}_normal.outputs:rgb>`
@@ -970,16 +1204,17 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 	}
 
-	if ( material.aoMap !== null ) {
+	if ( material.aoMap ) {
 
 		previewSurfaceNode.addProperty(
 			`float inputs:occlusion.connect = </Materials/Material_${material.id}/Texture_${material.aoMap.id}_occlusion.outputs:r>`
 		);
 
+		const aoMapIntensity = material.aoMapIntensity ?? 1;
 		const aoColor = new Color(
-			material.aoMapIntensity,
-			material.aoMapIntensity,
-			material.aoMapIntensity
+			aoMapIntensity,
+			aoMapIntensity,
+			aoMapIntensity
 		);
 		const textureNodes = buildTextureNodes(
 			material.aoMap,
@@ -990,7 +1225,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 	}
 
-	if ( material.roughnessMap !== null ) {
+	if ( material.roughnessMap ) {
 
 		previewSurfaceNode.addProperty(
 			`float inputs:roughness.connect = </Materials/Material_${material.id}/Texture_${material.roughnessMap.id}_roughness.outputs:g>`
@@ -1011,12 +1246,12 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 	} else {
 
 		previewSurfaceNode.addProperty(
-			`float inputs:roughness = ${material.roughness}`
+			`float inputs:roughness = ${material.roughness ?? 1}`
 		);
 
 	}
 
-	if ( material.metalnessMap !== null ) {
+	if ( material.metalnessMap ) {
 
 		previewSurfaceNode.addProperty(
 			`float inputs:metallic.connect = </Materials/Material_${material.id}/Texture_${material.metalnessMap.id}_metallic.outputs:b>`
@@ -1037,12 +1272,12 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 	} else {
 
 		previewSurfaceNode.addProperty(
-			`float inputs:metallic = ${material.metalness}`
+			`float inputs:metallic = ${material.metalness ?? 0}`
 		);
 
 	}
 
-	if ( material.alphaMap !== null ) {
+	if ( material.alphaMap ) {
 
 		previewSurfaceNode.addProperty(
 			`float inputs:opacity.connect = </Materials/Material_${material.id}/Texture_${material.alphaMap.id}_opacity.outputs:r>`
@@ -1137,9 +1372,9 @@ function buildColor( color ) {
 
 }
 
-function buildColor4( color ) {
+function buildColor4( color, alpha = 1 ) {
 
-	return `(${color.r}, ${color.g}, ${color.b}, 1.0)`;
+	return `(${color.r}, ${color.g}, ${color.b}, ${alpha})`;
 
 }
 
@@ -1149,11 +1384,9 @@ function buildVector2( vector ) {
 
 }
 
-function buildCamera( camera, usedNames ) {
+function buildCamera( camera, usedNames, options ) {
 
 	const name = getName( camera, usedNames );
-
-	const transform = buildMatrix( camera.matrix );
 
 	if ( camera.matrix.determinant() < 0 ) {
 
@@ -1165,8 +1398,7 @@ function buildCamera( camera, usedNames ) {
 	}
 
 	const node = new USDNode( name, 'Camera' );
-	node.addProperty( `matrix4d xformOp:transform = ${transform}` );
-	node.addProperty( 'uniform token[] xformOpOrder = ["xformOp:transform"]' );
+	addTransformProperties( node, camera, options );
 
 	const projection = camera.isOrthographicCamera
 		? 'orthographic'
@@ -1235,6 +1467,9 @@ function buildCamera( camera, usedNames ) {
  * can be configured via `ar.anchoring.type` and `ar.planeAnchoring.alignment`.
  * @property {boolean} [quickLookCompatible=false] - Whether to make the exported USDZ compatible to QuickLook
  * which means the asset is modified to accommodate the bugs FB10036297 and FB11442287 (Apple Feedback).
+ * @property {Array<AnimationClip>} [animations=[]] - Animation clips to bake into `xformOp` time samples on the
+ * targeted objects. Only `position`, `quaternion`, and `scale` tracks are exported.
+ * @property {number} [animationFrameRate=60] - Time codes per second used when writing animation samples.
  **/
 
 /**

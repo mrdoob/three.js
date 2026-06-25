@@ -10,7 +10,7 @@ Rhinoceros is a 3D modeler used to create, edit, analyze, document, render, anim
 
 ```js
 const loader = new Rhino3dmLoader();
-loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@8.0.1' );
+loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@8.17.0/' );
 const object = await loader.loadAsync( 'models/3dm/Rhino_Logo.3dm' );
 scene.add( object );
 ```

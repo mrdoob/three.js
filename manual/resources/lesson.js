@@ -3,9 +3,41 @@
 
 ( function () {
 
+	if ( ! window.frameElement && window.location.protocol !== 'file:' ) {
+
+		// not in iframe: redirect to the framed manual
+
+		const re = /^(.*?\/manual\/)(.*?)$/;
+		const [ , baseURL, articlePath ] = re.exec( window.location.href );
+		const href = `${baseURL}#${articlePath.replace( '.html', '' )}`;
+		window.location.replace( href ); // lgtm[js/client-side-unvalidated-url-redirection]
+
+	}
+
+	const parts = window.location.href.split( '/' );
+	const filename = parts[ parts.length - 1 ];
+
+	if ( filename !== 'primitives.html' && filename !== 'prerequisites.html' ) {
+
+		let text = document.body.innerHTML;
+
+		text = text.replace( /\[link:([\w\:\/\.\-\_\(\)\?\#\=\!\~]+)\]/gi, '<a href="$1" target="_blank">$1</a>' ); // [link:url]
+		text = text.replace( /\[link:([\w:/.\-_()?#=!~]+) ([\w\p{L}:/.\-_'\s]+)\]/giu, '<a href="$1" target="_blank">$2</a>' ); // [link:url title]
+		text = text.replace( /\[example:([\w\_]+)\]/gi, '[example:$1 $1]' ); // [example:name] to [example:name title]
+		text = text.replace( /\[example:([\w\_]+) ([\w\:\/\.\-\_ \s]+)\]/gi, '<a href="../../examples/#$1" target="_blank">$2</a>' ); // [example:name title]
+		text = text.replace( /\`(.*?)\`/gs, '<code class="notranslate" translate="no">$1</code>' ); // `code`
+
+		document.body.innerHTML = text;
+
+	}
+
 	if ( window.frameElement ) {
 
 		// in iframe
+		// Bind link handlers after the innerHTML above has been (re)written,
+		// otherwise the reassignment discards the freshly attached listeners
+		// and clicks fall back to native iframe navigation, leaving the parent
+		// page's URL hash and sidebar out of sync.
 		document.querySelectorAll( 'a' ).forEach( a => {
 
 			// we have to send all links to the parent
@@ -33,34 +65,6 @@
 
 		} );
 		window.parent.setTitle( document.title );
-
-	} else {
-
-		if ( window.location.protocol !== 'file:' ) {
-
-			const re = /^(.*?\/manual\/)(.*?)$/;
-			const [ , baseURL, articlePath ] = re.exec( window.location.href );
-			const href = `${baseURL}#${articlePath.replace( '.html', '' )}`;
-			window.location.replace( href ); // lgtm[js/client-side-unvalidated-url-redirection]
-
-		}
-
-	}
-
-	const parts = window.location.href.split( '/' );
-	const filename = parts[ parts.length - 1 ];
-
-	if ( filename !== 'primitives.html' && filename !== 'prerequisites.html' ) {
-
-		let text = document.body.innerHTML;
-
-		text = text.replace( /\[link:([\w\:\/\.\-\_\(\)\?\#\=\!\~]+)\]/gi, '<a href="$1" target="_blank">$1</a>' ); // [link:url]
-		text = text.replace( /\[link:([\w:/.\-_()?#=!~]+) ([\w\p{L}:/.\-_'\s]+)\]/giu, '<a href="$1" target="_blank">$2</a>' ); // [link:url title]
-		text = text.replace( /\[example:([\w\_]+)\]/gi, '[example:$1 $1]' ); // [example:name] to [example:name title]
-		text = text.replace( /\[example:([\w\_]+) ([\w\:\/\.\-\_ \s]+)\]/gi, '<a href="../../examples/#$1" target="_blank">$2</a>' ); // [example:name title]
-		text = text.replace( /\`(.*?)\`/gs, '<code class="notranslate" translate="no">$1</code>' ); // `code`
-
-		document.body.innerHTML = text;
 
 	}
 

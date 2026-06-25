@@ -17,11 +17,8 @@
 <p>This interpolant supports the COLLADA/Maya style of Bezier animation where
 each keyframe has explicit in/out tangent control points specified as
 2D coordinates (time, value).</p>
-<p>The tangent data must be provided via the <code>settings</code> object:</p>
-<ul>
-<li><code>settings.inTangents</code>: Float32Array with [time, value] pairs per keyframe per component</li>
-<li><code>settings.outTangents</code>: Float32Array with [time, value] pairs per keyframe per component</li>
-</ul>
+<p>Tangent data is read from <code>inTangents</code> and <code>outTangents</code> on the interpolant
+(populated by <code>KeyframeTrack.InterpolantFactoryMethodBezier</code>).</p>
 <p>For a track with N keyframes and stride S:</p>
 <ul>
 <li>Each tangent array has N * S * 2 values</li>

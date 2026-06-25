@@ -318,6 +318,74 @@ A WGSL snippet that represents the mip level, with level 0 containing a full siz
 
 **Returns:** The name of the dimension variable.
 
+### .generateTextureGather( texture : Texture, textureProperty : string, uvSnippet : string, gatherSnippet : string, depthSnippet : string, offsetSnippet : string, flipYSnippet : string ) : string
+
+Generates the WGSL snippet for gathering four texels from the given texture.
+
+**texture**
+
+The texture.
+
+**textureProperty**
+
+The name of the texture uniform in the shader.
+
+**uvSnippet**
+
+A WGSL snippet that represents texture coordinates used for sampling.
+
+**gatherSnippet**
+
+A WGSL snippet that represents the index of the channel to read.
+
+**depthSnippet**
+
+A WGSL snippet that represents 0-based texture array index to sample.
+
+**offsetSnippet**
+
+A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+
+**flipYSnippet**
+
+A WGSL snippet that represents the y-flip. Only used for WebGL.
+
+**Returns:** The WGSL snippet.
+
+### .generateTextureGatherCompare( texture : Texture, textureProperty : string, uvSnippet : string, compareSnippet : string, depthSnippet : string, offsetSnippet : string, flipYSnippet : string ) : string
+
+Generates the WGSL snippet for performing a depth comparison on four texels in the given depth texture.
+
+**texture**
+
+The texture.
+
+**textureProperty**
+
+The name of the texture uniform in the shader.
+
+**uvSnippet**
+
+A WGSL snippet that represents texture coordinates used for sampling.
+
+**compareSnippet**
+
+A WGSL snippet that represents the reference value.
+
+**depthSnippet**
+
+A WGSL snippet that represents 0-based texture array index to sample.
+
+**offsetSnippet**
+
+A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+
+**flipYSnippet**
+
+A WGSL snippet that represents the y-flip. Only used for WebGL.
+
+**Returns:** The WGSL snippet.
+
 ### .generateTextureGrad( texture : Texture, textureProperty : string, uvSnippet : string, gradSnippet : Array.<string>, depthSnippet : string, offsetSnippet : string, shaderStage : string ) : string
 
 Generates the WGSL snippet for sampling/loading the given texture using explicit gradients.

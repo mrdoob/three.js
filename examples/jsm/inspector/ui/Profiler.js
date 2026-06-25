@@ -1,5 +1,6 @@
 import { EventDispatcher } from 'three';
 import { Style } from './Style.js';
+import { Graph } from './Graph.js';
 import { getItem, setItem } from '../Inspector.js';
 
 export class Profiler extends EventDispatcher {
@@ -19,16 +20,28 @@ export class Profiler extends EventDispatcher {
 		this.maxZIndex = 1002; // Track the highest z-index for detached windows (starts at base z-index from CSS)
 		this.nextTabOriginalIndex = 0; // Track the original order of tabs as they are added
 
-		Style.init();
-
 		this.setupShell();
 		this.setupResizing();
+
+		Style.init( this.domElement );
 
 		// Setup window resize listener and update mobile status
 		this.setupWindowResizeListener();
 
 		// Setup orientation change listener for mobile devices
 		this.setupOrientationListener();
+
+		this.checkHeaderScroll();
+
+		this.panel.addEventListener( 'transitionend', ( e ) => {
+
+			if ( e.target === this.panel && ( e.propertyName === 'width' || e.propertyName === 'height' || e.propertyName === 'transform' ) ) {
+
+				this.checkHeaderScroll();
+
+			}
+
+		} );
 
 	}
 
@@ -180,6 +193,7 @@ export class Profiler extends EventDispatcher {
 
 			constrainDetachedWindows();
 			constrainMainPanel();
+			this.checkHeaderScroll();
 
 		} );
 
@@ -237,31 +251,36 @@ export class Profiler extends EventDispatcher {
 	setupShell() {
 
 		this.domElement = document.createElement( 'div' );
-		this.domElement.id = 'profiler-shell';
+
+		this.domElement.classList.add( 'three-inspector' );
 
 		this.toggleButton = document.createElement( 'button' );
-		this.toggleButton.id = 'profiler-toggle';
+		this.toggleButton.classList.add( 'profiler-toggle' );
 		this.toggleButton.innerHTML = `
-<span id="builtin-tabs-container"></span>
-<span id="toggle-text">
-	<span id="fps-counter">-</span>
+<span class="builtin-tabs-container"></span>
+<span class="toggle-text">
+	<span class="fps-counter">-</span>
 	<span class="fps-label">FPS</span>
 </span>
-<span id="toggle-icon">
+<span class="toggle-icon">
 	<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-device-ipad-horizontal-search"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11.5 20h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v5.5" /><path d="M9 17h2" /><path d="M18 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M20.2 20.2l1.8 1.8" /></svg>
+	<span class="console-badge-container">
+		<span class="console-badge error" style="display: none;">0</span>
+		<span class="console-badge warn" style="display: none;">0</span>
+	</span>
 </span>
 `;
 		this.toggleButton.onclick = () => this.togglePanel();
 
-		this.builtinTabsContainer = this.toggleButton.querySelector( '#builtin-tabs-container' );
+		this.builtinTabsContainer = this.toggleButton.querySelector( '.builtin-tabs-container' );
 
 		// Create mini-panel for builtin tabs (shown when panel is hidden)
 		this.miniPanel = document.createElement( 'div' );
-		this.miniPanel.id = 'profiler-mini-panel';
+		this.miniPanel.classList.add( 'profiler-mini-panel' );
 		this.miniPanel.className = 'profiler-mini-panel';
 
 		this.panel = document.createElement( 'div' );
-		this.panel.id = 'profiler-panel';
+		this.panel.classList.add( 'profiler-panel' );
 
 		const header = document.createElement( 'div' );
 		header.className = 'profiler-header';
@@ -285,7 +304,7 @@ export class Profiler extends EventDispatcher {
 		controls.className = 'profiler-controls';
 
 		this.floatingBtn = document.createElement( 'button' );
-		this.floatingBtn.id = 'floating-btn';
+		this.floatingBtn.classList.add( 'floating-btn' );
 		this.floatingBtn.title = 'Switch to Right Side';
 		this.floatingBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="15" y1="3" x2="15" y2="21"></line></svg>';
 		this.floatingBtn.onclick = () => this.togglePosition();
@@ -305,12 +324,12 @@ export class Profiler extends EventDispatcher {
 		}
 
 		this.maximizeBtn = document.createElement( 'button' );
-		this.maximizeBtn.id = 'maximize-btn';
+		this.maximizeBtn.classList.add( 'maximize-btn' );
 		this.maximizeBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
 		this.maximizeBtn.onclick = () => this.toggleMaximize();
 
 		const hideBtn = document.createElement( 'button' );
-		hideBtn.id = 'hide-panel-btn';
+		hideBtn.classList.add( 'hide-panel-btn' );
 		hideBtn.textContent = '-';
 		hideBtn.onclick = () => this.togglePanel();
 
@@ -336,6 +355,12 @@ export class Profiler extends EventDispatcher {
 			this.miniPanel.classList.add( 'position-right' );
 
 		}
+
+		// Create a background performance graph for the toggle button
+		this.toggleGraph = new Graph( 80 );
+		this.toggleGraph.addLine( 'fps', '#4c4c6bff' );
+		this.toggleGraph.domElement.className = 'profiler-toggle-graph';
+		this.toggleButton.appendChild( this.toggleGraph.domElement );
 
 	}
 
@@ -385,6 +410,7 @@ export class Profiler extends EventDispatcher {
 				}
 
 				this.dispatchEvent( { type: 'resize' } );
+				this.checkHeaderScroll();
 
 			};
 
@@ -430,6 +456,7 @@ export class Profiler extends EventDispatcher {
 		if ( this.panel.classList.contains( 'maximized' ) ) {
 
 			this.panel.classList.remove( 'maximized' );
+			this.domElement.classList.remove( 'maximized' );
 
 			// Restore size based on current position
 			if ( this.position === 'bottom' ) {
@@ -460,6 +487,7 @@ export class Profiler extends EventDispatcher {
 			}
 
 			this.panel.classList.add( 'maximized' );
+			this.domElement.classList.add( 'maximized' );
 
 			// Maximize based on current position
 			if ( this.position === 'bottom' ) {
@@ -752,6 +780,7 @@ export class Profiler extends EventDispatcher {
 			if ( this.panel.classList.contains( 'maximized' ) ) {
 
 				this.panel.classList.remove( 'maximized' );
+				this.domElement.classList.remove( 'maximized' );
 				this.maximizeBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
 
 			}
@@ -759,7 +788,7 @@ export class Profiler extends EventDispatcher {
 			// No tabs visible - set to minimum size
 			if ( this.position === 'bottom' ) {
 
-				this.panel.style.height = '38px';
+				this.panel.style.height = '32px';
 
 			} else if ( this.position === 'right' ) {
 
@@ -778,7 +807,7 @@ export class Profiler extends EventDispatcher {
 				if ( this.position === 'bottom' ) {
 
 					const currentHeight = parseInt( this.panel.style.height );
-					if ( currentHeight === 38 ) {
+					if ( currentHeight === 32 || currentHeight === 38 ) {
 
 						this.panel.style.height = `${ this.lastHeightBottom }px`;
 
@@ -800,6 +829,29 @@ export class Profiler extends EventDispatcher {
 		}
 
 		this.dispatchEvent( { type: 'resize' } );
+		this.checkHeaderScroll();
+
+	}
+
+	checkHeaderScroll() {
+
+		const header = this.panel.querySelector( '.profiler-header' );
+
+		if ( header ) {
+
+			const hasScroll = header.scrollWidth > header.clientWidth + 1;
+
+			if ( hasScroll ) {
+
+				this.panel.classList.add( 'has-horizontal-scroll' );
+
+			} else {
+
+				this.panel.classList.remove( 'has-horizontal-scroll' );
+
+			}
+
+		}
 
 	}
 
@@ -877,14 +929,14 @@ export class Profiler extends EventDispatcher {
 
 			if ( isDragging && hasMoved && previewWindow ) {
 
+				const finalX = parseInt( previewWindow.style.left ) + 200;
+				const finalY = parseInt( previewWindow.style.top ) + 20;
+
 				if ( previewWindow.parentNode ) {
 
 					previewWindow.parentNode.removeChild( previewWindow );
 
 				}
-
-				const finalX = parseInt( previewWindow.style.left ) + 200;
-				const finalY = parseInt( previewWindow.style.top ) + 20;
 
 				this.detachTab( tab, finalX, finalY );
 
@@ -975,7 +1027,7 @@ export class Profiler extends EventDispatcher {
 		windowPanel.appendChild( windowHeader );
 		windowPanel.appendChild( windowContent );
 
-		document.body.appendChild( windowPanel );
+		this.domElement.appendChild( windowPanel );
 
 		return windowPanel;
 
@@ -1123,13 +1175,7 @@ export class Profiler extends EventDispatcher {
 		windowPanel.style.left = `${ constrainedX }px`;
 		windowPanel.style.top = `${ constrainedY }px`;
 
-		if ( ! this.panel.classList.contains( 'visible' ) ) {
 
-			windowPanel.style.opacity = '0';
-			windowPanel.style.visibility = 'hidden';
-			windowPanel.style.pointerEvents = 'none';
-
-		}
 
 		// Hide detached window if tab is not visible
 		if ( ! tab.isVisible ) {
@@ -1189,7 +1235,7 @@ export class Profiler extends EventDispatcher {
 		windowPanel.appendChild( windowHeader );
 		windowPanel.appendChild( windowContent );
 
-		document.body.appendChild( windowPanel );
+		this.domElement.appendChild( windowPanel );
 
 		// Setup window dragging
 		this.setupDetachedWindowDrag( windowPanel, windowHeader, tab );
@@ -1484,6 +1530,8 @@ export class Profiler extends EventDispatcher {
 
 				}
 
+				this.dispatchEvent( { type: 'resize' } );
+
 			};
 
 			const onResizeEnd = () => {
@@ -1564,8 +1612,8 @@ export class Profiler extends EventDispatcher {
 
 			}
 
-			// Count only non-detached tabs that come before this one
-			if ( ! t.isDetached ) {
+			// Count only non-detached, non-builtin tabs that come before this one
+			if ( ! t.isDetached && ! t.builtin ) {
 
 				insertIndex ++;
 
@@ -1609,11 +1657,20 @@ export class Profiler extends EventDispatcher {
 
 		if ( this.tabs[ id ] ) {
 
-			this.tabs[ id ].setActive( true );
+			const tab = this.tabs[ id ];
+
+			if ( ! tab.isVisible ) {
+
+				tab.show();
+
+			}
+
+			tab.setActive( true );
 
 		}
 
 		this.saveLayout();
+		this.checkHeaderScroll();
 
 	}
 
@@ -1625,23 +1682,11 @@ export class Profiler extends EventDispatcher {
 
 		const isVisible = this.panel.classList.contains( 'visible' );
 
-		this.detachedWindows.forEach( detachedWindow => {
+		if ( isVisible && this.activeTabId && this.tabs[ this.activeTabId ] ) {
 
-			if ( isVisible ) {
+			this.tabs[ this.activeTabId ].setActive( true );
 
-				detachedWindow.panel.style.opacity = '';
-				detachedWindow.panel.style.visibility = '';
-				detachedWindow.panel.style.pointerEvents = '';
-
-			} else {
-
-				detachedWindow.panel.style.opacity = '0';
-				detachedWindow.panel.style.visibility = 'hidden';
-				detachedWindow.panel.style.pointerEvents = 'none';
-
-			}
-
-		} );
+		}
 
 		this.dispatchEvent( { type: 'resize' } );
 

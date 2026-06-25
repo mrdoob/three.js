@@ -166,22 +166,6 @@ The serialized animation clip.
 
 **Returns:** The new animation clip.
 
-### .parseAnimation( animation : Object, bones : Array.<Bone> ) : AnimationClip
-
-Parses the `animation.hierarchy` format and returns a new animation clip.
-
-**animation**
-
-A serialized animation clip as JSON.
-
-**bones**
-
-An array of bones.
-
-**Deprecated:** since r175.
-
-**Returns:** The new animation clip.
-
 ### .toJSON( clip : AnimationClip ) : Object
 
 Serializes the given animation clip into JSON.

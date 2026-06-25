@@ -306,7 +306,7 @@ class TSLGraphEditor extends Extension {
 
 				if ( ! this._pending.has( requestId ) ) return;
 				this._pending.delete( requestId );
-				reject( new Error( `Timeout for ${type}` ) );
+				reject( new Error( `THREE.TSLGraphEditor: Timeout for ${type}` ) );
 
 			}, 5000 );
 

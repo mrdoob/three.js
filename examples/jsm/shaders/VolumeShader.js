@@ -31,34 +31,23 @@ const VolumeRenderShader1 = {
 
 	vertexShader: /* glsl */`
 
-		varying vec4 v_nearpos;
-		varying vec4 v_farpos;
 		varying vec3 v_position;
+		varying vec3 v_cameraInObj;
+		varying vec3 v_viewDirInObj;
 
 		void main() {
-				// Prepare transforms to map to "camera view". See also:
-				// https://threejs.org/docs/#api/renderers/webgl/WebGLProgram
-				mat4 viewtransformf = modelViewMatrix;
-				mat4 viewtransformi = inverse(modelViewMatrix);
-
-				// Project local vertex coordinate to camera position. Then do a step
-				// backward (in cam coords) to the near clipping plane, and project back. Do
-				// the same for the far clipping plane. This gives us all the information we
-				// need to calculate the ray and truncate it to the viewing cone.
 				vec4 position4 = vec4(position, 1.0);
-				vec4 pos_in_cam = viewtransformf * position4;
 
-				// Intersection of ray and near clipping plane (z = -1 in clip coords)
-				pos_in_cam.z = -pos_in_cam.w;
-				v_nearpos = viewtransformi * pos_in_cam;
-
-				// Intersection of ray and far clipping plane (z = +1 in clip coords)
-				pos_in_cam.z = pos_in_cam.w;
-				v_farpos = viewtransformi * pos_in_cam;
-
-				// Set varyings and output pos
 				v_position = position;
-				gl_Position = projectionMatrix * viewMatrix * modelMatrix * position4;
+
+				// Express the camera position and view direction in the object's local
+				// space so the fragment shader can build the per-fragment view ray.
+				// For perspective cameras, rays converge at v_cameraInObj.
+				// For orthographic cameras, rays travel along v_viewDirInObj.
+				v_cameraInObj = (inverse(modelMatrix) * vec4(cameraPosition, 1.0)).xyz;
+				v_viewDirInObj = (inverse(modelViewMatrix) * vec4(0.0, 0.0, -1.0, 0.0)).xyz;
+
+				gl_Position = projectionMatrix * modelViewMatrix * position4;
 		}`,
 
 	fragmentShader: /* glsl */`
@@ -75,8 +64,8 @@ const VolumeRenderShader1 = {
 				uniform sampler2D u_cmdata;
 
 				varying vec3 v_position;
-				varying vec4 v_nearpos;
-				varying vec4 v_farpos;
+				varying vec3 v_cameraInObj;
+				varying vec3 v_viewDirInObj;
 
 				// The maximum distance through our rendering volume is sqrt(3).
 				const int MAX_STEPS = 887;	// 887 for 512^3, 1774 for 1024^3
@@ -96,33 +85,29 @@ const VolumeRenderShader1 = {
 
 
 				void main() {
-						// Normalize clipping plane info
-						vec3 farpos = v_farpos.xyz / v_farpos.w;
-						vec3 nearpos = v_nearpos.xyz / v_nearpos.w;
+						// Per-fragment ray direction in object space, pointing from the back
+						// face toward the camera. For perspective cameras the rays converge
+						// at the camera position; for orthographic cameras they are parallel
+						// to the view direction.
+						vec3 view_ray = isOrthographic
+								? normalize(-v_viewDirInObj)
+								: normalize(v_cameraInObj - v_position);
 
-						// Calculate unit vector pointing in the view direction through this fragment.
-						vec3 view_ray = normalize(nearpos.xyz - farpos.xyz);
-
-						// Compute the (negative) distance to the front surface or near clipping plane.
-						// v_position is the back face of the cuboid, so the initial distance calculated in the dot
-						// product below is the distance from near clip plane to the back of the cuboid
-						float distance = dot(nearpos - v_position, view_ray);
-						distance = max(distance, min((-0.5 - v_position.x) / view_ray.x,
-																				(u_size.x - 0.5 - v_position.x) / view_ray.x));
-						distance = max(distance, min((-0.5 - v_position.y) / view_ray.y,
-																				(u_size.y - 0.5 - v_position.y) / view_ray.y));
-						distance = max(distance, min((-0.5 - v_position.z) / view_ray.z,
-																				(u_size.z - 0.5 - v_position.z) / view_ray.z));
-
-						// Now we have the starting position on the front surface
-						vec3 front = v_position + view_ray * distance;
+						// Slab-based ray/AABB intersection: v_position lies on the back face
+						// of the cuboid, so stepping along view_ray traverses the volume and
+						// exits through the front face at t = distance.
+						vec3 t1 = (vec3(-0.5) - v_position) / view_ray;
+						vec3 t2 = (u_size - vec3(0.5) - v_position) / view_ray;
+						vec3 tmax = max(t1, t2);
+						float distance = min(min(tmax.x, tmax.y), tmax.z);
 
 						// Decide how many steps to take
-						int nsteps = int(-distance / relative_step_size + 0.5);
+						int nsteps = int(distance / relative_step_size + 0.5);
 						if ( nsteps < 1 )
 								discard;
 
 						// Get starting location and step vector in texture coordinates
+						vec3 front = v_position + view_ray * distance;
 						vec3 step = ((v_position - front) / u_size) / float(nsteps);
 						vec3 start_loc = front / u_size;
 
@@ -149,6 +134,8 @@ const VolumeRenderShader1 = {
 
 				vec4 apply_colormap(float val) {
 						val = (val - u_clim[0]) / (u_clim[1] - u_clim[0]);
+						float n = float(textureSize(u_cmdata, 0).x); // see #33842
+						val = (val * (n - 1.0) + 0.5) / n;
 						return texture2D(u_cmdata, vec2(val, 0.5));
 				}
 

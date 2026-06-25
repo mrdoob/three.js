@@ -1,5 +1,5 @@
 import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
-import { FileLoader } from 'three';
+import { FileLoader, PropertyBinding } from 'three';
 
 function MenubarFile( editor ) {
 
@@ -261,8 +261,7 @@ function MenubarFile( editor ) {
 			exportColor: object.geometry.hasAttribute( 'color' )
 		};
 
-		// TODO: Change to DRACOExporter's parse( geometry, onParse )?
-		const result = exporter.parse( object, options );
+		const result = await exporter.parseAsync( object, options );
 		saveArrayBuffer( result, 'model.drc' );
 
 	} );
@@ -276,6 +275,15 @@ function MenubarFile( editor ) {
 	option.onClick( async function () {
 
 		const scene = editor.scene;
+
+		if ( needsUniqueNames( scene ) ) { // see #25179
+
+			if ( confirm( strings.getKey( 'prompt/file/export/duplicateNames' ) ) === false ) return;
+
+			ensureUniqueNames( scene );
+
+		}
+
 		const animations = getAnimations( scene );
 
 		const optimizedAnimations = [];
@@ -307,6 +315,15 @@ function MenubarFile( editor ) {
 	option.onClick( async function () {
 
 		const scene = editor.scene;
+
+		if ( needsUniqueNames( scene ) ) { // see #25179
+
+			if ( confirm( strings.getKey( 'prompt/file/export/duplicateNames' ) ) === false ) return;
+
+			ensureUniqueNames( scene );
+
+		}
+
 		const animations = getAnimations( scene );
 
 		const optimizedAnimations = [];
@@ -457,6 +474,107 @@ function MenubarFile( editor ) {
 		} );
 
 		return animations;
+
+	}
+
+	function needsUniqueNames( scene ) {
+
+		const usedNames = new Set();
+		let duplicate = false;
+		let animated = false;
+
+		scene.traverse( function ( object ) {
+
+			if ( object.animations.length > 0 ) animated = true;
+
+			if ( object.name === '' ) return;
+
+			if ( usedNames.has( object.name ) ) duplicate = true;
+
+			usedNames.add( object.name );
+
+		} );
+
+		return duplicate && animated;
+
+	}
+
+	// Gives every object a unique name and keeps the animation tracks that
+	// reference them by name in sync. The renamed scene mirrors the result of a
+	// glTF round-trip, where the loader makes all names unique, too.
+
+	function ensureUniqueNames( scene ) {
+
+		// Resolve each track's target object up front, scoped to the object that
+		// owns the clip. This disambiguates colliding names before they change.
+
+		const trackBindings = [];
+
+		scene.traverse( function ( owner ) {
+
+			for ( const clip of owner.animations ) {
+
+				for ( const track of clip.tracks ) {
+
+					const nodeName = PropertyBinding.parseTrackName( track.name ).nodeName;
+					const target = PropertyBinding.findNode( owner, nodeName );
+
+					// References by UUID stay valid, so only track name-based ones.
+
+					if ( target !== null && target.name === nodeName ) {
+
+						trackBindings.push( { track, target, nodeName } );
+
+					}
+
+				}
+
+			}
+
+		} );
+
+		// Assign a unique name to every named object.
+
+		let changed = false;
+		const usedNames = new Set();
+
+		scene.traverse( function ( object ) {
+
+			if ( object.name === '' ) return;
+
+			if ( usedNames.has( object.name ) ) {
+
+				let suffix = 1, name;
+				do {
+
+					name = object.name + '_' + ( suffix ++ );
+
+				} while ( usedNames.has( name ) );
+
+				object.name = name;
+				changed = true;
+
+			}
+
+			usedNames.add( object.name );
+
+		} );
+
+		if ( changed === false ) return;
+
+		// Point the affected tracks at their renamed targets.
+
+		for ( const { track, target, nodeName } of trackBindings ) {
+
+			if ( target.name !== nodeName ) {
+
+				track.name = target.name + track.name.slice( nodeName.length );
+
+			}
+
+		}
+
+		editor.signals.sceneGraphChanged.dispatch();
 
 	}
 

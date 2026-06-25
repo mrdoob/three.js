@@ -175,9 +175,9 @@ Restricts the image maximum size (both width and height) to the given value.
 Default is `Infinity`.
 
 **animations**  
-Array.<[AnimationClip](AnimationClip.html)\>
+Array.<[AnimationClip](AnimationClip.html)\> | Array.<Array.<[AnimationClip](AnimationClip.html)\>>
 
-List of animations to be included in the export.
+List of animations to be included in the export. When exporting a single 3D object or scene, this is a flat list of clips. When exporting an array of multiple scenes, this must be a nested array with one list of clips per scene, matched to the input by index.
 
 Default is `[]`.
 

@@ -210,6 +210,14 @@ The contents are intended to be respecified repeatedly by the application, and u
 
 The contents are intended to be respecified repeatedly by reading data from the 3D API, and queried many times by the application.
 
+### .ENV_RAY_LENGTH : number (constant)
+
+Sentinel ray length the SSR pass writes for environment misses (no screen-space hit), set far above any real hit distance so a single magnitude test separates misses from hits and survives `.max( 0 )`.
+
+### .ENV_RAY_LENGTH_THRESHOLD : number (constant)
+
+Classification threshold for [ENV\_RAY\_LENGTH](global.html#ENV_RAY_LENGTH): above this is an env miss, below a real hit. An order of magnitude under the sentinel, robust to fp16 storage and bilinear blending at borders.
+
 ### .EqualCompare : number (constant)
 
 Pass if the incoming value equals the texture value.
@@ -229,6 +237,10 @@ Reflection mapping for equirectangular textures.
 ### .EquirectangularRefractionMapping : number (constant)
 
 Refraction mapping for equirectangular textures.
+
+### .F_Schlick (constant)
+
+Fresnel reflectance for the Schlick approximation.
 
 ### .FloatType : number (constant)
 
@@ -1049,6 +1061,18 @@ Zero slope ending for animations.
 
 Sets the stencil buffer value to `0`.
 
+### .batchColor : VaryingNode.<vec4> (constant)
+
+TSL object representing a varying property for the batching color vector.
+
+### .buildingPalette (constant)
+
+The NYC masonry palette every tower is dressed from ( hex colours ): limestone-dominant with terracotta accents. Shared by the single-tower example and [CityGenerator](CityGenerator.html)'s building material so both stay in sync.
+
+### .closestLineToLine (constant)
+
+Calculates the closest points on two 3D lines. Used for perspective-correct line rendering and coordinates interpolation.
+
 ### .depthAwareBlend (constant)
 
 Performs a depth-aware blend between a base scene and a secondary effect (like godrays). This function uses a Poisson disk sampling pattern to detect depth discontinuities in the neighborhood of the current pixel. If an edge is detected, it shifts the sampling coordinate for the blend node away from the edge to prevent light leaking/haloing.
@@ -1057,9 +1081,81 @@ Performs a depth-aware blend between a base scene and a secondary effect (like g
 
 Disposes the shadow material for the given light source.
 
+### .equirectUvToDir (constant)
+
+Equirectangular direction / UV / PDF helpers and MIS weighting shared by environment sampling code. Env-miss MIS integration lives in [ImportanceSampledEnvironment](ImportanceSampledEnvironment.html).
+
+Equirectangular parameterization helpers used with CDF importance sampling are adapted from [three-gpu-pathtracer](https://github.com/gkjohnson/three-gpu-pathtracer).
+
+See:
+
+*   [https://github.com/gkjohnson/three-gpu-pathtracer](https://github.com/gkjohnson/three-gpu-pathtracer)
+
+### .getBatchingColor (constant)
+
+TSL function that retrieves the batching color for a given instance ID from a colors texture.
+
+### .getIndirectIndex (constant)
+
+TSL function that retrieves the indirect index for a given batch ID.
+
+### .getMorph (constant)
+
+TSL function that retrieves and scales the morphed attribute (position or normal) texel value.
+
+### .getSpecularDominantFactor (constant)
+
+Specular dominant factor for parallax-corrected ray length. From REBLUR: A Hierarchical Recurrent Denoiser (NRD).
+
+### .ggxReflectionSample (constant)
+
+Importance-samples the GGX/VNDF specular lobe for one pixel and returns the reflected ray direction plus the Monte-Carlo weight to apply to the gathered radiance, along with the GGX terms the SSR env-miss MIS fallback needs.
+
+### .ggxReflectionStruct (constant)
+
+Everything a single GGX reflection sample produces. `reflectDir` and `sampleWeight` drive the SSR ray-march and compositing; `pdf`, `NdotV`, `alpha` and `f0` are the GGX terms the env-miss MIS fallback needs so the caller never re-derives microfacet math.
+
+### .instanceColor : VaryingNode.<vec3> (constant)
+
+TSL object representing a varying property for the instanced color vector.
+
+### .lineDistance : VaryingNode.<float> (constant)
+
+Varying node representing the accumulated distance along the line. Crucial for correctly computing dashed line intervals in fragment stage.
+
+### .outgoingLight : Node.<vec3> (constant)
+
+A node representing the outgoing light.
+
+### .temporalReproject (constant)
+
+### .totalDiffuse : Node.<vec3> (constant)
+
+A node representing the total diffuse light.
+
+### .totalSpecular : Node.<vec3> (constant)
+
+A node representing the total specular light.
+
+### .trimSegmentAlpha (constant)
+
+Trims the line segment to avoid rendering behind the camera near plane. Computes an interpolation factor (alpha) to clamp the segment's coordinate.
+
 ### .viewportResolution (constant)
 
 **Deprecated:** since r169. Use [screenSize](TSL.html#screenSize) instead.
+
+### .worldEnd : VaryingNode.<vec3> (constant)
+
+Varying node representing the world position of the segment end in view space. Used for distance and coordinate calculations across the fragment shader.
+
+### .worldPos : VaryingNode.<vec4> (constant)
+
+Varying node representing the interpolated world/view position of the current fragment. Used for line/ray distance checks under perspective projection.
+
+### .worldStart : VaryingNode.<vec3> (constant)
+
+Varying node representing the world position of the segment start in view space. Used for distance and coordinate calculations across the fragment shader.
 
 ## Methods
 
@@ -1183,6 +1279,54 @@ The shadow coordinates.
 
 **Returns:** The filtering result.
 
+### .addArcade()
+
+The base storey: a wall pierced by tall pointed-arch openings, extruded with thickness so the openings read as deep recesses.
+
+### .addCornice()
+
+A two-step projecting cornice / string-course band wrapping a face.
+
+### .addParapet()
+
+A low parapet wall capping the crown.
+
+### .addSpandrelBands()
+
+Horizontal terracotta bands at every floor line. Together with the projecting piers they form the facade grid; the gaps between them are the window openings, with glass set behind.
+
+### .bakeGroups()
+
+Bakes a list of instance groups into one non-indexed BufferGeometry. Each group is a base geometry ( position + normal + uv ), an array of Matrix4 placements and a `partId` written to a per-vertex attribute. Transforming straight into preallocated typed arrays avoids mergeGeometries' per-instance allocations; the result is one geometry, ready for a single draw call and the compute rasterizer.
+
+### .bilinearHistoryTap( ctx : Object, tapOffset : Node.<ivec2>, bilinearWeight : Node.<float> )
+
+**ctx**
+
+Shared [sampleBilinearTap](TSL.html#sampleBilinearTap) inputs plus `reprojICoord`.
+
+**tapOffset**
+
+**bilinearWeight**
+
+### .bindAnalyticNoise( resolution : UniformNode.<Vector2>, seed : number )
+
+Returns a TSL function that samples texture-free analytic R² noise. Index 0 uses continuous screen pixels; other indices tile-shift with an R² sequence into a 64×64 period. Values are four independent R² dimensions hashed from the sample coordinates.
+
+**resolution**
+
+**seed**
+
+Added to the coordinate hash so each pass gets an independent R² phase.
+
+Default is `0`.
+
+### .bindTemporalCameraUniforms( camera : Camera )
+
+Current and previous-frame camera matrices for temporal reprojection passes.
+
+**camera**
+
 ### .buildData3DTexture( chunk : Object ) : Data3DTexture
 
 Builds a 3D texture from a VOX chunk.
@@ -1192,6 +1336,14 @@ Builds a 3D texture from a VOX chunk.
 A VOX chunk loaded via [VOXLoader](VOXLoader.html).
 
 **Returns:** The generated 3D texture.
+
+### .buildFaces()
+
+Builds a face frame per footprint edge. Each frame is an orthonormal basis ( u along the edge, v up, n outward ) plus an origin and length, so all facade layout can happen in flat ( u, v ) space and bake to world with one matrix — the same authored piece then instances onto every face, including the diagonal chamfer.
+
+### .buildFootprint()
+
+A rectangle (centred at the origin in the XZ plane) with one corner cut at 45 degrees, returned as an ordered list of `Vector2( x, z )`. `cornerX` / `cornerZ` ( each ±1 ) pick which corner is cut, so the chamfer can be aimed outward to a block corner.
 
 ### .buildMesh( chunk : Object ) : Mesh
 
@@ -1273,6 +1425,10 @@ The texture's aspect ratio.
 
 **Returns:** The updated texture.
 
+### .createBuildingMaterial()
+
+The shared material every tower in a [CityGenerator](CityGenerator.html) is dressed with: one flat masonry colour per lot, picked from a palette by hashing the lot's grid cell.
+
 ### .createCanvasElement() : HTMLCanvasElement
 
 Creates a canvas element configured for block display.
@@ -1292,6 +1448,52 @@ The event type.
 **callback**
 
 The callback function.
+
+### .createForestMaterial( from : Node, to : Node ) : MeshStandardNodeMaterial
+
+The single material shared by every tree in a [ForestGenerator](ForestGenerator.html). A plain MeshStandardNodeMaterial lit by the scene — only the surface is authored: deep shadowed green in the recesses rising to a bright, yellow-green sunlit crown, mottled into needle clumps by 3D noise, with a matching bump so the clumps catch the light. Half a million instanced blobs makes this mesh vertex-bound, so the regional colour drift is baked to a per-instance attribute ( no shader noise for it ), and the costly clump noise + bump are **gated by distance** — full detail on the near trees ( where it reads ), skipped on the far canopy ( where it is sub-pixel ).
+
+**from**
+
+distance within which every tree is drawn.
+
+**to**
+
+distance past which no tree is drawn.
+
+### .createInstanceMatrixNode( builder : NodeBuilder, instanceMatrix : InstancedBufferAttribute | StorageInstancedBufferAttribute, count : number ) : Node
+
+Creates the appropriate node for instanced matrix transformations. Depending on buffer limits and storage capability, returns either a storage, buffer, or instanced interleaved attribute node.
+
+**builder**
+
+The current node builder.
+
+**instanceMatrix**
+
+The matrix buffer attribute.
+
+**count**
+
+The instance count.
+
+**Returns:** The matrix node.
+
+### .createRoadMaterial()
+
+The road surface: wet asphalt with lane lines and crosswalks aligned to a [CityGenerator](CityGenerator.html) layout. Apply it to a ground plane sized to the city.
+
+### .createSkyscraperMaterial()
+
+The facade material: a single MeshStandardNodeMaterial that reads the baked per-vertex `partId` and reproduces every zone — procedural terracotta brickwork on the walls and piers, smooth dressed stone on the window frames and ornament, dark glazing, and grey AC units — all dressed with world-space weathering. One material covers the whole building ( and a whole city ), which is what makes it compute-rasterizer friendly. `buildingBase` is the tower's flat masonry colour as a TSL node: pass a `uniform( Color )` for a single tower, or a per-fragment palette pick for a city, so the same material dresses both.
+
+### .createTreeMaterial( parameters : Object ) : MeshStandardNodeMaterial
+
+A simple bark material for a [TreeGenerator](TreeGenerator.html) mesh: a low-saturation brown with a faint, vertically-stretched grain, so trunks read near-black against bright fog.
+
+**parameters**
+
+`barkColor` ( a hex, THREE.Color or TSL node ).
 
 ### .damp( x : number, y : number, lambda : number, dt : number ) : number
 
@@ -1314,6 +1516,14 @@ A higher lambda value will make the movement more sudden, and a lower value will
 Delta time in seconds.
 
 **Returns:** The interpolated value.
+
+### .dampenForVarianceClip( rgb : Node.<vec3>, flickerSuppression : Node.<float> ) : Node.<vec3>
+
+Inverse-luminance compression for HDR variance clipping (Karis-style). Bright samples contribute less to neighbourhood moments so sun pixels do not inflate the YCoCg AABB and cause aggressive clipping flicker.
+
+**rgb**
+
+**flickerSuppression**
 
 ### .degToRad( degrees : number ) : number
 
@@ -1515,6 +1725,16 @@ The light's decay exponent.
 
 Utility functions for parsing
 
+### .getEntry( geometry : BufferGeometry ) : Object
+
+Resolves or creates a compiled DataArrayTexture containing encoded vertex morph targets data for WebGL2/WebGPU.
+
+**geometry**
+
+The geometry to parse.
+
+**Returns:** The resolved morph targets texture data mapping entry.
+
 ### .getFilteredStack()
 
 Parses the stack trace and filters out ignored files. Returns an array with function name, file, line, and column.
@@ -1562,6 +1782,118 @@ Generates a layout for struct members. This function takes an object representin
 An object where keys are member names and values are either types (as strings) or objects with type and atomic properties.
 
 **Returns:** An array of member layouts.
+
+### .getPreviousInstance( instancedMesh : InstancedMesh, instanceMatrix : InstancedBufferAttribute | StorageInstancedBufferAttribute, builder : NodeBuilder, count : number ) : Node
+
+Retrieves or initializes the previous frame instance matrix node for motion vectors. Uses a WeakMap to cache previous frame instance matrices and their TSL nodes.
+
+**instancedMesh**
+
+The instanced mesh object.
+
+**instanceMatrix**
+
+The current matrix buffer attribute.
+
+**builder**
+
+The current node builder.
+
+**count**
+
+The instance count.
+
+**Returns:** The previous frame instance matrix node.
+
+### .getPreviousSkinnedPosition( skinnedMesh : SkinnedMesh, bindMatrixNode : Node.<mat4>, bindMatrixInverseNode : Node.<mat4>, skinIndexNode : Node.<uvec4>, skinWeightNode : Node.<vec4> ) : Node.<vec3>
+
+Retrieves or initializes the previous frame skinned position node for motion vectors. Uses a WeakMap to cache previous frame bone matrix arrays and their TSL buffer nodes.
+
+**skinnedMesh**
+
+The skinned mesh.
+
+**bindMatrixNode**
+
+The bind matrix node.
+
+**bindMatrixInverseNode**
+
+The inverse bind matrix node.
+
+**skinIndexNode**
+
+The skin index attribute.
+
+**skinWeightNode**
+
+The skin weight attribute.
+
+**Returns:** The skinned position from the previous frame.
+
+### .getSkinnedNormalAndTangent( boneMatrices : Node, normal : Node.<vec3>, tangent : Node.<vec3>, bindMatrix : Node.<mat4>, bindMatrixInverse : Node.<mat4>, skinIndex : Node.<uvec4>, skinWeight : Node.<vec4> ) : Object
+
+Computes the skinned normal and tangent vectors by applying bone matrices based on weights.
+
+**boneMatrices**
+
+The bone matrices buffer or storage node.
+
+**normal**
+
+The normal vector in local space.
+
+**tangent**
+
+The tangent vector in local space.
+
+**bindMatrix**
+
+The bind matrix node.
+
+**bindMatrixInverse**
+
+The inverse bind matrix node.
+
+**skinIndex**
+
+The skin index attribute.
+
+**skinWeight**
+
+The skin weight attribute.
+
+**Returns:** The skinned normal and tangent.
+
+### .getSkinnedPosition( boneMatrices : Node, position : Node.<vec3>, bindMatrix : Node.<mat4>, bindMatrixInverse : Node.<mat4>, skinIndex : Node.<uvec4>, skinWeight : Node.<vec4> ) : Node.<vec3>
+
+Computes the skinned position by applying bone matrices based on weights.
+
+**boneMatrices**
+
+The bone matrices buffer or storage node.
+
+**position**
+
+The vertex position to transform.
+
+**bindMatrix**
+
+The bind matrix node.
+
+**bindMatrixInverse**
+
+The inverse bind matrix node.
+
+**skinIndex**
+
+The skin index attribute.
+
+**skinWeight**
+
+The skin weight attribute.
+
+**Returns:** The skinned position.
 
 ### .getStrideLength( vectorLength : number ) : number
 
@@ -1759,6 +2091,10 @@ The typed array that defines the data type of the value.
 
 **Returns:** The normalize value.
 
+### .pickBuildingColor()
+
+Picks one [buildingPalette](global.html#buildingPalette) colour ( a hex number ) for a tower from its seed.
+
 ### .pingpong( x : number, length : number ) : number
 
 Returns a value that alternates between `0` and the given `length` parameter.
@@ -1822,6 +2158,10 @@ The lower value boundary.
 The upper value boundary
 
 **Returns:** A random integer.
+
+### .rgbToYCoCg( c : Node.<vec3> ) : Node.<vec3>
+
+**c**
 
 ### .sample( callback : function, uv : Node.<vec2> ) : SampleNode
 
@@ -1901,6 +2241,22 @@ The rotation applied to the third axis, in radians.
 
 A string specifying the axes order.
 
+### .setupWebGLXRFallback( renderer : WebGPURenderer, createFallbackRenderer : function, onFallback : function )
+
+Sets up a construction-time WebGL fallback for WebGPU XR examples.
+
+**renderer**
+
+The initial renderer.
+
+**createFallbackRenderer**
+
+A function that returns a new renderer with a WebGL backend.
+
+**onFallback**
+
+A function that installs the new renderer in the app.
+
 ### .shadowRenderObjectFunction( object : Object3D, scene : Scene, _camera : Camera, geometry : BufferGeometry, material : Material, group : Group, …params : any )
 
 Shadow Render Object Function.
@@ -1932,6 +2288,10 @@ The group the object belongs to.
 **params**
 
 Additional parameters for rendering.
+
+### .slab()
+
+A thin horizontal cap over a footprint's bounding box at height `y`. Its sides are pulled in behind the facade plane ( into the backing-wall shell ) so they never sit coplanar with the walls, spandrels or piers and z-fight.
 
 ### .smootherstep( x : number, min : number, max : number ) : number
 
@@ -2074,6 +2434,10 @@ This function maintains an internal cache of warning messages and will only outp
 **params**
 
 The warning message components.
+
+### .ycocgToRGB( c : Node.<vec3> ) : Node.<vec3>
+
+**c**
 
 ### .yieldToMain() : Promise.<void>
 
@@ -2220,6 +2584,126 @@ function
 
 Allows the get the raw shader code for the given scene, camera and 3D object.
 
+### .DenoiseAlphaSource
+
+### .DenoiseMode
+
+### .RecurrentDenoiseNodeOptions
+
+**depth**  
+[Node](Node.html).<float>
+
+Scene depth buffer for view-space edge stopping.
+
+Default is `null`.
+
+**normal**  
+[Node](Node.html).<vec3>
+
+View-space normals for geometric edge stopping.
+
+Default is `null`.
+
+**metalRoughness**  
+[Node](Node.html).<vec4>
+
+Roughness/metalness G-buffer for specular edge stopping.
+
+Default is `null`.
+
+**diffuse**  
+[Node](Node.html).<vec4>
+
+Scene base color (albedo) G-buffer for chromatic edge stopping.
+
+Default is `null`.
+
+**raw**  
+[Node](Node.html).<vec4>
+
+Unfiltered input (e.g. raw SSR/SSGI) for secondary sampling and temporal blend.
+
+Default is `null`.
+
+**mode**  
+[DenoiseMode](global.html#DenoiseMode)
+
+Denoising kernel type.
+
+Default is `'diffuse'`.
+
+**accumulate**  
+boolean
+
+When `true`, temporally blend the spatially-denoised result (Karis-style) and write frame weight to alpha for feedback loops. When `false`, only spatial filtering is applied.
+
+Default is `true`.
+
+### .SSRNodeOptions
+
+**stochastic**  
+boolean
+
+When `false`, traces a single mirror reflection and softens roughness with a blur pass (first-generation SSR). When `true`, varies the reflection direction per pixel with stochastic GGX rays (second-generation SSR); higher quality on rough/glossy surfaces but noisier, so it expects a temporal/spatial denoiser downstream.
+
+Default is `false`.
+
+**metalnessNode**  
+[Node](Node.html).<float>
+
+Per-pixel metalness. Drives GGX reflection sampling and, with `reflectNonMetals=false`, the non-metal early-out.
+
+Default is `null`.
+
+**roughnessNode**  
+[Node](Node.html).<float>
+
+Per-pixel roughness. Drives GGX sampling and the blur mip selection.
+
+Default is `null`.
+
+**reflectNonMetals**  
+boolean
+
+Only used when `stochastic=false`. When `false`, non-metallic surfaces are discarded for a noticeable performance gain; set `true` to also reflect dielectrics (e.g. marble, polished wood, plastic).
+
+Default is `false`.
+
+**environmentNode**  
+[Texture](Texture.html)
+
+Equirectangular HDR environment map with CPU-side `image.data` (e.g. from RGBELoader). Not compatible with PMREM / `scene.environment` cubemaps.
+
+Default is `null`.
+
+**envImportanceSampling**  
+boolean
+
+When `true`, precomputes env-luminance CDF tables and uses MIS for environment misses. Build-time only.
+
+Default is `false`.
+
+**diffuseNode**  
+[Node](Node.html)
+
+Scene diffuse / base color. Defaults to `vec3(1)` in the shader when omitted.
+
+Default is `null`.
+
+**binaryRefine**  
+boolean
+
+Sub-step binary-search refinement of detected hits. Compile-time constant (baked into the shader at construction).
+
+Default is `false`.
+
+**camera**  
+[Camera](Camera.html)
+
+Camera the scene is rendered with. Inferred from the color pass when omitted.
+
+Default is `null`.
+
 ### .ShadowMapConfig
 
 Shadow map configuration
@@ -2238,6 +2722,29 @@ Whether to enable light transmission through non-opaque materials.
 number
 
 The shadow map type.
+
+### .TemporalReprojectMode
+
+### .TemporalReprojectNodeOptions
+
+**mode**  
+[TemporalReprojectMode](global.html#TemporalReprojectMode)
+
+`diffuse` for SSGI/scene colour; `specular` for SSR reflections.
+
+Default is `'diffuse'`.
+
+**hitPointReprojection**  
+boolean
+
+Parallax hit-point reprojection (specular mode only). Defaults to `true` in specular mode.
+
+**accumulate**  
+boolean
+
+When `true`, history is stored in this pass (classic temporal resolve). When `false`, use [TemporalReprojectNode#setHistoryTexture](TemporalReprojectNode.html#setHistoryTexture) to read history from another pass (e.g. denoise output).
+
+Default is `false`.
 
 ### .XRConfig
 

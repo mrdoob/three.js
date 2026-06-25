@@ -170,15 +170,6 @@ eventually assigned to <code>geometryNode</code>.</p>
 					</div>
 				</div>
 				<div class="member">
-					<h3 class="name" id="hardwareClipping" translate="no">.<a href="#hardwareClipping">hardwareClipping</a><span class="type-signature"> : boolean</span> </h3>
-					<div class="description">
-						<p>Whether this material uses hardware clipping or not.
-This property is managed by the engine and should not be
-modified by apps.</p>
-						<p>Default is <code>false</code>.</p>
-					</div>
-				</div>
-				<div class="member">
 					<h3 class="name" id="isNodeMaterial" translate="no">.<a href="#isNodeMaterial">isNodeMaterial</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
 						<p>This flag can be used for type testing.</p>
@@ -334,10 +325,10 @@ used in the vertex stage.</p>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( source : <span class="param-type"><a href="NodeMaterial.html">NodeMaterial</a></span> )</span><span class="type-signature"> : <a href="NodeMaterial.html">NodeMaterial</a></span> </h3>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( source : <span class="param-type"><a href="Material.html">Material</a></span> )</span><span class="type-signature"> : <a href="NodeMaterial.html">NodeMaterial</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Copies the properties of the given node material to this instance.</p>
+							<p>Copies the common properties of the given material to this instance.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -408,6 +399,27 @@ defining all material properties of the classic type in the node type.</p>
 								</tr>
 							</tbody>
 						</table>
+					</div>
+					<h3 class="name name-method" id="setupAmbientOcclusion" translate="no">.<a href="#setupAmbientOcclusion">setupAmbientOcclusion</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the ambient occlusion node from the material.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The ambient occlusion node.</dt>
+						</dl>
 					</div>
 					<h3 class="name name-method" id="setupClipping" translate="no">.<a href="#setupClipping">setupClipping</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="ClippingNode.html">ClippingNode</a></span> </h3>
 					<div class="method">
@@ -606,7 +618,7 @@ since it defines the material's lighting model.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The lighting model.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setupLights" translate="no">.<a href="#setupLights">setupLights</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="LightsNode.html">LightsNode</a></span> </h3>
+					<h3 class="name name-method" id="setupMaterialLightings" translate="no">.<a href="#setupMaterialLightings">setupMaterialLightings</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="LightingNode.html">LightingNode</a>.&lt;Array></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Setups the lights node based on the scene, environment and material.</p>
@@ -691,6 +703,22 @@ since it defines the material's lighting model.</p>
 					<div class="method">
 						<div class="description">
 							<p>Setups the output node.</p>
+<p>This method can be implemented by derived materials to extend the functionality
+of the material's output or replace it altogether.</p>
+<pre><code class="language-js">class ColoredShadowMaterial extends MeshPhongNodeMaterial {
+  constructor( parameters ) {
+    super( parameters );
+    this._shadeColor = uniform( new Color( parameters.shadeColor ?? 0xff0000 ) );
+  }
+  setupOutput( builder, outputNode ) {
+	   // Modify the native output of the MeshPhongNodeMaterial fragment shader
+    const brightness = min( outputNode.r, 1.0 );
+    const mixedColor = mix( this._shadeColor, diffuseColor.rgb, brightness );
+	   // Return new output back into NodeMaterial flow
+    return super.setupOutput( builder, vec4( mixedColor, outputNode.a ) );
+  }
+}
+</code></pre>
 						</div>
 						<table class="params">
 							<tbody>

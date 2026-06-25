@@ -43,11 +43,11 @@ from an array of cameras. This is particularly useful for multi-view renderers.<
 							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="containsPoint" translate="no">.<a href="#containsPoint">containsPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, cameraArray : <span class="param-type">Object</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="containsPoint" translate="no">.<a href="#containsPoint">containsPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Returns <code>true</code> if the given point lies within any frustum
-from the camera array.</p>
+							<p>Returns <code>true</code> if the given point lies within any cached frustum.</p>
+<p><a href="FrustumArray.html#setFromArrayCamera">FrustumArray#setFromArrayCamera</a> must be called once per render before this method.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -59,25 +59,38 @@ from the camera array.</p>
 										<p>The point to test.</p>
 									</td>
 								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">cameraArray</strong>
-									</td>
-									<td class="description last">
-										<p>An object with a cameras property containing an array of cameras.</p>
-									</td>
-								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the point is visible in any camera.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersectsBox" translate="no">.<a href="#intersectsBox">intersectsBox</a><span class="signature">( box : <span class="param-type"><a href="Box3.html">Box3</a></span>, cameraArray : <span class="param-type">Object</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( frustumArray : <span class="param-type"><a href="FrustumArray.html">FrustumArray</a></span> )</span><span class="type-signature"> : <a href="FrustumArray.html">FrustumArray</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Returns <code>true</code> if the given bounding box is intersecting any frustum
-from the camera array.</p>
+							<p>Copies the values of the given frustum array to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">frustumArray</strong>
+									</td>
+									<td class="description last">
+										<p>The frustum array to copy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this frustum array.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="intersectsBox" translate="no">.<a href="#intersectsBox">intersectsBox</a><span class="signature">( box : <span class="param-type"><a href="Box3.html">Box3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given bounding box is intersecting any cached frustum.</p>
+<p><a href="FrustumArray.html#setFromArrayCamera">FrustumArray#setFromArrayCamera</a> must be called once per render before this method.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -89,25 +102,17 @@ from the camera array.</p>
 										<p>The bounding box to test.</p>
 									</td>
 								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">cameraArray</strong>
-									</td>
-									<td class="description last">
-										<p>An object with a cameras property containing an array of cameras.</p>
-									</td>
-								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the box is visible in any camera.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersectsObject" translate="no">.<a href="#intersectsObject">intersectsObject</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, cameraArray : <span class="param-type">Object</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="intersectsObject" translate="no">.<a href="#intersectsObject">intersectsObject</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Returns <code>true</code> if the 3D object's bounding sphere is intersecting any frustum
-from the camera array.</p>
+							<p>Returns <code>true</code> if the 3D object's bounding sphere is intersecting any cached frustum.</p>
+<p><a href="FrustumArray.html#setFromArrayCamera">FrustumArray#setFromArrayCamera</a> must be called once per render before this method.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -119,25 +124,17 @@ from the camera array.</p>
 										<p>The 3D object to test.</p>
 									</td>
 								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">cameraArray</strong>
-									</td>
-									<td class="description last">
-										<p>An object with a cameras property containing an array of cameras.</p>
-									</td>
-								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the 3D object is visible in any camera.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersectsSphere" translate="no">.<a href="#intersectsSphere">intersectsSphere</a><span class="signature">( sphere : <span class="param-type"><a href="Sphere.html">Sphere</a></span>, cameraArray : <span class="param-type">Object</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="intersectsSphere" translate="no">.<a href="#intersectsSphere">intersectsSphere</a><span class="signature">( sphere : <span class="param-type"><a href="Sphere.html">Sphere</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Returns <code>true</code> if the given bounding sphere is intersecting any frustum
-from the camera array.</p>
+							<p>Returns <code>true</code> if the given bounding sphere is intersecting any cached frustum.</p>
+<p><a href="FrustumArray.html#setFromArrayCamera">FrustumArray#setFromArrayCamera</a> must be called once per render before this method.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -149,25 +146,17 @@ from the camera array.</p>
 										<p>The bounding sphere to test.</p>
 									</td>
 								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">cameraArray</strong>
-									</td>
-									<td class="description last">
-										<p>An object with a cameras property containing an array of cameras.</p>
-									</td>
-								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the sphere is visible in any camera.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersectsSprite" translate="no">.<a href="#intersectsSprite">intersectsSprite</a><span class="signature">( sprite : <span class="param-type"><a href="Sprite.html">Sprite</a></span>, cameraArray : <span class="param-type">Object</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="intersectsSprite" translate="no">.<a href="#intersectsSprite">intersectsSprite</a><span class="signature">( sprite : <span class="param-type"><a href="Sprite.html">Sprite</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Returns <code>true</code> if the given sprite is intersecting any frustum
-from the camera array.</p>
+							<p>Returns <code>true</code> if the given sprite is intersecting any cached frustum.</p>
+<p><a href="FrustumArray.html#setFromArrayCamera">FrustumArray#setFromArrayCamera</a> must be called once per render before this method.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -179,18 +168,31 @@ from the camera array.</p>
 										<p>The sprite to test.</p>
 									</td>
 								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the sprite is visible in any camera.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromArrayCamera" translate="no">.<a href="#setFromArrayCamera">setFromArrayCamera</a><span class="signature">( cameraArray : <span class="param-type"><a href="ArrayCamera.html">ArrayCamera</a></span> )</span><span class="type-signature"> : <a href="FrustumArray.html">FrustumArray</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes and caches a frustum for each camera of the given array camera.</p>
+						</div>
+						<table class="params">
+							<tbody>
 								<tr>
 									<td class="name">
 										<strong translate="no">cameraArray</strong>
 									</td>
 									<td class="description last">
-										<p>An object with a cameras property containing an array of cameras.</p>
+										<p>The array camera whose sub-cameras define the frustums.</p>
 									</td>
 								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> Whether the sprite is visible in any camera.</dt>
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this frustum array.</dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

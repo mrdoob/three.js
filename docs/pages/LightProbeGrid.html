@@ -14,6 +14,8 @@
 			<header>
 				<div class="class-description"><p>A 3D grid of L2 Spherical Harmonic irradiance probes that provides
 position-dependent diffuse global illumination.</p>
+<p>Note that this class can only be used with <a href="WebGLRenderer.html">WebGLRenderer</a>.
+A version for <a href="WebGPURenderer.html">WebGPURenderer</a> will be added at a later point.</p>
 <p>All seven packed SH sub-volumes are stored in a <strong>single</strong> RGBA
 <code>WebGL3DRenderTarget</code> using a texture-atlas layout along the Z axis.
 Each sub-volume occupies <code>( nz + 2 )</code> atlas slices: one padding slice at
@@ -152,7 +154,10 @@ by <a href="LightProbeGrid.html#bake">LightProbeGrid#bake</a>.</p>
 					<div class="method">
 						<div class="description">
 							<p>Bakes all probes by rendering cubemaps at each probe position
-and projecting to L2 SH. Fully GPU-resident with zero CPU readback.</p>
+and projecting to L2 SH. Optionally iterates additional passes to
+capture indirect bounces — each extra pass samples the previous pass's
+atlas as indirect light, so a grid added to the scene before baking
+accumulates one bounce per extra pass.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -205,6 +210,15 @@ and projecting to L2 SH. Fully GPU-resident with zero CPU readback.</p>
 									<td class="description last">
 										<p>Far plane for the cube camera.</p>
 										<p>Default is <code>100</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">bounces</strong>
+									</td>
+									<td class="description last">
+										<p>Additional bounce passes after the initial direct pass.</p>
+										<p>Default is <code>0</code>.</p>
 									</td>
 								</tr>
 							</tbody>

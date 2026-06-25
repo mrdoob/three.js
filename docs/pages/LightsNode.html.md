@@ -38,6 +38,16 @@ A node representing the total specular light.
 
 ## Methods
 
+### .analyze( builder : NodeBuilder )
+
+Analyzes the node's dependencies by building all nested light nodes and the output node.
+
+**builder**
+
+A reference to the current node builder.
+
+**Overrides:** [Node#analyze](Node.html#analyze)
+
 ### .customCacheKey() : number
 
 Overwrites the default [Node#customCacheKey](Node.html#customCacheKey) implementation by including light data into the cache key.
@@ -102,6 +112,22 @@ The light node.
 
 The light object containing color and direction properties.
 
+### .setupDirectRectAreaLight( builder : Object, lightNode : Object, lightData : Object )
+
+Sets up a direct rect area light in the lighting model.
+
+**builder**
+
+The builder object containing the context and stack.
+
+**lightNode**
+
+The light node.
+
+**lightData**
+
+The light object containing color and area light properties.
+
 ### .setupLights( builder : NodeBuilder, lightNodes : Array.<LightingNode> )
 
 Setups the internal lights by building all respective light nodes.
@@ -114,13 +140,15 @@ A reference to the current node builder.
 
 An array of lighting nodes.
 
-### .setupLightsNode( builder : NodeBuilder )
+### .setupLightsNode( builder : NodeBuilder ) : Array.<LightingNode>
 
 Creates lighting nodes for each scene light. This makes it possible to further process lights in the node system.
 
 **builder**
 
 A reference to the current node builder.
+
+**Returns:** The array of lighting nodes.
 
 ## Source
 

@@ -98,7 +98,7 @@ Returns all timestamp frames.
 
 **Returns:** The timestamp frames.
 
-### .hasTimestamp( uid : string ) : boolean
+### .hasTimestampQuery( uid : string ) : boolean
 
 Returns whether a timestamp is available for a given render context.
 

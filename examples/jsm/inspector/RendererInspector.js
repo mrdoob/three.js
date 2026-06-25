@@ -1,5 +1,6 @@
 
-import { InspectorBase, TimestampQuery, warnOnce } from 'three/webgpu';
+import { InspectorBase, TimestampQuery, warnOnce, RendererUtils, MeshBasicNodeMaterial, AdditiveBlending, NoToneMapping, LinearSRGBColorSpace } from 'three/webgpu';
+import { vec3 } from 'three/tsl';
 
 class ObjectStats {
 
@@ -84,6 +85,9 @@ export class RendererInspector extends InspectorBase {
 		this._lastFinishTime = 0;
 		this._resolveTimestampPromise = null;
 
+		this.overdraw = false;
+		this._overdrawMaterial = null;
+
 		this.isRendererInspector = true;
 
 	}
@@ -121,6 +125,66 @@ export class RendererInspector extends InspectorBase {
 		this.currentNodes = null;
 
 		this._lastFinishTime = now;
+
+		if ( this.overdraw === true ) {
+
+			this._renderOverdraw( frame );
+
+		}
+
+	}
+
+	_renderOverdraw( frame ) {
+
+		const renderer = this.getRenderer();
+
+		if ( renderer === null ) return;
+
+		// first scene render of the frame; nested shadow / RTT passes come after
+
+		let primary = null;
+
+		for ( const render of frame.renders ) {
+
+			if ( render.scene.isScene === true ) {
+
+				primary = render;
+				break;
+
+			}
+
+		}
+
+		if ( primary === null ) return;
+
+		if ( this._overdrawMaterial === null ) {
+
+			// additive constant, so each pixel sums the depth-passing fragments it shaded
+
+			this._overdrawMaterial = new MeshBasicNodeMaterial( {
+				colorNode: vec3( 0.25 ),
+				blending: AdditiveBlending,
+				depthTest: true,
+				depthWrite: true,
+				toneMapped: false
+			} );
+
+		}
+
+		const { scene, camera } = primary;
+
+		// raw render against black with no tone mapping, so the count stays linear
+
+		const state = RendererUtils.resetRendererAndSceneState( renderer, scene );
+
+		renderer.toneMapping = NoToneMapping;
+		renderer.outputColorSpace = LinearSRGBColorSpace;
+
+		scene.overrideMaterial = this._overdrawMaterial;
+
+		renderer.render( scene, camera );
+
+		RendererUtils.restoreRendererAndSceneState( renderer, scene, state );
 
 	}
 
@@ -191,87 +255,139 @@ export class RendererInspector extends InspectorBase {
 
 				const renderer = this.getRenderer();
 
-				await renderer.resolveTimestampsAsync( TimestampQuery.COMPUTE );
-				await renderer.resolveTimestampsAsync( TimestampQuery.RENDER );
+				if ( renderer.backend.hasTimestamp ) {
 
-				const computeFrames = renderer.backend.getTimestampFrames( TimestampQuery.COMPUTE );
-				const renderFrames = renderer.backend.getTimestampFrames( TimestampQuery.RENDER );
+					await renderer.resolveTimestampsAsync( TimestampQuery.COMPUTE );
+					await renderer.resolveTimestampsAsync( TimestampQuery.RENDER );
 
-				const frameIds = [ ...new Set( [ ...computeFrames, ...renderFrames ] ) ];
+					const computeFrames = renderer.backend.getTimestampFrames( TimestampQuery.COMPUTE );
+					const renderFrames = renderer.backend.getTimestampFrames( TimestampQuery.RENDER );
 
-				for ( const frameId of frameIds ) {
+					const frameIds = [ ...new Set( [ ...computeFrames, ...renderFrames ] ) ];
 
-					const frame = this.getFrameById( frameId );
+					for ( const frameId of frameIds ) {
 
-					if ( frame !== null ) {
+						const frame = this.getFrameById( frameId );
 
-						// resolve compute timestamps
+						if ( frame !== null ) {
 
-						if ( frame.resolvedCompute === false ) {
+							// resolve compute timestamps
 
-							if ( frame.computes.length > 0 ) {
+							if ( frame.resolvedCompute === false ) {
 
-								if ( computeFrames.includes( frameId ) ) {
+								if ( frame.computes.length > 0 ) {
 
-									for ( const stats of frame.computes ) {
+									if ( computeFrames.includes( frameId ) ) {
 
-										if ( renderer.backend.hasTimestamp( stats.uid ) ) {
+										for ( const stats of frame.computes ) {
 
-											stats.gpu = renderer.backend.getTimestamp( stats.uid );
+											if ( renderer.backend.hasTimestampQuery( stats.uid ) ) {
 
-										} else {
+												stats.gpu = renderer.backend.getTimestamp( stats.uid );
 
-											stats.gpu = 0;
-											stats.gpuNotAvailable = true;
+											} else {
+
+												stats.gpu = 0;
+												stats.gpuNotAvailable = true;
+
+											}
 
 										}
 
+										frame.resolvedCompute = true;
+
 									}
+
+								} else {
 
 									frame.resolvedCompute = true;
 
 								}
 
-							} else {
-
-								frame.resolvedCompute = true;
-
 							}
 
-						}
+							// resolve render timestamps
 
-						// resolve render timestamps
+							if ( frame.resolvedRender === false ) {
 
-						if ( frame.resolvedRender === false ) {
+								if ( frame.renders.length > 0 ) {
 
-							if ( frame.renders.length > 0 ) {
+									if ( renderFrames.includes( frameId ) ) {
 
-								if ( renderFrames.includes( frameId ) ) {
+										for ( const stats of frame.renders ) {
 
-									for ( const stats of frame.renders ) {
+											if ( renderer.backend.hasTimestampQuery( stats.uid ) ) {
 
-										if ( renderer.backend.hasTimestamp( stats.uid ) ) {
+												stats.gpu = renderer.backend.getTimestamp( stats.uid );
 
-											stats.gpu = renderer.backend.getTimestamp( stats.uid );
+											} else {
 
-										} else {
+												stats.gpu = 0;
+												stats.gpuNotAvailable = true;
 
-											stats.gpu = 0;
-											stats.gpuNotAvailable = true;
+											}
 
 										}
 
+										frame.resolvedRender = true;
+
 									}
+
+								} else {
 
 									frame.resolvedRender = true;
 
 								}
 
-							} else {
+							}
 
-								frame.resolvedRender = true;
+							if ( frame.resolvedCompute === true && frame.resolvedRender === true ) {
+
+								this.resolveFrame( frame );
 
 							}
+
+						}
+
+					}
+
+				} else {
+
+					for ( const frame of this.frames ) {
+
+						if ( frame.resolvedCompute === true && frame.resolvedRender === true ) {
+
+							continue;
+
+						}
+
+						const nextFrame = this.getFrameById( frame.frameId + 1 );
+
+						if ( nextFrame === null ) continue;
+
+						if ( frame.resolvedCompute === false ) {
+
+							for ( const stats of frame.computes ) {
+
+								stats.gpu = 0;
+								stats.gpuNotAvailable = true;
+
+							}
+
+							frame.resolvedCompute = true;
+
+						}
+
+						if ( frame.resolvedRender === false ) {
+
+							for ( const stats of frame.renders ) {
+
+								stats.gpu = 0;
+								stats.gpuNotAvailable = true;
+
+							}
+
+							frame.resolvedRender = true;
 
 						}
 

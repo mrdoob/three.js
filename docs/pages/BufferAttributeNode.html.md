@@ -4,14 +4,6 @@
 
 In earlier `three.js` versions it was only possible to define attribute data on geometry level. With `BufferAttributeNode`, it is also possible to do this on the node level.
 
-This new approach is especially interesting when geometry data are generated via compute shaders. The below line converts a storage buffer into an attribute node.
-
-```js
-material.positionNode = positionBuffer.toAttribute();
-```
-
-## Code Example
-
 ```js
 const geometry = new THREE.PlaneGeometry();
 const positionAttribute = geometry.getAttribute( 'position' );
@@ -20,6 +12,12 @@ for ( let i = 0; i < position.count; i ++ ) {
 	colors.push( 1, 0, 0 );
 }
 material.colorNode = bufferAttribute( new THREE.Float32BufferAttribute( colors, 3 ) );
+```
+
+This new approach is especially interesting when geometry data are generated via compute shaders. The below line converts a storage buffer into an attribute node.
+
+```js
+material.positionNode = positionBuffer.toAttribute();
 ```
 
 ## Constructor

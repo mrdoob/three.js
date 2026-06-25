@@ -4,6 +4,10 @@
 		<title>three.js webgpu - SSGI Ball Pool</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - SSGI Ball Pool">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_postprocessing_ssgi_ballpool.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_postprocessing_ssgi_ballpool.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 		<style>
 			canvas {
@@ -31,7 +35,7 @@
 					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/",
 					"monomorph": "https://cdn.jsdelivr.net/npm/monomorph@2.3.1/build/monomorph.js",
-					"@perplexdotgg/bounce": "https://cdn.jsdelivr.net/npm/@perplexdotgg/bounce@1.8.0/build/bounce.js"
+					"@perplexdotgg/bounce": "https://cdn.jsdelivr.net/npm/@perplexdotgg/bounce@1.8.1/build/bounce.js"
 				}
 			}
 		</script>
@@ -39,10 +43,12 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec4, directionToColor, colorToDirection, sample } from 'three/tsl';
+			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec4, packNormalToRGB, unpackRGBToNormal, sample } from 'three/tsl';
 			import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { World } from '@perplexdotgg/bounce';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const BALL_RADIUS = 0.4;
 			const FILL_RATIO = 0.4;
@@ -64,8 +70,8 @@
 			let wallMeshes = [];
 			const boxSize = { w: 8, h: BOX_HEIGHT, d: BOX_DEPTH };
 
-			let mouseRayOrigin = new THREE.Vector3();
-			let mouseRayDir = new THREE.Vector3();
+			const mouseRayOrigin = new THREE.Vector3();
+			const mouseRayDir = new THREE.Vector3();
 			let mouseMoving = false;
 			let mouseStopTimer = 0;
 			let pointerDown = false;
@@ -88,6 +94,7 @@
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 0.5;
 				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -98,7 +105,7 @@
 				scenePass.setMRT( mrt( {
 					output: output,
 					diffuseColor: diffuseColor,
-					normal: directionToColor( normalView ),
+					normal: packNormalToRGB( normalView ),
 					velocity: velocity
 				} ) );
 
@@ -118,7 +125,7 @@
 
 				const sceneNormal = sample( ( uv ) => {
 
-					return colorToDirection( scenePassNormal.sample( uv ) );
+					return unpackRGBToNormal( scenePassNormal.sample( uv ) );
 
 				} );
 
@@ -130,11 +137,11 @@
 
 				// composite
 
-				const gi = giPass.rgb;
-				const ao = giPass.a;
+				const ao = giPass.getAONode().toInspector( 'SSGI.AO' );
+				const gi = giPass.getGINode().toInspector( 'SSGI.GI' );
 
 				const compositePass = vec4(
-					add( scenePassColor.rgb.mul( ao ), scenePassDiffuse.rgb.mul( gi ) ),
+					add( scenePassColor.rgb.mul( ao.r ), scenePassDiffuse.rgb.mul( gi.rgb ) ),
 					scenePassColor.a
 				);
 

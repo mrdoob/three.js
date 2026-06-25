@@ -2,6 +2,8 @@
 
 A 3D grid of L2 Spherical Harmonic irradiance probes that provides position-dependent diffuse global illumination.
 
+Note that this class can only be used with [WebGLRenderer](WebGLRenderer.html). A version for [WebGPURenderer](WebGPURenderer.html) will be added at a later point.
+
 All seven packed SH sub-volumes are stored in a **single** RGBA `WebGL3DRenderTarget` using a texture-atlas layout along the Z axis. Each sub-volume occupies `( nz + 2 )` atlas slices: one padding slice at each end (a copy of the nearest edge data slice) to prevent color bleeding when the hardware trilinear filter reads across a sub-volume boundary.
 
 Atlas layout (nz = resolution.z, PADDING = 1):
@@ -105,7 +107,7 @@ The full width of the volume along X.
 
 ### .bake( renderer : WebGLRenderer, scene : Scene, options : Object )
 
-Bakes all probes by rendering cubemaps at each probe position and projecting to L2 SH. Fully GPU-resident with zero CPU readback.
+Bakes all probes by rendering cubemaps at each probe position and projecting to L2 SH. Optionally iterates additional passes to capture indirect bounces — each extra pass samples the previous pass's atlas as indirect light, so a grid added to the scene before baking accumulates one bounce per extra pass.
 
 **renderer**
 
@@ -136,6 +138,12 @@ Default is `0.1`.
 Far plane for the cube camera.
 
 Default is `100`.
+
+**bounces**
+
+Additional bounce passes after the initial direct pass.
+
+Default is `0`.
 
 ### .dispose()
 

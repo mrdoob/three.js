@@ -777,6 +777,286 @@
 			"kind": "function"
 		},
 		{
+			"title": "Backend",
+			"kind": "class"
+		},
+		{
+			"title": "Backend#_getQueryPool",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#beginCompute",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#beginRender",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#compute",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#coordinateSystem",
+			"kind": "member"
+		},
+		{
+			"title": "Backend#copyFramebufferToTexture",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#copyTextureToBuffer",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#copyTextureToTexture",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#createAttribute",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#createBindings",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#createComputePipeline",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#createDefaultTexture",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#createIndexAttribute",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#createNodeBuilder",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#createProgram",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#createRenderPipeline",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#createStorageAttribute",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#createTexture",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#createUniformBuffer",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#data",
+			"kind": "member"
+		},
+		{
+			"title": "Backend#delete",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#deleteBindGroupData",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#destroyAttribute",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#destroyProgram",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#destroySampler",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#destroyTexture",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#destroyUniformBuffer",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#dispose",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#domElement",
+			"kind": "member"
+		},
+		{
+			"title": "Backend#draw",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#finishCompute",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#finishRender",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#generateMipmaps",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#get",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#getArrayBufferAsync",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#getClearColor",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#getContext",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#getDomElement",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#getDrawingBufferSize",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#getRenderCacheKey",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#getTimestamp",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#getTimestampFrames",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#getTimestampUID",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#has",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#hasCompatibility",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#hasFeature",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#hasFeatureAsync",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#hasTimestamp",
+			"kind": "member"
+		},
+		{
+			"title": "Backend#hasTimestampQuery",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#init",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#initRenderTarget",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#isOccluded",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#needsRenderUpdate",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#parameters",
+			"kind": "member"
+		},
+		{
+			"title": "Backend#renderer",
+			"kind": "member"
+		},
+		{
+			"title": "Backend#resolveTimestampsAsync",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#set",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#setScissorTest",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#setXRTarget",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#timestampQueryPool",
+			"kind": "member"
+		},
+		{
+			"title": "Backend#trackTimestamp",
+			"kind": "member"
+		},
+		{
+			"title": "Backend#updateAttribute",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#updateBinding",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#updateBindings",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#updateSampler",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#updateSize",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#updateTexture",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#updateTimeStampUID",
+			"kind": "function"
+		},
+		{
+			"title": "Backend#updateViewport",
+			"kind": "function"
+		},
+		{
 			"title": "BarrierNode",
 			"kind": "class"
 		},
@@ -806,22 +1086,6 @@
 		},
 		{
 			"title": "BasicLightingModel#indirect",
-			"kind": "function"
-		},
-		{
-			"title": "BatchNode",
-			"kind": "class"
-		},
-		{
-			"title": "BatchNode#batchMesh",
-			"kind": "member"
-		},
-		{
-			"title": "BatchNode#batchingIdNode",
-			"kind": "member"
-		},
-		{
-			"title": "BatchNode#setup",
 			"kind": "function"
 		},
 		{
@@ -2981,6 +3245,10 @@
 			"kind": "class"
 		},
 		{
+			"title": "DataTextureLoader#createDataTexture",
+			"kind": "function"
+		},
+		{
 			"title": "DataTextureLoader#load",
 			"kind": "function"
 		},
@@ -3417,6 +3685,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "FrustumArray#copy",
+			"kind": "function"
+		},
+		{
 			"title": "FrustumArray#intersectsBox",
 			"kind": "function"
 		},
@@ -3430,6 +3702,10 @@
 		},
 		{
 			"title": "FrustumArray#intersectsSprite",
+			"kind": "function"
+		},
+		{
+			"title": "FrustumArray#setFromArrayCamera",
 			"kind": "function"
 		},
 		{
@@ -3610,6 +3886,14 @@
 		},
 		{
 			"title": "GLSLNodeBuilder#generateTextureCompare",
+			"kind": "function"
+		},
+		{
+			"title": "GLSLNodeBuilder#generateTextureGather",
+			"kind": "function"
+		},
+		{
+			"title": "GLSLNodeBuilder#generateTextureGatherCompare",
 			"kind": "function"
 		},
 		{
@@ -3853,7 +4137,15 @@
 			"kind": "class"
 		},
 		{
+			"title": "IESSpotLightNode#_iesTextureNode",
+			"kind": "member"
+		},
+		{
 			"title": "IESSpotLightNode#getSpotAttenuation",
+			"kind": "function"
+		},
+		{
+			"title": "IESSpotLightNode#update",
 			"kind": "function"
 		},
 		{
@@ -3953,6 +4245,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "Info#createUniformBuffer",
+			"kind": "function"
+		},
+		{
 			"title": "Info#destroyAttribute",
 			"kind": "function"
 		},
@@ -3966,6 +4262,10 @@
 		},
 		{
 			"title": "Info#destroyTexture",
+			"kind": "function"
+		},
+		{
+			"title": "Info#destroyUniformBuffer",
 			"kind": "function"
 		},
 		{
@@ -4101,58 +4401,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "InstanceNode",
-			"kind": "class"
-		},
-		{
-			"title": "InstanceNode#buffer",
-			"kind": "member"
-		},
-		{
-			"title": "InstanceNode#bufferColor",
-			"kind": "member"
-		},
-		{
-			"title": "InstanceNode#count",
-			"kind": "member"
-		},
-		{
-			"title": "InstanceNode#getPreviousInstancedPosition",
-			"kind": "function"
-		},
-		{
-			"title": "InstanceNode#instanceColor",
-			"kind": "member"
-		},
-		{
-			"title": "InstanceNode#instanceColorNode",
-			"kind": "member"
-		},
-		{
-			"title": "InstanceNode#instanceMatrix",
-			"kind": "member"
-		},
-		{
-			"title": "InstanceNode#instanceMatrixNode",
-			"kind": "member"
-		},
-		{
-			"title": "InstanceNode#previousInstanceMatrixNode",
-			"kind": "member"
-		},
-		{
-			"title": "InstanceNode#setup",
-			"kind": "function"
-		},
-		{
-			"title": "InstanceNode#update",
-			"kind": "function"
-		},
-		{
-			"title": "InstanceNode#updateType",
-			"kind": "member"
-		},
-		{
 			"title": "InstancedBufferAttribute",
 			"kind": "class"
 		},
@@ -4229,10 +4477,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "InstancedMesh#previousInstanceMatrix",
-			"kind": "member"
-		},
-		{
 			"title": "InstancedMesh#setColorAt",
 			"kind": "function"
 		},
@@ -4243,14 +4487,6 @@
 		{
 			"title": "InstancedMesh#setMorphAt",
 			"kind": "function"
-		},
-		{
-			"title": "InstancedMeshNode",
-			"kind": "class"
-		},
-		{
-			"title": "InstancedMeshNode#instancedMesh",
-			"kind": "member"
 		},
 		{
 			"title": "Int16BufferAttribute",
@@ -4849,6 +5085,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "LightingContextNode#materialLightings",
+			"kind": "member"
+		},
+		{
 			"title": "LightingModel",
 			"kind": "class"
 		},
@@ -4885,6 +5125,10 @@
 			"kind": "class"
 		},
 		{
+			"title": "LightsNode#analyze",
+			"kind": "function"
+		},
+		{
 			"title": "LightsNode#customCacheKey",
 			"kind": "function"
 		},
@@ -4918,6 +5162,10 @@
 		},
 		{
 			"title": "LightsNode#setupDirectLight",
+			"kind": "function"
+		},
+		{
+			"title": "LightsNode#setupDirectRectAreaLight",
 			"kind": "function"
 		},
 		{
@@ -4981,10 +5229,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "Line2NodeMaterial#copy",
-			"kind": "function"
-		},
-		{
 			"title": "Line2NodeMaterial#dashOffset",
 			"kind": "member"
 		},
@@ -5013,7 +5257,11 @@
 			"kind": "member"
 		},
 		{
-			"title": "Line2NodeMaterial#setup",
+			"title": "Line2NodeMaterial#setupDiffuseColor",
+			"kind": "function"
+		},
+		{
+			"title": "Line2NodeMaterial#setupModelViewProjection",
 			"kind": "function"
 		},
 		{
@@ -5493,6 +5741,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "Material#fromJSON",
+			"kind": "function"
+		},
+		{
 			"title": "Material#id",
 			"kind": "member"
 		},
@@ -5866,6 +6118,10 @@
 		},
 		{
 			"title": "Matrix4#determinant",
+			"kind": "function"
+		},
+		{
+			"title": "Matrix4#determinantAffine",
 			"kind": "function"
 		},
 		{
@@ -7225,30 +7481,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "MorphNode",
-			"kind": "class"
-		},
-		{
-			"title": "MorphNode#mesh",
-			"kind": "member"
-		},
-		{
-			"title": "MorphNode#morphBaseInfluence",
-			"kind": "member"
-		},
-		{
-			"title": "MorphNode#setup",
-			"kind": "function"
-		},
-		{
-			"title": "MorphNode#update",
-			"kind": "function"
-		},
-		{
-			"title": "MorphNode#updateType",
-			"kind": "member"
-		},
-		{
 			"title": "Node",
 			"kind": "class"
 		},
@@ -7833,6 +8065,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "NodeBuilder#getOutputType",
+			"kind": "function"
+		},
+		{
 			"title": "NodeBuilder#getPropertyName",
 			"kind": "function"
 		},
@@ -7941,7 +8177,15 @@
 			"kind": "member"
 		},
 		{
+			"title": "NodeBuilder#hardwareClipping",
+			"kind": "member"
+		},
+		{
 			"title": "NodeBuilder#hasGeometryAttribute",
+			"kind": "function"
+		},
+		{
+			"title": "NodeBuilder#hasWriteUsage",
 			"kind": "function"
 		},
 		{
@@ -7958,6 +8202,10 @@
 		},
 		{
 			"title": "NodeBuilder#isAvailable",
+			"kind": "function"
+		},
+		{
+			"title": "NodeBuilder#isContextAssign",
 			"kind": "function"
 		},
 		{
@@ -8429,10 +8677,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "NodeMaterial#hardwareClipping",
-			"kind": "member"
-		},
-		{
 			"title": "NodeMaterial#lights",
 			"kind": "member"
 		},
@@ -8485,6 +8729,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "NodeMaterial#setupAmbientOcclusion",
+			"kind": "function"
+		},
+		{
 			"title": "NodeMaterial#setupClipping",
 			"kind": "function"
 		},
@@ -8521,7 +8769,7 @@
 			"kind": "function"
 		},
 		{
-			"title": "NodeMaterial#setupLights",
+			"title": "NodeMaterial#setupMaterialLightings",
 			"kind": "function"
 		},
 		{
@@ -9269,6 +9517,14 @@
 			"kind": "member"
 		},
 		{
+			"title": "OverrideContextNode",
+			"kind": "class"
+		},
+		{
+			"title": "OverrideContextNode#getFlowContextData",
+			"kind": "function"
+		},
+		{
 			"title": "PMREMGenerator",
 			"kind": "class"
 		},
@@ -9450,10 +9706,6 @@
 		},
 		{
 			"title": "PassNode#setMRT",
-			"kind": "function"
-		},
-		{
-			"title": "PassNode#setPixelRatio",
 			"kind": "function"
 		},
 		{
@@ -10177,6 +10429,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "PropertyNode#placeholderNode",
+			"kind": "member"
+		},
+		{
 			"title": "PropertyNode#varying",
 			"kind": "member"
 		},
@@ -10393,6 +10649,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "RTTNode#getResolutionScale",
+			"kind": "function"
+		},
+		{
 			"title": "RTTNode#height",
 			"kind": "member"
 		},
@@ -10401,15 +10661,11 @@
 			"kind": "member"
 		},
 		{
-			"title": "RTTNode#pixelRatio",
-			"kind": "member"
-		},
-		{
 			"title": "RTTNode#renderTarget",
 			"kind": "member"
 		},
 		{
-			"title": "RTTNode#setPixelRatio",
+			"title": "RTTNode#setResolutionScale",
 			"kind": "function"
 		},
 		{
@@ -10993,6 +11249,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "RenderTarget#useArrayDepthTexture",
+			"kind": "member"
+		},
+		{
 			"title": "RenderTarget#viewport",
 			"kind": "member"
 		},
@@ -11294,6 +11554,10 @@
 		},
 		{
 			"title": "Renderer#onDeviceLost",
+			"kind": "member"
+		},
+		{
+			"title": "Renderer#onError",
 			"kind": "member"
 		},
 		{
@@ -11609,6 +11873,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "ShaderMaterial#fromJSON",
+			"kind": "function"
+		},
+		{
 			"title": "ShaderMaterial#glslVersion",
 			"kind": "member"
 		},
@@ -11853,6 +12121,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "ShapePath#userData",
+			"kind": "member"
+		},
+		{
 			"title": "ShapeUtils",
 			"kind": "class"
 		},
@@ -11907,10 +12179,6 @@
 		{
 			"title": "Skeleton#pose",
 			"kind": "function"
-		},
-		{
-			"title": "Skeleton#previousBoneMatrices",
-			"kind": "member"
 		},
 		{
 			"title": "Skeleton#toJSON",
@@ -11987,74 +12255,6 @@
 		{
 			"title": "SkinnedMesh#pose",
 			"kind": "function"
-		},
-		{
-			"title": "SkinningNode",
-			"kind": "class"
-		},
-		{
-			"title": "SkinningNode#bindMatrixInverseNode",
-			"kind": "member"
-		},
-		{
-			"title": "SkinningNode#bindMatrixNode",
-			"kind": "member"
-		},
-		{
-			"title": "SkinningNode#boneMatricesNode",
-			"kind": "member"
-		},
-		{
-			"title": "SkinningNode#generate",
-			"kind": "function"
-		},
-		{
-			"title": "SkinningNode#getPreviousSkinnedPosition",
-			"kind": "function"
-		},
-		{
-			"title": "SkinningNode#getSkinnedNormalAndTangent",
-			"kind": "function"
-		},
-		{
-			"title": "SkinningNode#getSkinnedPosition",
-			"kind": "function"
-		},
-		{
-			"title": "SkinningNode#positionNode",
-			"kind": "member"
-		},
-		{
-			"title": "SkinningNode#previousBoneMatricesNode",
-			"kind": "member"
-		},
-		{
-			"title": "SkinningNode#setup",
-			"kind": "function"
-		},
-		{
-			"title": "SkinningNode#skinIndexNode",
-			"kind": "member"
-		},
-		{
-			"title": "SkinningNode#skinWeightNode",
-			"kind": "member"
-		},
-		{
-			"title": "SkinningNode#skinnedMesh",
-			"kind": "member"
-		},
-		{
-			"title": "SkinningNode#toPositionNode",
-			"kind": "member"
-		},
-		{
-			"title": "SkinningNode#update",
-			"kind": "function"
-		},
-		{
-			"title": "SkinningNode#updateType",
-			"kind": "member"
 		},
 		{
 			"title": "Source",
@@ -12581,6 +12781,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "StandardNodeLibrary",
+			"kind": "class"
+		},
+		{
 			"title": "StereoCamera",
 			"kind": "class"
 		},
@@ -12761,6 +12965,26 @@
 			"kind": "function"
 		},
 		{
+			"title": "StorageTexture3DNode",
+			"kind": "class"
+		},
+		{
+			"title": "StorageTexture3DNode#generateOffset",
+			"kind": "function"
+		},
+		{
+			"title": "StorageTexture3DNode#generateUV",
+			"kind": "function"
+		},
+		{
+			"title": "StorageTexture3DNode#getDefaultUV",
+			"kind": "function"
+		},
+		{
+			"title": "StorageTexture3DNode#setUpdateMatrix",
+			"kind": "function"
+		},
+		{
 			"title": "StorageTextureNode",
 			"kind": "class"
 		},
@@ -12785,6 +13009,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "StorageTextureNode#getTransformedUV",
+			"kind": "function"
+		},
+		{
 			"title": "StorageTextureNode#mipLevel",
 			"kind": "member"
 		},
@@ -12794,6 +13022,10 @@
 		},
 		{
 			"title": "StorageTextureNode#setMipLevel",
+			"kind": "function"
+		},
+		{
+			"title": "StorageTextureNode#store",
 			"kind": "function"
 		},
 		{
@@ -13165,6 +13397,14 @@
 			"kind": "member"
 		},
 		{
+			"title": "TextureNode#gather",
+			"kind": "function"
+		},
+		{
+			"title": "TextureNode#gatherNode",
+			"kind": "member"
+		},
+		{
 			"title": "TextureNode#generate",
 			"kind": "function"
 		},
@@ -13377,7 +13617,7 @@
 			"kind": "function"
 		},
 		{
-			"title": "TimestampQueryPool#hasTimestamp",
+			"title": "TimestampQueryPool#hasTimestampQuery",
 			"kind": "function"
 		},
 		{
@@ -13791,6 +14031,10 @@
 		{
 			"title": "UniformsGroup#name",
 			"kind": "member"
+		},
+		{
+			"title": "UniformsGroup#release",
+			"kind": "function"
 		},
 		{
 			"title": "UniformsGroup#remove",
@@ -14941,6 +15185,14 @@
 			"kind": "function"
 		},
 		{
+			"title": "WGSLNodeBuilder#generateTextureGather",
+			"kind": "function"
+		},
+		{
+			"title": "WGSLNodeBuilder#generateTextureGatherCompare",
+			"kind": "function"
+		},
+		{
 			"title": "WGSLNodeBuilder#generateTextureGrad",
 			"kind": "function"
 		},
@@ -15737,6 +15989,14 @@
 			"kind": "member"
 		},
 		{
+			"title": "XRManager#foveateBoundTexture",
+			"kind": "function"
+		},
+		{
+			"title": "XRManager#getBaseLayer",
+			"kind": "function"
+		},
+		{
 			"title": "XRManager#getBinding",
 			"kind": "function"
 		},
@@ -15782,6 +16042,10 @@
 		},
 		{
 			"title": "XRManager#getSession",
+			"kind": "function"
+		},
+		{
+			"title": "XRManager#getWebGPUBinding",
 			"kind": "function"
 		},
 		{
@@ -16005,62 +16269,6 @@
 		{
 			"title": "AnaglyphPassNode#updateStereoCamera",
 			"kind": "function"
-		},
-		{
-			"title": "AnamorphicNode",
-			"kind": "class"
-		},
-		{
-			"title": "AnamorphicNode#colorNode",
-			"kind": "member"
-		},
-		{
-			"title": "AnamorphicNode#dispose",
-			"kind": "function"
-		},
-		{
-			"title": "AnamorphicNode#getTextureNode",
-			"kind": "function"
-		},
-		{
-			"title": "AnamorphicNode#resolution",
-			"kind": "member"
-		},
-		{
-			"title": "AnamorphicNode#resolutionScale",
-			"kind": "member"
-		},
-		{
-			"title": "AnamorphicNode#samples",
-			"kind": "member"
-		},
-		{
-			"title": "AnamorphicNode#scaleNode",
-			"kind": "member"
-		},
-		{
-			"title": "AnamorphicNode#setSize",
-			"kind": "function"
-		},
-		{
-			"title": "AnamorphicNode#setup",
-			"kind": "function"
-		},
-		{
-			"title": "AnamorphicNode#textureNode",
-			"kind": "member"
-		},
-		{
-			"title": "AnamorphicNode#thresholdNode",
-			"kind": "member"
-		},
-		{
-			"title": "AnamorphicNode#updateBefore",
-			"kind": "function"
-		},
-		{
-			"title": "AnamorphicNode#updateBeforeType",
-			"kind": "member"
 		},
 		{
 			"title": "AnimationClipCreator",
@@ -16363,8 +16571,16 @@
 			"kind": "function"
 		},
 		{
+			"title": "BloomNode#getResolutionScale",
+			"kind": "function"
+		},
+		{
 			"title": "BloomNode#getTextureNode",
 			"kind": "function"
+		},
+		{
+			"title": "BloomNode#highPassFn",
+			"kind": "member"
 		},
 		{
 			"title": "BloomNode#inputNode",
@@ -16373,6 +16589,10 @@
 		{
 			"title": "BloomNode#radius",
 			"kind": "member"
+		},
+		{
+			"title": "BloomNode#setResolutionScale",
+			"kind": "function"
 		},
 		{
 			"title": "BloomNode#setSize",
@@ -16655,6 +16875,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "CSMFrustum#zFar",
+			"kind": "member"
+		},
+		{
 			"title": "CSMFrustum#zNear",
 			"kind": "member"
 		},
@@ -16895,6 +17119,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "CityGenerator",
+			"kind": "class"
+		},
+		{
 			"title": "ClearMaskPass",
 			"kind": "class"
 		},
@@ -16925,6 +17153,18 @@
 		{
 			"title": "ClearPass#render",
 			"kind": "function"
+		},
+		{
+			"title": "ClusteredLighting",
+			"kind": "class"
+		},
+		{
+			"title": "ClusteredLighting#createNode",
+			"kind": "function"
+		},
+		{
+			"title": "ClusteredLightsNode",
+			"kind": "class"
 		},
 		{
 			"title": "ColladaComposer",
@@ -17048,6 +17288,10 @@
 		},
 		{
 			"title": "DRACOExporter#parse",
+			"kind": "function"
+		},
+		{
+			"title": "DRACOExporter#parseAsync",
 			"kind": "function"
 		},
 		{
@@ -17447,6 +17691,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "EnvMapCDFGenerator",
+			"kind": "class"
+		},
+		{
 			"title": "FBXLoader",
 			"kind": "class"
 		},
@@ -17527,6 +17775,18 @@
 			"kind": "function"
 		},
 		{
+			"title": "FaceFrame",
+			"kind": "class"
+		},
+		{
+			"title": "FaceFrame#bays",
+			"kind": "function"
+		},
+		{
+			"title": "FaceFrame#matrix",
+			"kind": "function"
+		},
+		{
 			"title": "FigureEightPolynomialKnot",
 			"kind": "class"
 		},
@@ -17588,6 +17848,10 @@
 		},
 		{
 			"title": "FirstPersonControls#constrainVertical",
+			"kind": "member"
+		},
+		{
+			"title": "FirstPersonControls#dampingFactor",
 			"kind": "member"
 		},
 		{
@@ -17701,6 +17965,10 @@
 		{
 			"title": "FontLoader#parse",
 			"kind": "function"
+		},
+		{
+			"title": "ForestGenerator",
+			"kind": "class"
 		},
 		{
 			"title": "FullScreenQuad",
@@ -18253,6 +18521,26 @@
 		{
 			"title": "IESLoader#type",
 			"kind": "member"
+		},
+		{
+			"title": "ImportanceSampledEnvironment",
+			"kind": "class"
+		},
+		{
+			"title": "ImportanceSampledEnvironment#sampleEnvironmentBRDF",
+			"kind": "function"
+		},
+		{
+			"title": "ImportanceSampledEnvironment#sampleEnvironmentMIS",
+			"kind": "function"
+		},
+		{
+			"title": "ImportanceSampledEnvironment#sampleReflect",
+			"kind": "function"
+		},
+		{
+			"title": "ImportanceSampledEnvironment#updateFrom",
+			"kind": "function"
 		},
 		{
 			"title": "ImprovedNoise",
@@ -18905,6 +19193,14 @@
 		{
 			"title": "LineSegmentsGeometry#setPositions",
 			"kind": "function"
+		},
+		{
+			"title": "LoftGeometry",
+			"kind": "class"
+		},
+		{
+			"title": "LoftGeometry#parameters",
+			"kind": "member"
 		},
 		{
 			"title": "LottieLoader",
@@ -20607,6 +20903,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "RapierPhysics#applyImpulse",
+			"kind": "function"
+		},
+		{
 			"title": "RapierPhysics#removeMesh",
 			"kind": "function"
 		},
@@ -20643,6 +20943,26 @@
 			"kind": "class"
 		},
 		{
+			"title": "RecurrentDenoiseNode",
+			"kind": "class"
+		},
+		{
+			"title": "RecurrentDenoiseNode#accumulate",
+			"kind": "member"
+		},
+		{
+			"title": "RecurrentDenoiseNode#alphaSource",
+			"kind": "member"
+		},
+		{
+			"title": "RecurrentDenoiseNode#getRenderTarget",
+			"kind": "function"
+		},
+		{
+			"title": "RecurrentDenoiseNode#mode",
+			"kind": "member"
+		},
+		{
 			"title": "Reflector",
 			"kind": "class"
 		},
@@ -20653,6 +20973,10 @@
 		{
 			"title": "Reflector#forceUpdate",
 			"kind": "member"
+		},
+		{
+			"title": "Reflector#getReflectionCamera",
+			"kind": "function"
 		},
 		{
 			"title": "Reflector#getRenderTarget",
@@ -20979,14 +21303,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "SSAAPassNode#clearAlpha",
-			"kind": "member"
-		},
-		{
-			"title": "SSAAPassNode#clearColor",
-			"kind": "member"
-		},
-		{
 			"title": "SSAAPassNode#dispose",
 			"kind": "function"
 		},
@@ -21139,7 +21455,11 @@
 			"kind": "member"
 		},
 		{
-			"title": "SSGINode#getTextureNode",
+			"title": "SSGINode#getAONode",
+			"kind": "function"
+		},
+		{
+			"title": "SSGINode#getGINode",
 			"kind": "function"
 		},
 		{
@@ -21199,6 +21519,30 @@
 			"kind": "class"
 		},
 		{
+			"title": "SSRNode#_binaryRefine",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#_blurQuality",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#_reflectNonMetals",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#_screenEdgeFadeBlack",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#_stepExponent",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#binaryRefine",
+			"kind": "member"
+		},
+		{
 			"title": "SSRNode#blurQuality",
 			"kind": "member"
 		},
@@ -21215,15 +21559,47 @@
 			"kind": "member"
 		},
 		{
+			"title": "SSRNode#diffuseNode",
+			"kind": "member"
+		},
+		{
 			"title": "SSRNode#dispose",
 			"kind": "function"
+		},
+		{
+			"title": "SSRNode#envImportanceSampling",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#envMapIntensity",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#environmentIntensity",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#environmentNode",
+			"kind": "member"
 		},
 		{
 			"title": "SSRNode#getTextureNode",
 			"kind": "function"
 		},
 		{
+			"title": "SSRNode#historyTexture",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#intensity",
+			"kind": "member"
+		},
+		{
 			"title": "SSRNode#maxDistance",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#maxLuminance",
 			"kind": "member"
 		},
 		{
@@ -21231,11 +21607,11 @@
 			"kind": "member"
 		},
 		{
-			"title": "SSRNode#normalNode",
+			"title": "SSRNode#mirrorBias",
 			"kind": "member"
 		},
 		{
-			"title": "SSRNode#opacity",
+			"title": "SSRNode#normalNode",
 			"kind": "member"
 		},
 		{
@@ -21243,8 +21619,32 @@
 			"kind": "member"
 		},
 		{
+			"title": "SSRNode#reflectNonMetals",
+			"kind": "member"
+		},
+		{
 			"title": "SSRNode#resolutionScale",
 			"kind": "member"
+		},
+		{
+			"title": "SSRNode#roughnessNode",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#screenEdgeFade",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#screenEdgeFadeBlack",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#setEnvMap",
+			"kind": "function"
+		},
+		{
+			"title": "SSRNode#setHistory",
+			"kind": "function"
 		},
 		{
 			"title": "SSRNode#setSize",
@@ -21253,6 +21653,14 @@
 		{
 			"title": "SSRNode#setup",
 			"kind": "function"
+		},
+		{
+			"title": "SSRNode#stepExponent",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#stochastic",
+			"kind": "member"
 		},
 		{
 			"title": "SSRNode#thickness",
@@ -21264,6 +21672,10 @@
 		},
 		{
 			"title": "SSRNode#updateBeforeType",
+			"kind": "member"
+		},
+		{
+			"title": "SSRNode#velocityTexture",
 			"kind": "member"
 		},
 		{
@@ -21747,6 +22159,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "SidewalkGenerator",
+			"kind": "class"
+		},
+		{
 			"title": "SimplexNoise",
 			"kind": "class"
 		},
@@ -21829,6 +22245,10 @@
 		{
 			"title": "SkyMesh#upUniform",
 			"kind": "member"
+		},
+		{
+			"title": "SkyscraperGenerator",
+			"kind": "class"
 		},
 		{
 			"title": "SobelOperatorNode",
@@ -22123,6 +22543,26 @@
 			"kind": "class"
 		},
 		{
+			"title": "TemporalReprojectNode",
+			"kind": "class"
+		},
+		{
+			"title": "TemporalReprojectNode#accumulate",
+			"kind": "member"
+		},
+		{
+			"title": "TemporalReprojectNode#mode",
+			"kind": "member"
+		},
+		{
+			"title": "TemporalReprojectNode#setHistoryTexture",
+			"kind": "function"
+		},
+		{
+			"title": "TerrainGenerator",
+			"kind": "class"
+		},
+		{
 			"title": "TessellateModifier",
 			"kind": "class"
 		},
@@ -22207,6 +22647,22 @@
 			"kind": "function"
 		},
 		{
+			"title": "TileCreasedNormalsPlugin",
+			"kind": "class"
+		},
+		{
+			"title": "TileCreasedNormalsPlugin#creaseAngle",
+			"kind": "member"
+		},
+		{
+			"title": "TileCreasedNormalsPlugin#dispose",
+			"kind": "function"
+		},
+		{
+			"title": "TileCreasedNormalsPlugin#processTileModel",
+			"kind": "function"
+		},
+		{
 			"title": "TileShadowNode",
 			"kind": "class"
 		},
@@ -22261,26 +22717,6 @@
 		{
 			"title": "TileShadowNodeHelper#update",
 			"kind": "function"
-		},
-		{
-			"title": "TiledLighting",
-			"kind": "class"
-		},
-		{
-			"title": "TiledLighting#createNode",
-			"kind": "function"
-		},
-		{
-			"title": "TiledLightsNode",
-			"kind": "class"
-		},
-		{
-			"title": "TiledLightsNode#maxLights",
-			"kind": "member"
-		},
-		{
-			"title": "TiledLightsNode#tileSize",
-			"kind": "member"
 		},
 		{
 			"title": "TorusKnot",
@@ -22503,11 +22939,19 @@
 			"kind": "function"
 		},
 		{
+			"title": "TransformControls#showE",
+			"kind": "member"
+		},
+		{
 			"title": "TransformControls#showX",
 			"kind": "member"
 		},
 		{
 			"title": "TransformControls#showXY",
+			"kind": "member"
+		},
+		{
+			"title": "TransformControls#showXYZE",
 			"kind": "member"
 		},
 		{
@@ -22536,6 +22980,10 @@
 		},
 		{
 			"title": "TransformControls#translationSnap",
+			"kind": "member"
+		},
+		{
+			"title": "TransformControls#viewport",
 			"kind": "member"
 		},
 		{
@@ -22589,6 +23037,10 @@
 		{
 			"title": "Transpiler#parse",
 			"kind": "function"
+		},
+		{
+			"title": "TreeGenerator",
+			"kind": "class"
 		},
 		{
 			"title": "TreesGeometry",
@@ -22932,6 +23384,10 @@
 		},
 		{
 			"title": "ViewHelper#animating",
+			"kind": "member"
+		},
+		{
+			"title": "ViewHelper#camera",
 			"kind": "member"
 		},
 		{
@@ -23727,6 +24183,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "module-GroundedSkybox",
+			"kind": "module"
+		},
+		{
 			"title": "module-HalftoneShader",
 			"kind": "module"
 		},
@@ -24253,10 +24713,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "AnimationClip.parseAnimation",
-			"kind": "function"
-		},
-		{
 			"title": "AnimationClip.toJSON",
 			"kind": "function"
 		},
@@ -24529,6 +24985,14 @@
 			"kind": "member"
 		},
 		{
+			"title": "ENV_RAY_LENGTH",
+			"kind": "member"
+		},
+		{
+			"title": "ENV_RAY_LENGTH_THRESHOLD",
+			"kind": "member"
+		},
+		{
 			"title": "Earcut.triangulate",
 			"kind": "function"
 		},
@@ -24559,6 +25023,10 @@
 		{
 			"title": "ExtrudeGeometry.fromJSON",
 			"kind": "function"
+		},
+		{
+			"title": "F_Schlick",
+			"kind": "member"
 		},
 		{
 			"title": "FloatType",
@@ -24770,6 +25238,10 @@
 		},
 		{
 			"title": "MaterialLoader.createMaterialFromType",
+			"kind": "function"
+		},
+		{
+			"title": "MaterialLoader.registerMaterial",
 			"kind": "function"
 		},
 		{
@@ -25050,6 +25522,10 @@
 		},
 		{
 			"title": "OneMinusSrcColorFactor",
+			"kind": "member"
+		},
+		{
+			"title": "OverrideContextNode.type",
 			"kind": "member"
 		},
 		{
@@ -25365,7 +25841,15 @@
 			"kind": "member"
 		},
 		{
+			"title": "SVGLoader.createFillMaterial",
+			"kind": "function"
+		},
+		{
 			"title": "SVGLoader.createShapes",
+			"kind": "function"
+		},
+		{
+			"title": "SVGLoader.createStrokeMaterial",
 			"kind": "function"
 		},
 		{
@@ -25665,12 +26149,72 @@
 			"kind": "member"
 		},
 		{
+			"title": "_bufferDescriptor.size",
+			"kind": "member"
+		},
+		{
+			"title": "_bufferDescriptor.size",
+			"kind": "member"
+		},
+		{
+			"title": "_shaderModuleDescriptor.label",
+			"kind": "member"
+		},
+		{
+			"title": "addArcade",
+			"kind": "function"
+		},
+		{
+			"title": "addCornice",
+			"kind": "function"
+		},
+		{
+			"title": "addParapet",
+			"kind": "function"
+		},
+		{
+			"title": "addSpandrelBands",
+			"kind": "function"
+		},
+		{
+			"title": "bakeGroups",
+			"kind": "function"
+		},
+		{
+			"title": "batchColor",
+			"kind": "member"
+		},
+		{
+			"title": "bilinearHistoryTap",
+			"kind": "function"
+		},
+		{
+			"title": "bindAnalyticNoise",
+			"kind": "function"
+		},
+		{
+			"title": "bindTemporalCameraUniforms",
+			"kind": "function"
+		},
+		{
 			"title": "buildData3DTexture",
+			"kind": "function"
+		},
+		{
+			"title": "buildFaces",
+			"kind": "function"
+		},
+		{
+			"title": "buildFootprint",
 			"kind": "function"
 		},
 		{
 			"title": "buildMesh",
 			"kind": "function"
+		},
+		{
+			"title": "buildingPalette",
+			"kind": "member"
 		},
 		{
 			"title": "ceilPowerOfTwo",
@@ -25679,6 +26223,10 @@
 		{
 			"title": "clamp",
 			"kind": "function"
+		},
+		{
+			"title": "closestLineToLine",
+			"kind": "member"
 		},
 		{
 			"title": "contain",
@@ -25693,6 +26241,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "createBuildingMaterial",
+			"kind": "function"
+		},
+		{
 			"title": "createCanvasElement",
 			"kind": "function"
 		},
@@ -25701,7 +26253,31 @@
 			"kind": "function"
 		},
 		{
+			"title": "createForestMaterial",
+			"kind": "function"
+		},
+		{
+			"title": "createInstanceMatrixNode",
+			"kind": "function"
+		},
+		{
+			"title": "createRoadMaterial",
+			"kind": "function"
+		},
+		{
+			"title": "createSkyscraperMaterial",
+			"kind": "function"
+		},
+		{
+			"title": "createTreeMaterial",
+			"kind": "function"
+		},
+		{
 			"title": "damp",
+			"kind": "function"
+		},
+		{
+			"title": "dampenForVarianceClip",
 			"kind": "function"
 		},
 		{
@@ -25723,6 +26299,10 @@
 		{
 			"title": "enhanceLogMessage",
 			"kind": "function"
+		},
+		{
+			"title": "equirectUvToDir",
+			"kind": "member"
 		},
 		{
 			"title": "error",
@@ -25761,6 +26341,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "getBatchingColor",
+			"kind": "member"
+		},
+		{
 			"title": "getByteLength",
 			"kind": "function"
 		},
@@ -25781,6 +26365,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "getEntry",
+			"kind": "function"
+		},
+		{
 			"title": "getFilteredStack",
 			"kind": "function"
 		},
@@ -25793,12 +26381,40 @@
 			"kind": "function"
 		},
 		{
+			"title": "getIndirectIndex",
+			"kind": "member"
+		},
+		{
 			"title": "getKeyframeOrder",
 			"kind": "function"
 		},
 		{
 			"title": "getMembersLayout",
 			"kind": "function"
+		},
+		{
+			"title": "getMorph",
+			"kind": "member"
+		},
+		{
+			"title": "getPreviousInstance",
+			"kind": "function"
+		},
+		{
+			"title": "getPreviousSkinnedPosition",
+			"kind": "function"
+		},
+		{
+			"title": "getSkinnedNormalAndTangent",
+			"kind": "function"
+		},
+		{
+			"title": "getSkinnedPosition",
+			"kind": "function"
+		},
+		{
+			"title": "getSpecularDominantFactor",
+			"kind": "member"
 		},
 		{
 			"title": "getStrideLength",
@@ -25821,6 +26437,18 @@
 			"kind": "function"
 		},
 		{
+			"title": "ggxReflectionSample",
+			"kind": "member"
+		},
+		{
+			"title": "ggxReflectionStruct",
+			"kind": "member"
+		},
+		{
+			"title": "instanceColor",
+			"kind": "member"
+		},
+		{
 			"title": "inverseLerp",
 			"kind": "function"
 		},
@@ -25835,6 +26463,10 @@
 		{
 			"title": "lerp",
 			"kind": "function"
+		},
+		{
+			"title": "lineDistance",
+			"kind": "member"
 		},
 		{
 			"title": "log",
@@ -25905,6 +26537,14 @@
 			"kind": "function"
 		},
 		{
+			"title": "outgoingLight",
+			"kind": "member"
+		},
+		{
+			"title": "pickBuildingColor",
+			"kind": "function"
+		},
+		{
 			"title": "pingpong",
 			"kind": "function"
 		},
@@ -25922,6 +26562,10 @@
 		},
 		{
 			"title": "randInt",
+			"kind": "function"
+		},
+		{
+			"title": "rgbToYCoCg",
 			"kind": "function"
 		},
 		{
@@ -25945,7 +26589,15 @@
 			"kind": "function"
 		},
 		{
+			"title": "setupWebGLXRFallback",
+			"kind": "function"
+		},
+		{
 			"title": "shadowRenderObjectFunction",
+			"kind": "function"
+		},
+		{
+			"title": "slab",
 			"kind": "function"
 		},
 		{
@@ -25965,8 +26617,24 @@
 			"kind": "function"
 		},
 		{
+			"title": "temporalReproject",
+			"kind": "member"
+		},
+		{
 			"title": "toHalfFloat",
 			"kind": "function"
+		},
+		{
+			"title": "totalDiffuse",
+			"kind": "member"
+		},
+		{
+			"title": "totalSpecular",
+			"kind": "member"
+		},
+		{
+			"title": "trimSegmentAlpha",
+			"kind": "member"
 		},
 		{
 			"title": "updateCamera",
@@ -25986,6 +26654,22 @@
 		},
 		{
 			"title": "warnOnce",
+			"kind": "function"
+		},
+		{
+			"title": "worldEnd",
+			"kind": "member"
+		},
+		{
+			"title": "worldPos",
+			"kind": "member"
+		},
+		{
+			"title": "worldStart",
+			"kind": "member"
+		},
+		{
+			"title": "ycocgToRGB",
 			"kind": "function"
 		},
 		{
@@ -26095,15 +26779,19 @@
 			"kind": "function"
 		},
 		{
+			"title": "alphaLine",
+			"kind": "member"
+		},
+		{
 			"title": "alphaT",
 			"kind": "member"
 		},
 		{
-			"title": "anaglyphPass",
-			"kind": "function"
+			"title": "ambientOcclusion",
+			"kind": "member"
 		},
 		{
-			"title": "anamorphic",
+			"title": "anaglyphPass",
 			"kind": "function"
 		},
 		{
@@ -26133,6 +26821,10 @@
 		{
 			"title": "append",
 			"kind": "function"
+		},
+		{
+			"title": "applyVarianceClipping",
+			"kind": "member"
 		},
 		{
 			"title": "array",
@@ -26245,6 +26937,10 @@
 		{
 			"title": "batch",
 			"kind": "function"
+		},
+		{
+			"title": "beautyTexelFromScreen",
+			"kind": "member"
 		},
 		{
 			"title": "bentNormalView",
@@ -26431,10 +27127,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "circleIntersectsAABB",
-			"kind": "function"
-		},
-		{
 			"title": "clamp",
 			"kind": "function"
 		},
@@ -26455,6 +27147,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "clipToAABB",
+			"kind": "member"
+		},
+		{
 			"title": "clipping",
 			"kind": "function"
 		},
@@ -26463,8 +27159,16 @@
 			"kind": "function"
 		},
 		{
+			"title": "clusteredLights",
+			"kind": "function"
+		},
+		{
 			"title": "code",
 			"kind": "function"
+		},
+		{
+			"title": "collectNeighborhood",
+			"kind": "member"
 		},
 		{
 			"title": "colorBleeding",
@@ -26485,6 +27189,14 @@
 		{
 			"title": "computeBuiltin",
 			"kind": "function"
+		},
+		{
+			"title": "computeFrustumSize",
+			"kind": "member"
+		},
+		{
+			"title": "computeHitDistFactor",
+			"kind": "member"
 		},
 		{
 			"title": "computeKernel",
@@ -26544,6 +27256,10 @@
 		},
 		{
 			"title": "cubeTextureBase",
+			"kind": "function"
+		},
+		{
+			"title": "curlNoise",
 			"kind": "function"
 		},
 		{
@@ -26611,6 +27327,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "diffuseColorDistance",
+			"kind": "member"
+		},
+		{
 			"title": "diffuseContribution",
 			"kind": "member"
 		},
@@ -26620,7 +27340,7 @@
 		},
 		{
 			"title": "directionToFaceDirection",
-			"kind": "member"
+			"kind": "function"
 		},
 		{
 			"title": "dispersion",
@@ -26664,6 +27384,10 @@
 		},
 		{
 			"title": "equal",
+			"kind": "function"
+		},
+		{
+			"title": "equirectDirection",
 			"kind": "function"
 		},
 		{
@@ -26773,6 +27497,14 @@
 		{
 			"title": "getShadowRenderObjectFunction",
 			"kind": "function"
+		},
+		{
+			"title": "getSpecularDominantDirection",
+			"kind": "member"
+		},
+		{
+			"title": "getTemporalVarianceFactor",
+			"kind": "member"
 		},
 		{
 			"title": "getViewPosition",
@@ -26911,6 +27643,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "karisTemporalBlend",
+			"kind": "member"
+		},
+		{
 			"title": "label",
 			"kind": "function"
 		},
@@ -26971,6 +27707,14 @@
 			"kind": "function"
 		},
 		{
+			"title": "lobeNormalFalloff",
+			"kind": "member"
+		},
+		{
+			"title": "lobeNormalWeight",
+			"kind": "member"
+		},
+		{
 			"title": "localId",
 			"kind": "member"
 		},
@@ -26993,6 +27737,10 @@
 		{
 			"title": "lut3D",
 			"kind": "function"
+		},
+		{
+			"title": "mapAo",
+			"kind": "member"
 		},
 		{
 			"title": "matcapUV",
@@ -27187,6 +27935,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "misPowerHeuristic",
+			"kind": "member"
+		},
+		{
 			"title": "mix",
 			"kind": "function"
 		},
@@ -27196,10 +27948,6 @@
 		},
 		{
 			"title": "mod",
-			"kind": "function"
-		},
-		{
-			"title": "modInt",
 			"kind": "function"
 		},
 		{
@@ -27251,6 +27999,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "module-GroundedSkybox.getGroundProjectedNormal",
+			"kind": "function"
+		},
+		{
 			"title": "module-Raymarching.RaymarchingBox",
 			"kind": "function"
 		},
@@ -27271,7 +28023,15 @@
 			"kind": "function"
 		},
 		{
+			"title": "mvpLine",
+			"kind": "member"
+		},
+		{
 			"title": "negate",
+			"kind": "function"
+		},
+		{
+			"title": "negateOnBackSide",
 			"kind": "function"
 		},
 		{
@@ -27399,7 +28159,19 @@
 			"kind": "function"
 		},
 		{
+			"title": "overrideNode",
+			"kind": "function"
+		},
+		{
+			"title": "overrideNodes",
+			"kind": "function"
+		},
+		{
 			"title": "packHalf2x16",
+			"kind": "function"
+		},
+		{
+			"title": "packNormalToRGB",
 			"kind": "function"
 		},
 		{
@@ -27443,12 +28215,20 @@
 			"kind": "function"
 		},
 		{
+			"title": "permute",
+			"kind": "function"
+		},
+		{
 			"title": "perspectiveDepthToViewZ",
 			"kind": "function"
 		},
 		{
 			"title": "pixelationPass",
 			"kind": "function"
+		},
+		{
+			"title": "planeDistance",
+			"kind": "member"
 		},
 		{
 			"title": "pmremTexture",
@@ -27523,6 +28303,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "projectWorldToUV",
+			"kind": "member"
+		},
+		{
 			"title": "property",
 			"kind": "function"
 		},
@@ -27565,6 +28349,10 @@
 		{
 			"title": "reciprocal",
 			"kind": "function"
+		},
+		{
+			"title": "recurrentDenoise",
+			"kind": "member"
 		},
 		{
 			"title": "reference",
@@ -27639,6 +28427,14 @@
 			"kind": "function"
 		},
 		{
+			"title": "reprojectHitPoint",
+			"kind": "member"
+		},
+		{
+			"title": "reprojectionStretchConfidence",
+			"kind": "member"
+		},
+		{
 			"title": "retroPass",
 			"kind": "function"
 		},
@@ -27673,6 +28469,14 @@
 		{
 			"title": "sRGBTransferOETF",
 			"kind": "function"
+		},
+		{
+			"title": "sampleBilinearTap",
+			"kind": "member"
+		},
+		{
+			"title": "sampleHistory4Tap",
+			"kind": "member"
 		},
 		{
 			"title": "sampler",
@@ -27795,6 +28599,14 @@
 			"kind": "function"
 		},
 		{
+			"title": "snoise",
+			"kind": "function"
+		},
+		{
+			"title": "snoiseVec3",
+			"kind": "function"
+		},
+		{
 			"title": "sobel",
 			"kind": "function"
 		},
@@ -27808,6 +28620,10 @@
 		},
 		{
 			"title": "specularF90",
+			"kind": "member"
+		},
+		{
+			"title": "specularLobeTanHalfAngle",
 			"kind": "member"
 		},
 		{
@@ -27868,6 +28684,10 @@
 		},
 		{
 			"title": "storageTexture",
+			"kind": "function"
+		},
+		{
+			"title": "storageTexture3D",
 			"kind": "function"
 		},
 		{
@@ -28055,10 +28875,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "tiledLights",
-			"kind": "function"
-		},
-		{
 			"title": "time",
 			"kind": "member"
 		},
@@ -28084,6 +28900,14 @@
 		},
 		{
 			"title": "transformNormal",
+			"kind": "function"
+		},
+		{
+			"title": "transformNormalByInverseViewMatrix",
+			"kind": "function"
+		},
+		{
+			"title": "transformNormalByViewMatrix",
 			"kind": "function"
 		},
 		{
@@ -28167,6 +28991,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "unpackRGBToNormal",
+			"kind": "function"
+		},
+		{
 			"title": "unpackSnorm2x16",
 			"kind": "function"
 		},
@@ -28196,6 +29024,10 @@
 		},
 		{
 			"title": "velocity",
+			"kind": "member"
+		},
+		{
+			"title": "velocityToUVOffset",
 			"kind": "member"
 		},
 		{
@@ -28281,6 +29113,10 @@
 		{
 			"title": "vignette",
 			"kind": "function"
+		},
+		{
+			"title": "vogelDisk",
+			"kind": "member"
 		},
 		{
 			"title": "vogelDiskSample",

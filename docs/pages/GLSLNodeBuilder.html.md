@@ -192,6 +192,74 @@ Default is `this.shaderStage`.
 
 **Returns:** The GLSL snippet.
 
+### .generateTextureGather( texture : Texture, textureProperty : string, uvSnippet : string, gatherSnippet : string, depthSnippet : string, offsetSnippet : string, flipYSnippet : string ) : string
+
+Generates the GLSL snippet for gathering four texels from the given texture.
+
+**texture**
+
+The texture.
+
+**textureProperty**
+
+The name of the texture uniform in the shader.
+
+**uvSnippet**
+
+A GLSL snippet that represents texture coordinates used for sampling.
+
+**gatherSnippet**
+
+A GLSL snippet that represents the index of the channel to read.
+
+**depthSnippet**
+
+A GLSL snippet that represents 0-based texture array index to sample.
+
+**offsetSnippet**
+
+A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+
+**flipYSnippet**
+
+A GLSL snippet that represents the y-flip. Only used for WebGL.
+
+**Returns:** The GLSL snippet.
+
+### .generateTextureGatherCompare( texture : Texture, textureProperty : string, uvSnippet : string, compareSnippet : string, depthSnippet : string, offsetSnippet : string, flipYSnippet : string ) : string
+
+Generates the GLSL snippet for performing a depth comparison on four texels in the given depth texture.
+
+**texture**
+
+The texture.
+
+**textureProperty**
+
+The name of the texture uniform in the shader.
+
+**uvSnippet**
+
+A GLSL snippet that represents texture coordinates used for sampling.
+
+**compareSnippet**
+
+A GLSL snippet that represents the reference value.
+
+**depthSnippet**
+
+A GLSL snippet that represents 0-based texture array index to sample.
+
+**offsetSnippet**
+
+A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+
+**flipYSnippet**
+
+A GLSL snippet that represents the y-flip. Only used for WebGL.
+
+**Returns:** The GLSL snippet.
+
 ### .generateTextureGrad( texture : Texture, textureProperty : string, uvSnippet : string, gradSnippet : Array.<string>, depthSnippet : string, offsetSnippet : string ) : string
 
 Generates the GLSL snippet for sampling/loading the given texture using explicit gradients.
@@ -306,7 +374,7 @@ The output type to bitcast to.
 
 The input type of the.
 
-**Returns:** The resolved WGSL bitcast invocation.
+**Returns:** The resolved GLSL bitcast invocation.
 
 ### .getClipDistance() : string
 

@@ -2,7 +2,12 @@ import { Parameters } from './Parameters.js';
 import { WebGPURenderer, WebGLBackend, Node } from 'three/webgpu';
 import { getItem, setItem } from '../Inspector.js';
 
-const _EXTENSIONS_PATH = '../extensions/extensions.json';
+const _extensions = [
+	{
+		name: 'TSL Graph',
+		url: '../extensions/tsl-graph/TSLGraphEditor.js'
+	}
+];
 
 const _init = WebGPURenderer.prototype.init;
 
@@ -43,7 +48,8 @@ function _loadState() {
 	_state = {
 		forceWebGL: settings.forceWebGL !== undefined ? settings.forceWebGL : false,
 		captureStackTrace: settings.captureStackTrace !== undefined ? settings.captureStackTrace : false,
-		activeExtensions: settings.activeExtensions !== undefined ? settings.activeExtensions : {}
+		activeExtensions: settings.activeExtensions !== undefined ? settings.activeExtensions : {},
+		storage: settings.storage !== undefined ? settings.storage : 'url'
 	};
 
 	if ( _state.forceWebGL ) {
@@ -67,7 +73,8 @@ function _saveState() {
 	setItem( 'settings', {
 		forceWebGL: _state.forceWebGL,
 		captureStackTrace: _state.captureStackTrace,
-		activeExtensions: _state.activeExtensions
+		activeExtensions: _state.activeExtensions,
+		storage: _state.storage
 	} );
 
 }
@@ -108,11 +115,50 @@ class Settings extends Parameters {
 
 		} );
 
+		// Render Modes
+
+		const modesGroup = this.createGroup( 'Render Modes' );
+
+		modesGroup.add( { overdraw: false }, 'overdraw' ).name( 'Overdraw' ).onChange( ( enable ) => {
+
+			this.inspector.overdraw = enable;
+
+		} ).info( 'Shows how many times each pixel is shaded.' );
+
 	}
 
 	init() {
 
 		const extensionsGroup = this.createGroup( 'Extensions' );
+
+		const storageGroup = this.createGroup( 'Storage' );
+
+		const currentState = _loadState();
+
+		storageGroup.add( currentState, 'storage', { 'URL Session': 'url', 'Keep across Origin': 'origin' } )
+			.name( 'Save Settings' )
+			.onChange( () => {
+
+				_saveState();
+
+			} ).info( `
+Defines how the **Inspector** preferences and states are stored in the browser.
+
+**URL Session**
+Saves state based on the exact URL. It will reset the settings whenever the URL changes.
+
+**Keep across Origin**
+Shares the same state across any page within the current origin.` );
+
+		storageGroup.add( {
+			clear: () => {
+
+				localStorage.removeItem( 'threejs-inspector' );
+
+				location.reload();
+
+			}
+		}, 'clear' ).name( 'Clear Settings' );
 
 		this._getExtensions().then( extensions => {
 
@@ -230,7 +276,7 @@ class Settings extends Parameters {
 
 		extension.active = true;
 
-		const extUrl = new URL( extension.url, new URL( _EXTENSIONS_PATH, import.meta.url ) ).href;
+		const extUrl = new URL( extension.url, import.meta.url ).href;
 
 		const module = await import( extUrl );
 
@@ -251,11 +297,7 @@ class Settings extends Parameters {
 
 	async _getExtensions() {
 
-		const url = new URL( _EXTENSIONS_PATH, import.meta.url );
-
-		const extensions = await fetch( url ).then( res => res.json() );
-
-		return extensions;
+		return _extensions;
 
 	}
 

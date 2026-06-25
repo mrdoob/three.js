@@ -1046,6 +1046,57 @@ class GLTFWriter {
 	}
 
 
+	/**
+	 * Builds a copy of the given normal map with the red and/or green channels
+	 * inverted (`color = 255 - color`). This is used to bake the sign of
+	 * `material.normalScale` and the tangent-space convention into the texture,
+	 * since glTF only supports OpenGL-style normal maps with a univariate,
+	 * positive scale.
+	 *
+	 * @param {THREE.Texture} normalMap The source normal map.
+	 * @param {boolean} flipX Whether to invert the red channel (normal X).
+	 * @param {boolean} flipY Whether to invert the green channel (normal Y).
+	 * @return {Promise<THREE.Texture>} The derived normal map texture.
+	 */
+	async buildNormalMapTextureAsync( normalMap, flipX, flipY ) {
+
+		if ( normalMap instanceof CompressedTexture ) {
+
+			normalMap = await this.decompressTextureAsync( normalMap );
+
+		}
+
+		const image = normalMap.image;
+
+		const canvas = getCanvas();
+		canvas.width = image.width;
+		canvas.height = image.height;
+
+		const context = canvas.getContext( '2d', {
+			willReadFrequently: true,
+		} );
+
+		context.drawImage( image, 0, 0, canvas.width, canvas.height );
+
+		const imageData = context.getImageData( 0, 0, canvas.width, canvas.height );
+		const data = imageData.data;
+
+		for ( let i = 0; i < data.length; i += 4 ) {
+
+			if ( flipX ) data[ i + 0 ] = 255 - data[ i + 0 ];
+			if ( flipY ) data[ i + 1 ] = 255 - data[ i + 1 ];
+
+		}
+
+		context.putImageData( imageData, 0, 0 );
+
+		const texture = normalMap.clone();
+		texture.source = new Source( canvas );
+
+		return texture;
+
+	}
+
 	async decompressTextureAsync( texture, maxTextureSize = Infinity ) {
 
 		if ( this.textureUtils === null ) {
@@ -1575,14 +1626,20 @@ class GLTFWriter {
 	/**
 	 * Process material
 	 * @param {THREE.Material} material Material to process
+	 * @param {THREE.BufferGeometry} [geometry] Geometry the material is used with.
 	 * @return {Promise<?number>} Index of the processed material in the "materials" array
 	 */
-	async processMaterialAsync( material ) {
+	async processMaterialAsync( material, geometry ) {
 
 		const cache = this.cache;
 		const json = this.json;
 
-		if ( cache.materials.has( material ) ) return cache.materials.get( material );
+		// Whether the geometry provides explicit tangents. The exported normal map depends on
+		// this, so it is part of the material cache key.
+		const hasTangent = geometry !== undefined && geometry.hasAttribute( 'tangent' );
+		const cacheKey = material.normalMap ? material.uuid + ':' + hasTangent : material.uuid;
+
+		if ( cache.materials.has( cacheKey ) ) return cache.materials.get( cacheKey );
 
 		if ( material.isShaderMaterial ) {
 
@@ -1677,16 +1734,36 @@ class GLTFWriter {
 		// normalTexture
 		if ( material.normalMap ) {
 
+			const normalScale = material.normalScale;
+
+			// glTF only supports OpenGL-style normal maps with a univariate, positive scale.
+			// A negative `normalScale` component is baked into the texture by inverting the
+			// corresponding channel. Meshes without explicit tangents use the opposite
+			// green-channel convention, so the green channel is inverted in that case too.
+			//
+			// The no-tangent green flip is the counterpart of GLTFLoader, which negates
+			// `normalScale.y` on import for the same case.
+			const flipX = normalScale.x < 0;
+			const flipY = hasTangent ? normalScale.y < 0 : normalScale.y > 0;
+
+			let normalMap = material.normalMap;
+
+			if ( flipX || flipY ) {
+
+				normalMap = await this.buildNormalMapTextureAsync( material.normalMap, flipX, flipY );
+
+			}
+
 			const normalMapDef = {
-				index: await this.processTextureAsync( material.normalMap ),
+				index: await this.processTextureAsync( normalMap ),
 				texCoord: material.normalMap.channel
 			};
 
-			if ( material.normalScale && material.normalScale.x !== 1 ) {
+			if ( Math.abs( normalScale.x ) !== 1 ) {
 
-				// glTF normal scale is univariate. Ignore `y`, which may be flipped.
-				// Context: https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
-				normalMapDef.scale = material.normalScale.x;
+				// glTF normal scale is univariate. The magnitude of `x` is used; the sign of
+				// both components has already been baked into the texture above.
+				normalMapDef.scale = Math.abs( normalScale.x );
 
 			}
 
@@ -1743,7 +1820,7 @@ class GLTFWriter {
 		} );
 
 		const index = json.materials.push( materialDef ) - 1;
-		cache.materials.set( material, index );
+		cache.materials.set( cacheKey, index );
 		return index;
 
 	}
@@ -2061,7 +2138,7 @@ class GLTFWriter {
 
 			}
 
-			const material = await this.processMaterialAsync( materials[ groups[ i ].materialIndex ] );
+			const material = await this.processMaterialAsync( materials[ groups[ i ].materialIndex ], geometry );
 
 			if ( material !== null ) primitive.material = material;
 
@@ -2702,9 +2779,33 @@ class GLTFWriter {
 
 		}
 
-		for ( let i = 0; i < options.animations.length; ++ i ) {
+		// animations
 
-			this.processAnimation( options.animations[ i ], input[ 0 ] );
+		if ( input.length === 1 ) {
+
+			// default: single input, flat animations array
+
+			for ( let i = 0; i < options.animations.length; ++ i ) {
+
+				this.processAnimation( options.animations[ i ], input[ 0 ] );
+
+			}
+
+		} else {
+
+			// multi-input with multi-dimensional animations array
+
+			for ( let i = 0; i < input.length; i ++ ) {
+
+				const animations = options.animations[ i ] || [];
+
+				for ( let j = 0; j < animations.length; ++ j ) {
+
+					this.processAnimation( animations[ j ], input[ i ] );
+
+				}
+
+			}
 
 		}
 
@@ -3717,7 +3818,8 @@ GLTFExporter.Utils = {
  * @property {boolean} [onlyVisible=true] - Export only visible 3D objects.
  * @property {boolean} [binary=false] - Export in binary (.glb) format, returning an ArrayBuffer.
  * @property {number} [maxTextureSize=Infinity] - Restricts the image maximum size (both width and height) to the given value.
- * @property {Array<AnimationClip>} [animations=[]] - List of animations to be included in the export.
+ * @property {Array<AnimationClip>|Array<Array<AnimationClip>>} [animations=[]] - List of animations to be included in the export. When exporting a single 3D object or scene, this is a flat list of clips.
+ * When exporting an array of multiple scenes, this must be a nested array with one list of clips per scene, matched to the input by index.
  * @property {boolean} [includeCustomExtensions=false] - Export custom glTF extensions defined on an object's `userData.gltfExtensions` property.
  **/
 

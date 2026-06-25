@@ -4,7 +4,14 @@
 		<title>three.js webgpu - custom fog</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - custom fog">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_custom_fog.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_custom_fog.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			body { background-color: #d0dee7; } /* match the scene's background grey */
+		</style>
 	</head>
 	<body>
 
@@ -16,7 +23,7 @@
 			</div>
 
 			<small>
-				Custom Fog via TSL.
+				Custom height fog via TSL, pooling in a procedural alpine valley forested with 500,000 instanced trees.
 			</small>
 		</div>
 
@@ -34,24 +41,67 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { color, fog, float, positionWorld, triNoise3D, positionView, normalWorld, uniform } from 'three/tsl';
+			import { color, fog, positionWorld, triNoise3D, normalWorld, uniform, densityFogFactor } from 'three/tsl';
 
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
+			import { TerrainGenerator } from 'three/addons/generators/TerrainGenerator.js';
+			import { ForestGenerator } from 'three/addons/generators/ForestGenerator.js';
 
-			let camera, scene, renderer;
-			let controls;
+			let camera, scene, renderer, controls, timer;
+			let terrain, forest, terrainGroup, forestGroup;
+			let sky, sun, sunLight, pmremGenerator, envScene;
+
+			const parameters = {
+				elevation: 11, // sun height above the horizon, in degrees ( low = golden hour )
+				azimuth: 150 // sun compass direction, in degrees
+			};
 
 			init();
 
-			function init() {
+			async function init() {
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 600 );
-				camera.position.set( 30, 15, 30 );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 0.62;
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera.position.set( - 50, 88, 230 );
 
 				scene = new THREE.Scene();
+				scene.environmentIntensity = 0.16; // a dim, cool sky fill so the warm sun stays the key and shadows read
 
-				// custom fog
+				// a physical sky, used only to bake the image-based lighting ( it is not
+				// the visible background — the fog gradient below is ); elevation / azimuth move the sun
+
+				sky = new SkyMesh();
+				sky.scale.setScalar( 10000 );
+				sky.turbidity.value = 12;
+				sky.rayleigh.value = 2;
+				sky.mieCoefficient.value = 0.005;
+				sky.mieDirectionalG.value = 0.88;
+
+				sun = new THREE.Vector3();
+				envScene = new THREE.Scene();
+
+				// custom fog. an animated, two-octave triNoise3D haze that settles into
+				// the valley as a level band: solid below `fogBase` ( down under the
+				// mountains ) and fading out by `fogTop` ( around mid-height ), so the
+				// peaks rise clear above it. the band sits at a fixed altitude whatever
+				// the distance, and the noise wobbles its top edge and drifts it through
+				// world space, so it reads as slow-moving cloud. ( the peaks reach ~130 )
 
 				const skyColorValue = 0xf0f5f5;
 				const groundColorValue = 0xd0dee7;
@@ -59,99 +109,152 @@
 				const skyColor = color( skyColorValue );
 				const groundColor = color( groundColorValue );
 
-				const fogNoiseDistance = positionView.z.negate().smoothstep( 0, camera.far - 300 );
-
-				const distance = fogNoiseDistance.mul( 20 ).max( 4 );
-				const alpha = .98;
-				const groundFogArea = float( distance ).sub( positionWorld.y ).div( distance ).pow( 3 ).saturate().mul( alpha );
+				const fogBase = uniform( - 20 ); // world-y the fog is solid below ( the valley floor )
+				const fogTop = uniform( 55 ); // world-y the fog fades out by ( mid-mountain )
+				const haze = uniform( 0.0012 ); // distance haze, so the far peaks dissolve into the same grey
 
 				// a alternative way to create a TimerNode
-				const timer = uniform( 0 ).onFrameUpdate( ( frame ) => frame.time );
+				const time = uniform( 0 ).onFrameUpdate( ( frame ) => frame.time );
 
-				const fogNoiseA = triNoise3D( positionWorld.mul( .005 ), 0.2, timer );
-				const fogNoiseB = triNoise3D( positionWorld.mul( .01 ), 0.2, timer.mul( 1.2 ) );
+				const fogNoiseA = triNoise3D( positionWorld.mul( .005 ), 0.2, time );
+				const fogNoiseB = triNoise3D( positionWorld.mul( .01 ), 0.2, time.mul( 1.2 ) );
 
-				const fogNoise = fogNoiseA.add( fogNoiseB ).mul( groundColor );
+				const fogNoise = fogNoiseA.add( fogNoiseB );
 
-				// apply custom fog
+				// the noise lifts and drops the top of the band so it breaks into wisps
+				const top = fogTop.add( fogNoise.sub( 0.7 ).mul( 22 ) );
+				const groundFogArea = top.sub( positionWorld.y ).div( top.sub( fogBase ) ).saturate().mul( .98 );
 
-				scene.fogNode = fog( fogNoiseDistance.oneMinus().mix( groundColor, fogNoise ), groundFogArea );
+				// the valley band plus a distance haze, so the far peaks dissolve into the grey too
+				const fogArea = groundFogArea.oneMinus().mul( densityFogFactor( haze ).oneMinus() ).oneMinus();
+
+				scene.fogNode = fog( groundColor, fogArea );
 				scene.backgroundNode = normalWorld.y.max( 0 ).mix( groundColor, skyColor );
 
-				// builds
+				// terrain + forest
 
-				const buildWindows = positionWorld.y.mul( 10 ).floor().mod( 4 ).sign().mix( color( 0x000066 ).add( fogNoiseDistance ), color( 0xffffff ) );
-
-				const buildGeometry = new THREE.BoxGeometry( 1, 1, 1 );
-				const buildMaterial = new THREE.MeshPhongNodeMaterial( {
-					colorNode: buildWindows
+				terrain = new TerrainGenerator( {
+					seed: 1,
+					size: 900,
+					segments: 512,
+					frequency: 0.0065,
+					heightScale: 150,
+					erosion: 0.7,
+					valleyBias: 1.2
 				} );
 
-				const buildMesh = new THREE.InstancedMesh( buildGeometry, buildMaterial, 4000 );
-				scene.add( buildMesh );
+				forest = new ForestGenerator( { count: 500000, castShadow: true } );
 
-				const dummy = new THREE.Object3D();
-				const center = new THREE.Vector3();
+				generate();
 
-				for ( let i = 0; i < buildMesh.count; i ++ ) {
+				// a single directional key aligned with the sky's sun, for the crisp relief
+				// shadows the sky fill alone can't give. its colour, intensity and position —
+				// and the baked environment — are set by updateSun()
 
-					const scaleY = Math.random() * 7 + .5;
+				sunLight = new THREE.DirectionalLight();
+				sunLight.castShadow = true;
+				sunLight.shadow.camera.left = - 420;
+				sunLight.shadow.camera.right = 420;
+				sunLight.shadow.camera.top = 420;
+				sunLight.shadow.camera.bottom = - 420;
+				sunLight.shadow.camera.near = 200;
+				sunLight.shadow.camera.far = 1800;
+				sunLight.shadow.mapSize.set( 4096, 4096 );
+				sunLight.shadow.bias = - 0.0004;
+				sunLight.shadow.normalBias = 0.15;
+				sunLight.shadow.autoUpdate = false; // the scene is static — re-render the shadow map only when the sun moves ( see updateSun ), not every frame
+				scene.add( sunLight );
 
-					dummy.position.x = Math.random() * 600 - 300;
-					dummy.position.z = Math.random() * 600 - 300;
+				updateSun();
 
-					const distance = Math.max( dummy.position.distanceTo( center ) * .012, 1 );
+				// gui
 
-					dummy.position.y = .5 * scaleY * distance;
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
-					dummy.scale.x = dummy.scale.z = Math.random() * 3 + .5;
-					dummy.scale.y = scaleY * distance;
+				const skyFolder = gui.addFolder( 'Sun' );
+				skyFolder.add( parameters, 'elevation', 1, 40 ).step( 0.5 ).name( 'elevation' ).onChange( updateSun );
+				skyFolder.add( parameters, 'azimuth', 0, 360 ).step( 1 ).name( 'azimuth' ).onChange( updateSun );
 
-					dummy.updateMatrix();
+				const fogFolder = gui.addFolder( 'Fog' );
+				fogFolder.add( fogBase, 'value', - 40, 20 ).step( 1 ).name( 'base' );
+				fogFolder.add( fogTop, 'value', 0, 130 ).step( 1 ).name( 'top' );
+				fogFolder.add( haze, 'value', 0, 0.005 ).step( 0.0001 ).name( 'haze' );
 
-					buildMesh.setMatrixAt( i, dummy.matrix );
+				const forestFolder = gui.addFolder( 'Forest' );
+				forestFolder.add( forest.from, 'value', 50, 1000 ).step( 10 ).name( 'cull from' );
+				forestFolder.add( forest.to, 'value', 100, 1400 ).step( 10 ).name( 'cull to' );
 
-				}
-
-				// lights
-
-				scene.add( new THREE.HemisphereLight( skyColorValue, groundColorValue, 0.5 ) );
-
-				// geometry
-
-				const planeGeometry = new THREE.PlaneGeometry( 200, 200 );
-				const planeMaterial = new THREE.MeshPhongMaterial( {
-					color: 0x999999
-				} );
-
-				const ground = new THREE.Mesh( planeGeometry, planeMaterial );
-				ground.rotation.x = - Math.PI / 2;
-				ground.scale.multiplyScalar( 3 );
-				ground.castShadow = true;
-				ground.receiveShadow = true;
-				scene.add( ground );
-
-				// renderer
-
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
-				renderer.inspector = new Inspector();
-				document.body.appendChild( renderer.domElement );
+				const terrainFolder = gui.addFolder( 'Terrain' );
+				terrainFolder.add( terrain.parameters, 'erosion', 0, 1.5 ).step( 0.05 ).name( 'erosion' );
+				terrainFolder.add( terrain.parameters, 'valleyBias', 1, 3 ).step( 0.1 ).name( 'valley bias' );
+				terrainFolder.add( { newSeed }, 'newSeed' ).name( 'regenerate' );
 
 				// controls
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 2, 0 );
-				controls.minDistance = 7;
-				controls.maxDistance = 100;
-				controls.maxPolarAngle = Math.PI / 2;
-				controls.autoRotate = true;
-				controls.autoRotateSpeed = .1;
-				controls.update();
+				timer = new THREE.Timer();
+
+				controls = new FirstPersonControls( camera, renderer.domElement );
+				controls.movementSpeed = 20;
+				controls.lookSpeed = 0.1;
+				controls.lookAt( 0, 5, - 120 ); // face across the valley
 
 				window.addEventListener( 'resize', resize );
+
+			}
+
+			// walks the sun: aligns the sky and the key light ( warm and dim near the
+			// horizon ), then re-bakes the sky into the IBL environment
+			function updateSun() {
+
+				const elevation = parameters.elevation;
+
+				sun.setFromSphericalCoords(
+					1,
+					THREE.MathUtils.degToRad( 90 - elevation ),
+					THREE.MathUtils.degToRad( parameters.azimuth )
+				);
+				sky.sunPosition.value.copy( sun );
+
+				// the longer air path near the horizon dims and warms the sun. it stays
+				// far brighter than the sky fill, so it reads as the key and casts firm shadows
+				const transmittance = Math.sqrt( Math.max( Math.sin( THREE.MathUtils.degToRad( elevation ) ), 0 ) );
+				sunLight.color.set( 0xff7a2f ).lerp( new THREE.Color( 0xfff2e0 ), transmittance ); // deep orange → warm white
+				sunLight.intensity = 11 * transmittance + 0.3;
+				sunLight.position.copy( sun ).multiplyScalar( 900 );
+				sunLight.shadow.needsUpdate = true; // the sun moved, so the on-demand shadow map needs one refresh
+
+				// re-bake the sky ( without the sun disc ) into the environment map for IBL.
+				// the sky lives only in envScene; it is never added to the visible scene
+				sky.showSunDisc.value = false;
+				envScene.add( sky );
+				const env = pmremGenerator.fromScene( envScene ).texture;
+				if ( scene.environment ) scene.environment.dispose();
+				scene.environment = env;
+
+			}
+
+			// a new seed ( and whatever erosion / valley bias is dialled in ) rebuilds
+			// the terrain, and with it the forest that sits on top
+			function newSeed() {
+
+				terrain.parameters.seed ++;
+				generate();
+
+			}
+
+			// the forest sits on the terrain, so a new terrain means a new forest
+			function generate() {
+
+				if ( terrainGroup ) scene.remove( terrainGroup );
+				if ( forestGroup ) scene.remove( forestGroup );
+
+				terrainGroup = terrain.build();
+				forestGroup = forest.build( terrain );
+
+				scene.add( terrainGroup );
+				scene.add( forestGroup );
+
+				if ( sunLight ) sunLight.shadow.needsUpdate = true; // rebuilt geometry ⇒ re-render the shadow map ( skipped on the first build, before the light exists; updateSun covers it )
 
 			}
 
@@ -166,7 +269,11 @@
 
 			function animate() {
 
-				controls.update();
+				timer.update();
+
+				controls.update( timer.getDelta() );
+
+				forest.setCameraPosition( camera.position ); // drives the forest cull
 
 				renderer.render( scene, camera );
 

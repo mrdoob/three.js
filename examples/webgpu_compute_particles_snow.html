@@ -3,6 +3,10 @@
 		<title>three.js webgpu - compute snow</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - compute snow">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_compute_particles_snow.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_compute_particles_snow.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 		<!-- <link type="text/css" rel="stylesheet" href="main.css"> -->
 	</head>
@@ -81,12 +85,14 @@
 				collisionCamera.layers.enable( 1 );
 
 				collisionPosRT = new THREE.RenderTarget( 1024, 1024 );
+				collisionPosRT.texture.format = THREE.RedFormat;
 				collisionPosRT.texture.type = THREE.HalfFloatType;
 				collisionPosRT.texture.magFilter = THREE.NearestFilter;
 				collisionPosRT.texture.minFilter = THREE.NearestFilter;
 				collisionPosRT.texture.generateMipmaps = false;
 
 				collisionPosMaterial = new THREE.MeshBasicNodeMaterial();
+				collisionPosMaterial.blending = THREE.NoBlending;
 				collisionPosMaterial.fog = false;
 				collisionPosMaterial.toneMapped = false;
 				collisionPosMaterial.colorNode = positionWorld.y;
@@ -146,11 +152,11 @@
 
 					const rippleOnSurface = texture( collisionPosRT.texture, getCoord( position.xz ) ).toInspector( 'Collision Test', () => {
 
-						return texture( collisionPosRT.texture ).y; // .div( collisionCamera.position.y );
+						return texture( collisionPosRT.texture ).r; // .div( collisionCamera.position.y );
 
 					} );
 
-					const rippleFloorArea = rippleOnSurface.y.add( scale.x.mul( surfaceOffset ) );
+					const rippleFloorArea = rippleOnSurface.r.add( scale.x.mul( surfaceOffset ) );
 
 					If( position.y.greaterThan( rippleFloorArea ), () => {
 
@@ -271,6 +277,7 @@
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( 0x000000 );
 				renderer.setAnimationLoop( animate );
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );

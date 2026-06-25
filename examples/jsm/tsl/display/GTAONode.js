@@ -1,5 +1,5 @@
 import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
-import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp } from 'three/tsl';
+import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, acos, clamp } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -375,10 +375,22 @@ class GTAONode extends TempNode {
 
 				const viewDir = normalize( viewPosition.xyz.negate() ).toVar();
 				const sliceBitangent = normalize( cross( sampleDir.xyz, viewDir ) ).toVar();
-				const sliceTangent = cross( sliceBitangent, viewDir );
-				const normalInSlice = normalize( viewNormal.sub( sliceBitangent.mul( dot( viewNormal, sliceBitangent ) ) ) );
+				const sliceTangent = cross( sliceBitangent, viewDir ).toVar();
 
-				const tangentToNormalInSlice = cross( normalInSlice, sliceBitangent ).toVar();
+				// Project the view normal onto the slice plane (remove component along sliceBitangent).
+				// The unnormalized length is the foreshortening weight applied at slice integration.
+				// (Activision GTAO paper, Section 3.2 "Per-pixel sampling".)
+				const projNRaw = viewNormal.sub( sliceBitangent.mul( dot( viewNormal, sliceBitangent ) ) ).toVar();
+				const projNLen = projNRaw.length().toVar();
+				const projN = projNRaw.div( max( projNLen, float( 0.0001 ) ) ).toVar();
+
+				// γ — angle of projN within the slice plane, signed by the tangent direction.
+				const nSin = dot( projN, sliceTangent ).toVar();
+				const nCos = clamp( dot( projN, viewDir ), 0, 1 ).toVar();
+				const signNSin = nSin.greaterThanEqual( 0 ).select( float( 1 ), float( - 1 ) );
+				const angleN = signNSin.mul( acos( nCos ) ).toVar();
+
+				const tangentToNormalInSlice = cross( projN, sliceBitangent ).toVar();
 				const cosHorizons = vec2( dot( viewDir, tangentToNormalInSlice ), dot( viewDir, tangentToNormalInSlice.negate() ) ).toVar();
 
 				// For each slice, the inner loop performs ray marching to find the horizons.
@@ -419,15 +431,24 @@ class GTAONode extends TempNode {
 
 				} );
 
-				// After the horizons are found for a given slice, their contribution to the total occlusion is calculated.
+				// Cosine-weighted inner integral, closed-form (Activision GTAO paper, Eq. 7).
+				// Per horizon h_i:    term_i = −cos( 2 h_i − γ ) + cos( γ ) + 2 h_i sin( γ )
+				// The 0.25 factor is ½ (integral normalization) × ½ (averaging the two horizons).
+				//
+				// In this slice setup `sliceTangent = cross( sliceBitangent, viewDir )` works out
+				// opposite to `sampleDir`, so the +sampleDir samples (cosHorizons.x) live on the
+				// −T side of the slice and −sampleDir samples (cosHorizons.y) on the +T side.
+				// γ is signed by +T (sliceTangent), so hPos must read from cosHorizons.y.
 
-				const sinHorizons = sqrt( sub( 1.0, cosHorizons.mul( cosHorizons ) ) ).toVar();
-				const nx = dot( normalInSlice, sliceTangent );
-				const ny = dot( normalInSlice, viewDir );
-				const nxb = mul( 0.5, acos( cosHorizons.y ).sub( acos( cosHorizons.x ) ).add( sinHorizons.x.mul( cosHorizons.x ).sub( sinHorizons.y.mul( cosHorizons.y ) ) ) );
-				const nyb = mul( 0.5, sub( 2.0, cosHorizons.x.mul( cosHorizons.x ) ).sub( cosHorizons.y.mul( cosHorizons.y ) ) );
-				const occlusion = nx.mul( nxb ).add( ny.mul( nyb ) );
-				ao.addAssign( occlusion );
+				const hPos = acos( cosHorizons.y ).toVar();
+				const hNeg = acos( cosHorizons.x ).negate().toVar();
+
+				const termPos = cos( hPos.mul( 2 ).sub( angleN ) ).negate().add( nCos ).add( hPos.mul( 2 ).mul( nSin ) );
+				const termNeg = cos( hNeg.mul( 2 ).sub( angleN ) ).negate().add( nCos ).add( hNeg.mul( 2 ).mul( nSin ) );
+				const a = termPos.add( termNeg ).mul( 0.25 );
+
+				// |projN| is the foreshortening weight from the per-slice normal projection.
+				ao.addAssign( projNLen.mul( a ) );
 
 			} );
 

@@ -50,6 +50,7 @@ let _lwoTree;
  *
  * @augments Loader
  * @three_import import { LWOLoader } from 'three/addons/loaders/LWOLoader.js';
+ * @deprecated since r185.
  */
 class LWOLoader extends Loader {
 
@@ -57,10 +58,13 @@ class LWOLoader extends Loader {
 	 * Constructs a new LWO loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
+	 * @deprecated since r185.
 	 */
 	constructor( manager ) {
 
 		super( manager );
+
+		console.warn( 'THREE.LWOLoader: The loader has been deprecated and will be removed with r195. Export your LWO files to glTF before using them on the web.' ); // @deprecated, r185
 
 	}
 

@@ -94,10 +94,13 @@ to the <code>onLoad()</code> callback.</p>
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#load">Loader#load</a></dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( buffer : <span class="param-type">ArrayBuffer | string</span> )</span><span class="type-signature"> : <a href="Group.html">Group</a></span> </h3>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( buffer : <span class="param-type">ArrayBuffer | string</span>, path : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span><span class="type-signature"> : <a href="Group.html">Group</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Parses the given USDZ data and returns the resulting group.</p>
+<p>The returned group is created synchronously, but any referenced textures
+are loaded asynchronously. Provide <code>onLoad</code> to be notified once all
+textures have finished loading.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -107,6 +110,31 @@ to the <code>onLoad()</code> callback.</p>
 									</td>
 									<td class="description last">
 										<p>The raw USDZ data as an array buffer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">path</strong>
+									</td>
+									<td class="description last">
+										<p>The URL base path.</p>
+										<p>Default is <code>''</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed once the group and all of its textures are ready.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
 									</td>
 								</tr>
 							</tbody>

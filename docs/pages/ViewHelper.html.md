@@ -36,6 +36,10 @@ Whether the helper is currently animating or not.
 
 Default is `false`.
 
+### .camera : Camera
+
+The camera whose transformation is visualized. It can be reassigned at any time to rebind the helper to a different camera.
+
 ### .center : Vector3
 
 The helper's center point.

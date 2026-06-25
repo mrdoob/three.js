@@ -64,7 +64,7 @@ The current material lights.
 
 The current render ID.
 
-**Returns:** Whether the given render object has changed its state or not.
+**Returns:** Whether the given render object is equal to its cached state or not.
 
 ### .firstInitialization( renderObject : RenderObject ) : boolean
 

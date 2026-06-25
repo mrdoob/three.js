@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>TreeGenerator - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">TreeGenerator</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Grows a procedural tree skeleton — trunk, branches and twigs, each swept as a tapered
+tube — and bakes it into one non-indexed <a href="BufferGeometry.html">BufferGeometry</a> (position and normal
+only), ready to instance into a forest. It produces <em>branches only</em>; add foliage as a
+separate layer.</p>
+<p>The branching is deterministic for a given <code>seed</code>: a recursive sweep lays down gently
+curved tubes with a parallel-transport frame (so they never twist), forking by the
+pipe model (each child much thinner than its parent), spreading children along the
+upper part of each branch with a golden-angle roll, and pulling them back up toward
+the light. A flared root, non-linear taper and gravity droop fill in the character.</p>
+<p>Parameters are set with a fluent builder: a <code>set&lt;Param&gt;()</code> exists for every default
+( <code>setSeed</code>, <code>setLevels</code>, <code>setChildren</code>, … ), each returning <code>this</code> for chaining.</p>
+<p>Each <code>build()</code> returns a fresh, independent mesh that the caller owns, so one
+generator can be re-parametrized and built repeatedly to grow a varied stand:</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const generator = new TreeGenerator( material );
+const oak = generator.setSeed( 1 ).setLevels( 4 ).build();
+const pine = generator.setSeed( 2 ).setLevels( 5 ).build();
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="TreeGenerator" translate="no">new <a href="#TreeGenerator">TreeGenerator</a><span class="signature">()</span> </h3>
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/generators/TreeGenerator.js" translate="no" target="_blank" rel="noopener">examples/jsm/generators/TreeGenerator.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>
