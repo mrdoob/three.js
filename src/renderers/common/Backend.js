@@ -670,6 +670,13 @@ class Backend {
 	setScissorTest( /*boolean*/ ) { }
 
 	/**
+	 * Resets the backend's internal state. A no-op for backends without a state cache (e.g. WebGPU).
+	 *
+	 * @abstract
+	 */
+	resetState() { }
+
+	/**
 	 * Returns the clear color and alpha into a single
 	 * color object.
 	 *
