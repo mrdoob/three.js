@@ -416,6 +416,7 @@
 		"webgpu_ocean",
 		"webgpu_parallax_uv",
 		"webgpu_particles",
+		"webgpu_particles_soft",
 		"webgpu_performance",
 		"webgpu_performance_renderbundle",
 		"webgpu_pmrem_cubemap",
