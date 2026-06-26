@@ -170,6 +170,10 @@ class MRTNode extends OutputStructNode {
 		for ( const name in outputNodes ) {
 
 			const index = getTextureIndex( textures, name );
+
+			// Ignore if the output exists in the MRT but has never been used.
+			if ( index === - 1 ) continue;
+
 			const type = builder.getOutputType( index );
 
 			members[ index ] = outputNodes[ name ].convert( type );
