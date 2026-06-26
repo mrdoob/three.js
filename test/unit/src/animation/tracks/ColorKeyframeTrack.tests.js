@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { ColorKeyframeTrack } from '../../../../../src/animation/tracks/ColorKeyframeTrack.js';
 
 import { KeyframeTrack } from '../../../../../src/animation/KeyframeTrack.js';

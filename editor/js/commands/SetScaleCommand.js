@@ -1,15 +1,15 @@
 import { Command } from '../Command.js';
 import { Vector3 } from 'three';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param newScale THREE.Vector3
- * @param optionalOldScale THREE.Vector3
- * @constructor
- */
 class SetScaleCommand extends Command {
 
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} object
+	 * @param {THREE.Vector3|null} newScale
+	 * @param {THREE.Vector3|null} optionalOldScale
+	 * @constructor
+	 */
 	constructor( editor, object = null, newScale = null, optionalOldScale = null ) {
 
 		super( editor );

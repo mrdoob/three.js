@@ -6,19 +6,74 @@ import { NumberKeyframeTrack } from './tracks/NumberKeyframeTrack.js';
 import { QuaternionKeyframeTrack } from './tracks/QuaternionKeyframeTrack.js';
 import { StringKeyframeTrack } from './tracks/StringKeyframeTrack.js';
 import { VectorKeyframeTrack } from './tracks/VectorKeyframeTrack.js';
-import * as MathUtils from '../math/MathUtils.js';
+import { generateUUID } from '../math/MathUtils.js';
 import { NormalAnimationBlendMode } from '../constants.js';
 
+/**
+ * A reusable set of keyframe tracks which represent an animation.
+ */
 class AnimationClip {
 
+	/**
+	 * Constructs a new animation clip.
+	 *
+	 * Note: Instead of instantiating an AnimationClip directly with the constructor, you can
+	 * use the static interface of this class for creating clips. In most cases though, animation clips
+	 * will automatically be created by loaders when importing animated 3D assets.
+	 *
+	 * @param {string} [name=''] - The clip's name.
+	 * @param {number} [duration=-1] - The clip's duration in seconds. If a negative value is passed,
+	 * the duration will be calculated from the passed keyframes.
+	 * @param {Array<KeyframeTrack>} tracks - An array of keyframe tracks.
+	 * @param {(NormalAnimationBlendMode|AdditiveAnimationBlendMode)} [blendMode=NormalAnimationBlendMode] - Defines how the animation
+	 * is blended/combined when two or more animations are simultaneously played.
+	 */
 	constructor( name = '', duration = - 1, tracks = [], blendMode = NormalAnimationBlendMode ) {
 
+		/**
+		 * The clip's name.
+		 *
+		 * @type {string}
+		 */
 		this.name = name;
+
+		/**
+		 *  An array of keyframe tracks.
+		 *
+		 * @type {Array<KeyframeTrack>}
+		 */
 		this.tracks = tracks;
+
+		/**
+		 * The clip's duration in seconds.
+		 *
+		 * @type {number}
+		 */
 		this.duration = duration;
+
+		/**
+		 * Defines how the animation is blended/combined when two or more animations
+		 * are simultaneously played.
+		 *
+		 * @type {(NormalAnimationBlendMode|AdditiveAnimationBlendMode)}
+		 */
 		this.blendMode = blendMode;
 
-		this.uuid = MathUtils.generateUUID();
+		/**
+		 * The UUID of the animation clip.
+		 *
+		 * @type {string}
+		 * @readonly
+		 */
+		this.uuid = generateUUID();
+
+		/**
+		 * An object that can be used to store custom data about the animation clip.
+		 * It should not hold references to functions as these will not be cloned.
+		 *
+		 * @type {Object}
+		 */
+		this.userData = {};
 
 		// this means it should figure out its duration by scanning the tracks
 		if ( this.duration < 0 ) {
@@ -29,7 +84,13 @@ class AnimationClip {
 
 	}
 
-
+	/**
+	 * Factory method for creating an animation clip from the given JSON.
+	 *
+	 * @static
+	 * @param {Object} json - The serialized animation clip.
+	 * @return {AnimationClip} The new animation clip.
+	 */
 	static parse( json ) {
 
 		const tracks = [],
@@ -45,10 +106,19 @@ class AnimationClip {
 		const clip = new this( json.name, json.duration, tracks, json.blendMode );
 		clip.uuid = json.uuid;
 
+		clip.userData = JSON.parse( json.userData || '{}' );
+
 		return clip;
 
 	}
 
+	/**
+	 * Serializes the given animation clip into JSON.
+	 *
+	 * @static
+	 * @param {AnimationClip} clip - The animation clip to serialize.
+	 * @return {Object} The JSON object.
+	 */
 	static toJSON( clip ) {
 
 		const tracks = [],
@@ -60,7 +130,8 @@ class AnimationClip {
 			'duration': clip.duration,
 			'tracks': tracks,
 			'uuid': clip.uuid,
-			'blendMode': clip.blendMode
+			'blendMode': clip.blendMode,
+			'userData': JSON.stringify( clip.userData ),
 
 		};
 
@@ -74,6 +145,20 @@ class AnimationClip {
 
 	}
 
+	/**
+	 * Returns a new animation clip from the passed morph targets array of a
+	 * geometry, taking a name and the number of frames per second.
+	 *
+	 * Note: The fps parameter is required, but the animation speed can be
+	 * overridden via {@link AnimationAction#setDuration}.
+	 *
+	 * @static
+	 * @param {string} name - The name of the animation clip.
+	 * @param {Array<Object>} morphTargetSequence - A sequence of morph targets.
+	 * @param {number} fps - The Frames-Per-Second value.
+	 * @param {boolean} noLoop - Whether the clip should be no loop or not.
+	 * @return {AnimationClip} The new animation clip.
+	 */
 	static CreateFromMorphTargetSequence( name, morphTargetSequence, fps, noLoop ) {
 
 		const numMorphTargets = morphTargetSequence.length;
@@ -116,6 +201,16 @@ class AnimationClip {
 
 	}
 
+	/**
+	 * Searches for an animation clip by name, taking as its first parameter
+	 * either an array of clips, or a mesh or geometry that contains an
+	 * array named "animations" property.
+	 *
+	 * @static
+	 * @param {(Array<AnimationClip>|Object3D)} objectOrClipArray - The array or object to search through.
+	 * @param {string} name - The name to search for.
+	 * @return {?AnimationClip} The found animation clip. Returns `null` if no clip has been found.
+	 */
 	static findByName( objectOrClipArray, name ) {
 
 		let clipArray = objectOrClipArray;
@@ -141,6 +236,19 @@ class AnimationClip {
 
 	}
 
+	/**
+	 * Returns an array of new AnimationClips created from the morph target
+	 * sequences of a geometry, trying to sort morph target names into
+	 * animation-group-based patterns like "Walk_001, Walk_002, Run_001, Run_002...".
+	 *
+	 * See {@link MD2Loader#parse} as an example for how the method should be used.
+	 *
+	 * @static
+	 * @param {Array<Object>} morphTargets - A sequence of morph targets.
+	 * @param {number} fps - The Frames-Per-Second value.
+	 * @param {boolean} noLoop - Whether the clip should be no loop or not.
+	 * @return {Array<AnimationClip>} An array of new animation clips.
+	 */
 	static CreateClipsFromMorphTargetSequences( morphTargets, fps, noLoop ) {
 
 		const animationToMorphTargets = {};
@@ -186,134 +294,11 @@ class AnimationClip {
 
 	}
 
-	// parse the animation.hierarchy format
-	static parseAnimation( animation, bones ) {
-
-		if ( ! animation ) {
-
-			console.error( 'THREE.AnimationClip: No animation in JSONLoader data.' );
-			return null;
-
-		}
-
-		const addNonemptyTrack = function ( trackType, trackName, animationKeys, propertyName, destTracks ) {
-
-			// only return track if there are actually keys.
-			if ( animationKeys.length !== 0 ) {
-
-				const times = [];
-				const values = [];
-
-				AnimationUtils.flattenJSON( animationKeys, times, values, propertyName );
-
-				// empty keys are filtered out, so check again
-				if ( times.length !== 0 ) {
-
-					destTracks.push( new trackType( trackName, times, values ) );
-
-				}
-
-			}
-
-		};
-
-		const tracks = [];
-
-		const clipName = animation.name || 'default';
-		const fps = animation.fps || 30;
-		const blendMode = animation.blendMode;
-
-		// automatic length determination in AnimationClip.
-		let duration = animation.length || - 1;
-
-		const hierarchyTracks = animation.hierarchy || [];
-
-		for ( let h = 0; h < hierarchyTracks.length; h ++ ) {
-
-			const animationKeys = hierarchyTracks[ h ].keys;
-
-			// skip empty tracks
-			if ( ! animationKeys || animationKeys.length === 0 ) continue;
-
-			// process morph targets
-			if ( animationKeys[ 0 ].morphTargets ) {
-
-				// figure out all morph targets used in this track
-				const morphTargetNames = {};
-
-				let k;
-
-				for ( k = 0; k < animationKeys.length; k ++ ) {
-
-					if ( animationKeys[ k ].morphTargets ) {
-
-						for ( let m = 0; m < animationKeys[ k ].morphTargets.length; m ++ ) {
-
-							morphTargetNames[ animationKeys[ k ].morphTargets[ m ] ] = - 1;
-
-						}
-
-					}
-
-				}
-
-				// create a track for each morph target with all zero
-				// morphTargetInfluences except for the keys in which
-				// the morphTarget is named.
-				for ( const morphTargetName in morphTargetNames ) {
-
-					const times = [];
-					const values = [];
-
-					for ( let m = 0; m !== animationKeys[ k ].morphTargets.length; ++ m ) {
-
-						const animationKey = animationKeys[ k ];
-
-						times.push( animationKey.time );
-						values.push( ( animationKey.morphTarget === morphTargetName ) ? 1 : 0 );
-
-					}
-
-					tracks.push( new NumberKeyframeTrack( '.morphTargetInfluence[' + morphTargetName + ']', times, values ) );
-
-				}
-
-				duration = morphTargetNames.length * fps;
-
-			} else {
-
-				// ...assume skeletal animation
-
-				const boneName = '.bones[' + bones[ h ].name + ']';
-
-				addNonemptyTrack(
-					VectorKeyframeTrack, boneName + '.position',
-					animationKeys, 'pos', tracks );
-
-				addNonemptyTrack(
-					QuaternionKeyframeTrack, boneName + '.quaternion',
-					animationKeys, 'rot', tracks );
-
-				addNonemptyTrack(
-					VectorKeyframeTrack, boneName + '.scale',
-					animationKeys, 'scl', tracks );
-
-			}
-
-		}
-
-		if ( tracks.length === 0 ) {
-
-			return null;
-
-		}
-
-		const clip = new this( clipName, duration, tracks, blendMode );
-
-		return clip;
-
-	}
-
+	/**
+	 * Sets the duration of this clip to the duration of its longest keyframe track.
+	 *
+	 * @return {AnimationClip} A reference to this animation clip.
+	 */
 	resetDuration() {
 
 		const tracks = this.tracks;
@@ -333,6 +318,11 @@ class AnimationClip {
 
 	}
 
+	/**
+	 * Trims all tracks to the clip's duration.
+	 *
+	 * @return {AnimationClip} A reference to this animation clip.
+	 */
 	trim() {
 
 		for ( let i = 0; i < this.tracks.length; i ++ ) {
@@ -345,6 +335,12 @@ class AnimationClip {
 
 	}
 
+	/**
+	 * Performs minimal validation on each track in the clip. Returns `true` if all
+	 * tracks are valid.
+	 *
+	 * @return {boolean} Whether the clip's keyframes are valid or not.
+	 */
 	validate() {
 
 		let valid = true;
@@ -359,6 +355,12 @@ class AnimationClip {
 
 	}
 
+	/**
+	 * Optimizes each track by removing equivalent sequential keys (which are
+	 * common in morph target sequences).
+	 *
+	 * @return {AnimationClip} A reference to this animation clip.
+	 */
 	optimize() {
 
 		for ( let i = 0; i < this.tracks.length; i ++ ) {
@@ -371,6 +373,11 @@ class AnimationClip {
 
 	}
 
+	/**
+	 * Returns a new animation clip with copied values from this instance.
+	 *
+	 * @return {AnimationClip} A clone of this instance.
+	 */
 	clone() {
 
 		const tracks = [];
@@ -381,10 +388,19 @@ class AnimationClip {
 
 		}
 
-		return new this.constructor( this.name, this.duration, tracks, this.blendMode );
+		const clip = new this.constructor( this.name, this.duration, tracks, this.blendMode );
+
+		clip.userData = JSON.parse( JSON.stringify( this.userData ) );
+
+		return clip;
 
 	}
 
+	/**
+	 * Serializes this animation clip into JSON.
+	 *
+	 * @return {Object} The JSON object.
+	 */
 	toJSON() {
 
 		return this.constructor.toJSON( this );

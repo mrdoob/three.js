@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { RectAreaLight } from '../../../../src/lights/RectAreaLight.js';
 
 import { Light } from '../../../../src/lights/Light.js';
@@ -58,18 +56,6 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.todo( 'width', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'height', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'power', ( assert ) => {
 
 			const a = new RectAreaLight( 0xaaaaaa, 1, 10, 10 );
@@ -101,18 +87,6 @@ export default QUnit.module( 'Lights', () => {
 				object.isRectAreaLight,
 				'RectAreaLight.isRectAreaLight should be true'
 			);
-
-		} );
-
-		QUnit.todo( 'copy', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'toJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

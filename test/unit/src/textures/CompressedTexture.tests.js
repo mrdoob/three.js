@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { CompressedTexture } from '../../../../src/textures/CompressedTexture.js';
 
 import { Texture } from '../../../../src/textures/Texture.js';
@@ -24,32 +22,6 @@ export default QUnit.module( 'Textures', () => {
 
 			const object = new CompressedTexture();
 			assert.ok( object, 'Can instantiate a CompressedTexture.' );
-
-		} );
-
-		// PROPERTIES
-		QUnit.todo( 'image', ( assert ) => {
-
-			// { width: width, height: height }
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'mipmaps', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'flipY', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'generateMipmaps', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

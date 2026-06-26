@@ -7,13 +7,12 @@ used before a patch is released.
 
 You may submit the report in the following ways:
 
-- send an email to hello@mrdoob.com; and/or
-- send us a [private vulnerability report](https://github.com/mrdoob/three.js/security/advisories/new)
+- Send an email to hello@mrdoob.com.
 
 Please provide the following information in your report:
 
-- A description of the vulnerability and its impact
-- How to reproduce the issue
+- A description of the vulnerability and its impact.
+- How to reproduce the issue.
 
 This project is maintained by volunteers on a reasonable-effort basis. As such,
 we ask that you give us 90 days to work on a fix before public exposure.

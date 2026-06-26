@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { CubeTexture } from '../../../../src/textures/CubeTexture.js';
 
 import { Texture } from '../../../../src/textures/Texture.js';
@@ -24,19 +22,6 @@ export default QUnit.module( 'Textures', () => {
 
 			const object = new CubeTexture();
 			assert.ok( object, 'Can instantiate a CubeTexture.' );
-
-		} );
-
-		// PROPERTIES
-		QUnit.todo( 'images', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'flipY', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

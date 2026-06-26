@@ -1,45 +1,125 @@
 import {
+	Controls,
 	Euler,
-	EventDispatcher,
 	Vector3
 } from 'three';
 
 const _euler = new Euler( 0, 0, 0, 'YXZ' );
 const _vector = new Vector3();
 
+/**
+ * Fires when the user moves the mouse.
+ *
+ * @event PointerLockControls#change
+ * @type {Object}
+ */
 const _changeEvent = { type: 'change' };
+
+/**
+ * Fires when the pointer lock status is "locked" (in other words: the mouse is captured).
+ *
+ * @event PointerLockControls#lock
+ * @type {Object}
+ */
 const _lockEvent = { type: 'lock' };
+
+/**
+ * Fires when the pointer lock status is "unlocked" (in other words: the mouse is not captured anymore).
+ *
+ * @event PointerLockControls#unlock
+ * @type {Object}
+ */
 const _unlockEvent = { type: 'unlock' };
 
+const _MOUSE_SENSITIVITY = 0.002;
 const _PI_2 = Math.PI / 2;
 
-class PointerLockControls extends EventDispatcher {
+/**
+ * The implementation of this class is based on the [Pointer Lock API](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API).
+ * `PointerLockControls` is a perfect choice for first person 3D games.
+ *
+ * ```js
+ * const controls = new PointerLockControls( camera, document.body );
+ *
+ * // add event listener to show/hide a UI (e.g. the game's menu)
+ * controls.addEventListener( 'lock', function () {
+ *
+ * 	menu.style.display = 'none';
+ *
+ * } );
+ *
+ * controls.addEventListener( 'unlock', function () {
+ *
+ * 	menu.style.display = 'block';
+ *
+ * } );
+ * ```
+ *
+ * @augments Controls
+ * @three_import import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+ */
+class PointerLockControls extends Controls {
 
-	constructor( camera, domElement ) {
+	/**
+	 * Constructs a new controls instance.
+	 *
+	 * @param {Camera} camera - The camera that is managed by the controls.
+	 * @param {?HTMLElement} domElement - The HTML element used for event listeners.
+	 */
+	constructor( camera, domElement = null ) {
 
-		super();
+		super( camera, domElement );
 
-		this.camera = camera;
-		this.domElement = domElement;
-
+		/**
+		 * Whether the controls are locked or not.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default false
+		 */
 		this.isLocked = false;
 
-		// Set to constrain the pitch of the camera
-		// Range is 0 to Math.PI radians
-		this.minPolarAngle = 0; // radians
-		this.maxPolarAngle = Math.PI; // radians
+		/**
+		 * Camera pitch, lower limit. Range is '[0, Math.PI]' in radians.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.minPolarAngle = 0;
 
+		/**
+		 * Camera pitch, upper limit. Range is '[0, Math.PI]' in radians.
+		 *
+		 * @type {number}
+		 * @default Math.PI
+		 */
+		this.maxPolarAngle = Math.PI;
+
+		/**
+		 * Multiplier for how much the pointer movement influences the camera rotation.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
 		this.pointerSpeed = 1.0;
+
+		// event listeners
 
 		this._onMouseMove = onMouseMove.bind( this );
 		this._onPointerlockChange = onPointerlockChange.bind( this );
 		this._onPointerlockError = onPointerlockError.bind( this );
 
-		this.connect();
+		if ( this.domElement !== null ) {
+
+			this.connect( this.domElement );
+
+		}
 
 	}
 
-	connect() {
+	connect( element ) {
+
+		super.connect( element );
 
 		this.domElement.ownerDocument.addEventListener( 'mousemove', this._onMouseMove );
 		this.domElement.ownerDocument.addEventListener( 'pointerlockchange', this._onPointerlockChange );
@@ -61,24 +141,31 @@ class PointerLockControls extends EventDispatcher {
 
 	}
 
-	getObject() { // retaining this method for backward compatibility
-
-		return this.camera;
-
-	}
-
+	/**
+	 * Returns the look direction of the camera.
+	 *
+	 * @param {Vector3} v - The target vector that is used to store the method's result.
+	 * @return {Vector3} The normalized direction vector.
+	 */
 	getDirection( v ) {
 
-		return v.set( 0, 0, - 1 ).applyQuaternion( this.camera.quaternion );
+		return v.set( 0, 0, - 1 ).applyQuaternion( this.object.quaternion );
 
 	}
 
+	/**
+	 * Moves the camera forward parallel to the xz-plane. Assumes camera.up is y-up.
+	 *
+	 * @param {number} distance - The signed distance.
+	 */
 	moveForward( distance ) {
+
+		if ( this.enabled === false ) return;
 
 		// move forward parallel to the xz-plane
 		// assumes camera.up is y-up
 
-		const camera = this.camera;
+		const camera = this.object;
 
 		_vector.setFromMatrixColumn( camera.matrix, 0 );
 
@@ -88,9 +175,16 @@ class PointerLockControls extends EventDispatcher {
 
 	}
 
+	/**
+	 * Moves the camera sidewards parallel to the xz-plane.
+	 *
+	 * @param {number} distance - The signed distance.
+	 */
 	moveRight( distance ) {
 
-		const camera = this.camera;
+		if ( this.enabled === false ) return;
+
+		const camera = this.object;
 
 		_vector.setFromMatrixColumn( camera.matrix, 0 );
 
@@ -98,12 +192,23 @@ class PointerLockControls extends EventDispatcher {
 
 	}
 
-	lock() {
+	/**
+	 * Activates the pointer lock.
+	 *
+	 * @param {boolean} [unadjustedMovement=false] - Disables OS-level adjustment for mouse acceleration, and accesses raw mouse input instead.
+	 * Setting it to true will disable mouse acceleration.
+	 */
+	lock( unadjustedMovement = false ) {
 
-		this.domElement.requestPointerLock();
+		this.domElement.requestPointerLock( {
+			unadjustedMovement
+		} );
 
 	}
 
+	/**
+	 * Exits the pointer lock.
+	 */
 	unlock() {
 
 		this.domElement.ownerDocument.exitPointerLock();
@@ -116,16 +221,13 @@ class PointerLockControls extends EventDispatcher {
 
 function onMouseMove( event ) {
 
-	if ( this.isLocked === false ) return;
+	if ( this.enabled === false || this.isLocked === false ) return;
 
-	const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-	const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-
-	const camera = this.camera;
+	const camera = this.object;
 	_euler.setFromQuaternion( camera.quaternion );
 
-	_euler.y -= movementX * 0.002 * this.pointerSpeed;
-	_euler.x -= movementY * 0.002 * this.pointerSpeed;
+	_euler.y -= event.movementX * _MOUSE_SENSITIVITY * this.pointerSpeed;
+	_euler.x -= event.movementY * _MOUSE_SENSITIVITY * this.pointerSpeed;
 
 	_euler.x = Math.max( _PI_2 - this.maxPolarAngle, Math.min( _PI_2 - this.minPolarAngle, _euler.x ) );
 

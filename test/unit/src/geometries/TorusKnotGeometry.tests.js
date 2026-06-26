@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { TorusKnotGeometry } from '../../../../src/geometries/TorusKnotGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
@@ -59,19 +57,6 @@ export default QUnit.module( 'Geometries', () => {
 				object.type === 'TorusKnotGeometry',
 				'TorusKnotGeometry.type should be TorusKnotGeometry'
 			);
-
-		} );
-
-		QUnit.todo( 'parameters', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// STATIC
-		QUnit.todo( 'fromJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

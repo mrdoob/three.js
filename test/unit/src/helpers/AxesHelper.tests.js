@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { AxesHelper } from '../../../../src/helpers/AxesHelper.js';
 
 import { LineSegments } from '../../../../src/objects/LineSegments.js';
@@ -39,11 +37,6 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'setColors', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
 
 		QUnit.test( 'dispose', ( assert ) => {
 

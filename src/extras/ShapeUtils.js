@@ -1,9 +1,18 @@
 import { Earcut } from './Earcut.js';
 
+/**
+ * A class containing utility functions for shapes.
+ *
+ * @hideconstructor
+ */
 class ShapeUtils {
 
-	// calculate area of the contour polygon
-
+	/**
+	 * Calculate area of a ( 2D ) contour polygon.
+	 *
+	 * @param {Array<Vector2>} contour - An array of 2D points.
+	 * @return {number} The area.
+	 */
 	static area( contour ) {
 
 		const n = contour.length;
@@ -19,12 +28,25 @@ class ShapeUtils {
 
 	}
 
+	/**
+	 * Returns `true` if the given contour uses a clockwise winding order.
+	 *
+	 * @param {Array<Vector2>} pts - An array of 2D points defining a polygon.
+	 * @return {boolean} Whether the given contour uses a clockwise winding order or not.
+	 */
 	static isClockWise( pts ) {
 
 		return ShapeUtils.area( pts ) < 0;
 
 	}
 
+	/**
+	 * Triangulates the given shape definition.
+	 *
+	 * @param {Array<Vector2>} contour - An array of 2D points defining the contour.
+	 * @param {Array<Array<Vector2>>} holes - An array that holds arrays of 2D points defining the holes.
+	 * @return {Array<Array<number>>} An array that holds for each face definition an array with three indices.
+	 */
 	static triangulateShape( contour, holes ) {
 
 		const vertices = []; // flat array of vertices like [ x0,y0, x1,y1, x2,y2, ... ]

@@ -5,7 +5,7 @@ export default /* glsl */`
 
 		#ifdef ENVMAP_TYPE_CUBE_UV
 
-			vec3 worldNormal = inverseTransformDirection( normal, viewMatrix );
+			vec3 worldNormal = transformNormalByInverseViewMatrix( normal, viewMatrix );
 
 			vec4 envMapColor = textureCubeUV( envMap, envMapRotation * worldNormal, 1.0 );
 
@@ -26,9 +26,9 @@ export default /* glsl */`
 			vec3 reflectVec = reflect( - viewDir, normal );
 
 			// Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
-			reflectVec = normalize( mix( reflectVec, normal, roughness * roughness) );
+			reflectVec = normalize( mix( reflectVec, normal, pow4( roughness ) ) );
 
-			reflectVec = inverseTransformDirection( reflectVec, viewMatrix );
+			reflectVec = transformDirectionByInverseViewMatrix( reflectVec, viewMatrix );
 
 			vec4 envMapColor = textureCubeUV( envMap, envMapRotation * reflectVec, roughness );
 

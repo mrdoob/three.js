@@ -1,0 +1,146 @@
+/* Three.js custom theme for Highlight.js */
+
+pre code.hljs {
+	display: block;
+	overflow-x: auto;
+	padding: 1.5em;
+}
+
+code.hljs {
+	padding: 3px 5px;
+}
+
+/* Light mode */
+.hljs {
+	color: #444444;
+	background: #F5F5F5;
+}
+
+.hljs-comment,
+.hljs-quote {
+	color: #999999;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-subst {
+	color: #30b030;
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag .hljs-attr {
+	color: #ff0080;
+}
+
+.hljs-string,
+.hljs-doctag {
+	color: #8000ff;
+}
+
+.hljs-title,
+.hljs-section,
+.hljs-selector-id {
+	color: #2194ce;
+}
+
+.hljs-type,
+.hljs-class .hljs-title {
+	color: #2194ce;
+}
+
+.hljs-tag,
+.hljs-name,
+.hljs-attribute {
+	color: #2194ce;
+}
+
+.hljs-regexp,
+.hljs-link {
+	color: #ff0080;
+}
+
+.hljs-symbol,
+.hljs-bullet {
+	color: #888888;
+}
+
+.hljs-built_in,
+.hljs-builtin-name {
+	color: #22c0c4;
+}
+
+.hljs-meta {
+	color: #999999;
+}
+
+.hljs-deletion {
+	background: #fdd;
+}
+
+.hljs-addition {
+	background: #dfd;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+
+	.hljs {
+		color: #aaaaaa;
+		background: #333333;
+	}
+
+	.hljs-comment,
+	.hljs-quote {
+		color: #666666;
+	}
+
+	.hljs-keyword,
+	.hljs-selector-tag,
+	.hljs-subst {
+		color: #30b030;
+	}
+
+	.hljs-number,
+	.hljs-literal,
+	.hljs-variable,
+	.hljs-template-variable,
+	.hljs-tag .hljs-attr {
+		color: #ff3399;
+	}
+
+	.hljs-string,
+	.hljs-doctag {
+		color: #BB55FF;
+	}
+
+	.hljs-title,
+	.hljs-section,
+	.hljs-selector-id,
+	.hljs-type,
+	.hljs-class .hljs-title {
+		color: #2194ce;
+	}
+
+	.hljs-tag,
+	.hljs-name,
+	.hljs-attribute {
+		color: #2194ce;
+	}
+
+	.hljs-regexp,
+	.hljs-link {
+		color: #ff3399;
+	}
+
+}

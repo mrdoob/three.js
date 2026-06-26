@@ -1,6 +1,7 @@
 import {
 	Color,
 	FrontSide,
+	HalfFloatType,
 	Matrix4,
 	Mesh,
 	PerspectiveCamera,
@@ -14,18 +15,39 @@ import {
 } from 'three';
 
 /**
- * Work based on :
- * https://github.com/Slayvin: Flat mirror for three.js
- * https://home.adelphi.edu/~stemkoski/ : An implementation of water shader based on the flat mirror
- * http://29a.ch/ && http://29a.ch/slides/2012/webglwater/ : Water shader explanations in WebGL
+ * A basic flat, reflective water effect.
+ *
+ * Note that this class can only be used with {@link WebGLRenderer}.
+ * When using {@link WebGPURenderer}, use {@link WaterMesh}.
+ *
+ * References:
+ *
+ * - [Flat mirror for three.js](https://github.com/Slayvin)
+ * - [An implementation of water shader based on the flat mirror](https://home.adelphi.edu/~stemkoski/)
+ * - [Water shader explanations in WebGL](http://29a.ch/slides/2012/webglwater/ )
+ *
+ * @augments Mesh
+ * @three_import import { Water } from 'three/addons/objects/Water.js';
  */
-
 class Water extends Mesh {
 
+	/**
+	 * Constructs a new water instance.
+	 *
+	 * @param {BufferGeometry} geometry - The water's geometry.
+	 * @param {Water~Options} [options] - The configuration options.
+	 */
 	constructor( geometry, options = {} ) {
 
 		super( geometry );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isWater = true;
 
 		const scope = this;
@@ -63,7 +85,7 @@ class Water extends Mesh {
 
 		const mirrorCamera = new PerspectiveCamera();
 
-		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight );
+		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { type: HalfFloatType } );
 
 		const mirrorShader = {
 
@@ -175,10 +197,10 @@ class Water extends Mesh {
 					vec3 reflectionSample = vec3( texture2D( mirrorSampler, mirrorCoord.xy / mirrorCoord.w + distortion ) );
 
 					float theta = max( dot( eyeDirection, surfaceNormal ), 0.0 );
-					float rf0 = 0.3;
+					float rf0 = 0.02;
 					float reflectance = rf0 + ( 1.0 - rf0 ) * pow( ( 1.0 - theta ), 5.0 );
 					vec3 scatter = max( 0.0, dot( surfaceNormal, eyeDirection ) ) * waterColor;
-					vec3 albedo = mix( ( sunColor * diffuseLight * 0.3 + scatter ) * getShadowMask(), ( vec3( 0.1 ) + reflectionSample * 0.9 + reflectionSample * specularLight ), reflectance);
+					vec3 albedo = mix( ( sunColor * diffuseLight * 0.3 + scatter ) * getShadowMask(), reflectionSample + specularLight, reflectance );
 					vec3 outgoingLight = albedo;
 					gl_FragColor = vec4( outgoingLight, alpha );
 
@@ -329,5 +351,24 @@ class Water extends Mesh {
 	}
 
 }
+
+/**
+ * Constructor options of `Water`.
+ *
+ * @typedef {Object} Water~Options
+ * @property {number} [textureWidth=512] - The texture width. A higher value results in more clear reflections but is also more expensive.
+ * @property {number} [textureHeight=512] - The texture height. A higher value results in more clear reflections but is also more expensive.
+ * @property {number} [clipBias=0] - The clip bias.
+ * @property {number} [alpha=1] - The alpha value.
+ * @property {number} [time=0] - The time value.
+ * @property {?Texture} [waterNormals=null] - The water's normal map.
+ * @property {Vector3} [sunDirection=(0.70707,0.70707,0.0)] - The sun direction.
+ * @property {number|Color|string} [sunColor=0xffffff] - The sun color.
+ * @property {number|Color|string} [waterColor=0x7F7F7F] - The water color.
+ * @property {Vector3} [eye] - The eye vector.
+ * @property {number} [distortionScale=20] - The distortion scale.
+ * @property {(FrontSide|BackSide|DoubleSide)} [side=FrontSide] - The water material's `side` property.
+ * @property {boolean} [fog=false] - Whether the water should be affected by fog or not.
+ **/
 
 export { Water };

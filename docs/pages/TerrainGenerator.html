@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>TerrainGenerator - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">TerrainGenerator</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Bakes a procedural mountain range into a single THREE.BufferGeometry and
+returns a <code>THREE.Group</code> ready to add to a scene.</p>
+<p>The heightfield is a derivative-damped fractal sum ( Quilez's fake erosion ): each
+octave is suppressed where the running slope is already steep, concentrating detail
+into weathered ridgelines, and a low-frequency domain warp makes those ridges
+meander. A few passes of thermal ( talus ) erosion then relax any slope past the
+angle of repose, settling the fractal's needle-spikes into real crests.</p>
+<p>The grid is triangulated with alternating quad diagonals ( a diamond pattern ), so a
+coarse mesh holds its silhouette without a one-way grain. The surface shades itself
+from altitude and slope in TSL — grass, forest, rock, scree and snow, with detail
+normals and aerial perspective — so no material or textures are needed.</p>
+<p>The baked height grid is exposed through TerrainGenerator#sampleHeight so a
+scattered forest ( or anything else ) can sit exactly on the surface.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const terrain = new TerrainGenerator( { seed: 1 } );
+scene.add( terrain.build() );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="TerrainGenerator" translate="no">new <a href="#TerrainGenerator">TerrainGenerator</a><span class="signature">()</span> </h3>
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/generators/TerrainGenerator.js" translate="no" target="_blank" rel="noopener">examples/jsm/generators/TerrainGenerator.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

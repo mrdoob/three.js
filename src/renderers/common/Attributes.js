@@ -3,23 +3,55 @@ import { AttributeType } from './Constants.js';
 
 import { DynamicDrawUsage } from '../../constants.js';
 
+/**
+ * This renderer module manages geometry attributes.
+ *
+ * @private
+ * @augments DataMap
+ */
 class Attributes extends DataMap {
 
-	constructor( backend ) {
+	/**
+	 * Constructs a new attribute management component.
+	 *
+	 * @param {Backend} backend - The renderer's backend.
+	 * @param {Info} info - Renderer component for managing metrics and monitoring data.
+	 */
+	constructor( backend, info ) {
 
 		super();
 
+		/**
+		 * The renderer's backend.
+		 *
+		 * @type {Backend}
+		 */
 		this.backend = backend;
+
+		/**
+		 * Renderer component for managing metrics and monitoring data.
+		 *
+		 * @type {Info}
+		 */
+		this.info = info;
 
 	}
 
+	/**
+	 * Deletes the data for the given attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The attribute.
+	 * @return {?Object} The deleted attribute data.
+	 */
 	delete( attribute ) {
 
 		const attributeData = super.delete( attribute );
 
-		if ( attributeData !== undefined ) {
+		if ( attributeData !== null ) {
 
 			this.backend.destroyAttribute( attribute );
+
+			this.info.destroyAttribute( attribute );
 
 		}
 
@@ -27,6 +59,13 @@ class Attributes extends DataMap {
 
 	}
 
+	/**
+	 * Updates the given attribute. This method creates attribute buffers
+	 * for new attributes and updates data for existing ones.
+	 *
+	 * @param {BufferAttribute} attribute - The attribute to update.
+	 * @param {number} type - The attribute type.
+	 */
 	update( attribute, type ) {
 
 		const data = this.get( attribute );
@@ -36,14 +75,22 @@ class Attributes extends DataMap {
 			if ( type === AttributeType.VERTEX ) {
 
 				this.backend.createAttribute( attribute );
+				this.info.createAttribute( attribute );
 
 			} else if ( type === AttributeType.INDEX ) {
 
 				this.backend.createIndexAttribute( attribute );
+				this.info.createIndexAttribute( attribute );
 
 			} else if ( type === AttributeType.STORAGE ) {
 
 				this.backend.createStorageAttribute( attribute );
+				this.info.createStorageAttribute( attribute );
+
+			} else if ( type === AttributeType.INDIRECT ) {
+
+				this.backend.createIndirectStorageAttribute( attribute );
+				this.info.createIndirectStorageAttribute( attribute );
 
 			}
 
@@ -65,6 +112,13 @@ class Attributes extends DataMap {
 
 	}
 
+	/**
+	 * Utility method for handling interleaved buffer attributes correctly.
+	 * To process them, their `InterleavedBuffer` is returned.
+	 *
+	 * @param {BufferAttribute} attribute - The attribute.
+	 * @return {BufferAttribute|InterleavedBuffer}
+	 */
 	_getBufferAttribute( attribute ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;

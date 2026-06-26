@@ -1,8 +1,6 @@
-/* global QUnit */
-
 import { CapsuleGeometry } from '../../../../src/geometries/CapsuleGeometry.js';
 
-import { LatheGeometry } from '../../../../src/geometries/LatheGeometry.js';
+import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
 import { runStdGeometryTests } from '../../utils/qunit-utils.js';
 
 export default QUnit.module( 'Geometries', () => {
@@ -14,17 +12,19 @@ export default QUnit.module( 'Geometries', () => {
 
 			const parameters = {
 				radius: 2,
-				length: 2,
+				height: 2,
 				capSegments: 20,
-				radialSegments: 20
+				radialSegments: 20,
+				heightSegments: 1
 			};
 
 			geometries = [
 				new CapsuleGeometry(),
 				new CapsuleGeometry( parameters.radius ),
-				new CapsuleGeometry( parameters.radius, parameters.length ),
-				new CapsuleGeometry( parameters.radius, parameters.length, parameters.capSegments ),
-				new CapsuleGeometry( parameters.radius, parameters.length, parameters.capSegments, parameters.radialSegments ),
+				new CapsuleGeometry( parameters.radius, parameters.height ),
+				new CapsuleGeometry( parameters.radius, parameters.height, parameters.capSegments ),
+				new CapsuleGeometry( parameters.radius, parameters.height, parameters.capSegments, parameters.radialSegments ),
+				new CapsuleGeometry( parameters.radius, parameters.height, parameters.capSegments, parameters.radialSegments, parameters.heightSegments )
 			];
 
 		} );
@@ -34,8 +34,8 @@ export default QUnit.module( 'Geometries', () => {
 
 			const object = new CapsuleGeometry();
 			assert.strictEqual(
-				object instanceof LatheGeometry, true,
-				'CapsuleGeometry extends from LatheGeometry'
+				object instanceof BufferGeometry, true,
+				'CapsuleGeometry extends from BufferGeometry'
 			);
 
 		} );
@@ -56,19 +56,6 @@ export default QUnit.module( 'Geometries', () => {
 				object.type === 'CapsuleGeometry',
 				'CapsuleGeometry.type should be CapsuleGeometry'
 			);
-
-		} );
-
-		QUnit.todo( 'parameters', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// STATIC
-		QUnit.todo( 'fromJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

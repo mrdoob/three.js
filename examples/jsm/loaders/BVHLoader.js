@@ -11,23 +11,66 @@ import {
 } from 'three';
 
 /**
- * Description: reads BVH files and outputs a single Skeleton and an AnimationClip
+ * A loader for the BVH format.
  *
- * Currently only supports bvh files containing a single root.
+ * Imports BVH files and outputs a single {@link Skeleton} and {@link AnimationClip}.
+ * The loader only supports BVH files containing a single root right now.
  *
+ * ```js
+ * const loader = new BVHLoader();
+ * const result = await loader.loadAsync( 'models/bvh/pirouette.bvh' );
+ *
+ * // visualize skeleton
+ * const skeletonHelper = new THREE.SkeletonHelper( result.skeleton.bones[ 0 ] );
+ * scene.add( result.skeleton.bones[ 0 ] );
+ * scene.add( skeletonHelper );
+ *
+ * // play animation clip
+ * mixer = new THREE.AnimationMixer( result.skeleton.bones[ 0 ] );
+ * mixer.clipAction( result.clip ).play();
+ * ```
+ *
+ * @augments Loader
+ * @three_import import { BVHLoader } from 'three/addons/loaders/BVHLoader.js';
  */
-
 class BVHLoader extends Loader {
 
+	/**
+	 * Constructs a new BVH loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
+		/**
+		 * Whether to animate bone positions or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.animateBonePositions = true;
+
+		/**
+		 * Whether to animate bone rotations or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.animateBoneRotations = true;
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded BVH asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function({skeleton:Skeleton,clip:AnimationClip})} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -62,15 +105,19 @@ class BVHLoader extends Loader {
 
 	}
 
+	/**
+	 * Parses the given BVH data and returns the resulting data.
+	 *
+	 * @param {string} text - The raw BVH data as a string.
+	 * @return {{skeleton:Skeleton,clip:AnimationClip}} An object representing the parsed asset.
+	 */
 	parse( text ) {
 
-		/*
-			reads a string array (lines) from a BVH file
-			and outputs a skeleton structure including motion data
+		// reads a string array (lines) from a BVH file
+		// and outputs a skeleton structure including motion data
 
-			returns thee root node:
-			{ name: '', channels: [], children: [] }
-		*/
+		// returns thee root node:
+		// { name: '', channels: [], children: [] }
 		function readBvh( lines ) {
 
 			// read model structure
@@ -204,7 +251,7 @@ class BVHLoader extends Loader {
 		}
 
 		/*
-		 Recursively parses the HIERACHY section of the BVH file
+		 Recursively parses the HIERARCHY section of the BVH file
 
 		 - lines: all lines of the file. lines are consumed as we go along.
 		 - firstline: line containing the node type and name e.g. 'JOINT hip'
@@ -338,11 +385,11 @@ class BVHLoader extends Loader {
 		}
 
 		/*
-			builds a AnimationClip from the keyframe data saved in each bone.
+			builds an AnimationClip from the keyframe data saved in each bone.
 
 			bone: bvh root node
 
-			returns: a AnimationClip containing position and quaternion tracks
+			returns: an AnimationClip containing position and quaternion tracks
 		*/
 		function toTHREEAnimation( bones ) {
 

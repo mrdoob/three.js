@@ -4,6 +4,10 @@
 		<title>three.js webgl - animation - skinning - ik</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - animation - skinning - ik">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_animation_skinning_ik.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_animation_skinning_ik.jpg">
 		<meta name="author" content="Antoine BERNIER (abernier)" />
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
@@ -16,7 +20,7 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - inverse kinematics<br />
-			Character model by <a href="https://assetstore.unity.com/packages/3d/characters/humanoids/humans/kira-lowpoly-character-100303" target="_blank" rel="noopener">Aki</a>, furnitures from <a href="https://poly.pizza" target="_blank" rel="noopener">poly.pizza</a>, scene by <a href="https://abernier.name/three.js/examples/webgl_esher.html" target="_blank" rel="noopener">abernier</a>. CC0.
+			Character model by <a href="https://assetstore.unity.com/packages/3d/characters/humanoids/humans/kira-lowpoly-character-100303" target="_blank" rel="noopener">Aki</a>, furnitures from <a href="https://poly.pizza" target="_blank" rel="noopener">poly.pizza</a>, scene by <a href="https://abernier.link/edin" target="_blank" rel="noopener">abernier</a>. CC0.
 		</div>
 
 		<script type="importmap">
@@ -71,7 +75,6 @@
 			scene.add( ambientLight );
 
 			const dracoLoader = new DRACOLoader();
-			dracoLoader.setDecoderPath( 'jsm/libs/draco/' );
 			const gltfLoader = new GLTFLoader();
 			gltfLoader.setDRACOLoader( dracoLoader );
 
@@ -151,7 +154,7 @@
 			transformControls.showX = false;
 			transformControls.space = 'world';
 			transformControls.attach( OOI.target_hand_l );
-			scene.add( transformControls );
+			scene.add( transformControls.getHelper() );
 
 			// disable orbitControls while using transformControls
 			transformControls.addEventListener( 'mouseDown', () => orbitControls.enabled = false );

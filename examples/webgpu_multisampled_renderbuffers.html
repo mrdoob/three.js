@@ -3,19 +3,32 @@
 		<title>three.js webgpu - multisampled renderbuffers</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta property="og:title" content="three.js webgpu - multisampled renderbuffers">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_multisampled_renderbuffers.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_multisampled_renderbuffers.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - multisampled renderbuffers
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Multisampled Renderbuffers</span>
+			</div>
+
+			<small>
+				Using multisampled renderbuffers for anti-aliasing.
+			</small>
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -23,10 +36,10 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { texture } from 'three/tsl';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
 			const mouse = new THREE.Vector2();
@@ -39,7 +52,7 @@
 
 			const params = {
 				animated: true,
-				samples: 4
+				multisampling: true
 			};
 
 			const mat4 = new THREE.Matrix4();
@@ -62,15 +75,14 @@
 
 			} );
 
-
-			initGUI();
 			init();
+			initGUI();
 
 			function initGUI() {
 
-				const gui = new GUI();
-				gui.add( params, 'samples', 0, 4 ).step( 1 );
-				gui.add( params, 'animated', true );
+				const gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( params, 'multisampling' );
+				gui.add( params, 'animated' );
 
 			}
 
@@ -85,8 +97,8 @@
 				// textured mesh
 
 				const geometryBox = new THREE.BoxGeometry( 7, 7, 7, 12, 12, 12 );
-				const materialBox = new THREE.MeshPhongNodeMaterial();
-				const materialBoxInner = new THREE.MeshPhongNodeMaterial( { color: 0xff0000 } );
+				const materialBox = new THREE.MeshBasicNodeMaterial();
+				const materialBoxInner = new THREE.MeshBasicNodeMaterial( { color: 0xff0000 } );
 
 				materialBox.wireframe = true;
 
@@ -107,13 +119,14 @@
 				//
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.inspector = new Inspector();
 				renderer.setPixelRatio( dpr );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				renderTarget = new THREE.RenderTarget( window.innerWidth * dpr, window.innerHeight * dpr, {
-					samples: params.samples,
+					samples: params.multisampling ? 4 : 1,
 					depthBuffer: true,
 				} );
 
@@ -159,7 +172,7 @@
 
 				}
 
-				renderTarget.samples = params.samples;
+				renderTarget.samples = params.multisampling ? 4 : 1;
 
 				renderer.setRenderTarget( renderTarget );
 				renderer.render( scene, camera );

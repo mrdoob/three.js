@@ -19,13 +19,12 @@ import {
 	TextureLoader,
 	SRGBColorSpace
 } from 'three';
-import * as fflate from '../libs/fflate.module.js';
+import { unzipSync } from '../libs/fflate.module.js';
 
 const COLOR_SPACE_3MF = SRGBColorSpace;
 
 /**
- *
- * 3D Manufacturing Format (3MF) specification: https://3mf.io/specification/
+ * A loader for the [3D Manufacturing Format (3MF)](https://3mf.io/specification/) format.
  *
  * The following features from the core specification are supported:
  *
@@ -39,18 +38,47 @@ const COLOR_SPACE_3MF = SRGBColorSpace;
  * - Texture 2D Groups
  * - Color Groups (Vertex Colors)
  * - Metallic Display Properties (PBR)
+ *
+ * ```js
+ * const loader = new ThreeMFLoader();
+ *
+ * const object = await loader.loadAsync( './models/3mf/truck.3mf' );
+ * object.rotation.set( - Math.PI / 2, 0, 0 ); // z-up conversion
+ * scene.add( object );
+ * ```
+ *
+ * @augments Loader
+ * @three_import import { ThreeMFLoader } from 'three/addons/loaders/3MFLoader.js';
  */
-
 class ThreeMFLoader extends Loader {
 
+	/**
+	 * Constructs a new 3MF loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
 
+		/**
+		 * An array of available extensions.
+		 *
+		 * @type {Array<Object>}
+		 */
 		this.availableExtensions = [];
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded 3MF asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(Group)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -85,6 +113,12 @@ class ThreeMFLoader extends Loader {
 
 	}
 
+	/**
+	 * Parses the given 3MF data and returns the resulting group.
+	 *
+	 * @param {ArrayBuffer} data - The raw 3MF asset data as an array buffer.
+	 * @return {Group} A group representing the parsed asset.
+	 */
 	parse( data ) {
 
 		const scope = this;
@@ -109,7 +143,7 @@ class ThreeMFLoader extends Loader {
 
 			try {
 
-				zip = fflate.unzipSync( new Uint8Array( data ) );
+				zip = unzipSync( new Uint8Array( data ) );
 
 			} catch ( e ) {
 
@@ -122,6 +156,8 @@ class ThreeMFLoader extends Loader {
 
 			}
 
+			let rootModelFile = null;
+
 			for ( file in zip ) {
 
 				if ( file.match( /\_rels\/.rels$/ ) ) {
@@ -132,9 +168,13 @@ class ThreeMFLoader extends Loader {
 
 					modelRelsName = file;
 
-				} else if ( file.match( /^3D\/.*\.model$/ ) ) {
+				} else if ( file.match( /^3D\/[^\/]*\.model$/ ) ) {
 
-					modelPartNames.push( file );
+					rootModelFile = file;
+
+				} else if ( file.match( /^3D\/.*\/.*\.model$/ ) ) {
+
+					modelPartNames.push( file ); // sub models
 
 				} else if ( file.match( /^3D\/Textures?\/.*/ ) ) {
 
@@ -143,6 +183,8 @@ class ThreeMFLoader extends Loader {
 				}
 
 			}
+
+			modelPartNames.push( rootModelFile ); // push root model at the end so it is processed after the sub models
 
 			if ( relsName === undefined ) throw new Error( 'THREE.ThreeMFLoader: Cannot find relationship file `rels` in 3MF archive.' );
 
@@ -372,6 +414,73 @@ class ThreeMFLoader extends Loader {
 			colorGroupData[ 'colors' ] = new Float32Array( colors );
 
 			return colorGroupData;
+
+		}
+
+		function parseImplicitIONode( implicitIONode ) {
+
+			const portNodes = implicitIONode.children;
+			const portArguments = {};
+			for ( let i = 0; i < portNodes.length; i ++ ) {
+
+				const args = { type: portNodes[ i ].nodeName.substring( 2 ) };
+				for ( let j = 0; j < portNodes[ i ].attributes.length; j ++ ) {
+
+					const attrib = portNodes[ i ].attributes[ j ];
+					if ( attrib.specified ) {
+
+		 				args[ attrib.name ] = attrib.value;
+
+					}
+
+				}
+
+				portArguments[ portNodes[ i ].getAttribute( 'identifier' ) ] = args;
+
+			}
+
+			return portArguments;
+
+		}
+
+		function parseImplicitFunctionNode( implicitFunctionNode ) {
+
+			const implicitFunctionData = {
+				id: implicitFunctionNode.getAttribute( 'id' ),
+				displayname: implicitFunctionNode.getAttribute( 'displayname' )
+			};
+
+			const functionNodes = implicitFunctionNode.children;
+
+			const operations = {};
+
+			for ( let i = 0; i < functionNodes.length; i ++ ) {
+
+				const operatorNode = functionNodes[ i ];
+
+				if ( operatorNode.nodeName === 'i:in' || operatorNode.nodeName === 'i:out' ) {
+
+					operations[ operatorNode.nodeName === 'i:in' ? 'inputs' : 'outputs' ] = parseImplicitIONode( operatorNode );
+
+				} else {
+
+					const inputNodes = operatorNode.children;
+					const portArguments = { 'op': operatorNode.nodeName.substring( 2 ), 'identifier': operatorNode.getAttribute( 'identifier' ) };
+					for ( let i = 0; i < inputNodes.length; i ++ ) {
+
+						portArguments[ inputNodes[ i ].nodeName.substring( 2 ) ] = parseImplicitIONode( inputNodes[ i ] );
+
+					}
+
+					operations[ portArguments[ 'identifier' ] ] = portArguments;
+
+				}
+
+			}
+
+			implicitFunctionData[ 'operations' ] = operations;
+
+			return implicitFunctionData;
 
 		}
 
@@ -673,6 +782,25 @@ class ThreeMFLoader extends Loader {
 
 			//
 
+			const implicitFunctionNodes = resourcesNode.querySelectorAll( 'implicitfunction' );
+
+			if ( implicitFunctionNodes.length > 0 ) {
+
+				resourcesData[ 'implicitfunction' ] = {};
+
+			}
+
+
+			for ( let i = 0; i < implicitFunctionNodes.length; i ++ ) {
+
+				const implicitFunctionNode = implicitFunctionNodes[ i ];
+				const implicitFunctionData = parseImplicitFunctionNode( implicitFunctionNode );
+				resourcesData[ 'implicitfunction' ][ implicitFunctionData[ 'id' ] ] = implicitFunctionData;
+
+			}
+
+			//
+
 			resourcesData[ 'pbmetallicdisplayproperties' ] = {};
 			const pbmetallicdisplaypropertiesNodes = resourcesNode.querySelectorAll( 'pbmetallicdisplayproperties' );
 
@@ -846,11 +974,13 @@ class ThreeMFLoader extends Loader {
 					case 'linear':
 						texture.magFilter = LinearFilter;
 						texture.minFilter = LinearFilter;
+						texture.generateMipmaps = false;
 						break;
 
 					case 'nearest':
 						texture.magFilter = NearestFilter;
 						texture.minFilter = NearestFilter;
+						texture.generateMipmaps = false;
 						break;
 
 					default:
@@ -1367,6 +1497,12 @@ class ThreeMFLoader extends Loader {
 
 			}
 
+			if ( modelData.resources.implicitfunction ) {
+
+				console.warn( 'THREE.ThreeMFLoader: Implicit Functions are implemented in data-only.', modelData.resources.implicitfunction );
+
+			}
+
 		}
 
 		function buildObjects( data3mf ) {
@@ -1469,6 +1605,11 @@ class ThreeMFLoader extends Loader {
 
 	}
 
+	/**
+	 * Adds a 3MF extension.
+	 *
+	 * @param {Object} extension - The extension to add.
+	 */
 	addExtension( extension ) {
 
 		this.availableExtensions.push( extension );

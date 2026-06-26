@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { TubeGeometry } from '../../../../src/geometries/TubeGeometry.js';
 
 import { LineCurve3 } from '../../../../src/extras/curves/LineCurve3.js';
@@ -50,51 +48,6 @@ export default QUnit.module( 'Geometries', () => {
 				object.type === 'TubeGeometry',
 				'TubeGeometry.type should be TubeGeometry'
 			);
-
-		} );
-
-		QUnit.todo( 'parameters', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'tangents', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'normals', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'binormals', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// PUBLIC
-		QUnit.todo( 'toJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// STATIC
-		QUnit.todo( 'fromJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// OTHERS
-		QUnit.todo( 'Standard geometry tests', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

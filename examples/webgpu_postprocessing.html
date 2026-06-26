@@ -4,14 +4,30 @@
 		<title>three.js webgpu - postprocessing</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta property="og:title" content="three.js webgpu - postprocessing">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_postprocessing.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_postprocessing.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Post Processing</span>
+			</div>
+
+			<small>Mix of simple post processing effects.</small>
+		</div>
+
 		<script type="importmap">
 			{
 				"imports": {
 					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -19,10 +35,13 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { pass } from 'three/tsl';
+			import { dotScreen } from 'three/addons/tsl/display/DotScreenNode.js';
+			import { rgbShift } from 'three/addons/tsl/display/RGBShiftNode.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let camera, renderer, postProcessing;
+			let camera, renderer, renderPipeline;
 			let object;
 
 			init();
@@ -33,6 +52,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -41,6 +61,7 @@
 				camera.position.z = 400;
 
 				const scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
 				scene.fog = new THREE.Fog( 0x000000, 1, 1000 );
 
 				object = new THREE.Object3D();
@@ -68,18 +89,18 @@
 
 				// postprocessing
 
-				postProcessing = new THREE.PostProcessing( renderer );
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				const scenePass = pass( scene, camera );
-				const scenePassColor = scenePass.getTextureNode();
+				const scenePassColor = scenePass.getTextureNode().toInspector( 'Scene Color' );
 
-				const dotScreenPass = scenePassColor.dotScreen();
+				const dotScreenPass = dotScreen( scenePassColor );
 				dotScreenPass.scale.value = 0.3;
 
-				const rgbShiftPass = dotScreenPass.rgbShift();
+				const rgbShiftPass = rgbShift( dotScreenPass );
 				rgbShiftPass.amount.value = 0.001;
 
-				postProcessing.outputNode = rgbShiftPass;
+				renderPipeline.outputNode = rgbShiftPass;
 
 				//
 
@@ -101,7 +122,7 @@
 				object.rotation.x += 0.005;
 				object.rotation.y += 0.01;
 
-				postProcessing.render();
+				renderPipeline.render();
 
 			}
 

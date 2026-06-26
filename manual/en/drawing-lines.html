@@ -1,0 +1,91 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <title>Drawing Lines</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Drawing Lines">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Drawing Lines</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          
+          <p>
+            Let's say you want to draw a line or a circle, not a wireframe `Mesh`.
+            First we need to set up the renderer, scene and camera (see the Creating a scene page).
+          </p>
+    
+          <p>Here is the code that we will use:</p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( renderer.domElement );
+
+const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
+camera.position.set( 0, 0, 100 );
+camera.lookAt( 0, 0, 0 );
+
+const scene = new THREE.Scene();
+</pre>
+          <p>Next thing we will do is define a material. For lines we have to use `LineBasicMaterial` or `LineDashedMaterial`.</p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+//create a blue LineBasicMaterial
+const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+</pre>
+    
+          <p>
+            After material we will need a geometry with some vertices:
+          </p>
+    
+<pre class="prettyprint notranslate lang-js" translate="no">
+const points = [];
+points.push( new THREE.Vector3( - 10, 0, 0 ) );
+points.push( new THREE.Vector3( 0, 10, 0 ) );
+points.push( new THREE.Vector3( 10, 0, 0 ) );
+
+const geometry = new THREE.BufferGeometry().setFromPoints( points );
+</pre>
+    
+          <p>Note that lines are drawn between each consecutive pair of vertices, but not between the first and last (the line is not closed.)</p>
+    
+          <p>Now that we have points for two lines and a material, we can put them together to form a line.</p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+const line = new THREE.Line( geometry, material );
+</pre>
+          <p>All that's left is to add it to the scene and call `renderer.render()`.</p>
+    
+<pre class="prettyprint notranslate lang-js" translate="no">
+scene.add( line );
+renderer.render( scene, camera );
+</pre>
+    
+          <p>You should now be seeing an arrow pointing upwards, made from two blue lines.</p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

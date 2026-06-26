@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { ArcCurve } from '../../../../../src/extras/curves/ArcCurve.js';
 
 import { EllipseCurve } from '../../../../../src/extras/curves/EllipseCurve.js';

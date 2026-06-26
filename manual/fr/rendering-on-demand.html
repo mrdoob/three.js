@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="fr"><head>
     <meta charset="utf-8">
-    <title>Rendering on Demand</title>
+    <title>Rendu à la demande</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
@@ -22,12 +22,166 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>Rendering on Demand</h1>
+        <h1>Rendu à la demande</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p>Désolé, cet article n'a pas encore été traduit. <a href="https://github.com/mrdoob/three.js">Les traductions sont le bienvenue</a>! 😄</p>
-<p><a href="/manual/en/rendering-on-demand.html">Voici l'article anglais originel pour le moment</a>.</p>
+          <p>Le sujet peut sembler évident pour beaucoup, mais au cas où... la plupart des exemples Three.js rendent en continu. En d'autres termes, ils mettent en place une boucle <code class="notranslate" translate="no">requestAnimationFrame</code> ou "<em>boucle rAF</em>" comme ceci</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render() {
+  ...
+  requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
+</pre>
+<p>Pour quelque chose qui s'anime, cela a du sens, mais qu'en est-il de quelque chose qui ne s'anime pas ? Dans ce cas, rendre en continu est un gaspillage de la puissance de l'appareil et si l'utilisateur est sur un appareil portable, cela gaspille la batterie de l'utilisateur. </p>
+<p>La façon la plus évidente de résoudre ce problème est de rendre une fois au début, puis de ne rendre que lorsque quelque chose change. Les changements incluent le chargement final des textures ou des modèles, l'arrivée de données depuis une source externe, l'ajustement d'un paramètre par l'utilisateur, le changement de caméra ou d'autres entrées pertinentes.</p>
+<p>Prenons un exemple de <a href="responsive.html">l'article sur la réactivité</a> et modifions-le pour qu'il rende à la demande.</p>
+<p>D'abord, nous allons ajouter les <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> afin qu'il y ait quelque chose qui puisse changer et auquel nous puissions réagir en rendant.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+</pre>
+<p>et les configurer</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
+const aspect = 2;  // the canvas default
+const near = 0.1;
+const far = 5;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+camera.position.z = 2;
+
++const controls = new OrbitControls(camera, canvas);
++controls.target.set(0, 0, 0);
++controls.update();
+</pre>
+<p>Puisque nous n'animerons plus les cubes, nous n'avons plus besoin de les suivre</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const cubes = [
+-  makeInstance(geometry, 0x44aa88,  0),
+-  makeInstance(geometry, 0x8844aa, -2),
+-  makeInstance(geometry, 0xaa8844,  2),
+-];
++makeInstance(geometry, 0x44aa88,  0);
++makeInstance(geometry, 0x8844aa, -2);
++makeInstance(geometry, 0xaa8844,  2);
+</pre>
+<p>Nous pouvons supprimer le code d'animation des cubes et les appels à <code class="notranslate" translate="no">requestAnimationFrame</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function render(time) {
+-  time *= 0.001;
++function render() {
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
+-  cubes.forEach((cube, ndx) =&gt; {
+-    const speed = 1 + ndx * .1;
+-    const rot = time * speed;
+-    cube.rotation.x = rot;
+-    cube.rotation.y = rot;
+  });
+
+  renderer.render(scene, camera);
+
+-  requestAnimationFrame(render);
+}
+
+-requestAnimationFrame(render);
+</pre>
+<p>puis nous devons rendre une fois</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">render();
+</pre>
+<p>Nous devons rendre chaque fois que les <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> modifient les paramètres de la caméra. Heureusement, les <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> déclenchent un événement <code class="notranslate" translate="no">change</code> chaque fois que quelque chose change.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">controls.addEventListener('change', render);
+</pre>
+<p>Nous devons également gérer le cas où l'utilisateur redimensionne la fenêtre. C'était géré automatiquement auparavant puisque nous rendions en continu, mais maintenant que nous ne le faisons plus, nous devons rendre lorsque la taille de la fenêtre change.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">window.addEventListener('resize', render);
+</pre>
+<p>Et avec cela, nous obtenons quelque chose qui rend à la demande.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/render-on-demand.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/render-on-demand.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Les <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> ont des options pour ajouter une sorte d'inertie afin de les rendre moins rigides. Nous pouvons l'activer en définissant la propriété <code class="notranslate" translate="no">enableDamping</code> sur true.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">controls.enableDamping = true;
+</pre>
+<p>Avec <code class="notranslate" translate="no">enableDamping</code> activé, nous devons appeler <code class="notranslate" translate="no">controls.update</code> dans notre fonction de rendu afin que les <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> puissent continuer à nous fournir de nouveaux paramètres de caméra pendant qu'ils lissent le mouvement. Mais cela signifie que nous ne pouvons pas appeler <code class="notranslate" translate="no">render</code> directement depuis l'événement <code class="notranslate" translate="no">change</code> car nous nous retrouverions dans une boucle infinie. Les contrôles nous enverraient un événement <code class="notranslate" translate="no">change</code> et appelleraient <code class="notranslate" translate="no">render</code>, <code class="notranslate" translate="no">render</code> appellerait <code class="notranslate" translate="no">controls.update</code>. <code class="notranslate" translate="no">controls.update</code> enverrait un autre événement <code class="notranslate" translate="no">change</code>.</p>
+<p>Nous pouvons résoudre cela en utilisant <code class="notranslate" translate="no">requestAnimationFrame</code> pour appeler <code class="notranslate" translate="no">render</code>, mais nous devons nous assurer de ne demander une nouvelle image que si une n'a pas déjà été demandée, ce que nous pouvons faire en conservant une variable qui suit si nous avons déjà demandé une image.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+let renderRequested = false;
+
+function render() {
++  renderRequested = false;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
+  renderer.render(scene, camera);
+}
+render();
+
++function requestRenderIfNotRequested() {
++  if (!renderRequested) {
++    renderRequested = true;
++    requestAnimationFrame(render);
++  }
++}
+
+-controls.addEventListener('change', render);
++controls.addEventListener('change', requestRenderIfNotRequested);
+</pre>
+<p>Nous devrions probablement aussi utiliser <code class="notranslate" translate="no">requestRenderIfNotRequested</code> pour le redimensionnement également</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-window.addEventListener('resize', render);
++window.addEventListener('resize', requestRenderIfNotRequested);
+</pre>
+<p>Il peut être difficile de voir la différence. Essayez de cliquer sur l'exemple ci-dessous et utilisez les touches fléchées pour vous déplacer ou faites glisser pour faire tourner. Ensuite, essayez de cliquer sur l'exemple ci-dessus et faites la même chose, et vous devriez pouvoir faire la différence. Celui d'en haut s'accroche lorsque vous appuyez sur une touche fléchée ou faites glisser, celui d'en bas glisse.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/render-on-demand-w-damping.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/render-on-demand-w-damping.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Ajoutons également une simple GUI lil-gui et faisons en sorte que ses modifications rendent à la demande.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
++import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
+</pre>
+<p>Permettons de définir la couleur et l'échelle x de chaque cube. Pour pouvoir définir la couleur, nous utiliserons le <code class="notranslate" translate="no">ColorGUIHelper</code> que nous avons créé dans <a href="lights.html">l'article sur les lumières</a>.</p>
+<p>Tout d'abord, nous devons créer une GUI</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
+</pre>
+<p>puis pour chaque cube, nous créerons un dossier et ajouterons 2 contrôles, un pour <code class="notranslate" translate="no">material.color</code> et un autre pour <code class="notranslate" translate="no">cube.scale.x</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, x) {
+  const material = new THREE.MeshPhongMaterial({color});
+
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
+
+  cube.position.x = x;
+
++  const folder = gui.addFolder(`Cube${x}`);
++  folder.addColor(new ColorGUIHelper(material, 'color'), 'value')
++      .name('color')
++      .onChange(requestRenderIfNotRequested);
++  folder.add(cube.scale, 'x', .1, 1.5)
++      .name('scale x')
++      .onChange(requestRenderIfNotRequested);
++  folder.open();
+
+  return cube;
+}
+</pre>
+<p>Vous pouvez voir ci-dessus que les contrôles lil-gui ont une méthode <code class="notranslate" translate="no">onChange</code> à laquelle vous pouvez passer une fonction de rappel à appeler lorsque la GUI modifie une valeur. Dans notre cas, nous avons juste besoin qu'elle appelle <code class="notranslate" translate="no">requestRenderIfNotRequested</code>. L'appel à <code class="notranslate" translate="no">folder.open</code> fait que le dossier s'ouvre dès le départ.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/render-on-demand-w-gui.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/render-on-demand-w-gui.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>J'espère que cela vous donne une idée de la façon de faire en sorte que three.js rende à la demande plutôt qu'en continu. Les applications/pages qui rendent three.js à la demande ne sont pas aussi courantes que la plupart des pages utilisant three.js qui sont soit des jeux, soit de l'art animé en 3D, mais des exemples de pages qui pourraient mieux rendre à la demande seraient, par exemple, une visionneuse de carte, un éditeur 3D, un générateur de graphiques 3D, un catalogue de produits, etc...</p>
 
         </div>
       </div>

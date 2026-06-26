@@ -1,5 +1,4 @@
-import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
-import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
+import { BufferAttribute, BufferGeometry } from 'three';
 import * as BufferGeometryUtils from '../../../../examples/jsm/utils/BufferGeometryUtils.js';
 
 const getGeometry = () => {

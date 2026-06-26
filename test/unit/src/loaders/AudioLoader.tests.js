@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { AudioLoader } from '../../../../src/loaders/AudioLoader.js';
 
 import { Loader } from '../../../../src/loaders/Loader.js';
@@ -24,13 +22,6 @@ export default QUnit.module( 'Loaders', () => {
 
 			const object = new AudioLoader();
 			assert.ok( object, 'Can instantiate an AudioLoader.' );
-
-		} );
-
-		// PUBLIC
-		QUnit.todo( 'load', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

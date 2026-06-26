@@ -7,7 +7,7 @@ export const state = {
 
 export const pickPosition = { x: 0, y: 0 };
 
-export function init( data ) { // eslint-disable-line no-unused-vars
+export function init( data ) {
 
 	const { canvas } = data;
 	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );

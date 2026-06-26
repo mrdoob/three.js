@@ -1,0 +1,40 @@
+<?js
+	var data = obj;
+	var self = this;
+	var defaultObjectClass = '';
+
+	// Check if the default value is an object or array; if so, apply code highlighting
+	if (data.defaultvalue && (data.defaultvaluetype === 'object' || data.defaultvaluetype === 'array')) {
+		data.defaultvalue = "<pre class=\"prettyprint\"><code>" + data.defaultvalue + "</code></pre>";
+		defaultObjectClass = ' class="object-value"';
+	}
+?>
+	<?js
+		var properties = data.properties;
+		if (properties && properties.length && properties.forEach && !data.hideconstructor) {
+	?>
+						<?js= this.partial('properties.tmpl', data) ?>
+	<?js } ?>
+	<?js if (data.overrides || data.deprecated || (data.see && see.length)) { ?>
+						<dl class="details">
+							<?js if (data.overrides) { ?>
+							<dt class="tag-overrides"><strong>Overrides:</strong> <?js= this.linkto(data.overrides, this.htmlsafe(data.overrides)) ?></dt>
+							<?js } ?>
+							<?js if (data.deprecated) { ?>
+							<dt class="important tag-deprecated"><strong>Deprecated:</strong> <?js
+								if (data.deprecated === true) { ?>Yes<?js }
+								else { ?><?js= data.deprecated ?><?js }
+							?></dt>
+							<?js } ?>
+							<?js if (data.see && see.length) {?>
+							<dt class="tag-see">See:</dt>
+							<dd class="tag-see">
+								<ul>
+									<?js see.forEach(function(s) { ?>
+									<li><?js= self.linkto(s) ?></li>
+									<?js }); ?>
+								</ul>
+							</dd>
+							<?js } ?>
+						</dl>
+	<?js } ?>

@@ -1,18 +1,8 @@
-/* global QUnit */
-
 import { EdgesGeometry } from '../../../../src/geometries/EdgesGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
-
-// DEBUGGING
-import { Scene } from '../../../../src/scenes/Scene.js';
-import { Mesh } from '../../../../src/objects/Mesh.js';
-import { LineSegments } from '../../../../src/objects/LineSegments.js';
-import { LineBasicMaterial } from '../../../../src/materials/LineBasicMaterial.js';
-import { WebGLRenderer } from '../../../../src/renderers/WebGLRenderer.js';
-import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera.js';
 
 //
 // HELPERS
@@ -32,7 +22,6 @@ function testEdges( vertList, idxList, numAfter, assert ) {
 		const egeom = new EdgesGeometry( geom );
 
 		assert.equal( countEdges( egeom ), numAfter, 'Edges after!' );
-		output( geom, egeom );
 
 	}
 
@@ -132,75 +121,6 @@ function countEdges( geom ) {
 
 }
 
-//
-// DEBUGGING
-//
-const DEBUG = false;
-let renderer;
-let camera;
-const scene = new Scene();
-let xoffset = 0;
-
-function output( geom, egeom ) {
-
-	if ( DEBUG !== true ) return;
-
-	if ( ! renderer ) initDebug();
-
-	const mesh = new Mesh( geom, undefined );
-	const edges = new LineSegments( egeom, new LineBasicMaterial( { color: 'black' } ) );
-
-	mesh.position.setX( xoffset );
-	edges.position.setX( xoffset ++ );
-	scene.add( mesh );
-	scene.add( edges );
-
-	if ( scene.children.length % 8 === 0 ) {
-
-		xoffset += 2;
-
-	}
-
-}
-
-function initDebug() {
-
-	renderer = new WebGLRenderer( {
-
-		antialias: true
-
-	} );
-
-	const width = 600;
-	const height = 480;
-
-	renderer.setSize( width, height );
-	renderer.setClearColor( 0xCCCCCC );
-
-	camera = new PerspectiveCamera( 45, width / height, 1, 100 );
-	camera.position.x = 30;
-	camera.position.z = 40;
-	camera.lookAt( new Vector3( 30, 0, 0 ) );
-
-	document.body.appendChild( renderer.domElement );
-
-	const controls = new THREE.OrbitControls( camera, renderer.domElement ); // TODO: please do somethings for that -_-'
-	controls.target = new Vector3( 30, 0, 0 );
-
-	animate();
-
-	function animate() {
-
-		requestAnimationFrame( animate );
-
-		controls.update();
-
-		renderer.render( scene, camera );
-
-	}
-
-}
-
 export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'EdgesGeometry', () => {
@@ -240,12 +160,6 @@ export default QUnit.module( 'Geometries', () => {
 				object.type === 'EdgesGeometry',
 				'EdgesGeometry.type should be EdgesGeometry'
 			);
-
-		} );
-
-		QUnit.todo( 'parameters', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

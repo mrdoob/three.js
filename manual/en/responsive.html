@@ -141,7 +141,7 @@ is an interesting part of the canvas spec and it's best not to set the same
 size if it's already the size we want.</p>
 <p>Once we know if we need to resize or not we then call <code class="notranslate" translate="no">renderer.setSize</code> and
 pass in the new width and height. It's important to pass <code class="notranslate" translate="no">false</code> at the end.
-<code class="notranslate" translate="no">render.setSize</code> by default sets the canvas's CSS size but doing so is not
+<code class="notranslate" translate="no">renderer.setSize</code> by default sets the canvas's CSS size but doing so is not
 what we want. We want the browser to continue to work how it does for all other
 elements which is to use CSS to determine the display size of the element. We don't
 want canvases used by three to be different than other elements.</p>
@@ -257,9 +257,39 @@ There is no special case where magic is happening behind the scenes.</p>
 <p>It might be hard to see the difference but if you have an HD-DPI
 display and you compare this sample to those above you should
 notice the edges are more crisp.</p>
+
+<h2 id="hd-dpi-limiting-maximum-drawing-buffer-size">
+  HD-DPI: Limiting maximum drawing buffer size
+</h2>
+
+<p>When using a fractional UI scaling factor on some operating system
+(eg: 150% on OSX or Linux) the assumption that the real physical
+resolution equals <code>width * window.devicePixelRatio</code> and
+<code>height * window.devicePixelRatio</code> no longer holds.
+This may lead to excessive GPU load, lower frame rates and high power 
+consumption.</p> 
+<p>A possible mitigation is to cap the maximum internal resolution (e.g. limit
+width × height) so the buffer remains within safe bounds.</p> 
+
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">    function resizeRendererToDisplaySize(renderer, maxPixelCount=3840*2160) {
+      const canvas = renderer.domElement;
+      const pixelRatio = window.devicePixelRatio;
+      let width  = Math.floor( canvas.clientWidth  * pixelRatio );
+      let height = Math.floor( canvas.clientHeight * pixelRatio );
+      const pixelCount = width * height;
+      const renderScale = pixelCount > maxPixelCount ? Math.sqrt(maxPixelCount / pixelCount) : 1;
+      width = Math.floor(width * renderScale);
+      height = Math.floor(height * renderScale);
+
+      const needResize = canvas.width !== width || canvas.height !== height;
+      if (needResize) {
+        renderer.setSize(width, height, false);
+      }
+      return needResize;
+    }
+</pre>
 <p>This article covered a very basic but fundamental topic. Next up lets quickly
 <a href="primitives.html">go over the basic primitives that three.js provides</a>.</p>
-
         </div>
       </div>
     </div>

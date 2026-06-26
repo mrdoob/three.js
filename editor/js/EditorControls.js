@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 class EditorControls extends THREE.EventDispatcher {
 
-	constructor( object, domElement ) {
+	constructor( object ) {
 
 		super();
 
@@ -34,9 +34,17 @@ class EditorControls extends THREE.EventDispatcher {
 		var pointers = [];
 		var pointerPositions = {};
 
+		var domElement = null;
+
 		// events
 
 		var changeEvent = { type: 'change' };
+
+		this.setCamera = function ( camera ) {
+
+			object = camera;
+
+		};
 
 		this.focus = function ( target ) {
 
@@ -64,13 +72,22 @@ class EditorControls extends THREE.EventDispatcher {
 
 			object.position.copy( center ).add( delta );
 
+			if ( object.isOrthographicCamera ) {
+
+				object.zoom = ( object.top - object.bottom ) / ( distance * 2 );
+				object.updateProjectionMatrix();
+
+			}
+
 			scope.dispatchEvent( changeEvent );
 
 		};
 
 		this.pan = function ( delta ) {
 
-			var distance = object.position.distanceTo( center );
+			var distance = object.isOrthographicCamera
+				? ( object.top - object.bottom ) / object.zoom
+				: object.position.distanceTo( center );
 
 			delta.multiplyScalar( distance * scope.panSpeed );
 			delta.applyMatrix3( normalMatrix.getNormalMatrix( object.matrix ) );
@@ -84,15 +101,24 @@ class EditorControls extends THREE.EventDispatcher {
 
 		this.zoom = function ( delta ) {
 
-			var distance = object.position.distanceTo( center );
+			if ( object.isOrthographicCamera ) {
 
-			delta.multiplyScalar( distance * scope.zoomSpeed );
+				object.zoom = Math.max( 0.0001, object.zoom * Math.pow( 0.95, delta.z ) );
+				object.updateProjectionMatrix();
 
-			if ( delta.length() > distance ) return;
+			} else {
 
-			delta.applyMatrix3( normalMatrix.getNormalMatrix( object.matrix ) );
+				var distance = object.position.distanceTo( center );
 
-			object.position.add( delta );
+				delta.multiplyScalar( distance * scope.zoomSpeed );
+
+				if ( delta.length() > distance ) return;
+
+				delta.applyMatrix3( normalMatrix.getNormalMatrix( object.matrix ) );
+
+				object.position.add( delta );
+
+			}
 
 			scope.dispatchEvent( changeEvent );
 
@@ -269,7 +295,21 @@ class EditorControls extends THREE.EventDispatcher {
 
 		}
 
-		this.dispose = function () {
+		this.connect = function ( element ) {
+
+			if ( domElement !== null ) this.disconnect();
+
+			domElement = element;
+
+			domElement.addEventListener( 'contextmenu', contextmenu );
+			domElement.addEventListener( 'dblclick', onMouseUp );
+			domElement.addEventListener( 'wheel', onMouseWheel, { passive: false } );
+
+			domElement.addEventListener( 'pointerdown', onPointerDown );
+
+		};
+
+		this.disconnect = function () {
 
 			domElement.removeEventListener( 'contextmenu', contextmenu );
 			domElement.removeEventListener( 'dblclick', onMouseUp );
@@ -277,13 +317,9 @@ class EditorControls extends THREE.EventDispatcher {
 
 			domElement.removeEventListener( 'pointerdown', onPointerDown );
 
+			domElement = null;
+
 		};
-
-		domElement.addEventListener( 'contextmenu', contextmenu );
-		domElement.addEventListener( 'dblclick', onMouseUp );
-		domElement.addEventListener( 'wheel', onMouseWheel, { passive: false } );
-
-		domElement.addEventListener( 'pointerdown', onPointerDown );
 
 		// touch
 
@@ -352,7 +388,8 @@ class EditorControls extends THREE.EventDispatcher {
 
 					touches[ 0 ].set( event.pageX, event.pageY, 0 ).divideScalar( window.devicePixelRatio );
 					touches[ 1 ].set( position.x, position.y, 0 ).divideScalar( window.devicePixelRatio );
-					var distance = touches[ 0 ].distanceTo( touches[ 1 ] );
+					// Divide by 10 to offset inherent over-sensitivity (https://github.com/mrdoob/three.js/issues/32442)
+					var distance = touches[ 0 ].distanceTo( touches[ 1 ] ) / 10;
 					scope.zoom( delta.set( 0, 0, prevDistance - distance ) );
 					prevDistance = distance;
 
@@ -430,6 +467,20 @@ class EditorControls extends THREE.EventDispatcher {
 			return pointerPositions[ pointerId ];
 
 		}
+
+	}
+
+	fromJSON( json ) {
+
+		if ( json.center !== undefined ) this.center.fromArray( json.center );
+
+	}
+
+	toJSON() {
+
+		return {
+			center: this.center.toArray()
+		};
 
 	}
 

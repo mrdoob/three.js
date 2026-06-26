@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>StackTrace - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">StackTrace</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Class representing a stack trace for debugging purposes.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="StackTrace" translate="no">new <a href="#StackTrace">StackTrace</a><span class="signature">( stackMessage : <span class="param-type">Error | string | null</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a StackTrace instance by capturing and filtering the current stack trace.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">stackMessage</strong>
+									</td>
+									<td class="description last">
+										<p>An optional stack trace to use instead of capturing a new one.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isStackTrace" translate="no">.<a href="#isStackTrace">isStackTrace</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="stack" translate="no">.<a href="#stack">stack</a><span class="type-signature"> : Array.&lt;{fn: string, file: string, line: number, column: number}></span> </h3>
+					<div class="description">
+						<p>The stack trace.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getError" translate="no">.<a href="#getError">getError</a><span class="signature">( message : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the full error message including the stack trace.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">message</strong>
+									</td>
+									<td class="description last">
+										<p>The error message.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The full error message with stack trace.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getLocation" translate="no">.<a href="#getLocation">getLocation</a><span class="signature">()</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a formatted location string of the top stack frame.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The formatted stack trace message.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/core/StackTrace.js" translate="no" target="_blank" rel="noopener">src/nodes/core/StackTrace.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

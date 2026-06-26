@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="fr"><head>
     <meta charset="utf-8">
-    <title>VR</title>
+    <title>RV</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
@@ -22,12 +22,346 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>VR</h1>
+        <h1>RV</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p>Désolé, cet article n'a pas encore été traduit. <a href="https://github.com/mrdoob/three.js">Les traductions sont le bienvenue</a>! 😄</p>
-<p><a href="/manual/en/webxr.html">Voici l'article anglais originel pour le moment</a>.</p>
+          <p>Créer une application RV dans three.js est assez simple. Il suffit essentiellement de dire à
+three.js que vous souhaitez utiliser WebXR. Si vous y réfléchissez, quelques points concernant WebXR
+devraient être clairs. La direction vers laquelle la caméra pointe est fournie par le système RV
+lui-même, puisque l'utilisateur tourne la tête pour choisir une direction à regarder. De même,
+le champ de vision et l'aspect seront fournis par le système RV, car chaque système a un champ
+de vision et un aspect d'affichage différents.</p>
+<p>Prenons un exemple de l'article sur <a href="responsive.html">la création d'une page web responsive</a>
+et rendons-le compatible avec la RV.</p>
+<p>Avant de commencer, vous aurez besoin d'un dispositif compatible RV comme un smartphone Android,
+Google Daydream, Oculus Go, Oculus Rift, Vive, Samsung Gear VR, un iPhone avec un
+<a href="https://apps.apple.com/us/app/webxr-viewer/id1295998056">navigateur WebXR</a>.</p>
+<p>Ensuite, si vous exécutez localement, vous devez exécuter un simple serveur web, comme
+expliqué dans <a href="setup.html">l'article sur la configuration</a>.</p>
+<p>Si l'appareil que vous utilisez pour visualiser la RV n'est pas le même ordinateur sur lequel vous
+exécutez, vous devez servir votre page web via https, sinon le navigateur ne permettra pas d'utiliser
+l'API WebXR. Le serveur mentionné dans <a href="setup.html">l'article sur la configuration</a>
+appelé <a href="https://greggman.github.io/servez" target="_blank">Servez</a> a une option pour utiliser https.
+Cochez-le et démarrez le serveur.</p>
+<div class="threejs_center"><img src="../resources/images/servez-https.png" class="nobg" style="width: 912px;"></div>
+
+<p>Notez les URL. Vous avez besoin de celle qui correspond à l'adresse IP locale de votre ordinateur.
+Elle commencera généralement par <code class="notranslate" translate="no">192</code>, <code class="notranslate" translate="no">172</code> ou <code class="notranslate" translate="no">10</code>. Saisissez cette adresse complète, y compris la partie <code class="notranslate" translate="no">https://</code>
+dans le navigateur de votre appareil RV. Note : Votre ordinateur et votre appareil RV doivent être sur le même réseau local
+ou WiFi, et vous devez probablement être sur un réseau domestique. note : De nombreux cafés sont configurés pour interdire ce type
+de connexion machine à machine.</p>
+<p>Vous serez accueilli par une erreur ressemblant à celle ci-dessous. Cliquez sur "avancé" puis cliquez sur
+<em>continuer</em>.</p>
+<div class="threejs_center"><img src="../resources/images/https-warning.gif"></div>
+
+<p>Vous pouvez maintenant exécuter vos exemples.</p>
+<p>Si vous vous lancez vraiment dans le développement WebXR, une autre chose que vous devriez apprendre est
+<a href="https://developers.google.com/web/tools/chrome-devtools/remote-debugging/">le débogage à distance</a>
+afin de pouvoir voir les avertissements, les erreurs de console, et bien sûr, réellement
+<a href="debugging-javascript.html">déboguer votre code</a>.</p>
+<p>Si vous voulez juste voir le code fonctionner ci-dessous, vous pouvez simplement exécuter le code depuis
+ce site.</p>
+<p>La première chose à faire est d'inclure le support RV après
+avoir inclus three.js</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import {VRButton} from 'three/addons/webxr/VRButton.js';
+</pre>
+<p>Ensuite, nous devons activer le support WebXR de three.js et ajouter son
+bouton RV à notre page</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
++  renderer.xr.enabled = true;
++  document.body.appendChild(VRButton.createButton(renderer));
+</pre>
+<p>Nous devons laisser three.js exécuter notre boucle de rendu. Jusqu'à présent, nous avons utilisé une
+boucle <code class="notranslate" translate="no">requestAnimationFrame</code>, mais pour supporter la RV, nous devons laisser three.js gérer
+notre boucle de rendu pour nous. Nous pouvons le faire en appelant
+<a href="/docs/#api/en/renderers/WebGLRenderer.setAnimationLoop"><code class="notranslate" translate="no">WebGLRenderer.setAnimationLoop</code></a> et en passant une fonction à appeler pour la boucle.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
+  cubes.forEach((cube, ndx) =&gt; {
+    const speed = 1 + ndx * .1;
+    const rot = time * speed;
+    cube.rotation.x = rot;
+    cube.rotation.y = rot;
+  });
+
+  renderer.render(scene, camera);
+
+-  requestAnimationFrame(render);
+}
+
+-requestAnimationFrame(render);
++renderer.setAnimationLoop(render);
+</pre>
+<p>Il y a un détail de plus. Nous devrions probablement définir une hauteur de caméra
+qui soit à peu près moyenne pour un utilisateur debout.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
++camera.position.set(0, 1.6, 0);
+</pre>
+<p>et déplacer les cubes pour qu'ils soient devant la caméra</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+
+cube.position.x = x;
++cube.position.y = 1.6;
++cube.position.z = -2;
+</pre>
+<p>Nous les avons définis à <code class="notranslate" translate="no">z = -2</code> car la caméra sera maintenant à <code class="notranslate" translate="no">z = 0</code> et
+la caméra par défaut regarde vers l'axe -z.</p>
+<p>Cela soulève un point extrêmement important. <strong>Les unités en RV sont des mètres</strong>.
+En d'autres termes, <strong>Une Unité = Un Mètre</strong>. Cela signifie que la caméra est à 1,6 mètres au-dessus de 0.
+Les centres des cubes sont à 2 mètres devant la caméra. Chaque cube
+a une taille de 1x1x1 mètre. C'est important car la RV doit ajuster les choses à l'utilisateur
+<em>dans le monde réel</em>. Cela signifie que les unités utilisées dans three.js doivent correspondre
+aux mouvements de l'utilisateur lui-même.</p>
+<p>Et avec cela, nous devrions obtenir 3 cubes tournant devant
+la caméra avec un bouton pour entrer en RV.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-basic.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/webxr-basic.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Je trouve que la RV fonctionne mieux si nous avons quelque chose entourant la caméra, comme
+une pièce pour référence, alors ajoutons une simple cubemap en grille comme nous l'avons vu dans
+<a href="backgrounds.html">l'article sur les arrière-plans</a>. Nous utiliserons simplement la même texture de grille
+pour chaque côté du cube, ce qui donnera une salle en grille.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
++{
++  const loader = new THREE.CubeTextureLoader();
++  const texture = loader.load([
++    'resources/images/grid-1024.png',
++    'resources/images/grid-1024.png',
++    'resources/images/grid-1024.png',
++    'resources/images/grid-1024.png',
++    'resources/images/grid-1024.png',
++    'resources/images/grid-1024.png',
++  ]);
++  scene.background = texture;
++}
+</pre>
+<p>C'est mieux.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-basic-w-background.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/webxr-basic-w-background.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
+</div>
+
+<p></p>
+<p>Note : Pour voir réellement la RV, vous aurez besoin d'un appareil compatible WebXR.
+Je crois que la plupart des téléphones Android peuvent supporter WebXR en utilisant Chrome ou Firefox.
+Pour iOS, vous pourriez pouvoir utiliser cette <a href="https://apps.apple.com/us/app/webxr-viewer/id1295998056">application WebXR</a>,
+bien qu'en général, le support WebXR sur iOS ne soit pas supporté en mai 2019.</p>
+<p>Pour utiliser WebXR sur Android ou iPhone, vous aurez besoin d'un <em>Casque RV</em>
+pour téléphones. Vous pouvez en trouver entre 5$ pour un fait de carton
+et 100$. Malheureusement, je ne sais pas lesquels recommander. J'en ai acheté
+6 au fil des ans et ils sont tous de qualité variable. Je n'ai
+jamais payé plus d'environ 25$.</p>
+<p>Juste pour mentionner quelques-uns des problèmes</p>
+<ol>
+<li><p>Sont-ils compatibles avec votre téléphone</p>
+<p>Les téléphones existent en différentes tailles et les casques RV doivent donc correspondre.
+De nombreux casques prétendent correspondre à une grande variété de tailles. Mon expérience
+est que plus ils correspondent à de tailles, moins ils sont performants, car au lieu
+d'être conçus pour une taille spécifique, ils doivent faire des compromis
+pour correspondre à plus de tailles. Malheureusement, les casques multi-tailles sont le type le plus courant.</p>
+</li>
+<li><p>Peuvent-ils faire la mise au point pour votre visage</p>
+<p>Certains appareils ont plus d'ajustements que d'autres. Généralement, il y a
+au maximum 2 ajustements. La distance entre les lentilles et vos yeux
+et la distance entre les lentilles.</p>
+</li>
+<li><p>Sont-ils trop réfléchissants</p>
+<p>De nombreux casques ont un cône en plastique entre votre œil et le téléphone.
+Si ce plastique est brillant ou réfléchissant, il agira comme
+un miroir reflétant l'écran et sera très distrayant.</p>
+<p>Peu de critiques, voire aucune, ne semblent couvrir ce problème.</p>
+</li>
+<li><p>Sont-ils confortables sur votre visage.</p>
+<p>La plupart des appareils reposent sur votre nez comme une paire de lunettes.
+Cela peut faire mal après quelques minutes. Certains ont des sangles qui passent
+autour de votre tête. D'autres ont une 3ème sangle qui passe par-dessus votre tête. Cela
+peut aider ou non à maintenir l'appareil au bon endroit.</p>
+<p>Il s'avère que pour la plupart (tous ?) des appareils, vos yeux doivent être centrés
+avec les lentilles. Si les lentilles sont légèrement au-dessus ou en dessous de vos
+yeux, l'image devient floue. Cela peut être très frustrant
+car les choses peuvent commencer nettes, mais 45 à 60 secondes plus tard, l'appareil
+s'est déplacé de 1 millimètre vers le haut ou vers le bas et vous réalisez soudain que vous avez
+lutté pour faire la mise au point sur une image floue.</p>
+</li>
+<li><p>Sont-ils compatibles avec vos lunettes.</p>
+<p>Si vous portez des lunettes, vous devrez lire les critiques pour voir
+si un casque particulier fonctionne bien avec les lunettes.</p>
+</li>
+</ol>
+<p>Je ne peux vraiment pas faire de recommandations malheureusement. <a href="https://vr.google.com/cardboard/get-cardboard/">Google propose quelques recommandations
+bon marché faites en carton</a>,
+certains à partir de 5$, alors peut-être commencer par là et si vous aimez,
+envisagez de passer à la vitesse supérieure. 5$ c'est le prix d'un café, alors sérieusement, essayez !</p>
+<p>Il existe également 3 types de dispositifs de base.</p>
+<ol>
+<li><p>3 degrés de liberté (3dof), pas de dispositif d'entrée</p>
+<p>C'est généralement le style téléphone, bien que parfois vous puissiez
+acheter un dispositif d'entrée tiers. Les 3 degrés de liberté
+signifient que vous pouvez regarder vers le haut/bas (1), gauche/droite (2) et que vous pouvez incliner
+la tête gauche et droite (3).</p>
+</li>
+<li><p>3 degrés de liberté (3dof) avec 1 dispositif d'entrée (3dof)</p>
+<p>C'est fondamentalement Google Daydream et Oculus GO</p>
+<p>Ceux-ci permettent également 3 degrés de liberté et incluent un petit
+contrôleur qui agit comme un pointeur laser dans la RV.
+Le pointeur laser n'a également que 3 degrés de liberté. Le
+système peut dire dans quelle direction le dispositif d'entrée pointe, mais
+il ne peut pas dire où se trouve le dispositif.</p>
+</li>
+<li><p>6 degrés de liberté (6dof) avec dispositifs d'entrée (6dof)</p>
+<p>Ceux-ci sont <em>le vrai truc</em> haha. 6 degrés de liberté
+signifie que non seulement ces appareils savent dans quelle direction vous regardez,
+mais ils savent aussi où se trouve réellement votre tête. Cela signifie que
+si vous vous déplacez de gauche à droite ou d'avant en arrière ou si vous vous levez / vous asseyez,
+les appareils peuvent enregistrer cela et tout dans la RV se déplace en conséquence.
+C'est incroyablement et étonnamment réaliste. Avec une bonne démo,
+vous serez époustouflé, ou du moins je l'ai été et je le suis toujours.</p>
+<p>De plus, ces appareils incluent généralement 2 contrôleurs, un
+pour chaque main, et le système peut dire exactement où se trouvent vos
+mains et dans quelle orientation elles sont, de sorte que vous pouvez
+manipuler des choses en RV en tendant simplement la main, touchant,
+poussant, tournant, etc...</p>
+<p>Les appareils à 6 degrés de liberté incluent le Vive et Vive Pro,
+l'Oculus Rift et Quest, et je crois tous les appareils Windows MR.</p>
+</li>
+</ol>
+<p>Avec tout cela couvert, je ne sais pas avec certitude quels appareils fonctionneront avec WebXR.
+Je suis sûr à 99% que la plupart des téléphones Android fonctionneront avec Chrome. Vous pourriez
+avoir besoin d'activer le support WebXR dans <a href="about:flags"><code class="notranslate" translate="no">about:flags</code></a>. Je sais aussi que Google
+Daydream fonctionnera également et de même, vous devez activer le support WebXR dans
+<a href="about:flags"><code class="notranslate" translate="no">about:flags</code></a>. Oculus Rift, Vive et Vive Pro fonctionneront via
+Chrome ou Firefox. Je suis moins sûr pour Oculus Go et Oculus Quest car les deux
+utilisent des systèmes d'exploitation personnalisés, mais selon Internet, ils semblent tous deux fonctionner.</p>
+<p>Bien, après cette longue digression sur les dispositifs RV et WebXR, il y a certaines choses à couvrir</p>
+<ul>
+<li><p>Prise en charge de la RV et de la non-RV</p>
+<p>Pour autant que je sache, du moins depuis la version r112, il n'y a pas de moyen simple de prendre en charge
+les modes RV et non-RV avec three.js. Idéalement,
+si vous n'êtes pas en mode RV, vous devriez pouvoir contrôler la caméra en utilisant
+les moyens que vous souhaitez, par exemple les <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>,
+et vous devriez obtenir un événement lors du passage en mode RV et
+de la sortie du mode RV afin que vous puissiez activer/désactiver les contrôles.</p>
+</li>
+</ul>
+<p>Si three.js ajoute un support pour faire les deux, j'essaierai de mettre à jour
+cet article. En attendant, vous pourriez avoir besoin de 2 versions de votre
+site OU de passer un drapeau dans l'URL, quelque chose comme</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">https://mysite.com/mycooldemo?allowvr=true
+</pre><p>Alors nous pourrions ajouter des liens pour changer de mode</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div class="mode"&gt;
++    &lt;a href="?allowvr=true" id="vr"&gt;Autoriser la RV&lt;/a&gt;
++    &lt;a href="?" id="nonvr"&gt;Utiliser le mode non-RV&lt;/a&gt;
++  &lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>et du CSS pour les positionner</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">body {
+    margin: 0;
+}
+#c {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
++.mode {
++  position: absolute;
++  right: 1em;
++  top: 1em;
++}
+</pre>
+<p>dans votre code, vous pourriez utiliser ce paramètre comme ceci</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
+-  renderer.xr.enabled = true;
+-  document.body.appendChild(VRButton.createButton(renderer));
+
+  const fov = 75;
+  const aspect = 2;  // the canvas default
+  const near = 0.1;
+  const far = 5;
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+  camera.position.set(0, 1.6, 0);
+
++  const params = (new URL(document.location)).searchParams;
++  const allowvr = params.get('allowvr') === 'true';
++  if (allowvr) {
++    renderer.xr.enabled = true;
++    document.body.appendChild(VRButton.createButton(renderer));
++    document.querySelector('#vr').style.display = 'none';
++  } else {
++    // no VR, add some controls
++    const controls = new OrbitControls(camera, canvas);
++    controls.target.set(0, 1.6, -2);
++    controls.update();
++    document.querySelector('#nonvr').style.display = 'none';
++  }
+</pre>
+<p>Que ce soit bon ou mauvais, je ne sais pas. J'ai l'impression que les différences
+entre ce qui est nécessaire pour la RV et ce qui est nécessaire pour la non-RV sont souvent
+très différentes, donc pour tout sauf les choses les plus simples, peut-être que 2 pages séparées
+sont meilleures ? Vous devrez décider.</p>
+<p>Note : pour diverses raisons, cela ne fonctionnera pas dans l'éditeur en direct
+sur ce site, donc si vous voulez le vérifier,
+<a href="../examples/webxr-basic-vr-optional.html" target="_blank">cliquez ici</a>.
+Il devrait démarrer en mode non-RV et vous pouvez utiliser la souris ou les doigts pour déplacer
+la caméra. Cliquer sur "Autoriser la RV" devrait basculer pour permettre le mode RV et vous devriez
+pouvoir cliquer sur "Entrer en RV" si vous êtes sur un dispositif RV.</p>
+<ul>
+<li><p>Décider du niveau de support RV</p>
+<p>Ci-dessus, nous avons couvert 3 types de dispositifs RV.</p>
+<ul>
+<li>3DOF sans entrée</li>
+<li>3DOF + entrée 3DOF</li>
+<li>6DOF + entrée 6DOF</li>
+</ul>
+<p>Vous devez décider combien d'efforts vous êtes prêt à investir
+pour supporter chaque type de dispositif.</p>
+<p>Par exemple, le dispositif le plus simple n'a pas d'entrée. Le mieux que vous puissiez
+généralement faire est de faire en sorte qu'il y ait des boutons ou des objets dans la vue de l'utilisateur
+et si l'utilisateur aligne un marqueur au centre de l'affichage
+sur ces objets pendant une demi-seconde environ, alors ce bouton est cliqué.
+Une UX courante consiste à afficher un petit minuteur qui apparaîtra au-dessus de l'objet indiquant
+que si vous maintenez le marqueur à cet endroit pendant un moment, l'objet/bouton sera sélectionné.</p>
+<p>Puisqu'il n'y a pas d'autre entrée, c'est à peu près le mieux que vous puissiez faire</p>
+<p>Au niveau supérieur, vous avez un dispositif d'entrée 3DOF. Généralement, il
+peut pointer vers des choses et l'utilisateur dispose d'au moins 2 boutons. Le Daydream
+possède également un pavé tactile qui fournit des entrées tactiles normales.</p>
+<p>Dans tous les cas, si un utilisateur dispose de ce type d'appareil, il est beaucoup plus
+confortable pour l'utilisateur de pouvoir pointer les choses avec
+son contrôleur que de devoir le faire avec sa tête en regardant les choses.</p>
+<p>Un niveau similaire pourrait être un appareil 3DOF ou 6DOF avec un
+contrôleur de console de jeu. Vous devrez décider quoi faire ici.
+Je soupçonne que la chose la plus courante est que l'utilisateur doit toujours regarder
+pour pointer et le contrôleur est juste utilisé pour les boutons.</p>
+<p>Le dernier niveau est un utilisateur avec un casque 6DOF et 2 contrôleurs 6DOF.
+Ces utilisateurs trouveront souvent une expérience qui n'est que 3DOF
+frustrante. De même, ils s'attendent généralement à pouvoir
+manipuler virtuellement des choses avec leurs mains en RV, donc vous devrez
+décider si vous voulez supporter cela ou non.</p>
+</li>
+</ul>
+<p>Comme vous pouvez le voir, commencer en RV est assez facile, mais réaliser quelque chose de livrable en RV
+nécessitera beaucoup de décisions et de conception.</p>
+<p>Ceci était une brève introduction à la RV avec three.js. Nous aborderons
+certaines méthodes d'entrée dans des <a href="webxr-look-to-select.html">articles futurs</a>.</p>
 
         </div>
       </div>

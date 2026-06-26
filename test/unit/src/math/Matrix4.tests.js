@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Matrix3 } from '../../../../src/math/Matrix3.js';
 import { Matrix4 } from '../../../../src/math/Matrix4.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
@@ -7,7 +5,6 @@ import { Euler } from '../../../../src/math/Euler.js';
 import { Quaternion } from '../../../../src/math/Quaternion.js';
 import * as MathUtils from '../../../../src/math/MathUtils.js';
 import { eps } from '../../utils/math-constants.js';
-
 
 function matrixEquals4( a, b, tolerance ) {
 
@@ -20,7 +17,7 @@ function matrixEquals4( a, b, tolerance ) {
 
 	for ( let i = 0, il = a.elements.length; i < il; i ++ ) {
 
-		const delta = a.elements[ i ] - b.elements[ i ];
+		const delta = Math.abs( a.elements[ i ] - b.elements[ i ] );
 		if ( delta > tolerance ) {
 
 			return false;
@@ -287,13 +284,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'makeRotationFromQuaternion', ( assert ) => {
-
-			// makeRotationFromQuaternion( q )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'lookAt', ( assert ) => {
 
 			const a = new Matrix4();
@@ -374,7 +364,6 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( rhs.elements[ 13 ] == 6246 );
 			assert.ok( rhs.elements[ 14 ] == 12378 );
 			assert.ok( rhs.elements[ 15 ] == 18710 );
-
 
 		} );
 
@@ -478,6 +467,43 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'determinantAffine', ( assert ) => {
+
+			// for affine matrices (the typical object world matrix), the 3x3 result
+			// equals the full 4x4 determinant since the bottom row is [ 0, 0, 0, 1 ]
+
+			const a = new Matrix4();
+			const position = new Vector3( 5, - 2, 3 );
+			const quaternion = new Quaternion().setFromEuler( new Euler( 0.1, - 0.7, 1.3 ) );
+
+			// translation + rotation + non-uniform scale
+
+			a.compose( position, quaternion, new Vector3( 2, 3, 0.5 ) );
+			assert.ok( Math.abs( a.determinantAffine() - a.determinant() ) <= eps, 'Affine matrix: Passed!' );
+
+			// reflection (negative scale on one axis flips the winding order)
+
+			a.compose( position, quaternion, new Vector3( 2, 3, - 0.5 ) );
+			assert.ok( a.determinantAffine() < 0, 'Reflection produces a negative determinant!' );
+			assert.ok( Math.abs( a.determinantAffine() - a.determinant() ) <= eps, 'Reflection matrix: Passed!' );
+
+			// shear
+
+			a.multiply( new Matrix4().makeShear( 0.5, 0, 0.2, 0, 0.7, 0 ) );
+			assert.ok( Math.abs( a.determinantAffine() - a.determinant() ) <= eps, 'Shear matrix: Passed!' );
+
+		} );
+
+		QUnit.test( 'determinantAffine (projective matrix)', ( assert ) => {
+
+			// for non-affine (projective) matrices, the bottom row is not [ 0, 0, 0, 1 ]
+			// and so the 3x3 result generally differs from the full 4x4 determinant
+
+			const a = new Matrix4().makePerspective( - 1, 1, 1, - 1, 1, 100 );
+			assert.ok( Math.abs( a.determinantAffine() - a.determinant() ) > eps, 'Passed!' );
+
+		} );
+
 		QUnit.test( 'transpose', ( assert ) => {
 
 			const a = new Matrix4();
@@ -519,7 +545,6 @@ export default QUnit.module( 'Maths', () => {
 
 			a.copy( b ).invert();
 			assert.ok( matrixEquals4( a, zero ), 'Passed!' );
-
 
 			const testMatrices = [
 				new Matrix4().makeRotationX( 0.3 ),
@@ -606,7 +631,6 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'makeRotationY', ( assert ) => {
 
-
 			const a = new Matrix4();
 			const b = Math.sqrt( 3 ) / 2;
 			const c = new Matrix4().set( b, 0, 0.5, 0, 0, 1, 0, 0, - 0.5, 0, b, 0, 0, 0, 0, 1 );
@@ -617,7 +641,6 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'makeRotationZ', ( assert ) => {
-
 
 			const a = new Matrix4();
 			const b = Math.sqrt( 3 ) / 2;

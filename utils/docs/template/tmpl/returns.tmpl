@@ -1,0 +1,9 @@
+<?js
+var data = obj || {};
+if (data.description) {
+	var desc = description;
+	// Remove wrapping <p> tags if present to allow inline display
+	if (desc.trim().startsWith('<p>') && desc.trim().endsWith('</p>')) {
+		desc = desc.trim().slice(3, -4);
+	}
+?><?js= desc ?><?js } ?>

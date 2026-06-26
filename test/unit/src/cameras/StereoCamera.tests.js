@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { StereoCamera } from '../../../../src/cameras/StereoCamera.js';
 
 export default QUnit.module( 'Cameras', () => {
@@ -22,37 +20,6 @@ export default QUnit.module( 'Cameras', () => {
 				object.type === 'StereoCamera',
 				'StereoCamera.type should be StereoCamera'
 			);
-
-		} );
-
-		QUnit.todo( 'aspect', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'eyeSep', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'cameraL', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'cameraR', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// PUBLIC
-		QUnit.todo( 'update', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

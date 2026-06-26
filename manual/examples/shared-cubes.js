@@ -5,7 +5,7 @@ export const state = {
 	height: 150, // canvas default
 };
 
-export function init( data ) { /* eslint-disable-line no-unused-vars */
+export function init( data ) {
 
 	const { canvas } = data;
 	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );

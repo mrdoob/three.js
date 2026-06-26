@@ -4,6 +4,10 @@
 		<title>three.js webgl - test - wide gamut</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - test - wide gamut">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_test_wide_gamut.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_test_wide_gamut.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			.container {
@@ -89,6 +93,8 @@
 
 			import * as THREE from 'three';
 
+			import { DisplayP3ColorSpace, DisplayP3ColorSpaceImpl, LinearDisplayP3ColorSpace, LinearDisplayP3ColorSpaceImpl } from 'three/addons/math/ColorSpaces.js';
+
 			import WebGL from 'three/addons/capabilities/WebGL.js';
 
 			let container, camera, renderer, loader;
@@ -98,11 +104,18 @@
 
 			const slider = document.querySelector( '.slider' );
 
-			const isP3Context = WebGL.isColorSpaceAvailable( THREE.DisplayP3ColorSpace );
+			const isP3Context = WebGL.isColorSpaceAvailable( DisplayP3ColorSpace );
+
+			THREE.ColorManagement.define( {
+
+				[ DisplayP3ColorSpace ]: DisplayP3ColorSpaceImpl,
+				[ LinearDisplayP3ColorSpace ]: LinearDisplayP3ColorSpaceImpl
+
+			} );
 
 			if ( isP3Context ) {
 
-				THREE.ColorManagement.workingColorSpace = THREE.LinearDisplayP3ColorSpace;
+				THREE.ColorManagement.workingColorSpace = LinearDisplayP3ColorSpace;
 
 			}
 
@@ -132,7 +145,7 @@
 
 				if ( isP3Context && window.matchMedia( '( color-gamut: p3 )' ).matches ) {
 
-					renderer.outputColorSpace = THREE.DisplayP3ColorSpace;
+					renderer.outputColorSpace = DisplayP3ColorSpace;
 
 				}
 
@@ -149,7 +162,7 @@
 				textureR = await loader.loadAsync( path.replace( '{colorSpace}', 'p3' ) );
 
 				textureL.colorSpace = THREE.SRGBColorSpace;
-				textureR.colorSpace = THREE.DisplayP3ColorSpace;
+				textureR.colorSpace = DisplayP3ColorSpace;
 
 				sceneL.background = THREE.TextureUtils.contain( textureL, window.innerWidth / window.innerHeight );
 				sceneR.background = THREE.TextureUtils.contain( textureR, window.innerWidth / window.innerHeight );
@@ -213,7 +226,7 @@
 
 			function onGamutChange( { matches } ) {
 
-				renderer.outputColorSpace = isP3Context && matches ? THREE.DisplayP3ColorSpace : THREE.SRGBColorSpace;
+				renderer.outputColorSpace = isP3Context && matches ? DisplayP3ColorSpace : THREE.SRGBColorSpace;
 
 				textureL.needsUpdate = true;
 				textureR.needsUpdate = true;

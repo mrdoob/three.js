@@ -1,15 +1,15 @@
 import { Command } from '../Command.js';
 import { Vector3 } from 'three';
 
-/**
- * @param editor Editor
- * @param object THREE.Object3D
- * @param newPosition THREE.Vector3
- * @param optionalOldPosition THREE.Vector3
- * @constructor
- */
 class SetPositionCommand extends Command {
 
+	/**
+	 * @param {Editor} editor
+	 * @param {THREE.Object3D|null} object
+	 * @param {THREE.Vector3|null} newPosition
+	 * @param {THREE.Vector3|null} optionalOldPosition
+	 * @constructor
+	 */
 	constructor( editor, object = null, newPosition = null, optionalOldPosition = null ) {
 
 		super( editor );

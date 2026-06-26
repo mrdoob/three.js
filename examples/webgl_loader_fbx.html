@@ -4,6 +4,10 @@
 		<title>three.js webgl - FBX loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - FBX loader">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_loader_fbx.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_loader_fbx.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -37,7 +41,8 @@
 			let camera, scene, renderer, stats, object, loader, guiMorphsFolder;
 			let mixer;
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			const params = {
 				asset: 'Samba Dancing'
@@ -45,9 +50,25 @@
 
 			const assets = [
 				'Samba Dancing',
-				'morph_test'
+				'morph_test',
+				'monkey',
+				'monkey_embedded_texture',
+				'vCube',
+				'archer/ArcherRi01',
+				'warrior/Warrior',
+				'stanford-bunny',
+				'mixamo',
+				'RotationTest',
+				'exampleWindow',
+				'Head_69',
+				'morph-translation',
 			];
 
+			const scales = new Map();
+			scales.set( 'warrior/Warrior', 100 );
+			scales.set( 'archer/ArcherRi01', 100 );
+			scales.set( 'stanford-bunny', 0.001 );
+			scales.set( 'Head_69', 100 );
 
 			init();
 
@@ -128,6 +149,12 @@
 
 						object.traverse( function ( child ) {
 
+							if ( child.isSkinnedMesh ) {
+
+								child.skeleton.dispose();
+
+							}
+
 							if ( child.material ) {
 
 								const materials = Array.isArray( child.material ) ? child.material : [ child.material ];
@@ -151,6 +178,9 @@
 					//
 
 					object = group;
+
+					const scale = scales.get( asset );
+					object.scale.setScalar( scale || 1 );
 
 					if ( object.animations && object.animations.length ) {
 
@@ -210,7 +240,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				if ( mixer ) mixer.update( delta );
 

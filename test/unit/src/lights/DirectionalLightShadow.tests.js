@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { DirectionalLightShadow } from '../../../../src/lights/DirectionalLightShadow.js';
 
 import { LightShadow } from '../../../../src/lights/LightShadow.js';

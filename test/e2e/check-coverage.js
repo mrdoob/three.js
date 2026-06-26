@@ -1,8 +1,7 @@
-import chalk from 'chalk';
 import * as fs from 'fs/promises';
 
-console.red = msg => console.log( chalk.red( msg ) );
-console.green = msg => console.log( chalk.green( msg ) );
+console.red = msg => console.log( `\x1b[31m${msg}\x1b[39m` );
+console.green = msg => console.log( `\x1b[32m${msg}\x1b[39m` );
 
 main();
 
@@ -16,7 +15,7 @@ async function main() {
 
 	// screenshots
 	const S = ( await fs.readdir( 'examples/screenshots' ) )
-		.filter( s => s.indexOf( '.' ) !== -1 )
+		.filter( s => s.indexOf( '.' ) !== - 1 )
 		.map( s => s.slice( 0, s.indexOf( '.' ) ) );
 
 	// files.js

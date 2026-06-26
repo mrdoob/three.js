@@ -7,10 +7,19 @@ import { Interpolant } from '../Interpolant.js';
  * It was derived from a Hermitian construction setting the first derivative
  * at each sample position to the linear slope between neighboring positions
  * over their parameter interval.
+ *
+ * @augments Interpolant
  */
-
 class CubicInterpolant extends Interpolant {
 
+	/**
+	 * Constructs a new cubic interpolant.
+	 *
+	 * @param {TypedArray} parameterPositions - The parameter positions hold the interpolation factors.
+	 * @param {TypedArray} sampleValues - The sample values.
+	 * @param {number} sampleSize - The sample size
+	 * @param {TypedArray} [resultBuffer] - The result buffer.
+	 */
 	constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
 		super( parameterPositions, sampleValues, sampleSize, resultBuffer );

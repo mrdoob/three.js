@@ -4,6 +4,10 @@
 		<title>three.js webgl - GLTFloader + Dispersion</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - GLTFloader + Dispersion">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_loader_gltf_dispersion.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_loader_gltf_dispersion.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -50,13 +54,13 @@
 				renderer.toneMappingExposure = 1;
 				container.appendChild( renderer.domElement );
 
-				const environment = new RoomEnvironment( renderer );
+				const environment = new RoomEnvironment();
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 				scene = new THREE.Scene();
 				scene.backgroundBlurriness = 0.5;
 
-				const env = pmremGenerator.fromScene( environment ).texture;
+				const env = pmremGenerator.fromScene( environment, 0.04 ).texture;
 				scene.background = env;
 				scene.environment = env;
 				environment.dispose();

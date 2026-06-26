@@ -4,6 +4,10 @@
 		<title>three.js WebGL 2 - clip cull distance</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+		<meta property="og:title" content="three.js WebGL 2 - clip cull distance">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_clipculldistance.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_clipculldistance.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css" />
 	</head>
 	<body>
@@ -62,7 +66,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import Stats from 'three/addons/libs/stats.module.js';
 
-			let camera, controls, clock, scene, renderer, stats;
+			let camera, controls, timer, scene, renderer, stats;
 
 			let material;
 
@@ -75,7 +79,8 @@
 
 				scene = new THREE.Scene();
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				//
 
@@ -174,10 +179,12 @@
 
 			function animate() {
 
+				timer.update();
+
 				controls.update();
 				stats.update();
 
-				material.uniforms.time.value = clock.getElapsedTime();
+				material.uniforms.time.value = timer.getElapsed();
 
 				renderer.render( scene, camera );
 

@@ -717,6 +717,7 @@ class ElementProxy {
   'pointerType',
   'clientX',
   'clientY',
+  'pointerId',
   'pageX',
   'pageY',
 ]);
@@ -755,6 +756,10 @@ function makeSendPropertiesHandler(properties) {
 }
 
 function touchEventHandler(event, sendFn) {
+  // preventDefault() fixes mousemove, mouseup and mousedown 
+  // firing when doing a simple touchup touchdown
+  // Happens only at offscreen canvas
+  event.preventDefault(); 
   const touches = [];
   const data = { type: event.type, touches };
   for (let i = 0; i &lt; event.touches.length; ++i) {
@@ -762,6 +767,8 @@ function touchEventHandler(event, sendFn) {
     touches.push({
       pageX: touch.pageX,
       pageY: touch.pageY,
+      clientX: touch.clientX,
+      clientY: touch.clientY,
     });
   }
   sendFn(data);

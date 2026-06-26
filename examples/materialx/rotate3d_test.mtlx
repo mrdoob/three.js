@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <surfacematerial name="mat_rotate2d_test" type="material" nodedef="ND_surfacematerial">
+    <input name="surfaceshader" type="surfaceshader" nodename="surface_shader1" />
+  </surfacematerial>
+  <standard_surface name="surface_shader1" type="surfaceshader" nodedef="ND_standard_surface_surfaceshader">
+    <input name="base_color" type="color3" output="out" nodegraph="rotate2d_test" />
+  </standard_surface>
+  <nodegraph name="rotate2d_test">
+    <texcoord name="texcoord1" type="vector2" />
+    <separate2 name="separate_texcoord" type="vector2">
+      <input name="in" type="vector2" nodename="texcoord1" />
+    </separate2>
+    <combine3 name="texcoord_3d" type="vector3">
+      <input name="in1" type="float" nodename="separate_texcoord" output="x" />
+      <input name="in2" type="float" nodename="separate_texcoord" output="y" />
+      <input name="in3" type="float" value="0.0" />
+    </combine3>
+    <time name="time1" type="float" />
+    <multiply name="multiply1" type="float">
+      <input name="in1" type="float" nodename="time1" />
+      <input name="in2" type="float" value="10.0" />
+    </multiply>
+    <rotate3d name="rotate3d_1" type="vector3">
+      <input name="in" type="vector3" nodename="texcoord_3d" />
+      <input name="amount" type="float" nodename="multiply1" />
+      <input name="axis" type="vector3" value="0.0, 0.0, 1.0" />
+    </rotate3d>
+    <separate3 name="separate_rotated" type="vector3">
+      <input name="in" type="vector3" nodename="rotate3d_1" />
+    </separate3>
+    <combine3 name="rotated_texcoord" type="vector3">
+      <input name="in1" type="float" nodename="separate_rotated" output="x" />
+      <input name="in2" type="float" nodename="separate_rotated" output="y" />
+      <input name="in3" type="float" nodename="separate_rotated" output="z" />
+    </combine3>
+    <image name="rotated_image" type="color3">
+      <input name="file" type="filename" value="resources/Images/grid.png" />
+      <input name="default" type="color3" value="0.5, 0.5, 0.5" />
+      <input name="texcoord" type="vector2" nodename="rotated_texcoord" />
+    </image>
+    <output name="out" type="color3" nodename="rotated_image" />
+  </nodegraph>
+</materialx> 

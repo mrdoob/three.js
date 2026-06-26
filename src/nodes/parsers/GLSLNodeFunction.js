@@ -95,14 +95,24 @@ const parse = ( source ) => {
 
 	} else {
 
-		throw new Error( 'FunctionNode: Function is not a GLSL code.' );
+		throw new Error( 'THREE.FunctionNode: Function is not a GLSL code.' );
 
 	}
 
 };
 
+/**
+ * This class represents a GLSL node function.
+ *
+ * @augments NodeFunction
+ */
 class GLSLNodeFunction extends NodeFunction {
 
+	/**
+	 * Constructs a new GLSL node function.
+	 *
+	 * @param {string} source - The GLSL source.
+	 */
 	constructor( source ) {
 
 		const { type, inputs, name, precision, inputsCode, blockCode, headerCode } = parse( source );
@@ -115,6 +125,12 @@ class GLSLNodeFunction extends NodeFunction {
 
 	}
 
+	/**
+	 * This method returns the GLSL code of the node function.
+	 *
+	 * @param {string} [name=this.name] - The function's name.
+	 * @return {string} The shader code.
+	 */
 	getCode( name = this.name ) {
 
 		let code;

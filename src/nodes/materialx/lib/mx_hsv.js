@@ -1,55 +1,60 @@
 // Three.js Transpiler
 // https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/libraries/stdlib/genglsl/lib/mx_hsv.glsl
 
-import { int, float, vec3, If, tslFn } from '../../shadernode/ShaderNode.js';
-import { add, sub, mul } from '../../math/OperatorNode.js';
+import { int, float, vec3, If, Fn } from '../../tsl/TSLBase.js';
+import { add } from '../../math/OperatorNode.js';
 import { floor, trunc, max, min } from '../../math/MathNode.js';
 
-export const mx_hsvtorgb = /*#__PURE__*/ tslFn( ( [ hsv_immutable ] ) => {
+export const mx_hsvtorgb = /*@__PURE__*/ Fn( ( [ hsv ] ) => {
 
-	const hsv = vec3( hsv_immutable ).toVar();
-	const h = float( hsv.x ).toVar();
-	const s = float( hsv.y ).toVar();
-	const v = float( hsv.z ).toVar();
+	const s = hsv.y;
+	const v = hsv.z;
+
+	const result = vec3().toVar();
 
 	If( s.lessThan( 0.0001 ), () => {
 
-		return vec3( v, v, v );
+		result.assign( vec3( v, v, v ) );
 
-	} ).else( () => {
+	} ).Else( () => {
 
-		h.assign( mul( 6.0, h.sub( floor( h ) ) ) );
-		const hi = int( trunc( h ) ).toVar();
-		const f = float( h.sub( float( hi ) ) ).toVar();
-		const p = float( v.mul( sub( 1.0, s ) ) ).toVar();
-		const q = float( v.mul( sub( 1.0, s.mul( f ) ) ) ).toVar();
-		const t = float( v.mul( sub( 1.0, s.mul( sub( 1.0, f ) ) ) ) ).toVar();
+		let h = hsv.x;
+		h = h.sub( floor( h ) ).mul( 6.0 ).toVar(); // TODO: check what .toVar() is needed in node system cache
+		const hi = int( trunc( h ) );
+		const f = h.sub( float( hi ) );
+		const p = v.mul( s.oneMinus() );
+		const q = v.mul( s.mul( f ).oneMinus() );
+		const t = v.mul( s.mul( f.oneMinus() ).oneMinus() );
 
 		If( hi.equal( int( 0 ) ), () => {
 
-			return vec3( v, t, p );
+			result.assign( vec3( v, t, p ) );
 
-		} ).elseif( hi.equal( int( 1 ) ), () => {
+		} ).ElseIf( hi.equal( int( 1 ) ), () => {
 
-			return vec3( q, v, p );
+			result.assign( vec3( q, v, p ) );
 
-		} ).elseif( hi.equal( int( 2 ) ), () => {
+		} ).ElseIf( hi.equal( int( 2 ) ), () => {
 
-			return vec3( p, v, t );
+			result.assign( vec3( p, v, t ) );
 
-		} ).elseif( hi.equal( int( 3 ) ), () => {
+		} ).ElseIf( hi.equal( int( 3 ) ), () => {
 
-			return vec3( p, q, v );
+			result.assign( vec3( p, q, v ) );
 
-		} ).elseif( hi.equal( int( 4 ) ), () => {
+		} ).ElseIf( hi.equal( int( 4 ) ), () => {
 
-			return vec3( t, p, v );
+			result.assign( vec3( t, p, v ) );
+
+		} ).Else( () => {
+
+			result.assign( vec3( v, p, q ) );
 
 		} );
 
-		return vec3( v, p, q );
-
 	} );
+
+	return result;
 
 } ).setLayout( {
 	name: 'mx_hsvtorgb',
@@ -59,7 +64,7 @@ export const mx_hsvtorgb = /*#__PURE__*/ tslFn( ( [ hsv_immutable ] ) => {
 	]
 } );
 
-export const mx_rgbtohsv = /*#__PURE__*/ tslFn( ( [ c_immutable ] ) => {
+export const mx_rgbtohsv = /*@__PURE__*/ Fn( ( [ c_immutable ] ) => {
 
 	const c = vec3( c_immutable ).toVar();
 	const r = float( c.x ).toVar();
@@ -75,7 +80,7 @@ export const mx_rgbtohsv = /*#__PURE__*/ tslFn( ( [ c_immutable ] ) => {
 
 		s.assign( delta.div( maxcomp ) );
 
-	} ).else( () => {
+	} ).Else( () => {
 
 		s.assign( 0.0 );
 
@@ -85,17 +90,17 @@ export const mx_rgbtohsv = /*#__PURE__*/ tslFn( ( [ c_immutable ] ) => {
 
 		h.assign( 0.0 );
 
-	} ).else( () => {
+	} ).Else( () => {
 
 		If( r.greaterThanEqual( maxcomp ), () => {
 
 			h.assign( g.sub( b ).div( delta ) );
 
-		} ).elseif( g.greaterThanEqual( maxcomp ), () => {
+		} ).ElseIf( g.greaterThanEqual( maxcomp ), () => {
 
 			h.assign( add( 2.0, b.sub( r ).div( delta ) ) );
 
-		} ).else( () => {
+		} ).Else( () => {
 
 			h.assign( add( 4.0, r.sub( g ).div( delta ) ) );
 

@@ -4,6 +4,10 @@
 		<title>three.js vr - roller coaster</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<meta property="og:title" content="three.js vr - roller coaster">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webxr_vr_rollercoaster.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webxr_vr_rollercoaster.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -203,6 +207,10 @@
 
 			const lookAt = new THREE.Vector3();
 
+			const tangent1 = new THREE.Vector3();
+			const tangent2 = new THREE.Vector3();
+			const bankQuaternion = new THREE.Quaternion();
+
 			let velocity = 0;
 			let progress = 0;
 
@@ -233,6 +241,23 @@
 
 				velocity -= tangent.y * 0.0000001 * delta;
 				velocity = Math.max( 0.00004, Math.min( 0.0002, velocity ) );
+
+				// banking
+
+				const bankDelta = 0.01;
+				const t1 = ( ( progress - bankDelta ) % 1 + 1 ) % 1;
+				const t2 = ( progress + bankDelta ) % 1;
+
+				tangent1.copy( curve.getTangentAt( t1 ) );
+				tangent2.copy( curve.getTangentAt( t2 ) );
+
+				let headingChange = Math.atan2( tangent2.x, tangent2.z ) - Math.atan2( tangent1.x, tangent1.z );
+				if ( headingChange > Math.PI ) headingChange -= Math.PI * 2;
+				if ( headingChange < -Math.PI ) headingChange += Math.PI * 2;
+
+				train.up.set( 0, 1, 0 );
+				bankQuaternion.setFromAxisAngle( tangent, - Math.atan( headingChange * 8 ) * 0.5 );
+				train.up.applyQuaternion( bankQuaternion );
 
 				train.lookAt( lookAt.copy( position ).sub( tangent ) );
 

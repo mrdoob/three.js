@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Spherical } from '../../../../src/math/Spherical.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import {

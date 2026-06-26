@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Object3D } from '../../../../src/core/Object3D.js';
 import { Mesh } from '../../../../src/objects/Mesh.js';
 import { Raycaster } from '../../../../src/core/Raycaster.js';
@@ -45,18 +43,6 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.todo( 'geometry', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'material', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isMesh', ( assert ) => {
 
@@ -65,12 +51,6 @@ export default QUnit.module( 'Objects', () => {
 				object.isMesh,
 				'Mesh.isMesh should be true'
 			);
-
-		} );
-
-		QUnit.todo( 'copy', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -91,18 +71,6 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.todo( 'updateMorphTargets', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'getVertexPosition', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.todo( 'raycast', ( assert ) => {
 
 			const geometry = new PlaneGeometry();
@@ -120,12 +88,12 @@ export default QUnit.module( 'Objects', () => {
 
 			const intersection = intersections[ 0 ];
 
-			assert.equal( intersection.object, mesh, 'intersction object' );
-			assert.equal( intersection.distance, 1, 'intersction distance' );
-			assert.equal( intersection.faceIndex, 1, 'intersction face index' );
-			assert.deepEqual( intersection.face, { a: 0, b: 2, c: 1 }, 'intersction vertex indices' );
-			assert.deepEqual( intersection.point, new Vector3( 0.25, 0.25, 0 ), 'intersction point' );
-			assert.deepEqual( intersection.uv, new Vector2( 0.75, 0.75 ), 'intersction uv' );
+			assert.equal( intersection.object, mesh, 'intersection object' );
+			assert.equal( intersection.distance, 1, 'intersection distance' );
+			assert.equal( intersection.faceIndex, 1, 'intersection face index' );
+			assert.deepEqual( intersection.face, { a: 0, b: 2, c: 1 }, 'intersection vertex indices' );
+			assert.deepEqual( intersection.point, new Vector3( 0.25, 0.25, 0 ), 'intersection point' );
+			assert.deepEqual( intersection.uv, new Vector2( 0.75, 0.75 ), 'intersection uv' );
 
 		} );
 

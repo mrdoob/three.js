@@ -1,20 +1,61 @@
-import Node, { addNodeClass } from './Node.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import Node from './Node.js';
+import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
+/**
+ * The class generates the code of a given node but returns another node in the output.
+ * This can be used to call a method or node that does not return a value, i.e.
+ * type `void` on an input where returning a value is required. Example:
+ *
+ * ```js
+ * material.colorNode = myColor.bypass( runVoidFn() )
+ *```
+ *
+ * @augments Node
+ */
 class BypassNode extends Node {
 
-	constructor( returnNode, callNode ) {
+	static get type() {
+
+		return 'BypassNode';
+
+	}
+
+	/**
+	 * Constructs a new bypass node.
+	 *
+	 * @param {Node} outputNode - The output node.
+	 * @param {Node} callNode - The call node.
+	 */
+	constructor( outputNode, callNode ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isBypassNode = true;
 
-		this.outputNode = returnNode;
+		/**
+		 * The output node.
+		 *
+		 * @type {Node}
+		 */
+		this.outputNode = outputNode;
+
+		/**
+		 * The call node.
+		 *
+		 * @type {Node}
+		 */
 		this.callNode = callNode;
 
 	}
 
-	getNodeType( builder ) {
+	generateNodeType( builder ) {
 
 		return this.outputNode.getNodeType( builder );
 
@@ -26,7 +67,7 @@ class BypassNode extends Node {
 
 		if ( snippet !== '' ) {
 
-			builder.addLineFlowCode( snippet );
+			builder.addLineFlowCode( snippet, this );
 
 		}
 
@@ -38,8 +79,15 @@ class BypassNode extends Node {
 
 export default BypassNode;
 
-export const bypass = nodeProxy( BypassNode );
+/**
+ * TSL function for creating a bypass node.
+ *
+ * @tsl
+ * @function
+ * @param {Node} outputNode - The output node.
+ * @param {Node} callNode - The call node.
+ * @returns {BypassNode}
+ */
+export const bypass = /*@__PURE__*/ nodeProxy( BypassNode ).setParameterLength( 2 );
 
-addNodeElement( 'bypass', bypass );
-
-addNodeClass( 'BypassNode', BypassNode );
+addMethodChaining( 'bypass', bypass );

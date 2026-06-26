@@ -4,6 +4,10 @@
 		<title>three.js webgl - teapot buffer geometry</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - teapot buffer geometry">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_geometry_teapot.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_geometry_teapot.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -63,9 +67,9 @@
 				camera.position.set( - 600, 550, 1300 );
 
 				// LIGHTS
-				ambientLight = new THREE.AmbientLight( 0x7c7c7c, 3.0 );
+				ambientLight = new THREE.AmbientLight( 0x7c7c7c, 2.0 );
 
-				light = new THREE.DirectionalLight( 0xFFFFFF, 3.0 );
+				light = new THREE.DirectionalLight( 0xFFFFFF, 2.0 );
 				light.position.set( 0.32, 0.39, 0.7 );
 
 				// RENDERER
@@ -96,7 +100,7 @@
 				materials[ 'wireframe' ] = new THREE.MeshBasicMaterial( { wireframe: true } );
 				materials[ 'flat' ] = new THREE.MeshPhongMaterial( { specular: 0x000000, flatShading: true, side: THREE.DoubleSide } );
 				materials[ 'smooth' ] = new THREE.MeshLambertMaterial( { side: THREE.DoubleSide } );
-				materials[ 'glossy' ] = new THREE.MeshPhongMaterial( { side: THREE.DoubleSide } );
+				materials[ 'glossy' ] = new THREE.MeshPhongMaterial( { color: 0xc0c0c0, specular: 0x404040, shininess: 300, side: THREE.DoubleSide } );
 				materials[ 'textured' ] = new THREE.MeshPhongMaterial( { map: textureMap, side: THREE.DoubleSide } );
 				materials[ 'reflective' ] = new THREE.MeshPhongMaterial( { envMap: textureCube, side: THREE.DoubleSide } );
 

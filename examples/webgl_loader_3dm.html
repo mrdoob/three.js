@@ -4,6 +4,10 @@
 		<title>three.js webgl - loaders - Rhino 3DM loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - loaders - Rhino 3DM loader">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_loader_3dm.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_loader_3dm.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			#loader {
@@ -75,8 +79,7 @@
 				scene.add( directionalLight );
 
 				const loader = new Rhino3dmLoader();
-				//generally, use this for the Library Path: https://cdn.jsdelivr.net/npm/rhino3dm@8.0.1
-				loader.setLibraryPath( 'jsm/libs/rhino3dm/' );
+				loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@8.17.0/' );
 				loader.load( 'models/3dm/Rhino_Logo.3dm', function ( object ) {
 
 					scene.add( object );

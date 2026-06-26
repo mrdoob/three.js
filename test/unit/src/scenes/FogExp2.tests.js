@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { FogExp2 } from '../../../../src/scenes/FogExp2.js';
 
 export default QUnit.module( 'Scenes', () => {
@@ -25,25 +23,6 @@ export default QUnit.module( 'Scenes', () => {
 
 		} );
 
-		// PROPERTIES
-		QUnit.todo( 'name', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'color', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'density', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC STUFF
 		QUnit.test( 'isFogExp2', ( assert ) => {
 
@@ -52,18 +31,6 @@ export default QUnit.module( 'Scenes', () => {
 				object.isFogExp2,
 				'FogExp2.isFogExp2 should be true'
 			);
-
-		} );
-
-		QUnit.todo( 'clone', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'toJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

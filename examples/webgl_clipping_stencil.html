@@ -4,6 +4,10 @@
 		<title>three.js webgl - clipping stencil</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - clipping stencil">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_clipping_stencil.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_clipping_stencil.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -27,7 +31,7 @@
 
 			let camera, scene, renderer, object, stats;
 			let planes, planeObjects, planeHelpers;
-			let clock;
+			let timer;
 
 			const params = {
 
@@ -100,7 +104,8 @@
 
 			function init() {
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				scene = new THREE.Scene();
 
@@ -284,7 +289,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				if ( params.animate ) {
 

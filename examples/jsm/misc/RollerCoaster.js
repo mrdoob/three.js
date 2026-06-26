@@ -8,8 +8,20 @@ import {
 	Vector3
 } from 'three';
 
+/**
+ * A procedural roller coaster geometry.
+ *
+ * @augments BufferGeometry
+ * @three_import import { RollerCoasterGeometry } from 'three/addons/misc/RollerCoaster.js';
+ */
 class RollerCoasterGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new geometry.
+	 *
+	 * @param {Curve} curve - The curve to generate the geometry along.
+ 	 * @param {number} divisions - The number of divisions which defines the detail of the geometry.
+	 */
 	constructor( curve, divisions ) {
 
 		super();
@@ -183,6 +195,10 @@ class RollerCoasterGeometry extends BufferGeometry {
 
 		const offset = new Vector3();
 
+		const sample1 = new Vector3();
+		const sample2 = new Vector3();
+		const rollQuaternion = new Quaternion();
+
 		for ( let i = 1; i <= divisions; i ++ ) {
 
 			point.copy( curve.getPointAt( i / divisions ) );
@@ -196,6 +212,20 @@ class RollerCoasterGeometry extends BufferGeometry {
 			const angle = Math.atan2( forward.x, forward.z );
 
 			quaternion.setFromAxisAngle( up, angle );
+
+			// banking
+
+			const bankDelta = 0.01;
+			const t = i / divisions;
+
+			sample1.copy( curve.getTangentAt( ( ( t - bankDelta ) % 1 + 1 ) % 1 ) );
+			sample2.copy( curve.getTangentAt( ( t + bankDelta ) % 1 ) );
+
+			let headingChange = Math.atan2( sample2.x, sample2.z ) - Math.atan2( sample1.x, sample1.z );
+			if ( headingChange > Math.PI ) headingChange -= Math.PI * 2;
+			if ( headingChange < -Math.PI ) headingChange += Math.PI * 2;
+
+			quaternion.premultiply( rollQuaternion.setFromAxisAngle( forward, - Math.atan( headingChange * 8 ) * 0.5 ) );
 
 			if ( i % 2 === 0 ) {
 
@@ -222,8 +252,20 @@ class RollerCoasterGeometry extends BufferGeometry {
 
 }
 
+/**
+ * A procedural roller coaster lifters geometry.
+ *
+ * @augments BufferGeometry
+ * @three_import import { RollerCoasterLiftersGeometry } from 'three/addons/misc/RollerCoaster.js';
+ */
 class RollerCoasterLiftersGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new geometry.
+	 *
+	 * @param {Curve} curve - The curve to generate the geometry along.
+ 	 * @param {number} divisions - The number of divisions which defines the detail of the geometry.
+	 */
 	constructor( curve, divisions ) {
 
 		super();
@@ -332,6 +374,11 @@ class RollerCoasterLiftersGeometry extends BufferGeometry {
 		const fromPoint = new Vector3();
 		const toPoint = new Vector3();
 
+		const sample1 = new Vector3();
+		const sample2 = new Vector3();
+		const bankedQuaternion = new Quaternion();
+		const rollQuaternion = new Quaternion();
+
 		for ( let i = 1; i <= divisions; i ++ ) {
 
 			point.copy( curve.getPointAt( i / divisions ) );
@@ -340,6 +387,22 @@ class RollerCoasterLiftersGeometry extends BufferGeometry {
 			const angle = Math.atan2( tangent.x, tangent.z );
 
 			quaternion.setFromAxisAngle( up, angle );
+
+			// banking
+
+			const bankDelta = 0.01;
+			const t = i / divisions;
+
+			sample1.copy( curve.getTangentAt( ( ( t - bankDelta ) % 1 + 1 ) % 1 ) );
+			sample2.copy( curve.getTangentAt( ( t + bankDelta ) % 1 ) );
+
+			let headingChange = Math.atan2( sample2.x, sample2.z ) - Math.atan2( sample1.x, sample1.z );
+			if ( headingChange > Math.PI ) headingChange -= Math.PI * 2;
+			if ( headingChange < -Math.PI ) headingChange += Math.PI * 2;
+
+			bankedQuaternion.copy( quaternion );
+			rollQuaternion.setFromAxisAngle( tangent, - Math.atan( headingChange * 8 ) * 0.5 );
+			bankedQuaternion.premultiply( rollQuaternion );
 
 			//
 
@@ -378,12 +441,11 @@ class RollerCoasterLiftersGeometry extends BufferGeometry {
 			} else {
 
 				fromPoint.set( 0, - 0.2, 0 );
-				fromPoint.applyQuaternion( quaternion );
+				fromPoint.applyQuaternion( bankedQuaternion );
 				fromPoint.add( point );
 
-				toPoint.set( 0, - point.y, 0 );
-				toPoint.applyQuaternion( quaternion );
-				toPoint.add( point );
+				toPoint.copy( fromPoint );
+				toPoint.y = 0;
 
 				extrudeShape( tube3, fromPoint, toPoint );
 
@@ -398,8 +460,20 @@ class RollerCoasterLiftersGeometry extends BufferGeometry {
 
 }
 
+/**
+ * A procedural roller coaster shadow geometry.
+ *
+ * @augments BufferGeometry
+ * @three_import import { RollerCoasterShadowGeometry } from 'three/addons/misc/RollerCoaster.js';
+ */
 class RollerCoasterShadowGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new geometry.
+	 *
+	 * @param {Curve} curve - The curve to generate the geometry along.
+ 	 * @param {number} divisions - The number of divisions which defines the detail of the geometry.
+	 */
 	constructor( curve, divisions ) {
 
 		super();
@@ -470,8 +544,17 @@ class RollerCoasterShadowGeometry extends BufferGeometry {
 
 }
 
+/**
+ * A procedural sky geometry.
+ *
+ * @augments BufferGeometry
+ * @three_import import { SkyGeometry } from 'three/addons/misc/RollerCoaster.js';
+ */
 class SkyGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new geometry.
+	 */
 	constructor() {
 
 		super();
@@ -503,8 +586,20 @@ class SkyGeometry extends BufferGeometry {
 
 }
 
+/**
+ * A procedural trees geometry.
+ *
+ * @augments BufferGeometry
+ * @three_import import { TreesGeometry } from 'three/addons/misc/RollerCoaster.js';
+ */
 class TreesGeometry extends BufferGeometry {
 
+	/**
+	 * Constructs a new geometry.
+	 *
+	 * @param {Mesh} landscape - A mesh representing the landscape. Trees will be positioned
+	 * randomly on the landscape's surface.
+	 */
 	constructor( landscape ) {
 
 		super();

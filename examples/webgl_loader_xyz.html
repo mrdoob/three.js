@@ -4,6 +4,10 @@
 		<title>three.js webgl - loaders - XYZ</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - loaders - XYZ">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_loader_xyz.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_loader_xyz.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -28,7 +32,7 @@
 
 			import { XYZLoader } from 'three/addons/loaders/XYZLoader.js';
 
-			let camera, scene, renderer, clock;
+			let camera, scene, renderer, timer;
 
 			let points;
 
@@ -43,7 +47,8 @@
 				scene.add( camera );
 				camera.lookAt( scene.position );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				const loader = new XYZLoader();
 				loader.load( 'models/xyz/helix_201.xyz', function ( geometry ) {
@@ -84,7 +89,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				if ( points ) {
 

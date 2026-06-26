@@ -1,10 +1,10 @@
-import { tslFn, float, vec3 } from '../../shadernode/ShaderNode.js';
+import { Fn, float, vec3 } from '../../tsl/TSLBase.js';
 
-const RECIPROCAL_PI = float( 1 / Math.PI );
+const RECIPROCAL_PI = /*@__PURE__*/ float( 1 / Math.PI );
 
 // https://google.github.io/filament/Filament.md.html#materialsystem/anisotropicmodel/anisotropicspecularbrdf
 
-const D_GGX_Anisotropic = tslFn( ( { alphaT, alphaB, dotNH, dotTH, dotBH } ) => {
+const D_GGX_Anisotropic = /*@__PURE__*/ Fn( ( { alphaT, alphaB, dotNH, dotTH, dotBH } ) => {
 
 	const a2 = alphaT.mul( alphaB );
 	const v = vec3( alphaB.mul( dotTH ), alphaT.mul( dotBH ), a2.mul( dotNH ) );

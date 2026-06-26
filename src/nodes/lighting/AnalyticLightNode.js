@@ -1,46 +1,147 @@
 import LightingNode from './LightingNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { vec3, vec4 } from '../shadernode/ShaderNode.js';
-import { reference } from '../accessors/ReferenceNode.js';
-import { texture } from '../accessors/TextureNode.js';
-import { positionWorld } from '../accessors/PositionNode.js';
-import { normalWorld } from '../accessors/NormalNode.js';
-import { mix } from '../math/MathNode.js';
-//import { add } from '../math/OperatorNode.js';
 import { Color } from '../../math/Color.js';
-import { DepthTexture } from '../../textures/DepthTexture.js';
-import { NearestFilter, LessCompare, NoToneMapping, WebGPUCoordinateSystem } from '../../constants.js';
+import { renderGroup } from '../core/UniformGroupNode.js';
+import { shadow } from './ShadowNode.js';
+import { nodeObject } from '../tsl/TSLCore.js';
+import { lightViewPosition } from '../accessors/Lights.js';
+import { positionView } from '../accessors/Position.js';
 
-let overrideMaterial = null;
-
+/**
+ * Base class for analytic light nodes.
+ *
+ * @augments LightingNode
+ */
 class AnalyticLightNode extends LightingNode {
 
+	static get type() {
+
+		return 'AnalyticLightNode';
+
+	}
+
+	/**
+	 * Constructs a new analytic light node.
+	 *
+	 * @param {?Light} [light=null] - The light source.
+	 */
 	constructor( light = null ) {
 
 		super();
 
-		this.updateType = NodeUpdateType.FRAME;
-
+		/**
+		 * The light source.
+		 *
+		 * @type {?Light}
+		 * @default null
+		 */
 		this.light = light;
 
-		this.rtt = null;
-		this.shadowNode = null;
-		this.shadowMaskNode = null;
-
+		/**
+		 * The light's color value.
+		 *
+		 * @type {Color}
+		 */
 		this.color = new Color();
-		this._defaultColorNode = uniform( this.color );
 
-		this.colorNode = this._defaultColorNode;
+		/**
+		 * The light's color node. Points to `colorNode` of the light source, if set. Otherwise
+		 * it creates a uniform node based on {@link AnalyticLightNode#color}.
+		 *
+		 * @type {Node}
+		 */
+		this.colorNode = ( light && light.colorNode ) || uniform( this.color ).setGroup( renderGroup );
 
+		/**
+		 * This property is used to retain a reference to the original value of {@link AnalyticLightNode#colorNode}.
+		 * The final color node is represented by a different node when using shadows.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.baseColorNode = null;
+
+		/**
+		 * Represents the light's shadow.
+		 *
+		 * @type {?ShadowNode}
+   		 * @default null
+		 */
+		this.shadowNode = null;
+
+		/**
+		 * Represents the light's shadow color.
+		 *
+		 * @type {?Node}
+   		 * @default null
+		 */
+		this.shadowColorNode = null;
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isAnalyticLightNode = true;
+
+		/**
+		 * Overwritten since analytic light nodes are updated
+		 * once per frame.
+		 *
+		 * @type {string}
+		 * @default 'frame'
+		 */
+		this.updateType = NodeUpdateType.FRAME;
+
+		if ( light && light.shadow ) {
+
+			this._shadowDisposeListener = () => {
+
+				this.disposeShadow();
+
+			};
+
+			light.addEventListener( 'dispose', this._shadowDisposeListener );
+
+		}
 
 	}
 
-	getCacheKey() {
+	dispose() {
 
-		return super.getCacheKey() + '-' + ( this.light.id + '-' + ( this.light.castShadow ? '1' : '0' ) );
+		if ( this._shadowDisposeListener ) {
+
+			this.light.removeEventListener( 'dispose', this._shadowDisposeListener );
+
+		}
+
+		super.dispose();
+
+	}
+
+	/**
+	 * Frees internal resources related to shadows.
+	 */
+	disposeShadow() {
+
+		if ( this.shadowNode !== null ) {
+
+			this.shadowNode.dispose();
+			this.shadowNode = null;
+
+		}
+
+		this.shadowColorNode = null;
+
+		if ( this.baseColorNode !== null ) {
+
+			this.colorNode = this.baseColorNode;
+			this.baseColorNode = null;
+
+		}
 
 	}
 
@@ -50,199 +151,151 @@ class AnalyticLightNode extends LightingNode {
 
 	}
 
+	/**
+	 * Returns a node representing a direction vector which points from the current
+	 * position in view space to the light's position in view space.
+	 *
+	 * @param {NodeBuilder} builder - The builder object used for setting up the light.
+	 * @return {Node<vec3>} The light vector node.
+	 */
+	getLightVector( builder ) {
+
+		return lightViewPosition( this.light ).sub( builder.context.positionView || positionView );
+
+	}
+
+	/**
+	 * Sets up the direct lighting for the analytic light node.
+	 *
+	 * @abstract
+	 * @param {NodeBuilder} builder - The builder object used for setting up the light.
+	 * @return {Object|undefined} The direct light data (color and direction).
+	 */
+	setupDirect( /*builder*/ ) { }
+
+	/**
+	 * Sets up the direct rect area lighting for the analytic light node.
+	 *
+	 * @abstract
+	 * @param {NodeBuilder} builder - The builder object used for setting up the light.
+	 * @return {Object|undefined} The direct rect area light data.
+	 */
+	setupDirectRectArea( /*builder*/ ) { }
+
+	/**
+	 * Setups the shadow node for this light. The method exists so concrete light classes
+	 * can setup different types of shadow nodes.
+	 *
+	 * @return {ShadowNode} The created shadow node.
+	 */
+	setupShadowNode() {
+
+		return shadow( this.light );
+
+	}
+
+	/**
+	 * Setups the shadow for this light. This method is only executed if the light
+	 * cast shadows and the current build object receives shadows. It incorporates
+	 * shadows into the lighting computation.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setupShadow( builder ) {
 
-		const { object } = builder;
+		const { renderer } = builder;
 
-		if ( object.receiveShadow === false ) return;
+		if ( renderer.shadowMap.enabled === false ) return;
 
-		let shadowNode = this.shadowNode;
+		let shadowColorNode = this.shadowColorNode;
 
-		if ( shadowNode === null ) {
+		if ( shadowColorNode === null ) {
 
-			if ( overrideMaterial === null ) {
+			const customShadowNode = this.light.shadow.shadowNode;
 
-				overrideMaterial = builder.createNodeMaterial();
-				overrideMaterial.fragmentNode = vec4( 0, 0, 0, 1 );
-				overrideMaterial.isShadowNodeMaterial = true; // Use to avoid other overrideMaterial override material.fragmentNode unintentionally when using material.shadowNode
+			let shadowNode;
 
-			}
+			if ( customShadowNode !== undefined ) {
 
-			const shadow = this.light.shadow;
-			const rtt = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height );
+				shadowNode = nodeObject( customShadowNode );
 
-			const depthTexture = new DepthTexture();
-			depthTexture.minFilter = NearestFilter;
-			depthTexture.magFilter = NearestFilter;
-			depthTexture.image.width = shadow.mapSize.width;
-			depthTexture.image.height = shadow.mapSize.height;
-			depthTexture.compareFunction = LessCompare;
+			} else {
 
-			rtt.depthTexture = depthTexture;
-
-			shadow.camera.updateProjectionMatrix();
-
-			//
-
-			const shadowIntensity = reference( 'intensity', 'float', shadow );
-			const bias = reference( 'bias', 'float', shadow );
-			const normalBias = reference( 'normalBias', 'float', shadow );
-
-			const position = object.material.shadowPositionNode || positionWorld;
-
-			let shadowCoord = uniform( shadow.matrix ).mul( position.add( normalWorld.mul( normalBias ) ) );
-			shadowCoord = shadowCoord.xyz.div( shadowCoord.w );
-
-			const frustumTest = shadowCoord.x.greaterThanEqual( 0 )
-				.and( shadowCoord.x.lessThanEqual( 1 ) )
-				.and( shadowCoord.y.greaterThanEqual( 0 ) )
-				.and( shadowCoord.y.lessThanEqual( 1 ) )
-				.and( shadowCoord.z.lessThanEqual( 1 ) );
-
-			let coordZ = shadowCoord.z.add( bias );
-
-			if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem ) {
-
-				coordZ = coordZ.mul( 2 ).sub( 1 ); // WebGPU: Convertion [ 0, 1 ] to [ - 1, 1 ]
+				shadowNode = this.setupShadowNode();
 
 			}
-
-			shadowCoord = vec3(
-				shadowCoord.x,
-				shadowCoord.y.oneMinus(), // follow webgpu standards
-				coordZ
-			);
-
-			const textureCompare = ( depthTexture, shadowCoord, compare ) => texture( depthTexture, shadowCoord ).compare( compare );
-			//const textureCompare = ( depthTexture, shadowCoord, compare ) => compare.step( texture( depthTexture, shadowCoord ) );
-
-			// BasicShadowMap
-
-			shadowNode = textureCompare( depthTexture, shadowCoord.xy, shadowCoord.z );
-
-			// PCFShadowMap
-			/*
-			const mapSize = reference( 'mapSize', 'vec2', shadow );
-			const radius = reference( 'radius', 'float', shadow );
-
-			const texelSize = vec2( 1 ).div( mapSize );
-			const dx0 = texelSize.x.negate().mul( radius );
-			const dy0 = texelSize.y.negate().mul( radius );
-			const dx1 = texelSize.x.mul( radius );
-			const dy1 = texelSize.y.mul( radius );
-			const dx2 = dx0.mul( 2 );
-			const dy2 = dy0.mul( 2 );
-			const dx3 = dx1.mul( 2 );
-			const dy3 = dy1.mul( 2 );
-
-			shadowNode = add(
-				textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx0, dy0 ) ), shadowCoord.z ),
-				textureCompare( depthTexture, shadowCoord.xy.add( vec2( 0, dy0 ) ), shadowCoord.z ),
-				textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx1, dy0 ) ), shadowCoord.z ),
-				textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx2, dy2 ) ), shadowCoord.z ),
-				textureCompare( depthTexture, shadowCoord.xy.add( vec2( 0, dy2 ) ), shadowCoord.z ),
-				textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx3, dy2 ) ), shadowCoord.z ),
-				textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx0, 0 ) ), shadowCoord.z ),
-				textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx2, 0 ) ), shadowCoord.z ),
-				textureCompare( depthTexture, shadowCoord.xy, shadowCoord.z ),
-				textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx3, 0 ) ), shadowCoord.z ),
-				textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx1, 0 ) ), shadowCoord.z ),
-				textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx2, dy3 ) ), shadowCoord.z ),
-				textureCompare( depthTexture, shadowCoord.xy.add( vec2( 0, dy3 ) ), shadowCoord.z ),
-				textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx3, dy3 ) ), shadowCoord.z ),
-				textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx0, dy1 ) ), shadowCoord.z ),
-				textureCompare( depthTexture, shadowCoord.xy.add( vec2( 0, dy1 ) ), shadowCoord.z ),
-				textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx1, dy1 ) ), shadowCoord.z )
-			).mul( 1 / 17 );
-			 */
-			//
-
-			const shadowColor = texture( rtt.texture, shadowCoord );
-			const shadowMaskNode = frustumTest.mix( 1, shadowNode.mix( shadowColor.a.mix( 1, shadowColor ), 1 ) );
-
-			this.rtt = rtt;
-			this.colorNode = this.colorNode.mul( mix( 1, shadowMaskNode, shadowIntensity ) );
 
 			this.shadowNode = shadowNode;
-			this.shadowMaskNode = shadowMaskNode;
 
-			//
+			this.shadowColorNode = shadowColorNode = this.colorNode.mul( shadowNode );
 
-			this.updateBeforeType = NodeUpdateType.RENDER;
+			this.baseColorNode = this.colorNode;
+
+		}
+
+		//
+
+		if ( builder.context.getShadow ) {
+
+			shadowColorNode = builder.context.getShadow( this, builder );
+
+		}
+
+		this.colorNode = shadowColorNode;
+
+	}
+
+	/**
+	 * Unlike most other nodes, lighting nodes do not return a output node in {@link Node#setup}.
+	 * The main purpose of lighting nodes is to configure the current {@link LightingModel} and/or
+	 * invocate the respective interface methods.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	setup( builder ) {
+
+		this.colorNode = this.baseColorNode || this.colorNode;
+
+		if ( this.light.castShadow ) {
+
+			if ( builder.object.receiveShadow ) {
+
+				this.setupShadow( builder );
+
+			}
+
+		} else if ( this.shadowNode !== null ) {
+
+			this.shadowNode.dispose();
+			this.shadowNode = null;
+			this.shadowColorNode = null;
+
+		}
+
+		const directLightData = this.setupDirect( builder );
+		const directRectAreaLightData = this.setupDirectRectArea( builder );
+
+		if ( directLightData ) {
+
+			builder.lightsNode.setupDirectLight( builder, this, directLightData );
+
+		}
+
+		if ( directRectAreaLightData ) {
+
+			builder.lightsNode.setupDirectRectAreaLight( builder, this, directRectAreaLightData );
 
 		}
 
 	}
 
-	setup( builder ) {
-
-		if ( this.light.castShadow ) this.setupShadow( builder );
-		else if ( this.shadowNode !== null ) this.disposeShadow();
-
-	}
-
-	updateShadow( frame ) {
-
-		const { rtt, light } = this;
-		const { renderer, scene, camera } = frame;
-
-		const currentOverrideMaterial = scene.overrideMaterial;
-
-		scene.overrideMaterial = overrideMaterial;
-
-		rtt.setSize( light.shadow.mapSize.width, light.shadow.mapSize.height );
-
-		light.shadow.updateMatrices( light );
-		light.shadow.camera.layers.mask = camera.layers.mask;
-
-		const currentToneMapping = renderer.toneMapping;
-		const currentRenderTarget = renderer.getRenderTarget();
-		const currentRenderObjectFunction = renderer.getRenderObjectFunction();
-
-		renderer.setRenderObjectFunction( ( object, ...params ) => {
-
-			if ( object.castShadow === true ) {
-
-				renderer.renderObject( object, ...params );
-
-			}
-
-		} );
-
-		renderer.setRenderTarget( rtt );
-		renderer.toneMapping = NoToneMapping;
-
-		renderer.render( scene, light.shadow.camera );
-
-		renderer.setRenderTarget( currentRenderTarget );
-		renderer.setRenderObjectFunction( currentRenderObjectFunction );
-
-		renderer.toneMapping = currentToneMapping;
-
-		scene.overrideMaterial = currentOverrideMaterial;
-
-	}
-
-	disposeShadow() {
-
-		this.rtt.dispose();
-
-		this.shadowNode = null;
-		this.shadowMaskNode = null;
-		this.rtt = null;
-
-		this.colorNode = this._defaultColorNode;
-
-	}
-
-	updateBefore( frame ) {
-
-		const { light } = this;
-
-		if ( light.castShadow ) this.updateShadow( frame );
-
-	}
-
+	/**
+	 * The update method is used to update light uniforms per frame.
+	 * Potentially overwritten in concrete light nodes to update light
+	 * specific uniforms.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
 	update( /*frame*/ ) {
 
 		const { light } = this;
@@ -254,5 +307,3 @@ class AnalyticLightNode extends LightingNode {
 }
 
 export default AnalyticLightNode;
-
-addNodeClass( 'AnalyticLightNode', AnalyticLightNode );

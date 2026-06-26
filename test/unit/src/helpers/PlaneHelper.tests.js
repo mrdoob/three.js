@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { PlaneHelper } from '../../../../src/helpers/PlaneHelper.js';
 
 import { Line } from '../../../../src/objects/Line.js';
@@ -38,24 +36,7 @@ export default QUnit.module( 'Helpers', () => {
 
 		} );
 
-		QUnit.todo( 'plane', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'size', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
-		QUnit.todo( 'updateMatrixWorld', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
 
 		QUnit.test( 'dispose', ( assert ) => {
 

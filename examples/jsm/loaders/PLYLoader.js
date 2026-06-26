@@ -1,60 +1,64 @@
 import {
 	BufferGeometry,
 	FileLoader,
+	BufferAttribute,
 	Float32BufferAttribute,
+	Int8BufferAttribute,
+	Int16BufferAttribute,
+	Int32BufferAttribute,
 	Loader,
-	Color
+	Uint8BufferAttribute,
+	Uint16BufferAttribute,
+	Uint32BufferAttribute,
+	Color,
+	SRGBColorSpace
 } from 'three';
-
-/**
- * Description: A THREE loader for PLY ASCII files (known as the Polygon
- * File Format or the Stanford Triangle Format).
- *
- * Limitations: ASCII decoding assumes file is UTF-8.
- *
- * Usage:
- *	const loader = new PLYLoader();
- *	loader.load('./models/ply/ascii/dolphins.ply', function (geometry) {
- *
- *		scene.add( new THREE.Mesh( geometry ) );
- *
- *	} );
- *
- * If the PLY file uses non standard property names, they can be mapped while
- * loading. For example, the following maps the properties
- * “diffuse_(red|green|blue)” in the file to standard color names.
- *
- * loader.setPropertyNameMapping( {
- *	diffuse_red: 'red',
- *	diffuse_green: 'green',
- *	diffuse_blue: 'blue'
- * } );
- *
- * Custom properties outside of the defaults for position, uv, normal
- * and color attributes can be added using the setCustomPropertyNameMapping method.
- * For example, the following maps the element properties “custom_property_a”
- * and “custom_property_b” to an attribute “customAttribute” with an item size of 2.
- * Attribute item sizes are set from the number of element properties in the property array.
- *
- * loader.setCustomPropertyNameMapping( {
- *	customAttribute: ['custom_property_a', 'custom_property_b'],
- * } );
- *
- */
 
 const _color = new Color();
 
+/**
+ * A loader for PLY the PLY format (known as the Polygon
+ * File Format or the Stanford Triangle Format).
+ *
+ * Limitations:
+ *  - ASCII decoding assumes file is UTF-8.
+ *
+ * ```js
+ * const loader = new PLYLoader();
+ * const geometry = await loader.loadAsync( './models/ply/ascii/dolphins.ply' );
+ * scene.add( new THREE.Mesh( geometry ) );
+ * ```
+ *
+ * @augments Loader
+ * @three_import import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
+ */
 class PLYLoader extends Loader {
 
+	/**
+	 * Constructs a new PLY loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
 	constructor( manager ) {
 
 		super( manager );
+
+		// internals
 
 		this.propertyNameMapping = {};
 		this.customPropertyMapping = {};
 
 	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded PLY asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(BufferGeometry)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -90,18 +94,53 @@ class PLYLoader extends Loader {
 
 	}
 
+	/**
+	 * Sets a property name mapping that maps default property names
+	 * to custom ones. For example, the following maps the properties
+	 * “diffuse_(red|green|blue)” in the file to standard color names.
+	 *
+	 * ```js
+	 * loader.setPropertyNameMapping( {
+	 * 	diffuse_red: 'red',
+	 * 	diffuse_green: 'green',
+	 * 	diffuse_blue: 'blue'
+	 * } );
+	 * ```
+	 *
+	 * @param {Object} mapping - The mapping dictionary.
+	 */
 	setPropertyNameMapping( mapping ) {
 
 		this.propertyNameMapping = mapping;
 
 	}
 
+	/**
+	 * Custom properties outside of the defaults for position, uv, normal
+	 * and color attributes can be added using the setCustomPropertyNameMapping method.
+	 * For example, the following maps the element properties “custom_property_a”
+	 * and “custom_property_b” to an attribute “customAttribute” with an item size of 2.
+	 * Attribute item sizes are set from the number of element properties in the property array.
+	 *
+	 * ```js
+	 * loader.setCustomPropertyNameMapping( {
+	 *	customAttribute: ['custom_property_a', 'custom_property_b'],
+	 * } );
+	 * ```
+	 * @param {Object} mapping - The mapping dictionary.
+	 */
 	setCustomPropertyNameMapping( mapping ) {
 
 		this.customPropertyMapping = mapping;
 
 	}
 
+	/**
+	 * Parses the given PLY data and returns the resulting geometry.
+	 *
+	 * @param {ArrayBuffer} data - The raw PLY data as an array buffer.
+	 * @return {BufferGeometry} The parsed geometry.
+	 */
 	parse( data ) {
 
 		function parseHeader( data, headerLength = 0 ) {
@@ -126,19 +165,19 @@ class PLYLoader extends Loader {
 			const lines = headerText.split( /\r\n|\r|\n/ );
 			let currentElement;
 
-			function make_ply_element_property( propertValues, propertyNameMapping ) {
+			function make_ply_element_property( propertyValues, propertyNameMapping ) {
 
-				const property = { type: propertValues[ 0 ] };
+				const property = { type: propertyValues[ 0 ] };
 
 				if ( property.type === 'list' ) {
 
-					property.name = propertValues[ 3 ];
-					property.countType = propertValues[ 1 ];
-					property.itemType = propertValues[ 2 ];
+					property.name = propertyValues[ 3 ];
+					property.countType = propertyValues[ 1 ];
+					property.itemType = propertyValues[ 2 ];
 
 				} else {
 
-					property.name = propertValues[ 1 ];
+					property.name = propertyValues[ 1 ];
 
 				}
 
@@ -285,7 +324,8 @@ class PLYLoader extends Loader {
 			  uvs: [],
 			  faceVertexUvs: [],
 			  colors: [],
-			  faceVertexColors: []
+			  faceVertexColors: [],
+			  descriptors: {}
 			};
 
 			for ( const customProperty of Object.keys( scope.customPropertyMapping ) ) {
@@ -298,21 +338,52 @@ class PLYLoader extends Loader {
 
 		}
 
-		function mapElementAttributes( properties ) {
 
-			const elementNames = properties.map( property => {
+		function getBufferAttributeClass( type ) {
 
-				return property.name;
+			switch ( type ) {
 
-			} );
+				case 'int8': case 'char':		return Int8BufferAttribute;
+				case 'uint8': case 'uchar':		return Uint8BufferAttribute;
+				case 'int16': case 'short':		return Int16BufferAttribute;
+				case 'uint16': case 'ushort':	return Uint16BufferAttribute;
+				case 'int32': case 'int':		return Int32BufferAttribute;
+				case 'uint32': case 'uint':		return Uint32BufferAttribute;
+				case 'float32': case 'float':	return Float32BufferAttribute;
+				case 'float64': case 'double': 	return Float64BufferAttribute;
 
-			function findAttrName( names ) {
+			}
 
-				for ( let i = 0, l = names.length; i < l; i ++ ) {
+		}
 
-					const name = names[ i ];
+		function getColorScale( type ) {
 
-					if ( elementNames.includes( name ) ) return name;
+			switch ( type ) {
+
+				case 'uchar': case 'uint8':	return 1 / 255;
+				case 'ushort': case 'uint16': return 1 / 65535;
+				case 'float': case 'float32':
+				case 'double': case 'float64': return 1;
+				default: return 1 / 255;
+
+			}
+
+		}
+
+		function isFloatType( type ) {
+
+			return type === 'float' || type === 'float32' || type === 'double' || type === 'float64';
+
+		}
+
+		function getAttributeDescriptor( properties ) {
+
+			function findProperty( names ) {
+
+				for ( const name of names ) {
+
+					const property = properties.find( p => p.name === name );
+					if ( property ) return property;
 
 				}
 
@@ -320,18 +391,67 @@ class PLYLoader extends Loader {
 
 			}
 
+			// property lookup
+
+			const x = findProperty( [ 'x', 'px', 'posx' ] );
+			const y = findProperty( [ 'y', 'py', 'posy' ] );
+			const z = findProperty( [ 'z', 'pz', 'posz' ] );
+			const nx = findProperty( [ 'nx', 'normalx' ] );
+			const ny = findProperty( [ 'ny', 'normaly' ] );
+			const nz = findProperty( [ 'nz', 'normalz' ] );
+			const s = findProperty( [ 's', 'u', 'texture_u', 'tx' ] );
+			const t = findProperty( [ 't', 'v', 'texture_v', 'ty' ] );
+			const r = findProperty( [ 'red', 'diffuse_red', 'r', 'diffuse_r' ] );
+			const g = findProperty( [ 'green', 'diffuse_green', 'g', 'diffuse_g' ] );
+			const b = findProperty( [ 'blue', 'diffuse_blue', 'b', 'diffuse_b' ] );
+			const texcoord = findProperty( [ 'texcoord' ] );
+
+			// custom property lookup
+
+			const custom = {};
+
+			for ( const customAttr of Object.keys( scope.customPropertyMapping ) ) {
+
+				const propNames = scope.customPropertyMapping[ customAttr ];
+				const matched = propNames.map( name => properties.find( p => p.name === name ) );
+				const types = matched.filter( p => p ).map( p => p.type );
+				const uniform = types.length > 0 && types.every( type => type === types[ 0 ] );
+
+				custom[ customAttr ] = {
+					type: uniform ? types[ 0 ] : 'float32',
+					usage: matched.every( p => p !== undefined ),
+				};
+
+			}
+
+			// build descriptor
+
 			return {
-				attrX: findAttrName( [ 'x', 'px', 'posx' ] ) || 'x',
-				attrY: findAttrName( [ 'y', 'py', 'posy' ] ) || 'y',
-				attrZ: findAttrName( [ 'z', 'pz', 'posz' ] ) || 'z',
-				attrNX: findAttrName( [ 'nx', 'normalx' ] ),
-				attrNY: findAttrName( [ 'ny', 'normaly' ] ),
-				attrNZ: findAttrName( [ 'nz', 'normalz' ] ),
-				attrS: findAttrName( [ 's', 'u', 'texture_u', 'tx' ] ),
-				attrT: findAttrName( [ 't', 'v', 'texture_v', 'ty' ] ),
-				attrR: findAttrName( [ 'red', 'diffuse_red', 'r', 'diffuse_r' ] ),
-				attrG: findAttrName( [ 'green', 'diffuse_green', 'g', 'diffuse_g' ] ),
-				attrB: findAttrName( [ 'blue', 'diffuse_blue', 'b', 'diffuse_b' ] ),
+				position: {
+					names: [ x ? x.name : 'x', y ? y.name : 'y', z ? z.name : 'z' ],
+					type: x ? x.type : 'float32',
+					usage: !! ( x && y && z ),
+				},
+				normal: {
+					names: [ nx ? nx.name : 'nx', ny ? ny.name : 'ny', nz ? nz.name : 'nz' ],
+					type: nx ? nx.type : 'float32',
+					usage: !! ( nx && ny && nz ),
+				},
+				uv: {
+					names: [ s ? s.name : 's', t ? t.name : 't' ],
+					type: s ? s.type : 'float32',
+					usage: !! ( s && t ),
+				},
+				texcoord: {
+					type: texcoord ? texcoord.itemType : 'float32',
+					usage: !! texcoord,
+				},
+				color: {
+					names: [ r ? r.name : 'red', g ? g.name : 'green', b ? b.name : 'blue' ],
+					type: r ? r.type : 'uchar',
+					usage: !! ( r && g && b ),
+				},
+				custom: custom,
 			};
 
 		}
@@ -360,7 +480,8 @@ class PLYLoader extends Loader {
 			loop: for ( let i = 0; i < header.elements.length; i ++ ) {
 
 				const elementDesc = header.elements[ i ];
-				const attributeMap = mapElementAttributes( elementDesc.properties );
+				const attributeDescriptor = getAttributeDescriptor( elementDesc.properties );
+				buffer.descriptors[ elementDesc.name ] = attributeDescriptor;
 
 				for ( let j = 0; j < elementDesc.count; j ++ ) {
 
@@ -368,7 +489,7 @@ class PLYLoader extends Loader {
 
 					if ( ! element ) break loop;
 
-					handleElement( buffer, elementDesc.name, element, attributeMap );
+					handleElement( buffer, elementDesc.name, element, attributeDescriptor );
 
 				}
 
@@ -382,6 +503,8 @@ class PLYLoader extends Loader {
 
 			let geometry = new BufferGeometry();
 
+			const vertexDescriptor = buffer.descriptors.vertex;
+
 			// mandatory buffer data
 
 			if ( buffer.indices.length > 0 ) {
@@ -390,25 +513,32 @@ class PLYLoader extends Loader {
 
 			}
 
-			geometry.setAttribute( 'position', new Float32BufferAttribute( buffer.vertices, 3 ) );
+			const PositionClass = getBufferAttributeClass( vertexDescriptor ? vertexDescriptor.position.type : 'float32' );
+			geometry.setAttribute( 'position', new PositionClass( buffer.vertices, 3 ) );
 
 			// optional buffer data
 
 			if ( buffer.normals.length > 0 ) {
 
-				geometry.setAttribute( 'normal', new Float32BufferAttribute( buffer.normals, 3 ) );
+				const NormalClass = getBufferAttributeClass( vertexDescriptor.normal.type );
+				geometry.setAttribute( 'normal', new NormalClass( buffer.normals, 3 ) );
 
 			}
 
 			if ( buffer.uvs.length > 0 ) {
 
-				geometry.setAttribute( 'uv', new Float32BufferAttribute( buffer.uvs, 2 ) );
+				const UvClass = getBufferAttributeClass( vertexDescriptor.uv.type );
+				geometry.setAttribute( 'uv', new UvClass( buffer.uvs, 2 ) );
 
 			}
 
 			if ( buffer.colors.length > 0 ) {
 
-				geometry.setAttribute( 'color', new Float32BufferAttribute( buffer.colors, 3 ) );
+				const colorType = vertexDescriptor.color.type;
+				const normalized = ! isFloatType( colorType );
+
+				const ColorClass = getBufferAttributeClass( colorType );
+				geometry.setAttribute( 'color', new ColorClass( buffer.colors, 3, normalized ) );
 
 			}
 
@@ -416,8 +546,22 @@ class PLYLoader extends Loader {
 
 				geometry = geometry.toNonIndexed();
 
-				if ( buffer.faceVertexUvs.length > 0 ) geometry.setAttribute( 'uv', new Float32BufferAttribute( buffer.faceVertexUvs, 2 ) );
-				if ( buffer.faceVertexColors.length > 0 ) geometry.setAttribute( 'color', new Float32BufferAttribute( buffer.faceVertexColors, 3 ) );
+				if ( buffer.faceVertexUvs.length > 0 ) {
+
+					const UvClass = getBufferAttributeClass( buffer.descriptors.face.texcoord.type );
+					geometry.setAttribute( 'uv', new UvClass( buffer.faceVertexUvs, 2 ) );
+
+				}
+
+				if ( buffer.faceVertexColors.length > 0 ) {
+
+					const colorType = buffer.descriptors.face.color.type;
+					const normalized = ! isFloatType( colorType );
+
+					const ColorClass = getBufferAttributeClass( colorType );
+					geometry.setAttribute( 'color', new ColorClass( buffer.faceVertexColors, 3, normalized ) );
+
+				}
 
 			}
 
@@ -427,13 +571,8 @@ class PLYLoader extends Loader {
 
 				if ( buffer[ customProperty ].length > 0 ) {
 
-				  	geometry.setAttribute(
-						customProperty,
-						new Float32BufferAttribute(
-					  		buffer[ customProperty ],
-					  		scope.customPropertyMapping[ customProperty ].length
-						)
-				  	);
+					const CustomClass = getBufferAttributeClass( vertexDescriptor.custom[ customProperty ].type );
+					geometry.setAttribute( customProperty, new CustomClass( buffer[ customProperty ], scope.customPropertyMapping[ customProperty ].length ) );
 
 				}
 
@@ -445,33 +584,64 @@ class PLYLoader extends Loader {
 
 		}
 
-		function handleElement( buffer, elementName, element, cacheEntry ) {
+		function handleElement( buffer, elementName, element, attributeDescriptor ) {
 
 			if ( elementName === 'vertex' ) {
 
-				buffer.vertices.push( element[ cacheEntry.attrX ], element[ cacheEntry.attrY ], element[ cacheEntry.attrZ ] );
+				const { position, normal, uv, color } = attributeDescriptor;
 
-				if ( cacheEntry.attrNX !== null && cacheEntry.attrNY !== null && cacheEntry.attrNZ !== null ) {
+				if ( position.usage ) {
 
-					buffer.normals.push( element[ cacheEntry.attrNX ], element[ cacheEntry.attrNY ], element[ cacheEntry.attrNZ ] );
-
-				}
-
-				if ( cacheEntry.attrS !== null && cacheEntry.attrT !== null ) {
-
-					buffer.uvs.push( element[ cacheEntry.attrS ], element[ cacheEntry.attrT ] );
+					buffer.vertices.push(
+						element[ position.names[ 0 ] ],
+						element[ position.names[ 1 ] ],
+						element[ position.names[ 2 ] ]
+					);
 
 				}
 
-				if ( cacheEntry.attrR !== null && cacheEntry.attrG !== null && cacheEntry.attrB !== null ) {
+				if ( normal.usage ) {
+
+					buffer.normals.push(
+						element[ normal.names[ 0 ] ],
+						element[ normal.names[ 1 ] ],
+						element[ normal.names[ 2 ] ]
+					);
+
+				}
+
+				if ( uv.usage ) {
+
+					buffer.uvs.push(
+						element[ uv.names[ 0 ] ],
+						element[ uv.names[ 1 ] ]
+					);
+
+				}
+
+				if ( color.usage ) {
+
+					const scale = getColorScale( color.type );
+					const isFloat = isFloatType( color.type );
+
+					// convert to float for color space conversion
 
 					_color.setRGB(
-						element[ cacheEntry.attrR ] / 255.0,
-						element[ cacheEntry.attrG ] / 255.0,
-						element[ cacheEntry.attrB ] / 255.0
-					).convertSRGBToLinear();
+						element[ color.names[ 0 ] ] * scale,
+						element[ color.names[ 1 ] ] * scale,
+						element[ color.names[ 2 ] ] * scale,
+						SRGBColorSpace
+					);
 
-					buffer.colors.push( _color.r, _color.g, _color.b );
+					// convert back to original type
+
+					const invScale = 1 / scale;
+
+					buffer.colors.push(
+						isFloat ? _color.r : Math.round( _color.r * invScale ),
+						isFloat ? _color.g : Math.round( _color.g * invScale ),
+						isFloat ? _color.b : Math.round( _color.b * invScale )
+					);
 
 				}
 
@@ -511,16 +681,32 @@ class PLYLoader extends Loader {
 
 				// face colors
 
-				if ( cacheEntry.attrR !== null && cacheEntry.attrG !== null && cacheEntry.attrB !== null ) {
+				const { color } = attributeDescriptor;
+
+				if ( color.usage ) {
+
+					// convert to float for color space conversion
+
+					const scale = getColorScale( color.type );
 
 					_color.setRGB(
-						element[ cacheEntry.attrR ] / 255.0,
-						element[ cacheEntry.attrG ] / 255.0,
-						element[ cacheEntry.attrB ] / 255.0
-					).convertSRGBToLinear();
-					buffer.faceVertexColors.push( _color.r, _color.g, _color.b );
-					buffer.faceVertexColors.push( _color.r, _color.g, _color.b );
-					buffer.faceVertexColors.push( _color.r, _color.g, _color.b );
+						element[ color.names[ 0 ] ] * scale,
+						element[ color.names[ 1 ] ] * scale,
+						element[ color.names[ 2 ] ] * scale,
+						SRGBColorSpace
+					);
+
+					// convert back to original type
+
+					const invScale = 1 / scale;
+
+					const r = _color.r * invScale;
+					const g = _color.g * invScale;
+					const b = _color.b * invScale;
+
+					buffer.faceVertexColors.push( r, g, b );
+					buffer.faceVertexColors.push( r, g, b );
+					buffer.faceVertexColors.push( r, g, b );
 
 				}
 
@@ -573,7 +759,7 @@ class PLYLoader extends Loader {
 
 				switch ( type ) {
 
-					// corespondences for non-specific length types here match rply:
+					// correspondences for non-specific length types here match rply:
 					case 'int8':	case 'char':	return { read: ( at ) => {
 
 						return dataview.getInt8( at );
@@ -650,7 +836,8 @@ class PLYLoader extends Loader {
 
 				const elementDesc = header.elements[ currentElement ];
 				const properties = elementDesc.properties;
-				const attributeMap = mapElementAttributes( properties );
+				const attributeDescriptor = getAttributeDescriptor( properties );
+				buffer.descriptors[ elementDesc.name ] = attributeDescriptor;
 
 				setPropertyBinaryReaders( properties, body, little_endian );
 
@@ -660,7 +847,7 @@ class PLYLoader extends Loader {
 					loc += result[ 1 ];
 					const element = result[ 0 ];
 
-					handleElement( buffer, elementDesc.name, element, attributeMap );
+					handleElement( buffer, elementDesc.name, element, attributeDescriptor );
 
 				}
 
@@ -740,6 +927,16 @@ class PLYLoader extends Loader {
 		}
 
 		return geometry;
+
+	}
+
+}
+
+class Float64BufferAttribute extends BufferAttribute {
+
+	constructor( array, itemSize, normalized ) {
+
+		super( new Float64Array( array ), itemSize, normalized );
 
 	}
 

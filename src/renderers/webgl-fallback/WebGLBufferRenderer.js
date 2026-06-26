@@ -26,7 +26,7 @@ class WebGLBufferRenderer {
 
 		}
 
-		info.update( object, count, mode, 1 );
+		info.update( object, count, 1 );
 
 	}
 
@@ -46,7 +46,7 @@ class WebGLBufferRenderer {
 
 		}
 
-		info.update( object, count, mode, primcount );
+		info.update( object, count, primcount );
 
 	}
 
@@ -85,53 +85,7 @@ class WebGLBufferRenderer {
 
 			}
 
-			info.update( object, elementCount, mode, 1 );
-
-		}
-
-	}
-
-	renderMultiDrawInstances( starts, counts, drawCount, primcount ) {
-
-		const { extensions, mode, object, info } = this;
-
-		if ( drawCount === 0 ) return;
-
-		const extension = extensions.get( 'WEBGL_multi_draw' );
-
-		if ( extension === null ) {
-
-			for ( let i = 0; i < drawCount; i ++ ) {
-
-				this.renderInstances( starts[ i ], counts[ i ], primcount[ i ] );
-
-			}
-
-		} else {
-
-			if ( this.index !== 0 ) {
-
-				extension.multiDrawElementsInstancedWEBGL( mode, counts, 0, this.type, starts, 0, primcount, 0, drawCount );
-
-			} else {
-
-				extension.multiDrawArraysInstancedWEBGL( mode, starts, 0, counts, 0, primcount, 0, drawCount );
-
-			}
-
-			let elementCount = 0;
-
-			for ( let i = 0; i < drawCount; i ++ ) {
-
-				elementCount += counts[ i ];
-
-			}
-
-			for ( let i = 0; i < primcount.length; i ++ ) {
-
-				info.update( object, elementCount, mode, primcount[ i ] );
-
-			}
+			info.update( object, elementCount, 1 );
 
 		}
 

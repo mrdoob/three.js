@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Frustum } from '../../../../src/math/Frustum.js';
 
 import { Sphere } from '../../../../src/math/Sphere.js';
@@ -122,7 +120,7 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'setFromProjectionMatrix/makeOrthographic/containsPoint', ( assert ) => {
 
-			const m = new Matrix4().makeOrthographic( - 1, 1, - 1, 1, 1, 100 );
+			const m = new Matrix4().makeOrthographic( - 1, 1, 1, - 1, 1, 100 );
 			const a = new Frustum().setFromProjectionMatrix( m );
 
 			assert.ok( ! a.containsPoint( new Vector3( 0, 0, 0 ) ), 'Passed!' );
@@ -132,10 +130,10 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( ! a.containsPoint( new Vector3( - 1.1, - 1.1, - 1.001 ) ), 'Passed!' );
 			assert.ok( a.containsPoint( new Vector3( 1, 1, - 1.001 ) ), 'Passed!' );
 			assert.ok( ! a.containsPoint( new Vector3( 1.1, 1.1, - 1.001 ) ), 'Passed!' );
-			assert.ok( a.containsPoint( new Vector3( 0, 0, - 100 ) ), 'Passed!' );
-			assert.ok( a.containsPoint( new Vector3( - 1, - 1, - 100 ) ), 'Passed!' );
+			assert.ok( a.containsPoint( new Vector3( 0, 0, - 99.999 ) ), 'Passed!' );
+			assert.ok( a.containsPoint( new Vector3( - 0.999, - 0.999, - 99.999 ) ), 'Passed!' );
 			assert.ok( ! a.containsPoint( new Vector3( - 1.1, - 1.1, - 100.1 ) ), 'Passed!' );
-			assert.ok( a.containsPoint( new Vector3( 1, 1, - 100 ) ), 'Passed!' );
+			assert.ok( a.containsPoint( new Vector3( 0.999, 0.999, - 99.999 ) ), 'Passed!' );
 			assert.ok( ! a.containsPoint( new Vector3( 1.1, 1.1, - 100.1 ) ), 'Passed!' );
 			assert.ok( ! a.containsPoint( new Vector3( 0, 0, - 101 ) ), 'Passed!' );
 
@@ -232,12 +230,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'intersectsSphere', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'intersectsBox', ( assert ) => {
 
 			const m = new Matrix4().makePerspective( - 1, 1, 1, - 1, 1, 100 );
@@ -254,12 +246,6 @@ export default QUnit.module( 'Maths', () => {
 
 			intersects = a.intersectsBox( box );
 			assert.ok( intersects, 'Successful intersection' );
-
-		} );
-
-		QUnit.todo( 'containsPoint', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

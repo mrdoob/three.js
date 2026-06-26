@@ -1,17 +1,46 @@
-import ChainMap from './ChainMap.js';
 import RenderContext from './RenderContext.js';
 
+/**
+ * This module manages the render contexts of the renderer.
+ *
+ * @private
+ */
 class RenderContexts {
 
-	constructor() {
+	/**
+	 * Constructs a new render context management component.
+	 *
+	 * @param {Renderer} renderer - The renderer.
+	 */
+	constructor( renderer ) {
 
-		this.chainMaps = {};
+		/**
+		 * The renderer.
+		 *
+		 * @type {Renderer}
+		 */
+		this.renderer = renderer;
+
+		/**
+		 * A dictionary that manages render contexts.
+		 *
+		 * @type {Object<string,RenderContext>}
+		 */
+		this._renderContexts = {};
 
 	}
 
-	get( scene, camera, renderTarget = null ) {
+	/**
+	 * Returns a render context for the given scene, camera and render target.
+	 *
+	 * @param {?RenderTarget} [renderTarget=null] - The active render target.
+	 * @param {?MRTNode} [mrt=null] - The MRT configuration
+	 * @param {?number} [callDepth=0] - The call depth of the renderer.
+	 * @return {RenderContext} The render context.
+	 */
+	get( renderTarget = null, mrt = null, callDepth = 0 ) {
 
-		const chainKey = [ scene, camera ];
+		//
 
 		let attachmentState;
 
@@ -22,39 +51,47 @@ class RenderContexts {
 		} else {
 
 			const format = renderTarget.texture.format;
-			const count = renderTarget.count;
+			const type = renderTarget.texture.type;
+			const count = renderTarget.textures.length;
 
-			attachmentState = `${ count }:${ format }:${ renderTarget.samples }:${ renderTarget.depthBuffer }:${ renderTarget.stencilBuffer }`;
+			attachmentState = `${ count }:${ format }:${ type }:${ renderTarget.samples }:${ renderTarget.depthBuffer }:${ renderTarget.stencilBuffer }`;
 
 		}
 
-		const chainMap = this.getChainMap( attachmentState );
+		//
 
-		let renderState = chainMap.get( chainKey );
+		const mrtState = ( mrt !== null ) ? mrt.id : 'default';
+
+		//
+
+		const renderStateKey = attachmentState + '-' + mrtState + '-' + callDepth;
+
+		let renderState = this._renderContexts[ renderStateKey ];
 
 		if ( renderState === undefined ) {
 
 			renderState = new RenderContext();
+			renderState.mrt = mrt;
 
-			chainMap.set( chainKey, renderState );
+			this._renderContexts[ renderStateKey ] = renderState;
 
 		}
 
 		if ( renderTarget !== null ) renderState.sampleCount = renderTarget.samples === 0 ? 1 : renderTarget.samples;
 
+		renderState.clearDepthValue = this.renderer.getClearDepth();
+		renderState.clearStencilValue = this.renderer.getClearStencil();
+
 		return renderState;
 
 	}
 
-	getChainMap( attachmentState ) {
-
-		return this.chainMaps[ attachmentState ] || ( this.chainMaps[ attachmentState ] = new ChainMap() );
-
-	}
-
+	/**
+	 * Frees internal resources.
+	 */
 	dispose() {
 
-		this.chainMaps = {};
+		this._renderContexts = {};
 
 	}
 

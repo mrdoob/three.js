@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import * as MathUtils from '../../../../src/math/MathUtils.js';
 
 export default QUnit.module( 'Maths', () => {
@@ -29,11 +27,11 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( 'euclideanModulo', ( assert ) => {
 
 			assert.ok( isNaN( MathUtils.euclideanModulo( 6, 0 ) ), 'Division by zero returns NaN' );
-			assert.strictEqual( MathUtils.euclideanModulo( 6, 1 ), 0, 'Divison by trivial divisor' );
-			assert.strictEqual( MathUtils.euclideanModulo( 6, 2 ), 0, 'Divison by non-trivial divisor' );
-			assert.strictEqual( MathUtils.euclideanModulo( 6, 5 ), 1, 'Divison by itself - 1' );
-			assert.strictEqual( MathUtils.euclideanModulo( 6, 6 ), 0, 'Divison by itself' );
-			assert.strictEqual( MathUtils.euclideanModulo( 6, 7 ), 6, 'Divison by itself + 1' );
+			assert.strictEqual( MathUtils.euclideanModulo( 6, 1 ), 0, 'Division by trivial divisor' );
+			assert.strictEqual( MathUtils.euclideanModulo( 6, 2 ), 0, 'Division by non-trivial divisor' );
+			assert.strictEqual( MathUtils.euclideanModulo( 6, 5 ), 1, 'Division by itself - 1' );
+			assert.strictEqual( MathUtils.euclideanModulo( 6, 6 ), 0, 'Division by itself' );
+			assert.strictEqual( MathUtils.euclideanModulo( 6, 7 ), 6, 'Division by itself + 1' );
 
 		} );
 
@@ -85,7 +83,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( MathUtils.smoothstep( 1, 0, 2 ), 0.5, 'Value within limits' );
 			assert.strictEqual( MathUtils.smoothstep( 1.5, 0, 2 ), 0.84375, 'Value within limits' );
 			assert.strictEqual( MathUtils.smoothstep( 2, 0, 2 ), 1, 'Value equal to maximum' );
-			assert.strictEqual( MathUtils.smoothstep( 3, 0, 2 ), 1, 'Value highter than maximum' );
+			assert.strictEqual( MathUtils.smoothstep( 3, 0, 2 ), 1, 'Value higher than maximum' );
 
 		} );
 
@@ -97,7 +95,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( MathUtils.smootherstep( 1, 0, 2 ), 0.5, 'Value within limits' );
 			assert.strictEqual( MathUtils.smootherstep( 1.5, 0, 2 ), 0.896484375, 'Value within limits' );
 			assert.strictEqual( MathUtils.smootherstep( 2, 0, 2 ), 1, 'Value equal to maximum' );
-			assert.strictEqual( MathUtils.smootherstep( 3, 0, 2 ), 1, 'Value highter than maximum' );
+			assert.strictEqual( MathUtils.smootherstep( 3, 0, 2 ), 1, 'Value higher than maximum' );
 
 		} );
 
@@ -127,13 +125,6 @@ export default QUnit.module( 'Maths', () => {
 
 			assert.ok( a > - 3 / 2, 'Value higher than lower limit' );
 			assert.ok( a < 3 / 2, 'Value lower than upper limit' );
-
-		} );
-
-		QUnit.todo( 'seededRandom', ( assert ) => {
-
-			// seededRandom( s ) // interval [ 0, 1 ]
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -178,27 +169,6 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( MathUtils.floorPowerOfTwo( 1 ), 1, 'Closest lower PoT to 1 is 1' );
 			assert.strictEqual( MathUtils.floorPowerOfTwo( 3 ), 2, 'Closest lower PoT to 3 is 2' );
 			assert.strictEqual( MathUtils.floorPowerOfTwo( 4 ), 4, 'Closest lower PoT to 4 is 4' );
-
-		} );
-
-		QUnit.todo( 'setQuaternionFromProperEuler', ( assert ) => {
-
-			// setQuaternionFromProperEuler( q, a, b, c, order )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'denormalize', ( assert ) => {
-
-			// denormalize( value, array )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'normalize', ( assert ) => {
-
-			// normalize( value, array )
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

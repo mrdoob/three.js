@@ -1,8 +1,12 @@
 import * as THREE from 'three';
 
-import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
+import { UIPanel, UIRow } from './libs/ui.js';
 
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
+import { MultiCmdsCommand } from './commands/MultiCmdsCommand.js';
+
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
 function MenubarAdd( editor ) {
 
@@ -81,7 +85,7 @@ function MenubarAdd( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/mesh/capsule' ) );
 	option.onClick( function () {
 
-		const geometry = new THREE.CapsuleGeometry( 1, 1, 4, 8 );
+		const geometry = new THREE.CapsuleGeometry( 1, 1, 4, 8, 1 );
 		const material = new THREE.MeshStandardMaterial();
 		const mesh = new THREE.Mesh( geometry, material );
 		mesh.name = 'Capsule';
@@ -267,6 +271,43 @@ function MenubarAdd( editor ) {
 	} );
 	meshSubmenu.add( option );
 
+	// Mesh / Text
+
+	option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/add/text' ) );
+	option.onClick( function () {
+
+		const loader = new FontLoader();
+		loader.load( '../examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
+
+			const text = 'THREE.JS';
+
+			const geometry = new TextGeometry( text, {
+				text: text,
+				font,
+				size: 1,
+				depth: 0.5,
+				curveSegments: 4,
+
+				bevelEnabled: false,
+				bevelThickness: 0.1,
+				bevelSize: 0.01,
+				bevelOffset: 0,
+				bevelSegments: 3
+
+			} );
+
+			const mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
+			mesh.name = 'Text';
+
+			editor.execute( new AddObjectCommand( editor, mesh ) );
+
+		} );
+
+	} );
+	meshSubmenu.add( option );
+
 	// Mesh / Torus
 
 	option = new UIRow();
@@ -379,7 +420,10 @@ function MenubarAdd( editor ) {
 
 		light.position.set( 5, 10, 7.5 );
 
-		editor.execute( new AddObjectCommand( editor, light ) );
+		editor.execute( new MultiCmdsCommand( editor, [
+			new AddObjectCommand( editor, light.target ),
+			new AddObjectCommand( editor, light )
+		] ) );
 
 	} );
 	lightSubmenu.add( option );
@@ -443,7 +487,10 @@ function MenubarAdd( editor ) {
 
 		light.position.set( 5, 10, 7.5 );
 
-		editor.execute( new AddObjectCommand( editor, light ) );
+		editor.execute( new MultiCmdsCommand( editor, [
+			new AddObjectCommand( editor, light.target ),
+			new AddObjectCommand( editor, light )
+		] ) );
 
 	} );
 	lightSubmenu.add( option );
@@ -479,7 +526,9 @@ function MenubarAdd( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/camera/orthographic' ) );
 	option.onClick( function () {
 
-		const aspect = editor.camera.aspect;
+		const aspect = editor.camera.isPerspectiveCamera
+			? editor.camera.aspect
+			: ( editor.camera.right - editor.camera.left ) / ( editor.camera.top - editor.camera.bottom );
 		const camera = new THREE.OrthographicCamera( - aspect, aspect );
 		camera.name = 'OrthographicCamera';
 

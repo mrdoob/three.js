@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { WebGPURenderer } from 'three/webgpu';
 
 import { UINumber, UIPanel, UIRow, UISelect, UIText } from './libs/ui.js';
 import { UIBoolean } from './libs/ui.three.js';
@@ -13,6 +14,44 @@ function SidebarProjectRenderer( editor ) {
 
 	const container = new UIPanel();
 	container.setBorderTop( '0px' );
+
+	// Camera
+
+	const cameraRow = new UIRow();
+	container.add( cameraRow );
+
+	cameraRow.add( new UIText( strings.getKey( 'sidebar/project/camera' ) ).setClass( 'Label' ) );
+
+	const cameraTypeSelect = new UISelect().setOptions( {
+		'perspective': 'Perspective',
+		'orthographic': 'Orthographic'
+	} ).setWidth( '150px' ).onChange( function () {
+
+		editor.setCameraType( this.getValue() );
+
+	} );
+	cameraTypeSelect.setValue( config.getKey( 'project/camera' ) );
+	cameraRow.add( cameraTypeSelect );
+
+	if ( config.getKey( 'project/camera' ) === 'orthographic' ) {
+
+		editor.setCameraType( 'orthographic' );
+
+	}
+
+	// Renderer
+
+	const rendererRow = new UIRow();
+	container.add( rendererRow );
+
+	rendererRow.add( new UIText( strings.getKey( 'sidebar/project/renderer' ) ).setClass( 'Label' ) );
+
+	const rendererTypeSelect = new UISelect().setOptions( {
+		'WebGLRenderer': 'WebGL',
+		'WebGPURenderer': 'WebGPU'
+	} ).setWidth( '150px' ).onChange( createRenderer );
+	rendererTypeSelect.setValue( config.getKey( 'project/renderer/type' ) );
+	rendererRow.add( rendererTypeSelect );
 
 	// Antialias
 
@@ -37,8 +76,7 @@ function SidebarProjectRenderer( editor ) {
 	const shadowTypeSelect = new UISelect().setOptions( {
 		0: 'Basic',
 		1: 'PCF',
-		2: 'PCF Soft',
-		//	3: 'VSM'
+		3: 'VSM'
 	} ).setWidth( '125px' ).onChange( updateShadows );
 	shadowTypeSelect.setValue( config.getKey( 'project/renderer/shadowType' ) );
 	shadowsRow.add( shadowTypeSelect );
@@ -90,9 +128,22 @@ function SidebarProjectRenderer( editor ) {
 
 	//
 
-	function createRenderer() {
+	async function createRenderer() {
 
-		currentRenderer = new THREE.WebGLRenderer( { antialias: antialiasBoolean.getValue() } );
+		const rendererType = rendererTypeSelect.getValue();
+		const antialias = antialiasBoolean.getValue();
+
+		if ( rendererType === 'WebGPURenderer' ) {
+
+			currentRenderer = new WebGPURenderer( { antialias: antialias, reversedDepthBuffer: true } );
+			await currentRenderer.init();
+
+		} else {
+
+			currentRenderer = new THREE.WebGLRenderer( { antialias: antialias, reversedDepthBuffer: true } );
+
+		}
+
 		currentRenderer.shadowMap.enabled = shadowsBoolean.getValue();
 		currentRenderer.shadowMap.type = parseFloat( shadowTypeSelect.getValue() );
 		currentRenderer.toneMapping = parseFloat( toneMappingSelect.getValue() );
@@ -108,11 +159,20 @@ function SidebarProjectRenderer( editor ) {
 
 	// Signals
 
+	signals.cameraResetted.add( function () {
+
+		const type = editor.camera.isOrthographicCamera ? 'orthographic' : 'perspective';
+
+		cameraTypeSelect.setValue( type );
+		config.setKey( 'project/camera', type );
+
+	} );
+
 	signals.editorCleared.add( function () {
 
 		currentRenderer.shadowMap.enabled = true;
 		currentRenderer.shadowMap.type = THREE.PCFShadowMap;
-		currentRenderer.toneMapping = THREE.NoToneMapping;
+		currentRenderer.toneMapping = THREE.NeutralToneMapping;
 		currentRenderer.toneMappingExposure = 1;
 
 		shadowsBoolean.setValue( currentRenderer.shadowMap.enabled );
@@ -128,6 +188,7 @@ function SidebarProjectRenderer( editor ) {
 	signals.rendererUpdated.add( function () {
 
 		config.setKey(
+			'project/renderer/type', rendererTypeSelect.getValue(),
 			'project/renderer/antialias', antialiasBoolean.getValue(),
 			'project/renderer/shadows', shadowsBoolean.getValue(),
 			'project/renderer/shadowType', parseFloat( shadowTypeSelect.getValue() ),

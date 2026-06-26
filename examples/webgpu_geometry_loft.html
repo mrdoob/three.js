@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - loft geometry</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - loft geometry">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_geometry_loft.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_geometry_loft.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Loft Geometry</span>
+			</div>
+
+			<small>
+				Surfaces generated through cross sections, textured procedurally with TSL.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { bumpMap, color, cos, float, mix, mx_fractal_noise_float, mx_noise_float, mx_worley_noise_float, positionLocal, screenUV, sin, smoothstep, uv, vec3 } from 'three/tsl';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { LoftGeometry } from 'three/addons/geometries/LoftGeometry.js';
+
+			let group, camera, scene, renderer;
+
+			init();
+
+			async function init() {
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFShadowMap;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				scene = new THREE.Scene();
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
+				scene.environmentIntensity = 0.4;
+
+				// a vignette in the background
+
+				const background = screenUV.distance( .5 ).mix( color( 0x5d5d84 ), color( 0x2e2e44 ) );
+
+				scene.backgroundNode = background;
+
+				// camera
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 15, 40 );
+
+				// controls
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 15;
+				controls.maxDistance = 50; // stay inside the curtain
+				controls.target.set( 0, - 3, 0 );
+				controls.update();
+
+				// everything stands on a rotating floor. all surface detail is
+				// procedural: the loft uvs run along the loft ( uv().x ) and around
+				// the sections ( uv().y ), so patterns can follow the geometry
+
+				group = new THREE.Group();
+				scene.add( group );
+
+				// floor: large, softly mottled, running under the curtain so its
+				// edge is never seen
+
+				const floorMaterial = new THREE.MeshStandardNodeMaterial( { roughness: 1 } );
+				floorMaterial.colorNode = color( 0x555577 ).mul( mx_noise_float( positionLocal.mul( 0.4 ) ).mul( 0.1 ).add( 0.95 ) );
+
+				const floor = new THREE.Mesh(
+					new THREE.CircleGeometry( 58, 64 ).rotateX( - Math.PI / 2 ),
+					floorMaterial
+				);
+				floor.position.y = - 5.01;
+				floor.receiveShadow = true;
+				group.add( floor );
+
+				// a theater curtain encircles the exhibition
+
+				const curtainMaterial = new THREE.MeshStandardNodeMaterial( { roughness: 0.9, side: THREE.DoubleSide } );
+				curtainMaterial.colorNode = color( 0x86222e ).mul( mx_noise_float( vec3( uv().y.mul( 300 ), uv().x.mul( 6 ), 0 ) ).mul( 0.08 ).add( 0.96 ) );
+
+				const curtain = new THREE.Mesh( createCurtainGeometry(), curtainMaterial );
+				group.add( curtain );
+
+				// light
+
+				const light = new THREE.DirectionalLight( 0xffffff, 3 );
+				light.position.set( 18, 30, 12 );
+				light.castShadow = true;
+				light.shadow.camera.left = - 60;
+				light.shadow.camera.right = 60;
+				light.shadow.camera.top = 60;
+				light.shadow.camera.bottom = - 60;
+				light.shadow.camera.far = 110;
+				light.shadow.mapSize.set( 4096, 4096 );
+				light.shadow.bias = - 0.0005;
+				scene.add( light );
+
+				// pedestals: polished marble. the veins meander and branch along the
+				// zero crossings of a domain warped fractal noise — a sharp dark
+				// core inside a soft halo — over a gently clouded white base
+
+				const p = positionLocal.mul( 0.9 );
+
+				const vein = mx_fractal_noise_float( p.add( mx_fractal_noise_float( p.mul( 0.4 ), 3 ).mul( 2 ) ), 4 ).abs().oneMinus();
+				const fine = mx_fractal_noise_float( p.mul( 3 ).add( 11 ), 3 ).abs().oneMinus();
+
+				const veining = vein.pow( 4 ).mul( 0.3 ).add( vein.pow( 12 ).mul( 0.7 ) ).add( fine.pow( 14 ).mul( 0.2 ) );
+				const clouds = mx_noise_float( p.mul( 0.5 ) ).mul( 0.5 ).add( 0.5 );
+
+				const pedestalMaterial = new THREE.MeshStandardNodeMaterial();
+				pedestalMaterial.colorNode = mix( mix( color( 0xf4f4f7 ), color( 0xeeeef2 ), clouds ), color( 0xd0d0d5 ), veining );
+				pedestalMaterial.roughnessNode = veining.mul( 0.14 ).add( 0.07 );
+				pedestalMaterial.envMapIntensity = 1.5;
+
+				function addPedestal( x, z, radius, height ) {
+
+					const pedestal = new THREE.Mesh( createPedestalGeometry( radius, height ), pedestalMaterial );
+					pedestal.position.set( x, - 5, z );
+					pedestal.rotation.y = x * 0.7 + z * 1.3; // so the marbling differs per pedestal
+					group.add( pedestal );
+
+					return - 5 + height; // the top of the pedestal
+
+				}
+
+				// a coffee set: a cup and a saucer lofted from the bottom center, up
+				// one side of the wall and back down the inside, and a handle swept
+				// along a spline. the porcelain glaze has a faint waviness
+
+				const porcelain = new THREE.MeshStandardNodeMaterial();
+				porcelain.roughnessNode = mx_noise_float( positionLocal.mul( 6 ) ).mul( 0.08 ).add( 0.2 );
+				porcelain.normalNode = bumpMap( mx_noise_float( positionLocal.mul( 2 ) ).mul( 0.05 ) );
+
+				const coffee = new THREE.Group();
+				coffee.position.y = addPedestal( 0, 0, 3.6, 2.2 );
+				coffee.scale.setScalar( 0.75 );
+				group.add( coffee );
+
+				const saucer = new THREE.Mesh( createSaucerGeometry(), porcelain );
+				coffee.add( saucer );
+
+				const cup = new THREE.Mesh( createCupGeometry(), porcelain );
+				cup.position.y = 0.3;
+				coffee.add( cup );
+
+				const handle = new THREE.Mesh( createHandleGeometry(), porcelain );
+				handle.position.y = 0.3;
+				handle.rotation.y = 0.15;
+				coffee.add( handle );
+
+				// the coffee has a lazy swirl on its surface
+
+				const liquidMaterial = new THREE.MeshStandardNodeMaterial( { roughness: 0.08 } );
+				liquidMaterial.colorNode = mix( color( 0x2b1a12 ), color( 0x4a2c1a ), mx_noise_float( positionLocal.mul( 1.5 ) ).mul( 0.5 ).add( 0.5 ) );
+
+				const liquid = new THREE.Mesh(
+					new THREE.CircleGeometry( 2, 48 ).rotateX( - Math.PI / 2 ),
+					liquidMaterial
+				);
+				liquid.position.y = 3.6;
+				coffee.add( liquid );
+
+				// a vase: circular sections with a varying radius. the glaze pools
+				// in throwing rings along the profile
+
+				const vaseRings = sin( uv().x.mul( 160 ) );
+
+				const vaseMaterial = new THREE.MeshStandardNodeMaterial( { side: THREE.DoubleSide } );
+				vaseMaterial.colorNode = mix( color( 0x2e6f9e ), color( 0x82b8d8 ), mx_noise_float( positionLocal.mul( 1.2 ) ).mul( 0.5 ).add( 0.5 ) );
+				vaseMaterial.roughnessNode = vaseRings.mul( 0.08 ).add( 0.3 );
+				vaseMaterial.normalNode = bumpMap( vaseRings.mul( 0.012 ) );
+
+				const vase = new THREE.Mesh( createVaseGeometry(), vaseMaterial );
+				vase.position.set( - 10.5, addPedestal( - 10.5, - 10.5, 3.6, 1.1 ), - 10.5 );
+				group.add( vase );
+
+				// a seashell: circular sections that grow while sweeping along a
+				// logarithmic spiral, with growth bands and fine ridges along it
+
+				const shellMaterial = new THREE.MeshStandardNodeMaterial( { roughness: 0.5, side: THREE.DoubleSide } );
+				shellMaterial.colorNode = mix( color( 0xc9a87f ), color( 0xf2e6d8 ), mx_noise_float( vec3( uv().x.mul( 24 ), 0, 0 ) ).mul( 0.5 ).add( 0.5 ) );
+				shellMaterial.normalNode = bumpMap( sin( uv().x.mul( 480 ) ).mul( 0.02 ) );
+
+				const shell = new THREE.Mesh( createShellGeometry(), shellMaterial );
+				shell.position.set( 10.5, addPedestal( 10.5, - 10.5, 3.6, 1.1 ) + 1.92, - 10.5 );
+				shell.rotation.y = - Math.PI / 2;
+				shell.scale.setScalar( 0.8 );
+				group.add( shell );
+
+				// a twisted star: non-circular sections that rotate and scale along
+				// the loft, in sandy terracotta
+
+				const starMaterial = new THREE.MeshStandardNodeMaterial( { roughness: 0.6 } );
+				starMaterial.colorNode = color( 0xcc5544 ).mul( mx_noise_float( positionLocal.mul( 3 ) ).mul( 0.12 ).add( 0.94 ) );
+				starMaterial.normalNode = bumpMap( mx_noise_float( positionLocal.mul( 50 ) ).mul( 0.008 ) );
+
+				const star = new THREE.Mesh( createStarGeometry(), starMaterial );
+				star.position.set( - 10.5, addPedestal( - 10.5, 10.5, 3.6, 1.1 ), 10.5 );
+				star.scale.setScalar( 0.8 );
+				group.add( star );
+
+				// a ribbon: open two-point sections ( closed: false ), in gold
+				// brushed along its length
+
+				const brush = mx_noise_float( vec3( uv().x.mul( 6 ), uv().y.mul( 160 ), 0 ) );
+
+				const ribbonMaterial = new THREE.MeshStandardNodeMaterial( { color: 0xffcc44, metalness: 1, side: THREE.DoubleSide } );
+				ribbonMaterial.roughnessNode = brush.mul( 0.08 ).add( 0.1 );
+				ribbonMaterial.normalNode = bumpMap( brush.mul( 0.004 ) );
+				ribbonMaterial.envMapIntensity = 2.5;
+
+				const ribbon = new THREE.Mesh( createRibbonGeometry(), ribbonMaterial );
+				ribbon.position.set( 10.5, addPedestal( 10.5, 10.5, 3.6, 1.1 ), 10.5 );
+				group.add( ribbon );
+
+				// a toothpaste tube: circular sections that morph into a flat
+				// crimped seam, with stripes printed around the body
+
+				const tubeU = uv().x;
+				const tealStripe = smoothstep( 0.48, 0.5, tubeU ).sub( smoothstep( 0.6, 0.62, tubeU ) );
+				const redStripe = smoothstep( 0.66, 0.68, tubeU ).sub( smoothstep( 0.72, 0.74, tubeU ) );
+
+				const tubeMaterial = new THREE.MeshStandardNodeMaterial( { roughness: 0.25 } );
+				tubeMaterial.colorNode = mix( mix( color( 0xf2f2f2 ), color( 0x2aa6b8 ), tealStripe ), color( 0xd0543a ), redStripe );
+
+				const tube = new THREE.Mesh( createToothpasteGeometry(), tubeMaterial );
+				tube.position.set( 7.8, addPedestal( 7.8, 0, 2, 1.6 ), 0 );
+				tube.rotation.y = 0.5;
+				group.add( tube );
+
+				// a pumpkin: lobed sections around a squashed profile. the shading
+				// follows the same crease function as the geometry, so the narrow
+				// creases are darker and rougher than the broad lobes
+
+				const lobe = cos( uv().y.mul( Math.PI * 7 ) ).abs().pow( 0.35 );
+
+				const pumpkinMaterial = new THREE.MeshStandardNodeMaterial();
+				pumpkinMaterial.colorNode = mix(
+					mix( color( 0x9c4f16 ), color( 0xe6913d ), lobe ),
+					color( 0x8a7a2e ), // greener around the stem
+					smoothstep( 0.88, 1, uv().x ).mul( 0.6 )
+				);
+				pumpkinMaterial.roughnessNode = float( 0.7 ).sub( lobe.mul( 0.2 ) );
+				pumpkinMaterial.normalNode = bumpMap( mx_noise_float( vec3( uv().y.mul( 120 ), uv().x.mul( 5 ), 0 ) ).mul( 0.01 ) );
+
+				const pumpkinY = addPedestal( 0, 7.8, 2, 1.6 );
+
+				const pumpkin = new THREE.Mesh( createPumpkinGeometry(), pumpkinMaterial );
+				pumpkin.position.set( 0, pumpkinY, 7.8 );
+				group.add( pumpkin );
+
+				const pumpkinStemMaterial = new THREE.MeshStandardNodeMaterial( { color: 0x667744 } );
+				pumpkinStemMaterial.roughnessNode = mx_noise_float( positionLocal.mul( 20 ) ).mul( 0.2 ).add( 0.7 );
+
+				const pumpkinStem = new THREE.Mesh( createPumpkinStemGeometry(), pumpkinStemMaterial );
+				pumpkinStem.position.set( 0, pumpkinY, 7.8 );
+				group.add( pumpkinStem );
+
+				// a mushroom: a cap that folds under its own rim. the cap uvs run
+				// from under the rim ( u 0 ) over the edge to the top center ( u 1 ),
+				// so the red dome with its raised warts and the pale underside with
+				// its radial gills can share one material
+
+				const capU = uv().x;
+				const dome = smoothstep( 0.42, 0.58, capU );
+				const warts = smoothstep( 0.18, 0.38, mx_worley_noise_float( positionLocal.mul( 2.4 ) ) ).oneMinus().mul( dome );
+				const gills = sin( uv().y.mul( Math.PI * 120 ) ).mul( 0.5 ).add( 0.5 ).mul( dome.oneMinus() );
+
+				const capMaterial = new THREE.MeshStandardNodeMaterial();
+				capMaterial.colorNode = mix(
+					mix( color( 0xe8dcc4 ), color( 0xbfae8e ), gills ),
+					mix( color( 0xa32d20 ), color( 0xf2e9d8 ), warts ),
+					dome
+				);
+				capMaterial.roughnessNode = float( 0.55 ).sub( dome.mul( 0.2 ) ).add( warts.mul( 0.25 ) );
+				capMaterial.normalNode = bumpMap( warts.mul( 0.08 ).sub( gills.mul( 0.015 ) ) );
+
+				const mushroomY = addPedestal( - 7.8, 0, 2, 1.6 );
+
+				const mushroomCap = new THREE.Mesh( createMushroomCapGeometry(), capMaterial );
+				mushroomCap.position.set( - 7.8, mushroomY, 0 );
+				group.add( mushroomCap );
+
+				const mushroomStemMaterial = new THREE.MeshStandardNodeMaterial();
+				mushroomStemMaterial.colorNode = color( 0xe5d5b5 ).mul( mx_noise_float( vec3( uv().y.mul( 24 ), uv().x.mul( 2 ), 0 ) ).mul( 0.1 ).add( 0.94 ) );
+				mushroomStemMaterial.roughnessNode = mx_noise_float( positionLocal.mul( 12 ) ).mul( 0.15 ).add( 0.55 );
+
+				const mushroomStem = new THREE.Mesh( createMushroomStemGeometry(), mushroomStemMaterial );
+				mushroomStem.position.set( - 7.8, mushroomY, 0 );
+				group.add( mushroomStem );
+
+				// a goblet: a foot, a thin stem and a bowl with folded back walls,
+				// in hammered copper
+
+				const dents = mx_worley_noise_float( positionLocal.mul( 5 ) );
+
+				const gobletMaterial = new THREE.MeshStandardNodeMaterial( { color: 0xb87333, metalness: 1 } );
+				gobletMaterial.roughnessNode = dents.mul( 0.18 ).add( 0.12 );
+				gobletMaterial.normalNode = bumpMap( dents.mul( 0.1 ) );
+				gobletMaterial.envMapIntensity = 2;
+
+				const goblet = new THREE.Mesh( createGobletGeometry(), gobletMaterial );
+				goblet.position.set( 0, addPedestal( 0, - 7.8, 2, 1.6 ), - 7.8 );
+				group.add( goblet );
+
+				// a rope barrier around the exhibition: brass stanchions, and a
+				// twisted cord sagging between them
+
+				const brassMaterial = new THREE.MeshStandardNodeMaterial( { color: 0xc9a86a, metalness: 1 } );
+				brassMaterial.roughnessNode = mx_noise_float( positionLocal.mul( 10 ) ).mul( 0.06 ).add( 0.16 );
+				brassMaterial.envMapIntensity = 2;
+
+				const ropeMaterial = new THREE.MeshStandardNodeMaterial( { color: 0x8a2433, roughness: 0.65 } );
+				ropeMaterial.normalNode = bumpMap( sin( uv().x.mul( 200 ).add( uv().y.mul( Math.PI * 2 ) ) ).mul( 0.015 ) ); // the twist of the cord
+
+				const posts = 14;
+				const barrierRadius = 20;
+
+				const stanchionGeometry = createStanchionGeometry();
+				const ropeGeometry = createRopeGeometry( 2 * barrierRadius * Math.sin( Math.PI / posts ) );
+
+				for ( let i = 0; i < posts; i ++ ) {
+
+					const angle = ( i + 0.5 ) / posts * Math.PI * 2;
+
+					const post = new THREE.Mesh( stanchionGeometry, brassMaterial );
+					post.position.set( Math.sin( angle ) * barrierRadius, - 5, Math.cos( angle ) * barrierRadius );
+					group.add( post );
+
+					const mid = angle + Math.PI / posts;
+					const midRadius = barrierRadius * Math.cos( Math.PI / posts );
+
+					const rope = new THREE.Mesh( ropeGeometry, ropeMaterial );
+					rope.position.set( Math.sin( mid ) * midRadius, - 5 + 2.05, Math.cos( mid ) * midRadius );
+					rope.rotation.y = mid;
+					group.add( rope );
+
+				}
+
+				// shadows
+
+				group.traverse( ( child ) => {
+
+					if ( child.isMesh ) child.castShadow = child.receiveShadow = true;
+
+				} );
+
+				floor.castShadow = false;
+				liquid.castShadow = false;
+
+				// every loft remembers the sections it was skinned through in
+				// geometry.parameters, so a skeleton of rings can be rebuilt from
+				// the meshes themselves
+
+				const skeleton = new THREE.Group();
+				skeleton.visible = false;
+				group.add( skeleton );
+
+				const lofts = [];
+
+				group.traverse( ( child ) => {
+
+					if ( child.isMesh && child.geometry.type === 'LoftGeometry' ) lofts.push( child );
+
+				} );
+
+				const lineMaterial = new THREE.LineBasicMaterial( { color: 0xaaccee } );
+
+				group.updateMatrixWorld( true );
+
+				for ( const mesh of lofts ) {
+
+					const { sections, closed } = mesh.geometry.parameters;
+					const step = Math.max( 1, Math.round( sections.length / 20 ) );
+
+					const positions = [];
+
+					function addRing( ring ) {
+
+						const segments = closed ? ring.length : ring.length - 1;
+
+						for ( let j = 0; j < segments; j ++ ) {
+
+							const a = ring[ j ], b = ring[ ( j + 1 ) % ring.length ];
+							positions.push( a.x, a.y, a.z, b.x, b.y, b.z );
+
+						}
+
+					}
+
+					for ( let i = 0; i < sections.length; i += step ) addRing( sections[ i ] );
+					if ( ( sections.length - 1 ) % step !== 0 ) addRing( sections[ sections.length - 1 ] );
+
+					const geometry = new THREE.BufferGeometry();
+					geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+
+					const lines = new THREE.LineSegments( geometry, lineMaterial );
+					lines.applyMatrix4( mesh.matrixWorld );
+					skeleton.add( lines );
+
+				}
+
+				// parameters
+
+				const gui = renderer.inspector.createParameters( 'Parameters' );
+
+				gui.add( { sections: false }, 'sections' ).onChange( ( value ) => {
+
+					skeleton.visible = value;
+					liquid.visible = ! value;
+
+					for ( const mesh of lofts ) mesh.visible = ! value;
+
+				} );
+
+				gui.add( { wireframe: false }, 'wireframe' ).onChange( ( value ) => {
+
+					group.traverse( ( child ) => {
+
+						if ( child.isMesh ) {
+
+							child.material.wireframe = value;
+							child.material.needsUpdate = true;
+
+						}
+
+					} );
+
+				} );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			// revolves a smoothed 2d profile ( x = radius, y = height ) into
+			// circular sections, like a lathe
+
+			function createRevolvedSections( profile, divisions, segments ) {
+
+				const points = new THREE.SplineCurve( profile ).getPoints( divisions );
+
+				const sections = [];
+
+				for ( let i = 0; i <= divisions; i ++ ) {
+
+					const point = points[ i ];
+
+					const ring = [];
+
+					for ( let j = 0; j < segments; j ++ ) {
+
+						const angle = j / segments * Math.PI * 2;
+						ring.push( new THREE.Vector3( Math.sin( angle ) * point.x, point.y, Math.cos( angle ) * point.x ) );
+
+					}
+
+					sections.push( ring );
+
+				}
+
+				return sections;
+
+			}
+
+			function createPedestalGeometry( radius, height ) {
+
+				// a stepped plinth, a tapered shaft and a cornice; revolved without
+				// smoothing, one ring per profile point. doubled points split the
+				// vertex normals, keeping those turnings crisp
+
+				const profile = [
+					new THREE.Vector2( 0.2, 0 ),
+					new THREE.Vector2( radius * 1.06, 0 ),
+					new THREE.Vector2( radius * 1.06, height * 0.1 ),
+					new THREE.Vector2( radius * 1.06, height * 0.1 ),
+					new THREE.Vector2( radius * 0.98, height * 0.16 ),
+					new THREE.Vector2( radius * 0.94, height * 0.55 ),
+					new THREE.Vector2( radius * 0.97, height * 0.84 ),
+					new THREE.Vector2( radius * 1.04, height * 0.88 ),
+					new THREE.Vector2( radius * 1.04, height * 0.97 ),
+					new THREE.Vector2( radius * 1.04, height * 0.97 ),
+					new THREE.Vector2( radius * 0.98, height ),
+					new THREE.Vector2( radius * 0.98, height ),
+					new THREE.Vector2( radius * 0.5, height - 0.004 ),
+					new THREE.Vector2( 0.2, height )
+				];
+
+				const sections = [];
+
+				for ( const point of profile ) {
+
+					const ring = [];
+
+					for ( let j = 0; j < 48; j ++ ) {
+
+						const angle = j / 48 * Math.PI * 2;
+						ring.push( new THREE.Vector3( Math.sin( angle ) * point.x, point.y, Math.cos( angle ) * point.x ) );
+
+					}
+
+					sections.push( ring );
+
+				}
+
+				return new LoftGeometry( sections, { capStart: true, capEnd: true } );
+
+			}
+
+			function createCupGeometry() {
+
+				// from the bottom center, up the egg shaped outer wall, over the lip
+				// and back down the inner wall
+
+				const profile = [
+					new THREE.Vector2( 0.2, 0 ),
+					new THREE.Vector2( 0.7, 0.04 ),
+					new THREE.Vector2( 1.05, 0.1 ),
+					new THREE.Vector2( 1.75, 0.55 ),
+					new THREE.Vector2( 2.25, 1.45 ),
+					new THREE.Vector2( 2.36, 2.2 ),
+					new THREE.Vector2( 2.3, 3.1 ),
+					new THREE.Vector2( 2.22, 3.82 ),
+					new THREE.Vector2( 2.18, 3.95 ),
+					new THREE.Vector2( 2.06, 3.8 ),
+					new THREE.Vector2( 2.18, 2.2 ),
+					new THREE.Vector2( 1.5, 0.75 ),
+					new THREE.Vector2( 0.9, 0.55 ),
+					new THREE.Vector2( 0.2, 0.62 )
+				];
+
+				const sections = createRevolvedSections( profile, 120, 64 );
+
+				return new LoftGeometry( sections, { capStart: true, capEnd: true } );
+
+			}
+
+			function createSaucerGeometry() {
+
+				// from the bottom center, out along the underside, around the thin
+				// rim and back across the gently dished top
+
+				const profile = [
+					new THREE.Vector2( 0.2, 0 ),
+					new THREE.Vector2( 1.3, 0.08 ),
+					new THREE.Vector2( 2.6, 0.35 ),
+					new THREE.Vector2( 3.7, 0.8 ),
+					new THREE.Vector2( 4.2, 1 ),
+					new THREE.Vector2( 3.4, 0.68 ),
+					new THREE.Vector2( 2, 0.3 ),
+					new THREE.Vector2( 1, 0.18 ),
+					new THREE.Vector2( 0.2, 0.26 )
+				];
+
+				const sections = createRevolvedSections( profile, 120, 64 );
+
+				return new LoftGeometry( sections, { capStart: true, capEnd: true } );
+
+			}
+
+			function createHandleGeometry() {
+
+				// an ear shaped loop swept along a spline, slightly tapering; the
+				// ends slim down so they stay buried inside the thin cup wall
+
+				const path = new THREE.SplineCurve( [
+					new THREE.Vector2( 2.2, 3.3 ),
+					new THREE.Vector2( 2.9, 3.45 ),
+					new THREE.Vector2( 3.6, 2.85 ),
+					new THREE.Vector2( 3.65, 1.95 ),
+					new THREE.Vector2( 3, 1.2 ),
+					new THREE.Vector2( 1.78, 1.05 )
+				] );
+
+				const divisions = 60;
+				const points = path.getPoints( divisions );
+
+				const sections = [];
+
+				for ( let i = 0; i <= divisions; i ++ ) {
+
+					const t = i / divisions;
+
+					const point = points[ i ];
+					const tangent = path.getTangent( t );
+
+					const scale = ( 1 - 0.25 * t )
+						* ( 0.28 + 0.72 * THREE.MathUtils.smoothstep( t, 0, 0.12 ) )
+						* ( 0.28 + 0.72 * ( 1 - THREE.MathUtils.smoothstep( t, 0.88, 1 ) ) );
+
+					const a = 0.22 * scale; // in the plane of the loop
+					const b = 0.27 * scale; // across the loop
+
+					const ring = [];
+
+					for ( let j = 0; j < 16; j ++ ) {
+
+						const phi = j / 16 * Math.PI * 2;
+						const radial = a * Math.cos( phi );
+
+						ring.push( new THREE.Vector3(
+							point.x - radial * tangent.y,
+							point.y + radial * tangent.x,
+							b * Math.sin( phi )
+						) );
+
+					}
+
+					sections.push( ring );
+
+				}
+
+				return new LoftGeometry( sections );
+
+			}
+
+			function createVaseGeometry() {
+
+				// a full belly, a slender waist and a flared lip
+
+				const profile = [
+					new THREE.Vector2( 0.2, 0 ),
+					new THREE.Vector2( 1.05, 0.05 ),
+					new THREE.Vector2( 1.5, 0.3 ),
+					new THREE.Vector2( 2.1, 1.4 ),
+					new THREE.Vector2( 2.2, 2.3 ),
+					new THREE.Vector2( 1.8, 3.6 ),
+					new THREE.Vector2( 1.2, 4.8 ),
+					new THREE.Vector2( 0.85, 5.8 ),
+					new THREE.Vector2( 0.72, 6.6 ),
+					new THREE.Vector2( 0.8, 7.3 ),
+					new THREE.Vector2( 1.1, 7.9 ),
+					new THREE.Vector2( 1.3, 8.2 )
+				];
+
+				const sections = createRevolvedSections( profile, 100, 48 );
+
+				return new LoftGeometry( sections, { capStart: true } );
+
+			}
+
+			function createShellGeometry() {
+
+				const turns = 3;
+				const growth = 0.18;
+				const scale = Math.exp( growth * turns * Math.PI * 2 );
+
+				const sections = [];
+
+				for ( let i = 0; i <= 150; i ++ ) {
+
+					const t = i / 150;
+
+					const angle = turns * Math.PI * 2 * t;
+					const e = Math.exp( growth * angle ) / scale;
+
+					const pathRadius = 3 * e;
+					const sectionRadius = 2.4 * e;
+					const sin = Math.sin( angle );
+					const cos = Math.cos( angle );
+
+					const points = [];
+
+					for ( let j = 0; j < 32; j ++ ) {
+
+						const phi = j / 32 * Math.PI * 2;
+						const r = pathRadius + sectionRadius * Math.cos( phi );
+
+						points.push( new THREE.Vector3( r * sin, 4.5 * ( 1 - e ) + sectionRadius * Math.sin( phi ), r * cos ) );
+
+					}
+
+					sections.push( points );
+
+				}
+
+				return new LoftGeometry( sections );
+
+			}
+
+			function createStarGeometry() {
+
+				const sections = [];
+
+				for ( let i = 0; i <= 60; i ++ ) {
+
+					const t = i / 60;
+
+					const twist = t * Math.PI / 3;
+					const scale = 1 - 0.35 * Math.sin( t * Math.PI );
+
+					const points = [];
+
+					for ( let j = 0; j < 96; j ++ ) {
+
+						const angle = j / 96 * Math.PI * 2;
+						const radius = ( 2.4 + 0.7 * Math.cos( 5 * angle ) ) * scale;
+						points.push( new THREE.Vector3( Math.sin( angle + twist ) * radius, t * 10, Math.cos( angle + twist ) * radius ) );
+
+					}
+
+					sections.push( points );
+
+				}
+
+				return new LoftGeometry( sections, { capStart: true, capEnd: true } );
+
+			}
+
+			function createRibbonGeometry() {
+
+				const sections = [];
+
+				for ( let i = 0; i <= 120; i ++ ) {
+
+					const t = i / 120;
+
+					const angle = t * Math.PI * 2 * 2.5;
+					const sin = Math.sin( angle );
+					const cos = Math.cos( angle );
+
+					sections.push( [
+						new THREE.Vector3( 3 * sin, t * 7.5, 3 * cos ),
+						new THREE.Vector3( 3 * sin, t * 7.5 + 2, 3 * cos )
+					] );
+
+				}
+
+				return new LoftGeometry( sections, { closed: false } );
+
+			}
+
+			function createToothpasteGeometry() {
+
+				// a cap, a shoulder, and a body whose circular sections flatten
+				// into a wide crimped seam at the top
+
+				const sections = [];
+
+				for ( let i = 0; i <= 80; i ++ ) {
+
+					const t = i / 80;
+
+					const radius = 0.5 + 0.28 * THREE.MathUtils.smoothstep( t, 0.08, 0.2 );
+					const crimp = THREE.MathUtils.smoothstep( t, 0.3, 0.95 );
+
+					const width = radius * ( 1 - crimp ) + 1.15 * crimp;
+					const depth = radius * ( 1 - crimp ) + 0.05 * crimp;
+
+					const points = [];
+
+					for ( let j = 0; j < 48; j ++ ) {
+
+						const angle = j / 48 * Math.PI * 2;
+						points.push( new THREE.Vector3( Math.sin( angle ) * width, t * 4.2, Math.cos( angle ) * depth ) );
+
+					}
+
+					sections.push( points );
+
+				}
+
+				return new LoftGeometry( sections, { capStart: true, capEnd: true } );
+
+			}
+
+			function createPumpkinGeometry() {
+
+				// a squashed sphere with broad lobes split by narrow creases, and
+				// a sunken hollow around the stem
+
+				const sections = [];
+
+				for ( let i = 0; i <= 60; i ++ ) {
+
+					const t = i / 60;
+
+					const angle = Math.PI * ( 0.03 + 0.94 * t );
+					const radius = 1.85 * Math.pow( Math.sin( angle ), 0.62 );
+					const creases = 0.15 * Math.sin( Math.PI * t );
+
+					const y = 2.05 * t - 0.75 * THREE.MathUtils.smoothstep( t, 0.8, 1 );
+
+					const points = [];
+
+					for ( let j = 0; j < 96; j ++ ) {
+
+						const theta = j / 96 * Math.PI * 2;
+						const lobe = Math.pow( Math.abs( Math.cos( 3.5 * theta ) ), 0.35 );
+						const r = radius * ( 1 - creases + creases * lobe );
+
+						points.push( new THREE.Vector3( Math.sin( theta ) * r, y, Math.cos( theta ) * r ) );
+
+					}
+
+					sections.push( points );
+
+				}
+
+				return new LoftGeometry( sections, { capStart: true, capEnd: true } );
+
+			}
+
+			function createPumpkinStemGeometry() {
+
+				// a ribbed stalk, flared at its base, that rises out of the hollow
+				// and leans over
+
+				const sections = [];
+
+				for ( let i = 0; i <= 30; i ++ ) {
+
+					const t = i / 30;
+
+					const radius = 0.2 - 0.09 * t + 0.14 * Math.pow( 1 - t, 4 );
+					const lean = 0.45 * t * t;
+
+					const points = [];
+
+					for ( let j = 0; j < 32; j ++ ) {
+
+						const angle = j / 32 * Math.PI * 2;
+						const r = radius * ( 0.92 + 0.13 * Math.pow( Math.abs( Math.cos( 2.5 * angle ) ), 0.5 ) );
+
+						points.push( new THREE.Vector3( lean + Math.sin( angle ) * r, 1.3 + 1.15 * t, Math.cos( angle ) * r ) );
+
+					}
+
+					sections.push( points );
+
+				}
+
+				return new LoftGeometry( sections, { capEnd: true } );
+
+			}
+
+			function createMushroomCapGeometry() {
+
+				// from under the rim, around the edge and over the dome
+
+				const profile = [
+					new THREE.Vector2( 0.35, 2.02 ),
+					new THREE.Vector2( 1.1, 2 ),
+					new THREE.Vector2( 1.65, 2.15 ),
+					new THREE.Vector2( 1.78, 2.4 ),
+					new THREE.Vector2( 1.5, 2.85 ),
+					new THREE.Vector2( 0.95, 3.18 ),
+					new THREE.Vector2( 0.2, 3.32 )
+				];
+
+				const sections = createRevolvedSections( profile, 80, 48 );
+
+				return new LoftGeometry( sections, { capEnd: true } );
+
+			}
+
+			function createMushroomStemGeometry() {
+
+				const profile = [
+					new THREE.Vector2( 0.2, 0 ),
+					new THREE.Vector2( 0.55, 0.05 ),
+					new THREE.Vector2( 0.45, 0.9 ),
+					new THREE.Vector2( 0.4, 1.7 ),
+					new THREE.Vector2( 0.42, 2.3 )
+				];
+
+				const sections = createRevolvedSections( profile, 60, 32 );
+
+				return new LoftGeometry( sections, { capStart: true, capEnd: true } );
+
+			}
+
+			function createGobletGeometry() {
+
+				// a foot, a thin stem, and a bowl that folds back down inside
+
+				const profile = [
+					new THREE.Vector2( 0.2, 0 ),
+					new THREE.Vector2( 1.25, 0.05 ),
+					new THREE.Vector2( 1.35, 0.2 ),
+					new THREE.Vector2( 0.6, 0.5 ),
+					new THREE.Vector2( 0.28, 0.9 ),
+					new THREE.Vector2( 0.24, 1.7 ),
+					new THREE.Vector2( 0.7, 2.15 ),
+					new THREE.Vector2( 1.15, 2.8 ),
+					new THREE.Vector2( 1.28, 3.5 ),
+					new THREE.Vector2( 1.27, 3.62 ),
+					new THREE.Vector2( 1.16, 3.5 ),
+					new THREE.Vector2( 0.95, 2.85 ),
+					new THREE.Vector2( 0.45, 2.25 ),
+					new THREE.Vector2( 0.2, 2.32 )
+				];
+
+				const sections = createRevolvedSections( profile, 140, 48 );
+
+				return new LoftGeometry( sections, { capStart: true, capEnd: true } );
+
+			}
+
+			function createStanchionGeometry() {
+
+				// a flat disc base, a slender pole and a small ball finial
+
+				const profile = [
+					new THREE.Vector2( 0.16, 0 ),
+					new THREE.Vector2( 0.42, 0.04 ),
+					new THREE.Vector2( 0.46, 0.12 ),
+					new THREE.Vector2( 0.28, 0.22 ),
+					new THREE.Vector2( 0.08, 0.38 ),
+					new THREE.Vector2( 0.06, 1 ),
+					new THREE.Vector2( 0.06, 1.85 ),
+					new THREE.Vector2( 0.11, 1.95 ),
+					new THREE.Vector2( 0.19, 2.08 ),
+					new THREE.Vector2( 0.2, 2.2 ),
+					new THREE.Vector2( 0.11, 2.3 ),
+					new THREE.Vector2( 0.04, 2.34 )
+				];
+
+				const sections = createRevolvedSections( profile, 80, 24 );
+
+				return new LoftGeometry( sections, { capStart: true, capEnd: true } );
+
+			}
+
+			function createRopeGeometry( length ) {
+
+				// a cord sagging between two stanchions, with both ends buried in
+				// their poles
+
+				const sag = 0.9;
+
+				const sections = [];
+
+				for ( let i = 0; i <= 40; i ++ ) {
+
+					const t = i / 40;
+
+					const x = ( t - 0.5 ) * length;
+					const y = - sag * 4 * t * ( 1 - t );
+
+					// the in plane tangent orients the rings along the curve
+
+					const tx = length;
+					const ty = - sag * 4 * ( 1 - 2 * t );
+					const tl = Math.sqrt( tx * tx + ty * ty );
+
+					const points = [];
+
+					for ( let j = 0; j < 16; j ++ ) {
+
+						const phi = j / 16 * Math.PI * 2;
+						const radial = 0.08 * Math.cos( phi );
+
+						points.push( new THREE.Vector3(
+							x - radial * ty / tl,
+							y + radial * tx / tl,
+							0.08 * Math.sin( phi )
+						) );
+
+					}
+
+					sections.push( points );
+
+				}
+
+				return new LoftGeometry( sections );
+
+			}
+
+			function createCurtainGeometry() {
+
+				// rows of pleated rings hanging from above; the folds deepen and
+				// drift sideways as they fall
+
+				const sections = [];
+
+				for ( let i = 0; i <= 30; i ++ ) {
+
+					const t = i / 30;
+					const y = - 5 + 25 * t;
+
+					const points = [];
+
+					for ( let j = 0; j < 480; j ++ ) {
+
+						const s = j / 480;
+
+						const folds = ( 1.2 - 0.5 * t ) * Math.sin( s * Math.PI * 2 * 48 + t * 2 );
+						const sway = 0.5 * Math.sin( s * Math.PI * 2 * 5 + t * 3 );
+
+						const theta = s * Math.PI * 2;
+						const r = 55 + folds + sway;
+
+						points.push( new THREE.Vector3( Math.sin( theta ) * r, y, Math.cos( theta ) * r ) );
+
+					}
+
+					sections.push( points );
+
+				}
+
+				return new LoftGeometry( sections );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				group.rotation.y += 0.001;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

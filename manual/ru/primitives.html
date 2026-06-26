@@ -46,7 +46,7 @@
 <div id="Diagram-DodecahedronGeometry" data-primitive="DodecahedronGeometry">Додекаэдр (12 граней)</div>
 <div id="Diagram-ExtrudeGeometry" data-primitive="ExtrudeGeometry">Выдавленная 2d фигура с скругленными краями.
 Здесь мы выдавливаем форму сердца. Обратите внимание, это основа
-для <a href="/docs/#api/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a> и <a href="/docs/#api/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a> соответственно.</div>
+для <a href="/docs/#examples/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a> и <a href="/docs/#examples/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a> соответственно.</div>
 <div id="Diagram-IcosahedronGeometry" data-primitive="IcosahedronGeometry">Икосаэдр (20 граней)</div>
 <div id="Diagram-LatheGeometry" data-primitive="LatheGeometry">Форма, созданная вращением линии. Например, лампы, кегли для боулинга, свечи, подсвечники, бокалы для вина, стаканы для питья и т. Д. Вы указываете 2-мерный силуэт в виде серии точек, а затем указываете three.js , сколько секций нужно сделать, когда он вращает силуэт вокруг оси.</div>
 <div id="Diagram-OctahedronGeometry" data-primitive="OctahedronGeometry">Октаэдр (8 граней)</div>
@@ -154,7 +154,7 @@ function addObject(x, y, obj) {
 
 <p></p>
 <p>Есть несколько заметных исключений из шаблона выше.
-Самым большим, вероятно, является <a href="/docs/#api/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>. Он должен
+Самым большим, вероятно, является <a href="/docs/#examples/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>. Он должен
 загрузить данные 3D шрифта, прежде чем он сможет сгенерировать
 сетку для текста. Эти данные загружаются асинхронно, поэтому
 нам нужно дождаться их загрузки, прежде чем пытаться создать
@@ -217,7 +217,7 @@ function addObject(x, y, obj) {
 как то, что справа.</p>
 <p>Другие исключения - это 2-строчные примеры для <a href="/docs/#api/en/geometries/EdgesGeometry"><code class="notranslate" translate="no">EdgesGeometry</code></a>
 и <a href="/docs/#api/en/geometries/WireframeGeometry"><code class="notranslate" translate="no">WireframeGeometry</code></a>. Вместо того, чтобы вызвать <code class="notranslate" translate="no">addSolidGeometry</code>
-они вызвают <code class="notranslate" translate="no">addLineGeomtry</code> который выглядит так</p>
+они вызвают <code class="notranslate" translate="no">addLineGeometry</code> который выглядит так</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">function addLineGeometry(x, y, geometry) {
   const material = new THREE.LineBasicMaterial({color: 0x000000});
   const mesh = new THREE.LineSegments(geometry, material);

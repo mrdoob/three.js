@@ -30,7 +30,6 @@ function SmartComparer() {
 		if ( val1 === val2 ) return true;
 
 		// Null or undefined values.
-		/* jshint eqnull:true */
 		if ( val1 == null || val2 == null ) {
 
 			if ( val1 != val2 ) {

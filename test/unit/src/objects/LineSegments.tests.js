@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Object3D } from '../../../../src/core/Object3D.js';
 import { Line } from '../../../../src/objects/Line.js';
 import { LineSegments } from '../../../../src/objects/LineSegments.js';
@@ -44,12 +42,6 @@ export default QUnit.module( 'Objects', () => {
 				object.isLineSegments,
 				'LineSegments.isLineSegments should be true'
 			);
-
-		} );
-
-		QUnit.todo( 'computeLineDistances', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

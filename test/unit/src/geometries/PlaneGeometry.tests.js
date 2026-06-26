@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { PlaneGeometry } from '../../../../src/geometries/PlaneGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
@@ -56,19 +54,6 @@ export default QUnit.module( 'Geometries', () => {
 				object.type === 'PlaneGeometry',
 				'PlaneGeometry.type should be PlaneGeometry'
 			);
-
-		} );
-
-		QUnit.todo( 'parameters', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// STATIC
-		QUnit.todo( 'fromJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

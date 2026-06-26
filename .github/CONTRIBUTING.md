@@ -18,7 +18,7 @@ It is assumed that you know a little about Node.js and Git. If not, [here's some
 
 * Install the dependencies
 
-      npm install
+      npm ci
 
 ## Next Steps
 

@@ -10,39 +10,103 @@ import { Pass, FullScreenQuad } from './Pass.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
 /**
-*
-* Supersample Anti-Aliasing Render Pass
-*
-* This manual approach to SSAA re-renders the scene ones for each sample with camera jitter and accumulates the results.
-*
-* References: https://en.wikipedia.org/wiki/Supersampling
-*
-*/
-
+ * Supersample Anti-Aliasing Render Pass.
+ *
+ * This manual approach to SSAA re-renders the scene ones for each sample with camera jitter and accumulates the results.
+ *
+ * ```js
+ * const ssaaRenderPass = new SSAARenderPass( scene, camera );
+ * ssaaRenderPass.sampleLevel = 3;
+ * composer.addPass( ssaaRenderPass );
+ * ```
+ *
+ * @augments Pass
+ * @three_import import { SSAARenderPass } from 'three/addons/postprocessing/SSAARenderPass.js';
+ */
 class SSAARenderPass extends Pass {
 
-	constructor( scene, camera, clearColor, clearAlpha ) {
+	/**
+	 * Constructs a new SSAA render pass.
+	 *
+	 * @param {Scene} scene - The scene to render.
+	 * @param {Camera} camera - The camera.
+	 * @param {?(number|Color|string)} [clearColor=0x000000] - The clear color of the render pass.
+	 * @param {?number} [clearAlpha=0] - The clear alpha of the render pass.
+	 */
+	constructor( scene, camera, clearColor = 0x000000, clearAlpha = 0 ) {
 
 		super();
 
+		/**
+		 * The scene to render.
+		 *
+		 * @type {Scene}
+		 */
 		this.scene = scene;
+
+		/**
+		 * The camera.
+		 *
+		 * @type {Camera}
+		 */
 		this.camera = camera;
 
-		this.sampleLevel = 4; // specified as n, where the number of samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.
+		/**
+		 * The sample level. Specified as n, where the number of
+		 * samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.
+		 *
+		 * @type {number}
+		 * @default 4
+		 */
+		this.sampleLevel = 4;
+
+		/**
+		 * Whether the pass should be unbiased or not. This property has the most
+		 * visible effect when rendering to a RGBA8 buffer because it mitigates
+		 * rounding errors. By default RGBA16F is used.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.unbiased = true;
 
-		// as we need to clear the buffer in this pass, clearColor must be set to something, defaults to black.
-		this.clearColor = ( clearColor !== undefined ) ? clearColor : 0x000000;
-		this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
+		/**
+		 * Whether to use a stencil buffer or not. This property can't
+		 * be changed after the first render.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.stencilBuffer = false;
+
+		/**
+		 * The clear color of the render pass.
+		 *
+		 * @type {?(number|Color|string)}
+		 * @default 0x000000
+		 */
+		this.clearColor = clearColor;
+
+		/**
+		 * The clear alpha of the render pass.
+		 *
+		 * @type {?number}
+		 * @default 0
+		 */
+		this.clearAlpha = clearAlpha;
+
+		// internals
+
+		this._sampleRenderTarget = null;
+
 		this._oldClearColor = new Color();
 
-		const copyShader = CopyShader;
-		this.copyUniforms = UniformsUtils.clone( copyShader.uniforms );
+		this._copyUniforms = UniformsUtils.clone( CopyShader.uniforms );
 
-		this.copyMaterial = new ShaderMaterial(	{
-			uniforms: this.copyUniforms,
-			vertexShader: copyShader.vertexShader,
-			fragmentShader: copyShader.fragmentShader,
+		this._copyMaterial = new ShaderMaterial(	{
+			uniforms: this._copyUniforms,
+			vertexShader: CopyShader.vertexShader,
+			fragmentShader: CopyShader.fragmentShader,
 			transparent: true,
 			depthTest: false,
 			depthWrite: false,
@@ -50,37 +114,58 @@ class SSAARenderPass extends Pass {
 			blending: AdditiveBlending
 		} );
 
-		this.fsQuad = new FullScreenQuad( this.copyMaterial );
+		this._fsQuad = new FullScreenQuad( this._copyMaterial );
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever the pass is no longer used in your app.
+	 */
 	dispose() {
 
-		if ( this.sampleRenderTarget ) {
+		if ( this._sampleRenderTarget ) {
 
-			this.sampleRenderTarget.dispose();
-			this.sampleRenderTarget = null;
+			this._sampleRenderTarget.dispose();
+			this._sampleRenderTarget = null;
 
 		}
 
-		this.copyMaterial.dispose();
+		this._copyMaterial.dispose();
 
-		this.fsQuad.dispose();
+		this._fsQuad.dispose();
 
 	}
 
+	/**
+	 * Sets the size of the pass.
+	 *
+	 * @param {number} width - The width to set.
+	 * @param {number} height - The height to set.
+	 */
 	setSize( width, height ) {
 
-		if ( this.sampleRenderTarget )	this.sampleRenderTarget.setSize( width, height );
+		if ( this._sampleRenderTarget )	this._sampleRenderTarget.setSize( width, height );
 
 	}
 
-	render( renderer, writeBuffer, readBuffer ) {
+	/**
+	 * Performs the SSAA render pass.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {WebGLRenderTarget} writeBuffer - The write buffer. This buffer is intended as the rendering
+	 * destination for the pass.
+	 * @param {WebGLRenderTarget} readBuffer - The read buffer. The pass can access the result from the
+	 * previous pass from this buffer.
+	 * @param {number} deltaTime - The delta time in seconds.
+	 * @param {boolean} maskActive - Whether masking is active or not.
+	 */
+	render( renderer, writeBuffer, readBuffer/*, deltaTime, maskActive */ ) {
 
-		if ( ! this.sampleRenderTarget ) {
+		if ( ! this._sampleRenderTarget ) {
 
-			this.sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, { type: HalfFloatType } );
-			this.sampleRenderTarget.texture.name = 'SSAARenderPass.sample';
+			this._sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, { type: HalfFloatType, stencilBuffer: this.stencilBuffer } );
+			this._sampleRenderTarget.texture.name = 'SSAARenderPass.sample';
 
 		}
 
@@ -94,7 +179,7 @@ class SSAARenderPass extends Pass {
 
 		const baseSampleWeight = 1.0 / jitterOffsets.length;
 		const roundingRange = 1 / 32;
-		this.copyUniforms[ 'tDiffuse' ].value = this.sampleRenderTarget.texture;
+		this._copyUniforms[ 'tDiffuse' ].value = this._sampleRenderTarget.texture;
 
 		const viewOffset = {
 
@@ -143,9 +228,9 @@ class SSAARenderPass extends Pass {
 
 			}
 
-			this.copyUniforms[ 'opacity' ].value = sampleWeight;
+			this._copyUniforms[ 'opacity' ].value = sampleWeight;
 			renderer.setClearColor( this.clearColor, this.clearAlpha );
-			renderer.setRenderTarget( this.sampleRenderTarget );
+			renderer.setRenderTarget( this._sampleRenderTarget );
 			renderer.clear();
 			renderer.render( this.scene, this.camera );
 
@@ -158,7 +243,7 @@ class SSAARenderPass extends Pass {
 
 			}
 
-			this.fsQuad.render( renderer );
+			this._fsQuad.render( renderer );
 
 		}
 

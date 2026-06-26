@@ -4,12 +4,21 @@ import {
 } from 'three';
 
 /**
- * References:
- * http://john-chapman-graphics.blogspot.com/2013/01/ssao-tutorial.html
- * https://learnopengl.com/Advanced-Lighting/SSAO
- * https://github.com/McNopper/OpenGL/blob/master/Example28/shader/ssao.frag.glsl
+ * @module SSAOShader
+ * @three_import import { SSAOShader } from 'three/addons/shaders/SSAOShader.js';
  */
 
+/**
+ * SSAO shader.
+ *
+ * References:
+ * - {@link http://john-chapman-graphics.blogspot.com/2013/01/ssao-tutorial.html}
+ * - {@link https://learnopengl.com/Advanced-Lighting/SSAO}
+ * - {@link https://github.com/McNopper/OpenGL/blob/master/Example28/shader/ssao.frag.glsl}
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const SSAOShader = {
 
 	name: 'SSAOShader',
@@ -70,6 +79,16 @@ const SSAOShader = {
 
 		#include <packing>
 
+		#ifdef USE_REVERSED_DEPTH_BUFFER
+
+			const float depthThreshold = 0.0;
+
+		#else
+
+			const float depthThreshold = 1.0;
+
+		#endif
+
 		float getDepth( const in vec2 screenPosition ) {
 
 			return texture2D( tDepth, screenPosition ).x;
@@ -128,10 +147,10 @@ const SSAOShader = {
 
 			float depth = getDepth( vUv );
 
-			if ( depth == 1.0 ) {
+			if ( depth == depthThreshold ) {
 
 				gl_FragColor = vec4( 1.0 ); // don't influence background
-				
+
 			} else {
 
 				float viewZ = getViewZ( depth );
@@ -182,6 +201,12 @@ const SSAOShader = {
 
 };
 
+/**
+ * SSAO depth shader.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
 const SSAODepthShader = {
 
 	name: 'SSAODepthShader',
@@ -245,6 +270,12 @@ const SSAODepthShader = {
 
 };
 
+/**
+ * SSAO blur shader.
+ *
+ * @constant
+ * @type {Object}
+ */
 const SSAOBlurShader = {
 
 	name: 'SSAOBlurShader',

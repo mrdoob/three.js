@@ -4,6 +4,10 @@
 		<title>three.js webgl - lines - fat</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - lines - fat">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_lines_fat.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_lines_fat.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -26,8 +30,6 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-			import { GPUStatsPanel } from 'three/addons/utils/GPUStatsPanel.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -39,7 +41,6 @@
 			let line, renderer, scene, camera, camera2, controls;
 			let line1;
 			let matLine, matLineBasic, matLineDashed;
-			let stats, gpuPanel;
 			let gui;
 
 			// viewport
@@ -138,13 +139,6 @@
 				window.addEventListener( 'resize', onWindowResize );
 				onWindowResize();
 
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
-
-				gpuPanel = new GPUStatsPanel( renderer.getContext() );
-				stats.addPanel( gpuPanel );
-				stats.showPanel( 0 );
-
 				initGui();
 
 			}
@@ -174,9 +168,7 @@
 
 				controls.update();
 
-				gpuPanel.startQuery();
 				renderer.render( scene, camera );
-				gpuPanel.endQuery();
 
 				// inset scene
 
@@ -197,8 +189,6 @@
 
 				renderer.setScissorTest( false );
 
-				stats.update();
-
 			}
 
 			//
@@ -210,8 +200,8 @@
 				const param = {
 					'line type': 0,
 					'world units': false,
-					'width': 5,
-					'alphaToCoverage': true,
+					'width': 10,
+					'alphaToCoverage': false,
 					'dashed': false,
 					'dash scale': 1,
 					'dash / gap': 1
@@ -244,9 +234,18 @@
 					matLine.worldUnits = val;
 					matLine.needsUpdate = true;
 
+					if ( val ) {
+
+						widthController.name( 'width (world units)' ).min( 0.1 ).max( 0.5 ).setValue( 0.5 );
+
+					} else {
+
+						widthController.name( 'width (pixels)' ).min( 1 ).max( 10 ).setValue( 10 );
+					}
+
 				} );
 
-				gui.add( param, 'width', 1, 10 ).onChange( function ( val ) {
+				const widthController = gui.add( param, 'width', 1, 10 ).name( 'width (pixels)' ).onChange( function ( val ) {
 
 					matLine.linewidth = val;
 

@@ -526,7 +526,7 @@
 
 		const errorFunc = options.errorFunc || function ( err, functionName, args ) {
 
-			console.error( `WebGL error ${glEnumToString( err )} in ${functionName}(${glFunctionArgsToString( functionName, args )})` ); /* eslint-disable-line no-console */
+			console.error( `WebGL error ${glEnumToString( err )} in ${functionName}(${glFunctionArgsToString( functionName, args )})` );
 
 		};
 
@@ -625,7 +625,7 @@
 
 		}
 
-		// Make a an object that has a copy of every property of the WebGL context
+		// Make an object that has a copy of every property of the WebGL context
 		// but wraps all functions.
 		for ( const propertyName in ctx ) {
 

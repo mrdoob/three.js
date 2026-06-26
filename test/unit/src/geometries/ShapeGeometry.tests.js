@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { ShapeGeometry } from '../../../../src/geometries/ShapeGeometry.js';
 
 import { Shape } from '../../../../src/extras/core/Shape.js';
@@ -51,33 +49,6 @@ export default QUnit.module( 'Geometries', () => {
 				object.type === 'ShapeGeometry',
 				'ShapeGeometry.type should be ShapeGeometry'
 			);
-
-		} );
-
-		QUnit.todo( 'parameters', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// PUBLIC
-		QUnit.todo( 'toJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// STATIC
-		QUnit.todo( 'fromJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// OTHERS
-		QUnit.todo( 'Standard geometry tests', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

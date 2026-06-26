@@ -12,14 +12,52 @@ import {
 	DoubleSide
 } from 'three';
 
+/**
+ * A helper for visualizing the cascades of a CSM instance.
+ *
+ * @augments Group
+ * @three_import import { CSMHelper } from 'three/addons/csm/CSMHelper.js';
+ */
 class CSMHelper extends Group {
 
+	/**
+	 * Constructs a new CSM helper.
+	 *
+	 * @param {CSM|CSMShadowNode} csm - The CSM instance to visualize.
+	 */
 	constructor( csm ) {
 
 		super();
+
+		/**
+		 * The CSM instance to visualize.
+		 *
+		 * @type {CSM|CSMShadowNode}
+		 */
 		this.csm = csm;
+
+		/**
+		 * Whether to display the CSM frustum or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.displayFrustum = true;
+
+		/**
+		 * Whether to display the cascade planes or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.displayPlanes = true;
+
+		/**
+		 * Whether to display the shadow bounds or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.displayShadowBounds = true;
 
 		const indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
@@ -37,6 +75,9 @@ class CSMHelper extends Group {
 
 	}
 
+	/**
+	 * This method must be called if one of the `display*` properties is changed at runtime.
+	 */
 	updateVisibility() {
 
 		const displayFrustum = this.displayFrustum;
@@ -63,6 +104,9 @@ class CSMHelper extends Group {
 
 	}
 
+	/**
+	 * Updates the helper. This method should be called in the app's animation loop.
+	 */
 	update() {
 
 		const csm = this.csm;
@@ -77,6 +121,8 @@ class CSMHelper extends Group {
 		const cascadeLines = this.cascadeLines;
 		const cascadePlanes = this.cascadePlanes;
 		const shadowLines = this.shadowLines;
+
+		if ( camera === null ) return;
 
 		this.position.copy( camera.position );
 		this.quaternion.copy( camera.quaternion );
@@ -158,6 +204,10 @@ class CSMHelper extends Group {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
 	dispose() {
 
 		const frustumLines = this.frustumLines;

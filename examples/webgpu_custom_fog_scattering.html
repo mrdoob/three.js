@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - fog - scattering</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - fog - scattering">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_custom_fog_scattering.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_custom_fog_scattering.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info" class="invert">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Fog - Scattering</span>
+			</div>
+
+			<small>
+				The demo simulates light scattering due to fog.<br/>
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { densityFogFactor, mix, pass, reference, uniform, vec2 } from 'three/tsl';
+			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
+
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { TreeGenerator } from 'three/addons/generators/TreeGenerator.js';
+
+			let camera, scene, renderer, renderPipeline, controls;
+
+			const timer = new THREE.Timer();
+
+			const params = {
+				scatteringEnabled: true
+			};
+
+			init();
+
+			async function init() {
+
+				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.1, 120 );
+				camera.position.set( 0.4, 1.7, 9 ); // ~human eye height
+
+				scene = new THREE.Scene();
+
+				// fog: a bright, cool haze. the background matches it so the trunks read
+				// as dark silhouettes that dissolve into depth — the scattering subject
+
+				scene.fog = new THREE.FogExp2( 0xc6cace, 0.11 );
+				scene.background = new THREE.Color( 0xc6cace );
+
+				// everything is a flat black silhouette — the fog and the scattering blur
+				// do all the shaping, so no lights are needed ( MeshBasicMaterial is unlit )
+
+				const material = new THREE.MeshBasicMaterial( { color: 0x000000 } );
+
+				// a few seeded variants of a tall scots pine: a clean bole rising into a
+				// high, open crown of fine bare branches
+
+				const variants = [];
+
+				const generator = new TreeGenerator( material );
+
+				for ( let v = 0; v < 6; v ++ ) {
+
+					const mesh = generator
+						.setSeed( v + 1 )
+						.setTrunkLength( 2.6 + v * 0.3 ) // the crowns ride high in the fog
+						.setTrunkRadius( 0.06 )
+						.setTaper( 0.28 ) // slender, tapers slowly
+						.setLevels( 4 )
+						.setChildren( [ 7, 5, 4 ] ) // a wide whorl of limbs ramifying into many fine twigs
+						.setBranchAngle( [ 55, 50, 46 ] ) // a rounded crown that turns up
+						.setAngleVariance( 22 )
+						.setLengthRatio( 0.46 ) // short crown limbs ( a modest pine crown )
+						.setMinLength( 0.04 )
+						.setDroop( 0.05 )
+						.setUpPull( 0.42 ) // crown branches reach up toward the light
+						.setGnarl( [ 0, 0.14, 0.24, 0.34 ] ) // dead-straight trunk, wispier twigs
+						.setSectionLength( 0.34 )
+						.setRadialSegments( 7 )
+						.setRadiusExponent( 2.5 ) // slender bole, whippy thin twigs
+						.setMinRadius( 0.0023 ) // very fine twigs
+						.setTrunkClear( 0.72 ) // tall clean bole; the crown sits only at the top
+						.build();
+
+					variants.push( mesh.geometry );
+
+				}
+
+				const placements = variants.map( () => [] );
+
+				const dummy = new THREE.Object3D();
+				const cols = 13, rows = 12, spacing = 1.9;
+
+				for ( let i = 0; i < cols; i ++ ) {
+
+					for ( let j = 0; j < rows; j ++ ) {
+
+						const v = Math.floor( Math.random() * variants.length );
+
+						const x = ( i - cols / 2 ) * spacing + ( Math.random() - 0.5 ) * spacing * 0.8;
+						const z = j * spacing - rows * spacing + 4.2 + ( Math.random() - 0.5 ) * spacing * 0.8;
+
+						dummy.position.set( x, 0, z );
+
+						const scale = 0.85 + Math.random() * 0.4;
+						dummy.rotation.set( ( Math.random() - 0.5 ) * 0.05, Math.random() * Math.PI * 2, ( Math.random() - 0.5 ) * 0.05 ); // slight lean
+						dummy.scale.set( scale, scale * ( 0.9 + Math.random() * 0.3 ), scale );
+						dummy.updateMatrix();
+
+						placements[ v ].push( dummy.matrix.clone() );
+
+					}
+
+				}
+
+				variants.forEach( ( geometry, v ) => {
+
+					const list = placements[ v ];
+					const mesh = new THREE.InstancedMesh( geometry, material, list.length );
+					for ( let k = 0; k < list.length; k ++ ) mesh.setMatrixAt( k, list[ k ] );
+					mesh.instanceMatrix.needsUpdate = true;
+					scene.add( mesh );
+
+				} );
+
+				// a couple of dominant trunks close to the camera to anchor the depth
+
+				[ [ - 1.1, 4.9, 1.5, 1.1 ], [ 1.5, 4, 1.2, 0.3 ] ].forEach( ( [ x, z, s, ry ] ) => {
+
+					const hero = new THREE.Mesh( variants[ variants.length - 1 ], material );
+					hero.position.set( x, 0, z );
+					hero.rotation.y = ry;
+					hero.scale.setScalar( s );
+					scene.add( hero );
+
+				} );
+
+				// ground
+
+				const ground = new THREE.Mesh( new THREE.PlaneGeometry( 600, 600 ).rotateX( - Math.PI / 2 ), material );
+				scene.add( ground );
+
+				// renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				// controls
+
+				controls = new FirstPersonControls( camera, renderer.domElement );
+				controls.movementSpeed = 2;
+				controls.lookSpeed = 0.1;
+				controls.lookAt( - 0.2, 1.7, - 8 );
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				// uniforms
+
+				const density = reference( 'density', 'float', scene.fog );
+				const scattering = uniform( 2 );
+
+				// scene pass
+
+				const scenePass = pass( scene, camera );
+
+				const scenePassColor = scenePass.getTextureNode( 'output' );
+				const scenePassViewZ = scenePass.getViewZNode();
+
+				// blur pass (always downsampled to improve performance)
+
+				const sceneColorBlurred = gaussianBlur( scenePassColor, vec2( scattering ), 4, { resolutionScale: 0.5 } );
+
+				// composite
+
+				const fogFactor = densityFogFactor( density ).context( { getViewZ: () => scenePassViewZ } );
+
+				const compositeNode = mix( scenePassColor, sceneColorBlurred, fogFactor );
+			
+				renderPipeline.outputNode = compositeNode;
+
+				// gui
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( scene.fog, 'density', 0.025, 0.16 ).step( 0.0005 ).name( 'fog density' );
+				gui.add( scattering, 'value', 0, 5 ).name( 'scattering factor' );
+				gui.add( params, 'scatteringEnabled' ).name( 'enable scattering' ).onChange( ( value ) => {
+			
+					if ( value === true ) {
+
+						renderPipeline.outputNode = compositeNode;
+
+					} else {
+
+						renderPipeline.outputNode = scenePassColor;
+
+					}
+
+					renderPipeline.needsUpdate = true;
+
+				} );
+
+				window.addEventListener( 'resize', resize );
+
+			}
+
+			function resize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				timer.update();
+				controls.update( timer.getDelta() );
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+	</body>
+</html>

@@ -223,7 +223,7 @@ drawn into the canvas will lag behind the rest of the page.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
 +scene.background = new THREE.Color('red');
 </pre>
-<p>And if we <a href="../examples/multiple-scenes-v2.html" target="_blank">quickly scroll up and down</a> we'll see the issue. Here's a animation of scrolling slowed down by 10x.</p>
+<p>And if we <a href="../examples/multiple-scenes-v2.html" target="_blank">quickly scroll up and down</a> we'll see the issue. Here's an animation of scrolling slowed down by 10x.</p>
 <div class="threejs_center"><img class="border" src="../resources/images/multi-view-skew.gif"></div>
 
 <p>We can switch to a different method which has a different tradeoff. We'll switch the canvas's CSS from <code class="notranslate" translate="no">position: fixed</code> to <code class="notranslate" translate="no">position: absolute</code>. </p>
@@ -622,8 +622,7 @@ render the scene for this area, then copy the result to the area's canvas.</p>
 <p></p>
 <p>One other advantage to this solution is you could potentially use
 <a href="https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas"><code class="notranslate" translate="no">OffscreenCanvas</code></a>
-to render from a web worker and still use this technique. Unfortunately as of July 2020
-<code class="notranslate" translate="no">OffscreenCanvas</code> is only supported by Chrome.</p>
+to render from a web worker and still use this technique.</p>
 
         </div>
       </div>

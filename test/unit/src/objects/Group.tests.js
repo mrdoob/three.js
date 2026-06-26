@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Group } from '../../../../src/objects/Group.js';
 
 import { Object3D } from '../../../../src/core/Object3D.js';

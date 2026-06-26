@@ -4,6 +4,10 @@
 		<title>three.js xr - cubes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<meta property="og:title" content="three.js xr - cubes">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webxr_xr_cubes.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webxr_xr_cubes.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -29,7 +33,8 @@
 			import { XRButton } from 'three/addons/webxr/XRButton.js';
 			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 
-			const clock = new THREE.Clock();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 
 			let container;
 			let camera, scene, raycaster, renderer;
@@ -186,7 +191,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta() * 60;
+				timer.update();
+
+				const delta = timer.getDelta() * 60;
 
 				if ( controller.userData.isSelecting === true ) {
 

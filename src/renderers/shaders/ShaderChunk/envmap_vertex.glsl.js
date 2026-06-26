@@ -19,7 +19,7 @@ export default /* glsl */`
 
 		}
 
-		vec3 worldNormal = inverseTransformDirection( transformedNormal, viewMatrix );
+		vec3 worldNormal = transformNormalByInverseViewMatrix( transformedNormal, viewMatrix );
 
 		#ifdef ENVMAP_MODE_REFLECTION
 

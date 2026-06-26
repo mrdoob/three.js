@@ -8,27 +8,77 @@ import {
 	SRGBColorSpace,
 	Vector3
 } from 'three';
-import { Projector } from '../renderers/Projector.js';
-import { RenderableFace } from '../renderers/Projector.js';
-import { RenderableLine } from '../renderers/Projector.js';
-import { RenderableSprite } from '../renderers/Projector.js';
 
+import {
+	Projector,
+	RenderableFace,
+	RenderableLine,
+	RenderableSprite
+} from './Projector.js';
+
+/**
+ * Can be used to wrap SVG elements into a 3D object.
+ *
+ * @augments Object3D
+ * @three_import import { SVGObject } from 'three/addons/renderers/SVGRenderer.js';
+ */
 class SVGObject extends Object3D {
 
+	/**
+	 * Constructs a new SVG object.
+	 *
+	 * @param {SVGElement} node - The SVG element.
+	 */
 	constructor( node ) {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isSVGObject = true;
 
+		/**
+		 * This SVG element.
+		 *
+		 * @type {SVGElement}
+		 */
 		this.node = node;
 
 	}
 
 }
 
+/**
+ * This renderer an be used to render geometric data using SVG. The produced vector
+ * graphics are particular useful in the following use cases:
+ *
+ * - Animated logos or icons.
+ * - Interactive 2D/3D diagrams or graphs.
+ * - Interactive maps.
+ * - Complex or animated user interfaces.
+ *
+ * `SVGRenderer` has various advantages. It produces crystal-clear and sharp output which
+ * is independent of the actual viewport resolution.SVG elements can be styled via CSS.
+ * And they have good accessibility since it's possible to add metadata like title or description
+ * (useful for search engines or screen readers).
+ *
+ * There are, however, some important limitations:
+ * - No advanced shading.
+ * - No texture support.
+ * - No shadow support.
+ *
+ * @three_import import { SVGRenderer } from 'three/addons/renderers/SVGRenderer.js';
+ */
 class SVGRenderer {
 
+	/**
+	 * Constructs a new SVG renderer.
+	 */
 	constructor() {
 
 		let _renderData, _elements, _lights,
@@ -38,6 +88,8 @@ class SVGRenderer {
 
 			_svgNode,
 			_pathCount = 0,
+			_svgObjectCount = 0,
+			_renderListCount = 0,
 
 			_precision = null,
 			_quality = 1,
@@ -64,20 +116,66 @@ class SVGRenderer {
 			_viewProjectionMatrix = new Matrix4(),
 
 			_svgPathPool = [],
+			_svgObjectsPool = [],
+			_renderListPool = [],
 
 			_projector = new Projector(),
 			_svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
 
+		/**
+		 * The DOM where the renderer appends its child-elements.
+		 *
+		 * @type {SVGSVGElement}
+		 */
 		this.domElement = _svg;
 
+		/**
+		 * Whether to automatically perform a clear before a render call or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.autoClear = true;
+
+		/**
+		 * Whether to sort 3D objects or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.sortObjects = true;
+
+		/**
+		 * Whether to sort elements or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
 		this.sortElements = true;
 
+		/**
+		 * Number of fractional pixels to enlarge polygons in order to
+		 * prevent anti-aliasing gaps. Range is `[0,1]`.
+		 *
+		 * @type {number}
+		 * @default 0.5
+		 */
 		this.overdraw = 0.5;
 
+		/**
+		 * The output color space.
+		 *
+		 * @type {(SRGBColorSpace|LinearSRGBColorSpace)}
+		 * @default SRGBColorSpace
+		 */
 		this.outputColorSpace = SRGBColorSpace;
 
+		/**
+		 * Provides information about the number of
+		 * rendered vertices and faces.
+		 *
+		 * @type {Object}
+		 */
 		this.info = {
 
 			render: {
@@ -89,6 +187,12 @@ class SVGRenderer {
 
 		};
 
+		/**
+		 * Sets the render quality. Setting to `high` makes the browser improve SVG quality
+		 * over rendering speed and geometric precision.
+		 *
+		 * @param {('low'|'high')} quality - The quality.
+		 */
 		this.setQuality = function ( quality ) {
 
 			switch ( quality ) {
@@ -100,6 +204,11 @@ class SVGRenderer {
 
 		};
 
+		/**
+		 * Sets the clear color.
+		 *
+		 * @param {(number|Color|string)} color - The clear color to set.
+		 */
 		this.setClearColor = function ( color ) {
 
 			_clearColor.set( color );
@@ -108,6 +217,12 @@ class SVGRenderer {
 
 		this.setPixelRatio = function () {};
 
+		/**
+		 * Resizes the renderer to the given width and height.
+		 *
+		 * @param {number} width - The width of the renderer.
+		 * @param {number} height - The height of the renderer.
+		 */
 		this.setSize = function ( width, height ) {
 
 			_svgWidth = width; _svgHeight = height;
@@ -122,6 +237,11 @@ class SVGRenderer {
 
 		};
 
+		/**
+		 * Returns an object containing the width and height of the renderer.
+		 *
+		 * @return {{width:number,height:number}} The size of the renderer.
+		 */
 		this.getSize = function () {
 
 			return {
@@ -131,6 +251,11 @@ class SVGRenderer {
 
 		};
 
+		/**
+		 * Sets the precision of the data used to create a paths.
+		 *
+		 * @param {number} precision - The precision to set.
+		 */
 		this.setPrecision = function ( precision ) {
 
 			_precision = precision;
@@ -155,6 +280,29 @@ class SVGRenderer {
 
 		}
 
+		function renderSort( a, b ) {
+
+			const aOrder = a.data.renderOrder !== undefined ? a.data.renderOrder : 0;
+			const bOrder = b.data.renderOrder !== undefined ? b.data.renderOrder : 0;
+
+			if ( aOrder !== bOrder ) {
+
+				return aOrder - bOrder;
+
+			} else {
+
+				const aZ = a.data.z !== undefined ? a.data.z : 0;
+				const bZ = b.data.z !== undefined ? b.data.z : 0;
+
+				return bZ - aZ; // Painter's algorithm: far to near
+
+			}
+
+		}
+
+		/**
+		 * Performs a manual clear with the defined clear color.
+		 */
 		this.clear = function () {
 
 			removeChildNodes();
@@ -162,6 +310,12 @@ class SVGRenderer {
 
 		};
 
+		/**
+		 * Renders the given scene using the given camera.
+		 *
+		 * @param {Object3D} scene - A scene or any other type of 3D object.
+		 * @param {Camera} camera - The camera.
+		 */
 		this.render = function ( scene, camera ) {
 
 			if ( camera instanceof Camera === false ) {
@@ -198,10 +352,7 @@ class SVGRenderer {
 
 			calculateLights( _lights );
 
-			 // reset accumulated path
-
-			_currentPath = '';
-			_currentStyle = '';
+			_renderListCount = 0;
 
 			for ( let e = 0, el = _elements.length; e < el; e ++ ) {
 
@@ -210,71 +361,15 @@ class SVGRenderer {
 
 				if ( material === undefined || material.opacity === 0 ) continue;
 
-				_elemBox.makeEmpty();
-
-				if ( element instanceof RenderableSprite ) {
-
-					_v1 = element;
-					_v1.x *= _svgWidthHalf; _v1.y *= - _svgHeightHalf;
-
-					renderSprite( _v1, element, material );
-
-				} else if ( element instanceof RenderableLine ) {
-
-					_v1 = element.v1; _v2 = element.v2;
-
-					_v1.positionScreen.x *= _svgWidthHalf; _v1.positionScreen.y *= - _svgHeightHalf;
-					_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= - _svgHeightHalf;
-
-					_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen ] );
-
-					if ( _clipBox.intersectsBox( _elemBox ) === true ) {
-
-						renderLine( _v1, _v2, material );
-
-					}
-
-				} else if ( element instanceof RenderableFace ) {
-
-					_v1 = element.v1; _v2 = element.v2; _v3 = element.v3;
-
-					if ( _v1.positionScreen.z < - 1 || _v1.positionScreen.z > 1 ) continue;
-					if ( _v2.positionScreen.z < - 1 || _v2.positionScreen.z > 1 ) continue;
-					if ( _v3.positionScreen.z < - 1 || _v3.positionScreen.z > 1 ) continue;
-
-					_v1.positionScreen.x *= _svgWidthHalf; _v1.positionScreen.y *= - _svgHeightHalf;
-					_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= - _svgHeightHalf;
-					_v3.positionScreen.x *= _svgWidthHalf; _v3.positionScreen.y *= - _svgHeightHalf;
-
-					if ( this.overdraw > 0 ) {
-
-						expand( _v1.positionScreen, _v2.positionScreen, this.overdraw );
-						expand( _v2.positionScreen, _v3.positionScreen, this.overdraw );
-						expand( _v3.positionScreen, _v1.positionScreen, this.overdraw );
-
-					}
-
-					_elemBox.setFromPoints( [
-						_v1.positionScreen,
-						_v2.positionScreen,
-						_v3.positionScreen
-					] );
-
-					if ( _clipBox.intersectsBox( _elemBox ) === true ) {
-
-						renderFace3( _v1, _v2, _v3, element, material );
-
-					}
-
-				}
+				getRenderItem( _renderListCount ++, 'element', element, material );
 
 			}
 
-			flushPath(); // just to flush last svg:path
+			_svgObjectCount = 0;
 
 			scene.traverseVisible( function ( object ) {
 
-				 if ( object.isSVGObject ) {
+				if ( object.isSVGObject ) {
 
 					_vector3.setFromMatrixPosition( object.matrixWorld );
 					_vector3.applyMatrix4( _viewProjectionMatrix );
@@ -284,14 +379,112 @@ class SVGRenderer {
 					const x = _vector3.x * _svgWidthHalf;
 					const y = - _vector3.y * _svgHeightHalf;
 
-					const node = object.node;
-					node.setAttribute( 'transform', 'translate(' + x + ',' + y + ')' );
+					const svgObject = getSVGObjectData( _svgObjectCount ++ );
 
-					_svg.appendChild( node );
+					svgObject.node = object.node;
+					svgObject.x = x;
+					svgObject.y = y;
+					svgObject.z = _vector3.z;
+					svgObject.renderOrder = object.renderOrder;
+
+					getRenderItem( _renderListCount ++, 'svgObject', svgObject, null );
 
 				}
 
 			} );
+
+			_renderListPool.length = _renderListCount;
+
+			if ( this.sortElements && _svgObjectCount > 0 ) {
+
+				// Elements are already sorted by the Projector.
+				// Only re-sort when SVGObjects need depth-interleaving.
+				_renderListPool.sort( renderSort );
+
+			}
+
+			// Reset accumulated path
+			_currentPath = '';
+			_currentStyle = '';
+
+			// Render in sorted order
+			for ( let i = 0; i < _renderListCount; i ++ ) {
+
+				const item = _renderListPool[ i ];
+
+				if ( item.type === 'svgObject' ) {
+
+					flushPath(); // Flush any accumulated paths before inserting SVG node
+
+					const svgObject = item.data;
+					const node = svgObject.node;
+					node.setAttribute( 'transform', 'translate(' + svgObject.x + ',' + svgObject.y + ')' );
+					_svg.appendChild( node );
+
+				} else {
+
+					const element = item.data;
+					const material = item.material;
+
+					_elemBox.makeEmpty();
+
+					if ( element instanceof RenderableSprite ) {
+
+						_v1 = element;
+						_v1.x *= _svgWidthHalf; _v1.y *= - _svgHeightHalf;
+
+						renderSprite( _v1, element, material );
+
+					} else if ( element instanceof RenderableLine ) {
+
+						_v1 = element.v1; _v2 = element.v2;
+
+						_v1.positionScreen.x *= _svgWidthHalf; _v1.positionScreen.y *= - _svgHeightHalf;
+						_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= - _svgHeightHalf;
+
+						_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen ] );
+
+						if ( _clipBox.intersectsBox( _elemBox ) === true ) {
+
+							renderLine( _v1, _v2, material );
+
+						}
+
+					} else if ( element instanceof RenderableFace ) {
+
+						_v1 = element.v1; _v2 = element.v2; _v3 = element.v3;
+
+						_v1.positionScreen.x *= _svgWidthHalf; _v1.positionScreen.y *= - _svgHeightHalf;
+						_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= - _svgHeightHalf;
+						_v3.positionScreen.x *= _svgWidthHalf; _v3.positionScreen.y *= - _svgHeightHalf;
+
+						if ( this.overdraw > 0 ) {
+
+							expand( _v1.positionScreen, _v2.positionScreen, this.overdraw );
+							expand( _v2.positionScreen, _v3.positionScreen, this.overdraw );
+							expand( _v3.positionScreen, _v1.positionScreen, this.overdraw );
+
+						}
+
+						_elemBox.setFromPoints( [
+							_v1.positionScreen,
+							_v2.positionScreen,
+							_v3.positionScreen
+						] );
+
+						if ( _clipBox.intersectsBox( _elemBox ) === true ) {
+
+							renderFace3( _v1, _v2, _v3, element, material );
+
+						}
+
+					}
+
+				}
+
+			}
+
+			flushPath(); // Flush any remaining paths
 
 		};
 
@@ -531,21 +724,71 @@ class SVGRenderer {
 
 		function getPathNode( id ) {
 
-			if ( _svgPathPool[ id ] == null ) {
+			let path = _svgPathPool[ id ];
 
-				_svgPathPool[ id ] = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
+			if ( path === undefined ) {
+
+				path = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
 
 				if ( _quality == 0 ) {
 
-					_svgPathPool[ id ].setAttribute( 'shape-rendering', 'crispEdges' ); //optimizeSpeed
+					path.setAttribute( 'shape-rendering', 'crispEdges' ); //optimizeSpeed
 
 				}
 
-				return _svgPathPool[ id ];
+				_svgPathPool[ id ] = path;
 
 			}
 
-			return _svgPathPool[ id ];
+			return path;
+
+		}
+
+		function getSVGObjectData( id ) {
+
+			let svgObject = _svgObjectsPool[ id ];
+
+			if ( svgObject === undefined ) {
+
+				svgObject = {
+					node: null,
+					x: 0,
+					y: 0,
+					z: 0,
+					renderOrder: 0
+				};
+
+				_svgObjectsPool[ id ] = svgObject;
+
+			}
+
+			return svgObject;
+
+		}
+
+		function getRenderItem( id, type, data, material ) {
+
+			let item = _renderListPool[ id ];
+
+			if ( item === undefined ) {
+
+				item = {
+					type: type,
+					data: data,
+					material: material
+				};
+
+				_renderListPool[ id ] = item;
+
+				return item;
+
+			}
+
+			item.type = type;
+			item.data = data;
+			item.material = material;
+
+			return item;
 
 		}
 

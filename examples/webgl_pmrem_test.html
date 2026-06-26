@@ -4,6 +4,10 @@
 		<title>three.js PMREM directional light test</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js PMREM directional light test">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_pmrem_test.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_pmrem_test.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -33,7 +37,7 @@
 			import * as THREE from 'three';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -120,7 +124,7 @@
 			function createObjects() {
 
 				let radianceMap = null;
-				new RGBELoader()
+				new HDRLoader()
 					// .setDataType( THREE.FloatType )
 					.setPath( 'textures/equirectangular/' )
 					.load( 'spot1Lux.hdr', function ( texture ) {

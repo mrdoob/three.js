@@ -1,0 +1,41 @@
+{
+    "opts": {
+            "destination": "docs",
+            "encoding": "utf8",
+            "package": "package.json",
+            "recurse": true,
+            "template": "utils/docs/template",
+            "themeOpts": {
+                "ignoreInheritedSymbols": true
+            }
+    },
+    "templates": {
+        "default": {
+            "outputSourceFiles": false
+        }
+    },
+    "plugins": [ "plugins/markdown" ],
+    "source": {
+        "include": [
+            "examples/jsm",
+            "src"
+        ],
+        "exclude": [
+            "src/extras/lib",
+            "src/renderers/common/extras/PMREMGenerator.js",
+            "src/renderers/webgpu/WebGPURenderer.Nodes.js",
+            "examples/jsm/helpers/LightProbeHelperGPU.js",
+            "examples/jsm/helpers/TextureHelperGPU.js",
+            "examples/jsm/libs",
+            "examples/jsm/lines/webgpu",
+            "examples/jsm/loaders/lwo",
+            "examples/jsm/materials/LDrawConditionalLineNodeMaterial.js",
+            "examples/jsm/misc/ProgressiveLightMapGPU.js",
+            "examples/jsm/modifiers/CurveModifierGPU.js",
+            "examples/jsm/objects/Water2.js",
+            "examples/jsm/objects/Water2Mesh.js",
+            "examples/jsm/offscreen",
+            "examples/jsm/utils/ShadowMapViewerGPU.js"
+        ]
+    }
+}

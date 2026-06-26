@@ -27,11 +27,11 @@ function Player( editor ) {
 
 	} );
 
-	signals.startPlayer.add( function () {
+	signals.startPlayer.add( async function () {
 
 		container.setDisplay( '' );
 
-		player.load( editor.toJSON() );
+		await player.load( editor.toJSON() );
 		player.setSize( container.dom.clientWidth, container.dom.clientHeight );
 		player.play();
 

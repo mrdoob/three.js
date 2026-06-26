@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { BufferGeometry, Float32BufferAttribute, Matrix4, Mesh, MeshBasicMaterial, Object3D, Raycaster, SphereGeometry, Vector3 } from 'three';
 
 const PINCH_MAX = 0.05;
 const PINCH_THRESHOLD = 0.02;
@@ -13,19 +13,42 @@ const POINTER_LENGTH = 0.035;
 const POINTER_SEGMENTS = 16;
 const POINTER_RINGS = 12;
 const POINTER_HEMISPHERE_ANGLE = 110;
-const YAXIS = /* @__PURE__ */ new THREE.Vector3( 0, 1, 0 );
-const ZAXIS = /* @__PURE__ */ new THREE.Vector3( 0, 0, 1 );
+const YAXIS = /* @__PURE__ */ new Vector3( 0, 1, 0 );
+const ZAXIS = /* @__PURE__ */ new Vector3( 0, 0, 1 );
 
 const CURSOR_RADIUS = 0.02;
 const CURSOR_MAX_DISTANCE = 1.5;
 
-class OculusHandPointerModel extends THREE.Object3D {
+/**
+ * Represents an Oculus hand pointer model.
+ *
+ * @augments Object3D
+ * @three_import import { OculusHandPointerModel } from 'three/addons/webxr/OculusHandPointerModel.js';
+ */
+class OculusHandPointerModel extends Object3D {
 
+	/**
+	 * Constructs a new Oculus hand model.
+	 *
+	 * @param {Group} hand - The hand controller.
+	 * @param {Group} controller - The WebXR controller in target ray space.
+	 */
 	constructor( hand, controller ) {
 
 		super();
 
+		/**
+		 * The hand controller.
+		 *
+		 * @type {Group}
+		 */
 		this.hand = hand;
+
+		/**
+		 * The WebXR controller in target ray space.
+		 *
+		 * @type {Group}
+		 */
 		this.controller = controller;
 
 		// Unused
@@ -33,15 +56,61 @@ class OculusHandPointerModel extends THREE.Object3D {
 		this.envMap = null;
 		this.mesh = null;
 
+		/**
+		 * The pointer geometry.
+		 *
+		 * @type {?BufferGeometry}
+		 * @default null
+		 */
 		this.pointerGeometry = null;
+
+		/**
+		 * The pointer mesh.
+		 *
+		 * @type {?Mesh}
+		 * @default null
+		 */
 		this.pointerMesh = null;
+
+		/**
+		 * The pointer object that holds the pointer mesh.
+		 *
+		 * @type {?Object3D}
+		 * @default null
+		 */
 		this.pointerObject = null;
 
+		/**
+		 * Whether the model is pinched or not.
+		 *
+		 * @type {?boolean}
+		 * @default false
+		 */
 		this.pinched = false;
+
+		/**
+		 * Whether the model is attached or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.attached = false;
 
+		/**
+		 * The cursor object.
+		 *
+		 * @type {?Mesh}
+		 * @default null
+		 */
 		this.cursorObject = null;
 
+		/**
+		 * The internal raycaster used for detecting
+		 * intersections.
+		 *
+		 * @type {?Raycaster}
+		 * @default null
+		 */
 		this.raycaster = null;
 
 		this._onConnected = this._onConnected.bind( this );
@@ -96,7 +165,7 @@ class OculusHandPointerModel extends THREE.Object3D {
 
 		const vertices = this.pointerGeometry.attributes.position.array;
 		// first ring for front face
-		const frontFaceBase = new THREE.Vector3(
+		const frontFaceBase = new Vector3(
 			POINTER_FRONT_RADIUS,
 			0,
 			- 1 * ( POINTER_LENGTH - rearRadius )
@@ -104,7 +173,7 @@ class OculusHandPointerModel extends THREE.Object3D {
 		this._drawVerticesRing( vertices, frontFaceBase, 0 );
 
 		// rings for rear hemisphere
-		const rearBase = new THREE.Vector3(
+		const rearBase = new Vector3(
 			Math.sin( ( Math.PI * POINTER_HEMISPHERE_ANGLE ) / 180 ) * rearRadius,
 			Math.cos( ( Math.PI * POINTER_HEMISPHERE_ANGLE ) / 180 ) * rearRadius,
 			0
@@ -122,7 +191,7 @@ class OculusHandPointerModel extends THREE.Object3D {
 		// front and rear face center vertices
 		const frontCenterIndex = POINTER_SEGMENTS * ( 1 + POINTER_RINGS );
 		const rearCenterIndex = POINTER_SEGMENTS * ( 1 + POINTER_RINGS ) + 1;
-		const frontCenter = new THREE.Vector3(
+		const frontCenter = new Vector3(
 			0,
 			0,
 			- 1 * ( POINTER_LENGTH - rearRadius )
@@ -130,19 +199,22 @@ class OculusHandPointerModel extends THREE.Object3D {
 		vertices[ frontCenterIndex * 3 ] = frontCenter.x;
 		vertices[ frontCenterIndex * 3 + 1 ] = frontCenter.y;
 		vertices[ frontCenterIndex * 3 + 2 ] = frontCenter.z;
-		const rearCenter = new THREE.Vector3( 0, 0, rearRadius );
+		const rearCenter = new Vector3( 0, 0, rearRadius );
 		vertices[ rearCenterIndex * 3 ] = rearCenter.x;
 		vertices[ rearCenterIndex * 3 + 1 ] = rearCenter.y;
 		vertices[ rearCenterIndex * 3 + 2 ] = rearCenter.z;
 
 		this.pointerGeometry.setAttribute(
 			'position',
-			new THREE.Float32BufferAttribute( vertices, 3 )
+			new Float32BufferAttribute( vertices, 3 )
 		);
 		// verticesNeedUpdate = true;
 
 	}
 
+	/**
+	 * Creates a pointer mesh and adds it to this model.
+	 */
 	createPointer() {
 
 		let i, j;
@@ -151,11 +223,11 @@ class OculusHandPointerModel extends THREE.Object3D {
 		).fill( 0 );
 		// const vertices = [];
 		const indices = [];
-		this.pointerGeometry = new THREE.BufferGeometry();
+		this.pointerGeometry = new BufferGeometry();
 
 		this.pointerGeometry.setAttribute(
 			'position',
-			new THREE.Float32BufferAttribute( vertices, 3 )
+			new Float32BufferAttribute( vertices, 3 )
 		);
 
 		this._updatePointerVertices( POINTER_REAR_RADIUS );
@@ -213,27 +285,27 @@ class OculusHandPointerModel extends THREE.Object3D {
 			POINTER_SEGMENTS * POINTER_RINGS
 		);
 
-		const material = new THREE.MeshBasicMaterial();
+		const material = new MeshBasicMaterial();
 		material.transparent = true;
 		material.opacity = POINTER_OPACITY_MIN;
 
 		this.pointerGeometry.setIndex( indices );
 
-		this.pointerMesh = new THREE.Mesh( this.pointerGeometry, material );
+		this.pointerMesh = new Mesh( this.pointerGeometry, material );
 
 		this.pointerMesh.position.set( 0, 0, - 1 * POINTER_REAR_RADIUS );
-		this.pointerObject = new THREE.Object3D();
+		this.pointerObject = new Object3D();
 		this.pointerObject.add( this.pointerMesh );
 
-		this.raycaster = new THREE.Raycaster();
+		this.raycaster = new Raycaster();
 
 		// create cursor
-		const cursorGeometry = new THREE.SphereGeometry( CURSOR_RADIUS, 10, 10 );
-		const cursorMaterial = new THREE.MeshBasicMaterial();
+		const cursorGeometry = new SphereGeometry( CURSOR_RADIUS, 10, 10 );
+		const cursorMaterial = new MeshBasicMaterial();
 		cursorMaterial.transparent = true;
 		cursorMaterial.opacity = POINTER_OPACITY_MIN;
 
-		this.cursorObject = new THREE.Mesh( cursorGeometry, cursorMaterial );
+		this.cursorObject = new Mesh( cursorGeometry, cursorMaterial );
 		this.pointerObject.add( this.cursorObject );
 
 		this.add( this.pointerObject );
@@ -245,7 +317,7 @@ class OculusHandPointerModel extends THREE.Object3D {
 		if ( this.raycaster ) {
 
 			const pointerMatrix = this.pointerObject.matrixWorld;
-			const tempMatrix = new THREE.Matrix4();
+			const tempMatrix = new Matrix4();
 			tempMatrix.identity().extractRotation( pointerMatrix );
 			this.raycaster.ray.origin.setFromMatrixPosition( pointerMatrix );
 			this.raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
@@ -317,6 +389,12 @@ class OculusHandPointerModel extends THREE.Object3D {
 
 	}
 
+	/**
+	 * Overwritten with a custom implementation. Makes sure the internal pointer and raycaster are updated.
+	 *
+	 * @param {boolean} [force=false] - When set to `true`, a recomputation of world matrices is forced even
+	 * when {@link Object3D#matrixWorldAutoUpdate} is set to `false`.
+	 */
 	updateMatrixWorld( force ) {
 
 		super.updateMatrixWorld( force );
@@ -329,24 +407,47 @@ class OculusHandPointerModel extends THREE.Object3D {
 
 	}
 
+	/**
+	 * Returns `true` is the model is pinched.
+	 *
+	 * @return {boolean} Whether the model is pinched or not.
+	 */
 	isPinched() {
 
 		return this.pinched;
 
 	}
 
+	/**
+	 * Sets the attached state.
+	 *
+	 * @param {boolean} attached - Whether the model is attached or not.
+	 */
 	setAttached( attached ) {
 
 		this.attached = attached;
 
 	}
 
+	/**
+	 * Returns `true` is the model is attached.
+	 *
+	 * @return {boolean} Whether the model is attached or not.
+	 */
 	isAttached() {
 
 		return this.attached;
 
 	}
 
+	/**
+	 * Performs an intersection test with the model's raycaster and the given object.
+	 *
+	 * @param {Object3D} object - The 3D object to check for intersection with the ray.
+	 * @param {boolean} [recursive=true] - If set to `true`, it also checks all descendants.
+	 * Otherwise it only checks intersection with the object.
+	 * @return {Array<Raycaster~Intersection>} An array holding the intersection points.
+	 */
 	intersectObject( object, recursive = true ) {
 
 		if ( this.raycaster ) {
@@ -357,6 +458,14 @@ class OculusHandPointerModel extends THREE.Object3D {
 
 	}
 
+	/**
+	 * Performs an intersection test with the model's raycaster and the given objects.
+	 *
+	 * @param {Array<Object3D>} objects - The 3D objects to check for intersection with the ray.
+	 * @param {boolean} [recursive=true] - If set to `true`, it also checks all descendants.
+	 * Otherwise it only checks intersection with the object.
+	 * @return {Array<Raycaster~Intersection>} An array holding the intersection points.
+	 */
 	intersectObjects( objects, recursive = true ) {
 
 		if ( this.raycaster ) {
@@ -367,12 +476,20 @@ class OculusHandPointerModel extends THREE.Object3D {
 
 	}
 
+	/**
+	 * Checks for intersections between the model's raycaster and the given objects. The method
+	 * updates the cursor object to the intersection point.
+	 *
+	 * @param {Array<Object3D>} objects - The 3D objects to check for intersection with the ray.
+	 * @param {boolean} [recursive=false] - If set to `true`, it also checks all descendants.
+	 * Otherwise it only checks intersection with the object.
+	 */
 	checkIntersections( objects, recursive = false ) {
 
 		if ( this.raycaster && ! this.attached ) {
 
 			const intersections = this.raycaster.intersectObjects( objects, recursive );
-			const direction = new THREE.Vector3( 0, 0, - 1 );
+			const direction = new Vector3( 0, 0, - 1 );
 			if ( intersections.length > 0 ) {
 
 				const intersection = intersections[ 0 ];
@@ -389,9 +506,14 @@ class OculusHandPointerModel extends THREE.Object3D {
 
 	}
 
+	/**
+	 * Sets the cursor to the given distance.
+	 *
+	 * @param {number} distance - The distance to set the cursor to.
+	 */
 	setCursor( distance ) {
 
-		const direction = new THREE.Vector3( 0, 0, - 1 );
+		const direction = new Vector3( 0, 0, - 1 );
 		if ( this.raycaster && ! this.attached ) {
 
 			this.cursorObject.position.copy( direction.multiplyScalar( distance ) );
@@ -400,6 +522,10 @@ class OculusHandPointerModel extends THREE.Object3D {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
 	dispose() {
 
 		this._onDisconnected();

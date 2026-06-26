@@ -6,8 +6,31 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
 
 const _box = /*@__PURE__*/ new Box3();
 
+/**
+ * Helper object to graphically show the world-axis-aligned bounding box
+ * around an object. The actual bounding box is handled with {@link Box3},
+ * this is just a visual helper for debugging. It can be automatically
+ * resized with {@link BoxHelper#update} when the object it's created from
+ * is transformed. Note that the object must have a geometry for this to work,
+ * so it won't work with sprites.
+ *
+ * ```js
+ * const sphere = new THREE.SphereGeometry();
+ * const object = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( 0xff0000 ) );
+ * const box = new THREE.BoxHelper( object, 0xffff00 );
+ * scene.add( box );
+ * ```
+ *
+ * @augments LineSegments
+ */
 class BoxHelper extends LineSegments {
 
+	/**
+	 * Constructs a new box helper.
+	 *
+	 * @param {Object3D} [object] - The 3D object to show the world-axis-aligned bounding box.
+	 * @param {number|Color|string} [color=0xffff00] - The box's color.
+	 */
 	constructor( object, color = 0xffff00 ) {
 
 		const indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
@@ -19,6 +42,11 @@ class BoxHelper extends LineSegments {
 
 		super( geometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
 
+		/**
+		 * The 3D object being visualized.
+		 *
+		 * @type {Object3D}
+		 */
 		this.object = object;
 		this.type = 'BoxHelper';
 
@@ -28,13 +56,11 @@ class BoxHelper extends LineSegments {
 
 	}
 
-	update( object ) {
-
-		if ( object !== undefined ) {
-
-			console.warn( 'THREE.BoxHelper: .update() has no longer arguments.' );
-
-		}
+	/**
+	 * Updates the helper's geometry to match the dimensions of the object,
+	 * including any children.
+	 */
+	update() {
 
 		if ( this.object !== undefined ) {
 
@@ -81,6 +107,12 @@ class BoxHelper extends LineSegments {
 
 	}
 
+	/**
+	 * Updates the wireframe box for the passed object.
+	 *
+	 * @param {Object3D} object - The 3D object to create the helper for.
+	 * @return {BoxHelper} A reference to this instance.
+	 */
 	setFromObject( object ) {
 
 		this.object = object;
@@ -100,6 +132,10 @@ class BoxHelper extends LineSegments {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
 	dispose() {
 
 		this.geometry.dispose();

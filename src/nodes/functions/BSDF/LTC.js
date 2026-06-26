@@ -1,4 +1,4 @@
-import { tslFn, If, mat3, vec2, vec3 } from '../../shadernode/ShaderNode.js';
+import { Fn, If, mat3, vec2, vec3 } from '../../tsl/TSLBase.js';
 import { max } from '../../math/MathNode.js';
 
 // Rect Area Light
@@ -7,7 +7,7 @@ import { max } from '../../math/MathNode.js';
 // by Eric Heitz, Jonathan Dupuy, Stephen Hill and David Neubelt
 // code: https://github.com/selfshadow/ltc_code/
 
-const LTC_Uv = tslFn( ( { N, V, roughness } ) => {
+const LTC_Uv = /*@__PURE__*/ Fn( ( { N, V, roughness } ) => {
 
 	const LUT_SIZE = 64.0;
 	const LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;
@@ -32,7 +32,7 @@ const LTC_Uv = tslFn( ( { N, V, roughness } ) => {
 	]
 } );
 
-const LTC_ClippedSphereFormFactor = tslFn( ( { f } ) => {
+const LTC_ClippedSphereFormFactor = /*@__PURE__*/ Fn( ( { f } ) => {
 
 	// Real-Time Area Lighting: a Journey from Research to Production (p.102)
 	// An approximation of the form factor of a horizon-clipped rectangle.
@@ -49,7 +49,7 @@ const LTC_ClippedSphereFormFactor = tslFn( ( { f } ) => {
 	]
 } );
 
-const LTC_EdgeVectorFormFactor = tslFn( ( { v1, v2 } ) => {
+const LTC_EdgeVectorFormFactor = /*@__PURE__*/ Fn( ( { v1, v2 } ) => {
 
 	const x = v1.dot( v2 );
 	const y = x.abs().toVar();
@@ -59,7 +59,7 @@ const LTC_EdgeVectorFormFactor = tslFn( ( { v1, v2 } ) => {
 	const b = y.add( 4.1616724 ).mul( y ).add( 3.4175940 ).toVar();
 	const v = a.div( b );
 
-	const theta_sintheta = x.greaterThan( 0.0 ).cond( v, max( x.mul( x ).oneMinus(), 1e-7 ).inverseSqrt().mul( 0.5 ).sub( v ) );
+	const theta_sintheta = x.greaterThan( 0.0 ).select( v, max( x.mul( x ).oneMinus(), 1e-7 ).inverseSqrt().mul( 0.5 ).sub( v ) );
 
 	return v1.cross( v2 ).mul( theta_sintheta );
 
@@ -72,7 +72,7 @@ const LTC_EdgeVectorFormFactor = tslFn( ( { v1, v2 } ) => {
 	]
 } );
 
-const LTC_Evaluate = tslFn( ( { N, V, P, mInv, p0, p1, p2, p3 } ) => {
+const LTC_Evaluate = /*@__PURE__*/ Fn( ( { N, V, P, mInv, p0, p1, p2, p3 } ) => {
 
 	// bail if point is on back side of plane of light
 	// assumes ccw winding order of light vertices
@@ -127,5 +127,49 @@ const LTC_Evaluate = tslFn( ( { N, V, P, mInv, p0, p1, p2, p3 } ) => {
 	]
 } );
 
+const LTC_Evaluate_Volume = /*@__PURE__*/ Fn( ( { P, p0, p1, p2, p3 } ) => {
 
-export { LTC_Evaluate, LTC_Uv };
+	// bail if point is on back side of plane of light
+	// assumes ccw winding order of light vertices
+	const v1 = p1.sub( p0 ).toVar();
+	const v2 = p3.sub( p0 ).toVar();
+
+	const lightNormal = v1.cross( v2 );
+	const result = vec3().toVar();
+
+	If( lightNormal.dot( P.sub( p0 ) ).greaterThanEqual( 0.0 ), () => {
+
+		// transform rect
+		// & project rect onto sphere
+		const coords0 = p0.sub( P ).normalize().toVar();
+		const coords1 = p1.sub( P ).normalize().toVar();
+		const coords2 = p2.sub( P ).normalize().toVar();
+		const coords3 = p3.sub( P ).normalize().toVar();
+
+		// calculate vector form factor
+		const vectorFormFactor = vec3( 0 ).toVar();
+		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords0, v2: coords1 } ) );
+		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords1, v2: coords2 } ) );
+		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords2, v2: coords3 } ) );
+		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords3, v2: coords0 } ) );
+
+		// adjust for horizon clipping
+		result.assign( vec3( LTC_ClippedSphereFormFactor( { f: vectorFormFactor.abs() } ) ) );
+
+	} );
+
+	return result;
+
+} ).setLayout( {
+	name: 'LTC_Evaluate',
+	type: 'vec3',
+	inputs: [
+		{ name: 'P', type: 'vec3' },
+		{ name: 'p0', type: 'vec3' },
+		{ name: 'p1', type: 'vec3' },
+		{ name: 'p2', type: 'vec3' },
+		{ name: 'p3', type: 'vec3' }
+	]
+} );
+
+export { LTC_Evaluate, LTC_Evaluate_Volume, LTC_Uv };

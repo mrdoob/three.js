@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Shape } from '../../../../../src/extras/core/Shape.js';
 
 import { Path } from '../../../../../src/extras/core/Path.js';
@@ -37,49 +35,6 @@ export default QUnit.module( 'Extras', () => {
 					object.type === 'Shape',
 					'Shape.type should be Shape'
 				);
-
-			} );
-
-			QUnit.todo( 'uuid', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'holes', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			// PUBLIC
-			QUnit.todo( 'getPointsHoles', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'extractPoints', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'copy', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'toJSON', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'fromJSON', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

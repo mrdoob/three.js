@@ -21,6 +21,13 @@ export default /* glsl */`
 #elif defined( USE_NORMALMAP_TANGENTSPACE )
 
 	vec3 mapN = texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0;
+
+	#if defined( USE_PACKED_NORMALMAP )
+
+		mapN = vec3( mapN.xy, sqrt( saturate( 1.0 - dot( mapN.xy, mapN.xy ) ) ) );
+
+	#endif
+
 	mapN.xy *= normalScale;
 
 	normal = normalize( tbn * mapN );

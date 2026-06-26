@@ -97,7 +97,7 @@ var slice_slice = function(length) {
   return (function read() {
     return that._source.read().then(function(result) {
 
-      // When done, it’s possible the request wasn’t fully fullfilled!
+      // When done, it’s possible the request wasn’t fully fulfilled!
       // If so, the pre-allocated array is too big and needs slicing.
       if (result.done) {
         that._array = empty;

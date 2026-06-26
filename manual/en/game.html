@@ -1401,7 +1401,7 @@ and change that later.</p>
 <p>When I first started this I used just one radius for all animals
 but of course that was no good as the pug is much smaller than the horse.
 So I added the difference sizes but I wanted to be able to visualize
-things. To do that I made a <code class="notranslate" translate="no">StatusDisplayHelper</code> component.</p>
+things. To do that I made a <code class="notranslate" translate="no">StateDisplayHelper</code> component.</p>
 <p>I uses a <a href="/docs/#api/en/helpers/PolarGridHelper"><code class="notranslate" translate="no">PolarGridHelper</code></a> to draw a circle around each character
 and it uses html elements to let each character show some status using
 the techniques covered in <a href="align-html-elements-to-3d.html">the article on aligning html elements to 3D</a>.</p>
@@ -1673,7 +1673,7 @@ coroutines while other coroutines are running. It also handles nested coroutines
 <p>To make a coroutine you make a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*">JavaScript generator function</a>.
 A generator function is preceded by the keyword <code class="notranslate" translate="no">function*</code> (the asterisk is important!)</p>
 <p>Generator functions can <code class="notranslate" translate="no">yield</code>. For example</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function* countOTo9() {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function* count0To9() {
   for (let i = 0; i &lt; 10; ++i) {
     console.log(i);
     yield;

@@ -4,6 +4,10 @@
 		<title>three.js webgl - light probe from cubeCamera</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - light probe from cubeCamera">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_lightprobe_cubecamera.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_lightprobe_cubecamera.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -78,13 +82,15 @@
 
 				const urls = genCubeUrls( 'textures/cube/pisa/', '.png' );
 
-				new THREE.CubeTextureLoader().load( urls, function ( cubeTexture ) {
+				new THREE.CubeTextureLoader().load( urls, async function ( cubeTexture ) {
 
 					scene.background = cubeTexture;
 
 					cubeCamera.update( renderer, scene );
 
-					lightProbe.copy( LightProbeGenerator.fromCubeRenderTarget( renderer, cubeRenderTarget ) );
+					const probe = await LightProbeGenerator.fromCubeRenderTarget( renderer, cubeRenderTarget );
+
+					lightProbe.copy( probe );
 
 					scene.add( new LightProbeHelper( lightProbe, 5 ) );
 

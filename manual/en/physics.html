@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Physics</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Physics">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+    <script type="importmap">
+			{
+				"imports": {
+					"three": "../../build/three.module.js"
+				}
+			}
+		</script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="lesson-title">
+            <h1>Physics</h1>
+        </div>
+        <div class="lesson">
+            <div class="lesson-main">
+
+                <p>
+                    Physics engines allow you to simulate physical phenomena like gravity, collisions, and forces within
+                    your 3D capabilities. In a typical three.js scene, objects are moved by directly modifying their
+                    position or rotation. When using a physics engine, however, you create a parallel physics world
+                    where bodies react to forces and collisions. You then synchronize the three.js meshes with these
+                    physics bodies on every frame, creating the illusion of a physically simulated environment.
+                </p>
+
+                <p>
+                    It should be noted that the physics engine does not necessarily have to be updated every frame.
+                    Usually, to keep experiences consistent, physics are updated at fixed time steps. For instance, it could
+                    be that we are running the game loop at 60fps but the physics engine at 30fps (that is 1/30=3.33ms)
+                    while updating the three.js meshes' transforms (e.g., positions and rotations) with the most recent
+                    state from the physics engine.
+                </p>
+
+                <p>
+                    Physics simulations are particularly useful for games, interactive visualizations, and any
+                    application requiring realistic object behavior, such as objects falling, bouncing, or sliding.
+                </p>
+
+                <h2>Integration Approaches</h2>
+
+                <p>
+                    There are three main ways to integrate a physics engine into a three.js project:
+                </p>
+
+                <h3>1. Using Three.js Physics Addons</h3>
+
+                <p>
+                    Three.js provides wrapper classes for several popular physics engines in the
+                    <i>examples/jsm/physics</i> directory. These addons simplify the setup process by handling the
+                    initialization of the physics world and the synchronization of meshes.
+                </p>
+
+                <p>
+                    Available addons include:
+                </p>
+
+                <ul>
+                    <li><b>AmmoPhysics:</b> A wrapper for Ammo.js (Bullet Physics).</li>
+                    <li><b>JoltPhysics:</b> A wrapper for Jolt Physics.</li>
+                    <li><b>RapierPhysics:</b> A wrapper for Rapier.</li>
+                </ul>
+
+                <p>
+                    These addons effectively hide much of the complexity of the underlying engines. For standard use
+                    cases, they offer a very quick way to get started.
+                </p>
+
+                <h4>
+                    Examples
+                </h4>
+                <ul>
+                    <li><a href="https://threejs.org/examples/physics_ammo_instancing.html" target="_blank">physics / ammo / instancing</a></li>
+                    <li><a href="https://threejs.org/examples/physics_jolt_instancing.html" target="_blank">physics / jolt / instancing</a></li>
+                    <li><a href="https://threejs.org/examples/physics_rapier_instancing.html" target="_blank">physics / rapier / instancing</a></li>
+                </ul>
+
+                <h3>2. Using 3rd-Party Physics JS/TS Libraries</h3>
+
+                <p>
+                    Many physics engines are written directly in JavaScript or TypeScript and are designed to work
+                    easily with the web ecosystem. Libraries like <b>cannon-es</b> are popular choices because they are
+                    lightweight and easy to integrate specifically with three.js.
+                </p>
+
+                <p>
+                    When using these libraries, you instantiate the physics world and bodies yourself, then manually
+                    copy the position and quaternion from the physics body to the three.js mesh in your animation loop.
+                </p>
+
+
+                <h4>
+                    Projects
+                </h4>
+                <ul>
+                    <li><b><a href="https://github.com/pmndrs/cannon-es" target="_blank">cannon-es</a></b>: A lightweight 3D physics engine purely written in JS/TS. Under an MIT license. Apparently no longer maintained (latest commit more than a couple years ago).</li>
+                    <li><b><a href="https://github.com/schteppe/cannon.js" target="_blank">cannon.js</a></b>: A lightweight 3D physics engine purely written in JavaScript. Under an MIT license. No longer maintained (latest commit more than a couple years ago). Consider using its more recent fork cannon-es.</li>
+                    <li><b><a href="https://github.com/lo-th/phy" target="_blank">phy</a></b>: Physics engine for three.js purely written in JavaScript. Under an MIT license. Latest commit. Currently maintained.</li>
+                    <li><b><a href="https://github.com/lo-th/Oimo.js" target="_blank">Oimo.js</a></b>: A no-longer maintained lightweight 3D physics engine written purely in JavaScript. Under an MIT license. Consider using phy instead (as per the author's advise).</li>
+                </ul>
+                <p>
+                    It should also be noted that there are a couple of 3D physics engines that are seemingly written in JS/TS but are in reality calling other standalone 3D physics engines. For example:
+                </p>
+                <ul>
+                    <li><b><a href="https://github.com/chandlerprall/Physijs" target="_blank">Physijs</a></b>: Calls ammo.js under the hood to do physics work in a separate thread (using web workers). Under MIT license. Apparently no longer maintained (latest commit more than a couple of years ago).</li>
+                    <li><b><a href="https://github.com/enable3d/enable3d" target="_blank">enable3d</a></b>: 3D physics framework for three.js built on top of ammo.js. Under LGPL-3.0 license. Apparently maintained.</li>
+                </ul>
+
+                <h3>3. Importing WASM-based Engines</h3>
+
+                <p>
+                    For maximum performance, stability, and precision, especially with complex simulations, you can use physics engines written in
+                    C++ or Rust (or any other language that supports WASM) that have been compiled to WebAssembly (WASM). Engines like <b>Ammo.js</b> (a port of
+                    Bullet Physics) and <b>Rapier</b> fall into this category.
+                </p>
+
+                <p>
+                    While this approach offers the most features and best performance, it often requires more setup code
+                    to handle the WASM memory management and interaction with the physics API directly.
+                </p>
+
+                <h4>
+                    Examples
+                </h4>
+                <ul>
+                    <li><a href="https://threejs.org/examples/physics_ammo_break.html" target="_blank">physics / ammo / break</a></li>
+                    <li><a href="https://threejs.org/examples/physics_ammo_cloth.html" target="_blank">physics / ammo / cloth</a></li>
+                    <li><a href="https://threejs.org/examples/physics_ammo_rope.html" target="_blank">physics / ammo / rope</a></li>
+                    <li><a href="https://threejs.org/examples/physics_ammo_terrain.html" target="_blank">physics / ammo / terrain</a></li>
+                    <li><a href="https://threejs.org/examples/physics_ammo_volume.html" target="_blank">physics / ammo / volume</a></li>
+                </ul>
+
+                <h4>
+                    Projects
+                </h4>
+                <ul>
+                    <li><b><a href="https://github.com/jrouwe/JoltPhysics" target="_blank">JoltPhysics</a></b>:  A multi core friendly rigid body physics and collision detection library. Written in C++. Under MIT license. Actively maintained. Proven with its usage in world-renowned titles and game engines including: Horizon Forbidden West, Death Stranding 2, and official supported by the Godot game engine.</li>
+                    <li><b><a href="https://github.com/NVIDIA-Omniverse/PhysX" target="_blank">PhysX</a></b>:  Industry-standard realtime 3D physics engine provided by NVIDIA. Under BSD-3-Clause license. Actively maintained and very stable.</li>
+                    <li><b><a href="https://github.com/dimforge/rapier" target="_blank">Rapier</a></b>: 2D and 3D physics engines focused on performance. Written in Rust. Under an MIT license. Actively maintained.</li>
+                    <li><b><a href="https://github.com/bulletphysics/bullet3" target="_blank">Bullet</a></b>: 
+                    Real-time collision detection and multi-physics simulation for VR, games, visual effects, robotics, machine learning etc. Written in C++. Under a ZLIB license. Potentially no longer maintained.</li>
+                </ul>
+                <p>
+                    Some of these multi-platform 3D physics engines have a ready-to-use WASM port, including:
+                </p>
+                <ul>
+                    <li><b><a href="https://github.com/jrouwe/JoltPhysics.js" target="_blank">JoltPhysics.js</a></b>:  Port of JoltPhysics to JavaScript using Emscripten. Under MIT license. Currently maintained.</li>
+                    <li><b><a href="https://github.com/fabmax/physx-js-webidl" target="_blank">physx-js-webidl</a></b>:   Javascript WASM bindings for Nvidia PhysX. Under MIT license. Currently maintained.</li>
+                    <li><b><a href="https://github.com/dimforge/rapier.js" target="_blank">Rapier.js</a></b>: Official JavaScript bindings for the Rapier physics engine. Under Apache-2.0 license. Actively maintained.</li>
+                    <li><b><a href="https://github.com/kripken/ammo.js" target="_blank">Ammo.js</a></b>: Direct port of the Bullet physics engine to JavaScript using Emscripten. No longer maintained (latest commit a couple of years ago). Under an MIT-like custom permissive license.</li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="../resources/prettify.js"></script>
+    <script src="../resources/lesson.js"></script>
+
+</body>
+
+</html>

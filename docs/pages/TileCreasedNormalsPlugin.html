@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>TileCreasedNormalsPlugin - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">TileCreasedNormalsPlugin</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A plugin for <code>3d-tiles-renderer</code> that computes creased vertex normals for the
+geometry of each loaded tile: smooth normals everywhere except where faces meet
+at an angle greater than the crease angle. Useful for photogrammetry tile sets
+like Google Photorealistic 3D Tiles which come without vertex normals.</p>
+<p>The normals are computed in a Web Worker so tile processing doesn't block the
+main thread. Tiles are displayed once their normals are ready.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">tiles.registerPlugin( new TileCreasedNormalsPlugin( { creaseAngle: Math.PI / 6 } ) );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">TileCreasedNormalsPlugin</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { TileCreasedNormalsPlugin } from 'three/addons/misc/TileCreasedNormalsPlugin.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="TileCreasedNormalsPlugin" translate="no">new <a href="#TileCreasedNormalsPlugin">TileCreasedNormalsPlugin</a><span class="signature">( options : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new plugin.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">options</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration options.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">creaseAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The crease angle in radians.</p>
+										<p>Default is <code>Math.PI/3</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="creaseAngle" translate="no">.<a href="#creaseAngle">creaseAngle</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The crease angle in radians.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Called by the tiles renderer when the plugin is unregistered or the
+tiles renderer is disposed.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="processTileModel" translate="no">.<a href="#processTileModel">processTileModel</a><span class="signature">( scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : Promise</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Called by the tiles renderer for each loaded tile model. The tile is
+displayed once the returned promise resolves.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">scene</strong>
+									</td>
+									<td class="description last">
+										<p>The tile model.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A promise that resolves when all geometries have creased normals.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/misc/TileCreasedNormalsPlugin.js" translate="no" target="_blank" rel="noopener">examples/jsm/misc/TileCreasedNormalsPlugin.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

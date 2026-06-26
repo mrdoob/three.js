@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - ambient occlusion</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - ambient occlusion">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_postprocessing_ao.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_postprocessing_ao.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>AO</span>
+			</div>
+
+			<small>
+				Ambient Occlusion based on GTAO.<br />
+				Tennyson bust from <a href="https://threedscans.com/lincoln/tennyson/" target="_blank" rel="noopener">Three D Scans</a>.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { sample, pass, mrt, screenUV, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, colorSpaceToWorking, builtinAOContext } from 'three/tsl';
+			import { ao } from 'three/addons/tsl/display/GTAONode.js';
+			import { traa } from 'three/addons/tsl/display/TRAANode.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			let camera, scene, renderer, renderPipeline, controls;
+
+			let aoPass, traaPass, transparentMesh;
+
+			const params = {
+				samples: 16,
+				distanceExponent: 1,
+				distanceFallOff: 1,
+				radius: 0.25,
+				scale: 0.5,
+				thickness: 1,
+				aoOnly: false,
+				transparentOpacity: 0.3
+			};
+
+			init();
+
+			async function init() {
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 50 );
+				camera.position.set( 1, 3, 7 );
+
+				scene = new THREE.Scene();
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				// controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.minDistance = 2;
+				controls.maxDistance = 16;
+				controls.target.set( 0, 1.2, 0 );
+
+				// environment
+
+				const environment = new RoomEnvironment();
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				scene.background = new THREE.Color( 0x666666 );
+				scene.environment = pmremGenerator.fromScene( environment, 0.04 ).texture;
+				scene.environmentIntensity = 0.3;
+				environment.dispose();
+				pmremGenerator.dispose();
+
+				// post-processing
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				// pre-pass
+
+				const prePass = pass( scene, camera ).toInspector( 'Normal', ( inspectNode ) => colorSpaceToWorking( inspectNode, THREE.SRGBColorSpace ) );
+				prePass.name = 'Pre-Pass';
+				prePass.transparent = false;
+
+				prePass.setMRT( mrt( {
+					output: packNormalToRGB( normalView ),
+					velocity: velocity
+				} ) );
+
+				const prePassNormal = sample( ( uv ) => {
+
+					return unpackRGBToNormal( prePass.getTextureNode().sample( uv ) );
+
+				} );
+
+				const prePassDepth = prePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => prePass.getLinearDepthNode() );
+				const prePassVelocity = prePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
+
+				// pre-pass - bandwidth optimization
+
+				const normalTexture = prePass.getTexture( 'output' );
+				normalTexture.type = THREE.UnsignedByteType;
+
+				// scene pass
+
+				const scenePass = pass( scene, camera ).toInspector( 'Color' );
+
+				// ao
+
+				aoPass = ao( prePassDepth, prePassNormal, camera ).toInspector( 'GTAO', ( inspectNode ) => inspectNode.r );
+				aoPass.resolutionScale = 0.5; // running AO in half resolution is often sufficient
+				aoPass.useTemporalFiltering = true;
+
+				const aoPassOutput = aoPass.getTextureNode();
+
+				// scene context
+
+				scenePass.contextNode = builtinAOContext( aoPassOutput.sample( screenUV ).r );
+
+				// final output + traa
+
+				traaPass = traa( scenePass, prePassDepth, prePassVelocity, camera );
+				traaPass.useSubpixelCorrection = false;
+
+				renderPipeline.outputNode = traaPass;
+
+				// models
+
+				const dracoLoader = new DRACOLoader();
+				const loader = new GLTFLoader();
+				loader.setDRACOLoader( dracoLoader );
+				loader.setPath( 'models/gltf/' );
+
+				// wall-mounted spotlights
+
+				function addSpotLight( position, targetPosition ) {
+
+					const light = new THREE.SpotLight( 0xffe09e, 40 );
+					light.position.copy( position );
+					light.angle = 0.6;
+					light.penumbra = 1;
+					light.distance = 6.5;
+					light.decay = 2;
+					light.target.position.copy( targetPosition );
+					scene.add( light );
+					scene.add( light.target );
+
+				}
+
+				addSpotLight( new THREE.Vector3( - 2.5, 5, - 4.8 ), new THREE.Vector3( - 2.5, - 2, - 4.8 ) );
+				addSpotLight( new THREE.Vector3( 2.5, 5, - 4.8 ), new THREE.Vector3( 2.5, - 2, - 4.8 ) );
+				addSpotLight( new THREE.Vector3( - 5.3, 5, 0 ), new THREE.Vector3( - 5.3, - 2, 0 ) );
+
+				// checkerboard floor
+
+				const tilesX = 16;
+				const tilesZ = 16;
+				const floorCanvas = document.createElement( 'canvas' );
+				floorCanvas.width = tilesX * 32;
+				floorCanvas.height = tilesZ * 32;
+				const floorCtx = floorCanvas.getContext( '2d' );
+
+				for ( let x = 0; x < tilesX; x ++ ) {
+
+					for ( let z = 0; z < tilesZ; z ++ ) {
+
+						floorCtx.fillStyle = ( x + z ) % 2 === 0 ? '#d8d0c8' : '#b8b0a8';
+						floorCtx.fillRect( x * 32, z * 32, 32, 32 );
+
+					}
+
+				}
+
+				const floorTexture = new THREE.CanvasTexture( floorCanvas );
+				floorTexture.colorSpace = THREE.SRGBColorSpace;
+				floorTexture.wrapS = THREE.RepeatWrapping;
+				floorTexture.wrapT = THREE.RepeatWrapping;
+
+				const floorMat = new THREE.MeshStandardMaterial( { map: floorTexture, roughness: 0.7, metalness: 0.05 } );
+				const floor = new THREE.Mesh( new THREE.PlaneGeometry( tilesX, tilesZ ), floorMat );
+				floor.rotation.x = - Math.PI / 2;
+				floor.position.y = - 2;
+				scene.add( floor );
+
+				// walls
+
+				const wallMat = new THREE.MeshStandardMaterial( { color: '#e0d8d0', roughness: 0.9, metalness: 0 } );
+
+				const backWall = new THREE.Mesh( new THREE.PlaneGeometry( 16, 10 ), wallMat );
+				backWall.position.set( 0, 3, - 5 );
+				scene.add( backWall );
+
+				const leftWall = new THREE.Mesh( new THREE.PlaneGeometry( 16, 10 ), wallMat );
+				leftWall.rotation.y = Math.PI / 2;
+				leftWall.position.set( - 5.5, 3, 0 );
+				scene.add( leftWall );
+
+				// central pedestal
+
+				const pedestalMat = new THREE.MeshStandardMaterial( { color: '#f0ece8', roughness: 0.4, metalness: 0.05 } );
+
+				const pedestalBase = new THREE.Mesh( new THREE.CylinderGeometry( 0.9, 1.0, 0.2, 32 ), pedestalMat );
+				pedestalBase.position.set( 0, - 1.9, 0 );
+				scene.add( pedestalBase );
+
+				const pedestalShaft = new THREE.Mesh( new THREE.CylinderGeometry( 0.55, 0.65, 1.5, 32 ), pedestalMat );
+				pedestalShaft.position.set( 0, - 1.05, 0 );
+				scene.add( pedestalShaft );
+
+				const pedestalTop = new THREE.Mesh( new THREE.CylinderGeometry( 0.8, 0.7, 0.25, 32 ), pedestalMat );
+				pedestalTop.position.set( 0, - 0.18, 0 );
+				scene.add( pedestalTop );
+
+				// torus knot
+
+				const knotMat = new THREE.MeshStandardMaterial( { color: '#c0a060', roughness: 0.45, metalness: 0 } );
+				const torusKnot = new THREE.Mesh( new THREE.TorusKnotGeometry( 0.5, 0.17, 128, 32 ), knotMat );
+				torusKnot.position.set( 0, 0.82, 0 );
+				scene.add( torusKnot );
+
+				// columns
+
+				const columnMat = new THREE.MeshStandardMaterial( { color: '#e8e4de', roughness: 0.5, metalness: 0 } );
+
+				function addColumn( x, z ) {
+
+					const columnGroup = new THREE.Group();
+
+					const base = new THREE.Mesh( new THREE.BoxGeometry( 0.6, 0.2, 0.6 ), columnMat );
+					base.position.y = - 1.9;
+					columnGroup.add( base );
+
+					const shaft = new THREE.Mesh( new THREE.CylinderGeometry( 0.18, 0.22, 5, 16 ), columnMat );
+					shaft.position.y = 0.7;
+					columnGroup.add( shaft );
+
+					const capital = new THREE.Mesh( new THREE.BoxGeometry( 0.55, 0.25, 0.55 ), columnMat );
+					capital.position.y = 3.35;
+					columnGroup.add( capital );
+
+					columnGroup.scale.setScalar( 1.5 );
+					columnGroup.position.set( x, 1.0, z );
+					scene.add( columnGroup );
+
+				}
+
+				addColumn( - 5.05, - 4.55 );
+				addColumn( 4.5, - 4.55 );
+				addColumn( - 5.05, 3 );
+
+				// vase on its own pedestal
+
+				const vaseProfile = [
+					new THREE.Vector2( 0, 0.5 ),
+					new THREE.Vector2( 0.12, 0.5 ),
+					new THREE.Vector2( 0.18, 0.7 ),
+					new THREE.Vector2( 0.28, 0.9 ),
+					new THREE.Vector2( 0.32, 1.0 ),
+					new THREE.Vector2( 0.3, 1.1 ),
+					new THREE.Vector2( 0.22, 1.15 ),
+					new THREE.Vector2( 0.2, 1.2 ),
+					new THREE.Vector2( 0.22, 1.25 ),
+					new THREE.Vector2( 0, 1.25 )
+				];
+
+				const vaseMat = new THREE.MeshStandardMaterial( { color: '#d4806a', roughness: 0.6, metalness: 0.02 } );
+
+				const vasePedestalBase = new THREE.Mesh( new THREE.CylinderGeometry( 0.6, 0.7, 0.15, 32 ), pedestalMat );
+				vasePedestalBase.position.set( - 5, - 1.925, - 2 );
+				scene.add( vasePedestalBase );
+
+				const vasePedestalShaft = new THREE.Mesh( new THREE.CylinderGeometry( 0.35, 0.42, 1, 32 ), pedestalMat );
+				vasePedestalShaft.position.set( - 5, - 1.35, - 2 );
+				scene.add( vasePedestalShaft );
+
+				const vasePedestalTop = new THREE.Mesh( new THREE.CylinderGeometry( 0.55, 0.48, 0.15, 32 ), pedestalMat );
+				vasePedestalTop.position.set( - 5, - 0.775, - 2 );
+				scene.add( vasePedestalTop );
+
+				const vase = new THREE.Mesh( new THREE.LatheGeometry( vaseProfile, 24 ), vaseMat );
+				vase.position.set( - 5, - 1.6, - 2 );
+				vase.scale.setScalar( 1.8 );
+				scene.add( vase );
+
+				// armchair
+
+				const woodMat = new THREE.MeshStandardMaterial( { color: '#8b6840', roughness: 0.8, metalness: 0 } );
+				const fabricMat = new THREE.MeshStandardMaterial( { color: '#8b3a3a', roughness: 0.9, metalness: 0 } );
+
+				const chairGroup = new THREE.Group();
+
+				const seat = new THREE.Mesh( new RoundedBoxGeometry( 0.9, 0.25, 0.8, 4, 0.06 ), fabricMat );
+				seat.position.set( 0, - 1.35, 0 );
+				chairGroup.add( seat );
+
+				const backrest = new THREE.Mesh( new RoundedBoxGeometry( 0.9, 0.6, 0.12, 4, 0.04 ), fabricMat );
+				backrest.position.set( 0, - 0.95, - 0.4 );
+				backrest.rotation.x = - 0.3;
+				chairGroup.add( backrest );
+
+				for ( const side of [ - 1, 1 ] ) {
+
+					const armrest = new THREE.Mesh( new THREE.BoxGeometry( 0.1, 0.25, 0.7 ), woodMat );
+					armrest.position.set( side * 0.5, - 1.2, 0 );
+					chairGroup.add( armrest );
+
+					const armTop = new THREE.Mesh( new THREE.BoxGeometry( 0.14, 0.06, 0.8 ), woodMat );
+					armTop.position.set( side * 0.5, - 1.07, 0 );
+					chairGroup.add( armTop );
+
+				}
+
+				const legPositions = [[ - 0.38, - 0.32 ], [ - 0.38, 0.32 ], [ 0.38, - 0.32 ], [ 0.38, 0.32 ]];
+				for ( const [ lx, lz ] of legPositions ) {
+
+					const leg = new THREE.Mesh( new THREE.CylinderGeometry( 0.03, 0.035, 0.2, 8 ), woodMat );
+					leg.position.set( lx, - 1.575, lz );
+					chairGroup.add( leg );
+
+				}
+
+				chairGroup.scale.setScalar( 1.76 );
+				chairGroup.position.set( 4, 0.948, - 2.5 );
+				chairGroup.rotation.y = - 0.6;
+				scene.add( chairGroup );
+
+				// side table with cup
+
+				const tableGroup = new THREE.Group();
+
+				const tableTop = new THREE.Mesh( new THREE.CylinderGeometry( 0.4, 0.4, 0.05, 24 ), woodMat );
+				tableTop.position.y = - 1.05;
+				tableGroup.add( tableTop );
+
+				const tableLeg = new THREE.Mesh( new THREE.CylinderGeometry( 0.04, 0.06, 0.9, 8 ), woodMat );
+				tableLeg.position.y = - 1.5;
+				tableGroup.add( tableLeg );
+
+				const tableBase = new THREE.Mesh( new THREE.CylinderGeometry( 0.25, 0.28, 0.06, 24 ), woodMat );
+				tableBase.position.y = - 1.92;
+				tableGroup.add( tableBase );
+
+				const cupMat = new THREE.MeshStandardMaterial( { color: '#f0ece0', roughness: 0.4, metalness: 0.05 } );
+				const cupBody = new THREE.Mesh( new THREE.CylinderGeometry( 0.1, 0.08, 0.2, 16 ), cupMat );
+				cupBody.scale.setScalar( 1 / 2.2 );
+				cupBody.position.set( 0.15, - 0.98, 0 );
+				tableGroup.add( cupBody );
+
+				tableGroup.scale.setScalar( 2.2 );
+				tableGroup.position.set( 2, 2.29, - 4 );
+				scene.add( tableGroup );
+
+				// rug
+
+				const rugMat = new THREE.MeshStandardMaterial( { color: '#c8a0a8', roughness: 0.95, metalness: 0 } );
+				const rug = new THREE.Mesh( new THREE.BoxGeometry( 6, 0.02, 5 ), rugMat );
+				rug.position.set( 0, - 1.99, 0.5 );
+				scene.add( rug );
+
+				const rugBorderMat = new THREE.MeshStandardMaterial( { color: '#d4b880', roughness: 0.95, metalness: 0 } );
+				const rugBorder = new THREE.Mesh( new THREE.BoxGeometry( 6.3, 0.015, 5.3 ), rugBorderMat );
+				rugBorder.position.set( 0, - 1.9925, 0.5 );
+				scene.add( rugBorder );
+
+				// picture frames
+
+				function addFrame( x, y, z, width, height, paintColor, rotY = 0 ) {
+
+					const frameGroup = new THREE.Group();
+					const t = 0.1;
+
+					const outerW = width + t * 2;
+					const outerH = height + t * 2;
+					const frameShape = new THREE.Shape();
+					frameShape.moveTo( - outerW / 2, - outerH / 2 );
+					frameShape.lineTo( outerW / 2, - outerH / 2 );
+					frameShape.lineTo( outerW / 2, outerH / 2 );
+					frameShape.lineTo( - outerW / 2, outerH / 2 );
+					frameShape.closePath();
+
+					const hole = new THREE.Path();
+					hole.moveTo( - width / 2, - height / 2 );
+					hole.lineTo( width / 2, - height / 2 );
+					hole.lineTo( width / 2, height / 2 );
+					hole.lineTo( - width / 2, height / 2 );
+					hole.closePath();
+					frameShape.holes.push( hole );
+
+					const frameMat = new THREE.MeshStandardMaterial( { color: '#8b6840', roughness: 0.7, metalness: 0 } );
+					const geo = new THREE.ExtrudeGeometry( frameShape, {
+						depth: 0.12,
+						bevelEnabled: true,
+						bevelThickness: 0.02,
+						bevelSize: 0.02,
+						bevelSegments: 2
+					} );
+					const frame = new THREE.Mesh( geo, frameMat );
+					frameGroup.add( frame );
+
+					const paintMat = new THREE.MeshStandardMaterial( { color: paintColor, roughness: 0.95, metalness: 0 } );
+					const canvas = new THREE.Mesh( new THREE.PlaneGeometry( width, height ), paintMat );
+					canvas.position.z = 0.001;
+					frameGroup.add( canvas );
+
+					frameGroup.position.set( x, y, z );
+					if ( rotY ) frameGroup.rotation.y = rotY;
+					scene.add( frameGroup );
+
+				}
+
+				addFrame( - 3.2, 2.0, - 4.9, 1.8, 1.2, '#e8a8a0' );
+				addFrame( - 0.5, 2.6, - 4.9, 1.1, 1.6, '#a0c0e0' );
+				addFrame( 2, 1.8, - 4.9, 2.0, 1.4, '#a0d0a8' );
+				addFrame( - 5.4, 2.2, - 3, 1.5, 1.1, '#d0b0d8', Math.PI / 2 );
+				addFrame( - 5.4, 1.8, 1, 1.8, 1.3, '#e0c8a0', Math.PI / 2 );
+
+				// bust pedestal
+
+				const bustX = - 3;
+				const bustZ = - 3.2;
+
+				const bustBase = new THREE.Mesh( new THREE.CylinderGeometry( 0.6, 0.7, 0.15, 32 ), pedestalMat );
+				bustBase.position.set( bustX, - 1.925, bustZ );
+				scene.add( bustBase );
+
+				const bustShaft = new THREE.Mesh( new THREE.CylinderGeometry( 0.35, 0.42, 1, 32 ), pedestalMat );
+				bustShaft.position.set( bustX, - 1.35, bustZ );
+				scene.add( bustShaft );
+
+				const bustTop = new THREE.Mesh( new THREE.CylinderGeometry( 0.55, 0.48, 0.15, 32 ), pedestalMat );
+				bustTop.position.set( bustX, - 0.775, bustZ );
+				scene.add( bustTop );
+
+
+				// Transparent plane for testing
+
+				transparentMesh = new THREE.Mesh( new THREE.PlaneGeometry( 1.8, 2 ), new THREE.MeshStandardNodeMaterial( { transparent: true, opacity: params.transparentOpacity } ) );
+				transparentMesh.visible = false;
+				transparentMesh.position.set( 0, 1.2, 1.5 );
+				scene.add( transparentMesh );
+
+				updateParameters();
+
+				// bust GLB
+
+				const gltf = await loader.loadAsync( 'tennyson-bust.glb' );
+				const bust = gltf.scene;
+				bust.rotation.y = Math.PI;
+
+				const targetHeight = 2.64;
+				const sizeBox = new THREE.Box3().setFromObject( bust );
+				const size = new THREE.Vector3();
+				sizeBox.getSize( size );
+				bust.scale.setScalar( targetHeight / size.y );
+
+				const fitBox = new THREE.Box3().setFromObject( bust );
+				const center = new THREE.Vector3();
+				fitBox.getCenter( center );
+				bust.position.set( bustX - center.x, - 0.7 - fitBox.min.y, bustZ - center.z + 0.1 );
+				scene.add( bust );
+
+				// events
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				// GUI
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( params, 'samples', 4, 32, 1 ).onChange( updateParameters );
+				gui.add( params, 'distanceExponent', 1, 2 ).onChange( updateParameters );
+				gui.add( params, 'distanceFallOff', 0.01, 1 ).onChange( updateParameters );
+				gui.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
+				gui.add( params, 'scale', 0.01, 1 ).onChange( updateParameters );
+				gui.add( params, 'thickness', 0.01, 2 ).onChange( updateParameters );
+				gui.add( aoPass, 'useTemporalFiltering' ).name( 'temporal filtering' );
+				gui.add( transparentMesh, 'visible' ).name( 'show transparent mesh' );
+				gui.add( params, 'transparentOpacity', 0, 1, 0.01 ).name( 'transparent opacity' ).onChange( updateParameters );
+				gui.add( params, 'aoOnly' ).onChange( ( value ) => {
+
+					if ( value === true ) {
+
+						renderPipeline.outputNode = vec4( vec3( aoPass.r ), 1 );
+						renderer.toneMapping = THREE.NoToneMapping;
+
+					} else {
+
+
+						renderPipeline.outputNode = traaPass;
+						renderer.toneMapping = THREE.NeutralToneMapping;
+
+					}
+
+					renderPipeline.needsUpdate = true;
+
+				} );
+
+			}
+
+			function updateParameters() {
+
+				aoPass.samples.value = params.samples;
+				aoPass.distanceExponent.value = params.distanceExponent;
+				aoPass.distanceFallOff.value = params.distanceFallOff;
+				aoPass.radius.value = params.radius;
+				aoPass.scale.value = params.scale;
+				aoPass.thickness.value = params.thickness;
+
+				transparentMesh.material.opacity = params.transparentOpacity;
+
+			}
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+			}
+
+			function animate() {
+
+				controls.update();
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+	</body>
+</html>

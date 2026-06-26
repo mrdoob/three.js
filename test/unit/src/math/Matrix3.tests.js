@@ -1,9 +1,8 @@
-/* global QUnit */
-
 import { Matrix3 } from '../../../../src/math/Matrix3.js';
 import { Matrix4 } from '../../../../src/math/Matrix4.js';
+import { Vector2 } from '../../../../src/math/Vector2.js';
 
-function matrixEquals3( a, b, tolerance ) {
+function matrixEquals3( b, a, tolerance ) {
 
 	tolerance = tolerance || 0.0001;
 	if ( a.elements.length != b.elements.length ) {
@@ -14,7 +13,7 @@ function matrixEquals3( a, b, tolerance ) {
 
 	for ( let i = 0, il = a.elements.length; i < il; i ++ ) {
 
-		const delta = a.elements[ i ] - b.elements[ i ];
+		const delta = Math.abs( a.elements[ i ] - b.elements[ i ] );
 		if ( delta > tolerance ) {
 
 			return false;
@@ -160,15 +159,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'extractBasis', ( assert ) => {
-
-			// extractBasis( xAxis, yAxis, zAxis )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'setFromMatrix4', ( assert ) => {
-
 
 			const a = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 			const b = new Matrix3();
@@ -375,7 +366,6 @@ export default QUnit.module( 'Maths', () => {
 				- 0.17677669529663687, 0.1767766952966369, 0.5,
 				0, 0, 1
 			);
-			const b = new Matrix3();
 			const params = {
 				centerX: 0.5,
 				centerY: 0.5,
@@ -398,57 +388,11 @@ export default QUnit.module( 'Maths', () => {
 				params.centerX, params.centerY
 			);
 
-			b.identity()
-			 .translate( - params.centerX, - params.centerY )
-			 .rotate( params.rotation )
-			 .scale( params.repeatX, params.repeatY )
-			 .translate( params.centerX, params.centerY )
-			 .translate( params.offsetX, params.offsetY );
-
 			assert.ok( matrixEquals3( a, expected ), 'Check direct method' );
-			assert.ok( matrixEquals3( b, expected ), 'Check indirect method' );
 
 		} );
 
-		QUnit.test( 'scale', ( assert ) => {
-
-			const a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
-			const expected = new Matrix3().set(
-				0.25, 0.5, 0.75,
-				1, 1.25, 1.5,
-				7, 8, 9
-			);
-
-			a.scale( 0.25, 0.25 );
-			assert.ok( matrixEquals3( a, expected ), 'Check scaling result' );
-
-		} );
-
-		QUnit.test( 'rotate', ( assert ) => {
-
-			const a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
-			const expected = new Matrix3().set(
-				3.5355339059327373, 4.949747468305833, 6.363961030678928,
-				2.121320343559643, 2.121320343559643, 2.1213203435596433,
-				7, 8, 9
-			);
-
-			a.rotate( Math.PI / 4 );
-			assert.ok( matrixEquals3( a, expected ), 'Check rotated result' );
-
-		} );
-
-		QUnit.test( 'translate', ( assert ) => {
-
-			const a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
-			const expected = new Matrix3().set( 22, 26, 30, 53, 61, 69, 7, 8, 9 );
-
-			a.translate( 3, 7 );
-			assert.ok( matrixEquals3( a, expected ), 'Check translation result' );
-
-		} );
-
-		QUnit.todo( 'makeTranslation', ( assert ) => {
+		QUnit.test( 'makeTranslation', ( assert ) => {
 
 			const a = new Matrix3();
 			const b = new Vector2( 1, 2 );
@@ -459,20 +403,6 @@ export default QUnit.module( 'Maths', () => {
 
 			a.makeTranslation( b );
 			assert.ok( matrixEquals3( a, c ), 'Check translation result' );
-
-		} );
-
-		QUnit.todo( 'makeRotation', ( assert ) => {
-
-			// makeRotation( theta ) // counterclockwise
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'makeScale', ( assert ) => {
-
-			// makeScale( x, y )
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

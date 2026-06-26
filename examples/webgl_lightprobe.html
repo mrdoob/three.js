@@ -4,6 +4,10 @@
 		<title>three.js webgl - light probe</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - light probe">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_lightprobe.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_lightprobe.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -28,7 +32,10 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
 			import { LightProbeGenerator } from 'three/addons/lights/LightProbeGenerator.js';
+
+			import { LightProbeHelper } from 'three/addons/helpers/LightProbeHelper.js';
 
 			let mesh, renderer, scene, camera;
 
@@ -99,6 +106,8 @@
 					scene.background = cubeTexture;
 
 					lightProbe.copy( LightProbeGenerator.fromCubeTexture( cubeTexture ) );
+					lightProbe.intensity = API.lightProbeIntensity;
+					lightProbe.position.set( - 10, 0, 0 ); // position not used in scene lighting calculations (helper honors the position, however)
 
 					const geometry = new THREE.SphereGeometry( 5, 64, 32 );
 					//const geometry = new THREE.TorusKnotGeometry( 4, 1.5, 256, 32, 2, 3 );
@@ -114,6 +123,10 @@
 					// mesh
 					mesh = new THREE.Mesh( geometry, material );
 					scene.add( mesh );
+
+					// helper
+					const helper = new LightProbeHelper( lightProbe, 1 );
+					scene.add( helper );
 
 					render();
 

@@ -4,6 +4,10 @@
 		<title>three.js webgl - postprocessing - unreal bloom</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - postprocessing - unreal bloom">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_postprocessing_unreal_bloom.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_postprocessing_unreal_bloom.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 		#info > * {
@@ -48,12 +52,12 @@
 			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			let camera, stats;
-			let composer, renderer, mixer, clock;
+			let composer, renderer, mixer, timer;
 
 			const params = {
 				threshold: 0,
 				strength: 1,
-				radius: 0,
+				radius: 0.5,
 				exposure: 1
 			};
 
@@ -63,7 +67,8 @@
 
 				const container = document.getElementById( 'container' );
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
+				timer.connect( document );
 
 				const scene = new THREE.Scene();
 
@@ -92,7 +97,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.toneMapping = THREE.ReinhardToneMapping;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 
 				//
@@ -174,7 +179,9 @@
 
 			function animate() {
 
-				const delta = clock.getDelta();
+				timer.update();
+
+				const delta = timer.getDelta();
 
 				mixer.update( delta );
 

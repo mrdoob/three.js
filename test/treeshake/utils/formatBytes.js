@@ -1,4 +1,4 @@
-export function formatBytes( bytes, decimals = 1 ) {
+export function formatBytes( bytes, decimals = 1, units = true ) {
 
 	if ( bytes === 0 ) return '0 B';
 
@@ -8,6 +8,6 @@ export function formatBytes( bytes, decimals = 1 ) {
 
 	const i = Math.floor( Math.log( bytes ) / Math.log( k ) );
 
-	return parseFloat( ( bytes / Math.pow( k, i ) ).toFixed( dm ) ) + ' ' + sizes[ i ];
+	return parseFloat( ( bytes / Math.pow( k, i ) ).toFixed( dm ) ) + ( units ? ' ' + sizes[ i ] : '' );
 
 }

@@ -4,6 +4,10 @@
 		<title>three.js webgl - drag controls</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - drag controls">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/misc_controls_drag.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/misc_controls_drag.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
@@ -20,7 +24,7 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - drag controls<br />
 			Use "Shift+Click" to add/remove objects to/from a group.<br />
-			Use "M" to toggle between rotate and translate mode.<br />
+			Use "M" to toggle between rotate and pan mode (touch only).<br />
 			Grouped objects can be transformed as a union.
 		</div>
 
@@ -143,10 +147,10 @@
 			function onKeyDown( event ) {
 
 				enableSelection = ( event.keyCode === 16 ) ? true : false;
-				
+			
 				if ( event.keyCode === 77 ) {
 
-					controls.mode = ( controls.mode === 'translate' ) ? 'rotate' : 'translate';
+					controls.touches.ONE = ( controls.touches.ONE === THREE.TOUCH.PAN ) ? THREE.TOUCH.ROTATE : THREE.TOUCH.PAN;
 			
 				}
 
@@ -164,7 +168,7 @@
 
 				if ( enableSelection === true ) {
 
-					const draggableObjects = controls.getObjects();
+					const draggableObjects = controls.objects;
 					draggableObjects.length = 0;
 
 					mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;

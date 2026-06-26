@@ -64,34 +64,21 @@ vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
 
 }
 
-vec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {
+#define inverseTransformDirection transformDirectionByInverseViewMatrix // @deprecated r185
 
-	// dir can be either a direction vector or a normal vector
-	// upper-left 3x3 of matrix is assumed to be orthogonal
+vec3 transformNormalByInverseViewMatrix( in vec3 normal, in mat4 viewMatrix ) {
 
-	return normalize( ( vec4( dir, 0.0 ) * matrix ).xyz );
+	// upper-left 3x3 of view matrix is assumed to be orthogonal
 
-}
-
-mat3 transposeMat3( const in mat3 m ) {
-
-	mat3 tmp;
-
-	tmp[ 0 ] = vec3( m[ 0 ].x, m[ 1 ].x, m[ 2 ].x );
-	tmp[ 1 ] = vec3( m[ 0 ].y, m[ 1 ].y, m[ 2 ].y );
-	tmp[ 2 ] = vec3( m[ 0 ].z, m[ 1 ].z, m[ 2 ].z );
-
-	return tmp;
+	return normalize( ( vec4( normal, 0.0 ) * viewMatrix ).xyz );
 
 }
 
-float luminance( const in vec3 rgb ) {
+vec3 transformDirectionByInverseViewMatrix( in vec3 dir, in mat4 viewMatrix ) {
 
-	// assumes rgb is in linear color space with sRGB primaries and D65 white point
+	// upper-left 3x3 of view matrix is assumed to be orthogonal
 
-	const vec3 weights = vec3( 0.2126729, 0.7151522, 0.0721750 );
-
-	return dot( weights, rgb );
+	return normalize( ( vec4( dir, 0.0 ) * viewMatrix ).xyz );
 
 }
 

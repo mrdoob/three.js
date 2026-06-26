@@ -5,16 +5,72 @@ import { PerspectiveCamera } from './PerspectiveCamera.js';
 const fov = - 90; // negative fov is not an error
 const aspect = 1;
 
+/**
+ * A special type of camera that is positioned in 3D space to render its surroundings into a
+ * cube render target. The render target can then be used as an environment map for rendering
+ * realtime reflections in your scene.
+ *
+ * ```js
+ * // Create cube render target
+ * const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 256, { generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
+ *
+ * // Create cube camera
+ * const cubeCamera = new THREE.CubeCamera( 1, 100000, cubeRenderTarget );
+ * scene.add( cubeCamera );
+ *
+ * // Create car
+ * const chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeRenderTarget.texture } );
+ * const car = new THREE.Mesh( carGeometry, chromeMaterial );
+ * scene.add( car );
+ *
+ * // Update the render target cube
+ * car.visible = false;
+ * cubeCamera.position.copy( car.position );
+ * cubeCamera.update( renderer, scene );
+ *
+ * // Render the scene
+ * car.visible = true;
+ * renderer.render( scene, camera );
+ * ```
+ *
+ * @augments Object3D
+ */
 class CubeCamera extends Object3D {
 
+	/**
+	 * Constructs a new cube camera.
+	 *
+	 * @param {number} near - The camera's near plane.
+	 * @param {number} far - The camera's far plane.
+	 * @param {WebGLCubeRenderTarget} renderTarget - The cube render target.
+	 */
 	constructor( near, far, renderTarget ) {
 
 		super();
 
 		this.type = 'CubeCamera';
 
+		/**
+		 * A reference to the cube render target.
+		 *
+		 * @type {WebGLCubeRenderTarget}
+		 */
 		this.renderTarget = renderTarget;
+
+		/**
+		 * The current active coordinate system.
+		 *
+		 * @type {?(WebGLCoordinateSystem|WebGPUCoordinateSystem)}
+		 * @default null
+		 */
 		this.coordinateSystem = null;
+
+		/**
+		 * The current active mipmap level
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.activeMipmapLevel = 0;
 
 		const cameraPX = new PerspectiveCamera( fov, aspect, near, far );
@@ -43,6 +99,9 @@ class CubeCamera extends Object3D {
 
 	}
 
+	/**
+	 * Must be called when the coordinate system of the cube camera is changed.
+	 */
 	updateCoordinateSystem() {
 
 		const coordinateSystem = this.coordinateSystem;
@@ -109,6 +168,13 @@ class CubeCamera extends Object3D {
 
 	}
 
+	/**
+	 * Calling this method will render the given scene with the given renderer
+	 * into the cube render target of the camera.
+	 *
+	 * @param {(Renderer|WebGLRenderer)} renderer - The renderer.
+	 * @param {Scene} scene - The scene to render.
+	 */
 	update( renderer, scene ) {
 
 		if ( this.parent === null ) this.updateMatrixWorld();
@@ -137,19 +203,38 @@ class CubeCamera extends Object3D {
 
 		renderTarget.texture.generateMipmaps = false;
 
+		// https://github.com/mrdoob/three.js/issues/31413#issuecomment-3095966812
+
+		let reversedDepthBuffer = false;
+
+		if ( renderer.isWebGLRenderer === true ) {
+
+			reversedDepthBuffer = renderer.state.buffers.depth.getReversed();
+
+		} else {
+
+			reversedDepthBuffer = renderer.reversedDepthBuffer;
+
+		}
+
 		renderer.setRenderTarget( renderTarget, 0, activeMipmapLevel );
+		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
 		renderer.render( scene, cameraPX );
 
 		renderer.setRenderTarget( renderTarget, 1, activeMipmapLevel );
+		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
 		renderer.render( scene, cameraNX );
 
 		renderer.setRenderTarget( renderTarget, 2, activeMipmapLevel );
+		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
 		renderer.render( scene, cameraPY );
 
 		renderer.setRenderTarget( renderTarget, 3, activeMipmapLevel );
+		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
 		renderer.render( scene, cameraNY );
 
 		renderer.setRenderTarget( renderTarget, 4, activeMipmapLevel );
+		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
 		renderer.render( scene, cameraPZ );
 
 		// mipmaps are generated during the last call of render()
@@ -158,6 +243,7 @@ class CubeCamera extends Object3D {
 		renderTarget.texture.generateMipmaps = generateMipmaps;
 
 		renderer.setRenderTarget( renderTarget, 5, activeMipmapLevel );
+		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
 		renderer.render( scene, cameraNZ );
 
 		renderer.setRenderTarget( currentRenderTarget, currentActiveCubeFace, currentActiveMipmapLevel );
