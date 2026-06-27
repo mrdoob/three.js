@@ -1231,7 +1231,8 @@ material.colorNode = texture( map ).mul( contrast ).add( brightness );
 | `vertexIndex` | The index of a vertex within a mesh. | `uint` |
 | `drawIndex` | The draw index when using multi-draw. | `uint` |
 | `batch( batchMesh )` | Creates a batch node for BatchedMesh. | `BatchNode` |
-| `instance( instancedMesh )` | Creates an instance node for InstancedMesh. | `InstanceNode` |
+| `instance( matrices, colors = null )` | Applies standard instancing setup with explicit instance matrix and optional color buffers. | `void` |
+| `instancedMesh( instancedMesh )` | Applies standard instancing setup for an InstancedMesh. | `void` |
 
 ## Position
 

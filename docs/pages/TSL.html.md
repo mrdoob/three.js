@@ -3068,13 +3068,9 @@ Default is `null`.
 
 **Returns:** The inspector node.
 
-### .instance( count : number, matrices : InstancedBufferAttribute | StorageInstancedBufferAttribute, colors : InstancedBufferAttribute | StorageInstancedBufferAttribute )
+### .instance( matrices : InstancedBufferAttribute | StorageInstancedBufferAttribute, colors : InstancedBufferAttribute | StorageInstancedBufferAttribute )
 
 TSL function representing the standard instancing vertex shader setup. Transforms positionLocal and normalLocal, and assigns varying color in-place.
-
-**count**
-
-The instance count.
 
 **matrices**
 

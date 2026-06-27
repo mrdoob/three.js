@@ -1461,7 +1461,7 @@ distance within which every tree is drawn.
 
 distance past which no tree is drawn.
 
-### .createInstanceMatrixNode( builder : NodeBuilder, instanceMatrix : InstancedBufferAttribute | StorageInstancedBufferAttribute, count : number ) : Node
+### .createInstanceMatrixNode( builder : NodeBuilder, instanceMatrix : InstancedBufferAttribute | StorageInstancedBufferAttribute ) : Node
 
 Creates the appropriate node for instanced matrix transformations. Depending on buffer limits and storage capability, returns either a storage, buffer, or instanced interleaved attribute node.
 
@@ -1472,10 +1472,6 @@ The current node builder.
 **instanceMatrix**
 
 The matrix buffer attribute.
-
-**count**
-
-The instance count.
 
 **Returns:** The matrix node.
 
@@ -1783,7 +1779,7 @@ An object where keys are member names and values are either types (as strings) o
 
 **Returns:** An array of member layouts.
 
-### .getPreviousInstance( instancedMesh : InstancedMesh, instanceMatrix : InstancedBufferAttribute | StorageInstancedBufferAttribute, builder : NodeBuilder, count : number ) : Node
+### .getPreviousInstance( instancedMesh : InstancedMesh, instanceMatrix : InstancedBufferAttribute | StorageInstancedBufferAttribute, builder : NodeBuilder ) : Node
 
 Retrieves or initializes the previous frame instance matrix node for motion vectors. Uses a WeakMap to cache previous frame instance matrices and their TSL nodes.
 
@@ -1798,10 +1794,6 @@ The current matrix buffer attribute.
 **builder**
 
 The current node builder.
-
-**count**
-
-The instance count.
 
 **Returns:** The previous frame instance matrix node.
 

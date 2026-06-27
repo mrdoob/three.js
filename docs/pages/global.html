@@ -2567,7 +2567,7 @@ trees ( where it reads ), skipped on the far canopy ( where it is sub-pixel ).</
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="createInstanceMatrixNode" translate="no">.<a href="#createInstanceMatrixNode">createInstanceMatrixNode</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, instanceMatrix : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a> | <a href="StorageInstancedBufferAttribute.html">StorageInstancedBufferAttribute</a></span>, count : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<h3 class="name name-method" id="createInstanceMatrixNode" translate="no">.<a href="#createInstanceMatrixNode">createInstanceMatrixNode</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, instanceMatrix : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a> | <a href="StorageInstancedBufferAttribute.html">StorageInstancedBufferAttribute</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Creates the appropriate node for instanced matrix transformations.
@@ -2589,14 +2589,6 @@ Depending on buffer limits and storage capability, returns either a storage, buf
 									</td>
 									<td class="description last">
 										<p>The matrix buffer attribute.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">count</strong>
-									</td>
-									<td class="description last">
-										<p>The instance count.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -3255,7 +3247,7 @@ Each member layout includes the member's name, type, and whether it is atomic.</
 							<dt class="tag-returns"><strong>Returns:</strong> An array of member layouts.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getPreviousInstance" translate="no">.<a href="#getPreviousInstance">getPreviousInstance</a><span class="signature">( instancedMesh : <span class="param-type"><a href="InstancedMesh.html">InstancedMesh</a></span>, instanceMatrix : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a> | <a href="StorageInstancedBufferAttribute.html">StorageInstancedBufferAttribute</a></span>, builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, count : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<h3 class="name name-method" id="getPreviousInstance" translate="no">.<a href="#getPreviousInstance">getPreviousInstance</a><span class="signature">( instancedMesh : <span class="param-type"><a href="InstancedMesh.html">InstancedMesh</a></span>, instanceMatrix : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a> | <a href="StorageInstancedBufferAttribute.html">StorageInstancedBufferAttribute</a></span>, builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Retrieves or initializes the previous frame instance matrix node for motion vectors.
@@ -3285,14 +3277,6 @@ Uses a WeakMap to cache previous frame instance matrices and their TSL nodes.</p
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">count</strong>
-									</td>
-									<td class="description last">
-										<p>The instance count.</p>
 									</td>
 								</tr>
 							</tbody>
