@@ -43,14 +43,15 @@ const contrastCurve = /*@__PURE__*/ Fn( ( [ input, power ] ) => {
  * @param {Node<float>} [parameters.opacity=float(1)] - The sprite's base opacity, which the soft fade is multiplied with.
  * @param {Node<float>|number} [parameters.distance=1] - The world-space distance over which the sprite fades out against the scene.
  * @param {Node<float>|number} [parameters.contrast=2] - The contrast power of the fade curve. `1` is linear, higher values sharpen the transition.
+ * @param {Node<float>} [parameters.viewportDepth=viewportDepthTexture()] - The opaque scene depth the particles fade against.
  * @return {Node<float>} The opacity node to assign to `material.opacityNode`.
  */
-export function softParticles( { opacity = float( 1 ), distance = 1, contrast = 2 } = {} ) {
+export function softParticles( { opacity = float( 1 ), distance = 1, contrast = 2, viewportDepth = viewportDepthTexture() } = {} ) {
 
 	// Read the opaque scene depth captured before the particle pass and convert both
 	// the scene depth and the particle's depth to view space, so the gap between them
 	// can be measured in world units.
-	const sceneViewZ = perspectiveDepthToViewZ( viewportDepthTexture(), cameraNear, cameraFar ).toConst();
+	const sceneViewZ = perspectiveDepthToViewZ( viewportDepth, cameraNear, cameraFar ).toConst();
 	const depthDelta = positionView.z.sub( sceneViewZ ).div( distance ).saturate();
 
 	// Fade out as the particle approaches the scene; stay opaque when well in front of it.
