@@ -180,21 +180,6 @@ const builds = [
 			}
 		],
 		external: [ 'three/webgpu' ]
-	},
-	{
-		input: 'src/Three.js',
-		plugins: [
-			glsl(),
-			header()
-		],
-		output: [
-			{
-				format: 'cjs',
-				name: 'THREE',
-				file: 'build/three.cjs',
-				indent: '\t'
-			}
-		]
 	}
 ];
 
