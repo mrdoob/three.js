@@ -5717,7 +5717,7 @@ Compared to Gaussian blur, hash blur requires just a single pass.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The inspector node.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="instance" translate="no">.<a href="#instance">instance</a><span class="signature">( matrices : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a> | <a href="StorageInstancedBufferAttribute.html">StorageInstancedBufferAttribute</a></span>, colors : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a> | <a href="StorageInstancedBufferAttribute.html">StorageInstancedBufferAttribute</a></span> )</span> </h3>
+					<h3 class="name name-method" id="instance" translate="no">.<a href="#instance">instance</a><span class="signature">( count : <span class="param-type">number</span>, matrices : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a> | <a href="StorageInstancedBufferAttribute.html">StorageInstancedBufferAttribute</a></span>, colors : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a> | <a href="StorageInstancedBufferAttribute.html">StorageInstancedBufferAttribute</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>TSL function representing the standard instancing vertex shader setup.
@@ -5725,6 +5725,14 @@ Transforms positionLocal and normalLocal, and assigns varying color in-place.</p
 						</div>
 						<table class="params">
 							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">count</strong>
+									</td>
+									<td class="description last">
+										<p>The instance count.</p>
+									</td>
+								</tr>
 								<tr>
 									<td class="name">
 										<strong translate="no">matrices</strong>
