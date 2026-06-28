@@ -66,7 +66,7 @@
 			document.body.appendChild( renderer.domElement );
 
 			composer = new EffectComposer( renderer );
-			const renderPixelatedPass = new RenderPixelatedPass( 4, scene, camera );
+			const renderPixelatedPass = new RenderPixelatedPass( 6, scene, camera );
 			composer.addPass( renderPixelatedPass );
 
 			const outputPass = new OutputPass();
@@ -80,7 +80,7 @@
 			// gui
 
 			gui = new GUI();
-			params = { pixelSize: 4, normalEdgeStrength: .3, depthEdgeStrength: .4, pixelAlignedPanning: true, pixelAlignedObjects: true };
+			params = { pixelSize: 6, normalEdgeStrength: .3, depthEdgeStrength: .4, pixelAlignedPanning: true, pixelAlignedObjects: true };
 			gui.add( params, 'pixelSize' ).min( 1 ).max( 16 ).step( 1 )
 				.onChange( () => {
 
