@@ -47,7 +47,6 @@
     "build": "rollup -c utils/build/rollup.config.js",
     "build-docs": "jsdoc -c utils/docs/jsdoc.config.json && npm run build-llms",
     "build-llms": "node utils/llms/build.js",
-    "build-module": "rollup -c utils/build/rollup.config.js --configOnlyModule",
     "dev": "node utils/build/dev.js && node utils/server.js -p 8080",
     "preview": "node utils/build/preview.js",
     "lint-core": "eslint src",
@@ -108,16 +107,5 @@
     "puppeteer": "^25.0.0",
     "rollup": "^4.6.0",
     "turndown": "^7.2.2"
-  },
-  "jspm": {
-    "files": [
-      "package.json",
-      "LICENSE",
-      "README.md",
-      "build/three.js",
-      "build/three.min.js",
-      "build/three.module.js"
-    ],
-    "directories": {}
   }
 }

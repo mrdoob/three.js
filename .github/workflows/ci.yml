@@ -67,7 +67,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build
-        run: npm run build-module
+        run: npm run build
 
       - name: === E2E testing ===
         run: xvfb-run -a npm run test-e2e
