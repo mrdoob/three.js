@@ -172,9 +172,10 @@ class VolumetricLightingModel extends LightingModel {
 
 	direct( { lightNode, lightColor }, builder ) {
 
-		// Ignore lights with infinite distance
+		// Clustered lights are accumulated in bulk and expose no single `light` reference,
+		// and directional/hemisphere lights have an infinite distance — skip both here.
 
-		if ( lightNode.light.distance === undefined ) return;
+		if ( lightNode.light === undefined || lightNode.light.distance === undefined ) return;
 
 		// TODO: We need a viewportOpaque*() ( output, depth ) to fit with modern rendering approaches
 
