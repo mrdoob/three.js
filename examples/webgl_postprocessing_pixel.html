@@ -39,7 +39,7 @@
 		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-		let camera, scene, renderer, composer, crystalMesh, timer;
+		let camera, scene, renderer, composer, controls, crystalMesh, timer;
 		let gui, params;
 
 		init();
@@ -74,7 +74,7 @@
 
 			window.addEventListener( 'resize', onWindowResize );
 
-			const controls = new OrbitControls( camera, renderer.domElement );
+			controls = new OrbitControls( camera, renderer.domElement );
 			controls.maxZoom = 2;
 
 			// gui
@@ -195,6 +195,7 @@
 			const pixelsPerScreenHeight = Math.floor( rendererSize.y / params[ 'pixelSize' ] );
 
 			// Remember the camera's true (unsnapped) transform so OrbitControls interaction is unaffected by snapping
+			const cameraPosition = camera.position.clone();
 			const cameraQuaternion = camera.quaternion.clone();
 			const cameraZoom = camera.zoom;
 
@@ -202,7 +203,7 @@
 			// and screen-space basis from the already-snapped orientation and zoom
 			if ( params[ 'cameraRotationSnap' ] > 0 || params[ 'cameraZoomSnap' ] > 0 ) {
 
-				pixelAlignCamera( camera, params[ 'cameraRotationSnap' ], params[ 'cameraZoomSnap' ] );
+				pixelAlignCamera( camera, controls.target, params[ 'cameraRotationSnap' ], params[ 'cameraZoomSnap' ] );
 
 			}
 
@@ -249,6 +250,7 @@
 			// Restore the true transforms after rendering so the next frame's motion builds on the real trajectory
 			crystalMesh.position.copy( crystalPosition );
 			crystalMesh.rotation.copy( crystalRotation );
+			camera.position.copy( cameraPosition );
 			camera.quaternion.copy( cameraQuaternion );
 			camera.zoom = cameraZoom;
 			camera.updateProjectionMatrix();
@@ -293,7 +295,7 @@
 
 		}
 
-		function pixelAlignCamera( camera, rotationIncrementDegrees, zoomIncrement ) {
+		function pixelAlignCamera( camera, target, rotationIncrementDegrees, zoomIncrement ) {
 
 			// Snap the camera's orientation to the nearest euler increment so the world doesn't rotate sub-step
 			if ( rotationIncrementDegrees > 0 ) {
@@ -304,6 +306,12 @@
 				euler.y = Math.round( euler.y / increment ) * increment;
 				euler.z = Math.round( euler.z / increment ) * increment;
 				camera.quaternion.setFromEuler( euler );
+
+				// Re-orbit the camera onto the snapped view axis so it keeps pointing at the target: the orbit
+				// translation now snaps along with the rotation instead of sliding smoothly off-target
+				const distance = camera.position.distanceTo( target );
+				const forward = new THREE.Vector3( 0.0, 0.0, - 1.0 ).applyQuaternion( camera.quaternion );
+				camera.position.copy( target ).addScaledVector( forward, - distance );
 
 			}
 
