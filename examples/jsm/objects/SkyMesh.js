@@ -294,48 +294,49 @@ class SkyMesh extends Mesh {
 				cloudUV.addAssign( time.mul( this.cloudSpeed ) );
 
 				// Gradient-noise fbm for fluffy clouds
-				const p = vec3( cloudUV.mul( 1000.0 ), 0.0 ).toVar();
-				const cloudNoise = mx_fractal_noise_float( p, 5, 2.0, 0.5 ).mul( 0.7 ).add( 0.5 ).clamp( 0.0, 1.0 ).toVar();
+				const evolve = time.mul( this.cloudSpeed ).mul( 300.0 ); // drift noise z so clouds billow, not just slide
+				const cloudNoise = mx_fractal_noise_float( vec3( cloudUV.mul( 1000.0 ), evolve ), 5, 2.0, 0.5 ).mul( 0.7 ).add( 0.5 ).clamp( 0.0, 1.0 ).toVar();
 
 				// Large-scale coverage variation: clear gaps next to dense banks
 				const region = mx_fractal_noise_float( vec3( cloudUV.mul( 300.0 ), 0.0 ), 2, 2.0, 0.5 ).mul( 0.33 ).add( 0.5 );
-				const cov = clamp( this.cloudCoverage.add( region.sub( 0.5 ).mul( 0.6 ) ), 0.0, 1.0 ).toVar();
+				const cov = clamp( this.cloudCoverage.add( region.sub( 0.5 ).mul( 0.6 ) ), 0.0, 1.0 );
 
-				// Apply coverage threshold
-				const lo = sub( 1.0, cov ).toVar();
-				const cloudMask = smoothstep( lo, lo.add( 0.3 ), cloudNoise ).toVar();
+				// carve clouds where noise rises above the coverage level
+				const threshold = sub( 1.0, cov ).toVar();
+				const cloudMask = smoothstep( threshold, threshold.add( 0.3 ), cloudNoise ).toVar();
 
 				// Fade clouds near horizon (adjusted by elevation)
 				const horizonFade = smoothstep( 0.0, add( 0.03, mul( 0.06, this.cloudElevation ) ), direction.y );
 				cloudMask.mulAssign( horizonFade );
 
 				// Cloud lighting from the sky's own radiance
-				const dayFactor = smoothstep( - 0.08, 0.30, vSunDirection.y ).toVar();
-				const sunColor = vSunE.mul( Fex ).mul( 0.22 ).mul( 0.04 ).toVar();
-				const skyAmbient = Lin.mul( 0.04 ).add( vec3( 0.0, 0.0003, 0.00075 ) ).toVar();
+				const dayFactor = smoothstep( - 0.08, 0.30, vSunDirection.y );
+				const sunColor = vSunE.mul( Fex ).mul( 0.22 ).mul( 0.04 ).toVar(); // 0.22 ~ albedo/pi, 0.04 = exposure ( Fex = sun->cloud; eye leg added by the aerial composite )
+				const skyAmbient = Lin.mul( 0.04 ).add( vec3( 0.0, 0.0003, 0.00075 ) );
 
 				// Beer-powder self-shadow from the sampled density
-				const depth = max( 0.0, cloudNoise.sub( lo ) ).toVar();
-				const beer = exp( depth.mul( - 4.0 ) );
-				const powder = sub( 1.0, exp( depth.mul( - 8.0 ) ) );
-				const shade = mix( 0.45, 1.0, beer.mul( powder ).mul( 2.6 ).clamp( 0.0, 1.0 ) ).toVar();
+				const depth = max( 0.0, cloudNoise.sub( threshold ) ).toVar();
+				const beer = exp( depth.mul( - 4.0 ) ).toVar();
+				const powder = sub( 1.0, beer.mul( beer ) ); // beer*beer == exp(-8*depth)
+				const shade = mix( 0.45, 1.0, beer.mul( powder ).mul( 2.6 ).clamp( 0.0, 1.0 ) ); // 2.6 = 1/0.385, normalizes beer*powder peak to 1
 
-				// Henyey-Greenstein forward lobe: silver lining on rims toward the sun
-				const cosT = dot( direction, vSunDirection ).toVar();
-				const g2 = float( 0.49 );
-				const silver = ONE_OVER_FOURPI.mul( sub( 1.0, g2 ) ).div( pow( sub( add( 1.0, g2 ), cosT.mul( 1.4 ) ), 1.5 ) ).mul( 12.566 ).clamp( 0.0, 3.0 ).toVar();
-				const edge = cloudMask.mul( sub( 1.0, cloudMask ) ).mul( 4.0 ).toVar();
+				// Henyey-Greenstein forward lobe ( g = 0.7 ): silver lining on rims toward the sun
+				const silver = float( 0.51 ).div( pow( sub( 1.49, cosTheta.mul( 1.4 ) ), 1.5 ) ).clamp( 0.0, 3.0 ); // 0.51=1-g^2, 1.49=1+g^2, 1.4=2g
+				const edge = cloudMask.mul( sub( 1.0, cloudMask ) ).mul( 4.0 );
 
 				const cloudColor = skyAmbient.add( sunColor.mul( shade ) ).toVar();
 				cloudColor.addAssign( sunColor.mul( silver ).mul( edge ).mul( 0.6 ) );
 				cloudColor.mulAssign( dayFactor.max( 0.03 ) );
 
+				// Cloud opacity via Beer's law: density sets how solid the clouds get
+				const alpha = sub( 1.0, exp( depth.mul( this.cloudDensity ).mul( - 12.0 ) ) ).mul( horizonFade ).toVar();
+
 				// Occlude the sun disc/glow behind opaque cloud
-				texColor.subAssign( L0.mul( 0.04 ).mul( cloudMask ) );
+				texColor.subAssign( L0.mul( 0.04 ).mul( alpha ) );
 
 				// Composite through the atmosphere so distant clouds dissolve into haze
-				const cloudAerial = cloudColor.mul( Fex ).add( texColor.mul( sub( vec3( 1.0 ), Fex ) ) ).toVar();
-				texColor.assign( mix( texColor, cloudAerial, cloudMask.mul( this.cloudDensity ) ) );
+				const cloudAerial = mix( texColor, cloudColor, Fex );
+				texColor.assign( mix( texColor, cloudAerial, alpha ) );
 
 			} );
 
