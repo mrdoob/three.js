@@ -309,7 +309,14 @@ class SkyMesh extends Mesh {
 				const sunColor = vSunE.mul( Fex ).mul( 0.22 ).mul( 0.04 ).toVar();
 				const skyAmbient = Lin.mul( 0.04 ).add( vec3( 0.0, 0.0003, 0.00075 ) ).toVar();
 
+				// Henyey-Greenstein forward lobe: silver lining on rims toward the sun
+				const cosT = dot( direction, vSunDirection ).toVar();
+				const g2 = float( 0.49 );
+				const silver = ONE_OVER_FOURPI.mul( sub( 1.0, g2 ) ).div( pow( sub( add( 1.0, g2 ), cosT.mul( 1.4 ) ), 1.5 ) ).mul( 12.566 ).clamp( 0.0, 3.0 ).toVar();
+				const edge = cloudMask.mul( sub( 1.0, cloudMask ) ).mul( 4.0 ).toVar();
+
 				const cloudColor = skyAmbient.add( sunColor ).toVar();
+				cloudColor.addAssign( sunColor.mul( silver ).mul( edge ).mul( 0.6 ) );
 				cloudColor.mulAssign( dayFactor.max( 0.03 ) );
 
 				// Composite through the atmosphere so distant clouds dissolve into haze
