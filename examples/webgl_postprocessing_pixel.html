@@ -80,7 +80,7 @@
 			// gui
 
 			gui = new GUI();
-			params = { pixelSize: 6, normalEdgeStrength: .3, depthEdgeStrength: .4, pixelAlignedPanning: true, pixelAlignedObjects: true, rotationSnap: 15, cameraRotationSnap: 0, cameraZoomSnap: 0 };
+			params = { pixelSize: 6, normalEdgeStrength: .3, depthEdgeStrength: .4, pixelAlignedPanning: true, pixelAlignedObjects: true, rotationSnap: 15, cameraRotationSnap: 10, cameraZoomSnap: 0.1 };
 			gui.add( params, 'pixelSize' ).min( 1 ).max( 16 ).step( 1 )
 				.onChange( () => {
 
@@ -297,21 +297,21 @@
 
 		function pixelAlignCamera( camera, target, rotationIncrementDegrees, zoomIncrement ) {
 
-			// Snap the camera's orientation to the nearest euler increment so the world doesn't rotate sub-step
+			// Snap the camera's orbit to the nearest increment of azimuth/polar angle around the target. Working
+			// in spherical coordinates (rather than snapping the euler angles) keeps the orbit translation locked
+			// onto the target and guarantees a roll-free orientation, since we re-aim with lookAt and world up.
 			if ( rotationIncrementDegrees > 0 ) {
 
 				const increment = THREE.MathUtils.degToRad( rotationIncrementDegrees );
-				const euler = new THREE.Euler().setFromQuaternion( camera.quaternion );
-				euler.x = Math.round( euler.x / increment ) * increment;
-				euler.y = Math.round( euler.y / increment ) * increment;
-				euler.z = Math.round( euler.z / increment ) * increment;
-				camera.quaternion.setFromEuler( euler );
-
-				// Re-orbit the camera onto the snapped view axis so it keeps pointing at the target: the orbit
-				// translation now snaps along with the rotation instead of sliding smoothly off-target
-				const distance = camera.position.distanceTo( target );
-				const forward = new THREE.Vector3( 0.0, 0.0, - 1.0 ).applyQuaternion( camera.quaternion );
-				camera.position.copy( target ).addScaledVector( forward, - distance );
+				const offset = new THREE.Vector3().subVectors( camera.position, target );
+				const spherical = new THREE.Spherical().setFromVector3( offset );
+				spherical.theta = Math.round( spherical.theta / increment ) * increment;
+				spherical.phi = Math.round( spherical.phi / increment ) * increment;
+				spherical.makeSafe();
+				offset.setFromSpherical( spherical );
+				camera.position.copy( target ).add( offset );
+				camera.up.set( 0.0, 1.0, 0.0 );
+				camera.lookAt( target );
 
 			}
 
