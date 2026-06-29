@@ -80,7 +80,7 @@
 			// gui
 
 			gui = new GUI();
-			params = { pixelSize: 6, normalEdgeStrength: .3, depthEdgeStrength: .4, pixelAlignedPanning: true, pixelAlignedObjects: true };
+			params = { pixelSize: 6, normalEdgeStrength: .3, depthEdgeStrength: .4, pixelAlignedPanning: true, pixelAlignedObjects: true, rotationSnap: 0 };
 			gui.add( params, 'pixelSize' ).min( 1 ).max( 16 ).step( 1 )
 				.onChange( () => {
 
@@ -91,6 +91,7 @@
 			gui.add( renderPixelatedPass, 'depthEdgeStrength' ).min( 0 ).max( 1 ).step( .05 );
 			gui.add( params, 'pixelAlignedPanning' );
 			gui.add( params, 'pixelAlignedObjects' );
+			gui.add( params, 'rotationSnap' ).min( 0 ).max( 90 ).step( 1 ).name( 'rotationSnap (deg, 0 = off)' );
 
 			// textures
 
@@ -205,8 +206,9 @@
 
 			}
 
-			// Remember the crystal's true (unsnapped) position so its bulk movement is unaffected by snapping
+			// Remember the crystal's true (unsnapped) transform so its bulk movement is unaffected by snapping
 			const crystalPosition = crystalMesh.position.clone();
+			const crystalQuaternion = crystalMesh.quaternion.clone();
 
 			if ( params[ 'pixelAlignedObjects' ] ) {
 
@@ -218,10 +220,18 @@
 
 			}
 
+			if ( params[ 'rotationSnap' ] > 0 ) {
+
+				// Snap the moving objects' rotation to the nearest camera-relative euler increment
+				snapObjectRotation( crystalMesh, camera, params[ 'rotationSnap' ] );
+
+			}
+
 			composer.render();
 
-			// Restore the true position after rendering so the next frame's motion builds on the real trajectory
+			// Restore the true transform after rendering so the next frame's motion builds on the real trajectory
 			crystalMesh.position.copy( crystalPosition );
+			crystalMesh.quaternion.copy( crystalQuaternion );
 
 		}
 
@@ -319,6 +329,26 @@
 			pos.addScaledVector( camRight, snappedRight );
 			pos.addScaledVector( camUp, snappedUp );
 			pos.addScaledVector( camForward, posForward );
+
+		}
+
+		function snapObjectRotation( object, camera, incrementDegrees ) {
+
+			const increment = THREE.MathUtils.degToRad( incrementDegrees );
+
+			// 1. Express the object's rotation relative to the camera
+			const camRot = new THREE.Quaternion(); camera.getWorldQuaternion( camRot );
+			const relative = camRot.clone().invert().multiply( object.quaternion );
+
+			// 2. Snap each euler axis (in camera space) to the nearest increment
+			const euler = new THREE.Euler().setFromQuaternion( relative );
+			euler.x = Math.round( euler.x / increment ) * increment;
+			euler.y = Math.round( euler.y / increment ) * increment;
+			euler.z = Math.round( euler.z / increment ) * increment;
+
+			// 3. Convert back to a world-space rotation
+			relative.setFromEuler( euler );
+			object.quaternion.copy( camRot.multiply( relative ) );
 
 		}
 
