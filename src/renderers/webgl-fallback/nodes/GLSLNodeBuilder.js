@@ -1771,7 +1771,7 @@ void main() {
 
 			} else if ( type === 'buffer' ) {
 
-				uniformNode.name = `buffer${ node.id }`;
+				uniformNode.name = `buffer${ node.bufferId }`;
 
 				const sharedData = this.getSharedDataFromNode( node );
 
@@ -1779,7 +1779,7 @@ void main() {
 
 				if ( buffer === undefined ) {
 
-					node.name = `NodeBuffer_${ node.id }`;
+					node.name = `NodeBuffer_${ node.bufferId }`;
 
 					buffer = new NodeUniformBuffer( node, group );
 					buffer.name = node.name;
