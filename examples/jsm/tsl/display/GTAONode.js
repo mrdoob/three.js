@@ -386,8 +386,7 @@ class GTAONode extends TempNode {
 			Loop( { start: int( 0 ), end: DIRECTIONS, type: 'int', condition: '<' }, ( { i } ) => {
 
 				const angle = float( i ).div( float( DIRECTIONS ) ).mul( PI ).add( this._temporalDirection ).toVar();
-				const sampleDir = vec3( cos( angle ), sin( angle ), 0 ).toVar();
-				sampleDir.assign( normalize( kernelMatrix.mul( sampleDir ) ) );
+				const sampleDir = kernelMatrix.mul( vec3( cos( angle ), sin( angle ), 0 ) ).toVar();
 				const sampleDirRadius = sampleDir.mul( radius ).toVar();
 
 				const sliceBitangent = normalize( cross( sampleDir, viewDir ) ).toVar();
