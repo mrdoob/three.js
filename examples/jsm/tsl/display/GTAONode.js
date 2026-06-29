@@ -359,7 +359,7 @@ class GTAONode extends TempNode {
 			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toVar();
 			const viewNormal = sampleNormal( uvNode ).toVar();
 
-			const radiusToUse = this.radius;
+			const radius = this.radius;
 
 			const noiseResolution = textureSize( this._noiseNode, 0 );
 			let noiseUv = vec2( uvNode.x, uvNode.y.oneMinus() );
@@ -416,7 +416,7 @@ class GTAONode extends TempNode {
 					// near-field. (Blender's Eevee adaptation)
 					const t = float( j ).add( 1.0 ).add( stepJitter ).div( STEPS ).toVar();
 					const sampleDist = t.mul( t );
-					const sampleViewOffset = sampleDir.mul( radiusToUse ).mul( sampleDist );
+					const sampleViewOffset = sampleDir.mul( radius ).mul( sampleDist );
 
 					// The loop marches in two opposite directions (x and y) along the slice's line to find the horizon on both sides.
 
@@ -435,7 +435,7 @@ class GTAONode extends TempNode {
 					// back toward the prior horizon as it approaches the radius boundary.
 					// (squared variant of the paper's near-field attenuation;
 					// Activision GTAO paper, Section 4.3 "Bounding the sampling area")
-					const distFacX = clamp( lenX.div( radiusToUse ), 0, 1 );
+					const distFacX = clamp( lenX.div( radius ), 0, 1 );
 					const distFacSqX = distFacX.mul( distFacX );
 
 					If( abs( viewDeltaX.z ).lessThan( this.thickness ), () => {
@@ -454,7 +454,7 @@ class GTAONode extends TempNode {
 
 					const sHY = dot( viewDir, viewDeltaY.div( max( lenY, float( 0.0001 ) ) ) );
 
-					const distFacY = clamp( lenY.div( radiusToUse ), 0, 1 );
+					const distFacY = clamp( lenY.div( radius ), 0, 1 );
 					const distFacSqY = distFacY.mul( distFacY );
 
 					If( abs( viewDeltaY.z ).lessThan( this.thickness ), () => {
