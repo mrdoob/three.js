@@ -1,9 +1,87 @@
-/* global chrome, importScripts, MESSAGE_ID, MESSAGE_INIT, MESSAGE_REGISTER, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, MESSAGE_COMMITTED */
+/* global chrome, importScripts, MESSAGE_ID, MESSAGE_INIT, MESSAGE_REGISTER, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, MESSAGE_SET_MONITORING, MESSAGE_COMMITTED, STORAGE_KEY_MONITORING */
 
 importScripts( 'constants.js' );
 
 // Map tab IDs to connections
 const connections = new Map();
+
+// Context menu item on the toolbar icon
+const MENU_MONITORING_ID = 'three-devtools-monitoring';
+
+// Read the persisted monitoring state (default: on)
+function getMonitoringEnabled() {
+
+	return chrome.storage.local.get( { [ STORAGE_KEY_MONITORING ]: true } )
+		.then( ( items ) => items[ STORAGE_KEY_MONITORING ] === true );
+
+}
+
+// Update the toolbar badge, ignoring errors for closed tabs
+function setBadge( tabId, text, color ) {
+
+	chrome.action.setBadgeText( { tabId: tabId, text: text } ).catch( () => {
+
+		// Ignore error - tab might have been closed
+
+	} );
+
+	if ( color ) {
+
+		chrome.action.setBadgeTextColor( { tabId: tabId, color: '#ffffff' } ).catch( () => {
+
+			// Ignore error - tab might have been closed
+
+		} );
+		chrome.action.setBadgeBackgroundColor( { tabId: tabId, color: color } ).catch( () => {
+
+			// Ignore error - tab might have been closed
+
+		} );
+
+	}
+
+}
+
+// Show the monitoring state ('off') or the three.js revision on the badge
+function updateBadge( tabId, revision, monitoringEnabled ) {
+
+	if ( ! monitoringEnabled ) {
+
+		setBadge( tabId, 'off', '#666666' );
+		return;
+
+	}
+
+	if ( ! revision ) {
+
+		setBadge( tabId, '' );
+		return;
+
+	}
+
+	revision = String( revision );
+	const number = revision.replace( /\D+$/, '' );
+	const isDev = revision.includes( 'dev' );
+
+	setBadge( tabId, number, isDev ? '#ff0098' : '#049ef4' );
+
+}
+
+// Sync a tab's bridge with the monitoring state. When enabled the bridge
+// responds with a full state refresh.
+function sendSetMonitoring( tabId, enabled ) {
+
+	chrome.tabs.sendMessage( tabId, {
+		name: MESSAGE_SET_MONITORING,
+		enabled: enabled,
+		tabId: tabId
+	} ).catch( () => {
+
+		// Ignore error - content script might not be injected yet
+
+	} );
+
+}
 
 // Handle extension icon clicks in the toolbar
 chrome.action.onClicked.addListener( ( tab ) => {
@@ -16,6 +94,68 @@ chrome.action.onClicked.addListener( ( tab ) => {
 
 		// Ignore error - tab might not have the content script injected
 		console.log( 'Could not send scroll-to-canvas message to tab', tab.id );
+
+	} );
+
+} );
+
+// Add a monitoring on/off checkbox to the toolbar icon context menu
+chrome.runtime.onInstalled.addListener( () => {
+
+	chrome.contextMenus.removeAll( () => {
+
+		getMonitoringEnabled().then( ( enabled ) => {
+
+			chrome.contextMenus.create( {
+				id: MENU_MONITORING_ID,
+				title: 'Monitor three.js scenes',
+				type: 'checkbox',
+				checked: enabled,
+				contexts: [ 'action' ]
+			} );
+
+		} );
+
+	} );
+
+} );
+
+chrome.contextMenus.onClicked.addListener( ( info ) => {
+
+	if ( info.menuItemId === MENU_MONITORING_ID ) {
+
+		chrome.storage.local.set( { [ STORAGE_KEY_MONITORING ]: info.checked === true } );
+
+	}
+
+} );
+
+// React to monitoring changes from the context menu or the panel: update the
+// menu checkbox and the badge/bridge of every tab where three.js registered
+chrome.storage.onChanged.addListener( ( changes, area ) => {
+
+	if ( area !== 'local' || ! ( STORAGE_KEY_MONITORING in changes ) ) return;
+
+	const enabled = changes[ STORAGE_KEY_MONITORING ].newValue === true;
+
+	chrome.contextMenus.update( MENU_MONITORING_ID, { checked: enabled } ).catch( () => {
+
+		// Ignore error - menu might not have been created yet
+
+	} );
+
+	chrome.storage.session.get( null ).then( ( items ) => {
+
+		for ( const key of Object.keys( items ) ) {
+
+			if ( ! key.startsWith( 'revision-' ) ) continue;
+
+			const tabId = parseInt( key.slice( 'revision-'.length ), 10 );
+
+			updateBadge( tabId, items[ key ], enabled );
+			sendSetMonitoring( tabId, enabled );
+
+		}
 
 	} );
 
@@ -43,9 +183,20 @@ chrome.runtime.onConnect.addListener( port => {
 			tabId = message.tabId;
 			connections.set( tabId, port );
 
+			// Sync the page with the persisted monitoring state
+			getMonitoringEnabled().then( ( enabled ) => {
+
+				sendSetMonitoring( tabId, enabled );
+
+			} );
+
 		} else if ( forwardableMessages.has( message.name ) && tabId ) {
 
-			chrome.tabs.sendMessage( tabId, message );
+			chrome.tabs.sendMessage( tabId, message ).catch( () => {
+
+				// Ignore error - content script might not be injected yet
+
+			} );
 
 		} else if ( tabId === undefined ) {
 
@@ -89,22 +240,16 @@ chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
 		if ( message.name === MESSAGE_REGISTER && message.detail && message.detail.revision ) {
 
 			const revision = String( message.detail.revision );
-			const number = revision.replace( /\D+$/, '' );
-			const isDev = revision.includes( 'dev' );
 
-			chrome.action.setBadgeText( { tabId: tabId, text: number } ).catch( () => {
+			// Remember the revision so the badge can be restored on re-enable
+			chrome.storage.session.set( { [ 'revision-' + tabId ]: revision } );
 
-				// Ignore error - tab might have been closed
+			getMonitoringEnabled().then( ( enabled ) => {
 
-			} );
-			chrome.action.setBadgeTextColor( { tabId: tabId, color: '#ffffff' } ).catch( () => {
+				updateBadge( tabId, revision, enabled );
 
-				// Ignore error - tab might have been closed
-
-			} );
-			chrome.action.setBadgeBackgroundColor( { tabId: tabId, color: isDev ? '#ff0098' : '#049ef4' } ).catch( () => {
-
-				// Ignore error - tab might have been closed
+				// A freshly loaded page's bridge defaults to enabled
+				if ( ! enabled ) sendSetMonitoring( tabId, false );
 
 			} );
 
@@ -144,11 +289,8 @@ chrome.webNavigation.onCommitted.addListener( details => {
 	// Clear badge on navigation, only for top-level navigation
 	if ( frameId === 0 ) {
 
-		chrome.action.setBadgeText( { tabId: tabId, text: '' } ).catch( () => {
-
-			// Ignore error - tab might have been closed
-
-		} );
+		setBadge( tabId, '' );
+		chrome.storage.session.remove( 'revision-' + tabId );
 
 	}
 
@@ -169,11 +311,8 @@ chrome.webNavigation.onCommitted.addListener( details => {
 // Clear badge when a tab is closed
 chrome.tabs.onRemoved.addListener( ( tabId ) => {
 
-	chrome.action.setBadgeText( { tabId: tabId, text: '' } ).catch( () => {
-
-		// Ignore error - tab is already gone
-
-	} );
+	setBadge( tabId, '' );
+	chrome.storage.session.remove( 'revision-' + tabId );
 
 	// Clean up connection if it exists for the closed tab
 	if ( connections.has( tabId ) ) {

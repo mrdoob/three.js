@@ -1,4 +1,4 @@
-/* global MESSAGE_ID, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, EVENT_REGISTER, EVENT_OBSERVE, EVENT_RENDERER, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_OBJECT_DETAILS, EVENT_DEVTOOLS_READY */
+/* global MESSAGE_ID, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, MESSAGE_SET_MONITORING, EVENT_REGISTER, EVENT_OBSERVE, EVENT_RENDERER, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_OBJECT_DETAILS, EVENT_DEVTOOLS_READY */
 
 /**
  * This script injected by the installed three.js developer
@@ -101,6 +101,8 @@
 		const sceneEmptyTicks = new Map(); // Consecutive sendState ticks each scene has been empty
 		const removedScenes = new Set(); // Scenes hidden from the panel; tracked so we can resurrect them
 		const SCENE_EMPTY_TICKS_THRESHOLD = 5; // ~5s at 1s polling — hide empty scene from the panel
+
+		let monitoringEnabled = true; // Toggled from the panel via 'set-monitoring'
 
 		// Shared tree traversal function
 		function traverseObjectTree( rootObject, callback, skipDuplicates = false ) {
@@ -403,7 +405,7 @@
 
 			} else if ( message.name === MESSAGE_REQUEST_OBJECT_DETAILS ) {
 
-				sendObjectDetails( message.uuid );
+				if ( monitoringEnabled ) sendObjectDetails( message.uuid );
 
 			} else if ( message.name === MESSAGE_SCROLL_TO_CANVAS ) {
 
@@ -411,17 +413,37 @@
 
 			} else if ( message.name === MESSAGE_HIGHLIGHT_OBJECT ) {
 
-				devTools.dispatchEvent( new CustomEvent( 'highlight-object', { detail: { uuid: message.uuid } } ) );
+				if ( monitoringEnabled ) devTools.dispatchEvent( new CustomEvent( 'highlight-object', { detail: { uuid: message.uuid } } ) );
 
 			} else if ( message.name === MESSAGE_UNHIGHLIGHT_OBJECT ) {
 
 				devTools.dispatchEvent( new CustomEvent( 'unhighlight-object' ) );
+
+			} else if ( message.name === MESSAGE_SET_MONITORING ) {
+
+				monitoringEnabled = message.enabled === true;
+
+				if ( monitoringEnabled ) {
+
+					// Counts may match even though the tree changed while off — force fresh batches
+					sceneObjectCountCache.clear();
+					sceneEmptyTicks.clear();
+					sendState();
+
+				} else {
+
+					// Remove any active highlight left behind by a hover
+					devTools.dispatchEvent( new CustomEvent( 'unhighlight-object' ) );
+
+				}
 
 			}
 
 		} );
 
 		function sendState() {
+
+			if ( ! monitoringEnabled ) return;
 
 			// Send current renderers
 			for ( const observedRenderer of observedRenderers ) {

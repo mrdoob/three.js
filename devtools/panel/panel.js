@@ -1,7 +1,10 @@
-/* global chrome, MESSAGE_ID, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, EVENT_REGISTER, EVENT_RENDERER, EVENT_OBJECT_DETAILS, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_COMMITTED */
+/* global chrome, MESSAGE_ID, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, STORAGE_KEY_MONITORING, EVENT_REGISTER, EVENT_RENDERER, EVENT_OBJECT_DETAILS, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_COMMITTED */
 
 const CONNECTION_NAME = 'three-devtools';
 const STATE_POLLING_INTERVAL = 1000;
+
+// Monitoring on/off state, restored from storage before connecting (default: on)
+let monitoringEnabled = true;
 
 // --- Utility Functions ---
 function getObjectIcon( obj ) {
@@ -75,22 +78,8 @@ let floatingPanel = null;
 const mousePosition = { x: 0, y: 0 };
 
 
-// Create a connection to the background page
-const backgroundPageConnection = chrome.runtime.connect( {
-	name: CONNECTION_NAME
-} );
-
-// Initialize the connection with the inspected tab ID
-backgroundPageConnection.postMessage( {
-	name: MESSAGE_INIT,
-	tabId: chrome.devtools.inspectedWindow.tabId
-} );
-
-// Request the initial state from the bridge script
-backgroundPageConnection.postMessage( {
-	name: MESSAGE_REQUEST_STATE,
-	tabId: chrome.devtools.inspectedWindow.tabId
-} );
+let backgroundPageConnection = null;
+let intervalId = null;
 
 // Function to scroll to canvas element
 function scrollToCanvas( rendererUuid ) {
@@ -102,22 +91,6 @@ function scrollToCanvas( rendererUuid ) {
 	} );
 
 }
-
-const intervalId = setInterval( () => {
-
-	backgroundPageConnection.postMessage( {
-		name: MESSAGE_REQUEST_STATE,
-		tabId: chrome.devtools.inspectedWindow.tabId
-	} );
-
-}, STATE_POLLING_INTERVAL );
-
-backgroundPageConnection.onDisconnect.addListener( () => {
-
-	clearInterval( intervalId );
-	clearState();
-
-} );
 
 // Function to request object details from the bridge
 function requestObjectDetails( uuid ) {
@@ -161,6 +134,7 @@ const treeExpandedState = new Map();
 // Static DOM elements (created once in initUI)
 let renderersSection = null;
 let scenesSection = null;
+let monitoringToggleButton = null;
 let sceneDirty = true;
 
 // Helper function to create properties column for renderer
@@ -318,17 +292,6 @@ function clearState() {
 	}
 
 }
-
-// Listen for messages from the background page
-backgroundPageConnection.onMessage.addListener( function ( message ) {
-
-	if ( message.id === MESSAGE_ID ) {
-
-		handleThreeEvent( message );
-
-	}
-
-} );
 
 function handleThreeEvent( message ) {
 
@@ -614,6 +577,36 @@ function renderObject( obj, container, level = 0, parentInvisible = false ) {
 
 }
 
+// Reflect the monitoring state in the panel. Pausing itself is enforced by the
+// background/bridge (which discard state requests while off); here we only
+// update the toggle button and dim the panel. Fires for changes from the
+// panel's own button and from the toolbar context menu alike.
+chrome.storage.onChanged.addListener( ( changes, area ) => {
+
+	if ( area !== 'local' || ! ( STORAGE_KEY_MONITORING in changes ) ) return;
+
+	monitoringEnabled = changes[ STORAGE_KEY_MONITORING ].newValue === true;
+
+	updateMonitoringUI();
+
+	if ( ! monitoringEnabled && floatingPanel ) floatingPanel.classList.remove( 'visible' );
+
+} );
+
+function updateMonitoringUI() {
+
+	if ( monitoringToggleButton ) {
+
+		monitoringToggleButton.textContent = monitoringEnabled ? 'On' : 'Off';
+		monitoringToggleButton.title = monitoringEnabled ? 'Monitoring is on - click to pause' : 'Monitoring is paused - click to resume';
+		monitoringToggleButton.classList.toggle( 'off', ! monitoringEnabled );
+
+	}
+
+	document.body.classList.toggle( 'monitoring-off', ! monitoringEnabled );
+
+}
+
 // Build the static DOM shell (called once)
 function initUI() {
 
@@ -633,8 +626,23 @@ function initUI() {
 	manifestVersionSpan.textContent = `${manifest.version}`;
 	manifestVersionSpan.style.opacity = '0.5';
 
+	monitoringToggleButton = document.createElement( 'button' );
+	monitoringToggleButton.className = 'monitoring-toggle';
+	monitoringToggleButton.addEventListener( 'click', () => {
+
+		chrome.storage.local.set( { [ STORAGE_KEY_MONITORING ]: ! monitoringEnabled } );
+
+	} );
+
+	const rightSpan = document.createElement( 'span' );
+	rightSpan.style.display = 'flex';
+	rightSpan.style.alignItems = 'center';
+	rightSpan.style.gap = '8px';
+	rightSpan.appendChild( monitoringToggleButton );
+	rightSpan.appendChild( manifestVersionSpan );
+
 	header.appendChild( miscSpan );
-	header.appendChild( manifestVersionSpan );
+	header.appendChild( rightSpan );
 	container.appendChild( header );
 
 	const sectionsContainer = document.createElement( 'div' );
@@ -650,6 +658,8 @@ function initUI() {
 	scenesSection.className = 'section';
 	scenesSection.style.display = 'none';
 	sectionsContainer.appendChild( scenesSection );
+
+	updateMonitoringUI();
 
 }
 
@@ -790,5 +800,57 @@ document.addEventListener( 'mouseover', ( event ) => {
 
 } );
 
-// Initial UI setup
-initUI();
+// Restore the persisted monitoring state, then build the UI and connect
+chrome.storage.local.get( { [ STORAGE_KEY_MONITORING ]: true } ).then( ( items ) => {
+
+	monitoringEnabled = items[ STORAGE_KEY_MONITORING ] === true;
+
+	initUI();
+
+	// Create a connection to the background page
+	backgroundPageConnection = chrome.runtime.connect( {
+		name: CONNECTION_NAME
+	} );
+
+	// Listen for messages from the background page
+	backgroundPageConnection.onMessage.addListener( function ( message ) {
+
+		if ( message.id === MESSAGE_ID ) {
+
+			handleThreeEvent( message );
+
+		}
+
+	} );
+
+	backgroundPageConnection.onDisconnect.addListener( () => {
+
+		clearInterval( intervalId );
+		clearState();
+
+	} );
+
+	// Initialize the connection with the inspected tab ID and request the
+	// initial state from the bridge script
+	backgroundPageConnection.postMessage( {
+		name: MESSAGE_INIT,
+		tabId: chrome.devtools.inspectedWindow.tabId
+	} );
+	backgroundPageConnection.postMessage( {
+		name: MESSAGE_REQUEST_STATE,
+		tabId: chrome.devtools.inspectedWindow.tabId
+	} );
+
+	// Poll for state continuously. While monitoring is paused the bridge
+	// discards these requests, so the page stays idle but the service worker
+	// and this port stay alive - no reconnect needed.
+	intervalId = setInterval( () => {
+
+		backgroundPageConnection.postMessage( {
+			name: MESSAGE_REQUEST_STATE,
+			tabId: chrome.devtools.inspectedWindow.tabId
+		} );
+
+	}, STATE_POLLING_INTERVAL );
+
+} );
