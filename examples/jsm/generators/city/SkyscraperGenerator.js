@@ -630,10 +630,20 @@ function addSpandrelBands( target, frame, vBottom, height, p ) {
 	// into the plane of the perpendicular face at the corners ( overdraw )
 	const bandLength = Math.max( 0.2, frame.length - 0.6 );
 
+	const vTop = vBottom + height;
+
 	for ( let f = 0; f <= floors; f ++ ) {
 
+		// the end bands ( f = 0 / f = floors ) are centred on the tier boundary; clamp
+		// them so they don't extend into the neighbouring tier
+		const center = vBottom + f * fh;
+		const top = Math.min( center + bandHeight / 2, vTop );
+		const bottom = Math.max( center - bandHeight / 2, vBottom );
+		const h = top - bottom;
+		if ( h <= 0 ) continue;
+
 		// front flush at w = 0, meeting the backing wall behind
-		target.push( boxMatrix( frame, frame.length / 2, vBottom + f * fh, - 0.3, bandLength, bandHeight, 0.6 ) );
+		target.push( boxMatrix( frame, frame.length / 2, ( top + bottom ) / 2, - 0.3, bandLength, h, 0.6 ) );
 
 	}
 
@@ -709,9 +719,49 @@ function addParapet( target, frame, vTop, p ) {
 
 }
 
+// the arch openings' inner reveal walls, each hole outline swept back to the wall
+// thickness; holes wind clockwise, so an edge's inward normal is ( dy, -dx )
+function buildArchReveals( holes, depth, curveSegments ) {
+
+	const positions = [], normals = [], uvs = [];
+
+	for ( const hole of holes ) {
+
+		const points = hole.getPoints( curveSegments );
+
+		for ( let i = 0; i < points.length - 1; i ++ ) {
+
+			const a = points[ i ], b = points[ i + 1 ];
+			const dx = b.x - a.x, dy = b.y - a.y;
+			const inv = 1 / ( Math.hypot( dx, dy ) || 1 );
+			const nx = dy * inv, ny = - dx * inv;
+
+			// the two triangles of the quad a → b, both facing into the opening
+			positions.push( a.x, a.y, 0, a.x, a.y, - depth, b.x, b.y, - depth );
+			positions.push( a.x, a.y, 0, b.x, b.y, - depth, b.x, b.y, 0 );
+
+			for ( let v = 0; v < 6; v ++ ) {
+
+				normals.push( nx, ny, 0 );
+				uvs.push( 0, 0 );
+
+			}
+
+		}
+
+	}
+
+	const geometry = new BufferGeometry();
+	geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( positions ), 3 ) );
+	geometry.setAttribute( 'normal', new BufferAttribute( new Float32Array( normals ), 3 ) );
+	geometry.setAttribute( 'uv', new BufferAttribute( new Float32Array( uvs ), 2 ) );
+	return geometry;
+
+}
+
 /**
- * The base storey: a wall pierced by tall pointed-arch openings, extruded with
- * thickness so the openings read as deep recesses.
+ * The base storey: a wall pierced by tall pointed-arch openings, built as a flat front
+ * face and the openings' reveals so they read as deep recesses.
  */
 function addArcade( target, frame, height, p ) {
 
@@ -746,8 +796,12 @@ function addArcade( target, frame, height, p ) {
 	}
 
 	const thickness = 1.1;
-	const geometry = new ExtrudeGeometry( shape, { depth: thickness, bevelEnabled: false, curveSegments: 8 } );
-	geometry.translate( 0, 0, - thickness );
+	const curveSegments = 8;
+
+	// flat front face plus the swept reveals; the openings show through to the dark plane behind
+	const front = new ShapeGeometry( shape, curveSegments );
+	const reveals = buildArchReveals( shape.holes, thickness, curveSegments );
+	const geometry = merge( [ front, reveals ] );
 	geometry.applyMatrix4( frame.matrix( 0, 0, 0 ) );
 
 	target.push( geometry );
