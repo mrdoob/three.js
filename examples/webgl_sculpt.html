@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - sculpt</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			canvas { cursor: none; }
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - sculpt
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+			import { Sculpt } from 'three/addons/sculpt/Sculpt.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			let renderer, scene, camera, controls, sculpt, mesh;
+			let cursorGroup, cursorRing, cursorDot;
+
+			const _normal = new THREE.Vector3();
+			const _forward = new THREE.Vector3( 0, 0, 1 );
+			const _mouse = new THREE.Vector3();
+
+			const link = document.createElement( 'a' );
+			link.style.display = 'none';
+			document.body.appendChild( link );
+
+			function exportGLTF() {
+
+				const exporter = new GLTFExporter();
+
+				exporter.parse( mesh, function ( buffer ) {
+
+					const blob = new Blob( [ buffer ], { type: 'application/octet-stream' } );
+					link.href = URL.createObjectURL( blob );
+					link.download = 'sculpt.glb';
+					link.click();
+
+				}, function ( error ) {
+
+					console.error( error );
+
+				}, { binary: true } );
+
+			}
+
+			init();
+
+			function init() {
+
+				// Renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				document.body.appendChild( renderer.domElement );
+
+				// Scene
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
+
+				// Camera
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 0, 4 );
+
+				// Lights
+
+				scene.add( new THREE.AmbientLight( 0x404040 ) );
+
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 2.0 );
+				dirLight.position.set( 1, 1.5, 2 );
+				scene.add( dirLight );
+
+				const dirLight2 = new THREE.DirectionalLight( 0x88aaff, 0.5 );
+				dirLight2.position.set( - 1, - 0.5, - 1 );
+				scene.add( dirLight2 );
+
+				// Mesh
+
+				const geometry = new THREE.IcosahedronGeometry( 1, 5 );
+				const material = new THREE.MeshStandardMaterial( {
+					color: 0xcc6644,
+					roughness: 0.4,
+					metalness: 0.1
+				} );
+				mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				// Controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.1;
+
+				// Sculpt
+
+				sculpt = new Sculpt( mesh, camera, renderer.domElement );
+
+				// Disable orbit controls while sculpting
+
+				renderer.domElement.addEventListener( 'pointerdown', function () {
+
+					requestAnimationFrame( function () {
+
+						if ( sculpt.isSculpting ) controls.enabled = false;
+
+					} );
+
+				} );
+
+				renderer.domElement.addEventListener( 'pointerup', function () {
+
+					controls.enabled = true;
+
+				} );
+
+				// GUI
+
+				const params = {
+					tool: 'brush',
+					size: 50,
+					strength: 0.5,
+					subdivision: 0.75,
+					decimation: 0.75,
+					negative: false,
+					wireframe: false,
+					export: exportGLTF
+				};
+
+				const gui = new GUI();
+
+				gui.add( params, 'tool', [ 'brush', 'inflate', 'smooth', 'flatten', 'pinch', 'crease', 'drag', 'scale' ] ).onChange( function ( value ) {
+
+					sculpt.tool = value;
+
+				} );
+
+				gui.add( params, 'size', 10, 200 ).onChange( function ( value ) {
+
+					sculpt.size = value;
+
+				} );
+
+				gui.add( params, 'strength', 0, 1 ).onChange( function ( value ) {
+
+					sculpt.strength = value;
+
+				} );
+
+				gui.add( params, 'subdivision', 0, 1 ).onChange( function ( value ) {
+
+					sculpt.subdivision = value;
+
+				} );
+
+				gui.add( params, 'decimation', 0, 1 ).onChange( function ( value ) {
+
+					sculpt.decimation = value;
+
+				} );
+
+				gui.add( params, 'negative' ).onChange( function ( value ) {
+
+					sculpt.negative = value;
+
+				} );
+
+				gui.add( params, 'wireframe' ).onChange( function ( value ) {
+
+					mesh.material.wireframe = value;
+
+				} );
+
+				gui.add( params, 'export' );
+
+				// 3D Cursor
+
+				const cursorMaterial = new THREE.MeshBasicMaterial( {
+					color: 0xffffff,
+					side: THREE.DoubleSide,
+					transparent: true,
+					opacity: 0.5,
+					depthTest: false
+				} );
+
+				cursorRing = new THREE.Mesh( new THREE.RingGeometry( 0.95, 1, 48 ), cursorMaterial );
+				cursorDot = new THREE.Mesh( new THREE.CircleGeometry( 0.04, 16 ), cursorMaterial );
+
+				cursorGroup = new THREE.Group();
+				cursorGroup.add( cursorRing );
+				cursorGroup.add( cursorDot );
+				cursorGroup.visible = false;
+				cursorGroup.renderOrder = 1;
+				cursorRing.renderOrder = 1;
+				cursorDot.renderOrder = 1;
+				scene.add( cursorGroup );
+
+				renderer.domElement.addEventListener( 'pointermove', function ( event ) {
+
+					// Hide cursor while orbiting
+					if ( event.buttons > 0 && ! sculpt.isSculpting ) {
+
+						cursorGroup.visible = false;
+						return;
+
+					}
+
+					const picking = ! sculpt.isSculpting;
+					const hit = picking && sculpt.pickFromMouse( event.clientX, event.clientY );
+
+					if ( hit || sculpt.isSculpting ) {
+
+						const ip = sculpt.hitPoint;
+						const n = sculpt.hitNormal;
+
+						// Position in world space
+						cursorGroup.position.set( ip[ 0 ], ip[ 1 ], ip[ 2 ] ).applyMatrix4( mesh.matrixWorld );
+
+						// Orient to surface normal (transform normal to world space)
+						if ( picking ) {
+
+							_normal.set( n[ 0 ], n[ 1 ], n[ 2 ] ).transformDirection( mesh.matrixWorld );
+							cursorGroup.quaternion.setFromUnitVectors( _forward, _normal );
+
+						}
+
+						// Scale to match brush size in world space
+						const dist = cursorGroup.position.distanceTo( camera.position );
+						const fov = camera.fov * Math.PI / 180;
+						const screenHeight = 2 * dist * Math.tan( fov / 2 );
+						const worldSize = ( sculpt.size / window.innerHeight ) * screenHeight;
+						cursorGroup.scale.setScalar( worldSize );
+
+						cursorRing.visible = picking;
+						cursorDot.visible = true;
+						cursorGroup.visible = true;
+
+					} else {
+
+						// No intersection: show ring facing camera at fixed depth
+						const rect = renderer.domElement.getBoundingClientRect();
+						_mouse.x = ( ( event.clientX - rect.left ) / rect.width ) * 2 - 1;
+						_mouse.y = - ( ( event.clientY - rect.top ) / rect.height ) * 2 + 1;
+						_mouse.z = 0.5;
+						_mouse.unproject( camera );
+
+						cursorGroup.position.copy( _mouse );
+						cursorGroup.quaternion.copy( camera.quaternion );
+
+						const dist = cursorGroup.position.distanceTo( camera.position );
+						const fov = camera.fov * Math.PI / 180;
+						const screenHeight = 2 * dist * Math.tan( fov / 2 );
+						const worldSize = ( sculpt.size / window.innerHeight ) * screenHeight;
+						cursorGroup.scale.setScalar( worldSize );
+
+						cursorRing.visible = true;
+						cursorDot.visible = true;
+						cursorGroup.visible = true;
+
+					}
+
+				} );
+
+				// Resize
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				controls.update();
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
