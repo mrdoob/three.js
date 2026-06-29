@@ -35,13 +35,12 @@
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { SSAARenderPass } from 'three/addons/postprocessing/SSAARenderPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-			let scene, renderer, composer;
+			let scene, renderer;
 			let cameraP, ssaaRenderPassP;
 			let cameraO, ssaaRenderPassO;
+			let activePass;
 			let gui, stats;
 
 			const params = {
@@ -93,7 +92,7 @@
 				const aspect = width / height;
 				const devicePixelRatio = window.devicePixelRatio || 1;
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { outputBufferType: THREE.HalfFloatType } );
 				renderer.setPixelRatio( devicePixelRatio );
 				renderer.setSize( width, height );
 				renderer.setAnimationLoop( animate );
@@ -173,14 +172,11 @@
 
 				// postprocessing
 
-				composer = new EffectComposer( renderer );
-				composer.setPixelRatio( 1 ); // ensure pixel ratio is always 1 for performance reasons
 				ssaaRenderPassP = new SSAARenderPass( scene, cameraP );
-				composer.addPass( ssaaRenderPassP );
 				ssaaRenderPassO = new SSAARenderPass( scene, cameraO );
-				composer.addPass( ssaaRenderPassO );
-				const outputPass = new OutputPass();
-				composer.addPass( outputPass );
+
+				activePass = ssaaRenderPassP;
+				renderer.setEffects( [ activePass ] );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -203,7 +199,6 @@
 				cameraO.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-				composer.setSize( width, height );
 
 			}
 
@@ -242,12 +237,19 @@
 				ssaaRenderPassP.sampleLevel = ssaaRenderPassO.sampleLevel = params.sampleLevel;
 				ssaaRenderPassP.unbiased = ssaaRenderPassO.unbiased = params.unbiased;
 
-				ssaaRenderPassP.enabled = ( params.camera === 'perspective' );
-				ssaaRenderPassO.enabled = ( params.camera === 'orthographic' );
+				const nextPass = params.camera === 'perspective' ? ssaaRenderPassP : ssaaRenderPassO;
+				const activeCamera = params.camera === 'perspective' ? cameraP : cameraO;
+
+				if ( nextPass !== activePass ) {
+
+					activePass = nextPass;
+					renderer.setEffects( [ activePass ] );
+
+				}
 
 				cameraP.view.offsetX = params.viewOffsetX;
 
-				composer.render();
+				renderer.render( scene, activeCamera );
 
 				stats.end();
 

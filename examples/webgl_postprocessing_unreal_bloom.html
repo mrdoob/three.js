@@ -46,13 +46,10 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-			let camera, stats;
-			let composer, renderer, mixer, timer;
+			let camera, scene, stats;
+			let renderer, mixer, timer;
 
 			const params = {
 				threshold: 0,
@@ -70,7 +67,7 @@
 				timer = new THREE.Timer();
 				timer.connect( document );
 
-				const scene = new THREE.Scene();
+				scene = new THREE.Scene();
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
 				camera.position.set( - 5, 2.5, - 3.5 );
@@ -93,7 +90,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, outputBufferType: THREE.HalfFloatType } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -102,19 +99,12 @@
 
 				//
 
-				const renderScene = new RenderPass( scene, camera );
-
 				const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
 				bloomPass.threshold = params.threshold;
 				bloomPass.strength = params.strength;
 				bloomPass.radius = params.radius;
 
-				const outputPass = new OutputPass();
-
-				composer = new EffectComposer( renderer );
-				composer.addPass( renderScene );
-				composer.addPass( bloomPass );
-				composer.addPass( outputPass );
+				renderer.setEffects( [ bloomPass ] );
 
 				//
 
@@ -173,7 +163,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-				composer.setSize( width, height );
 
 			}
 
@@ -187,7 +176,7 @@
 
 				stats.update();
 
-				composer.render();
+				renderer.render( scene, camera );
 
 			}
 

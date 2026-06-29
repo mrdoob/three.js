@@ -29,14 +29,11 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { TAARenderPass } from 'three/addons/postprocessing/TAARenderPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			let camera, scene, renderer, controls, stats, mesh, material;
 
-			let composer, renderPass, taaRenderPass, outputPass;
+			let taaRenderPass;
 
 			let needsUpdate = false;
 
@@ -100,7 +97,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, outputBufferType: THREE.HalfFloatType } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -116,18 +113,9 @@
 
 				//
 
-				composer = new EffectComposer( renderer );
-
-				renderPass = new RenderPass( scene, camera );
-				renderPass.enabled = false;
-
 				taaRenderPass = new TAARenderPass( scene, camera );
 
-				outputPass = new OutputPass();
-
-				composer.addPass( renderPass );
-				composer.addPass( taaRenderPass );
-				composer.addPass( outputPass );
+				renderer.setEffects( [ taaRenderPass ] );
 
 				//
 
@@ -148,8 +136,7 @@
 
 				taaFolder.add( params, 'taa' ).name( 'enabled' ).onChange( () => {
 
-					renderPass.enabled = ! params.taa;
-					taaRenderPass.enabled = params.taa;
+					renderer.setEffects( params.taa ? [ taaRenderPass ] : null );
 
 					sampleLevelCtrl.enable( params.taa );
 
@@ -174,7 +161,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				composer.setSize( window.innerWidth, window.innerHeight );
 
 				needsUpdate = true;
 
@@ -216,7 +202,7 @@
 
 				}
 
-				composer.render();
+				renderer.render( scene, camera );
 
 			}
 

@@ -42,12 +42,9 @@
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-			let camera, scene, renderer, composer, controls, timer, stats, mixer;
+			let camera, scene, renderer, controls, timer, stats, mixer;
 
 			init();
 
@@ -66,7 +63,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { outputBufferType: THREE.HalfFloatType } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
@@ -89,17 +86,9 @@
 				const width = window.innerWidth;
 				const height = window.innerHeight;
 
-				composer = new EffectComposer( renderer );
-
-				const renderPass = new RenderPass( scene, camera );
-				composer.addPass( renderPass );
-
 				const gtaoPass = new GTAOPass( scene, camera, width, height );
 				gtaoPass.output = GTAOPass.OUTPUT.Denoise;
-				composer.addPass( gtaoPass );
-
-				const outputPass = new OutputPass();
-				composer.addPass( outputPass );
+				renderer.setEffects( [ gtaoPass ] );
 
 				//
 
@@ -183,7 +172,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-				composer.setSize( width, height );
 
 			}
 
@@ -202,7 +190,7 @@
 				controls.update();
 
 				stats.begin();
-				composer.render();
+				renderer.render( scene, camera );
 				stats.end();
 
 			}

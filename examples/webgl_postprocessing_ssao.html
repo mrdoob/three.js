@@ -36,14 +36,10 @@
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			let container, stats;
 			let camera, scene, renderer;
-			let composer;
 			let group;
 
 			init();
@@ -53,7 +49,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { outputBufferType: THREE.HalfFloatType } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
@@ -104,16 +100,8 @@
 				const width = window.innerWidth;
 				const height = window.innerHeight;
 
-				composer = new EffectComposer( renderer );
-
-				const renderPass = new RenderPass( scene, camera );
-				composer.addPass( renderPass );
-
 				const ssaoPass = new SSAOPass( scene, camera, width, height );
-				composer.addPass( ssaoPass );
-
-				const outputPass = new OutputPass();
-				composer.addPass( outputPass );
+				renderer.setEffects( [ ssaoPass ] );
 
 				// Init gui
 				const gui = new GUI();
@@ -147,7 +135,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-				composer.setSize( width, height );
 
 			}
 
@@ -165,7 +152,7 @@
 				group.rotation.x = timer * 0.0002;
 				group.rotation.y = timer * 0.0001;
 
-				composer.render();
+				renderer.render( scene, camera );
 
 			}
 

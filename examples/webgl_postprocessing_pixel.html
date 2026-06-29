@@ -34,12 +34,10 @@
 		import * as THREE from 'three';
 
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 		import { RenderPixelatedPass } from 'three/addons/postprocessing/RenderPixelatedPass.js';
-		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-		let camera, scene, renderer, composer, crystalMesh, timer;
+		let camera, scene, renderer, crystalMesh, timer;
 		let gui, params;
 
 		init();
@@ -58,19 +56,15 @@
 			timer = new THREE.Timer();
 			timer.connect( document );
 
-			renderer = new THREE.WebGLRenderer();
+			renderer = new THREE.WebGLRenderer( { outputBufferType: THREE.HalfFloatType } );
 			renderer.shadowMap.enabled = true;
 			//renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setAnimationLoop( animate );
 			document.body.appendChild( renderer.domElement );
 
-			composer = new EffectComposer( renderer );
 			const renderPixelatedPass = new RenderPixelatedPass( 6, scene, camera );
-			composer.addPass( renderPixelatedPass );
-
-			const outputPass = new OutputPass();
-			composer.addPass( outputPass );
+			renderer.setEffects( [ renderPixelatedPass ] );
 
 			window.addEventListener( 'resize', onWindowResize );
 
@@ -171,7 +165,6 @@
 			camera.updateProjectionMatrix();
 
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			composer.setSize( window.innerWidth, window.innerHeight );
 
 		}
 
@@ -203,7 +196,7 @@
 
 			}
 
-			composer.render();
+			renderer.render( scene, camera );
 
 		}
 

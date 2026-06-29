@@ -37,18 +37,13 @@
 
 			import * as THREE from 'three';
 
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			let container;
 
 			let camera, scene, renderer;
 
 			let video, texture, material, mesh;
-
-			let composer;
 
 			let mouseX = 0;
 			let mouseY = 0;
@@ -80,7 +75,7 @@
 				light.position.set( 0.5, 1, 1 ).normalize();
 				scene.add( light );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { outputBufferType: THREE.HalfFloatType } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -152,21 +147,12 @@
 
 				}
 
-				renderer.autoClear = false;
-
 				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 				// postprocessing
 
-				const renderPass = new RenderPass( scene, camera );
 				const bloomPass = new BloomPass( 1.3 );
-				const outputPass = new OutputPass();
-
-				composer = new EffectComposer( renderer );
-
-				composer.addPass( renderPass );
-				composer.addPass( bloomPass );
-				composer.addPass( outputPass );
+				renderer.setEffects( [ bloomPass ] );
 
 				//
 
@@ -183,7 +169,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				composer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -262,8 +247,7 @@
 
 				counter ++;
 
-				renderer.clear();
-				composer.render();
+				renderer.render( scene, camera );
 
 			}
 
