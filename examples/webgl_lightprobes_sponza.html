@@ -170,7 +170,7 @@
 					countY: 7,
 					countZ: 7,
 					bounces: 1,
-					lightAzimuth: - 45,
+					lightAzimuth: - 165,
 					lightElevation: 55,
 					lightIntensity: 100.0,
 					shadows: true
@@ -314,7 +314,7 @@
 					if ( probesHelper ) probesHelper.visible = value;
 
 				} );
-				gui.add( params, 'probeSize', 0.05, 2.0, 0.05 ).name( 'Probe Size' ).onChange( ( value ) => {
+				gui.add( params, 'probeSize', 0.05, 0.5, 0.05 ).name( 'Probe Size' ).onChange( ( value ) => {
 
 					if ( probesHelper ) {
 
@@ -328,12 +328,87 @@
 
 				} );
 
-				gui.add( { log: () => {
+				gui.add( { load: loadProbes }, 'load' ).name( 'Load Bake' );
+				gui.add( { save: saveProbes }, 'save' ).name( 'Save Bake' );
 
-					console.log( 'position:', camera.position.x.toFixed( 2 ), camera.position.y.toFixed( 2 ), camera.position.z.toFixed( 2 ) );
-					console.log( 'rotation:', camera.rotation.x.toFixed( 4 ), camera.rotation.y.toFixed( 4 ), camera.rotation.z.toFixed( 4 ) );
+				function applyProbes( newProbes ) {
 
-				} }, 'log' ).name( 'Log Camera' );
+					if ( probes ) {
+
+						scene.remove( probes );
+						probes.dispose();
+
+					}
+
+					probes = newProbes;
+					probes.visible = params.enabled;
+					scene.add( probes );
+
+					if ( ! probesHelper ) {
+
+						probesHelper = new LightProbeGridHelper( probes, params.probeSize );
+						probesHelper.visible = params.showProbes;
+						scene.add( probesHelper );
+
+					} else {
+
+						probesHelper.probes = probes;
+						probesHelper.update();
+
+					}
+
+				}
+
+				function saveProbes() {
+
+					if ( ! probes ) return;
+
+					const json = JSON.stringify( probes.toJSON() );
+					const blob = new Blob( [ json ], { type: 'application/json' } );
+					const url = URL.createObjectURL( blob );
+
+					const link = document.createElement( 'a' );
+					link.href = url;
+					link.download = 'sponza-lightprobes.json';
+					link.click();
+
+					URL.revokeObjectURL( url );
+
+					console.log( `LightProbeGrid: serialized ${ ( blob.size / 1024 ).toFixed( 1 ) } KB` );
+
+				}
+
+				function loadProbes() {
+
+					const input = document.createElement( 'input' );
+					input.type = 'file';
+					input.accept = 'application/json,.json';
+					input.onchange = async () => {
+
+						const file = input.files[ 0 ];
+						if ( ! file ) return;
+
+						const json = JSON.parse( await file.text() );
+						const loaded = LightProbeGrid.fromJSON( json );
+
+						params.sizeX = loaded.width;
+						params.sizeY = loaded.height;
+						params.sizeZ = loaded.depth;
+						params.boundsX = loaded.position.x;
+						params.boundsY = loaded.position.y;
+						params.boundsZ = loaded.position.z;
+						params.countX = loaded.resolution.x;
+						params.countY = loaded.resolution.y;
+						params.countZ = loaded.resolution.z;
+						gui.controllersRecursive().forEach( ( c ) => c.updateDisplay() );
+
+						applyProbes( loaded );
+
+					};
+
+					input.click();
+
+				}
 
 				setShadowsEnabled( params.shadows );
 				await bakeWithSettings();
