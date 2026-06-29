@@ -304,15 +304,13 @@ class SkyMesh extends Mesh {
 				const horizonFade = smoothstep( 0.0, add( 0.1, mul( 0.2, this.cloudElevation ) ), direction.y );
 				cloudMask.mulAssign( horizonFade );
 
-				// Cloud lighting based on sun position
-				const sunInfluence = dot( direction, vSunDirection ).mul( 0.5 ).add( 0.5 );
-				const daylight = max( 0.0, vSunDirection.y.mul( 2.0 ) );
+				// Cloud lighting from the sky's own radiance
+				const dayFactor = smoothstep( - 0.08, 0.30, vSunDirection.y ).toVar();
+				const sunColor = vSunE.mul( Fex ).mul( 0.22 ).mul( 0.04 ).toVar();
+				const skyAmbient = Lin.mul( 0.04 ).add( vec3( 0.0, 0.0003, 0.00075 ) ).toVar();
 
-				// Base cloud color affected by atmosphere
-				const atmosphereColor = Lin.mul( 0.04 );
-				const cloudColor = mix( vec3( 0.3 ), vec3( 1.0 ), daylight ).toVar();
-				cloudColor.assign( mix( cloudColor, atmosphereColor.add( vec3( 1.0 ) ), sunInfluence.mul( 0.5 ) ) );
-				cloudColor.mulAssign( vSunE.mul( 0.00002 ) );
+				const cloudColor = skyAmbient.add( sunColor ).toVar();
+				cloudColor.mulAssign( dayFactor.max( 0.03 ) );
 
 				// Blend clouds with sky
 				texColor.assign( mix( texColor, cloudColor, cloudMask.mul( this.cloudDensity ) ) );
