@@ -406,7 +406,8 @@ class GTAONode extends TempNode {
 				const angleN = signNSin.mul( acos( nCos ) ).toVar();
 
 				const tangentToNormalInSlice = cross( projN, sliceBitangent ).toVar();
-				const cosHorizons = vec2( dot( viewDir, tangentToNormalInSlice ), dot( viewDir, tangentToNormalInSlice.negate() ) ).toVar();
+				const cosHorizon = dot( viewDir, tangentToNormalInSlice ).toVar();
+				const cosHorizons = vec2( cosHorizon, cosHorizon.negate() ).toVar();
 
 				// For each slice, the inner loop performs ray marching to find the horizons.
 
