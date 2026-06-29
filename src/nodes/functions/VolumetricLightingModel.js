@@ -172,8 +172,7 @@ class VolumetricLightingModel extends LightingModel {
 
 	direct( { lightNode, lightColor }, builder ) {
 
-		// Only analytic point lights (finite distance) scatter here. Skip non-analytic nodes
-		// like clustered lights, as well as directional/hemisphere lights (infinite distance).
+		// Ignore non-analytical lights and lights with infinite distance
 
 		if ( lightNode.isAnalyticLightNode !== true || lightNode.light.distance === undefined ) return;
 
