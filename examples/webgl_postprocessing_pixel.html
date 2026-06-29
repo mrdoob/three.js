@@ -80,7 +80,7 @@
 			// gui
 
 			gui = new GUI();
-			params = { pixelSize: 6, normalEdgeStrength: .3, depthEdgeStrength: .4, pixelAlignedPanning: true, pixelAlignedObjects: true, rotationSnap: 15, cameraRotationSnap: 9, cameraZoomSnap: 0.1 };
+			params = { pixelSize: 6, normalEdgeStrength: .3, depthEdgeStrength: .4, snapping: true, pixelAlignedPanning: true, pixelAlignedObjects: true, rotationSnap: 15, cameraRotationSnap: 9, cameraZoomSnap: 0.1 };
 			gui.add( params, 'pixelSize' ).min( 1 ).max( 16 ).step( 1 )
 				.onChange( () => {
 
@@ -89,11 +89,15 @@
 				} );
 			gui.add( renderPixelatedPass, 'normalEdgeStrength' ).min( 0 ).max( 2 ).step( .05 );
 			gui.add( renderPixelatedPass, 'depthEdgeStrength' ).min( 0 ).max( 1 ).step( .05 );
-			gui.add( params, 'pixelAlignedPanning' );
-			gui.add( params, 'pixelAlignedObjects' );
-			gui.add( params, 'rotationSnap' ).min( 0 ).max( 90 ).step( 1 ).name( 'rotationSnap (deg, 0 = off)' );
-			gui.add( params, 'cameraRotationSnap' ).min( 0 ).max( 90 ).step( 1 ).name( 'cameraRotationSnap (deg, 0 = off)' );
-			gui.add( params, 'cameraZoomSnap' ).min( 0 ).max( 1 ).step( .05 ).name( 'cameraZoomSnap (0 = off)' );
+
+			const snappingControl = gui.add( params, 'snapping' ).name( 'snapping (all)' );
+			const snappingFolder = gui.addFolder( 'Snapping' );
+			snappingControl.onChange( enabled => snappingFolder.controllers.forEach( c => c.enable( enabled ) ) );
+			snappingFolder.add( params, 'pixelAlignedPanning' );
+			snappingFolder.add( params, 'pixelAlignedObjects' );
+			snappingFolder.add( params, 'rotationSnap' ).min( 0 ).max( 90 ).step( 1 ).name( 'rotationSnap (deg, 0 = off)' );
+			snappingFolder.add( params, 'cameraRotationSnap' ).min( 0 ).max( 90 ).step( 1 ).name( 'cameraRotationSnap (deg, 0 = off)' );
+			snappingFolder.add( params, 'cameraZoomSnap' ).min( 0 ).max( 1 ).step( .05 ).name( 'cameraZoomSnap (0 = off)' );
 
 			// textures
 
@@ -194,6 +198,9 @@
 			const pixelsPerScreenWidth = Math.floor( rendererSize.x / params[ 'pixelSize' ] );
 			const pixelsPerScreenHeight = Math.floor( rendererSize.y / params[ 'pixelSize' ] );
 
+			// The top-level 'snapping' checkbox gates every individual snapping effect at once
+			const snapping = params[ 'snapping' ];
+
 			// Remember the camera's true (unsnapped) transform so OrbitControls interaction is unaffected by snapping
 			const cameraPosition = camera.position.clone();
 			const cameraQuaternion = camera.quaternion.clone();
@@ -201,13 +208,13 @@
 
 			// Snap the camera's rotation and scale first, so the translation snap below derives its pixel grid
 			// and screen-space basis from the already-snapped orientation and zoom
-			if ( params[ 'cameraRotationSnap' ] > 0 || params[ 'cameraZoomSnap' ] > 0 ) {
+			if ( snapping && ( params[ 'cameraRotationSnap' ] > 0 || params[ 'cameraZoomSnap' ] > 0 ) ) {
 
 				pixelAlignCamera( camera, controls.target, params[ 'cameraRotationSnap' ], params[ 'cameraZoomSnap' ] );
 
 			}
 
-			if ( params[ 'pixelAlignedPanning' ] ) {
+			if ( snapping && params[ 'pixelAlignedPanning' ] ) {
 
 				pixelAlignFrustum( camera, aspectRatio, pixelsPerScreenWidth, pixelsPerScreenHeight );
 
@@ -228,7 +235,7 @@
 			const crystalPosition = crystalMesh.position.clone();
 			const crystalRotation = crystalMesh.rotation.clone();
 
-			if ( params[ 'pixelAlignedObjects' ] ) {
+			if ( snapping && params[ 'pixelAlignedObjects' ] ) {
 
 				// Snap the moving objects to the screen-space pixel grid so they don't shimmer when pixelated
 				const worldScreenWidth = ( ( camera.right - camera.left ) / camera.zoom );
@@ -238,7 +245,7 @@
 
 			}
 
-			if ( params[ 'rotationSnap' ] > 0 ) {
+			if ( snapping && params[ 'rotationSnap' ] > 0 ) {
 
 				// Snap the moving objects' rotation to the nearest camera-relative euler increment
 				snapObjectRotation( crystalMesh, camera, params[ 'rotationSnap' ] );
