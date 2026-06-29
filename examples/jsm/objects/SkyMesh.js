@@ -297,8 +297,13 @@ class SkyMesh extends Mesh {
 				const p = vec3( cloudUV.mul( 1000.0 ), 0.0 ).toVar();
 				const cloudNoise = mx_fractal_noise_float( p, 5, 2.0, 0.5 ).mul( 0.7 ).add( 0.5 ).clamp( 0.0, 1.0 ).toVar();
 
+				// Large-scale coverage variation: clear gaps next to dense banks
+				const region = mx_fractal_noise_float( vec3( cloudUV.mul( 300.0 ), 0.0 ), 2, 2.0, 0.5 ).mul( 0.33 ).add( 0.5 );
+				const cov = clamp( this.cloudCoverage.add( region.sub( 0.5 ).mul( 0.6 ) ), 0.0, 1.0 ).toVar();
+
 				// Apply coverage threshold
-				const cloudMask = smoothstep( sub( 1.0, this.cloudCoverage ), sub( 1.0, this.cloudCoverage ).add( 0.3 ), cloudNoise ).toVar();
+				const lo = sub( 1.0, cov ).toVar();
+				const cloudMask = smoothstep( lo, lo.add( 0.3 ), cloudNoise ).toVar();
 
 				// Fade clouds near horizon (adjusted by elevation)
 				const horizonFade = smoothstep( 0.0, add( 0.03, mul( 0.06, this.cloudElevation ) ), direction.y );
