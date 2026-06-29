@@ -4908,30 +4908,6 @@ const split = ( node, channels ) => new SplitNode( nodeObject( node ), channels 
 addMethodChaining( 'element', element );
 addMethodChaining( 'convert', convert );
 
-// deprecated
-
-/**
- * @tsl
- * @function
- * @deprecated since r176. Use {@link Stack} instead.
- *
- * @param {Node} node - The node to add.
- * @returns {Function}
- */
-const append = ( node ) => { // @deprecated, r176
-
-	warn( 'TSL: append() has been renamed to Stack().', new StackTrace() );
-	return Stack( node );
-
-};
-
-addMethodChaining( 'append', ( node ) => { // @deprecated, r176
-
-	warn( 'TSL: .append() has been renamed to .toStack().', new StackTrace() );
-	return Stack( node );
-
-} );
-
 /**
  * This class represents a shader property. It can be used
  * to explicitly define a property and assign a value to it.
@@ -14170,19 +14146,6 @@ const viewportCoordinate = /*@__PURE__*/ screenCoordinate.sub( viewport.xy );
  */
 const viewportUV = /*@__PURE__*/ viewportCoordinate.div( viewportSize );
 
-// Deprecated
-
-/**
- * @deprecated since r169. Use {@link screenSize} instead.
- */
-const viewportResolution = /*@__PURE__*/ ( Fn( () => { // @deprecated, r169
-
-	warn( 'TSL: "viewportResolution" is deprecated. Use "screenSize" instead.', new StackTrace() );
-
-	return screenSize;
-
-}, 'vec2' ).once() )();
-
 // Cache node uniforms
 
 let _cameraProjectionMatrixBase = null;
@@ -15519,8 +15482,8 @@ const materialEnvIntensity = /*@__PURE__*/ uniform( 1 ).onReference( ( { materia
 
 /**
  * TSL object that represents the rotation of environment maps.
- * When `material.envMap` is set, the value is `material.envMapRotation`. `scene.environmentRotation` controls the
- * rotation of `scene.environment` instead.
+ * When `material.envMap` is set, the value is `material.envMapRotation`.
+ * `scene.environmentRotation` controls the rotation of `scene.environment` or `scene.environmentNode` instead.
  *
  * @tsl
  * @type {Node<mat4>}
@@ -15531,7 +15494,8 @@ const materialEnvRotation = /*@__PURE__*/ uniform( new Matrix4() ).onReference( 
 
 } ).onObjectUpdate( function ( { material, scene } ) {
 
-	const rotation = ( scene.environment !== null && material.envMap === null ) ? scene.environmentRotation : material.envMapRotation;
+	const hasSceneEnvironment = ( scene.environment !== null ) || ( scene.environmentNode && scene.environmentNode.isNode );
+	const rotation = ( hasSceneEnvironment && material.envMap === null ) ? scene.environmentRotation : material.envMapRotation;
 
 	if ( rotation ) {
 
@@ -18302,26 +18266,26 @@ const _previousInstanceMatrices = /*@__PURE__*/ new WeakMap();
  *
  * @param {NodeBuilder} builder - The current node builder.
  * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} instanceMatrix - The matrix buffer attribute.
- * @param {number} count - The instance count.
  * @returns {Node} The matrix node.
  */
-function createInstanceMatrixNode( builder, instanceMatrix, count ) {
+function createInstanceMatrixNode( builder, instanceMatrix ) {
 
 	let instanceMatrixNode;
+	const matrixCount = Math.max( instanceMatrix.count, 1 );
 
 	const isStorageMatrix = instanceMatrix.isStorageInstancedBufferAttribute === true;
 
 	if ( isStorageMatrix ) {
 
-		instanceMatrixNode = storage( instanceMatrix, 'mat4', Math.max( count, 1 ) ).element( instanceIndex );
+		instanceMatrixNode = storage( instanceMatrix, 'mat4', matrixCount ).element( instanceIndex );
 
 	} else {
 
-		const uniformBufferSize = count * 16 * 4;
+		const uniformBufferSize = matrixCount * 16 * 4;
 
 		if ( uniformBufferSize <= builder.getUniformBufferLimit() ) {
 
-			instanceMatrixNode = buffer( instanceMatrix.array, 'mat4', Math.max( count, 1 ) ).element( instanceIndex );
+			instanceMatrixNode = buffer( instanceMatrix.array, 'mat4', matrixCount ).element( instanceIndex );
 
 		} else {
 
@@ -18360,10 +18324,9 @@ function createInstanceMatrixNode( builder, instanceMatrix, count ) {
  * @param {InstancedMesh} instancedMesh - The instanced mesh object.
  * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} instanceMatrix - The current matrix buffer attribute.
  * @param {NodeBuilder} builder - The current node builder.
- * @param {number} count - The instance count.
  * @returns {Node} The previous frame instance matrix node.
  */
-function getPreviousInstance( instancedMesh, instanceMatrix, builder, count ) {
+function getPreviousInstance( instancedMesh, instanceMatrix, builder ) {
 
 	let data = _previousInstanceMatrices.get( instancedMesh );
 
@@ -18373,7 +18336,7 @@ function getPreviousInstance( instancedMesh, instanceMatrix, builder, count ) {
 
 		data = {
 			previousInstanceMatrix,
-			node: createInstanceMatrixNode( builder, previousInstanceMatrix, count )
+			node: createInstanceMatrixNode( builder, previousInstanceMatrix )
 		};
 
 		_previousInstanceMatrices.set( instancedMesh, data );
@@ -18397,26 +18360,22 @@ const instanceColor = /*@__PURE__*/ varyingProperty( 'vec3', 'vInstanceColor' );
  *
  * @tsl
  * @function
- * @param {number} count - The instance count.
  * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} matrices - The instanced transformation matrices.
  * @param {?InstancedBufferAttribute|StorageInstancedBufferAttribute} [colors=null] - The optional instanced colors.
  */
-const instance = /*@__PURE__*/ Fn( ( [ count, matrices, colors = null ], builder ) => {
-
-	// get numeric value (non-node)
-	count = count.value;
+const instance = /*@__PURE__*/ Fn( ( [ matrices, colors = null ], builder ) => {
 
 	const isStorageMatrix = matrices.isStorageInstancedBufferAttribute === true;
 	const isStorageColor = colors && colors.isStorageInstancedBufferAttribute === true;
 
-	const instanceMatrixNode = createInstanceMatrixNode( builder, matrices, count );
+	const instanceMatrixNode = createInstanceMatrixNode( builder, matrices );
 
 	// interleaved buffer tracking for matrix
 	let interleavedMatrix = null;
 
 	if ( ! isStorageMatrix ) {
 
-		const uniformBufferSize = count * 16 * 4;
+		const uniformBufferSize = Math.max( matrices.count, 1 ) * 16 * 4;
 
 		if ( uniformBufferSize > builder.getUniformBufferLimit() ) {
 
@@ -18508,7 +18467,7 @@ const instance = /*@__PURE__*/ Fn( ( [ count, matrices, colors = null ], builder
 
 		} );
 
-		const previousInstanceMatrixNode = getPreviousInstance( instancedMesh, matrices, builder, count );
+		const previousInstanceMatrixNode = getPreviousInstance( instancedMesh, matrices, builder );
 		positionPrevious.assign( previousInstanceMatrixNode.mul( positionPrevious ).xyz );
 
 	}
@@ -18541,9 +18500,9 @@ const instance = /*@__PURE__*/ Fn( ( [ count, matrices, colors = null ], builder
  */
 const instancedMesh = /*@__PURE__*/ Fn( ( [ instancedMesh ] ) => {
 
-	const { count, instanceMatrix, instanceColor } = instancedMesh;
+	const { instanceMatrix, instanceColor } = instancedMesh;
 
-	instance( count, instanceMatrix, instanceColor );
+	instance( instanceMatrix, instanceColor );
 
 }, 'void' );
 
@@ -27221,7 +27180,7 @@ class PMREMNode extends TempNode {
 		// PMREMGenerator renders into a render target with inverted Y, so its output needs the Y
 		// flip on sampling. Externally authored PMREMs follow the standard convention and don't.
 
-		uvNode = this._pmrem.isRenderTargetTexture
+		uvNode = this._pmrem === null || this._pmrem.isRenderTargetTexture
 			? materialEnvRotation.mul( vec3( uvNode.x, uvNode.y.negate(), uvNode.z ) )
 			: materialEnvRotation.mul( uvNode );
 
@@ -29221,9 +29180,9 @@ class VolumetricLightingModel extends LightingModel {
 
 	direct( { lightNode, lightColor }, builder ) {
 
-		// Ignore lights with infinite distance
+		// Ignore non-analytical lights and lights with infinite distance
 
-		if ( lightNode.light.distance === undefined ) return;
+		if ( lightNode.isAnalyticLightNode !== true || lightNode.light.distance === undefined ) return;
 
 		// TODO: We need a viewportOpaque*() ( output, depth ) to fit with modern rendering approaches
 
@@ -36054,6 +36013,10 @@ class MRTNode extends OutputStructNode {
 		for ( const name in outputNodes ) {
 
 			const index = getTextureIndex( textures, name );
+
+			// Ignore if the output exists in the MRT but has never been used.
+			if ( index === -1 ) continue;
+
 			const type = builder.getOutputType( index );
 
 			members[ index ] = outputNodes[ name ].convert( type );
@@ -38517,6 +38480,27 @@ const getScreenPosition = /*@__PURE__*/ Fn( ( [ viewPosition, projectionMatrix ]
 } );
 
 /**
+ * Converts a clip-space position into a screen position expressed as uv coordinates.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec4>} clipPosition - The position in clip space.
+ * @return {Node<vec2>} The screen position expressed as uv coordinates.
+ */
+const getScreenPositionFromClip = /*@__PURE__*/ Fn( ( [ clipPosition ] ) => {
+
+	const screen = clipPosition.xy.div( clipPosition.w ).mul( 0.5 ).add( 0.5 ).toVar();
+	return vec2( screen.x, screen.y.oneMinus() );
+
+} ).setLayout( {
+	name: 'getScreenPositionFromClip',
+	type: 'vec2',
+	inputs: [
+		{ name: 'clipPosition', type: 'vec4' }
+	]
+} );
+
+/**
  * Computes a normal vector based on depth data. Can be used as a fallback when no normal render
  * target is available or if flat surface normals are required.
  *
@@ -38930,7 +38914,7 @@ const backgroundRotation = /*@__PURE__*/ uniform( new Matrix4() ).setGroup( rend
 
 	const background = scene.background;
 
-	if ( background !== null && background.isTexture && background.mapping !== UVMapping ) {
+	if ( ( background !== null && background.isTexture && background.mapping !== UVMapping ) || ( scene.backgroundNode && scene.backgroundNode.isNode ) ) {
 
 		// note: since the matrix is orthonormal, we can use the more-efficient transpose() in lieu of invert()
 		_m1.makeRotationFromEuler( scene.backgroundRotation ).transpose();
@@ -48248,7 +48232,6 @@ var TSL = /*#__PURE__*/Object.freeze({
 	anisotropyB: anisotropyB,
 	anisotropyT: anisotropyT,
 	any: any,
-	append: append,
 	array: array,
 	asin: asin,
 	asinh: asinh,
@@ -48404,6 +48387,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	getParallaxCorrectNormal: getParallaxCorrectNormal,
 	getRoughness: getRoughness,
 	getScreenPosition: getScreenPosition,
+	getScreenPositionFromClip: getScreenPositionFromClip,
 	getShIrradianceAt: getShIrradianceAt,
 	getShadowMaterial: getShadowMaterial,
 	getShadowRenderObjectFunction: getShadowRenderObjectFunction,
@@ -48828,7 +48812,6 @@ var TSL = /*#__PURE__*/Object.freeze({
 	viewportLinearDepth: viewportLinearDepth,
 	viewportMipTexture: viewportMipTexture,
 	viewportOpaqueMipTexture: viewportOpaqueMipTexture,
-	viewportResolution: viewportResolution,
 	viewportSafeUV: viewportSafeUV,
 	viewportSharedTexture: viewportSharedTexture,
 	viewportSize: viewportSize,
@@ -61335,6 +61318,22 @@ class Renderer {
 	}
 
 	/**
+	 * Resets the backend's internal state cache. Useful when the rendering context is shared with
+	 * other libraries that change the state. A no-op for the WebGPU backend.
+	 */
+	resetState() {
+
+		if ( this._initialized === false ) {
+
+			throw new Error( 'THREE.Renderer: .resetState() called before the backend is initialized. Use "await renderer.init();" before using this method.' );
+
+		}
+
+		this.backend.resetState();
+
+	}
+
+	/**
 	 * Returns the viewport definition.
 	 *
 	 * @param {Vector4} target - The method writes the result in this target object.
@@ -66757,6 +66756,13 @@ class Backend {
 	setScissorTest( /*boolean*/ ) { }
 
 	/**
+	 * Resets the backend's internal state. A no-op for backends without a state cache (e.g. WebGPU).
+	 *
+	 * @abstract
+	 */
+	resetState() { }
+
+	/**
 	 * Returns the clear color and alpha into a single
 	 * color object.
 	 *
@@ -67299,6 +67305,8 @@ class WebGLState {
 		this.currentProgram = null;
 		this.currentBlendingEnabled = false;
 		this.currentBlending = null;
+		this.currentBlendEquation = null;
+		this.currentBlendEquationAlpha = null;
 		this.currentBlendSrc = null;
 		this.currentBlendDst = null;
 		this.currentBlendSrcAlpha = null;
@@ -68594,6 +68602,128 @@ class WebGLState {
 
 			gl.pixelStorei( name, value );
 			parameters[ name ] = value;
+
+		}
+
+	}
+
+	/**
+	 * Restores the WebGL state to its default and clears the cache so subsequent renderings
+	 * re-apply the required state. Useful when the WebGL context is shared with other libraries.
+	 */
+	reset() {
+
+		const { gl } = this;
+
+		// reset WebGL state
+
+		gl.disable( gl.BLEND );
+		gl.disable( gl.CULL_FACE );
+		gl.disable( gl.DEPTH_TEST );
+		gl.disable( gl.POLYGON_OFFSET_FILL );
+		gl.disable( gl.SCISSOR_TEST );
+		gl.disable( gl.STENCIL_TEST );
+		gl.disable( gl.SAMPLE_ALPHA_TO_COVERAGE );
+
+		gl.blendEquation( gl.FUNC_ADD );
+		gl.blendFunc( gl.ONE, gl.ZERO );
+		gl.blendFuncSeparate( gl.ONE, gl.ZERO, gl.ONE, gl.ZERO );
+		gl.blendColor( 0, 0, 0, 0 );
+
+		gl.colorMask( true, true, true, true );
+		gl.clearColor( 0, 0, 0, 0 );
+
+		gl.depthMask( true );
+		gl.depthFunc( gl.LESS );
+		gl.clearDepth( 1 );
+
+		gl.stencilMask( 0xffffffff );
+		gl.stencilFunc( gl.ALWAYS, 0, 0xffffffff );
+		gl.stencilOp( gl.KEEP, gl.KEEP, gl.KEEP );
+		gl.clearStencil( 0 );
+
+		gl.cullFace( gl.BACK );
+		gl.frontFace( gl.CCW );
+
+		gl.polygonOffset( 0, 0 );
+
+		gl.activeTexture( gl.TEXTURE0 );
+
+		gl.bindFramebuffer( gl.FRAMEBUFFER, null );
+		gl.bindFramebuffer( gl.DRAW_FRAMEBUFFER, null );
+		gl.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
+
+		gl.useProgram( null );
+
+		gl.lineWidth( 1 );
+
+		gl.scissor( 0, 0, gl.canvas.width, gl.canvas.height );
+		gl.viewport( 0, 0, gl.canvas.width, gl.canvas.height );
+
+		gl.pixelStorei( gl.PACK_ALIGNMENT, 4 );
+		gl.pixelStorei( gl.UNPACK_ALIGNMENT, 4 );
+		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, false );
+		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false );
+		gl.pixelStorei( gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.BROWSER_DEFAULT_WEBGL );
+		gl.pixelStorei( gl.PACK_ROW_LENGTH, 0 );
+		gl.pixelStorei( gl.PACK_SKIP_PIXELS, 0 );
+		gl.pixelStorei( gl.PACK_SKIP_ROWS, 0 );
+		gl.pixelStorei( gl.UNPACK_ROW_LENGTH, 0 );
+		gl.pixelStorei( gl.UNPACK_IMAGE_HEIGHT, 0 );
+		gl.pixelStorei( gl.UNPACK_SKIP_PIXELS, 0 );
+		gl.pixelStorei( gl.UNPACK_SKIP_ROWS, 0 );
+		gl.pixelStorei( gl.UNPACK_SKIP_IMAGES, 0 );
+
+		this.resetVertexState();
+
+		// reset internal cache
+
+		this.enabled = {};
+		this.parameters = {};
+		this.currentFlipSided = null;
+		this.currentCullFace = null;
+		this.currentProgram = null;
+		this.currentBlendingEnabled = false;
+		this.currentBlending = null;
+		this.currentBlendEquation = null;
+		this.currentBlendEquationAlpha = null;
+		this.currentBlendSrc = null;
+		this.currentBlendDst = null;
+		this.currentBlendSrcAlpha = null;
+		this.currentBlendDstAlpha = null;
+		this.currentPremultipledAlpha = null;
+		this.currentPolygonOffsetFactor = null;
+		this.currentPolygonOffsetUnits = null;
+		this.currentColorMask = null;
+		this.currentDepthFunc = null;
+		this.currentDepthMask = null;
+		this.currentStencilFunc = null;
+		this.currentStencilRef = null;
+		this.currentStencilFuncMask = null;
+		this.currentStencilFail = null;
+		this.currentStencilZFail = null;
+		this.currentStencilZPass = null;
+		this.currentStencilMask = null;
+		this.currentLineWidth = null;
+		this.currentClippingPlanes = 0;
+
+		this.currentBoundFramebuffers = {};
+		this.currentDrawbuffers = new WeakMap();
+
+		this.currentTextureSlot = null;
+		this.currentBoundTextures = {};
+		this.currentBoundBufferBases = {};
+
+		this.currentScissor.set( 0, 0, gl.canvas.width, gl.canvas.height );
+		this.currentViewport.set( 0, 0, gl.canvas.width, gl.canvas.height );
+
+		// re-apply reversed depth if used by the renderer
+
+		this.currentDepthReversed = false;
+
+		if ( this.backend.renderer.reversedDepthBuffer === true ) {
+
+			this.setReversedDepth( true );
 
 		}
 
@@ -71806,6 +71936,15 @@ class WebGLBackend extends Backend {
 		const state = this.state;
 
 		state.setScissorTest( boolean );
+
+	}
+
+	/**
+	 * Restores the WebGL state to its default and invalidates the internal state cache.
+	 */
+	resetState() {
+
+		this.state.reset();
 
 	}
 
