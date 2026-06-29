@@ -206,9 +206,11 @@
 
 			}
 
-			// Remember the crystal's true (unsnapped) transform so its bulk movement is unaffected by snapping
+			// Remember the crystal's true (unsnapped) transform so its bulk movement is unaffected by snapping.
+			// We snapshot the euler rotation (not the quaternion) because that's what drives the spin: restoring
+			// the quaternion would let three.js re-derive a gimbal-equivalent euler and corrupt the y rotation.
 			const crystalPosition = crystalMesh.position.clone();
-			const crystalQuaternion = crystalMesh.quaternion.clone();
+			const crystalRotation = crystalMesh.rotation.clone();
 
 			if ( params[ 'pixelAlignedObjects' ] ) {
 
@@ -231,7 +233,7 @@
 
 			// Restore the true transform after rendering so the next frame's motion builds on the real trajectory
 			crystalMesh.position.copy( crystalPosition );
-			crystalMesh.quaternion.copy( crystalQuaternion );
+			crystalMesh.rotation.copy( crystalRotation );
 
 		}
 
