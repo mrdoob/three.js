@@ -15,20 +15,30 @@ let _rendererState;
  * ```js
  * const renderPipeline = new THREE.RenderPipeline( renderer );
  *
- * const scenePass = pass( scene, camera );
- * scenePass.setMRT( mrt( {
- * 	output: output,
- * 	normal: normalView
+ * // pre-pass for normals and depth
+ *
+ * const prePass = pass( scene, camera );
+ * prePass.setMRT( mrt( {
+ * 	output: normalView
  * } ) );
  *
- * const scenePassColor = scenePass.getTextureNode( 'output' );
- * const scenePassNormal = scenePass.getTextureNode( 'normal' );
- * const scenePassDepth = scenePass.getTextureNode( 'depth' );
+ * const prePassNormal = prePass.getTextureNode();
+ * const prePassDepth = prePass.getTextureNode( 'depth' );
  *
- * const aoPass = ao( scenePassDepth, scenePassNormal, camera );
+ * // scene pass
+ *
+ * const scenePass = pass( scene, camera );
+ *
+ * // ao
+ *
+ * const aoPass = ao( prePassDepth, prePassNormal, camera );
  * const aoPassOutput = aoPass.getTextureNode();
  *
- * renderPipeline.outputNode = scenePassColor.mul( vec4( vec3( aoPassOutput.r ), 1 ) );
+ * // apply the ambient occlusion to the scene
+ *
+ * scenePass.contextNode = builtinAOContext( aoPassOutput.sample( screenUV ).r );
+ *
+ * renderPipeline.outputNode = scenePass;
  * ```
  *
  * Reference: [Practical Real-Time Strategies for Accurate Indirect Occlusion](https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf).
