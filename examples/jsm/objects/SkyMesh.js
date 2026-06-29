@@ -330,6 +330,9 @@ class SkyMesh extends Mesh {
 				cloudColor.addAssign( sunColor.mul( silver ).mul( edge ).mul( 0.6 ) );
 				cloudColor.mulAssign( dayFactor.max( 0.03 ) );
 
+				// Occlude the sun disc/glow behind opaque cloud
+				texColor.subAssign( L0.mul( 0.04 ).mul( cloudMask ) );
+
 				// Composite through the atmosphere so distant clouds dissolve into haze
 				const cloudAerial = cloudColor.mul( Fex ).add( texColor.mul( sub( vec3( 1.0 ), Fex ) ) ).toVar();
 				texColor.assign( mix( texColor, cloudAerial, cloudMask.mul( this.cloudDensity ) ) );
