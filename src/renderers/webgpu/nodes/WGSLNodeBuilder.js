@@ -1236,7 +1236,16 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			if ( node.isAtomic === true ) {
 
-				warn( 'WebGPURenderer: Atomic operations are only supported in compute shaders.' );
+				// Per the WGSL spec, atomic built-in functions are only allowed in
+				// the fragment and compute stages, not in the vertex stage.
+
+				if ( shaderStage === 'vertex' ) {
+
+					warn( 'WebGPURenderer: Atomic operations are not supported in the vertex stage. They are only available in the fragment and compute stages.' );
+
+					return NodeAccess.READ_ONLY;
+
+				}
 
 				return NodeAccess.READ_WRITE;
 
