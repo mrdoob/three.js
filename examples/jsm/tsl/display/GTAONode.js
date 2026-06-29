@@ -360,6 +360,7 @@ class GTAONode extends TempNode {
 			const viewNormal = sampleNormal( uvNode ).toVar();
 
 			const radius = this.radius;
+			const viewDir = normalize( viewPosition.xyz.negate() ).toVar();
 
 			const noiseResolution = textureSize( this._noiseNode, 0 );
 			let noiseUv = vec2( uvNode.x, uvNode.y.oneMinus() );
@@ -388,7 +389,6 @@ class GTAONode extends TempNode {
 				const sampleDir = vec3( cos( angle ), sin( angle ), 0 ).toVar();
 				sampleDir.assign( normalize( kernelMatrix.mul( sampleDir ) ) );
 
-				const viewDir = normalize( viewPosition.xyz.negate() ).toVar();
 				const sliceBitangent = normalize( cross( sampleDir, viewDir ) ).toVar();
 				const sliceTangent = cross( sliceBitangent, viewDir ).toVar();
 
