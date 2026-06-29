@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - MeshVolume</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - MeshVolume<br/>
+			Generation time: <span id="output">-</span>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.8/build/index.module.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+			import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast } from 'three-mesh-bvh';
+			import { Volume } from 'three/addons/utils/Volume.js';
+			import { InstancedVolume } from 'three/addons/utils/InstancedVolume.js';
+			import { RenderSDFLayerMaterial } from 'three/addons/utils/RenderSDFLayerMaterial.js';
+
+
+			// Add BVH extension to THREE.BufferGeometry
+			THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
+			THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
+			THREE.Mesh.prototype.raycast = acceleratedRaycast;
+
+			const params = {
+				resolution: 100,
+				margin: 0.05,
+				surface: 0.0,
+				regenerate: () => regenerateVolume(),
+				showMultiple: false,
+				showLayers: false,
+				layer: 0
+			};
+
+			let renderer, camera, scene, gui;
+			let outputContainer;
+			let sourceMesh, sourceMaterial;
+			let volumeMeshes = [];
+			let instancedVolumeMesh;
+			let layerPass;
+			// let pointLight, blueLight;
+
+			init();
+
+			async function init() {
+
+				outputContainer = document.getElementById( 'output' );
+
+				// renderer setup
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( render );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				document.body.appendChild( renderer.domElement );
+
+				// scene setup
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111111 );
+
+				// Setup environment map
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				const environment = new RoomEnvironment();
+				const envMapRT = pmremGenerator.fromScene( environment );
+				scene.environment = envMapRT.texture;
+				scene.environmentIntensity = 0.2;
+				environment.dispose();
+				pmremGenerator.dispose();
+
+				/*
+				// Helper function to create radial gradient texture (grayscale)
+				function createRadialGradientTexture() {
+
+					const canvas = document.createElement( 'canvas' );
+					canvas.width = 128;
+					canvas.height = 128;
+					const context = canvas.getContext( '2d' );
+					const gradient = context.createRadialGradient( 64, 64, 0, 64, 64, 64 );
+
+					// HDR-like center with exponential falloff for realistic glow
+					gradient.addColorStop( 0, 'rgba(255, 255, 255, 1.0)' );
+					gradient.addColorStop( 0.15, 'rgba(255, 255, 255, 0.8)' );
+					gradient.addColorStop( 0.35, 'rgba(255, 255, 255, 0.4)' );
+					gradient.addColorStop( 0.6, 'rgba(128, 128, 128, 0.15)' );
+					gradient.addColorStop( 1, 'rgba(0, 0, 0, 0)' );
+
+					context.fillStyle = gradient;
+					context.fillRect( 0, 0, 128, 128 );
+					return new THREE.CanvasTexture( canvas );
+
+				}
+
+				const gradientTexture = createRadialGradientTexture();
+
+				// Add point light
+				pointLight = new THREE.PointLight( 0xffffffbb, 20, 20 );
+				pointLight.position.set( 2, 2, 2 );
+				const whiteSprite = new THREE.Sprite(
+					new THREE.SpriteMaterial( {
+						map: gradientTexture,
+						color: pointLight.color,
+						blending: THREE.AdditiveBlending,
+						depthWrite: false
+					} )
+				);
+				whiteSprite.scale.setScalar( 0.25 );
+				pointLight.add( whiteSprite );
+				scene.add( pointLight );
+
+				// Add blue point light
+				blueLight = new THREE.PointLight( 0x00ffcc, 20, 20 );
+				blueLight.position.set( - 2, 2, - 2 );
+				const blueSprite = new THREE.Sprite(
+					new THREE.SpriteMaterial( {
+						map: gradientTexture,
+						color: blueLight.color,
+						blending: THREE.AdditiveBlending,
+						depthWrite: false
+					} )
+				);
+				blueSprite.scale.setScalar( 0.25 );
+				blueLight.add( blueSprite );
+				scene.add( blueLight );
+
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 1.0 );
+				dirLight.position.set( 5, 10, 7.5 );
+				scene.add( dirLight );
+				*/
+
+				// camera setup
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 50 );
+				camera.position.set( 1, 1, 2 );
+				camera.far = 100;
+				camera.updateProjectionMatrix();
+				scene.add( camera );
+
+				new OrbitControls( camera, renderer.domElement );
+
+				// screen pass to render a single layer of the 3d texture
+				layerPass = new FullScreenQuad( new RenderSDFLayerMaterial() );
+
+				// Load model
+				new GLTFLoader()
+					.load( 'models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf', async ( gltf ) => {
+
+						const object = gltf.scene;
+						object.updateMatrixWorld( true );
+
+						// Get material from first mesh
+						object.traverse( c => {
+
+							if ( c.isMesh && c.material && ! sourceMaterial ) {
+
+								sourceMaterial = c.material;
+
+							}
+
+						} );
+
+						// Merge into single geometry
+						const geometries = [];
+						object.traverse( c => {
+
+							if ( c.geometry ) {
+
+								const cloned = c.geometry.clone();
+								cloned.applyMatrix4( c.matrixWorld );
+								geometries.push( cloned );
+
+							}
+
+						} );
+
+						const mergedGeometry = BufferGeometryUtils.mergeGeometries( geometries );
+						mergedGeometry.center();
+
+						// Compute BVH (required for VolumeMesh)
+						mergedGeometry.computeBoundsTree( { maxLeafTris: 1 } );
+
+						sourceMesh = new THREE.Mesh( mergedGeometry, sourceMaterial );
+
+						// Generate the first volume mesh
+						await regenerateVolume();
+
+					} );
+
+				// GUI
+				gui = new GUI();
+				gui.add( params, 'resolution', 32, 200, 1 ).name( 'Resolution' );
+				gui.add( params, 'margin', 0, 0.5 ).name( 'Margin' );
+				gui.add( params, 'surface', - 0.2, 0.5 ).name( 'Surface' ).onChange( () => {
+
+					volumeMeshes.forEach( v => v.surface = params.surface );
+					if ( instancedVolumeMesh ) instancedVolumeMesh.surface = params.surface;
+
+				} );
+				gui.add( params, 'regenerate' ).name( 'Regenerate' );
+				gui.add( params, 'showMultiple' ).name( 'Show Multiple' ).onChange( ( value ) => {
+
+					if ( value ) {
+
+						createMultipleVolumes();
+
+					} else {
+
+						removeExtraVolumes();
+
+					}
+
+				} );
+				gui.add( params, 'showLayers' );
+				gui.add( params, 'layer', 0, params.resolution - 1, 1 );
+
+				window.addEventListener( 'resize', onResize );
+
+			}
+
+			async function regenerateVolume() {
+
+				if ( ! sourceMesh ) return;
+
+				const startTime = window.performance.now();
+
+				// Remove existing volume meshes
+				volumeMeshes.forEach( v => {
+
+					scene.remove( v );
+					v.dispose();
+
+				} );
+				volumeMeshes = [];
+
+				// Remove instanced mesh if it exists
+				if ( instancedVolumeMesh ) {
+
+					scene.remove( instancedVolumeMesh );
+					instancedVolumeMesh.dispose();
+					instancedVolumeMesh = null;
+
+				}
+
+				// Create new Volume - this is all you need!
+				const volume = new Volume( {
+					resolution: params.resolution,
+					margin: params.margin,
+					surface: params.surface,
+					roughness: 1.0,
+					metalness: 1.0
+				} );
+
+				// Generate the SDF from the source mesh
+				await volume.generate( sourceMesh );
+
+				// Add to scene
+				scene.add( volume );
+				volumeMeshes.push( volume );
+
+				const delta = window.performance.now() - startTime;
+				outputContainer.innerText = `${ delta.toFixed( 2 ) }ms`;
+				console.log( `VolumeMesh generated in ${delta.toFixed( 2 )}ms` );
+
+				// If showing multiple, create them
+				if ( params.showMultiple ) {
+
+					createMultipleVolumes();
+
+				}
+
+			}
+
+			async function createMultipleVolumes() {
+
+				if ( volumeMeshes.length === 0 || ! sourceMesh ) return;
+
+				// Remove the single volume mesh
+				scene.remove( volumeMeshes[ 0 ] );
+
+				// Create instanced volume mesh
+				const count = 1000;
+				instancedVolumeMesh = new InstancedVolume( count, {
+					resolution: params.resolution,
+					margin: params.margin,
+					surface: params.surface,
+					roughness: 1.0,
+					metalness: 1.0
+				} );
+
+				// Reuse the SDF texture from the first volume
+				instancedVolumeMesh.sdfTexture = volumeMeshes[ 0 ].sdfTexture;
+				instancedVolumeMesh.inverseBoundsMatrix.copy( volumeMeshes[ 0 ].inverseBoundsMatrix );
+
+				// Copy material properties
+				if ( sourceMesh.material ) {
+
+					const mat = sourceMesh.material;
+					if ( mat.map ) instancedVolumeMesh.material.map = mat.map;
+					if ( mat.normalMap ) instancedVolumeMesh.material.normalMap = mat.normalMap;
+					if ( mat.metalnessMap ) instancedVolumeMesh.material.metalnessMap = mat.metalnessMap;
+					if ( mat.roughnessMap ) instancedVolumeMesh.material.roughnessMap = mat.roughnessMap;
+					if ( mat.aoMap ) instancedVolumeMesh.material.aoMap = mat.aoMap;
+					instancedVolumeMesh.material.needsUpdate = true;
+
+				}
+
+				// Set up instance matrices
+				const transform = new THREE.Object3D();
+
+				for ( let i = 0; i < count; i ++ ) {
+
+					transform.position.set(
+						( Math.random() - 0.5 ) * 18,
+						( Math.random() - 0.5 ) * 18,
+						( Math.random() - 0.5 ) * 18
+					);
+
+					transform.rotation.set(
+						Math.random() * Math.PI,
+						Math.random() * Math.PI,
+						Math.random() * Math.PI
+					);
+
+					transform.updateMatrix();
+					instancedVolumeMesh.setMatrixAt( i, transform.matrix );
+
+				}
+
+				instancedVolumeMesh.instanceMatrix.needsUpdate = true;
+
+				scene.add( instancedVolumeMesh );
+
+			}
+
+			function removeExtraVolumes() {
+
+				// Remove instanced mesh if it exists
+				if ( instancedVolumeMesh ) {
+
+					scene.remove( instancedVolumeMesh );
+					// Don't dispose the shared texture
+					instancedVolumeMesh.geometry.dispose();
+					instancedVolumeMesh.material.dispose();
+					instancedVolumeMesh = null;
+
+				}
+
+				// Add back the single volume mesh
+				if ( volumeMeshes.length > 0 ) {
+
+					scene.add( volumeMeshes[ 0 ] );
+
+					const sdfBoundsMatrix = volumeMeshes[ 0 ].inverseBoundsMatrix.clone().invert();
+					const boundsCenter = new THREE.Vector3();
+					const boundsQuat = new THREE.Quaternion();
+					const boundsScale = new THREE.Vector3();
+					sdfBoundsMatrix.decompose( boundsCenter, boundsQuat, boundsScale );
+
+					volumeMeshes[ 0 ].position.copy( boundsCenter );
+					volumeMeshes[ 0 ].updateMatrixWorld();
+
+				}
+
+			}
+
+			function onResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function render() {
+
+				/*
+				// Animate point light in a circle
+				const time = Date.now() * 0.001;
+				const radius = 2;
+				pointLight.position.x = Math.cos( time ) * radius;
+				pointLight.position.z = Math.sin( time ) * radius;
+				pointLight.position.y = Math.sin( time * 0.5 ) * radius;
+
+				// Animate blue light in a different pattern
+				blueLight.position.x = Math.sin( time * 1.3 ) * radius;
+				blueLight.position.z = Math.cos( time * 1.3 ) * radius;
+				blueLight.position.y = Math.cos( time * 0.7 ) * radius;
+				*/
+
+				renderer.render( scene, camera );
+
+				if ( params.showLayers && volumeMeshes.length > 0 ) {
+
+					const layerSize = 256;
+					renderer.setScissorTest( true );
+					renderer.setScissor( 0, window.innerHeight - layerSize, layerSize, layerSize );
+					renderer.setViewport( 0, window.innerHeight - layerSize, layerSize, layerSize );
+
+					layerPass.material.uniforms.sdfTex.value = volumeMeshes[ 0 ].sdfTexture;
+					layerPass.material.uniforms.layer.value = params.layer * ( 1 / params.resolution );
+
+					layerPass.render( renderer );
+
+					renderer.setScissorTest( false );
+					renderer.setViewport( 0, 0, window.innerWidth, window.innerHeight );
+
+				}
+
+			}
+
+		</script>
+
+	</body>
+</html>
