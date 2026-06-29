@@ -799,12 +799,13 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 }
 
 /**
- * Returns a new indexed geometry based on `TrianglesDrawMode` draw mode.
- * This mode corresponds to the `gl.TRIANGLES` primitive in WebGL.
+ * Converts the given geometry to the `TrianglesDrawMode` draw mode, which
+ * corresponds to the `gl.TRIANGLES` primitive in WebGL. The conversion only
+ * rewrites the index, so the geometry is modified in place and returned.
  *
  * @param {BufferGeometry} geometry - The geometry to convert.
  * @param {number} drawMode - The current draw mode.
- * @return {BufferGeometry} The new geometry using `TrianglesDrawMode`.
+ * @return {BufferGeometry} The converted geometry using `TrianglesDrawMode`.
  */
 function toTrianglesDrawMode( geometry, drawMode ) {
 
@@ -894,13 +895,12 @@ function toTrianglesDrawMode( geometry, drawMode ) {
 
 		}
 
-		// build final geometry
+		// updated indices
 
-		const newGeometry = geometry.clone();
-		newGeometry.setIndex( newIndices );
-		newGeometry.clearGroups();
+		geometry.setIndex( newIndices );
+		geometry.clearGroups();
 
-		return newGeometry;
+		return geometry;
 
 	} else {
 
