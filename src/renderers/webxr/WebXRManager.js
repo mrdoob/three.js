@@ -51,6 +51,7 @@ class WebXRManager extends EventDispatcher {
 		let glBinding = null;
 		let glProjLayer = null;
 		let glBaseLayer = null;
+		let supportsMonoscopic = false;
 		let xrFrame = null;
 
 		const supportsGlBinding = typeof XRWebGLBinding !== 'undefined';
@@ -110,6 +111,17 @@ class WebXRManager extends EventDispatcher {
 		 * @default false
 		 */
 		this.isPresenting = false;
+
+		/**
+		 * When `true`, both eyes use the left eye's view position. Useful for content
+		 * that must be viewed from a single viewpoint (e.g. 360° panoramas, Matterport-style).
+		 * Uses native `forceMonoPresentation` when available, otherwise a position-override fallback.
+		 * Maintainers: please review the implementation when the WebXR Layers API evolves.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.forceMonoscopic = false;
 
 		/**
 		 * Returns a group representing the `target ray` space of the XR controller.
@@ -427,6 +439,8 @@ class WebXRManager extends EventDispatcher {
 
 				if ( ! supportsLayers ) {
 
+					supportsMonoscopic = false;
+
 					const layerInit = {
 						antialias: attributes.antialias,
 						alpha: true,
@@ -479,6 +493,15 @@ class WebXRManager extends EventDispatcher {
 					glBinding = this.getBinding();
 
 					glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
+
+					supportsMonoscopic = 'forceMonoPresentation' in glProjLayer;
+					// Monoscopic: fallback to native XR API if available.
+					// This will be ignored if the device/browser already supports native mono presentation
+					if ( scope.forceMonoscopic && supportsMonoscopic ) {
+
+						glProjLayer.forceMonoPresentation = true;
+
+					}
 
 					session.updateRenderState( { layers: [ glProjLayer ] } );
 
@@ -982,6 +1005,15 @@ class WebXRManager extends EventDispatcher {
 
 					camera.matrix.fromArray( view.transform.matrix );
 					camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
+
+					// Monoscopic fallback: override right eye position when native API not available
+					if ( scope.forceMonoscopic && ! supportsMonoscopic && i === 1 && cameras[ 0 ] !== undefined ) {
+
+						camera.position.copy( cameras[ 0 ].position );
+						camera.matrix.compose( camera.position, camera.quaternion, camera.scale );
+
+					}
+
 					camera.projectionMatrix.fromArray( view.projectionMatrix );
 					camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
 					camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
