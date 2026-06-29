@@ -178,6 +178,13 @@ class UniformNode extends InputNode {
 
 		if ( builder.context.nodeName !== undefined ) delete builder.context.nodeName;
 
+		if ( builder.currentFunctionNode !== null ) {
+
+			const nodeData = builder.getDataFromNode( builder.currentFunctionNode );
+			nodeData.cachePerMaterial = true;
+
+		}
+
 		//
 
 		let snippet = uniformName;
