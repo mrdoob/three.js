@@ -892,6 +892,7 @@ class Renderer {
 		const nodeFrame = this._nodes.nodeFrame;
 
 		const previousRenderId = nodeFrame.renderId;
+		const previousFrameId = nodeFrame.frameId;
 		const previousRenderContext = this._currentRenderContext;
 		const previousRenderObjectFunction = this._currentRenderObjectFunction;
 		const previousHandleObjectFunction = this._handleObjectFunction;
@@ -921,10 +922,7 @@ class Renderer {
 		this._compilationPromises = compilationPromises;
 
 		nodeFrame.renderId ++;
-
-		//
-
-		nodeFrame.update();
+		nodeFrame.frameId ++;
 
 		//
 
@@ -1063,6 +1061,10 @@ class Renderer {
 			await yieldToMain();
 
 		}
+
+		// Restore the frame id last so the temporary bump above does not persist.
+
+		nodeFrame.frameId = previousFrameId;
 
 	}
 
