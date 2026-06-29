@@ -209,6 +209,7 @@ export const vogelDiskSample = TSL.vogelDiskSample;
 export const getParallaxCorrectNormal = TSL.getParallaxCorrectNormal;
 export const getRoughness = TSL.getRoughness;
 export const getScreenPosition = TSL.getScreenPosition;
+export const getScreenPositionFromClip = TSL.getScreenPositionFromClip;
 export const getShIrradianceAt = TSL.getShIrradianceAt;
 export const getShadowMaterial = TSL.getShadowMaterial;
 export const getShadowRenderObjectFunction = TSL.getShadowRenderObjectFunction;
