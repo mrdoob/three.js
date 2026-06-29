@@ -90,7 +90,7 @@
 			gui.add( renderPixelatedPass, 'normalEdgeStrength' ).min( 0 ).max( 2 ).step( .05 );
 			gui.add( renderPixelatedPass, 'depthEdgeStrength' ).min( 0 ).max( 1 ).step( .05 );
 
-			const snappingControl = gui.add( params, 'snapping' ).name( 'snapping (all)' );
+			const snappingControl = gui.add( params, 'snapping' ).name( 'Enable Pixel Snapping' );
 			const snappingFolder = gui.addFolder( 'Snapping' ).close();
 			snappingControl.onChange( enabled => snappingFolder.controllers.forEach( c => c.enable( enabled ) ) );
 			snappingFolder.add( params, 'pixelAlignedPanning' );
