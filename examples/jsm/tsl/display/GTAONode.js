@@ -1,5 +1,5 @@
 import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
-import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand } from 'three/tsl';
+import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -350,6 +350,13 @@ class GTAONode extends TempNode {
 		const sampleNoise = ( uv ) => this._noiseNode.sample( uv );
 		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.sample( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
 
+		const clipToScreen = ( clip ) => {
+
+			const screen = clip.xy.div( clip.w ).mul( 0.5 ).add( 0.5 );
+			return vec2( screen.x, screen.y.oneMinus() );
+
+		};
+
 		const ao = Fn( () => {
 
 			const depth = sampleDepth( uvNode ).toVar();
@@ -361,6 +368,7 @@ class GTAONode extends TempNode {
 
 			const radius = this.radius;
 			const viewDir = normalize( viewPosition.xyz.negate() ).toVar();
+			const clipPosition = this._cameraProjectionMatrix.mul( vec4( viewPosition, 1.0 ) ).toVar();
 
 			const noiseResolution = textureSize( this._noiseNode, 0 );
 			let noiseUv = vec2( uvNode.x, uvNode.y.oneMinus() );
@@ -387,7 +395,7 @@ class GTAONode extends TempNode {
 
 				const angle = float( i ).div( float( DIRECTIONS ) ).mul( PI ).add( this._temporalDirection ).toVar();
 				const sampleDir = kernelMatrix.mul( vec3( cos( angle ), sin( angle ), 0 ) ).toVar();
-				const sampleDirRadius = sampleDir.mul( radius ).toVar();
+				const clipDirRadius = this._cameraProjectionMatrix.mul( vec4( sampleDir, 0.0 ) ).mul( radius ).toVar();
 
 				const sliceBitangent = normalize( cross( sampleDir, viewDir ) ).toVar();
 				const sliceTangent = cross( sliceBitangent, viewDir ).toVar();
@@ -417,13 +425,13 @@ class GTAONode extends TempNode {
 					// near-field. (Blender's Eevee adaptation)
 					const t = float( j ).add( 1.0 ).add( stepJitter ).div( STEPS ).toVar();
 					const sampleDist = t.mul( t );
-					const sampleViewOffset = sampleDirRadius.mul( sampleDist );
+					const clipOffset = clipDirRadius.mul( sampleDist ).toVar();
 
 					// The loop marches in two opposite directions (x and y) along the slice's line to find the horizon on both sides.
 
 					// x
 
-					const sampleScreenPositionX = getScreenPosition( viewPosition.add( sampleViewOffset ), this._cameraProjectionMatrix ).toVar();
+					const sampleScreenPositionX = clipToScreen( clipPosition.add( clipOffset ) ).toVar();
 					const sampleDepthX = sampleDepth( sampleScreenPositionX ).toVar();
 					const sampleSceneViewPositionX = getViewPosition( sampleScreenPositionX, sampleDepthX, this._cameraProjectionMatrixInverse ).toVar();
 					const viewDeltaX = sampleSceneViewPositionX.sub( viewPosition ).toVar();
@@ -447,7 +455,7 @@ class GTAONode extends TempNode {
 
 					// y
 
-					const sampleScreenPositionY = getScreenPosition( viewPosition.sub( sampleViewOffset ), this._cameraProjectionMatrix ).toVar();
+					const sampleScreenPositionY = clipToScreen( clipPosition.sub( clipOffset ) ).toVar();
 					const sampleDepthY = sampleDepth( sampleScreenPositionY ).toVar();
 					const sampleSceneViewPositionY = getViewPosition( sampleScreenPositionY, sampleDepthY, this._cameraProjectionMatrixInverse ).toVar();
 					const viewDeltaY = sampleSceneViewPositionY.sub( viewPosition ).toVar();
