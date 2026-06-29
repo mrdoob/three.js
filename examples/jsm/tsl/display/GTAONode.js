@@ -388,6 +388,7 @@ class GTAONode extends TempNode {
 				const angle = float( i ).div( float( DIRECTIONS ) ).mul( PI ).add( this._temporalDirection ).toVar();
 				const sampleDir = vec3( cos( angle ), sin( angle ), 0 ).toVar();
 				sampleDir.assign( normalize( kernelMatrix.mul( sampleDir ) ) );
+				const sampleDirRadius = sampleDir.mul( radius ).toVar();
 
 				const sliceBitangent = normalize( cross( sampleDir, viewDir ) ).toVar();
 				const sliceTangent = cross( sliceBitangent, viewDir ).toVar();
@@ -416,7 +417,7 @@ class GTAONode extends TempNode {
 					// near-field. (Blender's Eevee adaptation)
 					const t = float( j ).add( 1.0 ).add( stepJitter ).div( STEPS ).toVar();
 					const sampleDist = t.mul( t );
-					const sampleViewOffset = sampleDir.mul( radius ).mul( sampleDist );
+					const sampleViewOffset = sampleDirRadius.mul( sampleDist );
 
 					// The loop marches in two opposite directions (x and y) along the slice's line to find the horizon on both sides.
 
