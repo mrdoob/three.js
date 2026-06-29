@@ -126,7 +126,6 @@
 				container.appendChild( renderer.domElement );
 
 				// post-processing
-
 				bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
 				renderer.setEffects( [ bloomPass ] );
 
