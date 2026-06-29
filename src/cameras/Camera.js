@@ -109,6 +109,25 @@ class Camera extends Object3D {
 
 	}
 
+	/**
+	* Updates the local transformation matrix.
+	* Non-uniform scale is not supported on cameras. Only uniform scale is supported.
+	*/
+	updateMatrix() {
+
+		const sx = this.scale.x;
+
+		if ( this.scale.y !== sx || this.scale.z !== sx ) {
+
+			this.scale.setScalar( sx );
+
+		}
+
+		super.updateMatrix();
+
+	}
+
+
 	updateMatrixWorld( force ) {
 
 		super.updateMatrixWorld( force );
