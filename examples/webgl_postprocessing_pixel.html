@@ -184,7 +184,7 @@
 
 			crystalMesh.material.emissiveIntensity = Math.sin( t * 3 ) * .5 + .5;
 			crystalMesh.position.y = .7 + Math.sin( t * 2 ) * .05;
-			crystalMesh.rotation.y = stopGoEased( t, 2, 4 ) * 2 * Math.PI;
+			crystalMesh.rotation.y = stopGoEased( t, 6, 8 ) * 2 * Math.PI;
 
 			const rendererSize = renderer.getSize( new THREE.Vector2() );
 			const aspectRatio = rendererSize.x / rendererSize.y;
