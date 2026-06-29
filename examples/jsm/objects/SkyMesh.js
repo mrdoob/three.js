@@ -301,7 +301,7 @@ class SkyMesh extends Mesh {
 				const cloudMask = smoothstep( sub( 1.0, this.cloudCoverage ), sub( 1.0, this.cloudCoverage ).add( 0.3 ), cloudNoise ).toVar();
 
 				// Fade clouds near horizon (adjusted by elevation)
-				const horizonFade = smoothstep( 0.0, add( 0.1, mul( 0.2, this.cloudElevation ) ), direction.y );
+				const horizonFade = smoothstep( 0.0, add( 0.03, mul( 0.06, this.cloudElevation ) ), direction.y );
 				cloudMask.mulAssign( horizonFade );
 
 				// Cloud lighting from the sky's own radiance
@@ -312,8 +312,9 @@ class SkyMesh extends Mesh {
 				const cloudColor = skyAmbient.add( sunColor ).toVar();
 				cloudColor.mulAssign( dayFactor.max( 0.03 ) );
 
-				// Blend clouds with sky
-				texColor.assign( mix( texColor, cloudColor, cloudMask.mul( this.cloudDensity ) ) );
+				// Composite through the atmosphere so distant clouds dissolve into haze
+				const cloudAerial = cloudColor.mul( Fex ).add( texColor.mul( sub( vec3( 1.0 ), Fex ) ) ).toVar();
+				texColor.assign( mix( texColor, cloudAerial, cloudMask.mul( this.cloudDensity ) ) );
 
 			} );
 
