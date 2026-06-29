@@ -80,7 +80,7 @@
 			// gui
 
 			gui = new GUI();
-			params = { pixelSize: 6, normalEdgeStrength: .3, depthEdgeStrength: .4, pixelAlignedPanning: true, pixelAlignedObjects: true, rotationSnap: 15 };
+			params = { pixelSize: 6, normalEdgeStrength: .3, depthEdgeStrength: .4, pixelAlignedPanning: true, pixelAlignedObjects: true, rotationSnap: 15, cameraRotationSnap: 0, cameraZoomSnap: 0 };
 			gui.add( params, 'pixelSize' ).min( 1 ).max( 16 ).step( 1 )
 				.onChange( () => {
 
@@ -92,6 +92,8 @@
 			gui.add( params, 'pixelAlignedPanning' );
 			gui.add( params, 'pixelAlignedObjects' );
 			gui.add( params, 'rotationSnap' ).min( 0 ).max( 90 ).step( 1 ).name( 'rotationSnap (deg, 0 = off)' );
+			gui.add( params, 'cameraRotationSnap' ).min( 0 ).max( 90 ).step( 1 ).name( 'cameraRotationSnap (deg, 0 = off)' );
+			gui.add( params, 'cameraZoomSnap' ).min( 0 ).max( 1 ).step( .05 ).name( 'cameraZoomSnap (0 = off)' );
 
 			// textures
 
@@ -191,6 +193,19 @@
 			const aspectRatio = rendererSize.x / rendererSize.y;
 			const pixelsPerScreenWidth = Math.floor( rendererSize.x / params[ 'pixelSize' ] );
 			const pixelsPerScreenHeight = Math.floor( rendererSize.y / params[ 'pixelSize' ] );
+
+			// Remember the camera's true (unsnapped) transform so OrbitControls interaction is unaffected by snapping
+			const cameraQuaternion = camera.quaternion.clone();
+			const cameraZoom = camera.zoom;
+
+			// Snap the camera's rotation and scale first, so the translation snap below derives its pixel grid
+			// and screen-space basis from the already-snapped orientation and zoom
+			if ( params[ 'cameraRotationSnap' ] > 0 || params[ 'cameraZoomSnap' ] > 0 ) {
+
+				pixelAlignCamera( camera, params[ 'cameraRotationSnap' ], params[ 'cameraZoomSnap' ] );
+
+			}
+
 			if ( params[ 'pixelAlignedPanning' ] ) {
 
 				pixelAlignFrustum( camera, aspectRatio, pixelsPerScreenWidth, pixelsPerScreenHeight );
@@ -231,9 +246,12 @@
 
 			composer.render();
 
-			// Restore the true transform after rendering so the next frame's motion builds on the real trajectory
+			// Restore the true transforms after rendering so the next frame's motion builds on the real trajectory
 			crystalMesh.position.copy( crystalPosition );
 			crystalMesh.rotation.copy( crystalRotation );
+			camera.quaternion.copy( cameraQuaternion );
+			camera.zoom = cameraZoom;
+			camera.updateProjectionMatrix();
 
 		}
 
@@ -272,6 +290,30 @@
 			const tween = x - cycle * period;
 			const linStep = easeInOutCubic( linearStep( tween, downtime, period ) );
 			return cycle + linStep;
+
+		}
+
+		function pixelAlignCamera( camera, rotationIncrementDegrees, zoomIncrement ) {
+
+			// Snap the camera's orientation to the nearest euler increment so the world doesn't rotate sub-step
+			if ( rotationIncrementDegrees > 0 ) {
+
+				const increment = THREE.MathUtils.degToRad( rotationIncrementDegrees );
+				const euler = new THREE.Euler().setFromQuaternion( camera.quaternion );
+				euler.x = Math.round( euler.x / increment ) * increment;
+				euler.y = Math.round( euler.y / increment ) * increment;
+				euler.z = Math.round( euler.z / increment ) * increment;
+				camera.quaternion.setFromEuler( euler );
+
+			}
+
+			// Snap the camera's zoom to the nearest increment so the pixel grid stays a stable size while scaling
+			if ( zoomIncrement > 0 ) {
+
+				camera.zoom = Math.max( zoomIncrement, Math.round( camera.zoom / zoomIncrement ) * zoomIncrement );
+				camera.updateProjectionMatrix();
+
+			}
 
 		}
 
