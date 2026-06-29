@@ -146,11 +146,11 @@ class LightsNode extends Node {
 	 */
 	customCacheKey() {
 
-		const lights = this._lights;
+		const builtinLights = this.getBuiltinLights();
 
-		for ( let i = 0; i < lights.length; i ++ ) {
+		for ( let i = 0; i < builtinLights.length; i ++ ) {
 
-			const light = lights[ i ];
+			const light = builtinLights[ i ];
 
 			_hashData.push( light.id );
 			_hashData.push( light.castShadow ? 1 : 0 );
@@ -241,7 +241,9 @@ class LightsNode extends Node {
 		const previousLightNodes = nodeData.lightNodes || null;
 		const materialLightings = builder.context.materialLightings;
 
-		const lights = sortLights( [ ...materialLightings, ...this._lights ] );
+		const builtinLights = this.getBuiltinLights();
+
+		const lights = sortLights( [ ...materialLightings, ...builtinLights ] );
 		const nodeLibrary = builder.renderer.library;
 
 		for ( const light of lights ) {
@@ -453,6 +455,20 @@ class LightsNode extends Node {
 	 * @return {Array<Light>} The scene's lights.
 	 */
 	getLights() {
+
+		return this._lights;
+
+	}
+
+	/**
+	 * Returns an array of the scene's lights.
+	 *
+	 * The light variations are shader-dependent;
+	 * if this array changes, the shader needs to be recreated.
+	 *
+	 * @return {Array<Light>} The scene's lights.
+	 */
+	getBuiltinLights() {
 
 		return this._lights;
 
