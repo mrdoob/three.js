@@ -20,7 +20,7 @@ import {
 } from 'three';
 
 import { MeshStandardNodeMaterial } from 'three/webgpu';
-import { attribute, cameraPosition, color, cross, dot, float, floor, Fn, fract, fwidth, hash as ihash, mix, mod, modelWorldMatrixInverse, mx_fractal_noise_float, mx_noise_float, normalLocal, normalView, normalWorldGeometry, positionLocal, positionView, positionWorld, select, smoothstep, step, uint, uv, varying, vec2, vec3, vec4 } from 'three/tsl';
+import { attribute, cameraPosition, color, cross, dot, float, floor, Fn, fract, fwidth, hash as ihash, mix, mod, modelWorldMatrixInverse, mx_fractal_noise_float, normalLocal, normalView, normalWorldGeometry, positionLocal, positionView, positionWorld, select, smoothstep, step, uint, uv, varying, vec2, vec3, vec4 } from 'three/tsl';
 
 import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
 
@@ -1192,6 +1192,46 @@ function pickBuildingColor( seed ) {
 
 }
 
+// cheap value noise ( ~[ -1, 1 ] ), a lighter stand-in for gradient mx_noise on the
+// weathering terms; integer-hashed ( not fract(sin) ) to stay stable across drivers
+const valueNoise = /*@__PURE__*/ Fn( ( [ p ] ) => {
+
+	const i = floor( p );
+	const f = fract( p );
+	const u = f.mul( f ).mul( f.mul( - 2 ).add( 3 ) ); // 3f2 - 2f3 smooth interpolation
+	const corner = ( ox, oy, oz ) => {
+
+		const c = i.add( vec3( ox, oy, oz ) );
+		return ihash( uint( c.x.add( 1 << 20 ) ).mul( uint( 73856093 ) ).bitXor( uint( c.y.add( 1 << 20 ) ).mul( uint( 19349663 ) ) ).bitXor( uint( c.z.add( 1 << 20 ) ).mul( uint( 83492791 ) ) ) );
+
+	};
+
+	const x00 = mix( corner( 0, 0, 0 ), corner( 1, 0, 0 ), u.x );
+	const x10 = mix( corner( 0, 1, 0 ), corner( 1, 1, 0 ), u.x );
+	const x01 = mix( corner( 0, 0, 1 ), corner( 1, 0, 1 ), u.x );
+	const x11 = mix( corner( 0, 1, 1 ), corner( 1, 1, 1 ), u.x );
+	return mix( mix( x00, x10, u.y ), mix( x01, x11, u.y ), u.z ).mul( 2 ).sub( 1 );
+
+} ).setLayout( { name: 'valueNoise', type: 'float', inputs: [ { name: 'p', type: 'vec3' } ] } );
+
+// fractal ( fBm ) of valueNoise, octaves summed like mx_fractal_noise_float
+// ( amplitude halving, frequency doubling ); unrolled for a compile-time count
+const valueFractal = ( p, octaves ) => {
+
+	let sum = valueNoise( p );
+	let amp = 0.5, freq = 2;
+	for ( let o = 1; o < octaves; o ++ ) {
+
+		sum = sum.add( valueNoise( p.mul( freq ) ).mul( amp ) );
+		amp *= 0.5;
+		freq *= 2;
+
+	}
+
+	return sum;
+
+};
+
 /**
  * The facade material: a single MeshStandardNodeMaterial that reads the baked
  * per-vertex `partId` and reproduces every zone — procedural terracotta brickwork
@@ -1210,8 +1250,8 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	// across instanced and merged meshes: a slow tonal drift, a fine clay mottle,
 	// and sooty vertical streaks that pool low down
 
-	const tone = mx_fractal_noise_float( positionWorld.mul( 0.03 ), 2 ).mul( 0.18 );
-	const mottle = mx_noise_float( positionWorld.mul( 0.7 ) ).mul( 0.06 );
+	const tone = varying( mx_fractal_noise_float( positionWorld.mul( 0.03 ), 2 ) ).mul( 0.18 ); // very low frequency: evaluate per-vertex and interpolate over the facade's fine tessellation
+	const mottle = valueNoise( positionWorld.mul( 0.7 ) ).mul( 0.06 );
 	const streak = mx_fractal_noise_float( vec3( positionWorld.x.mul( 1.5 ), positionWorld.y.mul( 0.04 ), positionWorld.z.mul( 1.5 ) ), 2 );
 	const dirt = smoothstep( - 0.1, 0.45, streak ).mul( smoothstep( 210, 0, positionWorld.y ) ).mul( 0.6 );
 
@@ -1265,7 +1305,7 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	const lodBevel = texel.mul( 1.5 ).max( bevel );
 	const brickFace = smoothstep( 0, lodBevel, distU.mul( brickL ) ).mul( smoothstep( 0, lodBevel, distV.mul( brickH ) ) ).mul( wallFacing );
 	const reliefHeight = brickFace.mul( 0.008 );
-	const rough = mx_noise_float( positionWorld.mul( 0.5 ) ).mul( 0.08 ).add( 0.82 ).add( joint.mul( 0.12 ) );
+	const rough = valueNoise( positionWorld.mul( 0.5 ) ).mul( 0.08 ).add( 0.82 ).add( joint.mul( 0.12 ) );
 
 	// the merged geometry carries a per-vertex partId; this material reads it and
 	// branches to reproduce each zone — no per-part materials, compute-raster friendly
@@ -1290,7 +1330,7 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	// larger-scale grime instead of the wall's streaky soot — confined to those surfaces by a
 	// branch ( roofMask > 0 ), so the fractal never runs on the vertical facade
 	const roofMask = wallFacing.oneMinus();
-	const roofGrime = select( roofMask.greaterThan( 0 ), smoothstep( 0.0, 0.55, mx_fractal_noise_float( positionWorld.mul( 0.025 ), 3 ) ).mul( 0.22 ), float( 0 ) );
+	const roofGrime = select( roofMask.greaterThan( 0 ), smoothstep( 0.0, 0.55, valueFractal( positionWorld.mul( 0.025 ), 3 ) ).mul( 0.22 ), float( 0 ) );
 	const stoneColor = mix( masonry, soot, mix( dirt, roofGrime, roofMask ) );
 
 	// glass: the interior-mapped room is the base colour; the smooth, low-roughness
@@ -1306,7 +1346,7 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	const dustStreak = smoothstep( - 0.15, 0.5, filmNoise ).mul( 0.45 );
 	const pooled = smoothstep( 0.32, 0.0, uv().y ).mul( 0.4 );
 	const grime = float( 0.64 ).add( dustStreak ).add( pooled ).clamp( 0, 0.95 ); // baseline haze so the panes read as dirty glass, not open holes
-	const dirtyGlass = mix( color( 0x13161a ), color( 0x232b31 ), mx_noise_float( positionWorld.mul( 0.3 ) ).mul( 0.5 ).add( 0.5 ) );
+	const dirtyGlass = mix( color( 0x13161a ), color( 0x232b31 ), valueFractal( positionWorld.mul( 0.3 ), 2 ).mul( 0.5 ).add( 0.5 ) );
 	const glassColor = mix( room.xyz.mul( color( 0xb6c6bf ) ), dirtyGlass, grime ); // faint green-grey ( soda-lime ) room tint, dirtied toward grimy glass
 
 	// window frames are smooth dressed stone, not brick
@@ -1322,9 +1362,9 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	const acLouver = acVent.mul( acDetail );
 
 	// plastic shell: off-white, some units dingier / yellowed than others
-	const acDinge = mx_noise_float( positionWorld.mul( 0.4 ) ).mul( 0.5 ).add( 0.5 ); // ~per-unit
+	const acDinge = valueNoise( positionWorld.mul( 0.4 ) ).mul( 0.5 ).add( 0.5 ); // ~per-unit
 	const acPaint = mix( color( 0xf2f1ec ), color( 0xcfccc2 ), acDinge ) // bright white → light dingy grey, both lighter than the wall
-		.add( mx_noise_float( positionWorld.mul( 5 ) ).mul( 0.04 ) );
+		.add( valueNoise( positionWorld.mul( 5 ) ).mul( 0.04 ) );
 
 	// a darker recessed grille panel inset into the lighter cabinet, with horizontal louvers
 	// inside it ( the front vents ) — the white plastic reads as a thin border frame
@@ -1335,7 +1375,7 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	const acBody = acPaint.mul( mix( float( 1 ), acFin.mul( 0.42 ), acGrille ) ); // cabinet stays light; recessed grille goes dark grey
 
 	// grey-brown condensate grime streaking the lower edge ( plastic doesn't rust ); dirtier units streak more
-	const acStreak = mx_fractal_noise_float( vec3( positionWorld.x.mul( 6 ), positionWorld.y.mul( 0.5 ), positionWorld.z.mul( 6 ) ), 3 ).mul( 0.5 ).add( 0.5 );
+	const acStreak = valueFractal( vec3( positionWorld.x.mul( 6 ), positionWorld.y.mul( 0.5 ), positionWorld.z.mul( 6 ) ), 3 ).mul( 0.5 ).add( 0.5 );
 	const acGrime = smoothstep( 0.4, 0.0, acUv.y ).mul( acStreak ).mul( acDinge.add( 0.3 ) );
 	const acColor = mix( acBody, color( 0x6f685a ), acGrime.mul( 0.5 ) );
 
