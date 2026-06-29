@@ -26,6 +26,20 @@ The target object that is used to store the method's result.
 
 **Returns:** The HSV color.
 
+### .getOKLCH( color : Color, target : Object ) : Object
+
+Returns an OKLCH color representation of the given color object.
+
+**color**
+
+The color to get OKLCH values from.
+
+**target**
+
+The target object that is used to store the method's result.
+
+**Returns:** The OKLCH color.
+
 ### .setHSV( color : Color, h : number, s : number, v : number ) : Color
 
 Sets the given HSV color definition to the given color object.
@@ -47,6 +61,28 @@ The saturation.
 The value.
 
 **Returns:** The update color.
+
+### .setOKLCH( color : Color, l : number, c : number, h : number ) : Color
+
+Sets the given OKLCH color definition to the given color object.
+
+**color**
+
+The color to set.
+
+**l**
+
+The lightness.
+
+**c**
+
+The chroma.
+
+**h**
+
+The hue.
+
+**Returns:** The updated color.
 
 ## Source
 
