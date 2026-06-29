@@ -101,6 +101,7 @@ import { clone } from '../utils/SkeletonUtils.js';
  * - EXT_materials_bump
  * - EXT_meshopt_compression
  * - EXT_mesh_gpu_instancing
+ * - KHR_mesh_primitive_restart
  * - EXT_texture_avif
  * - EXT_texture_webp
  *
@@ -529,6 +530,10 @@ class GLTFLoader extends Loader {
 						extensions[ extensionName ] = new GLTFMeshQuantizationExtension();
 						break;
 
+					case EXTENSIONS.KHR_MESH_PRIMITIVE_RESTART:
+						extensions[ extensionName ] = new GLTFMeshPrimitiveRestartExtension();
+						break;
+
 					default:
 
 						if ( extensionsRequired.indexOf( extensionName ) >= 0 && plugins[ extensionName ] === undefined ) {
@@ -648,7 +653,8 @@ const EXTENSIONS = {
 	EXT_TEXTURE_AVIF: 'EXT_texture_avif',
 	EXT_MESHOPT_COMPRESSION: 'EXT_meshopt_compression',
 	KHR_MESHOPT_COMPRESSION: 'KHR_meshopt_compression',
-	EXT_MESH_GPU_INSTANCING: 'EXT_mesh_gpu_instancing'
+	EXT_MESH_GPU_INSTANCING: 'EXT_mesh_gpu_instancing',
+	KHR_MESH_PRIMITIVE_RESTART: 'KHR_mesh_primitive_restart'
 };
 
 /**
@@ -2064,6 +2070,24 @@ class GLTFMeshQuantizationExtension {
 	}
 
 }
+
+/**
+ * Mesh Primitive Restart Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/KHR_mesh_primitive_restart
+ *
+ * @private
+ */
+class GLTFMeshPrimitiveRestartExtension {
+
+	constructor() {
+
+		this.name = EXTENSIONS.KHR_MESH_PRIMITIVE_RESTART;
+
+	}
+
+}
+
 
 /*********************************/
 /********** INTERPOLATION ********/
