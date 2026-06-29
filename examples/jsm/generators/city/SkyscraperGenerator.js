@@ -1349,6 +1349,10 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	const dirtyGlass = mix( color( 0x13161a ), color( 0x232b31 ), valueFractal( positionWorld.mul( 0.3 ), 2 ).mul( 0.5 ).add( 0.5 ) );
 	const glassColor = mix( room.xyz.mul( color( 0xb6c6bf ) ), dirtyGlass, grime ); // faint green-grey ( soda-lime ) room tint, dirtied toward grimy glass
 
+	// dirt scatters the reflection too: rougher where grime pools at the sills, so the
+	// panes don't all mirror the sun in unison
+	const glassRough = float( 0.16 ).add( pooled.mul( 0.45 ) ).add( dustStreak.mul( 0.2 ) );
+
 	// window frames are smooth dressed stone, not brick
 	const frameColor = buildingBase.mul( 0.55 );
 
@@ -1385,7 +1389,7 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 
 	const material = new MeshStandardNodeMaterial();
 	material.colorNode = select( isGlass, glassColor, select( isFrame, frameColor, select( isOrnament, ornamentColor, select( isAC, acColor, stoneColor ) ) ) );
-	material.roughnessNode = select( isGlass, float( 0.18 ), select( isOrnament, float( 0.8 ), select( isAC, acRough, rough ) ) ); // glass kept smooth for a sky reflection, but soft enough not to alias over the interior
+	material.roughnessNode = select( isGlass, glassRough, select( isOrnament, float( 0.8 ), select( isAC, acRough, rough ) ) ); // glass roughness rides on its grime, so dirty panes scatter the reflection
 	material.metalnessNode = float( 0 ); // all dielectric — stone, glass and the plastic AC shells
 	material.emissiveNode = select( isGlass, room.xyz.mul( room.w ).mul( 4 ).mul( grime.mul( 0.6 ).oneMinus() ), color( 0x000000 ) ); // room.w = emissive weight ( 0 unlit, < 1 behind curtains ), muted further by grime
 	material.normalNode = bumpNormal( select( isGlass.or( isFrame ).or( isOrnament ), float( 0 ), select( isAC, acRelief, reliefHeight ) ) ); // glass / frames / ornament stay flat; AC has its own louvers

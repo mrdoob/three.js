@@ -20,7 +20,7 @@
 			</div>
 
 			<small>
-				A few procedurally generated city blocks of Neo-Gothic terracotta skyscrapers at sunset.
+				A few procedurally generated city blocks of Neo-Gothic terracotta skyscrapers.
 			</small>
 		</div>
 
@@ -38,12 +38,13 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass } from 'three/tsl';
+			import { pass, mrt, output, normalView, vec3, vec4 } from 'three/tsl';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
+			import { ao } from 'three/addons/tsl/display/GTAONode.js';
 			import { CityGenerator, createBuildingMaterial, createRoadMaterial } from 'three/addons/generators/CityGenerator.js';
 
 			let camera, scene, renderer, controls, timer;
@@ -64,7 +65,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 0.45;
+				renderer.toneMappingExposure = 0.5;
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				renderer.inspector = new Inspector();
@@ -132,15 +133,33 @@
 				materials = { building: createBuildingMaterial( city.layout, parameters.seed ) };
 				generateCity();
 
-				// bloom: a soft glow on the brightest areas, run on the linear HDR scene
-				// colour before tone mapping folds it back to display range
+				// ground-truth ambient occlusion for the facade's contact shadows; MRT
+				// writes view normals so the AO needs no second geometry pass
 
 				renderPipeline = new THREE.RenderPipeline( renderer );
 
-				const scenePassColor = pass( scene, camera ).getTextureNode( 'output' );
-				const bloomPass = bloom( scenePassColor, 0.05, 0.0, 0.0 );
+				const scenePass = pass( scene, camera );
+				scenePass.setMRT( mrt( { output, normal: normalView } ) );
 
-				renderPipeline.outputNode = scenePassColor.add( bloomPass );
+				const scenePassColor = scenePass.getTextureNode( 'output' );
+				const scenePassNormal = scenePass.getTextureNode( 'normal' );
+				const scenePassDepth = scenePass.getTextureNode( 'depth' );
+
+				const aoPass = ao( scenePassDepth, scenePassNormal, camera );
+				aoPass.resolutionScale = 0.5; // half-res is plenty for soft contact shading
+				aoPass.radius.value = 4;
+				aoPass.thickness.value = 4;
+				aoPass.scale.value = 2;
+
+				const aoColor = scenePassColor.mul( vec4( vec3( aoPass.getTextureNode().r ), 1 ) );
+
+				// bloom: a soft glow on the brightest areas, at quarter-res since the
+				// result is heavily blurred anyway
+
+				const bloomPass = bloom( aoColor, 0.05, 0.0, 0.0 );
+				bloomPass.setResolutionScale( 0.25 );
+
+				renderPipeline.outputNode = aoColor.add( bloomPass );
 
 				// parameters
 
@@ -148,7 +167,6 @@
 				gui.add( parameters, 'seed', 0, 100, 1 ).onChange( generateCity );
 				gui.add( parameters, 'timeOfDay', 6, 18, 0.1 ).name( 'time of day' ).onChange( updateSun );
 				gui.add( renderer, 'toneMappingExposure', 0.01, 1 ).name( 'exposure' );
-				gui.add( bloomPass.strength, 'value', 0, 2 ).name( 'bloom' );
 
 				window.addEventListener( 'resize', onWindowResize );
 
