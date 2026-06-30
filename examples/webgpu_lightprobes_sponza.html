@@ -35,7 +35,7 @@
 			import * as THREE from 'three/webgpu';
 
 			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
 			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
@@ -82,6 +82,7 @@
 				renderer.shadowMap.enabled = true;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1.0;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				await renderer.init();
@@ -274,7 +275,7 @@
 
 				updateLightPosition();
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Light Probes' );
 				gui.add( params, 'enabled' ).name( 'GI' ).onChange( ( value ) => {
 
 					if ( probes ) probes.visible = value;
