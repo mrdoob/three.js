@@ -31,8 +31,8 @@ const _identity = /*@__PURE__*/ new Matrix4();
 
 // material-zone codes baked per vertex into the merged geometry, so one material can
 // branch on partId and shade every zone
-const PartId = { WALL: 0, PIER: 1, FRAME: 2, ORNAMENT: 3, GLASS: 4, AC: 5 };
-const { WALL, PIER, FRAME, ORNAMENT, GLASS, AC } = PartId;
+const PartId = { WALL: 0, PIER: 1, FRAME: 2, ORNAMENT: 3, GLASS: 4, AC: 5, SHOPGLASS: 6, STORE: 7, AWNING: 8 };
+const { WALL, PIER, FRAME, ORNAMENT, GLASS, AC, SHOPGLASS, STORE, AWNING } = PartId;
 
 // fraction of a floor's height taken by the glazed opening; the remainder is
 // the spandrel band. shared by the window module and the spandrels so they tile.
@@ -64,6 +64,9 @@ function nonIndexed( geometry ) {
 
 // the unit box is identical for every building's shell boxes — build it once
 const _unitBox = /*@__PURE__*/ nonIndexed( new BoxGeometry( 1, 1, 1 ) );
+
+// a unit quad ( facing +Z ), scaled per placement for the storefront display glazing
+const _unitPlane = /*@__PURE__*/ nonIndexed( new PlaneGeometry( 1, 1 ) );
 
 /**
  * Bakes a list of instance groups into one non-indexed BufferGeometry. Each group is a
@@ -223,7 +226,8 @@ function randomStyle( random ) {
 		windowReveal: 0.12 + random() * 0.1,
 		stringCourseHeight: 0.5 + random() * 0.5,
 		archBayWidthRatio: Math.round( 1.5 + random() * 1.5 ),
-		archRise: 0.4 + random() * 0.5
+		archRise: 0.4 + random() * 0.5,
+		baseStyle: random() < 0.22 ? 'arcade' : 'storefront' // most towers get retail storefronts; a few take a grand arcade
 	};
 
 }
@@ -307,6 +311,11 @@ class SkyscraperGenerator {
 		const glassRooms = []; // per-glass interior-mapping room ( centre + size ), aligned with `glass`
 		const backWalls = []; // the thin wall closing the volume behind the glass
 		const bands = []; // spandrel bands, one at each floor line
+		const shopGlass = []; // ground-floor display glazing ( scaled unit quads )
+		const shopRooms = []; // interior-mapping room per shop, aligned with shopGlass
+		const mullions = []; // slim shopfront dividers
+		const storeBands = []; // storefront bulkhead and signboard fascia
+		const awnings = []; // projecting shop awnings
 		const piers = new Map(); // pier height -> matrices, so each tier's continuous piers share one geometry
 		const trim = []; // cornices and parapets ( axis-aligned unit boxes )
 		const acUnits = []; // window air-conditioner boxes on a random subset of shaft windows
@@ -340,11 +349,22 @@ class SkyscraperGenerator {
 
 		const crownCornice = p.stringCourseHeight * 1.6; // the crown's heavy cap; its piers stop below it
 
-		// shaft and crown are the same facade over different faces, spans and pier heights
+		// the street-level retail floor; a few larger towers take a grand arcade instead
+		const groundHeight = p.floorHeight;
+		const useArcade = p.baseStyle === 'arcade' && baseHeight > groundHeight * 1.5;
+
+		// shaft and crown are the same facade over different faces, spans and pier heights;
+		// the masonry base above the storefront is that facade again
 		const tiers = [
 			{ faces, bottom: baseTop, height: shaftHeight, pierHeight: shaftHeight, ac: acUnits },
 			{ faces: crownFaces, bottom: shaftTop, height: crownHeight, pierHeight: crownHeight - crownCornice, ac: null }
 		];
+
+		if ( ! useArcade && baseHeight > groundHeight + 0.1 ) {
+
+			tiers.push( { faces, bottom: groundHeight, height: baseHeight - groundHeight, pierHeight: baseHeight - groundHeight, ac: null } );
+
+		}
 
 		for ( const t of tiers ) {
 
@@ -359,10 +379,14 @@ class SkyscraperGenerator {
 
 		}
 
-		// the base: a gothic arcade, capped by a string course
+		// the ground floor: NYC retail storefronts, or a grand gothic arcade. either is
+		// capped by the base string course
+		const storefront = { glass: shopGlass, glassRooms: shopRooms, mullions, storeBands, backWalls, awnings, addPier };
 		for ( const frame of faces ) {
 
-			addArcade( extras, frame, baseHeight, p );
+			if ( useArcade ) addArcade( extras, frame, baseHeight, p );
+			else addStorefront( frame, groundHeight, p, storefront );
+
 			addCornice( trim, frame, baseTop - p.stringCourseHeight, p.stringCourseHeight, 0.5 );
 
 		}
@@ -399,6 +423,10 @@ class SkyscraperGenerator {
 		const groups = [
 			{ geometry: buildWindowGeometry( p ), matrices: windows, partId: FRAME, rigid: true },
 			{ geometry: nonIndexed( buildGlassGeometry( p ) ), matrices: glass, partId: GLASS, rooms: glassRooms, rigid: true },
+			{ geometry: _unitPlane, matrices: shopGlass, partId: SHOPGLASS, rooms: shopRooms }, // scaled per shop, so not rigid
+			{ geometry: _unitBox, matrices: mullions, partId: FRAME },
+			{ geometry: _unitBox, matrices: storeBands, partId: STORE },
+			{ geometry: _unitBox, matrices: awnings, partId: AWNING },
 			{ geometry: _unitBox, matrices: bands, partId: WALL }
 		];
 
@@ -811,6 +839,65 @@ function addArcade( target, frame, height, p ) {
 	const back = new PlaneGeometry( frame.length, height );
 	back.applyMatrix4( frame.matrix( frame.length / 2, height / 2, - thickness - 0.4 ) );
 	target.push( back );
+
+}
+
+/**
+ * The street-level retail front: glazed shopfronts on a low bulkhead, under a
+ * signboard fascia, framed by the building's ground-floor piers and split by slim
+ * mullions, with a projecting awning over some shops. Reads as a row of NYC
+ * storefronts. All pieces are pushed into the caller's `parts` accumulators.
+ */
+function addStorefront( frame, height, p, parts ) {
+
+	const bulkhead = 0.5; // the solid kickplate the glazing stands on
+	const fascia = Math.min( 0.9, height * 0.22 ); // the signboard band above the glass
+	const glassBottom = bulkhead;
+	const glassHeight = height - fascia - bulkhead;
+	const len = frame.length;
+
+	// a stone bulkhead and a projecting signboard band run the full face
+	parts.storeBands.push( boxMatrix( frame, len / 2, bulkhead / 2, 0, len, bulkhead, 0.55 ) );
+	parts.storeBands.push( boxMatrix( frame, len / 2, height - fascia / 2, 0.08, len, fascia, 0.72 ) );
+
+	// the shop interior wall behind the glazing
+	addWall( parts.backWalls, frame, 0, height, 0.8, - 0.6 );
+
+	// shopfronts are wider than the window bays above, so group bays into ~4 m shops
+	const shopWidth = Math.max( 4, p.bayWidth * 2 );
+	const { count, margin, width } = frame.bays( shopWidth );
+
+	for ( let i = 0; i < count; i ++ ) {
+
+		const x0 = margin + i * width;
+		const cx = x0 + width / 2;
+
+		// a structural pier at each shopfront edge, full ground-floor height ( the far
+		// end is the shared corner the next face piers, like addPiers )
+		parts.addPier( frame, x0, 0, height );
+
+		// the display glazing for this shop, set back behind the frame, with the
+		// interior-mapping room it looks into ( one shop-wide, ground-floor-tall box )
+		const reveal = 0.18;
+		const gw = width - p.pierWidth - 0.12;
+		const cy = glassBottom + glassHeight / 2;
+		parts.glass.push( boxMatrix( frame, cx, cy, - reveal, gw, glassHeight, 1 ) );
+		parts.glassRooms.push( { center: frame.point( cx, cy, - reveal ), size: new Vector2( gw, glassHeight ) } );
+
+		// two slim mullions dividing the shopfront into three lights
+		parts.mullions.push( boxMatrix( frame, x0 + width / 3, glassBottom + glassHeight / 2, 0, 0.08, glassHeight, 0.16 ) );
+		parts.mullions.push( boxMatrix( frame, x0 + width * 2 / 3, glassBottom + glassHeight / 2, 0, 0.08, glassHeight, 0.16 ) );
+
+		// an awning over roughly half the shops, projecting from below the signboard
+		const r = Math.sin( i * 23.7 + frame.origin.x * 0.21 + frame.origin.z * 0.11 ) * 43758.5453;
+		if ( r - Math.floor( r ) < 0.5 ) {
+
+			const depth = 1.3;
+			parts.awnings.push( boxMatrix( frame, cx, height - fascia - 0.12, depth / 2 + 0.05, width - 0.3, 0.14, depth ) );
+
+		}
+
+	}
 
 }
 
@@ -1369,6 +1456,9 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	const isFrame = partId.equal( FRAME );
 	const isOrnament = partId.equal( ORNAMENT );
 	const isAC = partId.equal( AC );
+	const isShopGlass = partId.equal( SHOPGLASS );
+	const isStore = partId.equal( STORE );
+	const isAwning = partId.equal( AWNING );
 
 	// stone zones: brick + weathering on the building's colour, lightened for
 	// piers / ornament and darkened for window frames
@@ -1400,8 +1490,8 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	const dustStreak = smoothstep( - 0.15, 0.5, filmNoise ).mul( 0.45 );
 	const pooled = smoothstep( 0.32, 0.0, uv().y ).mul( 0.4 );
 	const grime = float( 0.64 ).add( dustStreak ).add( pooled ).clamp( 0, 0.95 ); // baseline haze so the panes read as dirty glass, not open holes
-	const dirtyGlass = mix( color( 0x13161a ), color( 0x232b31 ), valueFractal( positionWorld.mul( 0.3 ), 2 ).mul( 0.5 ).add( 0.5 ) );
-	const glassColor = mix( room.xyz.mul( color( 0xb6c6bf ) ), dirtyGlass, grime ); // faint green-grey ( soda-lime ) room tint, dirtied toward grimy glass
+	const glassMottle = valueFractal( positionWorld.mul( 0.3 ), 2 ).mul( 0.5 ).add( 0.5 ); // shared by the upper dirty glass and the shop glazing, so the fractal runs once
+	const dirtyGlass = mix( color( 0x13161a ), color( 0x232b31 ), glassMottle );
 
 	// dirt scatters the reflection too: rougher where grime pools at the sills, so the
 	// panes don't all mirror the sun in unison
@@ -1441,12 +1531,40 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	const acRelief = acGrille.mul( acSlats.mul( 0.012 ).sub( 0.01 ) );
 	const acRough = float( 0.52 ).add( acGrille.mul( 0.08 ) );
 
+	// --- storefronts --------------------------------------------------------
+
+	// display glazing: upper-floor and shop panes both show the raymarched room, the
+	// shops behind cleaner, barely-filmed plate glass. the shared `room` toVar must be
+	// referenced only once per output flow ( referencing it from two select branches
+	// miscompiles the interior ), so select the room-free tint / backing / film here and
+	// composite the room a single time below
+	const shopFilm = float( 0.14 ).add( dustStreak.mul( 0.22 ) ); // shops are far cleaner than the grimy upper panes
+	const glassTint = select( isShopGlass, color( 0xccd4cf ), color( 0xb6c6bf ) ); // shop daylight vs the upper soda-lime green
+	const glassBack = select( isShopGlass, color( 0x161a1e ), dirtyGlass );
+	const glassFilm = select( isShopGlass, shopFilm, grime );
+	const glazingColor = mix( room.xyz.mul( glassTint ), glassBack, glassFilm );
+	const glazingEmit = select( isShopGlass, float( 2 ), float( 2.2 ).mul( grime.mul( 0.6 ).oneMinus() ) ); // lit-room glow weight, kept a soft fill so signals and lamps read brighter
+
+	// bulkhead and signboard: a dark painted storefront frame, keyed off the building's colour
+	const storeColor = mix( buildingBase.mul( 0.3 ), color( 0x24201c ), 0.5 );
+
+	// awning fabric, one canvas colour per shop, picked from a coarse street-cell hash
+	const awnCell = floor( vec2( positionWorld.x, positionWorld.z ).mul( 0.2 ) );
+	const awnPick = ihash( uint( awnCell.x.add( 1 << 16 ) ).mul( uint( 73856093 ) ).bitXor( uint( awnCell.y.add( 1 << 16 ) ).mul( uint( 19349663 ) ) ) ).mul( 5 );
+	let awningColor = color( 0x6a2f2f ); // maroon
+	awningColor = select( awnPick.greaterThan( 1 ), color( 0x244a32 ), awningColor ); // green
+	awningColor = select( awnPick.greaterThan( 2 ), color( 0x22384f ), awningColor ); // navy
+	awningColor = select( awnPick.greaterThan( 3 ), color( 0x5a5e58 ), awningColor ); // grey
+	awningColor = select( awnPick.greaterThan( 4 ), color( 0x201f22 ), awningColor ); // black
+
+	const isGlazing = isGlass.or( isShopGlass ); // upper panes and shopfronts share the room compositing
+
 	const material = new MeshStandardNodeMaterial();
-	material.colorNode = select( isGlass, glassColor, select( isFrame, frameColor, select( isOrnament, ornamentColor, select( isAC, acColor, stoneColor ) ) ) );
-	material.roughnessNode = select( isGlass, glassRough, select( isOrnament, float( 0.8 ), select( isAC, acRough, rough ) ) ); // glass roughness rides on its grime, so dirty panes scatter the reflection
-	material.metalnessNode = float( 0 ); // all dielectric — stone, glass and the plastic AC shells
-	material.emissiveNode = select( isGlass, room.xyz.mul( room.w ).mul( 4 ).mul( grime.mul( 0.6 ).oneMinus() ), color( 0x000000 ) ); // room.w = emissive weight ( 0 unlit, < 1 behind curtains ), muted further by grime
-	material.normalNode = bumpNormal( select( isGlass.or( isFrame ).or( isOrnament ), float( 0 ), select( isAC, acRelief, reliefHeight ) ) ); // glass / frames / ornament stay flat; AC has its own louvers
+	material.colorNode = select( isGlazing, glazingColor, select( isStore, storeColor, select( isAwning, awningColor, select( isFrame, frameColor, select( isOrnament, ornamentColor, select( isAC, acColor, stoneColor ) ) ) ) ) );
+	material.roughnessNode = select( isShopGlass, float( 0.14 ), select( isAwning, float( 0.85 ), select( isStore, float( 0.6 ), select( isGlass, glassRough, select( isOrnament, float( 0.8 ), select( isAC, acRough, rough ) ) ) ) ) ); // glass roughness rides on its grime, so dirty panes scatter the reflection
+	material.metalnessNode = float( 0 ); // all dielectric — stone, glass, fabric and the plastic AC shells
+	material.emissiveNode = select( isGlazing, room.xyz.mul( room.w ).mul( glazingEmit ), color( 0x000000 ) ); // lit rooms / shops glow through the panes
+	material.normalNode = bumpNormal( select( isGlass.or( isFrame ).or( isOrnament ).or( isShopGlass ).or( isStore ).or( isAwning ), float( 0 ), select( isAC, acRelief, reliefHeight ) ) ); // glass / frames / ornament / storefronts stay flat; AC has its own louvers
 
 	return material;
 

@@ -20,7 +20,8 @@
 			</div>
 
 			<small>
-				A few procedurally generated city blocks of Neo-Gothic terracotta skyscrapers.
+				A few procedurally generated city blocks of Neo-Gothic terracotta skyscrapers.<br />
+				Use WASD to move around.
 			</small>
 		</div>
 
@@ -38,7 +39,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, vec3, vec4 } from 'three/tsl';
+			import { pass, mrt, normalView, screenUV, sample, packNormalToRGB, unpackRGBToNormal, builtinAOContext } from 'three/tsl';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
@@ -133,33 +134,39 @@
 				materials = { building: createBuildingMaterial( city.layout, parameters.seed ) };
 				generateCity();
 
-				// ground-truth ambient occlusion for the facade's contact shadows; MRT
-				// writes view normals so the AO needs no second geometry pass
+				// ground-truth ambient occlusion for the facade's contact shadows. a cheap
+				// pre-pass lays down view normals and depth, so the AO is ready before the
+				// lit scene pass and feeds in through its lighting context: the occlusion
+				// then darkens only the sky/IBL fill in the crevices, never the direct sun
 
 				renderPipeline = new THREE.RenderPipeline( renderer );
 
-				const scenePass = pass( scene, camera );
-				scenePass.setMRT( mrt( { output, normal: normalView } ) );
+				const prePass = pass( scene, camera );
+				prePass.transparent = false;
+				prePass.setMRT( mrt( { output: packNormalToRGB( normalView ) } ) );
+				prePass.getTexture( 'output' ).type = THREE.UnsignedByteType; // normals fit in 8 bits
 
-				const scenePassColor = scenePass.getTextureNode( 'output' );
-				const scenePassNormal = scenePass.getTextureNode( 'normal' );
-				const scenePassDepth = scenePass.getTextureNode( 'depth' );
+				const prePassNormal = sample( ( uv ) => unpackRGBToNormal( prePass.getTextureNode().sample( uv ) ) );
+				const prePassDepth = prePass.getTextureNode( 'depth' );
 
-				const aoPass = ao( scenePassDepth, scenePassNormal, camera );
+				const aoPass = ao( prePassDepth, prePassNormal, camera );
 				aoPass.resolutionScale = 0.5; // half-res is plenty for soft contact shading
 				aoPass.radius.value = 4;
 				aoPass.thickness.value = 4;
 				aoPass.scale.value = 2;
 
-				const aoColor = scenePassColor.mul( vec4( vec3( aoPass.getTextureNode().r ), 1 ) );
+				const scenePass = pass( scene, camera );
+				scenePass.contextNode = builtinAOContext( aoPass.getTextureNode().sample( screenUV ).r );
+
+				const scenePassColor = scenePass.getTextureNode();
 
 				// bloom: a soft glow on the brightest areas, at quarter-res since the
 				// result is heavily blurred anyway
 
-				const bloomPass = bloom( aoColor, 0.05, 0.0, 0.0 );
+				const bloomPass = bloom( scenePassColor, 0.05, 0.0, 0.0 );
 				bloomPass.setResolutionScale( 0.25 );
 
-				renderPipeline.outputNode = aoColor.add( bloomPass );
+				renderPipeline.outputNode = scenePassColor.add( bloomPass );
 
 				// parameters
 
