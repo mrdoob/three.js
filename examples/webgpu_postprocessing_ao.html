@@ -53,7 +53,7 @@
 
 			let camera, scene, renderer, renderPipeline, controls;
 
-			let aoPass, traaPass, transparentMesh;
+			let aoPass, traaPass, transparentMesh, torusKnot;
 
 			const params = {
 				samples: 16,
@@ -61,7 +61,8 @@
 				scale: 0.8,
 				thickness: 1,
 				aoOnly: false,
-				transparentOpacity: 0.3
+				transparentOpacity: 0.3,
+				rotateTorusKnot: false
 			};
 
 			init();
@@ -137,9 +138,10 @@
 
 				// ao
 
-				aoPass = ao( prePassDepth, prePassNormal, camera ).toInspector( 'GTAO', ( inspectNode ) => inspectNode.r );
+				aoPass = ao( prePassDepth, prePassNormal, camera, prePassVelocity ).toInspector( 'GTAO', ( inspectNode ) => inspectNode.r );
 				aoPass.resolutionScale = 0.5; // running AO in half resolution is often sufficient
-				aoPass.useTemporalFiltering = true;
+				aoPass.jitter = true; // vary the sampling pattern per frame so temporal accumulation has something to average
+				aoPass.temporalAccumulation = true; // average the AO over frames to smooth the half-res noise
 
 				const aoPassOutput = aoPass.getTextureNode();
 
@@ -244,7 +246,7 @@
 				// torus knot
 
 				const knotMat = new THREE.MeshStandardMaterial( { color: '#c0a060', roughness: 0.45, metalness: 0 } );
-				const torusKnot = new THREE.Mesh( new THREE.TorusKnotGeometry( 0.5, 0.17, 128, 32 ), knotMat );
+				torusKnot = new THREE.Mesh( new THREE.TorusKnotGeometry( 0.5, 0.17, 128, 32 ), knotMat );
 				torusKnot.position.set( 0, 0.82, 0 );
 				scene.add( torusKnot );
 
@@ -500,9 +502,12 @@
 				gui.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
 				gui.add( params, 'scale', 0.01, 1 ).onChange( updateParameters );
 				gui.add( params, 'thickness', 0.01, 2 ).onChange( updateParameters );
-				gui.add( aoPass, 'useTemporalFiltering' ).name( 'temporal filtering' );
+				gui.add( aoPass, 'jitter' );
+				gui.add( aoPass, 'temporalAccumulation' ).name( 'temporal accumulation' );
+				gui.add( aoPass.temporalAccumulationAlpha, 'value', 0.01, 1, 0.01 ).name( 'accumulation alpha' );
 				gui.add( transparentMesh, 'visible' ).name( 'show transparent mesh' );
 				gui.add( params, 'transparentOpacity', 0, 1, 0.01 ).name( 'transparent opacity' ).onChange( updateParameters );
+				gui.add( params, 'rotateTorusKnot' ).name( 'rotate torus knot' );
 				gui.add( params, 'aoOnly' ).onChange( ( value ) => {
 
 					if ( value === true ) {
@@ -550,6 +555,13 @@
 			function animate() {
 
 				controls.update();
+
+				if ( params.rotateTorusKnot === true ) {
+
+					torusKnot.rotation.x += 0.01;
+					torusKnot.rotation.y += 0.01;
+
+				}
 
 				renderPipeline.render();
 
