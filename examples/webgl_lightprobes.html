@@ -32,8 +32,8 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
-			import { LightProbeGridHelper } from 'three/addons/helpers/LightProbeGridHelper.js';
+			import { LightProbeGridWebGL } from 'three/addons/lighting/LightProbeGridWebGL.js';
+			import { LightProbeGridHelperWebGL } from 'three/addons/helpers/LightProbeGridHelperWebGL.js';
 
 			let camera, scene, renderer, controls;
 			let probes, probesHelper;
@@ -134,10 +134,6 @@
 				light.shadow.normalBias = - 0.02;
 				scene.add( light );
 
-				// Dim ambient to see GI effect better
-				const ambient = new THREE.AmbientLight( 0xffffff, 0.05 );
-				scene.add( ambient );
-
 				// Renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -157,7 +153,7 @@
 
 				// Bake light probe volume
 
-				async function bakeWithResolution( resolution ) {
+				async function bake( resolution ) {
 
 					if ( probes ) {
 
@@ -166,7 +162,7 @@
 
 					}
 
-					probes = new LightProbeGrid( 5.6, 4.7, 5.6, resolution, resolution, resolution );
+					probes = new LightProbeGridWebGL( 5.6, 4.7, 5.6, resolution, resolution, resolution );
 					probes.position.set( 0, 2.45, 0 );
 					probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
 					probes.visible = params.enabled;
@@ -176,7 +172,7 @@
 
 					if ( ! probesHelper ) {
 
-						probesHelper = new LightProbeGridHelper( probes );
+						probesHelper = new LightProbeGridHelperWebGL( probes );
 						probesHelper.visible = params.showProbes;
 						scene.add( probesHelper );
 
@@ -195,7 +191,7 @@
 					resolution: 6
 				};
 
-				await bakeWithResolution( params.resolution );
+				await bake( params.resolution );
 
 				// GUI
 
@@ -207,7 +203,7 @@
 				} );
 				gui.add( params, 'resolution', 2, 12, 1 ).name( 'Resolution' ).onFinishChange( ( value ) => {
 
-					bakeWithResolution( value );
+					bake( value );
 
 				} );
 				gui.add( params, 'showProbes' ).name( 'Show Probes' ).onChange( ( value ) => {
