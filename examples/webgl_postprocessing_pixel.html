@@ -189,7 +189,10 @@
 
 			const t = timer.getElapsed();
 
-			crystalMesh.material.emissiveIntensity = Math.sin( t * 3 ) * .5 + .5;
+			// Quantize the pulsing glow to 32 discrete brightness levels to match the pixelated aesthetic
+			const brightnessLevels = 32;
+			crystalMesh.material.emissiveIntensity =
+				Math.round( ( Math.sin( t * 3 ) * .5 + .5 ) * ( brightnessLevels - 1 ) ) / ( brightnessLevels - 1 );
 			crystalMesh.position.y = .7 + Math.sin( t * 2 ) * .05;
 			crystalMesh.rotation.y = stopGoEased( t, 6, 8 ) * 2 * Math.PI;
 
