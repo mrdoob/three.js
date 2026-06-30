@@ -431,20 +431,22 @@ class LightProbeGrid extends Light {
 	 * @param {number} [options.far=100] - Far plane for the cube camera.
 	 * @param {number} [options.bounces=0] - Additional bounce passes after the initial direct pass.
 	 * @param {number} [options.sampleCount=512] - Directions integrated when projecting each cubemap to SH.
-	 * @return {Promise} Resolves once the bake has been submitted.
 	 */
-	async bake( renderer, scene, options = {} ) {
+	bake( renderer, scene, options = {} ) {
 
 		// The bake is node based, so it needs a WebGPURenderer.
 		if ( renderer.isWebGPURenderer !== true ) {
 
-			console.warn( 'THREE.LightProbeGrid: requires WebGPURenderer. For WebGLRenderer, use LightProbeGridWebGL.' );
-			return;
+			throw new Error( 'THREE.LightProbeGrid: .bake() requires a WebGPURenderer. For WebGLRenderer, use LightProbeGridWebGL.' );
 
 		}
 
-		// Make sure the device is ready before issuing any GPU work.
-		await renderer.init();
+		// The bake issues GPU work immediately, so the renderer must be ready.
+		if ( renderer.initialized === false ) {
+
+			throw new Error( 'THREE.LightProbeGrid: .bake() called before the renderer is initialized. Use "await renderer.init();" first.' );
+
+		}
 
 		// Register the light node with this renderer (idempotent).
 		if ( renderer.library.getLightNodeClass( LightProbeGrid ) === null ) {
