@@ -190,7 +190,7 @@
 			const t = timer.getElapsed();
 
 			// Quantize the pulsing glow to 32 discrete brightness levels to match the pixelated aesthetic
-			const brightnessLevels = 32;
+			const brightnessLevels = 4;
 			crystalMesh.material.emissiveIntensity =
 				Math.round( ( Math.sin( t * 3 ) * .5 + .5 ) * ( brightnessLevels - 1 ) ) / ( brightnessLevels - 1 );
 			crystalMesh.position.y = .7 + Math.sin( t * 2 ) * .05;
