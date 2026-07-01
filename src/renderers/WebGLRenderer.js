@@ -181,6 +181,14 @@ class WebGLRenderer {
 			 */
 			checkShaderErrors: true,
 			/**
+			 * Diagnostics configuration for the shader generation. Only relevant for TSL.
+			 * @type {Object}
+			 * @property {boolean} keywords - Whether declaration names that collide with reserved keywords of the shading language should be renamed or not.
+			 */
+			diagnostics: {
+				keywords: false
+			},
+			/**
 			 * Callback for custom error reporting.
 			 * @type {?Function}
 			 */

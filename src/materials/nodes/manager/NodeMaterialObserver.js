@@ -222,7 +222,7 @@ class NodeMaterialObserver {
 			data.environmentIntensity = environmentIntensity;
 			data.environmentRotation = environmentRotation.clone();
 
-			data.lights = this.getLightsData( renderObject.lightsNode.getLights(), [] );
+			data.lights = this.getLightsData( renderObject.lightsNode.getBuiltinLights(), [] );
 
 			this.renderObjects.set( renderObject, data );
 
@@ -701,7 +701,7 @@ class NodeMaterialObserver {
 		}
 
 		cached.renderId = renderId;
-		this.getLightsData( lightsNode.getLights(), cached.lightsData );
+		this.getLightsData( lightsNode.getBuiltinLights(), cached.lightsData );
 
 		return cached.lightsData;
 

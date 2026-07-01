@@ -3,7 +3,7 @@ import {
 	GPUSamplerBindingType, GPUShaderStage
 } from './WebGPUConstants.js';
 
-import { FloatType, IntType, UnsignedIntType, Compatibility } from '../../../constants.js';
+import { FloatType, IntType, UnsignedIntType, Compatibility, UnsignedShortType, ShortType } from '../../../constants.js';
 import { NodeAccess } from '../../../nodes/core/constants.js';
 import { isTypedArray, error } from '../../../utils.js';
 import { hashString } from '../../../nodes/core/NodeUtils.js';
@@ -535,6 +535,10 @@ class WebGPUBindingUtils {
 					} else if ( type === UnsignedIntType ) {
 
 						texture.sampleType = GPUTextureSampleType.UInt;
+
+					} else if ( binding.texture.normalized === true && ( type === ShortType || type === UnsignedShortType ) ) {
+
+						texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
 
 					} else if ( type === FloatType ) {
 

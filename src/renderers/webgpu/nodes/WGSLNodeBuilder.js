@@ -16,7 +16,7 @@ import { NodeAccess } from '../../../nodes/core/constants.js';
 import VarNode from '../../../nodes/core/VarNode.js';
 import ExpressionNode from '../../../nodes/code/ExpressionNode.js';
 
-import { FloatType, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter, Compatibility } from '../../../constants.js';
+import { FloatType, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter, Compatibility, ShortType, UnsignedShortType } from '../../../constants.js';
 import { warn, error } from '../../../utils.js';
 
 import { GPUShaderStage } from '../utils/WebGPUConstants.js';
@@ -239,6 +239,35 @@ const wgslMethods = {
 	floatunpack_unorm_2x16: 'unpack2x16unorm',
 	floatunpack_float16_2x16: 'unpack2x16float'
 };
+
+// See: https://www.w3.org/TR/WGSL/#keyword-summary and #reserved-words-section
+
+const wgslReservedKeywords = new Set( [
+	// keywords
+	'alias', 'break', 'case', 'const', 'const_assert', 'continue', 'continuing', 'default', 'diagnostic',
+	'discard', 'else', 'enable', 'false', 'fn', 'for', 'if', 'let', 'loop', 'override', 'requires',
+	'return', 'struct', 'switch', 'true', 'var', 'while',
+	// reserved words
+	'NULL', 'Self', 'abstract', 'active', 'alignas', 'alignof', 'as', 'asm', 'asm_fragment', 'async',
+	'attribute', 'auto', 'await', 'become', 'binding_array', 'cast', 'catch', 'class', 'co_await',
+	'co_return', 'co_yield', 'coherent', 'column_major', 'common', 'compile', 'compile_fragment',
+	'concept', 'const_cast', 'consteval', 'constexpr', 'constinit', 'crate', 'debugger', 'decltype',
+	'delete', 'demote', 'demote_to_helper', 'do', 'dynamic_cast', 'enum', 'explicit', 'export',
+	'extends', 'extern', 'external', 'fallthrough', 'filter', 'final', 'finally', 'friend', 'from',
+	'fxgroup', 'get', 'goto', 'groupshared', 'highp', 'impl', 'implements', 'import', 'inline',
+	'instanceof', 'interface', 'layout', 'lowp', 'macro', 'macro_rules', 'match', 'mediump', 'meta',
+	'mod', 'module', 'move', 'mut', 'mutable', 'namespace', 'new', 'nil', 'noexcept', 'noinline',
+	'nointerpolation', 'non_coherent', 'noncoherent', 'noperspective', 'null', 'nullptr', 'of',
+	'operator', 'package', 'packoffset', 'partition', 'pass', 'patch', 'pixelfragment', 'precise',
+	'precision', 'premerge', 'priv', 'protected', 'pub', 'public', 'readonly', 'ref', 'regardless',
+	'register', 'reinterpret_cast', 'require', 'resource', 'restrict', 'self', 'set', 'shared',
+	'sizeof', 'smooth', 'snorm', 'static', 'static_assert', 'static_cast', 'std', 'subroutine',
+	'super', 'target', 'template', 'this', 'thread_local', 'throw', 'trait', 'try', 'type', 'typedef',
+	'typeid', 'typename', 'typeof', 'union', 'unless', 'unorm', 'unsafe', 'unsized', 'use', 'using',
+	'varying', 'virtual', 'volatile', 'wgsl', 'where', 'with', 'writeonly', 'yield',
+	// generated entry points
+	'main'
+] );
 
 //
 
@@ -806,7 +835,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 		return this.getComponentTypeFromTexture( texture ) !== 'float' ||
 			( ! this.isAvailable( 'float32Filterable' ) && texture.type === FloatType ) ||
 			( this.isSampleCompare( texture ) === false && texture.minFilter === NearestFilter && texture.magFilter === NearestFilter ) ||
-			this.renderer.backend.utils.getTextureSampleData( texture ).primarySamples > 1;
+			this.renderer.backend.utils.getTextureSampleData( texture ).primarySamples > 1 ||
+			texture.normalized === true && ( texture.type === ShortType || texture.type === UnsignedShortType );
 
 	}
 
@@ -1145,6 +1175,18 @@ class WGSLNodeBuilder extends NodeBuilder {
 		}
 
 		return super.getPropertyName( node );
+
+	}
+
+	/**
+	 * Returns whether the given name is a reserved keyword of WGSL.
+	 *
+	 * @param {string} name - The name to test.
+	 * @return {boolean} Whether the name is a reserved keyword or not.
+	 */
+	isReservedKeyword( name ) {
+
+		return wgslReservedKeywords.has( name );
 
 	}
 

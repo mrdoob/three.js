@@ -254,6 +254,9 @@ export class Profiler extends EventDispatcher {
 
 		this.domElement.classList.add( 'three-inspector' );
 
+		this.domElement.addEventListener( 'keydown', ( e ) => e.stopPropagation() );
+		this.domElement.addEventListener( 'keyup', ( e ) => e.stopPropagation() );
+
 		this.toggleButton = document.createElement( 'button' );
 		this.toggleButton.classList.add( 'profiler-toggle' );
 		this.toggleButton.innerHTML = `

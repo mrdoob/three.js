@@ -8,7 +8,7 @@ import ParameterNode from './ParameterNode.js';
 import StructType from './StructType.js';
 import FunctionNode from '../code/FunctionNode.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
-import { getDataFromObject, getTypeFromLength, hashString } from './NodeUtils.js';
+import { getDataFromObject, getTypeFromLength, getTextureType, hashString } from './NodeUtils.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
 import {
@@ -23,7 +23,7 @@ import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
 
 import BindGroup from '../../renderers/common/BindGroup.js';
 
-import { REVISION, IntType, UnsignedIntType, LinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapLinearFilter, NormalBlending, RedFormat, RGFormat, RGBFormat, RedIntegerFormat, RGIntegerFormat, RGBIntegerFormat } from '../../constants.js';
+import { REVISION, IntType, UnsignedIntType, LinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapLinearFilter, NormalBlending } from '../../constants.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { Color } from '../../math/Color.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -573,50 +573,15 @@ class NodeBuilder {
 	 */
 	getOutputType( index = 0 ) {
 
-		let type = 'vec4';
-
 		const renderTarget = this.renderer.getRenderTarget();
 
 		if ( renderTarget !== null ) {
 
-			const renderTargetType = renderTarget.textures[ index ].type;
-			const renderTargetFormat = renderTarget.textures[ index ].format;
-
-			let typeStr = 'vec';
-
-			if ( renderTargetType === IntType ) {
-
-				typeStr = 'ivec';
-
-			} else if ( renderTargetType === UnsignedIntType ) {
-
-				typeStr = 'uvec';
-
-			}
-
-			if ( renderTargetFormat === RedFormat || renderTargetFormat === RedIntegerFormat ) {
-
-				if ( renderTargetType === IntType ) type = 'int';
-				else if ( renderTargetType === UnsignedIntType ) type = 'uint';
-				else type = 'float';
-
-			} else if ( renderTargetFormat === RGFormat || renderTargetFormat === RGIntegerFormat ) {
-
-				type = `${ typeStr }2`;
-
-			} else if ( renderTargetFormat === RGBFormat || renderTargetFormat === RGBIntegerFormat ) {
-
-				type = `${ typeStr }3`;
-
-			} else {
-
-				type = `${ typeStr }4`;
-
-			}
+			return getTextureType( renderTarget.textures[ index ] );
 
 		}
 
-		return type;
+		return 'vec4';
 
 	}
 
@@ -1543,6 +1508,20 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns whether the given name is a reserved keyword of the backend's
+	 * shading language. Backends override this method to provide their
+	 * language-specific keywords.
+	 *
+	 * @param {string} name - The name to test.
+	 * @return {boolean} Whether the name is a reserved keyword or not.
+	 */
+	isReservedKeyword( /* name */ ) {
+
+		return false;
+
+	}
+
+	/**
 	 * Whether the given type is a vector type or not.
 	 *
 	 * @param {string} type - The type to check.
@@ -2267,6 +2246,7 @@ class NodeBuilder {
 
 		const shaderStage = this.shaderStage;
 		const declarations = this.declarations[ shaderStage ] || ( this.declarations[ shaderStage ] = {} );
+		const checkKeywords = this.renderer.debug.diagnostics.keywords;
 
 		const baseName = node.name;
 
@@ -2274,9 +2254,9 @@ class NodeBuilder {
 		let property = this.getPropertyName( node );
 		let index = 1;
 
-		// Automatically renames the property if the name is already in use.
+		// Automatically renames the property if the name is already in use or reserved.
 
-		while ( declarations[ property ] !== undefined ) {
+		while ( ( checkKeywords && this.isReservedKeyword( name ) ) || declarations[ property ] !== undefined ) {
 
 			name = baseName + '_' + index ++;
 			node.name = name;
@@ -2286,7 +2266,7 @@ class NodeBuilder {
 
 		if ( name !== baseName ) {
 
-			warn( `TSL: Declaration name '${ baseName }' of '${ node.type }' already in use. Renamed to '${ name }'.` );
+			warn( `TSL: Declaration name '${ baseName }' of '${ node.type }' is a reserved keyword or already in use. Renamed to '${ name }'.` );
 
 		}
 

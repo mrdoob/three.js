@@ -78,9 +78,9 @@ const ATLAS_PADDING = 1;
  * Baking is fully GPU-resident: cubemap rendering, SH projection, and
  * texture packing all happen on the GPU with zero CPU readback.
  *
- * @three_import import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
+ * @three_import import { LightProbeGridWebGL } from 'three/addons/lighting/LightProbeGridWebGL.js';
  */
-class LightProbeGrid extends Object3D {
+class LightProbeGridWebGL extends Object3D {
 
 	/**
 	 * Constructs a new irradiance probe grid.
@@ -141,7 +141,7 @@ class LightProbeGrid extends Object3D {
 
 		/**
 		 * The world-space bounding box for the grid. Updated automatically
-		 * by {@link LightProbeGrid#bake}.
+		 * by {@link LightProbeGridWebGL#bake}.
 		 *
 		 * @type {Box3}
 		 */
@@ -362,7 +362,7 @@ class LightProbeGrid extends Object3D {
 
 		scene.matrixWorldAutoUpdate = currentMatrixWorldAutoUpdate;
 
-		// console.log( `LightProbeGrid: bake complete ${ ( performance.now() - t0 ).toFixed( 1 ) }ms` );
+		// console.log( `LightProbeGridWebGL: bake complete ${ ( performance.now() - t0 ).toFixed( 1 ) }ms` );
 
 		this.visible = true;
 
@@ -678,4 +678,4 @@ function _ensureBatchTarget( totalProbes ) {
 
 }
 
-export { LightProbeGrid };
+export { LightProbeGridWebGL };

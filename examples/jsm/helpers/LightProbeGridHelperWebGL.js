@@ -8,25 +8,25 @@ import {
 } from 'three';
 
 /**
- * Visualizes an {@link LightProbeGrid} by rendering a sphere at each
+ * Visualizes an {@link LightProbeGridWebGL} by rendering a sphere at each
  * probe position, shaded with the probe's L2 spherical harmonics.
  *
  * Uses a single `InstancedMesh` draw call for all probes.
  *
  * ```js
- * const helper = new LightProbeGridHelper( probes );
+ * const helper = new LightProbeGridHelperWebGL( probes );
  * scene.add( helper );
  * ```
  *
  * @augments InstancedMesh
- * @three_import import { LightProbeGridHelper } from 'three/addons/helpers/LightProbeGridHelper.js';
+ * @three_import import { LightProbeGridHelperWebGL } from 'three/addons/helpers/LightProbeGridHelperWebGL.js';
  */
-class LightProbeGridHelper extends InstancedMesh {
+class LightProbeGridHelperWebGL extends InstancedMesh {
 
 	/**
 	 * Constructs a new irradiance probe grid helper.
 	 *
-	 * @param {LightProbeGrid} probes - The probe grid to visualize.
+	 * @param {LightProbeGridWebGL} probes - The probe grid to visualize.
 	 * @param {number} [sphereSize=0.12] - The radius of each probe sphere.
 	 */
 	constructor( probes, sphereSize = 0.12 ) {
@@ -135,11 +135,11 @@ class LightProbeGridHelper extends InstancedMesh {
 		/**
 		 * The probe grid to visualize.
 		 *
-		 * @type {LightProbeGrid}
+		 * @type {LightProbeGridWebGL}
 		 */
 		this.probes = probes;
 
-		this.type = 'LightProbeGridHelper';
+		this.type = 'LightProbeGridHelperWebGL';
 
 		this.update();
 
@@ -218,4 +218,4 @@ class LightProbeGridHelper extends InstancedMesh {
 
 }
 
-export { LightProbeGridHelper };
+export { LightProbeGridHelperWebGL };
