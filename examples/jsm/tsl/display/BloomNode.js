@@ -107,6 +107,15 @@ class BloomNode extends TempNode {
 		this.smoothWidth = uniform( 0.01 );
 
 		/**
+		 * Whether to use linear sampling for the Gaussian blur.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._linearSampling = false;
+
+		/**
 		 * Scale factor for the internal render targets.
 		 *
 		 * @private
@@ -201,6 +210,15 @@ class BloomNode extends TempNode {
 		this._separableBlurMaterials = [];
 
 		/**
+		 * The shared context captured during `setup()`.
+		 *
+		 * @private
+		 * @type {?Object}
+		 * @default null
+		 */
+		this._sharedContext = null;
+
+		/**
 		 * The result of the luminance pass as a texture node for further processing.
 		 *
 		 * @private
@@ -264,6 +282,32 @@ class BloomNode extends TempNode {
 		 * @default 'frame'
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
+
+	}
+
+	/**
+	 * Whether to use linear sampling for the Gaussian blur. When enabled, adjacent
+	 * kernel taps are merged into single bilinear fetches, roughly halving the number
+	 * of texture reads for an approximate similar result. Recommended for mobile.
+	 *
+	 * @type {boolean}
+	 * @default false
+	 */
+	get linearSampling() {
+
+		return this._linearSampling;
+
+	}
+
+	set linearSampling( value ) {
+
+		if ( value !== this._linearSampling ) {
+
+			this._linearSampling = value;
+
+			if ( this._sharedContext !== null ) this._buildSeparableBlurMaterials();
+
+		}
 
 	}
 
@@ -408,15 +452,8 @@ class BloomNode extends TempNode {
 
 		// gaussian blur materials
 
-		// These sizes have been changed to account for the altered coefficients-calculation to avoid blockiness,
-		// while retaining the same blur-strength. For details see https://github.com/mrdoob/three.js/pull/31528
-		const kernelSizeArray = [ 6, 10, 14, 18, 22 ];
-
-		for ( let i = 0; i < this._nMips; i ++ ) {
-
-			this._separableBlurMaterials.push( this._getSeparableBlurMaterial( builder, kernelSizeArray[ i ] ) );
-
-		}
+		this._sharedContext = builder.getSharedContext();
+		this._buildSeparableBlurMaterials();
 
 		// composite material
 
@@ -495,14 +532,40 @@ class BloomNode extends TempNode {
 	}
 
 	/**
+	 * Builds the separable blur materials.
+	 *
+	 * @private
+	 */
+	_buildSeparableBlurMaterials() {
+
+		// These sizes have been changed to account for the altered coefficients-calculation to avoid blockiness,
+		// while retaining the same blur-strength. For details see https://github.com/mrdoob/three.js/pull/31528
+		const kernelSizeArray = [ 6, 10, 14, 18, 22 ];
+
+		for ( let i = 0; i < this._separableBlurMaterials.length; i ++ ) {
+
+			this._separableBlurMaterials[ i ].dispose();
+
+		}
+
+		this._separableBlurMaterials.length = 0;
+
+		for ( let i = 0; i < this._nMips; i ++ ) {
+
+			this._separableBlurMaterials.push( this._getSeparableBlurMaterial( kernelSizeArray[ i ] ) );
+
+		}
+
+	}
+
+	/**
 	 * Create a separable blur material for the given kernel radius.
 	 *
 	 * @private
-	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {number} kernelRadius - The kernel radius.
 	 * @return {NodeMaterial}
 	 */
-	_getSeparableBlurMaterial( builder, kernelRadius ) {
+	_getSeparableBlurMaterial( kernelRadius ) {
 
 		const coefficients = [];
 		const sigma = kernelRadius / 3;
@@ -513,10 +576,39 @@ class BloomNode extends TempNode {
 
 		}
 
+		const centerWeight = coefficients[ 0 ];
+		const offsets = [];
+		const weights = [];
+
+		if ( this.linearSampling === false ) {
+
+			for ( let i = 1; i < kernelRadius; i ++ ) {
+
+				offsets.push( i );
+				weights.push( coefficients[ i ] );
+
+			}
+
+		} else {
+
+			for ( let i = 1; i < kernelRadius; i += 2 ) {
+
+				const wa = coefficients[ i ];
+				const wb = ( i + 1 ) < kernelRadius ? coefficients[ i + 1 ] : 0;
+				const w = wa + wb;
+
+				offsets.push( ( i * wa + ( i + 1 ) * wb ) / w );
+				weights.push( w );
+
+			}
+
+		}
+
 		//
 
 		const colorTexture = texture( null );
-		const gaussianCoefficients = uniformArray( coefficients );
+		const gaussianOffsets = uniformArray( offsets );
+		const gaussianWeights = uniformArray( weights );
 		const invSize = uniform( new Vector2() );
 		const direction = uniform( new Vector2( 0.5, 0.5 ) );
 
@@ -525,13 +617,12 @@ class BloomNode extends TempNode {
 
 		const separableBlurPass = Fn( () => {
 
-			const diffuseSum = sampleTexel( uvNode ).rgb.mul( gaussianCoefficients.element( 0 ) ).toVar();
+			const diffuseSum = sampleTexel( uvNode ).rgb.mul( centerWeight ).toVar();
 
-			Loop( { start: int( 1 ), end: int( kernelRadius ), type: 'int', condition: '<' }, ( { i } ) => {
+			Loop( { start: int( 0 ), end: int( offsets.length ), type: 'int', condition: '<' }, ( { i } ) => {
 
-				const x = float( i );
-				const w = gaussianCoefficients.element( i );
-				const uvOffset = direction.mul( invSize ).mul( x );
+				const w = gaussianWeights.element( i );
+				const uvOffset = direction.mul( invSize ).mul( gaussianOffsets.element( i ) );
 				const sample1 = sampleTexel( uvNode.add( uvOffset ) ).rgb;
 				const sample2 = sampleTexel( uvNode.sub( uvOffset ) ).rgb;
 				diffuseSum.addAssign( add( sample1, sample2 ).mul( w ) );
@@ -543,7 +634,7 @@ class BloomNode extends TempNode {
 		} );
 
 		const separableBlurMaterial = new NodeMaterial();
-		separableBlurMaterial.fragmentNode = separableBlurPass().context( builder.getSharedContext() );
+		separableBlurMaterial.fragmentNode = separableBlurPass().context( this._sharedContext );
 		separableBlurMaterial.name = 'Bloom_separable';
 		separableBlurMaterial.needsUpdate = true;
 
