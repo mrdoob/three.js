@@ -620,6 +620,25 @@ class WGSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
+	 * Generates the WGSL snippet that resolves the dimensions of the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} levelSnippet - A WGSL snippet that represents the mip level.
+	 * @return {string} The WGSL snippet.
+	 */
+	generateTextureSize( texture, textureProperty, levelSnippet ) {
+
+		const { primarySamples } = this.renderer.backend.utils.getTextureSampleData( texture );
+		const isMultisampled = primarySamples > 1;
+
+		const params = ( isMultisampled || texture.isStorageTexture ) ? textureProperty : `${ textureProperty }, ${ levelSnippet }`;
+
+		return `textureDimensions( ${ params } )`;
+
+	}
+
+	/**
 	 * Generates the WGSL snippet for a manual filtered texture.
 	 *
 	 * @param {Texture} texture - The texture.
