@@ -47,14 +47,26 @@
 			import { dualKawaseBloom } from 'three/addons/tsl/display/DualKawaseBloomNode.js';
 			import { ssao } from 'three/addons/tsl/display/SSAONode.js';
 			import { CityGenerator, createBuildingMaterial, createRoadMaterial } from 'three/addons/generators/CityGenerator.js';
+			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
+			import { LightProbeGridHelper } from 'three/addons/helpers/LightProbeGridHelper.js';
 
 			let camera, scene, renderer, controls, timer;
-			let cityGroup, materials, city, renderPipeline;
+			let cityGroup, cityProxy, materials, city, renderPipeline;
 			let sky, sun, sunLight, pmremGenerator, envScene, envRenderTarget;
+			let probes, probesHelper, rebakeTimer = null;
+
+			// the irradiance grid spans the whole footprint plus the streets, rising to
+			// the mid-rise rooftops. diffuse GI is low frequency, so a coarse grid still
+			// reads the urban canyon: streets sit in shade, walls glow with terracotta bounce
+
+			const GRID_SIZE = new THREE.Vector3( 240, 120, 170 );
+			const GRID_PROBES = new THREE.Vector3( 10, 7, 8 );
 
 			const parameters = {
 				seed: 94,
-				timeOfDay: 6.4 // hours: 6 sunrise, 12 noon, 18 sunset
+				timeOfDay: 6.3, // hours: 6 sunrise, 12 noon, 18 sunset
+				gi: true,
+				showProbes: false
 			};
 
 			init();
@@ -134,6 +146,10 @@
 				materials = { building: createBuildingMaterial( city.layout, parameters.seed ) };
 				generateCity();
 
+				// bake the irradiance grid once the city and sun are in place
+
+				bakeProbes();
+
 				// screen-space ambient occlusion for the facade's contact shadows. a cheap
 				// pre-pass lays down view normals and depth, so the AO is ready before the
 				// lit scene pass and feeds in through its lighting context: the occlusion
@@ -151,6 +167,7 @@
 
 				const aoPass = ssao( prePassDepth, prePassNormal, camera );
 				aoPass.resolutionScale = 0.5; // half-res is plenty for soft contact shading
+				aoPass.samples.value = 8; // few taps: the AO only tints the soft sky fill in crevices
 				aoPass.radius.value = 1.5;
 				aoPass.intensity.value = 4;
 				aoPass.blurEnabled = false;
@@ -171,9 +188,25 @@
 				// parameters
 
 				const gui = renderer.inspector.createParameters( 'City' );
-				gui.add( parameters, 'seed', 0, 100, 1 ).onChange( generateCity );
-				gui.add( parameters, 'timeOfDay', 6, 18, 0.1 ).name( 'time of day' ).onChange( updateSun );
+				gui.add( parameters, 'seed', 0, 100, 1 ).onChange( () => {
+
+					generateCity();
+					scheduleRebake();
+
+				} );
+				gui.add( parameters, 'timeOfDay', 6, 18, 0.1 ).name( 'time of day' ).onChange( () => {
+
+					updateSun();
+					scheduleRebake();
+
+				} );
 				gui.add( renderer, 'toneMappingExposure', 0.01, 1 ).name( 'exposure' );
+				gui.add( parameters, 'gi' ).name( 'global illumination' ).onChange( ( value ) => {
+
+					if ( probes ) probes.visible = value;
+
+				} );
+				gui.add( parameters, 'showProbes' ).name( 'show probes' ).onChange( toggleProbesHelper );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -220,10 +253,86 @@
 			function generateCity() {
 
 				if ( cityGroup ) scene.remove( cityGroup );
+				if ( cityProxy ) {
+
+					scene.remove( cityProxy );
+					cityProxy.geometry.dispose();
+					cityProxy.material.dispose();
+
+				}
 
 				city.parameters.seed = parameters.seed;
 				cityGroup = city.build( materials );
 				scene.add( cityGroup );
+
+				// the box proxy shares the towers just built; it stands in only during the bake
+				cityProxy = city.buildProxy();
+				cityProxy.visible = false;
+				scene.add( cityProxy );
+
+			}
+
+			function bakeProbes() {
+
+				if ( probes === undefined ) {
+
+					probes = new LightProbeGrid( GRID_SIZE.x, GRID_SIZE.y, GRID_SIZE.z, GRID_PROBES.x, GRID_PROBES.y, GRID_PROBES.z );
+					probes.position.set( 0, GRID_SIZE.y / 2, 0 );
+					scene.add( probes );
+
+				}
+
+				// swap the detailed city for its box proxy, and hide the probe spheres and the
+				// sun disc, so each cubemap captures only the boxes, ground and sky fill. the
+				// DirectionalLight supplies the direct sun; a single bounce pass folds the warm
+				// stone back into the shade. the proxy is a single draw, so the bake stays cheap
+
+				if ( probesHelper ) probesHelper.visible = false;
+				cityGroup.visible = false;
+				cityProxy.visible = true;
+				sky.showSunDisc.value = false;
+
+				probes.bake( renderer, scene, { cubemapSize: 16, near: 0.1, far: 20000, bounces: 1 } );
+
+				sky.showSunDisc.value = true;
+				cityProxy.visible = false;
+				cityGroup.visible = true;
+				probes.visible = parameters.gi;
+
+				if ( probesHelper ) {
+
+					probesHelper.update();
+					probesHelper.visible = parameters.showProbes;
+
+				}
+
+			}
+
+			// re-baking walks the whole city cubemap by cubemap, so coalesce the rapid
+			// onChange calls from dragging a slider into a single bake once it settles
+
+			function scheduleRebake() {
+
+				if ( rebakeTimer !== null ) clearTimeout( rebakeTimer );
+				rebakeTimer = setTimeout( () => {
+
+					rebakeTimer = null;
+					bakeProbes();
+
+				}, 300 );
+
+			}
+
+			function toggleProbesHelper( value ) {
+
+				if ( probesHelper === undefined ) {
+
+					probesHelper = new LightProbeGridHelper( probes, 3 );
+					scene.add( probesHelper );
+
+				}
+
+				probesHelper.visible = value;
 
 			}
 

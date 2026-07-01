@@ -1,5 +1,7 @@
 import {
+	BoxGeometry,
 	Group,
+	InstancedMesh,
 	Matrix4,
 	Quaternion,
 	Vector3
@@ -42,6 +44,10 @@ class CityGenerator {
 		this.layout = cityLayout( this.parameters );
 
 		this.generators = [];
+
+		// per-tower box specs recorded during build(), consumed by buildProxy()
+		this.towers = [];
+
 		this.sidewalk = new SidewalkGenerator( {
 			width: this.layout.blockW,
 			depth: this.layout.blockD,
@@ -72,6 +78,8 @@ class CityGenerator {
 
 		const group = new Group();
 		group.name = 'City';
+
+		this.towers = [];
 
 		const L = this.layout;
 		const random = createRandom( this.parameters.seed );
@@ -118,9 +126,11 @@ class CityGenerator {
 						const fw = L.innerLotX - ( 0.4 + random() * 1 );
 						const fd = L.innerLotZ - ( 0.4 + random() * 1 );
 
+						const totalHeight = 38 + tall * tall * 114; // a few tall towers, mostly mid-rise
+
 						const generator = new SkyscraperGenerator( {
 							seed: Math.floor( random() * 100000 ),
-							totalHeight: 38 + tall * tall * 114, // a few tall towers, mostly mid-rise
+							totalHeight,
 							footprint: { width: fw, depth: fd },
 							floorHeight: 3.4 + random() * 1.8,
 							bayWidth: 1.9 + random() * 2.1,
@@ -146,6 +156,9 @@ class CityGenerator {
 						group.add( building );
 						this.generators.push( generator );
 
+						// record a plain box matching this tower for the GI proxy
+						this.towers.push( { x: cx, y: curb + totalHeight / 2, z: cz, w: fw, h: totalHeight, d: fd } );
+
 					}
 
 				}
@@ -161,6 +174,46 @@ class CityGenerator {
 		this.group = group;
 
 		return group;
+
+	}
+
+	/**
+	 * Builds a lightweight stand-in for the city: one instanced box per tower,
+	 * sized to match, in a single draw call. Intended for cheap global-illumination
+	 * bakes, where the detailed facades and street furniture are unnecessary and the
+	 * boxes still cast the same street shadows and bounce the same warm fill.
+	 *
+	 * Call after {@link CityGenerator#build}, which records the tower boxes.
+	 *
+	 * @return {InstancedMesh} The proxy mesh.
+	 */
+	buildProxy() {
+
+		const towers = this.towers;
+
+		// each box takes its tower's own masonry colour ( same node, keyed off world
+		// position ), so the GI bleeds the real per-building tints. mid roughness / metalness
+		// give the boxes a soft, part-glazed sky reflection.
+		const material = new MeshStandardNodeMaterial( { roughness: 0.4, metalness: 0.4 } );
+		material.colorNode = buildingColorNode( this.layout, this.parameters.seed );
+		const mesh = new InstancedMesh( new BoxGeometry( 1, 1, 1 ), material, towers.length );
+		mesh.name = 'CityProxy';
+
+		const matrix = new Matrix4();
+
+		for ( let i = 0; i < towers.length; i ++ ) {
+
+			const t = towers[ i ];
+			matrix.makeScale( t.w, t.h, t.d );
+			matrix.setPosition( t.x, t.y, t.z );
+			mesh.setMatrixAt( i, matrix );
+
+		}
+
+		mesh.castShadow = true;
+		mesh.receiveShadow = true;
+
+		return mesh;
 
 	}
 
@@ -447,13 +500,19 @@ function gridLine( coord, period, halfWidth ) {
 }
 
 /**
- * The shared material every tower in a {@link CityGenerator} is dressed with: one flat
- * masonry colour per lot, picked from a palette by hashing the lot's grid cell.
+ * The per-tower flat masonry colour: one palette entry per lot, picked by hashing the
+ * lot's grid cell from world position. Keyed off `positionWorld`, so it colours anything
+ * standing on the city grid identically, the towers and their {@link CityGenerator#buildProxy}
+ * boxes alike.
+ *
+ * @param {Object} layout - The city layout.
+ * @param {number} [seed] - The city seed.
+ * @return {Node<vec3>} The tower colour.
  */
-function createBuildingMaterial( layout, seed = 0 ) {
+function buildingColorNode( layout, seed = 0 ) {
 
-	// every tower takes one flat colour, picked by hashing its lot — one shared material
-	// dresses the whole skyline; common tones repeat so the equal-probability pick feels real
+	// every tower takes one flat colour, picked by hashing its lot; common tones repeat
+	// so the equal-probability pick feels real
 	const palette = buildingPalette.map( hex => color( hex ) );
 
 	const periodX = layout.blockW + layout.street;
@@ -476,8 +535,18 @@ function createBuildingMaterial( layout, seed = 0 ) {
 	for ( let i = 1; i < palette.length; i ++ ) buildingBase = mix( buildingBase, palette[ i ], step( i / palette.length, pick ) );
 	buildingBase = buildingBase.mul( cellHash( 269.5, 183.3 ).mul( 0.12 ).add( 0.94 ) ); // subtle per-building brightness
 
+	return buildingBase;
+
+}
+
+/**
+ * The shared material every tower in a {@link CityGenerator} is dressed with: the per-lot
+ * {@link buildingColorNode} resolved once per vertex on a skyscraper material.
+ */
+function createBuildingMaterial( layout, seed = 0 ) {
+
 	// the pick is constant across a tower, so resolve it once per vertex ( varying )
-	return createSkyscraperMaterial( varying( buildingBase ) );
+	return createSkyscraperMaterial( varying( buildingColorNode( layout, seed ) ) );
 
 }
 
