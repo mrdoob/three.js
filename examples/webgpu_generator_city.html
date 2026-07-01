@@ -50,7 +50,7 @@
 
 			let camera, scene, renderer, controls, timer;
 			let cityGroup, materials, city, renderPipeline;
-			let sky, sun, sunLight, pmremGenerator, envScene;
+			let sky, sun, sunLight, pmremGenerator, envScene, envRenderTarget;
 
 			const parameters = {
 				seed: 94,
@@ -204,13 +204,14 @@
 				sunLight.intensity = 6 * transmittance; // illuminance perpendicular to the rays; the renderer applies N·L per surface
 				sunLight.position.copy( sun ).multiplyScalar( 600 );
 
-				// re-bake the sky ( without the sun disc ) into the environment map for IBL
+				// re-bake the sky ( without the sun disc ) into the environment map for IBL.
+				// reuse one render target so the texture keeps its identity: a fresh texture
+				// would force every material to recompile its shader
 
 				sky.showSunDisc.value = false;
 				envScene.add( sky );
-				const env = pmremGenerator.fromScene( envScene ).texture;
-				if ( scene.environment ) scene.environment.dispose();
-				scene.environment = env;
+				envRenderTarget = pmremGenerator.fromScene( envScene, 0, 0.1, 100, { renderTarget: envRenderTarget } );
+				scene.environment = envRenderTarget.texture;
 				sky.showSunDisc.value = true;
 				scene.add( sky );
 
