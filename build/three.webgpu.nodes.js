@@ -15519,8 +15519,8 @@ const materialEnvIntensity = /*@__PURE__*/ uniform( 1 ).onReference( ( { materia
 
 /**
  * TSL object that represents the rotation of environment maps.
- * When `material.envMap` is set, the value is `material.envMapRotation`. `scene.environmentRotation` controls the
- * rotation of `scene.environment` instead.
+ * When `material.envMap` is set, the value is `material.envMapRotation`.
+ * `scene.environmentRotation` controls the rotation of `scene.environment` or `scene.environmentNode` instead.
  *
  * @tsl
  * @type {Node<mat4>}
@@ -15531,7 +15531,8 @@ const materialEnvRotation = /*@__PURE__*/ uniform( new Matrix4() ).onReference( 
 
 } ).onObjectUpdate( function ( { material, scene } ) {
 
-	const rotation = ( scene.environment !== null && material.envMap === null ) ? scene.environmentRotation : material.envMapRotation;
+	const hasSceneEnvironment = ( scene.environment !== null ) || ( scene.environmentNode && scene.environmentNode.isNode );
+	const rotation = ( hasSceneEnvironment && material.envMap === null ) ? scene.environmentRotation : material.envMapRotation;
 
 	if ( rotation ) {
 
@@ -18302,26 +18303,26 @@ const _previousInstanceMatrices = /*@__PURE__*/ new WeakMap();
  *
  * @param {NodeBuilder} builder - The current node builder.
  * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} instanceMatrix - The matrix buffer attribute.
- * @param {number} count - The instance count.
  * @returns {Node} The matrix node.
  */
-function createInstanceMatrixNode( builder, instanceMatrix, count ) {
+function createInstanceMatrixNode( builder, instanceMatrix ) {
 
 	let instanceMatrixNode;
+	const matrixCount = Math.max( instanceMatrix.count, 1 );
 
 	const isStorageMatrix = instanceMatrix.isStorageInstancedBufferAttribute === true;
 
 	if ( isStorageMatrix ) {
 
-		instanceMatrixNode = storage( instanceMatrix, 'mat4', Math.max( count, 1 ) ).element( instanceIndex );
+		instanceMatrixNode = storage( instanceMatrix, 'mat4', matrixCount ).element( instanceIndex );
 
 	} else {
 
-		const uniformBufferSize = count * 16 * 4;
+		const uniformBufferSize = matrixCount * 16 * 4;
 
 		if ( uniformBufferSize <= builder.getUniformBufferLimit() ) {
 
-			instanceMatrixNode = buffer( instanceMatrix.array, 'mat4', Math.max( count, 1 ) ).element( instanceIndex );
+			instanceMatrixNode = buffer( instanceMatrix.array, 'mat4', matrixCount ).element( instanceIndex );
 
 		} else {
 
@@ -18360,10 +18361,9 @@ function createInstanceMatrixNode( builder, instanceMatrix, count ) {
  * @param {InstancedMesh} instancedMesh - The instanced mesh object.
  * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} instanceMatrix - The current matrix buffer attribute.
  * @param {NodeBuilder} builder - The current node builder.
- * @param {number} count - The instance count.
  * @returns {Node} The previous frame instance matrix node.
  */
-function getPreviousInstance( instancedMesh, instanceMatrix, builder, count ) {
+function getPreviousInstance( instancedMesh, instanceMatrix, builder ) {
 
 	let data = _previousInstanceMatrices.get( instancedMesh );
 
@@ -18373,7 +18373,7 @@ function getPreviousInstance( instancedMesh, instanceMatrix, builder, count ) {
 
 		data = {
 			previousInstanceMatrix,
-			node: createInstanceMatrixNode( builder, previousInstanceMatrix, count )
+			node: createInstanceMatrixNode( builder, previousInstanceMatrix )
 		};
 
 		_previousInstanceMatrices.set( instancedMesh, data );
@@ -18397,26 +18397,22 @@ const instanceColor = /*@__PURE__*/ varyingProperty( 'vec3', 'vInstanceColor' );
  *
  * @tsl
  * @function
- * @param {number} count - The instance count.
  * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} matrices - The instanced transformation matrices.
  * @param {?InstancedBufferAttribute|StorageInstancedBufferAttribute} [colors=null] - The optional instanced colors.
  */
-const instance = /*@__PURE__*/ Fn( ( [ count, matrices, colors = null ], builder ) => {
-
-	// get numeric value (non-node)
-	count = count.value;
+const instance = /*@__PURE__*/ Fn( ( [ matrices, colors = null ], builder ) => {
 
 	const isStorageMatrix = matrices.isStorageInstancedBufferAttribute === true;
 	const isStorageColor = colors && colors.isStorageInstancedBufferAttribute === true;
 
-	const instanceMatrixNode = createInstanceMatrixNode( builder, matrices, count );
+	const instanceMatrixNode = createInstanceMatrixNode( builder, matrices );
 
 	// interleaved buffer tracking for matrix
 	let interleavedMatrix = null;
 
 	if ( ! isStorageMatrix ) {
 
-		const uniformBufferSize = count * 16 * 4;
+		const uniformBufferSize = Math.max( matrices.count, 1 ) * 16 * 4;
 
 		if ( uniformBufferSize > builder.getUniformBufferLimit() ) {
 
@@ -18508,7 +18504,7 @@ const instance = /*@__PURE__*/ Fn( ( [ count, matrices, colors = null ], builder
 
 		} );
 
-		const previousInstanceMatrixNode = getPreviousInstance( instancedMesh, matrices, builder, count );
+		const previousInstanceMatrixNode = getPreviousInstance( instancedMesh, matrices, builder );
 		positionPrevious.assign( previousInstanceMatrixNode.mul( positionPrevious ).xyz );
 
 	}
@@ -18541,9 +18537,9 @@ const instance = /*@__PURE__*/ Fn( ( [ count, matrices, colors = null ], builder
  */
 const instancedMesh = /*@__PURE__*/ Fn( ( [ instancedMesh ] ) => {
 
-	const { count, instanceMatrix, instanceColor } = instancedMesh;
+	const { instanceMatrix, instanceColor } = instancedMesh;
 
-	instance( count, instanceMatrix, instanceColor );
+	instance( instanceMatrix, instanceColor );
 
 }, 'void' );
 
@@ -29221,9 +29217,9 @@ class VolumetricLightingModel extends LightingModel {
 
 	direct( { lightNode, lightColor }, builder ) {
 
-		// Ignore lights with infinite distance
+		// Ignore non-analytical lights and lights with infinite distance
 
-		if ( lightNode.light.distance === undefined ) return;
+		if ( lightNode.isAnalyticLightNode !== true || lightNode.light.distance === undefined ) return;
 
 		// TODO: We need a viewportOpaque*() ( output, depth ) to fit with modern rendering approaches
 
@@ -36054,6 +36050,10 @@ class MRTNode extends OutputStructNode {
 		for ( const name in outputNodes ) {
 
 			const index = getTextureIndex( textures, name );
+
+			// Ignore if the output exists in the MRT but has never been used.
+			if ( index === -1 ) continue;
+
 			const type = builder.getOutputType( index );
 
 			members[ index ] = outputNodes[ name ].convert( type );
@@ -38930,7 +38930,7 @@ const backgroundRotation = /*@__PURE__*/ uniform( new Matrix4() ).setGroup( rend
 
 	const background = scene.background;
 
-	if ( background !== null && background.isTexture && background.mapping !== UVMapping ) {
+	if ( ( background !== null && background.isTexture && background.mapping !== UVMapping ) || ( scene.backgroundNode && scene.backgroundNode.isNode ) ) {
 
 		// note: since the matrix is orthonormal, we can use the more-efficient transpose() in lieu of invert()
 		_m1.makeRotationFromEuler( scene.backgroundRotation ).transpose();
