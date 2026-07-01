@@ -1,6 +1,7 @@
 import Node from './Node.js';
 import StackTrace from '../core/StackTrace.js';
 import { select } from '../math/ConditionalNode.js';
+import SwitchNode from './SwitchNode.js';
 import { ShaderNode, nodeProxy, getCurrentStack, setCurrentStack, nodeObject } from '../tsl/TSLBase.js';
 import { error } from '../../utils.js';
 
@@ -60,14 +61,14 @@ class StackNode extends Node {
 		this._currentCond = null;
 
 		/**
-		 * The expression node. Only
+		 * The current switch node. Only
 		 * relevant for Switch/Case.
 		 *
 		 * @private
-		 * @type {Node}
+		 * @type {?SwitchNode}
 		 * @default null
 		 */
-		this._expressionNode = null;
+		this._currentSwitch = null;
 
 		/**
 		 * The current node being processed.
@@ -230,17 +231,17 @@ class StackNode extends Node {
 	}
 
 	/**
-	 * Represents a `switch` statement in TSL.
+	 * Represents a `switch` statement in TSL. The case blocks are defined with
+	 * subsequent `Case()` calls and an optional `Default()` call.
 	 *
-	 * @param {any} expression - Represents the expression.
-	 * @param {Function} method - TSL code which is executed if the condition evaluates to `true`.
+	 * @param {any} expression - The integer expression to switch on.
 	 * @return {StackNode} A reference to this stack node.
 	 */
 	Switch( expression ) {
 
-		this._expressionNode = nodeObject( expression );
+		this._currentSwitch = new SwitchNode( nodeObject( expression ) );
 
-		return this;
+		return this.addToStack( this._currentSwitch );
 
 	}
 
@@ -253,69 +254,34 @@ class StackNode extends Node {
 	 */
 	Case( ...params ) {
 
-		const caseNodes = [];
-
-		// extract case nodes from the parameter list
-
-		if ( params.length >= 2 ) {
-
-			for ( let i = 0; i < params.length - 1; i ++ ) {
-
-				caseNodes.push( this._expressionNode.equal( nodeObject( params[ i ] ) ) );
-
-			}
-
-		} else {
+		if ( params.length < 2 ) {
 
 			error( 'TSL: Invalid parameter length. Case() requires at least two parameters.', new StackTrace() );
-
-		}
-
-		// extract method
-
-		const method = params[ params.length - 1 ];
-		const methodNode = new ShaderNode( method );
-
-		// chain multiple cases when using Case( 1, 2, 3, () => {} )
-
-		let caseNode = caseNodes[ 0 ];
-
-		for ( let i = 1; i < caseNodes.length; i ++ ) {
-
-			caseNode = caseNode.or( caseNodes[ i ] );
-
-		}
-
-		// build condition
-
-		const condNode = select( caseNode, methodNode );
-
-		if ( this._currentCond === null ) {
-
-			this._currentCond = condNode;
-
-			return this.addToStack( this._currentCond );
-
-		} else {
-
-			this._currentCond.elseNode = condNode;
-			this._currentCond = condNode;
 
 			return this;
 
 		}
+
+		// the last parameter is the callback method, the preceding ones are the case selectors
+
+		const method = params[ params.length - 1 ];
+		const conditions = params.slice( 0, - 1 ).map( ( value ) => nodeObject( value ) );
+
+		this._currentSwitch.addCase( conditions, new ShaderNode( method ) );
+
+		return this;
 
 	}
 
 	/**
 	 * Represents the default code block of a Switch/Case statement.
 	 *
-	 * @param {Function} method - TSL code which is executed in the `else` case.
+	 * @param {Function} method - TSL code which is executed in the `default` case.
 	 * @return {StackNode} A reference to this stack node.
 	 */
 	Default( method ) {
 
-		this.Else( method );
+		this._currentSwitch.setDefault( new ShaderNode( method ) );
 
 		return this;
 
