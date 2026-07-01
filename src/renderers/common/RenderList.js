@@ -1,6 +1,7 @@
 import { DoubleSide } from '../../constants.js';
 
 const _emptyArray = /*@__PURE__*/ Object.freeze( [] );
+const _classification = { transparent: false, doublePass: false };
 
 /**
  * Default sorting function for opaque render items.
@@ -65,6 +66,23 @@ function reversePainterSortStable( a, b ) {
 }
 
 /**
+ * Returns `true` if the given material classifies as transparent for
+ * render-list purposes.
+ *
+ * @private
+ * @function
+ * @param {Material} material - The material.
+ * @return {boolean} Whether the material classifies as transparent or not.
+ */
+export function isTransparent( material ) {
+
+	return material.transparent === true || material.transmission > 0 ||
+		( material.transmissionNode && material.transmissionNode.isNode ) ||
+		( material.backdropNode && material.backdropNode.isNode ) ? true : false;
+
+}
+
+/**
  * Returns `true` if the given transparent material requires a double pass.
  *
  * @private
@@ -72,7 +90,7 @@ function reversePainterSortStable( a, b ) {
  * @param {Material} material - The transparent material.
  * @return {boolean} Whether the given material requires a double pass or not.
  */
-function needsDoublePass( material ) {
+export function needsDoublePass( material ) {
 
 	const hasTransmission = material.transmission > 0 || ( material.transmissionNode && material.transmissionNode.isNode );
 
@@ -99,8 +117,11 @@ class RenderList {
 	 * @param {Lighting} lighting - The lighting management component.
 	 * @param {Scene} scene - The scene.
 	 * @param {Camera} camera - The camera the scene is rendered with.
+	 * @param {?RenderObjects} [objects=null] - When set (async compilation mode), render
+	 * items classify from the per-material compiled snapshots instead of live material
+	 * state, so list bucket, pass membership and pipeline always agree.
 	 */
-	constructor( lighting, scene, camera ) {
+	constructor( lighting, scene, camera, objects = null ) {
 
 		/**
 		 * 3D objects are transformed into render items and stored in this array.
@@ -203,6 +224,40 @@ class RenderList {
 		 * @default null
 		 */
 		this._lastOcclusionObject = null;
+
+		/**
+		 * The render objects management component, used for compiled
+		 * classification snapshots in async compilation mode.
+		 *
+		 * @type {?RenderObjects}
+		 * @default null
+		 */
+		this.objects = objects;
+
+	}
+
+	/**
+	 * Classifies the given material: from its compiled snapshot in async
+	 * compilation mode (when one exists), otherwise from live state.
+	 *
+	 * @private
+	 * @param {Material} material - The material.
+	 * @return {{transparent:boolean,doublePass:boolean}|Material} The classification source.
+	 */
+	_classify( material ) {
+
+		if ( this.objects !== null ) {
+
+			const classification = this.objects.getClassification( material );
+
+			if ( classification !== null ) return classification;
+
+		}
+
+		_classification.transparent = isTransparent( material );
+		_classification.doublePass = _classification.transparent && needsDoublePass( material );
+
+		return _classification;
 
 	}
 
@@ -309,11 +364,11 @@ class RenderList {
 
 		}
 
-		if ( material.transparent === true || material.transmission > 0 ||
-			( material.transmissionNode && material.transmissionNode.isNode ) ||
-			( material.backdropNode && material.backdropNode.isNode ) ) {
+		const classification = this._classify( material );
 
-			if ( needsDoublePass( material ) ) this.transparentDoublePass.push( renderItem );
+		if ( classification.transparent === true ) {
+
+			if ( classification.doublePass === true ) this.transparentDoublePass.push( renderItem );
 
 			this.transparent.push( renderItem );
 
@@ -341,11 +396,11 @@ class RenderList {
 
 		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext );
 
-		if ( material.transparent === true || material.transmission > 0 ||
-			( material.transmissionNode && material.transmissionNode.isNode ) ||
-			( material.backdropNode && material.backdropNode.isNode ) ) {
+		const classification = this._classify( material );
 
-			if ( needsDoublePass( material ) ) this.transparentDoublePass.unshift( renderItem );
+		if ( classification.transparent === true ) {
+
+			if ( classification.doublePass === true ) this.transparentDoublePass.unshift( renderItem );
 
 			this.transparent.unshift( renderItem );
 

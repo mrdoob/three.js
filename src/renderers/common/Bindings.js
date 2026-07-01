@@ -172,9 +172,13 @@ class Bindings extends DataMap {
 	 */
 	deleteForRender( renderObject ) {
 
-		const bindings = renderObject.getBindings();
+		// only destroy bindings that actually exist — never trigger a
+		// synchronous build for a render object that was disposed before
+		// its background compilation finished
 
-		this._destroyBindings( bindings );
+		const bindings = renderObject._bindings;
+
+		if ( bindings !== null ) this._destroyBindings( bindings );
 
 		this.delete( renderObject );
 

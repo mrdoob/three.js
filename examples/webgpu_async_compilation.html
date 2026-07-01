@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - async compilation</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - async compilation">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_async_compilation.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_async_compilation.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			#panel {
+				position: absolute;
+				bottom: 12px;
+				left: 12px;
+				width: 340px;
+				padding: 10px 12px 9px;
+				color: #cfd8e3;
+				font-family: 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+				font-size: 11px;
+				line-height: 1.5;
+				background: rgba(12, 14, 18, 0.88);
+				border: 1px solid rgba(255, 255, 255, 0.09);
+				border-radius: 8px;
+				pointer-events: none;
+			}
+			#panel .header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 8px;
+			}
+			#panel .badge {
+				padding: 1px 8px;
+				border-radius: 99px;
+				font-weight: 700;
+				font-size: 10px;
+				letter-spacing: 0.4px;
+			}
+			#panel .badge.async {
+				color: #8ef0b6;
+				background: rgba(46, 160, 92, 0.18);
+				border: 1px solid rgba(46, 160, 92, 0.45);
+			}
+			#panel .badge.sync {
+				color: #ffd089;
+				background: rgba(196, 130, 28, 0.16);
+				border: 1px solid rgba(196, 130, 28, 0.45);
+			}
+			#panel #status {
+				color: #8fa3b8;
+				font-size: 10px;
+			}
+			#graph {
+				display: block;
+				width: 316px;
+				height: 84px;
+				margin-bottom: 8px;
+				background: rgba(255, 255, 255, 0.03);
+				border-radius: 4px;
+			}
+			#results {
+				display: grid;
+				grid-template-columns: 1.4fr 1fr 0.9fr 1.1fr;
+				gap: 1px 8px;
+			}
+			#results .h {
+				color: #7d8fa3;
+				font-size: 10px;
+			}
+			#results .s {
+				grid-column: 1 / -1;
+				margin-top: 6px;
+				padding-top: 5px;
+				border-top: 1px solid rgba(255, 255, 255, 0.07);
+				color: #7d8fa3;
+				font-size: 10px;
+			}
+			#results .num {
+				text-align: right;
+				font-variant-numeric: tabular-nums;
+			}
+			#results .good { color: #8ef0b6; }
+			#results .bad { color: #ff7a66; }
+			#results .dim { color: #6b7b8c; }
+			#chips {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 2px 12px;
+				margin-top: 8px;
+				padding-top: 7px;
+				border-top: 1px solid rgba(255, 255, 255, 0.07);
+				color: #8fa3b8;
+				font-size: 10px;
+			}
+			#chips b {
+				color: #cfd8e3;
+				font-weight: 600;
+				font-variant-numeric: tabular-nums;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Async Compilation</span>
+			</div>
+
+			<small>
+				Compare <strong>asyncCompilation: true</strong> against the default synchronous compilation.<br />
+				Use <strong>spawn wave</strong> (streaming new assets) and <strong>rebuild all materials</strong> (shader editing) and watch the frame graph:<br />
+				synchronous compilation freezes the loop (red bars), async compilation keeps every frame on budget —<br />
+				changed objects keep their last material until the replacement is ready, new objects pop in like textures.<br />
+				The center mesh sets <strong>compilePriority</strong>, so on a rebuild its new material lands before the grid's.
+			</small>
+		</div>
+
+		<div id="panel">
+			<div class="header">
+				<span id="modeBadge" class="badge"></span>
+				<span id="status"></span>
+			</div>
+			<canvas id="graph"></canvas>
+			<div id="results"></div>
+			<div id="chips"></div>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { Fn, color, mix, positionLocal, normalWorld, sin, cos, time, float } from 'three/tsl';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			const FRAME_BUDGET = 1000 / 30; // a frame longer than this is a visible hitch
+
+			let camera, scene, renderer, controls, hero;
+
+			const meshes = [];
+			const geometries = [];
+
+			let materialId = 0;
+			let spawnRing = 0;
+
+			const params = {
+				asyncCompilation: new URLSearchParams( window.location.search ).get( 'async' ) !== 'false',
+				churn: false,
+				heroPriority: true
+			};
+
+			// ---------------------------------------------------------------------
+			// measurement
+			// ---------------------------------------------------------------------
+
+			const frameTimes = []; // ring buffer of recent frame intervals
+
+			let lastFrameTime = 0;
+
+			const action = {
+				name: null, // 'spawn wave' | 'rebuild all'
+				start: 0, // performance.now() at the click
+				until: 0, // measurement window end
+				targetDraws: 0, // scene draw calls expected once everything is visible
+				worst: 0, // longest frame interval in the window
+				dropped: 0, // frames over FRAME_BUDGET in the window
+				timeToVisible: - 1 // ms from click until everything drew
+			};
+
+			const lastResults = {}; // last finished measurement per action name
+
+			function beginAction( name, addedObjects ) {
+
+				finishAction();
+
+				action.name = name;
+				action.start = performance.now();
+				action.until = action.start + 4000;
+
+				// every mesh plus the output color transform quad
+
+				action.targetDraws = meshes.length + addedObjects + 1;
+				action.targetReached = false;
+				action.worst = 0;
+				action.dropped = 0;
+				action.timeToVisible = - 1;
+
+			}
+
+			function finishAction() {
+
+				if ( action.name === null ) return;
+
+				lastResults[ action.name ] = {
+					worst: action.worst,
+					dropped: action.dropped,
+					timeToVisible: action.timeToVisible
+				};
+
+				// persist for cross-mode comparison (the option is fixed per renderer,
+				// so the other mode is one reload away)
+
+				try {
+
+					const store = JSON.parse( sessionStorage.getItem( 'asyncCompilationDemo' ) || '{}' );
+					store[ params.asyncCompilation ? 'async' : 'sync' ] = lastResults;
+					sessionStorage.setItem( 'asyncCompilationDemo', JSON.stringify( store ) );
+
+				} catch ( e ) { /* storage unavailable */ }
+
+				action.name = null;
+
+			}
+
+			function measureFrame( now, sceneDraws ) {
+
+				if ( lastFrameTime > 0 ) {
+
+					const delta = now - lastFrameTime;
+
+					frameTimes.push( delta );
+					if ( frameTimes.length > 150 ) frameTimes.shift();
+
+					if ( action.name !== null ) {
+
+						if ( delta > action.worst ) action.worst = delta;
+						if ( delta > FRAME_BUDGET ) action.dropped ++;
+
+						if ( action.timeToVisible < 0 ) {
+
+							if ( action.targetReached === true ) {
+
+								// the frame that issued all draws has been displaced —
+								// everything is actually on screen now (in synchronous
+								// mode draws are issued before the pipeline compile
+								// stall, so counting issuance alone would under-report)
+
+								action.timeToVisible = now - action.start;
+
+							} else if ( sceneDraws >= action.targetDraws ) {
+
+								action.targetReached = true;
+
+							}
+
+						}
+
+						if ( now > action.until ) finishAction();
+
+					}
+
+				}
+
+				lastFrameTime = now;
+
+			}
+
+			// ---------------------------------------------------------------------
+			// workload — every material is a structurally unique TSL graph, so each
+			// one requires a full node build, WGSL generation and a new pipeline
+			// ---------------------------------------------------------------------
+
+			function createUniqueMaterial() {
+
+				const id = materialId ++;
+
+				const material = new THREE.MeshStandardNodeMaterial();
+
+				const baseColor = new THREE.Color().setHSL( ( id * 0.071 ) % 1, 0.6, 0.55 );
+				const altColor = new THREE.Color().setHSL( ( id * 0.13 + 0.4 ) % 1, 0.8, 0.45 );
+
+				material.colorNode = Fn( () => {
+
+					const wave = sin( positionLocal.y.mul( float( 2 + ( id % 7 ) ) ).add( time.mul( ( id % 5 ) + 1 ) ) );
+					let result = mix( color( baseColor ), color( altColor ), wave.mul( 0.5 ).add( 0.5 ) );
+
+					// vary the graph structure itself, not just its values
+
+					for ( let i = 0, l = id % 4; i < l; i ++ ) {
+
+						result = result.add( cos( positionLocal.x.mul( float( 3 + i ) ) ).mul( 0.05 ) );
+
+					}
+
+					if ( id % 3 === 0 ) result = result.mul( normalWorld.y.mul( 0.5 ).add( 0.75 ) );
+
+					return result;
+
+				} )();
+
+				material.roughnessNode = sin( positionLocal.x.mul( float( 4 + ( id % 3 ) ) ) ).mul( 0.25 ).add( float( 0.3 + ( id % 6 ) * 0.1 ) );
+				material.metalness = ( id % 4 ) * 0.25;
+
+				return material;
+
+			}
+
+			function addMesh( position ) {
+
+				const mesh = new THREE.Mesh( geometries[ meshes.length % geometries.length ], createUniqueMaterial() );
+
+				mesh.position.copy( position );
+				scene.add( mesh );
+				meshes.push( mesh );
+
+				return mesh;
+
+			}
+
+			// streaming scenario: a batch of brand-new objects with brand-new
+			// materials enters the scene at once
+
+			function spawnWave() {
+
+				const count = 24;
+
+				beginAction( 'spawn wave', count );
+
+				spawnRing ++;
+
+				const radius = 6 + spawnRing * 1.1;
+
+				for ( let i = 0; i < count; i ++ ) {
+
+					const angle = ( i / count ) * Math.PI * 2 + spawnRing * 0.2;
+
+					addMesh( new THREE.Vector3( Math.cos( angle ) * radius, ( spawnRing % 3 ) * 1.2 - 1, Math.sin( angle ) * radius ) );
+
+				}
+
+			}
+
+			// shader-editor scenario: an edit recompiles every material in the
+			// scene — with async compilation each mesh keeps its previous look
+			// until its replacement is ready
+
+			function rebuildAllMaterials() {
+
+				beginAction( 'rebuild all', 0 );
+
+				for ( const mesh of meshes ) {
+
+					mesh.material.dispose();
+					mesh.material = createUniqueMaterial();
+
+				}
+
+			}
+
+			// ---------------------------------------------------------------------
+
+			init();
+
+			function init() {
+
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU support' );
+
+				}
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 8, 16 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111113 );
+
+				scene.add( new THREE.HemisphereLight( 0xffffff, 0x444466, 2 ) );
+
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 2 );
+				dirLight.position.set( 4, 8, 4 );
+				scene.add( dirLight );
+
+				geometries.push(
+					new THREE.BoxGeometry( 0.8, 0.8, 0.8 ),
+					new THREE.SphereGeometry( 0.5, 32, 16 ),
+					new THREE.TorusKnotGeometry( 0.35, 0.12, 64, 12 ),
+					new THREE.ConeGeometry( 0.5, 0.9, 24 )
+				);
+
+				// initial grid
+
+				const size = 6;
+
+				for ( let x = 0; x < size; x ++ ) {
+
+					for ( let z = 0; z < size; z ++ ) {
+
+						addMesh( new THREE.Vector3( ( x - size / 2 + 0.5 ) * 1.4, 0, ( z - size / 2 + 0.5 ) * 1.4 ) );
+
+					}
+
+				}
+
+				// the hero mesh — `compilePriority` biases the background work so
+				// its replacement compiles ahead of everything else on rebuilds
+
+				hero = new THREE.Mesh( new THREE.TorusKnotGeometry( 0.9, 0.28, 128, 24 ), createUniqueMaterial() );
+				hero.position.set( 0, 2.2, 0 );
+				hero.compilePriority = params.heroPriority ? 1 : 0;
+				scene.add( hero );
+				meshes.push( hero );
+
+				//
+
+				renderer = new THREE.WebGPURenderer( { antialias: true, asyncCompilation: params.asyncCompilation } );
+				renderer.inspector = new Inspector();
+
+				if ( renderer.info.asyncCompilation === undefined ) {
+
+					// an older build silently ignores the asyncCompilation option
+
+					const message = document.createElement( 'div' );
+					message.style.cssText = 'position:absolute;top:50%;width:100%;text-align:center;color:#fff;font-family:monospace;';
+					message.textContent = 'This example requires a three.js build with asyncCompilation support — run "npm run build" and reload.';
+					document.body.appendChild( message );
+
+					throw new Error( 'webgpu_async_compilation: "build/three.webgpu.js" predates the asyncCompilation feature.' );
+
+				}
+
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				document.body.appendChild( renderer.domElement );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 0, 0 );
+
+				//
+
+				const gui = renderer.inspector.createParameters( 'Async Compilation' );
+
+				gui.add( params, 'asyncCompilation' ).name( 'async compilation' ).info( 'The option is fixed for the renderer\'s lifetime — toggling reloads the page.' ).onChange( ( value ) => {
+
+					const url = new URL( window.location.href );
+					url.searchParams.set( 'async', value );
+					window.location.href = url.href;
+
+				} );
+
+				gui.add( { 'spawn wave (24 new objects)': spawnWave }, 'spawn wave (24 new objects)' );
+				gui.add( { 'rebuild all materials': rebuildAllMaterials }, 'rebuild all materials' );
+				gui.add( params, 'churn' ).name( 'continuous editing' );
+				gui.add( params, 'heroPriority' ).name( 'prioritize center mesh' ).onChange( ( value ) => {
+
+					hero.compilePriority = value ? 1 : 0;
+
+				} );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				setInterval( () => {
+
+					if ( params.churn === false ) return;
+
+					const mesh = meshes[ Math.floor( Math.random() * meshes.length ) ];
+
+					mesh.material.dispose();
+					mesh.material = createUniqueMaterial();
+
+				}, 150 );
+
+				// hook for automated benchmarks
+
+				window.__demo = {
+					spawnWave,
+					rebuildAllMaterials,
+					results: () => ( { mode: params.asyncCompilation ? 'async' : 'sync', running: action.name, results: lastResults } ),
+					drawCalls: () => renderer.info.render.drawCalls,
+					meshCount: () => meshes.length
+				};
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			// ---------------------------------------------------------------------
+			// display
+			// ---------------------------------------------------------------------
+
+			const GRAPH_WIDTH = 316, GRAPH_HEIGHT = 84, GRAPH_SCALE = 100; // ms full scale
+
+			const graphCanvas = document.getElementById( 'graph' );
+			const graphContext = graphCanvas.getContext( '2d' );
+
+			const graphDPR = Math.min( window.devicePixelRatio || 1, 2 );
+
+			graphCanvas.width = GRAPH_WIDTH * graphDPR;
+			graphCanvas.height = GRAPH_HEIGHT * graphDPR;
+			graphContext.scale( graphDPR, graphDPR );
+
+			const panel = buildPanel();
+
+			function buildPanel() {
+
+				const mode = params.asyncCompilation;
+
+				const badge = document.getElementById( 'modeBadge' );
+				badge.textContent = mode ? 'asyncCompilation: true' : 'synchronous (default)';
+				badge.classList.add( mode ? 'async' : 'sync' );
+
+				// results of the other mode, written by a previous reload
+
+				let other = {};
+
+				try {
+
+					other = JSON.parse( sessionStorage.getItem( 'asyncCompilationDemo' ) || '{}' )[ mode ? 'sync' : 'async' ] || {};
+
+				} catch ( e ) { /* storage unavailable */ }
+
+				const results = document.getElementById( 'results' );
+				const cells = {};
+
+				const append = ( className, textContent ) => {
+
+					const cell = document.createElement( 'span' );
+					cell.className = className;
+					cell.textContent = textContent;
+					results.appendChild( cell );
+
+					return cell;
+
+				};
+
+				append( 'h', '' );
+				append( 'h num', 'worst' );
+				append( 'h num', 'dropped' );
+				append( 'h num', 'visible' );
+
+				const addSection = ( title, key ) => {
+
+					append( 's', title );
+
+					for ( const name of [ 'spawn wave', 'rebuild all' ] ) {
+
+						append( key === 'other' ? 'dim' : '', name );
+
+						cells[ key + name ] = [ append( 'num', '—' ), append( 'num', '—' ), append( 'num', '—' ) ];
+
+					}
+
+				};
+
+				addSection( 'this run', 'this' );
+				addSection( ( mode ? 'sync' : 'async' ) + ' — previous reload', 'other' );
+
+				const chips = document.getElementById( 'chips' );
+				const chip = ( label ) => {
+
+					const item = document.createElement( 'span' );
+					const value = document.createElement( 'b' );
+
+					item.append( label + ' ', value );
+					chips.appendChild( item );
+
+					return value;
+
+				};
+
+				return {
+					status: document.getElementById( 'status' ),
+					cells,
+					other,
+					queued: chip( 'queued' ),
+					pipelines: chip( 'pipelines' ),
+					promotions: chip( 'promotions' ),
+					failed: chip( 'failed' ),
+					objects: chip( 'objects' ),
+					materials: chip( 'materials' )
+				};
+
+			}
+
+			function setResultCells( cells, entry, dim ) {
+
+				if ( entry === undefined ) return;
+
+				const [ worst, dropped, visible ] = cells;
+
+				worst.textContent = entry.worst.toFixed( 0 ) + ' ms';
+				worst.className = 'num ' + ( dim ? 'dim' : ( entry.worst <= FRAME_BUDGET ? 'good' : 'bad' ) );
+
+				dropped.textContent = entry.dropped;
+				dropped.className = 'num ' + ( dim ? 'dim' : ( entry.dropped === 0 ? 'good' : 'bad' ) );
+
+				visible.textContent = entry.timeToVisible >= 0 ? entry.timeToVisible.toFixed( 0 ) + ' ms' : '—';
+				visible.className = 'num' + ( dim ? ' dim' : '' );
+
+			}
+
+			function drawGraph() {
+
+				const w = GRAPH_WIDTH, h = GRAPH_HEIGHT, scale = h / GRAPH_SCALE;
+
+				graphContext.clearRect( 0, 0, w, h );
+
+				// budget lines: 16.7 ms (60 fps) and 33.3 ms (30 fps)
+
+				graphContext.fillStyle = 'rgba( 99, 199, 133, 0.35 )';
+				graphContext.fillRect( 0, h - 16.7 * scale, w, 1 );
+				graphContext.fillStyle = 'rgba( 224, 162, 63, 0.35 )';
+				graphContext.fillRect( 0, h - 33.3 * scale, w, 1 );
+
+				for ( let i = 0; i < frameTimes.length; i ++ ) {
+
+					const ms = frameTimes[ i ];
+					const barHeight = Math.max( Math.min( ms, GRAPH_SCALE ) * scale, 1 );
+
+					graphContext.fillStyle = ms <= 16.8 ? '#3fae6a' : ( ms <= FRAME_BUDGET ? '#e0a23f' : '#e04f3f' );
+					graphContext.fillRect( i * 2 + ( w - frameTimes.length * 2 ), h - barHeight, 1.5, barHeight );
+
+				}
+
+				graphContext.fillStyle = '#7d8fa3';
+				graphContext.font = '9px monospace';
+				graphContext.fillText( 'frame time · 100 ms scale', 6, 11 );
+				graphContext.fillText( '16.7', w - 24, h - 16.7 * scale - 3 );
+				graphContext.fillText( '33.3', w - 24, h - 33.3 * scale - 3 );
+
+			}
+
+			function updatePanel() {
+
+				const ac = renderer.info.asyncCompilation;
+
+				panel.status.textContent = action.name !== null ? `measuring ${ action.name }…` : '';
+
+				setResultCells( panel.cells[ 'thisspawn wave' ], lastResults[ 'spawn wave' ], false );
+				setResultCells( panel.cells[ 'thisrebuild all' ], lastResults[ 'rebuild all' ], false );
+				setResultCells( panel.cells[ 'otherspawn wave' ], panel.other[ 'spawn wave' ], true );
+				setResultCells( panel.cells[ 'otherrebuild all' ], panel.other[ 'rebuild all' ], true );
+
+				panel.queued.textContent = ac.queued;
+				panel.pipelines.textContent = ac.pipelines;
+				panel.promotions.textContent = ac.promotions;
+				panel.failed.textContent = ac.failed;
+				panel.objects.textContent = meshes.length;
+				panel.materials.textContent = materialId;
+
+			}
+
+			function animate() {
+
+				controls.update();
+
+				const t = performance.now() * 0.0005;
+
+				for ( let i = 0; i < meshes.length; i ++ ) {
+
+					meshes[ i ].rotation.y = t + i * 0.1;
+
+				}
+
+				renderer.render( scene, camera );
+
+				renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
+
+				measureFrame( performance.now(), renderer.info.render.drawCalls );
+
+				drawGraph();
+				updatePanel();
+
+			}
+
+		</script>
+	</body>
+</html>
