@@ -57,7 +57,12 @@ class TextureSizeNode extends Node {
 		const textureProperty = this.textureNode.build( builder, 'property' );
 		const level = this.levelNode === null ? '0' : this.levelNode.build( builder, 'int' );
 
-		return builder.format( `${ builder.getMethod( 'textureDimensions' ) }( ${ textureProperty }, ${ level } )`, this.getNodeType( builder ), output );
+		const sampleData = builder.renderer.backend.utils.getTextureSampleData?.( this.textureNode.value );
+		const isMultisampled = sampleData?.primarySamples > 1;
+
+		const params = isMultisampled ? textureProperty : `${ textureProperty }, ${ level }`;
+
+		return builder.format( `${ builder.getMethod( 'textureDimensions' ) }( ${ params } )`, this.getNodeType( builder ), output );
 
 	}
 
