@@ -34,7 +34,6 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
-			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
 			import { LightProbeGridHelper } from 'three/addons/helpers/LightProbeGridHelper.js';
 
 			let camera, scene, renderer, controls;
@@ -306,13 +305,13 @@
 					// boundary so the two rooms blend smoothly without bleeding into
 					// each other.
 
-					probesLeft = new LightProbeGrid( 7.8, 4.7, 7.6, resolution, resolution, resolution );
+					probesLeft = new THREE.LightProbeGrid( 7.8, 4.7, 7.6, resolution, resolution, resolution );
 					probesLeft.position.set( - 3.9, 2.45, 0 );
 					probesLeft.falloff = 1.0;
 					await probesLeft.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
 					probesLeft.visible = params.enabled;
 
-					probesRight = new LightProbeGrid( 7.8, 4.7, 7.6, resolution, resolution, resolution );
+					probesRight = new THREE.LightProbeGrid( 7.8, 4.7, 7.6, resolution, resolution, resolution );
 					probesRight.position.set( 3.9, 2.45, 0 );
 					probesRight.falloff = 1.0;
 					await probesRight.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );

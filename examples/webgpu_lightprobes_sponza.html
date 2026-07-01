@@ -38,7 +38,6 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
-			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
 			import { LightProbeGridHelper } from 'three/addons/helpers/LightProbeGridHelper.js';
 
 			const MODEL_INDEX_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/model-index.json';
@@ -236,7 +235,7 @@
 
 						}
 
-						probes = new LightProbeGrid(
+						probes = new THREE.LightProbeGrid(
 							params.sizeX, params.sizeY, params.sizeZ,
 							params.countX, params.countY, params.countZ
 						);

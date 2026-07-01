@@ -1,5 +1,12 @@
-import { AnalyticLightNode, Vector3 } from 'three/webgpu';
-import { array, getShIrradianceAt, normalWorld, positionWorld, texture3D, uniform, vec3 } from 'three/tsl';
+import AnalyticLightNode from './AnalyticLightNode.js';
+import { Vector3 } from '../../math/Vector3.js';
+import { array } from '../core/ArrayNode.js';
+import { uniform } from '../core/UniformNode.js';
+import { texture3D } from '../accessors/Texture3DNode.js';
+import { positionWorld } from '../accessors/Position.js';
+import { normalWorld } from '../accessors/Normal.js';
+import { vec3 } from '../tsl/TSLBase.js';
+import getShIrradianceAt from '../functions/material/getShIrradianceAt.js';
 
 // Padding texels at each boundary of every atlas sub-volume.
 export const ATLAS_PADDING = 1;
@@ -56,7 +63,6 @@ function evaluateGridIrradiance( atlas, uvw, res, normal ) {
  * picks up the grid automatically (same role as the WebGL `lights_fragment_begin`
  * integration).
  *
- * @private
  * @augments AnalyticLightNode
  */
 class LightProbeGridNode extends AnalyticLightNode {
@@ -133,4 +139,4 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 }
 
-export { LightProbeGridNode };
+export default LightProbeGridNode;
