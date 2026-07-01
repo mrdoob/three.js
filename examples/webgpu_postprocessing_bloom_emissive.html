@@ -158,7 +158,6 @@
 				bloomFolder.add( params, 'type', [ 'Gaussian', 'Dual Kawase' ] ).onChange( updateBloom );
 				bloomFolder.add( strength, 'value', 0.0, 5.0 ).name( 'strength' );
 				bloomFolder.add( radius, 'value', 0.0, 1.0 ).name( 'radius' );
-				bloomFolder.add( bloomPasses[ 'Gaussian' ], 'linearSampling' ).name( 'linear sampling (Gaussian)' );
 
 				const toneMappingFolder = gui.addFolder( 'Tone Mapping' );
 				toneMappingFolder.add( renderer, 'toneMappingExposure', 0.1, 2 ).name( 'exposure' );
