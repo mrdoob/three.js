@@ -45,7 +45,7 @@
 			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
-			import { ao } from 'three/addons/tsl/display/GTAONode.js';
+			import { ssao } from 'three/addons/tsl/display/SSAONode.js';
 			import { CityGenerator, createBuildingMaterial, createRoadMaterial } from 'three/addons/generators/CityGenerator.js';
 
 			let camera, scene, renderer, controls, timer;
@@ -134,7 +134,7 @@
 				materials = { building: createBuildingMaterial( city.layout, parameters.seed ) };
 				generateCity();
 
-				// ground-truth ambient occlusion for the facade's contact shadows. a cheap
+				// screen-space ambient occlusion for the facade's contact shadows. a cheap
 				// pre-pass lays down view normals and depth, so the AO is ready before the
 				// lit scene pass and feeds in through its lighting context: the occlusion
 				// then darkens only the sky/IBL fill in the crevices, never the direct sun
@@ -149,11 +149,11 @@
 				const prePassNormal = sample( ( uv ) => unpackRGBToNormal( prePass.getTextureNode().sample( uv ) ) );
 				const prePassDepth = prePass.getTextureNode( 'depth' );
 
-				const aoPass = ao( prePassDepth, prePassNormal, camera );
+				const aoPass = ssao( prePassDepth, prePassNormal, camera );
 				aoPass.resolutionScale = 0.5; // half-res is plenty for soft contact shading
-				aoPass.radius.value = 4;
-				aoPass.thickness.value = 4;
-				aoPass.scale.value = 2;
+				aoPass.radius.value = 1.5;
+				aoPass.intensity.value = 4;
+				aoPass.blurEnabled = false;
 
 				const scenePass = pass( scene, camera );
 				scenePass.contextNode = builtinAOContext( aoPass.getTextureNode().sample( screenUV ).r );
