@@ -662,6 +662,16 @@ class Renderer {
 		this._compilationPromises = null;
 
 		/**
+		 * Whether the renderer is currently precompiling a render object in
+		 * `compileAsync()`.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._isPreCompiling = false;
+
+		/**
 		 * When an override material is in use, this property points to the current
 		 * source material during the rendering of a render object.
 		 *
@@ -1048,10 +1058,12 @@ class Renderer {
 			// Use async node building to yield to main thread
 			await this._nodes.getForRenderAsync( renderObject );
 
+			this._isPreCompiling = true; // note: no awaits are allowed when this flag is true otherwise the state leaks outside of this method
 			this._nodes.updateBefore( renderObject );
 			this._geometries.updateForRender( renderObject );
 			this._nodes.updateForRender( renderObject );
 			this._bindings.updateForRender( renderObject );
+			this._isPreCompiling = false;
 
 			// Wait for pipeline creation
 			const pipelinePromises = [];
@@ -1062,7 +1074,9 @@ class Renderer {
 
 			}
 
+			this._isPreCompiling = true;
 			this._nodes.updateAfter( renderObject );
+			this._isPreCompiling = false;
 
 			// Yield between objects to allow animation frames
 			await yieldToMain();
