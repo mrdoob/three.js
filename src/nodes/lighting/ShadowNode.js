@@ -850,7 +850,7 @@ class ShadowNode extends ShadowBaseNode {
 	 */
 	updateBefore( frame ) {
 
-		// like WebGLRenderer.compile(), compileAsync() does not render shadow maps
+		// do not render shadow maps during precompilation
 
 		if ( frame.renderer._isPreCompiling === true ) return;
 
