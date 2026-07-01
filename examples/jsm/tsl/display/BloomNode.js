@@ -1,5 +1,5 @@
 import { HalfFloatType, RenderTarget, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, NodeUpdateType } from 'three/webgpu';
-import { nodeObject, Fn, float, uv, passTexture, uniform, Loop, texture, luminance, smoothstep, mix, vec4, uniformArray, add, int } from 'three/tsl';
+import { nodeObject, Fn, float, uv, passTexture, uniform, Loop, texture, luminance, smoothstep, mix, vec4, uniformArray, add, int, array } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -105,6 +105,15 @@ class BloomNode extends TempNode {
 		 * @type {UniformNode<float>}
 		 */
 		this.smoothWidth = uniform( 0.01 );
+
+		/**
+		 * A per-mip tint color for the bloom, applied during the composite pass.
+		 * Defaults to white (no tint) for each of the mips. Mutate the vectors to
+		 * colorize the bloom (e.g. for a warm or anamorphic look).
+		 *
+		 * @type {Array<Vector3>}
+		 */
+		this.bloomTintColors = [ new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ) ];
 
 		/**
 		 * Scale factor for the internal render targets.
@@ -420,8 +429,8 @@ class BloomNode extends TempNode {
 
 		// composite material
 
-		const bloomFactors = uniformArray( [ 1.0, 0.8, 0.6, 0.4, 0.2 ] );
-		const bloomTintColors = uniformArray( [ new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ) ] );
+		const bloomFactors = array( [ float( 1.0 ), float( 0.8 ), float( 0.6 ), float( 0.4 ), float( 0.2 ) ] );
+		const bloomTintColors = uniformArray( this.bloomTintColors );
 
 		const lerpBloomFactor = Fn( ( [ factor, radius ] ) => {
 
@@ -533,8 +542,8 @@ class BloomNode extends TempNode {
 		//
 
 		const colorTexture = texture( null );
-		const gaussianOffsets = uniformArray( offsets );
-		const gaussianWeights = uniformArray( weights );
+		const gaussianOffsets = array( offsets.map( ( value ) => float( value ) ) );
+		const gaussianWeights = array( weights.map( ( value ) => float( value ) ) );
 		const invSize = uniform( new Vector2() );
 		const direction = uniform( new Vector2( 0.5, 0.5 ) );
 
