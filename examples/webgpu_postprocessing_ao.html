@@ -531,8 +531,9 @@
 				gui.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
 
 				const gtaoControls = [
-					gui.add( params, 'scale', 0.01, 1 ).onChange( updateParameters ),
-					gui.add( params, 'thickness', 0.01, 2 ).onChange( updateParameters ),
+					gui.add( params, 'scale', 0.01, 1 ).onChange( updateParameters );
+					gui.add( params, 'thickness', 0.01, 2 ).onChange( updateParameters );
+					gui.add( aoPass, 'resolutionScale', 0, 1 ).name( 'resolution scale' );
 					gui.add( params, 'temporalFiltering' ).name( 'temporal filtering' ).onChange( updateParameters )
 				];
 
