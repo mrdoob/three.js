@@ -118,14 +118,6 @@ class GTAONode extends TempNode {
 		this.radius = uniform( 0.25 );
 
 		/**
-		 * The resolution of the effect. Can be scaled via
-		 * `resolutionScale`.
-		 *
-		 * @type {UniformNode<vec2>}
-		 */
-		this.resolution = uniform( new Vector2() );
-
-		/**
 		 * The thickness of the ambient occlusion.
 		 *
 		 * @type {UniformNode<float>}
@@ -177,6 +169,14 @@ class GTAONode extends TempNode {
 		 * @default false
 		 */
 		this.useTemporalFiltering = false;
+
+		/**
+		 * The resolution of the effect. Can be scaled via `resolutionScale`.
+		 *
+		 * @private
+		 * @type {UniformNode<vec2>}
+		 */
+		this._resolution = uniform( new Vector2() );
 
 		/**
 		 * The node represents the internal noise texture used by the AO.
@@ -234,6 +234,13 @@ class GTAONode extends TempNode {
 		 */
 		this._temporalOffset = uniform( 0 );
 
+		/**
+		 * Resolution scale uniform.
+		 *
+		 * @private
+		 * @type {UniformNode<float>}
+		 */
+		this._resolutionScale = uniform( 0 );
 
 		/**
 		 * The material that is used to render the effect.
@@ -276,7 +283,8 @@ class GTAONode extends TempNode {
 		width = Math.round( this.resolutionScale * width );
 		height = Math.round( this.resolutionScale * height );
 
-		this.resolution.value.set( width, height );
+		this._resolutionScale.value = this.resolutionScale;
+		this._resolution.value.set( width, height );
 		this._aoRenderTarget.setSize( width, height );
 
 	}
@@ -373,7 +381,7 @@ class GTAONode extends TempNode {
 
 		const ao = Fn( () => {
 
-			const depth = sampleCenterDepth( uvNode ).toVar();
+			const depth = this._resolutionScale.lessThan( 1 ).select( sampleCenterDepth( uvNode ), sampleDepth( uvNode ) ).toConst();
 
 			depth.greaterThanEqual( 1.0 ).discard();
 
@@ -386,7 +394,7 @@ class GTAONode extends TempNode {
 
 			const noiseResolution = textureSize( this._noiseNode, 0 );
 			let noiseUv = vec2( uvNode.x, uvNode.y.oneMinus() );
-			noiseUv = noiseUv.mul( this.resolution.div( noiseResolution ) );
+			noiseUv = noiseUv.mul( this._resolution.div( noiseResolution ) );
 
 			const noiseTexel = sampleNoise( noiseUv );
 			const randomVec = noiseTexel.xyz.mul( 2.0 ).sub( 1.0 );
