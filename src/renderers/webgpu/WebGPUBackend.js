@@ -1767,14 +1767,15 @@ class WebGPUBackend extends Backend {
 
 		if ( hasIndex === true ) {
 
-			if ( currentSets.index !== index ) {
+			const buffer = this.get( index ).buffer;
 
-				const buffer = this.get( index ).buffer;
+			if ( currentSets.index !== buffer ) {
+
 				const indexFormat = ( index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
 
 				passEncoderGPU.setIndexBuffer( buffer, indexFormat );
 
-				currentSets.index = index;
+				currentSets.index = buffer;
 
 			}
 
@@ -1784,12 +1785,13 @@ class WebGPUBackend extends Backend {
 
 			const vertexBuffer = vertexBuffers[ i ];
 
-			if ( currentSets.attributes[ i ] !== vertexBuffer ) {
+			const buffer = this.get( vertexBuffer ).buffer;
 
-				const buffer = this.get( vertexBuffer ).buffer;
+			if ( currentSets.attributes[ i ] !== buffer ) {
+
 				passEncoderGPU.setVertexBuffer( i, buffer );
 
-				currentSets.attributes[ i ] = vertexBuffer;
+				currentSets.attributes[ i ] = buffer;
 
 			}
 

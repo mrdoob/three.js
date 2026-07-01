@@ -361,11 +361,16 @@ class WebGPUAttributeUtils {
 	destroyAttribute( attribute ) {
 
 		const backend = this.backend;
-		const data = backend.get( this._getBufferAttribute( attribute ) );
+		const bufferAttribute = this._getBufferAttribute( attribute );
+		const data = backend.get( bufferAttribute );
 
-		data.buffer.destroy();
+		if ( data.buffer !== undefined ) {
 
-		backend.delete( attribute );
+			data.buffer.destroy();
+
+		}
+
+		backend.delete( bufferAttribute );
 
 	}
 

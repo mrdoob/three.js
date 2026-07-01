@@ -219,6 +219,13 @@ class Bindings extends DataMap {
 
 						this.attributes.update( attribute, attributeType );
 
+						const bindingData = this.backend.get( binding );
+
+						bindingData.attribute = attribute;
+						bindingData.generation = this.attributes.getGeneration( attribute );
+
+						this.attributes.addBindGroup( attribute, bindGroup );
+
 					}
 
 				}
@@ -339,10 +346,18 @@ class Bindings extends DataMap {
 				const bindingData = backend.get( binding );
 
 				this.attributes.update( attribute, attributeType );
+				this.attributes.addBindGroup( attribute, bindGroup );
 
-				if ( bindingData.attribute !== attribute ) {
+				const generation = this.attributes.getGeneration( attribute );
+
+				if ( bindingData.attribute !== attribute || bindingData.generation !== generation ) {
 
 					bindingData.attribute = attribute;
+					bindingData.generation = generation;
+					const bindGroupData = backend.get( bindGroup );
+
+					bindGroupData.groups = undefined;
+					bindGroupData.versions = undefined;
 
 					needsBindingsUpdate = true;
 
