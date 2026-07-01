@@ -59505,7 +59505,8 @@ class ShapePath {
 			for ( let j = i - 1; j >= 0; j -- ) {
 
 				const candidate = entries[ j ];
-				if ( ! candidate.boundingBox.containsPoint( entry.interiorPoint ) ) continue;
+
+				if ( ! candidate.boundingBox.containsBox( entry.boundingBox ) ) continue;
 				if ( ! pointInPolygon( entry.interiorPoint, candidate.points ) ) continue;
 
 				entry.container = candidate.exclude ? candidate.container : candidate;
