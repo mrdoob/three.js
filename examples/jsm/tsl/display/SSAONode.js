@@ -1,5 +1,5 @@
 import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
-import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, getScreenPositionFromClip, vogelDiskSample, interleavedGradientNoise, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec4, int, dot, max, clamp, abs, length, screenCoordinate, PI2, texture, passTexture } from 'three/tsl';
+import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, getScreenPositionFromClip, vogelDiskSample, interleavedGradientNoise, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec4, int, dot, max, clamp, length, screenCoordinate, PI2, texture, passTexture } from 'three/tsl';
 import { depthAwareBlur } from './depthAwareBlur.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -16,11 +16,12 @@ let _rendererState;
  * temporal accumulation.
  * ```js
  * const scenePass = pass( scene, camera );
+ * scenePass.setMRT( mrt( { output, normal: normalView } ) );
  * const scenePassColor = scenePass.getTextureNode( 'output' );
  * const scenePassDepth = scenePass.getTextureNode( 'depth' );
+ * const scenePassNormal = scenePass.getTextureNode( 'normal' );
  *
- * // reconstruct normals from depth, so no normal pre-pass is required
- * const aoPass = ssao( scenePassDepth, null, camera );
+ * const aoPass = ssao( scenePassDepth, scenePassNormal, camera );
  *
  * renderPipeline.outputNode = scenePassColor.mul( aoPass.r );
  * ```
@@ -40,7 +41,7 @@ class SSAONode extends TempNode {
 	 * Constructs a new SSAO node.
 	 *
 	 * @param {Node<float>} depthNode - A node that represents the scene's depth.
-	 * @param {?Node<vec3>} normalNode - A node that represents the scene's normals. If `null`, normals are reconstructed from depth.
+	 * @param {Node<vec3>} normalNode - A node that represents the scene's normals.
 	 * @param {Camera} camera - The camera the scene is rendered with.
 	 */
 	constructor( depthNode, normalNode, camera ) {
@@ -55,10 +56,9 @@ class SSAONode extends TempNode {
 		this.depthNode = depthNode;
 
 		/**
-		 * A node that represents the scene's normals. If no normals are passed to the
-		 * constructor, normals are reconstructed from depth values in the shader.
+		 * A node that represents the scene's normals.
 		 *
-		 * @type {?Node<vec3>}
+		 * @type {Node<vec3>}
 		 */
 		this.normalNode = normalNode;
 
@@ -128,9 +128,9 @@ class SSAONode extends TempNode {
 		/**
 		 * The resolution of the effect. Set from the drawing buffer size and `resolutionScale`.
 		 *
-		 * @type {UniformNode<vec2>}
+		 * @type {Vector2}
 		 */
-		this.resolution = uniform( new Vector2() );
+		this.resolution = new Vector2();
 
 		/**
 		 * The render target the raw ambient occlusion is rendered into. Also holds the
@@ -258,7 +258,7 @@ class SSAONode extends TempNode {
 		width = Math.max( 1, Math.round( this.resolutionScale * width ) );
 		height = Math.max( 1, Math.round( this.resolutionScale * height ) );
 
-		this.resolution.value.set( width, height );
+		this.resolution.set( width, height );
 		this._aoRenderTarget.setSize( width, height );
 		this._blurRenderTarget.setSize( width, height );
 
@@ -295,12 +295,12 @@ class SSAONode extends TempNode {
 			_quadMesh.name = 'SSAO.Blur';
 
 			this._blurInput.value = this._aoRenderTarget.texture;
-			this._blurDirection.value.set( 1 / this.resolution.value.x, 0 );
+			this._blurDirection.value.set( 1 / this.resolution.x, 0 );
 			renderer.setRenderTarget( this._blurRenderTarget );
 			_quadMesh.render( renderer );
 
 			this._blurInput.value = this._blurRenderTarget.texture;
-			this._blurDirection.value.set( 0, 1 / this.resolution.value.y );
+			this._blurDirection.value.set( 0, 1 / this.resolution.y );
 			renderer.setRenderTarget( this._aoRenderTarget );
 			_quadMesh.render( renderer );
 
@@ -336,33 +336,6 @@ class SSAONode extends TempNode {
 
 		};
 
-		// normals reconstructed from depth. per axis the neighbour with the smaller depth
-		// step is used, so silhouettes don't smear the normal across an edge
-
-		const reconstructNormal = ( uvNode, center ) => {
-
-			const texel = vec2( float( 1 ).div( this.resolution.x ), float( 1 ).div( this.resolution.y ) );
-
-			const positionAt = ( uvNode ) => getViewPosition( uvNode, sampleDepth( uvNode ), this._cameraProjectionMatrixInverse );
-
-			const right = positionAt( uvNode.add( vec2( texel.x, 0 ) ) ).sub( center ).toVar();
-			const left = center.sub( positionAt( uvNode.sub( vec2( texel.x, 0 ) ) ) ).toVar();
-			const up = positionAt( uvNode.add( vec2( 0, texel.y ) ) ).sub( center ).toVar();
-			const down = center.sub( positionAt( uvNode.sub( vec2( 0, texel.y ) ) ) ).toVar();
-
-			const ddx = abs( right.z ).lessThan( abs( left.z ) ).select( right, left );
-			const ddy = abs( up.z ).lessThan( abs( down.z ) ).select( up, down );
-
-			const normal = ddx.cross( ddy ).normalize().toVar();
-
-			// visible surfaces face the camera ( view-space +z ), which pins the winding
-
-			return normal.z.lessThan( 0 ).select( normal.negate(), normal );
-
-		};
-
-		const sampleNormal = ( uv, center ) => ( this.normalNode !== null ) ? this.normalNode.sample( uv ).rgb.normalize() : reconstructNormal( uv, center );
-
 		// ambient occlusion
 
 		const ao = Fn( () => {
@@ -372,7 +345,7 @@ class SSAONode extends TempNode {
 			depth.greaterThanEqual( 1.0 ).discard();
 
 			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toVar();
-			const viewNormal = sampleNormal( uvNode, viewPosition ).toVar();
+			const viewNormal = this.normalNode.sample( uvNode ).rgb.normalize().toVar();
 
 			// a low-discrepancy Vogel disk rotated per-pixel decorrelates the samples spatially,
 			// so a small blur is enough to hide the sampling pattern
@@ -448,8 +421,8 @@ export default SSAONode;
  * @tsl
  * @function
  * @param {Node<float>} depthNode - A node that represents the scene's depth.
- * @param {?Node<vec3>} normalNode - A node that represents the scene's normals. If `null`, normals are reconstructed from depth.
+ * @param {Node<vec3>} normalNode - A node that represents the scene's normals.
  * @param {Camera} camera - The camera the scene is rendered with.
  * @returns {SSAONode}
  */
-export const ssao = ( depthNode, normalNode, camera ) => new SSAONode( nodeObject( depthNode ), normalNode ? nodeObject( normalNode ) : null, camera );
+export const ssao = ( depthNode, normalNode, camera ) => new SSAONode( nodeObject( depthNode ), nodeObject( normalNode ), camera );
