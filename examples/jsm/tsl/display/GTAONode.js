@@ -341,14 +341,7 @@ class GTAONode extends TempNode {
 
 		const uvNode = uv();
 
-		// Bilinear depth sampling blends values across silhouette edges, producing
-		// phantom mid-depth values that corrupt the horizon search and cause visible
-		// banding at low AO radius. textureGather returns the same 2×2 footprint
-		// unblended, so we can take the min (nearest surface wins).
-		const sampleDepth = ( uv ) => {
-
-			const g = this.depthNode.gather().sample( uv );
-			const depth = min( min( g.x, g.y ), min( g.z, g.w ) );
+		const linearizeDepth = ( depth ) => {
 
 			if ( builder.renderer.logarithmicDepthBuffer === true ) {
 
@@ -362,12 +355,25 @@ class GTAONode extends TempNode {
 
 		};
 
+		const sampleDepth = ( uv ) => linearizeDepth( this.depthNode.sample( uv ).r );
+
+		const sampleCenterDepth = ( uv ) => {
+
+			// Sidestep the nearest-rounding during depth access for the unjittered center pixel to avoid banding
+
+			const g = this.depthNode.gather().sample( uv );
+			const depth = min( min( g.x, g.y ), min( g.z, g.w ) );
+
+			return linearizeDepth( depth );
+
+		};
+
 		const sampleNoise = ( uv ) => this._noiseNode.sample( uv );
 		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.sample( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
 
 		const ao = Fn( () => {
 
-			const depth = sampleDepth( uvNode ).toVar();
+			const depth = sampleCenterDepth( uvNode ).toVar();
 
 			depth.greaterThanEqual( 1.0 ).discard();
 
