@@ -1786,6 +1786,16 @@ class GLTFMeshGpuInstancing {
 				}
 
 				// Add instance attributes to the geometry, excluding TRS.
+				//
+				// Custom instance attributes (e.g. _BATCHID, _FEATURE_ID_0) hold
+				// per-instance data. The source geometry is cached and may be shared
+				// by several nodes, so writing these attributes onto it would let each
+				// node overwrite the previous node's data. When such attributes exist,
+				// give this InstancedMesh a shallow geometry copy that shares the
+				// vertex/index buffers but owns its own instance attributes, stored as
+				// InstancedBufferAttribute (matching how _COLOR_0 is handled).
+				let instanceGeometry = null;
+
 				for ( const attributeName in attributes ) {
 
 					if ( attributeName === '_COLOR_0' ) {
@@ -1797,7 +1807,30 @@ class GLTFMeshGpuInstancing {
 						 attributeName !== 'ROTATION' &&
 						 attributeName !== 'SCALE' ) {
 
-						mesh.geometry.setAttribute( attributeName, attributes[ attributeName ] );
+						if ( instanceGeometry === null ) {
+
+							const source = instancedMesh.geometry;
+							instanceGeometry = new BufferGeometry();
+							instanceGeometry.name = source.name;
+
+							// Share the underlying vertex/index buffers by reference.
+							for ( const name in source.attributes ) instanceGeometry.setAttribute( name, source.attributes[ name ] );
+							for ( const name in source.morphAttributes ) instanceGeometry.morphAttributes[ name ] = source.morphAttributes[ name ];
+							if ( source.index !== null ) instanceGeometry.setIndex( source.index );
+
+							instanceGeometry.morphTargetsRelative = source.morphTargetsRelative;
+							instanceGeometry.groups = source.groups;
+							instanceGeometry.boundingBox = source.boundingBox;
+							instanceGeometry.boundingSphere = source.boundingSphere;
+							instanceGeometry.drawRange = source.drawRange;
+							instanceGeometry.userData = source.userData;
+
+							instancedMesh.geometry = instanceGeometry;
+
+						}
+
+						const attr = attributes[ attributeName ];
+						instanceGeometry.setAttribute( attributeName, new InstancedBufferAttribute( attr.array, attr.itemSize, attr.normalized ) );
 
 					}
 
