@@ -65,6 +65,7 @@
 				temporalFiltering: true, // GTAO
 				intensity: 2, // SSAO
 				bias: 0.025, // SSAO
+				blurEnabled: true, // SSAO
 				blurSharpness: 2, // SSAO
 				aoOnly: false,
 				transparentOpacity: 0.3
@@ -540,6 +541,7 @@
 				const ssaoControls = [
 					gui.add( params, 'intensity', 0, 4 ).onChange( updateParameters ),
 					gui.add( params, 'bias', 0, 0.2 ).onChange( updateParameters ),
+					gui.add( params, 'blurEnabled' ).name( 'blur' ).onChange( updateParameters ),
 					gui.add( params, 'blurSharpness', 0, 8 ).name( 'blur sharpness' ).onChange( updateParameters )
 				];
 
@@ -582,6 +584,7 @@
 
 					aoPass.intensity.value = params.intensity;
 					aoPass.bias.value = params.bias;
+					aoPass.blurEnabled = params.blurEnabled;
 					aoPass.blurSharpness.value = params.blurSharpness;
 
 				} else {
