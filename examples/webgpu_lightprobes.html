@@ -39,6 +39,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
 			import { LightProbeGridHelper } from 'three/addons/helpers/LightProbeGridHelper.js';
 
 			let camera, scene, renderer, controls;
@@ -171,7 +172,7 @@
 
 					}
 
-					probes = new THREE.LightProbeGrid( 5.6, 4.7, 5.6, resolution, resolution, resolution );
+					probes = new LightProbeGrid( 5.6, 4.7, 5.6, resolution, resolution, resolution );
 					probes.position.set( 0, 2.45, 0 );
 					await probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
 					probes.visible = params.enabled;

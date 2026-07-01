@@ -1,17 +1,36 @@
-import { Box3 } from '../../math/Box3.js';
-import { Vector3 } from '../../math/Vector3.js';
-import { Light } from '../Light.js';
-import { CubeCamera } from '../../cameras/CubeCamera.js';
-import { RenderTarget } from '../../core/RenderTarget.js';
-import { RenderTarget3D } from '../../core/RenderTarget3D.js';
-import { FloatType, HalfFloatType, RGBAFormat, LinearFilter, NearestFilter } from '../../constants.js';
-import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
-import QuadMesh from '../../renderers/common/QuadMesh.js';
-import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
+import {
+	Box3,
+	CubeCamera,
+	CubeRenderTarget,
+	FloatType,
+	HalfFloatType,
+	Light,
+	LinearFilter,
+	NearestFilter,
+	NodeMaterial,
+	QuadMesh,
+	RenderTarget,
+	RenderTarget3D,
+	RGBAFormat,
+	Vector3
+} from 'three/webgpu';
 
-import { array, cubeTexture, float, Fn, int, ivec2, Loop, screenCoordinate, texture, uniform, vec3, vec4 } from '../../nodes/TSL.js';
+import {
+	array,
+	cubeTexture,
+	float,
+	Fn,
+	int,
+	ivec2,
+	Loop,
+	screenCoordinate,
+	texture,
+	uniform,
+	vec3,
+	vec4
+} from 'three/tsl';
 
-import { ATLAS_PADDING } from '../../nodes/lighting/LightProbeGridNode.js';
+import { LightProbeGridNode, ATLAS_PADDING } from '../tsl/lighting/LightProbeGridNode.js';
 
 // Shared fullscreen-quad for the bake passes.
 const _quad = /*@__PURE__*/ new QuadMesh();
@@ -247,10 +266,10 @@ function ensureBakeMaterials( sampleCount, cubeMap, batchMap ) {
  * A 3D grid of L2 Spherical Harmonic irradiance probes that provides
  * position-dependent diffuse global illumination.
  *
- * The grid is a {@link Light}, so adding it to the scene applies its baked
- * irradiance to every lit node material automatically. Can only be used with
- * {@link WebGPURenderer}. When using {@link WebGLRenderer}, import the grid from
- * `LightProbeGridWebGL.js` instead.
+ * This is the {@link WebGPURenderer} version of `LightProbeGrid`. The grid is a
+ * {@link Light}, so adding it to the scene applies its baked irradiance to every
+ * lit node material automatically. When using {@link WebGLRenderer}, import the
+ * grid from `LightProbeGridWebGL.js` instead.
  *
  * The baked data is stored in a single RGBA `RenderTarget3D` atlas that packs
  * the nine L2 SH coefficients into seven sub-volumes stacked along Z. Baking is
@@ -258,6 +277,7 @@ function ensureBakeMaterials( sampleCount, cubeMap, batchMap ) {
  * happen on the GPU with zero CPU readback.
  *
  * @augments Light
+ * @three_import import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
  */
 class LightProbeGrid extends Light {
 
@@ -425,6 +445,13 @@ class LightProbeGrid extends Light {
 		if ( renderer.initialized === false ) {
 
 			throw new Error( 'THREE.LightProbeGrid: .bake() called before the renderer is initialized. Use "await renderer.init();" first.' );
+
+		}
+
+		// Register the light node with this renderer (idempotent).
+		if ( renderer.library.getLightNodeClass( LightProbeGrid ) === null ) {
+
+			renderer.library.addLight( LightProbeGridNode, LightProbeGrid );
 
 		}
 
@@ -627,4 +654,4 @@ class LightProbeGrid extends Light {
 
 }
 
-export default LightProbeGrid;
+export { LightProbeGrid };
