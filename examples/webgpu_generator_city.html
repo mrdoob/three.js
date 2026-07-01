@@ -20,7 +20,8 @@
 			</div>
 
 			<small>
-				A few procedurally generated city blocks of Neo-Gothic terracotta skyscrapers at sunset.
+				A few procedurally generated city blocks of Neo-Gothic terracotta skyscrapers.<br />
+				Use WASD to move around.
 			</small>
 		</div>
 
@@ -38,21 +39,34 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass } from 'three/tsl';
+			import { pass, mrt, normalView, screenUV, sample, packNormalToRGB, unpackRGBToNormal, builtinAOContext } from 'three/tsl';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
-			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
+			import { dualKawaseBloom } from 'three/addons/tsl/display/DualKawaseBloomNode.js';
+			import { ssao } from 'three/addons/tsl/display/SSAONode.js';
 			import { CityGenerator, createBuildingMaterial, createRoadMaterial } from 'three/addons/generators/CityGenerator.js';
+			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
+			import { LightProbeGridHelper } from 'three/addons/helpers/LightProbeGridHelper.js';
 
 			let camera, scene, renderer, controls, timer;
-			let cityGroup, materials, city, renderPipeline;
-			let sky, sun, sunLight, pmremGenerator, envScene;
+			let cityGroup, cityProxy, materials, city, renderPipeline;
+			let sky, sun, sunLight, pmremGenerator, envScene, envRenderTarget;
+			let probes, probesHelper, rebakeTimer = null;
+
+			// the irradiance grid spans the whole footprint plus the streets, rising to
+			// the mid-rise rooftops. diffuse GI is low frequency, so a coarse grid still
+			// reads the urban canyon: streets sit in shade, walls glow with terracotta bounce
+
+			const GRID_SIZE = new THREE.Vector3( 240, 120, 170 );
+			const GRID_PROBES = new THREE.Vector3( 10, 7, 8 );
 
 			const parameters = {
 				seed: 94,
-				timeOfDay: 6.4 // hours: 6 sunrise, 12 noon, 18 sunset
+				timeOfDay: 6.3, // hours: 6 sunrise, 12 noon, 18 sunset
+				gi: true,
+				showProbes: false
 			};
 
 			init();
@@ -64,7 +78,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 0.45;
+				renderer.toneMappingExposure = 0.5;
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				renderer.inspector = new Inspector();
@@ -132,23 +146,67 @@
 				materials = { building: createBuildingMaterial( city.layout, parameters.seed ) };
 				generateCity();
 
-				// bloom: a soft glow on the brightest areas, run on the linear HDR scene
-				// colour before tone mapping folds it back to display range
+				// bake the irradiance grid once the city and sun are in place
+
+				bakeProbes();
+
+				// screen-space ambient occlusion for the facade's contact shadows. a cheap
+				// pre-pass lays down view normals and depth, so the AO is ready before the
+				// lit scene pass and feeds in through its lighting context: the occlusion
+				// then darkens only the sky/IBL fill in the crevices, never the direct sun
 
 				renderPipeline = new THREE.RenderPipeline( renderer );
 
-				const scenePassColor = pass( scene, camera ).getTextureNode( 'output' );
-				const bloomPass = bloom( scenePassColor, 0.05, 0.0, 0.0 );
+				const prePass = pass( scene, camera );
+				prePass.transparent = false;
+				prePass.setMRT( mrt( { output: packNormalToRGB( normalView ) } ) );
+				prePass.getTexture( 'output' ).type = THREE.UnsignedByteType; // normals fit in 8 bits
+
+				const prePassNormal = sample( ( uv ) => unpackRGBToNormal( prePass.getTextureNode().sample( uv ) ) );
+				const prePassDepth = prePass.getTextureNode( 'depth' );
+
+				const aoPass = ssao( prePassDepth, prePassNormal, camera );
+				aoPass.resolutionScale = 0.5; // half-res is plenty for soft contact shading
+				aoPass.samples.value = 8; // few taps: the AO only tints the soft sky fill in crevices
+				aoPass.radius.value = 1.5;
+				aoPass.intensity.value = 4;
+				aoPass.blurEnabled = false;
+
+				const scenePass = pass( scene, camera );
+				scenePass.contextNode = builtinAOContext( aoPass.getTextureNode().sample( screenUV ).r );
+
+				const scenePassColor = scenePass.getTextureNode();
+
+				// bloom: a soft glow on the brightest areas, at quarter-res since the
+				// result is heavily blurred anyway
+
+				const bloomPass = dualKawaseBloom( scenePassColor, 0.05, 0.0, 0.0 );
+				bloomPass.setResolutionScale( 0.25 );
 
 				renderPipeline.outputNode = scenePassColor.add( bloomPass );
 
 				// parameters
 
 				const gui = renderer.inspector.createParameters( 'City' );
-				gui.add( parameters, 'seed', 0, 100, 1 ).onChange( generateCity );
-				gui.add( parameters, 'timeOfDay', 6, 18, 0.1 ).name( 'time of day' ).onChange( updateSun );
+				gui.add( parameters, 'seed', 0, 100, 1 ).onChange( () => {
+
+					generateCity();
+					scheduleRebake();
+
+				} );
+				gui.add( parameters, 'timeOfDay', 6, 18, 0.1 ).name( 'time of day' ).onChange( () => {
+
+					updateSun();
+					scheduleRebake();
+
+				} );
 				gui.add( renderer, 'toneMappingExposure', 0.01, 1 ).name( 'exposure' );
-				gui.add( bloomPass.strength, 'value', 0, 2 ).name( 'bloom' );
+				gui.add( parameters, 'gi' ).name( 'global illumination' ).onChange( ( value ) => {
+
+					if ( probes ) probes.visible = value;
+
+				} );
+				gui.add( parameters, 'showProbes' ).name( 'show probes' ).onChange( toggleProbesHelper );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -179,13 +237,14 @@
 				sunLight.intensity = 6 * transmittance; // illuminance perpendicular to the rays; the renderer applies N·L per surface
 				sunLight.position.copy( sun ).multiplyScalar( 600 );
 
-				// re-bake the sky ( without the sun disc ) into the environment map for IBL
+				// re-bake the sky ( without the sun disc ) into the environment map for IBL.
+				// reuse one render target so the texture keeps its identity: a fresh texture
+				// would force every material to recompile its shader
 
 				sky.showSunDisc.value = false;
 				envScene.add( sky );
-				const env = pmremGenerator.fromScene( envScene ).texture;
-				if ( scene.environment ) scene.environment.dispose();
-				scene.environment = env;
+				envRenderTarget = pmremGenerator.fromScene( envScene, 0, 0.1, 100, { renderTarget: envRenderTarget } );
+				scene.environment = envRenderTarget.texture;
 				sky.showSunDisc.value = true;
 				scene.add( sky );
 
@@ -194,10 +253,86 @@
 			function generateCity() {
 
 				if ( cityGroup ) scene.remove( cityGroup );
+				if ( cityProxy ) {
+
+					scene.remove( cityProxy );
+					cityProxy.geometry.dispose();
+					cityProxy.material.dispose();
+
+				}
 
 				city.parameters.seed = parameters.seed;
 				cityGroup = city.build( materials );
 				scene.add( cityGroup );
+
+				// the box proxy shares the towers just built; it stands in only during the bake
+				cityProxy = city.buildProxy();
+				cityProxy.visible = false;
+				scene.add( cityProxy );
+
+			}
+
+			function bakeProbes() {
+
+				if ( probes === undefined ) {
+
+					probes = new LightProbeGrid( GRID_SIZE.x, GRID_SIZE.y, GRID_SIZE.z, GRID_PROBES.x, GRID_PROBES.y, GRID_PROBES.z );
+					probes.position.set( 0, GRID_SIZE.y / 2, 0 );
+					scene.add( probes );
+
+				}
+
+				// swap the detailed city for its box proxy, and hide the probe spheres and the
+				// sun disc, so each cubemap captures only the boxes, ground and sky fill. the
+				// DirectionalLight supplies the direct sun; a single bounce pass folds the warm
+				// stone back into the shade. the proxy is a single draw, so the bake stays cheap
+
+				if ( probesHelper ) probesHelper.visible = false;
+				cityGroup.visible = false;
+				cityProxy.visible = true;
+				sky.showSunDisc.value = false;
+
+				probes.bake( renderer, scene, { cubemapSize: 16, near: 0.1, far: 20000, bounces: 1 } );
+
+				sky.showSunDisc.value = true;
+				cityProxy.visible = false;
+				cityGroup.visible = true;
+				probes.visible = parameters.gi;
+
+				if ( probesHelper ) {
+
+					probesHelper.update();
+					probesHelper.visible = parameters.showProbes;
+
+				}
+
+			}
+
+			// re-baking walks the whole city cubemap by cubemap, so coalesce the rapid
+			// onChange calls from dragging a slider into a single bake once it settles
+
+			function scheduleRebake() {
+
+				if ( rebakeTimer !== null ) clearTimeout( rebakeTimer );
+				rebakeTimer = setTimeout( () => {
+
+					rebakeTimer = null;
+					bakeProbes();
+
+				}, 300 );
+
+			}
+
+			function toggleProbesHelper( value ) {
+
+				if ( probesHelper === undefined ) {
+
+					probesHelper = new LightProbeGridHelper( probes, 3 );
+					scene.add( probesHelper );
+
+				}
+
+				probesHelper.visible = value;
 
 			}
 
