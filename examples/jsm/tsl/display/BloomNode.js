@@ -432,21 +432,6 @@ class BloomNode extends TempNode {
 		const bloomFactors = array( [ float( 1.0 ), float( 0.8 ), float( 0.6 ), float( 0.4 ), float( 0.2 ) ] );
 		const bloomTintColors = uniformArray( this.bloomTintColors );
 
-		const lerpBloomFactor = Fn( ( [ factor, radius ] ) => {
-
-			const mirrorFactor = float( 1.2 ).sub( factor );
-			return mix( factor, mirrorFactor, radius );
-
-		} ).setLayout( {
-			name: 'lerpBloomFactor',
-			type: 'float',
-			inputs: [
-				{ name: 'factor', type: 'float' },
-				{ name: 'radius', type: 'float' },
-			]
-		} );
-
-
 		const compositePass = Fn( () => {
 
 			const color0 = lerpBloomFactor( bloomFactors.element( 0 ), this.radius ).mul( vec4( bloomTintColors.element( 0 ), 1.0 ) ).mul( this._textureNodeBlur0 );
@@ -583,6 +568,20 @@ class BloomNode extends TempNode {
 	}
 
 }
+
+const lerpBloomFactor = Fn( ( [ factor, radius ] ) => {
+
+	const mirrorFactor = float( 1.2 ).sub( factor );
+	return mix( factor, mirrorFactor, radius );
+
+} ).setLayout( {
+	name: 'lerpBloomFactor',
+	type: 'float',
+	inputs: [
+		{ name: 'factor', type: 'float' },
+		{ name: 'radius', type: 'float' },
+	]
+} );
 
 /**
  * TSL function for creating a bloom effect.
