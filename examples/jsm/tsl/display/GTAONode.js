@@ -341,9 +341,14 @@ class GTAONode extends TempNode {
 
 		const uvNode = uv();
 
+		// Bilinear depth sampling blends values across silhouette edges, producing
+		// phantom mid-depth values that corrupt the horizon search and cause visible
+		// banding at low AO radius. textureGather returns the same 2×2 footprint
+		// unblended, so we can take the min (nearest surface wins).
 		const sampleDepth = ( uv ) => {
 
-			const depth = this.depthNode.sample( uv ).r;
+			const g = this.depthNode.gather().sample( uv );
+			const depth = min( min( g.x, g.y ), min( g.z, g.w ) );
 
 			if ( builder.renderer.logarithmicDepthBuffer === true ) {
 
