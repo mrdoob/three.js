@@ -52,14 +52,14 @@ class TextureSizeNode extends Node {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
 		const textureProperty = this.textureNode.build( builder, 'property' );
 		const level = this.levelNode === null ? '0' : this.levelNode.build( builder, 'int' );
 
 		const snippet = builder.generateTextureSize( this.textureNode.value, textureProperty, level );
 
-		return builder.format( snippet, this.getNodeType( builder ), output );
+		return builder.format( snippet, this.getNodeType( builder ) );
 
 	}
 
