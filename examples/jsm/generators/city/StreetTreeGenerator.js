@@ -10,7 +10,7 @@ import {
 } from 'three';
 
 import { MeshStandardNodeMaterial } from 'three/webgpu';
-import { attribute, color, float, fract, mix, mx_fractal_noise_float, normalWorldGeometry, positionGeometry, positionWorld, select, sin, smoothstep, varying, vec3 } from 'three/tsl';
+import { attribute, color, float, fract, instanceIndex, mix, mx_fractal_noise_float, mx_noise_float, normalView, normalWorldGeometry, positionGeometry, positionLocal, positionView, positionViewDirection, positionWorld, select, sin, smoothstep, time, varying, vec3 } from 'three/tsl';
 
 import { mergeGeometries, mergeVertices } from '../../utils/BufferGeometryUtils.js';
 
@@ -160,7 +160,7 @@ function buildStreetTreeGeometry( p ) {
 	// a few bare limbs fan from the trunk top into the clumps, so the canopy
 	// visibly grows out of the tree instead of hovering over it
 	const limbs = [];
-	for ( const [ rx, rz, len ] of [ [ 0.5, 0.2, 1.5 ], [ - 0.45, - 0.3, 1.4 ], [ 0.1, - 0.55, 1.2 ], [ - 0.15, 0.5, 1.3 ] ] ) {
+	for ( const [ rx, rz, len ] of [[ 0.5, 0.2, 1.5 ], [ - 0.45, - 0.3, 1.4 ], [ 0.1, - 0.55, 1.2 ], [ - 0.15, 0.5, 1.3 ]] ) {
 
 		limbs.push(
 			new CylinderGeometry( 0.03, 0.07, len, 5 )
@@ -191,6 +191,23 @@ function buildStreetTreeGeometry( p ) {
 
 }
 
+// derivative-based bump for a procedural, world-space height field. the built-in bumpMap
+// offsets the UV to read its height, so it returns a zero gradient for a height keyed off
+// world position; this feeds the hardware screen-space derivatives of the height into
+// Mikkelsen's surface-gradient method so the relief actually perturbs the normal.
+function bumpNormal( height ) {
+
+	const dpdx = positionView.dFdx();
+	const dpdy = positionView.dFdy();
+	const r1 = dpdy.cross( normalView );
+	const r2 = normalView.cross( dpdx );
+	const det = dpdx.dot( r1 );
+	const grad = det.sign().mul( height.dFdx().mul( r1 ).add( height.dFdy().mul( r2 ) ) );
+
+	return det.abs().mul( normalView ).sub( grad ).normalize();
+
+}
+
 function createStreetTreeMaterial() {
 
 	const partId = varying( attribute( 'partId', 'float' ) ).setInterpolation( InterpolationSamplingType.FLAT, InterpolationSamplingMode.EITHER );
@@ -203,20 +220,31 @@ function createStreetTreeMaterial() {
 	// ( or two sides of one crown ) read as the same flat colour
 	const patch = mx_fractal_noise_float( positionWorld.mul( 0.55 ), 2 ).mul( 0.5 ).add( 0.5 );
 
+	// leaf detail field: tuft-scale clumps and a leaf-scale sparkle. the same
+	// heights drive the colour break-up and the derivative bump, so the crown
+	// catches light like packed foliage instead of a smooth shell
+	const tufts = mx_fractal_noise_float( positionWorld.mul( 2.2 ), 2 ).mul( 0.5 ).add( 0.5 );
+	const sparkle = mx_noise_float( positionWorld.mul( 9 ) ).mul( 0.5 ).add( 0.5 );
+
 	// interior shadow: leaves darken toward the crown core, where a real canopy
 	// swallows the light, and brighten toward the sun-fed rim
 	const crownDist = p.sub( vec3( CROWN_CENTER.x, CROWN_CENTER.y, CROWN_CENTER.z ) ).length().div( CROWN_RADIUS );
 	const interiorAO = smoothstep( 0.1, 1.05, crownDist ).mul( 0.5 ).add( 0.5 );
 
+	// every tree draws its own tint: some paler, some warm as if turning early
+	const treeLane = fract( sin( float( instanceIndex ).mul( 12.9898 ) ).mul( 43758.5453 ) );
+
 	// sky-facing lift plus patchy hue drift between deep and warm greens
 	const skyLift = normalWorldGeometry.y.mul( 0.5 ).add( 0.5 );
 	const leafBase = mix( color( 0x33511f ), color( 0x5d7c33 ), skyLift );
 	const leafVaried = mix( leafBase, color( 0x77822f ), patch.mul( 0.55 ) );
-	const leaf = leafVaried.mul( interiorAO );
+	const leafTinted = mix( leafVaried, color( 0x7d7c2c ), treeLane.mul( 0.3 ) );
+	const leafLit = leafTinted.mul( tufts.mul( 0.35 ).add( 0.75 ) ).mul( sparkle.mul( 0.24 ).add( 0.88 ) );
+	const leaf = leafLit.mul( interiorAO );
 
-	// bark: vertical streaks of lighter dead bark over the brown
-	const barkStreak = fract( sin( p.x.mul( 37.7 ).add( p.z.mul( 51.3 ) ) ).mul( 289.31 ).add( p.y.mul( 0.7 ) ) );
-	const bark = mix( color( 0x4a3a2a ), color( 0x6a5a44 ), smoothstep( 0.55, 0.95, barkStreak ).mul( 0.6 ) );
+	// bark: ridges running up the trunk, their crevices darker and rougher
+	const ridge = mx_fractal_noise_float( vec3( p.x.mul( 9 ), p.y.mul( 1.4 ), p.z.mul( 9 ) ), 2 ).abs().oneMinus();
+	const bark = mix( color( 0x4a3a2a ), color( 0x6f5e46 ), smoothstep( 0.55, 1.0, ridge ).mul( 0.7 ) );
 
 	// cast-iron pit grate: concentric slots cut by a radial stripe pattern
 	const gr = p.xz.length();
@@ -225,8 +253,30 @@ function createStreetTreeMaterial() {
 
 	const material = new MeshStandardNodeMaterial();
 	material.colorNode = select( isLeaf, leaf, select( isGrate, grate, bark ) );
-	material.roughnessNode = select( isGrate, float( 0.7 ), float( 0.9 ) );
+	material.roughnessNode = select( isGrate, float( 0.7 ), select( isLeaf, sparkle.mul( 0.15 ).add( 0.8 ), ridge.mul( 0.12 ).add( 0.82 ) ) );
 	material.metalnessNode = select( isGrate, float( 0.4 ), float( 0 ) );
+
+	// the same detail heights feed the screen-space bump, so tufts and bark
+	// ridges self-shade under the sun
+	// tufts only: leaf-scale noise in the bump turns to moire at grazing light,
+	// and the bump itself fades out at grazing view angles for the same reason
+	const grazingFade = smoothstep( 0.08, 0.35, normalView.dot( positionViewDirection ).abs() );
+	const detailHeight = select( isLeaf, tufts.mul( 0.07 ), select( isGrate, float( 0 ), ridge.mul( 0.02 ) ) ).mul( grazingFade );
+	material.normalNode = bumpNormal( detailHeight );
+
+	// a gentle breeze: the canopy leans and flutters, rising with height so the
+	// trunk stays planted. per-instance phase keeps neighbouring trees out of step
+	const isLeafVertex = attribute( 'partId', 'float' ).equal( LEAF );
+	const phase = float( instanceIndex ).mul( 1.7 );
+	const heightGate = smoothstep( 2.0, 5.0, p.y );
+	const lean = vec3(
+		sin( time.mul( 0.8 ).add( phase ) ).mul( 0.05 ),
+		0,
+		sin( time.mul( 0.61 ).add( phase.mul( 1.3 ) ) ).mul( 0.04 )
+	);
+	const flutter = sin( time.mul( 3.1 ).add( p.y.mul( 2.4 ) ).add( p.x.mul( 1.9 ) ) ).mul( 0.015 );
+	const sway = lean.add( vec3( flutter, flutter.negate(), 0 ) ).mul( heightGate );
+	material.positionNode = positionLocal.add( select( isLeafVertex, sway, vec3( 0 ) ) ); // on top of positionLocal, which already carries the instance transform
 
 	return material;
 
