@@ -429,7 +429,7 @@ class BloomNode extends TempNode {
 
 		// composite material
 
-		const bloomFactors = array( [ float( 1.0 ), float( 0.8 ), float( 0.6 ), float( 0.4 ), float( 0.2 ) ] );
+		const bloomFactors = array( [ 1.0, 0.8, 0.6, 0.4, 0.2 ] );
 		const bloomTintColors = uniformArray( this.bloomTintColors );
 
 		const compositePass = Fn( () => {
@@ -527,8 +527,8 @@ class BloomNode extends TempNode {
 		//
 
 		const colorTexture = texture( null );
-		const gaussianOffsets = array( offsets.map( ( value ) => float( value ) ) );
-		const gaussianWeights = array( weights.map( ( value ) => float( value ) ) );
+		const gaussianOffsets = array( offsets );
+		const gaussianWeights = array( weights );
 		const invSize = uniform( new Vector2() );
 		const direction = uniform( new Vector2( 0.5, 0.5 ) );
 
@@ -569,19 +569,12 @@ class BloomNode extends TempNode {
 
 }
 
-const lerpBloomFactor = Fn( ( [ factor, radius ] ) => {
+const lerpBloomFactor = Fn( ( { factor, radius } ) => {
 
 	const mirrorFactor = float( 1.2 ).sub( factor );
 	return mix( factor, mirrorFactor, radius );
 
-} ).setLayout( {
-	name: 'lerpBloomFactor',
-	type: 'float',
-	inputs: [
-		{ name: 'factor', type: 'float' },
-		{ name: 'radius', type: 'float' },
-	]
-} );
+}, { factor: 'float', radius: 'float', return: 'float' } );
 
 /**
  * TSL function for creating a bloom effect.

@@ -2,7 +2,7 @@ import { BufferGeometry } from '../../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../../core/BufferAttribute.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { OrthographicCamera } from '../../cameras/OrthographicCamera.js';
-import { vec4, array, float } from '../../nodes/tsl/TSLBase.js';
+import { vec4, array } from '../../nodes/tsl/TSLBase.js';
 import { vertexIndex } from '../../nodes/core/IndexNode.js';
 import { warnOnce } from '../../utils.js';
 
@@ -39,8 +39,8 @@ class QuadGeometry extends BufferGeometry {
 const _geometry = /*@__PURE__*/ new QuadGeometry();
 
 const _vertexNode = /*@__PURE__*/ vec4(
-	array( [ float( - 1.0 ), float( - 1.0 ), float( 3.0 ) ] ).element( vertexIndex ),
-	array( [ float( 3.0 ), float( - 1.0 ), float( - 1.0 ) ] ).element( vertexIndex ),
+	array( [ - 1.0, - 1.0, 3.0 ] ).element( vertexIndex ),
+	array( [ 3.0, - 1.0, - 1.0 ] ).element( vertexIndex ),
 	0.0,
 	1.0
 );
