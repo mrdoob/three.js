@@ -538,7 +538,7 @@
 
 				} );
 				const resolutionScaleControl = gui.add( params, 'resolutionScale', 0, 1 ).name( 'resolution' ).onChange( updateParameters );
-				gui.add( params, 'samples', 4, 32, 1 ).onChange( updateParameters );
+				gui.add( params, 'samples', 4, 32, 1 ).onChange( updateParameters ).debounce( 250 );
 				gui.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
 
 				const gtaoControls = [
