@@ -92,6 +92,14 @@ class BezierInterpolant extends Interpolant {
 
 			}
 
+			// recompute the powers of s since the final Newton step may have updated it
+
+			s2 = s * s;
+			s3 = s2 * s;
+			oneMinusS = 1 - s;
+			oneMinusS2 = oneMinusS * oneMinusS;
+			oneMinusS3 = oneMinusS2 * oneMinusS;
+
 			// Evaluate Bezier Y(s)
 			result[ i ] = oneMinusS3 * v0 + 3 * oneMinusS2 * s * c0y + 3 * oneMinusS * s2 * c1y + s3 * v1;
 
