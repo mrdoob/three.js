@@ -44,7 +44,7 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
-			import { dualKawaseBloom } from 'three/addons/tsl/display/DualKawaseBloomNode.js';
+			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 			import { CityGenerator, createBuildingMaterial, createRoadMaterial } from 'three/addons/generators/CityGenerator.js';
 			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
 			import { LightProbeGridHelper } from 'three/addons/helpers/LightProbeGridHelper.js';
@@ -161,7 +161,7 @@
 				// bloom: a soft glow on the brightest areas, at quarter-res since the
 				// result is heavily blurred anyway
 
-				const bloomPass = dualKawaseBloom( scenePassColor, 0.05, 0.0, 0.0 );
+				const bloomPass = bloom( scenePassColor, 0.05, 0.0, 0.0 );
 				bloomPass.setResolutionScale( 0.25 );
 
 				renderPipeline.outputNode = scenePassColor.add( bloomPass );
