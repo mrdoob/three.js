@@ -230,12 +230,16 @@ class CityGenerator {
 
 		const lights = [], signals = [], cans = [], benches = [], hydrants = [], trees = [], people = [], cars = [];
 
-		// most cars are working vehicles; about a third are yellow cabs
+		// the kerbside mix of a New York street: yellow cabs over an almost
+		// entirely grayscale fleet ( black livery cars, whites, silvers,
+		// graphites ), with a dark navy, a burgundy or a bronze only here and
+		// there. cumulative weights, so common colours repeat like they do kerb
+		// to kerb
 		const carColor = () => {
 
-			if ( random() < 0.34 ) return 0xf5c518;
-			const palette = [ 0xe9e9e6, 0x17191d, 0x9aa0a4, 0x3a3f45, 0x6e7378, 0x7a2420, 0x1d2a46, 0x2f4632 ];
-			return palette[ Math.floor( random() * palette.length ) ];
+			const r = random();
+			for ( const [ threshold, color ] of CAR_COLORS ) if ( r < threshold ) return color;
+			return CAR_COLORS[ CAR_COLORS.length - 1 ][ 1 ];
 
 		};
 
@@ -379,6 +383,20 @@ CityGenerator.defaults = {
 	curbRadius: 5,
 	sidewalkWidth: 5 // walkable strip between the street wall and the curb ( NYC ~15 ft )
 };
+
+// kerbside paint mix sampled from Manhattan street photos: cumulative
+// probability thresholds and the paint they select
+const CAR_COLORS = [
+	[ 0.22, 0xf5c518 ], // yellow cab
+	[ 0.42, 0x111216 ], // black ( livery sedans and SUVs )
+	[ 0.59, 0xe9e8e3 ], // white
+	[ 0.72, 0xb2b5b8 ], // silver
+	[ 0.84, 0x3e4247 ], // graphite
+	[ 0.90, 0x74787c ], // mid grey
+	[ 0.95, 0x1c2a3f ], // dark navy
+	[ 0.98, 0x571f1f ], // burgundy
+	[ 1.01, 0x5c4834 ] // bronze
+];
 
 // derives the block / street dimensions from the parameters
 function cityLayout( parameters ) {

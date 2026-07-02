@@ -286,10 +286,11 @@ function buildCarGeometry( spec ) {
 		new BoxGeometry( 0.16, 0.09, 0.06 ).rotateY( 0.25 ).translate( mirrorHalfW + 0.06, spec.mirror[ 0 ], spec.mirror[ 1 ] )
 	] );
 
-	// licence plates centred on the bumper faces
+	// licence plates centred on the bumpers, proud of the face so the two
+	// surfaces never share a plane
 	const plates = mergeGeometries( [
-		new BoxGeometry( 0.32, 0.12, 0.02 ).translate( 0, spec.bumperY + 0.02, spec.nose + 0.02 ),
-		new BoxGeometry( 0.32, 0.12, 0.02 ).translate( 0, spec.bumperY + 0.02, spec.tail - 0.02 )
+		new BoxGeometry( 0.32, 0.12, 0.02 ).translate( 0, spec.bumperY + 0.02, spec.nose + 0.035 ),
+		new BoxGeometry( 0.32, 0.12, 0.02 ).translate( 0, spec.bumperY + 0.02, spec.tail - 0.035 )
 	] );
 
 	const darkParts = [ ...wheels, grille ];
