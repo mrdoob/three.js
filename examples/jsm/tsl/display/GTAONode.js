@@ -1,5 +1,5 @@
 import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, Vector4, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat, WebGPUCoordinateSystem } from 'three/webgpu';
-import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand } from 'three/tsl';
+import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -149,12 +149,11 @@ class GTAONode extends TempNode {
 
 		/**
 		 * How many samples are used to compute the AO.
-		 * A higher value results in better quality but also
-		 * in a more expensive runtime behavior.
 		 *
-		 * @type {UniformNode<float>}
+		 * @private
+		 * @type {number}
 		 */
-		this.samples = uniform( 16 );
+		this._samples = 16;
 
 		/**
 		 * Whether to use temporal filtering or not. Setting this property to
@@ -278,12 +277,48 @@ class GTAONode extends TempNode {
 		this._material.name = 'GTAO';
 
 		/**
+		 * Recreates the material's fragment node. Set up during `setup()` and
+		 * invoked when a property that is baked into the shader changes.
+		 *
+		 * @private
+		 * @type {?Function}
+		 */
+		this._updateFragmentNode = null;
+
+		/**
 		 * The result of the effect is represented as a separate texture node.
 		 *
 		 * @private
 		 * @type {PassTextureNode}
 		 */
 		this._textureNode = passTexture( this, this._aoRenderTarget.texture );
+
+	}
+
+	/**
+	 * How many samples are used to compute the AO.
+	 * A higher value results in better quality but also
+	 * in a more expensive runtime behavior. The value is baked
+	 * into the shader so changing it rebuilds the effect's material.
+	 *
+	 * @type {number}
+	 * @default 16
+	 */
+	get samples() {
+
+		return this._samples;
+
+	}
+
+	set samples( value ) {
+
+		if ( this._samples !== value ) {
+
+			this._samples = value;
+
+			if ( this._updateFragmentNode !== null ) this._updateFragmentNode();
+
+		}
 
 	}
 
@@ -464,9 +499,13 @@ class GTAONode extends TempNode {
 			const bitangent = vec3( tangent.y.mul( - 1.0 ), tangent.x, 0.0 );
 			const kernelMatrix = mat3( tangent, bitangent, vec3( 0.0, 0.0, 1.0 ) );
 
-			const DIRECTIONS = this.samples.lessThan( 30 ).select( 3, 5 ).toVar();
-			const STEPS = add( this.samples, DIRECTIONS.sub( 1 ) ).div( DIRECTIONS ).toVar();
-			const invSteps = STEPS.reciprocal().toVar();
+			// The direction and step counts are baked as constants so the loops below can be
+			// unrolled. The step count keeps its fractional part as the ray-length divisor to
+			// preserve the sample distribution ( e.g. 32 samples: 7 steps, divided by 7.2 ).
+
+			const dirCount = this._samples < 30 ? 3 : 5;
+			const stepCountF = ( this._samples + dirCount - 1 ) / dirCount;
+			const stepCount = Math.floor( stepCountF );
 
 			const ao = float( 0 ).toVar();
 
@@ -476,9 +515,9 @@ class GTAONode extends TempNode {
 			const noiseJitterIdx = this._temporalDirection.mul( 0.02 );
 			const stepJitter = interleavedGradientNoise( screenCoordinate.add( this._temporalOffset ) ).add( rand( uvNode.add( noiseJitterIdx ).mul( 2 ).sub( 1 ) ) );
 
-			Loop( { start: int( 0 ), end: DIRECTIONS, type: 'int', condition: '<' }, ( { i } ) => {
+			Loop( { start: int( 0 ), end: int( dirCount ), type: 'int', condition: '<' }, ( { i } ) => {
 
-				const angle = float( i ).div( float( DIRECTIONS ) ).mul( PI ).add( this._temporalDirection ).toVar();
+				const angle = float( i ).div( dirCount ).mul( PI ).add( this._temporalDirection ).toVar();
 				const sampleDir = kernelMatrix.mul( vec3( cos( angle ), sin( angle ), 0 ) ).toVar();
 				const clipDirRadius = this._cameraProjectionMatrix.mul( vec4( sampleDir, 0.0 ) ).mul( radius ).toVar();
 
@@ -504,11 +543,11 @@ class GTAONode extends TempNode {
 
 				// For each slice, the inner loop performs ray marching to find the horizons.
 
-				Loop( { end: STEPS, type: 'int', name: 'j', condition: '<' }, ( { j } ) => {
+				Loop( { end: int( stepCount ), type: 'int', name: 'j', condition: '<' }, ( { j } ) => {
 
 					// Quadratic step distribution ( sampleDist = t² ) concentrates samples in the
 					// near-field. (Blender's Eevee adaptation)
-					const t = float( j ).add( 1.0 ).add( stepJitter ).mul( invSteps ).toVar();
+					const t = float( j ).add( 1.0 ).add( stepJitter ).mul( 1 / stepCountF ).toVar();
 					const sampleDist = t.mul( t );
 					const clipOffset = clipDirRadius.mul( sampleDist ).toVar();
 
@@ -576,15 +615,24 @@ class GTAONode extends TempNode {
 
 			} );
 
-			ao.assign( clamp( ao.div( DIRECTIONS ), 0, 1 ) );
+			ao.assign( clamp( ao.div( dirCount ), 0, 1 ) );
 			ao.assign( pow( ao, this.scale ) );
 
 			return ao;
 
 		} );
 
-		this._material.fragmentNode = ao().context( builder.getSharedContext() );
-		this._material.needsUpdate = true;
+		// a new call node gets a new cache key, which forces a shader rebuild
+		// when a baked property like the sample count changes
+
+		this._updateFragmentNode = () => {
+
+			this._material.fragmentNode = ao().context( builder.getSharedContext() );
+			this._material.needsUpdate = true;
+
+		};
+
+		this._updateFragmentNode();
 
 		//
 

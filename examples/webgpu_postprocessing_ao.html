@@ -577,11 +577,11 @@
 
 			function updateParameters() {
 
-				aoPass.samples.value = params.samples;
 				aoPass.radius.value = params.radius;
 
 				if ( params.aoType === 'SSAO' ) {
 
+					aoPass.samples.value = params.samples;
 					aoPass.intensity.value = params.intensity;
 					aoPass.bias.value = params.bias;
 					aoPass.blurEnabled = params.blurEnabled;
@@ -589,6 +589,7 @@
 
 				} else {
 
+					aoPass.samples = params.samples;
 					aoPass.scale.value = params.scale;
 					aoPass.thickness.value = params.thickness;
 					aoPass.useTemporalFiltering = params.temporalFiltering;
