@@ -1,4 +1,4 @@
-import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, Vector4, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat, WebGPUCoordinateSystem } from 'three/webgpu';
+import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat, WebGPUCoordinateSystem } from 'three/webgpu';
 import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -226,24 +226,6 @@ class GTAONode extends TempNode {
 		this._cameraFar = reference( 'far', 'float', camera );
 
 		/**
-		 * Sparse coefficients of the inverse projection matrix ( i00, i11, i30, i31 )
-		 * used to reconstruct view-space XY in the perspective fast path.
-		 *
-		 * @private
-		 * @type {UniformNode<vec4>}
-		 */
-		this._unprojectXY = uniform( new Vector4() );
-
-		/**
-		 * Sparse coefficients of the inverse projection matrix ( i23, i33 )
-		 * used to reconstruct the view-space perspective divisor.
-		 *
-		 * @private
-		 * @type {UniformNode<vec2>}
-		 */
-		this._unprojectW = uniform( new Vector2() );
-
-		/**
 		 * Temporal direction that influences the rotation angle for each slice.
 		 *
 		 * @private
@@ -377,12 +359,6 @@ class GTAONode extends TempNode {
 
 		}
 
-		// sparse inverse projection coefficients for the perspective fast path (column-major)
-
-		const e = this._camera.projectionMatrixInverse.elements;
-		this._unprojectXY.value.set( e[ 0 ], e[ 5 ], e[ 12 ], e[ 13 ] );
-		this._unprojectW.value.set( e[ 11 ], e[ 15 ] );
-
 		//
 
 		const size = renderer.getDrawingBufferSize( _size );
@@ -416,9 +392,15 @@ class GTAONode extends TempNode {
 
 		const uvNode = uv();
 
+		// read once so no closure retains the builder beyond setup()
+
+		const logarithmicDepthBuffer = builder.renderer.logarithmicDepthBuffer === true;
+		const isWebGPU = builder.renderer.coordinateSystem === WebGPUCoordinateSystem;
+		const sharedContext = builder.getSharedContext();
+
 		const linearizeDepth = ( depth ) => {
 
-			if ( builder.renderer.logarithmicDepthBuffer === true ) {
+			if ( logarithmicDepthBuffer === true ) {
 
 				const viewZ = logarithmicDepthToViewZ( depth, this._cameraNear, this._cameraFar );
 
@@ -457,19 +439,21 @@ class GTAONode extends TempNode {
 
 			if ( this._camera.isPerspectiveCamera === true ) {
 
+				const im = this._cameraProjectionMatrixInverse;
+
 				const ndcXY = clipPosition.xy.mul( clipPosition.w.reciprocal() ).toVar();
-				const sampleUv = vec2( ndcXY.x.mul( 0.5 ).add( 0.5 ), float( 0.5 ).sub( ndcXY.y.mul( 0.5 ) ) );
+				const sampleUv = ndcXY.mul( vec2( 0.5, - 0.5 ) ).add( 0.5 );
 				const depth = sampleDepth( sampleUv );
 
-				const ndcZ = ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem ) ? depth : depth.mul( 2.0 ).sub( 1.0 );
-				const w = ndcZ.mul( this._unprojectW.x ).add( this._unprojectW.y );
+				const ndcZ = isWebGPU ? depth : depth.mul( 2.0 ).sub( 1.0 );
+				const w = ndcZ.mul( im.element( 2 ).w ).add( im.element( 3 ).w );
 
-				return vec3( ndcXY.mul( this._unprojectXY.xy ).add( this._unprojectXY.zw ), - 1.0 ).mul( w.reciprocal() );
+				return vec3( ndcXY.mul( vec2( im.element( 0 ).x, im.element( 1 ).y ) ).add( im.element( 3 ).xy ), - 1.0 ).mul( w.reciprocal() );
 
 			}
 
 			const screenPosition = getScreenPositionFromClip( clipPosition ).toVar();
-			const depth = sampleDepth( screenPosition ).toVar();
+			const depth = sampleDepth( screenPosition );
 
 			return getViewPosition( screenPosition, depth, this._cameraProjectionMatrixInverse );
 
@@ -551,46 +535,34 @@ class GTAONode extends TempNode {
 					const sampleDist = t.mul( t );
 					const clipOffset = clipDirRadius.mul( sampleDist ).toVar();
 
-					// The loop marches in two opposite directions (x and y) along the slice's line to find the horizon on both sides.
+					// The loop marches in two opposite directions along the slice's line to find the horizon on both sides.
 
-					// x
+					const march = ( sampleClipPosition, horizon ) => {
 
-					const sampleSceneViewPositionX = sampleViewPosition( clipPosition.add( clipOffset ) ).toVar();
-					const viewDeltaX = sampleSceneViewPositionX.sub( viewPosition ).toVar();
-					const lenX = viewDeltaX.length().toVar();
+						const sampleSceneViewPosition = sampleViewPosition( sampleClipPosition ).toVar();
+						const viewDelta = sampleSceneViewPosition.sub( viewPosition ).toVar();
+						const len = viewDelta.length().toVar();
 
-					// Manual normalize guards against zero-length delta.
-					const sHX = dot( viewDir, viewDeltaX ).div( max( lenX, float( 0.0001 ) ) );
+						// Manual normalize guards against zero-length delta.
+						const sH = dot( viewDir, viewDelta ).div( max( len, float( 0.0001 ) ) );
 
-					// Sphere falloff: ( dist / radius )² fades the sample's horizon contribution
-					// back toward the prior horizon as it approaches the radius boundary.
-					// (squared variant of the paper's near-field attenuation;
-					// Activision GTAO paper, Section 4.3 "Bounding the sampling area")
-					const distFacX = min( lenX.mul( invRadius ), 1 );
-					const distFacSqX = distFacX.mul( distFacX );
+						// Sphere falloff: ( dist / radius )² fades the sample's horizon contribution
+						// back toward the prior horizon as it approaches the radius boundary.
+						// (squared variant of the paper's near-field attenuation;
+						// Activision GTAO paper, Section 4.3 "Bounding the sampling area")
+						const distFac = min( len.mul( invRadius ), 1 );
+						const distFacSq = distFac.mul( distFac );
 
-					If( abs( viewDeltaX.z ).lessThan( this.thickness ), () => {
+						If( abs( viewDelta.z ).lessThan( this.thickness ), () => {
 
-						cosHorizons.x.assign( mix( max( cosHorizons.x, sHX ), cosHorizons.x, distFacSqX ) );
+							horizon.assign( mix( max( horizon, sH ), horizon, distFacSq ) );
 
-					} );
+						} );
 
-					// y
+					};
 
-					const sampleSceneViewPositionY = sampleViewPosition( clipPosition.sub( clipOffset ) ).toVar();
-					const viewDeltaY = sampleSceneViewPositionY.sub( viewPosition ).toVar();
-					const lenY = viewDeltaY.length().toVar();
-
-					const sHY = dot( viewDir, viewDeltaY ).div( max( lenY, float( 0.0001 ) ) );
-
-					const distFacY = min( lenY.mul( invRadius ), 1 );
-					const distFacSqY = distFacY.mul( distFacY );
-
-					If( abs( viewDeltaY.z ).lessThan( this.thickness ), () => {
-
-						cosHorizons.y.assign( mix( max( cosHorizons.y, sHY ), cosHorizons.y, distFacSqY ) );
-
-					} );
+					march( clipPosition.add( clipOffset ), cosHorizons.x );
+					march( clipPosition.sub( clipOffset ), cosHorizons.y );
 
 				} );
 
@@ -627,7 +599,7 @@ class GTAONode extends TempNode {
 
 		this._updateFragmentNode = () => {
 
-			this._material.fragmentNode = ao().context( builder.getSharedContext() );
+			this._material.fragmentNode = ao().context( sharedContext );
 			this._material.needsUpdate = true;
 
 		};
