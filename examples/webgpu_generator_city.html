@@ -39,13 +39,12 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, normalView, screenUV, sample, packNormalToRGB, unpackRGBToNormal, builtinAOContext } from 'three/tsl';
+			import { pass } from 'three/tsl';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
 			import { dualKawaseBloom } from 'three/addons/tsl/display/DualKawaseBloomNode.js';
-			import { ssao } from 'three/addons/tsl/display/SSAONode.js';
 			import { CityGenerator, createBuildingMaterial, createRoadMaterial } from 'three/addons/generators/CityGenerator.js';
 			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
 			import { LightProbeGridHelper } from 'three/addons/helpers/LightProbeGridHelper.js';
@@ -154,31 +153,9 @@
 
 				bakeProbes();
 
-				// screen-space ambient occlusion for the facade's contact shadows. a cheap
-				// pre-pass lays down view normals and depth, so the AO is ready before the
-				// lit scene pass and feeds in through its lighting context: the occlusion
-				// then darkens only the sky/IBL fill in the crevices, never the direct sun
-
 				renderPipeline = new THREE.RenderPipeline( renderer );
 
-				const prePass = pass( scene, camera );
-				prePass.transparent = false;
-				prePass.setMRT( mrt( { output: packNormalToRGB( normalView ) } ) );
-				prePass.getTexture( 'output' ).type = THREE.UnsignedByteType; // normals fit in 8 bits
-
-				const prePassNormal = sample( ( uv ) => unpackRGBToNormal( prePass.getTextureNode().sample( uv ) ) );
-				const prePassDepth = prePass.getTextureNode( 'depth' );
-
-				const aoPass = ssao( prePassDepth, prePassNormal, camera );
-				aoPass.resolutionScale = 0.5; // half-res is plenty for soft contact shading
-				aoPass.samples.value = 8; // few taps: the AO only tints the soft sky fill in crevices
-				aoPass.radius.value = 1.5;
-				aoPass.intensity.value = 4;
-				aoPass.blurEnabled = false;
-
 				const scenePass = pass( scene, camera );
-				scenePass.contextNode = builtinAOContext( aoPass.getTextureNode().sample( screenUV ).r );
-
 				const scenePassColor = scenePass.getTextureNode();
 
 				// bloom: a soft glow on the brightest areas, at quarter-res since the

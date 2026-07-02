@@ -8,7 +8,7 @@ import {
 } from 'three';
 
 import { MeshStandardNodeMaterial } from 'three/webgpu';
-import { attribute, color, float, select, varying } from 'three/tsl';
+import { attribute, color, float, mix, mx_fractal_noise_float, positionGeometry, select, smoothstep, varying } from 'three/tsl';
 
 import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
 
@@ -94,6 +94,10 @@ function buildHydrantGeometry( p ) {
 	const dome = new SphereGeometry( r * 0.65, 10, 4, 0, Math.PI * 2, 0, Math.PI / 2 ).translate( 0, 0.75, 0 );
 	const nut = new CylinderGeometry( 0.05, 0.05, 0.07, 6 ).translate( 0, 0.87, 0 ); // hex operating nut on top
 
+	// bolted flange rings where the castings meet: at the bonnet and above the footing
+	const bonnetFlange = new CylinderGeometry( r * 1.18, r * 1.18, 0.035, 12 ).translate( 0, 0.645, 0 );
+	const baseFlange = new CylinderGeometry( r * 1.28, r * 1.28, 0.04, 12 ).translate( 0, 0.11, 0 );
+
 	// left and right outlet nozzles, stubs finished with a bare cap, set just below mid-barrel
 	const nozzleL = new CylinderGeometry( 0.06, 0.06, 0.12, 8 ).rotateZ( Math.PI / 2 ).translate( - ( r + 0.03 ), 0.45, 0 );
 	const capL = new CylinderGeometry( 0.07, 0.07, 0.025, 8 ).rotateZ( Math.PI / 2 ).translate( - ( r + 0.102 ), 0.45, 0 );
@@ -106,6 +110,7 @@ function buildHydrantGeometry( p ) {
 
 	return mergeGeometries( [
 		part( footing, BODY ), part( barrel, BODY ), part( shoulder, BODY ), part( dome, BODY ),
+		part( bonnetFlange, BODY ), part( baseFlange, BODY ),
 		part( nozzleL, BODY ), part( nozzleR, BODY ), part( pumper, BODY ),
 		part( capL, CAP ), part( capR, CAP ), part( pumperCap, CAP ), part( nut, CAP )
 	] );
@@ -117,10 +122,20 @@ function createHydrantMaterial() {
 	const partId = varying( attribute( 'partId', 'float' ) ).setInterpolation( InterpolationSamplingType.FLAT, InterpolationSamplingMode.EITHER );
 	const isCap = partId.equal( CAP );
 
+	const p = positionGeometry;
+
+	// decades of repaints: the red fades patchily, and rust blooms up from the
+	// footing and wherever the paint has flaked through
+	const wear = mx_fractal_noise_float( p.mul( 9 ), 3 ).mul( 0.5 ).add( 0.5 );
+	const faded = mix( color( 0x8f2f1e ), color( 0xb85a38 ), wear.mul( 0.6 ) );
+
+	const rustMask = smoothstep( 0.28, 0.02, p.y ).max( smoothstep( 0.55, 0.85, wear ).mul( 0.5 ) );
+	const body = mix( faded, color( 0x4a2c1a ), rustMask.mul( 0.8 ) );
+
 	const material = new MeshStandardNodeMaterial();
-	material.colorNode = select( isCap, color( 0x9a9a92 ), color( 0x9a3320 ) ); // bare metal caps, weathered hydrant red
-	material.roughnessNode = select( isCap, float( 0.4 ), float( 0.55 ) );
-	material.metalnessNode = select( isCap, float( 0.8 ), float( 0.2 ) );
+	material.colorNode = select( isCap, color( 0x8a8a80 ), body ); // bare metal caps over the weathered red
+	material.roughnessNode = select( isCap, float( 0.45 ), wear.mul( 0.3 ).add( rustMask.mul( 0.25 ) ).add( 0.5 ) );
+	material.metalnessNode = select( isCap, float( 0.8 ), float( 0.15 ) );
 
 	return material;
 
