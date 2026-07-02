@@ -1310,6 +1310,202 @@ const interior = /*@__PURE__*/ Fn( () => {
 
 } );
 
+// the ground-floor shops' interior mapping: the same box raymarch as interior(), but
+// dressed as retail space ( tile floor, troffer-lit ceiling, stocked shelving, a sales
+// counter and a window display ), so storefronts read as shops rather than living rooms.
+// most shops trade with the lights on; the rest sit dark, some behind a roller grille.
+// returns vec4( colour, lit ), like interior().
+const shopInterior = /*@__PURE__*/ Fn( () => {
+
+	// flat for the same reason as interior(): floor() must not split a pane across cells
+	const roomCenter = varying( attribute( 'roomCenter', 'vec3' ) ).setInterpolation( InterpolationSamplingType.FLAT, InterpolationSamplingMode.EITHER );
+	const roomSize = attribute( 'roomSize', 'vec2' );
+
+	// the per-face frame and the view ray in room space ( across, up, depth ), as interior()
+	const n = normalLocal;
+	const up = vec3( 0, 1, 0 );
+	const uAxis = cross( up, n ).normalize();
+
+	const d = positionLocal.sub( roomCenter );
+	const camLocal = modelWorldMatrixInverse.mul( vec4( cameraPosition, 1 ) ).xyz;
+	const rayLocal = positionLocal.sub( camLocal ).normalize();
+	const origin = vec3( dot( d, uAxis ), d.y, 0 );
+	const dir = vec3( dot( rayLocal, uAxis ), rayLocal.y, dot( rayLocal, n ).negate() );
+
+	// the shop box: retail runs deeper than the flats above
+	const setback = float( 0.1 );
+	const depth = roomSize.y.mul( 2.4 );
+	const boxMax = vec3( roomSize.x.mul( 0.5 ), roomSize.y.mul( 0.5 ), setback.add( depth ) );
+	const boxMin = vec3( boxMax.x.negate(), boxMax.y.negate(), setback );
+	const tFar = boxMin.sub( origin ).div( dir ).max( boxMax.sub( origin ).div( dir ) );
+	const t = tFar.x.min( tFar.y ).min( tFar.z );
+	const hit = origin.add( dir.mul( t ) );
+	const q = hit.sub( boxMin ).div( boxMax.sub( boxMin ) ); // 0..1 inside the shop
+
+	const onBack = q.z.greaterThan( 0.998 );
+	const onCeil = q.y.greaterThan( 0.998 );
+	const onFloor = q.y.lessThan( 0.002 );
+
+	// per-shop key + hash, the same scheme as interior()
+	const cell = floor( roomCenter.mul( 2.0 ) );
+	const ckey = uint( cell.x.add( 1 << 21 ) ).mul( uint( 73856093 ) )
+		.bitXor( uint( cell.y.add( 1 << 21 ) ).mul( uint( 19349663 ) ) )
+		.bitXor( uint( cell.z.add( 1 << 21 ) ).mul( uint( 83492791 ) ) ).toVar();
+	const hash = ( kx, ky, kz ) => ihash( ckey.add( uint( Math.round( ( kx + ky * 7 + kz * 13 ) * 100 ) ) ) );
+	const seed = hash( 12.9898, 78.233, 37.719 );
+	const seed2 = hash( 39.346, 11.135, 83.155 );
+
+	const lit = step( 0.18, hash( 63.21, 9.17, 51.43 ) ); // most shops trade with the lights on; the rest sit closed
+	const market = step( 0.45, hash( 71.7, 23.9, 8.3 ) ); // shelf-stocked store, else a sparser showroom / boutique
+
+	// retail lighting: mostly cool fluorescent / LED whites, with a warm halogen minority
+	// ( boutiques, cafes ), so a shopping street reads as a mix of trades
+	const coolLight = mix( color( 0xeef2f6 ), color( 0xdfe8ff ), hash( 8.3, 51.2, 17.6 ) );
+	const warmLight = mix( color( 0xffd9a0 ), color( 0xffeacb ), hash( 27.1, 4.9, 61.7 ) );
+	const lightCol = select( hash( 44.7, 19.3, 6.1 ).greaterThan( 0.65 ), warmLight, coolLight );
+
+	// depth falloff: a lit shop carries its lighting deep into the room, a dark one falls away fast
+	const falloffAt = ( z ) => mix( float( 1.0 ), mix( float( 0.25 ), float( 0.6 ), lit ), z.sub( setback ).div( depth ).clamp( 0, 1 ) );
+	const rect = ( ax, ay, cx, cy, hw, hh ) => smoothstep( hw + 0.006, hw - 0.006, ax.sub( cx ).abs() ).mul( smoothstep( hh + 0.006, hh - 0.006, ay.sub( cy ).abs() ) );
+
+	// merchandise: a goods colour per shelf cell, from a compact retail palette
+	const goods = ( k ) => {
+
+		const pick = k.mul( 6 );
+		let c = color( 0x9e3d33 ); // red
+		c = select( pick.greaterThan( 1 ), color( 0xb2802f ), c ); // amber
+		c = select( pick.greaterThan( 2 ), color( 0x3d6b4f ), c ); // green
+		c = select( pick.greaterThan( 3 ), color( 0x35578a ), c ); // blue
+		c = select( pick.greaterThan( 4 ), color( 0xd6d0c4 ), c ); // white
+		c = select( pick.greaterThan( 5 ), color( 0x2b2830 ), c ); // black
+		return c;
+
+	};
+
+	// a stocked shelf unit over ( ax, ay ) in 0..1: a board at the foot of each band, goods
+	// of per-cell colour / height / width standing on it, dark backing where stock thins out
+	const shelfBoard = mix( color( 0x6b5a43 ), color( 0xcfccc4 ), step( 0.5, seed2 ) ); // wood or white metal, per shop
+	const shelves = ( ax, ay, cols, salt ) => {
+
+		const bands = 4;
+		const cellKey = ckey.add( uint( salt ) ).add( uint( floor( ax.mul( cols ) ) ).mul( uint( 197 ) ) ).add( uint( floor( ay.mul( bands ) ) ).mul( uint( 4099 ) ) );
+		const ch = ihash( cellKey );
+		const ch2 = ihash( cellKey.add( uint( 1 ) ) );
+		const gx = fract( ax.mul( cols ) );
+		const gy = fract( ay.mul( bands ) );
+		const item = step( 0.08, gy ).mul( step( gy, mix( float( 0.4 ), float( 0.85 ), fract( ch2.mul( 5 ) ) ) ) )
+			.mul( step( gx.sub( 0.5 ).abs(), mix( float( 0.26 ), float( 0.46 ), fract( ch2.mul( 13 ) ) ) ) )
+			.mul( step( 0.15, ch2 ) ); // the odd cell sits empty
+		const stocked = mix( color( 0x211e1b ), goods( ch ), item ); // dark backing behind the goods
+		return mix( stocked, shelfBoard, step( gy, 0.08 ) );
+
+	};
+
+	// --- the shop shell -----------------------------------------------------
+
+	// light retail paint; boutiques take a muted brand colour on the back wall
+	const wallCol = mix( color( 0xd8d2c6 ), color( 0xbfb9ae ), seed );
+
+	// floor: pale terrazzo tile with dark seams, or a checker for the odd deli / diner
+	const tileSeam = step( 0.93, fract( q.x.mul( 8 ) ) ).max( step( 0.93, fract( q.z.mul( 10 ) ) ) );
+	const terrazzo = mix( color( 0xb5afa2 ), color( 0x958f83 ), seed2 ).mul( tileSeam.mul( 0.35 ).oneMinus() );
+	const checker = mix( color( 0x24262a ), color( 0xcfccc2 ), mod( floor( q.x.mul( 8 ) ).add( floor( q.z.mul( 10 ) ) ), 2 ) );
+	const floorCol = select( hash( 5.7, 33.1, 2.9 ).greaterThan( 0.75 ), checker, terrazzo );
+
+	// ceiling: a suspended white grid whose recessed troffer panels carry the light
+	const tx = fract( q.x.mul( 3 ) ).sub( 0.5 ).abs();
+	const tz = fract( q.z.mul( 4 ) ).sub( 0.5 ).abs();
+	const troffer = step( tx, 0.3 ).mul( step( tz, 0.15 ) );
+	const ceilCol = mix( color( 0xe9e6df ), lightCol.mul( mix( float( 0.5 ), float( 6.0 ), lit ) ), troffer );
+
+	// back wall: a market is shelved wall to wall; a boutique hangs a framed poster
+	// on its brand-painted wall
+	const posterX = mix( float( 0.3 ), float( 0.7 ), seed );
+	let showroom = mix( goods( seed2 ), wallCol, 0.45 );
+	showroom = mix( showroom, color( 0xe8e4da ), rect( q.x, q.y, posterX, 0.62, 0.1, 0.14 ) ); // the mat
+	showroom = mix( showroom, goods( hash( 3.1, 44.2, 7.7 ) ), rect( q.x, q.y, posterX, 0.62, 0.075, 0.1 ).mul( 0.85 ) ); // the artwork
+	const backCol = select( market, shelves( q.x, q.y, roomSize.x.mul( 2.5 ), 31 ), showroom );
+
+	// side walls: markets shelve those too
+	const sideCol = select( market, shelves( q.z, q.y, depth.mul( 2.5 ), 57 ), wallCol );
+
+	const shellCol = select( onBack, backCol, select( onCeil, ceilCol, select( onFloor, floorCol, sideCol ) ) );
+
+	// the same soft corner shading as interior()
+	const aoBand = 0.15;
+	const aoEdge = ( a ) => smoothstep( 0, aoBand, a ).mul( smoothstep( 0, aoBand, a.oneMinus() ) );
+	const edgeAO = select( onBack, aoEdge( q.x ).mul( aoEdge( q.y ) ), select( onFloor.or( onCeil ), aoEdge( q.x ).mul( aoEdge( q.z ) ), aoEdge( q.y ).mul( aoEdge( q.z ) ) ) );
+	const shellAO = mix( float( 0.72 ), float( 1.0 ), edgeAO );
+
+	// --- nearest surface: the shell, then any fitting that lies closer ------
+
+	let bestT = t;
+	let bestCol = shellCol.mul( shellAO ).mul( falloffAt( hit.z ) );
+	let bestEmit = float( 1 );
+
+	const boxHit = ( bMin, bMax ) => {
+
+		const ta = bMin.sub( origin ).div( dir );
+		const tb = bMax.sub( origin ).div( dir );
+		const lo = ta.min( tb ), hi = ta.max( tb );
+		const tN = lo.x.max( lo.y ).max( lo.z );
+		const p = origin.add( dir.mul( tN ) );
+		return { tN, p, hit: hi.x.min( hi.y ).min( hi.z ).greaterThan( tN ).and( tN.greaterThan( 0 ) ), qb: p.sub( bMin ).div( bMax.sub( bMin ) ) };
+
+	};
+
+	const consider = ( h, tN, c, emit = 1 ) => {
+
+		const near = h.and( tN.lessThan( bestT ) ); bestCol = select( near, c, bestCol ); bestEmit = select( near, float( emit ), bestEmit ); bestT = select( near, tN, bestT );
+
+	};
+
+	const halfU = boxMax.x, floorY = boxMin.y, ceilY = boxMax.y, backZ = boxMax.z;
+
+	// the window display: a low platform just inside the glass, dressed with a few
+	// pedestals, each topped by an item of merchandise
+	const plat = boxHit( vec3( halfU.negate().add( 0.15 ), floorY, setback.add( 0.06 ) ), vec3( halfU.sub( 0.15 ), floorY.add( 0.4 ), setback.add( 0.95 ) ) );
+	const platCol = select( plat.qb.y.greaterThan( 0.93 ), color( 0xd9d4c8 ), color( 0x35302a ) ); // a light top on a dark plinth
+	consider( plat.hit, plat.tN, platCol.mul( falloffAt( plat.p.z ) ) );
+
+	for ( let i = 0; i < 3; i ++ ) {
+
+		const g = hash( 9.1 + i, 17.3, 40.7 );
+		const g2 = hash( 4.7, 29.1 + i, 13.9 );
+		const cx = halfU.mul( ( i - 1 ) * 0.62 );
+		const h = mix( float( 0.5 ), float( 1.2 ), g );
+		const w = mix( float( 0.16 ), float( 0.3 ), g2 );
+		const ped = boxHit( vec3( cx.sub( w ), floorY.add( 0.4 ), setback.add( 0.25 ) ), vec3( cx.add( w ), floorY.add( 0.4 ).add( h ), setback.add( 0.25 ).add( w.mul( 2 ) ) ) );
+		const pedCol = select( ped.qb.y.greaterThan( 0.6 ), goods( g ), color( 0xdad5cb ) ); // the item rides a light pedestal
+		consider( ped.hit.and( g2.greaterThan( 0.15 ) ), ped.tN, pedCol.mul( falloffAt( ped.p.z ) ) );
+
+	}
+
+	// the sales counter, standing mid-shop toward one side
+	const midZ = setback.add( depth.mul( 0.5 ) );
+	const cCx = mix( halfU.negate().add( 0.7 ), halfU.sub( 0.7 ), step( 0.5, seed ) );
+	const counter = boxHit( vec3( cCx.sub( 0.75 ), floorY, midZ ), vec3( cCx.add( 0.75 ), floorY.add( 1.0 ), midZ.add( 0.65 ) ) );
+	const counterCol = mix( color( 0x4a4036 ), color( 0x2c333a ), seed2 ).mul( select( counter.qb.y.greaterThan( 0.92 ), float( 1.3 ), float( 0.85 ) ) );
+	consider( counter.hit, counter.tN, counterCol.mul( falloffAt( counter.p.z ) ) );
+
+	// markets run a central gondola shelf down the aisle, stocked like the walls
+	const gz0 = setback.add( 1.2 ), gz1 = backZ.sub( 1.2 );
+	const gond = boxHit( vec3( - 0.45, floorY, gz0 ), vec3( 0.45, floorY.add( 1.5 ), gz1 ) );
+	const gondCol = shelves( gond.p.z.sub( gz0 ).div( gz1.sub( gz0 ) ), gond.qb.y, 8, 91 );
+	consider( gond.hit.and( market.greaterThan( 0.5 ) ), gond.tN, gondCol.mul( falloffAt( gond.p.z ) ) );
+
+	// some dark shops pull a steel roller grille down just inside the glass
+	const grille = boxHit( vec3( halfU.negate(), floorY, setback ), vec3( halfU, ceilY, setback.add( 0.05 ) ) );
+	const grilleCol = mix( color( 0x4c5158 ), color( 0x191b1e ), step( 0.62, fract( grille.p.y.mul( 7 ) ) ) ); // slats over shadowed gaps
+	const closed = lit.oneMinus().mul( step( 0.45, hash( 15.9, 3.3, 27.5 ) ) );
+	consider( grille.hit.and( closed.greaterThan( 0.5 ) ), grille.tN, grilleCol.mul( 0.8 ), 0 );
+
+	// a trading shop glows with its retail lighting; a closed one sits dim
+	const warmth = mix( vec3( 1.0, 1.0, 1.0 ), lightCol, lit.mul( 0.6 ) );
+	return vec4( bestCol.mul( warmth ).mul( mix( float( 0.45 ), float( 1.5 ), lit ) ), lit.mul( bestEmit ) );
+
+} );
+
 /**
  * The NYC masonry palette every tower is dressed from ( hex colours ): limestone-dominant
  * with terracotta accents. Shared by the single-tower example and {@link CityGenerator}'s
@@ -1479,8 +1675,9 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 
 	// glass: the interior-mapped room is the base colour; the smooth, low-roughness
 	// surface still lets a faint sky reflection ride over it, and lit rooms glow ( emissive ).
-	// toVar so the raymarch runs once, shared by the colour and emissive outputs
-	const room = interior().toVar();
+	// shopfronts march their own retail interior ( select compiles to a branch, so only one
+	// raymarch runs per fragment ). toVar so the result is shared by colour and emissive
+	const room = select( isShopGlass, shopInterior(), interior() ).toVar();
 
 	// grimy glazing: the room shows through, but muted by a dusty film and dirt pooled
 	// along the bottom of each pane, plus a baseline haze, so the panes read as old
