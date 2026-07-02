@@ -129,7 +129,7 @@ function createStreetlightMaterial() {
 	material.colorNode = select( isLens, color( 0xfff0cc ), color( 0x40433d ) ); // warm lit lens, dark olive-grey metal
 	material.roughnessNode = select( isLens, float( 0.3 ), float( 0.5 ) );
 	material.metalnessNode = select( isLens, float( 0 ), float( 0.7 ) );
-	material.emissiveNode = select( isLens, color( 0xffe2a6 ).mul( 3 ), color( 0x000000 ) ); // the lamp glows
+	material.emissiveNode = select( isLens, color( 0xffe2a6 ).mul( 60 ), color( 0x000000 ) ); // luminaire lens at ~2x a sunlit white wall, as a real cobra head reads
 
 	return material;
 

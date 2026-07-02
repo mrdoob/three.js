@@ -135,7 +135,7 @@ function createTrafficlightMaterial() {
 	material.colorNode = select( partId.equal( RED ), color( 0x3a0a06 ), select( partId.equal( AMBER ), color( 0x402608 ), select( isGreen, color( 0x2bd24b ), color( 0x233029 ) ) ) ); // dark glass, lit green, dark olive metal
 	material.roughnessNode = select( isLens, float( 0.3 ), float( 0.5 ) );
 	material.metalnessNode = select( isLens, float( 0 ), float( 0.7 ) );
-	material.emissiveNode = select( isGreen, color( 0x2bd24b ).mul( 4.5 ), color( 0x000000 ) ); // only the go signal glows
+	material.emissiveNode = select( isGreen, color( 0x2bd24b ).mul( 18 ), color( 0x000000 ) ); // only the go signal glows, at LED-aspect radiance that still reads in full sun
 
 	return material;
 

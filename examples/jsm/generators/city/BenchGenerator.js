@@ -7,7 +7,7 @@ import {
 } from 'three';
 
 import { MeshStandardNodeMaterial } from 'three/webgpu';
-import { attribute, color, float, select, varying } from 'three/tsl';
+import { attribute, color, float, floor, fract, mix, mx_fractal_noise_float, positionGeometry, select, sin, varying, vec3 } from 'three/tsl';
 
 import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
 
@@ -142,9 +142,20 @@ function createBenchMaterial() {
 	const partId = varying( attribute( 'partId', 'float' ) ).setInterpolation( InterpolationSamplingType.FLAT, InterpolationSamplingMode.EITHER );
 	const isWood = partId.equal( WOOD );
 
+	const p = positionGeometry;
+
+	// timber: grain streaks stretched along the slats, each slat cut from its own
+	// board ( a tone hashed from the slat's row position ) and greyed by weathering
+	const grain = mx_fractal_noise_float( p.mul( vec3( 3, 60, 60 ) ), 2 ).mul( 0.5 ).add( 0.5 );
+	const board = fract( sin( floor( p.z.mul( 10.5 ) ).add( floor( p.y.mul( 8.0 ) ).mul( 7.3 ) ).mul( 17.53 ) ).mul( 43758.5453 ) );
+	const weather = mx_fractal_noise_float( p.mul( 1.6 ), 2 ).mul( 0.5 ).add( 0.5 );
+
+	const stained = mix( color( 0x5e412a ), color( 0x8a6242 ), grain.mul( 0.7 ).add( board.mul( 0.3 ) ) );
+	const wood = mix( stained, color( 0x7c7468 ), weather.mul( 0.45 ) ); // sun-bleached grey where the stain has worn
+
 	const material = new MeshStandardNodeMaterial();
-	material.colorNode = select( isWood, color( 0x6b4a2e ), color( 0x2a2a28 ) ); // warm stained timber, dark cast iron
-	material.roughnessNode = select( isWood, float( 0.75 ), float( 0.45 ) );
+	material.colorNode = select( isWood, wood, color( 0x232322 ) ); // weathered timber, dark cast iron
+	material.roughnessNode = select( isWood, grain.mul( 0.25 ).add( 0.65 ), float( 0.5 ) );
 	material.metalnessNode = select( isWood, float( 0 ), float( 0.6 ) );
 
 	return material;
