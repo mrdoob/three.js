@@ -1,4 +1,4 @@
-import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
+import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, Vector4, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat, WebGPUCoordinateSystem } from 'three/webgpu';
 import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -187,6 +187,14 @@ class GTAONode extends TempNode {
 		this._noiseNode = texture( generateMagicSquareNoise() );
 
 		/**
+		 * The camera the scene is rendered with.
+		 *
+		 * @private
+		 * @type {Camera}
+		 */
+		this._camera = camera;
+
+		/**
 		 * Represents the projection matrix of the scene's camera.
 		 *
 		 * @private
@@ -217,6 +225,24 @@ class GTAONode extends TempNode {
 		 * @type {ReferenceNode<float>}
 		 */
 		this._cameraFar = reference( 'far', 'float', camera );
+
+		/**
+		 * Sparse coefficients of the inverse projection matrix ( i00, i11, i30, i31 )
+		 * used to reconstruct view-space XY in the perspective fast path.
+		 *
+		 * @private
+		 * @type {UniformNode<vec4>}
+		 */
+		this._unprojectXY = uniform( new Vector4() );
+
+		/**
+		 * Sparse coefficients of the inverse projection matrix ( i23, i33 )
+		 * used to reconstruct the view-space perspective divisor.
+		 *
+		 * @private
+		 * @type {UniformNode<vec2>}
+		 */
+		this._unprojectW = uniform( new Vector2() );
 
 		/**
 		 * Temporal direction that influences the rotation angle for each slice.
@@ -316,6 +342,12 @@ class GTAONode extends TempNode {
 
 		}
 
+		// sparse inverse projection coefficients for the perspective fast path (column-major)
+
+		const e = this._camera.projectionMatrixInverse.elements;
+		this._unprojectXY.value.set( e[ 0 ], e[ 5 ], e[ 12 ], e[ 13 ] );
+		this._unprojectW.value.set( e[ 11 ], e[ 15 ] );
+
 		//
 
 		const size = renderer.getDrawingBufferSize( _size );
@@ -378,6 +410,35 @@ class GTAONode extends TempNode {
 
 		const sampleNoise = ( uv ) => this._noiseNode.sample( uv );
 		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.sample( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
+
+		// Reconstructs the view-space position of the scene surface at a clip-space sample position.
+		// For perspective cameras the inverse projection matrix is sparse and collapses to
+		//
+		// viewPos = vec3( ndc.x * i00 + i30, ndc.y * i11 + i31, -1 ) / ( ndc.z * i23 + i33 )
+		//
+		// which avoids a full mat4 unprojection per sample.
+
+		const sampleViewPosition = ( clipPosition ) => {
+
+			if ( this._camera.isPerspectiveCamera === true ) {
+
+				const ndcXY = clipPosition.xy.mul( clipPosition.w.reciprocal() ).toVar();
+				const sampleUv = vec2( ndcXY.x.mul( 0.5 ).add( 0.5 ), float( 0.5 ).sub( ndcXY.y.mul( 0.5 ) ) );
+				const depth = sampleDepth( sampleUv );
+
+				const ndcZ = ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem ) ? depth : depth.mul( 2.0 ).sub( 1.0 );
+				const w = ndcZ.mul( this._unprojectW.x ).add( this._unprojectW.y );
+
+				return vec3( ndcXY.mul( this._unprojectXY.xy ).add( this._unprojectXY.zw ), - 1.0 ).mul( w.reciprocal() );
+
+			}
+
+			const screenPosition = getScreenPositionFromClip( clipPosition ).toVar();
+			const depth = sampleDepth( screenPosition ).toVar();
+
+			return getViewPosition( screenPosition, depth, this._cameraProjectionMatrixInverse );
+
+		};
 
 		const ao = Fn( () => {
 
@@ -455,9 +516,7 @@ class GTAONode extends TempNode {
 
 					// x
 
-					const sampleScreenPositionX = getScreenPositionFromClip( clipPosition.add( clipOffset ) ).toVar();
-					const sampleDepthX = sampleDepth( sampleScreenPositionX ).toVar();
-					const sampleSceneViewPositionX = getViewPosition( sampleScreenPositionX, sampleDepthX, this._cameraProjectionMatrixInverse ).toVar();
+					const sampleSceneViewPositionX = sampleViewPosition( clipPosition.add( clipOffset ) ).toVar();
 					const viewDeltaX = sampleSceneViewPositionX.sub( viewPosition ).toVar();
 					const lenX = viewDeltaX.length().toVar();
 
@@ -479,9 +538,7 @@ class GTAONode extends TempNode {
 
 					// y
 
-					const sampleScreenPositionY = getScreenPositionFromClip( clipPosition.sub( clipOffset ) ).toVar();
-					const sampleDepthY = sampleDepth( sampleScreenPositionY ).toVar();
-					const sampleSceneViewPositionY = getViewPosition( sampleScreenPositionY, sampleDepthY, this._cameraProjectionMatrixInverse ).toVar();
+					const sampleSceneViewPositionY = sampleViewPosition( clipPosition.sub( clipOffset ) ).toVar();
 					const viewDeltaY = sampleSceneViewPositionY.sub( viewPosition ).toVar();
 					const lenY = viewDeltaY.length().toVar();
 
