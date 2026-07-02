@@ -1808,7 +1808,6 @@ class GLTFMeshGpuInstancing {
 							instanceGeometry = new BufferGeometry();
 							instanceGeometry.name = source.name;
 
-							// Share the underlying vertex/index buffers by reference.
 							for ( const name in source.attributes ) instanceGeometry.setAttribute( name, source.attributes[ name ] );
 							for ( const name in source.morphAttributes ) instanceGeometry.morphAttributes[ name ] = source.morphAttributes[ name ];
 							if ( source.index !== null ) instanceGeometry.setIndex( source.index );
