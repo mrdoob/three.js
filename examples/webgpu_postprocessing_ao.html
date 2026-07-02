@@ -60,6 +60,7 @@
 				aoType: 'GTAO',
 				samples: 16,
 				radius: 0.5,
+				resolutionScale: 0.5,
 				scale: 0.8, // GTAO
 				thickness: 1, // GTAO
 				temporalFiltering: true, // GTAO
@@ -142,7 +143,7 @@
 
 				const scenePass = pass( scene, camera ).toInspector( 'Color' );
 
-				// final output + traa
+				// traa ( resolves the temporal noise of GTAO )
 
 				traaPass = traa( scenePass, prePassDepth, prePassVelocity, camera );
 				traaPass.useSubpixelCorrection = false;
@@ -153,7 +154,13 @@
 
 				function updateOutput() {
 
-					renderPipeline.outputNode = params.aoOnly ? vec4( vec3( aoPass.getTextureNode().sample( screenUV ).r ), 1 ) : traaPass;
+					// SSAO is self-denoised so it can skip TRAA and use MSAA for edge anti-aliasing instead
+
+					const useTRAA = ( params.aoType === 'GTAO' );
+
+					scenePass.options.samples = useTRAA ? 0 : 4;
+
+					renderPipeline.outputNode = params.aoOnly ? vec4( vec3( aoPass.getTextureNode().sample( screenUV ).r ), 1 ) : ( useTRAA ? traaPass : scenePass );
 					renderer.toneMapping = params.aoOnly ? THREE.NoToneMapping : THREE.NeutralToneMapping;
 					renderPipeline.needsUpdate = true;
 
@@ -166,8 +173,6 @@
 					aoPass = ( params.aoType === 'SSAO' )
 						? ssao( prePassDepth, prePassNormal, camera ).toInspector( 'SSAO', ( inspectNode ) => inspectNode.r )
 						: ao( prePassDepth, prePassNormal, camera ).toInspector( 'GTAO', ( inspectNode ) => inspectNode.r );
-
-					aoPass.resolutionScale = 0.5; // running AO in half resolution is often sufficient
 
 					updateParameters();
 
@@ -524,17 +529,21 @@
 				const gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( params, 'aoType', [ 'GTAO', 'SSAO' ] ).name( 'AO type' ).onChange( () => {
 
+					// half resolution suffices for GTAO since TRAA smooths it, SSAO looks best at full resolution
+
+					resolutionScaleControl.setValue( params.aoType === 'SSAO' ? 1 : 0.5 );
+
 					createAO();
 					updateControls();
 
 				} );
+				const resolutionScaleControl = gui.add( params, 'resolutionScale', 0, 1 ).name( 'resolution' ).onChange( updateParameters );
 				gui.add( params, 'samples', 4, 32, 1 ).onChange( updateParameters );
 				gui.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
 
 				const gtaoControls = [
 					gui.add( params, 'scale', 0.01, 1 ).onChange( updateParameters ),
 					gui.add( params, 'thickness', 0.01, 2 ).onChange( updateParameters ),
-					gui.add( aoPass, 'resolutionScale', 0, 1 ).name( 'resolution scale' ),
 					gui.add( params, 'temporalFiltering' ).name( 'temporal filtering' ).onChange( updateParameters )
 				];
 
@@ -546,7 +555,7 @@
 				];
 
 				gui.add( transparentMesh, 'visible' ).name( 'show transparent mesh' );
-				gui.add( params, 'transparentOpacity', 0, 1, 0.01 ).name( 'transparent opacity' ).onChange( ( value ) => {
+				gui.add( params, 'transparentOpacity', 0, 1, 0.01 ).name( 'mesh opacity' ).onChange( ( value ) => {
 
 					transparentMesh.material.opacity = value;
 
@@ -579,6 +588,7 @@
 
 				aoPass.samples.value = params.samples;
 				aoPass.radius.value = params.radius;
+				aoPass.resolutionScale = params.resolutionScale;
 
 				if ( params.aoType === 'SSAO' ) {
 
