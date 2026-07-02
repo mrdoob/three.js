@@ -1814,11 +1814,16 @@ class GLTFMeshGpuInstancing {
 							if ( source.index !== null ) instanceGeometry.setIndex( source.index );
 
 							instanceGeometry.morphTargetsRelative = source.morphTargetsRelative;
-							instanceGeometry.groups = source.groups;
-							instanceGeometry.boundingBox = source.boundingBox;
-							instanceGeometry.boundingSphere = source.boundingSphere;
-							instanceGeometry.drawRange = source.drawRange;
-							instanceGeometry.userData = source.userData;
+
+							for ( const group of source.groups ) instanceGeometry.addGroup( group.start, group.count, group.materialIndex );
+
+							if ( source.boundingBox !== null ) instanceGeometry.boundingBox = source.boundingBox.clone();
+							if ( source.boundingSphere !== null ) instanceGeometry.boundingSphere = source.boundingSphere.clone();
+
+							instanceGeometry.drawRange.start = source.drawRange.start;
+							instanceGeometry.drawRange.count = source.drawRange.count;
+
+							instanceGeometry.userData = Object.assign( {}, source.userData );
 
 							instancedMesh.geometry = instanceGeometry;
 
