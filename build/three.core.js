@@ -42449,41 +42449,54 @@ class BezierInterpolant extends Interpolant {
 			const c1x = inTangents[ inTangentOffset ];
 			const c1y = inTangents[ inTangentOffset + 1 ];
 
-			// Solve for Bezier parameter s where Bx(s) = t using Newton-Raphson
-			let s = ( t - t0 ) / ( t1 - t0 );
-			let s2, s3, oneMinusS, oneMinusS2, oneMinusS3;
+			// Find the curve parameter s where the Bezier X(s) matches t, then evaluate Y(s)
+			const s = solveBezierParameter( t, t0, c0x, c1x, t1 );
 
-			for ( let iter = 0; iter < 8; iter ++ ) {
-
-				s2 = s * s;
-				s3 = s2 * s;
-				oneMinusS = 1 - s;
-				oneMinusS2 = oneMinusS * oneMinusS;
-				oneMinusS3 = oneMinusS2 * oneMinusS;
-
-				// Bezier X(s) = (1-s)³·t0 + 3(1-s)²s·c0x + 3(1-s)s²·c1x + s³·t1
-				const bx = oneMinusS3 * t0 + 3 * oneMinusS2 * s * c0x + 3 * oneMinusS * s2 * c1x + s3 * t1;
-
-				const error = bx - t;
-				if ( Math.abs( error ) < 1e-10 ) break;
-
-				// Derivative dX/ds
-				const dbx = 3 * oneMinusS2 * ( c0x - t0 ) + 6 * oneMinusS * s * ( c1x - c0x ) + 3 * s2 * ( t1 - c1x );
-				if ( Math.abs( dbx ) < 1e-10 ) break;
-
-				s = s - error / dbx;
-				s = Math.max( 0, Math.min( 1, s ) );
-
-			}
-
-			// Evaluate Bezier Y(s)
-			result[ i ] = oneMinusS3 * v0 + 3 * oneMinusS2 * s * c0y + 3 * oneMinusS * s2 * c1y + s3 * v1;
+			result[ i ] = cubicBezier( s, v0, c0y, c1y, v1 );
 
 		}
 
 		return result;
 
 	}
+
+}
+
+function cubicBezier( s, p0, p1, p2, p3 ) {
+
+	const k = 1 - s;
+
+	return k * k * k * p0 + 3 * k * k * s * p1 + 3 * k * s * s * p2 + s * s * s * p3;
+
+}
+
+function cubicBezierSlope( s, p0, p1, p2, p3 ) {
+
+	const k = 1 - s;
+
+	return 3 * k * k * ( p1 - p0 ) + 6 * k * s * ( p2 - p1 ) + 3 * s * s * ( p3 - p2 );
+
+}
+
+// Solves cubicBezier( s, x0, x1, x2, x3 ) = x for s in [0,1] using Newton-Raphson
+
+function solveBezierParameter( x, x0, x1, x2, x3 ) {
+
+	let s = ( x - x0 ) / ( x3 - x0 );
+
+	for ( let i = 0; i < 8; i ++ ) {
+
+		const error = cubicBezier( s, x0, x1, x2, x3 ) - x;
+		if ( Math.abs( error ) < 1e-10 ) break;
+
+		const slope = cubicBezierSlope( s, x0, x1, x2, x3 );
+		if ( Math.abs( slope ) < 1e-10 ) break;
+
+		s = Math.max( 0, Math.min( 1, s - error / slope ) );
+
+	}
+
+	return s;
 
 }
 
