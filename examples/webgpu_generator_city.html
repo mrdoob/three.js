@@ -64,7 +64,7 @@
 
 			const parameters = {
 				seed: 94,
-				timeOfDay: 6.3, // hours: 6 sunrise, 12 noon, 18 sunset
+				timeOfDay: 6.4, // hours: 6 sunrise, 12 noon, 18 sunset
 				gi: true,
 				showProbes: false
 			};
@@ -78,7 +78,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 0.5;
+				renderer.toneMappingExposure = 0.13;
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				renderer.inspector = new Inspector();
@@ -89,7 +89,7 @@
 				pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 				scene = new THREE.Scene();
-				scene.environmentIntensity = 0.2; // sky as a soft fill; the sun is the key
+				scene.environmentIntensity = 0.05; // a hint of sky in the reflections; the diffuse sky fill comes occlusion-aware from the probe grid
 
 				// a physical sky drives both the backdrop and the image-based
 				// lighting; the time-of-day slider walks the sun along its arc
@@ -132,10 +132,14 @@
 
 				sunLight = new THREE.DirectionalLight();
 				sunLight.castShadow = true;
+
+				// the ortho box must hold the whole city in the light's view at every sun
+				// angle; near noon the ground plane tilts far down the view's vertical axis
+
 				sunLight.shadow.camera.left = - 280;
 				sunLight.shadow.camera.right = 280;
-				sunLight.shadow.camera.top = 360;
-				sunLight.shadow.camera.bottom = - 40;
+				sunLight.shadow.camera.top = 240;
+				sunLight.shadow.camera.bottom = - 160;
 				sunLight.shadow.camera.far = 2400;
 				sunLight.shadow.mapSize.set( 4096, 4096 );
 				sunLight.shadow.bias = - 0.0004;
@@ -226,15 +230,16 @@
 				);
 				sky.sunPosition.value.copy( sun );
 
-				// physically-motivated key light: real sunlight is far brighter than the
-				// sky, so the sun stays the dominant source and cast shadows read clearly
-				// against the soft sky fill. the longer air path near the horizon dims and
-				// warms it ( the fill dims with it, as the environment is re-baked below ).
+				// physically-motivated key light: on a real hazy midday the sun delivers
+				// about three times the sky's irradiance onto a horizontal surface, so it
+				// is anchored to ~3x the sky dome the probes capture. the longer air path
+				// near the horizon dims and warms it ( the fill dims with it, as the
+				// environment and probes are re-baked ).
 
 				const sinElevation = Math.sin( THREE.MathUtils.degToRad( elevation ) );
 				const transmittance = Math.sqrt( Math.max( sinElevation, 0 ) ); // 0 at the horizon → 1 at the zenith
 				sunLight.color.set( 0xffb072 ).lerp( new THREE.Color( 0xfff4e8 ), transmittance );
-				sunLight.intensity = 6 * transmittance; // illuminance perpendicular to the rays; the renderer applies N·L per surface
+				sunLight.intensity = 100 * transmittance; // illuminance perpendicular to the rays; the renderer applies N·L per surface
 				sunLight.position.copy( sun ).multiplyScalar( 600 );
 
 				// re-bake the sky ( without the sun disc ) into the environment map for IBL.
@@ -277,7 +282,7 @@
 				if ( probes === undefined ) {
 
 					probes = new LightProbeGrid( GRID_SIZE.x, GRID_SIZE.y, GRID_SIZE.z, GRID_PROBES.x, GRID_PROBES.y, GRID_PROBES.z );
-					probes.position.set( 0, GRID_SIZE.y / 2, 0 );
+					probes.position.set( 0, GRID_SIZE.y / 2 + 1, 0 ); // bottom probe layer floats just above the road, never in its plane
 					scene.add( probes );
 
 				}
