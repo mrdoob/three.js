@@ -389,6 +389,7 @@ class GTAONode extends TempNode {
 			const viewNormal = sampleNormal( uvNode ).toVar();
 
 			const radius = this.radius;
+			const invRadius = radius.reciprocal().toVar();
 			const viewDir = normalize( viewPosition.xyz.negate() ).toVar();
 			const clipPosition = this._cameraProjectionMatrix.mul( vec4( viewPosition, 1.0 ) ).toVar();
 
@@ -404,6 +405,7 @@ class GTAONode extends TempNode {
 
 			const DIRECTIONS = this.samples.lessThan( 30 ).select( 3, 5 ).toVar();
 			const STEPS = add( this.samples, DIRECTIONS.sub( 1 ) ).div( DIRECTIONS ).toVar();
+			const invSteps = STEPS.reciprocal().toVar();
 
 			const ao = float( 0 ).toVar();
 
@@ -445,7 +447,7 @@ class GTAONode extends TempNode {
 
 					// Quadratic step distribution ( sampleDist = t² ) concentrates samples in the
 					// near-field. (Blender's Eevee adaptation)
-					const t = float( j ).add( 1.0 ).add( stepJitter ).div( STEPS ).toVar();
+					const t = float( j ).add( 1.0 ).add( stepJitter ).mul( invSteps ).toVar();
 					const sampleDist = t.mul( t );
 					const clipOffset = clipDirRadius.mul( sampleDist ).toVar();
 
@@ -460,13 +462,13 @@ class GTAONode extends TempNode {
 					const lenX = viewDeltaX.length().toVar();
 
 					// Manual normalize guards against zero-length delta.
-					const sHX = dot( viewDir, viewDeltaX.div( max( lenX, float( 0.0001 ) ) ) );
+					const sHX = dot( viewDir, viewDeltaX ).div( max( lenX, float( 0.0001 ) ) );
 
 					// Sphere falloff: ( dist / radius )² fades the sample's horizon contribution
 					// back toward the prior horizon as it approaches the radius boundary.
 					// (squared variant of the paper's near-field attenuation;
 					// Activision GTAO paper, Section 4.3 "Bounding the sampling area")
-					const distFacX = min( lenX.div( radius ), 1 );
+					const distFacX = min( lenX.mul( invRadius ), 1 );
 					const distFacSqX = distFacX.mul( distFacX );
 
 					If( abs( viewDeltaX.z ).lessThan( this.thickness ), () => {
@@ -483,9 +485,9 @@ class GTAONode extends TempNode {
 					const viewDeltaY = sampleSceneViewPositionY.sub( viewPosition ).toVar();
 					const lenY = viewDeltaY.length().toVar();
 
-					const sHY = dot( viewDir, viewDeltaY.div( max( lenY, float( 0.0001 ) ) ) );
+					const sHY = dot( viewDir, viewDeltaY ).div( max( lenY, float( 0.0001 ) ) );
 
-					const distFacY = min( lenY.div( radius ), 1 );
+					const distFacY = min( lenY.mul( invRadius ), 1 );
 					const distFacSqY = distFacY.mul( distFacY );
 
 					If( abs( viewDeltaY.z ).lessThan( this.thickness ), () => {
