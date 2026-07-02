@@ -75,7 +75,6 @@ vec4 tsl_textureGatherCompare_array( sampler2DArrayShadow map, vec3 coord, ivec2
 };
 
 const glslMethods = {
-	textureDimensions: 'textureSize',
 	equals: 'equal',
 	bitcast_float_int: 'floatBitsToInt',
 	bitcast_int_float: 'intBitsToFloat',
@@ -631,6 +630,20 @@ ${ flowData.code }
 		if ( offsetSnippet ) return `textureOffset( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet } )`;
 
 		return `texture( ${ textureProperty }, ${ uvSnippet } )`;
+
+	}
+
+	/**
+	 * Generates the GLSL snippet that resolves the dimensions of the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} levelSnippet - A GLSL snippet that represents the mip level.
+	 * @return {string} The GLSL snippet.
+	 */
+	generateTextureSize( texture, textureProperty, levelSnippet ) {
+
+		return `textureSize( ${ textureProperty }, ${ levelSnippet } )`;
 
 	}
 
