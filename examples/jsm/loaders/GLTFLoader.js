@@ -1786,14 +1786,7 @@ class GLTFMeshGpuInstancing {
 				}
 
 				// Add instance attributes to the geometry, excluding TRS.
-				//
-				// Custom instance attributes (e.g. _BATCHID, _FEATURE_ID_0) hold
-				// per-instance data. The source geometry is cached and may be shared
-				// by several nodes, so writing these attributes onto it would let each
-				// node overwrite the previous node's data. When such attributes exist,
-				// give this InstancedMesh a shallow geometry copy that shares the
-				// vertex/index buffers but owns its own instance attributes, stored as
-				// InstancedBufferAttribute (matching how _COLOR_0 is handled).
+
 				let instanceGeometry = null;
 
 				for ( const attributeName in attributes ) {
@@ -1808,6 +1801,8 @@ class GLTFMeshGpuInstancing {
 						 attributeName !== 'SCALE' ) {
 
 						if ( instanceGeometry === null ) {
+
+							// do a shallow clone of the goemetry so per-instance data are not shared
 
 							const source = instancedMesh.geometry;
 							instanceGeometry = new BufferGeometry();
