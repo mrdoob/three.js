@@ -10,16 +10,20 @@ class Value extends EventDispatcher {
 		this.domElement.className = 'param-control';
 
 		this._onChangeFunction = null;
+		this._changeTimeout = null;
+		this._debounceTime = 0;
 
 		this.addEventListener( 'change', ( e ) => {
 
 			// defer to avoid issues when changing multiple values in the same call stack
 
-			requestAnimationFrame( () => {
+			clearTimeout( this._changeTimeout );
+
+			this._changeTimeout = setTimeout( () => {
 
 				if ( this._onChangeFunction ) this._onChangeFunction( e.value );
 
-			} );
+			}, this._debounceTime );
 
 		} );
 
@@ -48,6 +52,14 @@ class Value extends EventDispatcher {
 	onChange( callback ) {
 
 		this._onChangeFunction = callback;
+
+		return this;
+
+	}
+
+	debounce( time ) {
+
+		this._debounceTime = time;
 
 		return this;
 
