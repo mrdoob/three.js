@@ -1875,11 +1875,6 @@ class WebGLRenderer {
 							_vector4.setFromMatrixPosition( object.matrixWorld )
 								.applyMatrix4( _projScreenMatrix );
 
-							// with a reversed depth buffer the projected z is inverted; negate it so
-							// smaller z always means "closer" for render list sorting
-
-							if ( camera.reversedDepth === true ) _vector4.z = - _vector4.z;
-
 						}
 
 						const geometry = objects.update( object );
@@ -1887,7 +1882,7 @@ class WebGLRenderer {
 
 						if ( material.visible ) {
 
-							currentRenderList.push( object, geometry, material, groupOrder, _vector4.z, null );
+							currentRenderList.push( object, geometry, material, groupOrder, _vector4.z, null, camera );
 
 						}
 
@@ -1918,8 +1913,6 @@ class WebGLRenderer {
 								.applyMatrix4( object.matrixWorld )
 								.applyMatrix4( _projScreenMatrix );
 
-							if ( camera.reversedDepth === true ) _vector4.z = - _vector4.z;
-
 						}
 
 						if ( Array.isArray( material ) ) {
@@ -1933,7 +1926,7 @@ class WebGLRenderer {
 
 								if ( groupMaterial && groupMaterial.visible ) {
 
-									currentRenderList.push( object, geometry, groupMaterial, groupOrder, _vector4.z, group );
+									currentRenderList.push( object, geometry, groupMaterial, groupOrder, _vector4.z, group, camera );
 
 								}
 
@@ -1941,7 +1934,7 @@ class WebGLRenderer {
 
 						} else if ( material.visible ) {
 
-							currentRenderList.push( object, geometry, material, groupOrder, _vector4.z, null );
+							currentRenderList.push( object, geometry, material, groupOrder, _vector4.z, null, camera );
 
 						}
 

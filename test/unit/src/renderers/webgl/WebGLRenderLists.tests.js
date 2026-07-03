@@ -1,5 +1,6 @@
 import { WebGLRenderLists, WebGLRenderList } from '../../../../../src/renderers/webgl/WebGLRenderLists.js';
 import { Scene } from '../../../../../src/scenes/Scene.js';
+import { Camera } from '../../../../../src/cameras/Camera.js';
 
 export default QUnit.module( 'Renderers', () => {
 
@@ -30,12 +31,13 @@ export default QUnit.module( 'Renderers', () => {
 			QUnit.test( 'init', ( assert ) => {
 
 				const list = new WebGLRenderList();
+				const camera = new Camera();
 
 				assert.ok( list.transparent.length === 0, 'Transparent list defaults to length 0.' );
 				assert.ok( list.opaque.length === 0, 'Opaque list defaults to length 0.' );
 
-				list.push( {}, {}, { transparent: true }, 0, 0, {} );
-				list.push( {}, {}, { transparent: false }, 0, 0, {} );
+				list.push( {}, {}, { transparent: true }, 0, 0, {}, camera );
+				list.push( {}, {}, { transparent: false }, 0, 0, {}, camera );
 
 				assert.ok( list.transparent.length === 1, 'Transparent list is length 1 after adding transparent item.' );
 				assert.ok( list.opaque.length === 1, 'Opaque list is length 1 after adding opaque item.' );
@@ -50,6 +52,8 @@ export default QUnit.module( 'Renderers', () => {
 			QUnit.test( 'push', ( assert ) => {
 
 				const list = new WebGLRenderList();
+				const camera = new Camera();
+
 				const objA = { id: 'A', renderOrder: 0 };
 				const matA = { transparent: true };
 				const geoA = {};
@@ -66,7 +70,7 @@ export default QUnit.module( 'Renderers', () => {
 				const matD = { transparent: false };
 				const geoD = {};
 
-				list.push( objA, geoA, matA, 0, 0.5, {} );
+				list.push( objA, geoA, matA, 0, 0.5, {}, camera );
 				assert.ok( list.transparent.length === 1, 'Transparent list is length 1 after adding transparent item.' );
 				assert.ok( list.opaque.length === 0, 'Opaque list is length 0 after adding transparent item.' );
 				assert.deepEqual(
@@ -85,7 +89,7 @@ export default QUnit.module( 'Renderers', () => {
 					'The first transparent render list item is structured correctly.'
 				);
 
-				list.push( objB, geoB, matB, 1, 1.5, {} );
+				list.push( objB, geoB, matB, 1, 1.5, {}, camera );
 				assert.ok( list.transparent.length === 2, 'Transparent list is length 2 after adding second transparent item.' );
 				assert.ok( list.opaque.length === 0, 'Opaque list is length 0 after adding second transparent item.' );
 				assert.deepEqual(
@@ -104,7 +108,7 @@ export default QUnit.module( 'Renderers', () => {
 					'The second transparent render list item is structured correctly.'
 				);
 
-				list.push( objC, geoC, matC, 2, 2.5, {} );
+				list.push( objC, geoC, matC, 2, 2.5, {}, camera );
 				assert.ok( list.transparent.length === 2, 'Transparent list is length 2 after adding first opaque item.' );
 				assert.ok( list.opaque.length === 1, 'Opaque list is length 1 after adding first opaque item.' );
 				assert.deepEqual(
@@ -123,7 +127,7 @@ export default QUnit.module( 'Renderers', () => {
 					'The first opaque render list item is structured correctly.'
 				);
 
-				list.push( objD, geoD, matD, 3, 3.5, {} );
+				list.push( objD, geoD, matD, 3, 3.5, {}, camera );
 				assert.ok( list.transparent.length === 2, 'Transparent list is length 2 after adding second opaque item.' );
 				assert.ok( list.opaque.length === 2, 'Opaque list is length 2 after adding second opaque item.' );
 				assert.deepEqual(
@@ -245,12 +249,14 @@ export default QUnit.module( 'Renderers', () => {
 			QUnit.test( 'sort', ( assert ) => {
 
 				const list = new WebGLRenderList();
+				const camera = new Camera();
+
 				const items = [ { id: 4 }, { id: 5 }, { id: 2 }, { id: 3 } ];
 
 				items.forEach( item => {
 
-					list.push( item, {}, { transparent: true }, 0, 0, {} );
-					list.push( item, {}, { transparent: false }, 0, 0, {} );
+					list.push( item, {}, { transparent: true }, 0, 0, {}, camera );
+					list.push( item, {}, { transparent: false }, 0, 0, {}, camera );
 
 				} );
 
