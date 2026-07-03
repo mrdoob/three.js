@@ -300,6 +300,10 @@ class RenderList {
 	 */
 	push( object, geometry, material, groupOrder, z, group, clippingContext ) {
 
+		// with a reversed depth buffer the projected z is inverted
+
+		if ( this.camera.reversedDepth === true ) z = - z;
+
 		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext );
 
 		if ( object.occlusionTest === true && this._lastOcclusionObject !== object ) {
