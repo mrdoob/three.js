@@ -375,8 +375,9 @@ class MaterialXNode {
 
 	getNode( out = null ) {
 
-		let node = this.node;
-		if ( node !== null && out === null ) return node;
+		if ( this.node !== null && out === null ) return this.node;
+
+		let node;
 
 
 		if ( ( this.element === 'separate2' || this.element === 'separate3' || this.element === 'separate4' ) && out ) {

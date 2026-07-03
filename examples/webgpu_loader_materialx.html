@@ -252,7 +252,7 @@
 
 				const material = await new MaterialXLoader()
 					.setPath( path )
-					.loadAsync( sample )
+					.loadAsync( sample, { uvSpace: 'top-left' } )
 					.then( ( { materials } ) => Object.values( materials ).pop() );
 
 				const calibrationMesh = model.getObjectByName( 'Calibration_Mesh' );

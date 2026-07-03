@@ -433,6 +433,7 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 			return normalize( nodeX.getNodeByName( 'normal' ) || normalLocal );
 
 		}
+
 		return vec4( 0, 0, 0, 1 );
 
 	}
@@ -445,6 +446,7 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 			return normalize( nodeX.getNodeByName( 'normal' ) || normalLocal );
 
 		}
+
 		return vec4( 0, 0, 0, 1 );
 
 	}
@@ -472,6 +474,7 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 		}
 
 	}
+
 	const transformedUv = compileContext.mxFromBottomLeftUvSpace( mul( uvNode, tiling ) );
 	const tileData = compileContext.mxHextileCoord( transformedUv, rotation, rotationRange, scale, scaleRange, offset, offsetRange );
 
@@ -568,7 +571,7 @@ const compileGltfTextureNode = ( nodeX, compileContext, category ) => {
 	}
 
 	const defaultInput = nodeX.getNodeByName( 'default' );
-	let fallback = float( 0 );
+	let fallback;
 
 	if ( nodeX.type === 'color3' || nodeX.type === 'vector3' ) {
 
@@ -736,6 +739,7 @@ const compileCreateMatrixNode = ( nodeX ) => {
 			return vector3Input ? vec4( element( input, 0 ), element( input, 1 ), element( input, 2 ), w ) : input;
 
 		};
+
 		const in1 = toVec4Input( 'in1', vector3Input ? vec3( 1, 0, 0 ) : vec4( 1, 0, 0, 0 ), 0 );
 		const in2 = toVec4Input( 'in2', vector3Input ? vec3( 0, 1, 0 ) : vec4( 0, 1, 0, 0 ), 0 );
 		const in3 = toVec4Input( 'in3', vector3Input ? vec3( 0, 0, 1 ) : vec4( 0, 0, 1, 0 ), 0 );
