@@ -177,7 +177,6 @@ class GaussianSplatSPZLoader extends Loader {
 		offset += count * 3;
 
 		const rotationOffset = offset;
-		offset += rotationsSize;
 
 		for ( let i = 0; i < count; i ++ ) {
 

@@ -81,10 +81,10 @@
 					name: 'Cool Splats Output',
 					url: 'https://huggingface.co/datasets/runes/coolsplats/resolve/main/output.splat',
 					loader: GaussianSplatLoader,
-					rotation: new THREE.Euler( -Math.PI * 0.5, 0, Math.PI * 0.5 ),
+					rotation: new THREE.Euler( - Math.PI * 0.5, 0, Math.PI * 0.5 ),
 					cameraMode: 'inside',
-					cameraPosition: new THREE.Vector3( 0, -0.5, 1.85 ),
-					cameraTarget: new THREE.Vector3( 0,  -0.5, 0 ),
+					cameraPosition: new THREE.Vector3( 0, - 0.5, 1.85 ),
+					cameraTarget: new THREE.Vector3( 0, - 0.5, 0 ),
 					minDistance: 0.01,
 					note: 'Remote standard .splat file referenced as working input in mkkellogg/GaussianSplats3D.'
 				},
@@ -177,7 +177,7 @@
 					await loadSplatSource( sourceNames[ value ] );
 
 				} );
-		
+
 				await loadSplatSource( sourceNames[ params.source ] );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -265,7 +265,7 @@
 				camera.updateProjectionMatrix();
 				controls.update();
 
-		
+
 			}
 
 			function onWindowResize() {
