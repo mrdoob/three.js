@@ -6,7 +6,7 @@ import {
 	NodeMaterial
 } from 'three/webgpu';
 
-import { Fn, float, vec2, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varyingProperty, vec4, uniform, cameraPosition, fract, floor, sin, time, Loop, If } from 'three/tsl';
+import { Fn, float, floor, fract, vec2, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varyingProperty, vec4, uniform, cameraPosition, time, If, Loop } from 'three/tsl';
 
 /**
  * Represents a skydome for scene backgrounds. Based on [A Practical Analytic Model for Daylight](https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight)
@@ -284,44 +284,48 @@ class SkyMesh extends Mesh {
 
 			const texColor = add( Lin, L0 ).mul( 0.04 ).add( vec3( 0.0, 0.0003, 0.00075 ) ).toVar();
 
-			// Cloud noise functions
-			const hash = Fn( ( [ p ] ) => {
+			// gradient at a lattice corner; sinless hash so every GPU produces the same clouds
+			const gradient = Fn( ( [ i ] ) => {
 
-				return fract( sin( dot( p, vec2( 127.1, 311.7 ) ) ).mul( 43758.5453123 ) );
+				const p = fract( i.xyx.mul( vec3( 0.1031, 0.1030, 0.0973 ) ) ).toVar();
+				p.addAssign( dot( p, p.yzx.add( 33.33 ) ) );
+
+				return fract( p.xx.add( p.yz ).mul( p.zy ) ).mul( 2.0 ).sub( 1.0 );
 
 			} );
 
-			const noise = Fn( ( [ p_immutable ] ) => {
+			// 2D gradient noise: isotropic lobes like Perlin at value-noise cost
+			const noise = Fn( ( [ p ] ) => {
 
-				const p = vec2( p_immutable ).toVar();
 				const i = floor( p );
 				const f = fract( p );
-				const ff = f.mul( f ).mul( sub( 3.0, f.mul( 2.0 ) ) );
+				const u = f.mul( f ).mul( f ).mul( f.mul( f.mul( 6.0 ).sub( 15.0 ) ).add( 10.0 ) ); // quintic fade
 
-				const a = hash( i );
-				const b = hash( add( i, vec2( 1.0, 0.0 ) ) );
-				const c = hash( add( i, vec2( 0.0, 1.0 ) ) );
-				const d = hash( add( i, vec2( 1.0, 1.0 ) ) );
+				const a = dot( gradient( i ), f );
+				const b = dot( gradient( i.add( vec2( 1.0, 0.0 ) ) ), f.sub( vec2( 1.0, 0.0 ) ) );
+				const c = dot( gradient( i.add( vec2( 0.0, 1.0 ) ) ), f.sub( vec2( 0.0, 1.0 ) ) );
+				const d = dot( gradient( i.add( vec2( 1.0, 1.0 ) ) ), f.sub( vec2( 1.0, 1.0 ) ) );
 
-				return mix( mix( a, b, ff.x ), mix( c, d, ff.x ), ff.y );
+				return mix( mix( a, b, u.x ), mix( c, d, u.x ), u.y ).mul( 1.6 ); // ~[-1,1]
 
 			} );
 
-			const fbm = Fn( ( [ p_immutable ] ) => {
+			// fbm; per-octave drift makes clouds billow instead of scrolling as a rigid stamp
+			const fbm = Fn( ( [ position, drift ] ) => {
 
-				const p = vec2( p_immutable ).toVar();
-				const value = float( 0.0 ).toVar();
-				const amplitude = float( 0.5 ).toVar();
+				const p = vec2( position ).toVar();
+				const result = float( 0.0 ).toVar();
+				const amplitude = float( 1.0 ).toVar();
 
-				Loop( 5, () => {
+				Loop( 4, () => {
 
-					value.addAssign( amplitude.mul( noise( p ) ) );
-					p.mulAssign( 2.0 );
+					result.addAssign( amplitude.mul( noise( p ) ) );
 					amplitude.mulAssign( 0.5 );
+					p.mulAssign( 2.0 ).addAssign( drift );
 
 				} );
 
-				return value;
+				return result;
 
 			} );
 
@@ -334,29 +338,50 @@ class SkyMesh extends Mesh {
 				cloudUV.mulAssign( this.cloudScale );
 				cloudUV.addAssign( time.mul( this.cloudSpeed ) );
 
-				// Multi-octave noise for fluffy clouds
-				const cloudNoise = fbm( cloudUV.mul( 1000.0 ) ).add( fbm( cloudUV.mul( 2000.0 ).add( 3.7 ) ).mul( 0.5 ) ).toVar();
-				cloudNoise.assign( cloudNoise.mul( 0.5 ).add( 0.5 ) );
+				// Cloud density field
+				const evolve = time.mul( this.cloudSpeed ).mul( 300.0 );
+				const cloudNoise = fbm( cloudUV.mul( 1000.0 ), evolve ).mul( 0.7 ).add( 0.5 ).clamp( 0.0, 1.0 ).toVar();
 
-				// Apply coverage threshold
-				const cloudMask = smoothstep( sub( 1.0, this.cloudCoverage ), sub( 1.0, this.cloudCoverage ).add( 0.3 ), cloudNoise ).toVar();
+				// Large-scale coverage variation: clear gaps next to dense banks
+				const region = noise( cloudUV.mul( 300.0 ) ).mul( 0.37 ).add( 0.5 );
+				const cov = clamp( this.cloudCoverage.add( region.sub( 0.5 ).mul( 0.6 ) ), 0.0, 1.0 );
+
+				// Carve clouds where noise rises above the coverage level
+				const threshold = sub( 1.0, cov ).toVar();
+				const cloudMask = smoothstep( threshold, threshold.add( 0.3 ), cloudNoise ).toVar();
 
 				// Fade clouds near horizon (adjusted by elevation)
-				const horizonFade = smoothstep( 0.0, add( 0.1, mul( 0.2, this.cloudElevation ) ), direction.y );
+				const horizonFade = smoothstep( 0.0, add( 0.03, mul( 0.06, this.cloudElevation ) ), direction.y );
 				cloudMask.mulAssign( horizonFade );
 
-				// Cloud lighting based on sun position
-				const sunInfluence = dot( direction, vSunDirection ).mul( 0.5 ).add( 0.5 );
-				const daylight = max( 0.0, vSunDirection.y.mul( 2.0 ) );
+				// Cloud lighting from the sky's own radiance
+				const dayFactor = smoothstep( - 0.08, 0.3, vSunDirection.y );
+				const sunColor = vSunE.mul( Fex ).mul( 0.22 ).mul( 0.04 ).toVar(); // 0.22 ~ albedo/pi, 0.04 = exposure; the aerial composite adds the eye-leg extinction
+				const skyAmbient = Lin.mul( 0.04 ).add( vec3( 0.0, 0.0003, 0.00075 ) );
 
-				// Base cloud color affected by atmosphere
-				const atmosphereColor = Lin.mul( 0.04 );
-				const cloudColor = mix( vec3( 0.3 ), vec3( 1.0 ), daylight ).toVar();
-				cloudColor.assign( mix( cloudColor, atmosphereColor.add( vec3( 1.0 ) ), sunInfluence.mul( 0.5 ) ) );
-				cloudColor.mulAssign( vSunE.mul( 0.00002 ) );
+				// Beer-powder self-shadow from the sampled density
+				const depth = max( 0.0, cloudNoise.sub( threshold ) ).toVar();
+				const beer = exp( depth.mul( - 4.0 ) ).toVar();
+				const powder = sub( 1.0, beer.mul( beer ) ); // beer*beer == exp(-8*depth)
+				const shade = mix( 0.45, 1.0, beer.mul( powder ).mul( 2.6 ).clamp( 0.0, 1.0 ) ); // 2.6 = 1/0.385, normalizes beer*powder peak to 1
 
-				// Blend clouds with sky
-				texColor.assign( mix( texColor, cloudColor, cloudMask.mul( this.cloudDensity ) ) );
+				// Henyey-Greenstein forward lobe ( g = 0.7 ): silver lining on rims toward the sun
+				const silver = float( 0.51 ).div( pow( sub( 1.49, cosTheta.mul( 1.4 ) ), 1.5 ) ).clamp( 0.0, 3.0 ); // 0.51=1-g^2, 1.49=1+g^2, 1.4=2g
+				const edge = cloudMask.mul( sub( 1.0, cloudMask ) ).mul( 4.0 );
+
+				const cloudColor = skyAmbient.add( sunColor.mul( shade ) ).toVar();
+				cloudColor.addAssign( sunColor.mul( silver ).mul( edge ).mul( 0.6 ) );
+				cloudColor.mulAssign( dayFactor.max( 0.03 ) );
+
+				// Cloud opacity via Beer's law: density sets how solid the clouds get
+				const alpha = sub( 1.0, exp( depth.mul( this.cloudDensity ).mul( - 12.0 ) ) ).mul( horizonFade ).toVar();
+
+				// Occlude the sun disc/glow behind opaque cloud
+				texColor.subAssign( L0.mul( 0.04 ).mul( alpha ) );
+
+				// Composite through the atmosphere so distant clouds dissolve into haze
+				const cloudAerial = mix( texColor, cloudColor, Fex );
+				texColor.assign( mix( texColor, cloudAerial, alpha ) );
 
 			} );
 
