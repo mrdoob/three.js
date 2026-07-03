@@ -900,6 +900,8 @@ class WebGPUBackend extends Backend {
 
 		//
 
+		const renderTarget = renderContext.renderTarget;
+
 		if ( renderContext.depth ) {
 
 			if ( renderContext.clearDepth ) {
@@ -913,7 +915,15 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
+			if ( renderContext.sampleCount > 1 && renderTarget?.resolveDepthBuffer === false ) {
+
+				depthStencilAttachment.depthStoreOp = GPUStoreOp.Discard;
+
+			} else {
+
+				depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
+
+			}
 
 		}
 
@@ -930,7 +940,15 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
+			if ( renderContext.sampleCount > 1 && renderTarget?.resolveStencilBuffer === false ) {
+
+				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Discard;
+
+			} else {
+
+				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
+
+			}
 
 		}
 
