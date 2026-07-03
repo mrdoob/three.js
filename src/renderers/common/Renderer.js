@@ -961,16 +961,15 @@ class Renderer {
 
 		//
 
-		const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
+		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 
 		if ( camera.isArrayCamera ) {
 
-			frustum.setFromArrayCamera( camera );
+			_frustumArray.setFromArrayCamera( camera );
 
 		} else {
 
-			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-			frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
+			_frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
 
 		}
 
@@ -1675,16 +1674,15 @@ class Renderer {
 
 		//
 
-		const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
+		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 
 		if ( camera.isArrayCamera ) {
 
-			frustum.setFromArrayCamera( camera );
+			_frustumArray.setFromArrayCamera( camera );
 
 		} else {
 
-			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-			frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
+			_frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
 
 		}
 
