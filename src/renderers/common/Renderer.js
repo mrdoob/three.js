@@ -1697,7 +1697,7 @@ class Renderer {
 
 		if ( this.sortObjects === true ) {
 
-			renderList.sort( this._opaqueSort, this._transparentSort, camera.reversedDepth );
+			renderList.sort( this._opaqueSort, this._transparentSort );
 
 		}
 
@@ -3145,6 +3145,11 @@ class Renderer {
 
 						_vector4.setFromMatrixPosition( object.matrixWorld ).applyMatrix4( _projScreenMatrix );
 
+						// with a reversed depth buffer the projected z is inverted; negate it so
+						// smaller z always means "closer" for render list sorting
+
+						if ( camera.reversedDepth === true ) _vector4.z = - _vector4.z;
+
 					}
 
 					const { geometry, material } = object;
@@ -3177,6 +3182,8 @@ class Renderer {
 							.copy( geometry.boundingSphere.center )
 							.applyMatrix4( object.matrixWorld )
 							.applyMatrix4( _projScreenMatrix );
+
+						if ( camera.reversedDepth === true ) _vector4.z = - _vector4.z;
 
 					}
 
