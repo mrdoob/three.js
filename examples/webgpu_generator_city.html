@@ -51,7 +51,7 @@
 
 			let camera, scene, renderer, controls, timer;
 			let cityGroup, cityProxy, materials, city, renderPipeline;
-			let sky, sun, sunLight, pmremGenerator, envScene, envRenderTarget;
+			let sky, sun, sunLight, pmremGenerator, envScene, envRenderTarget, cityBounds;
 			let probes, probesHelper, rebakeTimer = null;
 
 			// the irradiance grid spans the whole footprint plus the streets, rising to
@@ -125,23 +125,27 @@
 				ground.receiveShadow = true;
 				scene.add( ground );
 
+				// everything a shadow can touch fits this box: the ground plane up to just
+				// above the tallest tower crown. updateSun() wraps the shadow camera around it
+
+				cityBounds = new THREE.Box3(
+					new THREE.Vector3( - floorW / 2, 0, - floorD / 2 ),
+					new THREE.Vector3( floorW / 2, 160, floorD / 2 )
+				);
+
 				// a single directional key aligned with the sky's sun, for the crisp
 				// relief shadows the IBL alone can't give. its colour, intensity and
 				// position — and the baked environment — are set by updateSun()
 
 				sunLight = new THREE.DirectionalLight();
 				sunLight.castShadow = true;
-
-				// the ortho box must hold the whole city in the light's view at every sun
-				// angle; near noon the ground plane tilts far down the view's vertical axis
-
-				sunLight.shadow.camera.left = - 280;
-				sunLight.shadow.camera.right = 280;
-				sunLight.shadow.camera.top = 240;
-				sunLight.shadow.camera.bottom = - 160;
-				sunLight.shadow.camera.far = 2400;
 				sunLight.shadow.mapSize.set( 4096, 4096 );
-				sunLight.shadow.bias = - 0.0004;
+
+				// acne is suppressed along the surface normal ( in world units ) rather
+				// than with a depth bias: a depth bias scales with the shadow range, and
+				// even a small one erases short casters, like the shadow beneath a car
+
+				sunLight.shadow.normalBias = 0.05;
 				scene.add( sunLight );
 
 				updateSun();
@@ -218,6 +222,37 @@
 				sunLight.color.set( 0xffb072 ).lerp( new THREE.Color( 0xfff4e8 ), transmittance );
 				sunLight.intensity = 100 * transmittance; // illuminance perpendicular to the rays; the renderer applies N·L per surface
 				sunLight.position.copy( sun ).multiplyScalar( 600 );
+
+				// shrink-wrap the shadow camera around the city for this sun angle: project
+				// the scene box into light space and fit the ortho bounds and depth range to
+				// it, so the map spends its texels only where shadows can actually fall
+
+				const shadowCamera = sunLight.shadow.camera;
+				const lightSpace = new THREE.Quaternion().setFromRotationMatrix( new THREE.Matrix4().lookAt( sunLight.position, scene.position, THREE.Object3D.DEFAULT_UP ) ).invert();
+
+				const fit = new THREE.Box3();
+				const corner = new THREE.Vector3();
+
+				for ( let i = 0; i < 8; i ++ ) {
+
+					corner.set(
+						i & 1 ? cityBounds.max.x : cityBounds.min.x,
+						i & 2 ? cityBounds.max.y : cityBounds.min.y,
+						i & 4 ? cityBounds.max.z : cityBounds.min.z
+					).sub( sunLight.position ).applyQuaternion( lightSpace );
+
+					fit.expandByPoint( corner );
+
+				}
+
+				const pad = 2;
+				shadowCamera.left = fit.min.x - pad;
+				shadowCamera.right = fit.max.x + pad;
+				shadowCamera.bottom = fit.min.y - pad;
+				shadowCamera.top = fit.max.y + pad;
+				shadowCamera.near = - fit.max.z - pad; // the camera looks down its negative z axis, so depth flips sign
+				shadowCamera.far = - fit.min.z + pad;
+				shadowCamera.updateProjectionMatrix();
 
 				// re-bake the sky ( without the sun disc ) into the environment map for IBL.
 				// reuse one render target so the texture keeps its identity: a fresh texture
