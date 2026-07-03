@@ -1602,7 +1602,7 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 
 	const brickH = BRICK.height;
 	const brickL = BRICK.length;
-	const mortar = 0.025; // joint width, in metres
+	const mortar = 0.010; // joint width, in metres
 
 	const nrm = normalWorldGeometry.abs();
 	const across = positionLocal.x.mul( normalWorldGeometry.z ).sub( positionLocal.z.mul( normalWorldGeometry.x ) );
@@ -1637,11 +1637,11 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	// course line, 0 at the joint, 0.5 at the centre ), so bricks read rounded rather than
 	// scratched. the bevel is widened to at least a screen pixel ( from the world-position
 	// derivative, our stand-in for a mip LOD ) so the edge never goes sub-pixel and shimmers.
-	const bevel = 0.02;
+	const bevel = 0.008;
 	const texel = fwidth( positionWorld ).length(); // on-screen size of a surface pixel — our hand-rolled LOD
 	const lodBevel = texel.mul( 1.5 ).max( bevel );
 	const brickFace = smoothstep( 0, lodBevel, distU.mul( brickL ) ).mul( smoothstep( 0, lodBevel, distV.mul( brickH ) ) ).mul( wallFacing );
-	const reliefHeight = brickFace.mul( 0.008 );
+	const reliefHeight = brickFace.mul( 0.003 );
 	const rough = valueNoise( positionWorld.mul( 0.5 ) ).mul( 0.08 ).add( 0.82 ).add( joint.mul( 0.12 ) );
 
 	// the merged geometry carries a per-vertex partId; this material reads it and
