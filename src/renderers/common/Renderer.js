@@ -1733,6 +1733,7 @@ class Renderer {
 		renderContext.activeCubeFace = activeCubeFace;
 		renderContext.activeMipmapLevel = activeMipmapLevel;
 		renderContext.occlusionQueryCount = renderList.occlusionQueryCount;
+		renderContext.fullscreenPass = scene.isQuadMesh === true;
 
 		//
 
@@ -2503,8 +2504,8 @@ class Renderer {
 	 * The current number of samples used for multi-sample anti-aliasing (MSAA).
 	 *
 	 * When rendering to a custom render target, the number of samples of that render target is used.
-	 * If the renderer needs an internal framebuffer target for tone mapping or color space conversion,
-	 * the number of samples is set to 0.
+	 * The number of samples is set to 0 when the renderer needs an internal framebuffer target for
+	 * tone mapping or color space conversion, or when rendering a fullscreen quad to screen.
 	 *
 	 * @type {number}
 	 */
@@ -2516,7 +2517,7 @@ class Renderer {
 
 			samples = this._renderTarget.samples;
 
-		} else if ( this.needsFrameBufferTarget ) {
+		} else if ( this.needsFrameBufferTarget || this._currentRenderContext?.fullscreenPass === true ) {
 
 			samples = 0;
 
