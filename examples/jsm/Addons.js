@@ -114,6 +114,7 @@ export * from './loaders/PDBLoader.js';
 export * from './loaders/PLYLoader.js';
 export * from './loaders/PVRLoader.js';
 export * from './loaders/RGBELoader.js';
+export * from './loaders/GaussianSplatPLYLoader.js';
 export * from './loaders/UltraHDRLoader.js';
 export * from './loaders/STLLoader.js';
 export * from './loaders/SVGLoader.js';
@@ -160,6 +161,8 @@ export * from './modifiers/SimplifyModifier.js';
 export * from './modifiers/TessellateModifier.js';
 
 export * from './objects/GroundedSkybox.js';
+export * from './objects/GaussianSplatData.js';
+export * from './objects/GaussianSplatMesh.js';
 export * from './objects/Lensflare.js';
 export * from './objects/MarchingCubes.js';
 export * from './objects/Reflector.js';
