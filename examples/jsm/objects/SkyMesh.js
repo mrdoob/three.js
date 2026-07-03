@@ -343,7 +343,7 @@ class SkyMesh extends Mesh {
 				const region = noise( cloudUV.mul( 300.0 ) ).mul( 0.37 ).add( 0.5 );
 				const cov = clamp( this.cloudCoverage.add( region.sub( 0.5 ).mul( 0.6 ) ), 0.0, 1.0 );
 
-				// carve clouds where noise rises above the coverage level
+				// Carve clouds where noise rises above the coverage level
 				const threshold = sub( 1.0, cov ).toVar();
 				const cloudMask = smoothstep( threshold, threshold.add( 0.3 ), cloudNoise ).toVar();
 
@@ -352,7 +352,7 @@ class SkyMesh extends Mesh {
 				cloudMask.mulAssign( horizonFade );
 
 				// Cloud lighting from the sky's own radiance
-				const dayFactor = smoothstep( - 0.08, 0.30, vSunDirection.y );
+				const dayFactor = smoothstep( - 0.08, 0.3, vSunDirection.y );
 				const sunColor = vSunE.mul( Fex ).mul( 0.22 ).mul( 0.04 ).toVar(); // 0.22 ~ albedo/pi, 0.04 = exposure; the aerial composite adds the eye-leg extinction
 				const skyAmbient = Lin.mul( 0.04 ).add( vec3( 0.0, 0.0003, 0.00075 ) );
 
