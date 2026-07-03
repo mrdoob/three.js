@@ -120,7 +120,7 @@
 
 				sphere = new THREE.Mesh(
 					new THREE.SphereGeometry( 400, 64, 32 ),
-					new THREE.MeshStandardMaterial( { metalness: 1, roughness: 0, envMap: cubeRenderTarget.texture } )
+					new THREE.MeshBasicMaterial( { envMap: cubeRenderTarget.texture } )
 				);
 				scene.add( sphere );
 
