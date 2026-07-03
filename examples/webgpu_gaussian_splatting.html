@@ -73,7 +73,7 @@
 					name: 'ReconWorldLab Demo',
 					url: 'https://raw.githubusercontent.com/ReconWorldLab/godot-gaussian-splatting/main/samples/assets/demo.ply',
 					loader: GaussianSplatPLYLoader,
-					rotation: new THREE.Euler( 0, 0, 0 ),
+					rotation: new THREE.Euler( Math.PI, 0, 0 ),
 					cameraPosition: new THREE.Vector3( 0, 0.2, 3.5 ),
 					note: 'MIT licensed sample from ReconWorldLab/godot-gaussian-splatting.'
 				},
@@ -81,10 +81,10 @@
 					name: 'Cool Splats Output',
 					url: 'https://huggingface.co/datasets/runes/coolsplats/resolve/main/output.splat',
 					loader: GaussianSplatLoader,
-					rotation: new THREE.Euler( 0, 0, 0 ),
+					rotation: new THREE.Euler( -Math.PI * 0.5, 0, Math.PI * 0.5 ),
 					cameraMode: 'inside',
-					cameraPosition: new THREE.Vector3( 0, 0, 0.35 ),
-					cameraTarget: new THREE.Vector3( 0, 0, 0 ),
+					cameraPosition: new THREE.Vector3( 0, -0.5, 1.85 ),
+					cameraTarget: new THREE.Vector3( 0,  -0.5, 0 ),
 					minDistance: 0.01,
 					note: 'Remote standard .splat file referenced as working input in mkkellogg/GaussianSplats3D.'
 				},
@@ -92,7 +92,7 @@
 					name: 'Niantic Horned Lizard',
 					url: 'https://raw.githubusercontent.com/nianticlabs/spz/v2.1.0/samples/hornedlizard.spz',
 					loader: GaussianSplatSPZLoader,
-					rotation: new THREE.Euler(0, 0, 0 ),
+					rotation: new THREE.Euler( 0, 0, 0 ),
 					cameraMode: 'inside',
 					cameraPosition: new THREE.Vector3( 0, 0.15, 0.9 ),
 					cameraTarget: new THREE.Vector3( 0, 0, 0 ),
@@ -135,6 +135,9 @@
 					note: 'Overlapping translucent layers at different depths. Orbit to validate back-to-front sorting.'
 				}
 			};
+			const params = {
+				source: 'Procedural Flower (local, CC0)',
+			};
 
 			init();
 
@@ -168,17 +171,13 @@
 				controls.target.set( 0, 0, 0 );
 				controls.update();
 
-				const params = {
-					source: 'Procedural Flower (local, CC0)'
-				};
-
 				const gui = new GUI();
 				gui.add( params, 'source', Object.keys( sourceNames ) ).name( 'Splat' ).onChange( async ( value ) => {
 
 					await loadSplatSource( sourceNames[ value ] );
 
 				} );
-
+		
 				await loadSplatSource( sourceNames[ params.source ] );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -240,7 +239,7 @@
 
 				mesh.updateWorldMatrix( true, false );
 
-				const sphere = mesh.boundingSphere.clone().applyMatrix4( mesh.matrixWorld );
+				const sphere = mesh.splatData.boundingSphere.clone().applyMatrix4( mesh.matrixWorld );
 				const radius = Math.max( sphere.radius, 1 );
 				const distance = radius / Math.sin( THREE.MathUtils.degToRad( camera.fov ) * 0.5 );
 
@@ -266,6 +265,7 @@
 				camera.updateProjectionMatrix();
 				controls.update();
 
+		
 			}
 
 			function onWindowResize() {
@@ -280,6 +280,8 @@
 			function render() {
 
 				controls.update();
+
+			
 
 				if ( splats !== undefined ) {
 
