@@ -1692,7 +1692,7 @@ class WebGLRenderer {
 
 			if ( _this.sortObjects === true ) {
 
-				currentRenderList.sort( _opaqueSort, _transparentSort, camera.reversedDepth );
+				currentRenderList.sort( _opaqueSort, _transparentSort );
 
 			}
 
@@ -1875,6 +1875,11 @@ class WebGLRenderer {
 							_vector4.setFromMatrixPosition( object.matrixWorld )
 								.applyMatrix4( _projScreenMatrix );
 
+							// with a reversed depth buffer the projected z is inverted; negate it so
+							// smaller z always means "closer" for render list sorting
+
+							if ( camera.reversedDepth === true ) _vector4.z = - _vector4.z;
+
 						}
 
 						const geometry = objects.update( object );
@@ -1912,6 +1917,8 @@ class WebGLRenderer {
 							_vector4
 								.applyMatrix4( object.matrixWorld )
 								.applyMatrix4( _projScreenMatrix );
+
+							if ( camera.reversedDepth === true ) _vector4.z = - _vector4.z;
 
 						}
 
