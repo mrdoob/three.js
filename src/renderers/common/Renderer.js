@@ -272,7 +272,7 @@ class Renderer {
 		 * @type {number}
 		 * @default 0
 		 */
-		this._samples = samples || ( antialias === true ) ? 4 : 0;
+		this._samples = samples || ( antialias === true ? 4 : 0 );
 
 		/**
 		 * OnCanvasTargetResize callback function.
