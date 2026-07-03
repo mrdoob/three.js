@@ -193,6 +193,14 @@ class RenderList {
 		this.occlusionQueryCount = 0;
 
 		/**
+		 * The ID of the frame the render list was last used in.
+		 *
+		 * @type {number}
+		 * @default -1
+		 */
+		this.frameId = - 1;
+
+		/**
 		 * The last object that was counted for occlusion query testing. Used to
 		 * avoid counting an object more than once when it produces multiple render
 		 * items (e.g. a mesh with multiple material groups), since such an object
@@ -420,21 +428,52 @@ class RenderList {
 
 			if ( renderItem.id === null ) break;
 
-			renderItem.id = null;
-			renderItem.object = null;
-			renderItem.geometry = null;
-			renderItem.material = null;
-			renderItem.groupOrder = null;
-			renderItem.renderOrder = null;
-			renderItem.z = null;
-			renderItem.group = null;
-			renderItem.clippingContext = null;
+			resetRenderItem( renderItem );
 
 		}
 
 		this._lastOcclusionObject = null;
 
 	}
+
+	/**
+	 * This method is called when the render list has become inactive.
+	 */
+	clear() {
+
+		// Clear all references from the render items so scene objects
+		// are not retained when the render list is not used anymore.
+
+		for ( let i = 0, il = this.renderItems.length; i < il; i ++ ) {
+
+			const renderItem = this.renderItems[ i ];
+
+			if ( renderItem.id === null ) break;
+
+			resetRenderItem( renderItem );
+
+		}
+
+		this.opaque.length = 0;
+		this.transparentDoublePass.length = 0;
+		this.transparent.length = 0;
+		this.bundles.length = 0;
+
+	}
+
+}
+
+function resetRenderItem( renderItem ) {
+
+	renderItem.id = null;
+	renderItem.object = null;
+	renderItem.geometry = null;
+	renderItem.material = null;
+	renderItem.groupOrder = null;
+	renderItem.renderOrder = null;
+	renderItem.z = null;
+	renderItem.group = null;
+	renderItem.clippingContext = null;
 
 }
 
