@@ -6,7 +6,7 @@ import {
 	NodeMaterial
 } from 'three/webgpu';
 
-import { Fn, float, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varyingProperty, vec4, uniform, cameraPosition, time, If, mx_fractal_noise_float } from 'three/tsl';
+import { Fn, float, floor, fract, sin, vec2, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varyingProperty, vec4, uniform, cameraPosition, time, If, Loop } from 'three/tsl';
 
 /**
  * Represents a skydome for scene backgrounds. Based on [A Practical Analytic Model for Daylight](https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight)
@@ -284,6 +284,48 @@ class SkyMesh extends Mesh {
 
 			const texColor = add( Lin, L0 ).mul( 0.04 ).add( vec3( 0.0, 0.0003, 0.00075 ) ).toVar();
 
+			// gradient at a lattice corner; the sin hash is safe at cloud-scale coordinates
+			const gradient = Fn( ( [ i ] ) => {
+
+				return fract( sin( vec2( dot( i, vec2( 127.1, 311.7 ) ), dot( i, vec2( 269.5, 183.3 ) ) ) ).mul( 43758.5453123 ) ).mul( 2.0 ).sub( 1.0 );
+
+			} );
+
+			// 2D gradient noise: isotropic lobes like Perlin at value-noise cost
+			const noise = Fn( ( [ p ] ) => {
+
+				const i = floor( p );
+				const f = fract( p );
+				const u = f.mul( f ).mul( f ).mul( f.mul( f.mul( 6.0 ).sub( 15.0 ) ).add( 10.0 ) ); // quintic fade
+
+				const a = dot( gradient( i ), f );
+				const b = dot( gradient( i.add( vec2( 1.0, 0.0 ) ) ), f.sub( vec2( 1.0, 0.0 ) ) );
+				const c = dot( gradient( i.add( vec2( 0.0, 1.0 ) ) ), f.sub( vec2( 0.0, 1.0 ) ) );
+				const d = dot( gradient( i.add( vec2( 1.0, 1.0 ) ) ), f.sub( vec2( 1.0, 1.0 ) ) );
+
+				return mix( mix( a, b, u.x ), mix( c, d, u.x ), u.y ).mul( 1.6 ); // ~[-1,1]
+
+			} );
+
+			// fbm; per-octave drift makes clouds billow instead of scrolling as a rigid stamp
+			const fbm = Fn( ( [ position, drift ] ) => {
+
+				const p = vec2( position ).toVar();
+				const result = float( 0.0 ).toVar();
+				const amplitude = float( 1.0 ).toVar();
+
+				Loop( 4, () => {
+
+					result.addAssign( amplitude.mul( noise( p ) ) );
+					amplitude.mulAssign( 0.5 );
+					p.mulAssign( 2.0 ).addAssign( drift );
+
+				} );
+
+				return result;
+
+			} );
+
 			// Clouds
 			If( direction.y.greaterThan( 0.0 ).and( this.cloudCoverage.greaterThan( 0.0 ) ), () => {
 
@@ -293,12 +335,12 @@ class SkyMesh extends Mesh {
 				cloudUV.mulAssign( this.cloudScale );
 				cloudUV.addAssign( time.mul( this.cloudSpeed ) );
 
-				// Gradient-noise fbm for fluffy clouds
-				const evolve = time.mul( this.cloudSpeed ).mul( 300.0 ); // drift noise z so clouds billow, not just slide
-				const cloudNoise = mx_fractal_noise_float( vec3( cloudUV.mul( 1000.0 ), evolve ), 5, 2.0, 0.5 ).mul( 0.7 ).add( 0.5 ).clamp( 0.0, 1.0 ).toVar();
+				// Cloud density field
+				const evolve = time.mul( this.cloudSpeed ).mul( 300.0 );
+				const cloudNoise = fbm( cloudUV.mul( 1000.0 ), evolve ).mul( 0.7 ).add( 0.5 ).clamp( 0.0, 1.0 ).toVar();
 
 				// Large-scale coverage variation: clear gaps next to dense banks
-				const region = mx_fractal_noise_float( vec3( cloudUV.mul( 300.0 ), 0.0 ), 2, 2.0, 0.5 ).mul( 0.33 ).add( 0.5 );
+				const region = noise( cloudUV.mul( 300.0 ) ).mul( 0.37 ).add( 0.5 );
 				const cov = clamp( this.cloudCoverage.add( region.sub( 0.5 ).mul( 0.6 ) ), 0.0, 1.0 );
 
 				// carve clouds where noise rises above the coverage level
@@ -311,7 +353,7 @@ class SkyMesh extends Mesh {
 
 				// Cloud lighting from the sky's own radiance
 				const dayFactor = smoothstep( - 0.08, 0.30, vSunDirection.y );
-				const sunColor = vSunE.mul( Fex ).mul( 0.22 ).mul( 0.04 ).toVar(); // 0.22 ~ albedo/pi, 0.04 = exposure ( Fex = sun->cloud; eye leg added by the aerial composite )
+				const sunColor = vSunE.mul( Fex ).mul( 0.22 ).mul( 0.04 ).toVar(); // 0.22 ~ albedo/pi, 0.04 = exposure; the aerial composite adds the eye-leg extinction
 				const skyAmbient = Lin.mul( 0.04 ).add( vec3( 0.0, 0.0003, 0.00075 ) );
 
 				// Beer-powder self-shadow from the sampled density
