@@ -40,7 +40,9 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { GaussianSplatLoader } from 'three/addons/loaders/GaussianSplatLoader.js';
 			import { GaussianSplatPLYLoader } from 'three/addons/loaders/GaussianSplatPLYLoader.js';
+			import { GaussianSplatSPZLoader } from 'three/addons/loaders/GaussianSplatSPZLoader.js';
 			import { GaussianSplatData } from 'three/addons/objects/GaussianSplatData.js';
 			import { GaussianSplatMesh } from 'three/addons/objects/GaussianSplatMesh.js';
 
@@ -51,6 +53,8 @@
 			const sourceNames = {
 				'Procedural Flower (local, CC0)': 'flower',
 				'ReconWorldLab Demo (remote PLY, MIT, 67 MB)': 'recon',
+				'Cool Splats Output (remote SPLAT, 112 MB)': 'coolSplats',
+				'Niantic Horned Lizard (remote SPZ, MIT, 18 MB)': 'hornedLizard',
 				'Debug: Single Round Splat': 'debugRound',
 				'Debug: Axis-Aligned Ellipses': 'debugAxes',
 				'Debug: Rotated Ellipses': 'debugRotated',
@@ -68,9 +72,32 @@
 				recon: {
 					name: 'ReconWorldLab Demo',
 					url: 'https://raw.githubusercontent.com/ReconWorldLab/godot-gaussian-splatting/main/samples/assets/demo.ply',
-					rotation: new THREE.Euler( Math.PI, 0, 0 ),
+					loader: GaussianSplatPLYLoader,
+					rotation: new THREE.Euler( 0, 0, 0 ),
 					cameraPosition: new THREE.Vector3( 0, 0.2, 3.5 ),
 					note: 'MIT licensed sample from ReconWorldLab/godot-gaussian-splatting.'
+				},
+				coolSplats: {
+					name: 'Cool Splats Output',
+					url: 'https://huggingface.co/datasets/runes/coolsplats/resolve/main/output.splat',
+					loader: GaussianSplatLoader,
+					rotation: new THREE.Euler( 0, 0, 0 ),
+					cameraMode: 'inside',
+					cameraPosition: new THREE.Vector3( 0, 0, 0.35 ),
+					cameraTarget: new THREE.Vector3( 0, 0, 0 ),
+					minDistance: 0.01,
+					note: 'Remote standard .splat file referenced as working input in mkkellogg/GaussianSplats3D.'
+				},
+				hornedLizard: {
+					name: 'Niantic Horned Lizard',
+					url: 'https://raw.githubusercontent.com/nianticlabs/spz/v2.1.0/samples/hornedlizard.spz',
+					loader: GaussianSplatSPZLoader,
+					rotation: new THREE.Euler(0, 0, 0 ),
+					cameraMode: 'inside',
+					cameraPosition: new THREE.Vector3( 0, 0.15, 0.9 ),
+					cameraTarget: new THREE.Vector3( 0, 0, 0 ),
+					minDistance: 0.01,
+					note: 'MIT licensed SPZ v2 sample from nianticlabs/spz, loaded from GitHub.'
 				},
 				debugRound: {
 					name: 'Debug Round Splat',
@@ -168,7 +195,8 @@
 
 				try {
 
-					const splatData = source.createData !== undefined ? source.createData() : await new GaussianSplatPLYLoader().loadAsync( source.url, function ( event ) {
+					const LoaderClass = source.loader || GaussianSplatPLYLoader;
+					const splatData = source.createData !== undefined ? source.createData() : await new LoaderClass().loadAsync( source.url, function ( event ) {
 
 						if ( event.lengthComputable === true ) {
 
@@ -194,8 +222,8 @@
 					splats.rotation.copy( source.rotation );
 					scene.add( splats );
 
-					fitCameraToSplats( splats, source.cameraPosition );
-					status.innerHTML=  oldStatus;
+					fitCameraToSplats( splats, source );
+					status.innerHTML = oldStatus;
 
 				} catch ( error ) {
 
@@ -208,18 +236,33 @@
 
 			}
 
-			function fitCameraToSplats( mesh, fallbackPosition ) {
+			function fitCameraToSplats( mesh, source ) {
 
 				mesh.updateWorldMatrix( true, false );
 
-				const sphere = mesh.splatData.boundingSphere.clone().applyMatrix4( mesh.matrixWorld );
+				const sphere = mesh.boundingSphere.clone().applyMatrix4( mesh.matrixWorld );
 				const radius = Math.max( sphere.radius, 1 );
 				const distance = radius / Math.sin( THREE.MathUtils.degToRad( camera.fov ) * 0.5 );
 
-				controls.target.copy( sphere.center );
-				camera.position.copy( fallbackPosition ).normalize().multiplyScalar( distance * 1.4 ).add( sphere.center );
-				camera.near = Math.max( distance / 1000, 0.001 );
-				camera.far = Math.max( distance * 10, 10 );
+				controls.minDistance = source.minDistance || 1.2;
+				controls.maxDistance = source.maxDistance || 8;
+
+				if ( source.cameraMode === 'inside' ) {
+
+					controls.target.copy( sphere.center ).add( source.cameraTarget );
+					camera.position.copy( sphere.center ).add( source.cameraPosition );
+					camera.near = 0.001;
+					camera.far = Math.max( radius * 4, 10 );
+
+				} else {
+
+					controls.target.copy( sphere.center );
+					camera.position.copy( source.cameraPosition ).normalize().multiplyScalar( distance * 1.4 ).add( sphere.center );
+					camera.near = Math.max( distance / 1000, 0.001 );
+					camera.far = Math.max( distance * 10, 10 );
+
+				}
+
 				camera.updateProjectionMatrix();
 				controls.update();
 

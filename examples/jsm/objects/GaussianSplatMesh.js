@@ -102,6 +102,16 @@ class GaussianSplatMesh extends Mesh {
 		this.splatData = splatData;
 
 		/**
+		 * Bounding sphere of the rendered splats after conversion from the
+		 * common Gaussian splat coordinate convention to three.js coordinates.
+		 *
+		 * @type {Sphere}
+		 */
+		this.boundingSphere = splatData.boundingSphere.clone();
+		this.boundingSphere.center.y *= - 1;
+		this.boundingSphere.center.z *= - 1;
+
+		/**
 		 * Whether to sort automatically in `onBeforeRender`.
 		 *
 		 * @type {boolean}
@@ -187,11 +197,11 @@ class GaussianSplatMesh extends Mesh {
 
 		this._sortMatrix.value.multiplyMatrices( camera.matrixWorldInverse, this.matrixWorld );
 
-		_worldCenter.copy( this.splatData.boundingSphere.center ).applyMatrix4( this.matrixWorld );
+		_worldCenter.copy( this.boundingSphere.center ).applyMatrix4( this.matrixWorld );
 		_viewCenter.copy( _worldCenter ).applyMatrix4( camera.matrixWorldInverse );
 		this.getWorldScale( _worldScale );
 
-		const radius = this.splatData.boundingSphere.radius * Math.max( _worldScale.x, _worldScale.y, _worldScale.z );
+		const radius = this.boundingSphere.radius * Math.max( _worldScale.x, _worldScale.y, _worldScale.z );
 		const depth = - _viewCenter.z;
 		const nearDepth = Math.max( camera.near, depth - radius );
 		const farDepth = Math.max( nearDepth + 0.0001, depth + radius );
@@ -235,13 +245,15 @@ function createStorageBuffers( splatData ) {
 		const i4 = i * 4;
 		const i6 = i * 6;
 
+		// Gaussian splat assets commonly use a coordinate convention that is
+		// 180 degrees around X from three.js.
 		centerData[ i4 ] = centers[ i3 ];
-		centerData[ i4 + 1 ] = centers[ i3 + 1 ];
-		centerData[ i4 + 2 ] = centers[ i3 + 2 ];
+		centerData[ i4 + 1 ] = - centers[ i3 + 1 ];
+		centerData[ i4 + 2 ] = - centers[ i3 + 2 ];
 
 		covarianceAData[ i4 ] = covariances[ i6 ];
-		covarianceAData[ i4 + 1 ] = covariances[ i6 + 1 ];
-		covarianceAData[ i4 + 2 ] = covariances[ i6 + 2 ];
+		covarianceAData[ i4 + 1 ] = - covariances[ i6 + 1 ];
+		covarianceAData[ i4 + 2 ] = - covariances[ i6 + 2 ];
 		covarianceAData[ i4 + 3 ] = covariances[ i6 + 3 ];
 
 		covarianceBData[ i4 ] = covariances[ i6 + 4 ];

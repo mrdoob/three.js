@@ -1,10 +1,10 @@
 import {
 	FileLoader,
-	Loader,
-	MathUtils
+	Loader
 } from 'three';
 
 import { GaussianSplatData } from '../objects/GaussianSplatData.js';
+import { writeColorBytes, writeCovariance } from './utils/GaussianSplatLoaderUtils.js';
 
 const SH_C0 = 0.28209479177387814;
 
@@ -184,11 +184,14 @@ class GaussianSplatPLYLoader extends Loader {
 
 				writeCovariance( covariances, i * 6, sx, sy, sz, qx, qy, qz, qw );
 
-				const i4 = i * 4;
-				colors[ i4 ] = MathUtils.clamp( Math.round( ( 0.5 + SH_C0 * readProperty( view, rowOffset, vertexElement.propertyMap.f_dc_0 ) ) * 255 ), 0, 255 );
-				colors[ i4 + 1 ] = MathUtils.clamp( Math.round( ( 0.5 + SH_C0 * readProperty( view, rowOffset, vertexElement.propertyMap.f_dc_1 ) ) * 255 ), 0, 255 );
-				colors[ i4 + 2 ] = MathUtils.clamp( Math.round( ( 0.5 + SH_C0 * readProperty( view, rowOffset, vertexElement.propertyMap.f_dc_2 ) ) * 255 ), 0, 255 );
-				colors[ i4 + 3 ] = MathUtils.clamp( Math.round( sigmoid( readProperty( view, rowOffset, vertexElement.propertyMap.opacity ) ) * 255 ), 0, 255 );
+				writeColorBytes(
+					colors,
+					i * 4,
+					( 0.5 + SH_C0 * readProperty( view, rowOffset, vertexElement.propertyMap.f_dc_0 ) ) * 255,
+					( 0.5 + SH_C0 * readProperty( view, rowOffset, vertexElement.propertyMap.f_dc_1 ) ) * 255,
+					( 0.5 + SH_C0 * readProperty( view, rowOffset, vertexElement.propertyMap.f_dc_2 ) ) * 255,
+					sigmoid( readProperty( view, rowOffset, vertexElement.propertyMap.opacity ) ) * 255
+				);
 
 			}
 
@@ -361,50 +364,6 @@ function readProperty( view, rowOffset, property ) {
 function sigmoid( value ) {
 
 	return 1 / ( 1 + Math.exp( - value ) );
-
-}
-
-function writeCovariance( target, offset, sx, sy, sz, qx, qy, qz, qw ) {
-
-	const invLength = 1 / Math.hypot( qx, qy, qz, qw );
-	qx *= invLength;
-	qy *= invLength;
-	qz *= invLength;
-	qw *= invLength;
-
-	const x2 = qx + qx;
-	const y2 = qy + qy;
-	const z2 = qz + qz;
-	const xx = qx * x2;
-	const xy = qx * y2;
-	const xz = qx * z2;
-	const yy = qy * y2;
-	const yz = qy * z2;
-	const zz = qz * z2;
-	const wx = qw * x2;
-	const wy = qw * y2;
-	const wz = qw * z2;
-
-	const r00 = 1 - ( yy + zz );
-	const r01 = xy - wz;
-	const r02 = xz + wy;
-	const r10 = xy + wz;
-	const r11 = 1 - ( xx + zz );
-	const r12 = yz - wx;
-	const r20 = xz - wy;
-	const r21 = yz + wx;
-	const r22 = 1 - ( xx + yy );
-
-	const sxx = sx * sx;
-	const syy = sy * sy;
-	const szz = sz * sz;
-
-	target[ offset ] = r00 * r00 * sxx + r01 * r01 * syy + r02 * r02 * szz;
-	target[ offset + 1 ] = r00 * r10 * sxx + r01 * r11 * syy + r02 * r12 * szz;
-	target[ offset + 2 ] = r00 * r20 * sxx + r01 * r21 * syy + r02 * r22 * szz;
-	target[ offset + 3 ] = r10 * r10 * sxx + r11 * r11 * syy + r12 * r12 * szz;
-	target[ offset + 4 ] = r10 * r20 * sxx + r11 * r21 * syy + r12 * r22 * szz;
-	target[ offset + 5 ] = r20 * r20 * sxx + r21 * r21 * syy + r22 * r22 * szz;
 
 }
 
