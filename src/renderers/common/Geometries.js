@@ -186,6 +186,8 @@ class Geometries extends DataMap {
 
 			this.info.memory.geometries --;
 
+			// index
+
 			const index = geometry.index;
 
 			if ( index !== null ) {
@@ -194,17 +196,15 @@ class Geometries extends DataMap {
 
 			}
 
-			// Delete the disposed geometry's own attributes. They must not be read
-			// from the render object: if the 3D object was switched to another
-			// geometry before this dispose fires, the render object already reports
-			// the new geometry's attributes, and deleting those would destroy GPU
-			// buffers that are still in use (while leaking the disposed ones).
+			// geometry attributes
 
-			for ( const name of Object.keys( geometry.attributes ) ) {
+			for ( const attribute of Object.values( geometry.attributes ) ) {
 
-				this.attributes.delete( geometry.attributes[ name ] );
+				this.attributes.delete( attribute );
 
 			}
+
+			// wireframe attributes
 
 			const wireframeAttribute = this.wireframes.get( geometry );
 
@@ -213,6 +213,22 @@ class Geometries extends DataMap {
 				this.attributes.delete( wireframeAttribute );
 
 			}
+
+			// node attributes (TODO: Remove this bit once we support BufferAttribute.dispose())
+
+			const currentAttributes = new Set( Object.values( renderObject.geometry.attributes ) );
+
+			for ( const attribute of renderObject.getAttributes() ) {
+
+				if ( currentAttributes.has( attribute ) === false ) {
+
+					this.attributes.delete( attribute );
+
+				}
+
+			}
+
+			//
 
 			geometry.removeEventListener( 'dispose', onDispose );
 
