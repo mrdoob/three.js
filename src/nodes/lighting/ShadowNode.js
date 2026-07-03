@@ -850,6 +850,10 @@ class ShadowNode extends ShadowBaseNode {
 	 */
 	updateBefore( frame ) {
 
+		// do not render shadow maps during precompilation
+
+		if ( frame.renderer._isPreCompiling === true ) return;
+
 		const { shadow } = this;
 
 		let needsUpdate = shadow.needsUpdate || shadow.autoUpdate;
