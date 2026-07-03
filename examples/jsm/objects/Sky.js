@@ -181,9 +181,11 @@ Sky.SkyShader = {
 		uniform float showSunDisc;
 		uniform float time;
 
-		// gradient at a lattice corner; the sin hash is safe at cloud-scale coordinates
+		// gradient at a lattice corner; sinless hash so every GPU produces the same clouds
 		vec2 gradient( vec2 i ) {
-			return fract( sin( vec2( dot( i, vec2( 127.1, 311.7 ) ), dot( i, vec2( 269.5, 183.3 ) ) ) ) * 43758.5453123 ) * 2.0 - 1.0;
+			vec3 p = fract( i.xyx * vec3( 0.1031, 0.1030, 0.0973 ) );
+			p += dot( p, p.yzx + 33.33 );
+			return fract( ( p.xx + p.yz ) * p.zy ) * 2.0 - 1.0;
 		}
 
 		// 2D gradient noise: isotropic lobes like Perlin at value-noise cost
