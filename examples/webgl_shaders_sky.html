@@ -36,6 +36,8 @@
 
 			let sky, sun;
 
+			let sphere, cubeCamera;
+
 			init();
 
 			function initSky() {
@@ -54,9 +56,9 @@
 					rayleigh: 3,
 					mieCoefficient: 0.005,
 					mieDirectionalG: 0.7,
-					elevation: 2,
-					azimuth: 180,
-					exposure: renderer.toneMappingExposure,
+					elevation: 65,
+					azimuth: 0,
+					exposure: 0.05,
 					cloudCoverage: 0.4,
 					cloudDensity: 0.4,
 					cloudElevation: 0.5,
@@ -113,8 +115,14 @@
 
 				scene = new THREE.Scene();
 
-				const helper = new THREE.GridHelper( 10000, 2, 0xffffff, 0xffffff );
-				scene.add( helper );
+				const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 256, { type: THREE.HalfFloatType } );
+				cubeCamera = new THREE.CubeCamera( 1, 1000, cubeRenderTarget );
+
+				sphere = new THREE.Mesh(
+					new THREE.SphereGeometry( 400, 64, 32 ),
+					new THREE.MeshStandardMaterial( { metalness: 1, roughness: 0, envMap: cubeRenderTarget.texture } )
+				);
+				scene.add( sphere );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -147,6 +155,11 @@
 			function animate() {
 
 				sky.material.uniforms[ 'time' ].value = performance.now() * 0.001;
+
+				sphere.visible = false;
+				cubeCamera.update( renderer, scene );
+				sphere.visible = true;
+
 				renderer.render( scene, camera );
 
 			}
