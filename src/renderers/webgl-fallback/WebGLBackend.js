@@ -519,6 +519,12 @@ class WebGLBackend extends Backend {
 			renderContextData.occlusionQueryObjects = new Array( occlusionQueryCount );
 			renderContextData.occlusionQueryIndex = 0;
 
+		} else if ( renderContextData.lastOcclusionObject !== undefined ) {
+
+			// invalidate if there is a stale query
+
+			renderContextData.lastOcclusionObject = undefined;
+
 		}
 
 	}
