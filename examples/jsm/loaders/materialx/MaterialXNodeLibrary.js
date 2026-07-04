@@ -176,6 +176,7 @@ const mx_bump = (
 	bitangent = vec3( 0.0, 1.0, 0.0 ),
 ) => mx_normalmap( mx_heighttonormal( height, 1 ), scale, normal, tangent, bitangent );
 const mx_dot = ( inNode ) => inNode;
+
 const mx_viewdirection = ( space = 'world' ) => {
 
 	const outputSpace = normalizeSpaceName( space, 'world' );
@@ -190,6 +191,7 @@ const mx_viewdirection = ( space = 'world' ) => {
 	return mx_transformnormal( worldDirection, 'world', outputSpace );
 
 };
+
 const mx_blackbody = ( temperature = 5000 ) => {
 
 	const temperatureKelvin = clamp( temperature, float( 800 ), float( 25000 ) );
