@@ -28,8 +28,8 @@ export const mx_rotate3d = ( input, amount = 0, axis = vec3( 0, 1, 0 ) ) => {
 	const oc = sub( 1, c );
 
 	// based on https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
-    // but the code in the Wikipedia article is for v' = M * v, where as 
-    // MaterialX is v' = v * M, thus the order of parameters into the first cross are reversed
+	// but the code in the Wikipedia article is for v' = M * v, where as
+	// MaterialX is v' = v * M, thus the order of parameters into the first cross are reversed
 	return input.mul( c )
 		.add( input.cross( normalizedAxis ).mul( s ) )
 		.add( normalizedAxis.mul( normalizedAxis.dot( input ).mul( oc ) ) );
