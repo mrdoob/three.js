@@ -273,6 +273,9 @@ class Bindings extends DataMap {
 
 						}
 
+						const textureData = this.textures.get( binding.texture );
+						if ( textureData.bindGroups !== undefined ) textureData.bindGroups.delete( bindGroup );
+
 						binding.release();
 
 					}
