@@ -186,8 +186,9 @@ class Geometries extends DataMap {
 
 			this.info.memory.geometries --;
 
+			// index
+
 			const index = geometry.index;
-			const geometryAttributes = renderObject.getAttributes();
 
 			if ( index !== null ) {
 
@@ -195,11 +196,15 @@ class Geometries extends DataMap {
 
 			}
 
-			for ( const geometryAttribute of geometryAttributes ) {
+			// geometry attributes
 
-				this.attributes.delete( geometryAttribute );
+			for ( const attribute of Object.values( geometry.attributes ) ) {
+
+				this.attributes.delete( attribute );
 
 			}
+
+			// wireframe attributes
 
 			const wireframeAttribute = this.wireframes.get( geometry );
 
@@ -208,6 +213,22 @@ class Geometries extends DataMap {
 				this.attributes.delete( wireframeAttribute );
 
 			}
+
+			// node attributes (TODO: Remove this bit once we support BufferAttribute.dispose())
+
+			const currentAttributes = new Set( Object.values( renderObject.geometry.attributes ) );
+
+			for ( const attribute of renderObject.getAttributes() ) {
+
+				if ( currentAttributes.has( attribute ) === false ) {
+
+					this.attributes.delete( attribute );
+
+				}
+
+			}
+
+			//
 
 			geometry.removeEventListener( 'dispose', onDispose );
 

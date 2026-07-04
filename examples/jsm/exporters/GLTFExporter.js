@@ -616,7 +616,8 @@ class GLTFWriter {
 			attributesNormalized: new Map(),
 			materials: new Map(),
 			textures: new Map(),
-			images: new Map()
+			images: new Map(),
+			normalMaps: new Map()
 		};
 
 		this.textureUtils = null;
@@ -1750,7 +1751,18 @@ class GLTFWriter {
 
 			if ( flipX || flipY ) {
 
-				normalMap = await this.buildNormalMapTextureAsync( material.normalMap, flipX, flipY );
+				if ( cache.normalMaps.has( material.normalMap ) === false ) cache.normalMaps.set( material.normalMap, {} );
+
+				const cachedVariants = cache.normalMaps.get( material.normalMap );
+				const cacheKey = `${flipX}:${flipY}`;
+
+				if ( cachedVariants[ cacheKey ] === undefined ) {
+
+					cachedVariants[ cacheKey ] = await this.buildNormalMapTextureAsync( material.normalMap, flipX, flipY );
+
+				}
+
+				normalMap = cachedVariants[ cacheKey ];
 
 			}
 
