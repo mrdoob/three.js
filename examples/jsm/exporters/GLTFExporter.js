@@ -28,7 +28,6 @@ import {
 	ImageUtils
 } from 'three';
 import { decomposeCovariance, linearToSH0 } from '../utils/GaussianSplatUtils.js';
-test/
 /**
  * The KHR_mesh_quantization extension allows these extra attribute component types
  *

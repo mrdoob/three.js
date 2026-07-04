@@ -611,6 +611,26 @@ function Loader( editor ) {
 
 			}
 
+			case 'ksplat':
+
+			{
+
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const contents = event.target.result;
+
+					const { GaussianSplatKSplatLoader } = await import( 'three/addons/loaders/GaussianSplatKSplatLoader.js' );
+					const splatData = new GaussianSplatKSplatLoader().parse( contents );
+
+					await addGaussianSplatObject( splatData, filename );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
+
+			}
+
 			case 'ply':
 
 			{
@@ -618,6 +638,16 @@ function Loader( editor ) {
 				reader.addEventListener( 'load', async function ( event ) {
 
 					const contents = event.target.result;
+
+					if ( isGaussianSplatPLY( contents ) ) {
+
+						const { GaussianSplatPLYLoader } = await import( 'three/addons/loaders/GaussianSplatPLYLoader.js' );
+						const splatData = new GaussianSplatPLYLoader().parse( contents );
+
+						await addGaussianSplatObject( splatData, filename );
+						return;
+
+					}
 
 					const { PLYLoader } = await import( 'three/addons/loaders/PLYLoader.js' );
 
@@ -642,6 +672,46 @@ function Loader( editor ) {
 					}
 
 					editor.execute( new AddObjectCommand( editor, object ) );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
+
+			}
+
+			case 'splat':
+
+			{
+
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const contents = event.target.result;
+
+					const { GaussianSplatLoader } = await import( 'three/addons/loaders/GaussianSplatLoader.js' );
+					const splatData = new GaussianSplatLoader().parse( contents );
+
+					await addGaussianSplatObject( splatData, filename );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
+
+			}
+
+			case 'spz':
+
+			{
+
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const contents = event.target.result;
+
+					const { GaussianSplatSPZLoader } = await import( 'three/addons/loaders/GaussianSplatSPZLoader.js' );
+					const splatData = new GaussianSplatSPZLoader().parse( contents );
+
+					await addGaussianSplatObject( splatData, filename );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
@@ -966,6 +1036,69 @@ function Loader( editor ) {
 				break;
 
 		}
+
+	}
+
+	async function addGaussianSplatObject( splatData, filename ) {
+
+		const { GaussianSplatMesh } = await import( 'three/addons/objects/GaussianSplatMesh.js' );
+		const object = new GaussianSplatMesh( splatData );
+		object.name = filename;
+
+		editor.execute( new AddObjectCommand( editor, object ) );
+
+	}
+
+	function isGaussianSplatPLY( contents ) {
+
+		const bytes = new Uint8Array( contents );
+		const endHeader = 'end_header';
+		let headerLength = - 1;
+
+		for ( let i = 0, l = bytes.length - endHeader.length; i < l; i ++ ) {
+
+			let match = true;
+
+			for ( let j = 0; j < endHeader.length; j ++ ) {
+
+				if ( bytes[ i + j ] !== endHeader.charCodeAt( j ) ) {
+
+					match = false;
+					break;
+
+				}
+
+			}
+
+			if ( match === true ) {
+
+				headerLength = i + endHeader.length;
+				break;
+
+			}
+
+		}
+
+		if ( headerLength === - 1 ) return false;
+
+		const header = new TextDecoder().decode( bytes.subarray( 0, headerLength ) );
+		const requiredFields = [
+			'x', 'y', 'z',
+			'scale_0', 'scale_1', 'scale_2',
+			'rot_0', 'rot_1', 'rot_2', 'rot_3',
+			'f_dc_0', 'f_dc_1', 'f_dc_2',
+			'opacity'
+		];
+
+		if ( header.includes( 'format binary_little_endian' ) === false ) return false;
+
+		for ( const field of requiredFields ) {
+
+			if ( new RegExp( `\\b${ field }\\b` ).test( header ) === false ) return false;
+
+		}
+
+		return true;
 
 	}
 
