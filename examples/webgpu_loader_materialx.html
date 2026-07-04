@@ -240,6 +240,27 @@
 
 			}
 
+			function reportMaterialXLog( sample, materialName, log ) {
+
+				if ( log.length === 0 ) return;
+
+				const label = materialName ? `"${materialName}"` : `"${sample}"`;
+				const errorCount = log.filter( ( entry ) => entry.severity === 'error' ).length;
+				const warningCount = log.filter( ( entry ) => entry.severity === 'warning' ).length;
+				console.groupCollapsed( `THREE.MaterialXLoader: ${errorCount} error(s), ${warningCount} warning(s) for ${label} (${sample})` );
+
+				for ( const entry of log ) {
+
+					const nodeName = entry.nodeName ? ` [${entry.nodeName}]` : '';
+					const style = entry.severity === 'warning' ? 'color: #c90' : 'color: #c00';
+					console[ entry.severity === 'warning' ? 'warn' : 'error' ]( `%c${entry.severity}: ${entry.code}${nodeName}: ${entry.message}`, style );
+
+				}
+
+				console.groupEnd();
+
+			}
+
 			async function addSample( sample, path ) {
 
 				const model = prefab.clone();
@@ -252,13 +273,15 @@
 
 				//
 
-				const material = await new MaterialXLoader()
+				const { materials, log } = await new MaterialXLoader()
 					.setPath( path )
 					.loadAsync( sample, {
 						uvSpace: 'top-left',
 						interfaceValidator: strictInterfaceValidator,
-					} )
-					.then( ( { materials } ) => Object.values( materials ).pop() );
+						throwOnErrors: false,
+					} );
+				const material = Object.values( materials ).pop();
+				reportMaterialXLog( sample, material ? material.name : null, log );
 
 				const calibrationMesh = model.getObjectByName( 'Calibration_Mesh' );
 				calibrationMesh.material = material;

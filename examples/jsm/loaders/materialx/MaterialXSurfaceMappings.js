@@ -1,5 +1,5 @@
 import { DoubleSide } from 'three/webgpu';
-import { MaterialXErrorCodes } from './MaterialXErrors.js';
+import { MaterialXLogCodes } from './MaterialXLog.js';
 import { float, color, mul, clamp, vec2, cos, sin, pow, mix, transformNormalToView } from 'three/tsl';
 
 const mappedStandardSurfaceInputs = new Set( [
@@ -98,14 +98,14 @@ const mappedOpenPbrInputs = new Set( [
 	'emission_luminance',
 ] );
 
-function warnIgnoredInputs( inputs, mappedInputs, errors, surfaceCategory, nodeName ) {
+function warnIgnoredInputs( inputs, mappedInputs, log, surfaceCategory, nodeName ) {
 
 	for ( const inputName of Object.keys( inputs ) ) {
 
 		if ( mappedInputs.has( inputName ) === false ) {
 
-			errors.addError(
-				MaterialXErrorCodes.IGNORED_SURFACE_INPUT,
+			log.add(
+				MaterialXLogCodes.IGNORED_SURFACE_INPUT,
 				`${surfaceCategory} input "${inputName}" is currently ignored in MaterialX translation.`,
 				nodeName,
 			);
@@ -218,7 +218,7 @@ function buildGltfOpacityNode( alphaNode, alphaModeNode ) {
 
 }
 
-function applyStandardSurface( material, inputs, errors, nodeName ) {
+function applyStandardSurface( material, inputs, log, nodeName ) {
 
 	let colorNode = null;
 	if ( inputs.base && inputs.base_color ) colorNode = mul( inputs.base, inputs.base_color );
@@ -346,11 +346,11 @@ function applyStandardSurface( material, inputs, errors, nodeName ) {
 	if ( hasNodeValue( emissiveNode ) ) material.emissiveNode = emissiveNode;
 
 	setTransmissionFlags( material, transmissionNode, opacityNode );
-	warnIgnoredInputs( inputs, mappedStandardSurfaceInputs, errors, 'standard_surface', nodeName );
+	warnIgnoredInputs( inputs, mappedStandardSurfaceInputs, log, 'standard_surface', nodeName );
 
 }
 
-function applyGltfPbrSurface( material, inputs, errors, nodeName ) {
+function applyGltfPbrSurface( material, inputs, log, nodeName ) {
 
 	const alphaModeLiteral = getConstNumber( inputs.alpha_mode );
 	const alphaMode = alphaModeLiteral === null ? 2 : Math.round( alphaModeLiteral );
@@ -477,11 +477,11 @@ function applyGltfPbrSurface( material, inputs, errors, nodeName ) {
 	else if ( hasNodeValue( inputs.emissive ) ) material.emissiveNode = inputs.emissive;
 
 	setTransmissionFlags( material, inputs.transmission, opacityNode, isAlphaBlendMode );
-	warnIgnoredInputs( inputs, mappedGltfPbrInputs, errors, 'gltf_pbr', nodeName );
+	warnIgnoredInputs( inputs, mappedGltfPbrInputs, log, 'gltf_pbr', nodeName );
 
 }
 
-function applyOpenPbrSurface( material, inputs, errors, nodeName ) {
+function applyOpenPbrSurface( material, inputs, log, nodeName ) {
 
 	const baseWeight = inputs.base_weight || float( 1 );
 	const baseColor = inputs.base_color || color( 0.8, 0.8, 0.8 );
@@ -625,7 +625,7 @@ function applyOpenPbrSurface( material, inputs, errors, nodeName ) {
 	if ( transmissionEnabled ) material.transparent = true;
 
 	setTransmissionFlags( material, inputs.transmission_weight, inputs.geometry_opacity );
-	warnIgnoredInputs( inputs, mappedOpenPbrInputs, errors, 'open_pbr_surface', nodeName );
+	warnIgnoredInputs( inputs, mappedOpenPbrInputs, log, 'open_pbr_surface', nodeName );
 
 }
 

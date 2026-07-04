@@ -1,7 +1,7 @@
 import { FileLoader, Loader } from 'three/webgpu';
 
 import { MaterialXDocument } from './materialx/MaterialXDocument.js';
-import { MaterialXErrors } from './materialx/MaterialXErrors.js';
+import { MaterialXLog } from './materialx/MaterialXLog.js';
 import { isZipBuffer, readMtlxArchive, createArchiveResolver } from './materialx/MaterialXArchive.js';
 
 const _textDecoder = new TextDecoder();
@@ -132,17 +132,17 @@ class MaterialXLoader extends Loader {
 
 	parse( text, options = {} ) {
 
-		const errors = new MaterialXErrors();
+		const log = new MaterialXLog();
 
-		const document = new MaterialXDocument( this.manager, options.path || this.path, errors, options.archiveResolver || null, options.uvSpace );
+		const document = new MaterialXDocument( this.manager, options.path || this.path, log, options.archiveResolver || null, options.uvSpace );
 		const result = document.parse( text, options.materialName || null, {
 			interfaceValidator: options.interfaceValidator,
 		} );
 
-		if ( options.throwOnErrors && errors.errors.length > 0 ) {
+		if ( options.throwOnErrors !== false && log.errors.length > 0 ) {
 
-			const details = errors.errors.map( ( error ) => error.message ).join( ' ' );
-			throw new Error( `THREE.MaterialXLoader: MaterialX translation failed with ${errors.errors.length} error(s). ${details}` );
+			const details = log.errors.map( ( error ) => error.message ).join( ' ' );
+			throw new Error( `THREE.MaterialXLoader: MaterialX translation failed with ${log.errors.length} error(s). ${details}` );
 
 		}
 

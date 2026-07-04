@@ -1,6 +1,6 @@
 import { MtlXLibrary } from './MaterialXNodeLibrary.js';
-import { MaterialXErrorCodes } from './MaterialXErrors.js';
-import registryData from './MaterialXNodeInterfaceRegistry.json' with { type: 'json' };
+import { MaterialXLogCodes } from './MaterialXLog.js';
+import registryData from './MaterialXNodeInterfaceRegistry.js';
 
 const SKIP_ELEMENTS = new Set( [ 'materialx', 'input', 'output' ] );
 const CONTAINER_ELEMENTS = new Set( [ 'nodegraph' ] );
@@ -46,7 +46,7 @@ function formatNodeElement( nodeX ) {
 function scoreNodedefCandidate( candidateName, nodeX ) {
 
 	const candidate = registryData.resolved[ candidateName ];
-	if ( ! candidate ) return -1;
+	if ( ! candidate ) return - 1;
 
 	let score = 0;
 	const nodeType = nodeX.type;
@@ -95,7 +95,7 @@ function resolveInterface( nodeX ) {
 	if ( candidates.length > 0 ) {
 
 		let selected = candidates[ 0 ];
-		let bestScore = -Infinity;
+		let bestScore = - Infinity;
 
 		for ( const candidateName of candidates ) {
 
@@ -236,18 +236,18 @@ function typesCompatible( expectedType, actualType ) {
 
 }
 
-function validatePortConnection( inputNodeX, parentNodeX, errors ) {
+function validatePortConnection( inputNodeX, parentNodeX, log ) {
 
 	const sourceNodeX = resolveReferencedNode( inputNodeX );
 	if ( ! sourceNodeX ) return;
 
-	const { outputType, outputName } = resolveSourceOutputType( sourceNodeX, inputNodeX.output );
+	const { outputType } = resolveSourceOutputType( sourceNodeX, inputNodeX.output );
 	const inputSnippet = formatInputElement( inputNodeX );
 
 	if ( inputNodeX.output && outputType === null ) {
 
-		errors.addError(
-			MaterialXErrorCodes.INVALID_OUTPUT_CONNECTION,
+		log.add(
+			MaterialXLogCodes.INVALID_OUTPUT_CONNECTION,
 			`No output found for port connection: ${inputSnippet}`,
 			parentNodeX.name,
 		);
@@ -258,8 +258,8 @@ function validatePortConnection( inputNodeX, parentNodeX, errors ) {
 	const inputType = inputNodeX.type;
 	if ( inputType && outputType && typesCompatible( inputType, outputType ) === false ) {
 
-		errors.addError(
-			MaterialXErrorCodes.TYPE_MISMATCH,
+		log.add(
+			MaterialXLogCodes.TYPE_MISMATCH,
 			`Mismatched types in port connection: ${inputSnippet}`,
 			parentNodeX.name,
 		);
@@ -268,13 +268,13 @@ function validatePortConnection( inputNodeX, parentNodeX, errors ) {
 
 }
 
-function validateNodeInputs( nodeX, errors ) {
+function validateNodeInputs( nodeX, log ) {
 
 	if ( nodeX.element === 'materialx' ) {
 
 		for ( const child of nodeX.children ) {
 
-			validateNodeInputs( child, errors );
+			validateNodeInputs( child, log );
 
 		}
 
@@ -287,7 +287,7 @@ function validateNodeInputs( nodeX, errors ) {
 
 		for ( const child of nodeX.children ) {
 
-			validateNodeInputs( child, errors );
+			validateNodeInputs( child, log );
 
 		}
 
@@ -307,8 +307,8 @@ function validateNodeInputs( nodeX, errors ) {
 
 			if ( nodeInterface.inputs[ inputName ] === undefined ) {
 
-				errors.addError(
-					MaterialXErrorCodes.UNKNOWN_INPUT,
+				log.add(
+					MaterialXLogCodes.UNKNOWN_INPUT,
 					`Node interface error: Input '${inputName}' doesn't match declaration: ${formatNodeElement( nodeX )}`,
 					nodeX.name,
 				);
@@ -320,8 +320,8 @@ function validateNodeInputs( nodeX, errors ) {
 				typesCompatible( nodeInterface.inputs[ inputName ], child.type ) === false
 			) {
 
-				errors.addError(
-					MaterialXErrorCodes.TYPE_MISMATCH,
+				log.add(
+					MaterialXLogCodes.TYPE_MISMATCH,
 					`Input '${inputName}' type '${child.type}' doesn't match nodedef type '${nodeInterface.inputs[ inputName ]}' on ${formatNodeElement( nodeX )}`,
 					nodeX.name,
 				);
@@ -330,7 +330,7 @@ function validateNodeInputs( nodeX, errors ) {
 
 			if ( child.hasReference ) {
 
-				validatePortConnection( child, nodeX, errors );
+				validatePortConnection( child, nodeX, log );
 
 			}
 
@@ -343,7 +343,7 @@ function validateNodeInputs( nodeX, errors ) {
 
 			if ( child.element === 'input' && child.hasReference ) {
 
-				validatePortConnection( child, nodeX, errors );
+				validatePortConnection( child, nodeX, log );
 
 			}
 
@@ -355,7 +355,7 @@ function validateNodeInputs( nodeX, errors ) {
 
 		if ( child.element !== 'input' && child.element !== 'output' ) {
 
-			validateNodeInputs( child, errors );
+			validateNodeInputs( child, log );
 
 		}
 
@@ -365,9 +365,9 @@ function validateNodeInputs( nodeX, errors ) {
 
 function createStrictInterfaceValidator() {
 
-	return function validateMaterialXInterfaces( rootNode, errors ) {
+	return function validateMaterialXInterfaces( rootNode, log ) {
 
-		validateNodeInputs( rootNode, errors );
+		validateNodeInputs( rootNode, log );
 
 	};
 

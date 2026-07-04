@@ -28,7 +28,7 @@ import {
 	mx_srgb_texture_to_lin_rec709,
 } from 'three/tsl';
 
-import { MaterialXErrorCodes } from './MaterialXErrors.js';
+import { MaterialXLogCodes } from './MaterialXLog.js';
 import { createMaterialXCompileRegistry, compileNodeFromRegistry } from './compile/MaterialXCompileRegistry.js';
 import { parseMaterialXNodeTree, parseMaterialXText } from './parse/MaterialXParser.js';
 import { getSurfaceMapper } from './MaterialXSurfaceMappings.js';
@@ -300,8 +300,8 @@ class MaterialXNode {
 		const mode = normalizeTextureAddressMode( rawMode );
 		if ( mode ) return mode;
 
-		this.materialX.errors.addError(
-			MaterialXErrorCodes.INVALID_VALUE,
+		this.materialX.log.add(
+			MaterialXLogCodes.INVALID_VALUE,
 			`Unsupported texture address mode "${rawMode}" on input "${inputName}". Expected constant, clamp, periodic, or mirror.`,
 			this.name,
 		);
@@ -438,8 +438,8 @@ class MaterialXNode {
 
 			} else {
 
-				this.materialX.errors.addError(
-					MaterialXErrorCodes.MISSING_REFERENCE,
+				this.materialX.log.add(
+					MaterialXLogCodes.MISSING_REFERENCE,
 					`Missing MaterialX reference "${this.referencePath}" from "${this.name}".`,
 					this.name,
 				);
@@ -467,8 +467,8 @@ class MaterialXNode {
 
 		if ( node === null || node === undefined ) {
 
-			this.materialX.errors.addError(
-				MaterialXErrorCodes.UNSUPPORTED_NODE,
+			this.materialX.log.add(
+				MaterialXLogCodes.UNSUPPORTED_NODE,
 				`Unsupported MaterialX node category "${this.element}" on "${this.name}".`,
 				this.name,
 			);
@@ -502,8 +502,8 @@ class MaterialXNode {
 
 			} else if ( resolvedType !== null && resolvedType !== undefined && resolvedType !== 'multioutput' ) {
 
-				this.materialX.errors.addError(
-					MaterialXErrorCodes.INVALID_VALUE,
+				this.materialX.log.add(
+					MaterialXLogCodes.INVALID_VALUE,
 					`Unexpected type "${resolvedType}" on node "${this.name}".`,
 					this.name,
 				);
@@ -649,12 +649,12 @@ class MaterialXNode {
 		const mapper = getSurfaceMapper( this.element );
 		if ( mapper ) {
 
-			mapper.apply( material, this.getNodes(), this.materialX.errors, this.name );
+			mapper.apply( material, this.getNodes(), this.materialX.log, this.name );
 
 		} else {
 
-			this.materialX.errors.addError(
-				MaterialXErrorCodes.UNSUPPORTED_NODE,
+			this.materialX.log.add(
+				MaterialXLogCodes.UNSUPPORTED_NODE,
 				`Unsupported MaterialX node category "${this.element}" on "${this.name}".`,
 				this.name,
 			);
@@ -711,8 +711,8 @@ class MaterialXNode {
 			const shaderProperties = this.resolveSurfaceShaderNode( nodeX );
 			if ( shaderProperties === null ) {
 
-				this.materialX.errors.addError(
-					MaterialXErrorCodes.MISSING_REFERENCE,
+				this.materialX.log.add(
+					MaterialXLogCodes.MISSING_REFERENCE,
 					`Missing MaterialX reference "${nodeX.referencePath || nodeX.nodeName || '(unknown)'}" from "${nodeX.name}".`,
 					nodeX.name,
 				);
@@ -740,8 +740,8 @@ class MaterialXNode {
 
 			if ( selectedSurfaceMaterials.length === 0 ) {
 
-				this.materialX.errors.addError(
-					MaterialXErrorCodes.MISSING_MATERIAL,
+				this.materialX.log.add(
+					MaterialXLogCodes.MISSING_MATERIAL,
 					materialName
 						? `Could not find surfacematerial named "${materialName}".`
 						: 'Document does not include a surfacematerial node.',
@@ -788,11 +788,11 @@ class MaterialXNode {
 
 class MaterialXDocument {
 
-	constructor( manager, path, errors, archiveResolver = null, uvSpace = 'bottom-left' ) {
+	constructor( manager, path, log, archiveResolver = null, uvSpace = 'bottom-left' ) {
 
 		this.manager = manager;
 		this.path = path;
-		this.errors = errors;
+		this.log = log;
 		this.archiveResolver = archiveResolver;
 		this.uvSpace = normalizeUvSpace( uvSpace );
 
@@ -865,12 +865,17 @@ class MaterialXDocument {
 
 		if ( options.interfaceValidator ) {
 
-			options.interfaceValidator( rootNode, this.errors );
+			options.interfaceValidator( rootNode, this.log );
 
 		}
 
 		const materials = rootNode.toMaterials( materialName );
-		return { materials, errors: this.errors.errors };
+		return {
+			materials,
+			log: this.log.entries,
+			errors: this.log.errors,
+			warnings: this.log.warnings,
+		};
 
 	}
 

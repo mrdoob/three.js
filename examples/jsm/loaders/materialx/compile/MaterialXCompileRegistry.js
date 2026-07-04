@@ -42,7 +42,7 @@ import {
 	toBooleanNode,
 	toVec3Channels,
 } from '../MaterialXUtils.js';
-import { MaterialXErrorCodes } from '../MaterialXErrors.js';
+import { MaterialXLogCodes } from '../MaterialXLog.js';
 
 const register = ( registry, categories, handler ) => {
 
@@ -425,8 +425,8 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 	const file = nodeX.getChildByName( 'file' );
 	if ( ! file ) {
 
-		nodeX.materialX.errors.addError(
-			MaterialXErrorCodes.INVALID_VALUE,
+		nodeX.materialX.log.add(
+			MaterialXLogCodes.INVALID_VALUE,
 			`Texture node "${nodeX.name || nodeX.element}" is missing required input "file".`,
 			nodeX.name,
 		);
@@ -871,8 +871,8 @@ const compileInvertMatrixNode = ( nodeX, compileContext ) => {
 
 		if ( invertedValues === null ) {
 
-			nodeX.materialX.errors.addError(
-				MaterialXErrorCodes.INVALID_VALUE,
+			nodeX.materialX.log.add(
+				MaterialXLogCodes.INVALID_VALUE,
 				`Matrix input for "${nodeX.name || nodeX.element}" is singular; using identity fallback.`,
 				nodeX.name,
 			);
@@ -981,8 +981,8 @@ function compileNodeFromRegistry( nodeX, out, compileContext ) {
 
 		}
 
-		nodeX.materialX.errors.addError(
-			MaterialXErrorCodes.INVALID_VALUE,
+		nodeX.materialX.log.add(
+			MaterialXLogCodes.INVALID_VALUE,
 			`Missing input "${paramName}" for node "${nodeX.name || nodeX.element}" (${nodeX.element}). Using fallback 0.`,
 			nodeX.name,
 		);
