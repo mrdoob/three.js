@@ -6,6 +6,7 @@ import './addons/utils/GaussianSplatValidation.tests.js';
 import './addons/math/ColorSpaces.tests.js';
 import './addons/curves/NURBSCurve.tests.js';
 import './addons/loaders/FBXLoader.tests.js';
+import './addons/loaders/GaussianSplatKSplatLoader.tests.js';
 import './addons/loaders/GaussianSplatLoader.tests.js';
 import './addons/loaders/GaussianSplatPLYLoader.tests.js';
 import './addons/loaders/GaussianSplatSPZLoader.tests.js';

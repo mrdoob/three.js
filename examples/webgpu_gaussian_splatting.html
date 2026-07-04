@@ -9,6 +9,22 @@
 		<meta property="og:url" content="https://threejs.org/examples/webgpu_gaussian_splatting.html">
 		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_gaussian_splatting.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			#camera-info {
+				position: absolute;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				padding: 8px 12px;
+				background: rgba( 0, 0, 0, 0.45 );
+				color: #fff;
+				font-family: monospace;
+				font-size: 12px;
+				line-height: 1.4;
+				pointer-events: none;
+				text-align: center;
+			}
+		</style>
 	</head>
 	<body>
 
@@ -19,8 +35,9 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Gaussian Splatting</span>
 			</div>
 
-			<small id="status">Minimal WebGPU/TSL Gaussian splat renderer loading a standard 3DGS PLY file by <a href="https://ben3d.ca">Ben Houston</a>.</small>
+			<small id="status">Minimal WebGPU/TSL Gaussian splat renderer loading PLY, SPLAT, SPZ, and KSPLAT data by <a href="https://ben3d.ca">Ben Houston</a>.</small>
 		</div>
+		<div id="camera-info"></div>
 
 		<script type="importmap">
 			{
@@ -37,24 +54,34 @@
 
 			import * as THREE from 'three/webgpu';
 
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { GaussianSplatLoader } from 'three/addons/loaders/GaussianSplatLoader.js';
+			import { GaussianSplatKSplatLoader } from 'three/addons/loaders/GaussianSplatKSplatLoader.js';
 			import { GaussianSplatPLYLoader } from 'three/addons/loaders/GaussianSplatPLYLoader.js';
 			import { GaussianSplatSPZLoader } from 'three/addons/loaders/GaussianSplatSPZLoader.js';
 			import { GaussianSplatData } from 'three/addons/objects/GaussianSplatData.js';
 			import { GaussianSplatMesh } from 'three/addons/objects/GaussianSplatMesh.js';
 
-			let camera, scene, renderer, controls, splats;
+			let camera, scene, renderer, orbitControls, firstPersonControls, activeControls, splats;
 			let loadId = 0;
 
 			const status = document.getElementById( 'status' );
+			const cameraInfo = document.getElementById( 'camera-info' );
+			const clock = new THREE.Clock();
+			const cameraDirection = new THREE.Vector3();
+			const lastRenderedCameraPosition = new THREE.Vector3();
+			const lastRenderedCameraQuaternion = new THREE.Quaternion();
+			const zeroVector = new THREE.Vector3();
+			let forceRender = true;
 			const sourceNames = {
 				'Procedural Flower (local, CC0)': 'flower',
 				'ReconWorldLab Demo (remote PLY, MIT, 67 MB)': 'recon',
 				'Cool Splats Output (remote SPLAT, 112 MB)': 'coolSplats',
 				'Niantic Horned Lizard (remote SPZ, MIT, 18 MB)': 'hornedLizard',
+				'NerfBaselines Bonsai (remote KSPLAT, 27 MB)': 'bonsaiKSplat',
 				'Debug: Single Round Splat': 'debugRound',
 				'Debug: Axis-Aligned Ellipses': 'debugAxes',
 				'Debug: Rotated Ellipses': 'debugRotated',
@@ -66,6 +93,7 @@
 					name: 'Procedural Flower',
 					url: 'models/gsplat/procedural_flower.ply',
 					rotation: new THREE.Euler( - 0.35, 0, 0 ),
+					controls: 'orbit',
 					cameraPosition: new THREE.Vector3( 0, 0.35, 3.2 ),
 					note: 'Procedural local CC0 sample.'
 				},
@@ -74,6 +102,7 @@
 					url: 'https://raw.githubusercontent.com/ReconWorldLab/godot-gaussian-splatting/main/samples/assets/demo.ply',
 					loader: GaussianSplatPLYLoader,
 					rotation: new THREE.Euler( Math.PI, 0, 0 ),
+					controls: 'orbit',
 					cameraPosition: new THREE.Vector3( 0, 0.2, 3.5 ),
 					note: 'MIT licensed sample from ReconWorldLab/godot-gaussian-splatting.'
 				},
@@ -82,9 +111,12 @@
 					url: 'https://huggingface.co/datasets/runes/coolsplats/resolve/main/output.splat',
 					loader: GaussianSplatLoader,
 					rotation: new THREE.Euler( - Math.PI * 0.5, 0, Math.PI * 0.5 ),
-					cameraMode: 'inside',
-					cameraPosition: new THREE.Vector3( 0, - 0.5, 1.85 ),
+					controls: 'firstPerson',
+					cameraPosition: new THREE.Vector3( 0.09, 0.11, 2.89 ),
+					cameraPositionWorld: true,
 					cameraTarget: new THREE.Vector3( 0, - 0.5, 0 ),
+					movementSpeed: 0.7,
+					lookSpeed: 0.08,
 					minDistance: 0.01,
 					note: 'Remote standard .splat file referenced as working input in mkkellogg/GaussianSplats3D.'
 				},
@@ -93,16 +125,34 @@
 					url: 'https://raw.githubusercontent.com/nianticlabs/spz/v2.1.0/samples/hornedlizard.spz',
 					loader: GaussianSplatSPZLoader,
 					rotation: new THREE.Euler( 0, 0, 0 ),
-					cameraMode: 'inside',
+					controls: 'firstPerson',
 					cameraPosition: new THREE.Vector3( 0, 0.15, 0.9 ),
 					cameraTarget: new THREE.Vector3( 0, 0, 0 ),
+					movementSpeed: 0.35,
+					lookSpeed: 0.08,
 					minDistance: 0.01,
 					note: 'MIT licensed SPZ v2 sample from nianticlabs/spz, loaded from GitHub.'
+				},
+				bonsaiKSplat: {
+					name: 'NerfBaselines Bonsai',
+					url: 'https://huggingface.co/datasets/nerfbaselines/nerfbaselines-supplementary/resolve/main/gaussian-splatting/mipnerf360/bonsai_demo/scene.ksplat',
+					loader: GaussianSplatKSplatLoader,
+					rotation: new THREE.Euler( Math.PI, Math.PI, 0 ),
+					controls: 'firstPerson',
+					cameraPosition: new THREE.Vector3( 0.12, - 3.81, - 1.14 ),
+					cameraPositionWorld: true,
+					cameraDirection: new THREE.Vector3( - 0.18, 0.59, 0.79 ),
+					movementSpeed: 0.6,
+					lookSpeed: 0.08,
+					minDistance: 0.01,
+					maxDistance: 12,
+					note: 'Remote KSplat sample from nerfbaselines/nerfbaselines-supplementary, hosted on Hugging Face.'
 				},
 				debugRound: {
 					name: 'Debug Round Splat',
 					createData: createDebugRoundSplat,
 					rotation: new THREE.Euler( 0, 0, 0 ),
+					controls: 'orbit',
 					cameraPosition: new THREE.Vector3( 0, 0, 3 ),
 					note: 'One isotropic Gaussian. It should stay round while zooming.'
 				},
@@ -110,6 +160,7 @@
 					name: 'Debug Axis-Aligned Ellipses',
 					createData: createDebugAxisSplats,
 					rotation: new THREE.Euler( 0, 0, 0 ),
+					controls: 'orbit',
 					cameraPosition: new THREE.Vector3( 0, 0, 4 ),
 					note: 'Rows show X, Y and depth-axis covariance. X/Y ellipses should keep stable orientation while zooming.'
 				},
@@ -117,6 +168,7 @@
 					name: 'Debug Rotated Ellipses',
 					createData: () => createDebugRotatedSplats( true ),
 					rotation: new THREE.Euler( 0, 0, 0 ),
+					controls: 'orbit',
 					cameraPosition: new THREE.Vector3( 0, 0, 4 ),
 					note: 'A ring of 2D rotated Gaussians. Ellipse orientation should rotate smoothly around the center.'
 				},
@@ -124,6 +176,7 @@
 					name: 'Debug Rotated Ellipses (no center)',
 					createData: () => createDebugRotatedSplats( false ),
 					rotation: new THREE.Euler( 0, 0, 0 ),
+					controls: 'orbit',
 					cameraPosition: new THREE.Vector3( 0, 0, 4 ),
 					note: 'Same rotated ring without the center splat, useful for isolating far-side projection from blending.'
 				},
@@ -131,6 +184,7 @@
 					name: 'Debug Depth Sorting Stack',
 					createData: createDebugDepthSplats,
 					rotation: new THREE.Euler( 0, 0, 0 ),
+					controls: 'orbit',
 					cameraPosition: new THREE.Vector3( 0, 0, 4 ),
 					note: 'Overlapping translucent layers at different depths. Orbit to validate back-to-front sorting.'
 				}
@@ -164,12 +218,17 @@
 
 				await renderer.init();
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.enableDamping = true;
-				controls.minDistance = 1.2;
-				controls.maxDistance = 8;
-				controls.target.set( 0, 0, 0 );
-				controls.update();
+				orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.enableDamping = true;
+				orbitControls.minDistance = 1.2;
+				orbitControls.maxDistance = 8;
+				orbitControls.target.set( 0, 0, 0 );
+				orbitControls.update();
+
+				firstPersonControls = new FirstPersonControls( camera, renderer.domElement );
+				firstPersonControls.enabled = false;
+				firstPersonControls.movementSpeed = 0.7;
+				firstPersonControls.lookSpeed = 0.08;
 
 				const gui = new GUI();
 				gui.add( params, 'source', Object.keys( sourceNames ) ).name( 'Splat' ).onChange( async ( value ) => {
@@ -243,28 +302,53 @@
 				const radius = Math.max( sphere.radius, 1 );
 				const distance = radius / Math.sin( THREE.MathUtils.degToRad( camera.fov ) * 0.5 );
 
-				controls.minDistance = source.minDistance || 1.2;
-				controls.maxDistance = source.maxDistance || 8;
+				orbitControls.minDistance = source.minDistance || 1.2;
+				orbitControls.maxDistance = source.maxDistance || 8;
 
-				if ( source.cameraMode === 'inside' ) {
+				if ( source.controls === 'firstPerson' ) {
 
-					controls.target.copy( sphere.center ).add( source.cameraTarget );
-					camera.position.copy( sphere.center ).add( source.cameraPosition );
+					if ( source.cameraPositionWorld === true ) {
+
+						camera.position.copy( source.cameraPosition );
+
+					} else {
+
+						camera.position.copy( sphere.center ).add( source.cameraPosition );
+
+					}
+
+					const target = source.cameraDirection !== undefined ?
+						camera.position.clone().add( source.cameraDirection ) :
+						sphere.center.clone().add( source.cameraTarget || zeroVector );
 					camera.near = 0.001;
 					camera.far = Math.max( radius * 4, 10 );
+					firstPersonControls.movementSpeed = source.movementSpeed || radius * 0.25;
+					firstPersonControls.lookSpeed = source.lookSpeed || 0.08;
+					firstPersonControls.lookAt( target );
+					setActiveControls( 'firstPerson' );
 
 				} else {
 
-					controls.target.copy( sphere.center );
+					orbitControls.target.copy( sphere.center ).add( source.cameraTarget || zeroVector );
 					camera.position.copy( source.cameraPosition ).normalize().multiplyScalar( distance * 1.4 ).add( sphere.center );
 					camera.near = Math.max( distance / 1000, 0.001 );
 					camera.far = Math.max( distance * 10, 10 );
+					setActiveControls( 'orbit' );
 
 				}
 
 				camera.updateProjectionMatrix();
-				controls.update();
+				activeControls.update( 0 );
+				forceRender = true;
 
+
+			}
+
+			function setActiveControls( mode ) {
+
+				orbitControls.enabled = mode === 'orbit';
+				firstPersonControls.enabled = mode === 'firstPerson';
+				activeControls = mode === 'firstPerson' ? firstPersonControls : orbitControls;
 
 			}
 
@@ -274,14 +358,33 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				forceRender = true;
 
 			}
 
 			function render() {
 
-				controls.update();
+				const delta = clock.getDelta();
 
-			
+				if ( activeControls !== undefined ) {
+
+					if ( activeControls === firstPersonControls ) {
+
+						activeControls.update( delta );
+
+					} else {
+
+						activeControls.update();
+
+					}
+
+				}
+
+				if ( activeControls === firstPersonControls && forceRender === false && hasCameraChanged() === false ) {
+
+					return;
+
+				}
 
 				if ( splats !== undefined ) {
 
@@ -289,7 +392,33 @@
 
 				}
 
+				updateCameraInfo();
 				renderer.render( scene, camera );
+				lastRenderedCameraPosition.copy( camera.position );
+				lastRenderedCameraQuaternion.copy( camera.quaternion );
+				forceRender = false;
+
+			}
+
+			function hasCameraChanged() {
+
+				return lastRenderedCameraPosition.distanceToSquared( camera.position ) > 1e-8 ||
+					1 - Math.abs( lastRenderedCameraQuaternion.dot( camera.quaternion ) ) > 1e-8;
+
+			}
+
+			function updateCameraInfo() {
+
+				if ( cameraInfo === null ) return;
+
+				camera.getWorldDirection( cameraDirection );
+				cameraInfo.textContent = `Camera position: ${ formatVector( camera.position ) } | View direction: ${ formatVector( cameraDirection ) } | Controls: ${ activeControls === firstPersonControls ? 'WASD / drag to look' : 'orbit' }`;
+
+			}
+
+			function formatVector( vector ) {
+
+				return `${ vector.x.toFixed( 2 ) }, ${ vector.y.toFixed( 2 ) }, ${ vector.z.toFixed( 2 ) }`;
 
 			}
 

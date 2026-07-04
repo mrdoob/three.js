@@ -115,6 +115,7 @@ export * from './loaders/PLYLoader.js';
 export * from './loaders/PVRLoader.js';
 export * from './loaders/RGBELoader.js';
 export * from './loaders/GaussianSplatLoader.js';
+export * from './loaders/GaussianSplatKSplatLoader.js';
 export * from './loaders/GaussianSplatPLYLoader.js';
 export * from './loaders/GaussianSplatSPZLoader.js';
 export * from './loaders/UltraHDRLoader.js';
