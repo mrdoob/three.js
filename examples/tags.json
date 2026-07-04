@@ -145,6 +145,7 @@
 	"webgpu_depth_texture": [ "renderTarget" ],
 	"webgpu_loader_gltf_dispersion": [ "transmission" ],
 	"webgpu_materials_lightmap": [ "shadow" ],
+	"webgpu_materials_parallaxmap": [ "pom", "silhouette", "relief", "height map", "tsl", "scifi" ],
 	"webgpu_materials_sss": [ "subsurface scattering", "derivatives", "translucency" ],
 	"webgpu_materials_transmission": [ "alpha" ],
 	"webgpu_materials_arrays": [ "webgpu", "geometry", "groups", "array" ],

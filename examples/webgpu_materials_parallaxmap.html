@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - parallax occlusion mapping</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - parallax occlusion mapping">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_materials_parallaxmap.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_materials_parallaxmap.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Parallax Occlusion Mapping</span>
+			</div>
+
+			<small>
+				Silhouette parallax occlusion mapping - height fields ray marched in TSL, silhouettes clipped through alpha test.<br />
+				Every surface is flat geometry: the wall carves its outline at the relief tile bounds, while the inflated<br />
+				column and pipe shells clip rays past their curved horizons. All maps are generated procedurally at startup.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { color, float, mix, normalLocal, normalMap, pass, positionLocal, texture, textureLevel, uniform, uv, vec2, vec3 } from 'three/tsl';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
+
+			import { parallaxOcclusionUV } from 'three/addons/tsl/utils/ParallaxOcclusion.js';
+
+			const FLOOR_MAP_SIZE = 1024;
+			const WALL_MAP_SIZE = 1024;
+			const COLUMN_MAP_SIZE = 512;
+
+			// The set piece: a street-level bulkhead with a recessed blast door,
+			// a conduit chase, a glyph sign and an overhead pipe run, flanked by
+			// two service columns on a worn slab deck. The wall face is a single
+			// relief tile with everything drawn in; columns and pipes wrap a
+			// small tiling flange-and-conduit map.
+
+			const WALL_WIDTH = 9.0, WALL_HEIGHT = 4.2;
+			const COLUMN_RADIUS = 0.46, COLUMN_HEIGHT = 3.4;
+			const COLUMN_U_TILES = 3; // tiles around each cylinder; rings follow from its length
+
+			const QUALITIES = {
+				'low': [ 8, 32 ],
+				'medium': [ 16, 96 ],
+				'high': [ 32, 160 ]
+			};
+
+			const settings = {
+				parallax: true,
+				silhouette: true,
+				scale: 0.15,
+				quality: 'medium',
+				bloom: false,
+				autoRotate: true
+			};
+
+			let camera, scene, renderer, controls, renderPipeline;
+			let wallMaterial, floorMaterial;
+			let wallMap, columnMap, floorMap;
+
+			const shellMaterials = []; // one per cylinder radius, see makeShellCylinder
+
+			const depthScale = uniform( settings.scale );
+
+			init();
+
+			async function init() {
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				// all relief maps are generated procedurally at startup, packed the
+				// same way: red is height (white = peak), green marks the emissive
+				// light strips and blue varies the tone per panel
+
+				wallMap = createWallMap();
+				columnMap = createColumnMap();
+				floorMap = createFloorMap();
+
+				//
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x11151c );
+				scene.fog = new THREE.Fog( 0x11151c, 10, 26 );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.05, 50 );
+				camera.position.set( 0.4, 1.8, 8.4 );
+
+				// no distance or angle limits: moving the camera through the relief
+				// (and through the floor) reveals that the geometry is actually flat.
+				// The orbit pivots on the middle of the blast door.
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 1.4, 0 );
+				controls.enableDamping = true;
+				controls.autoRotate = settings.autoRotate;
+				controls.autoRotateSpeed = 1.0;
+
+				// three point lighting: warm key, cool fill, and a rim light from
+				// behind that outlines the carved silhouettes
+
+				scene.add( new THREE.AmbientLight( 0x404855, 0.7 ) );
+
+				const keyLight = new THREE.DirectionalLight( 0xfff1e0, 2.6 );
+				keyLight.position.set( - 3, 4, 4 );
+				scene.add( keyLight );
+
+				const fillLight = new THREE.DirectionalLight( 0x8fb1d8, 0.9 );
+				fillLight.position.set( 3.5, 1.5, 2.5 );
+				scene.add( fillLight );
+
+				const rimLight = new THREE.DirectionalLight( 0xdfe8ff, 1.6 );
+				rimLight.position.set( 0.5, 3.5, - 4 );
+				scene.add( rimLight );
+
+				// the bulkhead wall: a flat slab whose whole face - blast door,
+				// plating, conduits, sign, edge trim - lives in one relief tile.
+				// With the silhouette enabled its outline crenellates along the
+				// trim instead of ending at the quad edge. A back-to-back clone
+				// carries the same relief on the reverse side.
+
+				const wallGeometry = new THREE.PlaneGeometry( WALL_WIDTH, WALL_HEIGHT );
+				wallGeometry.computeTangents(); // the parallax march runs in tangent space
+
+				const wallBackGeometry = wallGeometry.clone();
+				wallBackGeometry.rotateY( Math.PI );
+
+				wallMaterial = new THREE.MeshStandardNodeMaterial();
+
+				const wall = new THREE.Group();
+
+				const wallFront = new THREE.Mesh( wallGeometry, wallMaterial );
+				wallFront.position.z = 0.02;
+				wall.add( wallFront );
+
+				const wallBack = new THREE.Mesh( wallBackGeometry, wallMaterial );
+				wallBack.position.z = - 0.02;
+				wall.add( wallBack );
+
+				// sunk slightly into the deck, so the carved bottom border never
+				// shows a sliver where the two relief volumes meet
+
+				wall.position.set( 0, WALL_HEIGHT / 2 - 0.06, 0 );
+				scene.add( wall );
+
+				// columns and pipes share the flange map and the shell recipe:
+				// each shell is inflated along its normals by the relief height
+				// AT ITS OWN RADIUS (one tile wraps a third of its circumference)
+				// and marched with the curved silhouette test, so flanges and
+				// bolts extend BEYOND the base silhouette - the parallax
+				// analogue of true displacement. A plain closed cylinder
+				// underneath fills wherever the shell clips.
+
+				const coreMaterial = new THREE.MeshStandardNodeMaterial( { color: 0x272c34, roughness: 0.6, metalness: 0.25 } );
+				const capMaterial = new THREE.MeshStandardNodeMaterial( { color: 0x333944, roughness: 0.5, metalness: 0.3 } );
+
+				// tile counts follow each cylinder's size, so the flange map
+				// keeps square proportions instead of stretching along the axis.
+				// reliefFactor tames the relief depth on thin pipes, where a
+				// full tile of depth would rival the radius itself.
+
+				const makeShellCylinder = ( radius, length, aroundTiles, reliefFactor ) => {
+
+					const group = new THREE.Group();
+
+					const shellGeometry = new THREE.CylinderGeometry( radius, radius, length, 48, 1, true );
+					shellGeometry.computeTangents();
+
+					const tileAround = 2 * Math.PI * radius / aroundTiles;
+					const ringTiles = Math.max( 2, Math.round( length / tileAround ) );
+
+					const material = new THREE.MeshStandardNodeMaterial();
+					material.positionNode = positionLocal.add( normalLocal.mul( depthScale.mul( reliefFactor * tileAround ) ) );
+
+					shellMaterials.push( { material, aroundTiles, ringTiles, reliefFactor } );
+
+					group.add( new THREE.Mesh( shellGeometry, material ) );
+
+					// the core sits a hair inside the shell, so the two never
+					// z-fight when the scale slider rests at zero
+
+					group.add( new THREE.Mesh( new THREE.CylinderGeometry( radius - 0.005, radius - 0.005, length, 48 ), coreMaterial ) );
+
+					// end caps: flat hardware the relief cannot fake, sized to
+					// the flange radius at the default relief depth
+
+					const capRadius = radius + settings.scale * reliefFactor * tileAround * 0.95;
+					const capGeometry = new THREE.CylinderGeometry( capRadius, capRadius, 0.07, 48 );
+
+					for ( const end of [ - 1, 1 ] ) {
+
+						const cap = new THREE.Mesh( capGeometry, capMaterial );
+						cap.position.y = end * ( length / 2 + 0.02 );
+						group.add( cap );
+
+					}
+
+					return group;
+
+				};
+
+				// the columns stand inside the wall's span, so the carved wall
+				// edges stay visible - their end flanges come from the relief,
+				// not from extra geometry
+
+				for ( const side of [ - 1, 1 ] ) {
+
+					const column = makeShellCylinder( COLUMN_RADIUS, COLUMN_HEIGHT, COLUMN_U_TILES, 1.0 );
+					column.position.set( side * 2.55, COLUMN_HEIGHT / 2, 1.05 );
+					scene.add( column );
+
+				}
+
+				// the overhead pipe run, crossing the whole wall above the door
+				// and running on past its edges - one tile wraps each pipe
+
+				for ( const [ radius, y, z ] of [[ 0.15, 3.62, 0.32 ], [ 0.085, 3.92, 0.26 ]] ) {
+
+					const pipe = makeShellCylinder( radius, 10.4, 1, 0.7 );
+					pipe.rotation.z = Math.PI / 2;
+					pipe.position.set( 0, y, z );
+					scene.add( pipe );
+
+				}
+
+				// panel floor
+
+				const floorGeometry = new THREE.PlaneGeometry( 16, 16 );
+				floorGeometry.rotateX( - Math.PI / 2 );
+				floorGeometry.computeTangents();
+
+				floorMaterial = new THREE.MeshStandardNodeMaterial();
+
+				const floor = new THREE.Mesh( floorGeometry, floorMaterial );
+				scene.add( floor );
+
+				updateMaterials();
+
+				// optional bloom pass, so the emissive strips and signs glow
+
+				const scenePass = pass( scene, camera );
+				const scenePassColor = scenePass.getTextureNode();
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputNode = scenePassColor.add( bloom( scenePassColor, 0.5, 0.35, 0.85 ) );
+
+				//
+
+				renderer.setAnimationLoop( animate );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				initGui();
+
+			}
+
+			// All three relief maps are drawn into canvases with one packing:
+			// red is height (white = peak), green marks emissive light, blue is
+			// the tone channel - plate variation below 0.78, worn paint around
+			// 0.85, and the neon hue picker where green glows (low = cyan,
+			// high = magenta). Deterministic Mulberry32 randomness, so CI
+			// screenshots are reproducible.
+
+			function createRandom( seed ) {
+
+				return () => {
+
+					seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+					let t = Math.imul( seed ^ seed >>> 15, 1 | seed );
+					t = t + Math.imul( t ^ t >>> 7, 61 | t ) ^ t;
+					return ( ( t ^ t >>> 14 ) >>> 0 ) / 4294967296;
+
+				};
+
+			}
+
+			// procedural edge wear: bright metal showing through in short runs
+			// along a plate's borders, with the odd nick - wear that follows
+			// the shapes instead of speckling them
+
+			function wearEdges( context, random, x, y, w, h, height ) {
+
+				const bright = `rgb(${ Math.min( 235, Math.round( height + 26 ) ) },0,190)`;
+
+				for ( let e = 0; e < 3; e ++ ) {
+
+					const side = Math.floor( random() * 4 );
+					const along = 0.08 + random() * 0.55;
+					const run = 0.12 + random() * 0.3;
+
+					context.fillStyle = bright;
+
+					if ( side === 0 ) context.fillRect( x + along * w, y, run * w, 2 );
+					if ( side === 1 ) context.fillRect( x + along * w, y + h - 2, run * w, 2 );
+					if ( side === 2 ) context.fillRect( x, y + along * h, 2, run * h );
+					if ( side === 3 ) context.fillRect( x + w - 2, y + along * h, 2, run * h );
+
+				}
+
+				if ( random() < 0.3 ) {
+
+					context.fillStyle = 'rgb(58,0,64)';
+					context.fillRect( x + ( 0.1 + random() * 0.8 ) * w, random() < 0.5 ? y : y + h - 4, 5, 4 );
+
+				}
+
+			}
+
+			// soft grime settling below edges and vents - a translucent wash,
+			// not individual streaks
+
+			function grimeShadow( context, x, y, w, h ) {
+
+				context.globalAlpha = 0.16;
+				context.fillStyle = 'rgb(40,0,12)';
+				context.fillRect( x, y, w, h );
+				context.globalAlpha = 0.12;
+				context.fillRect( x, y, w, h * 0.45 );
+				context.globalAlpha = 1;
+
+			}
+
+			// The deck: an irregular grid of service panels - vent slots,
+			// recessed light strips, painted lane dashes, drainage grates and
+			// corner rivets, worn along their edges.
+
+			function createFloorMap() {
+
+				const random = createRandom( 7 );
+				const size = FLOOR_MAP_SIZE;
+
+				const canvas = document.createElement( 'canvas' );
+				canvas.width = size;
+				canvas.height = size;
+
+				const context = canvas.getContext( '2d' );
+
+				// deep seams between the panels
+
+				context.fillStyle = 'rgb(28,0,90)';
+				context.fillRect( 0, 0, size, size );
+
+				const splits = ( count ) => {
+
+					const values = [ 0 ];
+					for ( let i = 1; i < count; i ++ ) values.push( ( i + ( random() - 0.5 ) * 0.55 ) / count * size );
+					values.push( size );
+					return values;
+
+				};
+
+				const xs = splits( 6 );
+				const ys = splits( 6 );
+
+				for ( let i = 0; i < xs.length - 1; i ++ ) {
+
+					for ( let j = 0; j < ys.length - 1; j ++ ) {
+
+						const x = xs[ i ], y = ys[ j ];
+						const w = xs[ i + 1 ] - x, h = ys[ j + 1 ] - y;
+
+						const inset = 7;
+						const height = 150 + random() * 75;
+						const variation = 50 + random() * 140;
+
+						context.fillStyle = `rgb(${ Math.round( height ) },0,${ Math.round( variation ) })`;
+						context.fillRect( x + inset, y + inset, w - inset * 2, h - inset * 2 );
+
+						const type = random();
+
+						if ( type < 0.16 ) {
+
+							// vent slots
+
+							const slots = 3 + Math.floor( random() * 3 );
+
+							for ( let s = 0; s < slots; s ++ ) {
+
+								const sy = y + inset + 14 + ( s + 0.5 ) / slots * ( h - inset * 2 - 28 );
+								context.fillStyle = 'rgb(55,0,80)';
+								context.fillRect( x + w * 0.25, sy - 4, w * 0.5, 8 );
+
+							}
+
+						} else if ( type < 0.34 ) {
+
+							// recessed emissive light strip
+
+							context.fillStyle = 'rgb(90,255,0)';
+							context.fillRect( x + inset + 12, y + h / 2 - 5, w - inset * 2 - 24, 10 );
+
+						} else if ( type < 0.46 ) {
+
+							// painted lane dashes, worn down to the plate
+
+							for ( let d = 0; d < 3; d ++ ) {
+
+								context.fillStyle = `rgb(${ Math.round( height + 6 ) },0,216)`;
+								context.fillRect( x + w * ( 0.16 + d * 0.26 ), y + h * 0.46, w * 0.16, 12 );
+
+							}
+
+						} else if ( type < 0.56 ) {
+
+							// drainage grate
+
+							for ( let gy = 0; gy < 4; gy ++ ) {
+
+								for ( let gx = 0; gx < 4; gx ++ ) {
+
+									context.fillStyle = 'rgb(38,0,50)';
+									context.fillRect( x + w * ( 0.2 + gx * 0.16 ), y + h * ( 0.2 + gy * 0.16 ), w * 0.1, h * 0.1 );
+
+								}
+
+							}
+
+						}
+
+						// corner rivets
+
+						context.fillStyle = `rgb(${ Math.round( height - 45 ) },0,${ Math.round( variation ) })`;
+
+						for ( const [ rx, ry ] of [[ x + inset + 14, y + inset + 14 ], [ x + w - inset - 14, y + inset + 14 ], [ x + inset + 14, y + h - inset - 14 ], [ x + w - inset - 14, y + h - inset - 14 ]] ) {
+
+							context.beginPath();
+							context.arc( rx, ry, 5, 0, Math.PI * 2 );
+							context.fill();
+
+						}
+
+						wearEdges( context, random, x + inset, y + inset, w - inset * 2, h - inset * 2, height );
+
+					}
+
+				}
+
+				const map = new THREE.CanvasTexture( canvas );
+				map.wrapS = THREE.RepeatWrapping;
+				map.wrapT = THREE.RepeatWrapping;
+				map.anisotropy = 4;
+				map.name = 'floorPanelMap';
+
+				return map;
+
+			}
+
+			// The bulkhead face in one tile: concrete slabs behind armor
+			// plating, a kick plinth closed by a worn hazard chevron strip, the
+			// recessed blast door with its glowing frame, a conduit chase, a
+			// magenta glyph sign, a header beam with a light cove and a
+			// crenellated top trim that the carved outline follows.
+
+			function createWallMap() {
+
+				const random = createRandom( 21 );
+				const size = WALL_MAP_SIZE;
+
+				// world -> canvas: the wall is wider than tall while the canvas
+				// is square; v = 0 is the wall bottom, so world y measures up
+				// from the canvas bottom edge
+
+				const px = ( w ) => Math.round( w / WALL_WIDTH * size );
+				const py = ( h ) => Math.round( size - h / WALL_HEIGHT * size );
+
+				const canvas = document.createElement( 'canvas' );
+				canvas.width = size;
+				canvas.height = size;
+
+				const context = canvas.getContext( '2d' );
+
+				// deep structure behind everything
+
+				context.fillStyle = 'rgb(30,0,60)';
+				context.fillRect( 0, 0, size, size );
+
+				// backdrop concrete slabs with staggered joints
+
+				let edge = 0;
+
+				while ( edge < size ) {
+
+					const w = size * ( 0.12 + random() * 0.1 );
+					const height = 128 + random() * 26;
+					const variation = 46 + random() * 60;
+
+					context.fillStyle = `rgb(${ Math.round( height ) },0,${ Math.round( variation ) })`;
+					context.fillRect( edge + 3, 0, w - 6, size );
+
+					edge += w;
+
+				}
+
+				// plated mid band: staggered armor plates between plinth and beam
+
+				for ( let row = 0; row < 3; row ++ ) {
+
+					const rowY = py( 3.1 - row * 0.82 );
+					const rowH = py( 3.1 - row * 0.82 - 0.74 ) - rowY;
+					let plateX = row % 2 === 0 ? 0 : - px( 0.5 );
+
+					while ( plateX < size ) {
+
+						const plateW = px( 0.9 + random() * 0.7 );
+						const height = 150 + random() * 55;
+						const variation = 60 + random() * 130;
+
+						context.fillStyle = `rgb(${ Math.round( height ) },0,${ Math.round( variation ) })`;
+						context.fillRect( plateX + 4, rowY, plateW - 8, rowH - 6 );
+
+						if ( random() < 0.3 ) {
+
+							// vent slots with soot settling below them
+
+							for ( let s = 0; s < 4; s ++ ) {
+
+								context.fillStyle = 'rgb(52,0,44)';
+								context.fillRect( plateX + plateW * 0.22, rowY + rowH * 0.2 + s * rowH * 0.15, plateW * 0.5, 7 );
+
+							}
+
+							grimeShadow( context, plateX + plateW * 0.18, rowY + rowH * 0.72, plateW * 0.58, rowH * 0.28 );
+
+						}
+
+						wearEdges( context, random, plateX + 4, rowY, plateW - 8, rowH - 6, height );
+
+						plateX += plateW;
+
+					}
+
+				}
+
+				// kick plinth with soft scuffing, closed by a worn hazard strip,
+				// grime settling where it meets the deck
+
+				context.fillStyle = 'rgb(176,0,74)';
+				context.fillRect( 0, py( 0.62 ), size, size - py( 0.62 ) );
+
+				context.globalAlpha = 0.3;
+
+				for ( let s = 0; s < 14; s ++ ) {
+
+					context.fillStyle = 'rgb(120,0,40)';
+					context.fillRect( random() * size, py( 0.1 + random() * 0.4 ), 50 + random() * 120, 3 );
+
+				}
+
+				context.globalAlpha = 1;
+
+				grimeShadow( context, 0, py( 0.2 ), size, size - py( 0.2 ) );
+
+				for ( let c = 0; c < size / 40 + 1; c ++ ) {
+
+					context.fillStyle = c % 2 === 0 ? 'rgb(176,0,216)' : 'rgb(150,0,52)';
+					context.beginPath();
+					context.moveTo( c * 40, py( 0.78 ) );
+					context.lineTo( c * 40 + 22, py( 0.78 ) );
+					context.lineTo( c * 40 + 44, py( 0.62 ) );
+					context.lineTo( c * 40 + 22, py( 0.62 ) );
+					context.closePath();
+					context.fill();
+
+				}
+
+				// conduit chase left of the door: risers with clamp blocks
+
+				for ( let riser = 0; riser < 3; riser ++ ) {
+
+					const rx = px( 2.0 + riser * 0.28 );
+
+					context.fillStyle = 'rgb(196,0,96)';
+					context.fillRect( rx, py( 3.42 ), px( 0.14 ), py( 0.8 ) - py( 3.42 ) );
+
+					for ( let clamp = 0; clamp < 4; clamp ++ ) {
+
+						const cy = py( 3.1 - clamp * 0.72 );
+						context.fillStyle = 'rgb(224,0,110)';
+						context.fillRect( rx - 5, cy, px( 0.14 ) + 10, 16 );
+						grimeShadow( context, rx - 5, cy + 16, px( 0.14 ) + 10, 22 );
+
+					}
+
+				}
+
+				// the blast door: raised frame steps, a cyan glow reveal, a deep
+				// recess and a ribbed split leaf. Drawn last so it owns its
+				// footprint.
+
+				const doorHalf = px( 1.15 );
+				const doorTop = py( 2.75 );
+				const frame = px( 0.22 );
+
+				context.fillStyle = 'rgb(235,0,96)';
+				context.fillRect( size / 2 - doorHalf - frame, doorTop - frame, ( doorHalf + frame ) * 2, size - doorTop + frame );
+
+				context.fillStyle = 'rgb(214,0,88)';
+				context.fillRect( size / 2 - doorHalf - Math.round( frame * 0.55 ), doorTop - Math.round( frame * 0.55 ), ( doorHalf + Math.round( frame * 0.55 ) ) * 2, size - doorTop + Math.round( frame * 0.55 ) );
+
+				context.fillStyle = 'rgb(96,255,30)';
+				context.fillRect( size / 2 - doorHalf - Math.round( frame * 0.3 ), doorTop - Math.round( frame * 0.3 ), ( doorHalf + Math.round( frame * 0.3 ) ) * 2, size - doorTop + Math.round( frame * 0.3 ) );
+
+				context.fillStyle = 'rgb(50,0,40)';
+				context.fillRect( size / 2 - doorHalf, doorTop, doorHalf * 2, size - doorTop );
+
+				for ( const doorSide of [ - 1, 1 ] ) {
+
+					const leafX = doorSide === - 1 ? size / 2 - doorHalf + 8 : size / 2 + 10;
+					const leafW = doorHalf - 18;
+
+					for ( let rib = 0; rib < 7; rib ++ ) {
+
+						context.fillStyle = rib % 2 === 0 ? 'rgb(84,0,70)' : 'rgb(68,0,58)';
+						context.fillRect( leafX, doorTop + 10 + rib * ( size - doorTop - 20 ) / 7, leafW, ( size - doorTop - 20 ) / 7 - 4 );
+
+					}
+
+				}
+
+				// threshold sill across the door's base: the recess terminates on
+				// it instead of running into the wall's bottom edge, where the
+				// parallax volume would clash with the real floor plane
+
+				const sill = Math.round( frame * 0.55 );
+
+				context.fillStyle = 'rgb(214,0,88)';
+				context.fillRect( size / 2 - doorHalf - sill, py( 0.16 ), ( doorHalf + sill ) * 2, size - py( 0.16 ) );
+
+				// keypad by the right frame
+
+				context.fillStyle = 'rgb(205,0,120)';
+				context.fillRect( size / 2 + doorHalf + frame + 8, py( 1.85 ), px( 0.18 ), py( 1.55 ) - py( 1.85 ) );
+				context.fillStyle = 'rgb(120,255,30)';
+				context.fillRect( size / 2 + doorHalf + frame + 14, py( 1.78 ), px( 0.09 ), 8 );
+
+				// the glyph sign: a dark plate with stacked magenta block glyphs
+
+				const signX = px( 6.9 ), signW = px( 0.6 );
+
+				context.fillStyle = 'rgb(70,0,44)';
+				context.fillRect( signX - 8, py( 3.35 ) - 8, signW + 16, py( 1.05 ) - py( 3.35 ) + 16 );
+
+				// the glyph cells sit flush with the plate - no relief edges, so
+				// they read as lit segments rather than raised tiles
+
+				for ( let glyph = 0; glyph < 6; glyph ++ ) {
+
+					const gy = py( 3.2 - glyph * 0.36 );
+
+					for ( let cell = 0; cell < 9; cell ++ ) {
+
+						if ( random() < 0.55 ) {
+
+							context.fillStyle = 'rgb(70,255,255)';
+							context.fillRect( signX + ( cell % 3 ) * signW / 3 + 3, gy + Math.floor( cell / 3 ) * 22, signW / 3 - 6, 18 );
+
+						}
+
+					}
+
+				}
+
+				// header beam with a cyan light cove along its underside
+
+				context.fillStyle = 'rgb(216,0,84)';
+				context.fillRect( 0, py( 4.2 ), size, py( 3.55 ) - py( 4.2 ) );
+
+				context.fillStyle = 'rgb(88,255,30)';
+				context.fillRect( px( 0.4 ), py( 3.55 ), size - px( 0.8 ), 7 );
+
+				// crenellated trim along the top and both sides - the carved
+				// outline follows these blocks against the sky
+
+				for ( let block = 0; block < 12; block ++ ) {
+
+					context.fillStyle = block % 2 === 0 ? 'rgb(230,0,90)' : 'rgb(64,0,60)';
+					context.fillRect( block * size / 12, 0, size / 12, py( 3.98 ) );
+
+					context.fillStyle = block % 2 === 0 ? 'rgb(226,0,86)' : 'rgb(60,0,58)';
+					context.fillRect( 0, block * size / 12, px( 0.16 ), size / 12 );
+					context.fillRect( size - px( 0.16 ), block * size / 12, px( 0.16 ), size / 12 );
+
+				}
+
+				const map = new THREE.CanvasTexture( canvas );
+				map.wrapS = THREE.RepeatWrapping;
+				map.wrapT = THREE.RepeatWrapping;
+				map.anisotropy = 4;
+				map.name = 'wallBulkheadMap';
+
+				return map;
+
+			}
+
+			// The column and pipe tile: bolted flange rings over a field of
+			// vertical conduits, a worn hazard paint band and a recessed cyan
+			// ring. Wraps in both directions.
+
+			function createColumnMap() {
+
+				const random = createRandom( 34 );
+				const size = COLUMN_MAP_SIZE;
+
+				const canvas = document.createElement( 'canvas' );
+				canvas.width = size;
+				canvas.height = size;
+
+				const context = canvas.getContext( '2d' );
+
+				// conduit field: full-height vertical strips of varying depth
+
+				const strips = 8;
+
+				for ( let s = 0; s < strips; s ++ ) {
+
+					const x = Math.round( s / strips * size );
+					const w = Math.round( size / strips );
+					const height = 84 + random() * 62;
+					const variation = 40 + random() * 120;
+
+					context.fillStyle = `rgb(${ Math.round( height ) },0,${ Math.round( variation ) })`;
+					context.fillRect( x, 0, w, size );
+
+					context.fillStyle = 'rgb(36,0,60)';
+					context.fillRect( x, 0, 6, size );
+
+				}
+
+				// worn hazard paint band across the conduits
+
+				context.fillStyle = 'rgb(120,0,216)';
+				context.fillRect( 0, Math.round( size * 0.30 ), size, Math.round( size * 0.07 ) );
+
+				context.globalAlpha = 0.5;
+
+				for ( let n = 0; n < 8; n ++ ) {
+
+					context.fillStyle = 'rgb(100,0,90)';
+					context.fillRect( random() * size, size * 0.30 + random() * size * 0.05, 14 + random() * 26, 3 );
+
+				}
+
+				context.globalAlpha = 1;
+
+				// flange rings at the tile borders, studded with raised bolt
+				// heads - a seat ring around a bright domed head, not holes
+
+				const flange = Math.round( size * 0.13 );
+
+				context.fillStyle = 'rgb(226,0,96)';
+				context.fillRect( 0, 0, size, flange );
+				context.fillRect( 0, size - flange, size, flange );
+
+				for ( let b = 0; b < 8; b ++ ) {
+
+					const bx = Math.round( ( b + 0.5 ) / 8 * size );
+
+					for ( const by of [ Math.round( flange * 0.5 ), size - Math.round( flange * 0.5 ) ] ) {
+
+						context.fillStyle = 'rgb(206,0,96)';
+						context.beginPath();
+						context.arc( bx, by, 11, 0, Math.PI * 2 );
+						context.fill();
+
+						context.fillStyle = 'rgb(248,0,150)';
+						context.beginPath();
+						context.arc( bx, by, 7, 0, Math.PI * 2 );
+						context.fill();
+
+					}
+
+				}
+
+				// recessed cyan ring between the flanges
+
+				context.fillStyle = 'rgb(84,255,40)';
+				context.fillRect( 0, Math.round( size * 0.62 ) - 5, size, 10 );
+
+				const map = new THREE.CanvasTexture( canvas );
+				map.wrapS = THREE.RepeatWrapping;
+				map.wrapT = THREE.RepeatWrapping;
+				map.anisotropy = 4;
+				map.name = 'columnFlangeMap';
+
+				return map;
+
+			}
+
+			// Shared node setup: marched UV, gradient-safe sampler, silhouette
+			// coverage and a shading normal derived from the height field by
+			// central differences, scaled along with the relief depth.
+
+			function buildRelief( heightMap, options ) {
+
+				const { uvNode, texel, scale } = options;
+
+				const [ minLayers, maxLayers ] = QUALITIES[ settings.quality ];
+
+				let pomUV, sample, coverage;
+				let normalUV, normalSample;
+
+				if ( settings.parallax === true ) {
+
+					( { uv: pomUV, sample, coverage } = parallaxOcclusionUV( heightMap, { minLayers, maxLayers, ...options } ) );
+
+					// normalNode is compiled in its own sub-build, so the node graph
+					// assigned to it needs a dedicated march
+
+					( { uv: normalUV, sample: normalSample } = parallaxOcclusionUV( heightMap, { minLayers, maxLayers, ...options } ) );
+
+				} else {
+
+					pomUV = uvNode || uv();
+					sample = ( map, coord = pomUV ) => texture( map, coord );
+					normalUV = pomUV;
+					normalSample = sample;
+					coverage = null;
+
+				}
+
+				// the two texel wide taps soften the normal across the steep relief
+				// walls, which would otherwise alias into shading noise
+
+				const strength = scale.div( 4.0 * texel );
+
+				// with the silhouette alpha test active the taps fetch at an explicit
+				// LOD: the normal section runs after the alpha test discard, and screen
+				// derivative sampling behind a discard miscompiles on some drivers,
+				// eroding the silhouette coverage at grazing view angles
+
+				let tapAt = ( coord ) => normalSample( heightMap, coord ).r;
+
+				if ( coverage !== null ) {
+
+					const bounds = options.sampleBounds;
+
+					tapAt = ( coord ) => {
+
+						if ( bounds ) coord = vec2( coord.x.clamp( bounds[ 0 ][ 0 ], bounds[ 0 ][ 1 ] ), coord.y.clamp( bounds[ 1 ][ 0 ], bounds[ 1 ][ 1 ] ) );
+
+						return textureLevel( heightMap, coord, 0 ).r;
+
+					};
+
+				}
+
+				const left = tapAt( normalUV.sub( vec2( texel * 2.0, 0.0 ) ) );
+				const right = tapAt( normalUV.add( vec2( texel * 2.0, 0.0 ) ) );
+				const bottom = tapAt( normalUV.sub( vec2( 0.0, texel * 2.0 ) ) );
+				const top = tapAt( normalUV.add( vec2( 0.0, texel * 2.0 ) ) );
+
+				const packedNormal = vec3( left.sub( right ).mul( strength ), bottom.sub( top ).mul( strength ), 1.0 ).normalize().mul( 0.5 ).add( 0.5 );
+
+				return { pomUV, sample, coverage, normalNode: normalMap( packedNormal ) };
+
+			}
+
+			// worn plating, shared by every surface. The blue channel is read in
+			// bands: below ~0.78 it varies the plate tone and roughness, around
+			// 0.85 it flags worn hazard paint, and where the green channel
+			// glows it picks the neon hue - low for cyan, high for magenta.
+			// The silhouette is clipped through the alpha test path: coverage
+			// feathers to zero where the march left the height field, and
+			// alpha to coverage antialiases the clipped edge.
+
+			function applyPlatingMaterial( material, map, mapSize, scale, reliefOptions ) {
+
+				const { sample, coverage, normalNode } = buildRelief( map, {
+					scale: scale,
+					texel: 1.0 / mapSize,
+					...reliefOptions
+				} );
+
+				const panel = sample( map );
+				const height = panel.r;
+				const glow = panel.g;
+				const tone = panel.b;
+
+				const plating = mix( color( 0x33383f ), color( 0x848b94 ), height.mul( tone.mul( 0.5 ).add( 0.5 ) ) );
+
+				const paint = tone.smoothstep( 0.80, 0.83 ).mul( tone.smoothstep( 0.92, 0.95 ).oneMinus() );
+
+				material.colorNode = mix( plating, color( 0xc7a13f ).mul( height.mul( 0.5 ).add( 0.5 ) ), paint );
+				material.emissiveNode = mix( color( 0x36d8f0 ), color( 0xff2fae ), tone.smoothstep( 0.45, 0.55 ) ).mul( glow.pow( 2.0 ) ).mul( 3.2 );
+
+				material.opacityNode = coverage;
+				material.alphaTestNode = coverage !== null ? float( 0.5 ) : null;
+				material.alphaToCoverage = coverage !== null;
+
+				material.normalNode = normalNode;
+				material.roughnessNode = mix( float( 0.66 ), float( 0.32 ), tone.min( 0.78 ) );
+				material.metalnessNode = float( 0.22 );
+				material.needsUpdate = true;
+
+			}
+
+			function updateMaterials() {
+
+				// bulkhead wall: the whole face is one relief tile, so the map's
+				// [0, 1] UV range doubles as the silhouette bounds - rays that
+				// leave the tile through a recessed trim block clip, and the
+				// wall's outline crenellates along the border trim. The relief
+				// depth converts from world units through the wall height.
+
+				applyPlatingMaterial( wallMaterial, wallMap, WALL_MAP_SIZE, depthScale.mul( 1.2 / WALL_HEIGHT ), {
+					silhouette: settings.silhouette
+				} );
+
+				// columns and pipes: repeating UVs (no bounds) with the curved
+				// silhouette test - the flange rings overhang the cylinder
+				// outlines. The curvature is per axis: a cylinder curves around
+				// its circumference (2 pi over the tiles that wrap it) but not
+				// along its length, so marches along the axis stay level and
+				// the relief holds up when sighting down a pipe.
+
+				for ( const { material, aroundTiles, ringTiles, reliefFactor } of shellMaterials ) {
+
+					applyPlatingMaterial( material, columnMap, COLUMN_MAP_SIZE, depthScale.mul( reliefFactor ), {
+						silhouette: settings.silhouette,
+						uvNode: uv().mul( vec2( aroundTiles, ringTiles ) ),
+						silhouetteBounds: [ - 1e6, 1e6 ],
+						curvedSilhouette: true,
+						curvature: [ 2 * Math.PI / aroundTiles, 0 ]
+					} );
+
+				}
+
+				// slab deck: repeating UVs, so the march runs without the
+				// silhouette test
+
+				applyPlatingMaterial( floorMaterial, floorMap, FLOOR_MAP_SIZE, depthScale.mul( 0.4 ), {
+					silhouette: false,
+					uvNode: uv().mul( 5 )
+				} );
+
+			}
+
+			function initGui() {
+
+				const gui = renderer.inspector.createParameters( 'settings' );
+
+				gui.add( settings, 'parallax' ).onChange( updateMaterials );
+				gui.add( settings, 'silhouette' ).onChange( updateMaterials );
+				gui.add( settings, 'scale', 0, 0.25 ).onChange( ( value ) => depthScale.value = value );
+				gui.add( settings, 'quality', Object.keys( QUALITIES ) ).onChange( updateMaterials );
+				gui.add( settings, 'bloom' );
+				gui.add( settings, 'autoRotate' ).onChange( ( value ) => controls.autoRotate = value );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				controls.update();
+
+				if ( settings.bloom === true ) {
+
+					renderPipeline.render();
+
+				} else {
+
+					renderer.render( scene, camera );
+
+				}
+
+			}
+
+		</script>
+
+	</body>
+
+</html>
