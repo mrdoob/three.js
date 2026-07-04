@@ -5,7 +5,7 @@ import {
 } from 'three';
 
 import { GaussianSplatData } from '../objects/GaussianSplatData.js';
-import { writeColorBytes, writeCovariance } from './utils/GaussianSplatLoaderUtils.js';
+import { writeColorBytes, writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const HEADER_SIZE_BYTES = 4096;
 const SECTION_HEADER_SIZE_BYTES = 1024;

@@ -6,12 +6,11 @@ import {
 
 import { gunzipSync } from '../libs/fflate.module.js';
 import { GaussianSplatData } from '../objects/GaussianSplatData.js';
-import { writeColorBytes, writeCovariance } from './utils/GaussianSplatLoaderUtils.js';
+import { SH_C0, writeColorBytes, writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const SPZ_MAGIC = 0x5053474e;
 const HEADER_SIZE_BYTES = 16;
 const MAX_SPLATS = 10000000;
-const SH_C0 = 0.28209479177387814;
 const SPZ_COLOR_SCALE = SH_C0 / 0.15;
 const FLAG_LOD = 0x80;
 const SH_DEGREE_TO_VECTORS = [ 0, 3, 8, 15 ];

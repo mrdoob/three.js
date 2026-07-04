@@ -1,8 +1,8 @@
 import { GaussianSplatPLYLoader } from '../../../../examples/jsm/loaders/GaussianSplatPLYLoader.js';
 import { GaussianSplatData } from '../../../../examples/jsm/objects/GaussianSplatData.js';
+import { SH_C0 } from '../../../../examples/jsm/utils/GaussianSplatUtils.js';
 
 const EPS = 1e-6;
-const SH_C0 = 0.28209479177387814;
 
 function closeTo( assert, actual, expected, message ) {
 

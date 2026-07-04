@@ -4,7 +4,7 @@ import {
 } from 'three';
 
 import { GaussianSplatData } from '../objects/GaussianSplatData.js';
-import { writeCovariance } from './utils/GaussianSplatLoaderUtils.js';
+import { writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const ROW_SIZE_BYTES = 32;
 

@@ -4,9 +4,7 @@ import {
 } from 'three';
 
 import { GaussianSplatData } from '../objects/GaussianSplatData.js';
-import { writeColorBytes, writeCovariance } from './utils/GaussianSplatLoaderUtils.js';
-
-const SH_C0 = 0.28209479177387814;
+import { sigmoid, writeColorBytesFromSH0, writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const PLY_TYPES = {
 	char: { size: 1, getter: 'getInt8' },
@@ -184,13 +182,13 @@ class GaussianSplatPLYLoader extends Loader {
 
 				writeCovariance( covariances, i * 6, sx, sy, sz, qx, qy, qz, qw );
 
-				writeColorBytes(
+				writeColorBytesFromSH0(
 					colors,
 					i * 4,
-					( 0.5 + SH_C0 * readProperty( view, rowOffset, vertexElement.propertyMap.f_dc_0 ) ) * 255,
-					( 0.5 + SH_C0 * readProperty( view, rowOffset, vertexElement.propertyMap.f_dc_1 ) ) * 255,
-					( 0.5 + SH_C0 * readProperty( view, rowOffset, vertexElement.propertyMap.f_dc_2 ) ) * 255,
-					sigmoid( readProperty( view, rowOffset, vertexElement.propertyMap.opacity ) ) * 255
+					readProperty( view, rowOffset, vertexElement.propertyMap.f_dc_0 ),
+					readProperty( view, rowOffset, vertexElement.propertyMap.f_dc_1 ),
+					readProperty( view, rowOffset, vertexElement.propertyMap.f_dc_2 ),
+					sigmoid( readProperty( view, rowOffset, vertexElement.propertyMap.opacity ) )
 				);
 
 			}
@@ -358,12 +356,6 @@ function skipElement( view, offset, element ) {
 function readProperty( view, rowOffset, property ) {
 
 	return view[ property.getter ]( rowOffset + property.offset, true );
-
-}
-
-function sigmoid( value ) {
-
-	return 1 / ( 1 + Math.exp( - value ) );
 
 }
 
