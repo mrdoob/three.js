@@ -5,7 +5,7 @@
   </surfacematerial>
   <standard_surface name="surface_shader1" type="surfaceshader" nodedef="ND_standard_surface_surfaceshader">
     <input name="base_color" type="color3" value="0.8, 0.2, 0.2" />
-    <input name="opacity" type="float" value="0.5" />
+    <input name="opacity" type="color3" value="0.5, 0.5, 0.5" />
     <input name="specular_roughness" type="float" value="0.1" />
     <input name="metalness" type="float" value="0.0" />
   </standard_surface>

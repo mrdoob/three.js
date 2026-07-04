@@ -651,7 +651,7 @@ const compileGltfColorImageNode = ( nodeX, out, compileContext ) => {
 	const geomcolor = nodeX.getNodeByName( 'geomcolor' ) || vec4( 1, 1, 1, 1 );
 	const modulated = mul( mul( converted, color ), geomcolor );
 
-	if ( out === 'outa' || out === 'a' ) {
+	if ( out === 'outa' ) {
 
 		return element( modulated, 3 );
 

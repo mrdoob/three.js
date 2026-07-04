@@ -66,16 +66,12 @@ const NODE_CLASS_BY_TYPE = {
 const OUTPUT_CHANNELS = {
 	outx: 0,
 	outr: 0,
-	r: 0,
 	outy: 1,
 	outg: 1,
-	g: 1,
 	outz: 2,
 	outb: 2,
-	b: 2,
 	outw: 3,
 	outa: 3,
-	a: 3,
 };
 
 function mxFlipUvY( uvNode ) {

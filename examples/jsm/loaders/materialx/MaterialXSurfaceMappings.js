@@ -1,11 +1,10 @@
 import { DoubleSide } from 'three/webgpu';
 import { MaterialXLogCodes } from './MaterialXLog.js';
-import { float, color, mul, clamp, vec2, cos, sin, pow, mix, transformNormalToView } from 'three/tsl';
+import { float, color, mul, clamp, vec2, cos, sin, pow, mix, element, transformNormalToView } from 'three/tsl';
 
 const mappedStandardSurfaceInputs = new Set( [
 	'base',
 	'base_color',
-	'roughness',
 	'specular_roughness',
 	'metalness',
 	'specular',
@@ -16,7 +15,6 @@ const mappedStandardSurfaceInputs = new Set( [
 	'transmission_color',
 	'transmission_depth',
 	'thin_film_thickness',
-	'thin_film_ior',
 	'thin_film_IOR',
 	'sheen',
 	'sheen_color',
@@ -27,10 +25,8 @@ const mappedStandardSurfaceInputs = new Set( [
 	'coat_normal',
 	'normal',
 	'opacity',
-	'ior',
 	'specular_IOR',
 	'emission',
-	'emissionColor',
 	'emission_color',
 ] );
 
@@ -74,7 +70,6 @@ const mappedOpenPbrInputs = new Set( [
 	'base_metalness',
 	'specular_roughness_anisotropy',
 	'specular_ior',
-	'specular_ior_level',
 	'coat_weight',
 	'coat_ior',
 	'coat_color',
@@ -231,8 +226,8 @@ function applyStandardSurface( material, inputs, log, nodeName ) {
 
 	}
 
-	const roughnessNode = inputs.specular_roughness ?? inputs.roughness;
-	const opacityNode = inputs.opacity;
+	const roughnessNode = inputs.specular_roughness;
+	const opacityNode = hasNodeValue( inputs.opacity ) ? element( inputs.opacity, 0 ) : undefined;
 	const transmissionNode = inputs.transmission;
 	const transmissionColorNode = inputs.transmission_color;
 	const transmissionEnabled = isEnabledWeightNode( transmissionNode );
@@ -240,7 +235,7 @@ function applyStandardSurface( material, inputs, log, nodeName ) {
 	const clearcoatEnabled = isEnabledWeightNode( inputs.coat );
 
 	let emissiveNode = inputs.emission;
-	const emissionColorNode = inputs.emission_color ?? inputs.emissionColor;
+	const emissionColorNode = inputs.emission_color;
 	if ( hasNodeValue( emissionColorNode ) ) {
 
 		emissiveNode = emissiveNode ? mul( emissiveNode, emissionColorNode ) : emissionColorNode;
@@ -248,7 +243,7 @@ function applyStandardSurface( material, inputs, log, nodeName ) {
 	}
 
 	const thinFilmThicknessNode = inputs.thin_film_thickness;
-	const thinFilmIorNode = clamp( inputs.thin_film_ior || inputs.thin_film_IOR || float( 1.5 ), float( 1.0 ), float( 2.333 ) );
+	const thinFilmIorNode = clamp( inputs.thin_film_IOR || float( 1.5 ), float( 1.0 ), float( 2.333 ) );
 	const thinFilmEnabled = isEnabledWeightNode( thinFilmThicknessNode );
 	const transmissionTintNode = hasNodeValue( transmissionColorNode ) ? transmissionColorNode : color( 1, 1, 1 );
 
@@ -281,7 +276,7 @@ function applyStandardSurface( material, inputs, log, nodeName ) {
 	}
 
 	material.specularColorNode = inputs.specular_color || color( 1, 1, 1 );
-	const iorNode = inputs.specular_IOR || inputs.ior;
+	const iorNode = inputs.specular_IOR;
 	if ( hasNodeValue( iorNode ) && isConstNear( iorNode, 1.5 ) === false ) {
 
 		material.iorNode = iorNode;
@@ -505,7 +500,7 @@ function applyOpenPbrSurface( material, inputs, log, nodeName ) {
 	}
 
 	material.specularColorNode = inputs.specular_color || color( 1, 1, 1 );
-	const openPbrIorNode = inputs.specular_ior || inputs.specular_ior_level;
+	const openPbrIorNode = inputs.specular_ior;
 	if ( hasNodeValue( openPbrIorNode ) && isConstNear( openPbrIorNode, 1.5 ) === false ) {
 
 		material.iorNode = openPbrIorNode;

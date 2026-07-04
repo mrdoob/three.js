@@ -4,7 +4,8 @@
     <input name="surfaceshader" type="surfaceshader" nodename="surface_shader1" />
   </surfacematerial>
   <standard_surface name="surface_shader1" type="surfaceshader" nodedef="ND_standard_surface_surfaceshader">
-    <input name="base_color" type="color3" output="out" nodegraph="normalmap_cm" />
+    <input name="base_color" type="color3" value="0.8, 0.8, 0.8" />
+    <input name="normal" type="vector3" output="out" nodegraph="normalmap_cm" />
   </standard_surface>
   <!-- create nodegraph to test cm conversion on image node before feeding to heighttonormal  -->
   <nodegraph name="height_to_normal_cm">
