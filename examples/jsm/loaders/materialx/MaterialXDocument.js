@@ -28,6 +28,7 @@ import {
 	mx_srgb_texture_to_lin_rec709,
 } from 'three/tsl';
 
+import { MaterialXErrorCodes } from './MaterialXErrors.js';
 import { createMaterialXCompileRegistry, compileNodeFromRegistry } from './compile/MaterialXCompileRegistry.js';
 import { parseMaterialXNodeTree, parseMaterialXText } from './parse/MaterialXParser.js';
 import { getSurfaceMapper } from './MaterialXSurfaceMappings.js';
@@ -299,9 +300,10 @@ class MaterialXNode {
 		const mode = normalizeTextureAddressMode( rawMode );
 		if ( mode ) return mode;
 
-		this.materialX.issueCollector.addInvalidValue(
-			this.name,
+		this.materialX.errors.addError(
+			MaterialXErrorCodes.INVALID_VALUE,
 			`Unsupported texture address mode "${rawMode}" on input "${inputName}". Expected constant, clamp, periodic, or mirror.`,
+			this.name,
 		);
 		return 'periodic';
 
@@ -436,7 +438,11 @@ class MaterialXNode {
 
 			} else {
 
-				this.materialX.issueCollector.addMissingReference( this.name, this.referencePath );
+				this.materialX.errors.addError(
+					MaterialXErrorCodes.MISSING_REFERENCE,
+					`Missing MaterialX reference "${this.referencePath}" from "${this.name}".`,
+					this.name,
+				);
 				node = float( 0 );
 
 			}
@@ -461,7 +467,11 @@ class MaterialXNode {
 
 		if ( node === null || node === undefined ) {
 
-			this.materialX.issueCollector.addUnsupportedNode( this.element, this.name );
+			this.materialX.errors.addError(
+				MaterialXErrorCodes.UNSUPPORTED_NODE,
+				`Unsupported MaterialX node category "${this.element}" on "${this.name}".`,
+				this.name,
+			);
 			node = float( 0 );
 
 		}
@@ -492,7 +502,11 @@ class MaterialXNode {
 
 			} else if ( resolvedType !== null && resolvedType !== undefined && resolvedType !== 'multioutput' ) {
 
-				this.materialX.issueCollector.addInvalidValue( this.name, `Unexpected type "${resolvedType}" on node "${this.name}".` );
+				this.materialX.errors.addError(
+					MaterialXErrorCodes.INVALID_VALUE,
+					`Unexpected type "${resolvedType}" on node "${this.name}".`,
+					this.name,
+				);
 				node = float( 0 );
 
 			}
@@ -635,11 +649,15 @@ class MaterialXNode {
 		const mapper = getSurfaceMapper( this.element );
 		if ( mapper ) {
 
-			mapper.apply( material, this.getNodes(), this.materialX.issueCollector, this.name );
+			mapper.apply( material, this.getNodes(), this.materialX.errors, this.name );
 
 		} else {
 
-			this.materialX.issueCollector.addUnsupportedNode( this.element, this.name );
+			this.materialX.errors.addError(
+				MaterialXErrorCodes.UNSUPPORTED_NODE,
+				`Unsupported MaterialX node category "${this.element}" on "${this.name}".`,
+				this.name,
+			);
 
 		}
 
@@ -693,9 +711,10 @@ class MaterialXNode {
 			const shaderProperties = this.resolveSurfaceShaderNode( nodeX );
 			if ( shaderProperties === null ) {
 
-				this.materialX.issueCollector.addMissingReference(
+				this.materialX.errors.addError(
+					MaterialXErrorCodes.MISSING_REFERENCE,
+					`Missing MaterialX reference "${nodeX.referencePath || nodeX.nodeName || '(unknown)'}" from "${nodeX.name}".`,
 					nodeX.name,
-					nodeX.referencePath || nodeX.nodeName || '(unknown)',
 				);
 				continue;
 
@@ -721,7 +740,12 @@ class MaterialXNode {
 
 			if ( selectedSurfaceMaterials.length === 0 ) {
 
-				this.materialX.issueCollector.addMissingMaterial( materialName );
+				this.materialX.errors.addError(
+					MaterialXErrorCodes.MISSING_MATERIAL,
+					materialName
+						? `Could not find surfacematerial named "${materialName}".`
+						: 'Document does not include a surfacematerial node.',
+				);
 
 			}
 
@@ -764,11 +788,11 @@ class MaterialXNode {
 
 class MaterialXDocument {
 
-	constructor( manager, path, issueCollector, archiveResolver = null, uvSpace = 'bottom-left' ) {
+	constructor( manager, path, errors, archiveResolver = null, uvSpace = 'bottom-left' ) {
 
 		this.manager = manager;
 		this.path = path;
-		this.issueCollector = issueCollector;
+		this.errors = errors;
 		this.archiveResolver = archiveResolver;
 		this.uvSpace = normalizeUvSpace( uvSpace );
 
@@ -831,16 +855,22 @@ class MaterialXDocument {
 
 	}
 
-	parse( text, materialName = null ) {
+	parse( text, materialName = null, options = {} ) {
 
 		const rootNode = parseMaterialXText(
 			text,
 			( childNodeXML, childNodePath ) => new MaterialXNode( this, childNodeXML, childNodePath ),
 			( materialXNode ) => this.addMaterialXNode( materialXNode ),
 		);
+
+		if ( options.interfaceValidator ) {
+
+			options.interfaceValidator( rootNode, this.errors );
+
+		}
+
 		const materials = rootNode.toMaterials( materialName );
-		const report = this.issueCollector.buildReport();
-		return { materials, report };
+		return { materials, errors: this.errors.errors };
 
 	}
 

@@ -1,7 +1,7 @@
 import { FileLoader, Loader } from 'three/webgpu';
 
 import { MaterialXDocument } from './materialx/MaterialXDocument.js';
-import { MaterialXIssueCollector } from './materialx/MaterialXWarnings.js';
+import { MaterialXErrors } from './materialx/MaterialXErrors.js';
 import { isZipBuffer, readMtlxArchive, createArchiveResolver } from './materialx/MaterialXArchive.js';
 
 const _textDecoder = new TextDecoder();
@@ -132,15 +132,20 @@ class MaterialXLoader extends Loader {
 
 	parse( text, options = {} ) {
 
-		const issueCollector = new MaterialXIssueCollector( {
-			issuePolicy: options.issuePolicy,
-			onWarning: options.onWarning || options.warningCallback
+		const errors = new MaterialXErrors();
+
+		const document = new MaterialXDocument( this.manager, options.path || this.path, errors, options.archiveResolver || null, options.uvSpace );
+		const result = document.parse( text, options.materialName || null, {
+			interfaceValidator: options.interfaceValidator,
 		} );
 
-		const document = new MaterialXDocument( this.manager, options.path || this.path, issueCollector, options.archiveResolver || null, options.uvSpace );
-		const result = document.parse( text, options.materialName || null );
+		if ( options.throwOnErrors && errors.errors.length > 0 ) {
 
-		issueCollector.throwIfNeeded();
+			const details = errors.errors.map( ( error ) => error.message ).join( ' ' );
+			throw new Error( `THREE.MaterialXLoader: MaterialX translation failed with ${errors.errors.length} error(s). ${details}` );
+
+		}
+
 		return result;
 
 	}

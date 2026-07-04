@@ -52,6 +52,7 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			import { MaterialXLoader } from 'three/addons/loaders/MaterialXLoader.js';
+			import { createStrictInterfaceValidator } from 'three/addons/loaders/materialx/MaterialXInterfaceValidation.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -111,6 +112,7 @@
 			let camera, scene, renderer;
 			let controls, prefab;
 			const models = [];
+			const strictInterfaceValidator = createStrictInterfaceValidator();
 
 			init();
 
@@ -252,7 +254,10 @@
 
 				const material = await new MaterialXLoader()
 					.setPath( path )
-					.loadAsync( sample, { uvSpace: 'top-left' } )
+					.loadAsync( sample, {
+						uvSpace: 'top-left',
+						interfaceValidator: strictInterfaceValidator,
+					} )
 					.then( ( { materials } ) => Object.values( materials ).pop() );
 
 				const calibrationMesh = model.getObjectByName( 'Calibration_Mesh' );

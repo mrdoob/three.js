@@ -1,4 +1,5 @@
 import { DoubleSide } from 'three/webgpu';
+import { MaterialXErrorCodes } from './MaterialXErrors.js';
 import { float, color, mul, clamp, vec2, cos, sin, pow, mix, transformNormalToView } from 'three/tsl';
 
 const mappedStandardSurfaceInputs = new Set( [
@@ -97,13 +98,17 @@ const mappedOpenPbrInputs = new Set( [
 	'emission_luminance',
 ] );
 
-function warnIgnoredInputs( inputs, mappedInputs, issueCollector, surfaceCategory, nodeName ) {
+function warnIgnoredInputs( inputs, mappedInputs, errors, surfaceCategory, nodeName ) {
 
 	for ( const inputName of Object.keys( inputs ) ) {
 
 		if ( mappedInputs.has( inputName ) === false ) {
 
-			issueCollector.addIgnoredSurfaceInput( surfaceCategory, nodeName, inputName );
+			errors.addError(
+				MaterialXErrorCodes.IGNORED_SURFACE_INPUT,
+				`${surfaceCategory} input "${inputName}" is currently ignored in MaterialX translation.`,
+				nodeName,
+			);
 
 		}
 
@@ -213,7 +218,7 @@ function buildGltfOpacityNode( alphaNode, alphaModeNode ) {
 
 }
 
-function applyStandardSurface( material, inputs, issueCollector, nodeName ) {
+function applyStandardSurface( material, inputs, errors, nodeName ) {
 
 	let colorNode = null;
 	if ( inputs.base && inputs.base_color ) colorNode = mul( inputs.base, inputs.base_color );
@@ -341,11 +346,11 @@ function applyStandardSurface( material, inputs, issueCollector, nodeName ) {
 	if ( hasNodeValue( emissiveNode ) ) material.emissiveNode = emissiveNode;
 
 	setTransmissionFlags( material, transmissionNode, opacityNode );
-	warnIgnoredInputs( inputs, mappedStandardSurfaceInputs, issueCollector, 'standard_surface', nodeName );
+	warnIgnoredInputs( inputs, mappedStandardSurfaceInputs, errors, 'standard_surface', nodeName );
 
 }
 
-function applyGltfPbrSurface( material, inputs, issueCollector, nodeName ) {
+function applyGltfPbrSurface( material, inputs, errors, nodeName ) {
 
 	const alphaModeLiteral = getConstNumber( inputs.alpha_mode );
 	const alphaMode = alphaModeLiteral === null ? 2 : Math.round( alphaModeLiteral );
@@ -472,11 +477,11 @@ function applyGltfPbrSurface( material, inputs, issueCollector, nodeName ) {
 	else if ( hasNodeValue( inputs.emissive ) ) material.emissiveNode = inputs.emissive;
 
 	setTransmissionFlags( material, inputs.transmission, opacityNode, isAlphaBlendMode );
-	warnIgnoredInputs( inputs, mappedGltfPbrInputs, issueCollector, 'gltf_pbr', nodeName );
+	warnIgnoredInputs( inputs, mappedGltfPbrInputs, errors, 'gltf_pbr', nodeName );
 
 }
 
-function applyOpenPbrSurface( material, inputs, issueCollector, nodeName ) {
+function applyOpenPbrSurface( material, inputs, errors, nodeName ) {
 
 	const baseWeight = inputs.base_weight || float( 1 );
 	const baseColor = inputs.base_color || color( 0.8, 0.8, 0.8 );
@@ -620,7 +625,7 @@ function applyOpenPbrSurface( material, inputs, issueCollector, nodeName ) {
 	if ( transmissionEnabled ) material.transparent = true;
 
 	setTransmissionFlags( material, inputs.transmission_weight, inputs.geometry_opacity );
-	warnIgnoredInputs( inputs, mappedOpenPbrInputs, issueCollector, 'open_pbr_surface', nodeName );
+	warnIgnoredInputs( inputs, mappedOpenPbrInputs, errors, 'open_pbr_surface', nodeName );
 
 }
 
