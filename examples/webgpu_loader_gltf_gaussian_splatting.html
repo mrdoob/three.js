@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - gltf gaussian splatting</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - gltf gaussian splatting">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_loader_gltf_gaussian_splatting.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_loader_gltf_gaussian_splatting.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>glTF Gaussian Splatting</span>
+			</div>
+
+			<small>
+				glTF using <a href="https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_gaussian_splatting/README.md" target="_blank" rel="noopener">KHR_gaussian_splatting</a> by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+			let camera, scene, renderer, controls, splats;
+
+			init();
+
+			async function init() {
+
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+					throw new Error( 'No WebGPU support' );
+
+				}
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.01, 20 );
+				camera.position.set( 0, 0, 4 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x07080f );
+
+				renderer = new THREE.WebGPURenderer( { antialias: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( render );
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.target.set( 0, 0, 0 );
+				controls.update();
+
+				const loader = new GLTFLoader();
+				const gltf = await loader.loadAsync( 'models/gsplat/procedural_flower.gltf' );
+
+				scene.add( gltf.scene );
+
+				gltf.scene.traverse( function ( object ) {
+
+					if ( object.isGaussianSplatMesh === true ) {
+
+						splats = object;
+
+					}
+
+				} );
+
+				fitCameraToSplats();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function fitCameraToSplats() {
+
+				if ( splats === undefined ) return;
+
+				splats.updateWorldMatrix( true, false );
+
+				const sphere = splats.splatData.boundingSphere.clone().applyMatrix4( splats.matrixWorld );
+				const radius = Math.max( sphere.radius, 1 );
+				const distance = radius / Math.sin( THREE.MathUtils.degToRad( camera.fov ) * 0.5 );
+
+				controls.target.copy( sphere.center );
+				controls.minDistance = distance / 4;
+				controls.maxDistance = distance * 4;
+
+				camera.position.set( 0, 0, distance * 1.35 ).add( sphere.center );
+				camera.near = Math.max( distance / 1000, 0.001 );
+				camera.far = Math.max( distance * 10, 10 );
+				camera.updateProjectionMatrix();
+
+				controls.update();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function render() {
+
+				controls.update();
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
