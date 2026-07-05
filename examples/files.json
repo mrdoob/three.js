@@ -22,6 +22,7 @@
 		"webgl_effects_parallaxbarrier",
 		"webgl_effects_stereo",
 		"webgl_framebuffer_texture",
+		"webgl_gaussian_splatting",
 		"webgl_geometries",
 		"webgl_geometry_colors",
 		"webgl_geometry_colors_lookuptable",

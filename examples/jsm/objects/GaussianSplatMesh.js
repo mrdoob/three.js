@@ -1,5 +1,6 @@
 import {
 	BufferAttribute,
+	DynamicDrawUsage,
 	InstancedBufferGeometry,
 	Matrix4,
 	Mesh,
@@ -116,6 +117,9 @@ class GaussianSplatMesh extends Mesh {
 		this._sortInitialized = false;
 		this._lastSortPosition = new Vector3( Infinity, Infinity, Infinity );
 		this._lastSortDirection = new Vector3( 0, 0, - 1 );
+		this._webGLSortBins = new Uint32Array( splatData.count );
+		this._webGLSortCounts = new Uint32Array( BIN_COUNT );
+		this._webGLSortOffsets = new Uint32Array( BIN_COUNT );
 
 		createSortNodes( this );
 
@@ -132,9 +136,9 @@ class GaussianSplatMesh extends Mesh {
 	}
 
 	/**
-	 * Updates the GPU draw order if the camera has moved enough to need a new sort.
+	 * Updates the draw order if the camera has moved enough to need a new sort.
 	 *
-	 * @param {Renderer} renderer - The WebGPU renderer.
+	 * @param {Renderer} renderer - The renderer.
 	 * @param {Camera} camera - The camera used for rendering.
 	 * @return {boolean} Whether a sort was dispatched this call.
 	 */
@@ -144,10 +148,18 @@ class GaussianSplatMesh extends Mesh {
 
 			this._updateSortUniforms( camera );
 
-			renderer.compute( this._resetHistogramNode );
-			renderer.compute( this._histogramNode );
-			renderer.compute( this._prefixNode );
-			renderer.compute( this._scatterNode );
+			if ( renderer.backend && renderer.backend.isWebGLBackend === true ) {
+
+				this._sortCPU();
+
+			} else {
+
+				renderer.compute( this._resetHistogramNode );
+				renderer.compute( this._histogramNode );
+				renderer.compute( this._prefixNode );
+				renderer.compute( this._scatterNode );
+
+			}
 
 			this._sortInitialized = true;
 
@@ -198,6 +210,58 @@ class GaussianSplatMesh extends Mesh {
 
 		_sortDepthRange.set( nearDepth, farDepth );
 		this._sortDepthRange.value.copy( _sortDepthRange );
+
+	}
+
+	_sortCPU() {
+
+		const buffers = this._buffers;
+		const centers = this.splatData.centers;
+		const order = buffers.orderAttribute.array;
+		const bins = this._webGLSortBins;
+		const counts = this._webGLSortCounts;
+		const offsets = this._webGLSortOffsets;
+		const matrix = this._sortMatrix.value.elements;
+		const nearDepth = this._sortDepthRange.value.x;
+		const range = Math.max( this._sortDepthRange.value.y - nearDepth, 0.0001 );
+		const scale = ( BIN_COUNT - 1 ) / range;
+
+		counts.fill( 0 );
+
+		for ( let i = 0, l = buffers.count; i < l; i ++ ) {
+
+			const i3 = i * 3;
+			const depth = - ( matrix[ 2 ] * centers[ i3 ] + matrix[ 6 ] * centers[ i3 + 1 ] + matrix[ 10 ] * centers[ i3 + 2 ] + matrix[ 14 ] );
+			const depthBin = Math.min( BIN_COUNT - 1, Math.max( 0, Math.floor( ( depth - nearDepth ) * scale ) ) );
+			const bin = BIN_COUNT - 1 - depthBin;
+
+			bins[ i ] = bin;
+			counts[ bin ] ++;
+
+		}
+
+		let sum = 0;
+
+		for ( let i = 0; i < BIN_COUNT; i ++ ) {
+
+			offsets[ i ] = sum;
+			sum += counts[ i ];
+
+		}
+
+		for ( let i = 0, l = buffers.count; i < l; i ++ ) {
+
+			order[ offsets[ bins[ i ] ] ++ ] = i;
+
+		}
+
+		buffers.orderAttribute.needsUpdate = true;
+
+		if ( buffers.orderAttribute.pbo !== undefined ) {
+
+			buffers.orderAttribute.pbo.needsUpdate = true;
+
+		}
 
 	}
 
@@ -265,13 +329,16 @@ function createStorageBuffers( splatData ) {
 	const histogramAttribute = new StorageBufferAttribute( new Uint32Array( BIN_COUNT ), 1, Uint32Array );
 	const offsetAttribute = new StorageBufferAttribute( new Uint32Array( BIN_COUNT ), 1, Uint32Array );
 
+	orderAttribute.setUsage( DynamicDrawUsage );
+
 	return {
 		count,
-		centerRead: storage( centerAttribute, 'vec4', count ).toReadOnly(),
-		covarianceARead: storage( covarianceAAttribute, 'vec4', count ).toReadOnly(),
-		covarianceBRead: storage( covarianceBAttribute, 'vec4', count ).toReadOnly(),
-		colorRead: storage( colorAttribute, 'vec4', count ).toReadOnly(),
-		orderRead: storage( orderAttribute, 'uint', count ).toReadOnly(),
+		orderAttribute,
+		centerRead: storage( centerAttribute, 'vec4', count ).setPBO( true ).toReadOnly(),
+		covarianceARead: storage( covarianceAAttribute, 'vec4', count ).setPBO( true ).toReadOnly(),
+		covarianceBRead: storage( covarianceBAttribute, 'vec4', count ).setPBO( true ).toReadOnly(),
+		colorRead: storage( colorAttribute, 'vec4', count ).setPBO( true ).toReadOnly(),
+		orderRead: storage( orderAttribute, 'uint', count ).setPBO( true ).toReadOnly(),
 		orderWrite: storage( orderAttribute, 'uint', count ),
 		binRead: storage( binAttribute, 'uint', count ).toReadOnly(),
 		binWrite: storage( binAttribute, 'uint', count ),
