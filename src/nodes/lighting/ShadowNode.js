@@ -860,13 +860,13 @@ class ShadowNode extends ShadowBaseNode {
 
 		if ( needsUpdate ) {
 
-			if ( this._cameraFrameId[ frame.camera ] === frame.frameId ) {
+			if ( this._cameraFrameId.get( frame.camera ) === frame.frameId ) {
 
 				needsUpdate = false;
 
 			}
 
-			this._cameraFrameId[ frame.camera ] = frame.frameId;
+			this._cameraFrameId.set( frame.camera, frame.frameId );
 
 		}
 
