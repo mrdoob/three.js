@@ -435,7 +435,7 @@ class WebGPUBackend extends Backend {
 	_getDefaultRenderPassDescriptor() {
 
 		const renderer = this.renderer;
-		const canvasTarget = /** @type {CanvasTarget} */ ( renderer.getCanvasTarget() );
+		const canvasTarget = renderer.getCanvasTarget();
 		const canvasData = this.get( canvasTarget );
 		const samples = renderer.currentSamples;
 
