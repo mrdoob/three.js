@@ -435,7 +435,7 @@ class WebGPUBackend extends Backend {
 	_getDefaultRenderPassDescriptor() {
 
 		const renderer = this.renderer;
-		const canvasTarget = /** @type {CanvasTarget} */ ( renderer.getCanvasTarget() );
+		const canvasTarget = renderer.getCanvasTarget();
 		const canvasData = this.get( canvasTarget );
 		const samples = renderer.currentSamples;
 
@@ -2946,7 +2946,7 @@ class WebGPUBackend extends Backend {
 	 * @property {GPUBuffer} [occlusionQueryBuffer] - The buffer occlusion query results are copied into for read-back.
 	 * @property {?Object3D} [lastOcclusionObject] - The last 3D object an occlusion query state change was evaluated for.
 	 * @property {GPUQuerySet} [currentOcclusionQuerySet] - The previous frame's query set, kept alive until its results are resolved.
-	 * @property {GPUBuffer} [currentOcclusionQueryBuffer] - The previous frame's result buffer, currently being mapped.
+	 * @property {GPUBuffer} [currentOcclusionQueryBuffer] - The previous frame's result buffer, reset in beginRender() and replaced with the read data from the last frame's query set.
 	 * @property {Array<Object3D>} [currentOcclusionQueryObjects] - The previous frame's query objects.
 	 * @property {WeakSet<Object3D>} [occluded] - The 3D objects determined occluded by the last resolved queries.
 	 * @property {Array<Object>} [layerDescriptors] - Per-layer render pass descriptors for layered (array camera) render targets.
@@ -2955,12 +2955,9 @@ class WebGPUBackend extends Backend {
 	 */
 
 	/**
-	 * Backend data associated with a render target.
+	 * Backend data associated with a canvas target.
 	 *
-	 * All properties are created lazily, so any of them can be `undefined` before
-	 * the corresponding code path has run.
-	 *
-	 * @typedef {Object} WebGPURenderTargetData
+	 * @typedef {Object} WebGPUCanvasTargetData
 	 * @property {GPURenderPassDescriptor} [descriptor] - Cached render pass descriptor of the current render context's render pass encoder.
 	 * @property {GPUCanvasContext} [context] - The WebGPU rendering context of a <canvas> element.
 	 * @property {number} [samples] - The current number of samples used for multi-sample anti-aliasing (MSAA).
@@ -2970,8 +2967,8 @@ class WebGPUBackend extends Backend {
 	 * Returns the backend-specific data dictionary of the given object.
 	 *
 	 * @overload
-	 * @param {RenderTarget} object - The render target.
-	 * @return {WebGPURenderTargetData} The render target data.
+	 * @param {CanvasTarget} object - The canvas target.
+	 * @return {WebGPUCanvasTargetData} The render target data.
 	 */
 	/**
 	 * @overload
