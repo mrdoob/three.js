@@ -150,6 +150,7 @@ class GaussianSplatMesh extends Mesh {
 
 			if ( renderer.backend && renderer.backend.isWebGLBackend === true ) {
 
+				enableWebGLBuffers( this._buffers );
 				this._sortCPU();
 
 			} else {
@@ -329,22 +330,35 @@ function createStorageBuffers( splatData ) {
 	const histogramAttribute = new StorageBufferAttribute( new Uint32Array( BIN_COUNT ), 1, Uint32Array );
 	const offsetAttribute = new StorageBufferAttribute( new Uint32Array( BIN_COUNT ), 1, Uint32Array );
 
-	orderAttribute.setUsage( DynamicDrawUsage );
-
 	return {
 		count,
 		orderAttribute,
-		centerRead: storage( centerAttribute, 'vec4', count ).setPBO( true ).toReadOnly(),
-		covarianceARead: storage( covarianceAAttribute, 'vec4', count ).setPBO( true ).toReadOnly(),
-		covarianceBRead: storage( covarianceBAttribute, 'vec4', count ).setPBO( true ).toReadOnly(),
-		colorRead: storage( colorAttribute, 'vec4', count ).setPBO( true ).toReadOnly(),
-		orderRead: storage( orderAttribute, 'uint', count ).setPBO( true ).toReadOnly(),
+		webGLBuffersEnabled: false,
+		centerRead: storage( centerAttribute, 'vec4', count ).toReadOnly(),
+		covarianceARead: storage( covarianceAAttribute, 'vec4', count ).toReadOnly(),
+		covarianceBRead: storage( covarianceBAttribute, 'vec4', count ).toReadOnly(),
+		colorRead: storage( colorAttribute, 'vec4', count ).toReadOnly(),
+		orderRead: storage( orderAttribute, 'uint', count ).toReadOnly(),
 		orderWrite: storage( orderAttribute, 'uint', count ),
 		binRead: storage( binAttribute, 'uint', count ).toReadOnly(),
 		binWrite: storage( binAttribute, 'uint', count ),
 		histogramAtomic: storage( histogramAttribute, 'uint', BIN_COUNT ).toAtomic(),
 		offsetAtomic: storage( offsetAttribute, 'uint', BIN_COUNT ).toAtomic()
 	};
+
+}
+
+function enableWebGLBuffers( buffers ) {
+
+	if ( buffers.webGLBuffersEnabled === true ) return;
+
+	buffers.orderAttribute.setUsage( DynamicDrawUsage );
+	buffers.centerRead.setPBO( true );
+	buffers.covarianceARead.setPBO( true );
+	buffers.covarianceBRead.setPBO( true );
+	buffers.colorRead.setPBO( true );
+	buffers.orderRead.setPBO( true );
+	buffers.webGLBuffersEnabled = true;
 
 }
 
