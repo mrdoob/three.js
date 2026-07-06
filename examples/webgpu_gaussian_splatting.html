@@ -66,6 +66,7 @@
 
 			let camera, scene, renderer, orbitControls, firstPersonControls, activeControls, splats;
 			let loadId = 0;
+			THREE.ColorManagement.workingColorSpace = THREE.SRGBColorSpace;
 
 			const status = document.getElementById( 'status' );
 			const cameraInfo = document.getElementById( 'camera-info' );
@@ -75,6 +76,7 @@
 			const lastRenderedCameraQuaternion = new THREE.Quaternion();
 			const zeroVector = new THREE.Vector3();
 			let forceRender = true;
+			
 			const sourceNames = {
 				'Procedural Flower (local, CC0)': 'flower',
 				'ReconWorldLab Demo (remote PLY, MIT, 67 MB)': 'recon',
@@ -189,7 +191,7 @@
 				}
 			};
 			const params = {
-				source: 'Procedural Flower (local, CC0)',
+				source: 'ReconWorldLab Demo (remote PLY, MIT, 67 MB)',
 			};
 
 			init();
