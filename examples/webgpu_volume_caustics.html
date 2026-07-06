@@ -272,7 +272,7 @@
 
 				// Scene Pass
 
-				const scenePass = pass( scene, camera ).toInspector();
+				const scenePass = pass( scene, camera, { storeMultisampledColorBuffer: true } ).toInspector();
 				scenePass.name = 'Scene';
 
 				const sceneDepth = scenePass.getTextureNode( 'depth' );
