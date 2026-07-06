@@ -35,7 +35,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Gaussian Splatting</span>
 			</div>
 
-			<small id="status">Minimal WebGPU/TSL Gaussian splat renderer loading PLY, SPLAT, SPZ, KSPLAT, and glTF data by <a href="https://ben3d.ca">Ben Houston</a>.</small>
+			<small id="status">WebGPU TSL Gaussian splat renderer loading PLY, SPLAT, SPZ, KSPLAT, and glTF data by <a href="https://ben3d.ca">Ben Houston</a>.</small>
 		</div>
 		<div id="camera-info"></div>
 
@@ -78,7 +78,7 @@
 			const lastRenderedCameraQuaternion = new THREE.Quaternion();
 			const zeroVector = new THREE.Vector3();
 			let forceRender = true;
-			
+
 			const sourceNames = {
 				'Procedural Flower (PLY, local, 1MB)': 'flower',
 				'Procedural Flower glTF (glTF, local, 3KB)': 'flowerGLTF',
@@ -202,15 +202,17 @@
 					note: 'Overlapping translucent layers at different depths. Orbit to validate back-to-front sorting.'
 				}
 			};
+			const urlParams = new URLSearchParams( window.location.search );
 			const params = {
 				source: 'ReconWorldLab Demo (remote PLY, MIT, 67 MB)',
+				forceWebGL: urlParams.get( 'forceWebGL' ) === 'true'
 			};
 
 			init();
 
 			async function init() {
 
-				if ( WebGPU.isAvailable() === false ) {
+				if ( params.forceWebGL === false && WebGPU.isAvailable() === false ) {
 
 					document.body.appendChild( WebGPU.getErrorMessage() );
 					throw new Error( 'No WebGPU support' );
@@ -223,7 +225,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x07080f );
 
-				renderer = new THREE.WebGPURenderer( { antialias: false } );
+				renderer = new THREE.WebGPURenderer( { antialias: false, forceWebGL: params.forceWebGL } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
@@ -247,6 +249,23 @@
 				gui.add( params, 'source', Object.keys( sourceNames ) ).name( 'Splat' ).onChange( async ( value ) => {
 
 					await loadSplatSource( sourceNames[ value ] );
+
+				} );
+				gui.add( params, 'forceWebGL' ).name( 'forceWebGL' ).onChange( function ( value ) {
+
+					const url = new URL( window.location.href );
+
+					if ( value === true ) {
+
+						url.searchParams.set( 'forceWebGL', 'true' );
+
+					} else {
+
+						url.searchParams.delete( 'forceWebGL' );
+
+					}
+
+					window.location.href = url.href;
 
 				} );
 
