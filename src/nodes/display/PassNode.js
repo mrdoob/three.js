@@ -243,7 +243,7 @@ class PassNode extends TempNode {
 		 */
 		this._height = 1;
 
-		const renderTarget = new RenderTarget( this._width, this._height, { type: HalfFloatType, ...options, } );
+		const renderTarget = new RenderTarget( this._width, this._height, { type: HalfFloatType, storeMultisampledColorBuffer: false, storeMultisampledDepthBuffer: false, storeMultisampledStencilBuffer: false, ...options, } );
 		renderTarget.texture.name = 'output';
 
 		let depthTexture = null;
@@ -655,6 +655,14 @@ class PassNode extends TempNode {
 			textureNode = new PassMultipleTextureNode( this, name );
 			textureNode.updateTexture();
 			this._textureNodes[ name ] = textureNode;
+
+			if ( name === 'depth' ) {
+
+				// make sure depth can be read when a depth texture is requested with active MSAA
+
+				this.renderTarget.storeMultisampledDepthBuffer = true;
+
+			}
 
 		}
 

@@ -30,8 +30,12 @@ class RenderTarget extends EventDispatcher {
 	 * @property {string} [colorSpace=NoColorSpace] - The texture's color space.
 	 * @property {boolean} [depthBuffer=true] - Whether to allocate a depth buffer or not.
 	 * @property {boolean} [stencilBuffer=false] - Whether to allocate a stencil buffer or not.
+	 * @property {boolean} [resolveColorBuffer=true] - Whether to resolve the color buffer or not.
 	 * @property {boolean} [resolveDepthBuffer=true] - Whether to resolve the depth buffer or not.
 	 * @property {boolean} [resolveStencilBuffer=true] - Whether  to resolve the stencil buffer or not.
+	 * @property {boolean} [storeMultisampledColorBuffer=true] - Whether to store the multisampled color buffer or not.
+	 * @property {boolean} [storeMultisampledDepthBuffer=true] - Whether to store the multisampled depth buffer or not.
+	 * @property {boolean} [storeMultisampledStencilBuffer=true] - Whether to store the multisampled stencil buffer or not.
 	 * @property {?Texture} [depthTexture=null] - Reference to a depth texture.
 	 * @property {number} [samples=0] - The MSAA samples count.
 	 * @property {number} [count=1] - Defines the number of color attachments . Must be at least `1`.
@@ -57,8 +61,12 @@ class RenderTarget extends EventDispatcher {
 			minFilter: LinearFilter,
 			depthBuffer: true,
 			stencilBuffer: false,
+			resolveColorBuffer: true,
 			resolveDepthBuffer: true,
 			resolveStencilBuffer: true,
+			storeMultisampledColorBuffer: true,
+			storeMultisampledDepthBuffer: true,
+			storeMultisampledStencilBuffer: true,
 			depthTexture: null,
 			samples: 0,
 			count: 1,
@@ -165,6 +173,14 @@ class RenderTarget extends EventDispatcher {
 		this.stencilBuffer = options.stencilBuffer;
 
 		/**
+		 * Whether to resolve the color buffer or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.resolveColorBuffer = options.resolveColorBuffer;
+
+		/**
 		 * Whether to resolve the depth buffer or not.
 		 *
 		 * @type {boolean}
@@ -179,6 +195,30 @@ class RenderTarget extends EventDispatcher {
 		 * @default true
 		 */
 		this.resolveStencilBuffer = options.resolveStencilBuffer;
+
+		/**
+		 * Whether to store the multisampled color buffer or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.storeMultisampledColorBuffer = options.storeMultisampledColorBuffer;
+
+		/**
+		 * Whether to store the multisampled depth buffer or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.storeMultisampledDepthBuffer = options.storeMultisampledDepthBuffer;
+
+		/**
+		 * Whether to store the multisampled stencil buffer or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.storeMultisampledStencilBuffer = options.storeMultisampledStencilBuffer;
 
 		this._depthTexture = null;
 		this.depthTexture = options.depthTexture;
@@ -375,8 +415,13 @@ class RenderTarget extends EventDispatcher {
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
 
+		this.resolveColorBuffer = source.resolveColorBuffer;
 		this.resolveDepthBuffer = source.resolveDepthBuffer;
 		this.resolveStencilBuffer = source.resolveStencilBuffer;
+
+		this.storeMultisampledColorBuffer = source.storeMultisampledColorBuffer;
+		this.storeMultisampledDepthBuffer = source.storeMultisampledDepthBuffer;
+		this.storeMultisampledStencilBuffer = source.storeMultisampledStencilBuffer;
 
 		if ( source.depthTexture !== null ) this.depthTexture = source.depthTexture.clone();
 

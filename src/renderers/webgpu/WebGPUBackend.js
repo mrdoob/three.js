@@ -674,7 +674,7 @@ class WebGPUBackend extends Backend {
 					if ( textureData.msaaTexture !== undefined ) {
 
 						view = textureData.msaaTexture.createView();
-						resolveTarget = textureView;
+						resolveTarget = renderTarget.resolveColorBuffer === true ? textureView : undefined;
 
 					} else {
 
@@ -850,6 +850,7 @@ class WebGPUBackend extends Backend {
 		descriptor.occlusionQuerySet = occlusionQuerySet;
 
 		const depthStencilAttachment = descriptor.depthStencilAttachment;
+		const renderTarget = renderContext.renderTarget;
 
 		if ( renderContext.textures !== null ) {
 
@@ -884,7 +885,15 @@ class WebGPUBackend extends Backend {
 
 				}
 
-				colorAttachment.storeOp = GPUStoreOp.Store;
+				if ( renderContext.sampleCount > 1 && renderTarget?.storeMultisampledColorBuffer === false ) {
+
+					colorAttachment.storeOp = GPUStoreOp.Discard;
+
+				} else {
+
+					colorAttachment.storeOp = GPUStoreOp.Store;
+
+				}
 
 			}
 
@@ -909,8 +918,6 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		const renderTarget = renderContext.renderTarget;
-
 		if ( renderContext.depth ) {
 
 			if ( renderContext.clearDepth ) {
@@ -924,7 +931,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			if ( renderContext.sampleCount > 1 && renderTarget?.resolveDepthBuffer === false ) {
+			if ( renderContext.sampleCount > 1 && renderTarget?.storeMultisampledDepthBuffer === false ) {
 
 				depthStencilAttachment.depthStoreOp = GPUStoreOp.Discard;
 
@@ -949,7 +956,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			if ( renderContext.sampleCount > 1 && renderTarget?.resolveStencilBuffer === false ) {
+			if ( renderContext.sampleCount > 1 && renderTarget?.storeMultisampledStencilBuffer === false ) {
 
 				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Discard;
 
