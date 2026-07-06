@@ -40,7 +40,7 @@
 				texture.colorSpace = THREE.SRGBColorSpace;
 
 				const geometry = new THREE.BoxGeometry();
-				const material = new THREE.MeshBasicMaterial( { color: 0x00ff00, map: texture } );
+				const material = new THREE.MeshBasicMaterial( { map: texture } );
 
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
