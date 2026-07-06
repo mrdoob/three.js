@@ -738,9 +738,7 @@ class MaterialXNode {
 
 				this.materialX.log.add(
 					MaterialXLogCodes.MISSING_MATERIAL,
-					materialName
-						? `Could not find surfacematerial named "${materialName}".`
-						: 'Document does not include a surfacematerial node.',
+					`Could not find surfacematerial named "${materialName}".`,
 				);
 
 			}
