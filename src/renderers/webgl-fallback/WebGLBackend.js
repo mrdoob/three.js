@@ -547,7 +547,9 @@ class WebGLBackend extends Backend {
 
 		if ( occlusionQueryCount > 0 ) {
 
-			if ( occlusionQueryCount > renderContextData.occlusionQueryIndex ) {
+			const lastOcclusionObject = renderContextData.lastOcclusionObject;
+
+			if ( lastOcclusionObject && lastOcclusionObject.occlusionTest === true ) {
 
 				gl.endQuery( gl.ANY_SAMPLES_PASSED );
 
@@ -636,14 +638,14 @@ class WebGLBackend extends Backend {
 
 			const check = () => {
 
-				let completed = 0;
+				let completed = true;
 
 				// check all queries and requeue as appropriate
 				for ( let i = 0; i < currentOcclusionQueries.length; i ++ ) {
 
 					const query = currentOcclusionQueries[ i ];
 
-					if ( query === null ) continue;
+					if ( ! query ) continue;
 
 					if ( gl.getQueryParameter( query, gl.QUERY_RESULT_AVAILABLE ) ) {
 
@@ -652,13 +654,15 @@ class WebGLBackend extends Backend {
 						currentOcclusionQueries[ i ] = null;
 						gl.deleteQuery( query );
 
-						completed ++;
+					} else {
+
+						completed = false;
 
 					}
 
 				}
 
-				if ( completed < currentOcclusionQueries.length ) {
+				if ( completed === false ) {
 
 					requestAnimationFrame( check );
 

@@ -1204,7 +1204,9 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		if ( occlusionQueryCount > renderContextData.occlusionQueryIndex ) {
+		const lastOcclusionObject = renderContextData.lastOcclusionObject;
+
+		if ( lastOcclusionObject && lastOcclusionObject.occlusionTest === true ) {
 
 			renderContextData.currentPass.endOcclusionQuery();
 
@@ -1373,9 +1375,11 @@ class WebGPUBackend extends Backend {
 
 			for ( let i = 0; i < currentOcclusionQueryObjects.length; i ++ ) {
 
-				if ( results[ i ] === BigInt( 0 ) ) {
+				const object = currentOcclusionQueryObjects[ i ];
 
-					occluded.add( currentOcclusionQueryObjects[ i ] );
+				if ( object !== undefined && results[ i ] === BigInt( 0 ) ) {
+
+					occluded.add( object );
 
 				}
 
