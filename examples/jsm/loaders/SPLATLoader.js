@@ -17,15 +17,15 @@ const ROW_SIZE_BYTES = 32;
  * rotation data for one splat.
  *
  * ```js
- * const loader = new GaussianSplatLoader();
+ * const loader = new SPLATLoader();
  * const data = await loader.loadAsync( './models/gsplat/example.splat' );
  * scene.add( new GaussianSplatMesh( data ) );
  * ```
  *
  * @augments Loader
- * @three_import import { GaussianSplatLoader } from 'three/addons/loaders/GaussianSplatLoader.js';
+ * @three_import import { SPLATLoader } from 'three/addons/loaders/SPLATLoader.js';
  */
-class GaussianSplatLoader extends Loader {
+class SPLATLoader extends Loader {
 
 	/**
 	 * Constructs a new Gaussian splat loader.
@@ -92,7 +92,7 @@ class GaussianSplatLoader extends Loader {
 
 		if ( buffer.byteLength % ROW_SIZE_BYTES !== 0 ) {
 
-			throw new Error( 'THREE.GaussianSplatLoader: Invalid .splat byte length.' );
+			throw new Error( 'THREE.SPLATLoader: Invalid .splat byte length.' );
 
 		}
 
@@ -145,4 +145,4 @@ class GaussianSplatLoader extends Loader {
 
 }
 
-export { GaussianSplatLoader };
+export { SPLATLoader };

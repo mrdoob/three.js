@@ -24,15 +24,15 @@ const SH_DEGREE_TO_VECTORS = [ 0, 3, 8, 15 ];
  * higher-order spherical harmonics are parsed only enough to skip their payload.
  *
  * ```js
- * const loader = new GaussianSplatSPZLoader();
+ * const loader = new SPZLoader();
  * const data = await loader.loadAsync( './models/gsplat/example.spz' );
  * scene.add( new GaussianSplatMesh( data ) );
  * ```
  *
  * @augments Loader
- * @three_import import { GaussianSplatSPZLoader } from 'three/addons/loaders/GaussianSplatSPZLoader.js';
+ * @three_import import { SPZLoader } from 'three/addons/loaders/SPZLoader.js';
  */
-class GaussianSplatSPZLoader extends Loader {
+class SPZLoader extends Loader {
 
 	/**
 	 * Constructs a new Gaussian splat SPZ loader.
@@ -113,7 +113,7 @@ class GaussianSplatSPZLoader extends Loader {
 
 		if ( bytes.byteLength < HEADER_SIZE_BYTES ) {
 
-			throw new Error( 'THREE.GaussianSplatSPZLoader: Invalid SPZ header.' );
+			throw new Error( 'THREE.SPZLoader: Invalid SPZ header.' );
 
 		}
 
@@ -127,25 +127,25 @@ class GaussianSplatSPZLoader extends Loader {
 
 		if ( magic !== SPZ_MAGIC ) {
 
-			throw new Error( 'THREE.GaussianSplatSPZLoader: Invalid SPZ magic.' );
+			throw new Error( 'THREE.SPZLoader: Invalid SPZ magic.' );
 
 		}
 
 		if ( version < 1 || version > 3 ) {
 
-			throw new Error( `THREE.GaussianSplatSPZLoader: Unsupported SPZ version ${ version }.` );
+			throw new Error( `THREE.SPZLoader: Unsupported SPZ version ${ version }.` );
 
 		}
 
 		if ( count > MAX_SPLATS ) {
 
-			throw new Error( `THREE.GaussianSplatSPZLoader: SPZ file contains too many splats (${ count }).` );
+			throw new Error( `THREE.SPZLoader: SPZ file contains too many splats (${ count }).` );
 
 		}
 
 		if ( shDegree > 3 ) {
 
-			throw new Error( `THREE.GaussianSplatSPZLoader: Unsupported SPZ spherical harmonics degree ${ shDegree }.` );
+			throw new Error( `THREE.SPZLoader: Unsupported SPZ spherical harmonics degree ${ shDegree }.` );
 
 		}
 
@@ -161,7 +161,7 @@ class GaussianSplatSPZLoader extends Loader {
 
 		if ( bytes.byteLength !== expectedSize ) {
 
-			throw new Error( 'THREE.GaussianSplatSPZLoader: Invalid SPZ byte length.' );
+			throw new Error( 'THREE.SPZLoader: Invalid SPZ byte length.' );
 
 		}
 
@@ -310,4 +310,4 @@ function readSmallestThreeQuaternion( view, offset ) {
 
 }
 
-export { GaussianSplatSPZLoader };
+export { SPZLoader };

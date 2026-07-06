@@ -58,18 +58,18 @@ const COMPRESSION_LEVELS = {
  * current renderer uses the stored degree-0 color.
  *
  * ```js
- * const loader = new GaussianSplatKSplatLoader();
+ * const loader = new KSPLATLoader();
  * const data = await loader.loadAsync( './models/gsplat/example.ksplat' );
  * scene.add( new GaussianSplatMesh( data ) );
  * ```
  *
  * @augments Loader
- * @three_import import { GaussianSplatKSplatLoader } from 'three/addons/loaders/GaussianSplatKSplatLoader.js';
+ * @three_import import { KSPLATLoader } from 'three/addons/loaders/KSPLATLoader.js';
  */
-class GaussianSplatKSplatLoader extends Loader {
+class KSPLATLoader extends Loader {
 
 	/**
-	 * Constructs a new Gaussian splat KSplat loader.
+	 * Constructs a new Gaussian splat KSPLAT loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
 	 */
@@ -126,14 +126,14 @@ class GaussianSplatKSplatLoader extends Loader {
 	/**
 	 * Parses the given `.ksplat` data.
 	 *
-	 * @param {ArrayBuffer} buffer - The raw KSplat file as an array buffer.
+	 * @param {ArrayBuffer} buffer - The raw KSPLAT file as an array buffer.
 	 * @return {BufferGeometry} The parsed splat geometry.
 	 */
 	parse( buffer ) {
 
 		if ( buffer.byteLength < HEADER_SIZE_BYTES ) {
 
-			throw new Error( 'THREE.GaussianSplatKSplatLoader: Invalid KSplat header.' );
+			throw new Error( 'THREE.KSPLATLoader: Invalid KSPLAT header.' );
 
 		}
 
@@ -143,19 +143,19 @@ class GaussianSplatKSplatLoader extends Loader {
 
 		if ( header.versionMajor !== CURRENT_VERSION_MAJOR || header.versionMinor < CURRENT_VERSION_MINOR ) {
 
-			throw new Error( `THREE.GaussianSplatKSplatLoader: Unsupported KSplat version ${ header.versionMajor }.${ header.versionMinor }.` );
+			throw new Error( `THREE.KSPLATLoader: Unsupported KSPLAT version ${ header.versionMajor }.${ header.versionMinor }.` );
 
 		}
 
 		if ( header.compressionLevel < 0 || header.compressionLevel > 2 ) {
 
-			throw new Error( `THREE.GaussianSplatKSplatLoader: Unsupported KSplat compression level ${ header.compressionLevel }.` );
+			throw new Error( `THREE.KSPLATLoader: Unsupported KSPLAT compression level ${ header.compressionLevel }.` );
 
 		}
 
 		if ( header.splatCount > MAX_SPLATS ) {
 
-			throw new Error( `THREE.GaussianSplatKSplatLoader: KSplat file contains too many splats (${ header.splatCount }).` );
+			throw new Error( `THREE.KSPLATLoader: KSPLAT file contains too many splats (${ header.splatCount }).` );
 
 		}
 
@@ -164,7 +164,7 @@ class GaussianSplatKSplatLoader extends Loader {
 
 		if ( bytes.byteLength < sectionDataOffset ) {
 
-			throw new Error( 'THREE.GaussianSplatKSplatLoader: Invalid KSplat section headers.' );
+			throw new Error( 'THREE.KSPLATLoader: Invalid KSPLAT section headers.' );
 
 		}
 
@@ -183,7 +183,7 @@ class GaussianSplatKSplatLoader extends Loader {
 
 			if ( shComponents === undefined ) {
 
-				throw new Error( `THREE.GaussianSplatKSplatLoader: Unsupported KSplat spherical harmonics degree ${ section.sphericalHarmonicsDegree }.` );
+				throw new Error( `THREE.KSPLATLoader: Unsupported KSPLAT spherical harmonics degree ${ section.sphericalHarmonicsDegree }.` );
 
 			}
 
@@ -196,7 +196,7 @@ class GaussianSplatKSplatLoader extends Loader {
 
 			if ( sectionBase + storageSizeBytes > bytes.byteLength ) {
 
-				throw new Error( 'THREE.GaussianSplatKSplatLoader: Invalid KSplat byte length.' );
+				throw new Error( 'THREE.KSPLATLoader: Invalid KSPLAT byte length.' );
 
 			}
 
@@ -227,7 +227,7 @@ class GaussianSplatKSplatLoader extends Loader {
 
 		if ( splatOffset !== header.splatCount ) {
 
-			throw new Error( 'THREE.GaussianSplatKSplatLoader: KSplat splat count mismatch.' );
+			throw new Error( 'THREE.KSPLATLoader: KSPLAT splat count mismatch.' );
 
 		}
 
@@ -366,7 +366,7 @@ function getBucketIndex( view, section, sectionBase, splatIndex, fullBucketSplat
 
 	}
 
-	throw new Error( 'THREE.GaussianSplatKSplatLoader: Invalid KSplat bucket data.' );
+	throw new Error( 'THREE.KSPLATLoader: Invalid KSPLAT bucket data.' );
 
 }
 
@@ -382,4 +382,4 @@ function readCompressedFloat( view, offset, bytesPerVector ) {
 
 }
 
-export { GaussianSplatKSplatLoader };
+export { KSPLATLoader };

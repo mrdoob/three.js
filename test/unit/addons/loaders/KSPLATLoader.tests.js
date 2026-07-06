@@ -1,5 +1,5 @@
 import { BufferGeometry, DataUtils } from 'three';
-import { GaussianSplatKSplatLoader } from '../../../../examples/jsm/loaders/GaussianSplatKSplatLoader.js';
+import { KSPLATLoader } from '../../../../examples/jsm/loaders/KSPLATLoader.js';
 
 const EPS = 1e-6;
 const HEADER_SIZE_BYTES = 4096;
@@ -11,7 +11,7 @@ function closeTo( assert, actual, expected, message ) {
 
 }
 
-function createKSplatBuffer( { compressionLevel = 0, shDegree = 0 } = {} ) {
+function createKSPLATBuffer( { compressionLevel = 0, shDegree = 0 } = {} ) {
 
 	const compression = compressionLevel === 0 ? {
 		bytesPerSplat: 44,
@@ -97,20 +97,20 @@ export default QUnit.module( 'Addons', () => {
 
 	QUnit.module( 'Loaders', () => {
 
-		QUnit.module( 'GaussianSplatKSplatLoader', () => {
+		QUnit.module( 'KSPLATLoader', () => {
 
 			QUnit.test( 'Instancing', ( assert ) => {
 
-				const loader = new GaussianSplatKSplatLoader();
+				const loader = new KSPLATLoader();
 
-				assert.ok( loader instanceof GaussianSplatKSplatLoader, 'Can instantiate a GaussianSplatKSplatLoader.' );
+				assert.ok( loader instanceof KSPLATLoader, 'Can instantiate a KSPLATLoader.' );
 
 			} );
 
-			QUnit.test( 'parses uncompressed KSplat data', ( assert ) => {
+			QUnit.test( 'parses uncompressed KSPLAT data', ( assert ) => {
 
-				const loader = new GaussianSplatKSplatLoader();
-				const data = loader.parse( createKSplatBuffer() );
+				const loader = new KSPLATLoader();
+				const data = loader.parse( createKSPLATBuffer() );
 
 				const covariances = data.getAttribute( 'covariance' ).array;
 
@@ -127,10 +127,10 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'parses bucket-compressed KSplat data', ( assert ) => {
+			QUnit.test( 'parses bucket-compressed KSPLAT data', ( assert ) => {
 
-				const loader = new GaussianSplatKSplatLoader();
-				const data = loader.parse( createKSplatBuffer( { compressionLevel: 1 } ) );
+				const loader = new KSPLATLoader();
+				const data = loader.parse( createKSPLATBuffer( { compressionLevel: 1 } ) );
 				const covariances = data.getAttribute( 'covariance' ).array;
 
 				assert.deepEqual( Array.from( data.getAttribute( 'position' ).array ), [ 1, 2, 3 ], 'bucketed centers' );
@@ -143,8 +143,8 @@ export default QUnit.module( 'Addons', () => {
 
 			QUnit.test( 'skips higher-order spherical harmonic payloads', ( assert ) => {
 
-				const loader = new GaussianSplatKSplatLoader();
-				const data = loader.parse( createKSplatBuffer( { shDegree: 1 } ) );
+				const loader = new KSPLATLoader();
+				const data = loader.parse( createKSPLATBuffer( { shDegree: 1 } ) );
 
 				assert.deepEqual( Array.from( data.getAttribute( 'color' ).array ), [ 10, 20, 30, 40 ], 'SH payload does not affect baked color' );
 
@@ -152,14 +152,14 @@ export default QUnit.module( 'Addons', () => {
 
 			QUnit.test( 'rejects unsupported versions', ( assert ) => {
 
-				const loader = new GaussianSplatKSplatLoader();
-				const buffer = createKSplatBuffer();
+				const loader = new KSPLATLoader();
+				const buffer = createKSPLATBuffer();
 				const view = new DataView( buffer );
 				view.setUint8( 0, 1 );
 
 				assert.throws(
 					() => loader.parse( buffer ),
-					/Unsupported KSplat version 1\.1/,
+					/Unsupported KSPLAT version 1\.1/,
 					'unsupported version is rejected'
 				);
 
@@ -167,12 +167,12 @@ export default QUnit.module( 'Addons', () => {
 
 			QUnit.test( 'rejects invalid byte lengths', ( assert ) => {
 
-				const loader = new GaussianSplatKSplatLoader();
-				const buffer = createKSplatBuffer();
+				const loader = new KSPLATLoader();
+				const buffer = createKSPLATBuffer();
 
 				assert.throws(
 					() => loader.parse( buffer.slice( 0, buffer.byteLength - 1 ) ),
-					/Invalid KSplat byte length/,
+					/Invalid KSPLAT byte length/,
 					'invalid byte length is rejected'
 				);
 

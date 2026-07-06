@@ -619,8 +619,8 @@ function Loader( editor ) {
 
 					const contents = event.target.result;
 
-					const { GaussianSplatKSplatLoader } = await import( 'three/addons/loaders/GaussianSplatKSplatLoader.js' );
-					const splatData = new GaussianSplatKSplatLoader().parse( contents );
+					const { KSPLATLoader } = await import( 'three/addons/loaders/KSPLATLoader.js' );
+					const splatData = new KSPLATLoader().parse( contents );
 
 					await addGaussianSplatObject( splatData, filename );
 
@@ -688,8 +688,8 @@ function Loader( editor ) {
 
 					const contents = event.target.result;
 
-					const { GaussianSplatLoader } = await import( 'three/addons/loaders/GaussianSplatLoader.js' );
-					const splatData = new GaussianSplatLoader().parse( contents );
+					const { SPLATLoader } = await import( 'three/addons/loaders/SPLATLoader.js' );
+					const splatData = new SPLATLoader().parse( contents );
 
 					await addGaussianSplatObject( splatData, filename );
 
@@ -708,8 +708,8 @@ function Loader( editor ) {
 
 					const contents = event.target.result;
 
-					const { GaussianSplatSPZLoader } = await import( 'three/addons/loaders/GaussianSplatSPZLoader.js' );
-					const splatData = new GaussianSplatSPZLoader().parse( contents );
+					const { SPZLoader } = await import( 'three/addons/loaders/SPZLoader.js' );
+					const splatData = new SPZLoader().parse( contents );
 
 					await addGaussianSplatObject( splatData, filename );
 

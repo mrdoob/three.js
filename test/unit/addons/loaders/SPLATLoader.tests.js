@@ -1,5 +1,5 @@
 import { BufferGeometry } from 'three';
-import { GaussianSplatLoader } from '../../../../examples/jsm/loaders/GaussianSplatLoader.js';
+import { SPLATLoader } from '../../../../examples/jsm/loaders/SPLATLoader.js';
 
 const EPS = 1e-6;
 
@@ -33,19 +33,19 @@ export default QUnit.module( 'Addons', () => {
 
 	QUnit.module( 'Loaders', () => {
 
-		QUnit.module( 'GaussianSplatLoader', () => {
+		QUnit.module( 'SPLATLoader', () => {
 
 			QUnit.test( 'Instancing', ( assert ) => {
 
-				const loader = new GaussianSplatLoader();
+				const loader = new SPLATLoader();
 
-				assert.ok( loader instanceof GaussianSplatLoader, 'Can instantiate a GaussianSplatLoader.' );
+				assert.ok( loader instanceof SPLATLoader, 'Can instantiate a SPLATLoader.' );
 
 			} );
 
 			QUnit.test( 'parses fixed-width .splat data', ( assert ) => {
 
-				const loader = new GaussianSplatLoader();
+				const loader = new SPLATLoader();
 				const data = loader.parse( createSplatBuffer() );
 
 				const covariances = data.getAttribute( 'covariance' ).array;
@@ -65,7 +65,7 @@ export default QUnit.module( 'Addons', () => {
 
 			QUnit.test( 'uses quaternion byte order w, x, y, z', ( assert ) => {
 
-				const loader = new GaussianSplatLoader();
+				const loader = new SPLATLoader();
 				const data = loader.parse( createSplatBuffer( { rotation: [ 219, 219, 128, 128 ] } ) );
 				const covariances = data.getAttribute( 'covariance' ).array;
 
@@ -77,7 +77,7 @@ export default QUnit.module( 'Addons', () => {
 
 			QUnit.test( 'rejects invalid byte lengths', ( assert ) => {
 
-				const loader = new GaussianSplatLoader();
+				const loader = new SPLATLoader();
 
 				assert.throws(
 					() => loader.parse( new ArrayBuffer( 31 ) ),

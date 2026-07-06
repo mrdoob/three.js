@@ -1,6 +1,6 @@
 import { BufferGeometry, DataUtils } from 'three';
 import { gzipSync } from '../../../../examples/jsm/libs/fflate.module.js';
-import { GaussianSplatSPZLoader } from '../../../../examples/jsm/loaders/GaussianSplatSPZLoader.js';
+import { SPZLoader } from '../../../../examples/jsm/loaders/SPZLoader.js';
 
 const EPS = 1e-6;
 const SPZ_MAGIC = 0x5053474e;
@@ -81,19 +81,19 @@ export default QUnit.module( 'Addons', () => {
 
 	QUnit.module( 'Loaders', () => {
 
-		QUnit.module( 'GaussianSplatSPZLoader', () => {
+		QUnit.module( 'SPZLoader', () => {
 
 			QUnit.test( 'Instancing', ( assert ) => {
 
-				const loader = new GaussianSplatSPZLoader();
+				const loader = new SPZLoader();
 
-				assert.ok( loader instanceof GaussianSplatSPZLoader, 'Can instantiate a GaussianSplatSPZLoader.' );
+				assert.ok( loader instanceof SPZLoader, 'Can instantiate a SPZLoader.' );
 
 			} );
 
 			QUnit.test( 'parses SPZ v2 fixed-point data', ( assert ) => {
 
-				const loader = new GaussianSplatSPZLoader();
+				const loader = new SPZLoader();
 				const data = loader.parse( createSPZBuffer() );
 
 				const covariances = data.getAttribute( 'covariance' ).array;
@@ -110,7 +110,7 @@ export default QUnit.module( 'Addons', () => {
 
 			QUnit.test( 'parses SPZ v1 half-float centers', ( assert ) => {
 
-				const loader = new GaussianSplatSPZLoader();
+				const loader = new SPZLoader();
 				const data = loader.parse( createSPZBuffer( { version: 1, center: [ 0.5, 1, - 1.5 ] } ) );
 
 				assert.deepEqual( Array.from( data.getAttribute( 'position' ).array ), [ 0.5, 1, - 1.5 ], 'half-float centers' );
@@ -119,7 +119,7 @@ export default QUnit.module( 'Addons', () => {
 
 			QUnit.test( 'parses SPZ v3 smallest-three rotations', ( assert ) => {
 
-				const loader = new GaussianSplatSPZLoader();
+				const loader = new SPZLoader();
 				const data = loader.parse( createSPZBuffer( { version: 3, scale: [ 176, 160, 160 ] } ) );
 				const covariances = data.getAttribute( 'covariance' ).array;
 
@@ -131,7 +131,7 @@ export default QUnit.module( 'Addons', () => {
 
 			QUnit.test( 'skips higher-order spherical harmonic payloads', ( assert ) => {
 
-				const loader = new GaussianSplatSPZLoader();
+				const loader = new SPZLoader();
 				const data = loader.parse( createSPZBuffer( { shDegree: 1, sh: [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ] } ) );
 
 				assert.deepEqual( Array.from( data.getAttribute( 'color' ).array ), [ 128, 128, 128, 64 ], 'SH payload does not affect baked color' );
@@ -140,7 +140,7 @@ export default QUnit.module( 'Addons', () => {
 
 			QUnit.test( 'rejects invalid magic', ( assert ) => {
 
-				const loader = new GaussianSplatSPZLoader();
+				const loader = new SPZLoader();
 				const raw = new Uint8Array( 16 );
 
 				assert.throws(
@@ -153,7 +153,7 @@ export default QUnit.module( 'Addons', () => {
 
 			QUnit.test( 'rejects unsupported versions', ( assert ) => {
 
-				const loader = new GaussianSplatSPZLoader();
+				const loader = new SPZLoader();
 
 				assert.throws(
 					() => loader.parse( createSPZBuffer( { version: 4 } ) ),

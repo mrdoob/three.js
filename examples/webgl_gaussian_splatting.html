@@ -57,10 +57,10 @@
 			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-			import { GaussianSplatLoader } from 'three/addons/loaders/GaussianSplatLoader.js';
-			import { GaussianSplatKSplatLoader } from 'three/addons/loaders/GaussianSplatKSplatLoader.js';
+			import { SPLATLoader } from 'three/addons/loaders/SPLATLoader.js';
+			import { KSPLATLoader } from 'three/addons/loaders/KSPLATLoader.js';
 			import { GaussianSplatPLYLoader } from 'three/addons/loaders/GaussianSplatPLYLoader.js';
-			import { GaussianSplatSPZLoader } from 'three/addons/loaders/GaussianSplatSPZLoader.js';
+			import { SPZLoader } from 'three/addons/loaders/SPZLoader.js';
 			import { GaussianSplatMesh } from 'three/addons/objects/GaussianSplatMesh.js';
 
 			let camera, scene, renderer, orbitControls, firstPersonControls, activeControls, splats;
@@ -79,7 +79,7 @@
 				'ReconWorldLab Demo (remote PLY, MIT, 67 MB)': 'recon',
 				'Cool Splats Output (remote SPLAT, 112 MB)': 'coolSplats',
 				'Niantic Horned Lizard (remote SPZ, MIT, 18 MB)': 'hornedLizard',
-				'NerfBaselines Bonsai (remote KSPLAT, 27 MB)': 'bonsaiKSplat',
+				'NerfBaselines Bonsai (remote KSPLAT, 27 MB)': 'bonsaiKSPLAT',
 				'Debug: Single Round Splat': 'debugRound',
 				'Debug: Axis-Aligned Ellipses': 'debugAxes',
 				'Debug: Rotated Ellipses': 'debugRotated',
@@ -107,7 +107,7 @@
 				coolSplats: {
 					name: 'Cool Splats Output',
 					url: 'https://huggingface.co/datasets/runes/coolsplats/resolve/main/output.splat',
-					loader: GaussianSplatLoader,
+					loader: SPLATLoader,
 					rotation: new THREE.Euler( - Math.PI * 0.5, 0, Math.PI * 0.5 ),
 					controls: 'firstPerson',
 					cameraPosition: new THREE.Vector3( 0.09, 0.11, 2.89 ),
@@ -121,7 +121,7 @@
 				hornedLizard: {
 					name: 'Niantic Horned Lizard',
 					url: 'https://raw.githubusercontent.com/nianticlabs/spz/v2.1.0/samples/hornedlizard.spz',
-					loader: GaussianSplatSPZLoader,
+					loader: SPZLoader,
 					rotation: new THREE.Euler( 0, 0, 0 ),
 					controls: 'firstPerson',
 					cameraPosition: new THREE.Vector3( 0, 0.15, 0.9 ),
@@ -131,10 +131,10 @@
 					minDistance: 0.01,
 					note: 'MIT licensed SPZ v2 sample from nianticlabs/spz, loaded from GitHub.'
 				},
-				bonsaiKSplat: {
+				bonsaiKSPLAT: {
 					name: 'NerfBaselines Bonsai',
 					url: 'https://huggingface.co/datasets/nerfbaselines/nerfbaselines-supplementary/resolve/main/gaussian-splatting/mipnerf360/bonsai_demo/scene.ksplat',
-					loader: GaussianSplatKSplatLoader,
+					loader: KSPLATLoader,
 					rotation: new THREE.Euler( Math.PI, Math.PI, 0 ),
 					controls: 'firstPerson',
 					cameraPosition: new THREE.Vector3( 0.12, - 3.81, - 1.14 ),
@@ -144,7 +144,7 @@
 					lookSpeed: 0.08,
 					minDistance: 0.01,
 					maxDistance: 12,
-					note: 'Remote KSplat sample from nerfbaselines/nerfbaselines-supplementary, hosted on Hugging Face.'
+					note: 'Remote KSPLAT sample from nerfbaselines/nerfbaselines-supplementary, hosted on Hugging Face.'
 				},
 				debugRound: {
 					name: 'Debug Round Splat',
