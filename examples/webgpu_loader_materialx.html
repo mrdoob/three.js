@@ -51,6 +51,9 @@
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+			import * as MikkTSpace from 'three/addons/libs/mikktspace.module.js';
+			import { computeMikkTSpaceTangents } from 'three/addons/utils/BufferGeometryUtils.js';
+
 			import { MaterialXLoader } from 'three/addons/loaders/MaterialXLoader.js';
 			import { createStrictInterfaceValidator } from 'three/addons/loaders/materialx/MaterialXInterfaceValidation.js';
 
@@ -197,6 +200,7 @@
 						scene.environment = texture;
 
 						prefab = ( await new GLTFLoader().loadAsync( './models/gltf/ShaderBall.glb' ) ).scene;
+						await computePrefabTangents();
 
 						for ( const sample of samples ) {
 
@@ -215,6 +219,30 @@
 					} );
 
 				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			async function computePrefabTangents() {
+
+				await MikkTSpace.ready;
+
+				prefab.traverse( function ( node ) {
+
+					if ( node.isMesh === false ) return;
+
+					const geometry = node.geometry;
+
+					if ( geometry === undefined ) return;
+
+					if ( geometry.hasAttribute( 'tangent' ) ) return;
+
+					if ( geometry.hasAttribute( 'position' ) && geometry.hasAttribute( 'normal' ) && geometry.hasAttribute( 'uv' ) ) {
+
+						computeMikkTSpaceTangents( geometry, MikkTSpace );
+
+					}
+
+				} );
 
 			}
 
