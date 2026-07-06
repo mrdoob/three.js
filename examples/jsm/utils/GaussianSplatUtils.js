@@ -1,4 +1,15 @@
+import {
+	BufferAttribute,
+	BufferGeometry
+} from 'three';
+
 const SH_C0 = 0.2820947917738781;
+const GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING = {
+	scale: [ 'scale_0', 'scale_1', 'scale_2' ],
+	rotation: [ 'rot_0', 'rot_1', 'rot_2', 'rot_3' ],
+	f_dc: [ 'f_dc_0', 'f_dc_1', 'f_dc_2' ],
+	opacity: [ 'opacity' ]
+};
 
 function clampByte( value ) {
 
@@ -100,6 +111,89 @@ function writeCovariance( target, offset, sx, sy, sz, qx, qy, qz, qw ) {
 	target[ offset + 3 ] = r10 * r10 * sxx + r11 * r11 * syy + r12 * r12 * szz;
 	target[ offset + 4 ] = r10 * r20 * sxx + r11 * r21 * syy + r12 * r22 * szz;
 	target[ offset + 5 ] = r20 * r20 * sxx + r21 * r21 * syy + r22 * r22 * szz;
+
+}
+
+function createGaussianSplatGeometryFromPLYGeometry( geometry, {
+	scaleAttribute = 'scale',
+	rotationAttribute = 'rotation',
+	sh0Attribute = 'f_dc',
+	opacityAttribute = 'opacity'
+} = {} ) {
+
+	if ( geometry === undefined || geometry.isBufferGeometry !== true ) {
+
+		throw new Error( 'THREE.createGaussianSplatGeometryFromPLYGeometry: PLY geometry must be a BufferGeometry.' );
+
+	}
+
+	const position = geometry.getAttribute( 'position' );
+	const scale = geometry.getAttribute( scaleAttribute );
+	const rotation = geometry.getAttribute( rotationAttribute );
+	const sh0 = geometry.getAttribute( sh0Attribute );
+	const opacity = geometry.getAttribute( opacityAttribute );
+
+	if ( position === undefined || scale === undefined || rotation === undefined || sh0 === undefined || opacity === undefined ) {
+
+		throw new Error( 'THREE.createGaussianSplatGeometryFromPLYGeometry: PLY geometry requires position, scale, rotation, f_dc and opacity attributes.' );
+
+	}
+
+	const count = position.count;
+
+	if ( position.itemSize !== 3 || scale.itemSize !== 3 || rotation.itemSize !== 4 || sh0.itemSize !== 3 || opacity.itemSize !== 1 ) {
+
+		throw new Error( 'THREE.createGaussianSplatGeometryFromPLYGeometry: Invalid Gaussian splat PLY attribute itemSize.' );
+
+	}
+
+	if ( scale.count !== count || rotation.count !== count || sh0.count !== count || opacity.count !== count ) {
+
+		throw new Error( 'THREE.createGaussianSplatGeometryFromPLYGeometry: Gaussian splat PLY attribute counts must match position.' );
+
+	}
+
+	const centers = new Float32Array( count * 3 );
+	const covariances = new Float32Array( count * 6 );
+	const colors = new Uint8Array( count * 4 );
+
+	for ( let i = 0; i < count; i ++ ) {
+
+		const i3 = i * 3;
+		centers[ i3 ] = position.getX( i );
+		centers[ i3 + 1 ] = position.getY( i );
+		centers[ i3 + 2 ] = position.getZ( i );
+
+		const sx = Math.exp( scale.getX( i ) );
+		const sy = Math.exp( scale.getY( i ) );
+		const sz = Math.exp( scale.getZ( i ) );
+
+		// GraphDECO/INRIA PLY stores quaternions as rot_0=w, rot_1=x, rot_2=y, rot_3=z.
+		const qw = rotation.getX( i );
+		const qx = rotation.getY( i );
+		const qy = rotation.getZ( i );
+		const qz = rotation.getW( i );
+
+		writeCovariance( covariances, i * 6, sx, sy, sz, qx, qy, qz, qw );
+		writeColorBytesFromSH0(
+			colors,
+			i * 4,
+			sh0.getX( i ),
+			sh0.getY( i ),
+			sh0.getZ( i ),
+			sigmoid( opacity.getX( i ) )
+		);
+
+	}
+
+	const splatGeometry = new BufferGeometry();
+	splatGeometry.setAttribute( 'position', new BufferAttribute( centers, 3 ) );
+	splatGeometry.setAttribute( 'covariance', new BufferAttribute( covariances, 6 ) );
+	splatGeometry.setAttribute( 'color', new BufferAttribute( colors, 4, true ) );
+	splatGeometry.computeBoundingBox();
+	splatGeometry.computeBoundingSphere();
+
+	return splatGeometry;
 
 }
 
@@ -290,8 +384,10 @@ function writeQuaternionFromRotationMatrix( target, offset, r00, r01, r02, r10, 
 }
 
 export {
+	GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING,
 	SH_C0,
 	clampByte,
+	createGaussianSplatGeometryFromPLYGeometry,
 	decomposeCovariance,
 	linearToSH0,
 	sh0ToLinear,

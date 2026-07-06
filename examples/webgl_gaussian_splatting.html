@@ -59,9 +59,10 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { SPLATLoader } from 'three/addons/loaders/SPLATLoader.js';
 			import { KSPLATLoader } from 'three/addons/loaders/KSPLATLoader.js';
-			import { GaussianSplatPLYLoader } from 'three/addons/loaders/GaussianSplatPLYLoader.js';
+			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
 			import { SPZLoader } from 'three/addons/loaders/SPZLoader.js';
 			import { GaussianSplatMesh } from 'three/addons/objects/GaussianSplatMesh.js';
+			import { GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING, createGaussianSplatGeometryFromPLYGeometry } from 'three/addons/utils/GaussianSplatUtils.js';
 
 			let camera, scene, renderer, orbitControls, firstPersonControls, activeControls, splats;
 			let loadId = 0;
@@ -98,7 +99,6 @@
 				recon: {
 					name: 'ReconWorldLab Demo',
 					url: 'https://raw.githubusercontent.com/ReconWorldLab/godot-gaussian-splatting/main/samples/assets/demo.ply',
-					loader: GaussianSplatPLYLoader,
 					rotation: new THREE.Euler( Math.PI, 0, 0 ),
 					controls: 'orbit',
 					cameraPosition: new THREE.Vector3( 0, 0.2, 3.5 ),
@@ -245,8 +245,7 @@
 
 				try {
 
-					const LoaderClass = source.loader || GaussianSplatPLYLoader;
-					const splatData = source.createData !== undefined ? source.createData() : await new LoaderClass().loadAsync( source.url, function ( event ) {
+					const onProgress = function ( event ) {
 
 						if ( event.lengthComputable === true ) {
 
@@ -255,7 +254,8 @@
 
 						}
 
-					} );
+					};
+					const splatData = source.createData !== undefined ? source.createData() : await loadSplatData( source, onProgress );
 
 					if ( currentLoadId !== loadId ) return;
 
@@ -411,6 +411,31 @@
 			function formatVector( vector ) {
 
 				return `${ vector.x.toFixed( 2 ) }, ${ vector.y.toFixed( 2 ) }, ${ vector.z.toFixed( 2 ) }`;
+
+			}
+
+			async function loadSplatData( source, onProgress ) {
+
+				if ( source.loader !== undefined ) {
+
+					return new source.loader().loadAsync( source.url, onProgress );
+
+				}
+
+				return loadGaussianSplatPLY( source.url, onProgress );
+
+			}
+
+			async function loadGaussianSplatPLY( url, onProgress ) {
+
+				const loader = new PLYLoader();
+				loader.setCustomPropertyNameMapping( GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING );
+
+				const geometry = await loader.loadAsync( url, onProgress );
+				const splatGeometry = createGaussianSplatGeometryFromPLYGeometry( geometry );
+				geometry.dispose();
+
+				return splatGeometry;
 
 			}
 

@@ -382,7 +382,6 @@
 		"webgpu_loader_gltf_anisotropy",
 		"webgpu_loader_gltf_compressed",
 		"webgpu_loader_gltf_dispersion",
-		"webgpu_loader_gltf_gaussian_splatting",
 		"webgpu_loader_gltf_iridescence",
 		"webgpu_loader_gltf_sheen",
 		"webgpu_loader_gltf_transmission",

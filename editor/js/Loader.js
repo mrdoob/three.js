@@ -641,8 +641,14 @@ function Loader( editor ) {
 
 					if ( isGaussianSplatPLY( contents ) ) {
 
-						const { GaussianSplatPLYLoader } = await import( 'three/addons/loaders/GaussianSplatPLYLoader.js' );
-						const splatData = new GaussianSplatPLYLoader().parse( contents );
+						const { PLYLoader } = await import( 'three/addons/loaders/PLYLoader.js' );
+						const { GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING, createGaussianSplatGeometryFromPLYGeometry } = await import( 'three/addons/utils/GaussianSplatUtils.js' );
+						const loader = new PLYLoader();
+						loader.setCustomPropertyNameMapping( GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING );
+
+						const geometry = loader.parse( contents );
+						const splatData = createGaussianSplatGeometryFromPLYGeometry( geometry );
+						geometry.dispose();
 
 						await addGaussianSplatObject( splatData, filename );
 						return;

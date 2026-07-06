@@ -35,7 +35,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Gaussian Splatting</span>
 			</div>
 
-			<small id="status">Minimal WebGPU/TSL Gaussian splat renderer loading PLY, SPLAT, SPZ, and KSPLAT data by <a href="https://ben3d.ca">Ben Houston</a>.</small>
+			<small id="status">Minimal WebGPU/TSL Gaussian splat renderer loading PLY, SPLAT, SPZ, KSPLAT, and glTF data by <a href="https://ben3d.ca">Ben Houston</a>.</small>
 		</div>
 		<div id="camera-info"></div>
 
@@ -58,13 +58,15 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { SPLATLoader } from 'three/addons/loaders/SPLATLoader.js';
 			import { KSPLATLoader } from 'three/addons/loaders/KSPLATLoader.js';
-			import { GaussianSplatPLYLoader } from 'three/addons/loaders/GaussianSplatPLYLoader.js';
+			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
 			import { SPZLoader } from 'three/addons/loaders/SPZLoader.js';
 			import { GaussianSplatMesh } from 'three/addons/objects/GaussianSplatMesh.js';
+			import { GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING, createGaussianSplatGeometryFromPLYGeometry } from 'three/addons/utils/GaussianSplatUtils.js';
 
-			let camera, scene, renderer, orbitControls, firstPersonControls, activeControls, splats;
+			let camera, scene, renderer, orbitControls, firstPersonControls, activeControls, splats, splatRoot;
 			let loadId = 0;
 			THREE.ColorManagement.workingColorSpace = THREE.SRGBColorSpace;
 
@@ -79,6 +81,7 @@
 			
 			const sourceNames = {
 				'Procedural Flower (local, CC0)': 'flower',
+				'Procedural Flower glTF (local, KHR_gaussian_splatting)': 'flowerGLTF',
 				'ReconWorldLab Demo (remote PLY, MIT, 67 MB)': 'recon',
 				'Cool Splats Output (remote SPLAT, 112 MB)': 'coolSplats',
 				'Niantic Horned Lizard (remote SPZ, MIT, 18 MB)': 'hornedLizard',
@@ -98,10 +101,19 @@
 					cameraPosition: new THREE.Vector3( 0, 0.35, 3.2 ),
 					note: 'Procedural local CC0 sample.'
 				},
+				flowerGLTF: {
+					name: 'Procedural Flower glTF',
+					url: 'models/gsplat/procedural_flower.gltf',
+					createObject: loadGaussianSplatGLTF,
+					controls: 'orbit',
+					cameraPosition: new THREE.Vector3( 0, 0, 4 ),
+					minDistance: 0.7,
+					maxDistance: 8,
+					note: 'Local glTF sample using KHR_gaussian_splatting.'
+				},
 				recon: {
 					name: 'ReconWorldLab Demo',
 					url: 'https://raw.githubusercontent.com/ReconWorldLab/godot-gaussian-splatting/main/samples/assets/demo.ply',
-					loader: GaussianSplatPLYLoader,
 					rotation: new THREE.Euler( Math.PI, 0, 0 ),
 					controls: 'orbit',
 					cameraPosition: new THREE.Vector3( 0, 0.2, 3.5 ),
@@ -254,8 +266,7 @@
 
 				try {
 
-					const LoaderClass = source.loader || GaussianSplatPLYLoader;
-					const splatData = source.createData !== undefined ? source.createData() : await new LoaderClass().loadAsync( source.url, function ( event ) {
+					const onProgress = function ( event ) {
 
 						if ( event.lengthComputable === true ) {
 
@@ -264,22 +275,20 @@
 
 						}
 
-					} );
+					};
+
+					const loaded = await loadSplatObject( source, onProgress );
 
 					if ( currentLoadId !== loadId ) return;
 
-					if ( splats !== undefined ) {
+					disposeCurrentSplats();
 
-						scene.remove( splats );
-						splats.geometry.dispose();
-						splats.material.dispose();
-						splats = undefined;
+					splats = loaded.splats;
+					splatRoot = loaded.object;
 
-					}
+					if ( source.rotation !== undefined ) splatRoot.rotation.copy( source.rotation );
 
-					splats = new GaussianSplatMesh( splatData, { autoSort: false } );
-					splats.rotation.copy( source.rotation );
-					scene.add( splats );
+					scene.add( splatRoot );
 
 					fitCameraToSplats( splats, source );
 					status.innerHTML = oldStatus;
@@ -292,6 +301,18 @@
 					status.textContent = `Could not load ${ source.name }: ${ error.message }`;
 
 				}
+
+			}
+
+			function disposeCurrentSplats() {
+
+				if ( splatRoot === undefined ) return;
+
+				scene.remove( splatRoot );
+				splats.geometry.dispose();
+				splats.material.dispose();
+				splats = undefined;
+				splatRoot = undefined;
 
 			}
 
@@ -420,6 +441,72 @@
 			function formatVector( vector ) {
 
 				return `${ vector.x.toFixed( 2 ) }, ${ vector.y.toFixed( 2 ) }, ${ vector.z.toFixed( 2 ) }`;
+
+			}
+
+			async function loadSplatObject( source, onProgress ) {
+
+				if ( source.createObject !== undefined ) {
+
+					return source.createObject( source, onProgress );
+
+				}
+
+				const splatData = source.createData !== undefined ? source.createData() : await loadSplatData( source, onProgress );
+				const mesh = new GaussianSplatMesh( splatData, { autoSort: false } );
+
+				return { object: mesh, splats: mesh };
+
+			}
+
+			async function loadSplatData( source, onProgress ) {
+
+				if ( source.loader !== undefined ) {
+
+					return new source.loader().loadAsync( source.url, onProgress );
+
+				}
+
+				return loadGaussianSplatPLY( source.url, onProgress );
+
+			}
+
+			async function loadGaussianSplatGLTF( source, onProgress ) {
+
+				const loader = new GLTFLoader();
+				const gltf = await loader.loadAsync( source.url, onProgress );
+				let splatMesh;
+
+				gltf.scene.traverse( function ( object ) {
+
+					if ( object.isGaussianSplatMesh === true && splatMesh === undefined ) {
+
+						splatMesh = object;
+
+					}
+
+				} );
+
+				if ( splatMesh === undefined ) {
+
+					throw new Error( 'No GaussianSplatMesh found in glTF scene.' );
+
+				}
+
+				return { object: gltf.scene, splats: splatMesh };
+
+			}
+
+			async function loadGaussianSplatPLY( url, onProgress ) {
+
+				const loader = new PLYLoader();
+				loader.setCustomPropertyNameMapping( GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING );
+
+				const geometry = await loader.loadAsync( url, onProgress );
+				const splatGeometry = createGaussianSplatGeometryFromPLYGeometry( geometry );
+				geometry.dispose();
+
+				return splatGeometry;
 
 			}
 
