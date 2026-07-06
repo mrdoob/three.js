@@ -2406,6 +2406,7 @@ class WebGPUBackend extends Backend {
 		renderContextData.currentSets = renderContextData._currentSets;
 		renderContextData.currentPass = renderContextData._currentPass;
 		renderContextData._currentPass = null;
+		renderContextData._currentSets = null;
 
 	}
 
