@@ -1686,6 +1686,8 @@ class Renderer {
 
 		}
 
+		this._renderLists.update( nodeFrame.frameId );
+
 		const renderList = this._renderLists.get( scene, camera );
 		renderList.begin();
 
