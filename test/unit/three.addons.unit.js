@@ -14,6 +14,5 @@ import './addons/loaders/GaussianSplatPLYLoader.tests.js';
 import './addons/loaders/GaussianSplatSPZLoader.tests.js';
 import './addons/loaders/HDRLoader.tests.js';
 import './addons/loaders/USDLoader.tests.js';
-import './addons/objects/GaussianSplatData.tests.js';
 import './addons/exporters/GLTFExporter.tests.js';
 import './addons/exporters/USDZExporter.tests.js';

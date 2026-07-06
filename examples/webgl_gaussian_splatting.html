@@ -61,7 +61,6 @@
 			import { GaussianSplatKSplatLoader } from 'three/addons/loaders/GaussianSplatKSplatLoader.js';
 			import { GaussianSplatPLYLoader } from 'three/addons/loaders/GaussianSplatPLYLoader.js';
 			import { GaussianSplatSPZLoader } from 'three/addons/loaders/GaussianSplatSPZLoader.js';
-			import { GaussianSplatData } from 'three/addons/objects/GaussianSplatData.js';
 			import { GaussianSplatMesh } from 'three/addons/objects/GaussianSplatMesh.js';
 
 			let camera, scene, renderer, orbitControls, firstPersonControls, activeControls, splats;
@@ -291,7 +290,7 @@
 
 				mesh.updateWorldMatrix( true, false );
 
-				const sphere = mesh.splatData.boundingSphere.clone().applyMatrix4( mesh.matrixWorld );
+				const sphere = mesh.splatGeometry.boundingSphere.clone().applyMatrix4( mesh.matrixWorld );
 				const radius = Math.max( sphere.radius, 1 );
 				const distance = radius / Math.sin( THREE.MathUtils.degToRad( camera.fov ) * 0.5 );
 
@@ -504,7 +503,14 @@
 
 				}
 
-				return new GaussianSplatData( { centers, covariances, colors } );
+				const geometry = new THREE.BufferGeometry();
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( centers, 3 ) );
+				geometry.setAttribute( 'covariance', new THREE.BufferAttribute( covariances, 6 ) );
+				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 4, true ) );
+				geometry.computeBoundingBox();
+				geometry.computeBoundingSphere();
+
+				return geometry;
 
 			}
 

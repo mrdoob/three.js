@@ -102,7 +102,7 @@
 
 				splats.updateWorldMatrix( true, false );
 
-				const sphere = splats.splatData.boundingSphere.clone().applyMatrix4( splats.matrixWorld );
+				const sphere = splats.splatGeometry.boundingSphere.clone().applyMatrix4( splats.matrixWorld );
 				const radius = Math.max( sphere.radius, 1 );
 				const distance = radius / Math.sin( THREE.MathUtils.degToRad( camera.fov ) * 0.5 );
 

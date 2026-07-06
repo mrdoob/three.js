@@ -1,7 +1,6 @@
-import { DataUtils } from 'three';
+import { BufferGeometry, DataUtils } from 'three';
 import { gzipSync } from '../../../../examples/jsm/libs/fflate.module.js';
 import { GaussianSplatSPZLoader } from '../../../../examples/jsm/loaders/GaussianSplatSPZLoader.js';
-import { GaussianSplatData } from '../../../../examples/jsm/objects/GaussianSplatData.js';
 
 const EPS = 1e-6;
 const SPZ_MAGIC = 0x5053474e;
@@ -97,13 +96,15 @@ export default QUnit.module( 'Addons', () => {
 				const loader = new GaussianSplatSPZLoader();
 				const data = loader.parse( createSPZBuffer() );
 
-				assert.ok( data instanceof GaussianSplatData, 'returns GaussianSplatData' );
-				assert.strictEqual( data.count, 1, 'count' );
-				assert.deepEqual( Array.from( data.centers ), [ 1.5, - 2, 0.25 ], 'fixed-point centers' );
-				closeTo( assert, data.covariances[ 0 ], 1, 'covariance xx' );
-				closeTo( assert, data.covariances[ 3 ], 1, 'covariance yy' );
-				closeTo( assert, data.covariances[ 5 ], 1, 'covariance zz' );
-				assert.deepEqual( Array.from( data.colors ), [ 128, 128, 128, 64 ], 'degree-0 color and alpha' );
+				const covariances = data.getAttribute( 'covariance' ).array;
+
+				assert.ok( data instanceof BufferGeometry, 'returns BufferGeometry' );
+				assert.strictEqual( data.getAttribute( 'position' ).count, 1, 'count' );
+				assert.deepEqual( Array.from( data.getAttribute( 'position' ).array ), [ 1.5, - 2, 0.25 ], 'fixed-point centers' );
+				closeTo( assert, covariances[ 0 ], 1, 'covariance xx' );
+				closeTo( assert, covariances[ 3 ], 1, 'covariance yy' );
+				closeTo( assert, covariances[ 5 ], 1, 'covariance zz' );
+				assert.deepEqual( Array.from( data.getAttribute( 'color' ).array ), [ 128, 128, 128, 64 ], 'degree-0 color and alpha' );
 
 			} );
 
@@ -112,7 +113,7 @@ export default QUnit.module( 'Addons', () => {
 				const loader = new GaussianSplatSPZLoader();
 				const data = loader.parse( createSPZBuffer( { version: 1, center: [ 0.5, 1, - 1.5 ] } ) );
 
-				assert.deepEqual( Array.from( data.centers ), [ 0.5, 1, - 1.5 ], 'half-float centers' );
+				assert.deepEqual( Array.from( data.getAttribute( 'position' ).array ), [ 0.5, 1, - 1.5 ], 'half-float centers' );
 
 			} );
 
@@ -120,10 +121,11 @@ export default QUnit.module( 'Addons', () => {
 
 				const loader = new GaussianSplatSPZLoader();
 				const data = loader.parse( createSPZBuffer( { version: 3, scale: [ 176, 160, 160 ] } ) );
+				const covariances = data.getAttribute( 'covariance' ).array;
 
-				closeTo( assert, data.covariances[ 0 ], Math.E * Math.E, 'covariance xx' );
-				closeTo( assert, data.covariances[ 3 ], 1, 'covariance yy' );
-				closeTo( assert, data.covariances[ 5 ], 1, 'covariance zz' );
+				closeTo( assert, covariances[ 0 ], Math.E * Math.E, 'covariance xx' );
+				closeTo( assert, covariances[ 3 ], 1, 'covariance yy' );
+				closeTo( assert, covariances[ 5 ], 1, 'covariance zz' );
 
 			} );
 
@@ -132,7 +134,7 @@ export default QUnit.module( 'Addons', () => {
 				const loader = new GaussianSplatSPZLoader();
 				const data = loader.parse( createSPZBuffer( { shDegree: 1, sh: [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ] } ) );
 
-				assert.deepEqual( Array.from( data.colors ), [ 128, 128, 128, 64 ], 'SH payload does not affect baked color' );
+				assert.deepEqual( Array.from( data.getAttribute( 'color' ).array ), [ 128, 128, 128, 64 ], 'SH payload does not affect baked color' );
 
 			} );
 

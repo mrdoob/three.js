@@ -1,9 +1,10 @@
 import {
+	BufferAttribute,
+	BufferGeometry,
 	FileLoader,
 	Loader
 } from 'three';
 
-import { GaussianSplatData } from '../objects/GaussianSplatData.js';
 import { writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const ROW_SIZE_BYTES = 32;
@@ -11,7 +12,7 @@ const ROW_SIZE_BYTES = 32;
 /**
  * A loader for standard fixed-width Gaussian splat `.splat` files.
  *
- * This loader decodes the format into `GaussianSplatData` for use with
+ * This loader decodes the format into `BufferGeometry` for use with
  * `GaussianSplatMesh`. Each 32-byte row stores center, scale, color and
  * rotation data for one splat.
  *
@@ -42,7 +43,7 @@ class GaussianSplatLoader extends Loader {
 	 * the `onLoad()` callback.
 	 *
 	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
-	 * @param {function(GaussianSplatData)} onLoad - Executed when the loading process has been finished.
+	 * @param {function(BufferGeometry)} onLoad - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
 	 * @param {onErrorCallback} onError - Executed when errors occur.
 	 */
@@ -85,7 +86,7 @@ class GaussianSplatLoader extends Loader {
 	 * Parses the given fixed-width `.splat` data.
 	 *
 	 * @param {ArrayBuffer} buffer - The raw `.splat` file as an array buffer.
-	 * @return {GaussianSplatData} The parsed splat data.
+	 * @return {BufferGeometry} The parsed splat geometry.
 	 */
 	parse( buffer ) {
 
@@ -131,7 +132,14 @@ class GaussianSplatLoader extends Loader {
 
 		}
 
-		return new GaussianSplatData( { centers, covariances, colors, count } );
+		const geometry = new BufferGeometry();
+		geometry.setAttribute( 'position', new BufferAttribute( centers, 3 ) );
+		geometry.setAttribute( 'covariance', new BufferAttribute( covariances, 6 ) );
+		geometry.setAttribute( 'color', new BufferAttribute( colors, 4, true ) );
+		geometry.computeBoundingBox();
+		geometry.computeBoundingSphere();
+
+		return geometry;
 
 	}
 

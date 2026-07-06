@@ -4796,14 +4796,15 @@ async function createGaussianSplatMesh( geometry, primitiveDef ) {
 
 	}
 
-	const [
-		{ GaussianSplatData },
-		{ GaussianSplatMesh }
-	] = await Promise.all( [
-		import( '../objects/GaussianSplatData.js' ),
-		import( '../objects/GaussianSplatMesh.js' )
-	] );
-	const mesh = new GaussianSplatMesh( new GaussianSplatData( { centers, covariances, colors, count } ) );
+	const { GaussianSplatMesh } = await import( '../objects/GaussianSplatMesh.js' );
+	const splatGeometry = new BufferGeometry();
+	splatGeometry.setAttribute( 'position', new BufferAttribute( centers, 3 ) );
+	splatGeometry.setAttribute( 'covariance', new BufferAttribute( covariances, 6 ) );
+	splatGeometry.setAttribute( 'color', new BufferAttribute( colors, 4, true ) );
+	splatGeometry.computeBoundingBox();
+	splatGeometry.computeBoundingSphere();
+
+	const mesh = new GaussianSplatMesh( splatGeometry );
 
 	mesh.userData.gltfExtensions = mesh.userData.gltfExtensions || {};
 	mesh.userData.gltfExtensions[ EXTENSIONS.KHR_GAUSSIAN_SPLATTING ] = Object.assign( {}, extensionDef );

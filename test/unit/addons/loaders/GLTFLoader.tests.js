@@ -125,13 +125,14 @@ export default QUnit.module( 'Addons', () => {
 				const loader = new GLTFLoader();
 				const gltf = await loader.parseAsync( JSON.stringify( createGaussianSplatGLTF() ), '' );
 				const mesh = gltf.scene.children[ 0 ];
+				const covariances = mesh.splatGeometry.getAttribute( 'covariance' ).array;
 
 				assert.ok( mesh.isGaussianSplatMesh, 'creates GaussianSplatMesh' );
-				assert.deepEqual( Array.from( mesh.splatData.centers ), [ 1, 2, 3 ], 'loads centers' );
-				closeTo( assert, mesh.splatData.covariances[ 0 ], 4, 'covariance xx' );
-				closeTo( assert, mesh.splatData.covariances[ 3 ], 9, 'covariance yy' );
-				closeTo( assert, mesh.splatData.covariances[ 5 ], 16, 'covariance zz' );
-				assert.deepEqual( Array.from( mesh.splatData.colors ), [ 128, 128, 128, 128 ], 'loads degree-0 color and opacity' );
+				assert.deepEqual( Array.from( mesh.splatGeometry.getAttribute( 'position' ).array ), [ 1, 2, 3 ], 'loads centers' );
+				closeTo( assert, covariances[ 0 ], 4, 'covariance xx' );
+				closeTo( assert, covariances[ 3 ], 9, 'covariance yy' );
+				closeTo( assert, covariances[ 5 ], 16, 'covariance zz' );
+				assert.deepEqual( Array.from( mesh.splatGeometry.getAttribute( 'color' ).array ), [ 128, 128, 128, 128 ], 'loads degree-0 color and opacity' );
 
 			} );
 

@@ -57,10 +57,10 @@ const _cameraDirection = /*@__PURE__*/ new Vector3();
 const _sortDepthRange = /*@__PURE__*/ new Vector2();
 
 /**
- * A minimal WebGPU/TSL renderer for 3D Gaussian splat data.
+ * A minimal WebGPU/TSL renderer for 3D Gaussian splat geometry.
  *
  * ```js
- * const splats = new GaussianSplatMesh( data );
+ * const splats = new GaussianSplatMesh( geometry );
  * scene.add( splats );
  * ```
  *
@@ -72,14 +72,22 @@ class GaussianSplatMesh extends Mesh {
 	/**
 	 * Constructs a new Gaussian splat mesh.
 	 *
-	 * @param {GaussianSplatData} splatData - The splat data to render.
+	 * @param {BufferGeometry} splatGeometry - The splat geometry to render.
 	 * @param {Object} [options] - Options.
 	 * @param {boolean} [options.autoSort=true] - Whether to sort automatically in `onBeforeRender`.
 	 */
-	constructor( splatData, { autoSort = true } = {} ) {
+	constructor( splatGeometry, { autoSort = true } = {} ) {
 
-		const geometry = createGeometry( splatData.count );
-		const buffers = createStorageBuffers( splatData );
+		const positionAttribute = splatGeometry.getAttribute( 'position' );
+		const covarianceAttribute = splatGeometry.getAttribute( 'covariance' );
+		const colorAttribute = splatGeometry.getAttribute( 'color' );
+		const count = positionAttribute.count;
+
+		if ( splatGeometry.boundingBox === null ) splatGeometry.computeBoundingBox();
+		if ( splatGeometry.boundingSphere === null ) splatGeometry.computeBoundingSphere();
+
+		const geometry = createGeometry( count );
+		const buffers = createStorageBuffers( count, positionAttribute.array, covarianceAttribute.array, colorAttribute.array );
 		const material = createMaterial( buffers );
 
 		super( geometry, material );
@@ -96,11 +104,11 @@ class GaussianSplatMesh extends Mesh {
 		this.type = 'GaussianSplatMesh';
 
 		/**
-		 * The source splat data.
+		 * The source splat geometry.
 		 *
-		 * @type {GaussianSplatData}
+		 * @type {BufferGeometry}
 		 */
-		this.splatData = splatData;
+		this.splatGeometry = splatGeometry;
 
 		/**
 		 * Whether to sort automatically in `onBeforeRender`.
@@ -117,7 +125,8 @@ class GaussianSplatMesh extends Mesh {
 		this._sortInitialized = false;
 		this._lastSortPosition = new Vector3( Infinity, Infinity, Infinity );
 		this._lastSortDirection = new Vector3( 0, 0, - 1 );
-		this._webGLSortBins = new Uint32Array( splatData.count );
+		this._positionAttribute = positionAttribute;
+		this._webGLSortBins = new Uint32Array( count );
 		this._webGLSortCounts = new Uint32Array( BIN_COUNT );
 		this._webGLSortOffsets = new Uint32Array( BIN_COUNT );
 
@@ -200,11 +209,11 @@ class GaussianSplatMesh extends Mesh {
 
 		this._sortMatrix.value.multiplyMatrices( camera.matrixWorldInverse, this.matrixWorld );
 
-		_worldCenter.copy( this.splatData.boundingSphere.center ).applyMatrix4( this.matrixWorld );
+		_worldCenter.copy( this.splatGeometry.boundingSphere.center ).applyMatrix4( this.matrixWorld );
 		_viewCenter.copy( _worldCenter ).applyMatrix4( camera.matrixWorldInverse );
 		this.getWorldScale( _worldScale );
 
-		const radius = this.splatData.boundingSphere.radius * Math.max( _worldScale.x, _worldScale.y, _worldScale.z );
+		const radius = this.splatGeometry.boundingSphere.radius * Math.max( _worldScale.x, _worldScale.y, _worldScale.z );
 		const depth = - _viewCenter.z;
 		const nearDepth = Math.max( camera.near, depth - radius );
 		const farDepth = Math.max( nearDepth + 0.0001, depth + radius );
@@ -217,7 +226,7 @@ class GaussianSplatMesh extends Mesh {
 	_sortCPU() {
 
 		const buffers = this._buffers;
-		const centers = this.splatData.centers;
+		const centers = this._positionAttribute.array;
 		const order = buffers.orderAttribute.array;
 		const bins = this._webGLSortBins;
 		const counts = this._webGLSortCounts;
@@ -284,9 +293,8 @@ function createGeometry( count ) {
 
 }
 
-function createStorageBuffers( splatData ) {
+function createStorageBuffers( count, centers, covariances, colors ) {
 
-	const { count, centers, covariances, colors } = splatData;
 	const centerData = new Float32Array( count * 4 );
 	const covarianceAData = new Float32Array( count * 4 );
 	const covarianceBData = new Float32Array( count * 4 );

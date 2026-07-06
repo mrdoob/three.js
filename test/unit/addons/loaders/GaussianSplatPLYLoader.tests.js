@@ -1,5 +1,5 @@
+import { BufferGeometry } from 'three';
 import { GaussianSplatPLYLoader } from '../../../../examples/jsm/loaders/GaussianSplatPLYLoader.js';
-import { GaussianSplatData } from '../../../../examples/jsm/objects/GaussianSplatData.js';
 import { SH_C0 } from '../../../../examples/jsm/utils/GaussianSplatUtils.js';
 
 const EPS = 1e-6;
@@ -118,16 +118,18 @@ export default QUnit.module( 'Addons', () => {
 				const loader = new GaussianSplatPLYLoader();
 				const data = loader.parse( createPLYBuffer() );
 
-				assert.ok( data instanceof GaussianSplatData, 'returns GaussianSplatData' );
-				assert.strictEqual( data.count, 1, 'count' );
-				assert.deepEqual( Array.from( data.centers ), [ 1, 2, 3 ], 'centers' );
-				closeTo( assert, data.covariances[ 0 ], 4, 'covariance xx' );
-				closeTo( assert, data.covariances[ 1 ], 0, 'covariance xy' );
-				closeTo( assert, data.covariances[ 2 ], 0, 'covariance xz' );
-				closeTo( assert, data.covariances[ 3 ], 9, 'covariance yy' );
-				closeTo( assert, data.covariances[ 4 ], 0, 'covariance yz' );
-				closeTo( assert, data.covariances[ 5 ], 16, 'covariance zz' );
-				assert.deepEqual( Array.from( data.colors ), [ 128, 128, 128, 128 ], 'degree-0 color and opacity' );
+				const covariances = data.getAttribute( 'covariance' ).array;
+
+				assert.ok( data instanceof BufferGeometry, 'returns BufferGeometry' );
+				assert.strictEqual( data.getAttribute( 'position' ).count, 1, 'count' );
+				assert.deepEqual( Array.from( data.getAttribute( 'position' ).array ), [ 1, 2, 3 ], 'centers' );
+				closeTo( assert, covariances[ 0 ], 4, 'covariance xx' );
+				closeTo( assert, covariances[ 1 ], 0, 'covariance xy' );
+				closeTo( assert, covariances[ 2 ], 0, 'covariance xz' );
+				closeTo( assert, covariances[ 3 ], 9, 'covariance yy' );
+				closeTo( assert, covariances[ 4 ], 0, 'covariance yz' );
+				closeTo( assert, covariances[ 5 ], 16, 'covariance zz' );
+				assert.deepEqual( Array.from( data.getAttribute( 'color' ).array ), [ 128, 128, 128, 128 ], 'degree-0 color and opacity' );
 
 			} );
 
@@ -136,7 +138,7 @@ export default QUnit.module( 'Addons', () => {
 				const loader = new GaussianSplatPLYLoader();
 				const data = loader.parse( createPLYBuffer() );
 
-				assert.deepEqual( Array.from( data.colors ), [ 128, 128, 128, 128 ], 'extra f_rest_0 field does not affect baked color' );
+				assert.deepEqual( Array.from( data.getAttribute( 'color' ).array ), [ 128, 128, 128, 128 ], 'extra f_rest_0 field does not affect baked color' );
 
 			} );
 
@@ -177,7 +179,7 @@ export default QUnit.module( 'Addons', () => {
 
 				const data = loader.parse( buffer );
 
-				assert.strictEqual( data.colors[ 0 ], 255, 'red channel is decoded from f_dc_0 and clamped' );
+				assert.strictEqual( data.getAttribute( 'color' ).array[ 0 ], 255, 'red channel is decoded from f_dc_0 and clamped' );
 
 			} );
 

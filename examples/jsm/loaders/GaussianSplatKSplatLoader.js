@@ -1,10 +1,11 @@
 import {
+	BufferAttribute,
+	BufferGeometry,
 	DataUtils,
 	FileLoader,
 	Loader
 } from 'three';
 
-import { GaussianSplatData } from '../objects/GaussianSplatData.js';
 import { writeColorBytes, writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const HEADER_SIZE_BYTES = 4096;
@@ -52,7 +53,7 @@ const COMPRESSION_LEVELS = {
 /**
  * A loader for GaussianSplats3D `.ksplat` files.
  *
- * This loader decodes the format into `GaussianSplatData` for use with
+ * This loader decodes the format into `BufferGeometry` for use with
  * `GaussianSplatMesh`. Spherical harmonics payloads are skipped because the
  * current renderer uses the stored degree-0 color.
  *
@@ -83,7 +84,7 @@ class GaussianSplatKSplatLoader extends Loader {
 	 * the `onLoad()` callback.
 	 *
 	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
-	 * @param {function(GaussianSplatData)} onLoad - Executed when the loading process has been finished.
+	 * @param {function(BufferGeometry)} onLoad - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
 	 * @param {onErrorCallback} onError - Executed when errors occur.
 	 */
@@ -126,7 +127,7 @@ class GaussianSplatKSplatLoader extends Loader {
 	 * Parses the given `.ksplat` data.
 	 *
 	 * @param {ArrayBuffer} buffer - The raw KSplat file as an array buffer.
-	 * @return {GaussianSplatData} The parsed splat data.
+	 * @return {BufferGeometry} The parsed splat geometry.
 	 */
 	parse( buffer ) {
 
@@ -230,7 +231,14 @@ class GaussianSplatKSplatLoader extends Loader {
 
 		}
 
-		return new GaussianSplatData( { centers, covariances, colors, count: header.splatCount } );
+		const geometry = new BufferGeometry();
+		geometry.setAttribute( 'position', new BufferAttribute( centers, 3 ) );
+		geometry.setAttribute( 'covariance', new BufferAttribute( covariances, 6 ) );
+		geometry.setAttribute( 'color', new BufferAttribute( colors, 4, true ) );
+		geometry.computeBoundingBox();
+		geometry.computeBoundingSphere();
+
+		return geometry;
 
 	}
 

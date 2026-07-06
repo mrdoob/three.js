@@ -1,6 +1,9 @@
+import {
+	BufferAttribute,
+	BufferGeometry
+} from 'three';
 import { GLTFExporter } from '../../../../examples/jsm/exporters/GLTFExporter.js';
 import { GLTFLoader } from '../../../../examples/jsm/loaders/GLTFLoader.js';
-import { GaussianSplatData } from '../../../../examples/jsm/objects/GaussianSplatData.js';
 import { GaussianSplatMesh } from '../../../../examples/jsm/objects/GaussianSplatMesh.js';
 
 const EPS = 1e-5;
@@ -13,11 +16,14 @@ function closeTo( assert, actual, expected, message ) {
 
 function createGaussianSplatMesh() {
 
-	return new GaussianSplatMesh( new GaussianSplatData( {
-		centers: new Float32Array( [ 1, 2, 3 ] ),
-		covariances: new Float32Array( [ 4, 0, 0, 9, 0, 16 ] ),
-		colors: new Uint8Array( [ 128, 128, 128, 128 ] )
-	} ) );
+	const geometry = new BufferGeometry();
+	geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( [ 1, 2, 3 ] ), 3 ) );
+	geometry.setAttribute( 'covariance', new BufferAttribute( new Float32Array( [ 4, 0, 0, 9, 0, 16 ] ), 6 ) );
+	geometry.setAttribute( 'color', new BufferAttribute( new Uint8Array( [ 128, 128, 128, 128 ] ), 4, true ) );
+	geometry.computeBoundingBox();
+	geometry.computeBoundingSphere();
+
+	return new GaussianSplatMesh( geometry );
 
 }
 
@@ -53,13 +59,14 @@ export default QUnit.module( 'Addons', () => {
 				const json = await exporter.parseAsync( createGaussianSplatMesh() );
 				const gltf = await loader.parseAsync( JSON.stringify( json ), '' );
 				const mesh = gltf.scene.children[ 0 ];
+				const covariances = mesh.splatGeometry.getAttribute( 'covariance' ).array;
 
 				assert.ok( mesh.isGaussianSplatMesh, 'loads exported splat as GaussianSplatMesh' );
-				assert.deepEqual( Array.from( mesh.splatData.centers ), [ 1, 2, 3 ], 'round-trips centers' );
-				closeTo( assert, mesh.splatData.covariances[ 0 ], 4, 'round-trips covariance xx' );
-				closeTo( assert, mesh.splatData.covariances[ 3 ], 9, 'round-trips covariance yy' );
-				closeTo( assert, mesh.splatData.covariances[ 5 ], 16, 'round-trips covariance zz' );
-				assert.deepEqual( Array.from( mesh.splatData.colors ), [ 128, 128, 128, 128 ], 'round-trips color and opacity' );
+				assert.deepEqual( Array.from( mesh.splatGeometry.getAttribute( 'position' ).array ), [ 1, 2, 3 ], 'round-trips centers' );
+				closeTo( assert, covariances[ 0 ], 4, 'round-trips covariance xx' );
+				closeTo( assert, covariances[ 3 ], 9, 'round-trips covariance yy' );
+				closeTo( assert, covariances[ 5 ], 16, 'round-trips covariance zz' );
+				assert.deepEqual( Array.from( mesh.splatGeometry.getAttribute( 'color' ).array ), [ 128, 128, 128, 128 ], 'round-trips color and opacity' );
 
 			} );
 

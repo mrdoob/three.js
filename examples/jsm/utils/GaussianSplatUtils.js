@@ -289,4 +289,14 @@ function writeQuaternionFromRotationMatrix( target, offset, r00, r01, r02, r10, 
 
 }
 
-export { SH_C0, clampByte, decomposeCovariance, linearToSH0, sh0ToLinear, sigmoid, writeColorBytes, writeColorBytesFromSH0, writeCovariance };
+export {
+	SH_C0,
+	clampByte,
+	decomposeCovariance,
+	linearToSH0,
+	sh0ToLinear,
+	sigmoid,
+	writeColorBytes,
+	writeColorBytesFromSH0,
+	writeCovariance
+};

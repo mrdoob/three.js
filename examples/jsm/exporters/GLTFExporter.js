@@ -1852,14 +1852,18 @@ class GLTFWriter {
 	processGaussianSplatMesh( mesh ) {
 
 		const json = this.json;
-		const splatData = mesh.splatData;
-		const count = splatData.count;
-		const positions = new Float32Array( splatData.centers );
+		const positionAttribute = mesh.splatGeometry.getAttribute( 'position' );
+		const covarianceAttribute = mesh.splatGeometry.getAttribute( 'covariance' );
+		const colorAttribute = mesh.splatGeometry.getAttribute( 'color' );
+		const count = positionAttribute.count;
+		const positions = new Float32Array( positionAttribute.array );
 		const scales = new Float32Array( count * 3 );
 		const rotations = new Float32Array( count * 4 );
 		const opacities = new Uint8Array( count );
 		const sh0 = new Float32Array( count * 3 );
 		const fallbackColors = new Float32Array( count * 4 );
+		const colors = colorAttribute.array;
+		const covariances = covarianceAttribute.array;
 		const extensionDef = mesh.userData.gltfExtensions &&
 			mesh.userData.gltfExtensions.KHR_gaussian_splatting || {};
 		const colorSpace = extensionDef.colorSpace || 'srgb_rec709_display';
@@ -1868,14 +1872,14 @@ class GLTFWriter {
 
 			const i3 = i * 3;
 			const i4 = i * 4;
-			const r = splatData.colors[ i4 ] / 255;
-			const g = splatData.colors[ i4 + 1 ] / 255;
-			const b = splatData.colors[ i4 + 2 ] / 255;
-			const a = splatData.colors[ i4 + 3 ] / 255;
+			const r = colors[ i4 ] / 255;
+			const g = colors[ i4 + 1 ] / 255;
+			const b = colors[ i4 + 2 ] / 255;
+			const a = colors[ i4 + 3 ] / 255;
 
-			decomposeCovariance( splatData.covariances, i * 6, scales, rotations, i3 );
+			decomposeCovariance( covariances, i * 6, scales, rotations, i3 );
 
-			opacities[ i ] = splatData.colors[ i4 + 3 ];
+			opacities[ i ] = colors[ i4 + 3 ];
 			sh0[ i3 ] = linearToSH0( r );
 			sh0[ i3 + 1 ] = linearToSH0( g );
 			sh0[ i3 + 2 ] = linearToSH0( b );

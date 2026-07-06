@@ -1,11 +1,12 @@
 import {
+	BufferAttribute,
+	BufferGeometry,
 	DataUtils,
 	FileLoader,
 	Loader
 } from 'three';
 
 import { gunzipSync } from '../libs/fflate.module.js';
-import { GaussianSplatData } from '../objects/GaussianSplatData.js';
 import { SH_C0, writeColorBytes, writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const SPZ_MAGIC = 0x5053474e;
@@ -18,7 +19,7 @@ const SH_DEGREE_TO_VECTORS = [ 0, 3, 8, 15 ];
 /**
  * A loader for compressed Gaussian splat `.spz` files.
  *
- * This loader decodes the format into `GaussianSplatData` for use with
+ * This loader decodes the format into `BufferGeometry` for use with
  * `GaussianSplatMesh`. The current renderer supports degree-0 color only, so
  * higher-order spherical harmonics are parsed only enough to skip their payload.
  *
@@ -49,7 +50,7 @@ class GaussianSplatSPZLoader extends Loader {
 	 * the `onLoad()` callback.
 	 *
 	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
-	 * @param {function(GaussianSplatData)} onLoad - Executed when the loading process has been finished.
+	 * @param {function(BufferGeometry)} onLoad - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
 	 * @param {onErrorCallback} onError - Executed when errors occur.
 	 */
@@ -92,7 +93,7 @@ class GaussianSplatSPZLoader extends Loader {
 	 * Decompresses and parses the given `.spz` data.
 	 *
 	 * @param {ArrayBuffer} buffer - The raw gzip-compressed SPZ file as an array buffer.
-	 * @return {GaussianSplatData} The parsed splat data.
+	 * @return {BufferGeometry} The parsed splat geometry.
 	 */
 	parse( buffer ) {
 
@@ -106,7 +107,7 @@ class GaussianSplatSPZLoader extends Loader {
 	 * Parses raw SPZ data after gzip decompression.
 	 *
 	 * @param {Uint8Array} bytes - The decompressed SPZ data.
-	 * @return {GaussianSplatData} The parsed splat data.
+	 * @return {BufferGeometry} The parsed splat geometry.
 	 */
 	parseRawSPZ( bytes ) {
 
@@ -199,7 +200,14 @@ class GaussianSplatSPZLoader extends Loader {
 
 		}
 
-		return new GaussianSplatData( { centers, covariances, colors, count } );
+		const geometry = new BufferGeometry();
+		geometry.setAttribute( 'position', new BufferAttribute( centers, 3 ) );
+		geometry.setAttribute( 'covariance', new BufferAttribute( covariances, 6 ) );
+		geometry.setAttribute( 'color', new BufferAttribute( colors, 4, true ) );
+		geometry.computeBoundingBox();
+		geometry.computeBoundingSphere();
+
+		return geometry;
 
 	}
 
