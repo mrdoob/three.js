@@ -1,0 +1,241 @@
+name: Report E2E
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+
+permissions:
+  contents: read
+
+jobs:
+  report-e2e:
+    name: Comment on PR
+    runs-on: ubuntu-latest
+    # This job needs "pull-requests: write" to comment on the pull request and
+    # "contents: write" to push the failure screenshots to the "e2e-screenshots"
+    # branch so they can be embedded in the comment. We can't checkout the PR
+    # code in this workflow, and we never execute anything from the artifacts.
+    # Reference:
+    # https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+    permissions:
+      contents: write
+      pull-requests: write
+    if: github.event.workflow_run.event == 'pull_request' &&
+      (github.event.workflow_run.conclusion == 'success' ||
+      github.event.workflow_run.conclusion == 'failure')
+    steps:
+      # Using actions/download-artifact doesn't work here
+      # https://github.com/actions/download-artifact/issues/60
+      - name: Download artifacts
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        id: download
+        with:
+          script: |
+            const fs = require('fs/promises');
+
+            const runId = context.payload.workflow_run.id;
+
+            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: runId,
+            });
+
+            await fs.mkdir('screenshots', { recursive: true });
+
+            for (const artifact of artifacts) {
+
+              if (!artifact.name.startsWith('Output screenshots-') || artifact.expired) continue;
+
+              const download = await github.rest.actions.downloadArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: artifact.id,
+                archive_format: 'zip',
+              });
+
+              await fs.writeFile(`${artifact.id}.zip`, Buffer.from(download.data));
+
+              // -j flattens paths so a hostile archive can't write outside the directory
+              await exec.exec('unzip', ['-q', '-j', '-o', `${artifact.id}.zip`, '-d', 'screenshots']);
+
+            }
+
+            // The e2e test only writes these files for examples that failed.
+            // Only strictly named jpgs are accepted; everything else is ignored.
+            const pattern = /^([a-zA-Z0-9_-]+)-(actual|expected|diff)\.jpg$/;
+
+            const examples = new Map();
+
+            for (const file of await fs.readdir('screenshots')) {
+
+              const match = pattern.exec(file);
+              if (match === null) continue;
+
+              if (!examples.has(match[1])) examples.set(match[1], {});
+              examples.get(match[1])[match[2]] = file;
+
+            }
+
+            const names = [...examples.keys()].sort();
+
+            // Cap the embedded images so a broken build failing hundreds of
+            // examples doesn't blow up the comment. The rest are listed by name.
+            const MAX_EMBEDDED = 10;
+            const embedded = names.slice(0, MAX_EMBEDDED);
+
+            await fs.mkdir(`payload/${runId}`, { recursive: true });
+
+            for (const name of embedded) {
+
+              for (const file of Object.values(examples.get(name))) {
+
+                await fs.copyFile(`screenshots/${file}`, `payload/${runId}/${file}`);
+
+              }
+
+            }
+
+            const report = {
+              total: names.length,
+              embedded: embedded.map((name) => ({ name, ...examples.get(name) })),
+              omitted: names.slice(MAX_EMBEDDED),
+            };
+
+            await fs.writeFile('report.json', JSON.stringify(report));
+
+            core.setOutput('failed', names.length);
+
+      # Each run force-pushes a fresh orphan commit, so the branch stays a
+      # single small commit. The comment links images by commit sha, which
+      # keeps working until GitHub garbage-collects the unreachable commit.
+      - name: Publish images
+        id: publish
+        if: steps.download.outputs.failed != '0'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          cd payload
+          git init --quiet --initial-branch=e2e-screenshots
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit --quiet -m "E2E screenshots for run ${{ github.event.workflow_run.id }}"
+          git push --quiet --force "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/e2e-screenshots
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Comment on PR
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          IMAGES_SHA: ${{ steps.publish.outputs.sha }}
+        with:
+          script: |
+            const fs = require('fs/promises');
+
+            const run = context.payload.workflow_run;
+            const { owner, repo } = context.repo;
+
+            // workflow_run.pull_requests is empty for PRs from forks, so fall
+            // back to looking the PR up by its head. The head sha check also
+            // skips stale runs where the PR has received a newer push.
+            let pr = run.pull_requests.find((p) => p.head.sha === run.head_sha);
+
+            if (pr === undefined && run.head_repository !== null) {
+
+              const pulls = await github.rest.pulls.list({
+                owner,
+                repo,
+                state: 'open',
+                head: `${run.head_repository.owner.login}:${run.head_branch}`,
+                per_page: 100,
+              });
+
+              pr = pulls.data.find((p) => p.head.sha === run.head_sha);
+
+            }
+
+            if (pr === undefined) {
+
+              core.info('No open PR matches this run, skipping.');
+              return;
+
+            }
+
+            const report = JSON.parse(await fs.readFile('report.json', 'utf8'));
+
+            const marker = '<!-- e2e-report -->';
+            const runUrl = `https://github.com/${owner}/${repo}/actions/runs/${run.id}`;
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number: pr.number,
+              per_page: 100,
+            });
+
+            const previous = comments.find((comment) => comment.body && comment.body.includes(marker));
+
+            let body;
+
+            if (report.total > 0) {
+
+              const raw = `https://raw.githubusercontent.com/${owner}/${repo}/${process.env.IMAGES_SHA}/${run.id}`;
+              const cell = (file) => file === undefined ? '' :
+                `<a href="${raw}/${file}"><img src="${raw}/${file}" width="200"></a>`;
+
+              const rows = report.embedded.map((example) =>
+                `| \`${example.name}\` | ${cell(example.expected)} | ${cell(example.actual)} | ${cell(example.diff)} |`
+              );
+
+              const lines = [
+                marker,
+                '### 🖼️ E2E screenshot tests',
+                '',
+                `❌ **${report.total}** example(s) failed ([full artifacts](${runUrl})).`,
+                '',
+                '| Example | Expected | Actual | Diff |',
+                '|:--|:-:|:-:|:-:|',
+                ...rows,
+              ];
+
+              if (report.omitted.length > 0) {
+
+                lines.push('', `…and ${report.omitted.length} more: ${report.omitted.map((name) => `\`${name}\``).join(', ')}`);
+
+              }
+
+              body = lines.join('\n');
+
+            } else {
+
+              // Only turn a previous failure report green; don't comment on
+              // pull requests that never failed.
+              if (previous === undefined) return;
+
+              // The run can also fail on lint or unit tests. Only report
+              // success if the e2e jobs themselves all passed.
+              const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {
+                owner,
+                repo,
+                run_id: run.id,
+                filter: 'latest',
+              });
+
+              const e2eJobs = jobs.filter((job) => job.name.startsWith('E2E testing'));
+              if (e2eJobs.length === 0 || !e2eJobs.every((job) => job.conclusion === 'success')) return;
+
+              body = `${marker}\n### 🖼️ E2E screenshot tests\n\n✅ All examples render correctly again ([run](${runUrl})).`;
+
+            }
+
+            if (previous === undefined) {
+
+              await github.rest.issues.createComment({ owner, repo, issue_number: pr.number, body });
+
+            } else {
+
+              await github.rest.issues.updateComment({ owner, repo, comment_id: previous.id, body });
+
+            }
