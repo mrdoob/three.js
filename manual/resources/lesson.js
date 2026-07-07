@@ -15,7 +15,90 @@
 	}
 
 	const parts = window.location.href.split( '/' );
-	const filename = parts[ parts.length - 1 ];
+	const filename = parts[ parts.length - 1 ].split( '#' )[ 0 ];
+
+	function getHeadingId( heading ) {
+
+		const namedAnchor = heading.querySelector( 'a[name]' );
+
+		if ( namedAnchor ) {
+
+			return namedAnchor.getAttribute( 'name' );
+
+		}
+
+		const id = heading.textContent
+			.trim()
+			.toLowerCase()
+			.normalize( 'NFKD' )
+			.replace( /[\u0300-\u036f]/g, '' )
+			.replace( /[^\p{L}\p{N}]+/gu, '-' )
+			.replace( /^-+|-+$/g, '' );
+
+		return id || 'section';
+
+	}
+
+	function addHeadingIds() {
+
+		const usedIds = new Set();
+
+		document.querySelectorAll( '[id]' ).forEach( element => {
+
+			if ( element.id ) {
+
+				usedIds.add( element.id );
+
+			}
+
+		} );
+
+		document.querySelectorAll( 'h1, h2, h3, h4, h5, h6' ).forEach( heading => {
+
+			if ( heading.id ) return;
+
+			const baseId = getHeadingId( heading );
+			let id = baseId;
+			let suffix = 2;
+
+			while ( usedIds.has( id ) ) {
+
+				id = `${baseId}-${suffix ++}`;
+
+			}
+
+			heading.id = id;
+			usedIds.add( id );
+
+		} );
+
+	}
+
+	function scrollToHash() {
+
+		if ( window.location.hash.length <= 1 ) return;
+
+		let id;
+
+		try {
+
+			id = decodeURIComponent( window.location.hash.substring( 1 ) );
+
+		} catch ( e ) {
+
+			id = window.location.hash.substring( 1 );
+
+		}
+
+		const element = document.getElementById( id ) || document.getElementsByName( id )[ 0 ];
+
+		if ( element ) {
+
+			element.scrollIntoView();
+
+		}
+
+	}
 
 	if ( filename !== 'primitives.html' && filename !== 'prerequisites.html' ) {
 
@@ -30,6 +113,8 @@
 		document.body.innerHTML = text;
 
 	}
+
+	addHeadingIds();
 
 	if ( window.frameElement ) {
 
@@ -68,6 +153,8 @@
 
 	}
 
+	scrollToHash();
+
 	if ( window.prettyPrint ) {
 
 		window.prettyPrint();
@@ -87,6 +174,8 @@
 		window.threejsLessonUtils.afterPrettify();
 
 	}
+
+	scrollToHash();
 
 }() );
 

@@ -226,7 +226,7 @@
 			}
 
 			const categories = list[ language ];
-			const selectedPage = window.location.hash.substring( 1 ).replace( /\.html$/, '' );
+			const selectedPage = getSelectedPage();
 
 			for ( const category in categories ) {
 
@@ -298,7 +298,7 @@
 
 		function updateNavigation() {
 
-			const selectedPage = window.location.hash.substring( 1 ).replace( /\.html$/, '' );
+			const selectedPage = getSelectedPage();
 
 			content.querySelectorAll( 'a' ).forEach( function ( item ) {
 
@@ -432,6 +432,15 @@
 
 		// Routing
 
+		function getSelectedPage() {
+
+			return window.location.hash
+				.substring( 1 )
+				.split( '#' )[ 0 ]
+				.replace( /\.html$/, '' );
+
+		}
+
 		function setUrl( href ) {
 
 			// yea I know this is hacky.
@@ -560,6 +569,9 @@
 		}
 
 		//
+
+		window.setUrl = setUrl;
+		window.setTitle = setTitle;
 
 		console.log( [
 			'    __     __',
