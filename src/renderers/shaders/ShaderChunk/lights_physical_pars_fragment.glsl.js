@@ -430,37 +430,17 @@ vec3 BRDF_GGX_Multiscatter( const in vec3 lightDir, const in vec3 viewDir, const
 	// Single-scattering BRDF (standard GGX)
 	vec3 singleScatter = BRDF_GGX( lightDir, viewDir, normal, material );
 
-	// Multi-scattering compensation
-	float dotNL = saturate( dot( normal, lightDir ) );
 	float dotNV = saturate( dot( normal, viewDir ) );
 
-	// Precomputed DFG values for view and light directions
-	vec2 dfgV = texture2D( dfgLUT, vec2( material.roughness, dotNV ) ).rg;
-	vec2 dfgL = texture2D( dfgLUT, vec2( material.roughness, dotNL ) ).rg;
+	vec2 fab = texture2D( dfgLUT, vec2( material.roughness, dotNV ) ).rg;
 
-	// Single-scattering energy for view and light
-	vec3 FssEss_V = material.specularColorBlended * dfgV.x + material.specularF90 * dfgV.y;
-	vec3 FssEss_L = material.specularColorBlended * dfgL.x + material.specularF90 * dfgL.y;
+	// Energy of the single-scattering lobe in a white furnace ( F0 = F90 = 1 )
+	float Ess = fab.x + fab.y;
 
-	float Ess_V = dfgV.x + dfgV.y;
-	float Ess_L = dfgL.x + dfgL.y;
+	// Compensate for the energy lost to multiple scattering, tinting the added term by F0 ( equation 16 )
+	vec3 energyCompensation = 1.0 + material.specularColorBlended * ( 1.0 / Ess - 1.0 );
 
-	// Energy lost to multiple scattering
-	float Ems_V = 1.0 - Ess_V;
-	float Ems_L = 1.0 - Ess_L;
-
-	// Average Fresnel reflectance
-	vec3 Favg = material.specularColorBlended + ( 1.0 - material.specularColorBlended ) * 0.047619; // 1/21
-
-	// Multiple scattering contribution
-	vec3 Fms = FssEss_V * FssEss_L * Favg / ( 1.0 - Ems_V * Ems_L * Favg + EPSILON );
-
-	// Energy compensation factor
-	float compensationFactor = Ems_V * Ems_L;
-
-	vec3 multiScatter = Fms * compensationFactor;
-
-	return singleScatter + multiScatter;
+	return singleScatter * energyCompensation;
 
 }
 
