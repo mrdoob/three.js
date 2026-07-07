@@ -430,7 +430,7 @@ class WebGPUBackend extends Backend {
 	 * pass descriptor even when rendering directly to screen.
 	 *
 	 * @private
-	 * @return {Object} The render pass descriptor.
+	 * @return {GPURenderPassDescriptor} The render pass descriptor.
 	 */
 	_getDefaultRenderPassDescriptor() {
 
@@ -2418,6 +2418,8 @@ class WebGPUBackend extends Backend {
 
 		renderContextData.currentSets = renderContextData._currentSets;
 		renderContextData.currentPass = renderContextData._currentPass;
+		renderContextData._currentPass = null;
+		renderContextData._currentSets = null;
 
 	}
 
