@@ -2928,65 +2928,6 @@ class WebGPUBackend extends Backend {
 
 	}
 
-
-	/**
-	 * Backend data associated with a render context.
-	 *
-	 * @typedef {Object} WebGPURenderContextData
-	 * @property {GPUCommandEncoder} [encoder] - The command encoder the render context's passes are recorded into.
-	 * @property {GPURenderPassEncoder | GPURenderBundleEncoder} [currentPass] - The active render pass encoder or render bundle pass encoder associated with the provided render context.
-	 * @property {GPURenderPassDescriptor} [descriptor] - The render pass descriptor used to create the render context's current render pass encoder.
-	 * @property {{attributes: BufferAttribute[], bindingGroups: Array, pipeline: ?GPURenderPipeline, index: ?BufferAttribute}} [currentSets] - State already set on the current render pass encoder, tracked to avoid redundant calls.
-	 * @property {GPURenderPassEncoder} [_currentPass] Stash of the render pass encoder while a bundle encoder temporarily takes its place. Can be checked against as a pseudo-flag for whether the current pass encoder is a bundle encoder.
-	 * @property {Object} [_currentSets] - Stash of the state of a render pass encoder whose place is temporarily taken by a bundle encoder.
-	 * @property {Array<GPURenderBundle>} [renderBundles] - An array of render bundles to execute on the current render pass encoder in finishRender().
-	 * @property {number} [currentStencilRef] - The stencil reference value set on the current render pass encoder.
-	 * @property {GPUQuerySet} [occlusionQuerySet] - The query set for occlusion queries of the current frame.
-	 * @property {number} [occlusionQueryIndex] - The index of the next occlusion query.
-	 * @property {Array<Object3D>} [occlusionQueryObjects] - The 3D objects an occlusion query has been issued for.
-	 * @property {GPUBuffer} [occlusionQueryBuffer] - The buffer occlusion query results are copied into for read-back.
-	 * @property {?Object3D} [lastOcclusionObject] - The last 3D object an occlusion query state change was evaluated for.
-	 * @property {GPUQuerySet} [currentOcclusionQuerySet] - The previous frame's query set, kept alive until its results are resolved.
-	 * @property {GPUBuffer} [currentOcclusionQueryBuffer] - The previous frame's result buffer, reset in beginRender() and replaced with the read data from the last frame's query set.
-	 * @property {Array<Object3D>} [currentOcclusionQueryObjects] - The previous frame's query objects.
-	 * @property {WeakSet<Object3D>} [occluded] - The 3D objects determined occluded by the last resolved queries.
-	 * @property {Array<Object>} [layerDescriptors] - Per-layer render pass descriptors for layered (array camera) render targets.
-	 * @property {Array<GPURenderBundleEncoder>} [bundleEncoders] - Per-camera bundle encoders for layered render targets.
-	 * @property {Array<Object>} [bundleSets] - Per-camera state tracking for the bundle encoders.
-	 */
-
-	/**
-	 * Backend data associated with a canvas target.
-	 *
-	 * @typedef {Object} WebGPUCanvasTargetData
-	 * @property {GPURenderPassDescriptor} [descriptor] - Cached render pass descriptor of the current render context's render pass encoder.
-	 * @property {GPUCanvasContext} [context] - The WebGPU rendering context of a <canvas> element.
-	 * @property {number} [samples] - The current number of samples used for multi-sample anti-aliasing (MSAA).
-	 */
-
-	/**
-	 * Returns the backend-specific data dictionary of the given object.
-	 *
-	 * @overload
-	 * @param {CanvasTarget} object - The canvas target.
-	 * @return {WebGPUCanvasTargetData} The render target data.
-	 */
-	/**
-	 * @overload
-	 * @param {RenderContext} object - The render context.
-	 * @return {WebGPURenderContextData} The render context data.
-	 */
-	/**
-	 * @overload
-	 * @param {Object} object - The object.
-	 * @return {Object} The object's data dictionary.
-	 */
-	get( object ) {
-
-		return super.get( object );
-
-	}
-
 }
 
 export default WebGPUBackend;
