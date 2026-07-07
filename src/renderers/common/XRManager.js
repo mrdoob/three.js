@@ -953,7 +953,9 @@ class XRManager extends EventDispatcher {
 				),
 				stencilBuffer: attributes.stencil,
 				resolveDepthBuffer: false,
-				resolveStencilBuffer: false
+				resolveStencilBuffer: false,
+				storeMultisampledDepthBuffer: false,
+				storeMultisampledStencilBuffer: false
 			} );
 
 		renderTarget._autoAllocateDepthBuffer = true;
@@ -1044,7 +1046,9 @@ class XRManager extends EventDispatcher {
 				),
 				stencilBuffer: attributes.stencil,
 				resolveDepthBuffer: false,
-				resolveStencilBuffer: false
+				resolveStencilBuffer: false,
+				storeMultisampledDepthBuffer: false,
+				storeMultisampledStencilBuffer: false
 			} );
 
 		renderTarget._autoAllocateDepthBuffer = true;
@@ -1298,6 +1302,9 @@ class XRManager extends EventDispatcher {
 						samples: attributes.antialias ? 4 : 0,
 						resolveDepthBuffer: ( glProjLayer.ignoreDepthValues === false ),
 						resolveStencilBuffer: ( glProjLayer.ignoreDepthValues === false ),
+						storeMultisampledColorBuffer: false,
+						storeMultisampledDepthBuffer: ( glProjLayer.ignoreDepthValues === false ),
+						storeMultisampledStencilBuffer: ( glProjLayer.ignoreDepthValues === false ),
 						depth: this._useMultiview ? 2 : 1,
 						multiview: this._useMultiview
 					} );
@@ -1363,6 +1370,8 @@ class XRManager extends EventDispatcher {
 						stencilBuffer: renderer.stencil,
 						resolveDepthBuffer: ( glBaseLayer.ignoreDepthValues === false ),
 						resolveStencilBuffer: ( glBaseLayer.ignoreDepthValues === false ),
+						storeMultisampledDepthBuffer: ( glBaseLayer.ignoreDepthValues === false ),
+						storeMultisampledStencilBuffer: ( glBaseLayer.ignoreDepthValues === false ),
 					}
 				);
 
@@ -1716,7 +1725,9 @@ function onSessionEnd() {
 					),
 					stencilBuffer: layer.stencilBuffer,
 					resolveDepthBuffer: false,
-					resolveStencilBuffer: false
+					resolveStencilBuffer: false,
+					storeMultisampledDepthBuffer: false,
+					storeMultisampledStencilBuffer: false
 				} );
 
 			layer.renderTarget.isXRRenderTarget = false;
