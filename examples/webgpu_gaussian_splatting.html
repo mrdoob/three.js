@@ -79,22 +79,9 @@
 			const zeroVector = new THREE.Vector3();
 			let forceRender = true;
 
-			const sourceNames = {
-				'Procedural Flower (PLY, local, 1MB)': 'flower',
-				'Procedural Flower glTF (glTF, local, 3KB)': 'flowerGLTF',
-				'ReconWorldLab Demo (PLY, remote, 67 MB)': 'recon',
-				'Cool Splats Output (SPLAT, remote, 112 MB)': 'coolSplats',
-				'Niantic Horned Lizard (SPZ, remote, 18 MB)': 'hornedLizard',
-				'NerfBaselines Bonsai (KSPLAT, remote, 27 MB)': 'bonsaiKSPLAT',
-				'Debug: Single Round Splat': 'debugRound',
-				'Debug: Axis-Aligned Ellipses': 'debugAxes',
-				'Debug: Rotated Ellipses': 'debugRotated',
-				'Debug: Rotated Ellipses (no center)': 'debugRotatedNoCenter',
-				'Debug: Depth Sorting Stack': 'debugDepth',
-			};
 			const sources = {
 				flower: {
-					name: 'Procedural Flower',
+					name: 'Procedural Flower (PLY, local, 1MB)',
 					url: 'models/gsplat/procedural_flower.ply',
 					rotation: new THREE.Euler( - 0.35, 0, 0 ),
 					controls: 'orbit',
@@ -102,7 +89,7 @@
 					note: 'Procedural local CC0 sample.'
 				},
 				flowerGLTF: {
-					name: 'Procedural Flower glTF',
+					name: 'Procedural Flower glTF (glTF, local, 3KB)',
 					url: 'models/gsplat/procedural_flower.gltf',
 					createObject: loadGaussianSplatGLTF,
 					controls: 'orbit',
@@ -112,7 +99,7 @@
 					note: 'Local glTF sample using KHR_gaussian_splatting.'
 				},
 				recon: {
-					name: 'ReconWorldLab Demo',
+					name: 'ReconWorldLab Demo (PLY, remote, 67 MB)',
 					url: 'https://raw.githubusercontent.com/ReconWorldLab/godot-gaussian-splatting/main/samples/assets/demo.ply',
 					rotation: new THREE.Euler( Math.PI, 0, 0 ),
 					controls: 'orbit',
@@ -120,7 +107,7 @@
 					note: 'MIT licensed sample from ReconWorldLab/godot-gaussian-splatting.'
 				},
 				coolSplats: {
-					name: 'Cool Splats Output',
+					name: 'Cool Splats Output (SPLAT, remote, 112 MB)',
 					url: 'https://huggingface.co/datasets/runes/coolsplats/resolve/main/output.splat',
 					loader: SPLATLoader,
 					rotation: new THREE.Euler( - Math.PI * 0.5, 0, Math.PI * 0.5 ),
@@ -134,7 +121,7 @@
 					note: 'Remote standard .splat file referenced as working input in mkkellogg/GaussianSplats3D.'
 				},
 				hornedLizard: {
-					name: 'Niantic Horned Lizard',
+					name: 'Niantic Horned Lizard (SPZ, remote, 18 MB)',
 					url: 'https://raw.githubusercontent.com/nianticlabs/spz/v2.1.0/samples/hornedlizard.spz',
 					loader: SPZLoader,
 					rotation: new THREE.Euler( 0, 0, 0 ),
@@ -147,7 +134,7 @@
 					note: 'MIT licensed SPZ v2 sample from nianticlabs/spz, loaded from GitHub.'
 				},
 				bonsaiKSPLAT: {
-					name: 'NerfBaselines Bonsai',
+					name: 'NerfBaselines Bonsai (KSPLAT, remote, 27 MB)',
 					url: 'https://huggingface.co/datasets/nerfbaselines/nerfbaselines-supplementary/resolve/main/gaussian-splatting/mipnerf360/bonsai_demo/scene.ksplat',
 					loader: KSPLATLoader,
 					rotation: new THREE.Euler( Math.PI, Math.PI, 0 ),
@@ -162,7 +149,7 @@
 					note: 'Remote KSPLAT sample from nerfbaselines/nerfbaselines-supplementary, hosted on Hugging Face.'
 				},
 				debugRound: {
-					name: 'Debug Round Splat',
+					name: 'Debug: Single Round Splat',
 					createData: createDebugRoundSplat,
 					rotation: new THREE.Euler( 0, 0, 0 ),
 					controls: 'orbit',
@@ -170,7 +157,7 @@
 					note: 'One isotropic Gaussian. It should stay round while zooming.'
 				},
 				debugAxes: {
-					name: 'Debug Axis-Aligned Ellipses',
+					name: 'Debug: Axis-Aligned Ellipses',
 					createData: createDebugAxisSplats,
 					rotation: new THREE.Euler( 0, 0, 0 ),
 					controls: 'orbit',
@@ -178,7 +165,7 @@
 					note: 'Rows show X, Y and depth-axis covariance. X/Y ellipses should keep stable orientation while zooming.'
 				},
 				debugRotated: {
-					name: 'Debug Rotated Ellipses',
+					name: 'Debug: Rotated Ellipses',
 					createData: () => createDebugRotatedSplats( true ),
 					rotation: new THREE.Euler( 0, 0, 0 ),
 					controls: 'orbit',
@@ -186,7 +173,7 @@
 					note: 'A ring of 2D rotated Gaussians. Ellipse orientation should rotate smoothly around the center.'
 				},
 				debugRotatedNoCenter: {
-					name: 'Debug Rotated Ellipses (no center)',
+					name: 'Debug: Rotated Ellipses (no center)',
 					createData: () => createDebugRotatedSplats( false ),
 					rotation: new THREE.Euler( 0, 0, 0 ),
 					controls: 'orbit',
@@ -194,7 +181,7 @@
 					note: 'Same rotated ring without the center splat, useful for isolating far-side projection from blending.'
 				},
 				debugDepth: {
-					name: 'Debug Depth Sorting Stack',
+					name: 'Debug: Depth Sorting Stack',
 					createData: createDebugDepthSplats,
 					rotation: new THREE.Euler( 0, 0, 0 ),
 					controls: 'orbit',
@@ -202,9 +189,10 @@
 					note: 'Overlapping translucent layers at different depths. Orbit to validate back-to-front sorting.'
 				}
 			};
+			const sourceNames = Object.values( sources ).map( ( source ) => source.name );
 			const urlParams = new URLSearchParams( window.location.search );
 			const params = {
-				source: 'ReconWorldLab Demo (remote PLY, MIT, 67 MB)',
+				source: sources.recon.name,
 				forceWebGL: urlParams.get( 'forceWebGL' ) === 'true'
 			};
 
@@ -246,9 +234,9 @@
 				firstPersonControls.lookSpeed = 0.08;
 
 				const gui = new GUI();
-				gui.add( params, 'source', Object.keys( sourceNames ) ).name( 'Splat' ).onChange( async ( value ) => {
+				gui.add( params, 'source', sourceNames ).name( 'Splat' ).onChange( async ( value ) => {
 
-					await loadSplatSource( sourceNames[ value ] );
+					await loadSplatSource( getSourceKeyByName( value ) );
 
 				} );
 				gui.add( params, 'forceWebGL' ).name( 'forceWebGL' ).onChange( function ( value ) {
@@ -269,7 +257,7 @@
 
 				} );
 
-				await loadSplatSource( sourceNames[ params.source ] );
+				await loadSplatSource( getSourceKeyByName( params.source ) );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -320,6 +308,12 @@
 					status.textContent = `Could not load ${ source.name }: ${ error.message }`;
 
 				}
+
+			}
+
+			function getSourceKeyByName( sourceName ) {
+
+				return Object.keys( sources ).find( ( key ) => sources[ key ].name === sourceName );
 
 			}
 
