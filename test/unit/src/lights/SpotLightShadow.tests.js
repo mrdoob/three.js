@@ -66,7 +66,7 @@ export default QUnit.module( 'Lights', () => {
 			const shadow = new SpotLightShadow();
 
 			shadow.bias = 10;
-			shadow.radius = 5;
+			shadow.softness = 5;
 			shadow.mapSize.set( 128, 128 );
 			light.shadow = shadow;
 

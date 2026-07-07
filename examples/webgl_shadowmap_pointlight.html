@@ -55,7 +55,7 @@
 					light.castShadow = true;
 					light.shadow.bias = - 0.005; // reduces self-shadowing on double-sided objects
 					light.shadow.mapSize.width = 128;
-					light.shadow.radius = 10;
+					light.shadow.softness = 10;
 
 					let geometry = new THREE.SphereGeometry( 0.3, 12, 6 );
 					let material = new THREE.MeshBasicMaterial( { color: color } );

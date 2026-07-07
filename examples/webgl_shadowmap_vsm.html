@@ -48,16 +48,16 @@
 				const gui = new GUI();
 
 				const config = {
-					spotlightRadius: 4,
+					spotlightSoftness: 4,
 					spotlightSamples: 8,
-					dirlightRadius: 4,
+					dirlightSoftness: 4,
 					dirlightSamples: 8
 				};
 
 				const spotlightFolder = gui.addFolder( 'Spotlight' );
-				spotlightFolder.add( config, 'spotlightRadius' ).name( 'radius' ).min( 0 ).max( 25 ).onChange( function ( value ) {
+				spotlightFolder.add( config, 'spotlightSoftness' ).name( 'softness' ).min( 0 ).max( 25 ).onChange( function ( value ) {
 
-					spotLight.shadow.radius = value;
+					spotLight.shadow.softness = value;
 
 				} );
 
@@ -69,9 +69,9 @@
 				spotlightFolder.open();
 
 				const dirlightFolder = gui.addFolder( 'Directional Light' );
-				dirlightFolder.add( config, 'dirlightRadius' ).name( 'radius' ).min( 0 ).max( 25 ).onChange( function ( value ) {
+				dirlightFolder.add( config, 'dirlightSoftness' ).name( 'softness' ).min( 0 ).max( 25 ).onChange( function ( value ) {
 
-					dirLight.shadow.radius = value;
+					dirLight.shadow.softness = value;
 
 				} );
 
@@ -110,7 +110,7 @@
 				spotLight.shadow.mapSize.width = 256;
 				spotLight.shadow.mapSize.height = 256;
 				spotLight.shadow.bias = - 0.002;
-				spotLight.shadow.radius = 4;
+				spotLight.shadow.softness = 4;
 				scene.add( spotLight );
 
 
@@ -125,7 +125,7 @@
 				dirLight.shadow.camera.bottom = - 17;
 				dirLight.shadow.mapSize.width = 512;
 				dirLight.shadow.mapSize.height = 512;
-				dirLight.shadow.radius = 4;
+				dirLight.shadow.softness = 4;
 				dirLight.shadow.bias = - 0.0005;
 
 				dirGroup = new THREE.Group();

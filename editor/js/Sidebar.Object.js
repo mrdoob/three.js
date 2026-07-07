@@ -330,16 +330,16 @@ function SidebarObject( editor ) {
 
 	container.add( objectShadowNormalBiasRow );
 
-	// shadow radius
+	// shadow softness
 
-	const objectShadowRadiusRow = new UIRow();
+	const objectShadowSoftnessRow = new UIRow();
 
-	objectShadowRadiusRow.add( new UIText( strings.getKey( 'sidebar/object/shadowRadius' ) ).setClass( 'Label' ) );
+	objectShadowSoftnessRow.add( new UIText( strings.getKey( 'sidebar/object/shadowSoftness' ) ).setClass( 'Label' ) );
 
-	const objectShadowRadius = new UINumber( 1 ).onChange( update );
-	objectShadowRadiusRow.add( objectShadowRadius );
+	const objectShadowSoftness = new UINumber( 1 ).onChange( update );
+	objectShadowSoftnessRow.add( objectShadowSoftness );
 
-	container.add( objectShadowRadiusRow );
+	container.add( objectShadowSoftnessRow );
 
 	// visible
 
@@ -604,9 +604,9 @@ function SidebarObject( editor ) {
 
 				}
 
-				if ( object.shadow.radius !== objectShadowRadius.getValue() ) {
+				if ( object.shadow.softness !== objectShadowSoftness.getValue() ) {
 
-					editor.execute( new SetShadowValueCommand( editor, object, 'radius', objectShadowRadius.getValue() ) );
+					editor.execute( new SetShadowValueCommand( editor, object, 'softness', objectShadowSoftness.getValue() ) );
 
 				}
 
@@ -650,7 +650,7 @@ function SidebarObject( editor ) {
 			'decay': objectDecayRow,
 			'castShadow': objectShadowRow,
 			'receiveShadow': objectReceiveShadow,
-			'shadow': [ objectShadowIntensityRow, objectShadowBiasRow, objectShadowNormalBiasRow, objectShadowRadiusRow ]
+			'shadow': [ objectShadowIntensityRow, objectShadowBiasRow, objectShadowNormalBiasRow, objectShadowSoftnessRow ]
 		};
 
 		for ( const property in properties ) {
@@ -860,7 +860,7 @@ function SidebarObject( editor ) {
 			objectShadowIntensity.setValue( object.shadow.intensity );
 			objectShadowBias.setValue( object.shadow.bias );
 			objectShadowNormalBias.setValue( object.shadow.normalBias );
-			objectShadowRadius.setValue( object.shadow.radius );
+			objectShadowSoftness.setValue( object.shadow.softness );
 
 		}
 

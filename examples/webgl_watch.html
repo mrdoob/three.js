@@ -166,7 +166,7 @@
 				scene.add( dirLight );
 				const shadow = dirLight.shadow;
 				shadow.mapSize.width = shadow.mapSize.height = 2048;
-				shadow.radius = 8;
+				shadow.softness = 8;
 				shadow.bias = - 0.0005;
 				const shadowCam = shadow.camera, s = 0.5;
 				shadowCam.near = 0.1;

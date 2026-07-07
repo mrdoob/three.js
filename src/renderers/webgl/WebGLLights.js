@@ -289,7 +289,7 @@ function WebGLLights( extensions ) {
 					shadowUniforms.shadowIntensity = shadow.intensity;
 					shadowUniforms.shadowBias = shadow.bias;
 					shadowUniforms.shadowNormalBias = shadow.normalBias;
-					shadowUniforms.shadowRadius = shadow.radius;
+					shadowUniforms.shadowRadius = shadow.softness;
 					shadowUniforms.shadowMapSize = shadow.mapSize;
 
 					state.directionalShadow[ directionalLength ] = shadowUniforms;
@@ -343,7 +343,7 @@ function WebGLLights( extensions ) {
 					shadowUniforms.shadowIntensity = shadow.intensity;
 					shadowUniforms.shadowBias = shadow.bias;
 					shadowUniforms.shadowNormalBias = shadow.normalBias;
-					shadowUniforms.shadowRadius = shadow.radius;
+					shadowUniforms.shadowRadius = shadow.softness;
 					shadowUniforms.shadowMapSize = shadow.mapSize;
 
 					state.spotShadow[ spotLength ] = shadowUniforms;
@@ -385,7 +385,7 @@ function WebGLLights( extensions ) {
 					shadowUniforms.shadowIntensity = shadow.intensity;
 					shadowUniforms.shadowBias = shadow.bias;
 					shadowUniforms.shadowNormalBias = shadow.normalBias;
-					shadowUniforms.shadowRadius = shadow.radius;
+					shadowUniforms.shadowRadius = shadow.softness;
 					shadowUniforms.shadowMapSize = shadow.mapSize;
 					shadowUniforms.shadowCameraNear = shadow.camera.near;
 					shadowUniforms.shadowCameraFar = shadow.camera.far;

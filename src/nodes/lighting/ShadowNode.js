@@ -89,12 +89,12 @@ export const getShadowRenderObjectFunction = ( renderer, shadow, shadowType, use
  * @method
  * @param {Object} inputs - The input parameter object.
  * @param {Node<float>} inputs.samples - The number of samples
- * @param {Node<float>} inputs.radius - The radius.
+ * @param {Node<float>} inputs.softness - The softness.
  * @param {Node<float>} inputs.size - The size.
  * @param {TextureNode} inputs.shadowPass - A reference to the render target's depth data.
  * @return {Node<vec2>} The VSM output.
  */
-const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass, depthLayer } ) => {
+const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, softness, size, shadowPass, depthLayer } ) => {
 
 	const mean = float( 0 ).toVar( 'meanVertical' );
 	const squaredMean = float( 0 ).toVar( 'squareMeanVertical' );
@@ -106,7 +106,7 @@ const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass,
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		let depth = shadowPass.sample( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( size ) );
+		let depth = shadowPass.sample( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( softness ) ).div( size ) );
 
 		if ( shadowPass.value.isArrayTexture ) {
 
@@ -136,12 +136,12 @@ const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass,
  * @method
  * @param {Object} inputs - The input parameter object.
  * @param {Node<float>} inputs.samples - The number of samples
- * @param {Node<float>} inputs.radius - The radius.
+ * @param {Node<float>} inputs.softness - The softness.
  * @param {Node<float>} inputs.size - The size.
  * @param {TextureNode} inputs.shadowPass - The result of the first VSM render pass.
  * @return {Node<vec2>} The VSM output.
  */
-const VSMPassHorizontal = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass, depthLayer } ) => {
+const VSMPassHorizontal = /*@__PURE__*/ Fn( ( { samples, softness, size, shadowPass, depthLayer } ) => {
 
 	const mean = float( 0 ).toVar( 'meanHorizontal' );
 	const squaredMean = float( 0 ).toVar( 'squareMeanHorizontal' );
@@ -153,7 +153,7 @@ const VSMPassHorizontal = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPas
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		let distribution = shadowPass.sample( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( size ) );
+		let distribution = shadowPass.sample( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( softness ) ).div( size ) );
 
 		if ( shadowPass.value.isArrayTexture ) {
 
@@ -489,15 +489,15 @@ class ShadowNode extends ShadowBaseNode {
 			}
 
 			const samples = reference( 'blurSamples', 'float', shadow ).setGroup( renderGroup );
-			const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
+			const softness = reference( 'softness', 'float', shadow ).setGroup( renderGroup );
 			const size = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
 
 			let material = this.vsmMaterialVertical || ( this.vsmMaterialVertical = new NodeMaterial() );
-			material.fragmentNode = VSMPassVertical( { samples, radius, size, shadowPass: shadowPassVertical, depthLayer: this.depthLayer } ).context( builder.getSharedContext() );
+			material.fragmentNode = VSMPassVertical( { samples, softness, size, shadowPass: shadowPassVertical, depthLayer: this.depthLayer } ).context( builder.getSharedContext() );
 			material.name = 'VSMVertical';
 
 			material = this.vsmMaterialHorizontal || ( this.vsmMaterialHorizontal = new NodeMaterial() );
-			material.fragmentNode = VSMPassHorizontal( { samples, radius, size, shadowPass: shadowPassHorizontal, depthLayer: this.depthLayer } ).context( builder.getSharedContext() );
+			material.fragmentNode = VSMPassHorizontal( { samples, softness, size, shadowPass: shadowPassHorizontal, depthLayer: this.depthLayer } ).context( builder.getSharedContext() );
 			material.name = 'VSMHorizontal';
 
 		}

@@ -4,6 +4,7 @@ import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 import { Frustum } from '../math/Frustum.js';
 import { UnsignedByteType, WebGPUCoordinateSystem } from '../constants.js';
+import { warnOnce } from '../utils.js';
 
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld = /*@__PURE__*/ new Vector3();
@@ -84,7 +85,7 @@ class LightShadow {
 		 * @type {number}
 		 * @default 1
 		 */
-		this.radius = 1;
+		this.softness = 1;
 
 		/**
 		 * The amount of samples to use when blurring a VSM shadow map.
@@ -167,6 +168,29 @@ class LightShadow {
 			new Vector4( 0, 0, 1, 1 )
 
 		];
+
+	}
+
+	/**
+	 * The softness of the shadow.
+	 *
+	 * @deprecated since r186. Use {@link LightShadow#softness} instead.
+	 * @type {number}
+	 * @default 1
+	 */
+	get radius() {
+
+		warnOnce( 'LightShadow: The "radius" property has been renamed to "softness".' ); // @deprecated r186
+
+		return this.softness;
+
+	}
+
+	set radius( value ) {
+
+		warnOnce( 'LightShadow: The "radius" property has been renamed to "softness".' ); // @deprecated r186
+
+		this.softness = value;
 
 	}
 
@@ -293,7 +317,7 @@ class LightShadow {
 		this.intensity = source.intensity;
 
 		this.bias = source.bias;
-		this.radius = source.radius;
+		this.softness = source.softness;
 
 		this.autoUpdate = source.autoUpdate;
 		this.needsUpdate = source.needsUpdate;
@@ -332,7 +356,7 @@ class LightShadow {
 		if ( this.intensity !== 1 ) object.intensity = this.intensity;
 		if ( this.bias !== 0 ) object.bias = this.bias;
 		if ( this.normalBias !== 0 ) object.normalBias = this.normalBias;
-		if ( this.radius !== 1 ) object.radius = this.radius;
+		if ( this.softness !== 1 ) object.softness = this.softness;
 		if ( this.mapSize.x !== 512 || this.mapSize.y !== 512 ) object.mapSize = this.mapSize.toArray();
 
 		object.camera = this.camera.toJSON( false ).object;

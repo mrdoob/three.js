@@ -66,7 +66,7 @@ export default QUnit.module( 'Lights', () => {
 			const shadow = new DirectionalLightShadow();
 
 			shadow.bias = 10;
-			shadow.radius = 5;
+			shadow.softness = 5;
 			shadow.mapSize.set( 1024, 1024 );
 			light.shadow = shadow;
 

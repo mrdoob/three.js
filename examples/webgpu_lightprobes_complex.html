@@ -248,7 +248,7 @@
 				warmLight.position.set( - 4, 4.5, 0 );
 				warmLight.castShadow = true;
 				warmLight.shadow.mapSize.setScalar( 256 );
-				warmLight.shadow.radius = 12;
+				warmLight.shadow.softness = 12;
 				warmLight.shadow.bias = - 0.002;
 				scene.add( warmLight );
 
@@ -257,7 +257,7 @@
 				coolLight.position.set( 4, 4.5, 0 );
 				coolLight.castShadow = true;
 				coolLight.shadow.mapSize.setScalar( 256 );
-				coolLight.shadow.radius = 12;
+				coolLight.shadow.softness = 12;
 				coolLight.shadow.bias = - 0.002;
 				scene.add( coolLight );
 
