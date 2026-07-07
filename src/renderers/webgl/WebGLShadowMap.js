@@ -98,7 +98,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		if ( this.type === PCFSoftShadowMap ) {
 
-			warn( 'WebGLShadowMap: PCFSoftShadowMap has been deprecated. Using PCFShadowMap instead.' );
+			warn( 'WebGLShadowMap: PCFSoftShadowMap has been removed. Using PCFShadowMap instead.' );
 			this.type = PCFShadowMap;
 
 		}

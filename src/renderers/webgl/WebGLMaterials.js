@@ -483,6 +483,12 @@ function WebGLMaterials( renderer, properties ) {
 
 		}
 
+		if ( material.retroreflective > 0 ) {
+
+			uniforms.retroreflective.value = material.retroreflective;
+
+		}
+
 		if ( material.iridescence > 0 ) {
 
 			uniforms.iridescence.value = material.iridescence;

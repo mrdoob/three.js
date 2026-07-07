@@ -430,7 +430,7 @@ class WebGPUBackend extends Backend {
 	 * pass descriptor even when rendering directly to screen.
 	 *
 	 * @private
-	 * @return {Object} The render pass descriptor.
+	 * @return {GPURenderPassDescriptor} The render pass descriptor.
 	 */
 	_getDefaultRenderPassDescriptor() {
 
@@ -674,7 +674,7 @@ class WebGPUBackend extends Backend {
 					if ( textureData.msaaTexture !== undefined ) {
 
 						view = textureData.msaaTexture.createView();
-						resolveTarget = textureView;
+						resolveTarget = renderTarget.resolveColorBuffer === true ? textureView : undefined;
 
 					} else {
 
@@ -822,6 +822,15 @@ class WebGPUBackend extends Backend {
 
 			renderContextData.lastOcclusionObject = null;
 
+		} else if ( renderContextData.lastOcclusionObject !== undefined ) {
+
+			// invalidate if there is a stale query
+
+			renderContextData.lastOcclusionObject = undefined;
+
+			renderContextData.occlusionQuerySet.destroy();
+			renderContextData.occlusionQuerySet = undefined;
+
 		}
 
 		let descriptor;
@@ -841,6 +850,7 @@ class WebGPUBackend extends Backend {
 		descriptor.occlusionQuerySet = occlusionQuerySet;
 
 		const depthStencilAttachment = descriptor.depthStencilAttachment;
+		const renderTarget = renderContext.renderTarget;
 
 		if ( renderContext.textures !== null ) {
 
@@ -875,7 +885,15 @@ class WebGPUBackend extends Backend {
 
 				}
 
-				colorAttachment.storeOp = GPUStoreOp.Store;
+				if ( renderContext.sampleCount > 1 && renderTarget?.storeMultisampledColorBuffer === false ) {
+
+					colorAttachment.storeOp = GPUStoreOp.Discard;
+
+				} else {
+
+					colorAttachment.storeOp = GPUStoreOp.Store;
+
+				}
 
 			}
 
@@ -900,8 +918,6 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		const renderTarget = renderContext.renderTarget;
-
 		if ( renderContext.depth ) {
 
 			if ( renderContext.clearDepth ) {
@@ -915,7 +931,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			if ( renderContext.sampleCount > 1 && renderTarget?.resolveDepthBuffer === false ) {
+			if ( renderContext.sampleCount > 1 && renderTarget?.storeMultisampledDepthBuffer === false ) {
 
 				depthStencilAttachment.depthStoreOp = GPUStoreOp.Discard;
 
@@ -940,7 +956,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			if ( renderContext.sampleCount > 1 && renderTarget?.resolveStencilBuffer === false ) {
+			if ( renderContext.sampleCount > 1 && renderTarget?.storeMultisampledStencilBuffer === false ) {
 
 				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Discard;
 
@@ -1195,7 +1211,9 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		if ( occlusionQueryCount > renderContextData.occlusionQueryIndex ) {
+		const lastOcclusionObject = renderContextData.lastOcclusionObject;
+
+		if ( lastOcclusionObject && lastOcclusionObject.occlusionTest === true ) {
 
 			renderContextData.currentPass.endOcclusionQuery();
 
@@ -1364,9 +1382,11 @@ class WebGPUBackend extends Backend {
 
 			for ( let i = 0; i < currentOcclusionQueryObjects.length; i ++ ) {
 
-				if ( results[ i ] === BigInt( 0 ) ) {
+				const object = currentOcclusionQueryObjects[ i ];
 
-					occluded.add( currentOcclusionQueryObjects[ i ] );
+				if ( object !== undefined && results[ i ] === BigInt( 0 ) ) {
+
+					occluded.add( object );
 
 				}
 
@@ -2405,6 +2425,8 @@ class WebGPUBackend extends Backend {
 
 		renderContextData.currentSets = renderContextData._currentSets;
 		renderContextData.currentPass = renderContextData._currentPass;
+		renderContextData._currentPass = null;
+		renderContextData._currentSets = null;
 
 	}
 

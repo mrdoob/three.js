@@ -1,5 +1,5 @@
-import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, specularColorBlended, specularF90, diffuseColor, metalness, roughness, anisotropy, alphaT, anisotropyT, anisotropyB, ior, transmission, thickness, attenuationDistance, attenuationColor, dispersion } from '../../nodes/core/PropertyNode.js';
-import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialSpecularIntensity, materialSpecularColor, materialAnisotropy, materialIOR, materialTransmission, materialThickness, materialAttenuationDistance, materialAttenuationColor, materialDispersion } from '../../nodes/accessors/MaterialNode.js';
+import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, specularColorBlended, specularF90, diffuseColor, metalness, roughness, anisotropy, alphaT, anisotropyT, anisotropyB, ior, transmission, thickness, attenuationDistance, attenuationColor, dispersion, retroreflective } from '../../nodes/core/PropertyNode.js';
+import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialSpecularIntensity, materialSpecularColor, materialAnisotropy, materialIOR, materialTransmission, materialThickness, materialAttenuationDistance, materialAttenuationColor, materialDispersion, materialRetroreflective } from '../../nodes/accessors/MaterialNode.js';
 import { float, vec2, vec3, If } from '../../nodes/tsl/TSLBase.js';
 import getRoughness from '../../nodes/functions/material/getRoughness.js';
 import { TBNViewMatrix } from '../../nodes/accessors/AccessorsUtils.js';
@@ -252,6 +252,19 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		this.dispersionNode = null;
 
 		/**
+		 * The retroreflective strength of physical materials is by default inferred from the
+		 * `retroreflective` property. This node property allows to overwrite the default
+		 * and define the retroreflective strength with a node instead.
+		 *
+		 * If you don't want to overwrite the retroreflective strength but modify the existing
+		 * value instead, use {@link materialRetroreflective}.
+		 *
+		 * @type {?Node<float>}
+		 * @default null
+		 */
+		this.retroreflectiveNode = null;
+
+		/**
 		 * The anisotropy of physical materials is by default inferred from the
 		 * `anisotropy` property. This node property allows to overwrite the default
 		 * and define the anisotropy with a node instead.
@@ -343,6 +356,18 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	}
 
 	/**
+	 * Whether the lighting model should use retroreflection or not.
+	 *
+	 * @type {boolean}
+	 * @default true
+	 */
+	get useRetroreflective() {
+
+		return this.retroreflective > 0 || this.retroreflectiveNode !== null;
+
+	}
+
+	/**
 	 * Setups the specular related node variables.
 	 */
 	setupSpecular() {
@@ -363,7 +388,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	 */
 	setupLightingModel( /*builder*/ ) {
 
-		return new PhysicalLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useAnisotropy, this.useTransmission, this.useDispersion );
+		return new PhysicalLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useAnisotropy, this.useTransmission, this.useDispersion, this.useRetroreflective );
 
 	}
 
@@ -397,6 +422,16 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 			sheen.assign( sheenNode );
 			sheenRoughness.assign( sheenRoughnessNode );
+
+		}
+
+		// RETROREFLECTIVE
+
+		if ( this.useRetroreflective ) {
+
+			const retroreflectiveNode = this.retroreflectiveNode ? float( this.retroreflectiveNode ) : materialRetroreflective;
+
+			retroreflective.assign( retroreflectiveNode );
 
 		}
 

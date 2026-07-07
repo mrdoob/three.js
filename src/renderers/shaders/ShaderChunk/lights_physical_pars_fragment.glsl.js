@@ -14,6 +14,10 @@ struct PhysicalMaterial {
 	float specularF90;
 	float dispersion;
 
+	#ifdef USE_RETROREFLECTIVE
+		float retroreflective;
+	#endif
+
 	#ifdef USE_CLEARCOAT
 		float clearcoat;
 		float clearcoatRoughness;
@@ -553,7 +557,20 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
  
  	#endif
 
-	reflectedLight.directSpecular += irradiance * BRDF_GGX_Multiscatter( directLight.direction, geometryViewDir, geometryNormal, material );
+	vec3 specularBRDF = BRDF_GGX_Multiscatter( directLight.direction, geometryViewDir, geometryNormal, material );
+
+	#ifdef USE_RETROREFLECTIVE
+
+		// Minimal Retroreflective Microfacet Model:
+		// https://jcgt.org/published/0015/01/04/
+		vec3 retroViewDir = reflect( - geometryViewDir, geometryNormal );
+		vec3 retroSpecularBRDF = BRDF_GGX_Multiscatter( directLight.direction, retroViewDir, geometryNormal, material );
+
+		specularBRDF = mix( specularBRDF, retroSpecularBRDF, saturate( material.retroreflective ) );
+
+	#endif
+
+	reflectedLight.directSpecular += irradiance * specularBRDF;
 
 	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseContribution );
 }
