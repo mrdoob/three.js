@@ -29,10 +29,9 @@ const LOD_MIN = 4;
 // Used for scene blur in fromScene() method.
 const EXTRA_LODS = 6;
 
-// The maximum length of the blur for loop. Smaller sigmas will use fewer
-// samples and exit early, but not recompile the shader.
+// The number of spiral samples per blur pass.
 // Used for scene blur in fromScene() method.
-const MAX_SAMPLES = 20;
+const BLUR_SAMPLES = 20;
 
 // GGX VNDF importance sampling configuration
 const GGX_SAMPLES = 256;
@@ -45,6 +44,7 @@ let _oldActiveMipmapLevel = 0;
 let _oldXrEnabled = false;
 
 const _origin = /*@__PURE__*/ new Vector3();
+const _direction = /*@__PURE__*/ new Vector3();
 
 /**
  * This class generates a Prefiltered, Mipmapped Radiance Environment Map
@@ -562,9 +562,9 @@ class PMREMGenerator {
 	}
 
 	/**
-	 * This is a two-pass Gaussian blur for a cubemap. The blur is performed using
-	 * a spiral kernel (Golden Angle) to ensure good distribution of samples on the
-	 * sphere. We perform two passes with split sigma to improve quality and smoothness.
+	 * This is a two-pass Gaussian blur for a cubemap. Each pass importance-samples
+	 * the Gaussian along a spiral kernel (Golden Angle), which distributes samples
+	 * isotropically on the sphere (no pole artifacts).
 	 *
 	 * Used for initial scene blur in fromScene() method when sigma > 0.
 	 *
@@ -578,21 +578,13 @@ class PMREMGenerator {
 
 		const pingPongRenderTarget = this._pingPongRenderTarget;
 
-		const blurSigma = Math.sqrt( sigma * sigma / 2.0 );
+		// Two passes of sigma / sqrt( 2 ) compose to a blur of sigma while squaring
+		// the effective sample count. Sigmas beyond PI are visually indistinguishable
+		// from a uniform blur, so clamp to keep the shader math finite.
+		const blurSigma = Math.min( sigma, Math.PI ) / Math.SQRT2;
 
-		this._blurPass(
-			cubeUVRenderTarget,
-			pingPongRenderTarget,
-			lodIn,
-			lodOut,
-			blurSigma );
-
-		this._blurPass(
-			pingPongRenderTarget,
-			cubeUVRenderTarget,
-			lodOut,
-			lodOut,
-			blurSigma );
+		this._blurPass( cubeUVRenderTarget, pingPongRenderTarget, lodIn, lodOut, blurSigma );
+		this._blurPass( pingPongRenderTarget, cubeUVRenderTarget, lodOut, lodOut, blurSigma );
 
 	}
 
@@ -638,6 +630,7 @@ function _createPlanes( lodMax ) {
 		const sizeLod = Math.pow( 2, lod );
 		sizeLods.push( sizeLod );
 
+		// UVs overshoot the face by one texel to bake the CubeUV border into the directions.
 		const texelSize = 1.0 / ( sizeLod - 2 );
 		const min = - texelSize;
 		const max = 1 + texelSize;
@@ -646,11 +639,9 @@ function _createPlanes( lodMax ) {
 		const cubeFaces = 6;
 		const vertices = 6;
 		const positionSize = 3;
-		const uvSize = 2;
 
 		const position = new Float32Array( positionSize * vertices * cubeFaces );
-		const uv = new Float32Array( uvSize * vertices * cubeFaces );
-		const outputDirection = new Float32Array( 3 * vertices * cubeFaces );
+		const outputDirection = new Float32Array( positionSize * vertices * cubeFaces );
 
 		for ( let face = 0; face < cubeFaces; face ++ ) {
 
@@ -665,45 +656,40 @@ function _createPlanes( lodMax ) {
 				x, y + 1, 0
 			];
 			position.set( coordinates, positionSize * vertices * face );
-			uv.set( uv1, uvSize * vertices * face );
 
-			for ( let i = 0; i < vertices; i ++ ) {
+			for ( let vertex = 0; vertex < vertices; vertex ++ ) {
 
-				const u = uv1[ i * 2 ];
-				const v = uv1[ i * 2 + 1 ];
-				const vec = new Vector3();
+				const u = uv1[ vertex * 2 ] * 2 - 1;
+				const v = uv1[ vertex * 2 + 1 ] * 2 - 1;
 
-				// logic matching _getCommonVertexShader
-				const x = u * 2 - 1;
-				const y = v * 2 - 1;
-
+				// RH coordinate system; PMREM face-indexing convention
 				if ( face === 0 ) {
 
-					vec.set( 1, y, x );
+					_direction.set( 1, v, u ); // pos x
 
 				} else if ( face === 1 ) {
 
-					vec.set( - x, 1, - y );
+					_direction.set( - u, 1, - v ); // pos y
 
 				} else if ( face === 2 ) {
 
-					vec.set( - x, y, 1 );
+					_direction.set( - u, v, 1 ); // pos z
 
 				} else if ( face === 3 ) {
 
-					vec.set( - 1, y, - x );
+					_direction.set( - 1, v, - u ); // neg x
 
 				} else if ( face === 4 ) {
 
-					vec.set( - x, - 1, y );
+					_direction.set( - u, - 1, v ); // neg y
 
 				} else {
 
-					vec.set( x, y, - 1 );
+					_direction.set( u, v, - 1 ); // neg z
 
 				}
 
-				vec.toArray( outputDirection, ( face * vertices + i ) * 3 );
+				_direction.toArray( outputDirection, ( face * vertices + vertex ) * positionSize );
 
 			}
 
@@ -711,8 +697,7 @@ function _createPlanes( lodMax ) {
 
 		const planes = new BufferGeometry();
 		planes.setAttribute( 'position', new BufferAttribute( position, positionSize ) );
-		planes.setAttribute( 'uv', new BufferAttribute( uv, uvSize ) );
-		planes.setAttribute( 'outputDirection', new BufferAttribute( outputDirection, 3 ) );
+		planes.setAttribute( 'outputDirection', new BufferAttribute( outputDirection, positionSize ) );
 		lodMeshes.push( new Mesh( planes, null ) );
 
 		if ( lod > LOD_MIN ) {
@@ -888,7 +873,7 @@ function _getBlurShader( lodMax, width, height ) {
 		name: 'SphericalGaussianBlur',
 
 		defines: {
-			'n': MAX_SAMPLES,
+			'SAMPLES': BLUR_SAMPLES,
 			'CUBEUV_TEXEL_WIDTH': 1.0 / width,
 			'CUBEUV_TEXEL_HEIGHT': 1.0 / height,
 			'CUBEUV_MAX_MIP': `${lodMax}.0`,
@@ -904,8 +889,8 @@ function _getBlurShader( lodMax, width, height ) {
 
 		fragmentShader: /* glsl */`
 
-			precision mediump float;
-			precision mediump int;
+			precision highp float;
+			precision highp int;
 
 			varying vec3 vOutputDirection;
 
@@ -915,6 +900,9 @@ function _getBlurShader( lodMax, width, height ) {
 
 			#define ENVMAP_TYPE_CUBE_UV
 			#include <cube_uv_reflection_fragment>
+
+			#define PI 3.14159265359
+			#define GOLDEN_ANGLE 2.39996322973
 
 			void main() {
 
@@ -926,65 +914,33 @@ function _getBlurShader( lodMax, width, height ) {
 				}
 
 				vec3 outputDirection = normalize( vOutputDirection );
-				vec3 accumColor = vec3( 0.0 );
-				float accumWeight = 0.0;
 
 				vec3 up = abs( outputDirection.z ) < 0.999 ? vec3( 0.0, 0.0, 1.0 ) : vec3( 1.0, 0.0, 0.0 );
 				vec3 tangent = normalize( cross( up, outputDirection ) );
 				vec3 bitangent = cross( outputDirection, tangent );
 
-				// Golden angle
-				float phi = 0.0;
-				const float goldenAngle = 2.3999632;
+				// Truncate the kernel at three standard deviations or at the antipode.
+				float thetaMax = min( 3.0 * sigma, PI );
+				float truncation = 1.0 - exp( - 0.5 * thetaMax * thetaMax / ( sigma * sigma ) );
 
-				// Precompute sine/cosine of golden angle for incremental rotation
-				float sinPhi = sin( goldenAngle );
-				float cosPhi = cos( goldenAngle );
+				vec3 accumColor = vec3( 0.0 );
+				float accumWeight = 0.0;
 
-				// Initial rotation (phi = 0)
-				float cp = 1.0;
-				float sp = 0.0;
+				for ( int i = 0; i < SAMPLES; i ++ ) {
 
-				for ( int i = 0; i < n; i ++ ) {
+					// Stratified inverse-CDF sampling of the Gaussian, placed on a golden-angle spiral.
+					float stratum = ( float( i ) + 0.5 ) / float( SAMPLES );
+					float theta = sigma * sqrt( - 2.0 * log( 1.0 - stratum * truncation ) );
+					float phi = float( i ) * GOLDEN_ANGLE;
 
-					// Spiral radius (0 to 1)
-					float r = sqrt( ( float( i ) + 0.5 ) / float( n ) );
-					
-					// Map radius to theta (spread)
-					// 3 sigma covers ~99.7% of the gaussian
-					float theta = r * 3.0 * sigma;
+					vec3 offset = cos( phi ) * tangent + sin( phi ) * bitangent;
+					vec3 sampleDirection = cos( theta ) * outputDirection + sin( theta ) * offset;
 
-					// Calculate axis of rotation in tangent plane
-					// axis = -sin(phi) * tangent + cos(phi) * bitangent
-					vec3 axis = - sp * tangent + cp * bitangent;
+					// Correct the planar sample density to solid angle.
+					float weight = sin( theta ) / theta;
 
-					// Rotate N around axis by theta
-					// Since N is perpendicular to axis, simplified Rodrigues formula:
-					// result = N * cos(theta) + cross(axis, N) * sin(theta)
-					// cross(axis, N) = sin(phi) * bitangent + cos(phi) * tangent = dir
-					// So result = N * cos(theta) + dir * sin(theta)
-					
-					// However, we can compute the offset vector directly in tangent space
-					// offset = ( tangent * cp + bitangent * sp ) * sin( theta );
-					
-					float sinTheta = sin( theta );
-					float cosTheta = cos( theta );
-					
-					vec3 sampleDir = outputDirection * cosTheta + ( tangent * cp + bitangent * sp ) * sinTheta;
-
-					// Gaussian weight
-					// We sample 'n' points. We assume they are area-weighted by the spiral pattern.
-					// We just need the gaussian falloff.
-					float w = exp( - 0.5 * ( theta * theta ) / ( sigma * sigma ) );
-
-					accumColor += w * bilinearCubeUV( envMap, normalize( sampleDir ), mipInt );
-					accumWeight += w;
-
-					// Update phi for next sample
-					float cp_next = cp * cosPhi - sp * sinPhi;
-					float sp_next = sp * cosPhi + cp * sinPhi;
-					cp = cp_next;
-					sp = sp_next;
+					accumColor += weight * bilinearCubeUV( envMap, sampleDirection, mipInt );
+					accumWeight += weight;
 
 				}
 
