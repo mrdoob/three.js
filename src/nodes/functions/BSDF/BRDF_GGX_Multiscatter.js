@@ -9,14 +9,14 @@ import { Fn, float } from '../../tsl/TSLBase.js';
 // This provides more accurate energy conservation, especially for rough materials
 // Based on "Practical Multiple Scattering Compensation for Microfacet Models"
 // https://blog.selfshadow.com/publications/turquin/ms_comp_final.pdf
-const BRDF_GGX_Multiscatter = /*@__PURE__*/ Fn( ( { lightDirection, f0, f90, roughness: _roughness, f, USE_IRIDESCENCE, USE_ANISOTROPY } ) => {
+const BRDF_GGX_Multiscatter = /*@__PURE__*/ Fn( ( { lightDirection, viewDirection = positionViewDirection, f0, f90, roughness: _roughness, f, USE_IRIDESCENCE, USE_ANISOTROPY } ) => {
 
 	// Single-scattering BRDF (standard GGX)
-	const singleScatter = BRDF_GGX( { lightDirection, f0, f90, roughness: _roughness, f, USE_IRIDESCENCE, USE_ANISOTROPY } );
+	const singleScatter = BRDF_GGX( { lightDirection, viewDirection, f0, f90, roughness: _roughness, f, USE_IRIDESCENCE, USE_ANISOTROPY } );
 
 	// Multi-scattering compensation
 	const dotNL = normalView.dot( lightDirection ).clamp();
-	const dotNV = normalView.dot( positionViewDirection ).clamp();
+	const dotNV = normalView.dot( viewDirection ).clamp();
 
 	// Precomputed DFG values for view and light directions
 	const dfgV = DFGLUT( { roughness: _roughness, dotNV } );

@@ -463,6 +463,7 @@ MaterialNode.LINE_WIDTH = 'linewidth';
 MaterialNode.LINE_DASH_OFFSET = 'dashOffset';
 MaterialNode.POINT_SIZE = 'size';
 MaterialNode.DISPERSION = 'dispersion';
+MaterialNode.RETROREFLECTIVE = 'retroreflective';
 MaterialNode.LIGHT_MAP = 'light';
 MaterialNode.AO = 'ao';
 
@@ -763,6 +764,14 @@ export const materialPointSize = /*@__PURE__*/ nodeImmutable( MaterialNode, Mate
  * @type {Node<float>}
  */
 export const materialDispersion = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.DISPERSION );
+
+/**
+ * TSL object that represents the retroreflective strength of the current material.
+ *
+ * @tsl
+ * @type {Node<float>}
+ */
+export const materialRetroreflective = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.RETROREFLECTIVE );
 
 /**
  * TSL object that represents the light map of the current material.

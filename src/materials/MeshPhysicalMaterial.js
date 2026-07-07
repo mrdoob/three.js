@@ -19,6 +19,8 @@ import { clamp } from '../math/MathUtils.js';
  * transparent materials are less reflective. Physically-based transmission provides a more
  * realistic option for thin, transparent surfaces like glass.
  * - Advanced reflectivity: More flexible reflectivity for non-metallic materials.
+ * - Retroreflection: Redirects specular light back toward the light source for
+ * safety materials like road markings and reflective tape.
  * - Sheen: Can be used for representing cloth and fabric materials.
  *
  * As a result of these complex shading features, `MeshPhysicalMaterial` has a
@@ -354,6 +356,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this._clearcoat = 0;
 		this._dispersion = 0;
 		this._iridescence = 0;
+		this._retroreflective = 0;
 		this._sheen = 0.0;
 		this._transmission = 0;
 
@@ -462,6 +465,33 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 	}
 
 	/**
+	 * The strength of retroreflection, from `0.0` to `1.0`. A value of `1.0`
+	 * evaluates the material's microfacet reflection with the view direction
+	 * reflected about the surface normal, redirecting the specular lobe back
+	 * toward the light source.
+	 *
+	 * @type {number}
+	 * @default 0
+	 */
+	get retroreflective() {
+
+		return this._retroreflective;
+
+	}
+
+	set retroreflective( value ) {
+
+		if ( this._retroreflective > 0 !== value > 0 ) {
+
+			this.version ++;
+
+		}
+
+		this._retroreflective = value;
+
+	}
+
+	/**
 	 * The intensity of the sheen layer, from `0.0` to `1.0`.
 	 *
 	 * @type {number}
@@ -545,6 +575,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.iridescenceIOR = source.iridescenceIOR;
 		this.iridescenceThicknessRange = [ ...source.iridescenceThicknessRange ];
 		this.iridescenceThicknessMap = source.iridescenceThicknessMap;
+
+		this.retroreflective = source.retroreflective;
 
 		this.sheen = source.sheen;
 		this.sheenColor.copy( source.sheenColor );
