@@ -30,12 +30,12 @@ class RenderTarget extends EventDispatcher {
 	 * @property {string} [colorSpace=NoColorSpace] - The texture's color space.
 	 * @property {boolean} [depthBuffer=true] - Whether to allocate a depth buffer or not.
 	 * @property {boolean} [stencilBuffer=false] - Whether to allocate a stencil buffer or not.
-	 * @property {boolean} [resolveColorBuffer=true] - Whether to resolve the color buffer or not.
-	 * @property {boolean} [resolveDepthBuffer=true] - Whether to resolve the depth buffer or not.
-	 * @property {boolean} [resolveStencilBuffer=true] - Whether  to resolve the stencil buffer or not.
-	 * @property {boolean} [storeMultisampledColorBuffer=true] - Whether to store the multisampled color buffer or not.
-	 * @property {boolean} [storeMultisampledDepthBuffer=true] - Whether to store the multisampled depth buffer or not.
-	 * @property {boolean} [storeMultisampledStencilBuffer=true] - Whether to store the multisampled stencil buffer or not.
+	 * @property {boolean} [resolveColorBuffer=true] - Whether to resolve the color buffer or not. Only relevant for multisampled render targets.
+	 * @property {boolean} [resolveDepthBuffer=true] - Whether to resolve the depth buffer or not. Only relevant for multisampled render targets.
+	 * @property {boolean} [resolveStencilBuffer=true] - Whether to resolve the stencil buffer or not. Only relevant for multisampled render targets.
+	 * @property {boolean} [storeMultisampledColorBuffer=true] - Whether to store the multisampled color buffer or not. Setting to `false` saves memory bandwidth when the multisampled data are not needed after a render pass.
+	 * @property {boolean} [storeMultisampledDepthBuffer=true] - Whether to store the multisampled depth buffer or not. Setting to `false` saves memory bandwidth when the multisampled data are not needed after a render pass.
+	 * @property {boolean} [storeMultisampledStencilBuffer=true] - Whether to store the multisampled stencil buffer or not. Setting to `false` saves memory bandwidth when the multisampled data are not needed after a render pass.
 	 * @property {?Texture} [depthTexture=null] - Reference to a depth texture.
 	 * @property {number} [samples=0] - The MSAA samples count.
 	 * @property {number} [count=1] - Defines the number of color attachments . Must be at least `1`.
@@ -173,7 +173,12 @@ class RenderTarget extends EventDispatcher {
 		this.stencilBuffer = options.stencilBuffer;
 
 		/**
-		 * Whether to resolve the color buffer or not.
+		 * Whether to resolve the color buffer or not. When set to `false`, the color
+		 * attachments do not receive the resolved (single-sampled) output of a render
+		 * pass and the render target's textures are left untouched. The rendered
+		 * content is then only accessible within the render pass itself.
+		 *
+		 * Only relevant for multisampled render targets.
 		 *
 		 * @type {boolean}
 		 * @default true
@@ -181,7 +186,15 @@ class RenderTarget extends EventDispatcher {
 		this.resolveColorBuffer = options.resolveColorBuffer;
 
 		/**
-		 * Whether to resolve the depth buffer or not.
+		 * Whether to resolve the depth buffer or not. When set to `false`, the depth
+		 * texture does not receive the resolved depth output of a render pass which
+		 * saves memory bandwidth. Use this setting when the depth data of a render
+		 * pass are not required afterwards.
+		 *
+		 * Only relevant for multisampled render targets in WebGL. WebGPU does not
+		 * support depth resolves; sampling the depth texture of a multisampled render
+		 * target accesses the multisampled data directly, see
+		 * {@link RenderTarget#storeMultisampledDepthBuffer}.
 		 *
 		 * @type {boolean}
 		 * @default true
@@ -189,7 +202,8 @@ class RenderTarget extends EventDispatcher {
 		this.resolveDepthBuffer = options.resolveDepthBuffer;
 
 		/**
-		 * Whether to resolve the stencil buffer or not.
+		 * Whether to resolve the stencil buffer or not. Analogous to
+		 * {@link RenderTarget#resolveDepthBuffer} but for the stencil aspect.
 		 *
 		 * @type {boolean}
 		 * @default true
@@ -197,7 +211,16 @@ class RenderTarget extends EventDispatcher {
 		this.resolveStencilBuffer = options.resolveStencilBuffer;
 
 		/**
-		 * Whether to store the multisampled color buffer or not.
+		 * Whether to store the multisampled color buffer or not. When set to `false`,
+		 * the multisampled data are discarded at the end of a render pass, right after
+		 * they have been resolved. This saves memory bandwidth, especially on tile-based
+		 * GPUs, and is the recommended setting for render targets that are fully redrawn
+		 * each frame and whose output is only accessed via the resolved textures (e.g.
+		 * scene passes in post-processing chains).
+		 *
+		 * Must be kept `true` when the multisampled data are needed after the render
+		 * pass ends, e.g. when rendering into the target without clearing or when the
+		 * scene contains transmissive objects which require a mid-pass framebuffer copy.
 		 *
 		 * @type {boolean}
 		 * @default true
@@ -205,7 +228,13 @@ class RenderTarget extends EventDispatcher {
 		this.storeMultisampledColorBuffer = options.storeMultisampledColorBuffer;
 
 		/**
-		 * Whether to store the multisampled depth buffer or not.
+		 * Whether to store the multisampled depth buffer or not. When set to `false`,
+		 * the multisampled depth data are discarded at the end of a render pass which
+		 * saves memory bandwidth.
+		 *
+		 * Must be kept `true` in WebGPU when the depth texture of a multisampled render
+		 * target is sampled (e.g. by depth-based post-processing effects) since depth
+		 * is read directly from the multisampled data.
 		 *
 		 * @type {boolean}
 		 * @default true
@@ -213,7 +242,8 @@ class RenderTarget extends EventDispatcher {
 		this.storeMultisampledDepthBuffer = options.storeMultisampledDepthBuffer;
 
 		/**
-		 * Whether to store the multisampled stencil buffer or not.
+		 * Whether to store the multisampled stencil buffer or not. Analogous to
+		 * {@link RenderTarget#storeMultisampledDepthBuffer} but for the stencil aspect.
 		 *
 		 * @type {boolean}
 		 * @default true
