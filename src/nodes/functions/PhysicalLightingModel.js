@@ -459,14 +459,6 @@ class PhysicalLightingModel extends LightingModel {
 		this.iridescenceFresnel = null;
 
 		/**
-		 * The iridescence F0.
-		 *
-		 * @type {?Node}
-		 * @default null
-		 */
-		this.iridescenceF0 = null;
-
-		/**
 		 * The iridescence F0 dielectric.
 		 *
 		 * @type {?Node}
@@ -531,8 +523,6 @@ class PhysicalLightingModel extends LightingModel {
 
 			this.iridescenceF0Dielectric = Schlick_to_F0( { f: iridescenceFresnelDielectric, f90: 1.0, dotVH: dotNVi } );
 			this.iridescenceF0Metallic = Schlick_to_F0( { f: iridescenceFresnelMetallic, f90: 1.0, dotVH: dotNVi } );
-
-			this.iridescenceF0 = mix( this.iridescenceF0Dielectric, this.iridescenceF0Metallic, metalness );
 
 		}
 
