@@ -1,5 +1,5 @@
 import NodeMaterial from '../../../materials/nodes/NodeMaterial.js';
-import { blur, ggxConvolution } from '../../../nodes/pmrem/PMREMUtils.js';
+import { sphericalGaussianBlur, ggxConvolution } from '../../../nodes/pmrem/PMREMUtils.js';
 import { equirectUV } from '../../../nodes/utils/EquirectUV.js';
 import { uniform } from '../../../nodes/core/UniformNode.js';
 import { texture } from '../../../nodes/accessors/TextureNode.js';
@@ -887,7 +887,7 @@ function _getBlurShader( lodMax, width, height ) {
 	};
 
 	const material = _getMaterial( 'blur' );
-	material.fragmentNode = blur( {
+	material.fragmentNode = sphericalGaussianBlur( {
 		...materialUniforms,
 		outputDirection: _outputDirection,
 		SAMPLES: int( BLUR_SAMPLES )

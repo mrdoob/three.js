@@ -245,7 +245,7 @@ const bilinearCubeUV = /*@__PURE__*/ Fn( ( [ envMap, direction_immutable, mipInt
 
 // Gaussian blur along a golden-angle spiral, importance-sampled by stratified
 // inverse-CDF so every sample carries equal Gaussian weight.
-export const blur = /*@__PURE__*/ Fn( ( { SAMPLES, sigma, outputDirection, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
+export const sphericalGaussianBlur = /*@__PURE__*/ Fn( ( { SAMPLES, sigma, outputDirection, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
 
 	const color = vec3( 0.0 ).toVar();
 
