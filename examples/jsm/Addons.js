@@ -92,6 +92,7 @@ export * from './loaders/EXRLoader.js';
 export * from './loaders/FBXLoader.js';
 export * from './loaders/FontLoader.js';
 export * from './loaders/GCodeLoader.js';
+export * from './loaders/GLTFGaussianSplattingExtension.js';
 export * from './loaders/GLTFLoader.js';
 export * from './loaders/HDRLoader.js';
 export * from './loaders/HDRCubeTextureLoader.js';

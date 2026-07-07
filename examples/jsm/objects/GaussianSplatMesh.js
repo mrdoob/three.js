@@ -57,7 +57,12 @@ const _cameraDirection = /*@__PURE__*/ new Vector3();
 const _sortDepthRange = /*@__PURE__*/ new Vector2();
 
 /**
- * A minimal WebGPU/TSL renderer for 3D Gaussian splat geometry.
+ * A minimal renderer for 3D Gaussian splat geometry.
+ *
+ * Note that this class can only be used with {@link WebGPURenderer}. The
+ * `forceWebGL` fallback of {@link WebGPURenderer} is supported, but
+ * {@link WebGLRenderer} is not. Import maps or package exports must resolve
+ * both `three/webgpu` and `three/tsl`.
  *
  * ```js
  * const splats = new GaussianSplatMesh( geometry );

@@ -1,4 +1,5 @@
 import { GLTFLoader } from '../../../../examples/jsm/loaders/GLTFLoader.js';
+import { GLTFGaussianSplattingExtension } from '../../../../examples/jsm/loaders/GLTFGaussianSplattingExtension.js';
 
 const EPS = 1e-6;
 const FLOAT = 5126;
@@ -123,6 +124,12 @@ export default QUnit.module( 'Addons', () => {
 			QUnit.test( 'loads KHR_gaussian_splatting primitives as GaussianSplatMesh', async ( assert ) => {
 
 				const loader = new GLTFLoader();
+				loader.register( function ( parser ) {
+
+					return new GLTFGaussianSplattingExtension( parser );
+
+				} );
+
 				const gltf = await loader.parseAsync( JSON.stringify( createGaussianSplatGLTF() ), '' );
 				const mesh = gltf.scene.children[ 0 ];
 				const covariances = mesh.splatGeometry.getAttribute( 'covariance' ).array;

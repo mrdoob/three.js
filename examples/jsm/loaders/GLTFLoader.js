@@ -67,7 +67,6 @@ import {
 } from 'three';
 import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils.js';
 import { clone } from '../utils/SkeletonUtils.js';
-import { writeColorBytesFromSH0, writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 /**
  * A loader for the glTF 2.0 format.
@@ -84,7 +83,6 @@ import { writeColorBytesFromSH0, writeCovariance } from '../utils/GaussianSplatU
  *
  * `GLTFLoader` supports the following glTF 2.0 extensions:
  * - KHR_draco_mesh_compression
- * - KHR_gaussian_splatting
  * - KHR_lights_punctual
  * - KHR_materials_anisotropy
  * - KHR_materials_clearcoat
@@ -106,7 +104,8 @@ import { writeColorBytesFromSH0, writeCovariance } from '../utils/GaussianSplatU
  * - EXT_texture_avif
  * - EXT_texture_webp
  *
- * The following glTF 2.0 extension is supported by an external user plugin:
+ * The following glTF 2.0 extensions are supported by separately registered plugins:
+ * - KHR_gaussian_splatting
  * - [KHR_materials_variants](https://github.com/takahirox/three-gltf-extensions)
  * - [MSFT_texture_dds](https://github.com/takahirox/three-gltf-extensions)
  * - [KHR_animation_pointer](https://github.com/needle-tools/three-animation-pointer)
@@ -523,10 +522,6 @@ class GLTFLoader extends Loader {
 						extensions[ extensionName ] = new GLTFDracoMeshCompressionExtension( json, this.dracoLoader );
 						break;
 
-					case EXTENSIONS.KHR_GAUSSIAN_SPLATTING:
-						extensions[ extensionName ] = true;
-						break;
-
 					case EXTENSIONS.KHR_TEXTURE_TRANSFORM:
 						extensions[ extensionName ] = new GLTFTextureTransformExtension();
 						break;
@@ -634,7 +629,6 @@ function getMaterialExtension( parser, materialIndex, extensionName ) {
 const EXTENSIONS = {
 	KHR_BINARY_GLTF: 'KHR_binary_glTF',
 	KHR_DRACO_MESH_COMPRESSION: 'KHR_draco_mesh_compression',
-	KHR_GAUSSIAN_SPLATTING: 'KHR_gaussian_splatting',
 	KHR_LIGHTS_PUNCTUAL: 'KHR_lights_punctual',
 	KHR_MATERIALS_CLEARCOAT: 'KHR_materials_clearcoat',
 	KHR_MATERIALS_DISPERSION: 'KHR_materials_dispersion',
@@ -3919,9 +3913,7 @@ class GLTFParser {
 
 				} else if ( primitive.mode === WEBGL_CONSTANTS.POINTS ) {
 
-					mesh = isGaussianSplatPrimitive( primitive )
-						? await createGaussianSplatMesh( geometry, primitive )
-						: new Points( geometry, material );
+					mesh = new Points( geometry, material );
 
 				} else {
 
@@ -3941,7 +3933,7 @@ class GLTFParser {
 
 				if ( primitive.extensions ) addUnknownExtensionsToUserData( extensions, mesh, primitive );
 
-				if ( mesh.isGaussianSplatMesh !== true ) parser.assignFinalMaterial( mesh );
+				parser.assignFinalMaterial( mesh );
 
 				meshes.push( mesh );
 
@@ -4699,138 +4691,6 @@ class GLTFParser {
 		track.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline = true;
 
 	}
-
-}
-
-function isGaussianSplatPrimitive( primitiveDef ) {
-
-	return primitiveDef.extensions !== undefined &&
-		primitiveDef.extensions[ EXTENSIONS.KHR_GAUSSIAN_SPLATTING ] !== undefined;
-
-}
-
-async function createGaussianSplatMesh( geometry, primitiveDef ) {
-
-	const extensionDef = primitiveDef.extensions[ EXTENSIONS.KHR_GAUSSIAN_SPLATTING ];
-
-	if ( extensionDef.kernel !== 'ellipse' ) {
-
-		throw new Error( 'THREE.GLTFLoader: Unsupported KHR_gaussian_splatting kernel.' );
-
-	}
-
-	if ( extensionDef.colorSpace === undefined ) {
-
-		throw new Error( 'THREE.GLTFLoader: KHR_gaussian_splatting colorSpace is required.' );
-
-	}
-
-	if ( extensionDef.projection !== undefined && extensionDef.projection !== 'perspective' ) {
-
-		console.warn( 'THREE.GLTFLoader: Unsupported KHR_gaussian_splatting projection. Results may be incorrect.' );
-
-	}
-
-	if ( extensionDef.sortingMethod !== undefined && extensionDef.sortingMethod !== 'cameraDistance' ) {
-
-		console.warn( 'THREE.GLTFLoader: Unsupported KHR_gaussian_splatting sortingMethod. Results may be incorrect.' );
-
-	}
-
-	const position = getGaussianSplatAttribute( geometry, primitiveDef, 'POSITION' );
-	const scale = getGaussianSplatAttribute( geometry, primitiveDef, 'KHR_gaussian_splatting:SCALE' );
-	const rotation = getGaussianSplatAttribute( geometry, primitiveDef, 'KHR_gaussian_splatting:ROTATION' );
-	const opacity = getGaussianSplatAttribute( geometry, primitiveDef, 'KHR_gaussian_splatting:OPACITY' );
-	const sh0 = getGaussianSplatAttribute( geometry, primitiveDef, 'KHR_gaussian_splatting:SH_DEGREE_0_COEF_0' );
-	const count = position.count;
-
-	if ( scale.count !== count || rotation.count !== count || opacity.count !== count || sh0.count !== count ) {
-
-		throw new Error( 'THREE.GLTFLoader: KHR_gaussian_splatting attribute counts must match POSITION.' );
-
-	}
-
-	for ( const semantic in primitiveDef.attributes ) {
-
-		if ( /^KHR_gaussian_splatting:SH_DEGREE_[1-3]_COEF_/.test( semantic ) ) {
-
-			console.warn( 'THREE.GLTFLoader: KHR_gaussian_splatting spherical harmonics above degree 0 are ignored.' );
-			break;
-
-		}
-
-	}
-
-	const centers = new Float32Array( count * 3 );
-	const covariances = new Float32Array( count * 6 );
-	const colors = new Uint8Array( count * 4 );
-
-	for ( let i = 0; i < count; i ++ ) {
-
-		const i3 = i * 3;
-
-		centers[ i3 ] = position.getX( i );
-		centers[ i3 + 1 ] = position.getY( i );
-		centers[ i3 + 2 ] = position.getZ( i );
-
-		writeCovariance(
-			covariances,
-			i * 6,
-			scale.getX( i ),
-			scale.getY( i ),
-			scale.getZ( i ),
-			rotation.getX( i ),
-			rotation.getY( i ),
-			rotation.getZ( i ),
-			rotation.getW( i )
-		);
-
-		writeColorBytesFromSH0(
-			colors,
-			i * 4,
-			sh0.getX( i ),
-			sh0.getY( i ),
-			sh0.getZ( i ),
-			opacity.getX( i )
-		);
-
-	}
-
-	const { GaussianSplatMesh } = await import( '../objects/GaussianSplatMesh.js' );
-	const splatGeometry = new BufferGeometry();
-	splatGeometry.setAttribute( 'position', new BufferAttribute( centers, 3 ) );
-	splatGeometry.setAttribute( 'covariance', new BufferAttribute( covariances, 6 ) );
-	splatGeometry.setAttribute( 'color', new BufferAttribute( colors, 4, true ) );
-	splatGeometry.computeBoundingBox();
-	splatGeometry.computeBoundingSphere();
-
-	const mesh = new GaussianSplatMesh( splatGeometry );
-
-	mesh.userData.gltfExtensions = mesh.userData.gltfExtensions || {};
-	mesh.userData.gltfExtensions[ EXTENSIONS.KHR_GAUSSIAN_SPLATTING ] = Object.assign( {}, extensionDef );
-
-	return mesh;
-
-}
-
-function getGaussianSplatAttribute( geometry, primitiveDef, semantic ) {
-
-	if ( primitiveDef.attributes[ semantic ] === undefined ) {
-
-		throw new Error( `THREE.GLTFLoader: KHR_gaussian_splatting requires ${ semantic }.` );
-
-	}
-
-	const attributeName = ATTRIBUTES[ semantic ] || semantic.toLowerCase();
-	const attribute = geometry.getAttribute( attributeName );
-
-	if ( attribute === undefined ) {
-
-		throw new Error( `THREE.GLTFLoader: KHR_gaussian_splatting attribute ${ semantic } was not loaded.` );
-
-	}
-
-	return attribute;
 
 }
 

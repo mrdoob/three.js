@@ -128,8 +128,7 @@ function SidebarProjectApp( editor ) {
 				WebGPURenderer: {
 					imports: {
 						'three': './js/three.webgpu.js',
-						'three/webgpu': './js/three.webgpu.js',
-						'three/tsl': './js/three.tsl.js'
+						'three/webgpu': './js/three.webgpu.js'
 					}
 				}
 			};
@@ -174,12 +173,6 @@ function SidebarProjectApp( editor ) {
 			loader.load( '../build/three.webgpu.js', function ( content ) {
 
 				toZip[ 'js/three.webgpu.js' ] = strToU8( content );
-
-			} );
-
-			loader.load( '../build/three.tsl.js', function ( content ) {
-
-				toZip[ 'js/three.tsl.js' ] = strToU8( content );
 
 			} );
 

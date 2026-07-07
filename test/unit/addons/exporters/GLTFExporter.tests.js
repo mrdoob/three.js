@@ -3,6 +3,7 @@ import {
 	BufferGeometry
 } from 'three';
 import { GLTFExporter } from '../../../../examples/jsm/exporters/GLTFExporter.js';
+import { GLTFGaussianSplattingExtension } from '../../../../examples/jsm/loaders/GLTFGaussianSplattingExtension.js';
 import { GLTFLoader } from '../../../../examples/jsm/loaders/GLTFLoader.js';
 import { GaussianSplatMesh } from '../../../../examples/jsm/objects/GaussianSplatMesh.js';
 
@@ -56,6 +57,12 @@ export default QUnit.module( 'Addons', () => {
 
 				const exporter = new GLTFExporter();
 				const loader = new GLTFLoader();
+				loader.register( function ( parser ) {
+
+					return new GLTFGaussianSplattingExtension( parser );
+
+				} );
+
 				const json = await exporter.parseAsync( createGaussianSplatMesh() );
 				const gltf = await loader.parseAsync( JSON.stringify( json ), '' );
 				const mesh = gltf.scene.children[ 0 ];

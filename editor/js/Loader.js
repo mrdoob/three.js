@@ -611,26 +611,6 @@ function Loader( editor ) {
 
 			}
 
-			case 'ksplat':
-
-			{
-
-				reader.addEventListener( 'load', async function ( event ) {
-
-					const contents = event.target.result;
-
-					const { KSPLATLoader } = await import( 'three/addons/loaders/KSPLATLoader.js' );
-					const splatData = new KSPLATLoader().parse( contents );
-
-					await addGaussianSplatObject( splatData, filename );
-
-				}, false );
-				reader.readAsArrayBuffer( file );
-
-				break;
-
-			}
-
 			case 'ply':
 
 			{
@@ -638,22 +618,6 @@ function Loader( editor ) {
 				reader.addEventListener( 'load', async function ( event ) {
 
 					const contents = event.target.result;
-
-					if ( isGaussianSplatPLY( contents ) ) {
-
-						const { PLYLoader } = await import( 'three/addons/loaders/PLYLoader.js' );
-						const { GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING, createGaussianSplatGeometryFromPLYGeometry } = await import( 'three/addons/utils/GaussianSplatUtils.js' );
-						const loader = new PLYLoader();
-						loader.setCustomPropertyNameMapping( GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING );
-
-						const geometry = loader.parse( contents );
-						const splatData = createGaussianSplatGeometryFromPLYGeometry( geometry );
-						geometry.dispose();
-
-						await addGaussianSplatObject( splatData, filename );
-						return;
-
-					}
 
 					const { PLYLoader } = await import( 'three/addons/loaders/PLYLoader.js' );
 
@@ -678,46 +642,6 @@ function Loader( editor ) {
 					}
 
 					editor.execute( new AddObjectCommand( editor, object ) );
-
-				}, false );
-				reader.readAsArrayBuffer( file );
-
-				break;
-
-			}
-
-			case 'splat':
-
-			{
-
-				reader.addEventListener( 'load', async function ( event ) {
-
-					const contents = event.target.result;
-
-					const { SPLATLoader } = await import( 'three/addons/loaders/SPLATLoader.js' );
-					const splatData = new SPLATLoader().parse( contents );
-
-					await addGaussianSplatObject( splatData, filename );
-
-				}, false );
-				reader.readAsArrayBuffer( file );
-
-				break;
-
-			}
-
-			case 'spz':
-
-			{
-
-				reader.addEventListener( 'load', async function ( event ) {
-
-					const contents = event.target.result;
-
-					const { SPZLoader } = await import( 'three/addons/loaders/SPZLoader.js' );
-					const splatData = new SPZLoader().parse( contents );
-
-					await addGaussianSplatObject( splatData, filename );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
@@ -1042,69 +966,6 @@ function Loader( editor ) {
 				break;
 
 		}
-
-	}
-
-	async function addGaussianSplatObject( splatData, filename ) {
-
-		const { GaussianSplatMesh } = await import( 'three/addons/objects/GaussianSplatMesh.js' );
-		const object = new GaussianSplatMesh( splatData );
-		object.name = filename;
-
-		editor.execute( new AddObjectCommand( editor, object ) );
-
-	}
-
-	function isGaussianSplatPLY( contents ) {
-
-		const bytes = new Uint8Array( contents );
-		const endHeader = 'end_header';
-		let headerLength = - 1;
-
-		for ( let i = 0, l = bytes.length - endHeader.length; i < l; i ++ ) {
-
-			let match = true;
-
-			for ( let j = 0; j < endHeader.length; j ++ ) {
-
-				if ( bytes[ i + j ] !== endHeader.charCodeAt( j ) ) {
-
-					match = false;
-					break;
-
-				}
-
-			}
-
-			if ( match === true ) {
-
-				headerLength = i + endHeader.length;
-				break;
-
-			}
-
-		}
-
-		if ( headerLength === - 1 ) return false;
-
-		const header = new TextDecoder().decode( bytes.subarray( 0, headerLength ) );
-		const requiredFields = [
-			'x', 'y', 'z',
-			'scale_0', 'scale_1', 'scale_2',
-			'rot_0', 'rot_1', 'rot_2', 'rot_3',
-			'f_dc_0', 'f_dc_1', 'f_dc_2',
-			'opacity'
-		];
-
-		if ( header.includes( 'format binary_little_endian' ) === false ) return false;
-
-		for ( const field of requiredFields ) {
-
-			if ( new RegExp( `\\b${ field }\\b` ).test( header ) === false ) return false;
-
-		}
-
-		return true;
 
 	}
 
