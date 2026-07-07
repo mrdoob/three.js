@@ -399,7 +399,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		shadowMaterialVertical.uniforms.shadow_pass.value = shadow.map.depthTexture;
 		shadowMaterialVertical.uniforms.resolution.value = shadow.mapSize;
-		shadowMaterialVertical.uniforms.radius.value = shadow.radius;
+		shadowMaterialVertical.uniforms.radius.value = shadow.softness;
 		renderer.setRenderTarget( shadow.mapPass );
 		renderer.clear();
 		renderer.renderBufferDirect( camera, null, geometry, shadowMaterialVertical, fullScreenMesh, null );
@@ -408,7 +408,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		shadowMaterialHorizontal.uniforms.shadow_pass.value = shadow.mapPass.texture;
 		shadowMaterialHorizontal.uniforms.resolution.value = shadow.mapSize;
-		shadowMaterialHorizontal.uniforms.radius.value = shadow.radius;
+		shadowMaterialHorizontal.uniforms.radius.value = shadow.softness;
 		renderer.setRenderTarget( shadow.map );
 		renderer.clear();
 		renderer.renderBufferDirect( camera, null, geometry, shadowMaterialHorizontal, fullScreenMesh, null );

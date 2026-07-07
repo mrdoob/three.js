@@ -230,7 +230,7 @@ function main() {
 		gui.add( new DegRadHelper( light, 'angle' ), 'value', 0, 90 ).name( 'angle' ).onChange( updateCamera );
 		gui.add( light, 'penumbra', 0, 1, 0.01 );
 
-		gui.add( light.shadow, 'radius', 0, 50, 0.01 );
+		gui.add( light.shadow, 'softness', 0, 50, 0.01 );
 
 		{
 

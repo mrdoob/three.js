@@ -65,10 +65,10 @@ export const BasicPointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, 
  */
 export const PointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, shadow } ) => {
 
-	const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
+	const softness = reference( 'softness', 'float', shadow ).setGroup( renderGroup );
 	const mapSize = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
 
-	const texelSize = radius.div( mapSize.x );
+	const texelSize = softness.div( mapSize.x );
 
 	// Build a tangent-space coordinate system for applying offsets
 	const absDir = abs( bd3D );

@@ -65,7 +65,7 @@
 				spotLight.shadow.camera.far = 10;
 				spotLight.shadow.mapSize.width = 2048;
 				spotLight.shadow.mapSize.height = 2048;
-				spotLight.shadow.radius = 4;
+				spotLight.shadow.softness = 4;
 				scene.add( spotLight );
 
 				const dirLight = new THREE.DirectionalLight( 0x55505a, 3 );

@@ -445,7 +445,7 @@
 					renderer.shadowMap.type = THREE.VSMShadowMap;
 					const shadow = sun.shadow;
 					shadow.mapSize.width = shadow.mapSize.height = 2048;
-					shadow.radius = 2;
+					shadow.softness = 2;
 					shadow.bias = - 0.0005;
 					const shadowCam = shadow.camera, s = 5;
 					shadowCam.near = 0.1;

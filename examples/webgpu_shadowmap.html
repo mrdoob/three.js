@@ -72,7 +72,7 @@
 				spotLight.shadow.camera.far = 200;
 				spotLight.shadow.mapSize.width = 2048;
 				spotLight.shadow.mapSize.height = 2048;
-				spotLight.shadow.radius = 4;
+				spotLight.shadow.softness = 4;
 				scene.add( spotLight );
 
 
@@ -87,7 +87,7 @@
 				dirLight.shadow.camera.bottom = - 17;
 				dirLight.shadow.mapSize.width = 2048;
 				dirLight.shadow.mapSize.height = 2048;
-				dirLight.shadow.radius = 4;
+				dirLight.shadow.softness = 4;
 
 				dirGroup = new THREE.Group();
 				dirGroup.add( dirLight );
