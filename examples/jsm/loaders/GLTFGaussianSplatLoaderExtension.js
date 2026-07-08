@@ -23,14 +23,14 @@ const ATTRIBUTES = {
  * const loader = new GLTFLoader();
  * loader.register( function ( parser ) {
  *
- * 	return new GLTFGaussianSplattingExtension( parser );
+ * 	return new GLTFGaussianSplatLoaderExtension( parser );
  *
  * } );
  * ```
  *
- * @three_import import { GLTFGaussianSplattingExtension } from 'three/addons/loaders/GLTFGaussianSplattingExtension.js';
+ * @three_import import { GLTFGaussianSplatLoaderExtension } from 'three/addons/loaders/GLTFGaussianSplatLoaderExtension.js';
  */
-class GLTFGaussianSplattingExtension {
+class GLTFGaussianSplatLoaderExtension {
 
 	/**
 	 * Constructs a new glTF gaussian splatting extension plugin.
@@ -60,7 +60,7 @@ class GLTFGaussianSplattingExtension {
 
 		if ( primitives.every( isGaussianSplatPrimitive ) === false ) {
 
-			throw new Error( 'THREE.GLTFGaussianSplattingExtension: Mixed gaussian and non-gaussian mesh primitives are not supported.' );
+			throw new Error( 'THREE.GLTFGaussianSplatLoaderExtension: Mixed gaussian and non-gaussian mesh primitives are not supported.' );
 
 		}
 
@@ -75,7 +75,7 @@ class GLTFGaussianSplattingExtension {
 
 				if ( primitive.mode !== POINTS ) {
 
-					throw new Error( 'THREE.GLTFGaussianSplattingExtension: Gaussian splat primitives must use POINTS mode.' );
+					throw new Error( 'THREE.GLTFGaussianSplatLoaderExtension: Gaussian splat primitives must use POINTS mode.' );
 
 				}
 
@@ -125,25 +125,25 @@ function createGaussianSplatMesh( geometry, primitiveDef ) {
 
 	if ( extensionDef.kernel !== 'ellipse' ) {
 
-		throw new Error( 'THREE.GLTFGaussianSplattingExtension: Unsupported KHR_gaussian_splatting kernel.' );
+		throw new Error( 'THREE.GLTFGaussianSplatLoaderExtension: Unsupported KHR_gaussian_splatting kernel.' );
 
 	}
 
 	if ( extensionDef.colorSpace === undefined ) {
 
-		throw new Error( 'THREE.GLTFGaussianSplattingExtension: KHR_gaussian_splatting colorSpace is required.' );
+		throw new Error( 'THREE.GLTFGaussianSplatLoaderExtension: KHR_gaussian_splatting colorSpace is required.' );
 
 	}
 
 	if ( extensionDef.projection !== undefined && extensionDef.projection !== 'perspective' ) {
 
-		console.warn( 'THREE.GLTFGaussianSplattingExtension: Unsupported KHR_gaussian_splatting projection. Results may be incorrect.' );
+		console.warn( 'THREE.GLTFGaussianSplatLoaderExtension: Unsupported KHR_gaussian_splatting projection. Results may be incorrect.' );
 
 	}
 
 	if ( extensionDef.sortingMethod !== undefined && extensionDef.sortingMethod !== 'cameraDistance' ) {
 
-		console.warn( 'THREE.GLTFGaussianSplattingExtension: Unsupported KHR_gaussian_splatting sortingMethod. Results may be incorrect.' );
+		console.warn( 'THREE.GLTFGaussianSplatLoaderExtension: Unsupported KHR_gaussian_splatting sortingMethod. Results may be incorrect.' );
 
 	}
 
@@ -156,7 +156,7 @@ function createGaussianSplatMesh( geometry, primitiveDef ) {
 
 	if ( scale.count !== count || rotation.count !== count || opacity.count !== count || sh0.count !== count ) {
 
-		throw new Error( 'THREE.GLTFGaussianSplattingExtension: KHR_gaussian_splatting attribute counts must match POSITION.' );
+		throw new Error( 'THREE.GLTFGaussianSplatLoaderExtension: KHR_gaussian_splatting attribute counts must match POSITION.' );
 
 	}
 
@@ -164,7 +164,7 @@ function createGaussianSplatMesh( geometry, primitiveDef ) {
 
 		if ( /^KHR_gaussian_splatting:SH_DEGREE_[1-3]_COEF_/.test( semantic ) ) {
 
-			console.warn( 'THREE.GLTFGaussianSplattingExtension: KHR_gaussian_splatting spherical harmonics above degree 0 are ignored.' );
+			console.warn( 'THREE.GLTFGaussianSplatLoaderExtension: KHR_gaussian_splatting spherical harmonics above degree 0 are ignored.' );
 			break;
 
 		}
@@ -226,7 +226,7 @@ function getGaussianSplatAttribute( geometry, primitiveDef, semantic ) {
 
 	if ( primitiveDef.attributes[ semantic ] === undefined ) {
 
-		throw new Error( `THREE.GLTFGaussianSplattingExtension: KHR_gaussian_splatting requires ${ semantic }.` );
+		throw new Error( `THREE.GLTFGaussianSplatLoaderExtension: KHR_gaussian_splatting requires ${ semantic }.` );
 
 	}
 
@@ -235,7 +235,7 @@ function getGaussianSplatAttribute( geometry, primitiveDef, semantic ) {
 
 	if ( attribute === undefined ) {
 
-		throw new Error( `THREE.GLTFGaussianSplattingExtension: KHR_gaussian_splatting attribute ${ semantic } was not loaded.` );
+		throw new Error( `THREE.GLTFGaussianSplatLoaderExtension: KHR_gaussian_splatting attribute ${ semantic } was not loaded.` );
 
 	}
 
@@ -253,7 +253,7 @@ function assignExtrasToUserData( object, gltfDef ) {
 
 		} else {
 
-			console.warn( 'THREE.GLTFGaussianSplattingExtension: Ignoring primitive type .extras, ' + gltfDef.extras );
+			console.warn( 'THREE.GLTFGaussianSplatLoaderExtension: Ignoring primitive type .extras, ' + gltfDef.extras );
 
 		}
 
@@ -261,4 +261,4 @@ function assignExtrasToUserData( object, gltfDef ) {
 
 }
 
-export { GLTFGaussianSplattingExtension };
+export { GLTFGaussianSplatLoaderExtension };

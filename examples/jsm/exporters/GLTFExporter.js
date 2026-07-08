@@ -27,7 +27,6 @@ import {
 	REVISION,
 	ImageUtils
 } from 'three';
-import { decomposeCovariance, linearToSH0 } from '../utils/GaussianSplatUtils.js';
 /**
  * The KHR_mesh_quantization extension allows these extra attribute component types
  *
@@ -73,7 +72,6 @@ const KHR_mesh_quantization_ExtraAttrTypes = {
  *
  * GLTFExporter supports the [glTF 2.0 extensions](https://github.com/KhronosGroup/glTF/tree/master/extensions/):
  *
- * - KHR_gaussian_splatting
  * - KHR_lights_punctual
  * - KHR_materials_clearcoat
  * - KHR_materials_dispersion
@@ -91,8 +89,9 @@ const KHR_mesh_quantization_ExtraAttrTypes = {
  * - EXT_mesh_gpu_instancing
  * - EXT_texture_webp
  *
- * The following glTF 2.0 extension is supported by an external user plugin:
+ * The following glTF 2.0 extensions are supported by separately registered plugins:
  *
+ * - KHR_gaussian_splatting
  * - [KHR_materials_variants](https://github.com/takahirox/three-gltf-extensions)
  *
  * ```js
@@ -380,12 +379,6 @@ const GLB_CHUNK_TYPE_BIN = 0x004E4942;
 //------------------------------------------------------------------------------
 // Utility functions
 //------------------------------------------------------------------------------
-
-function srgbToLinear( value ) {
-
-	return value <= 0.04045 ? value * 0.0773993808 : Math.pow( value * 0.9478672986 + 0.0521327014, 2.4 );
-
-}
 
 /**
  * Compare two arrays
@@ -1845,84 +1838,6 @@ class GLTFWriter {
 	}
 
 	/**
-	 * Process Gaussian splat mesh
-	 * @param {GaussianSplatMesh} mesh Gaussian splat mesh to process
-	 * @return {number} Index of the processed mesh in the "meshes" array
-	 */
-	processGaussianSplatMesh( mesh ) {
-
-		const json = this.json;
-		const positionAttribute = mesh.splatGeometry.getAttribute( 'position' );
-		const covarianceAttribute = mesh.splatGeometry.getAttribute( 'covariance' );
-		const colorAttribute = mesh.splatGeometry.getAttribute( 'color' );
-		const count = positionAttribute.count;
-		const positions = new Float32Array( positionAttribute.array );
-		const scales = new Float32Array( count * 3 );
-		const rotations = new Float32Array( count * 4 );
-		const opacities = new Uint8Array( count );
-		const sh0 = new Float32Array( count * 3 );
-		const fallbackColors = new Float32Array( count * 4 );
-		const colors = colorAttribute.array;
-		const covariances = covarianceAttribute.array;
-		const extensionDef = mesh.userData.gltfExtensions &&
-			mesh.userData.gltfExtensions.KHR_gaussian_splatting || {};
-		const colorSpace = extensionDef.colorSpace || 'srgb_rec709_display';
-
-		for ( let i = 0; i < count; i ++ ) {
-
-			const i3 = i * 3;
-			const i4 = i * 4;
-			const r = colors[ i4 ] / 255;
-			const g = colors[ i4 + 1 ] / 255;
-			const b = colors[ i4 + 2 ] / 255;
-			const a = colors[ i4 + 3 ] / 255;
-
-			decomposeCovariance( covariances, i * 6, scales, rotations, i3 );
-
-			opacities[ i ] = colors[ i4 + 3 ];
-			sh0[ i3 ] = linearToSH0( r );
-			sh0[ i3 + 1 ] = linearToSH0( g );
-			sh0[ i3 + 2 ] = linearToSH0( b );
-
-			fallbackColors[ i4 ] = colorSpace === 'srgb_rec709_display' ? srgbToLinear( r ) : r;
-			fallbackColors[ i4 + 1 ] = colorSpace === 'srgb_rec709_display' ? srgbToLinear( g ) : g;
-			fallbackColors[ i4 + 2 ] = colorSpace === 'srgb_rec709_display' ? srgbToLinear( b ) : b;
-			fallbackColors[ i4 + 3 ] = a;
-
-		}
-
-		const primitive = {
-			mode: WEBGL_CONSTANTS.POINTS,
-			attributes: {
-				POSITION: this.processAccessor( new BufferAttribute( positions, 3 ) ),
-				'KHR_gaussian_splatting:SCALE': this.processAccessor( new BufferAttribute( scales, 3 ) ),
-				'KHR_gaussian_splatting:ROTATION': this.processAccessor( new BufferAttribute( rotations, 4 ) ),
-				'KHR_gaussian_splatting:OPACITY': this.processAccessor( new BufferAttribute( opacities, 1, true ) ),
-				'KHR_gaussian_splatting:SH_DEGREE_0_COEF_0': this.processAccessor( new BufferAttribute( sh0, 3 ) ),
-				COLOR_0: this.processAccessor( new BufferAttribute( fallbackColors, 4 ) )
-			},
-			extensions: {
-				KHR_gaussian_splatting: {
-					kernel: 'ellipse',
-					colorSpace: colorSpace,
-					projection: extensionDef.projection || 'perspective',
-					sortingMethod: extensionDef.sortingMethod || 'cameraDistance'
-				}
-			}
-		};
-		const meshDef = {
-			primitives: [ primitive ]
-		};
-
-		if ( ! json.meshes ) json.meshes = [];
-
-		this.extensionsUsed.KHR_gaussian_splatting = true;
-
-		return json.meshes.push( meshDef ) - 1;
-
-	}
-
-	/**
 	 * Process mesh
 	 * @param {THREE.Mesh} mesh Mesh to process
 	 * @return {Promise<?number>} Index of the processed mesh in the "meshes" array
@@ -1931,6 +1846,19 @@ class GLTFWriter {
 
 		const cache = this.cache;
 		const json = this.json;
+
+		for ( let i = 0, il = this.plugins.length; i < il; i ++ ) {
+
+			const plugin = this.plugins[ i ];
+
+			if ( plugin.processMeshAsync ) {
+
+				const meshIndex = await plugin.processMeshAsync( mesh );
+				if ( meshIndex !== null && meshIndex !== undefined ) return meshIndex;
+
+			}
+
+		}
 
 		const meshCacheKeyParts = [ mesh.geometry.uuid ];
 
@@ -1951,14 +1879,6 @@ class GLTFWriter {
 		const meshCacheKey = meshCacheKeyParts.join( ':' );
 
 		if ( cache.meshes.has( meshCacheKey ) ) return cache.meshes.get( meshCacheKey );
-
-		if ( mesh.isGaussianSplatMesh === true ) {
-
-			const index = this.processGaussianSplatMesh( mesh );
-			cache.meshes.set( meshCacheKey, index );
-			return index;
-
-		}
 
 		const geometry = mesh.geometry;
 

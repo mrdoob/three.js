@@ -1,5 +1,5 @@
 import { GLTFLoader } from '../../../../examples/jsm/loaders/GLTFLoader.js';
-import { GLTFGaussianSplattingExtension } from '../../../../examples/jsm/loaders/GLTFGaussianSplattingExtension.js';
+import { GLTFGaussianSplatLoaderExtension } from '../../../../examples/jsm/loaders/GLTFGaussianSplatLoaderExtension.js';
 
 const EPS = 1e-6;
 const FLOAT = 5126;
@@ -126,7 +126,7 @@ export default QUnit.module( 'Addons', () => {
 				const loader = new GLTFLoader();
 				loader.register( function ( parser ) {
 
-					return new GLTFGaussianSplattingExtension( parser );
+					return new GLTFGaussianSplatLoaderExtension( parser );
 
 				} );
 

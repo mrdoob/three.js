@@ -36,6 +36,7 @@ export * from './environments/RoomEnvironment.js';
 
 export * from './exporters/DRACOExporter.js';
 export * from './exporters/EXRExporter.js';
+export * from './exporters/GLTFGaussianSplatExporterExtension.js';
 export * from './exporters/GLTFExporter.js';
 export * from './exporters/KTX2Exporter.js';
 export * from './exporters/OBJExporter.js';
@@ -92,7 +93,7 @@ export * from './loaders/EXRLoader.js';
 export * from './loaders/FBXLoader.js';
 export * from './loaders/FontLoader.js';
 export * from './loaders/GCodeLoader.js';
-export * from './loaders/GLTFGaussianSplattingExtension.js';
+export * from './loaders/GLTFGaussianSplatLoaderExtension.js';
 export * from './loaders/GLTFLoader.js';
 export * from './loaders/HDRLoader.js';
 export * from './loaders/HDRCubeTextureLoader.js';

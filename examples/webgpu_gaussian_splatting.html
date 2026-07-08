@@ -59,7 +59,7 @@
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { GLTFGaussianSplattingExtension } from 'three/addons/loaders/GLTFGaussianSplattingExtension.js';
+			import { GLTFGaussianSplatLoaderExtension } from 'three/addons/loaders/GLTFGaussianSplatLoaderExtension.js';
 			import { SPLATLoader } from 'three/addons/loaders/SPLATLoader.js';
 			import { KSPLATLoader } from 'three/addons/loaders/KSPLATLoader.js';
 			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
@@ -490,7 +490,7 @@
 				const loader = new GLTFLoader();
 				loader.register( function ( parser ) {
 
-					return new GLTFGaussianSplattingExtension( parser );
+					return new GLTFGaussianSplatLoaderExtension( parser );
 
 				} );
 

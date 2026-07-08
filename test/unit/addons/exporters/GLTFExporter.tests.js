@@ -3,7 +3,8 @@ import {
 	BufferGeometry
 } from 'three';
 import { GLTFExporter } from '../../../../examples/jsm/exporters/GLTFExporter.js';
-import { GLTFGaussianSplattingExtension } from '../../../../examples/jsm/loaders/GLTFGaussianSplattingExtension.js';
+import { GLTFGaussianSplatExporterExtension } from '../../../../examples/jsm/exporters/GLTFGaussianSplatExporterExtension.js';
+import { GLTFGaussianSplatLoaderExtension } from '../../../../examples/jsm/loaders/GLTFGaussianSplatLoaderExtension.js';
 import { GLTFLoader } from '../../../../examples/jsm/loaders/GLTFLoader.js';
 import { GaussianSplatMesh } from '../../../../examples/jsm/objects/GaussianSplatMesh.js';
 
@@ -37,6 +38,12 @@ export default QUnit.module( 'Addons', () => {
 			QUnit.test( 'exports GaussianSplatMesh with KHR_gaussian_splatting primitive', async ( assert ) => {
 
 				const exporter = new GLTFExporter();
+				exporter.register( function ( writer ) {
+
+					return new GLTFGaussianSplatExporterExtension( writer );
+
+				} );
+
 				const json = await exporter.parseAsync( createGaussianSplatMesh() );
 				const primitive = json.meshes[ 0 ].primitives[ 0 ];
 
@@ -56,10 +63,16 @@ export default QUnit.module( 'Addons', () => {
 			QUnit.test( 'round-trips exported GaussianSplatMesh through GLTFLoader', async ( assert ) => {
 
 				const exporter = new GLTFExporter();
+				exporter.register( function ( writer ) {
+
+					return new GLTFGaussianSplatExporterExtension( writer );
+
+				} );
+
 				const loader = new GLTFLoader();
 				loader.register( function ( parser ) {
 
-					return new GLTFGaussianSplattingExtension( parser );
+					return new GLTFGaussianSplatLoaderExtension( parser );
 
 				} );
 
