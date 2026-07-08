@@ -1,6 +1,5 @@
 import BRDF_Lambert from './BSDF/BRDF_Lambert.js';
 import BRDF_GGX from './BSDF/BRDF_GGX.js';
-import BRDF_GGX_Multiscatter from './BSDF/BRDF_GGX_Multiscatter.js';
 import DFGLUT from './BSDF/DFGLUT.js';
 import EnvironmentBRDF from './BSDF/EnvironmentBRDF.js';
 import F_Schlick from './BSDF/F_Schlick.js';
@@ -632,20 +631,32 @@ class PhysicalLightingModel extends LightingModel {
 
 		reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseContribution } ) ) );
 
-		let specularBRDF = BRDF_GGX_Multiscatter( { lightDirection, f0: specularColorBlended, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
+		let specularBRDF = BRDF_GGX( { lightDirection, f0: specularColorBlended, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
 
 		if ( this.retroreflective === true ) {
 
 			// Minimal Retroreflective Microfacet Model:
 			// https://jcgt.org/published/0015/01/04/
 			const retroViewDirection = positionViewDirection.negate().reflect( normalView );
-			const retroSpecularBRDF = BRDF_GGX_Multiscatter( { lightDirection, viewDirection: retroViewDirection, f0: specularColorBlended, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
+			const retroSpecularBRDF = BRDF_GGX( { lightDirection, viewDirection: retroViewDirection, f0: specularColorBlended, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
 
 			specularBRDF = mix( specularBRDF, retroSpecularBRDF, retroreflective.clamp() );
 
 		}
 
-		reflectedLight.directSpecular.addAssign( irradiance.mul( specularBRDF ) );
+		// Multi-scattering energy compensation for direct lighting
+		// Based on "Practical Multiple Scattering Compensation for Microfacet Models"
+		// https://blog.selfshadow.com/publications/turquin/ms_comp_final.pdf
+		const dotNV = normalView.dot( positionViewDirection ).clamp();
+		const fab = DFGLUT( { roughness, dotNV } );
+
+		// Energy of the single-scattering lobe in a white furnace ( F0 = F90 = 1 )
+		const Ess = fab.x.add( fab.y );
+
+		// Compensate for the energy lost to multiple scattering, tinting the added term by F0 ( equation 16 )
+		const energyCompensation = specularColorBlended.mul( Ess.reciprocal().sub( 1.0 ) ).add( 1.0 );
+
+		reflectedLight.directSpecular.addAssign( irradiance.mul( specularBRDF ).mul( energyCompensation ) );
 
 	}
 
