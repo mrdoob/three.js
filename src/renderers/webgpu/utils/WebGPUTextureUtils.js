@@ -365,6 +365,20 @@ class WebGPUTextureUtils {
 
 		}
 
+		const renderTarget = texture.renderTarget;
+
+		// when the multisampled data are discarded, try to use a transient attachment if possible
+
+		if ( texture.isDepthTexture === true && primarySamples > 1 && GPUTextureUsage.TRANSIENT_ATTACHMENT !== undefined ) {
+
+			if ( renderTarget?.storeMultisampledDepthBuffer === false && ( renderTarget.stencilBuffer === false || renderTarget.storeMultisampledStencilBuffer === false ) ) {
+
+				usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TRANSIENT_ATTACHMENT;
+
+			}
+
+		}
+
 		const textureDescriptorGPU = new GPUTextureDescriptor();
 		textureDescriptorGPU.label = texture.name;
 		textureDescriptorGPU.size.width = width;
@@ -412,6 +426,14 @@ class WebGPUTextureUtils {
 			msaaTextureDescriptorGPU.label = msaaTextureDescriptorGPU.label + '-msaa';
 			msaaTextureDescriptorGPU.sampleCount = samples;
 			msaaTextureDescriptorGPU.mipLevelCount = 1; // See https://www.w3.org/TR/webgpu/#texture-creation
+
+			// when the multisampled data are discarded, try to use a transient attachment if possible
+
+			if ( renderTarget?.storeMultisampledColorBuffer === false && GPUTextureUsage.TRANSIENT_ATTACHMENT !== undefined ) {
+
+				msaaTextureDescriptorGPU.usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TRANSIENT_ATTACHMENT;
+
+			}
 
 			textureData.msaaTexture = backend.device.createTexture( msaaTextureDescriptorGPU );
 
