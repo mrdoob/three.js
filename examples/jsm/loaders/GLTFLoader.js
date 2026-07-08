@@ -3842,8 +3842,18 @@ class GLTFParser {
 						primitive.mode === WEBGL_CONSTANTS.TRIANGLE_FAN ||
 						primitive.mode === undefined ) {
 
+					const isSkinnedMesh = meshDef.isSkinnedMesh === true
+						&& geometry.attributes.skinIndex !== undefined
+						&& geometry.attributes.skinWeight !== undefined;
+
+					if ( meshDef.isSkinnedMesh === true && isSkinnedMesh === false ) {
+
+						console.warn( 'THREE.GLTFLoader: Missing skinIndex or skinWeight attributes. Skinning disabled.' );
+
+					}
+
 					// .isSkinnedMesh isn't in glTF spec. See ._markDefs()
-					mesh = meshDef.isSkinnedMesh === true
+					mesh = isSkinnedMesh === true
 						? new SkinnedMesh( geometry, material )
 						: new Mesh( geometry, material );
 
