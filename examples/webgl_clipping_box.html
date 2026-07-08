@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - clipping box</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - clipping box">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_clipping_box.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_clipping_box.jpg">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - clipping box<br/>
+			Drag faces to resize. Ctrl+drag for opposite face. Click an object to fit.
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { TransformControls } from 'three/addons/controls/TransformControls.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			let camera, scene, renderer;
+			let orbitControls, transformControls;
+			let contentGroup, boxGroup;
+
+			const faceMeshes = [];
+			const faceMaterials = [];
+			const clippingPlanes = [];
+			const contentMaterials = [];
+
+			const raycaster = new THREE.Raycaster();
+			const pointer = new THREE.Vector2();
+
+			let dragInfo = null;
+			let hoveredFaceIndex = - 1;
+			let selectedObject = null;
+
+			const MIN_SIZE = 0.01;
+
+			const params = {
+				color: '#2a93cc',
+				hoverColor: '#ffcf33',
+				opacity: 0.1,
+				margin: 1.1,
+				mode: 'none'
+			};
+
+			// Face definitions: +x, -x, +y, -y, +z, -z
+
+			const faces = [
+				{ axis: 0, sign: 1, position: [ 0.5, 0, 0 ], rotation: [ 0, Math.PI / 2, 0 ] },
+				{ axis: 0, sign: - 1, position: [ - 0.5, 0, 0 ], rotation: [ 0, - Math.PI / 2, 0 ] },
+				{ axis: 1, sign: 1, position: [ 0, 0.5, 0 ], rotation: [ - Math.PI / 2, 0, 0 ] },
+				{ axis: 1, sign: - 1, position: [ 0, - 0.5, 0 ], rotation: [ Math.PI / 2, 0, 0 ] },
+				{ axis: 2, sign: 1, position: [ 0, 0, 0.5 ], rotation: [ 0, 0, 0 ] },
+				{ axis: 2, sign: - 1, position: [ 0, 0, - 0.5 ], rotation: [ 0, Math.PI, 0 ] }
+			];
+
+			// Inward-pointing normals for a unit cube — union clipping keeps the interior
+
+			const localPlanes = faces.map( function ( f ) {
+
+				const normal = new THREE.Vector3();
+				normal.setComponent( f.axis, - f.sign );
+				return new THREE.Plane( normal, 0.5 );
+
+			} );
+
+			// Reusable math objects (allocated once to avoid per-frame GC)
+
+			const _normalMatrix = new THREE.Matrix3(); // transforms plane normals to world space
+			const _box = new THREE.Box3(); // bounding box for fitBox()
+			const _center = new THREE.Vector3(); // box center
+			const _size = new THREE.Vector3(); // box dimensions
+			const _offsetVec1 = new THREE.Vector3(); // face-drag projection intermediates
+			const _offsetVec2 = new THREE.Vector3();
+
+			init();
+
+			function init() {
+
+				// Renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.localClippingEnabled = true;
+				document.body.appendChild( renderer.domElement );
+
+				// Camera
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 4, 3, 6 );
+
+				// Scene
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x263238 );
+
+				scene.add( new THREE.AmbientLight( 0x505050, 3 ) );
+
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
+				dirLight.position.set( 5, 10, 7.5 );
+				scene.add( dirLight );
+
+				// Content
+
+				contentGroup = new THREE.Group();
+				scene.add( contentGroup );
+
+				createContent();
+
+				// Clipping planes (world-space, updated by updateClippingPlanes)
+
+				for ( let i = 0; i < 6; i ++ ) {
+
+					clippingPlanes.push( new THREE.Plane() );
+
+				}
+
+				applyClipping();
+
+				// Section box
+
+				boxGroup = new THREE.Group();
+				scene.add( boxGroup );
+
+				createBoxVisuals();
+
+				// Fit to content
+
+				fitBox();
+
+				// OrbitControls
+
+				orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.addEventListener( 'change', render );
+				orbitControls.minDistance = 1;
+				orbitControls.maxDistance = 50;
+
+				// TransformControls
+
+				transformControls = new TransformControls( camera, renderer.domElement );
+				transformControls.addEventListener( 'objectChange', function () {
+
+					updateClippingPlanes();
+					render();
+
+				} );
+				transformControls.addEventListener( 'dragging-changed', function ( event ) {
+
+					orbitControls.enabled = ! event.value;
+
+				} );
+				transformControls.addEventListener( 'change', render );
+				scene.add( transformControls.getHelper() );
+
+				// GUI
+
+				buildGUI();
+
+				// Events
+
+				renderer.domElement.addEventListener( 'pointerdown', onPointerDown );
+				renderer.domElement.addEventListener( 'pointermove', onPointerMove );
+				renderer.domElement.addEventListener( 'pointerup', onPointerUp );
+				window.addEventListener( 'resize', onWindowResize );
+
+				render();
+
+			}
+
+			function createContent() {
+
+				const torusKnot = new THREE.Mesh(
+					new THREE.TorusKnotGeometry( 0.6, 0.2, 128, 32 ),
+					new THREE.MeshPhongMaterial( { color: 0xe91e63, side: THREE.DoubleSide } )
+				);
+				torusKnot.position.set( - 1.5, 0.8, 0 );
+				contentGroup.add( torusKnot );
+
+				const sphere = new THREE.Mesh(
+					new THREE.SphereGeometry( 0.7, 32, 16 ),
+					new THREE.MeshPhongMaterial( { color: 0x4caf50, side: THREE.DoubleSide } )
+				);
+				sphere.position.set( 1.2, 0.7, 0.5 );
+				contentGroup.add( sphere );
+
+				const box = new THREE.Mesh(
+					new THREE.BoxGeometry( 1, 1, 1 ),
+					new THREE.MeshPhongMaterial( { color: 0x2196f3, side: THREE.DoubleSide } )
+				);
+				box.position.set( 0, 0.5, - 1.2 );
+				contentGroup.add( box );
+
+			}
+
+			function createBoxVisuals() {
+
+				const planeGeometry = new THREE.PlaneGeometry( 1, 1 );
+
+				for ( let i = 0; i < 6; i ++ ) {
+
+					const face = faces[ i ];
+
+					const material = new THREE.MeshBasicMaterial( {
+						color: params.color,
+						transparent: true,
+						opacity: params.opacity,
+						depthWrite: false,
+						side: THREE.DoubleSide,
+						toneMapped: false
+					} );
+
+					const mesh = new THREE.Mesh( planeGeometry, material );
+					mesh.position.fromArray( face.position );
+					mesh.rotation.fromArray( face.rotation );
+
+					boxGroup.add( mesh );
+					faceMeshes.push( mesh );
+					faceMaterials.push( material );
+
+				}
+
+				// Wireframe edges
+
+				const edgesGeometry = new THREE.EdgesGeometry( new THREE.BoxGeometry( 1, 1, 1 ) );
+				const edges = new THREE.LineSegments(
+					edgesGeometry,
+					new THREE.LineBasicMaterial( { color: params.color, toneMapped: false } )
+				);
+				boxGroup.add( edges );
+
+			}
+
+			function fitBox( target ) {
+
+				_box.makeEmpty();
+
+				if ( target ) {
+
+					if ( target.isBox3 ) {
+
+						_box.copy( target );
+
+					} else if ( target.isObject3D ) {
+
+						_box.setFromObject( target );
+
+					}
+
+				} else {
+
+					_box.setFromObject( contentGroup );
+
+				}
+
+				if ( _box.isEmpty() ) return;
+
+				_box.getCenter( _center );
+				_box.getSize( _size ).multiplyScalar( params.margin );
+
+				boxGroup.position.copy( _center );
+				boxGroup.quaternion.identity();
+				boxGroup.scale.copy( _size );
+
+				updateClippingPlanes();
+
+			}
+
+			function updateClippingPlanes() {
+
+				boxGroup.updateWorldMatrix( true, false );
+				_normalMatrix.getNormalMatrix( boxGroup.matrixWorld );
+
+				for ( let i = 0; i < 6; i ++ ) {
+
+					clippingPlanes[ i ].copy( localPlanes[ i ] ).applyMatrix4( boxGroup.matrixWorld, _normalMatrix );
+
+				}
+
+			}
+
+			function applyClipping() {
+
+				contentGroup.traverse( function ( object ) {
+
+					if ( ! object.isMesh ) return;
+
+					const materials = Array.isArray( object.material ) ? object.material : [ object.material ];
+
+					for ( let i = 0; i < materials.length; i ++ ) {
+
+						const material = materials[ i ];
+
+						if ( contentMaterials.indexOf( material ) === - 1 ) {
+
+							contentMaterials.push( material );
+
+						}
+
+						material.clippingPlanes = clippingPlanes;
+						material.clipShadows = true;
+						material.needsUpdate = true;
+
+					}
+
+				} );
+
+			}
+
+			// Face drag math — project pointer motion onto the face normal
+
+			function calculateOffset( clickPoint, normal, rayStart, rayDir ) {
+
+				const e1 = normal.dot( normal );
+				const e2 = normal.dot( clickPoint ) - normal.dot( rayStart );
+				const e3 = normal.dot( rayDir );
+
+				if ( e3 === 0 ) return - e2 / e1;
+
+				_offsetVec1.copy( rayDir ).multiplyScalar( e1 / e3 ).sub( normal );
+				_offsetVec2.copy( rayDir ).multiplyScalar( e2 / e3 ).add( rayStart ).sub( clickPoint );
+
+				return - _offsetVec1.dot( _offsetVec2 ) / _offsetVec1.dot( _offsetVec1 );
+
+			}
+
+			function updatePointer( event ) {
+
+				const rect = renderer.domElement.getBoundingClientRect();
+				pointer.x = ( ( event.clientX - rect.left ) / rect.width ) * 2 - 1;
+				pointer.y = - ( ( event.clientY - rect.top ) / rect.height ) * 2 + 1;
+
+			}
+
+			function onPointerDown( event ) {
+
+				if ( event.button !== 0 ) return;
+				if ( transformControls.dragging ) return;
+
+				updatePointer( event );
+				raycaster.setFromCamera( pointer, camera );
+
+				const intersects = raycaster.intersectObjects( faceMeshes );
+
+				if ( intersects.length === 0 ) {
+
+					// No face hit — record as potential select-to-fit click
+					dragInfo = {
+						downX: event.clientX,
+						downY: event.clientY,
+						selectOnly: true
+					};
+					return;
+
+				}
+
+				const hit = intersects[ 0 ];
+				let faceIndex = faceMeshes.indexOf( hit.object );
+				if ( faceIndex === - 1 ) return;
+
+				// Ctrl/Meta flips to the opposite face (pairs: 0↔1, 2↔3, 4↔5)
+				if ( event.ctrlKey || event.metaKey ) faceIndex ^= 1;
+
+				const face = faces[ faceIndex ];
+
+				const dir = new THREE.Vector3();
+				dir.setComponent( face.axis, face.sign );
+				dir.applyQuaternion( boxGroup.quaternion );
+				dir.normalize();
+
+				dragInfo = {
+					faceIndex: faceIndex,
+					face: face,
+					clickPoint: hit.point.clone(),
+					dir: dir,
+					startScale: boxGroup.scale.getComponent( face.axis ),
+					startPos: boxGroup.position.clone(),
+					downX: event.clientX,
+					downY: event.clientY,
+					dragging: false
+				};
+
+				orbitControls.enabled = false;
+				renderer.domElement.setPointerCapture( event.pointerId );
+
+			}
+
+			function onPointerMove( event ) {
+
+				updatePointer( event );
+
+				if ( dragInfo ) {
+
+					if ( ! dragInfo.dragging ) {
+
+						const dx = event.clientX - dragInfo.downX;
+						const dy = event.clientY - dragInfo.downY;
+						if ( dx * dx + dy * dy < 9 ) return;
+
+						dragInfo.dragging = true;
+
+					}
+
+					raycaster.setFromCamera( pointer, camera );
+
+					const offset = calculateOffset(
+						dragInfo.clickPoint,
+						dragInfo.dir,
+						raycaster.ray.origin,
+						raycaster.ray.direction
+					);
+
+					const face = dragInfo.face;
+					boxGroup.scale.setComponent( face.axis, Math.max( MIN_SIZE, dragInfo.startScale + offset ) );
+
+					const applied = boxGroup.scale.getComponent( face.axis ) - dragInfo.startScale;
+					boxGroup.position.copy( dragInfo.startPos ).addScaledVector( dragInfo.dir, applied / 2 );
+
+					updateClippingPlanes();
+					render();
+					return;
+
+				}
+
+				// Hover detection
+
+				if ( transformControls.dragging ) return;
+
+				raycaster.setFromCamera( pointer, camera );
+				const intersects = raycaster.intersectObjects( faceMeshes );
+
+				let newHover = - 1;
+
+				if ( intersects.length > 0 ) {
+
+					newHover = faceMeshes.indexOf( intersects[ 0 ].object );
+
+				}
+
+				setHoveredFace( newHover );
+
+			}
+
+			function onPointerUp( event ) {
+
+				if ( ! dragInfo ) return;
+
+				const info = dragInfo;
+				dragInfo = null;
+
+				// Was it a click (no drag)?
+				const dx = event.clientX - info.downX;
+				const dy = event.clientY - info.downY;
+				const wasClick = dx * dx + dy * dy < 9;
+
+				if ( ! info.selectOnly ) {
+
+					orbitControls.enabled = true;
+
+					try {
+
+						renderer.domElement.releasePointerCapture( event.pointerId );
+
+					} catch ( e ) {
+
+						// pointer already released
+
+					}
+
+				}
+
+				// Select-to-fit on click (whether on face or empty space)
+				if ( wasClick ) {
+
+					updatePointer( event );
+					raycaster.setFromCamera( pointer, camera );
+					const hits = raycaster.intersectObjects( contentGroup.children, true );
+
+					if ( hits.length > 0 ) {
+
+						let target = hits[ 0 ].object;
+						while ( target.parent && target.parent !== contentGroup ) target = target.parent;
+
+						selectObject( target );
+
+					} else {
+
+						selectObject( null );
+
+					}
+
+				}
+
+			}
+
+			function selectObject( object ) {
+
+				// Deselect previous
+				if ( selectedObject ) {
+
+					selectedObject.traverse( function ( child ) {
+
+						if ( child.isMesh ) child.material.emissive.setHex( 0x000000 );
+
+					} );
+
+				}
+
+				selectedObject = object;
+
+				if ( selectedObject ) {
+
+					selectedObject.traverse( function ( child ) {
+
+						if ( child.isMesh ) child.material.emissive.setHex( 0x222222 );
+
+					} );
+
+					fitBox( selectedObject );
+
+				} else {
+
+					fitBox();
+
+				}
+
+				render();
+
+			}
+
+			function setHoveredFace( index ) {
+
+				if ( index === hoveredFaceIndex ) return;
+
+				if ( hoveredFaceIndex !== - 1 ) {
+
+					faceMaterials[ hoveredFaceIndex ].color.set( params.color );
+					faceMaterials[ hoveredFaceIndex ].opacity = params.opacity;
+
+				}
+
+				hoveredFaceIndex = index;
+
+				if ( hoveredFaceIndex !== - 1 ) {
+
+					faceMaterials[ hoveredFaceIndex ].color.set( params.hoverColor );
+					faceMaterials[ hoveredFaceIndex ].opacity = Math.min( params.opacity * 2, 1 );
+
+				}
+
+				renderer.domElement.style.cursor = hoveredFaceIndex !== - 1 ? 'grab' : '';
+				render();
+
+			}
+
+			function buildGUI() {
+
+				const gui = new GUI();
+
+				gui.add( params, 'mode', [ 'none', 'translate', 'rotate', 'scale' ] ).name( 'Gizmo Mode' ).onChange( function ( value ) {
+
+					if ( value === 'none' ) {
+
+						transformControls.detach();
+
+					} else {
+
+						transformControls.attach( boxGroup );
+						transformControls.setMode( value );
+
+					}
+
+					render();
+
+				} );
+
+				gui.addColor( params, 'color' ).name( 'Box Color' ).onChange( function ( value ) {
+
+					for ( let i = 0; i < 6; i ++ ) {
+
+						if ( i !== hoveredFaceIndex ) {
+
+							faceMaterials[ i ].color.set( value );
+
+						}
+
+					}
+
+					boxGroup.children[ 6 ].material.color.set( value );
+					render();
+
+				} );
+
+				gui.add( params, 'opacity', 0, 0.5 ).name( 'Face Opacity' ).onChange( function ( value ) {
+
+					for ( let i = 0; i < 6; i ++ ) {
+
+						if ( i !== hoveredFaceIndex ) {
+
+							faceMaterials[ i ].opacity = value;
+
+						}
+
+					}
+
+					render();
+
+				} );
+
+				gui.add( params, 'margin', 1.0, 2.0 ).name( 'Fit Margin' );
+
+				gui.add( {
+					refit: function () {
+
+						fitBox();
+						render();
+
+					}
+				}, 'refit' ).name( 'Refit to Content' );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
