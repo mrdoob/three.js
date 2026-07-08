@@ -619,7 +619,12 @@ class PhysicalLightingModel extends LightingModel {
 
 		}
 
-		reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseContribution } ) ) );
+		// Light reflected by the specular interface is not available to the diffuse layer ( glTF fresnel_mix )
+		const halfDir = lightDirection.add( positionViewDirection ).normalize();
+		const dotVH = positionViewDirection.dot( halfDir ).clamp();
+		const F = F_Schlick( { f0: specularColor, f90: specularF90, dotVH } );
+
+		reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseContribution } ) ).mul( F.oneMinus() ) );
 
 		let specularBRDF = BRDF_GGX( { lightDirection, f0: specularColorBlended, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
 
@@ -733,11 +738,19 @@ class PhysicalLightingModel extends LightingModel {
 
 		const { irradiance, reflectedLight } = builder.context;
 
-		const diffuse = irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseContribution } ) ).toVar();
+		// Energy reflected by the specular lobe is not available to the diffuse layer
+		const singleScattering = vec3().toVar();
+		const multiScattering = vec3().toVar();
+
+		this.computeMultiscattering( singleScattering, multiScattering, specularF90, specularColor, this.iridescenceF0Dielectric );
+
+		const diffuse = irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseContribution } ) ).mul( singleScattering.add( multiScattering ).oneMinus() ).toVar();
 
 		if ( this.sheen === true ) {
 
 			const sheenAlbedo = IBLSheenBRDF( { normal: normalView, viewDir: positionViewDirection, roughness: sheenRoughness } );
+
+			this.sheenSpecularIndirect.addAssign( irradiance.mul( sheen, sheenAlbedo, 1 / Math.PI ) );
 
 			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( sheenAlbedo ).oneMinus();
 
@@ -766,7 +779,8 @@ class PhysicalLightingModel extends LightingModel {
 					normal: normalView,
 					viewDir: positionViewDirection,
 					roughness: sheenRoughness
-				} )
+				} ),
+				1 / Math.PI
 			) );
 
 		}
@@ -888,7 +902,7 @@ class PhysicalLightingModel extends LightingModel {
 
 		if ( this.sheen === true ) {
 
-			const sheenLight = outgoingLight.add( this.sheenSpecularDirect, this.sheenSpecularIndirect.mul( 1.0 / Math.PI ) );
+			const sheenLight = outgoingLight.add( this.sheenSpecularDirect, this.sheenSpecularIndirect );
 
 			outgoingLight.assign( sheenLight );
 

@@ -542,16 +542,37 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
 
 	reflectedLight.directSpecular += irradiance * specularBRDF * energyCompensation;
 
-	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseContribution );
+	// Light reflected by the specular interface is not available to the diffuse layer ( glTF fresnel_mix )
+	vec3 halfDir = normalize( directLight.direction + geometryViewDir );
+	float dotVH = saturate( dot( geometryViewDir, halfDir ) );
+	vec3 F = F_Schlick( material.specularColor, material.specularF90, dotVH );
+
+	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseContribution ) * ( 1.0 - F );
 }
 
 void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
 
-	vec3 diffuse = irradiance * BRDF_Lambert( material.diffuseContribution );
+	// Energy reflected by the specular lobe is not available to the diffuse layer
+	vec3 singleScattering = vec3( 0.0 );
+	vec3 multiScattering = vec3( 0.0 );
+
+	#ifdef USE_IRIDESCENCE
+
+		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.iridescence, material.iridescenceF0Dielectric, material.roughness, singleScattering, multiScattering );
+
+	#else
+
+		computeMultiscattering( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.roughness, singleScattering, multiScattering );
+
+	#endif
+
+	vec3 diffuse = irradiance * BRDF_Lambert( material.diffuseContribution ) * ( 1.0 - singleScattering - multiScattering );
 
 	#ifdef USE_SHEEN
 
 		float sheenAlbedo = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );
+
+		sheenSpecularIndirect += irradiance * material.sheenColor * sheenAlbedo * RECIPROCAL_PI;
 
 		float sheenEnergyComp = 1.0 - max3( material.sheenColor ) * sheenAlbedo;
 
