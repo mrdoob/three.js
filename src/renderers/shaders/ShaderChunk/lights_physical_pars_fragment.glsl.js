@@ -422,28 +422,6 @@ void computeMultiscattering( const in vec3 normal, const in vec3 viewDir, const 
 
 }
 
-// GGX BRDF with multi-scattering energy compensation for direct lighting
-// Based on "Practical Multiple Scattering Compensation for Microfacet Models"
-// https://blog.selfshadow.com/publications/turquin/ms_comp_final.pdf
-vec3 BRDF_GGX_Multiscatter( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material ) {
-
-	// Single-scattering BRDF (standard GGX)
-	vec3 singleScatter = BRDF_GGX( lightDir, viewDir, normal, material );
-
-	float dotNV = saturate( dot( normal, viewDir ) );
-
-	vec2 fab = texture2D( dfgLUT, vec2( material.roughness, dotNV ) ).rg;
-
-	// Energy of the single-scattering lobe in a white furnace ( F0 = F90 = 1 )
-	float Ess = fab.x + fab.y;
-
-	// Compensate for the energy lost to multiple scattering, tinting the added term by F0 ( equation 16 )
-	vec3 energyCompensation = 1.0 + material.specularColorBlended * ( 1.0 / Ess - 1.0 );
-
-	return singleScatter * energyCompensation;
-
-}
-
 #if NUM_RECT_AREA_LIGHTS > 0
 
 	void RE_Direct_RectArea_Physical( const in RectAreaLight rectAreaLight, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
@@ -537,20 +515,33 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
  
  	#endif
 
-	vec3 specularBRDF = BRDF_GGX_Multiscatter( directLight.direction, geometryViewDir, geometryNormal, material );
+	vec3 specularBRDF = BRDF_GGX( directLight.direction, geometryViewDir, geometryNormal, material );
 
 	#ifdef USE_RETROREFLECTIVE
 
 		// Minimal Retroreflective Microfacet Model:
 		// https://jcgt.org/published/0015/01/04/
 		vec3 retroViewDir = reflect( - geometryViewDir, geometryNormal );
-		vec3 retroSpecularBRDF = BRDF_GGX_Multiscatter( directLight.direction, retroViewDir, geometryNormal, material );
+		vec3 retroSpecularBRDF = BRDF_GGX( directLight.direction, retroViewDir, geometryNormal, material );
 
 		specularBRDF = mix( specularBRDF, retroSpecularBRDF, saturate( material.retroreflective ) );
 
 	#endif
 
-	reflectedLight.directSpecular += irradiance * specularBRDF;
+	// Multi-scattering energy compensation for direct lighting
+	// Based on "Practical Multiple Scattering Compensation for Microfacet Models"
+	// https://blog.selfshadow.com/publications/turquin/ms_comp_final.pdf
+	float dotNV = saturate( dot( geometryNormal, geometryViewDir ) );
+
+	vec2 fab = texture2D( dfgLUT, vec2( material.roughness, dotNV ) ).rg;
+
+	// Energy of the single-scattering lobe in a white furnace ( F0 = F90 = 1 )
+	float Ess = fab.x + fab.y;
+
+	// Compensate for the energy lost to multiple scattering, tinting the added term by F0 ( equation 16 )
+	vec3 energyCompensation = 1.0 + material.specularColorBlended * ( 1.0 / Ess - 1.0 );
+
+	reflectedLight.directSpecular += irradiance * specularBRDF * energyCompensation;
 
 	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseContribution );
 }
