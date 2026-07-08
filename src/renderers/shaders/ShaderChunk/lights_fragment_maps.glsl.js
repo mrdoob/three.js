@@ -34,6 +34,12 @@ export default /* glsl */`
 
 	#endif
 
+	#ifdef USE_RETROREFLECTIVE
+
+		radiance = mix( radiance, getIBLRetroRadiance( geometryViewDir, geometryNormal, material.roughness ), saturate( material.retroreflective ) );
+
+	#endif
+
 	#ifdef USE_CLEARCOAT
 
 		clearcoatRadiance += getIBLRadiance( geometryViewDir, geometryClearcoatNormal, material.clearcoatRoughness );
