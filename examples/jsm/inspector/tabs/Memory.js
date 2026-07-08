@@ -74,6 +74,36 @@ class Memory extends Tab {
 		this.memoryStats.add( this.uniformBuffers );
 
 		this.graph = graph;
+		this.memoryList = memoryList;
+
+	}
+
+	addWebGPUMemory() {
+
+		this.backendResourceStats = new Item( 'Backend Resources', '', 'N/A' );
+		this.backendResourceStats.domElement.firstChild.classList.add( 'no-hover' );
+		this.memoryList.add( this.backendResourceStats );
+
+		this.renderPassEncoders = new Item( 'Render Pass Encoders', createValueSpan(), 'N/A' );
+		this.backendResourceStats.add( this.renderPassEncoders );
+
+		this.renderBundleEncoders = new Item( 'Render Bundle Encoders', createValueSpan(), 'N/A' );
+		this.backendResourceStats.add( this.renderBundleEncoders );
+
+		this.computePassEncoders = new Item( 'Compute Pass Encoders', createValueSpan(), 'N/A' );
+		this.backendResourceStats.add( this.computePassEncoders );
+
+		this.commandEncoders = new Item( 'Command Encoders', createValueSpan(), 'N/A' );
+		this.backendResourceStats.add( this.commandEncoders );
+
+		this.deviceEncoderSubmits = new Item( 'Device Submits', createValueSpan(), 'N/A' );
+		this.backendResourceStats.add( this.deviceEncoderSubmits );
+
+		this.renderPipelines = new Item( 'Render Pipelines', createValueSpan(), 'N/A' );
+		this.backendResourceStats.add( this.renderPipelines );
+
+		this.computePipelines = new Item( 'Compute Pipelines', createValueSpan(), 'N/A' );
+		this.backendResourceStats.add( this.computePipelines );
 
 	}
 
@@ -128,6 +158,20 @@ class Memory extends Tab {
 
 		setText( this.uniformBuffers.data[ 1 ], memory.uniformBuffers.toString() );
 		setText( this.uniformBuffers.data[ 2 ], formatBytes( memory.uniformBuffersSize ) );
+
+		if ( this.backendResourceStats ) {
+
+			const backendInfo = renderer.info.backendInfo;
+
+			setText( this.renderPassEncoders.data[ 1 ], backendInfo.renderPassEncoders.toString() );
+			setText( this.renderBundleEncoders.data[ 1 ], backendInfo.renderBundleEncoders.toString() );
+			setText( this.computePassEncoders.data[ 1 ], backendInfo.computePassEncoders.toString() );
+			setText( this.commandEncoders.data[ 1 ], backendInfo.commandEncoders.toString() );
+			setText( this.deviceEncoderSubmits.data[ 1 ], backendInfo.deviceEncoderSubmits.toString() );
+			setText( this.renderPipelines.data[ 1 ], backendInfo.renderPipelines.toString() );
+			setText( this.computePipelines.data[ 1 ], backendInfo.computePipelines.toString() );
+
+		}
 
 	}
 
