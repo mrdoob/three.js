@@ -764,6 +764,7 @@ class WebGPUTextureUtils {
 
 		_bufferDescriptor.reset();
 
+		this.backend.renderer.info.backendInfo.commandEncoders ++;
 		const encoder = device.createCommandEncoder( _commandEncoderDescriptor );
 
 		_texelCopyTextureInfo.texture = textureGPU;
@@ -789,6 +790,8 @@ class WebGPUTextureUtils {
 
 		const typedArrayType = this._getTypedArrayType( format );
 
+
+		this.backend.renderer.info.backendInfo.deviceEncoderSubmits ++;
 		submit( device, encoder.finish() );
 
 		await readBuffer.mapAsync( GPUMapMode.READ );

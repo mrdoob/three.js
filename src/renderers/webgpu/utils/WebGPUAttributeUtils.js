@@ -466,6 +466,7 @@ class WebGPUAttributeUtils {
 
 		// copy the data
 		_commandEncoderDescriptor.label = `readback_encoder_${ attribute.name }`;
+		this.backend.renderer.info.backendInfo.commandEncoders ++;
 		const cmdEncoder = device.createCommandEncoder( _commandEncoderDescriptor );
 		_commandEncoderDescriptor.reset();
 
@@ -478,6 +479,7 @@ class WebGPUAttributeUtils {
 		);
 
 		const gpuCommands = cmdEncoder.finish();
+		this.backend.renderer.info.backendInfo.deviceEncoderSubmits ++;
 		submit( device, gpuCommands );
 
 		// map the data to the CPU

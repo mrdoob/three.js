@@ -243,6 +243,7 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		const copyTransferPipeline = this.getTransferPipeline( format, textureGPU.textureBindingViewDimension );
 		const flipTransferPipeline = this.getTransferPipeline( format, tempTexture.textureBindingViewDimension );
 
+		this.backend.renderer.info.backendInfo.commandEncoders ++;
 		const commandEncoder = this.device.createCommandEncoder( _commandEncoderDescriptor );
 
 		const pass = ( pipeline, sourceTexture, sourceArrayLayer, destinationTexture, destinationArrayLayer, flipY ) => {
@@ -287,11 +288,13 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 			_renderPassDescriptor.colorAttachments.push( _colorAttachment );
 
+			this.backend.renderer.info.backendInfo.renderPassEncoders ++;
 			const passEncoder = commandEncoder.beginRenderPass( _renderPassDescriptor );
 
 			_renderPassDescriptor.reset();
 			_colorAttachment.reset();
 
+			this.backend.renderer.info.backendInfo.renderPipelines ++;
 			passEncoder.setPipeline( pipeline );
 			passEncoder.setBindGroup( 0, bindGroup );
 			passEncoder.draw( 3, 1, 0, sourceArrayLayer );
@@ -302,6 +305,7 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		pass( copyTransferPipeline, textureGPU, baseArrayLayer, tempTexture, 0, false );
 		pass( flipTransferPipeline, tempTexture, 0, textureGPU, baseArrayLayer, true );
 
+		this.backend.renderer.info.backendInfo.deviceEncoderSubmits ++;
 		submit( this.device, commandEncoder.finish() );
 
 		tempTexture.destroy();
@@ -325,6 +329,7 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		if ( commandEncoder === null ) {
 
 			_commandEncoderDescriptor.label = 'mipmapEncoder';
+			this.backend.renderer.info.backendInfo.commandEncoders ++;
 			commandEncoder = this.device.createCommandEncoder( _commandEncoderDescriptor );
 			_commandEncoderDescriptor.reset();
 
@@ -332,7 +337,12 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 		this._mipmapRunBundles( commandEncoder, passes );
 
-		if ( encoder === null ) submit( this.device, commandEncoder.finish() );
+		if ( encoder === null ) {
+
+			this.backend.renderer.info.backendInfo.deviceEncoderSubmits ++;
+			submit( this.device, commandEncoder.finish() );
+
+		}
 
 		textureData.layers = passes;
 
@@ -402,10 +412,12 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 				_renderBundleEncoderDescriptor.colorFormats = [ textureGPU.format ];
 
+				this.backend.renderer.info.backendInfo.renderBundleEncoders ++;
 				const passEncoder = this.device.createRenderBundleEncoder( _renderBundleEncoderDescriptor );
 
 				_renderBundleEncoderDescriptor.reset();
 
+				this.backend.renderer.info.backendInfo.renderPipelines ++;
 				passEncoder.setPipeline( pipeline );
 				passEncoder.setBindGroup( 0, bindGroup );
 				passEncoder.draw( 3, 1, 0, baseArrayLayer );
@@ -437,6 +449,7 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 			const pass = passes[ i ];
 
+			this.backend.renderer.info.backendInfo.renderPassEncoders ++;
 			const passEncoder = commandEncoder.beginRenderPass( pass.passDescriptor );
 
 			passEncoder.executeBundles( pass.renderBundles );

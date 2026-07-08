@@ -363,6 +363,7 @@ class WebGPUPipelineUtils {
 		_renderBundleEncoderDescriptor.depthStencilFormat = depthStencilFormat;
 		_renderBundleEncoderDescriptor.sampleCount = sampleCount;
 
+		this.backend.renderer.info.backendInfo.renderBundleEncoders ++;
 		const bundleEncoder = device.createRenderBundleEncoder( _renderBundleEncoderDescriptor );
 
 		_renderBundleEncoderDescriptor.reset();
