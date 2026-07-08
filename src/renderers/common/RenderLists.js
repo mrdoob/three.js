@@ -32,6 +32,23 @@ class RenderLists {
 		 */
 		this.lists = new ChainMap();
 
+		/**
+		 * The render lists which are currently in use. Lists are removed
+		 * as soon as they become stale.
+		 *
+		 * @private
+		 * @type {Set<RenderList>}
+		 */
+		this._activeLists = new Set();
+
+		/**
+		 * The current frame ID.
+		 *
+		 * @private
+		 * @type {number}
+		 */
+		this._frameId = - 1;
+
 	}
 
 	/**
@@ -60,7 +77,40 @@ class RenderLists {
 		_chainKeys[ 0 ] = null;
 		_chainKeys[ 1 ] = null;
 
+		//
+
+		list.frameId = this._frameId;
+		this._activeLists.add( list );
+
 		return list;
+
+	}
+
+	/**
+	 * Must be called when a new frame begins.
+	 *
+	 * @param {number} frameId - The current frame ID.
+	 */
+	update( frameId ) {
+
+		if ( frameId === this._frameId ) return;
+
+		this._frameId = frameId;
+
+		for ( const list of this._activeLists ) {
+
+			// if a render list has not been used within 10 frames, consider
+			// it as inactive and clear it
+
+			if ( frameId - list.frameId > 10 ) {
+
+				list.clear();
+
+				this._activeLists.delete( list );
+
+			}
+
+		}
 
 	}
 
@@ -70,6 +120,9 @@ class RenderLists {
 	dispose() {
 
 		this.lists = new ChainMap();
+
+		this._activeLists.clear();
+		this._frameId = - 1;
 
 	}
 

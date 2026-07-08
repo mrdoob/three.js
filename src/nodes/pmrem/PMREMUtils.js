@@ -1,8 +1,10 @@
 import { Fn, int, uint, float, vec2, vec3, vec4, If } from '../tsl/TSLBase.js';
-import { cos, sin, abs, max, exp2, log2, clamp, fract, mix, floor, normalize, cross, dot, sqrt } from '../math/MathNode.js';
+import { cos, sin, abs, min, max, exp, exp2, log, log2, clamp, fract, mix, floor, normalize, cross, dot, sqrt } from '../math/MathNode.js';
 import { mul } from '../math/OperatorNode.js';
 import { select } from '../math/ConditionalNode.js';
-import { Loop, Break } from '../utils/LoopNode.js';
+import { Loop } from '../utils/LoopNode.js';
+
+const GOLDEN_ANGLE = 2.399963229728653;
 
 // These defines must match with PMREMGenerator
 
@@ -143,53 +145,6 @@ const roughnessToMip = /*@__PURE__*/ Fn( ( [ roughness ] ) => {
 	]
 } );
 
-// RH coordinate system; PMREM face-indexing convention
-export const getDirection = /*@__PURE__*/ Fn( ( [ uv_immutable, face ] ) => {
-
-	const uv = uv_immutable.toVar();
-	uv.assign( mul( 2.0, uv ).sub( 1.0 ) );
-	const direction = vec3( uv, 1.0 ).toVar();
-
-	If( face.equal( 0.0 ), () => {
-
-		direction.assign( direction.zyx ); // ( 1, v, u ) pos x
-
-	} ).ElseIf( face.equal( 1.0 ), () => {
-
-		direction.assign( direction.xzy );
-		direction.xz.mulAssign( - 1.0 ); // ( -u, 1, -v ) pos y
-
-	} ).ElseIf( face.equal( 2.0 ), () => {
-
-		direction.x.mulAssign( - 1.0 ); // ( -u, v, 1 ) pos z
-
-	} ).ElseIf( face.equal( 3.0 ), () => {
-
-		direction.assign( direction.zyx );
-		direction.xz.mulAssign( - 1.0 ); // ( -1, v, -u ) neg x
-
-	} ).ElseIf( face.equal( 4.0 ), () => {
-
-		direction.assign( direction.xzy );
-		direction.xy.mulAssign( - 1.0 ); // ( -u, -1, v ) neg y
-
-	} ).ElseIf( face.equal( 5.0 ), () => {
-
-		direction.z.mulAssign( - 1.0 ); // ( u, v, -1 ) neg zS
-
-	} );
-
-	return direction;
-
-} ).setLayout( {
-	name: 'getDirection',
-	type: 'vec3',
-	inputs: [
-		{ name: 'uv', type: 'vec2' },
-		{ name: 'face', type: 'float' }
-	]
-} );
-
 //
 
 export const textureCubeUV = /*@__PURE__*/ Fn( ( [ envMap, sampleDir_immutable, roughness_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
@@ -241,49 +196,51 @@ const bilinearCubeUV = /*@__PURE__*/ Fn( ( [ envMap, direction_immutable, mipInt
 
 } );
 
-const getSample = /*@__PURE__*/ Fn( ( { envMap, mipInt, outputDirection, theta, axis, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
+// Gaussian blur along a golden-angle spiral, importance-sampled by stratified
+// inverse-CDF so every sample carries equal Gaussian weight.
+export const sphericalGaussianBlur = /*@__PURE__*/ Fn( ( { SAMPLES, sigma, outputDirection, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
 
-	const cosTheta = cos( theta );
+	const color = vec3( 0.0 ).toVar();
 
-	// Rodrigues' axis-angle rotation
-	const sampleDirection = outputDirection.mul( cosTheta )
-		.add( axis.cross( outputDirection ).mul( sin( theta ) ) )
-		.add( axis.mul( axis.dot( outputDirection ).mul( cosTheta.oneMinus() ) ) );
+	If( sigma.equal( 0.0 ), () => {
 
-	return bilinearCubeUV( envMap, sampleDirection, mipInt, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP );
+		color.assign( bilinearCubeUV( envMap, outputDirection, mipInt, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ) );
 
-} );
+	} ).Else( () => {
 
-export const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirection, weights, samples, dTheta, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
+		const up = select( abs( outputDirection.z ).lessThan( 0.999 ), vec3( 0.0, 0.0, 1.0 ), vec3( 1.0, 0.0, 0.0 ) );
+		const tangent = normalize( cross( up, outputDirection ) ).toVar();
+		const bitangent = cross( outputDirection, tangent ).toVar();
 
-	const axis = vec3( select( latitudinal, poleAxis, cross( poleAxis, outputDirection ) ) ).toVar();
+		// Truncate the kernel at three standard deviations or at the antipode.
+		const thetaMax = min( sigma.mul( 3.0 ), Math.PI );
+		const truncation = exp( thetaMax.mul( thetaMax ).mul( - 0.5 ).div( sigma.mul( sigma ) ) ).oneMinus().toVar();
 
-	If( axis.equal( vec3( 0.0 ) ), () => {
+		const accumWeight = float( 0.0 ).toVar();
 
-		axis.assign( vec3( outputDirection.z, 0.0, outputDirection.x.negate() ) );
+		Loop( { start: int( 0 ), end: SAMPLES }, ( { i } ) => {
 
-	} );
+			// Stratified inverse-CDF sampling of the Gaussian, placed on a golden-angle spiral.
+			const stratum = float( i ).add( 0.5 ).div( float( SAMPLES ) );
+			const theta = sigma.mul( sqrt( log( stratum.mul( truncation ).oneMinus() ).mul( - 2.0 ) ) ).toVar();
+			const phi = float( i ).mul( GOLDEN_ANGLE ).toVar();
 
-	axis.assign( normalize( axis ) );
+			const offset = tangent.mul( cos( phi ) ).add( bitangent.mul( sin( phi ) ) );
+			const sampleDirection = outputDirection.mul( cos( theta ) ).add( offset.mul( sin( theta ) ) );
 
-	const gl_FragColor = vec3().toVar();
-	gl_FragColor.addAssign( weights.element( 0 ).mul( getSample( { theta: 0.0, axis, outputDirection, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) ) );
+			// Correct the planar sample density to solid angle.
+			const weight = sin( theta ).div( theta ).toVar();
 
-	Loop( { start: int( 1 ), end: n }, ( { i } ) => {
-
-		If( i.greaterThanEqual( samples ), () => {
-
-			Break();
+			color.addAssign( bilinearCubeUV( envMap, sampleDirection, mipInt, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ).mul( weight ) );
+			accumWeight.addAssign( weight );
 
 		} );
 
-		const theta = float( dTheta.mul( float( i ) ) ).toVar();
-		gl_FragColor.addAssign( weights.element( i ).mul( getSample( { theta: theta.mul( - 1.0 ), axis, outputDirection, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) ) );
-		gl_FragColor.addAssign( weights.element( i ).mul( getSample( { theta, axis, outputDirection, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) ) );
+		color.divAssign( accumWeight );
 
 	} );
 
-	return vec4( gl_FragColor, 1 );
+	return vec4( color, 1.0 );
 
 } );
 

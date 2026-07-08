@@ -85,6 +85,12 @@ material.roughness = min( material.roughness, 1.0 );
 
 #endif
 
+#ifdef USE_RETROREFLECTIVE
+
+	material.retroreflective = retroreflective;
+
+#endif
+
 #ifdef USE_IRIDESCENCE
 
 	material.iridescence = iridescence;
