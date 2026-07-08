@@ -5,6 +5,7 @@ import { cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
 import { materialLineScale, materialLineDashSize, materialLineGapSize, materialLineDashOffset, materialLineWidth } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { positionGeometry } from '../../nodes/accessors/Position.js';
+import { uniform } from '../../nodes/core/UniformNode.js';
 import { mix, smoothstep } from '../../nodes/math/MathNode.js';
 import { Fn, float, vec2, vec3, vec4, If } from '../../nodes/tsl/TSLBase.js';
 import { uv } from '../../nodes/accessors/UV.js';
@@ -52,12 +53,13 @@ const worldPos = varyingProperty( 'vec4', 'worldPos' );
  * @param {Object} inputs
  * @param {Node<vec4>} inputs.start - Segment start position in view space.
  * @param {Node<vec4>} inputs.end - Segment end position in view space.
+ * @param {Node<mat4>} inputs.projectionMatrix - Projection matrix used for the segment.
  * @returns {Node<float>} The interpolation factor (alpha) to trim the segment.
  */
-const trimSegmentAlpha = Fn( ( { start, end } ) => {
+const trimSegmentAlpha = Fn( ( { start, end, projectionMatrix } ) => {
 
-	const a = cameraProjectionMatrix.element( 2 ).element( 2 ); // 3nd entry in 3th column
-	const b = cameraProjectionMatrix.element( 3 ).element( 2 ); // 3nd entry in 4th column
+	const a = projectionMatrix.element( 2 ).element( 2 ); // 3rd entry in 3rd column
+	const b = projectionMatrix.element( 3 ).element( 2 ); // 3rd entry in 4th column
 
 	// we need different nearEstimate formula for reversed and default depth buffer
 	// a is positive with a reversed depth buffer so it can be used for controlling the code flow
@@ -66,7 +68,7 @@ const trimSegmentAlpha = Fn( ( { start, end } ) => {
 
 	return nearEstimate.sub( start.z ).div( end.z.sub( start.z ) );
 
-}, { start: 'vec4', end: 'vec4', return: 'float' } );
+}, { start: 'vec4', end: 'vec4', projectionMatrix: 'mat4', return: 'float' } );
 
 /**
  * Calculates the closest points on two 3D lines.
@@ -109,7 +111,7 @@ const closestLineToLine = Fn( ( { p1, p2, p3, p4 } ) => {
  * @tsl
  * @type {Node<vec4>}
  */
-const mvpLine = Fn( ( { material } ) => {
+const getLineClip = ( material, modelViewMatrixNode, projectionMatrixNode, writeLineVaryings, name ) => {
 
 	const useDash = material._useDash;
 	const useWorldUnits = material._useWorldUnits;
@@ -119,19 +121,19 @@ const mvpLine = Fn( ( { material } ) => {
 
 	// camera space
 
-	const start = vec4( modelViewMatrix.mul( vec4( instanceStart, 1.0 ) ) ).toVar( 'start' );
-	const end = vec4( modelViewMatrix.mul( vec4( instanceEnd, 1.0 ) ) ).toVar( 'end' );
+	const start = vec4( modelViewMatrixNode.mul( vec4( instanceStart, 1.0 ) ) ).toVar( `${ name }Start` );
+	const end = vec4( modelViewMatrixNode.mul( vec4( instanceEnd, 1.0 ) ) ).toVar( `${ name }End` );
 
 	let distanceStart, distanceEnd;
 
-	if ( useDash ) {
+	if ( useDash && writeLineVaryings ) {
 
-		distanceStart = float( attribute( 'instanceDistanceStart' ) ).toVar( 'distanceStart' );
-		distanceEnd = float( attribute( 'instanceDistanceEnd' ) ).toVar( 'distanceEnd' );
+		distanceStart = float( attribute( 'instanceDistanceStart' ) ).toVar( `${ name }DistanceStart` );
+		distanceEnd = float( attribute( 'instanceDistanceEnd' ) ).toVar( `${ name }DistanceEnd` );
 
 	}
 
-	if ( useWorldUnits ) {
+	if ( useWorldUnits && writeLineVaryings ) {
 
 		worldStart.assign( start.xyz );
 		worldEnd.assign( end.xyz );
@@ -145,16 +147,16 @@ const mvpLine = Fn( ( { material } ) => {
 	// but we need to perform ndc-space calculations in the shader, so we must address this issue directly
 	// perhaps there is a more elegant solution -- WestLangley
 
-	const perspective = cameraProjectionMatrix.element( 2 ).element( 3 ).equal( - 1.0 ); // 4th entry in the 3rd column
+	const perspective = projectionMatrixNode.element( 2 ).element( 3 ).equal( - 1.0 ); // 4th entry in the 3rd column
 
 	If( perspective, () => {
 
 		If( start.z.lessThan( 0.0 ).and( end.z.greaterThan( 0.0 ) ), () => {
 
-			const alpha = trimSegmentAlpha( { start, end } );
+			const alpha = trimSegmentAlpha( { start, end, projectionMatrix: projectionMatrixNode } );
 			end.assign( vec4( mix( start.xyz, end.xyz, alpha ), end.w ) );
 
-			if ( useDash ) {
+			if ( useDash && writeLineVaryings ) {
 
 				distanceEnd.assign( mix( distanceStart, distanceEnd, alpha ) );
 
@@ -162,10 +164,10 @@ const mvpLine = Fn( ( { material } ) => {
 
 		} ).ElseIf( end.z.lessThan( 0.0 ).and( start.z.greaterThanEqual( 0.0 ) ), () => {
 
-			const alpha = trimSegmentAlpha( { start: end, end: start } );
+			const alpha = trimSegmentAlpha( { start: end, end: start, projectionMatrix: projectionMatrixNode } );
 			start.assign( vec4( mix( end.xyz, start.xyz, alpha ), start.w ) );
 
-			if ( useDash ) {
+			if ( useDash && writeLineVaryings ) {
 
 				distanceStart.assign( mix( distanceEnd, distanceStart, alpha ) );
 
@@ -175,7 +177,7 @@ const mvpLine = Fn( ( { material } ) => {
 
 	} );
 
-	if ( useDash ) {
+	if ( useDash && writeLineVaryings ) {
 
 		const dashScaleNode = material.dashScaleNode ? float( material.dashScaleNode ) : materialLineScale;
 		const offsetNode = material.offsetNode ? float( material.offsetNode ) : materialLineDashOffset;
@@ -188,8 +190,8 @@ const mvpLine = Fn( ( { material } ) => {
 	}
 
 	// clip space
-	const clipStart = cameraProjectionMatrix.mul( start );
-	const clipEnd = cameraProjectionMatrix.mul( end );
+	const clipStart = projectionMatrixNode.mul( start );
+	const clipEnd = projectionMatrixNode.mul( end );
 
 	// ndc space
 	const ndcStart = clipStart.xyz.div( clipStart.w );
@@ -213,33 +215,39 @@ const mvpLine = Fn( ( { material } ) => {
 		const worldUp = worldDir.cross( tmpFwd ).normalize();
 		const worldFwd = worldDir.cross( worldUp );
 
-		worldPos.assign( positionGeometry.y.lessThan( 0.5 ).select( start, end ) );
+		const lineWorldPos = positionGeometry.y.lessThan( 0.5 ).select( start, end ).toVar( `${ name }WorldPos` );
 
 		// height offset
 		const hw = materialLineWidth.mul( 0.5 );
-		worldPos.addAssign( vec4( positionGeometry.x.lessThan( 0.0 ).select( worldUp.mul( hw ), worldUp.mul( hw ).negate() ), 0 ) );
+		lineWorldPos.addAssign( vec4( positionGeometry.x.lessThan( 0.0 ).select( worldUp.mul( hw ), worldUp.mul( hw ).negate() ), 0 ) );
 
 		// don't extend the line if we're rendering dashes because we
 		// won't be rendering the endcaps
 		if ( ! useDash ) {
 
 			// cap extension
-			worldPos.addAssign( vec4( positionGeometry.y.lessThan( 0.5 ).select( worldDir.mul( hw ).negate(), worldDir.mul( hw ) ), 0 ) );
+			lineWorldPos.addAssign( vec4( positionGeometry.y.lessThan( 0.5 ).select( worldDir.mul( hw ).negate(), worldDir.mul( hw ) ), 0 ) );
 
 			// add width to the box
-			worldPos.addAssign( vec4( worldFwd.mul( hw ), 0 ) );
+			lineWorldPos.addAssign( vec4( worldFwd.mul( hw ), 0 ) );
 
 			// endcaps
 			If( positionGeometry.y.greaterThan( 1.0 ).or( positionGeometry.y.lessThan( 0.0 ) ), () => {
 
-				worldPos.subAssign( vec4( worldFwd.mul( 2.0 ).mul( hw ), 0 ) );
+				lineWorldPos.subAssign( vec4( worldFwd.mul( 2.0 ).mul( hw ), 0 ) );
 
 			} );
 
 		}
 
+		if ( writeLineVaryings ) {
+
+			worldPos.assign( lineWorldPos );
+
+		}
+
 		// project the worldpos
-		clip.assign( cameraProjectionMatrix.mul( worldPos ) );
+		clip.assign( projectionMatrixNode.mul( lineWorldPos ) );
 
 		// shift the depth of the projected points so the line
 		// segments overlap neatly
@@ -250,7 +258,7 @@ const mvpLine = Fn( ( { material } ) => {
 
 	} else {
 
-		const offset = vec2( dir.y, dir.x.negate() ).toVar( 'offset' );
+		const offset = vec2( dir.y, dir.x.negate() ).toVar( `${ name }Offset` );
 
 		// undo aspect ratio adjustment
 		dir.x.assign( dir.x.div( aspect ) );
@@ -288,7 +296,31 @@ const mvpLine = Fn( ( { material } ) => {
 
 	return clip;
 
+};
+
+const mvpLine = Fn( ( { material } ) => {
+
+	return getLineClip( material, modelViewMatrix, cameraProjectionMatrix, true, 'line' );
+
 } )();
+
+const lineClip = Fn( ( [ modelViewMatrixNode, projectionMatrixNode, material, name ] ) => {
+
+	return getLineClip( material, modelViewMatrixNode, projectionMatrixNode, false, name );
+
+}, 'vec4' );
+
+const lineVelocity = Fn( ( [ currentProjectionMatrix, previousProjectionMatrix, previousModelViewMatrix, material ] ) => {
+
+	const clipPositionCurrent = lineClip( modelViewMatrix, currentProjectionMatrix, material, 'lineVelocityCurrent' ).toVarying( 'v_lineVelocityCurrent' );
+	const clipPositionPrevious = lineClip( previousModelViewMatrix, previousProjectionMatrix, material, 'lineVelocityPrevious' ).toVarying( 'v_lineVelocityPrevious' );
+
+	const ndcPositionCurrent = clipPositionCurrent.xy.div( clipPositionCurrent.w );
+	const ndcPositionPrevious = clipPositionPrevious.xy.div( clipPositionPrevious.w );
+
+	return ndcPositionCurrent.sub( ndcPositionPrevious );
+
+}, 'vec2' );
 
 /**
  * TSL fragment node that computes the shape/coverage (alpha) of the fat line segment.
@@ -527,6 +559,23 @@ class Line2NodeMaterial extends NodeMaterial {
 	setupModelViewProjection( /*builder*/ ) {
 
 		return mvpLine;
+
+	}
+
+	/**
+	 * Setups motion vectors for wide lines. This mirrors the custom line
+	 * expansion used for the visible color pass so temporal reprojection can
+	 * follow the rendered line pixels.
+	 *
+	 * @param {VelocityNode} velocityNode - The velocity node requesting custom output.
+	 * @return {Node<vec2>} The motion vector.
+	 */
+	setupVelocity( velocityNode ) {
+
+		const projectionMatrix = ( velocityNode.projectionMatrix === null ) ? cameraProjectionMatrix : uniform( velocityNode.projectionMatrix );
+		const previousModelViewMatrix = velocityNode.previousCameraViewMatrix.mul( velocityNode.previousModelWorldMatrix );
+
+		return lineVelocity( projectionMatrix, velocityNode.previousProjectionMatrix, previousModelViewMatrix, this );
 
 	}
 

@@ -161,7 +161,21 @@ class VelocityNode extends TempNode {
 	 * @param {NodeBuilder} builder - A reference to the current node builder.
 	 * @return {Node<vec2>} The motion vector.
 	 */
-	setup( /*builder*/ ) {
+	setup( builder ) {
+
+		const { material } = builder;
+
+		if ( material && typeof material.setupVelocity === 'function' ) {
+
+			const velocityNode = material.setupVelocity( this );
+
+			if ( velocityNode !== null && velocityNode !== undefined ) {
+
+				return velocityNode;
+
+			}
+
+		}
 
 		const projectionMatrix = ( this.projectionMatrix === null ) ? cameraProjectionMatrix : uniform( this.projectionMatrix );
 
