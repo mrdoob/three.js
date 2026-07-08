@@ -30,9 +30,8 @@ struct PhysicalMaterial {
 		float iridescenceIOR;
 		float iridescenceThickness;
 		vec3 iridescenceFresnel;
-		vec3 iridescenceF0;
-		vec3 iridescenceFresnelDielectric;
-		vec3 iridescenceFresnelMetallic;
+		vec3 iridescenceF0Dielectric;
+		vec3 iridescenceF0Metallic;
 	#endif
 
 	#ifdef USE_SHEEN
@@ -589,8 +588,8 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	#ifdef USE_IRIDESCENCE
 
-		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.iridescence, material.iridescenceFresnelDielectric, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
-		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.diffuseColor, material.specularF90, material.iridescence, material.iridescenceFresnelMetallic, material.roughness, singleScatteringMetallic, multiScatteringMetallic );
+		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.iridescence, material.iridescenceF0Dielectric, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
+		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.diffuseColor, material.specularF90, material.iridescence, material.iridescenceF0Metallic, material.roughness, singleScatteringMetallic, multiScatteringMetallic );
 
 	#else
 
