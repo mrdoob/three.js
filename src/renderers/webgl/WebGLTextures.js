@@ -1065,8 +1065,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 											}
 
-											texture.clearLayerUpdates();
-
 										} else {
 
 											state.compressedTexSubImage3D( _gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data );
@@ -1106,6 +1104,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 						}
 
 					}
+
+					if ( texture.layerUpdates.size > 0 ) texture.clearLayerUpdates();
 
 				} else {
 
