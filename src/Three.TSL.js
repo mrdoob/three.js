@@ -21,7 +21,6 @@ export const NodeShaderStage = TSL.NodeShaderStage;
 export const NodeType = TSL.NodeType;
 export const NodeUpdateType = TSL.NodeUpdateType;
 export const PCFShadowFilter = TSL.PCFShadowFilter;
-export const PCFSoftShadowFilter = TSL.PCFSoftShadowFilter;
 export const PI = TSL.PI;
 export const PI2 = TSL.PI2;
 export const TWO_PI = TSL.TWO_PI;
