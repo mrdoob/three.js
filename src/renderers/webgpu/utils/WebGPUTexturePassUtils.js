@@ -33,18 +33,25 @@ class WebGPUTexturePassUtils extends DataMap {
 	/**
 	 * Constructs a new utility object.
 	 *
-	 * @param {GPUDevice} device - The WebGPU device.
+	 * @param {WebGPUBackend} backend - The WebGPU backend.
 	 */
-	constructor( device ) {
+	constructor( backend ) {
 
 		super();
+
+		/**
+		 * The renderer's backend.
+		 *
+		 * @type {Backend}
+		 */
+		this.backend = backend;
 
 		/**
 		 * The WebGPU device.
 		 *
 		 * @type {GPUDevice}
 		 */
-		this.device = device;
+		this.device = this.backend.device;
 
 		const mipmapSource = `
 struct VarysStruct {
@@ -127,14 +134,14 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		 *
 		 * @type {GPUSampler}
 		 */
-		this.mipmapSampler = device.createSampler( { minFilter: GPUFilterMode.Linear } );
+		this.mipmapSampler = this.device.createSampler( { minFilter: GPUFilterMode.Linear } );
 
 		/**
 		 * The flipY GPU sampler.
 		 *
 		 * @type {GPUSampler}
 		 */
-		this.flipYSampler = device.createSampler( { minFilter: GPUFilterMode.Nearest } ); //@TODO?: Consider using textureLoad()
+		this.flipYSampler = this.device.createSampler( { minFilter: GPUFilterMode.Nearest } ); //@TODO?: Consider using textureLoad()
 
 		/**
 		 * flip uniform buffer
@@ -143,11 +150,11 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		_bufferDescriptor.size = 4;
 		_bufferDescriptor.usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
 
-		this.flipUniformBuffer = device.createBuffer( _bufferDescriptor );
+		this.flipUniformBuffer = this.device.createBuffer( _bufferDescriptor );
 
 		_bufferDescriptor.reset();
 
-		device.queue.writeBuffer( this.flipUniformBuffer, 0, new Uint32Array( [ 1 ] ) );
+		this.device.queue.writeBuffer( this.flipUniformBuffer, 0, new Uint32Array( [ 1 ] ) );
 
 		/**
 		 * no flip uniform buffer
@@ -156,7 +163,7 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		_bufferDescriptor.size = 4;
 		_bufferDescriptor.usage = GPUBufferUsage.UNIFORM;
 
-		this.noFlipUniformBuffer = device.createBuffer( _bufferDescriptor );
+		this.noFlipUniformBuffer = this.device.createBuffer( _bufferDescriptor );
 
 		_bufferDescriptor.reset();
 
@@ -176,7 +183,7 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		_shaderModuleDescriptor.label = 'mipmap';
 		_shaderModuleDescriptor.code = mipmapSource;
 
-		this.mipmapShaderModule = device.createShaderModule( _shaderModuleDescriptor );
+		this.mipmapShaderModule = this.device.createShaderModule( _shaderModuleDescriptor );
 
 		_shaderModuleDescriptor.reset();
 

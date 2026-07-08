@@ -982,7 +982,7 @@ class WebGPUTextureUtils {
 
 		if ( passUtils === null ) {
 
-			this._passUtils = passUtils = new WebGPUTexturePassUtils( this.backend.device );
+			this._passUtils = passUtils = new WebGPUTexturePassUtils( this.backend );
 
 		}
 
