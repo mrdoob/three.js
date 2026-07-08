@@ -190,9 +190,9 @@ const getIBLVolumeRefraction = /*@__PURE__*/ Fn( ( [ n, v, roughness, diffuseCol
 
 // XYZ to linear-sRGB color space
 const XYZ_TO_REC709 = /*@__PURE__*/ mat3(
-	3.2404542, - 0.9692660, 0.0556434,
-	- 1.5371385, 1.8760108, - 0.2040259,
-	- 0.4985314, 0.0415560, 1.0572252
+	3.2404542, - 1.5371385, - 0.4985314,
+	- 0.9692660, 1.8760108, 0.0415560,
+	0.0556434, - 0.2040259, 1.0572252
 );
 
 // Assume air interface for top
