@@ -904,7 +904,7 @@ class Renderer {
 
 		if ( this.shadowMap.type === PCFSoftShadowMap ) {
 
-			warn( 'Renderer: PCFSoftShadowMap has been removed. Using PCFShadowMap instead.' );
+			warn( 'WebGPURenderer: PCFSoftShadowMap has been removed. Using PCFShadowMap instead.' );
 
 			this.shadowMap.type = PCFShadowMap;
 
@@ -1552,7 +1552,7 @@ class Renderer {
 
 		if ( this.shadowMap.type === PCFSoftShadowMap ) {
 
-			warn( 'Renderer: PCFSoftShadowMap has been removed. Using PCFShadowMap instead.' );
+			warn( 'WebGPURenderer: PCFSoftShadowMap has been removed. Using PCFShadowMap instead.' );
 
 			this.shadowMap.type = PCFShadowMap;
 
