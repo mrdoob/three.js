@@ -33,8 +33,7 @@ const toneMappingMap = {
 
 function WebGLOutput( type, width, height, antialias, depth, stencil ) {
 
-	// the format of the depth texture must match the stencil setting, otherwise the
-	// multisample resolve blit fails with a depth/stencil format mismatch
+	// make sure depth texture matches renderer settings
 
 	let depthTexture;
 
