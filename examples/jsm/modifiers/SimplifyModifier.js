@@ -33,7 +33,7 @@ class SimplifyModifier {
 	 *
 	 * @param {BufferGeometry} geometry - The geometry to modify.
 	 * @param {number} count - The number of vertices to remove.
-	 * @param {string[]} [ignoredAttributes=[]] - The attributes to be kept the same and excluded from simplification.
+	 * @param {Array<string>} [ignoredAttributes=[]] - The attributes to be kept the same and excluded from simplification.
 	 * @param {Object} [config] - The config for the attributes
 	 * @return {BufferGeometry} A new, modified geometry.
 	 */
