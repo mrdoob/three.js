@@ -46,7 +46,6 @@ const refreshUniforms = [
 	'normalMap',
 	'normalScale',
 	'opacity',
-	'retroreflective',
 	'roughness',
 	'roughnessMap',
 	'sheen',
@@ -196,7 +195,6 @@ class NodeMaterialObserver {
 
 			data = {
 				geometryId: geometry.id,
-				materialVersion: this.getMaterialData( renderObject.material )._version,
 				worldMatrix: object.matrixWorld.clone()
 			};
 
@@ -337,7 +335,7 @@ class NodeMaterialObserver {
 
 		if ( data === undefined ) {
 
-			data = { _renderId: -1, _version: 0 };
+			data = { _renderId: -1, _equal: false };
 
 			for ( const property of this.refreshUniforms ) {
 
@@ -401,13 +399,11 @@ class NodeMaterialObserver {
 
 		const materialData = this.getMaterialData( renderObject.material );
 
-		// check the material properties just once per render for all render objects
+		// check the material for the "equal" state just once per render for all render objects
 
 		if ( materialData._renderId !== renderId ) {
 
 			materialData._renderId = renderId;
-
-			let changed = false;
 
 			for ( const property in materialData ) {
 
@@ -415,7 +411,7 @@ class NodeMaterialObserver {
 				const mtlValue = material[ property ];
 
 				if ( property === '_renderId' ) continue;
-				if ( property === '_version' ) continue;
+				if ( property === '_equal' ) continue;
 
 				if ( value.equals !== undefined ) {
 
@@ -423,7 +419,8 @@ class NodeMaterialObserver {
 
 						value.copy( mtlValue );
 
-						changed = true;
+						materialData._equal = false;
+						return false;
 
 					}
 
@@ -434,7 +431,8 @@ class NodeMaterialObserver {
 						value.id = mtlValue.id;
 						value.version = mtlValue.version;
 
-						changed = true;
+						materialData._equal = false;
+						return false;
 
 					}
 
@@ -442,38 +440,34 @@ class NodeMaterialObserver {
 
 					materialData[ property ] = mtlValue;
 
-					changed = true;
+					materialData._equal = false;
+					return false;
 
 				}
 
 			}
 
-			if ( changed === true ) materialData._version ++;
+			if ( materialData.transmission > 0 ) {
 
-		}
+				const { width, height } = renderObject.context;
 
-		// a version mismatch means the material has changed since this render object was last refreshed
+				if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
 
-		if ( renderObjectData.materialVersion !== materialData._version ) {
+					renderObjectData.bufferWidth = width;
+					renderObjectData.bufferHeight = height;
 
-			renderObjectData.materialVersion = materialData._version;
+					materialData._equal = false;
+					return false;
 
-			return false;
-
-		}
-
-		if ( materialData.transmission > 0 ) {
-
-			const { width, height } = renderObject.context;
-
-			if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
-
-				renderObjectData.bufferWidth = width;
-				renderObjectData.bufferHeight = height;
-
-				return false;
+				}
 
 			}
+
+			materialData._equal = true;
+
+		} else {
+
+			if ( materialData._equal === false ) return false;
 
 		}
 
@@ -48282,8 +48276,8 @@ const mx_heighttonormal = ( input, scale/*, texcoord*/ ) => {
 const getParallaxCorrectNormal = /*@__PURE__*/ Fn( ( [ normal, cubeSize, cubePos ] ) => {
 
 	const nDir = normalize( normal ).toVar();
-	const rbmax = cubeSize.mul( 0.5 ).add( cubePos ).sub( positionWorld ).div( nDir ).toVar();
-	const rbmin = cubeSize.mul( -0.5 ).add( cubePos ).sub( positionWorld ).div( nDir ).toVar();
+	const rbmax = sub( float( 0.5 ).mul( cubeSize.sub( cubePos ) ), positionWorld ).div( nDir ).toVar();
+	const rbmin = sub( float( -0.5 ).mul( cubeSize.sub( cubePos ) ), positionWorld ).div( nDir ).toVar();
 	const rbminmax = vec3().toVar();
 	rbminmax.x = nDir.x.greaterThan( float( 0 ) ).select( rbmax.x, rbmin.x );
 	rbminmax.y = nDir.y.greaterThan( float( 0 ) ).select( rbmax.y, rbmin.y );
@@ -69836,29 +69830,12 @@ class WebGLTextureUtils {
 
 				if ( texture.isCompressedArrayTexture ) {
 
+
 					if ( texture.format !== gl.RGBA ) {
 
 						if ( glFormat !== null ) {
 
-							if ( texture.layerUpdates.size > 0 ) {
-
-								const layerByteLength = getByteLength( mipmap.width, mipmap.height, texture.format, texture.type );
-
-								for ( const layerIndex of texture.layerUpdates ) {
-
-									const layerData = mipmap.data.subarray(
-										layerIndex * layerByteLength / mipmap.data.BYTES_PER_ELEMENT,
-										( layerIndex + 1 ) * layerByteLength / mipmap.data.BYTES_PER_ELEMENT
-									);
-									gl.compressedTexSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, layerIndex, mipmap.width, mipmap.height, 1, glFormat, layerData );
-
-								}
-
-							} else {
-
-								gl.compressedTexSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data );
-
-							}
+							gl.compressedTexSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data );
 
 						} else {
 
@@ -69888,7 +69865,6 @@ class WebGLTextureUtils {
 
 			}
 
-			if ( texture.isCompressedArrayTexture && texture.layerUpdates.size > 0 ) texture.clearLayerUpdates();
 
 		} else if ( texture.isCubeTexture ) {
 
