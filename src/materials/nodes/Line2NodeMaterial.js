@@ -1,10 +1,10 @@
 import NodeMaterial from './NodeMaterial.js';
 import { dashSize, diffuseColor, gapSize, varyingProperty } from '../../nodes/core/PropertyNode.js';
 import { attribute } from '../../nodes/core/AttributeNode.js';
-import { cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
+import { cameraProjectionMatrix, cameraProjectionMatrixInverse, cameraWorldMatrix } from '../../nodes/accessors/Camera.js';
 import { materialLineScale, materialLineDashSize, materialLineGapSize, materialLineDashOffset, materialLineWidth } from '../../nodes/accessors/MaterialNode.js';
-import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
-import { positionGeometry } from '../../nodes/accessors/Position.js';
+import { modelViewMatrix, modelWorldMatrixInverse } from '../../nodes/accessors/ModelNode.js';
+import { positionGeometry, positionLocal, positionPrevious } from '../../nodes/accessors/Position.js';
 import { mix, smoothstep } from '../../nodes/math/MathNode.js';
 import { Fn, float, vec2, vec3, vec4, If } from '../../nodes/tsl/TSLBase.js';
 import { uv } from '../../nodes/accessors/UV.js';
@@ -518,15 +518,24 @@ class Line2NodeMaterial extends NodeMaterial {
 	}
 
 	/**
-	 * Setups the position in clip space for the vertex stage of the fat line.
-	 * Overrides the default model-view-projection to return the expanded fat line vertex coordinates.
+	 * Setups the position of the expanded fat line vertex in local space.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {Node<vec4>} The position of the fat line vertex in clip space.
+	 * @return {Node<vec3>} The position of the fat line vertex in local space.
 	 */
-	setupModelViewProjection( /*builder*/ ) {
+	setupPosition( builder ) {
 
-		return mvpLine;
+		const localPosition = modelWorldMatrixInverse.mul( cameraWorldMatrix ).mul( cameraProjectionMatrixInverse ).mul( mvpLine );
+
+		positionLocal.assign( localPosition.xyz.div( localPosition.w ) );
+
+		if ( builder.needsPreviousData() ) {
+
+			positionPrevious.assign( positionLocal );
+
+		}
+
+		return positionLocal;
 
 	}
 
