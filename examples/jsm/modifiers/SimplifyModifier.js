@@ -5,9 +5,9 @@ import {
 	Vector2,
 	Vector3,
 	Vector4,
-} from "three";
+} from 'three';
 
-import { mergeVertices } from "../utils/BufferGeometryUtils.js";
+import { mergeVertices } from '../utils/BufferGeometryUtils.js';
 
 const _cb = new Vector3(),
 	_ab = new Vector3();
@@ -33,14 +33,14 @@ class SimplifyModifier {
 	 *
 	 * @param {BufferGeometry} geometry - The geometry to modify.
 	 * @param {number} count - The number of vertices to remove.
-	 * @param {String[]} [ignoredAttributes=[]] - The attributes to be kept the same and excluded from simplification.
+	 * @param {string[]} [ignoredAttributes=[]] - The attributes to be kept the same and excluded from simplification.
 	 * @param {Object} [config] - The config for the attributes
 	 * @return {BufferGeometry} A new, modified geometry.
 	 */
-	modify(geometry, count, ignoredAttributes = [], config = {}) {
+	modify( geometry, count, ignoredAttributes = [], config = {} ) {
 		geometry = geometry.clone();
 
-		const LOCKED = config["locked"] ?? false;
+		const LOCKED = config[ 'locked' ] ?? false;
 
 		// currently morphAttributes are not supported
 		delete geometry.morphAttributes.position;
@@ -48,27 +48,27 @@ class SimplifyModifier {
 		const attributes = geometry.attributes;
 
 		//filter ignoredAttributes
-		for (let name of [...ignoredAttributes]) {
-			if (attributes[name] == undefined) {
+		for ( const name of [ ...ignoredAttributes ] ) {
+			if (attributes[name] == undefined)
 				ignoredAttributes.splice(ignoredAttributes.indexOf(name), 1);
 			}
 		}
 
 		// make sure position attribute is not ignored
-		if (ignoredAttributes.includes("position")) {
+		if(ignoredAttributes.includes('position')) {
 			console.warn(
-				"THREE.SimplifyModifier: position-attribute can't be igored!",
+				'THREE.SimplifyModifier: position-attribute can\'t be igored!',
 			);
 		}
 
 		// delete all non-ignored attributes, that are not part of the essential attributes
 		for (const name in attributes) {
 			if (
-				name !== "position" &&
-				name !== "uv" &&
-				name !== "normal" &&
-				name !== "tangent" &&
-				name !== "color" &&
+				name !== 'position' &&
+				name !== 'uv' &&
+				name !== 'normal' &&
+				name !== 'tangent' &&
+				name !== 'color' &&
 				!ignoredAttributes.includes(name)
 			)
 				geometry.deleteAttribute(name);
@@ -80,21 +80,21 @@ class SimplifyModifier {
 		// put data of original geometry in different data structures
 		//
 
-		const positionAttribute = geometry.getAttribute("position");
+		const positionAttribute = geometry.getAttribute('position');
 
 		// load all non-ignored attributes
-		const uvAttribute = ignoredAttributes.includes("uv")
+		const uvAttribute = ignoredAttributes.includes('uv')
 			? undefined
-			: geometry.getAttribute("uv");
-		const normalAttribute = ignoredAttributes.includes("normal")
+			: geometry.getAttribute('uv');
+		const normalAttribute = ignoredAttributes.includes('normal')
 			? undefined
-			: geometry.getAttribute("normal");
-		const tangentAttribute = ignoredAttributes.includes("tangent")
+			: geometry.getAttribute('normal');
+		const tangentAttribute = ignoredAttributes.includes('tangent')
 			? undefined
-			: geometry.getAttribute("tangent");
-		const colorAttribute = ignoredAttributes.includes("color")
+			: geometry.getAttribute('tangent');
+		const colorAttribute = ignoredAttributes.includes('color')
 			? undefined
-			: geometry.getAttribute("color");
+			: geometry.getAttribute('color');
 
 		let t = null;
 		let v2 = null;
@@ -192,25 +192,25 @@ class SimplifyModifier {
 
 		let z = count;
 
-		let error = 0;
+		let err = 0;
 
 		while (z--) {
 			// repeat for number of vertices to remove
 			nextVertex = minimumCostEdge(vertices);
 
-			if (!nextVertex) {
-				console.warn("THREE.SimplifyModifier: No next vertex");
+			if (! nextVertex) {
+				console.warn('THREE.SimplifyModifier: No next vertex');
 				break;
 			}
 
 			if (nextVertex.collapseCost == Infinity) {
 				console.warn(
-					"THREE.SimplifyModifier: No next vertex; Only border is left",
+					'THREE.SimplifyModifier: No next vertex; Only border is left',
 				);
 				break;
 			}
 
-			error += nextVertex.collapseCost;
+			err += nextVertex.collapseCost;
 
 			collapse(
 				vertices,
@@ -221,7 +221,7 @@ class SimplifyModifier {
 			);
 		}
 
-		this.error = error;
+		this.error = err;
 		//
 
 		const simplifiedGeometry = new BufferGeometry();
@@ -310,27 +310,27 @@ class SimplifyModifier {
 		}
 
 		simplifiedGeometry.setAttribute(
-			"position",
+			'position',
 			new Float32BufferAttribute(position, 3),
 		);
 		if (uv.length > 0)
 			simplifiedGeometry.setAttribute(
-				"uv",
+				'uv',
 				new Float32BufferAttribute(uv, 2),
 			);
 		if (normal.length > 0)
 			simplifiedGeometry.setAttribute(
-				"normal",
+				'normal',
 				new Float32BufferAttribute(normal, 3),
 			);
 		if (tangent.length > 0)
 			simplifiedGeometry.setAttribute(
-				"tangent",
+				'tangent',
 				new Float32BufferAttribute(tangent, 4),
 			);
 		if (color.length > 0)
 			simplifiedGeometry.setAttribute(
-				"color",
+				'color',
 				new Float32BufferAttribute(color, 3),
 			);
 
@@ -364,14 +364,14 @@ function removeFromArray(array, object) {
 
 function computeEdgeCollapseCost(u, v, locked) {
 	// if we collapse edge uv by moving u to v then how
-	// much different will the model change, i.e. the "error".
+	// much different will the model change, i.e. the 'error'.
 
 	let edgelength = v.position.distanceTo(u.position);
 	let curvature = 0;
 
 	const sideFaces = [];
 
-	// find the "sides" triangles that are on the edge uv
+	// find the 'sides' triangles that are on the edge uv
 	for (let i = 0, il = u.faces.length; i < il; i++) {
 		const face = u.faces[i];
 
@@ -467,7 +467,7 @@ function computeEdgeCostAtVertex(v, locked) {
 
 	v.collapseNeighbor = null;
 
-	// search all neighboring edges for "least cost" edge
+	// search all neighboring edges for 'least cost' edge
 	for (let i = 0; i < v.neighbors.length; i++) {
 		const collapseCost = computeEdgeCollapseCost(v, v.neighbors[i], locked);
 
@@ -740,7 +740,7 @@ class Vertex {
 		this.id = -1; // external use position in vertices list (for e.g. face generation)
 
 		this.faces = []; // faces vertex is connected
-		this.neighbors = []; // neighbouring vertices aka "adjacentVertices"
+		this.neighbors = []; // neighbouring vertices aka 'adjacentVertices'
 
 		// these will be computed in computeEdgeCostAtVertex()
 		this.collapseCost = 0; // cost of collapsing this vertex, the less the better. aka objdist
