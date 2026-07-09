@@ -1,5 +1,5 @@
 import { positionWorld } from '../../accessors/Position.js';
-import { float, Fn, min, normalize, sub, vec3 } from '../../tsl/TSLBase.js';
+import { float, Fn, min, normalize, vec3 } from '../../tsl/TSLBase.js';
 
 /**
  * This computes a parallax corrected normal which is used for box-projected cube mapping (BPCEM).
@@ -21,8 +21,8 @@ import { float, Fn, min, normalize, sub, vec3 } from '../../tsl/TSLBase.js';
 const getParallaxCorrectNormal = /*@__PURE__*/ Fn( ( [ normal, cubeSize, cubePos ] ) => {
 
 	const nDir = normalize( normal ).toVar();
-	const rbmax = sub( float( 0.5 ).mul( cubeSize.sub( cubePos ) ), positionWorld ).div( nDir ).toVar();
-	const rbmin = sub( float( - 0.5 ).mul( cubeSize.sub( cubePos ) ), positionWorld ).div( nDir ).toVar();
+	const rbmax = cubeSize.mul( 0.5 ).add( cubePos ).sub( positionWorld ).div( nDir ).toVar();
+	const rbmin = cubeSize.mul( - 0.5 ).add( cubePos ).sub( positionWorld ).div( nDir ).toVar();
 	const rbminmax = vec3().toVar();
 	rbminmax.x = nDir.x.greaterThan( float( 0 ) ).select( rbmax.x, rbmin.x );
 	rbminmax.y = nDir.y.greaterThan( float( 0 ) ).select( rbmax.y, rbmin.y );

@@ -38,6 +38,7 @@ const refreshUniforms = [
 	'normalMap',
 	'normalScale',
 	'opacity',
+	'retroreflective',
 	'roughness',
 	'roughnessMap',
 	'sheen',
@@ -187,6 +188,7 @@ class NodeMaterialObserver {
 
 			data = {
 				geometryId: geometry.id,
+				materialVersion: this.getMaterialData( renderObject.material )._version,
 				worldMatrix: object.matrixWorld.clone()
 			};
 
@@ -327,7 +329,7 @@ class NodeMaterialObserver {
 
 		if ( data === undefined ) {
 
-			data = { _renderId: - 1, _equal: false };
+			data = { _renderId: - 1, _version: 0 };
 
 			for ( const property of this.refreshUniforms ) {
 
@@ -391,11 +393,13 @@ class NodeMaterialObserver {
 
 		const materialData = this.getMaterialData( renderObject.material );
 
-		// check the material for the "equal" state just once per render for all render objects
+		// check the material properties just once per render for all render objects
 
 		if ( materialData._renderId !== renderId ) {
 
 			materialData._renderId = renderId;
+
+			let changed = false;
 
 			for ( const property in materialData ) {
 
@@ -403,7 +407,7 @@ class NodeMaterialObserver {
 				const mtlValue = material[ property ];
 
 				if ( property === '_renderId' ) continue;
-				if ( property === '_equal' ) continue;
+				if ( property === '_version' ) continue;
 
 				if ( value.equals !== undefined ) {
 
@@ -411,8 +415,7 @@ class NodeMaterialObserver {
 
 						value.copy( mtlValue );
 
-						materialData._equal = false;
-						return false;
+						changed = true;
 
 					}
 
@@ -423,8 +426,7 @@ class NodeMaterialObserver {
 						value.id = mtlValue.id;
 						value.version = mtlValue.version;
 
-						materialData._equal = false;
-						return false;
+						changed = true;
 
 					}
 
@@ -432,34 +434,38 @@ class NodeMaterialObserver {
 
 					materialData[ property ] = mtlValue;
 
-					materialData._equal = false;
-					return false;
+					changed = true;
 
 				}
 
 			}
 
-			if ( materialData.transmission > 0 ) {
+			if ( changed === true ) materialData._version ++;
 
-				const { width, height } = renderObject.context;
+		}
 
-				if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
+		// a version mismatch means the material has changed since this render object was last refreshed
 
-					renderObjectData.bufferWidth = width;
-					renderObjectData.bufferHeight = height;
+		if ( renderObjectData.materialVersion !== materialData._version ) {
 
-					materialData._equal = false;
-					return false;
+			renderObjectData.materialVersion = materialData._version;
 
-				}
+			return false;
+
+		}
+
+		if ( materialData.transmission > 0 ) {
+
+			const { width, height } = renderObject.context;
+
+			if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
+
+				renderObjectData.bufferWidth = width;
+				renderObjectData.bufferHeight = height;
+
+				return false;
 
 			}
-
-			materialData._equal = true;
-
-		} else {
-
-			if ( materialData._equal === false ) return false;
 
 		}
 

@@ -8,7 +8,9 @@ import {
 	NeutralToneMapping,
 	CustomToneMapping,
 	SRGBTransfer,
-	HalfFloatType
+	HalfFloatType,
+	DepthStencilFormat,
+	UnsignedInt248Type
 } from '../../constants.js';
 import { BufferGeometry } from '../../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../../core/BufferAttribute.js';
@@ -31,13 +33,30 @@ const toneMappingMap = {
 
 function WebGLOutput( type, width, height, antialias, depth, stencil ) {
 
+	// make sure depth texture matches renderer settings
+
+	let depthTexture;
+
+	if ( depth === true ) {
+
+		depthTexture = new DepthTexture( width, height );
+
+		if ( stencil === true ) {
+
+			depthTexture.format = DepthStencilFormat;
+			depthTexture.type = UnsignedInt248Type;
+
+		}
+
+	}
+
 	// render targets for scene and post-processing
 	const targetA = new WebGLRenderTarget( width, height, {
 		type: type,
 		depthBuffer: depth,
 		stencilBuffer: stencil,
 		samples: antialias ? 4 : 0,
-		depthTexture: depth ? new DepthTexture( width, height ) : undefined
+		depthTexture: depthTexture
 	} );
 
 	const targetB = new WebGLRenderTarget( width, height, {

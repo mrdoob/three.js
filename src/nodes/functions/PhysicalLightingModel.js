@@ -1,6 +1,5 @@
 import BRDF_Lambert from './BSDF/BRDF_Lambert.js';
 import BRDF_GGX from './BSDF/BRDF_GGX.js';
-import BRDF_GGX_Multiscatter from './BSDF/BRDF_GGX_Multiscatter.js';
 import DFGLUT from './BSDF/DFGLUT.js';
 import EnvironmentBRDF from './BSDF/EnvironmentBRDF.js';
 import F_Schlick from './BSDF/F_Schlick.js';
@@ -190,9 +189,9 @@ const getIBLVolumeRefraction = /*@__PURE__*/ Fn( ( [ n, v, roughness, diffuseCol
 
 // XYZ to linear-sRGB color space
 const XYZ_TO_REC709 = /*@__PURE__*/ mat3(
-	3.2404542, - 0.9692660, 0.0556434,
-	- 1.5371385, 1.8760108, - 0.2040259,
-	- 0.4985314, 0.0415560, 1.0572252
+	3.2404542, - 1.5371385, - 0.4985314,
+	- 0.9692660, 1.8760108, 0.0415560,
+	0.0556434, - 0.2040259, 1.0572252
 );
 
 // Assume air interface for top
@@ -459,14 +458,6 @@ class PhysicalLightingModel extends LightingModel {
 		this.iridescenceFresnel = null;
 
 		/**
-		 * The iridescence F0.
-		 *
-		 * @type {?Node}
-		 * @default null
-		 */
-		this.iridescenceF0 = null;
-
-		/**
 		 * The iridescence F0 dielectric.
 		 *
 		 * @type {?Node}
@@ -531,8 +522,6 @@ class PhysicalLightingModel extends LightingModel {
 
 			this.iridescenceF0Dielectric = Schlick_to_F0( { f: iridescenceFresnelDielectric, f90: 1.0, dotVH: dotNVi } );
 			this.iridescenceF0Metallic = Schlick_to_F0( { f: iridescenceFresnelMetallic, f90: 1.0, dotVH: dotNVi } );
-
-			this.iridescenceF0 = mix( this.iridescenceF0Dielectric, this.iridescenceF0Metallic, metalness );
 
 		}
 
@@ -630,22 +619,39 @@ class PhysicalLightingModel extends LightingModel {
 
 		}
 
-		reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseContribution } ) ) );
+		// Light reflected by the specular interface is not available to the diffuse layer ( glTF fresnel_mix )
+		const halfDir = lightDirection.add( positionViewDirection ).normalize();
+		const dotVH = positionViewDirection.dot( halfDir ).clamp();
+		const F = F_Schlick( { f0: specularColor, f90: specularF90, dotVH } );
 
-		let specularBRDF = BRDF_GGX_Multiscatter( { lightDirection, f0: specularColorBlended, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
+		reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseContribution } ) ).mul( F.oneMinus() ) );
+
+		let specularBRDF = BRDF_GGX( { lightDirection, f0: specularColorBlended, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
 
 		if ( this.retroreflective === true ) {
 
 			// Minimal Retroreflective Microfacet Model:
 			// https://jcgt.org/published/0015/01/04/
 			const retroViewDirection = positionViewDirection.negate().reflect( normalView );
-			const retroSpecularBRDF = BRDF_GGX_Multiscatter( { lightDirection, viewDirection: retroViewDirection, f0: specularColorBlended, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
+			const retroSpecularBRDF = BRDF_GGX( { lightDirection, viewDirection: retroViewDirection, f0: specularColorBlended, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
 
 			specularBRDF = mix( specularBRDF, retroSpecularBRDF, retroreflective.clamp() );
 
 		}
 
-		reflectedLight.directSpecular.addAssign( irradiance.mul( specularBRDF ) );
+		// Multi-scattering energy compensation for direct lighting
+		// Based on "Practical Multiple Scattering Compensation for Microfacet Models"
+		// https://blog.selfshadow.com/publications/turquin/ms_comp_final.pdf
+		const dotNV = normalView.dot( positionViewDirection ).clamp();
+		const fab = DFGLUT( { roughness, dotNV } );
+
+		// Energy of the single-scattering lobe in a white furnace ( F0 = F90 = 1 )
+		const Ess = fab.x.add( fab.y );
+
+		// Compensate for the energy lost to multiple scattering, tinting the added term by F0 ( equation 16 )
+		const energyCompensation = specularColorBlended.mul( Ess.reciprocal().sub( 1.0 ) ).add( 1.0 );
+
+		reflectedLight.directSpecular.addAssign( irradiance.mul( specularBRDF ).mul( energyCompensation ) );
 
 	}
 
@@ -732,11 +738,19 @@ class PhysicalLightingModel extends LightingModel {
 
 		const { irradiance, reflectedLight } = builder.context;
 
-		const diffuse = irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseContribution } ) ).toVar();
+		// Energy reflected by the specular lobe is not available to the diffuse layer
+		const singleScattering = vec3().toVar();
+		const multiScattering = vec3().toVar();
+
+		this.computeMultiscattering( singleScattering, multiScattering, specularF90, specularColor, this.iridescenceF0Dielectric );
+
+		const diffuse = irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseContribution } ) ).mul( singleScattering.add( multiScattering ).oneMinus() ).toVar();
 
 		if ( this.sheen === true ) {
 
 			const sheenAlbedo = IBLSheenBRDF( { normal: normalView, viewDir: positionViewDirection, roughness: sheenRoughness } );
+
+			this.sheenSpecularIndirect.addAssign( irradiance.mul( sheen, sheenAlbedo, 1 / Math.PI ) );
 
 			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( sheenAlbedo ).oneMinus();
 
@@ -765,7 +779,8 @@ class PhysicalLightingModel extends LightingModel {
 					normal: normalView,
 					viewDir: positionViewDirection,
 					roughness: sheenRoughness
-				} )
+				} ),
+				1 / Math.PI
 			) );
 
 		}
@@ -887,7 +902,7 @@ class PhysicalLightingModel extends LightingModel {
 
 		if ( this.sheen === true ) {
 
-			const sheenLight = outgoingLight.add( this.sheenSpecularDirect, this.sheenSpecularIndirect.mul( 1.0 / Math.PI ) );
+			const sheenLight = outgoingLight.add( this.sheenSpecularDirect, this.sheenSpecularIndirect );
 
 			outgoingLight.assign( sheenLight );
 
