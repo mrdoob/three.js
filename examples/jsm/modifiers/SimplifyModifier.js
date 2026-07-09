@@ -199,12 +199,12 @@ class SimplifyModifier {
 			nextVertex = minimumCostEdge(vertices);
 
 			if (!nextVertex) {
-				console.log("THREE.SimplifyModifier: No next vertex");
+				console.warn("THREE.SimplifyModifier: No next vertex");
 				break;
 			}
 
 			if (nextVertex.collapseCost == Infinity) {
-				console.log(
+				console.warn(
 					"THREE.SimplifyModifier: No next vertex; Only border is left",
 				);
 				break;
