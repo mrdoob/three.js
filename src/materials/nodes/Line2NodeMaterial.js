@@ -535,7 +535,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 		}
 
-		return positionLocal;
+		return super.setupPosition( builder );
 
 	}
 
