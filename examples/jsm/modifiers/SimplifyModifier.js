@@ -165,7 +165,7 @@ class SimplifyModifier {
 			if ( nextVertex.collapseCost == Infinity ) {
 
 				console.warn(
-					'THREE.SimplifyModifier: No next vertex; Only border is left',
+					'THREE.SimplifyModifier: No next vertex; Only invalid trinagles (causing normal flips) is left',
 				);
 				break;
 
