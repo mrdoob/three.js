@@ -638,9 +638,10 @@ function estimateBytesUsed( geometry ) {
  *
  * @param {BufferGeometry} geometry - The geometry to merge vertices for.
  * @param {number} [tolerance=1e-4] - The tolerance value.
+ * @param {Array<string>} [ignoredAttributes=[]] - The attributes to be ignored.
  * @return {BufferGeometry} - The new geometry with merged vertices.
  */
-function mergeVertices( geometry, tolerance = 1e-4 ) {
+function mergeVertices( geometry, tolerance = 1e-4, ignoredAttributes = [] ) {
 
 	tolerance = Math.max( tolerance, Number.EPSILON );
 
@@ -656,6 +657,10 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 	// attributes and new attribute arrays
 	const attributeNames = Object.keys( geometry.attributes );
+	const filteredAttributeNames = attributeNames.filter(
+		( name ) => ! ignoredAttributes.includes( name ),
+	);
+
 	const tmpAttributes = {};
 	const tmpMorphAttributes = {};
 	const newIndices = [];
@@ -672,7 +677,7 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 		tmpAttributes[ name ] = new attr.constructor(
 			new attr.array.constructor( attr.count * attr.itemSize ),
 			attr.itemSize,
-			attr.normalized
+			attr.normalized,
 		);
 
 		const morphAttributes = geometry.morphAttributes[ name ];
@@ -681,8 +686,14 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 			if ( ! tmpMorphAttributes[ name ] ) tmpMorphAttributes[ name ] = [];
 			morphAttributes.forEach( ( morphAttr, i ) => {
 
-				const array = new morphAttr.array.constructor( morphAttr.count * morphAttr.itemSize );
-				tmpMorphAttributes[ name ][ i ] = new morphAttr.constructor( array, morphAttr.itemSize, morphAttr.normalized );
+				const array = new morphAttr.array.constructor(
+					morphAttr.count * morphAttr.itemSize,
+				);
+				tmpMorphAttributes[ name ][ i ] = new morphAttr.constructor(
+					array,
+					morphAttr.itemSize,
+					morphAttr.normalized,
+				);
 
 			} );
 
@@ -701,16 +712,16 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 		// Generate a hash for the vertex attributes at the current index 'i'
 		let hash = '';
-		for ( let j = 0, l = attributeNames.length; j < l; j ++ ) {
+		for ( let j = 0, l = filteredAttributeNames.length; j < l; j ++ ) {
 
-			const name = attributeNames[ j ];
+			const name = filteredAttributeNames[ j ];
 			const attribute = geometry.getAttribute( name );
 			const itemSize = attribute.itemSize;
 
 			for ( let k = 0; k < itemSize; k ++ ) {
 
 				// double tilde truncates the decimal value
-				hash += `${ ~ ~ ( attribute[ getters[ k ] ]( index ) * hashMultiplier + hashAdditive ) },`;
+				hash += `${~ ~ ( attribute[ getters[ k ] ]( index ) * hashMultiplier + hashAdditive )},`;
 
 			}
 
@@ -744,7 +755,10 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 						for ( let m = 0, ml = morphAttributes.length; m < ml; m ++ ) {
 
-							newMorphArrays[ m ][ setterFunc ]( nextIndex, morphAttributes[ m ][ getterFunc ]( index ) );
+							newMorphArrays[ m ][ setterFunc ](
+								nextIndex,
+								morphAttributes[ m ][ getterFunc ]( index ),
+							);
 
 						}
 
@@ -768,11 +782,14 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 		const tmpAttribute = tmpAttributes[ name ];
 
-		result.setAttribute( name, new tmpAttribute.constructor(
-			tmpAttribute.array.slice( 0, nextIndex * tmpAttribute.itemSize ),
-			tmpAttribute.itemSize,
-			tmpAttribute.normalized,
-		) );
+		result.setAttribute(
+			name,
+			new tmpAttribute.constructor(
+				tmpAttribute.array.slice( 0, nextIndex * tmpAttribute.itemSize ),
+				tmpAttribute.itemSize,
+				tmpAttribute.normalized,
+			),
+		);
 
 		if ( ! ( name in tmpMorphAttributes ) ) continue;
 
@@ -781,7 +798,10 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 			const tmpMorphAttribute = tmpMorphAttributes[ name ][ j ];
 
 			result.morphAttributes[ name ][ j ] = new tmpMorphAttribute.constructor(
-				tmpMorphAttribute.array.slice( 0, nextIndex * tmpMorphAttribute.itemSize ),
+				tmpMorphAttribute.array.slice(
+					0,
+					nextIndex * tmpMorphAttribute.itemSize,
+				),
 				tmpMorphAttribute.itemSize,
 				tmpMorphAttribute.normalized,
 			);
