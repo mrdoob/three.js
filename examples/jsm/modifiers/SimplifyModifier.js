@@ -47,11 +47,7 @@ class SimplifyModifier {
 
 		for ( const name in attributes ) {
 
-			if ( attributes[ name ] == undefined ) {
-
-				if ( name !== 'position' && name !== 'uv' && name !== 'normal' && name !== 'tangent' && name !== 'color' ) geometry.deleteAttribute( name );
-
-			}
+			if ( name !== 'position' && name !== 'uv' && name !== 'normal' && name !== 'tangent' && name !== 'color' ) geometry.deleteAttribute( name );
 
 		}
 
