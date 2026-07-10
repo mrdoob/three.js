@@ -32,9 +32,10 @@ class SimplifyModifier {
 	 *
 	 * @param {BufferGeometry} geometry - The geometry to modify.
 	 * @param {number} count - The number of vertices to remove.
+	 * @param {Array<string>} [ignoredAttributes=[]] - The attributes to be kept the same and excluded from simplification.
 	 * @return {BufferGeometry} A new, modified geometry.
 	 */
-	modify( geometry, count ) {
+	modify( geometry, count, ignoredAttributes = [] ) {
 
 		geometry = geometry.clone();
 
@@ -43,11 +44,14 @@ class SimplifyModifier {
 		delete geometry.morphAttributes.normal;
 		const attributes = geometry.attributes;
 
-		// this modifier can only process indexed and non-indexed geometries with at least a position attribute
+		//filter ignoredAttributes
+		for ( const name of [ ...ignoredAttributes ] ) {
 
-		for ( const name in attributes ) {
+			if ( attributes[ name ] == undefined ) {
 
-			if ( name !== 'position' && name !== 'uv' && name !== 'normal' && name !== 'tangent' && name !== 'color' ) geometry.deleteAttribute( name );
+				ignoredAttributes.splice( ignoredAttributes.indexOf( name ), 1 );
+
+			}
 
 		}
 
@@ -56,11 +60,6 @@ class SimplifyModifier {
 		//
 		// put data of original geometry in different data structures
 		//
-
-		const vertices = [];
-		const faces = [];
-
-		// add vertices
 
 		const positionAttribute = geometry.getAttribute( 'position' );
 		const uvAttribute = geometry.getAttribute( 'uv' );
@@ -73,9 +72,12 @@ class SimplifyModifier {
 		let nor = null;
 		let col = null;
 
+		const vertices = [];
+
 		for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
 			const v = new Vector3().fromBufferAttribute( positionAttribute, i );
+
 			if ( uvAttribute ) {
 
 				v2 = new Vector2().fromBufferAttribute( uvAttribute, i );
@@ -106,6 +108,7 @@ class SimplifyModifier {
 		}
 
 		// add faces
+		const faces = [];
 
 		let index = geometry.getIndex();
 
@@ -149,21 +152,41 @@ class SimplifyModifier {
 
 		let z = count;
 
+		let err = 0;
+
 		while ( z -- ) {
 
+			// repeat for number of vertices to remove
 			nextVertex = minimumCostEdge( vertices );
 
 			if ( ! nextVertex ) {
 
-				console.log( 'THREE.SimplifyModifier: No next vertex' );
+				console.warn( 'THREE.SimplifyModifier: No next vertex' );
 				break;
 
 			}
 
-			collapse( vertices, faces, nextVertex, nextVertex.collapseNeighbor );
+			if ( nextVertex.collapseCost == Infinity ) {
+
+				console.warn(
+					'THREE.SimplifyModifier: No next vertex; Only border is left',
+				);
+				break;
+
+			}
+
+			err += nextVertex.collapseCost;
+
+			collapse(
+				vertices,
+				faces,
+				nextVertex,
+				nextVertex.collapseNeighbor,
+			);
 
 		}
 
+		this.error = err;
 		//
 
 		const simplifiedGeometry = new BufferGeometry();
@@ -250,14 +273,14 @@ function removeFromArray( array, object ) {
 function computeEdgeCollapseCost( u, v ) {
 
 	// if we collapse edge uv by moving u to v then how
-	// much different will the model change, i.e. the "error".
+	// much different will the model change, i.e. the 'error'.
 
 	const edgelength = v.position.distanceTo( u.position );
 	let curvature = 0;
 
 	const sideFaces = [];
 
-	// find the "sides" triangles that are on the edge uv
+	// find the 'sides' triangles that are on the edge uv
 	for ( let i = 0, il = u.faces.length; i < il; i ++ ) {
 
 		const face = u.faces[ i ];
@@ -302,6 +325,8 @@ function computeEdgeCollapseCost( u, v ) {
 
 	}
 
+	if ( ! testCollapse( u, v ) ) return Infinity;
+
 	const amt = edgelength * curvature + borders;
 
 	return amt;
@@ -327,10 +352,9 @@ function computeEdgeCostAtVertex( v ) {
 
 	}
 
-	v.collapseCost = 100000;
 	v.collapseNeighbor = null;
 
-	// search all neighboring edges for "least cost" edge
+	// search all neighboring edges for 'least cost' edge
 	for ( let i = 0; i < v.neighbors.length; i ++ ) {
 
 		const collapseCost = computeEdgeCollapseCost( v, v.neighbors[ i ] );
@@ -345,11 +369,17 @@ function computeEdgeCostAtVertex( v ) {
 
 		}
 
-		v.costCount ++;
-		v.totalCost += collapseCost;
+		if ( collapseCost !== Infinity ) {
+
+			v.costCount ++;
+			v.totalCost += collapseCost;
+
+		}
+
 
 		if ( collapseCost < v.minCost ) {
 
+			// if collapseCost is lowest store it as smallest collapseCost
 			v.collapseNeighbor = v.neighbors[ i ];
 			v.minCost = collapseCost;
 
@@ -358,8 +388,9 @@ function computeEdgeCostAtVertex( v ) {
 	}
 
 	// we average the cost of collapsing at this vertex
+
 	v.collapseCost = v.totalCost / v.costCount;
-	// v.collapseCost = v.minCost;
+	//v.collapseCost = v.minCost;
 
 }
 
@@ -441,7 +472,6 @@ function collapse( vertices, faces, u, v ) {
 
 	}
 
-
 	// delete triangles on edge uv:
 	for ( let i = u.faces.length - 1; i >= 0; i -- ) {
 
@@ -460,7 +490,6 @@ function collapse( vertices, faces, u, v ) {
 
 	}
 
-
 	removeVertex( u, vertices );
 
 	// recompute the edge collapse costs in neighborhood
@@ -472,7 +501,41 @@ function collapse( vertices, faces, u, v ) {
 
 }
 
+function testCollapse( u, v ) {
 
+	// Collapse the edge uv by moving vertex u onto v
+
+	if ( ! v ) {
+
+		return true;
+
+	}
+
+	// update remaining triangles to have v instead of u
+	for ( let i = u.faces.length - 1; i >= 0; i -- ) {
+
+		if ( ! ( u.faces[ i ] && u.faces[ i ].hasVertex( v ) ) ) {
+
+			u.faces[ i ].computeNormal();
+
+			const oldNormal = u.faces[ i ].normal.clone();
+			u.faces[ i ].computeNormalReplace( u, v );
+			const dotRes = u.faces[ i ].normal.dot( oldNormal );
+			u.faces[ i ].normal.copy( oldNormal );
+
+			if ( dotRes < 0 ) {
+
+				return false;
+
+			}
+
+		}
+
+	}
+
+	return true;
+
+}
 
 function minimumCostEdge( vertices ) {
 
@@ -520,12 +583,57 @@ class Triangle {
 		v2.addUniqueNeighbor( v1 );
 		v2.addUniqueNeighbor( v3 );
 
-
 		v3.faces.push( this );
 		v3.addUniqueNeighbor( v1 );
 		v3.addUniqueNeighbor( v2 );
 
 	}
+
+	getEdges() {
+
+		return [
+			[ this.v1, this.v2 ],
+			[ this.v2, this.v3 ],
+			[ this.v3, this.v1 ],
+		];
+
+	}
+
+	getArea() {
+
+		// use herons formula
+		const a = this.v1.position.distanceTo( this.v2.position );
+		const b = this.v2.position.distanceTo( this.v3.position );
+		const c = this.v3.position.distanceTo( this.v1.position );
+
+		const s = 0.5 * ( a + b + c );
+
+		return Math.sqrt( s * ( s - a ) * ( s - b ) * ( s - c ) );
+
+	}
+
+	getEdgesWith( vertex ) {
+
+		return this.getEdges().filter(
+			( entry ) => entry[ 0 ] == vertex || entry[ 1 ] == vertex,
+		);
+
+	}
+
+	computeNormalReplace( u, v ) {
+
+		const vA = this.v1 === u ? v.position : this.v1.position;
+		const vB = this.v2 === u ? v.position : this.v2.position;
+		const vC = this.v3 === u ? v.position : this.v3.position;
+
+		_cb.subVectors( vC, vB );
+		_ab.subVectors( vA, vB );
+		_cb.cross( _ab ).normalize();
+
+		this.normal.copy( _cb );
+
+	}
+
 
 	computeNormal() {
 
@@ -555,7 +663,6 @@ class Triangle {
 
 		removeFromArray( oldv.faces, this );
 		newv.faces.push( this );
-
 
 		oldv.removeIfNonNeighbor( this.v1 );
 		this.v1.removeIfNonNeighbor( oldv );
