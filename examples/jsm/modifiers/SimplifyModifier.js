@@ -32,10 +32,9 @@ class SimplifyModifier {
 	 *
 	 * @param {BufferGeometry} geometry - The geometry to modify.
 	 * @param {number} count - The number of vertices to remove.
-	 * @param {Array<string>} [ignoredAttributes=[]] - The attributes to be kept the same and excluded from simplification.
 	 * @return {BufferGeometry} A new, modified geometry.
 	 */
-	modify( geometry, count, ignoredAttributes = [] ) {
+	modify( geometry, count ) {
 
 		geometry = geometry.clone();
 
@@ -45,11 +44,11 @@ class SimplifyModifier {
 		const attributes = geometry.attributes;
 
 		//filter ignoredAttributes
-		for ( const name of [ ...ignoredAttributes ] ) {
+		for ( const name in attributes ) {
 
 			if ( attributes[ name ] == undefined ) {
 
-				ignoredAttributes.splice( ignoredAttributes.indexOf( name ), 1 );
+				if ( name !== 'position' && name !== 'uv' && name !== 'normal' && name !== 'tangent' && name !== 'color' ) geometry.deleteAttribute( name );
 
 			}
 
@@ -586,37 +585,6 @@ class Triangle {
 		v3.faces.push( this );
 		v3.addUniqueNeighbor( v1 );
 		v3.addUniqueNeighbor( v2 );
-
-	}
-
-	getEdges() {
-
-		return [
-			[ this.v1, this.v2 ],
-			[ this.v2, this.v3 ],
-			[ this.v3, this.v1 ],
-		];
-
-	}
-
-	getArea() {
-
-		// use herons formula
-		const a = this.v1.position.distanceTo( this.v2.position );
-		const b = this.v2.position.distanceTo( this.v3.position );
-		const c = this.v3.position.distanceTo( this.v1.position );
-
-		const s = 0.5 * ( a + b + c );
-
-		return Math.sqrt( s * ( s - a ) * ( s - b ) * ( s - c ) );
-
-	}
-
-	getEdgesWith( vertex ) {
-
-		return this.getEdges().filter(
-			( entry ) => entry[ 0 ] == vertex || entry[ 1 ] == vertex,
-		);
 
 	}
 
