@@ -33,14 +33,6 @@
 				<div id="inputWrapper">
 					<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off" spellcheck="false" />
 					<div id="clearSearchButton"></div>
-					<select id="language">
-						<option value="en">en</option>
-						<option value="fr">fr</option>
-						<option value="ru">ru</option>
-						<option value="ko">한국어</option>
-						<option value="zh">中文</option>
-						<option value="ja">日本語</option>
-					</select>
 				</div>
 				<br/>
 				<div id="content"></div>
@@ -72,37 +64,7 @@
 
 			const list = await ( await fetch( 'list.json' ) ).json();
 
-			const hash = window.location.hash.substring( 1 );
-
-			// Localization
-
-			let language = 'en';
-
-			const hashLanguage = /^(.*?)\//.exec( hash );
-
-			if ( hashLanguage ) {
-
-				language = hashLanguage[ 1 ];
-
-			}
-
-			const languageSelect = document.querySelector( '#language' );
-			languageSelect.value = language;
-			languageSelect.addEventListener( 'change', function () {
-
-				setLanguage( this.value );
-
-			} );
-
-			function setLanguage( value ) {
-
-				language = value;
-
-				createNavigation( list, language );
-				updateFilter();
-				autoChangeUrlLanguage( language );
-
-			}
+			redirectLegacyLanguage();
 
 			// Functionality for hamburger button (on small devices)
 
@@ -157,14 +119,28 @@
 
 			window.onpopstate = function () {
 
+				redirectLegacyLanguage();
 				updateNavigation();
 				createNewIframe();
 
 			};
 
+			// Redirect legacy localized deep links entered directly in the address bar
+
+			window.addEventListener( 'hashchange', function () {
+
+				if ( redirectLegacyLanguage() ) {
+
+					updateNavigation();
+					createNewIframe();
+
+				}
+
+			} );
+
 			// Create the navigation panel and configure the iframe
 
-			createNavigation( list, language );
+			createNavigation( list );
 			createNewIframe();
 
 			// Handle search query
@@ -186,7 +162,7 @@
 		function createLink( pageName, pageURL ) {
 
 			const link = document.createElement( 'a' );
-			const url = new URL( pageURL, window.location.href );
+			const url = new URL( 'pages/' + pageURL, window.location.href );
 			url.pathname += '.html';
 			link.href = url.href;
 			link.textContent = pageName;
@@ -206,7 +182,7 @@
 
 		}
 
-		function createNavigation( list, language ) {
+		function createNavigation( list ) {
 
 			if ( navigation !== undefined ) {
 
@@ -219,13 +195,7 @@
 			navigation = document.createElement( 'div' );
 			content.appendChild( navigation );
 
-			if ( language === 'ar' ) {
-
-				navigation.style.direction = 'rtl';
-
-			}
-
-			const categories = list[ language ];
+			const categories = list;
 			const selectedPage = window.location.hash.substring( 1 ).replace( /\.html$/, '' );
 
 			for ( const category in categories ) {
@@ -302,7 +272,7 @@
 
 			content.querySelectorAll( 'a' ).forEach( function ( item ) {
 
-				if ( item.href.includes( selectedPage ) ) {
+				if ( selectedPage !== '' && item.href.includes( selectedPage ) ) {
 
 					item.classList.add( 'selected' );
 
@@ -313,17 +283,6 @@
 				}
 
 			} );
-
-		}
-
-		// Auto change language url. If a reader open a document in English, when they click "zh", the document they read will auto change into Chinese version
-
-		function autoChangeUrlLanguage( language ) {
-
-			const hash = location.hash;
-			if ( hash === '' ) return;
-			const docLink = hash.slice( hash.indexOf( '/' ) );
-			location.href = '#' + language + docLink;
 
 		}
 
@@ -445,7 +404,7 @@
 				const [ , base, path ] = m;
 				if ( base.includes( 'manual' ) ) {
 
- 					const newHash = `#${ path.replace( '.html', '' ) }`;
+ 					const newHash = `#${ path.replace( 'pages/', '' ).replace( '.html', '' ) }`;
 					// Only create new iframe if we're actually changing pages.
 					// We could just be going to an anchor on the same page.
 					const newPrefix = newHash.split( '#' )[ 1 ];
@@ -481,6 +440,25 @@
 
 		}
 
+		function redirectLegacyLanguage() {
+
+			// Legacy language-qualified deep links (e.g. #en/installation, #fr/installation)
+			// now resolve to the language-neutral URL (e.g. #installation).
+
+			const legacyLanguage = /^#(en|fr|ja|ko|ru|zh)(\/|$)/;
+
+			if ( legacyLanguage.test( window.location.hash ) ) {
+
+				window.history.replaceState( null, '', window.location.hash.replace( legacyLanguage, '#' ) );
+
+				return true;
+
+			}
+
+			return false;
+
+		}
+
 		function createNewIframe() {
 
 			// Change the content displayed in the iframe
@@ -503,18 +481,18 @@
 
 				// We can have 2 hashes. One for the main page, one for the page it's referencing
 				// In other words
-				//	 #en/somePage#someSectionOfPage
+				//	 #somePage#someSectionOfPage
 				const subHash = splitHash[ 0 ].indexOf( '#' );
 				let src;
 				if ( subHash >= 0 ) {
 
 					const beforeSubHash = splitHash[ 0 ].slice( 0, subHash );
 					const afterSubHash = splitHash[ 0 ].slice( subHash );
-					src = `${beforeSubHash}.html${afterSubHash}${splitHash[ 1 ]}`;
+					src = `pages/${beforeSubHash}.html${afterSubHash}${splitHash[ 1 ]}`;
 		
 				} else {
 
-					src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
+					src = 'pages/' + splitHash[ 0 ] + '.html' + splitHash[ 1 ];
 		
 				}
 
