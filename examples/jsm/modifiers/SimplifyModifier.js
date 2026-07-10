@@ -32,11 +32,14 @@ class SimplifyModifier {
 	 *
 	 * @param {BufferGeometry} geometry - The geometry to modify.
 	 * @param {number} count - The number of vertices to remove.
+	 * @param {Object} [config] - The config for the attributes
 	 * @return {BufferGeometry} A new, modified geometry.
 	 */
-	modify( geometry, count ) {
+	modify( geometry, count, config = {} ) {
 
 		geometry = geometry.clone();
+
+		const LOCKED = config[ 'locked' ] ?? false;
 
 		// currently morphAttributes are not supported
 		delete geometry.morphAttributes.position;
@@ -57,11 +60,6 @@ class SimplifyModifier {
 		// put data of original geometry in different data structures
 		//
 
-		const vertices = [];
-		const faces = [];
-
-		// add vertices
-
 		const positionAttribute = geometry.getAttribute( 'position' );
 		const uvAttribute = geometry.getAttribute( 'uv' );
 		const normalAttribute = geometry.getAttribute( 'normal' );
@@ -73,9 +71,12 @@ class SimplifyModifier {
 		let nor = null;
 		let col = null;
 
+		const vertices = [];
+
 		for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
 			const v = new Vector3().fromBufferAttribute( positionAttribute, i );
+
 			if ( uvAttribute ) {
 
 				v2 = new Vector2().fromBufferAttribute( uvAttribute, i );
@@ -106,6 +107,7 @@ class SimplifyModifier {
 		}
 
 		// add faces
+		const faces = [];
 
 		let index = geometry.getIndex();
 
@@ -141,7 +143,7 @@ class SimplifyModifier {
 
 		for ( let i = 0, il = vertices.length; i < il; i ++ ) {
 
-			computeEdgeCostAtVertex( vertices[ i ] );
+			computeEdgeCostAtVertex( vertices[ i ], LOCKED );
 
 		}
 
@@ -149,21 +151,42 @@ class SimplifyModifier {
 
 		let z = count;
 
+		let err = 0;
+
 		while ( z -- ) {
 
+			// repeat for number of vertices to remove
 			nextVertex = minimumCostEdge( vertices );
 
 			if ( ! nextVertex ) {
 
-				console.log( 'THREE.SimplifyModifier: No next vertex' );
+				console.warn( 'THREE.SimplifyModifier: No next vertex' );
 				break;
 
 			}
 
-			collapse( vertices, faces, nextVertex, nextVertex.collapseNeighbor );
+			if ( nextVertex.collapseCost == Infinity ) {
+
+				console.warn(
+					'THREE.SimplifyModifier: No next vertex; Only border is left',
+				);
+				break;
+
+			}
+
+			err += nextVertex.collapseCost;
+
+			collapse(
+				vertices,
+				faces,
+				nextVertex,
+				nextVertex.collapseNeighbor,
+				LOCKED,
+			);
 
 		}
 
+		this.error = err;
 		//
 
 		const simplifiedGeometry = new BufferGeometry();
@@ -247,17 +270,17 @@ function removeFromArray( array, object ) {
 
 }
 
-function computeEdgeCollapseCost( u, v ) {
+function computeEdgeCollapseCost( u, v, locked ) {
 
 	// if we collapse edge uv by moving u to v then how
-	// much different will the model change, i.e. the "error".
+	// much different will the model change, i.e. the 'error'.
 
 	const edgelength = v.position.distanceTo( u.position );
 	let curvature = 0;
 
 	const sideFaces = [];
 
-	// find the "sides" triangles that are on the edge uv
+	// find the 'sides' triangles that are on the edge uv
 	for ( let i = 0, il = u.faces.length; i < il; i ++ ) {
 
 		const face = u.faces[ i ];
@@ -290,6 +313,12 @@ function computeEdgeCollapseCost( u, v ) {
 
 	}
 
+	if ( locked ) {
+
+		if ( checkBorder( u ) || checkBorder( v ) ) return Infinity;
+
+	}
+
 	// crude approach in attempt to preserve borders
 	// though it seems not to be totally correct
 	const borders = 0;
@@ -308,7 +337,49 @@ function computeEdgeCollapseCost( u, v ) {
 
 }
 
-function computeEdgeCostAtVertex( v ) {
+function checkBorder( vertex ) {
+
+	if ( vertex.border !== undefined ) return vertex.border;
+
+	for ( const f of vertex.faces ) {
+
+		// for all triangles connected to the vertex
+		const edges = f.getEdgesWith( vertex );
+
+		for ( const e of edges ) {
+
+			// go over all edges including the vertex
+			const otherVertex = e[ 0 ] == vertex ? e[ 1 ] : e[ 0 ]; // get the vertex on the opposite side of the edge
+
+			let isBorder = true;
+
+			for ( const f2 of vertex.faces ) {
+
+				if ( f == f2 ) continue;
+
+				if ( f2.getEdgesWith( otherVertex ).length > 0 ) {
+
+					// if another face connected to the vertex includes the vertex on the opposite side
+					// the edge is not a border
+					isBorder = false;
+
+				}
+
+			}
+
+			vertex.border = true;
+			if ( isBorder ) return true; // if the edge is a border return true
+
+		}
+
+	}
+
+	vertex.border = false;
+	return false;
+
+}
+
+function computeEdgeCostAtVertex( v, locked ) {
 
 	// compute the edge collapse cost for all edges that start
 	// from vertex v.  Since we are only interested in reducing
@@ -327,13 +398,12 @@ function computeEdgeCostAtVertex( v ) {
 
 	}
 
-	v.collapseCost = 100000;
 	v.collapseNeighbor = null;
 
-	// search all neighboring edges for "least cost" edge
+	// search all neighboring edges for 'least cost' edge
 	for ( let i = 0; i < v.neighbors.length; i ++ ) {
 
-		const collapseCost = computeEdgeCollapseCost( v, v.neighbors[ i ] );
+		const collapseCost = computeEdgeCollapseCost( v, v.neighbors[ i ], locked );
 
 		if ( ! v.collapseNeighbor ) {
 
@@ -345,11 +415,17 @@ function computeEdgeCostAtVertex( v ) {
 
 		}
 
-		v.costCount ++;
-		v.totalCost += collapseCost;
+		if ( collapseCost !== Infinity ) {
+
+			v.costCount ++;
+			v.totalCost += collapseCost;
+
+		}
+
 
 		if ( collapseCost < v.minCost ) {
 
+			// if collapseCost is lowest store it as smallest collapseCost
 			v.collapseNeighbor = v.neighbors[ i ];
 			v.minCost = collapseCost;
 
@@ -358,8 +434,9 @@ function computeEdgeCostAtVertex( v ) {
 	}
 
 	// we average the cost of collapsing at this vertex
+
 	v.collapseCost = v.totalCost / v.costCount;
-	// v.collapseCost = v.minCost;
+	//v.collapseCost = v.minCost;
 
 }
 
@@ -403,7 +480,7 @@ function removeFace( f, faces ) {
 
 }
 
-function collapse( vertices, faces, u, v ) {
+function collapse( vertices, faces, u, v, locked ) {
 
 	// Collapse the edge uv by moving vertex u onto v
 
@@ -441,7 +518,6 @@ function collapse( vertices, faces, u, v ) {
 
 	}
 
-
 	// delete triangles on edge uv:
 	for ( let i = u.faces.length - 1; i >= 0; i -- ) {
 
@@ -460,13 +536,12 @@ function collapse( vertices, faces, u, v ) {
 
 	}
 
-
 	removeVertex( u, vertices );
 
 	// recompute the edge collapse costs in neighborhood
 	for ( let i = 0; i < tmpVertices.length; i ++ ) {
 
-		computeEdgeCostAtVertex( tmpVertices[ i ] );
+		computeEdgeCostAtVertex( tmpVertices[ i ], locked );
 
 	}
 
@@ -520,10 +595,28 @@ class Triangle {
 		v2.addUniqueNeighbor( v1 );
 		v2.addUniqueNeighbor( v3 );
 
-
 		v3.faces.push( this );
 		v3.addUniqueNeighbor( v1 );
 		v3.addUniqueNeighbor( v2 );
+
+	}
+
+	getEdges() {
+
+		return [
+			[ this.v1, this.v2 ],
+			[ this.v2, this.v3 ],
+			[ this.v3, this.v1 ],
+		];
+
+	}
+
+
+	getEdgesWith( vertex ) {
+
+		return this.getEdges().filter(
+			( entry ) => entry[ 0 ] == vertex || entry[ 1 ] == vertex,
+		);
 
 	}
 
@@ -555,7 +648,6 @@ class Triangle {
 
 		removeFromArray( oldv.faces, this );
 		newv.faces.push( this );
-
 
 		oldv.removeIfNonNeighbor( this.v1 );
 		this.v1.removeIfNonNeighbor( oldv );
@@ -594,11 +686,12 @@ class Vertex {
 		this.id = - 1; // external use position in vertices list (for e.g. face generation)
 
 		this.faces = []; // faces vertex is connected
-		this.neighbors = []; // neighbouring vertices aka "adjacentVertices"
+		this.neighbors = []; // neighbouring vertices aka 'adjacentVertices'
 
 		// these will be computed in computeEdgeCostAtVertex()
 		this.collapseCost = 0; // cost of collapsing this vertex, the less the better. aka objdist
 		this.collapseNeighbor = null; // best candidate for collapsing
+		this.border; //wether this vertex is a border or not
 
 	}
 
