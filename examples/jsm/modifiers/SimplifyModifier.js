@@ -43,7 +43,8 @@ class SimplifyModifier {
 		delete geometry.morphAttributes.normal;
 		const attributes = geometry.attributes;
 
-		//filter ignoredAttributes
+		// this modifier can only process indexed and non-indexed geometries with at least a position attribute
+
 		for ( const name in attributes ) {
 
 			if ( attributes[ name ] == undefined ) {
