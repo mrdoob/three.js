@@ -165,7 +165,7 @@ class SimplifyModifier {
 			if ( nextVertex.collapseCost == Infinity ) {
 
 				console.warn(
-					'THREE.SimplifyModifier: No next vertex; Only invalid triangles (causing normal flips) is left',
+					'THREE.SimplifyModifier: No next vertex; Only invalid triangles (causing normal flips) left',
 				);
 				break;
 
