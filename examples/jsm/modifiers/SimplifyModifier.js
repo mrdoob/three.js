@@ -32,9 +32,13 @@ class SimplifyModifier {
 	 *
 	 * @param {BufferGeometry} geometry - The geometry to modify.
 	 * @param {number} count - The number of vertices to remove.
+	 * @param {Object} [options] - The options.
+	 * @param {boolean} [options.preventNormalFlips=false] - Whether to prevent edge collapses that would flip neighboring face normals. Enabling this changes the simplification result and may remove fewer vertices than requested.
 	 * @return {BufferGeometry} A new, modified geometry.
 	 */
-	modify( geometry, count ) {
+	modify( geometry, count, options = {} ) {
+
+		const { preventNormalFlips = false } = options;
 
 		geometry = geometry.clone();
 
@@ -57,6 +61,11 @@ class SimplifyModifier {
 		// put data of original geometry in different data structures
 		//
 
+		const vertices = [];
+		const faces = [];
+
+		// add vertices
+
 		const positionAttribute = geometry.getAttribute( 'position' );
 		const uvAttribute = geometry.getAttribute( 'uv' );
 		const normalAttribute = geometry.getAttribute( 'normal' );
@@ -68,12 +77,9 @@ class SimplifyModifier {
 		let nor = null;
 		let col = null;
 
-		const vertices = [];
-
 		for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
 			const v = new Vector3().fromBufferAttribute( positionAttribute, i );
-
 			if ( uvAttribute ) {
 
 				v2 = new Vector2().fromBufferAttribute( uvAttribute, i );
@@ -104,7 +110,6 @@ class SimplifyModifier {
 		}
 
 		// add faces
-		const faces = [];
 
 		let index = geometry.getIndex();
 
@@ -148,41 +153,44 @@ class SimplifyModifier {
 
 		let z = count;
 
-		let err = 0;
+		while ( z > 0 ) {
 
-		while ( z -- ) {
-
-			// repeat for number of vertices to remove
 			nextVertex = minimumCostEdge( vertices );
 
 			if ( ! nextVertex ) {
 
-				console.warn( 'THREE.SimplifyModifier: No next vertex' );
+				console.log( 'THREE.SimplifyModifier: No next vertex' );
 				break;
 
 			}
 
-			if ( nextVertex.collapseCost == Infinity ) {
+			if ( preventNormalFlips ) {
 
-				console.warn(
-					'THREE.SimplifyModifier: No next vertex; Only invalid triangles (causing normal flips) left',
-				);
-				break;
+				if ( nextVertex.collapseCost === Infinity ) {
+
+					console.log( 'THREE.SimplifyModifier: No collapsible vertex left, stopping early to prevent normal flips' );
+					break;
+
+				}
+
+				if ( testCollapse( nextVertex, nextVertex.collapseNeighbor ) === false ) {
+
+					// this collapse would flip a neighboring face so exclude the vertex from
+					// selection until a collapse in its neighborhood recomputes its cost
+
+					nextVertex.collapseCost = Infinity;
+					continue;
+
+				}
 
 			}
 
-			err += nextVertex.collapseCost;
+			collapse( vertices, faces, nextVertex, nextVertex.collapseNeighbor );
 
-			collapse(
-				vertices,
-				faces,
-				nextVertex,
-				nextVertex.collapseNeighbor,
-			);
+			z --;
 
 		}
 
-		this.error = err;
 		//
 
 		const simplifiedGeometry = new BufferGeometry();
@@ -269,14 +277,14 @@ function removeFromArray( array, object ) {
 function computeEdgeCollapseCost( u, v ) {
 
 	// if we collapse edge uv by moving u to v then how
-	// much different will the model change, i.e. the 'error'.
+	// much different will the model change, i.e. the "error".
 
 	const edgelength = v.position.distanceTo( u.position );
 	let curvature = 0;
 
 	const sideFaces = [];
 
-	// find the 'sides' triangles that are on the edge uv
+	// find the "sides" triangles that are on the edge uv
 	for ( let i = 0, il = u.faces.length; i < il; i ++ ) {
 
 		const face = u.faces[ i ];
@@ -321,8 +329,6 @@ function computeEdgeCollapseCost( u, v ) {
 
 	}
 
-	if ( ! testCollapse( u, v ) ) return Infinity;
-
 	const amt = edgelength * curvature + borders;
 
 	return amt;
@@ -348,9 +354,10 @@ function computeEdgeCostAtVertex( v ) {
 
 	}
 
+	v.collapseCost = 100000;
 	v.collapseNeighbor = null;
 
-	// search all neighboring edges for 'least cost' edge
+	// search all neighboring edges for "least cost" edge
 	for ( let i = 0; i < v.neighbors.length; i ++ ) {
 
 		const collapseCost = computeEdgeCollapseCost( v, v.neighbors[ i ] );
@@ -365,17 +372,11 @@ function computeEdgeCostAtVertex( v ) {
 
 		}
 
-		if ( collapseCost !== Infinity ) {
-
-			v.costCount ++;
-			v.totalCost += collapseCost;
-
-		}
-
+		v.costCount ++;
+		v.totalCost += collapseCost;
 
 		if ( collapseCost < v.minCost ) {
 
-			// if collapseCost is lowest store it as smallest collapseCost
 			v.collapseNeighbor = v.neighbors[ i ];
 			v.minCost = collapseCost;
 
@@ -384,9 +385,8 @@ function computeEdgeCostAtVertex( v ) {
 	}
 
 	// we average the cost of collapsing at this vertex
-
 	v.collapseCost = v.totalCost / v.costCount;
-	//v.collapseCost = v.minCost;
+	// v.collapseCost = v.minCost;
 
 }
 
@@ -468,6 +468,7 @@ function collapse( vertices, faces, u, v ) {
 
 	}
 
+
 	// delete triangles on edge uv:
 	for ( let i = u.faces.length - 1; i >= 0; i -- ) {
 
@@ -486,6 +487,7 @@ function collapse( vertices, faces, u, v ) {
 
 	}
 
+
 	removeVertex( u, vertices );
 
 	// recompute the edge collapse costs in neighborhood
@@ -499,33 +501,26 @@ function collapse( vertices, faces, u, v ) {
 
 function testCollapse( u, v ) {
 
-	// Collapse the edge uv by moving vertex u onto v
+	// tests whether collapsing the edge uv by moving u onto v would
+	// flip the normal of one of the remaining faces around u
 
-	if ( ! v ) {
+	for ( let i = 0, il = u.faces.length; i < il; i ++ ) {
 
-		return true;
+		const face = u.faces[ i ];
 
-	}
+		// faces shared by u and v are removed by the collapse
 
-	// update remaining triangles to have v instead of u
-	for ( let i = u.faces.length - 1; i >= 0; i -- ) {
+		if ( face.hasVertex( v ) ) continue;
 
-		if ( ! ( u.faces[ i ] && u.faces[ i ].hasVertex( v ) ) ) {
+		const vA = face.v1 === u ? v.position : face.v1.position;
+		const vB = face.v2 === u ? v.position : face.v2.position;
+		const vC = face.v3 === u ? v.position : face.v3.position;
 
-			u.faces[ i ].computeNormal();
+		_cb.subVectors( vC, vB );
+		_ab.subVectors( vA, vB );
+		_cb.cross( _ab );
 
-			const oldNormal = u.faces[ i ].normal.clone();
-			u.faces[ i ].computeNormalReplace( u, v );
-			const dotRes = u.faces[ i ].normal.dot( oldNormal );
-			u.faces[ i ].normal.copy( oldNormal );
-
-			if ( dotRes < 0 ) {
-
-				return false;
-
-			}
-
-		}
+		if ( _cb.dot( face.normal ) < 0 ) return false;
 
 	}
 
@@ -579,26 +574,12 @@ class Triangle {
 		v2.addUniqueNeighbor( v1 );
 		v2.addUniqueNeighbor( v3 );
 
+
 		v3.faces.push( this );
 		v3.addUniqueNeighbor( v1 );
 		v3.addUniqueNeighbor( v2 );
 
 	}
-
-	computeNormalReplace( u, v ) {
-
-		const vA = this.v1 === u ? v.position : this.v1.position;
-		const vB = this.v2 === u ? v.position : this.v2.position;
-		const vC = this.v3 === u ? v.position : this.v3.position;
-
-		_cb.subVectors( vC, vB );
-		_ab.subVectors( vA, vB );
-		_cb.cross( _ab ).normalize();
-
-		this.normal.copy( _cb );
-
-	}
-
 
 	computeNormal() {
 
@@ -628,6 +609,7 @@ class Triangle {
 
 		removeFromArray( oldv.faces, this );
 		newv.faces.push( this );
+
 
 		oldv.removeIfNonNeighbor( this.v1 );
 		this.v1.removeIfNonNeighbor( oldv );
