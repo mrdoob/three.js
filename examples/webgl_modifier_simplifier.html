@@ -25,6 +25,7 @@
 			import * as THREE from 'three';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { SimplifyModifier } from 'three/addons/modifiers/SimplifyModifier.js';
 
@@ -81,6 +82,18 @@
 					simplified.position.x = 3;
 					simplified.rotation.y = - Math.PI / 2;
 					scene.add( simplified );
+
+					const params = { preventNormalFlips: false };
+
+					const gui = new GUI();
+					gui.add( params, 'preventNormalFlips' ).onChange( function ( value ) {
+
+						simplified.geometry.dispose();
+						simplified.geometry = modifier.modify( mesh.geometry, count, { preventNormalFlips: value } );
+
+						render();
+
+					} );
 
 					render();
 
