@@ -256,7 +256,7 @@ const sampleBilinearTap = Fn( ( [
 	const reprojDepth = textureLoad( previousDepthNode, tapCoord ).r;
 	const reprojViewPos = getViewPosition( vec2( tapCoord ).add( 0.5 ).div( resolution ), reprojDepth, previousProjectionMatrixInverse );
 	const reprojWorldPos = previousCameraWorldMatrix.mul( vec4( reprojViewPos, 1.0 ) ).xyz;
-	const reprojWorldNorm = unpackRGBToNormal( textureLoad( previousNormalNode, tapCoord ).rgb ).transformDirection( previousCameraViewMatrix );
+	const reprojWorldNorm = unpackRGBToNormal( textureLoad( previousNormalNode, tapCoord ).rgb ).transformNormalByInverseViewMatrix( previousCameraViewMatrix );
 
 	const planeDiff = abs( dot( reprojWorldPos.sub( worldPosition ), worldNormal ) ).toVar();
 	planeDiff.divAssign( abs( reprojViewPos.z ) );
@@ -794,7 +794,7 @@ class TemporalReprojectNode extends TempNode {
 
 			// Shared 3×3 beauty fetch: feeds both the variance-clip box and the SSR ray-length stats.
 			const neighborhood = collectNeighborhood( this.beautyNode, beautyTexel, inputColor, this.flickerSuppression );
-			const worldNormal = viewNormal.transformDirection( cameraUniforms.viewMatrix ).toVar();
+			const worldNormal = viewNormal.transformNormalByInverseViewMatrix( cameraUniforms.viewMatrix ).toVar();
 
 			const viewPosition = getViewPosition( uvNode, depth, cameraUniforms.projectionMatrixInverse ).toVar();
 			const worldPosition = cameraUniforms.worldMatrix.mul( vec4( viewPosition, 1.0 ) ).xyz.toVar();
