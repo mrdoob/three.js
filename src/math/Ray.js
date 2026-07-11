@@ -306,6 +306,8 @@ class Ray {
 	 */
 	intersectSphere( sphere, target ) {
 
+		if ( sphere.radius < 0 ) return null; // handle empty spheres, see #31187
+
 		_vector.subVectors( sphere.center, this.origin );
 		const tca = _vector.dot( this.direction );
 		const d2 = _vector.dot( _vector ) - tca * tca;
