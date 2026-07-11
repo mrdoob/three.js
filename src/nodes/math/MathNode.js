@@ -258,11 +258,6 @@ class MathNode extends TempNode {
 
 			} else if ( coordinateSystem === WebGLCoordinateSystem && ( method === MathNode.MIN || method === MathNode.MAX ) ) {
 
-				// GLSL only offers a mixed-type overload where the second operand is a scalar
-				// of the input's component type ( e.g. min( ivec2, int ), min( vec3, float ) ).
-				// Coerce a scalar second operand to that component type so integer inputs don't
-				// generate an invalid min( int, float( ... ) ).
-
 				params.push(
 					a.build( builder, inputType ),
 					b.build( builder, builder.getTypeLength( b.getNodeType( builder ) ) === 1 ? builder.getComponentType( inputType ) : inputType )
