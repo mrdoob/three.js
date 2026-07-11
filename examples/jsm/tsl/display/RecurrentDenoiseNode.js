@@ -606,7 +606,7 @@ class RecurrentDenoiseNode extends TempNode {
 			const runDenoise = () => {
 
 				const viewNormal = sampleNormal( uvCoord ).toConst();
-				const worldNormal = viewNormal.transformDirection( this._viewMatrix ).toConst();
+				const worldNormal = viewNormal.transformNormalByInverseViewMatrix( this._viewMatrix ).toConst();
 				const texel = sampleTexture( uvCoord ).max( 0 ).toConst();
 
 				const viewPosition = getViewPosition( uvCoord, depth, this._cameraProjectionMatrixInverse ).toConst();
@@ -796,7 +796,7 @@ class RecurrentDenoiseNode extends TempNode {
 					if ( this.mode === 'specular' ) kernelDiff.addAssign( ( abs( roughness.sub( sampleRoughnessMetalness( sampleUv ).g ) ).mul( this.roughnessPhi ) ) );
 
 					const nViewNormal = sampleNormal( sampleUv );
-					const nWorldNormal = nViewNormal.transformDirection( this._viewMatrix );
+					const nWorldNormal = nViewNormal.transformNormalByInverseViewMatrix( this._viewMatrix );
 					const distToPlane = planeDistance( viewPosition, nViewPosition, viewNormal );
 
 					// Geometric edge stopping (depth and normal)
