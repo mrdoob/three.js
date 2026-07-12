@@ -177,29 +177,23 @@ export const instance = /*@__PURE__*/ Fn( ( [ matrices, colors = null ], builder
 
 		OnFrameUpdate( () => {
 
-			if ( interleavedMatrix !== null ) {
+			if ( interleavedMatrix !== null && matrices.version !== interleavedMatrix.version ) {
 
 				interleavedMatrix.clearUpdateRanges();
 				interleavedMatrix.updateRanges.push( ...matrices.updateRanges );
+				matrices.clearUpdateRanges();
 
-				if ( matrices.version !== interleavedMatrix.version ) {
-
-					interleavedMatrix.version = matrices.version;
-
-				}
+				interleavedMatrix.version = matrices.version;
 
 			}
 
-			if ( colors && interleavedColor !== null ) {
+			if ( colors && interleavedColor !== null && colors.version !== interleavedColor.version ) {
 
 				interleavedColor.clearUpdateRanges();
 				interleavedColor.updateRanges.push( ...colors.updateRanges );
+				colors.clearUpdateRanges();
 
-				if ( colors.version !== interleavedColor.version ) {
-
-					interleavedColor.version = colors.version;
-
-				}
+				interleavedColor.version = colors.version;
 
 			}
 
