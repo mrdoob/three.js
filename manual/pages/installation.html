@@ -27,7 +27,7 @@
       <div class="lesson">
         <div class="lesson-main">
           
-          <h2>Project structure</h2>
+          <h2 id="project-structure">Project structure</h2>
 
           <p>
             Every three.js project needs at least one HTML file to define the webpage, and a JavaScript file to run your three.js code. The structure and naming choices below aren't required, but will be used throughout this guide for consistency.
@@ -74,9 +74,9 @@ import * as THREE from 'three';
             Now that we've set up the basic project structure, we need a way to run the project locally and access it through a web browser. Installation and local development can be accomplished with npm and a build tool, or by importing three.js from a CDN. Both options are explained in the sections below.
           </p>
 
-          <h2>Option 1: Install with NPM and a build tool</h2>
+          <h2 id="npm-and-build-tool">Option 1: Install with NPM and a build tool</h2>
 
-          <h3>Development</h3>
+          <h3 id="npm-development">Development</h3>
 
           <p>
             Installing from the [link:https://www.npmjs.com/ npm package registry] and using a [link:https://eloquentjavascript.net/10_modules.html#h_zWTXAU93DC build tool] is the recommended approach for most users — the more dependencies your project needs, the more likely you are to run into problems that the static hosting cannot easily resolve. With a build tool, importing local JavaScript files and npm packages should work out of the box, without import maps.
@@ -153,15 +153,15 @@ npm install --save-dev vite
             </li>
           </ul>
 
-          <h3>Production</h3>
+          <h3 id="npm-production">Production</h3>
 
           <p>
             Later, when you're ready to deploy your web application, you'll just need to tell Vite to run a production build — <i>npx vite build</i>. Everything used by the application will be compiled, optimized, and copied into the <i>dist/</i> folder. The contents of that folder are ready to be hosted on your website.
           </p>
 
-          <h2>Option 2: Import from a CDN</h2>
+          <h2 id="cdn">Option 2: Import from a CDN</h2>
 
-          <h3>Development</h3>
+          <h3 id="cdn-development">Development</h3>
 
           <p>Installing without build tools will require some changes to the project structure given above.</p>
 
@@ -209,7 +209,7 @@ npm install --save-dev vite
           <details>
             <summary>More local servers</summary>
 
-            <h3>Command Line</h3>
+            <h3 id="local-server-command-line">Command Line</h3>
 
             <p>Command line local servers run from a terminal window. The associated programming language may need to be installed first.</p>
 
@@ -222,7 +222,7 @@ npm install --save-dev vite
             </ul>
 
 
-            <h3>GUI</h3>
+            <h3 id="local-server-gui">GUI</h3>
 
             <p>GUI local servers run as an application window on your computer, and may have a user interface.</p>
 
@@ -230,7 +230,7 @@ npm install --save-dev vite
               <li>[link:https://greggman.github.io/servez Servez]</li>
             </ul>
 
-            <h3>Code Editor Plugins</h3>
+            <h3 id="local-server-editor-plugins">Code Editor Plugins</h3>
 
             <p>Some code editors have plugins that spawn a simple server on demand.</p>
 
@@ -243,7 +243,7 @@ npm install --save-dev vite
 
           </details>
 
-          <h3>Production</h3>
+          <h3 id="cdn-production">Production</h3>
 
           <p>
             When you're ready to deploy your web application, push the source files to your web hosting provider — no need to build or compile anything. The downside of that tradeoff is that you'll need to be careful to keep the import map updated with any dependencies (and dependencies of dependencies!) that your application requires. If the CDN hosting your dependencies goes down temporarily, your website will stop working too.
@@ -276,7 +276,7 @@ const loader = new GLTFLoader();
             Some excellent third-party projects are available for three.js, too. These need to be installed separately — see <a href="libraries-and-plugins">Libraries and Plugins</a>.
           </p>
 
-          <h2>Next Steps</h2>
+          <h2 id="next-steps">Next Steps</h2>
 
           <p>
             You're now ready to <a href="creating-a-scene.html">create a scene</a>.
