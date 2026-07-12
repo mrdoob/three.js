@@ -55,7 +55,49 @@ class SimplifyModifier {
 		const ratio = Math.min( 1, Math.max( 0, 1 - count / positionAttribute.count ) );
 		const targetIndexCount = Math.max( 3, Math.floor( index.count * ratio / 3 ) * 3 );
 
-		const [ indices ] = MeshoptSimplifier.simplify( index.array, positions, 3, targetIndexCount, 1 );
+		// normals and uvs, when present, contribute to the error metric so collapses
+		// that would distort shading or texture seams are penalized
+
+		const normalAttribute = geometry.getAttribute( 'normal' );
+		const uvAttribute = geometry.getAttribute( 'uv' );
+		const attributeStride = ( normalAttribute ? 3 : 0 ) + ( uvAttribute ? 2 : 0 );
+
+		let indices;
+
+		if ( attributeStride > 0 ) {
+
+			const vertexAttributes = new Float32Array( positionAttribute.count * attributeStride );
+			const attributeWeights = [];
+
+			if ( normalAttribute ) attributeWeights.push( 0.25, 0.25, 0.25 );
+			if ( uvAttribute ) attributeWeights.push( 0.5, 0.5 );
+
+			for ( let i = 0, o = 0; i < positionAttribute.count; i ++ ) {
+
+				if ( normalAttribute ) {
+
+					vertexAttributes[ o ++ ] = normalAttribute.getX( i );
+					vertexAttributes[ o ++ ] = normalAttribute.getY( i );
+					vertexAttributes[ o ++ ] = normalAttribute.getZ( i );
+
+				}
+
+				if ( uvAttribute ) {
+
+					vertexAttributes[ o ++ ] = uvAttribute.getX( i );
+					vertexAttributes[ o ++ ] = uvAttribute.getY( i );
+
+				}
+
+			}
+
+			indices = MeshoptSimplifier.simplifyWithAttributes( index.array, positions, 3, vertexAttributes, attributeStride, attributeWeights, null, targetIndexCount, 1 )[ 0 ];
+
+		} else {
+
+			indices = MeshoptSimplifier.simplify( index.array, positions, 3, targetIndexCount, 1 )[ 0 ];
+
+		}
 
 		// drop vertices that are no longer referenced and rebuild the attributes
 
