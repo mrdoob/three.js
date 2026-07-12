@@ -12,7 +12,7 @@
 	</head>
 	<body>
 
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Polygon Reduction using MeshoptSimplifier</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Vertex Reduction using SimplifyModifier</div>
 
 		<script type="importmap">
 			{
@@ -29,8 +29,8 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-			import { MeshoptSimplifier } from 'three/addons/libs/meshopt_simplifier.module.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { SimplifyModifier } from 'three/addons/modifiers/SimplifyModifier.js';
 
 			let renderer, scene, camera;
 
@@ -59,53 +59,34 @@
 				camera.add( light );
 				scene.add( camera );
 
-				new GLTFLoader().load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', async function ( gltf ) {
-
-					await MeshoptSimplifier.ready;
+				new GLTFLoader().load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
 
 					const mesh = gltf.scene.children[ 0 ];
 					mesh.position.x = - 3;
 					mesh.rotation.y = Math.PI / 2;
 					scene.add( mesh );
 
+					const modifier = new SimplifyModifier();
+
 					const simplified = mesh.clone();
 					simplified.material = simplified.material.clone();
 					simplified.material.flatShading = true;
-
-					const baseGeometry = mesh.geometry.clone();
-					simplified.geometry = baseGeometry;
 
 					simplified.position.x = 3;
 					simplified.rotation.y = - Math.PI / 2;
 					scene.add( simplified );
 
-					const sourceIndices = mesh.geometry.getIndex().array;
-					const sourcePositions = mesh.geometry.getAttribute( 'position' ).array;
+					const params = { ratio: 0.125 };
 
-					const params = { ratio: 0.125, compact: false };
+					async function simplify() {
 
-					function simplify() {
+						const count = Math.floor( mesh.geometry.attributes.position.count * ( 1 - params.ratio ) ); // number of vertices to remove
 
-						const targetIndexCount = Math.max( 3, Math.floor( sourceIndices.length * params.ratio / 3 ) * 3 );
+						const geometry = await modifier.modify( mesh.geometry, count );
 
-						const [ indices ] = MeshoptSimplifier.simplify( sourceIndices, sourcePositions, 3, targetIndexCount, 1 );
+						if ( simplified.geometry !== mesh.geometry ) simplified.geometry.dispose();
 
-						if ( simplified.geometry !== baseGeometry ) simplified.geometry.dispose();
-
-						if ( params.compact === true ) {
-
-							// remove unreferenced vertices from the buffers
-
-							simplified.geometry = compactGeometry( mesh.geometry, indices );
-
-						} else {
-
-							// keep the full vertex buffers and only swap the index
-
-							baseGeometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-							simplified.geometry = baseGeometry;
-
-						}
+						simplified.geometry = geometry;
 
 						render();
 
@@ -115,49 +96,10 @@
 
 					const gui = new GUI();
 					gui.add( params, 'ratio', 0.01, 1, 0.01 ).onChange( simplify );
-					gui.add( params, 'compact' ).onChange( simplify );
 
 				} );
 
 				window.addEventListener( 'resize', onWindowResize );
-
-			}
-
-			// Builds a new geometry from the source attributes and a simplified index buffer,
-			// dropping vertices that are no longer referenced.
-
-			function compactGeometry( geometry, indices ) {
-
-				const [ remap, unique ] = MeshoptSimplifier.compactMesh( indices ); // rewrites indices in place
-
-				const compacted = new THREE.BufferGeometry();
-
-				for ( const name in geometry.attributes ) {
-
-					const attribute = geometry.getAttribute( name );
-					const itemSize = attribute.itemSize;
-					const src = attribute.array;
-					const dst = new src.constructor( unique * itemSize );
-
-					// scatter each vertex to its new slot; 0xffffffff marks unreferenced vertices
-
-					for ( let i = 0; i < remap.length; i ++ ) {
-
-						const target = remap[ i ];
-
-						if ( target === 0xffffffff ) continue;
-
-						for ( let k = 0; k < itemSize; k ++ ) dst[ target * itemSize + k ] = src[ i * itemSize + k ];
-
-					}
-
-					compacted.setAttribute( name, new THREE.BufferAttribute( dst, itemSize, attribute.normalized ) );
-
-				}
-
-				compacted.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-
-				return compacted;
 
 			}
 
