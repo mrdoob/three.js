@@ -71,7 +71,9 @@
 					const simplified = mesh.clone();
 					simplified.material = simplified.material.clone();
 					simplified.material.flatShading = true;
-					simplified.geometry = mesh.geometry.clone();
+
+					const baseGeometry = mesh.geometry.clone();
+					simplified.geometry = baseGeometry;
 
 					simplified.position.x = 3;
 					simplified.rotation.y = - Math.PI / 2;
@@ -80,7 +82,7 @@
 					const sourceIndices = mesh.geometry.getIndex().array;
 					const sourcePositions = mesh.geometry.getAttribute( 'position' ).array;
 
-					const params = { ratio: 0.125 };
+					const params = { ratio: 0.125, compact: false };
 
 					function simplify() {
 
@@ -88,7 +90,22 @@
 
 						const [ indices ] = MeshoptSimplifier.simplify( sourceIndices, sourcePositions, 3, targetIndexCount, 1 );
 
-						simplified.geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+						if ( simplified.geometry !== baseGeometry ) simplified.geometry.dispose();
+
+						if ( params.compact === true ) {
+
+							// remove unreferenced vertices from the buffers
+
+							simplified.geometry = compactGeometry( mesh.geometry, indices );
+
+						} else {
+
+							// keep the full vertex buffers and only swap the index
+
+							baseGeometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+							simplified.geometry = baseGeometry;
+
+						}
 
 						render();
 
@@ -98,10 +115,49 @@
 
 					const gui = new GUI();
 					gui.add( params, 'ratio', 0.01, 1, 0.01 ).onChange( simplify );
+					gui.add( params, 'compact' ).onChange( simplify );
 
 				} );
 
 				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			// Builds a new geometry from the source attributes and a simplified index buffer,
+			// dropping vertices that are no longer referenced.
+
+			function compactGeometry( geometry, indices ) {
+
+				const [ remap, unique ] = MeshoptSimplifier.compactMesh( indices ); // rewrites indices in place
+
+				const compacted = new THREE.BufferGeometry();
+
+				for ( const name in geometry.attributes ) {
+
+					const attribute = geometry.getAttribute( name );
+					const itemSize = attribute.itemSize;
+					const src = attribute.array;
+					const dst = new src.constructor( unique * itemSize );
+
+					// scatter each vertex to its new slot; 0xffffffff marks unreferenced vertices
+
+					for ( let i = 0; i < remap.length; i ++ ) {
+
+						const target = remap[ i ];
+
+						if ( target === 0xffffffff ) continue;
+
+						for ( let k = 0; k < itemSize; k ++ ) dst[ target * itemSize + k ] = src[ i * itemSize + k ];
+
+					}
+
+					compacted.setAttribute( name, new THREE.BufferAttribute( dst, itemSize, attribute.normalized ) );
+
+				}
+
+				compacted.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+
+				return compacted;
 
 			}
 
