@@ -1,6 +1,6 @@
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
-import { vec4, renderOutput } from '../../nodes/TSL.js';
+import { vec4, renderOutput, context } from '../../nodes/TSL.js';
 import { NoToneMapping } from '../../constants.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { warnOnce } from '../../utils.js';
@@ -28,6 +28,15 @@ class RenderPipeline {
 	 * @param {Node<vec4>} outputNode - An optional output node.
 	 */
 	constructor( renderer, outputNode = vec4( 0, 0, 1, 1 ) ) {
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isRenderPipeline = true;
 
 		/**
 		 * A reference to the renderer.
@@ -86,13 +95,13 @@ class RenderPipeline {
 		this._quadMesh.name = 'Render Pipeline';
 
 		/**
-		 * The context of the render pipeline stack.
+		 * The context data for the render pipeline.
 		 *
 		 * @private
 		 * @type {?Object}
 		 * @default null
 		 */
-		this._context = null;
+		this._contextData = null;
 
 		/**
 		 * The current tone mapping.
@@ -124,7 +133,7 @@ class RenderPipeline {
 
 		this._update();
 
-		if ( this._context.onBeforeRenderPipeline !== null ) this._context.onBeforeRenderPipeline();
+		for ( const callback of this._contextData.onBeforePipelineCallbacks ) callback();
 
 		const toneMapping = renderer.toneMapping;
 		const outputColorSpace = renderer.outputColorSpace;
@@ -146,19 +155,7 @@ class RenderPipeline {
 		renderer.toneMapping = toneMapping;
 		renderer.outputColorSpace = outputColorSpace;
 
-		if ( this._context.onAfterRenderPipeline !== null ) this._context.onAfterRenderPipeline();
-
-	}
-
-	/**
-	 * Returns the current context of the render pipeline stack.
-	 *
-	 * @readonly
-	 * @type {?Object}
-	 */
-	get context() {
-
-		return this._context;
+		for ( const callback of this._contextData.onAfterPipelineCallbacks ) callback();
 
 	}
 
@@ -197,31 +194,28 @@ class RenderPipeline {
 			const toneMapping = this._toneMapping;
 			const outputColorSpace = this._outputColorSpace;
 
-			const context = {
+			const contextData = {
 				renderPipeline: this,
-				onBeforeRenderPipeline: null,
-				onAfterRenderPipeline: null
+				onBeforePipelineCallbacks: [],
+				onAfterPipelineCallbacks: []
 			};
 
 			let outputNode = this.outputNode;
 
 			if ( this.outputColorTransform === true ) {
 
-				outputNode = outputNode.context( context );
-
 				outputNode = renderOutput( outputNode, toneMapping, outputColorSpace );
 
 			} else {
 
-				context.toneMapping = toneMapping;
-				context.outputColorSpace = outputColorSpace;
-
-				outputNode = outputNode.context( context );
+				contextData.toneMapping = toneMapping;
+				contextData.outputColorSpace = outputColorSpace;
 
 			}
 
-			this._context = context;
+			this._contextData = contextData;
 
+			this._quadMesh.material.contextNode = context( contextData );
 			this._quadMesh.material.fragmentNode = outputNode;
 			this._quadMesh.material.needsUpdate = true;
 

@@ -1,5 +1,5 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture, FloatType } from 'three/webgpu';
-import { add, float, If, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth, struct, ivec2, mix, logarithmicDepthToViewZ, viewZToOrthographicDepth, context } from 'three/tsl';
+import { add, float, If, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth, struct, ivec2, mix, logarithmicDepthToViewZ, viewZToOrthographicDepth, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -442,24 +442,24 @@ class TRAANode extends TempNode {
 	 */
 	setup( builder ) {
 
-		const renderPipeline = builder.context.renderPipeline;
+		if ( builder.renderPipeline && ! builder.context.viewOffset ) {
 
-		if ( renderPipeline ) {
+			builder.context.viewOffset = this;
 
 			this._needsPostProcessingSync = true;
 
-			renderPipeline.context.onBeforeRenderPipeline = () => {
+			OnBeforeRenderPipeline( () => {
 
 				const size = builder.renderer.getDrawingBufferSize( _size );
 				this.setViewOffset( size.width, size.height );
 
-			};
+			} );
 
-			renderPipeline.context.onAfterRenderPipeline = () => {
+			OnAfterRenderPipeline( () => {
 
 				this.clearViewOffset();
 
-			};
+			} );
 
 		}
 

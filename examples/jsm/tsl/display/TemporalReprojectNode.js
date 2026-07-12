@@ -1,4 +1,4 @@
-import { EPSILON, Fn, If, abs, convertToTexture, dFdx, dFdy, dot, exp, float, floor, fwidth, getViewPosition, ivec2, luminance, max, min, mix, nodeObject, normalize, passTexture, screenCoordinate, select, smoothstep, sqrt, struct, texture, textureLoad, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4, velocity, context } from 'three/tsl';
+import { EPSILON, Fn, If, abs, convertToTexture, dFdx, dFdy, dot, exp, float, floor, fwidth, getViewPosition, ivec2, luminance, max, min, mix, nodeObject, normalize, passTexture, screenCoordinate, select, smoothstep, sqrt, struct, texture, textureLoad, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4, velocity, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
 import { DepthTexture, HalfFloatType, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, TempNode, Vector2, Vector3 } from 'three/webgpu';
 import { ENV_RAY_LENGTH, ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
 
@@ -729,23 +729,23 @@ class TemporalReprojectNode extends TempNode {
 
 		const sharedContext = context( builder.getSharedContext() );
 
-		const renderPipeline = builder.context.renderPipeline;
+		if ( builder.renderPipeline && ! builder.context.viewOffset ) {
 
-		if ( renderPipeline ) {
+			builder.context.viewOffset = this;
 
 			this._needsPostProcessingSync = true;
 
-			renderPipeline.context.onBeforeRenderPipeline = () => {
+			OnBeforeRenderPipeline( () => {
 
 				this.setViewOffset();
 
-			};
+			} );
 
-			renderPipeline.context.onAfterRenderPipeline = () => {
+			OnAfterRenderPipeline( () => {
 
 				this.clearViewOffset();
 
-			};
+			} );
 
 		}
 
