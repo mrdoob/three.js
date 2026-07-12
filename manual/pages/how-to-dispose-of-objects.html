@@ -35,7 +35,7 @@
             This guide provides a brief overview about how this API is used and what objects are relevant in this context.
           </p>
         
-          <h2>Geometries</h2>
+          <h2 id="geometries">Geometries</h2>
         
           <p>
             A geometry usually represents vertex information defined as a collection of attributes. *three.js* internally creates an object of type [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer WebGLBuffer]
@@ -43,7 +43,7 @@
             execute the method to free all related resources.
           </p>
         
-          <h2>Materials</h2>
+          <h2 id="materials">Materials</h2>
         
           <p>
             A material defines how objects are rendered. *three.js* uses the information of a material definition in order to construct a shader program for rendering.
@@ -52,7 +52,7 @@
             executing `Material.dispose()`.
           </p>
         
-          <h2>Textures</h2>
+          <h2 id="textures">Textures</h2>
         
           <p>
             The disposal of a material has no effect on textures. They are handled separately since a single texture can be used by multiple materials at the same time.
@@ -65,7 +65,7 @@
             An automated call of `ImageBitmap.close()` in `Texture.dispose()` is not possible, since the image bitmap becomes unusable, and the engine has no way of knowing if the image bitmap is used elsewhere.
           </p>
         
-          <h2>Render Targets</h2>
+          <h2 id="render-targets">Render Targets</h2>
         
           <p>
             Objects of type `WebGLRenderTarget` not only allocate an instance of [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLTexture WebGLTexture] but also
@@ -73,23 +73,23 @@
             for realizing custom rendering destinations. These objects are only deallocated by executing `WebGLRenderTarget.dispose()`.
           </p>
         
-          <h2>Skinned Mesh</h2>
+          <h2 id="skinned-mesh">Skinned Mesh</h2>
         
           <p>
             Skinned meshes represent their bone hierarchy as skeletons. If you don't need a skinned mesh anymore, consider to call `Skeleton.dispose()` on the skeleton to free internal resources.
             Keep in mind that skeletons can be shared across multiple skinned meshes, so only call `dispose()` if the skeleton is not used by other active skinned meshes.
           </p>
         
-          <h2>Miscellaneous</h2>
+          <h2 id="miscellaneous">Miscellaneous</h2>
         
           <p>
             There are other classes from the examples directory like controls or post processing passes which provide `dispose()` methods in order to remove internal event listeners
             or render targets. In general, it's recommended to check the API or documentation of a class and watch for `dispose()`. If present, you should use it when cleaning things up.
           </p>
         
-          <h2>FAQ</h2>
+          <h2 id="faq">FAQ</h2>
         
-          <h3>Why can't *three.js* dispose objects automatically?</h3>
+          <h3 id="why-cant-threejs-dispose-objects-automatically">Why can't *three.js* dispose objects automatically?</h3>
         
           <p>
             This question was asked many times by the community so it's important to clarify this matter. Fact is that *three.js* does not know the lifetime or scope
@@ -98,13 +98,13 @@
             `dispose()` method.
           </p>
         
-          <h3>Does removing a mesh from the scene also dispose its geometry and material?</h3>
+          <h3 id="does-removing-a-mesh-from-the-scene-also-dispose-its-geometry-and-material">Does removing a mesh from the scene also dispose its geometry and material?</h3>
         
           <p>
             No, you have to explicitly dispose the geometry and material via *dispose()*. Keep in mind that geometries and materials can be shared among 3D objects like meshes.
           </p>
         
-          <h3>Does *three.js* provide information about the amount of cached objects?</h3>
+          <h3 id="does-threejs-provide-information-about-the-amount-of-cached-objects">Does *three.js* provide information about the amount of cached objects?</h3>
         
           <p>
             Yes. It's possible to evaluate `renderer.info`, a special property of the renderer with a series of statistical information about the graphics board memory
@@ -112,14 +112,14 @@
             in your application, it's a good idea to debug this property in order to easily identify a memory leak.
           </p>
         
-          <h3>What happens when you call `dispose()` on a texture but the image is not loaded yet?</h3>
+          <h3 id="what-happens-when-you-call-dispose-on-a-texture-but-the-image-is-not-loaded-yet">What happens when you call `dispose()` on a texture but the image is not loaded yet?</h3>
         
           <p>
             Internal resources for a texture are only allocated if the image has fully loaded. If you dispose a texture before the image was loaded,
             nothing happens. No resources were allocated so there is also no need for clean up.
           </p>
         
-          <h3>What happens when I call `dispose()` and then use the respective object at a later point?</h3>
+          <h3 id="what-happens-when-i-call-dispose-and-then-use-the-respective-object-at-a-later-point">What happens when I call `dispose()` and then use the respective object at a later point?</h3>
         
           <p>
             That depends. For geometries, materials, textures, render targets and post processing passes the deleted internal resources can be created again by the engine.
@@ -128,7 +128,7 @@
             Controls and renderers are an exception. Instances of these classes can not be used after `dispose()` has been called. You have to create new instances in this case.
           </p>
         
-          <h3>How should I manage *three.js* objects in my app? When do I know how to dispose things?</h3>
+          <h3 id="how-should-i-manage-threejs-objects-in-my-app">How should I manage *three.js* objects in my app? When do I know how to dispose things?</h3>
         
           <p>
             In general, there is no definite recommendation for this. It highly depends on the specific use case when calling `dispose()` is appropriate. It's important to highlight that
@@ -137,7 +137,7 @@
             produce a runtime error if you dispose an object that is actually still in use. The worst thing that can happen is performance drop for a single frame.
           </p>
         
-          <h3>Why `renderer.info.memory` is still reporting geometries and textures after traversing the scene and disposing all reachable textures and geometries?</h3>
+          <h3 id="renderer-info-memory-after-dispose">Why `renderer.info.memory` is still reporting geometries and textures after traversing the scene and disposing all reachable textures and geometries?</h3>
         
           <p>
             In certain cases, there are some textures and geometries used internally by Three.js
@@ -149,7 +149,7 @@
             or other contexts that would require the engine to create textures or geometries for internal use.
           </p>
         
-          <h2>Examples that demonstrate the usage of dispose()</h2>
+          <h2 id="dispose-usage-examples">Examples that demonstrate the usage of dispose()</h2>
         
           <p>
             [example:webgl_test_memory WebGL / test / memory]<br />

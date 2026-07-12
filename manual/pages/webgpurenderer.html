@@ -32,7 +32,7 @@
               renderer and basic guidelines about the usage.
             </p>
 
-            <h2>Overview</h2>
+            <h2 id="overview">Overview</h2>
 
             <p>
               `WebGPURenderer` is designed to be the modern alternative to the long-standing `WebGLRenderer`.
@@ -65,7 +65,7 @@
 
             Let's find out how to integrate `WebGPURenderer` in three.js applications.
 
-            <h2>Usage</h2>
+            <h2 id="usage">Usage</h2>
 
              <p>
              `WebGPURenderer` has different build files so the way you import three.js changes:
@@ -133,7 +133,7 @@ document.body.appendChild( renderer.domElement );
 +  const renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true } );
 </pre>
 
-            <h2>Migration</h2>
+            <h2 id="migration">Migration</h2>
 
             <p>
               If you want to give `WebGPURenderer` a try, you have to be aware of the following.
@@ -160,7 +160,7 @@ document.body.appendChild( renderer.domElement );
               </li>
             </ul>
 
-            <h2>State of WebGLRenderer</h2>
+            <h2 id="state-of-webglrenderer">State of WebGLRenderer</h2>
 
             <p>Although in the meanwhile a lot of work happens in context of `WebGPURenderer`, the node material and TSL, `WebGLRenderer` is still maintained 
               and the recommended choice for pure WebGL 2 applications. However, keep in mind that there are no plans to add larger new features to 
