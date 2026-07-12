@@ -11,6 +11,9 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Polygon Reduction using MeshoptSimplifier</div>
+
 		<script type="importmap">
 			{
 				"imports": {
@@ -34,14 +37,6 @@
 			init();
 
 			function init() {
-
-				const info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Polygon Reduction using MeshoptSimplifier';
-				document.body.appendChild( info );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
