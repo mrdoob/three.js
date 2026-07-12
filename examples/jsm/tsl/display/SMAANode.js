@@ -1,5 +1,5 @@
 import { HalfFloatType, LinearFilter, NearestFilter, RenderTarget, Texture, Vector2, QuadMesh, NodeMaterial, TempNode, RendererUtils } from 'three/webgpu';
-import { abs, Fn, NodeUpdateType, uv, uniform, convertToTexture, varyingProperty, vec2, vec4, modelViewProjection, passTexture, max, step, dot, float, texture, If, Loop, int, Break, sqrt, sign, mix } from 'three/tsl';
+import { abs, Fn, NodeUpdateType, uv, uniform, convertToTexture, varyingProperty, vec2, vec4, modelViewProjection, passTexture, max, step, dot, float, texture, If, Loop, int, Break, sqrt, sign, mix, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -694,16 +694,19 @@ class SMAANode extends TempNode {
 
 		} );
 
-		this._materialEdges.vertexNode = SMAAEdgeDetectionVS().context( builder.getSharedContext() );
-		this._materialEdges.fragmentNode = SMAAEdgeDetectionFS().context( builder.getSharedContext() );
+		this._materialEdges.contextNode = context( builder.getSharedContext() );
+		this._materialEdges.vertexNode = SMAAEdgeDetectionVS();
+		this._materialEdges.fragmentNode = SMAAEdgeDetectionFS();
 		this._materialEdges.needsUpdate = true;
 
-		this._materialWeights.vertexNode = SMAAWeightsVS().context( builder.getSharedContext() );
-		this._materialWeights.fragmentNode = SMAAWeightsFS().context( builder.getSharedContext() );
+		this._materialWeights.contextNode = context( builder.getSharedContext() );
+		this._materialWeights.vertexNode = SMAAWeightsVS();
+		this._materialWeights.fragmentNode = SMAAWeightsFS();
 		this._materialWeights.needsUpdate = true;
 
-		this._materialBlend.vertexNode = SMAABlendVS().context( builder.getSharedContext() );
-		this._materialBlend.fragmentNode = SMAABlendFS().context( builder.getSharedContext() );
+		this._materialBlend.contextNode = context( builder.getSharedContext() );
+		this._materialBlend.vertexNode = SMAABlendVS();
+		this._materialBlend.fragmentNode = SMAABlendFS();
 		this._materialBlend.needsUpdate = true;
 
 		return this._textureNode;

@@ -1,5 +1,5 @@
 import { HalfFloatType, RenderTarget, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, NodeUpdateType } from 'three/webgpu';
-import { nodeObject, Fn, float, uv, passTexture, uniform, Loop, texture, luminance, smoothstep, mix, vec4, uniformArray, add, int, array } from 'three/tsl';
+import { nodeObject, Fn, float, uv, passTexture, uniform, Loop, texture, luminance, smoothstep, mix, vec4, uniformArray, add, int, array, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -408,10 +408,13 @@ class BloomNode extends TempNode {
 	 */
 	setup( builder ) {
 
+		const sharedContext = context( builder.getSharedContext() );
+
 		// luminosity high pass material
 
 		this._highPassFilterMaterial = this._highPassFilterMaterial || new NodeMaterial();
-		this._highPassFilterMaterial.fragmentNode = this.highPassFn( { input: this.inputNode, threshold: this.threshold, smoothWidth: this.smoothWidth } ).context( builder.getSharedContext() );
+		this._highPassFilterMaterial.contextNode = sharedContext;
+		this._highPassFilterMaterial.fragmentNode = this.highPassFn( { input: this.inputNode, threshold: this.threshold, smoothWidth: this.smoothWidth } );
 		this._highPassFilterMaterial.name = 'Bloom_highPass';
 		this._highPassFilterMaterial.needsUpdate = true;
 
@@ -423,7 +426,7 @@ class BloomNode extends TempNode {
 
 		for ( let i = 0; i < this._nMips; i ++ ) {
 
-			this._separableBlurMaterials.push( this._getSeparableBlurMaterial( builder, kernelSizeArray[ i ] ) );
+			this._separableBlurMaterials.push( this._getSeparableBlurMaterial( sharedContext, kernelSizeArray[ i ] ) );
 
 		}
 
@@ -447,7 +450,8 @@ class BloomNode extends TempNode {
 		} );
 
 		this._compositeMaterial = this._compositeMaterial || new NodeMaterial();
-		this._compositeMaterial.fragmentNode = compositePass().context( builder.getSharedContext() );
+		this._compositeMaterial.contextNode = sharedContext;
+		this._compositeMaterial.fragmentNode = compositePass();
 		this._compositeMaterial.name = 'Bloom_comp';
 		this._compositeMaterial.needsUpdate = true;
 
@@ -492,11 +496,11 @@ class BloomNode extends TempNode {
 	 * Create a separable blur material for the given kernel radius.
 	 *
 	 * @private
-	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {NodeContext} sharedContext
 	 * @param {number} kernelRadius - The kernel radius.
 	 * @return {NodeMaterial}
 	 */
-	_getSeparableBlurMaterial( builder, kernelRadius ) {
+	_getSeparableBlurMaterial( sharedContext, kernelRadius ) {
 
 		const coefficients = [];
 		const sigma = kernelRadius / 3;
@@ -554,7 +558,8 @@ class BloomNode extends TempNode {
 		} );
 
 		const separableBlurMaterial = new NodeMaterial();
-		separableBlurMaterial.fragmentNode = separableBlurPass().context( builder.getSharedContext() );
+		separableBlurMaterial.contextNode = sharedContext;
+		separableBlurMaterial.fragmentNode = separableBlurPass();
 		separableBlurMaterial.name = 'Bloom_separable';
 		separableBlurMaterial.needsUpdate = true;
 

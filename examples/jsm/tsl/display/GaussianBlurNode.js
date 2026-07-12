@@ -1,5 +1,5 @@
 import { RenderTarget, Vector2, NodeMaterial, RendererUtils, QuadMesh, TempNode, NodeUpdateType } from 'three/webgpu';
-import { Fn, float, uv, uniform, convertToTexture, vec2, vec4, passTexture, premultiplyAlpha, unpremultiplyAlpha } from 'three/tsl';
+import { Fn, float, uv, uniform, convertToTexture, vec2, vec4, passTexture, premultiplyAlpha, unpremultiplyAlpha, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
@@ -287,7 +287,8 @@ class GaussianBlurNode extends TempNode {
 		//
 
 		const material = this._material || ( this._material = new NodeMaterial() );
-		material.fragmentNode = blur().context( builder.getSharedContext() );
+		material.contextNode = context( builder.getSharedContext() );
+		material.fragmentNode = blur();
 		material.name = 'Gaussian_blur';
 		material.needsUpdate = true;
 

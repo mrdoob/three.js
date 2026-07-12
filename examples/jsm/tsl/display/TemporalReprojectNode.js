@@ -1,4 +1,4 @@
-import { EPSILON, Fn, If, abs, convertToTexture, dFdx, dFdy, dot, exp, float, floor, fwidth, getViewPosition, ivec2, luminance, max, min, mix, nodeObject, normalize, passTexture, screenCoordinate, select, smoothstep, sqrt, struct, texture, textureLoad, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4, velocity } from 'three/tsl';
+import { EPSILON, Fn, If, abs, convertToTexture, dFdx, dFdy, dot, exp, float, floor, fwidth, getViewPosition, ivec2, luminance, max, min, mix, nodeObject, normalize, passTexture, screenCoordinate, select, smoothstep, sqrt, struct, texture, textureLoad, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4, velocity, context } from 'three/tsl';
 import { DepthTexture, HalfFloatType, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, TempNode, Vector2, Vector3 } from 'three/webgpu';
 import { ENV_RAY_LENGTH, ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
 
@@ -727,6 +727,8 @@ class TemporalReprojectNode extends TempNode {
 
 	setup( builder ) {
 
+		const sharedContext = context( builder.getSharedContext() );
+
 		const renderPipeline = builder.context.renderPipeline;
 
 		if ( renderPipeline ) {
@@ -747,16 +749,17 @@ class TemporalReprojectNode extends TempNode {
 
 		}
 
-		this._resolveMaterial.fragmentNode = this._buildResolve( builder );
+		this._resolveMaterial.contextNode = sharedContext;
+		this._resolveMaterial.fragmentNode = this._buildResolve();
 		this._resolveMaterial.needsUpdate = true;
 
-		this._buildSeed( builder );
+		this._buildSeed( sharedContext );
 
 		return this._textureNode;
 
 	}
 
-	_buildSeed( builder ) {
+	_buildSeed( sharedContext ) {
 
 		const seed = Fn( () => {
 
@@ -768,12 +771,13 @@ class TemporalReprojectNode extends TempNode {
 
 		} );
 
-		this._seedMaterial.fragmentNode = seed().context( builder.getSharedContext() );
+		this._seedMaterial.contextNode = sharedContext;
+		this._seedMaterial.fragmentNode = seed();
 		this._seedMaterial.needsUpdate = true;
 
 	}
 
-	_buildResolve( builder ) {
+	_buildResolve() {
 
 		const isSpecular = this.mode === 'specular';
 		const cameraUniforms = this._cameraUniforms;
@@ -944,7 +948,7 @@ class TemporalReprojectNode extends TempNode {
 
 		} );
 
-		return resolve().context( builder.getSharedContext() );
+		return resolve();
 
 	}
 
