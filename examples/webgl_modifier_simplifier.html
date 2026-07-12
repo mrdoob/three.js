@@ -25,8 +25,9 @@
 			import * as THREE from 'three';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { MeshoptSimplifier } from 'three/addons/libs/meshopt_simplifier.module.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { SimplifyModifier } from 'three/addons/modifiers/SimplifyModifier.js';
 
 			let renderer, scene, camera;
 
@@ -39,7 +40,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Vertex Reduction using SimplifyModifier';
+				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Polygon Reduction using MeshoptSimplifier';
 				document.body.appendChild( info );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -63,26 +64,45 @@
 				camera.add( light );
 				scene.add( camera );
 
-				new GLTFLoader().load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
+				new GLTFLoader().load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', async function ( gltf ) {
+
+					await MeshoptSimplifier.ready;
 
 					const mesh = gltf.scene.children[ 0 ];
 					mesh.position.x = - 3;
 					mesh.rotation.y = Math.PI / 2;
 					scene.add( mesh );
 
-					const modifier = new SimplifyModifier();
-
 					const simplified = mesh.clone();
 					simplified.material = simplified.material.clone();
 					simplified.material.flatShading = true;
-					const count = Math.floor( simplified.geometry.attributes.position.count * 0.875 ); // number of vertices to remove
-					simplified.geometry = modifier.modify( simplified.geometry, count );
+					simplified.geometry = mesh.geometry.clone();
 
 					simplified.position.x = 3;
 					simplified.rotation.y = - Math.PI / 2;
 					scene.add( simplified );
 
-					render();
+					const sourceIndices = mesh.geometry.getIndex().array;
+					const sourcePositions = mesh.geometry.getAttribute( 'position' ).array;
+
+					const params = { ratio: 0.125 };
+
+					function simplify() {
+
+						const targetIndexCount = Math.max( 3, Math.floor( sourceIndices.length * params.ratio / 3 ) * 3 );
+
+						const [ indices ] = MeshoptSimplifier.simplify( sourceIndices, sourcePositions, 3, targetIndexCount, 1 );
+
+						simplified.geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+
+						render();
+
+					}
+
+					simplify();
+
+					const gui = new GUI();
+					gui.add( params, 'ratio', 0.01, 1, 0.01 ).onChange( simplify );
 
 				} );
 

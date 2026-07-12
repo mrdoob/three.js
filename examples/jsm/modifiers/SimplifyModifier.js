@@ -22,9 +22,16 @@ const _cb = new Vector3(), _ab = new Vector3();
  * geometry = modifier.modify( geometry );
  * ```
  *
+ * @deprecated since r186. Use `MeshoptSimplifier` from `three/addons/libs/meshopt_simplifier.module.js` instead.
  * @three_import import { SimplifyModifier } from 'three/addons/modifiers/SimplifyModifier.js';
  */
 class SimplifyModifier {
+
+	constructor() {
+
+		console.warn( 'THREE.SimplifyModifier: This class has been deprecated. Use "MeshoptSimplifier" from "three/addons/libs/meshopt_simplifier.module.js" instead.' ); // @deprecated, r186
+
+	}
 
 	/**
 	 * Returns a new, modified version of the given geometry by applying a simplification.
