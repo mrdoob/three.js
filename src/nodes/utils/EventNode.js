@@ -63,7 +63,7 @@ class EventNode extends Node {
 
 			const callbacks = builder.context.onBeforePipelineCallbacks;
 
-			if ( callbacks && callbacks.length === 0 ) {
+			if ( callbacks ) {
 
 				callbacks.push( callback );
 
@@ -73,7 +73,7 @@ class EventNode extends Node {
 
 			const callbacks = builder.context.onAfterPipelineCallbacks;
 
-			if ( callbacks && callbacks.length === 0 ) {
+			if ( callbacks ) {
 
 				callbacks.push( callback );
 
