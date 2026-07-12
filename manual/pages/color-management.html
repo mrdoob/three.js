@@ -69,7 +69,7 @@
       <div class="lesson">
         <div class="lesson-main">
         
-			<h2>What is a color space?</h2>
+			<h2 id="what-is-a-color-space">What is a color space?</h2>
 
 	<p>
 		Every color space is a collection of several design decisions, chosen together to support a
@@ -159,7 +159,7 @@
 		</p>
 	</blockquote>
 
-	<h2>Roles of color spaces</h2>
+	<h2 id="roles-of-color-spaces">Roles of color spaces</h2>
 
 	<p>
 		Linear workflows — required for modern rendering methods — generally involve more than
@@ -167,7 +167,7 @@
 		appropriate for different roles, explained below.
 	</p>
 
-	<h3>Input color space</h3>
+	<h3 id="input-color-space">Input color space</h3>
 
 	<p>
 		Colors supplied to three.js — from color pickers, textures, 3D models, and other sources —
@@ -218,7 +218,7 @@ THREE.ColorManagement.enabled = true;
 		</p>
 	</blockquote>
 
-	<h3>Working color space</h3>
+	<h3 id="working-color-space">Working color space</h3>
 
 	<p>
 		Rendering, interpolation, and many other operations must be performed in an open domain
@@ -226,7 +226,7 @@ THREE.ColorManagement.enabled = true;
 		illumination. In three.js, the working color space is Linear-sRGB.
 	</p>
 
-	<h3>Output color space</h3>
+	<h3 id="output-color-space">Output color space</h3>
 
 	<p>
 		Output to a display device, image, or video may involve conversion from the open domain
@@ -263,7 +263,7 @@ THREE.ColorManagement.enabled = true;
 		For instances of `ShaderMaterial`, adding the `colorspace_fragment` shader chunk to the fragment shader's `main()` function should be sufficient.
 	</p>
 
-	<h2>Working with THREE.Color instances</h2>
+	<h2 id="working-with-three-color-instances">Working with THREE.Color instances</h2>
 
 	<p>
 		Methods reading or modifying `Color` instances assume data is already in the
@@ -308,7 +308,7 @@ console.log( color.getHex( LinearSRGBColorSpace ) ); // → 0x808080
 console.log( color.getHex( SRGBColorSpace ) ); // → 0xBCBCBC
 </pre>
 
-	<h2>Common mistakes</h2>
+	<h2 id="common-mistakes">Common mistakes</h2>
 
 	<p>
 		When an individual color or texture is misconfigured, it will appear darker or lighter than
@@ -327,7 +327,7 @@ console.log( color.getHex( SRGBColorSpace ) ); // → 0xBCBCBC
 		("display referred").
 	</p>
 
-	<h2>Further reading</h2>
+	<h2 id="further-reading">Further reading</h2>
 
 	<ul>
 		<li>

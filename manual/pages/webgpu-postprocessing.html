@@ -32,7 +32,7 @@
               works and provides some basic guidelines about the usage.
             </p>
 
-            <h2>Overview</h2>
+            <h2 id="overview">Overview</h2>
 
              <p>
               The previous post-processing for `WebGLRenderer` had many conceptual issues. Making use of Multiple Render Targets 
@@ -58,7 +58,7 @@
                Let's find out how to integrate post-processing in three.js applications.
             </p>
 
-            <h2>Basics</h2>
+            <h2 id="basics">Basics</h2>
 
             <p>
               First, please read the instructions in the guide about <a href="webgpurenderer">WebGPURenderer</a> to correctly configure your 
@@ -115,7 +115,7 @@ const scenePass = pass( scene, camera );
 renderPipeline.outputNode = rgbShiftPass;
 </pre>
 
-            <h2>Tone Mapping and Color Spaces</h2>
+            <h2 id="tone-mapping-and-color-spaces">Tone Mapping and Color Spaces</h2>
 
             <p>
             When using post-processing, tone mapping and color space conversion are automatically applied at the end 
@@ -147,7 +147,7 @@ renderPipeline.outputNode = fxaaPass;
             based on your requirements.
           </p>
 
-          <h2>MRT</h2>
+          <h2 id="mrt">MRT</h2>
 
           <p>
             The new post-processing stack has built-in Multiple Render Targets (MRT) support which is crucial for more advanced
