@@ -69,9 +69,9 @@ class WorkgroupInfoElementNode extends ArrayElementNode {
 class WorkgroupInfoNode extends Node {
 
 	/**
-	 * Constructs a new buffer scoped to type scope.
+	 * Constructs a new workgroup info node.
 	 *
-	 * @param {string} scope - TODO.
+	 * @param {string} scope - The address space the buffer is scoped to. Currently only `'Workgroup'` is used.
 	 * @param {string} bufferType - The data type of a 'workgroup' scoped buffer element.
 	 * @param {number} [bufferCount=0] - The number of elements in the buffer.
 	 */
@@ -111,7 +111,7 @@ class WorkgroupInfoNode extends Node {
 		this.elementType = bufferType;
 
 		/**
-		 * TODO.
+		 * The address space the buffer is scoped to. Currently only `'Workgroup'` is used.
 		 *
 		 * @type {string}
 		 */
