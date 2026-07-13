@@ -59,6 +59,19 @@ export default QUnit.module( 'Geometries', () => {
 
 		} );
 
+		// PUBLIC
+		QUnit.test( 'fromJSON', ( assert ) => {
+
+			const geometry = new TorusGeometry( 1, 0.4, 12, 48, Math.PI, 0.3, 1.1 );
+			const geometry2 = TorusGeometry.fromJSON( geometry.toJSON() );
+
+			assert.deepEqual(
+				geometry2.parameters, geometry.parameters,
+				'fromJSON() restores all parameters, including thetaStart and thetaLength'
+			);
+
+		} );
+
 		// OTHERS
 		QUnit.test( 'Standard geometry tests', ( assert ) => {
 
