@@ -297,11 +297,14 @@ export const storageTexture = /*@__PURE__*/ nodeProxy( StorageTextureNode ).setP
 
 
 /**
- * TODO: Explain difference to `storageTexture()`.
+ * TSL function for storing a value in a storage texture.
+ *
+ * Unlike {@link storageTexture}, this function also accepts an existing storage
+ * texture node and is intended for performing the store operation itself.
  *
  * @tsl
  * @function
- * @param {StorageTexture|StorageTextureNode} value - The storage texture.
+ * @param {StorageTexture|StorageTextureNode} value - The storage texture or storage texture node.
  * @param {Node<vec2|vec3>} uvNode - The uv node.
  * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
  * @returns {StorageTextureNode}
