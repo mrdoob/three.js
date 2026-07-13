@@ -694,17 +694,19 @@ class SMAANode extends TempNode {
 
 		} );
 
-		this._materialEdges.contextNode = context( builder.getSharedContext() );
+		const sharedContext = context( builder.getSharedContext() );
+
+		this._materialEdges.contextNode = sharedContext;
 		this._materialEdges.vertexNode = SMAAEdgeDetectionVS();
 		this._materialEdges.fragmentNode = SMAAEdgeDetectionFS();
 		this._materialEdges.needsUpdate = true;
 
-		this._materialWeights.contextNode = context( builder.getSharedContext() );
+		this._materialWeights.contextNode = sharedContext;
 		this._materialWeights.vertexNode = SMAAWeightsVS();
 		this._materialWeights.fragmentNode = SMAAWeightsFS();
 		this._materialWeights.needsUpdate = true;
 
-		this._materialBlend.contextNode = context( builder.getSharedContext() );
+		this._materialBlend.contextNode = sharedContext;
 		this._materialBlend.vertexNode = SMAABlendVS();
 		this._materialBlend.fragmentNode = SMAABlendFS();
 		this._materialBlend.needsUpdate = true;

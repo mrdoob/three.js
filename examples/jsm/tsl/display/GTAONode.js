@@ -350,7 +350,8 @@ class GTAONode extends TempNode {
 
 			this._currentSamples = this.samples.value;
 
-			this._material.fragmentNode = this._ao().context( this._sharedContext );
+			this._material.contextNode = context( this._sharedContext );
+			this._material.fragmentNode = this._ao();
 			this._material.needsUpdate = true;
 
 		}
