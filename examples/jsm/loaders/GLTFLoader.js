@@ -2072,6 +2072,27 @@ class GLTFTextureTransformExtension {
 
 		}
 
+		if ( transform.rotation !== undefined ) {
+
+			// glTF's KHR_texture_transform order differs from three.js:
+			// glTF defines the UV transform as T * R * S
+			// three.js defines the UV transform as T * S * R
+			//
+			// To fix this, we need to override the matrix with the value computed per glTF spec
+			// We still set the other fields so that you can inspect/export the resulting object.
+
+			const c = Math.cos( texture.rotation );
+			const s = Math.sin( texture.rotation );
+
+			texture.matrix.set(
+				texture.repeat.x * c, texture.repeat.y * s, texture.offset.x,
+				- texture.repeat.x * s, texture.repeat.y * c, texture.offset.y,
+				0, 0, 1
+			);
+			texture.matrixAutoUpdate = false;
+
+		}
+
 		texture.needsUpdate = true;
 
 		return texture;
