@@ -25,6 +25,7 @@ class SimplifyModifier {
 	 * Returns a new, simplified version of the given geometry. The vertex buffers
 	 * of the result only contain vertices referenced by the simplified index.
 	 *
+	 * @async
 	 * @param {BufferGeometry} geometry - The geometry to modify.
 	 * @param {number} count - The approximate number of vertices to remove.
 	 * @return {Promise<BufferGeometry>} A promise that resolves with the new, modified geometry.
