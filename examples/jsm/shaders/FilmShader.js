@@ -4,7 +4,8 @@
  */
 
 /**
- * TODO
+ * Film grain shader that adds animated noise to the image, with an optional
+ * grayscale conversion.
  *
  * Used by {@link FilmPass}.
  *
