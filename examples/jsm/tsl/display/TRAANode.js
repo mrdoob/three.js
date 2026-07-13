@@ -442,9 +442,9 @@ class TRAANode extends TempNode {
 	 */
 	setup( builder ) {
 
-		if ( builder.renderPipeline && ! builder.context.viewOffset ) {
+		if ( builder.renderPipeline && ! builder.context.renderPipelineState.viewOffset ) {
 
-			builder.context.viewOffset = this;
+			builder.context.renderPipelineState.viewOffset = this;
 
 			this._needsPostProcessingSync = true;
 

@@ -196,6 +196,9 @@ class RenderPipeline {
 
 			const contextData = {
 				renderPipeline: this,
+				renderPipelineState: {
+					viewOffset: null
+				},
 				onBeforePipelineCallbacks: [],
 				onAfterPipelineCallbacks: []
 			};
