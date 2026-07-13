@@ -20,6 +20,8 @@
 		</style>
 	</head>
 	<body>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive lines</div>
+
 		<script type="importmap">
 			{
 				"imports": {
@@ -48,14 +50,6 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
-
-				const info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive lines';
-				container.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 

@@ -1,5 +1,5 @@
 import { HalfFloatType, LinearFilter, NearestFilter, RenderTarget, Texture, Vector2, QuadMesh, NodeMaterial, TempNode, RendererUtils } from 'three/webgpu';
-import { abs, Fn, NodeUpdateType, uv, uniform, convertToTexture, varyingProperty, vec2, vec4, modelViewProjection, passTexture, max, step, dot, float, texture, If, Loop, int, Break, sqrt, sign, mix, context } from 'three/tsl';
+import { abs, Fn, NodeUpdateType, uv, uniform, convertToTexture, vec2, vec4, passTexture, max, step, dot, float, texture, If, Loop, int, Break, sqrt, sign, mix, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -292,25 +292,11 @@ class SMAANode extends TempNode {
 
 		// edges
 
-		const SMAAEdgeDetectionVS = Fn( () => {
+		const SMAAEdgeDetection = Fn( () => {
 
-			const vOffset0 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( - 1.0, 0.0, 0.0, - 1.0 ) ) );
-			const vOffset1 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( 1.0, 0.0, 0.0, 1.0 ) ) );
-			const vOffset2 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( - 2.0, 0.0, 0.0, - 2.0 ) ) );
-
-			varyingProperty( 'vec4', 'vOffset0' ).assign( vOffset0 );
-			varyingProperty( 'vec4', 'vOffset1' ).assign( vOffset1 );
-			varyingProperty( 'vec4', 'vOffset2' ).assign( vOffset2 );
-
-			return modelViewProjection;
-
-		} );
-
-		const SMAAEdgeDetectionFS = Fn( () => {
-
-			const vOffset0 = varyingProperty( 'vec4', 'vOffset0' );
-			const vOffset1 = varyingProperty( 'vec4', 'vOffset1' );
-			const vOffset2 = varyingProperty( 'vec4', 'vOffset2' );
+			const vOffset0 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( - 1.0, 0.0, 0.0, - 1.0 ) ) ).toVertexStage();
+			const vOffset1 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( 1.0, 0.0, 0.0, 1.0 ) ) ).toVertexStage();
+			const vOffset2 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( - 2.0, 0.0, 0.0, - 2.0 ) ) ).toVertexStage();
 
 			const threshold = vec2( SMAA_THRESHOLD, SMAA_THRESHOLD );
 
@@ -513,32 +499,16 @@ class SMAANode extends TempNode {
 
 		} );
 
-		const SMAAWeightsVS = Fn( () => {
+		const SMAAWeights = Fn( () => {
 
-			const vPixcoord = uvNode.xy.div( this._invSize );
+			const vPixcoord = uvNode.xy.div( this._invSize ).toVertexStage();
 
 			// We will use these offsets for the searches later on (see @PSEUDO_GATHER4):
-			const vOffset0 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( - 0.25, - 0.125, 1.25, - 0.125 ) ) ).toVar();
-			const vOffset1 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( - 0.125, - 0.25, - 0.125, 1.25 ) ) ).toVar();
+			const vOffset0 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( - 0.25, - 0.125, 1.25, - 0.125 ) ) ).toVertexStage();
+			const vOffset1 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( - 0.125, - 0.25, - 0.125, 1.25 ) ) ).toVertexStage();
 
 			// And these for the searches, they indicate the ends of the loops:
-			const vOffset2 = vec4( vOffset0.xz, vOffset1.yw ).add( vec4( - 2.0, 2.0, - 2.0, 2.0 ).mul( vec4( this._invSize.xx, this._invSize.yy ) ).mul( float( SMAA_MAX_SEARCH_STEPS ) ) ).toVar();
-
-			varyingProperty( 'vec2', 'vPixcoord' ).assign( vPixcoord );
-			varyingProperty( 'vec4', 'vOffset0' ).assign( vOffset0 );
-			varyingProperty( 'vec4', 'vOffset1' ).assign( vOffset1 );
-			varyingProperty( 'vec4', 'vOffset2' ).assign( vOffset2 );
-
-			return modelViewProjection;
-
-		} );
-
-		const SMAAWeightsFS = Fn( () => {
-
-			const vPixcoord = varyingProperty( 'vec2', 'vPixcoord' );
-			const vOffset0 = varyingProperty( 'vec4', 'vOffset0' );
-			const vOffset1 = varyingProperty( 'vec4', 'vOffset1' );
-			const vOffset2 = varyingProperty( 'vec4', 'vOffset2' );
+			const vOffset2 = vec4( vOffset0.xz, vOffset1.yw ).add( vec4( - 2.0, 2.0, - 2.0, 2.0 ).mul( vec4( this._invSize.xx, this._invSize.yy ) ).mul( float( SMAA_MAX_SEARCH_STEPS ) ) ).toVertexStage();
 
 			const weights = vec4( 0.0, 0.0, 0.0, 0.0 ).toVar();
 			const subsampleIndices = vec4( 0.0, 0.0, 0.0, 0.0 ).toVar();
@@ -623,22 +593,9 @@ class SMAANode extends TempNode {
 
 		// blend
 
-		const SMAABlendVS = Fn( () => {
+		const SMAABlend = Fn( () => {
 
-			//const vOffset0 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( - 1.0, 0.0, 0.0, - 1.0 ) ) );
-			const vOffset1 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( 1.0, 0.0, 0.0, 1.0 ) ) );
-
-			//varyingProperty( 'vec4', 'vOffset0' ).assign( vOffset0 );
-			varyingProperty( 'vec4', 'vOffset1' ).assign( vOffset1 );
-
-			return modelViewProjection;
-
-		} );
-
-		const SMAABlendFS = Fn( () => {
-
-			//const vOffset0 = varyingProperty( 'vec4', 'vOffset0' );
-			const vOffset1 = varyingProperty( 'vec4', 'vOffset1' );
+			const vOffset1 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( 1.0, 0.0, 0.0, 1.0 ) ) ).toVertexStage();
 			const result = vec4().toVar();
 
 			// Fetch the blending weights for current pixel:
@@ -697,18 +654,15 @@ class SMAANode extends TempNode {
 		const sharedContext = context( builder.getSharedContext() );
 
 		this._materialEdges.contextNode = sharedContext;
-		this._materialEdges.vertexNode = SMAAEdgeDetectionVS();
-		this._materialEdges.fragmentNode = SMAAEdgeDetectionFS();
+		this._materialEdges.fragmentNode = SMAAEdgeDetection();
 		this._materialEdges.needsUpdate = true;
 
 		this._materialWeights.contextNode = sharedContext;
-		this._materialWeights.vertexNode = SMAAWeightsVS();
-		this._materialWeights.fragmentNode = SMAAWeightsFS();
+		this._materialWeights.fragmentNode = SMAAWeights();
 		this._materialWeights.needsUpdate = true;
 
 		this._materialBlend.contextNode = sharedContext;
-		this._materialBlend.vertexNode = SMAABlendVS();
-		this._materialBlend.fragmentNode = SMAABlendFS();
+		this._materialBlend.fragmentNode = SMAABlend();
 		this._materialBlend.needsUpdate = true;
 
 		return this._textureNode;

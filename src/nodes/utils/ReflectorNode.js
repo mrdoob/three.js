@@ -185,10 +185,14 @@ class ReflectorNode extends TextureNode {
 }
 
 /**
- * Holds the actual implementation of the reflector.
+ * Holds the actual implementation of the reflector (virtual cameras, render
+ * targets and the reflection rendering).
  *
- * TODO: Explain why `ReflectorBaseNode`. Originally the entire logic was implemented
- * in `ReflectorNode`, see #29619.
+ * This logic is kept separate from {@link ReflectorNode} because the latter is
+ * a {@link TextureNode} representing a single texture view. A reflector can be
+ * sampled by multiple texture nodes at once - e.g. one for color and one for
+ * depth (see {@link ReflectorNode#getDepthNode}) - which all reference the same
+ * base node so the reflection is rendered only once.
  *
  * @private
  * @augments Node
