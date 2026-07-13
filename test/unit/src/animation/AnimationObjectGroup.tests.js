@@ -130,6 +130,52 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
+		QUnit.test( 'uncache the last active object', ( assert ) => {
+
+			const objectA = new Object3D(),
+				objectB = new Object3D();
+
+			const group = new AnimationObjectGroup( objectA, objectB );
+			const bindings = group.subscribe_( PathA, ParsedPathA );
+
+			// Uncaching the highest-indexed active object must forget it
+			// completely, so that adding it again re-activates it. A stale
+			// index left in _indicesByUUID makes the re-add a silent no-op.
+			group.uncache( objectB );
+			group.add( objectB );
+
+			const activeRoots = [];
+			for ( let i = group.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
+
+				activeRoots.push( bindings[ i ].rootNode );
+
+			}
+
+			assert.ok(
+				activeRoots.includes( objectB ),
+				'object re-added after being uncached is active again'
+			);
+
+		} );
+
+		QUnit.test( 'unsubscribe a path that is not the last', ( assert ) => {
+
+			const group = new AnimationObjectGroup( new Object3D() );
+
+			group.subscribe_( PathA, ParsedPathA );
+			group.subscribe_( PathB, ParsedPathB );
+
+			// Removing the first path moves the last path (PathB) into its
+			// slot; the path -> index bookkeeping must follow the moved path.
+			group.unsubscribe_( PathA );
+
+			assert.strictEqual(
+				group._bindingsIndicesByPath[ PathB ], 0,
+				'moved path is re-indexed to its new slot'
+			);
+
+		} );
+
 	} );
 
 } );

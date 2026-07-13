@@ -305,7 +305,7 @@ class AnimationObjectGroup {
 					const lastIndex = -- nObjects,
 						lastObject = objects[ lastIndex ];
 
-					if ( lastIndex > 0 ) {
+					if ( index !== lastIndex ) {
 
 						indicesByUUID[ lastObject.uuid ] = index;
 
@@ -389,7 +389,7 @@ class AnimationObjectGroup {
 				bindings = this._bindings,
 				lastBindingsIndex = bindings.length - 1,
 				lastBindings = bindings[ lastBindingsIndex ],
-				lastBindingsPath = path[ lastBindingsIndex ];
+				lastBindingsPath = paths[ lastBindingsIndex ];
 
 			indicesByPath[ lastBindingsPath ] = index;
 
