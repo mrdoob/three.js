@@ -22,6 +22,7 @@ import { getShadowMaterial, disposeShadowMaterial, BasicShadowFilter, PCFShadowF
 import { positionLocal } from '../accessors/Position.js';
 import { uniform } from '../core/UniformNode.js';
 import { equirectDirection } from '../utils/EquirectUV.js';
+import { context } from '../core/ContextNode.js';
 
 //
 
@@ -492,12 +493,16 @@ class ShadowNode extends ShadowBaseNode {
 			const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
 			const size = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
 
+			const sharedContext = context( builder.getSharedContext() );
+
 			let material = this.vsmMaterialVertical || ( this.vsmMaterialVertical = new NodeMaterial() );
-			material.fragmentNode = VSMPassVertical( { samples, radius, size, shadowPass: shadowPassVertical, depthLayer: this.depthLayer } ).context( builder.getSharedContext() );
+			material.contextNode = sharedContext;
+			material.fragmentNode = VSMPassVertical( { samples, radius, size, shadowPass: shadowPassVertical, depthLayer: this.depthLayer } );
 			material.name = 'VSMVertical';
 
 			material = this.vsmMaterialHorizontal || ( this.vsmMaterialHorizontal = new NodeMaterial() );
-			material.fragmentNode = VSMPassHorizontal( { samples, radius, size, shadowPass: shadowPassHorizontal, depthLayer: this.depthLayer } ).context( builder.getSharedContext() );
+			material.contextNode = sharedContext;
+			material.fragmentNode = VSMPassHorizontal( { samples, radius, size, shadowPass: shadowPassHorizontal, depthLayer: this.depthLayer } );
 			material.name = 'VSMHorizontal';
 
 		}

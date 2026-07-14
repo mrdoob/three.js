@@ -1,5 +1,5 @@
 import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
-import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand } from 'three/tsl';
+import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -350,7 +350,8 @@ class GTAONode extends TempNode {
 
 			this._currentSamples = this.samples.value;
 
-			this._material.fragmentNode = this._ao().context( this._sharedContext );
+			this._material.contextNode = context( this._sharedContext );
+			this._material.fragmentNode = this._ao();
 			this._material.needsUpdate = true;
 
 		}
@@ -571,7 +572,8 @@ class GTAONode extends TempNode {
 		this._sharedContext = builder.getSharedContext();
 		this._currentSamples = this.samples.value;
 
-		this._material.fragmentNode = this._ao().context( this._sharedContext );
+		this._material.contextNode = context( builder.getSharedContext() );
+		this._material.fragmentNode = this._ao();
 		this._material.needsUpdate = true;
 
 		//

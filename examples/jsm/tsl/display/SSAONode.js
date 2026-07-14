@@ -1,5 +1,5 @@
 import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
-import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, getScreenPositionFromClip, vogelDiskSample, interleavedGradientNoise, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec4, int, dot, max, clamp, length, screenCoordinate, PI2, texture, passTexture } from 'three/tsl';
+import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, getScreenPositionFromClip, vogelDiskSample, interleavedGradientNoise, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec4, int, dot, max, clamp, length, screenCoordinate, PI2, texture, passTexture, context } from 'three/tsl';
 import { depthAwareBlur } from './depthAwareBlur.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -385,12 +385,18 @@ class SSAONode extends TempNode {
 
 		} );
 
-		this._aoMaterial.fragmentNode = ao().context( builder.getSharedContext() );
+		const sharedContext = context( builder.getSharedContext() );
+
+		// compute ambient occlusion
+
+		this._aoMaterial.contextNode = sharedContext;
+		this._aoMaterial.fragmentNode = ao();
 		this._aoMaterial.needsUpdate = true;
 
 		// separable, depth-aware blur ( run horizontally then vertically via `_blurDirection` )
 
-		this._blurMaterial.fragmentNode = depthAwareBlur( this._blurInput, this.depthNode, this._blurDirection, this._camera, this.blurSharpness, this.radius ).context( builder.getSharedContext() );
+		this._blurMaterial.contextNode = sharedContext;
+		this._blurMaterial.fragmentNode = depthAwareBlur( this._blurInput, this.depthNode, this._blurDirection, this._camera, this.blurSharpness, this.radius );
 		this._blurMaterial.needsUpdate = true;
 
 		return this._textureNode;

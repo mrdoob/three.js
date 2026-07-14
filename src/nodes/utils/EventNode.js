@@ -55,6 +55,36 @@ class EventNode extends Node {
 
 	}
 
+	setup( builder ) {
+
+		const { eventType, callback } = this;
+
+		if ( eventType === EventNode.BEFORE_RENDER_PIPELINE ) {
+
+			const callbacks = builder.context.onBeforePipelineCallbacks;
+
+			if ( callbacks ) {
+
+				callbacks.push( callback );
+
+			}
+
+		} else if ( eventType === EventNode.AFTER_RENDER_PIPELINE ) {
+
+			const callbacks = builder.context.onAfterPipelineCallbacks;
+
+			if ( callbacks ) {
+
+				callbacks.push( callback );
+
+			}
+
+		}
+
+		return super.setup( builder );
+
+	}
+
 	update( frame ) {
 
 		this.callback( frame );
@@ -75,6 +105,8 @@ EventNode.FRAME = 'frame';
 EventNode.BEFORE_OBJECT = 'beforeObject';
 EventNode.BEFORE_MATERIAL = 'beforeMaterial';
 EventNode.BEFORE_FRAME = 'beforeFrame';
+EventNode.BEFORE_RENDER_PIPELINE = 'beforeRenderPipeline';
+EventNode.AFTER_RENDER_PIPELINE = 'afterRenderPipeline';
 
 export default EventNode;
 
@@ -146,3 +178,25 @@ export const OnBeforeMaterialUpdate = ( callback ) => createEvent( EventNode.BEF
  * @returns {EventNode}
  */
 export const OnBeforeFrameUpdate = ( callback ) => createEvent( EventNode.BEFORE_FRAME, callback );
+
+/**
+ * Creates an event that triggers a function before the render pipeline is rendered.
+ *
+ * The node must be part of a node chain that is used as the output of a `RenderPipeline`,
+ * otherwise the event is ignored.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+export const OnBeforeRenderPipeline = ( callback ) => createEvent( EventNode.BEFORE_RENDER_PIPELINE, callback );
+
+/**
+ * Creates an event that triggers a function after the render pipeline is rendered.
+ *
+ * The node must be part of a node chain that is used as the output of a `RenderPipeline`,
+ * otherwise the event is ignored.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+export const OnAfterRenderPipeline = ( callback ) => createEvent( EventNode.AFTER_RENDER_PIPELINE, callback );

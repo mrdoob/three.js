@@ -892,6 +892,17 @@ class NodeBuilder {
 	}
 
 	/**
+	 * A reference to the render pipeline.
+	 *
+	 * @type {RenderPipeline}
+	 */
+	get renderPipeline() {
+
+		return this.context.renderPipeline;
+
+	}
+
+	/**
 	 * Whether the given texture is filtered or not.
 	 *
 	 * @param {Texture} texture - The texture to check.

@@ -1,5 +1,5 @@
 import { HalfFloatType, LinearFilter, NearestFilter, RenderTarget, Texture, Vector2, QuadMesh, NodeMaterial, TempNode, RendererUtils } from 'three/webgpu';
-import { abs, Fn, NodeUpdateType, uv, uniform, convertToTexture, vec2, vec4, passTexture, max, step, dot, float, texture, If, Loop, int, Break, sqrt, sign, mix } from 'three/tsl';
+import { abs, Fn, NodeUpdateType, uv, uniform, convertToTexture, vec2, vec4, passTexture, max, step, dot, float, texture, If, Loop, int, Break, sqrt, sign, mix, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -651,13 +651,18 @@ class SMAANode extends TempNode {
 
 		} );
 
-		this._materialEdges.fragmentNode = SMAAEdgeDetection().context( builder.getSharedContext() );
+		const sharedContext = context( builder.getSharedContext() );
+
+		this._materialEdges.contextNode = sharedContext;
+		this._materialEdges.fragmentNode = SMAAEdgeDetection();
 		this._materialEdges.needsUpdate = true;
 
-		this._materialWeights.fragmentNode = SMAAWeights().context( builder.getSharedContext() );
+		this._materialWeights.contextNode = sharedContext;
+		this._materialWeights.fragmentNode = SMAAWeights();
 		this._materialWeights.needsUpdate = true;
 
-		this._materialBlend.fragmentNode = SMAABlend().context( builder.getSharedContext() );
+		this._materialBlend.contextNode = sharedContext;
+		this._materialBlend.fragmentNode = SMAABlend();
 		this._materialBlend.needsUpdate = true;
 
 		return this._textureNode;
