@@ -26,13 +26,31 @@ export default /* glsl */`
 
 	#ifdef USE_ANISOTROPY
 
-		radiance += getIBLAnisotropyRadiance( geometryViewDir, geometryNormal, material.roughness, material.anisotropyB, material.anisotropy );
+		vec3 iblRadiance = getIBLAnisotropyRadiance( geometryViewDir, geometryNormal, material.roughness, material.anisotropyB, material.anisotropy );
 
 	#else
 
-		radiance += getIBLRadiance( geometryViewDir, geometryNormal, material.roughness );
+		vec3 iblRadiance = getIBLRadiance( geometryViewDir, geometryNormal, material.roughness );
 
 	#endif
+
+	#ifdef USE_RETROREFLECTIVE
+
+		#ifdef USE_ANISOTROPY
+
+			vec3 retroIBLRadiance = getIBLAnisotropyRetroRadiance( geometryViewDir, geometryNormal, material.roughness, material.anisotropyB, material.anisotropy );
+
+		#else
+
+			vec3 retroIBLRadiance = getIBLRetroRadiance( geometryViewDir, geometryNormal, material.roughness );
+
+		#endif
+
+		iblRadiance = mix( iblRadiance, retroIBLRadiance, saturate( material.retroreflective ) );
+
+	#endif
+
+	radiance += iblRadiance;
 
 	#ifdef USE_CLEARCOAT
 
