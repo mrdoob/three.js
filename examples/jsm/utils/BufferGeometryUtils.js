@@ -657,9 +657,7 @@ function mergeVertices( geometry, tolerance = 1e-4, ignoredAttributes = [] ) {
 
 	// attributes and new attribute arrays
 	const attributeNames = Object.keys( geometry.attributes );
-	const filteredAttributeNames = attributeNames.filter(
-		( name ) => ! ignoredAttributes.includes( name ),
-	);
+	const filteredAttributeNames = attributeNames.filter( ( name ) => ! ignoredAttributes.includes( name ) );
 
 	const tmpAttributes = {};
 	const tmpMorphAttributes = {};
@@ -677,7 +675,7 @@ function mergeVertices( geometry, tolerance = 1e-4, ignoredAttributes = [] ) {
 		tmpAttributes[ name ] = new attr.constructor(
 			new attr.array.constructor( attr.count * attr.itemSize ),
 			attr.itemSize,
-			attr.normalized,
+			attr.normalized
 		);
 
 		const morphAttributes = geometry.morphAttributes[ name ];
@@ -686,14 +684,8 @@ function mergeVertices( geometry, tolerance = 1e-4, ignoredAttributes = [] ) {
 			if ( ! tmpMorphAttributes[ name ] ) tmpMorphAttributes[ name ] = [];
 			morphAttributes.forEach( ( morphAttr, i ) => {
 
-				const array = new morphAttr.array.constructor(
-					morphAttr.count * morphAttr.itemSize,
-				);
-				tmpMorphAttributes[ name ][ i ] = new morphAttr.constructor(
-					array,
-					morphAttr.itemSize,
-					morphAttr.normalized,
-				);
+				const array = new morphAttr.array.constructor( morphAttr.count * morphAttr.itemSize );
+				tmpMorphAttributes[ name ][ i ] = new morphAttr.constructor( array, morphAttr.itemSize, morphAttr.normalized );
 
 			} );
 
@@ -721,7 +713,7 @@ function mergeVertices( geometry, tolerance = 1e-4, ignoredAttributes = [] ) {
 			for ( let k = 0; k < itemSize; k ++ ) {
 
 				// double tilde truncates the decimal value
-				hash += `${~ ~ ( attribute[ getters[ k ] ]( index ) * hashMultiplier + hashAdditive )},`;
+				hash += `${ ~ ~ ( attribute[ getters[ k ] ]( index ) * hashMultiplier + hashAdditive ) },`;
 
 			}
 
@@ -755,10 +747,7 @@ function mergeVertices( geometry, tolerance = 1e-4, ignoredAttributes = [] ) {
 
 						for ( let m = 0, ml = morphAttributes.length; m < ml; m ++ ) {
 
-							newMorphArrays[ m ][ setterFunc ](
-								nextIndex,
-								morphAttributes[ m ][ getterFunc ]( index ),
-							);
+							newMorphArrays[ m ][ setterFunc ]( nextIndex, morphAttributes[ m ][ getterFunc ]( index ) );
 
 						}
 
@@ -782,14 +771,11 @@ function mergeVertices( geometry, tolerance = 1e-4, ignoredAttributes = [] ) {
 
 		const tmpAttribute = tmpAttributes[ name ];
 
-		result.setAttribute(
-			name,
-			new tmpAttribute.constructor(
-				tmpAttribute.array.slice( 0, nextIndex * tmpAttribute.itemSize ),
-				tmpAttribute.itemSize,
-				tmpAttribute.normalized,
-			),
-		);
+		result.setAttribute( name, new tmpAttribute.constructor(
+			tmpAttribute.array.slice( 0, nextIndex * tmpAttribute.itemSize ),
+			tmpAttribute.itemSize,
+			tmpAttribute.normalized,
+		) );
 
 		if ( ! ( name in tmpMorphAttributes ) ) continue;
 
@@ -798,10 +784,7 @@ function mergeVertices( geometry, tolerance = 1e-4, ignoredAttributes = [] ) {
 			const tmpMorphAttribute = tmpMorphAttributes[ name ][ j ];
 
 			result.morphAttributes[ name ][ j ] = new tmpMorphAttribute.constructor(
-				tmpMorphAttribute.array.slice(
-					0,
-					nextIndex * tmpMorphAttribute.itemSize,
-				),
+				tmpMorphAttribute.array.slice( 0, nextIndex * tmpMorphAttribute.itemSize ),
 				tmpMorphAttribute.itemSize,
 				tmpMorphAttribute.normalized,
 			);
