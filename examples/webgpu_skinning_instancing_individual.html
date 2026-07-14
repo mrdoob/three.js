@@ -38,7 +38,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Fn, add, attributeArray, color, instanceIndex, screenUV, storage, transformNormal, transformNormalToView, uint, uniform, vec4, vertexIndex } from 'three/tsl';
+			import { Fn, add, attributeArray, color, instanceIndex, screenUV, storage, transformNormal, transformNormalToView, uint, uniform, vec4, vertexIndex, mat3 } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -161,7 +161,9 @@
 						boneMatZ.mul( skinWeight.z ).mul( skinVertex ),
 						boneMatW.mul( skinWeight.w ).mul( skinVertex )
 					) ).xyz;
-					const skinNormal = bindMatrixInverse.mul( skinMatrix ).mul( bindMatrix ).transformDirection( sourceVertices.element( sourceOffset.add( uint( 1 ) ) ).xyz ).xyz;
+
+					const skinMatrix3 = mat3( bindMatrixInverse.mul( skinMatrix ).mul( bindMatrix ) );
+					const skinNormal = skinMatrix3.mul( sourceVertices.element( sourceOffset.add( uint( 1 ) ) ).xyz );
 					const instanceMatrix = instanceMatricesNode.element( meshInstance );
 
 					vertices.element( targetOffset ).assign( vec4( instanceMatrix.mul( skinPosition ).xyz, 1 ) );
