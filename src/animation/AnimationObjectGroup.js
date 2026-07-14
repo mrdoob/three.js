@@ -275,12 +275,24 @@ class AnimationObjectGroup {
 						lastIndex = -- nObjects,
 						lastObject = objects[ lastIndex ];
 
-					// last cached object takes this object's place
-					indicesByUUID[ lastCachedObject.uuid ] = index;
+					if ( index !== firstActiveIndex ) {
+
+						// last cached object takes this object's place
+
+						indicesByUUID[ lastCachedObject.uuid ] = index;
+
+					}
+
 					objects[ index ] = lastCachedObject;
 
-					// last object goes to the activated slot and pop
-					indicesByUUID[ lastObject.uuid ] = firstActiveIndex;
+					if ( firstActiveIndex !== lastIndex ) {
+
+						// last object goes to the activated slot and pop
+
+						indicesByUUID[ lastObject.uuid ] = firstActiveIndex;
+
+					}
+
 					objects[ firstActiveIndex ] = lastObject;
 					objects.pop();
 
