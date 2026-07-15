@@ -13,6 +13,7 @@ struct PhysicalMaterial {
 	float metalness;
 	float specularF90;
 	float dispersion;
+	vec3 multiScatteringCompensation;
 
 	#ifdef USE_RETROREFLECTIVE
 		float retroreflective;
@@ -527,20 +528,7 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
 
 	#endif
 
-	// Multi-scattering energy compensation for direct lighting
-	// Based on "Practical Multiple Scattering Compensation for Microfacet Models"
-	// https://blog.selfshadow.com/publications/turquin/ms_comp_final.pdf
-	float dotNV = saturate( dot( geometryNormal, geometryViewDir ) );
-
-	vec2 fab = texture2D( dfgLUT, vec2( material.roughness, dotNV ) ).rg;
-
-	// Energy of the single-scattering lobe in a white furnace ( F0 = F90 = 1 )
-	float Ess = fab.x + fab.y;
-
-	// Compensate for the energy lost to multiple scattering, tinting the added term by F0 ( equation 16 )
-	vec3 energyCompensation = 1.0 + material.specularColorBlended * ( 1.0 / Ess - 1.0 );
-
-	reflectedLight.directSpecular += irradiance * specularBRDF * energyCompensation;
+	reflectedLight.directSpecular += irradiance * specularBRDF * material.multiScatteringCompensation;
 
 	// Light reflected by the specular interface is not available to the diffuse layer ( glTF fresnel_mix )
 	vec3 halfDir = normalize( directLight.direction + geometryViewDir );

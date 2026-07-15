@@ -54,6 +54,23 @@ vec3 geometryClearcoatNormal = vec3( 0.0 );
 
 #endif
 
+#ifdef STANDARD
+
+	// Multi-scattering energy compensation for direct lighting
+	// Based on "Practical Multiple Scattering Compensation for Microfacet Models"
+	// https://blog.selfshadow.com/publications/turquin/ms_comp_final.pdf
+	float dotNVms = saturate( dot( geometryNormal, geometryViewDir ) );
+
+	vec2 fabMs = texture2D( dfgLUT, vec2( material.roughness, dotNVms ) ).rg;
+
+	// Energy of the single-scattering lobe in a white furnace ( F0 = F90 = 1 )
+	float EssMs = fabMs.x + fabMs.y;
+
+	// Compensate for the energy lost to multiple scattering, tinting the added term by F0 ( equation 16 )
+	material.multiScatteringCompensation = 1.0 + material.specularColorBlended * ( 1.0 / EssMs - 1.0 );
+
+#endif
+
 IncidentLight directLight;
 
 #if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )
