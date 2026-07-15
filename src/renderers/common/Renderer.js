@@ -757,7 +757,7 @@ class Renderer {
 				const useFrameBufferTarget = this.needsFrameBufferTarget && this._renderTarget === null;
 				const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : ( this._renderTarget || this._outputRenderTarget );
 
-				const renderList = this._renderLists.get( scene, camera );
+				const renderList = this._renderLists.get( scene, camera, this.lighting );
 				const renderContext = this._renderContexts.get( renderTarget, this._mrt );
 
 				const material = scene.overrideMaterial || object.material;
@@ -831,7 +831,7 @@ class Renderer {
 			this._pipelines = new Pipelines( backend, this._nodes, this.info );
 			this._bindings = new Bindings( backend, this._nodes, this._textures, this._attributes, this._pipelines, this.info );
 			this._objects = new RenderObjects( this, this._nodes, this._geometries, this._pipelines, this._bindings, this.info );
-			this._renderLists = new RenderLists( this.lighting );
+			this._renderLists = new RenderLists();
 			this._bundles = new RenderBundles();
 			this._renderContexts = new RenderContexts( this );
 
@@ -982,7 +982,7 @@ class Renderer {
 		}
 
 		// Use sceneRef for render list to ensure lightsNode matches between compileAsync and render
-		const renderList = this._renderLists.get( sceneRef, camera );
+		const renderList = this._renderLists.get( sceneRef, camera, this.lighting );
 		renderList.begin();
 
 		this._projectObject( scene, camera, 0, renderList, renderContext.clippingContext );
@@ -1708,7 +1708,7 @@ class Renderer {
 
 		this._renderLists.update( nodeFrame.frameId );
 
-		const renderList = this._renderLists.get( scene, camera );
+		const renderList = this._renderLists.get( scene, camera, this.lighting );
 		renderList.begin();
 
 		this._projectObject( scene, camera, 0, renderList, renderContext.clippingContext );
@@ -3235,7 +3235,7 @@ class Renderer {
 
 			// replace render list
 
-			renderList = this._renderLists.get( object, camera );
+			renderList = this._renderLists.get( object, camera, this.lighting );
 
 			const renderBundle = this._bundles.get( object, camera, this._currentRenderContext );
 			const renderBundleData = this.backend.get( renderBundle );
