@@ -6,7 +6,7 @@ let _id = 0;
 
 /**
  * This renderer module manages the lights nodes which are unique
- * per scene and camera combination.
+ * per scene + camera + lighting combination.
  *
  * The lights node itself is later configured in the render list
  * with the actual lights from the scene.
@@ -49,7 +49,7 @@ class Lighting {
 		 * @private
 		 * @type {WeakMap<Scene, LightsNode>}
 		 */
-		this._lightsNodeMap = /*@__PURE__*/ new WeakMap();
+		this._lightsNodeMap = new WeakMap();
 
 	}
 
