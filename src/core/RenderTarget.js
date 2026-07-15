@@ -453,7 +453,19 @@ class RenderTarget extends EventDispatcher {
 		this.storeMultisampledDepthBuffer = source.storeMultisampledDepthBuffer;
 		this.storeMultisampledStencilBuffer = source.storeMultisampledStencilBuffer;
 
-		if ( source.depthTexture !== null ) this.depthTexture = source.depthTexture.clone();
+		if ( source.depthTexture !== null ) {
+
+			if ( source.depthTexture.renderTarget === source ) {
+
+				this.depthTexture = source.depthTexture.clone();
+
+			} else {
+
+				this.depthTexture = source.depthTexture;
+
+			}
+
+		}
 
 		this.samples = source.samples;
 		this.multiview = source.multiview;
