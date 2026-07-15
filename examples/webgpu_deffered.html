@@ -27,9 +27,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../src/three.webgpu.js",
-					"three/webgpu": "../src/three.webgpu.js",
-					"three/tsl": "../src/three.tsl.js",
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -155,6 +155,7 @@
 				// opaque pass
 
 				const opaquePass = pass( scene, camera );
+				opaquePass.name = 'opaque pass';
 				opaquePass.transparent = false;
 				opaquePass.setLayers( new THREE.Layers() ); // default layer 0 is used by the renderer
 				opaquePass.setMRT( mrt( {
@@ -216,6 +217,7 @@
 				const opaqueDepthTexture = opaquePass.getTexture( 'depth' );
 
 				const transparentPass = pass( scene, camera, { depthTexture: opaqueDepthTexture, autoClearDepth: false } );
+				transparentPass.name = 'transparent pass';
 				transparentPass.setLayers( new THREE.Layers() ); // default layer 0 is used by the renderer
 				transparentPass.opaque = false;
 
