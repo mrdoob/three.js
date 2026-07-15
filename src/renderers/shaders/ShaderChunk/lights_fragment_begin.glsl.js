@@ -54,7 +54,7 @@ vec3 geometryClearcoatNormal = vec3( 0.0 );
 
 #endif
 
-#ifdef STANDARD
+#if defined( STANDARD ) && ( NUM_DIR_LIGHTS > 0 || NUM_POINT_LIGHTS > 0 || NUM_SPOT_LIGHTS > 0 )
 
 	// Multi-scattering energy compensation for direct lighting
 	// Based on "Practical Multiple Scattering Compensation for Microfacet Models"
