@@ -2,8 +2,6 @@ import { LightsNode } from '../../nodes/Nodes.js';
 
 const _defaultLights = /*@__PURE__*/ new LightsNode();
 
-let _id = 0;
-
 /**
  * This renderer module manages the lights nodes which are unique
  * per scene + camera + lighting combination.
@@ -27,13 +25,6 @@ class Lighting {
 		 * @default true
 		 */
 		this.enabled = true;
-
-		/**
-		 * The ID of this lighting manager.
-		 *
-		 * @type {number}
-		 */
-		this.id = _id ++;
 
 		/**
 		 * A stack of light arrays saved per render via {@link Lighting#beginRender}.
