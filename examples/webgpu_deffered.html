@@ -181,6 +181,9 @@
 				resolveLayers.disableAll();
 				resolveLayers.enable( RESOLVE_LAYER );
 
+				// the resolve material must be compatible with the other materials in the scene;
+				// in common deferred rendering scenarios, a standardized material is used.
+
 				const resolveMaterial = new THREE.MeshStandardNodeMaterial();
 				resolveMaterial.colorNode = Fn( () => {
 
