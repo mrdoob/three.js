@@ -385,8 +385,8 @@ targetOrbit.rotation.y = time * .27;
 targetBob.position.y = Math.sin(time * 2) * 4;
 targetMesh.rotation.x = time * 7;
 targetMesh.rotation.y = time * 13;
-targetMaterial.emissive.setHSL(time * 10 % 1, 1, .25);
-targetMaterial.color.setHSL(time * 10 % 1, 1, .25);
+targetMaterial.emissive.setHSL(time * 0.3 % 1, 1, .25);
+targetMaterial.color.setHSL(time * 0.3 % 1, 1, .25);
 </pre>
 <p>For the tank there's an <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> called <code class="notranslate" translate="no">tank</code> which is used to move everything
 below it around. The code uses a <a href="/docs/#api/en/extras/curves/SplineCurve"><code class="notranslate" translate="no">SplineCurve</code></a> which it can ask for positions
