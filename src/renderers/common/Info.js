@@ -139,10 +139,10 @@ class Info {
 		/**
 		 * Map for storing calculated byte sizes of tracked objects.
 		 *
-		 * @type {Map<Object, number>}
+		 * @type {WeakMap<Object, number>}
 		 * @private
 		 */
-		this.memoryMap = new Map();
+		this.memoryMap = new WeakMap();
 
 	}
 
@@ -218,7 +218,7 @@ class Info {
 
 		}
 
-		this.memoryMap.clear();
+		this.memoryMap = new WeakMap();
 
 	}
 
