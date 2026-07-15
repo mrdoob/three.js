@@ -2208,7 +2208,7 @@ class WebGLBackend extends Backend {
 
 			let samples = renderTarget.samples;
 
-			if ( descriptor.depthTexture !== null && useMultisampledRTT === false ) {
+			if ( descriptor.depthTexture !== null && descriptor.depthTexture.renderTarget !== renderTarget && useMultisampledRTT === false ) {
 
 				if ( samples > 0 ) {
 

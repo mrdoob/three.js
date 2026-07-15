@@ -457,7 +457,10 @@ class RenderTarget extends EventDispatcher {
 
 			if ( source.depthTexture.renderTarget === source ) {
 
-				this.depthTexture = source.depthTexture.clone();
+				const depthTexture = source.depthTexture.clone();
+				depthTexture.renderTarget = null;
+
+				this.depthTexture = depthTexture;
 
 			} else {
 
