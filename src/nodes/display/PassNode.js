@@ -250,7 +250,7 @@ class PassNode extends TempNode {
 
 		if ( this.scope === PassNode.DEPTH || options.depthBuffer !== false ) {
 
-			depthTexture = new DepthTexture();
+			depthTexture = options.depthTexture || new DepthTexture();
 			depthTexture.isRenderTargetTexture = true;
 			//depthTexture.type = FloatType;
 			depthTexture.name = 'depth';
@@ -288,6 +288,38 @@ class PassNode extends TempNode {
 		 * @default true
 		 */
 		this.opaque = true;
+
+		/**
+		 * Whether the renderer should automatically clear before rendering the pass.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.autoClear = options.autoClear !== undefined ? options.autoClear : true;
+
+		/**
+		 * Whether the color buffer should be cleared.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.autoClearColor = options.autoClearColor !== undefined ? options.autoClearColor : true;
+
+		/**
+		 * Whether the depth buffer should be cleared.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.autoClearDepth = options.autoClearDepth !== undefined ? options.autoClearDepth : true;
+
+		/**
+		 * Whether the stencil buffer should be cleared.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.autoClearStencil = options.autoClearStencil !== undefined ? options.autoClearStencil : true;
 
 		/**
 		 * An optional global context for the pass.
@@ -807,6 +839,9 @@ class PassNode extends TempNode {
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentMRT = renderer.getMRT();
 		const currentAutoClear = renderer.autoClear;
+		const currentAutoClearColor = renderer.autoClearColor;
+		const currentAutoClearDepth = renderer.autoClearDepth;
+		const currentAutoClearStencil = renderer.autoClearStencil;
 		const currentTransparent = renderer.transparent;
 		const currentOpaque = renderer.opaque;
 		const currentMask = camera.layers.mask;
@@ -836,7 +871,10 @@ class PassNode extends TempNode {
 
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setMRT( this._mrt );
-		renderer.autoClear = true;
+		renderer.autoClear = this.autoClear;
+		renderer.autoClearColor = this.autoClearColor;
+		renderer.autoClearDepth = this.autoClearDepth;
+		renderer.autoClearStencil = this.autoClearStencil;
 		renderer.transparent = this.transparent;
 		renderer.opaque = this.opaque;
 
@@ -867,6 +905,9 @@ class PassNode extends TempNode {
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
 		renderer.autoClear = currentAutoClear;
+		renderer.autoClearColor = currentAutoClearColor;
+		renderer.autoClearDepth = currentAutoClearDepth;
+		renderer.autoClearStencil = currentAutoClearStencil;
 		renderer.transparent = currentTransparent;
 		renderer.opaque = currentOpaque;
 		renderer.contextNode = currentContextNode;

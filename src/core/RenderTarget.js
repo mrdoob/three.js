@@ -334,8 +334,8 @@ class RenderTarget extends EventDispatcher {
 
 	set depthTexture( current ) {
 
-		if ( this._depthTexture !== null ) this._depthTexture.renderTarget = null;
-		if ( current !== null ) current.renderTarget = this;
+		if ( this._depthTexture !== null && this._depthTexture.renderTarget === this ) this._depthTexture.renderTarget = null;
+		if ( current !== null && current.renderTarget === null ) current.renderTarget = this;
 
 		this._depthTexture = current;
 
