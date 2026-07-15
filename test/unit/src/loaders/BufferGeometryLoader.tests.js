@@ -52,6 +52,25 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
+		QUnit.test( 'parser - morphAttributes - usage', ( assert ) => {
+
+			const loader = new BufferGeometryLoader();
+			const geometry = new BufferGeometry();
+			const attr = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 );
+			attr.setUsage( DynamicDrawUsage );
+
+			geometry.morphAttributes.position = [ attr ];
+
+			const geometry2 = loader.parse( geometry.toJSON() );
+
+			assert.strictEqual(
+				geometry2.morphAttributes.position[ 0 ].usage,
+				DynamicDrawUsage,
+				'The usage of a morph attribute is preserved through serialization.'
+			);
+
+		} );
+
 	} );
 
 } );
