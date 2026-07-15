@@ -209,6 +209,8 @@ class Sprite extends Object3D {
 
 		this.material = source.material;
 
+		this.count = source.count;
+
 		return this;
 
 	}

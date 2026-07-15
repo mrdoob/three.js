@@ -46,6 +46,16 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
+		QUnit.test( 'copy/count', ( assert ) => {
+
+			const sprite = new Sprite();
+			sprite.count = 3;
+
+			const copy = sprite.clone();
+			assert.strictEqual( copy.count, 3, 'The instance count is copied.' );
+
+		} );
+
 	} );
 
 } );

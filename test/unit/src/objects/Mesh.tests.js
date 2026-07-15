@@ -71,6 +71,16 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
+		QUnit.test( 'copy/count', ( assert ) => {
+
+			const mesh = new Mesh();
+			mesh.count = 4;
+
+			const copy = mesh.clone();
+			assert.strictEqual( copy.count, 4, 'The instance count is copied.' );
+
+		} );
+
 		QUnit.todo( 'raycast', ( assert ) => {
 
 			const geometry = new PlaneGeometry();
