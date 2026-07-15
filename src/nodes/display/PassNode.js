@@ -289,6 +289,8 @@ class PassNode extends TempNode {
 		 */
 		this.opaque = true;
 
+		this.lighting = null;
+
 		/**
 		 * Whether the renderer should automatically clear before rendering the pass.
 		 *
@@ -844,6 +846,7 @@ class PassNode extends TempNode {
 		const currentAutoClearStencil = renderer.autoClearStencil;
 		const currentTransparent = renderer.transparent;
 		const currentOpaque = renderer.opaque;
+		const currentLighting = renderer.lighting;
 		const currentMask = camera.layers.mask;
 		const currentContextNode = renderer.contextNode;
 		const currentOverrideMaterial = scene.overrideMaterial;
@@ -878,6 +881,12 @@ class PassNode extends TempNode {
 		renderer.transparent = this.transparent;
 		renderer.opaque = this.opaque;
 
+		if ( this.lighting !== null ) {
+
+			renderer.lighting = this.lighting;
+
+		}
+
 		if ( this.contextNode !== null ) {
 
 			if ( this._contextNodeCache === null || this._contextNodeCache.version !== this.version ) {
@@ -911,6 +920,7 @@ class PassNode extends TempNode {
 		renderer.transparent = currentTransparent;
 		renderer.opaque = currentOpaque;
 		renderer.contextNode = currentContextNode;
+		renderer.lighting = currentLighting;
 
 		camera.layers.mask = currentMask;
 
