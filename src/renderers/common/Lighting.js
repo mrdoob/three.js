@@ -2,11 +2,9 @@ import { LightsNode } from '../../nodes/Nodes.js';
 
 const _defaultLights = /*@__PURE__*/ new LightsNode();
 
-let _id = 0;
-
 /**
  * This renderer module manages the lights nodes which are unique
- * per scene and camera combination.
+ * per scene + camera + lighting combination.
  *
  * The lights node itself is later configured in the render list
  * with the actual lights from the scene.
@@ -29,13 +27,6 @@ class Lighting {
 		this.enabled = true;
 
 		/**
-		 * The ID of this lighting manager.
-		 *
-		 * @type {number}
-		 */
-		this.id = _id ++;
-
-		/**
 		 * A stack of light arrays saved per render via {@link Lighting#beginRender}.
 		 *
 		 * @private
@@ -49,7 +40,7 @@ class Lighting {
 		 * @private
 		 * @type {WeakMap<Scene, LightsNode>}
 		 */
-		this._lightsNodeMap = /*@__PURE__*/ new WeakMap();
+		this._lightsNodeMap = new WeakMap();
 
 	}
 
