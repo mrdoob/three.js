@@ -103,6 +103,8 @@ class BufferGeometryLoader extends Loader {
 			const ib = new InterleavedBuffer( array, interleavedBuffer.stride );
 			ib.uuid = interleavedBuffer.uuid;
 
+			if ( interleavedBuffer.usage !== undefined ) ib.setUsage( interleavedBuffer.usage );
+
 			interleavedBufferMap[ uuid ] = ib;
 
 			return ib;
@@ -157,6 +159,7 @@ class BufferGeometryLoader extends Loader {
 
 			if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
 			if ( attribute.usage !== undefined ) bufferAttribute.setUsage( attribute.usage );
+			if ( attribute.gpuType !== undefined ) bufferAttribute.gpuType = attribute.gpuType;
 
 			geometry.setAttribute( key, bufferAttribute );
 
@@ -190,6 +193,8 @@ class BufferGeometryLoader extends Loader {
 					}
 
 					if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
+					if ( attribute.usage !== undefined ) bufferAttribute.setUsage( attribute.usage );
+					if ( attribute.gpuType !== undefined ) bufferAttribute.gpuType = attribute.gpuType;
 					array.push( bufferAttribute );
 
 				}
