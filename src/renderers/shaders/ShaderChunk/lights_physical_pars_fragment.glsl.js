@@ -13,6 +13,7 @@ struct PhysicalMaterial {
 	float metalness;
 	float specularF90;
 	float dispersion;
+	vec2 dfg;
 	vec3 multiScatteringCompensation;
 
 	#ifdef USE_RETROREFLECTIVE
@@ -391,13 +392,10 @@ vec3 EnvironmentBRDF( const in vec3 normal, const in vec3 viewDir, const in vec3
 // Approximates multiscattering in order to preserve energy.
 // http://www.jcgt.org/published/0008/01/03/
 #ifdef USE_IRIDESCENCE
-void computeMultiscatteringIridescence( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float iridescence, const in vec3 iridescenceF0, const in float roughness, inout vec3 singleScatter, inout vec3 multiScatter ) {
+void computeMultiscatteringIridescence( const in vec2 fab, const in vec3 specularColor, const in float specularF90, const in float iridescence, const in vec3 iridescenceF0, inout vec3 singleScatter, inout vec3 multiScatter ) {
 #else
-void computeMultiscattering( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float roughness, inout vec3 singleScatter, inout vec3 multiScatter ) {
+void computeMultiscattering( const in vec2 fab, const in vec3 specularColor, const in float specularF90, inout vec3 singleScatter, inout vec3 multiScatter ) {
 #endif
-
-	float dotNV = saturate( dot( normal, viewDir ) );
-	vec2 fab = texture2D( dfgLUT, vec2( roughness, dotNV ) ).rg;
 
 	#ifdef USE_IRIDESCENCE
 
@@ -546,11 +544,11 @@ void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in vec3 geomet
 
 	#ifdef USE_IRIDESCENCE
 
-		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.iridescence, material.iridescenceF0Dielectric, material.roughness, singleScattering, multiScattering );
+		computeMultiscatteringIridescence( material.dfg, material.specularColor, material.specularF90, material.iridescence, material.iridescenceF0Dielectric, singleScattering, multiScattering );
 
 	#else
 
-		computeMultiscattering( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.roughness, singleScattering, multiScattering );
+		computeMultiscattering( material.dfg, material.specularColor, material.specularF90, singleScattering, multiScattering );
 
 	#endif
 
@@ -597,13 +595,13 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	#ifdef USE_IRIDESCENCE
 
-		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.iridescence, material.iridescenceF0Dielectric, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
-		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.diffuseColor, material.specularF90, material.iridescence, material.iridescenceF0Metallic, material.roughness, singleScatteringMetallic, multiScatteringMetallic );
+		computeMultiscatteringIridescence( material.dfg, material.specularColor, material.specularF90, material.iridescence, material.iridescenceF0Dielectric, singleScatteringDielectric, multiScatteringDielectric );
+		computeMultiscatteringIridescence( material.dfg, material.diffuseColor, material.specularF90, material.iridescence, material.iridescenceF0Metallic, singleScatteringMetallic, multiScatteringMetallic );
 
 	#else
 
-		computeMultiscattering( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
-		computeMultiscattering( geometryNormal, geometryViewDir, material.diffuseColor, material.specularF90, material.roughness, singleScatteringMetallic, multiScatteringMetallic );
+		computeMultiscattering( material.dfg, material.specularColor, material.specularF90, singleScatteringDielectric, multiScatteringDielectric );
+		computeMultiscattering( material.dfg, material.diffuseColor, material.specularF90, singleScatteringMetallic, multiScatteringMetallic );
 
 	#endif
 
