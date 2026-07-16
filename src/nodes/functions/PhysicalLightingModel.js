@@ -651,9 +651,7 @@ class PhysicalLightingModel extends LightingModel {
 		// Light reflected by the specular interface is not available to the diffuse layer ( glTF fresnel_mix )
 		const halfDir = lightDirection.add( positionViewDirection ).normalize();
 		const dotVH = positionViewDirection.dot( halfDir ).clamp();
-		const F = F_Schlick( { f0: specularColor, f90: specularF90, dotVH } );
-
-		reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseContribution } ) ).mul( F.oneMinus() ) );
+		let F = F_Schlick( { f0: specularColor, f90: specularF90, dotVH } );
 
 		let specularBRDF = BRDF_GGX( { lightDirection, f0: specularColorBlended, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
 
@@ -662,11 +660,17 @@ class PhysicalLightingModel extends LightingModel {
 			// Minimal Retroreflective Microfacet Model:
 			// https://jcgt.org/published/0015/01/04/
 			const retroViewDirection = positionViewDirection.negate().reflect( normalView );
+			const retroHalfDir = lightDirection.add( retroViewDirection ).normalize();
+			const dotRetroVH = retroViewDirection.dot( retroHalfDir ).clamp();
+			const retroF = F_Schlick( { f0: specularColor, f90: specularF90, dotVH: dotRetroVH } );
 			const retroSpecularBRDF = BRDF_GGX( { lightDirection, viewDirection: retroViewDirection, f0: specularColorBlended, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
 
+			F = mix( F, retroF, retroreflective.clamp() );
 			specularBRDF = mix( specularBRDF, retroSpecularBRDF, retroreflective.clamp() );
 
 		}
+
+		reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseContribution } ) ).mul( F.oneMinus() ) );
 
 		reflectedLight.directSpecular.addAssign( irradiance.mul( specularBRDF ).mul( this.multiScatteringCompensation ) );
 
