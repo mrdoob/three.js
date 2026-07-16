@@ -474,6 +474,14 @@ class PhysicalLightingModel extends LightingModel {
 		this.iridescenceF0Metallic = null;
 
 		/**
+		 * The sampled DFG LUT value, shared by the direct and indirect lighting paths.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.dfg = null;
+
+		/**
 		 * The multi-scattering energy compensation for direct lighting.
 		 *
 		 * @type {?Node}
@@ -565,14 +573,17 @@ class PhysicalLightingModel extends LightingModel {
 
 		}
 
+		//
+
+		const dotNV = normalView.dot( positionViewDirection ).clamp();
+		this.dfg = DFGLUT( { roughness, dotNV } ).toConst( 'dfg' );
+
 		// Multi-scattering energy compensation for direct lighting
 		// Based on "Practical Multiple Scattering Compensation for Microfacet Models"
 		// https://blog.selfshadow.com/publications/turquin/ms_comp_final.pdf
-		const dotNV = normalView.dot( positionViewDirection ).clamp();
-		const fab = DFGLUT( { roughness, dotNV } );
 
 		// Energy of the single-scattering lobe in a white furnace ( F0 = F90 = 1 )
-		const Ess = fab.x.add( fab.y );
+		const Ess = this.dfg.x.add( this.dfg.y );
 
 		// Compensate for the energy lost to multiple scattering, tinting the added term by F0 ( equation 16 )
 		this.multiScatteringCompensation = specularColorBlended.mul( Ess.reciprocal().sub( 1.0 ) ).add( 1.0 ).toConst( 'multiScatteringCompensation' );
@@ -587,9 +598,7 @@ class PhysicalLightingModel extends LightingModel {
 
 	computeMultiscattering( singleScatter, multiScatter, specularF90, f0, iridescenceF0 = null ) {
 
-		const dotNV = normalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
-
-		const fab = DFGLUT( { roughness, dotNV } );
+		const fab = this.dfg;
 
 		const Fr = iridescenceF0 ? iridescence.mix( f0, iridescenceF0 ) : f0;
 
