@@ -273,7 +273,7 @@ Sky.SkyShader = {
 
 			// composition + solar disc
 			float sundisc = clamp( ( cosTheta - sunAngularDiameterCos ) * 50000.0, 0.0, 1.0 ) * showSunDisc;
-			vec3 sundiscColor = ( 760.0 * sundisc ) * min( vSunE * Fex, 80.0 ); // 760 = 19000 * 0.04, capped below the half-float range
+			vec3 sundiscColor = ( 760.0 * sundisc ) * min( vSunE * Fex, 80.0 );
 
 			vec3 texColor = ( Lin + L0 ) * 0.04 + sundiscColor + vec3( 0.0, 0.0003, 0.00075 );
 
