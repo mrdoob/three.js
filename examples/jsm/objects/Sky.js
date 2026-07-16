@@ -25,9 +25,9 @@ import {
  * sky.scale.setScalar( 10000 );
  * scene.add( sky );
  * ```
- * 
+ *
  * It can be useful to hide the sun disc when generating an environment map to avoid artifacts
- * 
+ *
  * ```js
  * // disable before rendering environment map
  * sky.material.uniforms.showSunDisc.value = false;
@@ -272,10 +272,10 @@ Sky.SkyShader = {
 			vec3 L0 = vec3( 0.1 ) * Fex;
 
 			// composition + solar disc
-			float sundisc = smoothstep( sunAngularDiameterCos, sunAngularDiameterCos + 0.00002, cosTheta ) * showSunDisc;
-			L0 += ( vSunE * 19000.0 * Fex ) * sundisc;
+			float sundisc = clamp( ( cosTheta - sunAngularDiameterCos ) * 50000.0, 0.0, 1.0 ) * showSunDisc;
+			vec3 sundiscColor = ( 760.0 * sundisc ) * min( vSunE * Fex, 80.0 );
 
-			vec3 texColor = ( Lin + L0 ) * 0.04 + vec3( 0.0, 0.0003, 0.00075 );
+			vec3 texColor = ( Lin + L0 ) * 0.04 + sundiscColor + vec3( 0.0, 0.0003, 0.00075 );
 
 			// Clouds
 			if ( direction.y > 0.0 && cloudCoverage > 0.0 ) {
