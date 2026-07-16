@@ -6,7 +6,7 @@ import {
 	NodeMaterial
 } from 'three/webgpu';
 
-import { Fn, float, floor, fract, vec2, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varyingProperty, vec4, uniform, cameraPosition, time, If, Loop } from 'three/tsl';
+import { Fn, float, floor, fract, vec2, vec3, acos, add, mul, clamp, cos, dot, exp, max, min, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varyingProperty, vec4, uniform, cameraPosition, time, If, Loop } from 'three/tsl';
 
 /**
  * Represents a skydome for scene backgrounds. Based on [A Practical Analytic Model for Daylight](https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight)
@@ -27,7 +27,7 @@ import { Fn, float, floor, fract, vec2, vec3, acos, add, mul, clamp, cos, dot, e
  * ```
  *
  * It can be useful to hide the sun disc when generating an environment map to avoid artifacts
- * 
+ *
  * ```js
  * // disable before rendering environment map
  * sky.showSunDisc.value = false;
@@ -279,10 +279,10 @@ class SkyMesh extends Mesh {
 			const L0 = vec3( 0.1 ).mul( Fex );
 
 			// composition + solar disc
-			const sundisc = smoothstep( sunAngularDiameterCos, sunAngularDiameterCos.add( 0.00002 ), cosTheta ).mul( this.showSunDisc );
-			L0.addAssign( vSunE.mul( 19000.0 ).mul( Fex ).mul( sundisc ) );
+			const sundisc = clamp( cosTheta.sub( sunAngularDiameterCos ).mul( 50000.0 ), 0.0, 1.0 ).mul( this.showSunDisc );
+			const sundiscColor = min( vSunE.mul( Fex ), 80.0 ).mul( 760.0 ).mul( sundisc ); // 760 = 19000 * 0.04, capped below the half-float range
 
-			const texColor = add( Lin, L0 ).mul( 0.04 ).add( vec3( 0.0, 0.0003, 0.00075 ) ).toVar();
+			const texColor = add( Lin, L0 ).mul( 0.04 ).add( sundiscColor ).add( vec3( 0.0, 0.0003, 0.00075 ) ).toVar();
 
 			// gradient at a lattice corner; sinless hash so every GPU produces the same clouds
 			const gradient = Fn( ( [ i ] ) => {
@@ -377,7 +377,7 @@ class SkyMesh extends Mesh {
 				const alpha = sub( 1.0, exp( depth.mul( this.cloudDensity ).mul( - 12.0 ) ) ).mul( horizonFade ).toVar();
 
 				// Occlude the sun disc/glow behind opaque cloud
-				texColor.subAssign( L0.mul( 0.04 ).mul( alpha ) );
+				texColor.subAssign( L0.mul( 0.04 ).add( sundiscColor ).mul( alpha ) );
 
 				// Composite through the atmosphere so distant clouds dissolve into haze
 				const cloudAerial = mix( texColor, cloudColor, Fex );
