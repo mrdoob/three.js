@@ -533,6 +533,16 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
 	float dotVH = saturate( dot( geometryViewDir, halfDir ) );
 	vec3 F = F_Schlick( material.specularColor, material.specularF90, dotVH );
 
+	#ifdef USE_RETROREFLECTIVE
+
+		vec3 retroHalfDir = normalize( directLight.direction + retroViewDir );
+		float dotRetroVH = saturate( dot( retroViewDir, retroHalfDir ) );
+		vec3 retroF = F_Schlick( material.specularColor, material.specularF90, dotRetroVH );
+
+		F = mix( F, retroF, saturate( material.retroreflective ) );
+
+	#endif
+
 	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseContribution ) * ( 1.0 - F );
 }
 
