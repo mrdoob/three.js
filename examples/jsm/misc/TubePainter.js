@@ -49,6 +49,8 @@ function TubePainter() {
 	mesh.frustumCulled = false;
 
 	const normalMatrix = new Matrix3();
+	const normalMatrix1 = new Matrix3();
+	const normalMatrix2 = new Matrix3();
 
 	//
 
@@ -323,6 +325,9 @@ function TubePainter() {
 		const points1 = getPoints( size1 );
 		const points2 = getPoints( size2 );
 
+		normalMatrix1.getNormalMatrix( matrix1 );
+		normalMatrix2.getNormalMatrix( matrix2 );
+
 		for ( let i = 0, il = points2.length; i < il; i ++ ) {
 
 			const vertex1_2 = points2[ i ];
@@ -343,10 +348,10 @@ function TubePainter() {
 			vector3.toArray( positions.array, ( count + 4 ) * 3 );
 			vector4.toArray( positions.array, ( count + 5 ) * 3 );
 
-			vector1.copy( vertex1_2 ).applyMatrix4( matrix2 ).normalize();
-			vector2.copy( vertex2_2 ).applyMatrix4( matrix2 ).normalize();
-			vector3.copy( vertex2_1 ).applyMatrix4( matrix1 ).normalize();
-			vector4.copy( vertex1_1 ).applyMatrix4( matrix1 ).normalize();
+			vector1.copy( vertex1_2 ).applyNormalMatrix( normalMatrix2 );
+			vector2.copy( vertex2_2 ).applyNormalMatrix( normalMatrix2 );
+			vector3.copy( vertex2_1 ).applyNormalMatrix( normalMatrix1 );
+			vector4.copy( vertex1_1 ).applyNormalMatrix( normalMatrix1 );
 
 			vector1.toArray( normals.array, ( count + 0 ) * 3 );
 			vector2.toArray( normals.array, ( count + 1 ) * 3 );
