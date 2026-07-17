@@ -61,7 +61,7 @@ class CSS2DObject extends Object3D {
 		 * @type {number}
 		 * @default 0
 		 */
-		this.rotationAngle = 0;
+		this.rotation2D = 0;
 
 		this.addEventListener( 'removed', function () {
 
@@ -91,7 +91,7 @@ class CSS2DObject extends Object3D {
 
 		this.center = source.center;
 
-		this.rotationAngle = source.rotationAngle;
+		this.rotation2D = source.rotation2D;
 
 		return this;
 
@@ -252,7 +252,7 @@ class CSS2DRenderer {
 					element.style.transformOrigin = `${cx}% ${cy}%`;
 
 					// angle of rotation, counter-clockwise convention
-					const angle = - object.rotationAngle;
+					const angle = - object.rotation2D;
 
 					// coordinates
 					const tx = _vector.x * _widthHalf + _widthHalf;
