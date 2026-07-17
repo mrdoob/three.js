@@ -46,13 +46,22 @@ class CSS2DObject extends Object3D {
 		this.element.setAttribute( 'draggable', false );
 
 		/**
-		 * The 3D objects center point.
-		 * `( 0, 0 )` is the lower left, `( 1, 1 )` is the top right.
+		 * The object's anchor point, and the point around which the object rotates.
+		 * A value of `(0.5, 0.5)` corresponds to the midpoint of the object. A value
+		 * of `(0, 0)` corresponds to the upper left corner of the object.
 		 *
 		 * @type {Vector2}
 		 * @default (0.5,0.5)
 		 */
 		this.center = new Vector2( 0.5, 0.5 );
+
+		/**
+		 * The object's angle of rotation, counterclockwise, in radians.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.rotationAngle = 0;
 
 		this.addEventListener( 'removed', function () {
 
@@ -82,6 +91,8 @@ class CSS2DObject extends Object3D {
 
 		this.center = source.center;
 
+		this.rotationAngle = source.rotationAngle;
+
 		return this;
 
 	}
@@ -97,8 +108,8 @@ const _a = new Vector3();
 const _b = new Vector3();
 
 /**
- * This renderer is a simplified version of {@link CSS3DRenderer}. The only transformation that is
- * supported is translation.
+ * This renderer is a simplified version of {@link CSS3DRenderer}. The only transformations that
+ * are supported are translation and 2D rotation.
  *
  * The renderer is very useful if you want to combine HTML based labels with 3D objects. Here too,
  * the respective DOM elements are wrapped into an instance of {@link CSS2DObject} and added to the
@@ -235,7 +246,20 @@ class CSS2DRenderer {
 
 					object.onBeforeRender( _this, scene, camera );
 
-					element.style.transform = 'translate(' + ( - 100 * object.center.x ) + '%,' + ( - 100 * object.center.y ) + '%)' + 'translate(' + ( _vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
+					// pivot point
+					const cx = 100 * object.center.x;
+					const cy = 100 * object.center.y;
+					element.style.transformOrigin = `${cx}% ${cy}%`;
+
+					// angle of rotation, counter-clockwise convention
+					const angle = - object.rotationAngle;
+
+					// coordinates
+					const tx = _vector.x * _widthHalf + _widthHalf;
+					const ty = -_vector.y * _heightHalf + _heightHalf;
+
+					// transform
+					element.style.transform = `translate(${-cx}%, ${-cy}%) translate(${tx}px, ${ty}px) rotate(${angle}rad)`;
 
 					if ( element.parentNode !== domElement ) {
 
