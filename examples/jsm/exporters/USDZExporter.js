@@ -218,6 +218,21 @@ class USDZExporter {
 		options.animationTracks = animationTracks;
 
 		const root = new USDNode( 'Root', 'Xform' );
+		if ( options.includeAnchoringProperties ) {
+
+			root.addMetadata(
+				'prepend apiSchemas',
+				'["Preliminary_AnchoringAPI"]'
+			);
+			root.addProperty(
+				`uniform token preliminary:anchoring:type = "${options.ar.anchoring.type}"`
+			);
+			root.addProperty(
+				`uniform token preliminary:planeAnchoring:alignment = "${options.ar.planeAnchoring.alignment}"`
+			);
+
+		}
+
 		const scenesNode = new USDNode( 'Scenes', 'Scope' );
 		scenesNode.addMetadata( 'kind', '"sceneLibrary"' );
 		root.addChild( scenesNode );
@@ -229,17 +244,6 @@ class USDZExporter {
 			`string sceneName = "${sceneName}"`,
 		] );
 		sceneNode.addMetadata( 'sceneName', `"${sceneName}"` );
-		if ( options.includeAnchoringProperties ) {
-
-			sceneNode.addProperty(
-				`token preliminary:anchoring:type = "${options.ar.anchoring.type}"`
-			);
-			sceneNode.addProperty(
-				`token preliminary:planeAnchoring:alignment = "${options.ar.planeAnchoring.alignment}"`
-			);
-
-		}
-
 		scenesNode.addChild( sceneNode );
 
 		let output;

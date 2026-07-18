@@ -19,11 +19,33 @@
 			a {
 				color: #00f
 			}
-			#button {
+			#quick-look {
 				position: absolute;
 				bottom: 15px;
-				left: calc(50% - 40px);
-
+				left: 50%;
+				display: flex;
+				gap: 24px;
+				transform: translateX(-50%);
+			}
+			.quick-look-option {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 4px;
+				color: #222;
+				font: 12px sans-serif;
+			}
+			.quick-look-option a {
+				opacity: 0.35;
+				pointer-events: none;
+			}
+			.quick-look-option a.ready {
+				opacity: 1;
+				pointer-events: auto;
+			}
+			.quick-look-option img {
+				display: block;
+				width: 80px;
 			}
 		</style>
 	</head>
@@ -35,9 +57,20 @@
 			<a href="https://sketchfab.com/prefrontalcortex" target="_blank" rel="noopener">prefrontal cortex</a>
 		</div>
 
-		<a id="link" rel="ar" href="" download="asset.usdz">
-			<img id="button" width="100" src="files/arkit.png">
-		</a>
+		<div id="quick-look">
+			<div class="quick-look-option">
+				<span>Floor: bike</span>
+				<a id="horizontal" rel="ar" href="" download="horizontal-bike.usdz" aria-label="View the horizontally anchored bike in AR">
+					<img src="files/arkit.png" alt="">
+				</a>
+			</div>
+			<div class="quick-look-option">
+				<span>Wall: plaque</span>
+				<a id="vertical" rel="ar" href="" download="vertical-plaque.usdz" aria-label="View the vertically anchored plaque in AR">
+					<img src="files/arkit.png" alt="">
+				</a>
+			</div>
+		</div>
 
 		<script type="importmap">
 			{
@@ -65,7 +98,8 @@
 			let camera, scene, renderer, mixer, timer, controls;
 
 			const params = {
-				exportUSDZ: exportUSDZ
+				exportHorizontalUSDZ: () => openUSDZ( 'horizontal' ),
+				exportVerticalUSDZ: () => openUSDZ( 'vertical' )
 			};
 
 			init();
@@ -90,6 +124,8 @@
 				scene.background = new THREE.Color( 0xf0f0f0 );
 				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 
+				prepareQuickLookAsset( createWallPlaque(), 'vertical' );
+
 				const ktx2loader = new KTX2Loader().detectSupport( renderer );
 				const dracoLoader = new DRACOLoader();
 				const gltfLoader = new GLTFLoader();
@@ -113,13 +149,7 @@
 
 					// USDZ
 
-					const exporter = new USDZExporter();
-					exporter.setTextureUtils( WebGLTextureUtils ); // for texture decompresssing
-					const arraybuffer = await exporter.parseAsync( gltf.scene, { animations: gltf.animations } );
-					const blob = new Blob( [ arraybuffer ], { type: 'application/octet-stream' } );
-
-					const link = document.getElementById( 'link' );
-					link.href = URL.createObjectURL( blob );
+					prepareQuickLookAsset( gltf.scene, 'horizontal', gltf.animations );
 
 				} );
 
@@ -138,7 +168,8 @@
 
 					const gui = new GUI();
 
-					gui.add( params, 'exportUSDZ' ).name( 'Export USDZ' );
+					gui.add( params, 'exportHorizontalUSDZ' ).name( 'Export horizontal USDZ' );
+					gui.add( params, 'exportVerticalUSDZ' ).name( 'Export vertical USDZ' );
 					gui.open();
 
 				}
@@ -154,10 +185,75 @@
 
 			}
 
-			function exportUSDZ() {
+			function createWallPlaque() {
 
-				const link = document.getElementById( 'link' );
-				link.click();
+				const plaque = new THREE.Group();
+				plaque.name = 'WallPlaque';
+
+				const panelMaterial = new THREE.MeshStandardMaterial( { color: 0x315c7d, roughness: 0.7 } );
+				const frameMaterial = new THREE.MeshStandardMaterial( { color: 0xd6a84b, roughness: 0.35, metalness: 0.6 } );
+				const accentMaterial = new THREE.MeshStandardMaterial( { color: 0xf4e8c1, roughness: 0.6 } );
+
+				const panel = new THREE.Mesh( new THREE.BoxGeometry( 1.2, 0.8, 0.06 ), panelMaterial );
+				panel.name = 'Panel';
+				panel.position.z = 0.03;
+				plaque.add( panel );
+
+				const horizontalFrameGeometry = new THREE.BoxGeometry( 1.32, 0.08, 0.1 );
+				const verticalFrameGeometry = new THREE.BoxGeometry( 0.08, 0.8, 0.1 );
+
+				for ( const y of [ - 0.44, 0.44 ] ) {
+
+					const frame = new THREE.Mesh( horizontalFrameGeometry, frameMaterial );
+					frame.position.set( 0, y, 0.05 );
+					plaque.add( frame );
+
+				}
+
+				for ( const x of [ - 0.62, 0.62 ] ) {
+
+					const frame = new THREE.Mesh( verticalFrameGeometry, frameMaterial );
+					frame.position.set( x, 0, 0.05 );
+					plaque.add( frame );
+
+				}
+
+				const accent = new THREE.Mesh( new THREE.CylinderGeometry( 0.22, 0.22, 0.08, 32 ), accentMaterial );
+				accent.name = 'Accent';
+				accent.rotation.x = Math.PI / 2;
+				accent.position.z = 0.1;
+				plaque.add( accent );
+
+				return plaque;
+
+			}
+
+			async function prepareQuickLookAsset( object, alignment, animations = [] ) {
+
+				object.updateMatrixWorld( true );
+
+				const exporter = new USDZExporter();
+				exporter.setTextureUtils( WebGLTextureUtils ); // for texture decompresssing
+
+				const arraybuffer = await exporter.parseAsync( object, {
+					animations: animations,
+					ar: {
+						anchoring: { type: 'plane' },
+						planeAnchoring: { alignment: alignment },
+					},
+				} );
+				const blob = new Blob( [ arraybuffer ], { type: 'model/vnd.usdz+zip' } );
+
+				const link = document.getElementById( alignment );
+				link.href = URL.createObjectURL( blob );
+				link.classList.add( 'ready' );
+
+			}
+
+			function openUSDZ( linkID ) {
+
+				const link = document.getElementById( linkID );
+				if ( link.classList.contains( 'ready' ) ) link.click();
 
 			}
 
