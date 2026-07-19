@@ -233,19 +233,6 @@ class USDZExporter {
 
 		}
 
-		const scenesNode = new USDNode( 'Scenes', 'Scope' );
-		scenesNode.addMetadata( 'kind', '"sceneLibrary"' );
-		root.addChild( scenesNode );
-
-		const sceneName = 'Scene';
-		const sceneNode = new USDNode( sceneName, 'Xform' );
-		sceneNode.addMetadata( 'customData', [
-			'bool preliminary_collidesWithEnvironment = 0',
-			`string sceneName = "${sceneName}"`,
-		] );
-		sceneNode.addMetadata( 'sceneName', `"${sceneName}"` );
-		scenesNode.addChild( sceneNode );
-
 		let output;
 
 		const materials = {};
@@ -253,11 +240,11 @@ class USDZExporter {
 
 		if ( scene.isScene ) {
 
-			buildHierarchy( scene, sceneNode, materials, usedNames, files, options );
+			buildHierarchy( scene, root, materials, usedNames, files, options );
 
 		} else {
 
-			buildNode( scene, sceneNode, materials, usedNames, files, options );
+			buildNode( scene, root, materials, usedNames, files, options );
 
 		}
 
