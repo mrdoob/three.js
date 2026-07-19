@@ -207,6 +207,24 @@ class NodeManager extends DataMap {
 
 			if ( nodeBuilderState === undefined ) {
 
+				const provider = this.renderer.nodeBuilderStateProvider;
+
+				if ( provider !== null ) {
+
+					const precompiledState = provider.getForRender( renderObject, NodeBuilderState );
+
+					if ( precompiledState !== undefined && precompiledState !== null ) {
+
+						nodeBuilderCache.set( cacheKey, precompiledState );
+						precompiledState.usedTimes ++;
+						renderObjectData.nodeBuilderState = precompiledState;
+
+						return precompiledState;
+
+					}
+
+				}
+
 				const buildNodeBuilder = async () => {
 
 					let nodeBuilder = this._createNodeBuilder( renderObject, renderObject.material );
@@ -456,10 +474,22 @@ class NodeManager extends DataMap {
 
 		if ( nodeBuilderState === undefined || computeData.version !== computeNode.version ) {
 
-			const nodeBuilder = this.backend.createNodeBuilder( computeNode, this.renderer );
-			nodeBuilder.build();
+			const provider = this.renderer.nodeBuilderStateProvider;
 
-			nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
+			if ( provider !== null ) {
+
+				nodeBuilderState = provider.getForCompute( computeNode, NodeBuilderState );
+
+			}
+
+			if ( nodeBuilderState === undefined || nodeBuilderState === null ) {
+
+				const nodeBuilder = this.backend.createNodeBuilder( computeNode, this.renderer );
+				nodeBuilder.build();
+
+				nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
+
+			}
 
 			computeData.nodeBuilderState = nodeBuilderState;
 			computeData.version = computeNode.version;

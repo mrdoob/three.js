@@ -263,6 +263,18 @@ class Renderer {
 		 */
 		this.lighting = new Lighting();
 
+		/**
+		 * An application-provided source of prebuilt node builder states.
+		 * `getForRender()` and `getForCompute()` receive the `NodeBuilderState`
+		 * constructor so they can hydrate persisted shader artifacts without
+		 * importing renderer internals. Returning `null` or `undefined` falls
+		 * back to the default build path.
+		 *
+		 * @type {?{getForRender: Function, getForCompute: Function}}
+		 * @default null
+		 */
+		this.nodeBuilderStateProvider = null;
+
 		// internals
 
 		/**
