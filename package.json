@@ -102,7 +102,7 @@
     "globals": "^17.0.0",
     "jpeg-js": "^0.4.4",
     "jsdoc": "^4.0.5",
-    "magic-string": "^0.30.0",
+    "magic-string": "^1.0.0",
     "pngjs": "^7.0.0",
     "puppeteer": "^25.0.0",
     "rollup": "^4.6.0",
