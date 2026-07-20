@@ -37,37 +37,37 @@ export default QUnit.module( 'Materials', () => {
 
 		} );
 
-		QUnit.test( 'retroreflective', ( assert ) => {
+		QUnit.test( 'retroreflectivity', ( assert ) => {
 
 			const object = new MeshPhysicalMaterial();
-			assert.strictEqual( object.retroreflective, 0, 'retroreflective defaults to 0.' );
+			assert.strictEqual( object.retroreflectivity, 0, 'retroreflectivity defaults to 0.' );
 
-			object.retroreflective = 0.75;
-			assert.strictEqual( object.retroreflective, 0.75, 'Can set retroreflective.' );
+			object.retroreflectivity = 0.75;
+			assert.strictEqual( object.retroreflectivity, 0.75, 'Can set retroreflectivity.' );
 
 		} );
 
-		QUnit.test( 'copy copies retroreflective', ( assert ) => {
+		QUnit.test( 'copy copies retroreflectivity', ( assert ) => {
 
-			const source = new MeshPhysicalMaterial( { retroreflective: 0.5 } );
+			const source = new MeshPhysicalMaterial( { retroreflectivity: 0.5 } );
 			const object = new MeshPhysicalMaterial();
 
 			object.copy( source );
 
-			assert.strictEqual( object.retroreflective, 0.5, 'copy() preserves retroreflective.' );
+			assert.strictEqual( object.retroreflectivity, 0.5, 'copy() preserves retroreflectivity.' );
 
 		} );
 
-		QUnit.test( 'fromJSON restores retroreflective', ( assert ) => {
+		QUnit.test( 'fromJSON restores retroreflectivity', ( assert ) => {
 
-			const source = new MeshPhysicalMaterial( { retroreflective: 0.25 } );
+			const source = new MeshPhysicalMaterial( { retroreflectivity: 0.25 } );
 			const json = source.toJSON();
 			const object = new MeshPhysicalMaterial();
 
 			object.fromJSON( json );
 
-			assert.strictEqual( json.retroreflective, 0.25, 'toJSON() serializes retroreflective.' );
-			assert.strictEqual( object.retroreflective, 0.25, 'fromJSON() restores retroreflective.' );
+			assert.strictEqual( json.retroreflectivity, 0.25, 'toJSON() serializes retroreflectivity.' );
+			assert.strictEqual( object.retroreflectivity, 0.25, 'fromJSON() restores retroreflectivity.' );
 
 		} );
 

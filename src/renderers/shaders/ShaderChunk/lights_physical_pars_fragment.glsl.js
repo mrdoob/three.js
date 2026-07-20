@@ -16,8 +16,8 @@ struct PhysicalMaterial {
 	vec2 dfg;
 	vec3 multiScatteringCompensation;
 
-	#ifdef USE_RETROREFLECTIVE
-		float retroreflective;
+	#ifdef USE_RETROREFLECTION
+		float retroreflectivity;
 	#endif
 
 	#ifdef USE_CLEARCOAT
@@ -515,14 +515,14 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
 
 	vec3 specularBRDF = BRDF_GGX( directLight.direction, geometryViewDir, geometryNormal, material );
 
-	#ifdef USE_RETROREFLECTIVE
+	#ifdef USE_RETROREFLECTION
 
 		// Minimal Retroreflective Microfacet Model:
 		// https://jcgt.org/published/0015/01/04/
 		vec3 retroViewDir = reflect( - geometryViewDir, geometryNormal );
 		vec3 retroSpecularBRDF = BRDF_GGX( directLight.direction, retroViewDir, geometryNormal, material );
 
-		specularBRDF = mix( specularBRDF, retroSpecularBRDF, saturate( material.retroreflective ) );
+		specularBRDF = mix( specularBRDF, retroSpecularBRDF, saturate( material.retroreflectivity ) );
 
 	#endif
 
@@ -533,13 +533,13 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
 	float dotVH = saturate( dot( geometryViewDir, halfDir ) );
 	vec3 F = F_Schlick( material.specularColor, material.specularF90, dotVH );
 
-	#ifdef USE_RETROREFLECTIVE
+	#ifdef USE_RETROREFLECTION
 
 		vec3 retroHalfDir = normalize( directLight.direction + retroViewDir );
 		float dotRetroVH = saturate( dot( retroViewDir, retroHalfDir ) );
 		vec3 retroF = F_Schlick( material.specularColor, material.specularF90, dotRetroVH );
 
-		F = mix( F, retroF, saturate( material.retroreflective ) );
+		F = mix( F, retroF, saturate( material.retroreflectivity ) );
 
 	#endif
 

@@ -38,7 +38,7 @@ const refreshUniforms = [
 	'normalMap',
 	'normalScale',
 	'opacity',
-	'retroreflective',
+	'retroreflectivity',
 	'roughness',
 	'roughnessMap',
 	'sheen',

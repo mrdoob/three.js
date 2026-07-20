@@ -7,7 +7,7 @@ import Schlick_to_F0 from './BSDF/Schlick_to_F0.js';
 import BRDF_Sheen from './BSDF/BRDF_Sheen.js';
 import { LTC_Evaluate, LTC_Uv } from './BSDF/LTC.js';
 import LightingModel from '../core/LightingModel.js';
-import { diffuseColor, diffuseContribution, specularColor, specularColorBlended, specularF90, roughness, metalness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, ior, thickness, transmission, attenuationDistance, attenuationColor, dispersion, retroreflective } from '../core/PropertyNode.js';
+import { diffuseColor, diffuseContribution, specularColor, specularColorBlended, specularF90, roughness, metalness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, ior, thickness, transmission, attenuationDistance, attenuationColor, dispersion, retroreflectivity } from '../core/PropertyNode.js';
 import { normalView, clearcoatNormalView, normalWorld } from '../accessors/Normal.js';
 import { positionViewDirection, positionView, positionWorld } from '../accessors/Position.js';
 import { Fn, float, vec2, vec3, vec4, mat3, If } from '../tsl/TSLBase.js';
@@ -347,9 +347,9 @@ class PhysicalLightingModel extends LightingModel {
 	 * @param {boolean} [anisotropy=false] - Whether anisotropy is supported or not.
 	 * @param {boolean} [transmission=false] - Whether transmission is supported or not.
 	 * @param {boolean} [dispersion=false] - Whether dispersion is supported or not.
-	 * @param {boolean} [retroreflective=false] - Whether retroreflection is supported or not.
+	 * @param {boolean} [retroreflection=false] - Whether retroreflection is supported or not.
 	 */
-	constructor( clearcoat = false, sheen = false, iridescence = false, anisotropy = false, transmission = false, dispersion = false, retroreflective = false ) {
+	constructor( clearcoat = false, sheen = false, iridescence = false, anisotropy = false, transmission = false, dispersion = false, retroreflection = false ) {
 
 		super();
 
@@ -407,7 +407,7 @@ class PhysicalLightingModel extends LightingModel {
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.retroreflective = retroreflective;
+		this.retroreflection = retroreflection;
 
 		/**
 		 * The clear coat radiance.
@@ -655,7 +655,7 @@ class PhysicalLightingModel extends LightingModel {
 
 		let specularBRDF = BRDF_GGX( { lightDirection, f0: specularColorBlended, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
 
-		if ( this.retroreflective === true ) {
+		if ( this.retroreflection === true ) {
 
 			// Minimal Retroreflective Microfacet Model:
 			// https://jcgt.org/published/0015/01/04/
@@ -665,8 +665,8 @@ class PhysicalLightingModel extends LightingModel {
 			const retroF = F_Schlick( { f0: specularColor, f90: specularF90, dotVH: dotRetroVH } );
 			const retroSpecularBRDF = BRDF_GGX( { lightDirection, viewDirection: retroViewDirection, f0: specularColorBlended, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
 
-			F = mix( F, retroF, retroreflective.clamp() );
-			specularBRDF = mix( specularBRDF, retroSpecularBRDF, retroreflective.clamp() );
+			F = mix( F, retroF, retroreflectivity.clamp() );
+			specularBRDF = mix( specularBRDF, retroSpecularBRDF, retroreflectivity.clamp() );
 
 		}
 

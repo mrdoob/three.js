@@ -356,7 +356,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this._clearcoat = 0;
 		this._dispersion = 0;
 		this._iridescence = 0;
-		this._retroreflective = 0;
+		this._retroreflectivity = 0;
 		this._sheen = 0.0;
 		this._transmission = 0;
 
@@ -473,21 +473,21 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 	 * @type {number}
 	 * @default 0
 	 */
-	get retroreflective() {
+	get retroreflectivity() {
 
-		return this._retroreflective;
+		return this._retroreflectivity;
 
 	}
 
-	set retroreflective( value ) {
+	set retroreflectivity( value ) {
 
-		if ( this._retroreflective > 0 !== value > 0 ) {
+		if ( this._retroreflectivity > 0 !== value > 0 ) {
 
 			this.version ++;
 
 		}
 
-		this._retroreflective = value;
+		this._retroreflectivity = value;
 
 	}
 
@@ -576,7 +576,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.iridescenceThicknessRange = [ ...source.iridescenceThicknessRange ];
 		this.iridescenceThicknessMap = source.iridescenceThicknessMap;
 
-		this.retroreflective = source.retroreflective;
+		this.retroreflectivity = source.retroreflectivity;
 
 		this.sheen = source.sheen;
 		this.sheenColor.copy( source.sheenColor );
