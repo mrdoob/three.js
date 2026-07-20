@@ -94,7 +94,7 @@
 
 				const causticEffect = Fn( ( [ projectorUV ] ) => {
 
-					const waterLayer0 = mx_worley_noise_float( projectorUV.mul( 10 ).add( time ) );
+					const waterLayer0 = mx_worley_noise_float( projectorUV.mul( 10 ).add( time ) ).pow( 2 );
 
 					const caustic = waterLayer0.mul( color( 0x5abcd8 ) ).mul( 2 );
 

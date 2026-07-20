@@ -65,6 +65,16 @@
 
 				const sunLight = new THREE.DirectionalLight( 0xFFE499, 5 );
 				sunLight.position.set( .5, 3, .5 );
+				sunLight.castShadow = true;
+				sunLight.shadow.mapSize.width = 512;
+				sunLight.shadow.mapSize.height = 512;
+				sunLight.shadow.camera.near = 0.5;
+				sunLight.shadow.camera.far = 15;
+				sunLight.shadow.camera.left = - 1.5;
+				sunLight.shadow.camera.right = 1.5;
+				sunLight.shadow.camera.top = 1.5;
+				sunLight.shadow.camera.bottom = - 1.5;
+				sunLight.shadow.bias = - 0.001;
 
 				const waterAmbientLight = new THREE.HemisphereLight( 0x333366, 0x74ccf4, 5 );
 				const skyAmbientLight = new THREE.HemisphereLight( 0x74ccf4, 0, 1 );
@@ -82,6 +92,16 @@
 				loader.load( 'models/gltf/Michelle.glb', function ( gltf ) {
 
 					model = gltf.scene;
+					model.traverse( ( child ) => {
+
+						if ( child.isMesh ) {
+
+							child.castShadow = true;
+							child.receiveShadow = true;
+
+						}
+
+					} );
 
 					mixer = new THREE.AnimationMixer( model );
 
@@ -136,8 +156,8 @@
 				const t = time.mul( .8 );
 				const floorUV = positionWorld.xzy;
 
-				const waterLayer0 = mx_worley_noise_float( floorUV.mul( 4 ).add( t ) );
-				const waterLayer1 = mx_worley_noise_float( floorUV.mul( 2 ).add( t ) );
+				const waterLayer0 = mx_worley_noise_float( floorUV.mul( 6 ).add( t ) ).pow( 2 );
+				const waterLayer1 = mx_worley_noise_float( floorUV.mul( 3 ).add( t ) ).pow( 2 );
 
 				const waterIntensity = waterLayer0.mul( waterLayer1 );
 				const waterColor = waterIntensity.mul( 1.4 ).mix( color( 0x0487e2 ), color( 0x74ccf4 ) );
@@ -160,7 +180,7 @@
 
 				const waterMaterial = new THREE.MeshBasicNodeMaterial();
 				waterMaterial.colorNode = waterColor.toInspector( 'Water / Color' );
-				waterMaterial.backdropNode = depthEffect.mix( viewportSharedTexture(), viewportTexture.mul( depthRefraction.mix( 1, waterColor ) ) );
+				waterMaterial.backdropNode = depthEffect.mix( viewportSharedTexture(), viewportTexture.mul( depthRefraction.mix( 1, waterColor ) ) ).mul( color( 0xd3ebf8 ) );
 				waterMaterial.backdropAlphaNode = depthRefraction.oneMinus();
 				waterMaterial.transparent = true;
 
@@ -172,19 +192,15 @@
 
 				floor = new THREE.Mesh( new THREE.CylinderGeometry( 1.1, 1.1, 10 ), new THREE.MeshStandardNodeMaterial( { colorNode: iceColorNode } ) );
 				floor.position.set( 0, - 5, 0 );
+				floor.receiveShadow = true;
 				scene.add( floor );
 
 				// caustics
 
-				const waterPosY = positionWorld.y.sub( water.position.y );
-
-				let transition = waterPosY.add( .1 ).saturate().oneMinus();
-				transition = waterPosY.lessThan( 0 ).select( transition, normalWorld.y.mix( transition, 0 ) ).toVar();
-
-				const colorNode = transition.mix( material.colorNode, material.colorNode.add( waterLayer0 ) );
+				const causticFade = normalWorld.y.mix( positionWorld.y.distance( 0 ).oneMinus().saturate(), 0 );
 
 				//material.colorNode = colorNode;
-				floor.material.colorNode = colorNode;
+				floor.material.colorNode = causticFade.mix( material.colorNode, material.colorNode.add( waterLayer0 ) );
 
 				// renderer
 
@@ -192,6 +208,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.shadowMap.enabled = true;
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 

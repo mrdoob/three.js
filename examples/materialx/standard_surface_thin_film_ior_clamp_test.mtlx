@@ -6,10 +6,10 @@
   <standard_surface name="surface_shader1" type="surfaceshader" nodedef="ND_standard_surface_surfaceshader">
     <input name="base_color" type="color3" value="0.1, 0.1, 0.1" />
     <input name="thin_film_thickness" type="float" value="200.0" />
-    <input name="thin_film_ior" type="float" value="3.5" />
+    <input name="thin_film_IOR" type="float" value="3.5" />
     <input name="specular_roughness" type="float" value="0.1" />
     <input name="metalness" type="float" value="0.0" />
-    <input name="ior" type="float" value="1.5" />
+    <input name="specular_IOR" type="float" value="1.5" />
     <input name="specular" type="float" value="1.0" />
   </standard_surface>
 </materialx> 

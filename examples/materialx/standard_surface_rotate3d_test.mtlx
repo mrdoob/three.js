@@ -12,8 +12,8 @@
       <input name="in" type="vector2" nodename="texcoord1" />
     </separate2>
     <combine3 name="texcoord_3d" type="vector3">
-      <input name="in1" type="float" nodename="separate_texcoord" output="x" />
-      <input name="in2" type="float" nodename="separate_texcoord" output="y" />
+      <input name="in1" type="float" nodename="separate_texcoord" output="outx" />
+      <input name="in2" type="float" nodename="separate_texcoord" output="outy" />
       <input name="in3" type="float" value="0.0" />
     </combine3>
     <time name="time1" type="float" />
@@ -29,11 +29,10 @@
     <separate3 name="separate_rotated" type="vector3">
       <input name="in" type="vector3" nodename="rotate3d_1" />
     </separate3>
-    <combine3 name="rotated_texcoord" type="vector3">
-      <input name="in1" type="float" nodename="separate_rotated" output="x" />
-      <input name="in2" type="float" nodename="separate_rotated" output="y" />
-      <input name="in3" type="float" nodename="separate_rotated" output="z" />
-    </combine3>
+    <combine2 name="rotated_texcoord" type="vector2">
+      <input name="in1" type="float" nodename="separate_rotated" output="outx" />
+      <input name="in2" type="float" nodename="separate_rotated" output="outy" />
+    </combine2>
     <image name="rotated_image" type="color3">
       <input name="file" type="filename" value="resources/Images/grid.png" />
       <input name="default" type="color3" value="0.5, 0.5, 0.5" />
