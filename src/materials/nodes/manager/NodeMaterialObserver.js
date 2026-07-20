@@ -730,11 +730,18 @@ class NodeMaterialObserver {
 
 		const { renderId } = nodeFrame;
 
+		let force = false;
+
 		if ( this.renderId !== renderId ) {
 
 			this.renderId = renderId;
 
-			return true;
+			// this force has two purposes:
+			//
+			// 1. force the render object to use the equals() code path so its internal cache state gets synched
+			// 2. make sure shared UBOs are updated at least once
+
+			force = true;
 
 		}
 
@@ -742,12 +749,12 @@ class NodeMaterialObserver {
 		const isBundle = renderObject.bundle !== null && renderObject.bundle.static === true && this.getRenderObjectData( renderObject ).version === renderObject.bundle.version;
 
 		if ( isStatic || isBundle )
-			return false;
+			return force;
 
 		const lightsData = this.getLights( renderObject.lightsNode, renderId );
 		const notEqual = this.equals( renderObject, lightsData, renderId ) !== true;
 
-		return notEqual;
+		return ( force || notEqual );
 
 	}
 
