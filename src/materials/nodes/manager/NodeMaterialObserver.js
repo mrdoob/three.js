@@ -730,11 +730,18 @@ class NodeMaterialObserver {
 
 		const { renderId } = nodeFrame;
 
+		let force = false;
+
+		// shared UBOs are potentially never updated when objects don't change. Below block
+		// make sure these UBOs are updated at least once.
+
 		if ( this.renderId !== renderId ) {
 
 			this.renderId = renderId;
 
-			return true;
+			// no early out here. instead, force the render object to use the equals() code path so its internal cache state gets synched
+
+			force = true;
 
 		}
 
@@ -742,12 +749,12 @@ class NodeMaterialObserver {
 		const isBundle = renderObject.bundle !== null && renderObject.bundle.static === true && this.getRenderObjectData( renderObject ).version === renderObject.bundle.version;
 
 		if ( isStatic || isBundle )
-			return false;
+			return force;
 
 		const lightsData = this.getLights( renderObject.lightsNode, renderId );
 		const notEqual = this.equals( renderObject, lightsData, renderId ) !== true;
 
-		return notEqual;
+		return ( force || notEqual );
 
 	}
 
