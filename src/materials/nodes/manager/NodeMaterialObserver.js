@@ -732,14 +732,14 @@ class NodeMaterialObserver {
 
 		let force = false;
 
+		// shared UBOs are potentially never updated when objects don't change. Below block
+		// make sure these UBOs are updated at least once.
+
 		if ( this.renderId !== renderId ) {
 
 			this.renderId = renderId;
 
-			// this force has two purposes:
-			//
-			// 1. force the render object to use the equals() code path so its internal cache state gets synched
-			// 2. make sure shared UBOs are updated at least once
+			// no early out here. instead, force the render object to use the equals() code path so its internal cache state gets synched
 
 			force = true;
 
