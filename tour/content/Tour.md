@@ -654,328 +654,269 @@ TSL provides all standard mathematical constants and functions as both direct fu
 
 ### Functions
 
-::: api abs( x )
+::: api abs( x ) - Computes the absolute value of `x`. Returns `Node`.
 - **x**: `Node | Number` — Input value or node.
-- Computes the absolute value of `x`. Returns `Node`.
 :::
 
-::: api acos( x )
+::: api acos( x ) - Computes the arccosine of `x` in radians. Returns `Node`.
 - **x**: `Node | Number` — Input value or node in range `[-1, 1]`.
-- Computes the arccosine of `x` in radians. Returns `Node`.
 :::
 
-::: api all( x )
+::: api all( x ) - Returns `true` if all components of `x` are non-zero or true. Returns `boolean`.
 - **x**: `Node` — Vector node.
-- Returns `true` if all components of `x` are non-zero or true. Returns `boolean`.
 :::
 
-::: api any( x )
+::: api any( x ) - Returns `true` if any component of `x` is non-zero or true. Returns `boolean`.
 - **x**: `Node` — Vector node.
-- Returns `true` if any component of `x` is non-zero or true. Returns `boolean`.
 :::
 
-::: api asin( x )
+::: api asin( x ) - Computes the arcsine of `x` in radians. Returns `Node`.
 - **x**: `Node | Number` — Input value or node in range `[-1, 1]`.
-- Computes the arcsine of `x` in radians. Returns `Node`.
 :::
 
-::: api atan( y, x? )
+::: api atan( y, x? ) - Computes the arc-tangent of `y` or `y / x` in radians. Returns `Node`.
 - **y**: `Node | Number` — Y coordinate or single tangent ratio.
 - **x**: `Node | Number` — (Optional) X coordinate for two-argument arc-tangent (`atan2`).
-- Computes the arc-tangent of `y` or `y / x` in radians. Returns `Node`.
 :::
 
-::: api bitcast( x, type )
+::: api bitcast( x, type ) - Reinterprets the bit pattern of `x` as a different type without type conversion. Returns `Node`.
 - **x**: `Node` — Input node.
 - **type**: `string` — Target primitive type name (e.g. `'float'`, `'int'`, `'uint'`).
-- Reinterprets the bit pattern of `x` as a different type without type conversion. Returns `Node`.
 :::
 
-::: api cbrt( x )
+::: api cbrt( x ) - Computes the cube root of `x`. Returns `Node`.
 - **x**: `Node | Number` — Input value or node.
-- Computes the cube root of `x`. Returns `Node`.
 :::
 
-::: api ceil( x )
+::: api ceil( x ) - Rounds `x` up to the nearest integer. Returns `Node`.
 - **x**: `Node | Number` — Input value or node.
-- Rounds `x` up to the nearest integer. Returns `Node`.
 :::
 
-::: api clamp( x, min, max )
+::: api clamp( x, min, max ) - Constrains `x` to lie between `min` and `max`. Returns `Node`.
 - **x**: `Node | Number` — Value to constrain.
 - **min**: `Node | Number` — Lower bound.
 - **max**: `Node | Number` — Upper bound.
-- Constrains `x` to lie between `min` and `max`. Returns `Node`.
 :::
 
-::: api cos( x )
+::: api cos( x ) - Computes the cosine of `x`. Returns `Node`.
 - **x**: `Node | Number` — Angle in radians.
-- Computes the cosine of `x`. Returns `Node`.
 :::
 
-::: api cross( a, b )
+::: api cross( a, b ) - Computes the cross product of 3D vectors `a` and `b`. Returns `vec3`.
 - **a**: `vec3` — First 3D vector.
 - **b**: `vec3` — Second 3D vector.
-- Computes the cross product of 3D vectors `a` and `b`. Returns `vec3`.
 :::
 
-::: api dFdx( p )
+::: api dFdx( p ) - Computes the partial derivative of `p` with respect to screen X axis. Returns `Node`.
 - **p**: `Node` — Input expression node.
-- Computes the partial derivative of `p` with respect to screen X axis. Returns `Node`.
 :::
 
-::: api dFdy( p )
+::: api dFdy( p ) - Computes the partial derivative of `p` with respect to screen Y axis. Returns `Node`.
 - **p**: `Node` — Input expression node.
-- Computes the partial derivative of `p` with respect to screen Y axis. Returns `Node`.
 :::
 
-::: api degrees( radians )
+::: api degrees( radians ) - Converts an angle from radians to degrees. Returns `Node`.
 - **radians**: `Node | Number` — Angle in radians.
-- Converts an angle from radians to degrees. Returns `Node`.
 :::
 
-::: api difference( a, b )
+::: api difference( a, b ) - Computes the absolute difference `|a - b|`. Returns `Node`.
 - **a**: `Node | Number` — First value or node.
 - **b**: `Node | Number` — Second value or node.
-- Computes the absolute difference `|a - b|`. Returns `Node`.
 :::
 
-::: api distance( a, b )
+::: api distance( a, b ) - Computes the Euclidean distance between two points (`length(a - b)`). Returns `float`.
 - **a**: `Node` — First point or vector node.
 - **b**: `Node` — Second point or vector node.
-- Computes the Euclidean distance between two points (`length(a - b)`). Returns `float`.
 :::
 
-::: api dot( a, b )
+::: api dot( a, b ) - Computes the dot product of vectors `a` and `b`. Returns `float`.
 - **a**: `Node` — First vector node.
 - **b**: `Node` — Second vector node.
-- Computes the dot product of vectors `a` and `b`. Returns `float`.
 :::
 
-::: api equals( a, b )
+::: api equals( a, b ) - Returns `true` if `a` equals `b`. Returns `boolean`.
 - **a**: `Node | Number` — First value or node.
 - **b**: `Node | Number` — Second value or node.
-- Returns `true` if `a` equals `b`. Returns `boolean`.
 :::
 
-::: api exp( x )
+::: api exp( x ) - Computes the natural exponential e^`x`. Returns `Node`.
 - **x**: `Node | Number` — Input value or node.
-- Computes the natural exponential e^`x`. Returns `Node`.
 :::
 
-::: api exp2( x )
+::: api exp2( x ) - Computes `2` raised to the power of `x`. Returns `Node`.
 - **x**: `Node | Number` — Input value or node.
-- Computes `2` raised to the power of `x`. Returns `Node`.
 :::
 
-::: api faceforward( N, I, Nref )
+::: api faceforward( N, I, Nref ) - Orients a normal vector to point away from a surface. Returns `vec3`.
 - **N**: `vec3` — Surface normal vector.
 - **I**: `vec3` — Incident vector.
 - **Nref**: `vec3` — Reference normal vector.
-- Orients a normal vector to point away from a surface. Returns `vec3`.
 :::
 
-::: api floor( x )
+::: api floor( x ) - Rounds `x` down to the nearest integer. Returns `Node`.
 - **x**: `Node | Number` — Input value or node.
-- Rounds `x` down to the nearest integer. Returns `Node`.
 :::
 
-::: api fract( x )
+::: api fract( x ) - Computes the fractional part of `x` (`x - floor(x)`). Returns `Node`.
 - **x**: `Node | Number` — Input value or node.
-- Computes the fractional part of `x` (`x - floor(x)`). Returns `Node`.
 :::
 
-::: api fwidth( p )
+::: api fwidth( p ) - Computes the sum of absolute partial derivatives `|dFdx(p)| + |dFdy(p)|`. Returns `Node`.
 - **p**: `Node` — Input expression node.
-- Computes the sum of absolute partial derivatives `|dFdx(p)| + |dFdy(p)|`. Returns `Node`.
 :::
 
-::: api inverseSqrt( x )
+::: api inverseSqrt( x ) - Computes the reciprocal of the square root `1 / sqrt(x)`. Returns `Node`.
 - **x**: `Node | Number` — Input value or node.
-- Computes the reciprocal of the square root `1 / sqrt(x)`. Returns `Node`.
 :::
 
-::: api length( x )
+::: api length( x ) - Computes the Euclidean length of vector `x`. Returns `float`.
 - **x**: `Node` — Vector node.
-- Computes the Euclidean length of vector `x`. Returns `float`.
 :::
 
-::: api lengthSq( x )
+::: api lengthSq( x ) - Computes the squared length of vector `x` (`dot(x, x)`). Returns `float`.
 - **x**: `Node` — Vector node.
-- Computes the squared length of vector `x` (`dot(x, x)`). Returns `float`.
 :::
 
-::: api log( x )
+::: api log( x ) - Computes the natural logarithm ln(`x`). Returns `Node`.
 - **x**: `Node | Number` — Input value or node.
-- Computes the natural logarithm ln(`x`). Returns `Node`.
 :::
 
-::: api log2( x )
+::: api log2( x ) - Computes the base-2 logarithm log₂(`x`). Returns `Node`.
 - **x**: `Node | Number` — Input value or node.
-- Computes the base-2 logarithm log₂(`x`). Returns `Node`.
 :::
 
-::: api max( a, b )
+::: api max( a, b ) - Returns the greater of two values. Returns `Node`.
 - **a**: `Node | Number` — First value or node.
 - **b**: `Node | Number` — Second value or node.
-- Returns the greater of two values. Returns `Node`.
 :::
 
-::: api min( a, b )
+::: api min( a, b ) - Returns the lesser of two values. Returns `Node`.
 - **a**: `Node | Number` — First value or node.
 - **b**: `Node | Number` — Second value or node.
-- Returns the lesser of two values. Returns `Node`.
 :::
 
-::: api mix( a, b, t )
+::: api mix( a, b, t ) - Linearly interpolates between `a` and `b`. Returns `Node`.
 - **a**: `Node | Number` — Start value or node (returned when `t = 0`).
 - **b**: `Node | Number` — End value or node (returned when `t = 1`).
 - **t**: `Node | Number` — Interpolation factor between `0` and `1`.
-- Linearly interpolates between `a` and `b`. Returns `Node`.
 :::
 
-::: api negate( x )
+::: api negate( x ) - Negates the value of `x` (`-x`). Returns `Node`.
 - **x**: `Node | Number` — Input value or node.
-- Negates the value of `x` (`-x`). Returns `Node`.
 :::
 
-::: api normalize( x )
+::: api normalize( x ) - Computes the unit vector in the same direction as vector `x`. Returns `Node`.
 - **x**: `Node` — Vector node.
-- Computes the unit vector in the same direction as vector `x`. Returns `Node`.
 :::
 
-::: api oneMinus( x )
+::: api oneMinus( x ) - Computes `1 - x`. Returns `Node`.
 - **x**: `Node | Number` — Input value or node.
-- Computes `1 - x`. Returns `Node`.
 :::
 
-::: api pow( x, y )
+::: api pow( x, y ) - Computes `x` raised to power `y` (`x^y`). Returns `Node`.
 - **x**: `Node | Number` — Base value or node.
 - **y**: `Node | Number` — Exponent value or node.
-- Computes `x` raised to power `y` (`x^y`). Returns `Node`.
 :::
 
-::: api pow2( x )
+::: api pow2( x ) - Computes the square of `x` (`x * x`). Returns `Node`.
 - **x**: `Node | Number` — Input value or node.
-- Computes the square of `x` (`x * x`). Returns `Node`.
 :::
 
-::: api pow3( x )
+::: api pow3( x ) - Computes the cube of `x` (`x * x * x`). Returns `Node`.
 - **x**: `Node | Number` — Input value or node.
-- Computes the cube of `x` (`x * x * x`). Returns `Node`.
 :::
 
-::: api pow4( x )
+::: api pow4( x ) - Computes the fourth power of `x`. Returns `Node`.
 - **x**: `Node | Number` — Input value or node.
-- Computes the fourth power of `x`. Returns `Node`.
 :::
 
-::: api radians( degrees )
+::: api radians( degrees ) - Converts an angle from degrees to radians. Returns `Node`.
 - **degrees**: `Node | Number` — Angle in degrees.
-- Converts an angle from degrees to radians. Returns `Node`.
 :::
 
-::: api reciprocal( x )
+::: api reciprocal( x ) - Computes the reciprocal `1 / x`. Returns `Node`.
 - **x**: `Node | Number` — Input value or node.
-- Computes the reciprocal `1 / x`. Returns `Node`.
 :::
 
-::: api reflect( I, N )
+::: api reflect( I, N ) - Computes the reflection direction for an incident vector. Returns `vec3`.
 - **I**: `vec3` — Incident vector pointing towards the surface.
 - **N**: `vec3` — Normalized surface normal vector.
-- Computes the reflection direction for an incident vector. Returns `vec3`.
 :::
 
-::: api refract( I, N, eta )
+::: api refract( I, N, eta ) - Computes the refraction direction for an incident vector. Returns `vec3`.
 - **I**: `vec3` — Incident vector pointing towards the surface.
 - **N**: `vec3` — Normalized surface normal vector.
 - **eta**: `float | Number` — Ratio of indices of refraction.
-- Computes the refraction direction for an incident vector. Returns `vec3`.
 :::
 
-::: api round( x )
+::: api round( x ) - Rounds `x` to the nearest integer. Returns `Node`.
 - **x**: `Node | Number` — Input value or node.
-- Rounds `x` to the nearest integer. Returns `Node`.
 :::
 
-::: api saturate( x )
+::: api saturate( x ) - Constrains `x` to range `[0, 1]`. Returns `Node`.
 - **x**: `Node | Number` — Input value or node.
-- Constrains `x` to range `[0, 1]`. Returns `Node`.
 :::
 
-::: api sign( x )
+::: api sign( x ) - Extracts the sign of `x` (`-1.0`, `0.0`, or `1.0`). Returns `Node`.
 - **x**: `Node | Number` — Input value or node.
-- Extracts the sign of `x` (`-1.0`, `0.0`, or `1.0`). Returns `Node`.
 :::
 
-::: api sin( x )
+::: api sin( x ) - Computes the sine of `x`. Returns `Node`.
 - **x**: `Node | Number` — Angle in radians.
-- Computes the sine of `x`. Returns `Node`.
 :::
 
-::: api smoothstep( low, high, x )
+::: api smoothstep( low, high, x ) - Performs smooth Hermite interpolation between `low` and `high` edges. Returns `Node`.
 - **low**: `Node | Number` — Lower edge threshold.
 - **high**: `Node | Number` — Upper edge threshold.
 - **x**: `Node | Number` — Source value to evaluate.
-- Performs smooth Hermite interpolation between `low` and `high` edges. Returns `Node`.
 :::
 
-::: api sqrt( x )
+::: api sqrt( x ) - Computes the square root of `x`. Returns `Node`.
 - **x**: `Node | Number` — Input value or node.
-- Computes the square root of `x`. Returns `Node`.
 :::
 
-::: api step( edge, x )
+::: api step( edge, x ) - Generates a step function, returning `0.0` if `x < edge`, else `1.0`. Returns `Node`.
 - **edge**: `Node | Number` — Threshold edge.
 - **x**: `Node | Number` — Source value.
-- Generates a step function, returning `0.0` if `x < edge`, else `1.0`. Returns `Node`.
 :::
 
-::: api tan( x )
+::: api tan( x ) - Computes the tangent of `x`. Returns `Node`.
 - **x**: `Node | Number` — Angle in radians.
-- Computes the tangent of `x`. Returns `Node`.
 :::
 
-::: api transformDirection( dir, matrix )
+::: api transformDirection( dir, matrix ) - Transforms direction vector `dir` by `matrix` and normalizes the result. Returns `vec3`.
 - **dir**: `vec3` — Direction vector node.
 - **matrix**: `mat4` — Transformation matrix node.
-- Transforms direction vector `dir` by `matrix` and normalizes the result. Returns `vec3`.
 :::
 
-::: api transformNormalByViewMatrix( normal, viewMatrix? )
+::: api transformNormalByViewMatrix( normal, viewMatrix? ) - Transforms a normal vector from world space to view space and normalizes the result. Returns `vec3`.
 - **normal**: `vec3` — World-space normal vector.
 - **viewMatrix**: `mat4` — (Optional) View matrix node. Defaults to camera view matrix.
-- Transforms a normal vector from world space to view space and normalizes the result. Returns `vec3`.
 :::
 
-::: api transformNormalByInverseViewMatrix( normal, viewMatrix? )
+::: api transformNormalByInverseViewMatrix( normal, viewMatrix? ) - Transforms a normal vector from view space to world space and normalizes the result. Returns `vec3`.
 - **normal**: `vec3` — View-space normal vector.
 - **viewMatrix**: `mat4` — (Optional) View matrix node. Defaults to camera view matrix.
-- Transforms a normal vector from view space to world space and normalizes the result. Returns `vec3`.
 :::
 
-::: api trunc( x )
+::: api trunc( x ) - Truncates `x` towards zero, removing its fractional part. Returns `Node`.
 - **x**: `Node | Number` — Input value or node.
-- Truncates `x` towards zero, removing its fractional part. Returns `Node`.
 :::
 
-> Method Chaining Exceptions: In TSL method chaining `node.method(...)`, functions that accept interpolation or comparison factors use the calling node as the **last parameter** (the evaluation factor or source value):
+> Important: Method Chaining Exceptions: In TSL method chaining `node.method(...)`, functions that accept interpolation or comparison factors use the calling node as the **last parameter** (the evaluation factor or source value):
 
-::: api t.mix( a, b )
+::: api t.mix( a, b ) - Method chaining form of `mix( a, b, t )`. Calling node `t` is the interpolation factor (0 to 1). Returns `Node`.
 - **a**: `Node` — Start value node (returned when `t = 0`).
 - **b**: `Node` — End value node (returned when `t = 1`).
-- Method chaining form of `mix( a, b, t )`. Calling node `t` is the interpolation factor (0 to 1). Returns `Node`.
 :::
 
-::: api x.smoothstep( low, high )
+::: api x.smoothstep( low, high ) - Method chaining form of `smoothstep( low, high, x )`. Calling node `x` is the source value evaluated between `low` and `high`. Returns `Node`.
 - **low**: `Node` — Lower edge threshold.
 - **high**: `Node` — Upper edge threshold.
-- Method chaining form of `smoothstep( low, high, x )`. Calling node `x` is the source value evaluated between `low` and `high`. Returns `Node`.
 :::
 
-::: api x.step( edge )
+::: api x.step( edge ) - Method chaining form of `step( edge, x )`. Calling node `x` is the source value compared against `edge`. Returns `Node`.
 - **edge**: `Node` — Threshold edge node.
-- Method chaining form of `step( edge, x )`. Calling node `x` is the source value compared against `edge`. Returns `Node`.
 :::
 
 ```tsl
@@ -1185,10 +1126,9 @@ model.material.colorNode = texture( map, uvScaled );
 
 Properties serve as reference nodes in the shader graph. They can be created and accessed at any point during shader construction to assign or retrieve values dynamically.
 
-::: api property( type, name? )
+::: api property( type, name? ) - Declares a reference property node in the shader scope.
 - **type**: `string` — TSL type name (e.g. `'float'`, `'vec3'`, `'vec4'`).
 - **name**: `string` — (Optional) Name of the property in the shader. Defaults to `null`.
-- Declares a reference property node in the shader scope.
 :::
 
 <code name="propertiesExample" default="true">Properties Showcase</code>
@@ -1646,9 +1586,7 @@ Functions and methods used to optimize computations by moving them to the vertex
 - **node**: `Node` — TSL expression to compute on the vertex stage.
 :::
 
-::: api .toVertexStage()
-- Chainable method to convert any existing node or expression directly into a vertex-stage calculation.
-:::
+::: api .toVertexStage() - Chainable method to convert any existing node or expression directly into a vertex-stage calculation. :::
 
 The `vertexStage()` function forces a calculation to be performed in the vertex stage of the GPU pipeline, rather than in the fragment stage. This is useful for optimizing expensive operations by performing them per-vertex and interpolating the results.
 
@@ -1684,9 +1622,8 @@ Similarly to `vertexStage()`, `varying()` function forces a calculation to be pe
 - **name**: `string` — (Optional) Custom name for the varying variable. Defaults to `null`.
 :::
 
-::: api .toVarying( name? )
+::: api .toVarying( name? ) - Chainable method to convert any existing node or expression directly into a varying variable.
 - **name**: `string` — (Optional) Custom name for the varying variable. Defaults to `null`.
-- Chainable method to convert any existing node or expression directly into a varying variable.
 :::
 
 If `varying()` is added only to `material.positionNode`, it will only return a simple variable and a varying will not be created because `material.positionNode` is computed at the vertex stage.
@@ -2192,7 +2129,7 @@ Position nodes provide access to the coordinates of vertices or fragments at dif
 
 ::: api positionViewDirection : vec3 - Normalized view direction. :::
 
-> The transformed term reflects the modifications applied by processes such as __skinning__, __morphing__, and similar techniques.
+> Important: The transformed term reflects the modifications applied by processes such as __skinning__, __morphing__, and similar techniques.
 
 <code name="positionExample" default="true">Local vs World Space</code>
 
@@ -2241,7 +2178,7 @@ Normal nodes provide access to surface direction vectors at different transforma
 
 ::: api normalWorldGeometry : vec3 - Normalized world normal. :::
 
-> The transformed term here also includes following the correct orientation of the face, so that the normals are inverted inside the geometry.
+> Important: The transformed term here also includes following the correct orientation of the face, so that the normals are inverted inside the geometry.
 
 ```tsl
 import 'scenes/shaderball';
@@ -2919,28 +2856,24 @@ Functions for blending colors and layers together using standard blend mode algo
 - Blends two colors based on their alpha values by replicating normal alpha blending. Returns `vec4`.
 :::
 
-::: api blendScreen( base, blend )
+::: api blendScreen( base, blend ) - Lightens the base layer's colors based on the color of the blend layer. Returns `vec3`.
 - **base**: `vec3` — The base color.
 - **blend**: `vec3` — The blend color. A black `#000000` blend color does not alter the base color.
-- Lightens the base layer's colors based on the color of the blend layer. Returns `vec3`.
 :::
 
-::: api blendOverlay( base, blend )
+::: api blendOverlay( base, blend ) - Increases contrast of the base layer by combining Multiply and Screen blend modes based on base lightness. Returns `vec3`.
 - **base**: `vec3` — The base color.
 - **blend**: `vec3` — The blend color.
-- Increases contrast of the base layer by combining Multiply and Screen blend modes based on base lightness. Returns `vec3`.
 :::
 
-::: api blendDodge( base, blend )
+::: api blendDodge( base, blend ) - Significantly increases brightness and contrast of the base layer based on the blend layer. Returns `vec3`.
 - **base**: `vec3` — The base color.
 - **blend**: `vec3` — The blend color. A black `#000000` blend color does not alter the base color.
-- Significantly increases brightness and contrast of the base layer based on the blend layer. Returns `vec3`.
 :::
 
-::: api blendBurn( base, blend )
+::: api blendBurn( base, blend ) - Darkens the base layer's colors and increases contrast based on the blend layer. Returns `vec3`.
 - **base**: `vec3` — The base color.
 - **blend**: `vec3` — The blend color. A white `#ffffff` blend color does not alter the base color.
-- Darkens the base layer's colors and increases contrast based on the blend layer. Returns `vec3`.
 :::
 
 <code name="blendModesExample" default="true">Blend Modes Showcase</code>
@@ -3011,49 +2944,42 @@ renderPipeline.outputNode = finalColor;
 
 Functions for adjusting and manipulating colors.
 
-::: api grayscale( color )
+::: api grayscale( color ) - Computes a grayscale color value for the given RGB color based on luminance. Returns `vec3`.
 - **color**: `vec3` — Input RGB color value.
-- Computes a grayscale color value for the given RGB color based on luminance. Returns `vec3`.
 :::
 
-::: api luminance( color, luminanceCoefficients? )
+::: api luminance( color, luminanceCoefficients? ) - Calculates the luminance (perceived brightness) of an RGB color. Returns `float`.
 - **color**: `vec3` — Input RGB color value.
 - **luminanceCoefficients**: `vec3` — (Optional) Luminance coefficients node. Defaults to current working color space coefficients.
-- Calculates the luminance (perceived brightness) of an RGB color. Returns `float`.
 :::
 
-::: api saturation( color, adjustment? )
+::: api saturation( color, adjustment? ) - Adjusts the saturation of an RGB color. Returns `vec3`.
 - **color**: `vec3` — Input RGB color value.
 - **adjustment**: `float` — (Optional) Conversion factor. Values `< 1` desaturate, values `> 1` super-saturate. Defaults to `float( 1 )`.
-- Adjusts the saturation of an RGB color. Returns `vec3`.
 :::
 
-::: api vibrance( color, adjustment? )
+::: api vibrance( color, adjustment? ) - Selectively enhances the intensity of less saturated RGB colors while preserving saturated ones. Returns `vec3`.
 - **color**: `vec3` — Input RGB color value.
 - **adjustment**: `float` — (Optional) Intensity factor for vibrance effect. Defaults to `float( 0 )`.
-- Selectively enhances the intensity of less saturated RGB colors while preserving saturated ones. Returns `vec3`.
 :::
 
-::: api hue( color, adjustment? )
+::: api hue( color, adjustment? ) - Rotates the hue of an RGB color while preserving its luminance and saturation. Returns `vec3`.
 - **color**: `vec3` — Input RGB color value.
 - **adjustment**: `float` — (Optional) Hue rotation angle in radians (positive = clockwise, negative = counterclockwise). Defaults to `float( 1 )`.
-- Rotates the hue of an RGB color while preserving its luminance and saturation. Returns `vec3`.
 :::
 
-::: api posterize( source, steps )
+::: api posterize( source, steps ) - Reduces the number of color levels, creating a poster-like effect. Returns `Node`.
 - **source**: `Node` — Input color value.
 - **steps**: `Node` — Number of color levels. Lower values produce a more blocky, stylized effect.
-- Reduces the number of color levels, creating a poster-like effect. Returns `Node`.
 :::
 
-::: api cdl( color, slope?, offset?, power?, saturation?, luminanceCoefficients? )
+::: api cdl( color, slope?, offset?, power?, saturation?, luminanceCoefficients? ) - Compact representation of ASC Color Decision List (CDL) v1.2 color grading information. Returns `vec4`.
 - **color**: `vec4` — Input color (typically in a log color space such as LogC, ACEScc, or AgX Log).
 - **slope**: `vec3` — (Optional) Slope adjustment multiplier for RGB channels. Defaults to `vec3( 1 )`.
 - **offset**: `vec3` — (Optional) Offset adjustment added to RGB channels. Defaults to `vec3( 0 )`.
 - **power**: `vec3` — (Optional) Power gamma exponent applied to RGB channels. Defaults to `vec3( 1 )`.
 - **saturation**: `float` — (Optional) Overall saturation adjustment factor. Defaults to `float( 1 )`.
 - **luminanceCoefficients**: `vec3` — (Optional) Luminance coefficients used for saturation calculation (defaults to Rec. 709).
-- Compact representation of ASC Color Decision List (CDL) v1.2 color grading information. Returns `vec4`.
 :::
 
 <code name="colorAdjustmentsExample" default="true">Color Adjustments Showcase</code>
