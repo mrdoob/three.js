@@ -1020,11 +1020,6 @@ class Tour {
 		}
 
 		let description = page.description;
-		if ( this.isEditorCollapsed && page.hasCode ) {
-
-			description += '\n\n```js\n' + pageCode + '\n```';
-
-		}
 
 		this.dom.contentArea.innerHTML = '<div style="max-width: 800px; margin: 0 auto; width: 100%; position: relative;">' +
 			'<button id="copy-code-btn" class="copy-code-btn" title="Copy Markdown">' +
