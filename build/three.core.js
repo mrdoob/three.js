@@ -5297,8 +5297,8 @@ class Vector3 {
 	}
 
 	/**
-	 * Transforms the direction of this vector by a matrix (the upper left 3 x 3
-	 * subset of the given 4x4 matrix and then normalizes the result.
+	 * Transforms this vector by the upper left 3x3 sub-matrix of the given 4x4 matrix,
+	 * and normalizes the result.
 	 *
 	 * @param {Matrix4} m - The matrix.
 	 * @return {Vector3} A reference to this vector.
@@ -9422,8 +9422,8 @@ class RenderTarget extends EventDispatcher {
 
 	set depthTexture( current ) {
 
-		if ( this._depthTexture !== null ) this._depthTexture.renderTarget = null;
-		if ( current !== null ) current.renderTarget = this;
+		if ( this._depthTexture !== null && this._depthTexture.renderTarget === this ) this._depthTexture.renderTarget = null;
+		if ( current !== null && current.renderTarget === null ) current.renderTarget = this;
 
 		this._depthTexture = current;
 
@@ -9541,7 +9541,22 @@ class RenderTarget extends EventDispatcher {
 		this.storeMultisampledDepthBuffer = source.storeMultisampledDepthBuffer;
 		this.storeMultisampledStencilBuffer = source.storeMultisampledStencilBuffer;
 
-		if ( source.depthTexture !== null ) this.depthTexture = source.depthTexture.clone();
+		if ( source.depthTexture !== null ) {
+
+			if ( source.depthTexture.renderTarget === source ) {
+
+				const depthTexture = source.depthTexture.clone();
+				depthTexture.renderTarget = null;
+
+				this.depthTexture = depthTexture;
+
+			} else {
+
+				this.depthTexture = source.depthTexture;
+
+			}
+
+		}
 
 		this.samples = source.samples;
 		this.multiview = source.multiview;
@@ -9697,6 +9712,22 @@ class DataArrayTexture extends Texture {
 		 * @type {Set<number>}
 		 */
 		this.layerUpdates = new Set();
+
+	}
+
+	/**
+	 * Copies the values of the given texture to this instance.
+	 *
+	 * @param {DataArrayTexture} source - The texture to copy.
+	 * @return {DataArrayTexture} A reference to this instance.
+	 */
+	copy( source ) {
+
+		super.copy( source );
+
+		this.wrapR = source.wrapR;
+
+		return this;
 
 	}
 
@@ -9873,6 +9904,22 @@ class Data3DTexture extends Texture {
 		 * @default 1
 		 */
 		this.unpackAlignment = 1;
+
+	}
+
+	/**
+	 * Copies the values of the given texture to this instance.
+	 *
+	 * @param {Data3DTexture} source - The texture to copy.
+	 * @return {Data3DTexture} A reference to this instance.
+	 */
+	copy( source ) {
+
+		super.copy( source );
+
+		this.wrapR = source.wrapR;
+
+		return this;
 
 	}
 
@@ -10150,7 +10197,7 @@ class Matrix4 {
 	}
 
 	/**
-	 * Extracts the basis of this matrix into the three axis vectors provided.
+	 * Extracts the basis vectors of this matrix into the three vectors provided.
 	 *
 	 * @param {Vector3} xAxis - The basis's x axis.
 	 * @param {Vector3} yAxis - The basis's y axis.
@@ -10709,7 +10756,7 @@ class Matrix4 {
 	}
 
 	/**
-	 * Multiplies the columns of this matrix by the given vector.
+	 * Scales each of the first three columns of this matrix by the corresponding component of the given vector.
 	 *
 	 * @param {Vector3} v - The scale vector.
 	 * @return {Matrix4} A reference to this matrix.
@@ -12870,6 +12917,17 @@ class Object3D extends EventDispatcher {
 	 * @param {Array<Object>} intersects - An array holding the result of the method.
 	 */
 	raycast( /* raycaster, intersects */ ) {}
+
+	/**
+	 * Abstract method to test whether this 3D object intersects the given frustum.
+	 * Renderable 3D objects such as {@link Mesh}, {@link Line} or {@link Points}
+	 * implement this method in order to use frustum culling.
+	 *
+	 * @abstract
+	 * @param {Frustum|FrustumArray} frustum - The frustum to test.
+	 * @return {boolean|undefined} Whether this 3D object intersects the given frustum or not.
+	 */
+	intersectsFrustum( /* frustum */ ) {}
 
 	/**
 	 * Executes the callback on this 3D object and all descendants.
@@ -17476,6 +17534,7 @@ class BufferAttribute extends EventDispatcher {
 
 		if ( this.name !== '' ) data.name = this.name;
 		if ( this.usage !== StaticDrawUsage ) data.usage = this.usage;
+		if ( this.gpuType !== FloatType ) data.gpuType = this.gpuType;
 
 		return data;
 
@@ -20003,12 +20062,16 @@ class InterleavedBuffer {
 
 		//
 
-		return {
+		const json = {
 			uuid: this.uuid,
 			buffer: this.array.buffer._uuid,
 			type: this.array.constructor.name,
 			stride: this.stride
 		};
+
+		if ( this.usage !== StaticDrawUsage ) json.usage = this.usage;
+
+		return json;
 
 	}
 
@@ -20551,6 +20614,399 @@ class InterleavedBufferAttribute {
 			};
 
 		}
+
+	}
+
+}
+
+const _vector1 = /*@__PURE__*/ new Vector3();
+const _vector2 = /*@__PURE__*/ new Vector3();
+const _normalMatrix = /*@__PURE__*/ new Matrix3();
+
+/**
+ * A two dimensional surface that extends infinitely in 3D space, represented
+ * in [Hessian normal form](http://mathworld.wolfram.com/HessianNormalForm.html)
+ * by a unit length normal vector and a constant.
+ */
+class Plane {
+
+	/**
+	 * Constructs a new plane.
+	 *
+	 * @param {Vector3} [normal=(1,0,0)] - A unit length vector defining the normal of the plane.
+	 * @param {number} [constant=0] - The signed distance from the origin to the plane.
+	 */
+	constructor( normal = new Vector3( 1, 0, 0 ), constant = 0 ) {
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isPlane = true;
+
+		/**
+		 * A unit length vector defining the normal of the plane.
+		 *
+		 * @type {Vector3}
+		 */
+		this.normal = normal;
+
+		/**
+		 * The signed distance from the origin to the plane.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.constant = constant;
+
+	}
+
+	/**
+	 * Sets the plane components by copying the given values.
+	 *
+	 * @param {Vector3} normal - The normal.
+	 * @param {number} constant - The constant.
+	 * @return {Plane} A reference to this plane.
+	 */
+	set( normal, constant ) {
+
+		this.normal.copy( normal );
+		this.constant = constant;
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the plane components by defining `x`, `y`, `z` as the
+	 * plane normal and `w` as the constant.
+	 *
+	 * @param {number} x - The value for the normal's x component.
+	 * @param {number} y - The value for the normal's y component.
+	 * @param {number} z - The value for the normal's z component.
+	 * @param {number} w - The constant value.
+	 * @return {Plane} A reference to this plane.
+	 */
+	setComponents( x, y, z, w ) {
+
+		this.normal.set( x, y, z );
+		this.constant = w;
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the plane from the given normal and coplanar point (that is a point
+	 * that lies onto the plane).
+	 *
+	 * @param {Vector3} normal - The normal.
+	 * @param {Vector3} point - A coplanar point.
+	 * @return {Plane} A reference to this plane.
+	 */
+	setFromNormalAndCoplanarPoint( normal, point ) {
+
+		this.normal.copy( normal );
+		this.constant = - point.dot( this.normal );
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the plane from three coplanar points. The winding order is
+	 * assumed to be counter-clockwise, and determines the direction of
+	 * the plane normal.
+	 *
+	 * @param {Vector3} a - The first coplanar point.
+	 * @param {Vector3} b - The second coplanar point.
+	 * @param {Vector3} c - The third coplanar point.
+	 * @return {Plane} A reference to this plane.
+	 */
+	setFromCoplanarPoints( a, b, c ) {
+
+		const normal = _vector1.subVectors( c, b ).cross( _vector2.subVectors( a, b ) ).normalize();
+
+		// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
+
+		this.setFromNormalAndCoplanarPoint( normal, a );
+
+		return this;
+
+	}
+
+	/**
+	 * Copies the values of the given plane to this instance.
+	 *
+	 * @param {Plane} plane - The plane to copy.
+	 * @return {Plane} A reference to this plane.
+	 */
+	copy( plane ) {
+
+		this.normal.copy( plane.normal );
+		this.constant = plane.constant;
+
+		return this;
+
+	}
+
+	/**
+	 * Normalizes the plane normal and adjusts the constant accordingly.
+	 *
+	 * @return {Plane} A reference to this plane.
+	 */
+	normalize() {
+
+		// Note: will lead to a divide by zero if the plane is invalid.
+
+		const inverseNormalLength = 1.0 / this.normal.length();
+		this.normal.multiplyScalar( inverseNormalLength );
+		this.constant *= inverseNormalLength;
+
+		return this;
+
+	}
+
+	/**
+	 * Negates both the plane normal and the constant.
+	 *
+	 * @return {Plane} A reference to this plane.
+	 */
+	negate() {
+
+		this.constant *= -1;
+		this.normal.negate();
+
+		return this;
+
+	}
+
+	/**
+	 * Returns the signed distance from the given point to this plane.
+	 *
+	 * @param {Vector3} point - The point to compute the distance for.
+	 * @return {number} The signed distance.
+	 */
+	distanceToPoint( point ) {
+
+		return this.normal.dot( point ) + this.constant;
+
+	}
+
+	/**
+	 * Returns the signed distance from the given sphere to this plane.
+	 *
+	 * @param {Sphere} sphere - The sphere to compute the distance for.
+	 * @return {number} The signed distance.
+	 */
+	distanceToSphere( sphere ) {
+
+		return this.distanceToPoint( sphere.center ) - sphere.radius;
+
+	}
+
+	/**
+	 * Projects a the given point onto the plane.
+	 *
+	 * @param {Vector3} point - The point to project.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {Vector3} The projected point on the plane.
+	 */
+	projectPoint( point, target ) {
+
+		return target.copy( point ).addScaledVector( this.normal, - this.distanceToPoint( point ) );
+
+	}
+
+	/**
+	 * Returns the intersection point of the passed line and the plane. Returns
+	 * `null` if the line does not intersect. Returns the line's starting point if
+	 * the line is coplanar with the plane.
+	 *
+	 * @param {Line3} line - The line to compute the intersection for.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @param {boolean} [clampToLine=true] - Whether to clamp the intersection to the line segment.
+	 * @return {?Vector3} The intersection point. Returns `null` if no intersection is detected.
+	 */
+	intersectLine( line, target, clampToLine = true ) {
+
+		const direction = line.delta( _vector1 );
+
+		const denominator = this.normal.dot( direction );
+
+		if ( denominator === 0 ) {
+
+			// line is coplanar, return origin
+			if ( this.distanceToPoint( line.start ) === 0 ) {
+
+				return target.copy( line.start );
+
+			}
+
+			// Unsure if this is the correct method to handle this case.
+			return null;
+
+		}
+
+		const t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
+
+		if ( ( clampToLine === true ) && ( t < 0 || t > 1 ) ) {
+
+			return null;
+
+		}
+
+		return target.copy( line.start ).addScaledVector( direction, t );
+
+	}
+
+	/**
+	 * Returns `true` if the given line segment intersects with (passes through) the plane.
+	 *
+	 * @param {Line3} line - The line to test.
+	 * @return {boolean} Whether the given line segment intersects with the plane or not.
+	 */
+	intersectsLine( line ) {
+
+		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
+
+		const startSign = this.distanceToPoint( line.start );
+		const endSign = this.distanceToPoint( line.end );
+
+		return ( startSign < 0 && endSign > 0 ) || ( endSign < 0 && startSign > 0 );
+
+	}
+
+	/**
+	 * Returns `true` if the given bounding box intersects with the plane.
+	 *
+	 * @param {Box3} box - The bounding box to test.
+	 * @return {boolean} Whether the given bounding box intersects with the plane or not.
+	 */
+	intersectsBox( box ) {
+
+		return box.intersectsPlane( this );
+
+	}
+
+	/**
+	 * Returns `true` if the given bounding sphere intersects with the plane.
+	 *
+	 * @param {Sphere} sphere - The bounding sphere to test.
+	 * @return {boolean} Whether the given bounding sphere intersects with the plane or not.
+	 */
+	intersectsSphere( sphere ) {
+
+		return sphere.intersectsPlane( this );
+
+	}
+
+	/**
+	 * Returns a coplanar vector to the plane, by calculating the
+	 * projection of the normal at the origin onto the plane.
+	 *
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {Vector3} The coplanar point.
+	 */
+	coplanarPoint( target ) {
+
+		return target.copy( this.normal ).multiplyScalar( - this.constant );
+
+	}
+
+	/**
+	 * Apply a 4x4 matrix to the plane. The matrix must be an affine, homogeneous transform.
+	 *
+	 * The optional normal matrix can be pre-computed like so:
+	 * ```js
+	 * const optionalNormalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
+	 * ```
+	 *
+	 * @param {Matrix4} matrix - The transformation matrix.
+	 * @param {Matrix4} [optionalNormalMatrix] - A pre-computed normal matrix.
+	 * @return {Plane} A reference to this plane.
+	 */
+	applyMatrix4( matrix, optionalNormalMatrix ) {
+
+		const normalMatrix = optionalNormalMatrix || _normalMatrix.getNormalMatrix( matrix );
+
+		const referencePoint = this.coplanarPoint( _vector1 ).applyMatrix4( matrix );
+
+		const normal = this.normal.applyMatrix3( normalMatrix ).normalize();
+
+		this.constant = - referencePoint.dot( normal );
+
+		return this;
+
+	}
+
+	/**
+	 * Translates the plane by the distance defined by the given offset vector.
+	 * Note that this only affects the plane constant and will not affect the normal vector.
+	 *
+	 * @param {Vector3} offset - The offset vector.
+	 * @return {Plane} A reference to this plane.
+	 */
+	translate( offset ) {
+
+		this.constant -= offset.dot( this.normal );
+
+		return this;
+
+	}
+
+	/**
+	 * Returns `true` if this plane is equal with the given one.
+	 *
+	 * @param {Plane} plane - The plane to test for equality.
+	 * @return {boolean} Whether this plane is equal with the given one.
+	 */
+	equals( plane ) {
+
+		return plane.normal.equals( this.normal ) && ( plane.constant === this.constant );
+
+	}
+
+	/**
+	 * Returns a new plane with copied values from this instance.
+	 *
+	 * @return {Plane} A clone of this instance.
+	 */
+	clone() {
+
+		return new this.constructor().copy( this );
+
+	}
+
+	/**
+	 * Returns a serialized structure of the plane.
+	 *
+	 * @return {Object} Serialized structure with fields representing the object state.
+	 */
+	toJSON() {
+
+		return {
+			normal: this.normal.toArray(),
+			constant: this.constant
+		};
+
+	}
+
+	/**
+	 * Sets the plane properties from the given JSON.
+	 *
+	 * @param {Object} json - The serialized json to set the plane from.
+	 * @return {Plane} A reference to this plane.
+	 */
+	fromJSON( json ) {
+
+		this.normal.fromArray( json.normal );
+		this.constant = json.constant;
+
+		return this;
 
 	}
 
@@ -21234,7 +21690,7 @@ class Material extends EventDispatcher {
 		}
 
 		if ( this.dispersion !== undefined ) data.dispersion = this.dispersion;
-		if ( this.retroreflective !== undefined ) data.retroreflective = this.retroreflective;
+		if ( this.retroreflectivity !== undefined ) data.retroreflectivity = this.retroreflectivity;
 
 		if ( this.iridescence !== undefined ) data.iridescence = this.iridescence;
 		if ( this.iridescenceIOR !== undefined ) data.iridescenceIOR = this.iridescenceIOR;
@@ -21361,6 +21817,15 @@ class Material extends EventDispatcher {
 		if ( this.depthWrite === false ) data.depthWrite = this.depthWrite;
 		if ( this.colorWrite === false ) data.colorWrite = this.colorWrite;
 
+		if ( Array.isArray( this.clippingPlanes ) && this.clippingPlanes.length > 0 ) {
+
+			data.clippingPlanes = this.clippingPlanes.map( plane => plane.toJSON() );
+
+		}
+
+		if ( this.clipIntersection === true ) data.clipIntersection = true;
+		if ( this.clipShadows === true ) data.clipShadows = true;
+
 		if ( this.stencilWriteMask !== 0xff ) data.stencilWriteMask = this.stencilWriteMask;
 		if ( this.stencilFunc !== AlwaysStencilFunc ) data.stencilFunc = this.stencilFunc;
 		if ( this.stencilRef !== 0 ) data.stencilRef = this.stencilRef;
@@ -21373,11 +21838,16 @@ class Material extends EventDispatcher {
 		// rotation (SpriteMaterial)
 		if ( this.rotation !== undefined && this.rotation !== 0 ) data.rotation = this.rotation;
 
+		// depthPacking (MeshDepthMaterial)
+		if ( this.depthPacking !== undefined && this.depthPacking !== BasicDepthPacking ) data.depthPacking = this.depthPacking;
+
 		if ( this.polygonOffset === true ) data.polygonOffset = true;
 		if ( this.polygonOffsetFactor !== 0 ) data.polygonOffsetFactor = this.polygonOffsetFactor;
 		if ( this.polygonOffsetUnits !== 0 ) data.polygonOffsetUnits = this.polygonOffsetUnits;
 
 		if ( this.linewidth !== undefined && this.linewidth !== 1 ) data.linewidth = this.linewidth;
+		if ( this.linecap !== undefined && this.linecap !== 'round' ) data.linecap = this.linecap;
+		if ( this.linejoin !== undefined && this.linejoin !== 'round' ) data.linejoin = this.linejoin;
 		if ( this.dashSize !== undefined ) data.dashSize = this.dashSize;
 		if ( this.gapSize !== undefined ) data.gapSize = this.gapSize;
 		if ( this.scale !== undefined ) data.scale = this.scale;
@@ -21463,7 +21933,7 @@ class Material extends EventDispatcher {
 		if ( json.clearcoat !== undefined ) this.clearcoat = json.clearcoat;
 		if ( json.clearcoatRoughness !== undefined ) this.clearcoatRoughness = json.clearcoatRoughness;
 		if ( json.dispersion !== undefined ) this.dispersion = json.dispersion;
-		if ( json.retroreflective !== undefined ) this.retroreflective = json.retroreflective;
+		if ( json.retroreflectivity !== undefined ) this.retroreflectivity = json.retroreflectivity;
 		if ( json.iridescence !== undefined ) this.iridescence = json.iridescence;
 		if ( json.iridescenceIOR !== undefined ) this.iridescenceIOR = json.iridescenceIOR;
 		if ( json.iridescenceThicknessRange !== undefined ) this.iridescenceThicknessRange = json.iridescenceThicknessRange;
@@ -21487,6 +21957,10 @@ class Material extends EventDispatcher {
 		if ( json.depthTest !== undefined ) this.depthTest = json.depthTest;
 		if ( json.depthWrite !== undefined ) this.depthWrite = json.depthWrite;
 		if ( json.colorWrite !== undefined ) this.colorWrite = json.colorWrite;
+		if ( json.clippingPlanes !== undefined ) this.clippingPlanes = json.clippingPlanes.map( plane => new Plane().fromJSON( plane ) );
+		if ( json.clipIntersection !== undefined ) this.clipIntersection = json.clipIntersection;
+		if ( json.clipShadows !== undefined ) this.clipShadows = json.clipShadows;
+		if ( json.depthPacking !== undefined ) this.depthPacking = json.depthPacking;
 		if ( json.blendSrc !== undefined ) this.blendSrc = json.blendSrc;
 		if ( json.blendDst !== undefined ) this.blendDst = json.blendDst;
 		if ( json.blendEquation !== undefined ) this.blendEquation = json.blendEquation;
@@ -21512,6 +21986,8 @@ class Material extends EventDispatcher {
 		if ( json.rotation !== undefined ) this.rotation = json.rotation;
 
 		if ( json.linewidth !== undefined ) this.linewidth = json.linewidth;
+		if ( json.linecap !== undefined ) this.linecap = json.linecap;
+		if ( json.linejoin !== undefined ) this.linejoin = json.linejoin;
 		if ( json.dashSize !== undefined ) this.dashSize = json.dashSize;
 		if ( json.gapSize !== undefined ) this.gapSize = json.gapSize;
 		if ( json.scale !== undefined ) this.scale = json.scale;
@@ -22009,6 +22485,18 @@ class Sprite extends Object3D {
 		 * @default 1
 		 */
 		this.count = 1;
+
+	}
+
+	/**
+	 * Returns `true` if this sprite intersects the given frustum.
+	 *
+	 * @param {Frustum|FrustumArray} frustum - The frustum to test.
+	 * @return {boolean} Whether this sprite intersects the given frustum or not.
+	 */
+	intersectsFrustum( frustum ) {
+
+		return frustum.intersectsSprite( this );
 
 	}
 
@@ -22763,6 +23251,8 @@ class Ray {
 	 * @return {?Vector3} The intersection point.
 	 */
 	intersectSphere( sphere, target ) {
+
+		if ( sphere.radius < 0 ) return null; // handle empty spheres, see #31187
 
 		_vector$7.subVectors( sphere.center, this.origin );
 		const tca = _vector$7.dot( this.direction );
@@ -23631,6 +24121,18 @@ class Mesh extends Object3D {
 		}
 
 		return target;
+
+	}
+
+	/**
+	 * Returns `true` if this mesh intersects the given frustum.
+	 *
+	 * @param {Frustum|FrustumArray} frustum - The frustum to test.
+	 * @return {boolean} Whether this mesh intersects the given frustum or not.
+	 */
+	intersectsFrustum( frustum ) {
+
+		return frustum.intersectsObject( this );
 
 	}
 
@@ -25224,370 +25726,6 @@ class InstancedMesh extends Mesh {
 			this.morphTexture = null;
 
 		}
-
-	}
-
-}
-
-const _vector1 = /*@__PURE__*/ new Vector3();
-const _vector2 = /*@__PURE__*/ new Vector3();
-const _normalMatrix = /*@__PURE__*/ new Matrix3();
-
-/**
- * A two dimensional surface that extends infinitely in 3D space, represented
- * in [Hessian normal form](http://mathworld.wolfram.com/HessianNormalForm.html)
- * by a unit length normal vector and a constant.
- */
-class Plane {
-
-	/**
-	 * Constructs a new plane.
-	 *
-	 * @param {Vector3} [normal=(1,0,0)] - A unit length vector defining the normal of the plane.
-	 * @param {number} [constant=0] - The signed distance from the origin to the plane.
-	 */
-	constructor( normal = new Vector3( 1, 0, 0 ), constant = 0 ) {
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isPlane = true;
-
-		/**
-		 * A unit length vector defining the normal of the plane.
-		 *
-		 * @type {Vector3}
-		 */
-		this.normal = normal;
-
-		/**
-		 * The signed distance from the origin to the plane.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.constant = constant;
-
-	}
-
-	/**
-	 * Sets the plane components by copying the given values.
-	 *
-	 * @param {Vector3} normal - The normal.
-	 * @param {number} constant - The constant.
-	 * @return {Plane} A reference to this plane.
-	 */
-	set( normal, constant ) {
-
-		this.normal.copy( normal );
-		this.constant = constant;
-
-		return this;
-
-	}
-
-	/**
-	 * Sets the plane components by defining `x`, `y`, `z` as the
-	 * plane normal and `w` as the constant.
-	 *
-	 * @param {number} x - The value for the normal's x component.
-	 * @param {number} y - The value for the normal's y component.
-	 * @param {number} z - The value for the normal's z component.
-	 * @param {number} w - The constant value.
-	 * @return {Plane} A reference to this plane.
-	 */
-	setComponents( x, y, z, w ) {
-
-		this.normal.set( x, y, z );
-		this.constant = w;
-
-		return this;
-
-	}
-
-	/**
-	 * Sets the plane from the given normal and coplanar point (that is a point
-	 * that lies onto the plane).
-	 *
-	 * @param {Vector3} normal - The normal.
-	 * @param {Vector3} point - A coplanar point.
-	 * @return {Plane} A reference to this plane.
-	 */
-	setFromNormalAndCoplanarPoint( normal, point ) {
-
-		this.normal.copy( normal );
-		this.constant = - point.dot( this.normal );
-
-		return this;
-
-	}
-
-	/**
-	 * Sets the plane from three coplanar points. The winding order is
-	 * assumed to be counter-clockwise, and determines the direction of
-	 * the plane normal.
-	 *
-	 * @param {Vector3} a - The first coplanar point.
-	 * @param {Vector3} b - The second coplanar point.
-	 * @param {Vector3} c - The third coplanar point.
-	 * @return {Plane} A reference to this plane.
-	 */
-	setFromCoplanarPoints( a, b, c ) {
-
-		const normal = _vector1.subVectors( c, b ).cross( _vector2.subVectors( a, b ) ).normalize();
-
-		// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
-
-		this.setFromNormalAndCoplanarPoint( normal, a );
-
-		return this;
-
-	}
-
-	/**
-	 * Copies the values of the given plane to this instance.
-	 *
-	 * @param {Plane} plane - The plane to copy.
-	 * @return {Plane} A reference to this plane.
-	 */
-	copy( plane ) {
-
-		this.normal.copy( plane.normal );
-		this.constant = plane.constant;
-
-		return this;
-
-	}
-
-	/**
-	 * Normalizes the plane normal and adjusts the constant accordingly.
-	 *
-	 * @return {Plane} A reference to this plane.
-	 */
-	normalize() {
-
-		// Note: will lead to a divide by zero if the plane is invalid.
-
-		const inverseNormalLength = 1.0 / this.normal.length();
-		this.normal.multiplyScalar( inverseNormalLength );
-		this.constant *= inverseNormalLength;
-
-		return this;
-
-	}
-
-	/**
-	 * Negates both the plane normal and the constant.
-	 *
-	 * @return {Plane} A reference to this plane.
-	 */
-	negate() {
-
-		this.constant *= -1;
-		this.normal.negate();
-
-		return this;
-
-	}
-
-	/**
-	 * Returns the signed distance from the given point to this plane.
-	 *
-	 * @param {Vector3} point - The point to compute the distance for.
-	 * @return {number} The signed distance.
-	 */
-	distanceToPoint( point ) {
-
-		return this.normal.dot( point ) + this.constant;
-
-	}
-
-	/**
-	 * Returns the signed distance from the given sphere to this plane.
-	 *
-	 * @param {Sphere} sphere - The sphere to compute the distance for.
-	 * @return {number} The signed distance.
-	 */
-	distanceToSphere( sphere ) {
-
-		return this.distanceToPoint( sphere.center ) - sphere.radius;
-
-	}
-
-	/**
-	 * Projects a the given point onto the plane.
-	 *
-	 * @param {Vector3} point - The point to project.
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {Vector3} The projected point on the plane.
-	 */
-	projectPoint( point, target ) {
-
-		return target.copy( point ).addScaledVector( this.normal, - this.distanceToPoint( point ) );
-
-	}
-
-	/**
-	 * Returns the intersection point of the passed line and the plane. Returns
-	 * `null` if the line does not intersect. Returns the line's starting point if
-	 * the line is coplanar with the plane.
-	 *
-	 * @param {Line3} line - The line to compute the intersection for.
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @param {boolean} [clampToLine=true] - Whether to clamp the intersection to the line segment.
-	 * @return {?Vector3} The intersection point. Returns `null` if no intersection is detected.
-	 */
-	intersectLine( line, target, clampToLine = true ) {
-
-		const direction = line.delta( _vector1 );
-
-		const denominator = this.normal.dot( direction );
-
-		if ( denominator === 0 ) {
-
-			// line is coplanar, return origin
-			if ( this.distanceToPoint( line.start ) === 0 ) {
-
-				return target.copy( line.start );
-
-			}
-
-			// Unsure if this is the correct method to handle this case.
-			return null;
-
-		}
-
-		const t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
-
-		if ( ( clampToLine === true ) && ( t < 0 || t > 1 ) ) {
-
-			return null;
-
-		}
-
-		return target.copy( line.start ).addScaledVector( direction, t );
-
-	}
-
-	/**
-	 * Returns `true` if the given line segment intersects with (passes through) the plane.
-	 *
-	 * @param {Line3} line - The line to test.
-	 * @return {boolean} Whether the given line segment intersects with the plane or not.
-	 */
-	intersectsLine( line ) {
-
-		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
-
-		const startSign = this.distanceToPoint( line.start );
-		const endSign = this.distanceToPoint( line.end );
-
-		return ( startSign < 0 && endSign > 0 ) || ( endSign < 0 && startSign > 0 );
-
-	}
-
-	/**
-	 * Returns `true` if the given bounding box intersects with the plane.
-	 *
-	 * @param {Box3} box - The bounding box to test.
-	 * @return {boolean} Whether the given bounding box intersects with the plane or not.
-	 */
-	intersectsBox( box ) {
-
-		return box.intersectsPlane( this );
-
-	}
-
-	/**
-	 * Returns `true` if the given bounding sphere intersects with the plane.
-	 *
-	 * @param {Sphere} sphere - The bounding sphere to test.
-	 * @return {boolean} Whether the given bounding sphere intersects with the plane or not.
-	 */
-	intersectsSphere( sphere ) {
-
-		return sphere.intersectsPlane( this );
-
-	}
-
-	/**
-	 * Returns a coplanar vector to the plane, by calculating the
-	 * projection of the normal at the origin onto the plane.
-	 *
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {Vector3} The coplanar point.
-	 */
-	coplanarPoint( target ) {
-
-		return target.copy( this.normal ).multiplyScalar( - this.constant );
-
-	}
-
-	/**
-	 * Apply a 4x4 matrix to the plane. The matrix must be an affine, homogeneous transform.
-	 *
-	 * The optional normal matrix can be pre-computed like so:
-	 * ```js
-	 * const optionalNormalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
-	 * ```
-	 *
-	 * @param {Matrix4} matrix - The transformation matrix.
-	 * @param {Matrix4} [optionalNormalMatrix] - A pre-computed normal matrix.
-	 * @return {Plane} A reference to this plane.
-	 */
-	applyMatrix4( matrix, optionalNormalMatrix ) {
-
-		const normalMatrix = optionalNormalMatrix || _normalMatrix.getNormalMatrix( matrix );
-
-		const referencePoint = this.coplanarPoint( _vector1 ).applyMatrix4( matrix );
-
-		const normal = this.normal.applyMatrix3( normalMatrix ).normalize();
-
-		this.constant = - referencePoint.dot( normal );
-
-		return this;
-
-	}
-
-	/**
-	 * Translates the plane by the distance defined by the given offset vector.
-	 * Note that this only affects the plane constant and will not affect the normal vector.
-	 *
-	 * @param {Vector3} offset - The offset vector.
-	 * @return {Plane} A reference to this plane.
-	 */
-	translate( offset ) {
-
-		this.constant -= offset.dot( this.normal );
-
-		return this;
-
-	}
-
-	/**
-	 * Returns `true` if this plane is equal with the given one.
-	 *
-	 * @param {Plane} plane - The plane to test for equality.
-	 * @return {boolean} Whether this plane is equal with the given one.
-	 */
-	equals( plane ) {
-
-		return plane.normal.equals( this.normal ) && ( plane.constant === this.constant );
-
-	}
-
-	/**
-	 * Returns a new plane with copied values from this instance.
-	 *
-	 * @return {Plane} A clone of this instance.
-	 */
-	clone() {
-
-		return new this.constructor().copy( this );
 
 	}
 
@@ -28034,6 +28172,18 @@ class Line extends Object3D {
 	}
 
 	/**
+	 * Returns `true` if this line intersects the given frustum.
+	 *
+	 * @param {Frustum|FrustumArray} frustum - The frustum to test.
+	 * @return {boolean} Whether this line intersects the given frustum or not.
+	 */
+	intersectsFrustum( frustum ) {
+
+		return frustum.intersectsObject( this );
+
+	}
+
+	/**
 	 * Computes intersection points between a casted ray and this line.
 	 *
 	 * @param {Raycaster} raycaster - The raycaster.
@@ -28532,6 +28682,18 @@ class Points extends Object3D {
 		this.geometry = source.geometry;
 
 		return this;
+
+	}
+
+	/**
+	 * Returns `true` if this point cloud intersects the given frustum.
+	 *
+	 * @param {Frustum|FrustumArray} frustum - The frustum to test.
+	 * @return {boolean} Whether this point cloud intersects the given frustum or not.
+	 */
+	intersectsFrustum( frustum ) {
+
+		return frustum.intersectsObject( this );
 
 	}
 
@@ -29083,6 +29245,22 @@ class CompressedArrayTexture extends CompressedTexture {
 		 * @type {Set<number>}
 		 */
 		this.layerUpdates = new Set();
+
+	}
+
+	/**
+	 * Copies the values of the given texture to this instance.
+	 *
+	 * @param {CompressedArrayTexture} source - The texture to copy.
+	 * @return {CompressedArrayTexture} A reference to this instance.
+	 */
+	copy( source ) {
+
+		super.copy( source );
+
+		this.wrapR = source.wrapR;
+
+		return this;
 
 	}
 
@@ -36959,7 +37137,7 @@ class TorusGeometry extends BufferGeometry {
 	 */
 	static fromJSON( data ) {
 
-		return new TorusGeometry( data.radius, data.tube, data.radialSegments, data.tubularSegments, data.arc );
+		return new TorusGeometry( data.radius, data.tube, data.radialSegments, data.tubularSegments, data.arc, data.thetaStart, data.thetaLength );
 
 	}
 
@@ -39176,7 +39354,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this._clearcoat = 0;
 		this._dispersion = 0;
 		this._iridescence = 0;
-		this._retroreflective = 0;
+		this._retroreflectivity = 0;
 		this._sheen = 0.0;
 		this._transmission = 0;
 
@@ -39293,21 +39471,21 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 	 * @type {number}
 	 * @default 0
 	 */
-	get retroreflective() {
+	get retroreflectivity() {
 
-		return this._retroreflective;
+		return this._retroreflectivity;
 
 	}
 
-	set retroreflective( value ) {
+	set retroreflectivity( value ) {
 
-		if ( this._retroreflective > 0 !== value > 0 ) {
+		if ( this._retroreflectivity > 0 !== value > 0 ) {
 
 			this.version ++;
 
 		}
 
-		this._retroreflective = value;
+		this._retroreflectivity = value;
 
 	}
 
@@ -39396,7 +39574,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.iridescenceThicknessRange = [ ...source.iridescenceThicknessRange ];
 		this.iridescenceThicknessMap = source.iridescenceThicknessMap;
 
-		this.retroreflective = source.retroreflective;
+		this.retroreflectivity = source.retroreflectivity;
 
 		this.sheen = source.sheen;
 		this.sheenColor.copy( source.sheenColor );
@@ -46243,6 +46421,7 @@ class LightShadow {
 		if ( this.bias !== 0 ) object.bias = this.bias;
 		if ( this.normalBias !== 0 ) object.normalBias = this.normalBias;
 		if ( this.radius !== 1 ) object.radius = this.radius;
+		if ( this.blurSamples !== 8 ) object.blurSamples = this.blurSamples;
 		if ( this.mapSize.x !== 512 || this.mapSize.y !== 512 ) object.mapSize = this.mapSize.toArray();
 
 		object.camera = this.camera.toJSON( false ).object;
@@ -46876,8 +47055,26 @@ class SpotLightShadow extends LightShadow {
 		super.copy( source );
 
 		this.focus = source.focus;
+		this.aspect = source.aspect;
 
 		return this;
+
+	}
+
+	/**
+	 * Serializes the light shadow into JSON.
+	 *
+	 * @return {Object} A JSON object representing the serialized light shadow.
+	 * @see {@link ObjectLoader#parse}
+	 */
+	toJSON() {
+
+		const object = super.toJSON();
+
+		if ( this.focus !== 1 ) object.focus = this.focus;
+		if ( this.aspect !== 1 ) object.aspect = this.aspect;
+
+		return object;
 
 	}
 
@@ -48556,6 +48753,8 @@ class BufferGeometryLoader extends Loader {
 			const ib = new InterleavedBuffer( array, interleavedBuffer.stride );
 			ib.uuid = interleavedBuffer.uuid;
 
+			if ( interleavedBuffer.usage !== undefined ) ib.setUsage( interleavedBuffer.usage );
+
 			interleavedBufferMap[ uuid ] = ib;
 
 			return ib;
@@ -48610,6 +48809,7 @@ class BufferGeometryLoader extends Loader {
 
 			if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
 			if ( attribute.usage !== undefined ) bufferAttribute.setUsage( attribute.usage );
+			if ( attribute.gpuType !== undefined ) bufferAttribute.gpuType = attribute.gpuType;
 
 			geometry.setAttribute( key, bufferAttribute );
 
@@ -48643,6 +48843,8 @@ class BufferGeometryLoader extends Loader {
 					}
 
 					if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
+					if ( attribute.usage !== undefined ) bufferAttribute.setUsage( attribute.usage );
+					if ( attribute.gpuType !== undefined ) bufferAttribute.gpuType = attribute.gpuType;
 					array.push( bufferAttribute );
 
 				}
@@ -49789,6 +49991,9 @@ class ObjectLoader extends Loader {
 			if ( data.shadow.bias !== undefined ) object.shadow.bias = data.shadow.bias;
 			if ( data.shadow.normalBias !== undefined ) object.shadow.normalBias = data.shadow.normalBias;
 			if ( data.shadow.radius !== undefined ) object.shadow.radius = data.shadow.radius;
+			if ( data.shadow.blurSamples !== undefined ) object.shadow.blurSamples = data.shadow.blurSamples;
+			if ( data.shadow.focus !== undefined ) object.shadow.focus = data.shadow.focus;
+			if ( data.shadow.aspect !== undefined ) object.shadow.aspect = data.shadow.aspect;
 			if ( data.shadow.mapSize !== undefined ) object.shadow.mapSize.fromArray( data.shadow.mapSize );
 			if ( data.shadow.camera !== undefined ) object.shadow.camera = this.parseObject( data.shadow.camera );
 
@@ -53694,12 +53899,24 @@ class AnimationObjectGroup {
 						lastIndex = -- nObjects,
 						lastObject = objects[ lastIndex ];
 
-					// last cached object takes this object's place
-					indicesByUUID[ lastCachedObject.uuid ] = index;
+					if ( index !== firstActiveIndex ) {
+
+						// last cached object takes this object's place
+
+						indicesByUUID[ lastCachedObject.uuid ] = index;
+
+					}
+
 					objects[ index ] = lastCachedObject;
 
-					// last object goes to the activated slot and pop
-					indicesByUUID[ lastObject.uuid ] = firstActiveIndex;
+					if ( firstActiveIndex !== lastIndex ) {
+
+						// last object goes to the activated slot and pop
+
+						indicesByUUID[ lastObject.uuid ] = firstActiveIndex;
+
+					}
+
 					objects[ firstActiveIndex ] = lastObject;
 					objects.pop();
 
@@ -53724,7 +53941,7 @@ class AnimationObjectGroup {
 					const lastIndex = -- nObjects,
 						lastObject = objects[ lastIndex ];
 
-					if ( lastIndex > 0 ) {
+					if ( index !== lastIndex ) {
 
 						indicesByUUID[ lastObject.uuid ] = index;
 
@@ -53808,7 +54025,7 @@ class AnimationObjectGroup {
 				bindings = this._bindings,
 				lastBindingsIndex = bindings.length - 1,
 				lastBindings = bindings[ lastBindingsIndex ],
-				lastBindingsPath = path[ lastBindingsIndex ];
+				lastBindingsPath = paths[ lastBindingsIndex ];
 
 			indicesByPath[ lastBindingsPath ] = index;
 

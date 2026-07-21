@@ -46,7 +46,7 @@ const refreshUniforms = [
 	'normalMap',
 	'normalScale',
 	'opacity',
-	'retroreflective',
+	'retroreflectivity',
 	'roughness',
 	'roughnessMap',
 	'sheen',
@@ -196,6 +196,7 @@ class NodeMaterialObserver {
 
 			data = {
 				geometryId: geometry.id,
+				geometryVersion: this.getGeometryData( geometry )._version,
 				materialVersion: this.getMaterialData( renderObject.material )._version,
 				worldMatrix: object.matrixWorld.clone()
 			};
@@ -308,7 +309,7 @@ class NodeMaterialObserver {
 
 			data = {
 				_renderId: -1,
-				_equal: false,
+				_version: 0,
 
 				attributes: this.getAttributesData( geometry.attributes ),
 				indexId: geometry.index ? geometry.index.id : null,
@@ -488,11 +489,13 @@ class NodeMaterialObserver {
 
 		const geometryData = this.getGeometryData( renderObject.geometry );
 
-		// check the geoemtry for the "equal" state just once per render for all render objects
+		// check the geometry properties just once per render for all render objects
 
 		if ( geometryData._renderId !== renderId ) {
 
 			geometryData._renderId = renderId;
+
+			let changed = false;
 
 			// attributes
 
@@ -516,8 +519,8 @@ class NodeMaterialObserver {
 					// attribute was removed
 					delete storedAttributes[ name ];
 
-					geometryData._equal = false;
-					return false;
+					changed = true;
+					continue;
 
 				}
 
@@ -529,8 +532,7 @@ class NodeMaterialObserver {
 					storedAttributeData.id = id;
 					storedAttributeData.version = version;
 
-					geometryData._equal = false;
-					return false;
+					changed = true;
 
 				}
 
@@ -540,26 +542,22 @@ class NodeMaterialObserver {
 
 				geometryData.attributes = this.getAttributesData( attributes );
 
-				geometryData._equal = false;
-				return false;
+				changed = true;
 
 			}
 
 			// check index
 
 			const index = geometry.index;
-			const storedIndexId = geometryData.indexId;
-			const storedIndexVersion = geometryData.indexVersion;
 			const currentIndexId = index ? index.id : null;
 			const currentIndexVersion = index ? index.version : null;
 
-			if ( storedIndexId !== currentIndexId || storedIndexVersion !== currentIndexVersion ) {
+			if ( geometryData.indexId !== currentIndexId || geometryData.indexVersion !== currentIndexVersion ) {
 
 				geometryData.indexId = currentIndexId;
 				geometryData.indexVersion = currentIndexVersion;
 
-				geometryData._equal = false;
-				return false;
+				changed = true;
 
 			}
 
@@ -570,16 +568,21 @@ class NodeMaterialObserver {
 				geometryData.drawRange.start = geometry.drawRange.start;
 				geometryData.drawRange.count = geometry.drawRange.count;
 
-				geometryData._equal = false;
-				return false;
+				changed = true;
 
 			}
 
-			geometryData._equal = true;
+			if ( changed === true ) geometryData._version ++;
 
-		} else {
+		}
 
-			if ( geometryData._equal === false ) return false;
+		// a version mismatch means the geometry has changed since this render object was last refreshed
+
+		if ( renderObjectData.geometryVersion !== geometryData._version ) {
+
+			renderObjectData.geometryVersion = geometryData._version;
+
+			return false;
 
 		}
 
@@ -735,11 +738,18 @@ class NodeMaterialObserver {
 
 		const { renderId } = nodeFrame;
 
+		let force = false;
+
+		// shared UBOs are potentially never updated when objects don't change. Below block
+		// make sure these UBOs are updated at least once.
+
 		if ( this.renderId !== renderId ) {
 
 			this.renderId = renderId;
 
-			return true;
+			// no early out here. instead, force the render object to use the equals() code path so its internal cache state gets synched
+
+			force = true;
 
 		}
 
@@ -747,12 +757,12 @@ class NodeMaterialObserver {
 		const isBundle = renderObject.bundle !== null && renderObject.bundle.static === true && this.getRenderObjectData( renderObject ).version === renderObject.bundle.version;
 
 		if ( isStatic || isBundle )
-			return false;
+			return force;
 
 		const lightsData = this.getLights( renderObject.lightsNode, renderId );
 		const notEqual = this.equals( renderObject, lightsData, renderId ) !== true;
 
-		return notEqual;
+		return ( force || notEqual );
 
 	}
 
@@ -5383,12 +5393,12 @@ const attenuationColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'color', 'At
 const dispersion = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Dispersion' );
 
 /**
- * TSL object that represents the shader variable `Retroreflective`.
+ * TSL object that represents the shader variable `Retroreflectivity`.
  *
  * @tsl
  * @type {PropertyNode<float>}
  */
-const retroreflective = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Retroreflective' );
+const retroreflectivity = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Retroreflectivity' );
 
 /**
  * TSL object that represents the shader variable `AmbientOcclusion`.
@@ -5448,8 +5458,9 @@ class UniformGroupNode extends Node {
 		this.shared = shared;
 
 		/**
-		 * Influences the internal sorting.
-		 * TODO: Add details when this property should be changed.
+		 * The sort key that determines the order of this group relative to other
+		 * uniform groups. Groups with a lower order are placed first. Shared groups
+		 * typically use a lower order so they precede regular per-object groups.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -7361,7 +7372,7 @@ class MathNode extends TempNode {
 
 				params.push(
 					a.build( builder, inputType ),
-					b.build( builder, builder.getTypeLength( b.getNodeType( builder ) ) === 1 ? 'float' : inputType )
+					b.build( builder, builder.getTypeLength( b.getNodeType( builder ) ) === 1 ? builder.getComponentType( inputType ) : inputType )
 				);
 
 			} else if ( method === MathNode.REFRACT ) {
@@ -17337,7 +17348,7 @@ MaterialNode.LINE_WIDTH = 'linewidth';
 MaterialNode.LINE_DASH_OFFSET = 'dashOffset';
 MaterialNode.POINT_SIZE = 'size';
 MaterialNode.DISPERSION = 'dispersion';
-MaterialNode.RETROREFLECTIVE = 'retroreflective';
+MaterialNode.RETROREFLECTIVITY = 'retroreflectivity';
 MaterialNode.LIGHT_MAP = 'light';
 MaterialNode.AO = 'ao';
 
@@ -17643,7 +17654,7 @@ const materialDispersion = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNo
  * @tsl
  * @type {Node<float>}
  */
-const materialRetroreflective = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.RETROREFLECTIVE );
+const materialRetroreflectivity = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.RETROREFLECTIVITY );
 
 /**
  * TSL object that represents the light map of the current material.
@@ -17745,6 +17756,36 @@ class EventNode extends Node {
 
 	}
 
+	setup( builder ) {
+
+		const { eventType, callback } = this;
+
+		if ( eventType === EventNode.BEFORE_RENDER_PIPELINE ) {
+
+			const callbacks = builder.context.onBeforePipelineCallbacks;
+
+			if ( callbacks ) {
+
+				callbacks.push( callback );
+
+			}
+
+		} else if ( eventType === EventNode.AFTER_RENDER_PIPELINE ) {
+
+			const callbacks = builder.context.onAfterPipelineCallbacks;
+
+			if ( callbacks ) {
+
+				callbacks.push( callback );
+
+			}
+
+		}
+
+		return super.setup( builder );
+
+	}
+
 	update( frame ) {
 
 		this.callback( frame );
@@ -17765,6 +17806,8 @@ EventNode.FRAME = 'frame';
 EventNode.BEFORE_OBJECT = 'beforeObject';
 EventNode.BEFORE_MATERIAL = 'beforeMaterial';
 EventNode.BEFORE_FRAME = 'beforeFrame';
+EventNode.BEFORE_RENDER_PIPELINE = 'beforeRenderPipeline';
+EventNode.AFTER_RENDER_PIPELINE = 'afterRenderPipeline';
 
 /**
  * Helper to create an EventNode and add it to the stack.
@@ -17834,6 +17877,28 @@ const OnBeforeMaterialUpdate = ( callback ) => createEvent( EventNode.BEFORE_MAT
  * @returns {EventNode}
  */
 const OnBeforeFrameUpdate = ( callback ) => createEvent( EventNode.BEFORE_FRAME, callback );
+
+/**
+ * Creates an event that triggers a function before the render pipeline is rendered.
+ *
+ * The node must be part of a node chain that is used as the output of a `RenderPipeline`,
+ * otherwise the event is ignored.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+const OnBeforeRenderPipeline = ( callback ) => createEvent( EventNode.BEFORE_RENDER_PIPELINE, callback );
+
+/**
+ * Creates an event that triggers a function after the render pipeline is rendered.
+ *
+ * The node must be part of a node chain that is used as the output of a `RenderPipeline`,
+ * otherwise the event is ignored.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+const OnAfterRenderPipeline = ( callback ) => createEvent( EventNode.AFTER_RENDER_PIPELINE, callback );
 
 /**
  * This class enables element access on instances of {@link StorageBufferNode}.
@@ -18535,29 +18600,23 @@ const instance = /*@__PURE__*/ Fn( ( [ matrices, colors = null ], builder ) => {
 
 		OnFrameUpdate( () => {
 
-			if ( interleavedMatrix !== null ) {
+			if ( interleavedMatrix !== null && interleavedMatrix.version !== matrices.version ) {
 
 				interleavedMatrix.clearUpdateRanges();
 				interleavedMatrix.updateRanges.push( ...matrices.updateRanges );
+				matrices.clearUpdateRanges(); // "matrices" as the source is never uploaded directly. clear to avoid update range accumulation
 
-				if ( matrices.version !== interleavedMatrix.version ) {
-
-					interleavedMatrix.version = matrices.version;
-
-				}
+				interleavedMatrix.version = matrices.version;
 
 			}
 
-			if ( colors && interleavedColor !== null ) {
+			if ( colors && interleavedColor !== null && interleavedColor.version !== colors.version ) {
 
 				interleavedColor.clearUpdateRanges();
 				interleavedColor.updateRanges.push( ...colors.updateRanges );
+				colors.clearUpdateRanges();
 
-				if ( colors.version !== interleavedColor.version ) {
-
-					interleavedColor.version = colors.version;
-
-				}
+				interleavedColor.version = colors.version;
 
 			}
 
@@ -21190,9 +21249,11 @@ class NodeMaterial extends Material {
 		this.castShadowNode = null;
 
 		/**
-		 * This node can be used to define the final output of the material.
+		 * This node can be used to overwrite the final output of the material.
 		 *
-		 * TODO: Explain the differences to `fragmentNode`.
+		 * Unlike {@link NodeMaterial#fragmentNode}, the built-in material logic
+		 * (diffuse color, lighting, etc.) is still evaluated; assigning a node
+		 * only replaces the resulting output color.
 		 *
 		 * @type {?Node<vec4>}
 		 * @default null
@@ -21843,14 +21904,6 @@ class NodeMaterial extends Material {
 
 		const materialLightsNode = [];
 
-		if ( builder.renderer.lighting.enabled === false ) {
-
-			return materialLightsNode;
-
-		}
-
-		//
-
 		const envNode = this.setupEnvironment( builder );
 
 		if ( envNode && envNode.isLightingNode ) {
@@ -21936,9 +21989,10 @@ class NodeMaterial extends Material {
 
 		// OUTGOING LIGHT
 
-		const lights = this.lights === true || this.lightsNode !== null;
+		const sceneLighting = this.lights === true && builder.renderer.lighting.enabled;
+		const lights = sceneLighting || this.lightsNode !== null;
 
-		const materialLightings = this.lights === true ? this.setupMaterialLightings( builder ) : [];
+		const materialLightings = sceneLighting ? this.setupMaterialLightings( builder ) : [];
 		const lightsNode = lights ? ( this.lightsNode || builder.lightsNode ) : null;
 
 		let outgoingLightNode = this.setupOutgoingLight( builder );
@@ -25027,9 +25081,9 @@ class PhysicalLightingModel extends LightingModel {
 	 * @param {boolean} [anisotropy=false] - Whether anisotropy is supported or not.
 	 * @param {boolean} [transmission=false] - Whether transmission is supported or not.
 	 * @param {boolean} [dispersion=false] - Whether dispersion is supported or not.
-	 * @param {boolean} [retroreflective=false] - Whether retroreflection is supported or not.
+	 * @param {boolean} [retroreflection=false] - Whether retroreflection is supported or not.
 	 */
-	constructor( clearcoat = false, sheen = false, iridescence = false, anisotropy = false, transmission = false, dispersion = false, retroreflective = false ) {
+	constructor( clearcoat = false, sheen = false, iridescence = false, anisotropy = false, transmission = false, dispersion = false, retroreflection = false ) {
 
 		super();
 
@@ -25087,7 +25141,7 @@ class PhysicalLightingModel extends LightingModel {
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.retroreflective = retroreflective;
+		this.retroreflection = retroreflection;
 
 		/**
 		 * The clear coat radiance.
@@ -25152,6 +25206,22 @@ class PhysicalLightingModel extends LightingModel {
 		 * @default null
 		 */
 		this.iridescenceF0Metallic = null;
+
+		/**
+		 * The sampled DFG LUT value, shared by the direct and indirect lighting paths.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.dfg = null;
+
+		/**
+		 * The multi-scattering energy compensation for direct lighting.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.multiScatteringCompensation = null;
 
 	}
 
@@ -25237,6 +25307,21 @@ class PhysicalLightingModel extends LightingModel {
 
 		}
 
+		//
+
+		const dotNV = normalView.dot( positionViewDirection ).clamp();
+		this.dfg = DFGLUT( { roughness, dotNV } ).toConst( 'dfg' );
+
+		// Multi-scattering energy compensation for direct lighting
+		// Based on "Practical Multiple Scattering Compensation for Microfacet Models"
+		// https://blog.selfshadow.com/publications/turquin/ms_comp_final.pdf
+
+		// Energy of the single-scattering lobe in a white furnace ( F0 = F90 = 1 )
+		const Ess = this.dfg.x.add( this.dfg.y );
+
+		// Compensate for the energy lost to multiple scattering, tinting the added term by F0 ( equation 16 )
+		this.multiScatteringCompensation = specularColorBlended.mul( Ess.reciprocal().sub( 1.0 ) ).add( 1.0 ).toConst( 'multiScatteringCompensation' );
+
 		super.start( builder );
 
 	}
@@ -25247,9 +25332,7 @@ class PhysicalLightingModel extends LightingModel {
 
 	computeMultiscattering( singleScatter, multiScatter, specularF90, f0, iridescenceF0 = null ) {
 
-		const dotNV = normalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
-
-		const fab = DFGLUT( { roughness, dotNV } );
+		const fab = this.dfg;
 
 		const Fr = iridescenceF0 ? iridescence.mix( f0, iridescenceF0 ) : f0;
 
@@ -25302,36 +25385,28 @@ class PhysicalLightingModel extends LightingModel {
 		// Light reflected by the specular interface is not available to the diffuse layer ( glTF fresnel_mix )
 		const halfDir = lightDirection.add( positionViewDirection ).normalize();
 		const dotVH = positionViewDirection.dot( halfDir ).clamp();
-		const F = F_Schlick( { f0: specularColor, f90: specularF90, dotVH } );
-
-		reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseContribution } ) ).mul( F.oneMinus() ) );
+		let F = F_Schlick( { f0: specularColor, f90: specularF90, dotVH } );
 
 		let specularBRDF = BRDF_GGX( { lightDirection, f0: specularColorBlended, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
 
-		if ( this.retroreflective === true ) {
+		if ( this.retroreflection === true ) {
 
 			// Minimal Retroreflective Microfacet Model:
 			// https://jcgt.org/published/0015/01/04/
 			const retroViewDirection = positionViewDirection.negate().reflect( normalView );
+			const retroHalfDir = lightDirection.add( retroViewDirection ).normalize();
+			const dotRetroVH = retroViewDirection.dot( retroHalfDir ).clamp();
+			const retroF = F_Schlick( { f0: specularColor, f90: specularF90, dotVH: dotRetroVH } );
 			const retroSpecularBRDF = BRDF_GGX( { lightDirection, viewDirection: retroViewDirection, f0: specularColorBlended, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
 
-			specularBRDF = mix( specularBRDF, retroSpecularBRDF, retroreflective.clamp() );
+			F = mix( F, retroF, retroreflectivity.clamp() );
+			specularBRDF = mix( specularBRDF, retroSpecularBRDF, retroreflectivity.clamp() );
 
 		}
 
-		// Multi-scattering energy compensation for direct lighting
-		// Based on "Practical Multiple Scattering Compensation for Microfacet Models"
-		// https://blog.selfshadow.com/publications/turquin/ms_comp_final.pdf
-		const dotNV = normalView.dot( positionViewDirection ).clamp();
-		const fab = DFGLUT( { roughness, dotNV } );
+		reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseContribution } ) ).mul( F.oneMinus() ) );
 
-		// Energy of the single-scattering lobe in a white furnace ( F0 = F90 = 1 )
-		const Ess = fab.x.add( fab.y );
-
-		// Compensate for the energy lost to multiple scattering, tinting the added term by F0 ( equation 16 )
-		const energyCompensation = specularColorBlended.mul( Ess.reciprocal().sub( 1.0 ) ).add( 1.0 );
-
-		reflectedLight.directSpecular.addAssign( irradiance.mul( specularBRDF ).mul( energyCompensation ) );
+		reflectedLight.directSpecular.addAssign( irradiance.mul( specularBRDF ).mul( this.multiScatteringCompensation ) );
 
 	}
 
@@ -27847,16 +27922,16 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 		/**
 		 * The retroreflective strength of physical materials is by default inferred from the
-		 * `retroreflective` property. This node property allows to overwrite the default
+		 * `retroreflectivity` property. This node property allows to overwrite the default
 		 * and define the retroreflective strength with a node instead.
 		 *
 		 * If you don't want to overwrite the retroreflective strength but modify the existing
-		 * value instead, use {@link materialRetroreflective}.
+		 * value instead, use {@link materialRetroreflectivity}.
 		 *
 		 * @type {?Node<float>}
 		 * @default null
 		 */
-		this.retroreflectiveNode = null;
+		this.retroreflectivityNode = null;
 
 		/**
 		 * The anisotropy of physical materials is by default inferred from the
@@ -27955,9 +28030,9 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	 * @type {boolean}
 	 * @default true
 	 */
-	get useRetroreflective() {
+	get useRetroreflection() {
 
-		return this.retroreflective > 0 || this.retroreflectiveNode !== null;
+		return this.retroreflectivity > 0 || this.retroreflectivityNode !== null;
 
 	}
 
@@ -27982,7 +28057,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	 */
 	setupLightingModel( /*builder*/ ) {
 
-		return new PhysicalLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useAnisotropy, this.useTransmission, this.useDispersion, this.useRetroreflective );
+		return new PhysicalLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useAnisotropy, this.useTransmission, this.useDispersion, this.useRetroreflection );
 
 	}
 
@@ -28019,13 +28094,13 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 		}
 
-		// RETROREFLECTIVE
+		// RETROREFLECTION
 
-		if ( this.useRetroreflective ) {
+		if ( this.useRetroreflection ) {
 
-			const retroreflectiveNode = this.retroreflectiveNode ? float( this.retroreflectiveNode ) : materialRetroreflective;
+			const retroreflectivityNode = this.retroreflectivityNode ? float( this.retroreflectivityNode ) : materialRetroreflectivity;
 
-			retroreflective.assign( retroreflectiveNode );
+			retroreflectivity.assign( retroreflectivityNode );
 
 		}
 
@@ -31581,10 +31656,10 @@ class Info {
 		/**
 		 * Map for storing calculated byte sizes of tracked objects.
 		 *
-		 * @type {Map<Object, number>}
+		 * @type {WeakMap<Object, number>}
 		 * @private
 		 */
-		this.memoryMap = new Map();
+		this.memoryMap = new WeakMap();
 
 	}
 
@@ -31660,7 +31735,7 @@ class Info {
 
 		}
 
-		this.memoryMap.clear();
+		this.memoryMap = new WeakMap();
 
 	}
 
@@ -32928,10 +33003,14 @@ class Bindings extends DataMap {
 
 							this.backend.destroySampler( binding );
 
-						}
+						} else if ( binding.texture !== null ) {
 
-						const textureData = this.textures.get( binding.texture );
-						if ( textureData.bindGroups !== undefined ) textureData.bindGroups.delete( bindGroup );
+							// untrack destroyed bind group from its texture
+
+							const textureData = this.textures.get( binding.texture );
+							if ( textureData.bindGroups !== undefined ) textureData.bindGroups.delete( bindGroup );
+
+						}
 
 						binding.release();
 
@@ -33604,17 +33683,8 @@ class RenderLists {
 
 	/**
 	 * Constructs a render lists management component.
-	 *
-	 * @param {Lighting} lighting - The lighting management component.
 	 */
-	constructor( lighting ) {
-
-		/**
-		 * The lighting management component.
-		 *
-		 * @type {Lighting}
-		 */
-		this.lighting = lighting;
+	constructor() {
 
 		/**
 		 * The internal chain map which holds the render lists.
@@ -33647,26 +33717,29 @@ class RenderLists {
 	 *
 	 * @param {Scene} scene - The scene.
 	 * @param {Camera} camera - The camera.
+	 * @param {Lighting} lighting - The lighting manager.
 	 * @return {RenderList} The render list.
 	 */
-	get( scene, camera ) {
+	get( scene, camera, lighting ) {
 
 		const lists = this.lists;
 
 		_chainKeys$2[ 0 ] = scene;
 		_chainKeys$2[ 1 ] = camera;
+		_chainKeys$2[ 2 ] = lighting;
 
 		let list = lists.get( _chainKeys$2 );
 
 		if ( list === undefined ) {
 
-			list = new RenderList( this.lighting, scene, camera );
+			list = new RenderList( lighting, scene, camera );
 			lists.set( _chainKeys$2, list );
 
 		}
 
 		_chainKeys$2[ 0 ] = null;
 		_chainKeys$2[ 1 ] = null;
+		_chainKeys$2[ 2 ] = null;
 
 		//
 
@@ -34206,7 +34279,7 @@ class Textures extends DataMap {
 
 			textureNeedsUpdate = true;
 
-			if ( depthTexture ) {
+			if ( depthTexture && depthTexture.renderTarget === renderTarget ) {
 
 				depthTexture.needsUpdate = true;
 				depthTexture.image.width = mipWidth;
@@ -34229,7 +34302,7 @@ class Textures extends DataMap {
 
 			textureNeedsUpdate = true;
 
-			if ( depthTexture ) {
+			if ( depthTexture && depthTexture.renderTarget === renderTarget ) {
 
 				depthTexture.needsUpdate = true;
 
@@ -34663,7 +34736,7 @@ class Textures extends DataMap {
 
 			}
 
-			if ( depthTexture ) {
+			if ( depthTexture && depthTexture.renderTarget === renderTarget ) {
 
 				this._destroyTexture( depthTexture );
 
@@ -37755,10 +37828,14 @@ class ReflectorNode extends TextureNode {
 }
 
 /**
- * Holds the actual implementation of the reflector.
+ * Holds the actual implementation of the reflector (virtual cameras, render
+ * targets and the reflection rendering).
  *
- * TODO: Explain why `ReflectorBaseNode`. Originally the entire logic was implemented
- * in `ReflectorNode`, see #29619.
+ * This logic is kept separate from {@link ReflectorNode} because the latter is
+ * a {@link TextureNode} representing a single texture view. A reflector can be
+ * sampled by multiple texture nodes at once - e.g. one for color and one for
+ * depth (see {@link ReflectorNode#getDepthNode}) - which all reference the same
+ * base node so the reflection is rendered only once.
  *
  * @private
  * @augments Node
@@ -38412,15 +38489,6 @@ class RTTNode extends TextureNode {
 		this._resolutionScale = 1;
 
 		/**
-		 * The node which is used with the quad mesh for RTT.
-		 *
-		 * @private
-		 * @type {Node}
-		 * @default null
-		 */
-		this._rttNode = null;
-
-		/**
 		 * The internal quad mesh for RTT.
 		 *
 		 * @private
@@ -38454,7 +38522,8 @@ class RTTNode extends TextureNode {
 
 	setup( builder ) {
 
-		this._rttNode = this.node.context( builder.getSharedContext() );
+		this._quadMesh.material.contextNode = context( builder.getSharedContext() );
+		this._quadMesh.material.fragmentNode = this.node;
 		this._quadMesh.material.name = 'RTT';
 		this._quadMesh.material.needsUpdate = true;
 
@@ -38548,8 +38617,6 @@ class RTTNode extends TextureNode {
 
 		}
 
-
-		this._quadMesh.material.fragmentNode = this._rttNode;
 		this._quadMesh.name = name;
 
 		//
@@ -39400,11 +39467,14 @@ const storageTexture = /*@__PURE__*/ nodeProxy( StorageTextureNode ).setParamete
 
 
 /**
- * TODO: Explain difference to `storageTexture()`.
+ * TSL function for storing a value in a storage texture.
+ *
+ * Unlike {@link storageTexture}, this function also accepts an existing storage
+ * texture node and is intended for performing the store operation itself.
  *
  * @tsl
  * @function
- * @param {StorageTexture|StorageTextureNode} value - The storage texture.
+ * @param {StorageTexture|StorageTextureNode} value - The storage texture or storage texture node.
  * @param {Node<vec2|vec3>} uvNode - The uv node.
  * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
  * @returns {StorageTextureNode}
@@ -40587,7 +40657,7 @@ class PassNode extends TempNode {
 
 		if ( this.scope === PassNode.DEPTH || options.depthBuffer !== false ) {
 
-			depthTexture = new DepthTexture();
+			depthTexture = options.depthTexture || new DepthTexture();
 			depthTexture.isRenderTargetTexture = true;
 			//depthTexture.type = FloatType;
 			depthTexture.name = 'depth';
@@ -40625,6 +40695,40 @@ class PassNode extends TempNode {
 		 * @default true
 		 */
 		this.opaque = true;
+
+		this.lighting = null;
+
+		/**
+		 * Whether the renderer should automatically clear before rendering the pass.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.autoClear = options.autoClear !== undefined ? options.autoClear : true;
+
+		/**
+		 * Whether the color buffer should be cleared.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.autoClearColor = options.autoClearColor !== undefined ? options.autoClearColor : true;
+
+		/**
+		 * Whether the depth buffer should be cleared.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.autoClearDepth = options.autoClearDepth !== undefined ? options.autoClearDepth : true;
+
+		/**
+		 * Whether the stencil buffer should be cleared.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.autoClearStencil = options.autoClearStencil !== undefined ? options.autoClearStencil : true;
 
 		/**
 		 * An optional global context for the pass.
@@ -41144,8 +41248,12 @@ class PassNode extends TempNode {
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentMRT = renderer.getMRT();
 		const currentAutoClear = renderer.autoClear;
+		const currentAutoClearColor = renderer.autoClearColor;
+		const currentAutoClearDepth = renderer.autoClearDepth;
+		const currentAutoClearStencil = renderer.autoClearStencil;
 		const currentTransparent = renderer.transparent;
 		const currentOpaque = renderer.opaque;
+		const currentLighting = renderer.lighting;
 		const currentMask = camera.layers.mask;
 		const currentContextNode = renderer.contextNode;
 		const currentOverrideMaterial = scene.overrideMaterial;
@@ -41173,9 +41281,18 @@ class PassNode extends TempNode {
 
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setMRT( this._mrt );
-		renderer.autoClear = true;
+		renderer.autoClear = this.autoClear;
+		renderer.autoClearColor = this.autoClearColor;
+		renderer.autoClearDepth = this.autoClearDepth;
+		renderer.autoClearStencil = this.autoClearStencil;
 		renderer.transparent = this.transparent;
 		renderer.opaque = this.opaque;
+
+		if ( this.lighting !== null ) {
+
+			renderer.lighting = this.lighting;
+
+		}
 
 		if ( this.contextNode !== null ) {
 
@@ -41204,9 +41321,13 @@ class PassNode extends TempNode {
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
 		renderer.autoClear = currentAutoClear;
+		renderer.autoClearColor = currentAutoClearColor;
+		renderer.autoClearDepth = currentAutoClearDepth;
+		renderer.autoClearStencil = currentAutoClearStencil;
 		renderer.transparent = currentTransparent;
 		renderer.opaque = currentOpaque;
 		renderer.contextNode = currentContextNode;
+		renderer.lighting = currentLighting;
 
 		camera.layers.mask = currentMask;
 
@@ -42822,9 +42943,9 @@ class WorkgroupInfoElementNode extends ArrayElementNode {
 class WorkgroupInfoNode extends Node {
 
 	/**
-	 * Constructs a new buffer scoped to type scope.
+	 * Constructs a new workgroup info node.
 	 *
-	 * @param {string} scope - TODO.
+	 * @param {string} scope - The address space the buffer is scoped to. Currently only `'Workgroup'` is used.
 	 * @param {string} bufferType - The data type of a 'workgroup' scoped buffer element.
 	 * @param {number} [bufferCount=0] - The number of elements in the buffer.
 	 */
@@ -42864,7 +42985,7 @@ class WorkgroupInfoNode extends Node {
 		this.elementType = bufferType;
 
 		/**
-		 * TODO.
+		 * The address space the buffer is scoped to. Currently only `'Workgroup'` is used.
 		 *
 		 * @type {string}
 		 */
@@ -45261,12 +45382,16 @@ class ShadowNode extends ShadowBaseNode {
 			const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
 			const size = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
 
+			const sharedContext = context( builder.getSharedContext() );
+
 			let material = this.vsmMaterialVertical || ( this.vsmMaterialVertical = new NodeMaterial() );
-			material.fragmentNode = VSMPassVertical( { samples, radius, size, shadowPass: shadowPassVertical, depthLayer: this.depthLayer } ).context( builder.getSharedContext() );
+			material.contextNode = sharedContext;
+			material.fragmentNode = VSMPassVertical( { samples, radius, size, shadowPass: shadowPassVertical, depthLayer: this.depthLayer } );
 			material.name = 'VSMVertical';
 
 			material = this.vsmMaterialHorizontal || ( this.vsmMaterialHorizontal = new NodeMaterial() );
-			material.fragmentNode = VSMPassHorizontal( { samples, radius, size, shadowPass: shadowPassHorizontal, depthLayer: this.depthLayer } ).context( builder.getSharedContext() );
+			material.contextNode = sharedContext;
+			material.fragmentNode = VSMPassHorizontal( { samples, radius, size, shadowPass: shadowPassHorizontal, depthLayer: this.depthLayer } );
 			material.name = 'VSMHorizontal';
 
 		}
@@ -46459,10 +46584,41 @@ const shapeCircle = Fn( ( [ coord = uv$1() ], { renderer, material } ) => {
 
 } );
 
-// Three.js Transpiler
-// https://raw.githubusercontent.com/AcademySoftwareFoundation/MaterialX/main/libraries/stdlib/genglsl/lib/mx_noise.glsl
+const mx_rotate2d = ( input, amount = 0 ) => {
 
+	input = vec2( input );
+	amount = float( amount );
 
+	const rotationRadians = mul( amount, Math.PI / 180.0 );
+	const sa = sin( rotationRadians );
+	const ca = cos( rotationRadians );
+	const x = input.x;
+	const y = input.y;
+
+	return vec2( add( mul( ca, x ), mul( sa, y ) ), sub( mul( ca, y ), mul( sa, x ) ) );
+
+};
+
+const mx_rotate3d = ( input, amount = 0, axis = vec3( 0, 1, 0 ) ) => {
+
+	input = vec3( input );
+	amount = float( amount );
+	axis = vec3( axis );
+
+	const normalizedAxis = normalize( axis );
+	const rotationRadians = mul( amount, Math.PI / 180.0 );
+	const s = sin( rotationRadians );
+	const c = cos( rotationRadians );
+	const oc = sub( 1, c );
+
+	// based on https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
+	// but the code in the Wikipedia article is for v' = M * v, where as
+	// MaterialX is v' = v * M, thus the order of parameters into the first cross are reversed
+	return input.mul( c )
+		.add( input.cross( normalizedAxis ).mul( s ) )
+		.add( normalizedAxis.mul( normalizedAxis.dot( input ).mul( oc ) ) );
+
+};
 
 const mx_select = /*@__PURE__*/ Fn( ( [ b_immutable, t_immutable, f_immutable ] ) => {
 
@@ -46521,6 +46677,22 @@ const mx_floorfrac = /*@__PURE__*/ Fn( ( [ x_immutable, i ] ) => {
 
 } );
 
+const mxBilerpValue = ( v0, v1, v2, v3, s, t ) => {
+
+	const s1 = float( sub( 1.0, s ) ).toVar();
+	return sub( 1.0, t ).mul( v0.mul( s1 ).add( v1.mul( s ) ) ).add( t.mul( v2.mul( s1 ).add( v3.mul( s ) ) ) );
+
+};
+
+const mxTrilerpValue = ( v0, v1, v2, v3, v4, v5, v6, v7, s, t, r ) => {
+
+	const s1 = float( sub( 1.0, s ) ).toVar();
+	const t1 = float( sub( 1.0, t ) ).toVar();
+	const r1 = float( sub( 1.0, r ) ).toVar();
+	return r1.mul( t1.mul( v0.mul( s1 ).add( v1.mul( s ) ) ).add( t.mul( v2.mul( s1 ).add( v3.mul( s ) ) ) ) ).add( r.mul( t1.mul( v4.mul( s1 ).add( v5.mul( s ) ) ).add( t.mul( v6.mul( s1 ).add( v7.mul( s ) ) ) ) ) );
+
+};
+
 const mx_bilerp_0 = /*@__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immutable, s_immutable, t_immutable ] ) => {
 
 	const t = float( t_immutable ).toVar();
@@ -46529,9 +46701,8 @@ const mx_bilerp_0 = /*@__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_immutab
 	const v2 = float( v2_immutable ).toVar();
 	const v1 = float( v1_immutable ).toVar();
 	const v0 = float( v0_immutable ).toVar();
-	const s1 = float( sub( 1.0, s ) ).toVar();
 
-	return sub( 1.0, t ).mul( v0.mul( s1 ).add( v1.mul( s ) ) ).add( t.mul( v2.mul( s1 ).add( v3.mul( s ) ) ) );
+	return mxBilerpValue( v0, v1, v2, v3, s, t );
 
 } ).setLayout( {
 	name: 'mx_bilerp_0',
@@ -46554,9 +46725,8 @@ const mx_bilerp_1 = /*@__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_immutab
 	const v2 = vec3( v2_immutable ).toVar();
 	const v1 = vec3( v1_immutable ).toVar();
 	const v0 = vec3( v0_immutable ).toVar();
-	const s1 = float( sub( 1.0, s ) ).toVar();
 
-	return sub( 1.0, t ).mul( v0.mul( s1 ).add( v1.mul( s ) ) ).add( t.mul( v2.mul( s1 ).add( v3.mul( s ) ) ) );
+	return mxBilerpValue( v0, v1, v2, v3, s, t );
 
 } ).setLayout( {
 	name: 'mx_bilerp_1',
@@ -46586,11 +46756,8 @@ const mx_trilerp_0 = /*@__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_immuta
 	const v2 = float( v2_immutable ).toVar();
 	const v1 = float( v1_immutable ).toVar();
 	const v0 = float( v0_immutable ).toVar();
-	const s1 = float( sub( 1.0, s ) ).toVar();
-	const t1 = float( sub( 1.0, t ) ).toVar();
-	const r1 = float( sub( 1.0, r ) ).toVar();
 
-	return r1.mul( t1.mul( v0.mul( s1 ).add( v1.mul( s ) ) ).add( t.mul( v2.mul( s1 ).add( v3.mul( s ) ) ) ) ).add( r.mul( t1.mul( v4.mul( s1 ).add( v5.mul( s ) ) ).add( t.mul( v6.mul( s1 ).add( v7.mul( s ) ) ) ) ) );
+	return mxTrilerpValue( v0, v1, v2, v3, v4, v5, v6, v7, s, t, r );
 
 } ).setLayout( {
 	name: 'mx_trilerp_0',
@@ -46623,11 +46790,8 @@ const mx_trilerp_1 = /*@__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_immuta
 	const v2 = vec3( v2_immutable ).toVar();
 	const v1 = vec3( v1_immutable ).toVar();
 	const v0 = vec3( v0_immutable ).toVar();
-	const s1 = float( sub( 1.0, s ) ).toVar();
-	const t1 = float( sub( 1.0, t ) ).toVar();
-	const r1 = float( sub( 1.0, r ) ).toVar();
 
-	return r1.mul( t1.mul( v0.mul( s1 ).add( v1.mul( s ) ) ).add( t.mul( v2.mul( s1 ).add( v3.mul( s ) ) ) ) ).add( r.mul( t1.mul( v4.mul( s1 ).add( v5.mul( s ) ) ).add( t.mul( v6.mul( s1 ).add( v7.mul( s ) ) ) ) ) );
+	return mxTrilerpValue( v0, v1, v2, v3, v4, v5, v6, v7, s, t, r );
 
 } ).setLayout( {
 	name: 'mx_trilerp_1',
@@ -46813,6 +46977,9 @@ const mx_rotl32 = /*@__PURE__*/ Fn( ( [ x_immutable, k_immutable ] ) => {
 
 const mx_bjmix = /*@__PURE__*/ Fn( ( [ a, b, c ] ) => {
 
+	a = uint( a ).toVar();
+	b = uint( b ).toVar();
+	c = uint( c ).toVar();
 	a.subAssign( c );
 	a.bitXorAssign( mx_rotl32( c, int( 4 ) ) );
 	c.addAssign( b );
@@ -46832,6 +46999,16 @@ const mx_bjmix = /*@__PURE__*/ Fn( ( [ a, b, c ] ) => {
 	c.bitXorAssign( mx_rotl32( b, int( 4 ) ) );
 	b.addAssign( a );
 
+	return uvec3( a, b, c );
+
+} ).setLayout( {
+	name: 'mx_bjmix',
+	type: 'uvec3',
+	inputs: [
+		{ name: 'a', type: 'uint' },
+		{ name: 'b', type: 'uint' },
+		{ name: 'c', type: 'uint' }
+	]
 } );
 
 const mx_bjfinal = /*@__PURE__*/ Fn( ( [ a_immutable, b_immutable, c_immutable ] ) => {
@@ -46870,7 +47047,7 @@ const mx_bits_to_01 = /*@__PURE__*/ Fn( ( [ bits_immutable ] ) => {
 
 	const bits = uint( bits_immutable ).toVar();
 
-	return float( bits ).div( float( uint( int( 0xffffffff ) ) ) );
+	return float( bits ).div( float( uint( 0xffffffff ) ) );
 
 } ).setLayout( {
 	name: 'mx_bits_to_01',
@@ -46898,7 +47075,7 @@ const mx_hash_int_0 = /*@__PURE__*/ Fn( ( [ x_immutable ] ) => {
 
 	const x = int( x_immutable ).toVar();
 	const len = uint( uint( 1 ) ).toVar();
-	const seed = uint( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ).toVar();
+	const seed = uint( uint( 0xdeadbeef ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ).toVar();
 
 	return mx_bjfinal( seed.add( uint( x ) ), seed, seed );
 
@@ -46916,7 +47093,7 @@ const mx_hash_int_1 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable ] ) => {
 	const x = int( x_immutable ).toVar();
 	const len = uint( uint( 2 ) ).toVar();
 	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
-	a.assign( b.assign( c.assign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
+	a.assign( b.assign( c.assign( uint( 0xdeadbeef ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
 	a.addAssign( uint( x ) );
 	b.addAssign( uint( y ) );
 
@@ -46938,7 +47115,7 @@ const mx_hash_int_2 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_immutabl
 	const x = int( x_immutable ).toVar();
 	const len = uint( uint( 3 ) ).toVar();
 	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
-	a.assign( b.assign( c.assign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
+	a.assign( b.assign( c.assign( uint( 0xdeadbeef ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
 	a.addAssign( uint( x ) );
 	b.addAssign( uint( y ) );
 	c.addAssign( uint( z ) );
@@ -46963,11 +47140,14 @@ const mx_hash_int_3 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_immutabl
 	const x = int( x_immutable ).toVar();
 	const len = uint( uint( 4 ) ).toVar();
 	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
-	a.assign( b.assign( c.assign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
+	a.assign( b.assign( c.assign( uint( 0xdeadbeef ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
 	a.addAssign( uint( x ) );
 	b.addAssign( uint( y ) );
 	c.addAssign( uint( z ) );
-	mx_bjmix( a, b, c );
+	const mixed = uvec3( mx_bjmix( a, b, c ) ).toVar();
+	a.assign( mixed.x );
+	b.assign( mixed.y );
+	c.assign( mixed.z );
 	a.addAssign( uint( xx ) );
 
 	return mx_bjfinal( a, b, c );
@@ -46992,11 +47172,14 @@ const mx_hash_int_4 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_immutabl
 	const x = int( x_immutable ).toVar();
 	const len = uint( uint( 5 ) ).toVar();
 	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
-	a.assign( b.assign( c.assign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
+	a.assign( b.assign( c.assign( uint( 0xdeadbeef ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
 	a.addAssign( uint( x ) );
 	b.addAssign( uint( y ) );
 	c.addAssign( uint( z ) );
-	mx_bjmix( a, b, c );
+	const mixed = uvec3( mx_bjmix( a, b, c ) ).toVar();
+	a.assign( mixed.x );
+	b.assign( mixed.y );
+	c.assign( mixed.z );
 	a.addAssign( uint( xx ) );
 	b.addAssign( uint( yy ) );
 
@@ -47223,7 +47406,11 @@ const mx_cell_noise_vec3_0 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 	const p = float( p_immutable ).toVar();
 	const ix = int( mx_floor( p ) ).toVar();
 
-	return vec3( mx_bits_to_01( mx_hash_int( ix, int( 0 ) ) ), mx_bits_to_01( mx_hash_int( ix, int( 1 ) ) ), mx_bits_to_01( mx_hash_int( ix, int( 2 ) ) ) );
+	return vec3(
+		mx_bits_to_01( mx_hash_int( ix, int( 0 ) ) ),
+		mx_bits_to_01( mx_hash_int( ix, int( 1 ) ) ),
+		mx_bits_to_01( mx_hash_int( ix, int( 2 ) ) )
+	);
 
 } ).setLayout( {
 	name: 'mx_cell_noise_vec3_0',
@@ -47239,7 +47426,11 @@ const mx_cell_noise_vec3_1 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 	const ix = int( mx_floor( p.x ) ).toVar();
 	const iy = int( mx_floor( p.y ) ).toVar();
 
-	return vec3( mx_bits_to_01( mx_hash_int( ix, iy, int( 0 ) ) ), mx_bits_to_01( mx_hash_int( ix, iy, int( 1 ) ) ), mx_bits_to_01( mx_hash_int( ix, iy, int( 2 ) ) ) );
+	return vec3(
+		mx_bits_to_01( mx_hash_int( ix, iy, int( 0 ) ) ),
+		mx_bits_to_01( mx_hash_int( ix, iy, int( 1 ) ) ),
+		mx_bits_to_01( mx_hash_int( ix, iy, int( 2 ) ) )
+	);
 
 } ).setLayout( {
 	name: 'mx_cell_noise_vec3_1',
@@ -47249,14 +47440,29 @@ const mx_cell_noise_vec3_1 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 	]
 } );
 
-const mx_cell_noise_vec3_2 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
+const mx_cell_noise_vec3_2 = /*@__PURE__*/ Fn( ( [ positionInput ] ) => {
 
-	const p = vec3( p_immutable ).toVar();
-	const ix = int( mx_floor( p.x ) ).toVar();
-	const iy = int( mx_floor( p.y ) ).toVar();
-	const iz = int( mx_floor( p.z ) ).toVar();
+	const position = vec3( positionInput ).toVar();
+	const ix = int( floor( position.x ) ).toVar();
+	const iy = int( floor( position.y ) ).toVar();
+	const iz = int( floor( position.z ) ).toVar();
+	const seed = uint( 0xdeadbeef + ( 4 << 2 ) + 13 ).toVar();
+	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
+	a.assign( b.assign( c.assign( seed ) ) );
+	a.addAssign( uint( ix ) );
+	b.addAssign( uint( iy ) );
+	c.addAssign( uint( iz ) );
 
-	return vec3( mx_bits_to_01( mx_hash_int( ix, iy, iz, int( 0 ) ) ), mx_bits_to_01( mx_hash_int( ix, iy, iz, int( 1 ) ) ), mx_bits_to_01( mx_hash_int( ix, iy, iz, int( 2 ) ) ) );
+	const mixed = uvec3( mx_bjmix( a, b, c ) ).toVar();
+	const hash0 = mx_bjfinal( mixed.x, mixed.y, mixed.z );
+	const hash1 = mx_bjfinal( add( mixed.x, uint( 1 ) ), mixed.y, mixed.z );
+	const hash2 = mx_bjfinal( add( mixed.x, uint( 2 ) ), mixed.y, mixed.z );
+
+	return vec3(
+		mx_bits_to_01( hash0 ),
+		mx_bits_to_01( hash1 ),
+		mx_bits_to_01( hash2 )
+	);
 
 } ).setLayout( {
 	name: 'mx_cell_noise_vec3_2',
@@ -47273,8 +47479,24 @@ const mx_cell_noise_vec3_3 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 	const iy = int( mx_floor( p.y ) ).toVar();
 	const iz = int( mx_floor( p.z ) ).toVar();
 	const iw = int( mx_floor( p.w ) ).toVar();
+	const seed = uint( 0xdeadbeef + ( 5 << 2 ) + 13 ).toVar();
+	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
+	a.assign( b.assign( c.assign( seed ) ) );
+	a.addAssign( uint( ix ) );
+	b.addAssign( uint( iy ) );
+	c.addAssign( uint( iz ) );
 
-	return vec3( mx_bits_to_01( mx_hash_int( ix, iy, iz, iw, int( 0 ) ) ), mx_bits_to_01( mx_hash_int( ix, iy, iz, iw, int( 1 ) ) ), mx_bits_to_01( mx_hash_int( ix, iy, iz, iw, int( 2 ) ) ) );
+	const mixed = uvec3( mx_bjmix( a, b, c ) ).toVar();
+	a.assign( mixed.x );
+	b.assign( mixed.y );
+	c.assign( mixed.z );
+	a.addAssign( uint( iw ) );
+
+	return vec3(
+		mx_bits_to_01( mx_bjfinal( a, b, c ) ),
+		mx_bits_to_01( mx_bjfinal( a, add( b, uint( 1 ) ), c ) ),
+		mx_bits_to_01( mx_bjfinal( a, add( b, uint( 2 ) ), c ) )
+	);
 
 } ).setLayout( {
 	name: 'mx_cell_noise_vec3_3',
@@ -47284,7 +47506,63 @@ const mx_cell_noise_vec3_3 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 	]
 } );
 
-const mx_cell_noise_vec3 = /*@__PURE__*/ overloadingFn( [ mx_cell_noise_vec3_0, mx_cell_noise_vec3_1, mx_cell_noise_vec3_2, mx_cell_noise_vec3_3 ] );
+const mx_cell_noise_vec3$1 = /*@__PURE__*/ overloadingFn( [ mx_cell_noise_vec3_0, mx_cell_noise_vec3_1, mx_cell_noise_vec3_2, mx_cell_noise_vec3_3 ] );
+
+const mx_cell_noise_vec3_3d = /*@__PURE__*/ Fn( ( [ positionInput ] ) => {
+
+	const position = vec3( positionInput ).toVar();
+	const ix = int( floor( position.x ) ).toVar();
+	const iy = int( floor( position.y ) ).toVar();
+	const iz = int( floor( position.z ) ).toVar();
+	const seed = uint( 0xdeadbeef + ( 4 << 2 ) + 13 ).toVar();
+	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
+	a.assign( b.assign( c.assign( seed ) ) );
+	a.addAssign( uint( ix ) );
+	b.addAssign( uint( iy ) );
+	c.addAssign( uint( iz ) );
+
+	const mixed = uvec3( mx_bjmix( a, b, c ) ).toVar();
+	const hash0 = mx_bjfinal( mixed.x, mixed.y, mixed.z );
+	const hash1 = mx_bjfinal( add( mixed.x, uint( 1 ) ), mixed.y, mixed.z );
+	const hash2 = mx_bjfinal( add( mixed.x, uint( 2 ) ), mixed.y, mixed.z );
+
+	return vec3(
+		mx_bits_to_01( hash0 ),
+		mx_bits_to_01( hash1 ),
+		mx_bits_to_01( hash2 )
+	);
+
+} );
+
+const mx_fractal_noise_float_2d$1 = /*@__PURE__*/ Fn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
+
+	const diminish = float( diminish_immutable ).toVar();
+	const lacunarity = float( lacunarity_immutable ).toVar();
+	const octaves = int( octaves_immutable ).toVar();
+	const p = vec2( p_immutable ).toVar();
+	const result = float( 0.0 ).toVar();
+	const amplitude = float( 1.0 ).toVar();
+
+	Loop( octaves, () => {
+
+		result.addAssign( amplitude.mul( mx_perlin_noise_float( p ) ) );
+		amplitude.mulAssign( diminish );
+		p.mulAssign( lacunarity );
+
+	} );
+
+	return result;
+
+} ).setLayout( {
+	name: 'mx_fractal_noise_float_2d',
+	type: 'float',
+	inputs: [
+		{ name: 'p', type: 'vec2' },
+		{ name: 'octaves', type: 'int' },
+		{ name: 'lacunarity', type: 'float' },
+		{ name: 'diminish', type: 'float' }
+	]
+} );
 
 const mx_fractal_noise_float$1 = /*@__PURE__*/ Fn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
 
@@ -47397,7 +47675,7 @@ const mx_worley_distance_0 = /*@__PURE__*/ Fn( ( [ p_immutable, x_immutable, y_i
 	const y = int( y_immutable ).toVar();
 	const x = int( x_immutable ).toVar();
 	const p = vec2( p_immutable ).toVar();
-	const tmp = vec3( mx_cell_noise_vec3( vec2( x.add( xoff ), y.add( yoff ) ) ) ).toVar();
+	const tmp = vec3( mx_cell_noise_vec3$1( vec2( x.add( xoff ), y.add( yoff ) ) ) ).toVar();
 	const off = vec2( tmp.x, tmp.y ).toVar();
 	off.subAssign( 0.5 );
 	off.mulAssign( jitter );
@@ -47444,7 +47722,7 @@ const mx_worley_distance_1 = /*@__PURE__*/ Fn( ( [ p_immutable, x_immutable, y_i
 	const y = int( y_immutable ).toVar();
 	const x = int( x_immutable ).toVar();
 	const p = vec3( p_immutable ).toVar();
-	const off = vec3( mx_cell_noise_vec3( vec3( x.add( xoff ), y.add( yoff ), z.add( zoff ) ) ) ).toVar();
+	const off = vec3( mx_cell_noise_vec3_3d( vec3( x.add( xoff ), y.add( yoff ), z.add( zoff ) ) ) ).toVar();
 	off.subAssign( 0.5 );
 	off.mulAssign( jitter );
 	off.addAssign( 0.5 );
@@ -47483,27 +47761,49 @@ const mx_worley_distance_1 = /*@__PURE__*/ Fn( ( [ p_immutable, x_immutable, y_i
 
 const mx_worley_distance = /*@__PURE__*/ overloadingFn( [ mx_worley_distance_0, mx_worley_distance_1 ] );
 
-const mx_worley_noise_float_0 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
+const mx_perlin_noise_float_scaled = ( texcoord, amplitude = 1, pivot = 0 ) => mx_perlin_noise_float( texcoord ).mul( amplitude ).add( pivot );
 
-	const metric = int( metric_immutable ).toVar();
-	const jitter = float( jitter_immutable ).toVar();
-	const p = vec2( p_immutable ).toVar();
-	const X = int().toVar(), Y = int().toVar();
-	const localpos = vec2( mx_floorfrac( p.x, X ), mx_floorfrac( p.y, Y ) ).toVar();
+const mx_worley_noise_float_3d$1 = /*@__PURE__*/ Fn( ( [ positionInput, jitterInput, styleInput ] ) => {
+
+	const position = vec3( positionInput ).toVar();
+	const jitter = float( jitterInput ).toVar();
+	const style = int( styleInput ).toVar();
+	const X = int().toVar(), Y = int().toVar(), Z = int().toVar();
+	const localpos = vec3( mx_floorfrac( position.x, X ), mx_floorfrac( position.y, Y ), mx_floorfrac( position.z, Z ) ).toVar();
 	const sqdist = float( 1e6 ).toVar();
+	const minpos = vec3( 0, 0, 0 ).toVar();
 
 	Loop( { start: -1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
 
 		Loop( { start: -1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
 
-			const dist = float( mx_worley_distance( localpos, x, y, X, Y, jitter, metric ) ).toVar();
-			sqdist.assign( min$1( sqdist, dist ) );
+			Loop( { start: -1, end: int( 1 ), name: 'z', condition: '<=' }, ( { z } ) => {
+
+				const dist = float( mx_worley_distance( localpos, x, y, z, X, Y, Z, jitter, int( 0 ) ) ).toVar();
+				const off = vec3( mx_cell_noise_vec3_3d( vec3( X.add( x ), Y.add( y ), Z.add( z ) ) ) ).toVar();
+				off.subAssign( 0.5 );
+				off.mulAssign( jitter );
+				off.addAssign( 0.5 );
+				const cellpos = vec3( vec3( float( x ), float( y ), float( z ) ).add( off ).sub( localpos ) ).toVar();
+
+				If( dist.lessThan( sqdist ), () => {
+
+					sqdist.assign( dist );
+					minpos.assign( cellpos );
+
+				} );
+
+			} );
 
 		} );
 
 	} );
 
-	If( metric.equal( int( 0 ) ), () => {
+	If( style.equal( int( 1 ) ), () => {
+
+		sqdist.assign( mx_cell_noise_float$1( minpos.add( position ) ) );
+
+	} ).Else( () => {
 
 		sqdist.assign( sqrt( sqdist ) );
 
@@ -47511,14 +47811,54 @@ const mx_worley_noise_float_0 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immuta
 
 	return sqdist;
 
-} ).setLayout( {
-	name: 'mx_worley_noise_float_0',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'vec2' },
-		{ name: 'jitter', type: 'float' },
-		{ name: 'metric', type: 'int' }
-	]
+} );
+
+const mx_worley_noise_float_2d$1 = /*@__PURE__*/ Fn( ( [ texcoordInput, jitterInput, styleInput ] ) => {
+
+	const texcoord = vec2( texcoordInput ).toVar();
+	const jitter = float( jitterInput ).toVar();
+	const style = int( styleInput ).toVar();
+	const floorPos = floor( texcoord ).toVar();
+	const localpos = vec2( fract( texcoord.x ), fract( texcoord.y ) ).toVar();
+	const sqdist = float( 1e6 ).toVar();
+	const minpos = vec2( 0, 0 ).toVar();
+
+	Loop( { start: -1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
+
+		Loop( { start: -1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
+
+			const cell = vec2( float( x ), float( y ) ).toVar();
+			const seed = vec2( cell.x.add( floorPos.x ), cell.y.add( floorPos.y ) ).toVar();
+			const off = vec2( mx_cell_noise_float$1( vec3( seed.x, seed.y, 0 ) ), mx_cell_noise_float$1( vec3( seed.x, seed.y, 1 ) ) ).toVar();
+			off.subAssign( 0.5 );
+			off.mulAssign( jitter );
+			off.addAssign( 0.5 );
+			const cellpos = vec2( cell.add( off ).sub( localpos ) ).toVar();
+			const dist = dot( cellpos, cellpos ).toVar();
+
+			If( dist.lessThan( sqdist ), () => {
+
+				sqdist.assign( dist );
+				minpos.assign( cellpos );
+
+			} );
+
+		} );
+
+	} );
+
+	If( style.equal( int( 1 ) ), () => {
+
+		sqdist.assign( mx_cell_noise_float$1( minpos.add( texcoord ) ) );
+
+	} ).Else( () => {
+
+		sqdist.assign( sqrt( sqdist ) );
+
+	} );
+
+	return sqdist;
+
 } );
 
 const mx_worley_noise_vec2_0 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
@@ -47622,50 +47962,6 @@ const mx_worley_noise_vec3_0 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutab
 		{ name: 'metric', type: 'int' }
 	]
 } );
-
-const mx_worley_noise_float_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
-
-	const metric = int( metric_immutable ).toVar();
-	const jitter = float( jitter_immutable ).toVar();
-	const p = vec3( p_immutable ).toVar();
-	const X = int().toVar(), Y = int().toVar(), Z = int().toVar();
-	const localpos = vec3( mx_floorfrac( p.x, X ), mx_floorfrac( p.y, Y ), mx_floorfrac( p.z, Z ) ).toVar();
-	const sqdist = float( 1e6 ).toVar();
-
-	Loop( { start: -1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
-
-		Loop( { start: -1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
-
-			Loop( { start: -1, end: int( 1 ), name: 'z', condition: '<=' }, ( { z } ) => {
-
-				const dist = float( mx_worley_distance( localpos, x, y, z, X, Y, Z, jitter, metric ) ).toVar();
-				sqdist.assign( min$1( sqdist, dist ) );
-
-			} );
-
-		} );
-
-	} );
-
-	If( metric.equal( int( 0 ) ), () => {
-
-		sqdist.assign( sqrt( sqdist ) );
-
-	} );
-
-	return sqdist;
-
-} ).setLayout( {
-	name: 'mx_worley_noise_float_1',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'vec3' },
-		{ name: 'jitter', type: 'float' },
-		{ name: 'metric', type: 'int' }
-	]
-} );
-
-const mx_worley_noise_float$1 = /*@__PURE__*/ overloadingFn( [ mx_worley_noise_float_0, mx_worley_noise_float_1 ] );
 
 const mx_worley_noise_vec2_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
 
@@ -47781,173 +48077,258 @@ const mx_worley_noise_vec3_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutab
 
 const mx_worley_noise_vec3$1 = /*@__PURE__*/ overloadingFn( [ mx_worley_noise_vec3_0, mx_worley_noise_vec3_1 ] );
 
-// Unified Noise 2D
-const mx_unifiednoise2d$1 = /*@__PURE__*/ Fn( ( [
-	noiseType_immutable, texcoord_immutable, freq_immutable, offset_immutable,
-	jitter_immutable, outmin_immutable, outmax_immutable, clampoutput_immutable,
-	octaves_immutable, lacunarity_immutable, diminish_immutable
-] ) => {
+const mx_worley_noise_vec3_style_0 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, style_immutable, metric_immutable ] ) => {
 
-	const noiseType = int( noiseType_immutable ).toVar();
-	const texcoord = vec2( texcoord_immutable ).toVar();
-	const freq = vec2( freq_immutable ).toVar();
-	const offset = vec2( offset_immutable ).toVar();
+	const metric = int( metric_immutable ).toVar();
+	const style = int( style_immutable ).toVar();
 	const jitter = float( jitter_immutable ).toVar();
-	const outmin = float( outmin_immutable ).toVar();
-	const outmax = float( outmax_immutable ).toVar();
-	const clampoutput = bool( clampoutput_immutable ).toVar();
-	const octaves = int( octaves_immutable ).toVar();
-	const lacunarity = float( lacunarity_immutable ).toVar();
-	const diminish = float( diminish_immutable ).toVar();
+	const p = vec2( p_immutable ).toVar();
+	const X = int().toVar(), Y = int().toVar();
+	const localpos = vec2( mx_floorfrac( p.x, X ), mx_floorfrac( p.y, Y ) ).toVar();
+	const sqdist = float( 1e6 ).toVar();
+	const minpos = vec2( 0, 0 ).toVar();
 
-	// Compute input position
-	const p = texcoord.mul( freq ).add( offset );
+	Loop( { start: -1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
 
-	const result = float( 0.0 ).toVar();
+		Loop( { start: -1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
 
-	// Perlin
-	If( noiseType.equal( int( 0 ) ), () => {
+			const dist = float( mx_worley_distance( localpos, x, y, X, Y, jitter, metric ) ).toVar();
+			const tmp = vec3( mx_cell_noise_vec3$1( vec2( X.add( x ), Y.add( y ) ) ) ).toVar();
+			const off = vec2( tmp.x, tmp.y ).toVar();
+			off.subAssign( 0.5 );
+			off.mulAssign( jitter );
+			off.addAssign( 0.5 );
+			const cellpos = vec2( vec2( float( x ), float( y ) ).add( off ).sub( localpos ) ).toVar();
 
-		result.assign( mx_perlin_noise_vec3( p ) );
+			If( dist.lessThan( sqdist ), () => {
 
-	} );
+				sqdist.assign( dist );
+				minpos.assign( cellpos );
 
-	// Cell
-	If( noiseType.equal( int( 1 ) ), () => {
+			} );
 
-		result.assign( mx_cell_noise_vec3( p ) );
-
-	} );
-
-	// Worley (metric=0 = euclidean)
-	If( noiseType.equal( int( 2 ) ), () => {
-
-		result.assign( mx_worley_noise_vec3$1( p, jitter, int( 0 ) ) );
+		} );
 
 	} );
 
-	// Fractal (use vec3(p, 0.0) for 2D input)
-	If( noiseType.equal( int( 3 ) ), () => {
+	const result = vec3( mx_worley_noise_vec3$1( p, jitter, metric ) ).toVar();
+	If( style.equal( int( 1 ) ), () => {
 
-		result.assign( mx_fractal_noise_vec3$1( vec3( p, 0.0 ), octaves, lacunarity, diminish ) );
-
-	} );
-
-	// Remap output to [outmin, outmax]
-	result.assign( result.mul( outmax.sub( outmin ) ).add( outmin ) );
-
-	// Clamp if requested
-	If( clampoutput, () => {
-
-		result.assign( clamp( result, outmin, outmax ) );
+		result.assign( mx_cell_noise_vec3$1( minpos.add( p ) ) );
 
 	} );
 
 	return result;
 
 } ).setLayout( {
-	name: 'mx_unifiednoise2d',
-	type: 'float',
+	name: 'mx_worley_noise_vec3_style_0',
+	type: 'vec3',
 	inputs: [
-		{ name: 'noiseType', type: 'int' },
-		{ name: 'texcoord', type: 'vec2' },
-		{ name: 'freq', type: 'vec2' },
-		{ name: 'offset', type: 'vec2' },
+		{ name: 'p', type: 'vec2' },
 		{ name: 'jitter', type: 'float' },
-		{ name: 'outmin', type: 'float' },
-		{ name: 'outmax', type: 'float' },
-		{ name: 'clampoutput', type: 'bool' },
-		{ name: 'octaves', type: 'int' },
-		{ name: 'lacunarity', type: 'float' },
-		{ name: 'diminish', type: 'float' }
+		{ name: 'style', type: 'int' },
+		{ name: 'metric', type: 'int' }
 	]
+} );
+
+const mx_worley_noise_vec3_style_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, style_immutable, metric_immutable ] ) => {
+
+	const metric = int( metric_immutable ).toVar();
+	const style = int( style_immutable ).toVar();
+	const jitter = float( jitter_immutable ).toVar();
+	const p = vec3( p_immutable ).toVar();
+	const X = int().toVar(), Y = int().toVar(), Z = int().toVar();
+	const localpos = vec3( mx_floorfrac( p.x, X ), mx_floorfrac( p.y, Y ), mx_floorfrac( p.z, Z ) ).toVar();
+	const sqdist = float( 1e6 ).toVar();
+	const minpos = vec3( 0, 0, 0 ).toVar();
+
+	Loop( { start: -1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
+
+		Loop( { start: -1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
+
+			Loop( { start: -1, end: int( 1 ), name: 'z', condition: '<=' }, ( { z } ) => {
+
+				const dist = float( mx_worley_distance( localpos, x, y, z, X, Y, Z, jitter, metric ) ).toVar();
+				const off = vec3( mx_cell_noise_vec3_3d( vec3( X.add( x ), Y.add( y ), Z.add( z ) ) ) ).toVar();
+				off.subAssign( 0.5 );
+				off.mulAssign( jitter );
+				off.addAssign( 0.5 );
+				const cellpos = vec3( vec3( float( x ), float( y ), float( z ) ).add( off ).sub( localpos ) ).toVar();
+
+				If( dist.lessThan( sqdist ), () => {
+
+					sqdist.assign( dist );
+					minpos.assign( cellpos );
+
+				} );
+
+			} );
+
+		} );
+
+	} );
+
+	const result = vec3( mx_worley_noise_vec3$1( p, jitter, metric ) ).toVar();
+	If( style.equal( int( 1 ) ), () => {
+
+		result.assign( mx_cell_noise_vec3_3d( minpos.add( p ) ) );
+
+	} );
+
+	return result;
+
+} ).setLayout( {
+	name: 'mx_worley_noise_vec3_style_1',
+	type: 'vec3',
+	inputs: [
+		{ name: 'p', type: 'vec3' },
+		{ name: 'jitter', type: 'float' },
+		{ name: 'style', type: 'int' },
+		{ name: 'metric', type: 'int' }
+	]
+} );
+
+const mx_worley_noise_vec3_style$1 = /*@__PURE__*/ overloadingFn( [ mx_worley_noise_vec3_style_0, mx_worley_noise_vec3_style_1 ] );
+
+// Unified Noise 2D
+const mx_unifiednoise2d$1 = /*@__PURE__*/ Fn( ( [
+	noiseTypeInput,
+	texcoordInput,
+	freqInput,
+	offsetInput,
+	jitterInput,
+	outminInput,
+	outmaxInput,
+	clampoutputInput,
+	octavesInput,
+	lacunarityInput,
+	diminishInput,
+	styleInput
+] ) => {
+
+	const noiseType = int( noiseTypeInput ).toVar();
+	const texcoord = vec2( texcoordInput ).toVar();
+	const freq = vec2( freqInput ).toVar();
+	const offset = vec2( offsetInput ).toVar();
+	const jitter = float( jitterInput ).toVar();
+	const outmin = float( outminInput ).toVar();
+	const outmax = float( outmaxInput ).toVar();
+	const clampoutput = float( clampoutputInput ).toVar();
+	const octaves = int( octavesInput ).toVar();
+	const lacunarity = float( lacunarityInput ).toVar();
+	const diminish = float( diminishInput ).toVar();
+	const style = int( styleInput ).toVar();
+
+	const applyFreq = mul( texcoord, freq ).toVar();
+	const applyOffset = add( applyFreq, offset ).toVar();
+	const cellJitterMult = mul( sub( jitter, 1 ), 90000 ).toVar();
+	const applyCellJitter = mx_rotate2d( applyOffset, cellJitterMult ).toVar();
+	const fractalInput = vec3( applyOffset.x, applyOffset.y, cellJitterMult ).toVar();
+	const result = float( 0 ).toVar();
+
+	If( noiseType.equal( int( 0 ) ), () => {
+
+		result.assign( mx_perlin_noise_float_scaled( applyCellJitter, 0.5, 0.5 ) );
+
+	} );
+	If( noiseType.equal( int( 1 ) ), () => {
+
+		result.assign( mx_cell_noise_float$1( applyCellJitter ) );
+
+	} );
+	If( noiseType.equal( int( 2 ) ), () => {
+
+		result.assign( mx_worley_noise_float_2d$1( applyOffset, jitter, style ) );
+
+	} );
+	If( noiseType.equal( int( 3 ) ), () => {
+
+		result.assign( mx_fractal_noise_float$1( fractalInput, octaves, lacunarity, diminish ) );
+
+	} );
+
+	const ranged = add( outmin, mul( result, sub( outmax, outmin ) ) ).toVar();
+	const clamped = clamp( ranged, outmin, outmax ).toVar();
+	const output = ranged.toVar();
+
+	If( clampoutput.equal( float( 1 ) ), () => {
+
+		output.assign( clamped );
+
+	} );
+
+	return output;
+
 } );
 
 // Unified Noise 3D
 const mx_unifiednoise3d$1 = /*@__PURE__*/ Fn( ( [
-	noiseType_immutable, position_immutable, freq_immutable, offset_immutable,
-	jitter_immutable, outmin_immutable, outmax_immutable, clampoutput_immutable,
-	octaves_immutable, lacunarity_immutable, diminish_immutable
+	noiseTypeInput,
+	positionInput,
+	freqInput,
+	offsetInput,
+	jitterInput,
+	outminInput,
+	outmaxInput,
+	clampoutputInput,
+	octavesInput,
+	lacunarityInput,
+	diminishInput,
+	styleInput
 ] ) => {
 
-	const noiseType = int( noiseType_immutable ).toVar();
-	const position = vec3( position_immutable ).toVar();
-	const freq = vec3( freq_immutable ).toVar();
-	const offset = vec3( offset_immutable ).toVar();
-	const jitter = float( jitter_immutable ).toVar();
-	const outmin = float( outmin_immutable ).toVar();
-	const outmax = float( outmax_immutable ).toVar();
-	const clampoutput = bool( clampoutput_immutable ).toVar();
-	const octaves = int( octaves_immutable ).toVar();
-	const lacunarity = float( lacunarity_immutable ).toVar();
-	const diminish = float( diminish_immutable ).toVar();
+	const noiseType = int( noiseTypeInput ).toVar();
+	const position = vec3( positionInput ).toVar();
+	const freq = vec3( freqInput ).toVar();
+	const offset = vec3( offsetInput ).toVar();
+	const jitter = float( jitterInput ).toVar();
+	const outmin = float( outminInput ).toVar();
+	const outmax = float( outmaxInput ).toVar();
+	const clampoutput = float( clampoutputInput ).toVar();
+	const octaves = int( octavesInput ).toVar();
+	const lacunarity = float( lacunarityInput ).toVar();
+	const diminish = float( diminishInput ).toVar();
+	const style = int( styleInput ).toVar();
 
-	// Compute input position
-	const p = position.mul( freq ).add( offset );
+	const applyFreq = mul( position, freq ).toVar();
+	const applyOffset = add( applyFreq, offset ).toVar();
+	const cellJitterMult = mul( sub( jitter, 1 ), 90000 ).toVar();
+	const applyCellJitter = mx_rotate3d( applyOffset, cellJitterMult, vec3( 0.1, 1, 0 ) ).toVar();
+	const perlin = mx_perlin_noise_float_scaled( applyCellJitter, 0.5, 0.5 );
+	const cell = mx_cell_noise_float$1( applyCellJitter );
+	const worley = mx_worley_noise_float_3d$1( applyOffset, jitter, style );
+	const fractal = mx_fractal_noise_float$1( applyCellJitter, octaves, lacunarity, diminish );
+	const result = perlin.toVar();
 
-	const result = float( 0.0 ).toVar();
-
-	// Perlin
-	If( noiseType.equal( int( 0 ) ), () => {
-
-		result.assign( mx_perlin_noise_vec3( p ) );
-
-	} );
-
-	// Cell
 	If( noiseType.equal( int( 1 ) ), () => {
 
-		result.assign( mx_cell_noise_vec3( p ) );
+		result.assign( cell );
 
 	} );
-
-	// Worley (metric=0 = euclidean)
 	If( noiseType.equal( int( 2 ) ), () => {
 
-		result.assign( mx_worley_noise_vec3$1( p, jitter, int( 0 ) ) );
+		result.assign( worley );
 
 	} );
-
-	// Fractal
 	If( noiseType.equal( int( 3 ) ), () => {
 
-		result.assign( mx_fractal_noise_vec3$1( p, octaves, lacunarity, diminish ) );
+		result.assign( fractal );
 
 	} );
 
-	// Remap output to [outmin, outmax]
-	result.assign( result.mul( outmax.sub( outmin ) ).add( outmin ) );
+	const ranged = add( outmin, mul( result, sub( outmax, outmin ) ) ).toVar();
+	const clamped = clamp( ranged, outmin, outmax ).toVar();
+	const output = ranged.toVar();
 
-	// Clamp if requested
-	If( clampoutput, () => {
+	If( clampoutput.equal( float( 1 ) ), () => {
 
-		result.assign( clamp( result, outmin, outmax ) );
+		output.assign( clamped );
 
 	} );
 
-	return result;
+	return output;
 
-} ).setLayout( {
-	name: 'mx_unifiednoise3d',
-	type: 'float',
-	inputs: [
-		{ name: 'noiseType', type: 'int' },
-		{ name: 'position', type: 'vec3' },
-		{ name: 'freq', type: 'vec3' },
-		{ name: 'offset', type: 'vec3' },
-		{ name: 'jitter', type: 'float' },
-		{ name: 'outmin', type: 'float' },
-		{ name: 'outmax', type: 'float' },
-		{ name: 'clampoutput', type: 'bool' },
-		{ name: 'octaves', type: 'int' },
-		{ name: 'lacunarity', type: 'float' },
-		{ name: 'diminish', type: 'float' }
-	]
 } );
-
-// Three.js Transpiler
-// https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/libraries/stdlib/genglsl/lib/mx_hsv.glsl
-
 
 const mx_hsvtorgb = /*@__PURE__*/ Fn( ( [ hsv ] ) => {
 
@@ -48070,10 +48451,6 @@ const mx_rgbtohsv = /*@__PURE__*/ Fn( ( [ c_immutable ] ) => {
 	]
 } );
 
-// Three.js Transpiler
-// https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/libraries/stdlib/genglsl/lib/mx_transform_color.glsl
-
-
 const mx_srgb_texture_to_lin_rec709 = /*@__PURE__*/ Fn( ( [ color_immutable ] ) => {
 
 	const color = vec3( color_immutable ).toVar();
@@ -48104,7 +48481,7 @@ const mx_aastep = ( threshold, value ) => {
 
 const _ramp = ( a, b, uv, p ) => mix( a, b, uv[ p ].clamp() );
 const mx_ramplr = ( valuel, valuer, texcoord = uv$1() ) => _ramp( valuel, valuer, texcoord, 'x' );
-const mx_ramptb = ( valuet, valueb, texcoord = uv$1() ) => _ramp( valuet, valueb, texcoord, 'y' );
+const mx_ramptb = ( valueb, valuet, texcoord = uv$1() ) => _ramp( valueb, valuet, texcoord, 'y' );
 
 // Bilinear ramp: interpolate between four corners (tl, tr, bl, br) using texcoord.x and texcoord.y
 const mx_ramp4 = (
@@ -48115,13 +48492,13 @@ const mx_ramp4 = (
 	const v = texcoord.y.clamp();
 	const top = mix( valuetl, valuetr, u );
 	const bottom = mix( valuebl, valuebr, u );
-	return mix( top, bottom, v );
+	return mix( bottom, top, v );
 
 };
 
 const _split = ( a, b, center, uv, p ) => mix( a, b, mx_aastep( center, uv[ p ] ) );
 const mx_splitlr = ( valuel, valuer, center, texcoord = uv$1() ) => _split( valuel, valuer, center, texcoord, 'x' );
-const mx_splittb = ( valuet, valueb, center, texcoord = uv$1() ) => _split( valuet, valueb, center, texcoord, 'y' );
+const mx_splittb = ( valueb, valuet, center, texcoord = uv$1() ) => _split( valueb, valuet, center, texcoord, 'y' );
 
 const mx_transform_uv = ( uv_scale = 1, uv_offset = 0, uv_geo = uv$1() ) => uv_geo.mul( uv_scale ).add( uv_offset );
 
@@ -48148,15 +48525,32 @@ const mx_noise_vec4 = ( texcoord = uv$1(), amplitude = 1, pivot = 0 ) => {
 
 };
 
-const mx_unifiednoise2d = ( noiseType, texcoord = uv$1(), freq = vec2( 1, 1 ), offset = vec2( 0, 0 ), jitter = 1, outmin = 0, outmax = 1, clampoutput = false, octaves = 1, lacunarity = 2, diminish = .5 ) => mx_unifiednoise2d$1( noiseType, texcoord.convert( 'vec2|vec3' ), freq, offset, jitter, outmin, outmax, clampoutput, octaves, lacunarity, diminish );
-const mx_unifiednoise3d = ( noiseType, texcoord = uv$1(), freq = vec2( 1, 1 ), offset = vec2( 0, 0 ), jitter = 1, outmin = 0, outmax = 1, clampoutput = false, octaves = 1, lacunarity = 2, diminish = .5 ) => mx_unifiednoise3d$1( noiseType, texcoord.convert( 'vec2|vec3' ), freq, offset, jitter, outmin, outmax, clampoutput, octaves, lacunarity, diminish );
+const mx_smoothstep = ( inNode, low = 0, high = 1 ) => {
 
-const mx_worley_noise_float = ( texcoord = uv$1(), jitter = 1 ) => mx_worley_noise_float$1( texcoord.convert( 'vec2|vec3' ), jitter, int( 1 ) );
+	const range = sub( high, low );
+	const safeRange = max$1( abs( range ), float( 1e-6 ) );
+	const t = clamp( div( sub( inNode, low ), safeRange ), float( 0 ), float( 1 ) );
+	const hermite = mul( mul( t, t ), sub( float( 3 ), mul( float( 2 ), t ) ) );
+	const fallback = step( high, inNode );
+	const useFallback = step( high, low );
+	return mix( hermite, fallback, useFallback );
+
+};
+
+const mx_cell_noise_vec3 = ( texcoord = uv$1() ) => mx_cell_noise_vec3$1( texcoord.convert( 'vec2|vec3' ) );
+const mx_worley_noise_float_2d = ( texcoord = uv$1(), jitter = 1, style = 0 ) => mx_worley_noise_float_2d$1( texcoord, jitter, style );
+const mx_worley_noise_float_3d = ( texcoord = uv$1(), jitter = 1, style = 0 ) => mx_worley_noise_float_3d$1( texcoord, jitter, style );
+const mx_unifiednoise2d = ( noiseType, texcoord = uv$1(), freq = vec2( 1, 1 ), offset = vec2( 0, 0 ), jitter = 1, outmin = 0, outmax = 1, clampoutput = false, octaves = 1, lacunarity = 2, diminish = .5, style = 0 ) => mx_unifiednoise2d$1( noiseType, texcoord, freq, offset, jitter, outmin, outmax, clampoutput, octaves, lacunarity, diminish, style );
+const mx_unifiednoise3d = ( noiseType, texcoord = uv$1(), freq = vec3( 1, 1, 1 ), offset = vec3( 0, 0, 0 ), jitter = 1, outmin = 0, outmax = 1, clampoutput = false, octaves = 1, lacunarity = 2, diminish = .5, style = 0 ) => mx_unifiednoise3d$1( noiseType, texcoord, freq, offset, jitter, outmin, outmax, clampoutput, octaves, lacunarity, diminish, style );
+
+const mx_worley_noise_float = ( texcoord = uv$1(), jitter = 1, style = 0 ) => mx_worley_noise_float_3d( texcoord.convert( 'vec2|vec3' ), jitter, style );
 const mx_worley_noise_vec2 = ( texcoord = uv$1(), jitter = 1 ) => mx_worley_noise_vec2$1( texcoord.convert( 'vec2|vec3' ), jitter, int( 1 ) );
-const mx_worley_noise_vec3 = ( texcoord = uv$1(), jitter = 1 ) => mx_worley_noise_vec3$1( texcoord.convert( 'vec2|vec3' ), jitter, int( 1 ) );
+const mx_worley_noise_vec3 = ( texcoord = uv$1(), jitter = 1, metric = 1 ) => mx_worley_noise_vec3$1( texcoord.convert( 'vec2|vec3' ), jitter, int( metric ) );
+const mx_worley_noise_vec3_style = ( texcoord = uv$1(), jitter = 1, style = 0, metric = 0 ) => mx_worley_noise_vec3_style$1( texcoord.convert( 'vec2|vec3' ), jitter, int( style ), int( metric ) );
 
 const mx_cell_noise_float = ( texcoord = uv$1() ) => mx_cell_noise_float$1( texcoord.convert( 'vec2|vec3' ) );
 
+const mx_fractal_noise_float_2d = ( texcoord = uv$1(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => mx_fractal_noise_float_2d$1( texcoord, int( octaves ), lacunarity, diminish ).mul( amplitude );
 const mx_fractal_noise_float = ( position = uv$1(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => mx_fractal_noise_float$1( position, int( octaves ), lacunarity, diminish ).mul( amplitude );
 const mx_fractal_noise_vec2 = ( position = uv$1(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => mx_fractal_noise_vec2$1( position, int( octaves ), lacunarity, diminish ).mul( amplitude );
 const mx_fractal_noise_vec3 = ( position = uv$1(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => mx_fractal_noise_vec3$1( position, int( octaves ), lacunarity, diminish ).mul( amplitude );
@@ -48169,15 +48563,15 @@ const mx_add = ( in1, in2 = float( 0 ) ) => add( in1, in2 );
 const mx_subtract = ( in1, in2 = float( 0 ) ) => sub( in1, in2 );
 const mx_multiply = ( in1, in2 = float( 1 ) ) => mul( in1, in2 );
 const mx_divide = ( in1, in2 = float( 1 ) ) => div( in1, in2 );
-const mx_modulo = ( in1, in2 = float( 1 ) ) => mod( in1, in2 );
+const mx_modulo = ( in1, in2 = float( 1 ) ) => sub( in1, mul( in2, floor( div( in1, in2 ) ) ) );
 const mx_power = ( in1, in2 = float( 1 ) ) => pow( in1, in2 );
 const mx_atan2 = ( in1 = float( 0 ), in2 = float( 1 ) ) => atan( in1, in2 );
 const mx_timer = () => time;
 const mx_frame = () => frameId;
 const mx_invert = ( in1, amount = float( 1 ) ) => sub( amount, in1 );
-const mx_ifgreater = ( value1, value2, in1, in2 ) => value1.greaterThan( value2 ).mix( in1, in2 );
-const mx_ifgreatereq = ( value1, value2, in1, in2 ) => value1.greaterThanEqual( value2 ).mix( in1, in2 );
-const mx_ifequal = ( value1, value2, in1, in2 ) => value1.equal( value2 ).mix( in1, in2 );
+const mx_ifgreater = ( value1, value2, in1, in2 ) => value1.greaterThan( value2 ).mix( in2, in1 );
+const mx_ifgreatereq = ( value1, value2, in1, in2 ) => value1.greaterThanEqual( value2 ).mix( in2, in1 );
+const mx_ifequal = ( value1, value2, in1, in2 ) => value1.equal( value2 ).mix( in2, in1 );
 
 // Enhanced separate node to support multi-output referencing (outx, outy, outz, outw)
 const mx_separate = ( in1, channelOrOut = null ) => {
@@ -48208,66 +48602,35 @@ const mx_separate = ( in1, channelOrOut = null ) => {
 };
 
 const mx_place2d = (
-	texcoord, pivot = vec2( 0.5, 0.5 ), scale = vec2( 1, 1 ), rotate = float( 0 ), offset = vec2( 0, 0 )/*, operationorder = int( 0 )*/
+	texcoord, pivot = vec2( 0, 0 ), scale = vec2( 1, 1 ), rotate = float( 0 ), offset = vec2( 0, 0 ), operationorder = int( 0 )
 ) => {
 
-	let uv = texcoord;
-	if ( pivot ) uv = uv.sub( pivot );
-	if ( scale ) uv = uv.mul( scale );
-	if ( rotate ) {
+	const centered = sub( texcoord, pivot );
+	const srt = add( sub( mx_rotate2d( div( centered, scale ), rotate ), offset ), pivot );
+	const trs = add( div( mx_rotate2d( sub( centered, offset ), rotate ), scale ), pivot );
 
-		const rad = rotate.mul( Math.PI / 180.0 );
-		const cosR = rad.cos();
-		const sinR = rad.sin();
-		uv = vec2(
-			uv.x.mul( cosR ).sub( uv.y.mul( sinR ) ),
-			uv.x.mul( sinR ).add( uv.y.mul( cosR ) )
-		);
+	if ( typeof operationorder === 'number' ) return Math.abs( operationorder ) > Number.EPSILON ? trs : srt;
 
-	}
-
-	if ( pivot ) uv = uv.add( pivot );
-	if ( offset ) uv = uv.add( offset );
-	return uv;
+	return mix( srt, trs, step( 0.5, float( operationorder ) ) );
 
 };
 
-const mx_rotate2d = ( input, amount ) => {
+const mx_heighttonormal = ( input, scale = 1, texcoord = uv$1() ) => {
 
-	input = vec2( input );
-	amount = float( amount );
-
-	const radians = amount.mul( Math.PI / 180.0 );
-	return rotate( input, radians );
-
-};
-
-const mx_rotate3d = ( input, amount, axis ) => {
-
-	input = vec3( input );
-	amount = float( amount );
-	axis = vec3( axis );
-
-
-	const radians = amount.mul( Math.PI / 180.0 );
-	const nAxis = axis.normalize();
-	const cosA = radians.cos();
-	const sinA = radians.sin();
-	const oneMinusCosA = float( 1 ).sub( cosA );
-	const rot =
-		input.mul( cosA )
-			.add( nAxis.cross( input ).mul( sinA ) )
-			.add( nAxis.mul( nAxis.dot( input ) ).mul( oneMinusCosA ) );
-	return rot;
-
-};
-
-const mx_heighttonormal = ( input, scale/*, texcoord*/ ) => {
-
-	input = vec3( input );
-	scale = float( scale );
-
-	return bumpMap( input, scale );
+	const sobelScale = float( 1.0 / 16.0 );
+	const height = float( input );
+	const uvNode = vec2( texcoord );
+	const dHdS = vec2( height.dFdx(), height.dFdy() ).mul( float( scale ) ).mul( sobelScale );
+	const dUdS = vec2( uvNode.x.dFdx(), uvNode.x.dFdy() );
+	const dVdS = vec2( uvNode.y.dFdx(), uvNode.y.dFdy() );
+	const tangent = vec3( dUdS.x, dVdS.x, dHdS.x );
+	const bitangent = vec3( dUdS.y, dVdS.y, dHdS.y );
+	let n = cross( tangent, bitangent );
+	const invalid = dot( n, n ).lessThan( float( 1e-12 ) );
+	n = invalid.mix( n, vec3( 0, 0, 1 ) );
+	const mirrored = n.z.lessThan( float( 0 ) );
+	n = mirrored.mix( n, n.mul( -1 ) );
+	return normalize( n ).mul( 0.5 ).add( 0.5 );
 
 };
 
@@ -48354,9 +48717,11 @@ var TSL = /*#__PURE__*/Object.freeze({
 	NodeShaderStage: NodeShaderStage,
 	NodeType: NodeType,
 	NodeUpdateType: NodeUpdateType,
+	OnAfterRenderPipeline: OnAfterRenderPipeline,
 	OnBeforeFrameUpdate: OnBeforeFrameUpdate,
 	OnBeforeMaterialUpdate: OnBeforeMaterialUpdate,
 	OnBeforeObjectUpdate: OnBeforeObjectUpdate,
+	OnBeforeRenderPipeline: OnBeforeRenderPipeline,
 	OnFrameUpdate: OnFrameUpdate,
 	OnMaterialUpdate: OnMaterialUpdate,
 	OnObjectUpdate: OnObjectUpdate,
@@ -48642,7 +49007,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	materialReference: materialReference,
 	materialReflectivity: materialReflectivity,
 	materialRefractionRatio: materialRefractionRatio,
-	materialRetroreflective: materialRetroreflective,
+	materialRetroreflectivity: materialRetroreflectivity,
 	materialRotation: materialRotation,
 	materialRoughness: materialRoughness,
 	materialSheen: materialSheen,
@@ -48679,9 +49044,11 @@ var TSL = /*#__PURE__*/Object.freeze({
 	mx_add: mx_add,
 	mx_atan2: mx_atan2,
 	mx_cell_noise_float: mx_cell_noise_float,
+	mx_cell_noise_vec3: mx_cell_noise_vec3,
 	mx_contrast: mx_contrast,
 	mx_divide: mx_divide,
 	mx_fractal_noise_float: mx_fractal_noise_float,
+	mx_fractal_noise_float_2d: mx_fractal_noise_float_2d,
 	mx_fractal_noise_vec2: mx_fractal_noise_vec2,
 	mx_fractal_noise_vec3: mx_fractal_noise_vec3,
 	mx_fractal_noise_vec4: mx_fractal_noise_vec4,
@@ -48707,6 +49074,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	mx_rotate3d: mx_rotate3d,
 	mx_safepower: mx_safepower,
 	mx_separate: mx_separate,
+	mx_smoothstep: mx_smoothstep,
 	mx_splitlr: mx_splitlr,
 	mx_splittb: mx_splittb,
 	mx_srgb_texture_to_lin_rec709: mx_srgb_texture_to_lin_rec709,
@@ -48716,8 +49084,11 @@ var TSL = /*#__PURE__*/Object.freeze({
 	mx_unifiednoise2d: mx_unifiednoise2d,
 	mx_unifiednoise3d: mx_unifiednoise3d,
 	mx_worley_noise_float: mx_worley_noise_float,
+	mx_worley_noise_float_2d: mx_worley_noise_float_2d,
+	mx_worley_noise_float_3d: mx_worley_noise_float_3d,
 	mx_worley_noise_vec2: mx_worley_noise_vec2,
 	mx_worley_noise_vec3: mx_worley_noise_vec3,
+	mx_worley_noise_vec3_style: mx_worley_noise_vec3_style,
 	negate: negate,
 	negateOnBackSide: negateOnBackSide,
 	neutralToneMapping: neutralToneMapping,
@@ -48815,7 +49186,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	renderOutput: renderOutput,
 	rendererReference: rendererReference,
 	replaceDefaultUV: replaceDefaultUV,
-	retroreflective: retroreflective,
+	retroreflectivity: retroreflectivity,
 	rotate: rotate,
 	rotateUV: rotateUV,
 	roughness: roughness,
@@ -51419,6 +51790,17 @@ class NodeBuilder {
 	get currentNode() {
 
 		return this.chaining[ this.chaining.length - 1 ];
+
+	}
+
+	/**
+	 * A reference to the render pipeline.
+	 *
+	 * @type {RenderPipeline}
+	 */
+	get renderPipeline() {
+
+		return this.context.renderPipeline;
 
 	}
 
@@ -55435,6 +55817,10 @@ class NodeManager extends DataMap {
 	_createNodeBuilder( renderObject, material ) {
 
 		const nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer );
+		const onNodeBuilderCreated = this.renderer.debug.onNodeBuilderCreated;
+
+		if ( onNodeBuilderCreated !== null ) onNodeBuilderCreated( nodeBuilder, renderObject );
+
 		nodeBuilder.scene = renderObject.scene;
 		nodeBuilder.material = material;
 		nodeBuilder.camera = renderObject.camera;
@@ -55727,6 +56113,10 @@ class NodeManager extends DataMap {
 		if ( nodeBuilderState === undefined || computeData.version !== computeNode.version ) {
 
 			const nodeBuilder = this.backend.createNodeBuilder( computeNode, this.renderer );
+			const onNodeBuilderCreated = this.renderer.debug.onNodeBuilderCreated;
+
+			if ( onNodeBuilderCreated !== null ) onNodeBuilderCreated( nodeBuilder, computeNode );
+
 			nodeBuilder.build();
 
 			nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
@@ -56849,11 +57239,10 @@ class NodeLibrary {
 }
 
 const _defaultLights = /*@__PURE__*/ new LightsNode();
-const _weakMap = /*@__PURE__*/ new WeakMap();
 
 /**
  * This renderer module manages the lights nodes which are unique
- * per scene and camera combination.
+ * per scene + camera + lighting combination.
  *
  * The lights node itself is later configured in the render list
  * with the actual lights from the scene.
@@ -56883,6 +57272,14 @@ class Lighting {
 		 */
 		this._cache = [];
 
+		/**
+		 * A map of lights nodes per scene.
+		 *
+		 * @private
+		 * @type {WeakMap<Scene, LightsNode>}
+		 */
+		this._lightsNodeMap = new WeakMap();
+
 	}
 
 	/**
@@ -56908,12 +57305,12 @@ class Lighting {
 		// Ignore renderable objects, e.g: Mesh, Sprite, etc.
 		if ( scene.isScene !== true && scene.isGroup !== true ) return _defaultLights;
 
-		let node = _weakMap.get( scene );
+		let node = this._lightsNodeMap.get( scene );
 
 		if ( node === undefined ) {
 
 			node = this.createNode();
-			_weakMap.set( scene, node );
+			this._lightsNodeMap.set( scene, node );
 
 		}
 
@@ -60062,6 +60459,7 @@ class Renderer {
 		 * @property {boolean} checkShaderErrors - Whether shader errors should be checked or not.
 		 * @property {Object} diagnostics - Diagnostics configuration for the shader generation.
 		 * @property {boolean} diagnostics.keywords - Whether declaration names that collide with reserved keywords should be renamed or not.
+		 * @property {?Function} onNodeBuilderCreated - A callback function that is executed after a node builder has been created and before it is built.
 		 * @property {?Function} onShaderError - A callback function that is executed when a shader error happens. Only supported with WebGL 2 right now.
 		 * @property {Function} getShaderAsync - Allows the get the raw shader code for the given scene, camera and 3D object.
 		 */
@@ -60076,6 +60474,7 @@ class Renderer {
 			diagnostics: {
 				keywords: false
 			},
+			onNodeBuilderCreated: null,
 			onShaderError: null,
 			getShaderAsync: async ( scene, camera, object ) => {
 
@@ -60084,7 +60483,7 @@ class Renderer {
 				const useFrameBufferTarget = this.needsFrameBufferTarget && this._renderTarget === null;
 				const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : ( this._renderTarget || this._outputRenderTarget );
 
-				const renderList = this._renderLists.get( scene, camera );
+				const renderList = this._renderLists.get( scene, camera, this.lighting );
 				const renderContext = this._renderContexts.get( renderTarget, this._mrt );
 
 				const material = scene.overrideMaterial || object.material;
@@ -60158,7 +60557,7 @@ class Renderer {
 			this._pipelines = new Pipelines( backend, this._nodes, this.info );
 			this._bindings = new Bindings( backend, this._nodes, this._textures, this._attributes, this._pipelines, this.info );
 			this._objects = new RenderObjects( this, this._nodes, this._geometries, this._pipelines, this._bindings, this.info );
-			this._renderLists = new RenderLists( this.lighting );
+			this._renderLists = new RenderLists();
 			this._bundles = new RenderBundles();
 			this._renderContexts = new RenderContexts( this );
 
@@ -60309,7 +60708,7 @@ class Renderer {
 		}
 
 		// Use sceneRef for render list to ensure lightsNode matches between compileAsync and render
-		const renderList = this._renderLists.get( sceneRef, camera );
+		const renderList = this._renderLists.get( sceneRef, camera, this.lighting );
 		renderList.begin();
 
 		this._projectObject( scene, camera, 0, renderList, renderContext.clippingContext );
@@ -61035,7 +61434,7 @@ class Renderer {
 
 		this._renderLists.update( nodeFrame.frameId );
 
-		const renderList = this._renderLists.get( scene, camera );
+		const renderList = this._renderLists.get( scene, camera, this.lighting );
 		renderList.begin();
 
 		this._projectObject( scene, camera, 0, renderList, renderContext.clippingContext );
@@ -62486,7 +62885,7 @@ class Renderer {
 
 				const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
 
-				if ( ! object.frustumCulled || frustum.intersectsSprite( object ) ) {
+				if ( ! object.frustumCulled || object.intersectsFrustum( frustum ) ) {
 
 					if ( this.sortObjects === true ) {
 
@@ -62512,7 +62911,7 @@ class Renderer {
 
 				const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
 
-				if ( ! object.frustumCulled || frustum.intersectsObject( object ) ) {
+				if ( ! object.frustumCulled || object.intersectsFrustum( frustum ) ) {
 
 					const { geometry, material } = object;
 
@@ -62562,7 +62961,7 @@ class Renderer {
 
 			// replace render list
 
-			renderList = this._renderLists.get( object, camera );
+			renderList = this._renderLists.get( object, camera, this.lighting );
 
 			const renderBundle = this._bundles.get( object, camera, this._currentRenderContext );
 			const renderBundleData = this.backend.get( renderBundle );
@@ -63467,7 +63866,9 @@ class NodeUniformBuffer extends UniformBuffer {
 	 */
 	constructor( nodeUniform, groupNode ) {
 
-		super( 'UniformBuffer_' + _id$4 ++, nodeUniform ? nodeUniform.value : null );
+		const label = nodeUniform && nodeUniform.name ? nodeUniform.name : _id$4 ++;
+
+		super( 'UniformBuffer_' + label, nodeUniform ? nodeUniform.value : null );
 
 		/**
 		 * The uniform buffer node.
@@ -73674,7 +74075,7 @@ class WebGLBackend extends Backend {
 
 			const renderTarget = descriptor.renderTarget;
 			const renderTargetContextData = this.get( renderTarget );
-			const { samples, depthBuffer, stencilBuffer } = renderTarget;
+			const { depthBuffer, stencilBuffer } = renderTarget;
 
 			const isCube = renderTarget.isCubeRenderTarget === true;
 			const isRenderTarget3D = renderTarget.isRenderTarget3D === true;
@@ -73687,6 +74088,20 @@ class WebGLBackend extends Backend {
 			const multisampledRTTExt = this.extensions.get( 'WEBGL_multisampled_render_to_texture' );
 			const multiviewExt = this.extensions.get( 'OVR_multiview2' );
 			const useMultisampledRTT = this._useMultisampledExtension( renderTarget );
+
+			let samples = renderTarget.samples;
+
+			if ( descriptor.depthTexture !== null && descriptor.depthTexture.renderTarget !== renderTarget && useMultisampledRTT === false ) {
+
+				if ( samples > 0 ) {
+
+					warnOnce( 'WebGLBackend: Shared depth texture is not supported with MSAA when "WEBGL_multisampled_render_to_texture" is unsupported. Falling back to single-sample rendering.' );
+					samples = 0;
+
+				}
+
+			}
+
 			const cacheKey = getCacheKey( descriptor );
 
 			let fb;
@@ -74199,7 +74614,7 @@ class WebGLBackend extends Backend {
 
 			const renderTargetContextData = this.get( renderTarget );
 
-			if ( renderTarget.samples > 0 && this._useMultisampledExtension( renderTarget ) === false ) {
+			if ( renderTarget.samples > 0 && renderTargetContextData.msaaFrameBuffer !== undefined && this._useMultisampledExtension( renderTarget ) === false ) {
 
 				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
 
@@ -74787,7 +75202,9 @@ class NodeStorageBuffer extends StorageBuffer {
 	 */
 	constructor( nodeUniform, groupNode ) {
 
-		super( 'StorageBuffer_' + _id ++, nodeUniform ? nodeUniform.value : null );
+		const label = nodeUniform && nodeUniform.name ? nodeUniform.name : _id ++;
+
+		super( 'StorageBuffer_' + label, nodeUniform ? nodeUniform.value : null );
 
 		/**
 		 * The node uniform.
@@ -79976,7 +80393,16 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			if ( node.isAtomic === true ) {
 
-				warn( 'WebGPURenderer: Atomic operations are only supported in compute shaders.' );
+				// Per the WGSL spec, atomic built-in functions are only allowed in
+				// the fragment and compute stages, not in the vertex stage.
+
+				if ( shaderStage === 'vertex' ) {
+
+					warn( 'WebGPURenderer: Atomic operations are not supported in the vertex stage. They are only available in the fragment and compute stages.' );
+
+					return NodeAccess.READ_ONLY;
+
+				}
 
 				return NodeAccess.READ_WRITE;
 
@@ -82459,8 +82885,6 @@ class WebGPUBindingUtils {
 
 					if ( binding.visibility & GPUShaderStage.COMPUTE ) {
 
-						// compute
-
 						if ( binding.access === NodeAccess.READ_WRITE || binding.access === NodeAccess.WRITE_ONLY ) {
 
 							buffer.type = GPUBufferBindingType.Storage;
@@ -82470,6 +82894,14 @@ class WebGPUBindingUtils {
 							buffer.type = GPUBufferBindingType.ReadOnlyStorage;
 
 						}
+
+					} else if ( binding.nodeUniform && binding.nodeUniform.isAtomic && ( binding.visibility & GPUShaderStage.FRAGMENT ) ) {
+
+						// Atomic buffers require a read_write storage binding. Per the WGSL
+						// spec this is only valid in the fragment stage (compute is handled
+						// above), so the vertex stage falls back to read-only storage.
+
+						buffer.type = GPUBufferBindingType.Storage;
 
 					} else {
 
@@ -87529,6 +87961,15 @@ class RenderPipeline {
 	constructor( renderer, outputNode = vec4( 0, 0, 1, 1 ) ) {
 
 		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isRenderPipeline = true;
+
+		/**
 		 * A reference to the renderer.
 		 *
 		 * @type {Renderer}
@@ -87585,13 +88026,13 @@ class RenderPipeline {
 		this._quadMesh.name = 'Render Pipeline';
 
 		/**
-		 * The context of the render pipeline stack.
+		 * The context data for the render pipeline.
 		 *
 		 * @private
 		 * @type {?Object}
 		 * @default null
 		 */
-		this._context = null;
+		this._contextData = null;
 
 		/**
 		 * The current tone mapping.
@@ -87623,7 +88064,7 @@ class RenderPipeline {
 
 		this._update();
 
-		if ( this._context.onBeforeRenderPipeline !== null ) this._context.onBeforeRenderPipeline();
+		for ( const callback of this._contextData.onBeforePipelineCallbacks ) callback();
 
 		const toneMapping = renderer.toneMapping;
 		const outputColorSpace = renderer.outputColorSpace;
@@ -87645,19 +88086,7 @@ class RenderPipeline {
 		renderer.toneMapping = toneMapping;
 		renderer.outputColorSpace = outputColorSpace;
 
-		if ( this._context.onAfterRenderPipeline !== null ) this._context.onAfterRenderPipeline();
-
-	}
-
-	/**
-	 * Returns the current context of the render pipeline stack.
-	 *
-	 * @readonly
-	 * @type {?Object}
-	 */
-	get context() {
-
-		return this._context;
+		for ( const callback of this._contextData.onAfterPipelineCallbacks ) callback();
 
 	}
 
@@ -87696,31 +88125,31 @@ class RenderPipeline {
 			const toneMapping = this._toneMapping;
 			const outputColorSpace = this._outputColorSpace;
 
-			const context = {
+			const contextData = {
 				renderPipeline: this,
-				onBeforeRenderPipeline: null,
-				onAfterRenderPipeline: null
+				renderPipelineState: {
+					viewOffsetOwner: null
+				},
+				onBeforePipelineCallbacks: [],
+				onAfterPipelineCallbacks: []
 			};
 
 			let outputNode = this.outputNode;
 
 			if ( this.outputColorTransform === true ) {
 
-				outputNode = outputNode.context( context );
-
 				outputNode = renderOutput( outputNode, toneMapping, outputColorSpace );
 
 			} else {
 
-				context.toneMapping = toneMapping;
-				context.outputColorSpace = outputColorSpace;
-
-				outputNode = outputNode.context( context );
+				contextData.toneMapping = toneMapping;
+				contextData.outputColorSpace = outputColorSpace;
 
 			}
 
-			this._context = context;
+			this._contextData = contextData;
 
+			this._quadMesh.material.contextNode = context( contextData );
 			this._quadMesh.material.fragmentNode = outputNode;
 			this._quadMesh.material.needsUpdate = true;
 
@@ -88002,6 +88431,22 @@ class Storage3DTexture extends Texture {
 		 *
 		 */
 		this.is3DTexture = true;
+
+	}
+
+	/**
+	 * Copies the values of the given texture to this instance.
+	 *
+	 * @param {Storage3DTexture} source - The texture to copy.
+	 * @return {Storage3DTexture} A reference to this instance.
+	 */
+	copy( source ) {
+
+		super.copy( source );
+
+		this.wrapR = source.wrapR;
+
+		return this;
 
 	}
 
