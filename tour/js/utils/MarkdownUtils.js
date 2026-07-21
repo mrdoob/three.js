@@ -509,7 +509,7 @@ function formatSignatureArgs( argsText ) {
 		const optionalHtml = isOptional ? `<span class="tsl-sig-param-optional">?</span>` : '';
 
 		// Check if it has a colon (typed argument like `callback: Function`)
-		const colonMatch = cleanArg.match( /^(\.*)?([a-zA-Z0-9_]+)\s*:\s*(.+)$/ );
+		const colonMatch = cleanArg.match( /^(\.*)?([a-zA-Z0-9_./-]+)\s*:\s*(.+)$/ );
 		if ( colonMatch ) {
 
 			const dots = colonMatch[ 1 ] || '';
@@ -632,7 +632,7 @@ function renderSingleApiCard( signature, body ) {
 		sigHtml = `<div class="tsl-api-sig-left"><code>${funcNameHtml}<span class="tsl-sig-paren">(</span></code>${argsHtml}<code><span class="tsl-sig-paren">)</span></code></div>`;
 
 		// Auto-generate single parameter descriptor for single-argument typed signatures
-		const typedArgMatch = argsText.match( /^(\.*)?([a-zA-Z0-9_]+)\s*:\s*(.+)$/ );
+		const typedArgMatch = argsText.match( /^(\.*)?([a-zA-Z0-9_./-]+)\s*:\s*(.+)$/ );
 		if ( typedArgMatch ) {
 
 			const dots = typedArgMatch[ 1 ] || '';
@@ -683,7 +683,7 @@ function renderSingleApiCard( signature, body ) {
 			line = line.trim();
 			if ( ! line ) continue;
 
-			const paramMatch = line.match( /^[\-\*]\s+\*\*([a-zA-Z0-9_.]+)\*\*\s*:\s*`([^`]+)`\s*(?:[\u2014\-]\s*)?([\s\S]*)$/ );
+			const paramMatch = line.match( /^[\-\*]\s+\*\*([a-zA-Z0-9_./-]+)\*\*\s*:\s*`([^`]+)`\s*(?:[\u2014\-]\s*)?([\s\S]*)$/ );
 			if ( paramMatch ) {
 
 				const name = paramMatch[ 1 ].trim();
@@ -803,7 +803,7 @@ function renderApiTableCard( group ) {
 			sigHtml = `<div class="tsl-api-sig-left"><code>${funcNameHtml}<span class="tsl-sig-paren">(</span></code>${argsHtml}<code><span class="tsl-sig-paren">)</span></code></div>`;
 
 			// Auto-generate single parameter descriptor for single-argument typed signatures
-			const typedArgMatch = argsText.match( /^(\.*)?([a-zA-Z0-9_]+)\s*:\s*(.+)$/ );
+			const typedArgMatch = argsText.match( /^(\.*)?([a-zA-Z0-9_./-]+)\s*:\s*(.+)$/ );
 			if ( typedArgMatch ) {
 
 				const dots = typedArgMatch[ 1 ] || '';
@@ -854,7 +854,7 @@ function renderApiTableCard( group ) {
 				line = line.trim();
 				if ( ! line ) continue;
 
-				const paramMatch = line.match( /^[\-\*]\s+\*\*([a-zA-Z0-9_.]+)\*\*\s*:\s*`([^`]+)`\s*(?:[\u2014\-]\s*)?([\s\S]*)$/ );
+				const paramMatch = line.match( /^[\-\*]\s+\*\*([a-zA-Z0-9_./-]+)\*\*\s*:\s*`([^`]+)`\s*(?:[\u2014\-]\s*)?([\s\S]*)$/ );
 				if ( paramMatch ) {
 
 					const name = paramMatch[ 1 ].trim();
