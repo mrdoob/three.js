@@ -38,7 +38,7 @@
 			import * as THREE from 'three/webgpu';
 			import { color, vec2, pass, linearDepth, normalWorld, triplanarTexture, texture, objectPosition, screenUV, viewportLinearDepth, viewportDepthTexture, viewportSharedTexture, positionWorld, time } from 'three/tsl';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
-			import { voronoi, voronoi3d } from 'three/addons/tsl/math/voronoiNoise.js';
+			import { voronoi2d, voronoi3d } from 'three/addons/tsl/math/voronoiNoise.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -157,8 +157,8 @@
 				const t = time.mul( .8 );
 				const floorUV = positionWorld.xz;
 
-				const waterLayer0 = voronoi( floorUV.mul( 6 ), t );
-				const waterLayer1 = voronoi( floorUV.mul( 3 ), t );
+				const waterLayer0 = voronoi2d( floorUV.mul( 6 ), t );
+				const waterLayer1 = voronoi2d( floorUV.mul( 3 ), t );
 
 				const waterIntensity = waterLayer0.mul( waterLayer1 );
 				const waterColor = waterIntensity.mul( 1.4 ).mix( color( 0x0487e2 ), color( 0x74ccf4 ) );
