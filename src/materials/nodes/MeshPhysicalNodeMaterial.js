@@ -1,5 +1,5 @@
-import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, specularColorBlended, specularF90, diffuseColor, metalness, roughness, anisotropy, alphaT, anisotropyT, anisotropyB, ior, transmission, thickness, attenuationDistance, attenuationColor, dispersion, retroreflective } from '../../nodes/core/PropertyNode.js';
-import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialSpecularIntensity, materialSpecularColor, materialAnisotropy, materialIOR, materialTransmission, materialThickness, materialAttenuationDistance, materialAttenuationColor, materialDispersion, materialRetroreflective } from '../../nodes/accessors/MaterialNode.js';
+import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, specularColorBlended, specularF90, diffuseColor, metalness, roughness, anisotropy, alphaT, anisotropyT, anisotropyB, ior, transmission, thickness, attenuationDistance, attenuationColor, dispersion, retroreflectivity } from '../../nodes/core/PropertyNode.js';
+import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialSpecularIntensity, materialSpecularColor, materialAnisotropy, materialIOR, materialTransmission, materialThickness, materialAttenuationDistance, materialAttenuationColor, materialDispersion, materialRetroreflectivity } from '../../nodes/accessors/MaterialNode.js';
 import { float, vec2, vec3, If } from '../../nodes/tsl/TSLBase.js';
 import getRoughness from '../../nodes/functions/material/getRoughness.js';
 import { TBNViewMatrix } from '../../nodes/accessors/AccessorsUtils.js';
@@ -253,16 +253,16 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 		/**
 		 * The retroreflective strength of physical materials is by default inferred from the
-		 * `retroreflective` property. This node property allows to overwrite the default
+		 * `retroreflectivity` property. This node property allows to overwrite the default
 		 * and define the retroreflective strength with a node instead.
 		 *
 		 * If you don't want to overwrite the retroreflective strength but modify the existing
-		 * value instead, use {@link materialRetroreflective}.
+		 * value instead, use {@link materialRetroreflectivity}.
 		 *
 		 * @type {?Node<float>}
 		 * @default null
 		 */
-		this.retroreflectiveNode = null;
+		this.retroreflectivityNode = null;
 
 		/**
 		 * The anisotropy of physical materials is by default inferred from the
@@ -361,9 +361,9 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	 * @type {boolean}
 	 * @default true
 	 */
-	get useRetroreflective() {
+	get useRetroreflection() {
 
-		return this.retroreflective > 0 || this.retroreflectiveNode !== null;
+		return this.retroreflectivity > 0 || this.retroreflectivityNode !== null;
 
 	}
 
@@ -388,7 +388,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	 */
 	setupLightingModel( /*builder*/ ) {
 
-		return new PhysicalLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useAnisotropy, this.useTransmission, this.useDispersion, this.useRetroreflective );
+		return new PhysicalLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useAnisotropy, this.useTransmission, this.useDispersion, this.useRetroreflection );
 
 	}
 
@@ -425,13 +425,13 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 		}
 
-		// RETROREFLECTIVE
+		// RETROREFLECTION
 
-		if ( this.useRetroreflective ) {
+		if ( this.useRetroreflection ) {
 
-			const retroreflectiveNode = this.retroreflectiveNode ? float( this.retroreflectiveNode ) : materialRetroreflective;
+			const retroreflectivityNode = this.retroreflectivityNode ? float( this.retroreflectivityNode ) : materialRetroreflectivity;
 
-			retroreflective.assign( retroreflectiveNode );
+			retroreflectivity.assign( retroreflectivityNode );
 
 		}
 

@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - materials - retroreflective</title>
+		<title>three.js webgpu - materials - retroreflection</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<meta property="og:title" content="three.js webgpu - materials - retroreflective">
+		<meta property="og:title" content="three.js webgpu - materials - retroreflection">
 		<meta property="og:type" content="website">
-		<meta property="og:url" content="https://threejs.org/examples/webgpu_materials_retroreflective.html">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_materials_retroreflection.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_materials_retroreflection.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
@@ -46,8 +47,8 @@
 			let frontLight, bandMaterial;
 
 			const params = {
-				retroreflectivity: true,
-				retroreflective: 1.0,
+				retroreflective: true,
+				retroreflectivity: 1.0,
 				frontLightIntensity: 5.0
 			};
 
@@ -95,8 +96,8 @@
 				controls.update();
 
 				const gui = new GUI();
-				gui.add( params, 'retroreflectivity' ).name( 'retroreflectivity' ).onChange( updateMaterial );
-				gui.add( params, 'retroreflective', 0, 1, 0.01 ).name( 'retroreflective' ).onChange( updateMaterial );
+				gui.add( params, 'retroreflective' ).name( 'retroreflective' ).onChange( updateMaterial );
+				gui.add( params, 'retroreflectivity', 0, 1, 0.01 ).name( 'retroreflectivity' ).onChange( updateMaterial );
 				gui.add( params, 'frontLightIntensity', 0, 30, 0.1 ).name( 'front light intensity' ).onChange( updateMaterial );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -120,7 +121,7 @@
 					color: 0xf7f0d6,
 					roughness: 0.22,
 					metalness: 0.0,
-					retroreflective: params.retroreflective
+					retroreflectivity: params.retroreflectivity
 				} );
 
 				const base = new THREE.Mesh(
@@ -167,7 +168,7 @@
 
 			function updateMaterial() {
 
-				bandMaterial.retroreflective = params.retroreflectivity ? params.retroreflective : 0;
+				bandMaterial.retroreflectivity = params.retroreflective ? params.retroreflectivity : 0;
 				frontLight.intensity = params.frontLightIntensity;
 
 			}

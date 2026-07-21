@@ -404,12 +404,12 @@ export const attenuationColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'colo
 export const dispersion = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Dispersion' );
 
 /**
- * TSL object that represents the shader variable `Retroreflective`.
+ * TSL object that represents the shader variable `Retroreflectivity`.
  *
  * @tsl
  * @type {PropertyNode<float>}
  */
-export const retroreflective = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Retroreflective' );
+export const retroreflectivity = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Retroreflectivity' );
 
 /**
  * TSL object that represents the shader variable `AmbientOcclusion`.

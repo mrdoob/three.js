@@ -99,8 +99,8 @@ uniform float opacity;
 	uniform float dispersion;
 #endif
 
-#ifdef USE_RETROREFLECTIVE
-	uniform float retroreflective;
+#ifdef USE_RETROREFLECTION
+	uniform float retroreflectivity;
 #endif
 
 #ifdef USE_IRIDESCENCE

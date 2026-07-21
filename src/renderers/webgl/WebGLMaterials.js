@@ -483,9 +483,9 @@ function WebGLMaterials( renderer, properties ) {
 
 		}
 
-		if ( material.retroreflective > 0 ) {
+		if ( material.retroreflectivity > 0 ) {
 
-			uniforms.retroreflective.value = material.retroreflective;
+			uniforms.retroreflectivity.value = material.retroreflectivity;
 
 		}
 
