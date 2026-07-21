@@ -36,8 +36,9 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { color, vec2, pass, linearDepth, normalWorld, triplanarTexture, texture, objectPosition, screenUV, viewportLinearDepth, viewportDepthTexture, viewportSharedTexture, positionWorld, time, Fn, float, int, Loop, dot, sin, fract, min, TWO_PI } from 'three/tsl';
+			import { color, vec2, pass, linearDepth, normalWorld, triplanarTexture, texture, objectPosition, screenUV, viewportLinearDepth, viewportDepthTexture, viewportSharedTexture, positionWorld, time } from 'three/tsl';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
+			import { voronoi } from 'three/addons/tsl/math/voronoiNoise.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -153,43 +154,11 @@
 
 				// water
 
-				const hash2 = Fn( ( [ p ] ) => {
-
-					return fract( sin( vec2( dot( p, vec2( 127.1, 311.7 ) ), dot( p, vec2( 269.5, 183.3 ) ) ) ).mul( 43758.5453 ) );
-
-				} );
-
-				const waterNoise = Fn( ( [ uv, t ] ) => {
-
-					const n = uv.floor().toConst();
-					const f = uv.fract().toConst();
-					const minDist = float( 8 ).toVar();
-
-					// animated voronoi
-
-					Loop( { start: int( - 1 ), end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
-
-						Loop( { start: int( - 1 ), end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
-
-							const g = vec2( float( x ), float( y ) ).toConst();
-							const o = hash2( n.add( g ) ).toConst();
-							const r = g.add( sin( t.add( o.mul( TWO_PI ) ) ).mul( 0.5 ).add( 0.5 ) ).sub( f );
-
-							minDist.assign( min( minDist, dot( r, r ) ) );
-
-						} );
-
-					} );
-
-					return minDist;
-
-				} );
-
 				const t = time.mul( .8 );
 				const floorUV = positionWorld.xz;
 
-				const waterLayer0 = waterNoise( floorUV.mul( 6 ), t );
-				const waterLayer1 = waterNoise( floorUV.mul( 3 ), t );
+				const waterLayer0 = voronoi( floorUV.mul( 6 ), t );
+				const waterLayer1 = voronoi( floorUV.mul( 3 ), t );
 
 				const waterIntensity = waterLayer0.mul( waterLayer1 );
 				const waterColor = waterIntensity.mul( 1.4 ).mix( color( 0x0487e2 ), color( 0x74ccf4 ) );
