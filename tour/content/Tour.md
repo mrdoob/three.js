@@ -402,7 +402,7 @@ https://www.youtube.com/watch?v=C2gDL9Qk_vo
 
 <page name="Method Chaining">
 
-__Method chaining__ will only be including operators, converters, math and some core functions. These functions, however, can be used on any __Node__.
+Method chaining will only be including operators, converters, math and some core functions. These functions, however, can be used on any __Node__.
 
 Example:
 
@@ -2129,7 +2129,7 @@ Position nodes provide access to the coordinates of vertices or fragments at dif
 
 ::: api positionViewDirection : vec3 - Normalized view direction. :::
 
-> Important: The transformed term reflects the modifications applied by processes such as __skinning__, __morphing__, and similar techniques.
+> Important: The transformed term reflects the modifications applied by processes such as **skinning**, **morphing**, and similar techniques.
 
 <code name="positionExample" default="true">Local vs World Space</code>
 
