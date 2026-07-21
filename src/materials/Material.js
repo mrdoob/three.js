@@ -4,6 +4,7 @@ import { FrontSide, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlph
 import { generateUUID } from '../math/MathUtils.js';
 import { warn } from '../utils.js';
 import { Vector2 } from '../math/Vector2.js';
+import { Plane } from '../math/Plane.js';
 
 let _materialId = 0;
 
@@ -810,6 +811,15 @@ class Material extends EventDispatcher {
 		if ( this.depthWrite === false ) data.depthWrite = this.depthWrite;
 		if ( this.colorWrite === false ) data.colorWrite = this.colorWrite;
 
+		if ( Array.isArray( this.clippingPlanes ) && this.clippingPlanes.length > 0 ) {
+
+			data.clippingPlanes = this.clippingPlanes.map( plane => plane.toJSON() );
+
+		}
+
+		if ( this.clipIntersection === true ) data.clipIntersection = true;
+		if ( this.clipShadows === true ) data.clipShadows = true;
+
 		if ( this.stencilWriteMask !== 0xff ) data.stencilWriteMask = this.stencilWriteMask;
 		if ( this.stencilFunc !== AlwaysStencilFunc ) data.stencilFunc = this.stencilFunc;
 		if ( this.stencilRef !== 0 ) data.stencilRef = this.stencilRef;
@@ -941,6 +951,9 @@ class Material extends EventDispatcher {
 		if ( json.depthTest !== undefined ) this.depthTest = json.depthTest;
 		if ( json.depthWrite !== undefined ) this.depthWrite = json.depthWrite;
 		if ( json.colorWrite !== undefined ) this.colorWrite = json.colorWrite;
+		if ( json.clippingPlanes !== undefined ) this.clippingPlanes = json.clippingPlanes.map( plane => new Plane().fromJSON( plane ) );
+		if ( json.clipIntersection !== undefined ) this.clipIntersection = json.clipIntersection;
+		if ( json.clipShadows !== undefined ) this.clipShadows = json.clipShadows;
 		if ( json.depthPacking !== undefined ) this.depthPacking = json.depthPacking;
 		if ( json.blendSrc !== undefined ) this.blendSrc = json.blendSrc;
 		if ( json.blendDst !== undefined ) this.blendDst = json.blendDst;
