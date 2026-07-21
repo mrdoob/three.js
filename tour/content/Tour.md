@@ -2404,19 +2404,31 @@ Viewport nodes return values and textures representing the screen-space viewport
 
 ### Texture
 
-::: api viewportSharedTexture( uvNode?, levelNode? ) : vec4 - Accesses what has already been rendered, preserving render-order (defaults: `uvNode = screenUV`, `levelNode = null`). :::
+::: api viewportSharedTexture( uv?, level? ) - Accesses the screen framebuffer texture already rendered in the current scene, sharing a single texture instance across all calls for optimal performance while preserving render order.
+- **uv**: `Node` — (Optional) Coordinate node used for sampling the shared viewport texture. Defaults to `screenUV`.
+- **level**: `Node` — (Optional) Mipmap level node to sample from. Defaults to `null`.
+:::
 
-::: api viewportMipTexture( uvNode?, levelNode?, framebufferTexture? ) : vec4 - Returns a viewport texture with mipmap generation enabled (defaults: `uvNode = screenUV`, `levelNode = null`, `framebufferTexture = null`). :::
+::: api viewportMipTexture( uv?, level?, framebufferTexture? ) - Returns a viewport texture with mipmap generation enabled for blurred or LOD screen-space effects.
+- **uv**: `Node` — (Optional) Coordinate node used for sampling the viewport texture. Defaults to `screenUV`.
+- **level**: `Node` — (Optional) Mipmap level node to sample from. Defaults to `null`.
+- **framebufferTexture**: `FramebufferTexture` — (Optional) Custom framebuffer texture instance. Defaults to `null`.
+:::
 
 ### Depth
 
 ::: api viewportLinearDepth : float - Returns the linear (orthographic) depth value of the current fragment. :::
 
-::: api viewportDepthTexture( uvNode?, levelNode? ) : float - Returns the depth texture of the viewport (defaults: `uvNode = screenUV`, `levelNode = null`). :::
+::: api viewportDepthTexture( uv?, level? ) - Returns the depth texture of the current viewport for screen-space depth evaluation and volume effects.
+- **uv**: `Node` — (Optional) Coordinate node used for sampling the depth texture. Defaults to `screenUV`.
+- **level**: `Node` — (Optional) Mipmap level node to sample from. Defaults to `null`.
+:::
 
 ### Utils
 
-::: api viewportSafeUV( uv? ) : vec2 - Returns safe UV coordinates for refraction purposes (defaults to `screenUV`). :::
+::: api viewportSafeUV( uv? ) - Generates depth-aware safe UV coordinates for screen-space refraction. Performs depth testing to prevent foreground objects located in front of the refractive surface from leaking into the refraction sample. Returns `vec2`.
+- **uv**: `vec2` — (Optional) Refracted UV coordinate node to evaluate. Defaults to `screenUV`.
+:::
 
 ```tsl refractionExample
 import 'scenes/shaderball';
