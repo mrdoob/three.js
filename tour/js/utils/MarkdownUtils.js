@@ -592,7 +592,7 @@ function renderSingleApiCard( signature, body ) {
 	let rowDesc = '';
 	let returnTypeHtml = '';
 
-	const sigMatch = sigText.match( /^([^\s:\-—–]+(?:\([^\)]*\))?)(?:\s*(?::|->)\s*([a-zA-Z0-9_|]+))?\s*[\-—–]\s*(.+)$/ );
+	const sigMatch = sigText.match( /^([^\s:\-—–]+(?:\([^\)]*\))?)(?:\s*(?::|->)\s*([a-zA-Z0-9_|`\s]+?))?\s*[\-—–]\s*(.+)$/ );
 	if ( sigMatch ) {
 
 		sigText = sigMatch[ 1 ].trim();
@@ -603,7 +603,8 @@ function renderSingleApiCard( signature, body ) {
 
 		if ( retType ) {
 
-			const retTypeTokens = retType.split( '|' ).map( t => t.trim() );
+			const cleanRetType = retType.replace( /`/g, '' ).trim();
+			const retTypeTokens = cleanRetType.split( '|' ).map( t => t.trim() );
 			let retHtml = '';
 			for ( let i = 0; i < retTypeTokens.length; i ++ ) {
 
@@ -763,7 +764,7 @@ function renderApiTableCard( group ) {
 		let rowDesc = '';
 		let returnTypeHtml = '';
 
-		const sigMatch = sigText.match( /^([^\s:\-—–]+(?:\([^\)]*\))?)(?:\s*(?::|->)\s*([a-zA-Z0-9_|]+))?\s*[\-—–]\s*(.+)$/ );
+		const sigMatch = sigText.match( /^([^\s:\-—–]+(?:\([^\)]*\))?)(?:\s*(?::|->)\s*([a-zA-Z0-9_|`\s]+?))?\s*[\-—–]\s*(.+)$/ );
 		if ( sigMatch ) {
 
 			sigText = sigMatch[ 1 ].trim();
@@ -774,7 +775,8 @@ function renderApiTableCard( group ) {
 
 			if ( retType ) {
 
-				const retTypeTokens = retType.split( '|' ).map( t => t.trim() );
+				const cleanRetType = retType.replace( /`/g, '' ).trim();
+				const retTypeTokens = cleanRetType.split( '|' ).map( t => t.trim() );
 				let retHtml = '';
 				for ( let i = 0; i < retTypeTokens.length; i ++ ) {
 

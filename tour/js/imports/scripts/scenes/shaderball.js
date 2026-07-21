@@ -31,6 +31,8 @@ function resetScene() {
 	scene.fogNode = null;
 	scene.backgroundNode = null;
 
+	floor.visible = true;
+
 	camera.position.set( 2, 3, 4 );
 	camera.lookAt( 0, 1, 0 );
 

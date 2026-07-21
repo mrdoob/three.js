@@ -1873,11 +1873,11 @@ Attributes are inputs that are defined per-vertex or per-instance in the geometr
 
 ### Constants
 
-::: api instanceIndex - The index of the current instance (returns `uint`). :::
+::: api instanceIndex : `uint` - The index of the current instance. :::
 
-::: api vertexIndex - The index of a vertex within a mesh (returns `uint`). :::
+::: api vertexIndex : `uint` - The index of a vertex within a mesh. :::
 
-::: api drawIndex - The draw index when using multi-draw (returns `uint`). :::
+::: api drawIndex : `uint` - The draw index when using multi-draw. :::
 
 ### Functions
 
@@ -2527,13 +2527,6 @@ Functions for creating fog effects in the scene. Assign the fog node to `scene.f
 
 ::: api exponentialHeightFogFactor( density, height ) : float - Creates an exponential height fog factor below a specified world height. :::
 
-| Name | Description | Type |
-| -- | -- | -- |
-| `fog( color, factor )` | Creates a fog node with specified color and fog factor. | `FogNode` |
-| `rangeFogFactor( near, far )` | Creates a linear fog factor based on distance from camera. | `float` |
-| `densityFogFactor( density )` | Creates an exponential squared fog factor for denser fog. | `float` |
-| `exponentialHeightFogFactor( density, height )` | Creates an exponential height fog factor below a specified world height. | `float` |
-
 <code name="volumetricFog" default="true">Volumetric Fog</code>
 
 ```tsl volumetricFog
@@ -2571,7 +2564,7 @@ const fogFactor = totalOpticalDepth.negate().exp().oneMinus();
 
 const fogColor = color( 0x06b6d4 );
 scene.fogNode = fog( fogColor, fogFactor );
-scene.backgroundNode = fogColor;
+scene.backgroundNode = fogColor.mul( 6.7 );
 
 model.material.colorNode = color( 0xffaa00 );
 ```
@@ -2589,7 +2582,7 @@ Custom procedural backgrounds and skyboxes assigned directly to `scene.backgroun
 <code name="auroraSky">3D Aurora & Stars</code>
 
 ```tsl iblSky
-import 'scenes/shaderball';
+import 'scenes/empty';
 import { positionWorldDirection, pmremTexture, color, float, vec3, time, smoothstep, mx_noise_float, Fn } from 'three/tsl';
 
 // 1. Ray Direction Vector & Corrected IBL Sampling Direction
@@ -2607,7 +2600,8 @@ const perspectivePos = vec3( dir.x.div( skyY ), float( 1.0 ), dir.z.div( skyY ) 
 
 // 4. Volumetric FBM Cloud Noise
 const cloudNoise = Fn( ( [ p ] ) => {
-	const wind = vec3( time.mul( 0.03 ), 0.0, time.mul( 0.015 ) );
+
+	const wind = vec3( time.mul( 0.1 ), 0.0, time.mul( 0.015 ) );
 	const animatedP = p.mul( 0.3 ).add( wind );
 
 	const n1 = mx_noise_float( animatedP ).mul( 0.5 ).add( 0.5 ).mul( 0.50 );
@@ -2642,17 +2636,15 @@ const finalSky = cloudAlpha.mix( iblSky, cloudColor );
 const horizonBlend = smoothstep( - 0.15, 0.15, dir.y );
 const finalBackground = horizonBlend.mix( groundColor, finalSky );
 
+// Assign to scene.backgroundNode
 scene.backgroundNode = finalBackground;
 
-// Material: Sky blue shaderball
-model.material.colorNode = color( 0x0284c7 );
-
-// Adjust camera angle for a better view of the sky and clouds
-camera.position.set( 4, .1, 6 );
+// Adjust camera angle and floor visibility for a better view of the sky and clouds
+camera.position.set( 4, 1, 4 );
 ```
 
 ```tsl auroraSky
-import 'scenes/shaderball';
+import 'scenes/empty';
 import { positionWorldDirection, color, float, vec3, time, smoothstep } from 'three/tsl';
 
 // 1. Continuous 3D Direction Vector
@@ -2699,13 +2691,11 @@ const aurora = auroraColor.mul( auroraMask ).mul( 1.2 );
 // 4. Smooth 3D Deep Space Skybox Gradient (100% continuous from Zenith to Nadir)
 const spaceBg = dir.y.mul( 0.5 ).add( 0.5 ).clamp( 0.0, 1.0 ).pow( 0.6 ).mix( color( 0x03020c ), color( 0x0d0722 ) );
 
-// Assign 3D skybox to scene.backgroundNode
+// Assign to scene.backgroundNode
 scene.backgroundNode = spaceBg.add( color( 0xffffff ).mul( stars ) ).add( aurora );
 
-// Material: Dark metallic indigo shaderball
-model.material.colorNode = color( 0x1e1b4b );
-model.material.roughness = 0.15;
-model.material.metalness = 0.85;
+// Adjust camera angle for a better view of the sky and clouds
+camera.position.set( 4, .1, 6 );
 ```
 
 </page>
