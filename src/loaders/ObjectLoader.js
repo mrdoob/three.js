@@ -741,6 +741,7 @@ class ObjectLoader extends Loader {
 
 					texture.wrapS = parseConstant( data.wrap[ 0 ], TEXTURE_WRAPPING );
 					texture.wrapT = parseConstant( data.wrap[ 1 ], TEXTURE_WRAPPING );
+					if ( data.wrap[ 2 ] !== undefined ) texture.wrapR = parseConstant( data.wrap[ 2 ], TEXTURE_WRAPPING );
 
 				}
 
@@ -1162,6 +1163,9 @@ class ObjectLoader extends Loader {
 			if ( data.shadow.bias !== undefined ) object.shadow.bias = data.shadow.bias;
 			if ( data.shadow.normalBias !== undefined ) object.shadow.normalBias = data.shadow.normalBias;
 			if ( data.shadow.radius !== undefined ) object.shadow.radius = data.shadow.radius;
+			if ( data.shadow.blurSamples !== undefined ) object.shadow.blurSamples = data.shadow.blurSamples;
+			if ( data.shadow.focus !== undefined ) object.shadow.focus = data.shadow.focus;
+			if ( data.shadow.aspect !== undefined ) object.shadow.aspect = data.shadow.aspect;
 			if ( data.shadow.mapSize !== undefined ) object.shadow.mapSize.fromArray( data.shadow.mapSize );
 			if ( data.shadow.camera !== undefined ) object.shadow.camera = this.parseObject( data.shadow.camera );
 

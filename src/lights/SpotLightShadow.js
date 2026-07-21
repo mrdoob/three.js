@@ -70,8 +70,20 @@ class SpotLightShadow extends LightShadow {
 		super.copy( source );
 
 		this.focus = source.focus;
+		this.aspect = source.aspect;
 
 		return this;
+
+	}
+
+	toJSON() {
+
+		const object = super.toJSON();
+
+		object.focus = this.focus;
+		object.aspect = this.aspect;
+
+		return object;
 
 	}
 

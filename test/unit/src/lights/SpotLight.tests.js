@@ -2,6 +2,7 @@ import { SpotLight } from '../../../../src/lights/SpotLight.js';
 
 import { Light } from '../../../../src/lights/Light.js';
 import { runStdLightTests } from '../../utils/qunit-utils.js';
+import { ObjectLoader } from '../../../../src/loaders/ObjectLoader.js';
 
 export default QUnit.module( 'Lights', () => {
 
@@ -101,6 +102,23 @@ export default QUnit.module( 'Lights', () => {
 		QUnit.test( 'Standard light tests', ( assert ) => {
 
 			runStdLightTests( assert, lights );
+
+		} );
+
+		// SERIALIZATION
+		QUnit.test( 'shadow focus, aspect and blurSamples survive toJSON and clone', ( assert ) => {
+
+			const light = new SpotLight();
+			light.shadow.focus = 0.5;
+			light.shadow.aspect = 2.5;
+			light.shadow.blurSamples = 17;
+
+			const reloaded = new ObjectLoader().parse( light.toJSON() );
+			assert.equal( reloaded.shadow.focus, 0.5, 'focus' );
+			assert.equal( reloaded.shadow.aspect, 2.5, 'aspect' );
+			assert.equal( reloaded.shadow.blurSamples, 17, 'blurSamples' );
+
+			assert.equal( light.clone().shadow.aspect, 2.5, 'aspect survives clone' );
 
 		} );
 

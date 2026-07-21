@@ -809,6 +809,9 @@ class Material extends EventDispatcher {
 		if ( this.depthTest === false ) data.depthTest = this.depthTest;
 		if ( this.depthWrite === false ) data.depthWrite = this.depthWrite;
 		if ( this.colorWrite === false ) data.colorWrite = this.colorWrite;
+		if ( this.clipIntersection === true ) data.clipIntersection = true;
+		if ( this.clipShadows === true ) data.clipShadows = true;
+		if ( this.depthPacking !== undefined ) data.depthPacking = this.depthPacking;
 
 		if ( this.stencilWriteMask !== 0xff ) data.stencilWriteMask = this.stencilWriteMask;
 		if ( this.stencilFunc !== AlwaysStencilFunc ) data.stencilFunc = this.stencilFunc;
@@ -830,6 +833,8 @@ class Material extends EventDispatcher {
 		if ( this.dashSize !== undefined ) data.dashSize = this.dashSize;
 		if ( this.gapSize !== undefined ) data.gapSize = this.gapSize;
 		if ( this.scale !== undefined ) data.scale = this.scale;
+		if ( this.linecap !== undefined ) data.linecap = this.linecap;
+		if ( this.linejoin !== undefined ) data.linejoin = this.linejoin;
 
 		if ( this.dithering === true ) data.dithering = true;
 
@@ -936,6 +941,11 @@ class Material extends EventDispatcher {
 		if ( json.depthTest !== undefined ) this.depthTest = json.depthTest;
 		if ( json.depthWrite !== undefined ) this.depthWrite = json.depthWrite;
 		if ( json.colorWrite !== undefined ) this.colorWrite = json.colorWrite;
+		if ( json.clipIntersection !== undefined ) this.clipIntersection = json.clipIntersection;
+		if ( json.clipShadows !== undefined ) this.clipShadows = json.clipShadows;
+		if ( json.depthPacking !== undefined ) this.depthPacking = json.depthPacking;
+		if ( json.linecap !== undefined ) this.linecap = json.linecap;
+		if ( json.linejoin !== undefined ) this.linejoin = json.linejoin;
 		if ( json.blendSrc !== undefined ) this.blendSrc = json.blendSrc;
 		if ( json.blendDst !== undefined ) this.blendDst = json.blendDst;
 		if ( json.blendEquation !== undefined ) this.blendEquation = json.blendEquation;

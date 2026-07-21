@@ -483,6 +483,7 @@ class Texture extends EventDispatcher {
 
 		this.wrapS = source.wrapS;
 		this.wrapT = source.wrapT;
+		if ( source.wrapR !== undefined ) this.wrapR = source.wrapR;
 
 		this.magFilter = source.magFilter;
 		this.minFilter = source.minFilter;
@@ -625,6 +626,9 @@ class Texture extends EventDispatcher {
 			unpackAlignment: this.unpackAlignment
 
 		};
+
+		// wrapR only exists on 3D and array textures, so add it to the wrap list when present
+		if ( this.wrapR !== undefined ) output.wrap.push( this.wrapR );
 
 		if ( Object.keys( this.userData ).length > 0 ) output.userData = this.userData;
 

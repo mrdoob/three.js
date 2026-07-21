@@ -1,6 +1,8 @@
 import { MeshDepthMaterial } from '../../../../src/materials/MeshDepthMaterial.js';
 
 import { Material } from '../../../../src/materials/Material.js';
+import { MaterialLoader } from '../../../../src/loaders/MaterialLoader.js';
+import { RGBADepthPacking } from '../../../../src/constants.js';
 
 export default QUnit.module( 'Materials', () => {
 
@@ -44,6 +46,18 @@ export default QUnit.module( 'Materials', () => {
 				object.isMeshDepthMaterial,
 				'MeshDepthMaterial.isMeshDepthMaterial should be true'
 			);
+
+		} );
+
+		// SERIALIZATION
+		QUnit.test( 'depthPacking survives toJSON and clone', ( assert ) => {
+
+			const material = new MeshDepthMaterial();
+			material.depthPacking = RGBADepthPacking;
+
+			const reloaded = new MaterialLoader().parse( material.toJSON() );
+			assert.equal( reloaded.depthPacking, RGBADepthPacking, 'toJSON/fromJSON keeps depthPacking' );
+			assert.equal( material.clone().depthPacking, RGBADepthPacking, 'clone keeps depthPacking' );
 
 		} );
 
