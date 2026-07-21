@@ -1074,7 +1074,6 @@ body.preview-hidden .code-modifier-inline-btn.active {
 
 /* Inverted Vertical Resizer Toggle Button */
 .resizer-v-toggle-btn.inverted {
-	display: none;
 	bottom: auto;
 	top: -2px;
 	border-radius: 0 0 16px 16px;
