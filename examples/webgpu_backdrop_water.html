@@ -38,7 +38,7 @@
 			import * as THREE from 'three/webgpu';
 			import { color, vec2, pass, linearDepth, normalWorld, triplanarTexture, texture, objectPosition, screenUV, viewportLinearDepth, viewportDepthTexture, viewportSharedTexture, positionWorld, time } from 'three/tsl';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
-			import { voronoi } from 'three/addons/tsl/math/voronoiNoise.js';
+			import { voronoi, voronoi3d } from 'three/addons/tsl/math/voronoiNoise.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -200,8 +200,10 @@
 
 				const causticFade = normalWorld.y.mix( positionWorld.y.distance( 0 ).oneMinus().saturate(), 0 );
 
+				const causticNoise = voronoi3d( positionWorld.mul( 6 ), t );
+
 				//material.colorNode = colorNode;
-				floor.material.colorNode = causticFade.mix( material.colorNode, material.colorNode.add( waterLayer0 ) );
+				floor.material.colorNode = causticFade.mix( material.colorNode, material.colorNode.add( causticNoise ) );
 
 				// renderer
 
