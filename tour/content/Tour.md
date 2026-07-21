@@ -655,268 +655,268 @@ TSL provides all standard mathematical constants and functions as both direct fu
 ### Functions
 
 ::: api abs( x ) - Computes the absolute value of `x`. Returns `Node`.
-- **x**: `Node | Number` — Input value or node.
+- **x**: `Node | Number` - Input value or node.
 :::
 
 ::: api acos( x ) - Computes the arccosine of `x` in radians. Returns `Node`.
-- **x**: `Node | Number` — Input value or node in range `[-1, 1]`.
+- **x**: `Node | Number` - Input value or node in range `[-1, 1]`.
 :::
 
 ::: api all( x ) - Returns `true` if all components of `x` are non-zero or true. Returns `boolean`.
-- **x**: `Node` — Vector node.
+- **x**: `Node` - Vector node.
 :::
 
 ::: api any( x ) - Returns `true` if any component of `x` is non-zero or true. Returns `boolean`.
-- **x**: `Node` — Vector node.
+- **x**: `Node` - Vector node.
 :::
 
 ::: api asin( x ) - Computes the arcsine of `x` in radians. Returns `Node`.
-- **x**: `Node | Number` — Input value or node in range `[-1, 1]`.
+- **x**: `Node | Number` - Input value or node in range `[-1, 1]`.
 :::
 
 ::: api atan( y, x? ) - Computes the arc-tangent of `y` or `y / x` in radians. Returns `Node`.
-- **y**: `Node | Number` — Y coordinate or single tangent ratio.
-- **x**: `Node | Number` — (Optional) X coordinate for two-argument arc-tangent (`atan2`).
+- **y**: `Node | Number` - Y coordinate or single tangent ratio.
+- **x**: `Node | Number` - (Optional) X coordinate for two-argument arc-tangent (`atan2`).
 :::
 
 ::: api bitcast( x, type ) - Reinterprets the bit pattern of `x` as a different type without type conversion. Returns `Node`.
-- **x**: `Node` — Input node.
-- **type**: `string` — Target primitive type name (e.g. `'float'`, `'int'`, `'uint'`).
+- **x**: `Node` - Input node.
+- **type**: `string` - Target primitive type name (e.g. `'float'`, `'int'`, `'uint'`).
 :::
 
 ::: api cbrt( x ) - Computes the cube root of `x`. Returns `Node`.
-- **x**: `Node | Number` — Input value or node.
+- **x**: `Node | Number` - Input value or node.
 :::
 
 ::: api ceil( x ) - Rounds `x` up to the nearest integer. Returns `Node`.
-- **x**: `Node | Number` — Input value or node.
+- **x**: `Node | Number` - Input value or node.
 :::
 
 ::: api clamp( x, min, max ) - Constrains `x` to lie between `min` and `max`. Returns `Node`.
-- **x**: `Node | Number` — Value to constrain.
-- **min**: `Node | Number` — Lower bound.
-- **max**: `Node | Number` — Upper bound.
+- **x**: `Node | Number` - Value to constrain.
+- **min**: `Node | Number` - Lower bound.
+- **max**: `Node | Number` - Upper bound.
 :::
 
 ::: api cos( x ) - Computes the cosine of `x`. Returns `Node`.
-- **x**: `Node | Number` — Angle in radians.
+- **x**: `Node | Number` - Angle in radians.
 :::
 
 ::: api cross( a, b ) - Computes the cross product of 3D vectors `a` and `b`. Returns `vec3`.
-- **a**: `vec3` — First 3D vector.
-- **b**: `vec3` — Second 3D vector.
+- **a**: `vec3` - First 3D vector.
+- **b**: `vec3` - Second 3D vector.
 :::
 
 ::: api dFdx( p ) - Computes the partial derivative of `p` with respect to screen X axis. Returns `Node`.
-- **p**: `Node` — Input expression node.
+- **p**: `Node` - Input expression node.
 :::
 
 ::: api dFdy( p ) - Computes the partial derivative of `p` with respect to screen Y axis. Returns `Node`.
-- **p**: `Node` — Input expression node.
+- **p**: `Node` - Input expression node.
 :::
 
 ::: api degrees( radians ) - Converts an angle from radians to degrees. Returns `Node`.
-- **radians**: `Node | Number` — Angle in radians.
+- **radians**: `Node | Number` - Angle in radians.
 :::
 
 ::: api difference( a, b ) - Computes the absolute difference `|a - b|`. Returns `Node`.
-- **a**: `Node | Number` — First value or node.
-- **b**: `Node | Number` — Second value or node.
+- **a**: `Node | Number` - First value or node.
+- **b**: `Node | Number` - Second value or node.
 :::
 
 ::: api distance( a, b ) - Computes the Euclidean distance between two points (`length(a - b)`). Returns `float`.
-- **a**: `Node` — First point or vector node.
-- **b**: `Node` — Second point or vector node.
+- **a**: `Node` - First point or vector node.
+- **b**: `Node` - Second point or vector node.
 :::
 
 ::: api dot( a, b ) - Computes the dot product of vectors `a` and `b`. Returns `float`.
-- **a**: `Node` — First vector node.
-- **b**: `Node` — Second vector node.
+- **a**: `Node` - First vector node.
+- **b**: `Node` - Second vector node.
 :::
 
 ::: api equals( a, b ) - Returns `true` if `a` equals `b`. Returns `boolean`.
-- **a**: `Node | Number` — First value or node.
-- **b**: `Node | Number` — Second value or node.
+- **a**: `Node | Number` - First value or node.
+- **b**: `Node | Number` - Second value or node.
 :::
 
 ::: api exp( x ) - Computes the natural exponential e^`x`. Returns `Node`.
-- **x**: `Node | Number` — Input value or node.
+- **x**: `Node | Number` - Input value or node.
 :::
 
 ::: api exp2( x ) - Computes `2` raised to the power of `x`. Returns `Node`.
-- **x**: `Node | Number` — Input value or node.
+- **x**: `Node | Number` - Input value or node.
 :::
 
 ::: api faceforward( N, I, Nref ) - Orients a normal vector to point away from a surface. Returns `vec3`.
-- **N**: `vec3` — Surface normal vector.
-- **I**: `vec3` — Incident vector.
-- **Nref**: `vec3` — Reference normal vector.
+- **N**: `vec3` - Surface normal vector.
+- **I**: `vec3` - Incident vector.
+- **Nref**: `vec3` - Reference normal vector.
 :::
 
 ::: api floor( x ) - Rounds `x` down to the nearest integer. Returns `Node`.
-- **x**: `Node | Number` — Input value or node.
+- **x**: `Node | Number` - Input value or node.
 :::
 
 ::: api fract( x ) - Computes the fractional part of `x` (`x - floor(x)`). Returns `Node`.
-- **x**: `Node | Number` — Input value or node.
+- **x**: `Node | Number` - Input value or node.
 :::
 
 ::: api fwidth( p ) - Computes the sum of absolute partial derivatives `|dFdx(p)| + |dFdy(p)|`. Returns `Node`.
-- **p**: `Node` — Input expression node.
+- **p**: `Node` - Input expression node.
 :::
 
 ::: api inverseSqrt( x ) - Computes the reciprocal of the square root `1 / sqrt(x)`. Returns `Node`.
-- **x**: `Node | Number` — Input value or node.
+- **x**: `Node | Number` - Input value or node.
 :::
 
 ::: api length( x ) - Computes the Euclidean length of vector `x`. Returns `float`.
-- **x**: `Node` — Vector node.
+- **x**: `Node` - Vector node.
 :::
 
 ::: api lengthSq( x ) - Computes the squared length of vector `x` (`dot(x, x)`). Returns `float`.
-- **x**: `Node` — Vector node.
+- **x**: `Node` - Vector node.
 :::
 
 ::: api log( x ) - Computes the natural logarithm ln(`x`). Returns `Node`.
-- **x**: `Node | Number` — Input value or node.
+- **x**: `Node | Number` - Input value or node.
 :::
 
 ::: api log2( x ) - Computes the base-2 logarithm log₂(`x`). Returns `Node`.
-- **x**: `Node | Number` — Input value or node.
+- **x**: `Node | Number` - Input value or node.
 :::
 
 ::: api max( a, b ) - Returns the greater of two values. Returns `Node`.
-- **a**: `Node | Number` — First value or node.
-- **b**: `Node | Number` — Second value or node.
+- **a**: `Node | Number` - First value or node.
+- **b**: `Node | Number` - Second value or node.
 :::
 
 ::: api min( a, b ) - Returns the lesser of two values. Returns `Node`.
-- **a**: `Node | Number` — First value or node.
-- **b**: `Node | Number` — Second value or node.
+- **a**: `Node | Number` - First value or node.
+- **b**: `Node | Number` - Second value or node.
 :::
 
 ::: api mix( a, b, t ) - Linearly interpolates between `a` and `b`. Returns `Node`.
-- **a**: `Node | Number` — Start value or node (returned when `t = 0`).
-- **b**: `Node | Number` — End value or node (returned when `t = 1`).
-- **t**: `Node | Number` — Interpolation factor between `0` and `1`.
+- **a**: `Node | Number` - Start value or node (returned when `t = 0`).
+- **b**: `Node | Number` - End value or node (returned when `t = 1`).
+- **t**: `Node | Number` - Interpolation factor between `0` and `1`.
 :::
 
 ::: api negate( x ) - Negates the value of `x` (`-x`). Returns `Node`.
-- **x**: `Node | Number` — Input value or node.
+- **x**: `Node | Number` - Input value or node.
 :::
 
 ::: api normalize( x ) - Computes the unit vector in the same direction as vector `x`. Returns `Node`.
-- **x**: `Node` — Vector node.
+- **x**: `Node` - Vector node.
 :::
 
 ::: api oneMinus( x ) - Computes `1 - x`. Returns `Node`.
-- **x**: `Node | Number` — Input value or node.
+- **x**: `Node | Number` - Input value or node.
 :::
 
 ::: api pow( x, y ) - Computes `x` raised to power `y` (`x^y`). Returns `Node`.
-- **x**: `Node | Number` — Base value or node.
-- **y**: `Node | Number` — Exponent value or node.
+- **x**: `Node | Number` - Base value or node.
+- **y**: `Node | Number` - Exponent value or node.
 :::
 
 ::: api pow2( x ) - Computes the square of `x` (`x * x`). Returns `Node`.
-- **x**: `Node | Number` — Input value or node.
+- **x**: `Node | Number` - Input value or node.
 :::
 
 ::: api pow3( x ) - Computes the cube of `x` (`x * x * x`). Returns `Node`.
-- **x**: `Node | Number` — Input value or node.
+- **x**: `Node | Number` - Input value or node.
 :::
 
 ::: api pow4( x ) - Computes the fourth power of `x`. Returns `Node`.
-- **x**: `Node | Number` — Input value or node.
+- **x**: `Node | Number` - Input value or node.
 :::
 
 ::: api radians( degrees ) - Converts an angle from degrees to radians. Returns `Node`.
-- **degrees**: `Node | Number` — Angle in degrees.
+- **degrees**: `Node | Number` - Angle in degrees.
 :::
 
 ::: api reciprocal( x ) - Computes the reciprocal `1 / x`. Returns `Node`.
-- **x**: `Node | Number` — Input value or node.
+- **x**: `Node | Number` - Input value or node.
 :::
 
 ::: api reflect( I, N ) - Computes the reflection direction for an incident vector. Returns `vec3`.
-- **I**: `vec3` — Incident vector pointing towards the surface.
-- **N**: `vec3` — Normalized surface normal vector.
+- **I**: `vec3` - Incident vector pointing towards the surface.
+- **N**: `vec3` - Normalized surface normal vector.
 :::
 
 ::: api refract( I, N, eta ) - Computes the refraction direction for an incident vector. Returns `vec3`.
-- **I**: `vec3` — Incident vector pointing towards the surface.
-- **N**: `vec3` — Normalized surface normal vector.
-- **eta**: `float | Number` — Ratio of indices of refraction.
+- **I**: `vec3` - Incident vector pointing towards the surface.
+- **N**: `vec3` - Normalized surface normal vector.
+- **eta**: `float | Number` - Ratio of indices of refraction.
 :::
 
 ::: api round( x ) - Rounds `x` to the nearest integer. Returns `Node`.
-- **x**: `Node | Number` — Input value or node.
+- **x**: `Node | Number` - Input value or node.
 :::
 
 ::: api saturate( x ) - Constrains `x` to range `[0, 1]`. Returns `Node`.
-- **x**: `Node | Number` — Input value or node.
+- **x**: `Node | Number` - Input value or node.
 :::
 
 ::: api sign( x ) - Extracts the sign of `x` (`-1.0`, `0.0`, or `1.0`). Returns `Node`.
-- **x**: `Node | Number` — Input value or node.
+- **x**: `Node | Number` - Input value or node.
 :::
 
 ::: api sin( x ) - Computes the sine of `x`. Returns `Node`.
-- **x**: `Node | Number` — Angle in radians.
+- **x**: `Node | Number` - Angle in radians.
 :::
 
 ::: api smoothstep( low, high, x ) - Performs smooth Hermite interpolation between `low` and `high` edges. Returns `Node`.
-- **low**: `Node | Number` — Lower edge threshold.
-- **high**: `Node | Number` — Upper edge threshold.
-- **x**: `Node | Number` — Source value to evaluate.
+- **low**: `Node | Number` - Lower edge threshold.
+- **high**: `Node | Number` - Upper edge threshold.
+- **x**: `Node | Number` - Source value to evaluate.
 :::
 
 ::: api sqrt( x ) - Computes the square root of `x`. Returns `Node`.
-- **x**: `Node | Number` — Input value or node.
+- **x**: `Node | Number` - Input value or node.
 :::
 
 ::: api step( edge, x ) - Generates a step function, returning `0.0` if `x < edge`, else `1.0`. Returns `Node`.
-- **edge**: `Node | Number` — Threshold edge.
-- **x**: `Node | Number` — Source value.
+- **edge**: `Node | Number` - Threshold edge.
+- **x**: `Node | Number` - Source value.
 :::
 
 ::: api tan( x ) - Computes the tangent of `x`. Returns `Node`.
-- **x**: `Node | Number` — Angle in radians.
+- **x**: `Node | Number` - Angle in radians.
 :::
 
 ::: api transformDirection( dir, matrix ) - Transforms direction vector `dir` by `matrix` and normalizes the result. Returns `vec3`.
-- **dir**: `vec3` — Direction vector node.
-- **matrix**: `mat4` — Transformation matrix node.
+- **dir**: `vec3` - Direction vector node.
+- **matrix**: `mat4` - Transformation matrix node.
 :::
 
 ::: api transformNormalByViewMatrix( normal, viewMatrix? ) - Transforms a normal vector from world space to view space and normalizes the result. Returns `vec3`.
-- **normal**: `vec3` — World-space normal vector.
-- **viewMatrix**: `mat4` — (Optional) View matrix node. Defaults to camera view matrix.
+- **normal**: `vec3` - World-space normal vector.
+- **viewMatrix**: `mat4` - (Optional) View matrix node. Defaults to camera view matrix.
 :::
 
 ::: api transformNormalByInverseViewMatrix( normal, viewMatrix? ) - Transforms a normal vector from view space to world space and normalizes the result. Returns `vec3`.
-- **normal**: `vec3` — View-space normal vector.
-- **viewMatrix**: `mat4` — (Optional) View matrix node. Defaults to camera view matrix.
+- **normal**: `vec3` - View-space normal vector.
+- **viewMatrix**: `mat4` - (Optional) View matrix node. Defaults to camera view matrix.
 :::
 
 ::: api trunc( x ) - Truncates `x` towards zero, removing its fractional part. Returns `Node`.
-- **x**: `Node | Number` — Input value or node.
+- **x**: `Node | Number` - Input value or node.
 :::
 
 > Important: Method Chaining Exceptions: In TSL method chaining `node.method(...)`, functions that accept interpolation or comparison factors use the calling node as the **last parameter** (the evaluation factor or source value):
 
 ::: api t.mix( a, b ) - Method chaining form of `mix( a, b, t )`. Calling node `t` is the interpolation factor (0 to 1). Returns `Node`.
-- **a**: `Node` — Start value node (returned when `t = 0`).
-- **b**: `Node` — End value node (returned when `t = 1`).
+- **a**: `Node` - Start value node (returned when `t = 0`).
+- **b**: `Node` - End value node (returned when `t = 1`).
 :::
 
 ::: api x.smoothstep( low, high ) - Method chaining form of `smoothstep( low, high, x )`. Calling node `x` is the source value evaluated between `low` and `high`. Returns `Node`.
-- **low**: `Node` — Lower edge threshold.
-- **high**: `Node` — Upper edge threshold.
+- **low**: `Node` - Lower edge threshold.
+- **high**: `Node` - Upper edge threshold.
 :::
 
 ::: api x.step( edge ) - Method chaining form of `step( edge, x )`. Calling node `x` is the source value compared against `edge`. Returns `Node`.
-- **edge**: `Node` — Threshold edge node.
+- **edge**: `Node` - Threshold edge node.
 :::
 
 ```tsl
@@ -983,8 +983,6 @@ model.material.colorNode = modifyColor( baseColor ); // Becomes Cyan
 
 It is possible to use classic JS functions or a `Fn()` interface. The main difference is that `Fn()` creates a controllable environment, allowing the use of **stack** where you can use **assign** and **conditional**, while the classic function only allows inline approaches.
 
-Example:
-
 ```js
 // tsl function
 const oscSine = Fn( ( [ t = time ] ) => {
@@ -998,9 +996,11 @@ export const oscSine = ( t = time ) => t.add( 0.75 ).mul( Math.PI * 2 ).sin().mu
 ```
 > Both above can be called with `oscSine( value )`.
 
-TSL allows the entry of parameters as object, this is useful in functions that have many optional arguments.
-
 <code name="oscSine">oscSine example</code>
+
+### Parameters as Object
+
+TSL allows the entry of parameters as object, this is useful in functions that have many optional arguments.
 
 Parameters as object also allows traditional calls as an array, enabling different types of usage.
 
@@ -1054,12 +1054,117 @@ model.material.userData.customColor = new THREE.Color( 0x0066ff );
 // Retrieve the color from builder
 const getMaterialColor = Fn( ( { material } ) => {
 
-	return color( material.userData.customColor );
+	if ( material.userData.customColor !== undefined ) {
+
+		return color( material.userData.customColor );
+
+	}
+
+	return color( 0 );
 
 } );
 
 // Assign color
 model.material.colorNode = getMaterialColor();
+```
+
+### Function as Parameter
+
+Functions in TSL can accept other functions or callbacks as parameters. This allows designing higher-order shader functions that delegate specific evaluations (such as sampling height maps, applying custom math transformations, or evaluating procedural channels) to the caller.
+
+<code name="bumpMapFunctionExample">Function as Parameter example</code>
+
+```js
+const sample = ( sampleUV = uv() ) => texture( map, sampleUV ).r;
+
+material.normalNode = customBumpMap( sample, 3.0 );
+```
+
+```tsl bumpMapFunctionExample
+import 'scenes/shaderball';
+import * as THREE from 'three';
+import { float, vec2, uv, normalView, positionView, faceDirection, texture, color } from 'three/tsl';
+
+// Load texture map for bump height sampling and configure repeat wrapping
+const map = new THREE.TextureLoader().load( '../examples/textures/uv_grid_opengl.jpg' );
+map.wrapS = THREE.RepeatWrapping;
+map.wrapT = THREE.RepeatWrapping;
+
+// Recreated custom bumpMap function accepting a height sampler function, scale, and optional uv parameter
+const customBumpMap = ( sampleHeightFn, bumpScale = float( 1.0 ), bumpUV = uv() ) => {
+
+	const Hll = float( sampleHeightFn( bumpUV ) );
+
+	// Calculate forward height derivatives using screen-space UV derivatives
+	const dHdx = float( sampleHeightFn( bumpUV.add( bumpUV.dFdx() ) ) ).sub( Hll ).mul( bumpScale );
+	const dHdy = float( sampleHeightFn( bumpUV.add( bumpUV.dFdy() ) ) ).sub( Hll ).mul( bumpScale );
+	const dHdxy = vec2( dHdx, dHdy );
+
+	// Calculate perturbed surface normal vector
+	const vSigmaX = positionView.dFdx().normalize();
+	const vSigmaY = positionView.dFdy().normalize();
+	const vN = normalView;
+
+	const R1 = vSigmaY.cross( vN );
+	const R2 = vN.cross( vSigmaX );
+
+	const fDet = vSigmaX.dot( R1 ).mul( faceDirection );
+	const vGrad = fDet.sign().mul( dHdxy.x.mul( R1 ).add( dHdxy.y.mul( R2 ) ) );
+
+	return fDet.abs().mul( vN ).sub( vGrad ).normalize();
+
+};
+
+// Height sampling function evaluating the red channel (.r) of the texture
+const sample = ( sampleUV = uv() ) => texture( map, sampleUV ).r;
+
+// Apply custom bump map with custom UV scaling directly passed to bumpMap
+model.material.normalNode = customBumpMap( sample, 3.0, uv().mul( 3 ) );
+
+// Set base material color
+model.material.colorNode = color( 0x3b82f6 );
+```
+
+### Closure
+
+TSL functions support JavaScript closures. A function defined with `Fn()` can contain a nested `Fn()` inside its body. The inner `Fn()` captures variables, constants, and parameters defined in the outer `Fn()` scope, allowing modular and reusable sub-functions within TSL shader graphs.
+
+<code name="closureExample">Closure example</code>
+
+```js
+const createChecker = Fn( ( [ scale ] ) => {
+
+	const tintColor = vec3( 0.1, 0.6, 1.0 );
+	const computeChecker = Fn( ( [ customUV ] ) => checker( customUV ).mul( tintColor ) );
+
+	return computeChecker( uv().mul( scale ) );
+
+} );
+```
+
+> Although closures are allowed, they are not always recommended because inner functions create new instances that cannot be efficiently reused in the shader cache.
+
+```tsl closureExample
+import 'scenes/shaderball';
+import { Fn, vec3, uv, checker } from 'three/tsl';
+
+// Outer TSL Fn accepting a scale parameter
+const createChecker = Fn( ( [ scale ] ) => {
+
+	const tintColor = vec3( 0.1, 0.6, 1.0 );
+
+	// Inner TSL Fn nested inside outer Fn (capturing outer parameter 'scale' and variable 'tintColor')
+	const computeChecker = Fn( ( [ customUV ] ) => {
+
+		return checker( customUV ).mul( tintColor );
+
+	} );
+
+	return computeChecker( uv().mul( scale ) );
+
+} );
+
+model.material.colorNode = createChecker( 8.0 );
 ```
 
 #### Related
@@ -1075,11 +1180,11 @@ TSL allows creating explicit shader variables and constants to store intermediat
 ### Chainable Methods
 
 ::: api .toVar( name? )
-- **name**: `string` — (Optional) Name of the variable in the shader. Defaults to `null`.
+- **name**: `string` - (Optional) Name of the variable in the shader. Defaults to `null`.
 :::
 
 ::: api .toConst( name? )
-- **name**: `string` — (Optional) Name of the constant in the shader. Defaults to `null`.
+- **name**: `string` - (Optional) Name of the constant in the shader. Defaults to `null`.
 :::
 
 ### Var and Const
@@ -1089,13 +1194,13 @@ Direct functions create variables or constants explicitly by taking a TSL node a
 > Important: Notice here `Var` and `Const` are capitalized.
 
 ::: api Var( node, name? )
-- **node**: `Node` — TSL node or expression to initialize the variable with.
-- **name**: `string` — (Optional) Name of the variable in the shader. Defaults to `null`.
+- **node**: `Node` - TSL node or expression to initialize the variable with.
+- **name**: `string` - (Optional) Name of the variable in the shader. Defaults to `null`.
 :::
 
 ::: api Const( node, name? )
-- **node**: `Node` — TSL node or expression to initialize the constant with.
-- **name**: `string` — (Optional) Name of the constant in the shader. Defaults to `null`.
+- **node**: `Node` - TSL node or expression to initialize the constant with.
+- **name**: `string` - (Optional) Name of the constant in the shader. Defaults to `null`.
 :::
 
 The name is optional; if set to `null`, the node system will generate one automatically.
@@ -1127,8 +1232,8 @@ model.material.colorNode = texture( map, uvScaled );
 Properties serve as reference nodes in the shader graph. They can be created and accessed at any point during shader construction to assign or retrieve values dynamically.
 
 ::: api property( type, name? ) - Declares a reference property node in the shader scope.
-- **type**: `string` — TSL type name (e.g. `'float'`, `'vec3'`, `'vec4'`).
-- **name**: `string` — (Optional) Name of the property in the shader. Defaults to `null`.
+- **type**: `string` - TSL type name (e.g. `'float'`, `'vec3'`, `'vec4'`).
+- **name**: `string` - (Optional) Name of the property in the shader. Defaults to `null`.
 :::
 
 <code name="propertiesExample" default="true">Properties Showcase</code>
@@ -1209,13 +1314,13 @@ model.material.colorNode = activeColor;
 
 Structs allow you to create custom data types with multiple members. They can be used to organize related data in shaders, define structures for attributes and uniforms.
 
-::: api struct( membersLayout, name? ) : Function — Creates a struct type with the specified member layout.
-- **membersLayout**: `object` — An object defining the fields and their type strings (e.g., `{ min: 'vec3', max: 'vec3' }`). Members can also be declared as objects to enable WebGPU atomic operations (e.g., `{ x: { type: 'int', atomic: true } }`).
-- **name**: `string` — (Optional) The name of the struct type in the generated WGSL/GLSL shader source code. Defaults to `null`.
+::: api struct( membersLayout, name? ) : Function - Creates a struct type with the specified member layout.
+- **membersLayout**: `object` - An object defining the fields and their type strings (e.g., `{ min: 'vec3', max: 'vec3' }`). Members can also be declared as objects to enable WebGPU atomic operations (e.g., `{ x: { type: 'int', atomic: true } }`).
+- **name**: `string` - (Optional) The name of the struct type in the generated WGSL/GLSL shader source code. Defaults to `null`.
 :::
 
-::: api outputStruct( ...members ) : Node — Creates an output struct node for returning multiple values.
-- **members**: `...Node` — The nodes to return as members of the output structure (commonly used in MRT).
+::: api outputStruct( ...members ) : Node - Creates an output struct node for returning multiple values.
+- **members**: `...Node` - The nodes to return as members of the output structure (commonly used in MRT).
 :::
 
 Example:
@@ -1397,9 +1502,9 @@ model.material.colorNode = selectColor();
 Different from [If-Else](#if-else), a ternary conditional will return a value and can be used outside of `Fn()`.
 
 ::: api select( conditionNode, trueNode, falseNode )
-- **conditionNode**: `Node` — TSL condition expression.
-- **trueNode**: `Node` — Node or value returned if the condition is true.
-- **falseNode**: `Node` — Node or value returned if the condition is false.
+- **conditionNode**: `Node` - TSL condition expression.
+- **trueNode**: `Node` - Node or value returned if the condition is true.
+- **falseNode**: `Node` - Node or value returned if the condition is false.
 :::
 
 ```js
@@ -1427,8 +1532,8 @@ model.material.colorNode = chromaColor;
 This module offers a variety of ways to implement loops in TSL.
 
 ::: api Loop( count/config, callback )
-- **count/config**: `number | object` — Either the iteration count (e.g. `5`), or a configuration object (e.g. `{ start, end, type, condition, name }`).
-- **callback**: `Function` — Loop body callback function, receiving index variables destructured (e.g. `( { i } ) => {}`).
+- **count/config**: `number | object` - Either the iteration count (e.g. `5`), or a configuration object (e.g. `{ start, end, type, condition, name }`).
+- **callback**: `Function` - Loop body callback function, receiving index variables destructured (e.g. `( { i } ) => {}`).
 :::
 
 In its basic form:
@@ -1583,7 +1688,7 @@ Functions and methods used to optimize computations by moving them to the vertex
 ### Vertex Stage
 
 ::: api vertexStage( node )
-- **node**: `Node` — TSL expression to compute on the vertex stage.
+- **node**: `Node` - TSL expression to compute on the vertex stage.
 :::
 
 ::: api .toVertexStage() - Chainable method to convert any existing node or expression directly into a vertex-stage calculation. :::
@@ -1618,12 +1723,12 @@ model.material.colorNode = normalView.normalize();
 Similarly to `vertexStage()`, `varying()` function forces a calculation to be performed in the vertex stage of the GPU pipeline, but it also declares a named varying variable.
 
 ::: api varying( node, name? )
-- **node**: `Node` — TSL expression to compute in the vertex stage and pass to the fragment stage.
-- **name**: `string` — (Optional) Custom name for the varying variable. Defaults to `null`.
+- **node**: `Node` - TSL expression to compute in the vertex stage and pass to the fragment stage.
+- **name**: `string` - (Optional) Custom name for the varying variable. Defaults to `null`.
 :::
 
 ::: api .toVarying( name? ) - Chainable method to convert any existing node or expression directly into a varying variable.
-- **name**: `string` — (Optional) Custom name for the varying variable. Defaults to `null`.
+- **name**: `string` - (Optional) Custom name for the varying variable. Defaults to `null`.
 :::
 
 If `varying()` is added only to `material.positionNode`, it will only return a simple variable and a varying will not be created because `material.positionNode` is computed at the vertex stage.
@@ -1646,8 +1751,8 @@ model.material.colorNode = myVaryingUv.sin();
 The `varyingProperty()` function declares a varying property placeholder in the shader without initializing it immediately. This is useful when you need to write to the varying inside a custom TSL function.
 
 ::: api varyingProperty( type, name? )
-- **type**: `string` — TSL type name (e.g. `'float'`, `'vec3'`, etc.).
-- **name**: `string` — (Optional) Custom name for the varying variable. Defaults to `null`.
+- **type**: `string` - TSL type name (e.g. `'float'`, `'vec3'`, etc.).
+- **name**: `string` - (Optional) Custom name for the varying variable. Defaults to `null`.
 :::
 
 <code name="varyingPropertyExample">Varying property example</code>
@@ -1687,14 +1792,14 @@ The **Compute Stage** allows you to perform general-purpose parallel computation
 TSL provides the `compute()` function to wrap TSL functions into `ComputeNode`s, which can be executed either automatically by the rendering pipeline or manually using `renderer.compute()`.
 
 ::: api compute( node, count, workgroupSize? )
-- **node**: `Node` — TSL function call containing the logic for the compute shader.
-- **count**: `number` — Total number of dispatches (threads/instances).
-- **workgroupSize**: `Array<number>` — (Optional) The size of the workgroup threads. Defaults to `[ 64 ]`.
+- **node**: `Node` - TSL function call containing the logic for the compute shader.
+- **count**: `number` - Total number of dispatches (threads/instances).
+- **workgroupSize**: `Array<number>` - (Optional) The size of the workgroup threads. Defaults to `[ 64 ]`.
 :::
 
 ::: api .compute( count, workgroupSize? )
-- **count**: `number` — Total number of dispatches (threads/instances).
-- **workgroupSize**: `Array<number>` — (Optional) The size of the workgroup threads. Defaults to `[ 64 ]`.
+- **count**: `number` - Total number of dispatches (threads/instances).
+- **workgroupSize**: `Array<number>` - (Optional) The size of the workgroup threads. Defaults to `[ 64 ]`.
 :::
 
 <code name="computeParticleSystem" default="true">Particle example</code>
@@ -1882,24 +1987,24 @@ Attributes are inputs that are defined per-vertex or per-instance in the geometr
 ### Functions
 
 ::: api attribute( name, type? )
-- **name**: `string` — Name of the geometry attribute.
-- **type**: `string` — (Optional) Explicit TSL type name. Defaults to `null`.
+- **name**: `string` - Name of the geometry attribute.
+- **type**: `string` - (Optional) Explicit TSL type name. Defaults to `null`.
 :::
 
 ::: api uv( index? )
-- **index**: `number` — (Optional) The UV coordinate set index. Defaults to `0`.
+- **index**: `number` - (Optional) The UV coordinate set index. Defaults to `0`.
 :::
 
 ::: api vertexColor( index? )
-- **index**: `number` — (Optional) The vertex color set index. Defaults to `0`.
+- **index**: `number` - (Optional) The vertex color set index. Defaults to `0`.
 :::
 
 ::: api batch( batchMesh )
-- **batchMesh**: `BatchedMesh` — Creates a batch node for BatchedMesh.
+- **batchMesh**: `BatchedMesh` - Creates a batch node for BatchedMesh.
 :::
 
 ::: api instance( instancedMesh )
-- **instancedMesh**: `InstancedMesh` — Creates an instance node for InstancedMesh.
+- **instancedMesh**: `InstancedMesh` - Creates an instance node for InstancedMesh.
 :::
 
 ```tsl attributesExample
@@ -1945,8 +2050,8 @@ model.material.colorNode = factor.mix( color( 0x3b82f6 ), color( 0xffaa76 ) );
 Uniforms are useful to update values of variables like colors, lighting, or transformations without having to recreate the shader program. They are the true variables from a GPU.
 
 ::: api uniform( value, type? )
-- **value**: `boolean | Number | Color | Vector2 | Vector3 | Vector4 | Matrix3 | Matrix4` — Dynamic value to initialize the uniform with.
-- **type**: `string` — (Optional) Explicit TSL type name (e.g. `'float'`, `'vec3'`, etc.). Defaults to `null`.
+- **value**: `boolean | Number | Color | Vector2 | Vector3 | Vector4 | Matrix3 | Matrix4` - Dynamic value to initialize the uniform with.
+- **type**: `string` - (Optional) Explicit TSL type name (e.g. `'float'`, `'vec3'`, etc.). Defaults to `null`.
 :::
 
 <code name="uniformEventUpdate">Uniform material update example</code>
@@ -2001,9 +2106,11 @@ model.material.colorNode = ramp.mul( color( 0x1e90ff ) );
 It is possible to use the same [Array](#array) logic for uniforms using Three.js native components or primitive values.
 
 ::: api uniformArray( values, type? )
-- **values**: `Array` — Array of initial values (e.g. `Color`, `Vector3`, numbers, etc.).
-- **type**: `string` — (Optional) Explicit TSL type name (e.g. `'color'`, `'vec3'`, etc.). Defaults to `null`.
+- **values**: `Array` - Array of initial values (e.g. `Color`, `Vector3`, numbers, etc.).
+- **type**: `string` - (Optional) Explicit TSL type name (e.g. `'color'`, `'vec3'`, etc.). Defaults to `null`.
 :::
+
+Example:
 
 ```js
 const tintColors = uniformArray( [
@@ -2046,15 +2153,15 @@ It is possible to create arrays that can be used in compute shaders and storage 
 Under the hood, `instancedArray` creates a `StorageInstancedBufferAttribute`:
 
 ::: api instancedArray( array, type )
-- **array**: `TypedArray | Array` — Primitive values or typed arrays to initialize the buffer.
-- **type**: `string` — TSL type name (e.g. `'float'`, `'vec3'`, etc.).
+- **array**: `TypedArray | Array` - Primitive values or typed arrays to initialize the buffer.
+- **type**: `string` - TSL type name (e.g. `'float'`, `'vec3'`, etc.).
 :::
 
 Under the hood, `attributeArray` creates a `StorageBufferAttribute`:
 
 ::: api attributeArray( array, type )
-- **array**: `TypedArray | Array` — Primitive values or typed arrays to initialize the buffer.
-- **type**: `string` — TSL type name (e.g. `'float'`, `'vec3'`, etc.).
+- **array**: `TypedArray | Array` - Primitive values or typed arrays to initialize the buffer.
+- **type**: `string` - TSL type name (e.g. `'float'`, `'vec3'`, etc.).
 :::
 
 Example:
@@ -2405,14 +2512,14 @@ Viewport nodes return values and textures representing the screen-space viewport
 ### Texture
 
 ::: api viewportSharedTexture( uv?, level? ) - Accesses the screen framebuffer texture already rendered in the current scene, sharing a single texture instance across all calls for optimal performance while preserving render order.
-- **uv**: `Node` — (Optional) Coordinate node used for sampling the shared viewport texture. Defaults to `screenUV`.
-- **level**: `Node` — (Optional) Mipmap level node to sample from. Defaults to `null`.
+- **uv**: `Node` - (Optional) Coordinate node used for sampling the shared viewport texture. Defaults to `screenUV`.
+- **level**: `Node` - (Optional) Mipmap level node to sample from. Defaults to `null`.
 :::
 
 ::: api viewportMipTexture( uv?, level?, framebufferTexture? ) - Returns a viewport texture with mipmap generation enabled for blurred or LOD screen-space effects.
-- **uv**: `Node` — (Optional) Coordinate node used for sampling the viewport texture. Defaults to `screenUV`.
-- **level**: `Node` — (Optional) Mipmap level node to sample from. Defaults to `null`.
-- **framebufferTexture**: `FramebufferTexture` — (Optional) Custom framebuffer texture instance. Defaults to `null`.
+- **uv**: `Node` - (Optional) Coordinate node used for sampling the viewport texture. Defaults to `screenUV`.
+- **level**: `Node` - (Optional) Mipmap level node to sample from. Defaults to `null`.
+- **framebufferTexture**: `FramebufferTexture` - (Optional) Custom framebuffer texture instance. Defaults to `null`.
 :::
 
 ### Depth
@@ -2420,14 +2527,14 @@ Viewport nodes return values and textures representing the screen-space viewport
 ::: api viewportLinearDepth : float - Returns the linear (orthographic) depth value of the current fragment. :::
 
 ::: api viewportDepthTexture( uv?, level? ) - Returns the depth texture of the current viewport for screen-space depth evaluation and volume effects.
-- **uv**: `Node` — (Optional) Coordinate node used for sampling the depth texture. Defaults to `screenUV`.
-- **level**: `Node` — (Optional) Mipmap level node to sample from. Defaults to `null`.
+- **uv**: `Node` - (Optional) Coordinate node used for sampling the depth texture. Defaults to `screenUV`.
+- **level**: `Node` - (Optional) Mipmap level node to sample from. Defaults to `null`.
 :::
 
 ### Utils
 
 ::: api viewportSafeUV( uv? ) - Generates depth-aware safe UV coordinates for screen-space refraction. Performs depth testing to prevent foreground objects located in front of the refractive surface from leaking into the refraction sample. Returns `vec2`.
-- **uv**: `vec2` — (Optional) Refracted UV coordinate node to evaluate. Defaults to `screenUV`.
+- **uv**: `vec2` - (Optional) Refracted UV coordinate node to evaluate. Defaults to `screenUV`.
 :::
 
 ```tsl refractionExample
@@ -2852,30 +2959,29 @@ model.material.colorNode = bg.add( wavesColor );
 
 Functions for blending colors and layers together using standard blend mode algorithms.
 
-::: api blendColor( base, blend )
-- **base**: `vec4` — The base color (non-premultiplied alpha).
-- **blend**: `vec4` — The blend color (non-premultiplied alpha).
-- Blends two colors based on their alpha values by replicating normal alpha blending. Returns `vec4`.
+::: api blendColor( base, blend ) : vec4 - Blends two colors based on their alpha values by replicating normal alpha blending.
+- **base**: `vec4` - The base color (non-premultiplied alpha).
+- **blend**: `vec4` - The blend color (non-premultiplied alpha).
 :::
 
-::: api blendScreen( base, blend ) - Lightens the base layer's colors based on the color of the blend layer. Returns `vec3`.
-- **base**: `vec3` — The base color.
-- **blend**: `vec3` — The blend color. A black `#000000` blend color does not alter the base color.
+::: api blendScreen( base, blend ) : vec3 - Lightens the base layer's colors based on the color of the blend layer.
+- **base**: `vec3` - The base color.
+- **blend**: `vec3` - The blend color. A black `#000000` blend color does not alter the base color.
 :::
 
-::: api blendOverlay( base, blend ) - Increases contrast of the base layer by combining Multiply and Screen blend modes based on base lightness. Returns `vec3`.
-- **base**: `vec3` — The base color.
-- **blend**: `vec3` — The blend color.
+::: api blendOverlay( base, blend ) : vec3 - Increases contrast of the base layer by combining Multiply and Screen blend modes based on base lightness.
+- **base**: `vec3` - The base color.
+- **blend**: `vec3` - The blend color.
 :::
 
-::: api blendDodge( base, blend ) - Significantly increases brightness and contrast of the base layer based on the blend layer. Returns `vec3`.
-- **base**: `vec3` — The base color.
-- **blend**: `vec3` — The blend color. A black `#000000` blend color does not alter the base color.
+::: api blendDodge( base, blend ) : vec3 - Significantly increases brightness and contrast of the base layer based on the blend layer.
+- **base**: `vec3` - The base color.
+- **blend**: `vec3` - The blend color. A black `#000000` blend color does not alter the base color.
 :::
 
-::: api blendBurn( base, blend ) - Darkens the base layer's colors and increases contrast based on the blend layer. Returns `vec3`.
-- **base**: `vec3` — The base color.
-- **blend**: `vec3` — The blend color. A white `#ffffff` blend color does not alter the base color.
+::: api blendBurn( base, blend ) : vec3 - Darkens the base layer's colors and increases contrast based on the blend layer.
+- **base**: `vec3` - The base color.
+- **blend**: `vec3` - The blend color. A white `#ffffff` blend color does not alter the base color.
 :::
 
 <code name="blendModesExample" default="true">Blend Modes Showcase</code>
@@ -2947,41 +3053,41 @@ renderPipeline.outputNode = finalColor;
 Functions for adjusting and manipulating colors.
 
 ::: api grayscale( color ) - Computes a grayscale color value for the given RGB color based on luminance. Returns `vec3`.
-- **color**: `vec3` — Input RGB color value.
+- **color**: `vec3` - Input RGB color value.
 :::
 
 ::: api luminance( color, luminanceCoefficients? ) - Calculates the luminance (perceived brightness) of an RGB color. Returns `float`.
-- **color**: `vec3` — Input RGB color value.
-- **luminanceCoefficients**: `vec3` — (Optional) Luminance coefficients node. Defaults to current working color space coefficients.
+- **color**: `vec3` - Input RGB color value.
+- **luminanceCoefficients**: `vec3` - (Optional) Luminance coefficients node. Defaults to current working color space coefficients.
 :::
 
 ::: api saturation( color, adjustment? ) - Adjusts the saturation of an RGB color. Returns `vec3`.
-- **color**: `vec3` — Input RGB color value.
-- **adjustment**: `float` — (Optional) Conversion factor. Values `< 1` desaturate, values `> 1` super-saturate. Defaults to `float( 1 )`.
+- **color**: `vec3` - Input RGB color value.
+- **adjustment**: `float` - (Optional) Conversion factor. Values `< 1` desaturate, values `> 1` super-saturate. Defaults to `float( 1 )`.
 :::
 
 ::: api vibrance( color, adjustment? ) - Selectively enhances the intensity of less saturated RGB colors while preserving saturated ones. Returns `vec3`.
-- **color**: `vec3` — Input RGB color value.
-- **adjustment**: `float` — (Optional) Intensity factor for vibrance effect. Defaults to `float( 0 )`.
+- **color**: `vec3` - Input RGB color value.
+- **adjustment**: `float` - (Optional) Intensity factor for vibrance effect. Defaults to `float( 0 )`.
 :::
 
 ::: api hue( color, adjustment? ) - Rotates the hue of an RGB color while preserving its luminance and saturation. Returns `vec3`.
-- **color**: `vec3` — Input RGB color value.
-- **adjustment**: `float` — (Optional) Hue rotation angle in radians (positive = clockwise, negative = counterclockwise). Defaults to `float( 1 )`.
+- **color**: `vec3` - Input RGB color value.
+- **adjustment**: `float` - (Optional) Hue rotation angle in radians (positive = clockwise, negative = counterclockwise). Defaults to `float( 1 )`.
 :::
 
 ::: api posterize( source, steps ) - Reduces the number of color levels, creating a poster-like effect. Returns `Node`.
-- **source**: `Node` — Input color value.
-- **steps**: `Node` — Number of color levels. Lower values produce a more blocky, stylized effect.
+- **source**: `Node` - Input color value.
+- **steps**: `Node` - Number of color levels. Lower values produce a more blocky, stylized effect.
 :::
 
 ::: api cdl( color, slope?, offset?, power?, saturation?, luminanceCoefficients? ) - Compact representation of ASC Color Decision List (CDL) v1.2 color grading information. Returns `vec4`.
-- **color**: `vec4` — Input color (typically in a log color space such as LogC, ACEScc, or AgX Log).
-- **slope**: `vec3` — (Optional) Slope adjustment multiplier for RGB channels. Defaults to `vec3( 1 )`.
-- **offset**: `vec3` — (Optional) Offset adjustment added to RGB channels. Defaults to `vec3( 0 )`.
-- **power**: `vec3` — (Optional) Power gamma exponent applied to RGB channels. Defaults to `vec3( 1 )`.
-- **saturation**: `float` — (Optional) Overall saturation adjustment factor. Defaults to `float( 1 )`.
-- **luminanceCoefficients**: `vec3` — (Optional) Luminance coefficients used for saturation calculation (defaults to Rec. 709).
+- **color**: `vec4` - Input color (typically in a log color space such as LogC, ACEScc, or AgX Log).
+- **slope**: `vec3` - (Optional) Slope adjustment multiplier for RGB channels. Defaults to `vec3( 1 )`.
+- **offset**: `vec3` - (Optional) Offset adjustment added to RGB channels. Defaults to `vec3( 0 )`.
+- **power**: `vec3` - (Optional) Power gamma exponent applied to RGB channels. Defaults to `vec3( 1 )`.
+- **saturation**: `float` - (Optional) Overall saturation adjustment factor. Defaults to `float( 1 )`.
+- **luminanceCoefficients**: `vec3` - (Optional) Luminance coefficients used for saturation calculation (defaults to Rec. 709).
 :::
 
 <code name="colorAdjustmentsExample" default="true">Color Adjustments Showcase</code>

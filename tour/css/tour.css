@@ -471,15 +471,16 @@ body.preview-hidden .code-modifier-inline-btn.active {
 	background-color: var(--bg-sidebar);
 	border-right: 1px solid var(--border-color);
 	transform: translateX(-100%);
-	transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
 	z-index: 20;
 	display: flex;
 	flex-direction: column;
-	box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
 }
 
 .sidebar.open {
 	transform: translateX(0);
+	box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
 }
 
 .sidebar-header {
@@ -748,7 +749,7 @@ body.preview-hidden .code-modifier-inline-btn.active {
 }
 
 .code-container-wrap:focus-within {
-	z-index: 250;
+	z-index: 5;
 }
 
 .preview-section {
@@ -775,7 +776,7 @@ body.preview-hidden .code-modifier-inline-btn.active {
 .h-resizer-container {
 	position: relative;
 	width: 4px;
-	z-index: 200;
+	z-index: 1000;
 	flex-shrink: 0;
 	display: flex;
 }
@@ -936,7 +937,7 @@ body.preview-hidden .code-modifier-inline-btn.active {
 .v-resizer-container {
 	position: relative;
 	height: 4px;
-	z-index: 100;
+	z-index: 500;
 	flex-shrink: 0;
 	display: flex;
 	flex-direction: column;
@@ -1256,82 +1257,94 @@ body.preview-hidden .code-modifier-inline-btn.active {
 }
 
 /* Inverted Button when Editor is Collapsed */
-.v-resizer-container:has(.resizer-v.editor-collapsed) .resizer-v-toggle-btn.inverted {
+.v-resizer-container:has(.resizer-v.editor-collapsed) .resizer-v-toggle-btn.inverted,
+body.v-resizer-editor-collapsed .resizer-v-toggle-btn.inverted {
 	top: auto;
-	bottom: 3px;
-	z-index: 25;
+	bottom: 4px;
+	z-index: 250;
+	pointer-events: auto;
 	border-radius: 16px 16px 0 0;
-	border: 1px solid transparent;
+	border: 1px solid var(--border-color);
 	border-bottom: none;
-	box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.15);
+	box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.v-resizer-container:has(.resizer-v.editor-collapsed) .resizer-v-toggle-btn.inverted::before {
-	bottom: 1px;
+.v-resizer-container:has(.resizer-v.editor-collapsed) .resizer-v-toggle-btn.inverted::before,
+body.v-resizer-editor-collapsed .resizer-v-toggle-btn.inverted::before {
+	bottom: 0;
 	top: auto;
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 12px;
 	box-shadow: 4px 0 0 0 var(--bg-sidebar);
 	border-top: none;
-	border-bottom: 1px solid transparent;
-	border-right: 1px solid transparent;
+	border-bottom: 1px solid var(--border-color);
+	border-right: 1px solid var(--border-color);
 }
 
-.v-resizer-container:has(.resizer-v.editor-collapsed) .resizer-v-toggle-btn.inverted::after {
-	bottom: 1px;
+.v-resizer-container:has(.resizer-v.editor-collapsed) .resizer-v-toggle-btn.inverted::after,
+body.v-resizer-editor-collapsed .resizer-v-toggle-btn.inverted::after {
+	bottom: 0;
 	top: auto;
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 12px;
 	box-shadow: -4px 0 0 0 var(--bg-sidebar);
 	border-top: none;
-	border-bottom: 1px solid transparent;
-	border-left: 1px solid transparent;
+	border-bottom: 1px solid var(--border-color);
+	border-left: 1px solid var(--border-color);
 }
 
 @media (hover: hover) {
-	.v-resizer-container:has(.resizer-v.editor-collapsed) .resizer-v-toggle-btn.inverted:hover {
+	.v-resizer-container:has(.resizer-v.editor-collapsed) .resizer-v-toggle-btn.inverted:hover,
+	body.v-resizer-editor-collapsed .resizer-v-toggle-btn.inverted:hover {
 		background-color: var(--bg-card);
 		color: var(--accent);
 		border-color: var(--accent);
 	}
 
-	.v-resizer-container:has(.resizer-v.editor-collapsed) .resizer-v-toggle-btn.inverted:hover::before {
+	.v-resizer-container:has(.resizer-v.editor-collapsed) .resizer-v-toggle-btn.inverted:hover::before,
+	body.v-resizer-editor-collapsed .resizer-v-toggle-btn.inverted::before {
 		box-shadow: 4px 0 0 0 var(--bg-card);
 		border-bottom-color: var(--accent);
 		border-right-color: var(--accent);
 	}
 
-	.v-resizer-container:has(.resizer-v.editor-collapsed) .resizer-v-toggle-btn.inverted:hover::after {
+	.v-resizer-container:has(.resizer-v.editor-collapsed) .resizer-v-toggle-btn.inverted:hover::after,
+	body.v-resizer-editor-collapsed .resizer-v-toggle-btn.inverted::after {
 		box-shadow: -4px 0 0 0 var(--bg-card);
 		border-bottom-color: var(--accent);
 		border-left-color: var(--accent);
 	}
 }
 
-.v-resizer-container:has(.resizer-v.editor-collapsed) .resizer-v-toggle-btn.inverted:active {
+.v-resizer-container:has(.resizer-v.editor-collapsed) .resizer-v-toggle-btn.inverted:active,
+body.v-resizer-editor-collapsed .resizer-v-toggle-btn.inverted:active {
 	background-color: var(--bg-card);
 	color: var(--accent);
 	border-color: var(--accent);
 }
 
-.v-resizer-container:has(.resizer-v.editor-collapsed) .resizer-v-toggle-btn.inverted:active::before {
+.v-resizer-container:has(.resizer-v.editor-collapsed) .resizer-v-toggle-btn.inverted:active::before,
+body.v-resizer-editor-collapsed .resizer-v-toggle-btn.inverted:active::before {
 	box-shadow: 4px 0 0 0 var(--bg-card);
 	border-bottom-color: var(--accent);
 	border-right-color: var(--accent);
 }
 
-.v-resizer-container:has(.resizer-v.editor-collapsed) .resizer-v-toggle-btn.inverted:active::after {
+.v-resizer-container:has(.resizer-v.editor-collapsed) .resizer-v-toggle-btn.inverted:active::after,
+body.v-resizer-editor-collapsed .resizer-v-toggle-btn.inverted:active::after {
 	box-shadow: -4px 0 0 0 var(--bg-card);
 	border-bottom-color: var(--accent);
 	border-left-color: var(--accent);
 }
 
 /* Show / Hide Toggle Buttons depending on layout state */
-.v-resizer-container:has(.resizer-v.collapsed) .resizer-v-toggle-btn.inverted {
+.v-resizer-container:has(.resizer-v.collapsed) .resizer-v-toggle-btn.inverted,
+body.v-resizer-collapsed .resizer-v-toggle-btn.inverted {
 	display: none !important;
 }
 
-.v-resizer-container:has(.resizer-v.editor-collapsed) .resizer-v-toggle-btn:not(.inverted) {
+.v-resizer-container:has(.resizer-v.editor-collapsed) .resizer-v-toggle-btn:not(.inverted),
+body.v-resizer-editor-collapsed .resizer-v-toggle-btn:not(.inverted) {
 	display: none !important;
 }
 
@@ -2894,7 +2907,7 @@ body.loading .app-header {
 }
 
 .sidebar {
-	transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease !important;
+	transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
 }
 
 /* Loading Screen Styling */
@@ -2983,10 +2996,10 @@ body.loading .app-header {
 }
 
 .loading-text-container {
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 0.35rem;
 }
 
 .loading-text {
@@ -3038,6 +3051,12 @@ body.loading .app-header {
 }
 
 .loading-subtext {
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	transform: translateX(-50%);
+	margin-top: 0.35rem;
+	white-space: nowrap;
 	font-family: 'Inter', sans-serif;
 	font-size: 0.72rem;
 	font-weight: 500;

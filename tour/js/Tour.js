@@ -298,12 +298,6 @@ class Tour {
 
 			const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
 
-			if ( isMobile && this.isSidebarOpen ) {
-
-				this.toggleSidebar( false );
-
-			}
-
 			if ( isMobile !== wasMobile ) {
 
 				wasMobile = isMobile;
@@ -416,8 +410,10 @@ class Tour {
 
 			updateSearchFocus();
 
+			if ( window.innerWidth < MOBILE_BREAKPOINT ) return;
+
 			// Check if focus is moving outside the sidebar
-			const focusMovedOutside = ! e.relatedTarget || ! this.dom.sidebar.contains( e.relatedTarget );
+			const focusMovedOutside = e.relatedTarget && ! this.dom.sidebar.contains( e.relatedTarget );
 			if ( this.openedViaHeaderSearch && this.dom.searchInput.value.trim().length === 0 && focusMovedOutside ) {
 
 				this.toggleSidebar( false );
@@ -485,8 +481,9 @@ class Tour {
 
 				const isClickInsideSidebar = this.dom.sidebar.contains( e.target );
 				const isClickOnToggle = this.dom.menuToggleMain.contains( e.target );
+				const isClickOnSearchToggle = this.dom.headerSearchBtn.contains( e.target );
 
-				if ( ! isClickInsideSidebar && ! isClickOnToggle ) {
+				if ( ! isClickInsideSidebar && ! isClickOnToggle && ! isClickOnSearchToggle ) {
 
 					this.toggleSidebar( false );
 
