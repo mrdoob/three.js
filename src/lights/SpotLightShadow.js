@@ -70,8 +70,26 @@ class SpotLightShadow extends LightShadow {
 		super.copy( source );
 
 		this.focus = source.focus;
+		this.aspect = source.aspect;
 
 		return this;
+
+	}
+
+	/**
+	 * Serializes the light shadow into JSON.
+	 *
+	 * @return {Object} A JSON object representing the serialized light shadow.
+	 * @see {@link ObjectLoader#parse}
+	 */
+	toJSON() {
+
+		const object = super.toJSON();
+
+		if ( this.focus !== 1 ) object.focus = this.focus;
+		if ( this.aspect !== 1 ) object.aspect = this.aspect;
+
+		return object;
 
 	}
 

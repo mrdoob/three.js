@@ -106,6 +106,22 @@ class DataArrayTexture extends Texture {
 	}
 
 	/**
+	 * Copies the values of the given texture to this instance.
+	 *
+	 * @param {DataArrayTexture} source - The texture to copy.
+	 * @return {DataArrayTexture} A reference to this instance.
+	 */
+	copy( source ) {
+
+		super.copy( source );
+
+		this.wrapR = source.wrapR;
+
+		return this;
+
+	}
+
+	/**
 	 * Describes that a specific layer of the texture needs to be updated.
 	 * Normally when {@link Texture#needsUpdate} is set to `true`, the
 	 * entire data texture array is sent to the GPU. Marking specific
