@@ -24,8 +24,12 @@ textarea {
 	--border-color: #3f3f4e;
 }
 
+html,
 body {
 	margin: 0;
+	padding: 0;
+	height: 100%;
+	height: 100dvh;
 	font-family: 'Inter', system-ui, -apple-system, sans-serif;
 	line-height: 1.5;
 	background-color: var(--bg-main);
@@ -325,7 +329,10 @@ body.preview-hidden .code-modifier-inline-btn.active {
 
 /* Layout & Header */
 .app-container {
-	height: 100vh;
+	height: 100%;
+	height: 100dvh;
+	min-height: 100dvh;
+	max-height: 100dvh;
 	display: flex;
 	flex-direction: row;
 	color: var(--text-muted);
@@ -338,7 +345,10 @@ body.preview-hidden .code-modifier-inline-btn.active {
 	display: flex;
 	flex-direction: column;
 	min-width: 0;
+	height: 100%;
+	height: 100dvh;
 	position: relative;
+	overflow: hidden;
 }
 
 .app-header {
@@ -1064,6 +1074,7 @@ body.preview-hidden .code-modifier-inline-btn.active {
 
 /* Inverted Vertical Resizer Toggle Button */
 .resizer-v-toggle-btn.inverted {
+	display: none;
 	bottom: auto;
 	top: -2px;
 	border-radius: 0 0 16px 16px;
@@ -1348,6 +1359,71 @@ body.v-resizer-editor-collapsed .resizer-v-toggle-btn:not(.inverted) {
 	display: none !important;
 }
 
+
+@media (max-width: 767.98px) {
+	.content-area-wrap {
+		padding: 1.25rem 1rem;
+	}
+
+	/* Position h-resizer-container & toggle button correctly on mobile */
+	body:not(.collapsed-workspace) .h-resizer-container {
+		position: absolute;
+		left: 0;
+		top: 0;
+		bottom: 0;
+		z-index: 1000;
+	}
+
+	body:not(.collapsed-workspace) .resizer-toggle-btn {
+		left: 0;
+		transform: translate(0, -50%);
+		border-radius: 0 16px 16px 0;
+		border-left: none;
+		border-right: 1px solid var(--border-color);
+		box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15);
+	}
+
+	body:not(.collapsed-workspace) .resizer-toggle-btn::before {
+		right: auto;
+		left: 1px;
+		border-bottom-right-radius: 0;
+		border-bottom-left-radius: 17px;
+		box-shadow: -4px 4px 0 0 var(--bg-sidebar);
+		border-right: none;
+		border-left: 1px solid var(--border-color);
+	}
+
+	body:not(.collapsed-workspace) .resizer-toggle-btn::after {
+		right: auto;
+		left: 1px;
+		border-top-right-radius: 0;
+		border-top-left-radius: 17px;
+		box-shadow: -4px -4px 0 0 var(--bg-sidebar);
+		border-right: none;
+		border-left: 1px solid var(--border-color);
+	}
+
+	body.collapsed-workspace .resizer-toggle-btn {
+		left: 1px;
+		transform: translate(-100%, -50%);
+		border-radius: 16px 0 0 16px;
+	}
+
+	/* Hide inverted v-resizer button on mobile unless editor is explicitly collapsed */
+	.resizer-v-toggle-btn.inverted {
+		display: none !important;
+	}
+
+	body.v-resizer-editor-collapsed .resizer-v-toggle-btn.inverted {
+		display: flex !important;
+	}
+}
+
+@media (max-width: 600px) {
+	.header-subtitle {
+		display: none;
+	}
+}
 
 @media (min-width: 768px) {
 	.content-col {
@@ -2915,8 +2991,10 @@ body.loading .app-header {
 	position: fixed;
 	top: 0;
 	left: 0;
-	width: 100vw;
-	height: 100vh;
+	width: 100%;
+	width: 100dvw;
+	height: 100%;
+	height: 100dvh;
 	background: radial-gradient(circle at 50% 50%, #131720 0%, #14151a 50%, var(--bg-sidebar) 80%);
 	z-index: 9999;
 	display: flex;
@@ -2982,7 +3060,9 @@ body.loading .app-header {
 	height: 125px;
 	position: relative;
 	z-index: 2;
-	transform: translate(2px, 2px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	-webkit-mask: linear-gradient(90deg, rgba(0, 0, 0, 0.75) 35%, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0.75) 65%);
 	-webkit-mask-size: 200% 100%;
 	mask: linear-gradient(90deg, rgba(0, 0, 0, 0.75) 35%, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0.75) 65%);

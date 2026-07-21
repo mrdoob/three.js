@@ -457,45 +457,45 @@ Input functions can be used to create contants and do explicit conversions.
 
 > Important: Conversions are also performed automatically if the output and input are of different types.
 
-::: api float( value: Node | Number ) - Convert or create a float node. :::
+::: api float( value: Node | number ) : float - Convert or create a float node. :::
 
-::: api int( value: Node | Number ) - Convert or create an integer node. :::
+::: api int( value: Node | number ) : int - Convert or create an integer node. :::
 
-::: api uint( value: Node | Number ) - Convert or create an unsigned integer node. :::
+::: api uint( value: Node | number ) : uint - Convert or create an unsigned integer node. :::
 
-::: api bool( value: Node | boolean ) - Convert or create a boolean node. :::
+::: api bool( value: Node | boolean ) : bool - Convert or create a boolean node. :::
 
-::: api color( ...value: Node | Color | String | Number ) - Convert or create a color node. :::
+::: api color( ...value: Node | Color | string | number ) : color - Convert or create a color node. :::
 
-::: api vec2( ...value: Node | Vector2 | Number ) - Convert or create a Vector2 node. :::
+::: api vec2( ...value: Node | Vector2 | number ) : vec2 - Convert or create a Vector2 node. :::
 
-::: api vec3( ...value: Node | Vector3 | Number ) - Convert or create a Vector3 node. :::
+::: api vec3( ...value: Node | Vector3 | number ) : vec3 - Convert or create a Vector3 node. :::
 
-::: api vec4( ...value: Node | Vector4 | Number ) - Convert or create a Vector4 node. :::
+::: api vec4( ...value: Node | Vector4 | number ) : vec4 - Convert or create a Vector4 node. :::
 
-::: api mat2( ...value: Node | Matrix2 | Number ) - Convert or create a Matrix2 node. :::
+::: api mat2( ...value: Node | Matrix2 | number ) : mat2 - Convert or create a Matrix2 node. :::
 
-::: api mat3( ...value: Node | Matrix3 | Number ) - Convert or create a Matrix3 node. :::
+::: api mat3( ...value: Node | Matrix3 | number ) : mat3 - Convert or create a Matrix3 node. :::
 
-::: api mat4( ...value: Node | Matrix4 | Number ) - Convert or create a Matrix4 node. :::
+::: api mat4( ...value: Node | Matrix4 | number ) : mat4 - Convert or create a Matrix4 node. :::
 
-::: api ivec2( ...value: Node | Number ) - Convert or create an integer Vector2 node. :::
+::: api ivec2( ...value: Node | number ) : ivec2 - Convert or create an integer Vector2 node. :::
 
-::: api ivec3( ...value: Node | Number ) - Convert or create an integer Vector3 node. :::
+::: api ivec3( ...value: Node | number ) : ivec3 - Convert or create an integer Vector3 node. :::
 
-::: api ivec4( ...value: Node | Number ) - Convert or create an integer Vector4 node. :::
+::: api ivec4( ...value: Node | number ) : ivec4 - Convert or create an integer Vector4 node. :::
 
-::: api uvec2( ...value: Node | Number ) - Convert or create an unsigned integer Vector2 node. :::
+::: api uvec2( ...value: Node | number ) : uvec2 - Convert or create an unsigned integer Vector2 node. :::
 
-::: api uvec3( ...value: Node | Number ) - Convert or create an unsigned integer Vector3 node. :::
+::: api uvec3( ...value: Node | number ) : uvec3 - Convert or create an unsigned integer Vector3 node. :::
 
-::: api uvec4( ...value: Node | Number ) - Convert or create an unsigned integer Vector4 node. :::
+::: api uvec4( ...value: Node | number ) : uvec4 - Convert or create an unsigned integer Vector4 node. :::
 
-::: api bvec2( ...value: Node | boolean ) - Convert or create a boolean Vector2 node. :::
+::: api bvec2( ...value: Node | boolean ) : bvec2 - Convert or create a boolean Vector2 node. :::
 
-::: api bvec3( ...value: Node | boolean ) - Convert or create a boolean Vector3 node. :::
+::: api bvec3( ...value: Node | boolean ) : bvec3 - Convert or create a boolean Vector3 node. :::
 
-::: api bvec4( ...value: Node | boolean ) - Convert or create a boolean Vector4 node. :::
+::: api bvec4( ...value: Node | boolean ) : bvec4 - Convert or create a boolean Vector4 node. :::
 
 Example:
 
@@ -516,45 +516,45 @@ material.colorNode = vec2( positionWorld ); // result positionWorld.xy
 
 It is also possible to perform conversions using the **method chaining**:
 
-::: api .toFloat() - Convert the node value to float. :::
+::: api .toFloat() : float - Convert the node value to float. :::
 
-::: api .toInt() - Convert the node value to integer. :::
+::: api .toInt() : int - Convert the node value to integer. :::
 
-::: api .toUint() - Convert the node value to unsigned integer. :::
+::: api .toUint() : uint - Convert the node value to unsigned integer. :::
 
-::: api .toBool() - Convert the node value to boolean. :::
+::: api .toBool() : bool - Convert the node value to boolean. :::
 
-::: api .toColor() - Convert the node value to color. :::
+::: api .toColor() : color - Convert the node value to color. :::
 
-::: api .toVec2() - Convert the node value to Vector2. :::
+::: api .toVec2() : vec2 - Convert the node value to Vector2. :::
 
-::: api .toVec3() - Convert the node value to Vector3. :::
+::: api .toVec3() : vec3 - Convert the node value to Vector3. :::
 
-::: api .toVec4() - Convert the node value to Vector4. :::
+::: api .toVec4() : vec4 - Convert the node value to Vector4. :::
 
-::: api .toMat2() - Convert the node value to Matrix2. :::
+::: api .toMat2() : mat2 - Convert the node value to Matrix2. :::
 
-::: api .toMat3() - Convert the node value to Matrix3. :::
+::: api .toMat3() : mat3 - Convert the node value to Matrix3. :::
 
-::: api .toMat4() - Convert the node value to Matrix4. :::
+::: api .toMat4() : mat4 - Convert the node value to Matrix4. :::
 
-::: api .toIVec2() - Convert the node value to integer Vector2. :::
+::: api .toIVec2() : ivec2 - Convert the node value to integer Vector2. :::
 
-::: api .toIVec3() - Convert the node value to integer Vector3. :::
+::: api .toIVec3() : ivec3 - Convert the node value to integer Vector3. :::
 
-::: api .toIVec4() - Convert the node value to integer Vector4. :::
+::: api .toIVec4() : ivec4 - Convert the node value to integer Vector4. :::
 
-::: api .toUVec2() - Convert the node value to unsigned integer Vector2. :::
+::: api .toUVec2() : uvec2 - Convert the node value to unsigned integer Vector2. :::
 
-::: api .toUVec3() - Convert the node value to unsigned integer Vector3. :::
+::: api .toUVec3() : uvec3 - Convert the node value to unsigned integer Vector3. :::
 
-::: api .toUVec4() - Convert the node value to unsigned integer Vector4. :::
+::: api .toUVec4() : uvec4 - Convert the node value to unsigned integer Vector4. :::
 
-::: api .toBVec2() - Convert the node value to boolean Vector2. :::
+::: api .toBVec2() : bvec2 - Convert the node value to boolean Vector2. :::
 
-::: api .toBVec3() - Convert the node value to boolean Vector3. :::
+::: api .toBVec3() : bvec3 - Convert the node value to boolean Vector3. :::
 
-::: api .toBVec4() - Convert the node value to boolean Vector4. :::
+::: api .toBVec4() : bvec4 - Convert the node value to boolean Vector4. :::
 
 Example:
 
@@ -578,47 +578,47 @@ model.material.colorNode = color( 0x1e90ff );
 
 TSL nodes support all standard mathematical, logical, and bitwise operators as chainable methods:
 
-::: api .add( ...value: Node | Number ) - Return the addition of two or more values. :::
+::: api .add( ...value: Node | number ) : Node - Return the addition of two or more values. :::
 
-::: api .sub( value: Node | Number ) - Return the subtraction of two or more values. :::
+::: api .sub( value: Node | number ) : Node - Return the subtraction of two or more values. :::
 
-::: api .mul( value: Node | Number ) - Return the multiplication of two or more values. :::
+::: api .mul( value: Node | number ) : Node - Return the multiplication of two or more values. :::
 
-::: api .div( value: Node | Number ) - Return the division of two or more values. :::
+::: api .div( value: Node | number ) : Node - Return the division of two or more values. :::
 
-::: api .mod( value: Node | Number ) - Computes the remainder of dividing the first node by the second. :::
+::: api .mod( value: Node | number ) : Node - Computes the remainder of dividing the first node by the second. :::
 
-::: api .equal( value: Node | Number | Boolean ) - Checks if two nodes are equal. :::
+::: api .equal( value: Node | number | boolean ) : bool - Checks if two nodes are equal. :::
 
-::: api .notEqual( value: Node | Number | Boolean ) - Checks if two nodes are not equal. :::
+::: api .notEqual( value: Node | number | boolean ) : bool - Checks if two nodes are not equal. :::
 
-::: api .lessThan( value: Node | Number | Boolean ) - Checks if the first node is less than the second. :::
+::: api .lessThan( value: Node | number | boolean ) : bool - Checks if the first node is less than the second. :::
 
-::: api .greaterThan( value: Node | Number | Boolean ) - Checks if the first node is greater than the second. :::
+::: api .greaterThan( value: Node | number | boolean ) : bool - Checks if the first node is greater than the second. :::
 
-::: api .lessThanEqual( value: Node | Number | Boolean ) - Checks if the first node is less than or equal to the second. :::
+::: api .lessThanEqual( value: Node | number | boolean ) : bool - Checks if the first node is less than or equal to the second. :::
 
-::: api .greaterThanEqual( value: Node | Number | Boolean ) - Checks if the first node is greater than or equal to the second. :::
+::: api .greaterThanEqual( value: Node | number | boolean ) : bool - Checks if the first node is greater than or equal to the second. :::
 
-::: api .and( value: Node | Boolean ) - Performs logical AND on two nodes. :::
+::: api .and( value: Node | boolean ) : bool - Performs logical AND on two nodes. :::
 
-::: api .or( value: Node | Boolean ) - Performs logical OR on two nodes. :::
+::: api .or( value: Node | boolean ) : bool - Performs logical OR on two nodes. :::
 
-::: api .not( value: Node | Boolean ) - Performs logical NOT on a node. :::
+::: api .not( value: Node | boolean ) : bool - Performs logical NOT on a node. :::
 
-::: api .xor( value: Node | Boolean ) - Performs logical XOR on two nodes. :::
+::: api .xor( value: Node | boolean ) : bool - Performs logical XOR on two nodes. :::
 
-::: api .bitAnd( value: Node | Number ) - Performs bitwise AND on two nodes. :::
+::: api .bitAnd( value: Node | number ) : Node - Performs bitwise AND on two nodes. :::
 
-::: api .bitNot( value: Node | Number ) - Performs bitwise NOT on a node. :::
+::: api .bitNot( value: Node | number ) : Node - Performs bitwise NOT on a node. :::
 
-::: api .bitOr( value: Node | Number ) - Performs bitwise OR on two nodes. :::
+::: api .bitOr( value: Node | number ) : Node - Performs bitwise OR on two nodes. :::
 
-::: api .bitXor( value: Node | Number ) - Performs bitwise XOR on two nodes. :::
+::: api .bitXor( value: Node | number ) : Node - Performs bitwise XOR on two nodes. :::
 
-::: api .shiftLeft( value: Node | Number ) - Shifts a node to the left. :::
+::: api .shiftLeft( value: Node | number ) : Node - Shifts a node to the left. :::
 
-::: api .shiftRight( value: Node | Number ) - Shifts a node to the right. :::
+::: api .shiftRight( value: Node | number ) : Node - Shifts a node to the right. :::
 
 ```tsl
 import 'scenes/shaderball';
@@ -642,280 +642,280 @@ TSL provides all standard mathematical constants and functions as both direct fu
 
 ### Constants
 
-::: api EPSILON - Small floating-point precision value (`1e-6`). Returns `float`. :::
+::: api EPSILON : float - Small floating-point precision value (`1e-6`). :::
 
-::: api INFINITY - Represents positive infinity. Returns `float`. :::
+::: api INFINITY : float - Represents positive infinity. :::
 
-::: api PI - Mathematical constant π (`3.141592653589793`). Returns `float`. :::
+::: api PI : float - Mathematical constant π (`3.141592653589793`). :::
 
-::: api TWO_PI - Two times π (`6.283185307179586`). Returns `float`. :::
+::: api TWO_PI : float - Two times π (`6.283185307179586`). :::
 
-::: api HALF_PI - Half of π (`1.5707963267948966`). Returns `float`. :::
+::: api HALF_PI : float - Half of π (`1.5707963267948966`). :::
 
 ### Functions
 
-::: api abs( x ) - Computes the absolute value of `x`. Returns `Node`.
-- **x**: `Node | Number` - Input value or node.
+::: api abs( x ) : Node - Computes the absolute value of `x`.
+- **x**: `Node | number` - Input value or node.
 :::
 
-::: api acos( x ) - Computes the arccosine of `x` in radians. Returns `Node`.
-- **x**: `Node | Number` - Input value or node in range `[-1, 1]`.
+::: api acos( x ) : Node - Computes the arccosine of `x` in radians.
+- **x**: `Node | number` - Input value or node in range `[-1, 1]`.
 :::
 
-::: api all( x ) - Returns `true` if all components of `x` are non-zero or true. Returns `boolean`.
+::: api all( x ) : bool - Returns `true` if all components of `x` are non-zero or true.
 - **x**: `Node` - Vector node.
 :::
 
-::: api any( x ) - Returns `true` if any component of `x` is non-zero or true. Returns `boolean`.
+::: api any( x ) : bool - Returns `true` if any component of `x` is non-zero or true.
 - **x**: `Node` - Vector node.
 :::
 
-::: api asin( x ) - Computes the arcsine of `x` in radians. Returns `Node`.
-- **x**: `Node | Number` - Input value or node in range `[-1, 1]`.
+::: api asin( x ) : Node - Computes the arcsine of `x` in radians.
+- **x**: `Node | number` - Input value or node in range `[-1, 1]`.
 :::
 
-::: api atan( y, x? ) - Computes the arc-tangent of `y` or `y / x` in radians. Returns `Node`.
-- **y**: `Node | Number` - Y coordinate or single tangent ratio.
-- **x**: `Node | Number` - (Optional) X coordinate for two-argument arc-tangent (`atan2`).
+::: api atan( y, x? ) : Node - Computes the arc-tangent of `y` or `y / x` in radians.
+- **y**: `Node | number` - Y coordinate or single tangent ratio.
+- **x**: `Node | number` - (Optional) X coordinate for two-argument arc-tangent (`atan2`).
 :::
 
-::: api bitcast( x, type ) - Reinterprets the bit pattern of `x` as a different type without type conversion. Returns `Node`.
+::: api bitcast( x, type ) : Node - Reinterprets the bit pattern of `x` as a different type without type conversion.
 - **x**: `Node` - Input node.
 - **type**: `string` - Target primitive type name (e.g. `'float'`, `'int'`, `'uint'`).
 :::
 
-::: api cbrt( x ) - Computes the cube root of `x`. Returns `Node`.
-- **x**: `Node | Number` - Input value or node.
+::: api cbrt( x ) : Node - Computes the cube root of `x`.
+- **x**: `Node | number` - Input value or node.
 :::
 
-::: api ceil( x ) - Rounds `x` up to the nearest integer. Returns `Node`.
-- **x**: `Node | Number` - Input value or node.
+::: api ceil( x ) : Node - Rounds `x` up to the nearest integer.
+- **x**: `Node | number` - Input value or node.
 :::
 
-::: api clamp( x, min, max ) - Constrains `x` to lie between `min` and `max`. Returns `Node`.
-- **x**: `Node | Number` - Value to constrain.
-- **min**: `Node | Number` - Lower bound.
-- **max**: `Node | Number` - Upper bound.
+::: api clamp( x, min, max ) : Node - Constrains `x` to lie between `min` and `max`.
+- **x**: `Node | number` - Value to constrain.
+- **min**: `Node | number` - Lower bound.
+- **max**: `Node | number` - Upper bound.
 :::
 
-::: api cos( x ) - Computes the cosine of `x`. Returns `Node`.
-- **x**: `Node | Number` - Angle in radians.
+::: api cos( x ) : Node - Computes the cosine of `x`.
+- **x**: `Node | number` - Angle in radians.
 :::
 
-::: api cross( a, b ) - Computes the cross product of 3D vectors `a` and `b`. Returns `vec3`.
+::: api cross( a, b ) : vec3 - Computes the cross product of 3D vectors `a` and `b`.
 - **a**: `vec3` - First 3D vector.
 - **b**: `vec3` - Second 3D vector.
 :::
 
-::: api dFdx( p ) - Computes the partial derivative of `p` with respect to screen X axis. Returns `Node`.
+::: api dFdx( p ) : Node - Computes the partial derivative of `p` with respect to screen X axis.
 - **p**: `Node` - Input expression node.
 :::
 
-::: api dFdy( p ) - Computes the partial derivative of `p` with respect to screen Y axis. Returns `Node`.
+::: api dFdy( p ) : Node - Computes the partial derivative of `p` with respect to screen Y axis.
 - **p**: `Node` - Input expression node.
 :::
 
-::: api degrees( radians ) - Converts an angle from radians to degrees. Returns `Node`.
-- **radians**: `Node | Number` - Angle in radians.
+::: api degrees( radians ) : Node - Converts an angle from radians to degrees.
+- **radians**: `Node | number` - Angle in radians.
 :::
 
-::: api difference( a, b ) - Computes the absolute difference `|a - b|`. Returns `Node`.
-- **a**: `Node | Number` - First value or node.
-- **b**: `Node | Number` - Second value or node.
+::: api difference( a, b ) : Node - Computes the absolute difference `|a - b|`.
+- **a**: `Node | number` - First value or node.
+- **b**: `Node | number` - Second value or node.
 :::
 
-::: api distance( a, b ) - Computes the Euclidean distance between two points (`length(a - b)`). Returns `float`.
+::: api distance( a, b ) : float - Computes the Euclidean distance between two points (`length(a - b)`).
 - **a**: `Node` - First point or vector node.
 - **b**: `Node` - Second point or vector node.
 :::
 
-::: api dot( a, b ) - Computes the dot product of vectors `a` and `b`. Returns `float`.
+::: api dot( a, b ) : float - Computes the dot product of vectors `a` and `b`.
 - **a**: `Node` - First vector node.
 - **b**: `Node` - Second vector node.
 :::
 
-::: api equals( a, b ) - Returns `true` if `a` equals `b`. Returns `boolean`.
-- **a**: `Node | Number` - First value or node.
-- **b**: `Node | Number` - Second value or node.
+::: api equals( a, b ) : bool - Returns `true` if `a` equals `b`.
+- **a**: `Node | number` - First value or node.
+- **b**: `Node | number` - Second value or node.
 :::
 
-::: api exp( x ) - Computes the natural exponential e^`x`. Returns `Node`.
-- **x**: `Node | Number` - Input value or node.
+::: api exp( x ) : Node - Computes the natural exponential e^`x`.
+- **x**: `Node | number` - Input value or node.
 :::
 
-::: api exp2( x ) - Computes `2` raised to the power of `x`. Returns `Node`.
-- **x**: `Node | Number` - Input value or node.
+::: api exp2( x ) : Node - Computes `2` raised to the power of `x`.
+- **x**: `Node | number` - Input value or node.
 :::
 
-::: api faceforward( N, I, Nref ) - Orients a normal vector to point away from a surface. Returns `vec3`.
+::: api faceforward( N, I, Nref ) : vec3 - Orients a normal vector to point away from a surface.
 - **N**: `vec3` - Surface normal vector.
 - **I**: `vec3` - Incident vector.
 - **Nref**: `vec3` - Reference normal vector.
 :::
 
-::: api floor( x ) - Rounds `x` down to the nearest integer. Returns `Node`.
-- **x**: `Node | Number` - Input value or node.
+::: api floor( x ) : Node - Rounds `x` down to the nearest integer.
+- **x**: `Node | number` - Input value or node.
 :::
 
-::: api fract( x ) - Computes the fractional part of `x` (`x - floor(x)`). Returns `Node`.
-- **x**: `Node | Number` - Input value or node.
+::: api fract( x ) : Node - Computes the fractional part of `x` (`x - floor(x)`).
+- **x**: `Node | number` - Input value or node.
 :::
 
-::: api fwidth( p ) - Computes the sum of absolute partial derivatives `|dFdx(p)| + |dFdy(p)|`. Returns `Node`.
+::: api fwidth( p ) : Node - Computes the sum of absolute partial derivatives `|dFdx(p)| + |dFdy(p)|`.
 - **p**: `Node` - Input expression node.
 :::
 
-::: api inverseSqrt( x ) - Computes the reciprocal of the square root `1 / sqrt(x)`. Returns `Node`.
-- **x**: `Node | Number` - Input value or node.
+::: api inverseSqrt( x ) : Node - Computes the reciprocal of the square root `1 / sqrt(x)`.
+- **x**: `Node | number` - Input value or node.
 :::
 
-::: api length( x ) - Computes the Euclidean length of vector `x`. Returns `float`.
+::: api length( x ) : float - Computes the Euclidean length of vector `x`.
 - **x**: `Node` - Vector node.
 :::
 
-::: api lengthSq( x ) - Computes the squared length of vector `x` (`dot(x, x)`). Returns `float`.
+::: api lengthSq( x ) : float - Computes the squared length of vector `x` (`dot(x, x)`).
 - **x**: `Node` - Vector node.
 :::
 
-::: api log( x ) - Computes the natural logarithm ln(`x`). Returns `Node`.
-- **x**: `Node | Number` - Input value or node.
+::: api log( x ) : Node - Computes the natural logarithm ln(`x`).
+- **x**: `Node | number` - Input value or node.
 :::
 
-::: api log2( x ) - Computes the base-2 logarithm log₂(`x`). Returns `Node`.
-- **x**: `Node | Number` - Input value or node.
+::: api log2( x ) : Node - Computes the base-2 logarithm log₂(`x`).
+- **x**: `Node | number` - Input value or node.
 :::
 
-::: api max( a, b ) - Returns the greater of two values. Returns `Node`.
-- **a**: `Node | Number` - First value or node.
-- **b**: `Node | Number` - Second value or node.
+::: api max( a, b ) : Node - Returns the greater of two values.
+- **a**: `Node | number` - First value or node.
+- **b**: `Node | number` - Second value or node.
 :::
 
-::: api min( a, b ) - Returns the lesser of two values. Returns `Node`.
-- **a**: `Node | Number` - First value or node.
-- **b**: `Node | Number` - Second value or node.
+::: api min( a, b ) : Node - Returns the lesser of two values.
+- **a**: `Node | number` - First value or node.
+- **b**: `Node | number` - Second value or node.
 :::
 
-::: api mix( a, b, t ) - Linearly interpolates between `a` and `b`. Returns `Node`.
-- **a**: `Node | Number` - Start value or node (returned when `t = 0`).
-- **b**: `Node | Number` - End value or node (returned when `t = 1`).
-- **t**: `Node | Number` - Interpolation factor between `0` and `1`.
+::: api mix( a, b, t ) : Node - Linearly interpolates between `a` and `b`.
+- **a**: `Node | number` - Start value or node (returned when `t = 0`).
+- **b**: `Node | number` - End value or node (returned when `t = 1`).
+- **t**: `Node | number` - Interpolation factor between `0` and `1`.
 :::
 
-::: api negate( x ) - Negates the value of `x` (`-x`). Returns `Node`.
-- **x**: `Node | Number` - Input value or node.
+::: api negate( x ) : Node - Negates the value of `x` (`-x`).
+- **x**: `Node | number` - Input value or node.
 :::
 
-::: api normalize( x ) - Computes the unit vector in the same direction as vector `x`. Returns `Node`.
+::: api normalize( x ) : Node - Computes the unit vector in the same direction as vector `x`.
 - **x**: `Node` - Vector node.
 :::
 
-::: api oneMinus( x ) - Computes `1 - x`. Returns `Node`.
-- **x**: `Node | Number` - Input value or node.
+::: api oneMinus( x ) : Node - Computes `1 - x`.
+- **x**: `Node | number` - Input value or node.
 :::
 
-::: api pow( x, y ) - Computes `x` raised to power `y` (`x^y`). Returns `Node`.
-- **x**: `Node | Number` - Base value or node.
-- **y**: `Node | Number` - Exponent value or node.
+::: api pow( x, y ) : Node - Computes `x` raised to power `y` (`x^y`).
+- **x**: `Node | number` - Base value or node.
+- **y**: `Node | number` - Exponent value or node.
 :::
 
-::: api pow2( x ) - Computes the square of `x` (`x * x`). Returns `Node`.
-- **x**: `Node | Number` - Input value or node.
+::: api pow2( x ) : Node - Computes the square of `x` (`x * x`).
+- **x**: `Node | number` - Input value or node.
 :::
 
-::: api pow3( x ) - Computes the cube of `x` (`x * x * x`). Returns `Node`.
-- **x**: `Node | Number` - Input value or node.
+::: api pow3( x ) : Node - Computes the cube of `x` (`x * x * x`).
+- **x**: `Node | number` - Input value or node.
 :::
 
-::: api pow4( x ) - Computes the fourth power of `x`. Returns `Node`.
-- **x**: `Node | Number` - Input value or node.
+::: api pow4( x ) : Node - Computes the fourth power of `x`.
+- **x**: `Node | number` - Input value or node.
 :::
 
-::: api radians( degrees ) - Converts an angle from degrees to radians. Returns `Node`.
-- **degrees**: `Node | Number` - Angle in degrees.
+::: api radians( degrees ) : Node - Converts an angle from degrees to radians.
+- **degrees**: `Node | number` - Angle in degrees.
 :::
 
-::: api reciprocal( x ) - Computes the reciprocal `1 / x`. Returns `Node`.
-- **x**: `Node | Number` - Input value or node.
+::: api reciprocal( x ) : Node - Computes the reciprocal `1 / x`.
+- **x**: `Node | number` - Input value or node.
 :::
 
-::: api reflect( I, N ) - Computes the reflection direction for an incident vector. Returns `vec3`.
+::: api reflect( I, N ) : vec3 - Computes the reflection direction for an incident vector.
 - **I**: `vec3` - Incident vector pointing towards the surface.
 - **N**: `vec3` - Normalized surface normal vector.
 :::
 
-::: api refract( I, N, eta ) - Computes the refraction direction for an incident vector. Returns `vec3`.
+::: api refract( I, N, eta ) : vec3 - Computes the refraction direction for an incident vector.
 - **I**: `vec3` - Incident vector pointing towards the surface.
 - **N**: `vec3` - Normalized surface normal vector.
-- **eta**: `float | Number` - Ratio of indices of refraction.
+- **eta**: `float | number` - Ratio of indices of refraction.
 :::
 
-::: api round( x ) - Rounds `x` to the nearest integer. Returns `Node`.
-- **x**: `Node | Number` - Input value or node.
+::: api round( x ) : Node - Rounds `x` to the nearest integer.
+- **x**: `Node | number` - Input value or node.
 :::
 
-::: api saturate( x ) - Constrains `x` to range `[0, 1]`. Returns `Node`.
-- **x**: `Node | Number` - Input value or node.
+::: api saturate( x ) : Node - Constrains `x` to range `[0, 1]`.
+- **x**: `Node | number` - Input value or node.
 :::
 
-::: api sign( x ) - Extracts the sign of `x` (`-1.0`, `0.0`, or `1.0`). Returns `Node`.
-- **x**: `Node | Number` - Input value or node.
+::: api sign( x ) : Node - Extracts the sign of `x` (`-1.0`, `0.0`, or `1.0`).
+- **x**: `Node | number` - Input value or node.
 :::
 
-::: api sin( x ) - Computes the sine of `x`. Returns `Node`.
-- **x**: `Node | Number` - Angle in radians.
+::: api sin( x ) : Node - Computes the sine of `x`.
+- **x**: `Node | number` - Angle in radians.
 :::
 
-::: api smoothstep( low, high, x ) - Performs smooth Hermite interpolation between `low` and `high` edges. Returns `Node`.
-- **low**: `Node | Number` - Lower edge threshold.
-- **high**: `Node | Number` - Upper edge threshold.
-- **x**: `Node | Number` - Source value to evaluate.
+::: api smoothstep( low, high, x ) : Node - Performs smooth Hermite interpolation between `low` and `high` edges.
+- **low**: `Node | number` - Lower edge threshold.
+- **high**: `Node | number` - Upper edge threshold.
+- **x**: `Node | number` - Source value to evaluate.
 :::
 
-::: api sqrt( x ) - Computes the square root of `x`. Returns `Node`.
-- **x**: `Node | Number` - Input value or node.
+::: api sqrt( x ) : Node - Computes the square root of `x`.
+- **x**: `Node | number` - Input value or node.
 :::
 
-::: api step( edge, x ) - Generates a step function, returning `0.0` if `x < edge`, else `1.0`. Returns `Node`.
-- **edge**: `Node | Number` - Threshold edge.
-- **x**: `Node | Number` - Source value.
+::: api step( edge, x ) : Node - Generates a step function, returning `0.0` if `x < edge`, else `1.0`.
+- **edge**: `Node | number` - Threshold edge.
+- **x**: `Node | number` - Source value.
 :::
 
-::: api tan( x ) - Computes the tangent of `x`. Returns `Node`.
-- **x**: `Node | Number` - Angle in radians.
+::: api tan( x ) : Node - Computes the tangent of `x`.
+- **x**: `Node | number` - Angle in radians.
 :::
 
-::: api transformDirection( dir, matrix ) - Transforms direction vector `dir` by `matrix` and normalizes the result. Returns `vec3`.
+::: api transformDirection( dir, matrix ) : vec3 - Transforms direction vector `dir` by `matrix` and normalizes the result.
 - **dir**: `vec3` - Direction vector node.
 - **matrix**: `mat4` - Transformation matrix node.
 :::
 
-::: api transformNormalByViewMatrix( normal, viewMatrix? ) - Transforms a normal vector from world space to view space and normalizes the result. Returns `vec3`.
+::: api transformNormalByViewMatrix( normal, viewMatrix? ) : vec3 - Transforms a normal vector from world space to view space and normalizes the result.
 - **normal**: `vec3` - World-space normal vector.
 - **viewMatrix**: `mat4` - (Optional) View matrix node. Defaults to camera view matrix.
 :::
 
-::: api transformNormalByInverseViewMatrix( normal, viewMatrix? ) - Transforms a normal vector from view space to world space and normalizes the result. Returns `vec3`.
+::: api transformNormalByInverseViewMatrix( normal, viewMatrix? ) : vec3 - Transforms a normal vector from view space to world space and normalizes the result.
 - **normal**: `vec3` - View-space normal vector.
 - **viewMatrix**: `mat4` - (Optional) View matrix node. Defaults to camera view matrix.
 :::
 
-::: api trunc( x ) - Truncates `x` towards zero, removing its fractional part. Returns `Node`.
-- **x**: `Node | Number` - Input value or node.
+::: api trunc( x ) : Node - Truncates `x` towards zero, removing its fractional part.
+- **x**: `Node | number` - Input value or node.
 :::
 
 > Important: Method Chaining Exceptions: In TSL method chaining `node.method(...)`, functions that accept interpolation or comparison factors use the calling node as the **last parameter** (the evaluation factor or source value):
 
-::: api t.mix( a, b ) - Method chaining form of `mix( a, b, t )`. Calling node `t` is the interpolation factor (0 to 1). Returns `Node`.
+::: api t.mix( a, b ) : Node - Method chaining form of `mix( a, b, t )`. Calling node `t` is the interpolation factor (0 to 1).
 - **a**: `Node` - Start value node (returned when `t = 0`).
 - **b**: `Node` - End value node (returned when `t = 1`).
 :::
 
-::: api x.smoothstep( low, high ) - Method chaining form of `smoothstep( low, high, x )`. Calling node `x` is the source value evaluated between `low` and `high`. Returns `Node`.
+::: api x.smoothstep( low, high ) : Node - Method chaining form of `smoothstep( low, high, x )`. Calling node `x` is the source value evaluated between `low` and `high`.
 - **low**: `Node` - Lower edge threshold.
 - **high**: `Node` - Upper edge threshold.
 :::
 
-::: api x.step( edge ) - Method chaining form of `step( edge, x )`. Calling node `x` is the source value compared against `edge`. Returns `Node`.
+::: api x.step( edge ) : Node - Method chaining form of `step( edge, x )`. Calling node `x` is the source value compared against `edge`.
 - **edge**: `Node` - Threshold edge node.
 :::
 
@@ -936,27 +936,27 @@ model.material.colorNode = positiveValue;
 <page name="Assignments">
 
 TSL variables and parameters inside a custom function `Fn` can be updated dynamically using assignment methods:
-::: api .assign( value: Node | Number ) - Assign one or more value to a and return the same. :::
+::: api .assign( value: Node | Number ) : Node - Assign one or more value to a and return the same. :::
 
-::: api .addAssign( value: Node | Number ) - Adds a value and assigns the result. :::
+::: api .addAssign( value: Node | Number ) : Node - Adds a value and assigns the result. :::
 
-::: api .subAssign( value: Node | Number ) - Subtracts a value and assigns the result. :::
+::: api .subAssign( value: Node | Number ) : Node - Subtracts a value and assigns the result. :::
 
-::: api .mulAssign( value: Node | Number ) - Multiplies a value and assigns the result. :::
+::: api .mulAssign( value: Node | Number ) : Node - Multiplies a value and assigns the result. :::
 
-::: api .divAssign( value: Node | Number ) - Divides a value and assigns the result. :::
+::: api .divAssign( value: Node | Number ) : Node - Divides a value and assigns the result. :::
 
-::: api .modAssign( value: Node | Number ) - Computes the remainder and assigns the result. :::
+::: api .modAssign( value: Node | Number ) : Node - Computes the remainder and assigns the result. :::
 
-::: api .bitAndAssign( value: Node | Number ) - Performs bitwise AND and assigns the result. :::
+::: api .bitAndAssign( value: Node | Number ) : Node - Performs bitwise AND and assigns the result. :::
 
-::: api .bitOrAssign( value: Node | Number ) - Performs bitwise OR and assigns the result. :::
+::: api .bitOrAssign( value: Node | Number ) : Node - Performs bitwise OR and assigns the result. :::
 
-::: api .bitXorAssign( value: Node | Number ) - Performs bitwise XOR and assigns the result. :::
+::: api .bitXorAssign( value: Node | Number ) : Node - Performs bitwise XOR and assigns the result. :::
 
-::: api .shiftLeftAssign( value: Node | Number ) - Shifts left and assigns the result. :::
+::: api .shiftLeftAssign( value: Node | Number ) : Node - Shifts left and assigns the result. :::
 
-::: api .shiftRightAssign( value: Node | Number ) - Shifts right and assigns the result. :::
+::: api .shiftRightAssign( value: Node | Number ) : Node - Shifts right and assigns the result. :::
 
 ```tsl
 import 'scenes/shaderball';
@@ -2050,7 +2050,7 @@ model.material.colorNode = factor.mix( color( 0x3b82f6 ), color( 0xffaa76 ) );
 Uniforms are useful to update values of variables like colors, lighting, or transformations without having to recreate the shader program. They are the true variables from a GPU.
 
 ::: api uniform( value, type? )
-- **value**: `boolean | Number | Color | Vector2 | Vector3 | Vector4 | Matrix3 | Matrix4` - Dynamic value to initialize the uniform with.
+- **value**: `boolean | number | Color | Vector2 | Vector3 | Vector4 | Matrix3 | Matrix4` - Dynamic value to initialize the uniform with.
 - **type**: `string` - (Optional) Explicit TSL type name (e.g. `'float'`, `'vec3'`, etc.). Defaults to `null`.
 :::
 
@@ -2626,13 +2626,24 @@ Functions for creating fog effects in the scene. Assign the fog node to `scene.f
 
 ::: api scene.fogNode : Node - Assign a node to control the scene's fog effect. :::
 
-::: api fog( color, factor ) : FogNode - Creates a fog node with specified color and fog factor. :::
+::: api fog( color, factor ) : FogNode - Creates a fog node with specified color and fog factor.
+- **color**: `Node | Color | string` - Color node or value for the fog.
+- **factor**: `Node` - Fog factor node determining fog density or falloff (e.g. `rangeFogFactor`, `densityFogFactor`).
+:::
 
-::: api rangeFogFactor( near, far ) : float - Creates a linear fog factor based on distance from camera. :::
+::: api rangeFogFactor( near?, far? ) : float - Creates a linear fog factor based on distance from camera.
+- **near**: `Node | number` - (Optional) Distance from camera where fog begins. Defaults to camera near plane.
+- **far**: `Node | number` - (Optional) Distance from camera where fog reaches maximum density. Defaults to camera far plane.
+:::
 
-::: api densityFogFactor( density ) : float - Creates an exponential squared fog factor for denser fog. :::
+::: api densityFogFactor( density? ) : float - Creates an exponential squared fog factor for denser fog.
+- **density**: `Node | number` - (Optional) Fog density coefficient. Defaults to `0.00025`.
+:::
 
-::: api exponentialHeightFogFactor( density, height ) : float - Creates an exponential height fog factor below a specified world height. :::
+::: api exponentialHeightFogFactor( density?, height? ) : float - Creates an exponential height fog factor below a specified world height.
+- **density**: `Node | number` - (Optional) Fog density coefficient. Defaults to `0.00025`.
+- **height**: `Node | number` - (Optional) World-space height threshold for exponential falloff. Defaults to `0.0`.
+:::
 
 <code name="volumetricFog" default="true">Volumetric Fog</code>
 
