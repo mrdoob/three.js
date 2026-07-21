@@ -1,6 +1,6 @@
 import { Color } from '../math/Color.js';
 import { EventDispatcher } from '../core/EventDispatcher.js';
-import { FrontSide, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor, AlwaysStencilFunc, KeepStencilOp } from '../constants.js';
+import { FrontSide, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor, AlwaysStencilFunc, KeepStencilOp, BasicDepthPacking } from '../constants.js';
 import { generateUUID } from '../math/MathUtils.js';
 import { warn } from '../utils.js';
 import { Vector2 } from '../math/Vector2.js';
@@ -822,11 +822,16 @@ class Material extends EventDispatcher {
 		// rotation (SpriteMaterial)
 		if ( this.rotation !== undefined && this.rotation !== 0 ) data.rotation = this.rotation;
 
+		// depthPacking (MeshDepthMaterial)
+		if ( this.depthPacking !== undefined && this.depthPacking !== BasicDepthPacking ) data.depthPacking = this.depthPacking;
+
 		if ( this.polygonOffset === true ) data.polygonOffset = true;
 		if ( this.polygonOffsetFactor !== 0 ) data.polygonOffsetFactor = this.polygonOffsetFactor;
 		if ( this.polygonOffsetUnits !== 0 ) data.polygonOffsetUnits = this.polygonOffsetUnits;
 
 		if ( this.linewidth !== undefined && this.linewidth !== 1 ) data.linewidth = this.linewidth;
+		if ( this.linecap !== undefined && this.linecap !== 'round' ) data.linecap = this.linecap;
+		if ( this.linejoin !== undefined && this.linejoin !== 'round' ) data.linejoin = this.linejoin;
 		if ( this.dashSize !== undefined ) data.dashSize = this.dashSize;
 		if ( this.gapSize !== undefined ) data.gapSize = this.gapSize;
 		if ( this.scale !== undefined ) data.scale = this.scale;
@@ -936,6 +941,7 @@ class Material extends EventDispatcher {
 		if ( json.depthTest !== undefined ) this.depthTest = json.depthTest;
 		if ( json.depthWrite !== undefined ) this.depthWrite = json.depthWrite;
 		if ( json.colorWrite !== undefined ) this.colorWrite = json.colorWrite;
+		if ( json.depthPacking !== undefined ) this.depthPacking = json.depthPacking;
 		if ( json.blendSrc !== undefined ) this.blendSrc = json.blendSrc;
 		if ( json.blendDst !== undefined ) this.blendDst = json.blendDst;
 		if ( json.blendEquation !== undefined ) this.blendEquation = json.blendEquation;
@@ -961,6 +967,8 @@ class Material extends EventDispatcher {
 		if ( json.rotation !== undefined ) this.rotation = json.rotation;
 
 		if ( json.linewidth !== undefined ) this.linewidth = json.linewidth;
+		if ( json.linecap !== undefined ) this.linecap = json.linecap;
+		if ( json.linejoin !== undefined ) this.linejoin = json.linejoin;
 		if ( json.dashSize !== undefined ) this.dashSize = json.dashSize;
 		if ( json.gapSize !== undefined ) this.gapSize = json.gapSize;
 		if ( json.scale !== undefined ) this.scale = json.scale;

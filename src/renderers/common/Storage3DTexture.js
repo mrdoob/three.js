@@ -75,6 +75,22 @@ class Storage3DTexture extends Texture {
 	}
 
 	/**
+	 * Copies the values of the given texture to this instance.
+	 *
+	 * @param {Storage3DTexture} source - The texture to copy.
+	 * @return {Storage3DTexture} A reference to this instance.
+	 */
+	copy( source ) {
+
+		super.copy( source );
+
+		this.wrapR = source.wrapR;
+
+		return this;
+
+	}
+
+	/**
 	 * Sets the size of the storage 3d texture.
 	 *
 	 * @param {number} width - The new width of the storage texture.
