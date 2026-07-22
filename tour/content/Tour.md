@@ -3159,7 +3159,7 @@ const fireScaleEnvelope = smoothstep( float( 0.0 ), float( 0.1 ), fireLife ).mul
 fireMaterial.scaleNode = fireScale.mul( fireScaleEnvelope );
 
 fireMaterial.colorNode = mix( color( 0xffaa00 ), color( 0xff3b00 ), fireLife ); // gold to hot red-orange
-fireMaterial.opacityNode = firePuff.mul( fireLife.oneMinus().pow( 4.0 ) ); // smoother fade out
+fireMaterial.opacityNode = firePuff.mul( fireLife.oneMinus().pow( 4.0 ) ).mul( .5 ); // smoother fade out
 fireMaterial.transparent = true;
 fireMaterial.depthWrite = false;
 fireMaterial.blending = THREE.AdditiveBlending;
