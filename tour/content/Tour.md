@@ -127,7 +127,7 @@ It is also possible to serialize or deserialize a Node using `serialize()` and `
 
 </page>
 
-<page name="Learning TSL">
+<page name="What is TSL?">
 
 TSL is a Node-based shader abstraction, written in JavaScript. TSL's functions are inspired by GLSL, but follow a very different concept. WGSL and GLSL are focused on creating GPU programs, in TSL this is one of the features.
 
