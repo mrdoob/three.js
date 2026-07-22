@@ -3030,32 +3030,16 @@ camera.position.set( 0, 3.0, 8.0 );
 
 TSL provides utilities for generating pseudo-random values. These are useful for procedural generation, noise, and randomized instanced attributes (e.g., varying speed, size, or color across thousands of particle instances).
 
-::: api hash( seed ) : float - Generates a hash value in the range `[ 0, 1 ]` from the given seed.
-- **seed**: `Node | float | int | uint` - The input value to generate the hash from.
-:::
-
 ::: api range( min, max ) : Node - Generates a range `attribute` of values between min and max. Attribute randomization is useful when you want to randomize values between instances and not between pixels.
 - **min**: `Node | number | Vector2 | Vector3 | Vector4 | Color` - The minimum value.
 - **max**: `Node | number | Vector2 | Vector3 | Vector4 | Color` - The maximum value.
 :::
 
-<code name="hashExample" default="true">Hash Grid</code>
+::: api hash( seed ) : float - Generates a hash value in the range `[ 0, 1 ]` from the given seed.
+- **seed**: `Node | float | int | uint` - The input value to generate the hash from.
+:::
 
-```tsl hashExample
-import 'scenes/quad';
-import { uv, floor, hash } from 'three/tsl';
-
-// Divide the screen coordinates into a 16x16 grid of cells
-const gridCoords = floor( uv().mul( 16.0 ) );
-
-// Hash each cell's 2D coordinate to generate a pseudo-random value [0, 1] per cell
-const randomVal = hash( gridCoords );
-
-// Output the random value as a grayscale color
-model.material.colorNode = randomVal;
-```
-
-<code name="rangeExample">Instanced Range</code>
+<code name="rangeExample" default="true">Instanced Range</code>
 
 ```tsl rangeExample
 import 'scenes/empty';
@@ -3098,6 +3082,22 @@ scene.add( dirLight );
 camera.position.set( 0, 4.0, 6.0 );
 ```
 
+<code name="hashExample">Hash Grid</code>
+
+```tsl hashExample
+import 'scenes/quad';
+import { uv, floor, hash } from 'three/tsl';
+
+// Divide the screen coordinates into a 16x16 grid of cells
+const gridCoords = floor( uv().mul( 16.0 ) );
+
+// Hash each cell's 2D coordinate to generate a pseudo-random value [0, 1] per cell
+const randomVal = hash( gridCoords );
+
+// Output the random value as a grayscale color
+model.material.colorNode = randomVal;
+```
+
 <code name="fireParticles">Realistic Bonfire</code>
 
 ```tsl fireParticles
@@ -3131,7 +3131,7 @@ const fireScale = range( 0.22, 0.42 );
 const fireLife = speedTime.mul( fireSpeed ).add( fireOffset ).fract();
 
 // Calculate fire position: starts narrow at base, then expands/funnels outwards as it rises and dissipates (upward cone)
-const fireSpread = fireLife.mix( float( 0.5 ), float( 1.2 ), fireLife ); // starts narrow, expands outwards widely
+const fireSpread = fireLife.mix( float( 0.5 ), float( 1.7 ), fireLife ); // starts narrow, expands outwards widely
 const fireCurrentAngle = fireOffset.mul( Math.PI * 2.0 ).add( fireLife.mul( 1.5 ) );
 
 // Add randomized dispersion offsets that grow with life to scatter particles as they rise
@@ -3159,13 +3159,14 @@ const fireScaleEnvelope = smoothstep( float( 0.0 ), float( 0.1 ), fireLife ).mul
 fireMaterial.scaleNode = fireScale.mul( fireScaleEnvelope );
 
 fireMaterial.colorNode = mix( color( 0xffaa00 ), color( 0xff3b00 ), fireLife ); // gold to hot red-orange
-fireMaterial.opacityNode = firePuff.mul( fireLife.oneMinus().pow( 1.5 ) ); // smoother fade out
+fireMaterial.opacityNode = firePuff.mul( fireLife.oneMinus().pow( 4.0 ) ); // smoother fade out
 fireMaterial.transparent = true;
 fireMaterial.depthWrite = false;
 fireMaterial.blending = THREE.AdditiveBlending;
 
 const fireParticles = new THREE.Sprite( fireMaterial );
 fireParticles.count = fireCount;
+fireParticles.renderOrder = 2;
 fireParticles.frustumCulled = false;
 scene.add( fireParticles );
 
@@ -3181,7 +3182,7 @@ const smokeAngleBase = smokeRand.w.mul( Math.PI * 2.0 );
 const smokeBaseX = smokeAngleBase.cos().mul( smokeRadiusBase );
 const smokeBaseZ = smokeAngleBase.sin().mul( smokeRadiusBase );
 
-const smokeScale = range( 0.35, 0.7 );
+const smokeScale = range( 0.35, 0.8 );
 const smokeLife = speedTime.mul( smokeSpeed ).add( smokeOffset ).fract();
 
 // Calculate smoke position: rises twisting upward, dispersing/expanding outwards as it rises
@@ -3231,6 +3232,7 @@ smokeMaterial.blending = THREE.NormalBlending;
 
 const smokeParticles = new THREE.Sprite( smokeMaterial );
 smokeParticles.count = smokeCount;
+smokeParticles.renderOrder = 1;
 smokeParticles.frustumCulled = false;
 scene.add( smokeParticles );
 
@@ -3293,6 +3295,7 @@ sparkMaterial.blending = THREE.AdditiveBlending;
 
 const sparkParticles = new THREE.Sprite( sparkMaterial );
 sparkParticles.count = sparkCount;
+sparkParticles.renderOrder = 3;
 sparkParticles.frustumCulled = false;
 scene.add( sparkParticles );
 
