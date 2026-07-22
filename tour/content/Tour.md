@@ -3030,13 +3030,13 @@ camera.position.set( 0, 3.0, 8.0 );
 
 TSL provides utilities for generating pseudo-random values. These are useful for procedural generation, noise, and randomized instanced attributes (e.g., varying speed, size, or color across thousands of particle instances).
 
-::: api hash( seed ) : float - Generates a hash value in the range [ 0, 1 ] from the given seed.
+::: api hash( seed ) : float - Generates a hash value in the range `[ 0, 1 ]` from the given seed.
 - **seed**: `Node | float | int | uint` - The input value to generate the hash from.
 :::
 
 ::: api range( min, max ) : Node - Generates a range `attribute` of values between min and max. Attribute randomization is useful when you want to randomize values between instances and not between pixels.
-- **min**: `Node | number | Vector2 | Vector3 | Color` - The minimum value.
-- **max**: `Node | number | Vector2 | Vector3 | Color` - The maximum value.
+- **min**: `Node | number | Vector2 | Vector3 | Vector4 | Color` - The minimum value.
+- **max**: `Node | number | Vector2 | Vector3 | Vector4 | Color` - The maximum value.
 :::
 
 <code name="hashExample" default="true">Hash Grid</code>
