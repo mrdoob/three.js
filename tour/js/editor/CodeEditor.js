@@ -109,12 +109,146 @@ class CodeEditor extends EventDispatcher {
 				window.monaco.editor.defineTheme( 'chatgpt-dark', {
 					base: 'vs-dark',
 					inherit: true,
-					rules: [],
+					rules: [
+						{ token: 'tsl-constant-symbol', foreground: '#00aeff' },
+						{ token: 'tsl-function-symbol', foreground: '#dcdcaa' },
+						{ token: 'tsl-chained-symbol', foreground: '#59d592' }
+					],
 					colors: {
 						'editor.background': '#15151a',
 						'editor.lineHighlightBackground': '#2a2a33'
 					}
 				} );
+
+				// Extend Monaco JavaScript/TypeScript tokenizers with dynamic TSL keywords
+				const extendTokenizer = async () => {
+
+					try {
+
+						const tslConstants = new Set();
+						const tslFunctions = new Set();
+						const tslChaining = new Set();
+
+						// 1. Gather keys from TSL
+						Object.keys( TSL ).forEach( key => {
+
+							if ( /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test( key ) ) {
+
+								const val = TSL[ key ];
+								if ( typeof val === 'function' ) {
+
+									tslFunctions.add( key );
+
+								} else {
+
+									tslConstants.add( key );
+
+								}
+
+							}
+
+						} );
+
+						// 2. Gather only methods (functions) from THREE.Node.prototype to support chaining
+						if ( THREE.Node && THREE.Node.prototype ) {
+
+							let proto = THREE.Node.prototype;
+							while ( proto && proto !== Object.prototype ) {
+
+								Object.getOwnPropertyNames( proto ).forEach( name => {
+
+									if ( name === 'constructor' || name.startsWith( '_' ) ) return;
+
+									if ( /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test( name ) ) {
+
+										const desc = Object.getOwnPropertyDescriptor( proto, name );
+										if ( desc && ! desc.get && ! desc.set && typeof desc.value === 'function' ) {
+
+											tslChaining.add( name );
+
+										}
+
+									}
+
+								} );
+								proto = Object.getPrototypeOf( proto );
+
+							}
+
+						}
+
+						// 3. Gather keys from TSL Addons
+						Object.keys( ADDONS_TSL_IMPORTS ).forEach( key => {
+
+							if ( /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test( key ) ) {
+
+								tslFunctions.add( key );
+
+							}
+
+						} );
+
+						const allLangs = window.monaco.languages.getLanguages();
+						for ( const langId of [ 'javascript', 'typescript' ] ) {
+
+							const langDef = allLangs.find( ( { id } ) => id === langId );
+							if ( langDef && typeof langDef.loader === 'function' ) {
+
+								const langMod = await langDef.loader();
+								const lang = langMod.language;
+
+								if ( lang && lang.tokenizer && lang.tokenizer.root ) {
+
+									// Chaining rule matches dot + keyword, tokenizing them separately
+									if ( tslChaining.size > 0 ) {
+
+										const escapedChaining = Array.from( tslChaining ).map( key => key.replace( /[-\/\\^$*+?.()|[\]{}]/g, '\\$&' ) );
+										escapedChaining.sort( ( a, b ) => b.length - a.length );
+
+										const chainingRegex = new RegExp( `(\\.)(${escapedChaining.join( '|' )})\\b` );
+										lang.tokenizer.root.unshift( [ chainingRegex, [ 'delimiter', 'tsl-chained-symbol' ]] );
+
+									}
+
+									// Functions rule matches standalone function usages
+									if ( tslFunctions.size > 0 ) {
+
+										const escapedFunctions = Array.from( tslFunctions ).map( key => key.replace( /[-\/\\^$*+?.()|[\]{}]/g, '\\$&' ) );
+										escapedFunctions.sort( ( a, b ) => b.length - a.length );
+
+										const functionsRegex = new RegExp( `\\b(${escapedFunctions.join( '|' )})\\b` );
+										lang.tokenizer.root.unshift( [ functionsRegex, 'tsl-function-symbol' ] );
+
+									}
+
+									// Constants rule matches standalone variable/constant usages
+									if ( tslConstants.size > 0 ) {
+
+										const escapedConstants = Array.from( tslConstants ).map( key => key.replace( /[-\/\\^$*+?.()|[\]{}]/g, '\\$&' ) );
+										escapedConstants.sort( ( a, b ) => b.length - a.length );
+
+										const constantsRegex = new RegExp( `\\b(${escapedConstants.join( '|' )})\\b` );
+										lang.tokenizer.root.unshift( [ constantsRegex, 'tsl-constant-symbol' ] );
+
+									}
+
+									window.monaco.languages.setMonarchTokensProvider( langId, lang );
+
+								}
+
+							}
+
+						}
+
+					} catch ( e ) {
+
+						console.error( 'Failed to extend Monaco tokenizer for TSL', e );
+
+					}
+
+				};
+
+				extendTokenizer();
 
 				// Register completion provider for TSL and THREE auto-imports
 				const suggestionsTemplates = [];
@@ -314,7 +448,7 @@ class CodeEditor extends EventDispatcher {
 								return [
 									{
 										range: new window.monaco.Range( 1, 1, 1, 1 ),
-										text: "import * as THREE from 'three';\n"
+										text: 'import * as THREE from \'three\';\n'
 									}
 								];
 

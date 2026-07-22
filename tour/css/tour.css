@@ -2765,7 +2765,7 @@ body.preview-maximized .preview-hide-btn {
 }
 
 .tsl-sig-const-name {
-	color: #00a6ff !important; /* Soft orange for TSL constants/properties */
+	color: #00aeff !important; /* Soft orange for TSL constants/properties */
 	font-weight: 500;
 }
 
