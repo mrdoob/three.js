@@ -90,7 +90,7 @@
 				const depthDistance = viewportLinearDepth.distance( linearDepth() );
 
 				const depthAlphaNode = depthDistance.oneMinus().smoothstep( .90, 2 ).mul( 10 ).saturate();
-				const depthBlurred = hashBlur( viewportSharedTexture(), depthDistance.smoothstep( 0, .6 ).mul( 40 ).clamp().mul( .1 ) );
+				const depthBlurred = hashBlur( viewportSharedTexture(), depthDistance.smoothstep( 0, .6 ).mul( 40 ).clamp().mul( .1 ), { repeats: 25 } );
 
 				const blurredBlur = new THREE.MeshBasicNodeMaterial();
 				blurredBlur.backdropNode = depthBlurred.add( depthAlphaNode.mix( color( 0x003399 ).mul( .3 ), 0 ) );
