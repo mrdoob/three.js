@@ -416,6 +416,29 @@ body.preview-hidden .code-modifier-inline-btn.active {
 	margin-top: 0.1rem;
 }
 
+.header-release {
+	font-size: 0.68rem;
+	font-weight: 500;
+	font-family: 'Fira Code', monospace;
+	color: var(--text-muted);
+	background: rgba(255, 255, 255, 0.04);
+	padding: 0.5rem;
+	border-radius: 4px;
+	margin-left: 0.4rem;
+	user-select: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.header-release .badge-suffix {
+	opacity: 0.35;
+	font-weight: 400;
+	margin-left: 0.2rem;
+}
+
 .header-title-accent {
 	color: #fff;
 	font-weight: 500;
@@ -1360,6 +1383,10 @@ body.v-resizer-editor-collapsed .resizer-v-toggle-btn:not(.inverted) {
 
 
 @media (max-width: 767.98px) {
+	.header-release {
+		display: none !important;
+	}
+
 	.content-area-wrap {
 		padding: 1.25rem 1rem;
 	}

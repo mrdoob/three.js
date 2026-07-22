@@ -217,6 +217,25 @@ class Tour {
 
 
 
+		// Set Three.js release badge with prefix and dev suffix wrapped in spans
+		const releaseEl = document.getElementById( 'threejs-release' );
+		if ( releaseEl ) {
+
+			const revision = THREE.REVISION;
+			const isDev = revision.endsWith( 'dev' );
+			const num = isDev ? revision.slice( 0, - 3 ) : revision;
+
+			let html = `<span class="badge-prefix">r</span><span class="badge-number">${ num }</span>`;
+			if ( isDev ) {
+
+				html += `<span class="badge-suffix">dev</span>`;
+
+			}
+
+			releaseEl.innerHTML = html;
+
+		}
+
 		// Initialize Lucide Icons
 		this.createIcons();
 
