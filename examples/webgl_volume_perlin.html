@@ -193,7 +193,7 @@
 									float t1 = t;
 
 									for ( int j = 0; j < REFINEMENT_STEPS; j ++ ) {
-										
+
 										float tm = ( t0 + t1 ) * 0.5;
 
 										float dm = sample1( vOrigin + tm * rayDir + 0.5 );
@@ -201,7 +201,7 @@
 										if ( dm > threshold ) {
 
 											t1 = tm;
-											
+
 										} else {
 
 											t0 = tm;
