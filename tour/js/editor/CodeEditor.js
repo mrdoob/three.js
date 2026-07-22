@@ -6,6 +6,130 @@ import { CodeCompiler } from '../code/CodeCompiler.js';
 
 let _monacoConfigured = false;
 
+const tslConstants = new Set();
+const tslFunctions = new Set();
+const tslChaining = new Set();
+let _currentImportedSymbolsStr = '';
+
+const buildRegex = ( words, prefix = '', suffix = '\\b' ) => {
+
+	const escaped = Array.from( words )
+		.map( w => w.replace( /[-\/\\^$*+?.()|[\]{}]/g, '\\$&' ) )
+		.sort( ( a, b ) => b.length - a.length );
+	return new RegExp( `${prefix}(${escaped.join( '|' )})${suffix}` );
+
+};
+
+const updateTokenizerForCode = async () => {
+
+	try {
+
+		const importedSymbols = new Set();
+		const importRegex = /import\s*\{([^}]+)\}\s*from\s*['"](?:three\/tsl|three\/addons\/tsl\/[^'"]+)['"]/g;
+
+		// Gather imports from all open models in Monaco
+		window.monaco.editor.getModels().forEach( model => {
+
+			const langId = model.getLanguageId();
+			if ( langId === 'javascript' || langId === 'typescript' ) {
+
+				let match;
+				importRegex.lastIndex = 0;
+				while ( ( match = importRegex.exec( model.getValue() ) ) !== null ) {
+
+					match[ 1 ].split( ',' ).forEach( s => {
+
+						const trimmed = s.trim();
+						if ( trimmed ) importedSymbols.add( trimmed );
+
+					} );
+
+				}
+
+			}
+
+		} );
+
+		const importedSymbolsStr = Array.from( importedSymbols ).sort().join( ',' );
+		if ( importedSymbolsStr === _currentImportedSymbolsStr ) {
+
+			return;
+
+		}
+
+		_currentImportedSymbolsStr = importedSymbolsStr;
+
+		const activeConstants = Array.from( tslConstants ).filter( key => importedSymbols.has( key ) );
+		const activeFunctions = Array.from( tslFunctions ).filter( key => importedSymbols.has( key ) );
+
+		const allLangs = window.monaco.languages.getLanguages();
+		for ( const langId of [ 'javascript', 'typescript' ] ) {
+
+			const langDef = allLangs.find( ( { id } ) => id === langId );
+			if ( langDef && typeof langDef.loader === 'function' ) {
+
+				const langMod = await langDef.loader();
+				const lang = langMod.language;
+
+				if ( lang && lang.tokenizer && lang.tokenizer.root ) {
+
+					// Clean previous rules
+					lang.tokenizer.root = lang.tokenizer.root.filter( rule => {
+
+						if ( Array.isArray( rule ) ) {
+
+							const action = rule[ 1 ];
+							if ( typeof action === 'string' ) {
+
+								return action !== 'tsl-function-symbol' && action !== 'tsl-constant-symbol';
+
+							} else if ( Array.isArray( action ) ) {
+
+								return ! action.includes( 'tsl-chained-symbol' );
+
+							}
+
+						}
+
+						return true;
+
+					} );
+
+					// Register new rules
+					if ( tslChaining.size > 0 ) {
+
+						lang.tokenizer.root.unshift( [ buildRegex( tslChaining, '(\\.)' ), [ 'delimiter', 'tsl-chained-symbol' ]] );
+
+					}
+
+					if ( activeFunctions.length > 0 ) {
+
+						lang.tokenizer.root.unshift( [ buildRegex( activeFunctions, '\\b' ), 'tsl-function-symbol' ] );
+
+					}
+
+					if ( activeConstants.length > 0 ) {
+
+						lang.tokenizer.root.unshift( [ buildRegex( activeConstants, '\\b' ), 'tsl-constant-symbol' ] );
+
+					}
+
+					window.monaco.languages.setMonarchTokensProvider( langId, lang );
+
+				}
+
+			}
+
+		}
+
+	} catch ( e ) {
+
+		console.error( 'Failed to update Monaco tokenizer for TSL imports', e );
+
+	}
+
+};
+
 const ADDONS_TSL_IMPORTS = {
 
 	// display
@@ -120,135 +244,73 @@ class CodeEditor extends EventDispatcher {
 					}
 				} );
 
-				// Extend Monaco JavaScript/TypeScript tokenizers with dynamic TSL keywords
-				const extendTokenizer = async () => {
+				// Gather TSL keywords dynamically once on configuration
+				try {
 
-					try {
+					// 1. Gather keys from TSL
+					Object.keys( TSL ).forEach( key => {
 
-						const tslConstants = new Set();
-						const tslFunctions = new Set();
-						const tslChaining = new Set();
+						if ( /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test( key ) ) {
 
-						// 1. Gather keys from TSL
-						Object.keys( TSL ).forEach( key => {
-
-							if ( /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test( key ) ) {
-
-								const val = TSL[ key ];
-								if ( typeof val === 'function' ) {
-
-									tslFunctions.add( key );
-
-								} else {
-
-									tslConstants.add( key );
-
-								}
-
-							}
-
-						} );
-
-						// 2. Gather only methods (functions) from THREE.Node.prototype to support chaining
-						if ( THREE.Node && THREE.Node.prototype ) {
-
-							let proto = THREE.Node.prototype;
-							while ( proto && proto !== Object.prototype ) {
-
-								Object.getOwnPropertyNames( proto ).forEach( name => {
-
-									if ( name === 'constructor' || name.startsWith( '_' ) ) return;
-
-									if ( /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test( name ) ) {
-
-										const desc = Object.getOwnPropertyDescriptor( proto, name );
-										if ( desc && ! desc.get && ! desc.set && typeof desc.value === 'function' ) {
-
-											tslChaining.add( name );
-
-										}
-
-									}
-
-								} );
-								proto = Object.getPrototypeOf( proto );
-
-							}
-
-						}
-
-						// 3. Gather keys from TSL Addons
-						Object.keys( ADDONS_TSL_IMPORTS ).forEach( key => {
-
-							if ( /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test( key ) ) {
+							const val = TSL[ key ];
+							if ( typeof val === 'function' ) {
 
 								tslFunctions.add( key );
 
-							}
+							} else {
 
-						} );
-
-						const allLangs = window.monaco.languages.getLanguages();
-						for ( const langId of [ 'javascript', 'typescript' ] ) {
-
-							const langDef = allLangs.find( ( { id } ) => id === langId );
-							if ( langDef && typeof langDef.loader === 'function' ) {
-
-								const langMod = await langDef.loader();
-								const lang = langMod.language;
-
-								if ( lang && lang.tokenizer && lang.tokenizer.root ) {
-
-									// Chaining rule matches dot + keyword, tokenizing them separately
-									if ( tslChaining.size > 0 ) {
-
-										const escapedChaining = Array.from( tslChaining ).map( key => key.replace( /[-\/\\^$*+?.()|[\]{}]/g, '\\$&' ) );
-										escapedChaining.sort( ( a, b ) => b.length - a.length );
-
-										const chainingRegex = new RegExp( `(\\.)(${escapedChaining.join( '|' )})\\b` );
-										lang.tokenizer.root.unshift( [ chainingRegex, [ 'delimiter', 'tsl-chained-symbol' ]] );
-
-									}
-
-									// Functions rule matches standalone function usages
-									if ( tslFunctions.size > 0 ) {
-
-										const escapedFunctions = Array.from( tslFunctions ).map( key => key.replace( /[-\/\\^$*+?.()|[\]{}]/g, '\\$&' ) );
-										escapedFunctions.sort( ( a, b ) => b.length - a.length );
-
-										const functionsRegex = new RegExp( `\\b(${escapedFunctions.join( '|' )})\\b` );
-										lang.tokenizer.root.unshift( [ functionsRegex, 'tsl-function-symbol' ] );
-
-									}
-
-									// Constants rule matches standalone variable/constant usages
-									if ( tslConstants.size > 0 ) {
-
-										const escapedConstants = Array.from( tslConstants ).map( key => key.replace( /[-\/\\^$*+?.()|[\]{}]/g, '\\$&' ) );
-										escapedConstants.sort( ( a, b ) => b.length - a.length );
-
-										const constantsRegex = new RegExp( `\\b(${escapedConstants.join( '|' )})\\b` );
-										lang.tokenizer.root.unshift( [ constantsRegex, 'tsl-constant-symbol' ] );
-
-									}
-
-									window.monaco.languages.setMonarchTokensProvider( langId, lang );
-
-								}
+								tslConstants.add( key );
 
 							}
 
 						}
 
-					} catch ( e ) {
+					} );
 
-						console.error( 'Failed to extend Monaco tokenizer for TSL', e );
+					// 2. Gather only methods (functions) from THREE.Node.prototype to support chaining
+					if ( THREE.Node && THREE.Node.prototype ) {
+
+						let proto = THREE.Node.prototype;
+						while ( proto && proto !== Object.prototype ) {
+
+							Object.getOwnPropertyNames( proto ).forEach( name => {
+
+								if ( name === 'constructor' || name.startsWith( '_' ) ) return;
+
+								if ( /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test( name ) ) {
+
+									const desc = Object.getOwnPropertyDescriptor( proto, name );
+									if ( desc && ! desc.get && ! desc.set && typeof desc.value === 'function' ) {
+
+										tslChaining.add( name );
+
+									}
+
+								}
+
+							} );
+							proto = Object.getPrototypeOf( proto );
+
+						}
 
 					}
 
-				};
+					// 3. Gather keys from TSL Addons
+					Object.keys( ADDONS_TSL_IMPORTS ).forEach( key => {
 
-				extendTokenizer();
+						if ( /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test( key ) ) {
+
+							tslFunctions.add( key );
+
+						}
+
+					} );
+
+				} catch ( e ) {
+
+					console.error( 'Failed to populate TSL keyword sets', e );
+
+				}
 
 				// Register completion provider for TSL and THREE auto-imports
 				const suggestionsTemplates = [];
@@ -635,9 +697,22 @@ class CodeEditor extends EventDispatcher {
 
 			this.editor = window.monaco.editor.create( this.container, options );
 
+			// Dynamic TSL syntax highlighting updates based on file imports
+			const updateHighlights = () => {
+
+				if ( this.language === 'javascript' || this.language === 'typescript' ) {
+
+					updateTokenizerForCode();
+
+				}
+
+			};
+
 			if ( ! this.readOnly ) {
 
 				this.editor.onDidChangeModelContent( () => {
+
+					updateHighlights();
 
 					if ( this.isProgrammaticChange ) return;
 
@@ -646,6 +721,8 @@ class CodeEditor extends EventDispatcher {
 				} );
 
 			}
+
+			updateHighlights();
 
 			if ( ! this.scrollable ) {
 
@@ -776,6 +853,13 @@ class CodeEditor extends EventDispatcher {
 		} finally {
 
 			this.isProgrammaticChange = false;
+
+		}
+
+		// Update highlights after setting the value
+		if ( this.language === 'javascript' || this.language === 'typescript' ) {
+
+			updateTokenizerForCode();
 
 		}
 
