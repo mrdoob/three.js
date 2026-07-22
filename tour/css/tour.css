@@ -3059,6 +3059,7 @@ body.loading .app-header {
 	align-items: center;
 	justify-content: center;
 	gap: 0.75rem;
+	margin-top: -23px;
 }
 
 .loading-logo-wrapper {

@@ -321,6 +321,12 @@ class Tour {
 
 				wasMobile = isMobile;
 
+				if ( isMobile ) {
+
+					this.toggleSidebar( false );
+
+				}
+
 				if ( this.isPlaygroundActive ) {
 
 					this.isPlaygroundActive = false;
