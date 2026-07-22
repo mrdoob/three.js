@@ -2782,7 +2782,7 @@ body.preview-maximized .preview-hide-btn {
 .tsl-api-table-row-robust .tsl-api-signature code,
 .tsl-api-table-row-robust .tsl-sig-param-name,
 .tsl-api-table-row-robust .tsl-sig-param {
-	font-size: 0.9rem !important;
+	font-size: 0.8rem !important;
 }
 
 /* API Signature Syntax Highlighting */
