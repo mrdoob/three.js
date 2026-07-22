@@ -37,7 +37,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Break, If, Loop, bool, vec3, vec4, texture3D, uniform, Fn } from 'three/tsl';
+			import { Break, If, Loop, select, int, bool, vec3, vec4, texture3D, uniform, Fn } from 'three/tsl';
 
 			import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js';
 
@@ -134,15 +134,10 @@
 									const pm = p0.add( p1 ).mul( 0.5 ).toConst();
 									const dm = texture.sample( pm.add( 0.5 ) ).r.toConst();
 
-									If( dm.greaterThan( threshold ), () => {
+									const isGreater = dm.greaterThan( threshold );
 
-										p1.assign( pm );
-
-									} ).Else( () => {
-
-										p0.assign( pm );
-
-									} );
+									p1.assign( select( isGreater, pm, p1 ) );
+									p0.assign( select( isGreater, p0, pm ) );
 
 								} );
 
@@ -166,6 +161,7 @@
 					return finalColor;
 
 				} );
+
 
 				//
 
