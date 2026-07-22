@@ -37,26 +37,6 @@ import { texture, matcapUV } from 'three/tsl';
 const matcap = texture( matcapMap, matcapUV );
 ```
 
-## Remap
-
-| Variable | Description | Type |
-| -- | -- | -- |
-| `remap( node, inLow, inHigh, outLow = float( 0 ), outHigh = float( 1 ) )` | Remaps a value from one range to another. | `any` |
-| `remapClamp( node, inLow, inHigh, outLow = float( 0 ), outHigh = float( 1 ) )` | Remaps a value from one range to another, with clamping. | `any` |
-
-## Random
-
-| Variable | Description | Type |
-| -- | -- | -- |
-| `hash( seed )` | Generates a hash value in the range [ 0, 1 ] from the given seed. | `float` |
-| `range( min, max )` | Generates a range `attribute` of values between min and max. Attribute randomization is useful when you want to randomize values ​​between instances and not between pixels. | `any` |
-
-## Rotate
-
-| Name | Description | Type |
-| -- | -- | -- |
-| `rotate( position, rotation )` | Applies a rotation to the given position node. Depending on whether the position data are 2D or 3D, the rotation is expressed a single float value or an Euler value. | `vec2`, `vec3`
-
 ## Packing
 
 | Variable | Description | Type |

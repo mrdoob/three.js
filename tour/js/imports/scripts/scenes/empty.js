@@ -26,6 +26,11 @@ const gridTexture = Fn( ( [ coord, lineWidth = float( 0.01 ), dotSize = float( 0
 
 function resetScene() {
 
+	scene.clear();
+
+	scene.add( reflection.target );
+	scene.add( floor );
+
 	scene.fogNode = null;
 	scene.backgroundNode = null;
 
@@ -80,7 +85,6 @@ async function init() {
 	// Planar Reflector for glossy floor reflections
 	reflection = reflector( { resolutionScale: 1 } );
 	reflection.target.rotateX( - Math.PI / 2 );
-	scene.add( reflection.target );
 
 	const gridColor = vec4( 0.45, 0.45, 0.45, 1.0 );
 	const baseColor = vec4( 0.08, 0.08, 0.08, 1.0 ); // Neutral dark metallic base
@@ -95,7 +99,6 @@ async function init() {
 	floor.rotation.x = - Math.PI / 2;
 	floor.renderOrder = - 1;
 	floor.receiveShadow = true;
-	scene.add( floor );
 
 	// Load environment map
 	const texture = await new HDRLoader()
