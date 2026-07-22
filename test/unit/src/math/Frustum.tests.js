@@ -247,6 +247,26 @@ export default QUnit.module( 'Maths', () => {
 			intersects = a.intersectsBox( box );
 			assert.ok( intersects, 'Successful intersection' );
 
+			// large box that crosses several frustum planes while lying fully
+			// outside the frustum must not report a false positive (see #27756).
+			// fov 60, aspect 1, far 10: no frustum point has |x| > 10 * tan( 30 deg )
+
+			const t = Math.tan( Math.PI / 6 );
+			const m2 = new Matrix4().makePerspective( - t, t, t, - t, 1, 10 );
+			const b = new Frustum().setFromProjectionMatrix( m2 );
+
+			const bigBox = new Box3( new Vector3( 6, - 60, - 12 ), new Vector3( 60, 60, 1 ) );
+
+			intersects = b.intersectsBox( bigBox );
+			assert.notOk( intersects, 'No intersection for a large box beyond the side plane' );
+
+			// a box that encloses the entire frustum still intersects
+
+			const hugeBox = new Box3( new Vector3( - 100, - 100, - 100 ), new Vector3( 100, 100, 100 ) );
+
+			intersects = b.intersectsBox( hugeBox );
+			assert.ok( intersects, 'Successful intersection for a box enclosing the frustum' );
+
 		} );
 
 	} );

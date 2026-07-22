@@ -7,6 +7,45 @@ import { Plane } from './Plane.js';
 const _sphere = /*@__PURE__*/ new Sphere();
 const _defaultSpriteCenter = /*@__PURE__*/ new Vector2( 0.5, 0.5 );
 const _vector = /*@__PURE__*/ new Vector3();
+const _v1 = /*@__PURE__*/ new Vector3();
+const _v2 = /*@__PURE__*/ new Vector3();
+const _v3 = /*@__PURE__*/ new Vector3();
+
+function setCornerFromPlanes( target, p1, p2, p3 ) {
+
+	// intersection point of three planes, n * x + constant = 0
+
+	_v1.crossVectors( p2.normal, p3.normal );
+	_v2.crossVectors( p3.normal, p1.normal );
+	_v3.crossVectors( p1.normal, p2.normal );
+
+	const denominator = p1.normal.dot( _v1 );
+
+	// for degenerate plane configurations the result is not finite and the
+	// corner-based rejection in intersectsBox() is skipped implicitly
+
+	return target.copy( _v1 ).multiplyScalar( - p1.constant )
+		.addScaledVector( _v2, - p2.constant )
+		.addScaledVector( _v3, - p3.constant )
+		.divideScalar( denominator );
+
+}
+
+function updateCorners( frustum ) {
+
+	const [ right, left, bottom, top, far, near ] = frustum.planes;
+	const corners = frustum._corners;
+
+	setCornerFromPlanes( corners[ 0 ], left, bottom, near );
+	setCornerFromPlanes( corners[ 1 ], right, bottom, near );
+	setCornerFromPlanes( corners[ 2 ], left, top, near );
+	setCornerFromPlanes( corners[ 3 ], right, top, near );
+	setCornerFromPlanes( corners[ 4 ], left, bottom, far );
+	setCornerFromPlanes( corners[ 5 ], right, bottom, far );
+	setCornerFromPlanes( corners[ 6 ], left, top, far );
+	setCornerFromPlanes( corners[ 7 ], right, top, far );
+
+}
 
 /**
  * Frustums are used to determine what is inside the camera's field of view.
@@ -36,6 +75,12 @@ class Frustum {
 		 */
 		this.planes = [ p0, p1, p2, p3, p4, p5 ];
 
+		// the eight corner points of the frustum, derived lazily from the
+		// planes by intersectsBox()
+
+		this._corners = [ new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3() ];
+		this._cornersNeedUpdate = true;
+
 	}
 
 	/**
@@ -60,6 +105,8 @@ class Frustum {
 		planes[ 4 ].copy( p4 );
 		planes[ 5 ].copy( p5 );
 
+		this._cornersNeedUpdate = true;
+
 		return this;
 
 	}
@@ -79,6 +126,8 @@ class Frustum {
 			planes[ i ].copy( frustum.planes[ i ] );
 
 		}
+
+		this._cornersNeedUpdate = true;
 
 		return this;
 
@@ -130,6 +179,8 @@ class Frustum {
 			}
 
 		}
+
+		this._cornersNeedUpdate = true;
 
 		return this;
 
@@ -240,7 +291,36 @@ class Frustum {
 
 		}
 
-		return true;
+		// No frustum plane separates the box, but a large box that crosses
+		// several frustum planes can still lie outside the frustum. If all
+		// eight frustum corners lie beyond one face of the box, the box's
+		// face separates the two (see #27756). Non-finite corners (degenerate
+		// planes) fail every comparison and skip this rejection.
+
+		if ( this._cornersNeedUpdate ) {
+
+			updateCorners( this );
+			this._cornersNeedUpdate = false;
+
+		}
+
+		const corners = this._corners;
+		let outMaxX = 0, outMinX = 0, outMaxY = 0, outMinY = 0, outMaxZ = 0, outMinZ = 0;
+
+		for ( let i = 0; i < 8; i ++ ) {
+
+			const corner = corners[ i ];
+
+			if ( corner.x > box.max.x ) outMaxX ++;
+			if ( corner.x < box.min.x ) outMinX ++;
+			if ( corner.y > box.max.y ) outMaxY ++;
+			if ( corner.y < box.min.y ) outMinY ++;
+			if ( corner.z > box.max.z ) outMaxZ ++;
+			if ( corner.z < box.min.z ) outMinZ ++;
+
+		}
+
+		return outMaxX !== 8 && outMinX !== 8 && outMaxY !== 8 && outMinY !== 8 && outMaxZ !== 8 && outMinZ !== 8;
 
 	}
 
