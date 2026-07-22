@@ -8,7 +8,7 @@
 		<meta property="og:type" content="website">
 		<meta property="og:url" content="https://threejs.org/examples/webgl_volume_perlin.html">
 		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_volume_perlin.jpg">
-		<link type="text/css" rel="stylesheet" href="main.css">		
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
@@ -194,20 +194,15 @@
 
 									for ( int j = 0; j < REFINEMENT_STEPS; j ++ ) {
 										
-									  //get the mid point ray parameter
 										float tm = ( t0 + t1 ) * 0.5;
 
-										//get the sample at mid point and check if its above the threshold
 										float dm = sample1( vOrigin + tm * rayDir + 0.5 );
 
-										//if it is, we reduce the higher interval
 										if ( dm > threshold ) {
 
 											t1 = tm;
 											
-										} 
-										//else, we reduce the lower interval	
-										else {
+										} else {
 
 											t0 = tm;
 
