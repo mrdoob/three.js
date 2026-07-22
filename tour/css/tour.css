@@ -421,10 +421,12 @@ body.preview-hidden .code-modifier-inline-btn.active {
 	font-weight: 500;
 	font-family: 'Fira Code', monospace;
 	color: var(--text-muted);
-	background: rgba(255, 255, 255, 0.04);
-	padding: 0.5rem;
-	border-radius: 4px;
+	border-left: 1px solid var(--border-color);
+	padding-left: 0.6rem;
+	padding-top: 0.1rem;
+	padding-bottom: 0.1rem;
 	margin-left: 0.4rem;
+	margin-top: 0.1rem;
 	user-select: none;
 	display: inline-flex;
 	align-items: center;
