@@ -4,31 +4,11 @@
 		<title>three.js webgl2 - volume</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0;
-				background-color: #000;
-				color: #fff;
-				font-family: Monospace, monospace;
-				font-size: 13px;
-				line-height: 24px;
-				overscroll-behavior: none;
-			}
-			#info {
-				position: absolute;
-				top: 0;
-				width: 100%;
-				padding: 10px;
-				box-sizing: border-box;
-				text-align: center;
-				z-index: 1;
-				pointer-events: none;
-			}
-			#info a {
-				color: #ff0;
-				pointer-events: auto;
-			}
-		</style>
+		<meta property="og:title" content="three.js webgl2 - volume">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_volume_perlin.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_volume_perlin.jpg">
+		<link type="text/css" rel="stylesheet" href="main.css">		
 	</head>
 
 	<body>
@@ -39,8 +19,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js",
-					"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
