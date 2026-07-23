@@ -31,6 +31,7 @@ export { default as ParameterNode } from './core/ParameterNode.js';
 export { default as PropertyNode } from './core/PropertyNode.js';
 export { default as StackNode } from './core/StackNode.js';
 export { default as StackTrace } from './core/StackTrace.js';
+export { default as SwitchNode } from './core/SwitchNode.js';
 export { default as StructNode } from './core/StructNode.js';
 export { default as StructTypeNode } from './core/StructTypeNode.js';
 export { default as SubBuildNode } from './core/SubBuildNode.js';
