@@ -14,8 +14,8 @@ const typedArraysToVertexFormatPrefix = new Map( [
 	[ Uint8Array, [ 'uint8', 'unorm8' ]],
 	[ Int16Array, [ 'sint16', 'snorm16' ]],
 	[ Uint16Array, [ 'uint16', 'unorm16' ]],
-	[ Int32Array, [ 'sint32', 'snorm32' ]],
-	[ Uint32Array, [ 'uint32', 'unorm32' ]],
+	[ Int32Array, [ 'sint32' ]],
+	[ Uint32Array, [ 'uint32' ]],
 	[ Float32Array, [ 'float32', ]],
 ] );
 
@@ -31,9 +31,7 @@ const typedAttributeToVertexFormatPrefix = new Map( [
 
 const typeArraysToVertexFormatPrefixForItemSize1 = new Map( [
 	[ Int32Array, 'sint32' ],
-	[ Int16Array, 'sint32' ], // patch for INT16
 	[ Uint32Array, 'uint32' ],
-	[ Uint16Array, 'uint32' ], // patch for UINT16
 	[ Float32Array, 'float32' ]
 ] );
 
@@ -82,7 +80,7 @@ class WebGPUAttributeUtils {
 			let array = bufferAttribute.array;
 
 			// patch for INT16 and UINT16
-			if ( attribute.normalized === false ) {
+			if ( attribute.normalized === false && attribute.isInterleavedBufferAttribute !== true ) {
 
 				if ( array.constructor === Int16Array || array.constructor === Int8Array ) {
 
@@ -318,13 +316,6 @@ class WebGPUAttributeUtils {
 						arrayStride = Math.floor( ( arrayStride + 3 ) / 4 ) * 4;
 
 					}
-
-				}
-
-				// patch for INT16 and UINT16
-				if ( geometryAttribute.normalized === false && ( geometryAttribute.array.constructor === Int16Array || geometryAttribute.array.constructor === Uint16Array ) ) {
-
-					arrayStride = 4;
 
 				}
 
