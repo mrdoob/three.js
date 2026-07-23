@@ -39,6 +39,10 @@ class EventNode extends Node {
 
 			this.updateType = NodeUpdateType.FRAME;
 
+		} else if ( eventType === EventNode.AFTER_OBJECT ) {
+
+			this.updateAfterType = NodeUpdateType.OBJECT;
+
 		} else if ( eventType === EventNode.BEFORE_OBJECT ) {
 
 			this.updateBeforeType = NodeUpdateType.OBJECT;
@@ -97,11 +101,18 @@ class EventNode extends Node {
 
 	}
 
+	updateAfter( frame ) {
+
+		this.callback( frame );
+
+	}
+
 }
 
 EventNode.OBJECT = 'object';
 EventNode.MATERIAL = 'material';
 EventNode.FRAME = 'frame';
+EventNode.AFTER_OBJECT = 'afterObject';
 EventNode.BEFORE_OBJECT = 'beforeObject';
 EventNode.BEFORE_MATERIAL = 'beforeMaterial';
 EventNode.BEFORE_FRAME = 'beforeFrame';
@@ -148,6 +159,16 @@ export const OnMaterialUpdate = ( callback ) => createEvent( EventNode.MATERIAL,
  * @returns {EventNode}
  */
 export const OnFrameUpdate = ( callback ) => createEvent( EventNode.FRAME, callback );
+
+/**
+ * Creates an event that triggers a function every time an object (Mesh|Sprite) has been rendered.
+ *
+ * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+export const OnAfterObjectUpdate = ( callback ) => createEvent( EventNode.AFTER_OBJECT, callback );
 
 /**
  * Creates an event that triggers a function before an object (Mesh|Sprite) is updated.
