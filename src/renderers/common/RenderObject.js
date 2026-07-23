@@ -120,6 +120,15 @@ class RenderObject {
 		this.material = material;
 
 		/**
+		 * The material's side this render object is rendered with. Since render objects are
+		 * unique per pass (see the `backSide` pass ID), this preserves the side of the back
+		 * side pass when `material.side` has already been restored.
+		 *
+		 * @type {number}
+		 */
+		this.materialSide = material.side;
+
+		/**
 		 * The scene the 3D object belongs to.
 		 *
 		 * @type {Scene}
@@ -752,9 +761,9 @@ class RenderObject {
 					if ( property === 'side' ) {
 
 						// `side` is an enum (FrontSide/BackSide/DoubleSide) that changes code
-						// generation, so its exact value must be preserved.
+						// generation, so the exact side of this render object must be preserved.
 
-						valueKey = String( value );
+						valueKey = String( this.materialSide );
 
 					} else {
 

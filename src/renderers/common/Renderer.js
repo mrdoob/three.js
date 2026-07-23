@@ -653,13 +653,13 @@ class Renderer {
 		this._initPromise = null;
 
 		/**
-		 * An array of compilation promises which are used in `compileAsync()`.
+		 * An array of render objects which are precompiled in `compileAsync()`.
 		 *
 		 * @private
-		 * @type {?Array<Promise>}
+		 * @type {?Array<RenderObject>}
 		 * @default null
 		 */
-		this._compilationPromises = null;
+		this._compilationRenderObjects = null;
 
 		/**
 		 * Whether the renderer is currently precompiling a render object in
@@ -921,7 +921,7 @@ class Renderer {
 		const previousRenderContext = this._currentRenderContext;
 		const previousRenderObjectFunction = this._currentRenderObjectFunction;
 		const previousHandleObjectFunction = this._handleObjectFunction;
-		const previousCompilationPromises = this._compilationPromises;
+		const previousCompilationRenderObjects = this._compilationRenderObjects;
 
 		//
 
@@ -939,14 +939,14 @@ class Renderer {
 		const renderContext = this._renderContexts.get( renderTarget, this._mrt );
 		const activeMipmapLevel = this._activeMipmapLevel;
 
-		const compilationPromises = [];
+		const compilationRenderObjects = [];
 
 		this._currentRenderContext = renderContext;
 		this._currentRenderObjectFunction = this.renderObject;
 
 		this._handleObjectFunction = this._createObjectPipeline;
 
-		this._compilationPromises = compilationPromises;
+		this._compilationRenderObjects = compilationRenderObjects;
 
 		nodeFrame.renderId ++;
 
@@ -1039,7 +1039,7 @@ class Renderer {
 
 		}
 
-		// process render lists - _createObjectPipeline will push async promises to _compilationPromises
+		// process render lists - _createObjectPipeline will push render objects to _compilationRenderObjects
 
 		const opaqueObjects = renderList.opaque;
 		const transparentObjects = renderList.transparent;
@@ -1056,19 +1056,15 @@ class Renderer {
 		this._currentRenderContext = previousRenderContext;
 		this._currentRenderObjectFunction = previousRenderObjectFunction;
 		this._handleObjectFunction = previousHandleObjectFunction;
-		this._compilationPromises = previousCompilationPromises;
+		this._compilationRenderObjects = previousCompilationRenderObjects;
 
 		// Process compilation work items sequentially to avoid freezing
 		// Yields between objects to keep animation smooth
 
-		const total = compilationPromises.length;
+		const total = compilationRenderObjects.length;
 		let loaded = 0;
 
-		for ( const item of compilationPromises ) {
-
-			const renderObject = this._objects.get( item.object, item.material, item.scene, item.camera, item.lightsNode, item.renderContext, item.clippingContext, item.passId );
-			renderObject.drawRange = item.object.geometry.drawRange;
-			renderObject.group = item.group;
+		for ( const renderObject of compilationRenderObjects ) {
 
 			// Use async node building to yield to main thread
 			await this._nodes.getForRenderAsync( renderObject );
@@ -1083,6 +1079,7 @@ class Renderer {
 			// Wait for pipeline creation
 			const pipelinePromises = [];
 			this._pipelines.getForRender( renderObject, pipelinePromises );
+
 			if ( pipelinePromises.length > 0 ) {
 
 				await Promise.all( pipelinePromises );
@@ -3891,8 +3888,8 @@ class Renderer {
 	}
 
 	/**
-	 * A different implementation for `_handleObjectFunction` which only makes sure the object is ready for rendering.
-	 * Used in `compileAsync()`.
+	 * A different implementation for `_handleObjectFunction` which collects the render objects
+	 * that are precompiled in `compileAsync()` instead of rendering them.
 	 *
 	 * @private
 	 * @param {Object3D} object - The 3D object.
@@ -3906,43 +3903,14 @@ class Renderer {
 	 */
 	_createObjectPipeline( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
 
-		// If in async compilation mode, queue the work for sequential execution
-		if ( this._compilationPromises !== null ) {
+		// the render object must be requested during the traversal since `material.side` is
+		// temporarily overwritten for the back side pass, see `RenderObject.materialSide`
 
-			// Store work items instead of promises - will be processed sequentially
-			this._compilationPromises.push( {
-				object,
-				material,
-				scene,
-				camera,
-				lightsNode,
-				group,
-				clippingContext,
-				passId,
-				renderContext: this._currentRenderContext
-			} );
-
-			return;
-
-		}
-
-		// Sync path
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, clippingContext, passId );
 		renderObject.drawRange = object.geometry.drawRange;
 		renderObject.group = group;
 
-		//
-
-		this._nodes.updateBefore( renderObject );
-
-		this._geometries.updateForRender( renderObject );
-
-		this._nodes.updateForRender( renderObject );
-		this._bindings.updateForRender( renderObject );
-
-		this._pipelines.getForRender( renderObject, this._compilationPromises );
-
-		this._nodes.updateAfter( renderObject );
+		this._compilationRenderObjects.push( renderObject );
 
 	}
 

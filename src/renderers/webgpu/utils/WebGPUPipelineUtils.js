@@ -71,7 +71,7 @@ class WebGPUPipelineUtils {
 	 */
 	createRenderPipeline( renderObject, promises ) {
 
-		const { object, material, geometry, pipeline } = renderObject;
+		const { material, pipeline } = renderObject;
 		const { vertexProgram, fragmentProgram } = pipeline;
 
 		const backend = this.backend;
@@ -193,7 +193,7 @@ class WebGPUPipelineUtils {
 		const vertexModule = backend.get( vertexProgram ).module;
 		const fragmentModule = backend.get( fragmentProgram ).module;
 
-		const primitiveState = this._getPrimitiveState( object, geometry, material );
+		const primitiveState = this._getPrimitiveState( renderObject );
 		const depthCompare = this._getDepthCompare( material );
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderObject.context );
 
@@ -888,12 +888,12 @@ class WebGPUPipelineUtils {
 	 * for the pipeline creation.
 	 *
 	 * @private
-	 * @param {Object3D} object - The 3D object.
-	 * @param {BufferGeometry} geometry - The geometry.
-	 * @param {Material} material - The material.
+	 * @param {RenderObject} renderObject - The render object.
 	 * @return {Object} The primitive state.
 	 */
-	_getPrimitiveState( object, geometry, material ) {
+	_getPrimitiveState( renderObject ) {
+
+		const { object, geometry, material, materialSide } = renderObject;
 
 		const descriptor = {};
 		const utils = this.backend.utils;
@@ -910,7 +910,7 @@ class WebGPUPipelineUtils {
 
 		//
 
-		let flipSided = ( material.side === BackSide );
+		let flipSided = ( materialSide === BackSide );
 
 		if ( object.isMesh && object.matrixWorld.determinantAffine() < 0 ) flipSided = ! flipSided;
 
@@ -918,7 +918,7 @@ class WebGPUPipelineUtils {
 
 		//
 
-		descriptor.cullMode = ( material.side === DoubleSide ) ? GPUCullMode.None : GPUCullMode.Back;
+		descriptor.cullMode = ( materialSide === DoubleSide ) ? GPUCullMode.None : GPUCullMode.Back;
 
 		return descriptor;
 

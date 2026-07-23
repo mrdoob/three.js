@@ -117,6 +117,14 @@ class NodeBuilder {
 		this.material = ( object && object.material ) || null;
 
 		/**
+		 * The material's side the shader is built for. Nodes must use this property instead
+		 * of `material.side` which is temporarily overwritten for the back side pass.
+		 *
+		 * @type {?number}
+		 */
+		this.materialSide = this.material !== null ? this.material.side : null;
+
+		/**
 		 * The geometry of the 3D object.
 		 *
 		 * @type {?BufferGeometry}
