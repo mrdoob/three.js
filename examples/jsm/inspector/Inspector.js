@@ -243,6 +243,7 @@ class Inspector extends RendererInspector {
 		if ( renderer.backend.isWebGPUBackend ) {
 
 			sign += 'WebGPU';
+			this.memory.addWebGPUMemory();
 
 		} else if ( renderer.backend.isWebGLBackend ) {
 

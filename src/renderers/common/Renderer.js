@@ -37,6 +37,7 @@ import { reference } from '../../nodes/accessors/ReferenceNode.js';
 import { highpModelNormalViewMatrix, highpModelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { context } from '../../nodes/core/ContextNode.js';
 import { error, warn, warnOnce, yieldToMain } from '../../utils.js';
+import WebGPUInfo from '../webgpu/WebGPUInfo.js';
 
 const _scene = /*@__PURE__*/ new Scene();
 const _drawingBufferSize = /*@__PURE__*/ new Vector2();
@@ -234,7 +235,7 @@ class Renderer {
 		 *
 		 * @type {Info}
 		 */
-		this.info = new Info();
+		this.info = this.backend.isWebGPUBackend ? new WebGPUInfo() : new Info();
 
 		/**
 		 * A global context node that stores override nodes for specific transformations or calculations.

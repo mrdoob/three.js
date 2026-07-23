@@ -33,18 +33,25 @@ class WebGPUTexturePassUtils extends DataMap {
 	/**
 	 * Constructs a new utility object.
 	 *
-	 * @param {GPUDevice} device - The WebGPU device.
+	 * @param {WebGPUBackend} backend - The WebGPU backend.
 	 */
-	constructor( device ) {
+	constructor( backend ) {
 
 		super();
+
+		/**
+		 * The renderer's backend.
+		 *
+		 * @type {Backend}
+		 */
+		this.backend = backend;
 
 		/**
 		 * The WebGPU device.
 		 *
 		 * @type {GPUDevice}
 		 */
-		this.device = device;
+		this.device = this.backend.device;
 
 		const mipmapSource = `
 struct VarysStruct {
@@ -127,14 +134,14 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		 *
 		 * @type {GPUSampler}
 		 */
-		this.mipmapSampler = device.createSampler( { minFilter: GPUFilterMode.Linear } );
+		this.mipmapSampler = this.device.createSampler( { minFilter: GPUFilterMode.Linear } );
 
 		/**
 		 * The flipY GPU sampler.
 		 *
 		 * @type {GPUSampler}
 		 */
-		this.flipYSampler = device.createSampler( { minFilter: GPUFilterMode.Nearest } ); //@TODO?: Consider using textureLoad()
+		this.flipYSampler = this.device.createSampler( { minFilter: GPUFilterMode.Nearest } ); //@TODO?: Consider using textureLoad()
 
 		/**
 		 * flip uniform buffer
@@ -143,11 +150,11 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		_bufferDescriptor.size = 4;
 		_bufferDescriptor.usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
 
-		this.flipUniformBuffer = device.createBuffer( _bufferDescriptor );
+		this.flipUniformBuffer = this.device.createBuffer( _bufferDescriptor );
 
 		_bufferDescriptor.reset();
 
-		device.queue.writeBuffer( this.flipUniformBuffer, 0, new Uint32Array( [ 1 ] ) );
+		this.device.queue.writeBuffer( this.flipUniformBuffer, 0, new Uint32Array( [ 1 ] ) );
 
 		/**
 		 * no flip uniform buffer
@@ -156,7 +163,7 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		_bufferDescriptor.size = 4;
 		_bufferDescriptor.usage = GPUBufferUsage.UNIFORM;
 
-		this.noFlipUniformBuffer = device.createBuffer( _bufferDescriptor );
+		this.noFlipUniformBuffer = this.device.createBuffer( _bufferDescriptor );
 
 		_bufferDescriptor.reset();
 
@@ -176,7 +183,7 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		_shaderModuleDescriptor.label = 'mipmap';
 		_shaderModuleDescriptor.code = mipmapSource;
 
-		this.mipmapShaderModule = device.createShaderModule( _shaderModuleDescriptor );
+		this.mipmapShaderModule = this.device.createShaderModule( _shaderModuleDescriptor );
 
 		_shaderModuleDescriptor.reset();
 
@@ -243,6 +250,7 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		const copyTransferPipeline = this.getTransferPipeline( format, textureGPU.textureBindingViewDimension );
 		const flipTransferPipeline = this.getTransferPipeline( format, tempTexture.textureBindingViewDimension );
 
+		this.backend.renderer.info.backendInfo.commandEncoders ++;
 		const commandEncoder = this.device.createCommandEncoder( _commandEncoderDescriptor );
 
 		const pass = ( pipeline, sourceTexture, sourceArrayLayer, destinationTexture, destinationArrayLayer, flipY ) => {
@@ -287,11 +295,13 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 			_renderPassDescriptor.colorAttachments.push( _colorAttachment );
 
+			this.backend.renderer.info.backendInfo.renderPassEncoders ++;
 			const passEncoder = commandEncoder.beginRenderPass( _renderPassDescriptor );
 
 			_renderPassDescriptor.reset();
 			_colorAttachment.reset();
 
+			this.backend.renderer.info.backendInfo.renderPipelines ++;
 			passEncoder.setPipeline( pipeline );
 			passEncoder.setBindGroup( 0, bindGroup );
 			passEncoder.draw( 3, 1, 0, sourceArrayLayer );
@@ -302,6 +312,7 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		pass( copyTransferPipeline, textureGPU, baseArrayLayer, tempTexture, 0, false );
 		pass( flipTransferPipeline, tempTexture, 0, textureGPU, baseArrayLayer, true );
 
+		this.backend.renderer.info.backendInfo.deviceEncoderSubmits ++;
 		submit( this.device, commandEncoder.finish() );
 
 		tempTexture.destroy();
@@ -325,6 +336,7 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		if ( commandEncoder === null ) {
 
 			_commandEncoderDescriptor.label = 'mipmapEncoder';
+			this.backend.renderer.info.backendInfo.commandEncoders ++;
 			commandEncoder = this.device.createCommandEncoder( _commandEncoderDescriptor );
 			_commandEncoderDescriptor.reset();
 
@@ -332,7 +344,12 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 		this._mipmapRunBundles( commandEncoder, passes );
 
-		if ( encoder === null ) submit( this.device, commandEncoder.finish() );
+		if ( encoder === null ) {
+
+			this.backend.renderer.info.backendInfo.deviceEncoderSubmits ++;
+			submit( this.device, commandEncoder.finish() );
+
+		}
 
 		textureData.layers = passes;
 
@@ -402,10 +419,12 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 				_renderBundleEncoderDescriptor.colorFormats = [ textureGPU.format ];
 
+				this.backend.renderer.info.backendInfo.renderBundleEncoders ++;
 				const passEncoder = this.device.createRenderBundleEncoder( _renderBundleEncoderDescriptor );
 
 				_renderBundleEncoderDescriptor.reset();
 
+				this.backend.renderer.info.backendInfo.renderPipelines ++;
 				passEncoder.setPipeline( pipeline );
 				passEncoder.setBindGroup( 0, bindGroup );
 				passEncoder.draw( 3, 1, 0, baseArrayLayer );
@@ -437,6 +456,7 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 			const pass = passes[ i ];
 
+			this.backend.renderer.info.backendInfo.renderPassEncoders ++;
 			const passEncoder = commandEncoder.beginRenderPass( pass.passDescriptor );
 
 			passEncoder.executeBundles( pass.renderBundles );

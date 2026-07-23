@@ -971,6 +971,7 @@ class WebGPUBackend extends Backend {
 		//
 
 		_commandEncoderDescriptor.label = 'renderContext_' + renderContext.id;
+		this.renderer.info.backendInfo.commandEncoders ++;
 		const encoder = device.createCommandEncoder( _commandEncoderDescriptor );
 		_commandEncoderDescriptor.reset();
 
@@ -1020,6 +1021,7 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
+			this.renderer.info.backendInfo.renderPassEncoders ++;
 			const currentPass = encoder.beginRenderPass( descriptor );
 			renderContextData.currentPass = currentPass;
 
@@ -1239,6 +1241,8 @@ class WebGPUBackend extends Backend {
 				if ( i < bundles.length ) {
 
 					const layerDescriptor = renderContextData.layerDescriptors[ i ];
+
+					this.renderer.info.backendInfo.renderPassEncoders ++;
 					const renderPass = encoder.beginRenderPass( layerDescriptor );
 
 					if ( renderContext.viewport ) {
@@ -1311,6 +1315,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
+		this.renderer.info.backendInfo.deviceEncoderSubmits ++;
 		submit( this.device, renderContextData.encoder.finish() );
 
 
@@ -1579,9 +1584,11 @@ class WebGPUBackend extends Backend {
 		//
 
 		_commandEncoderDescriptor.label = 'clear';
+		this.renderer.info.backendInfo.commandEncoders ++;
 		const encoder = device.createCommandEncoder( _commandEncoderDescriptor );
 		_commandEncoderDescriptor.reset();
 
+		this.renderer.info.backendInfo.renderPassEncoders ++;
 		const currentPass = encoder.beginRenderPass( {
 			colorAttachments,
 			depthStencilAttachment
@@ -1589,6 +1596,7 @@ class WebGPUBackend extends Backend {
 
 		currentPass.end();
 
+		this.renderer.info.backendInfo.deviceEncoderSubmits ++;
 		submit( device, encoder.finish() );
 
 	}
@@ -1614,7 +1622,9 @@ class WebGPUBackend extends Backend {
 
 		this.initTimestampQuery( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ), _computePassDescriptor );
 
+		this.renderer.info.backendInfo.commandEncoders ++;
 		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( _commandEncoderDescriptor );
+		this.renderer.info.backendInfo.computePassEncoders ++;
 		groupGPU.passEncoderGPU = groupGPU.cmdEncoderGPU.beginComputePass( _computePassDescriptor );
 		groupGPU.currentPipeline = null;
 
@@ -1647,6 +1657,7 @@ class WebGPUBackend extends Backend {
 
 		if ( groupGPU.currentPipeline !== pipelineGPU ) {
 
+			this.renderer.info.backendInfo.computePipelines ++;
 			passEncoderGPU.setPipeline( pipelineGPU );
 			groupGPU.currentPipeline = pipelineGPU;
 
@@ -1746,6 +1757,7 @@ class WebGPUBackend extends Backend {
 
 		groupData.passEncoderGPU.end();
 
+		this.renderer.info.backendInfo.deviceEncoderSubmits ++;
 		submit( this.device, groupData.cmdEncoderGPU.finish() );
 
 	}
@@ -1775,6 +1787,7 @@ class WebGPUBackend extends Backend {
 
 		if ( currentSets.pipeline !== pipelineGPU ) {
 
+			this.renderer.info.backendInfo.renderPipelines ++;
 			passEncoderGPU.setPipeline( pipelineGPU );
 			currentSets.pipeline = pipelineGPU;
 
@@ -2724,6 +2737,7 @@ class WebGPUBackend extends Backend {
 		}
 
 		_commandEncoderDescriptor.label = 'copyTextureToTexture_' + srcTexture.id + '_' + dstTexture.id;
+		this.renderer.info.backendInfo.commandEncoders ++;
 		const encoder = this.device.createCommandEncoder( _commandEncoderDescriptor );
 		_commandEncoderDescriptor.reset();
 
@@ -2756,6 +2770,7 @@ class WebGPUBackend extends Backend {
 		_texelCopyTextureInfoDst.reset();
 		_extent3D.reset();
 
+		this.renderer.info.backendInfo.deviceEncoderSubmits ++;
 		submit( this.device, encoder.finish() );
 
 		if ( dstLevel === 0 && dstTexture.generateMipmaps ) {
@@ -2826,6 +2841,7 @@ class WebGPUBackend extends Backend {
 		} else {
 
 			_commandEncoderDescriptor.label = 'copyFramebufferToTexture_' + texture.id;
+			this.renderer.info.backendInfo.commandEncoders ++;
 			encoder = this.device.createCommandEncoder( _commandEncoderDescriptor );
 			_commandEncoderDescriptor.reset();
 
@@ -2872,6 +2888,7 @@ class WebGPUBackend extends Backend {
 			if ( renderContext.depth ) descriptor.depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
 			if ( renderContext.stencil ) descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
 
+			this.renderer.info.backendInfo.renderPassEncoders ++;
 			renderContextData.currentPass = encoder.beginRenderPass( descriptor );
 			renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
 
@@ -2889,6 +2906,7 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
+			this.renderer.info.backendInfo.deviceEncoderSubmits ++;
 			submit( this.device, encoder.finish() );
 
 		}

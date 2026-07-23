@@ -786,6 +786,7 @@ class WebGPUTextureUtils {
 
 		_bufferDescriptor.reset();
 
+		this.backend.renderer.info.backendInfo.commandEncoders ++;
 		const encoder = device.createCommandEncoder( _commandEncoderDescriptor );
 
 		_texelCopyTextureInfo.texture = textureGPU;
@@ -811,6 +812,8 @@ class WebGPUTextureUtils {
 
 		const typedArrayType = this._getTypedArrayType( format );
 
+
+		this.backend.renderer.info.backendInfo.deviceEncoderSubmits ++;
 		submit( device, encoder.finish() );
 
 		await readBuffer.mapAsync( GPUMapMode.READ );
@@ -1001,7 +1004,7 @@ class WebGPUTextureUtils {
 
 		if ( passUtils === null ) {
 
-			this._passUtils = passUtils = new WebGPUTexturePassUtils( this.backend.device );
+			this._passUtils = passUtils = new WebGPUTexturePassUtils( this.backend );
 
 		}
 
