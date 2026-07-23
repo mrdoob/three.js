@@ -50,6 +50,7 @@ const wgslTypeLib = {
 	'mat4x4f': 'mat4',
 
 	'sampler': 'sampler',
+	'sampler_comparison': 'samplerComparison',
 
 	'texture_1d': 'texture',
 
