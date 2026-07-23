@@ -2520,30 +2520,79 @@ class NodeBuilder {
 
 		const backend = this.renderer.backend;
 
-		let cache = _functionNodeCache.get( backend );
+		let backendCache = _functionNodeCache.get( backend );
 
-		if ( cache === undefined ) {
+		if ( backendCache === undefined ) {
 
-			cache = new WeakMap();
-			_functionNodeCache.set( backend, cache );
+			backendCache = new WeakMap();
+			_functionNodeCache.set( backend, backendCache );
+
+		} else {
+
+			const fn = backendCache.get( shaderNode );
+
+			if ( fn !== undefined ) {
+
+				return fn;
+
+			}
 
 		}
 
-		let fn = cache.get( shaderNode );
+		let builderCache = _functionNodeCache.get( this );
 
-		if ( fn === undefined ) {
+		if ( builderCache === undefined ) {
 
-			fn = new FunctionNode();
+			builderCache = new WeakMap();
+			_functionNodeCache.set( this, builderCache );
 
-			const previous = this.currentFunctionNode;
+		} else {
 
-			this.currentFunctionNode = fn;
+			const fn = builderCache.get( shaderNode );
 
-			fn.code = this.buildFunctionCode( shaderNode );
+			if ( fn !== undefined ) {
 
-			this.currentFunctionNode = previous;
+				const cachePerMaterial = this.getDataFromNode( fn ).cachePerMaterial;
 
-			cache.set( shaderNode, fn );
+				if ( cachePerMaterial && this.currentFunctionNode !== null ) {
+
+					// Propagate the flag to the current function even when a cache hit.
+					this.getDataFromNode( this.currentFunctionNode ).cachePerMaterial = true;
+
+				}
+
+				return fn;
+
+			}
+
+		}
+
+		const fn = new FunctionNode();
+
+		const previous = this.currentFunctionNode;
+
+		this.currentFunctionNode = fn;
+
+		fn.code = this.buildFunctionCode( shaderNode );
+
+		this.currentFunctionNode = previous;
+
+		const cachePerMaterial = this.getDataFromNode( fn ).cachePerMaterial;
+
+		if ( cachePerMaterial ) {
+
+			if ( previous !== null ) {
+
+				// Propagate the flag to the current function.
+				this.getDataFromNode( previous ).cachePerMaterial = true;
+
+			}
+
+			builderCache.set( shaderNode, fn );
+
+		} else {
+
+			backendCache.set( shaderNode, fn );
 
 		}
 
