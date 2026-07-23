@@ -1,0 +1,123 @@
+{
+	"asset": {
+		"version": "2.0",
+		"generator": "three.js KHR_gaussian_splatting example"
+	},
+	"scene": 0,
+	"scenes": [
+		{
+			"nodes": [
+				0
+			]
+		}
+	],
+	"nodes": [
+		{
+			"mesh": 0,
+			"name": "glTF Gaussian Splat"
+		}
+	],
+	"meshes": [
+		{
+			"name": "glTF Gaussian Splat",
+			"primitives": [
+				{
+					"mode": 0,
+					"attributes": {
+						"POSITION": 0,
+						"KHR_gaussian_splatting:SCALE": 1,
+						"KHR_gaussian_splatting:ROTATION": 2,
+						"KHR_gaussian_splatting:OPACITY": 3,
+						"KHR_gaussian_splatting:SH_DEGREE_0_COEF_0": 4
+					},
+					"extensions": {
+						"KHR_gaussian_splatting": {
+							"kernel": "ellipse",
+							"colorSpace": "srgb_rec709_display"
+						}
+					}
+				}
+			]
+		}
+	],
+	"accessors": [
+		{
+			"bufferView": 0,
+			"componentType": 5126,
+			"count": 25,
+			"type": "VEC3",
+			"min": [
+				-1.0044256202348036,
+				-1.0076141112923507,
+				-0.1373438554063569
+			],
+			"max": [
+				0.8616376924415227,
+				0.9377124671218132,
+				0.08
+			]
+		},
+		{
+			"bufferView": 1,
+			"componentType": 5126,
+			"count": 25,
+			"type": "VEC3"
+		},
+		{
+			"bufferView": 2,
+			"componentType": 5120,
+			"count": 25,
+			"type": "VEC4",
+			"normalized": true
+		},
+		{
+			"bufferView": 3,
+			"componentType": 5121,
+			"count": 25,
+			"type": "SCALAR",
+			"normalized": true
+		},
+		{
+			"bufferView": 4,
+			"componentType": 5126,
+			"count": 25,
+			"type": "VEC3"
+		}
+	],
+	"bufferViews": [
+		{
+			"buffer": 0,
+			"byteOffset": 0,
+			"byteLength": 300
+		},
+		{
+			"buffer": 0,
+			"byteOffset": 300,
+			"byteLength": 300
+		},
+		{
+			"buffer": 0,
+			"byteOffset": 600,
+			"byteLength": 100
+		},
+		{
+			"buffer": 0,
+			"byteOffset": 700,
+			"byteLength": 25
+		},
+		{
+			"buffer": 0,
+			"byteOffset": 728,
+			"byteLength": 300
+		}
+	],
+	"buffers": [
+		{
+			"byteLength": 1028,
+			"uri": "data:application/octet-stream;base64,AAAAAAAAAAAAAAAAWw0BP7n5hj0K16M99XrwPvsuuD4K4Si8exscPrL1uz51Zp69Kx2YvUNwET8ktvc86ASmvpDD2D4scY49ADPCvhlKIT5rREW9I8kbv5/vor3yDGq9NlK9vjQAkb4uyoA9xJw0vv522b7YrCc9CHSjPbxHHL/PZJa97N+APhpEqL6/VLS8mS75PmT0Tr7YAqI9AAJVP56oYj4K16M8PrI1PyYLNT9p/Y+9UJ0zPm1iJj/eowy+RXB/vu0NcD/6zvO8WjAjv/fGIz8mfxw8Yegrv7OTOT59g929BZGAv0rOiL7B5++97AoPv2CHDr+7HD07QM9PvrWAQL9wK5y8dz2JPoD5gL8Lowi+9Fr9PspE/r549qe9SpRcP1oebr5Chpw8zcxMPjEIrD1CYGU9vHSTPizUmj07cE49vHSTPizUmj07cE49vHSTPizUmj07cE49vHSTPizUmj07cE49vHSTPizUmj07cE49vHSTPizUmj07cE49vHSTPizUmj07cE49vHSTPizUmj07cE49vHSTPizUmj07cE49vHSTPizUmj07cE49vHSTPizUmj07cE49vHSTPizUmj07cE49ppvEPjtwzj0noIk9ppvEPjtwzj0noIk9ppvEPjtwzj0noIk9ppvEPjtwzj0noIk9ppvEPjtwzj0noIk9ppvEPjtwzj0noIk9ppvEPjtwzj0noIk9ppvEPjtwzj0noIk9ppvEPjtwzj0noIk9ppvEPjtwzj0noIk9ppvEPjtwzj0noIk9ppvEPjtwzj0noIk9AAAAfwAACH8AACl4AABHagAAX1QAAHI4AAB9GQAAf/gAAHjXAABquQAAVKEAADiOAAAZgwAAEH4AADB1AABNZQAAZU0AAHUxAAB+EQAAfvAAAHXQAABlswAATZsAADGLAAARguC4uLi4uLi4uLi4uLienp6enp6enp6enp4AAADF3+I/xd/iP8Xf4j/F3+I/lMzZPj5Gmr/F3+I/b1mjP/Xya7/cHwi/1s+eP8Xf4j/QfzU+DTORvsXf4j/F3+I/lMzZvjKmRz/F3+I/Vxn+vj5Gmr/F3+I/lMzZPj5Gmr/F3+I/b1mjP/Xya7/cHwi/1s+eP8Xf4j/QfzU+DTORvsXf4j/F3+I/lMzZvjKmRz/F3+I/Vxn+vj5Gmr/F3+I/b1mjP/Xya7/cHwi/1s+eP8Xf4j/QfzU+DTORvsXf4j/F3+I/lMzZvjKmRz/F3+I/Vxn+vj5Gmr/F3+I/lMzZPj5Gmr/F3+I/b1mjP/Xya7/cHwi/1s+eP8Xf4j/QfzU+DTORvsXf4j/F3+I/lMzZvjKmRz/F3+I/Vxn+vj5Gmr/F3+I/lMzZPj5Gmr8="
+		}
+	],
+	"extensionsUsed": [
+		"KHR_gaussian_splatting"
+	]
+}

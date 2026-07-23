@@ -27,7 +27,6 @@ import {
 	REVISION,
 	ImageUtils
 } from 'three';
-
 /**
  * The KHR_mesh_quantization extension allows these extra attribute component types
  *
@@ -90,8 +89,9 @@ const KHR_mesh_quantization_ExtraAttrTypes = {
  * - EXT_mesh_gpu_instancing
  * - EXT_texture_webp
  *
- * The following glTF 2.0 extension is supported by an external user plugin:
+ * The following glTF 2.0 extensions are supported by separately registered plugins:
  *
+ * - KHR_gaussian_splatting
  * - [KHR_materials_variants](https://github.com/takahirox/three-gltf-extensions)
  *
  * ```js
@@ -1846,6 +1846,19 @@ class GLTFWriter {
 
 		const cache = this.cache;
 		const json = this.json;
+
+		for ( let i = 0, il = this.plugins.length; i < il; i ++ ) {
+
+			const plugin = this.plugins[ i ];
+
+			if ( plugin.processMeshAsync ) {
+
+				const meshIndex = await plugin.processMeshAsync( mesh );
+				if ( meshIndex !== null && meshIndex !== undefined ) return meshIndex;
+
+			}
+
+		}
 
 		const meshCacheKeyParts = [ mesh.geometry.uuid ];
 

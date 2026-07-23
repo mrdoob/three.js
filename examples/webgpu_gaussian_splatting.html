@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - gaussian splatting</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - gaussian splatting">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_gaussian_splatting.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_gaussian_splatting.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			#camera-info {
+				position: absolute;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				padding: 8px 12px;
+				background: rgba( 0, 0, 0, 0.45 );
+				color: #fff;
+				font-family: monospace;
+				font-size: 12px;
+				line-height: 1.4;
+				pointer-events: none;
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Gaussian Splatting</span>
+			</div>
+
+			<small id="status">WebGPU TSL Gaussian splat renderer loading PLY, SPLAT, SPZ, KSPLAT, and glTF data by <a href="https://ben3d.ca">Ben Houston</a>.</small>
+		</div>
+		<div id="camera-info"></div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { GLTFGaussianSplatLoaderExtension } from 'three/addons/loaders/GLTFGaussianSplatLoaderExtension.js';
+			import { SPLATLoader } from 'three/addons/loaders/SPLATLoader.js';
+			import { KSPLATLoader } from 'three/addons/loaders/KSPLATLoader.js';
+			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
+			import { SPZLoader } from 'three/addons/loaders/SPZLoader.js';
+			import { GaussianSplatMesh } from 'three/addons/objects/GaussianSplatMesh.js';
+			import { GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING, createGaussianSplatGeometryFromPLYGeometry } from 'three/addons/utils/GaussianSplatUtils.js';
+
+			let camera, scene, renderer, orbitControls, firstPersonControls, activeControls, splats, splatRoot;
+			let loadId = 0;
+			THREE.ColorManagement.workingColorSpace = THREE.SRGBColorSpace;
+
+			const status = document.getElementById( 'status' );
+			const cameraInfo = document.getElementById( 'camera-info' );
+			const clock = new THREE.Clock();
+			const cameraDirection = new THREE.Vector3();
+			const lastRenderedCameraPosition = new THREE.Vector3();
+			const lastRenderedCameraQuaternion = new THREE.Quaternion();
+			const zeroVector = new THREE.Vector3();
+			let forceRender = true;
+
+			const sources = {
+				flower: {
+					name: 'Procedural Flower (PLY, local, 1MB)',
+					url: 'models/gsplat/procedural_flower.ply',
+					rotation: new THREE.Euler( - 0.35, 0, 0 ),
+					controls: 'orbit',
+					cameraPosition: new THREE.Vector3( 0, 0.35, 3.2 ),
+					note: 'Procedural local CC0 sample.'
+				},
+				flowerGLTF: {
+					name: 'Procedural Flower glTF (glTF, local, 3KB)',
+					url: 'models/gsplat/procedural_flower.gltf',
+					createObject: loadGaussianSplatGLTF,
+					controls: 'orbit',
+					cameraPosition: new THREE.Vector3( 0, 0, 4 ),
+					minDistance: 0.7,
+					maxDistance: 8,
+					note: 'Local glTF sample using KHR_gaussian_splatting.'
+				},
+				recon: {
+					name: 'ReconWorldLab Demo (PLY, remote, 67 MB)',
+					url: 'https://raw.githubusercontent.com/ReconWorldLab/godot-gaussian-splatting/main/samples/assets/demo.ply',
+					rotation: new THREE.Euler( Math.PI, 0, 0 ),
+					controls: 'orbit',
+					cameraPosition: new THREE.Vector3( 0, 0.2, 3.5 ),
+					note: 'MIT licensed sample from ReconWorldLab/godot-gaussian-splatting.'
+				},
+				coolSplats: {
+					name: 'Cool Splats Output (SPLAT, remote, 112 MB)',
+					url: 'https://huggingface.co/datasets/runes/coolsplats/resolve/main/output.splat',
+					loader: SPLATLoader,
+					rotation: new THREE.Euler( - Math.PI * 0.5, 0, Math.PI * 0.5 ),
+					controls: 'firstPerson',
+					cameraPosition: new THREE.Vector3( 0.09, 0.11, 2.89 ),
+					cameraPositionWorld: true,
+					cameraTarget: new THREE.Vector3( 0, - 0.5, 0 ),
+					movementSpeed: 0.7,
+					lookSpeed: 0.08,
+					minDistance: 0.01,
+					note: 'Remote standard .splat file referenced as working input in mkkellogg/GaussianSplats3D.'
+				},
+				hornedLizard: {
+					name: 'Niantic Horned Lizard (SPZ, remote, 18 MB)',
+					url: 'https://raw.githubusercontent.com/nianticlabs/spz/v2.1.0/samples/hornedlizard.spz',
+					loader: SPZLoader,
+					rotation: new THREE.Euler( 0, 0, 0 ),
+					controls: 'firstPerson',
+					cameraPosition: new THREE.Vector3( 0, 0.15, 0.9 ),
+					cameraTarget: new THREE.Vector3( 0, 0, 0 ),
+					movementSpeed: 0.35,
+					lookSpeed: 0.08,
+					minDistance: 0.01,
+					note: 'MIT licensed SPZ v2 sample from nianticlabs/spz, loaded from GitHub.'
+				},
+				bonsaiKSPLAT: {
+					name: 'NerfBaselines Bonsai (KSPLAT, remote, 27 MB)',
+					url: 'https://huggingface.co/datasets/nerfbaselines/nerfbaselines-supplementary/resolve/main/gaussian-splatting/mipnerf360/bonsai_demo/scene.ksplat',
+					loader: KSPLATLoader,
+					rotation: new THREE.Euler( Math.PI, Math.PI, 0 ),
+					controls: 'firstPerson',
+					cameraPosition: new THREE.Vector3( 0.12, - 3.81, - 1.14 ),
+					cameraPositionWorld: true,
+					cameraDirection: new THREE.Vector3( - 0.18, 0.59, 0.79 ),
+					movementSpeed: 0.6,
+					lookSpeed: 0.08,
+					minDistance: 0.01,
+					maxDistance: 12,
+					note: 'Remote KSPLAT sample from nerfbaselines/nerfbaselines-supplementary, hosted on Hugging Face.'
+				},
+				debugRound: {
+					name: 'Debug: Single Round Splat',
+					createData: createDebugRoundSplat,
+					rotation: new THREE.Euler( 0, 0, 0 ),
+					controls: 'orbit',
+					cameraPosition: new THREE.Vector3( 0, 0, 3 ),
+					note: 'One isotropic Gaussian. It should stay round while zooming.'
+				},
+				debugAxes: {
+					name: 'Debug: Axis-Aligned Ellipses',
+					createData: createDebugAxisSplats,
+					rotation: new THREE.Euler( 0, 0, 0 ),
+					controls: 'orbit',
+					cameraPosition: new THREE.Vector3( 0, 0, 4 ),
+					note: 'Rows show X, Y and depth-axis covariance. X/Y ellipses should keep stable orientation while zooming.'
+				},
+				debugRotated: {
+					name: 'Debug: Rotated Ellipses',
+					createData: () => createDebugRotatedSplats( true ),
+					rotation: new THREE.Euler( 0, 0, 0 ),
+					controls: 'orbit',
+					cameraPosition: new THREE.Vector3( 0, 0, 4 ),
+					note: 'A ring of 2D rotated Gaussians. Ellipse orientation should rotate smoothly around the center.'
+				},
+				debugRotatedNoCenter: {
+					name: 'Debug: Rotated Ellipses (no center)',
+					createData: () => createDebugRotatedSplats( false ),
+					rotation: new THREE.Euler( 0, 0, 0 ),
+					controls: 'orbit',
+					cameraPosition: new THREE.Vector3( 0, 0, 4 ),
+					note: 'Same rotated ring without the center splat, useful for isolating far-side projection from blending.'
+				},
+				debugDepth: {
+					name: 'Debug: Depth Sorting Stack',
+					createData: createDebugDepthSplats,
+					rotation: new THREE.Euler( 0, 0, 0 ),
+					controls: 'orbit',
+					cameraPosition: new THREE.Vector3( 0, 0, 4 ),
+					note: 'Overlapping translucent layers at different depths. Orbit to validate back-to-front sorting.'
+				}
+			};
+			const sourceNames = Object.values( sources ).map( ( source ) => source.name );
+			const urlParams = new URLSearchParams( window.location.search );
+			const params = {
+				source: sources.recon.name,
+				forceWebGL: urlParams.get( 'forceWebGL' ) === 'true'
+			};
+
+			init();
+
+			async function init() {
+
+				if ( params.forceWebGL === false && WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+					throw new Error( 'No WebGPU support' );
+
+				}
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100 );
+				camera.position.set( 0, 0.35, 3.2 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x07080f );
+
+				renderer = new THREE.WebGPURenderer( { antialias: false, forceWebGL: params.forceWebGL } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( render );
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.enableDamping = true;
+				orbitControls.minDistance = 1.2;
+				orbitControls.maxDistance = 8;
+				orbitControls.target.set( 0, 0, 0 );
+				orbitControls.update();
+
+				firstPersonControls = new FirstPersonControls( camera, renderer.domElement );
+				firstPersonControls.enabled = false;
+				firstPersonControls.movementSpeed = 0.7;
+				firstPersonControls.lookSpeed = 0.08;
+
+				const gui = new GUI();
+				gui.add( params, 'source', sourceNames ).name( 'Splat' ).onChange( async ( value ) => {
+
+					await loadSplatSource( getSourceKeyByName( value ) );
+
+				} );
+				gui.add( params, 'forceWebGL' ).name( 'forceWebGL' ).onChange( function ( value ) {
+
+					const url = new URL( window.location.href );
+
+					if ( value === true ) {
+
+						url.searchParams.set( 'forceWebGL', 'true' );
+
+					} else {
+
+						url.searchParams.delete( 'forceWebGL' );
+
+					}
+
+					window.location.href = url.href;
+
+				} );
+
+				await loadSplatSource( getSourceKeyByName( params.source ) );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			async function loadSplatSource( sourceKey ) {
+
+				const source = sources[ sourceKey ];
+				const currentLoadId = ++ loadId;
+
+				const oldStatus = status.innerHTML;
+				status.textContent = `Loading ${ source.name }...`;
+
+				try {
+
+					const onProgress = function ( event ) {
+
+						if ( event.lengthComputable === true ) {
+
+							const percent = Math.round( event.loaded / event.total * 100 );
+							status.textContent = `Loading ${ source.name }... ${ percent }%`;
+
+						}
+
+					};
+
+					const loaded = await loadSplatObject( source, onProgress );
+
+					if ( currentLoadId !== loadId ) return;
+
+					disposeCurrentSplats();
+
+					splats = loaded.splats;
+					splatRoot = loaded.object;
+
+					if ( source.rotation !== undefined ) splatRoot.rotation.copy( source.rotation );
+
+					scene.add( splatRoot );
+
+					fitCameraToSplats( splats, source );
+					status.innerHTML = oldStatus;
+
+				} catch ( error ) {
+
+					if ( currentLoadId !== loadId ) return;
+
+					console.error( error );
+					status.textContent = `Could not load ${ source.name }: ${ error.message }`;
+
+				}
+
+			}
+
+			function getSourceKeyByName( sourceName ) {
+
+				return Object.keys( sources ).find( ( key ) => sources[ key ].name === sourceName );
+
+			}
+
+			function disposeCurrentSplats() {
+
+				if ( splatRoot === undefined ) return;
+
+				scene.remove( splatRoot );
+				splats.geometry.dispose();
+				splats.material.dispose();
+				splats = undefined;
+				splatRoot = undefined;
+
+			}
+
+			function fitCameraToSplats( mesh, source ) {
+
+				mesh.updateWorldMatrix( true, false );
+
+				const sphere = mesh.splatGeometry.boundingSphere.clone().applyMatrix4( mesh.matrixWorld );
+				const radius = Math.max( sphere.radius, 1 );
+				const distance = radius / Math.sin( THREE.MathUtils.degToRad( camera.fov ) * 0.5 );
+
+				orbitControls.minDistance = source.minDistance || 1.2;
+				orbitControls.maxDistance = source.maxDistance || 8;
+
+				if ( source.controls === 'firstPerson' ) {
+
+					if ( source.cameraPositionWorld === true ) {
+
+						camera.position.copy( source.cameraPosition );
+
+					} else {
+
+						camera.position.copy( sphere.center ).add( source.cameraPosition );
+
+					}
+
+					const target = source.cameraDirection !== undefined ?
+						camera.position.clone().add( source.cameraDirection ) :
+						sphere.center.clone().add( source.cameraTarget || zeroVector );
+					camera.near = 0.001;
+					camera.far = Math.max( radius * 4, 10 );
+					firstPersonControls.movementSpeed = source.movementSpeed || radius * 0.25;
+					firstPersonControls.lookSpeed = source.lookSpeed || 0.08;
+					firstPersonControls.lookAt( target );
+					setActiveControls( 'firstPerson' );
+
+				} else {
+
+					orbitControls.target.copy( sphere.center ).add( source.cameraTarget || zeroVector );
+					camera.position.copy( source.cameraPosition ).normalize().multiplyScalar( distance * 1.4 ).add( sphere.center );
+					camera.near = Math.max( distance / 1000, 0.001 );
+					camera.far = Math.max( distance * 10, 10 );
+					setActiveControls( 'orbit' );
+
+				}
+
+				camera.updateProjectionMatrix();
+				activeControls.update( 0 );
+				forceRender = true;
+
+
+			}
+
+			function setActiveControls( mode ) {
+
+				orbitControls.enabled = mode === 'orbit';
+				firstPersonControls.enabled = mode === 'firstPerson';
+				activeControls = mode === 'firstPerson' ? firstPersonControls : orbitControls;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				forceRender = true;
+
+			}
+
+			function render() {
+
+				const delta = clock.getDelta();
+
+				if ( activeControls !== undefined ) {
+
+					if ( activeControls === firstPersonControls ) {
+
+						activeControls.update( delta );
+
+					} else {
+
+						activeControls.update();
+
+					}
+
+				}
+
+				if ( activeControls === firstPersonControls && forceRender === false && hasCameraChanged() === false ) {
+
+					return;
+
+				}
+
+				if ( splats !== undefined ) {
+
+					splats.updateSort( renderer, camera );
+
+				}
+
+				updateCameraInfo();
+				renderer.render( scene, camera );
+				lastRenderedCameraPosition.copy( camera.position );
+				lastRenderedCameraQuaternion.copy( camera.quaternion );
+				forceRender = false;
+
+			}
+
+			function hasCameraChanged() {
+
+				return lastRenderedCameraPosition.distanceToSquared( camera.position ) > 1e-8 ||
+					1 - Math.abs( lastRenderedCameraQuaternion.dot( camera.quaternion ) ) > 1e-8;
+
+			}
+
+			function updateCameraInfo() {
+
+				if ( cameraInfo === null ) return;
+
+				camera.getWorldDirection( cameraDirection );
+				cameraInfo.textContent = `Camera position: ${ formatVector( camera.position ) } | View direction: ${ formatVector( cameraDirection ) } | Controls: ${ activeControls === firstPersonControls ? 'WASD / drag to look' : 'orbit' }`;
+
+			}
+
+			function formatVector( vector ) {
+
+				return `${ vector.x.toFixed( 2 ) }, ${ vector.y.toFixed( 2 ) }, ${ vector.z.toFixed( 2 ) }`;
+
+			}
+
+			async function loadSplatObject( source, onProgress ) {
+
+				if ( source.createObject !== undefined ) {
+
+					return source.createObject( source, onProgress );
+
+				}
+
+				const splatData = source.createData !== undefined ? source.createData() : await loadSplatData( source, onProgress );
+				const mesh = new GaussianSplatMesh( splatData, { autoSort: false } );
+
+				return { object: mesh, splats: mesh };
+
+			}
+
+			async function loadSplatData( source, onProgress ) {
+
+				if ( source.loader !== undefined ) {
+
+					return new source.loader().loadAsync( source.url, onProgress );
+
+				}
+
+				return loadGaussianSplatPLY( source.url, onProgress );
+
+			}
+
+			async function loadGaussianSplatGLTF( source, onProgress ) {
+
+				const loader = new GLTFLoader();
+				loader.register( function ( parser ) {
+
+					return new GLTFGaussianSplatLoaderExtension( parser );
+
+				} );
+
+				const gltf = await loader.loadAsync( source.url, onProgress );
+				let splatMesh;
+
+				gltf.scene.traverse( function ( object ) {
+
+					if ( object.isGaussianSplatMesh === true && splatMesh === undefined ) {
+
+						splatMesh = object;
+
+					}
+
+				} );
+
+				if ( splatMesh === undefined ) {
+
+					throw new Error( 'No GaussianSplatMesh found in glTF scene.' );
+
+				}
+
+				return { object: gltf.scene, splats: splatMesh };
+
+			}
+
+			async function loadGaussianSplatPLY( url, onProgress ) {
+
+				const loader = new PLYLoader();
+				loader.setCustomPropertyNameMapping( GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING );
+
+				const geometry = await loader.loadAsync( url, onProgress );
+				const splatGeometry = createGaussianSplatGeometryFromPLYGeometry( geometry );
+				geometry.dispose();
+
+				return splatGeometry;
+
+			}
+
+			function createDebugRoundSplat() {
+
+				return createDebugData( [
+					{ position: [ 0, 0, 0 ], scales: [ 0.35, 0.35, 0.35 ], color: [ 255, 180, 80, 220 ] }
+				] );
+
+			}
+
+			function createDebugAxisSplats() {
+
+				const splats = [];
+				const colors = [
+					[ 255, 90, 90, 210 ],
+					[ 90, 220, 120, 210 ],
+					[ 100, 150, 255, 210 ]
+				];
+
+				for ( let row = 0; row < 3; row ++ ) {
+
+					for ( let column = 0; column < 3; column ++ ) {
+
+						const position = [ ( column - 1 ) * 0.9, ( 1 - row ) * 0.75, 0 ];
+						const scales = row === 0 ? [ 0.36, 0.08, 0.04 ] : row === 1 ? [ 0.08, 0.36, 0.04 ] : [ 0.08, 0.08, 0.36 ];
+						splats.push( { position, scales, color: colors[ row ] } );
+
+					}
+
+				}
+
+				return createDebugData( splats );
+
+			}
+
+			function createDebugRotatedSplats( includeCenter ) {
+
+				const splats = [];
+				const count = 12;
+
+				for ( let i = 0; i < count; i ++ ) {
+
+					const angle = i / count * Math.PI * 2;
+					const hue = i / count;
+					splats.push( {
+						position: [ Math.cos( angle ) * 1.1, Math.sin( angle ) * 1.1, 0 ],
+						scales: [ 0.34, 0.07, 0.07 ],
+						angle,
+						color: hslToRgbBytes( hue, 0.75, 0.58, 210 )
+					} );
+
+				}
+
+				if ( includeCenter === true ) {
+
+					splats.push( { position: [ 0, 0, 0 ], scales: [ 0.18, 0.18, 0.18 ], color: [ 255, 255, 255, 190 ] } );
+
+				}
+
+				return createDebugData( splats );
+
+			}
+
+			function createDebugDepthSplats() {
+
+				return createDebugData( [
+					{ position: [ 0, 0, - 0.45 ], scales: [ 0.52, 0.52, 0.06 ], color: [ 255, 70, 70, 150 ] },
+					{ position: [ 0.14, 0.08, 0 ], scales: [ 0.52, 0.52, 0.06 ], color: [ 70, 255, 110, 150 ] },
+					{ position: [ - 0.14, - 0.08, 0.45 ], scales: [ 0.52, 0.52, 0.06 ], color: [ 80, 140, 255, 150 ] }
+				] );
+
+			}
+
+			function createDebugData( splats ) {
+
+				const centers = new Float32Array( splats.length * 3 );
+				const covariances = new Float32Array( splats.length * 6 );
+				const colors = new Uint8Array( splats.length * 4 );
+
+				for ( let i = 0; i < splats.length; i ++ ) {
+
+					const splat = splats[ i ];
+					const i3 = i * 3;
+					const i4 = i * 4;
+
+					centers.set( splat.position, i3 );
+					writeDebugCovariance( covariances, i * 6, splat.scales, splat.angle || 0 );
+					colors.set( splat.color, i4 );
+
+				}
+
+				const geometry = new THREE.BufferGeometry();
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( centers, 3 ) );
+				geometry.setAttribute( 'covariance', new THREE.BufferAttribute( covariances, 6 ) );
+				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 4, true ) );
+				geometry.computeBoundingBox();
+				geometry.computeBoundingSphere();
+
+				return geometry;
+
+			}
+
+			function writeDebugCovariance( target, offset, scales, angle ) {
+
+				const cos = Math.cos( angle );
+				const sin = Math.sin( angle );
+				const sx2 = scales[ 0 ] * scales[ 0 ];
+				const sy2 = scales[ 1 ] * scales[ 1 ];
+				const sz2 = scales[ 2 ] * scales[ 2 ];
+
+				target[ offset ] = cos * cos * sx2 + sin * sin * sy2;
+				target[ offset + 1 ] = cos * sin * ( sx2 - sy2 );
+				target[ offset + 2 ] = 0;
+				target[ offset + 3 ] = sin * sin * sx2 + cos * cos * sy2;
+				target[ offset + 4 ] = 0;
+				target[ offset + 5 ] = sz2;
+
+			}
+
+			function hslToRgbBytes( h, s, l, alpha ) {
+
+				const a = s * Math.min( l, 1 - l );
+				const f = ( n ) => {
+
+					const k = ( n + h * 12 ) % 12;
+					return l - a * Math.max( - 1, Math.min( k - 3, 9 - k, 1 ) );
+
+				};
+
+				return [
+					Math.round( f( 0 ) * 255 ),
+					Math.round( f( 8 ) * 255 ),
+					Math.round( f( 4 ) * 255 ),
+					alpha
+				];
+
+			}
+
+		</script>
+	</body>
+</html>
