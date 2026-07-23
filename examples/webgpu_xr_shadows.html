@@ -38,7 +38,7 @@
 			timer.connect( document );
 
 			let camera, cameraRig, scene, renderer;
-			let directionalLight, torusKnot, box, icosahedron, cone;
+			let directionalLight, torusKnot, box, icosahedron, cone, glass;
 
 			init();
 
@@ -132,6 +132,28 @@
 				cone.receiveShadow = true;
 				scene.add( cone );
 
+				// transmission
+
+				glass = new THREE.Mesh(
+					new THREE.IcosahedronGeometry( 0.65, 4 ),
+					new THREE.MeshPhysicalMaterial( {
+						color: 0xb9e7ff,
+						roughness: 0.05,
+						metalness: 0,
+						transmission: 1,
+						thickness: 0.9,
+						ior: 1.45,
+						attenuationColor: 0x72b5d4,
+						attenuationDistance: 3,
+						specularIntensity: 1,
+						side: THREE.DoubleSide
+					} )
+				);
+				glass.position.set( 0.9, 1.15, 1.2 );
+				glass.castShadow = true;
+				glass.receiveShadow = true;
+				scene.add( glass );
+
 				// renderer
 
 				renderer = createRenderer();
@@ -205,6 +227,9 @@
 				icosahedron.rotation.x += delta * 0.3;
 				icosahedron.rotation.y -= delta * 0.5;
 				cone.rotation.y -= delta * 0.35;
+				glass.position.y = 1.15 + Math.sin( elapsed * 1.1 ) * 0.08;
+				glass.rotation.x -= delta * 0.2;
+				glass.rotation.y += delta * 0.3;
 
 				directionalLight.position.x = Math.cos( elapsed * 0.25 ) * 4;
 				directionalLight.position.z = Math.sin( elapsed * 0.25 ) * 4;

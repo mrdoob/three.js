@@ -13,7 +13,7 @@ import { positionViewDirection, positionView, positionWorld } from '../accessors
 import { Fn, float, vec2, vec3, vec4, mat3, If } from '../tsl/TSLBase.js';
 import { mix, normalize, refract, length, clamp, log2, log, exp, smoothstep } from '../math/MathNode.js';
 import { div } from '../math/OperatorNode.js';
-import { cameraPosition, cameraProjectionMatrix, cameraViewMatrix } from '../accessors/Camera.js';
+import { cameraPosition, cameraProjectionMatrix, cameraViewMatrix, cameraViewport } from '../accessors/Camera.js';
 import { modelWorldMatrix } from '../accessors/ModelNode.js';
 import { screenSize } from '../display/ScreenNode.js';
 import { viewportMipTexture, viewportOpaqueMipTexture } from '../display/ViewportTextureNode.js';
@@ -70,14 +70,19 @@ const applyIorToRoughness = /*@__PURE__*/ Fn( ( [ roughness, ior ] ) => {
 const viewportBackSideTexture = /*@__PURE__*/ viewportMipTexture();
 const viewportFrontSideTexture = /*@__PURE__*/ viewportOpaqueMipTexture();
 
-const getTransmissionSample = /*@__PURE__*/ Fn( ( [ fragCoord, roughness, ior ], { material } ) => {
+const getTransmissionSample = /*@__PURE__*/ Fn( ( [ fragCoord, roughness, ior ], { camera, material } ) => {
 
 	const vTexture = material.side === BackSide ? viewportBackSideTexture : viewportFrontSideTexture;
 
-	const transmissionSample = vTexture.sample( fragCoord );
+	// Array cameras can render multiple views into a shared framebuffer.
+	const isArrayCamera = camera.isArrayCamera && camera.cameras.length > 0;
+	const viewportCoord = isArrayCamera ? fragCoord.mul( cameraViewport.zw ).add( cameraViewport.xy ).div( screenSize ) : fragCoord;
+	const viewportWidth = isArrayCamera ? cameraViewport.z : screenSize.x;
+
+	const transmissionSample = vTexture.sample( viewportCoord );
 	//const transmissionSample = viewportMipTexture( fragCoord );
 
-	const lod = log2( screenSize.x ).mul( applyIorToRoughness( roughness, ior ) );
+	const lod = log2( viewportWidth ).mul( applyIorToRoughness( roughness, ior ) );
 
 	return textureBicubicLevel( transmissionSample, lod );
 
