@@ -201,6 +201,32 @@ details.renderer-container[open] > summary.renderer-summary .toggle-icon::before
 	opacity: 0.3;
 }
 
+/* Monitoring on/off toggle */
+.monitoring-toggle {
+	background: none;
+	border: 1px solid light-dark( #388e3c, #66bb6a );
+	border-radius: 3px;
+	color: light-dark( #388e3c, #66bb6a );
+	cursor: pointer;
+	font-family: monospace;
+	font-size: 11px;
+	padding: 1px 6px;
+}
+
+.monitoring-toggle:hover {
+	background: light-dark( rgba(0,0,0,0.1), rgba(255,255,255,0.1) );
+}
+
+.monitoring-toggle.off {
+	border-color: light-dark( #aaa, #777 );
+	color: light-dark( #999, #888 );
+}
+
+/* Dim content while monitoring is paused */
+body.monitoring-off .sections-container {
+	opacity: 0.5;
+}
+
 /* Two-column layout for wide panel */
 @media (min-width: 1000px) {
 	.sections-container {
