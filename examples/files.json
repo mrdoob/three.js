@@ -523,7 +523,8 @@
 		"webgpu_water",
 		"webgpu_xr_rollercoaster",
 		"webgpu_xr_cubes",
-		"webgpu_xr_native_layers"
+		"webgpu_xr_native_layers",
+		"webgpu_xr_media_layer"
 	],
 	"webaudio": [
 		"webaudio_orientation",
