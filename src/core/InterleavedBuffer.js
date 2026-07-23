@@ -279,8 +279,9 @@ class InterleavedBuffer {
 
 		const json = {
 			uuid: this.uuid,
+			type: 'InterleavedBuffer',
+			arrayType: this.array.constructor.name,
 			buffer: this.array.buffer._uuid,
-			type: this.array.constructor.name,
 			stride: this.stride
 		};
 
