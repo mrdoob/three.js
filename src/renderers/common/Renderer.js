@@ -1323,7 +1323,15 @@ class Renderer {
 
 		if ( renderBundleNeedsUpdate ) {
 
+			if ( renderBundleData.attributes !== undefined ) {
+
+				this._unregisterRenderBundleAttributes( renderBundle );
+
+			}
+
 			this.backend.beginBundle( renderContext );
+
+			renderBundleData.renderObjects = [];
 
 			this._currentRenderBundle = renderBundle;
 
@@ -1369,6 +1377,98 @@ class Renderer {
 		}
 
 		this.backend.addBundle( renderContext, renderBundle );
+
+	}
+
+	/**
+	 * Registers an attribute as used by a render bundle.
+	 *
+	 * @private
+	 * @param {RenderBundle} renderBundle - The render bundle.
+	 * @param {?BufferAttribute} attribute - The attribute.
+	 */
+	_registerRenderBundleAttribute( renderBundle, attribute ) {
+
+		if ( attribute === null ) return;
+
+		if ( this._attributes.addRenderBundle( attribute, renderBundle ) === true ) {
+
+			const renderBundleData = this.backend.get( renderBundle );
+
+			if ( renderBundleData.attributes === undefined ) {
+
+				renderBundleData.attributes = new Set();
+
+			}
+
+			renderBundleData.attributes.add( attribute );
+
+		}
+
+	}
+
+	/**
+	 * Registers render-bundle attribute dependencies for the given render object.
+	 *
+	 * @private
+	 * @param {RenderBundle} renderBundle - The render bundle.
+	 * @param {RenderObject} renderObject - The render object.
+	 */
+	_registerRenderBundleAttributes( renderBundle, renderObject ) {
+
+		this._registerRenderBundleAttribute( renderBundle, renderObject.getIndex() );
+		this._registerRenderBundleAttribute( renderBundle, renderObject.getIndirect() );
+
+		const attributes = renderObject.getAttributes();
+
+		for ( let i = 0, l = attributes.length; i < l; i ++ ) {
+
+			this._registerRenderBundleAttribute( renderBundle, attributes[ i ] );
+
+		}
+
+		const bindings = renderObject.getBindings();
+
+		for ( let i = 0, l = bindings.length; i < l; i ++ ) {
+
+			const bindGroup = bindings[ i ];
+
+			for ( let j = 0, jl = bindGroup.bindings.length; j < jl; j ++ ) {
+
+				const binding = bindGroup.bindings[ j ];
+
+				if ( binding.isStorageBuffer === true ) {
+
+					this._registerRenderBundleAttribute( renderBundle, binding.attribute );
+
+				}
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * Unregisters render-bundle attribute dependencies.
+	 *
+	 * @private
+	 * @param {RenderBundle} renderBundle - The render bundle.
+	 */
+	_unregisterRenderBundleAttributes( renderBundle ) {
+
+		const renderBundleData = this.backend.get( renderBundle );
+		const attributes = renderBundleData.attributes;
+
+		if ( attributes === undefined ) return;
+
+		for ( const attribute of attributes ) {
+
+			this._attributes.removeRenderBundle( attribute, renderBundle );
+
+		}
+
+		renderBundleData.attributes = undefined;
 
 	}
 
@@ -2594,7 +2694,7 @@ class Renderer {
 
 			this.info.dispose();
 			this.backend.dispose();
-
+			this._attributes.dispose();
 			this._animation.dispose();
 			this._objects.dispose();
 			this._geometries.dispose();
@@ -3777,6 +3877,12 @@ class Renderer {
 		}
 
 		this._pipelines.updateForRender( renderObject );
+
+		if ( this._currentRenderBundle !== null ) {
+
+			this._registerRenderBundleAttributes( this._currentRenderBundle, renderObject );
+
+		}
 
 		//
 
