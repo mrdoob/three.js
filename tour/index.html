@@ -1,0 +1,235 @@
+<html lang="en">
+	<head>
+		<title>Tour of TSL - Interactive Guide</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="shortcut icon" href="../files/favicon_white.ico" media="(prefers-color-scheme: dark)"/>
+		<link rel="shortcut icon" href="../files/favicon.ico" media="(prefers-color-scheme: light)"/>
+
+		<!-- Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+        <!-- CSS -->
+		<link rel="stylesheet" href="css/tour.css">
+
+		<!-- Scripts -->
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "../examples/jsm/",
+					"tsl-textures": "https://cdn.jsdelivr.net/gh/boytchev/tsl-textures/dist/tsl-textures.js",
+					"marked": "https://cdn.jsdelivr.net/npm/marked@12.0.1/lib/marked.esm.js",
+					"acorn": "https://cdn.jsdelivr.net/npm/acorn@8.11.3/dist/acorn.mjs",
+					"eslint-linter-browserify": "https://cdn.jsdelivr.net/npm/eslint-linter-browserify@8.57.0/linter.mjs"
+				}
+			}
+		</script>
+
+		<!-- Monaco Editor -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.46.0/min/vs/loader.min.js"></script>
+
+	</head>
+
+	<body class="app-container loading">
+
+		<!-- Loading Screen -->
+		<div id="loading-screen" class="loading-screen">
+			<div class="loading-spinner-container">
+				<div class="loading-logo-wrapper">
+					<div class="loading-logo">
+						<svg fill="none" stroke-linecap="square" stroke-miterlimit="10" version="1.1" viewBox="0 0 226.77 226.77" xmlns="http://www.w3.org/2000/svg">
+							<g transform="translate(8.964 4.2527)" fill-rule="evenodd" stroke="#ffffff" stroke-linecap="butt" stroke-linejoin="round" stroke-width="4">
+								<path d="m63.02 200.61-43.213-174.94 173.23 49.874z"/>
+								<path d="m106.39 50.612 21.591 87.496-86.567-24.945z"/>
+								<path d="m84.91 125.03-10.724-43.465 43.008 12.346z"/>
+								<path d="m63.458 38.153 10.724 43.465-43.008-12.346z"/>
+								<path d="m149.47 62.93 10.724 43.465-43.008-12.346z"/>
+								<path d="m84.915 125.06 10.724 43.465-43.008-12.346z"/>
+							</g>
+						</svg>
+					</div>
+				</div>
+				<div class="loading-text-container">
+					<div class="loading-text"><span class="loading-text-light">Tour of </span><span class="loading-text-bold">TSL</span></div>
+					<div class="loading-subtext">Loading</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Sidebar -->
+		<aside id="sidebar" class="sidebar">
+			<div class="sidebar-header">
+				<button id="menu-toggle-close" class="icon-btn">
+					<i data-icon="panel-left" style="width: 1.25rem; height: 1.25rem;"></i>
+				</button>
+				<div class="header-logo-container">
+					<div class="header-logo-bg">
+						<svg fill="none" stroke-linecap="square" stroke-miterlimit="10" version="1.1" viewBox="0 0 226.77 226.77" xmlns="http://www.w3.org/2000/svg" style="width: 1.25rem; height: 1.25rem;">
+							<g transform="translate(8.964 4.2527)" fill-rule="evenodd" stroke="#ffffff" stroke-linecap="butt" stroke-linejoin="round" stroke-width="4">
+								<path d="m63.02 200.61-43.213-174.94 173.23 49.874z"/>
+								<path d="m106.39 50.612 21.591 87.496-86.567-24.945z"/>
+								<path d="m84.91 125.03-10.724-43.465 43.008 12.346z"/>
+								<path d="m63.458 38.153 10.724 43.465-43.008-12.346z"/>
+								<path d="m149.47 62.93 10.724 43.465-43.008-12.346z"/>
+								<path d="m84.915 125.06 10.724 43.465-43.008-12.346z"/>
+							</g>
+						</svg>
+					</div>
+				</div>
+			</div>
+			<div class="sidebar-content custom-scrollbar">
+				<nav id="toc-list" style="display: flex; flex-direction: column; gap: 0.25rem;">
+					<!-- Links generated via JS -->
+				</nav>
+			</div>
+		</aside>
+
+		<div class="main-wrap">
+			<!-- Header -->
+			<header class="app-header">
+				<div style="display: flex; align-items: center; gap: 0.5rem;">
+					<button id="menu-toggle-main" class="icon-btn">
+						<i data-icon="panel-left" style="width: 1.25rem; height: 1.25rem;"></i>
+					</button>
+					<button id="header-search-btn" class="icon-btn" title="Search">
+						<i data-icon="search" style="width: 1.25rem; height: 1.25rem;"></i>
+					</button>
+					<button id="playground-btn" class="icon-btn" title="Open Playground">
+						<i data-icon="terminal" style="width: 1.25rem; height: 1.25rem;"></i>
+					</button>
+				</div>
+
+				<!-- Centered Title -->
+				<div class="header-title-container">
+					<div class="header-title-wrapper">
+						<h1 class="header-title"><span class="header-title-prefix">Tour of </span><span class="header-title-accent">TSL</span></h1>
+						<span class="header-subtitle">Three.js Shading Language</span>
+						<span class="header-release" id="threejs-release"></span>
+					</div>
+				</div>
+
+				<div style="width: auto; display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end;">
+					<button id="copy-code-btn-header" class="icon-btn" title="Copy Markdown">
+						<i data-icon="copy" style="width: 1.25rem; height: 1.25rem;"></i>
+					</button>
+					<button id="header-preview-toggle" class="icon-btn" title="Toggle 3D preview">
+						<i data-icon="eye" style="width: 1.25rem; height: 1.25rem;"></i>
+					</button>
+					<button id="header-editor-toggle" class="icon-btn" title="Toggle editor panel">
+						<i data-icon="panel-right" style="width: 1.25rem; height: 1.25rem;"></i>
+					</button>
+				</div>
+			</header>
+
+			<!-- Main Layout -->
+			<main class="main-layout">
+
+				<!-- Left Column: Content -->
+				<section class="content-col">
+					<div id="content-area" class="content-area-wrap custom-scrollbar markdown-content page-transition">
+						<!-- Markdown Rendered Here -->
+					</div>
+				</section>
+
+				<div class="h-resizer-container" id="h-resizer-container">
+					<button id="h-resizer-toggle" class="resizer-toggle-btn" title="Toggle editor pane">
+						<i data-icon="chevron-right" style="width: 10px; height: 10px;"></i>
+					</button>
+					<div class="resizer-h" id="h-resizer"></div>
+					<div class="resizer-h-line"></div>
+				</div>
+
+				<!-- Right Column: Code Editor/Preview -->
+				<section class="editor-col">
+					<div class="editor-workspace">
+						<!-- Mini Preview Visual Mockup -->
+						<div class="preview-section" style="position: relative;">
+							<div id="preview-container" class="preview-box group"></div>
+							<div class="preview-controls-top">
+								<button id="preview-hide" class="preview-hide-btn" title="Hide preview">
+									<i data-icon="eye-off" style="width: 1.15rem; height: 1.15rem;"></i>
+								</button>
+								<button id="preview-fullscreen" class="preview-fullscreen-btn" title="Toggle fullscreen">
+									<i data-icon="maximize" style="width: 1.15rem; height: 1.15rem;"></i>
+								</button>
+								<button id="preview-playground" class="preview-playground-btn" title="Open in Playground">
+									<i data-icon="terminal" style="width: 1.15rem; height: 1.15rem;"></i>
+								</button>
+							</div>
+							<button id="preview-copy" class="preview-copy-btn" title="Copy standalone code">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-codeblock" style="width: 1.15rem; height: 1.15rem; display: block;">
+									<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+									<path d="M5 4l-2 2l2 2" />
+									<path d="M12 4l2 2l-2 2" />
+									<path d="M8 8l1 -4" />
+									<path d="M17 6a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-7" />
+								</svg>
+							</button>
+						</div>
+
+						<!-- Vertical Resizer Container -->
+						<div class="v-resizer-container" id="v-resizer-container">
+							<button id="v-resizer-toggle" class="resizer-v-toggle-btn" title="Toggle preview pane">
+								<i data-icon="chevron-up" style="width: 10px; height: 10px;"></i>
+							</button>
+							<button id="v-resizer-toggle-inverted" class="resizer-v-toggle-btn inverted" title="Toggle editor pane">
+								<i data-icon="chevron-down" style="width: 10px; height: 10px;"></i>
+							</button>
+							<div class="resizer-v" id="v-resizer"></div>
+							<div class="resizer-v-line"></div>
+						</div>
+
+						<div id="code-container" class="code-container-wrap custom-scrollbar">
+							<!-- Monaco Editor -->
+						</div>
+
+						<!-- Sleek Debug Panel -->
+						<div id="debug-container" class="debug-container">
+							<div class="debug-header">
+								<div class="debug-title">&gt; CODE</div>
+								<div class="debug-selectors">
+									<select id="debug-language-select" class="debug-select">
+										<option value="WGSL">WGSL</option>
+										<option value="GLSL">GLSL</option>
+									</select>
+									<select id="debug-stage-select" class="debug-select">
+										<option value="fragment">Fragment</option>
+										<option value="vertex">Vertex</option>
+									</select>
+								</div>
+							</div>
+							<div id="debug-editor-container"></div>
+						</div>
+
+						<!-- Sleek Console Panel -->
+						<div id="editor-console" class="minimized">
+							<div class="console-header" id="console-header">
+								<div class="console-title">&gt; CONSOLE</div>
+								<div class="console-header-actions">
+									<button class="console-close" id="console-toggle-btn" title="Toggle Console">
+										<i data-icon="chevron-up" id="console-toggle-icon" style="width: 0.95rem; height: 0.95rem;"></i>
+									</button>
+								</div>
+							</div>
+							<div class="console-body custom-scrollbar" id="console-error-message"></div>
+						</div>
+					</div>
+				</section>
+			</main>
+		</div>
+
+		<script type="module">
+
+			import { Tour } from './js/Tour.js';
+
+			const tour = new Tour();
+			tour.load( 'content/Tour.md' );
+
+		</script>
+	</body>
+</html>
