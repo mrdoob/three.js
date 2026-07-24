@@ -215,13 +215,13 @@ export const instance = /*@__PURE__*/ Fn( ( [ matrices, colors = null ], builder
 			const { previousInstanceMatrix } = _previousInstanceMatrices.get( object );
 
 			previousInstanceMatrix.array.set( matrices.array );
-			previousInstanceMatrix.needsUpdate = true;
+			previousInstanceMatrix.version = matrices.version;
 
 			// handle interleaved path
 
 			const previousInterleavedMatrix = _matrixBuffers.get( previousInstanceMatrix );
 
-			if ( previousInterleavedMatrix !== undefined ) previousInterleavedMatrix.needsUpdate = true;
+			if ( previousInterleavedMatrix !== undefined ) previousInterleavedMatrix.version = matrices.version;
 
 		} );
 
