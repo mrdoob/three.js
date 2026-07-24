@@ -437,29 +437,15 @@ class WebGPUBindingUtils {
 
 				if ( binding.isStorageBuffer ) {
 
-					if ( binding.visibility & GPUShaderStage.COMPUTE ) {
+					if ( binding.visibility & GPUShaderStage.VERTEX ) {
 
-						if ( binding.access === NodeAccess.READ_WRITE || binding.access === NodeAccess.WRITE_ONLY ) {
-
-							buffer.type = GPUBufferBindingType.Storage;
-
-						} else {
-
-							buffer.type = GPUBufferBindingType.ReadOnlyStorage;
-
-						}
-
-					} else if ( binding.nodeUniform && binding.nodeUniform.isAtomic && ( binding.visibility & GPUShaderStage.FRAGMENT ) ) {
-
-						// Atomic buffers require a read_write storage binding. Per the WGSL
-						// spec this is only valid in the fragment stage (compute is handled
-						// above), so the vertex stage falls back to read-only storage.
-
-						buffer.type = GPUBufferBindingType.Storage;
+						buffer.type = GPUBufferBindingType.ReadOnlyStorage;
 
 					} else {
 
-						buffer.type = GPUBufferBindingType.ReadOnlyStorage;
+						buffer.type = ( binding.access === NodeAccess.READ_WRITE || binding.access === NodeAccess.WRITE_ONLY )
+							? GPUBufferBindingType.Storage
+							: GPUBufferBindingType.ReadOnlyStorage;
 
 					}
 
