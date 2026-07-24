@@ -648,11 +648,11 @@ class XRManager extends EventDispatcher {
 	 * Browser-side `XRWebGLBinding.foveateBoundTexture()` failures are treated as
 	 * non-fatal so they do not interrupt rendering.
 	 *
-	 * @param {RenderTarget} renderTarget - The internal render target.
+	 * @param {?RenderTarget} renderTarget - The internal render target.
 	 */
 	foveateBoundTexture( renderTarget ) {
 
-		if ( renderTarget.isPostProcessingRenderTarget !== true ) return;
+		if ( renderTarget === null || renderTarget.isPostProcessingRenderTarget !== true ) return;
 		if ( this.isPresenting !== true ) return;
 		if ( this._glProjLayer === null ) return;
 

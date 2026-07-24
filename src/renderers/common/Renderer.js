@@ -932,7 +932,9 @@ class Renderer {
 
 		// Match render()'s logic: use frameBufferTarget when needsFrameBufferTarget is true
 		const useFrameBufferTarget = this.needsFrameBufferTarget && this._renderTarget === null;
-		const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : ( this._renderTarget || this._outputRenderTarget );
+		const outputRenderTarget = this._renderTarget || this._outputRenderTarget;
+		const useXRCamera = outputRenderTarget !== null && outputRenderTarget.isXRRenderTarget === true;
+		const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : outputRenderTarget;
 		const renderContext = this._renderContexts.get( renderTarget, this._mrt );
 		const activeMipmapLevel = this._activeMipmapLevel;
 
@@ -963,7 +965,7 @@ class Renderer {
 
 		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
-		camera = this._updateCamera( camera );
+		camera = this._updateCamera( camera, useXRCamera );
 
 		//
 
@@ -1582,6 +1584,7 @@ class Renderer {
 		const sceneRef = ( scene.isScene === true ) ? scene : _scene;
 
 		const outputRenderTarget = this._renderTarget || this._outputRenderTarget;
+		const useXRCamera = outputRenderTarget !== null && outputRenderTarget.isXRRenderTarget === true;
 
 		const activeCubeFace = this._activeCubeFace;
 		const activeMipmapLevel = this._activeMipmapLevel;
@@ -1650,7 +1653,7 @@ class Renderer {
 
 		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
-		camera = this._updateCamera( camera );
+		camera = this._updateCamera( camera, useXRCamera );
 
 		//
 
@@ -3497,13 +3500,14 @@ class Renderer {
 	 *
 	 * @private
 	 * @param {Camera} camera - The camera to update.
+	 * @param {boolean} useXRCamera - Whether the XR camera should be used when presenting.
 	 * @return {Camera} The returned camera might be different depending on whether XR is used or not.
 	 */
-	_updateCamera( camera ) {
+	_updateCamera( camera, useXRCamera ) {
 
 		const xr = this.xr;
 
-		if ( xr.isPresenting === false ) {
+		if ( xr.isPresenting === false || useXRCamera === false ) {
 
 			let projectionMatrixNeedsUpdate = false;
 
@@ -3573,7 +3577,7 @@ class Renderer {
 
 		// handle XR
 
-		if ( xr.enabled === true && xr.isPresenting === true ) {
+		if ( useXRCamera === true && xr.enabled === true && xr.isPresenting === true ) {
 
 			if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
 			camera = xr.getCamera(); // use XR camera for rendering
