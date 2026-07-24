@@ -167,6 +167,7 @@
 	"webgpu_postprocessing_ssgi": [ "global illumination", "indirect diffuse" ],
 	"webgpu_postprocessing_ssgi_ballpool": [ "community", "physics" ],
 	"webgpu_postprocessing_sss": [ "shadow" ],
+	"webgpu_postprocessing_ssss": [ "subsurface", "scattering" ],
 	"webgpu_refraction": [ "water" ],
 	"webgpu_rtt": [ "renderTarget", "texture" ],
 	"webgpu_rendertarget_2d-array_3d": [ "renderTarget", "2d-array", "3d" ],
