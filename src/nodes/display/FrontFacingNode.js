@@ -41,9 +41,7 @@ class FrontFacingNode extends Node {
 
 		//
 
-		const { material } = builder;
-
-		if ( material.side === BackSide ) {
+		if ( builder.materialSide === BackSide ) {
 
 			return 'false';
 
@@ -88,9 +86,9 @@ export const faceDirection = /*@__PURE__*/ float( frontFacing ).mul( 2.0 ).sub( 
  * @param {Node<vec3>} vector - The vector to process.
  * @returns {Node<vec3>} The processed vector.
  */
-export const negateOnBackSide = /*@__PURE__*/ Fn( ( [ vector ], { material } ) => {
+export const negateOnBackSide = /*@__PURE__*/ Fn( ( [ vector ], { materialSide } ) => {
 
-	const side = material.side;
+	const side = materialSide;
 
 	if ( side === BackSide ) {
 
@@ -128,4 +126,3 @@ export const directionToFaceDirection = ( vector ) => {
 	return negateOnBackSide( vector );
 
 };
-

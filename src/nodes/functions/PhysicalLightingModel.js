@@ -70,9 +70,9 @@ const applyIorToRoughness = /*@__PURE__*/ Fn( ( [ roughness, ior ] ) => {
 const viewportBackSideTexture = /*@__PURE__*/ viewportMipTexture();
 const viewportFrontSideTexture = /*@__PURE__*/ viewportOpaqueMipTexture();
 
-const getTransmissionSample = /*@__PURE__*/ Fn( ( [ fragCoord, roughness, ior ], { material } ) => {
+const getTransmissionSample = /*@__PURE__*/ Fn( ( [ fragCoord, roughness, ior ], { materialSide } ) => {
 
-	const vTexture = material.side === BackSide ? viewportBackSideTexture : viewportFrontSideTexture;
+	const vTexture = materialSide === BackSide ? viewportBackSideTexture : viewportFrontSideTexture;
 
 	const transmissionSample = vTexture.sample( fragCoord );
 	//const transmissionSample = viewportMipTexture( fragCoord );

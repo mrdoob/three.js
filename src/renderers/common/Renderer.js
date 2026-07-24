@@ -1060,12 +1060,17 @@ class Renderer {
 
 		for ( const item of compilationPromises ) {
 
+			let currentSide = item.material.side;
+			item.material.side = item.side;
+
 			const renderObject = this._objects.get( item.object, item.material, item.scene, item.camera, item.lightsNode, item.renderContext, item.clippingContext, item.passId );
+
+			item.material.side = currentSide;
 			renderObject.drawRange = item.object.geometry.drawRange;
 			renderObject.group = item.group;
 
 			// Use async node building to yield to main thread
-			await this._nodes.getForRenderAsync( renderObject );
+			await this._nodes.getForRenderAsync( renderObject, item.side );
 
 			this._isPreCompiling = true; // note: no awaits are allowed when this flag is true otherwise the state leaks outside of this method
 			this._nodes.updateBefore( renderObject );
@@ -1076,7 +1081,14 @@ class Renderer {
 
 			// Wait for pipeline creation
 			const pipelinePromises = [];
+
+			currentSide = item.material.side;
+			item.material.side = item.side;
+
 			this._pipelines.getForRender( renderObject, pipelinePromises );
+
+			item.material.side = currentSide;
+
 			if ( pipelinePromises.length > 0 ) {
 
 				await Promise.all( pipelinePromises );
@@ -3819,6 +3831,7 @@ class Renderer {
 				group,
 				clippingContext,
 				passId,
+				side: material.side,
 				renderContext: this._currentRenderContext
 			} );
 

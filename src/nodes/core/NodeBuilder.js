@@ -117,6 +117,13 @@ class NodeBuilder {
 		this.material = ( object && object.material ) || null;
 
 		/**
+		 * The material side used to build the shader.
+		 *
+		 * @type {?number}
+		 */
+		this.materialSide = this.material !== null ? this.material.side : null;
+
+		/**
 		 * The geometry of the 3D object.
 		 *
 		 * @type {?BufferGeometry}

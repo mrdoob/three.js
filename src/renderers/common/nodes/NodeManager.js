@@ -160,9 +160,10 @@ class NodeManager extends DataMap {
 	 * @private
 	 * @param {RenderObject} renderObject - The render object.
 	 * @param {Material} material - The material to use.
+	 * @param {number} [materialSide=material.side] - The material side to use.
 	 * @return {NodeBuilder} The configured node builder.
 	 */
-	_createNodeBuilder( renderObject, material ) {
+	_createNodeBuilder( renderObject, material, materialSide = material.side ) {
 
 		const nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer );
 		const onNodeBuilderCreated = this.renderer.debug.onNodeBuilderCreated;
@@ -171,6 +172,7 @@ class NodeManager extends DataMap {
 
 		nodeBuilder.scene = renderObject.scene;
 		nodeBuilder.material = material;
+		nodeBuilder.materialSide = materialSide;
 		nodeBuilder.camera = renderObject.camera;
 		nodeBuilder.context.material = material;
 		nodeBuilder.lightsNode = renderObject.lightsNode;
@@ -193,9 +195,10 @@ class NodeManager extends DataMap {
 	 *
 	 * @param {RenderObject} renderObject - The render object.
 	 * @param {boolean} [useAsync=false] - Whether to use async build with yielding.
+	 * @param {number} [materialSide] - The material side to use during an async build.
 	 * @return {NodeBuilderState|Promise<NodeBuilderState>} The node builder state (or Promise if async).
 	 */
-	getForRender( renderObject, useAsync = false ) {
+	getForRender( renderObject, useAsync = false, materialSide = renderObject.material.side ) {
 
 		const renderObjectData = this.get( renderObject );
 
@@ -213,7 +216,7 @@ class NodeManager extends DataMap {
 
 				const buildNodeBuilder = async () => {
 
-					let nodeBuilder = this._createNodeBuilder( renderObject, renderObject.material );
+					let nodeBuilder = this._createNodeBuilder( renderObject, renderObject.material, materialSide );
 
 					try {
 
@@ -229,7 +232,7 @@ class NodeManager extends DataMap {
 
 					} catch ( e ) {
 
-						nodeBuilder = this._createNodeBuilder( renderObject, new NodeMaterial() );
+						nodeBuilder = this._createNodeBuilder( renderObject, new NodeMaterial(), materialSide );
 
 						if ( useAsync ) {
 
@@ -265,7 +268,7 @@ class NodeManager extends DataMap {
 				} else {
 
 					// Synchronous path - call buildNodeBuilder but don't await
-					let nodeBuilder = this._createNodeBuilder( renderObject, renderObject.material );
+					let nodeBuilder = this._createNodeBuilder( renderObject, renderObject.material, materialSide );
 
 					try {
 
@@ -273,7 +276,7 @@ class NodeManager extends DataMap {
 
 					} catch ( e ) {
 
-						nodeBuilder = this._createNodeBuilder( renderObject, new NodeMaterial() );
+						nodeBuilder = this._createNodeBuilder( renderObject, new NodeMaterial(), materialSide );
 						nodeBuilder.build();
 
 						let stackTrace = e.stackTrace;
@@ -313,11 +316,12 @@ class NodeManager extends DataMap {
 	 * Use this in compileAsync() to prevent blocking the main thread.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
+	 * @param {number} [materialSide] - The material side to use during the build.
 	 * @return {Promise<NodeBuilderState>} A promise that resolves to the node builder state.
 	 */
-	getForRenderAsync( renderObject ) {
+	getForRenderAsync( renderObject, materialSide = renderObject.material.side ) {
 
-		const result = this.getForRender( renderObject, true );
+		const result = this.getForRender( renderObject, true, materialSide );
 
 		// Ensure we always return a Promise (cache hit returns nodeBuilderState directly)
 		if ( result.then ) {
@@ -367,10 +371,11 @@ class NodeManager extends DataMap {
 
 			// Mark as pending and add to build queue
 			renderObjectData.pendingBuild = true;
+			const materialSide = renderObject.material.side;
 
 			this._buildQueue.push( () => {
 
-				return this.getForRenderAsync( renderObject ).then( () => {
+				return this.getForRenderAsync( renderObject, materialSide ).then( () => {
 
 					renderObjectData.pendingBuild = false;
 
