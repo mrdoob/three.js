@@ -932,7 +932,9 @@ class Renderer {
 
 		// Match render()'s logic: use frameBufferTarget when needsFrameBufferTarget is true
 		const useFrameBufferTarget = this.needsFrameBufferTarget && this._renderTarget === null;
-		const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : ( this._renderTarget || this._outputRenderTarget );
+		const outputRenderTarget = this._renderTarget || this._outputRenderTarget;
+		const useXRCamera = outputRenderTarget !== null && outputRenderTarget.isXRRenderTarget === true;
+		const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : outputRenderTarget;
 		const renderContext = this._renderContexts.get( renderTarget, this._mrt );
 		const activeMipmapLevel = this._activeMipmapLevel;
 
@@ -963,7 +965,7 @@ class Renderer {
 
 		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
-		camera = this._updateCamera( camera );
+		camera = this._updateCamera( camera, useXRCamera );
 
 		//
 
@@ -1582,7 +1584,7 @@ class Renderer {
 		const sceneRef = ( scene.isScene === true ) ? scene : _scene;
 
 		const outputRenderTarget = this._renderTarget || this._outputRenderTarget;
-		const useXRCamera = outputRenderTarget === this._outputRenderTarget;
+		const useXRCamera = outputRenderTarget !== null && outputRenderTarget.isXRRenderTarget === true;
 
 		const activeCubeFace = this._activeCubeFace;
 		const activeMipmapLevel = this._activeMipmapLevel;
@@ -3498,10 +3500,10 @@ class Renderer {
 	 *
 	 * @private
 	 * @param {Camera} camera - The camera to update.
-	 * @param {boolean} [useXRCamera=true] - Whether the XR camera should be used when presenting.
+	 * @param {boolean} useXRCamera - Whether the XR camera should be used when presenting.
 	 * @return {Camera} The returned camera might be different depending on whether XR is used or not.
 	 */
-	_updateCamera( camera, useXRCamera = true ) {
+	_updateCamera( camera, useXRCamera ) {
 
 		const xr = this.xr;
 
