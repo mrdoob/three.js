@@ -740,6 +740,27 @@ class NodeManager extends DataMap {
 
 		if ( node === undefined || forceUpdate ) {
 
+			if ( node === undefined && object.isTexture === true ) {
+
+				const onTextureDispose = () => {
+
+					object.removeEventListener( 'dispose', onTextureDispose );
+
+					const node = nodeCache.get( object );
+
+					if ( node !== undefined ) {
+
+						nodeCache.delete( object );
+						node.dispose();
+
+					}
+
+				};
+
+				object.addEventListener( 'dispose', onTextureDispose );
+
+			}
+
 			node = callback();
 			nodeCache.set( object, node );
 
