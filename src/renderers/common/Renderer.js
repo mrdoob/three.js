@@ -934,7 +934,7 @@ class Renderer {
 		// Match render()'s logic: use frameBufferTarget when needsFrameBufferTarget is true
 		const useFrameBufferTarget = this.needsFrameBufferTarget && this._renderTarget === null;
 		const outputRenderTarget = this._renderTarget || this._outputRenderTarget;
-		const useXRCamera = outputRenderTarget !== null && outputRenderTarget.isXRRenderTarget === true;
+		const useXRCamera = this.xr.isPresenting === true && this.isOutputTarget;
 		const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : outputRenderTarget;
 		const renderContext = this._renderContexts.get( renderTarget, this._mrt );
 		const activeMipmapLevel = this._activeMipmapLevel;
@@ -1680,7 +1680,7 @@ class Renderer {
 		const sceneRef = ( scene.isScene === true ) ? scene : _scene;
 
 		const outputRenderTarget = this._renderTarget || this._outputRenderTarget;
-		const useXRCamera = outputRenderTarget !== null && outputRenderTarget.isXRRenderTarget === true;
+		const useXRCamera = this.xr.isPresenting === true && this.isOutputTarget;
 
 		const activeCubeFace = this._activeCubeFace;
 		const activeMipmapLevel = this._activeMipmapLevel;
