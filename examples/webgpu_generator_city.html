@@ -20,7 +20,8 @@
 			</div>
 
 			<small>
-				A few procedurally generated city blocks of Neo-Gothic terracotta skyscrapers at sunset.
+				A few procedurally generated city blocks of Neo-Gothic terracotta skyscrapers.<br />
+				Use WASD to move around.
 			</small>
 		</div>
 
@@ -45,14 +46,26 @@
 			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 			import { CityGenerator, createBuildingMaterial, createRoadMaterial } from 'three/addons/generators/CityGenerator.js';
+			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
+			import { LightProbeGridHelper } from 'three/addons/helpers/LightProbeGridHelper.js';
 
 			let camera, scene, renderer, controls, timer;
-			let cityGroup, materials, city, renderPipeline;
-			let sky, sun, sunLight, pmremGenerator, envScene;
+			let cityGroup, cityProxy, materials, city, renderPipeline;
+			let sky, sun, sunLight, pmremGenerator, envScene, envRenderTarget, cityBounds;
+			let probes, probesHelper, rebakeTimer = null;
+
+			// the irradiance grid spans the whole footprint plus the streets, rising to
+			// the mid-rise rooftops. diffuse GI is low frequency, so a coarse grid still
+			// reads the urban canyon: streets sit in shade, walls glow with terracotta bounce
+
+			const GRID_SIZE = new THREE.Vector3( 240, 120, 170 );
+			const GRID_PROBES = new THREE.Vector3( 10, 7, 8 );
 
 			const parameters = {
 				seed: 94,
-				timeOfDay: 6.4 // hours: 6 sunrise, 12 noon, 18 sunset
+				timeOfDay: 6.4, // hours: 6 sunrise, 12 noon, 18 sunset
+				gi: true,
+				showProbes: false
 			};
 
 			init();
@@ -64,7 +77,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 0.45;
+				renderer.toneMappingExposure = 0.13;
 				renderer.shadowMap.enabled = true;
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
@@ -74,7 +87,7 @@
 				pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 				scene = new THREE.Scene();
-				scene.environmentIntensity = 0.2; // sky as a soft fill; the sun is the key
+				scene.environmentIntensity = 0.05; // a hint of sky in the reflections; the diffuse sky fill comes occlusion-aware from the probe grid
 
 				// a physical sky drives both the backdrop and the image-based
 				// lighting; the time-of-day slider walks the sun along its arc
@@ -111,19 +124,27 @@
 				ground.receiveShadow = true;
 				scene.add( ground );
 
+				// everything a shadow can touch fits this box: the ground plane up to just
+				// above the tallest tower crown. updateSun() wraps the shadow camera around it
+
+				cityBounds = new THREE.Box3(
+					new THREE.Vector3( - floorW / 2, 0, - floorD / 2 ),
+					new THREE.Vector3( floorW / 2, 160, floorD / 2 )
+				);
+
 				// a single directional key aligned with the sky's sun, for the crisp
 				// relief shadows the IBL alone can't give. its colour, intensity and
 				// position — and the baked environment — are set by updateSun()
 
 				sunLight = new THREE.DirectionalLight();
 				sunLight.castShadow = true;
-				sunLight.shadow.camera.left = - 280;
-				sunLight.shadow.camera.right = 280;
-				sunLight.shadow.camera.top = 360;
-				sunLight.shadow.camera.bottom = - 40;
-				sunLight.shadow.camera.far = 2400;
 				sunLight.shadow.mapSize.set( 4096, 4096 );
-				sunLight.shadow.bias = - 0.0004;
+
+				// acne is suppressed along the surface normal ( in world units ) rather
+				// than with a depth bias: a depth bias scales with the shadow range, and
+				// even a small one erases short casters, like the shadow beneath a car
+
+				sunLight.shadow.normalBias = 0.05;
 				scene.add( sunLight );
 
 				updateSun();
@@ -131,23 +152,45 @@
 				materials = { building: createBuildingMaterial( city.layout, parameters.seed ) };
 				generateCity();
 
-				// bloom: a soft glow on the brightest areas, run on the linear HDR scene
-				// colour before tone mapping folds it back to display range
+				// bake the irradiance grid once the city and sun are in place
+
+				bakeProbes();
 
 				renderPipeline = new THREE.RenderPipeline( renderer );
 
-				const scenePassColor = pass( scene, camera ).getTextureNode( 'output' );
+				const scenePass = pass( scene, camera );
+				const scenePassColor = scenePass.getTextureNode();
+
+				// bloom: a soft glow on the brightest areas, at quarter-res since the
+				// result is heavily blurred anyway
+
 				const bloomPass = bloom( scenePassColor, 0.05, 0.0, 0.0 );
+				bloomPass.setResolutionScale( 0.25 );
 
 				renderPipeline.outputNode = scenePassColor.add( bloomPass );
 
 				// parameters
 
 				const gui = renderer.inspector.createParameters( 'City' );
-				gui.add( parameters, 'seed', 0, 100, 1 ).onChange( generateCity );
-				gui.add( parameters, 'timeOfDay', 6, 18, 0.1 ).name( 'time of day' ).onChange( updateSun );
+				gui.add( parameters, 'seed', 0, 100, 1 ).onChange( () => {
+
+					generateCity();
+					scheduleRebake();
+
+				} );
+				gui.add( parameters, 'timeOfDay', 6, 18, 0.1 ).name( 'time of day' ).onChange( () => {
+
+					updateSun();
+					scheduleRebake();
+
+				} );
 				gui.add( renderer, 'toneMappingExposure', 0.01, 1 ).name( 'exposure' );
-				gui.add( bloomPass.strength, 'value', 0, 2 ).name( 'bloom' );
+				gui.add( parameters, 'gi' ).name( 'global illumination' ).onChange( ( value ) => {
+
+					if ( probes ) probes.visible = value;
+
+				} );
+				gui.add( parameters, 'showProbes' ).name( 'show probes' ).onChange( toggleProbesHelper );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -167,24 +210,57 @@
 				);
 				sky.sunPosition.value.copy( sun );
 
-				// physically-motivated key light: real sunlight is far brighter than the
-				// sky, so the sun stays the dominant source and cast shadows read clearly
-				// against the soft sky fill. the longer air path near the horizon dims and
-				// warms it ( the fill dims with it, as the environment is re-baked below ).
+				// physically-motivated key light: on a real hazy midday the sun delivers
+				// about three times the sky's irradiance onto a horizontal surface, so it
+				// is anchored to ~3x the sky dome the probes capture. the longer air path
+				// near the horizon dims and warms it ( the fill dims with it, as the
+				// environment and probes are re-baked ).
 
 				const sinElevation = Math.sin( THREE.MathUtils.degToRad( elevation ) );
 				const transmittance = Math.sqrt( Math.max( sinElevation, 0 ) ); // 0 at the horizon → 1 at the zenith
 				sunLight.color.set( 0xffb072 ).lerp( new THREE.Color( 0xfff4e8 ), transmittance );
-				sunLight.intensity = 6 * transmittance; // illuminance perpendicular to the rays; the renderer applies N·L per surface
+				sunLight.intensity = 100 * transmittance; // illuminance perpendicular to the rays; the renderer applies N·L per surface
 				sunLight.position.copy( sun ).multiplyScalar( 600 );
 
-				// re-bake the sky ( without the sun disc ) into the environment map for IBL
+				// shrink-wrap the shadow camera around the city for this sun angle: project
+				// the scene box into light space and fit the ortho bounds and depth range to
+				// it, so the map spends its texels only where shadows can actually fall
+
+				const shadowCamera = sunLight.shadow.camera;
+				const lightSpace = new THREE.Quaternion().setFromRotationMatrix( new THREE.Matrix4().lookAt( sunLight.position, scene.position, THREE.Object3D.DEFAULT_UP ) ).invert();
+
+				const fit = new THREE.Box3();
+				const corner = new THREE.Vector3();
+
+				for ( let i = 0; i < 8; i ++ ) {
+
+					corner.set(
+						i & 1 ? cityBounds.max.x : cityBounds.min.x,
+						i & 2 ? cityBounds.max.y : cityBounds.min.y,
+						i & 4 ? cityBounds.max.z : cityBounds.min.z
+					).sub( sunLight.position ).applyQuaternion( lightSpace );
+
+					fit.expandByPoint( corner );
+
+				}
+
+				const pad = 2;
+				shadowCamera.left = fit.min.x - pad;
+				shadowCamera.right = fit.max.x + pad;
+				shadowCamera.bottom = fit.min.y - pad;
+				shadowCamera.top = fit.max.y + pad;
+				shadowCamera.near = - fit.max.z - pad; // the camera looks down its negative z axis, so depth flips sign
+				shadowCamera.far = - fit.min.z + pad;
+				shadowCamera.updateProjectionMatrix();
+
+				// re-bake the sky ( without the sun disc ) into the environment map for IBL.
+				// reuse one render target so the texture keeps its identity: a fresh texture
+				// would force every material to recompile its shader
 
 				sky.showSunDisc.value = false;
 				envScene.add( sky );
-				const env = pmremGenerator.fromScene( envScene ).texture;
-				if ( scene.environment ) scene.environment.dispose();
-				scene.environment = env;
+				envRenderTarget = pmremGenerator.fromScene( envScene, 0, 0.1, 100, { renderTarget: envRenderTarget } );
+				scene.environment = envRenderTarget.texture;
 				sky.showSunDisc.value = true;
 				scene.add( sky );
 
@@ -193,10 +269,86 @@
 			function generateCity() {
 
 				if ( cityGroup ) scene.remove( cityGroup );
+				if ( cityProxy ) {
+
+					scene.remove( cityProxy );
+					cityProxy.geometry.dispose();
+					cityProxy.material.dispose();
+
+				}
 
 				city.parameters.seed = parameters.seed;
 				cityGroup = city.build( materials );
 				scene.add( cityGroup );
+
+				// the box proxy shares the towers just built; it stands in only during the bake
+				cityProxy = city.buildProxy();
+				cityProxy.visible = false;
+				scene.add( cityProxy );
+
+			}
+
+			function bakeProbes() {
+
+				if ( probes === undefined ) {
+
+					probes = new LightProbeGrid( GRID_SIZE.x, GRID_SIZE.y, GRID_SIZE.z, GRID_PROBES.x, GRID_PROBES.y, GRID_PROBES.z );
+					probes.position.set( 0, GRID_SIZE.y / 2 + 1, 0 ); // bottom probe layer floats just above the road, never in its plane
+					scene.add( probes );
+
+				}
+
+				// swap the detailed city for its box proxy, and hide the probe spheres and the
+				// sun disc, so each cubemap captures only the boxes, ground and sky fill. the
+				// DirectionalLight supplies the direct sun; a single bounce pass folds the warm
+				// stone back into the shade. the proxy is a single draw, so the bake stays cheap
+
+				if ( probesHelper ) probesHelper.visible = false;
+				cityGroup.visible = false;
+				cityProxy.visible = true;
+				sky.showSunDisc.value = false;
+
+				probes.bake( renderer, scene, { cubemapSize: 16, near: 0.1, far: 20000, bounces: 1 } );
+
+				sky.showSunDisc.value = true;
+				cityProxy.visible = false;
+				cityGroup.visible = true;
+				probes.visible = parameters.gi;
+
+				if ( probesHelper ) {
+
+					probesHelper.update();
+					probesHelper.visible = parameters.showProbes;
+
+				}
+
+			}
+
+			// re-baking walks the whole city cubemap by cubemap, so coalesce the rapid
+			// onChange calls from dragging a slider into a single bake once it settles
+
+			function scheduleRebake() {
+
+				if ( rebakeTimer !== null ) clearTimeout( rebakeTimer );
+				rebakeTimer = setTimeout( () => {
+
+					rebakeTimer = null;
+					bakeProbes();
+
+				}, 300 );
+
+			}
+
+			function toggleProbesHelper( value ) {
+
+				if ( probesHelper === undefined ) {
+
+					probesHelper = new LightProbeGridHelper( probes, 3 );
+					scene.add( probesHelper );
+
+				}
+
+				probesHelper.visible = value;
 
 			}
 
