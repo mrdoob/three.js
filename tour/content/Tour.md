@@ -1168,7 +1168,7 @@ model.material.colorNode = createChecker( 8.0 );
 ```
 
 #### Related
-  - [See JavaScript Synergy](#javascript-synergy)
+  - [JavaScript Synergy](#javascript-synergy)
 
 
 </page>
@@ -1236,9 +1236,9 @@ Properties serve as reference nodes in the shader graph. They can be created and
 - **name**: `string` - (Optional) Name of the property in the shader. Defaults to `null`.
 :::
 
-<code name="propertiesExample" default="true">Properties Showcase</code>
+<code name="propertyExample" default="true">Property example</code>
 
-```tsl propertiesExample
+```tsl propertyExample
 import 'scenes/shaderball';
 import * as THREE from 'three';
 import { diffuseColor, grayscale } from 'three/tsl';
@@ -1249,6 +1249,43 @@ model.material.map = map;
 
 // 2. Read diffuseColor property and convert it to grayscale on outputNode
 model.material.outputNode = grayscale( diffuseColor );
+```
+
+### Varying Property
+
+The `varyingProperty()` function declares a varying property placeholder in the shader without initializing it immediately. This is useful when you need to write to the varying inside a custom TSL function.
+
+::: api varyingProperty( type, name? )
+- **type**: `string` - TSL type name (e.g. `'float'`, `'vec3'`, etc.).
+- **name**: `string` - (Optional) Custom name for the varying variable. Defaults to `null`.
+:::
+
+<code name="varyingPropertyExample">Varying property example</code>
+
+```tsl varyingPropertyExample
+import 'scenes/shaderball';
+import { Fn, varyingProperty, positionLocal, vertexStage, time, vec3 } from 'three/tsl';
+
+// Declare a varying property placeholder
+const myVarying = varyingProperty( 'vec3', 'vCustomColor' );
+
+const mainVertex = Fn( () => {
+
+	// Animate/offset position in the vertex stage
+	const offsetPosition = positionLocal.add( vec3( 0, time.sin().mul( 0.2 ), 0 ) );
+
+	// Assign the animated position to our varying property
+	myVarying.assign( offsetPosition );
+
+	return offsetPosition;
+
+} );
+
+// Link the vertex function to positionNode to execute it on the vertex stage
+model.material.positionNode = vertexStage( mainVertex() );
+
+// Read from the varying property in the fragment stage
+model.material.colorNode = myVarying;
 ```
 
 </page>
@@ -1746,42 +1783,8 @@ const myVaryingUv = uv().mul( 10.0 ).toVarying( 'vScaledUv' );
 model.material.colorNode = myVaryingUv.sin();
 ```
 
-### Varying Property
-
-The `varyingProperty()` function declares a varying property placeholder in the shader without initializing it immediately. This is useful when you need to write to the varying inside a custom TSL function.
-
-::: api varyingProperty( type, name? )
-- **type**: `string` - TSL type name (e.g. `'float'`, `'vec3'`, etc.).
-- **name**: `string` - (Optional) Custom name for the varying variable. Defaults to `null`.
-:::
-
-<code name="varyingPropertyExample">Varying property example</code>
-
-```tsl varyingPropertyExample
-import 'scenes/shaderball';
-import { Fn, varyingProperty, positionLocal, vertexStage, time, vec3 } from 'three/tsl';
-
-// Declare a varying property placeholder
-const myVarying = varyingProperty( 'vec3', 'vCustomColor' );
-
-const mainVertex = Fn( () => {
-
-	// Animate/offset position in the vertex stage
-	const offsetPosition = positionLocal.add( vec3( 0, time.sin().mul( 0.2 ), 0 ) );
-
-	// Assign the animated position to our varying property
-	myVarying.assign( offsetPosition );
-
-	return offsetPosition;
-
-} );
-
-// Link the vertex function to positionNode to execute it on the vertex stage
-model.material.positionNode = vertexStage( mainVertex() );
-
-// Read from the varying property in the fragment stage
-model.material.colorNode = myVarying;
-```
+#### Related
+  - [Properties](#properties)
 
 </page>
 
