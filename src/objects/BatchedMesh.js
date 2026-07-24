@@ -262,6 +262,8 @@ class BatchedMesh extends Mesh {
 		// flags
 		this._visibilityChanged = true;
 		this._geometryInitialized = false;
+		this._availableInstanceIdsSorted = true;
+		this._availableGeometryIdsSorted = true;
 
 		// cached user options
 		this._maxInstanceCount = maxInstanceCount;
@@ -579,7 +581,12 @@ class BatchedMesh extends Mesh {
 		// Prioritize using previously freed instance ids
 		if ( this._availableInstanceIds.length > 0 ) {
 
-			this._availableInstanceIds.sort( ascIdSort );
+			if ( ! this._availableInstanceIdsSorted ) {
+
+				this._availableInstanceIds.sort( ascIdSort );
+				this._availableInstanceIdsSorted = true;
+
+			}
 
 			drawId = this._availableInstanceIds.shift();
 			this._instanceInfo[ drawId ] = instanceInfo;
@@ -676,7 +683,12 @@ class BatchedMesh extends Mesh {
 		let geometryId;
 		if ( this._availableGeometryIds.length > 0 ) {
 
-			this._availableGeometryIds.sort( ascIdSort );
+			if ( ! this._availableGeometryIdsSorted ) {
+
+				this._availableGeometryIds.sort( ascIdSort );
+				this._availableGeometryIdsSorted = true;
+
+			}
 
 			geometryId = this._availableGeometryIds.shift();
 			geometryInfoList[ geometryId ] = geometryInfo;
@@ -845,6 +857,7 @@ class BatchedMesh extends Mesh {
 
 		geometryInfoList[ geometryId ].active = false;
 		this._availableGeometryIds.push( geometryId );
+		this._availableGeometryIdsSorted = false;
 		this._visibilityChanged = true;
 
 		return this;
@@ -863,6 +876,7 @@ class BatchedMesh extends Mesh {
 
 		this._instanceInfo[ instanceId ].active = false;
 		this._availableInstanceIds.push( instanceId );
+		this._availableInstanceIdsSorted = false;
 		this._visibilityChanged = true;
 
 		return this;
@@ -1267,7 +1281,13 @@ class BatchedMesh extends Mesh {
 		// shrink the available instances as much as possible
 		const availableInstanceIds = this._availableInstanceIds;
 		const instanceInfo = this._instanceInfo;
-		availableInstanceIds.sort( ascIdSort );
+		if ( ! this._availableInstanceIdsSorted ) {
+
+			availableInstanceIds.sort( ascIdSort );
+			this._availableInstanceIdsSorted = true;
+
+		}
+
 		while ( availableInstanceIds[ availableInstanceIds.length - 1 ] === instanceInfo.length - 1 ) {
 
 			instanceInfo.pop();
@@ -1462,6 +1482,8 @@ class BatchedMesh extends Mesh {
 
 		this._availableInstanceIds = source._availableInstanceIds.slice();
 		this._availableGeometryIds = source._availableGeometryIds.slice();
+		this._availableInstanceIdsSorted = source._availableInstanceIdsSorted;
+		this._availableGeometryIdsSorted = source._availableGeometryIdsSorted;
 
 		this._nextIndexStart = source._nextIndexStart;
 		this._nextVertexStart = source._nextVertexStart;
