@@ -417,7 +417,7 @@ body.preview-hidden .code-modifier-inline-btn.active {
 }
 
 .header-release {
-	font-size: 0.68rem;
+	font-size: 0.75rem;
 	font-weight: 500;
 	font-family: 'Fira Code', monospace;
 	color: var(--text-muted);
@@ -2977,6 +2977,7 @@ body.preview-maximized .preview-hide-btn {
 
 .tsl-function-builtin {
 	color: #4ec9b0 !important;
+	font-weight: normal;
 }
 
 .tsl-function {
