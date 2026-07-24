@@ -7,7 +7,7 @@ A special type of box geometry intended for [LineSegments](LineSegments.html).
 ## Code Example
 
 ```js
-const geometry = new BoxLineGeometry();
+const geometry = new THREE.BoxLineGeometry();
 const material = new THREE.LineBasicMaterial( { color: 0x00ff00 } );
 const lines = new THREE.LineSegments( geometry, material );
 scene.add( lines );
