@@ -212,9 +212,16 @@ export const instance = /*@__PURE__*/ Fn( ( [ matrices, colors = null ], builder
 
 		OnAfterObjectUpdate( ( { object } ) => {
 
-			const previousInstanceData = _previousInstanceMatrices.get( object );
+			const { previousInstanceMatrix } = _previousInstanceMatrices.get( object );
 
-			previousInstanceData.previousInstanceMatrix.array.set( matrices.array );
+			previousInstanceMatrix.array.set( matrices.array );
+			previousInstanceMatrix.needsUpdate = true;
+
+			// handle interleaved path
+
+			const previousInterleavedMatrix = _matrixBuffers.get( previousInstanceMatrix );
+
+			if ( previousInterleavedMatrix !== undefined ) previousInterleavedMatrix.needsUpdate = true;
 
 		} );
 
