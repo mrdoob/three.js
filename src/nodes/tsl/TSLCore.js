@@ -8,7 +8,7 @@ import FlipNode from '../utils/FlipNode.js';
 import ConstNode from '../core/ConstNode.js';
 import MemberNode from '../utils/MemberNode.js';
 import StackTrace from '../core/StackTrace.js';
-import { getValueFromType, getValueType } from '../core/NodeUtils.js';
+import { getValueFromType, getValueType, isArrayAsParameter } from '../core/NodeUtils.js';
 import { warn, error } from '../../utils.js';
 
 let currentStack = null;
@@ -700,12 +700,6 @@ class ShaderCallNodeInternal extends Node {
 		return result;
 
 	}
-
-}
-
-function isArrayAsParameter( params ) {
-
-	return params[ 0 ] && ( params[ 0 ].isNode || Object.getPrototypeOf( params[ 0 ] ) !== Object.prototype );
 
 }
 

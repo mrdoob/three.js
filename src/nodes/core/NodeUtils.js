@@ -488,3 +488,9 @@ export function base64ToArrayBuffer( base64 ) {
 	return Uint8Array.from( atob( base64 ), c => c.charCodeAt( 0 ) ).buffer;
 
 }
+
+export function isArrayAsParameter( params ) {
+
+	return ( params[ 0 ] !== undefined && params[ 0 ] !== null ) && ( params[ 0 ].isNode || Object.getPrototypeOf( params[ 0 ] ) !== Object.prototype );
+
+}
