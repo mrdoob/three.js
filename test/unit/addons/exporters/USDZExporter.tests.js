@@ -12,6 +12,24 @@ function isValidUSDA( usda ) {
 
 }
 
+async function exportToUSDA( options ) {
+
+	const exporter = new USDZExporter();
+	const scene = new Scene();
+	const mesh = new Mesh(
+		new BoxGeometry( 1, 1, 1 ),
+		new MeshStandardMaterial()
+	);
+	mesh.name = 'AnchoredMesh';
+	scene.add( mesh );
+
+	const result = await exporter.parseAsync( scene, options );
+	const unzipped = unzipSync( result );
+
+	return strFromU8( unzipped[ 'model.usda' ] );
+
+}
+
 export default QUnit.module( 'Addons', () => {
 
 	QUnit.module( 'Exporters', () => {
@@ -155,6 +173,79 @@ export default QUnit.module( 'Addons', () => {
 
 				assert.ok( usdaContent2.includes( 'box1' ), 'USDA contains box1' );
 				assert.ok( usdaContent2.includes( 'box2' ), 'USDA contains box2' );
+
+			} );
+
+			QUnit.test( 'export scene with vertical anchoring', async ( assert ) => {
+
+				const usdaContent = await exportToUSDA( {
+					ar: {
+						anchoring: { type: 'plane' },
+						planeAnchoring: { alignment: 'vertical' },
+					},
+					includeAnchoringProperties: true,
+				} );
+
+				assert.ok(
+					/def Xform "Root" \(\s*prepend apiSchemas = \["Preliminary_AnchoringAPI"\]\s*\)\s*\{\s*uniform token preliminary:anchoring:type = "plane"\s*uniform token preliminary:planeAnchoring:alignment = "vertical"/.test( usdaContent ),
+					'Root applies the anchoring schema and contains the vertical anchoring properties'
+				);
+				assert.notOk( usdaContent.includes( 'kind = "sceneLibrary"' ), 'No nested scene library is authored' );
+				assert.ok( usdaContent.includes( '\n\tdef Xform "AnchoredMesh"' ), 'Scene content is authored directly under Root' );
+				assert.equal(
+					( usdaContent.match( /preliminary:anchoring:type/g ) || [] ).length,
+					1,
+					'Anchoring type is only authored on Root'
+				);
+				assert.equal(
+					( usdaContent.match( /preliminary:planeAnchoring:alignment/g ) || [] ).length,
+					1,
+					'Plane alignment is only authored on Root'
+				);
+				assert.ok( usdaContent.includes( 'defaultPrim = "Root"' ), 'Root remains the default prim' );
+
+			} );
+
+			QUnit.test( 'export scene with horizontal anchoring', async ( assert ) => {
+
+				const usdaContent = await exportToUSDA( {
+					ar: {
+						anchoring: { type: 'plane' },
+						planeAnchoring: { alignment: 'horizontal' },
+					},
+					includeAnchoringProperties: true,
+				} );
+
+				assert.ok(
+					/def Xform "Root" \(\s*prepend apiSchemas = \["Preliminary_AnchoringAPI"\]\s*\)\s*\{\s*uniform token preliminary:anchoring:type = "plane"\s*uniform token preliminary:planeAnchoring:alignment = "horizontal"/.test( usdaContent ),
+					'Root applies the anchoring schema and contains the horizontal anchoring properties'
+				);
+				assert.notOk( usdaContent.includes( 'kind = "sceneLibrary"' ), 'No nested scene library is authored' );
+				assert.ok( usdaContent.includes( '\n\tdef Xform "AnchoredMesh"' ), 'Scene content is authored directly under Root' );
+				assert.equal(
+					( usdaContent.match( /preliminary:anchoring:type/g ) || [] ).length,
+					1,
+					'Anchoring type is only authored on Root'
+				);
+				assert.equal(
+					( usdaContent.match( /preliminary:planeAnchoring:alignment/g ) || [] ).length,
+					1,
+					'Plane alignment is only authored on Root'
+				);
+				assert.notOk( usdaContent.includes( 'alignment = "vertical"' ), 'No vertical alignment is authored' );
+
+			} );
+
+			QUnit.test( 'export scene without anchoring properties', async ( assert ) => {
+
+				const usdaContent = await exportToUSDA( {
+					ar: null,
+					includeAnchoringProperties: false,
+				} );
+
+				assert.notOk( usdaContent.includes( 'Preliminary_AnchoringAPI' ), 'Anchoring schema is omitted' );
+				assert.notOk( usdaContent.includes( 'preliminary:anchoring:type' ), 'Anchoring type is omitted' );
+				assert.notOk( usdaContent.includes( 'preliminary:planeAnchoring:alignment' ), 'Plane alignment is omitted' );
 
 			} );
 
