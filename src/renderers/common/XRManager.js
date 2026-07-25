@@ -23,6 +23,40 @@ const _cameraRPos = /*@__PURE__*/ new Vector3();
 
 const _contextNodeLib = /*@__PURE__*/ new WeakMap();
 
+function getInlineOutputContextNode( contextNode ) {
+
+	let outputContextNode = _contextNodeLib.get( contextNode );
+
+	if ( outputContextNode === undefined ) {
+
+		outputContextNode = contextNode.context( {
+			outputColorTransform: false,
+
+			getOutput: ( outputNode, builder ) => {
+
+				const renderer = builder.renderer;
+				const renderTarget = renderer.getRenderTarget();
+
+				if ( renderer.isOutputTarget === true || renderTarget?._hasExternalTextures === true ) {
+
+					return renderOutput( outputNode, renderer.toneMapping, renderer.outputColorSpace );
+
+				}
+
+				return outputNode;
+
+			}
+
+		} );
+
+		_contextNodeLib.set( contextNode, outputContextNode );
+
+	}
+
+	return outputContextNode;
+
+}
+
 /**
  * The XR manager is built on top of the WebXR Device API to
  * manage XR sessions with renderer backends.
@@ -1110,25 +1144,7 @@ class XRManager extends EventDispatcher {
 
 				renderer._setXRLayerSize( layer.renderTarget.width, layer.renderTarget.height );
 
-				contextNode = _contextNodeLib.get( currentContextNode );
-
-				if ( contextNode === undefined ) {
-
-					// Apply ToneMapping and OutputColorSpace directly in the material shader
-
-					contextNode = currentContextNode.context( {
-
-						getOutput: ( outputNode ) => {
-
-							return renderOutput( outputNode, renderer.toneMapping, renderer.outputColorSpace );
-
-						}
-
-					} );
-
-					_contextNodeLib.set( currentContextNode, contextNode );
-
-				}
+				contextNode = getInlineOutputContextNode( currentContextNode );
 
 			} else {
 
@@ -1829,6 +1845,8 @@ function onAnimationFrame( time, frame ) {
 	const backend = renderer.backend;
 
 	const glBaseLayer = this._glBaseLayer;
+	let currentContextNode = null;
+	let inlineOutputContextNode = null;
 
 	const referenceSpace = this.getReferenceSpace();
 	const pose = frame.getViewerPose( referenceSpace );
@@ -1936,6 +1954,16 @@ function onAnimationFrame( time, frame ) {
 
 		renderer.setOutputRenderTarget( this._xrRenderTarget );
 
+		if ( webgpuViewData !== null ) {
+
+			// Inline the output transform so MSAA can resolve directly into the XR texture.
+			currentContextNode = renderer.contextNode;
+			inlineOutputContextNode = getInlineOutputContextNode( currentContextNode );
+
+			renderer.contextNode = inlineOutputContextNode;
+
+		}
+
 		const frameBufferTarget = renderer._getFrameBufferTarget();
 
 		if ( webgpuViewData !== null ) {
@@ -1964,7 +1992,19 @@ function onAnimationFrame( time, frame ) {
 
 	}
 
-	if ( this._currentAnimationLoop ) this._currentAnimationLoop( time, frame );
+	try {
+
+		if ( this._currentAnimationLoop ) this._currentAnimationLoop( time, frame );
+
+	} finally {
+
+		if ( inlineOutputContextNode !== null ) {
+
+			if ( renderer.contextNode === inlineOutputContextNode ) renderer.contextNode = currentContextNode;
+
+		}
+
+	}
 
 	if ( frame.detectedPlanes ) {
 

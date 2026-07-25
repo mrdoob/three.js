@@ -49,6 +49,32 @@ const _vector4 = /*@__PURE__*/ new Vector4();
 
 const _shadowSide = { [ FrontSide ]: BackSide, [ BackSide ]: FrontSide, [ DoubleSide ]: DoubleSide };
 
+function needsLinearFrameBuffer( object, camera, overrideMaterial = null ) {
+
+	if ( object.visible === false ) return false;
+
+	if ( object.layers.test( camera.layers ) && object.material !== undefined ) {
+
+		const materials = overrideMaterial !== null ? [ overrideMaterial ] : ( Array.isArray( object.material ) ? object.material : [ object.material ] );
+
+		for ( const material of materials ) {
+
+			if ( material.visible === true && ( material.transmission > 0 || material.transmissionNode?.isNode === true || material.backdropNode?.isNode === true ) ) return true;
+
+		}
+
+	}
+
+	for ( const child of object.children ) {
+
+		if ( needsLinearFrameBuffer( child, camera, overrideMaterial ) ) return true;
+
+	}
+
+	return false;
+
+}
+
 /**
  * Base class for renderers.
  */
@@ -1493,7 +1519,40 @@ class Renderer {
 
 		}
 
-		this._renderScene( scene, camera );
+		const inlineOutputContextNode = this.contextNode;
+		const outputRenderTarget = this._outputRenderTarget;
+
+		// Framebuffer-dependent materials must sample the linear scene before the output transform.
+		const useLinearFrameBuffer = outputRenderTarget !== null && this.xr.isPresenting === true && this.isOutputTarget === true &&
+			inlineOutputContextNode.value.outputColorTransform === false && inlineOutputContextNode.node !== null &&
+			needsLinearFrameBuffer( scene, camera, scene.isScene === true ? scene.overrideMaterial : null );
+
+		if ( useLinearFrameBuffer === false ) {
+
+			this._renderScene( scene, camera );
+			return;
+
+		}
+
+		const samples = outputRenderTarget.samples;
+		const depthBuffer = outputRenderTarget.depthBuffer;
+
+		this.contextNode = inlineOutputContextNode.node;
+		outputRenderTarget.samples = 0;
+		outputRenderTarget.depthBuffer = false;
+
+		try {
+
+			this._renderScene( scene, camera );
+
+		} finally {
+
+			if ( this.contextNode === inlineOutputContextNode.node ) this.contextNode = inlineOutputContextNode;
+
+			outputRenderTarget.samples = samples;
+			outputRenderTarget.depthBuffer = depthBuffer;
+
+		}
 
 	}
 
@@ -1552,12 +1611,7 @@ class Renderer {
 	 */
 	_getFrameBufferTarget() {
 
-		const { currentToneMapping, currentColorSpace } = this;
-
-		const useToneMapping = currentToneMapping !== NoToneMapping;
-		const useColorSpace = currentColorSpace !== ColorManagement.workingColorSpace;
-
-		if ( useToneMapping === false && useColorSpace === false ) return null;
+		if ( this.needsFrameBufferTarget === false ) return null;
 
 		const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
 		const { depth, stencil } = this;
@@ -2603,6 +2657,9 @@ class Renderer {
 	 *
 	 */
 	get needsFrameBufferTarget() {
+
+		// The active material context can apply the output transform inline.
+		if ( this.contextNode.value.outputColorTransform === false ) return false;
 
 		const useToneMapping = this.currentToneMapping !== NoToneMapping;
 		const useColorSpace = this.currentColorSpace !== ColorManagement.workingColorSpace;
