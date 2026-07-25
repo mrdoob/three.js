@@ -352,6 +352,20 @@ class WebGPUTextureUtils {
 		textureData.format = format;
 
 		const { samples, primarySamples, isMSAA } = backend.utils.getTextureSampleData( texture );
+		const renderTarget = texture.renderTarget;
+
+		// WebGPU multisampled 2D textures can only have a single array layer.
+		const useSeparateMSAATextures = samples > 1 && renderTarget !== null && depth > 1 && dimension === GPUTextureDimension.TwoD;
+		const supportsTransientAttachments = GPUTextureUsage.TRANSIENT_ATTACHMENT !== undefined;
+		// Layered rendering can resume after a framebuffer copy, so its attachments must support loading.
+		const useTransientAttachments = supportsTransientAttachments && useSeparateMSAATextures === false;
+		const useTransientDepthAttachment = texture.isDepthTexture === true &&
+			useTransientAttachments &&
+			renderTarget?.storeMultisampledDepthBuffer === false &&
+			( renderTarget.stencilBuffer === false || renderTarget.storeMultisampledStencilBuffer === false );
+		const useTransientColorAttachment = texture.isDepthTexture !== true &&
+			useTransientAttachments &&
+			renderTarget?.storeMultisampledColorBuffer === false;
 
 		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC;
 
@@ -367,17 +381,11 @@ class WebGPUTextureUtils {
 
 		}
 
-		const renderTarget = texture.renderTarget;
-
 		// when the multisampled data are discarded, try to use a transient attachment if possible
 
-		if ( texture.isDepthTexture === true && primarySamples > 1 && GPUTextureUsage.TRANSIENT_ATTACHMENT !== undefined ) {
+		if ( primarySamples > 1 && useTransientDepthAttachment ) {
 
-			if ( renderTarget?.storeMultisampledDepthBuffer === false && ( renderTarget.stencilBuffer === false || renderTarget.storeMultisampledStencilBuffer === false ) ) {
-
-				usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TRANSIENT_ATTACHMENT;
-
-			}
+			usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TRANSIENT_ATTACHMENT;
 
 		}
 
@@ -387,7 +395,7 @@ class WebGPUTextureUtils {
 		textureDescriptorGPU.size.height = height;
 		textureDescriptorGPU.size.depthOrArrayLayers = depth;
 		textureDescriptorGPU.mipLevelCount = levels;
-		textureDescriptorGPU.sampleCount = primarySamples;
+		textureDescriptorGPU.sampleCount = useSeparateMSAATextures ? 1 : primarySamples;
 		textureDescriptorGPU.dimension = dimension;
 		textureDescriptorGPU.format = format;
 		textureDescriptorGPU.usage = usage;
@@ -421,7 +429,7 @@ class WebGPUTextureUtils {
 
 		}
 
-		if ( isMSAA ) {
+		if ( isMSAA || useSeparateMSAATextures ) {
 
 			const msaaTextureDescriptorGPU = Object.assign( {}, textureDescriptorGPU );
 
@@ -431,13 +439,30 @@ class WebGPUTextureUtils {
 
 			// when the multisampled data are discarded, try to use a transient attachment if possible
 
-			if ( renderTarget?.storeMultisampledColorBuffer === false && GPUTextureUsage.TRANSIENT_ATTACHMENT !== undefined ) {
+			if ( useTransientDepthAttachment || useTransientColorAttachment ) {
 
 				msaaTextureDescriptorGPU.usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TRANSIENT_ATTACHMENT;
 
 			}
 
-			textureData.msaaTexture = backend.device.createTexture( msaaTextureDescriptorGPU );
+			if ( useSeparateMSAATextures ) {
+
+				msaaTextureDescriptorGPU.size = Object.assign( {}, msaaTextureDescriptorGPU.size, { depthOrArrayLayers: 1 } );
+
+				textureData.msaaTextures = [];
+
+				for ( let i = 0; i < depth; i ++ ) {
+
+					msaaTextureDescriptorGPU.label = textureDescriptorGPU.label + '-msaa-' + i;
+					textureData.msaaTextures.push( backend.device.createTexture( msaaTextureDescriptorGPU ) );
+
+				}
+
+			} else {
+
+				textureData.msaaTexture = backend.device.createTexture( msaaTextureDescriptorGPU );
+
+			}
 
 		}
 
@@ -458,9 +483,15 @@ class WebGPUTextureUtils {
 		const backend = this.backend;
 		const textureData = backend.get( texture );
 
-		if ( textureData.texture !== undefined && isDefaultTexture === false && texture.isExternalTexture !== true ) textureData.texture.destroy();
+		if ( textureData.texture !== undefined && isDefaultTexture === false && texture.isExternalTexture !== true && textureData.externalTexture !== true ) textureData.texture.destroy();
 
 		if ( textureData.msaaTexture !== undefined ) textureData.msaaTexture.destroy();
+
+		if ( textureData.msaaTextures !== undefined ) {
+
+			for ( const msaaTexture of textureData.msaaTextures ) msaaTexture.destroy();
+
+		}
 
 		backend.delete( texture );
 
