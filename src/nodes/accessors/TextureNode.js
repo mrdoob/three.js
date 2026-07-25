@@ -824,6 +824,18 @@ class TextureNode extends UniformNode {
 	}
 
 	/**
+	 * Returns `true` if the texture is sampled with a plain gather (`textureGather`),
+	 * meaning a gather without a compare value.
+	 *
+	 * @return {boolean} Whether a plain gather is used or not.
+	 */
+	isPlainGather() {
+
+		return this.gatherNode !== null && this.compareNode === null;
+
+	}
+
+	/**
 	 * Samples the texture by defining a depth node.
 	 *
 	 * @param {Node<int>} depthNode - The depth node.
