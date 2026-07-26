@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - shadow - contact surfaces</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - contact shadows on arbitrary surfaces<br />
+			each shadow is clipped to the shape it lands on, and carries its own softness
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { ContactShadow } from 'three/addons/objects/ContactShadow.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			// Shared look for every shadow. Each surface below scales these for itself, which is
+			// the point of the demo: one surface can hold a razor-sharp shadow while the one
+			// beside it holds a very soft one.
+			const OPACITY = [ 0.95, 0.7, 0.38 ];
+			const BLUR = [ 0.93, 3.33, 3.67 ];
+			const BANDS = [ 0.025, 0.12 ];
+
+			// Two framings: the whole set, and a close read on the torus knot where the shadow
+			// has to sit on a disc it barely covers.
+			const VIEWS = {
+				overview: { position: [ 0.631, 2.023, - 2.932 ], target: [ 0.584, 0.162, 1.196 ] },
+				'torus knot': { position: [ 0.35, 1.22, - 1.65 ], target: [ 0, 0.74, 0 ] }
+			};
+
+			// darkness and softness are multipliers on the values above.
+			const settings = { view: 'overview', levels: 3, darkness: 0.5, softness: 1.5 };
+
+			let camera, scene, renderer, controls, gui;
+			const shadows = [];
+
+			init();
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				document.body.appendChild( renderer.domElement );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0.631, 2.023, - 2.932 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x828285 );
+
+				new THREE.TextureLoader()
+					.setPath( 'textures/equirectangular/' )
+					.load( 'studio_soft.jpg', ( texture ) => {
+
+						texture.mapping = THREE.EquirectangularReflectionMapping;
+						texture.colorSpace = THREE.SRGBColorSpace;
+						scene.environment = texture;
+						scene.environmentIntensity = 0.5;
+						rebake();	// the shadows are baked, so re-run them once the lighting is final
+
+					} );
+
+				// Three-point setup: warm key, cool fill, violet rim.
+				const key = new THREE.DirectionalLight( 0xfff4e0, 2.5 );
+				key.position.set( 3, 5, 4 );
+				scene.add( key );
+
+				const fill = new THREE.DirectionalLight( 0xb8d4ff, 0.8 );
+				fill.position.set( - 4, 2, - 3 );
+				scene.add( fill );
+
+				const rim = new THREE.DirectionalLight( 0xe8e0ff, 0.6 );
+				rim.position.set( 0, - 3, - 6 );
+				scene.add( rim );
+
+				scene.add( new THREE.AmbientLight( 0xffffff, 0.4 ) );
+
+				const ground = new THREE.Mesh(
+					new THREE.PlaneGeometry( 40, 40 ).rotateX( - Math.PI / 2 ),
+					new THREE.MeshStandardMaterial( { color: 0x9a9aa2, roughness: 0.85 } )
+				);
+				scene.add( ground );
+
+				const stone = new THREE.MeshStandardMaterial( { color: 0xc6c1b9, roughness: 0.41 } );
+				const base = new THREE.MeshStandardMaterial( { color: 0xb0aca6, roughness: 0.48 } );
+				const accent = new THREE.MeshStandardMaterial( { color: 0xff6924, roughness: 0.45 } );
+				const pale = new THREE.MeshStandardMaterial( { color: 0xcccccc, roughness: 0.5 } );
+				const chrome = new THREE.MeshStandardMaterial( { color: 0xc0c0c0, roughness: 0.05, metalness: 1 } );
+
+				function add( geometry, material, x, y, z ) {
+
+					const mesh = new THREE.Mesh( geometry, material );
+					mesh.position.set( x, y, z );
+					scene.add( mesh );
+					return mesh;
+
+				}
+
+				// ── a pedestal with a round top ───────────────────────
+				// The disc is the classic case: a square shadow would visibly hang off its rim.
+				const pedestal = add( new THREE.CylinderGeometry( 0.1, 0.25, 0.5, 32 ), base, 0, 0.252, 0 );
+				const disc = add( new THREE.CylinderGeometry( 0.65, 0.65, 0.1, 50 ), stone, 0, 0.511, 0 );
+				const knot = add( new THREE.TorusKnotGeometry( 0.18, 0.06, 164, 30, 2, 3 ), accent, 0, 0.871, 0 );
+
+				// ── a tapered stand ──────────────────────────────────
+				const stand = add( new THREE.CylinderGeometry( 0.3, 0.2, 0.6, 32 ), stone, 1.249, 0.304, 2.515 );
+				const ball = add( new THREE.SphereGeometry( 0.25, 32, 16 ), accent, 1.253, 0.802, 2.505 );
+
+				// ── two stars, each holding a solid ──────────────────
+				// Deliberately awkward outlines: five points and deep notches, so it is obvious
+				// whether the shadow follows the real shape or just a bounding square.
+				const starGeometry = starShape( 5, 0.5, 0.22, 0.2 );
+
+				const starA = add( starGeometry, stone, 0.685, 0.1, 1.135 );
+				const solidA = add( new THREE.OctahedronGeometry( 0.3 ), chrome, 0.67, 0.508, 1.195 );
+				solidA.rotation.y = - 3.8 * Math.PI / 180;
+
+				const starB = add( starGeometry, stone, 0.097, 0.1, 2.389 );
+				const solidB = add( new THREE.OctahedronGeometry( 0.3 ), accent, 0.143, 0.45, 2.459 );
+				solidB.rotation.set( 0, - 3.8 * Math.PI / 180, 33.3 * Math.PI / 180 );
+
+				// ── two solids straight on the ground, for comparison ─
+				const loose1 = add( new THREE.SphereGeometry( 0.5, 32, 16 ), pale, 1.808, 0.5, 0.738 );
+				const loose2 = add( new THREE.SphereGeometry( 0.25, 32, 16 ), accent, - 0.478, 0.255, 1.534 );
+
+				// ── the shadows ──────────────────────────────────────
+				// The two scale arguments are this demo's own idea, not part of the class: they
+				// scale the shared look above so each surface reads differently. Note the first
+				// star at 0 softness — a hard, crisp contact, right beside the second star's
+				// very soft one.
+				function cast( caster, receiver, opacityScale, blurScale ) {
+
+					const shadow = new ContactShadow( caster, {
+						receiver: receiver,
+						bands: BANDS,
+						opacity: OPACITY.map( v => Math.min( 1, v * opacityScale ) ),
+						blur: BLUR.map( v => v * blurScale )
+					} );
+					shadow.userData.opacityScale = opacityScale;
+					shadow.userData.blurScale = blurScale;
+					scene.add( shadow );
+					shadows.push( shadow );
+
+				}
+
+				cast( knot, disc, 1.4, 1.55 );
+				cast( ball, stand, 0.75, 1.45 );
+				cast( solidA, starA, 1.35, 0 );
+				cast( solidB, starB, 0.65, 1.7 );
+				cast( loose1, null, 1, 1 );
+				cast( loose2, null, 1, 1 );
+
+				// The surfaces are themselves standing on the ground, so they get their own
+				// shadows too — without these they read as floating.
+				cast( pedestal, null, 1, 1 );
+				cast( stand, null, 1, 1 );
+				cast( starA, null, 1, 1 );
+				cast( starB, null, 1, 1 );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0.584, 0.162, 1.196 );
+				controls.enableDamping = true;
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				gui = new GUI();
+				gui.add( settings, 'view', Object.keys( VIEWS ) ).onChange( setView );
+				gui.add( settings, 'levels', 1, 3, 1 ).onChange( rebake );
+				gui.add( settings, 'darkness', 0, 3, 0.05 ).onChange( rebake );
+				gui.add( settings, 'softness', 0, 3, 0.05 ).onChange( rebake );
+
+				rebake();
+
+			}
+
+			function setView() {
+
+				const v = VIEWS[ settings.view ];
+				camera.position.fromArray( v.position );
+				controls.target.fromArray( v.target );
+				controls.update();
+
+			}
+
+			function rebake() {
+
+				for ( const shadow of shadows ) {
+
+					shadow.levels = settings.levels;
+					shadow.opacity = OPACITY.map( v => Math.min( 1, v * shadow.userData.opacityScale * settings.darkness ) );
+					shadow.blur = BLUR.map( v => v * shadow.userData.blurScale * settings.softness );
+					shadow.update( renderer, scene );
+
+				}
+
+			}
+
+			// A five-pointed star with real notches. three.js has no star primitive, and an
+			// outline this awkward is exactly what proves the shadow is clipped to the surface.
+			function starShape( points, outer, inner, depth ) {
+
+				const shape = new THREE.Shape();
+
+				for ( let i = 0; i < points * 2; i ++ ) {
+
+					const radius = ( i % 2 === 0 ) ? outer : inner;
+					const angle = i / ( points * 2 ) * Math.PI * 2;
+					const x = Math.cos( angle ) * radius;
+					const y = Math.sin( angle ) * radius;
+
+					if ( i === 0 ) shape.moveTo( x, y );
+					else shape.lineTo( x, y );
+
+				}
+
+				shape.closePath();
+
+				const geometry = new THREE.ExtrudeGeometry( shape, { depth: depth, bevelEnabled: false } );
+				geometry.rotateX( Math.PI / 2 );
+				geometry.translate( 0, depth / 2, 0 );
+				return geometry;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				controls.update();
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
