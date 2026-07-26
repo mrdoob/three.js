@@ -883,7 +883,7 @@ ${ flowData.code }
 
 					snippet = `${typePrefix}sampler3D ${ uniform.name };`;
 
-				} else if ( texture.compareFunction && textureNode.compareNode !== null ) {
+				} else if ( texture.compareFunction && textureNode.isPlainGather() === false ) {
 
 					if ( texture.isArrayTexture === true ) {
 
