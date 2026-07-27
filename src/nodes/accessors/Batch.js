@@ -108,6 +108,13 @@ function getPreviousNode( batchMesh, id ) {
 export const batchColor = /*@__PURE__*/ varyingProperty( 'vec4', 'vBatchColor' );
 
 /**
+ * TSL object representing a varying property for the batch indirect index (instance ID).
+ *
+ * @type {VaryingNode<uint>}
+ */
+export const batchIndirectIndex = /*@__PURE__*/ varyingProperty( 'uint', 'vBatchIndirectId' );
+
+/**
  * TSL function representing the vertex shader batching setup.
  * Applies the batch transformation matrix to positionLocal, normalLocal, and tangentLocal.
  * Also assigns the batch color if a color texture is present.
@@ -121,6 +128,8 @@ export const batch = /*@__PURE__*/ Fn( ( [ batchMesh ], builder ) => {
 	const batchingIdNode = builder.getDrawIndex() === null ? instanceIndex : drawIndex;
 
 	const indirectId = getIndirectIndex( batchMesh._indirectTexture, int( batchingIdNode ) );
+
+	batchIndirectIndex.assign( indirectId );
 
 	const batchingMatrix = createBatchingMatrixNode( batchMesh._matricesTexture, indirectId );
 
