@@ -102,7 +102,8 @@ class CodeNode extends Node {
 
 		for ( const include of includes ) {
 
-			include.build( builder );
+			// Build only the include declaration or resource binding.
+			include.build( builder, 'property' );
 
 		}
 
