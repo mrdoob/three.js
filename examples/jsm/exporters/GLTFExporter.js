@@ -99,6 +99,13 @@ const KHR_mesh_quantization_ExtraAttrTypes = {
  * const data = await exporter.parseAsync( scene, options );
  * ```
  *
+ * A custom shader has no glTF equivalent and cannot be exported. Such a material can nominate a
+ * standard stand-in through `userData.gltfProxyMaterial`, which is written in its place:
+ *
+ * ```js
+ * gemMaterial.userData.gltfProxyMaterial = new THREE.MeshPhysicalMaterial( { transmission: 1, ior: 2.42 } );
+ * ```
+ *
  * @three_import import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
  */
 class GLTFExporter {
@@ -1644,8 +1651,32 @@ class GLTFWriter {
 
 		if ( material.isShaderMaterial ) {
 
-			console.warn( 'GLTFExporter: THREE.ShaderMaterial not supported.' );
-			return null;
+			// A custom shader has no glTF equivalent, so it cannot be described here. Dropping it
+			// leaves the mesh with no material at all, and the writeMaterial plugin hook further
+			// down is never reached from this branch, so there is no way to intervene either.
+			// Instead let the material nominate a standard stand-in to be written in its place:
+			// gems, matcaps and other procedural surfaces then still export the approximation a
+			// glTF viewer was going to show anyway, instead of nothing.
+			const proxy = material.userData.gltfProxyMaterial;
+
+			if ( proxy === undefined ) {
+
+				console.warn( 'THREE.GLTFExporter: THREE.ShaderMaterial not supported. Set userData.gltfProxyMaterial to export a standard material in its place.' );
+				return null;
+
+			}
+
+			if ( proxy.isMaterial !== true || proxy.isShaderMaterial === true ) {
+
+				console.warn( 'THREE.GLTFExporter: userData.gltfProxyMaterial must be a material, and not itself a THREE.ShaderMaterial.' );
+				return null;
+
+			}
+
+			// Cached under the shader material too, so a scene that reuses it writes one material.
+			const proxyIndex = await this.processMaterialAsync( proxy, geometry );
+			cache.materials.set( cacheKey, proxyIndex );
+			return proxyIndex;
 
 		}
 
