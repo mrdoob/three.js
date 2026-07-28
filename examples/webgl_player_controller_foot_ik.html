@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - player controller - foot ik</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - player controller - foot ik">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_player_controller_foot_ik.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_player_controller_foot_ik.jpg">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				color: white;
+			}
+
+			#info a {
+				color: #4d6675;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
+			<a href="https://github.com/hh-hang/three-player-controller/blob/master/README_En.md" target="_blank" rel="noopener">player controller</a> - foot ik<br />
+			WASD move, Shift sprint, Space jump, V view, F fly, mouse to look<br />
+			Character and animations:
+			<a href="https://quaternius.itch.io/universal-animation-library" target="_blank" rel="noopener">Universal Animation Library by Quaternius</a> (CC0)
+		</div>
+
+		<!-- "three/examples/" import map entry required by three-player-controller -->
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"three/examples/": "./",
+					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.13/build/index.module.js",
+					"three-player-controller": "https://cdn.jsdelivr.net/npm/three-player-controller@0.5.0/dist/index.mjs",
+					"three-player-controller/foot-ik": "https://cdn.jsdelivr.net/npm/three-player-controller@0.5.0/dist/foot-ik.mjs"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { MapControls } from 'three/addons/controls/MapControls.js';
+			import { Sky } from 'three/addons/objects/Sky.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+
+			import { playerController as PlayerController } from 'three-player-controller';
+			import { FootIK } from 'three-player-controller/foot-ik';
+
+			let camera, scene, renderer, controls, stats;
+			let player, footIK;
+			let sun, sunDebugHelper, sunShadowCameraHelper;
+			let initialViewPending = true;
+			const initialPlayerPosition = new THREE.Vector3( - 7.5, 0.25, - 3.5 );
+
+			init();
+
+			async function init() {
+
+				// scene
+				scene = new THREE.Scene();
+
+				// renderer
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( Math.min( window.devicePixelRatio, 2 ) );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 0.8;
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFShadowMap;
+				document.body.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				// camera
+				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.01, 500 );
+				camera.position.copy( initialPlayerPosition ).add( new THREE.Vector3( - 1.5, 1.2, 0 ) );
+
+				// controls
+				controls = new MapControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.maxDistance = 80;
+				controls.maxPolarAngle = Math.PI / 2.05;
+				controls.target.copy( initialPlayerPosition ).add( new THREE.Vector3( 0, 0.65, 0 ) );
+				controls.update();
+
+				// lights
+				scene.add( new THREE.AmbientLight( 0xffffff, 1.8 ) );
+
+				sun = new THREE.DirectionalLight( 0xffffff, 2 );
+				sun.position.set( 6, 10, 7 );
+				sun.castShadow = true;
+				sun.shadow.mapSize.set( 2048, 2048 );
+				sun.shadow.camera.near = 0.5;
+				sun.shadow.camera.far = 35;
+				sun.shadow.camera.left = - 12;
+				sun.shadow.camera.right = 12;
+				sun.shadow.camera.top = 10;
+				sun.shadow.camera.bottom = - 10;
+				sun.shadow.bias = - 0.0002;
+				scene.add( sun );
+
+				// sky
+				const sky = new Sky();
+				sky.scale.setScalar( 450000 );
+				scene.add( sky );
+
+				const skyUniforms = sky.material.uniforms;
+				skyUniforms[ 'turbidity' ].value = 5;
+				skyUniforms[ 'rayleigh' ].value = 1.5;
+				skyUniforms[ 'mieCoefficient' ].value = 0.003;
+				skyUniforms[ 'mieDirectionalG' ].value = 0.8;
+
+				const skySun = skyUniforms[ 'sunPosition' ].value;
+				skySun.setFromSphericalCoords(
+					1,
+					THREE.MathUtils.degToRad( 70 ),
+					THREE.MathUtils.degToRad( 210 ),
+				);
+
+				sunDebugHelper = new THREE.DirectionalLightHelper( sun, 1.2, 0xffd166 );
+				sunDebugHelper.visible = false;
+				scene.add( sunDebugHelper );
+
+				sunShadowCameraHelper = new THREE.CameraHelper( sun.shadow.camera );
+				sunShadowCameraHelper.visible = false;
+				scene.add( sunShadowCameraHelper );
+
+				// test course (stairs / obstacles / ramps)
+				const staticCollider = buildTestCourse();
+				scene.add( staticCollider );
+				addGroundGrid( scene );
+
+				// player
+				player = new PlayerController();
+				await player.init( {
+					scene,
+					camera,
+					controls,
+					staticCollider,
+					initPos: initialPlayerPosition,
+					minCamDistance: 10,
+					maxCamDistance: 300,
+					camLookAtHeightRatio: 0.5,
+					enableSpringCamera: true,
+					playerModelConfig: {
+						url: 'models/gltf/UAL1_Standard/UAL1_Standard.glb',
+						scale: 0.005,
+						idleAnim: 'Idle_Loop',
+						walkAnim: 'Walk_Loop',
+						runAnim: 'Sprint_Loop',
+						jumpAnim: [ 'Jump_Start', 'Jump_Loop', 'Jump_Land' ],
+						flyAnim: 'fly',
+						flyIdleAnim: 'flyIdle',
+						flyHoverForwardAnim: 'flyHoverForward',
+						flyHoverBackAnim: 'flyHoverBack',
+						flyHoverLeftAnim: 'flyHoverLeft',
+						flyHoverRightAnim: 'flyHoverRight',
+						flyHoverUpAnim: 'flyHoverUp',
+						flyHoverDownAnim: 'flyHoverDown',
+						speed: 100,
+						runSpeed: 600,
+						rotateY: Math.PI / 2,
+						firstPersonCameraOffset: [ 0, 0.15, 0.12 ],
+						headBoneName: 'Head',
+					},
+				} );
+
+				player.getPlayerModel().traverse( ( object ) => {
+
+					if ( ! object.isMesh ) return;
+					object.castShadow = true;
+					object.receiveShadow = true;
+
+				} );
+
+				// foot ik
+				const skeleton = {
+					hips: 'pelvis',
+					legs: {
+						left: {
+							upper: 'thigh_l',
+							lower: 'calf_l',
+							foot: 'foot_l',
+							toe: 'ball_l',
+						},
+						right: {
+							upper: 'thigh_r',
+							lower: 'calf_r',
+							foot: 'foot_r',
+							toe: 'ball_r',
+						},
+					},
+				};
+
+				footIK = new FootIK( {
+					skeleton,
+					soleSkinThickness: 1.6,
+				} );
+				player.use( footIK );
+
+				// gui
+				createDebugPanel();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				renderer.setAnimationLoop( animate );
+
+			}
+
+			function createDebugPanel() {
+
+				const options = footIK.getOptions();
+				const params = {
+					footIKEnabled: options.enabled ?? true,
+					footIKDebug: options.debug ?? false,
+					soleSampleDebug: options.soleSampleDebug ?? false,
+					sunDebug: false,
+					playerDebug: false,
+					soleHalfWidth: options.soleHalfWidth ?? 7,
+					soleToeExtend: options.soleToeExtend ?? 7,
+					soleHeelExtend: options.soleHeelExtend ?? 3,
+					soleSkinThickness: options.soleSkinThickness ?? 3,
+				};
+
+				const applyFootIKOptions = ( patch ) => {
+
+					footIK.configure( patch );
+
+				};
+
+				player.setDebug( params.playerDebug );
+				footIK.setDebugEnabled( params.footIKDebug && params.footIKEnabled );
+				footIK.setSoleSampleDebugEnabled( params.soleSampleDebug );
+				sunDebugHelper.visible = params.sunDebug;
+				sunShadowCameraHelper.visible = params.sunDebug;
+
+				const gui = new GUI();
+
+				const sceneFolder = gui.addFolder( 'Scene' );
+				sceneFolder.add( params, 'playerDebug' ).name( 'Player Collider' ).onChange( ( value ) => {
+
+					player.setDebug( value );
+
+				} );
+				sceneFolder.add( params, 'sunDebug' ).name( 'Sun Debug' ).onChange( ( value ) => {
+
+					sunDebugHelper.visible = value;
+					sunShadowCameraHelper.visible = value;
+
+				} );
+				sceneFolder.close();
+
+				const debugFolder = gui.addFolder( 'Foot IK Debug' );
+				debugFolder.add( params, 'footIKEnabled' ).name( 'Enabled' ).onChange( ( value ) => {
+
+					footIK.setEnabled( value );
+
+					if ( ! value ) {
+
+						footIK.setDebugEnabled( false );
+
+					} else {
+
+						footIK.setDebugEnabled( params.footIKDebug );
+
+					}
+
+				} );
+				debugFolder.add( params, 'footIKDebug' ).name( 'IK Targets' ).onChange( ( value ) => {
+
+					footIK.setDebugEnabled( value && params.footIKEnabled );
+
+				} );
+				debugFolder.add( params, 'soleSampleDebug' ).name( 'Sole Samples' ).onChange( ( value ) => {
+
+					footIK.setSoleSampleDebugEnabled( value );
+
+				} );
+				debugFolder.open();
+
+				const soleFolder = gui.addFolder( 'Sole Layout' );
+				soleFolder.add( params, 'soleHalfWidth', 0, 24, 0.1 ).name( 'Half Width' ).onChange( ( value ) => {
+
+					applyFootIKOptions( { soleHalfWidth: value } );
+
+				} );
+				soleFolder.add( params, 'soleToeExtend', 0, 24, 0.1 ).name( 'Toe Extend' ).onChange( ( value ) => {
+
+					applyFootIKOptions( { soleToeExtend: value } );
+
+				} );
+				soleFolder.add( params, 'soleHeelExtend', 0, 24, 0.1 ).name( 'Heel Extend' ).onChange( ( value ) => {
+
+					applyFootIKOptions( { soleHeelExtend: value } );
+
+				} );
+				soleFolder.add( params, 'soleSkinThickness', 0, 16, 0.1 ).name( 'Skin Thickness' ).onChange( ( value ) => {
+
+					applyFootIKOptions( { soleSkinThickness: value } );
+
+				} );
+				soleFolder.close();
+				gui.open();
+
+			}
+
+			function buildTestCourse() {
+
+				const root = new THREE.Group();
+				const groundMat = new THREE.MeshStandardMaterial( { color: 0xd8d5cf, roughness: 0.9 } );
+				const stairMats = [
+					new THREE.MeshStandardMaterial( { color: 0xb8b0a1, roughness: 0.75 } ),
+					new THREE.MeshStandardMaterial( { color: 0xc3a28f, roughness: 0.75 } ),
+					new THREE.MeshStandardMaterial( { color: 0xa8b4c4, roughness: 0.75 } ),
+				];
+				const rampMats = [
+					new THREE.MeshStandardMaterial( { color: 0xadbca8, roughness: 0.8 } ),
+					new THREE.MeshStandardMaterial( { color: 0x9fb7b4, roughness: 0.8 } ),
+					new THREE.MeshStandardMaterial( { color: 0xc0b48c, roughness: 0.8 } ),
+				];
+				const obstacleMats = [
+					new THREE.MeshStandardMaterial( { color: 0xe5b73b, roughness: 0.72 } ),
+					new THREE.MeshStandardMaterial( { color: 0x4b4a46, roughness: 0.82 } ),
+				];
+				const wallMat = new THREE.MeshStandardMaterial( { color: 0x59636d, roughness: 0.88 } );
+
+				// ground + walls
+				addBox( root, new THREE.Vector3( 0, - 0.06, 0 ), new THREE.Vector3( 20, 0.12, 12 ), groundMat );
+				createBoundaryWalls( root, wallMat );
+
+				// stairs (increasing step height)
+				createStairs( root, new THREE.Vector3( - 6.5, 0, - 3.5 ), 0.08, stairMats[ 0 ] );
+				createStairs( root, new THREE.Vector3( - 1.2, 0, - 3.5 ), 0.12, stairMats[ 1 ] );
+				createStairs( root, new THREE.Vector3( 4.1, 0, - 3.5 ), 0.16, stairMats[ 2 ] );
+
+				// obstacles
+				createObstacleCourse( root, - 0.25, obstacleMats );
+
+				// ramps (increasing slope)
+				createRamp( root, new THREE.Vector3( - 6.1, 0, 3 ), 10, rampMats[ 0 ] );
+				createRamp( root, new THREE.Vector3( - 0.3, 0, 3 ), 18, rampMats[ 1 ] );
+				createRamp( root, new THREE.Vector3( 5.8, 0, 3 ), 28, rampMats[ 2 ] );
+
+				return root;
+
+			}
+
+			function addGroundGrid( root ) {
+
+				const width = 20;
+				const depth = 12;
+				const step = 1;
+				const points = [];
+
+				for ( let x = - width / 2; x <= width / 2 + 0.0001; x += step ) {
+
+					points.push( new THREE.Vector3( x, 0, - depth / 2 ), new THREE.Vector3( x, 0, depth / 2 ) );
+
+				}
+
+				for ( let z = - depth / 2; z <= depth / 2 + 0.0001; z += step ) {
+
+					points.push( new THREE.Vector3( - width / 2, 0, z ), new THREE.Vector3( width / 2, 0, z ) );
+
+				}
+
+				const geometry = new THREE.BufferGeometry().setFromPoints( points );
+				const material = new THREE.LineBasicMaterial( { color: 0xbcb7af } );
+				const grid = new THREE.LineSegments( geometry, material );
+				grid.position.y = 0.004;
+				root.add( grid );
+
+			}
+
+			function createBoundaryWalls( root, material ) {
+
+				const wallHeight = 1;
+				const wallThickness = 0.16;
+				const halfWidth = 10;
+				const halfDepth = 6;
+				const centerY = wallHeight / 2;
+
+				addBox( root, new THREE.Vector3( 0, centerY, - halfDepth ), new THREE.Vector3( halfWidth * 2, wallHeight, wallThickness ), material );
+				addBox( root, new THREE.Vector3( 0, centerY, halfDepth ), new THREE.Vector3( halfWidth * 2, wallHeight, wallThickness ), material );
+				addBox( root, new THREE.Vector3( - halfWidth, centerY, 0 ), new THREE.Vector3( wallThickness, wallHeight, halfDepth * 2 ), material );
+				addBox( root, new THREE.Vector3( halfWidth, centerY, 0 ), new THREE.Vector3( wallThickness, wallHeight, halfDepth * 2 ), material );
+
+			}
+
+			function createStairs( root, start, stepHeight, material ) {
+
+				const stepCount = 7;
+				const stepDepth = 0.42;
+				const width = 1.9;
+
+				for ( let i = 0; i < stepCount; i ++ ) {
+
+					const height = stepHeight * ( i + 1 );
+					addBox(
+						root,
+						new THREE.Vector3( start.x + i * stepDepth, height / 2, start.z ),
+						new THREE.Vector3( stepDepth, height, width ),
+						material,
+					);
+
+				}
+
+			}
+
+			function createObstacleCourse( root, centerZ, materials ) {
+
+				const height = 0.14;
+				const depth = 1.7;
+				const widths = [ 0.14, 0.16, 0.18, 0.20, 0.22, 0.24, 0.26, 0.28, 0.30, 0.32 ];
+				const gaps = [ 0.32, 0.58, 0.41, 0.75, 0.36, 0.63, 0.48, 0.71, 0.54 ];
+				const totalWidth = widths.reduce( ( sum, width ) => sum + width, 0 )
+					+ gaps.reduce( ( sum, gap ) => sum + gap, 0 );
+				let cursorX = - totalWidth / 2;
+
+				widths.forEach( ( width, index ) => {
+
+					addBox(
+						root,
+						new THREE.Vector3( cursorX + width / 2, height / 2, centerZ ),
+						new THREE.Vector3( width, height, depth ),
+						materials[ index % materials.length ],
+					);
+					cursorX += width + ( gaps[ index ] ?? 0 );
+
+				} );
+
+			}
+
+			function createRamp( root, position, angleDeg, material ) {
+
+				const length = 3.4;
+				const width = 1.8;
+				const height = Math.tan( THREE.MathUtils.degToRad( angleDeg ) ) * length;
+				const ramp = new THREE.Mesh( createRampGeometry( length, height, width ), material );
+				ramp.position.copy( position );
+				ramp.castShadow = true;
+				ramp.receiveShadow = true;
+				root.add( ramp );
+
+			}
+
+			function createRampGeometry( length, height, width ) {
+
+				const halfLength = length / 2;
+				const halfWidth = width / 2;
+				const vertices = [
+					- halfLength, 0, - halfWidth,
+					halfLength, 0, - halfWidth,
+					halfLength, height, - halfWidth,
+					- halfLength, 0, halfWidth,
+					halfLength, 0, halfWidth,
+					halfLength, height, halfWidth,
+				];
+				const indices = [
+					0, 1, 4, 0, 4, 3,
+					1, 2, 5, 1, 5, 4,
+					0, 3, 5, 0, 5, 2,
+					0, 2, 1,
+					3, 4, 5,
+				];
+				const geometry = new THREE.BufferGeometry();
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.setIndex( indices );
+
+				const flatGeometry = geometry.toNonIndexed();
+				flatGeometry.computeVertexNormals();
+				return flatGeometry;
+
+			}
+
+			function addBox( root, position, scale, material ) {
+
+				const mesh = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, 1 ), material );
+				mesh.position.copy( position );
+				mesh.scale.copy( scale );
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				root.add( mesh );
+
+			}
+
+			function animate() {
+
+				sunDebugHelper.update();
+				sunShadowCameraHelper.update();
+
+				if ( footIK ) {
+
+					if ( initialViewPending ) {
+
+						camera.position.copy( initialPlayerPosition ).add( new THREE.Vector3( - 1.5, 1.2, 0 ) );
+						controls.target.copy( initialPlayerPosition ).add( new THREE.Vector3( 0, 0.65, 0 ) );
+						controls.update();
+						initialViewPending = false;
+
+					}
+
+					player.update();
+
+				}
+
+				renderer.render( scene, camera );
+				stats.update();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+		</script>
+
+	</body>
+</html>

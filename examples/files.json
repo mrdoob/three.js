@@ -186,6 +186,7 @@
 		"webgl_multiple_views",
 		"webgl_panorama_cube",
 		"webgl_panorama_equirectangular",
+		"webgl_player_controller_foot_ik",
 		"webgl_points_billboards",
 		"webgl_points_dynamic",
 		"webgl_points_sprites",

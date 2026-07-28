@@ -88,6 +88,7 @@
 	"webgl_multiple_elements_text": [ "font" ],
 	"webgl_panorama_cube": [ "envmap" ],
 	"webgl_panorama_equirectangular": [ "envmap" ],
+	"webgl_player_controller_foot_ik": [ "community", "controller", "ik", "three-player-controller" ],
 	"webgl_points_billboards": [ "particles" ],
 	"webgl_points_dynamic": [ "particles" ],
 	"webgl_points_sprites": [ "particles", "snow" ],
