@@ -1271,7 +1271,7 @@ class WebGPUBackend extends Backend {
 			for ( let i = 0; i < renderContextData.layerDescriptors.length; i ++ ) {
 
 				const layerDescriptor = renderContextData.layerDescriptors[ i ];
-				const colorLoadOp = layerDescriptor.colorAttachments[ 0 ].loadOp;
+				const colorLoadOps = layerDescriptor.colorAttachments.map( attachment => attachment.loadOp );
 				const depthLoadOp = layerDescriptor.depthStencilAttachment?.depthLoadOp;
 				const stencilLoadOp = layerDescriptor.depthStencilAttachment?.stencilLoadOp;
 
@@ -1318,7 +1318,11 @@ class WebGPUBackend extends Backend {
 
 				}
 
-				layerDescriptor.colorAttachments[ 0 ].loadOp = colorLoadOp;
+				for ( let j = 0; j < layerDescriptor.colorAttachments.length; j ++ ) {
+
+					layerDescriptor.colorAttachments[ j ].loadOp = colorLoadOps[ j ];
+
+				}
 
 				if ( renderContext.depth ) layerDescriptor.depthStencilAttachment.depthLoadOp = depthLoadOp;
 				if ( renderContext.stencil ) layerDescriptor.depthStencilAttachment.stencilLoadOp = stencilLoadOp;
@@ -2878,7 +2882,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		if ( renderContextData.bundleEncoders !== undefined ) {
+		if ( this._isRenderCameraDepthArray( renderContext ) === true ) {
 
 			// Layered draws are only executed in finishRender(), so preserve this copy as a render-stage boundary.
 			const bundles = this._finishArrayCameraBundleEncoders( renderContextData );
@@ -2890,6 +2894,7 @@ class WebGPUBackend extends Backend {
 					sourceGPU,
 					destinationGPU,
 					rectangle: { x: rectangle.x, y: rectangle.y, z: rectangle.z, w: rectangle.w },
+					// ViewportTextureNode restores this flag before the deferred copy executes.
 					generateMipmaps: texture.generateMipmaps
 				}
 			} );

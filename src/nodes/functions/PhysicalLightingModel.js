@@ -70,19 +70,14 @@ const applyIorToRoughness = /*@__PURE__*/ Fn( ( [ roughness, ior ] ) => {
 const viewportBackSideTexture = /*@__PURE__*/ viewportMipTexture();
 const viewportFrontSideTexture = /*@__PURE__*/ viewportOpaqueMipTexture();
 
-const getTransmissionSample = /*@__PURE__*/ Fn( ( [ fragCoord, roughness, ior ], { camera, material } ) => {
+const getTransmissionSample = /*@__PURE__*/ Fn( ( [ fragCoord, roughness, ior ], { material } ) => {
 
 	const vTexture = material.side === BackSide ? viewportBackSideTexture : viewportFrontSideTexture;
 
-	// Array cameras can render multiple views into a shared framebuffer.
-	const isArrayCamera = camera.isArrayCamera && camera.cameras.length > 0;
-	const viewportCoord = isArrayCamera ? fragCoord.mul( cameraViewport.zw ).add( cameraViewport.xy ).div( screenSize ) : fragCoord;
-	const viewportWidth = isArrayCamera ? cameraViewport.z : screenSize.x;
-
-	const transmissionSample = vTexture.sample( viewportCoord );
+	const transmissionSample = vTexture.sample( fragCoord.mul( cameraViewport.zw ).add( cameraViewport.xy ).div( screenSize ) );
 	//const transmissionSample = viewportMipTexture( fragCoord );
 
-	const lod = log2( viewportWidth ).mul( applyIorToRoughness( roughness, ior ) );
+	const lod = log2( cameraViewport.z ).mul( applyIorToRoughness( roughness, ior ) );
 
 	return textureBicubicLevel( transmissionSample, lod );
 
