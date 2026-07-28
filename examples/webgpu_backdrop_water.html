@@ -36,8 +36,9 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { color, vec2, pass, linearDepth, normalWorld, triplanarTexture, texture, objectPosition, screenUV, viewportLinearDepth, viewportDepthTexture, viewportSharedTexture, mx_worley_noise_float, positionWorld, time } from 'three/tsl';
+			import { color, vec2, pass, linearDepth, normalWorld, triplanarTexture, texture, objectPosition, screenUV, viewportLinearDepth, viewportDepthTexture, viewportSharedTexture, positionWorld, time } from 'three/tsl';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
+			import { voronoi2d, voronoi3d } from 'three/addons/tsl/math/voronoiNoise.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -154,10 +155,10 @@
 				// water
 
 				const t = time.mul( .8 );
-				const floorUV = positionWorld.xzy;
+				const floorUV = positionWorld.xz;
 
-				const waterLayer0 = mx_worley_noise_float( floorUV.mul( 6 ).add( t ) ).pow( 2 );
-				const waterLayer1 = mx_worley_noise_float( floorUV.mul( 3 ).add( t ) ).pow( 2 );
+				const waterLayer0 = voronoi2d( floorUV.mul( 6 ), t );
+				const waterLayer1 = voronoi2d( floorUV.mul( 3 ), t );
 
 				const waterIntensity = waterLayer0.mul( waterLayer1 );
 				const waterColor = waterIntensity.mul( 1.4 ).mix( color( 0x0487e2 ), color( 0x74ccf4 ) );
@@ -199,8 +200,10 @@
 
 				const causticFade = normalWorld.y.mix( positionWorld.y.distance( 0 ).oneMinus().saturate(), 0 );
 
+				const causticNoise = voronoi3d( positionWorld.mul( 6 ), t );
+
 				//material.colorNode = colorNode;
-				floor.material.colorNode = causticFade.mix( material.colorNode, material.colorNode.add( waterLayer0 ) );
+				floor.material.colorNode = causticFade.mix( material.colorNode, material.colorNode.add( causticNoise ) );
 
 				// renderer
 

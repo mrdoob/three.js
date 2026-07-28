@@ -333,6 +333,7 @@ class LightShadow {
 		if ( this.bias !== 0 ) object.bias = this.bias;
 		if ( this.normalBias !== 0 ) object.normalBias = this.normalBias;
 		if ( this.radius !== 1 ) object.radius = this.radius;
+		if ( this.blurSamples !== 8 ) object.blurSamples = this.blurSamples;
 		if ( this.mapSize.x !== 512 || this.mapSize.y !== 512 ) object.mapSize = this.mapSize.toArray();
 
 		object.camera = this.camera.toJSON( false ).object;

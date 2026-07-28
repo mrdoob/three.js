@@ -107,6 +107,22 @@ class Data3DTexture extends Texture {
 
 	}
 
+	/**
+	 * Copies the values of the given texture to this instance.
+	 *
+	 * @param {Data3DTexture} source - The texture to copy.
+	 * @return {Data3DTexture} A reference to this instance.
+	 */
+	copy( source ) {
+
+		super.copy( source );
+
+		this.wrapR = source.wrapR;
+
+		return this;
+
+	}
+
 }
 
 export { Data3DTexture };

@@ -896,9 +896,10 @@ class Renderer {
 	 * @param {Object3D} scene - The scene or 3D object to precompile.
 	 * @param {Camera} camera - The camera that is used to render the scene.
 	 * @param {?Scene} targetScene - If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.
+	 * @param {onProgressCallback} [onProgress] - Executed while the compilation is in progress.
 	 * @return {Promise} A Promise that resolves when the compile has been finished.
 	 */
-	async compileAsync( scene, camera, targetScene = null ) {
+	async compileAsync( scene, camera, targetScene = null, onProgress = null ) {
 
 		if ( this._isDeviceLost === true ) return;
 
@@ -932,7 +933,9 @@ class Renderer {
 
 		// Match render()'s logic: use frameBufferTarget when needsFrameBufferTarget is true
 		const useFrameBufferTarget = this.needsFrameBufferTarget && this._renderTarget === null;
-		const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : ( this._renderTarget || this._outputRenderTarget );
+		const outputRenderTarget = this._renderTarget || this._outputRenderTarget;
+		const useXRCamera = this.xr.isPresenting === true && this.isOutputTarget;
+		const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : outputRenderTarget;
 		const renderContext = this._renderContexts.get( renderTarget, this._mrt );
 		const activeMipmapLevel = this._activeMipmapLevel;
 
@@ -963,7 +966,7 @@ class Renderer {
 
 		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
-		camera = this._updateCamera( camera );
+		camera = this._updateCamera( camera, useXRCamera );
 
 		//
 
@@ -1058,6 +1061,9 @@ class Renderer {
 		// Process compilation work items sequentially to avoid freezing
 		// Yields between objects to keep animation smooth
 
+		const total = compilationPromises.length;
+		let loaded = 0;
+
 		for ( const item of compilationPromises ) {
 
 			const renderObject = this._objects.get( item.object, item.material, item.scene, item.camera, item.lightsNode, item.renderContext, item.clippingContext, item.passId );
@@ -1087,8 +1093,100 @@ class Renderer {
 			this._nodes.updateAfter( renderObject );
 			this._isPreCompiling = false;
 
+			loaded ++;
+
+			if ( onProgress !== null ) {
+
+				onProgress( new ProgressEvent( 'progress', { lengthComputable: true, loaded, total } ) );
+
+			}
+
 			// Yield between objects to allow animation frames
 			await yieldToMain();
+
+		}
+
+	}
+
+	/**
+	 * Compile compute programs. This can be useful to avoid a
+	 * phenomenon which is called "shader compilation stutter", which occurs when
+	 * rendering an object with a new shader for the first time.
+	 *
+	 * @async
+	 * @param {Node|Array<Node>} computeNodes - The compute node(s).
+	 * @param {onProgressCallback} [onProgress] - Executed while the compilation is in progress.
+	 * @return {Promise} A Promise that resolves when the compile has been finished.
+	 */
+	async compileComputeAsync( computeNodes, onProgress = null ) {
+
+		if ( this._isDeviceLost === true ) return;
+
+		if ( this._initialized === false ) await this.init();
+
+		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
+
+		if ( computeList.length === 0 || computeList.some( ( computeNode ) => computeNode === undefined || computeNode === null || computeNode.isComputeNode !== true ) ) {
+
+			throw new Error( 'THREE.Renderer: .compileComputeAsync() expects a ComputeNode.' );
+
+		}
+
+		const total = computeList.length;
+		let loaded = 0;
+
+		//
+
+		const pipelines = this._pipelines;
+		const bindings = this._bindings;
+		const nodes = this._nodes;
+
+		for ( const computeNode of computeList ) {
+
+			if ( pipelines.has( computeNode ) === false ) {
+
+				const dispose = () => {
+
+					computeNode.removeEventListener( 'dispose', dispose );
+
+					pipelines.delete( computeNode );
+					bindings.deleteForCompute( computeNode );
+					nodes.delete( computeNode );
+
+				};
+
+				computeNode.addEventListener( 'dispose', dispose );
+
+				const onInitFn = computeNode.onInitFunction;
+
+				if ( onInitFn !== null ) {
+
+					onInitFn.call( computeNode, { renderer: this } );
+
+				}
+
+			}
+
+			await nodes.getForComputeAsync( computeNode );
+
+			nodes.updateForCompute( computeNode );
+			bindings.updateForCompute( computeNode );
+
+			const computeBindings = bindings.getForCompute( computeNode );
+			const compilationPromises = [];
+
+			pipelines.getForCompute( computeNode, computeBindings, compilationPromises );
+			await Promise.all( compilationPromises );
+
+			loaded ++;
+
+			if ( onProgress !== null ) {
+
+				onProgress( new ProgressEvent( 'progress', { lengthComputable: true, loaded, total } ) );
+
+			}
+
+			if ( loaded < total ) await yieldToMain();
 
 		}
 
@@ -1582,6 +1680,7 @@ class Renderer {
 		const sceneRef = ( scene.isScene === true ) ? scene : _scene;
 
 		const outputRenderTarget = this._renderTarget || this._outputRenderTarget;
+		const useXRCamera = this.xr.isPresenting === true && this.isOutputTarget;
 
 		const activeCubeFace = this._activeCubeFace;
 		const activeMipmapLevel = this._activeMipmapLevel;
@@ -1650,7 +1749,7 @@ class Renderer {
 
 		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
-		camera = this._updateCamera( camera );
+		camera = this._updateCamera( camera, useXRCamera );
 
 		//
 
@@ -3115,7 +3214,7 @@ class Renderer {
 	 * @param {number} width - The width of the copy region.
 	 * @param {number} height - The height of the copy region.
 	 * @param {number} [textureIndex=0] - The texture index of a MRT render target.
-	 * @param {number} [faceIndex=0] - The active cube face index.
+	 * @param {number} [faceIndex=0] - The cube face, depth slice or array layer index.
 	 * @return {Promise<TypedArray>} A Promise that resolves when the read has been finished. The resolve provides the read data as a typed array.
 	 */
 	async readRenderTargetPixelsAsync( renderTarget, x, y, width, height, textureIndex = 0, faceIndex = 0 ) {
@@ -3497,13 +3596,14 @@ class Renderer {
 	 *
 	 * @private
 	 * @param {Camera} camera - The camera to update.
+	 * @param {boolean} useXRCamera - Whether the XR camera should be used when presenting.
 	 * @return {Camera} The returned camera might be different depending on whether XR is used or not.
 	 */
-	_updateCamera( camera ) {
+	_updateCamera( camera, useXRCamera ) {
 
 		const xr = this.xr;
 
-		if ( xr.isPresenting === false ) {
+		if ( xr.isPresenting === false || useXRCamera === false ) {
 
 			let projectionMatrixNeedsUpdate = false;
 
@@ -3573,7 +3673,7 @@ class Renderer {
 
 		// handle XR
 
-		if ( xr.enabled === true && xr.isPresenting === true ) {
+		if ( useXRCamera === true && xr.enabled === true && xr.isPresenting === true ) {
 
 			if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
 			camera = xr.getCamera(); // use XR camera for rendering
@@ -3864,7 +3964,8 @@ class Renderer {
 	 * @param {Object3D} scene - The scene or 3D object to precompile.
 	 * @param {Camera} camera - The camera that is used to render the scene.
 	 * @param {Scene} targetScene - If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.
-	 * @return {function(Object3D, Camera, ?Scene): Promise|undefined} A Promise that resolves when the compile has been finished.
+	 * @param {onProgressCallback} [onProgress] - Executed while the compilation is in progress.
+	 * @return {function(Object3D, Camera, ?Scene, ?onProgressCallback): Promise|undefined} A Promise that resolves when the compile has been finished.
 	 */
 	get compile() {
 

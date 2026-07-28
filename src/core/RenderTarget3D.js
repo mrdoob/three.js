@@ -31,15 +31,19 @@ class RenderTarget3D extends RenderTarget {
 
 		this.depth = depth;
 
-		/**
-		 * Overwritten with a different texture type.
-		 *
-		 * @type {Data3DTexture}
-		 */
-		this.texture = new Data3DTexture( null, width, height, depth );
-		this._setTextureOptions( options );
+		// overwrite attachments with 3D textures
 
-		this.texture.isRenderTargetTexture = true;
+		for ( let i = 0; i < this.textures.length; i ++ ) {
+
+			const texture = new Data3DTexture( null, width, height, depth );
+			texture.isRenderTargetTexture = true;
+			texture.renderTarget = this;
+
+			this.textures[ i ] = texture;
+
+		}
+
+		this._setTextureOptions( options );
 
 	}
 

@@ -1233,7 +1233,7 @@ class WebGLTextureUtils {
 	 * @param {number} y - The y coordinate of the copy origin.
 	 * @param {number} width - The width of the copy.
 	 * @param {number} height - The height of the copy.
-	 * @param {number} faceIndex - The face index.
+	 * @param {number} faceIndex - The cube face, depth slice or array layer index.
 	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operation has finished.
 	 */
 	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
@@ -1246,9 +1246,17 @@ class WebGLTextureUtils {
 
 		backend.state.bindFramebuffer( gl.READ_FRAMEBUFFER, fb );
 
-		const target = texture.isCubeTexture ? gl.TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex : gl.TEXTURE_2D;
+		if ( texture.isData3DTexture || texture.isDataArrayTexture || texture.isArrayTexture ) {
 
-		gl.framebufferTexture2D( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, target, textureGPU, 0 );
+			gl.framebufferTextureLayer( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, textureGPU, 0, faceIndex );
+
+		} else {
+
+			const target = texture.isCubeTexture ? gl.TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex : gl.TEXTURE_2D;
+
+			gl.framebufferTexture2D( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, target, textureGPU, 0 );
+
+		}
 
 		const typedArrayType = this._getTypedArrayType( glType );
 		const bytesPerTexel = this._getBytesPerTexel( glType, glFormat );
