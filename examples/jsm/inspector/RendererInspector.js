@@ -128,34 +128,19 @@ export class RendererInspector extends InspectorBase {
 
 		if ( this.overdraw === true ) {
 
-			this._renderOverdraw( frame );
+			this._renderOverdraw();
 
 		}
 
 	}
 
-	_renderOverdraw( frame ) {
+	_renderOverdraw() {
+
+		const primaryPass = this.getPrimaryPass();
+
+		if ( primaryPass === null ) return;
 
 		const renderer = this.getRenderer();
-
-		if ( renderer === null ) return;
-
-		// first scene render of the frame; nested shadow / RTT passes come after
-
-		let primary = null;
-
-		for ( const render of frame.renders ) {
-
-			if ( render.scene.isScene === true ) {
-
-				primary = render;
-				break;
-
-			}
-
-		}
-
-		if ( primary === null ) return;
 
 		if ( this._overdrawMaterial === null ) {
 
@@ -165,13 +150,12 @@ export class RendererInspector extends InspectorBase {
 				colorNode: vec3( 0.25 ),
 				blending: AdditiveBlending,
 				depthTest: true,
-				depthWrite: true,
-				toneMapped: false
+				depthWrite: true
 			} );
 
 		}
 
-		const { scene, camera } = primary;
+		const { scene, camera } = primaryPass;
 
 		// raw render against black with no tone mapping, so the count stays linear
 
@@ -222,6 +206,29 @@ export class RendererInspector extends InspectorBase {
 			renders: [],
 			computes: []
 		};
+
+	}
+
+	getPrimaryPass() {
+
+		const frame = this.getFrame();
+
+		// first scene render of the frame; nested shadow / RTT passes come after
+
+		let primary = null;
+
+		for ( const render of frame.renders ) {
+
+			if ( render.scene.isScene === true ) {
+
+				primary = render;
+				break;
+
+			}
+
+		}
+
+		return primary;
 
 	}
 
