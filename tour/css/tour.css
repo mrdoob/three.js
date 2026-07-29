@@ -2666,10 +2666,11 @@ body.preview-maximized .preview-hide-btn {
 .tsl-param-type {
 	font-family: 'Fira Code', monospace;
 	font-size: 0.7rem;
+	line-height: normal;
 	color: var(--text-muted);
 	background-color: var(--bg-main);
 	border: 1px solid var(--border-color);
-	padding: 0.0rem 0.4rem;
+	padding: 0.1rem 0.3rem;
 	border-radius: 4px;
 	white-space: nowrap;
 }

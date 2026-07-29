@@ -642,15 +642,15 @@ TSL provides all standard mathematical constants and functions as both direct fu
 
 ### Constants
 
-::: api EPSILON : float - Small floating-point precision value (`1e-6`). :::
+::: api EPSILON : float - Small floating-point precision value `1e-6`. :::
 
 ::: api INFINITY : float - Represents positive infinity. :::
 
-::: api PI : float - Mathematical constant π (`3.141592653589793`). :::
+::: api PI : float - Mathematical constant π `3.141592653589793`. :::
 
-::: api TWO_PI : float - Two times π (`6.283185307179586`). :::
+::: api TWO_PI : float - Two times π `6.283185307179586`. :::
 
-::: api HALF_PI : float - Half of π (`1.5707963267948966`). :::
+::: api HALF_PI : float - Half of π `1.5707963267948966`. :::
 
 ### Functions
 
@@ -724,7 +724,7 @@ TSL provides all standard mathematical constants and functions as both direct fu
 - **b**: `Node | number` - Second value or node.
 :::
 
-::: api distance( a, b ) : float - Computes the Euclidean distance between two points (`length(a - b)`).
+::: api distance( a, b ) : float - Computes the Euclidean distance between two points `length(a - b)`.
 - **a**: `Node` - First point or vector node.
 - **b**: `Node` - Second point or vector node.
 :::
@@ -1294,6 +1294,11 @@ model.material.colorNode = myVarying;
 
 The `array()` function in TSL allows creating constant or dynamic value arrays; there are many ways to create arrays in TSL.
 
+::: api array( array, type? ) : Node - Creates an array node.
+- **array**: `Array` - Array of initial values (e.g. `Color`, `Vector3`, numbers, etc.).
+- **type**: `string` - (Optional) TSL type name (e.g. `'float'`, `'vec3'`, etc.).
+:::
+
 To access the values you can use `a[ 1 ]` or `a.element( 1 )`. The difference is that `a[ 1 ]` only allows constant values, while `a.element( 1 )` allows the use of dynamic values such as `a.element( index )` where index is a node.
 
 ```js
@@ -1306,6 +1311,13 @@ const colors = array( [
 const greenColor = colors.element( 1 ); // vec3( 0, 1, 0 )
 ```
 
+Define an array type explicitly:
+
+```js
+const a = array( [ 0, 1, 2 ], 'uint' );
+const value = a.element( 1 ); // 1u
+```
+
 Array fixed size:
 
 ```js
@@ -1316,13 +1328,6 @@ Fill an array with a default value:
 
 ```js
 const a = vec3( 0, 0, 1 ).toArray( 2 ); // [ vec3( 0, 0, 1 ), vec3( 0, 0, 1 ) ]
-```
-
-Define an array type explicitly:
-
-```js
-const a = array( [ 0, 1, 2 ], 'uint' );
-const value = a.element( 1 ); // 1u
 ```
 
 ```tsl
@@ -1419,12 +1424,17 @@ conditional shader branches.
 > Important: Notice here `If`, `ElseIf`, `Else` are capitalized.
 
 ```js
+If( conditional, () => {
 
-Fn( () => {
+	// Do something...
 
-	If( conditional, function )
-	.ElseIf( conditional, function )
-	.Else( function )
+} ).ElseIf( conditional, () => {
+
+	// Do something else...
+
+} ).Else( () => {
+
+	// Do something else...
 
 } );
 ```

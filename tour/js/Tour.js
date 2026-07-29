@@ -228,7 +228,7 @@ class Tour {
 			let html = `<span class="badge-prefix">r</span><span class="badge-number">${ num }</span>`;
 			if ( isDev ) {
 
-				html += `<span class="badge-suffix">dev</span>`;
+				html += '<span class="badge-suffix">dev</span>';
 
 			}
 
@@ -272,11 +272,29 @@ class Tour {
 		this.renderer.setPixelRatio( window.devicePixelRatio );
 		this.renderer.setSize( Math.max( this.dom.previewContainer.clientWidth, 1 ), Math.max( this.dom.previewContainer.clientHeight, 1 ) );
 		this.renderer.setAnimationLoop( this.animate );
-		//this.renderer.inspector = new Inspector();
+		this.renderer.inspector = new Inspector();
+		this.renderer.inspector.setDefaultAlign( 'left', 'top' );
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.shadowMap.type = THREE.PCFShadowMap;
 		this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
 		this.dom.previewContainer.appendChild( this.renderer.domElement );
+
+		// Hide inspector when in collapsed-workspace (.preview-box) mode
+		const updateInspectorVisibility = () => {
+
+			if ( this.renderer && this.renderer.inspector ) {
+
+				const isCollapsed = document.body.classList.contains( 'collapsed-workspace' );
+				this.renderer.inspector.setVisible( ! isCollapsed );
+
+			}
+
+		};
+
+		updateInspectorVisibility();
+
+		const layoutObserver = new MutationObserver( updateInspectorVisibility );
+		layoutObserver.observe( document.body, { attributes: true, attributeFilter: [ 'class' ] } );
 
 		this.webGLRenderer = new THREE.WebGPURenderer( { forceWebGL: true } );
 		this.webGLRenderer.debug.diagnostics.keywords = true;
@@ -1044,7 +1062,7 @@ class Tour {
 
 		}
 
-		let description = page.description;
+		const description = page.description;
 
 		this.dom.contentArea.innerHTML = '<div style="max-width: 800px; margin: 0 auto; width: 100%; position: relative;">' +
 			'<button id="copy-code-btn" class="copy-code-btn" title="Copy Markdown">' +
