@@ -2781,7 +2781,8 @@ Custom procedural backgrounds and skyboxes assigned directly to `scene.backgroun
 
 ```tsl iblSky
 import 'scenes/empty';
-import { positionWorldDirection, pmremTexture, color, float, vec3, time, smoothstep, mx_noise_float, Fn } from 'three/tsl';
+import { RepeatWrapping } from 'three';
+import { positionWorldDirection, pmremTexture, color, float, vec3, time, smoothstep, mx_noise_float, Fn, rtt, uv } from 'three/tsl';
 
 // 1. Ray Direction Vector & Corrected IBL Sampling Direction
 const dir = positionWorldDirection;
@@ -2796,9 +2797,12 @@ const groundColor = iblSky.mul( 0.2 );
 const skyY = dir.y.clamp( 0.001, 1.0 ).pow( 0.7 ).max( 0.08 );
 const perspectivePos = vec3( dir.x.div( skyY ), float( 1.0 ), dir.z.div( skyY ) );
 
-// 4. Volumetric FBM Cloud Noise
-const cloudNoise = Fn( ( [ p ] ) => {
+// 4. Volumetric FBM Cloud Noise RTT
+const rttScale = float( 0.02 );
 
+const noiseNode = Fn( ( [ uvNode ] ) => {
+
+	const p = vec3( uvNode.x, float( 1.0 ), uvNode.y ).div( rttScale );
 	const wind = vec3( time.mul( 0.1 ), 0.0, time.mul( 0.015 ) );
 	const animatedP = p.mul( 0.3 ).add( wind );
 
@@ -2808,7 +2812,13 @@ const cloudNoise = Fn( ( [ p ] ) => {
 	const n4 = mx_noise_float( animatedP.mul( 8.0 ) ).mul( 0.5 ).add( 0.5 ).mul( 0.0625 );
 
 	return n1.add( n2 ).add( n3 ).add( n4 );
+
 } );
+
+const cloudNoiseRTT = rtt( noiseNode( uv() ), 1024, 1024, { wrapS: RepeatWrapping, wrapT: RepeatWrapping } );
+
+const cloudNoise = ( uv ) => cloudNoiseRTT.sample( uv.xz.mul( rttScale ).add( 0.5 ) ).x;
+// const cloudNoise = ( uv ) => noiseNode( uv.xz.mul( rttScale ) ).x;
 
 // Smooth anti-aliased cloud density
 const fbmVal = cloudNoise( perspectivePos );
