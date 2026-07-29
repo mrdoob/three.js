@@ -309,14 +309,14 @@ class Rhino3dmLoader extends Loader {
 		const mat = new MeshPhysicalMaterial( {
 
 			color: new Color( material.diffuseColor.r / 255.0, material.diffuseColor.g / 255.0, material.diffuseColor.b / 255.0 ),
-			emissive: new Color( material.emissionColor.r, material.emissionColor.g, material.emissionColor.b ),
+			emissive: new Color( material.emissionColor.r / 255.0, material.emissionColor.g / 255.0, material.emissionColor.b / 255.0 ),
 			flatShading: material.disableLighting,
 			ior: material.indexOfRefraction,
 			name: material.name,
 			reflectivity: material.reflectivity,
 			opacity: 1.0 - material.transparency,
 			side: DoubleSide,
-			specularColor: material.specularColor,
+			specularColor: new Color( material.specularColor.r / 255.0, material.specularColor.g / 255.0, material.specularColor.b / 255.0 ),
 			transparent: material.transparency > 0 ? true : false
 
 		} );
@@ -333,20 +333,18 @@ class Rhino3dmLoader extends Loader {
 			mat.clearcoat = pbr.clearcoat;
 			mat.clearcoatRoughness = pbr.clearcoatRoughness;
 			mat.metalness = pbr.metallic;
-			mat.transmission = 1 - pbr.opacity;
 			mat.roughness = pbr.roughness;
 			mat.sheen = pbr.sheen;
 			mat.specularIntensity = pbr.specular;
 			mat.thickness = pbr.subsurface;
 
-		}
-
-		if ( material.pbrSupported && material.pbr.opacity === 0 && material.transparency === 1 ) {
-
-			//some compromises
-
-			mat.opacity = 0.2;
-			mat.transmission = 1.00;
+			// Rhino PBR Opacity is coverage/alpha, not glass transmission, and is
+			// 1 = opaque (glTF/Disney convention, matching three.js mat.opacity — unlike
+			// the legacy Material.transparency used above, which is 0 = opaque). Map it
+			// straight to opacity so it behaves as pure alpha; leave mat.transmission at
+			// its default (0) rather than deriving glass from opacity. (RH3DM-190)
+			mat.opacity = pbr.opacity;
+			mat.transparent = pbr.opacity < 1.0;
 
 		}
 
