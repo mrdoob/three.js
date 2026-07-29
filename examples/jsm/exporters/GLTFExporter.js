@@ -688,7 +688,7 @@ class GLTFWriter {
 		// Update bytelength of the single buffer.
 		if ( json.buffers && json.buffers.length > 0 ) json.buffers[ 0 ].byteLength = blob.size;
 
-		if ( options.copyright !== null && options.copyright !== undefined ) json.asset.copyright = options.copyright;
+		if ( options.copyright ) json.asset.copyright = options.copyright;
 
 		if ( options.binary === true ) {
 
