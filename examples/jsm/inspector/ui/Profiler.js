@@ -20,8 +20,8 @@ export class Profiler extends EventDispatcher {
 		this.maxZIndex = 1002; // Track the highest z-index for detached windows (starts at base z-index from CSS)
 		this.nextTabOriginalIndex = 0; // Track the original order of tabs as they are added
 
-		this.defaultHorizontal = 'right'; // 'left' or 'right'
-		this.defaultVertical = 'top';     // 'top' or 'bottom'
+		this.horizontalAlign = 'right'; // 'left' or 'right'
+		this.verticalAlign = 'top';     // 'top' or 'bottom'
 
 		this.setupShell();
 		this.setupResizing();
@@ -2124,11 +2124,21 @@ export class Profiler extends EventDispatcher {
 
 	}
 
-	setDefaultAlign( horizontal, vertical ) {
+	setHorizontalAlign( value ) {
 
-		this.defaultHorizontal = horizontal;
-		this.defaultVertical = vertical;
+		this.horizontalAlign = value;
 		this.updateWidgetPosition();
+
+		return this;
+
+	}
+
+	setVerticalAlign( value ) {
+
+		this.verticalAlign = value;
+		this.updateWidgetPosition();
+
+		return this;
 
 	}
 
@@ -2138,8 +2148,8 @@ export class Profiler extends EventDispatcher {
 		const isMaximized = this.panel.classList.contains( 'maximized' );
 		const isRight = this.position === 'right';
 
-		let horizontal = this.defaultHorizontal; // 'left' or 'right'
-		let vertical = this.defaultVertical;     // 'top' or 'bottom'
+		let horizontal = this.horizontalAlign; // 'left' or 'right'
+		let vertical = this.verticalAlign;     // 'top' or 'bottom'
 
 		if ( isVisible ) {
 
@@ -2147,7 +2157,7 @@ export class Profiler extends EventDispatcher {
 
 				// If panel is open on the right:
 				// Toggle should be on the opposite side of 'right' if default is 'right' to avoid overlapping the panel.
-				if ( this.defaultHorizontal === 'right' ) {
+				if ( this.horizontalAlign === 'right' ) {
 
 					horizontal = 'left';
 
@@ -2159,7 +2169,7 @@ export class Profiler extends EventDispatcher {
 				if ( ! isMaximized ) {
 
 					// If default is bottom, we must move to top to avoid overlapping the panel at the bottom.
-					if ( this.defaultVertical === 'bottom' ) {
+					if ( this.verticalAlign === 'bottom' ) {
 
 						vertical = 'top';
 
@@ -2168,7 +2178,7 @@ export class Profiler extends EventDispatcher {
 				} else {
 
 					// If maximized, move to the opposite vertical position to avoid overlap with header/tabs.
-					vertical = this.defaultVertical === 'top' ? 'bottom' : 'top';
+					vertical = this.verticalAlign === 'top' ? 'bottom' : 'top';
 
 				}
 

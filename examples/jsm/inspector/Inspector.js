@@ -163,9 +163,17 @@ class Inspector extends RendererInspector {
 
 	}
 
-	setDefaultAlign( horizontal, vertical ) {
+	setHorizontalAlign( value ) {
 
-		this.profiler.setDefaultAlign( horizontal, vertical );
+		this.profiler.setHorizontalAlign( value );
+
+		return this;
+
+	}
+
+	setVerticalAlign( value ) {
+
+		this.profiler.setVerticalAlign( value );
 
 		return this;
 
