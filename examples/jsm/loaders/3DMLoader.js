@@ -1,4 +1,6 @@
 import {
+	BufferAttribute,
+	BufferGeometry,
 	BufferGeometryLoader,
 	CanvasTexture,
 	ClampToEdgeWrapping,
@@ -30,6 +32,7 @@ import {
 import { EXRLoader } from '../loaders/EXRLoader.js';
 
 const _taskCache = new WeakMap();
+const _bufferGeometryLoader = new BufferGeometryLoader();
 
 /**
  * A loader for Rhinoceros 3D files and objects.
@@ -38,11 +41,11 @@ const _taskCache = new WeakMap();
  * animate, and translate NURBS curves, surfaces, breps, extrusions, point clouds,
  * as well as polygon meshes and SubD objects. `rhino3dm.js` is compiled to WebAssembly
  * from the open source geometry library `openNURBS`. The loader currently uses
- * `rhino3dm.js 8.4.0`.
+ * `rhino3dm.js 8.32.0`.
  *
  * ```js
  * const loader = new Rhino3dmLoader();
- * loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@8.17.0/' );
+ * loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@8.32.0/' );
  *
  * const object = await loader.loadAsync( 'models/3dm/Rhino_Logo.3dm' );
  * scene.add( object );
@@ -77,6 +80,10 @@ class Rhino3dmLoader extends Loader {
 		this.workerSourceURL = '';
 		this.workerConfig = {};
 
+		// Number of global subdivisions applied to SubD objects before meshing. Higher
+		// values increase smoothness at the cost of (potentially very large) vertex counts.
+		this.subdivisionLevel = 3;
+
 		this.materials = [];
 		this.warnings = [];
 
@@ -107,6 +114,22 @@ class Rhino3dmLoader extends Loader {
 	setWorkerLimit( workerLimit ) {
 
 		this.workerLimit = workerLimit;
+
+		return this;
+
+	}
+
+	/**
+	 * Sets the number of global subdivisions applied to SubD objects before they are
+	 * meshed for display. The default is `3`. Large models with many SubD objects may
+	 * benefit from a lower value to keep vertex counts manageable.
+	 *
+	 * @param {number} level - The subdivision level.
+	 * @return {Rhino3dmLoader} A reference to this loader.
+	 */
+	setSubdivisionLevel( level ) {
+
+		this.subdivisionLevel = level;
 
 		return this;
 
@@ -189,9 +212,7 @@ class Rhino3dmLoader extends Loader {
 
 					worker._callbacks[ taskID ] = { resolve, reject };
 
-					worker.postMessage( { type: 'decode', id: taskID, buffer }, [ buffer ] );
-
-					// this.debug();
+					worker.postMessage( { type: 'decode', id: taskID, buffer, subdivisionLevel: this.subdivisionLevel }, [ buffer ] );
 
 				} );
 
@@ -213,7 +234,6 @@ class Rhino3dmLoader extends Loader {
 
 					this._releaseTask( worker, taskID );
 
-					//this.debug();
 
 				}
 
@@ -249,6 +269,23 @@ class Rhino3dmLoader extends Loader {
 
 			} )
 			.catch( e => onError( e ) );
+
+	}
+
+	/**
+	 * Parses the given 3DM data and returns a Promise that resolves with the loaded asset.
+	 *
+	 * @param {ArrayBuffer} data - The raw 3DM asset data as an array buffer.
+	 * @return {Promise<Object3D>} A Promise that resolves with the decoded 3D object.
+	 */
+	parseAsync( data ) {
+
+		return this.decodeObjects( data, '' ).then( result => {
+
+			result.userData.warnings = this.warnings;
+			return result;
+
+		} );
 
 	}
 
@@ -304,7 +341,6 @@ class Rhino3dmLoader extends Loader {
 
 		}
 
-		//console.log(material)
 
 		const mat = new MeshPhysicalMaterial( {
 
@@ -358,7 +394,6 @@ class Rhino3dmLoader extends Loader {
 
 				const map = textureLoader.load( texture.image );
 
-				//console.log(texture.type )
 
 				switch ( texture.type ) {
 
@@ -529,7 +564,6 @@ class Rhino3dmLoader extends Loader {
 		object.userData[ 'settings' ] = data.settings;
 		object.userData.settings[ 'renderSettings' ] = data.renderSettings;
 		object.userData[ 'objectType' ] = 'File3dm';
-		object.userData[ 'materials' ] = null;
 
 		object.name = this.url;
 
@@ -675,15 +709,38 @@ class Rhino3dmLoader extends Loader {
 
 		}
 
-		object.userData[ 'materials' ] = this.materials;
 		object.name = '';
 		return object;
 
 	}
 
-	_createObject( obj, mat ) {
+	/**
+	 * Builds a BufferGeometry from a worker payload. Meshes decoded via the fast path
+	 * arrive as transferable typed arrays (`format: 'buffers'`) and are assembled directly;
+	 * everything else falls back to the three.js BufferGeometry JSON produced by
+	 * `toThreejsJSON()` (older rhino3dm, point clouds, curves, …).
+	 */
+	_geometryFromData( data ) {
 
-		const loader = new BufferGeometryLoader();
+		if ( data && data.format === 'buffers' ) {
+
+			const geometry = new BufferGeometry();
+
+			if ( data.position && data.position.length ) geometry.setAttribute( 'position', new BufferAttribute( data.position, 3 ) );
+			if ( data.normal && data.normal.length ) geometry.setAttribute( 'normal', new BufferAttribute( data.normal, 3 ) );
+			if ( data.uv && data.uv.length ) geometry.setAttribute( 'uv', new BufferAttribute( data.uv, 2 ) );
+			if ( data.color && data.color.length ) geometry.setAttribute( 'color', new BufferAttribute( data.color, 3 ) );
+			if ( data.index && data.index.length ) geometry.setIndex( new BufferAttribute( data.index, 1 ) );
+
+			return geometry;
+
+		}
+
+		return _bufferGeometryLoader.parse( data );
+
+	}
+
+	_createObject( obj, mat ) {
 
 		const attributes = obj.attributes;
 
@@ -694,7 +751,7 @@ class Rhino3dmLoader extends Loader {
 			case 'Point':
 			case 'PointSet':
 
-				geometry = loader.parse( obj.geometry );
+				geometry = this._geometryFromData( obj.geometry );
 
 				if ( geometry.hasAttribute( 'color' ) ) {
 
@@ -729,7 +786,7 @@ class Rhino3dmLoader extends Loader {
 
 				if ( obj.geometry === null ) return;
 
-				geometry = loader.parse( obj.geometry );
+				geometry = this._geometryFromData( obj.geometry );
 
 
 				if ( mat === null ) {
@@ -763,7 +820,7 @@ class Rhino3dmLoader extends Loader {
 
 			case 'Curve':
 
-				geometry = loader.parse( obj.geometry );
+				geometry = this._geometryFromData( obj.geometry );
 
 				_color = attributes.drawColor;
 				color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
@@ -1086,16 +1143,20 @@ function Rhino3dmWorker() {
 
 				taskID = message.id;
 				const buffer = message.buffer;
+				const subdivisionLevel = message.subdivisionLevel != null ? message.subdivisionLevel : 3;
 				libraryPending.then( () => {
 
 					try {
 
-						const data = decodeObjects( rhino, buffer );
-						self.postMessage( { type: 'decode', id: message.id, data } );
+						const data = decodeObjects( rhino, buffer, subdivisionLevel );
+						// Transfer the mesh typed arrays (fast path) instead of structure-cloning
+						// them across the worker boundary.
+						self.postMessage( { type: 'decode', id: message.id, data }, collectTransferables( data ) );
 
 					} catch ( error ) {
 
-						self.postMessage( { type: 'error', id: message.id, error } );
+						// Error objects don't always survive structured clone with their stack intact.
+						self.postMessage( { type: 'error', id: message.id, error: { message: error.message, stack: error.stack } } );
 
 					}
 
@@ -1107,7 +1168,57 @@ function Rhino3dmWorker() {
 
 	};
 
-	function decodeObjects( rhino, buffer ) {
+	// Converts a rhino3dm mesh to a Three.js payload. When the wasm build supports it
+	// (rhino3dm >= 8.32), returns transferable typed arrays tagged `format: 'buffers'`;
+	// otherwise falls back to the element-by-element BufferGeometry JSON. Point clouds
+	// (which lack toThreejsBuffers) also take the fallback.
+	function meshToThreejs( geom ) {
+
+		if ( typeof geom.toThreejsBuffers === 'function' ) {
+
+			const b = geom.toThreejsBuffers( false );
+			const g = { format: 'buffers', position: b.position, normal: b.normal, index: b.index };
+			if ( b.uv ) g.uv = b.uv;
+			if ( b.color ) g.color = b.color;
+			return g;
+
+		}
+
+		return geom.toThreejsJSON();
+
+	}
+
+	// Gathers the ArrayBuffers backing every fast-path mesh so postMessage can transfer
+	// (move) them to the main thread instead of copying.
+	function collectTransferables( data ) {
+
+		const transfer = new Set();
+
+		if ( data && data.objects ) {
+
+			for ( const obj of data.objects ) {
+
+				const g = obj.geometry;
+
+				if ( g && g.format === 'buffers' ) {
+
+					for ( const key of [ 'position', 'normal', 'uv', 'color', 'index' ] ) {
+
+						if ( g[ key ] && g[ key ].buffer ) transfer.add( g[ key ].buffer );
+
+					}
+
+				}
+
+			}
+
+		}
+
+		return Array.from( transfer );
+
+	}
+
+	function decodeObjects( rhino, buffer, subdivisionLevel ) {
 
 		const arr = new Uint8Array( buffer );
 		const doc = rhino.File3dm.fromByteArray( arr );
@@ -1129,7 +1240,7 @@ function Rhino3dmWorker() {
 
 			const _object = objs.get( i );
 
-			const object = extractObjectData( _object, doc );
+			const object = extractObjectData( _object, doc, subdivisionLevel );
 
 			_object.delete();
 
@@ -1142,7 +1253,6 @@ function Rhino3dmWorker() {
 		}
 
 		// Handle instance definitions
-		// console.log( `Instance Definitions Count: ${doc.instanceDefinitions().count()}` );
 
 		for ( let i = 0; i < doc.instanceDefinitions().count; i ++ ) {
 
@@ -1274,15 +1384,11 @@ function Rhino3dmWorker() {
 		//TODO: Handle other document stuff like dimstyles, instance definitions, bitmaps etc.
 
 		// Handle dimstyles
-		// console.log( `Dimstyle Count: ${doc.dimstyles().count()}` );
 
 		// Handle bitmaps
-		// console.log( `Bitmap Count: ${doc.bitmaps().count()}` );
 
 		// Handle strings
-		// console.log( `Document Strings Count: ${doc.strings().count()}` );
 		// Note: doc.strings().documentUserTextCount() counts any doc.strings defined in a section
-		// console.log( `Document User Text Count: ${doc.strings().documentUserTextCount()}` );
 
 		const strings_count = doc.strings().count;
 
@@ -1435,7 +1541,7 @@ function Rhino3dmWorker() {
 
 	}
 
-	function extractObjectData( object, doc ) {
+	function extractObjectData( object, doc, subdivisionLevel ) {
 
 		const _geometry = object.geometry();
 		const _attributes = object.attributes();
@@ -1505,7 +1611,7 @@ function Rhino3dmWorker() {
 			case rhino.ObjectType.PointSet:
 			case rhino.ObjectType.Mesh:
 
-				geometry = _geometry.toThreejsJSON();
+				geometry = meshToThreejs( _geometry );
 
 				break;
 
@@ -1533,7 +1639,7 @@ function Rhino3dmWorker() {
 				if ( mesh.faces().count > 0 ) {
 
 					mesh.compact();
-					geometry = mesh.toThreejsJSON();
+					geometry = meshToThreejs( mesh );
 					faces.delete();
 
 				}
@@ -1548,7 +1654,7 @@ function Rhino3dmWorker() {
 
 				if ( mesh ) {
 
-					geometry = mesh.toThreejsJSON();
+					geometry = meshToThreejs( mesh );
 					mesh.delete();
 
 				}
@@ -1590,11 +1696,11 @@ function Rhino3dmWorker() {
 			case rhino.ObjectType.SubD:
 
 				// TODO: precalculate resulting vertices and faces and warn on excessive results
-				_geometry.subdivide( 3 );
+				_geometry.subdivide( subdivisionLevel );
 				mesh = rhino.Mesh.createFromSubDControlNet( _geometry, false );
 				if ( mesh ) {
 
-					geometry = mesh.toThreejsJSON();
+					geometry = meshToThreejs( mesh );
 					mesh.delete();
 
 				}
@@ -1704,7 +1810,6 @@ function Rhino3dmWorker() {
 			} else {
 
 				// these are functions that could be called to extract more data.
-				//console.log( `${property}: ${object[ property ].constructor.name}` );
 
 			}
 
