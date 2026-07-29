@@ -262,25 +262,51 @@ class FirstPersonControls extends Controls {
 
 		if ( this.enabled === false ) return;
 
-		const moveForward = this._keyForward || this._pointerForward;
-		const moveBackward = this._keyBackward || this._pointerBackward;
+		let drive = ( this._keyForward ? 1 : 0 ) - ( this._keyBackward ? 1 : 0 );
+		let lookMove = ( this._pointerForward ? 1 : 0 ) - ( this._pointerBackward ? 1 : 0 );
 
-		const forward = moveForward || ( this.autoForward && ! moveBackward );
-
-		// target velocity in the object's local space
-
-		_targetVelocity.set(
-			( this._moveRight ? 1 : 0 ) - ( this._moveLeft ? 1 : 0 ),
-			( this._moveUp ? 1 : 0 ) - ( this._moveDown ? 1 : 0 ),
-			( moveBackward ? 1 : 0 ) - ( forward ? 1 : 0 )
-		).multiplyScalar( this.movementSpeed );
+		if ( this.autoForward && drive === 0 && lookMove === 0 ) lookMove = 1;
 
 		// faster forward movement the higher the camera is
 
-		if ( forward && this.heightSpeed ) {
+		let forwardSpeed = this.movementSpeed;
+
+		if ( this.heightSpeed ) {
 
 			const y = MathUtils.clamp( this.object.position.y, this.heightMin, this.heightMax );
-			_targetVelocity.z -= ( y - this.heightMin ) * this.heightCoef;
+			forwardSpeed += ( y - this.heightMin ) * this.heightCoef;
+
+		}
+
+		// target velocity in world space: keys are world axis aligned, moving in the
+		// XZ plane from the camera's yaw only (Q / E along world Y), while pointer
+		// and touch input moves along the look direction
+
+		const yaw = MathUtils.degToRad( this._lon );
+		const sinYaw = Math.sin( yaw );
+		const cosYaw = Math.cos( yaw );
+
+		let strafe = ( this._moveRight ? 1 : 0 ) - ( this._moveLeft ? 1 : 0 );
+		let climb = ( this._moveUp ? 1 : 0 ) - ( this._moveDown ? 1 : 0 );
+
+		// normalize combined key input so diagonal movement isn't faster
+
+		const keyScale = 1 / Math.max( 1, Math.sqrt( strafe * strafe + climb * climb + drive * drive ) );
+
+		strafe *= this.movementSpeed * keyScale;
+		climb *= this.movementSpeed * keyScale;
+		drive *= ( drive > 0 ? forwardSpeed : this.movementSpeed ) * keyScale;
+
+		_targetVelocity.set(
+			sinYaw * drive - cosYaw * strafe,
+			climb,
+			cosYaw * drive + sinYaw * strafe
+		);
+
+		if ( lookMove !== 0 ) {
+
+			_lookDirection.set( 0, 0, - 1 ).applyQuaternion( this.object.quaternion );
+			_targetVelocity.addScaledVector( _lookDirection, lookMove * ( lookMove > 0 ? forwardSpeed : this.movementSpeed ) );
 
 		}
 
@@ -288,9 +314,7 @@ class FirstPersonControls extends Controls {
 
 		this._velocity.lerp( _targetVelocity, this.dampingFactor );
 
-		this.object.translateX( this._velocity.x * delta );
-		this.object.translateY( this._velocity.y * delta );
-		this.object.translateZ( this._velocity.z * delta );
+		this.object.position.addScaledVector( this._velocity, delta );
 
 		let verticalLookRatio = 1;
 

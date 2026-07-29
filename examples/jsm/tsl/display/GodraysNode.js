@@ -1,5 +1,5 @@
 import { Frustum, Matrix4, RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType, Vector3, Plane } from 'three/webgpu';
-import { cubeTexture, clamp, viewZToPerspectiveDepth, logarithmicDepthToViewZ, float, Loop, max, Fn, passTexture, uv, dot, uniformArray, If, getViewPosition, uniform, vec4, add, interleavedGradientNoise, screenCoordinate, round, mul, uint, mix, exp, vec3, distance, pow, reference, lightPosition, vec2, bool, texture, perspectiveDepthToViewZ, lightShadowMatrix } from 'three/tsl';
+import { cubeTexture, clamp, viewZToPerspectiveDepth, logarithmicDepthToViewZ, float, Loop, max, Fn, passTexture, uv, dot, uniformArray, If, getViewPosition, uniform, vec4, add, interleavedGradientNoise, screenCoordinate, round, mul, uint, mix, exp, vec3, distance, pow, reference, lightPosition, vec2, bool, texture, perspectiveDepthToViewZ, lightShadowMatrix, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -579,7 +579,8 @@ class GodraysNode extends TempNode {
 
 		} );
 
-		this._material.fragmentNode = godrays().context( builder.getSharedContext() );
+		this._material.contextNode = context( builder.getSharedContext() );
+		this._material.fragmentNode = godrays();
 		this._material.needsUpdate = true;
 
 		return this._textureNode;

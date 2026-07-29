@@ -672,6 +672,7 @@ class BufferAttribute extends EventDispatcher {
 
 		if ( this.name !== '' ) data.name = this.name;
 		if ( this.usage !== StaticDrawUsage ) data.usage = this.usage;
+		if ( this.gpuType !== FloatType ) data.gpuType = this.gpuType;
 
 		return data;
 

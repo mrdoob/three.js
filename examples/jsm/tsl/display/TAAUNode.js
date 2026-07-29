@@ -1,5 +1,5 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
-import { add, exp, float, If, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth, struct, ivec2, mix, property, outputStruct } from 'three/tsl';
+import { add, exp, float, If, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth, struct, ivec2, mix, property, outputStruct, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -501,13 +501,13 @@ class TAAUNode extends TempNode {
 	 */
 	setup( builder ) {
 
-		const renderPipeline = builder.context.renderPipeline;
+		if ( builder.renderPipeline && ! builder.context.renderPipelineState.viewOffsetOwner ) {
 
-		if ( renderPipeline ) {
+			builder.context.renderPipelineState.viewOffsetOwner = this;
 
 			this._needsPostProcessingSync = true;
 
-			renderPipeline.context.onBeforeRenderPipeline = () => {
+			OnBeforeRenderPipeline( () => {
 
 				const beautyRenderTarget = ( this.beautyNode.isRTTNode ) ? this.beautyNode.renderTarget : this.beautyNode.passNode.renderTarget;
 
@@ -516,13 +516,13 @@ class TAAUNode extends TempNode {
 
 				this.setViewOffset( inputWidth, inputHeight );
 
-			};
+			} );
 
-			renderPipeline.context.onAfterRenderPipeline = () => {
+			OnAfterRenderPipeline( () => {
 
 				this.clearViewOffset();
 
-			};
+			} );
 
 		}
 
@@ -763,6 +763,9 @@ class TAAUNode extends TempNode {
 
 		// materials
 
+		const sharedContext = context( builder.getSharedContext() );
+
+		this._resolveMaterial.contextNode = sharedContext;
 		this._resolveMaterial.colorNode = resolve();
 		this._resolveMaterial.outputNode = outputNode;
 
@@ -775,6 +778,7 @@ class TAAUNode extends TempNode {
 
 		} )();
 
+		this._seedMaterial.contextNode = sharedContext;
 		this._seedMaterial.outputNode = outputNode;
 
 		return this._textureNode;

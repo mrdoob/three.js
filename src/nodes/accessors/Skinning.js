@@ -1,5 +1,5 @@
 
-import { Fn, add, uniform } from '../tsl/TSLBase.js';
+import { Fn, add, uniform, mat3 } from '../tsl/TSLBase.js';
 import { attribute } from '../core/AttributeNode.js';
 import { OnObjectUpdate } from '../utils/EventNode.js';
 import { normalLocal } from './Normal.js';
@@ -78,8 +78,10 @@ function getSkinnedNormalAndTangent( boneMatrices, normal, tangent, bindMatrix, 
 
 	skinMatrix = bindMatrixInverse.mul( skinMatrix ).mul( bindMatrix );
 
-	const skinNormal = skinMatrix.transformDirection( normal ).xyz;
-	const skinTangent = skinMatrix.transformDirection( tangent ).xyz;
+	const skinMatrix3 = mat3( skinMatrix );
+
+	const skinNormal = skinMatrix3.mul( normal );
+	const skinTangent = skinMatrix3.mul( tangent );
 
 	return { skinNormal, skinTangent };
 

@@ -15,6 +15,8 @@ import { isTypedArray, warnOnce, warn, error } from '../../utils.js';
 import { WebGLCoordinateSystem, TimestampQuery, Compatibility } from '../../constants.js';
 import WebGLTimestampQueryPool from './utils/WebGLTimestampQueryPool.js';
 
+const _invalidationArray = [];
+
 /**
  * A backend implementation targeting WebGL 2.
  *
@@ -519,6 +521,12 @@ class WebGLBackend extends Backend {
 			renderContextData.occlusionQueryObjects = new Array( occlusionQueryCount );
 			renderContextData.occlusionQueryIndex = 0;
 
+		} else if ( renderContextData.lastOcclusionObject !== undefined ) {
+
+			// invalidate if there is a stale query
+
+			renderContextData.lastOcclusionObject = undefined;
+
 		}
 
 	}
@@ -541,7 +549,9 @@ class WebGLBackend extends Backend {
 
 		if ( occlusionQueryCount > 0 ) {
 
-			if ( occlusionQueryCount > renderContextData.occlusionQueryIndex ) {
+			const lastOcclusionObject = renderContextData.lastOcclusionObject;
+
+			if ( lastOcclusionObject && lastOcclusionObject.occlusionTest === true ) {
 
 				gl.endQuery( gl.ANY_SAMPLES_PASSED );
 
@@ -630,14 +640,14 @@ class WebGLBackend extends Backend {
 
 			const check = () => {
 
-				let completed = 0;
+				let completed = true;
 
 				// check all queries and requeue as appropriate
 				for ( let i = 0; i < currentOcclusionQueries.length; i ++ ) {
 
 					const query = currentOcclusionQueries[ i ];
 
-					if ( query === null ) continue;
+					if ( ! query ) continue;
 
 					if ( gl.getQueryParameter( query, gl.QUERY_RESULT_AVAILABLE ) ) {
 
@@ -646,13 +656,15 @@ class WebGLBackend extends Backend {
 						currentOcclusionQueries[ i ] = null;
 						gl.deleteQuery( query );
 
-						completed ++;
+					} else {
+
+						completed = false;
 
 					}
 
 				}
 
-				if ( completed < currentOcclusionQueries.length ) {
+				if ( completed === false ) {
 
 					requestAnimationFrame( check );
 
@@ -1426,7 +1438,7 @@ class WebGLBackend extends Backend {
 	 * @param {number} y - The y coordinate of the copy origin.
 	 * @param {number} width - The width of the copy.
 	 * @param {number} height - The height of the copy.
-	 * @param {number} faceIndex - The face index.
+	 * @param {number} faceIndex - The cube face, depth slice or array layer index.
 	 * @return {Promise<TypedArray>} A Promise that resolves with a typed array when the copy operation has finished.
 	 */
 	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
@@ -1710,10 +1722,11 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {ComputePipeline} computePipeline - The compute pipeline.
 	 * @param {Array<BindGroup>} bindings - The bindings.
+	 * @param {?Array<Promise>} [promises=null] - Optional compilation promises.
 	 */
-	createComputePipeline( computePipeline, bindings ) {
+	createComputePipeline( computePipeline, bindings, promises = null ) {
 
-		const { state, gl } = this;
+		const { gl } = this;
 
 		// Program
 
@@ -1756,19 +1769,6 @@ class WebGLBackend extends Backend {
 
 		gl.linkProgram( programGPU );
 
-		if ( gl.getProgramParameter( programGPU, gl.LINK_STATUS ) === false ) {
-
-			this._logProgramError( programGPU, fragmentShader, vertexShader );
-
-
-		}
-
-		state.useProgram( programGPU );
-
-		// Bindings
-
-		this._setupBindings( bindings, programGPU );
-
 		const attributeNodes = computeProgram.attributes;
 		const attributes = [];
 		const transformBuffers = [];
@@ -1795,13 +1795,72 @@ class WebGLBackend extends Backend {
 
 		}
 
-		//
+		// Store pipeline data
 
 		this.set( computePipeline, {
 			programGPU,
+			fragmentShader,
+			vertexShader,
 			transformBuffers,
 			attributes
 		} );
+
+		if ( promises !== null && this.parallel ) {
+
+			const parallel = this.parallel;
+
+			const p = new Promise( ( resolve ) => {
+
+				const checkStatus = () => {
+
+					if ( gl.getProgramParameter( programGPU, parallel.COMPLETION_STATUS_KHR ) ) {
+
+						this._completeComputeCompile( computePipeline, bindings );
+						resolve();
+
+					} else {
+
+						requestAnimationFrame( checkStatus );
+
+					}
+
+				};
+
+				checkStatus();
+
+			} );
+
+			promises.push( p );
+			return;
+
+		}
+
+		// Sync fallback
+		this._completeComputeCompile( computePipeline, bindings );
+
+	}
+
+	/**
+	 * Completes the compute pipeline setup for the given compute pipeline.
+	 *
+	 * @param {ComputePipeline} computePipeline - The compute pipeline.
+	 * @param {Array<BindGroup>} bindings - Array of bind groups.
+	 */
+	_completeComputeCompile( computePipeline, bindings ) {
+
+		const { state, gl } = this;
+		const { programGPU, fragmentShader, vertexShader } = this.get( computePipeline );
+
+		if ( gl.getProgramParameter( programGPU, gl.LINK_STATUS ) === false ) {
+
+			this._logProgramError( programGPU, fragmentShader, vertexShader );
+
+		}
+
+		state.useProgram( programGPU );
+
+		// Bindings (must be after link completion)
+		this._setupBindings( bindings, programGPU );
 
 	}
 
@@ -2180,7 +2239,7 @@ class WebGLBackend extends Backend {
 
 			const renderTarget = descriptor.renderTarget;
 			const renderTargetContextData = this.get( renderTarget );
-			const { samples, depthBuffer, stencilBuffer } = renderTarget;
+			const { depthBuffer, stencilBuffer } = renderTarget;
 
 			const isCube = renderTarget.isCubeRenderTarget === true;
 			const isRenderTarget3D = renderTarget.isRenderTarget3D === true;
@@ -2193,6 +2252,20 @@ class WebGLBackend extends Backend {
 			const multisampledRTTExt = this.extensions.get( 'WEBGL_multisampled_render_to_texture' );
 			const multiviewExt = this.extensions.get( 'OVR_multiview2' );
 			const useMultisampledRTT = this._useMultisampledExtension( renderTarget );
+
+			let samples = renderTarget.samples;
+
+			if ( descriptor.depthTexture !== null && descriptor.depthTexture.renderTarget !== renderTarget && useMultisampledRTT === false ) {
+
+				if ( samples > 0 ) {
+
+					warnOnce( 'WebGLBackend: Shared depth texture is not supported with MSAA when "WEBGL_multisampled_render_to_texture" is unsupported. Falling back to single-sample rendering.' );
+					samples = 0;
+
+				}
+
+			}
+
 			const cacheKey = getCacheKey( descriptor );
 
 			let fb;
@@ -2423,8 +2496,6 @@ class WebGLBackend extends Backend {
 
 				if ( msaaFb === undefined ) {
 
-					const invalidationArray = [];
-
 					msaaFb = gl.createFramebuffer();
 
 					state.bindFramebuffer( gl.FRAMEBUFFER, msaaFb );
@@ -2438,8 +2509,6 @@ class WebGLBackend extends Backend {
 						msaaRenderbuffers[ i ] = gl.createRenderbuffer();
 
 						gl.bindRenderbuffer( gl.RENDERBUFFER, msaaRenderbuffers[ i ] );
-
-						invalidationArray.push( gl.COLOR_ATTACHMENT0 + i );
 
 						const texture = descriptor.textures[ i ];
 						const textureData = this.get( texture );
@@ -2462,12 +2531,7 @@ class WebGLBackend extends Backend {
 
 						renderTargetContextData.depthRenderbuffer = depthRenderbuffer;
 
-						const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
-						invalidationArray.push( depthStyle );
-
 					}
-
-					renderTargetContextData.invalidationArray = invalidationArray;
 
 				}
 
@@ -2714,11 +2778,11 @@ class WebGLBackend extends Backend {
 
 			const renderTargetContextData = this.get( renderTarget );
 
-			if ( renderTarget.samples > 0 && this._useMultisampledExtension( renderTarget ) === false ) {
+			if ( renderTarget.samples > 0 && renderTargetContextData.msaaFrameBuffer !== undefined && this._useMultisampledExtension( renderTarget ) === false ) {
 
 				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
 
-				let mask = gl.COLOR_BUFFER_BIT;
+				let mask = renderTarget.resolveColorBuffer === false ? 0 : gl.COLOR_BUFFER_BIT;
 
 				if ( renderTarget.resolveDepthBuffer ) {
 
@@ -2796,11 +2860,33 @@ class WebGLBackend extends Backend {
 
 				if ( this._supportsInvalidateFramebuffer === true ) {
 
-					gl.invalidateFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray );
+					if ( renderTarget.storeMultisampledColorBuffer === false ) {
+
+						for ( let i = 0; i < textures.length; i ++ ) {
+
+							_invalidationArray.push( gl.COLOR_ATTACHMENT0 + i );
+
+						}
+
+					}
+
+					if ( renderTarget.depthBuffer && renderTarget.storeMultisampledDepthBuffer === false ) {
+
+						_invalidationArray.push( renderTarget.stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT );
+
+					}
+
+					if ( _invalidationArray.length > 0 ) {
+
+						gl.invalidateFramebuffer( gl.READ_FRAMEBUFFER, _invalidationArray );
+
+						_invalidationArray.length = 0;
+
+					}
 
 				}
 
-			} else if ( renderTarget.resolveDepthBuffer === false && renderTargetContextData.framebuffers ) {
+			} else if ( renderTarget.storeMultisampledDepthBuffer === false && renderTargetContextData.framebuffers ) {
 
 				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
 				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );

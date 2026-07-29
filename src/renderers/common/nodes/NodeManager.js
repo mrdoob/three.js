@@ -165,6 +165,10 @@ class NodeManager extends DataMap {
 	_createNodeBuilder( renderObject, material ) {
 
 		const nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer );
+		const onNodeBuilderCreated = this.renderer.debug.onNodeBuilderCreated;
+
+		if ( onNodeBuilderCreated !== null ) onNodeBuilderCreated( nodeBuilder, renderObject );
+
 		nodeBuilder.scene = renderObject.scene;
 		nodeBuilder.material = material;
 		nodeBuilder.camera = renderObject.camera;
@@ -446,9 +450,10 @@ class NodeManager extends DataMap {
 	 * Returns a node builder state for the given compute node.
 	 *
 	 * @param {Node} computeNode - The compute node.
-	 * @return {NodeBuilderState} The node builder state.
+	 * @param {boolean} [useAsync=false] - Whether to use async build with yielding.
+	 * @return {NodeBuilderState|Promise<NodeBuilderState>} The node builder state (or Promise if async).
 	 */
-	getForCompute( computeNode ) {
+	getForCompute( computeNode, useAsync = false ) {
 
 		const computeData = this.get( computeNode );
 
@@ -457,6 +462,25 @@ class NodeManager extends DataMap {
 		if ( nodeBuilderState === undefined || computeData.version !== computeNode.version ) {
 
 			const nodeBuilder = this.backend.createNodeBuilder( computeNode, this.renderer );
+			const onNodeBuilderCreated = this.renderer.debug.onNodeBuilderCreated;
+
+			if ( onNodeBuilderCreated !== null ) onNodeBuilderCreated( nodeBuilder, computeNode );
+
+			if ( useAsync ) {
+
+				return nodeBuilder.buildAsync().then( () => {
+
+					nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
+
+					computeData.nodeBuilderState = nodeBuilderState;
+					computeData.version = computeNode.version;
+
+					return nodeBuilderState;
+
+				} );
+
+			}
+
 			nodeBuilder.build();
 
 			nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
@@ -467,6 +491,27 @@ class NodeManager extends DataMap {
 		}
 
 		return nodeBuilderState;
+
+	}
+
+	/**
+	 * Async version of getForCompute() that yields to main thread during build.
+	 * Use this in compileComputeAsync() to prevent blocking the main thread.
+	 *
+	 * @param {Node} computeNode - The compute node.
+	 * @return {Promise<NodeBuilderState>} A promise that resolves to the node builder state.
+	 */
+	getForComputeAsync( computeNode ) {
+
+		const result = this.getForCompute( computeNode, true );
+
+		if ( result.then ) {
+
+			return result;
+
+		}
+
+		return Promise.resolve( result );
 
 	}
 
@@ -731,6 +776,27 @@ class NodeManager extends DataMap {
 		let node = nodeCache.get( object );
 
 		if ( node === undefined || forceUpdate ) {
+
+			if ( node === undefined && object.isTexture === true ) {
+
+				const onTextureDispose = () => {
+
+					object.removeEventListener( 'dispose', onTextureDispose );
+
+					const node = nodeCache.get( object );
+
+					if ( node !== undefined ) {
+
+						nodeCache.delete( object );
+						node.dispose();
+
+					}
+
+				};
+
+				object.addEventListener( 'dispose', onTextureDispose );
+
+			}
 
 			node = callback();
 			nodeCache.set( object, node );

@@ -3,7 +3,7 @@ import {
 	GPUSamplerBindingType, GPUShaderStage
 } from './WebGPUConstants.js';
 
-import { FloatType, IntType, UnsignedIntType, Compatibility } from '../../../constants.js';
+import { FloatType, IntType, UnsignedIntType, Compatibility, UnsignedShortType, ShortType } from '../../../constants.js';
 import { NodeAccess } from '../../../nodes/core/constants.js';
 import { isTypedArray, error } from '../../../utils.js';
 import { hashString } from '../../../nodes/core/NodeUtils.js';
@@ -439,8 +439,6 @@ class WebGPUBindingUtils {
 
 					if ( binding.visibility & GPUShaderStage.COMPUTE ) {
 
-						// compute
-
 						if ( binding.access === NodeAccess.READ_WRITE || binding.access === NodeAccess.WRITE_ONLY ) {
 
 							buffer.type = GPUBufferBindingType.Storage;
@@ -450,6 +448,14 @@ class WebGPUBindingUtils {
 							buffer.type = GPUBufferBindingType.ReadOnlyStorage;
 
 						}
+
+					} else if ( binding.nodeUniform && binding.nodeUniform.isAtomic && ( binding.visibility & GPUShaderStage.FRAGMENT ) ) {
+
+						// Atomic buffers require a read_write storage binding. Per the WGSL
+						// spec this is only valid in the fragment stage (compute is handled
+						// above), so the vertex stage falls back to read-only storage.
+
+						buffer.type = GPUBufferBindingType.Storage;
 
 					} else {
 
@@ -536,6 +542,10 @@ class WebGPUBindingUtils {
 
 						texture.sampleType = GPUTextureSampleType.UInt;
 
+					} else if ( binding.texture.normalized === true && ( type === ShortType || type === UnsignedShortType ) ) {
+
+						texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
+
 					} else if ( type === FloatType ) {
 
 						if ( this.backend.hasFeature( 'float32-filterable' ) ) {
@@ -574,7 +584,7 @@ class WebGPUBindingUtils {
 
 				if ( binding.texture.isDepthTexture ) {
 
-					if ( binding.texture.compareFunction !== null && binding.textureNode.compareNode !== null && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ) {
+					if ( binding.texture.compareFunction !== null && binding.textureNode.isPlainGather() === false && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ) {
 
 						sampler.type = GPUSamplerBindingType.Comparison;
 

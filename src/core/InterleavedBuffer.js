@@ -277,12 +277,16 @@ class InterleavedBuffer {
 
 		//
 
-		return {
+		const json = {
 			uuid: this.uuid,
 			buffer: this.array.buffer._uuid,
 			type: this.array.constructor.name,
 			stride: this.stride
 		};
+
+		if ( this.usage !== StaticDrawUsage ) json.usage = this.usage;
+
+		return json;
 
 	}
 

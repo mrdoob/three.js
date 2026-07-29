@@ -75,7 +75,6 @@ vec4 tsl_textureGatherCompare_array( sampler2DArrayShadow map, vec3 coord, ivec2
 };
 
 const glslMethods = {
-	textureDimensions: 'textureSize',
 	equals: 'equal',
 	bitcast_float_int: 'floatBitsToInt',
 	bitcast_int_float: 'intBitsToFloat',
@@ -133,6 +132,30 @@ precision highp sampler2DShadow;
 precision highp sampler2DArrayShadow;
 precision highp samplerCubeShadow;
 `;
+
+const glslReservedKeywords = new Set( [
+	// keywords
+	'const', 'uniform', 'buffer', 'shared', 'attribute', 'varying', 'coherent', 'volatile', 'restrict',
+	'readonly', 'writeonly', 'atomic_uint', 'layout', 'centroid', 'flat', 'smooth', 'noperspective',
+	'patch', 'sample', 'invariant', 'precise', 'break', 'continue', 'do', 'for', 'while', 'switch',
+	'case', 'default', 'if', 'else', 'subroutine', 'in', 'out', 'inout', 'int', 'void', 'bool', 'true',
+	'false', 'float', 'double', 'discard', 'return', 'vec2', 'vec3', 'vec4', 'ivec2', 'ivec3', 'ivec4',
+	'bvec2', 'bvec3', 'bvec4', 'uint', 'uvec2', 'uvec3', 'uvec4', 'dvec2', 'dvec3', 'dvec4', 'mat2',
+	'mat3', 'mat4', 'mat2x2', 'mat2x3', 'mat2x4', 'mat3x2', 'mat3x3', 'mat3x4', 'mat4x2', 'mat4x3',
+	'mat4x4', 'dmat2', 'dmat3', 'dmat4', 'dmat2x2', 'dmat2x3', 'dmat2x4', 'dmat3x2', 'dmat3x3',
+	'dmat3x4', 'dmat4x2', 'dmat4x3', 'dmat4x4', 'lowp', 'mediump', 'highp', 'precision', 'sampler2D',
+	'sampler3D', 'samplerCube', 'sampler2DShadow', 'samplerCubeShadow', 'sampler2DArray',
+	'sampler2DArrayShadow', 'isampler2D', 'isampler3D', 'isamplerCube', 'isampler2DArray', 'usampler2D',
+	'usampler3D', 'usamplerCube', 'usampler2DArray', 'struct',
+	// reserved for future use
+	'common', 'partition', 'active', 'asm', 'class', 'union', 'enum', 'typedef', 'template', 'this',
+	'resource', 'goto', 'inline', 'noinline', 'public', 'static', 'extern', 'external', 'interface',
+	'long', 'short', 'half', 'fixed', 'unsigned', 'superp', 'input', 'output', 'hvec2', 'hvec3',
+	'hvec4', 'fvec2', 'fvec3', 'fvec4', 'sampler3DRect', 'filter', 'sizeof', 'cast', 'namespace',
+	'using',
+	// generated entry points
+	'main'
+] );
 
 /**
  * A node builder targeting GLSL.
@@ -429,6 +452,18 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Returns whether the given name is a reserved keyword of GLSL.
+	 *
+	 * @param {string} name - The name to test.
+	 * @return {boolean} Whether the name is a reserved keyword or not.
+	 */
+	isReservedKeyword( name ) {
+
+		return glslReservedKeywords.has( name );
+
+	}
+
+	/**
 	 * Setups the Pixel Buffer Object (PBO) for the given storage
 	 * buffer node.
 	 *
@@ -595,6 +630,20 @@ ${ flowData.code }
 		if ( offsetSnippet ) return `textureOffset( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet } )`;
 
 		return `texture( ${ textureProperty }, ${ uvSnippet } )`;
+
+	}
+
+	/**
+	 * Generates the GLSL snippet that resolves the dimensions of the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} levelSnippet - A GLSL snippet that represents the mip level.
+	 * @return {string} The GLSL snippet.
+	 */
+	generateTextureSize( texture, textureProperty, levelSnippet ) {
+
+		return `textureSize( ${ textureProperty }, ${ levelSnippet } )`;
 
 	}
 
@@ -834,7 +883,7 @@ ${ flowData.code }
 
 					snippet = `${typePrefix}sampler3D ${ uniform.name };`;
 
-				} else if ( texture.compareFunction && textureNode.compareNode !== null ) {
+				} else if ( texture.compareFunction && textureNode.isPlainGather() === false ) {
 
 					if ( texture.isArrayTexture === true ) {
 

@@ -51,7 +51,11 @@
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+			import * as MikkTSpace from 'three/addons/libs/mikktspace.module.js';
+			import { computeMikkTSpaceTangents } from 'three/addons/utils/BufferGeometryUtils.js';
+
 			import { MaterialXLoader } from 'three/addons/loaders/MaterialXLoader.js';
+			import { createStrictInterfaceValidator } from 'three/addons/loaders/materialx/MaterialXInterfaceValidation.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -82,31 +86,36 @@
 			];
 
 			const localSamples = [
-				'heightnormal.mtlx',
-				'conditional_if_float.mtlx',
-				'image_transform.mtlx',
-				'color3_vec3_cm_test.mtlx',
-				'rotate2d_test.mtlx',
-				'rotate3d_test.mtlx',
-				'heighttonormal_normal_input.mtlx',
-				'roughness_test.mtlx',
-				'opacity_test.mtlx',
-				'opacity_only_test.mtlx',
-				'specular_test.mtlx',
-				'ior_test.mtlx',
-				'combined_test.mtlx',
-				'texture_opacity_test.mtlx',
-				'transmission_test.mtlx',
-				'transmission_only_test.mtlx',
-				'transmission_rough.mtlx',
-				'thin_film_rainbow_test.mtlx',
-				'thin_film_ior_clamp_test.mtlx',
-				'sheen_test.mtlx',
+				'standard_surface_heightnormal.mtlx',
+				'standard_surface_conditional_if_float.mtlx',
+				'standard_surface_image_transform.mtlx',
+				'standard_surface_color3_vec3_cm_test.mtlx',
+				'standard_surface_rotate2d_test.mtlx',
+				'standard_surface_rotate3d_test.mtlx',
+				'standard_surface_heighttonormal_normal_input.mtlx',
+				'standard_surface_roughness_test.mtlx',
+				'standard_surface_opacity_test.mtlx',
+				'standard_surface_opacity_only_test.mtlx',
+				'standard_surface_specular_test.mtlx',
+				'standard_surface_ior_test.mtlx',
+				'standard_surface_combined_test.mtlx',
+				'standard_surface_texture_opacity_test.mtlx',
+				'standard_surface_transmission_test.mtlx',
+				'standard_surface_transmission_only_test.mtlx',
+				'standard_surface_transmission_rough.mtlx',
+				'standard_surface_thin_film_rainbow_test.mtlx',
+				'standard_surface_thin_film_ior_clamp_test.mtlx',
+				'standard_surface_sheen_test.mtlx',
+				'gltf_pbr_glass_dispersion.mtlx',
+				'open_pbr_surface_velvet.mtlx',
+				'open_pbr_surface_pearl.mtlx',
+				'open_pbr_surface_honey.mtlx',
 			];
 
 			let camera, scene, renderer;
 			let controls, prefab;
 			const models = [];
+			const strictInterfaceValidator = createStrictInterfaceValidator();
 
 			init();
 
@@ -191,6 +200,7 @@
 						scene.environment = texture;
 
 						prefab = ( await new GLTFLoader().loadAsync( './models/gltf/ShaderBall.glb' ) ).scene;
+						await computePrefabTangents();
 
 						for ( const sample of samples ) {
 
@@ -209,6 +219,30 @@
 					} );
 
 				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			async function computePrefabTangents() {
+
+				await MikkTSpace.ready;
+
+				prefab.traverse( function ( node ) {
+
+					if ( node.isMesh === false ) return;
+
+					const geometry = node.geometry;
+
+					if ( geometry === undefined ) return;
+
+					if ( geometry.hasAttribute( 'tangent' ) ) return;
+
+					if ( geometry.hasAttribute( 'position' ) && geometry.hasAttribute( 'normal' ) && geometry.hasAttribute( 'uv' ) ) {
+
+						computeMikkTSpaceTangents( geometry, MikkTSpace );
+
+					}
+
+				} );
 
 			}
 
@@ -234,6 +268,27 @@
 
 			}
 
+			function reportMaterialXLog( sample, materialName, log ) {
+
+				if ( log.length === 0 ) return;
+
+				const label = materialName ? `"${materialName}"` : `"${sample}"`;
+				const errorCount = log.filter( ( entry ) => entry.severity === 'error' ).length;
+				const warningCount = log.filter( ( entry ) => entry.severity === 'warning' ).length;
+				console.groupCollapsed( `THREE.MaterialXLoader: ${errorCount} error(s), ${warningCount} warning(s) for ${label} (${sample})` );
+
+				for ( const entry of log ) {
+
+					const nodeName = entry.nodeName ? ` [${entry.nodeName}]` : '';
+					const style = entry.severity === 'warning' ? 'color: #c90' : 'color: #c00';
+					console[ entry.severity === 'warning' ? 'warn' : 'error' ]( `%c${entry.severity}: ${entry.code}${nodeName}: ${entry.message}`, style );
+
+				}
+
+				console.groupEnd();
+
+			}
+
 			async function addSample( sample, path ) {
 
 				const model = prefab.clone();
@@ -246,10 +301,15 @@
 
 				//
 
-				const material = await new MaterialXLoader()
+				const { materials, log } = await new MaterialXLoader()
 					.setPath( path )
-					.loadAsync( sample )
-					.then( ( { materials } ) => Object.values( materials ).pop() );
+					.loadAsync( sample, {
+						uvSpace: 'top-left',
+						interfaceValidator: strictInterfaceValidator,
+						throwOnErrors: false,
+					} );
+				const material = Object.values( materials ).pop();
+				reportMaterialXLog( sample, material ? material.name : null, log );
 
 				const calibrationMesh = model.getObjectByName( 'Calibration_Mesh' );
 				calibrationMesh.material = material;

@@ -483,6 +483,12 @@ function WebGLMaterials( renderer, properties ) {
 
 		}
 
+		if ( material.retroreflectivity > 0 ) {
+
+			uniforms.retroreflectivity.value = material.retroreflectivity;
+
+		}
+
 		if ( material.iridescence > 0 ) {
 
 			uniforms.iridescence.value = material.iridescence;

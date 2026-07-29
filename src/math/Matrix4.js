@@ -229,7 +229,7 @@ class Matrix4 {
 	}
 
 	/**
-	 * Extracts the basis of this matrix into the three axis vectors provided.
+	 * Extracts the basis vectors of this matrix into the three vectors provided.
 	 *
 	 * @param {Vector3} xAxis - The basis's x axis.
 	 * @param {Vector3} yAxis - The basis's y axis.
@@ -788,7 +788,7 @@ class Matrix4 {
 	}
 
 	/**
-	 * Multiplies the columns of this matrix by the given vector.
+	 * Scales each of the first three columns of this matrix by the corresponding component of the given vector.
 	 *
 	 * @param {Vector3} v - The scale vector.
 	 * @return {Matrix4} A reference to this matrix.

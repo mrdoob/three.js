@@ -260,6 +260,13 @@ export default QUnit.module( 'Maths', () => {
 			a0.intersectSphere( b, point );
 			assert.ok( point.distanceTo( new Vector3( 0, 0, - 5 ) ) < TOL, 'Passed!' );
 
+			// empty sphere ( negative radius ) can never be intersected, so the
+			// target must be left untouched and the return value must be null,
+			// consistent with intersectsSphere()
+			b = new Sphere( new Vector3( 0, 0, - 1 ), - 1 );
+			assert.strictEqual( a0.intersectSphere( b, point.copy( posInf3 ) ), null, 'Passed!' );
+			assert.ok( point.equals( posInf3 ), 'Passed!' );
+
 		} );
 
 		QUnit.test( 'intersectsSphere', ( assert ) => {

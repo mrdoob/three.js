@@ -1,4 +1,4 @@
-import { EPSILON, Fn, If, abs, convertToTexture, dFdx, dFdy, dot, exp, float, floor, fwidth, getViewPosition, ivec2, luminance, max, min, mix, nodeObject, normalize, passTexture, screenCoordinate, select, smoothstep, sqrt, struct, texture, textureLoad, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4, velocity } from 'three/tsl';
+import { EPSILON, Fn, If, abs, convertToTexture, dFdx, dFdy, dot, exp, float, floor, fwidth, getViewPosition, ivec2, luminance, max, min, mix, nodeObject, normalize, passTexture, screenCoordinate, select, smoothstep, sqrt, struct, texture, textureLoad, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4, velocity, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
 import { DepthTexture, HalfFloatType, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, TempNode, Vector2, Vector3 } from 'three/webgpu';
 import { ENV_RAY_LENGTH, ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
 
@@ -256,7 +256,7 @@ const sampleBilinearTap = Fn( ( [
 	const reprojDepth = textureLoad( previousDepthNode, tapCoord ).r;
 	const reprojViewPos = getViewPosition( vec2( tapCoord ).add( 0.5 ).div( resolution ), reprojDepth, previousProjectionMatrixInverse );
 	const reprojWorldPos = previousCameraWorldMatrix.mul( vec4( reprojViewPos, 1.0 ) ).xyz;
-	const reprojWorldNorm = unpackRGBToNormal( textureLoad( previousNormalNode, tapCoord ).rgb ).transformDirection( previousCameraViewMatrix );
+	const reprojWorldNorm = unpackRGBToNormal( textureLoad( previousNormalNode, tapCoord ).rgb ).transformNormalByInverseViewMatrix( previousCameraViewMatrix );
 
 	const planeDiff = abs( dot( reprojWorldPos.sub( worldPosition ), worldNormal ) ).toVar();
 	planeDiff.divAssign( abs( reprojViewPos.z ) );
@@ -727,36 +727,39 @@ class TemporalReprojectNode extends TempNode {
 
 	setup( builder ) {
 
-		const renderPipeline = builder.context.renderPipeline;
+		const sharedContext = context( builder.getSharedContext() );
 
-		if ( renderPipeline ) {
+		if ( builder.renderPipeline && ! builder.context.renderPipelineState.viewOffsetOwner ) {
+
+			builder.context.renderPipelineState.viewOffsetOwner = this;
 
 			this._needsPostProcessingSync = true;
 
-			renderPipeline.context.onBeforeRenderPipeline = () => {
+			OnBeforeRenderPipeline( () => {
 
 				this.setViewOffset();
 
-			};
+			} );
 
-			renderPipeline.context.onAfterRenderPipeline = () => {
+			OnAfterRenderPipeline( () => {
 
 				this.clearViewOffset();
 
-			};
+			} );
 
 		}
 
-		this._resolveMaterial.fragmentNode = this._buildResolve( builder );
+		this._resolveMaterial.contextNode = sharedContext;
+		this._resolveMaterial.fragmentNode = this._buildResolve();
 		this._resolveMaterial.needsUpdate = true;
 
-		this._buildSeed( builder );
+		this._buildSeed( sharedContext );
 
 		return this._textureNode;
 
 	}
 
-	_buildSeed( builder ) {
+	_buildSeed( sharedContext ) {
 
 		const seed = Fn( () => {
 
@@ -768,12 +771,13 @@ class TemporalReprojectNode extends TempNode {
 
 		} );
 
-		this._seedMaterial.fragmentNode = seed().context( builder.getSharedContext() );
+		this._seedMaterial.contextNode = sharedContext;
+		this._seedMaterial.fragmentNode = seed();
 		this._seedMaterial.needsUpdate = true;
 
 	}
 
-	_buildResolve( builder ) {
+	_buildResolve() {
 
 		const isSpecular = this.mode === 'specular';
 		const cameraUniforms = this._cameraUniforms;
@@ -794,7 +798,7 @@ class TemporalReprojectNode extends TempNode {
 
 			// Shared 3×3 beauty fetch: feeds both the variance-clip box and the SSR ray-length stats.
 			const neighborhood = collectNeighborhood( this.beautyNode, beautyTexel, inputColor, this.flickerSuppression );
-			const worldNormal = viewNormal.transformDirection( cameraUniforms.viewMatrix ).toVar();
+			const worldNormal = viewNormal.transformNormalByInverseViewMatrix( cameraUniforms.viewMatrix ).toVar();
 
 			const viewPosition = getViewPosition( uvNode, depth, cameraUniforms.projectionMatrixInverse ).toVar();
 			const worldPosition = cameraUniforms.worldMatrix.mul( vec4( viewPosition, 1.0 ) ).xyz.toVar();
@@ -944,7 +948,7 @@ class TemporalReprojectNode extends TempNode {
 
 		} );
 
-		return resolve().context( builder.getSharedContext() );
+		return resolve();
 
 	}
 

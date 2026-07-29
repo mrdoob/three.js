@@ -1,4 +1,4 @@
-# Contribution
+# Contributing
 ## Introduction
 
 It is assumed that you know a little about Node.js and Git. If not, [here's some help to get started with Git](https://help.github.com/en/github/using-git) and [here’s some help to get started with Node.js.](https://nodejs.org/en/docs/guides/getting-started-guide/)

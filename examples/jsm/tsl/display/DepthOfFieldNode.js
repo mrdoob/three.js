@@ -1,5 +1,5 @@
 import { TempNode, NodeMaterial, NodeUpdateType, RenderTarget, Vector2, HalfFloatType, RedFormat, QuadMesh, RendererUtils } from 'three/webgpu';
-import { convertToTexture, nodeObject, Fn, uniform, smoothstep, step, texture, max, uniformArray, outputStruct, property, vec4, vec3, uv, Loop, min, mix, float } from 'three/tsl';
+import { convertToTexture, nodeObject, Fn, uniform, smoothstep, step, texture, max, uniformArray, outputStruct, property, vec4, vec3, uv, Loop, min, mix, float, context } from 'three/tsl';
 import { gaussianBlur } from './GaussianBlurNode.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -351,6 +351,8 @@ class DepthOfFieldNode extends TempNode {
 	 */
 	setup( builder ) {
 
+		const sharedContext = context( builder.getSharedContext() );
+
 		const kernels = this._generateKernels();
 
 		// CoC, near and far fields
@@ -372,7 +374,8 @@ class DepthOfFieldNode extends TempNode {
 
 		} );
 
-		this._CoCMaterial.colorNode = CoC().context( builder.getSharedContext() );
+		this._CoCMaterial.contextNode = sharedContext;
+		this._CoCMaterial.colorNode = CoC();
 		this._CoCMaterial.outputNode = outputNode;
 		this._CoCMaterial.needsUpdate = true;
 
@@ -408,7 +411,8 @@ class DepthOfFieldNode extends TempNode {
 
 		} );
 
-		this._blur64Material.fragmentNode = blur64().context( builder.getSharedContext() );
+		this._blur64Material.contextNode = sharedContext;
+		this._blur64Material.fragmentNode = blur64();
 		this._blur64Material.needsUpdate = true;
 
 		// bokeh 16 blur pass
@@ -437,7 +441,8 @@ class DepthOfFieldNode extends TempNode {
 
 		} );
 
-		this._blur16Material.fragmentNode = blur16().context( builder.getSharedContext() );
+		this._blur16Material.contextNode = sharedContext;
+		this._blur16Material.fragmentNode = blur16();
 		this._blur16Material.needsUpdate = true;
 
 		// composite
@@ -466,7 +471,8 @@ class DepthOfFieldNode extends TempNode {
 
 		} );
 
-		this._compositeMaterial.fragmentNode = composite().context( builder.getSharedContext() );
+		this._compositeMaterial.contextNode = sharedContext;
+		this._compositeMaterial.fragmentNode = composite();
 		this._compositeMaterial.needsUpdate = true;
 
 		return this._textureNode;

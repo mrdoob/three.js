@@ -38,6 +38,7 @@ const refreshUniforms = [
 	'normalMap',
 	'normalScale',
 	'opacity',
+	'retroreflectivity',
 	'roughness',
 	'roughnessMap',
 	'sheen',
@@ -187,6 +188,8 @@ class NodeMaterialObserver {
 
 			data = {
 				geometryId: geometry.id,
+				geometryVersion: this.getGeometryData( geometry )._version,
+				materialVersion: this.getMaterialData( renderObject.material )._version,
 				worldMatrix: object.matrixWorld.clone()
 			};
 
@@ -222,7 +225,7 @@ class NodeMaterialObserver {
 			data.environmentIntensity = environmentIntensity;
 			data.environmentRotation = environmentRotation.clone();
 
-			data.lights = this.getLightsData( renderObject.lightsNode.getLights(), [] );
+			data.lights = this.getLightsData( renderObject.lightsNode.getBuiltinLights(), [] );
 
 			this.renderObjects.set( renderObject, data );
 
@@ -298,7 +301,7 @@ class NodeMaterialObserver {
 
 			data = {
 				_renderId: - 1,
-				_equal: false,
+				_version: 0,
 
 				attributes: this.getAttributesData( geometry.attributes ),
 				indexId: geometry.index ? geometry.index.id : null,
@@ -327,7 +330,7 @@ class NodeMaterialObserver {
 
 		if ( data === undefined ) {
 
-			data = { _renderId: - 1, _equal: false };
+			data = { _renderId: - 1, _version: 0 };
 
 			for ( const property of this.refreshUniforms ) {
 
@@ -391,11 +394,13 @@ class NodeMaterialObserver {
 
 		const materialData = this.getMaterialData( renderObject.material );
 
-		// check the material for the "equal" state just once per render for all render objects
+		// check the material properties just once per render for all render objects
 
 		if ( materialData._renderId !== renderId ) {
 
 			materialData._renderId = renderId;
+
+			let changed = false;
 
 			for ( const property in materialData ) {
 
@@ -403,7 +408,7 @@ class NodeMaterialObserver {
 				const mtlValue = material[ property ];
 
 				if ( property === '_renderId' ) continue;
-				if ( property === '_equal' ) continue;
+				if ( property === '_version' ) continue;
 
 				if ( value.equals !== undefined ) {
 
@@ -411,8 +416,7 @@ class NodeMaterialObserver {
 
 						value.copy( mtlValue );
 
-						materialData._equal = false;
-						return false;
+						changed = true;
 
 					}
 
@@ -423,8 +427,7 @@ class NodeMaterialObserver {
 						value.id = mtlValue.id;
 						value.version = mtlValue.version;
 
-						materialData._equal = false;
-						return false;
+						changed = true;
 
 					}
 
@@ -432,34 +435,38 @@ class NodeMaterialObserver {
 
 					materialData[ property ] = mtlValue;
 
-					materialData._equal = false;
-					return false;
+					changed = true;
 
 				}
 
 			}
 
-			if ( materialData.transmission > 0 ) {
+			if ( changed === true ) materialData._version ++;
 
-				const { width, height } = renderObject.context;
+		}
 
-				if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
+		// a version mismatch means the material has changed since this render object was last refreshed
 
-					renderObjectData.bufferWidth = width;
-					renderObjectData.bufferHeight = height;
+		if ( renderObjectData.materialVersion !== materialData._version ) {
 
-					materialData._equal = false;
-					return false;
+			renderObjectData.materialVersion = materialData._version;
 
-				}
+			return false;
+
+		}
+
+		if ( materialData.transmission > 0 ) {
+
+			const { width, height } = renderObject.context;
+
+			if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
+
+				renderObjectData.bufferWidth = width;
+				renderObjectData.bufferHeight = height;
+
+				return false;
 
 			}
-
-			materialData._equal = true;
-
-		} else {
-
-			if ( materialData._equal === false ) return false;
 
 		}
 
@@ -474,11 +481,13 @@ class NodeMaterialObserver {
 
 		const geometryData = this.getGeometryData( renderObject.geometry );
 
-		// check the geoemtry for the "equal" state just once per render for all render objects
+		// check the geometry properties just once per render for all render objects
 
 		if ( geometryData._renderId !== renderId ) {
 
 			geometryData._renderId = renderId;
+
+			let changed = false;
 
 			// attributes
 
@@ -502,8 +511,8 @@ class NodeMaterialObserver {
 					// attribute was removed
 					delete storedAttributes[ name ];
 
-					geometryData._equal = false;
-					return false;
+					changed = true;
+					continue;
 
 				}
 
@@ -515,8 +524,7 @@ class NodeMaterialObserver {
 					storedAttributeData.id = id;
 					storedAttributeData.version = version;
 
-					geometryData._equal = false;
-					return false;
+					changed = true;
 
 				}
 
@@ -526,26 +534,22 @@ class NodeMaterialObserver {
 
 				geometryData.attributes = this.getAttributesData( attributes );
 
-				geometryData._equal = false;
-				return false;
+				changed = true;
 
 			}
 
 			// check index
 
 			const index = geometry.index;
-			const storedIndexId = geometryData.indexId;
-			const storedIndexVersion = geometryData.indexVersion;
 			const currentIndexId = index ? index.id : null;
 			const currentIndexVersion = index ? index.version : null;
 
-			if ( storedIndexId !== currentIndexId || storedIndexVersion !== currentIndexVersion ) {
+			if ( geometryData.indexId !== currentIndexId || geometryData.indexVersion !== currentIndexVersion ) {
 
 				geometryData.indexId = currentIndexId;
 				geometryData.indexVersion = currentIndexVersion;
 
-				geometryData._equal = false;
-				return false;
+				changed = true;
 
 			}
 
@@ -556,16 +560,21 @@ class NodeMaterialObserver {
 				geometryData.drawRange.start = geometry.drawRange.start;
 				geometryData.drawRange.count = geometry.drawRange.count;
 
-				geometryData._equal = false;
-				return false;
+				changed = true;
 
 			}
 
-			geometryData._equal = true;
+			if ( changed === true ) geometryData._version ++;
 
-		} else {
+		}
 
-			if ( geometryData._equal === false ) return false;
+		// a version mismatch means the geometry has changed since this render object was last refreshed
+
+		if ( renderObjectData.geometryVersion !== geometryData._version ) {
+
+			renderObjectData.geometryVersion = geometryData._version;
+
+			return false;
 
 		}
 
@@ -701,7 +710,7 @@ class NodeMaterialObserver {
 		}
 
 		cached.renderId = renderId;
-		this.getLightsData( lightsNode.getLights(), cached.lightsData );
+		this.getLightsData( lightsNode.getBuiltinLights(), cached.lightsData );
 
 		return cached.lightsData;
 
@@ -721,11 +730,18 @@ class NodeMaterialObserver {
 
 		const { renderId } = nodeFrame;
 
+		let force = false;
+
+		// shared UBOs are potentially never updated when objects don't change. Below block
+		// make sure these UBOs are updated at least once.
+
 		if ( this.renderId !== renderId ) {
 
 			this.renderId = renderId;
 
-			return true;
+			// no early out here. instead, force the render object to use the equals() code path so its internal cache state gets synched
+
+			force = true;
 
 		}
 
@@ -733,12 +749,12 @@ class NodeMaterialObserver {
 		const isBundle = renderObject.bundle !== null && renderObject.bundle.static === true && this.getRenderObjectData( renderObject ).version === renderObject.bundle.version;
 
 		if ( isStatic || isBundle )
-			return false;
+			return force;
 
 		const lightsData = this.getLights( renderObject.lightsNode, renderId );
 		const notEqual = this.equals( renderObject, lightsData, renderId ) !== true;
 
-		return notEqual;
+		return ( force || notEqual );
 
 	}
 

@@ -126,9 +126,19 @@ class FunctionNode extends CodeNode {
 
 		if ( name !== '' ) {
 
-			// use a custom property name
+			const nodeData = builder.getDataFromNode( this );
 
-			nodeCode.name = name;
+			if ( nodeData.declarationRegistered !== true ) {
+
+				// use a custom property name
+
+				nodeCode.name = name;
+
+				builder.registerDeclaration( nodeCode );
+
+				nodeData.declarationRegistered = true;
+
+			}
 
 		}
 

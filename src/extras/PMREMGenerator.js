@@ -22,18 +22,16 @@ import { Color } from '../math/Color.js';
 import { WebGLRenderTarget } from '../renderers/WebGLRenderTarget.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { BoxGeometry } from '../geometries/BoxGeometry.js';
-import { error, warn } from '../utils.js';
 
 const LOD_MIN = 4;
 
-// The standard deviations (radians) associated with the extra mips.
+// The number of extra mips.
 // Used for scene blur in fromScene() method.
-const EXTRA_LOD_SIGMA = [ 0.125, 0.215, 0.35, 0.446, 0.526, 0.582 ];
+const EXTRA_LODS = 6;
 
-// The maximum length of the blur for loop. Smaller sigmas will use fewer
-// samples and exit early, but not recompile the shader.
+// The number of spiral samples per blur pass.
 // Used for scene blur in fromScene() method.
-const MAX_SAMPLES = 20;
+const BLUR_SAMPLES = 20;
 
 // GGX VNDF importance sampling configuration
 const GGX_SAMPLES = 256;
@@ -46,6 +44,7 @@ let _oldActiveMipmapLevel = 0;
 let _oldXrEnabled = false;
 
 const _origin = /*@__PURE__*/ new Vector3();
+const _direction = /*@__PURE__*/ new Vector3();
 
 /**
  * This class generates a Prefiltered, Mipmapped Radiance Environment Map
@@ -78,7 +77,6 @@ class PMREMGenerator {
 		this._lodMax = 0;
 		this._cubeSize = 0;
 		this._sizeLods = [];
-		this._sigmas = [];
 		this._lodMeshes = [];
 
 		this._backgroundBox = null;
@@ -313,7 +311,7 @@ class PMREMGenerator {
 			this._pingPongRenderTarget = _createRenderTarget( width, height, params );
 
 			const { _lodMax } = this;
-			( { lodMeshes: this._lodMeshes, sizeLods: this._sizeLods, sigmas: this._sigmas } = _createPlanes( _lodMax ) );
+			( { lodMeshes: this._lodMeshes, sizeLods: this._sizeLods } = _createPlanes( _lodMax ) );
 
 			this._blurMaterial = _getBlurShader( _lodMax, width, height );
 			this._ggxMaterial = _getGGXShader( _lodMax, width, height );
@@ -534,7 +532,7 @@ class PMREMGenerator {
 		const incrementalRoughness = Math.sqrt( targetRoughness * targetRoughness - sourceRoughness * sourceRoughness );
 
 		// Apply blur strength mapping for better quality across the roughness range
-		const blurStrength = 0.0 + targetRoughness * 1.25;
+		const blurStrength = targetRoughness * 1.25;
 		const adjustedRoughness = incrementalRoughness * blurStrength;
 
 		// Calculate viewport position based on output LOD level
@@ -564,11 +562,9 @@ class PMREMGenerator {
 	}
 
 	/**
-	 * This is a two-pass Gaussian blur for a cubemap. Normally this is done
-	 * vertically and horizontally, but this breaks down on a cube. Here we apply
-	 * the blur latitudinally (around the poles), and then longitudinally (towards
-	 * the poles) to approximate the orthogonally-separable blur. It is least
-	 * accurate at the poles, but still does a decent job.
+	 * This is a two-pass Gaussian blur for a cubemap. Each pass importance-samples
+	 * the Gaussian along a spiral kernel (Golden Angle), which distributes samples
+	 * isotropically on the sphere (no pole artifacts).
 	 *
 	 * Used for initial scene blur in fromScene() method when sigma > 0.
 	 *
@@ -577,109 +573,37 @@ class PMREMGenerator {
 	 * @param {number} lodIn
 	 * @param {number} lodOut
 	 * @param {number} sigma
-	 * @param {Vector3} [poleAxis]
 	 */
-	_blur( cubeUVRenderTarget, lodIn, lodOut, sigma, poleAxis ) {
+	_blur( cubeUVRenderTarget, lodIn, lodOut, sigma ) {
 
 		const pingPongRenderTarget = this._pingPongRenderTarget;
 
-		this._halfBlur(
-			cubeUVRenderTarget,
-			pingPongRenderTarget,
-			lodIn,
-			lodOut,
-			sigma,
-			'latitudinal',
-			poleAxis );
+		// Two passes of sigma / sqrt( 2 ) compose to a blur of sigma while squaring
+		// the effective sample count. Sigmas beyond PI are visually indistinguishable
+		// from a uniform blur, so clamp to keep the shader math finite.
+		const blurSigma = Math.min( sigma, Math.PI ) / Math.SQRT2;
 
-		this._halfBlur(
-			pingPongRenderTarget,
-			cubeUVRenderTarget,
-			lodOut,
-			lodOut,
-			sigma,
-			'longitudinal',
-			poleAxis );
+		this._blurPass( cubeUVRenderTarget, pingPongRenderTarget, lodIn, lodOut, blurSigma );
+		this._blurPass( pingPongRenderTarget, cubeUVRenderTarget, lodOut, lodOut, blurSigma );
 
 	}
 
-	_halfBlur( targetIn, targetOut, lodIn, lodOut, sigmaRadians, direction, poleAxis ) {
+	_blurPass( targetIn, targetOut, lodIn, lodOut, sigmaRadians ) {
 
 		const renderer = this._renderer;
 		const blurMaterial = this._blurMaterial;
-
-		if ( direction !== 'latitudinal' && direction !== 'longitudinal' ) {
-
-			error(
-				'blur direction must be either latitudinal or longitudinal!' );
-
-		}
-
-		// Number of standard deviations at which to cut off the discrete approximation.
-		const STANDARD_DEVIATIONS = 3;
 
 		const blurMesh = this._lodMeshes[ lodOut ];
 		blurMesh.material = blurMaterial;
 
 		const blurUniforms = blurMaterial.uniforms;
 
-		const pixels = this._sizeLods[ lodIn ] - 1;
-		const radiansPerPixel = isFinite( sigmaRadians ) ? Math.PI / ( 2 * pixels ) : 2 * Math.PI / ( 2 * MAX_SAMPLES - 1 );
-		const sigmaPixels = sigmaRadians / radiansPerPixel;
-		const samples = isFinite( sigmaRadians ) ? 1 + Math.floor( STANDARD_DEVIATIONS * sigmaPixels ) : MAX_SAMPLES;
-
-		if ( samples > MAX_SAMPLES ) {
-
-			warn( `sigmaRadians, ${
-				sigmaRadians}, is too large and will clip, as it requested ${
-				samples} samples when the maximum is set to ${MAX_SAMPLES}` );
-
-		}
-
-		const weights = [];
-		let sum = 0;
-
-		for ( let i = 0; i < MAX_SAMPLES; ++ i ) {
-
-			const x = i / sigmaPixels;
-			const weight = Math.exp( - x * x / 2 );
-			weights.push( weight );
-
-			if ( i === 0 ) {
-
-				sum += weight;
-
-			} else if ( i < samples ) {
-
-				sum += 2 * weight;
-
-			}
-
-		}
-
-		for ( let i = 0; i < weights.length; i ++ ) {
-
-			weights[ i ] = weights[ i ] / sum;
-
-		}
-
 		blurUniforms[ 'envMap' ].value = targetIn.texture;
-		blurUniforms[ 'samples' ].value = samples;
-		blurUniforms[ 'weights' ].value = weights;
-		blurUniforms[ 'latitudinal' ].value = direction === 'latitudinal';
-
-		if ( poleAxis ) {
-
-			blurUniforms[ 'poleAxis' ].value = poleAxis;
-
-		}
-
-		const { _lodMax } = this;
-		blurUniforms[ 'dTheta' ].value = radiansPerPixel;
-		blurUniforms[ 'mipInt' ].value = _lodMax - lodIn;
+		blurUniforms[ 'sigma' ].value = sigmaRadians;
+		blurUniforms[ 'mipInt' ].value = this._lodMax - lodIn;
 
 		const outputSize = this._sizeLods[ lodOut ];
-		const x = 3 * outputSize * ( lodOut > _lodMax - LOD_MIN ? lodOut - _lodMax + LOD_MIN : 0 );
+		const x = 3 * outputSize * ( lodOut > this._lodMax - LOD_MIN ? lodOut - this._lodMax + LOD_MIN : 0 );
 		const y = 4 * ( this._cubeSize - outputSize );
 
 		_setViewport( targetOut, x, y, 3 * outputSize, 2 * outputSize );
@@ -695,31 +619,18 @@ class PMREMGenerator {
 function _createPlanes( lodMax ) {
 
 	const sizeLods = [];
-	const sigmas = [];
 	const lodMeshes = [];
 
 	let lod = lodMax;
 
-	const totalLods = lodMax - LOD_MIN + 1 + EXTRA_LOD_SIGMA.length;
+	const totalLods = lodMax - LOD_MIN + 1 + EXTRA_LODS;
 
 	for ( let i = 0; i < totalLods; i ++ ) {
 
 		const sizeLod = Math.pow( 2, lod );
 		sizeLods.push( sizeLod );
-		let sigma = 1.0 / sizeLod;
 
-		if ( i > lodMax - LOD_MIN ) {
-
-			sigma = EXTRA_LOD_SIGMA[ i - lodMax + LOD_MIN - 1 ];
-
-		} else if ( i === 0 ) {
-
-			sigma = 0;
-
-		}
-
-		sigmas.push( sigma );
-
+		// UVs overshoot the face by one texel to bake the CubeUV border into the directions.
 		const texelSize = 1.0 / ( sizeLod - 2 );
 		const min = - texelSize;
 		const max = 1 + texelSize;
@@ -728,12 +639,9 @@ function _createPlanes( lodMax ) {
 		const cubeFaces = 6;
 		const vertices = 6;
 		const positionSize = 3;
-		const uvSize = 2;
-		const faceIndexSize = 1;
 
 		const position = new Float32Array( positionSize * vertices * cubeFaces );
-		const uv = new Float32Array( uvSize * vertices * cubeFaces );
-		const faceIndex = new Float32Array( faceIndexSize * vertices * cubeFaces );
+		const outputDirection = new Float32Array( positionSize * vertices * cubeFaces );
 
 		for ( let face = 0; face < cubeFaces; face ++ ) {
 
@@ -748,16 +656,48 @@ function _createPlanes( lodMax ) {
 				x, y + 1, 0
 			];
 			position.set( coordinates, positionSize * vertices * face );
-			uv.set( uv1, uvSize * vertices * face );
-			const fill = [ face, face, face, face, face, face ];
-			faceIndex.set( fill, faceIndexSize * vertices * face );
+
+			for ( let vertex = 0; vertex < vertices; vertex ++ ) {
+
+				const u = uv1[ vertex * 2 ] * 2 - 1;
+				const v = uv1[ vertex * 2 + 1 ] * 2 - 1;
+
+				// RH coordinate system; PMREM face-indexing convention
+				if ( face === 0 ) {
+
+					_direction.set( 1, v, u ); // pos x
+
+				} else if ( face === 1 ) {
+
+					_direction.set( - u, 1, - v ); // pos y
+
+				} else if ( face === 2 ) {
+
+					_direction.set( - u, v, 1 ); // pos z
+
+				} else if ( face === 3 ) {
+
+					_direction.set( - 1, v, - u ); // neg x
+
+				} else if ( face === 4 ) {
+
+					_direction.set( - u, - 1, v ); // neg y
+
+				} else {
+
+					_direction.set( u, v, - 1 ); // neg z
+
+				}
+
+				_direction.toArray( outputDirection, ( face * vertices + vertex ) * positionSize );
+
+			}
 
 		}
 
 		const planes = new BufferGeometry();
 		planes.setAttribute( 'position', new BufferAttribute( position, positionSize ) );
-		planes.setAttribute( 'uv', new BufferAttribute( uv, uvSize ) );
-		planes.setAttribute( 'faceIndex', new BufferAttribute( faceIndex, faceIndexSize ) );
+		planes.setAttribute( 'outputDirection', new BufferAttribute( outputDirection, positionSize ) );
 		lodMeshes.push( new Mesh( planes, null ) );
 
 		if ( lod > LOD_MIN ) {
@@ -768,7 +708,7 @@ function _createPlanes( lodMax ) {
 
 	}
 
-	return { lodMeshes, sizeLods, sigmas };
+	return { lodMeshes, sizeLods };
 
 }
 
@@ -928,14 +868,12 @@ function _getGGXShader( lodMax, width, height ) {
 
 function _getBlurShader( lodMax, width, height ) {
 
-	const weights = new Float32Array( MAX_SAMPLES );
-	const poleAxis = new Vector3( 0, 1, 0 );
 	const shaderMaterial = new ShaderMaterial( {
 
 		name: 'SphericalGaussianBlur',
 
 		defines: {
-			'n': MAX_SAMPLES,
+			'SAMPLES': BLUR_SAMPLES,
 			'CUBEUV_TEXEL_WIDTH': 1.0 / width,
 			'CUBEUV_TEXEL_HEIGHT': 1.0 / height,
 			'CUBEUV_MAX_MIP': `${lodMax}.0`,
@@ -943,74 +881,70 @@ function _getBlurShader( lodMax, width, height ) {
 
 		uniforms: {
 			'envMap': { value: null },
-			'samples': { value: 1 },
-			'weights': { value: weights },
-			'latitudinal': { value: false },
-			'dTheta': { value: 0 },
+			'sigma': { value: 0 },
 			'mipInt': { value: 0 },
-			'poleAxis': { value: poleAxis }
 		},
 
 		vertexShader: _getCommonVertexShader(),
 
 		fragmentShader: /* glsl */`
 
-			precision mediump float;
-			precision mediump int;
+			precision highp float;
+			precision highp int;
 
 			varying vec3 vOutputDirection;
 
 			uniform sampler2D envMap;
-			uniform int samples;
-			uniform float weights[ n ];
-			uniform bool latitudinal;
-			uniform float dTheta;
+			uniform float sigma;
 			uniform float mipInt;
-			uniform vec3 poleAxis;
 
 			#define ENVMAP_TYPE_CUBE_UV
 			#include <cube_uv_reflection_fragment>
 
-			vec3 getSample( float theta, vec3 axis ) {
-
-				float cosTheta = cos( theta );
-				// Rodrigues' axis-angle rotation
-				vec3 sampleDirection = vOutputDirection * cosTheta
-					+ cross( axis, vOutputDirection ) * sin( theta )
-					+ axis * dot( axis, vOutputDirection ) * ( 1.0 - cosTheta );
-
-				return bilinearCubeUV( envMap, sampleDirection, mipInt );
-
-			}
+			#define PI 3.14159265359
+			#define GOLDEN_ANGLE 2.39996322973
 
 			void main() {
 
-				vec3 axis = latitudinal ? poleAxis : cross( poleAxis, vOutputDirection );
+				if ( sigma == 0.0 ) {
 
-				if ( all( equal( axis, vec3( 0.0 ) ) ) ) {
+					gl_FragColor = vec4( bilinearCubeUV( envMap, vOutputDirection, mipInt ), 1.0 );
+					return;
 
-					axis = vec3( vOutputDirection.z, 0.0, - vOutputDirection.x );
+				}
+
+				vec3 outputDirection = normalize( vOutputDirection );
+
+				vec3 up = abs( outputDirection.z ) < 0.999 ? vec3( 0.0, 0.0, 1.0 ) : vec3( 1.0, 0.0, 0.0 );
+				vec3 tangent = normalize( cross( up, outputDirection ) );
+				vec3 bitangent = cross( outputDirection, tangent );
+
+				// Truncate the kernel at three standard deviations or at the antipode.
+				float thetaMax = min( 3.0 * sigma, PI );
+				float truncation = 1.0 - exp( - 0.5 * thetaMax * thetaMax / ( sigma * sigma ) );
+
+				vec3 accumColor = vec3( 0.0 );
+				float accumWeight = 0.0;
+
+				for ( int i = 0; i < SAMPLES; i ++ ) {
+
+					// Stratified inverse-CDF sampling of the Gaussian, placed on a golden-angle spiral.
+					float stratum = ( float( i ) + 0.5 ) / float( SAMPLES );
+					float theta = sigma * sqrt( - 2.0 * log( 1.0 - stratum * truncation ) );
+					float phi = float( i ) * GOLDEN_ANGLE;
+
+					vec3 offset = cos( phi ) * tangent + sin( phi ) * bitangent;
+					vec3 sampleDirection = cos( theta ) * outputDirection + sin( theta ) * offset;
+
+					// Correct the planar sample density to solid angle.
+					float weight = sin( theta ) / theta;
+
+					accumColor += weight * bilinearCubeUV( envMap, sampleDirection, mipInt );
+					accumWeight += weight;
 
 				}
 
-				axis = normalize( axis );
-
-				gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );
-				gl_FragColor.rgb += weights[ 0 ] * getSample( 0.0, axis );
-
-				for ( int i = 1; i < n; i++ ) {
-
-					if ( i >= samples ) {
-
-						break;
-
-					}
-
-					float theta = dTheta * float( i );
-					gl_FragColor.rgb += weights[ i ] * getSample( -1.0 * theta, axis );
-					gl_FragColor.rgb += weights[ i ] * getSample( theta, axis );
-
-				}
+				gl_FragColor = vec4( accumColor / accumWeight, 1.0 );
 
 			}
 		`,
@@ -1112,53 +1046,13 @@ function _getCommonVertexShader() {
 		precision mediump float;
 		precision mediump int;
 
-		attribute float faceIndex;
+		attribute vec3 outputDirection;
 
 		varying vec3 vOutputDirection;
 
-		// RH coordinate system; PMREM face-indexing convention
-		vec3 getDirection( vec2 uv, float face ) {
-
-			uv = 2.0 * uv - 1.0;
-
-			vec3 direction = vec3( uv, 1.0 );
-
-			if ( face == 0.0 ) {
-
-				direction = direction.zyx; // ( 1, v, u ) pos x
-
-			} else if ( face == 1.0 ) {
-
-				direction = direction.xzy;
-				direction.xz *= -1.0; // ( -u, 1, -v ) pos y
-
-			} else if ( face == 2.0 ) {
-
-				direction.x *= -1.0; // ( -u, v, 1 ) pos z
-
-			} else if ( face == 3.0 ) {
-
-				direction = direction.zyx;
-				direction.xz *= -1.0; // ( -1, v, -u ) neg x
-
-			} else if ( face == 4.0 ) {
-
-				direction = direction.xzy;
-				direction.xy *= -1.0; // ( -u, -1, v ) neg y
-
-			} else if ( face == 5.0 ) {
-
-				direction.z *= -1.0; // ( u, v, -1 ) neg z
-
-			}
-
-			return direction;
-
-		}
-
 		void main() {
 
-			vOutputDirection = getDirection( uv, faceIndex );
+			vOutputDirection = outputDirection;
 			gl_Position = vec4( position, 1.0 );
 
 		}

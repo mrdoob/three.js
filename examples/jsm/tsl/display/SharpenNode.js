@@ -1,5 +1,5 @@
 import { HalfFloatType, RenderTarget, Vector2, NodeMaterial, RendererUtils, QuadMesh, TempNode, NodeUpdateType } from 'three/webgpu';
-import { Fn, float, vec3, vec4, ivec2, int, uv, floor, abs, max, min, exp2, nodeObject, passTexture, textureSize, textureLoad, convertToTexture } from 'three/tsl';
+import { Fn, float, vec3, vec4, ivec2, int, uv, floor, abs, max, min, exp2, nodeObject, passTexture, textureSize, textureLoad, convertToTexture, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -236,10 +236,9 @@ class SharpenNode extends TempNode {
 
 		//
 
-		const context = builder.getSharedContext();
-
 		const material = this._material || ( this._material = new NodeMaterial() );
-		material.fragmentNode = rcas().context( context );
+		material.contextNode = context( builder.getSharedContext() );
+		material.fragmentNode = rcas();
 		material.name = 'Sharpen_RCAS';
 		material.needsUpdate = true;
 

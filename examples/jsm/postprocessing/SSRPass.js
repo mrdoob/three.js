@@ -315,7 +315,8 @@ class SSRPass extends Pass {
 		//for bouncing
 		this.prevRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 			minFilter: NearestFilter,
-			magFilter: NearestFilter
+			magFilter: NearestFilter,
+			depthBuffer: false
 		} );
 
 		// normal render target
@@ -340,7 +341,8 @@ class SSRPass extends Pass {
 
 		this.ssrRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 			minFilter: NearestFilter,
-			magFilter: NearestFilter
+			magFilter: NearestFilter,
+			depthBuffer: false
 		} );
 
 		this.blurRenderTarget = this.ssrRenderTarget.clone();

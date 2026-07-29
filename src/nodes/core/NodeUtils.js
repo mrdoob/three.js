@@ -6,6 +6,20 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 
+import {
+	IntType,
+	UnsignedIntType,
+	AlphaFormat,
+	RedFormat,
+	RedIntegerFormat,
+	RGFormat,
+	RGIntegerFormat,
+	RGBFormat,
+	RGBIntegerFormat,
+	DepthFormat,
+	DepthStencilFormat
+} from '../../constants.js';
+
 import { error } from '../../utils.js';
 import StackTrace from '../core/StackTrace.js';
 
@@ -277,6 +291,74 @@ export function getValueType( value ) {
 }
 
 /**
+ * Returns the node data type for the given texture.
+ *
+ * @private
+ * @method
+ * @param {Texture} texture - The texture.
+ * @return {string} The data type.
+ */
+export function getTextureType( texture ) {
+
+	if ( texture.isDepthTexture === true ) {
+
+		return 'float';
+
+	}
+
+	const format = texture.format;
+
+	let length;
+
+	if ( format === RedFormat || format === RedIntegerFormat || format === DepthFormat || format === DepthStencilFormat || format === AlphaFormat ) {
+
+		length = 1;
+
+	} else if ( format === RGFormat || format === RGIntegerFormat ) {
+
+		length = 2;
+
+	} else if ( format === RGBFormat || format === RGBIntegerFormat ) {
+
+		length = 3;
+
+	} else {
+
+		length = 4;
+
+	}
+
+	let componentType;
+
+	if ( texture.type === UnsignedIntType ) {
+
+		componentType = 'uint';
+
+	} else if ( texture.type === IntType ) {
+
+		componentType = 'int';
+
+	} else {
+
+		componentType = 'float';
+
+	}
+
+	if ( length === 1 ) return componentType;
+
+	let baseType = getTypeFromLength( length );
+
+	if ( componentType !== 'float' ) {
+
+		baseType = componentType[ 0 ] + baseType;
+
+	}
+
+	return baseType;
+
+}
+
+/**
  * Returns the value/object for the given data type and parameters.
  *
  * @private
@@ -404,5 +486,11 @@ export function arrayBufferToBase64( arrayBuffer ) {
 export function base64ToArrayBuffer( base64 ) {
 
 	return Uint8Array.from( atob( base64 ), c => c.charCodeAt( 0 ) ).buffer;
+
+}
+
+export function isArrayAsParameter( params ) {
+
+	return ( params[ 0 ] !== undefined && params[ 0 ] !== null ) && ( params[ 0 ].isNode || Object.getPrototypeOf( params[ 0 ] ) !== Object.prototype );
 
 }

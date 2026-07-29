@@ -170,26 +170,26 @@ When using TSL, use node-based materials:
 
 ## Getting Started
 
-- [Installation](https://threejs.org/manual/#en/installation)
-- [Creating a Scene](https://threejs.org/manual/#en/creating-a-scene)
-- [Fundamentals](https://threejs.org/manual/#en/fundamentals)
-- [Responsive Design](https://threejs.org/manual/#en/responsive)
+- [Installation](https://threejs.org/manual/#installation)
+- [Creating a Scene](https://threejs.org/manual/#creating-a-scene)
+- [Fundamentals](https://threejs.org/manual/#fundamentals)
+- [Responsive Design](https://threejs.org/manual/#responsive)
 
 ## Renderer Guides
 
-- [WebGPURenderer](https://threejs.org/manual/#en/webgpurenderer)
+- [WebGPURenderer](https://threejs.org/manual/#webgpurenderer)
 
 ## Core Concepts
 
 - [TSL Specification](https://threejs.org/docs/#api/en/nodes/TSL): Complete shader language reference
-- [Animation System](https://threejs.org/manual/#en/animation-system)
-- [Loading 3D Models](https://threejs.org/manual/#en/loading-3d-models)
-- [Scene Graph](https://threejs.org/manual/#en/scenegraph)
-- [Materials](https://threejs.org/manual/#en/materials)
-- [Textures](https://threejs.org/manual/#en/textures)
-- [Lights](https://threejs.org/manual/#en/lights)
-- [Cameras](https://threejs.org/manual/#en/cameras)
-- [Shadows](https://threejs.org/manual/#en/shadows)
+- [Animation System](https://threejs.org/manual/#animation-system)
+- [Loading 3D Models](https://threejs.org/manual/#loading-3d-models)
+- [Scene Graph](https://threejs.org/manual/#scenegraph)
+- [Materials](https://threejs.org/manual/#materials)
+- [Textures](https://threejs.org/manual/#textures)
+- [Lights](https://threejs.org/manual/#lights)
+- [Cameras](https://threejs.org/manual/#cameras)
+- [Shadows](https://threejs.org/manual/#shadows)
 
 ## Essential API
 

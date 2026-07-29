@@ -44,7 +44,6 @@ class ClusteredLightsNode extends LightsNode {
 
 		this.materialLights = [];
 		this.clusteredLights = [];
-		this._allLights = [];
 
 		this.maxLights = maxLights;
 		this.tileSize = tileSize;
@@ -206,8 +205,6 @@ class ClusteredLightsNode extends LightsNode {
 
 	setLights( lights ) {
 
-		this._allLights = lights;
-
 		const { clusteredLights, materialLights } = this;
 
 		let materialIndex = 0;
@@ -230,13 +227,13 @@ class ClusteredLightsNode extends LightsNode {
 		materialLights.length = materialIndex;
 		clusteredLights.length = clusteredIndex;
 
-		return super.setLights( materialLights );
+		return super.setLights( lights );
 
 	}
 
-	getLights() {
+	getBuiltinLights() {
 
-		return this._allLights;
+		return this.materialLights;
 
 	}
 
@@ -595,12 +592,6 @@ class ClusteredLightsNode extends LightsNode {
 		this._lightsTexture = lightsTexture;
 		this._zSliceRangesTexture = zSliceRangesTexture;
 		this._zSliceRangesData = zSliceRangesData;
-
-	}
-
-	get hasLights() {
-
-		return super.hasLights || this.clusteredLights.length > 0;
 
 	}
 

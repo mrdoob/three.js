@@ -271,6 +271,13 @@ class Bindings extends DataMap {
 
 							this.backend.destroySampler( binding );
 
+						} else if ( binding.texture !== null ) {
+
+							// untrack destroyed bind group from its texture
+
+							const textureData = this.textures.get( binding.texture );
+							if ( textureData.bindGroups !== undefined ) textureData.bindGroups.delete( bindGroup );
+
 						}
 
 						binding.release();

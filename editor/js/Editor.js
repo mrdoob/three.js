@@ -448,10 +448,12 @@ Editor.prototype = {
 				} else if ( object.isSkinnedMesh ) {
 
 					helper = new THREE.SkeletonHelper( object.skeleton.bones[ 0 ] );
+					helper.userData.object = object;
 
 				} else if ( object.isBone === true && object.parent && object.parent.isBone !== true ) {
 
 					helper = new THREE.SkeletonHelper( object );
+					helper.userData.object = object;
 
 				} else {
 
@@ -460,10 +462,14 @@ Editor.prototype = {
 
 				}
 
-				const picker = new THREE.Mesh( geometry, material );
-				picker.name = 'picker';
-				picker.userData.object = object;
-				helper.add( picker );
+				if ( helper.isSkeletonHelper !== true ) {
+
+					const picker = new THREE.Mesh( geometry, material );
+					picker.name = 'picker';
+					picker.userData.object = object;
+					helper.add( picker );
+
+				}
 
 			}
 

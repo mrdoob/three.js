@@ -163,7 +163,7 @@ class SSAOPass extends Pass {
 
 		// ssao render target
 
-		this.ssaoRenderTarget = new WebGLRenderTarget( this.width, this.height, { type: HalfFloatType } );
+		this.ssaoRenderTarget = new WebGLRenderTarget( this.width, this.height, { type: HalfFloatType, depthBuffer: false } );
 
 		this.blurRenderTarget = this.ssaoRenderTarget.clone();
 

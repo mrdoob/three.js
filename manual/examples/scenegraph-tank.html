@@ -275,8 +275,8 @@ function main() {
 		targetBob.position.y = Math.sin( time * 2 ) * 4;
 		targetMesh.rotation.x = time * 7;
 		targetMesh.rotation.y = time * 13;
-		targetMaterial.emissive.setHSL( time * 10 % 1, 1, .25 );
-		targetMaterial.color.setHSL( time * 10 % 1, 1, .25 );
+		targetMaterial.emissive.setHSL( time * 0.3 % 1, 1, .25 );
+		targetMaterial.color.setHSL( time * 0.3 % 1, 1, .25 );
 
 		// move tank
 		const tankTime = time * .05;

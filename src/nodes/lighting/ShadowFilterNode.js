@@ -1,7 +1,7 @@
-import { float, vec2, vec4, If, Fn, ivec2 } from '../tsl/TSLBase.js';
+import { float, vec2, vec4, If, Fn } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
-import { mix, fract, step, max, clamp } from '../math/MathNode.js';
+import { step, max, clamp } from '../math/MathNode.js';
 import { add, sub } from '../math/OperatorNode.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
@@ -82,54 +82,6 @@ export const PCFShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, 
 		depthCompare( shadowCoord.xy.add( vogelDiskSample( 3, 5, phi ).mul( radiusScaled ) ), shadowCoord.z ),
 		depthCompare( shadowCoord.xy.add( vogelDiskSample( 4, 5, phi ).mul( radiusScaled ) ), shadowCoord.z )
 	).mul( 1 / 5 );
-
-} );
-
-/**
- * A shadow filtering function performing PCF soft filtering.
- *
- * @method
- * @param {Object} inputs - The input parameter object.
- * @param {DepthTexture} inputs.depthTexture - A reference to the shadow map's texture data.
- * @param {Node<vec3>} inputs.shadowCoord - The shadow coordinates.
- * @param {LightShadow} inputs.shadow - The light shadow.
- * @return {Node<float>} The filtering result.
- */
-export const PCFSoftShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, shadow, depthLayer } ) => {
-
-	const mapSize = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
-
-	const texelSize = vec2( 1 ).div( mapSize );
-
-	const uv = shadowCoord.xy;
-	const f = fract( uv.mul( mapSize ).add( 0.5 ) ).toConst();
-	uv.subAssign( f.sub( 0.5 ).mul( texelSize ) );
-
-	const gatherCompare = ( offset ) => {
-
-		let t = texture( depthTexture, uv ).offset( offset ).gather();
-
-		if ( depthTexture.isArrayTexture ) {
-
-			t = t.depth( depthLayer );
-
-		}
-
-		return t.compare( shadowCoord.z );
-
-	};
-
-	const c1 = gatherCompare( ivec2( - 1, 1 ) ).toConst();
-	const c2 = gatherCompare( ivec2( 1, 1 ) ).toConst();
-	const c3 = gatherCompare( ivec2( - 1, - 1 ) ).toConst();
-	const c4 = gatherCompare( ivec2( 1, - 1 ) ).toConst();
-
-	return add(
-		mix( c1.x, c2.y, f.x ).add( c1.y ).add( c2.x ).mul( f.y ),
-		mix( c1.w, c2.z, f.x ).add( c1.z ).add( c2.w ),
-		mix( c3.x, c4.y, f.x ).add( c3.y ).add( c4.x ),
-		mix( c3.w, c4.z, f.x ).add( c3.z ).add( c4.w ).mul( f.y.oneMinus() )
-	).mul( 1 / 9 );
 
 } );
 

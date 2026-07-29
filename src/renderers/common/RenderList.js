@@ -193,6 +193,14 @@ class RenderList {
 		this.occlusionQueryCount = 0;
 
 		/**
+		 * The ID of the frame the render list was last used in.
+		 *
+		 * @type {number}
+		 * @default -1
+		 */
+		this.frameId = - 1;
+
+		/**
 		 * The last object that was counted for occlusion query testing. Used to
 		 * avoid counting an object more than once when it produces multiple render
 		 * items (e.g. a mesh with multiple material groups), since such an object
@@ -300,6 +308,10 @@ class RenderList {
 	 */
 	push( object, geometry, material, groupOrder, z, group, clippingContext ) {
 
+		// with a reversed depth buffer the projected z is inverted
+
+		if ( this.camera.reversedDepth === true ) z = - z;
+
 		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext );
 
 		if ( object.occlusionTest === true && this._lastOcclusionObject !== object ) {
@@ -384,21 +396,12 @@ class RenderList {
 	 *
 	 * @param {?function(any, any): number} customOpaqueSort - A custom sort function for opaque objects.
 	 * @param {?function(any, any): number} customTransparentSort -  A custom sort function for transparent objects.
-	 * @param {boolean} reversedDepth - Whether a reversed depth buffer is used or not.
 	 */
-	sort( customOpaqueSort, customTransparentSort, reversedDepth ) {
+	sort( customOpaqueSort, customTransparentSort ) {
 
 		if ( this.opaque.length > 1 ) this.opaque.sort( customOpaqueSort || painterSortStable );
 		if ( this.transparentDoublePass.length > 1 ) this.transparentDoublePass.sort( customTransparentSort || reversePainterSortStable );
 		if ( this.transparent.length > 1 ) this.transparent.sort( customTransparentSort || reversePainterSortStable );
-
-		if ( reversedDepth ) {
-
-			this.opaque.reverse();
-			this.transparentDoublePass.reverse();
-			this.transparent.reverse();
-
-		}
 
 	}
 
@@ -420,21 +423,52 @@ class RenderList {
 
 			if ( renderItem.id === null ) break;
 
-			renderItem.id = null;
-			renderItem.object = null;
-			renderItem.geometry = null;
-			renderItem.material = null;
-			renderItem.groupOrder = null;
-			renderItem.renderOrder = null;
-			renderItem.z = null;
-			renderItem.group = null;
-			renderItem.clippingContext = null;
+			resetRenderItem( renderItem );
 
 		}
 
 		this._lastOcclusionObject = null;
 
 	}
+
+	/**
+	 * This method is called when the render list has become inactive.
+	 */
+	clear() {
+
+		// Clear all references from the render items so scene objects
+		// are not retained when the render list is not used anymore.
+
+		for ( let i = 0, il = this.renderItems.length; i < il; i ++ ) {
+
+			const renderItem = this.renderItems[ i ];
+
+			if ( renderItem.id === null ) break;
+
+			resetRenderItem( renderItem );
+
+		}
+
+		this.opaque.length = 0;
+		this.transparentDoublePass.length = 0;
+		this.transparent.length = 0;
+		this.bundles.length = 0;
+
+	}
+
+}
+
+function resetRenderItem( renderItem ) {
+
+	renderItem.id = null;
+	renderItem.object = null;
+	renderItem.geometry = null;
+	renderItem.material = null;
+	renderItem.groupOrder = null;
+	renderItem.renderOrder = null;
+	renderItem.z = null;
+	renderItem.group = null;
+	renderItem.clippingContext = null;
 
 }
 

@@ -70,6 +70,7 @@ export const PCFShadowMap = 1;
  *
  * @type {number}
  * @constant
+ * @deprecated since r186. Use `PCFShadowMap` instead.
  */
 export const PCFSoftShadowMap = 2;
 

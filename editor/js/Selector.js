@@ -76,7 +76,7 @@ class Selector {
 
 		this.editor.sceneHelpers.traverseVisible( function ( child ) {
 
-			if ( child.name === 'picker' ) objects.push( child );
+			if ( child.name === 'picker' || child.userData.object !== undefined ) objects.push( child );
 
 		} );
 

@@ -303,7 +303,7 @@
 		"webgl_tsl_clearcoat",
 		"webgl_tsl_instancing"
 	],
-	"webgpu (wip)": [
+	"webgpu": [
 		"webgpu_animation_retargeting",
 		"webgpu_animation_retargeting_readyplayer",
 		"webgpu_backdrop",
@@ -340,6 +340,7 @@
 		"webgpu_custom_fog",
 		"webgpu_custom_fog_background",
 		"webgpu_custom_fog_scattering",
+		"webgpu_deferred",
 		"webgpu_depth_texture",
 		"webgpu_display_stereo",
 		"webgpu_equirectangular",
@@ -359,6 +360,9 @@
 		"webgpu_lensflares",
 		"webgpu_lightprobe",
 		"webgpu_lightprobe_cubecamera",
+		"webgpu_lightprobes",
+		"webgpu_lightprobes_complex",
+		"webgpu_lightprobes_sponza",
 		"webgpu_lights_clustered",
 		"webgpu_lights_custom",
 		"webgpu_lights_dynamic",
@@ -393,6 +397,7 @@
 		"webgpu_materials_envmaps",
 		"webgpu_materials_lightmap",
 		"webgpu_materials_matcap",
+		"webgpu_materials_retroreflection",
 		"webgpu_materials_sss",
 		"webgpu_materials_texture_html",
 		"webgpu_materials_texture_manualmipmap",
@@ -416,6 +421,7 @@
 		"webgpu_ocean",
 		"webgpu_parallax_uv",
 		"webgpu_particles",
+		"webgpu_particles_soft",
 		"webgpu_performance",
 		"webgpu_performance_renderbundle",
 		"webgpu_pmrem_cubemap",
@@ -517,7 +523,8 @@
 		"webgpu_water",
 		"webgpu_xr_rollercoaster",
 		"webgpu_xr_cubes",
-		"webgpu_xr_native_layers"
+		"webgpu_xr_native_layers",
+		"webgpu_xr_shadows"
 	],
 	"webaudio": [
 		"webaudio_orientation",
