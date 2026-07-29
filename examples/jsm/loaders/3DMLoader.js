@@ -41,11 +41,11 @@ const _bufferGeometryLoader = new BufferGeometryLoader();
  * animate, and translate NURBS curves, surfaces, breps, extrusions, point clouds,
  * as well as polygon meshes and SubD objects. `rhino3dm.js` is compiled to WebAssembly
  * from the open source geometry library `openNURBS`. The loader currently uses
- * `rhino3dm.js 8.32.0`.
+ * `rhino3dm.js 8.32.1`.
  *
  * ```js
  * const loader = new Rhino3dmLoader();
- * loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@8.32.0/' );
+ * loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@8.32.1/' );
  *
  * const object = await loader.loadAsync( 'models/3dm/Rhino_Logo.3dm' );
  * scene.add( object );
@@ -1168,16 +1168,18 @@ function Rhino3dmWorker() {
 
 	};
 
-	// Converts a rhino3dm mesh to a Three.js payload. When the wasm build supports it
-	// (rhino3dm >= 8.32), returns transferable typed arrays tagged `format: 'buffers'`;
-	// otherwise falls back to the element-by-element BufferGeometry JSON. Point clouds
-	// (which lack toThreejsBuffers) also take the fallback.
+	// Converts a rhino3dm mesh or point cloud to a Three.js payload. When the wasm build
+	// supports toThreejsBuffers (rhino3dm >= 8.32.1 for point clouds, >= 8.32 for meshes),
+	// returns transferable typed arrays tagged `format: 'buffers'`; otherwise falls back to
+	// the element-by-element BufferGeometry JSON.
 	function meshToThreejs( geom ) {
 
 		if ( typeof geom.toThreejsBuffers === 'function' ) {
 
 			const b = geom.toThreejsBuffers( false );
-			const g = { format: 'buffers', position: b.position, normal: b.normal, index: b.index };
+			const g = { format: 'buffers', position: b.position };
+			if ( b.normal ) g.normal = b.normal; // meshes always have normals; point clouds may not
+			if ( b.index ) g.index = b.index; // meshes only (point clouds are non-indexed)
 			if ( b.uv ) g.uv = b.uv;
 			if ( b.color ) g.color = b.color;
 			return g;

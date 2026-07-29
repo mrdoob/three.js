@@ -18,10 +18,10 @@
 animate, and translate NURBS curves, surfaces, breps, extrusions, point clouds,
 as well as polygon meshes and SubD objects. <code>rhino3dm.js</code> is compiled to WebAssembly
 from the open source geometry library <code>openNURBS</code>. The loader currently uses
-<code>rhino3dm.js 8.32.0</code>.</p></div>
+<code>rhino3dm.js 8.32.1</code>.</p></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const loader = new Rhino3dmLoader();
-loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@8.32.0/' );
+loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@8.32.1/' );
 const object = await loader.loadAsync( 'models/3dm/Rhino_Logo.3dm' );
 scene.add( object );
 </code></pre></div>

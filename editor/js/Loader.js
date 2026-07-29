@@ -186,7 +186,7 @@ function Loader( editor ) {
 					const { Rhino3dmLoader } = await import( 'three/addons/loaders/3DMLoader.js' );
 
 					const loader = new Rhino3dmLoader();
-					loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@8.32.0/' );
+					loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@8.32.1/' );
 					loader.parse( contents, function ( object ) {
 
 						object.name = filename;
