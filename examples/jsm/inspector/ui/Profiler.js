@@ -20,10 +20,15 @@ export class Profiler extends EventDispatcher {
 		this.maxZIndex = 1002; // Track the highest z-index for detached windows (starts at base z-index from CSS)
 		this.nextTabOriginalIndex = 0; // Track the original order of tabs as they are added
 
+		this.defaultHorizontal = 'right'; // 'left' or 'right'
+		this.defaultVertical = 'top';     // 'top' or 'bottom'
+
 		this.setupShell();
 		this.setupResizing();
 
 		Style.init( this.domElement );
+
+		this.updateWidgetPosition();
 
 		// Setup window resize listener and update mobile status
 		this.setupWindowResizeListener();
@@ -495,19 +500,21 @@ export class Profiler extends EventDispatcher {
 			// Maximize based on current position
 			if ( this.position === 'bottom' ) {
 
-				this.panel.style.height = '100vh';
+				this.panel.style.height = '100%';
 				this.panel.style.width = '100%';
 
 			} else if ( this.position === 'right' ) {
 
 				this.panel.style.height = '100%';
-				this.panel.style.width = '100vw';
+				this.panel.style.width = '100%';
 
 			}
 
 			this.maximizeBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>';
 
 		}
+
+		this.updateWidgetPosition();
 
 		this.dispatchEvent( { type: 'resize' } );
 
@@ -1691,6 +1698,8 @@ export class Profiler extends EventDispatcher {
 
 		}
 
+		this.updateWidgetPosition();
+
 		this.dispatchEvent( { type: 'resize' } );
 
 		this.saveLayout();
@@ -1723,8 +1732,6 @@ export class Profiler extends EventDispatcher {
 			// Apply right position styles
 			this.panel.classList.remove( 'position-bottom' );
 			this.panel.classList.add( 'position-right' );
-			this.toggleButton.classList.add( 'position-right' );
-			this.miniPanel.classList.add( 'position-right' );
 			this.panel.style.bottom = '';
 			this.panel.style.top = '0';
 			this.panel.style.right = '0';
@@ -1733,7 +1740,7 @@ export class Profiler extends EventDispatcher {
 			// Apply size based on maximized state
 			if ( isMaximized ) {
 
-				this.panel.style.width = '100vw';
+				this.panel.style.width = '100%';
 				this.panel.style.height = '100%';
 
 			} else {
@@ -1753,8 +1760,6 @@ export class Profiler extends EventDispatcher {
 			// Apply bottom position styles
 			this.panel.classList.remove( 'position-right' );
 			this.panel.classList.add( 'position-bottom' );
-			this.toggleButton.classList.remove( 'position-right' );
-			this.miniPanel.classList.remove( 'position-right' );
 			this.panel.style.top = '';
 			this.panel.style.right = '';
 			this.panel.style.bottom = '0';
@@ -1764,7 +1769,7 @@ export class Profiler extends EventDispatcher {
 			if ( isMaximized ) {
 
 				this.panel.style.width = '100%';
-				this.panel.style.height = '100vh';
+				this.panel.style.height = '100%';
 
 			} else {
 
@@ -1774,6 +1779,8 @@ export class Profiler extends EventDispatcher {
 			}
 
 		}
+
+		this.updateWidgetPosition();
 
 		// Re-enable transition after a brief delay
 		setTimeout( () => {
@@ -2114,6 +2121,86 @@ export class Profiler extends EventDispatcher {
 
 		// Update panel size after restoring detached tabs
 		this.updatePanelSize();
+
+	}
+
+	setDefaultAlign( horizontal, vertical ) {
+
+		this.defaultHorizontal = horizontal;
+		this.defaultVertical = vertical;
+		this.updateWidgetPosition();
+
+	}
+
+	updateWidgetPosition() {
+
+		const isVisible = this.panel.classList.contains( 'visible' );
+		const isMaximized = this.panel.classList.contains( 'maximized' );
+		const isRight = this.position === 'right';
+
+		let horizontal = this.defaultHorizontal; // 'left' or 'right'
+		let vertical = this.defaultVertical;     // 'top' or 'bottom'
+
+		if ( isVisible ) {
+
+			if ( isRight ) {
+
+				// If panel is open on the right:
+				// Toggle should be on the opposite side of 'right' if default is 'right' to avoid overlapping the panel.
+				if ( this.defaultHorizontal === 'right' ) {
+
+					horizontal = 'left';
+
+				}
+
+			} else {
+
+				// If panel is open at the bottom:
+				if ( ! isMaximized ) {
+
+					// If default is bottom, we must move to top to avoid overlapping the panel at the bottom.
+					if ( this.defaultVertical === 'bottom' ) {
+
+						vertical = 'top';
+
+					}
+
+				} else {
+
+					// If maximized, move to the opposite vertical position to avoid overlap with header/tabs.
+					vertical = this.defaultVertical === 'top' ? 'bottom' : 'top';
+
+				}
+
+			}
+
+		}
+
+		// Apply horizontal class
+		if ( horizontal === 'left' ) {
+
+			this.toggleButton.classList.add( 'toggle-left' );
+			this.miniPanel.classList.add( 'toggle-left' );
+
+		} else {
+
+			this.toggleButton.classList.remove( 'toggle-left' );
+			this.miniPanel.classList.remove( 'toggle-left' );
+
+		}
+
+		// Apply vertical class
+		if ( vertical === 'bottom' ) {
+
+			this.toggleButton.classList.add( 'toggle-bottom' );
+			this.miniPanel.classList.add( 'toggle-bottom' );
+
+		} else {
+
+			this.toggleButton.classList.remove( 'toggle-bottom' );
+			this.miniPanel.classList.remove( 'toggle-bottom' );
+
+		}
 
 	}
 

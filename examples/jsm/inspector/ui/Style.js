@@ -20,6 +20,18 @@ export class Style {
 		--color-call: rgba(255, 185, 34, 1);
 		--font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 		--font-mono: 'Courier New', Courier, monospace;
+
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+		z-index: 1000;
+	}
+
+	:scope * {
+		pointer-events: auto;
 	}
 
 	.profiler-panel, .profiler-toggle, .detached-tab-panel,
@@ -33,7 +45,7 @@ export class Style {
 	}
 
 	.profiler-toggle {
-		position: fixed;
+		position: absolute;
 		top: 15px;
 		right: 15px;
 		background-color: rgba(30, 30, 36, 0.85);
@@ -68,14 +80,14 @@ export class Style {
 		opacity: 0.5;
 	}
 
-	.profiler-toggle.position-right.panel-open {
+	.profiler-toggle.toggle-left {
 		right: auto;
 		left: 15px;
 		border-radius: 6px 12px 12px 6px;
 		flex-direction: row-reverse;
 	}
 
-	.profiler-toggle.position-right.panel-open .builtin-tabs-container {
+	.profiler-toggle.toggle-left .builtin-tabs-container {
 		border-right: none;
 		border-left: 1px solid #262636;
 	}
@@ -227,7 +239,7 @@ export class Style {
 	}
 
 	.profiler-mini-panel {
-		position: fixed;
+		position: absolute;
 		top: 60px;
 		right: 15px;
 		background-color: rgba(30, 30, 36, 0.85);
@@ -252,7 +264,7 @@ export class Style {
 					transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 	}
 
-	.profiler-mini-panel.position-right.panel-open {
+	.profiler-mini-panel.toggle-left {
 		right: auto;
 		left: 15px;
 	}
@@ -263,20 +275,14 @@ export class Style {
 		transform: translateY(0) scale(1);
 	}
 
-	/* Position toggle and mini-panel at the bottom when maximized */
-	:scope:has(.profiler-panel.maximized) .profiler-toggle,
-	:scope.maximized .profiler-toggle {
-		top: auto !important;
-		bottom: 15px !important;
-		z-index: 10005 !important;
+	.profiler-toggle.toggle-bottom {
+		top: auto;
+		bottom: 15px;
 	}
 
-	:scope:has(.profiler-panel.maximized) .profiler-mini-panel,
-	:scope.maximized .profiler-mini-panel {
-		top: auto !important;
-		bottom: 60px !important;
-		max-height: calc(100vh - 120px) !important;
-		z-index: 10006 !important;
+	.profiler-mini-panel.toggle-bottom {
+		top: auto;
+		bottom: 60px;
 	}
 
 	.profiler-mini-panel::-webkit-scrollbar {
@@ -560,7 +566,7 @@ export class Style {
 	}
 
 	.profiler-panel {
-		position: fixed;
+		position: absolute;
 		z-index: 1001 !important;
 		bottom: 0;
 		left: 0;
@@ -589,7 +595,7 @@ export class Style {
 	}
 
 	.profiler-panel.maximized {
-		height: 100vh;
+		height: 100%;
 	}
 
 	/* Position-specific styles */
@@ -1689,7 +1695,7 @@ export class Style {
 	}
 
 	.drag-preview-indicator {
-		position: fixed;
+		position: absolute;
 		background-color: rgba(0, 170, 255, 0.2);
 		border: 2px dashed var(--color-accent);
 		z-index: 999;
@@ -1699,7 +1705,7 @@ export class Style {
 
 	/* Detached Tab Windows */
 	.detached-tab-panel {
-		position: fixed;
+		position: absolute;
 		width: 500px;
 		height: 400px;
 		background: var(--profiler-background);
