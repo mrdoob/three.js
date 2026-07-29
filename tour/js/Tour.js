@@ -273,7 +273,8 @@ class Tour {
 		this.renderer.setSize( Math.max( this.dom.previewContainer.clientWidth, 1 ), Math.max( this.dom.previewContainer.clientHeight, 1 ) );
 		this.renderer.setAnimationLoop( this.animate );
 		this.renderer.inspector = new Inspector();
-		this.renderer.inspector.setDefaultAlign( 'left', 'top' );
+		this.renderer.inspector.setHorizontalAlign( 'left' );
+		this.renderer.inspector.setVerticalAlign( 'top' );
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.shadowMap.type = THREE.PCFShadowMap;
 		this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
