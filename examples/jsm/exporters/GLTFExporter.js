@@ -652,7 +652,8 @@ class GLTFWriter {
 			onlyVisible: true,
 			maxTextureSize: Infinity,
 			animations: [],
-			includeCustomExtensions: false
+			includeCustomExtensions: false,
+			copyright: null
 		}, options );
 
 		if ( this.options.animations.length > 0 ) {
@@ -686,6 +687,8 @@ class GLTFWriter {
 
 		// Update bytelength of the single buffer.
 		if ( json.buffers && json.buffers.length > 0 ) json.buffers[ 0 ].byteLength = blob.size;
+
+		if ( options.copyright !== null && options.copyright !== undefined ) json.asset.copyright = options.copyright;
 
 		if ( options.binary === true ) {
 
@@ -3833,6 +3836,7 @@ GLTFExporter.Utils = {
  * @property {Array<AnimationClip>|Array<Array<AnimationClip>>} [animations=[]] - List of animations to be included in the export. When exporting a single 3D object or scene, this is a flat list of clips.
  * When exporting an array of multiple scenes, this must be a nested array with one list of clips per scene, matched to the input by index.
  * @property {boolean} [includeCustomExtensions=false] - Export custom glTF extensions defined on an object's `userData.gltfExtensions` property.
+ * @property {string} [copyright=null] - Export with a copyright notice embedded in the glTF.
  **/
 
 /**
