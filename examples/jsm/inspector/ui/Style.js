@@ -596,6 +596,7 @@ export class Style {
 
 	.profiler-panel.maximized {
 		height: 100%;
+		z-index: 10000 !important;
 	}
 
 	/* Position-specific styles */
