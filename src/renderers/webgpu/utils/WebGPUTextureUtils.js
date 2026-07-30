@@ -395,7 +395,7 @@ class WebGPUTextureUtils {
 		textureDescriptorGPU.size.height = height;
 		textureDescriptorGPU.size.depthOrArrayLayers = depth;
 		textureDescriptorGPU.mipLevelCount = levels;
-		textureDescriptorGPU.sampleCount = useSeparateMSAATextures ? 1 : primarySamples;
+		textureDescriptorGPU.sampleCount = primarySamples;
 		textureDescriptorGPU.dimension = dimension;
 		textureDescriptorGPU.format = format;
 		textureDescriptorGPU.usage = usage;

@@ -1299,6 +1299,10 @@ class WebGPUBackend extends Backend {
 	 */
 	_updateArrayCameraLayerDescriptors( renderContext, renderContextData, descriptor, cameras ) {
 
+		const renderTarget = renderContext.renderTarget;
+		const discardDepth = renderContext.sampleCount > 1 && renderTarget?.storeMultisampledDepthBuffer === false;
+		const discardStencil = renderContext.sampleCount > 1 && renderTarget?.storeMultisampledStencilBuffer === false;
+
 		for ( let i = 0; i < cameras.length; i ++ ) {
 
 			const layerDescriptor = renderContextData.layerDescriptors[ i ];
@@ -1319,7 +1323,7 @@ class WebGPUBackend extends Backend {
 
 				if ( renderContext.depth ) {
 
-					if ( renderContext.clearDepth ) {
+					if ( renderContext.clearDepth || discardDepth ) {
 
 						depthAttachment.depthClearValue = renderContext.clearDepthValue;
 						depthAttachment.depthLoadOp = GPULoadOp.Clear;
@@ -1334,7 +1338,7 @@ class WebGPUBackend extends Backend {
 
 				if ( renderContext.stencil ) {
 
-					if ( renderContext.clearStencil ) {
+					if ( renderContext.clearStencil || discardStencil ) {
 
 						depthAttachment.stencilClearValue = renderContext.clearStencilValue;
 						depthAttachment.stencilLoadOp = GPULoadOp.Clear;
@@ -1464,10 +1468,19 @@ class WebGPUBackend extends Backend {
 
 				}
 
-				if ( renderContext.depth ) layerDescriptor.depthStencilAttachment.depthLoadOp = depthLoadOp;
-				if ( renderContext.depth ) layerDescriptor.depthStencilAttachment.depthStoreOp = depthStoreOp;
-				if ( renderContext.stencil ) layerDescriptor.depthStencilAttachment.stencilLoadOp = stencilLoadOp;
-				if ( renderContext.stencil ) layerDescriptor.depthStencilAttachment.stencilStoreOp = stencilStoreOp;
+				if ( renderContext.depth ) {
+
+					layerDescriptor.depthStencilAttachment.depthLoadOp = depthLoadOp;
+					layerDescriptor.depthStencilAttachment.depthStoreOp = depthStoreOp;
+
+				}
+
+				if ( renderContext.stencil ) {
+
+					layerDescriptor.depthStencilAttachment.stencilLoadOp = stencilLoadOp;
+					layerDescriptor.depthStencilAttachment.stencilStoreOp = stencilStoreOp;
+
+				}
 
 			}
 
