@@ -53,7 +53,7 @@ export class Style {
 		border-radius: 12px 6px 6px 12px;
 		color: var(--text-primary);
 		cursor: pointer;
-		z-index: 1001;
+		z-index: 1002;
 		transition: all 0.2s ease-in-out;
 		/*font-size: 14px;*/
 		font-size: 15px;
