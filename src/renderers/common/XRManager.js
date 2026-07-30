@@ -958,8 +958,6 @@ class XRManager extends EventDispatcher {
 				storeMultisampledStencilBuffer: false
 			} );
 
-		renderTarget._autoAllocateDepthBuffer = true;
-
 		const material = new MeshBasicMaterial( { color: 0xffffff, side: FrontSide } );
 		material.map = renderTarget.texture;
 		material.map.offset.y = 1;
@@ -1050,8 +1048,6 @@ class XRManager extends EventDispatcher {
 				storeMultisampledDepthBuffer: false,
 				storeMultisampledStencilBuffer: false
 			} );
-
-		renderTarget._autoAllocateDepthBuffer = true;
 
 		const material = new MeshBasicMaterial( { color: 0xffffff, side: BackSide } );
 		material.map = renderTarget.texture;
