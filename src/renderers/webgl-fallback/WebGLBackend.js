@@ -2886,7 +2886,7 @@ class WebGLBackend extends Backend {
 
 				}
 
-			} else if ( renderTarget.storeMultisampledDepthBuffer === false && renderTargetContextData.framebuffers ) {
+			} else if ( this._supportsInvalidateFramebuffer === true && ( renderTarget.samples > 0 && renderTarget.storeMultisampledDepthBuffer === false ) && renderTargetContextData.framebuffers ) {
 
 				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
 				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
