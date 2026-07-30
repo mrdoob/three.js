@@ -109,7 +109,6 @@ class Viewer extends Tab {
 		this.folderLibrary = new Map();
 		this.canvasNodes = new Map();
 		this.currentDataList = [];
-		this.nodeList = nodeList;
 		this.nodes = nodes;
 		this.scrollWrapper = scrollWrapper;
 		this.fullViewerContainer = fullViewerContainer;
