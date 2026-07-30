@@ -53,7 +53,7 @@ export class Style {
 		border-radius: 12px 6px 6px 12px;
 		color: var(--text-primary);
 		cursor: pointer;
-		z-index: 1001;
+		z-index: 1002;
 		transition: all 0.2s ease-in-out;
 		/*font-size: 14px;*/
 		font-size: 15px;
@@ -596,6 +596,7 @@ export class Style {
 
 	.profiler-panel.maximized {
 		height: 100%;
+		z-index: 10000 !important;
 	}
 
 	/* Position-specific styles */
@@ -1197,6 +1198,7 @@ export class Style {
 
 	.list-children-container.closed {
 		max-height: 0;
+		display: none !important;
 	}
 
 	.item-toggler {
@@ -2045,6 +2047,140 @@ export class Style {
 		overflow: hidden;
 		position: relative;
 		touch-action: none;
+	}
+
+	.node-canvas-wrapper .node-canvas-split-btn {
+		position: absolute;
+		top: 5px;
+		left: 5px;
+		background: rgba(30, 30, 36, 0.85);
+		border: 1px solid var(--profiler-border);
+		color: var(--text-primary);
+		border-radius: 4px;
+		padding: 4px;
+		cursor: pointer;
+		opacity: 1;
+		transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 10;
+	}
+
+	.node-canvas-wrapper .node-canvas-split-btn:hover {
+		background-color: var(--color-accent);
+		border-color: var(--color-accent);
+		color: white;
+	}
+
+	.node-canvas-wrapper .node-canvas-split-btn.active,
+	.node-canvas-wrapper .node-canvas-fullscreen-btn.active {
+		background-color: var(--color-accent) !important;
+		border-color: var(--color-accent) !important;
+		color: white !important;
+	}
+
+	.split-screen-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		pointer-events: none !important;
+		z-index: 999;
+		touch-action: none;
+	}
+
+	.split-screen-line {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		width: 4px;
+		margin-left: -2px;
+		left: 50%;
+		background: var(--profiler-border);
+		cursor: ew-resize;
+		pointer-events: auto !important;
+		z-index: 10;
+		touch-action: none;
+	}
+
+	.split-screen-line::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: -10px;
+		width: 24px;
+		background: transparent;
+		cursor: ew-resize;
+	}
+
+	/* Grid Mode styles for List component */
+	.list-scroll-wrapper:has(> .list-container.grid-mode) {
+		width: 100% !important;
+	}
+
+	.list-container.grid-mode {
+		min-width: 0 !important;
+		width: 100% !important;
+		box-sizing: border-box;
+	}
+
+	.list-container.grid-mode .list-header {
+		display: none !important;
+	}
+
+	.list-container.grid-mode .list-children-container {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 15px;
+		padding-left: 0 !important;
+		margin-top: 10px;
+		margin-bottom: 15px;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	.list-container.grid-mode .list-children-container > .list-item-wrapper {
+		display: inline-block;
+		width: 160px;
+		margin: 0;
+	}
+
+	.list-container.grid-mode .list-children-container > .list-item-wrapper > .list-item-row {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: flex-start;
+		/*background-color: var(--profiler-header);
+		border: 1px solid var(--profiler-border);*/
+		border-radius: 6px;
+		padding: 8px;
+		gap: 8px;
+		width: 100%;
+		box-sizing: border-box;
+		grid-template-columns: none !important;
+	}
+
+	.list-container.grid-mode .list-children-container > .list-item-wrapper > .list-item-row > .list-item-cell:first-child {
+		width: 140px;
+		height: 140px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0;
+	}
+
+	.list-container.grid-mode .list-children-container > .list-item-wrapper > .list-item-row > .list-item-cell:not(:first-child) {
+		width: 100%;
+		text-align: center !important;
+		font-size: 11px;
+		font-weight: 500;
+		color: var(--text-primary);
+		white-space: normal;
+		word-break: break-all;
+		justify-content: center !important;
 	}
 
 }

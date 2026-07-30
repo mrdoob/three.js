@@ -1,7 +1,7 @@
 import {
 	CullFaceNone, CullFaceBack, CullFaceFront, DoubleSide, BackSide,
 	NormalBlending, NoBlending, CustomBlending, AddEquation,
-	AdditiveBlending, SubtractiveBlending, MultiplyBlending, SubtractEquation, ReverseSubtractEquation,
+	AdditiveBlending, SubtractiveBlending, MultiplyBlending, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation,
 	ZeroFactor, OneFactor, SrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, DstColorFactor, DstAlphaFactor,
 	OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor,
 	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth,
@@ -108,7 +108,9 @@ class WebGLState {
 		equationToGL = {
 			[ AddEquation ]: gl.FUNC_ADD,
 			[ SubtractEquation ]: gl.FUNC_SUBTRACT,
-			[ ReverseSubtractEquation ]: gl.FUNC_REVERSE_SUBTRACT
+			[ ReverseSubtractEquation ]: gl.FUNC_REVERSE_SUBTRACT,
+			[ MinEquation ]: gl.MIN,
+			[ MaxEquation ]: gl.MAX
 		};
 
 		factorToGL = {
