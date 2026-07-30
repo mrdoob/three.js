@@ -1498,6 +1498,8 @@ class BatchedMesh extends Mesh {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		// Assuming the geometry is not shared with other meshes
 		this.geometry.dispose();
 
