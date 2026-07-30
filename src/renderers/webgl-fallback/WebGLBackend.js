@@ -2151,6 +2151,15 @@ class WebGLBackend extends Backend {
 	 */
 	hasFeature( name ) {
 
+		if ( name === 'multiview' ) {
+
+			const attributes = this.gl.getContextAttributes();
+			const multisampled = attributes !== null && attributes.antialias === true;
+
+			return this.extensions.getMultiviewExtension( multisampled ) !== null;
+
+		}
+
 		const keysMatching = Object.keys( GLFeatureName ).filter( key => GLFeatureName[ key ] === name );
 
 		const extensions = this.extensions;
@@ -2162,6 +2171,41 @@ class WebGLBackend extends Backend {
 		}
 
 		return false;
+
+	}
+
+	/**
+	 * Attaches a texture array to the active framebuffer for multiview rendering.
+	 *
+	 * @private
+	 * @param {number} framebufferTarget - The framebuffer target.
+	 * @param {number} attachment - The framebuffer attachment.
+	 * @param {WebGLTexture} texture - The texture array.
+	 * @param {number} mipLevel - The mip level.
+	 * @param {number} samples - The number of MSAA samples.
+	 * @param {number} baseViewIndex - The first texture-array view.
+	 * @param {number} viewCount - The number of views.
+	 */
+	_attachMultiviewTexture( framebufferTarget, attachment, texture, mipLevel, samples, baseViewIndex, viewCount ) {
+
+		const extension = this.extensions.getMultiviewExtension( samples > 0 );
+
+		if ( extension === null ) {
+
+			error( `WebGLBackend: Multiview framebuffer attachment is not supported with ${samples} samples.` );
+			return;
+
+		}
+
+		if ( samples > 0 ) {
+
+			extension.framebufferTextureMultisampleMultiviewOVR( framebufferTarget, attachment, texture, mipLevel, samples, baseViewIndex, viewCount );
+
+		} else {
+
+			extension.framebufferTextureMultiviewOVR( framebufferTarget, attachment, texture, mipLevel, baseViewIndex, viewCount );
+
+		}
 
 	}
 
@@ -2250,7 +2294,6 @@ class WebGLBackend extends Backend {
 			let msaaFb = renderTargetContextData.msaaFrameBuffer;
 			let depthRenderbuffer = renderTargetContextData.depthRenderbuffer;
 			const multisampledRTTExt = this.extensions.get( 'WEBGL_multisampled_render_to_texture' );
-			const multiviewExt = this.extensions.get( 'OVR_multiview2' );
 			const useMultisampledRTT = this._useMultisampledExtension( renderTarget );
 
 			let samples = renderTarget.samples;
@@ -2323,7 +2366,7 @@ class WebGLBackend extends Backend {
 
 						if ( renderTarget.multiview ) {
 
-							multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, attachment, textureData.textureGPU, 0, samples, 0, 2 );
+							this._attachMultiviewTexture( gl.FRAMEBUFFER, attachment, textureData.textureGPU, 0, samples, 0, 2 );
 
 						} else if ( isRenderTarget3D || isRenderTargetArray ) {
 
@@ -2377,7 +2420,7 @@ class WebGLBackend extends Backend {
 
 						if ( renderTarget.multiview ) {
 
-							multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, depthStyle, textureData.textureGPU, 0, samples, 0, 2 );
+							this._attachMultiviewTexture( gl.FRAMEBUFFER, depthStyle, textureData.textureGPU, 0, samples, 0, 2 );
 
 						} else if ( _hasExternalTextures && useMultisampledRTT ) {
 
@@ -2446,7 +2489,7 @@ class WebGLBackend extends Backend {
 
 					if ( renderTarget.multiview ) {
 
-						multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, textureData.textureGPU, 0, samples, 0, 2 );
+						this._attachMultiviewTexture( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, textureData.textureGPU, 0, samples, 0, 2 );
 
 					} else if ( useMultisampledRTT ) {
 
@@ -2474,7 +2517,7 @@ class WebGLBackend extends Backend {
 
 						if ( renderTarget.multiview ) {
 
-							multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, depthStyle, textureData.textureGPU, 0, samples, 0, 2 );
+							this._attachMultiviewTexture( gl.FRAMEBUFFER, depthStyle, textureData.textureGPU, 0, samples, 0, 2 );
 
 						} else if ( useMultisampledRTT ) {
 

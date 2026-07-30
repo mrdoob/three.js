@@ -8,6 +8,7 @@ export const GLFeatureName = {
 	'WEBGL_compressed_texture_s3tc': 'texture-compression-s3tc',
 	'EXT_texture_compression_bptc': 'texture-compression-bc',
 	'EXT_disjoint_timer_query_webgl2': 'timestamp-query',
+	'OCULUS_multiview': 'OCULUS_multiview',
 	'OVR_multiview2': 'OVR_multiview2'
 
 };

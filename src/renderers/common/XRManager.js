@@ -405,7 +405,7 @@ class XRManager extends EventDispatcher {
 
 		/**
 		 * Whether the usage of multiview is actually enabled. This flag only evaluates to `true`
-		 * if multiview has been requested by the application and the `OVR_multiview2` is available.
+		 * if multiview has been requested by the application and the backend supports it.
 		 *
 		 * @private
 		 * @type {boolean}
@@ -1275,10 +1275,14 @@ class XRManager extends EventDispatcher {
 					clearOnAccess: false
 				};
 
-				if ( this._useMultiviewIfPossible && renderer.hasFeature( 'OVR_multiview2' ) ) {
+				if ( this._useMultiviewIfPossible && renderer.hasFeature( 'multiview' ) ) {
 
 					projectionlayerInit.textureType = 'texture-array';
 					this._useMultiview = true;
+
+				} else if ( this._useMultiviewIfPossible ) {
+
+					warnOnce( 'XRManager: The active WebGL context does not support the requested multiview configuration. Falling back to stereo rendering.' );
 
 				}
 

@@ -78,6 +78,42 @@ class WebGLExtensions {
 
 	}
 
+	/**
+	 * Returns a multiview extension that supports the requested sample mode.
+	 *
+	 * `OCULUS_multiview` is checked first since it provides the multisampled
+	 * attachment path used by Meta Quest Browser. `OVR_multiview2` is used as a
+	 * fallback when it exposes the required attachment method.
+	 *
+	 * @param {boolean} [multisampled=false] - Whether multisampled attachment support is required.
+	 * @return {?Object} The multiview extension object.
+	 */
+	getMultiviewExtension( multisampled = false ) {
+
+		const method = multisampled
+			? 'framebufferTextureMultisampleMultiviewOVR'
+			: 'framebufferTextureMultiviewOVR';
+
+		const oculusExtension = this.get( 'OCULUS_multiview' );
+
+		if ( oculusExtension !== null && typeof oculusExtension[ method ] === 'function' ) {
+
+			return oculusExtension;
+
+		}
+
+		const ovrExtension = this.get( 'OVR_multiview2' );
+
+		if ( ovrExtension !== null && typeof ovrExtension[ method ] === 'function' ) {
+
+			return ovrExtension;
+
+		}
+
+		return null;
+
+	}
+
 }
 
 export default WebGLExtensions;
