@@ -928,6 +928,7 @@ class XRManager extends EventDispatcher {
 	 * @param {Function} rendercall - A callback function that renders the layer. Similar to code in
 	 * the default animation loop, this method can be used to update/transform 3D object in the layer's scene.
 	 * @param {Object} [attributes={}] - Allows to configure the layer's render target.
+	 * @param {number} [attributes.samples] - The scene MSAA sample count. Defaults to the renderer's sample count.
 	 * @return {Mesh} A mesh representing the quadratic XR layer. This mesh should be added to the XR scene.
 	 */
 	createQuadLayer( width, height, translation, quaternion, pixelwidth, pixelheight, rendercall, attributes = {} ) {
@@ -952,8 +953,10 @@ class XRManager extends EventDispatcher {
 					attributes.stencil ? DepthStencilFormat : DepthFormat
 				),
 				stencilBuffer: attributes.stencil,
+				samples: attributes.samples ?? this._renderer.samples,
 				resolveDepthBuffer: false,
 				resolveStencilBuffer: false,
+				storeMultisampledColorBuffer: false,
 				storeMultisampledDepthBuffer: false,
 				storeMultisampledStencilBuffer: false
 			} );
@@ -974,6 +977,7 @@ class XRManager extends EventDispatcher {
 			quaternion: quaternion,
 			pixelwidth: pixelwidth,
 			pixelheight: pixelheight,
+			samples: renderTarget.samples,
 			plane: plane,
 			material: material,
 			rendercall: rendercall,
@@ -1019,6 +1023,7 @@ class XRManager extends EventDispatcher {
 	 * @param {Function} rendercall - A callback function that renders the layer. Similar to code in
 	 * the default animation loop, this method can be used to update/transform 3D object in the layer's scene.
 	 * @param {Object} [attributes={}] - Allows to configure the layer's render target.
+	 * @param {number} [attributes.samples] - The scene MSAA sample count. Defaults to the renderer's sample count.
 	 * @return {Mesh} A mesh representing the cylindrical XR layer. This mesh should be added to the XR scene.
 	 */
 	createCylinderLayer( radius, centralAngle, aspectratio, translation, quaternion, pixelwidth, pixelheight, rendercall, attributes = {} ) {
@@ -1043,8 +1048,10 @@ class XRManager extends EventDispatcher {
 					attributes.stencil ? DepthStencilFormat : DepthFormat
 				),
 				stencilBuffer: attributes.stencil,
+				samples: attributes.samples ?? this._renderer.samples,
 				resolveDepthBuffer: false,
 				resolveStencilBuffer: false,
+				storeMultisampledColorBuffer: false,
 				storeMultisampledDepthBuffer: false,
 				storeMultisampledStencilBuffer: false
 			} );
@@ -1066,6 +1073,7 @@ class XRManager extends EventDispatcher {
 			quaternion: quaternion,
 			pixelwidth: pixelwidth,
 			pixelheight: pixelheight,
+			samples: renderTarget.samples,
 			plane: plane,
 			material: material,
 			rendercall: rendercall,
@@ -1720,8 +1728,10 @@ function onSessionEnd() {
 						layer.stencilBuffer ? DepthStencilFormat : DepthFormat
 					),
 					stencilBuffer: layer.stencilBuffer,
+					samples: layer.samples,
 					resolveDepthBuffer: false,
 					resolveStencilBuffer: false,
+					storeMultisampledColorBuffer: false,
 					storeMultisampledDepthBuffer: false,
 					storeMultisampledStencilBuffer: false
 				} );
