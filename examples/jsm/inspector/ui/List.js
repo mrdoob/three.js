@@ -39,6 +39,20 @@ export class List {
 
 	}
 
+	setViewMode( mode ) {
+
+		if ( mode === 'grid' ) {
+
+			this.domElement.classList.add( 'grid-mode' );
+
+		} else {
+
+			this.domElement.classList.remove( 'grid-mode' );
+
+		}
+
+	}
+
 	add( item ) {
 
 		if ( item.parent !== null ) {

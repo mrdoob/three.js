@@ -4,10 +4,14 @@ import { Item } from '../ui/Item.js';
 import { splitPath, splitCamelCase } from '../ui/utils.js';
 import { getItem, setItem } from '../Inspector.js';
 
-import { RendererUtils, NoToneMapping, LinearSRGBColorSpace, QuadMesh, NodeMaterial, CanvasTarget, Vector2 } from 'three/webgpu';
+import { RendererUtils, NoToneMapping, LinearSRGBColorSpace, QuadMesh, NodeMaterial, CanvasTarget, Vector2, Color } from 'three/webgpu';
 import { renderOutput, vec2, vec3, vec4, Fn, screenUV, step, OnMaterialUpdate, uniform, float } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
+
+const splitIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><polyline points="5 8 1 12 5 16"></polyline><polyline points="19 8 23 12 19 16"></polyline></svg>';
+const fullscreenIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
+const backIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
 
 const aspectRatioUV = /*@__PURE__*/ Fn( ( [ uv, textureNode, canvasAspect ] ) => {
 
@@ -55,7 +59,7 @@ class Viewer extends Tab {
 		const backBtn = document.createElement( 'button' );
 		backBtn.className = 'viewer-back-btn';
 		backBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>';
-		backBtn.title = 'Back to list';
+		backBtn.title = 'Back';
 		backBtn.style.display = 'none';
 		toolbar.appendChild( backBtn );
 
@@ -73,11 +77,13 @@ class Viewer extends Tab {
 		select.appendChild( defaultOption );
 
 		toolbar.appendChild( select );
-		this.content.appendChild( toolbar );
 
 		const nodeList = new List( 'Viewer', 'Name' );
 		nodeList.setGridStyle( '150px minmax(200px, 2fr)' );
 		nodeList.domElement.style.minWidth = '400px';
+		this.nodeList = nodeList;
+
+		this.content.appendChild( toolbar );
 
 		const scrollWrapper = document.createElement( 'div' );
 		scrollWrapper.className = 'list-scroll-wrapper';
@@ -103,7 +109,6 @@ class Viewer extends Tab {
 		this.folderLibrary = new Map();
 		this.canvasNodes = new Map();
 		this.currentDataList = [];
-		this.nodeList = nodeList;
 		this.nodes = nodes;
 		this.scrollWrapper = scrollWrapper;
 		this.fullViewerContainer = fullViewerContainer;
@@ -112,7 +117,23 @@ class Viewer extends Tab {
 		this.activeFullNodeId = null;
 		this.pendingRestoreView = true;
 
+		this.splitActive = false;
+		this.splitCanvasData = null;
+		this.splitOverlay = null;
+		this.splitLine = null;
+		this.splitQuad = null;
+		this.splitMaterial = null;
+		this.splitUniforms = null;
+		this.splitCanvas = null;
+		this.splitCanvasTarget = null;
+
 		backBtn.addEventListener( 'click', () => {
+
+			if ( this.splitActive ) {
+
+				this.stopSplitMode();
+
+			}
 
 			select.value = 'list';
 			this.showListView();
@@ -161,8 +182,6 @@ class Viewer extends Tab {
 			if ( ! this.isDraggingThumbnail || ! this.activeSourceCanvas ) return;
 
 			const renderer = this.inspector.getRenderer();
-
-			if ( ! renderer || ! renderer.domElement ) return;
 
 			if ( e.isForwarded ) return;
 
@@ -220,6 +239,12 @@ class Viewer extends Tab {
 		this.activeSourceCanvas = null;
 		this.activePointerIds.clear();
 
+		if ( this.splitActive ) {
+
+			this.stopSplitMode();
+
+		}
+
 	}
 
 	addNodeItem( canvasData ) {
@@ -249,6 +274,13 @@ class Viewer extends Tab {
 			viewBtn.onclick = ( e ) => {
 
 				e.stopPropagation();
+
+				if ( this.splitActive ) {
+
+					this.stopSplitMode();
+
+				}
+
 				this.select.value = canvasData.id;
 				this.showNodeView( canvasData.id );
 				this.saveLastView();
@@ -259,45 +291,60 @@ class Viewer extends Tab {
 			const fullscreenBtn = document.createElement( 'button' );
 			fullscreenBtn.className = 'node-canvas-fullscreen-btn';
 			fullscreenBtn.title = 'Fullscreen view';
-			fullscreenBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
+			fullscreenBtn.innerHTML = fullscreenIcon;
 
 			fullscreenBtn.onclick = ( e ) => {
 
 				e.stopPropagation();
-				this.select.value = canvasData.id;
-				this.showNodeView( canvasData.id );
 
-				if ( this.profiler && ! this.profiler.panel.classList.contains( 'maximized' ) ) {
+				if ( this.splitActive && this.splitCanvasData === canvasData && this.splitFullscreen ) {
 
-					this.profiler.toggleMaximize();
-					this.maximizedByFullscreenButton = true;
+					this.stopSplitMode();
 
-					if ( ! this._maximizeListenerAdded && this.profiler.maximizeBtn ) {
+				} else {
 
-						this.profiler.maximizeBtn.addEventListener( 'click', () => {
-
-							this.maximizedByFullscreenButton = false;
-
-						} );
-						this._maximizeListenerAdded = true;
-
-					}
+					this.splitFullscreen = true;
+					this.startSplitMode( canvasData );
 
 				}
 
-				this.saveLastView();
+			};
+
+			// Split screen button
+			const splitBtn = document.createElement( 'button' );
+			splitBtn.className = 'node-canvas-split-btn';
+			splitBtn.title = 'Interactive split screen';
+			splitBtn.innerHTML = splitIcon;
+
+			splitBtn.onclick = ( e ) => {
+
+				e.stopPropagation();
+
+				if ( this.splitActive && this.splitCanvasData === canvasData && ! this.splitFullscreen ) {
+
+					this.stopSplitMode();
+
+				} else {
+
+					this.splitFullscreen = false;
+					this.startSplitMode( canvasData );
+
+				}
 
 			};
 
 			wrapper.appendChild( domElement );
 			wrapper.appendChild( viewBtn );
 			wrapper.appendChild( fullscreenBtn );
+			wrapper.appendChild( splitBtn );
 
 			this.setupEventForwarding( domElement );
 
 			// Store elements in canvasData for access
 			canvasData.domElement = domElement;
 			canvasData.wrapperElement = wrapper;
+			canvasData.splitBtn = splitBtn;
+			canvasData.fullscreenBtn = fullscreenBtn;
 
 			item = new Item( wrapper, name );
 			item.itemRow.children[ 1 ].style[ 'justify-content' ] = 'flex-start';
@@ -441,6 +488,45 @@ class Viewer extends Tab {
 
 	}
 
+	init( inspector ) {
+
+		super.init( inspector );
+
+		const updateLayoutFromPosition = () => {
+
+			const position = inspector.profiler.position;
+			const isHorizontal = position === 'top' || position === 'bottom';
+			this.setViewMode( isHorizontal ? 'grid' : 'list' );
+
+		};
+
+		inspector.profiler.addEventListener( 'resize', updateLayoutFromPosition );
+
+		// Run initially once
+		updateLayoutFromPosition();
+
+	}
+
+	setViewMode( mode ) {
+
+		if ( this.nodeList ) {
+
+			if ( mode === 'grid' ) {
+
+				this.nodeList.domElement.style.minWidth = '0';
+
+			} else {
+
+				this.nodeList.domElement.style.minWidth = '400px';
+
+			}
+
+			this.nodeList.setViewMode( mode );
+
+		}
+
+	}
+
 	showListView() {
 
 		if ( this.activeFullNodeId ) {
@@ -514,6 +600,273 @@ class Viewer extends Tab {
 
 	}
 
+	get isActive() {
+
+		if ( this.splitActive ) return true;
+
+		return super.isActive;
+
+	}
+
+	set isActive( value ) {
+
+		super.isActive = value;
+
+	}
+
+	startSplitMode( canvasData ) {
+
+		this.splitActive = true;
+		this.splitCanvasData = canvasData;
+
+		const renderer = this.inspector.getRenderer();
+		const mainCanvas = renderer.domElement;
+		const rect = mainCanvas.getBoundingClientRect();
+
+		// Position target canvas on top of main canvas
+		if ( ! this.splitCanvas ) {
+
+			this.splitCanvas = document.createElement( 'canvas' );
+			this.splitCanvas.style.position = 'fixed';
+			this.splitCanvas.style.pointerEvents = 'none';
+			this.splitCanvas.style.zIndex = '998';
+
+			this.splitCanvasTarget = new CanvasTarget( this.splitCanvas );
+			this.splitCanvasTarget.setPixelRatio( window.devicePixelRatio );
+
+		}
+
+		this.splitCanvas.style.left = `${ rect.left }px`;
+		this.splitCanvas.style.top = `${ rect.top }px`;
+		this.splitCanvas.style.width = `${ rect.width }px`;
+		this.splitCanvas.style.height = `${ rect.height }px`;
+
+		this.splitCanvasTarget.setSize( rect.width, rect.height );
+		renderer.backend.delete( this.splitCanvasTarget );
+
+		document.body.appendChild( this.splitCanvas );
+
+		// Overlay divider line (only in split/non-fullscreen mode)
+		if ( ! this.splitFullscreen ) {
+
+			if ( ! this.splitOverlay ) {
+
+				const overlay = document.createElement( 'div' );
+				overlay.className = 'split-screen-overlay';
+
+				const line = document.createElement( 'div' );
+				line.className = 'split-screen-line';
+
+				overlay.appendChild( line );
+
+				let isDragging = false;
+
+				const onPointerDown = ( e ) => {
+
+					isDragging = true;
+					e.preventDefault();
+
+				};
+
+				const onPointerMove = ( e ) => {
+
+					if ( ! isDragging ) return;
+
+					const minPadding = 10; // Keep the line at least 15px away from the edges for easy grabbing
+					const x = Math.max( minPadding, Math.min( window.innerWidth - minPadding, e.clientX ) );
+					const pct = x / window.innerWidth;
+					this.splitX = pct;
+					line.style.left = `${ pct * 100 }%`;
+
+					if ( this.splitUniforms && this.splitUniforms.splitX ) {
+
+						this.splitUniforms.splitX.value = pct;
+
+					}
+
+				};
+
+				const onPointerUp = () => {
+
+					isDragging = false;
+
+				};
+
+				line.addEventListener( 'pointerdown', onPointerDown );
+				window.addEventListener( 'pointermove', onPointerMove );
+				window.addEventListener( 'pointerup', onPointerUp );
+
+				this.splitOverlay = overlay;
+				this.splitLine = line;
+
+			}
+
+			this.splitLine.style.left = '50%';
+
+			this.profiler.domElement.appendChild( this.splitOverlay );
+
+		} else {
+
+			// If we transitioned from split to fullscreen, remove the overlay slider
+			if ( this.splitOverlay && this.splitOverlay.parentElement ) {
+
+				this.splitOverlay.parentElement.removeChild( this.splitOverlay );
+
+			}
+
+		}
+
+		if ( ! this.splitUniforms ) {
+
+			this.splitUniforms = {
+				splitX: uniform( 0.5 ),
+				viewportWidth: uniform( window.innerWidth )
+			};
+
+		}
+
+		this.splitUniforms.splitX.value = 0.5;
+		this.splitUniforms.viewportWidth.value = renderer.domElement.width;
+
+		// Recreate or setup material for split screen comparison
+		const node = canvasData.node;
+		const target = node.context( { getUV: () => screenUV } );
+		const targetColor = renderOutput( vec4( vec3( target ), 1 ), NoToneMapping, renderer.outputColorSpace );
+		const targetColorCtx = targetColor.context( { inspector: true } );
+
+		let finalColor;
+
+		if ( this.splitFullscreen ) {
+
+			finalColor = targetColorCtx;
+
+		} else {
+
+			const thickness = float( 1 ).div( this.splitUniforms.viewportWidth );
+			const isLine = screenUV.x.sub( this.splitUniforms.splitX ).abs().lessThan( thickness );
+			finalColor = Fn( () => {
+
+				screenUV.x.lessThan( this.splitUniforms.splitX ).discard();
+
+				return isLine.select( vec4( 0.29, 0.29, 0.35, 1.0 ), targetColorCtx );
+
+			} )();
+
+		}
+
+		if ( this.splitMaterial ) {
+
+			this.splitMaterial.dispose();
+
+		}
+
+		this.splitMaterial = new NodeMaterial();
+		this.splitMaterial.outputNode = finalColor;
+		this.splitMaterial.depthTest = false;
+		this.splitMaterial.depthWrite = false;
+
+		if ( this.splitQuad ) {
+
+			this.splitQuad.material = this.splitMaterial;
+
+		} else {
+
+			this.splitQuad = new QuadMesh( this.splitMaterial );
+
+		}
+
+		this.updateSplitButtonsState();
+
+	}
+
+	stopSplitMode() {
+
+		this.splitActive = false;
+		this.splitCanvasData = null;
+		this.splitFullscreen = false;
+
+		if ( this.splitOverlay && this.splitOverlay.parentElement ) {
+
+			this.splitOverlay.parentElement.removeChild( this.splitOverlay );
+
+		}
+
+		if ( this.splitCanvas && this.splitCanvas.parentElement ) {
+
+			this.splitCanvas.parentElement.removeChild( this.splitCanvas );
+
+		}
+
+		this.updateSplitButtonsState();
+
+	}
+
+	updateSplitButtonsState() {
+
+		if ( this.splitActive ) {
+
+			this.backBtn.style.display = '';
+
+		} else {
+
+			if ( this.select.value === 'list' ) {
+
+				this.backBtn.style.display = 'none';
+
+			} else {
+
+				this.backBtn.style.display = '';
+
+			}
+
+		}
+
+		for ( const canvasData of this.canvasNodes.values() ) {
+
+			if ( ! canvasData.splitBtn || ! canvasData.fullscreenBtn ) continue;
+
+			const isSelected = this.splitActive && this.splitCanvasData === canvasData;
+
+			if ( isSelected ) {
+
+				if ( this.splitFullscreen ) {
+
+					canvasData.fullscreenBtn.classList.add( 'active' );
+					canvasData.fullscreenBtn.innerHTML = backIcon;
+					canvasData.fullscreenBtn.title = 'Exit Fullscreen';
+
+					canvasData.splitBtn.classList.remove( 'active' );
+					canvasData.splitBtn.innerHTML = splitIcon;
+					canvasData.splitBtn.title = 'Interactive split screen';
+
+				} else {
+
+					canvasData.splitBtn.classList.add( 'active' );
+					canvasData.splitBtn.innerHTML = backIcon;
+					canvasData.splitBtn.title = 'Exit Split Screen';
+
+					canvasData.fullscreenBtn.classList.remove( 'active' );
+					canvasData.fullscreenBtn.innerHTML = fullscreenIcon;
+					canvasData.fullscreenBtn.title = 'Fullscreen view';
+
+				}
+
+			} else {
+
+				canvasData.splitBtn.classList.remove( 'active' );
+				canvasData.splitBtn.innerHTML = splitIcon;
+				canvasData.splitBtn.title = 'Interactive split screen';
+
+				canvasData.fullscreenBtn.classList.remove( 'active' );
+				canvasData.fullscreenBtn.innerHTML = fullscreenIcon;
+				canvasData.fullscreenBtn.title = 'Fullscreen view';
+
+			}
+
+		}
+
+	}
+
 	getCanvasDataByNode( renderer, node ) {
 
 		let canvasData = this.canvasNodes.get( node );
@@ -575,6 +928,48 @@ class Viewer extends Tab {
 	update( inspector ) {
 
 		const renderer = inspector.getRenderer();
+
+		if ( this.splitActive ) {
+
+			// Resize canvas target to match the main canvas if window resized
+			const mainCanvas = renderer.domElement;
+			const rect = mainCanvas.getBoundingClientRect();
+
+			if ( this.splitCanvasTarget.domElement.width !== rect.width || this.splitCanvasTarget.domElement.height !== rect.height ) {
+
+				this.splitCanvas.style.width = `${ rect.width }px`;
+				this.splitCanvas.style.height = `${ rect.height }px`;
+				this.splitCanvas.style.left = `${ rect.left }px`;
+				this.splitCanvas.style.top = `${ rect.top }px`;
+
+				this.splitCanvasTarget.setSize( rect.width, rect.height );
+
+				renderer.backend.delete( this.splitCanvasTarget );
+
+			}
+
+			// Render the split quad to the splitCanvasTarget
+			const previousCanvasTarget = renderer.getCanvasTarget();
+			const previousClearColor = renderer.getClearColor( new Color() );
+			const previousClearAlpha = renderer.getClearAlpha();
+
+			const state = RendererUtils.resetRendererState( renderer );
+
+			renderer.toneMapping = NoToneMapping;
+			renderer.outputColorSpace = LinearSRGBColorSpace;
+
+			renderer.setCanvasTarget( this.splitCanvasTarget );
+			renderer.setClearColor( 0x000000, 0 );
+
+			this.splitQuad.render( renderer );
+
+			renderer.setCanvasTarget( previousCanvasTarget );
+			renderer.setClearColor( previousClearColor, previousClearAlpha );
+
+			RendererUtils.restoreRendererState( renderer, state );
+
+		}
+
 		const nodes = inspector.getNodes();
 
 		if ( nodes.length > 0 ) {
