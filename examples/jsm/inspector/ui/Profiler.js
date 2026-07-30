@@ -2004,6 +2004,9 @@ export class Profiler extends EventDispatcher {
 			// Update panel size after loading layout
 			this.updatePanelSize();
 
+			// Update widget position (toggle and mini panel alignment)
+			this.updateWidgetPosition();
+
 			// Ensure initial open state applies to mini panel as well
 			if ( this.panel.classList.contains( 'visible' ) ) {
 
