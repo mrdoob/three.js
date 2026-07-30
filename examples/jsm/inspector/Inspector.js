@@ -135,6 +135,20 @@ class Inspector extends RendererInspector {
 
 	}
 
+	setVisible( value ) {
+
+		this.domElement.style.display = value ? '' : 'none';
+
+		return this;
+
+	}
+
+	getVisible() {
+
+		return this.domElement.style.display !== 'none';
+
+	}
+
 	getSize() {
 
 		return this.profiler.getSize();
@@ -144,6 +158,22 @@ class Inspector extends RendererInspector {
 	setActiveTab( tab ) {
 
 		this.profiler.setActiveTab( tab.id );
+
+		return this;
+
+	}
+
+	setHorizontalAlign( value ) {
+
+		this.profiler.setHorizontalAlign( value );
+
+		return this;
+
+	}
+
+	setVerticalAlign( value ) {
+
+		this.profiler.setVerticalAlign( value );
 
 		return this;
 
