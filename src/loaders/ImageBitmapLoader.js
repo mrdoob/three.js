@@ -186,6 +186,8 @@ class ImageBitmapLoader extends Loader {
 
 			scope.manager.itemEnd( url );
 
+			return imageBitmap;
+
 		} ).catch( function ( e ) {
 
 			if ( onError ) onError( e );
