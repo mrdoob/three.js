@@ -239,6 +239,16 @@ class XRManager extends EventDispatcher {
 		this._currentSize = new Vector2();
 
 		/**
+		 * The `fov` and `zoom` of the user camera before the XR session
+		 * has been started. Used to restore the camera when the session ends.
+		 *
+		 * @private
+		 * @type {?Object}
+		 * @default null
+		 */
+		this._currentCameraSettings = null;
+
+		/**
 		 * The default event listener for handling events inside a XR session.
 		 *
 		 * @private
@@ -1428,6 +1438,12 @@ class XRManager extends EventDispatcher {
 
 		// update user camera and its children
 
+		if ( this._currentCameraSettings === null && camera.isPerspectiveCamera ) {
+
+			this._currentCameraSettings = { camera: camera, fov: camera.fov, zoom: camera.zoom };
+
+		}
+
 		updateUserCamera( camera, cameraXR, parent );
 
 
@@ -1712,6 +1728,18 @@ function onSessionEnd() {
 
 	renderer.setPixelRatio( this._currentPixelRatio );
 	renderer.setSize( this._currentSize.width, this._currentSize.height, false );
+
+	if ( this._currentCameraSettings !== null ) {
+
+		const camera = this._currentCameraSettings.camera;
+
+		camera.fov = this._currentCameraSettings.fov;
+		camera.zoom = this._currentCameraSettings.zoom;
+		camera.updateProjectionMatrix();
+
+		this._currentCameraSettings = null;
+
+	}
 
 	this.dispatchEvent( { type: 'sessionend' } );
 
