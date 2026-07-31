@@ -251,6 +251,7 @@
 		"webgl_buffergeometry",
 		"webgl_buffergeometry_attributes_integer",
 		"webgl_buffergeometry_attributes_none",
+		"webgl_buffergeometry_attributes_opacity",
 		"webgl_buffergeometry_custom_attributes_particles",
 		"webgl_buffergeometry_drawrange",
 		"webgl_buffergeometry_glbufferattribute",
