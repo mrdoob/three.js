@@ -22,8 +22,8 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - foot ik<br />
-			WASD move, Shift sprint, Space jump, mouse orbit<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - animation - foot ik - <a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a><br/>
+			WASD move, Shift sprint, mouse orbit<br/>
 			Soldier model from <a href="https://www.mixamo.com" target="_blank" rel="noopener">https://www.mixamo.com</a>.
 		</div>
 
@@ -54,7 +54,6 @@
 			THREE.Mesh.prototype.raycast = acceleratedRaycast;
 
 			const GRAVITY = - 30;
-			const JUMP_SPEED = 10;
 			const PHYSICS_STEPS = 5;
 			const PLAYER_MODEL_SCALE = 0.5;
 			const CAPSULE_RADIUS = 0.175;
@@ -69,7 +68,7 @@
 
 			let camera, scene, renderer, orbitControls, stats, timer;
 			let player, playerCapsuleHelper, playerModel, collider, footIK, mixer, actions;
-			let sun, sunDebugHelper, sunShadowCameraHelper;
+			let sun;
 			let playerIsOnGround = false;
 			let groundSnapHeight = 0;
 			let maxGroundDistance = 0;
@@ -91,7 +90,7 @@
 				fadeDuration: 0.25,
 				runVelocity: 2.1,
 				walkVelocity: 0.8,
-				rotateSpeed: 0.05
+				rotateSpeed: 10
 			};
 
 			const playerHost = {
@@ -171,14 +170,6 @@
 					THREE.MathUtils.degToRad( 70 ),
 					THREE.MathUtils.degToRad( 210 ),
 				);
-
-				sunDebugHelper = new THREE.DirectionalLightHelper( sun, 1.2, 0xffd166 );
-				sunDebugHelper.visible = false;
-				scene.add( sunDebugHelper );
-
-				sunShadowCameraHelper = new THREE.CameraHelper( sun.shadow.camera );
-				sunShadowCameraHelper.visible = false;
-				scene.add( sunShadowCameraHelper );
 
 				const course = buildTestCourse();
 				scene.add( course );
@@ -378,7 +369,7 @@
 						},
 						soleSkinThickness: 0.015
 					} );
-					footIK.onAttach( playerHost );
+					footIK.attach( playerHost );
 
 					createDebugPanel();
 
@@ -392,9 +383,8 @@
 				const params = {
 					footIKEnabled: options.enabled,
 					footIKDebug: options.debug,
-					soleSampleDebug: options.soleSampleDebug,
-					sunDebug: false,
 					playerDebug: false,
+					colliderDebug: false,
 					soleHalfWidth: options.soleHalfWidth,
 					soleToeExtend: options.soleToeExtend,
 					soleHeelExtend: options.soleHeelExtend,
@@ -409,10 +399,9 @@
 					playerCapsuleHelper.visible = value;
 
 				} );
-				sceneFolder.add( params, 'sunDebug' ).name( 'Sun Debug' ).onChange( ( value ) => {
+				sceneFolder.add( params, 'colliderDebug' ).name( 'BVH Collider' ).onChange( ( value ) => {
 
-					sunDebugHelper.visible = value;
-					sunShadowCameraHelper.visible = value;
+					collider.visible = value;
 
 				} );
 				sceneFolder.close();
@@ -436,11 +425,6 @@
 				debugFolder.add( params, 'footIKDebug' ).name( 'IK Targets' ).onChange( ( value ) => {
 
 					footIK.setDebugEnabled( value && params.footIKEnabled );
-
-				} );
-				debugFolder.add( params, 'soleSampleDebug' ).name( 'Sole Samples' ).onChange( ( value ) => {
-
-					footIK.setSoleSampleDebugEnabled( value );
 
 				} );
 				debugFolder.open();
@@ -633,13 +617,13 @@
 
 			}
 
-			function updatePlayerFacing() {
+			function updatePlayerFacing( delta ) {
 
 				const key = moveControls.key;
 
 				if ( key[ 0 ] === 0 && key[ 1 ] === 0 ) return;
 
-				player.quaternion.rotateTowards( moveControls.rotate, moveControls.rotateSpeed );
+				player.quaternion.rotateTowards( moveControls.rotate, moveControls.rotateSpeed * delta );
 
 			}
 
@@ -660,17 +644,6 @@
 					case 'ArrowLeft': case 'KeyA': key[ 1 ] = - 1; break;
 					case 'ArrowRight': case 'KeyD': key[ 1 ] = 1; break;
 					case 'ShiftLeft': case 'ShiftRight': key[ 2 ] = 1; break;
-					case 'Space':
-						event.preventDefault();
-						if ( ! event.repeat && playerIsOnGround ) {
-
-							playerIsOnGround = false;
-							playerHost.playerIsOnGround = false;
-							playerVelocity.y = JUMP_SPEED;
-
-						}
-
-						break;
 
 				}
 
@@ -898,9 +871,6 @@
 				timer.update();
 				const delta = Math.min( timer.getDelta(), 0.1 );
 
-				sunDebugHelper.update();
-				sunShadowCameraHelper.update();
-
 				if ( mixer && footIK && collider ) {
 
 					updateAnimation();
@@ -913,11 +883,11 @@
 
 					}
 
-					updatePlayerFacing();
+					updatePlayerFacing( delta );
 
-					footIK.onBeforeAnimationUpdate( delta );
+					footIK.restore();
 					mixer.update( delta );
-					footIK.onAfterAnimationUpdate( delta );
+					footIK.update( delta );
 
 				}
 
