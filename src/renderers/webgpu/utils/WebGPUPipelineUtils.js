@@ -1,5 +1,3 @@
-import { BlendColorFactor, OneMinusBlendColorFactor, } from '../../common/Constants.js';
-
 import {
 	GPUFrontFace, GPUCullMode, GPUColorWriteFlags, GPUCompareFunction, GPUBlendFactor, GPUBlendOperation, GPUIndexFormat, GPUStencilOperation, GPUPrimitiveTopology
 } from './WebGPUConstants.js';
@@ -10,6 +8,7 @@ import {
 	NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending, MaterialBlending,
 	ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstColorFactor,
 	OneMinusDstColorFactor, DstAlphaFactor, OneMinusDstAlphaFactor, SrcAlphaSaturateFactor,
+	ConstantColorFactor, OneMinusConstantColorFactor, ConstantAlphaFactor, OneMinusConstantAlphaFactor,
 	AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation,
 	KeepStencilOp, ZeroStencilOp, ReplaceStencilOp, InvertStencilOp, IncrementStencilOp, DecrementStencilOp, IncrementWrapStencilOp, DecrementWrapStencilOp,
 	NeverStencilFunc, AlwaysStencilFunc, LessStencilFunc, LessEqualStencilFunc, EqualStencilFunc, GreaterEqualStencilFunc, GreaterStencilFunc, NotEqualStencilFunc
@@ -714,11 +713,13 @@ class WebGPUPipelineUtils {
 				blendFactor = GPUBlendFactor.SrcAlphaSaturated;
 				break;
 
-			case BlendColorFactor:
+			case ConstantColorFactor:
+			case ConstantAlphaFactor: // WebGPU has no dedicated constant alpha blend factors
 				blendFactor = GPUBlendFactor.Constant;
 				break;
 
-			case OneMinusBlendColorFactor:
+			case OneMinusConstantColorFactor:
+			case OneMinusConstantAlphaFactor: // WebGPU has no dedicated constant alpha blend factors
 				blendFactor = GPUBlendFactor.OneMinusConstant;
 				break;
 
