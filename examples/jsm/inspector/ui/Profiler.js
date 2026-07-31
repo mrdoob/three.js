@@ -21,7 +21,7 @@ export class Profiler extends EventDispatcher {
 		this.nextTabOriginalIndex = 0; // Track the original order of tabs as they are added
 
 		this.horizontalAlign = 'right'; // 'left' or 'right'
-		this.verticalAlign = 'top';     // 'top' or 'bottom'
+		this.verticalAlign = 'top'; // 'top' or 'bottom'
 
 		this.setupShell();
 		this.setupResizing();
@@ -2152,7 +2152,7 @@ export class Profiler extends EventDispatcher {
 		const isRight = this.position === 'right';
 
 		let horizontal = this.horizontalAlign; // 'left' or 'right'
-		let vertical = this.verticalAlign;     // 'top' or 'bottom'
+		let vertical = this.verticalAlign; // 'top' or 'bottom'
 
 		if ( isVisible ) {
 
