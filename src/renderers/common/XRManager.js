@@ -239,8 +239,7 @@ class XRManager extends EventDispatcher {
 		this._currentSize = new Vector2();
 
 		/**
-		 * The `fov` and `zoom` of the user camera before the XR session
-		 * has been started. Used to restore the camera when the session ends.
+		 * Holds a reference to the user camera and its current settings.
 		 *
 		 * @private
 		 * @type {?Object}
