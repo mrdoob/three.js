@@ -4169,10 +4169,6 @@ class Quaternion {
 
 		const x = euler._x, y = euler._y, z = euler._z, order = euler._order;
 
-		// http://www.mathworks.com/matlabcentral/fileexchange/
-		// 	20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/
-		//	content/SpinCalc.m
-
 		const cos = Math.cos;
 		const sin = Math.sin;
 
@@ -4248,8 +4244,6 @@ class Quaternion {
 	 */
 	setFromAxisAngle( axis, angle ) {
 
-		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm
-
 		const halfAngle = angle / 2, s = Math.sin( halfAngle );
 
 		this._x = axis.x * s;
@@ -4270,8 +4264,6 @@ class Quaternion {
 	 * @return {Quaternion} A reference to this quaternion.
 	 */
 	setFromRotationMatrix( m ) {
-
-		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
 
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
@@ -4559,8 +4551,6 @@ class Quaternion {
 	 * @return {Quaternion} A reference to this quaternion.
 	 */
 	multiplyQuaternions( a, b ) {
-
-		// from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm
 
 		const qax = a._x, qay = a._y, qaz = a._z, qaw = a._w;
 		const qbx = b._x, qby = b._y, qbz = b._z, qbw = b._w;
@@ -8521,8 +8511,6 @@ class Vector4 {
 	 */
 	setAxisAngleFromQuaternion( q ) {
 
-		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/index.htm
-
 		// q is assumed to be normalized
 
 		this.w = 2 * Math.acos( q.w );
@@ -8555,8 +8543,6 @@ class Vector4 {
 	 * @return {Vector4} A reference to this vector.
 	 */
 	setAxisAngleFromRotationMatrix( m ) {
-
-		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToAngle/index.htm
 
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
@@ -13508,6 +13494,27 @@ class Object3D extends EventDispatcher {
 		}
 
 		return this;
+
+	}
+
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 *
+	 * Geometries, materials and textures are potentially shared with other
+	 * 3D objects and must be disposed of separately.
+	 *
+	 * @fires Object3D#dispose
+	 */
+	dispose() {
+
+		/**
+		 * Fires when the 3D object has been disposed of.
+		 *
+		 * @event Object3D#dispose
+		 * @type {Object}
+		 */
+		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 
@@ -25718,7 +25725,7 @@ class InstancedMesh extends Mesh {
 	 */
 	dispose() {
 
-		this.dispatchEvent( { type: 'dispose' } );
+		super.dispose();
 
 		if ( this.morphTexture !== null ) {
 
@@ -25914,6 +25921,10 @@ class Frustum {
 	/**
 	 * Returns `true` if the given bounding sphere is intersecting this frustum.
 	 *
+	 * This is a fast, conservative test that favors performance over precision. It can
+	 * report false positives for spheres that lie outside the frustum but are not separated
+	 * by a single frustum plane. It never reports false negatives, so it is safe for culling.
+	 *
 	 * @param {Sphere} sphere - The bounding sphere to test.
 	 * @return {boolean} Whether the bounding sphere is intersecting this frustum or not.
 	 */
@@ -25941,6 +25952,11 @@ class Frustum {
 
 	/**
 	 * Returns `true` if the given bounding box is intersecting this frustum.
+	 *
+	 * This is a fast, conservative test that favors performance over precision. It can
+	 * report false positives for large boxes that lie outside the frustum but are not
+	 * separated by a single frustum plane. It never reports false negatives, so it is
+	 * safe for culling.
 	 *
 	 * @param {Box3} box - The bounding box to test.
 	 * @return {boolean} Whether the bounding box is intersecting this frustum or not.
@@ -27422,6 +27438,7 @@ class BatchedMesh extends Mesh {
 		this.validateGeometryId( geometryId );
 
 		this._instanceInfo[ instanceId ].geometryIndex = geometryId;
+		this._visibilityChanged = true;
 
 		return this;
 
@@ -27715,6 +27732,8 @@ class BatchedMesh extends Mesh {
 	 * method whenever this instance is no longer used in your app.
 	 */
 	dispose() {
+
+		super.dispose();
 
 		// Assuming the geometry is not shared with other meshes
 		this.geometry.dispose();
@@ -45988,16 +46007,6 @@ class Light extends Object3D {
 
 	}
 
-	/**
-	 * Frees the GPU-related resources allocated by this instance. Call this
-	 * method whenever this instance is no longer used in your app.
-	 */
-	dispose() {
-
-		this.dispatchEvent( { type: 'dispose' } );
-
-	}
-
 	copy( source, recursive ) {
 
 		super.copy( source, recursive );
@@ -50318,6 +50327,8 @@ class ImageBitmapLoader extends Loader {
 			if ( onLoad ) onLoad( imageBitmap );
 
 			scope.manager.itemEnd( url );
+
+			return imageBitmap; // see #34150
 
 		} ).catch( function ( e ) {
 
@@ -55867,15 +55878,19 @@ class RenderTarget3D extends RenderTarget {
 
 		this.depth = depth;
 
-		/**
-		 * Overwritten with a different texture type.
-		 *
-		 * @type {Data3DTexture}
-		 */
-		this.texture = new Data3DTexture( null, width, height, depth );
-		this._setTextureOptions( options );
+		// overwrite attachments with 3D textures
 
-		this.texture.isRenderTargetTexture = true;
+		for ( let i = 0; i < this.textures.length; i ++ ) {
+
+			const texture = new Data3DTexture( null, width, height, depth );
+			texture.isRenderTargetTexture = true;
+			texture.renderTarget = this;
+
+			this.textures[ i ] = texture;
+
+		}
+
+		this._setTextureOptions( options );
 
 	}
 
@@ -57928,6 +57943,8 @@ class SpotLightHelper extends Object3D {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this.cone.geometry.dispose();
 		this.cone.material.dispose();
 
@@ -58139,6 +58156,8 @@ class SkeletonHelper extends LineSegments {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this.geometry.dispose();
 		this.material.dispose();
 
@@ -58229,6 +58248,8 @@ class PointLightHelper extends Mesh {
 	 * method whenever this instance is no longer used in your app.
 	 */
 	dispose() {
+
+		super.dispose();
 
 		this.geometry.dispose();
 		this.material.dispose();
@@ -58350,6 +58371,8 @@ class HemisphereLightHelper extends Object3D {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this.children[ 0 ].geometry.dispose();
 		this.children[ 0 ].material.dispose();
 
@@ -58462,6 +58485,8 @@ class GridHelper extends LineSegments {
 	 * method whenever this instance is no longer used in your app.
 	 */
 	dispose() {
+
+		super.dispose();
 
 		this.geometry.dispose();
 		this.material.dispose();
@@ -58581,6 +58606,8 @@ class PolarGridHelper extends LineSegments {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this.geometry.dispose();
 		this.material.dispose();
 
@@ -58685,6 +58712,8 @@ class DirectionalLightHelper extends Object3D {
 	 * method whenever this instance is no longer used in your app.
 	 */
 	dispose() {
+
+		super.dispose();
 
 		this.lightPlane.geometry.dispose();
 		this.lightPlane.material.dispose();
@@ -59036,6 +59065,8 @@ class CameraHelper extends LineSegments {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this.geometry.dispose();
 		this.material.dispose();
 
@@ -59198,6 +59229,8 @@ class BoxHelper extends LineSegments {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this.geometry.dispose();
 		this.material.dispose();
 
@@ -59274,6 +59307,8 @@ class Box3Helper extends LineSegments {
 	 * method whenever this instance is no longer used in your app.
 	 */
 	dispose() {
+
+		super.dispose();
 
 		this.geometry.dispose();
 		this.material.dispose();
@@ -59360,6 +59395,8 @@ class PlaneHelper extends Line {
 	 * light being visualized.
 	 */
 	dispose() {
+
+		super.dispose();
 
 		this.geometry.dispose();
 		this.material.dispose();
@@ -59521,6 +59558,8 @@ class ArrowHelper extends Object3D {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this.line.geometry.dispose();
 		this.line.material.dispose();
 		this.cone.geometry.dispose();
@@ -59610,6 +59649,8 @@ class AxesHelper extends LineSegments {
 	 * method whenever this instance is no longer used in your app.
 	 */
 	dispose() {
+
+		super.dispose();
 
 		this.geometry.dispose();
 		this.material.dispose();
