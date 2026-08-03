@@ -113,6 +113,7 @@ class RenderObjects {
 			// update references
 
 			renderObject.camera = camera;
+			renderObject.materialSide = material.side;
 
 			//
 

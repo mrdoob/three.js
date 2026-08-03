@@ -171,6 +171,7 @@ class NodeManager extends DataMap {
 
 		nodeBuilder.scene = renderObject.scene;
 		nodeBuilder.material = material;
+		nodeBuilder.materialSide = renderObject.materialSide;
 		nodeBuilder.camera = renderObject.camera;
 		nodeBuilder.context.material = material;
 		nodeBuilder.lightsNode = renderObject.lightsNode;
