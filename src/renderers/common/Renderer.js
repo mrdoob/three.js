@@ -30,7 +30,7 @@ import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
-import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, HalfFloatType, RGBAFormat, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap } from '../../constants.js';
+import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, HalfFloatType, RGBAFormat, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap, RenderObjectRefreshType } from '../../constants.js';
 
 import { float, vec3, vec4, Fn } from '../../nodes/tsl/TSLCore.js';
 import { reference } from '../../nodes/accessors/ReferenceNode.js';
@@ -1450,7 +1450,9 @@ class Renderer {
 
 				const renderObject = renderObjects[ i ];
 
-				if ( this._nodes.needsRefresh( renderObject ) ) {
+				const refreshType = this._nodes.needsRefresh( renderObject );
+
+				if ( refreshType === RenderObjectRefreshType.FULL ) {
 
 					this._nodes.updateBefore( renderObject );
 
@@ -1459,6 +1461,11 @@ class Renderer {
 					this._bindings.updateForRender( renderObject );
 
 					this._nodes.updateAfter( renderObject );
+
+				} else if ( refreshType === RenderObjectRefreshType.SHARED ) {
+
+					this._nodes.updateForRender( renderObject );
+					this._bindings.updateSharedForRender( renderObject );
 
 				}
 
@@ -3861,9 +3868,9 @@ class Renderer {
 
 		//
 
-		const needsRefresh = this._nodes.needsRefresh( renderObject );
+		const refreshType = this._nodes.needsRefresh( renderObject );
 
-		if ( needsRefresh ) {
+		if ( refreshType === RenderObjectRefreshType.FULL ) {
 
 			this._nodes.updateBefore( renderObject );
 
@@ -3871,6 +3878,11 @@ class Renderer {
 
 			this._nodes.updateForRender( renderObject );
 			this._bindings.updateForRender( renderObject );
+
+		} else if ( refreshType === RenderObjectRefreshType.SHARED ) {
+
+			this._nodes.updateForRender( renderObject );
+			this._bindings.updateSharedForRender( renderObject );
 
 		}
 
@@ -3882,7 +3894,7 @@ class Renderer {
 
 			this.backend.draw( renderObject, this.info );
 
-			if ( needsRefresh ) this._nodes.updateAfter( renderObject );
+			if ( refreshType === RenderObjectRefreshType.FULL ) this._nodes.updateAfter( renderObject );
 
 		}
 
