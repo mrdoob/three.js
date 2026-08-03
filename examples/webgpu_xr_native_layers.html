@@ -46,7 +46,7 @@
 			import { HTMLMesh } from 'three/addons/interactive/HTMLMesh.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			let camera, scene, renderer;
+			let camera, scene, renderer, renderPipeline;
 			let controller1, controller2;
 			let controllerGrip1, controllerGrip2;
 
@@ -191,6 +191,7 @@
 				document.body.appendChild( renderer.domElement );
 				renderer.setAnimationLoop( render );
 				renderer.xr.enabled = true;
+				renderPipeline = new THREE.DirectRenderPipeline( renderer );
 
 				//
 
@@ -712,7 +713,7 @@
 
 				}
 
-				renderer.render( scene, camera );
+				renderPipeline.render( scene, camera );
 
 			}
 

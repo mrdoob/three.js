@@ -2600,6 +2600,8 @@ class Renderer {
 	 */
 	get needsFrameBufferTarget() {
 
+		if ( this.contextNode.value.outputColorTransform === false ) return false;
+
 		const useToneMapping = this.currentToneMapping !== NoToneMapping;
 		const useColorSpace = this.currentColorSpace !== ColorManagement.workingColorSpace;
 
