@@ -5,6 +5,7 @@ import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { materialPointSize } from '../../nodes/accessors/MaterialNode.js';
 import { rotate } from '../../nodes/utils/RotateNode.js';
 import { float, uniform, vec2, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
+import { frameGroup } from '../../nodes/core/UniformGroupNode.js';
 
 import { PointsMaterial } from '../PointsMaterial.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -200,7 +201,7 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 
 }
 
-const scale = /*@__PURE__*/ uniform( 1 ).onFrameUpdate( function ( { renderer } ) {
+const scale = /*@__PURE__*/ uniform( 1 ).setGroup( frameGroup ).onFrameUpdate( function ( { renderer } ) {
 
 	const size = renderer.getSize( _size ); // logical units
 
