@@ -460,6 +460,7 @@
 		"webgpu_postprocessing_traa",
 		"webgpu_postprocessing_transition",
 		"webgpu_postprocessing",
+		"webgpu_postprocessing_direct",
 		"webgpu_procedural_texture",
 		"webgpu_reflection",
 		"webgpu_reflection_blurred",
