@@ -1464,8 +1464,12 @@ class Renderer {
 
 				} else if ( refreshType === RenderObjectRefreshType.SHARED ) {
 
+					this._nodes.updateBefore( renderObject );
+
 					this._nodes.updateForRender( renderObject );
 					this._bindings.updateSharedForRender( renderObject );
+
+					this._nodes.updateAfter( renderObject );
 
 				}
 
@@ -3881,6 +3885,8 @@ class Renderer {
 
 		} else if ( refreshType === RenderObjectRefreshType.SHARED ) {
 
+			this._nodes.updateBefore( renderObject );
+
 			this._nodes.updateForRender( renderObject );
 			this._bindings.updateSharedForRender( renderObject );
 
@@ -3894,7 +3900,7 @@ class Renderer {
 
 			this.backend.draw( renderObject, this.info );
 
-			if ( refreshType === RenderObjectRefreshType.FULL ) this._nodes.updateAfter( renderObject );
+			if ( refreshType !== RenderObjectRefreshType.NONE ) this._nodes.updateAfter( renderObject );
 
 		}
 
