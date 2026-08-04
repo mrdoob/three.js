@@ -1,4 +1,5 @@
 import { output, renderOutput, uniform } from '../../nodes/TSL.js';
+import RenderPipeline from './RenderPipeline.js';
 
 /**
  * An alternative render pipeline that applies output processing directly in
@@ -12,15 +13,20 @@ import { output, renderOutput, uniform } from '../../nodes/TSL.js';
  * ```
  *
  * Note: This module can only be used with `WebGPURenderer`.
+ *
+ * @augments RenderPipeline
  */
-class DirectRenderPipeline {
+class DirectRenderPipeline extends RenderPipeline {
 
 	/**
 	 * Constructs a direct render pipeline.
 	 *
 	 * @param {Renderer} renderer - A reference to the renderer.
+	 * @param {Node<vec4>} outputNode - An optional output node.
 	 */
-	constructor( renderer ) {
+	constructor( renderer, outputNode = output ) {
+
+		super( renderer, outputNode );
 
 		/**
 		 * This flag can be used for type testing.
@@ -30,31 +36,6 @@ class DirectRenderPipeline {
 		 * @default true
 		 */
 		this.isDirectRenderPipeline = true;
-
-		/**
-		 * A reference to the renderer.
-		 *
-		 * @type {Renderer}
-		 */
-		this.renderer = renderer;
-
-		/**
-		 * An optional node for processing each material output before tone mapping
-		 * and color conversion. The current material output is available through
-		 * the TSL `output` property.
-		 *
-		 * @type {?Node<vec4>}
-		 * @default null
-		 */
-		this.outputNode = null;
-
-		/**
-		 * Must be set to `true` when the output node changes.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.needsUpdate = true;
 
 		/**
 		 * The context node used to apply output processing in material shaders.
@@ -73,22 +54,6 @@ class DirectRenderPipeline {
 		 * @default null
 		 */
 		this._rendererContextNode = null;
-
-		/**
-		 * The current tone mapping.
-		 *
-		 * @private
-		 * @type {ToneMapping}
-		 */
-		this._toneMapping = renderer.toneMapping;
-
-		/**
-		 * The current output color space.
-		 *
-		 * @private
-		 * @type {ColorSpace}
-		 */
-		this._outputColorSpace = renderer.outputColorSpace;
 
 		/**
 		 * Cached node representations of solid scene backgrounds.
@@ -138,6 +103,8 @@ class DirectRenderPipeline {
 
 		try {
 
+			for ( const callback of this._contextData.onBeforePipelineCallbacks ) callback();
+
 			renderer.render( scene, camera );
 
 		} finally {
@@ -152,6 +119,8 @@ class DirectRenderPipeline {
 				outputRenderTarget.depthBuffer = depthBuffer;
 
 			}
+
+			for ( const callback of this._contextData.onAfterPipelineCallbacks ) callback();
 
 		}
 
@@ -187,68 +156,56 @@ class DirectRenderPipeline {
 	}
 
 	/**
-	 * Updates the material context when pipeline or renderer output settings change.
+	 * Updates the state of the module.
 	 *
 	 * @private
 	 */
 	_update() {
 
-		const renderer = this.renderer;
+		if ( this._rendererContextNode !== this.renderer.contextNode ) {
 
-		if ( this._rendererContextNode !== renderer.contextNode ) {
-
-			this._rendererContextNode = renderer.contextNode;
+			this._rendererContextNode = this.renderer.contextNode;
 			this.needsUpdate = true;
 
 		}
 
-		if ( this._toneMapping !== renderer.toneMapping ) {
+		super._update();
 
-			this._toneMapping = renderer.toneMapping;
-			this.needsUpdate = true;
+	}
 
-		}
+	/**
+	 * Updates the context used to process material output directly.
+	 *
+	 * @private
+	 */
+	_updateContext() {
 
-		if ( this._outputColorSpace !== renderer.outputColorSpace ) {
+		super._updateContext();
 
-			this._outputColorSpace = renderer.outputColorSpace;
-			this.needsUpdate = true;
+		const pipelineOutputNode = this.outputNode;
+		const toneMapping = this._toneMapping;
+		const outputColorSpace = this._outputColorSpace;
+		const outputColorTransform = this.outputColorTransform;
 
-		}
+		this._contextNode = this._rendererContextNode.context( {
+			...this._contextData,
+			outputColorTransform: false,
 
-		if ( this.needsUpdate === true ) {
+			getOutput: ( materialOutputNode, builder ) => {
 
-			const pipelineOutputNode = this.outputNode;
-			const toneMapping = this._toneMapping;
-			const outputColorSpace = this._outputColorSpace;
+				const renderer = builder.renderer;
+				const renderTarget = renderer.getRenderTarget();
 
-			this._contextNode = this._rendererContextNode.context( {
-				outputColorTransform: false,
+				if ( renderer.isOutputTarget === false && renderTarget?._hasExternalTextures !== true ) return materialOutputNode;
 
-				getOutput: ( materialOutputNode, builder ) => {
+				output.assign( materialOutputNode );
 
-					const renderer = builder.renderer;
-					const renderTarget = renderer.getRenderTarget();
+				return outputColorTransform === true ?
+					renderOutput( pipelineOutputNode, toneMapping, outputColorSpace ) :
+					pipelineOutputNode;
 
-					if ( renderer.isOutputTarget === false && renderTarget?._hasExternalTextures !== true ) return materialOutputNode;
-
-					let outputNode = materialOutputNode;
-
-					if ( pipelineOutputNode !== null ) {
-
-						output.assign( materialOutputNode );
-						outputNode = pipelineOutputNode;
-
-					}
-
-					return renderOutput( outputNode, toneMapping, outputColorSpace );
-
-				}
-			} );
-
-			this.needsUpdate = false;
-
-		}
+			}
+		} );
 
 	}
 
