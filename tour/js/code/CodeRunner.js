@@ -806,7 +806,6 @@ class CodeRunner extends EventDispatcher {
 			const activeModules = {};
 			this.activeScriptNames = [];
 
-			const loadPromises = [];
 			const importedCustomScripts = [];
 
 			// Parse custom script imports (e.g. import 'teapot' or import 'teapot.js')
@@ -906,69 +905,59 @@ class CodeRunner extends EventDispatcher {
 
 				}
 
-				loadPromises.push( ( async () => {
+				try {
 
-					try {
+					const instance = await this.load( baseName );
+					if ( instance ) {
 
-						const instance = await this.load( baseName );
-						if ( instance ) {
+						if ( instance.init ) await instance.init();
 
-							if ( instance.init ) await instance.init();
+						if ( instance.resize && this.env.renderer ) {
 
-							if ( instance.resize && this.env.renderer ) {
+							const width = this.env.renderer.domElement.clientWidth;
+							const height = this.env.renderer.domElement.clientHeight;
+							if ( width > 0 && height > 0 ) {
 
-								const width = this.env.renderer.domElement.clientWidth;
-								const height = this.env.renderer.domElement.clientHeight;
-								if ( width > 0 && height > 0 ) {
-
-									instance.resize( width, height );
-
-								}
-
-							}
-
-							for ( const key of Object.keys( instance ) ) {
-
-								if ( ! LIFECYCLE_METHODS.includes( key ) && instance[ key ] !== undefined ) {
-
-									activeModules[ key ] = instance[ key ];
-									this.env[ key ] = instance[ key ];
-
-								}
-
-							}
-
-							this.activeScriptNames.push( baseName );
-
-						}
-
-					} catch ( err ) {
-
-						// Find where the script was imported in the main editor code
-						const matchRegex = new RegExp( `import\\s+['"](\\.\\/)?${baseName}(\\.js)?['"];?`, 'i' );
-						const match = code.match( matchRegex );
-						if ( match ) {
-
-							const charIndex = code.indexOf( match[ 0 ] );
-							if ( charIndex !== - 1 ) {
-
-								err.customLineNumber = code.substring( 0, charIndex ).split( '\n' ).length;
+								instance.resize( width, height );
 
 							}
 
 						}
 
-						throw err;
+						for ( const key of Object.keys( instance ) ) {
+
+							if ( ! LIFECYCLE_METHODS.includes( key ) && instance[ key ] !== undefined ) {
+
+								activeModules[ key ] = instance[ key ];
+								this.env[ key ] = instance[ key ];
+
+							}
+
+						}
+
+						this.activeScriptNames.push( baseName );
 
 					}
 
-				} )() );
+				} catch ( err ) {
 
-			}
+					// Find where the script was imported in the main editor code
+					const matchRegex = new RegExp( `import\\s+['"](\\.\\/)?${baseName}(\\.js)?['"];?`, 'i' );
+					const match = code.match( matchRegex );
+					if ( match ) {
 
-			if ( loadPromises.length > 0 ) {
+						const charIndex = code.indexOf( match[ 0 ] );
+						if ( charIndex !== - 1 ) {
 
-				await Promise.all( loadPromises );
+							err.customLineNumber = code.substring( 0, charIndex ).split( '\n' ).length;
+
+						}
+
+					}
+
+					throw err;
+
+				}
 
 			}
 
