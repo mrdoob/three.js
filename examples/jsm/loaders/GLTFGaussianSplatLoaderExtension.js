@@ -1,11 +1,9 @@
 import {
-	BufferAttribute,
-	BufferGeometry,
 	Group
 } from 'three';
 
 import { GaussianSplatMesh } from '../objects/GaussianSplatMesh.js';
-import { writeColorBytesFromSH0, writeCovariance } from '../utils/GaussianSplatUtils.js';
+import { createGaussianSplatGeometry, writeColorBytesFromSH0, writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const EXTENSION_NAME = 'KHR_gaussian_splatting';
 const POINTS = 0;
@@ -206,14 +204,7 @@ function createGaussianSplatMesh( geometry, primitiveDef ) {
 
 	}
 
-	const splatGeometry = new BufferGeometry();
-	splatGeometry.setAttribute( 'position', new BufferAttribute( centers, 3 ) );
-	splatGeometry.setAttribute( 'covariance', new BufferAttribute( covariances, 6 ) );
-	splatGeometry.setAttribute( 'color', new BufferAttribute( colors, 4, true ) );
-	splatGeometry.computeBoundingBox();
-	splatGeometry.computeBoundingSphere();
-
-	const mesh = new GaussianSplatMesh( splatGeometry );
+	const mesh = new GaussianSplatMesh( createGaussianSplatGeometry( centers, covariances, colors ) );
 
 	mesh.userData.gltfExtensions = mesh.userData.gltfExtensions || {};
 	mesh.userData.gltfExtensions[ EXTENSION_NAME ] = Object.assign( {}, extensionDef );

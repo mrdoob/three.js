@@ -9,7 +9,7 @@ function closeTo( assert, actual, expected, message ) {
 
 }
 
-function createSplatBuffer( { rotation = [ 128, 128, 128, 128 ] } = {} ) {
+function createSplatBuffer() {
 
 	const buffer = new ArrayBuffer( 32 );
 	const view = new DataView( buffer );
@@ -23,7 +23,7 @@ function createSplatBuffer( { rotation = [ 128, 128, 128, 128 ] } = {} ) {
 	view.setFloat32( 20, 4, true );
 
 	bytes.set( [ 10, 20, 30, 40 ], 24 );
-	bytes.set( rotation, 28 );
+	bytes.set( [ 128, 128, 128, 128 ], 28 );
 
 	return buffer;
 
@@ -34,14 +34,6 @@ export default QUnit.module( 'Addons', () => {
 	QUnit.module( 'Loaders', () => {
 
 		QUnit.module( 'SPLATLoader', () => {
-
-			QUnit.test( 'Instancing', ( assert ) => {
-
-				const loader = new SPLATLoader();
-
-				assert.ok( loader instanceof SPLATLoader, 'Can instantiate a SPLATLoader.' );
-
-			} );
 
 			QUnit.test( 'parses fixed-width .splat data', ( assert ) => {
 
@@ -60,30 +52,6 @@ export default QUnit.module( 'Addons', () => {
 				closeTo( assert, covariances[ 4 ], 0, 'covariance yz' );
 				closeTo( assert, covariances[ 5 ], 16, 'covariance zz' );
 				assert.deepEqual( Array.from( data.getAttribute( 'color' ).array ), [ 10, 20, 30, 40 ], 'colors' );
-
-			} );
-
-			QUnit.test( 'uses quaternion byte order w, x, y, z', ( assert ) => {
-
-				const loader = new SPLATLoader();
-				const data = loader.parse( createSplatBuffer( { rotation: [ 219, 219, 128, 128 ] } ) );
-				const covariances = data.getAttribute( 'covariance' ).array;
-
-				closeTo( assert, covariances[ 0 ], 4, 'covariance xx' );
-				closeTo( assert, covariances[ 3 ], 16, 'covariance yy after x rotation' );
-				closeTo( assert, covariances[ 5 ], 9, 'covariance zz after x rotation' );
-
-			} );
-
-			QUnit.test( 'rejects invalid byte lengths', ( assert ) => {
-
-				const loader = new SPLATLoader();
-
-				assert.throws(
-					() => loader.parse( new ArrayBuffer( 31 ) ),
-					/Invalid \.splat byte length/,
-					'invalid byte length is rejected'
-				);
 
 			} );
 

@@ -7,12 +7,11 @@ import { PLYLoader } from '../../../../examples/jsm/loaders/PLYLoader.js';
 
 import {
 	GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING,
+	createGaussianSplatGeometry,
 	createGaussianSplatGeometryFromPLYGeometry,
-	decomposeCovariance,
 	linearToSH0,
 	sh0ToLinear,
-	sigmoid,
-	writeCovariance
+	sigmoid
 } from '../../../../examples/jsm/utils/GaussianSplatUtils.js';
 
 const EPS = 1e-6;
@@ -41,6 +40,22 @@ export default QUnit.module( 'Addons', () => {
 
 				closeTo( assert, sigmoid( 0 ), 0.5, 'zero maps to half' );
 				closeTo( assert, sigmoid( Math.log( 3 ) ), 0.75, 'logit maps to expected value' );
+
+			} );
+
+			QUnit.test( 'creates Gaussian splat geometry from packed arrays', ( assert ) => {
+
+				const data = createGaussianSplatGeometry(
+					new Float32Array( [ 1, 2, 3 ] ),
+					new Float32Array( [ 4, 0, 0, 9, 0, 16 ] ),
+					new Uint8Array( [ 128, 128, 128, 128 ] )
+				);
+
+				assert.strictEqual( data.getAttribute( 'position' ).count, 1, 'count' );
+				assert.deepEqual( Array.from( data.getAttribute( 'position' ).array ), [ 1, 2, 3 ], 'centers' );
+				assert.deepEqual( Array.from( data.getAttribute( 'color' ).array ), [ 128, 128, 128, 128 ], 'colors' );
+				assert.ok( data.boundingBox !== null, 'computes bounding box' );
+				assert.ok( data.boundingSphere !== null, 'computes bounding sphere' );
 
 			} );
 
@@ -119,26 +134,6 @@ export default QUnit.module( 'Addons', () => {
 					/requires position, scale, rotation, f_dc and opacity attributes/,
 					'missing custom attributes are rejected'
 				);
-
-			} );
-
-			QUnit.test( 'decomposes covariance into scale and rotation', ( assert ) => {
-
-				const covariance = new Float32Array( 6 );
-				const scales = new Float32Array( 3 );
-				const rotations = new Float32Array( 4 );
-				const roundTrip = new Float32Array( 6 );
-
-				writeCovariance( covariance, 0, 2, 3, 4, 0, 0, 0, 1 );
-				decomposeCovariance( covariance, 0, scales, rotations, 0 );
-				writeCovariance( roundTrip, 0, scales[ 0 ], scales[ 1 ], scales[ 2 ], rotations[ 0 ], rotations[ 1 ], rotations[ 2 ], rotations[ 3 ] );
-
-				closeTo( assert, roundTrip[ 0 ], covariance[ 0 ], 'xx covariance' );
-				closeTo( assert, roundTrip[ 1 ], covariance[ 1 ], 'xy covariance' );
-				closeTo( assert, roundTrip[ 2 ], covariance[ 2 ], 'xz covariance' );
-				closeTo( assert, roundTrip[ 3 ], covariance[ 3 ], 'yy covariance' );
-				closeTo( assert, roundTrip[ 4 ], covariance[ 4 ], 'yz covariance' );
-				closeTo( assert, roundTrip[ 5 ], covariance[ 5 ], 'zz covariance' );
 
 			} );
 

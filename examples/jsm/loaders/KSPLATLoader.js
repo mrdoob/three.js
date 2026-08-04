@@ -1,12 +1,10 @@
 import {
-	BufferAttribute,
-	BufferGeometry,
 	DataUtils,
 	FileLoader,
 	Loader
 } from 'three';
 
-import { writeColorBytes, writeCovariance } from '../utils/GaussianSplatUtils.js';
+import { createGaussianSplatGeometry, writeColorBytes, writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const HEADER_SIZE_BYTES = 4096;
 const SECTION_HEADER_SIZE_BYTES = 1024;
@@ -231,14 +229,7 @@ class KSPLATLoader extends Loader {
 
 		}
 
-		const geometry = new BufferGeometry();
-		geometry.setAttribute( 'position', new BufferAttribute( centers, 3 ) );
-		geometry.setAttribute( 'covariance', new BufferAttribute( covariances, 6 ) );
-		geometry.setAttribute( 'color', new BufferAttribute( colors, 4, true ) );
-		geometry.computeBoundingBox();
-		geometry.computeBoundingSphere();
-
-		return geometry;
+		return createGaussianSplatGeometry( centers, covariances, colors );
 
 	}
 

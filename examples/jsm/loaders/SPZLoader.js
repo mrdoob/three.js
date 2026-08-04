@@ -1,13 +1,11 @@
 import {
-	BufferAttribute,
-	BufferGeometry,
 	DataUtils,
 	FileLoader,
 	Loader
 } from 'three';
 
 import { gunzipSync } from '../libs/fflate.module.js';
-import { SH_C0, writeColorBytes, writeCovariance } from '../utils/GaussianSplatUtils.js';
+import { SH_C0, createGaussianSplatGeometry, writeColorBytes, writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const SPZ_MAGIC = 0x5053474e;
 const HEADER_SIZE_BYTES = 16;
@@ -200,14 +198,7 @@ class SPZLoader extends Loader {
 
 		}
 
-		const geometry = new BufferGeometry();
-		geometry.setAttribute( 'position', new BufferAttribute( centers, 3 ) );
-		geometry.setAttribute( 'covariance', new BufferAttribute( covariances, 6 ) );
-		geometry.setAttribute( 'color', new BufferAttribute( colors, 4, true ) );
-		geometry.computeBoundingBox();
-		geometry.computeBoundingSphere();
-
-		return geometry;
+		return createGaussianSplatGeometry( centers, covariances, colors );
 
 	}
 

@@ -1,11 +1,9 @@
 import {
-	BufferAttribute,
-	BufferGeometry,
 	FileLoader,
 	Loader
 } from 'three';
 
-import { writeCovariance } from '../utils/GaussianSplatUtils.js';
+import { createGaussianSplatGeometry, writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const ROW_SIZE_BYTES = 32;
 
@@ -132,14 +130,7 @@ class SPLATLoader extends Loader {
 
 		}
 
-		const geometry = new BufferGeometry();
-		geometry.setAttribute( 'position', new BufferAttribute( centers, 3 ) );
-		geometry.setAttribute( 'covariance', new BufferAttribute( covariances, 6 ) );
-		geometry.setAttribute( 'color', new BufferAttribute( colors, 4, true ) );
-		geometry.computeBoundingBox();
-		geometry.computeBoundingSphere();
-
-		return geometry;
+		return createGaussianSplatGeometry( centers, covariances, colors );
 
 	}
 
