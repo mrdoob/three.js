@@ -13,6 +13,7 @@ import { LayoutManager } from './managers/LayoutManager.js';
 import { ConsoleManager } from './managers/ConsoleManager.js';
 import { PlaygroundManager } from './managers/PlaygroundManager.js';
 import { getSVG, compressString } from './utils/TourUtils.js';
+import mermaid from 'mermaid';
 
 const MOBILE_BREAKPOINT = 768;
 
@@ -85,6 +86,15 @@ class Tour {
 		this.dom = {};
 
 		this.animate = this.animate.bind( this );
+
+		mermaid.initialize( {
+			startOnLoad: false,
+			theme: 'dark',
+			flowchart: {
+				useMaxWidth: true,
+				htmlLabels: true
+			}
+		} );
 
 	}
 
@@ -481,6 +491,44 @@ class Tour {
 				} else {
 
 					this.dom.searchInput.blur();
+
+				}
+
+			}
+
+			if ( e.key === 'Enter' ) {
+
+				const firstBtn = this.dom.tocList.querySelector( '.toc-btn' );
+				if ( firstBtn ) {
+
+					const firstPageId = firstBtn.getAttribute( 'data-page-id' );
+					if ( firstPageId ) {
+
+						e.preventDefault();
+
+						this.dom.searchInput.blur();
+
+						if ( window.location.hash === '#' + firstPageId ) {
+
+							this.dom.searchInput.value = '';
+							this.dom.searchClear.style.display = 'none';
+							this.searchManager.performSearch( '' );
+							this.searchManager.updateHashWithSearch( '' );
+							updateSearchFocus();
+
+						} else {
+
+							window.location.hash = firstPageId;
+
+						}
+
+						if ( window.innerWidth < MOBILE_BREAKPOINT ) {
+
+							this.toggleSidebar( false );
+
+						}
+
+					}
 
 				}
 
@@ -1071,6 +1119,10 @@ class Tour {
 			'</button>' +
 			headerHTML + parse( description ) + '</div>';
 
+		mermaid.run( {
+			querySelector: '.mermaid'
+		} ).catch( err => console.error( 'Mermaid render error:', err ) );
+
 		getTwitterWidgets().ready( ( twttr ) => {
 
 			twttr.widgets.load( this.dom.contentArea );
@@ -1653,7 +1705,15 @@ class Tour {
 				}
 
 				// Scroll the active item into view within the sidebar
-				btn.scrollIntoView( { behavior: 'smooth', block: 'center' } );
+				if ( ! this.dom.searchInput.value.trim() ) {
+
+					setTimeout( () => {
+
+						btn.scrollIntoView( { behavior: 'smooth', block: 'center' } );
+
+					}, 50 );
+
+				}
 
 			} else {
 
@@ -1989,6 +2049,8 @@ class Tour {
 
 		// Re-initialize Lucide icons to render the chevrons
 		this.createIcons( this.dom.tocList );
+
+		this.updateUI();
 
 	}
 

@@ -2,6 +2,23 @@ import { marked } from 'marked';
 import * as THREE from 'three';
 import * as TSL from 'three/tsl';
 
+marked.use( {
+	renderer: {
+		code( code, infostring ) {
+
+			if ( infostring === 'mermaid' ) {
+
+				return `<pre class="mermaid">${code}</pre>`;
+
+			}
+
+			return false;
+
+		}
+	}
+} );
+
+
 function parseTour( rawMarkdown ) {
 
 	const pageTree = [];
