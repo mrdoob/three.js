@@ -1,4 +1,6 @@
 import { output, renderOutput, uniform } from '../../nodes/TSL.js';
+import { ColorManagement } from '../../math/ColorManagement.js';
+import { NoToneMapping } from '../../constants.js';
 import RenderPipeline from './RenderPipeline.js';
 
 /**
@@ -86,6 +88,8 @@ class DirectRenderPipeline extends RenderPipeline {
 
 		let samples;
 		let depthBuffer;
+		let toneMapping;
+		let outputColorSpace;
 
 		if ( backgroundNode !== null ) scene.backgroundNode = backgroundNode;
 
@@ -105,9 +109,18 @@ class DirectRenderPipeline extends RenderPipeline {
 
 			for ( const callback of this._contextData.onBeforePipelineCallbacks ) callback();
 
+			toneMapping = renderer.toneMapping;
+			outputColorSpace = renderer.outputColorSpace;
+
+			renderer.toneMapping = NoToneMapping;
+			renderer.outputColorSpace = ColorManagement.workingColorSpace;
+
 			renderer.render( scene, camera );
 
 		} finally {
+
+			if ( toneMapping !== undefined ) renderer.toneMapping = toneMapping;
+			if ( outputColorSpace !== undefined ) renderer.outputColorSpace = outputColorSpace;
 
 			if ( backgroundNode !== null && scene.backgroundNode === backgroundNode ) scene.backgroundNode = currentBackgroundNode;
 
@@ -189,7 +202,6 @@ class DirectRenderPipeline extends RenderPipeline {
 
 		this._contextNode = this._rendererContextNode.context( {
 			...this._contextData,
-			outputColorTransform: false,
 
 			getOutput: ( materialOutputNode, builder ) => {
 
