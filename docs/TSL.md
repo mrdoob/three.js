@@ -168,7 +168,7 @@ TSL is a Node-based shader abstraction, written in JavaScript. TSL's functions a
   - Build materials by connecting nodes through: [positionWorld](#position), [normalWorld](#normal), [screenUV](#screen), [attribute()](#attributes), etc. 
 More declarative("what") vs. imperative("how").
 - Composition & High-Level Concepts
-  - Work with high-level concepts for Node Material like [colorNode](#basic), [roughnessNode](#standard), [metalnessNode](#standard), [positionNode](#basic), etc. This preserves the integrity of the lighting model while allowing customizations, helping to avoid mistakes from incorrect setups.
+  - Work with high-level concepts for Node Material like [colorNode](#basic), [roughnessNode](#meshstandardnodematerial), [metalnessNode](#meshstandardnodematerial), [positionNode](#basic), etc. This preserves the integrity of the lighting model while allowing customizations, helping to avoid mistakes from incorrect setups.
 - Keeping an eye on software exchange
   - Modern 3D authoring software uses Shader-Graph based material composition to exchange between other software. TSL already has its own MaterialX integration.
 - Easier Migration
