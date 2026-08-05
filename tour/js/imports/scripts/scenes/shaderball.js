@@ -7,6 +7,8 @@ import { Fn, float, fract, fwidth, abs, saturate, max, smoothstep, length, posit
 let scene, camera, controls, defaultPass, renderPipeline, prefab, previewMesh, calibrationMesh, floor, reflection, dragging = false;
 let model;
 
+const resetCameraOnRefresh = false;
+
 const gridTexture = Fn( ( [ coord, lineWidth = float( 0.01 ), dotSize = float( 0.03 ) ] ) => {
 
 	const g = fract( coord );
@@ -26,18 +28,22 @@ const gridTexture = Fn( ( [ coord, lineWidth = float( 0.01 ), dotSize = float( 0
 
 } );
 
-function resetScene() {
-
-	scene.fogNode = null;
-	scene.backgroundNode = null;
-
-	floor.visible = true;
+function refreshCamera() {
 
 	camera.position.set( 2, 3, 4 );
 	camera.lookAt( 0, 1, 0 );
 
 	controls.target.set( 0, 1, 0 );
 	controls.update();
+
+}
+
+function refresh() {
+
+	scene.fogNode = null;
+	scene.backgroundNode = null;
+
+	floor.visible = true;
 
 	prefab.rotation.set( 0, 0, 0 );
 
@@ -57,16 +63,15 @@ function resetScene() {
 	renderPipeline.outputNode = defaultPass;
 	renderPipeline.needsUpdate = true;
 
+	if ( resetCameraOnRefresh ) {
+
+		refreshCamera();
+
+	}
+
 }
 
 async function init() {
-
-	if ( scene ) {
-
-		resetScene();
-		return;
-
-	}
 
 	scene = new THREE.Scene();
 
@@ -173,7 +178,7 @@ async function init() {
 
 	model = previewMesh;
 
-	resetScene();
+	refreshCamera();
 
 }
 
@@ -198,6 +203,8 @@ function dispose() {
 
 	// TODO: Implement dispose
 
+	refreshCamera();
+
 }
 
 function debug() {
@@ -206,4 +213,4 @@ function debug() {
 
 }
 
-export { scene, camera, controls, defaultPass, renderPipeline, model, floor, dragging, debug };
+export { scene, camera, controls, defaultPass, renderPipeline, model, floor, dragging, init, refresh, update, resize, dispose, debug };

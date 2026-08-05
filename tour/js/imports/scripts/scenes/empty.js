@@ -5,6 +5,8 @@ import { Fn, float, fract, fwidth, abs, saturate, max, smoothstep, length, posit
 
 let scene, camera, controls, defaultPass, renderPipeline, floor, reflection, dragging = false;
 
+const resetCameraOnRefresh = false;
+
 const gridTexture = Fn( ( [ coord, lineWidth = float( 0.01 ), dotSize = float( 0.03 ) ] ) => {
 
 	const g = fract( coord );
@@ -24,7 +26,17 @@ const gridTexture = Fn( ( [ coord, lineWidth = float( 0.01 ), dotSize = float( 0
 
 } );
 
-function resetScene() {
+function refreshCamera() {
+
+	camera.position.set( 2, 3, 4 );
+	camera.lookAt( 0, 1, 0 );
+
+	controls.target.set( 0, 1, 0 );
+	controls.update();
+
+}
+
+function refresh() {
 
 	scene.clear();
 
@@ -36,25 +48,18 @@ function resetScene() {
 
 	floor.visible = true;
 
-	camera.position.set( 2, 3, 4 );
-	camera.lookAt( 0, 1, 0 );
-
-	controls.target.set( 0, 1, 0 );
-	controls.update();
-
 	renderPipeline.outputNode = defaultPass;
 	renderPipeline.needsUpdate = true;
+
+	if ( resetCameraOnRefresh ) {
+
+		refreshCamera();
+
+	}
 
 }
 
 async function init() {
-
-	if ( scene ) {
-
-		resetScene();
-		return;
-
-	}
 
 	scene = new THREE.Scene();
 
@@ -114,7 +119,7 @@ async function init() {
 	scene.backgroundBlurriness = 0.65;
 	scene.backgroundIntensity = 0.15;
 
-	resetScene();
+	refreshCamera();
 
 }
 
@@ -144,4 +149,4 @@ function debug() {
 
 }
 
-export { scene, camera, controls, defaultPass, renderPipeline, floor, dragging, resetScene, debug };
+export { scene, camera, controls, defaultPass, renderPipeline, floor, dragging, init, refresh, update, resize, dispose, debug };

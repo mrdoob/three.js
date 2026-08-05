@@ -117,7 +117,7 @@ function isStandardModule( moduleName, imports ) {
 }
 
 
-const LIFECYCLE_METHODS = [ 'init', 'update', 'resize', 'dispose' ];
+const LIFECYCLE_METHODS = [ 'init', 'refresh', 'update', 'resize', 'dispose' ];
 
 class CodeRunner extends EventDispatcher {
 
@@ -591,18 +591,13 @@ class CodeRunner extends EventDispatcher {
 
 		this.dispatchEvent( { type: 'start' } );
 
-		this.activeScriptNames.forEach( scriptName => {
+		// Dispose previous main script
+		const prevMain = this.scripts[ '__main__' ];
+		if ( prevMain && prevMain.instance && prevMain.instance.dispose ) {
 
-			const scriptConfig = this.scripts[ scriptName ];
-			if ( scriptConfig && scriptConfig.instance && scriptConfig.instance.dispose ) {
+			prevMain.instance.dispose();
 
-				scriptConfig.instance.dispose();
-
-			}
-
-		} );
-
-		this.activeScriptNames = [];
+		}
 
 		try {
 
@@ -804,7 +799,7 @@ class CodeRunner extends EventDispatcher {
 
 			// Execute scene scripts dynamically
 			const activeModules = {};
-			this.activeScriptNames = [];
+			const prevActiveCustomScripts = this.activeScriptNames.filter( name => name !== '__main__' );
 
 			const importedCustomScripts = [];
 
@@ -892,6 +887,28 @@ class CodeRunner extends EventDispatcher {
 
 			}
 
+			// Dispose and clear removed scripts
+			const removedCustomScripts = prevActiveCustomScripts.filter( name => ! importedCustomScripts.includes( name ) );
+			for ( const baseName of removedCustomScripts ) {
+
+				const scriptConfig = this.scripts[ baseName ];
+				if ( scriptConfig ) {
+
+					if ( scriptConfig.instance && scriptConfig.instance.dispose ) {
+
+						scriptConfig.instance.dispose();
+
+					}
+
+					scriptConfig.instance = null;
+					scriptConfig.promise = null;
+
+				}
+
+			}
+
+			this.activeScriptNames = [];
+
 			// Load / Create active scripts
 			for ( const baseName of importedCustomScripts ) {
 
@@ -907,10 +924,23 @@ class CodeRunner extends EventDispatcher {
 
 				try {
 
+					const scriptConfig = this.scripts[ baseName ];
+					const hadInstance = scriptConfig.instance !== null;
 					const instance = await this.load( baseName );
 					if ( instance ) {
 
-						if ( instance.init ) await instance.init();
+						const isNew = ! hadInstance || ! prevActiveCustomScripts.includes( baseName );
+						if ( isNew && instance.init ) {
+
+							await instance.init();
+
+						}
+
+						if ( instance.refresh ) {
+
+							await instance.refresh();
+
+						}
 
 						if ( instance.resize && this.env.renderer ) {
 

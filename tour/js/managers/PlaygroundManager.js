@@ -130,6 +130,8 @@ class PlaygroundManager {
 				this.tour.dom.previewSection.style.flex = '';
 				this.tour.dom.codeContainer.style.height = '';
 
+				this.tour.layoutManager.updateVResizerIcons( '' );
+
 				if ( this.tour.isEditorCollapsed ) {
 
 					document.body.classList.add( 'collapsed-workspace' );
@@ -630,26 +632,52 @@ class PlaygroundManager {
 
 		const mainTab = this.playgroundTabs.find( t => t.name === 'main' ) || this.playgroundTabs[ 0 ];
 
+		const tabNames = this.playgroundTabs.map( t => t.name );
+
+		// 1. Identify virtual scripts that are no longer in tabs (i.e. deleted tabs)
 		for ( const key of Object.keys( this.tour.runner.scripts ) ) {
 
 			if ( this.tour.runner.scripts[ key ].url === null && key !== '__main__' ) {
 
-				delete this.tour.runner.scripts[ key ];
+				if ( ! tabNames.includes( key ) ) {
+
+					const scriptConfig = this.tour.runner.scripts[ key ];
+					if ( scriptConfig && scriptConfig.instance && scriptConfig.instance.dispose ) {
+
+						scriptConfig.instance.dispose();
+
+					}
+
+					delete this.tour.runner.scripts[ key ];
+
+				}
 
 			}
 
 		}
 
+		// 2. Add or update virtual script configs based on tabs
 		this.playgroundTabs.forEach( tab => {
 
 			if ( tab.name !== 'main' ) {
 
-				this.tour.runner.scripts[ tab.name ] = {
-					url: null,
-					text: tab.code,
-					instance: null,
-					promise: null
-				};
+				const existing = this.tour.runner.scripts[ tab.name ];
+				if ( ! existing || existing.text !== tab.code ) {
+
+					if ( existing && existing.instance && existing.instance.dispose ) {
+
+						existing.instance.dispose();
+
+					}
+
+					this.tour.runner.scripts[ tab.name ] = {
+						url: null,
+						text: tab.code,
+						instance: null,
+						promise: null
+					};
+
+				}
 
 			}
 
@@ -689,12 +717,25 @@ class PlaygroundManager {
 
 		if ( ! this.tour.isPlaygroundActive ) return;
 
-		if ( ! this.tour.debugCodeEditor ) return;
-
 		const debugData = this.getDebugTarget();
 		if ( ! debugData ) {
 
 			this.tour.debugCodeEditor.setValue( 'No debug() function exported or debug target object found.' );
+
+			// Collapse/hide debug container similar to clicking v-resizer-toggle-inverted
+			const previewSection = this.tour.dom.previewSection;
+			const currentHeight = previewSection.style.height;
+			if ( currentHeight !== '100%' ) {
+
+				this.tour.lastPreviewHeight = currentHeight;
+
+			}
+
+			previewSection.style.height = '100%';
+			this.tour.layoutManager.updateVResizerIcons( '100%' );
+
+			this.tour.codeEditor.layout();
+			this.tour.debugCodeEditor.layout();
 			return;
 
 		}
@@ -717,7 +758,36 @@ class PlaygroundManager {
 		if ( ! scene || ! camera || ! object ) {
 
 			this.tour.debugCodeEditor.setValue( 'Invalid debug data. Ensure scene, camera, and object are provided.' );
+
+			// Collapse/hide debug container
+			const previewSection = this.tour.dom.previewSection;
+			const currentHeight = previewSection.style.height;
+			if ( currentHeight !== '100%' ) {
+
+				this.tour.lastPreviewHeight = currentHeight;
+
+			}
+
+			previewSection.style.height = '100%';
+			this.tour.layoutManager.updateVResizerIcons( '100%' );
+
+			this.tour.codeEditor.layout();
+			this.tour.debugCodeEditor.layout();
 			return;
+
+		}
+
+		// Restore/expand debug container since we have valid debug data
+		const previewSection = this.tour.dom.previewSection;
+		const currentHeight = previewSection.style.height;
+		if ( currentHeight === '100%' ) {
+
+			const targetHeight = this.tour.lastPreviewHeight || '50%';
+			previewSection.style.height = targetHeight;
+			this.tour.layoutManager.updateVResizerIcons( targetHeight );
+
+			this.tour.codeEditor.layout();
+			this.tour.debugCodeEditor.layout();
 
 		}
 
