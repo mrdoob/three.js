@@ -115,6 +115,12 @@ class DirectRenderPipeline extends RenderPipeline {
 			renderer.toneMapping = NoToneMapping;
 			renderer.outputColorSpace = ColorManagement.workingColorSpace;
 
+			if ( renderer.xr.enabled ) {
+
+				renderer.xr.renderLayers();
+
+			}
+
 			renderer.render( scene, camera );
 
 		} finally {
@@ -201,6 +207,7 @@ class DirectRenderPipeline extends RenderPipeline {
 		const outputColorTransform = this.outputColorTransform;
 
 		this._contextNode = this._rendererContextNode.context( {
+
 			...this._contextData,
 
 			getOutput: ( materialOutputNode, builder ) => {
