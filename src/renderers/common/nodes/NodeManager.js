@@ -1066,10 +1066,10 @@ class NodeManager extends DataMap {
 	}
 
 	/**
-	 * Returns `true` if the given render object requires a refresh.
+	 * Returns the refresh type of the given render object.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
-	 * @return {boolean} Whether the given render object requires a refresh or not.
+	 * @return {number} The refresh type, see `RenderObjectRefreshType`.
 	 */
 	needsRefresh( renderObject ) {
 

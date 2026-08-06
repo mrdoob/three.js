@@ -1,6 +1,6 @@
 
 import { vec3, mat4, Fn } from '../tsl/TSLBase.js';
-import { OnAfterObjectUpdate, OnFrameUpdate } from '../utils/EventNode.js';
+import { OnAfterObjectUpdate, OnBeforeFrameUpdate } from '../utils/EventNode.js';
 import { normalLocal, transformNormal } from './Normal.js';
 import { positionLocal, positionPrevious } from './Position.js';
 import { varyingProperty } from '../core/PropertyNode.js';
@@ -172,10 +172,10 @@ export const instance = /*@__PURE__*/ Fn( ( [ matrices, colors = null ], builder
 
 	}
 
-	// Synchronization of dynamic buffer updates per frame
+	// Synchronization of dynamic buffer updates per frame.
 	if ( interleavedMatrix !== null || interleavedColor !== null ) {
 
-		OnFrameUpdate( () => {
+		OnBeforeFrameUpdate( () => {
 
 			if ( interleavedMatrix !== null && interleavedMatrix.version !== matrices.version ) {
 

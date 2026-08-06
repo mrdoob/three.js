@@ -1,3 +1,5 @@
+import { RenderObjectRefreshType, DynamicDrawUsage } from '../../../constants.js';
+
 const refreshUniforms = [
 	'alphaMap',
 	'alphaTest',
@@ -9,28 +11,36 @@ const refreshUniforms = [
 	'attenuationColor',
 	'attenuationDistance',
 	'bumpMap',
+	'bumpScale',
 	'clearcoat',
 	'clearcoatMap',
 	'clearcoatNormalMap',
 	'clearcoatNormalScale',
 	'clearcoatRoughness',
 	'color',
+	'dashOffset',
+	'dashSize',
 	'dispersion',
+	'displacementBias',
 	'displacementMap',
+	'displacementScale',
 	'emissive',
 	'emissiveIntensity',
 	'emissiveMap',
 	'envMap',
 	'envMapIntensity',
 	'envMapRotation',
+	'gapSize',
 	'gradientMap',
 	'ior',
 	'iridescence',
 	'iridescenceIOR',
 	'iridescenceMap',
+	'iridescenceThickness',
 	'iridescenceThicknessMap',
 	'lightMap',
 	'lightMapIntensity',
+	'linewidth',
 	'map',
 	'matcap',
 	'metalness',
@@ -38,20 +48,26 @@ const refreshUniforms = [
 	'normalMap',
 	'normalScale',
 	'opacity',
+	'reflectivity',
 	'retroreflectivity',
+	'rotation',
 	'roughness',
 	'roughnessMap',
+	'scale',
 	'sheen',
 	'sheenColor',
 	'sheenColorMap',
+	'sheenRoughness',
 	'sheenRoughnessMap',
 	'shininess',
+	'size',
 	'specular',
 	'specularColor',
 	'specularColorMap',
 	'specularIntensity',
 	'specularIntensityMap',
 	'specularMap',
+	'steps',
 	'thickness',
 	'transmission',
 	'transmissionMap'
@@ -159,6 +175,20 @@ class NodeMaterialObserver {
 	}
 
 	/**
+	 * Returns `true` if the given 3D object uses instance buffers with dynamic draw usage.
+	 * Such buffers must be uploaded once per render so the render object requires a full refresh.
+	 *
+	 * @param {Object3D} object - The 3D object.
+	 * @return {boolean} Whether the given 3D object uses instance buffers with dynamic draw usage or not.
+	 */
+	hasDynamicInstancing( object ) {
+
+		return object.isInstancedMesh === true && ( object.instanceMatrix.usage === DynamicDrawUsage ||
+			( object.instanceColor !== null && object.instanceColor.usage === DynamicDrawUsage ) );
+
+	}
+
+	/**
 	 * Returns `true` if the current rendering produces motion vectors.
 	 *
 	 * @param {Renderer} renderer - The renderer.
@@ -202,6 +232,22 @@ class NodeMaterialObserver {
 			if ( object.morphTargetInfluences ) {
 
 				data.morphTargetInfluences = object.morphTargetInfluences.slice();
+
+			}
+
+			if ( object.isInstancedMesh === true ) {
+
+				data.instanceMatrixVersion = object.instanceMatrix.version;
+				data.instanceColorVersion = object.instanceColor !== null ? object.instanceColor.version : null;
+				data.morphTextureVersion = object.morphTexture !== null ? object.morphTexture.version : null;
+
+			}
+
+			if ( object.isBatchedMesh === true ) {
+
+				data.matricesTextureVersion = object._matricesTexture.version;
+				data.colorsTextureVersion = object._colorsTexture !== null ? object._colorsTexture.version : null;
+				data.indirectTextureVersion = object._indirectTexture.version;
 
 			}
 
@@ -599,6 +645,47 @@ class NodeMaterialObserver {
 
 		}
 
+		// instancing
+
+		if ( object.isInstancedMesh === true ) {
+
+			const instanceColorVersion = object.instanceColor !== null ? object.instanceColor.version : null;
+			const morphTextureVersion = object.morphTexture !== null ? object.morphTexture.version : null;
+
+			if ( renderObjectData.instanceMatrixVersion !== object.instanceMatrix.version ||
+				renderObjectData.instanceColorVersion !== instanceColorVersion ||
+				renderObjectData.morphTextureVersion !== morphTextureVersion ) {
+
+				renderObjectData.instanceMatrixVersion = object.instanceMatrix.version;
+				renderObjectData.instanceColorVersion = instanceColorVersion;
+				renderObjectData.morphTextureVersion = morphTextureVersion;
+
+				return false;
+
+			}
+
+		}
+
+		// batching
+
+		if ( object.isBatchedMesh === true ) {
+
+			const colorsTextureVersion = object._colorsTexture !== null ? object._colorsTexture.version : null;
+
+			if ( renderObjectData.matricesTextureVersion !== object._matricesTexture.version ||
+				renderObjectData.colorsTextureVersion !== colorsTextureVersion ||
+				renderObjectData.indirectTextureVersion !== object._indirectTexture.version ) {
+
+				renderObjectData.matricesTextureVersion = object._matricesTexture.version;
+				renderObjectData.colorsTextureVersion = colorsTextureVersion;
+				renderObjectData.indirectTextureVersion = object._indirectTexture.version;
+
+				return false;
+
+			}
+
+		}
+
 		// lights
 
 		if ( renderObjectData.lights ) {
@@ -721,16 +808,16 @@ class NodeMaterialObserver {
 	 *
 	 * @param {RenderObject} renderObject - The render object.
 	 * @param {NodeFrame} nodeFrame - The current node frame.
-	 * @return {boolean} Whether the given render object requires a refresh or not.
+	 * @return {number} The refresh type, see {@link RenderObjectRefreshType}.
 	 */
 	needsRefresh( renderObject, nodeFrame ) {
 
-		if ( this.hasNode || this.hasAnimation || this.firstInitialization( renderObject ) || this.needsVelocity( nodeFrame.renderer ) )
-			return true;
+		if ( this.hasNode || this.hasAnimation || this.hasDynamicInstancing( renderObject.object ) || this.firstInitialization( renderObject ) || this.needsVelocity( nodeFrame.renderer ) )
+			return RenderObjectRefreshType.FULL;
 
 		const { renderId } = nodeFrame;
 
-		let force = false;
+		let refreshType = RenderObjectRefreshType.NONE;
 
 		// shared UBOs are potentially never updated when objects don't change. Below block
 		// make sure these UBOs are updated at least once.
@@ -739,9 +826,9 @@ class NodeMaterialObserver {
 
 			this.renderId = renderId;
 
-			// no early out here. instead, force the render object to use the equals() code path so its internal cache state gets synched
+			// no early out here. instead, use the equals() code path below so the internal cache state gets synched
 
-			force = true;
+			refreshType = RenderObjectRefreshType.SHARED;
 
 		}
 
@@ -749,12 +836,17 @@ class NodeMaterialObserver {
 		const isBundle = renderObject.bundle !== null && renderObject.bundle.static === true && this.getRenderObjectData( renderObject ).version === renderObject.bundle.version;
 
 		if ( isStatic || isBundle )
-			return force;
+			return refreshType;
 
 		const lightsData = this.getLights( renderObject.lightsNode, renderId );
-		const notEqual = this.equals( renderObject, lightsData, renderId ) !== true;
 
-		return ( force || notEqual );
+		if ( this.equals( renderObject, lightsData, renderId ) === false ) {
+
+			refreshType = RenderObjectRefreshType.FULL;
+
+		}
+
+		return refreshType;
 
 	}
 
