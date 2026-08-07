@@ -1,4 +1,4 @@
-import { RenderTarget, Vector2, NodeMaterial, RendererUtils, QuadMesh, TempNode, NodeUpdateType } from 'three/webgpu';
+import { RenderTarget, NodeMaterial, RendererUtils, QuadMesh, TempNode, NodeUpdateType, vec2Create, vec2Set } from 'three/webgpu';
 import { Fn, float, uv, uniform, convertToTexture, vec2, vec4, passTexture, premultiplyAlpha, unpremultiplyAlpha, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -60,7 +60,7 @@ class GaussianBlurNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
-		this._invSize = uniform( new Vector2() );
+		this._invSize = uniform( vec2Create(), 'vec2' );
 
 		/**
 		 * Gaussian blur is applied in two passes (horizontal, vertical).
@@ -69,7 +69,7 @@ class GaussianBlurNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
-		this._passDirection = uniform( new Vector2() );
+		this._passDirection = uniform( vec2Create(), 'vec2' );
 
 		/**
 		 * The render target used for the horizontal pass.
@@ -154,7 +154,7 @@ class GaussianBlurNode extends TempNode {
 		width = Math.max( Math.round( width * this.resolutionScale ), 1 );
 		height = Math.max( Math.round( height * this.resolutionScale ), 1 );
 
-		this._invSize.value.set( 1 / width, 1 / height );
+		vec2Set( 1 / width, 1 / height, this._invSize.value );
 		this._horizontalRT.setSize( width, height );
 		this._verticalRT.setSize( width, height );
 
@@ -191,7 +191,7 @@ class GaussianBlurNode extends TempNode {
 
 		renderer.setRenderTarget( this._horizontalRT );
 
-		this._passDirection.value.set( 1, 0 );
+		vec2Set( 1, 0, this._passDirection.value );
 
 		_quadMesh.name = 'Gaussian Blur [ Horizontal Pass ]';
 		_quadMesh.render( renderer );
@@ -201,7 +201,7 @@ class GaussianBlurNode extends TempNode {
 		textureNode.value = this._horizontalRT.texture;
 		renderer.setRenderTarget( this._verticalRT );
 
-		this._passDirection.value.set( 0, 1 );
+		vec2Set( 0, 1, this._passDirection.value );
 
 		_quadMesh.name = 'Gaussian Blur [ Vertical Pass ]';
 		_quadMesh.render( renderer );
@@ -342,14 +342,14 @@ class GaussianBlurNode extends TempNode {
 	 * The resolution scale.
 	 *
 	 * @deprecated
-	 * @type {Vector2}
+	 * @type {import('three').Vector2Like}
 	 * @default {(1,1)}
 	 */
 	get resolution() {
 
 		console.warn( 'THREE.GaussianBlurNode: The "resolution" property has been renamed to "resolutionScale" and is now of type `number`.' ); // @deprecated r180
 
-		return new Vector2( this.resolutionScale, this.resolutionScale );
+		return vec2Create( this.resolutionScale, this.resolutionScale );
 
 	}
 

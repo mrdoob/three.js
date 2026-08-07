@@ -3,6 +3,7 @@ import { Texture } from '../textures/Texture.js';
 import { LinearFilter } from '../constants.js';
 import { Vector4 } from '../math/Vector4.js';
 import { Source } from '../textures/Source.js';
+import { vec4Copy, vec4Set } from '../math/Vector4Functions.js';
 
 /**
  * A render target is a buffer where the video card draws pixels for a scene
@@ -392,8 +393,8 @@ class RenderTarget extends EventDispatcher {
 
 		}
 
-		this.viewport.set( 0, 0, width, height );
-		this.scissor.set( 0, 0, width, height );
+		vec4Set( 0, 0, width, height, this.viewport );
+		vec4Set( 0, 0, width, height, this.scissor );
 
 	}
 
@@ -422,10 +423,10 @@ class RenderTarget extends EventDispatcher {
 		this.height = source.height;
 		this.depth = source.depth;
 
-		this.scissor.copy( source.scissor );
+		vec4Copy( source.scissor, this.scissor );
 		this.scissorTest = source.scissorTest;
 
-		this.viewport.copy( source.viewport );
+		vec4Copy( source.viewport, this.viewport );
 
 		this.textures.length = 0;
 

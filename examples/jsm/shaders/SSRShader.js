@@ -1,6 +1,6 @@
 import {
-	Matrix4,
-	Vector2
+	mat4Create,
+	vec2Create
 } from 'three';
 
 
@@ -41,9 +41,9 @@ const SSRShader = {
 		'tDepth': { value: null },
 		'cameraNear': { value: null },
 		'cameraFar': { value: null },
-		'resolution': { value: new Vector2() },
-		'cameraProjectionMatrix': { value: new Matrix4() },
-		'cameraInverseProjectionMatrix': { value: new Matrix4() },
+		'resolution': { value: vec2Create() },
+		'cameraProjectionMatrix': { value: mat4Create() },
+		'cameraInverseProjectionMatrix': { value: mat4Create() },
 		'opacity': { value: .5 },
 		'maxDistance': { value: 180 },
 		'cameraRange': { value: 0 },
@@ -335,7 +335,7 @@ const SSRBlurShader = {
 	uniforms: {
 
 		'tDiffuse': { value: null },
-		'resolution': { value: new Vector2() },
+		'resolution': { value: vec2Create() },
 		'opacity': { value: .5 },
 
 	},

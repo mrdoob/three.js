@@ -1,8 +1,6 @@
 import {
 	AdditiveBlending,
-	Box2,
 	BufferGeometry,
-	Color,
 	FramebufferTexture,
 	InterleavedBuffer,
 	InterleavedBufferAttribute,
@@ -10,10 +8,20 @@ import {
 	MeshBasicNodeMaterial,
 	NodeMaterial,
 	UnsignedByteType,
-	Vector2,
-	Vector3,
-	Vector4,
-	Node
+	Node,
+	box2ContainsPoint,
+	box2Create,
+	colorConvertSRGBToLinear,
+	colorSet,
+	vec2Create,
+	vec2Set,
+	vec3ApplyMatrix4,
+	vec3Copy,
+	vec3Create,
+	vec3SetFromMatrixPosition,
+	vec4Create,
+	vec4Floor,
+	vec4MultiplyScalar
 } from 'three/webgpu';
 
 import { texture, textureLoad, uv, ivec2, vec2, vec4, positionGeometry, reference, varyingProperty, materialReference, Fn } from 'three/tsl';
@@ -76,7 +84,7 @@ class LensflareMesh extends Mesh {
 
 		//
 
-		const positionView = new Vector3();
+		const positionView = vec3Create();
 
 		// textures
 
@@ -90,8 +98,8 @@ class LensflareMesh extends Mesh {
 		// values for shared material uniforms
 
 		const sharedValues = {
-			scale: new Vector2(),
-			positionScreen: new Vector3()
+			scale: vec2Create(),
+			positionScreen: vec3Create()
 		};
 
 		// materials
@@ -141,8 +149,8 @@ class LensflareMesh extends Mesh {
 		material2.fog = false;
 		material2.type = 'Lensflare-2';
 
-		material2.screenPosition = new Vector3();
-		material2.scale = new Vector2();
+		material2.screenPosition = vec3Create();
+		material2.scale = vec2Create();
 		material2.occlusionMap = occlusionMap;
 
 		material2.vertexNode = Fn( ( { material } ) => {
@@ -204,9 +212,9 @@ class LensflareMesh extends Mesh {
 		//
 
 		const positionScreen = sharedValues.positionScreen;
-		const screenPositionPixels = new Vector4( 0, 0, 16, 16 );
-		const validArea = new Box2();
-		const viewport = new Vector4();
+		const screenPositionPixels = vec4Create( 0, 0, 16, 16 );
+		const validArea = box2Create();
+		const viewport = vec4Create();
 
 		// dummy node for renderer.renderObject()
 		const lightsNode = new Node();
@@ -215,7 +223,8 @@ class LensflareMesh extends Mesh {
 
 			renderer.getViewport( viewport );
 
-			viewport.multiplyScalar( renderer.getPixelRatio() ).floor();
+			vec4MultiplyScalar( viewport, renderer.getPixelRatio(), viewport );
+			vec4Floor( viewport, viewport );
 
 			const renderTarget = renderer.getRenderTarget();
 			const type = ( renderTarget !== null ) ? renderTarget.texture.type : UnsignedByteType;
@@ -237,19 +246,20 @@ class LensflareMesh extends Mesh {
 
 			const size = 16 / viewport.w;
 
-			sharedValues.scale.set( size * invAspect, size );
+			vec2Set( size * invAspect, size, sharedValues.scale );
 
-			validArea.min.set( viewport.x, viewport.y );
-			validArea.max.set( viewport.x + ( viewport.z - 16 ), viewport.y + ( viewport.w - 16 ) );
+			vec2Set( viewport.x, viewport.y, validArea.min );
+			vec2Set( viewport.x + ( viewport.z - 16 ), viewport.y + ( viewport.w - 16 ), validArea.max );
 
 			// calculate position in screen space
 
-			positionView.setFromMatrixPosition( this.matrixWorld );
-			positionView.applyMatrix4( camera.matrixWorldInverse );
+			vec3SetFromMatrixPosition( this.matrixWorld, positionView );
+			vec3ApplyMatrix4( positionView, camera.matrixWorldInverse, positionView );
 
 			if ( positionView.z > 0 ) return; // lensflare is behind the camera
 
-			positionScreen.copy( positionView ).applyMatrix4( camera.projectionMatrix );
+			vec3Copy( positionView, positionScreen );
+			vec3ApplyMatrix4( positionScreen, camera.projectionMatrix, positionScreen );
 
 			// horizontal and vertical coordinate of the lower left corner of the pixels to copy
 
@@ -258,7 +268,7 @@ class LensflareMesh extends Mesh {
 
 			// screen cull
 
-			if ( validArea.containsPoint( screenPositionPixels ) ) {
+			if ( box2ContainsPoint( validArea, screenPositionPixels ) ) {
 
 				// save current RGB to temp texture
 
@@ -291,7 +301,7 @@ class LensflareMesh extends Mesh {
 
 						mesh2 = elementMeshes[ i ] = new Mesh( geometry, material2 );
 
-						mesh2.color = element.color.convertSRGBToLinear();
+						mesh2.color = colorConvertSRGBToLinear( element.color );
 						mesh2.map = element.texture;
 
 					}
@@ -302,7 +312,7 @@ class LensflareMesh extends Mesh {
 
 					const size = element.size / viewport.w;
 
-					material2.scale.set( size * invAspect, size );
+					vec2Set( size * invAspect, size, material2.scale );
 
 					renderer.renderObject( mesh2, scene, camera, geometry, material2, null, lightsNode );
 
@@ -341,7 +351,7 @@ class LensflareMesh extends Mesh {
 
 class LensflareElement {
 
-	constructor( texture, size = 1, distance = 0, color = new Color( 0xffffff ) ) {
+	constructor( texture, size = 1, distance = 0, color = colorSet( 0xffffff ) ) {
 
 		this.texture = texture;
 		this.size = size;

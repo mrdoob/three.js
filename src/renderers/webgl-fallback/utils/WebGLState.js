@@ -8,8 +8,8 @@ import {
 	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth,
 	MaterialBlending
 } from '../../../constants.js';
-import { Color } from '../../../math/Color.js';
-import { Vector4 } from '../../../math/Vector4.js';
+import { colorCopy, colorCreate, colorEquals, colorSet } from '../../../math/ColorFunctions.js';
+import { vec4Copy, vec4Create, vec4Equals, vec4FromArray, vec4Set } from '../../../math/Vector4Functions.js';
 import { error, ReversedDepthFuncs, warnOnce } from '../../../utils.js';
 
 let equationToGL, factorToGL;
@@ -64,7 +64,7 @@ class WebGLState {
 		this.currentBlendDst = null;
 		this.currentBlendSrcAlpha = null;
 		this.currentBlendDstAlpha = null;
-		this.currentBlendColor = new Color( 0, 0, 0 );
+		this.currentBlendColor = colorSet( 0, 0, 0, colorCreate() );
 		this.currentBlendAlpha = 0;
 		this.currentPremultipledAlpha = null;
 		this.currentPolygonOffsetFactor = null;
@@ -138,10 +138,10 @@ class WebGLState {
 		const scissorParam = gl.getParameter( gl.SCISSOR_BOX );
 		const viewportParam = gl.getParameter( gl.VIEWPORT );
 
-		this.currentScissor = new Vector4().fromArray( scissorParam );
-		this.currentViewport = new Vector4().fromArray( viewportParam );
+		this.currentScissor = vec4FromArray( scissorParam );
+		this.currentViewport = vec4FromArray( viewportParam );
 
-		this._tempVec4 = new Vector4();
+		this._tempVec4 = vec4Create();
 
 	}
 
@@ -578,11 +578,11 @@ class WebGLState {
 
 		}
 
-		if ( blendColor.equals( this.currentBlendColor ) === false || blendAlpha !== this.currentBlendAlpha ) {
+		if ( colorEquals( blendColor, this.currentBlendColor ) === false || blendAlpha !== this.currentBlendAlpha ) {
 
 			gl.blendColor( blendColor.r, blendColor.g, blendColor.b, blendAlpha );
 
-			this.currentBlendColor.copy( blendColor );
+			colorCopy( blendColor, this.currentBlendColor );
 			this.currentBlendAlpha = blendAlpha;
 
 		}
@@ -762,14 +762,14 @@ class WebGLState {
 	 */
 	scissor( x, y, width, height ) {
 
-		const scissor = this._tempVec4.set( x, y, width, height );
+		const scissor = vec4Set( x, y, width, height, this._tempVec4 );
 
-		if ( this.currentScissor.equals( scissor ) === false ) {
+		if ( vec4Equals( this.currentScissor, scissor ) === false ) {
 
 			const { gl } = this;
 
 			gl.scissor( scissor.x, scissor.y, scissor.z, scissor.w );
-			this.currentScissor.copy( scissor );
+			vec4Copy( scissor, this.currentScissor );
 
 		}
 
@@ -786,14 +786,14 @@ class WebGLState {
 	 */
 	viewport( x, y, width, height ) {
 
-		const viewport = this._tempVec4.set( x, y, width, height );
+		const viewport = vec4Set( x, y, width, height, this._tempVec4 );
 
-		if ( this.currentViewport.equals( viewport ) === false ) {
+		if ( vec4Equals( this.currentViewport, viewport ) === false ) {
 
 			const { gl } = this;
 
 			gl.viewport( viewport.x, viewport.y, viewport.z, viewport.w );
-			this.currentViewport.copy( viewport );
+			vec4Copy( viewport, this.currentViewport );
 
 		}
 
@@ -1463,7 +1463,7 @@ class WebGLState {
 		this.currentBlendDst = null;
 		this.currentBlendSrcAlpha = null;
 		this.currentBlendDstAlpha = null;
-		this.currentBlendColor.set( 0, 0, 0 );
+		colorSet( 0, 0, 0, this.currentBlendColor );
 		this.currentBlendAlpha = 0;
 		this.currentPremultipledAlpha = null;
 		this.currentPolygonOffsetFactor = null;
@@ -1488,8 +1488,8 @@ class WebGLState {
 		this.currentBoundTextures = {};
 		this.currentBoundBufferBases = {};
 
-		this.currentScissor.set( 0, 0, gl.canvas.width, gl.canvas.height );
-		this.currentViewport.set( 0, 0, gl.canvas.width, gl.canvas.height );
+		vec4Set( 0, 0, gl.canvas.width, gl.canvas.height, this.currentScissor );
+		vec4Set( 0, 0, gl.canvas.width, gl.canvas.height, this.currentViewport );
 
 		// re-apply reversed depth if used by the renderer
 

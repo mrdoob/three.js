@@ -1,6 +1,6 @@
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
-import { Vector3 } from '../math/Vector3.js';
+import { vec3Create, vec3Normalize, vec3Set } from '../math/Vector3Functions.js';
 
 /**
  * A geometry class for representing a capsule.
@@ -69,8 +69,8 @@ class CapsuleGeometry extends BufferGeometry {
 		const numVerticalSegments = capSegments * 2 + heightSegments;
 		const verticesPerRow = radialSegments + 1;
 
-		const normal = new Vector3();
-		const vertex = new Vector3();
+		const normal = vec3Create();
+		const vertex = vec3Create();
 
 		// generate vertices, normals, and uvs
 
@@ -148,12 +148,13 @@ class CapsuleGeometry extends BufferGeometry {
 
 				// normal
 
-				normal.set(
+				vec3Set(
+					normal,
 					- profileRadius * cosTheta,
 					normalYComponent,
 					profileRadius * sinTheta
 				);
-				normal.normalize();
+				vec3Normalize( normal, normal );
 				normals.push( normal.x, normal.y, normal.z );
 
 				// uv

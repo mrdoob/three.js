@@ -1,8 +1,17 @@
-import { Color, Node, Vector3 } from 'three/webgpu';
+import {
+	Node,
+	colorCreate,
+	colorCopy,
+	colorMultiplyScalar,
+	vec3Create,
+	vec3SetFromMatrixPosition,
+	vec3SubVectors,
+	vec3TransformDirection
+} from 'three/webgpu';
 import { Loop, NodeUpdateType, renderGroup, uniform, uniformArray, vec3 } from 'three/tsl';
 
-const _lightPosition = /*@__PURE__*/ new Vector3();
-const _targetPosition = /*@__PURE__*/ new Vector3();
+const _lightPosition = /*@__PURE__*/ vec3Create();
+const _targetPosition = /*@__PURE__*/ vec3Create();
 
 const warn = ( message ) => {
 
@@ -34,8 +43,8 @@ class DirectionalLightDataNode extends Node {
 
 		for ( let i = 0; i < maxCount; i ++ ) {
 
-			this._colors.push( new Color() );
-			this._directions.push( new Vector3() );
+			this._colors.push( colorCreate() );
+			this._directions.push( vec3Create() );
 
 		}
 
@@ -70,12 +79,14 @@ class DirectionalLightDataNode extends Node {
 
 			const light = this._lights[ i ];
 
-			this._colors[ i ].copy( light.color ).multiplyScalar( light.intensity );
+			colorCopy( light.color, this._colors[ i ] );
+			colorMultiplyScalar( this._colors[ i ], light.intensity, this._colors[ i ] );
 
-			_lightPosition.setFromMatrixPosition( light.matrixWorld );
-			_targetPosition.setFromMatrixPosition( light.target.matrixWorld );
+			vec3SetFromMatrixPosition( light.matrixWorld, _lightPosition );
+			vec3SetFromMatrixPosition( light.target.matrixWorld, _targetPosition );
 
-			this._directions[ i ].subVectors( _lightPosition, _targetPosition ).transformDirection( camera.matrixWorldInverse );
+			vec3SubVectors( _lightPosition, _targetPosition, this._directions[ i ] );
+			vec3TransformDirection( this._directions[ i ], camera.matrixWorldInverse, this._directions[ i ] );
 
 		}
 

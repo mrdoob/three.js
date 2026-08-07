@@ -1,5 +1,5 @@
 import { EventDispatcher } from '../../core/EventDispatcher.js';
-import { Vector4 } from '../../math/Vector4.js';
+import { vec4Copy, vec4Create, vec4Set } from '../../math/Vector4Functions.js';
 import { FramebufferTexture } from '../../textures/FramebufferTexture.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 
@@ -59,7 +59,7 @@ class CanvasTarget extends EventDispatcher {
 		 * @private
 		 * @type {Vector4}
 		 */
-		this._viewport = new Vector4( 0, 0, this._width, this._height );
+		this._viewport = vec4Create( 0, 0, this._width, this._height );
 
 		/**
 		 * The scissor rectangle of the renderer in logical pixel unit.
@@ -67,7 +67,7 @@ class CanvasTarget extends EventDispatcher {
 		 * @private
 		 * @type {Vector4}
 		 */
-		this._scissor = new Vector4( 0, 0, this._width, this._height );
+		this._scissor = vec4Create( 0, 0, this._width, this._height );
 
 		/**
 		 * Whether the scissor test should be enabled or not.
@@ -112,7 +112,10 @@ class CanvasTarget extends EventDispatcher {
 	 */
 	getDrawingBufferSize( target ) {
 
-		return target.set( this._width * this._pixelRatio, this._height * this._pixelRatio ).floor();
+		target.x = Math.floor( this._width * this._pixelRatio );
+		target.y = Math.floor( this._height * this._pixelRatio );
+
+		return target;
 
 	}
 
@@ -124,7 +127,10 @@ class CanvasTarget extends EventDispatcher {
 	 */
 	getSize( target ) {
 
-		return target.set( this._width, this._height );
+		target.x = this._width;
+		target.y = this._height;
+
+		return target;
 
 	}
 
@@ -216,12 +222,7 @@ class CanvasTarget extends EventDispatcher {
 
 		const scissor = this._scissor;
 
-		target.x = scissor.x;
-		target.y = scissor.y;
-		target.width = scissor.width;
-		target.height = scissor.height;
-
-		return target;
+		return vec4Copy( scissor, target );
 
 	}
 
@@ -240,11 +241,11 @@ class CanvasTarget extends EventDispatcher {
 
 		if ( x.isVector4 ) {
 
-			scissor.copy( x );
+			vec4Copy( x, scissor );
 
 		} else {
 
-			scissor.set( x, y, width, height );
+			vec4Set( x, y, width, height, scissor );
 
 		}
 
@@ -280,7 +281,7 @@ class CanvasTarget extends EventDispatcher {
 	 */
 	getViewport( target ) {
 
-		return target.copy( this._viewport );
+		return vec4Copy( this._viewport, target );
 
 	}
 
@@ -300,11 +301,11 @@ class CanvasTarget extends EventDispatcher {
 
 		if ( x.isVector4 ) {
 
-			viewport.copy( x );
+			vec4Copy( x, viewport );
 
 		} else {
 
-			viewport.set( x, y, width, height );
+			vec4Set( x, y, width, height, viewport );
 
 		}
 

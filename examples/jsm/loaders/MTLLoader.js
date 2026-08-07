@@ -1,5 +1,6 @@
 import {
 	Color,
+	colorFromArray,
 	ColorManagement,
 	DefaultLoadingManager,
 	FileLoader,
@@ -9,7 +10,9 @@ import {
 	MeshPhongMaterial,
 	RepeatWrapping,
 	TextureLoader,
-	Vector2,
+	vec2Create,
+	vec2Set,
+	vec2Copy,
 	SRGBColorSpace
 } from 'three';
 
@@ -361,8 +364,8 @@ class MaterialCreator {
 			const texParams = scope.getTextureParams( value, params );
 			const map = scope.loadTexture( resolveURL( scope.baseUrl, texParams.url ) );
 
-			map.repeat.copy( texParams.scale );
-			map.offset.copy( texParams.offset );
+			vec2Copy( texParams.scale, map.repeat );
+			vec2Copy( texParams.offset, map.offset );
 
 			map.wrapS = scope.wrap;
 			map.wrapT = scope.wrap;
@@ -392,21 +395,21 @@ class MaterialCreator {
 
 					// Diffuse color (color under white light) using RGB values
 
-					params.color = ColorManagement.colorSpaceToWorking( new Color().fromArray( value ), SRGBColorSpace );
+					params.color = ColorManagement.colorSpaceToWorking( colorFromArray( value, 0, new Color() ), SRGBColorSpace );
 
 					break;
 
 				case 'ks':
 
 					// Specular color (color when light is reflected from shiny surface) using RGB values
-					params.specular = ColorManagement.colorSpaceToWorking( new Color().fromArray( value ), SRGBColorSpace );
+					params.specular = ColorManagement.colorSpaceToWorking( colorFromArray( value, 0, new Color() ), SRGBColorSpace );
 
 					break;
 
 				case 'ke':
 
 					// Emissive using RGB values
-					params.emissive = ColorManagement.colorSpaceToWorking( new Color().fromArray( value ), SRGBColorSpace );
+					params.emissive = ColorManagement.colorSpaceToWorking( colorFromArray( value, 0, new Color() ), SRGBColorSpace );
 
 					break;
 
@@ -517,8 +520,8 @@ class MaterialCreator {
 
 		const texParams = {
 
-			scale: new Vector2( 1, 1 ),
-			offset: new Vector2( 0, 0 )
+			scale: vec2Create( 1, 1 ),
+			offset: vec2Create( 0, 0 )
 
 		 };
 
@@ -548,7 +551,7 @@ class MaterialCreator {
 
 		if ( pos >= 0 ) {
 
-			texParams.scale.set( parseFloat( items[ pos + 1 ] ), parseFloat( items[ pos + 2 ] ) );
+			vec2Set( parseFloat( items[ pos + 1 ] ), parseFloat( items[ pos + 2 ] ), texParams.scale );
 			items.splice( pos, 4 ); // we expect 3 parameters here!
 
 		}
@@ -557,7 +560,7 @@ class MaterialCreator {
 
 		if ( pos >= 0 ) {
 
-			texParams.offset.set( parseFloat( items[ pos + 1 ] ), parseFloat( items[ pos + 2 ] ) );
+			vec2Set( parseFloat( items[ pos + 1 ] ), parseFloat( items[ pos + 2 ] ), texParams.offset );
 			items.splice( pos, 4 ); // we expect 3 parameters here!
 
 		}

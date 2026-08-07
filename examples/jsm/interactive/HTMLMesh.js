@@ -5,7 +5,8 @@ import {
 	MeshBasicMaterial,
 	PlaneGeometry,
 	SRGBColorSpace,
-	Color
+	colorCreate,
+	colorSet
 } from 'three';
 
 /**
@@ -152,7 +153,7 @@ const canvases = new WeakMap();
 function html2canvas( element ) {
 
 	const range = document.createRange();
-	const color = new Color();
+	const color = colorCreate();
 
 	function Clipper( context ) {
 
@@ -391,7 +392,7 @@ function html2canvas( element ) {
 
 				if ( accentColor === undefined || accentColor === 'auto' ) accentColor = style.color;
 
-				color.set( accentColor );
+				colorSet( accentColor, undefined, undefined, color );
 
 				const luminance = Math.sqrt( 0.299 * ( color.r ** 2 ) + 0.587 * ( color.g ** 2 ) + 0.114 * ( color.b ** 2 ) );
 				const accentTextColor = luminance < 0.5 ? 'white' : '#111111';

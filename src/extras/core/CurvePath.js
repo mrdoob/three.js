@@ -1,5 +1,13 @@
 import { Curve } from './Curve.js';
 import * as Curves from '../curves/Curves.js';
+import { vec2Equals } from '../../math/Vector2Functions.js';
+import { vec3Equals } from '../../math/Vector3Functions.js';
+
+function pointsEqual( a, b ) {
+
+	return ( a.z === undefined ) ? vec2Equals( a, b ) : vec3Equals( a, b );
+
+}
 
 /**
  * A base class extending {@link Curve}. `CurvePath` is simply an
@@ -59,9 +67,9 @@ class CurvePath extends Curve {
 		const startPoint = this.curves[ 0 ].getPoint( 0 );
 		const endPoint = this.curves[ this.curves.length - 1 ].getPoint( 1 );
 
-		if ( ! startPoint.equals( endPoint ) ) {
+		if ( ! pointsEqual( startPoint, endPoint ) ) {
 
-			const lineType = ( startPoint.isVector2 === true ) ? 'LineCurve' : 'LineCurve3';
+			const lineType = ( startPoint.z === undefined ) ? 'LineCurve' : 'LineCurve3';
 			this.curves.push( new Curves[ lineType ]( endPoint, startPoint ) );
 
 		}
@@ -215,7 +223,7 @@ class CurvePath extends Curve {
 
 				const point = pts[ j ];
 
-				if ( last && last.equals( point ) ) continue; // ensures no consecutive points are duplicates
+				if ( last && pointsEqual( last, point ) ) continue; // ensures no consecutive points are duplicates
 
 				points.push( point );
 				last = point;
@@ -224,7 +232,7 @@ class CurvePath extends Curve {
 
 		}
 
-		if ( this.autoClose && points.length > 1 && ! points[ points.length - 1 ].equals( points[ 0 ] ) ) {
+		if ( this.autoClose && points.length > 1 && ! pointsEqual( points[ points.length - 1 ], points[ 0 ] ) ) {
 
 			points.push( points[ 0 ] );
 

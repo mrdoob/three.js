@@ -4,12 +4,15 @@ import {
 } from '../constants.js';
 import { Bone } from './Bone.js';
 import { Matrix4 } from '../math/Matrix4.js';
+import {
+	mat4Create, mat4Copy, mat4Invert, mat4Multiply, mat4MultiplyMatrices, mat4ToArray, mat4FromArray, mat4Decompose
+} from '../math/Matrix4Functions.js';
 import { DataTexture } from '../textures/DataTexture.js';
 import { generateUUID } from '../math/MathUtils.js';
 import { warn } from '../utils.js';
 
-const _offsetMatrix = /*@__PURE__*/ new Matrix4();
-const _identityMatrix = /*@__PURE__*/ new Matrix4();
+const _offsetMatrix = /*@__PURE__*/ mat4Create();
+const _identityMatrix = /*@__PURE__*/ mat4Create();
 
 /**
  * Class for representing the armatures in `three.js`. The skeleton
@@ -137,7 +140,8 @@ class Skeleton {
 
 			if ( this.bones[ i ] ) {
 
-				inverse.copy( this.bones[ i ].matrixWorld ).invert();
+				mat4Copy( this.bones[ i ].matrixWorld, inverse );
+				mat4Invert( inverse, inverse );
 
 			}
 
@@ -160,7 +164,8 @@ class Skeleton {
 
 			if ( bone ) {
 
-				bone.matrixWorld.copy( this.boneInverses[ i ] ).invert();
+				mat4Copy( this.boneInverses[ i ], bone.matrixWorld );
+				mat4Invert( bone.matrixWorld, bone.matrixWorld );
 
 			}
 
@@ -176,16 +181,17 @@ class Skeleton {
 
 				if ( bone.parent && bone.parent.isBone ) {
 
-					bone.matrix.copy( bone.parent.matrixWorld ).invert();
-					bone.matrix.multiply( bone.matrixWorld );
+					mat4Copy( bone.parent.matrixWorld, bone.matrix );
+					mat4Invert( bone.matrix, bone.matrix );
+					mat4Multiply( bone.matrix, bone.matrixWorld, bone.matrix );
 
 				} else {
 
-					bone.matrix.copy( bone.matrixWorld );
+					mat4Copy( bone.matrixWorld, bone.matrix );
 
 				}
 
-				bone.matrix.decompose( bone.position, bone.quaternion, bone.scale );
+				mat4Decompose( bone.matrix, bone.position, bone.quaternion, bone.scale );
 
 			}
 
@@ -211,8 +217,8 @@ class Skeleton {
 
 			const matrix = bones[ i ] ? bones[ i ].matrixWorld : _identityMatrix;
 
-			_offsetMatrix.multiplyMatrices( matrix, boneInverses[ i ] );
-			_offsetMatrix.toArray( boneMatrices, i * 16 );
+			mat4MultiplyMatrices( matrix, boneInverses[ i ], _offsetMatrix );
+			mat4ToArray( _offsetMatrix, boneMatrices, i * 16 );
 
 		}
 
@@ -331,7 +337,7 @@ class Skeleton {
 			}
 
 			this.bones.push( bone );
-			this.boneInverses.push( new Matrix4().fromArray( json.boneInverses[ i ] ) );
+			this.boneInverses.push( mat4FromArray( json.boneInverses[ i ], 0, new Matrix4() ) );
 
 		}
 
@@ -370,7 +376,7 @@ class Skeleton {
 			data.bones.push( bone.uuid );
 
 			const boneInverse = boneInverses[ i ];
-			data.boneInverses.push( boneInverse.toArray() );
+			data.boneInverses.push( mat4ToArray( boneInverse ) );
 
 		}
 

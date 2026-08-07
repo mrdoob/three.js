@@ -1,12 +1,12 @@
 import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, logarithmicDepthToViewZ, luminance, max, min, mix, mul, nodeObject, normalize, orthographicDepthToViewZ, passTexture, perspectiveDepthToViewZ, reference, reflect, sub, texture, trunc, uniform, uv, vec2, vec3, vec4, viewZToPerspectiveDepth, context } from 'three/tsl';
-import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, TempNode, Vector2, Vector3 } from 'three/webgpu';
+import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, TempNode, mat4Copy, vec2Create, vec2Set, vec3Copy } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
 import { boxBlur } from './boxBlur.js';
 import ImportanceSampledEnvironment from './ImportanceSampledEnvironment.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _size = /*@__PURE__*/ new Vector2();
+const _size = /*@__PURE__*/ vec2Create();
 let _rendererState;
 
 // Maximum ray-march step count; `quality` (0..1) scales it to a fixed per-ray count.
@@ -358,11 +358,11 @@ class SSRNode extends TempNode {
 		 */
 		this._cameraFar = reference( 'far', 'float', camera );
 
-		this._cameraWorldMatrix = uniform( new Matrix4().copy( camera.matrixWorld ) );
-		this._cameraWorldPosition = uniform( new Vector3().copy( camera.position ) );
+		this._cameraWorldMatrix = uniform( mat4Copy( camera.matrixWorld ), 'mat4' );
+		this._cameraWorldPosition = uniform( vec3Copy( camera.position ), 'vec3' );
 
-		this._cameraViewMatrix = uniform( new Matrix4().copy( camera.matrixWorld ) );
-		this._cameraViewMatrixInverse = uniform( new Matrix4().copy( camera.matrixWorldInverse ) );
+		this._cameraViewMatrix = uniform( mat4Copy( camera.matrixWorld ), 'mat4' );
+		this._cameraViewMatrixInverse = uniform( mat4Copy( camera.matrixWorldInverse ), 'mat4' );
 
 		/**
 		 * The resolution of the pass.
@@ -370,7 +370,7 @@ class SSRNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
-		this._resolution = uniform( new Vector2() );
+		this._resolution = uniform( vec2Create(), 'vec2' );
 
 		this._noiseIndex = uniform( 0 );
 
@@ -653,7 +653,7 @@ class SSRNode extends TempNode {
 		width = Math.round( this.resolutionScale * width );
 		height = Math.round( this.resolutionScale * height );
 
-		this._resolution.value.set( width, height );
+		vec2Set( width, height, this._resolution.value );
 		this._ssrRenderTarget.setSize( width, height );
 		this._blurRenderTarget.setSize( width, height );
 
@@ -743,8 +743,8 @@ class SSRNode extends TempNode {
 
 		const { renderer } = frame;
 
-		this._cameraWorldMatrix.value.copy( this.camera.matrixWorld );
-		this._cameraWorldPosition.value.copy( this.camera.position );
+		mat4Copy( this.camera.matrixWorld, this._cameraWorldMatrix.value );
+		vec3Copy( this.camera.position, this._cameraWorldPosition.value );
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
@@ -755,7 +755,7 @@ class SSRNode extends TempNode {
 
 		_quadMesh.material = this._ssrMaterial;
 
-		this.setSize( size.width, size.height );
+		this.setSize( size.x, size.y );
 
 		// Advance the noise index once per frame (matches SSGI / Denoise).
 		this._noiseIndex.value = ( this._noiseIndex.value + 1 ) % 0x7fffffff;

@@ -1,5 +1,5 @@
 import {
-	Vector2
+	vec2Create
 } from 'three';
 
 /**
@@ -19,8 +19,8 @@ const NormalMapShader = {
 	uniforms: {
 
 		'heightMap': { value: null },
-		'resolution': { value: new Vector2( 512, 512 ) },
-		'scale': { value: new Vector2( 1, 1 ) },
+		'resolution': { value: vec2Create( 512, 512 ) },
+		'scale': { value: vec2Create( 1, 1 ) },
 		'height': { value: 0.05 }
 
 	},

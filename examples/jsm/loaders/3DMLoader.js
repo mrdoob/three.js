@@ -10,7 +10,6 @@ import {
 	Line,
 	LineBasicMaterial,
 	Loader,
-	Matrix4,
 	Mesh,
 	MeshPhysicalMaterial,
 	MeshStandardMaterial,
@@ -24,7 +23,12 @@ import {
 	Sprite,
 	SpriteMaterial,
 	TextureLoader,
-	EquirectangularReflectionMapping
+	EquirectangularReflectionMapping,
+	mat4Create,
+	mat4Set,
+	colorSet,
+	vec2Set,
+	vec3Set
 } from 'three';
 
 import { EXRLoader } from '../loaders/EXRLoader.js';
@@ -296,7 +300,7 @@ class Rhino3dmLoader extends Loader {
 		if ( material === undefined ) {
 
 			return new MeshStandardMaterial( {
-				color: new Color( 1, 1, 1 ),
+				color: colorSet( 1, 1, 1, new Color() ),
 				metalness: 0.8,
 				name: Loader.DEFAULT_MATERIAL_NAME,
 				side: DoubleSide
@@ -308,8 +312,8 @@ class Rhino3dmLoader extends Loader {
 
 		const mat = new MeshPhysicalMaterial( {
 
-			color: new Color( material.diffuseColor.r / 255.0, material.diffuseColor.g / 255.0, material.diffuseColor.b / 255.0 ),
-			emissive: new Color( material.emissionColor.r, material.emissionColor.g, material.emissionColor.b ),
+			color: colorSet( material.diffuseColor.r / 255.0, material.diffuseColor.g / 255.0, material.diffuseColor.b / 255.0, new Color() ),
+			emissive: colorSet( material.emissionColor.r, material.emissionColor.g, material.emissionColor.b, new Color() ),
 			flatShading: material.disableLighting,
 			ior: material.indexOfRefraction,
 			name: material.name,
@@ -329,7 +333,7 @@ class Rhino3dmLoader extends Loader {
 
 			mat.anisotropy = pbr.anisotropic;
 			mat.anisotropyRotation = pbr.anisotropicRotation;
-			mat.color = new Color( pbr.baseColor.r, pbr.baseColor.g, pbr.baseColor.b );
+			mat.color = colorSet( pbr.baseColor.r, pbr.baseColor.g, pbr.baseColor.b, new Color() );
 			mat.clearcoat = pbr.clearcoat;
 			mat.clearcoatRoughness = pbr.clearcoatRoughness;
 			mat.metalness = pbr.metallic;
@@ -496,7 +500,7 @@ class Rhino3dmLoader extends Loader {
 
 				if ( texture.repeat ) {
 
-					map.repeat.set( texture.repeat[ 0 ], texture.repeat[ 1 ] );
+					vec2Set( texture.repeat[ 0 ], texture.repeat[ 1 ], map.repeat );
 
 				}
 
@@ -658,8 +662,7 @@ class Rhino3dmLoader extends Loader {
 					const iRefObject = new Object3D();
 					const xf = iRef.geometry.xform.array;
 
-					const matrix = new Matrix4();
-					matrix.set( ...xf );
+					const matrix = mat4Set( mat4Create(), ...xf );
 
 					iRefObject.applyMatrix4( matrix );
 
@@ -705,7 +708,7 @@ class Rhino3dmLoader extends Loader {
 				} else {
 
 					_color = attributes.drawColor;
-					color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
+					color = colorSet( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0, new Color() );
 					material = new PointsMaterial( { color: color, sizeAttenuation: false, size: 2 } );
 
 				}
@@ -768,7 +771,7 @@ class Rhino3dmLoader extends Loader {
 				geometry = loader.parse( obj.geometry );
 
 				_color = attributes.drawColor;
-				color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
+				color = colorSet( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0, new Color() );
 
 				material = new LineBasicMaterial( { color: color } );
 				material = this._compareMaterials( material );
@@ -820,8 +823,8 @@ class Rhino3dmLoader extends Loader {
 
 				material = new SpriteMaterial( { map: texture, depthTest: false } );
 				const sprite = new Sprite( material );
-				sprite.position.set( geometry.point[ 0 ], geometry.point[ 1 ], geometry.point[ 2 ] );
-				sprite.scale.set( width / 10, height / 10, 1.0 );
+				vec3Set( sprite.position, geometry.point[ 0 ], geometry.point[ 1 ], geometry.point[ 2 ] );
+				vec3Set( sprite.scale, width / 10, height / 10, 1.0 );
 
 				sprite.userData[ 'attributes' ] = attributes;
 				sprite.userData[ 'objectType' ] = obj.objectType;
@@ -846,7 +849,7 @@ class Rhino3dmLoader extends Loader {
 
 						light = new PointLight();
 						light.castShadow = attributes.castsShadows;
-						light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
+						vec3Set( light.position, geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
 						light.shadow.normalBias = 0.1;
 
 						break;
@@ -855,8 +858,8 @@ class Rhino3dmLoader extends Loader {
 
 						light = new SpotLight();
 						light.castShadow = attributes.castsShadows;
-						light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
-						light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
+						vec3Set( light.position, geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
+						vec3Set( light.target.position, geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
 						light.angle = geometry.spotAngleRadians;
 						light.shadow.normalBias = 0.1;
 
@@ -867,7 +870,7 @@ class Rhino3dmLoader extends Loader {
 						light = new RectAreaLight();
 						const width = Math.abs( geometry.width[ 2 ] );
 						const height = Math.abs( geometry.length[ 0 ] );
-						light.position.set( geometry.location[ 0 ] - ( height / 2 ), geometry.location[ 1 ], geometry.location[ 2 ] - ( width / 2 ) );
+						vec3Set( light.position, geometry.location[ 0 ] - ( height / 2 ), geometry.location[ 1 ], geometry.location[ 2 ] - ( width / 2 ) );
 						light.height = height;
 						light.width = width;
 						light.lookAt( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
@@ -878,8 +881,8 @@ class Rhino3dmLoader extends Loader {
 
 						light = new DirectionalLight();
 						light.castShadow = attributes.castsShadows;
-						light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
-						light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
+						vec3Set( light.position, geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
+						vec3Set( light.target.position, geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
 						light.shadow.normalBias = 0.1;
 
 						break;
@@ -897,7 +900,7 @@ class Rhino3dmLoader extends Loader {
 
 					light.intensity = geometry.intensity;
 					_color = geometry.diffuse;
-					color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
+					color = colorSet( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0, new Color() );
 					light.color = color;
 					light.userData[ 'attributes' ] = attributes;
 					light.userData[ 'objectType' ] = obj.objectType;

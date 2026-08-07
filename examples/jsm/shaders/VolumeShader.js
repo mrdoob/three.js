@@ -1,6 +1,7 @@
 import {
-	Vector2,
-	Vector3
+	vec2Create,
+	vec3Create,
+	vec3Set
 } from 'three';
 
 /**
@@ -21,10 +22,10 @@ const VolumeRenderShader1 = {
 	name: 'VolumeRenderShader1',
 
 	uniforms: {
-		'u_size': { value: new Vector3( 1, 1, 1 ) },
+		'u_size': { value: vec3Set( vec3Create(), 1, 1, 1 ) },
 		'u_renderstyle': { value: 0 },
 		'u_renderthreshold': { value: 0.5 },
-		'u_clim': { value: new Vector2( 1, 1 ) },
+		'u_clim': { value: vec2Create( 1, 1 ) },
 		'u_data': { value: null },
 		'u_cmdata': { value: null }
 	},

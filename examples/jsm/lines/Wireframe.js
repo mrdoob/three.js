@@ -2,15 +2,18 @@ import {
 	InstancedInterleavedBuffer,
 	InterleavedBufferAttribute,
 	Mesh,
-	Vector3,
-	Vector4
+	vec2Set,
+	vec3Create,
+	vec3DistanceTo,
+	vec3FromBufferAttribute,
+	vec4Create
 } from 'three';
 import { LineSegmentsGeometry } from './LineSegmentsGeometry.js';
 import { LineMaterial } from './LineMaterial.js';
 
-const _start = new Vector3();
-const _end = new Vector3();
-const _viewport = new Vector4();
+const _start = /*@__PURE__*/ vec3Create();
+const _end = /*@__PURE__*/ vec3Create();
+const _viewport = /*@__PURE__*/ vec4Create();
 
 /**
  * A class for creating wireframes based on wide lines.
@@ -73,11 +76,11 @@ class Wireframe extends Mesh {
 
 		for ( let i = 0, j = 0, l = instanceStart.count; i < l; i ++, j += 2 ) {
 
-			_start.fromBufferAttribute( instanceStart, i );
-			_end.fromBufferAttribute( instanceEnd, i );
+			vec3FromBufferAttribute( instanceStart, i, _start );
+			vec3FromBufferAttribute( instanceEnd, i, _end );
 
 			lineDistances[ j ] = ( j === 0 ) ? 0 : lineDistances[ j - 1 ];
-			lineDistances[ j + 1 ] = lineDistances[ j ] + _start.distanceTo( _end );
+			lineDistances[ j + 1 ] = lineDistances[ j ] + vec3DistanceTo( _start, _end );
 
 		}
 
@@ -97,7 +100,7 @@ class Wireframe extends Mesh {
 		if ( uniforms && uniforms.resolution ) {
 
 			renderer.getViewport( _viewport );
-			this.material.uniforms.resolution.value.set( _viewport.z, _viewport.w );
+			vec2Set( _viewport.z, _viewport.w, this.material.uniforms.resolution.value );
 
 		}
 

@@ -1,6 +1,6 @@
-import { StereoCamera, Vector2, PassNode, RendererUtils } from 'three/webgpu';
+import { StereoCamera, PassNode, RendererUtils, vec2Create } from 'three/webgpu';
 
-const _size = /*@__PURE__*/ new Vector2();
+const _size = /*@__PURE__*/ vec2Create();
 
 let _rendererState;
 
@@ -68,7 +68,7 @@ class StereoPassNode extends PassNode {
 		stereo.update( camera );
 
 		const size = renderer.getSize( _size );
-		this.setSize( size.width, size.height );
+		this.setSize( size.x, size.y );
 
 		renderer.autoClear = false;
 

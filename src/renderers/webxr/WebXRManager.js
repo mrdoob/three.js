@@ -1,10 +1,12 @@
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
-import { Vector2 } from '../../math/Vector2.js';
-import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { RAD2DEG } from '../../math/MathUtils.js';
+import { mat4Compose, mat4Copy, mat4Decompose, mat4FromArray, mat4Invert, mat4MakePerspective, mat4Multiply, mat4MultiplyMatrices } from '../../math/Matrix4Functions.js';
+import { vec2Create } from '../../math/Vector2Functions.js';
+import { vec3Create, vec3DistanceTo, vec3SetFromMatrixPosition } from '../../math/Vector3Functions.js';
+import { vec4Set } from '../../math/Vector4Functions.js';
 import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { WebXRController } from './WebXRController.js';
@@ -65,7 +67,7 @@ class WebXRManager extends EventDispatcher {
 		const controllers = [];
 		const controllerInputSources = [];
 
-		const currentSize = new Vector2();
+		const currentSize = vec2Create();
 		let currentPixelRatio = null;
 		let currentCameraSettings = null;
 
@@ -261,7 +263,7 @@ class WebXRManager extends EventDispatcher {
 			scope.isPresenting = false;
 
 			renderer.setPixelRatio( currentPixelRatio );
-			renderer.setSize( currentSize.width, currentSize.height, false );
+			renderer.setSize( currentSize.x, currentSize.y, false );
 
 			if ( currentCameraSettings !== null ) {
 
@@ -632,8 +634,8 @@ class WebXRManager extends EventDispatcher {
 
 		//
 
-		const cameraLPos = new Vector3();
-		const cameraRPos = new Vector3();
+		const cameraLPos = vec3Create();
+		const cameraRPos = vec3Create();
 
 		/**
 		 * Assumes 2 cameras that are parallel and share an X-axis, and that
@@ -647,10 +649,10 @@ class WebXRManager extends EventDispatcher {
 		 */
 		function setProjectionFromUnion( camera, cameraL, cameraR ) {
 
-			cameraLPos.setFromMatrixPosition( cameraL.matrixWorld );
-			cameraRPos.setFromMatrixPosition( cameraR.matrixWorld );
+			vec3SetFromMatrixPosition( cameraL.matrixWorld, cameraLPos );
+			vec3SetFromMatrixPosition( cameraR.matrixWorld, cameraRPos );
 
-			const ipd = cameraLPos.distanceTo( cameraRPos );
+			const ipd = vec3DistanceTo( cameraLPos, cameraRPos );
 
 			const projL = cameraL.projectionMatrix.elements;
 			const projR = cameraR.projectionMatrix.elements;
@@ -674,11 +676,12 @@ class WebXRManager extends EventDispatcher {
 			const xOffset = zOffset * - leftFov;
 
 			// TODO: Better way to apply this offset?
-			cameraL.matrixWorld.decompose( camera.position, camera.quaternion, camera.scale );
+			mat4Decompose( cameraL.matrixWorld, camera.position, camera.quaternion, camera.scale );
 			camera.translateX( xOffset );
 			camera.translateZ( zOffset );
-			camera.matrixWorld.compose( camera.position, camera.quaternion, camera.scale );
-			camera.matrixWorldInverse.copy( camera.matrixWorld ).invert();
+			mat4Compose( camera.position, camera.quaternion, camera.scale, camera.matrixWorld );
+			mat4Copy( camera.matrixWorld, camera.matrixWorldInverse );
+			mat4Invert( camera.matrixWorldInverse, camera.matrixWorldInverse );
 
 			// Check if the projection uses an infinite far plane.
 			if ( projL[ 10 ] === - 1.0 ) {
@@ -686,8 +689,8 @@ class WebXRManager extends EventDispatcher {
 				// Use the projection matrix from the left eye.
 				// The camera offset is sufficient to include the view volumes
 				// of both eyes (assuming symmetric projections).
-				camera.projectionMatrix.copy( cameraL.projectionMatrix );
-				camera.projectionMatrixInverse.copy( cameraL.projectionMatrixInverse );
+				mat4Copy( cameraL.projectionMatrix, camera.projectionMatrix );
+				mat4Copy( cameraL.projectionMatrixInverse, camera.projectionMatrixInverse );
 
 			} else {
 
@@ -701,8 +704,9 @@ class WebXRManager extends EventDispatcher {
 				const top2 = topFov * far / far2 * near2;
 				const bottom2 = bottomFov * far / far2 * near2;
 
-				camera.projectionMatrix.makePerspective( left2, right2, top2, bottom2, near2, far2 );
-				camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
+				mat4MakePerspective( left2, right2, top2, bottom2, near2, far2, camera.coordinateSystem, camera.reversedDepth, camera.projectionMatrix );
+				mat4Copy( camera.projectionMatrix, camera.projectionMatrixInverse );
+				mat4Invert( camera.projectionMatrixInverse, camera.projectionMatrixInverse );
 
 			}
 
@@ -712,15 +716,16 @@ class WebXRManager extends EventDispatcher {
 
 			if ( parent === null ) {
 
-				camera.matrixWorld.copy( camera.matrix );
+				mat4Copy( camera.matrix, camera.matrixWorld );
 
 			} else {
 
-				camera.matrixWorld.multiplyMatrices( parent.matrixWorld, camera.matrix );
+				mat4MultiplyMatrices( parent.matrixWorld, camera.matrix, camera.matrixWorld );
 
 			}
 
-			camera.matrixWorldInverse.copy( camera.matrixWorld ).invert();
+			mat4Copy( camera.matrixWorld, camera.matrixWorldInverse );
+			mat4Invert( camera.matrixWorldInverse, camera.matrixWorldInverse );
 
 		}
 
@@ -790,7 +795,7 @@ class WebXRManager extends EventDispatcher {
 
 				// assume single camera setup (AR)
 
-				cameraXR.projectionMatrix.copy( cameraL.projectionMatrix );
+				mat4Copy( cameraL.projectionMatrix, cameraXR.projectionMatrix );
 
 			}
 
@@ -810,21 +815,21 @@ class WebXRManager extends EventDispatcher {
 
 			if ( parent === null ) {
 
-				camera.matrix.copy( cameraXR.matrixWorld );
+				mat4Copy( cameraXR.matrixWorld, camera.matrix );
 
 			} else {
 
-				camera.matrix.copy( parent.matrixWorld );
-				camera.matrix.invert();
-				camera.matrix.multiply( cameraXR.matrixWorld );
+				mat4Copy( parent.matrixWorld, camera.matrix );
+				mat4Invert( camera.matrix, camera.matrix );
+				mat4Multiply( camera.matrix, cameraXR.matrixWorld, camera.matrix );
 
 			}
 
-			camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
+			mat4Decompose( camera.matrix, camera.position, camera.quaternion, camera.scale );
 			camera.updateMatrixWorld( true );
 
-			camera.projectionMatrix.copy( cameraXR.projectionMatrix );
-			camera.projectionMatrixInverse.copy( cameraXR.projectionMatrixInverse );
+			mat4Copy( cameraXR.projectionMatrix, camera.projectionMatrix );
+			mat4Copy( cameraXR.projectionMatrixInverse, camera.projectionMatrixInverse );
 
 			if ( camera.isPerspectiveCamera ) {
 
@@ -1003,16 +1008,17 @@ class WebXRManager extends EventDispatcher {
 
 					}
 
-					camera.matrix.fromArray( view.transform.matrix );
-					camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
-					camera.projectionMatrix.fromArray( view.projectionMatrix );
-					camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
-					camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
+					mat4FromArray( view.transform.matrix, 0, camera.matrix );
+					mat4Decompose( camera.matrix, camera.position, camera.quaternion, camera.scale );
+					mat4FromArray( view.projectionMatrix, 0, camera.projectionMatrix );
+					mat4Copy( camera.projectionMatrix, camera.projectionMatrixInverse );
+					mat4Invert( camera.projectionMatrixInverse, camera.projectionMatrixInverse );
+					vec4Set( viewport.x, viewport.y, viewport.width, viewport.height, camera.viewport );
 
 					if ( i === 0 ) {
 
-						cameraXR.matrix.copy( camera.matrix );
-						cameraXR.matrix.decompose( cameraXR.position, cameraXR.quaternion, cameraXR.scale );
+						mat4Copy( camera.matrix, cameraXR.matrix );
+						mat4Decompose( cameraXR.matrix, cameraXR.position, cameraXR.quaternion, cameraXR.scale );
 
 					}
 

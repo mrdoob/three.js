@@ -1,4 +1,4 @@
-import { NearestFilter, Vector4, TempNode, NodeUpdateType, PassNode } from 'three/webgpu';
+import { NearestFilter, TempNode, NodeUpdateType, PassNode, vec4Create, vec4Set } from 'three/webgpu';
 import { nodeObject, Fn, float, uv, uniform, convertToTexture, vec2, vec3, clamp, floor, dot, smoothstep, If, sign, step, mrt, output, normalView, property, vec4 } from 'three/tsl';
 
 /**
@@ -77,7 +77,7 @@ class PixelationNode extends TempNode {
 		 * @private
 		 * @type {Node<vec4>}
 		 */
-		this._resolution = uniform( new Vector4() );
+		this._resolution = uniform( vec4Create(), 'vec4' );
 
 		/**
 		 * The `updateType` is set to `NodeUpdateType.FRAME` since the node updates
@@ -102,7 +102,7 @@ class PixelationNode extends TempNode {
 		const width = map.image.width;
 		const height = map.image.height;
 
-		this._resolution.value.set( width, height, 1 / width, 1 / height );
+		vec4Set( width, height, 1 / width, 1 / height, this._resolution.value );
 
 	}
 

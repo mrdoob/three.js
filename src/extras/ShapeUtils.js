@@ -1,4 +1,5 @@
 import { Earcut } from './Earcut.js';
+import { vec2Equals } from '../math/Vector2Functions.js';
 
 /**
  * A class containing utility functions for shapes.
@@ -92,7 +93,7 @@ function removeDupEndPts( points ) {
 
 	const l = points.length;
 
-	if ( l > 2 && points[ l - 1 ].equals( points[ 0 ] ) ) {
+	if ( l > 2 && vec2Equals( points[ l - 1 ], points[ 0 ] ) ) {
 
 		points.pop();
 

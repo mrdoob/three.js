@@ -1,23 +1,62 @@
-import { Vector3 } from '../math/Vector3.js';
-import { Vector2 } from '../math/Vector2.js';
 import { Box3 } from '../math/Box3.js';
 import { EventDispatcher } from './EventDispatcher.js';
 import { BufferAttribute, Float32BufferAttribute, Uint16BufferAttribute, Uint32BufferAttribute } from './BufferAttribute.js';
 import { Sphere } from '../math/Sphere.js';
 import { Object3D } from './Object3D.js';
-import { Matrix4 } from '../math/Matrix4.js';
-import { Matrix3 } from '../math/Matrix3.js';
 import { generateUUID } from '../math/MathUtils.js';
 import { arrayNeedsUint32, warn, error } from '../utils.js';
+import {
+	box3Copy,
+	box3Create,
+	box3ExpandByPoint,
+	box3GetCenter,
+	box3MakeEmpty,
+	box3Set,
+	box3SetFromBufferAttribute
+} from '../math/Box3Functions.js';
+import { mat3Create, mat3GetNormalMatrix } from '../math/Matrix3Functions.js';
+import {
+	mat4Create,
+	mat4MakeRotationFromQuaternion,
+	mat4MakeRotationX,
+	mat4MakeRotationY,
+	mat4MakeRotationZ,
+	mat4MakeScale,
+	mat4MakeTranslation
+} from '../math/Matrix4Functions.js';
+import { sphereCopy, sphereSet } from '../math/SphereFunctions.js';
+import {
+	vec2Create,
+	vec2FromBufferAttribute,
+	vec2Sub
+} from '../math/Vector2Functions.js';
+import {
+	vec3Add,
+	vec3AddScaledVector,
+	vec3AddVectors,
+	vec3Copy,
+	vec3Create,
+	vec3Cross,
+	vec3CrossVectors,
+	vec3DistanceToSquared,
+	vec3Dot,
+	vec3FromBufferAttribute,
+	vec3MultiplyScalar,
+	vec3Negate,
+	vec3Normalize,
+	vec3Sub,
+	vec3SubVectors
+} from '../math/Vector3Functions.js';
 
 let _id = 0;
 
-const _m1 = /*@__PURE__*/ new Matrix4();
+const _m1 = /*@__PURE__*/ mat4Create();
 const _obj = /*@__PURE__*/ new Object3D();
-const _offset = /*@__PURE__*/ new Vector3();
-const _box = /*@__PURE__*/ new Box3();
-const _boxMorphTargets = /*@__PURE__*/ new Box3();
-const _vector = /*@__PURE__*/ new Vector3();
+const _offset = /*@__PURE__*/ vec3Create();
+const _box = /*@__PURE__*/ box3Create();
+const _boxMorphTargets = /*@__PURE__*/ box3Create();
+const _vector = /*@__PURE__*/ vec3Create();
+const _normalMatrix = /*@__PURE__*/ mat3Create();
 
 /**
  * A representation of mesh, line, or point geometry. Includes vertex
@@ -389,9 +428,9 @@ class BufferGeometry extends EventDispatcher {
 
 		if ( normal !== undefined ) {
 
-			const normalMatrix = new Matrix3().getNormalMatrix( matrix );
+			mat3GetNormalMatrix( matrix, _normalMatrix );
 
-			normal.applyNormalMatrix( normalMatrix );
+			normal.applyNormalMatrix( _normalMatrix );
 
 			normal.needsUpdate = true;
 
@@ -433,7 +472,7 @@ class BufferGeometry extends EventDispatcher {
 	 */
 	applyQuaternion( q ) {
 
-		_m1.makeRotationFromQuaternion( q );
+		mat4MakeRotationFromQuaternion( q, _m1 );
 
 		this.applyMatrix4( _m1 );
 
@@ -453,7 +492,7 @@ class BufferGeometry extends EventDispatcher {
 
 		// rotate geometry around world x-axis
 
-		_m1.makeRotationX( angle );
+		mat4MakeRotationX( angle, _m1 );
 
 		this.applyMatrix4( _m1 );
 
@@ -473,7 +512,7 @@ class BufferGeometry extends EventDispatcher {
 
 		// rotate geometry around world y-axis
 
-		_m1.makeRotationY( angle );
+		mat4MakeRotationY( angle, _m1 );
 
 		this.applyMatrix4( _m1 );
 
@@ -493,7 +532,7 @@ class BufferGeometry extends EventDispatcher {
 
 		// rotate geometry around world z-axis
 
-		_m1.makeRotationZ( angle );
+		mat4MakeRotationZ( angle, _m1 );
 
 		this.applyMatrix4( _m1 );
 
@@ -515,7 +554,7 @@ class BufferGeometry extends EventDispatcher {
 
 		// translate geometry
 
-		_m1.makeTranslation( x, y, z );
+		mat4MakeTranslation( x, y, z, _m1 );
 
 		this.applyMatrix4( _m1 );
 
@@ -537,7 +576,7 @@ class BufferGeometry extends EventDispatcher {
 
 		// scale geometry
 
-		_m1.makeScale( x, y, z );
+		mat4MakeScale( x, y, z, _m1 );
 
 		this.applyMatrix4( _m1 );
 
@@ -574,7 +613,8 @@ class BufferGeometry extends EventDispatcher {
 
 		this.computeBoundingBox();
 
-		this.boundingBox.getCenter( _offset ).negate();
+		box3GetCenter( this.boundingBox, _offset );
+		vec3Negate( _offset, _offset );
 
 		this.translate( _offset.x, _offset.y, _offset.z );
 
@@ -655,9 +695,10 @@ class BufferGeometry extends EventDispatcher {
 
 			error( 'BufferGeometry.computeBoundingBox(): GLBufferAttribute requires a manual bounding box.', this );
 
-			this.boundingBox.set(
-				new Vector3( - Infinity, - Infinity, - Infinity ),
-				new Vector3( + Infinity, + Infinity, + Infinity )
+			box3Set(
+				{ x: - Infinity, y: - Infinity, z: - Infinity },
+				{ x: + Infinity, y: + Infinity, z: + Infinity },
+				this.boundingBox
 			);
 
 			return;
@@ -666,7 +707,7 @@ class BufferGeometry extends EventDispatcher {
 
 		if ( position !== undefined ) {
 
-			this.boundingBox.setFromBufferAttribute( position );
+			box3SetFromBufferAttribute( position, this.boundingBox );
 
 			// process morph attributes if present
 
@@ -675,20 +716,20 @@ class BufferGeometry extends EventDispatcher {
 				for ( let i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
 
 					const morphAttribute = morphAttributesPosition[ i ];
-					_box.setFromBufferAttribute( morphAttribute );
+					box3SetFromBufferAttribute( morphAttribute, _box );
 
 					if ( this.morphTargetsRelative ) {
 
-						_vector.addVectors( this.boundingBox.min, _box.min );
-						this.boundingBox.expandByPoint( _vector );
+						vec3AddVectors( this.boundingBox.min, _box.min, _vector );
+						box3ExpandByPoint( this.boundingBox, _vector, this.boundingBox );
 
-						_vector.addVectors( this.boundingBox.max, _box.max );
-						this.boundingBox.expandByPoint( _vector );
+						vec3AddVectors( this.boundingBox.max, _box.max, _vector );
+						box3ExpandByPoint( this.boundingBox, _vector, this.boundingBox );
 
 					} else {
 
-						this.boundingBox.expandByPoint( _box.min );
-						this.boundingBox.expandByPoint( _box.max );
+						box3ExpandByPoint( this.boundingBox, _box.min, this.boundingBox );
+						box3ExpandByPoint( this.boundingBox, _box.max, this.boundingBox );
 
 					}
 
@@ -698,7 +739,7 @@ class BufferGeometry extends EventDispatcher {
 
 		} else {
 
-			this.boundingBox.makeEmpty();
+			box3MakeEmpty( this.boundingBox );
 
 		}
 
@@ -730,7 +771,7 @@ class BufferGeometry extends EventDispatcher {
 
 			error( 'BufferGeometry.computeBoundingSphere(): GLBufferAttribute requires a manual bounding sphere.', this );
 
-			this.boundingSphere.set( new Vector3(), Infinity );
+			sphereSet( { x: 0, y: 0, z: 0 }, Infinity, this.boundingSphere );
 
 			return;
 
@@ -742,7 +783,7 @@ class BufferGeometry extends EventDispatcher {
 
 			const center = this.boundingSphere.center;
 
-			_box.setFromBufferAttribute( position );
+			box3SetFromBufferAttribute( position, _box );
 
 			// process morph attributes if present
 
@@ -751,20 +792,20 @@ class BufferGeometry extends EventDispatcher {
 				for ( let i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
 
 					const morphAttribute = morphAttributesPosition[ i ];
-					_boxMorphTargets.setFromBufferAttribute( morphAttribute );
+					box3SetFromBufferAttribute( morphAttribute, _boxMorphTargets );
 
 					if ( this.morphTargetsRelative ) {
 
-						_vector.addVectors( _box.min, _boxMorphTargets.min );
-						_box.expandByPoint( _vector );
+						vec3AddVectors( _box.min, _boxMorphTargets.min, _vector );
+						box3ExpandByPoint( _box, _vector, _box );
 
-						_vector.addVectors( _box.max, _boxMorphTargets.max );
-						_box.expandByPoint( _vector );
+						vec3AddVectors( _box.max, _boxMorphTargets.max, _vector );
+						box3ExpandByPoint( _box, _vector, _box );
 
 					} else {
 
-						_box.expandByPoint( _boxMorphTargets.min );
-						_box.expandByPoint( _boxMorphTargets.max );
+						box3ExpandByPoint( _box, _boxMorphTargets.min, _box );
+						box3ExpandByPoint( _box, _boxMorphTargets.max, _box );
 
 					}
 
@@ -772,7 +813,7 @@ class BufferGeometry extends EventDispatcher {
 
 			}
 
-			_box.getCenter( center );
+			box3GetCenter( _box, center );
 
 			// second, try to find a boundingSphere with a radius smaller than the
 			// boundingSphere of the boundingBox: sqrt(3) smaller in the best case
@@ -781,9 +822,9 @@ class BufferGeometry extends EventDispatcher {
 
 			for ( let i = 0, il = position.count; i < il; i ++ ) {
 
-				_vector.fromBufferAttribute( position, i );
+				vec3FromBufferAttribute( position, i, _vector );
 
-				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector ) );
+				maxRadiusSq = Math.max( maxRadiusSq, vec3DistanceToSquared( center, _vector ) );
 
 			}
 
@@ -798,16 +839,16 @@ class BufferGeometry extends EventDispatcher {
 
 					for ( let j = 0, jl = morphAttribute.count; j < jl; j ++ ) {
 
-						_vector.fromBufferAttribute( morphAttribute, j );
+						vec3FromBufferAttribute( morphAttribute, j, _vector );
 
 						if ( morphTargetsRelative ) {
 
-							_offset.fromBufferAttribute( position, j );
-							_vector.add( _offset );
+							vec3FromBufferAttribute( position, j, _offset );
+							vec3Add( _vector, _offset, _vector );
 
 						}
 
-						maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector ) );
+						maxRadiusSq = Math.max( maxRadiusSq, vec3DistanceToSquared( center, _vector ) );
 
 					}
 
@@ -869,37 +910,37 @@ class BufferGeometry extends EventDispatcher {
 
 		for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
-			tan1[ i ] = new Vector3();
-			tan2[ i ] = new Vector3();
+			tan1[ i ] = vec3Create();
+			tan2[ i ] = vec3Create();
 
 		}
 
-		const vA = new Vector3(),
-			vB = new Vector3(),
-			vC = new Vector3(),
+		const vA = vec3Create(),
+			vB = vec3Create(),
+			vC = vec3Create(),
 
-			uvA = new Vector2(),
-			uvB = new Vector2(),
-			uvC = new Vector2(),
+			uvA = vec2Create(),
+			uvB = vec2Create(),
+			uvC = vec2Create(),
 
-			sdir = new Vector3(),
-			tdir = new Vector3();
+			sdir = vec3Create(),
+			tdir = vec3Create();
 
 		function handleTriangle( a, b, c ) {
 
-			vA.fromBufferAttribute( positionAttribute, a );
-			vB.fromBufferAttribute( positionAttribute, b );
-			vC.fromBufferAttribute( positionAttribute, c );
+			vec3FromBufferAttribute( positionAttribute, a, vA );
+			vec3FromBufferAttribute( positionAttribute, b, vB );
+			vec3FromBufferAttribute( positionAttribute, c, vC );
 
-			uvA.fromBufferAttribute( uvAttribute, a );
-			uvB.fromBufferAttribute( uvAttribute, b );
-			uvC.fromBufferAttribute( uvAttribute, c );
+			vec2FromBufferAttribute( uvAttribute, a, uvA );
+			vec2FromBufferAttribute( uvAttribute, b, uvB );
+			vec2FromBufferAttribute( uvAttribute, c, uvC );
 
-			vB.sub( vA );
-			vC.sub( vA );
+			vec3Sub( vB, vA, vB );
+			vec3Sub( vC, vA, vC );
 
-			uvB.sub( uvA );
-			uvC.sub( uvA );
+			vec2Sub( uvB, uvA, uvB );
+			vec2Sub( uvC, uvA, uvC );
 
 			const r = 1.0 / ( uvB.x * uvC.y - uvC.x * uvB.y );
 
@@ -907,16 +948,23 @@ class BufferGeometry extends EventDispatcher {
 
 			if ( ! isFinite( r ) ) return;
 
-			sdir.copy( vB ).multiplyScalar( uvC.y ).addScaledVector( vC, - uvB.y ).multiplyScalar( r );
-			tdir.copy( vC ).multiplyScalar( uvB.x ).addScaledVector( vB, - uvC.x ).multiplyScalar( r );
+			vec3Copy( vB, sdir );
+			vec3MultiplyScalar( sdir, uvC.y, sdir );
+			vec3AddScaledVector( sdir, vC, - uvB.y, sdir );
+			vec3MultiplyScalar( sdir, r, sdir );
 
-			tan1[ a ].add( sdir );
-			tan1[ b ].add( sdir );
-			tan1[ c ].add( sdir );
+			vec3Copy( vC, tdir );
+			vec3MultiplyScalar( tdir, uvB.x, tdir );
+			vec3AddScaledVector( tdir, vB, - uvC.x, tdir );
+			vec3MultiplyScalar( tdir, r, tdir );
 
-			tan2[ a ].add( tdir );
-			tan2[ b ].add( tdir );
-			tan2[ c ].add( tdir );
+			vec3Add( tan1[ a ], sdir, tan1[ a ] );
+			vec3Add( tan1[ b ], sdir, tan1[ b ] );
+			vec3Add( tan1[ c ], sdir, tan1[ c ] );
+
+			vec3Add( tan2[ a ], tdir, tan2[ a ] );
+			vec3Add( tan2[ b ], tdir, tan2[ b ] );
+			vec3Add( tan2[ c ], tdir, tan2[ c ] );
 
 		}
 
@@ -950,25 +998,27 @@ class BufferGeometry extends EventDispatcher {
 
 		}
 
-		const tmp = new Vector3(), tmp2 = new Vector3();
-		const n = new Vector3(), n2 = new Vector3();
+		const tmp = vec3Create(), tmp2 = vec3Create();
+		const n = vec3Create(), n2 = vec3Create();
 
 		function handleVertex( v ) {
 
-			n.fromBufferAttribute( normalAttribute, v );
-			n2.copy( n );
+			vec3FromBufferAttribute( normalAttribute, v, n );
+			vec3Copy( n, n2 );
 
 			const t = tan1[ v ];
 
 			// Gram-Schmidt orthogonalize
 
-			tmp.copy( t );
-			tmp.sub( n.multiplyScalar( n.dot( t ) ) ).normalize();
+			vec3Copy( t, tmp );
+			vec3MultiplyScalar( n, vec3Dot( n, t ), n );
+			vec3Sub( tmp, n, tmp );
+			vec3Normalize( tmp, tmp );
 
 			// Calculate handedness
 
-			tmp2.crossVectors( n2, t );
-			const test = tmp2.dot( tan2[ v ] );
+			vec3CrossVectors( n2, t, tmp2 );
+			const test = vec3Dot( tmp2, tan2[ v ] );
 			const w = ( test < 0.0 ) ? - 1.0 : 1.0;
 
 			tangentAttribute.setXYZW( v, tmp.x, tmp.y, tmp.z, w );
@@ -1028,9 +1078,9 @@ class BufferGeometry extends EventDispatcher {
 
 			}
 
-			const pA = new Vector3(), pB = new Vector3(), pC = new Vector3();
-			const nA = new Vector3(), nB = new Vector3(), nC = new Vector3();
-			const cb = new Vector3(), ab = new Vector3();
+			const pA = vec3Create(), pB = vec3Create(), pC = vec3Create();
+			const nA = vec3Create(), nB = vec3Create(), nC = vec3Create();
+			const cb = vec3Create(), ab = vec3Create();
 
 			// indexed elements
 
@@ -1042,21 +1092,21 @@ class BufferGeometry extends EventDispatcher {
 					const vB = index.getX( i + 1 );
 					const vC = index.getX( i + 2 );
 
-					pA.fromBufferAttribute( positionAttribute, vA );
-					pB.fromBufferAttribute( positionAttribute, vB );
-					pC.fromBufferAttribute( positionAttribute, vC );
+					vec3FromBufferAttribute( positionAttribute, vA, pA );
+					vec3FromBufferAttribute( positionAttribute, vB, pB );
+					vec3FromBufferAttribute( positionAttribute, vC, pC );
 
-					cb.subVectors( pC, pB );
-					ab.subVectors( pA, pB );
-					cb.cross( ab );
+					vec3SubVectors( pC, pB, cb );
+					vec3SubVectors( pA, pB, ab );
+					vec3Cross( cb, ab, cb );
 
-					nA.fromBufferAttribute( normalAttribute, vA );
-					nB.fromBufferAttribute( normalAttribute, vB );
-					nC.fromBufferAttribute( normalAttribute, vC );
+					vec3FromBufferAttribute( normalAttribute, vA, nA );
+					vec3FromBufferAttribute( normalAttribute, vB, nB );
+					vec3FromBufferAttribute( normalAttribute, vC, nC );
 
-					nA.add( cb );
-					nB.add( cb );
-					nC.add( cb );
+					vec3Add( nA, cb, nA );
+					vec3Add( nB, cb, nB );
+					vec3Add( nC, cb, nC );
 
 					normalAttribute.setXYZ( vA, nA.x, nA.y, nA.z );
 					normalAttribute.setXYZ( vB, nB.x, nB.y, nB.z );
@@ -1070,13 +1120,13 @@ class BufferGeometry extends EventDispatcher {
 
 				for ( let i = 0, il = positionAttribute.count; i < il; i += 3 ) {
 
-					pA.fromBufferAttribute( positionAttribute, i + 0 );
-					pB.fromBufferAttribute( positionAttribute, i + 1 );
-					pC.fromBufferAttribute( positionAttribute, i + 2 );
+					vec3FromBufferAttribute( positionAttribute, i + 0, pA );
+					vec3FromBufferAttribute( positionAttribute, i + 1, pB );
+					vec3FromBufferAttribute( positionAttribute, i + 2, pC );
 
-					cb.subVectors( pC, pB );
-					ab.subVectors( pA, pB );
-					cb.cross( ab );
+					vec3SubVectors( pC, pB, cb );
+					vec3SubVectors( pA, pB, ab );
+					vec3Cross( cb, ab, cb );
 
 					normalAttribute.setXYZ( i + 0, cb.x, cb.y, cb.z );
 					normalAttribute.setXYZ( i + 1, cb.x, cb.y, cb.z );
@@ -1104,9 +1154,8 @@ class BufferGeometry extends EventDispatcher {
 
 		for ( let i = 0, il = normals.count; i < il; i ++ ) {
 
-			_vector.fromBufferAttribute( normals, i );
-
-			_vector.normalize();
+			vec3FromBufferAttribute( normals, i, _vector );
+			vec3Normalize( _vector, _vector );
 
 			normals.setXYZ( i, _vector.x, _vector.y, _vector.z );
 
@@ -1432,7 +1481,7 @@ class BufferGeometry extends EventDispatcher {
 
 		if ( boundingBox !== null ) {
 
-			this.boundingBox = boundingBox.clone();
+			this.boundingBox = box3Copy( boundingBox, new Box3() );
 
 		}
 
@@ -1442,7 +1491,7 @@ class BufferGeometry extends EventDispatcher {
 
 		if ( boundingSphere !== null ) {
 
-			this.boundingSphere = boundingSphere.clone();
+			this.boundingSphere = sphereCopy( boundingSphere, new Sphere() );
 
 		}
 

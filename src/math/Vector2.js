@@ -1,4 +1,54 @@
-import { clamp } from './MathUtils.js';
+import {
+	vec2Add,
+	vec2AddScalar,
+	vec2AddScaledVector,
+	vec2AddVectors,
+	vec2Angle,
+	vec2AngleTo,
+	vec2ApplyMatrix3,
+	vec2Ceil,
+	vec2Clamp,
+	vec2ClampLength,
+	vec2ClampScalar,
+	vec2Copy,
+	vec2Cross,
+	vec2DistanceTo,
+	vec2DistanceToSquared,
+	vec2Divide,
+	vec2DivideScalar,
+	vec2Dot,
+	vec2Equals,
+	vec2Floor,
+	vec2FromArray,
+	vec2FromBufferAttribute,
+	vec2GetComponent,
+	vec2Length,
+	vec2LengthSq,
+	vec2Lerp,
+	vec2LerpVectors,
+	vec2ManhattanDistanceTo,
+	vec2ManhattanLength,
+	vec2Max,
+	vec2Min,
+	vec2Multiply,
+	vec2MultiplyScalar,
+	vec2Negate,
+	vec2Normalize,
+	vec2Random,
+	vec2RotateAround,
+	vec2Round,
+	vec2RoundToZero,
+	vec2Set,
+	vec2SetComponent,
+	vec2SetLength,
+	vec2SetScalar,
+	vec2SetX,
+	vec2SetY,
+	vec2Sub,
+	vec2SubScalar,
+	vec2SubVectors,
+	vec2ToArray
+} from './Vector2Functions.js';
 
 /**
  * Class representing a 2D vector. A 2D vector is an ordered pair of numbers
@@ -24,21 +74,14 @@ import { clamp } from './MathUtils.js';
  *
  * const d = a.distanceTo( b );
  * ```
+ *
+ * `Vector2` is a thin, backwards-compatible wrapper around the standalone,
+ * tree-shakeable `vec2*` functions in {@link Vector2Functions}, which operate
+ * on any {@link Vector2Like} object. Prefer importing those functions
+ * directly if you only need a handful of operations and want unused ones
+ * eliminated from your bundle.
  */
 class Vector2 {
-
-	static {
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		Vector2.prototype.isVector2 = true;
-
-	}
 
 	/**
 	 * Constructs a new 2D vector.
@@ -47,6 +90,15 @@ class Vector2 {
 	 * @param {number} [y=0] - The y value of this vector.
 	 */
 	constructor( x = 0, y = 0 ) {
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		Object.defineProperty( this, 'isVector2', { value: true } );
 
 		/**
 		 * The x value of this vector.
@@ -107,10 +159,7 @@ class Vector2 {
 	 */
 	set( x, y ) {
 
-		this.x = x;
-		this.y = y;
-
-		return this;
+		return vec2Set( x, y, this );
 
 	}
 
@@ -122,10 +171,7 @@ class Vector2 {
 	 */
 	setScalar( scalar ) {
 
-		this.x = scalar;
-		this.y = scalar;
-
-		return this;
+		return vec2SetScalar( scalar, this );
 
 	}
 
@@ -137,9 +183,7 @@ class Vector2 {
 	 */
 	setX( x ) {
 
-		this.x = x;
-
-		return this;
+		return vec2SetX( this, x, this );
 
 	}
 
@@ -151,9 +195,7 @@ class Vector2 {
 	 */
 	setY( y ) {
 
-		this.y = y;
-
-		return this;
+		return vec2SetY( this, y, this );
 
 	}
 
@@ -166,15 +208,7 @@ class Vector2 {
 	 */
 	setComponent( index, value ) {
 
-		switch ( index ) {
-
-			case 0: this.x = value; break;
-			case 1: this.y = value; break;
-			default: throw new Error( 'THREE.Vector2: index is out of range: ' + index );
-
-		}
-
-		return this;
+		return vec2SetComponent( this, index, value, this );
 
 	}
 
@@ -186,13 +220,7 @@ class Vector2 {
 	 */
 	getComponent( index ) {
 
-		switch ( index ) {
-
-			case 0: return this.x;
-			case 1: return this.y;
-			default: throw new Error( 'THREE.Vector2: index is out of range: ' + index );
-
-		}
+		return vec2GetComponent( this, index );
 
 	}
 
@@ -210,30 +238,24 @@ class Vector2 {
 	/**
 	 * Copies the values of the given vector to this instance.
 	 *
-	 * @param {Vector2} v - The vector to copy.
+	 * @param {Vector2Like} v - The vector to copy.
 	 * @return {Vector2} A reference to this vector.
 	 */
 	copy( v ) {
 
-		this.x = v.x;
-		this.y = v.y;
-
-		return this;
+		return vec2Copy( v, this );
 
 	}
 
 	/**
 	 * Adds the given vector to this instance.
 	 *
-	 * @param {Vector2} v - The vector to add.
+	 * @param {Vector2Like} v - The vector to add.
 	 * @return {Vector2} A reference to this vector.
 	 */
 	add( v ) {
 
-		this.x += v.x;
-		this.y += v.y;
-
-		return this;
+		return vec2Add( this, v, this );
 
 	}
 
@@ -245,57 +267,45 @@ class Vector2 {
 	 */
 	addScalar( s ) {
 
-		this.x += s;
-		this.y += s;
-
-		return this;
+		return vec2AddScalar( this, s, this );
 
 	}
 
 	/**
 	 * Adds the given vectors and stores the result in this instance.
 	 *
-	 * @param {Vector2} a - The first vector.
-	 * @param {Vector2} b - The second vector.
+	 * @param {Vector2Like} a - The first vector.
+	 * @param {Vector2Like} b - The second vector.
 	 * @return {Vector2} A reference to this vector.
 	 */
 	addVectors( a, b ) {
 
-		this.x = a.x + b.x;
-		this.y = a.y + b.y;
-
-		return this;
+		return vec2AddVectors( a, b, this );
 
 	}
 
 	/**
 	 * Adds the given vector scaled by the given factor to this instance.
 	 *
-	 * @param {Vector2} v - The vector.
+	 * @param {Vector2Like} v - The vector.
 	 * @param {number} s - The factor that scales `v`.
 	 * @return {Vector2} A reference to this vector.
 	 */
 	addScaledVector( v, s ) {
 
-		this.x += v.x * s;
-		this.y += v.y * s;
-
-		return this;
+		return vec2AddScaledVector( this, v, s, this );
 
 	}
 
 	/**
 	 * Subtracts the given vector from this instance.
 	 *
-	 * @param {Vector2} v - The vector to subtract.
+	 * @param {Vector2Like} v - The vector to subtract.
 	 * @return {Vector2} A reference to this vector.
 	 */
 	sub( v ) {
 
-		this.x -= v.x;
-		this.y -= v.y;
-
-		return this;
+		return vec2Sub( this, v, this );
 
 	}
 
@@ -307,41 +317,32 @@ class Vector2 {
 	 */
 	subScalar( s ) {
 
-		this.x -= s;
-		this.y -= s;
-
-		return this;
+		return vec2SubScalar( this, s, this );
 
 	}
 
 	/**
 	 * Subtracts the given vectors and stores the result in this instance.
 	 *
-	 * @param {Vector2} a - The first vector.
-	 * @param {Vector2} b - The second vector.
+	 * @param {Vector2Like} a - The first vector.
+	 * @param {Vector2Like} b - The second vector.
 	 * @return {Vector2} A reference to this vector.
 	 */
 	subVectors( a, b ) {
 
-		this.x = a.x - b.x;
-		this.y = a.y - b.y;
-
-		return this;
+		return vec2SubVectors( a, b, this );
 
 	}
 
 	/**
 	 * Multiplies the given vector with this instance.
 	 *
-	 * @param {Vector2} v - The vector to multiply.
+	 * @param {Vector2Like} v - The vector to multiply.
 	 * @return {Vector2} A reference to this vector.
 	 */
 	multiply( v ) {
 
-		this.x *= v.x;
-		this.y *= v.y;
-
-		return this;
+		return vec2Multiply( this, v, this );
 
 	}
 
@@ -353,25 +354,19 @@ class Vector2 {
 	 */
 	multiplyScalar( scalar ) {
 
-		this.x *= scalar;
-		this.y *= scalar;
-
-		return this;
+		return vec2MultiplyScalar( this, scalar, this );
 
 	}
 
 	/**
 	 * Divides this instance by the given vector.
 	 *
-	 * @param {Vector2} v - The vector to divide.
+	 * @param {Vector2Like} v - The vector to divide.
 	 * @return {Vector2} A reference to this vector.
 	 */
 	divide( v ) {
 
-		this.x /= v.x;
-		this.y /= v.y;
-
-		return this;
+		return vec2Divide( this, v, this );
 
 	}
 
@@ -383,7 +378,7 @@ class Vector2 {
 	 */
 	divideScalar( scalar ) {
 
-		return this.multiplyScalar( 1 / scalar );
+		return vec2DivideScalar( this, scalar, this );
 
 	}
 
@@ -396,13 +391,7 @@ class Vector2 {
 	 */
 	applyMatrix3( m ) {
 
-		const x = this.x, y = this.y;
-		const e = m.elements;
-
-		this.x = e[ 0 ] * x + e[ 3 ] * y + e[ 6 ];
-		this.y = e[ 1 ] * x + e[ 4 ] * y + e[ 7 ];
-
-		return this;
+		return vec2ApplyMatrix3( this, m, this );
 
 	}
 
@@ -410,15 +399,12 @@ class Vector2 {
 	 * If this vector's x or y value is greater than the given vector's x or y
 	 * value, replace that value with the corresponding min value.
 	 *
-	 * @param {Vector2} v - The vector.
+	 * @param {Vector2Like} v - The vector.
 	 * @return {Vector2} A reference to this vector.
 	 */
 	min( v ) {
 
-		this.x = Math.min( this.x, v.x );
-		this.y = Math.min( this.y, v.y );
-
-		return this;
+		return vec2Min( this, v, this );
 
 	}
 
@@ -426,15 +412,12 @@ class Vector2 {
 	 * If this vector's x or y value is less than the given vector's x or y
 	 * value, replace that value with the corresponding max value.
 	 *
-	 * @param {Vector2} v - The vector.
+	 * @param {Vector2Like} v - The vector.
 	 * @return {Vector2} A reference to this vector.
 	 */
 	max( v ) {
 
-		this.x = Math.max( this.x, v.x );
-		this.y = Math.max( this.y, v.y );
-
-		return this;
+		return vec2Max( this, v, this );
 
 	}
 
@@ -444,18 +427,13 @@ class Vector2 {
 	 * If this vector's x or y value is less than the min vector's x or y value,
 	 * it is replaced by the corresponding value.
 	 *
-	 * @param {Vector2} min - The minimum x and y values.
-	 * @param {Vector2} max - The maximum x and y values in the desired range.
+	 * @param {Vector2Like} min - The minimum x and y values.
+	 * @param {Vector2Like} max - The maximum x and y values in the desired range.
 	 * @return {Vector2} A reference to this vector.
 	 */
 	clamp( min, max ) {
 
-		// assumes min < max, componentwise
-
-		this.x = clamp( this.x, min.x, max.x );
-		this.y = clamp( this.y, min.y, max.y );
-
-		return this;
+		return vec2Clamp( this, min, max, this );
 
 	}
 
@@ -471,10 +449,7 @@ class Vector2 {
 	 */
 	clampScalar( minVal, maxVal ) {
 
-		this.x = clamp( this.x, minVal, maxVal );
-		this.y = clamp( this.y, minVal, maxVal );
-
-		return this;
+		return vec2ClampScalar( this, minVal, maxVal, this );
 
 	}
 
@@ -490,9 +465,7 @@ class Vector2 {
 	 */
 	clampLength( min, max ) {
 
-		const length = this.length();
-
-		return this.divideScalar( length || 1 ).multiplyScalar( clamp( length, min, max ) );
+		return vec2ClampLength( this, min, max, this );
 
 	}
 
@@ -503,10 +476,7 @@ class Vector2 {
 	 */
 	floor() {
 
-		this.x = Math.floor( this.x );
-		this.y = Math.floor( this.y );
-
-		return this;
+		return vec2Floor( this, this );
 
 	}
 
@@ -517,10 +487,7 @@ class Vector2 {
 	 */
 	ceil() {
 
-		this.x = Math.ceil( this.x );
-		this.y = Math.ceil( this.y );
-
-		return this;
+		return vec2Ceil( this, this );
 
 	}
 
@@ -531,10 +498,7 @@ class Vector2 {
 	 */
 	round() {
 
-		this.x = Math.round( this.x );
-		this.y = Math.round( this.y );
-
-		return this;
+		return vec2Round( this, this );
 
 	}
 
@@ -546,10 +510,7 @@ class Vector2 {
 	 */
 	roundToZero() {
 
-		this.x = Math.trunc( this.x );
-		this.y = Math.trunc( this.y );
-
-		return this;
+		return vec2RoundToZero( this, this );
 
 	}
 
@@ -560,34 +521,31 @@ class Vector2 {
 	 */
 	negate() {
 
-		this.x = - this.x;
-		this.y = - this.y;
-
-		return this;
+		return vec2Negate( this, this );
 
 	}
 
 	/**
 	 * Calculates the dot product of the given vector with this instance.
 	 *
-	 * @param {Vector2} v - The vector to compute the dot product with.
+	 * @param {Vector2Like} v - The vector to compute the dot product with.
 	 * @return {number} The result of the dot product.
 	 */
 	dot( v ) {
 
-		return this.x * v.x + this.y * v.y;
+		return vec2Dot( this, v );
 
 	}
 
 	/**
 	 * Calculates the cross product of the given vector with this instance.
 	 *
-	 * @param {Vector2} v - The vector to compute the cross product with.
+	 * @param {Vector2Like} v - The vector to compute the cross product with.
 	 * @return {number} The result of the cross product.
 	 */
 	cross( v ) {
 
-		return this.x * v.y - this.y * v.x;
+		return vec2Cross( this, v );
 
 	}
 
@@ -600,7 +558,7 @@ class Vector2 {
 	 */
 	lengthSq() {
 
-		return this.x * this.x + this.y * this.y;
+		return vec2LengthSq( this );
 
 	}
 
@@ -611,7 +569,7 @@ class Vector2 {
 	 */
 	length() {
 
-		return Math.sqrt( this.x * this.x + this.y * this.y );
+		return vec2Length( this );
 
 	}
 
@@ -622,7 +580,7 @@ class Vector2 {
 	 */
 	manhattanLength() {
 
-		return Math.abs( this.x ) + Math.abs( this.y );
+		return vec2ManhattanLength( this );
 
 	}
 
@@ -634,7 +592,7 @@ class Vector2 {
 	 */
 	normalize() {
 
-		return this.divideScalar( this.length() || 1 );
+		return vec2Normalize( this, this );
 
 	}
 
@@ -645,41 +603,31 @@ class Vector2 {
 	 */
 	angle() {
 
-		const angle = Math.atan2( - this.y, - this.x ) + Math.PI;
-
-		return angle;
+		return vec2Angle( this );
 
 	}
 
 	/**
 	 * Returns the angle between the given vector and this instance in radians.
 	 *
-	 * @param {Vector2} v - The vector to compute the angle with.
+	 * @param {Vector2Like} v - The vector to compute the angle with.
 	 * @return {number} The angle in radians.
 	 */
 	angleTo( v ) {
 
-		const denominator = Math.sqrt( this.lengthSq() * v.lengthSq() );
-
-		if ( denominator === 0 ) return Math.PI / 2;
-
-		const theta = this.dot( v ) / denominator;
-
-		// clamp, to handle numerical problems
-
-		return Math.acos( clamp( theta, - 1, 1 ) );
+		return vec2AngleTo( this, v );
 
 	}
 
 	/**
 	 * Computes the distance from the given vector to this instance.
 	 *
-	 * @param {Vector2} v - The vector to compute the distance to.
+	 * @param {Vector2Like} v - The vector to compute the distance to.
 	 * @return {number} The distance.
 	 */
 	distanceTo( v ) {
 
-		return Math.sqrt( this.distanceToSquared( v ) );
+		return vec2DistanceTo( this, v );
 
 	}
 
@@ -688,25 +636,24 @@ class Vector2 {
 	 * If you are just comparing the distance with another distance, you should compare
 	 * the distance squared instead as it is slightly more efficient to calculate.
 	 *
-	 * @param {Vector2} v - The vector to compute the squared distance to.
+	 * @param {Vector2Like} v - The vector to compute the squared distance to.
 	 * @return {number} The squared distance.
 	 */
 	distanceToSquared( v ) {
 
-		const dx = this.x - v.x, dy = this.y - v.y;
-		return dx * dx + dy * dy;
+		return vec2DistanceToSquared( this, v );
 
 	}
 
 	/**
 	 * Computes the Manhattan distance from the given vector to this instance.
 	 *
-	 * @param {Vector2} v - The vector to compute the Manhattan distance to.
+	 * @param {Vector2Like} v - The vector to compute the Manhattan distance to.
 	 * @return {number} The Manhattan distance.
 	 */
 	manhattanDistanceTo( v ) {
 
-		return Math.abs( this.x - v.x ) + Math.abs( this.y - v.y );
+		return vec2ManhattanDistanceTo( this, v );
 
 	}
 
@@ -719,7 +666,7 @@ class Vector2 {
 	 */
 	setLength( length ) {
 
-		return this.normalize().multiplyScalar( length );
+		return vec2SetLength( this, length, this );
 
 	}
 
@@ -728,16 +675,13 @@ class Vector2 {
 	 * alpha is the percent distance along the line - alpha = 0 will be this
 	 * vector, and alpha = 1 will be the given one.
 	 *
-	 * @param {Vector2} v - The vector to interpolate towards.
+	 * @param {Vector2Like} v - The vector to interpolate towards.
 	 * @param {number} alpha - The interpolation factor, typically in the closed interval `[0, 1]`.
 	 * @return {Vector2} A reference to this vector.
 	 */
 	lerp( v, alpha ) {
 
-		this.x += ( v.x - this.x ) * alpha;
-		this.y += ( v.y - this.y ) * alpha;
-
-		return this;
+		return vec2Lerp( this, v, alpha, this );
 
 	}
 
@@ -746,29 +690,26 @@ class Vector2 {
 	 * distance along the line - alpha = 0 will be first vector, and alpha = 1 will
 	 * be the second one. The result is stored in this instance.
 	 *
-	 * @param {Vector2} v1 - The first vector.
-	 * @param {Vector2} v2 - The second vector.
+	 * @param {Vector2Like} v1 - The first vector.
+	 * @param {Vector2Like} v2 - The second vector.
 	 * @param {number} alpha - The interpolation factor, typically in the closed interval `[0, 1]`.
 	 * @return {Vector2} A reference to this vector.
 	 */
 	lerpVectors( v1, v2, alpha ) {
 
-		this.x = v1.x + ( v2.x - v1.x ) * alpha;
-		this.y = v1.y + ( v2.y - v1.y ) * alpha;
-
-		return this;
+		return vec2LerpVectors( v1, v2, alpha, this );
 
 	}
 
 	/**
 	 * Returns `true` if this vector is equal with the given one.
 	 *
-	 * @param {Vector2} v - The vector to test for equality.
+	 * @param {Vector2Like} v - The vector to test for equality.
 	 * @return {boolean} Whether this vector is equal with the given one.
 	 */
 	equals( v ) {
 
-		return ( ( v.x === this.x ) && ( v.y === this.y ) );
+		return vec2Equals( this, v );
 
 	}
 
@@ -782,10 +723,7 @@ class Vector2 {
 	 */
 	fromArray( array, offset = 0 ) {
 
-		this.x = array[ offset ];
-		this.y = array[ offset + 1 ];
-
-		return this;
+		return vec2FromArray( array, offset, this );
 
 	}
 
@@ -799,10 +737,7 @@ class Vector2 {
 	 */
 	toArray( array = [], offset = 0 ) {
 
-		array[ offset ] = this.x;
-		array[ offset + 1 ] = this.y;
-
-		return array;
+		return vec2ToArray( this, array, offset );
 
 	}
 
@@ -815,31 +750,20 @@ class Vector2 {
 	 */
 	fromBufferAttribute( attribute, index ) {
 
-		this.x = attribute.getX( index );
-		this.y = attribute.getY( index );
-
-		return this;
+		return vec2FromBufferAttribute( attribute, index, this );
 
 	}
 
 	/**
 	 * Rotates this vector around the given center by the given angle.
 	 *
-	 * @param {Vector2} center - The point around which to rotate.
+	 * @param {Vector2Like} center - The point around which to rotate.
 	 * @param {number} angle - The angle to rotate, in radians.
 	 * @return {Vector2} A reference to this vector.
 	 */
 	rotateAround( center, angle ) {
 
-		const c = Math.cos( angle ), s = Math.sin( angle );
-
-		const x = this.x - center.x;
-		const y = this.y - center.y;
-
-		this.x = x * c - y * s + center.x;
-		this.y = x * s + y * c + center.y;
-
-		return this;
+		return vec2RotateAround( this, center, angle, this );
 
 	}
 
@@ -851,10 +775,7 @@ class Vector2 {
 	 */
 	random() {
 
-		this.x = Math.random();
-		this.y = Math.random();
-
-		return this;
+		return vec2Random( this );
 
 	}
 

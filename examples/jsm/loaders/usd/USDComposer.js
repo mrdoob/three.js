@@ -9,10 +9,8 @@ import {
 	ConeGeometry,
 	CylinderGeometry,
 	DirectionalLight,
-	Euler,
 	Group,
 	LoaderUtils,
-	Matrix4,
 	Mesh,
 	MeshPhysicalMaterial,
 	MirroredRepeatWrapping,
@@ -21,7 +19,6 @@ import {
 	OrthographicCamera,
 	PerspectiveCamera,
 	PointLight,
-	Quaternion,
 	QuaternionKeyframeTrack,
 	RectAreaLight,
 	RepeatWrapping,
@@ -34,8 +31,38 @@ import {
 	SRGBColorSpace,
 	Texture,
 	Vector2,
-	Vector3,
-	VectorKeyframeTrack
+	VectorKeyframeTrack,
+	colorSet,
+	colorSetRGB,
+	colorMultiply,
+	colorMultiplyScalar,
+	eulerCreate,
+	eulerSet,
+	mat4Create,
+	mat4Set,
+	mat4Copy,
+	mat4Multiply,
+	mat4Invert,
+	mat4Decompose,
+	mat4MakeTranslation,
+	mat4MakeScale,
+	mat4MakeRotationX,
+	mat4MakeRotationY,
+	mat4MakeRotationZ,
+	mat4MakeRotationFromEuler,
+	mat4MakeRotationFromQuaternion,
+	quatCreate,
+	quatSet,
+	quatSetFromEuler,
+	quatToArray,
+	vec2Create,
+	vec2Set,
+	vec3Create,
+	vec3Set,
+	vec3SetScalar,
+	vec3Normalize,
+	vec3CrossVectors,
+	vec3Dot
 } from 'three';
 
 // Pre-compiled regex patterns for performance
@@ -139,7 +166,7 @@ class USDComposer {
 
 		if ( metersPerUnit !== undefined && metersPerUnit !== 1 ) {
 
-			group.scale.setScalar( metersPerUnit );
+			vec3SetScalar( group.scale, metersPerUnit );
 
 		}
 
@@ -167,8 +194,8 @@ class USDComposer {
 		// If we have xformOpOrder, apply transforms using matrices
 		if ( xformOpOrder && xformOpOrder.length > 0 ) {
 
-			const matrix = new Matrix4();
-			const tempMatrix = new Matrix4();
+			const matrix = mat4Create();
+			const tempMatrix = mat4Create();
 
 			// Track scale for handling negative scale with rotation
 			let scaleValues = null;
@@ -185,14 +212,15 @@ class USDComposer {
 					const m = data[ 'xformOp:transform' ];
 					if ( m && m.length === 16 ) {
 
-						tempMatrix.set(
+						mat4Set(
+							tempMatrix,
 							m[ 0 ], m[ 4 ], m[ 8 ], m[ 12 ],
 							m[ 1 ], m[ 5 ], m[ 9 ], m[ 13 ],
 							m[ 2 ], m[ 6 ], m[ 10 ], m[ 14 ],
 							m[ 3 ], m[ 7 ], m[ 11 ], m[ 15 ]
 						);
-						if ( isInverse ) tempMatrix.invert();
-						matrix.multiply( tempMatrix );
+						if ( isInverse ) mat4Invert( tempMatrix, tempMatrix );
+						mat4Multiply( matrix, tempMatrix, matrix );
 
 					}
 
@@ -201,9 +229,9 @@ class USDComposer {
 					const t = data[ 'xformOp:translate' ];
 					if ( t ) {
 
-						tempMatrix.makeTranslation( t[ 0 ], t[ 1 ], t[ 2 ] );
-						if ( isInverse ) tempMatrix.invert();
-						matrix.multiply( tempMatrix );
+						mat4MakeTranslation( t[ 0 ], t[ 1 ], t[ 2 ], tempMatrix );
+						if ( isInverse ) mat4Invert( tempMatrix, tempMatrix );
+						mat4Multiply( matrix, tempMatrix, matrix );
 
 					}
 
@@ -212,9 +240,9 @@ class USDComposer {
 					const t = data[ 'xformOp:translate:pivot' ];
 					if ( t ) {
 
-						tempMatrix.makeTranslation( t[ 0 ], t[ 1 ], t[ 2 ] );
-						if ( isInverse ) tempMatrix.invert();
-						matrix.multiply( tempMatrix );
+						mat4MakeTranslation( t[ 0 ], t[ 1 ], t[ 2 ], tempMatrix );
+						if ( isInverse ) mat4Invert( tempMatrix, tempMatrix );
+						mat4Multiply( matrix, tempMatrix, matrix );
 
 					}
 
@@ -225,18 +253,18 @@ class USDComposer {
 
 						if ( Array.isArray( s ) ) {
 
-							tempMatrix.makeScale( s[ 0 ], s[ 1 ], s[ 2 ] );
+							mat4MakeScale( s[ 0 ], s[ 1 ], s[ 2 ], tempMatrix );
 							scaleValues = [ s[ 0 ], s[ 1 ], s[ 2 ] ];
 
 						} else {
 
-							tempMatrix.makeScale( s, s, s );
+							mat4MakeScale( s, s, s, tempMatrix );
 							scaleValues = [ s, s, s ];
 
 						}
 
-						if ( isInverse ) tempMatrix.invert();
-						matrix.multiply( tempMatrix );
+						if ( isInverse ) mat4Invert( tempMatrix, tempMatrix );
+						mat4Multiply( matrix, tempMatrix, matrix );
 
 					}
 
@@ -247,15 +275,15 @@ class USDComposer {
 
 						// USD rotateXYZ: matrix = Rx * Ry * Rz
 						// Three.js Euler 'ZYX' order produces same result
-						const euler = new Euler(
+						const euler = eulerCreate(
 							r[ 0 ] * Math.PI / 180,
 							r[ 1 ] * Math.PI / 180,
 							r[ 2 ] * Math.PI / 180,
 							'ZYX'
 						);
-						tempMatrix.makeRotationFromEuler( euler );
-						if ( isInverse ) tempMatrix.invert();
-						matrix.multiply( tempMatrix );
+						mat4MakeRotationFromEuler( euler, tempMatrix );
+						if ( isInverse ) mat4Invert( tempMatrix, tempMatrix );
+						mat4Multiply( matrix, tempMatrix, matrix );
 
 					}
 
@@ -264,9 +292,9 @@ class USDComposer {
 					const r = data[ 'xformOp:rotateX' ];
 					if ( r !== undefined ) {
 
-						tempMatrix.makeRotationX( r * Math.PI / 180 );
-						if ( isInverse ) tempMatrix.invert();
-						matrix.multiply( tempMatrix );
+						mat4MakeRotationX( r * Math.PI / 180, tempMatrix );
+						if ( isInverse ) mat4Invert( tempMatrix, tempMatrix );
+						mat4Multiply( matrix, tempMatrix, matrix );
 
 					}
 
@@ -275,9 +303,9 @@ class USDComposer {
 					const r = data[ 'xformOp:rotateY' ];
 					if ( r !== undefined ) {
 
-						tempMatrix.makeRotationY( r * Math.PI / 180 );
-						if ( isInverse ) tempMatrix.invert();
-						matrix.multiply( tempMatrix );
+						mat4MakeRotationY( r * Math.PI / 180, tempMatrix );
+						if ( isInverse ) mat4Invert( tempMatrix, tempMatrix );
+						mat4Multiply( matrix, tempMatrix, matrix );
 
 					}
 
@@ -286,9 +314,9 @@ class USDComposer {
 					const r = data[ 'xformOp:rotateZ' ];
 					if ( r !== undefined ) {
 
-						tempMatrix.makeRotationZ( r * Math.PI / 180 );
-						if ( isInverse ) tempMatrix.invert();
-						matrix.multiply( tempMatrix );
+						mat4MakeRotationZ( r * Math.PI / 180, tempMatrix );
+						if ( isInverse ) mat4Invert( tempMatrix, tempMatrix );
+						mat4Multiply( matrix, tempMatrix, matrix );
 
 					}
 
@@ -297,10 +325,10 @@ class USDComposer {
 					const q = data[ 'xformOp:orient' ];
 					if ( q && q.length === 4 ) {
 
-						const quat = new Quaternion( q[ 0 ], q[ 1 ], q[ 2 ], q[ 3 ] );
-						tempMatrix.makeRotationFromQuaternion( quat );
-						if ( isInverse ) tempMatrix.invert();
-						matrix.multiply( tempMatrix );
+						const quat = quatSet( q[ 0 ], q[ 1 ], q[ 2 ], q[ 3 ] );
+						mat4MakeRotationFromQuaternion( quat, tempMatrix );
+						if ( isInverse ) mat4Invert( tempMatrix, tempMatrix );
+						mat4Multiply( matrix, tempMatrix, matrix );
 
 					}
 
@@ -308,8 +336,8 @@ class USDComposer {
 
 			}
 
-			obj.matrix.copy( matrix );
-			obj.matrix.decompose( obj.position, obj.quaternion, obj.scale );
+			mat4Copy( matrix, obj.matrix );
+			mat4Decompose( obj.matrix, obj.position, obj.quaternion, obj.scale );
 
 			// Fix for negative scale: decompose() may absorb negative scale into quaternion
 			// Restore original scale signs to keep animation consistent
@@ -324,12 +352,13 @@ class USDComposer {
 				// For [-1,-1,-1] → [-1,1,1], Y and Z were absorbed, flip quat.y and quat.w
 				if ( negCount === 3 ) {
 
-					obj.scale.set( scaleValues[ 0 ], scaleValues[ 1 ], scaleValues[ 2 ] );
-					obj.quaternion.set(
+					vec3Set( obj.scale, scaleValues[ 0 ], scaleValues[ 1 ], scaleValues[ 2 ] );
+					quatSet(
 						obj.quaternion.x,
 						- obj.quaternion.y,
 						obj.quaternion.z,
-						- obj.quaternion.w
+						- obj.quaternion.w,
+						obj.quaternion
 					);
 
 				}
@@ -344,14 +373,14 @@ class USDComposer {
 		if ( data[ 'xformOp:translate' ] ) {
 
 			const t = data[ 'xformOp:translate' ];
-			obj.position.set( t[ 0 ], t[ 1 ], t[ 2 ] );
+			vec3Set( obj.position, t[ 0 ], t[ 1 ], t[ 2 ] );
 
 		}
 
 		if ( data[ 'xformOp:translate:pivot' ] ) {
 
 			const p = data[ 'xformOp:translate:pivot' ];
-			obj.pivot = new Vector3( p[ 0 ], p[ 1 ], p[ 2 ] );
+			obj.pivot = vec3Set( vec3Create(), p[ 0 ], p[ 1 ], p[ 2 ] );
 
 		}
 
@@ -361,11 +390,11 @@ class USDComposer {
 
 			if ( Array.isArray( s ) ) {
 
-				obj.scale.set( s[ 0 ], s[ 1 ], s[ 2 ] );
+				vec3Set( obj.scale, s[ 0 ], s[ 1 ], s[ 2 ] );
 
 			} else {
 
-				obj.scale.set( s, s, s );
+				vec3Set( obj.scale, s, s, s );
 
 			}
 
@@ -1300,7 +1329,7 @@ class USDComposer {
 
 				if ( mat.color && mat.color.r === 1 && mat.color.g === 1 && mat.color.b === 1 && ! mat.map ) {
 
-					mat.color.setRGB( displayColor[ 0 ], displayColor[ 1 ], displayColor[ 2 ], SRGBColorSpace );
+					colorSetRGB( displayColor[ 0 ], displayColor[ 1 ], displayColor[ 2 ], SRGBColorSpace, mat.color );
 
 				}
 
@@ -1495,12 +1524,12 @@ class USDComposer {
 		const enableColorTemperature = attrs[ 'inputs:enableColorTemperature' ] === true;
 		const colorTemperature = this._parseNumber( attrs[ 'inputs:colorTemperature' ], 6500 );
 
-		const color = new Color( baseColor[ 0 ], baseColor[ 1 ], baseColor[ 2 ] );
+		const color = colorSet( baseColor[ 0 ], baseColor[ 1 ], baseColor[ 2 ], new Color() );
 
 		if ( enableColorTemperature ) {
 
 			const temp = this._colorTemperature( colorTemperature );
-			color.multiply( temp );
+			colorMultiply( color, temp, color );
 
 		}
 
@@ -1591,7 +1620,7 @@ class USDComposer {
 
 		}
 
-		return new Color(
+		return colorSet(
 			Math.min( Math.max( r, 0 ), 1 ),
 			Math.min( Math.max( g, 0 ), 1 ),
 			Math.min( Math.max( b, 0 ), 1 )
@@ -2496,7 +2525,7 @@ class USDComposer {
 
 		for ( const idx of faceIndices ) {
 
-			contour3D.push( new Vector3(
+			contour3D.push( vec3Set( vec3Create(),
 				points[ idx * 3 ],
 				points[ idx * 3 + 1 ],
 				points[ idx * 3 + 2 ]
@@ -2505,7 +2534,7 @@ class USDComposer {
 		}
 
 		// Calculate polygon normal using Newell's method
-		const normal = new Vector3();
+		const normal = vec3Create();
 		for ( let i = 0; i < contour3D.length; i ++ ) {
 
 			const curr = contour3D[ i ];
@@ -2516,29 +2545,29 @@ class USDComposer {
 
 		}
 
-		normal.normalize();
+		vec3Normalize( normal, normal );
 
 		// Create tangent basis for projection
-		const tangent = new Vector3();
-		const bitangent = new Vector3();
+		const tangent = vec3Create();
+		const bitangent = vec3Create();
 
 		if ( Math.abs( normal.y ) > 0.9 ) {
 
-			tangent.set( 1, 0, 0 );
+			vec3Set( tangent, 1, 0, 0 );
 
 		} else {
 
-			tangent.set( 0, 1, 0 );
+			vec3Set( tangent, 0, 1, 0 );
 
 		}
 
-		bitangent.crossVectors( normal, tangent ).normalize();
-		tangent.crossVectors( bitangent, normal ).normalize();
+		vec3Normalize( vec3CrossVectors( normal, tangent, bitangent ), bitangent );
+		vec3Normalize( vec3CrossVectors( bitangent, normal, tangent ), tangent );
 
 		// Project to 2D
 		for ( const p of contour3D ) {
 
-			contour2D.push( new Vector2( p.dot( tangent ), p.dot( bitangent ) ) );
+			contour2D.push( vec2Create( vec3Dot( p, tangent ), vec3Dot( p, bitangent ) ) );
 
 		}
 
@@ -2568,7 +2597,7 @@ class USDComposer {
 
 		for ( const idx of outerIndices ) {
 
-			outer3D.push( new Vector3(
+			outer3D.push( vec3Set( vec3Create(),
 				points[ idx * 3 ],
 				points[ idx * 3 + 1 ],
 				points[ idx * 3 + 2 ]
@@ -2577,7 +2606,7 @@ class USDComposer {
 		}
 
 		// Calculate polygon normal using Newell's method
-		const normal = new Vector3();
+		const normal = vec3Create();
 		for ( let i = 0; i < outer3D.length; i ++ ) {
 
 			const curr = outer3D[ i ];
@@ -2588,30 +2617,30 @@ class USDComposer {
 
 		}
 
-		normal.normalize();
+		vec3Normalize( normal, normal );
 
 		// Create tangent basis for projection
-		const tangent = new Vector3();
-		const bitangent = new Vector3();
+		const tangent = vec3Create();
+		const bitangent = vec3Create();
 
 		if ( Math.abs( normal.y ) > 0.9 ) {
 
-			tangent.set( 1, 0, 0 );
+			vec3Set( tangent, 1, 0, 0 );
 
 		} else {
 
-			tangent.set( 0, 1, 0 );
+			vec3Set( tangent, 0, 1, 0 );
 
 		}
 
-		bitangent.crossVectors( normal, tangent ).normalize();
-		tangent.crossVectors( bitangent, normal ).normalize();
+		vec3Normalize( vec3CrossVectors( normal, tangent, bitangent ), bitangent );
+		vec3Normalize( vec3CrossVectors( bitangent, normal, tangent ), tangent );
 
 		// Project outer contour to 2D
 		const outer2D = [];
 		for ( const p of outer3D ) {
 
-			outer2D.push( new Vector2( p.dot( tangent ), p.dot( bitangent ) ) );
+			outer2D.push( vec2Create( vec3Dot( p, tangent ), vec3Dot( p, bitangent ) ) );
 
 		}
 
@@ -2624,12 +2653,12 @@ class USDComposer {
 
 			for ( const idx of holeIndices ) {
 
-				const p = new Vector3(
+				const p = vec3Set( vec3Create(),
 					points[ idx * 3 ],
 					points[ idx * 3 + 1 ],
 					points[ idx * 3 + 2 ]
 				);
-				hole2D.push( new Vector2( p.dot( tangent ), p.dot( bitangent ) ) );
+				hole2D.push( vec2Create( vec3Dot( p, tangent ), vec3Dot( p, bitangent ) ) );
 
 			}
 
@@ -3069,7 +3098,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+					colorSetRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace, material.color );
 
 				}
 
@@ -3082,7 +3111,7 @@ class USDComposer {
 			const scale = material.map.userData.scale;
 			if ( Array.isArray( scale ) && scale.length >= 3 ) {
 
-				material.color.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace );
+				colorSetRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace, material.color );
 
 			}
 
@@ -3097,7 +3126,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.emissive.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+					colorSetRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace, material.emissive );
 
 				}
 
@@ -3111,13 +3140,13 @@ class USDComposer {
 				const scale = material.emissiveMap.userData.scale;
 				if ( Array.isArray( scale ) && scale.length >= 3 ) {
 
-					material.emissive.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace );
+					colorSetRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace, material.emissive );
 
 				}
 
 			} else {
 
-				material.emissive.set( 0xffffff );
+				colorSet( 1, 1, 1, material.emissive );
 
 			}
 
@@ -3190,7 +3219,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.specularColor.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+					colorSetRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace, material.specularColor );
 
 				}
 
@@ -3203,7 +3232,7 @@ class USDComposer {
 			const scale = material.specularColorMap.userData.scale;
 			if ( Array.isArray( scale ) && scale.length >= 3 ) {
 
-				material.specularColor.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace );
+				colorSetRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace, material.specularColor );
 
 			}
 
@@ -3284,7 +3313,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+					colorSetRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace, material.color );
 
 				}
 
@@ -3297,7 +3326,7 @@ class USDComposer {
 			const scale = material.map.userData.scale;
 			if ( Array.isArray( scale ) && scale.length >= 3 ) {
 
-				material.color.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace );
+				colorSetRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace, material.color );
 
 			}
 
@@ -3344,7 +3373,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.emissive.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+					colorSetRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace, material.emissive );
 
 				}
 
@@ -3363,7 +3392,7 @@ class USDComposer {
 			} else {
 
 				// Scale the emissive color by luminance
-				material.emissive.multiplyScalar( emissionLuminance );
+				colorMultiplyScalar( material.emissive, emissionLuminance, material.emissive );
 
 			}
 
@@ -3388,7 +3417,7 @@ class USDComposer {
 
 			if ( transmissionColor !== undefined && Array.isArray( transmissionColor ) ) {
 
-				material.attenuationColor.setRGB( transmissionColor[ 0 ], transmissionColor[ 1 ], transmissionColor[ 2 ] );
+				colorSetRGB( transmissionColor[ 0 ], transmissionColor[ 1 ], transmissionColor[ 2 ], undefined, material.attenuationColor );
 				material.attenuationDistance = transmissionDepth || 1.0;
 
 			}
@@ -3471,7 +3500,7 @@ class USDComposer {
 
 		if ( specularColor !== undefined && Array.isArray( specularColor ) ) {
 
-			material.specularColor.setRGB( specularColor[ 0 ], specularColor[ 1 ], specularColor[ 2 ] );
+			colorSetRGB( specularColor[ 0 ], specularColor[ 1 ], specularColor[ 2 ], undefined, material.specularColor );
 
 		}
 
@@ -3767,14 +3796,14 @@ class USDComposer {
 		const scale = attrs[ 'inputs:scale' ];
 		if ( scale && Array.isArray( scale ) && scale.length >= 2 ) {
 
-			texture.repeat.set( scale[ 0 ], scale[ 1 ] );
+			vec2Set( scale[ 0 ], scale[ 1 ], texture.repeat );
 
 		}
 
 		const translation = attrs[ 'inputs:translation' ];
 		if ( translation && Array.isArray( translation ) && translation.length >= 2 ) {
 
-			texture.offset.set( translation[ 0 ], translation[ 1 ] );
+			vec2Set( translation[ 0 ], translation[ 1 ], texture.offset );
 
 		}
 
@@ -3972,21 +4001,22 @@ class USDComposer {
 			// Compute inverse bind matrix
 			if ( bindTransforms && bindTransforms.length >= ( i + 1 ) * 16 ) {
 
-				const bindMatrix = new Matrix4();
+				const bindMatrix = mat4Create();
 				// USD matrices are row-major, Three.js is column-major - need to transpose
 				const m = bindTransforms.slice( i * 16, ( i + 1 ) * 16 );
-				bindMatrix.set(
+				mat4Set(
+					bindMatrix,
 					m[ 0 ], m[ 4 ], m[ 8 ], m[ 12 ],
 					m[ 1 ], m[ 5 ], m[ 9 ], m[ 13 ],
 					m[ 2 ], m[ 6 ], m[ 10 ], m[ 14 ],
 					m[ 3 ], m[ 7 ], m[ 11 ], m[ 15 ]
 				);
-				const inverseBindMatrix = bindMatrix.clone().invert();
+				const inverseBindMatrix = mat4Invert( bindMatrix );
 				boneInverses.push( inverseBindMatrix );
 
 			} else {
 
-				boneInverses.push( new Matrix4() );
+				boneInverses.push( mat4Create() );
 
 			}
 
@@ -4021,15 +4051,16 @@ class USDComposer {
 
 			for ( let i = 0; i < joints.length; i ++ ) {
 
-				const matrix = new Matrix4();
+				const matrix = mat4Create();
 				const m = restTransforms.slice( i * 16, ( i + 1 ) * 16 );
-				matrix.set(
+				mat4Set(
+					matrix,
 					m[ 0 ], m[ 4 ], m[ 8 ], m[ 12 ],
 					m[ 1 ], m[ 5 ], m[ 9 ], m[ 13 ],
 					m[ 2 ], m[ 6 ], m[ 10 ], m[ 14 ],
 					m[ 3 ], m[ 7 ], m[ 11 ], m[ 15 ]
 				);
-				matrix.decompose( bones[ i ].position, bones[ i ].quaternion, bones[ i ].scale );
+				mat4Decompose( matrix, bones[ i ].position, bones[ i ].quaternion, bones[ i ].scale );
 
 			}
 
@@ -4148,13 +4179,14 @@ class USDComposer {
 			// Use geomBindTransform if available, otherwise fall back to identity.
 			// Estimating bind transforms from vertex/joint samples is not robust and can
 			// produce severe skinning distortion for valid assets.
-			const bindMatrix = new Matrix4();
+			const bindMatrix = mat4Create();
 
 			if ( geomBindTransform && geomBindTransform.length === 16 ) {
 
 				// USD matrices are row-major, Three.js is column-major - need to transpose
 				const m = geomBindTransform;
-				bindMatrix.set(
+				mat4Set(
+					bindMatrix,
 					m[ 0 ], m[ 4 ], m[ 8 ], m[ 12 ],
 					m[ 1 ], m[ 5 ], m[ 9 ], m[ 13 ],
 					m[ 2 ], m[ 6 ], m[ 10 ], m[ 14 ],
@@ -4253,8 +4285,8 @@ class USDComposer {
 				const { times, values } = rotateXYZSpec.fields.timeSamples;
 				const keyframeTimes = [];
 				const keyframeValues = [];
-				const tempEuler = new Euler();
-				const tempQuat = new Quaternion();
+				const tempEuler = eulerCreate();
+				const tempQuat = quatCreate();
 
 				for ( let i = 0; i < times.length; i ++ ) {
 
@@ -4262,14 +4294,15 @@ class USDComposer {
 
 					const r = values[ i ];
 					// USD rotateXYZ: matrix = Rx * Ry * Rz, use 'ZYX' order in Three.js
-					tempEuler.set(
+					eulerSet(
 						r[ 0 ] * Math.PI / 180,
 						r[ 1 ] * Math.PI / 180,
 						r[ 2 ] * Math.PI / 180,
-						'ZYX'
+						'ZYX',
+						tempEuler
 					);
-					tempQuat.setFromEuler( tempEuler );
-					keyframeValues.push( tempQuat.x, tempQuat.y, tempQuat.z, tempQuat.w );
+					quatSetFromEuler( tempEuler, tempQuat );
+					quatToArray( tempQuat, keyframeValues, keyframeValues.length );
 
 				}
 
@@ -4365,10 +4398,10 @@ class USDComposer {
 				const scaleTimes = [];
 				const scaleValues = [];
 
-				const matrix = new Matrix4();
-				const position = new Vector3();
-				const quaternion = new Quaternion();
-				const scale = new Vector3();
+				const matrix = mat4Create();
+				const position = vec3Create();
+				const quaternion = quatCreate();
+				const scale = vec3Create();
 
 				for ( let i = 0; i < times.length; i ++ ) {
 
@@ -4378,20 +4411,21 @@ class USDComposer {
 					const t = times[ i ] / this.fps;
 
 					// USD matrices are row-major, Three.js is column-major
-					matrix.set(
+					mat4Set(
+						matrix,
 						m[ 0 ], m[ 4 ], m[ 8 ], m[ 12 ],
 						m[ 1 ], m[ 5 ], m[ 9 ], m[ 13 ],
 						m[ 2 ], m[ 6 ], m[ 10 ], m[ 14 ],
 						m[ 3 ], m[ 7 ], m[ 11 ], m[ 15 ]
 					);
 
-					matrix.decompose( position, quaternion, scale );
+					mat4Decompose( matrix, position, quaternion, scale );
 
 					positionTimes.push( t );
 					positionValues.push( position.x, position.y, position.z );
 
 					quaternionTimes.push( t );
-					quaternionValues.push( quaternion.x, quaternion.y, quaternion.z, quaternion.w );
+					quatToArray( quaternion, quaternionValues, quaternionValues.length );
 
 					scaleTimes.push( t );
 					scaleValues.push( scale.x, scale.y, scale.z );

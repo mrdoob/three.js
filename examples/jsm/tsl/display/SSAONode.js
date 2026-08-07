@@ -1,9 +1,9 @@
-import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
+import { RenderTarget, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat, vec2Create, vec2Set } from 'three/webgpu';
 import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, getScreenPositionFromClip, vogelDiskSample, interleavedGradientNoise, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec4, int, dot, max, clamp, length, screenCoordinate, PI2, texture, passTexture, context } from 'three/tsl';
 import { depthAwareBlur } from './depthAwareBlur.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _size = /*@__PURE__*/ new Vector2();
+const _size = /*@__PURE__*/ vec2Create();
 
 let _rendererState;
 
@@ -130,7 +130,7 @@ class SSAONode extends TempNode {
 		 *
 		 * @type {Vector2}
 		 */
-		this.resolution = new Vector2();
+		this.resolution = vec2Create();
 
 		/**
 		 * The render target the raw ambient occlusion is rendered into. Also holds the
@@ -206,7 +206,7 @@ class SSAONode extends TempNode {
 		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
-		this._blurDirection = uniform( new Vector2() );
+		this._blurDirection = uniform( vec2Create(), 'vec2' );
 
 		/**
 		 * The material that computes the raw ambient occlusion.
@@ -258,7 +258,7 @@ class SSAONode extends TempNode {
 		width = Math.max( 1, Math.round( this.resolutionScale * width ) );
 		height = Math.max( 1, Math.round( this.resolutionScale * height ) );
 
-		this.resolution.set( width, height );
+		vec2Set( width, height, this.resolution );
 		this._aoRenderTarget.setSize( width, height );
 		this._blurRenderTarget.setSize( width, height );
 
@@ -276,7 +276,7 @@ class SSAONode extends TempNode {
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		const size = renderer.getDrawingBufferSize( _size );
-		this.setSize( size.width, size.height );
+		this.setSize( size.x, size.y );
 
 		renderer.setClearColor( 0xffffff, 1 );
 
@@ -295,12 +295,12 @@ class SSAONode extends TempNode {
 			_quadMesh.name = 'SSAO.Blur';
 
 			this._blurInput.value = this._aoRenderTarget.texture;
-			this._blurDirection.value.set( 1 / this.resolution.x, 0 );
+			vec2Set( 1 / this.resolution.x, 0, this._blurDirection.value );
 			renderer.setRenderTarget( this._blurRenderTarget );
 			_quadMesh.render( renderer );
 
 			this._blurInput.value = this._blurRenderTarget.texture;
-			this._blurDirection.value.set( 0, 1 / this.resolution.y );
+			vec2Set( 0, 1 / this.resolution.y, this._blurDirection.value );
 			renderer.setRenderTarget( this._aoRenderTarget );
 			_quadMesh.render( renderer );
 

@@ -2,16 +2,22 @@ import {
 	AdditiveBlending,
 	BufferGeometry,
 	Color,
+	colorSetRGB,
 	DoubleSide,
 	FileLoader,
 	Float32BufferAttribute,
 	Group,
 	Loader,
 	LoaderUtils,
-	Matrix4,
+	mat4Create,
+	mat4Copy,
+	mat4Invert,
+	mat4Transpose,
+	mat4Decompose,
 	Mesh,
 	MeshPhongMaterial,
-	TextureLoader
+	TextureLoader,
+	vec3Set
 } from 'three';
 
 /**
@@ -193,7 +199,7 @@ class TDSLoader extends Loader {
 
 				const scale = next.readFloat();
 				this.debugMessage( 'Master scale: ' + scale );
-				this.group.scale.set( scale, scale, scale );
+				vec3Set( this.group.scale, scale, scale, scale );
 
 			} else if ( next.id === NAMED_OBJECT ) {
 
@@ -424,7 +430,7 @@ class TDSLoader extends Loader {
 
 				}
 
-				const matrix = new Matrix4();
+				const matrix = mat4Create();
 
 				//X Line
 				matrix.elements[ 0 ] = values[ 0 ];
@@ -450,13 +456,14 @@ class TDSLoader extends Loader {
 				matrix.elements[ 14 ] = 0;
 				matrix.elements[ 15 ] = 1;
 
-				matrix.transpose();
+				mat4Transpose( matrix, matrix );
 
-				const inverse = new Matrix4();
-				inverse.copy( matrix ).invert();
+				const inverse = mat4Create();
+				mat4Copy( matrix, inverse );
+				mat4Invert( inverse, inverse );
 				geometry.applyMatrix4( inverse );
 
-				matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );
+				mat4Decompose( matrix, mesh.position, mesh.quaternion, mesh.scale );
 
 			} else {
 
@@ -645,7 +652,7 @@ class TDSLoader extends Loader {
 			const g = subChunk.readByte( );
 			const b = subChunk.readByte( );
 
-			color.setRGB( r / 255, g / 255, b / 255 );
+			colorSetRGB( r / 255, g / 255, b / 255, undefined, color );
 
 			this.debugMessage( '      Color: ' + color.r + ', ' + color.g + ', ' + color.b );
 
@@ -655,7 +662,7 @@ class TDSLoader extends Loader {
 			const g = subChunk.readFloat( );
 			const b = subChunk.readFloat( );
 
-			color.setRGB( r, g, b );
+			colorSetRGB( r, g, b, undefined, color );
 
 			this.debugMessage( '      Color: ' + color.r + ', ' + color.g + ', ' + color.b );
 

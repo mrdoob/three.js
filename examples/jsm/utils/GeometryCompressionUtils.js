@@ -1,8 +1,13 @@
 import {
 	BufferAttribute,
-	Matrix3,
-	Matrix4,
-	Vector3
+	mat3Create,
+	mat3MakeScale,
+	mat3Transpose,
+	mat4Create,
+	mat4Scale,
+	mat4Transpose,
+	vec3Create,
+	vec3Set
 } from 'three';
 
 /**
@@ -419,7 +424,7 @@ function quantizedEncode( array, bytes ) {
 
 	}
 
-	const decodeMat = new Matrix4();
+	const decodeMat = mat4Create();
 
 	const min = new Float32Array( 3 );
 	const max = new Float32Array( 3 );
@@ -438,17 +443,17 @@ function quantizedEncode( array, bytes ) {
 
 	}
 
-	decodeMat.scale( new Vector3(
+	mat4Scale( decodeMat, vec3Set( vec3Create(),
 		( max[ 0 ] - min[ 0 ] ) / segments,
 		( max[ 1 ] - min[ 1 ] ) / segments,
 		( max[ 2 ] - min[ 2 ] ) / segments
-	) );
+	), decodeMat );
 
 	decodeMat.elements[ 12 ] = min[ 0 ];
 	decodeMat.elements[ 13 ] = min[ 1 ];
 	decodeMat.elements[ 14 ] = min[ 2 ];
 
-	decodeMat.transpose();
+	mat4Transpose( decodeMat, decodeMat );
 
 
 	const multiplier = new Float32Array( [
@@ -492,7 +497,7 @@ function quantizedEncodeUV( array, bytes ) {
 
 	}
 
-	const decodeMat = new Matrix3();
+	const decodeMat = mat3Create();
 
 	const min = new Float32Array( 2 );
 	const max = new Float32Array( 2 );
@@ -509,15 +514,16 @@ function quantizedEncodeUV( array, bytes ) {
 
 	}
 
-	decodeMat.makeScale(
+	mat3MakeScale(
 		( max[ 0 ] - min[ 0 ] ) / segments,
-		( max[ 1 ] - min[ 1 ] ) / segments
+		( max[ 1 ] - min[ 1 ] ) / segments,
+		decodeMat
 	);
 
 	decodeMat.elements[ 6 ] = min[ 0 ];
 	decodeMat.elements[ 7 ] = min[ 1 ];
 
-	decodeMat.transpose();
+	mat3Transpose( decodeMat, decodeMat );
 
 	const multiplier = new Float32Array( [
 		max[ 0 ] !== min[ 0 ] ? segments / ( max[ 0 ] - min[ 0 ] ) : 0,

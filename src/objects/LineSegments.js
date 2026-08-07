@@ -1,10 +1,10 @@
 import { Line } from './Line.js';
-import { Vector3 } from '../math/Vector3.js';
+import { vec3Create, vec3FromBufferAttribute, vec3DistanceTo } from '../math/Vector3Functions.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { warn } from '../utils.js';
 
-const _start = /*@__PURE__*/ new Vector3();
-const _end = /*@__PURE__*/ new Vector3();
+const _start = /*@__PURE__*/ vec3Create();
+const _end = /*@__PURE__*/ vec3Create();
 
 /**
  * A series of lines drawn between pairs of vertices.
@@ -49,11 +49,11 @@ class LineSegments extends Line {
 
 			for ( let i = 0, l = positionAttribute.count; i < l; i += 2 ) {
 
-				_start.fromBufferAttribute( positionAttribute, i );
-				_end.fromBufferAttribute( positionAttribute, i + 1 );
+				vec3FromBufferAttribute( positionAttribute, i, _start );
+				vec3FromBufferAttribute( positionAttribute, i + 1, _end );
 
 				lineDistances[ i ] = ( i === 0 ) ? 0 : lineDistances[ i - 1 ];
-				lineDistances[ i + 1 ] = lineDistances[ i ] + _start.distanceTo( _end );
+				lineDistances[ i + 1 ] = lineDistances[ i ] + vec3DistanceTo( _start, _end );
 
 			}
 

@@ -9,7 +9,13 @@ import {
 	PlaneGeometry,
 	MeshBasicMaterial,
 	BufferAttribute,
-	DoubleSide
+	DoubleSide,
+	quatCopy,
+	vec3AddVectors,
+	vec3Copy,
+	vec3MultiplyScalar,
+	vec3Set,
+	vec3SubVectors
 } from 'three';
 
 /**
@@ -124,9 +130,9 @@ class CSMHelper extends Group {
 
 		if ( camera === null ) return;
 
-		this.position.copy( camera.position );
-		this.quaternion.copy( camera.quaternion );
-		this.scale.copy( camera.scale );
+		vec3Copy( camera.position, this.position );
+		quatCopy( camera.quaternion, this.quaternion );
+		vec3Copy( camera.scale, this.scale );
 		this.updateMatrixWorld( true );
 
 		while ( cascadeLines.length > cascades ) {
@@ -168,24 +174,24 @@ class CSMHelper extends Group {
 			const shadowLineGroup = shadowLines[ i ];
 			const shadowLine = shadowLineGroup.children[ 0 ];
 
-			cascadeLine.box.min.copy( farVerts[ 2 ] );
-			cascadeLine.box.max.copy( farVerts[ 0 ] );
+			vec3Copy( farVerts[ 2 ], cascadeLine.box.min );
+			vec3Copy( farVerts[ 0 ], cascadeLine.box.max );
 			cascadeLine.box.max.z += 1e-4;
 
-			cascadePlane.position.addVectors( farVerts[ 0 ], farVerts[ 2 ] );
-			cascadePlane.position.multiplyScalar( 0.5 );
-			cascadePlane.scale.subVectors( farVerts[ 0 ], farVerts[ 2 ] );
+			vec3AddVectors( farVerts[ 0 ], farVerts[ 2 ], cascadePlane.position );
+			vec3MultiplyScalar( cascadePlane.position, 0.5, cascadePlane.position );
+			vec3SubVectors( farVerts[ 0 ], farVerts[ 2 ], cascadePlane.scale );
 			cascadePlane.scale.z = 1e-4;
 
 			this.remove( shadowLineGroup );
-			shadowLineGroup.position.copy( shadowCam.position );
-			shadowLineGroup.quaternion.copy( shadowCam.quaternion );
-			shadowLineGroup.scale.copy( shadowCam.scale );
+			vec3Copy( shadowCam.position, shadowLineGroup.position );
+			quatCopy( shadowCam.quaternion, shadowLineGroup.quaternion );
+			vec3Copy( shadowCam.scale, shadowLineGroup.scale );
 			shadowLineGroup.updateMatrixWorld( true );
 			this.attach( shadowLineGroup );
 
-			shadowLine.box.min.set( shadowCam.bottom, shadowCam.left, - shadowCam.far );
-			shadowLine.box.max.set( shadowCam.top, shadowCam.right, - shadowCam.near );
+			vec3Set( shadowLine.box.min, shadowCam.bottom, shadowCam.left, - shadowCam.far );
+			vec3Set( shadowLine.box.max, shadowCam.top, shadowCam.right, - shadowCam.near );
 
 		}
 

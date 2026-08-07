@@ -1,8 +1,6 @@
 import {
 	AdditiveBlending,
-	Box2,
 	BufferGeometry,
-	Color,
 	FramebufferTexture,
 	InterleavedBuffer,
 	InterleavedBufferAttribute,
@@ -10,9 +8,17 @@ import {
 	MeshBasicMaterial,
 	RawShaderMaterial,
 	UnsignedByteType,
-	Vector2,
-	Vector3,
-	Vector4
+	box2ContainsPoint,
+	box2Create,
+	colorCopy,
+	colorSet,
+	vec2Create,
+	vec2Set,
+	vec3ApplyMatrix4,
+	vec3Copy,
+	vec3Create,
+	vec3SetFromMatrixPosition,
+	vec4Create
 } from 'three';
 
 /**
@@ -73,8 +79,8 @@ class Lensflare extends Mesh {
 
 		//
 
-		const positionScreen = new Vector3();
-		const positionView = new Vector3();
+		const positionScreen = vec3Create();
+		const positionView = vec3Create();
 
 		// textures
 
@@ -180,9 +186,9 @@ class Lensflare extends Mesh {
 			uniforms: {
 				'map': { value: null },
 				'occlusionMap': { value: occlusionMap },
-				'color': { value: new Color( 0xffffff ) },
-				'scale': { value: new Vector2() },
-				'screenPosition': { value: new Vector3() }
+				'color': { value: colorSet( 0xffffff ) },
+				'scale': { value: vec2Create() },
+				'screenPosition': { value: vec3Create() }
 			},
 			vertexShader: shader.vertexShader,
 			fragmentShader: shader.fragmentShader,
@@ -206,10 +212,10 @@ class Lensflare extends Mesh {
 
 		//
 
-		const scale = new Vector2();
-		const screenPositionPixels = new Vector2();
-		const validArea = new Box2();
-		const viewport = new Vector4();
+		const scale = vec2Create();
+		const screenPositionPixels = vec2Create();
+		const validArea = box2Create();
+		const viewport = vec4Create();
 
 		this.onBeforeRender = function ( renderer, scene, camera ) {
 
@@ -234,19 +240,20 @@ class Lensflare extends Mesh {
 			const halfViewportHeight = viewport.w / 2.0;
 
 			let size = 16 / viewport.w;
-			scale.set( size * invAspect, size );
+			vec2Set( size * invAspect, size, scale );
 
-			validArea.min.set( viewport.x, viewport.y );
-			validArea.max.set( viewport.x + ( viewport.z - 16 ), viewport.y + ( viewport.w - 16 ) );
+			vec2Set( viewport.x, viewport.y, validArea.min );
+			vec2Set( viewport.x + ( viewport.z - 16 ), viewport.y + ( viewport.w - 16 ), validArea.max );
 
 			// calculate position in screen space
 
-			positionView.setFromMatrixPosition( this.matrixWorld );
-			positionView.applyMatrix4( camera.matrixWorldInverse );
+			vec3SetFromMatrixPosition( this.matrixWorld, positionView );
+			vec3ApplyMatrix4( positionView, camera.matrixWorldInverse, positionView );
 
 			if ( positionView.z > 0 ) return; // lensflare is behind the camera
 
-			positionScreen.copy( positionView ).applyMatrix4( camera.projectionMatrix );
+			vec3Copy( positionView, positionScreen );
+			vec3ApplyMatrix4( positionScreen, camera.projectionMatrix, positionScreen );
 
 			// horizontal and vertical coordinate of the lower left corner of the pixels to copy
 
@@ -255,7 +262,7 @@ class Lensflare extends Mesh {
 
 			// screen cull
 
-			if ( validArea.containsPoint( screenPositionPixels ) ) {
+			if ( box2ContainsPoint( validArea, screenPositionPixels ) ) {
 
 				// save current RGB to temp texture
 
@@ -292,7 +299,7 @@ class Lensflare extends Mesh {
 
 					const uniforms = material2.uniforms;
 
-					uniforms[ 'color' ].value.copy( element.color );
+					colorCopy( element.color, uniforms[ 'color' ].value );
 					uniforms[ 'map' ].value = element.texture;
 					uniforms[ 'screenPosition' ].value.x = positionScreen.x + vecX * element.distance;
 					uniforms[ 'screenPosition' ].value.y = positionScreen.y + vecY * element.distance;
@@ -300,7 +307,7 @@ class Lensflare extends Mesh {
 					size = element.size / viewport.w;
 					const invAspect = viewport.w / viewport.z;
 
-					uniforms[ 'scale' ].value.set( size * invAspect, size );
+					vec2Set( size * invAspect, size, uniforms[ 'scale' ].value );
 
 					material2.uniformsNeedUpdate = true;
 
@@ -353,7 +360,7 @@ class LensflareElement {
 	 * A value of `0` means the flare is located at light source.
 	 * @param {Color} [color] - The flare's color
 	 */
-	constructor( texture, size = 1, distance = 0, color = new Color( 0xffffff ) ) {
+	constructor( texture, size = 1, distance = 0, color = colorSet( 0xffffff ) ) {
 
 		/**
 		 * The flare's texture.

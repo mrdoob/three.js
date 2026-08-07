@@ -1,4 +1,10 @@
-import { Quaternion } from '../math/Quaternion.js';
+import {
+	quatConjugate,
+	quatFromArray,
+	quatMultiplyQuaternionsFlat,
+	quatNormalize,
+	quatToArray
+} from '../math/QuaternionFunctions.js';
 import { AdditiveAnimationBlendMode } from '../constants.js';
 import { isTypedArray } from '../utils.js';
 
@@ -324,8 +330,10 @@ function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targe
 		// Conjugate the quaternion
 		if ( referenceTrackType === 'quaternion' ) {
 
-			const referenceQuat = new Quaternion().fromArray( referenceValue ).normalize().conjugate();
-			referenceQuat.toArray( referenceValue );
+			const referenceQuat = quatFromArray( referenceValue );
+			quatNormalize( referenceQuat, referenceQuat );
+			quatConjugate( referenceQuat, referenceQuat );
+			quatToArray( referenceQuat, referenceValue );
 
 		}
 
@@ -339,7 +347,7 @@ function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targe
 			if ( referenceTrackType === 'quaternion' ) {
 
 				// Multiply the conjugate for quaternion track types
-				Quaternion.multiplyQuaternionsFlat(
+				quatMultiplyQuaternionsFlat(
 					targetTrack.values,
 					valueStart,
 					referenceValue,

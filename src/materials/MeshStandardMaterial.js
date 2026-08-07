@@ -3,6 +3,9 @@ import { Material } from './Material.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
 import { Euler } from '../math/Euler.js';
+import { colorCopy } from '../math/ColorFunctions.js';
+import { vec2Copy } from '../math/Vector2Functions.js';
+import { eulerCopy } from '../math/EulerFunctions.js';
 
 /**
  * A standard physically based material, using Metallic-Roughness workflow.
@@ -411,7 +414,7 @@ class MeshStandardMaterial extends Material {
 
 		this.defines = { 'STANDARD': '' };
 
-		this.color.copy( source.color );
+		colorCopy( source.color, this.color );
 		this.roughness = source.roughness;
 		this.metalness = source.metalness;
 
@@ -423,7 +426,7 @@ class MeshStandardMaterial extends Material {
 		this.aoMap = source.aoMap;
 		this.aoMapIntensity = source.aoMapIntensity;
 
-		this.emissive.copy( source.emissive );
+		colorCopy( source.emissive, this.emissive );
 		this.emissiveMap = source.emissiveMap;
 		this.emissiveIntensity = source.emissiveIntensity;
 
@@ -432,7 +435,7 @@ class MeshStandardMaterial extends Material {
 
 		this.normalMap = source.normalMap;
 		this.normalMapType = source.normalMapType;
-		this.normalScale.copy( source.normalScale );
+		vec2Copy( source.normalScale, this.normalScale );
 
 		this.displacementMap = source.displacementMap;
 		this.displacementScale = source.displacementScale;
@@ -445,7 +448,7 @@ class MeshStandardMaterial extends Material {
 		this.alphaMap = source.alphaMap;
 
 		this.envMap = source.envMap;
-		this.envMapRotation.copy( source.envMapRotation );
+		eulerCopy( source.envMapRotation, this.envMapRotation );
 		this.envMapIntensity = source.envMapIntensity;
 
 		this.wireframe = source.wireframe;

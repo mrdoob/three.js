@@ -1,11 +1,12 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
-	Color,
 	DynamicDrawUsage,
 	Mesh,
 	Sphere,
-	Vector3
+	colorSet,
+	sphereSet,
+	vec3Create
 } from 'three';
 
 /**
@@ -128,7 +129,7 @@ class MarchingCubes extends Mesh {
 
 			}
 
-			geometry.boundingSphere = new Sphere( new Vector3(), 1 );
+			geometry.boundingSphere = sphereSet( vec3Create(), 1, new Sphere() );
 
 		};
 
@@ -543,26 +544,26 @@ class MarchingCubes extends Mesh {
 			const sign = Math.sign( strength );
 			strength = Math.abs( strength );
 			const userDefineColor = ! ( colors === undefined || colors === null );
-			let ballColor = new Color( ballx, bally, ballz );
+			let ballColor = colorSet( ballx, bally, ballz );
 
 			if ( userDefineColor ) {
 
 				try {
 
 					ballColor =
-						colors instanceof Color
+						( colors && ( colors.isColor || ( typeof colors === 'object' && 'r' in colors ) ) )
 							? colors
 							: Array.isArray( colors )
-								? new Color(
+								? colorSet(
 									Math.min( Math.abs( colors[ 0 ] ), 1 ),
 									Math.min( Math.abs( colors[ 1 ] ), 1 ),
 									Math.min( Math.abs( colors[ 2 ] ), 1 )
 							  )
-								: new Color( colors );
+								: colorSet( colors );
 
 				} catch ( err ) {
 
-					ballColor = new Color( ballx, bally, ballz );
+					ballColor = colorSet( ballx, bally, ballz );
 
 				}
 

@@ -1,15 +1,23 @@
 import {
-	Color,
 	LightProbe,
 	LinearSRGBColorSpace,
-	SphericalHarmonics3,
-	Vector3,
 	SRGBColorSpace,
 	NoColorSpace,
 	HalfFloatType,
 	DataUtils,
 	WebGLCoordinateSystem,
-	FloatType
+	FloatType,
+	ColorManagement,
+	colorConvertSRGBToLinear,
+	colorCreate,
+	colorSetRGB,
+	sh3Create,
+	sh3GetBasisAt,
+	vec3Copy,
+	vec3Create,
+	vec3LengthSq,
+	vec3Normalize,
+	vec3Set
 } from 'three';
 
 /**
@@ -33,15 +41,15 @@ class LightProbeGenerator {
 
 		let totalWeight = 0;
 
-		const coord = new Vector3();
+		const coord = vec3Create();
 
-		const dir = new Vector3();
+		const dir = vec3Create();
 
-		const color = new Color();
+		const color = colorCreate();
 
 		const shBasis = [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
 
-		const sh = new SphericalHarmonics3();
+		const sh = sh3Create();
 		const shCoefficients = sh.coefficients;
 
 		for ( let faceIndex = 0; faceIndex < 6; faceIndex ++ ) {
@@ -71,7 +79,7 @@ class LightProbeGenerator {
 			for ( let i = 0, il = data.length; i < il; i += 4 ) { // RGBA assumed
 
 				// pixel color
-				color.setRGB( data[ i ] / 255, data[ i + 1 ] / 255, data[ i + 2 ] / 255 );
+				colorSetRGB( data[ i ] / 255, data[ i + 1 ] / 255, data[ i + 2 ] / 255, ColorManagement.workingColorSpace, color );
 
 				// convert to linear color space
 				convertColorToLinear( color, cubeTexture.colorSpace );
@@ -86,33 +94,33 @@ class LightProbeGenerator {
 
 				switch ( faceIndex ) {
 
-					case 0: coord.set( - 1, row, - col ); break;
+					case 0: vec3Set( coord, - 1, row, - col ); break;
 
-					case 1: coord.set( 1, row, col ); break;
+					case 1: vec3Set( coord, 1, row, col ); break;
 
-					case 2: coord.set( - col, 1, - row ); break;
+					case 2: vec3Set( coord, - col, 1, - row ); break;
 
-					case 3: coord.set( - col, - 1, row ); break;
+					case 3: vec3Set( coord, - col, - 1, row ); break;
 
-					case 4: coord.set( - col, row, 1 ); break;
+					case 4: vec3Set( coord, - col, row, 1 ); break;
 
-					case 5: coord.set( col, row, - 1 ); break;
+					case 5: vec3Set( coord, col, row, - 1 ); break;
 
 				}
 
 				// weight assigned to this pixel
 
-				const lengthSq = coord.lengthSq();
+				const lengthSq = vec3LengthSq( coord );
 
 				const weight = 4 / ( Math.sqrt( lengthSq ) * lengthSq );
 
 				totalWeight += weight;
 
 				// direction vector to this pixel
-				dir.copy( coord ).normalize();
+				vec3Normalize( vec3Copy( coord, dir ), dir );
 
 				// evaluate SH basis functions in direction dir
-				SphericalHarmonics3.getBasisAt( dir, shBasis );
+				sh3GetBasisAt( dir, shBasis );
 
 				// accumulate
 				for ( let j = 0; j < 9; j ++ ) {
@@ -161,15 +169,15 @@ class LightProbeGenerator {
 		// The renderTarget must be set to RGBA in order to make readRenderTargetPixels works
 		let totalWeight = 0;
 
-		const coord = new Vector3();
+		const coord = vec3Create();
 
-		const dir = new Vector3();
+		const dir = vec3Create();
 
-		const color = new Color();
+		const color = colorCreate();
 
 		const shBasis = [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
 
-		const sh = new SphericalHarmonics3();
+		const sh = sh3Create();
 		const shCoefficients = sh.coefficients;
 
 		const dataType = cubeRenderTarget.texture.type;
@@ -236,7 +244,7 @@ class LightProbeGenerator {
 				}
 
 				// pixel color
-				color.setRGB( r, g, b );
+				colorSetRGB( r, g, b, ColorManagement.workingColorSpace, color );
 
 				// convert to linear color space
 				convertColorToLinear( color, cubeRenderTarget.texture.colorSpace );
@@ -251,33 +259,33 @@ class LightProbeGenerator {
 
 				switch ( faceIndex ) {
 
-					case 0: coord.set( - 1 * flip, row, col * flip ); break;
+					case 0: vec3Set( coord, - 1 * flip, row, col * flip ); break;
 
-					case 1: coord.set( 1 * flip, row, - col * flip ); break;
+					case 1: vec3Set( coord, 1 * flip, row, - col * flip ); break;
 
-					case 2: coord.set( col, 1, - row ); break;
+					case 2: vec3Set( coord, col, 1, - row ); break;
 
-					case 3: coord.set( col, - 1, row ); break;
+					case 3: vec3Set( coord, col, - 1, row ); break;
 
-					case 4: coord.set( col, row, 1 ); break;
+					case 4: vec3Set( coord, col, row, 1 ); break;
 
-					case 5: coord.set( - col, row, - 1 ); break;
+					case 5: vec3Set( coord, - col, row, - 1 ); break;
 
 				}
 
 				// weight assigned to this pixel
 
-				const lengthSq = coord.lengthSq();
+				const lengthSq = vec3LengthSq( coord );
 
 				const weight = 4 / ( Math.sqrt( lengthSq ) * lengthSq );
 
 				totalWeight += weight;
 
 				// direction vector to this pixel
-				dir.copy( coord ).normalize();
+				vec3Normalize( vec3Copy( coord, dir ), dir );
 
 				// evaluate SH basis functions in direction dir
-				SphericalHarmonics3.getBasisAt( dir, shBasis );
+				sh3GetBasisAt( dir, shBasis );
 
 				// accumulate
 				for ( let j = 0; j < 9; j ++ ) {
@@ -315,7 +323,7 @@ function convertColorToLinear( color, colorSpace ) {
 
 		case SRGBColorSpace:
 
-			color.convertSRGBToLinear();
+			colorConvertSRGBToLinear( color, color );
 			break;
 
 		case LinearSRGBColorSpace:

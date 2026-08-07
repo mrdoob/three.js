@@ -17,8 +17,9 @@ import { Mesh } from '../objects/Mesh.js';
 import { OrthographicCamera } from '../cameras/OrthographicCamera.js';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 import { ShaderMaterial } from '../materials/ShaderMaterial.js';
-import { Vector3 } from '../math/Vector3.js';
+import { colorCopy } from '../math/ColorFunctions.js';
 import { Color } from '../math/Color.js';
+import { vec3Create, vec3Set, vec3ToArray } from '../math/Vector3Functions.js';
 import { WebGLRenderTarget } from '../renderers/WebGLRenderTarget.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { BoxGeometry } from '../geometries/BoxGeometry.js';
@@ -43,8 +44,8 @@ let _oldActiveCubeFace = 0;
 let _oldActiveMipmapLevel = 0;
 let _oldXrEnabled = false;
 
-const _origin = /*@__PURE__*/ new Vector3();
-const _direction = /*@__PURE__*/ new Vector3();
+const _origin = /*@__PURE__*/ vec3Create();
+const _direction = /*@__PURE__*/ vec3Create();
 
 /**
  * This class generates a Prefiltered, Mipmapped Radiance Environment Map
@@ -381,7 +382,7 @@ class PMREMGenerator {
 
 			if ( background.isColor ) {
 
-				backgroundMaterial.color.copy( background );
+				colorCopy( background, backgroundMaterial.color );
 				scene.background = null;
 				useSolidColor = true;
 
@@ -389,7 +390,7 @@ class PMREMGenerator {
 
 		} else {
 
-			backgroundMaterial.color.copy( _clearColor );
+			colorCopy( _clearColor, backgroundMaterial.color );
 			useSolidColor = true;
 
 		}
@@ -665,31 +666,31 @@ function _createPlanes( lodMax ) {
 				// RH coordinate system; PMREM face-indexing convention
 				if ( face === 0 ) {
 
-					_direction.set( 1, v, u ); // pos x
+					vec3Set( _direction, 1, v, u ); // pos x
 
 				} else if ( face === 1 ) {
 
-					_direction.set( - u, 1, - v ); // pos y
+					vec3Set( _direction, - u, 1, - v ); // pos y
 
 				} else if ( face === 2 ) {
 
-					_direction.set( - u, v, 1 ); // pos z
+					vec3Set( _direction, - u, v, 1 ); // pos z
 
 				} else if ( face === 3 ) {
 
-					_direction.set( - 1, v, - u ); // neg x
+					vec3Set( _direction, - 1, v, - u ); // neg x
 
 				} else if ( face === 4 ) {
 
-					_direction.set( - u, - 1, v ); // neg y
+					vec3Set( _direction, - u, - 1, v ); // neg y
 
 				} else {
 
-					_direction.set( u, v, - 1 ); // neg z
+					vec3Set( _direction, u, v, - 1 ); // neg z
 
 				}
 
-				_direction.toArray( outputDirection, ( face * vertices + vertex ) * positionSize );
+				vec3ToArray( _direction, outputDirection, ( face * vertices + vertex ) * positionSize );
 
 			}
 

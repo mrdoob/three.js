@@ -1,11 +1,18 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
-	Color,
 	Group,
-	Matrix4,
 	Mesh,
-	Vector3
+	colorCreate,
+	colorFromArray,
+	colorToArray,
+	mat4Create,
+	mat4Decompose,
+	mat4FromArray,
+	mat4ToArray,
+	vec3ApplyMatrix4,
+	vec3Create,
+	vec3FromBufferAttribute
 } from 'three';
 
 import { mergeGroups, deepCloneAttribute } from './BufferGeometryUtils.js';
@@ -15,8 +22,8 @@ import { mergeGroups, deepCloneAttribute } from './BufferGeometryUtils.js';
  * @three_import import * as SceneUtils from 'three/addons/utils/SceneUtils.js';
  */
 
-const _color = /*@__PURE__*/new Color();
-const _matrix = /*@__PURE__*/new Matrix4();
+const _color = /*@__PURE__*/ colorCreate();
+const _matrix = /*@__PURE__*/ mat4Create();
 
 /**
  * This function creates a mesh for each instance of the given instanced mesh and
@@ -39,7 +46,7 @@ function createMeshesFromInstancedMesh( instancedMesh ) {
 		const mesh = new Mesh( geometry, material );
 
 		instancedMesh.getMatrixAt( i, mesh.matrix );
-		mesh.matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );
+		mat4Decompose( mesh.matrix, mesh.position, mesh.quaternion, mesh.scale );
 
 		group.add( mesh );
 
@@ -169,7 +176,7 @@ function createMultiMaterialObject( geometry, materials ) {
 function reduceVertices( object, func, initialValue ) {
 
 	let value = initialValue;
-	const vertex = new Vector3();
+	const vertex = vec3Create();
 
 	object.updateWorldMatrix( true, true );
 
@@ -191,13 +198,13 @@ function reduceVertices( object, func, initialValue ) {
 
 					} else {
 
-						vertex.fromBufferAttribute( position, i );
+						vec3FromBufferAttribute( position, i, vertex );
 
 					}
 
 					if ( ! child.isSkinnedMesh ) {
 
-						vertex.applyMatrix4( child.matrixWorld );
+						vec3ApplyMatrix4( vertex, child.matrixWorld, vertex );
 
 					}
 
@@ -258,13 +265,13 @@ function sortInstancedMesh( mesh, compareFn ) {
 
 		const refIndex = tokens[ i ];
 
-		_matrix.fromArray( instanceMatrixRef.array, refIndex * mesh.instanceMatrix.itemSize );
-		_matrix.toArray( mesh.instanceMatrix.array, i * mesh.instanceMatrix.itemSize );
+		mat4FromArray( instanceMatrixRef.array, refIndex * mesh.instanceMatrix.itemSize, _matrix );
+		mat4ToArray( _matrix, mesh.instanceMatrix.array, i * mesh.instanceMatrix.itemSize );
 
 		if ( mesh.instanceColor ) {
 
-			_color.fromArray( instanceColorRef.array, refIndex * mesh.instanceColor.itemSize );
-			_color.toArray( mesh.instanceColor.array, i * mesh.instanceColor.itemSize );
+			colorFromArray( instanceColorRef.array, refIndex * mesh.instanceColor.itemSize, _color );
+			colorToArray( _color, mesh.instanceColor.array, i * mesh.instanceColor.itemSize );
 
 		}
 

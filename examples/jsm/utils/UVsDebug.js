@@ -1,5 +1,9 @@
 import {
-	Vector2
+	vec2AddVectors,
+	vec2Create,
+	vec2DivideScalar,
+	vec2FromBufferAttribute,
+	vec2Set
 } from 'three';
 
 /**
@@ -23,13 +27,13 @@ function UVsDebug( geometry, size = 1024 ) {
 	// handles wrapping of uv.x > 1 only
 
 	const abc = 'abc';
-	const a = new Vector2();
-	const b = new Vector2();
+	const a = vec2Create();
+	const b = vec2Create();
 
 	const uvs = [
-		new Vector2(),
-		new Vector2(),
-		new Vector2()
+		vec2Create(),
+		vec2Create(),
+		vec2Create()
 	];
 
 	const face = [];
@@ -63,9 +67,9 @@ function UVsDebug( geometry, size = 1024 ) {
 			face[ 1 ] = index.getX( i + 1 );
 			face[ 2 ] = index.getX( i + 2 );
 
-			uvs[ 0 ].fromBufferAttribute( uvAttribute, face[ 0 ] );
-			uvs[ 1 ].fromBufferAttribute( uvAttribute, face[ 1 ] );
-			uvs[ 2 ].fromBufferAttribute( uvAttribute, face[ 2 ] );
+			vec2FromBufferAttribute( uvAttribute, face[ 0 ], uvs[ 0 ] );
+			vec2FromBufferAttribute( uvAttribute, face[ 1 ], uvs[ 1 ] );
+			vec2FromBufferAttribute( uvAttribute, face[ 2 ], uvs[ 2 ] );
 
 			processFace( face, uvs, i / 3 );
 
@@ -81,9 +85,9 @@ function UVsDebug( geometry, size = 1024 ) {
 			face[ 1 ] = i + 1;
 			face[ 2 ] = i + 2;
 
-			uvs[ 0 ].fromBufferAttribute( uvAttribute, face[ 0 ] );
-			uvs[ 1 ].fromBufferAttribute( uvAttribute, face[ 1 ] );
-			uvs[ 2 ].fromBufferAttribute( uvAttribute, face[ 2 ] );
+			vec2FromBufferAttribute( uvAttribute, face[ 0 ], uvs[ 0 ] );
+			vec2FromBufferAttribute( uvAttribute, face[ 1 ], uvs[ 1 ] );
+			vec2FromBufferAttribute( uvAttribute, face[ 2 ], uvs[ 2 ] );
 
 			processFace( face, uvs, i / 3 );
 
@@ -99,7 +103,7 @@ function UVsDebug( geometry, size = 1024 ) {
 
 		ctx.beginPath();
 
-		a.set( 0, 0 );
+		vec2Set( 0, 0, a );
 
 		for ( let j = 0, jl = uvs.length; j < jl; j ++ ) {
 
@@ -125,7 +129,7 @@ function UVsDebug( geometry, size = 1024 ) {
 
 		// calculate center of face
 
-		a.divideScalar( uvs.length );
+		vec2DivideScalar( a, uvs.length, a );
 
 		// label the face number
 
@@ -151,7 +155,7 @@ function UVsDebug( geometry, size = 1024 ) {
 		for ( let j = 0, jl = uvs.length; j < jl; j ++ ) {
 
 			const uv = uvs[ j ];
-			b.addVectors( a, uv ).divideScalar( 2 );
+			vec2DivideScalar( vec2AddVectors( a, uv, b ), 2, b );
 
 			const vnum = face[ j ];
 			ctx.fillText( abc[ j ] + vnum, b.x * width, ( 1 - b.y ) * height );

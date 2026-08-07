@@ -1,7 +1,16 @@
-import { Color, Node, Vector3, Vector4 } from 'three/webgpu';
+import {
+	Node,
+	colorCreate,
+	colorCopy,
+	colorMultiplyScalar,
+	vec3ApplyMatrix4,
+	vec3Create,
+	vec3SetFromMatrixPosition,
+	vec4Create
+} from 'three/webgpu';
 import { Loop, NodeUpdateType, getDistanceAttenuation, positionView, renderGroup, uniform, uniformArray, vec3 } from 'three/tsl';
 
-const _position = /*@__PURE__*/ new Vector3();
+const _position = /*@__PURE__*/ vec3Create();
 
 const warn = ( message ) => {
 
@@ -34,9 +43,9 @@ class PointLightDataNode extends Node {
 
 		for ( let i = 0; i < maxCount; i ++ ) {
 
-			this._colors.push( new Color() );
-			this._positionsAndCutoff.push( new Vector4() );
-			this._decays.push( new Vector4() );
+			this._colors.push( colorCreate() );
+			this._positionsAndCutoff.push( vec4Create() );
+			this._decays.push( vec4Create() );
 
 		}
 
@@ -72,10 +81,11 @@ class PointLightDataNode extends Node {
 
 			const light = this._lights[ i ];
 
-			this._colors[ i ].copy( light.color ).multiplyScalar( light.intensity );
+			colorCopy( light.color, this._colors[ i ] );
+			colorMultiplyScalar( this._colors[ i ], light.intensity, this._colors[ i ] );
 
-			_position.setFromMatrixPosition( light.matrixWorld );
-			_position.applyMatrix4( camera.matrixWorldInverse );
+			vec3SetFromMatrixPosition( light.matrixWorld, _position );
+			vec3ApplyMatrix4( _position, camera.matrixWorldInverse, _position );
 
 			const positionAndCutoff = this._positionsAndCutoff[ i ];
 			positionAndCutoff.x = _position.x;

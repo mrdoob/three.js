@@ -1,8 +1,12 @@
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import * as Curves from '../extras/curves/Curves.js';
-import { Vector2 } from '../math/Vector2.js';
-import { Vector3 } from '../math/Vector3.js';
+import { vec2AddScaledVector, vec2Create } from '../math/Vector2Functions.js';
+import {
+	vec3Add,
+	vec3Create,
+	vec3MultiplyScalar
+} from '../math/Vector3Functions.js';
 import { Shape } from '../extras/core/Shape.js';
 import { ShapeUtils } from '../extras/ShapeUtils.js';
 import { error } from '../utils.js';
@@ -37,7 +41,7 @@ class ExtrudeGeometry extends BufferGeometry {
 	 * @param {Shape|Array<Shape>} [shapes] - A shape or an array of shapes.
 	 * @param {ExtrudeGeometry~Options} [options] - The extrude settings.
 	 */
-	constructor( shapes = new Shape( [ new Vector2( 0.5, 0.5 ), new Vector2( - 0.5, 0.5 ), new Vector2( - 0.5, - 0.5 ), new Vector2( 0.5, - 0.5 ) ] ), options = {} ) {
+	constructor( shapes = new Shape( [ vec2Create( 0.5, 0.5 ), vec2Create( - 0.5, 0.5 ), vec2Create( - 0.5, - 0.5 ), vec2Create( 0.5, - 0.5 ) ] ), options = {} ) {
 
 		super();
 
@@ -118,9 +122,9 @@ class ExtrudeGeometry extends BufferGeometry {
 
 				// log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
 
-				binormal = new Vector3();
-				normal = new Vector3();
-				position2 = new Vector3();
+				binormal = vec3Create();
+				normal = vec3Create();
+				position2 = vec3Create();
 
 			}
 
@@ -223,7 +227,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 				if ( ! vec ) error( 'ExtrudeGeometry: vec does not exist' );
 
-				return pt.clone().addScaledVector( vec, size );
+				return vec2AddScaledVector( pt, vec, size );
 
 			}
 
@@ -290,7 +294,7 @@ class ExtrudeGeometry extends BufferGeometry {
 					const v_trans_lensq = ( v_trans_x * v_trans_x + v_trans_y * v_trans_y );
 					if ( v_trans_lensq <= 2 ) {
 
-						return new Vector2( v_trans_x, v_trans_y );
+						return vec2Create( v_trans_x, v_trans_y );
 
 					} else {
 
@@ -352,7 +356,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 				}
 
-				return new Vector2( v_trans_x / shrink_by, v_trans_y / shrink_by );
+				return vec2Create( v_trans_x / shrink_by, v_trans_y / shrink_by );
 
 			}
 
@@ -471,10 +475,11 @@ class ExtrudeGeometry extends BufferGeometry {
 
 					// v( vert.x, vert.y + extrudePts[ 0 ].y, extrudePts[ 0 ].x );
 
-					normal.copy( splineTube.normals[ 0 ] ).multiplyScalar( vert.x );
-					binormal.copy( splineTube.binormals[ 0 ] ).multiplyScalar( vert.y );
+					vec3MultiplyScalar( splineTube.normals[ 0 ], vert.x, normal );
+					vec3MultiplyScalar( splineTube.binormals[ 0 ], vert.y, binormal );
 
-					position2.copy( extrudePts[ 0 ] ).add( normal ).add( binormal );
+					vec3Add( extrudePts[ 0 ], normal, position2 );
+					vec3Add( position2, binormal, position2 );
 
 					v( position2.x, position2.y, position2.z );
 
@@ -499,10 +504,11 @@ class ExtrudeGeometry extends BufferGeometry {
 
 						// v( vert.x, vert.y + extrudePts[ s - 1 ].y, extrudePts[ s - 1 ].x );
 
-						normal.copy( splineTube.normals[ s ] ).multiplyScalar( vert.x );
-						binormal.copy( splineTube.binormals[ s ] ).multiplyScalar( vert.y );
+						vec3MultiplyScalar( splineTube.normals[ s ], vert.x, normal );
+						vec3MultiplyScalar( splineTube.binormals[ s ], vert.y, binormal );
 
-						position2.copy( extrudePts[ s ] ).add( normal ).add( binormal );
+						vec3Add( extrudePts[ s ], normal, position2 );
+						vec3Add( position2, binormal, position2 );
 
 						v( position2.x, position2.y, position2.z );
 
@@ -817,9 +823,9 @@ const WorldUVGenerator = {
 		const c_y = vertices[ indexC * 3 + 1 ];
 
 		return [
-			new Vector2( a_x, a_y ),
-			new Vector2( b_x, b_y ),
-			new Vector2( c_x, c_y )
+			vec2Create( a_x, a_y ),
+			vec2Create( b_x, b_y ),
+			vec2Create( c_x, c_y )
 		];
 
 	},
@@ -842,19 +848,19 @@ const WorldUVGenerator = {
 		if ( Math.abs( a_y - b_y ) < Math.abs( a_x - b_x ) ) {
 
 			return [
-				new Vector2( a_x, 1 - a_z ),
-				new Vector2( b_x, 1 - b_z ),
-				new Vector2( c_x, 1 - c_z ),
-				new Vector2( d_x, 1 - d_z )
+				vec2Create( a_x, 1 - a_z ),
+				vec2Create( b_x, 1 - b_z ),
+				vec2Create( c_x, 1 - c_z ),
+				vec2Create( d_x, 1 - d_z )
 			];
 
 		} else {
 
 			return [
-				new Vector2( a_y, 1 - a_z ),
-				new Vector2( b_y, 1 - b_z ),
-				new Vector2( c_y, 1 - c_z ),
-				new Vector2( d_y, 1 - d_z )
+				vec2Create( a_y, 1 - a_z ),
+				vec2Create( b_y, 1 - b_z ),
+				vec2Create( c_y, 1 - c_z ),
+				vec2Create( d_y, 1 - d_z )
 			];
 
 		}

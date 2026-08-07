@@ -1,14 +1,26 @@
 import { SRGBColorSpace, LinearSRGBColorSpace, SRGBTransfer, LinearTransfer, NoColorSpace } from '../constants.js';
-import { Matrix3 } from './Matrix3.js';
+import { mat3Create, mat3Multiply, mat3Set } from './Matrix3Functions.js';
+import { vec3FromArray } from './Vector3Functions.js';
 import { warnOnce } from '../utils.js';
 
-const LINEAR_REC709_TO_XYZ = /*@__PURE__*/ new Matrix3().set(
+function applyMatrix3ToColor( color, m ) {
+
+	const r = color.r, g = color.g, b = color.b;
+	const e = m.elements;
+
+	color.r = e[ 0 ] * r + e[ 3 ] * g + e[ 6 ] * b;
+	color.g = e[ 1 ] * r + e[ 4 ] * g + e[ 7 ] * b;
+	color.b = e[ 2 ] * r + e[ 5 ] * g + e[ 8 ] * b;
+
+}
+
+const LINEAR_REC709_TO_XYZ = /*@__PURE__*/ mat3Set( mat3Create(),
 	0.4123908, 0.3575843, 0.1804808,
 	0.2126390, 0.7151687, 0.0721923,
 	0.0193308, 0.1191948, 0.9505322
 );
 
-const XYZ_TO_LINEAR_REC709 = /*@__PURE__*/ new Matrix3().set(
+const XYZ_TO_LINEAR_REC709 = /*@__PURE__*/ mat3Set( mat3Create(),
 	3.2409699, - 1.5373832, - 0.4986108,
 	- 0.9692436, 1.8759675, 0.0415551,
 	0.0556301, - 0.2039770, 1.0569715
@@ -60,8 +72,9 @@ function createColorManagement() {
 
 			if ( this.spaces[ sourceColorSpace ].primaries !== this.spaces[ targetColorSpace ].primaries ) {
 
-				color.applyMatrix3( this.spaces[ sourceColorSpace ].toXYZ );
-				color.applyMatrix3( this.spaces[ targetColorSpace ].fromXYZ );
+				// Inline Color.applyMatrix3 so ColorLike plain objects (no methods) work.
+				applyMatrix3ToColor( color, this.spaces[ sourceColorSpace ].toXYZ );
+				applyMatrix3ToColor( color, this.spaces[ targetColorSpace ].fromXYZ );
 
 			}
 
@@ -111,7 +124,7 @@ function createColorManagement() {
 
 		getLuminanceCoefficients: function ( target, colorSpace = this.workingColorSpace ) {
 
-			return target.fromArray( this.spaces[ colorSpace ].luminanceCoefficients );
+			return vec3FromArray( this.spaces[ colorSpace ].luminanceCoefficients, 0, target );
 
 		},
 
@@ -125,9 +138,11 @@ function createColorManagement() {
 
 		_getMatrix: function ( targetMatrix, sourceColorSpace, targetColorSpace ) {
 
-			return targetMatrix
-				.copy( this.spaces[ sourceColorSpace ].toXYZ )
-				.multiply( this.spaces[ targetColorSpace ].fromXYZ );
+			return mat3Multiply(
+				this.spaces[ sourceColorSpace ].toXYZ,
+				this.spaces[ targetColorSpace ].fromXYZ,
+				targetMatrix
+			);
 
 		},
 

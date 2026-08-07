@@ -2,14 +2,16 @@ import {
 	BufferAttribute,
 	BufferGeometry,
 	ClampToEdgeWrapping,
-	Color,
+	colorCreate,
+	colorSetStyle,
 	FileLoader,
 	Float32BufferAttribute,
 	Group,
 	LinearFilter,
 	LinearMipmapLinearFilter,
 	Loader,
-	Matrix4,
+	mat4Create,
+	mat4Set,
 	Mesh,
 	MeshPhongMaterial,
 	MeshStandardMaterial,
@@ -398,14 +400,14 @@ class ThreeMFLoader extends Loader {
 			const colorNodes = colorGroupNode.querySelectorAll( 'color' );
 
 			const colors = [];
-			const colorObject = new Color();
+			const colorObject = colorCreate();
 
 			for ( let i = 0; i < colorNodes.length; i ++ ) {
 
 				const colorNode = colorNodes[ i ];
 				const color = colorNode.getAttribute( 'color' );
 
-				colorObject.setStyle( color.substring( 0, 7 ), COLOR_SPACE_3MF );
+				colorSetStyle( color.substring( 0, 7 ), COLOR_SPACE_3MF, colorObject );
 
 				colors.push( colorObject.r, colorObject.g, colorObject.b );
 
@@ -653,8 +655,9 @@ class ThreeMFLoader extends Loader {
 
 			} );
 
-			const matrix = new Matrix4();
-			matrix.set(
+			const matrix = mat4Create();
+			mat4Set(
+				matrix,
 				t[ 0 ], t[ 3 ], t[ 6 ], t[ 9 ],
 				t[ 1 ], t[ 4 ], t[ 7 ], t[ 10 ],
 				t[ 2 ], t[ 5 ], t[ 8 ], t[ 11 ],
@@ -1418,7 +1421,7 @@ class ThreeMFLoader extends Loader {
 			const displaycolor = materialData.displaycolor;
 
 			const color = displaycolor.substring( 0, 7 );
-			material.color.setStyle( color, COLOR_SPACE_3MF );
+			colorSetStyle( color, COLOR_SPACE_3MF, material.color );
 
 			// process alpha if set
 

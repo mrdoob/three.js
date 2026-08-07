@@ -7,39 +7,39 @@ import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
 import { BufferAttribute } from '../../core/BufferAttribute.js';
 import { BufferGeometry } from '../../core/BufferGeometry.js';
 import { Mesh } from '../../objects/Mesh.js';
-import { Vector4 } from '../../math/Vector4.js';
-import { Vector2 } from '../../math/Vector2.js';
-import { Matrix4 } from '../../math/Matrix4.js';
-import { Frustum } from '../../math/Frustum.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { CubeDepthTexture } from '../../textures/CubeDepthTexture.js';
+import { frustumCreate, frustumSetFromProjectionMatrix } from '../../math/FrustumFunctions.js';
+import { mat4Create, mat4MakeTranslation, mat4MultiplyMatrices } from '../../math/Matrix4Functions.js';
+import { vec2Copy, vec2Create, vec2Multiply } from '../../math/Vector2Functions.js';
+import { vec3Add, vec3Create, vec3Copy, vec3SetFromMatrixPosition } from '../../math/Vector3Functions.js';
+import { vec4Create, vec4Set } from '../../math/Vector4Functions.js';
 
 import * as vsm from '../shaders/ShaderLib/vsm.glsl.js';
 import { warn } from '../../utils.js';
-import { Vector3 } from '../../math/Vector3.js';
 
 const _cubeDirections = [
-	/*@__PURE__*/ new Vector3( 1, 0, 0 ), /*@__PURE__*/ new Vector3( - 1, 0, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ),
-	/*@__PURE__*/ new Vector3( 0, - 1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ), /*@__PURE__*/ new Vector3( 0, 0, - 1 )
+	{ x: 1, y: 0, z: 0 }, { x: - 1, y: 0, z: 0 }, { x: 0, y: 1, z: 0 },
+	{ x: 0, y: - 1, z: 0 }, { x: 0, y: 0, z: 1 }, { x: 0, y: 0, z: - 1 }
 ];
 
 const _cubeUps = [
-	/*@__PURE__*/ new Vector3( 0, - 1, 0 ), /*@__PURE__*/ new Vector3( 0, - 1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ),
-	/*@__PURE__*/ new Vector3( 0, 0, - 1 ), /*@__PURE__*/ new Vector3( 0, - 1, 0 ), /*@__PURE__*/ new Vector3( 0, - 1, 0 )
+	{ x: 0, y: - 1, z: 0 }, { x: 0, y: - 1, z: 0 }, { x: 0, y: 0, z: 1 },
+	{ x: 0, y: 0, z: - 1 }, { x: 0, y: - 1, z: 0 }, { x: 0, y: - 1, z: 0 }
 ];
 
-const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
-const _lightPositionWorld = /*@__PURE__*/ new Vector3();
-const _lookTarget = /*@__PURE__*/ new Vector3();
+const _projScreenMatrix = /*@__PURE__*/ mat4Create();
+const _lightPositionWorld = /*@__PURE__*/ vec3Create();
+const _lookTarget = /*@__PURE__*/ vec3Create();
 
 function WebGLShadowMap( renderer, objects, capabilities ) {
 
-	let _frustum = new Frustum();
+	let _frustum = frustumCreate();
 
-	const _shadowMapSize = new Vector2(),
-		_viewportSize = new Vector2(),
+	const _shadowMapSize = vec2Create(),
+		_viewportSize = vec2Create(),
 
-		_viewport = new Vector4(),
+		_viewport = vec4Create(),
 
 		_depthMaterial = new MeshDepthMaterial(),
 		_distanceMaterial = new MeshDistanceMaterial(),
@@ -56,7 +56,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 		},
 		uniforms: {
 			shadow_pass: { value: null },
-			resolution: { value: new Vector2() },
+			resolution: { value: vec2Create() },
 			radius: { value: 4.0 }
 		},
 
@@ -169,13 +169,13 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 			if ( shadow.autoUpdate === false && shadow.needsUpdate === false ) continue;
 
-			_shadowMapSize.copy( shadow.mapSize );
+			vec2Copy( shadow.mapSize, _shadowMapSize );
 
 			const shadowFrameExtents = shadow.getFrameExtents();
 
-			_shadowMapSize.multiply( shadowFrameExtents );
+			vec2Multiply( _shadowMapSize, shadowFrameExtents, _shadowMapSize );
 
-			_viewportSize.copy( shadow.mapSize );
+			vec2Copy( shadow.mapSize, _viewportSize );
 
 			if ( _shadowMapSize.x > _maxTextureSize || _shadowMapSize.y > _maxTextureSize ) {
 
@@ -301,11 +301,12 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 					const viewport = shadow.getViewport( face );
 
-					_viewport.set(
+					vec4Set(
 						_viewportSize.x * viewport.x,
 						_viewportSize.y * viewport.y,
 						_viewportSize.x * viewport.z,
-						_viewportSize.y * viewport.w
+						_viewportSize.y * viewport.w,
+						_viewport
 					);
 
 					_state.viewport( _viewport );
@@ -326,19 +327,19 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 					}
 
-					_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
+					vec3SetFromMatrixPosition( light.matrixWorld, _lightPositionWorld );
 					camera.position.copy( _lightPositionWorld );
 
-					_lookTarget.copy( camera.position );
-					_lookTarget.add( _cubeDirections[ face ] );
+					vec3Copy( camera.position, _lookTarget );
+					vec3Add( _lookTarget, _cubeDirections[ face ], _lookTarget );
 					camera.up.copy( _cubeUps[ face ] );
 					camera.lookAt( _lookTarget );
 					camera.updateMatrixWorld();
 
-					shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
+					mat4MakeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z, shadowMatrix );
 
-					_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-					shadow._frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
+					mat4MultiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse, _projScreenMatrix );
+					frustumSetFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth, shadow._frustum );
 
 				} else {
 
@@ -514,7 +515,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 			if ( ( object.castShadow || ( object.receiveShadow && type === VSMShadowMap ) ) && ( ! object.frustumCulled || object.intersectsFrustum( _frustum ) ) ) {
 
-				object.modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
+				mat4MultiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld, object.modelViewMatrix );
 
 				const geometry = objects.update( object );
 				const material = object.material;

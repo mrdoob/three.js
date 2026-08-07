@@ -2,9 +2,31 @@ import {
 	Controls,
 	MathUtils,
 	MOUSE,
-	Quaternion,
-	Vector2,
-	Vector3
+	Vector3,
+	quatCreate,
+	quatSetFromAxisAngle,
+	vec2Add,
+	vec2Copy,
+	vec2Create,
+	vec2LengthSq,
+	vec2MultiplyScalar,
+	vec2Set,
+	vec2SubVectors,
+	vec3Add,
+	vec3AddVectors,
+	vec3ApplyQuaternion,
+	vec3Copy,
+	vec3Cross,
+	vec3CrossVectors,
+	vec3Create,
+	vec3DistanceToSquared,
+	vec3Length,
+	vec3LengthSq,
+	vec3MultiplyScalar,
+	vec3Normalize,
+	vec3Set,
+	vec3SetLength,
+	vec3SubVectors
 } from 'three';
 
 /**
@@ -34,16 +56,16 @@ const _endEvent = { type: 'end' };
 const _EPS = 0.000001;
 const _STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM_PAN: 4 };
 
-const _v2 = new Vector2();
-const _mouseChange = new Vector2();
-const _objectUp = new Vector3();
-const _pan = new Vector3();
-const _axis = new Vector3();
-const _quaternion = new Quaternion();
-const _eyeDirection = new Vector3();
-const _objectUpDirection = new Vector3();
-const _objectSidewaysDirection = new Vector3();
-const _moveDirection = new Vector3();
+const _v2 = /*@__PURE__*/ vec2Create();
+const _mouseChange = /*@__PURE__*/ vec2Create();
+const _objectUp = /*@__PURE__*/ vec3Create();
+const _pan = /*@__PURE__*/ vec3Create();
+const _axis = /*@__PURE__*/ vec3Create();
+const _quaternion = /*@__PURE__*/ quatCreate();
+const _eyeDirection = /*@__PURE__*/ vec3Create();
+const _objectUpDirection = /*@__PURE__*/ vec3Create();
+const _objectSidewaysDirection = /*@__PURE__*/ vec3Create();
+const _moveDirection = /*@__PURE__*/ vec3Create();
 
 /**
  * This class is similar to {@link OrbitControls}. However, it does not maintain a constant camera
@@ -208,24 +230,24 @@ class TrackballControls extends Controls {
 		this.state = _STATE.NONE;
 		this.keyState = _STATE.NONE;
 
-		this._lastPosition = new Vector3();
+		this._lastPosition = vec3Create();
 		this._lastZoom = 1;
 		this._touchZoomDistanceStart = 0;
 		this._touchZoomDistanceEnd = 0;
 		this._lastAngle = 0;
 
-		this._eye = new Vector3();
+		this._eye = vec3Create();
 
-		this._movePrev = new Vector2();
-		this._moveCurr = new Vector2();
+		this._movePrev = vec2Create();
+		this._moveCurr = vec2Create();
 
-		this._lastAxis = new Vector3();
+		this._lastAxis = vec3Create();
 
-		this._zoomStart = new Vector2();
-		this._zoomEnd = new Vector2();
+		this._zoomStart = vec2Create();
+		this._zoomEnd = vec2Create();
 
-		this._panStart = new Vector2();
-		this._panEnd = new Vector2();
+		this._panStart = vec2Create();
+		this._panEnd = vec2Create();
 
 		this._pointers = [];
 		this._pointerPositions = {};
@@ -251,9 +273,9 @@ class TrackballControls extends Controls {
 
 		// for reset
 
-		this._target0 = this.target.clone();
-		this._position0 = this.object.position.clone();
-		this._up0 = this.object.up.clone();
+		this._target0 = vec3Copy( this.target );
+		this._position0 = vec3Copy( this.object.position );
+		this._up0 = vec3Copy( this.object.up );
 		this._zoom0 = this.object.zoom;
 
 		if ( domElement !== null ) {
@@ -325,7 +347,7 @@ class TrackballControls extends Controls {
 
 	update() {
 
-		this._eye.subVectors( this.object.position, this.target );
+		vec3SubVectors( this.object.position, this.target, this._eye );
 
 		if ( ! this.noRotate ) {
 
@@ -345,7 +367,7 @@ class TrackballControls extends Controls {
 
 		}
 
-		this.object.position.addVectors( this.target, this._eye );
+		vec3AddVectors( this.target, this._eye, this.object.position );
 
 		if ( this.object.isPerspectiveCamera ) {
 
@@ -353,11 +375,11 @@ class TrackballControls extends Controls {
 
 			this.object.lookAt( this.target );
 
-			if ( this._lastPosition.distanceToSquared( this.object.position ) > _EPS ) {
+			if ( vec3DistanceToSquared( this._lastPosition, this.object.position ) > _EPS ) {
 
 				this.dispatchEvent( _changeEvent );
 
-				this._lastPosition.copy( this.object.position );
+				vec3Copy( this.object.position, this._lastPosition );
 
 			}
 
@@ -365,11 +387,11 @@ class TrackballControls extends Controls {
 
 			this.object.lookAt( this.target );
 
-			if ( this._lastPosition.distanceToSquared( this.object.position ) > _EPS || this._lastZoom !== this.object.zoom ) {
+			if ( vec3DistanceToSquared( this._lastPosition, this.object.position ) > _EPS || this._lastZoom !== this.object.zoom ) {
 
 				this.dispatchEvent( _changeEvent );
 
-				this._lastPosition.copy( this.object.position );
+				vec3Copy( this.object.position, this._lastPosition );
 				this._lastZoom = this.object.zoom;
 
 			}
@@ -390,29 +412,29 @@ class TrackballControls extends Controls {
 		this.state = _STATE.NONE;
 		this.keyState = _STATE.NONE;
 
-		this.target.copy( this._target0 );
-		this.object.position.copy( this._position0 );
-		this.object.up.copy( this._up0 );
+		vec3Copy( this._target0, this.target );
+		vec3Copy( this._position0, this.object.position );
+		vec3Copy( this._up0, this.object.up );
 		this.object.zoom = this._zoom0;
 
 		this.object.updateProjectionMatrix();
 
-		this._eye.subVectors( this.object.position, this.target );
+		vec3SubVectors( this.object.position, this.target, this._eye );
 
 		this.object.lookAt( this.target );
 
 		this.dispatchEvent( _changeEvent );
 
-		this._lastPosition.copy( this.object.position );
+		vec3Copy( this.object.position, this._lastPosition );
 		this._lastZoom = this.object.zoom;
 
 	}
 
 	_panCamera() {
 
-		_mouseChange.copy( this._panEnd ).sub( this._panStart );
+		vec2SubVectors( this._panEnd, this._panStart, _mouseChange );
 
-		if ( _mouseChange.lengthSq() ) {
+		if ( vec2LengthSq( _mouseChange ) ) {
 
 			if ( this.object.isOrthographicCamera ) {
 
@@ -424,21 +446,26 @@ class TrackballControls extends Controls {
 
 			}
 
-			_mouseChange.multiplyScalar( this._eye.length() * this.panSpeed );
+			vec2MultiplyScalar( _mouseChange, vec3Length( this._eye ) * this.panSpeed, _mouseChange );
 
-			_pan.copy( this._eye ).cross( this.object.up ).setLength( _mouseChange.x );
-			_pan.add( _objectUp.copy( this.object.up ).setLength( _mouseChange.y ) );
+			vec3Cross( this._eye, this.object.up, _pan );
+			vec3SetLength( _pan, _mouseChange.x, _pan );
+			vec3Copy( this.object.up, _objectUp );
+			vec3SetLength( _objectUp, _mouseChange.y, _objectUp );
+			vec3Add( _pan, _objectUp, _pan );
 
-			this.object.position.add( _pan );
-			this.target.add( _pan );
+			vec3Add( this.object.position, _pan, this.object.position );
+			vec3Add( this.target, _pan, this.target );
 
 			if ( this.staticMoving ) {
 
-				this._panStart.copy( this._panEnd );
+				vec2Copy( this._panEnd, this._panStart );
 
 			} else {
 
-				this._panStart.add( _mouseChange.subVectors( this._panEnd, this._panStart ).multiplyScalar( this.dynamicDampingFactor ) );
+				vec2SubVectors( this._panEnd, this._panStart, _mouseChange );
+				vec2MultiplyScalar( _mouseChange, this.dynamicDampingFactor, _mouseChange );
+				vec2Add( this._panStart, _mouseChange, this._panStart );
 
 			}
 
@@ -448,44 +475,46 @@ class TrackballControls extends Controls {
 
 	_rotateCamera() {
 
-		_moveDirection.set( this._moveCurr.x - this._movePrev.x, this._moveCurr.y - this._movePrev.y, 0 );
-		let angle = _moveDirection.length();
+		vec3Set( _moveDirection, this._moveCurr.x - this._movePrev.x, this._moveCurr.y - this._movePrev.y, 0 );
+		let angle = vec3Length( _moveDirection );
 
 		if ( angle ) {
 
-			this._eye.copy( this.object.position ).sub( this.target );
+			vec3SubVectors( this.object.position, this.target, this._eye );
 
-			_eyeDirection.copy( this._eye ).normalize();
-			_objectUpDirection.copy( this.object.up ).normalize();
-			_objectSidewaysDirection.crossVectors( _objectUpDirection, _eyeDirection ).normalize();
+			vec3Normalize( this._eye, _eyeDirection );
+			vec3Normalize( this.object.up, _objectUpDirection );
+			vec3CrossVectors( _objectUpDirection, _eyeDirection, _objectSidewaysDirection );
+			vec3Normalize( _objectSidewaysDirection, _objectSidewaysDirection );
 
-			_objectUpDirection.setLength( this._moveCurr.y - this._movePrev.y );
-			_objectSidewaysDirection.setLength( this._moveCurr.x - this._movePrev.x );
+			vec3SetLength( _objectUpDirection, this._moveCurr.y - this._movePrev.y, _objectUpDirection );
+			vec3SetLength( _objectSidewaysDirection, this._moveCurr.x - this._movePrev.x, _objectSidewaysDirection );
 
-			_moveDirection.copy( _objectUpDirection.add( _objectSidewaysDirection ) );
+			vec3Add( _objectUpDirection, _objectSidewaysDirection, _moveDirection );
 
-			_axis.crossVectors( _moveDirection, this._eye ).normalize();
+			vec3CrossVectors( _moveDirection, this._eye, _axis );
+			vec3Normalize( _axis, _axis );
 
 			angle *= this.rotateSpeed;
-			_quaternion.setFromAxisAngle( _axis, angle );
+			quatSetFromAxisAngle( _axis, angle, _quaternion );
 
-			this._eye.applyQuaternion( _quaternion );
-			this.object.up.applyQuaternion( _quaternion );
+			vec3ApplyQuaternion( this._eye, _quaternion, this._eye );
+			vec3ApplyQuaternion( this.object.up, _quaternion, this.object.up );
 
-			this._lastAxis.copy( _axis );
+			vec3Copy( _axis, this._lastAxis );
 			this._lastAngle = angle;
 
 		} else if ( ! this.staticMoving && this._lastAngle ) {
 
 			this._lastAngle *= Math.sqrt( 1.0 - this.dynamicDampingFactor );
-			this._eye.copy( this.object.position ).sub( this.target );
-			_quaternion.setFromAxisAngle( this._lastAxis, this._lastAngle );
-			this._eye.applyQuaternion( _quaternion );
-			this.object.up.applyQuaternion( _quaternion );
+			vec3SubVectors( this.object.position, this.target, this._eye );
+			quatSetFromAxisAngle( this._lastAxis, this._lastAngle, _quaternion );
+			vec3ApplyQuaternion( this._eye, _quaternion, this._eye );
+			vec3ApplyQuaternion( this.object.up, _quaternion, this.object.up );
 
 		}
 
-		this._movePrev.copy( this._moveCurr );
+		vec2Copy( this._moveCurr, this._movePrev );
 
 	}
 
@@ -500,7 +529,7 @@ class TrackballControls extends Controls {
 
 			if ( this.object.isPerspectiveCamera ) {
 
-				this._eye.multiplyScalar( factor );
+				vec3MultiplyScalar( this._eye, factor, this._eye );
 
 			} else if ( this.object.isOrthographicCamera ) {
 
@@ -526,7 +555,7 @@ class TrackballControls extends Controls {
 
 				if ( this.object.isPerspectiveCamera ) {
 
-					this._eye.multiplyScalar( factor );
+					vec3MultiplyScalar( this._eye, factor, this._eye );
 
 				} else if ( this.object.isOrthographicCamera ) {
 
@@ -548,7 +577,7 @@ class TrackballControls extends Controls {
 
 			if ( this.staticMoving ) {
 
-				this._zoomStart.copy( this._zoomEnd );
+				vec2Copy( this._zoomEnd, this._zoomStart );
 
 			} else {
 
@@ -562,9 +591,10 @@ class TrackballControls extends Controls {
 
 	_getMouseOnScreen( pageX, pageY ) {
 
-		_v2.set(
+		vec2Set(
 			( pageX - this.screen.left ) / this.screen.width,
-			( pageY - this.screen.top ) / this.screen.height
+			( pageY - this.screen.top ) / this.screen.height,
+			_v2
 		);
 
 		return _v2;
@@ -573,9 +603,10 @@ class TrackballControls extends Controls {
 
 	_getMouseOnCircle( pageX, pageY ) {
 
-		_v2.set(
+		vec2Set(
 			( ( pageX - this.screen.width * 0.5 - this.screen.left ) / ( this.screen.width * 0.5 ) ),
-			( ( this.screen.height + 2 * ( this.screen.top - pageY ) ) / this.screen.width ) // screen.width intentional
+			( ( this.screen.height + 2 * ( this.screen.top - pageY ) ) / this.screen.width ), // screen.width intentional
+			_v2
 		);
 
 		return _v2;
@@ -611,12 +642,12 @@ class TrackballControls extends Controls {
 
 		if ( position === undefined ) {
 
-			position = new Vector2();
+			position = vec2Create();
 			this._pointerPositions[ event.pointerId ] = position;
 
 		}
 
-		position.set( event.pageX, event.pageY );
+		vec2Set( event.pageX, event.pageY, position );
 
 	}
 
@@ -632,17 +663,19 @@ class TrackballControls extends Controls {
 
 		if ( ! this.noZoom || ! this.noPan ) {
 
-			if ( this._eye.lengthSq() > this.maxDistance * this.maxDistance ) {
+			if ( vec3LengthSq( this._eye ) > this.maxDistance * this.maxDistance ) {
 
-				this.object.position.addVectors( this.target, this._eye.setLength( this.maxDistance ) );
-				this._zoomStart.copy( this._zoomEnd );
+				vec3SetLength( this._eye, this.maxDistance, this._eye );
+				vec3AddVectors( this.target, this._eye, this.object.position );
+				vec2Copy( this._zoomEnd, this._zoomStart );
 
 			}
 
-			if ( this._eye.lengthSq() < this.minDistance * this.minDistance ) {
+			if ( vec3LengthSq( this._eye ) < this.minDistance * this.minDistance ) {
 
-				this.object.position.addVectors( this.target, this._eye.setLength( this.minDistance ) );
-				this._zoomStart.copy( this._zoomEnd );
+				vec3SetLength( this._eye, this.minDistance, this._eye );
+				vec3AddVectors( this.target, this._eye, this.object.position );
+				vec2Copy( this._zoomEnd, this._zoomStart );
 
 			}
 
@@ -814,18 +847,18 @@ function onMouseDown( event ) {
 
 	if ( state === _STATE.ROTATE && ! this.noRotate ) {
 
-		this._moveCurr.copy( this._getMouseOnCircle( event.pageX, event.pageY ) );
-		this._movePrev.copy( this._moveCurr );
+		vec2Copy( this._getMouseOnCircle( event.pageX, event.pageY ), this._moveCurr );
+		vec2Copy( this._moveCurr, this._movePrev );
 
 	} else if ( state === _STATE.ZOOM && ! this.noZoom ) {
 
-		this._zoomStart.copy( this._getMouseOnScreen( event.pageX, event.pageY ) );
-		this._zoomEnd.copy( this._zoomStart );
+		vec2Copy( this._getMouseOnScreen( event.pageX, event.pageY ), this._zoomStart );
+		vec2Copy( this._zoomStart, this._zoomEnd );
 
 	} else if ( state === _STATE.PAN && ! this.noPan ) {
 
-		this._panStart.copy( this._getMouseOnScreen( event.pageX, event.pageY ) );
-		this._panEnd.copy( this._panStart );
+		vec2Copy( this._getMouseOnScreen( event.pageX, event.pageY ), this._panStart );
+		vec2Copy( this._panStart, this._panEnd );
 
 	}
 
@@ -839,16 +872,16 @@ function onMouseMove( event ) {
 
 	if ( state === _STATE.ROTATE && ! this.noRotate ) {
 
-		this._movePrev.copy( this._moveCurr );
-		this._moveCurr.copy( this._getMouseOnCircle( event.pageX, event.pageY ) );
+		vec2Copy( this._moveCurr, this._movePrev );
+		vec2Copy( this._getMouseOnCircle( event.pageX, event.pageY ), this._moveCurr );
 
 	} else if ( state === _STATE.ZOOM && ! this.noZoom ) {
 
-		this._zoomEnd.copy( this._getMouseOnScreen( event.pageX, event.pageY ) );
+		vec2Copy( this._getMouseOnScreen( event.pageX, event.pageY ), this._zoomEnd );
 
 	} else if ( state === _STATE.PAN && ! this.noPan ) {
 
-		this._panEnd.copy( this._getMouseOnScreen( event.pageX, event.pageY ) );
+		vec2Copy( this._getMouseOnScreen( event.pageX, event.pageY ), this._panEnd );
 
 	}
 
@@ -910,8 +943,8 @@ function onTouchStart( event ) {
 
 		case 1:
 			this.state = _STATE.TOUCH_ROTATE;
-			this._moveCurr.copy( this._getMouseOnCircle( this._pointers[ 0 ].pageX, this._pointers[ 0 ].pageY ) );
-			this._movePrev.copy( this._moveCurr );
+			vec2Copy( this._getMouseOnCircle( this._pointers[ 0 ].pageX, this._pointers[ 0 ].pageY ), this._moveCurr );
+			vec2Copy( this._moveCurr, this._movePrev );
 			break;
 
 		default: // 2 or more
@@ -922,8 +955,8 @@ function onTouchStart( event ) {
 
 			const x = ( this._pointers[ 0 ].pageX + this._pointers[ 1 ].pageX ) / 2;
 			const y = ( this._pointers[ 0 ].pageY + this._pointers[ 1 ].pageY ) / 2;
-			this._panStart.copy( this._getMouseOnScreen( x, y ) );
-			this._panEnd.copy( this._panStart );
+			vec2Copy( this._getMouseOnScreen( x, y ), this._panStart );
+			vec2Copy( this._panStart, this._panEnd );
 			break;
 
 	}
@@ -939,8 +972,8 @@ function onTouchMove( event ) {
 	switch ( this._pointers.length ) {
 
 		case 1:
-			this._movePrev.copy( this._moveCurr );
-			this._moveCurr.copy( this._getMouseOnCircle( event.pageX, event.pageY ) );
+			vec2Copy( this._moveCurr, this._movePrev );
+			vec2Copy( this._getMouseOnCircle( event.pageX, event.pageY ), this._moveCurr );
 			break;
 
 		default: // 2 or more
@@ -953,7 +986,7 @@ function onTouchMove( event ) {
 
 			const x = ( event.pageX + position.x ) / 2;
 			const y = ( event.pageY + position.y ) / 2;
-			this._panEnd.copy( this._getMouseOnScreen( x, y ) );
+			vec2Copy( this._getMouseOnScreen( x, y ), this._panEnd );
 			break;
 
 	}
@@ -970,8 +1003,8 @@ function onTouchEnd( event ) {
 
 		case 1:
 			this.state = _STATE.TOUCH_ROTATE;
-			this._moveCurr.copy( this._getMouseOnCircle( event.pageX, event.pageY ) );
-			this._movePrev.copy( this._moveCurr );
+			vec2Copy( this._getMouseOnCircle( event.pageX, event.pageY ), this._moveCurr );
+			vec2Copy( this._moveCurr, this._movePrev );
 			break;
 
 		case 2:
@@ -982,8 +1015,8 @@ function onTouchEnd( event ) {
 				if ( this._pointers[ i ].pointerId !== event.pointerId ) {
 
 					const position = this._pointerPositions[ this._pointers[ i ].pointerId ];
-					this._moveCurr.copy( this._getMouseOnCircle( position.x, position.y ) );
-					this._movePrev.copy( this._moveCurr );
+					vec2Copy( this._getMouseOnCircle( position.x, position.y ), this._moveCurr );
+					vec2Copy( this._moveCurr, this._movePrev );
 					break;
 
 				}

@@ -1,6 +1,6 @@
 import {
 	Group,
-	Matrix4
+	mat4MakeTranslation
 } from 'three';
 
 import { MeshStandardNodeMaterial } from 'three/webgpu';
@@ -66,7 +66,7 @@ class CityGenerator {
 
 				if ( curb > 0 ) {
 
-					slabs.push( new Matrix4().makeTranslation( blockX + L.blockW / 2, 0, blockZ + L.blockD / 2 ) );
+					slabs.push( mat4MakeTranslation( blockX + L.blockW / 2, 0, blockZ + L.blockD / 2 ) );
 
 				}
 

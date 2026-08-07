@@ -1,15 +1,23 @@
 import {
 	Controls,
 	MathUtils,
-	Spherical,
-	Vector3
+	sphericalCreate,
+	sphericalSetFromVector3,
+	vec3Add,
+	vec3AddScaledVector,
+	vec3ApplyQuaternion,
+	vec3Copy,
+	vec3Create,
+	vec3Lerp,
+	vec3Set,
+	vec3SetFromSphericalCoords
 } from 'three';
 
-const _lookDirection = new Vector3();
-const _spherical = new Spherical();
-const _target = new Vector3();
-const _targetPosition = new Vector3();
-const _targetVelocity = new Vector3();
+const _lookDirection = /*@__PURE__*/ vec3Create();
+const _spherical = /*@__PURE__*/ sphericalCreate();
+const _target = /*@__PURE__*/ vec3Create();
+const _targetPosition = /*@__PURE__*/ vec3Create();
+const _targetVelocity = /*@__PURE__*/ vec3Create();
 
 /**
  * This class is an alternative implementation of {@link FlyControls}.
@@ -138,7 +146,7 @@ class FirstPersonControls extends Controls {
 
 		// internals
 
-		this._velocity = new Vector3();
+		this._velocity = /*@__PURE__*/ vec3Create();
 
 		this._pointerX = 0;
 		this._pointerY = 0;
@@ -242,15 +250,15 @@ class FirstPersonControls extends Controls {
 
 		if ( x.isVector3 ) {
 
-			_target.copy( x );
+			vec3Copy( x, _target );
 
 		} else {
 
-			_target.set( x, y, z );
+			vec3Set( _target, x, y, z );
 
 		}
 
-		this.object.lookAt( _target );
+		this.object.lookAt( _target.x, _target.y, _target.z );
 
 		this._setOrientation();
 
@@ -297,7 +305,7 @@ class FirstPersonControls extends Controls {
 		climb *= this.movementSpeed * keyScale;
 		drive *= ( drive > 0 ? forwardSpeed : this.movementSpeed ) * keyScale;
 
-		_targetVelocity.set(
+		vec3Set( _targetVelocity,
 			sinYaw * drive - cosYaw * strafe,
 			climb,
 			cosYaw * drive + sinYaw * strafe
@@ -305,16 +313,17 @@ class FirstPersonControls extends Controls {
 
 		if ( lookMove !== 0 ) {
 
-			_lookDirection.set( 0, 0, - 1 ).applyQuaternion( this.object.quaternion );
-			_targetVelocity.addScaledVector( _lookDirection, lookMove * ( lookMove > 0 ? forwardSpeed : this.movementSpeed ) );
+			vec3Set( _lookDirection, 0, 0, - 1 );
+			vec3ApplyQuaternion( _lookDirection, this.object.quaternion, _lookDirection );
+			vec3AddScaledVector( _targetVelocity, _lookDirection, lookMove * ( lookMove > 0 ? forwardSpeed : this.movementSpeed ), _targetVelocity );
 
 		}
 
 		// ease toward the target velocity for smooth acceleration and deceleration
 
-		this._velocity.lerp( _targetVelocity, this.dampingFactor );
+		vec3Lerp( this._velocity, _targetVelocity, this.dampingFactor, this._velocity );
 
-		this.object.position.addScaledVector( this._velocity, delta );
+		vec3AddScaledVector( this.object.position, this._velocity, delta, this.object.position );
 
 		let verticalLookRatio = 1;
 
@@ -348,9 +357,10 @@ class FirstPersonControls extends Controls {
 
 		const position = this.object.position;
 
-		_targetPosition.setFromSphericalCoords( 1, phi, theta ).add( position );
+		vec3SetFromSphericalCoords( 1, phi, theta, _targetPosition );
+		vec3Add( _targetPosition, position, _targetPosition );
 
-		this.object.lookAt( _targetPosition );
+		this.object.lookAt( _targetPosition.x, _targetPosition.y, _targetPosition.z );
 
 	}
 
@@ -358,8 +368,9 @@ class FirstPersonControls extends Controls {
 
 		const quaternion = this.object.quaternion;
 
-		_lookDirection.set( 0, 0, - 1 ).applyQuaternion( quaternion );
-		_spherical.setFromVector3( _lookDirection );
+		vec3Set( _lookDirection, 0, 0, - 1 );
+		vec3ApplyQuaternion( _lookDirection, quaternion, _lookDirection );
+		sphericalSetFromVector3( _lookDirection, _spherical );
 
 		this._lat = 90 - MathUtils.radToDeg( _spherical.phi );
 		this._lon = MathUtils.radToDeg( _spherical.theta );

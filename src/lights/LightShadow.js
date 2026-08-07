@@ -1,13 +1,16 @@
 import { Matrix4 } from '../math/Matrix4.js';
 import { Vector2 } from '../math/Vector2.js';
-import { Vector3 } from '../math/Vector3.js';
-import { Vector4 } from '../math/Vector4.js';
 import { Frustum } from '../math/Frustum.js';
 import { UnsignedByteType, WebGPUCoordinateSystem } from '../constants.js';
+import { mat4Create, mat4Multiply, mat4MultiplyMatrices, mat4Set } from '../math/Matrix4Functions.js';
+import { vec2Copy, vec2Create, vec2ToArray } from '../math/Vector2Functions.js';
+import { vec3Create, vec3Copy, vec3SetFromMatrixPosition } from '../math/Vector3Functions.js';
+import { vec4Create } from '../math/Vector4Functions.js';
+import { frustumSetFromProjectionMatrix } from '../math/FrustumFunctions.js';
 
-const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
-const _lightPositionWorld = /*@__PURE__*/ new Vector3();
-const _lookTarget = /*@__PURE__*/ new Vector3();
+const _projScreenMatrix = /*@__PURE__*/ mat4Create();
+const _lightPositionWorld = /*@__PURE__*/ vec3Create();
+const _lookTarget = /*@__PURE__*/ vec3Create();
 
 /**
  * Abstract base class for light shadow classes. These classes
@@ -158,13 +161,13 @@ class LightShadow {
 		this.needsUpdate = false;
 
 		this._frustum = new Frustum();
-		this._frameExtents = new Vector2( 1, 1 );
+		this._frameExtents = vec2Create( 1, 1 );
 
 		this._viewportCount = 1;
 
 		this._viewports = [
 
-			new Vector4( 0, 0, 1, 1 )
+			vec4Create( 0, 0, 1, 1 )
 
 		];
 
@@ -203,19 +206,20 @@ class LightShadow {
 		const shadowCamera = this.camera;
 		const shadowMatrix = this.matrix;
 
-		_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
-		shadowCamera.position.copy( _lightPositionWorld );
+		vec3SetFromMatrixPosition( light.matrixWorld, _lightPositionWorld );
+		vec3Copy( _lightPositionWorld, shadowCamera.position );
 
-		_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
+		vec3SetFromMatrixPosition( light.target.matrixWorld, _lookTarget );
 		shadowCamera.lookAt( _lookTarget );
 		shadowCamera.updateMatrixWorld();
 
-		_projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
-		this._frustum.setFromProjectionMatrix( _projScreenMatrix, shadowCamera.coordinateSystem, shadowCamera.reversedDepth );
+		mat4MultiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse, _projScreenMatrix );
+		frustumSetFromProjectionMatrix( _projScreenMatrix, shadowCamera.coordinateSystem, shadowCamera.reversedDepth, this._frustum );
 
 		if ( shadowCamera.coordinateSystem === WebGPUCoordinateSystem || shadowCamera.reversedDepth ) {
 
-			shadowMatrix.set(
+			mat4Set(
+				shadowMatrix,
 				0.5, 0.0, 0.0, 0.5,
 				0.0, 0.5, 0.0, 0.5,
 				0.0, 0.0, 1.0, 0.0, // Identity Z (preserving the correct [0, 1] range from the projection matrix)
@@ -224,7 +228,8 @@ class LightShadow {
 
 		} else {
 
-			shadowMatrix.set(
+			mat4Set(
+				shadowMatrix,
 				0.5, 0.0, 0.0, 0.5,
 				0.0, 0.5, 0.0, 0.5,
 				0.0, 0.0, 0.5, 0.5,
@@ -233,7 +238,7 @@ class LightShadow {
 
 		}
 
-		shadowMatrix.multiply( _projScreenMatrix );
+		mat4Multiply( shadowMatrix, _projScreenMatrix, shadowMatrix );
 
 	}
 
@@ -300,7 +305,7 @@ class LightShadow {
 		this.normalBias = source.normalBias;
 		this.blurSamples = source.blurSamples;
 
-		this.mapSize.copy( source.mapSize );
+		vec2Copy( source.mapSize, this.mapSize );
 
 		this.biasNode = source.biasNode;
 
@@ -334,7 +339,7 @@ class LightShadow {
 		if ( this.normalBias !== 0 ) object.normalBias = this.normalBias;
 		if ( this.radius !== 1 ) object.radius = this.radius;
 		if ( this.blurSamples !== 8 ) object.blurSamples = this.blurSamples;
-		if ( this.mapSize.x !== 512 || this.mapSize.y !== 512 ) object.mapSize = this.mapSize.toArray();
+		if ( this.mapSize.x !== 512 || this.mapSize.y !== 512 ) object.mapSize = vec2ToArray( this.mapSize );
 
 		object.camera = this.camera.toJSON( false ).object;
 		delete object.camera.matrix;

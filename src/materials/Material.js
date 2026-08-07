@@ -5,6 +5,11 @@ import { generateUUID } from '../math/MathUtils.js';
 import { warn } from '../utils.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Plane } from '../math/Plane.js';
+import { colorCopy, colorGetHex, colorSet, colorSetHex } from '../math/ColorFunctions.js';
+import { vec2Copy, vec2FromArray, vec2ToArray } from '../math/Vector2Functions.js';
+import { vec3Copy } from '../math/Vector3Functions.js';
+import { eulerCopy, eulerFromArray, eulerToArray } from '../math/EulerFunctions.js';
+import { planeCopy, planeFromJSON, planeToJSON } from '../math/PlaneFunctions.js';
 
 let _materialId = 0;
 
@@ -580,15 +585,19 @@ class Material extends EventDispatcher {
 
 			if ( currentValue && currentValue.isColor ) {
 
-				currentValue.set( newValue );
+				colorSet( newValue, undefined, undefined, currentValue );
 
-			} else if (
-				( ( currentValue && currentValue.isVector2 ) && ( newValue && newValue.isVector2 ) ) ||
-				( ( currentValue && currentValue.isEuler ) && ( newValue && newValue.isEuler ) ) ||
-				( ( currentValue && currentValue.isVector3 ) && ( newValue && newValue.isVector3 ) )
-			) {
+			} else if ( ( currentValue && currentValue.isVector2 ) && ( newValue && newValue.isVector2 ) ) {
 
-				currentValue.copy( newValue );
+				vec2Copy( newValue, currentValue );
+
+			} else if ( ( currentValue && currentValue.isEuler ) && ( newValue && newValue.isEuler ) ) {
+
+				eulerCopy( newValue, currentValue );
+
+			} else if ( ( currentValue && currentValue.isVector3 ) && ( newValue && newValue.isVector3 ) ) {
+
+				vec3Copy( newValue, currentValue );
 
 			} else {
 
@@ -634,20 +643,20 @@ class Material extends EventDispatcher {
 
 		if ( this.name !== '' ) data.name = this.name;
 
-		if ( this.color && this.color.isColor ) data.color = this.color.getHex();
+		if ( this.color && this.color.isColor ) data.color = colorGetHex( this.color );
 
 		if ( this.roughness !== undefined ) data.roughness = this.roughness;
 		if ( this.metalness !== undefined ) data.metalness = this.metalness;
 
 		if ( this.sheen !== undefined ) data.sheen = this.sheen;
-		if ( this.sheenColor && this.sheenColor.isColor ) data.sheenColor = this.sheenColor.getHex();
+		if ( this.sheenColor && this.sheenColor.isColor ) data.sheenColor = colorGetHex( this.sheenColor );
 		if ( this.sheenRoughness !== undefined ) data.sheenRoughness = this.sheenRoughness;
-		if ( this.emissive && this.emissive.isColor ) data.emissive = this.emissive.getHex();
+		if ( this.emissive && this.emissive.isColor ) data.emissive = colorGetHex( this.emissive );
 		if ( this.emissiveIntensity !== undefined && this.emissiveIntensity !== 1 ) data.emissiveIntensity = this.emissiveIntensity;
 
-		if ( this.specular && this.specular.isColor ) data.specular = this.specular.getHex();
+		if ( this.specular && this.specular.isColor ) data.specular = colorGetHex( this.specular );
 		if ( this.specularIntensity !== undefined ) data.specularIntensity = this.specularIntensity;
-		if ( this.specularColor && this.specularColor.isColor ) data.specularColor = this.specularColor.getHex();
+		if ( this.specularColor && this.specularColor.isColor ) data.specularColor = colorGetHex( this.specularColor );
 		if ( this.shininess !== undefined ) data.shininess = this.shininess;
 		if ( this.clearcoat !== undefined ) data.clearcoat = this.clearcoat;
 		if ( this.clearcoatRoughness !== undefined ) data.clearcoatRoughness = this.clearcoatRoughness;
@@ -667,7 +676,7 @@ class Material extends EventDispatcher {
 		if ( this.clearcoatNormalMap && this.clearcoatNormalMap.isTexture ) {
 
 			data.clearcoatNormalMap = this.clearcoatNormalMap.toJSON( meta ).uuid;
-			data.clearcoatNormalScale = this.clearcoatNormalScale.toArray();
+			data.clearcoatNormalScale = vec2ToArray( this.clearcoatNormalScale );
 
 		}
 
@@ -740,7 +749,7 @@ class Material extends EventDispatcher {
 
 			data.normalMap = this.normalMap.toJSON( meta ).uuid;
 			data.normalMapType = this.normalMapType;
-			data.normalScale = this.normalScale.toArray();
+			data.normalScale = vec2ToArray( this.normalScale );
 
 		}
 
@@ -768,7 +777,7 @@ class Material extends EventDispatcher {
 
 		}
 
-		if ( this.envMapRotation !== undefined ) data.envMapRotation = this.envMapRotation.toArray();
+		if ( this.envMapRotation !== undefined ) data.envMapRotation = eulerToArray( this.envMapRotation );
 		if ( this.envMapIntensity !== undefined ) data.envMapIntensity = this.envMapIntensity;
 		if ( this.reflectivity !== undefined ) data.reflectivity = this.reflectivity;
 		if ( this.refractionRatio !== undefined ) data.refractionRatio = this.refractionRatio;
@@ -784,7 +793,7 @@ class Material extends EventDispatcher {
 		if ( this.thickness !== undefined ) data.thickness = this.thickness;
 		if ( this.thicknessMap && this.thicknessMap.isTexture ) data.thicknessMap = this.thicknessMap.toJSON( meta ).uuid;
 		if ( this.attenuationDistance !== undefined && this.attenuationDistance !== Infinity ) data.attenuationDistance = this.attenuationDistance;
-		if ( this.attenuationColor !== undefined ) data.attenuationColor = this.attenuationColor.getHex();
+		if ( this.attenuationColor !== undefined ) data.attenuationColor = colorGetHex( this.attenuationColor );
 
 		if ( this.size !== undefined ) data.size = this.size;
 		if ( this.shadowSide !== null ) data.shadowSide = this.shadowSide;
@@ -803,7 +812,7 @@ class Material extends EventDispatcher {
 		if ( this.blendSrcAlpha !== null ) data.blendSrcAlpha = this.blendSrcAlpha;
 		if ( this.blendDstAlpha !== null ) data.blendDstAlpha = this.blendDstAlpha;
 		if ( this.blendEquationAlpha !== null ) data.blendEquationAlpha = this.blendEquationAlpha;
-		if ( this.blendColor && this.blendColor.isColor ) data.blendColor = this.blendColor.getHex();
+		if ( this.blendColor && this.blendColor.isColor ) data.blendColor = colorGetHex( this.blendColor );
 		if ( this.blendAlpha !== 0 ) data.blendAlpha = this.blendAlpha;
 
 		if ( this.depthFunc !== LessEqualDepth ) data.depthFunc = this.depthFunc;
@@ -813,7 +822,7 @@ class Material extends EventDispatcher {
 
 		if ( Array.isArray( this.clippingPlanes ) && this.clippingPlanes.length > 0 ) {
 
-			data.clippingPlanes = this.clippingPlanes.map( plane => plane.toJSON() );
+			data.clippingPlanes = this.clippingPlanes.map( plane => planeToJSON( plane ) );
 
 		}
 
@@ -913,16 +922,16 @@ class Material extends EventDispatcher {
 
 		if ( json.uuid !== undefined ) this.uuid = json.uuid;
 		if ( json.name !== undefined ) this.name = json.name;
-		if ( json.color !== undefined && this.color !== undefined ) this.color.setHex( json.color );
+		if ( json.color !== undefined && this.color !== undefined ) colorSetHex( json.color, undefined, this.color );
 		if ( json.roughness !== undefined ) this.roughness = json.roughness;
 		if ( json.metalness !== undefined ) this.metalness = json.metalness;
 		if ( json.sheen !== undefined ) this.sheen = json.sheen;
-		if ( json.sheenColor !== undefined ) this.sheenColor = new Color().setHex( json.sheenColor );
+		if ( json.sheenColor !== undefined ) this.sheenColor = colorSetHex( json.sheenColor, undefined, new Color() );
 		if ( json.sheenRoughness !== undefined ) this.sheenRoughness = json.sheenRoughness;
-		if ( json.emissive !== undefined && this.emissive !== undefined ) this.emissive.setHex( json.emissive );
-		if ( json.specular !== undefined && this.specular !== undefined ) this.specular.setHex( json.specular );
+		if ( json.emissive !== undefined && this.emissive !== undefined ) colorSetHex( json.emissive, undefined, this.emissive );
+		if ( json.specular !== undefined && this.specular !== undefined ) colorSetHex( json.specular, undefined, this.specular );
 		if ( json.specularIntensity !== undefined ) this.specularIntensity = json.specularIntensity;
-		if ( json.specularColor !== undefined && this.specularColor !== undefined ) this.specularColor.setHex( json.specularColor );
+		if ( json.specularColor !== undefined && this.specularColor !== undefined ) colorSetHex( json.specularColor, undefined, this.specularColor );
 		if ( json.shininess !== undefined ) this.shininess = json.shininess;
 		if ( json.clearcoat !== undefined ) this.clearcoat = json.clearcoat;
 		if ( json.clearcoatRoughness !== undefined ) this.clearcoatRoughness = json.clearcoatRoughness;
@@ -934,7 +943,7 @@ class Material extends EventDispatcher {
 		if ( json.transmission !== undefined ) this.transmission = json.transmission;
 		if ( json.thickness !== undefined ) this.thickness = json.thickness;
 		if ( json.attenuationDistance !== undefined ) this.attenuationDistance = json.attenuationDistance;
-		if ( json.attenuationColor !== undefined && this.attenuationColor !== undefined ) this.attenuationColor.setHex( json.attenuationColor );
+		if ( json.attenuationColor !== undefined && this.attenuationColor !== undefined ) colorSetHex( json.attenuationColor, undefined, this.attenuationColor );
 		if ( json.anisotropy !== undefined ) this.anisotropy = json.anisotropy;
 		if ( json.anisotropyRotation !== undefined ) this.anisotropyRotation = json.anisotropyRotation;
 		if ( json.fog !== undefined ) this.fog = json.fog;
@@ -951,7 +960,7 @@ class Material extends EventDispatcher {
 		if ( json.depthTest !== undefined ) this.depthTest = json.depthTest;
 		if ( json.depthWrite !== undefined ) this.depthWrite = json.depthWrite;
 		if ( json.colorWrite !== undefined ) this.colorWrite = json.colorWrite;
-		if ( json.clippingPlanes !== undefined ) this.clippingPlanes = json.clippingPlanes.map( plane => new Plane().fromJSON( plane ) );
+		if ( json.clippingPlanes !== undefined ) this.clippingPlanes = json.clippingPlanes.map( plane => planeFromJSON( plane, new Plane() ) );
 		if ( json.clipIntersection !== undefined ) this.clipIntersection = json.clipIntersection;
 		if ( json.clipShadows !== undefined ) this.clipShadows = json.clipShadows;
 		if ( json.depthPacking !== undefined ) this.depthPacking = json.depthPacking;
@@ -961,7 +970,7 @@ class Material extends EventDispatcher {
 		if ( json.blendSrcAlpha !== undefined ) this.blendSrcAlpha = json.blendSrcAlpha;
 		if ( json.blendDstAlpha !== undefined ) this.blendDstAlpha = json.blendDstAlpha;
 		if ( json.blendEquationAlpha !== undefined ) this.blendEquationAlpha = json.blendEquationAlpha;
-		if ( json.blendColor !== undefined && this.blendColor !== undefined ) this.blendColor.setHex( json.blendColor );
+		if ( json.blendColor !== undefined && this.blendColor !== undefined ) colorSetHex( json.blendColor, undefined, this.blendColor );
 		if ( json.blendAlpha !== undefined ) this.blendAlpha = json.blendAlpha;
 		if ( json.stencilWriteMask !== undefined ) this.stencilWriteMask = json.stencilWriteMask;
 		if ( json.stencilFunc !== undefined ) this.stencilFunc = json.stencilFunc;
@@ -1046,7 +1055,7 @@ class Material extends EventDispatcher {
 
 			}
 
-			this.normalScale = new Vector2().fromArray( normalScale );
+			this.normalScale = vec2FromArray( normalScale, 0, new Vector2() );
 
 		}
 
@@ -1065,7 +1074,7 @@ class Material extends EventDispatcher {
 		if ( json.specularColorMap !== undefined ) this.specularColorMap = textures[ json.specularColorMap ] || null;
 
 		if ( json.envMap !== undefined ) this.envMap = textures[ json.envMap ] || null;
-		if ( json.envMapRotation !== undefined ) this.envMapRotation.fromArray( json.envMapRotation );
+		if ( json.envMapRotation !== undefined ) eulerFromArray( json.envMapRotation, this.envMapRotation );
 		if ( json.envMapIntensity !== undefined ) this.envMapIntensity = json.envMapIntensity;
 
 		if ( json.reflectivity !== undefined ) this.reflectivity = json.reflectivity;
@@ -1082,7 +1091,7 @@ class Material extends EventDispatcher {
 		if ( json.clearcoatMap !== undefined ) this.clearcoatMap = textures[ json.clearcoatMap ] || null;
 		if ( json.clearcoatRoughnessMap !== undefined ) this.clearcoatRoughnessMap = textures[ json.clearcoatRoughnessMap ] || null;
 		if ( json.clearcoatNormalMap !== undefined ) this.clearcoatNormalMap = textures[ json.clearcoatNormalMap ] || null;
-		if ( json.clearcoatNormalScale !== undefined ) this.clearcoatNormalScale = new Vector2().fromArray( json.clearcoatNormalScale );
+		if ( json.clearcoatNormalScale !== undefined ) this.clearcoatNormalScale = vec2FromArray( json.clearcoatNormalScale, 0, new Vector2() );
 
 		if ( json.iridescenceMap !== undefined ) this.iridescenceMap = textures[ json.iridescenceMap ] || null;
 		if ( json.iridescenceThicknessMap !== undefined ) this.iridescenceThicknessMap = textures[ json.iridescenceThicknessMap ] || null;
@@ -1133,7 +1142,7 @@ class Material extends EventDispatcher {
 		this.blendSrcAlpha = source.blendSrcAlpha;
 		this.blendDstAlpha = source.blendDstAlpha;
 		this.blendEquationAlpha = source.blendEquationAlpha;
-		this.blendColor.copy( source.blendColor );
+		colorCopy( source.blendColor, this.blendColor );
 		this.blendAlpha = source.blendAlpha;
 
 		this.depthFunc = source.depthFunc;
@@ -1159,7 +1168,7 @@ class Material extends EventDispatcher {
 
 			for ( let i = 0; i !== n; ++ i ) {
 
-				dstPlanes[ i ] = srcPlanes[ i ].clone();
+				dstPlanes[ i ] = planeCopy( srcPlanes[ i ], new Plane() );
 
 			}
 

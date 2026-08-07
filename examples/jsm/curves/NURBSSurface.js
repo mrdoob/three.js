@@ -1,5 +1,5 @@
 import {
-	Vector4
+	vec4Create
 } from 'three';
 import * as NURBSUtils from '../curves/NURBSUtils.js';
 
@@ -69,7 +69,7 @@ class NURBSSurface {
 			for ( let j = 0; j < len2; ++ j ) {
 
 				const point = controlPoints[ i ][ j ];
-				this.controlPoints[ i ][ j ] = new Vector4( point.x, point.y, point.z, point.w );
+				this.controlPoints[ i ][ j ] = vec4Create( point.x, point.y, point.z, point.w );
 
 			}
 

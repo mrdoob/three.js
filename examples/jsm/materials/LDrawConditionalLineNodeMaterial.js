@@ -1,4 +1,4 @@
-import { Color, NodeMaterial } from 'three/webgpu';
+import { Color, NodeMaterial, colorCopy } from 'three/webgpu';
 import { attribute, cameraProjectionMatrix, dot, float, Fn, modelViewMatrix, modelViewProjection, normalize, positionGeometry, sign, uniform, varyingProperty, vec2, vec4 } from 'three/tsl';
 
 /**
@@ -129,7 +129,7 @@ class LDrawConditionalLineMaterial extends NodeMaterial {
 
 				set: function ( value ) {
 
-					this._diffuseUniform.value.copy( value );
+					colorCopy( value, this._diffuseUniform.value );
 
 				}
 			}

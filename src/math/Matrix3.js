@@ -1,4 +1,29 @@
-import { warnOnce } from '../utils.js';
+import {
+	mat3Copy,
+	mat3Determinant,
+	mat3Equals,
+	mat3ExtractBasis,
+	mat3FromArray,
+	mat3GetNormalMatrix,
+	mat3Identity,
+	mat3Invert,
+	mat3MakeRotation,
+	mat3MakeScale,
+	mat3MakeTranslation,
+	mat3Multiply,
+	mat3MultiplyMatrices,
+	mat3MultiplyScalar,
+	mat3PreMultiply,
+	mat3Rotate,
+	mat3Scale,
+	mat3Set,
+	mat3SetFromMatrix4,
+	mat3SetUvTransform,
+	mat3ToArray,
+	mat3Translate,
+	mat3Transpose,
+	mat3TransposeIntoArray
+} from './Matrix3Functions.js';
 
 /**
  * Represents a 3x3 matrix.
@@ -27,21 +52,14 @@ import { warnOnce } from '../utils.js';
  * three.js documentation shows matrices in row-major order. Just bear in
  * mind that if you are reading the source code, you'll have to take the
  * transpose of any matrices outlined here to make sense of the calculations.
+ *
+ * `Matrix3` is a thin, backwards-compatible wrapper around the standalone,
+ * tree-shakeable `mat3*` functions in {@link Matrix3Functions}, which operate
+ * on any {@link Matrix3Like} object. Prefer importing those functions
+ * directly if you only need a handful of operations and want unused ones
+ * eliminated from your bundle.
  */
 class Matrix3 {
-
-	static {
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		Matrix3.prototype.isMatrix3 = true;
-
-	}
 
 	/**
 	 * Constructs a new 3x3 matrix. The arguments are supposed to be
@@ -59,6 +77,15 @@ class Matrix3 {
 	 * @param {number} [n33] - 3-3 matrix element.
 	 */
 	constructor( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		Object.defineProperty( this, 'isMatrix3', { value: true } );
 
 		/**
 		 * A column-major list of matrix values.
@@ -98,13 +125,7 @@ class Matrix3 {
 	 */
 	set( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
-		const te = this.elements;
-
-		te[ 0 ] = n11; te[ 1 ] = n21; te[ 2 ] = n31;
-		te[ 3 ] = n12; te[ 4 ] = n22; te[ 5 ] = n32;
-		te[ 6 ] = n13; te[ 7 ] = n23; te[ 8 ] = n33;
-
-		return this;
+		return mat3Set( this, n11, n12, n13, n21, n22, n23, n31, n32, n33 );
 
 	}
 
@@ -115,34 +136,19 @@ class Matrix3 {
 	 */
 	identity() {
 
-		this.set(
-
-			1, 0, 0,
-			0, 1, 0,
-			0, 0, 1
-
-		);
-
-		return this;
+		return mat3Identity( this );
 
 	}
 
 	/**
 	 * Copies the values of the given matrix to this instance.
 	 *
-	 * @param {Matrix3} m - The matrix to copy.
+	 * @param {Matrix3Like} m - The matrix to copy.
 	 * @return {Matrix3} A reference to this matrix.
 	 */
 	copy( m ) {
 
-		const te = this.elements;
-		const me = m.elements;
-
-		te[ 0 ] = me[ 0 ]; te[ 1 ] = me[ 1 ]; te[ 2 ] = me[ 2 ];
-		te[ 3 ] = me[ 3 ]; te[ 4 ] = me[ 4 ]; te[ 5 ] = me[ 5 ];
-		te[ 6 ] = me[ 6 ]; te[ 7 ] = me[ 7 ]; te[ 8 ] = me[ 8 ];
-
-		return this;
+		return mat3Copy( m, this );
 
 	}
 
@@ -156,9 +162,7 @@ class Matrix3 {
 	 */
 	extractBasis( xAxis, yAxis, zAxis ) {
 
-		xAxis.setFromMatrix3Column( this, 0 );
-		yAxis.setFromMatrix3Column( this, 1 );
-		zAxis.setFromMatrix3Column( this, 2 );
+		mat3ExtractBasis( this, xAxis, yAxis, zAxis );
 
 		return this;
 
@@ -172,41 +176,31 @@ class Matrix3 {
 	 */
 	setFromMatrix4( m ) {
 
-		const me = m.elements;
-
-		this.set(
-
-			me[ 0 ], me[ 4 ], me[ 8 ],
-			me[ 1 ], me[ 5 ], me[ 9 ],
-			me[ 2 ], me[ 6 ], me[ 10 ]
-
-		);
-
-		return this;
+		return mat3SetFromMatrix4( m, this );
 
 	}
 
 	/**
 	 * Post-multiplies this matrix by the given 3x3 matrix.
 	 *
-	 * @param {Matrix3} m - The matrix to multiply with.
+	 * @param {Matrix3Like} m - The matrix to multiply with.
 	 * @return {Matrix3} A reference to this matrix.
 	 */
 	multiply( m ) {
 
-		return this.multiplyMatrices( this, m );
+		return mat3Multiply( this, m, this );
 
 	}
 
 	/**
 	 * Pre-multiplies this matrix by the given 3x3 matrix.
 	 *
-	 * @param {Matrix3} m - The matrix to multiply with.
+	 * @param {Matrix3Like} m - The matrix to multiply with.
 	 * @return {Matrix3} A reference to this matrix.
 	 */
 	premultiply( m ) {
 
-		return this.multiplyMatrices( m, this );
+		return mat3PreMultiply( this, m, this );
 
 	}
 
@@ -214,37 +208,13 @@ class Matrix3 {
 	 * Multiples the given 3x3 matrices and stores the result
 	 * in this matrix.
 	 *
-	 * @param {Matrix3} a - The first matrix.
-	 * @param {Matrix3} b - The second matrix.
+	 * @param {Matrix3Like} a - The first matrix.
+	 * @param {Matrix3Like} b - The second matrix.
 	 * @return {Matrix3} A reference to this matrix.
 	 */
 	multiplyMatrices( a, b ) {
 
-		const ae = a.elements;
-		const be = b.elements;
-		const te = this.elements;
-
-		const a11 = ae[ 0 ], a12 = ae[ 3 ], a13 = ae[ 6 ];
-		const a21 = ae[ 1 ], a22 = ae[ 4 ], a23 = ae[ 7 ];
-		const a31 = ae[ 2 ], a32 = ae[ 5 ], a33 = ae[ 8 ];
-
-		const b11 = be[ 0 ], b12 = be[ 3 ], b13 = be[ 6 ];
-		const b21 = be[ 1 ], b22 = be[ 4 ], b23 = be[ 7 ];
-		const b31 = be[ 2 ], b32 = be[ 5 ], b33 = be[ 8 ];
-
-		te[ 0 ] = a11 * b11 + a12 * b21 + a13 * b31;
-		te[ 3 ] = a11 * b12 + a12 * b22 + a13 * b32;
-		te[ 6 ] = a11 * b13 + a12 * b23 + a13 * b33;
-
-		te[ 1 ] = a21 * b11 + a22 * b21 + a23 * b31;
-		te[ 4 ] = a21 * b12 + a22 * b22 + a23 * b32;
-		te[ 7 ] = a21 * b13 + a22 * b23 + a23 * b33;
-
-		te[ 2 ] = a31 * b11 + a32 * b21 + a33 * b31;
-		te[ 5 ] = a31 * b12 + a32 * b22 + a33 * b32;
-		te[ 8 ] = a31 * b13 + a32 * b23 + a33 * b33;
-
-		return this;
+		return mat3MultiplyMatrices( a, b, this );
 
 	}
 
@@ -256,13 +226,7 @@ class Matrix3 {
 	 */
 	multiplyScalar( s ) {
 
-		const te = this.elements;
-
-		te[ 0 ] *= s; te[ 3 ] *= s; te[ 6 ] *= s;
-		te[ 1 ] *= s; te[ 4 ] *= s; te[ 7 ] *= s;
-		te[ 2 ] *= s; te[ 5 ] *= s; te[ 8 ] *= s;
-
-		return this;
+		return mat3MultiplyScalar( this, s, this );
 
 	}
 
@@ -273,13 +237,7 @@ class Matrix3 {
 	 */
 	determinant() {
 
-		const te = this.elements;
-
-		const a = te[ 0 ], b = te[ 1 ], c = te[ 2 ],
-			d = te[ 3 ], e = te[ 4 ], f = te[ 5 ],
-			g = te[ 6 ], h = te[ 7 ], i = te[ 8 ];
-
-		return a * e * i - a * f * h - b * d * i + b * f * g + c * d * h - c * e * g;
+		return mat3Determinant( this );
 
 	}
 
@@ -292,35 +250,7 @@ class Matrix3 {
 	 */
 	invert() {
 
-		const te = this.elements,
-
-			n11 = te[ 0 ], n21 = te[ 1 ], n31 = te[ 2 ],
-			n12 = te[ 3 ], n22 = te[ 4 ], n32 = te[ 5 ],
-			n13 = te[ 6 ], n23 = te[ 7 ], n33 = te[ 8 ],
-
-			t11 = n33 * n22 - n32 * n23,
-			t12 = n32 * n13 - n33 * n12,
-			t13 = n23 * n12 - n22 * n13,
-
-			det = n11 * t11 + n21 * t12 + n31 * t13;
-
-		if ( det === 0 ) return this.set( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
-
-		const detInv = 1 / det;
-
-		te[ 0 ] = t11 * detInv;
-		te[ 1 ] = ( n31 * n23 - n33 * n21 ) * detInv;
-		te[ 2 ] = ( n32 * n21 - n31 * n22 ) * detInv;
-
-		te[ 3 ] = t12 * detInv;
-		te[ 4 ] = ( n33 * n11 - n31 * n13 ) * detInv;
-		te[ 5 ] = ( n31 * n12 - n32 * n11 ) * detInv;
-
-		te[ 6 ] = t13 * detInv;
-		te[ 7 ] = ( n21 * n13 - n23 * n11 ) * detInv;
-		te[ 8 ] = ( n22 * n11 - n21 * n12 ) * detInv;
-
-		return this;
+		return mat3Invert( this, this );
 
 	}
 
@@ -331,14 +261,7 @@ class Matrix3 {
 	 */
 	transpose() {
 
-		let tmp;
-		const m = this.elements;
-
-		tmp = m[ 1 ]; m[ 1 ] = m[ 3 ]; m[ 3 ] = tmp;
-		tmp = m[ 2 ]; m[ 2 ] = m[ 6 ]; m[ 6 ] = tmp;
-		tmp = m[ 5 ]; m[ 5 ] = m[ 7 ]; m[ 7 ] = tmp;
-
-		return this;
+		return mat3Transpose( this, this );
 
 	}
 
@@ -351,7 +274,7 @@ class Matrix3 {
 	 */
 	getNormalMatrix( matrix4 ) {
 
-		return this.setFromMatrix4( matrix4 ).invert().transpose();
+		return mat3GetNormalMatrix( matrix4, this );
 
 	}
 
@@ -363,19 +286,7 @@ class Matrix3 {
 	 */
 	transposeIntoArray( r ) {
 
-		const m = this.elements;
-
-		r[ 0 ] = m[ 0 ];
-		r[ 1 ] = m[ 3 ];
-		r[ 2 ] = m[ 6 ];
-		r[ 3 ] = m[ 1 ];
-		r[ 4 ] = m[ 4 ];
-		r[ 5 ] = m[ 7 ];
-		r[ 6 ] = m[ 2 ];
-		r[ 7 ] = m[ 5 ];
-		r[ 8 ] = m[ 8 ];
-
-		return this;
+		return mat3TransposeIntoArray( this, r );
 
 	}
 
@@ -393,16 +304,7 @@ class Matrix3 {
 	 */
 	setUvTransform( tx, ty, sx, sy, rotation, cx, cy ) {
 
-		const c = Math.cos( rotation );
-		const s = Math.sin( rotation );
-
-		this.set(
-			sx * c, sx * s, - sx * ( c * cx + s * cy ) + cx + tx,
-			- sy * s, sy * c, - sy * ( - s * cx + c * cy ) + cy + ty,
-			0, 0, 1
-		);
-
-		return this;
+		return mat3SetUvTransform( tx, ty, sx, sy, rotation, cx, cy, this );
 
 	}
 
@@ -416,11 +318,7 @@ class Matrix3 {
 	 */
 	scale( sx, sy ) {
 
-		warnOnce( 'Matrix3: .scale() is deprecated. Use .makeScale() instead.' ); // @deprecated r185
-
-		this.premultiply( _m3.makeScale( sx, sy ) );
-
-		return this;
+		return mat3Scale( this, sx, sy, this );
 
 	}
 
@@ -433,11 +331,7 @@ class Matrix3 {
 	 */
 	rotate( theta ) {
 
-		warnOnce( 'Matrix3: .rotate() is deprecated. Use .makeRotation() instead.' ); // @deprecated r185
-
-		this.premultiply( _m3.makeRotation( - theta ) );
-
-		return this;
+		return mat3Rotate( this, theta, this );
 
 	}
 
@@ -451,11 +345,7 @@ class Matrix3 {
 	 */
 	translate( tx, ty ) {
 
-		warnOnce( 'Matrix3: .translate() is deprecated. Use .makeTranslation() instead.' ); // @deprecated r185
-
-		this.premultiply( _m3.makeTranslation( tx, ty ) );
-
-		return this;
+		return mat3Translate( this, tx, ty, this );
 
 	}
 
@@ -470,29 +360,7 @@ class Matrix3 {
 	 */
 	makeTranslation( x, y ) {
 
-		if ( x.isVector2 ) {
-
-			this.set(
-
-				1, 0, x.x,
-				0, 1, x.y,
-				0, 0, 1
-
-			);
-
-		} else {
-
-			this.set(
-
-				1, 0, x,
-				0, 1, y,
-				0, 0, 1
-
-			);
-
-		}
-
-		return this;
+		return mat3MakeTranslation( x, y, this );
 
 	}
 
@@ -504,20 +372,7 @@ class Matrix3 {
 	 */
 	makeRotation( theta ) {
 
-		// counterclockwise
-
-		const c = Math.cos( theta );
-		const s = Math.sin( theta );
-
-		this.set(
-
-			c, - s, 0,
-			s, c, 0,
-			0, 0, 1
-
-		);
-
-		return this;
+		return mat3MakeRotation( theta, this );
 
 	}
 
@@ -530,36 +385,19 @@ class Matrix3 {
 	 */
 	makeScale( x, y ) {
 
-		this.set(
-
-			x, 0, 0,
-			0, y, 0,
-			0, 0, 1
-
-		);
-
-		return this;
+		return mat3MakeScale( x, y, this );
 
 	}
 
 	/**
 	 * Returns `true` if this matrix is equal with the given one.
 	 *
-	 * @param {Matrix3} matrix - The matrix to test for equality.
+	 * @param {Matrix3Like} matrix - The matrix to test for equality.
 	 * @return {boolean} Whether this matrix is equal with the given one.
 	 */
 	equals( matrix ) {
 
-		const te = this.elements;
-		const me = matrix.elements;
-
-		for ( let i = 0; i < 9; i ++ ) {
-
-			if ( te[ i ] !== me[ i ] ) return false;
-
-		}
-
-		return true;
+		return mat3Equals( this, matrix );
 
 	}
 
@@ -572,13 +410,7 @@ class Matrix3 {
 	 */
 	fromArray( array, offset = 0 ) {
 
-		for ( let i = 0; i < 9; i ++ ) {
-
-			this.elements[ i ] = array[ i + offset ];
-
-		}
-
-		return this;
+		return mat3FromArray( array, offset, this );
 
 	}
 
@@ -592,21 +424,7 @@ class Matrix3 {
 	 */
 	toArray( array = [], offset = 0 ) {
 
-		const te = this.elements;
-
-		array[ offset ] = te[ 0 ];
-		array[ offset + 1 ] = te[ 1 ];
-		array[ offset + 2 ] = te[ 2 ];
-
-		array[ offset + 3 ] = te[ 3 ];
-		array[ offset + 4 ] = te[ 4 ];
-		array[ offset + 5 ] = te[ 5 ];
-
-		array[ offset + 6 ] = te[ 6 ];
-		array[ offset + 7 ] = te[ 7 ];
-		array[ offset + 8 ] = te[ 8 ];
-
-		return array;
+		return mat3ToArray( this, array, offset );
 
 	}
 
@@ -622,7 +440,5 @@ class Matrix3 {
 	}
 
 }
-
-const _m3 = /*@__PURE__*/ new Matrix3();
 
 export { Matrix3 };

@@ -1,12 +1,13 @@
 import {
-	Matrix4,
 	Mesh,
 	MeshBasicMaterial,
 	EqualStencilFunc,
-	IncrementStencilOp
+	IncrementStencilOp,
+	mat4Create,
+	mat4MultiplyMatrices
 } from 'three';
 
-const _shadowMatrix = new Matrix4();
+const _shadowMatrix = /*@__PURE__*/ mat4Create();
 
 /**
  * A Shadow Mesh that follows a shadow-casting mesh in the scene,
@@ -121,7 +122,7 @@ class ShadowMesh extends Mesh {
 		sme[ 11 ] = - lightPosition4D.w * plane.normal.z;
 		sme[ 15 ] = dot - lightPosition4D.w * - plane.constant;
 
-		this.matrix.multiplyMatrices( _shadowMatrix, this.meshMatrix );
+		mat4MultiplyMatrices( _shadowMatrix, this.meshMatrix, this.matrix );
 
 	}
 

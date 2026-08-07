@@ -1,4 +1,4 @@
-import { TempNode, NodeMaterial, NodeUpdateType, RenderTarget, Vector2, HalfFloatType, RedFormat, QuadMesh, RendererUtils } from 'three/webgpu';
+import { TempNode, NodeMaterial, NodeUpdateType, RenderTarget, HalfFloatType, RedFormat, QuadMesh, RendererUtils, vec2Create, vec2Set } from 'three/webgpu';
 import { convertToTexture, nodeObject, Fn, uniform, smoothstep, step, texture, max, uniformArray, outputStruct, property, vec4, vec3, uv, Loop, min, mix, float, context } from 'three/tsl';
 import { gaussianBlur } from './GaussianBlurNode.js';
 
@@ -77,7 +77,7 @@ class DepthOfFieldNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
-		this._invSize = uniform( new Vector2() );
+		this._invSize = uniform( vec2Create(), 'vec2' );
 
 		/**
 		 * The render target used for the near and far field.
@@ -233,7 +233,7 @@ class DepthOfFieldNode extends TempNode {
 	 */
 	setSize( width, height ) {
 
-		this._invSize.value.set( 1 / width, 1 / height );
+		vec2Set( 1 / width, 1 / height, this._invSize.value );
 
 		this._CoCRT.setSize( width, height );
 		this._compositeRT.setSize( width, height );
@@ -386,7 +386,7 @@ class DepthOfFieldNode extends TempNode {
 
 		// bokeh 64 blur pass
 
-		const bokeh64 = uniformArray( kernels.points64 );
+		const bokeh64 = uniformArray( kernels.points64, 'vec2' );
 
 		const blur64 = Fn( () => {
 
@@ -417,7 +417,7 @@ class DepthOfFieldNode extends TempNode {
 
 		// bokeh 16 blur pass
 
-		const bokeh16 = uniformArray( kernels.points16 );
+		const bokeh16 = uniformArray( kernels.points16, 'vec2' );
 
 		const blur16 = Fn( () => {
 
@@ -500,7 +500,7 @@ class DepthOfFieldNode extends TempNode {
 			const theta = i * GOLDEN_ANGLE;
 			const r = Math.sqrt( i ) / Math.sqrt( SAMPLES );
 
-			const p = new Vector2( r * Math.cos( theta ), r * Math.sin( theta ) );
+			const p = vec2Create( r * Math.cos( theta ), r * Math.sin( theta ) );
 
 			if ( i % 5 === 0 ) {
 

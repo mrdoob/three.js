@@ -27,15 +27,38 @@ import {
 	PerspectiveCamera,
 	Points,
 	PointsMaterial,
-	Quaternion,
 	RepeatWrapping,
 	Scene,
 	ShapeUtils,
 	SphereGeometry,
 	SRGBColorSpace,
 	TextureLoader,
-	Vector2,
-	Vector3
+	vec2Create,
+	vec2Set,
+	vec2FromArray,
+	vec3Create,
+	vec3Set,
+	vec3Copy,
+	vec3Add,
+	vec3SubVectors,
+	vec3Cross,
+	vec3Normalize,
+	vec3Multiply,
+	vec3FromArray,
+	vec3FromBufferAttribute,
+	vec3ApplyQuaternion,
+	vec3AngleTo,
+	vec3SetFromSphericalCoords,
+	quatCreate,
+	quatSetFromAxisAngle,
+	colorCreate,
+	colorSet,
+	colorSetRGB,
+	colorSetHex,
+	colorCopy,
+	colorLerp,
+	colorFromBufferAttribute,
+	vec2Copy
 } from 'three';
 import chevrotain from '../libs/chevrotain.module.min.js';
 
@@ -842,13 +865,13 @@ class VRMLLoader extends Loader {
 						break;
 
 					case 'rotation':
-						const axis = new Vector3( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] ).normalize();
+						const axis = vec3Normalize( vec3Set( vec3Create(), fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] ) );
 						const angle = fieldValues[ 3 ];
-						object.quaternion.setFromAxisAngle( axis, angle );
+						quatSetFromAxisAngle( axis, angle, object.quaternion );
 						break;
 
 					case 'scale':
-						object.scale.set( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] );
+						vec3Set( object.scale, fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] );
 						break;
 
 					case 'scaleOrientation':
@@ -856,7 +879,7 @@ class VRMLLoader extends Loader {
 						break;
 
 					case 'translation':
-						object.position.set( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] );
+						vec3Set( object.position, fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] );
 						break;
 
 					case 'proxy':
@@ -960,7 +983,7 @@ class VRMLLoader extends Loader {
 
 				} else {
 
-					skyMaterial.color.setRGB( skyColor[ 0 ], skyColor[ 1 ], skyColor[ 2 ], SRGBColorSpace );
+					colorSetRGB( skyColor[ 0 ], skyColor[ 1 ], skyColor[ 2 ], SRGBColorSpace, skyMaterial.color );
 
 				}
 
@@ -1068,7 +1091,7 @@ class VRMLLoader extends Loader {
 
 						if ( material.isMeshPhongMaterial ) {
 
-							pointsMaterial.color.copy( material.emissive );
+							colorCopy( material.emissive, pointsMaterial.color );
 
 						}
 
@@ -1095,7 +1118,7 @@ class VRMLLoader extends Loader {
 
 						if ( material.isMeshPhongMaterial ) {
 
-							lineMaterial.color.copy( material.emissive );
+							colorCopy( material.emissive, lineMaterial.color );
 
 						}
 
@@ -1159,10 +1182,10 @@ class VRMLLoader extends Loader {
 
 							const materialData = getNode( fieldValues[ 0 ] );
 
-							if ( materialData.diffuseColor ) material.color.copy( materialData.diffuseColor );
-							if ( materialData.emissiveColor ) material.emissive.copy( materialData.emissiveColor );
+							if ( materialData.diffuseColor ) colorCopy( materialData.diffuseColor, material.color );
+							if ( materialData.emissiveColor ) colorCopy( materialData.emissiveColor, material.emissive );
 							if ( materialData.shininess ) material.shininess = materialData.shininess;
-							if ( materialData.specularColor ) material.specular.copy( materialData.specularColor );
+							if ( materialData.specularColor ) colorCopy( materialData.specularColor, material.specular );
 							if ( materialData.transparency ) material.opacity = 1 - materialData.transparency;
 							if ( materialData.transparency > 0 ) material.transparent = true;
 
@@ -1229,11 +1252,11 @@ class VRMLLoader extends Loader {
 							break;
 
 						case TEXTURE_TYPE.RGB:
-							material.color.set( 0xffffff ); // ignore material color
+							colorSetHex( 0xffffff, undefined, material.color ); // ignore material color
 							break;
 
 						case TEXTURE_TYPE.RGBA:
-							material.color.set( 0xffffff ); // ignore material color
+							colorSetHex( 0xffffff, undefined, material.color ); // ignore material color
 							material.opacity = 1; // ignore transparency
 							break;
 
@@ -1249,10 +1272,10 @@ class VRMLLoader extends Loader {
 
 				if ( transformData ) {
 
-					material.map.center.copy( transformData.center );
+					vec2Copy( transformData.center, material.map.center );
 					material.map.rotation = transformData.rotation;
-					material.map.repeat.copy( transformData.scale );
-					material.map.offset.copy( transformData.translation );
+					vec2Copy( transformData.scale, material.map.repeat );
+					vec2Copy( transformData.translation, material.map.offset );
 
 				}
 
@@ -1281,11 +1304,11 @@ class VRMLLoader extends Loader {
 						break;
 
 					case 'diffuseColor':
-						materialData.diffuseColor = new Color().setRGB( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ], SRGBColorSpace );
+						materialData.diffuseColor = colorSetRGB( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ], SRGBColorSpace, new Color() );
 						break;
 
 					case 'emissiveColor':
-						materialData.emissiveColor = new Color().setRGB( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ], SRGBColorSpace );
+						materialData.emissiveColor = colorSetRGB( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ], SRGBColorSpace, new Color() );
 						break;
 
 					case 'shininess':
@@ -1293,7 +1316,7 @@ class VRMLLoader extends Loader {
 						break;
 
 					case 'specularColor':
-						materialData.specularColor = new Color().setRGB( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ], SRGBColorSpace );
+						materialData.specularColor = colorSetRGB( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ], SRGBColorSpace, new Color() );
 						break;
 
 					case 'transparency':
@@ -1513,10 +1536,10 @@ class VRMLLoader extends Loader {
 		function buildTextureTransformNode( node ) {
 
 			const transformData = {
-				center: new Vector2(),
-				rotation: new Vector2(),
-				scale: new Vector2(),
-				translation: new Vector2()
+				center: vec2Create(),
+				rotation: vec2Create(),
+				scale: vec2Create(),
+				translation: vec2Create()
 			};
 
 			const fields = node.fields;
@@ -1530,7 +1553,7 @@ class VRMLLoader extends Loader {
 				switch ( fieldName ) {
 
 					case 'center':
-						transformData.center.set( fieldValues[ 0 ], fieldValues[ 1 ] );
+						vec2Set( fieldValues[ 0 ], fieldValues[ 1 ], transformData.center );
 						break;
 
 					case 'rotation':
@@ -1538,11 +1561,11 @@ class VRMLLoader extends Loader {
 						break;
 
 					case 'scale':
-						transformData.scale.set( fieldValues[ 0 ], fieldValues[ 1 ] );
+						vec2Set( fieldValues[ 0 ], fieldValues[ 1 ], transformData.scale );
 						break;
 
 					case 'translation':
-						transformData.translation.set( fieldValues[ 0 ], fieldValues[ 1 ] );
+						vec2Set( fieldValues[ 0 ], fieldValues[ 1 ], transformData.translation );
 						break;
 
 					default:
@@ -1616,13 +1639,13 @@ class VRMLLoader extends Loader {
 				switch ( fieldName ) {
 
 					case 'position':
-						camera.position.set( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 0 ] );
+						vec3Set( camera.position, fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 0 ] );
 						break;
 
 					case 'orientation':
-						const axis = new Vector3( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] ).normalize();
+						const axis = vec3Normalize( vec3Set( vec3Create(), fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] ) );
 						const angle = fieldValues[ 3 ];
-						camera.quaternion.setFromAxisAngle( axis, angle );
+						quatSetFromAxisAngle( axis, angle, camera.quaternion );
 						break;
 
 					case 'focalDistance':
@@ -2117,7 +2140,7 @@ class VRMLLoader extends Loader {
 
 		function buildBoxNode( node ) {
 
-			const size = new Vector3( 2, 2, 2 );
+			const size = vec3Set( vec3Create(), 2, 2, 2 );
 
 			const fields = node.fields;
 
@@ -2658,16 +2681,16 @@ class VRMLLoader extends Loader {
 			// vertices
 
 			const vertices = [];
-			const spineVector = new Vector3();
-			const scaling = new Vector3();
+			const spineVector = vec3Create();
+			const scaling = vec3Create();
 
-			const axis = new Vector3();
-			const vertex = new Vector3();
-			const quaternion = new Quaternion();
+			const axis = vec3Create();
+			const vertex = vec3Create();
+			const quaternion = quatCreate();
 
 			for ( let i = 0, j = 0, o = 0, il = spine.length; i < il; i += 3, j += 2, o += 4 ) {
 
-				spineVector.fromArray( spine, i );
+				vec3FromArray( spine, i, spineVector );
 
 				scaling.x = scale ? scale[ j + 0 ] : 1;
 				scaling.y = 1;
@@ -2686,16 +2709,16 @@ class VRMLLoader extends Loader {
 
 					// scale
 
-					vertex.multiply( scaling );
+					vec3Multiply( vertex, scaling, vertex );
 
 					// rotate
 
-					quaternion.setFromAxisAngle( axis, angle );
-					vertex.applyQuaternion( quaternion );
+					quatSetFromAxisAngle( axis, angle, quaternion );
+					vec3ApplyQuaternion( vertex, quaternion, vertex );
 
 					// translate
 
-					vertex.add( spineVector );
+					vec3Add( vertex, spineVector, vertex );
 
 					vertices.push( vertex.x, vertex.y, vertex.z );
 
@@ -2750,7 +2773,7 @@ class VRMLLoader extends Loader {
 
 				for ( let i = 0, l = crossSection.length; i < l; i += 2 ) {
 
-					contour.push( new Vector2( crossSection[ i ], crossSection[ i + 1 ] ) );
+					contour.push( vec2Create( crossSection[ i ], crossSection[ i + 1 ] ) );
 
 				}
 
@@ -2994,13 +3017,13 @@ class VRMLLoader extends Loader {
 
 		}
 
-		const vA = new Vector3();
-		const vB = new Vector3();
-		const vC = new Vector3();
+		const vA = vec3Create();
+		const vB = vec3Create();
+		const vC = vec3Create();
 
-		const uvA = new Vector2();
-		const uvB = new Vector2();
-		const uvC = new Vector2();
+		const uvA = vec2Create();
+		const uvB = vec2Create();
+		const uvC = vec2Create();
 
 		function computeAttributeFromIndexedData( coordIndex, index, data, itemSize ) {
 
@@ -3016,9 +3039,9 @@ class VRMLLoader extends Loader {
 
 				if ( itemSize === 2 ) {
 
-					uvA.fromArray( data, a * itemSize );
-					uvB.fromArray( data, b * itemSize );
-					uvC.fromArray( data, c * itemSize );
+					vec2FromArray( data, a * itemSize, uvA );
+					vec2FromArray( data, b * itemSize, uvB );
+					vec2FromArray( data, c * itemSize, uvC );
 
 					array.push( uvA.x, uvA.y );
 					array.push( uvB.x, uvB.y );
@@ -3026,9 +3049,9 @@ class VRMLLoader extends Loader {
 
 				} else {
 
-					vA.fromArray( data, a * itemSize );
-					vB.fromArray( data, b * itemSize );
-					vC.fromArray( data, c * itemSize );
+					vec3FromArray( data, a * itemSize, vA );
+					vec3FromArray( data, b * itemSize, vB );
+					vec3FromArray( data, c * itemSize, vC );
 
 					array.push( vA.x, vA.y, vA.z );
 					array.push( vB.x, vB.y, vB.z );
@@ -3048,7 +3071,7 @@ class VRMLLoader extends Loader {
 
 			for ( let i = 0, j = 0, l = index.length; i < l; i += 3, j ++ ) {
 
-				vA.fromArray( faceData, j * 3 );
+				vec3FromArray( faceData, j * 3, vA );
 
 				array.push( vA.x, vA.y, vA.z );
 				array.push( vA.x, vA.y, vA.z );
@@ -3066,7 +3089,7 @@ class VRMLLoader extends Loader {
 
 			for ( let i = 0, j = 0, l = index.length; i < l; i += 2, j ++ ) {
 
-				vA.fromArray( lineData, j * 3 );
+				vec3FromArray( lineData, j * 3, vA );
 
 				array.push( vA.x, vA.y, vA.z );
 				array.push( vA.x, vA.y, vA.z );
@@ -3102,8 +3125,8 @@ class VRMLLoader extends Loader {
 
 		}
 
-		const ab = new Vector3();
-		const cb = new Vector3();
+		const ab = vec3Create();
+		const cb = vec3Create();
 
 		function computeNormalAttribute( index, coord, creaseAngle ) {
 
@@ -3120,17 +3143,17 @@ class VRMLLoader extends Loader {
 
 				const face = new Face( a, b, c );
 
-				vA.fromArray( coord, a * 3 );
-				vB.fromArray( coord, b * 3 );
-				vC.fromArray( coord, c * 3 );
+				vec3FromArray( coord, a * 3, vA );
+				vec3FromArray( coord, b * 3, vB );
+				vec3FromArray( coord, c * 3, vC );
 
-				cb.subVectors( vC, vB );
-				ab.subVectors( vA, vB );
-				cb.cross( ab );
+				vec3SubVectors( vC, vB, cb );
+				vec3SubVectors( vA, vB, ab );
+				vec3Cross( cb, ab, cb );
 
-				cb.normalize();
+				vec3Normalize( cb, cb );
 
-				face.normal.copy( cb );
+				vec3Copy( cb, face.normal );
 
 				if ( vertexNormals[ a ] === undefined ) vertexNormals[ a ] = [];
 				if ( vertexNormals[ b ] === undefined ) vertexNormals[ b ] = [];
@@ -3156,9 +3179,9 @@ class VRMLLoader extends Loader {
 				const nB = weightedNormal( vertexNormals[ face.b ], face.normal, creaseAngle );
 				const nC = weightedNormal( vertexNormals[ face.c ], face.normal, creaseAngle );
 
-				vA.fromArray( coord, face.a * 3 );
-				vB.fromArray( coord, face.b * 3 );
-				vC.fromArray( coord, face.c * 3 );
+				vec3FromArray( coord, face.a * 3, vA );
+				vec3FromArray( coord, face.b * 3, vB );
+				vec3FromArray( coord, face.c * 3, vC );
 
 				normals.push( nA.x, nA.y, nA.z );
 				normals.push( nB.x, nB.y, nB.z );
@@ -3172,19 +3195,19 @@ class VRMLLoader extends Loader {
 
 		function weightedNormal( normals, vector, creaseAngle ) {
 
-			const normal = new Vector3();
+			const normal = vec3Create();
 
 			if ( creaseAngle === 0 ) {
 
-				normal.copy( vector );
+				vec3Copy( vector, normal );
 
 			} else {
 
 				for ( let i = 0, l = normals.length; i < l; i ++ ) {
 
-					if ( normals[ i ].angleTo( vector ) < creaseAngle ) {
+					if ( vec3AngleTo( normals[ i ], vector ) < creaseAngle ) {
 
-						normal.add( normals[ i ] );
+						vec3Add( normal, normals[ i ], normal );
 
 					}
 
@@ -3192,7 +3215,7 @@ class VRMLLoader extends Loader {
 
 			}
 
-			return normal.normalize();
+			return vec3Normalize( normal, normal );
 
 		}
 
@@ -3202,7 +3225,7 @@ class VRMLLoader extends Loader {
 
 			for ( let i = 0, l = colors.length; i < l; i += 3 ) {
 
-				array.push( new Color( colors[ i ], colors[ i + 1 ], colors[ i + 2 ] ) );
+				array.push( colorSet( colors[ i ], colors[ i + 1 ], colors[ i + 2 ] ) );
 
 			}
 
@@ -3212,11 +3235,11 @@ class VRMLLoader extends Loader {
 
 		function convertColorsToLinearSRGB( attribute ) {
 
-			const color = new Color();
+			const color = colorCreate();
 
 			for ( let i = 0; i < attribute.count; i ++ ) {
 
-				color.fromBufferAttribute( attribute, i );
+				colorFromBufferAttribute( attribute, i, color );
 
 				ColorManagement.colorSpaceToWorking( color, SRGBColorSpace );
 
@@ -3260,8 +3283,7 @@ class VRMLLoader extends Loader {
 				let angle = ( i === 0 ) ? 0 : angles[ i - 1 ];
 				angle = ( topDown === true ) ? angle : ( startAngle - angle );
 
-				const point = new Vector3();
-				point.setFromSphericalCoords( radius, angle, 0 );
+				const point = vec3SetFromSphericalCoords( radius, angle, 0 );
 
 				thresholds.push( point );
 
@@ -3273,13 +3295,13 @@ class VRMLLoader extends Loader {
 			const positionAttribute = geometry.attributes.position;
 			const colorAttribute = new BufferAttribute( new Float32Array( geometry.attributes.position.count * 3 ), 3 );
 
-			const position = new Vector3();
-			const color = new Color();
+			const position = vec3Create();
+			const color = colorCreate();
 
 			for ( let i = 0; i < indices.count; i ++ ) {
 
 				const index = indices.getX( i );
-				position.fromBufferAttribute( positionAttribute, index );
+				vec3FromBufferAttribute( positionAttribute, index, position );
 
 				let thresholdIndexA, thresholdIndexB;
 				let t = 1;
@@ -3323,7 +3345,7 @@ class VRMLLoader extends Loader {
 				const colorA = colors[ thresholdIndexA ];
 				const colorB = colors[ thresholdIndexB ];
 
-				color.copy( colorA ).lerp( colorB, t );
+				colorLerp( colorA, colorB, t, color );
 
 				ColorManagement.colorSpaceToWorking( color, SRGBColorSpace );
 
@@ -3630,7 +3652,7 @@ class Face {
 		this.a = a;
 		this.b = b;
 		this.c = c;
-		this.normal = new Vector3();
+		this.normal = vec3Create();
 
 	}
 

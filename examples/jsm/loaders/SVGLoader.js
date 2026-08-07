@@ -1,5 +1,4 @@
 import {
-	Box2,
 	BufferGeometry,
 	CanvasTexture,
 	ClampToEdgeWrapping,
@@ -8,7 +7,6 @@ import {
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
-	Matrix3,
 	MeshBasicMaterial,
 	MirroredRepeatWrapping,
 	Path,
@@ -16,8 +14,46 @@ import {
 	ShapePath,
 	ShapeUtils,
 	SRGBColorSpace,
-	Vector2,
-	Vector3
+	box2Create,
+	box2ExpandByPoint,
+	box2IsEmpty,
+	colorCreate,
+	colorSetStyle,
+	colorGetStyle,
+	mat3Create,
+	mat3Set,
+	mat3Copy,
+	mat3Identity,
+	mat3Invert,
+	mat3Transpose,
+	mat3Multiply,
+	mat3MultiplyMatrices,
+	mat3PreMultiply,
+	mat3MakeTranslation,
+	mat3MakeRotation,
+	mat3MakeScale,
+	vec2Create,
+	vec2Set,
+	vec2Copy,
+	vec2Add,
+	vec2AddVectors,
+	vec2Sub,
+	vec2SubVectors,
+	vec2MultiplyScalar,
+	vec2DivideScalar,
+	vec2Normalize,
+	vec2Dot,
+	vec2Length,
+	vec2SetLength,
+	vec2Negate,
+	vec2Equals,
+	vec2DistanceTo,
+	vec2ApplyMatrix3,
+	vec2RotateAround,
+	vec2ToArray,
+	vec3Create,
+	vec3Set,
+	vec3ApplyMatrix3
 } from 'three';
 
 const COLOR_SPACE_SVG = SRGBColorSpace;
@@ -242,7 +278,7 @@ class SVGLoader extends Loader {
 
 				if ( style.fill !== undefined && style.fill !== 'none' && ! style.fill.startsWith( 'url' ) ) {
 
-					path.color.setStyle( style.fill, COLOR_SPACE_SVG );
+					colorSetStyle( style.fill, COLOR_SPACE_SVG, path.color );
 
 				}
 
@@ -253,7 +289,7 @@ class SVGLoader extends Loader {
 				const pathStyle = Object.assign( {}, style );
 				pathStyle.strokeWidth = style.strokeWidth * getTransformScale( currentTransform );
 
-				path.userData = { node: node, style: pathStyle, transform: currentTransform.clone(), gradients: gradients };
+				path.userData = { node: node, style: pathStyle, transform: mat3Copy( currentTransform ), gradients: gradients };
 
 			}
 
@@ -283,11 +319,11 @@ class SVGLoader extends Loader {
 
 				if ( transformStack.length > 0 ) {
 
-					currentTransform.copy( transformStack[ transformStack.length - 1 ] );
+					mat3Copy( transformStack[ transformStack.length - 1 ], currentTransform );
 
 				} else {
 
-					currentTransform.identity();
+					mat3Identity( currentTransform );
 
 				}
 
@@ -299,10 +335,10 @@ class SVGLoader extends Loader {
 
 			const path = new ShapePath();
 
-			const point = new Vector2();
-			const control = new Vector2();
+			const point = vec2Create();
+			const control = vec2Create();
 
-			const firstPoint = new Vector2();
+			const firstPoint = vec2Create();
 			let isFirstPoint = true;
 			let doSetFirstPoint = false;
 
@@ -351,7 +387,7 @@ class SVGLoader extends Loader {
 
 							}
 
-							if ( j === 0 ) firstPoint.copy( point );
+							if ( j === 0 ) vec2Copy( point, firstPoint );
 
 						}
 
@@ -367,7 +403,7 @@ class SVGLoader extends Loader {
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 && doSetFirstPoint === true ) vec2Copy( point, firstPoint );
 
 						}
 
@@ -383,7 +419,7 @@ class SVGLoader extends Loader {
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 && doSetFirstPoint === true ) vec2Copy( point, firstPoint );
 
 						}
 
@@ -400,7 +436,7 @@ class SVGLoader extends Loader {
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 && doSetFirstPoint === true ) vec2Copy( point, firstPoint );
 
 						}
 
@@ -424,7 +460,7 @@ class SVGLoader extends Loader {
 							point.x = numbers[ j + 4 ];
 							point.y = numbers[ j + 5 ];
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 && doSetFirstPoint === true ) vec2Copy( point, firstPoint );
 
 						}
 
@@ -448,7 +484,7 @@ class SVGLoader extends Loader {
 							point.x = numbers[ j + 2 ];
 							point.y = numbers[ j + 3 ];
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 && doSetFirstPoint === true ) vec2Copy( point, firstPoint );
 
 						}
 
@@ -470,7 +506,7 @@ class SVGLoader extends Loader {
 							point.x = numbers[ j + 2 ];
 							point.y = numbers[ j + 3 ];
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 && doSetFirstPoint === true ) vec2Copy( point, firstPoint );
 
 						}
 
@@ -494,7 +530,7 @@ class SVGLoader extends Loader {
 							point.x = numbers[ j + 0 ];
 							point.y = numbers[ j + 1 ];
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 && doSetFirstPoint === true ) vec2Copy( point, firstPoint );
 
 						}
 
@@ -508,7 +544,7 @@ class SVGLoader extends Loader {
 							// skip command if start point == end point
 							if ( numbers[ j + 5 ] == point.x && numbers[ j + 6 ] == point.y ) continue;
 
-							const start = point.clone();
+							const start = vec2Copy( point );
 							point.x = numbers[ j + 5 ];
 							point.y = numbers[ j + 6 ];
 							control.x = point.x;
@@ -517,7 +553,7 @@ class SVGLoader extends Loader {
 								path, numbers[ j ], numbers[ j + 1 ], numbers[ j + 2 ], numbers[ j + 3 ], numbers[ j + 4 ], start, point
 							);
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 && doSetFirstPoint === true ) vec2Copy( point, firstPoint );
 
 						}
 
@@ -543,7 +579,7 @@ class SVGLoader extends Loader {
 
 							}
 
-							if ( j === 0 ) firstPoint.copy( point );
+							if ( j === 0 ) vec2Copy( point, firstPoint );
 
 						}
 
@@ -559,7 +595,7 @@ class SVGLoader extends Loader {
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 && doSetFirstPoint === true ) vec2Copy( point, firstPoint );
 
 						}
 
@@ -575,7 +611,7 @@ class SVGLoader extends Loader {
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 && doSetFirstPoint === true ) vec2Copy( point, firstPoint );
 
 						}
 
@@ -592,7 +628,7 @@ class SVGLoader extends Loader {
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 && doSetFirstPoint === true ) vec2Copy( point, firstPoint );
 
 						}
 
@@ -616,7 +652,7 @@ class SVGLoader extends Loader {
 							point.x += numbers[ j + 4 ];
 							point.y += numbers[ j + 5 ];
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 && doSetFirstPoint === true ) vec2Copy( point, firstPoint );
 
 						}
 
@@ -640,7 +676,7 @@ class SVGLoader extends Loader {
 							point.x += numbers[ j + 2 ];
 							point.y += numbers[ j + 3 ];
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 && doSetFirstPoint === true ) vec2Copy( point, firstPoint );
 
 						}
 
@@ -662,7 +698,7 @@ class SVGLoader extends Loader {
 							point.x += numbers[ j + 2 ];
 							point.y += numbers[ j + 3 ];
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 && doSetFirstPoint === true ) vec2Copy( point, firstPoint );
 
 						}
 
@@ -686,7 +722,7 @@ class SVGLoader extends Loader {
 							point.x = point.x + numbers[ j + 0 ];
 							point.y = point.y + numbers[ j + 1 ];
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 && doSetFirstPoint === true ) vec2Copy( point, firstPoint );
 
 						}
 
@@ -700,7 +736,7 @@ class SVGLoader extends Loader {
 							// skip command if no displacement
 							if ( numbers[ j + 5 ] == 0 && numbers[ j + 6 ] == 0 ) continue;
 
-							const start = point.clone();
+							const start = vec2Copy( point );
 							point.x += numbers[ j + 5 ];
 							point.y += numbers[ j + 6 ];
 							control.x = point.x;
@@ -709,7 +745,7 @@ class SVGLoader extends Loader {
 								path, numbers[ j ], numbers[ j + 1 ], numbers[ j + 2 ], numbers[ j + 3 ], numbers[ j + 4 ], start, point
 							);
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+							if ( j === 0 && doSetFirstPoint === true ) vec2Copy( point, firstPoint );
 
 						}
 
@@ -722,8 +758,8 @@ class SVGLoader extends Loader {
 						if ( path.currentPath.curves.length > 0 ) {
 
 							// Reset point to beginning of Path
-							point.copy( firstPoint );
-							path.currentPath.currentPoint.copy( point );
+							vec2Copy( firstPoint, point );
+							vec2Copy( point, path.currentPath.currentPoint );
 							isFirstPoint = true;
 
 						}
@@ -1159,7 +1195,7 @@ class SVGLoader extends Loader {
 
 				if ( a.gradientTransform ) {
 
-					gradient.gradientTransform = new Matrix3();
+					gradient.gradientTransform = mat3Create();
 					parseTransformString( a.gradientTransform, gradient.gradientTransform );
 
 				}
@@ -1637,11 +1673,11 @@ class SVGLoader extends Loader {
 
 			if ( transformStack.length > 0 ) {
 
-				transform.premultiply( transformStack[ transformStack.length - 1 ] );
+				mat3PreMultiply( transform, transformStack[ transformStack.length - 1 ], transform );
 
 			}
 
-			currentTransform.copy( transform );
+			mat3Copy( transform, currentTransform );
 			transformStack.push( transform );
 
 			return transform;
@@ -1650,14 +1686,14 @@ class SVGLoader extends Loader {
 
 		function parseNodeTransform( node ) {
 
-			const transform = new Matrix3();
+			const transform = mat3Create();
 
 			if ( node.nodeName === 'use' && ( node.hasAttribute( 'x' ) || node.hasAttribute( 'y' ) ) ) {
 
 				const tx = parseFloatWithUnits( node.getAttribute( 'x' ) || 0 );
 				const ty = parseFloatWithUnits( node.getAttribute( 'y' ) || 0 );
 
-				transform.makeTranslation( tx, ty );
+				mat3MakeTranslation( tx, ty, transform );
 
 			}
 
@@ -1692,7 +1728,7 @@ class SVGLoader extends Loader {
 
 					const array = parseFloats( transformText.slice( openParPos + 1 ) );
 
-					currentTransform.identity();
+					mat3Identity( currentTransform );
 
 					switch ( transformType ) {
 
@@ -1709,7 +1745,7 @@ class SVGLoader extends Loader {
 
 								}
 
-								currentTransform.makeTranslation( tx, ty );
+								mat3MakeTranslation( tx, ty, currentTransform );
 
 							}
 
@@ -1735,11 +1771,11 @@ class SVGLoader extends Loader {
 								}
 
 								// Rotate around center (cx, cy)
-								tempTransform1.makeTranslation( - cx, - cy );
-								tempTransform2.makeRotation( angle );
-								tempTransform3.multiplyMatrices( tempTransform2, tempTransform1 );
-								tempTransform1.makeTranslation( cx, cy );
-								currentTransform.multiplyMatrices( tempTransform1, tempTransform3 );
+								mat3MakeTranslation( - cx, - cy, tempTransform1 );
+								mat3MakeRotation( angle, tempTransform2 );
+								mat3MultiplyMatrices( tempTransform2, tempTransform1, tempTransform3 );
+								mat3MakeTranslation( cx, cy, tempTransform1 );
+								mat3MultiplyMatrices( tempTransform1, tempTransform3, currentTransform );
 
 							}
 
@@ -1758,7 +1794,7 @@ class SVGLoader extends Loader {
 
 								}
 
-								currentTransform.makeScale( scaleX, scaleY );
+								mat3MakeScale( scaleX, scaleY, currentTransform );
 
 							}
 
@@ -1768,7 +1804,7 @@ class SVGLoader extends Loader {
 
 							if ( array.length === 1 ) {
 
-								currentTransform.set(
+								mat3Set( currentTransform,
 									1, Math.tan( array[ 0 ] * Math.PI / 180 ), 0,
 									0, 1, 0,
 									0, 0, 1
@@ -1782,7 +1818,7 @@ class SVGLoader extends Loader {
 
 							if ( array.length === 1 ) {
 
-								currentTransform.set(
+								mat3Set( currentTransform,
 									1, 0, 0,
 									Math.tan( array[ 0 ] * Math.PI / 180 ), 1, 0,
 									0, 0, 1
@@ -1796,7 +1832,7 @@ class SVGLoader extends Loader {
 
 							if ( array.length === 6 ) {
 
-								currentTransform.set(
+								mat3Set( currentTransform,
 									array[ 0 ], array[ 2 ], array[ 4 ],
 									array[ 1 ], array[ 3 ], array[ 5 ],
 									0, 0, 1
@@ -1808,7 +1844,7 @@ class SVGLoader extends Loader {
 
 					}
 
-					transform.premultiply( currentTransform );
+					mat3PreMultiply( transform, currentTransform, transform );
 
 				}
 
@@ -1822,9 +1858,9 @@ class SVGLoader extends Loader {
 
 			function transfVec2( v2 ) {
 
-				tempV3.set( v2.x, v2.y, 1 ).applyMatrix3( m );
+				vec3ApplyMatrix3( vec3Set( tempV3, v2.x, v2.y, 1 ), m, tempV3 );
 
-				v2.set( tempV3.x, tempV3.y );
+				vec2Set( tempV3.x, tempV3.y, v2 );
 
 			}
 
@@ -1839,21 +1875,22 @@ class SVGLoader extends Loader {
 				const cosTheta = Math.cos( curve.aRotation );
 				const sinTheta = Math.sin( curve.aRotation );
 
-				const v1 = new Vector3( a * cosTheta, a * sinTheta, 0 );
-				const v2 = new Vector3( - b * sinTheta, b * cosTheta, 0 );
+				const v1 = vec3Set( vec3Create(), a * cosTheta, a * sinTheta, 0 );
+				const v2 = vec3Set( vec3Create(), - b * sinTheta, b * cosTheta, 0 );
 
-				const f1 = v1.applyMatrix3( m );
-				const f2 = v2.applyMatrix3( m );
+				const f1 = vec3ApplyMatrix3( v1, m, v1 );
+				const f2 = vec3ApplyMatrix3( v2, m, v2 );
 
-				const mF = tempTransform0.set(
+				const mF = mat3Set(
+					tempTransform0,
 					f1.x, f2.x, 0,
 					f1.y, f2.y, 0,
 					0, 0, 1,
 				);
 
-				const mFInv = tempTransform1.copy( mF ).invert();
-				const mFInvT = tempTransform2.copy( mFInv ).transpose();
-				const mQ = mFInvT.multiply( mFInv );
+				const mFInv = mat3Invert( mF, tempTransform1 );
+				const mFInvT = mat3Transpose( mFInv, tempTransform2 );
+				const mQ = mat3Multiply( mFInvT, mFInv, mFInvT );
 				const mQe = mQ.elements;
 
 				const ed = eigenDecomposition( mQe[ 0 ], mQe[ 1 ], mQe[ 4 ] );
@@ -1872,24 +1909,26 @@ class SVGLoader extends Loader {
 
 				if ( ! isFullEllipse ) {
 
-					const mDsqrt = tempTransform1.set(
+					const mDsqrt = mat3Set(
+						tempTransform1,
 						rt1sqrt, 0, 0,
 						0, rt2sqrt, 0,
 						0, 0, 1,
 					);
 
-					const mRT = tempTransform2.set(
+					const mRT = mat3Set(
+						tempTransform2,
 						ed.cs, ed.sn, 0,
 						- ed.sn, ed.cs, 0,
 						0, 0, 1,
 					);
 
-					const mDRF = mDsqrt.multiply( mRT ).multiply( mF );
+					const mDRF = mat3Multiply( mat3Multiply( mDsqrt, mRT, mDsqrt ), mF, mDsqrt );
 
 					const transformAngle = phi => {
 
 						const { x: cosR, y: sinR } =
-							new Vector3( Math.cos( phi ), Math.sin( phi ), 0 ).applyMatrix3( mDRF );
+							vec3ApplyMatrix3( vec3Set( vec3Create(), Math.cos( phi ), Math.sin( phi ), 0 ), mDRF );
 
 						return Math.atan2( sinR, cosR );
 
@@ -1976,7 +2015,7 @@ class SVGLoader extends Loader {
 
 						// Transform ellipse center point
 
-						tempV2.set( curve.aX, curve.aY );
+						vec2Set( curve.aX, curve.aY, tempV2 );
 						transfVec2( tempV2 );
 						curve.aX = tempV2.x;
 						curve.aY = tempV2.y;
@@ -2132,14 +2171,14 @@ class SVGLoader extends Loader {
 
 		const transformStack = [];
 
-		const tempTransform0 = new Matrix3();
-		const tempTransform1 = new Matrix3();
-		const tempTransform2 = new Matrix3();
-		const tempTransform3 = new Matrix3();
-		const tempV2 = new Vector2();
-		const tempV3 = new Vector3();
+		const tempTransform0 = mat3Create();
+		const tempTransform1 = mat3Create();
+		const tempTransform2 = mat3Create();
+		const tempTransform3 = mat3Create();
+		const tempV2 = vec2Create();
+		const tempV3 = vec3Create();
 
-		const currentTransform = new Matrix3();
+		const currentTransform = mat3Create();
 
 		const xml = new DOMParser().parseFromString( text, 'image/svg+xml' ); // application/xml
 
@@ -2225,7 +2264,7 @@ class SVGLoader extends Loader {
 		}
 
 		return new MeshBasicMaterial( {
-			color: new Color().setStyle( style.stroke, COLOR_SPACE_SVG ),
+			color: colorSetStyle( style.stroke, COLOR_SPACE_SVG, new Color() ),
 			opacity: style.strokeOpacity * ( style.opacity || 1 ),
 			transparent: true,
 			side: DoubleSide,
@@ -2330,23 +2369,23 @@ class SVGLoader extends Loader {
 		// if 'vertices' parameter is undefined no triangles will be generated, but the returned vertices count will still be valid (useful to preallocate the buffers)
 		// 'normals' and 'uvs' buffers are optional
 
-		const tempV2_1 = new Vector2();
-		const tempV2_2 = new Vector2();
-		const tempV2_3 = new Vector2();
-		const tempV2_4 = new Vector2();
-		const tempV2_5 = new Vector2();
-		const tempV2_6 = new Vector2();
-		const tempV2_7 = new Vector2();
-		const lastPointL = new Vector2();
-		const lastPointR = new Vector2();
-		const point0L = new Vector2();
-		const point0R = new Vector2();
-		const currentPointL = new Vector2();
-		const currentPointR = new Vector2();
-		const nextPointL = new Vector2();
-		const nextPointR = new Vector2();
-		const innerPoint = new Vector2();
-		const outerPoint = new Vector2();
+		const tempV2_1 = vec2Create();
+		const tempV2_2 = vec2Create();
+		const tempV2_3 = vec2Create();
+		const tempV2_4 = vec2Create();
+		const tempV2_5 = vec2Create();
+		const tempV2_6 = vec2Create();
+		const tempV2_7 = vec2Create();
+		const lastPointL = vec2Create();
+		const lastPointR = vec2Create();
+		const point0L = vec2Create();
+		const point0R = vec2Create();
+		const currentPointL = vec2Create();
+		const currentPointR = vec2Create();
+		const nextPointL = vec2Create();
+		const nextPointR = vec2Create();
+		const innerPoint = vec2Create();
+		const outerPoint = vec2Create();
 
 		arcDivisions = arcDivisions !== undefined ? arcDivisions : 12;
 		minDistance = minDistance !== undefined ? minDistance : 0.001;
@@ -2359,7 +2398,7 @@ class SVGLoader extends Loader {
 
 		if ( numPoints < 2 ) return 0;
 
-		const isClosed = points[ 0 ].equals( points[ numPoints - 1 ] );
+		const isClosed = vec2Equals( points[ 0 ], points[ numPoints - 1 ] );
 
 		let currentPoint;
 		let previousPoint = points[ 0 ];
@@ -2380,11 +2419,11 @@ class SVGLoader extends Loader {
 		let currentCoordinateUV = vertexOffset * 2;
 
 		// Get initial left and right stroke points
-		getNormal( points[ 0 ], points[ 1 ], tempV2_1 ).multiplyScalar( strokeWidth2 );
-		lastPointL.copy( points[ 0 ] ).sub( tempV2_1 );
-		lastPointR.copy( points[ 0 ] ).add( tempV2_1 );
-		point0L.copy( lastPointL );
-		point0R.copy( lastPointR );
+		vec2MultiplyScalar( getNormal( points[ 0 ], points[ 1 ], tempV2_1 ), strokeWidth2, tempV2_1 );
+		vec2Sub( points[ 0 ], tempV2_1, lastPointL );
+		vec2Add( points[ 0 ], tempV2_1, lastPointR );
+		vec2Copy( lastPointL, point0L );
+		vec2Copy( lastPointR, point0R );
 
 		for ( let iPoint = 1; iPoint < numPoints; iPoint ++ ) {
 
@@ -2410,9 +2449,9 @@ class SVGLoader extends Loader {
 			const normal1 = tempV2_1;
 			getNormal( previousPoint, currentPoint, normal1 );
 
-			tempV2_3.copy( normal1 ).multiplyScalar( strokeWidth2 );
-			currentPointL.copy( currentPoint ).sub( tempV2_3 );
-			currentPointR.copy( currentPoint ).add( tempV2_3 );
+			vec2MultiplyScalar( normal1, strokeWidth2, tempV2_3 );
+			vec2Sub( currentPoint, tempV2_3, currentPointL );
+			vec2Add( currentPoint, tempV2_3, currentPointR );
 
 			u1 = u0 + deltaU;
 
@@ -2423,13 +2462,13 @@ class SVGLoader extends Loader {
 				// Normal of next segment in tempV2_2
 				getNormal( currentPoint, nextPoint, tempV2_2 );
 
-				tempV2_3.copy( tempV2_2 ).multiplyScalar( strokeWidth2 );
-				nextPointL.copy( currentPoint ).sub( tempV2_3 );
-				nextPointR.copy( currentPoint ).add( tempV2_3 );
+				vec2MultiplyScalar( tempV2_2, strokeWidth2, tempV2_3 );
+				vec2Sub( currentPoint, tempV2_3, nextPointL );
+				vec2Add( currentPoint, tempV2_3, nextPointR );
 
 				joinIsOnLeftSide = true;
-				tempV2_3.subVectors( nextPoint, previousPoint );
-				if ( normal1.dot( tempV2_3 ) < 0 ) {
+				vec2SubVectors( nextPoint, previousPoint, tempV2_3 );
+				if ( vec2Dot( normal1, tempV2_3 ) < 0 ) {
 
 					joinIsOnLeftSide = false;
 
@@ -2437,34 +2476,33 @@ class SVGLoader extends Loader {
 
 				if ( iPoint === 1 ) initialJoinIsOnLeftSide = joinIsOnLeftSide;
 
-				tempV2_3.subVectors( nextPoint, currentPoint );
-				tempV2_3.normalize();
-				const dot = Math.abs( normal1.dot( tempV2_3 ) );
+				vec2Normalize( vec2SubVectors( nextPoint, currentPoint, tempV2_3 ), tempV2_3 );
+				const dot = Math.abs( vec2Dot( normal1, tempV2_3 ) );
 
 				// If path is straight, don't create join
 				if ( dot > Number.EPSILON ) {
 
 					// Compute inner and outer segment intersections
 					const miterSide = strokeWidth2 / dot;
-					tempV2_3.multiplyScalar( - miterSide );
-					tempV2_4.subVectors( currentPoint, previousPoint );
-					tempV2_5.copy( tempV2_4 ).setLength( miterSide ).add( tempV2_3 );
-					innerPoint.copy( tempV2_5 ).negate();
-					const miterLength2 = tempV2_5.length();
-					const segmentLengthPrev = tempV2_4.length();
-					tempV2_4.divideScalar( segmentLengthPrev );
-					tempV2_6.subVectors( nextPoint, currentPoint );
-					const segmentLengthNext = tempV2_6.length();
-					tempV2_6.divideScalar( segmentLengthNext );
+					vec2MultiplyScalar( tempV2_3, - miterSide, tempV2_3 );
+					vec2SubVectors( currentPoint, previousPoint, tempV2_4 );
+					vec2Add( vec2SetLength( tempV2_4, miterSide, tempV2_5 ), tempV2_3, tempV2_5 );
+					vec2Negate( tempV2_5, innerPoint );
+					const miterLength2 = vec2Length( tempV2_5 );
+					const segmentLengthPrev = vec2Length( tempV2_4 );
+					vec2DivideScalar( tempV2_4, segmentLengthPrev, tempV2_4 );
+					vec2SubVectors( nextPoint, currentPoint, tempV2_6 );
+					const segmentLengthNext = vec2Length( tempV2_6 );
+					vec2DivideScalar( tempV2_6, segmentLengthNext, tempV2_6 );
 					// Check that previous and next segments doesn't overlap with the innerPoint of intersection
-					if ( tempV2_4.dot( innerPoint ) < segmentLengthPrev && tempV2_6.dot( innerPoint ) < segmentLengthNext ) {
+					if ( vec2Dot( tempV2_4, innerPoint ) < segmentLengthPrev && vec2Dot( tempV2_6, innerPoint ) < segmentLengthNext ) {
 
 						innerSideModified = true;
 
 					}
 
-					outerPoint.copy( tempV2_5 ).add( currentPoint );
-					innerPoint.add( currentPoint );
+					vec2Add( tempV2_5, currentPoint, outerPoint );
+					vec2Add( innerPoint, currentPoint, innerPoint );
 
 					// in-loop fold detection to mitigate #25326
 					if ( innerSideModified ) {
@@ -2476,7 +2514,7 @@ class SVGLoader extends Loader {
 							- ( outerPoint.y - refPt.y ) * ( innerPoint.x - refPt.x );
 						if ( ( joinIsOnLeftSide && foldCross < 0 ) || ( ! joinIsOnLeftSide && foldCross > 0 ) ) {
 
-							innerPoint.copy( refPt );
+							vec2Copy( refPt, innerPoint );
 
 						}
 
@@ -2488,13 +2526,13 @@ class SVGLoader extends Loader {
 
 						if ( joinIsOnLeftSide ) {
 
-							nextPointR.copy( innerPoint );
-							currentPointR.copy( innerPoint );
+							vec2Copy( innerPoint, nextPointR );
+							vec2Copy( innerPoint, currentPointR );
 
 						} else {
 
-							nextPointL.copy( innerPoint );
-							currentPointL.copy( innerPoint );
+							vec2Copy( innerPoint, nextPointL );
+							vec2Copy( innerPoint, currentPointL );
 
 						}
 
@@ -2559,8 +2597,8 @@ class SVGLoader extends Loader {
 
 									if ( joinIsOnLeftSide ) {
 
-										tempV2_6.subVectors( outerPoint, currentPointL ).multiplyScalar( miterFraction ).add( currentPointL );
-										tempV2_7.subVectors( outerPoint, nextPointL ).multiplyScalar( miterFraction ).add( nextPointL );
+										vec2Add( vec2MultiplyScalar( vec2SubVectors( outerPoint, currentPointL, tempV2_6 ), miterFraction, tempV2_6 ), currentPointL, tempV2_6 );
+										vec2Add( vec2MultiplyScalar( vec2SubVectors( outerPoint, nextPointL, tempV2_7 ), miterFraction, tempV2_7 ), nextPointL, tempV2_7 );
 
 										addVertex( currentPointL, u1, 0 );
 										addVertex( tempV2_6, u1, 0 );
@@ -2576,8 +2614,8 @@ class SVGLoader extends Loader {
 
 									} else {
 
-										tempV2_6.subVectors( outerPoint, currentPointR ).multiplyScalar( miterFraction ).add( currentPointR );
-										tempV2_7.subVectors( outerPoint, nextPointR ).multiplyScalar( miterFraction ).add( nextPointR );
+										vec2Add( vec2MultiplyScalar( vec2SubVectors( outerPoint, currentPointR, tempV2_6 ), miterFraction, tempV2_6 ), currentPointR, tempV2_6 );
+										vec2Add( vec2MultiplyScalar( vec2SubVectors( outerPoint, nextPointR, tempV2_7 ), miterFraction, tempV2_7 ), nextPointR, tempV2_7 );
 
 										addVertex( currentPointR, u1, 1 );
 										addVertex( tempV2_6, u1, 1 );
@@ -2628,11 +2666,11 @@ class SVGLoader extends Loader {
 
 									if ( joinIsOnLeftSide ) {
 
-										nextPointL.copy( outerPoint );
+										vec2Copy( outerPoint, nextPointL );
 
 									} else {
 
-										nextPointR.copy( outerPoint );
+										vec2Copy( outerPoint, nextPointR );
 
 									}
 
@@ -2702,8 +2740,8 @@ class SVGLoader extends Loader {
 
 			previousPoint = currentPoint;
 
-			lastPointL.copy( nextPointL );
-			lastPointR.copy( nextPointR );
+			vec2Copy( nextPointL, lastPointL );
+			vec2Copy( nextPointR, lastPointR );
 
 		}
 
@@ -2730,12 +2768,12 @@ class SVGLoader extends Loader {
 
 				if ( isMiter || initialJoinIsOnLeftSide ) {
 
-					lastInner.toArray( vertices, 0 * 3 );
-					lastInner.toArray( vertices, 3 * 3 );
+					vec2ToArray( lastInner, vertices, 0 * 3 );
+					vec2ToArray( lastInner, vertices, 3 * 3 );
 
 					if ( isMiter ) {
 
-						lastOuter.toArray( vertices, 1 * 3 );
+						vec2ToArray( lastOuter, vertices, 1 * 3 );
 
 					}
 
@@ -2745,12 +2783,12 @@ class SVGLoader extends Loader {
 
 				if ( isMiter || ! initialJoinIsOnLeftSide ) {
 
-					lastInner.toArray( vertices, 1 * 3 );
-					lastInner.toArray( vertices, 3 * 3 );
+					vec2ToArray( lastInner, vertices, 1 * 3 );
+					vec2ToArray( lastInner, vertices, 3 * 3 );
 
 					if ( isMiter ) {
 
-						lastOuter.toArray( vertices, 0 * 3 );
+						vec2ToArray( lastOuter, vertices, 0 * 3 );
 
 					}
 
@@ -2766,14 +2804,14 @@ class SVGLoader extends Loader {
 
 		if ( vertices ) {
 
-			const tri = [ new Vector2(), new Vector2(), new Vector2() ];
+			const tri = [ vec2Create(), vec2Create(), vec2Create() ];
 			const startFloat = vertexOffset * 3;
 
 			for ( let t = startFloat; t < currentCoordinate; t += 9 ) {
 
-				tri[ 0 ].set( vertices[ t ], vertices[ t + 1 ] );
-				tri[ 1 ].set( vertices[ t + 3 ], vertices[ t + 4 ] );
-				tri[ 2 ].set( vertices[ t + 6 ], vertices[ t + 7 ] );
+				vec2Set( vertices[ t ], vertices[ t + 1 ], tri[ 0 ] );
+				vec2Set( vertices[ t + 3 ], vertices[ t + 4 ], tri[ 1 ] );
+				vec2Set( vertices[ t + 6 ], vertices[ t + 7 ], tri[ 2 ] );
 
 				if ( ShapeUtils.area( tri ) < 0 ) {
 
@@ -2794,8 +2832,8 @@ class SVGLoader extends Loader {
 
 		function getNormal( p1, p2, result ) {
 
-			result.subVectors( p2, p1 );
-			return result.set( - result.y, result.x ).normalize();
+			vec2SubVectors( p2, p1, result );
+			return vec2Normalize( vec2Set( - result.y, result.x, result ), result );
 
 		}
 
@@ -2837,26 +2875,26 @@ class SVGLoader extends Loader {
 			// param p1, p2: Points in the circle arc.
 			// p1 and p2 are in clockwise direction.
 
-			tempV2_1.copy( p1 ).sub( center ).normalize();
-			tempV2_2.copy( p2 ).sub( center ).normalize();
+			vec2Normalize( vec2Sub( p1, center, tempV2_1 ), tempV2_1 );
+			vec2Normalize( vec2Sub( p2, center, tempV2_2 ), tempV2_2 );
 
 			let angle = Math.PI;
-			const dot = tempV2_1.dot( tempV2_2 );
+			const dot = vec2Dot( tempV2_1, tempV2_2 );
 			if ( Math.abs( dot ) < 1 ) angle = Math.abs( Math.acos( dot ) );
 
 			angle /= arcDivisions;
 
-			tempV2_3.copy( p1 );
+			vec2Copy( p1, tempV2_3 );
 
 			for ( let i = 0, il = arcDivisions - 1; i < il; i ++ ) {
 
-				tempV2_4.copy( tempV2_3 ).rotateAround( center, angle );
+				vec2RotateAround( tempV2_3, center, angle, tempV2_4 );
 
 				addVertex( tempV2_3, u, v );
 				addVertex( tempV2_4, u, v );
 				addVertex( center, u, 0.5 );
 
-				tempV2_3.copy( tempV2_4 );
+				vec2Copy( tempV2_4, tempV2_3 );
 
 			}
 
@@ -3015,50 +3053,50 @@ class SVGLoader extends Loader {
 
 					if ( start ) {
 
-						tempV2_1.subVectors( p1, center );
-						tempV2_2.set( tempV2_1.y, - tempV2_1.x );
+						vec2SubVectors( p1, center, tempV2_1 );
+						vec2Set( tempV2_1.y, - tempV2_1.x, tempV2_2 );
 
-						tempV2_3.addVectors( tempV2_1, tempV2_2 ).add( center );
-						tempV2_4.subVectors( tempV2_2, tempV2_1 ).add( center );
+						vec2Add( vec2AddVectors( tempV2_1, tempV2_2, tempV2_3 ), center, tempV2_3 );
+						vec2Add( vec2SubVectors( tempV2_2, tempV2_1, tempV2_4 ), center, tempV2_4 );
 
 						// Modify already existing vertices
 						if ( joinIsOnLeftSide ) {
 
-							tempV2_3.toArray( vertices, 1 * 3 );
-							tempV2_4.toArray( vertices, 0 * 3 );
-							tempV2_4.toArray( vertices, 3 * 3 );
+							vec2ToArray( tempV2_3, vertices, 1 * 3 );
+							vec2ToArray( tempV2_4, vertices, 0 * 3 );
+							vec2ToArray( tempV2_4, vertices, 3 * 3 );
 
 						} else {
 
-							tempV2_3.toArray( vertices, 1 * 3 );
+							vec2ToArray( tempV2_3, vertices, 1 * 3 );
 							// using tempV2_4 to update 3rd vertex if the uv.y of 3rd vertex is 1
-							uvs[ 3 * 2 + 1 ] === 1 ? tempV2_4.toArray( vertices, 3 * 3 ) : tempV2_3.toArray( vertices, 3 * 3 );
-							tempV2_4.toArray( vertices, 0 * 3 );
+							uvs[ 3 * 2 + 1 ] === 1 ? vec2ToArray( tempV2_4, vertices, 3 * 3 ) : vec2ToArray( tempV2_3, vertices, 3 * 3 );
+							vec2ToArray( tempV2_4, vertices, 0 * 3 );
 
 						}
 
 					} else {
 
-						tempV2_1.subVectors( p2, center );
-						tempV2_2.set( tempV2_1.y, - tempV2_1.x );
+						vec2SubVectors( p2, center, tempV2_1 );
+						vec2Set( tempV2_1.y, - tempV2_1.x, tempV2_2 );
 
-						tempV2_3.addVectors( tempV2_1, tempV2_2 ).add( center );
-						tempV2_4.subVectors( tempV2_2, tempV2_1 ).add( center );
+						vec2Add( vec2AddVectors( tempV2_1, tempV2_2, tempV2_3 ), center, tempV2_3 );
+						vec2Add( vec2SubVectors( tempV2_2, tempV2_1, tempV2_4 ), center, tempV2_4 );
 
 						const vl = vertices.length;
 
 						// Modify already existing vertices
 						if ( joinIsOnLeftSide ) {
 
-							tempV2_3.toArray( vertices, vl - 1 * 3 );
-							tempV2_4.toArray( vertices, vl - 2 * 3 );
-							tempV2_4.toArray( vertices, vl - 4 * 3 );
+							vec2ToArray( tempV2_3, vertices, vl - 1 * 3 );
+							vec2ToArray( tempV2_4, vertices, vl - 2 * 3 );
+							vec2ToArray( tempV2_4, vertices, vl - 4 * 3 );
 
 						} else {
 
-							tempV2_4.toArray( vertices, vl - 2 * 3 );
-							tempV2_3.toArray( vertices, vl - 1 * 3 );
-							tempV2_4.toArray( vertices, vl - 4 * 3 );
+							vec2ToArray( tempV2_4, vertices, vl - 2 * 3 );
+							vec2ToArray( tempV2_3, vertices, vl - 1 * 3 );
+							vec2ToArray( tempV2_4, vertices, vl - 4 * 3 );
 
 						}
 
@@ -3084,7 +3122,7 @@ class SVGLoader extends Loader {
 			let dupPoints = false;
 			for ( let i = 1, n = points.length - 1; i < n; i ++ ) {
 
-				if ( points[ i ].distanceTo( points[ i + 1 ] ) < minDistance ) {
+				if ( vec2DistanceTo( points[ i ], points[ i + 1 ] ) < minDistance ) {
 
 					dupPoints = true;
 					break;
@@ -3100,7 +3138,7 @@ class SVGLoader extends Loader {
 
 			for ( let i = 1, n = points.length - 1; i < n; i ++ ) {
 
-				if ( points[ i ].distanceTo( points[ i + 1 ] ) >= minDistance ) {
+				if ( vec2DistanceTo( points[ i ], points[ i + 1 ] ) >= minDistance ) {
 
 					newPoints.push( points[ i ] );
 
@@ -3150,14 +3188,15 @@ function buildGradientTexture( gradient, shapePath, resolution = 256 ) {
 	// objectBoundingBox: bbox → local) → worldTransform → world.
 	function resolvePoint( x, y, out ) {
 
-		out.set( x, y, 1 );
-		if ( gradient.gradientTransform ) out.applyMatrix3( gradient.gradientTransform );
-		if ( isBBoxUnits ) out.set(
+		vec3Set( out, x, y, 1 );
+		if ( gradient.gradientTransform ) vec3ApplyMatrix3( out, gradient.gradientTransform, out );
+		if ( isBBoxUnits ) vec3Set(
+			out,
 			localBBox.minX + out.x * localBBox.width,
 			localBBox.minY + out.y * localBBox.height,
 			1,
 		);
-		if ( worldTransform ) out.applyMatrix3( worldTransform );
+		if ( worldTransform ) vec3ApplyMatrix3( out, worldTransform, out );
 
 	}
 
@@ -3176,8 +3215,8 @@ function buildGradientTexture( gradient, shapePath, resolution = 256 ) {
 		ctx.fillStyle = grad;
 		ctx.fillRect( 0, 0, resolution, 1 );
 
-		const p1 = new Vector3();
-		const p2 = new Vector3();
+		const p1 = vec3Create();
+		const p2 = vec3Create();
 		resolvePoint( gradient.x1, gradient.y1, p1 );
 		resolvePoint( gradient.x2, gradient.y2, p2 );
 
@@ -3189,7 +3228,8 @@ function buildGradientTexture( gradient, shapePath, resolution = 256 ) {
 		const c = - ( a * p1.x + b * p1.y );
 
 		// M * (vx, vy, 1) = (t, 0.5, 1)
-		textureMatrix = new Matrix3().set(
+		textureMatrix = mat3Set(
+			mat3Create(),
 			a, b, c,
 			0, 0, 0.5,
 			0, 0, 1,
@@ -3207,10 +3247,10 @@ function buildGradientTexture( gradient, shapePath, resolution = 256 ) {
 
 		if ( gradient.gradientTransform ) {
 
-			const tmp = new Vector3();
-			tmp.set( cx, cy, 1 ).applyMatrix3( gradient.gradientTransform );
+			const tmp = vec3Create();
+			vec3ApplyMatrix3( vec3Set( tmp, cx, cy, 1 ), gradient.gradientTransform, tmp );
 			cx = tmp.x; cy = tmp.y;
-			tmp.set( fx, fy, 1 ).applyMatrix3( gradient.gradientTransform );
+			vec3ApplyMatrix3( vec3Set( tmp, fx, fy, 1 ), gradient.gradientTransform, tmp );
 			fx = tmp.x; fy = tmp.y;
 
 		}
@@ -3246,13 +3286,14 @@ function buildGradientTexture( gradient, shapePath, resolution = 256 ) {
 		ctx.fillRect( localMinX, localMinY, localSpan, localSpan );
 
 		// UV matrix: world → local (via worldTransform⁻¹) → normalized canvas UV.
-		const inv = worldTransform ? worldTransform.clone().invert() : new Matrix3();
-		const norm = new Matrix3().set(
+		const inv = worldTransform ? mat3Invert( worldTransform ) : mat3Create();
+		const norm = mat3Set(
+			mat3Create(),
 			1 / localSpan, 0, - localMinX / localSpan,
 			0, 1 / localSpan, - localMinY / localSpan,
 			0, 0, 1,
 		);
-		textureMatrix = norm.multiply( inv );
+		textureMatrix = mat3Multiply( norm, inv, norm );
 
 	}
 
@@ -3274,23 +3315,23 @@ function buildGradientTexture( gradient, shapePath, resolution = 256 ) {
 
 function computeLocalBBox( shapePath, worldTransform ) {
 
-	const inv = worldTransform ? worldTransform.clone().invert() : null;
-	const tmp = new Vector2();
-	const box = new Box2();
+	const inv = worldTransform ? mat3Invert( worldTransform ) : null;
+	const tmp = vec2Create();
+	const box = box2Create();
 
 	for ( const subPath of shapePath.subPaths ) {
 
 		for ( const p of subPath.getPoints() ) {
 
-			tmp.copy( p );
-			if ( inv ) tmp.applyMatrix3( inv );
-			box.expandByPoint( tmp );
+			vec2Copy( p, tmp );
+			if ( inv ) vec2ApplyMatrix3( tmp, inv, tmp );
+			box2ExpandByPoint( box, tmp, box );
 
 		}
 
 	}
 
-	if ( box.isEmpty() ) return null;
+	if ( box2IsEmpty( box ) ) return null;
 
 	return { minX: box.min.x, minY: box.min.y, width: box.max.x - box.min.x, height: box.max.y - box.min.y };
 
@@ -3298,14 +3339,14 @@ function computeLocalBBox( shapePath, worldTransform ) {
 
 function addStops( canvasGradient, stops ) {
 
-	const tmpColor = new Color();
+	const tmpColor = colorCreate();
 	for ( const stop of stops ) {
 
 		let css = stop.color;
 		if ( stop.opacity < 1 ) {
 
-			tmpColor.setStyle( stop.color, COLOR_SPACE_SVG );
-			const m = /rgb\(([^)]+)\)/.exec( tmpColor.getStyle( COLOR_SPACE_SVG ) );
+			colorSetStyle( stop.color, COLOR_SPACE_SVG, tmpColor );
+			const m = /rgb\(([^)]+)\)/.exec( colorGetStyle( tmpColor, COLOR_SPACE_SVG ) );
 			if ( m ) css = `rgba(${m[ 1 ]},${stop.opacity})`;
 
 		}

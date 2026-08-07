@@ -3,8 +3,8 @@ import { WebGLShader } from './WebGLShader.js';
 import { ShaderChunk } from '../shaders/ShaderChunk.js';
 import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, CubeRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFShadowMap, VSMShadowMap, AgXToneMapping, ACESFilmicToneMapping, NeutralToneMapping, CineonToneMapping, CustomToneMapping, ReinhardToneMapping, LinearToneMapping, GLSL3, LinearTransfer, SRGBTransfer } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
-import { Vector3 } from '../../math/Vector3.js';
-import { Matrix3 } from '../../math/Matrix3.js';
+import { mat3Create } from '../../math/Matrix3Functions.js';
+import { vec3Create } from '../../math/Vector3Functions.js';
 import { warn, error } from '../../utils.js';
 
 // From https://www.khronos.org/registry/webgl/extensions/KHR_parallel_shader_compile/
@@ -31,7 +31,7 @@ function handleSource( string, errorLine ) {
 
 }
 
-const _m0 = /*@__PURE__*/ new Matrix3();
+const _m0 = /*@__PURE__*/ mat3Create();
 
 function getEncodingComponents( colorSpace ) {
 
@@ -122,7 +122,7 @@ function getToneMappingFunction( functionName, toneMapping ) {
 
 }
 
-const _v0 = /*@__PURE__*/ new Vector3();
+const _v0 = /*@__PURE__*/ vec3Create();
 
 function getLuminanceFunction() {
 

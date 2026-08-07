@@ -2,11 +2,19 @@ import {
 	AnimationClip,
 	Bone,
 	Box3,
+	box3Copy,
+	box3ExpandByVector,
+	box3GetBoundingSphere,
+	box3Set,
 	BufferAttribute,
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Color,
 	ColorManagement,
+	colorCopy,
+	colorSet,
+	colorSetHex,
+	colorSetRGB,
 	DirectionalLight,
 	DoubleSide,
 	FileLoader,
@@ -31,7 +39,9 @@ import {
 	LoaderUtils,
 	Material,
 	MathUtils,
-	Matrix4,
+	mat4Compose,
+	mat4Create,
+	mat4FromArray,
 	Mesh,
 	MeshBasicMaterial,
 	MeshPhysicalMaterial,
@@ -48,12 +58,17 @@ import {
 	Points,
 	PointsMaterial,
 	PropertyBinding,
-	Quaternion,
 	QuaternionKeyframeTrack,
+	quatCreate,
+	quatFromArray,
+	quatFromBufferAttribute,
+	quatNormalize,
+	quatToArray,
 	RepeatWrapping,
 	Skeleton,
 	SkinnedMesh,
 	Sphere,
+	sphereCopy,
 	SpotLight,
 	Texture,
 	TextureLoader,
@@ -61,6 +76,14 @@ import {
 	TriangleStripDrawMode,
 	Vector2,
 	Vector3,
+	vec2FromArray,
+	vec2Set,
+	vec3Create,
+	vec3FromArray,
+	vec3FromBufferAttribute,
+	vec3Max,
+	vec3MultiplyScalar,
+	vec3Set,
 	VectorKeyframeTrack,
 	SRGBColorSpace,
 	InstancedBufferAttribute
@@ -705,9 +728,9 @@ class GLTFLightsExtension {
 		const lightDef = lightDefs[ lightIndex ];
 		let lightNode;
 
-		const color = new Color( 0xffffff );
+		const color = colorSetHex( 0xffffff, SRGBColorSpace, new Color() );
 
-		if ( lightDef.color !== undefined ) color.setRGB( lightDef.color[ 0 ], lightDef.color[ 1 ], lightDef.color[ 2 ], LinearSRGBColorSpace );
+		if ( lightDef.color !== undefined ) colorSetRGB( lightDef.color[ 0 ], lightDef.color[ 1 ], lightDef.color[ 2 ], LinearSRGBColorSpace, color );
 
 		const range = lightDef.range !== undefined ? lightDef.range : 0;
 
@@ -715,7 +738,7 @@ class GLTFLightsExtension {
 
 			case 'directional':
 				lightNode = new DirectionalLight( color );
-				lightNode.target.position.set( 0, 0, - 1 );
+				vec3Set( lightNode.target.position, 0, 0, - 1 );
 				lightNode.add( lightNode.target );
 				break;
 
@@ -733,7 +756,7 @@ class GLTFLightsExtension {
 				lightDef.spot.outerConeAngle = lightDef.spot.outerConeAngle !== undefined ? lightDef.spot.outerConeAngle : Math.PI / 4.0;
 				lightNode.angle = lightDef.spot.outerConeAngle;
 				lightNode.penumbra = 1.0 - lightDef.spot.innerConeAngle / lightDef.spot.outerConeAngle;
-				lightNode.target.position.set( 0, 0, - 1 );
+				vec3Set( lightNode.target.position, 0, 0, - 1 );
 				lightNode.add( lightNode.target );
 				break;
 
@@ -744,7 +767,7 @@ class GLTFLightsExtension {
 
 		// Some lights (e.g. spot) default to a position other than the origin. Reset the position
 		// here, because node-level parsing will only override position if explicitly specified.
-		lightNode.position.set( 0, 0, 0 );
+		vec3Set( lightNode.position, 0, 0, 0 );
 
 		assignExtrasToUserData( lightNode, lightDef );
 
@@ -814,7 +837,7 @@ class GLTFMaterialsUnlitExtension {
 
 		const pending = [];
 
-		materialParams.color = new Color( 1.0, 1.0, 1.0 );
+		materialParams.color = colorSet( 1.0, 1.0, 1.0, new Color() );
 		materialParams.opacity = 1.0;
 
 		const metallicRoughness = materialDef.pbrMetallicRoughness;
@@ -825,7 +848,7 @@ class GLTFMaterialsUnlitExtension {
 
 				const array = metallicRoughness.baseColorFactor;
 
-				materialParams.color.setRGB( array[ 0 ], array[ 1 ], array[ 2 ], LinearSRGBColorSpace );
+				colorSetRGB( array[ 0 ], array[ 1 ], array[ 2 ], LinearSRGBColorSpace, materialParams.color );
 				materialParams.opacity = array[ 3 ];
 
 			}
@@ -1104,14 +1127,14 @@ class GLTFMaterialsSheenExtension {
 
 		const pending = [];
 
-		materialParams.sheenColor = new Color( 0, 0, 0 );
+		materialParams.sheenColor = colorSet( 0, 0, 0, new Color() );
 		materialParams.sheenRoughness = 0;
 		materialParams.sheen = 1;
 
 		if ( extension.sheenColorFactor !== undefined ) {
 
 			const colorFactor = extension.sheenColorFactor;
-			materialParams.sheenColor.setRGB( colorFactor[ 0 ], colorFactor[ 1 ], colorFactor[ 2 ], LinearSRGBColorSpace );
+			colorSetRGB( colorFactor[ 0 ], colorFactor[ 1 ], colorFactor[ 2 ], LinearSRGBColorSpace, materialParams.sheenColor );
 
 		}
 
@@ -1233,7 +1256,7 @@ class GLTFMaterialsVolumeExtension {
 		materialParams.attenuationDistance = extension.attenuationDistance || Infinity;
 
 		const colorArray = extension.attenuationColor || [ 1, 1, 1 ];
-		materialParams.attenuationColor = new Color().setRGB( colorArray[ 0 ], colorArray[ 1 ], colorArray[ 2 ], LinearSRGBColorSpace );
+		materialParams.attenuationColor = colorSetRGB( colorArray[ 0 ], colorArray[ 1 ], colorArray[ 2 ], LinearSRGBColorSpace, new Color() );
 
 		return Promise.all( pending );
 
@@ -1322,7 +1345,7 @@ class GLTFMaterialsSpecularExtension {
 		}
 
 		const colorArray = extension.specularColorFactor || [ 1, 1, 1 ];
-		materialParams.specularColor = new Color().setRGB( colorArray[ 0 ], colorArray[ 1 ], colorArray[ 2 ], LinearSRGBColorSpace );
+		materialParams.specularColor = colorSetRGB( colorArray[ 0 ], colorArray[ 1 ], colorArray[ 2 ], LinearSRGBColorSpace, new Color() );
 
 		if ( extension.specularColorTexture !== undefined ) {
 
@@ -1754,10 +1777,10 @@ class GLTFMeshGpuInstancing {
 			for ( const mesh of meshes ) {
 
 				// Temporal variables
-				const m = new Matrix4();
-				const p = new Vector3();
-				const q = new Quaternion();
-				const s = new Vector3( 1, 1, 1 );
+				const m = mat4Create();
+				const p = vec3Create();
+				const q = quatCreate();
+				const s = vec3Set( vec3Create(), 1, 1, 1 );
 
 				const instancedMesh = new InstancedMesh( mesh.geometry, mesh.material, count );
 
@@ -1765,23 +1788,23 @@ class GLTFMeshGpuInstancing {
 
 					if ( attributes.TRANSLATION ) {
 
-						p.fromBufferAttribute( attributes.TRANSLATION, i );
+						vec3FromBufferAttribute( attributes.TRANSLATION, i, p );
 
 					}
 
 					if ( attributes.ROTATION ) {
 
-						q.fromBufferAttribute( attributes.ROTATION, i );
+						quatFromBufferAttribute( attributes.ROTATION, i, q );
 
 					}
 
 					if ( attributes.SCALE ) {
 
-						s.fromBufferAttribute( attributes.SCALE, i );
+						vec3FromBufferAttribute( attributes.SCALE, i, s );
 
 					}
 
-					instancedMesh.setMatrixAt( i, m.compose( p, q, s ) );
+					instancedMesh.setMatrixAt( i, mat4Compose( p, q, s, m ) );
 
 				}
 
@@ -1816,8 +1839,8 @@ class GLTFMeshGpuInstancing {
 
 							for ( const group of source.groups ) instanceGeometry.addGroup( group.start, group.count, group.materialIndex );
 
-							if ( source.boundingBox !== null ) instanceGeometry.boundingBox = source.boundingBox.clone();
-							if ( source.boundingSphere !== null ) instanceGeometry.boundingSphere = source.boundingSphere.clone();
+							if ( source.boundingBox !== null ) instanceGeometry.boundingBox = box3Copy( source.boundingBox, new Box3() );
+							if ( source.boundingSphere !== null ) instanceGeometry.boundingSphere = sphereCopy( source.boundingSphere, new Sphere() );
 
 							instanceGeometry.drawRange.start = source.drawRange.start;
 							instanceGeometry.drawRange.count = source.drawRange.count;
@@ -2056,7 +2079,7 @@ class GLTFTextureTransformExtension {
 
 		if ( transform.offset !== undefined ) {
 
-			texture.offset.fromArray( transform.offset );
+			vec2FromArray( transform.offset, 0, texture.offset );
 
 		}
 
@@ -2068,7 +2091,7 @@ class GLTFTextureTransformExtension {
 
 		if ( transform.scale !== undefined ) {
 
-			texture.repeat.fromArray( transform.scale );
+			vec2FromArray( transform.scale, 0, texture.repeat );
 
 		}
 
@@ -2194,7 +2217,7 @@ class GLTFCubicSplineInterpolant extends Interpolant {
 
 }
 
-const _quaternion = new Quaternion();
+const _quaternion = quatCreate();
 
 class GLTFCubicSplineQuaternionInterpolant extends GLTFCubicSplineInterpolant {
 
@@ -2202,7 +2225,7 @@ class GLTFCubicSplineQuaternionInterpolant extends GLTFCubicSplineInterpolant {
 
 		const result = super.interpolate_( i1, t0, t, t1 );
 
-		_quaternion.fromArray( result ).normalize().toArray( result );
+		quatToArray( quatNormalize( quatFromArray( result, 0, _quaternion ), _quaternion ), result );
 
 		return result;
 
@@ -2593,7 +2616,7 @@ function getImageURIMimeType( uri ) {
 
 }
 
-const _identityMatrix = new Matrix4();
+const _identityMatrix = mat4Create();
 
 /* GLTF PARSER */
 
@@ -3508,7 +3531,7 @@ class GLTFParser {
 
 				pointsMaterial = new PointsMaterial();
 				Material.prototype.copy.call( pointsMaterial, material );
-				pointsMaterial.color.copy( material.color );
+				colorCopy( material.color, pointsMaterial.color );
 				pointsMaterial.map = material.map;
 				pointsMaterial.sizeAttenuation = false; // glTF spec says points should be 1px
 
@@ -3528,7 +3551,7 @@ class GLTFParser {
 
 				lineMaterial = new LineBasicMaterial();
 				Material.prototype.copy.call( lineMaterial, material );
-				lineMaterial.color.copy( material.color );
+				colorCopy( material.color, lineMaterial.color );
 				lineMaterial.map = material.map;
 
 				this.cache.add( cacheKey, lineMaterial );
@@ -3618,14 +3641,14 @@ class GLTFParser {
 
 			const metallicRoughness = materialDef.pbrMetallicRoughness || {};
 
-			materialParams.color = new Color( 1.0, 1.0, 1.0 );
+			materialParams.color = colorSet( 1.0, 1.0, 1.0, new Color() );
 			materialParams.opacity = 1.0;
 
 			if ( Array.isArray( metallicRoughness.baseColorFactor ) ) {
 
 				const array = metallicRoughness.baseColorFactor;
 
-				materialParams.color.setRGB( array[ 0 ], array[ 1 ], array[ 2 ], LinearSRGBColorSpace );
+				colorSetRGB( array[ 0 ], array[ 1 ], array[ 2 ], LinearSRGBColorSpace, materialParams.color );
 				materialParams.opacity = array[ 3 ];
 
 			}
@@ -3697,7 +3720,7 @@ class GLTFParser {
 
 				const scale = materialDef.normalTexture.scale;
 
-				materialParams.normalScale.set( scale, scale );
+				vec2Set( scale, scale, materialParams.normalScale );
 
 			}
 
@@ -3718,7 +3741,7 @@ class GLTFParser {
 		if ( materialDef.emissiveFactor !== undefined && materialType !== MeshBasicMaterial ) {
 
 			const emissiveFactor = materialDef.emissiveFactor;
-			materialParams.emissive = new Color().setRGB( emissiveFactor[ 0 ], emissiveFactor[ 1 ], emissiveFactor[ 2 ], LinearSRGBColorSpace );
+			materialParams.emissive = colorSetRGB( emissiveFactor[ 0 ], emissiveFactor[ 1 ], emissiveFactor[ 2 ], LinearSRGBColorSpace, new Color() );
 
 		}
 
@@ -4089,11 +4112,11 @@ class GLTFParser {
 
 					bones.push( jointNode );
 
-					const mat = new Matrix4();
+					const mat = mat4Create();
 
 					if ( inverseBindMatrices !== null ) {
 
-						mat.fromArray( inverseBindMatrices.array, i * 16 );
+						mat4FromArray( inverseBindMatrices.array, i * 16, mat );
 
 					}
 
@@ -4313,7 +4336,7 @@ class GLTFParser {
 				const pivotChild = children[ 0 ];
 
 				// Set pivot on container and adjust transforms
-				node.pivot = new Vector3().fromArray( pivot );
+				node.pivot = vec3FromArray( pivot, 0, new Vector3() );
 
 				// Adjust container position: stored as position + pivot, so subtract pivot
 				node.position.x -= pivot[ 0 ];
@@ -4321,7 +4344,7 @@ class GLTFParser {
 				node.position.z -= pivot[ 2 ];
 
 				// Remove the child's -pivot offset since pivot now handles it
-				pivotChild.position.set( 0, 0, 0 );
+				vec3Set( pivotChild.position, 0, 0, 0 );
 
 				delete node.userData.pivot;
 
@@ -4435,15 +4458,14 @@ class GLTFParser {
 
 			if ( nodeDef.matrix !== undefined ) {
 
-				const matrix = new Matrix4();
-				matrix.fromArray( nodeDef.matrix );
+				const matrix = mat4FromArray( nodeDef.matrix );
 				node.applyMatrix4( matrix );
 
 			} else {
 
 				if ( nodeDef.translation !== undefined ) {
 
-					node.position.fromArray( nodeDef.translation );
+					vec3FromArray( nodeDef.translation, 0, node.position );
 
 				}
 
@@ -4455,7 +4477,7 @@ class GLTFParser {
 
 				if ( nodeDef.scale !== undefined ) {
 
-					node.scale.fromArray( nodeDef.scale );
+					vec3FromArray( nodeDef.scale, 0, node.scale );
 
 				}
 
@@ -4734,6 +4756,7 @@ function computeBounds( geometry, primitiveDef, parser ) {
 
 	const attributes = primitiveDef.attributes;
 
+	// Keep Box3/Sphere class instances: BufferGeometry.toJSON and mesh.copy() call .toJSON()/.clone().
 	const box = new Box3();
 
 	if ( attributes.POSITION !== undefined ) {
@@ -4747,16 +4770,17 @@ function computeBounds( geometry, primitiveDef, parser ) {
 
 		if ( min !== undefined && max !== undefined ) {
 
-			box.set(
-				new Vector3( min[ 0 ], min[ 1 ], min[ 2 ] ),
-				new Vector3( max[ 0 ], max[ 1 ], max[ 2 ] )
+			box3Set(
+				vec3Set( vec3Create(), min[ 0 ], min[ 1 ], min[ 2 ] ),
+				vec3Set( vec3Create(), max[ 0 ], max[ 1 ], max[ 2 ] ),
+				box
 			);
 
 			if ( accessor.normalized ) {
 
 				const boxScale = getNormalizedComponentScale( WEBGL_COMPONENT_TYPES[ accessor.componentType ] );
-				box.min.multiplyScalar( boxScale );
-				box.max.multiplyScalar( boxScale );
+				vec3MultiplyScalar( box.min, boxScale, box.min );
+				vec3MultiplyScalar( box.max, boxScale, box.max );
 
 			}
 
@@ -4778,8 +4802,8 @@ function computeBounds( geometry, primitiveDef, parser ) {
 
 	if ( targets !== undefined ) {
 
-		const maxDisplacement = new Vector3();
-		const vector = new Vector3();
+		const maxDisplacement = vec3Create();
+		const vector = vec3Create();
 
 		for ( let i = 0, il = targets.length; i < il; i ++ ) {
 
@@ -4796,15 +4820,18 @@ function computeBounds( geometry, primitiveDef, parser ) {
 				if ( min !== undefined && max !== undefined ) {
 
 					// we need to get max of absolute components because target weight is [-1,1]
-					vector.setX( Math.max( Math.abs( min[ 0 ] ), Math.abs( max[ 0 ] ) ) );
-					vector.setY( Math.max( Math.abs( min[ 1 ] ), Math.abs( max[ 1 ] ) ) );
-					vector.setZ( Math.max( Math.abs( min[ 2 ] ), Math.abs( max[ 2 ] ) ) );
+					vec3Set(
+						vector,
+						Math.max( Math.abs( min[ 0 ] ), Math.abs( max[ 0 ] ) ),
+						Math.max( Math.abs( min[ 1 ] ), Math.abs( max[ 1 ] ) ),
+						Math.max( Math.abs( min[ 2 ] ), Math.abs( max[ 2 ] ) )
+					);
 
 
 					if ( accessor.normalized ) {
 
 						const boxScale = getNormalizedComponentScale( WEBGL_COMPONENT_TYPES[ accessor.componentType ] );
-						vector.multiplyScalar( boxScale );
+						vec3MultiplyScalar( vector, boxScale, vector );
 
 					}
 
@@ -4812,7 +4839,7 @@ function computeBounds( geometry, primitiveDef, parser ) {
 					// to assume that each target can have a max weight of 1. However, for some use cases - notably, when morph targets
 					// are used to implement key-frame animations and as such only two are active at a time - this results in very large
 					// boxes. So for now we make a box that's sometimes a touch too small but is hopefully mostly of reasonable size.
-					maxDisplacement.max( vector );
+					vec3Max( maxDisplacement, vector, maxDisplacement );
 
 				} else {
 
@@ -4825,7 +4852,7 @@ function computeBounds( geometry, primitiveDef, parser ) {
 		}
 
 		// As per comment above this box isn't conservative, but has a reasonable size for a very large number of morph targets.
-		box.expandByVector( maxDisplacement );
+		box3ExpandByVector( box, maxDisplacement, box );
 
 	}
 
@@ -4833,8 +4860,7 @@ function computeBounds( geometry, primitiveDef, parser ) {
 
 	const sphere = new Sphere();
 
-	box.getCenter( sphere.center );
-	sphere.radius = box.min.distanceTo( box.max ) / 2;
+	box3GetBoundingSphere( box, sphere );
 
 	geometry.boundingSphere = sphere;
 

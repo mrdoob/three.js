@@ -1,4 +1,4 @@
-import { Vector2 } from 'three';
+import { vec2Create } from 'three';
 
 /**
  * A helper for {@link SelectionBox}.
@@ -51,9 +51,9 @@ class SelectionHelper {
 
 		// private
 
-		this._startPoint = new Vector2();
-		this._pointTopLeft = new Vector2();
-		this._pointBottomRight = new Vector2();
+		this._startPoint = vec2Create();
+		this._pointTopLeft = vec2Create();
+		this._pointBottomRight = vec2Create();
 
 		this._onPointerDown = function ( event ) {
 

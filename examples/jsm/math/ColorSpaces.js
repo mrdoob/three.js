@@ -1,4 +1,4 @@
-import { LinearTransfer, Matrix3, SRGBTransfer, SRGBColorSpace, ColorManagement } from 'three';
+import { LinearTransfer, SRGBTransfer, SRGBColorSpace, ColorManagement, mat3Create, mat3Set } from 'three';
 
 /** @module ColorSpaces */
 
@@ -14,13 +14,13 @@ const D65 = [ 0.3127, 0.3290 ];
  * Display P3 definitions
  */
 
-const LINEAR_DISPLAY_P3_TO_XYZ = /*@__PURE__*/ new Matrix3().set(
+const LINEAR_DISPLAY_P3_TO_XYZ = /*@__PURE__*/ mat3Set( mat3Create(),
 	0.4865709, 0.2656677, 0.1982173,
 	0.2289746, 0.6917385, 0.0792869,
 	0.0000000, 0.0451134, 1.0439444
 );
 
-const XYZ_TO_LINEAR_DISPLAY_P3 = /*@__PURE__*/ new Matrix3().set(
+const XYZ_TO_LINEAR_DISPLAY_P3 = /*@__PURE__*/ mat3Set( mat3Create(),
 	2.4934969, - 0.9313836, - 0.4027108,
 	- 0.8294890, 1.7626641, 0.0236247,
 	0.0358458, - 0.0761724, 0.9568845
@@ -79,13 +79,13 @@ export const LinearDisplayP3ColorSpaceImpl = {
  * Rec. 2020 definitions
  */
 
-const LINEAR_REC2020_TO_XYZ = /*@__PURE__*/ new Matrix3().set(
+const LINEAR_REC2020_TO_XYZ = /*@__PURE__*/ mat3Set( mat3Create(),
 	0.6369580, 0.1446169, 0.1688810,
 	0.2627002, 0.6779981, 0.0593017,
 	0.0000000, 0.0280727, 1.0609851
 );
 
-const XYZ_TO_LINEAR_REC2020 = /*@__PURE__*/ new Matrix3().set(
+const XYZ_TO_LINEAR_REC2020 = /*@__PURE__*/ mat3Set( mat3Create(),
 	1.7166512, - 0.3556708, - 0.2533663,
 	- 0.6666844, 1.6164812, 0.0157685,
 	0.0176399, - 0.0427706, 0.9421031

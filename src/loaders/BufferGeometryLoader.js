@@ -1,4 +1,5 @@
 import { Sphere } from '../math/Sphere.js';
+import { sphereFromJSON } from '../math/SphereFunctions.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { FileLoader } from './FileLoader.js';
@@ -231,7 +232,7 @@ class BufferGeometryLoader extends Loader {
 
 		if ( boundingSphere !== undefined ) {
 
-			geometry.boundingSphere = new Sphere().fromJSON( boundingSphere );
+			geometry.boundingSphere = sphereFromJSON( boundingSphere, new Sphere() );
 
 		}
 

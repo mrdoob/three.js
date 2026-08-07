@@ -24,11 +24,22 @@ import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 import { Scene } from '../../scenes/Scene.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
-import { Frustum } from '../../math/Frustum.js';
+import { colorCopy } from '../../math/ColorFunctions.js';
 import { FrustumArray } from '../../math/FrustumArray.js';
-import { Matrix4 } from '../../math/Matrix4.js';
-import { Vector2 } from '../../math/Vector2.js';
-import { Vector4 } from '../../math/Vector4.js';
+import { frustumCreate, frustumSetFromProjectionMatrix } from '../../math/FrustumFunctions.js';
+import { mat4Create, mat4MultiplyMatrices } from '../../math/Matrix4Functions.js';
+import { vec2Create } from '../../math/Vector2Functions.js';
+import {
+	vec4ApplyMatrix4,
+	vec4Copy,
+	vec4Create,
+	vec4Equals,
+	vec4Floor,
+	vec4Max,
+	vec4MultiplyScalar,
+	vec4Set,
+	vec4SetFromMatrixPosition
+} from '../../math/Vector4Functions.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, HalfFloatType, RGBAFormat, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap } from '../../constants.js';
 
@@ -39,13 +50,13 @@ import { context } from '../../nodes/core/ContextNode.js';
 import { error, warn, warnOnce, yieldToMain } from '../../utils.js';
 
 const _scene = /*@__PURE__*/ new Scene();
-const _drawingBufferSize = /*@__PURE__*/ new Vector2();
-const _screen = /*@__PURE__*/ new Vector4();
-const _frustum = /*@__PURE__*/ new Frustum();
+const _drawingBufferSize = /*@__PURE__*/ vec2Create();
+const _screen = /*@__PURE__*/ vec4Create();
+const _frustum = /*@__PURE__*/ frustumCreate();
 const _frustumArray = /*@__PURE__*/ new FrustumArray();
 
-const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
-const _vector4 = /*@__PURE__*/ new Vector4();
+const _projScreenMatrix = /*@__PURE__*/ mat4Create();
+const _vector4 = /*@__PURE__*/ vec4Create();
 
 const _shadowSide = { [ FrontSide ]: BackSide, [ BackSide ]: FrontSide, [ DoubleSide ]: DoubleSide };
 
@@ -974,7 +985,7 @@ class Renderer {
 
 		//
 
-		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+		mat4MultiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse, _projScreenMatrix );
 
 		if ( camera.isArrayCamera ) {
 
@@ -982,7 +993,7 @@ class Renderer {
 
 		} else {
 
-			_frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
+			frustumSetFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth, _frustum );
 
 		}
 
@@ -1616,10 +1627,10 @@ class Renderer {
 		const pixelRatio = this._outputRenderTarget ? 1 : target._pixelRatio;
 		const scissorTest = this._outputRenderTarget ? this._outputRenderTarget.scissorTest : target._scissorTest;
 
-		frameBufferTarget.viewport.copy( viewport );
-		frameBufferTarget.scissor.copy( scissor );
-		frameBufferTarget.viewport.multiplyScalar( pixelRatio );
-		frameBufferTarget.scissor.multiplyScalar( pixelRatio );
+		vec4Copy( viewport, frameBufferTarget.viewport );
+		vec4Copy( scissor, frameBufferTarget.scissor );
+		vec4MultiplyScalar( frameBufferTarget.viewport, pixelRatio, frameBufferTarget.viewport );
+		vec4MultiplyScalar( frameBufferTarget.scissor, pixelRatio, frameBufferTarget.scissor );
 		frameBufferTarget.scissorTest = scissorTest;
 		frameBufferTarget.multiview = outputRenderTarget !== null ? outputRenderTarget.multiview : false;
 		frameBufferTarget.useArrayDepthTexture = outputRenderTarget !== null ? outputRenderTarget.useArrayDepthTexture : false;
@@ -1766,22 +1777,26 @@ class Renderer {
 
 		this.getDrawingBufferSize( _drawingBufferSize );
 
-		_screen.set( 0, 0, _drawingBufferSize.width, _drawingBufferSize.height );
+		vec4Set( 0, 0, _drawingBufferSize.x, _drawingBufferSize.y, _screen );
 
 		const minDepth = ( viewport.minDepth === undefined ) ? 0 : viewport.minDepth;
 		const maxDepth = ( viewport.maxDepth === undefined ) ? 1 : viewport.maxDepth;
 
-		renderContext.viewportValue.copy( viewport ).multiplyScalar( pixelRatio ).floor();
-		renderContext.viewportValue.width >>= activeMipmapLevel;
-		renderContext.viewportValue.height >>= activeMipmapLevel;
+		vec4Copy( viewport, renderContext.viewportValue );
+		vec4MultiplyScalar( renderContext.viewportValue, pixelRatio, renderContext.viewportValue );
+		vec4Floor( renderContext.viewportValue, renderContext.viewportValue );
+		renderContext.viewportValue.z >>= activeMipmapLevel;
+		renderContext.viewportValue.w >>= activeMipmapLevel;
 		renderContext.viewportValue.minDepth = minDepth;
 		renderContext.viewportValue.maxDepth = maxDepth;
-		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
+		renderContext.viewport = vec4Equals( renderContext.viewportValue, _screen ) === false;
 
-		renderContext.scissorValue.copy( scissor ).multiplyScalar( pixelRatio ).floor();
-		renderContext.scissor = canvasTarget._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
-		renderContext.scissorValue.width >>= activeMipmapLevel;
-		renderContext.scissorValue.height >>= activeMipmapLevel;
+		vec4Copy( scissor, renderContext.scissorValue );
+		vec4MultiplyScalar( renderContext.scissorValue, pixelRatio, renderContext.scissorValue );
+		vec4Floor( renderContext.scissorValue, renderContext.scissorValue );
+		renderContext.scissor = canvasTarget._scissorTest && vec4Equals( renderContext.scissorValue, _screen ) === false;
+		renderContext.scissorValue.z >>= activeMipmapLevel;
+		renderContext.scissorValue.w >>= activeMipmapLevel;
 
 		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
 		renderContext.clippingContext.updateGlobal( sceneRef, camera );
@@ -1792,7 +1807,7 @@ class Renderer {
 
 		//
 
-		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+		mat4MultiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse, _projScreenMatrix );
 
 		if ( camera.isArrayCamera ) {
 
@@ -1800,7 +1815,7 @@ class Renderer {
 
 		} else {
 
-			_frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
+			frustumSetFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth, _frustum );
 
 		}
 
@@ -1839,8 +1854,8 @@ class Renderer {
 
 			renderContext.textures = null;
 			renderContext.depthTexture = null;
-			renderContext.width = _drawingBufferSize.width;
-			renderContext.height = _drawingBufferSize.height;
+			renderContext.width = _drawingBufferSize.x;
+			renderContext.height = _drawingBufferSize.y;
 			renderContext.depth = this.depth;
 			renderContext.stencil = this.stencil;
 
@@ -1855,17 +1870,18 @@ class Renderer {
 
 		//
 
-		renderContext.scissorValue.max( _vector4.set( 0, 0, 0, 0 ) );
+		vec4Set( 0, 0, 0, 0, _vector4 );
+		vec4Max( renderContext.scissorValue, _vector4, renderContext.scissorValue );
 
-		if ( renderContext.scissorValue.x + renderContext.scissorValue.width > renderContext.width ) {
+		if ( renderContext.scissorValue.x + renderContext.scissorValue.z > renderContext.width ) {
 
-			renderContext.scissorValue.width = Math.max( renderContext.width - renderContext.scissorValue.x, 0 );
+			renderContext.scissorValue.z = Math.max( renderContext.width - renderContext.scissorValue.x, 0 );
 
 		}
 
-		if ( renderContext.scissorValue.y + renderContext.scissorValue.height > renderContext.height ) {
+		if ( renderContext.scissorValue.y + renderContext.scissorValue.w > renderContext.height ) {
 
-			renderContext.scissorValue.height = Math.max( renderContext.height - renderContext.scissorValue.y, 0 );
+			renderContext.scissorValue.w = Math.max( renderContext.height - renderContext.scissorValue.y, 0 );
 
 		}
 
@@ -2343,7 +2359,7 @@ class Renderer {
 	 */
 	getClearColor( target ) {
 
-		return target.copy( this._clearColor );
+		return colorCopy( this._clearColor, target );
 
 	}
 
@@ -3128,11 +3144,12 @@ class Renderer {
 
 			if ( rectangle.isVector2 ) {
 
-				rectangle = _vector4.set( rectangle.x, rectangle.y, framebufferTexture.image.width, framebufferTexture.image.height ).floor();
+				vec4Set( rectangle.x, rectangle.y, framebufferTexture.image.width, framebufferTexture.image.height, _vector4 );
+				rectangle = vec4Floor( _vector4, _vector4 );
 
 			} else if ( rectangle.isVector4 ) {
 
-				rectangle = _vector4.copy( rectangle ).floor();
+				rectangle = vec4Floor( rectangle, _vector4 );
 
 			} else {
 
@@ -3144,7 +3161,7 @@ class Renderer {
 
 		} else {
 
-			rectangle = _vector4.set( 0, 0, framebufferTexture.image.width, framebufferTexture.image.height );
+			rectangle = vec4Set( 0, 0, framebufferTexture.image.width, framebufferTexture.image.height, _vector4 );
 
 		}
 
@@ -3262,7 +3279,8 @@ class Renderer {
 
 					if ( this.sortObjects === true ) {
 
-						_vector4.setFromMatrixPosition( object.matrixWorld ).applyMatrix4( _projScreenMatrix );
+						vec4SetFromMatrixPosition( object.matrixWorld, _vector4 );
+						vec4ApplyMatrix4( _vector4, _projScreenMatrix, _vector4 );
 
 					}
 
@@ -3292,10 +3310,9 @@ class Renderer {
 
 						if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-						_vector4
-							.copy( geometry.boundingSphere.center )
-							.applyMatrix4( object.matrixWorld )
-							.applyMatrix4( _projScreenMatrix );
+						vec4Copy( geometry.boundingSphere.center, _vector4 );
+						vec4ApplyMatrix4( _vector4, object.matrixWorld, _vector4 );
+						vec4ApplyMatrix4( _vector4, _projScreenMatrix, _vector4 );
 
 					}
 

@@ -1,10 +1,17 @@
 import {
-	Color,
 	ColorManagement,
-	Matrix3,
 	SRGBColorSpace,
-	Vector2,
-	Vector3
+	colorCreate,
+	colorFromBufferAttribute,
+	mat3Create,
+	mat3GetNormalMatrix,
+	vec2Create,
+	vec2FromBufferAttribute,
+	vec3ApplyMatrix3,
+	vec3ApplyMatrix4,
+	vec3Create,
+	vec3FromBufferAttribute,
+	vec3Normalize
 } from 'three';
 
 /**
@@ -37,10 +44,10 @@ class OBJExporter {
 		let indexVertexUvs = 0;
 		let indexNormals = 0;
 
-		const vertex = new Vector3();
-		const color = new Color();
-		const normal = new Vector3();
-		const uv = new Vector2();
+		const vertex = vec3Create();
+		const color = colorCreate();
+		const normal = vec3Create();
+		const uv = vec2Create();
 
 		const face = [];
 
@@ -52,7 +59,7 @@ class OBJExporter {
 
 			const geometry = mesh.geometry;
 
-			const normalMatrixWorld = new Matrix3();
+			const normalMatrixWorld = mat3Create();
 
 			// shortcuts
 			const vertices = geometry.getAttribute( 'position' );
@@ -76,10 +83,10 @@ class OBJExporter {
 
 				for ( let i = 0, l = vertices.count; i < l; i ++, nbVertex ++ ) {
 
-					vertex.fromBufferAttribute( vertices, i );
+					vec3FromBufferAttribute( vertices, i, vertex );
 
 					// transform the vertex to world space
-					vertex.applyMatrix4( mesh.matrixWorld );
+					vec3ApplyMatrix4( vertex, mesh.matrixWorld, vertex );
 
 					// transform the vertex to export format
 					output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
@@ -94,7 +101,7 @@ class OBJExporter {
 
 				for ( let i = 0, l = uvs.count; i < l; i ++, nbVertexUvs ++ ) {
 
-					uv.fromBufferAttribute( uvs, i );
+					vec2FromBufferAttribute( uvs, i, uv );
 
 					// transform the uv to export format
 					output += 'vt ' + uv.x + ' ' + uv.y + '\n';
@@ -107,14 +114,15 @@ class OBJExporter {
 
 			if ( normals !== undefined ) {
 
-				normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
+				mat3GetNormalMatrix( mesh.matrixWorld, normalMatrixWorld );
 
 				for ( let i = 0, l = normals.count; i < l; i ++, nbNormals ++ ) {
 
-					normal.fromBufferAttribute( normals, i );
+					vec3FromBufferAttribute( normals, i, normal );
 
 					// transform the normal to world space
-					normal.applyMatrix3( normalMatrixWorld ).normalize();
+					vec3ApplyMatrix3( normal, normalMatrixWorld, normal );
+					vec3Normalize( normal, normal );
 
 					// transform the normal to export format
 					output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
@@ -185,10 +193,10 @@ class OBJExporter {
 
 				for ( let i = 0, l = vertices.count; i < l; i ++, nbVertex ++ ) {
 
-					vertex.fromBufferAttribute( vertices, i );
+					vec3FromBufferAttribute( vertices, i, vertex );
 
 					// transform the vertex to world space
-					vertex.applyMatrix4( line.matrixWorld );
+					vec3ApplyMatrix4( vertex, line.matrixWorld, vertex );
 
 					// transform the vertex to export format
 					output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
@@ -241,14 +249,14 @@ class OBJExporter {
 
 				for ( let i = 0, l = vertices.count; i < l; i ++, nbVertex ++ ) {
 
-					vertex.fromBufferAttribute( vertices, i );
-					vertex.applyMatrix4( points.matrixWorld );
+					vec3FromBufferAttribute( vertices, i, vertex );
+					vec3ApplyMatrix4( vertex, points.matrixWorld, vertex );
 
 					output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z;
 
 					if ( colors !== undefined ) {
 
-						color.fromBufferAttribute( colors, i );
+						colorFromBufferAttribute( colors, i, color );
 
 						ColorManagement.workingToColorSpace( color, SRGBColorSpace );
 

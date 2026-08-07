@@ -5,12 +5,18 @@ import {
 	InstancedInterleavedBuffer,
 	InterleavedBufferAttribute,
 	Sphere,
-	Vector3,
-	WireframeGeometry
+	WireframeGeometry,
+	box3Create,
+	box3GetCenter,
+	box3SetFromBufferAttribute,
+	box3Union,
+	vec3Create,
+	vec3DistanceToSquared,
+	vec3FromBufferAttribute
 } from 'three';
 
-const _box = new Box3();
-const _vector = new Vector3();
+const _box = /*@__PURE__*/ box3Create();
+const _vector = /*@__PURE__*/ vec3Create();
 
 /**
  * A series of vertex pairs, forming line segments.
@@ -230,11 +236,11 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 		if ( start !== undefined && end !== undefined ) {
 
-			this.boundingBox.setFromBufferAttribute( start );
+			box3SetFromBufferAttribute( start, this.boundingBox );
 
-			_box.setFromBufferAttribute( end );
+			box3SetFromBufferAttribute( end, _box );
 
-			this.boundingBox.union( _box );
+			box3Union( this.boundingBox, _box, this.boundingBox );
 
 		}
 
@@ -261,17 +267,17 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 			const center = this.boundingSphere.center;
 
-			this.boundingBox.getCenter( center );
+			box3GetCenter( this.boundingBox, center );
 
 			let maxRadiusSq = 0;
 
 			for ( let i = 0, il = start.count; i < il; i ++ ) {
 
-				_vector.fromBufferAttribute( start, i );
-				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector ) );
+				vec3FromBufferAttribute( start, i, _vector );
+				maxRadiusSq = Math.max( maxRadiusSq, vec3DistanceToSquared( center, _vector ) );
 
-				_vector.fromBufferAttribute( end, i );
-				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector ) );
+				vec3FromBufferAttribute( end, i, _vector );
+				maxRadiusSq = Math.max( maxRadiusSq, vec3DistanceToSquared( center, _vector ) );
 
 			}
 

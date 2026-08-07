@@ -1,4 +1,4 @@
-import { Color, ColorManagement, SRGBColorSpace } from 'three';
+import { ColorManagement, SRGBColorSpace, colorCreate, colorFromBufferAttribute } from 'three';
 
 /* global DracoEncoderModule */
 
@@ -252,7 +252,7 @@ function createVertexColorSRGBArray( attribute ) {
 	// for .drc files, but note that Draco buffers embedded in glTF files will
 	// be Linear-sRGB instead.
 
-	const _color = new Color();
+	const _color = colorCreate();
 
 	const count = attribute.count;
 	const itemSize = attribute.itemSize;
@@ -260,7 +260,7 @@ function createVertexColorSRGBArray( attribute ) {
 
 	for ( let i = 0, il = count; i < il; i ++ ) {
 
-		_color.fromBufferAttribute( attribute, i );
+		colorFromBufferAttribute( attribute, i, _color );
 
 		ColorManagement.workingToColorSpace( _color, SRGBColorSpace );
 

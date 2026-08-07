@@ -1,9 +1,20 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
-	Matrix4,
-	Vector3,
-	Vector4
+	mat4Create,
+	mat4MultiplyMatrices,
+	mat4Set,
+	mat4Transpose,
+	vec3Create,
+	vec3CrossVectors,
+	vec3FromArray,
+	vec3Normalize,
+	vec3Set,
+	vec4ApplyMatrix4,
+	vec4Copy,
+	vec4Create,
+	vec4Dot,
+	vec4FromArray
 } from 'three';
 
 /**
@@ -416,8 +427,9 @@ class TeapotGeometry extends BufferGeometry {
 		const uvs = new Float32Array( numVertices * 2 );
 
 		// Bezier form
-		const ms = new Matrix4();
-		ms.set(
+		const ms = mat4Create();
+		mat4Set(
+			ms,
 			- 1.0, 3.0, - 3.0, 1.0,
 			3.0, - 6.0, 3.0, 0.0,
 			- 3.0, 3.0, 0.0, 0.0,
@@ -438,9 +450,9 @@ class TeapotGeometry extends BufferGeometry {
 		const sdir = [];
 		const tdir = [];
 
-		const norm = new Vector3();
+		const norm = vec3Create();
 
-		let tcoord;
+		const tcoord = vec4Create();
 
 		let sval;
 		let tval;
@@ -448,21 +460,20 @@ class TeapotGeometry extends BufferGeometry {
 		let dsval = 0;
 		let dtval = 0;
 
-		const normOut = new Vector3();
+		const normOut = vec3Create();
 
-		const gmx = new Matrix4();
-		const tmtx = new Matrix4();
+		const gmx = mat4Create();
+		const tmtx = mat4Create();
 
-		const vsp = new Vector4();
-		const vtp = new Vector4();
-		const vdsp = new Vector4();
-		const vdtp = new Vector4();
+		const vsp = vec4Create();
+		const vtp = vec4Create();
+		const vdsp = vec4Create();
+		const vdtp = vec4Create();
 
-		const vsdir = new Vector3();
-		const vtdir = new Vector3();
+		const vsdir = vec3Create();
+		const vtdir = vec3Create();
 
-		const mst = ms.clone();
-		mst.transpose();
+		const mst = mat4Transpose( ms );
 
 		// internal function: test if triangle has any matching vertices;
 		// if so, don't save triangle, since it won't display anything.
@@ -479,7 +490,7 @@ class TeapotGeometry extends BufferGeometry {
 
 		for ( let i = 0; i < 3; i ++ ) {
 
-			mgm[ i ] = new Matrix4();
+			mgm[ i ] = mat4Create();
 
 		}
 
@@ -536,10 +547,10 @@ class TeapotGeometry extends BufferGeometry {
 
 					}
 
-					gmx.set( g[ 0 ], g[ 1 ], g[ 2 ], g[ 3 ], g[ 4 ], g[ 5 ], g[ 6 ], g[ 7 ], g[ 8 ], g[ 9 ], g[ 10 ], g[ 11 ], g[ 12 ], g[ 13 ], g[ 14 ], g[ 15 ] );
+					mat4Set( gmx, g[ 0 ], g[ 1 ], g[ 2 ], g[ 3 ], g[ 4 ], g[ 5 ], g[ 6 ], g[ 7 ], g[ 8 ], g[ 9 ], g[ 10 ], g[ 11 ], g[ 12 ], g[ 13 ], g[ 14 ], g[ 15 ] );
 
-					tmtx.multiplyMatrices( gmx, ms );
-					mgm[ i ].multiplyMatrices( mst, tmtx );
+					mat4MultiplyMatrices( gmx, ms, tmtx );
+					mat4MultiplyMatrices( mst, tmtx, mgm[ i ] );
 
 				}
 
@@ -577,46 +588,46 @@ class TeapotGeometry extends BufferGeometry {
 
 						}
 
-						vsp.fromArray( sp );
-						vtp.fromArray( tp );
-						vdsp.fromArray( dsp );
-						vdtp.fromArray( dtp );
+						vec4FromArray( sp, 0, vsp );
+						vec4FromArray( tp, 0, vtp );
+						vec4FromArray( dsp, 0, vdsp );
+						vec4FromArray( dtp, 0, vdtp );
 
 						// do for x,y,z
 						for ( let i = 0; i < 3; i ++ ) {
 
 							// multiply power vectors times matrix to get value
-							tcoord = vsp.clone();
-							tcoord.applyMatrix4( mgm[ i ] );
-							vert[ i ] = tcoord.dot( vtp );
+							vec4Copy( vsp, tcoord );
+							vec4ApplyMatrix4( tcoord, mgm[ i ], tcoord );
+							vert[ i ] = vec4Dot( tcoord, vtp );
 
 							// get s and t tangent vectors
-							tcoord = vdsp.clone();
-							tcoord.applyMatrix4( mgm[ i ] );
-							sdir[ i ] = tcoord.dot( vtp );
+							vec4Copy( vdsp, tcoord );
+							vec4ApplyMatrix4( tcoord, mgm[ i ], tcoord );
+							sdir[ i ] = vec4Dot( tcoord, vtp );
 
-							tcoord = vsp.clone();
-							tcoord.applyMatrix4( mgm[ i ] );
-							tdir[ i ] = tcoord.dot( vdtp );
+							vec4Copy( vsp, tcoord );
+							vec4ApplyMatrix4( tcoord, mgm[ i ], tcoord );
+							tdir[ i ] = vec4Dot( tcoord, vdtp );
 
 						}
 
 						// find normal
-						vsdir.fromArray( sdir );
-						vtdir.fromArray( tdir );
-						norm.crossVectors( vtdir, vsdir );
-						norm.normalize();
+						vec3FromArray( sdir, 0, vsdir );
+						vec3FromArray( tdir, 0, vtdir );
+						vec3CrossVectors( vtdir, vsdir, norm );
+						vec3Normalize( norm, norm );
 
 						// if X and Z length is 0, at the cusp, so point the normal up or down, depending on patch number
 						if ( vert[ 0 ] === 0 && vert[ 1 ] === 0 ) {
 
 							// if above the middle of the teapot, normal points up, else down
-							normOut.set( 0, vert[ 2 ] > maxHeight2 ? 1 : - 1, 0 );
+							vec3Set( normOut, 0, vert[ 2 ] > maxHeight2 ? 1 : - 1, 0 );
 
 						} else {
 
 							// standard output: rotate on X axis
-							normOut.set( norm.x, norm.z, - norm.y );
+							vec3Set( normOut, norm.x, norm.z, - norm.y );
 
 						}
 

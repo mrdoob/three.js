@@ -18,11 +18,21 @@ import {
 	UnsignedShort5551Type,
 	WebGLCoordinateSystem
 } from '../constants.js';
-import { Color } from '../math/Color.js';
-import { Frustum } from '../math/Frustum.js';
-import { Matrix4 } from '../math/Matrix4.js';
-import { Vector3 } from '../math/Vector3.js';
-import { Vector4 } from '../math/Vector4.js';
+import { colorCopy, colorCreate, colorSetHex } from '../math/ColorFunctions.js';
+import { frustumCreate, frustumSetFromProjectionMatrix } from '../math/FrustumFunctions.js';
+import { mat4Create, mat4MultiplyMatrices } from '../math/Matrix4Functions.js';
+import { vec2Floor, vec2Set } from '../math/Vector2Functions.js';
+import { vec3Create, vec3SetFromMatrixPosition } from '../math/Vector3Functions.js';
+import {
+	vec4ApplyMatrix4,
+	vec4Copy,
+	vec4Create,
+	vec4Floor,
+	vec4MultiplyScalar,
+	vec4Round,
+	vec4Set,
+	vec4SetFromMatrixPosition
+} from '../math/Vector4Functions.js';
 import { WebGLAnimation } from './webgl/WebGLAnimation.js';
 import { WebGLAttributes } from './webgl/WebGLAttributes.js';
 import { WebGLBackground } from './webgl/WebGLBackground.js';
@@ -130,7 +140,7 @@ class WebGLRenderer {
 
 		const uintClearColor = new Uint32Array( 4 );
 		const intClearColor = new Int32Array( 4 );
-		const objectPosition = new Vector3();
+		const objectPosition = vec3Create();
 
 		let currentRenderList = null;
 		let currentRenderState = null;
@@ -318,11 +328,11 @@ class WebGLRenderer {
 
 		let _currentCamera = null;
 
-		const _currentViewport = new Vector4();
-		const _currentScissor = new Vector4();
+		const _currentViewport = vec4Create();
+		const _currentScissor = vec4Create();
 		let _currentScissorTest = null;
 
-		const _currentClearColor = new Color( 0x000000 );
+		const _currentClearColor = colorSetHex( 0x000000, undefined, colorCreate() );
 		let _currentClearAlpha = 0;
 
 		//
@@ -334,13 +344,13 @@ class WebGLRenderer {
 		let _opaqueSort = null;
 		let _transparentSort = null;
 
-		const _viewport = new Vector4( 0, 0, _width, _height );
-		const _scissor = new Vector4( 0, 0, _width, _height );
+		const _viewport = vec4Create( 0, 0, _width, _height );
+		const _scissor = vec4Create( 0, 0, _width, _height );
 		let _scissorTest = false;
 
 		// frustum
 
-		const _frustum = new Frustum();
+		const _frustum = frustumCreate();
 
 		// clipping
 
@@ -349,11 +359,11 @@ class WebGLRenderer {
 
 		// camera matrices cache
 
-		const _projScreenMatrix = new Matrix4();
+		const _projScreenMatrix = mat4Create();
 
-		const _vector3 = new Vector3();
+		const _vector3 = vec3Create();
 
-		const _vector4 = new Vector4();
+		const _vector4 = vec4Create();
 
 		const _emptyScene = { background: null, fog: null, environment: null, overrideMaterial: null, isScene: true };
 
@@ -651,7 +661,7 @@ class WebGLRenderer {
 		 */
 		this.getSize = function ( target ) {
 
-			return target.set( _width, _height );
+			return vec2Set( _width, _height, target );
 
 		};
 
@@ -704,7 +714,7 @@ class WebGLRenderer {
 		 */
 		this.getDrawingBufferSize = function ( target ) {
 
-			return target.set( _width * _pixelRatio, _height * _pixelRatio ).floor();
+			return vec2Floor( vec2Set( _width * _pixelRatio, _height * _pixelRatio, target ), target );
 
 		};
 
@@ -776,7 +786,7 @@ class WebGLRenderer {
 		 */
 		this.getCurrentViewport = function ( target ) {
 
-			return target.copy( _currentViewport );
+			return vec4Copy( _currentViewport, target );
 
 		};
 
@@ -788,7 +798,7 @@ class WebGLRenderer {
 		 */
 		this.getViewport = function ( target ) {
 
-			return target.copy( _viewport );
+			return vec4Copy( _viewport, target );
 
 		};
 
@@ -805,15 +815,17 @@ class WebGLRenderer {
 
 			if ( x.isVector4 ) {
 
-				_viewport.set( x.x, x.y, x.z, x.w );
+				vec4Set( x.x, x.y, x.z, x.w, _viewport );
 
 			} else {
 
-				_viewport.set( x, y, width, height );
+				vec4Set( x, y, width, height, _viewport );
 
 			}
 
-			state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ).round() );
+			vec4Copy( _viewport, _currentViewport );
+			vec4MultiplyScalar( _currentViewport, _pixelRatio, _currentViewport );
+			state.viewport( vec4Round( _currentViewport, _currentViewport ) );
 
 		};
 
@@ -825,7 +837,7 @@ class WebGLRenderer {
 		 */
 		this.getScissor = function ( target ) {
 
-			return target.copy( _scissor );
+			return vec4Copy( _scissor, target );
 
 		};
 
@@ -842,15 +854,17 @@ class WebGLRenderer {
 
 			if ( x.isVector4 ) {
 
-				_scissor.set( x.x, x.y, x.z, x.w );
+				vec4Set( x.x, x.y, x.z, x.w, _scissor );
 
 			} else {
 
-				_scissor.set( x, y, width, height );
+				vec4Set( x, y, width, height, _scissor );
 
 			}
 
-			state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ).round() );
+			vec4Copy( _scissor, _currentScissor );
+			vec4MultiplyScalar( _currentScissor, _pixelRatio, _currentScissor );
+			state.scissor( vec4Round( _currentScissor, _currentScissor ) );
 
 		};
 
@@ -912,7 +926,7 @@ class WebGLRenderer {
 		 */
 		this.getClearColor = function ( target ) {
 
-			return target.copy( background.getClearColor() );
+			return colorCopy( background.getClearColor(), target );
 
 		};
 
@@ -1663,8 +1677,8 @@ class WebGLRenderer {
 			currentRenderState.state.textureUnits = textures.getTextureUnits();
 			renderStateStack.push( currentRenderState );
 
-			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-			_frustum.setFromProjectionMatrix( _projScreenMatrix, WebGLCoordinateSystem, camera.reversedDepth );
+			mat4MultiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse, _projScreenMatrix );
+			frustumSetFromProjectionMatrix( _projScreenMatrix, WebGLCoordinateSystem, camera.reversedDepth, _frustum );
 
 			_localClippingEnabled = this.localClippingEnabled;
 			_clippingEnabled = clipping.init( this.clippingPlanes, _localClippingEnabled );
@@ -1872,8 +1886,8 @@ class WebGLRenderer {
 
 						if ( sortObjects ) {
 
-							_vector4.setFromMatrixPosition( object.matrixWorld )
-								.applyMatrix4( _projScreenMatrix );
+							vec4SetFromMatrixPosition( object.matrixWorld, _vector4 );
+							vec4ApplyMatrix4( _vector4, _projScreenMatrix, _vector4 );
 
 						}
 
@@ -1900,18 +1914,17 @@ class WebGLRenderer {
 							if ( object.boundingSphere !== undefined ) {
 
 								if ( object.boundingSphere === null ) object.computeBoundingSphere();
-								_vector4.copy( object.boundingSphere.center );
+								vec4Copy( object.boundingSphere.center, _vector4 );
 
 							} else {
 
 								if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
-								_vector4.copy( geometry.boundingSphere.center );
+								vec4Copy( geometry.boundingSphere.center, _vector4 );
 
 							}
 
-							_vector4
-								.applyMatrix4( object.matrixWorld )
-								.applyMatrix4( _projScreenMatrix );
+							vec4ApplyMatrix4( _vector4, object.matrixWorld, _vector4 );
+							vec4ApplyMatrix4( _vector4, _projScreenMatrix, _vector4 );
 
 						}
 
@@ -1962,7 +1975,7 @@ class WebGLRenderer {
 
 			if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, camera );
 
-			if ( viewport ) state.viewport( _currentViewport.copy( viewport ) );
+			if ( viewport ) state.viewport( vec4Copy( viewport, _currentViewport ) );
 
 			if ( opaqueObjects.length > 0 ) renderObjects( opaqueObjects, scene, camera );
 			if ( transmissiveObjects.length > 0 ) renderObjects( transmissiveObjects, scene, camera );
@@ -2327,7 +2340,7 @@ class WebGLRenderer {
 
 			}
 
-			objectPosition.setFromMatrixPosition( object.matrixWorld );
+			vec3SetFromMatrixPosition( object.matrixWorld, objectPosition );
 
 			for ( let i = 0, l = volumes.length; i < l; i ++ ) {
 
@@ -2585,7 +2598,7 @@ class WebGLRenderer {
 
 				if ( uCamPos !== undefined ) {
 
-					uCamPos.setValue( _gl, _vector3.setFromMatrixPosition( camera.matrixWorld ) );
+					uCamPos.setValue( _gl, vec3SetFromMatrixPosition( camera.matrixWorld, _vector3 ) );
 
 				}
 
@@ -2917,8 +2930,8 @@ class WebGLRenderer {
 					// Bind to the stored framebuffer (may be null for default, or a WebGLFramebuffer)
 					state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
 
-					_currentViewport.copy( renderTarget.viewport );
-					_currentScissor.copy( renderTarget.scissor );
+					vec4Copy( renderTarget.viewport, _currentViewport );
+					vec4Copy( renderTarget.scissor, _currentScissor );
 					_currentScissorTest = renderTarget.scissorTest;
 
 					state.viewport( _currentViewport );
@@ -3004,14 +3017,18 @@ class WebGLRenderer {
 
 				}
 
-				_currentViewport.copy( renderTarget.viewport );
-				_currentScissor.copy( renderTarget.scissor );
+				vec4Copy( renderTarget.viewport, _currentViewport );
+				vec4Copy( renderTarget.scissor, _currentScissor );
 				_currentScissorTest = renderTarget.scissorTest;
 
 			} else {
 
-				_currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ).floor();
-				_currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ).floor();
+				vec4Copy( _viewport, _currentViewport );
+				vec4MultiplyScalar( _currentViewport, _pixelRatio, _currentViewport );
+				vec4Floor( _currentViewport, _currentViewport );
+				vec4Copy( _scissor, _currentScissor );
+				vec4MultiplyScalar( _currentScissor, _pixelRatio, _currentScissor );
+				vec4Floor( _currentScissor, _currentScissor );
 				_currentScissorTest = _scissorTest;
 
 			}

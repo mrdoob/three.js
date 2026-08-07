@@ -2,6 +2,8 @@ import { Vector2 } from '../math/Vector2.js';
 import { MeshStandardMaterial } from './MeshStandardMaterial.js';
 import { Color } from '../math/Color.js';
 import { clamp } from '../math/MathUtils.js';
+import { colorCopy } from '../math/ColorFunctions.js';
+import { vec2Copy } from '../math/Vector2Functions.js';
 
 /**
  * An extension of the {@link MeshStandardMaterial}, providing more advanced
@@ -565,7 +567,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.clearcoatRoughness = source.clearcoatRoughness;
 		this.clearcoatRoughnessMap = source.clearcoatRoughnessMap;
 		this.clearcoatNormalMap = source.clearcoatNormalMap;
-		this.clearcoatNormalScale.copy( source.clearcoatNormalScale );
+		vec2Copy( source.clearcoatNormalScale, this.clearcoatNormalScale );
 
 		this.dispersion = source.dispersion;
 		this.ior = source.ior;
@@ -579,7 +581,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.retroreflectivity = source.retroreflectivity;
 
 		this.sheen = source.sheen;
-		this.sheenColor.copy( source.sheenColor );
+		colorCopy( source.sheenColor, this.sheenColor );
 		this.sheenColorMap = source.sheenColorMap;
 		this.sheenRoughness = source.sheenRoughness;
 		this.sheenRoughnessMap = source.sheenRoughnessMap;
@@ -590,11 +592,11 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.thickness = source.thickness;
 		this.thicknessMap = source.thicknessMap;
 		this.attenuationDistance = source.attenuationDistance;
-		this.attenuationColor.copy( source.attenuationColor );
+		colorCopy( source.attenuationColor, this.attenuationColor );
 
 		this.specularIntensity = source.specularIntensity;
 		this.specularIntensityMap = source.specularIntensityMap;
-		this.specularColor.copy( source.specularColor );
+		colorCopy( source.specularColor, this.specularColor );
 		this.specularColorMap = source.specularColorMap;
 
 		return this;

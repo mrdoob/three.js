@@ -1,4 +1,5 @@
 import { SphericalHarmonics3 } from '../math/SphericalHarmonics3.js';
+import { sh3Copy, sh3ToArray } from '../math/SphericalHarmonics3Functions.js';
 import { Light } from './Light.js';
 
 /**
@@ -54,7 +55,7 @@ class LightProbe extends Light {
 
 		super.copy( source );
 
-		this.sh.copy( source.sh );
+		sh3Copy( source.sh, this.sh );
 
 		return this;
 
@@ -64,7 +65,7 @@ class LightProbe extends Light {
 
 		const data = super.toJSON( meta );
 
-		data.object.sh = this.sh.toArray();
+		data.object.sh = sh3ToArray( this.sh );
 
 		return data;
 

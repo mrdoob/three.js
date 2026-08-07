@@ -5,8 +5,14 @@ import {
 	MirroredRepeatWrapping,
 	ImageLoader,
 	ImageBitmapLoader,
-	Matrix3,
-	Matrix4,
+	mat3FromArray,
+	mat3Determinant,
+	mat3Invert,
+	mat3Transpose,
+	mat4FromArray,
+	mat4Determinant,
+	mat4Invert,
+	mat4Transpose,
 	MeshBasicNodeMaterial,
 	MeshPhysicalNodeMaterial,
 } from 'three/webgpu';
@@ -126,21 +132,23 @@ function invertConstantMatrixValues( values, size ) {
 
 	if ( size === 3 ) {
 
-		const matrix = new Matrix3().setFromArray( values );
-		if ( Math.abs( matrix.determinant() ) < MATRIX_INVERSE_EPSILON ) return null;
-		matrix.invert();
+		const matrix = mat3FromArray( values );
+		if ( Math.abs( mat3Determinant( matrix ) ) < MATRIX_INVERSE_EPSILON ) return null;
+		mat3Invert( matrix, matrix );
 		// Convert Three.js internal column-major storage back to row-major literal order.
-		return matrix.transpose().elements;
+		mat3Transpose( matrix, matrix );
+		return matrix.elements;
 
 	}
 
 	if ( size === 4 ) {
 
-		const matrix = new Matrix4().setFromArray( values );
-		if ( Math.abs( matrix.determinant() ) < MATRIX_INVERSE_EPSILON ) return null;
-		matrix.invert();
+		const matrix = mat4FromArray( values );
+		if ( Math.abs( mat4Determinant( matrix ) ) < MATRIX_INVERSE_EPSILON ) return null;
+		mat4Invert( matrix, matrix );
 		// Convert Three.js internal column-major storage back to row-major literal order.
-		return matrix.transpose().elements;
+		mat4Transpose( matrix, matrix );
+		return matrix.elements;
 
 	}
 

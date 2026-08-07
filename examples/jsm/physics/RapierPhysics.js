@@ -1,11 +1,23 @@
-import { Timer, Vector3, Quaternion, Matrix4 } from 'three';
+import {
+	Timer,
+	mat4Compose,
+	mat4Create,
+	mat4ToArray,
+	quatCreate,
+	quatSet,
+	vec3Copy,
+	vec3Create,
+	vec3FromArray,
+	vec3FromBufferAttribute,
+	vec3Set
+} from 'three';
 
 const RAPIER_PATH = 'https://cdn.skypack.dev/@dimforge/rapier3d-compat@0.17.3';
 
 const frameRate = 60;
 
-const _scale = new Vector3( 1, 1, 1 );
-const ZERO = new Vector3();
+const _scale = /*@__PURE__*/ vec3Set( vec3Create(), 1, 1, 1 );
+const ZERO = /*@__PURE__*/ vec3Create();
 
 let RAPIER = null;
 
@@ -54,12 +66,12 @@ function getShape( geometry ) {
 	} else if ( geometry.type === 'BufferGeometry' ) {
 
 		const vertices = [];
-		const vertex = new Vector3();
+		const vertex = vec3Create();
 		const position = geometry.getAttribute( 'position' );
 
 		for ( let i = 0; i < position.count; i ++ ) {
 
-			vertex.fromBufferAttribute( position, i );
+			vec3FromBufferAttribute( position, i, vertex );
 			vertices.push( vertex.x, vertex.y, vertex.z );
 
 		}
@@ -104,15 +116,15 @@ async function RapierPhysics() {
 
 	// Docs: https://rapier.rs/docs/api/javascript/JavaScript3D/
 
-	const gravity = new Vector3( 0.0, - 9.81, 0.0 );
+	const gravity = { x: 0.0, y: - 9.81, z: 0.0 };
 	const world = new RAPIER.World( gravity );
 
 	const meshes = [];
 	const meshMap = new WeakMap();
 
-	const _vector = new Vector3();
-	const _quaternion = new Quaternion();
-	const _matrix = new Matrix4();
+	const _vector = vec3Create();
+	const _quaternion = quatCreate();
+	const _matrix = mat4Create();
 
 	function addScene( scene ) {
 
@@ -191,7 +203,7 @@ async function RapierPhysics() {
 
 		for ( let i = 0; i < mesh.count; i ++ ) {
 
-			const position = _vector.fromArray( array, i * 16 + 12 );
+			const position = vec3FromArray( array, i * 16 + 12, _vector );
 			const { body, collider } = createBody( position, null, mass, shape );
 			bodies.push( body );
 			colliders.push( collider );
@@ -205,7 +217,7 @@ async function RapierPhysics() {
 	function createBody( position, quaternion, mass, shape ) {
 
 		const desc = mass > 0 ? RAPIER.RigidBodyDesc.dynamic() : RAPIER.RigidBodyDesc.fixed();
-		desc.setTranslation( ...position );
+		desc.setTranslation( position.x, position.y, position.z );
 		if ( quaternion !== null ) desc.setRotation( quaternion );
 
 		const body = world.createRigidBody( desc );
@@ -340,9 +352,11 @@ async function RapierPhysics() {
 					const body = bodies[ j ];
 
 					const position = body.translation();
-					_quaternion.copy( body.rotation() );
+					const rotation = body.rotation();
+					quatSet( rotation.x, rotation.y, rotation.z, rotation.w, _quaternion );
 
-					_matrix.compose( position, _quaternion, _scale ).toArray( array, j * 16 );
+					mat4Compose( position, _quaternion, _scale, _matrix );
+					mat4ToArray( _matrix, array, j * 16 );
 
 				}
 
@@ -353,8 +367,11 @@ async function RapierPhysics() {
 
 				const { body } = meshMap.get( mesh );
 
-				mesh.position.copy( body.translation() );
-				mesh.quaternion.copy( body.rotation() );
+				vec3Copy( body.translation(), mesh.position );
+
+				const rotation = body.rotation();
+				quatSet( rotation.x, rotation.y, rotation.z, rotation.w, mesh.quaternion );
+				mesh.quaternion._onChangeCallback();
 
 			}
 

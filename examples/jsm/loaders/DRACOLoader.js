@@ -1,7 +1,8 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
-	Color,
+	colorCreate,
+	colorFromBufferAttribute,
 	ColorManagement,
 	FileLoader,
 	Loader,
@@ -343,11 +344,11 @@ class DRACOLoader extends Loader {
 
 		if ( inputColorSpace !== SRGBColorSpace ) return;
 
-		const _color = new Color();
+		const _color = colorCreate();
 
 		for ( let i = 0, il = attribute.count; i < il; i ++ ) {
 
-			_color.fromBufferAttribute( attribute, i );
+			colorFromBufferAttribute( attribute, i, _color );
 			ColorManagement.colorSpaceToWorking( _color, SRGBColorSpace );
 			attribute.setXYZ( i, _color.r, _color.g, _color.b );
 

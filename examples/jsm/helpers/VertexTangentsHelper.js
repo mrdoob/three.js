@@ -3,11 +3,16 @@ import {
 	Float32BufferAttribute,
 	LineSegments,
 	LineBasicMaterial,
-	Vector3
+	vec3Add,
+	vec3ApplyMatrix4,
+	vec3Create,
+	vec3FromBufferAttribute,
+	vec3MultiplyScalar,
+	vec3TransformDirection
 } from 'three';
 
-const _v1 = new Vector3();
-const _v2 = new Vector3();
+const _v1 = /*@__PURE__*/ vec3Create();
+const _v2 = /*@__PURE__*/ vec3Create();
 
 /**
  * Visualizes an object's vertex tangents.
@@ -97,11 +102,14 @@ class VertexTangentsHelper extends LineSegments {
 
 		for ( let j = 0, jl = objPos.count; j < jl; j ++ ) {
 
-			_v1.fromBufferAttribute( objPos, j ).applyMatrix4( matrixWorld );
+			vec3FromBufferAttribute( objPos, j, _v1 );
+			vec3ApplyMatrix4( _v1, matrixWorld, _v1 );
 
-			_v2.fromBufferAttribute( objTan, j );
+			vec3FromBufferAttribute( objTan, j, _v2 );
 
-			_v2.transformDirection( matrixWorld ).multiplyScalar( this.size ).add( _v1 );
+			vec3TransformDirection( _v2, matrixWorld, _v2 );
+			vec3MultiplyScalar( _v2, this.size, _v2 );
+			vec3Add( _v2, _v1, _v2 );
 
 			position.setXYZ( idx, _v1.x, _v1.y, _v1.z );
 

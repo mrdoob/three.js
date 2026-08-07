@@ -1,13 +1,13 @@
 import { WebGLCoordinateSystem } from '../constants.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Object3D } from '../core/Object3D.js';
-import { Vector3 } from '../math/Vector3.js';
-import { Quaternion } from '../math/Quaternion.js';
 import { mat4Compose, mat4Copy, mat4Decompose, mat4Invert } from '../math/Matrix4Functions.js';
+import { quatCreate } from '../math/QuaternionFunctions.js';
+import { vec3Create, vec3Negate, vec3Set } from '../math/Vector3Functions.js';
 
-const _position = /*@__PURE__*/ new Vector3();
-const _quaternion = /*@__PURE__*/ new Quaternion();
-const _scale = /*@__PURE__*/ new Vector3();
+const _position = /*@__PURE__*/ vec3Create();
+const _quaternion = /*@__PURE__*/ quatCreate();
+const _scale = /*@__PURE__*/ vec3Create();
 
 /**
  * Abstract base class for cameras. This class should always be inherited
@@ -84,10 +84,10 @@ class Camera extends Object3D {
 
 		super.copy( source, recursive );
 
-		this.matrixWorldInverse.copy( source.matrixWorldInverse );
+		mat4Copy( source.matrixWorldInverse, this.matrixWorldInverse );
 
-		this.projectionMatrix.copy( source.projectionMatrix );
-		this.projectionMatrixInverse.copy( source.projectionMatrixInverse );
+		mat4Copy( source.projectionMatrix, this.projectionMatrix );
+		mat4Copy( source.projectionMatrixInverse, this.projectionMatrixInverse );
 
 		this.coordinateSystem = source.coordinateSystem;
 
@@ -106,7 +106,7 @@ class Camera extends Object3D {
 	 */
 	getWorldDirection( target ) {
 
-		return super.getWorldDirection( target ).negate();
+		return vec3Negate( super.getWorldDirection( target ), target );
 
 	}
 
@@ -139,7 +139,7 @@ class Camera extends Object3D {
 
 		} else {
 
-			_scale.set( 1, 1, 1 );
+			vec3Set( _scale, 1, 1, 1 );
 			mat4Compose( _position, _quaternion, _scale, this.matrixWorldInverse );
 			mat4Invert( this.matrixWorldInverse, this.matrixWorldInverse );
 

@@ -92,7 +92,7 @@ export default QUnit.module( 'Extras', () => {
 
 				points = curve.getPoints( 4 );
 
-				assert.deepEqual( points, curve.points, '2nd: Returned points are identical to control points' );
+				assert.deepEqual( points.map( p => ( { x: p.x, y: p.y } ) ), curve.points.map( p => ( { x: p.x, y: p.y } ) ), '2nd: Returned points are identical to control points' );
 
 			} );
 

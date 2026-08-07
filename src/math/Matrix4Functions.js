@@ -1,4 +1,5 @@
 import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../constants.js';
+import { quatIdentity, quatSetFromRotationMatrix } from './QuaternionFunctions.js';
 
 /**
  * A structural type describing any object that stores a 4x4 matrix as a
@@ -176,9 +177,9 @@ export function mat4ExtractBasis( m, xAxis, yAxis, zAxis ) {
 
 	if ( mat4DeterminantAffine( m ) === 0 ) {
 
-		xAxis.set( 1, 0, 0 );
-		yAxis.set( 0, 1, 0 );
-		zAxis.set( 0, 0, 1 );
+		xAxis.x = 1; xAxis.y = 0; xAxis.z = 0;
+		yAxis.x = 0; yAxis.y = 1; yAxis.z = 0;
+		zAxis.x = 0; zAxis.y = 0; zAxis.z = 1;
 
 		return m;
 
@@ -186,9 +187,9 @@ export function mat4ExtractBasis( m, xAxis, yAxis, zAxis ) {
 
 	const me = m.elements;
 
-	xAxis.set( me[ 0 ], me[ 1 ], me[ 2 ] );
-	yAxis.set( me[ 4 ], me[ 5 ], me[ 6 ] );
-	zAxis.set( me[ 8 ], me[ 9 ], me[ 10 ] );
+	xAxis.x = me[ 0 ]; xAxis.y = me[ 1 ]; xAxis.z = me[ 2 ];
+	yAxis.x = me[ 4 ]; yAxis.y = me[ 5 ]; yAxis.z = me[ 6 ];
+	zAxis.x = me[ 8 ]; zAxis.y = me[ 9 ]; zAxis.z = me[ 10 ];
 
 	return m;
 
@@ -1091,8 +1092,16 @@ export function mat4Decompose( m, position, quaternion, scale ) {
 
 	if ( det === 0 ) {
 
-		scale.set( 1, 1, 1 );
-		quaternion.identity();
+		scale.x = 1;
+		scale.y = 1;
+		scale.z = 1;
+		quatIdentity( quaternion );
+
+		if ( typeof quaternion._onChangeCallback === 'function' ) {
+
+			quaternion._onChangeCallback();
+
+		}
 
 		return m;
 
@@ -1118,7 +1127,13 @@ export function mat4Decompose( m, position, quaternion, scale ) {
 	re[ 8 ] = te[ 8 ] * invSZ; re[ 9 ] = te[ 9 ] * invSZ; re[ 10 ] = te[ 10 ] * invSZ; re[ 11 ] = 0;
 	re[ 12 ] = 0; re[ 13 ] = 0; re[ 14 ] = 0; re[ 15 ] = 1;
 
-	quaternion.setFromRotationMatrix( _decomposeRotation );
+	quatSetFromRotationMatrix( _decomposeRotation, quaternion );
+
+	if ( typeof quaternion._onChangeCallback === 'function' ) {
+
+		quaternion._onChangeCallback();
+
+	}
 
 	scale.x = sx;
 	scale.y = sy;

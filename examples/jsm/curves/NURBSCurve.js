@@ -1,7 +1,13 @@
 import {
 	Curve,
-	Vector3,
-	Vector4
+	vec3Copy,
+	vec3Create,
+	vec3Normalize,
+	vec3Set,
+	vec4Create,
+	vec4DivideScalar,
+	vec4FromArray,
+	vec4ToArray
 } from 'three';
 import * as NURBSUtils from '../curves/NURBSUtils.js';
 
@@ -70,7 +76,7 @@ class NURBSCurve extends Curve {
 
 			// ensure Vector4 for control points
 			const point = controlPoints[ i ];
-			this.controlPoints[ i ] = new Vector4( point.x, point.y, point.z, point.w );
+			this.controlPoints[ i ] = vec4Create( point.x, point.y, point.z, point.w );
 
 		}
 
@@ -83,7 +89,7 @@ class NURBSCurve extends Curve {
 	 * @param {Vector3} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector3} The position on the curve.
 	 */
-	getPoint( t, optionalTarget = new Vector3() ) {
+	getPoint( t, optionalTarget = vec3Create() ) {
 
 		const point = optionalTarget;
 
@@ -95,11 +101,11 @@ class NURBSCurve extends Curve {
 		if ( hpoint.w !== 1.0 ) {
 
 			// project to 3D space: (wx, wy, wz, w) -> (x, y, z, 1)
-			hpoint.divideScalar( hpoint.w );
+			vec4DivideScalar( hpoint, hpoint.w, hpoint );
 
 		}
 
-		return point.set( hpoint.x, hpoint.y, hpoint.z );
+		return vec3Set( point, hpoint.x, hpoint.y, hpoint.z );
 
 	}
 
@@ -110,13 +116,13 @@ class NURBSCurve extends Curve {
 	 * @param {Vector3} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector3} The tangent vector.
 	 */
-	getTangent( t, optionalTarget = new Vector3() ) {
+	getTangent( t, optionalTarget = vec3Create() ) {
 
 		const tangent = optionalTarget;
 
 		const u = this.knots[ 0 ] + t * ( this.knots[ this.knots.length - 1 ] - this.knots[ 0 ] );
 		const ders = NURBSUtils.calcNURBSDerivatives( this.degree, this.knots, this.controlPoints, u, 1 );
-		tangent.copy( ders[ 1 ] ).normalize();
+		vec3Normalize( vec3Copy( ders[ 1 ], tangent ), tangent );
 
 		return tangent;
 
@@ -128,7 +134,7 @@ class NURBSCurve extends Curve {
 
 		data.degree = this.degree;
 		data.knots = [ ...this.knots ];
-		data.controlPoints = this.controlPoints.map( p => p.toArray() );
+		data.controlPoints = this.controlPoints.map( p => vec4ToArray( p ) );
 		data.startKnot = this.startKnot;
 		data.endKnot = this.endKnot;
 
@@ -142,7 +148,7 @@ class NURBSCurve extends Curve {
 
 		this.degree = json.degree;
 		this.knots = [ ...json.knots ];
-		this.controlPoints = json.controlPoints.map( p => new Vector4( p[ 0 ], p[ 1 ], p[ 2 ], p[ 3 ] ) );
+		this.controlPoints = json.controlPoints.map( p => vec4FromArray( p ) );
 		this.startKnot = json.startKnot;
 		this.endKnot = json.endKnot;
 

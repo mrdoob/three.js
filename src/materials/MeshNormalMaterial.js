@@ -1,6 +1,7 @@
 import { TangentSpaceNormalMap } from '../constants.js';
 import { Material } from './Material.js';
 import { Vector2 } from '../math/Vector2.js';
+import { vec2Copy } from '../math/Vector2Functions.js';
 
 /**
  * A material that maps the normal vectors to RGB colors.
@@ -163,7 +164,7 @@ class MeshNormalMaterial extends Material {
 
 		this.normalMap = source.normalMap;
 		this.normalMapType = source.normalMapType;
-		this.normalScale.copy( source.normalScale );
+		vec2Copy( source.normalScale, this.normalScale );
 
 		this.displacementMap = source.displacementMap;
 		this.displacementScale = source.displacementScale;

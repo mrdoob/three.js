@@ -1,10 +1,10 @@
-import { Matrix4 } from '../math/Matrix4.js';
 import { DEG2RAD } from '../math/MathUtils.js';
+import { mat4Copy, mat4Create, mat4Multiply } from '../math/Matrix4Functions.js';
 import { PerspectiveCamera } from './PerspectiveCamera.js';
 
-const _eyeRight = /*@__PURE__*/ new Matrix4();
-const _eyeLeft = /*@__PURE__*/ new Matrix4();
-const _projectionMatrix = /*@__PURE__*/ new Matrix4();
+const _eyeRight = /*@__PURE__*/ mat4Create();
+const _eyeLeft = /*@__PURE__*/ mat4Create();
+const _projectionMatrix = /*@__PURE__*/ mat4Create();
 
 /**
  * A special type of camera that uses two perspective cameras with
@@ -103,7 +103,7 @@ class StereoCamera {
 			// Off-axis stereoscopic effect based on
 			// http://paulbourke.net/stereographics/stereorender/
 
-			_projectionMatrix.copy( camera.projectionMatrix );
+			mat4Copy( camera.projectionMatrix, _projectionMatrix );
 			const eyeSepHalf = cache.eyeSep / 2;
 			const eyeSepOnProjection = eyeSepHalf * cache.near / cache.focus;
 			const ymax = ( cache.near * Math.tan( DEG2RAD * cache.fov * 0.5 ) ) / cache.zoom;
@@ -122,7 +122,7 @@ class StereoCamera {
 			_projectionMatrix.elements[ 0 ] = 2 * cache.near / ( xmax - xmin );
 			_projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
 
-			this.cameraL.projectionMatrix.copy( _projectionMatrix );
+			mat4Copy( _projectionMatrix, this.cameraL.projectionMatrix );
 
 			// for right eye
 
@@ -132,14 +132,14 @@ class StereoCamera {
 			_projectionMatrix.elements[ 0 ] = 2 * cache.near / ( xmax - xmin );
 			_projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
 
-			this.cameraR.projectionMatrix.copy( _projectionMatrix );
+			mat4Copy( _projectionMatrix, this.cameraR.projectionMatrix );
 
 		}
 
-		this.cameraL.matrix.copy( camera.matrixWorld ).multiply( _eyeLeft );
+		mat4Multiply( camera.matrixWorld, _eyeLeft, this.cameraL.matrix );
 		this.cameraL.matrixWorldNeedsUpdate = true;
 
-		this.cameraR.matrix.copy( camera.matrixWorld ).multiply( _eyeRight );
+		mat4Multiply( camera.matrixWorld, _eyeRight, this.cameraR.matrix );
 		this.cameraR.matrixWorldNeedsUpdate = true;
 
 	}

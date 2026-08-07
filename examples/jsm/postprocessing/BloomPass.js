@@ -3,8 +3,8 @@ import {
 	HalfFloatType,
 	ShaderMaterial,
 	UniformsUtils,
-	Vector2,
-	WebGLRenderTarget
+	WebGLRenderTarget,
+	vec2Create
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 import { ConvolutionShader } from '../shaders/ConvolutionShader.js';
@@ -233,8 +233,8 @@ const CombineShader = {
 
 };
 
-BloomPass.blurX = new Vector2( 0.001953125, 0.0 );
-BloomPass.blurY = new Vector2( 0.0, 0.001953125 );
+BloomPass.blurX = /*@__PURE__*/ vec2Create( 0.001953125, 0.0 );
+BloomPass.blurY = /*@__PURE__*/ vec2Create( 0.0, 0.001953125 );
 
 
 function gauss( x, sigma ) {

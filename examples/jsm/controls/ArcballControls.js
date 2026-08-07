@@ -7,13 +7,50 @@ import {
 	LineBasicMaterial,
 	Raycaster,
 	Group,
-	Box3,
-	Sphere,
-	Quaternion,
-	Vector2,
 	Vector3,
-	Matrix4,
-	MathUtils
+	MathUtils,
+	box3Create,
+	box3GetBoundingSphere,
+	box3SetFromObject,
+	mat4Copy,
+	mat4Create,
+	mat4Decompose,
+	mat4ExtractRotation,
+	mat4FromArray,
+	mat4Identity,
+	mat4MakeRotationAxis,
+	mat4MakeScale,
+	mat4MakeTranslation,
+	mat4Multiply,
+	mat4SetPosition,
+	quatCopy,
+	quatCreate,
+	quatSetFromRotationMatrix,
+	sphereCreate,
+	vec2Angle,
+	vec2Copy,
+	vec2Create,
+	vec2SetX,
+	vec2SetY,
+	vec3Add,
+	vec3AngleTo,
+	vec3ApplyAxisAngle,
+	vec3ApplyMatrix4,
+	vec3ApplyQuaternion,
+	vec3Copy,
+	vec3Create,
+	vec3CrossVectors,
+	vec3DistanceTo,
+	vec3Equals,
+	vec3FromArray,
+	vec3Length,
+	vec3MultiplyScalar,
+	vec3Normalize,
+	vec3Set,
+	vec3SetFromMatrixPosition,
+	vec3SetY,
+	vec3SetZ,
+	vec3Sub
 } from 'three';
 
 //trackball state
@@ -54,8 +91,8 @@ const _center = {
 //transformation matrices for gizmos and camera
 const _transformation = {
 
-	camera: new Matrix4(),
-	gizmos: new Matrix4()
+	camera: mat4Create(),
+	gizmos: mat4Create()
 
 };
 
@@ -84,11 +121,11 @@ const _startEvent = { type: 'start' };
 const _endEvent = { type: 'end' };
 
 const _raycaster = new Raycaster();
-const _offset = new Vector3();
+const _offset = vec3Create();
 
-const _gizmoMatrixStateTemp = new Matrix4();
-const _cameraMatrixStateTemp = new Matrix4();
-const _scalePointTemp = new Vector3();
+const _gizmoMatrixStateTemp = mat4Create();
+const _cameraMatrixStateTemp = mat4Create();
+const _scalePointTemp = vec3Create();
 
 const _EPS = 0.000001;
 
@@ -136,7 +173,7 @@ class ArcballControls extends Controls {
 		 * @type {Vector3}
 		 */
 		this.target = new Vector3();
-		this._currentTarget = new Vector3();
+		this._currentTarget = vec3Create();
 
 		/**
 		 * The size of the gizmo relative to the screen width and height.
@@ -157,46 +194,46 @@ class ArcballControls extends Controls {
 
 
 		//global vectors and matrices that are used in some operations to avoid creating new objects every time (e.g. every time cursor moves)
-		this._v2_1 = new Vector2();
-		this._v3_1 = new Vector3();
-		this._v3_2 = new Vector3();
+		this._v2_1 = vec2Create();
+		this._v3_1 = vec3Create();
+		this._v3_2 = vec3Create();
 
-		this._m4_1 = new Matrix4();
-		this._m4_2 = new Matrix4();
+		this._m4_1 = mat4Create();
+		this._m4_2 = mat4Create();
 
-		this._quat = new Quaternion();
+		this._quat = quatCreate();
 
 		//transformation matrices
-		this._translationMatrix = new Matrix4(); //matrix for translation operation
-		this._rotationMatrix = new Matrix4(); //matrix for rotation operation
-		this._scaleMatrix = new Matrix4(); //matrix for scaling operation
+		this._translationMatrix = mat4Create(); //matrix for translation operation
+		this._rotationMatrix = mat4Create(); //matrix for rotation operation
+		this._scaleMatrix = mat4Create(); //matrix for scaling operation
 
-		this._rotationAxis = new Vector3(); //axis for rotate operation
+		this._rotationAxis = vec3Create(); //axis for rotate operation
 
 
 		//camera state
-		this._cameraMatrixState = new Matrix4();
-		this._cameraProjectionState = new Matrix4();
+		this._cameraMatrixState = mat4Create();
+		this._cameraProjectionState = mat4Create();
 
 		this._fovState = 1;
-		this._upState = new Vector3();
+		this._upState = vec3Create();
 		this._zoomState = 1;
 		this._nearPos = 0;
 		this._farPos = 0;
 
-		this._gizmoMatrixState = new Matrix4();
+		this._gizmoMatrixState = mat4Create();
 
 		//initial values
-		this._up0 = new Vector3();
+		this._up0 = vec3Create();
 		this._zoom0 = 1;
 		this._fov0 = 0;
 		this._initialNear = 0;
 		this._nearPos0 = 0;
 		this._initialFar = 0;
 		this._farPos0 = 0;
-		this._cameraMatrixState0 = new Matrix4();
-		this._gizmoMatrixState0 = new Matrix4();
-		this._target0 = new Vector3();
+		this._cameraMatrixState0 = mat4Create();
+		this._gizmoMatrixState0 = mat4Create();
+		this._target0 = vec3Create();
 
 		//pointers array
 		this._button = - 1;
@@ -224,12 +261,12 @@ class ArcballControls extends Controls {
 		this._movementThreshold = 24;
 
 		//cursor positions
-		this._currentCursorPosition = new Vector3();
-		this._startCursorPosition = new Vector3();
+		this._currentCursorPosition = vec3Create();
+		this._startCursorPosition = vec3Create();
 
 		//grid
 		this._grid = null; //grid to be visualized during pan operation
-		this._gridPosition = new Vector3();
+		this._gridPosition = vec3Create();
 
 		//gizmos
 		this._gizmos = new Group();
@@ -253,8 +290,8 @@ class ArcballControls extends Controls {
 		this._timeCurrent = 0; //time at which current rotate operation has been detected
 		this._anglePrev = 0; //angle of previous rotation
 		this._angleCurrent = 0; //angle of current rotation
-		this._cursorPosPrev = new Vector3();	//cursor position when previous rotate operation has been detected
-		this._cursorPosCurr = new Vector3();//cursor position when current rotate operation has been detected
+		this._cursorPosPrev = vec3Create();	//cursor position when previous rotate operation has been detected
+		this._cursorPosCurr = vec3Create();//cursor position when current rotate operation has been detected
 		this._wPrev = 0; //angular velocity of the previous rotate operation
 		this._wCurr = 0; //angular velocity of the current rotate operation
 
@@ -516,7 +553,7 @@ class ArcballControls extends Controls {
 					}
 
 					this.updateTbState( STATE.PAN, true );
-					this._startCursorPosition.copy( this.unprojectOnTbPlane( this.object, _center.x, _center.y, this.domElement ) );
+					vec3Copy( this.unprojectOnTbPlane( this.object, _center.x, _center.y, this.domElement ), this._startCursorPosition );
 					if ( this.enableGrid ) {
 
 						this.drawGrid();
@@ -543,14 +580,14 @@ class ArcballControls extends Controls {
 					}
 
 					this.updateTbState( STATE.ROTATE, true );
-					this._startCursorPosition.copy( this.unprojectOnTbSurface( this.object, _center.x, _center.y, this.domElement, this._tbRadius ) );
+					vec3Copy( this.unprojectOnTbSurface( this.object, _center.x, _center.y, this.domElement, this._tbRadius ), this._startCursorPosition );
 					this.activateGizmos( true );
 					if ( this.enableAnimations ) {
 
 						this._timePrev = this._timeCurrent = performance.now();
 						this._angleCurrent = this._anglePrev = 0;
-						this._cursorPosPrev.copy( this._startCursorPosition );
-						this._cursorPosCurr.copy( this._cursorPosPrev );
+						vec3Copy( this._startCursorPosition, this._cursorPosPrev );
+						vec3Copy( this._cursorPosPrev, this._cursorPosCurr );
 						this._wCurr = 0;
 						this._wPrev = this._wCurr;
 
@@ -579,8 +616,8 @@ class ArcballControls extends Controls {
 					}
 
 					this.updateTbState( STATE.FOV, true );
-					this._startCursorPosition.setY( this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
-					this._currentCursorPosition.copy( this._startCursorPosition );
+					vec3SetY( this._startCursorPosition, this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
+					vec3Copy( this._startCursorPosition, this._currentCursorPosition );
 					break;
 
 				case 'ZOOM':
@@ -603,8 +640,8 @@ class ArcballControls extends Controls {
 					}
 
 					this.updateTbState( STATE.SCALE, true );
-					this._startCursorPosition.setY( this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
-					this._currentCursorPosition.copy( this._startCursorPosition );
+					vec3SetY( this._startCursorPosition, this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
+					vec3Copy( this._startCursorPosition, this._currentCursorPosition );
 					break;
 
 			}
@@ -634,7 +671,7 @@ class ArcballControls extends Controls {
 							this.dispatchEvent( _startEvent );
 
 							this.updateTbState( opState, true );
-							this._startCursorPosition.copy( this.unprojectOnTbPlane( this.object, _center.x, _center.y, this.domElement ) );
+							vec3Copy( this.unprojectOnTbPlane( this.object, _center.x, _center.y, this.domElement ), this._startCursorPosition );
 							if ( this.enableGrid ) {
 
 								this.drawGrid();
@@ -646,7 +683,7 @@ class ArcballControls extends Controls {
 						} else {
 
 							//continue with pan operation
-							this._currentCursorPosition.copy( this.unprojectOnTbPlane( this.object, _center.x, _center.y, this.domElement ) );
+							vec3Copy( this.unprojectOnTbPlane( this.object, _center.x, _center.y, this.domElement ), this._currentCursorPosition );
 							this.applyTransformMatrix( this.pan( this._startCursorPosition, this._currentCursorPosition ) );
 
 						}
@@ -667,7 +704,7 @@ class ArcballControls extends Controls {
 							this.dispatchEvent( _startEvent );
 
 							this.updateTbState( opState, true );
-							this._startCursorPosition.copy( this.unprojectOnTbSurface( this.object, _center.x, _center.y, this.domElement, this._tbRadius ) );
+							vec3Copy( this.unprojectOnTbSurface( this.object, _center.x, _center.y, this.domElement, this._tbRadius ), this._startCursorPosition );
 
 							if ( this.enableGrid ) {
 
@@ -680,10 +717,10 @@ class ArcballControls extends Controls {
 						} else {
 
 							//continue with rotate operation
-							this._currentCursorPosition.copy( this.unprojectOnTbSurface( this.object, _center.x, _center.y, this.domElement, this._tbRadius ) );
+							vec3Copy( this.unprojectOnTbSurface( this.object, _center.x, _center.y, this.domElement, this._tbRadius ), this._currentCursorPosition );
 
-							const distance = this._startCursorPosition.distanceTo( this._currentCursorPosition );
-							const angle = this._startCursorPosition.angleTo( this._currentCursorPosition );
+							const distance = vec3DistanceTo( this._startCursorPosition, this._currentCursorPosition );
+							const angle = vec3AngleTo( this._startCursorPosition, this._currentCursorPosition );
 							const amount = Math.max( distance / this._tbRadius, angle ) * this.rotateSpeed; //effective rotation angle
 
 							this.applyTransformMatrix( this.rotate( this.calculateRotationAxis( this._startCursorPosition, this._currentCursorPosition ), amount ) );
@@ -694,8 +731,8 @@ class ArcballControls extends Controls {
 								this._timeCurrent = performance.now();
 								this._anglePrev = this._angleCurrent;
 								this._angleCurrent = amount;
-								this._cursorPosPrev.copy( this._cursorPosCurr );
-								this._cursorPosCurr.copy( this._currentCursorPosition );
+								vec3Copy( this._cursorPosCurr, this._cursorPosPrev );
+								vec3Copy( this._currentCursorPosition, this._cursorPosCurr );
 								this._wPrev = this._wCurr;
 								this._wCurr = this.calculateAngularSpeed( this._anglePrev, this._angleCurrent, this._timePrev, this._timeCurrent );
 
@@ -719,8 +756,8 @@ class ArcballControls extends Controls {
 							this.dispatchEvent( _startEvent );
 
 							this.updateTbState( opState, true );
-							this._startCursorPosition.setY( this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
-							this._currentCursorPosition.copy( this._startCursorPosition );
+							vec3SetY( this._startCursorPosition, this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
+							vec3Copy( this._startCursorPosition, this._currentCursorPosition );
 
 							if ( this.enableGrid ) {
 
@@ -734,7 +771,7 @@ class ArcballControls extends Controls {
 
 							//continue with zoom operation
 							const screenNotches = 8;	//how many wheel notches corresponds to a full screen pan
-							this._currentCursorPosition.setY( this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
+							vec3SetY( this._currentCursorPosition, this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
 
 							const movement = this._currentCursorPosition.y - this._startCursorPosition.y;
 
@@ -750,7 +787,7 @@ class ArcballControls extends Controls {
 
 							}
 
-							this._v3_1.setFromMatrixPosition( this._gizmoMatrixState );
+							vec3SetFromMatrixPosition( this._gizmoMatrixState, this._v3_1 );
 
 							this.applyTransformMatrix( this.scale( size, this._v3_1 ) );
 
@@ -772,8 +809,8 @@ class ArcballControls extends Controls {
 							this.dispatchEvent( _startEvent );
 
 							this.updateTbState( opState, true );
-							this._startCursorPosition.setY( this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
-							this._currentCursorPosition.copy( this._startCursorPosition );
+							vec3SetY( this._startCursorPosition, this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
+							vec3Copy( this._startCursorPosition, this._currentCursorPosition );
 
 							if ( this.enableGrid ) {
 
@@ -787,7 +824,7 @@ class ArcballControls extends Controls {
 
 							//continue with fov operation
 							const screenNotches = 8;	//how many wheel notches corresponds to a full screen pan
-							this._currentCursorPosition.setY( this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
+							vec3SetY( this._currentCursorPosition, this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
 
 							const movement = this._currentCursorPosition.y - this._startCursorPosition.y;
 
@@ -803,8 +840,8 @@ class ArcballControls extends Controls {
 
 							}
 
-							this._v3_1.setFromMatrixPosition( this._cameraMatrixState );
-							const x = this._v3_1.distanceTo( this._gizmos.position );
+							vec3SetFromMatrixPosition( this._cameraMatrixState, this._v3_1 );
+							const x = vec3DistanceTo( this._v3_1, this._gizmos.position );
 							let xNew = x / size; //distance between camera and gizmos if scale(size, scalepoint) would be performed
 
 							//check min and max distance
@@ -820,14 +857,14 @@ class ArcballControls extends Controls {
 
 							const newDistance = y / Math.tan( MathUtils.DEG2RAD * ( newFov / 2 ) );
 							size = x / newDistance;
-							this._v3_2.setFromMatrixPosition( this._gizmoMatrixState );
+							vec3SetFromMatrixPosition( this._gizmoMatrixState, this._v3_2 );
 
 							this.setFov( newFov );
 							this.applyTransformMatrix( this.scale( size, this._v3_2, false ) );
 
 							//adjusting distance
-							_offset.copy( this._gizmos.position ).sub( this.object.position ).normalize().multiplyScalar( newDistance / x );
-							this._m4_1.makeTranslation( _offset.x, _offset.y, _offset.z );
+							vec3MultiplyScalar( vec3Normalize( vec3Sub( this._gizmos.position, this.object.position, _offset ), _offset ), newDistance / x, _offset );
+							mat4MakeTranslation( _offset.x, _offset.y, _offset.z, this._m4_1 );
 
 						}
 
@@ -959,8 +996,8 @@ class ArcballControls extends Controls {
 			this.updateTbState( STATE.PAN, true );
 
 			this.setCenter( ( this._touchCurrent[ 0 ].clientX + this._touchCurrent[ 1 ].clientX ) / 2, ( this._touchCurrent[ 0 ].clientY + this._touchCurrent[ 1 ].clientY ) / 2 );
-			this._startCursorPosition.copy( this.unprojectOnTbPlane( this.object, _center.x, _center.y, this.domElement, true ) );
-			this._currentCursorPosition.copy( this._startCursorPosition );
+			vec3Copy( this.unprojectOnTbPlane( this.object, _center.x, _center.y, this.domElement, true ), this._startCursorPosition );
+			vec3Copy( this._startCursorPosition, this._currentCursorPosition );
 
 			this.activateGizmos( false );
 
@@ -977,11 +1014,11 @@ class ArcballControls extends Controls {
 			if ( this._state != STATE.PAN ) {
 
 				this.updateTbState( STATE.PAN, true );
-				this._startCursorPosition.copy( this._currentCursorPosition );
+				vec3Copy( this._currentCursorPosition, this._startCursorPosition );
 
 			}
 
-			this._currentCursorPosition.copy( this.unprojectOnTbPlane( this.object, _center.x, _center.y, this.domElement, true ) );
+			vec3Copy( this.unprojectOnTbPlane( this.object, _center.x, _center.y, this.domElement, true ), this._currentCursorPosition );
 			this.applyTransformMatrix( this.pan( this._startCursorPosition, this._currentCursorPosition, true ) );
 			this.dispatchEvent( _changeEvent );
 
@@ -1040,12 +1077,12 @@ class ArcballControls extends Controls {
 
 			if ( ! this.enablePan ) {
 
-				rotationPoint = new Vector3().setFromMatrixPosition( this._gizmoMatrixState );
+				rotationPoint = vec3SetFromMatrixPosition( this._gizmoMatrixState, vec3Create() );
 
 			} else {
 
-				this._v3_2.setFromMatrixPosition( this._gizmoMatrixState );
-				rotationPoint = this.unprojectOnTbPlane( this.object, _center.x, _center.y, this.domElement ).applyQuaternion( this.object.quaternion ).multiplyScalar( 1 / this.object.zoom ).add( this._v3_2 );
+				vec3SetFromMatrixPosition( this._gizmoMatrixState, this._v3_2 );
+				rotationPoint = vec3Add( vec3MultiplyScalar( vec3ApplyQuaternion( this.unprojectOnTbPlane( this.object, _center.x, _center.y, this.domElement ), this.object.quaternion ), 1 / this.object.zoom ), this._v3_2 );
 
 			}
 
@@ -1109,16 +1146,11 @@ class ArcballControls extends Controls {
 
 				if ( this.object.isOrthographicCamera ) {
 
-					scalePoint = this.unprojectOnTbPlane( this.object, _center.x, _center.y, this.domElement )
-						.applyQuaternion( this.object.quaternion )
-						.multiplyScalar( 1 / this.object.zoom )
-						.add( this._gizmos.position );
+					scalePoint = vec3Add( vec3MultiplyScalar( vec3ApplyQuaternion( this.unprojectOnTbPlane( this.object, _center.x, _center.y, this.domElement ), this.object.quaternion ), 1 / this.object.zoom ), this._gizmos.position );
 
 				} else if ( this.object.isPerspectiveCamera ) {
 
-					scalePoint = this.unprojectOnTbPlane( this.object, _center.x, _center.y, this.domElement )
-						.applyQuaternion( this.object.quaternion )
-						.add( this._gizmos.position );
+					scalePoint = vec3Add( vec3ApplyQuaternion( this.unprojectOnTbPlane( this.object, _center.x, _center.y, this.domElement ), this.object.quaternion ), this._gizmos.position );
 
 				}
 
@@ -1160,8 +1192,8 @@ class ArcballControls extends Controls {
 
 			this.setCenter( clientX / nFingers, clientY / nFingers );
 
-			this._startCursorPosition.setY( this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
-			this._currentCursorPosition.copy( this._startCursorPosition );
+			vec3SetY( this._startCursorPosition, this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
+			vec3Copy( this._startCursorPosition, this._currentCursorPosition );
 
 		}
 
@@ -1196,7 +1228,7 @@ class ArcballControls extends Controls {
 			this.setCenter( clientX / nFingers, clientY / nFingers );
 
 			const screenNotches = 8;	//how many wheel notches corresponds to a full screen pan
-			this._currentCursorPosition.setY( this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
+			vec3SetY( this._currentCursorPosition, this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
 
 			const movement = this._currentCursorPosition.y - this._startCursorPosition.y;
 
@@ -1212,8 +1244,8 @@ class ArcballControls extends Controls {
 
 			}
 
-			this._v3_1.setFromMatrixPosition( this._cameraMatrixState );
-			const x = this._v3_1.distanceTo( this._gizmos.position );
+			vec3SetFromMatrixPosition( this._cameraMatrixState, this._v3_1 );
+			const x = vec3DistanceTo( this._v3_1, this._gizmos.position );
 			let xNew = x / size; //distance between camera and gizmos if scale(size, scalepoint) would be performed
 
 			//check min and max distance
@@ -1229,14 +1261,14 @@ class ArcballControls extends Controls {
 
 			const newDistance = y / Math.tan( MathUtils.DEG2RAD * ( newFov / 2 ) );
 			size = x / newDistance;
-			this._v3_2.setFromMatrixPosition( this._gizmoMatrixState );
+			vec3SetFromMatrixPosition( this._gizmoMatrixState, this._v3_2 );
 
 			this.setFov( newFov );
 			this.applyTransformMatrix( this.scale( size, this._v3_2, false ) );
 
 			//adjusting distance
-			_offset.copy( this._gizmos.position ).sub( this.object.position ).normalize().multiplyScalar( newDistance / x );
-			this._m4_1.makeTranslation( _offset.x, _offset.y, _offset.z );
+			vec3MultiplyScalar( vec3Normalize( vec3Sub( this._gizmos.position, this.object.position, _offset ), _offset ), newDistance / x, _offset );
+			mat4MakeTranslation( _offset.x, _offset.y, _offset.z, this._m4_1 );
 
 			this.dispatchEvent( _changeEvent );
 
@@ -1552,14 +1584,15 @@ class ArcballControls extends Controls {
 
 		if ( transformation.camera != null ) {
 
-			this._m4_1.copy( this._cameraMatrixState ).premultiply( transformation.camera );
-			this._m4_1.decompose( this.object.position, this.object.quaternion, this.object.scale );
+			mat4Multiply( transformation.camera, this._cameraMatrixState, this._m4_1 );
+			mat4Decompose( this._m4_1, this.object.position, this.object.quaternion, this.object.scale );
+			this.object.quaternion._onChangeCallback();
 			this.object.updateMatrix();
 
 			//update camera up vector
 			if ( this._state == STATE.ROTATE || this._state == STATE.ZROTATE || this._state == STATE.ANIMATION_ROTATE ) {
 
-				this.object.up.copy( this._upState ).applyQuaternion( this.object.quaternion );
+				vec3ApplyQuaternion( this._upState, this.object.quaternion, this.object.up );
 
 			}
 
@@ -1567,8 +1600,9 @@ class ArcballControls extends Controls {
 
 		if ( transformation.gizmos != null ) {
 
-			this._m4_1.copy( this._gizmoMatrixState ).premultiply( transformation.gizmos );
-			this._m4_1.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
+			mat4Multiply( transformation.gizmos, this._gizmoMatrixState, this._m4_1 );
+			mat4Decompose( this._m4_1, this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
+			this._gizmos.quaternion._onChangeCallback();
 			this._gizmos.updateMatrix();
 
 		}
@@ -1579,21 +1613,19 @@ class ArcballControls extends Controls {
 
 			if ( this.adjustNearFar ) {
 
-				const cameraDistance = this.object.position.distanceTo( this._gizmos.position );
+				const cameraDistance = vec3DistanceTo( this.object.position, this._gizmos.position );
 
-				const bb = new Box3();
-				bb.setFromObject( this._gizmos );
-				const sphere = new Sphere();
-				bb.getBoundingSphere( sphere );
+				const bb = box3SetFromObject( this._gizmos, false, box3Create() );
+				const sphere = box3GetBoundingSphere( bb, sphereCreate() );
 
-				const adjustedNearPosition = Math.max( this._nearPos0, sphere.radius + sphere.center.length() );
+				const adjustedNearPosition = Math.max( this._nearPos0, sphere.radius + vec3Length( sphere.center ) );
 				const regularNearPosition = cameraDistance - this._initialNear;
 
 				const minNearPos = Math.min( adjustedNearPosition, regularNearPosition );
 				this.object.near = cameraDistance - minNearPos;
 
 
-				const adjustedFarPosition = Math.min( this._farPos0, - sphere.radius + sphere.center.length() );
+				const adjustedFarPosition = Math.min( this._farPos0, - sphere.radius + vec3Length( sphere.center ) );
 				const regularFarPosition = cameraDistance - this._initialFar;
 
 				const minFarPos = Math.min( adjustedFarPosition, regularFarPosition );
@@ -1679,11 +1711,11 @@ class ArcballControls extends Controls {
 	 */
 	calculateRotationAxis( vec1, vec2 ) {
 
-		this._rotationMatrix.extractRotation( this._cameraMatrixState );
-		this._quat.setFromRotationMatrix( this._rotationMatrix );
+		mat4ExtractRotation( this._cameraMatrixState, this._rotationMatrix );
+		quatSetFromRotationMatrix( this._rotationMatrix, this._quat );
 
-		this._rotationAxis.crossVectors( vec1, vec2 ).applyQuaternion( this._quat );
-		return this._rotationAxis.normalize().clone();
+		vec3ApplyQuaternion( vec3CrossVectors( vec1, vec2, this._rotationAxis ), this._quat, this._rotationAxis );
+		return vec3Copy( vec3Normalize( this._rotationAxis, this._rotationAxis ), vec3Create() );
 
 	}
 
@@ -1696,7 +1728,7 @@ class ArcballControls extends Controls {
 	 */
 	calculateTbRadius( camera ) {
 
-		const distance = camera.position.distanceTo( this._gizmos.position );
+		const distance = vec3DistanceTo( camera.position, this._gizmos.position );
 
 		if ( camera.type == 'PerspectiveCamera' ) {
 
@@ -1723,16 +1755,18 @@ class ArcballControls extends Controls {
 	focus( point, size, amount = 1 ) {
 
 		//move center of camera (along with gizmos) towards point of interest
-		_offset.copy( point ).sub( this._gizmos.position ).multiplyScalar( amount );
-		this._translationMatrix.makeTranslation( _offset.x, _offset.y, _offset.z );
+		vec3MultiplyScalar( vec3Sub( point, this._gizmos.position, _offset ), amount, _offset );
+		mat4MakeTranslation( _offset.x, _offset.y, _offset.z, this._translationMatrix );
 
-		_gizmoMatrixStateTemp.copy( this._gizmoMatrixState );
-		this._gizmoMatrixState.premultiply( this._translationMatrix );
-		this._gizmoMatrixState.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
+		mat4Copy( this._gizmoMatrixState, _gizmoMatrixStateTemp );
+		mat4Multiply( this._translationMatrix, this._gizmoMatrixState, this._gizmoMatrixState );
+		mat4Decompose( this._gizmoMatrixState, this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
+		this._gizmos.quaternion._onChangeCallback();
 
-		_cameraMatrixStateTemp.copy( this._cameraMatrixState );
-		this._cameraMatrixState.premultiply( this._translationMatrix );
-		this._cameraMatrixState.decompose( this.object.position, this.object.quaternion, this.object.scale );
+		mat4Copy( this._cameraMatrixState, _cameraMatrixStateTemp );
+		mat4Multiply( this._translationMatrix, this._cameraMatrixState, this._cameraMatrixState );
+		mat4Decompose( this._cameraMatrixState, this.object.position, this.object.quaternion, this.object.scale );
+		this.object.quaternion._onChangeCallback();
 
 		//apply zoom
 		if ( this.enableZoom ) {
@@ -1741,8 +1775,8 @@ class ArcballControls extends Controls {
 
 		}
 
-		this._gizmoMatrixState.copy( _gizmoMatrixStateTemp );
-		this._cameraMatrixState.copy( _cameraMatrixStateTemp );
+		mat4Copy( _gizmoMatrixStateTemp, this._gizmoMatrixState );
+		mat4Copy( _cameraMatrixStateTemp, this._cameraMatrixState );
 
 	}
 
@@ -1772,7 +1806,7 @@ class ArcballControls extends Controls {
 
 			} else if ( this.object.isPerspectiveCamera ) {
 
-				const distance = this.object.position.distanceTo( this._gizmos.position );
+				const distance = vec3DistanceTo( this.object.position, this._gizmos.position );
 				const halfFovV = MathUtils.DEG2RAD * this.object.fov * 0.5;
 				const halfFovH = Math.atan( ( this.object.aspect ) * Math.tan( halfFovV ) );
 
@@ -1787,9 +1821,10 @@ class ArcballControls extends Controls {
 			if ( this._grid == null ) {
 
 				this._grid = new GridHelper( size, divisions, color, color );
-				this._grid.position.copy( this._gizmos.position );
-				this._gridPosition.copy( this._grid.position );
-				this._grid.quaternion.copy( this.object.quaternion );
+				vec3Copy( this._gizmos.position, this._grid.position );
+				vec3Copy( this._grid.position, this._gridPosition );
+				quatCopy( this.object.quaternion, this._grid.quaternion );
+				this._grid.quaternion._onChangeCallback();
 				this._grid.rotateX( Math.PI * 0.5 );
 
 				this.scene.add( this._grid );
@@ -1881,9 +1916,9 @@ class ArcballControls extends Controls {
 	getCursorNDC( cursorX, cursorY, canvas ) {
 
 		const canvasRect = canvas.getBoundingClientRect();
-		this._v2_1.setX( ( ( cursorX - canvasRect.left ) / canvasRect.width ) * 2 - 1 );
-		this._v2_1.setY( ( ( canvasRect.bottom - cursorY ) / canvasRect.height ) * 2 - 1 );
-		return this._v2_1.clone();
+		vec2SetX( this._v2_1, ( ( cursorX - canvasRect.left ) / canvasRect.width ) * 2 - 1, this._v2_1 );
+		vec2SetY( this._v2_1, ( ( canvasRect.bottom - cursorY ) / canvasRect.height ) * 2 - 1, this._v2_1 );
+		return vec2Copy( this._v2_1, vec2Create() );
 
 	}
 
@@ -1898,10 +1933,10 @@ class ArcballControls extends Controls {
 	 */
 	getCursorPosition( cursorX, cursorY, canvas ) {
 
-		this._v2_1.copy( this.getCursorNDC( cursorX, cursorY, canvas ) );
+		vec2Copy( this.getCursorNDC( cursorX, cursorY, canvas ), this._v2_1 );
 		this._v2_1.x *= ( this.object.right - this.object.left ) * 0.5;
 		this._v2_1.y *= ( this.object.top - this.object.bottom ) * 0.5;
-		return this._v2_1.clone();
+		return vec2Copy( this._v2_1, vec2Create() );
 
 	}
 
@@ -1923,22 +1958,22 @@ class ArcballControls extends Controls {
 
 		}
 
-		this._cameraMatrixState0.copy( camera.matrix );
-		this._cameraMatrixState.copy( this._cameraMatrixState0 );
-		this._cameraProjectionState.copy( camera.projectionMatrix );
+		mat4Copy( camera.matrix, this._cameraMatrixState0 );
+		mat4Copy( this._cameraMatrixState0, this._cameraMatrixState );
+		mat4Copy( camera.projectionMatrix, this._cameraProjectionState );
 		this._zoom0 = camera.zoom;
 		this._zoomState = this._zoom0;
 
 		this._initialNear = camera.near;
-		this._nearPos0 = camera.position.distanceTo( this.target ) - camera.near;
+		this._nearPos0 = vec3DistanceTo( camera.position, this.target ) - camera.near;
 		this._nearPos = this._initialNear;
 
 		this._initialFar = camera.far;
-		this._farPos0 = camera.position.distanceTo( this.target ) - camera.far;
+		this._farPos0 = vec3DistanceTo( camera.position, this.target ) - camera.far;
 		this._farPos = this._initialFar;
 
-		this._up0.copy( camera.up );
-		this._upState.copy( camera.up );
+		vec3Copy( camera.up, this._up0 );
+		vec3Copy( camera.up, this._upState );
 
 		this.object = camera;
 		this.object.updateProjectionMatrix();
@@ -2017,23 +2052,25 @@ class ArcballControls extends Controls {
 
 
 		//setting state
-		this._gizmoMatrixState0.identity().setPosition( tbCenter );
-		this._gizmoMatrixState.copy( this._gizmoMatrixState0 );
+		mat4SetPosition( mat4Identity( this._gizmoMatrixState0 ), tbCenter.x, tbCenter.y, tbCenter.z, this._gizmoMatrixState0 );
+		mat4Copy( this._gizmoMatrixState0, this._gizmoMatrixState );
 
 		if ( this.object.zoom !== 1 ) {
 
 			//adapt gizmos size to camera zoom
 			const size = 1 / this.object.zoom;
-			this._scaleMatrix.makeScale( size, size, size );
-			this._translationMatrix.makeTranslation( - tbCenter.x, - tbCenter.y, - tbCenter.z );
+			mat4MakeScale( size, size, size, this._scaleMatrix );
+			mat4MakeTranslation( - tbCenter.x, - tbCenter.y, - tbCenter.z, this._translationMatrix );
 
-			this._gizmoMatrixState.premultiply( this._translationMatrix ).premultiply( this._scaleMatrix );
-			this._translationMatrix.makeTranslation( tbCenter.x, tbCenter.y, tbCenter.z );
-			this._gizmoMatrixState.premultiply( this._translationMatrix );
+			mat4Multiply( this._translationMatrix, this._gizmoMatrixState, this._gizmoMatrixState );
+			mat4Multiply( this._scaleMatrix, this._gizmoMatrixState, this._gizmoMatrixState );
+			mat4MakeTranslation( tbCenter.x, tbCenter.y, tbCenter.z, this._translationMatrix );
+			mat4Multiply( this._translationMatrix, this._gizmoMatrixState, this._gizmoMatrixState );
 
 		}
 
-		this._gizmoMatrixState.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
+		mat4Decompose( this._gizmoMatrixState, this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
+		this._gizmos.quaternion._onChangeCallback();
 
 		//
 
@@ -2081,13 +2118,14 @@ class ArcballControls extends Controls {
 			const deltaTime = time - this._timeStart;
 			const animTime = deltaTime / this.focusAnimationTime;
 
-			this._gizmoMatrixState.copy( gizmoMatrix );
+			mat4Copy( gizmoMatrix, this._gizmoMatrixState );
 
 			if ( animTime >= 1 ) {
 
 				//animation end
 
-				this._gizmoMatrixState.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
+				mat4Decompose( this._gizmoMatrixState, this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
+				this._gizmos.quaternion._onChangeCallback();
 
 				this.focus( point, this.scaleFactor );
 
@@ -2102,14 +2140,15 @@ class ArcballControls extends Controls {
 				const amount = this.easeOutCubic( animTime );
 				const size = ( ( 1 - amount ) + ( this.scaleFactor * amount ) );
 
-				this._gizmoMatrixState.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
+				mat4Decompose( this._gizmoMatrixState, this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
+				this._gizmos.quaternion._onChangeCallback();
 				this.focus( point, size, amount );
 
 				this.dispatchEvent( _changeEvent );
 				const self = this;
 				this._animationId = window.requestAnimationFrame( function ( t ) {
 
-					self.onFocusAnim( t, point, cameraMatrix, gizmoMatrix.clone() );
+					self.onFocusAnim( t, point, cameraMatrix, mat4Copy( gizmoMatrix ) );
 
 				} );
 
@@ -2206,26 +2245,26 @@ class ArcballControls extends Controls {
 	 */
 	pan( p0, p1, adjust = false ) {
 
-		const movement = p0.clone().sub( p1 );
+		const movement = vec3Sub( p0, p1 );
 
 		if ( this.object.isOrthographicCamera ) {
 
 			//adjust movement amount
-			movement.multiplyScalar( 1 / this.object.zoom );
+			vec3MultiplyScalar( movement, 1 / this.object.zoom, movement );
 
 		} else if ( this.object.isPerspectiveCamera && adjust ) {
 
 			//adjust movement amount
-			this._v3_1.setFromMatrixPosition( this._cameraMatrixState0 );	//camera's initial position
-			this._v3_2.setFromMatrixPosition( this._gizmoMatrixState0 );	//gizmo's initial position
-			const distanceFactor = this._v3_1.distanceTo( this._v3_2 ) / this.object.position.distanceTo( this._gizmos.position );
-			movement.multiplyScalar( 1 / distanceFactor );
+			vec3SetFromMatrixPosition( this._cameraMatrixState0, this._v3_1 );	//camera's initial position
+			vec3SetFromMatrixPosition( this._gizmoMatrixState0, this._v3_2 );	//gizmo's initial position
+			const distanceFactor = vec3DistanceTo( this._v3_1, this._v3_2 ) / vec3DistanceTo( this.object.position, this._gizmos.position );
+			vec3MultiplyScalar( movement, 1 / distanceFactor, movement );
 
 		}
 
-		this._v3_1.set( movement.x, movement.y, 0 ).applyQuaternion( this.object.quaternion );
+		vec3ApplyQuaternion( vec3Set( this._v3_1, movement.x, movement.y, 0 ), this.object.quaternion, this._v3_1 );
 
-		this._m4_1.makeTranslation( this._v3_1.x, this._v3_1.y, this._v3_1.z );
+		mat4MakeTranslation( this._v3_1.x, this._v3_1.y, this._v3_1.z, this._m4_1 );
 
 		this.setTransformationMatrices( this._m4_1, this._m4_1 );
 		return _transformation;
@@ -2237,7 +2276,7 @@ class ArcballControls extends Controls {
 	 */
 	reset() {
 
-		this.target.copy( this._target0 );
+		vec3Copy( this._target0, this.target );
 		this.object.zoom = this._zoom0;
 
 		if ( this.object.isPerspectiveCamera ) {
@@ -2248,15 +2287,17 @@ class ArcballControls extends Controls {
 
 		this.object.near = this._nearPos;
 		this.object.far = this._farPos;
-		this._cameraMatrixState.copy( this._cameraMatrixState0 );
-		this._cameraMatrixState.decompose( this.object.position, this.object.quaternion, this.object.scale );
-		this.object.up.copy( this._up0 );
+		mat4Copy( this._cameraMatrixState0, this._cameraMatrixState );
+		mat4Decompose( this._cameraMatrixState, this.object.position, this.object.quaternion, this.object.scale );
+		this.object.quaternion._onChangeCallback();
+		vec3Copy( this._up0, this.object.up );
 
 		this.object.updateMatrix();
 		this.object.updateProjectionMatrix();
 
-		this._gizmoMatrixState.copy( this._gizmoMatrixState0 );
-		this._gizmoMatrixState0.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
+		mat4Copy( this._gizmoMatrixState0, this._gizmoMatrixState );
+		mat4Decompose( this._gizmoMatrixState0, this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
+		this._gizmos.quaternion._onChangeCallback();
 		this._gizmos.updateMatrix();
 
 		this._tbRadius = this.calculateTbRadius( this.object );
@@ -2281,13 +2322,13 @@ class ArcballControls extends Controls {
 	rotate( axis, angle ) {
 
 		const point = this._gizmos.position; //rotation center
-		this._translationMatrix.makeTranslation( - point.x, - point.y, - point.z );
-		this._rotationMatrix.makeRotationAxis( axis, - angle );
+		mat4MakeTranslation( - point.x, - point.y, - point.z, this._translationMatrix );
+		mat4MakeRotationAxis( axis, - angle, this._rotationMatrix );
 
 		//rotate camera
-		this._m4_1.makeTranslation( point.x, point.y, point.z );
-		this._m4_1.multiply( this._rotationMatrix );
-		this._m4_1.multiply( this._translationMatrix );
+		mat4MakeTranslation( point.x, point.y, point.z, this._m4_1 );
+		mat4Multiply( this._m4_1, this._rotationMatrix, this._m4_1 );
+		mat4Multiply( this._m4_1, this._translationMatrix, this._m4_1 );
 
 		this.setTransformationMatrices( this._m4_1 );
 
@@ -2361,13 +2402,13 @@ class ArcballControls extends Controls {
 		this.object.updateMatrix();
 		this._gizmos.updateMatrix();
 
-		this._target0.copy( this.target );
-		this._cameraMatrixState0.copy( this.object.matrix );
-		this._gizmoMatrixState0.copy( this._gizmos.matrix );
+		vec3Copy( this.target, this._target0 );
+		mat4Copy( this.object.matrix, this._cameraMatrixState0 );
+		mat4Copy( this._gizmos.matrix, this._gizmoMatrixState0 );
 		this._nearPos = this.object.near;
 		this._farPos = this.object.far;
 		this._zoom0 = this.object.zoom;
-		this._up0.copy( this.object.up );
+		vec3Copy( this.object.up, this._up0 );
 
 		if ( this.object.isPerspectiveCamera ) {
 
@@ -2388,7 +2429,7 @@ class ArcballControls extends Controls {
 	 */
 	scale( size, point, scaleGizmos = true ) {
 
-		_scalePointTemp.copy( point );
+		vec3Copy( point, _scalePointTemp );
 		let sizeInverse = 1 / size;
 
 		if ( this.object.isOrthographicCamera ) {
@@ -2412,35 +2453,36 @@ class ArcballControls extends Controls {
 
 			this.object.updateProjectionMatrix();
 
-			this._v3_1.setFromMatrixPosition( this._gizmoMatrixState );	//gizmos position
+			vec3SetFromMatrixPosition( this._gizmoMatrixState, this._v3_1 );	//gizmos position
 
 			//scale gizmos so they appear in the same spot having the same dimension
-			this._scaleMatrix.makeScale( sizeInverse, sizeInverse, sizeInverse );
-			this._translationMatrix.makeTranslation( - this._v3_1.x, - this._v3_1.y, - this._v3_1.z );
+			mat4MakeScale( sizeInverse, sizeInverse, sizeInverse, this._scaleMatrix );
+			mat4MakeTranslation( - this._v3_1.x, - this._v3_1.y, - this._v3_1.z, this._translationMatrix );
 
-			this._m4_2.makeTranslation( this._v3_1.x, this._v3_1.y, this._v3_1.z ).multiply( this._scaleMatrix );
-			this._m4_2.multiply( this._translationMatrix );
+			mat4MakeTranslation( this._v3_1.x, this._v3_1.y, this._v3_1.z, this._m4_2 );
+			mat4Multiply( this._m4_2, this._scaleMatrix, this._m4_2 );
+			mat4Multiply( this._m4_2, this._translationMatrix, this._m4_2 );
 
 
 			//move camera and gizmos to obtain pinch effect
-			_scalePointTemp.sub( this._v3_1 );
+			vec3Sub( _scalePointTemp, this._v3_1, _scalePointTemp );
 
-			const amount = _scalePointTemp.clone().multiplyScalar( sizeInverse );
-			_scalePointTemp.sub( amount );
+			const amount = vec3MultiplyScalar( _scalePointTemp, sizeInverse );
+			vec3Sub( _scalePointTemp, amount, _scalePointTemp );
 
-			this._m4_1.makeTranslation( _scalePointTemp.x, _scalePointTemp.y, _scalePointTemp.z );
-			this._m4_2.premultiply( this._m4_1 );
+			mat4MakeTranslation( _scalePointTemp.x, _scalePointTemp.y, _scalePointTemp.z, this._m4_1 );
+			mat4Multiply( this._m4_1, this._m4_2, this._m4_2 );
 
 			this.setTransformationMatrices( this._m4_1, this._m4_2 );
 			return _transformation;
 
 		} else if ( this.object.isPerspectiveCamera ) {
 
-			this._v3_1.setFromMatrixPosition( this._cameraMatrixState );
-			this._v3_2.setFromMatrixPosition( this._gizmoMatrixState );
+			vec3SetFromMatrixPosition( this._cameraMatrixState, this._v3_1 );
+			vec3SetFromMatrixPosition( this._gizmoMatrixState, this._v3_2 );
 
 			//move camera
-			let distance = this._v3_1.distanceTo( _scalePointTemp );
+			let distance = vec3DistanceTo( this._v3_1, _scalePointTemp );
 			let amount = distance - ( distance * sizeInverse );
 
 			//check min and max distance
@@ -2457,9 +2499,9 @@ class ArcballControls extends Controls {
 
 			}
 
-			_offset.copy( _scalePointTemp ).sub( this._v3_1 ).normalize().multiplyScalar( amount );
+			vec3MultiplyScalar( vec3Normalize( vec3Sub( _scalePointTemp, this._v3_1, _offset ), _offset ), amount, _offset );
 
-			this._m4_1.makeTranslation( _offset.x, _offset.y, _offset.z );
+			mat4MakeTranslation( _offset.x, _offset.y, _offset.z, this._m4_1 );
 
 
 			if ( scaleGizmos ) {
@@ -2467,19 +2509,20 @@ class ArcballControls extends Controls {
 				//scale gizmos so they appear in the same spot having the same dimension
 				const pos = this._v3_2;
 
-				distance = pos.distanceTo( _scalePointTemp );
+				distance = vec3DistanceTo( pos, _scalePointTemp );
 				amount = distance - ( distance * sizeInverse );
-				_offset.copy( _scalePointTemp ).sub( this._v3_2 ).normalize().multiplyScalar( amount );
+				vec3MultiplyScalar( vec3Normalize( vec3Sub( _scalePointTemp, this._v3_2, _offset ), _offset ), amount, _offset );
 
-				this._translationMatrix.makeTranslation( pos.x, pos.y, pos.z );
-				this._scaleMatrix.makeScale( sizeInverse, sizeInverse, sizeInverse );
+				mat4MakeTranslation( pos.x, pos.y, pos.z, this._translationMatrix );
+				mat4MakeScale( sizeInverse, sizeInverse, sizeInverse, this._scaleMatrix );
 
-				this._m4_2.makeTranslation( _offset.x, _offset.y, _offset.z ).multiply( this._translationMatrix );
-				this._m4_2.multiply( this._scaleMatrix );
+				mat4MakeTranslation( _offset.x, _offset.y, _offset.z, this._m4_2 );
+				mat4Multiply( this._m4_2, this._translationMatrix, this._m4_2 );
+				mat4Multiply( this._m4_2, this._scaleMatrix, this._m4_2 );
 
-				this._translationMatrix.makeTranslation( - pos.x, - pos.y, - pos.z );
+				mat4MakeTranslation( - pos.x, - pos.y, - pos.z, this._translationMatrix );
 
-				this._m4_2.multiply( this._translationMatrix );
+				mat4Multiply( this._m4_2, this._translationMatrix, this._m4_2 );
 				this.setTransformationMatrices( this._m4_1, this._m4_2 );
 
 
@@ -2525,11 +2568,11 @@ class ArcballControls extends Controls {
 
 			if ( _transformation.camera != null ) {
 
-				_transformation.camera.copy( camera );
+				mat4Copy( camera, _transformation.camera );
 
 			} else {
 
-				_transformation.camera = camera.clone();
+				_transformation.camera = mat4Copy( camera );
 
 			}
 
@@ -2543,11 +2586,11 @@ class ArcballControls extends Controls {
 
 			if ( _transformation.gizmos != null ) {
 
-				_transformation.gizmos.copy( gizmos );
+				mat4Copy( gizmos, _transformation.gizmos );
 
 			} else {
 
-				_transformation.gizmos = gizmos.clone();
+				_transformation.gizmos = mat4Copy( gizmos );
 
 			}
 
@@ -2569,18 +2612,18 @@ class ArcballControls extends Controls {
 	 */
 	zRotate( point, angle ) {
 
-		this._rotationMatrix.makeRotationAxis( this._rotationAxis, angle );
-		this._translationMatrix.makeTranslation( - point.x, - point.y, - point.z );
+		mat4MakeRotationAxis( this._rotationAxis, angle, this._rotationMatrix );
+		mat4MakeTranslation( - point.x, - point.y, - point.z, this._translationMatrix );
 
-		this._m4_1.makeTranslation( point.x, point.y, point.z );
-		this._m4_1.multiply( this._rotationMatrix );
-		this._m4_1.multiply( this._translationMatrix );
+		mat4MakeTranslation( point.x, point.y, point.z, this._m4_1 );
+		mat4Multiply( this._m4_1, this._rotationMatrix, this._m4_1 );
+		mat4Multiply( this._m4_1, this._translationMatrix, this._m4_1 );
 
-		this._v3_1.setFromMatrixPosition( this._gizmoMatrixState ).sub( point );	//vector from rotation center to gizmos position
-		this._v3_2.copy( this._v3_1 ).applyAxisAngle( this._rotationAxis, angle );	//apply rotation
-		this._v3_2.sub( this._v3_1 );
+		vec3Sub( vec3SetFromMatrixPosition( this._gizmoMatrixState, this._v3_1 ), point, this._v3_1 );	//vector from rotation center to gizmos position
+		vec3ApplyAxisAngle( this._v3_1, this._rotationAxis, angle, this._v3_2 );	//apply rotation
+		vec3Sub( this._v3_2, this._v3_1, this._v3_2 );
 
-		this._m4_2.makeTranslation( this._v3_2.x, this._v3_2.y, this._v3_2.z );
+		mat4MakeTranslation( this._v3_2.x, this._v3_2.y, this._v3_2.z, this._m4_2 );
 
 		this.setTransformationMatrices( this._m4_1, this._m4_2 );
 		return _transformation;
@@ -2621,7 +2664,7 @@ class ArcballControls extends Controls {
 
 			if ( intersect[ i ].object.uuid != this._gizmos.uuid && intersect[ i ].face != null ) {
 
-				return intersect[ i ].point.clone();
+				return vec3Copy( intersect[ i ].point );
 
 			}
 
@@ -2646,8 +2689,8 @@ class ArcballControls extends Controls {
 
 		if ( camera.type == 'OrthographicCamera' ) {
 
-			this._v2_1.copy( this.getCursorPosition( cursorX, cursorY, canvas ) );
-			this._v3_1.set( this._v2_1.x, this._v2_1.y, 0 );
+			vec2Copy( this.getCursorPosition( cursorX, cursorY, canvas ), this._v2_1 );
+			vec3Set( this._v3_1, this._v2_1.x, this._v2_1.y, 0 );
 
 			const x2 = Math.pow( this._v2_1.x, 2 );
 			const y2 = Math.pow( this._v2_1.y, 2 );
@@ -2656,12 +2699,12 @@ class ArcballControls extends Controls {
 			if ( x2 + y2 <= r2 * 0.5 ) {
 
 				//intersection with sphere
-				this._v3_1.setZ( Math.sqrt( r2 - ( x2 + y2 ) ) );
+				vec3SetZ( this._v3_1, Math.sqrt( r2 - ( x2 + y2 ) ) );
 
 			} else {
 
 				//intersection with hyperboloid
-				this._v3_1.setZ( ( r2 * 0.5 ) / ( Math.sqrt( x2 + y2 ) ) );
+				vec3SetZ( this._v3_1, ( r2 * 0.5 ) / ( Math.sqrt( x2 + y2 ) ) );
 
 			}
 
@@ -2670,13 +2713,13 @@ class ArcballControls extends Controls {
 		} else if ( camera.type == 'PerspectiveCamera' ) {
 
 			//unproject cursor on the near plane
-			this._v2_1.copy( this.getCursorNDC( cursorX, cursorY, canvas ) );
+			vec2Copy( this.getCursorNDC( cursorX, cursorY, canvas ), this._v2_1 );
 
-			this._v3_1.set( this._v2_1.x, this._v2_1.y, - 1 );
-			this._v3_1.applyMatrix4( camera.projectionMatrixInverse );
+			vec3Set( this._v3_1, this._v2_1.x, this._v2_1.y, - 1 );
+			vec3ApplyMatrix4( this._v3_1, camera.projectionMatrixInverse, this._v3_1 );
 
-			const rayDir = this._v3_1.clone().normalize(); //unprojected ray direction
-			const cameraGizmoDistance = camera.position.distanceTo( this._gizmos.position );
+			const rayDir = vec3Normalize( this._v3_1 ); //unprojected ray direction
+			const cameraGizmoDistance = vec3DistanceTo( camera.position, this._gizmos.position );
 			const radius2 = Math.pow( tbRadius, 2 );
 
 			//	  camera
@@ -2695,7 +2738,7 @@ class ArcballControls extends Controls {
 			if ( l == 0 ) {
 
 				//ray aligned with camera
-				rayDir.set( this._v3_1.x, this._v3_1.y, tbRadius );
+				vec3Set( rayDir, this._v3_1.x, this._v3_1.y, tbRadius );
 				return rayDir;
 
 			}
@@ -2718,10 +2761,10 @@ class ArcballControls extends Controls {
 			if ( delta >= 0 ) {
 
 				//intersection with sphere
-				this._v2_1.setX( ( - b - Math.sqrt( delta ) ) / ( 2 * a ) );
-				this._v2_1.setY( m * this._v2_1.x + q );
+				vec2SetX( this._v2_1, ( - b - Math.sqrt( delta ) ) / ( 2 * a ), this._v2_1 );
+				vec2SetY( this._v2_1, m * this._v2_1.x + q, this._v2_1 );
 
-				const angle = MathUtils.RAD2DEG * this._v2_1.angle();
+				const angle = MathUtils.RAD2DEG * vec2Angle( this._v2_1 );
 
 				if ( angle >= 45 ) {
 
@@ -2729,7 +2772,7 @@ class ArcballControls extends Controls {
 					//otherwise, calculate intersection point with hyperboloid
 
 					const rayLength = Math.sqrt( Math.pow( this._v2_1.x, 2 ) + Math.pow( ( cameraGizmoDistance - this._v2_1.y ), 2 ) );
-					rayDir.multiplyScalar( rayLength );
+					vec3MultiplyScalar( rayDir, rayLength, rayDir );
 					rayDir.z += cameraGizmoDistance;
 					return rayDir;
 
@@ -2749,12 +2792,12 @@ class ArcballControls extends Controls {
 			b = q;
 			c = - radius2 * 0.5;
 			delta = Math.pow( b, 2 ) - ( 4 * a * c );
-			this._v2_1.setX( ( - b - Math.sqrt( delta ) ) / ( 2 * a ) );
-			this._v2_1.setY( m * this._v2_1.x + q );
+			vec2SetX( this._v2_1, ( - b - Math.sqrt( delta ) ) / ( 2 * a ), this._v2_1 );
+			vec2SetY( this._v2_1, m * this._v2_1.x + q, this._v2_1 );
 
 			const rayLength = Math.sqrt( Math.pow( this._v2_1.x, 2 ) + Math.pow( ( cameraGizmoDistance - this._v2_1.y ), 2 ) );
 
-			rayDir.multiplyScalar( rayLength );
+			vec3MultiplyScalar( rayDir, rayLength, rayDir );
 			rayDir.z += cameraGizmoDistance;
 			return rayDir;
 
@@ -2778,20 +2821,20 @@ class ArcballControls extends Controls {
 
 		if ( camera.type == 'OrthographicCamera' ) {
 
-			this._v2_1.copy( this.getCursorPosition( cursorX, cursorY, canvas ) );
-			this._v3_1.set( this._v2_1.x, this._v2_1.y, 0 );
+			vec2Copy( this.getCursorPosition( cursorX, cursorY, canvas ), this._v2_1 );
+			vec3Set( this._v3_1, this._v2_1.x, this._v2_1.y, 0 );
 
-			return this._v3_1.clone();
+			return vec3Copy( this._v3_1 );
 
 		} else if ( camera.type == 'PerspectiveCamera' ) {
 
-			this._v2_1.copy( this.getCursorNDC( cursorX, cursorY, canvas ) );
+			vec2Copy( this.getCursorNDC( cursorX, cursorY, canvas ), this._v2_1 );
 
 			//unproject cursor on the near plane
-			this._v3_1.set( this._v2_1.x, this._v2_1.y, - 1 );
-			this._v3_1.applyMatrix4( camera.projectionMatrixInverse );
+			vec3Set( this._v3_1, this._v2_1.x, this._v2_1.y, - 1 );
+			vec3ApplyMatrix4( this._v3_1, camera.projectionMatrixInverse, this._v3_1 );
 
-			const rayDir = this._v3_1.clone().normalize(); //unprojected ray direction
+			const rayDir = vec3Normalize( this._v3_1 ); //unprojected ray direction
 
 			//	  camera
 			//		|\
@@ -2809,11 +2852,11 @@ class ArcballControls extends Controls {
 
 			if ( initialDistance ) {
 
-				cameraGizmoDistance = this._v3_1.setFromMatrixPosition( this._cameraMatrixState0 ).distanceTo( this._v3_2.setFromMatrixPosition( this._gizmoMatrixState0 ) );
+				cameraGizmoDistance = vec3DistanceTo( vec3SetFromMatrixPosition( this._cameraMatrixState0, this._v3_1 ), vec3SetFromMatrixPosition( this._gizmoMatrixState0, this._v3_2 ) );
 
 			} else {
 
-				cameraGizmoDistance = camera.position.distanceTo( this._gizmos.position );
+				cameraGizmoDistance = vec3DistanceTo( camera.position, this._gizmos.position );
 
 			}
 
@@ -2827,7 +2870,7 @@ class ArcballControls extends Controls {
 			if ( l == 0 ) {
 
 				//ray aligned with camera
-				rayDir.set( 0, 0, 0 );
+				vec3Set( rayDir, 0, 0, 0 );
 				return rayDir;
 
 			}
@@ -2837,7 +2880,7 @@ class ArcballControls extends Controls {
 			const x = - q / m;
 
 			const rayLength = Math.sqrt( Math.pow( q, 2 ) + Math.pow( x, 2 ) );
-			rayDir.multiplyScalar( rayLength );
+			vec3MultiplyScalar( rayDir, rayLength, rayDir );
 			rayDir.z = 0;
 			return rayDir;
 
@@ -2853,12 +2896,12 @@ class ArcballControls extends Controls {
 	updateMatrixState() {
 
 		//update camera and gizmos state
-		this._cameraMatrixState.copy( this.object.matrix );
-		this._gizmoMatrixState.copy( this._gizmos.matrix );
+		mat4Copy( this.object.matrix, this._cameraMatrixState );
+		mat4Copy( this._gizmos.matrix, this._gizmoMatrixState );
 
 		if ( this.object.isOrthographicCamera ) {
 
-			this._cameraProjectionState.copy( this.object.projectionMatrix );
+			mat4Copy( this.object.projectionMatrix, this._cameraProjectionState );
 			this.object.updateProjectionMatrix();
 			this._zoomState = this.object.zoom;
 
@@ -2890,12 +2933,12 @@ class ArcballControls extends Controls {
 
 	update() {
 
-		if ( this.target.equals( this._currentTarget ) === false ) {
+		if ( vec3Equals( this.target, this._currentTarget ) === false ) {
 
-			this._gizmos.position.copy( this.target );	//for correct radius calculation
+			vec3Copy( this.target, this._gizmos.position );	//for correct radius calculation
 			this._tbRadius = this.calculateTbRadius( this.object );
 			this.makeGizmos( this.target, this._tbRadius );
-			this._currentTarget.copy( this.target );
+			vec3Copy( this.target, this._currentTarget );
 
 		}
 
@@ -2913,7 +2956,7 @@ class ArcballControls extends Controls {
 		} else if ( this.object.isPerspectiveCamera ) {
 
 			//check distance
-			const distance = this.object.position.distanceTo( this._gizmos.position );
+			const distance = vec3DistanceTo( this.object.position, this._gizmos.position );
 
 			if ( distance > this.maxDistance + _EPS || distance < this.minDistance - _EPS ) {
 
@@ -2962,12 +3005,13 @@ class ArcballControls extends Controls {
 
 		if ( state.arcballState != undefined ) {
 
-			this.target.fromArray( state.arcballState.target );
+			vec3FromArray( state.arcballState.target, 0, this.target );
 
-			this._cameraMatrixState.fromArray( state.arcballState.cameraMatrix.elements );
-			this._cameraMatrixState.decompose( this.object.position, this.object.quaternion, this.object.scale );
+			mat4FromArray( state.arcballState.cameraMatrix.elements, 0, this._cameraMatrixState );
+			mat4Decompose( this._cameraMatrixState, this.object.position, this.object.quaternion, this.object.scale );
+			this.object.quaternion._onChangeCallback();
 
-			this.object.up.copy( state.arcballState.cameraUp );
+			vec3Copy( state.arcballState.cameraUp, this.object.up );
 			this.object.near = state.arcballState.cameraNear;
 			this.object.far = state.arcballState.cameraFar;
 
@@ -2979,8 +3023,9 @@ class ArcballControls extends Controls {
 
 			}
 
-			this._gizmoMatrixState.fromArray( state.arcballState.gizmoMatrix.elements );
-			this._gizmoMatrixState.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
+			mat4FromArray( state.arcballState.gizmoMatrix.elements, 0, this._gizmoMatrixState );
+			mat4Decompose( this._gizmoMatrixState, this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
+			this._gizmos.quaternion._onChangeCallback();
 
 			this.object.updateMatrix();
 			this.object.updateProjectionMatrix();
@@ -2988,9 +3033,9 @@ class ArcballControls extends Controls {
 			this._gizmos.updateMatrix();
 
 			this._tbRadius = this.calculateTbRadius( this.object );
-			const gizmoTmp = new Matrix4().copy( this._gizmoMatrixState0 );
+			const gizmoTmp = mat4Copy( this._gizmoMatrixState0 );
 			this.makeGizmos( this._gizmos.position, this._tbRadius );
-			this._gizmoMatrixState0.copy( gizmoTmp );
+			mat4Copy( gizmoTmp, this._gizmoMatrixState0 );
 
 			this.object.lookAt( this._gizmos.position );
 			this.updateTbState( STATE.IDLE, false );
@@ -3419,11 +3464,11 @@ function onWheel( event ) {
 
 						if ( this.object.isOrthographicCamera ) {
 
-							scalePoint = this.unprojectOnTbPlane( this.object, event.clientX, event.clientY, this.domElement ).applyQuaternion( this.object.quaternion ).multiplyScalar( 1 / this.object.zoom ).add( this._gizmos.position );
+							scalePoint = vec3Add( vec3MultiplyScalar( vec3ApplyQuaternion( this.unprojectOnTbPlane( this.object, event.clientX, event.clientY, this.domElement ), this.object.quaternion ), 1 / this.object.zoom ), this._gizmos.position );
 
 						} else if ( this.object.isPerspectiveCamera ) {
 
-							scalePoint = this.unprojectOnTbPlane( this.object, event.clientX, event.clientY, this.domElement ).applyQuaternion( this.object.quaternion ).add( this._gizmos.position );
+							scalePoint = vec3Add( vec3ApplyQuaternion( this.unprojectOnTbPlane( this.object, event.clientX, event.clientY, this.domElement ), this.object.quaternion ), this._gizmos.position );
 
 						}
 
@@ -3487,8 +3532,8 @@ function onWheel( event ) {
 
 						}
 
-						this._v3_1.setFromMatrixPosition( this._cameraMatrixState );
-						const x = this._v3_1.distanceTo( this._gizmos.position );
+						vec3SetFromMatrixPosition( this._cameraMatrixState, this._v3_1 );
+						const x = vec3DistanceTo( this._v3_1, this._gizmos.position );
 						let xNew = x / size;	//distance between camera and gizmos if scale(size, scalepoint) would be performed
 
 						//check min and max distance

@@ -1,8 +1,8 @@
-import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
+import { DataTexture, RenderTarget, RepeatWrapping, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat, vec2Create, vec2Set, vec3Create, vec3Set, vec3Normalize } from 'three/webgpu';
 import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _size = /*@__PURE__*/ new Vector2();
+const _size = /*@__PURE__*/ vec2Create();
 
 // From Activision GTAO paper: https://www.activision.com/cdn/research/s2016_pbs_activision_occlusion.pptx
 const _temporalRotations = [ 60, 300, 180, 240, 120, 0 ];
@@ -178,7 +178,7 @@ class GTAONode extends TempNode {
 		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
-		this._resolution = uniform( new Vector2() );
+		this._resolution = uniform( vec2Create(), 'vec2' );
 
 		/**
 		 * The node represents the internal noise texture used by the AO.
@@ -312,7 +312,7 @@ class GTAONode extends TempNode {
 		height = Math.round( this.resolutionScale * height );
 
 		this._resolutionScale.value = this.resolutionScale;
-		this._resolution.value.set( width, height );
+		vec2Set( width, height, this._resolution.value );
 		this._aoRenderTarget.setSize( width, height );
 
 	}
@@ -359,7 +359,7 @@ class GTAONode extends TempNode {
 		//
 
 		const size = renderer.getDrawingBufferSize( _size );
-		this.setSize( size.width, size.height );
+		this.setSize( size.x, size.y );
 
 		_quadMesh.material = this._material;
 		_quadMesh.name = 'AO';
@@ -615,11 +615,11 @@ function generateMagicSquareNoise( size = 5 ) {
 
 		const iAng = magicSquare[ inx ];
 		const angle = ( 2 * Math.PI * iAng ) / noiseSquareSize;
-		const randomVec = new Vector3(
+		const randomVec = vec3Normalize( vec3Set( vec3Create(),
 			Math.cos( angle ),
 			Math.sin( angle ),
 			0
-		).normalize();
+		) );
 		data[ inx * 4 ] = ( randomVec.x * 0.5 + 0.5 ) * 255;
 		data[ inx * 4 + 1 ] = ( randomVec.y * 0.5 + 0.5 ) * 255;
 		data[ inx * 4 + 2 ] = 127;

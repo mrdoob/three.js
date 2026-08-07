@@ -3,8 +3,10 @@ import {
 	BufferGeometry,
 	Group,
 	LineSegments,
-	Matrix3,
-	Mesh
+	Mesh,
+	mat3Create,
+	mat3GetNormalMatrix,
+	mat4Determinant
 } from 'three';
 
 import { mergeGeometries } from './BufferGeometryUtils.js';
@@ -115,7 +117,7 @@ class LDrawUtils {
 		const condLinesGeometries = {};
 
 		object.updateMatrixWorld( true );
-		const normalMatrix = new Matrix3();
+		const normalMatrix = mat3Create();
 
 		object.traverse( c => {
 
@@ -124,7 +126,7 @@ class LDrawUtils {
 				const elemSize = c.isMesh ? 3 : 2;
 
 				const geometry = c.geometry.clone();
-				const matrixIsInverted = c.matrixWorld.determinant() < 0;
+				const matrixIsInverted = mat4Determinant( c.matrixWorld ) < 0;
 				if ( matrixIsInverted ) {
 
 					permuteAttribute( geometry.attributes.position, elemSize );
@@ -138,7 +140,7 @@ class LDrawUtils {
 
 					geometry.attributes.control0.applyMatrix4( c.matrixWorld );
 					geometry.attributes.control1.applyMatrix4( c.matrixWorld );
-					normalMatrix.getNormalMatrix( c.matrixWorld );
+					mat3GetNormalMatrix( c.matrixWorld, normalMatrix );
 					geometry.attributes.direction.applyNormalMatrix( normalMatrix );
 
 				}

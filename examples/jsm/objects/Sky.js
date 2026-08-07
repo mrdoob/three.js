@@ -4,7 +4,8 @@ import {
 	Mesh,
 	ShaderMaterial,
 	UniformsUtils,
-	Vector3
+	vec3Create,
+	vec3Set
 } from 'three';
 
 /**
@@ -81,8 +82,8 @@ Sky.SkyShader = {
 		'rayleigh': { value: 1 },
 		'mieCoefficient': { value: 0.005 },
 		'mieDirectionalG': { value: 0.8 },
-		'sunPosition': { value: new Vector3() },
-		'up': { value: new Vector3( 0, 1, 0 ) },
+		'sunPosition': { value: vec3Create() },
+		'up': { value: vec3Set( vec3Create(), 0, 1, 0 ) },
 		'cloudScale': { value: 0.0002 },
 		'cloudSpeed': { value: 0.0001 },
 		'cloudCoverage': { value: 0.4 },

@@ -2,6 +2,8 @@ import { TangentSpaceNormalMap } from '../constants.js';
 import { Material } from './Material.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
+import { colorCopy } from '../math/ColorFunctions.js';
+import { vec2Copy } from '../math/Vector2Functions.js';
 
 /**
  * This material is defined by a MatCap (or Lit Sphere) texture, which encodes the
@@ -234,7 +236,7 @@ class MeshMatcapMaterial extends Material {
 
 		this.defines = { 'MATCAP': '' };
 
-		this.color.copy( source.color );
+		colorCopy( source.color, this.color );
 
 		this.matcap = source.matcap;
 
@@ -245,7 +247,7 @@ class MeshMatcapMaterial extends Material {
 
 		this.normalMap = source.normalMap;
 		this.normalMapType = source.normalMapType;
-		this.normalScale.copy( source.normalScale );
+		vec2Copy( source.normalScale, this.normalScale );
 
 		this.displacementMap = source.displacementMap;
 		this.displacementScale = source.displacementScale;

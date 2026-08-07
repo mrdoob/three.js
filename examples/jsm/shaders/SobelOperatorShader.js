@@ -1,5 +1,5 @@
 import {
-	Vector2
+	vec2Create
 } from 'three';
 
 /**
@@ -22,7 +22,7 @@ const SobelOperatorShader = {
 	uniforms: {
 
 		'tDiffuse': { value: null },
-		'resolution': { value: new Vector2() }
+		'resolution': { value: vec2Create() }
 
 	},
 

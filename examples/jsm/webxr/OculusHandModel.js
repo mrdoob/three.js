@@ -1,4 +1,9 @@
-import { Object3D, Sphere, Box3 } from 'three';
+import {
+	Object3D,
+	box3SetFromObject,
+	sphereIntersectsBox,
+	sphereSet
+} from 'three';
 import { XRHandMeshModel } from './XRHandMeshModel.js';
 
 const TOUCH_RADIUS = 0.01;
@@ -151,9 +156,9 @@ class OculusHandModel extends Object3D {
 		const pointerPosition = this.getPointerPosition();
 		if ( pointerPosition ) {
 
-			const indexSphere = new Sphere( pointerPosition, TOUCH_RADIUS );
-			const box = new Box3().setFromObject( boxObject );
-			return indexSphere.intersectsBox( box );
+			const indexSphere = sphereSet( pointerPosition, TOUCH_RADIUS );
+			const box = box3SetFromObject( boxObject );
+			return sphereIntersectsBox( indexSphere, box );
 
 		} else {
 

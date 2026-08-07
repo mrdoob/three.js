@@ -1,11 +1,11 @@
 import {
-	Color,
 	Mesh,
-	Vector2,
-	Vector3,
 	NodeMaterial,
 	NodeUpdateType,
-	TempNode
+	TempNode,
+	colorSet,
+	vec2Create,
+	vec3Create
 } from 'three/webgpu';
 
 import { Fn, vec2, viewportSafeUV, viewportSharedTexture, reflector, pow, float, abs, texture, uniform, vec4, cameraPosition, positionWorld, uv, mix, vec3, normalize, max, dot, screenUV } from 'three/tsl';
@@ -68,12 +68,12 @@ class WaterNode extends TempNode {
 		this.normalMap1 = texture( options.normalMap1 );
 		this.flowMap = texture( options.flowMap );
 
-		this.color = uniform( options.color !== undefined ? new Color( options.color ) : new Color( 0xffffff ) );
-		this.flowDirection = uniform( options.flowDirection !== undefined ? options.flowDirection : new Vector2( 1, 0 ) );
+		this.color = uniform( colorSet( options.color !== undefined ? options.color : 0xffffff ) );
+		this.flowDirection = uniform( options.flowDirection !== undefined ? options.flowDirection : vec2Create( 1, 0 ) );
 		this.flowSpeed = uniform( options.flowSpeed !== undefined ? options.flowSpeed : 0.03 );
 		this.reflectivity = uniform( options.reflectivity !== undefined ? options.reflectivity : 0.02 );
 		this.scale = uniform( options.scale !== undefined ? options.scale : 1 );
-		this.flowConfig = uniform( new Vector3() );
+		this.flowConfig = uniform( vec3Create() );
 
 		this.updateBeforeType = NodeUpdateType.RENDER;
 

@@ -1,13 +1,18 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
-	Vector3
+	vec3Create,
+	vec3Cross,
+	vec3Dot,
+	vec3Normalize,
+	vec3Set,
+	vec3Sub
 } from 'three';
 import * as BufferGeometryUtils from '../utils/BufferGeometryUtils.js';
 
-const _A = new Vector3();
-const _B = new Vector3();
-const _C = new Vector3();
+const _A = /*@__PURE__*/ vec3Create();
+const _B = /*@__PURE__*/ vec3Create();
+const _C = /*@__PURE__*/ vec3Create();
 
 /**
  * The modifier can be used to split faces at sharp edges. This allows to compute
@@ -41,27 +46,30 @@ class EdgeSplitModifier {
 
 				let index = indexes[ i ];
 
-				_A.set(
+				vec3Set(
+					_A,
 					positions[ 3 * index ],
 					positions[ 3 * index + 1 ],
 					positions[ 3 * index + 2 ] );
 
 				index = indexes[ i + 1 ];
-				_B.set(
+				vec3Set(
+					_B,
 					positions[ 3 * index ],
 					positions[ 3 * index + 1 ],
 					positions[ 3 * index + 2 ] );
 
 				index = indexes[ i + 2 ];
-				_C.set(
+				vec3Set(
+					_C,
 					positions[ 3 * index ],
 					positions[ 3 * index + 1 ],
 					positions[ 3 * index + 2 ] );
 
-				_C.sub( _B );
-				_A.sub( _B );
+				vec3Sub( _C, _B, _C );
+				vec3Sub( _A, _B, _A );
 
-				const normal = _C.cross( _A ).normalize();
+				const normal = vec3Normalize( vec3Cross( _C, _A, _C ), _C );
 
 				for ( let j = 0; j < 3; j ++ ) {
 
@@ -99,7 +107,7 @@ class EdgeSplitModifier {
 
 		function edgeSplitToGroups( indexes, cutOff, firstIndex ) {
 
-			_A.set( normals[ 3 * firstIndex ], normals[ 3 * firstIndex + 1 ], normals[ 3 * firstIndex + 2 ] ).normalize();
+			vec3Normalize( vec3Set( _A, normals[ 3 * firstIndex ], normals[ 3 * firstIndex + 1 ], normals[ 3 * firstIndex + 2 ] ), _A );
 
 			const result = {
 				splitGroup: [],
@@ -110,9 +118,9 @@ class EdgeSplitModifier {
 
 				if ( j !== firstIndex ) {
 
-					_B.set( normals[ 3 * j ], normals[ 3 * j + 1 ], normals[ 3 * j + 2 ] ).normalize();
+					vec3Normalize( vec3Set( _B, normals[ 3 * j ], normals[ 3 * j + 1 ], normals[ 3 * j + 2 ] ), _B );
 
-					if ( _B.dot( _A ) < cutOff ) {
+					if ( vec3Dot( _B, _A ) < cutOff ) {
 
 						result.splitGroup.push( j );
 

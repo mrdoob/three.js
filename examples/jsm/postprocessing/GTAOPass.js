@@ -1,6 +1,5 @@
 import {
 	AddEquation,
-	Color,
 	CustomBlending,
 	DataTexture,
 	DepthTexture,
@@ -18,7 +17,11 @@ import {
 	UnsignedByteType,
 	UnsignedInt248Type,
 	WebGLRenderTarget,
-	ZeroFactor
+	ZeroFactor,
+	colorCreate,
+	mat4Copy,
+	vec2Set,
+	vec3Copy
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 import { generateMagicSquareNoise, GTAOShader, GTAODepthShader, GTAOBlendShader } from '../shaders/GTAOShader.js';
@@ -154,7 +157,7 @@ class GTAOPass extends Pass {
 		} );
 		this.gtaoMaterial.defines.PERSPECTIVE_CAMERA = this.camera.isPerspectiveCamera ? 1 : 0;
 		this.gtaoMaterial.uniforms.tNoise.value = this.gtaoNoiseTexture;
-		this.gtaoMaterial.uniforms.resolution.value.set( this.width, this.height );
+		vec2Set( this.width, this.height, this.gtaoMaterial.uniforms.resolution.value );
 		this.gtaoMaterial.uniforms.cameraNear.value = this.camera.near;
 		this.gtaoMaterial.uniforms.cameraFar.value = this.camera.far;
 
@@ -171,7 +174,7 @@ class GTAOPass extends Pass {
 		} );
 		this.pdMaterial.uniforms.tDiffuse.value = this.gtaoRenderTarget.texture;
 		this.pdMaterial.uniforms.tNoise.value = this.pdNoiseTexture;
-		this.pdMaterial.uniforms.resolution.value.set( this.width, this.height );
+		vec2Set( this.width, this.height, this.pdMaterial.uniforms.resolution.value );
 		this.pdMaterial.uniforms.lumaPhi.value = 10;
 		this.pdMaterial.uniforms.depthPhi.value = 2;
 		this.pdMaterial.uniforms.normalPhi.value = 3;
@@ -220,7 +223,7 @@ class GTAOPass extends Pass {
 
 		this._fsQuad = new FullScreenQuad( null );
 
-		this._originalClearColor = new Color();
+		this._originalClearColor = colorCreate();
 
 		this.setGBuffer( parameters ? parameters.depthTexture : undefined, parameters ? parameters.normalTexture : undefined );
 
@@ -253,12 +256,12 @@ class GTAOPass extends Pass {
 		this.normalRenderTarget.setSize( width, height );
 		this.pdRenderTarget.setSize( width, height );
 
-		this.gtaoMaterial.uniforms.resolution.value.set( width, height );
-		this.gtaoMaterial.uniforms.cameraProjectionMatrix.value.copy( this.camera.projectionMatrix );
-		this.gtaoMaterial.uniforms.cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
+		vec2Set( width, height, this.gtaoMaterial.uniforms.resolution.value );
+		mat4Copy( this.camera.projectionMatrix, this.gtaoMaterial.uniforms.cameraProjectionMatrix.value );
+		mat4Copy( this.camera.projectionMatrixInverse, this.gtaoMaterial.uniforms.cameraProjectionMatrixInverse.value );
 
-		this.pdMaterial.uniforms.resolution.value.set( width, height );
-		this.pdMaterial.uniforms.cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
+		vec2Set( width, height, this.pdMaterial.uniforms.resolution.value );
+		mat4Copy( this.camera.projectionMatrixInverse, this.pdMaterial.uniforms.cameraProjectionMatrixInverse.value );
 
 	}
 
@@ -354,8 +357,8 @@ class GTAOPass extends Pass {
 
 			this.gtaoMaterial.needsUpdate = this.gtaoMaterial.defines.SCENE_CLIP_BOX !== 1;
 			this.gtaoMaterial.defines.SCENE_CLIP_BOX = 1;
-			this.gtaoMaterial.uniforms.sceneBoxMin.value.copy( box.min );
-			this.gtaoMaterial.uniforms.sceneBoxMax.value.copy( box.max );
+			vec3Copy( box.min, this.gtaoMaterial.uniforms.sceneBoxMin.value );
+			vec3Copy( box.max, this.gtaoMaterial.uniforms.sceneBoxMax.value );
 
 		} else {
 
@@ -511,14 +514,14 @@ class GTAOPass extends Pass {
 
 		this.gtaoMaterial.uniforms.cameraNear.value = this.camera.near;
 		this.gtaoMaterial.uniforms.cameraFar.value = this.camera.far;
-		this.gtaoMaterial.uniforms.cameraProjectionMatrix.value.copy( this.camera.projectionMatrix );
-		this.gtaoMaterial.uniforms.cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
-		this.gtaoMaterial.uniforms.cameraWorldMatrix.value.copy( this.camera.matrixWorld );
+		mat4Copy( this.camera.projectionMatrix, this.gtaoMaterial.uniforms.cameraProjectionMatrix.value );
+		mat4Copy( this.camera.projectionMatrixInverse, this.gtaoMaterial.uniforms.cameraProjectionMatrixInverse.value );
+		mat4Copy( this.camera.matrixWorld, this.gtaoMaterial.uniforms.cameraWorldMatrix.value );
 		this._renderPass( renderer, this.gtaoMaterial, this.gtaoRenderTarget, 0xffffff, 1.0 );
 
 		// render poisson denoise
 
-		this.pdMaterial.uniforms.cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
+		mat4Copy( this.camera.projectionMatrixInverse, this.pdMaterial.uniforms.cameraProjectionMatrixInverse.value );
 		this._renderPass( renderer, this.pdMaterial, this.pdRenderTarget, 0xffffff, 1.0 );
 
 		// output result to screen

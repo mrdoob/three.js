@@ -1,8 +1,17 @@
 import { WebGLCoordinateSystem } from '../constants.js';
-import { Frustum } from './Frustum.js';
-import { Matrix4 } from './Matrix4.js';
+import {
+	frustumContainsPoint,
+	frustumCopy,
+	frustumCreate,
+	frustumIntersectsBox,
+	frustumIntersectsObject,
+	frustumIntersectsSphere,
+	frustumIntersectsSprite,
+	frustumSetFromProjectionMatrix
+} from './FrustumFunctions.js';
+import { mat4Create, mat4MultiplyMatrices } from './Matrix4Functions.js';
 
-const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
+const _projScreenMatrix = /*@__PURE__*/ mat4Create();
 
 /**
  * FrustumArray is used to determine if an object is visible in at least one camera
@@ -61,11 +70,11 @@ class FrustumArray {
 
 			const camera = cameras[ i ];
 
-			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+			mat4MultiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse, _projScreenMatrix );
 
-			if ( frustums[ i ] === undefined ) frustums[ i ] = new Frustum();
+			if ( frustums[ i ] === undefined ) frustums[ i ] = frustumCreate();
 
-			frustums[ i ].setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
+			frustumSetFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth, frustums[ i ] );
 
 		}
 
@@ -89,7 +98,7 @@ class FrustumArray {
 
 		for ( let i = 0; i < this._count; i ++ ) {
 
-			if ( frustums[ i ].intersectsObject( object ) ) return true;
+			if ( frustumIntersectsObject( frustums[ i ], object ) ) return true;
 
 		}
 
@@ -111,7 +120,7 @@ class FrustumArray {
 
 		for ( let i = 0; i < this._count; i ++ ) {
 
-			if ( frustums[ i ].intersectsSprite( sprite ) ) return true;
+			if ( frustumIntersectsSprite( frustums[ i ], sprite ) ) return true;
 
 		}
 
@@ -133,7 +142,7 @@ class FrustumArray {
 
 		for ( let i = 0; i < this._count; i ++ ) {
 
-			if ( frustums[ i ].intersectsSphere( sphere ) ) return true;
+			if ( frustumIntersectsSphere( frustums[ i ], sphere ) ) return true;
 
 		}
 
@@ -155,7 +164,7 @@ class FrustumArray {
 
 		for ( let i = 0; i < this._count; i ++ ) {
 
-			if ( frustums[ i ].intersectsBox( box ) ) return true;
+			if ( frustumIntersectsBox( frustums[ i ], box ) ) return true;
 
 		}
 
@@ -177,7 +186,7 @@ class FrustumArray {
 
 		for ( let i = 0; i < this._count; i ++ ) {
 
-			if ( frustums[ i ].containsPoint( point ) ) return true;
+			if ( frustumContainsPoint( frustums[ i ], point ) ) return true;
 
 		}
 
@@ -200,9 +209,9 @@ class FrustumArray {
 
 		for ( let i = 0; i < source._count; i ++ ) {
 
-			if ( frustums[ i ] === undefined ) frustums[ i ] = new Frustum();
+			if ( frustums[ i ] === undefined ) frustums[ i ] = frustumCreate();
 
-			frustums[ i ].copy( sourceFrustums[ i ] );
+			frustumCopy( sourceFrustums[ i ], frustums[ i ] );
 
 		}
 

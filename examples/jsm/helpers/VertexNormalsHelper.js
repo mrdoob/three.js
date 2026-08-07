@@ -3,13 +3,20 @@ import {
 	Float32BufferAttribute,
 	LineSegments,
 	LineBasicMaterial,
-	Matrix3,
-	Vector3
+	mat3Create,
+	mat3GetNormalMatrix,
+	vec3Add,
+	vec3ApplyMatrix3,
+	vec3ApplyMatrix4,
+	vec3Create,
+	vec3FromBufferAttribute,
+	vec3MultiplyScalar,
+	vec3Normalize
 } from 'three';
 
-const _v1 = new Vector3();
-const _v2 = new Vector3();
-const _normalMatrix = new Matrix3();
+const _v1 = /*@__PURE__*/ vec3Create();
+const _v2 = /*@__PURE__*/ vec3Create();
+const _normalMatrix = /*@__PURE__*/ mat3Create();
 
 /**
  * Visualizes an object's vertex normals.
@@ -95,7 +102,7 @@ class VertexNormalsHelper extends LineSegments {
 
 		this.object.updateMatrixWorld( true );
 
-		_normalMatrix.getNormalMatrix( this.object.matrixWorld );
+		mat3GetNormalMatrix( this.object.matrixWorld, _normalMatrix );
 
 		const matrixWorld = this.object.matrixWorld;
 
@@ -117,11 +124,15 @@ class VertexNormalsHelper extends LineSegments {
 
 			for ( let j = 0, jl = objPos.count; j < jl; j ++ ) {
 
-				_v1.fromBufferAttribute( objPos, j ).applyMatrix4( matrixWorld );
+				vec3FromBufferAttribute( objPos, j, _v1 );
+				vec3ApplyMatrix4( _v1, matrixWorld, _v1 );
 
-				_v2.fromBufferAttribute( objNorm, j );
+				vec3FromBufferAttribute( objNorm, j, _v2 );
 
-				_v2.applyMatrix3( _normalMatrix ).normalize().multiplyScalar( this.size ).add( _v1 );
+				vec3ApplyMatrix3( _v2, _normalMatrix, _v2 );
+				vec3Normalize( _v2, _v2 );
+				vec3MultiplyScalar( _v2, this.size, _v2 );
+				vec3Add( _v2, _v1, _v2 );
 
 				position.setXYZ( idx, _v1.x, _v1.y, _v1.z );
 

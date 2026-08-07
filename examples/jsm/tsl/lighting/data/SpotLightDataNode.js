@@ -1,8 +1,19 @@
-import { Color, Node, Vector3, Vector4 } from 'three/webgpu';
+import {
+	Node,
+	colorCreate,
+	colorCopy,
+	colorMultiplyScalar,
+	vec3ApplyMatrix4,
+	vec3Create,
+	vec3SetFromMatrixPosition,
+	vec3Sub,
+	vec3TransformDirection,
+	vec4Create
+} from 'three/webgpu';
 import { Loop, NodeUpdateType, getDistanceAttenuation, positionView, renderGroup, smoothstep, uniform, uniformArray, vec3 } from 'three/tsl';
 
-const _lightPosition = /*@__PURE__*/ new Vector3();
-const _targetPosition = /*@__PURE__*/ new Vector3();
+const _lightPosition = /*@__PURE__*/ vec3Create();
+const _targetPosition = /*@__PURE__*/ vec3Create();
 
 const warn = ( message ) => {
 
@@ -38,10 +49,10 @@ class SpotLightDataNode extends Node {
 
 		for ( let i = 0; i < maxCount; i ++ ) {
 
-			this._colors.push( new Color() );
-			this._positionsAndCutoff.push( new Vector4() );
-			this._directionsAndDecay.push( new Vector4() );
-			this._cones.push( new Vector4() );
+			this._colors.push( colorCreate() );
+			this._positionsAndCutoff.push( vec4Create() );
+			this._directionsAndDecay.push( vec4Create() );
+			this._cones.push( vec4Create() );
 
 		}
 
@@ -78,10 +89,11 @@ class SpotLightDataNode extends Node {
 
 			const light = this._lights[ i ];
 
-			this._colors[ i ].copy( light.color ).multiplyScalar( light.intensity );
+			colorCopy( light.color, this._colors[ i ] );
+			colorMultiplyScalar( this._colors[ i ], light.intensity, this._colors[ i ] );
 
-			_lightPosition.setFromMatrixPosition( light.matrixWorld );
-			_lightPosition.applyMatrix4( camera.matrixWorldInverse );
+			vec3SetFromMatrixPosition( light.matrixWorld, _lightPosition );
+			vec3ApplyMatrix4( _lightPosition, camera.matrixWorldInverse, _lightPosition );
 
 			const positionAndCutoff = this._positionsAndCutoff[ i ];
 			positionAndCutoff.x = _lightPosition.x;
@@ -89,9 +101,10 @@ class SpotLightDataNode extends Node {
 			positionAndCutoff.z = _lightPosition.z;
 			positionAndCutoff.w = light.distance;
 
-			_lightPosition.setFromMatrixPosition( light.matrixWorld );
-			_targetPosition.setFromMatrixPosition( light.target.matrixWorld );
-			_lightPosition.sub( _targetPosition ).transformDirection( camera.matrixWorldInverse );
+			vec3SetFromMatrixPosition( light.matrixWorld, _lightPosition );
+			vec3SetFromMatrixPosition( light.target.matrixWorld, _targetPosition );
+			vec3Sub( _lightPosition, _targetPosition, _lightPosition );
+			vec3TransformDirection( _lightPosition, camera.matrixWorldInverse, _lightPosition );
 
 			const directionAndDecay = this._directionsAndDecay[ i ];
 			directionAndDecay.x = _lightPosition.x;

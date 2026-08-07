@@ -1,22 +1,22 @@
-import { Frustum, Matrix4, RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType, Vector3, Plane } from 'three/webgpu';
+import { RenderTarget, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType, vec2Create, vec3Create, vec3Set, vec3Copy, vec3AddScaledVector, vec3MultiplyScalar, vec3SetFromMatrixPosition, mat4Create, mat4MultiplyMatrices, planeCreate, planeSetFromNormalAndCoplanarPoint, frustumCreate, frustumSetFromProjectionMatrix } from 'three/webgpu';
 import { cubeTexture, clamp, viewZToPerspectiveDepth, logarithmicDepthToViewZ, float, Loop, max, Fn, passTexture, uv, dot, uniformArray, If, getViewPosition, uniform, vec4, add, interleavedGradientNoise, screenCoordinate, round, mul, uint, mix, exp, vec3, distance, pow, reference, lightPosition, vec2, bool, texture, perspectiveDepthToViewZ, lightShadowMatrix, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _size = /*@__PURE__*/ new Vector2();
+const _size = /*@__PURE__*/ vec2Create();
 
 const _DIRECTIONS = [
-	new Vector3( 1, 0, 0 ),
-	new Vector3( - 1, 0, 0 ),
-	new Vector3( 0, 1, 0 ),
-	new Vector3( 0, - 1, 0 ),
-	new Vector3( 0, 0, 1 ),
-	new Vector3( 0, 0, - 1 ),
+	vec3Set( vec3Create(), 1, 0, 0 ),
+	vec3Set( vec3Create(), - 1, 0, 0 ),
+	vec3Set( vec3Create(), 0, 1, 0 ),
+	vec3Set( vec3Create(), 0, - 1, 0 ),
+	vec3Set( vec3Create(), 0, 0, 1 ),
+	vec3Set( vec3Create(), 0, 0, - 1 ),
 ];
 
-const _PLANES = _DIRECTIONS.map( () => new Plane() );
-const _SCRATCH_VECTOR = new Vector3();
-const _SCRATCH_MAT4 = new Matrix4();
-const _SCRATCH_FRUSTUM = new Frustum();
+const _PLANES = _DIRECTIONS.map( () => planeCreate() );
+const _SCRATCH_VECTOR = /*@__PURE__*/ vec3Create();
+const _SCRATCH_MAT4 = /*@__PURE__*/ mat4Create();
+const _SCRATCH_FRUSTUM = /*@__PURE__*/ frustumCreate();
 
 let _rendererState;
 
@@ -146,7 +146,7 @@ class GodraysNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<mat4>}
 		 */
-		this._premultipliedLightCameraMatrix = uniform( new Matrix4() );
+		this._premultipliedLightCameraMatrix = uniform( mat4Create(), 'mat4' );
 
 		/**
 		 * Represents the world position of the scene's camera.
@@ -154,7 +154,7 @@ class GodraysNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<mat4>}
 		 */
-		this._cameraPosition = uniform( new Vector3() );
+		this._cameraPosition = uniform( vec3Create(), 'vec3' );
 
 		/**
 		 * Represents the near value of the scene's camera.
@@ -188,7 +188,7 @@ class GodraysNode extends TempNode {
 		 */
 		this._shadowCameraFar = reference( 'far', 'float', light.shadow.camera );
 
-		this._fNormals = uniformArray( _DIRECTIONS.map( () => new Vector3() ) );
+		this._fNormals = uniformArray( _DIRECTIONS.map( () => vec3Create() ), 'vec3' );
 		this._fConstants = uniformArray( _DIRECTIONS.map( () => 0 ) );
 
 		/**
@@ -276,7 +276,7 @@ class GodraysNode extends TempNode {
 		//
 
 		const size = renderer.getDrawingBufferSize( _size );
-		this.setSize( size.width, size.height );
+		this.setSize( size.x, size.y );
 
 		//
 
@@ -285,7 +285,7 @@ class GodraysNode extends TempNode {
 
 		this._updateLightParams();
 
-		this._cameraPosition.value.setFromMatrixPosition( this._camera.matrixWorld );
+		vec3SetFromMatrixPosition( this._camera.matrixWorld, this._cameraPosition.value );
 
 		// clear
 
@@ -307,7 +307,7 @@ class GodraysNode extends TempNode {
 		const light = this._light;
 		const shadowCamera = light.shadow.camera;
 
-		this._premultipliedLightCameraMatrix.value.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
+		mat4MultiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse, this._premultipliedLightCameraMatrix.value );
 
 		if ( light.isPointLight ) {
 
@@ -316,25 +316,25 @@ class GodraysNode extends TempNode {
 				const direction = _DIRECTIONS[ i ];
 				const plane = _PLANES[ i ];
 
-				_SCRATCH_VECTOR.copy( light.position );
-				_SCRATCH_VECTOR.addScaledVector( direction, shadowCamera.far );
-				plane.setFromNormalAndCoplanarPoint( direction, _SCRATCH_VECTOR );
+				vec3Copy( light.position, _SCRATCH_VECTOR );
+				vec3AddScaledVector( _SCRATCH_VECTOR, direction, shadowCamera.far, _SCRATCH_VECTOR );
+				planeSetFromNormalAndCoplanarPoint( direction, _SCRATCH_VECTOR, plane );
 
-				this._fNormals.array[ i ].copy( plane.normal );
+				vec3Copy( plane.normal, this._fNormals.array[ i ] );
 				this._fConstants.array[ i ] = plane.constant;
 
 			}
 
 		} else if ( light.isDirectionalLight ) {
 
-			_SCRATCH_MAT4.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
-			_SCRATCH_FRUSTUM.setFromProjectionMatrix( _SCRATCH_MAT4 );
+			mat4MultiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse, _SCRATCH_MAT4 );
+			frustumSetFromProjectionMatrix( _SCRATCH_MAT4, undefined, false, _SCRATCH_FRUSTUM );
 
 			for ( let i = 0; i < 6; i ++ ) {
 
 				const plane = _SCRATCH_FRUSTUM.planes[ i ];
 
-				this._fNormals.array[ i ].copy( plane.normal ).multiplyScalar( - 1 );
+				vec3MultiplyScalar( plane.normal, - 1, this._fNormals.array[ i ] );
 				this._fConstants.array[ i ] = plane.constant * - 1;
 
 			}

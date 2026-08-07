@@ -1,5 +1,5 @@
 import {
-	Vector4
+	vec4Create
 } from 'three';
 import * as NURBSUtils from '../curves/NURBSUtils.js';
 
@@ -49,7 +49,7 @@ class NURBSVolume {
 				for ( let k = 0; k < len3; ++ k ) {
 
 					const point = controlPoints[ i ][ j ][ k ];
-					this.controlPoints[ i ][ j ][ k ] = new Vector4( point.x, point.y, point.z, point.w );
+					this.controlPoints[ i ][ j ][ k ] = vec4Create( point.x, point.y, point.z, point.w );
 
 				}
 

@@ -1,17 +1,24 @@
 import {
-	Vector3,
 	Object3D,
 	ShadowBaseNode,
-	Plane,
-	Line3,
 	DepthTexture,
 	LessCompare,
-	Vector2,
 	RedFormat,
 	ArrayCamera,
 	VSMShadowMap,
 	RendererUtils,
-	Quaternion
+	vec2Create,
+	vec3Create,
+	vec3Set,
+	vec3Copy,
+	vec3SubVectors,
+	vec3Normalize,
+	vec3Length,
+	vec3AddScaledVector,
+	quatCreate,
+	quatCopy,
+	planeSet,
+	line3Create
 } from 'three/webgpu';
 
 import { min, Fn, shadow, NodeUpdateType, getShadowMaterial, getShadowRenderObjectFunction } from 'three/tsl';
@@ -20,10 +27,10 @@ const { resetRendererAndSceneState, restoreRendererAndSceneState } = RendererUti
 let _rendererState;
 
 const _cameraLayers = [];
-const _vec3Temp1 = /*@__PURE__*/ new Vector3();
-const _vec3Temp2 = /*@__PURE__*/ new Vector3();
-const _vec3Temp3 = /*@__PURE__*/ new Vector3();
-const _quatTemp1 = /*@__PURE__*/ new Quaternion();
+const _vec3Temp1 = /*@__PURE__*/ vec3Create();
+const _vec3Temp2 = /*@__PURE__*/ vec3Create();
+const _vec3Temp3 = /*@__PURE__*/ vec3Create();
+const _quatTemp1 = /*@__PURE__*/ quatCreate();
 
 class LwLight extends Object3D {
 
@@ -74,10 +81,10 @@ class TileShadowNode extends ShadowBaseNode {
 		this.debug = this.config.debug;
 
 		this.originalLight = light;
-		this.lightPlane = new Plane( new Vector3( 0, 1, 0 ), 0 );
-		this.line = new Line3();
+		this.lightPlane = planeSet( vec3Set( vec3Create(), 0, 1, 0 ), 0 );
+		this.line = line3Create();
 
-		this.initialLightDirection = new Vector3();
+		this.initialLightDirection = vec3Create();
 		this.updateLightDirection();
 
 		this._cameraFrameId = new WeakMap();
@@ -132,10 +139,10 @@ class TileShadowNode extends ShadowBaseNode {
 	 */
 	updateLightDirection() {
 
-		this.initialLightDirection.subVectors(
-			this.originalLight.target.getWorldPosition( new Vector3() ),
-			this.originalLight.getWorldPosition( new Vector3() )
-		).normalize();
+		this.originalLight.target.getWorldPosition( _vec3Temp1 );
+		this.originalLight.getWorldPosition( _vec3Temp2 );
+		vec3SubVectors( _vec3Temp1, _vec3Temp2, this.initialLightDirection );
+		vec3Normalize( this.initialLightDirection, this.initialLightDirection );
 
 	}
 
@@ -231,8 +238,8 @@ class TileShadowNode extends ShadowBaseNode {
 		const light = this.originalLight;
 
 		const shadowCam = light.shadow.camera;
-		const lsMin = new Vector2( shadowCam.left, shadowCam.bottom );
-		const lsMax = new Vector2( shadowCam.right, shadowCam.top );
+		const lsMin = vec2Create( shadowCam.left, shadowCam.bottom );
+		const lsMax = vec2Create( shadowCam.right, shadowCam.top );
 		const fullWidth = lsMax.x - lsMin.x;
 		const fullHeight = lsMax.y - lsMin.y;
 
@@ -375,13 +382,13 @@ class TileShadowNode extends ShadowBaseNode {
 
 		const sourceWorldPos = sourceLight.getWorldPosition( _vec3Temp1 );
 		const targetWorldPos = sourceLight.target.getWorldPosition( _vec3Temp2 );
-		const forward = _vec3Temp3.subVectors( targetWorldPos, sourceWorldPos );
-		const targetDistance = forward.length();
-		forward.normalize();
-		lwLight.position.copy( sourceWorldPos );
-		lwLight.target.position.copy( sourceWorldPos ).add( forward.multiplyScalar( targetDistance ) );
-		lwLight.quaternion.copy( sourceLight.getWorldQuaternion( _quatTemp1 ) );
-		lwLight.scale.copy( sourceLight.scale );
+		vec3SubVectors( targetWorldPos, sourceWorldPos, _vec3Temp3 );
+		const targetDistance = vec3Length( _vec3Temp3 );
+		vec3Normalize( _vec3Temp3, _vec3Temp3 );
+		vec3Copy( sourceWorldPos, lwLight.position );
+		vec3AddScaledVector( sourceWorldPos, _vec3Temp3, targetDistance, lwLight.target.position );
+		quatCopy( sourceLight.getWorldQuaternion( _quatTemp1 ), lwLight.quaternion );
+		vec3Copy( sourceLight.scale, lwLight.scale );
 		lwLight.updateMatrix();
 		lwLight.updateMatrixWorld( true );
 		lwLight.target.updateMatrix();

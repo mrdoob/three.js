@@ -1,5 +1,5 @@
 import {
-	Vector2
+	vec2Create
 } from 'three';
 
 /**
@@ -27,7 +27,7 @@ const ConvolutionShader = {
 	uniforms: {
 
 		'tDiffuse': { value: null },
-		'uImageIncrement': { value: new Vector2( 0.001953125, 0.0 ) },
+		'uImageIncrement': { value: vec2Create( 0.001953125, 0.0 ) },
 		'cKernel': { value: [] }
 
 	},

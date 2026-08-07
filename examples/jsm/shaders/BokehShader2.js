@@ -1,5 +1,5 @@
 import {
-	Vector2
+	vec2Create
 } from 'three';
 
 /**
@@ -52,7 +52,7 @@ const BokehShader = {
 		'pentagon': { value: 0 },
 
 		'shaderFocus': { value: 1 },
-		'focusCoords': { value: new Vector2() }
+		'focusCoords': { value: vec2Create() }
 
 
 	},

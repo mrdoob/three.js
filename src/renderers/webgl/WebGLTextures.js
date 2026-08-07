@@ -1,7 +1,7 @@
 import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedIntType, FloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, UnsignedByteType, NoColorSpace, LinearSRGBColorSpace, NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, SRGBTransfer, LinearTransfer, UnsignedShortType, UnsignedInt248Type } from '../../constants.js';
 import { createElementNS, warn, error } from '../../utils.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
-import { Vector2 } from '../../math/Vector2.js';
+import { vec2Create } from '../../math/Vector2Functions.js';
 import { getByteLength } from '../../extras/TextureUtils.js';
 
 function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info ) {
@@ -9,7 +9,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	const multisampledRTTExt = extensions.has( 'WEBGL_multisampled_render_to_texture' ) ? extensions.get( 'WEBGL_multisampled_render_to_texture' ) : null;
 	const supportsInvalidateFramebuffer = typeof navigator === 'undefined' ? false : /OculusBrowser/g.test( navigator.userAgent );
 
-	const _imageDimensions = new Vector2();
+	const _imageDimensions = vec2Create();
 	const _videoTextures = new WeakMap();
 	const _htmlTextures = new Set();
 	let _canvas;
@@ -51,9 +51,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		// handle case if texture exceeds max size
 
-		if ( dimensions.width > maxSize || dimensions.height > maxSize ) {
+		if ( dimensions.x > maxSize || dimensions.y > maxSize ) {
 
-			scale = maxSize / Math.max( dimensions.width, dimensions.height );
+			scale = maxSize / Math.max( dimensions.x, dimensions.y );
 
 		}
 
@@ -68,8 +68,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ||
 				( typeof VideoFrame !== 'undefined' && image instanceof VideoFrame ) ) {
 
-				const width = Math.floor( scale * dimensions.width );
-				const height = Math.floor( scale * dimensions.height );
+				const width = Math.floor( scale * dimensions.x );
+				const height = Math.floor( scale * dimensions.y );
 
 				if ( _canvas === undefined ) _canvas = createCanvas( width, height );
 
@@ -83,7 +83,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				const context = canvas.getContext( '2d' );
 				context.drawImage( image, 0, 0, width, height );
 
-				warn( 'WebGLRenderer: Texture has been resized from (' + dimensions.width + 'x' + dimensions.height + ') to (' + width + 'x' + height + ').' );
+				warn( 'WebGLRenderer: Texture has been resized from (' + dimensions.x + 'x' + dimensions.y + ') to (' + width + 'x' + height + ').' );
 
 				return canvas;
 
@@ -91,7 +91,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				if ( 'data' in image ) {
 
-					warn( 'WebGLRenderer: Image in DataTexture is too big (' + dimensions.width + 'x' + dimensions.height + ').' );
+					warn( 'WebGLRenderer: Image in DataTexture is too big (' + dimensions.x + 'x' + dimensions.y + ').' );
 
 				}
 
@@ -1334,7 +1334,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						const dimensions = getDimensions( mipmaps[ 0 ] );
 
-						state.texStorage2D( _gl.TEXTURE_2D, levels, glInternalFormat, dimensions.width, dimensions.height );
+						state.texStorage2D( _gl.TEXTURE_2D, levels, glInternalFormat, dimensions.x, dimensions.y );
 
 					}
 
@@ -1368,7 +1368,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 							const dimensions = getDimensions( image );
 
-							state.texStorage2D( _gl.TEXTURE_2D, levels, glInternalFormat, dimensions.width, dimensions.height );
+							state.texStorage2D( _gl.TEXTURE_2D, levels, glInternalFormat, dimensions.x, dimensions.y );
 
 						}
 
@@ -1539,7 +1539,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					const dimensions = getDimensions( cubeImage[ 0 ] );
 
-					state.texStorage2D( _gl.TEXTURE_CUBE_MAP, levels, glInternalFormat, dimensions.width, dimensions.height );
+					state.texStorage2D( _gl.TEXTURE_CUBE_MAP, levels, glInternalFormat, dimensions.x, dimensions.y );
 
 				}
 
@@ -2470,18 +2470,18 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			// if intrinsic data are not available, fallback to width/height
 
-			_imageDimensions.width = image.naturalWidth || image.width;
-			_imageDimensions.height = image.naturalHeight || image.height;
+			_imageDimensions.x = image.naturalWidth || image.width;
+			_imageDimensions.y = image.naturalHeight || image.height;
 
 		} else if ( typeof VideoFrame !== 'undefined' && image instanceof VideoFrame ) {
 
-			_imageDimensions.width = image.displayWidth;
-			_imageDimensions.height = image.displayHeight;
+			_imageDimensions.x = image.displayWidth;
+			_imageDimensions.y = image.displayHeight;
 
 		} else {
 
-			_imageDimensions.width = image.width;
-			_imageDimensions.height = image.height;
+			_imageDimensions.x = image.width;
+			_imageDimensions.y = image.height;
 
 		}
 

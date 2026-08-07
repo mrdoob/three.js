@@ -2,8 +2,8 @@ import {
 	HalfFloatType,
 	NoBlending,
 	Timer,
-	Vector2,
-	WebGLRenderTarget
+	WebGLRenderTarget,
+	vec2Create
 } from 'three';
 import { CopyShader } from '../shaders/CopyShader.js';
 import { ShaderPass } from './ShaderPass.js';
@@ -62,9 +62,9 @@ class EffectComposer {
 
 		if ( renderTarget === undefined ) {
 
-			const size = renderer.getSize( new Vector2() );
-			this._width = size.width;
-			this._height = size.height;
+			const size = renderer.getSize( vec2Create() );
+			this._width = size.x;
+			this._height = size.y;
 
 			renderTarget = new WebGLRenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, { type: HalfFloatType } );
 			renderTarget.texture.name = 'EffectComposer.rt1';
@@ -287,10 +287,10 @@ class EffectComposer {
 
 		if ( renderTarget === undefined ) {
 
-			const size = this.renderer.getSize( new Vector2() );
+			const size = this.renderer.getSize( vec2Create() );
 			this._pixelRatio = this.renderer.getPixelRatio();
-			this._width = size.width;
-			this._height = size.height;
+			this._width = size.x;
+			this._height = size.y;
 
 			renderTarget = this.renderTarget1.clone();
 			renderTarget.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );

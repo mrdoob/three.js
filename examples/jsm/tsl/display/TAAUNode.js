@@ -1,8 +1,8 @@
-import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
+import { HalfFloatType, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, DepthTexture, vec2Create, vec2Set, mat4Create, mat4Copy } from 'three/webgpu';
 import { add, exp, float, If, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth, struct, ivec2, mix, property, outputStruct, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _size = /*@__PURE__*/ new Vector2();
+const _size = /*@__PURE__*/ vec2Create();
 
 let _rendererState;
 
@@ -148,7 +148,7 @@ class TAAUNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
-		this._jitterOffset = uniform( new Vector2() );
+		this._jitterOffset = uniform( vec2Create(), 'vec2' );
 
 		/**
 		 * The render target that represents the history of frame data.
@@ -221,7 +221,7 @@ class TAAUNode extends TempNode {
 		 * @private
 		 * @type {Matrix4}
 		 */
-		this._originalProjectionMatrix = new Matrix4();
+		this._originalProjectionMatrix = mat4Create();
 
 		/**
 		 * A uniform node holding the camera's near and far.
@@ -229,7 +229,7 @@ class TAAUNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
-		this._cameraNearFar = uniform( new Vector2() );
+		this._cameraNearFar = uniform( vec2Create(), 'vec2' );
 
 		/**
 		 * A uniform node holding the camera world matrix.
@@ -237,7 +237,7 @@ class TAAUNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<mat4>}
 		 */
-		this._cameraWorldMatrix = uniform( new Matrix4() );
+		this._cameraWorldMatrix = uniform( mat4Create(), 'mat4' );
 
 		/**
 		 * A uniform node holding the camera world matrix inverse.
@@ -245,7 +245,7 @@ class TAAUNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<mat4>}
 		 */
-		this._cameraWorldMatrixInverse = uniform( new Matrix4() );
+		this._cameraWorldMatrixInverse = uniform( mat4Create(), 'mat4' );
 
 		/**
 		 * A uniform node holding the camera projection matrix inverse.
@@ -253,7 +253,7 @@ class TAAUNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<mat4>}
 		 */
-		this._cameraProjectionMatrixInverse = uniform( new Matrix4() );
+		this._cameraProjectionMatrixInverse = uniform( mat4Create(), 'mat4' );
 
 		/**
 		 * A uniform node holding the previous frame's view matrix.
@@ -261,7 +261,7 @@ class TAAUNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<mat4>}
 		 */
-		this._previousCameraWorldMatrix = uniform( new Matrix4() );
+		this._previousCameraWorldMatrix = uniform( mat4Create(), 'mat4' );
 
 		/**
 		 * A uniform node holding the previous frame's projection matrix inverse.
@@ -269,7 +269,7 @@ class TAAUNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<mat4>}
 		 */
-		this._previousCameraProjectionMatrixInverse = uniform( new Matrix4() );
+		this._previousCameraProjectionMatrixInverse = uniform( mat4Create(), 'mat4' );
 
 		/**
 		 * A texture node for the previous depth buffer.
@@ -329,7 +329,7 @@ class TAAUNode extends TempNode {
 		// save original/unjittered projection matrix for velocity pass
 
 		this.camera.updateProjectionMatrix();
-		this._originalProjectionMatrix.copy( this.camera.projectionMatrix );
+		mat4Copy( this.camera.projectionMatrix, this._originalProjectionMatrix );
 
 		velocity.setProjectionMatrix( this._originalProjectionMatrix );
 
@@ -341,7 +341,7 @@ class TAAUNode extends TempNode {
 		const jitterX = ( haltonOffset[ 0 ] - 0.5 );
 		const jitterY = ( haltonOffset[ 1 ] - 0.5 );
 
-		this._jitterOffset.value.set( jitterX, jitterY );
+		vec2Set( jitterX, jitterY, this._jitterOffset.value );
 
 		this.camera.setViewOffset(
 
@@ -382,15 +382,15 @@ class TAAUNode extends TempNode {
 
 		// store previous frame matrices before updating current ones
 
-		this._previousCameraWorldMatrix.value.copy( this._cameraWorldMatrix.value );
-		this._previousCameraProjectionMatrixInverse.value.copy( this._cameraProjectionMatrixInverse.value );
+		mat4Copy( this._cameraWorldMatrix.value, this._previousCameraWorldMatrix.value );
+		mat4Copy( this._cameraProjectionMatrixInverse.value, this._previousCameraProjectionMatrixInverse.value );
 
 		// update camera matrices uniforms
 
-		this._cameraNearFar.value.set( this.camera.near, this.camera.far );
-		this._cameraWorldMatrix.value.copy( this.camera.matrixWorld );
-		this._cameraWorldMatrixInverse.value.copy( this.camera.matrixWorldInverse );
-		this._cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
+		vec2Set( this.camera.near, this.camera.far, this._cameraNearFar.value );
+		mat4Copy( this.camera.matrixWorld, this._cameraWorldMatrix.value );
+		mat4Copy( this.camera.matrixWorldInverse, this._cameraWorldMatrixInverse.value );
+		mat4Copy( this.camera.projectionMatrixInverse, this._cameraProjectionMatrixInverse.value );
 
 		// extract input dimensions from the beauty buffer and output
 		// dimensions from the renderer's drawing buffer
@@ -401,8 +401,8 @@ class TAAUNode extends TempNode {
 		const inputHeight = beautyRenderTarget.texture.height;
 
 		const drawingBufferSize = renderer.getDrawingBufferSize( _size );
-		const outputWidth = drawingBufferSize.width;
-		const outputHeight = drawingBufferSize.height;
+		const outputWidth = drawingBufferSize.x;
+		const outputHeight = drawingBufferSize.y;
 
 		//
 

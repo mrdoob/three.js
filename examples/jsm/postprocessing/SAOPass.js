@@ -1,6 +1,5 @@
 import {
 	AddEquation,
-	Color,
 	CustomBlending,
 	DepthTexture,
 	DstAlphaFactor,
@@ -13,9 +12,12 @@ import {
 	UniformsUtils,
 	DepthStencilFormat,
 	UnsignedInt248Type,
-	Vector2,
 	WebGLRenderTarget,
-	ZeroFactor
+	ZeroFactor,
+	colorCreate,
+	mat4Copy,
+	vec2Create,
+	vec2Set
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 import { SAOShader } from '../shaders/SAOShader.js';
@@ -44,7 +46,7 @@ class SAOPass extends Pass {
 	 * @param {Camera} camera - The camera.
 	 * @param {Vector2} [resolution] - The effect's resolution.
 	 */
-	constructor( scene, camera, resolution = new Vector2( 256, 256 ) ) {
+	constructor( scene, camera, resolution = vec2Create( 256, 256 ) ) {
 
 		super();
 
@@ -78,8 +80,8 @@ class SAOPass extends Pass {
 		 */
 		this.needsSwap = false;
 
-		this._originalClearColor = new Color();
-		this._oldClearColor = new Color();
+		this._originalClearColor = colorCreate();
+		this._oldClearColor = colorCreate();
 		this._oldClearAlpha = 1;
 
 		/**
@@ -106,7 +108,7 @@ class SAOPass extends Pass {
 		 * @type {Vector2}
 		 * @default (256,256)
 		 */
-		this.resolution = new Vector2( resolution.x, resolution.y );
+		this.resolution = vec2Create( resolution.x, resolution.y );
 
 		this.saoRenderTarget = new WebGLRenderTarget( this.resolution.x, this.resolution.y, { type: HalfFloatType, depthBuffer: false } );
 		this.blurIntermediateRenderTarget = this.saoRenderTarget.clone();
@@ -134,8 +136,8 @@ class SAOPass extends Pass {
 		this.saoMaterial.defines[ 'PERSPECTIVE_CAMERA' ] = this.camera.isPerspectiveCamera ? 1 : 0;
 		this.saoMaterial.uniforms[ 'tDepth' ].value = depthTexture;
 		this.saoMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
-		this.saoMaterial.uniforms[ 'size' ].value.set( this.resolution.x, this.resolution.y );
-		this.saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
+		vec2Set( this.resolution.x, this.resolution.y, this.saoMaterial.uniforms[ 'size' ].value );
+		mat4Copy( this.camera.projectionMatrixInverse, this.saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value );
 		this.saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = this.camera.projectionMatrix;
 		this.saoMaterial.blending = NoBlending;
 
@@ -149,7 +151,7 @@ class SAOPass extends Pass {
 		this.vBlurMaterial.defines[ 'PERSPECTIVE_CAMERA' ] = this.camera.isPerspectiveCamera ? 1 : 0;
 		this.vBlurMaterial.uniforms[ 'tDiffuse' ].value = this.saoRenderTarget.texture;
 		this.vBlurMaterial.uniforms[ 'tDepth' ].value = depthTexture;
-		this.vBlurMaterial.uniforms[ 'size' ].value.set( this.resolution.x, this.resolution.y );
+		vec2Set( this.resolution.x, this.resolution.y, this.vBlurMaterial.uniforms[ 'size' ].value );
 		this.vBlurMaterial.blending = NoBlending;
 
 		this.hBlurMaterial = new ShaderMaterial( {
@@ -162,7 +164,7 @@ class SAOPass extends Pass {
 		this.hBlurMaterial.defines[ 'PERSPECTIVE_CAMERA' ] = this.camera.isPerspectiveCamera ? 1 : 0;
 		this.hBlurMaterial.uniforms[ 'tDiffuse' ].value = this.blurIntermediateRenderTarget.texture;
 		this.hBlurMaterial.uniforms[ 'tDepth' ].value = depthTexture;
-		this.hBlurMaterial.uniforms[ 'size' ].value.set( this.resolution.x, this.resolution.y );
+		vec2Set( this.resolution.x, this.resolution.y, this.hBlurMaterial.uniforms[ 'size' ].value );
 		this.hBlurMaterial.blending = NoBlending;
 
 		this.materialCopy = new ShaderMaterial( {
@@ -235,8 +237,8 @@ class SAOPass extends Pass {
 		this.params.saoBlurRadius = Math.floor( this.params.saoBlurRadius );
 		if ( ( this.prevStdDev !== this.params.saoBlurStdDev ) || ( this.prevNumSamples !== this.params.saoBlurRadius ) ) {
 
-			BlurShaderUtils.configure( this.vBlurMaterial, this.params.saoBlurRadius, this.params.saoBlurStdDev, new Vector2( 0, 1 ) );
-			BlurShaderUtils.configure( this.hBlurMaterial, this.params.saoBlurRadius, this.params.saoBlurStdDev, new Vector2( 1, 0 ) );
+			BlurShaderUtils.configure( this.vBlurMaterial, this.params.saoBlurRadius, this.params.saoBlurStdDev, vec2Create( 0, 1 ) );
+			BlurShaderUtils.configure( this.hBlurMaterial, this.params.saoBlurRadius, this.params.saoBlurStdDev, vec2Create( 1, 0 ) );
 			this.prevStdDev = this.params.saoBlurStdDev;
 			this.prevNumSamples = this.params.saoBlurRadius;
 
@@ -302,15 +304,15 @@ class SAOPass extends Pass {
 		this.blurIntermediateRenderTarget.setSize( width, height );
 		this.normalRenderTarget.setSize( width, height );
 
-		this.saoMaterial.uniforms[ 'size' ].value.set( width, height );
-		this.saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
+		vec2Set( width, height, this.saoMaterial.uniforms[ 'size' ].value );
+		mat4Copy( this.camera.projectionMatrixInverse, this.saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value );
 		this.saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = this.camera.projectionMatrix;
 		this.saoMaterial.needsUpdate = true;
 
-		this.vBlurMaterial.uniforms[ 'size' ].value.set( width, height );
+		vec2Set( width, height, this.vBlurMaterial.uniforms[ 'size' ].value );
 		this.vBlurMaterial.needsUpdate = true;
 
-		this.hBlurMaterial.uniforms[ 'size' ].value.set( width, height );
+		vec2Set( width, height, this.hBlurMaterial.uniforms[ 'size' ].value );
 		this.hBlurMaterial.needsUpdate = true;
 
 	}

@@ -1,7 +1,11 @@
 import {
 	BufferGeometry,
 	Float32BufferAttribute,
-	Vector3
+	vec3Create,
+	vec3CrossVectors,
+	vec3Normalize,
+	vec3Set,
+	vec3SubVectors
 } from 'three';
 
 /**
@@ -28,7 +32,7 @@ class ParametricGeometry extends BufferGeometry {
 	 * @param {number} [slices=8] - The number of slices to use for the parametric function.
 	 * @param {number} [stacks=8] - The stacks of slices to use for the parametric function.
 	 */
-	constructor( func = ( u, v, target ) => target.set( u, v, Math.cos( u ) * Math.sin( v ) ), slices = 8, stacks = 8 ) {
+	constructor( func = ( u, v, target ) => vec3Set( target, u, v, Math.cos( u ) * Math.sin( v ) ), slices = 8, stacks = 8 ) {
 
 		super();
 
@@ -56,10 +60,10 @@ class ParametricGeometry extends BufferGeometry {
 
 		const EPS = 0.00001;
 
-		const normal = new Vector3();
+		const normal = vec3Create();
 
-		const p0 = new Vector3(), p1 = new Vector3();
-		const pu = new Vector3(), pv = new Vector3();
+		const p0 = vec3Create(), p1 = vec3Create();
+		const pu = vec3Create(), pv = vec3Create();
 
 		// generate vertices, normals and uvs
 
@@ -85,30 +89,30 @@ class ParametricGeometry extends BufferGeometry {
 				if ( u - EPS >= 0 ) {
 
 					func( u - EPS, v, p1 );
-					pu.subVectors( p0, p1 );
+					vec3SubVectors( p0, p1, pu );
 
 				} else {
 
 					func( u + EPS, v, p1 );
-					pu.subVectors( p1, p0 );
+					vec3SubVectors( p1, p0, pu );
 
 				}
 
 				if ( v - EPS >= 0 ) {
 
 					func( u, v - EPS, p1 );
-					pv.subVectors( p0, p1 );
+					vec3SubVectors( p0, p1, pv );
 
 				} else {
 
 					func( u, v + EPS, p1 );
-					pv.subVectors( p1, p0 );
+					vec3SubVectors( p1, p0, pv );
 
 				}
 
 				// cross product of tangent vectors returns surface normal
 
-				normal.crossVectors( pu, pv ).normalize();
+				vec3Normalize( vec3CrossVectors( pu, pv, normal ), normal );
 				normals.push( normal.x, normal.y, normal.z );
 
 				// uv
@@ -166,7 +170,7 @@ class ParametricGeometry extends BufferGeometry {
  * @callback ParametricGeometry~Func
  * @param {number} u - The `u` coordinate on the surface in the range `[0,1]`.
  * @param {number} v - The `v` coordinate on the surface in the range `[0,1]`.
- * @param {Vector3} target - The target vector that is used to store the method's result.
+ * @param {Vector3Like} target - The target vector that is used to store the method's result.
  */
 
 export { ParametricGeometry };

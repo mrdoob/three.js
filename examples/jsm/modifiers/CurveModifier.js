@@ -13,7 +13,8 @@ import {
 	InstancedMesh,
 	LinearFilter,
 	DynamicDrawUsage,
-	Matrix4
+	mat4Create,
+	mat4MakeTranslation
 } from 'three';
 
 /**
@@ -290,7 +291,7 @@ export class Flow {
 
 }
 
-const _matrix = new Matrix4();
+const _matrix = /*@__PURE__*/ mat4Create();
 
 /**
  * An instanced version of {@link Flow} for making meshes bend around curves, where the instances are placed on the curve.
@@ -334,10 +335,11 @@ export class InstancedFlow extends Flow {
 	 */
 	writeChanges( index ) {
 
-		_matrix.makeTranslation(
+		mat4MakeTranslation(
 			this.curveLengthArray[ this.whichCurve[ index ] ],
 			this.whichCurve[ index ],
-			this.offsets[ index ]
+			this.offsets[ index ],
+			_matrix
 		);
 		this.object3D.setMatrixAt( index, _matrix );
 		this.object3D.instanceMatrix.needsUpdate = true;

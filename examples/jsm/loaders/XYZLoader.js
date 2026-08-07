@@ -1,6 +1,7 @@
 import {
 	BufferGeometry,
-	Color,
+	colorCreate,
+	colorSetRGB,
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
@@ -85,7 +86,7 @@ class XYZLoader extends Loader {
 
 		const vertices = [];
 		const colors = [];
-		const color = new Color();
+		const color = colorCreate();
 
 		for ( let line of lines ) {
 
@@ -117,7 +118,7 @@ class XYZLoader extends Loader {
 				const g = parseFloat( lineValues[ 4 ] ) / 255;
 				const b = parseFloat( lineValues[ 5 ] ) / 255;
 
-				color.setRGB( r, g, b, SRGBColorSpace );
+				colorSetRGB( r, g, b, SRGBColorSpace, color );
 
 				colors.push( color.r, color.g, color.b );
 

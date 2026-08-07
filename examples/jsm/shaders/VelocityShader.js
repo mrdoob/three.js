@@ -1,7 +1,7 @@
 import {
+	mat4Create,
 	UniformsLib,
-	UniformsUtils,
-	Matrix4
+	UniformsUtils
 } from 'three';
 
 /**
@@ -23,9 +23,9 @@ const VelocityShader = {
 		UniformsLib.common,
 		UniformsLib.displacementmap,
 		{
-			modelMatrixPrev: { value: new Matrix4() },
-			currentProjectionViewMatrix: { value: new Matrix4() },
-			previousProjectionViewMatrix: { value: new Matrix4() }
+			modelMatrixPrev: { value: mat4Create() },
+			currentProjectionViewMatrix: { value: mat4Create() },
+			previousProjectionViewMatrix: { value: mat4Create() }
 		}
 	] ),
 

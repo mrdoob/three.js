@@ -1,16 +1,36 @@
 import {
-	Color,
-	Matrix4,
 	Mesh,
 	PerspectiveCamera,
-	Plane,
-	Quaternion,
 	ShaderMaterial,
 	UniformsUtils,
-	Vector3,
-	Vector4,
 	WebGLRenderTarget,
-	HalfFloatType
+	HalfFloatType,
+	colorSet,
+	mat4Copy,
+	mat4Create,
+	mat4Decompose,
+	mat4ExtractRotation,
+	mat4Invert,
+	mat4Multiply,
+	mat4Set,
+	planeApplyMatrix4,
+	planeCopy,
+	planeCreate,
+	planeSetFromNormalAndCoplanarPoint,
+	quatCreate,
+	vec3ApplyMatrix4,
+	vec3ApplyQuaternion,
+	vec3Create,
+	vec3Dot,
+	vec3Negate,
+	vec3Normalize,
+	vec3Set,
+	vec3SetFromMatrixPosition,
+	vec3SubVectors,
+	vec4Create,
+	vec4Dot,
+	vec4MultiplyScalar,
+	vec4Set
 } from 'three';
 
 /**
@@ -67,7 +87,7 @@ class Refractor extends Mesh {
 
 		const scope = this;
 
-		const color = ( options.color !== undefined ) ? new Color( options.color ) : new Color( 0x7F7F7F );
+		const color = colorSet( options.color !== undefined ? options.color : 0x7F7F7F );
 		const textureWidth = options.textureWidth || 512;
 		const textureHeight = options.textureHeight || 512;
 		const clipBias = options.clipBias || 0;
@@ -82,8 +102,8 @@ class Refractor extends Mesh {
 
 		//
 
-		const refractorPlane = new Plane();
-		const textureMatrix = new Matrix4();
+		const refractorPlane = planeCreate();
+		const textureMatrix = mat4Create();
 
 		// render target
 
@@ -107,26 +127,26 @@ class Refractor extends Mesh {
 
 		const visible = ( function () {
 
-			const refractorWorldPosition = new Vector3();
-			const cameraWorldPosition = new Vector3();
-			const rotationMatrix = new Matrix4();
+			const refractorWorldPosition = vec3Create();
+			const cameraWorldPosition = vec3Create();
+			const rotationMatrix = mat4Create();
 
-			const view = new Vector3();
-			const normal = new Vector3();
+			const view = vec3Create();
+			const normal = vec3Create();
 
 			return function visible( camera ) {
 
-				refractorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
-				cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
+				vec3SetFromMatrixPosition( scope.matrixWorld, refractorWorldPosition );
+				vec3SetFromMatrixPosition( camera.matrixWorld, cameraWorldPosition );
 
-				view.subVectors( refractorWorldPosition, cameraWorldPosition );
+				vec3SubVectors( refractorWorldPosition, cameraWorldPosition, view );
 
-				rotationMatrix.extractRotation( scope.matrixWorld );
+				mat4ExtractRotation( scope.matrixWorld, rotationMatrix );
 
-				normal.set( 0, 0, 1 );
-				normal.applyMatrix4( rotationMatrix );
+				vec3Set( normal, 0, 0, 1 );
+				vec3ApplyMatrix4( normal, rotationMatrix, normal );
 
-				return view.dot( normal ) < 0;
+				return vec3Dot( view, normal ) < 0;
 
 			};
 
@@ -134,21 +154,23 @@ class Refractor extends Mesh {
 
 		const updateRefractorPlane = ( function () {
 
-			const normal = new Vector3();
-			const position = new Vector3();
-			const quaternion = new Quaternion();
-			const scale = new Vector3();
+			const normal = vec3Create();
+			const position = vec3Create();
+			const quaternion = quatCreate();
+			const scale = vec3Create();
 
 			return function updateRefractorPlane() {
 
-				scope.matrixWorld.decompose( position, quaternion, scale );
-				normal.set( 0, 0, 1 ).applyQuaternion( quaternion ).normalize();
+				mat4Decompose( scope.matrixWorld, position, quaternion, scale );
+				vec3Set( normal, 0, 0, 1 );
+				vec3ApplyQuaternion( normal, quaternion, normal );
+				vec3Normalize( normal, normal );
 
 				// flip the normal because we want to cull everything above the plane
 
-				normal.negate();
+				vec3Negate( normal, normal );
 
-				refractorPlane.setFromNormalAndCoplanarPoint( normal, position );
+				planeSetFromNormalAndCoplanarPoint( normal, position, refractorPlane );
 
 			};
 
@@ -156,25 +178,26 @@ class Refractor extends Mesh {
 
 		const updateVirtualCamera = ( function () {
 
-			const clipPlane = new Plane();
-			const clipVector = new Vector4();
-			const q = new Vector4();
+			const clipPlane = planeCreate();
+			const clipVector = vec4Create();
+			const q = vec4Create();
 
 			return function updateVirtualCamera( camera ) {
 
-				virtualCamera.matrixWorld.copy( camera.matrixWorld );
-				virtualCamera.matrixWorldInverse.copy( virtualCamera.matrixWorld ).invert();
-				virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
+				mat4Copy( camera.matrixWorld, virtualCamera.matrixWorld );
+				mat4Copy( virtualCamera.matrixWorld, virtualCamera.matrixWorldInverse );
+				mat4Invert( virtualCamera.matrixWorldInverse, virtualCamera.matrixWorldInverse );
+				mat4Copy( camera.projectionMatrix, virtualCamera.projectionMatrix );
 				virtualCamera.far = camera.far; // used in WebGLBackground
 
 				// The following code creates an oblique view frustum for clipping.
 				// see: Lengyel, Eric. “Oblique View Frustum Depth Projection and Clipping”.
 				// Journal of Game Development, Vol. 1, No. 2 (2005), Charles River Media, pp. 5–16
 
-				clipPlane.copy( refractorPlane );
-				clipPlane.applyMatrix4( virtualCamera.matrixWorldInverse );
+				planeCopy( refractorPlane, clipPlane );
+				planeApplyMatrix4( clipPlane, virtualCamera.matrixWorldInverse, undefined, clipPlane );
 
-				clipVector.set( clipPlane.normal.x, clipPlane.normal.y, clipPlane.normal.z, clipPlane.constant );
+				vec4Set( clipPlane.normal.x, clipPlane.normal.y, clipPlane.normal.z, clipPlane.constant, clipVector );
 
 				// calculate the clip-space corner point opposite the clipping plane and
 				// transform it into camera space by multiplying it by the inverse of the projection matrix
@@ -188,7 +211,7 @@ class Refractor extends Mesh {
 
 				// calculate the scaled plane vector
 
-				clipVector.multiplyScalar( 2.0 / clipVector.dot( q ) );
+				vec4MultiplyScalar( clipVector, 2.0 / vec4Dot( clipVector, q ), clipVector );
 
 				// replacing the third row of the projection matrix
 
@@ -208,7 +231,8 @@ class Refractor extends Mesh {
 
 			// this matrix does range mapping to [ 0, 1 ]
 
-			textureMatrix.set(
+			mat4Set(
+				textureMatrix,
 				0.5, 0.0, 0.0, 0.5,
 				0.0, 0.5, 0.0, 0.5,
 				0.0, 0.0, 0.5, 0.5,
@@ -219,9 +243,9 @@ class Refractor extends Mesh {
 			// (matrix above) with the projection and view matrix of the virtual camera
 			// and the model matrix of the refractor
 
-			textureMatrix.multiply( camera.projectionMatrix );
-			textureMatrix.multiply( camera.matrixWorldInverse );
-			textureMatrix.multiply( scope.matrixWorld );
+			mat4Multiply( textureMatrix, camera.projectionMatrix, textureMatrix );
+			mat4Multiply( textureMatrix, camera.matrixWorldInverse, textureMatrix );
+			mat4Multiply( textureMatrix, scope.matrixWorld, textureMatrix );
 
 		}
 

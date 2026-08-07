@@ -12,14 +12,16 @@ import {
 } from '../constants.js';
 import { generateUUID } from '../math/MathUtils.js';
 import { Vector2 } from '../math/Vector2.js';
-import { Vector3 } from '../math/Vector3.js';
 import { Matrix3 } from '../math/Matrix3.js';
+import { mat3Copy, mat3SetUvTransform } from '../math/Matrix3Functions.js';
+import { vec2ApplyMatrix3, vec2Copy } from '../math/Vector2Functions.js';
+import { vec3Copy, vec3Create } from '../math/Vector3Functions.js';
 import { Source } from './Source.js';
 import { warn } from '../utils.js';
 
 let _textureId = 0;
 
-const _tempVec3 = /*@__PURE__*/ new Vector3();
+const _tempVec3 = /*@__PURE__*/ vec3Create();
 
 /**
  * Base class for all textures.
@@ -429,7 +431,7 @@ class Texture extends EventDispatcher {
 	 */
 	updateMatrix() {
 
-		this.matrix.setUvTransform( this.offset.x, this.offset.y, this.repeat.x, this.repeat.y, this.rotation, this.center.x, this.center.y );
+		mat3SetUvTransform( this.offset.x, this.offset.y, this.repeat.x, this.repeat.y, this.rotation, this.center.x, this.center.y, this.matrix );
 
 	}
 
@@ -494,13 +496,13 @@ class Texture extends EventDispatcher {
 		this.type = source.type;
 		this.normalized = source.normalized;
 
-		this.offset.copy( source.offset );
-		this.repeat.copy( source.repeat );
-		this.center.copy( source.center );
+		vec2Copy( source.offset, this.offset );
+		vec2Copy( source.repeat, this.repeat );
+		vec2Copy( source.center, this.center );
 		this.rotation = source.rotation;
 
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
-		this.matrix.copy( source.matrix );
+		mat3Copy( source.matrix, this.matrix );
 
 		this.generateMipmaps = source.generateMipmaps;
 		this.premultiplyAlpha = source.premultiplyAlpha;
@@ -548,15 +550,15 @@ class Texture extends EventDispatcher {
 
 			if ( ( currentValue && newValue ) && ( currentValue.isVector2 && newValue.isVector2 ) ) {
 
-				currentValue.copy( newValue );
+				vec2Copy( newValue, currentValue );
 
 			} else if ( ( currentValue && newValue ) && ( currentValue.isVector3 && newValue.isVector3 ) ) {
 
-				currentValue.copy( newValue );
+				vec3Copy( newValue, currentValue );
 
 			} else if ( ( currentValue && newValue ) && ( currentValue.isMatrix3 && newValue.isMatrix3 ) ) {
 
-				currentValue.copy( newValue );
+				mat3Copy( newValue, currentValue );
 
 			} else {
 
@@ -666,7 +668,7 @@ class Texture extends EventDispatcher {
 
 		if ( this.mapping !== UVMapping ) return uv;
 
-		uv.applyMatrix3( this.matrix );
+		vec2ApplyMatrix3( uv, this.matrix, uv );
 
 		if ( uv.x < 0 || uv.x > 1 ) {
 

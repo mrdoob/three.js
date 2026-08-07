@@ -521,7 +521,7 @@ class WebGPUTextureUtils {
 
 		const backend = this.backend;
 		const canvasTarget = backend.renderer.getCanvasTarget();
-		const { width, height } = backend.getDrawingBufferSize();
+		const { x: width, y: height } = backend.getDrawingBufferSize();
 		const samples = backend.renderer.currentSamples;
 
 		const colorTexture = canvasTarget.colorTexture;
@@ -574,7 +574,7 @@ class WebGPUTextureUtils {
 
 		const backend = this.backend;
 		const canvasTarget = backend.renderer.getCanvasTarget();
-		const { width, height } = backend.getDrawingBufferSize();
+		const { x: width, y: height } = backend.getDrawingBufferSize();
 		const samples = backend.renderer.currentSamples;
 
 		const depthTexture = canvasTarget.depthTexture;

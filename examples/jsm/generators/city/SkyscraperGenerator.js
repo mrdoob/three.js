@@ -6,17 +6,34 @@ import {
 	InterpolationSamplingMode,
 	InterpolationSamplingType,
 	LatheGeometry,
-	Matrix3,
-	Matrix4,
 	Mesh,
 	MeshStandardMaterial,
 	Path,
 	PlaneGeometry,
 	ShapeGeometry,
 	Shape,
-	Sphere,
-	Vector2,
-	Vector3
+	mat3Create,
+	mat3GetNormalMatrix,
+	mat4Create,
+	mat4MakeBasis,
+	mat4MakeTranslation,
+	mat4Scale,
+	mat4SetPosition,
+	sphereSet,
+	vec2Copy,
+	vec2Create,
+	vec2DistanceTo,
+	vec2Lerp,
+	vec3AddScaledVector,
+	vec3Copy,
+	vec3Create,
+	vec3CrossVectors,
+	vec3DistanceTo,
+	vec3Dot,
+	vec3Negate,
+	vec3Normalize,
+	vec3Set,
+	vec3Sub
 } from 'three';
 
 import { MeshStandardNodeMaterial } from 'three/webgpu';
@@ -24,10 +41,10 @@ import { attribute, cameraPosition, color, cross, dot, float, floor, Fn, fract, 
 
 import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
 
-const _scale = /*@__PURE__*/ new Vector3();
-const _point = /*@__PURE__*/ new Vector3();
-const _normalMatrix = /*@__PURE__*/ new Matrix3();
-const _identity = /*@__PURE__*/ new Matrix4();
+const _scale = /*@__PURE__*/ vec3Create();
+const _point = /*@__PURE__*/ vec3Create();
+const _normalMatrix = /*@__PURE__*/ mat3Create();
+const _identity = /*@__PURE__*/ mat4Create();
 
 // material-zone codes baked per vertex into the merged geometry, so one material can
 // branch on partId and shade every zone
@@ -67,7 +84,7 @@ const _unitBox = /*@__PURE__*/ nonIndexed( new BoxGeometry( 1, 1, 1 ) );
 
 /**
  * Bakes a list of instance groups into one non-indexed BufferGeometry. Each group is a
- * base geometry ( position + normal + uv ), an array of Matrix4 placements and a `partId`
+ * base geometry ( position + normal + uv ), an array of Matrix4Like placements and a `partId`
  * written to a per-vertex attribute. Transforming straight into preallocated typed arrays
  * avoids mergeGeometries' per-instance allocations; the result is one geometry, ready for
  * a single draw call and the compute rasterizer.
@@ -123,7 +140,7 @@ function bakeGroups( groups ) {
 
 			} else {
 
-				const ne = _normalMatrix.getNormalMatrix( matrix ).elements;
+				const ne = mat3GetNormalMatrix( matrix, _normalMatrix ).elements;
 				n0 = ne[ 0 ]; n1 = ne[ 1 ]; n2 = ne[ 2 ]; n3 = ne[ 3 ]; n4 = ne[ 4 ]; n5 = ne[ 5 ]; n6 = ne[ 6 ]; n7 = ne[ 7 ]; n8 = ne[ 8 ];
 
 			}
@@ -171,8 +188,8 @@ function bakeGroups( groups ) {
 	geometry.setAttribute( 'roomCenter', new BufferAttribute( roomCenter, 3 ) );
 	geometry.setAttribute( 'roomSize', new BufferAttribute( roomSize, 2 ) );
 
-	geometry.boundingSphere = new Sphere(
-		new Vector3( ( minX + maxX ) / 2, ( minY + maxY ) / 2, ( minZ + maxZ ) / 2 ),
+	geometry.boundingSphere = sphereSet(
+		{ x: ( minX + maxX ) / 2, y: ( minY + maxY ) / 2, z: ( minZ + maxZ ) / 2 },
 		Math.hypot( maxX - minX, maxY - minY, maxZ - minZ ) / 2
 	);
 
@@ -461,9 +478,9 @@ SkyscraperGenerator.defaults = {
 
 /**
  * A rectangle (centred at the origin in the XZ plane) with one corner cut at
- * 45 degrees, returned as an ordered list of `Vector2( x, z )`. `cornerX` /
- * `cornerZ` ( each ±1 ) pick which corner is cut, so the chamfer can be aimed
- * outward to a block corner.
+ * 45 degrees, returned as an ordered list of `{ x, y }` points ( x, z in world ).
+ * `cornerX` / `cornerZ` ( each ±1 ) pick which corner is cut, so the chamfer can
+ * be aimed outward to a block corner.
  */
 function buildFootprint( width, depth, chamfer, cornerX = 1, cornerZ = 1 ) {
 
@@ -473,10 +490,10 @@ function buildFootprint( width, depth, chamfer, cornerX = 1, cornerZ = 1 ) {
 
 	// the four corners, counter-clockwise
 	const corners = [
-		new Vector2( hw, hd ),
-		new Vector2( - hw, hd ),
-		new Vector2( - hw, - hd ),
-		new Vector2( hw, - hd )
+		vec2Create( hw, hd ),
+		vec2Create( - hw, hd ),
+		vec2Create( - hw, - hd ),
+		vec2Create( hw, - hd )
 	];
 
 	const points = [];
@@ -491,12 +508,12 @@ function buildFootprint( width, depth, chamfer, cornerX = 1, cornerZ = 1 ) {
 
 			const prev = corners[ ( i + 3 ) % 4 ];
 			const next = corners[ ( i + 1 ) % 4 ];
-			points.push( corner.clone().lerp( prev, c / corner.distanceTo( prev ) ) );
-			points.push( corner.clone().lerp( next, c / corner.distanceTo( next ) ) );
+			points.push( vec2Lerp( corner, prev, c / vec2DistanceTo( corner, prev ) ) );
+			points.push( vec2Lerp( corner, next, c / vec2DistanceTo( corner, next ) ) );
 
 		} else {
 
-			points.push( corner.clone() );
+			points.push( vec2Copy( corner ) );
 
 		}
 
@@ -516,7 +533,7 @@ function buildFootprint( width, depth, chamfer, cornerX = 1, cornerZ = 1 ) {
 function buildFaces( points ) {
 
 	const faces = [];
-	const up = new Vector3( 0, 1, 0 );
+	const up = vec3Set( vec3Create(), 0, 1, 0 );
 
 	for ( let i = 0; i < points.length; i ++ ) {
 
@@ -526,23 +543,23 @@ function buildFaces( points ) {
 		// outward normal: perpendicular to the edge, pointing away from the
 		// origin (the footprint is centred there)
 
-		const n = new Vector3( b.y - a.y, 0, - ( b.x - a.x ) ).normalize();
-		const mid = new Vector3( ( a.x + b.x ) / 2, 0, ( a.y + b.y ) / 2 );
-		if ( n.dot( mid ) < 0 ) n.negate();
+		const n = vec3Normalize( vec3Set( vec3Create(), b.y - a.y, 0, - ( b.x - a.x ) ) );
+		const mid = vec3Set( vec3Create(), ( a.x + b.x ) / 2, 0, ( a.y + b.y ) / 2 );
+		if ( vec3Dot( n, mid ) < 0 ) vec3Negate( n, n );
 
 		// right-handed basis: u = v × n, so makeBasis( u, v, n ) is a pure rotation
 
-		const u = new Vector3().crossVectors( up, n ).normalize();
+		const u = vec3Normalize( vec3CrossVectors( up, n ) );
 
-		const pa = new Vector3( a.x, 0, a.y );
-		const pb = new Vector3( b.x, 0, b.y );
-		const length = pa.distanceTo( pb );
+		const pa = vec3Set( vec3Create(), a.x, 0, a.y );
+		const pb = vec3Set( vec3Create(), b.x, 0, b.y );
+		const length = vec3DistanceTo( pa, pb );
 
 		// the edge end that u points away from becomes the origin
 
-		const origin = pb.clone().sub( pa ).dot( u ) > 0 ? pa : pb;
+		const origin = vec3Dot( vec3Sub( pb, pa ), u ) > 0 ? pa : pb;
 
-		faces.push( new FaceFrame( origin, u, up.clone(), n, length ) );
+		faces.push( new FaceFrame( origin, u, vec3Copy( up ), n, length ) );
 
 	}
 
@@ -563,22 +580,23 @@ class FaceFrame {
 
 	}
 
-	point( u, v, w, target = new Vector3() ) {
+	point( u, v, w, target = vec3Create() ) {
 
-		return target
-			.copy( this.origin )
-			.addScaledVector( this.u, u )
-			.addScaledVector( this.v, v )
-			.addScaledVector( this.n, w );
+		vec3Copy( this.origin, target );
+		vec3AddScaledVector( target, this.u, u, target );
+		vec3AddScaledVector( target, this.v, v, target );
+		vec3AddScaledVector( target, this.n, w, target );
+
+		return target;
 
 	}
 
 	/** Places a piece authored in the canonical local frame ( x across, y up, z outward ). */
 	matrix( u, v, w ) {
 
-		return new Matrix4()
-			.makeBasis( this.u, this.v, this.n )
-			.setPosition( this.point( u, v, w, _point ) );
+		const p = this.point( u, v, w, _point );
+
+		return mat4SetPosition( mat4MakeBasis( this.u, this.v, this.n ), p.x, p.y, p.z );
 
 	}
 
@@ -596,15 +614,16 @@ class FaceFrame {
 
 // --- shell pieces --------------------------------------------------------
 
-// a Matrix4 mapping the shared unit box ( 1×1×1, centred ) onto a face-aligned
+// a Matrix4Like mapping the shared unit box ( 1×1×1, centred ) onto a face-aligned
 // box of the given size, centred at the given face-local point. these matrices
 // are what the shell InstancedMesh is built from.
 function boxMatrix( frame, u, v, w, sizeU, sizeV, sizeN ) {
 
-	return new Matrix4()
-		.makeBasis( frame.u, frame.v, frame.n )
-		.scale( _scale.set( sizeU, sizeV, sizeN ) )
-		.setPosition( frame.point( u, v, w, _point ) );
+	const m = mat4MakeBasis( frame.u, frame.v, frame.n );
+	mat4Scale( m, vec3Set( _scale, sizeU, sizeV, sizeN ), m );
+	const p = frame.point( u, v, w, _point );
+
+	return mat4SetPosition( m, p.x, p.y, p.z, m );
 
 }
 
@@ -820,7 +839,7 @@ function addWindows( frame, windows, glass, glassRooms, acUnits, vBottom, height
 			const bStart = Math.max( 0, room * roomBays - roomPhase );
 			const bEnd = Math.min( count, ( room + 1 ) * roomBays - roomPhase );
 			const span = bEnd - bStart;
-			glassRooms.push( { center: frame.point( margin + ( bStart + span / 2 ) * width, cy, - p.windowReveal ), size: new Vector2( span * width, fh - 1 ) } ); // centred on the glass plane, so the interior is anchored to the pane it is drawn on
+			glassRooms.push( { center: frame.point( margin + ( bStart + span / 2 ) * width, cy, - p.windowReveal ), size: vec2Create( span * width, fh - 1 ) } ); // centred on the glass plane, so the interior is anchored to the pane it is drawn on
 
 			if ( acUnits && acFits ) {
 
@@ -849,7 +868,8 @@ function addFinials( frame, finials, vBottom, height, p ) {
 
 	for ( let i = 0; i < count; i ++ ) {
 
-		finials.push( new Matrix4().setPosition( frame.point( margin + i * width, top, p.pierDepth * 0.5, _point ) ) );
+		const pnt = frame.point( margin + i * width, top, p.pierDepth * 0.5, _point );
+		finials.push( mat4MakeTranslation( pnt.x, pnt.y, pnt.z ) );
 
 	}
 
@@ -947,11 +967,11 @@ function buildFinialGeometry( p ) {
 
 	const s = p.pierWidth;
 	const profile = [
-		new Vector2( 0.0, 0 ),
-		new Vector2( s * 0.9, 0 ),
-		new Vector2( s * 0.9, s * 0.4 ),
-		new Vector2( s * 0.55, s * 1.0 ),
-		new Vector2( 0.0, s * 3.2 )
+		vec2Create( 0.0, 0 ),
+		vec2Create( s * 0.9, 0 ),
+		vec2Create( s * 0.9, s * 0.4 ),
+		vec2Create( s * 0.55, s * 1.0 ),
+		vec2Create( 0.0, s * 3.2 )
 	];
 
 	return new LatheGeometry( profile, 8 ); // round enough to read as a smooth pinnacle, still light

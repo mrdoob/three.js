@@ -1,7 +1,16 @@
 import {
-	Matrix3,
-	Matrix4,
-	Vector3
+	mat3Create,
+	mat3Identity,
+	mat4Identity,
+	mat4MakeRotationX,
+	mat4MakeRotationY,
+	mat4Multiply,
+	mat4SetPosition,
+	vec3ApplyMatrix4,
+	vec3Create,
+	vec3Dot,
+	vec3Normalize,
+	vec3Set
 } from 'three';
 import { VolumeSlice } from '../misc/VolumeSlice.js';
 
@@ -165,15 +174,14 @@ class Volume {
 		 *
 		 * @type {Martrix3}
 		 */
-		this.matrix = new Matrix3();
-		this.matrix.identity();
+		this.matrix = mat3Identity( mat3Create() );
 
 		/**
 		 * The RAS to IJK matrix.
 		 *
 		 * @type {Martrix3}
 		 */
-		this.inverseMatrix = new Matrix3();
+		this.inverseMatrix = mat3Create();
 
 		let lowerThreshold = - Infinity;
 		Object.defineProperty( this, 'lowerThreshold', {
@@ -302,7 +310,7 @@ class Volume {
 	/**
 	 * Apply a function to all the voxels, be careful, the value will be replaced.
 	 *
-	 * @param {Function} functionToMap A function to apply to every voxel, will be called with the following parameters:
+	 * @param {Function} functionToMap A function to apply to every voxel, will be called with the following parameters :
 	 * value of the voxel, index of the voxel, the data (TypedArray).
 	 * @param {Object} context - You can specify a context in which call the function, default if this Volume.
 	 * @returns {Volume} A reference to this instance.
@@ -337,86 +345,86 @@ class Volume {
 			positionOffset,
 			IJKIndex;
 
-		const axisInIJK = new Vector3(),
-			firstDirection = new Vector3(),
-			secondDirection = new Vector3(),
-			planeMatrix = ( new Matrix4() ).identity(),
+		const axisInIJK = vec3Create(),
+			firstDirection = vec3Create(),
+			secondDirection = vec3Create(),
+			planeMatrix = mat4Identity(),
 			volume = this;
 
-		const dimensions = new Vector3( this.xLength, this.yLength, this.zLength );
+		const dimensions = vec3Set( vec3Create(), this.xLength, this.yLength, this.zLength );
 
 
 		switch ( axis ) {
 
 			case 'x' :
-				axisInIJK.set( 1, 0, 0 );
-				firstDirection.set( 0, 0, - 1 );
-				secondDirection.set( 0, - 1, 0 );
+				vec3Set( axisInIJK, 1, 0, 0 );
+				vec3Set( firstDirection, 0, 0, - 1 );
+				vec3Set( secondDirection, 0, - 1, 0 );
 				firstSpacing = this.spacing[ this.axisOrder.indexOf( 'z' ) ];
 				secondSpacing = this.spacing[ this.axisOrder.indexOf( 'y' ) ];
-				IJKIndex = new Vector3( RASIndex, 0, 0 );
+				IJKIndex = vec3Set( vec3Create(), RASIndex, 0, 0 );
 
-				planeMatrix.multiply( ( new Matrix4() ).makeRotationY( Math.PI / 2 ) );
+				mat4Multiply( planeMatrix, mat4MakeRotationY( Math.PI / 2 ), planeMatrix );
 				positionOffset = ( volume.RASDimensions[ 0 ] - 1 ) / 2;
-				planeMatrix.setPosition( new Vector3( RASIndex - positionOffset, 0, 0 ) );
+				mat4SetPosition( planeMatrix, RASIndex - positionOffset, 0, 0, planeMatrix );
 				break;
 			case 'y' :
-				axisInIJK.set( 0, 1, 0 );
-				firstDirection.set( 1, 0, 0 );
-				secondDirection.set( 0, 0, 1 );
+				vec3Set( axisInIJK, 0, 1, 0 );
+				vec3Set( firstDirection, 1, 0, 0 );
+				vec3Set( secondDirection, 0, 0, 1 );
 				firstSpacing = this.spacing[ this.axisOrder.indexOf( 'x' ) ];
 				secondSpacing = this.spacing[ this.axisOrder.indexOf( 'z' ) ];
-				IJKIndex = new Vector3( 0, RASIndex, 0 );
+				IJKIndex = vec3Set( vec3Create(), 0, RASIndex, 0 );
 
-				planeMatrix.multiply( ( new Matrix4() ).makeRotationX( - Math.PI / 2 ) );
+				mat4Multiply( planeMatrix, mat4MakeRotationX( - Math.PI / 2 ), planeMatrix );
 				positionOffset = ( volume.RASDimensions[ 1 ] - 1 ) / 2;
-				planeMatrix.setPosition( new Vector3( 0, RASIndex - positionOffset, 0 ) );
+				mat4SetPosition( planeMatrix, 0, RASIndex - positionOffset, 0, planeMatrix );
 				break;
 			case 'z' :
 			default :
-				axisInIJK.set( 0, 0, 1 );
-				firstDirection.set( 1, 0, 0 );
-				secondDirection.set( 0, - 1, 0 );
+				vec3Set( axisInIJK, 0, 0, 1 );
+				vec3Set( firstDirection, 1, 0, 0 );
+				vec3Set( secondDirection, 0, - 1, 0 );
 				firstSpacing = this.spacing[ this.axisOrder.indexOf( 'x' ) ];
 				secondSpacing = this.spacing[ this.axisOrder.indexOf( 'y' ) ];
-				IJKIndex = new Vector3( 0, 0, RASIndex );
+				IJKIndex = vec3Set( vec3Create(), 0, 0, RASIndex );
 
 				positionOffset = ( volume.RASDimensions[ 2 ] - 1 ) / 2;
-				planeMatrix.setPosition( new Vector3( 0, 0, RASIndex - positionOffset ) );
+				mat4SetPosition( planeMatrix, 0, 0, RASIndex - positionOffset, planeMatrix );
 				break;
 
 		}
 
 		if ( ! this.segmentation ) {
 
-			firstDirection.applyMatrix4( volume.inverseMatrix ).normalize();
-			secondDirection.applyMatrix4( volume.inverseMatrix ).normalize();
-			axisInIJK.applyMatrix4( volume.inverseMatrix ).normalize();
+			vec3Normalize( vec3ApplyMatrix4( firstDirection, volume.inverseMatrix, firstDirection ), firstDirection );
+			vec3Normalize( vec3ApplyMatrix4( secondDirection, volume.inverseMatrix, secondDirection ), secondDirection );
+			vec3Normalize( vec3ApplyMatrix4( axisInIJK, volume.inverseMatrix, axisInIJK ), axisInIJK );
 
 		}
 
 		firstDirection.arglet = 'i';
 		secondDirection.arglet = 'j';
-		const iLength = Math.floor( Math.abs( firstDirection.dot( dimensions ) ) );
-		const jLength = Math.floor( Math.abs( secondDirection.dot( dimensions ) ) );
+		const iLength = Math.floor( Math.abs( vec3Dot( firstDirection, dimensions ) ) );
+		const jLength = Math.floor( Math.abs( vec3Dot( secondDirection, dimensions ) ) );
 		const planeWidth = Math.abs( iLength * firstSpacing );
 		const planeHeight = Math.abs( jLength * secondSpacing );
 
-		IJKIndex = Math.abs( Math.round( IJKIndex.applyMatrix4( volume.inverseMatrix ).dot( axisInIJK ) ) );
-		const base = [ new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ) ];
+		IJKIndex = Math.abs( Math.round( vec3Dot( vec3ApplyMatrix4( IJKIndex, volume.inverseMatrix, IJKIndex ), axisInIJK ) ) );
+		const base = [ vec3Set( vec3Create(), 1, 0, 0 ), vec3Set( vec3Create(), 0, 1, 0 ), vec3Set( vec3Create(), 0, 0, 1 ) ];
 		const iDirection = [ firstDirection, secondDirection, axisInIJK ].find( function ( x ) {
 
-			return Math.abs( x.dot( base[ 0 ] ) ) > 0.9;
+			return Math.abs( vec3Dot( x, base[ 0 ] ) ) > 0.9;
 
 		} );
 		const jDirection = [ firstDirection, secondDirection, axisInIJK ].find( function ( x ) {
 
-			return Math.abs( x.dot( base[ 1 ] ) ) > 0.9;
+			return Math.abs( vec3Dot( x, base[ 1 ] ) ) > 0.9;
 
 		} );
 		const kDirection = [ firstDirection, secondDirection, axisInIJK ].find( function ( x ) {
 
-			return Math.abs( x.dot( base[ 2 ] ) ) > 0.9;
+			return Math.abs( vec3Dot( x, base[ 2 ] ) ) > 0.9;
 
 		} );
 
@@ -428,9 +436,9 @@ class Volume {
 
 			// invert indices if necessary
 
-			const accessI = ( iDirection.dot( base[ 0 ] ) > 0 ) ? si : ( volume.xLength - 1 ) - si;
-			const accessJ = ( jDirection.dot( base[ 1 ] ) > 0 ) ? sj : ( volume.yLength - 1 ) - sj;
-			const accessK = ( kDirection.dot( base[ 2 ] ) > 0 ) ? sk : ( volume.zLength - 1 ) - sk;
+			const accessI = ( vec3Dot( iDirection, base[ 0 ] ) > 0 ) ? si : ( volume.xLength - 1 ) - si;
+			const accessJ = ( vec3Dot( jDirection, base[ 1 ] ) > 0 ) ? sj : ( volume.yLength - 1 ) - sj;
+			const accessK = ( vec3Dot( kDirection, base[ 2 ] ) > 0 ) ? sk : ( volume.zLength - 1 ) - sk;
 
 			return volume.access( accessI, accessJ, accessK );
 

@@ -1,7 +1,7 @@
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
-import { Vector2 } from '../math/Vector2.js';
-import { Vector3 } from '../math/Vector3.js';
+import { vec2Create } from '../math/Vector2Functions.js';
+import { vec3Create } from '../math/Vector3Functions.js';
 
 /**
  * A class for generating a two-dimensional ring geometry.
@@ -64,8 +64,8 @@ class RingGeometry extends BufferGeometry {
 
 		let radius = innerRadius;
 		const radiusStep = ( ( outerRadius - innerRadius ) / phiSegments );
-		const vertex = new Vector3();
-		const uv = new Vector2();
+		const vertex = vec3Create();
+		const uv = vec2Create();
 
 		// generate vertices, normals and uvs
 

@@ -1,4 +1,14 @@
-import { Vector2 } from '../../math/Vector2.js';
+import {
+	vec2Add,
+	vec2Copy,
+	vec2Create,
+	vec2FromArray,
+	vec2MultiplyScalar,
+	vec2Normalize,
+	vec2Sub,
+	vec2SubVectors,
+	vec2ToArray
+} from '../../math/Vector2Functions.js';
 import { Curve } from '../core/Curve.js';
 
 /**
@@ -14,7 +24,7 @@ class LineCurve extends Curve {
 	 * @param {Vector2} [v1] - The start point.
 	 * @param {Vector2} [v2] - The end point.
 	 */
-	constructor( v1 = new Vector2(), v2 = new Vector2() ) {
+	constructor( v1 = vec2Create(), v2 = vec2Create() ) {
 
 		super();
 
@@ -52,18 +62,19 @@ class LineCurve extends Curve {
 	 * @param {Vector2} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector2} The position on the line.
 	 */
-	getPoint( t, optionalTarget = new Vector2() ) {
+	getPoint( t, optionalTarget = vec2Create() ) {
 
 		const point = optionalTarget;
 
 		if ( t === 1 ) {
 
-			point.copy( this.v2 );
+			vec2Copy( this.v2, point );
 
 		} else {
 
-			point.copy( this.v2 ).sub( this.v1 );
-			point.multiplyScalar( t ).add( this.v1 );
+			vec2Sub( this.v2, this.v1, point );
+			vec2MultiplyScalar( point, t, point );
+			vec2Add( point, this.v1, point );
 
 		}
 
@@ -78,9 +89,10 @@ class LineCurve extends Curve {
 
 	}
 
-	getTangent( t, optionalTarget = new Vector2() ) {
+	getTangent( t, optionalTarget = vec2Create() ) {
 
-		return optionalTarget.subVectors( this.v2, this.v1 ).normalize();
+		vec2SubVectors( this.v2, this.v1, optionalTarget );
+		return vec2Normalize( optionalTarget, optionalTarget );
 
 	}
 
@@ -94,8 +106,8 @@ class LineCurve extends Curve {
 
 		super.copy( source );
 
-		this.v1.copy( source.v1 );
-		this.v2.copy( source.v2 );
+		vec2Copy( source.v1, this.v1 );
+		vec2Copy( source.v2, this.v2 );
 
 		return this;
 
@@ -105,8 +117,8 @@ class LineCurve extends Curve {
 
 		const data = super.toJSON();
 
-		data.v1 = this.v1.toArray();
-		data.v2 = this.v2.toArray();
+		data.v1 = vec2ToArray( this.v1 );
+		data.v2 = vec2ToArray( this.v2 );
 
 		return data;
 
@@ -116,8 +128,8 @@ class LineCurve extends Curve {
 
 		super.fromJSON( json );
 
-		this.v1.fromArray( json.v1 );
-		this.v2.fromArray( json.v2 );
+		vec2FromArray( json.v1, 0, this.v1 );
+		vec2FromArray( json.v2, 0, this.v2 );
 
 		return this;
 

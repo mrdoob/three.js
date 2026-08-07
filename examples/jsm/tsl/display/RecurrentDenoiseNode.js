@@ -1,10 +1,10 @@
 import { abs, atan, bool, convertToTexture, cos, cross, Discard, dot, EPSILON, exp, float, Fn, getScreenPosition, getViewPosition, If, int, log, Loop, luminance, mat2, max, mix, nodeObject, NodeUpdateType, normalize, passTexture, PI, property, reflect, sin, smoothstep, sqrt, tan, texture, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4, context } from 'three/tsl';
-import { HalfFloatType, MathUtils, Matrix4, NodeMaterial, QuadMesh, RendererUtils, RenderTarget, TempNode, Vector2 } from 'three/webgpu';
+import { HalfFloatType, MathUtils, NodeMaterial, QuadMesh, RendererUtils, RenderTarget, TempNode, mat4Copy, vec2Create, vec2Set } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _size = /*@__PURE__*/ new Vector2();
+const _size = /*@__PURE__*/ vec2Create();
 
 let _rendererState;
 
@@ -421,11 +421,11 @@ class RecurrentDenoiseNode extends TempNode {
 
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
-		this._resolution = uniform( new Vector2() );
+		this._resolution = uniform( vec2Create(), 'vec2' );
 		this._fovY = uniform( MathUtils.degToRad( camera.fov ) );
-		this._cameraProjectionMatrixInverse = uniform( new Matrix4().copy( camera.projectionMatrixInverse ) );
-		this._cameraProjectionMatrix = uniform( new Matrix4().copy( camera.projectionMatrix ) );
-		this._viewMatrix = uniform( new Matrix4().copy( camera.matrixWorldInverse ) );
+		this._cameraProjectionMatrixInverse = uniform( mat4Copy( camera.projectionMatrixInverse ), 'mat4' );
+		this._cameraProjectionMatrix = uniform( mat4Copy( camera.projectionMatrix ), 'mat4' );
+		this._viewMatrix = uniform( mat4Copy( camera.matrixWorldInverse ), 'mat4' );
 
 		this._renderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 		this._renderTarget.texture.name = 'RecurrentDenoiseNode.output';
@@ -442,7 +442,7 @@ class RecurrentDenoiseNode extends TempNode {
 		if ( width === null || height === null ) return;
 
 		this._renderTarget.setSize( width, height );
-		this._resolution.value.set( width, height );
+		vec2Set( width, height, this._resolution.value );
 
 	}
 
@@ -468,15 +468,15 @@ class RecurrentDenoiseNode extends TempNode {
 		const { renderer } = frame;
 
 		const drawingBufferSize = renderer.getDrawingBufferSize( _size );
-		const width = drawingBufferSize.width;
-		const height = drawingBufferSize.height;
+		const width = drawingBufferSize.x;
+		const height = drawingBufferSize.y;
 
 		const needsRestart = this._renderTarget.width !== width || this._renderTarget.height !== height;
 		this.setSize( width, height );
 
-		this._cameraProjectionMatrix.value.copy( this.camera.projectionMatrix );
-		this._cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
-		this._viewMatrix.value.copy( this.camera.matrixWorldInverse );
+		mat4Copy( this.camera.projectionMatrix, this._cameraProjectionMatrix.value );
+		mat4Copy( this.camera.projectionMatrixInverse, this._cameraProjectionMatrixInverse.value );
+		mat4Copy( this.camera.matrixWorldInverse, this._viewMatrix.value );
 
 		if ( this.camera.isPerspectiveCamera ) {
 

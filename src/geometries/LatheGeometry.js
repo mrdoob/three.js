@@ -1,7 +1,7 @@
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
-import { Vector3 } from '../math/Vector3.js';
-import { Vector2 } from '../math/Vector2.js';
+import { vec3Copy, vec3Create, vec3Normalize } from '../math/Vector3Functions.js';
+import { vec2Create } from '../math/Vector2Functions.js';
 import { clamp } from '../math/MathUtils.js';
 
 /**
@@ -33,7 +33,7 @@ class LatheGeometry extends BufferGeometry {
 	 * @param {number} [phiLength=Math.PI*2] - The radian (0 to 2PI) range of the lathed section 2PI is a
 	 * closed lathe, less than 2PI is a portion.
 	 */
-	constructor( points = [ new Vector2( 0, - 0.5 ), new Vector2( 0.5, 0 ), new Vector2( 0, 0.5 ) ], segments = 12, phiStart = 0, phiLength = Math.PI * 2 ) {
+	constructor( points = [ vec2Create( 0, - 0.5 ), vec2Create( 0.5, 0 ), vec2Create( 0, 0.5 ) ], segments = 12, phiStart = 0, phiLength = Math.PI * 2 ) {
 
 		super();
 
@@ -70,11 +70,11 @@ class LatheGeometry extends BufferGeometry {
 		// helper variables
 
 		const inverseSegments = 1.0 / segments;
-		const vertex = new Vector3();
-		const uv = new Vector2();
-		const normal = new Vector3();
-		const curNormal = new Vector3();
-		const prevNormal = new Vector3();
+		const vertex = vec3Create();
+		const uv = vec2Create();
+		const normal = vec3Create();
+		const curNormal = vec3Create();
+		const prevNormal = vec3Create();
 		let dx = 0;
 		let dy = 0;
 
@@ -93,9 +93,9 @@ class LatheGeometry extends BufferGeometry {
 					normal.y = - dx;
 					normal.z = dy * 0.0;
 
-					prevNormal.copy( normal );
+					vec3Copy( normal, prevNormal );
 
-					normal.normalize();
+					vec3Normalize( normal, normal );
 
 					initNormals.push( normal.x, normal.y, normal.z );
 
@@ -116,17 +116,17 @@ class LatheGeometry extends BufferGeometry {
 					normal.y = - dx;
 					normal.z = dy * 0.0;
 
-					curNormal.copy( normal );
+					vec3Copy( normal, curNormal );
 
 					normal.x += prevNormal.x;
 					normal.y += prevNormal.y;
 					normal.z += prevNormal.z;
 
-					normal.normalize();
+					vec3Normalize( normal, normal );
 
 					initNormals.push( normal.x, normal.y, normal.z );
 
-					prevNormal.copy( curNormal );
+					vec3Copy( curNormal, prevNormal );
 
 			}
 

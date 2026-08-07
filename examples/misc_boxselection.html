@@ -152,10 +152,9 @@
 
 				}
 
-				selectionBox.startPoint.set(
-					( event.clientX / window.innerWidth ) * 2 - 1,
-					- ( event.clientY / window.innerHeight ) * 2 + 1,
-					0.5 );
+				selectionBox.startPoint.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				selectionBox.startPoint.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+				selectionBox.startPoint.z = 0.5;
 
 			} );
 
@@ -169,10 +168,9 @@
 
 					}
 
-					selectionBox.endPoint.set(
-						( event.clientX / window.innerWidth ) * 2 - 1,
-						- ( event.clientY / window.innerHeight ) * 2 + 1,
-						0.5 );
+					selectionBox.endPoint.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+					selectionBox.endPoint.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+					selectionBox.endPoint.z = 0.5;
 
 					const allSelected = selectionBox.select();
 
@@ -188,10 +186,9 @@
 
 			document.addEventListener( 'pointerup', function ( event ) {
 
-				selectionBox.endPoint.set(
-					( event.clientX / window.innerWidth ) * 2 - 1,
-					- ( event.clientY / window.innerHeight ) * 2 + 1,
-					0.5 );
+				selectionBox.endPoint.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				selectionBox.endPoint.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+				selectionBox.endPoint.z = 0.5;
 
 				const allSelected = selectionBox.select();
 

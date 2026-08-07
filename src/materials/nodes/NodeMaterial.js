@@ -1,4 +1,6 @@
 import { Material } from '../Material.js';
+import { Plane } from '../../math/Plane.js';
+import { planeCopy } from '../../math/PlaneFunctions.js';
 
 import { hashArray, hashString } from '../../nodes/core/NodeUtils.js';
 import { output, diffuseColor, ambientOcclusion, emissive } from '../../nodes/core/PropertyNode.js';
@@ -1356,7 +1358,7 @@ class NodeMaterial extends Material {
 
 		}
 
-		this.clippingPlanes = source.clippingPlanes ? source.clippingPlanes.map( ( plane ) => plane.clone() ) : null;
+		this.clippingPlanes = source.clippingPlanes ? source.clippingPlanes.map( ( plane ) => planeCopy( plane, new Plane() ) ) : null;
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 

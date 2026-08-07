@@ -1,12 +1,36 @@
 import {
-	Box2,
 	Camera,
-	Color,
-	Matrix3,
-	Matrix4,
 	Object3D,
 	SRGBColorSpace,
-	Vector3
+	box2Create,
+	box2IntersectsBox,
+	box2MakeEmpty,
+	box2SetFromPoints,
+	colorAdd,
+	colorAddScalar,
+	colorCopy,
+	colorCreate,
+	colorGetStyle,
+	colorMultiply,
+	colorMultiplyScalar,
+	colorSet,
+	mat3Create,
+	mat3GetNormalMatrix,
+	mat4Copy,
+	mat4Create,
+	mat4MultiplyMatrices,
+	vec2Set,
+	vec3Add,
+	vec3ApplyMatrix3,
+	vec3ApplyMatrix4,
+	vec3Copy,
+	vec3Create,
+	vec3DistanceTo,
+	vec3DivideScalar,
+	vec3Dot,
+	vec3Normalize,
+	vec3SetFromMatrixPosition,
+	vec3SubVectors
 } from 'three';
 
 import {
@@ -97,23 +121,23 @@ class SVGRenderer {
 			_currentPath, _currentStyle;
 
 		const _this = this,
-			_clipBox = new Box2(),
-			_elemBox = new Box2(),
+			_clipBox = box2Create(),
+			_elemBox = box2Create(),
 
-			_color = new Color(),
-			_diffuseColor = new Color(),
-			_ambientLight = new Color(),
-			_directionalLights = new Color(),
-			_pointLights = new Color(),
-			_clearColor = new Color(),
+			_color = colorCreate(),
+			_diffuseColor = colorCreate(),
+			_ambientLight = colorCreate(),
+			_directionalLights = colorCreate(),
+			_pointLights = colorCreate(),
+			_clearColor = colorCreate(),
 
-			_vector3 = new Vector3(), // Needed for PointLight
-			_centroid = new Vector3(),
-			_normal = new Vector3(),
-			_normalViewMatrix = new Matrix3(),
+			_vector3 = vec3Create(), // Needed for PointLight
+			_centroid = vec3Create(),
+			_normal = vec3Create(),
+			_normalViewMatrix = mat3Create(),
 
-			_viewMatrix = new Matrix4(),
-			_viewProjectionMatrix = new Matrix4(),
+			_viewMatrix = mat4Create(),
+			_viewProjectionMatrix = mat4Create(),
 
 			_svgPathPool = [],
 			_svgObjectsPool = [],
@@ -211,7 +235,7 @@ class SVGRenderer {
 		 */
 		this.setClearColor = function ( color ) {
 
-			_clearColor.set( color );
+			colorSet( color, undefined, undefined, _clearColor );
 
 		};
 
@@ -232,8 +256,8 @@ class SVGRenderer {
 			_svg.setAttribute( 'width', _svgWidth );
 			_svg.setAttribute( 'height', _svgHeight );
 
-			_clipBox.min.set( - _svgWidthHalf, - _svgHeightHalf );
-			_clipBox.max.set( _svgWidthHalf, _svgHeightHalf );
+			vec2Set( - _svgWidthHalf, - _svgHeightHalf, _clipBox.min );
+			vec2Set( _svgWidthHalf, _svgHeightHalf, _clipBox.max );
 
 		};
 
@@ -306,7 +330,7 @@ class SVGRenderer {
 		this.clear = function () {
 
 			removeChildNodes();
-			_svg.style.backgroundColor = _clearColor.getStyle( _this.outputColorSpace );
+			_svg.style.backgroundColor = colorGetStyle( _clearColor, _this.outputColorSpace );
 
 		};
 
@@ -330,7 +354,7 @@ class SVGRenderer {
 			if ( background && background.isColor ) {
 
 				removeChildNodes();
-				_svg.style.backgroundColor = background.getStyle( _this.outputColorSpace );
+				_svg.style.backgroundColor = colorGetStyle( background, _this.outputColorSpace );
 
 			} else if ( this.autoClear === true ) {
 
@@ -341,14 +365,14 @@ class SVGRenderer {
 			_this.info.render.vertices = 0;
 			_this.info.render.faces = 0;
 
-			_viewMatrix.copy( camera.matrixWorldInverse );
-			_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
+			mat4Copy( camera.matrixWorldInverse, _viewMatrix );
+			mat4MultiplyMatrices( camera.projectionMatrix, _viewMatrix, _viewProjectionMatrix );
 
 			_renderData = _projector.projectScene( scene, camera, this.sortObjects, this.sortElements );
 			_elements = _renderData.elements;
 			_lights = _renderData.lights;
 
-			_normalViewMatrix.getNormalMatrix( camera.matrixWorldInverse );
+			mat3GetNormalMatrix( camera.matrixWorldInverse, _normalViewMatrix );
 
 			calculateLights( _lights );
 
@@ -371,8 +395,8 @@ class SVGRenderer {
 
 				if ( object.isSVGObject ) {
 
-					_vector3.setFromMatrixPosition( object.matrixWorld );
-					_vector3.applyMatrix4( _viewProjectionMatrix );
+					vec3SetFromMatrixPosition( object.matrixWorld, _vector3 );
+					vec3ApplyMatrix4( _vector3, _viewProjectionMatrix, _vector3 );
 
 					if ( _vector3.z < - 1 || _vector3.z > 1 ) return;
 
@@ -426,7 +450,7 @@ class SVGRenderer {
 					const element = item.data;
 					const material = item.material;
 
-					_elemBox.makeEmpty();
+					box2MakeEmpty( _elemBox );
 
 					if ( element instanceof RenderableSprite ) {
 
@@ -442,9 +466,9 @@ class SVGRenderer {
 						_v1.positionScreen.x *= _svgWidthHalf; _v1.positionScreen.y *= - _svgHeightHalf;
 						_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= - _svgHeightHalf;
 
-						_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen ] );
+						box2SetFromPoints( [ _v1.positionScreen, _v2.positionScreen ], _elemBox );
 
-						if ( _clipBox.intersectsBox( _elemBox ) === true ) {
+						if ( box2IntersectsBox( _clipBox, _elemBox ) === true ) {
 
 							renderLine( _v1, _v2, material );
 
@@ -466,13 +490,13 @@ class SVGRenderer {
 
 						}
 
-						_elemBox.setFromPoints( [
+						box2SetFromPoints( [
 							_v1.positionScreen,
 							_v2.positionScreen,
 							_v3.positionScreen
-						] );
+						], _elemBox );
 
-						if ( _clipBox.intersectsBox( _elemBox ) === true ) {
+						if ( box2IntersectsBox( _clipBox, _elemBox ) === true ) {
 
 							renderFace3( _v1, _v2, _v3, element, material );
 
@@ -490,9 +514,9 @@ class SVGRenderer {
 
 		function calculateLights( lights ) {
 
-			_ambientLight.setRGB( 0, 0, 0 );
-			_directionalLights.setRGB( 0, 0, 0 );
-			_pointLights.setRGB( 0, 0, 0 );
+			colorSet( 0, 0, 0, _ambientLight );
+			colorSet( 0, 0, 0, _directionalLights );
+			colorSet( 0, 0, 0, _pointLights );
 
 			for ( let l = 0, ll = lights.length; l < ll; l ++ ) {
 
@@ -532,9 +556,9 @@ class SVGRenderer {
 
 				if ( light.isDirectionalLight ) {
 
-					const lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld ).normalize();
+					const lightPosition = vec3Normalize( vec3SetFromMatrixPosition( light.matrixWorld, _vector3 ), _vector3 );
 
-					let amount = normal.dot( lightPosition );
+					let amount = vec3Dot( normal, lightPosition );
 
 					if ( amount <= 0 ) continue;
 
@@ -546,13 +570,13 @@ class SVGRenderer {
 
 				} else if ( light.isPointLight ) {
 
-					const lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld );
+					const lightPosition = vec3SetFromMatrixPosition( light.matrixWorld, _vector3 );
 
-					let amount = normal.dot( _vector3.subVectors( lightPosition, position ).normalize() );
+					let amount = vec3Dot( normal, vec3Normalize( vec3SubVectors( lightPosition, position, _vector3 ), _vector3 ) );
 
 					if ( amount <= 0 ) continue;
 
-					amount *= light.distance == 0 ? 1 : 1 - Math.min( position.distanceTo( lightPosition ) / light.distance, 1 );
+					amount *= light.distance == 0 ? 1 : 1 - Math.min( vec3DistanceTo( position, lightPosition ) / light.distance, 1 );
 
 					if ( amount == 0 ) continue;
 
@@ -585,7 +609,7 @@ class SVGRenderer {
 
 			if ( material.isSpriteMaterial || material.isPointsMaterial ) {
 
-				style = 'fill:' + material.color.getStyle( _this.outputColorSpace ) + ';fill-opacity:' + material.opacity;
+				style = 'fill:' + colorGetStyle( material.color, _this.outputColorSpace ) + ';fill-opacity:' + material.opacity;
 
 			}
 
@@ -599,7 +623,7 @@ class SVGRenderer {
 
 			if ( material.isLineBasicMaterial ) {
 
-				let style = 'fill:none;stroke:' + material.color.getStyle( _this.outputColorSpace ) + ';stroke-opacity:' + material.opacity + ';stroke-width:' + material.linewidth + ';stroke-linecap:' + material.linecap;
+				let style = 'fill:none;stroke:' + colorGetStyle( material.color, _this.outputColorSpace ) + ';stroke-opacity:' + material.opacity + ';stroke-width:' + material.linewidth + ';stroke-linecap:' + material.linecap;
 
 				if ( material.isLineDashedMaterial ) {
 
@@ -623,47 +647,54 @@ class SVGRenderer {
 
 			if ( material.isMeshBasicMaterial ) {
 
-				_color.copy( material.color );
+				colorCopy( material.color, _color );
 
 				if ( material.vertexColors ) {
 
-					_color.multiply( element.color );
+					colorMultiply( _color, element.color, _color );
 
 				}
 
 			} else if ( material.isMeshLambertMaterial || material.isMeshPhongMaterial || material.isMeshStandardMaterial ) {
 
-				_diffuseColor.copy( material.color );
+				colorCopy( material.color, _diffuseColor );
 
 				if ( material.vertexColors ) {
 
-					_diffuseColor.multiply( element.color );
+					colorMultiply( _diffuseColor, element.color, _diffuseColor );
 
 				}
 
-				_color.copy( _ambientLight );
+				colorCopy( _ambientLight, _color );
 
-				_centroid.copy( v1.positionWorld ).add( v2.positionWorld ).add( v3.positionWorld ).divideScalar( 3 );
+				vec3Copy( v1.positionWorld, _centroid );
+				vec3Add( _centroid, v2.positionWorld, _centroid );
+				vec3Add( _centroid, v3.positionWorld, _centroid );
+				vec3DivideScalar( _centroid, 3, _centroid );
 
 				calculateLight( _lights, _centroid, element.normalModel, _color );
 
-				_color.multiply( _diffuseColor ).add( material.emissive );
+				colorAdd( colorMultiply( _color, _diffuseColor, _color ), material.emissive, _color );
 
 			} else if ( material.isMeshNormalMaterial ) {
 
-				_normal.copy( element.normalModel ).applyMatrix3( _normalViewMatrix ).normalize();
+				vec3Copy( element.normalModel, _normal );
+				vec3ApplyMatrix3( _normal, _normalViewMatrix, _normal );
+				vec3Normalize( _normal, _normal );
 
-				_color.setRGB( _normal.x, _normal.y, _normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
+				colorSet( _normal.x, _normal.y, _normal.z, _color );
+				colorMultiplyScalar( _color, 0.5, _color );
+				colorAddScalar( _color, 0.5, _color );
 
 			}
 
 			if ( material.wireframe ) {
 
-				style = 'fill:none;stroke:' + _color.getStyle( _this.outputColorSpace ) + ';stroke-opacity:' + material.opacity + ';stroke-width:' + material.wireframeLinewidth + ';stroke-linecap:' + material.wireframeLinecap + ';stroke-linejoin:' + material.wireframeLinejoin;
+				style = 'fill:none;stroke:' + colorGetStyle( _color, _this.outputColorSpace ) + ';stroke-opacity:' + material.opacity + ';stroke-width:' + material.wireframeLinewidth + ';stroke-linecap:' + material.wireframeLinecap + ';stroke-linejoin:' + material.wireframeLinejoin;
 
 			} else {
 
-				style = 'fill:' + _color.getStyle( _this.outputColorSpace ) + ';fill-opacity:' + material.opacity;
+				style = 'fill:' + colorGetStyle( _color, _this.outputColorSpace ) + ';fill-opacity:' + material.opacity;
 
 			}
 

@@ -1,7 +1,7 @@
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
-import { Vector3 } from '../math/Vector3.js';
-import { Vector2 } from '../math/Vector2.js';
+import { vec3Create } from '../math/Vector3Functions.js';
+import { vec2Create } from '../math/Vector2Functions.js';
 
 /**
  * A simple shape of Euclidean geometry. It is constructed from a
@@ -63,8 +63,8 @@ class CircleGeometry extends BufferGeometry {
 
 		// helper variables
 
-		const vertex = new Vector3();
-		const uv = new Vector2();
+		const vertex = vec3Create();
+		const uv = vec2Create();
 
 		// center point
 

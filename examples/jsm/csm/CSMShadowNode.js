@@ -1,27 +1,44 @@
 import {
-	Vector2,
-	Vector3,
-	MathUtils,
-	Matrix4,
-	Box3,
 	Object3D,
 	WebGLCoordinateSystem,
 	ShadowBaseNode
 } from 'three/webgpu';
+import {
+	box3Create,
+	box3ExpandByPoint,
+	box3GetCenter,
+	box3MakeEmpty,
+	MathUtils,
+	mat4Copy,
+	mat4Create,
+	mat4Invert,
+	mat4LookAt,
+	mat4MultiplyMatrices,
+	vec2Create,
+	vec2Set,
+	vec3Add,
+	vec3ApplyMatrix4,
+	vec3Copy,
+	vec3Create,
+	vec3DistanceTo,
+	vec3Normalize,
+	vec3Set,
+	vec3SubVectors
+} from 'three';
 
 import { CSMFrustum } from './CSMFrustum.js';
 import { viewZToOrthographicDepth, reference, uniform, float, vec4, vec2, If, Fn, min, renderGroup, positionView, shadow } from 'three/tsl';
 
-const _cameraToLightMatrix = new Matrix4();
+const _cameraToLightMatrix = /*@__PURE__*/ mat4Create();
 const _lightSpaceFrustum = new CSMFrustum();
-const _center = new Vector3();
-const _bbox = new Box3();
+const _center = /*@__PURE__*/ vec3Create();
+const _bbox = /*@__PURE__*/ box3Create();
 const _uniformArray = [];
 const _logArray = [];
-const _lightDirection = new Vector3();
-const _lightOrientationMatrix = new Matrix4();
-const _lightOrientationMatrixInverse = new Matrix4();
-const _up = new Vector3( 0, 1, 0 );
+const _lightDirection = /*@__PURE__*/ vec3Create();
+const _lightOrientationMatrix = /*@__PURE__*/ mat4Create();
+const _lightOrientationMatrixInverse = /*@__PURE__*/ mat4Create();
+const _up = /*@__PURE__*/ vec3Set( vec3Create(), 0, 1, 0 );
 
 class LwLight extends Object3D {
 
@@ -181,7 +198,7 @@ class CSMShadowNode extends ShadowBaseNode {
 
 			this._shadowNodes.push( shadow( lwLight, lShadow ) );
 
-			this._cascades.push( new Vector2() );
+			this._cascades.push( /*@__PURE__*/ vec2Create() );
 
 		}
 
@@ -293,7 +310,7 @@ class CSMShadowNode extends ShadowBaseNode {
 			const amount = this.breaks[ i ];
 			const prev = this.breaks[ i - 1 ] || 0;
 
-			this._cascades[ i ].set( prev, amount );
+			vec2Set( prev, amount, this._cascades[ i ] );
 
 		}
 
@@ -322,7 +339,7 @@ class CSMShadowNode extends ShadowBaseNode {
 
 			let point2;
 
-			if ( point1.distanceTo( farVerts[ 2 ] ) > point1.distanceTo( nearVerts[ 2 ] ) ) {
+			if ( vec3DistanceTo( point1, farVerts[ 2 ] ) > vec3DistanceTo( point1, nearVerts[ 2 ] ) ) {
 
 				point2 = farVerts[ 2 ];
 
@@ -332,7 +349,7 @@ class CSMShadowNode extends ShadowBaseNode {
 
 			}
 
-			let squaredBBWidth = point1.distanceTo( point2 );
+			let squaredBBWidth = vec3DistanceTo( point1, point2 );
 
 			if ( this.fade ) {
 
@@ -522,12 +539,14 @@ class CSMShadowNode extends ShadowBaseNode {
 
 		}
 
-		_lightDirection.subVectors( light.target.position, light.position ).normalize();
+		vec3SubVectors( light.target.position, light.position, _lightDirection );
+		vec3Normalize( _lightDirection, _lightDirection );
 
 		// for each frustum we need to find its min-max box aligned with the light orientation
 		// the position in _lightOrientationMatrix does not matter, as we transform there and back
-		_lightOrientationMatrix.lookAt( light.position, light.target.position, _up );
-		_lightOrientationMatrixInverse.copy( _lightOrientationMatrix ).invert();
+		mat4LookAt( light.position, light.target.position, _up, _lightOrientationMatrix );
+		mat4Copy( _lightOrientationMatrix, _lightOrientationMatrixInverse );
+		mat4Invert( _lightOrientationMatrixInverse, _lightOrientationMatrixInverse );
 
 		for ( let i = 0; i < frustums.length; i ++ ) {
 
@@ -537,30 +556,30 @@ class CSMShadowNode extends ShadowBaseNode {
 			const texelWidth = ( shadowCam.right - shadowCam.left ) / shadow.mapSize.width;
 			const texelHeight = ( shadowCam.top - shadowCam.bottom ) / shadow.mapSize.height;
 
-			_cameraToLightMatrix.multiplyMatrices( _lightOrientationMatrixInverse, camera.matrixWorld );
+			mat4MultiplyMatrices( _lightOrientationMatrixInverse, camera.matrixWorld, _cameraToLightMatrix );
 			frustums[ i ].toSpace( _cameraToLightMatrix, _lightSpaceFrustum );
 
 			const nearVerts = _lightSpaceFrustum.vertices.near;
 			const farVerts = _lightSpaceFrustum.vertices.far;
 
-			_bbox.makeEmpty();
+			box3MakeEmpty( _bbox );
 
 			for ( let j = 0; j < 4; j ++ ) {
 
-				_bbox.expandByPoint( nearVerts[ j ] );
-				_bbox.expandByPoint( farVerts[ j ] );
+				box3ExpandByPoint( _bbox, nearVerts[ j ], _bbox );
+				box3ExpandByPoint( _bbox, farVerts[ j ], _bbox );
 
 			}
 
-			_bbox.getCenter( _center );
+			box3GetCenter( _bbox, _center );
 			_center.z = _bbox.max.z + this.lightMargin;
 			_center.x = Math.floor( _center.x / texelWidth ) * texelWidth;
 			_center.y = Math.floor( _center.y / texelHeight ) * texelHeight;
-			_center.applyMatrix4( _lightOrientationMatrix );
+			vec3ApplyMatrix4( _center, _lightOrientationMatrix, _center );
 
-			lwLight.position.copy( _center );
-			lwLight.target.position.copy( _center );
-			lwLight.target.position.add( _lightDirection );
+			vec3Copy( _center, lwLight.position );
+			vec3Copy( _center, lwLight.target.position );
+			vec3Add( lwLight.target.position, _lightDirection, lwLight.target.position );
 
 		}
 

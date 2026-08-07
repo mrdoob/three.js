@@ -1,6 +1,7 @@
 import { Light } from './Light.js';
 import { SpotLightShadow } from './SpotLightShadow.js';
 import { Object3D } from '../core/Object3D.js';
+import { vec3Copy } from '../math/Vector3Functions.js';
 
 /**
  * This light gets emitted from a single point in one direction, along a cone
@@ -51,7 +52,7 @@ class SpotLight extends Light {
 
 		this.type = 'SpotLight';
 
-		this.position.copy( Object3D.DEFAULT_UP );
+		vec3Copy( Object3D.DEFAULT_UP, this.position );
 		this.updateMatrix();
 
 		/**

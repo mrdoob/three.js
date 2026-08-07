@@ -1,5 +1,6 @@
 import { Object3D } from '../core/Object3D.js';
 import { Color } from '../math/Color.js';
+import { colorCopy, colorGetHex } from '../math/ColorFunctions.js';
 
 /**
  * Abstract base class for lights - all other light types inherit the
@@ -52,7 +53,7 @@ class Light extends Object3D {
 
 		super.copy( source, recursive );
 
-		this.color.copy( source.color );
+		colorCopy( source.color, this.color );
 		this.intensity = source.intensity;
 
 		return this;
@@ -63,7 +64,7 @@ class Light extends Object3D {
 
 		const data = super.toJSON( meta );
 
-		data.object.color = this.color.getHex();
+		data.object.color = colorGetHex( this.color );
 		data.object.intensity = this.intensity;
 
 		return data;

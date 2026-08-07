@@ -15,11 +15,19 @@ import {
 	NearestMipmapLinearFilter,
 	LinearFilter,
 	LinearMipmapNearestFilter,
-	LinearMipmapLinearFilter
+	LinearMipmapLinearFilter,
+
+	SRGBColorSpace
 } from '../constants.js';
 import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
 import { Color } from '../math/Color.js';
+import { colorSetHex } from '../math/ColorFunctions.js';
+import { vec2FromArray } from '../math/Vector2Functions.js';
 import { Vector3 } from '../math/Vector3.js';
+import { vec3FromArray } from '../math/Vector3Functions.js';
+import { mat4Decompose, mat4FromArray } from '../math/Matrix4Functions.js';
+import { eulerFromArray } from '../math/EulerFunctions.js';
+import { quatFromArray } from '../math/QuaternionFunctions.js';
 import { Object3D } from '../core/Object3D.js';
 import { Group } from '../objects/Group.js';
 import { InstancedMesh } from '../objects/InstancedMesh.js';
@@ -62,8 +70,11 @@ import { FileLoader } from './FileLoader.js';
 import * as Geometries from '../geometries/Geometries.js';
 import { getTypedArray, error, warn } from '../utils.js';
 import { Box3 } from '../math/Box3.js';
+import { box3FromJSON } from '../math/Box3Functions.js';
 import { Sphere } from '../math/Sphere.js';
+import { sphereFromJSON } from '../math/SphereFunctions.js';
 import { SphericalHarmonics3 } from '../math/SphericalHarmonics3.js';
+import { sh3FromArray } from '../math/SphericalHarmonics3Functions.js';
 
 const _customGeometries = {};
 
@@ -732,9 +743,9 @@ class ObjectLoader extends Loader {
 				if ( data.mapping !== undefined ) texture.mapping = parseConstant( data.mapping, TEXTURE_MAPPING );
 				if ( data.channel !== undefined ) texture.channel = data.channel;
 
-				if ( data.offset !== undefined ) texture.offset.fromArray( data.offset );
-				if ( data.repeat !== undefined ) texture.repeat.fromArray( data.repeat );
-				if ( data.center !== undefined ) texture.center.fromArray( data.center );
+				if ( data.offset !== undefined ) vec2FromArray( data.offset, 0, texture.offset );
+				if ( data.repeat !== undefined ) vec2FromArray( data.repeat, 0, texture.repeat );
+				if ( data.center !== undefined ) vec2FromArray( data.center, 0, texture.center );
 				if ( data.rotation !== undefined ) texture.rotation = data.rotation;
 
 				if ( data.wrap !== undefined ) {
@@ -849,7 +860,7 @@ class ObjectLoader extends Loader {
 
 					if ( Number.isInteger( data.background ) ) {
 
-						object.background = new Color( data.background );
+						object.background = colorSetHex( data.background, SRGBColorSpace, new Color() );
 
 					} else {
 
@@ -887,10 +898,20 @@ class ObjectLoader extends Loader {
 
 				if ( data.backgroundBlurriness !== undefined ) object.backgroundBlurriness = data.backgroundBlurriness;
 				if ( data.backgroundIntensity !== undefined ) object.backgroundIntensity = data.backgroundIntensity;
-				if ( data.backgroundRotation !== undefined ) object.backgroundRotation.fromArray( data.backgroundRotation );
+				if ( data.backgroundRotation !== undefined ) {
+
+					eulerFromArray( data.backgroundRotation, object.backgroundRotation );
+					object.backgroundRotation._onChangeCallback();
+
+				}
 
 				if ( data.environmentIntensity !== undefined ) object.environmentIntensity = data.environmentIntensity;
-				if ( data.environmentRotation !== undefined ) object.environmentRotation.fromArray( data.environmentRotation );
+				if ( data.environmentRotation !== undefined ) {
+
+					eulerFromArray( data.environmentRotation, object.environmentRotation );
+					object.environmentRotation._onChangeCallback();
+
+				}
 
 				break;
 
@@ -955,7 +976,7 @@ class ObjectLoader extends Loader {
 
 			case 'LightProbe':
 
-				const sh = new SphericalHarmonics3().fromArray( data.sh );
+				const sh = sh3FromArray( data.sh, 0, new SphericalHarmonics3() );
 				object = new LightProbe( sh, data.intensity );
 
 				break;
@@ -968,7 +989,7 @@ class ObjectLoader extends Loader {
 				object = new SkinnedMesh( geometry, material );
 
 				if ( data.bindMode !== undefined ) object.bindMode = data.bindMode;
-				if ( data.bindMatrix !== undefined ) object.bindMatrix.fromArray( data.bindMatrix );
+				if ( data.bindMatrix !== undefined ) mat4FromArray( data.bindMatrix, 0, object.bindMatrix );
 				if ( data.skeleton !== undefined ) object.skeleton = data.skeleton;
 
 				break;
@@ -1015,13 +1036,13 @@ class ObjectLoader extends Loader {
 					let sphere = null;
 					if ( info.boundingBox !== undefined ) {
 
-						box = new Box3().fromJSON( info.boundingBox );
+						box = box3FromJSON( info.boundingBox, new Box3() );
 
 					}
 
 					if ( info.boundingSphere !== undefined ) {
 
-						sphere = new Sphere().fromJSON( info.boundingSphere );
+						sphere = sphereFromJSON( info.boundingSphere, new Sphere() );
 
 					}
 
@@ -1059,13 +1080,13 @@ class ObjectLoader extends Loader {
 
 				if ( data.boundingSphere !== undefined ) {
 
-					object.boundingSphere = new Sphere().fromJSON( data.boundingSphere );
+					object.boundingSphere = sphereFromJSON( data.boundingSphere, new Sphere() );
 
 				}
 
 				if ( data.boundingBox !== undefined ) {
 
-					object.boundingBox = new Box3().fromJSON( data.boundingBox );
+					object.boundingBox = box3FromJSON( data.boundingBox, new Box3() );
 
 				}
 
@@ -1132,23 +1153,35 @@ class ObjectLoader extends Loader {
 
 		if ( data.matrix !== undefined ) {
 
-			object.matrix.fromArray( data.matrix );
+			mat4FromArray( data.matrix, 0, object.matrix );
 
 			if ( data.matrixAutoUpdate !== undefined ) object.matrixAutoUpdate = data.matrixAutoUpdate;
-			if ( object.matrixAutoUpdate ) object.matrix.decompose( object.position, object.quaternion, object.scale );
+			if ( object.matrixAutoUpdate ) mat4Decompose( object.matrix, object.position, object.quaternion, object.scale );
 
 		} else {
 
-			if ( data.position !== undefined ) object.position.fromArray( data.position );
-			if ( data.rotation !== undefined ) object.rotation.fromArray( data.rotation );
-			if ( data.quaternion !== undefined ) object.quaternion.fromArray( data.quaternion );
-			if ( data.scale !== undefined ) object.scale.fromArray( data.scale );
+			if ( data.position !== undefined ) vec3FromArray( data.position, 0, object.position );
+			if ( data.rotation !== undefined ) {
+
+				eulerFromArray( data.rotation, object.rotation );
+				object.rotation._onChangeCallback();
+
+			}
+
+			if ( data.quaternion !== undefined ) {
+
+				quatFromArray( data.quaternion, 0, object.quaternion );
+				object.quaternion._onChangeCallback();
+
+			}
+
+			if ( data.scale !== undefined ) vec3FromArray( data.scale, 0, object.scale );
 
 		}
 
-		if ( data.up !== undefined ) object.up.fromArray( data.up );
+		if ( data.up !== undefined ) vec3FromArray( data.up, 0, object.up );
 
-		if ( data.pivot !== undefined ) object.pivot = new Vector3().fromArray( data.pivot );
+		if ( data.pivot !== undefined ) object.pivot = vec3FromArray( data.pivot, 0, new Vector3() );
 
 		if ( data.morphTargetDictionary !== undefined ) object.morphTargetDictionary = Object.assign( {}, data.morphTargetDictionary );
 		if ( data.morphTargetInfluences !== undefined ) object.morphTargetInfluences = data.morphTargetInfluences.slice();
@@ -1165,7 +1198,7 @@ class ObjectLoader extends Loader {
 			if ( data.shadow.blurSamples !== undefined ) object.shadow.blurSamples = data.shadow.blurSamples;
 			if ( data.shadow.focus !== undefined ) object.shadow.focus = data.shadow.focus;
 			if ( data.shadow.aspect !== undefined ) object.shadow.aspect = data.shadow.aspect;
-			if ( data.shadow.mapSize !== undefined ) object.shadow.mapSize.fromArray( data.shadow.mapSize );
+			if ( data.shadow.mapSize !== undefined ) vec2FromArray( data.shadow.mapSize, 0, object.shadow.mapSize );
 			if ( data.shadow.camera !== undefined ) object.shadow.camera = this.parseObject( data.shadow.camera );
 
 		}

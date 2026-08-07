@@ -76,7 +76,7 @@ export default QUnit.module( 'Extras', () => {
 				let points = curve.getPoints( expectedPoints.length - 1 );
 
 				assert.strictEqual( points.length, expectedPoints.length, 'Correct number of points' );
-				assert.deepEqual( points, expectedPoints, 'Correct points calculated' );
+				assert.deepEqual( points.map( p => ( { x: p.x, y: p.y, z: p.z } ) ), expectedPoints.map( p => ( { x: p.x, y: p.y, z: p.z } ) ), 'Correct points calculated' );
 
 				// symmetry
 				const curveRev = new CubicBezierCurve3(
@@ -86,7 +86,7 @@ export default QUnit.module( 'Extras', () => {
 				points = curveRev.getPoints( expectedPoints.length - 1 );
 
 				assert.strictEqual( points.length, expectedPoints.length, 'Reversed: Correct number of points' );
-				assert.deepEqual( points, expectedPoints.reverse(), 'Reversed: Correct points curve' );
+				assert.deepEqual( points.map( p => ( { x: p.x, y: p.y, z: p.z } ) ), expectedPoints.reverse().map( p => ( { x: p.x, y: p.y, z: p.z } ) ), 'Reversed: Correct points curve' );
 
 			} );
 
@@ -132,7 +132,7 @@ export default QUnit.module( 'Extras', () => {
 					curve.getPointAt( 1, new Vector3() )
 				];
 
-				assert.deepEqual( points, expectedPoints, 'Correct points' );
+				assert.deepEqual( points.map( p => ( { x: p.x, y: p.y, z: p.z } ) ), expectedPoints.map( p => ( { x: p.x, y: p.y, z: p.z } ) ), 'Correct points' );
 
 			} );
 
@@ -220,7 +220,7 @@ export default QUnit.module( 'Extras', () => {
 				const points = curve.getSpacedPoints();
 
 				assert.strictEqual( points.length, expectedPoints.length, 'Correct number of points' );
-				assert.deepEqual( points, expectedPoints, 'Correct points calculated' );
+				assert.deepEqual( points.map( p => ( { x: p.x, y: p.y, z: p.z } ) ), expectedPoints.map( p => ( { x: p.x, y: p.y, z: p.z } ) ), 'Correct points calculated' );
 
 			} );
 

@@ -8,8 +8,9 @@ import { float, int, uint } from '../../../nodes/tsl/TSLBase.js';
 import { attribute } from '../../../nodes/core/AttributeNode.js';
 
 import { OrthographicCamera } from '../../../cameras/OrthographicCamera.js';
-import { Color } from '../../../math/Color.js';
-import { Vector3 } from '../../../math/Vector3.js';
+import { colorCopy, colorCreate } from '../../../math/ColorFunctions.js';
+import { vec3Create, vec3Set, vec3ToArray } from '../../../math/Vector3Functions.js';
+import { vec4Set } from '../../../math/Vector4Functions.js';
 import { BufferGeometry } from '../../../core/BufferGeometry.js';
 import { BufferAttribute } from '../../../core/BufferAttribute.js';
 import { RenderTarget } from '../../../core/RenderTarget.js';
@@ -45,13 +46,13 @@ const GGX_SAMPLES = 256;
 
 const _flatCamera = /*@__PURE__*/ new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 const _cubeCamera = /*@__PURE__*/ new PerspectiveCamera( 90, 1 );
-const _clearColor = /*@__PURE__*/ new Color();
+const _clearColor = /*@__PURE__*/ colorCreate();
 let _oldTarget = null;
 let _oldActiveCubeFace = 0;
 let _oldActiveMipmapLevel = 0;
 
-const _origin = /*@__PURE__*/ new Vector3();
-const _direction = /*@__PURE__*/ new Vector3();
+const _origin = /*@__PURE__*/ vec3Create();
+const _direction = /*@__PURE__*/ vec3Create();
 
 // maps blur materials to their uniforms dictionary
 
@@ -488,7 +489,7 @@ class PMREMGenerator {
 
 			if ( background.isColor ) {
 
-				backgroundMaterial.color.copy( background );
+				colorCopy( background, backgroundMaterial.color );
 				scene.background = null;
 				useSolidColor = true;
 
@@ -496,7 +497,7 @@ class PMREMGenerator {
 
 		} else {
 
-			backgroundMaterial.color.copy( _clearColor );
+			colorCopy( _clearColor, backgroundMaterial.color );
 			useSolidColor = true;
 
 		}
@@ -517,21 +518,21 @@ class PMREMGenerator {
 
 			if ( col === 0 ) {
 
-				cubeCamera.up.set( 0, upSign[ i ], 0 );
-				cubeCamera.position.set( position.x, position.y, position.z );
+				vec3Set( cubeCamera.up, 0, upSign[ i ], 0 );
+				vec3Set( cubeCamera.position, position.x, position.y, position.z );
 				cubeCamera.lookAt( position.x + forwardSign[ i ], position.y, position.z );
 
 			} else if ( col === 1 ) {
 
-				cubeCamera.up.set( 0, 0, upSign[ i ] );
-				cubeCamera.position.set( position.x, position.y, position.z );
+				vec3Set( cubeCamera.up, 0, 0, upSign[ i ] );
+				vec3Set( cubeCamera.position, position.x, position.y, position.z );
 				cubeCamera.lookAt( position.x, position.y + forwardSign[ i ], position.z );
 
 
 			} else {
 
-				cubeCamera.up.set( 0, upSign[ i ], 0 );
-				cubeCamera.position.set( position.x, position.y, position.z );
+				vec3Set( cubeCamera.up, 0, upSign[ i ], 0 );
+				vec3Set( cubeCamera.position, position.x, position.y, position.z );
 				cubeCamera.lookAt( position.x, position.y, position.z + forwardSign[ i ] );
 
 
@@ -722,13 +723,13 @@ class PMREMGenerator {
 
 		if ( this._renderer.isWebGLRenderer ) {
 
-			target.viewport.set( x, target.height - height - y, width, height );
-			target.scissor.set( x, target.height - height - y, width, height );
+			vec4Set( x, target.height - height - y, width, height, target.viewport );
+			vec4Set( x, target.height - height - y, width, height, target.scissor );
 
 		} else {
 
-			target.viewport.set( x, y, width, height );
-			target.scissor.set( x, y, width, height );
+			vec4Set( x, y, width, height, target.viewport );
+			vec4Set( x, y, width, height, target.scissor );
 
 		}
 
@@ -788,31 +789,31 @@ function _createPlanes( lodMax ) {
 				// RH coordinate system; PMREM face-indexing convention
 				if ( faceIdx === 0 ) {
 
-					_direction.set( 1, v, u ); // pos x
+					vec3Set( _direction, 1, v, u ); // pos x
 
 				} else if ( faceIdx === 1 ) {
 
-					_direction.set( - u, 1, - v ); // pos y
+					vec3Set( _direction, - u, 1, - v ); // pos y
 
 				} else if ( faceIdx === 2 ) {
 
-					_direction.set( - u, v, 1 ); // pos z
+					vec3Set( _direction, - u, v, 1 ); // pos z
 
 				} else if ( faceIdx === 3 ) {
 
-					_direction.set( - 1, v, - u ); // neg x
+					vec3Set( _direction, - 1, v, - u ); // neg x
 
 				} else if ( faceIdx === 4 ) {
 
-					_direction.set( - u, - 1, v ); // neg y
+					vec3Set( _direction, - u, - 1, v ); // neg y
 
 				} else {
 
-					_direction.set( u, v, - 1 ); // neg z
+					vec3Set( _direction, u, v, - 1 ); // neg z
 
 				}
 
-				_direction.toArray( outputDirection, ( faceIdx * vertices + vertex ) * positionSize );
+				vec3ToArray( _direction, outputDirection, ( faceIdx * vertices + vertex ) * positionSize );
 
 			}
 

@@ -1,6 +1,7 @@
 import { Light } from './Light.js';
 import { DirectionalLightShadow } from './DirectionalLightShadow.js';
 import { Object3D } from '../core/Object3D.js';
+import { vec3Copy } from '../math/Vector3Functions.js';
 
 /**
  * A light that gets emitted in a specific direction. This light will behave
@@ -52,7 +53,7 @@ class DirectionalLight extends Light {
 
 		this.type = 'DirectionalLight';
 
-		this.position.copy( Object3D.DEFAULT_UP );
+		vec3Copy( Object3D.DEFAULT_UP, this.position );
 		this.updateMatrix();
 
 		/**

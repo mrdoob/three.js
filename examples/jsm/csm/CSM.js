@@ -1,25 +1,38 @@
 import {
-	Vector2,
 	Vector3,
 	DirectionalLight,
 	MathUtils,
 	ShaderChunk,
-	Matrix4,
-	Box3
+	box3Create,
+	box3ExpandByPoint,
+	box3GetCenter,
+	box3MakeEmpty,
+	mat4Copy,
+	mat4Create,
+	mat4Invert,
+	mat4LookAt,
+	mat4MultiplyMatrices,
+	vec2Create,
+	vec3ApplyMatrix4,
+	vec3Copy,
+	vec3Create,
+	vec3DistanceTo,
+	vec3Normalize,
+	vec3Set
 } from 'three';
 import { CSMFrustum } from './CSMFrustum.js';
 import { CSMShader } from './CSMShader.js';
 
-const _cameraToLightMatrix = new Matrix4();
+const _cameraToLightMatrix = /*@__PURE__*/ mat4Create();
 const _lightSpaceFrustum = new CSMFrustum( { webGL: true } );
-const _center = new Vector3();
-const _origin = new Vector3();
-const _bbox = new Box3();
+const _center = /*@__PURE__*/ vec3Create();
+const _origin = /*@__PURE__*/ vec3Create();
+const _bbox = /*@__PURE__*/ box3Create();
 const _uniformArray = [];
 const _logArray = [];
-const _lightOrientationMatrix = new Matrix4();
-const _lightOrientationMatrixInverse = new Matrix4();
-const _up = new Vector3( 0, 1, 0 );
+const _lightOrientationMatrix = /*@__PURE__*/ mat4Create();
+const _lightOrientationMatrixInverse = /*@__PURE__*/ mat4Create();
+const _up = /*@__PURE__*/ vec3Set( vec3Create(), 0, 1, 0 );
 
 /**
  * An implementation of Cascade Shadow Maps (CSM).
@@ -97,7 +110,9 @@ export class CSM {
 		 *
 		 * @type {Vector3}
 		 */
-		this.lightDirection = data.lightDirection || new Vector3( 1, - 1, 1 ).normalize();
+		this.lightDirection = data.lightDirection || new Vector3( 1, - 1, 1 );
+
+		if ( ! data.lightDirection ) vec3Normalize( this.lightDirection, this.lightDirection );
 
 		/**
 		 * The light intensity.
@@ -251,7 +266,7 @@ export class CSM {
 			const farVerts = frustum.vertices.far;
 			const point1 = farVerts[ 0 ];
 			let point2;
-			if ( point1.distanceTo( farVerts[ 2 ] ) > point1.distanceTo( nearVerts[ 2 ] ) ) {
+			if ( vec3DistanceTo( point1, farVerts[ 2 ] ) > vec3DistanceTo( point1, nearVerts[ 2 ] ) ) {
 
 				point2 = farVerts[ 2 ];
 
@@ -261,7 +276,7 @@ export class CSM {
 
 			}
 
-			let squaredBBWidth = point1.distanceTo( point2 );
+			let squaredBBWidth = vec3DistanceTo( point1, point2 );
 			if ( this.fade ) {
 
 				// expand the shadow extents by the fade margin if fade is enabled.
@@ -368,8 +383,9 @@ export class CSM {
 
 		// for each frustum we need to find its min-max box aligned with the light orientation
 		// the position in _lightOrientationMatrix does not matter, as we transform there and back
-		_lightOrientationMatrix.lookAt( _origin, this.lightDirection, _up );
-		_lightOrientationMatrixInverse.copy( _lightOrientationMatrix ).invert();
+		mat4LookAt( _origin, this.lightDirection, _up, _lightOrientationMatrix );
+		mat4Copy( _lightOrientationMatrix, _lightOrientationMatrixInverse );
+		mat4Invert( _lightOrientationMatrixInverse, _lightOrientationMatrixInverse );
 
 		for ( let i = 0; i < frustums.length; i ++ ) {
 
@@ -377,27 +393,27 @@ export class CSM {
 			const shadowCam = light.shadow.camera;
 			const texelWidth = ( shadowCam.right - shadowCam.left ) / this.shadowMapSize;
 			const texelHeight = ( shadowCam.top - shadowCam.bottom ) / this.shadowMapSize;
-			_cameraToLightMatrix.multiplyMatrices( _lightOrientationMatrixInverse, camera.matrixWorld );
+			mat4MultiplyMatrices( _lightOrientationMatrixInverse, camera.matrixWorld, _cameraToLightMatrix );
 			frustums[ i ].toSpace( _cameraToLightMatrix, _lightSpaceFrustum );
 
 			const nearVerts = _lightSpaceFrustum.vertices.near;
 			const farVerts = _lightSpaceFrustum.vertices.far;
-			_bbox.makeEmpty();
+			box3MakeEmpty( _bbox );
 			for ( let j = 0; j < 4; j ++ ) {
 
-				_bbox.expandByPoint( nearVerts[ j ] );
-				_bbox.expandByPoint( farVerts[ j ] );
+				box3ExpandByPoint( _bbox, nearVerts[ j ], _bbox );
+				box3ExpandByPoint( _bbox, farVerts[ j ], _bbox );
 
 			}
 
-			_bbox.getCenter( _center );
+			box3GetCenter( _bbox, _center );
 			_center.z = _bbox.max.z + this.lightMargin;
 			_center.x = Math.floor( _center.x / texelWidth ) * texelWidth;
 			_center.y = Math.floor( _center.y / texelHeight ) * texelHeight;
-			_center.applyMatrix4( _lightOrientationMatrix );
+			vec3ApplyMatrix4( _center, _lightOrientationMatrix, _center );
 
-			light.position.copy( _center );
-			light.target.position.copy( _center );
+			vec3Copy( _center, light.position );
+			vec3Copy( _center, light.target.position );
 
 			light.target.position.x += this.lightDirection.x;
 			light.target.position.y += this.lightDirection.y;
@@ -504,7 +520,7 @@ export class CSM {
 
 		while ( target.length < this.breaks.length ) {
 
-			target.push( new Vector2() );
+			target.push( /*@__PURE__*/ vec2Create() );
 
 		}
 

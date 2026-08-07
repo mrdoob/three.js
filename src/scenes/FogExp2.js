@@ -1,4 +1,5 @@
 import { Color } from '../math/Color.js';
+import { colorGetHex } from '../math/ColorFunctions.js';
 
 /**
  * This class can be used to define an exponential squared fog,
@@ -75,7 +76,7 @@ class FogExp2 {
 		return {
 			type: 'FogExp2',
 			name: this.name,
-			color: this.color.getHex(),
+			color: colorGetHex( this.color ),
 			density: this.density
 		};
 

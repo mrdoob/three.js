@@ -1,5 +1,5 @@
 import {
-	Vector2
+	vec2Create
 } from 'three';
 
 /**
@@ -24,7 +24,7 @@ const TriangleBlurShader = {
 	uniforms: {
 
 		'texture': { value: null },
-		'delta': { value: new Vector2( 1, 1 ) }
+		'delta': { value: vec2Create( 1, 1 ) }
 
 	},
 

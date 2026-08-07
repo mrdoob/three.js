@@ -2,6 +2,8 @@ import { TangentSpaceNormalMap } from '../constants.js';
 import { Material } from './Material.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
+import { colorCopy } from '../math/ColorFunctions.js';
+import { vec2Copy } from '../math/Vector2Functions.js';
 
 /**
  * A material implementing toon shading.
@@ -310,7 +312,7 @@ class MeshToonMaterial extends Material {
 
 		super.copy( source );
 
-		this.color.copy( source.color );
+		colorCopy( source.color, this.color );
 
 		this.map = source.map;
 		this.gradientMap = source.gradientMap;
@@ -321,7 +323,7 @@ class MeshToonMaterial extends Material {
 		this.aoMap = source.aoMap;
 		this.aoMapIntensity = source.aoMapIntensity;
 
-		this.emissive.copy( source.emissive );
+		colorCopy( source.emissive, this.emissive );
 		this.emissiveMap = source.emissiveMap;
 		this.emissiveIntensity = source.emissiveIntensity;
 
@@ -330,7 +332,7 @@ class MeshToonMaterial extends Material {
 
 		this.normalMap = source.normalMap;
 		this.normalMapType = source.normalMapType;
-		this.normalScale.copy( source.normalScale );
+		vec2Copy( source.normalScale, this.normalScale );
 
 		this.displacementMap = source.displacementMap;
 		this.displacementScale = source.displacementScale;

@@ -1,9 +1,15 @@
-import { Vector3 } from '../math/Vector3.js';
 import { BufferAttribute } from './BufferAttribute.js';
 import { denormalize, normalize } from '../math/MathUtils.js';
 import { log } from '../utils.js';
+import {
+	vec3ApplyMatrix4,
+	vec3ApplyNormalMatrix,
+	vec3Create,
+	vec3FromBufferAttribute,
+	vec3TransformDirection
+} from '../math/Vector3Functions.js';
 
-const _vector = /*@__PURE__*/ new Vector3();
+const _vector = /*@__PURE__*/ vec3Create();
 
 /**
  * An alternative version of a buffer attribute with interleaved data. Interleaved
@@ -116,9 +122,8 @@ class InterleavedBufferAttribute {
 
 		for ( let i = 0, l = this.data.count; i < l; i ++ ) {
 
-			_vector.fromBufferAttribute( this, i );
-
-			_vector.applyMatrix4( m );
+			vec3FromBufferAttribute( this, i, _vector );
+			vec3ApplyMatrix4( _vector, m, _vector );
 
 			this.setXYZ( i, _vector.x, _vector.y, _vector.z );
 
@@ -139,9 +144,8 @@ class InterleavedBufferAttribute {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector.fromBufferAttribute( this, i );
-
-			_vector.applyNormalMatrix( m );
+			vec3FromBufferAttribute( this, i, _vector );
+			vec3ApplyNormalMatrix( _vector, m, _vector );
 
 			this.setXYZ( i, _vector.x, _vector.y, _vector.z );
 
@@ -162,9 +166,8 @@ class InterleavedBufferAttribute {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector.fromBufferAttribute( this, i );
-
-			_vector.transformDirection( m );
+			vec3FromBufferAttribute( this, i, _vector );
+			vec3TransformDirection( _vector, m, _vector );
 
 			this.setXYZ( i, _vector.x, _vector.y, _vector.z );
 

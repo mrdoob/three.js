@@ -1,10 +1,10 @@
-import { Box3 } from '../math/Box3.js';
+import { box3Create, box3IsEmpty, box3SetFromObject } from '../math/Box3Functions.js';
 import { LineSegments } from '../objects/LineSegments.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-const _box = /*@__PURE__*/ new Box3();
+const _box = /*@__PURE__*/ box3Create();
 
 /**
  * Helper object to graphically show the world-axis-aligned bounding box
@@ -64,11 +64,11 @@ class BoxHelper extends LineSegments {
 
 		if ( this.object !== undefined ) {
 
-			_box.setFromObject( this.object );
+			box3SetFromObject( this.object, false, _box );
 
 		}
 
-		if ( _box.isEmpty() ) return;
+		if ( box3IsEmpty( _box ) ) return;
 
 		const min = _box.min;
 		const max = _box.max;

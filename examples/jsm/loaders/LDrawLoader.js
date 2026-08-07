@@ -7,12 +7,26 @@ import {
 	LineBasicMaterial,
 	LineSegments,
 	Loader,
-	Matrix4,
 	Mesh,
 	MeshStandardMaterial,
 	SRGBColorSpace,
-	Vector3,
-	Ray
+	vec3Create,
+	vec3Set,
+	vec3Copy,
+	vec3Add,
+	vec3SubVectors,
+	vec3CrossVectors,
+	vec3Normalize,
+	vec3Dot,
+	vec3AddScaledVector,
+	vec3ApplyMatrix4,
+	mat4Create,
+	mat4Set,
+	mat4Decompose,
+	mat4Determinant,
+	rayCreate,
+	colorSetStyle,
+	colorMultiplyScalar
 } from 'three';
 
 // Special surface finish tag types.
@@ -39,8 +53,8 @@ const MAIN_EDGE_COLOUR_CODE = '24';
 
 const COLOR_SPACE_LDRAW = SRGBColorSpace;
 
-const _tempVec0 = new Vector3();
-const _tempVec1 = new Vector3();
+const _tempVec0 = vec3Create();
+const _tempVec1 = vec3Create();
 
 
 class ConditionalLineSegments extends LineSegments {
@@ -64,17 +78,15 @@ function generateFaceNormals( faces ) {
 		const v1 = vertices[ 1 ];
 		const v2 = vertices[ 2 ];
 
-		_tempVec0.subVectors( v1, v0 );
-		_tempVec1.subVectors( v2, v1 );
-		face.faceNormal = new Vector3()
-			.crossVectors( _tempVec0, _tempVec1 )
-			.normalize();
+		vec3SubVectors( v1, v0, _tempVec0 );
+		vec3SubVectors( v2, v1, _tempVec1 );
+		face.faceNormal = vec3Normalize( vec3CrossVectors( _tempVec0, _tempVec1 ) );
 
 	}
 
 }
 
-const _ray = new Ray();
+const _ray = rayCreate();
 function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 
 	// NOTE: 1e2 is pretty coarse but was chosen to quantize the resulting value because
@@ -107,10 +119,10 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 	// onto the original line.
 	function toNormalizedRay( v0, v1, targetRay ) {
 
-		targetRay.direction.subVectors( v1, v0 ).normalize();
+		vec3Normalize( vec3SubVectors( v1, v0, targetRay.direction ), targetRay.direction );
 
-		const scalar = v0.dot( targetRay.direction );
-		targetRay.origin.copy( v0 ).addScaledVector( targetRay.direction, - scalar );
+		const scalar = vec3Dot( v0, targetRay.direction );
+		vec3AddScaledVector( v0, targetRay.direction, - scalar, targetRay.origin );
 
 		return targetRay;
 
@@ -142,7 +154,7 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 		if ( checkSubSegments ) {
 
 			// add both ray directions to the map
-			const ray = toNormalizedRay( v0, v1, new Ray() );
+			const ray = toNormalizedRay( v0, v1, rayCreate() );
 			const rh1 = hashRay( ray );
 			if ( ! hardEdgeRays.has( rh1 ) ) {
 
@@ -162,8 +174,8 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 			// store both segments ends in min, max order in the distances array to check if a face edge is a
 			// subsegment later.
 			const info = hardEdgeRays.get( rh1 );
-			let d0 = info.ray.direction.dot( v0 );
-			let d1 = info.ray.direction.dot( v1 );
+			let d0 = vec3Dot( info.ray.direction, v0 );
+			let d1 = vec3Dot( info.ray.direction, v1 );
 			if ( d0 > d1 ) {
 
 				[ d0, d1 ] = [ d1, d0 ];
@@ -207,8 +219,8 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 
 					const info = hardEdgeRays.get( rayHash );
 					const { ray, distances } = info;
-					let d0 = ray.direction.dot( v0 );
-					let d1 = ray.direction.dot( v1 );
+					let d0 = vec3Dot( ray.direction, v0 );
+					let d1 = vec3Dot( ray.direction, v1 );
 
 					if ( d0 > d1 ) {
 
@@ -303,7 +315,7 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 					// NOTE: If the angle between faces is > 67.5 degrees then assume it's
 					// hard edge. There are some cases where the line segments do not line up exactly
 					// with or span multiple triangle edges (see Lunar Vehicle wheels).
-					if ( Math.abs( otherTri.faceNormal.dot( tri.faceNormal ) ) < 0.25 ) {
+					if ( Math.abs( vec3Dot( otherTri.faceNormal, tri.faceNormal ) ) < 0.25 ) {
 
 						continue;
 
@@ -326,7 +338,7 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 						vertNormals[ index ] !== otherNormals[ otherNext ]
 					) {
 
-						otherNormals[ otherNext ].norm.add( vertNormals[ index ].norm );
+						vec3Add( otherNormals[ otherNext ].norm, vertNormals[ index ].norm, otherNormals[ otherNext ].norm );
 						vertNormals[ index ].norm = otherNormals[ otherNext ].norm;
 
 					}
@@ -337,7 +349,7 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 						// it's possible to encounter an edge of a triangle that has already been traversed meaning
 						// both edges already have different normals defined and shared. To work around this we create
 						// a wrapper object so when those edges are merged the normals can be updated everywhere.
-						sharedNormal1 = { norm: new Vector3() };
+						sharedNormal1 = { norm: vec3Create() };
 						normals.push( sharedNormal1.norm );
 
 					}
@@ -345,14 +357,14 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 					if ( vertNormals[ index ] === null ) {
 
 						vertNormals[ index ] = sharedNormal1;
-						sharedNormal1.norm.add( faceNormal );
+						vec3Add( sharedNormal1.norm, faceNormal, sharedNormal1.norm );
 
 					}
 
 					if ( otherNormals[ otherNext ] === null ) {
 
 						otherNormals[ otherNext ] = sharedNormal1;
-						sharedNormal1.norm.add( otherFaceNormal );
+						vec3Add( sharedNormal1.norm, otherFaceNormal, sharedNormal1.norm );
 
 					}
 
@@ -362,7 +374,7 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 						vertNormals[ next ] !== otherNormals[ otherIndex ]
 					) {
 
-						otherNormals[ otherIndex ].norm.add( vertNormals[ next ].norm );
+						vec3Add( otherNormals[ otherIndex ].norm, vertNormals[ next ].norm, otherNormals[ otherIndex ].norm );
 						vertNormals[ next ].norm = otherNormals[ otherIndex ].norm;
 
 					}
@@ -370,7 +382,7 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 					let sharedNormal2 = vertNormals[ next ] || otherNormals[ otherIndex ];
 					if ( sharedNormal2 === null ) {
 
-						sharedNormal2 = { norm: new Vector3() };
+						sharedNormal2 = { norm: vec3Create() };
 						normals.push( sharedNormal2.norm );
 
 					}
@@ -378,14 +390,14 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 					if ( vertNormals[ next ] === null ) {
 
 						vertNormals[ next ] = sharedNormal2;
-						sharedNormal2.norm.add( faceNormal );
+						vec3Add( sharedNormal2.norm, faceNormal, sharedNormal2.norm );
 
 					}
 
 					if ( otherNormals[ otherIndex ] === null ) {
 
 						otherNormals[ otherIndex ] = sharedNormal2;
-						sharedNormal2.norm.add( otherFaceNormal );
+						vec3Add( sharedNormal2.norm, otherFaceNormal, sharedNormal2.norm );
 
 					}
 
@@ -400,7 +412,7 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 	// The normals of each face have been added up so now we average them by normalizing the vector.
 	for ( let i = 0, l = normals.length; i < l; i ++ ) {
 
-		normals[ i ].normalize();
+		vec3Normalize( normals[ i ], normals[ i ] );
 
 	}
 
@@ -477,7 +489,7 @@ class LineParser {
 
 	getVector() {
 
-		return new Vector3( parseFloat( this.getToken() ), parseFloat( this.getToken() ), parseFloat( this.getToken() ) );
+		return vec3Set( vec3Create(), parseFloat( this.getToken() ), parseFloat( this.getToken() ), parseFloat( this.getToken() ) );
 
 	}
 
@@ -528,7 +540,7 @@ class LDrawParsedCache {
 			return {
 				colorCode: face.colorCode,
 				material: face.material,
-				vertices: face.vertices.map( v => v.clone() ),
+				vertices: face.vertices.map( v => vec3Copy( v ) ),
 				normals: face.normals.map( () => null ),
 				faceNormal: null
 			};
@@ -540,8 +552,8 @@ class LDrawParsedCache {
 			return {
 				colorCode: face.colorCode,
 				material: face.material,
-				vertices: face.vertices.map( v => v.clone() ),
-				controlPoints: face.controlPoints.map( v => v.clone() )
+				vertices: face.vertices.map( v => vec3Copy( v ) ),
+				controlPoints: face.controlPoints.map( v => vec3Copy( v ) )
 			};
 
 		} );
@@ -551,7 +563,7 @@ class LDrawParsedCache {
 			return {
 				colorCode: face.colorCode,
 				material: face.material,
-				vertices: face.vertices.map( v => v.clone() )
+				vertices: face.vertices.map( v => vec3Copy( v ) )
 			};
 
 		} );
@@ -905,7 +917,8 @@ class LDrawParsedCache {
 					const m7 = parseFloat( lp.getToken() );
 					const m8 = parseFloat( lp.getToken() );
 
-					const matrix = new Matrix4().set(
+					const matrix = mat4Set(
+						mat4Create(),
 						m0, m1, m2, posX,
 						m3, m4, m5, posY,
 						m6, m7, m8, posZ,
@@ -1237,7 +1250,7 @@ class LDrawPartsGeometryCache {
 				if ( subobjectInfo.isGroup ) {
 
 					const subobjectGroup = subobjectInfo;
-					subobject.matrix.decompose( subobjectGroup.position, subobjectGroup.quaternion, subobjectGroup.scale );
+					mat4Decompose( subobject.matrix, subobjectGroup.position, subobjectGroup.quaternion, subobjectGroup.scale );
 					subobjectGroup.userData.startingBuildingStep = subobject.startingBuildingStep;
 					subobjectGroup.name = subobject.fileName;
 
@@ -1268,7 +1281,7 @@ class LDrawPartsGeometryCache {
 				const faces = subobjectInfo.faces;
 				const matrix = subobject.matrix;
 				const inverted = subobject.inverted;
-				const matrixScaleInverted = matrix.determinant() < 0;
+				const matrixScaleInverted = mat4Determinant( matrix ) < 0;
 				const colorCode = subobject.colorCode;
 
 				const lineColorCode = colorCode === MAIN_COLOUR_CODE ? MAIN_EDGE_COLOUR_CODE : colorCode;
@@ -1276,8 +1289,8 @@ class LDrawPartsGeometryCache {
 
 					const ls = lineSegments[ i ];
 					const vertices = ls.vertices;
-					vertices[ 0 ].applyMatrix4( matrix );
-					vertices[ 1 ].applyMatrix4( matrix );
+					vec3ApplyMatrix4( vertices[ 0 ], matrix, vertices[ 0 ] );
+					vec3ApplyMatrix4( vertices[ 1 ], matrix, vertices[ 1 ] );
 					ls.colorCode = ls.colorCode === MAIN_EDGE_COLOUR_CODE ? lineColorCode : ls.colorCode;
 					ls.material = ls.material || getMaterialFromCode( ls.colorCode, ls.colorCode, info.materials, true );
 
@@ -1290,10 +1303,10 @@ class LDrawPartsGeometryCache {
 					const os = conditionalSegments[ i ];
 					const vertices = os.vertices;
 					const controlPoints = os.controlPoints;
-					vertices[ 0 ].applyMatrix4( matrix );
-					vertices[ 1 ].applyMatrix4( matrix );
-					controlPoints[ 0 ].applyMatrix4( matrix );
-					controlPoints[ 1 ].applyMatrix4( matrix );
+					vec3ApplyMatrix4( vertices[ 0 ], matrix, vertices[ 0 ] );
+					vec3ApplyMatrix4( vertices[ 1 ], matrix, vertices[ 1 ] );
+					vec3ApplyMatrix4( controlPoints[ 0 ], matrix, controlPoints[ 0 ] );
+					vec3ApplyMatrix4( controlPoints[ 1 ], matrix, controlPoints[ 1 ] );
 					os.colorCode = os.colorCode === MAIN_EDGE_COLOUR_CODE ? lineColorCode : os.colorCode;
 					os.material = os.material || getMaterialFromCode( os.colorCode, os.colorCode, info.materials, true );
 
@@ -1307,7 +1320,7 @@ class LDrawPartsGeometryCache {
 					const vertices = tri.vertices;
 					for ( let i = 0, l = vertices.length; i < l; i ++ ) {
 
-						vertices[ i ].applyMatrix4( matrix );
+						vec3ApplyMatrix4( vertices[ i ], matrix, vertices[ i ] );
 
 					}
 
@@ -1553,11 +1566,9 @@ function createObject( loader, elements, elementSize, isConditionalSegments = fa
 				const v0 = vertices[ 0 ];
 				const v1 = vertices[ 1 ];
 				const v2 = vertices[ 2 ];
-				_tempVec0.subVectors( v1, v0 );
-				_tempVec1.subVectors( v2, v1 );
-				elem.faceNormal = new Vector3()
-					.crossVectors( _tempVec0, _tempVec1 )
-					.normalize();
+				vec3SubVectors( v1, v0, _tempVec0 );
+				vec3SubVectors( v2, v1, _tempVec1 );
+				elem.faceNormal = vec3Normalize( vec3CrossVectors( _tempVec0, _tempVec1 ) );
 
 			}
 
@@ -2390,7 +2401,7 @@ class LDrawLoader extends Loader {
 
 		}
 
-		material.color.setStyle( fillColor, COLOR_SPACE_LDRAW );
+		colorSetStyle( fillColor, COLOR_SPACE_LDRAW, material.color );
 		material.transparent = isTransparent;
 		material.opacity = alpha;
 		material.depthWrite = ! isTransparent;
@@ -2400,7 +2411,7 @@ class LDrawLoader extends Loader {
 
 		if ( luminance !== 0 ) {
 
-			material.emissive.setStyle( fillColor, COLOR_SPACE_LDRAW ).multiplyScalar( luminance );
+			colorMultiplyScalar( colorSetStyle( fillColor, COLOR_SPACE_LDRAW, material.emissive ), luminance, material.emissive );
 
 		}
 
@@ -2408,7 +2419,7 @@ class LDrawLoader extends Loader {
 
 			// This is the material used for edges
 			edgeMaterial = new LineBasicMaterial( {
-				color: new Color().setStyle( edgeColor, COLOR_SPACE_LDRAW ),
+				color: colorSetStyle( edgeColor, COLOR_SPACE_LDRAW, new Color() ),
 				transparent: isTransparent,
 				opacity: alpha,
 				depthWrite: ! isTransparent
@@ -2429,7 +2440,7 @@ class LDrawLoader extends Loader {
 				fog: true,
 				transparent: isTransparent,
 				depthWrite: ! isTransparent,
-				color: new Color().setStyle( edgeColor, COLOR_SPACE_LDRAW ),
+				color: colorSetStyle( edgeColor, COLOR_SPACE_LDRAW, new Color() ),
 				opacity: alpha,
 
 			} );

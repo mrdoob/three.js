@@ -5,7 +5,8 @@ import {
 	ShaderMaterial,
 	Texture,
 	UniformsUtils,
-	WebGLRenderTarget
+	WebGLRenderTarget,
+	vec2Set
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 import { SMAABlendShader, SMAAEdgesShader, SMAAWeightsShader } from '../shaders/SMAAShader.js';
@@ -185,9 +186,9 @@ class SMAAPass extends Pass {
 		this._edgesRT.setSize( width, height );
 		this._weightsRT.setSize( width, height );
 
-		this._materialEdges.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
-		this._materialWeights.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
-		this._materialBlend.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
+		vec2Set( 1 / width, 1 / height, this._materialEdges.uniforms[ 'resolution' ].value );
+		vec2Set( 1 / width, 1 / height, this._materialWeights.uniforms[ 'resolution' ].value );
+		vec2Set( 1 / width, 1 / height, this._materialBlend.uniforms[ 'resolution' ].value );
 
 	}
 

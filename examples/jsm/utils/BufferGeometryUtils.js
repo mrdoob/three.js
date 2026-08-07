@@ -8,7 +8,12 @@ import {
 	TriangleFanDrawMode,
 	TriangleStripDrawMode,
 	TrianglesDrawMode,
-	Vector3,
+	vec3Add,
+	vec3AddScaledVector,
+	vec3Create,
+	vec3FromBufferAttribute,
+	vec3Set,
+	vec3Sub,
 } from 'three';
 
 /**
@@ -923,17 +928,17 @@ function toTrianglesDrawMode( geometry, drawMode ) {
  */
 function computeMorphedAttributes( object ) {
 
-	const _vA = new Vector3();
-	const _vB = new Vector3();
-	const _vC = new Vector3();
+	const _vA = vec3Create();
+	const _vB = vec3Create();
+	const _vC = vec3Create();
 
-	const _tempA = new Vector3();
-	const _tempB = new Vector3();
-	const _tempC = new Vector3();
+	const _tempA = vec3Create();
+	const _tempB = vec3Create();
+	const _tempC = vec3Create();
 
-	const _morphA = new Vector3();
-	const _morphB = new Vector3();
-	const _morphC = new Vector3();
+	const _morphA = vec3Create();
+	const _morphB = vec3Create();
+	const _morphC = vec3Create();
 
 	function _calculateMorphedAttributeData(
 		object,
@@ -946,17 +951,17 @@ function computeMorphedAttributes( object ) {
 		modifiedAttributeArray
 	) {
 
-		_vA.fromBufferAttribute( attribute, a );
-		_vB.fromBufferAttribute( attribute, b );
-		_vC.fromBufferAttribute( attribute, c );
+		vec3FromBufferAttribute( attribute, a, _vA );
+		vec3FromBufferAttribute( attribute, b, _vB );
+		vec3FromBufferAttribute( attribute, c, _vC );
 
 		const morphInfluences = object.morphTargetInfluences;
 
 		if ( morphAttribute && morphInfluences ) {
 
-			_morphA.set( 0, 0, 0 );
-			_morphB.set( 0, 0, 0 );
-			_morphC.set( 0, 0, 0 );
+			vec3Set( _morphA, 0, 0, 0 );
+			vec3Set( _morphB, 0, 0, 0 );
+			vec3Set( _morphC, 0, 0, 0 );
 
 			for ( let i = 0, il = morphAttribute.length; i < il; i ++ ) {
 
@@ -965,29 +970,29 @@ function computeMorphedAttributes( object ) {
 
 				if ( influence === 0 ) continue;
 
-				_tempA.fromBufferAttribute( morph, a );
-				_tempB.fromBufferAttribute( morph, b );
-				_tempC.fromBufferAttribute( morph, c );
+				vec3FromBufferAttribute( morph, a, _tempA );
+				vec3FromBufferAttribute( morph, b, _tempB );
+				vec3FromBufferAttribute( morph, c, _tempC );
 
 				if ( morphTargetsRelative ) {
 
-					_morphA.addScaledVector( _tempA, influence );
-					_morphB.addScaledVector( _tempB, influence );
-					_morphC.addScaledVector( _tempC, influence );
+					vec3AddScaledVector( _morphA, _tempA, influence, _morphA );
+					vec3AddScaledVector( _morphB, _tempB, influence, _morphB );
+					vec3AddScaledVector( _morphC, _tempC, influence, _morphC );
 
 				} else {
 
-					_morphA.addScaledVector( _tempA.sub( _vA ), influence );
-					_morphB.addScaledVector( _tempB.sub( _vB ), influence );
-					_morphC.addScaledVector( _tempC.sub( _vC ), influence );
+					vec3AddScaledVector( _morphA, vec3Sub( _tempA, _vA, _tempA ), influence, _morphA );
+					vec3AddScaledVector( _morphB, vec3Sub( _tempB, _vB, _tempB ), influence, _morphB );
+					vec3AddScaledVector( _morphC, vec3Sub( _tempC, _vC, _tempC ), influence, _morphC );
 
 				}
 
 			}
 
-			_vA.add( _morphA );
-			_vB.add( _morphB );
-			_vC.add( _morphC );
+			vec3Add( _vA, _morphA, _vA );
+			vec3Add( _vB, _morphB, _vB );
+			vec3Add( _vC, _morphC, _vC );
 
 		}
 

@@ -1,20 +1,29 @@
 import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
 import { Mesh } from './Mesh.js';
 import { Box3 } from '../math/Box3.js';
-import { Matrix4 } from '../math/Matrix4.js';
 import { Sphere } from '../math/Sphere.js';
+import {
+	mat4Create, mat4FromArray, mat4ToArray, mat4MultiplyMatrices
+} from '../math/Matrix4Functions.js';
+import {
+	box3Create, box3Copy, box3ApplyMatrix4, box3MakeEmpty, box3Union
+} from '../math/Box3Functions.js';
+import {
+	sphereCreate, sphereCopy, sphereApplyMatrix4, sphereMakeEmpty, sphereUnion
+} from '../math/SphereFunctions.js';
+import { rayIntersectsSphere } from '../math/RayFunctions.js';
 import { DataTexture } from '../textures/DataTexture.js';
 import { FloatType, RedFormat } from '../constants.js';
 
-const _instanceLocalMatrix = /*@__PURE__*/ new Matrix4();
-const _instanceWorldMatrix = /*@__PURE__*/ new Matrix4();
+const _instanceLocalMatrix = /*@__PURE__*/ mat4Create();
+const _instanceWorldMatrix = /*@__PURE__*/ mat4Create();
 
 const _instanceIntersects = [];
 
-const _box3 = /*@__PURE__*/ new Box3();
-const _identity = /*@__PURE__*/ new Matrix4();
+const _box3 = /*@__PURE__*/ box3Create();
+const _identity = /*@__PURE__*/ mat4Create();
 const _mesh = /*@__PURE__*/ new Mesh();
-const _sphere = /*@__PURE__*/ new Sphere();
+const _sphere = /*@__PURE__*/ sphereCreate();
 
 /**
  * A special version of a mesh with instanced rendering support. Use
@@ -129,15 +138,16 @@ class InstancedMesh extends Mesh {
 
 		}
 
-		this.boundingBox.makeEmpty();
+		box3MakeEmpty( this.boundingBox );
 
 		for ( let i = 0; i < count; i ++ ) {
 
 			this.getMatrixAt( i, _instanceLocalMatrix );
 
-			_box3.copy( geometry.boundingBox ).applyMatrix4( _instanceLocalMatrix );
+			box3Copy( geometry.boundingBox, _box3 );
+			box3ApplyMatrix4( _box3, _instanceLocalMatrix, _box3 );
 
-			this.boundingBox.union( _box3 );
+			box3Union( this.boundingBox, _box3, this.boundingBox );
 
 		}
 
@@ -165,15 +175,16 @@ class InstancedMesh extends Mesh {
 
 		}
 
-		this.boundingSphere.makeEmpty();
+		sphereMakeEmpty( this.boundingSphere );
 
 		for ( let i = 0; i < count; i ++ ) {
 
 			this.getMatrixAt( i, _instanceLocalMatrix );
 
-			_sphere.copy( geometry.boundingSphere ).applyMatrix4( _instanceLocalMatrix );
+			sphereCopy( geometry.boundingSphere, _sphere );
+			sphereApplyMatrix4( _sphere, _instanceLocalMatrix, _sphere );
 
-			this.boundingSphere.union( _sphere );
+			sphereUnion( this.boundingSphere, _sphere, this.boundingSphere );
 
 		}
 
@@ -227,7 +238,7 @@ class InstancedMesh extends Mesh {
 	 */
 	getMatrixAt( index, matrix ) {
 
-		return matrix.fromArray( this.instanceMatrix.array, index * 16 );
+		return mat4FromArray( this.instanceMatrix.array, index * 16, matrix );
 
 	}
 
@@ -269,10 +280,10 @@ class InstancedMesh extends Mesh {
 
 		if ( this.boundingSphere === null ) this.computeBoundingSphere();
 
-		_sphere.copy( this.boundingSphere );
-		_sphere.applyMatrix4( matrixWorld );
+		sphereCopy( this.boundingSphere, _sphere );
+		sphereApplyMatrix4( _sphere, matrixWorld, _sphere );
 
-		if ( raycaster.ray.intersectsSphere( _sphere ) === false ) return;
+		if ( rayIntersectsSphere( raycaster.ray, _sphere ) === false ) return;
 
 		// now test each instance
 
@@ -282,7 +293,7 @@ class InstancedMesh extends Mesh {
 
 			this.getMatrixAt( instanceId, _instanceLocalMatrix );
 
-			_instanceWorldMatrix.multiplyMatrices( matrixWorld, _instanceLocalMatrix );
+			mat4MultiplyMatrices( matrixWorld, _instanceLocalMatrix, _instanceWorldMatrix );
 
 			// the mesh represents this single instance
 
@@ -338,7 +349,7 @@ class InstancedMesh extends Mesh {
 	 */
 	setMatrixAt( index, matrix ) {
 
-		matrix.toArray( this.instanceMatrix.array, index * 16 );
+		mat4ToArray( matrix, this.instanceMatrix.array, index * 16 );
 		return this;
 
 	}

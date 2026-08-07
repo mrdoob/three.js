@@ -1,17 +1,35 @@
 import {
-	Color,
 	FrontSide,
 	HalfFloatType,
-	Matrix4,
 	Mesh,
 	PerspectiveCamera,
-	Plane,
 	ShaderMaterial,
 	UniformsLib,
 	UniformsUtils,
-	Vector3,
-	Vector4,
-	WebGLRenderTarget
+	WebGLRenderTarget,
+	colorSet,
+	mat4Copy,
+	mat4Create,
+	mat4ExtractRotation,
+	mat4Multiply,
+	mat4Set,
+	planeApplyMatrix4,
+	planeCreate,
+	planeSetFromNormalAndCoplanarPoint,
+	vec3Add,
+	vec3ApplyMatrix4,
+	vec3Copy,
+	vec3Create,
+	vec3Dot,
+	vec3Negate,
+	vec3Reflect,
+	vec3Set,
+	vec3SetFromMatrixPosition,
+	vec3SubVectors,
+	vec4Create,
+	vec4Dot,
+	vec4MultiplyScalar,
+	vec4Set
 } from 'three';
 
 /**
@@ -59,29 +77,29 @@ class Water extends Mesh {
 		const alpha = options.alpha !== undefined ? options.alpha : 1.0;
 		const time = options.time !== undefined ? options.time : 0.0;
 		const normalSampler = options.waterNormals !== undefined ? options.waterNormals : null;
-		const sunDirection = options.sunDirection !== undefined ? options.sunDirection : new Vector3( 0.70707, 0.70707, 0.0 );
-		const sunColor = new Color( options.sunColor !== undefined ? options.sunColor : 0xffffff );
-		const waterColor = new Color( options.waterColor !== undefined ? options.waterColor : 0x7F7F7F );
-		const eye = options.eye !== undefined ? options.eye : new Vector3( 0, 0, 0 );
+		const sunDirection = options.sunDirection !== undefined ? options.sunDirection : vec3Set( vec3Create(), 0.70707, 0.70707, 0.0 );
+		const sunColor = colorSet( options.sunColor !== undefined ? options.sunColor : 0xffffff );
+		const waterColor = colorSet( options.waterColor !== undefined ? options.waterColor : 0x7F7F7F );
+		const eye = options.eye !== undefined ? options.eye : vec3Create();
 		const distortionScale = options.distortionScale !== undefined ? options.distortionScale : 20.0;
 		const side = options.side !== undefined ? options.side : FrontSide;
 		const fog = options.fog !== undefined ? options.fog : false;
 
 		//
 
-		const mirrorPlane = new Plane();
-		const normal = new Vector3();
-		const mirrorWorldPosition = new Vector3();
-		const cameraWorldPosition = new Vector3();
-		const rotationMatrix = new Matrix4();
-		const lookAtPosition = new Vector3( 0, 0, - 1 );
-		const clipPlane = new Vector4();
+		const mirrorPlane = planeCreate();
+		const normal = vec3Create();
+		const mirrorWorldPosition = vec3Create();
+		const cameraWorldPosition = vec3Create();
+		const rotationMatrix = mat4Create();
+		const lookAtPosition = vec3Set( vec3Create(), 0, 0, - 1 );
+		const clipPlane = vec4Create();
 
-		const view = new Vector3();
-		const target = new Vector3();
-		const q = new Vector4();
+		const view = vec3Create();
+		const target = vec3Create();
+		const q = vec4Create();
 
-		const textureMatrix = new Matrix4();
+		const textureMatrix = mat4Create();
 
 		const mirrorCamera = new PerspectiveCamera();
 
@@ -101,11 +119,11 @@ class Water extends Mesh {
 					'time': { value: 0.0 },
 					'size': { value: 1.0 },
 					'distortionScale': { value: 20.0 },
-					'textureMatrix': { value: new Matrix4() },
-					'sunColor': { value: new Color( 0x7F7F7F ) },
-					'sunDirection': { value: new Vector3( 0.70707, 0.70707, 0 ) },
-					'eye': { value: new Vector3() },
-					'waterColor': { value: new Color( 0x555555 ) }
+					'textureMatrix': { value: mat4Create() },
+					'sunColor': { value: colorSet( 0x7F7F7F ) },
+					'sunDirection': { value: vec3Set( vec3Create(), 0.70707, 0.70707, 0 ) },
+					'eye': { value: vec3Create() },
+					'waterColor': { value: colorSet( 0x555555 ) }
 				}
 			] ),
 
@@ -237,60 +255,63 @@ class Water extends Mesh {
 
 		scope.onBeforeRender = function ( renderer, scene, camera ) {
 
-			mirrorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
-			cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
+			vec3SetFromMatrixPosition( scope.matrixWorld, mirrorWorldPosition );
+			vec3SetFromMatrixPosition( camera.matrixWorld, cameraWorldPosition );
 
-			rotationMatrix.extractRotation( scope.matrixWorld );
+			mat4ExtractRotation( scope.matrixWorld, rotationMatrix );
 
-			normal.set( 0, 0, 1 );
-			normal.applyMatrix4( rotationMatrix );
+			vec3Set( normal, 0, 0, 1 );
+			vec3ApplyMatrix4( normal, rotationMatrix, normal );
 
-			view.subVectors( mirrorWorldPosition, cameraWorldPosition );
+			vec3SubVectors( mirrorWorldPosition, cameraWorldPosition, view );
 
 			// Avoid rendering when mirror is facing away
 
-			if ( view.dot( normal ) > 0 ) return;
+			if ( vec3Dot( view, normal ) > 0 ) return;
 
-			view.reflect( normal ).negate();
-			view.add( mirrorWorldPosition );
+			vec3Reflect( view, normal, view );
+			vec3Negate( view, view );
+			vec3Add( view, mirrorWorldPosition, view );
 
-			rotationMatrix.extractRotation( camera.matrixWorld );
+			mat4ExtractRotation( camera.matrixWorld, rotationMatrix );
 
-			lookAtPosition.set( 0, 0, - 1 );
-			lookAtPosition.applyMatrix4( rotationMatrix );
-			lookAtPosition.add( cameraWorldPosition );
+			vec3Set( lookAtPosition, 0, 0, - 1 );
+			vec3ApplyMatrix4( lookAtPosition, rotationMatrix, lookAtPosition );
+			vec3Add( lookAtPosition, cameraWorldPosition, lookAtPosition );
 
-			target.subVectors( mirrorWorldPosition, lookAtPosition );
-			target.reflect( normal ).negate();
-			target.add( mirrorWorldPosition );
+			vec3SubVectors( mirrorWorldPosition, lookAtPosition, target );
+			vec3Reflect( target, normal, target );
+			vec3Negate( target, target );
+			vec3Add( target, mirrorWorldPosition, target );
 
-			mirrorCamera.position.copy( view );
-			mirrorCamera.up.set( 0, 1, 0 );
-			mirrorCamera.up.applyMatrix4( rotationMatrix );
-			mirrorCamera.up.reflect( normal );
+			vec3Copy( view, mirrorCamera.position );
+			vec3Set( mirrorCamera.up, 0, 1, 0 );
+			vec3ApplyMatrix4( mirrorCamera.up, rotationMatrix, mirrorCamera.up );
+			vec3Reflect( mirrorCamera.up, normal, mirrorCamera.up );
 			mirrorCamera.lookAt( target );
 
 			mirrorCamera.far = camera.far; // Used in WebGLBackground
 
 			mirrorCamera.updateMatrixWorld();
-			mirrorCamera.projectionMatrix.copy( camera.projectionMatrix );
+			mat4Copy( camera.projectionMatrix, mirrorCamera.projectionMatrix );
 
 			// Update the texture matrix
-			textureMatrix.set(
+			mat4Set(
+				textureMatrix,
 				0.5, 0.0, 0.0, 0.5,
 				0.0, 0.5, 0.0, 0.5,
 				0.0, 0.0, 0.5, 0.5,
 				0.0, 0.0, 0.0, 1.0
 			);
-			textureMatrix.multiply( mirrorCamera.projectionMatrix );
-			textureMatrix.multiply( mirrorCamera.matrixWorldInverse );
+			mat4Multiply( textureMatrix, mirrorCamera.projectionMatrix, textureMatrix );
+			mat4Multiply( textureMatrix, mirrorCamera.matrixWorldInverse, textureMatrix );
 
 			// Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
 			// Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
-			mirrorPlane.setFromNormalAndCoplanarPoint( normal, mirrorWorldPosition );
-			mirrorPlane.applyMatrix4( mirrorCamera.matrixWorldInverse );
+			planeSetFromNormalAndCoplanarPoint( normal, mirrorWorldPosition, mirrorPlane );
+			planeApplyMatrix4( mirrorPlane, mirrorCamera.matrixWorldInverse, undefined, mirrorPlane );
 
-			clipPlane.set( mirrorPlane.normal.x, mirrorPlane.normal.y, mirrorPlane.normal.z, mirrorPlane.constant );
+			vec4Set( mirrorPlane.normal.x, mirrorPlane.normal.y, mirrorPlane.normal.z, mirrorPlane.constant, clipPlane );
 
 			const projectionMatrix = mirrorCamera.projectionMatrix;
 
@@ -300,7 +321,7 @@ class Water extends Mesh {
 			q.w = ( 1.0 + projectionMatrix.elements[ 10 ] ) / projectionMatrix.elements[ 14 ];
 
 			// Calculate the scaled plane vector
-			clipPlane.multiplyScalar( 2.0 / clipPlane.dot( q ) );
+			vec4MultiplyScalar( clipPlane, 2.0 / vec4Dot( clipPlane, q ), clipPlane );
 
 			// Replacing the third row of the projection matrix
 			projectionMatrix.elements[ 2 ] = clipPlane.x;
@@ -308,7 +329,7 @@ class Water extends Mesh {
 			projectionMatrix.elements[ 10 ] = clipPlane.z + 1.0 - clipBias;
 			projectionMatrix.elements[ 14 ] = clipPlane.w;
 
-			eye.setFromMatrixPosition( camera.matrixWorld );
+			vec3SetFromMatrixPosition( camera.matrixWorld, eye );
 
 			// Render
 

@@ -4,6 +4,7 @@ import {
 	UniformsLib,
 	UniformsUtils,
 	Vector2,
+	vec2Copy,
 } from 'three';
 
 UniformsLib.line = {
@@ -683,7 +684,7 @@ class LineMaterial extends ShaderMaterial {
 
 	set resolution( value ) {
 
-		this.uniforms.resolution.value.copy( value );
+		vec2Copy( value, this.uniforms.resolution.value );
 
 	}
 

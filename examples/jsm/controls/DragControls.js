@@ -1,26 +1,40 @@
 import {
 	Controls,
-	Matrix4,
-	Plane,
+	mat4Copy,
+	mat4Create,
+	mat4Invert,
 	Raycaster,
-	Vector2,
-	Vector3,
 	MOUSE,
-	TOUCH
+	TOUCH,
+	planeCreate,
+	planeSetFromNormalAndCoplanarPoint,
+	rayIntersectPlane,
+	vec2Copy,
+	vec2Create,
+	vec2MultiplyScalar,
+	vec2SubVectors,
+	vec3ApplyMatrix4,
+	vec3ApplyQuaternion,
+	vec3Copy,
+	vec3Create,
+	vec3Normalize,
+	vec3Set,
+	vec3SetFromMatrixPosition,
+	vec3Sub
 } from 'three';
 
-const _plane = new Plane();
+const _plane = /*@__PURE__*/ planeCreate();
 
-const _pointer = new Vector2();
-const _offset = new Vector3();
-const _diff = new Vector2();
-const _previousPointer = new Vector2();
-const _intersection = new Vector3();
-const _worldPosition = new Vector3();
-const _inverseMatrix = new Matrix4();
+const _pointer = /*@__PURE__*/ vec2Create();
+const _offset = /*@__PURE__*/ vec3Create();
+const _diff = /*@__PURE__*/ vec2Create();
+const _previousPointer = /*@__PURE__*/ vec2Create();
+const _intersection = /*@__PURE__*/ vec3Create();
+const _worldPosition = /*@__PURE__*/ vec3Create();
+const _inverseMatrix = /*@__PURE__*/ mat4Create();
 
-const _up = new Vector3();
-const _right = new Vector3();
+const _up = /*@__PURE__*/ vec3Create();
+const _right = /*@__PURE__*/ vec3Create();
 
 let _selected = null, _hovered = null;
 const _intersections = [];
@@ -252,23 +266,27 @@ function onPointerMove( event ) {
 
 		if ( this.state === STATE.PAN ) {
 
-			if ( raycaster.ray.intersectPlane( _plane, _intersection ) ) {
+			if ( rayIntersectPlane( raycaster.ray, _plane, _intersection ) ) {
 
-				_selected.position.copy( _intersection.sub( _offset ).applyMatrix4( _inverseMatrix ) );
+				vec3Sub( _intersection, _offset, _intersection );
+				vec3ApplyMatrix4( _intersection, _inverseMatrix, _intersection );
+				vec3Copy( _intersection, _selected.position );
 				this.dispatchEvent( { type: 'drag', object: _selected } );
 
 			}
 
 		} else if ( this.state === STATE.ROTATE ) {
 
-			_diff.subVectors( _pointer, _previousPointer ).multiplyScalar( this.rotateSpeed );
+			vec2SubVectors( _pointer, _previousPointer, _diff );
+			vec2MultiplyScalar( _diff, this.rotateSpeed, _diff );
 			_selected.rotateOnWorldAxis( _up, _diff.x );
-			_selected.rotateOnWorldAxis( _right.normalize(), - _diff.y );
+			vec3Normalize( _right, _right );
+			_selected.rotateOnWorldAxis( _right, - _diff.y );
 			this.dispatchEvent( { type: 'drag', object: _selected } );
 
 		}
 
-		_previousPointer.copy( _pointer );
+		vec2Copy( _pointer, _previousPointer );
 
 	} else {
 
@@ -285,7 +303,9 @@ function onPointerMove( event ) {
 
 				const object = _intersections[ 0 ].object;
 
-				_plane.setFromNormalAndCoplanarPoint( camera.getWorldDirection( _plane.normal ), _worldPosition.setFromMatrixPosition( object.matrixWorld ) );
+				camera.getWorldDirection( _plane.normal );
+				vec3SetFromMatrixPosition( object.matrixWorld, _worldPosition );
+				planeSetFromNormalAndCoplanarPoint( _plane.normal, _worldPosition, _plane );
 
 				if ( _hovered !== object && _hovered !== null ) {
 
@@ -322,7 +342,7 @@ function onPointerMove( event ) {
 
 	}
 
-	_previousPointer.copy( _pointer );
+	vec2Copy( _pointer, _previousPointer );
 
 }
 
@@ -356,22 +376,30 @@ function onPointerDown( event ) {
 
 		}
 
-		_plane.setFromNormalAndCoplanarPoint( camera.getWorldDirection( _plane.normal ), _worldPosition.setFromMatrixPosition( _selected.matrixWorld ) );
+		camera.getWorldDirection( _plane.normal );
+		vec3SetFromMatrixPosition( _selected.matrixWorld, _worldPosition );
+		planeSetFromNormalAndCoplanarPoint( _plane.normal, _worldPosition, _plane );
 
-		if ( raycaster.ray.intersectPlane( _plane, _intersection ) ) {
+		if ( rayIntersectPlane( raycaster.ray, _plane, _intersection ) ) {
 
 			if ( this.state === STATE.PAN ) {
 
-				_inverseMatrix.copy( _selected.parent.matrixWorld ).invert();
-				_offset.copy( _intersection ).sub( _worldPosition.setFromMatrixPosition( _selected.matrixWorld ) );
+				mat4Copy( _selected.parent.matrixWorld, _inverseMatrix );
+				mat4Invert( _inverseMatrix, _inverseMatrix );
+				vec3SetFromMatrixPosition( _selected.matrixWorld, _worldPosition );
+				vec3Sub( _intersection, _worldPosition, _offset );
 				domElement.style.cursor = 'move';
 				this.dispatchEvent( { type: 'dragstart', object: _selected } );
 
 			} else if ( this.state === STATE.ROTATE ) {
 
 				// the controls only support Y+ up
-				_up.set( 0, 1, 0 ).applyQuaternion( camera.quaternion ).normalize();
-				_right.set( 1, 0, 0 ).applyQuaternion( camera.quaternion ).normalize();
+				vec3Set( _up, 0, 1, 0 );
+				vec3ApplyQuaternion( _up, camera.quaternion, _up );
+				vec3Normalize( _up, _up );
+				vec3Set( _right, 1, 0, 0 );
+				vec3ApplyQuaternion( _right, camera.quaternion, _right );
+				vec3Normalize( _right, _right );
 				domElement.style.cursor = 'move';
 				this.dispatchEvent( { type: 'dragstart', object: _selected } );
 
@@ -381,7 +409,7 @@ function onPointerDown( event ) {
 
 	}
 
-	_previousPointer.copy( _pointer );
+	vec2Copy( _pointer, _previousPointer );
 
 }
 

@@ -1,12 +1,21 @@
 import {
-	Triangle,
-	Vector2,
-	Vector3
+	triangleCreate,
+	triangleGetArea,
+	triangleGetNormal,
+	vec2AddScaledVector,
+	vec2Create,
+	vec2FromBufferAttribute,
+	vec2Set,
+	vec3AddScaledVector,
+	vec3Create,
+	vec3FromBufferAttribute,
+	vec3Normalize,
+	vec3Set
 } from 'three';
 
-const _face = new Triangle();
-const _color = new Vector3();
-const _uva = new Vector2(), _uvb = new Vector2(), _uvc = new Vector2();
+const _face = /*@__PURE__*/ triangleCreate();
+const _color = /*@__PURE__*/ vec3Create();
+const _uva = /*@__PURE__*/ vec2Create(), _uvb = /*@__PURE__*/ vec2Create(), _uvc = /*@__PURE__*/ vec2Create();
 
 /**
  * Utility class for sampling weighted random points on the surface of a mesh.
@@ -126,10 +135,10 @@ class MeshSurfaceSampler {
 
 			}
 
-			_face.a.fromBufferAttribute( positionAttribute, i0 );
-			_face.b.fromBufferAttribute( positionAttribute, i1 );
-			_face.c.fromBufferAttribute( positionAttribute, i2 );
-			faceWeight *= _face.getArea();
+			vec3FromBufferAttribute( positionAttribute, i0, _face.a );
+			vec3FromBufferAttribute( positionAttribute, i1, _face.b );
+			vec3FromBufferAttribute( positionAttribute, i2, _face.c );
+			faceWeight *= triangleGetArea( _face );
 
 			faceWeights[ i ] = faceWeight;
 
@@ -252,28 +261,31 @@ class MeshSurfaceSampler {
 
 		}
 
-		_face.a.fromBufferAttribute( this.positionAttribute, i0 );
-		_face.b.fromBufferAttribute( this.positionAttribute, i1 );
-		_face.c.fromBufferAttribute( this.positionAttribute, i2 );
+		vec3FromBufferAttribute( this.positionAttribute, i0, _face.a );
+		vec3FromBufferAttribute( this.positionAttribute, i1, _face.b );
+		vec3FromBufferAttribute( this.positionAttribute, i2, _face.c );
 
-		targetPosition
-			.set( 0, 0, 0 )
-			.addScaledVector( _face.a, u )
-			.addScaledVector( _face.b, v )
-			.addScaledVector( _face.c, 1 - ( u + v ) );
+		vec3Set( targetPosition, 0, 0, 0 );
+		vec3AddScaledVector( targetPosition, _face.a, u, targetPosition );
+		vec3AddScaledVector( targetPosition, _face.b, v, targetPosition );
+		vec3AddScaledVector( targetPosition, _face.c, 1 - ( u + v ), targetPosition );
 
 		if ( targetNormal !== undefined ) {
 
 			if ( this.normalAttribute !== undefined ) {
 
-				_face.a.fromBufferAttribute( this.normalAttribute, i0 );
-				_face.b.fromBufferAttribute( this.normalAttribute, i1 );
-				_face.c.fromBufferAttribute( this.normalAttribute, i2 );
-				targetNormal.set( 0, 0, 0 ).addScaledVector( _face.a, u ).addScaledVector( _face.b, v ).addScaledVector( _face.c, 1 - ( u + v ) ).normalize();
+				vec3FromBufferAttribute( this.normalAttribute, i0, _face.a );
+				vec3FromBufferAttribute( this.normalAttribute, i1, _face.b );
+				vec3FromBufferAttribute( this.normalAttribute, i2, _face.c );
+				vec3Set( targetNormal, 0, 0, 0 );
+				vec3AddScaledVector( targetNormal, _face.a, u, targetNormal );
+				vec3AddScaledVector( targetNormal, _face.b, v, targetNormal );
+				vec3AddScaledVector( targetNormal, _face.c, 1 - ( u + v ), targetNormal );
+				vec3Normalize( targetNormal, targetNormal );
 
 			} else {
 
-				_face.getNormal( targetNormal );
+				triangleGetNormal( _face.a, _face.b, _face.c, targetNormal );
 
 			}
 
@@ -281,15 +293,14 @@ class MeshSurfaceSampler {
 
 		if ( targetColor !== undefined && this.colorAttribute !== undefined ) {
 
-			_face.a.fromBufferAttribute( this.colorAttribute, i0 );
-			_face.b.fromBufferAttribute( this.colorAttribute, i1 );
-			_face.c.fromBufferAttribute( this.colorAttribute, i2 );
+			vec3FromBufferAttribute( this.colorAttribute, i0, _face.a );
+			vec3FromBufferAttribute( this.colorAttribute, i1, _face.b );
+			vec3FromBufferAttribute( this.colorAttribute, i2, _face.c );
 
-			_color
-				.set( 0, 0, 0 )
-				.addScaledVector( _face.a, u )
-				.addScaledVector( _face.b, v )
-				.addScaledVector( _face.c, 1 - ( u + v ) );
+			vec3Set( _color, 0, 0, 0 );
+			vec3AddScaledVector( _color, _face.a, u, _color );
+			vec3AddScaledVector( _color, _face.b, v, _color );
+			vec3AddScaledVector( _color, _face.c, 1 - ( u + v ), _color );
 
 			targetColor.r = _color.x;
 			targetColor.g = _color.y;
@@ -299,10 +310,13 @@ class MeshSurfaceSampler {
 
 		if ( targetUV !== undefined && this.uvAttribute !== undefined ) {
 
-			_uva.fromBufferAttribute( this.uvAttribute, i0 );
-			_uvb.fromBufferAttribute( this.uvAttribute, i1 );
-			_uvc.fromBufferAttribute( this.uvAttribute, i2 );
-			targetUV.set( 0, 0 ).addScaledVector( _uva, u ).addScaledVector( _uvb, v ).addScaledVector( _uvc, 1 - ( u + v ) );
+			vec2FromBufferAttribute( this.uvAttribute, i0, _uva );
+			vec2FromBufferAttribute( this.uvAttribute, i1, _uvb );
+			vec2FromBufferAttribute( this.uvAttribute, i2, _uvc );
+			vec2Set( 0, 0, targetUV );
+			vec2AddScaledVector( targetUV, _uva, u, targetUV );
+			vec2AddScaledVector( targetUV, _uvb, v, targetUV );
+			vec2AddScaledVector( targetUV, _uvc, 1 - ( u + v ), targetUV );
 
 		}
 

@@ -1,4 +1,4 @@
-import { MathUtils, SRGBColorSpace } from 'three';
+import { MathUtils, SRGBColorSpace, colorSetRGB } from 'three';
 
 /**
  * @module ColorUtils
@@ -64,11 +64,12 @@ function setKelvin( color, kelvin ) {
 
 	}
 
-	return color.setRGB(
+	return colorSetRGB(
 		MathUtils.clamp( r, 0, 255 ) / 255,
 		MathUtils.clamp( g, 0, 255 ) / 255,
 		MathUtils.clamp( b, 0, 255 ) / 255,
-		SRGBColorSpace
+		SRGBColorSpace,
+		color
 	);
 
 }

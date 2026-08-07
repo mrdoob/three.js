@@ -1,4 +1,19 @@
 import { Vector3 } from './Vector3.js';
+import {
+	sh3Add,
+	sh3AddScaledSH,
+	sh3Copy,
+	sh3Equals,
+	sh3FromArray,
+	sh3GetAt,
+	sh3GetBasisAt,
+	sh3GetIrradianceAt,
+	sh3Lerp,
+	sh3Scale,
+	sh3Set,
+	sh3ToArray,
+	sh3Zero
+} from './SphericalHarmonics3Functions.js';
 
 /**
  * Represents a third-order spherical harmonics (SH). Light probes use this class
@@ -6,6 +21,12 @@ import { Vector3 } from './Vector3.js';
  *
  * - Primary reference: {@link https://graphics.stanford.edu/papers/envmap/envmap.pdf}
  * - Secondary reference: {@link https://www.ppsloan.org/publications/StupidSH36.pdf}
+ *
+ * `SphericalHarmonics3` is a thin, backwards-compatible wrapper around the
+ * standalone, tree-shakeable `sh3*` functions in {@link SphericalHarmonics3Functions},
+ * which operate on any {@link SphericalHarmonics3Like} object. Prefer importing
+ * those functions directly if you only need a handful of operations and want
+ * unused ones eliminated from your bundle.
  */
 class SphericalHarmonics3 {
 
@@ -21,7 +42,7 @@ class SphericalHarmonics3 {
 		 * @readonly
 		 * @default true
 		 */
-		this.isSphericalHarmonics3 = true;
+		Object.defineProperty( this, 'isSphericalHarmonics3', { value: true } );
 
 		/**
 		 * An array holding the (9) SH coefficients.
@@ -47,13 +68,7 @@ class SphericalHarmonics3 {
 	 */
 	set( coefficients ) {
 
-		for ( let i = 0; i < 9; i ++ ) {
-
-			this.coefficients[ i ].copy( coefficients[ i ] );
-
-		}
-
-		return this;
+		return sh3Set( coefficients, this );
 
 	}
 
@@ -64,13 +79,7 @@ class SphericalHarmonics3 {
 	 */
 	zero() {
 
-		for ( let i = 0; i < 9; i ++ ) {
-
-			this.coefficients[ i ].set( 0, 0, 0 );
-
-		}
-
-		return this;
+		return sh3Zero( this );
 
 	}
 
@@ -83,28 +92,7 @@ class SphericalHarmonics3 {
 	 */
 	getAt( normal, target ) {
 
-		// normal is assumed to be unit length
-
-		const x = normal.x, y = normal.y, z = normal.z;
-
-		const coeff = this.coefficients;
-
-		// band 0
-		target.copy( coeff[ 0 ] ).multiplyScalar( 0.282095 );
-
-		// band 1
-		target.addScaledVector( coeff[ 1 ], 0.488603 * y );
-		target.addScaledVector( coeff[ 2 ], 0.488603 * z );
-		target.addScaledVector( coeff[ 3 ], 0.488603 * x );
-
-		// band 2
-		target.addScaledVector( coeff[ 4 ], 1.092548 * ( x * y ) );
-		target.addScaledVector( coeff[ 5 ], 1.092548 * ( y * z ) );
-		target.addScaledVector( coeff[ 6 ], 0.315392 * ( 3.0 * z * z - 1.0 ) );
-		target.addScaledVector( coeff[ 7 ], 1.092548 * ( x * z ) );
-		target.addScaledVector( coeff[ 8 ], 0.546274 * ( x * x - y * y ) );
-
-		return target;
+		return sh3GetAt( this, normal, target );
 
 	}
 
@@ -118,28 +106,7 @@ class SphericalHarmonics3 {
 	 */
 	getIrradianceAt( normal, target ) {
 
-		// normal is assumed to be unit length
-
-		const x = normal.x, y = normal.y, z = normal.z;
-
-		const coeff = this.coefficients;
-
-		// band 0
-		target.copy( coeff[ 0 ] ).multiplyScalar( 0.886227 ); // π * 0.282095
-
-		// band 1
-		target.addScaledVector( coeff[ 1 ], 2.0 * 0.511664 * y ); // ( 2 * π / 3 ) * 0.488603
-		target.addScaledVector( coeff[ 2 ], 2.0 * 0.511664 * z );
-		target.addScaledVector( coeff[ 3 ], 2.0 * 0.511664 * x );
-
-		// band 2
-		target.addScaledVector( coeff[ 4 ], 2.0 * 0.429043 * x * y ); // ( π / 4 ) * 1.092548
-		target.addScaledVector( coeff[ 5 ], 2.0 * 0.429043 * y * z );
-		target.addScaledVector( coeff[ 6 ], 0.743125 * z * z - 0.247708 ); // ( π / 4 ) * 0.315392 * 3
-		target.addScaledVector( coeff[ 7 ], 2.0 * 0.429043 * x * z );
-		target.addScaledVector( coeff[ 8 ], 0.429043 * ( x * x - y * y ) ); // ( π / 4 ) * 0.546274
-
-		return target;
+		return sh3GetIrradianceAt( this, normal, target );
 
 	}
 
@@ -151,13 +118,7 @@ class SphericalHarmonics3 {
 	 */
 	add( sh ) {
 
-		for ( let i = 0; i < 9; i ++ ) {
-
-			this.coefficients[ i ].add( sh.coefficients[ i ] );
-
-		}
-
-		return this;
+		return sh3Add( this, sh, this );
 
 	}
 
@@ -171,13 +132,7 @@ class SphericalHarmonics3 {
 	 */
 	addScaledSH( sh, s ) {
 
-		for ( let i = 0; i < 9; i ++ ) {
-
-			this.coefficients[ i ].addScaledVector( sh.coefficients[ i ], s );
-
-		}
-
-		return this;
+		return sh3AddScaledSH( this, sh, s, this );
 
 	}
 
@@ -189,13 +144,7 @@ class SphericalHarmonics3 {
 	 */
 	scale( s ) {
 
-		for ( let i = 0; i < 9; i ++ ) {
-
-			this.coefficients[ i ].multiplyScalar( s );
-
-		}
-
-		return this;
+		return sh3Scale( this, s, this );
 
 	}
 
@@ -209,13 +158,7 @@ class SphericalHarmonics3 {
 	 */
 	lerp( sh, alpha ) {
 
-		for ( let i = 0; i < 9; i ++ ) {
-
-			this.coefficients[ i ].lerp( sh.coefficients[ i ], alpha );
-
-		}
-
-		return this;
+		return sh3Lerp( this, sh, alpha, this );
 
 	}
 
@@ -227,17 +170,7 @@ class SphericalHarmonics3 {
 	 */
 	equals( sh ) {
 
-		for ( let i = 0; i < 9; i ++ ) {
-
-			if ( ! this.coefficients[ i ].equals( sh.coefficients[ i ] ) ) {
-
-				return false;
-
-			}
-
-		}
-
-		return true;
+		return sh3Equals( this, sh );
 
 	}
 
@@ -249,7 +182,7 @@ class SphericalHarmonics3 {
 	 */
 	copy( sh ) {
 
-		return this.set( sh.coefficients );
+		return sh3Copy( sh, this );
 
 	}
 
@@ -273,15 +206,7 @@ class SphericalHarmonics3 {
 	 */
 	fromArray( array, offset = 0 ) {
 
-		const coefficients = this.coefficients;
-
-		for ( let i = 0; i < 9; i ++ ) {
-
-			coefficients[ i ].fromArray( array, offset + ( i * 3 ) );
-
-		}
-
-		return this;
+		return sh3FromArray( array, offset, this );
 
 	}
 
@@ -295,15 +220,7 @@ class SphericalHarmonics3 {
 	 */
 	toArray( array = [], offset = 0 ) {
 
-		const coefficients = this.coefficients;
-
-		for ( let i = 0; i < 9; i ++ ) {
-
-			coefficients[ i ].toArray( array, offset + ( i * 3 ) );
-
-		}
-
-		return array;
+		return sh3ToArray( this, array, offset );
 
 	}
 
@@ -315,24 +232,7 @@ class SphericalHarmonics3 {
 	 */
 	static getBasisAt( normal, shBasis ) {
 
-		// normal is assumed to be unit length
-
-		const x = normal.x, y = normal.y, z = normal.z;
-
-		// band 0
-		shBasis[ 0 ] = 0.282095;
-
-		// band 1
-		shBasis[ 1 ] = 0.488603 * y;
-		shBasis[ 2 ] = 0.488603 * z;
-		shBasis[ 3 ] = 0.488603 * x;
-
-		// band 2
-		shBasis[ 4 ] = 1.092548 * x * y;
-		shBasis[ 5 ] = 1.092548 * y * z;
-		shBasis[ 6 ] = 0.315392 * ( 3 * z * z - 1 );
-		shBasis[ 7 ] = 1.092548 * x * z;
-		shBasis[ 8 ] = 0.546274 * ( x * x - y * y );
+		sh3GetBasisAt( normal, shBasis );
 
 	}
 

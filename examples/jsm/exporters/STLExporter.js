@@ -1,4 +1,12 @@
-import { Vector3 } from 'three';
+import {
+	vec3ApplyMatrix4,
+	vec3Copy,
+	vec3Create,
+	vec3Cross,
+	vec3FromBufferAttribute,
+	vec3Normalize,
+	vec3SubVectors
+} from 'three';
 
 /**
  * An exporter for STL.
@@ -76,12 +84,12 @@ class STLExporter {
 
 		}
 
-		const vA = new Vector3();
-		const vB = new Vector3();
-		const vC = new Vector3();
-		const cb = new Vector3();
-		const ab = new Vector3();
-		const normal = new Vector3();
+		const vA = vec3Create();
+		const vB = vec3Create();
+		const vC = vec3Create();
+		const cb = vec3Create();
+		const ab = vec3Create();
+		const normal = vec3Create();
 
 		for ( let i = 0, il = objects.length; i < il; i ++ ) {
 
@@ -133,9 +141,9 @@ class STLExporter {
 
 		function writeFace( a, b, c, positionAttribute, object ) {
 
-			vA.fromBufferAttribute( positionAttribute, a );
-			vB.fromBufferAttribute( positionAttribute, b );
-			vC.fromBufferAttribute( positionAttribute, c );
+			vec3FromBufferAttribute( positionAttribute, a, vA );
+			vec3FromBufferAttribute( positionAttribute, b, vB );
+			vec3FromBufferAttribute( positionAttribute, c, vC );
 
 			if ( object.isSkinnedMesh === true ) {
 
@@ -145,9 +153,9 @@ class STLExporter {
 
 			}
 
-			vA.applyMatrix4( object.matrixWorld );
-			vB.applyMatrix4( object.matrixWorld );
-			vC.applyMatrix4( object.matrixWorld );
+			vec3ApplyMatrix4( vA, object.matrixWorld, vA );
+			vec3ApplyMatrix4( vB, object.matrixWorld, vB );
+			vec3ApplyMatrix4( vC, object.matrixWorld, vC );
 
 			writeNormal( vA, vB, vC );
 
@@ -170,11 +178,13 @@ class STLExporter {
 
 		function writeNormal( vA, vB, vC ) {
 
-			cb.subVectors( vC, vB );
-			ab.subVectors( vA, vB );
-			cb.cross( ab ).normalize();
+			vec3SubVectors( vC, vB, cb );
+			vec3SubVectors( vA, vB, ab );
+			vec3Cross( cb, ab, cb );
+			vec3Normalize( cb, cb );
 
-			normal.copy( cb ).normalize();
+			vec3Copy( cb, normal );
+			vec3Normalize( normal, normal );
 
 			if ( binary === true ) {
 

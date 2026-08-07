@@ -1,13 +1,18 @@
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { DEG2RAD } from '../math/MathUtils.js';
-import { Triangle } from '../math/Triangle.js';
-import { Vector3 } from '../math/Vector3.js';
+import { triangleCreate, triangleGetNormal } from '../math/TriangleFunctions.js';
+import {
+	vec3Copy,
+	vec3Create,
+	vec3Dot,
+	vec3FromBufferAttribute
+} from '../math/Vector3Functions.js';
 
-const _v0 = /*@__PURE__*/ new Vector3();
-const _v1 = /*@__PURE__*/ new Vector3();
-const _normal = /*@__PURE__*/ new Vector3();
-const _triangle = /*@__PURE__*/ new Triangle();
+const _v0 = /*@__PURE__*/ vec3Create();
+const _v1 = /*@__PURE__*/ vec3Create();
+const _normal = /*@__PURE__*/ vec3Create();
+const _triangle = /*@__PURE__*/ triangleCreate();
 
 /**
  * Can be used as a helper object to view the edges of a geometry.
@@ -83,10 +88,10 @@ class EdgesGeometry extends BufferGeometry {
 				}
 
 				const { a, b, c } = _triangle;
-				a.fromBufferAttribute( positionAttr, indexArr[ 0 ] );
-				b.fromBufferAttribute( positionAttr, indexArr[ 1 ] );
-				c.fromBufferAttribute( positionAttr, indexArr[ 2 ] );
-				_triangle.getNormal( _normal );
+				vec3FromBufferAttribute( positionAttr, indexArr[ 0 ], a );
+				vec3FromBufferAttribute( positionAttr, indexArr[ 1 ], b );
+				vec3FromBufferAttribute( positionAttr, indexArr[ 2 ], c );
+				triangleGetNormal( a, b, c, _normal );
 
 				// create hashes for the edge from the vertices
 				hashes[ 0 ] = `${ Math.round( a.x * precision ) },${ Math.round( a.y * precision ) },${ Math.round( a.z * precision ) }`;
@@ -117,7 +122,7 @@ class EdgesGeometry extends BufferGeometry {
 
 						// if we found a sibling edge add it into the vertex array if
 						// it meets the angle threshold and delete the edge from the map.
-						if ( _normal.dot( edgeData[ reverseHash ].normal ) <= thresholdDot ) {
+						if ( vec3Dot( _normal, edgeData[ reverseHash ].normal ) <= thresholdDot ) {
 
 							vertices.push( v0.x, v0.y, v0.z );
 							vertices.push( v1.x, v1.y, v1.z );
@@ -133,7 +138,7 @@ class EdgesGeometry extends BufferGeometry {
 
 							index0: indexArr[ j ],
 							index1: indexArr[ jNext ],
-							normal: _normal.clone(),
+							normal: vec3Copy( _normal ),
 
 						};
 
@@ -149,8 +154,8 @@ class EdgesGeometry extends BufferGeometry {
 				if ( edgeData[ key ] ) {
 
 					const { index0, index1 } = edgeData[ key ];
-					_v0.fromBufferAttribute( positionAttr, index0 );
-					_v1.fromBufferAttribute( positionAttr, index1 );
+					vec3FromBufferAttribute( positionAttr, index0, _v0 );
+					vec3FromBufferAttribute( positionAttr, index1, _v1 );
 
 					vertices.push( _v0.x, _v0.y, _v0.z );
 					vertices.push( _v1.x, _v1.y, _v1.z );

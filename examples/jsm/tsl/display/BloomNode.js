@@ -1,11 +1,11 @@
-import { HalfFloatType, RenderTarget, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, NodeUpdateType } from 'three/webgpu';
+import { HalfFloatType, RenderTarget, TempNode, QuadMesh, NodeMaterial, RendererUtils, NodeUpdateType, vec2Create, vec2Set, vec3Create, vec3Set } from 'three/webgpu';
 import { nodeObject, Fn, float, uv, passTexture, uniform, Loop, texture, luminance, smoothstep, mix, vec4, uniformArray, add, int, array, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _size = /*@__PURE__*/ new Vector2();
+const _size = /*@__PURE__*/ vec2Create();
 
-const _BlurDirectionX = /*@__PURE__*/ new Vector2( 1.0, 0.0 );
-const _BlurDirectionY = /*@__PURE__*/ new Vector2( 0.0, 1.0 );
+const _BlurDirectionX = /*@__PURE__*/ vec2Create( 1.0, 0.0 );
+const _BlurDirectionY = /*@__PURE__*/ vec2Create( 0.0, 1.0 );
 
 let _rendererState;
 
@@ -113,7 +113,7 @@ class BloomNode extends TempNode {
 		 *
 		 * @type {Array<Vector3>}
 		 */
-		this.bloomTintColors = [ new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ) ];
+		this.bloomTintColors = [ vec3Set( vec3Create(), 1, 1, 1 ), vec3Set( vec3Create(), 1, 1, 1 ), vec3Set( vec3Create(), 1, 1, 1 ), vec3Set( vec3Create(), 1, 1, 1 ), vec3Set( vec3Create(), 1, 1, 1 ) ];
 
 		/**
 		 * Scale factor for the internal render targets.
@@ -331,7 +331,7 @@ class BloomNode extends TempNode {
 			this._renderTargetsHorizontal[ i ].setSize( resx, resy );
 			this._renderTargetsVertical[ i ].setSize( resx, resy );
 
-			this._separableBlurMaterials[ i ].invSize.value.set( 1 / resx, 1 / resy );
+			vec2Set( 1 / resx, 1 / resy, this._separableBlurMaterials[ i ].invSize.value );
 
 			resx = Math.floor( resx / 2 );
 			resy = Math.floor( resy / 2 );
@@ -354,7 +354,7 @@ class BloomNode extends TempNode {
 		//
 
 		const size = renderer.getDrawingBufferSize( _size );
-		this.setSize( size.width, size.height );
+		this.setSize( size.x, size.y );
 
 		// 1. Extract bright areas
 
@@ -433,7 +433,7 @@ class BloomNode extends TempNode {
 		// composite material
 
 		const bloomFactors = array( [ 1.0, 0.8, 0.6, 0.4, 0.2 ] );
-		const bloomTintColors = uniformArray( this.bloomTintColors );
+		const bloomTintColors = uniformArray( this.bloomTintColors, 'vec3' );
 
 		const compositePass = Fn( () => {
 
@@ -533,8 +533,8 @@ class BloomNode extends TempNode {
 		const colorTexture = texture( null );
 		const gaussianOffsets = array( offsets );
 		const gaussianWeights = array( weights );
-		const invSize = uniform( new Vector2() );
-		const direction = uniform( new Vector2( 0.5, 0.5 ) );
+		const invSize = uniform( vec2Create(), 'vec2' );
+		const direction = uniform( vec2Create( 0.5, 0.5 ), 'vec2' );
 
 		const uvNode = uv();
 		const sampleTexel = ( uv ) => colorTexture.sample( uv );

@@ -1,6 +1,6 @@
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
-import { Vector3 } from '../math/Vector3.js';
+import { vec3Create, vec3Normalize } from '../math/Vector3Functions.js';
 
 /**
  * A class for generating a sphere geometry.
@@ -59,8 +59,8 @@ class SphereGeometry extends BufferGeometry {
 		let index = 0;
 		const grid = [];
 
-		const vertex = new Vector3();
-		const normal = new Vector3();
+		const vertex = vec3Create();
+		const normal = vec3Create();
 
 		// buffers
 
@@ -110,7 +110,7 @@ class SphereGeometry extends BufferGeometry {
 
 				// normal
 
-				normal.copy( vertex ).normalize();
+				vec3Normalize( vertex, normal );
 				normals.push( normal.x, normal.y, normal.z );
 
 				// uv

@@ -1,6 +1,7 @@
 import {
 	BufferGeometry,
-	Color,
+	colorCreate,
+	colorSetRGB,
 	FileLoader,
 	Float32BufferAttribute,
 	Int32BufferAttribute,
@@ -377,7 +378,7 @@ class PCDLoader extends Loader {
 		const intensity = [];
 		const label = [];
 
-		const c = new Color();
+		const c = colorCreate();
 
 		// ascii
 
@@ -424,7 +425,7 @@ class PCDLoader extends Loader {
 					const g = ( ( rgb >> 8 ) & 0x0000ff ) / 255;
 					const b = ( ( rgb >> 0 ) & 0x0000ff ) / 255;
 
-					c.setRGB( r, g, b, SRGBColorSpace );
+					colorSetRGB( r, g, b, SRGBColorSpace, c );
 
 					color.push( c.r, c.g, c.b );
 
@@ -491,7 +492,7 @@ class PCDLoader extends Loader {
 					const g = dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ rgbIndex ] * i + 1 ) / 255.0;
 					const b = dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ rgbIndex ] * i + 0 ) / 255.0;
 
-					c.setRGB( r, g, b, SRGBColorSpace );
+					colorSetRGB( r, g, b, SRGBColorSpace, c );
 
 					color.push( c.r, c.g, c.b );
 
@@ -552,7 +553,7 @@ class PCDLoader extends Loader {
 					const g = dataview.getUint8( row + offset.rgb + 1 ) / 255.0;
 					const b = dataview.getUint8( row + offset.rgb + 0 ) / 255.0;
 
-					c.setRGB( r, g, b, SRGBColorSpace );
+					colorSetRGB( r, g, b, SRGBColorSpace, c );
 
 					color.push( c.r, c.g, c.b );
 

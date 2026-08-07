@@ -1,9 +1,36 @@
+import {
+	box2ClampPoint,
+	box2ContainsBox,
+	box2ContainsPoint,
+	box2Copy,
+	box2DistanceToPoint,
+	box2Equals,
+	box2ExpandByPoint,
+	box2ExpandByScalar,
+	box2ExpandByVector,
+	box2GetCenter,
+	box2GetParameter,
+	box2GetSize,
+	box2Intersect,
+	box2IntersectsBox,
+	box2IsEmpty,
+	box2MakeEmpty,
+	box2Set,
+	box2SetFromCenterAndSize,
+	box2SetFromPoints,
+	box2Translate,
+	box2Union
+} from './Box2Functions.js';
 import { Vector2 } from './Vector2.js';
-
-const _vector = /*@__PURE__*/ new Vector2();
 
 /**
  * Represents an axis-aligned bounding box (AABB) in 2D space.
+ *
+ * `Box2` is a thin, backwards-compatible wrapper around the standalone,
+ * tree-shakeable `box2*` functions in {@link Box2Functions}, which operate
+ * on any {@link Box2Like} object. Prefer importing those functions
+ * directly if you only need a handful of operations and want unused ones
+ * eliminated from your bundle.
  */
 class Box2 {
 
@@ -50,10 +77,7 @@ class Box2 {
 	 */
 	set( min, max ) {
 
-		this.min.copy( min );
-		this.max.copy( max );
-
-		return this;
+		return box2Set( min, max, this );
 
 	}
 
@@ -66,15 +90,7 @@ class Box2 {
 	 */
 	setFromPoints( points ) {
 
-		this.makeEmpty();
-
-		for ( let i = 0, il = points.length; i < il; i ++ ) {
-
-			this.expandByPoint( points[ i ] );
-
-		}
-
-		return this;
+		return box2SetFromPoints( points, this );
 
 	}
 
@@ -88,11 +104,7 @@ class Box2 {
 	 */
 	setFromCenterAndSize( center, size ) {
 
-		const halfSize = _vector.copy( size ).multiplyScalar( 0.5 );
-		this.min.copy( center ).sub( halfSize );
-		this.max.copy( center ).add( halfSize );
-
-		return this;
+		return box2SetFromCenterAndSize( center, size, this );
 
 	}
 
@@ -115,10 +127,7 @@ class Box2 {
 	 */
 	copy( box ) {
 
-		this.min.copy( box.min );
-		this.max.copy( box.max );
-
-		return this;
+		return box2Copy( box, this );
 
 	}
 
@@ -129,10 +138,7 @@ class Box2 {
 	 */
 	makeEmpty() {
 
-		this.min.x = this.min.y = + Infinity;
-		this.max.x = this.max.y = - Infinity;
-
-		return this;
+		return box2MakeEmpty( this );
 
 	}
 
@@ -145,9 +151,7 @@ class Box2 {
 	 */
 	isEmpty() {
 
-		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
-
-		return ( this.max.x < this.min.x ) || ( this.max.y < this.min.y );
+		return box2IsEmpty( this );
 
 	}
 
@@ -159,7 +163,7 @@ class Box2 {
 	 */
 	getCenter( target ) {
 
-		return this.isEmpty() ? target.set( 0, 0 ) : target.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
+		return box2GetCenter( this, target );
 
 	}
 
@@ -171,7 +175,7 @@ class Box2 {
 	 */
 	getSize( target ) {
 
-		return this.isEmpty() ? target.set( 0, 0 ) : target.subVectors( this.max, this.min );
+		return box2GetSize( this, target );
 
 	}
 
@@ -183,10 +187,7 @@ class Box2 {
 	 */
 	expandByPoint( point ) {
 
-		this.min.min( point );
-		this.max.max( point );
-
-		return this;
+		return box2ExpandByPoint( this, point, this );
 
 	}
 
@@ -201,10 +202,7 @@ class Box2 {
 	 */
 	expandByVector( vector ) {
 
-		this.min.sub( vector );
-		this.max.add( vector );
-
-		return this;
+		return box2ExpandByVector( this, vector, this );
 
 	}
 
@@ -217,10 +215,7 @@ class Box2 {
 	 */
 	expandByScalar( scalar ) {
 
-		this.min.addScalar( - scalar );
-		this.max.addScalar( scalar );
-
-		return this;
+		return box2ExpandByScalar( this, scalar, this );
 
 	}
 
@@ -232,8 +227,7 @@ class Box2 {
 	 */
 	containsPoint( point ) {
 
-		return point.x >= this.min.x && point.x <= this.max.x &&
-			point.y >= this.min.y && point.y <= this.max.y;
+		return box2ContainsPoint( this, point );
 
 	}
 
@@ -246,8 +240,7 @@ class Box2 {
 	 */
 	containsBox( box ) {
 
-		return this.min.x <= box.min.x && box.max.x <= this.max.x &&
-			this.min.y <= box.min.y && box.max.y <= this.max.y;
+		return box2ContainsBox( this, box );
 
 	}
 
@@ -260,13 +253,7 @@ class Box2 {
 	 */
 	getParameter( point, target ) {
 
-		// This can potentially have a divide by zero if the box
-		// has a size dimension of 0.
-
-		return target.set(
-			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
-			( point.y - this.min.y ) / ( this.max.y - this.min.y )
-		);
+		return box2GetParameter( this, point, target );
 
 	}
 
@@ -278,10 +265,7 @@ class Box2 {
 	 */
 	intersectsBox( box ) {
 
-		// using 4 splitting planes to rule out intersections
-
-		return box.max.x >= this.min.x && box.min.x <= this.max.x &&
-			box.max.y >= this.min.y && box.min.y <= this.max.y;
+		return box2IntersectsBox( this, box );
 
 	}
 
@@ -294,7 +278,7 @@ class Box2 {
 	 */
 	clampPoint( point, target ) {
 
-		return target.copy( point ).clamp( this.min, this.max );
+		return box2ClampPoint( this, point, target );
 
 	}
 
@@ -307,7 +291,7 @@ class Box2 {
 	 */
 	distanceToPoint( point ) {
 
-		return this.clampPoint( point, _vector ).distanceTo( point );
+		return box2DistanceToPoint( this, point );
 
 	}
 
@@ -322,12 +306,7 @@ class Box2 {
 	 */
 	intersect( box ) {
 
-		this.min.max( box.min );
-		this.max.min( box.max );
-
-		if ( this.isEmpty() ) this.makeEmpty();
-
-		return this;
+		return box2Intersect( this, box, this );
 
 	}
 
@@ -341,10 +320,7 @@ class Box2 {
 	 */
 	union( box ) {
 
-		this.min.min( box.min );
-		this.max.max( box.max );
-
-		return this;
+		return box2Union( this, box, this );
 
 	}
 
@@ -357,10 +333,7 @@ class Box2 {
 	 */
 	translate( offset ) {
 
-		this.min.add( offset );
-		this.max.add( offset );
-
-		return this;
+		return box2Translate( this, offset, this );
 
 	}
 
@@ -372,7 +345,7 @@ class Box2 {
 	 */
 	equals( box ) {
 
-		return box.min.equals( this.min ) && box.max.equals( this.max );
+		return box2Equals( this, box );
 
 	}
 

@@ -4,7 +4,6 @@ import {
 	Bone,
 	BufferGeometry,
 	ClampToEdgeWrapping,
-	Color,
 	ColorManagement,
 	DirectionalLight,
 	DoubleSide,
@@ -18,7 +17,6 @@ import {
 	LineSegments,
 	Loader,
 	MathUtils,
-	Matrix4,
 	Mesh,
 	MeshBasicMaterial,
 	MeshLambertMaterial,
@@ -26,18 +24,43 @@ import {
 	OrthographicCamera,
 	PerspectiveCamera,
 	PointLight,
-	Quaternion,
 	QuaternionKeyframeTrack,
 	RepeatWrapping,
 	Skeleton,
 	SkinnedMesh,
 	SpotLight,
-	Triangle,
 	Vector2,
-	Vector3,
 	VectorKeyframeTrack,
 	SRGBColorSpace,
-	ShapeUtils
+	ShapeUtils,
+	colorCreate,
+	colorCopy,
+	colorFromArray,
+	colorSetRGB,
+	mat4Create,
+	mat4FromArray,
+	mat4Transpose,
+	mat4Identity,
+	mat4Copy,
+	mat4Multiply,
+	mat4Decompose,
+	mat4MakeRotationAxis,
+	mat4MakeTranslation,
+	mat4Scale,
+	quatCreate,
+	quatIdentity,
+	quatSetFromAxisAngle,
+	quatMultiply,
+	quatCopy,
+	quatDot,
+	quatToArray,
+	triangleCreate,
+	triangleGetNormal,
+	vec2Create,
+	vec2Set,
+	vec3Create,
+	vec3Set,
+	vec3FromArray
 } from 'three';
 
 import { getElementsByTagName, parseFloats } from './ColladaParser.js';
@@ -54,15 +77,15 @@ class ColladaComposer {
 		this.textureLoader = textureLoader;
 		this.tgaLoader = tgaLoader;
 
-		this.tempColor = new Color();
+		this.tempColor = colorCreate();
 		this.animations = [];
 		this.kinematics = {};
 
 		// Reusable objects for animation
-		this.position = new Vector3();
-		this.scale = new Vector3();
-		this.quaternion = new Quaternion();
-		this.matrix = new Matrix4();
+		this.position = vec3Create();
+		this.scale = vec3Create();
+		this.quaternion = quatCreate();
+		this.matrix = mat4Create();
 
 		// Storage for deferred pivot animation data
 		// Nodes with pivot transforms need all their animation channels collected
@@ -308,7 +331,7 @@ class ColladaComposer {
 
 	buildMatrixTracks( object3D, channelData, nodeData, tracks ) {
 
-		const defaultMatrix = nodeData.matrix.clone().transpose();
+		const defaultMatrix = mat4Transpose( mat4Copy( nodeData.matrix ) );
 		const data = {};
 
 		for ( const member in channelData ) {
@@ -421,7 +444,7 @@ class ColladaComposer {
 				const info = nodeData.transformData[ transformSid ];
 				rotations.push( {
 					sid: transformSid,
-					axis: new Vector3( info.axis[ 0 ], info.axis[ 1 ], info.axis[ 2 ] ),
+					axis: vec3Set( vec3Create(), info.axis[ 0 ], info.axis[ 1 ], info.axis[ 2 ] ),
 					defaultAngle: info.angle
 				} );
 
@@ -429,16 +452,16 @@ class ColladaComposer {
 
 		}
 
-		const quaternion = new Quaternion();
-		const prevQuaternion = new Quaternion();
-		const tempQuat = new Quaternion();
+		const quaternion = quatCreate();
+		const prevQuaternion = quatCreate();
+		const tempQuat = quatCreate();
 		const values = [];
 		const interpolationInfo = this.getInterpolationInfo( channelData );
 
 		for ( let i = 0; i < times.length; i ++ ) {
 
 			const time = times[ i ];
-			quaternion.identity();
+			quatIdentity( quaternion );
 
 			for ( const rotation of rotations ) {
 
@@ -455,24 +478,24 @@ class ColladaComposer {
 				}
 
 				const angleRadians = MathUtils.degToRad( angleDegrees );
-				tempQuat.setFromAxisAngle( rotation.axis, angleRadians );
-				quaternion.multiply( tempQuat );
+				quatSetFromAxisAngle( rotation.axis, angleRadians, tempQuat );
+				quatMultiply( quaternion, tempQuat, quaternion );
 
 			}
 
 			// Ensure quaternion continuity
-			if ( i > 0 && prevQuaternion.dot( quaternion ) < 0 ) {
+			if ( i > 0 && quatDot( prevQuaternion, quaternion ) < 0 ) {
 
-				quaternion.x = - quaternion.x;
-				quaternion.y = - quaternion.y;
-				quaternion.z = - quaternion.z;
-				quaternion.w = - quaternion.w;
+				quaternion._x = - quaternion._x;
+				quaternion._y = - quaternion._y;
+				quaternion._z = - quaternion._z;
+				quaternion._w = - quaternion._w;
 
 			}
 
-			prevQuaternion.copy( quaternion );
+			quatCopy( quaternion, prevQuaternion );
 
-			values.push( quaternion.x, quaternion.y, quaternion.z, quaternion.w );
+			quatToArray( quaternion, values, values.length );
 
 		}
 
@@ -777,12 +800,12 @@ class ColladaComposer {
 			const time = keyframe.time;
 			const value = keyframe.value;
 
-			matrix.fromArray( value ).transpose();
-			matrix.decompose( position, quaternion, scale );
+			mat4Transpose( mat4FromArray( value, 0, matrix ), matrix );
+			mat4Decompose( matrix, position, quaternion, scale );
 
 			times.push( time );
 			positionData.push( position.x, position.y, position.z );
-			quaternionData.push( quaternion.x, quaternion.y, quaternion.z, quaternion.w );
+			quatToArray( quaternion, quaternionData, quaternionData.length );
 			scaleData.push( scale.x, scale.y, scale.z );
 
 		}
@@ -1060,11 +1083,11 @@ class ColladaComposer {
 
 		if ( data.bindShapeMatrix ) {
 
-			build.bindMatrix = new Matrix4().fromArray( data.bindShapeMatrix ).transpose();
+			build.bindMatrix = mat4Transpose( mat4FromArray( data.bindShapeMatrix ) );
 
 		} else {
 
-			build.bindMatrix = new Matrix4().identity();
+			build.bindMatrix = mat4Identity();
 
 		}
 
@@ -1073,7 +1096,7 @@ class ColladaComposer {
 		for ( i = 0, l = jointSource.array.length; i < l; i ++ ) {
 
 			const name = jointSource.array[ i ];
-			const boneInverse = new Matrix4().fromArray( inverseSource.array, i * inverseSource.stride ).transpose();
+			const boneInverse = mat4Transpose( mat4FromArray( inverseSource.array, i * inverseSource.stride ) );
 
 			build.joints.push( { name: name, boneInverse: boneInverse } );
 
@@ -1224,8 +1247,8 @@ class ColladaComposer {
 						texture.wrapS = technique.wrapU ? RepeatWrapping : ClampToEdgeWrapping;
 						texture.wrapT = technique.wrapV ? RepeatWrapping : ClampToEdgeWrapping;
 
-						texture.offset.set( technique.offsetU || 0, technique.offsetV || 0 );
-						texture.repeat.set( technique.repeatU || 1, technique.repeatV || 1 );
+						vec2Set( technique.offsetU || 0, technique.offsetV || 0, texture.offset );
+						vec2Set( technique.repeatU || 1, technique.repeatV || 1, texture.repeat );
 
 					} else {
 
@@ -1269,11 +1292,11 @@ class ColladaComposer {
 			switch ( key ) {
 
 				case 'diffuse':
-					if ( parameter.color ) material.color.fromArray( parameter.color );
+					if ( parameter.color ) colorFromArray( parameter.color, 0, material.color );
 					if ( parameter.texture ) material.map = getTexture( parameter.texture, SRGBColorSpace );
 					break;
 				case 'specular':
-					if ( parameter.color && material.specular ) material.specular.fromArray( parameter.color );
+					if ( parameter.color && material.specular ) colorFromArray( parameter.color, 0, material.specular );
 					if ( parameter.texture ) material.specularMap = getTexture( parameter.texture );
 					break;
 				case 'bump':
@@ -1286,7 +1309,7 @@ class ColladaComposer {
 					if ( parameter.float && material.shininess ) material.shininess = parameter.float;
 					break;
 				case 'emission':
-					if ( parameter.color && material.emissive ) material.emissive.fromArray( parameter.color );
+					if ( parameter.color && material.emissive ) colorFromArray( parameter.color, 0, material.emissive );
 					if ( parameter.texture ) material.emissiveMap = getTexture( parameter.texture, SRGBColorSpace );
 					break;
 
@@ -1489,7 +1512,7 @@ class ColladaComposer {
 
 		}
 
-		if ( data.parameters.color ) light.color.copy( data.parameters.color );
+		if ( data.parameters.color ) colorCopy( data.parameters.color, light.color );
 		if ( data.parameters.distance ) light.distance = data.parameters.distance;
 		if ( data.parameters.falloffAngle ) light.angle = MathUtils.degToRad( data.parameters.falloffAngle );
 
@@ -1813,12 +1836,7 @@ class ColladaComposer {
 
 				// convert the vertex colors from srgb to linear if present
 				const startIndex = array.length - sourceStride - 1;
-				tempColor.setRGB(
-					array[ startIndex + 0 ],
-					array[ startIndex + 1 ],
-					array[ startIndex + 2 ],
-					SRGBColorSpace
-				);
+				colorSetRGB( array[ startIndex + 0 ], array[ startIndex + 1 ], array[ startIndex + 2 ], SRGBColorSpace, tempColor );
 
 				array[ startIndex + 0 ] = tempColor.r;
 				array[ startIndex + 1 ] = tempColor.g;
@@ -1872,19 +1890,19 @@ class ColladaComposer {
 						const y = sourceArray[ positionIndex + 1 ];
 						const z = sourceArray[ positionIndex + 2 ];
 
-						vertices.push( new Vector3( x, y, z ) );
+						vertices.push( vec3Set( vec3Create(), x, y, z ) );
 
 					}
 
 					// determine surface normal
 
-					const normal = new Vector3();
-					const _triangle = new Triangle();
+					const normal = vec3Create();
+					const _triangle = triangleCreate();
 
 					_triangle.a = vertices[ 0 ];
 					_triangle.b = vertices[ 1 ];
 					_triangle.c = vertices[ 2 ];
-					_triangle.getNormal( normal );
+					triangleGetNormal( _triangle.a, _triangle.b, _triangle.c, normal );
 
 					// project to 2D and triangulate
 
@@ -1894,7 +1912,7 @@ class ColladaComposer {
 
 						for ( let k = 0; k < count; k ++ ) {
 
-							vertices2D.push( new Vector2( vertices[ k ].y, vertices[ k ].z ) );
+							vertices2D.push( vec2Create( vertices[ k ].y, vertices[ k ].z ) );
 
 						}
 
@@ -1902,7 +1920,7 @@ class ColladaComposer {
 
 						for ( let k = 0; k < count; k ++ ) {
 
-							vertices2D.push( new Vector2( vertices[ k ].x, vertices[ k ].z ) );
+							vertices2D.push( vec2Create( vertices[ k ].x, vertices[ k ].z ) );
 
 						}
 
@@ -1910,7 +1928,7 @@ class ColladaComposer {
 
 						for ( let k = 0; k < count; k ++ ) {
 
-							vertices2D.push( new Vector2( vertices[ k ].x, vertices[ k ].y ) );
+							vertices2D.push( vec2Create( vertices[ k ].x, vertices[ k ].y ) );
 
 						}
 
@@ -2075,7 +2093,7 @@ class ColladaComposer {
 
 		}
 
-		const m0 = new Matrix4();
+		const m0 = mat4Create();
 		const matrix = this.matrix;
 
 		this.kinematics = {
@@ -2120,7 +2138,7 @@ class ColladaComposer {
 						const axis = joint.axis;
 						const transforms = jointData.transforms;
 
-						matrix.identity();
+						mat4Identity( matrix );
 
 						// each update, we have to apply all transforms in the correct order
 
@@ -2135,11 +2153,11 @@ class ColladaComposer {
 								switch ( joint.type ) {
 
 									case 'revolute':
-										matrix.multiply( m0.makeRotationAxis( axis, MathUtils.degToRad( value ) ) );
+										mat4Multiply( matrix, mat4MakeRotationAxis( axis, MathUtils.degToRad( value ), m0 ), matrix );
 										break;
 
 									case 'prismatic':
-										matrix.multiply( m0.makeTranslation( axis.x * value, axis.y * value, axis.z * value ) );
+										mat4Multiply( matrix, mat4MakeTranslation( axis.x * value, axis.y * value, axis.z * value, m0 ), matrix );
 										break;
 
 									default:
@@ -2153,19 +2171,19 @@ class ColladaComposer {
 								switch ( transform.type ) {
 
 									case 'matrix':
-										matrix.multiply( transform.obj );
+										mat4Multiply( matrix, transform.obj, matrix );
 										break;
 
 									case 'translate':
-										matrix.multiply( m0.makeTranslation( transform.obj.x, transform.obj.y, transform.obj.z ) );
+										mat4Multiply( matrix, mat4MakeTranslation( transform.obj.x, transform.obj.y, transform.obj.z, m0 ), matrix );
 										break;
 
 									case 'scale':
-										matrix.scale( transform.obj );
+										mat4Scale( matrix, transform.obj, matrix );
 										break;
 
 									case 'rotate':
-										matrix.multiply( m0.makeRotationAxis( transform.obj, transform.angle ) );
+										mat4Multiply( matrix, mat4MakeRotationAxis( transform.obj, transform.angle, m0 ), matrix );
 										break;
 
 								}
@@ -2174,8 +2192,8 @@ class ColladaComposer {
 
 						}
 
-						object.matrix.copy( matrix );
-						object.matrix.decompose( object.position, object.quaternion, object.scale );
+						mat4Copy( matrix, object.matrix );
+						mat4Decompose( object.matrix, object.position, object.quaternion, object.scale );
 
 						jointMap[ jointIndex ].position = value;
 
@@ -2211,7 +2229,7 @@ class ColladaComposer {
 
 				case 'matrix':
 					array = parseFloats( child.textContent );
-					const matrix = new Matrix4().fromArray( array ).transpose();
+					const matrix = mat4Transpose( mat4FromArray( array ) );
 					transforms.push( {
 						sid: child.getAttribute( 'sid' ),
 						type: child.nodeName,
@@ -2222,7 +2240,7 @@ class ColladaComposer {
 				case 'translate':
 				case 'scale':
 					array = parseFloats( child.textContent );
-					vector = new Vector3().fromArray( array );
+					vector = vec3FromArray( array );
 					transforms.push( {
 						sid: child.getAttribute( 'sid' ),
 						type: child.nodeName,
@@ -2232,7 +2250,7 @@ class ColladaComposer {
 
 				case 'rotate':
 					array = parseFloats( child.textContent );
-					vector = new Vector3().fromArray( array );
+					vector = vec3FromArray( array );
 					const angle = MathUtils.degToRad( array[ 3 ] );
 					transforms.push( {
 						sid: child.getAttribute( 'sid' ),
@@ -2386,7 +2404,7 @@ class ColladaComposer {
 					// and weights defined for it. But we still have to add the bone to the sorted bone list in order to
 					// ensure a correct animation of the model.
 
-					boneInverse = new Matrix4();
+					boneInverse = mat4Create();
 
 				}
 
@@ -2532,8 +2550,8 @@ class ColladaComposer {
 
 		}
 
-		object.matrix.copy( matrix );
-		object.matrix.decompose( object.position, object.quaternion, object.scale );
+		mat4Copy( matrix, object.matrix );
+		mat4Decompose( object.matrix, object.position, object.quaternion, object.scale );
 
 		return object;
 
@@ -2563,27 +2581,27 @@ class ColladaComposer {
 			switch ( info.type ) {
 
 				case 'translate':
-					transformNode.position.set( info.x, info.y, info.z );
+					vec3Set( transformNode.position, info.x, info.y, info.z );
 					break;
 
 				case 'rotate': {
 
-					const axis = new Vector3( info.axis[ 0 ], info.axis[ 1 ], info.axis[ 2 ] );
+					const axis = vec3Set( vec3Create(), info.axis[ 0 ], info.axis[ 1 ], info.axis[ 2 ] );
 					const angle = MathUtils.degToRad( info.angle );
-					transformNode.quaternion.setFromAxisAngle( axis, angle );
+					quatSetFromAxisAngle( axis, angle, transformNode.quaternion );
 					transformNode.userData.rotationAxis = axis;
 					break;
 
 				}
 
 				case 'scale':
-					transformNode.scale.set( info.x, info.y, info.z );
+					vec3Set( transformNode.scale, info.x, info.y, info.z );
 					break;
 
 				case 'matrix': {
 
-					const matrix = new Matrix4().fromArray( info.array ).transpose();
-					matrix.decompose( transformNode.position, transformNode.quaternion, transformNode.scale );
+					const matrix = mat4Transpose( mat4FromArray( info.array ) );
+					mat4Decompose( matrix, transformNode.position, transformNode.quaternion, transformNode.scale );
 					break;
 
 				}
@@ -2683,7 +2701,7 @@ class ColladaComposer {
 
 						// copy compatible properties
 
-						lineMaterial.color.copy( material.color );
+						colorCopy( material.color, lineMaterial.color );
 						lineMaterial.opacity = material.opacity;
 						lineMaterial.transparent = material.transparent;
 
@@ -2952,10 +2970,10 @@ class ColladaComposer {
 		if ( times.length === 0 ) return;
 
 		const axis = transformNode.userData.rotationAxis ||
-			new Vector3( transformInfo.axis[ 0 ], transformInfo.axis[ 1 ], transformInfo.axis[ 2 ] );
+			vec3Set( vec3Create(), transformInfo.axis[ 0 ], transformInfo.axis[ 1 ], transformInfo.axis[ 2 ] );
 
-		const quaternion = new Quaternion();
-		const prevQuaternion = new Quaternion();
+		const quaternion = quatCreate();
+		const prevQuaternion = quatCreate();
 		const values = [];
 
 		const interpolationInfo = this.getInterpolationInfo( channelData );
@@ -2966,20 +2984,20 @@ class ColladaComposer {
 			const angleDegrees = this.getValueAtTime( angleData, time, transformInfo.angle );
 			const angleRadians = MathUtils.degToRad( angleDegrees );
 
-			quaternion.setFromAxisAngle( axis, angleRadians );
+			quatSetFromAxisAngle( axis, angleRadians, quaternion );
 
 			// Ensure quaternion continuity
-			if ( i > 0 && prevQuaternion.dot( quaternion ) < 0 ) {
+			if ( i > 0 && quatDot( prevQuaternion, quaternion ) < 0 ) {
 
-				quaternion.x = - quaternion.x;
-				quaternion.y = - quaternion.y;
-				quaternion.z = - quaternion.z;
-				quaternion.w = - quaternion.w;
+				quaternion._x = - quaternion._x;
+				quaternion._y = - quaternion._y;
+				quaternion._z = - quaternion._z;
+				quaternion._w = - quaternion._w;
 
 			}
 
-			prevQuaternion.copy( quaternion );
-			values.push( quaternion.x, quaternion.y, quaternion.z, quaternion.w );
+			quatCopy( quaternion, prevQuaternion );
+			quatToArray( quaternion, values, values.length );
 
 		}
 

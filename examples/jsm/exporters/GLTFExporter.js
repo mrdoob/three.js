@@ -1,7 +1,6 @@
 import {
 	BufferAttribute,
 	ClampToEdgeWrapping,
-	Color,
 	DoubleSide,
 	InterpolateDiscrete,
 	InterpolateLinear,
@@ -10,7 +9,6 @@ import {
 	LinearMipmapLinearFilter,
 	LinearMipmapNearestFilter,
 	MathUtils,
-	Matrix4,
 	MirroredRepeatWrapping,
 	NearestFilter,
 	NearestMipmapLinearFilter,
@@ -22,10 +20,25 @@ import {
 	Source,
 	SRGBColorSpace,
 	CompressedTexture,
-	Vector3,
-	Quaternion,
 	REVISION,
-	ImageUtils
+	ImageUtils,
+	colorCreate,
+	colorEquals,
+	colorToArray,
+	mat4Copy,
+	mat4Create,
+	mat4Decompose,
+	mat4Multiply,
+	mat4ToArray,
+	quatCreate,
+	quatToArray,
+	vec2ToArray,
+	vec3Create,
+	vec3FromBufferAttribute,
+	vec3Length,
+	vec3Normalize,
+	vec3SetX,
+	vec3ToArray
 } from 'three';
 
 /**
@@ -363,7 +376,7 @@ const PATH_PROPERTIES = {
 	morphTargetInfluences: 'weights'
 };
 
-const DEFAULT_SPECULAR_COLOR = new Color();
+const DEFAULT_SPECULAR_COLOR = colorCreate();
 
 // GLB constants
 // https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
@@ -415,7 +428,7 @@ function stringToArrayBuffer( text ) {
  * Is identity matrix
  *
  * @private
- * @param {Matrix4} matrix
+ * @param {Matrix4Like} matrix
  * @returns {boolean} Returns true, if parameter is identity matrix
  */
 function isIdentityMatrix( matrix ) {
@@ -844,12 +857,12 @@ class GLTFWriter {
 
 		if ( cache.attributesNormalized.has( normal ) ) return false;
 
-		const v = new Vector3();
+		const v = vec3Create();
 
 		for ( let i = 0, il = normal.count; i < il; i ++ ) {
 
 			// 0.0005 is from glTF-validator
-			if ( Math.abs( v.fromBufferAttribute( normal, i ).length() - 1.0 ) > 0.0005 ) return false;
+			if ( Math.abs( vec3Length( vec3FromBufferAttribute( normal, i, v ) ) - 1.0 ) > 0.0005 ) return false;
 
 		}
 
@@ -871,20 +884,20 @@ class GLTFWriter {
 		if ( cache.attributesNormalized.has( normal ) )	return cache.attributesNormalized.get( normal );
 
 		const attribute = normal.clone();
-		const v = new Vector3();
+		const v = vec3Create();
 
 		for ( let i = 0, il = attribute.count; i < il; i ++ ) {
 
-			v.fromBufferAttribute( attribute, i );
+			vec3FromBufferAttribute( attribute, i, v );
 
 			if ( v.x === 0 && v.y === 0 && v.z === 0 ) {
 
 				// if values can't be normalized set (1, 0, 0)
-				v.setX( 1.0 );
+				vec3SetX( v, 1.0 );
 
 			} else {
 
-				v.normalize();
+				vec3Normalize( v, v );
 
 			}
 
@@ -912,7 +925,7 @@ class GLTFWriter {
 
 		if ( texture.offset.x !== 0 || texture.offset.y !== 0 ) {
 
-			transformDef.offset = texture.offset.toArray();
+			transformDef.offset = vec2ToArray( texture.offset );
 			didTransform = true;
 
 		}
@@ -926,7 +939,7 @@ class GLTFWriter {
 
 		if ( texture.repeat.x !== 1 || texture.repeat.y !== 1 ) {
 
-			transformDef.scale = texture.repeat.toArray();
+			transformDef.scale = vec2ToArray( texture.repeat );
 			didTransform = true;
 
 		}
@@ -1664,7 +1677,7 @@ class GLTFWriter {
 		}
 
 		// pbrMetallicRoughness.baseColorFactor
-		const color = material.color.toArray().concat( [ material.opacity ] );
+		const color = colorToArray( material.color ).concat( [ material.opacity ] );
 
 		if ( ! equalArray( color, [ 1, 1, 1, 1 ] ) ) {
 
@@ -1717,7 +1730,7 @@ class GLTFWriter {
 
 			if ( maxEmissiveComponent > 0 ) {
 
-				materialDef.emissiveFactor = material.emissive.toArray();
+				materialDef.emissiveFactor = colorToArray( material.emissive );
 
 			}
 
@@ -2426,13 +2439,14 @@ class GLTFWriter {
 
 		const joints = [];
 		const inverseBindMatrices = new Float32Array( skeleton.bones.length * 16 );
-		const temporaryBoneInverse = new Matrix4();
+		const temporaryBoneInverse = mat4Create();
 
 		for ( let i = 0; i < skeleton.bones.length; ++ i ) {
 
 			joints.push( nodeMap.get( skeleton.bones[ i ] ) );
-			temporaryBoneInverse.copy( skeleton.boneInverses[ i ] );
-			temporaryBoneInverse.multiply( object.bindMatrix ).toArray( inverseBindMatrices, i * 16 );
+			mat4Copy( skeleton.boneInverses[ i ], temporaryBoneInverse );
+			mat4Multiply( temporaryBoneInverse, object.bindMatrix, temporaryBoneInverse );
+			mat4ToArray( temporaryBoneInverse, inverseBindMatrices, i * 16 );
 
 		}
 
@@ -2474,9 +2488,9 @@ class GLTFWriter {
 
 		if ( options.trs ) {
 
-			const rotation = object.quaternion.toArray();
-			const position = object.position.toArray();
-			const scale = object.scale.toArray();
+			const rotation = quatToArray( object.quaternion );
+			const position = vec3ToArray( object.position );
+			const scale = vec3ToArray( object.scale );
 
 			if ( ! equalArray( rotation, [ 0, 0, 0, 1 ] ) ) {
 
@@ -2583,13 +2597,13 @@ class GLTFWriter {
 		// Animations will target this node
 		const containerDef = {};
 
-		const rotation = object.quaternion.toArray();
+		const rotation = quatToArray( object.quaternion );
 		const position = [
 			object.position.x + pivot.x,
 			object.position.y + pivot.y,
 			object.position.z + pivot.z
 		];
-		const scale = object.scale.toArray();
+		const scale = vec3ToArray( object.scale );
 
 		if ( ! equalArray( rotation, [ 0, 0, 0, 1 ] ) ) {
 
@@ -2610,7 +2624,7 @@ class GLTFWriter {
 		}
 
 		// Store pivot in extras for round-trip reconstruction
-		containerDef.extras = { pivot: pivot.toArray() };
+		containerDef.extras = { pivot: vec3ToArray( pivot ) };
 
 		if ( object.name !== '' ) containerDef.name = String( object.name );
 
@@ -2879,7 +2893,7 @@ class GLTFLightExtension {
 
 		if ( light.name ) lightDef.name = light.name;
 
-		lightDef.color = light.color.toArray();
+		lightDef.color = colorToArray( light.color );
 
 		lightDef.intensity = light.intensity;
 
@@ -3240,7 +3254,7 @@ class GLTFMaterialsVolumeExtension {
 
 		}
 
-		extensionDef.attenuationColor = material.attenuationColor.toArray();
+		extensionDef.attenuationColor = colorToArray( material.attenuationColor );
 
 		materialDef.extensions = materialDef.extensions || {};
 		materialDef.extensions[ this.name ] = extensionDef;
@@ -3306,7 +3320,7 @@ class GLTFMaterialsSpecularExtension {
 	async writeMaterialAsync( material, materialDef ) {
 
 		if ( ! material.isMeshPhysicalMaterial || ( material.specularIntensity === 1.0 &&
-		       material.specularColor.equals( DEFAULT_SPECULAR_COLOR ) &&
+		       colorEquals( material.specularColor, DEFAULT_SPECULAR_COLOR ) &&
 		     ! material.specularIntensityMap && ! material.specularColorMap ) ) return;
 
 		const writer = this.writer;
@@ -3337,7 +3351,7 @@ class GLTFMaterialsSpecularExtension {
 		}
 
 		extensionDef.specularFactor = material.specularIntensity;
-		extensionDef.specularColorFactor = material.specularColor.toArray();
+		extensionDef.specularColorFactor = colorToArray( material.specularColor );
 
 		materialDef.extensions = materialDef.extensions || {};
 		materialDef.extensions[ this.name ] = extensionDef;
@@ -3396,7 +3410,7 @@ class GLTFMaterialsSheenExtension {
 		}
 
 		extensionDef.sheenRoughnessFactor = material.sheenRoughness;
-		extensionDef.sheenColorFactor = material.sheenColor.toArray();
+		extensionDef.sheenColorFactor = colorToArray( material.sheenColor );
 
 		materialDef.extensions = materialDef.extensions || {};
 		materialDef.extensions[ this.name ] = extensionDef;
@@ -3566,19 +3580,19 @@ class GLTFMeshGpuInstancing {
 		const rotationAttr = new Float32Array( mesh.count * 4 );
 		const scaleAttr = new Float32Array( mesh.count * 3 );
 
-		const matrix = new Matrix4();
-		const position = new Vector3();
-		const quaternion = new Quaternion();
-		const scale = new Vector3();
+		const matrix = mat4Create();
+		const position = vec3Create();
+		const quaternion = quatCreate();
+		const scale = vec3Create();
 
 		for ( let i = 0; i < mesh.count; i ++ ) {
 
 			mesh.getMatrixAt( i, matrix );
-			matrix.decompose( position, quaternion, scale );
+			mat4Decompose( matrix, position, quaternion, scale );
 
-			position.toArray( translationAttr, i * 3 );
-			quaternion.toArray( rotationAttr, i * 4 );
-			scale.toArray( scaleAttr, i * 3 );
+			vec3ToArray( position, translationAttr, i * 3 );
+			quatToArray( quaternion, rotationAttr, i * 4 );
+			vec3ToArray( scale, scaleAttr, i * 3 );
 
 		}
 

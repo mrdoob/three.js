@@ -2,7 +2,10 @@ import {
 	DirectionalLight,
 	Group,
 	LightProbe,
-	WebGLCubeRenderTarget
+	WebGLCubeRenderTarget,
+	colorSetRGB,
+	sh3FromArray,
+	vec3Copy
 } from 'three';
 
 class SessionLightProbe {
@@ -94,7 +97,7 @@ class SessionLightProbe {
 		if ( lightEstimate ) {
 
 			// We can copy the estimate's spherical harmonics array directly into the light probe.
-			this.xrLight.lightProbe.sh.fromArray( lightEstimate.sphericalHarmonicsCoefficients );
+			sh3FromArray( lightEstimate.sphericalHarmonicsCoefficients, 0, this.xrLight.lightProbe.sh );
 			this.xrLight.lightProbe.intensity = 1.0;
 
 			// For the directional light we have to normalize the color and set the scalar as the
@@ -104,12 +107,14 @@ class SessionLightProbe {
 					Math.max( lightEstimate.primaryLightIntensity.y,
 						lightEstimate.primaryLightIntensity.z ) ) );
 
-			this.xrLight.directionalLight.color.setRGB(
+			colorSetRGB(
 				lightEstimate.primaryLightIntensity.x / intensityScalar,
 				lightEstimate.primaryLightIntensity.y / intensityScalar,
-				lightEstimate.primaryLightIntensity.z / intensityScalar );
+				lightEstimate.primaryLightIntensity.z / intensityScalar,
+				undefined,
+				this.xrLight.directionalLight.color );
 			this.xrLight.directionalLight.intensity = intensityScalar;
-			this.xrLight.directionalLight.position.copy( lightEstimate.primaryLightDirection );
+			vec3Copy( lightEstimate.primaryLightDirection, this.xrLight.directionalLight.position );
 
 			if ( this.estimationStartCallback ) {
 

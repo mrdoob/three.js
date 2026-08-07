@@ -1,6 +1,6 @@
 import {
 	StereoCamera,
-	Vector2
+	vec2Create
 } from 'three';
 
 /**
@@ -22,7 +22,7 @@ class StereoEffect {
 
 		const _stereo = new StereoCamera();
 		_stereo.aspect = 0.5;
-		const size = new Vector2();
+		const size = vec2Create();
 
 		/**
 		 * Sets the given eye separation.
@@ -70,12 +70,12 @@ class StereoEffect {
 
 			renderer.setScissorTest( true );
 
-			renderer.setScissor( 0, 0, size.width / 2, size.height );
-			renderer.setViewport( 0, 0, size.width / 2, size.height );
+			renderer.setScissor( 0, 0, size.x / 2, size.y );
+			renderer.setViewport( 0, 0, size.x / 2, size.y );
 			renderer.render( scene, _stereo.cameraL );
 
-			renderer.setScissor( size.width / 2, 0, size.width / 2, size.height );
-			renderer.setViewport( size.width / 2, 0, size.width / 2, size.height );
+			renderer.setScissor( size.x / 2, 0, size.x / 2, size.y );
+			renderer.setViewport( size.x / 2, 0, size.x / 2, size.y );
 			renderer.render( scene, _stereo.cameraR );
 
 			renderer.setScissorTest( false );

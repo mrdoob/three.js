@@ -1,14 +1,37 @@
-import { Matrix3 } from './Matrix3.js';
 import { Vector3 } from './Vector3.js';
-
-const _vector1 = /*@__PURE__*/ new Vector3();
-const _vector2 = /*@__PURE__*/ new Vector3();
-const _normalMatrix = /*@__PURE__*/ new Matrix3();
+import {
+	planeApplyMatrix4,
+	planeCoplanarPoint,
+	planeCopy,
+	planeDistanceToPoint,
+	planeDistanceToSphere,
+	planeEquals,
+	planeFromJSON,
+	planeIntersectLine,
+	planeIntersectsBox,
+	planeIntersectsLine,
+	planeIntersectsSphere,
+	planeNegate,
+	planeNormalize,
+	planeProjectPoint,
+	planeSet,
+	planeSetComponents,
+	planeSetFromCoplanarPoints,
+	planeSetFromNormalAndCoplanarPoint,
+	planeToJSON,
+	planeTranslate
+} from './PlaneFunctions.js';
 
 /**
  * A two dimensional surface that extends infinitely in 3D space, represented
  * in [Hessian normal form](http://mathworld.wolfram.com/HessianNormalForm.html)
  * by a unit length normal vector and a constant.
+ *
+ * `Plane` is a thin, backwards-compatible wrapper around the standalone,
+ * tree-shakeable `plane*` functions in {@link PlaneFunctions}, which operate
+ * on any {@link PlaneLike} object. Prefer importing those functions
+ * directly if you only need a handful of operations and want unused ones
+ * eliminated from your bundle.
  */
 class Plane {
 
@@ -27,7 +50,7 @@ class Plane {
 		 * @readonly
 		 * @default true
 		 */
-		this.isPlane = true;
+		Object.defineProperty( this, 'isPlane', { value: true } );
 
 		/**
 		 * A unit length vector defining the normal of the plane.
@@ -55,10 +78,7 @@ class Plane {
 	 */
 	set( normal, constant ) {
 
-		this.normal.copy( normal );
-		this.constant = constant;
-
-		return this;
+		return planeSet( normal, constant, this );
 
 	}
 
@@ -74,10 +94,7 @@ class Plane {
 	 */
 	setComponents( x, y, z, w ) {
 
-		this.normal.set( x, y, z );
-		this.constant = w;
-
-		return this;
+		return planeSetComponents( x, y, z, w, this );
 
 	}
 
@@ -91,10 +108,7 @@ class Plane {
 	 */
 	setFromNormalAndCoplanarPoint( normal, point ) {
 
-		this.normal.copy( normal );
-		this.constant = - point.dot( this.normal );
-
-		return this;
+		return planeSetFromNormalAndCoplanarPoint( normal, point, this );
 
 	}
 
@@ -110,13 +124,7 @@ class Plane {
 	 */
 	setFromCoplanarPoints( a, b, c ) {
 
-		const normal = _vector1.subVectors( c, b ).cross( _vector2.subVectors( a, b ) ).normalize();
-
-		// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
-
-		this.setFromNormalAndCoplanarPoint( normal, a );
-
-		return this;
+		return planeSetFromCoplanarPoints( a, b, c, this );
 
 	}
 
@@ -128,10 +136,7 @@ class Plane {
 	 */
 	copy( plane ) {
 
-		this.normal.copy( plane.normal );
-		this.constant = plane.constant;
-
-		return this;
+		return planeCopy( plane, this );
 
 	}
 
@@ -142,13 +147,7 @@ class Plane {
 	 */
 	normalize() {
 
-		// Note: will lead to a divide by zero if the plane is invalid.
-
-		const inverseNormalLength = 1.0 / this.normal.length();
-		this.normal.multiplyScalar( inverseNormalLength );
-		this.constant *= inverseNormalLength;
-
-		return this;
+		return planeNormalize( this, this );
 
 	}
 
@@ -159,10 +158,7 @@ class Plane {
 	 */
 	negate() {
 
-		this.constant *= - 1;
-		this.normal.negate();
-
-		return this;
+		return planeNegate( this, this );
 
 	}
 
@@ -174,7 +170,7 @@ class Plane {
 	 */
 	distanceToPoint( point ) {
 
-		return this.normal.dot( point ) + this.constant;
+		return planeDistanceToPoint( this, point );
 
 	}
 
@@ -186,7 +182,7 @@ class Plane {
 	 */
 	distanceToSphere( sphere ) {
 
-		return this.distanceToPoint( sphere.center ) - sphere.radius;
+		return planeDistanceToSphere( this, sphere );
 
 	}
 
@@ -199,7 +195,7 @@ class Plane {
 	 */
 	projectPoint( point, target ) {
 
-		return target.copy( point ).addScaledVector( this.normal, - this.distanceToPoint( point ) );
+		return planeProjectPoint( this, point, target );
 
 	}
 
@@ -215,33 +211,7 @@ class Plane {
 	 */
 	intersectLine( line, target, clampToLine = true ) {
 
-		const direction = line.delta( _vector1 );
-
-		const denominator = this.normal.dot( direction );
-
-		if ( denominator === 0 ) {
-
-			// line is coplanar, return origin
-			if ( this.distanceToPoint( line.start ) === 0 ) {
-
-				return target.copy( line.start );
-
-			}
-
-			// Unsure if this is the correct method to handle this case.
-			return null;
-
-		}
-
-		const t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
-
-		if ( ( clampToLine === true ) && ( t < 0 || t > 1 ) ) {
-
-			return null;
-
-		}
-
-		return target.copy( line.start ).addScaledVector( direction, t );
+		return planeIntersectLine( this, line, target, clampToLine );
 
 	}
 
@@ -253,12 +223,7 @@ class Plane {
 	 */
 	intersectsLine( line ) {
 
-		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
-
-		const startSign = this.distanceToPoint( line.start );
-		const endSign = this.distanceToPoint( line.end );
-
-		return ( startSign < 0 && endSign > 0 ) || ( endSign < 0 && startSign > 0 );
+		return planeIntersectsLine( this, line );
 
 	}
 
@@ -270,7 +235,7 @@ class Plane {
 	 */
 	intersectsBox( box ) {
 
-		return box.intersectsPlane( this );
+		return planeIntersectsBox( this, box );
 
 	}
 
@@ -282,7 +247,7 @@ class Plane {
 	 */
 	intersectsSphere( sphere ) {
 
-		return sphere.intersectsPlane( this );
+		return planeIntersectsSphere( this, sphere );
 
 	}
 
@@ -295,7 +260,7 @@ class Plane {
 	 */
 	coplanarPoint( target ) {
 
-		return target.copy( this.normal ).multiplyScalar( - this.constant );
+		return planeCoplanarPoint( this, target );
 
 	}
 
@@ -313,15 +278,7 @@ class Plane {
 	 */
 	applyMatrix4( matrix, optionalNormalMatrix ) {
 
-		const normalMatrix = optionalNormalMatrix || _normalMatrix.getNormalMatrix( matrix );
-
-		const referencePoint = this.coplanarPoint( _vector1 ).applyMatrix4( matrix );
-
-		const normal = this.normal.applyMatrix3( normalMatrix ).normalize();
-
-		this.constant = - referencePoint.dot( normal );
-
-		return this;
+		return planeApplyMatrix4( this, matrix, optionalNormalMatrix, this );
 
 	}
 
@@ -334,9 +291,7 @@ class Plane {
 	 */
 	translate( offset ) {
 
-		this.constant -= offset.dot( this.normal );
-
-		return this;
+		return planeTranslate( this, offset, this );
 
 	}
 
@@ -348,7 +303,7 @@ class Plane {
 	 */
 	equals( plane ) {
 
-		return plane.normal.equals( this.normal ) && ( plane.constant === this.constant );
+		return planeEquals( this, plane );
 
 	}
 
@@ -370,10 +325,7 @@ class Plane {
 	 */
 	toJSON() {
 
-		return {
-			normal: this.normal.toArray(),
-			constant: this.constant
-		};
+		return planeToJSON( this );
 
 	}
 
@@ -385,10 +337,7 @@ class Plane {
 	 */
 	fromJSON( json ) {
 
-		this.normal.fromArray( json.normal );
-		this.constant = json.constant;
-
-		return this;
+		return planeFromJSON( json, this );
 
 	}
 

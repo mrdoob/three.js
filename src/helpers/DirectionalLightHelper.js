@@ -1,13 +1,14 @@
-import { Vector3 } from '../math/Vector3.js';
+import { colorCopy, colorSet } from '../math/ColorFunctions.js';
+import { vec3Create, vec3Length, vec3SetFromMatrixPosition, vec3SubVectors } from '../math/Vector3Functions.js';
 import { Object3D } from '../core/Object3D.js';
 import { Line } from '../objects/Line.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 
-const _v1 = /*@__PURE__*/ new Vector3();
-const _v2 = /*@__PURE__*/ new Vector3();
-const _v3 = /*@__PURE__*/ new Vector3();
+const _v1 = /*@__PURE__*/ vec3Create();
+const _v2 = /*@__PURE__*/ vec3Create();
+const _v3 = /*@__PURE__*/ vec3Create();
 
 /**
  * Helper object to assist with visualizing a {@link DirectionalLight}'s
@@ -123,26 +124,26 @@ class DirectionalLightHelper extends Object3D {
 		this.light.updateWorldMatrix( true, false );
 		this.light.target.updateWorldMatrix( true, false );
 
-		_v1.setFromMatrixPosition( this.light.matrixWorld );
-		_v2.setFromMatrixPosition( this.light.target.matrixWorld );
-		_v3.subVectors( _v2, _v1 );
+		vec3SetFromMatrixPosition( this.light.matrixWorld, _v1 );
+		vec3SetFromMatrixPosition( this.light.target.matrixWorld, _v2 );
+		vec3SubVectors( _v2, _v1, _v3 );
 
-		this.lightPlane.lookAt( _v2 );
+		this.lightPlane.lookAt( _v2.x, _v2.y, _v2.z );
 
 		if ( this.color !== undefined ) {
 
-			this.lightPlane.material.color.set( this.color );
-			this.targetLine.material.color.set( this.color );
+			colorSet( this.color, undefined, undefined, this.lightPlane.material.color );
+			colorSet( this.color, undefined, undefined, this.targetLine.material.color );
 
 		} else {
 
-			this.lightPlane.material.color.copy( this.light.color );
-			this.targetLine.material.color.copy( this.light.color );
+			colorCopy( this.light.color, this.lightPlane.material.color );
+			colorCopy( this.light.color, this.targetLine.material.color );
 
 		}
 
-		this.targetLine.lookAt( _v2 );
-		this.targetLine.scale.z = _v3.length();
+		this.targetLine.lookAt( _v2.x, _v2.y, _v2.z );
+		this.targetLine.scale.z = vec3Length( _v3 );
 
 	}
 

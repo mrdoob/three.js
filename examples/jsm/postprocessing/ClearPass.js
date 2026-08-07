@@ -1,5 +1,5 @@
 import {
-	Color
+	colorCreate
 } from 'three';
 import { Pass } from './Pass.js';
 
@@ -53,7 +53,7 @@ class ClearPass extends Pass {
 
 		// internals
 
-		this._oldClearColor = new Color();
+		this._oldClearColor = colorCreate();
 
 	}
 

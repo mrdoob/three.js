@@ -1,15 +1,22 @@
 import {
-	Matrix4,
 	Object3D,
-	Quaternion,
-	Vector3
+	mat4Copy,
+	mat4Create,
+	mat4Decompose,
+	mat4MakeRotationZ,
+	mat4Multiply,
+	mat4Scale,
+	mat4SetPosition,
+	mat4Transpose,
+	quatCreate,
+	vec3Create
 } from 'three';
 
 // Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
 
-const _position = new Vector3();
-const _quaternion = new Quaternion();
-const _scale = new Vector3();
+const _position = /*@__PURE__*/ vec3Create();
+const _quaternion = /*@__PURE__*/ quatCreate();
+const _scale = /*@__PURE__*/ vec3Create();
 
 /**
  * The base 3D object that is supported by {@link CSS3DRenderer}.
@@ -134,8 +141,8 @@ class CSS3DSprite extends CSS3DObject {
 
 //
 
-const _matrix = new Matrix4();
-const _matrix2 = new Matrix4();
+const _matrix = /*@__PURE__*/ mat4Create();
+const _matrix2 = /*@__PURE__*/ mat4Create();
 
 /**
  * This renderer can be used to apply hierarchical 3D transformations to DOM elements
@@ -386,14 +393,14 @@ class CSS3DRenderer {
 
 						// http://swiftcoder.wordpress.com/2008/11/25/constructing-a-billboard-matrix/
 
-						_matrix.copy( camera.matrixWorldInverse );
-						_matrix.transpose();
+						mat4Copy( camera.matrixWorldInverse, _matrix );
+						mat4Transpose( _matrix, _matrix );
 
-						if ( object.rotation2D !== 0 ) _matrix.multiply( _matrix2.makeRotationZ( object.rotation2D ) );
+						if ( object.rotation2D !== 0 ) mat4Multiply( _matrix, mat4MakeRotationZ( object.rotation2D, _matrix2 ), _matrix );
 
-						object.matrixWorld.decompose( _position, _quaternion, _scale );
-						_matrix.setPosition( _position );
-						_matrix.scale( _scale );
+						mat4Decompose( object.matrixWorld, _position, _quaternion, _scale );
+						mat4SetPosition( _matrix, _position.x, _position.y, _position.z, _matrix );
+						mat4Scale( _matrix, _scale, _matrix );
 
 						_matrix.elements[ 3 ] = 0;
 						_matrix.elements[ 7 ] = 0;

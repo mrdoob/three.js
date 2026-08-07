@@ -481,7 +481,7 @@ class WebGLBackend extends Backend {
 
 		} else {
 
-			const { width, height } = this.getDrawingBufferSize();
+			const { x: width, y: height } = this.getDrawingBufferSize();
 			state.viewport( 0, 0, width, height );
 
 		}
@@ -492,7 +492,7 @@ class WebGLBackend extends Backend {
 
 		} else {
 
-			const { width, height } = this.getDrawingBufferSize();
+			const { x: width, y: height } = this.getDrawingBufferSize();
 			state.scissor( 0, 0, width, height );
 
 		}
@@ -593,7 +593,7 @@ class WebGLBackend extends Backend {
 
 			} else {
 
-				const { width, height } = this.getDrawingBufferSize();
+				const { x: width, y: height } = this.getDrawingBufferSize();
 				state.viewport( 0, 0, width, height );
 
 			}
@@ -604,7 +604,7 @@ class WebGLBackend extends Backend {
 
 			} else {
 
-				const { width, height } = this.getDrawingBufferSize();
+				const { x: width, y: height } = this.getDrawingBufferSize();
 				state.scissor( 0, 0, width, height );
 
 			}
@@ -706,7 +706,7 @@ class WebGLBackend extends Backend {
 	updateViewport( renderContext ) {
 
 		const { state } = this;
-		const { x, y, width, height } = renderContext.viewportValue;
+		const { x, y, z: width, w: height } = renderContext.viewportValue;
 
 		state.viewport( x, renderContext.height - height - y, width, height );
 
@@ -720,7 +720,7 @@ class WebGLBackend extends Backend {
 	updateScissor( renderContext ) {
 
 		const { state } = this;
-		const { x, y, width, height } = renderContext.scissorValue;
+		const { x, y, z: width, w: height } = renderContext.scissorValue;
 
 		state.scissor( x, renderContext.height - height - y, width, height );
 
@@ -2829,7 +2829,7 @@ class WebGLBackend extends Backend {
 
 					if ( renderContext.scissor ) {
 
-						const { x, y, width, height } = renderContext.scissorValue;
+						const { x, y, z: width, w: height } = renderContext.scissorValue;
 
 						const viewY = renderContext.height - height - y;
 

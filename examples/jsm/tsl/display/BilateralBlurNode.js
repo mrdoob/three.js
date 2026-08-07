@@ -1,4 +1,4 @@
-import { RenderTarget, Vector2, NodeMaterial, RendererUtils, QuadMesh, TempNode, NodeUpdateType } from 'three/webgpu';
+import { RenderTarget, NodeMaterial, RendererUtils, QuadMesh, TempNode, NodeUpdateType, vec2Create, vec2Set } from 'three/webgpu';
 import { Fn, float, uv, uniform, convertToTexture, vec2, vec4, passTexture, luminance, abs, exp, max, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -74,7 +74,7 @@ class BilateralBlurNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
-		this._invSize = uniform( new Vector2() );
+		this._invSize = uniform( vec2Create(), 'vec2' );
 
 		/**
 		 * Bilateral blur is applied in two passes (horizontal, vertical).
@@ -83,7 +83,7 @@ class BilateralBlurNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
-		this._passDirection = uniform( new Vector2() );
+		this._passDirection = uniform( vec2Create(), 'vec2' );
 
 		/**
 		 * The render target used for the horizontal pass.
@@ -150,7 +150,7 @@ class BilateralBlurNode extends TempNode {
 		width = Math.max( Math.round( width * this.resolutionScale ), 1 );
 		height = Math.max( Math.round( height * this.resolutionScale ), 1 );
 
-		this._invSize.value.set( 1 / width, 1 / height );
+		vec2Set( 1 / width, 1 / height, this._invSize.value );
 		this._horizontalRT.setSize( width, height );
 		this._verticalRT.setSize( width, height );
 
@@ -187,7 +187,7 @@ class BilateralBlurNode extends TempNode {
 
 		renderer.setRenderTarget( this._horizontalRT );
 
-		this._passDirection.value.set( 1, 0 );
+		vec2Set( 1, 0, this._passDirection.value );
 
 		_quadMesh.name = 'Bilateral Blur [ Horizontal Pass ]';
 		_quadMesh.render( renderer );
@@ -197,7 +197,7 @@ class BilateralBlurNode extends TempNode {
 		textureNode.value = this._horizontalRT.texture;
 		renderer.setRenderTarget( this._verticalRT );
 
-		this._passDirection.value.set( 0, 1 );
+		vec2Set( 0, 1, this._passDirection.value );
 
 		_quadMesh.name = 'Bilateral Blur [ Vertical Pass ]';
 		_quadMesh.render( renderer );

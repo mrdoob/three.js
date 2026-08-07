@@ -1,4 +1,16 @@
-import { Timer, Vector3, Quaternion, Matrix4 } from 'three';
+import {
+	Timer,
+	mat4Compose,
+	mat4Create,
+	mat4FromArray,
+	mat4ToArray,
+	quatCreate,
+	quatSet,
+	quatSetFromRotationMatrix,
+	vec3Create,
+	vec3FromArray,
+	vec3Set
+} from 'three';
 
 const JOLT_PATH = 'https://cdn.jsdelivr.net/npm/jolt-physics@1.0.0/dist/jolt-physics.wasm-compat.js';
 
@@ -94,11 +106,11 @@ async function JoltPhysics() {
 	const meshes = [];
 	const meshMap = new WeakMap();
 
-	const _position = new Vector3();
-	const _quaternion = new Quaternion();
-	const _scale = new Vector3( 1, 1, 1 );
+	const _position = vec3Create();
+	const _quaternion = quatCreate();
+	const _scale = vec3Set( vec3Create(), 1, 1, 1 );
 
-	const _matrix = new Matrix4();
+	const _matrix = mat4Create();
 
 	function addScene( scene ) {
 
@@ -147,8 +159,9 @@ async function JoltPhysics() {
 
 		for ( let i = 0; i < mesh.count; i ++ ) {
 
-			const position = _position.fromArray( array, i * 16 + 12 );
-			const quaternion = _quaternion.setFromRotationMatrix( _matrix.fromArray( array, i * 16 ) ); // TODO Copilot did this
+			const position = vec3FromArray( array, i * 16 + 12, _position );
+			mat4FromArray( array, i * 16, _matrix );
+			const quaternion = quatSetFromRotationMatrix( _matrix, _quaternion ); // TODO Copilot did this
 			bodies.push( createBody( position, quaternion, mass, restitution, shape ) );
 
 		}
@@ -160,7 +173,7 @@ async function JoltPhysics() {
 	function createBody( position, rotation, mass, restitution, shape ) {
 
 		const pos = new Jolt.Vec3( position.x, position.y, position.z );
-		const rot = new Jolt.Quat( rotation.x, rotation.y, rotation.z, rotation.w );
+		const rot = new Jolt.Quat( rotation._x, rotation._y, rotation._z, rotation._w );
 
 		const motion = mass > 0 ? Jolt.EMotionType_Dynamic : Jolt.EMotionType_Static;
 		const layer = mass > 0 ? LAYER_MOVING : LAYER_NON_MOVING;
@@ -192,7 +205,7 @@ async function JoltPhysics() {
 			const physics = mesh.userData.physics;
 
 			const shape = body.GetShape();
-			const body2 = createBody( position, { x: 0, y: 0, z: 0, w: 1 }, physics.mass, physics.restitution, shape );
+			const body2 = createBody( position, quatCreate(), physics.mass, physics.restitution, shape );
 
 			bodies[ index ] = body2;
 
@@ -257,10 +270,11 @@ async function JoltPhysics() {
 					const position = body.GetPosition();
 					const quaternion = body.GetRotation();
 
-					_position.set( position.GetX(), position.GetY(), position.GetZ() );
-					_quaternion.set( quaternion.GetX(), quaternion.GetY(), quaternion.GetZ(), quaternion.GetW() );
+					vec3Set( _position, position.GetX(), position.GetY(), position.GetZ() );
+					quatSet( quaternion.GetX(), quaternion.GetY(), quaternion.GetZ(), quaternion.GetW(), _quaternion );
 
-					_matrix.compose( _position, _quaternion, _scale ).toArray( array, j * 16 );
+					mat4Compose( _position, _quaternion, _scale, _matrix );
+					mat4ToArray( _matrix, array, j * 16 );
 
 				}
 
@@ -274,8 +288,9 @@ async function JoltPhysics() {
 				const position = body.GetPosition();
 				const rotation = body.GetRotation();
 
-				mesh.position.set( position.GetX(), position.GetY(), position.GetZ() );
-				mesh.quaternion.set( rotation.GetX(), rotation.GetY(), rotation.GetZ(), rotation.GetW() );
+				vec3Set( mesh.position, position.GetX(), position.GetY(), position.GetZ() );
+				quatSet( rotation.GetX(), rotation.GetY(), rotation.GetZ(), rotation.GetW(), mesh.quaternion );
+				mesh.quaternion._onChangeCallback();
 
 			}
 

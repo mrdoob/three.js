@@ -1,4 +1,15 @@
-import { DataTexture, FloatType, RGBAFormat, Vector2, Vector3, LightsNode, NodeUpdateType } from 'three/webgpu';
+import {
+	DataTexture,
+	FloatType,
+	RGBAFormat,
+	LightsNode,
+	NodeUpdateType,
+	vec2Create,
+	vec2Set,
+	vec3ApplyMatrix4,
+	vec3Create,
+	vec3SetFromMatrixPosition
+} from 'three/webgpu';
 
 import {
 	attributeArray, nodeProxy, int, float, vec3, vec4, ivec2, ivec4, uniform, Break, Loop, positionView,
@@ -7,8 +18,8 @@ import {
 	min, max, pow, log, clamp, dot
 } from 'three/tsl';
 
-const _vector3 = /*@__PURE__*/ new Vector3();
-const _size = /*@__PURE__*/ new Vector2();
+const _vector3 = /*@__PURE__*/ vec3Create();
+const _size = /*@__PURE__*/ vec2Create();
 
 /**
  * A custom version of `LightsNode` implementing Forward+ clustered shading:
@@ -71,7 +82,7 @@ class ClusteredLightsNode extends LightsNode {
 		this._cameraViewMatrix = uniform( 'mat4' ).setName( 'clusteredCameraViewMatrix' ).setGroup( renderGroup );
 		this._cameraProjectionMatrix = uniform( 'mat4' ).setName( 'clusteredCameraProjectionMatrix' ).setGroup( renderGroup );
 
-		this._gridDimensions = uniform( new Vector2() );
+		this._gridDimensions = uniform( vec2Create(), 'vec2' );
 
 		this.updateBeforeType = NodeUpdateType.RENDER;
 
@@ -100,8 +111,8 @@ class ClusteredLightsNode extends LightsNode {
 
 		for ( let i = 0; i < count; i ++ ) {
 
-			_vector3.setFromMatrixPosition( clusteredLights[ i ].matrixWorld );
-			_vector3.applyMatrix4( camera.matrixWorldInverse );
+			vec3SetFromMatrixPosition( clusteredLights[ i ].matrixWorld, _vector3 );
+			vec3ApplyMatrix4( _vector3, camera.matrixWorldInverse, _vector3 );
 			viewZ[ i ] = _vector3.z;
 			order[ i ] = i;
 
@@ -116,7 +127,7 @@ class ClusteredLightsNode extends LightsNode {
 
 			const light = clusteredLights[ order[ i ] ];
 
-			_vector3.setFromMatrixPosition( light.matrixWorld );
+			vec3SetFromMatrixPosition( light.matrixWorld, _vector3 );
 
 			const offset = i * 4;
 
@@ -387,7 +398,7 @@ class ClusteredLightsNode extends LightsNode {
 		width = this.getBufferFitSize( width );
 		height = this.getBufferFitSize( height );
 
-		if ( ! this._bufferSize || this._bufferSize.width !== width || this._bufferSize.height !== height ) {
+		if ( ! this._bufferSize || this._bufferSize.x !== width || this._bufferSize.y !== height ) {
 
 			this.create( width, height );
 
@@ -401,14 +412,14 @@ class ClusteredLightsNode extends LightsNode {
 
 		renderer.getDrawingBufferSize( _size );
 
-		const width = this.getBufferFitSize( _size.width );
-		const height = this.getBufferFitSize( _size.height );
+		const width = this.getBufferFitSize( _size.x );
+		const height = this.getBufferFitSize( _size.y );
 
 		if ( this._bufferSize === null ) {
 
 			this.create( width, height );
 
-		} else if ( this._bufferSize.width !== width || this._bufferSize.height !== height ) {
+		} else if ( this._bufferSize.x !== width || this._bufferSize.y !== height ) {
 
 			this.create( width, height );
 
@@ -420,14 +431,14 @@ class ClusteredLightsNode extends LightsNode {
 
 		const { tileSize, maxLights, zSlices, maxLightsPerCluster, _chunksPerCluster: chunksPerCluster } = this;
 
-		const bufferSize = new Vector2( width, height );
+		const bufferSize = vec2Create( width, height );
 
-		const NX = Math.floor( bufferSize.width / tileSize );
-		const NY = Math.floor( bufferSize.height / tileSize );
+		const NX = Math.floor( bufferSize.x / tileSize );
+		const NY = Math.floor( bufferSize.y / tileSize );
 		const NZ = zSlices;
 		const clusterCount = NX * NY * NZ;
 
-		this._gridDimensions.value.set( NX, NY );
+		vec2Set( NX, NY, this._gridDimensions.value );
 
 		// Lights data texture (same layout as TiledLightsNode)
 

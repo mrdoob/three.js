@@ -1,5 +1,4 @@
 import {
-	Box3,
 	CubeCamera,
 	CubeRenderTarget,
 	FloatType,
@@ -12,7 +11,11 @@ import {
 	RenderTarget,
 	RenderTarget3D,
 	RGBAFormat,
-	Vector3
+	box3Create,
+	box3SetFromCenterAndSize,
+	vec3Copy,
+	vec3Create,
+	vec3Set
 } from 'three/webgpu';
 
 import {
@@ -36,8 +39,8 @@ import { LightProbeGridNode, ATLAS_PADDING } from '../tsl/lighting/LightProbeGri
 const _quad = /*@__PURE__*/ new QuadMesh();
 
 // Reusable temp objects.
-const _position = /*@__PURE__*/ new Vector3();
-const _size = /*@__PURE__*/ new Vector3();
+const _position = /*@__PURE__*/ vec3Create();
+const _size = /*@__PURE__*/ vec3Create();
 
 // Bake materials, shared across grids so the shaders compile once, not per bake.
 let _shMaterial = null;
@@ -227,7 +230,7 @@ function ensureBakeMaterials( sampleCount, cubeMap, batchMap ) {
 
 		_cubeNode = cubeTexture( cubeMap );
 		_batchNode = texture( batchMap );
-		_resolutionUniform = uniform( new Vector3() );
+		_resolutionUniform = uniform( vec3Create(), 'vec3' );
 		_sliceZUniform = uniform( 0, 'int' );
 		_repackMaterials = [];
 
@@ -332,9 +335,10 @@ class LightProbeGrid extends Light {
 		/**
 		 * The number of probes along each axis.
 		 *
-		 * @type {Vector3}
+		 * @type {Vector3Like}
 		 */
-		this.resolution = new Vector3(
+		this.resolution = vec3Set(
+			vec3Create(),
 			widthProbes !== undefined ? widthProbes : Math.max( 2, Math.round( width ) + 1 ),
 			heightProbes !== undefined ? heightProbes : Math.max( 2, Math.round( height ) + 1 ),
 			depthProbes !== undefined ? depthProbes : Math.max( 2, Math.round( depth ) + 1 )
@@ -344,9 +348,9 @@ class LightProbeGrid extends Light {
 		 * The world-space bounding box for the grid. Updated automatically
 		 * by {@link LightProbeGrid#bake}.
 		 *
-		 * @type {Box3}
+		 * @type {Box3Like}
 		 */
-		this.boundingBox = new Box3();
+		this.boundingBox = box3Create();
 
 		/**
 		 * Distance in world units over which the grid contribution fades out
@@ -387,8 +391,8 @@ class LightProbeGrid extends Light {
 	 * @param {number} ix - X index.
 	 * @param {number} iy - Y index.
 	 * @param {number} iz - Z index.
-	 * @param {Vector3} target - The target vector.
-	 * @return {Vector3} The world-space position.
+	 * @param {Vector3Like} target - The target vector.
+	 * @return {Vector3Like} The world-space position.
 	 */
 	getProbePosition( ix, iy, iz, target ) {
 
@@ -396,13 +400,12 @@ class LightProbeGrid extends Light {
 		const res = this.resolution;
 		const w = this.width, h = this.height, d = this.depth;
 
-		target.set(
+		return vec3Set(
+			target,
 			res.x > 1 ? pos.x - w / 2 + ix * w / ( res.x - 1 ) : pos.x,
 			res.y > 1 ? pos.y - h / 2 + iy * h / ( res.y - 1 ) : pos.y,
 			res.z > 1 ? pos.z - d / 2 + iz * d / ( res.z - 1 ) : pos.z
 		);
-
-		return target;
 
 	}
 
@@ -411,8 +414,8 @@ class LightProbeGrid extends Light {
 	 */
 	updateBoundingBox() {
 
-		_size.set( this.width, this.height, this.depth );
-		this.boundingBox.setFromCenterAndSize( this.position, _size );
+		vec3Set( _size, this.width, this.height, this.depth );
+		box3SetFromCenterAndSize( this.position, _size, this.boundingBox );
 
 	}
 
@@ -469,7 +472,7 @@ class LightProbeGrid extends Light {
 
 		ensureBakeTargets( cubemapSize, near, far, totalProbes );
 		ensureBakeMaterials( sampleCount, _cubeRenderTarget.texture, _batchTarget.texture );
-		_resolutionUniform.value.copy( res );
+		vec3Copy( res, _resolutionUniform.value );
 
 		const cubeCamera = _cubeCamera;
 		const batchTarget = _batchTarget;
@@ -537,7 +540,7 @@ class LightProbeGrid extends Light {
 							const probeIndex = ix + iy * res.x + iz * res.x * res.y;
 
 							this.getProbePosition( ix, iy, iz, _position );
-							cubeCamera.position.copy( _position );
+							vec3Copy( _position, cubeCamera.position );
 
 							// The cube faces must be cleared per face.
 							renderer.autoClear = true;

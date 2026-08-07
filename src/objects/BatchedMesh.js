@@ -2,15 +2,27 @@ import { BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { DataTexture } from '../textures/DataTexture.js';
 import { FloatType, RedIntegerFormat, UnsignedIntType, RGBAFormat } from '../constants.js';
-import { Matrix4 } from '../math/Matrix4.js';
 import { Mesh } from './Mesh.js';
 import { ColorManagement } from '../math/ColorManagement.js';
 import { Box3 } from '../math/Box3.js';
 import { Sphere } from '../math/Sphere.js';
 import { Frustum } from '../math/Frustum.js';
-import { Vector3 } from '../math/Vector3.js';
-import { Color } from '../math/Color.js';
 import { FrustumArray } from '../math/FrustumArray.js';
+import {
+	mat4Create, mat4Copy, mat4Invert, mat4Identity, mat4ToArray, mat4FromArray,
+	mat4Multiply, mat4MultiplyMatrices, mat4PreMultiply
+} from '../math/Matrix4Functions.js';
+import {
+	box3Create, box3Copy, box3ApplyMatrix4, box3GetCenter
+} from '../math/Box3Functions.js';
+import {
+	sphereCreate, sphereCopy, sphereApplyMatrix4
+} from '../math/SphereFunctions.js';
+import {
+	vec3Create, vec3Set, vec3FromBufferAttribute, vec3SetFromMatrixPosition,
+	vec3ApplyMatrix4, vec3TransformDirection, vec3SubVectors, vec3Dot, vec3DistanceToSquared
+} from '../math/Vector3Functions.js';
+import { colorCreate, colorToArray } from '../math/ColorFunctions.js';
 
 function ascIdSort( a, b ) {
 
@@ -77,15 +89,15 @@ class MultiDrawRenderList {
 
 }
 
-const _matrix = /*@__PURE__*/ new Matrix4();
-const _whiteColor = /*@__PURE__*/ new Color( 1, 1, 1 );
+const _matrix = /*@__PURE__*/ mat4Create();
+const _whiteColor = /*@__PURE__*/ colorCreate();
 const _frustum = /*@__PURE__*/ new Frustum();
 const _frustumArray = /*@__PURE__*/ new FrustumArray();
-const _box = /*@__PURE__*/ new Box3();
-const _sphere = /*@__PURE__*/ new Sphere();
-const _vector = /*@__PURE__*/ new Vector3();
-const _forward = /*@__PURE__*/ new Vector3();
-const _temp = /*@__PURE__*/ new Vector3();
+const _box = /*@__PURE__*/ box3Create();
+const _sphere = /*@__PURE__*/ sphereCreate();
+const _vector = /*@__PURE__*/ vec3Create();
+const _forward = /*@__PURE__*/ vec3Create();
+const _temp = /*@__PURE__*/ vec3Create();
 const _renderList = /*@__PURE__*/ new MultiDrawRenderList();
 const _mesh = /*@__PURE__*/ new Mesh();
 const _batchIntersects = [];
@@ -513,7 +525,8 @@ class BatchedMesh extends Mesh {
 
 			const geometryId = instanceInfo[ i ].geometryIndex;
 			this.getMatrixAt( i, _matrix );
-			this.getBoundingBoxAt( geometryId, _box ).applyMatrix4( _matrix );
+			this.getBoundingBoxAt( geometryId, _box );
+			box3ApplyMatrix4( _box, _matrix, _box );
 			boundingBox.union( _box );
 
 		}
@@ -543,7 +556,8 @@ class BatchedMesh extends Mesh {
 
 			const geometryId = instanceInfo[ i ].geometryIndex;
 			this.getMatrixAt( i, _matrix );
-			this.getBoundingSphereAt( geometryId, _sphere ).applyMatrix4( _matrix );
+			this.getBoundingSphereAt( geometryId, _sphere );
+			sphereApplyMatrix4( _sphere, _matrix, _sphere );
 			boundingSphere.union( _sphere );
 
 		}
@@ -592,13 +606,14 @@ class BatchedMesh extends Mesh {
 		}
 
 		const matricesTexture = this._matricesTexture;
-		_matrix.identity().toArray( matricesTexture.image.data, drawId * 16 );
+		mat4Identity( _matrix );
+		mat4ToArray( _matrix, matricesTexture.image.data, drawId * 16 );
 		matricesTexture.needsUpdate = true;
 
 		const colorsTexture = this._colorsTexture;
 		if ( colorsTexture ) {
 
-			_whiteColor.toArray( colorsTexture.image.data, drawId * 4 );
+			colorToArray( _whiteColor, colorsTexture.image.data, drawId * 4 );
 			colorsTexture.needsUpdate = true;
 
 		}
@@ -998,7 +1013,8 @@ class BatchedMesh extends Mesh {
 
 				}
 
-				box.expandByPoint( _vector.fromBufferAttribute( position, iv ) );
+				vec3FromBufferAttribute( position, iv, _vector );
+				box.expandByPoint( _vector );
 
 			}
 
@@ -1006,7 +1022,7 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		target.copy( geometryInfo.boundingBox );
+		box3Copy( geometryInfo.boundingBox, target );
 		return target;
 
 	}
@@ -1033,7 +1049,7 @@ class BatchedMesh extends Mesh {
 
 			const sphere = new Sphere();
 			this.getBoundingBoxAt( geometryId, _box );
-			_box.getCenter( sphere.center );
+			box3GetCenter( _box, sphere.center );
 
 			const index = geometry.index;
 			const position = geometry.attributes.position;
@@ -1048,8 +1064,8 @@ class BatchedMesh extends Mesh {
 
 				}
 
-				_vector.fromBufferAttribute( position, iv );
-				maxRadiusSq = Math.max( maxRadiusSq, sphere.center.distanceToSquared( _vector ) );
+				vec3FromBufferAttribute( position, iv, _vector );
+				maxRadiusSq = Math.max( maxRadiusSq, vec3DistanceToSquared( sphere.center, _vector ) );
 
 			}
 
@@ -1058,7 +1074,7 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		target.copy( geometryInfo.boundingSphere );
+		sphereCopy( geometryInfo.boundingSphere, target );
 		return target;
 
 	}
@@ -1077,7 +1093,7 @@ class BatchedMesh extends Mesh {
 
 		const matricesTexture = this._matricesTexture;
 		const matricesArray = this._matricesTexture.image.data;
-		matrix.toArray( matricesArray, instanceId * 16 );
+		mat4ToArray( matrix, matricesArray, instanceId * 16 );
 		matricesTexture.needsUpdate = true;
 
 		return this;
@@ -1094,7 +1110,7 @@ class BatchedMesh extends Mesh {
 	getMatrixAt( instanceId, matrix ) {
 
 		this.validateInstanceId( instanceId );
-		return matrix.fromArray( this._matricesTexture.image.data, instanceId * 16 );
+		return mat4FromArray( this._matricesTexture.image.data, instanceId * 16, matrix );
 
 	}
 
@@ -1416,7 +1432,8 @@ class BatchedMesh extends Mesh {
 			_mesh.geometry.setDrawRange( geometryInfo.start, geometryInfo.count );
 
 			// get the intersects
-			this.getMatrixAt( i, _mesh.matrixWorld ).premultiply( matrixWorld );
+			this.getMatrixAt( i, _mesh.matrixWorld );
+			mat4PreMultiply( _mesh.matrixWorld, matrixWorld, _mesh.matrixWorld );
 			this.getBoundingBoxAt( geometryId, _mesh.geometry.boundingBox );
 			this.getBoundingSphereAt( geometryId, _mesh.geometry.boundingSphere );
 			_mesh.raycast( raycaster, _batchIntersects );
@@ -1563,9 +1580,8 @@ class BatchedMesh extends Mesh {
 
 			} else {
 
-				_matrix
-					.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse )
-					.multiply( this.matrixWorld );
+				mat4MultiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse, _matrix );
+				mat4Multiply( _matrix, this.matrixWorld, _matrix );
 
 				frustum.setFromProjectionMatrix(
 					_matrix,
@@ -1581,9 +1597,13 @@ class BatchedMesh extends Mesh {
 		if ( this.sortObjects ) {
 
 			// get the camera position in the local frame
-			_matrix.copy( this.matrixWorld ).invert();
-			_vector.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _matrix );
-			_forward.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld ).transformDirection( _matrix );
+			mat4Copy( this.matrixWorld, _matrix );
+			mat4Invert( _matrix, _matrix );
+			vec3SetFromMatrixPosition( camera.matrixWorld, _vector );
+			vec3ApplyMatrix4( _vector, _matrix, _vector );
+			vec3Set( _forward, 0, 0, - 1 );
+			vec3TransformDirection( _forward, camera.matrixWorld, _forward );
+			vec3TransformDirection( _forward, _matrix, _forward );
 
 			for ( let i = 0, l = instanceInfo.length; i < l; i ++ ) {
 
@@ -1593,7 +1613,8 @@ class BatchedMesh extends Mesh {
 
 					// get the bounds in world space
 					this.getMatrixAt( i, _matrix );
-					this.getBoundingSphereAt( geometryId, _sphere ).applyMatrix4( _matrix );
+					this.getBoundingSphereAt( geometryId, _sphere );
+					sphereApplyMatrix4( _sphere, _matrix, _sphere );
 
 					// determine whether the batched geometry is within the frustum
 					let culled = false;
@@ -1607,7 +1628,7 @@ class BatchedMesh extends Mesh {
 
 						// get the distance from camera used for sorting
 						const geometryInfo = geometryInfoList[ geometryId ];
-						const z = _temp.subVectors( _sphere.center, _vector ).dot( _forward );
+						const z = vec3Dot( vec3SubVectors( _sphere.center, _vector, _temp ), _forward );
 						_renderList.push( geometryInfo.start, geometryInfo.count, z, i );
 
 					}
@@ -1655,7 +1676,8 @@ class BatchedMesh extends Mesh {
 
 						// get the bounds in world space
 						this.getMatrixAt( i, _matrix );
-						this.getBoundingSphereAt( geometryId, _sphere ).applyMatrix4( _matrix );
+						this.getBoundingSphereAt( geometryId, _sphere );
+						sphereApplyMatrix4( _sphere, _matrix, _sphere );
 						culled = ! frustum.intersectsSphere( _sphere );
 
 					}

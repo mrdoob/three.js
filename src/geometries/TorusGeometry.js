@@ -1,6 +1,6 @@
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
-import { Vector3 } from '../math/Vector3.js';
+import { vec3Create, vec3Normalize, vec3SubVectors } from '../math/Vector3Functions.js';
 
 /**
  * A geometry class for representing an torus.
@@ -63,9 +63,9 @@ class TorusGeometry extends BufferGeometry {
 
 		// helper variables
 
-		const center = new Vector3();
-		const vertex = new Vector3();
-		const normal = new Vector3();
+		const center = vec3Create();
+		const vertex = vec3Create();
+		const normal = vec3Create();
 
 		// generate vertices, normals and uvs
 
@@ -89,7 +89,7 @@ class TorusGeometry extends BufferGeometry {
 
 				center.x = radius * Math.cos( u );
 				center.y = radius * Math.sin( u );
-				normal.subVectors( vertex, center ).normalize();
+				vec3Normalize( vec3SubVectors( vertex, center, normal ), normal );
 
 				normals.push( normal.x, normal.y, normal.z );
 

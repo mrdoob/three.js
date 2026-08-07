@@ -1,6 +1,10 @@
 import { Color } from '../../math/Color.js';
-import { Box2 } from '../../math/Box2.js';
-import { Vector2 } from '../../math/Vector2.js';
+import {
+	box2ContainsBox,
+	box2Create,
+	box2ExpandByPoint,
+	box2GetCenter
+} from '../../math/Box2Functions.js';
 import { Path } from './Path.js';
 import { Shape } from './Shape.js';
 import { ShapeUtils } from '../ShapeUtils.js';
@@ -179,7 +183,7 @@ class ShapePath {
 		// https://github.com/paperjs/paper.js/blob/develop/src/path/PathItem.Boolean.js
 		function getInteriorPoint( polygon, boundingBox ) {
 
-			const point = boundingBox.getCenter( new Vector2() );
+			const point = box2GetCenter( boundingBox );
 
 			if ( pointInPolygon( point, polygon ) ) return point;
 
@@ -246,8 +250,8 @@ class ShapePath {
 			const area = ShapeUtils.area( points );
 			if ( area === 0 ) continue;
 
-			const boundingBox = new Box2();
-			for ( let i = 0; i < points.length; i ++ ) boundingBox.expandByPoint( points[ i ] );
+			const boundingBox = box2Create();
+			for ( let i = 0; i < points.length; i ++ ) box2ExpandByPoint( boundingBox, points[ i ], boundingBox );
 
 			entries.push( {
 				subPath: subPath,
@@ -286,7 +290,7 @@ class ShapePath {
 
 				const candidate = entries[ j ];
 
-				if ( ! candidate.boundingBox.containsBox( entry.boundingBox ) ) continue;
+				if ( ! box2ContainsBox( candidate.boundingBox, entry.boundingBox ) ) continue;
 				if ( ! pointInPolygon( entry.interiorPoint, candidate.points ) ) continue;
 
 				entry.container = candidate.exclude ? candidate.container : candidate;

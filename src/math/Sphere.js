@@ -1,13 +1,35 @@
-import { Box3 } from './Box3.js';
+import {
+	sphereApplyMatrix4,
+	sphereClampPoint,
+	sphereContainsPoint,
+	sphereCopy,
+	sphereDistanceToPoint,
+	sphereEquals,
+	sphereExpandByPoint,
+	sphereFromJSON,
+	sphereGetBoundingBox,
+	sphereIntersectsBox,
+	sphereIntersectsPlane,
+	sphereIntersectsSphere,
+	sphereIsEmpty,
+	sphereMakeEmpty,
+	sphereSet,
+	sphereSetFromPoints,
+	sphereToJSON,
+	sphereTranslate,
+	sphereUnion
+} from './SphereFunctions.js';
 import { Vector3 } from './Vector3.js';
-
-const _box = /*@__PURE__*/ new Box3();
-const _v1 = /*@__PURE__*/ new Vector3();
-const _v2 = /*@__PURE__*/ new Vector3();
 
 /**
  * An analytical 3D sphere defined by a center and radius. This class is mainly
  * used as a Bounding Sphere for 3D objects.
+ *
+ * `Sphere` is a thin, backwards-compatible wrapper around the standalone,
+ * tree-shakeable `sphere*` functions in {@link SphereFunctions}, which operate
+ * on any {@link SphereLike} object. Prefer importing those functions
+ * directly if you only need a handful of operations and want unused ones
+ * eliminated from your bundle.
  */
 class Sphere {
 
@@ -53,10 +75,7 @@ class Sphere {
 	 */
 	set( center, radius ) {
 
-		this.center.copy( center );
-		this.radius = radius;
-
-		return this;
+		return sphereSet( center, radius, this );
 
 	}
 
@@ -72,29 +91,7 @@ class Sphere {
 	 */
 	setFromPoints( points, optionalCenter ) {
 
-		const center = this.center;
-
-		if ( optionalCenter !== undefined ) {
-
-			center.copy( optionalCenter );
-
-		} else {
-
-			_box.setFromPoints( points ).getCenter( center );
-
-		}
-
-		let maxRadiusSq = 0;
-
-		for ( let i = 0, il = points.length; i < il; i ++ ) {
-
-			maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( points[ i ] ) );
-
-		}
-
-		this.radius = Math.sqrt( maxRadiusSq );
-
-		return this;
+		return sphereSetFromPoints( points, optionalCenter, this );
 
 	}
 
@@ -106,10 +103,7 @@ class Sphere {
 	 */
 	copy( sphere ) {
 
-		this.center.copy( sphere.center );
-		this.radius = sphere.radius;
-
-		return this;
+		return sphereCopy( sphere, this );
 
 	}
 
@@ -123,7 +117,7 @@ class Sphere {
 	 */
 	isEmpty() {
 
-		return ( this.radius < 0 );
+		return sphereIsEmpty( this );
 
 	}
 
@@ -134,10 +128,7 @@ class Sphere {
 	 */
 	makeEmpty() {
 
-		this.center.set( 0, 0, 0 );
-		this.radius = - 1;
-
-		return this;
+		return sphereMakeEmpty( this );
 
 	}
 
@@ -150,7 +141,7 @@ class Sphere {
 	 */
 	containsPoint( point ) {
 
-		return ( point.distanceToSquared( this.center ) <= ( this.radius * this.radius ) );
+		return sphereContainsPoint( this, point );
 
 	}
 
@@ -164,7 +155,7 @@ class Sphere {
 	 */
 	distanceToPoint( point ) {
 
-		return ( point.distanceTo( this.center ) - this.radius );
+		return sphereDistanceToPoint( this, point );
 
 	}
 
@@ -176,9 +167,7 @@ class Sphere {
 	 */
 	intersectsSphere( sphere ) {
 
-		const radiusSum = this.radius + sphere.radius;
-
-		return sphere.center.distanceToSquared( this.center ) <= ( radiusSum * radiusSum );
+		return sphereIntersectsSphere( this, sphere );
 
 	}
 
@@ -190,7 +179,7 @@ class Sphere {
 	 */
 	intersectsBox( box ) {
 
-		return box.intersectsSphere( this );
+		return sphereIntersectsBox( this, box );
 
 	}
 
@@ -202,7 +191,7 @@ class Sphere {
 	 */
 	intersectsPlane( plane ) {
 
-		return Math.abs( plane.distanceToPoint( this.center ) ) <= this.radius;
+		return sphereIntersectsPlane( this, plane );
 
 	}
 
@@ -217,18 +206,7 @@ class Sphere {
 	 */
 	clampPoint( point, target ) {
 
-		const deltaLengthSq = this.center.distanceToSquared( point );
-
-		target.copy( point );
-
-		if ( deltaLengthSq > ( this.radius * this.radius ) ) {
-
-			target.sub( this.center ).normalize();
-			target.multiplyScalar( this.radius ).add( this.center );
-
-		}
-
-		return target;
+		return sphereClampPoint( this, point, target );
 
 	}
 
@@ -240,18 +218,7 @@ class Sphere {
 	 */
 	getBoundingBox( target ) {
 
-		if ( this.isEmpty() ) {
-
-			// Empty sphere produces empty bounding box
-			target.makeEmpty();
-			return target;
-
-		}
-
-		target.set( this.center, this.center );
-		target.expandByScalar( this.radius );
-
-		return target;
+		return sphereGetBoundingBox( this, target );
 
 	}
 
@@ -263,10 +230,7 @@ class Sphere {
 	 */
 	applyMatrix4( matrix ) {
 
-		this.center.applyMatrix4( matrix );
-		this.radius = this.radius * matrix.getMaxScaleOnAxis();
-
-		return this;
+		return sphereApplyMatrix4( this, matrix, this );
 
 	}
 
@@ -278,9 +242,7 @@ class Sphere {
 	 */
 	translate( offset ) {
 
-		this.center.add( offset );
-
-		return this;
+		return sphereTranslate( this, offset, this );
 
 	}
 
@@ -292,35 +254,7 @@ class Sphere {
 	 */
 	expandByPoint( point ) {
 
-		if ( this.isEmpty() ) {
-
-			this.center.copy( point );
-
-			this.radius = 0;
-
-			return this;
-
-		}
-
-		_v1.subVectors( point, this.center );
-
-		const lengthSq = _v1.lengthSq();
-
-		if ( lengthSq > ( this.radius * this.radius ) ) {
-
-			// calculate the minimal sphere
-
-			const length = Math.sqrt( lengthSq );
-
-			const delta = ( length - this.radius ) * 0.5;
-
-			this.center.addScaledVector( _v1, delta / length );
-
-			this.radius += delta;
-
-		}
-
-		return this;
+		return sphereExpandByPoint( this, point, this );
 
 	}
 
@@ -332,35 +266,7 @@ class Sphere {
 	 */
 	union( sphere ) {
 
-		if ( sphere.isEmpty() ) {
-
-			return this;
-
-		}
-
-		if ( this.isEmpty() ) {
-
-			this.copy( sphere );
-
-			return this;
-
-		}
-
-		if ( this.center.equals( sphere.center ) === true ) {
-
-			 this.radius = Math.max( this.radius, sphere.radius );
-
-		} else {
-
-			_v2.subVectors( sphere.center, this.center ).setLength( sphere.radius );
-
-			this.expandByPoint( _v1.copy( sphere.center ).add( _v2 ) );
-
-			this.expandByPoint( _v1.copy( sphere.center ).sub( _v2 ) );
-
-		}
-
-		return this;
+		return sphereUnion( this, sphere, this );
 
 	}
 
@@ -372,7 +278,7 @@ class Sphere {
 	 */
 	equals( sphere ) {
 
-		return sphere.center.equals( this.center ) && ( sphere.radius === this.radius );
+		return sphereEquals( this, sphere );
 
 	}
 
@@ -394,10 +300,7 @@ class Sphere {
 	 */
 	toJSON() {
 
-		return {
-			radius: this.radius,
-			center: this.center.toArray()
-		};
+		return sphereToJSON( this );
 
 	}
 
@@ -409,9 +312,7 @@ class Sphere {
 	 */
 	fromJSON( json ) {
 
-		this.radius = json.radius;
-		this.center.fromArray( json.center );
-		return this;
+		return sphereFromJSON( json, this );
 
 	}
 

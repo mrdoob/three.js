@@ -3,10 +3,15 @@ import {
 	Bone,
 	FileLoader,
 	Loader,
-	Quaternion,
+	quatCreate,
+	quatSetFromAxisAngle,
+	quatMultiply,
+	quatToArray,
 	QuaternionKeyframeTrack,
 	Skeleton,
-	Vector3,
+	vec3Create,
+	vec3Set,
+	vec3Add,
 	VectorKeyframeTrack
 } from 'three';
 
@@ -194,17 +199,17 @@ class BVHLoader extends Loader {
 
 			const keyframe = {
 				time: frameTime,
-				position: new Vector3(),
-				rotation: new Quaternion()
+				position: vec3Create(),
+				rotation: quatCreate()
 			};
 
 			bone.frames.push( keyframe );
 
-			const quat = new Quaternion();
+			const quat = quatCreate();
 
-			const vx = new Vector3( 1, 0, 0 );
-			const vy = new Vector3( 0, 1, 0 );
-			const vz = new Vector3( 0, 0, 1 );
+			const vx = vec3Set( vec3Create(), 1, 0, 0 );
+			const vy = vec3Set( vec3Create(), 0, 1, 0 );
+			const vz = vec3Set( vec3Create(), 0, 0, 1 );
 
 			// parse values for each channel in node
 
@@ -222,16 +227,16 @@ class BVHLoader extends Loader {
 						keyframe.position.z = parseFloat( data.shift().trim() );
 						break;
 					case 'Xrotation':
-						quat.setFromAxisAngle( vx, parseFloat( data.shift().trim() ) * Math.PI / 180 );
-						keyframe.rotation.multiply( quat );
+						quatSetFromAxisAngle( vx, parseFloat( data.shift().trim() ) * Math.PI / 180, quat );
+						quatMultiply( keyframe.rotation, quat, keyframe.rotation );
 						break;
 					case 'Yrotation':
-						quat.setFromAxisAngle( vy, parseFloat( data.shift().trim() ) * Math.PI / 180 );
-						keyframe.rotation.multiply( quat );
+						quatSetFromAxisAngle( vy, parseFloat( data.shift().trim() ) * Math.PI / 180, quat );
+						quatMultiply( keyframe.rotation, quat, keyframe.rotation );
 						break;
 					case 'Zrotation':
-						quat.setFromAxisAngle( vz, parseFloat( data.shift().trim() ) * Math.PI / 180 );
-						keyframe.rotation.multiply( quat );
+						quatSetFromAxisAngle( vz, parseFloat( data.shift().trim() ) * Math.PI / 180, quat );
+						quatMultiply( keyframe.rotation, quat, keyframe.rotation );
 						break;
 					default:
 						console.warn( 'THREE.BVHLoader: Invalid channel type.' );
@@ -302,7 +307,8 @@ class BVHLoader extends Loader {
 
 			}
 
-			const offset = new Vector3(
+			const offset = vec3Set(
+				vec3Create(),
 				parseFloat( tokens[ 1 ] ),
 				parseFloat( tokens[ 2 ] ),
 				parseFloat( tokens[ 3 ] )
@@ -367,7 +373,7 @@ class BVHLoader extends Loader {
 			const bone = new Bone();
 			list.push( bone );
 
-			bone.position.add( source.offset );
+			vec3Add( bone.position, source.offset, bone.position );
 			bone.name = source.name;
 
 			if ( source.type !== 'ENDSITE' ) {
@@ -423,10 +429,8 @@ class BVHLoader extends Loader {
 					positions.push( frame.position.y + bone.offset.y );
 					positions.push( frame.position.z + bone.offset.z );
 
-					rotations.push( frame.rotation.x );
-					rotations.push( frame.rotation.y );
-					rotations.push( frame.rotation.z );
-					rotations.push( frame.rotation.w );
+					const rotation = quatToArray( frame.rotation );
+					rotations.push( rotation[ 0 ], rotation[ 1 ], rotation[ 2 ], rotation[ 3 ] );
 
 				}
 

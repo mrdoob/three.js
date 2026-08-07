@@ -2,7 +2,17 @@ import {
 	BufferAttribute,
 	BufferGeometry,
 	Mesh,
-	Vector3
+	vec3AddScaledVector,
+	vec3ApplyAxisAngle,
+	vec3Copy,
+	vec3Create,
+	vec3CrossVectors,
+	vec3DivideScalar,
+	vec3Dot,
+	vec3Length,
+	vec3Lerp,
+	vec3Normalize,
+	vec3Set
 } from 'three';
 
 import { MeshStandardNodeMaterial } from 'three/webgpu';
@@ -14,8 +24,8 @@ const GOLDEN_ANGLE = Math.PI * ( 3 - Math.sqrt( 5 ) );
 const DEG2RAD = Math.PI / 180;
 const TAU = Math.PI * 2;
 
-const UP = /*@__PURE__*/ new Vector3( 0, 1, 0 );
-const _axis = /*@__PURE__*/ new Vector3();
+const UP = /*@__PURE__*/ vec3Set( vec3Create(), 0, 1, 0 );
+const _axis = /*@__PURE__*/ vec3Create();
 
 // reusable scratch for one tube's ring vertices ( grows to the largest tube seen )
 let _ring = new Float32Array( 0 );
@@ -62,7 +72,7 @@ class TreeGenerator {
 		// one pass — no per-vertex objects, no array growth
 
 		const tubes = [];
-		growBranch( tubes, new Vector3(), UP, p.trunkLength, p.trunkRadius, 0, p, random );
+		growBranch( tubes, vec3Create(), UP, p.trunkLength, p.trunkRadius, 0, p, random );
 
 		let vertexCount = 0;
 		for ( const tube of tubes ) vertexCount += ( tube.rings.length - 1 ) * tube.radial * 6;
@@ -139,11 +149,11 @@ function growBranch( tubes, base, dir, length, baseRadius, level, p, random ) {
 	const gnarl = p.gnarl[ Math.min( level, p.gnarl.length - 1 ) ];
 	const start = level === 0 ? p.trunkClear : p.childStart; // the trunk carries a clean bole below its crown
 
-	let tangent = dir.clone().normalize();
+	let tangent = vec3Normalize( dir );
 	const normal = perpendicular( tangent );
 
 	const rings = [];
-	const pos = base.clone();
+	const pos = vec3Copy( base );
 
 	for ( let s = 0; s <= sections; s ++ ) {
 
@@ -159,24 +169,24 @@ function growBranch( tubes, base, dir, length, baseRadius, level, p, random ) {
 		}
 
 		rings.push( {
-			pos: pos.clone(),
-			tangent: tangent.clone(),
-			normal: normal.clone(),
-			binormal: new Vector3().crossVectors( tangent, normal ),
+			pos: vec3Copy( pos ),
+			tangent: vec3Copy( tangent ),
+			normal: vec3Copy( normal ),
+			binormal: vec3CrossVectors( tangent, normal ),
 			radius
 		} );
 
 		if ( s < sections ) {
 
-			const next = tangent.clone();
+			const next = vec3Copy( tangent );
 			next.x += ( random() * 2 - 1 ) * gnarl;
 			next.y += ( random() * 2 - 1 ) * gnarl;
 			next.z += ( random() * 2 - 1 ) * gnarl;
 			if ( level > 0 ) next.y -= p.droop * step; // branches sag; the trunk stays vertical
-			next.normalize();
+			vec3Normalize( next, next );
 
 			transport( tangent, next, normal ); // keep the frame torsion-free
-			pos.addScaledVector( next, step );
+			vec3AddScaledVector( pos, next, step, pos );
 			tangent = next;
 
 		}
@@ -204,10 +214,9 @@ function growBranch( tubes, base, dir, length, baseRadius, level, p, random ) {
 
 		// tilt off a perpendicular axis FIRST, then roll about the parent axis, then pull
 		// back toward the light ( else the roll sends half the children downward )
-		const childDir = ring.tangent.clone()
-			.applyAxisAngle( ring.normal, tilt )
-			.applyAxisAngle( ring.tangent, roll );
-		if ( p.upPull > 0 ) childDir.lerp( UP, p.upPull ).normalize();
+		const childDir = vec3ApplyAxisAngle( ring.tangent, ring.normal, tilt );
+		vec3ApplyAxisAngle( childDir, ring.tangent, roll, childDir );
+		if ( p.upPull > 0 ) vec3Normalize( vec3Lerp( childDir, UP, p.upPull, childDir ), childDir );
 
 		// the pipe-model drop, but never fatter than the wood it leaves nor below the floor
 		const childBase = Math.max( p.minRadius, Math.min( baseRadius * pipeDrop, ring.radius ) );
@@ -221,19 +230,28 @@ function growBranch( tubes, base, dir, length, baseRadius, level, p, random ) {
 // a unit vector perpendicular to v ( cross with the least-aligned axis )
 function perpendicular( v ) {
 
-	const a = Math.abs( v.x ) < 0.9 ? _axis.set( 1, 0, 0 ) : _axis.set( 0, 1, 0 );
-	return new Vector3().crossVectors( v, a ).normalize();
+	if ( Math.abs( v.x ) < 0.9 ) {
+
+		vec3Set( _axis, 1, 0, 0 );
+
+	} else {
+
+		vec3Set( _axis, 0, 1, 0 );
+
+	}
+
+	return vec3Normalize( vec3CrossVectors( v, _axis ) );
 
 }
 
 // rotate frame vector n by the rotation that maps tangent t0 onto t1
 function transport( t0, t1, n ) {
 
-	_axis.crossVectors( t0, t1 );
-	const sin = _axis.length();
+	vec3CrossVectors( t0, t1, _axis );
+	const sin = vec3Length( _axis );
 	if ( sin < 1e-6 ) return; // already parallel
-	_axis.divideScalar( sin );
-	n.applyAxisAngle( _axis, Math.atan2( sin, t0.dot( t1 ) ) );
+	vec3DivideScalar( _axis, sin, _axis );
+	vec3ApplyAxisAngle( n, _axis, Math.atan2( sin, vec3Dot( t0, t1 ) ), n );
 
 }
 
@@ -247,9 +265,9 @@ function ringAt( rings, t ) {
 	const b = rings[ Math.min( i + 1, rings.length - 1 ) ];
 
 	return {
-		pos: a.pos.clone().lerp( b.pos, frac ),
-		tangent: a.tangent.clone().lerp( b.tangent, frac ).normalize(),
-		normal: a.normal.clone().lerp( b.normal, frac ).normalize(),
+		pos: vec3Lerp( a.pos, b.pos, frac ),
+		tangent: vec3Normalize( vec3Lerp( a.tangent, b.tangent, frac ) ),
+		normal: vec3Normalize( vec3Lerp( a.normal, b.normal, frac ) ),
 		radius: a.radius + ( b.radius - a.radius ) * frac
 	};
 

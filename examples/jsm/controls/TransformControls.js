@@ -4,32 +4,60 @@ import {
 	Controls,
 	CylinderGeometry,
 	DoubleSide,
-	Euler,
+	eulerCreate,
+	eulerSet,
 	Float32BufferAttribute,
 	Line,
 	LineBasicMaterial,
-	Matrix4,
+	mat4Create,
+	mat4Decompose,
+	mat4Invert,
+	mat4LookAt,
 	Mesh,
 	MeshBasicMaterial,
 	Object3D,
 	OctahedronGeometry,
 	PlaneGeometry,
-	Quaternion,
+	quatCopy,
+	quatCreate,
+	quatInvert,
+	quatMultiply,
+	quatMultiplyQuaternions,
+	quatNormalize,
+	quatSetFromAxisAngle,
+	quatSetFromEuler,
+	quatSetFromRotationMatrix,
 	Raycaster,
 	SphereGeometry,
 	TorusGeometry,
-	Vector3
+	vec3Add,
+	vec3ApplyMatrix4,
+	vec3ApplyQuaternion,
+	vec3Copy,
+	vec3Create,
+	vec3Cross,
+	vec3DistanceTo,
+	vec3Divide,
+	vec3Dot,
+	vec3Length,
+	vec3Multiply,
+	vec3MultiplyScalar,
+	vec3Normalize,
+	vec3Set,
+	vec3SetFromMatrixPosition,
+	vec3Sub,
+	vec3AngleTo
 } from 'three';
 
 const _raycaster = new Raycaster();
 
-const _tempVector = new Vector3();
-const _tempVector2 = new Vector3();
-const _tempQuaternion = new Quaternion();
+const _tempVector = /*@__PURE__*/ vec3Create();
+const _tempVector2 = /*@__PURE__*/ vec3Create();
+const _tempQuaternion = /*@__PURE__*/ quatCreate();
 const _unit = {
-	X: new Vector3( 1, 0, 0 ),
-	Y: new Vector3( 0, 1, 0 ),
-	Z: new Vector3( 0, 0, 1 )
+	X: /*@__PURE__*/ vec3Set( vec3Create(), 1, 0, 0 ),
+	Y: /*@__PURE__*/ vec3Set( vec3Create(), 0, 1, 0 ),
+	Z: /*@__PURE__*/ vec3Set( vec3Create(), 0, 0, 1 )
 };
 
 /**
@@ -363,17 +391,17 @@ class TransformControls extends Controls {
 
 		// Reusable utility variables
 
-		const worldPosition = new Vector3();
-		const worldPositionStart = new Vector3();
-		const worldQuaternion = new Quaternion();
-		const worldQuaternionStart = new Quaternion();
-		const cameraPosition = new Vector3();
-		const cameraQuaternion = new Quaternion();
-		const pointStart = new Vector3();
-		const pointEnd = new Vector3();
-		const rotationAxis = new Vector3();
+		const worldPosition = vec3Create();
+		const worldPositionStart = vec3Create();
+		const worldQuaternion = quatCreate();
+		const worldQuaternionStart = quatCreate();
+		const cameraPosition = vec3Create();
+		const cameraQuaternion = quatCreate();
+		const pointStart = vec3Create();
+		const pointEnd = vec3Create();
+		const rotationAxis = vec3Create();
 		const rotationAngle = 0;
-		const eye = new Vector3();
+		const eye = vec3Create();
 
 		// TODO: remove properties unused in plane and gizmo
 
@@ -389,23 +417,23 @@ class TransformControls extends Controls {
 		defineProperty( 'rotationAngle', rotationAngle );
 		defineProperty( 'eye', eye );
 
-		this._offset = new Vector3();
-		this._startNorm = new Vector3();
-		this._endNorm = new Vector3();
-		this._cameraScale = new Vector3();
+		this._offset = vec3Create();
+		this._startNorm = vec3Create();
+		this._endNorm = vec3Create();
+		this._cameraScale = vec3Create();
 
-		this._parentPosition = new Vector3();
-		this._parentQuaternion = new Quaternion();
-		this._parentQuaternionInv = new Quaternion();
-		this._parentScale = new Vector3();
+		this._parentPosition = vec3Create();
+		this._parentQuaternion = quatCreate();
+		this._parentQuaternionInv = quatCreate();
+		this._parentScale = vec3Create();
 
-		this._worldScaleStart = new Vector3();
-		this._worldQuaternionInv = new Quaternion();
-		this._worldScale = new Vector3();
+		this._worldScaleStart = vec3Create();
+		this._worldQuaternionInv = quatCreate();
+		this._worldScale = vec3Create();
 
-		this._positionStart = new Vector3();
-		this._quaternionStart = new Quaternion();
-		this._scaleStart = new Vector3();
+		this._positionStart = vec3Create();
+		this._quaternionStart = quatCreate();
+		this._scaleStart = vec3Create();
 
 		this._getPointer = getPointer.bind( this );
 		this._onPointerDown = onPointerDown.bind( this );
@@ -491,13 +519,13 @@ class TransformControls extends Controls {
 				this.object.updateMatrixWorld();
 				this.object.parent.updateMatrixWorld();
 
-				this._positionStart.copy( this.object.position );
-				this._quaternionStart.copy( this.object.quaternion );
-				this._scaleStart.copy( this.object.scale );
+				vec3Copy( this.object.position, this._positionStart );
+				quatCopy( this.object.quaternion, this._quaternionStart );
+				vec3Copy( this.object.scale, this._scaleStart );
 
-				this.object.matrixWorld.decompose( this.worldPositionStart, this.worldQuaternionStart, this._worldScaleStart );
+				mat4Decompose( this.object.matrixWorld, this.worldPositionStart, this.worldQuaternionStart, this._worldScaleStart );
 
-				this.pointStart.copy( planeIntersect.point ).sub( this.worldPositionStart );
+				vec3Sub( planeIntersect.point, this.worldPositionStart, this.pointStart );
 
 			}
 
@@ -534,17 +562,17 @@ class TransformControls extends Controls {
 
 		if ( ! planeIntersect ) return;
 
-		this.pointEnd.copy( planeIntersect.point ).sub( this.worldPositionStart );
+		vec3Sub( planeIntersect.point, this.worldPositionStart, this.pointEnd );
 
 		if ( mode === 'translate' ) {
 
 			// Apply translate
 
-			this._offset.copy( this.pointEnd ).sub( this.pointStart );
+			vec3Sub( this.pointEnd, this.pointStart, this._offset );
 
 			if ( space === 'local' && axis !== 'XYZ' ) {
 
-				this._offset.applyQuaternion( this._worldQuaternionInv );
+				vec3ApplyQuaternion( this._offset, this._worldQuaternionInv, this._offset );
 
 			}
 
@@ -554,15 +582,17 @@ class TransformControls extends Controls {
 
 			if ( space === 'local' && axis !== 'XYZ' ) {
 
-				this._offset.applyQuaternion( this._quaternionStart ).divide( this._parentScale );
+				vec3ApplyQuaternion( this._offset, this._quaternionStart, this._offset );
+				vec3Divide( this._offset, this._parentScale, this._offset );
 
 			} else {
 
-				this._offset.applyQuaternion( this._parentQuaternionInv ).divide( this._parentScale );
+				vec3ApplyQuaternion( this._offset, this._parentQuaternionInv, this._offset );
+				vec3Divide( this._offset, this._parentScale, this._offset );
 
 			}
 
-			object.position.copy( this._offset ).add( this._positionStart );
+			vec3Add( this._offset, this._positionStart, object.position );
 
 			// Apply translation snap
 
@@ -570,7 +600,8 @@ class TransformControls extends Controls {
 
 				if ( space === 'local' ) {
 
-					object.position.applyQuaternion( _tempQuaternion.copy( this._quaternionStart ).invert() );
+					quatInvert( this._quaternionStart, _tempQuaternion );
+					vec3ApplyQuaternion( object.position, _tempQuaternion, object.position );
 
 					if ( axis.search( 'X' ) !== - 1 ) {
 
@@ -590,13 +621,13 @@ class TransformControls extends Controls {
 
 					}
 
-					object.position.applyQuaternion( this._quaternionStart );
+					vec3ApplyQuaternion( object.position, this._quaternionStart, object.position );
 
 				}
 
 				if ( space === 'world' ) {
 
-					object.getWorldPosition( _tempVector );
+					vec3SetFromMatrixPosition( object.matrixWorld, _tempVector );
 
 					if ( axis.search( 'X' ) !== - 1 ) {
 
@@ -616,7 +647,8 @@ class TransformControls extends Controls {
 
 					}
 
-					object.position.copy( object.parent.worldToLocal( _tempVector ) );
+					mat4Invert( object.parent.matrixWorld, _tempMatrix );
+					vec3ApplyMatrix4( _tempVector, _tempMatrix, object.position );
 
 				}
 
@@ -630,21 +662,21 @@ class TransformControls extends Controls {
 
 			if ( axis.search( 'XYZ' ) !== - 1 ) {
 
-				let d = this.pointEnd.length() / this.pointStart.length();
+				let d = vec3Length( this.pointEnd ) / vec3Length( this.pointStart );
 
-				if ( this.pointEnd.dot( this.pointStart ) < 0 ) d *= - 1;
+				if ( vec3Dot( this.pointEnd, this.pointStart ) < 0 ) d *= - 1;
 
-				_tempVector2.set( d, d, d );
+				vec3Set( _tempVector2, d, d, d );
 
 			} else {
 
-				_tempVector.copy( this.pointStart );
-				_tempVector2.copy( this.pointEnd );
+				vec3Copy( this.pointStart, _tempVector );
+				vec3Copy( this.pointEnd, _tempVector2 );
 
-				_tempVector.applyQuaternion( this._worldQuaternionInv );
-				_tempVector2.applyQuaternion( this._worldQuaternionInv );
+				vec3ApplyQuaternion( _tempVector, this._worldQuaternionInv, _tempVector );
+				vec3ApplyQuaternion( _tempVector2, this._worldQuaternionInv, _tempVector2 );
 
-				_tempVector2.divide( _tempVector );
+				vec3Divide( _tempVector2, _tempVector, _tempVector2 );
 
 				if ( axis.search( 'X' ) === - 1 ) {
 
@@ -668,7 +700,7 @@ class TransformControls extends Controls {
 
 			// Apply scale
 
-			object.scale.copy( this._scaleStart ).multiply( _tempVector2 );
+			vec3Multiply( this._scaleStart, _tempVector2, object.scale );
 
 			if ( this.scaleSnap ) {
 
@@ -694,39 +726,43 @@ class TransformControls extends Controls {
 
 		} else if ( mode === 'rotate' ) {
 
-			this._offset.copy( this.pointEnd ).sub( this.pointStart );
+			vec3Sub( this.pointEnd, this.pointStart, this._offset );
 
-			const ROTATION_SPEED = 20 / this.worldPosition.distanceTo( _tempVector.setFromMatrixPosition( this.camera.matrixWorld ) );
+			vec3SetFromMatrixPosition( this.camera.matrixWorld, _tempVector );
+			const ROTATION_SPEED = 20 / vec3DistanceTo( this.worldPosition, _tempVector );
 
 			let _inPlaneRotation = false;
 
 			if ( axis === 'XYZE' ) {
 
-				this.rotationAxis.copy( this._offset ).cross( this.eye ).normalize();
-				this.rotationAngle = this._offset.dot( _tempVector.copy( this.rotationAxis ).cross( this.eye ) ) * ROTATION_SPEED;
+				vec3Cross( this._offset, this.eye, this.rotationAxis );
+				vec3Normalize( this.rotationAxis, this.rotationAxis );
+				vec3Cross( this.rotationAxis, this.eye, _tempVector );
+				this.rotationAngle = vec3Dot( this._offset, _tempVector ) * ROTATION_SPEED;
 
 			} else if ( axis === 'X' || axis === 'Y' || axis === 'Z' ) {
 
-				this.rotationAxis.copy( _unit[ axis ] );
+				vec3Copy( _unit[ axis ], this.rotationAxis );
 
-				_tempVector.copy( _unit[ axis ] );
+				vec3Copy( _unit[ axis ], _tempVector );
 
 				if ( space === 'local' ) {
 
-					_tempVector.applyQuaternion( this.worldQuaternion );
+					vec3ApplyQuaternion( _tempVector, this.worldQuaternion, _tempVector );
 
 				}
 
-				_tempVector.cross( this.eye );
+				vec3Cross( _tempVector, this.eye, _tempVector );
 
 				// When _tempVector is 0 after cross with this.eye the vectors are parallel and should use in-plane rotation logic.
-				if ( _tempVector.length() === 0 ) {
+				if ( vec3Length( _tempVector ) === 0 ) {
 
 					_inPlaneRotation = true;
 
 				} else {
 
-					this.rotationAngle = this._offset.dot( _tempVector.normalize() ) * ROTATION_SPEED;
+					vec3Normalize( _tempVector, _tempVector );
+					this.rotationAngle = vec3Dot( this._offset, _tempVector ) * ROTATION_SPEED;
 
 				}
 
@@ -735,13 +771,14 @@ class TransformControls extends Controls {
 
 			if ( axis === 'E' || _inPlaneRotation ) {
 
-				this.rotationAxis.copy( this.eye );
-				this.rotationAngle = this.pointEnd.angleTo( this.pointStart );
+				vec3Copy( this.eye, this.rotationAxis );
+				this.rotationAngle = vec3AngleTo( this.pointEnd, this.pointStart );
 
-				this._startNorm.copy( this.pointStart ).normalize();
-				this._endNorm.copy( this.pointEnd ).normalize();
+				vec3Normalize( this.pointStart, this._startNorm );
+				vec3Normalize( this.pointEnd, this._endNorm );
 
-				this.rotationAngle *= ( this._endNorm.cross( this._startNorm ).dot( this.eye ) < 0 ? 1 : - 1 );
+				vec3Cross( this._endNorm, this._startNorm, this._endNorm );
+				this.rotationAngle *= ( vec3Dot( this._endNorm, this.eye ) < 0 ? 1 : - 1 );
 
 			}
 
@@ -752,14 +789,20 @@ class TransformControls extends Controls {
 			// Apply rotate
 			if ( space === 'local' && axis !== 'E' && axis !== 'XYZE' ) {
 
-				object.quaternion.copy( this._quaternionStart );
-				object.quaternion.multiply( _tempQuaternion.setFromAxisAngle( this.rotationAxis, this.rotationAngle ) ).normalize();
+				quatCopy( this._quaternionStart, object.quaternion );
+				quatSetFromAxisAngle( this.rotationAxis, this.rotationAngle, _tempQuaternion );
+				quatMultiply( object.quaternion, _tempQuaternion, object.quaternion );
+				quatNormalize( object.quaternion, object.quaternion );
+				object.quaternion._onChangeCallback();
 
 			} else {
 
-				this.rotationAxis.applyQuaternion( this._parentQuaternionInv );
-				object.quaternion.copy( _tempQuaternion.setFromAxisAngle( this.rotationAxis, this.rotationAngle ) );
-				object.quaternion.multiply( this._quaternionStart ).normalize();
+				vec3ApplyQuaternion( this.rotationAxis, this._parentQuaternionInv, this.rotationAxis );
+				quatSetFromAxisAngle( this.rotationAxis, this.rotationAngle, _tempQuaternion );
+				quatCopy( _tempQuaternion, object.quaternion );
+				quatMultiply( object.quaternion, this._quaternionStart, object.quaternion );
+				quatNormalize( object.quaternion, object.quaternion );
+				object.quaternion._onChangeCallback();
 
 			}
 
@@ -834,14 +877,15 @@ class TransformControls extends Controls {
 
 		if ( this.dragging ) {
 
-			this.object.position.copy( this._positionStart );
-			this.object.quaternion.copy( this._quaternionStart );
-			this.object.scale.copy( this._scaleStart );
+			vec3Copy( this._positionStart, this.object.position );
+			quatCopy( this._quaternionStart, this.object.quaternion );
+			this.object.quaternion._onChangeCallback();
+			vec3Copy( this._scaleStart, this.object.scale );
 
 			this.dispatchEvent( _changeEvent );
 			this.dispatchEvent( _objectChangeEvent );
 
-			this.pointStart.copy( this.pointEnd );
+			vec3Copy( this.pointEnd, this.pointStart );
 
 		}
 
@@ -1091,22 +1135,22 @@ function intersectObjectWithRay( object, raycaster, includeInvisible ) {
 
 // Reusable utility variables
 
-const _tempEuler = new Euler();
-const _alignVector = new Vector3( 0, 1, 0 );
-const _zeroVector = new Vector3( 0, 0, 0 );
-const _lookAtMatrix = new Matrix4();
-const _tempQuaternion2 = new Quaternion();
-const _identityQuaternion = new Quaternion();
-const _dirVector = new Vector3();
-const _tempMatrix = new Matrix4();
+const _tempEuler = /*@__PURE__*/ eulerCreate();
+const _alignVector = /*@__PURE__*/ vec3Set( vec3Create(), 0, 1, 0 );
+const _zeroVector = /*@__PURE__*/ vec3Create();
+const _lookAtMatrix = /*@__PURE__*/ mat4Create();
+const _tempQuaternion2 = /*@__PURE__*/ quatCreate();
+const _identityQuaternion = /*@__PURE__*/ quatCreate();
+const _dirVector = /*@__PURE__*/ vec3Create();
+const _tempMatrix = /*@__PURE__*/ mat4Create();
 
-const _unitX = new Vector3( 1, 0, 0 );
-const _unitY = new Vector3( 0, 1, 0 );
-const _unitZ = new Vector3( 0, 0, 1 );
+const _unitX = /*@__PURE__*/ vec3Set( vec3Create(), 1, 0, 0 );
+const _unitY = /*@__PURE__*/ vec3Set( vec3Create(), 0, 1, 0 );
+const _unitZ = /*@__PURE__*/ vec3Set( vec3Create(), 0, 0, 1 );
 
-const _v1 = new Vector3();
-const _v2 = new Vector3();
-const _v3 = new Vector3();
+const _v1 = /*@__PURE__*/ vec3Create();
+const _v2 = /*@__PURE__*/ vec3Create();
+const _v3 = /*@__PURE__*/ vec3Create();
 
 class TransformControlsRoot extends Object3D {
 
@@ -1136,27 +1180,29 @@ class TransformControlsRoot extends Object3D {
 
 			} else {
 
-				controls.object.parent.matrixWorld.decompose( controls._parentPosition, controls._parentQuaternion, controls._parentScale );
+				mat4Decompose( controls.object.parent.matrixWorld, controls._parentPosition, controls._parentQuaternion, controls._parentScale );
 
 			}
 
-			controls.object.matrixWorld.decompose( controls.worldPosition, controls.worldQuaternion, controls._worldScale );
+			mat4Decompose( controls.object.matrixWorld, controls.worldPosition, controls.worldQuaternion, controls._worldScale );
 
-			controls._parentQuaternionInv.copy( controls._parentQuaternion ).invert();
-			controls._worldQuaternionInv.copy( controls.worldQuaternion ).invert();
+			quatInvert( controls._parentQuaternion, controls._parentQuaternionInv );
+			quatInvert( controls.worldQuaternion, controls._worldQuaternionInv );
 
 		}
 
 		controls.camera.updateMatrixWorld();
-		controls.camera.matrixWorld.decompose( controls.cameraPosition, controls.cameraQuaternion, controls._cameraScale );
+		mat4Decompose( controls.camera.matrixWorld, controls.cameraPosition, controls.cameraQuaternion, controls._cameraScale );
 
 		if ( controls.camera.isOrthographicCamera ) {
 
-			controls.camera.getWorldDirection( controls.eye ).negate();
+			vec3Set( controls.eye, 0, 0, 1 );
+			vec3ApplyQuaternion( controls.eye, controls.cameraQuaternion, controls.eye );
 
 		} else {
 
-			controls.eye.copy( controls.cameraPosition ).sub( controls.worldPosition ).normalize();
+			vec3Sub( controls.cameraPosition, controls.worldPosition, controls.eye );
+			vec3Normalize( controls.eye, controls.eye );
 
 		}
 
@@ -1164,8 +1210,9 @@ class TransformControlsRoot extends Object3D {
 
 		if ( this.parent ) {
 
-			_tempMatrix.copy( this.parent.matrixWorld ).invert();
-			_tempMatrix.decompose( this.position, this.quaternion, this.scale );
+			mat4Invert( this.parent.matrixWorld, _tempMatrix );
+			mat4Decompose( _tempMatrix, this.position, this.quaternion, this.scale );
+			this.quaternion._onChangeCallback();
 
 		}
 
@@ -1517,19 +1564,20 @@ class TransformControlsGizmo extends Object3D {
 
 					if ( position ) {
 
-						object.position.set( position[ 0 ], position[ 1 ], position[ 2 ] );
+						vec3Set( object.position, position[ 0 ], position[ 1 ], position[ 2 ] );
 
 					}
 
 					if ( rotation ) {
 
-						object.rotation.set( rotation[ 0 ], rotation[ 1 ], rotation[ 2 ] );
+						eulerSet( rotation[ 0 ], rotation[ 1 ], rotation[ 2 ], object.rotation._order, object.rotation );
+						object.rotation._onChangeCallback();
 
 					}
 
 					if ( scale ) {
 
-						object.scale.set( scale[ 0 ], scale[ 1 ], scale[ 2 ] );
+						vec3Set( object.scale, scale[ 0 ], scale[ 1 ], scale[ 2 ] );
 
 					}
 
@@ -1540,9 +1588,10 @@ class TransformControlsGizmo extends Object3D {
 					object.geometry = tempGeometry;
 					object.renderOrder = Infinity;
 
-					object.position.set( 0, 0, 0 );
-					object.rotation.set( 0, 0, 0 );
-					object.scale.set( 1, 1, 1 );
+					vec3Set( object.position, 0, 0, 0 );
+					eulerSet( 0, 0, 0, object.rotation._order, object.rotation );
+					object.rotation._onChangeCallback();
+					vec3Set( object.scale, 1, 1, 1 );
 
 					gizmo.add( object );
 
@@ -1609,8 +1658,9 @@ class TransformControlsGizmo extends Object3D {
 			// hide aligned to camera
 
 			handle.visible = true;
-			handle.rotation.set( 0, 0, 0 );
-			handle.position.copy( this.worldPosition );
+			eulerSet( 0, 0, 0, handle.rotation._order, handle.rotation );
+			handle.rotation._onChangeCallback();
+			vec3Copy( this.worldPosition, handle.position );
 
 			let factor;
 
@@ -1620,11 +1670,12 @@ class TransformControlsGizmo extends Object3D {
 
 			} else {
 
-				factor = this.worldPosition.distanceTo( this.cameraPosition ) * Math.min( 1.9 * Math.tan( Math.PI * this.camera.fov / 360 ) / this.camera.zoom, 7 );
+				factor = vec3DistanceTo( this.worldPosition, this.cameraPosition ) * Math.min( 1.9 * Math.tan( Math.PI * this.camera.fov / 360 ) / this.camera.zoom, 7 );
 
 			}
 
-			handle.scale.set( 1, 1, 1 ).multiplyScalar( factor * this.size / 4 );
+			vec3Set( handle.scale, 1, 1, 1 );
+			vec3MultiplyScalar( handle.scale, factor * this.size / 4, handle.scale );
 
 			// TODO: simplify helpers and consider decoupling from gizmo
 
@@ -1638,10 +1689,13 @@ class TransformControlsGizmo extends Object3D {
 
 					if ( this.axis === 'X' ) {
 
-						_tempQuaternion.setFromEuler( _tempEuler.set( 0, 0, 0 ) );
-						handle.quaternion.copy( quaternion ).multiply( _tempQuaternion );
+						eulerSet( 0, 0, 0, _tempEuler._order, _tempEuler );
+						quatSetFromEuler( _tempEuler, _tempQuaternion );
+						quatMultiply( quaternion, _tempQuaternion, handle.quaternion );
+						handle.quaternion._onChangeCallback();
 
-						if ( Math.abs( _alignVector.copy( _unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) > 0.9 ) {
+						vec3ApplyQuaternion( _unitX, quaternion, _alignVector );
+						if ( Math.abs( vec3Dot( _alignVector, this.eye ) ) > 0.9 ) {
 
 							handle.visible = false;
 
@@ -1651,10 +1705,13 @@ class TransformControlsGizmo extends Object3D {
 
 					if ( this.axis === 'Y' ) {
 
-						_tempQuaternion.setFromEuler( _tempEuler.set( 0, 0, Math.PI / 2 ) );
-						handle.quaternion.copy( quaternion ).multiply( _tempQuaternion );
+						eulerSet( 0, 0, Math.PI / 2, _tempEuler._order, _tempEuler );
+						quatSetFromEuler( _tempEuler, _tempQuaternion );
+						quatMultiply( quaternion, _tempQuaternion, handle.quaternion );
+						handle.quaternion._onChangeCallback();
 
-						if ( Math.abs( _alignVector.copy( _unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) > 0.9 ) {
+						vec3ApplyQuaternion( _unitY, quaternion, _alignVector );
+						if ( Math.abs( vec3Dot( _alignVector, this.eye ) ) > 0.9 ) {
 
 							handle.visible = false;
 
@@ -1664,10 +1721,13 @@ class TransformControlsGizmo extends Object3D {
 
 					if ( this.axis === 'Z' ) {
 
-						_tempQuaternion.setFromEuler( _tempEuler.set( 0, Math.PI / 2, 0 ) );
-						handle.quaternion.copy( quaternion ).multiply( _tempQuaternion );
+						eulerSet( 0, Math.PI / 2, 0, _tempEuler._order, _tempEuler );
+						quatSetFromEuler( _tempEuler, _tempQuaternion );
+						quatMultiply( quaternion, _tempQuaternion, handle.quaternion );
+						handle.quaternion._onChangeCallback();
 
-						if ( Math.abs( _alignVector.copy( _unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) > 0.9 ) {
+						vec3ApplyQuaternion( _unitZ, quaternion, _alignVector );
+						if ( Math.abs( vec3Dot( _alignVector, this.eye ) ) > 0.9 ) {
 
 							handle.visible = false;
 
@@ -1677,10 +1737,13 @@ class TransformControlsGizmo extends Object3D {
 
 					if ( this.axis === 'XYZE' ) {
 
-						_tempQuaternion.setFromEuler( _tempEuler.set( 0, Math.PI / 2, 0 ) );
-						_alignVector.copy( this.rotationAxis );
-						handle.quaternion.setFromRotationMatrix( _lookAtMatrix.lookAt( _zeroVector, _alignVector, _unitY ) );
-						handle.quaternion.multiply( _tempQuaternion );
+						eulerSet( 0, Math.PI / 2, 0, _tempEuler._order, _tempEuler );
+						quatSetFromEuler( _tempEuler, _tempQuaternion );
+						vec3Copy( this.rotationAxis, _alignVector );
+						mat4LookAt( _zeroVector, _alignVector, _unitY, _lookAtMatrix );
+						quatSetFromRotationMatrix( _lookAtMatrix, handle.quaternion );
+						quatMultiply( handle.quaternion, _tempQuaternion, handle.quaternion );
+						handle.quaternion._onChangeCallback();
 						handle.visible = this.dragging;
 
 					}
@@ -1694,34 +1757,40 @@ class TransformControlsGizmo extends Object3D {
 
 				} else if ( handle.name === 'START' ) {
 
-					handle.position.copy( this.worldPositionStart );
+					vec3Copy( this.worldPositionStart, handle.position );
 					handle.visible = this.dragging;
 
 				} else if ( handle.name === 'END' ) {
 
-					handle.position.copy( this.worldPosition );
+					vec3Copy( this.worldPosition, handle.position );
 					handle.visible = this.dragging;
 
 				} else if ( handle.name === 'DELTA' ) {
 
-					handle.position.copy( this.worldPositionStart );
-					handle.quaternion.copy( this.worldQuaternionStart );
-					_tempVector.set( 1e-10, 1e-10, 1e-10 ).add( this.worldPositionStart ).sub( this.worldPosition ).multiplyScalar( - 1 );
-					_tempVector.applyQuaternion( this.worldQuaternionStart.clone().invert() );
-					handle.scale.copy( _tempVector );
+					vec3Copy( this.worldPositionStart, handle.position );
+					quatCopy( this.worldQuaternionStart, handle.quaternion );
+					handle.quaternion._onChangeCallback();
+					vec3Set( _tempVector, 1e-10, 1e-10, 1e-10 );
+					vec3Add( _tempVector, this.worldPositionStart, _tempVector );
+					vec3Sub( _tempVector, this.worldPosition, _tempVector );
+					vec3MultiplyScalar( _tempVector, - 1, _tempVector );
+					quatInvert( this.worldQuaternionStart, _tempQuaternion );
+					vec3ApplyQuaternion( _tempVector, _tempQuaternion, _tempVector );
+					vec3Copy( _tempVector, handle.scale );
 					handle.visible = this.dragging;
 
 				} else {
 
-					handle.quaternion.copy( quaternion );
+					quatCopy( quaternion, handle.quaternion );
+					handle.quaternion._onChangeCallback();
 
 					if ( this.dragging ) {
 
-						handle.position.copy( this.worldPositionStart );
+						vec3Copy( this.worldPositionStart, handle.position );
 
 					} else {
 
-						handle.position.copy( this.worldPosition );
+						vec3Copy( this.worldPosition, handle.position );
 
 					}
 
@@ -1740,7 +1809,8 @@ class TransformControlsGizmo extends Object3D {
 
 			// Align handles to current local or world rotation
 
-			handle.quaternion.copy( quaternion );
+			quatCopy( quaternion, handle.quaternion );
+			handle.quaternion._onChangeCallback();
 
 			if ( this.mode === 'translate' || this.mode === 'scale' ) {
 
@@ -1751,9 +1821,10 @@ class TransformControlsGizmo extends Object3D {
 
 				if ( handle.name === 'X' ) {
 
-					if ( Math.abs( _alignVector.copy( _unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_THRESHOLD ) {
+					vec3ApplyQuaternion( _unitX, quaternion, _alignVector );
+					if ( Math.abs( vec3Dot( _alignVector, this.eye ) ) > AXIS_HIDE_THRESHOLD ) {
 
-						handle.scale.set( 1e-10, 1e-10, 1e-10 );
+						vec3Set( handle.scale, 1e-10, 1e-10, 1e-10 );
 						handle.visible = false;
 
 					}
@@ -1762,9 +1833,10 @@ class TransformControlsGizmo extends Object3D {
 
 				if ( handle.name === 'Y' ) {
 
-					if ( Math.abs( _alignVector.copy( _unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_THRESHOLD ) {
+					vec3ApplyQuaternion( _unitY, quaternion, _alignVector );
+					if ( Math.abs( vec3Dot( _alignVector, this.eye ) ) > AXIS_HIDE_THRESHOLD ) {
 
-						handle.scale.set( 1e-10, 1e-10, 1e-10 );
+						vec3Set( handle.scale, 1e-10, 1e-10, 1e-10 );
 						handle.visible = false;
 
 					}
@@ -1773,9 +1845,10 @@ class TransformControlsGizmo extends Object3D {
 
 				if ( handle.name === 'Z' ) {
 
-					if ( Math.abs( _alignVector.copy( _unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_THRESHOLD ) {
+					vec3ApplyQuaternion( _unitZ, quaternion, _alignVector );
+					if ( Math.abs( vec3Dot( _alignVector, this.eye ) ) > AXIS_HIDE_THRESHOLD ) {
 
-						handle.scale.set( 1e-10, 1e-10, 1e-10 );
+						vec3Set( handle.scale, 1e-10, 1e-10, 1e-10 );
 						handle.visible = false;
 
 					}
@@ -1784,9 +1857,10 @@ class TransformControlsGizmo extends Object3D {
 
 				if ( handle.name === 'XY' ) {
 
-					if ( Math.abs( _alignVector.copy( _unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_THRESHOLD ) {
+					vec3ApplyQuaternion( _unitZ, quaternion, _alignVector );
+					if ( Math.abs( vec3Dot( _alignVector, this.eye ) ) < PLANE_HIDE_THRESHOLD ) {
 
-						handle.scale.set( 1e-10, 1e-10, 1e-10 );
+						vec3Set( handle.scale, 1e-10, 1e-10, 1e-10 );
 						handle.visible = false;
 
 					}
@@ -1795,9 +1869,10 @@ class TransformControlsGizmo extends Object3D {
 
 				if ( handle.name === 'YZ' ) {
 
-					if ( Math.abs( _alignVector.copy( _unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_THRESHOLD ) {
+					vec3ApplyQuaternion( _unitX, quaternion, _alignVector );
+					if ( Math.abs( vec3Dot( _alignVector, this.eye ) ) < PLANE_HIDE_THRESHOLD ) {
 
-						handle.scale.set( 1e-10, 1e-10, 1e-10 );
+						vec3Set( handle.scale, 1e-10, 1e-10, 1e-10 );
 						handle.visible = false;
 
 					}
@@ -1806,9 +1881,10 @@ class TransformControlsGizmo extends Object3D {
 
 				if ( handle.name === 'XZ' ) {
 
-					if ( Math.abs( _alignVector.copy( _unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_THRESHOLD ) {
+					vec3ApplyQuaternion( _unitY, quaternion, _alignVector );
+					if ( Math.abs( vec3Dot( _alignVector, this.eye ) ) < PLANE_HIDE_THRESHOLD ) {
 
-						handle.scale.set( 1e-10, 1e-10, 1e-10 );
+						vec3Set( handle.scale, 1e-10, 1e-10, 1e-10 );
 						handle.visible = false;
 
 					}
@@ -1819,36 +1895,42 @@ class TransformControlsGizmo extends Object3D {
 
 				// Align handles to current local or world rotation
 
-				_tempQuaternion2.copy( quaternion );
-				_alignVector.copy( this.eye ).applyQuaternion( _tempQuaternion.copy( quaternion ).invert() );
+				quatCopy( quaternion, _tempQuaternion2 );
+				quatInvert( quaternion, _tempQuaternion );
+				vec3ApplyQuaternion( this.eye, _tempQuaternion, _alignVector );
 
 				if ( handle.name.search( 'E' ) !== - 1 ) {
 
-					handle.quaternion.setFromRotationMatrix( _lookAtMatrix.lookAt( this.eye, _zeroVector, _unitY ) );
+					mat4LookAt( this.eye, _zeroVector, _unitY, _lookAtMatrix );
+					quatSetFromRotationMatrix( _lookAtMatrix, handle.quaternion );
+					handle.quaternion._onChangeCallback();
 
 				}
 
 				if ( handle.name === 'X' ) {
 
-					_tempQuaternion.setFromAxisAngle( _unitX, Math.atan2( - _alignVector.y, _alignVector.z ) );
-					_tempQuaternion.multiplyQuaternions( _tempQuaternion2, _tempQuaternion );
-					handle.quaternion.copy( _tempQuaternion );
+					quatSetFromAxisAngle( _unitX, Math.atan2( - _alignVector.y, _alignVector.z ), _tempQuaternion );
+					quatMultiplyQuaternions( _tempQuaternion2, _tempQuaternion, _tempQuaternion );
+					quatCopy( _tempQuaternion, handle.quaternion );
+					handle.quaternion._onChangeCallback();
 
 				}
 
 				if ( handle.name === 'Y' ) {
 
-					_tempQuaternion.setFromAxisAngle( _unitY, Math.atan2( _alignVector.x, _alignVector.z ) );
-					_tempQuaternion.multiplyQuaternions( _tempQuaternion2, _tempQuaternion );
-					handle.quaternion.copy( _tempQuaternion );
+					quatSetFromAxisAngle( _unitY, Math.atan2( _alignVector.x, _alignVector.z ), _tempQuaternion );
+					quatMultiplyQuaternions( _tempQuaternion2, _tempQuaternion, _tempQuaternion );
+					quatCopy( _tempQuaternion, handle.quaternion );
+					handle.quaternion._onChangeCallback();
 
 				}
 
 				if ( handle.name === 'Z' ) {
 
-					_tempQuaternion.setFromAxisAngle( _unitZ, Math.atan2( _alignVector.y, _alignVector.x ) );
-					_tempQuaternion.multiplyQuaternions( _tempQuaternion2, _tempQuaternion );
-					handle.quaternion.copy( _tempQuaternion );
+					quatSetFromAxisAngle( _unitZ, Math.atan2( _alignVector.y, _alignVector.x ), _tempQuaternion );
+					quatMultiplyQuaternions( _tempQuaternion2, _tempQuaternion, _tempQuaternion );
+					quatCopy( _tempQuaternion, handle.quaternion );
+					handle.quaternion._onChangeCallback();
 
 				}
 
@@ -1926,17 +2008,17 @@ class TransformControlsPlane extends Mesh {
 
 		let space = this.space;
 
-		this.position.copy( this.worldPosition );
+		vec3Copy( this.worldPosition, this.position );
 
 		if ( this.mode === 'scale' ) space = 'local'; // scale always oriented to local rotation
 
-		_v1.copy( _unitX ).applyQuaternion( space === 'local' ? this.worldQuaternion : _identityQuaternion );
-		_v2.copy( _unitY ).applyQuaternion( space === 'local' ? this.worldQuaternion : _identityQuaternion );
-		_v3.copy( _unitZ ).applyQuaternion( space === 'local' ? this.worldQuaternion : _identityQuaternion );
+		vec3ApplyQuaternion( _unitX, space === 'local' ? this.worldQuaternion : _identityQuaternion, _v1 );
+		vec3ApplyQuaternion( _unitY, space === 'local' ? this.worldQuaternion : _identityQuaternion, _v2 );
+		vec3ApplyQuaternion( _unitZ, space === 'local' ? this.worldQuaternion : _identityQuaternion, _v3 );
 
 		// Align the plane for current transform mode, axis and space.
 
-		_alignVector.copy( _v2 );
+		vec3Copy( _v2, _alignVector );
 
 		switch ( this.mode ) {
 
@@ -1945,30 +2027,30 @@ class TransformControlsPlane extends Mesh {
 				switch ( this.axis ) {
 
 					case 'X':
-						_alignVector.copy( this.eye ).cross( _v1 );
-						_dirVector.copy( _v1 ).cross( _alignVector );
+						vec3Cross( this.eye, _v1, _alignVector );
+						vec3Cross( _v1, _alignVector, _dirVector );
 						break;
 					case 'Y':
-						_alignVector.copy( this.eye ).cross( _v2 );
-						_dirVector.copy( _v2 ).cross( _alignVector );
+						vec3Cross( this.eye, _v2, _alignVector );
+						vec3Cross( _v2, _alignVector, _dirVector );
 						break;
 					case 'Z':
-						_alignVector.copy( this.eye ).cross( _v3 );
-						_dirVector.copy( _v3 ).cross( _alignVector );
+						vec3Cross( this.eye, _v3, _alignVector );
+						vec3Cross( _v3, _alignVector, _dirVector );
 						break;
 					case 'XY':
-						_dirVector.copy( _v3 );
+						vec3Copy( _v3, _dirVector );
 						break;
 					case 'YZ':
-						_dirVector.copy( _v1 );
+						vec3Copy( _v1, _dirVector );
 						break;
 					case 'XZ':
-						_alignVector.copy( _v3 );
-						_dirVector.copy( _v2 );
+						vec3Copy( _v3, _alignVector );
+						vec3Copy( _v2, _dirVector );
 						break;
 					case 'XYZ':
 					case 'E':
-						_dirVector.set( 0, 0, 0 );
+						vec3Set( _dirVector, 0, 0, 0 );
 						break;
 
 				}
@@ -1977,20 +2059,23 @@ class TransformControlsPlane extends Mesh {
 			case 'rotate':
 			default:
 				// special case for rotate
-				_dirVector.set( 0, 0, 0 );
+				vec3Set( _dirVector, 0, 0, 0 );
 
 		}
 
-		if ( _dirVector.length() === 0 ) {
+		if ( vec3Length( _dirVector ) === 0 ) {
 
 			// If in rotate mode, make the plane parallel to camera
-			this.quaternion.copy( this.cameraQuaternion );
+			quatCopy( this.cameraQuaternion, this.quaternion );
+			this.quaternion._onChangeCallback();
 
 		} else {
 
-			_tempMatrix.lookAt( _tempVector.set( 0, 0, 0 ), _dirVector, _alignVector );
+			vec3Set( _tempVector, 0, 0, 0 );
+			mat4LookAt( _tempVector, _dirVector, _alignVector, _tempMatrix );
 
-			this.quaternion.setFromRotationMatrix( _tempMatrix );
+			quatSetFromRotationMatrix( _tempMatrix, this.quaternion );
+			this.quaternion._onChangeCallback();
 
 		}
 

@@ -5,7 +5,8 @@ import {
 	InstancedBufferAttribute,
 	InstancedMesh,
 	Object3D,
-	Vector3
+	vec3Copy,
+	vec3Create
 } from 'three';
 
 import { MeshStandardNodeMaterial } from 'three/webgpu';
@@ -46,7 +47,7 @@ class ForestGenerator {
 
 		// main-camera position ( set via setCameraPosition ). NOT the TSL cameraPosition node:
 		// in the shadow pass that resolves to the light, which would cull the wrong trees.
-		this._cameraPosition = uniform( new Vector3() );
+		this._cameraPosition = uniform( vec3Create(), 'vec3' );
 
 		this.material = createForestMaterial( this.from, this.to, this._cameraPosition );
 		this.mesh = null;
@@ -148,7 +149,7 @@ class ForestGenerator {
 	// call each frame so the distance cull tracks the camera
 	setCameraPosition( position ) {
 
-		this._cameraPosition.value.copy( position );
+		vec3Copy( position, this._cameraPosition.value );
 
 	}
 

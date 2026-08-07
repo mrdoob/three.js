@@ -1,9 +1,9 @@
-import { Matrix3 } from '../../math/Matrix3.js';
-import { Matrix4 } from '../../math/Matrix4.js';
-import { Plane } from '../../math/Plane.js';
-import { Vector4 } from '../../math/Vector4.js';
+import { mat3Create, mat3GetNormalMatrix } from '../../math/Matrix3Functions.js';
+import { mat4Copy, mat4Create } from '../../math/Matrix4Functions.js';
+import { planeApplyMatrix4, planeCopy, planeCreate } from '../../math/PlaneFunctions.js';
+import { vec4Create } from '../../math/Vector4Functions.js';
 
-const _plane = /*@__PURE__*/ new Plane();
+const _plane = /*@__PURE__*/ planeCreate();
 
 /**
  * Represents the state that is used to perform clipping via clipping planes.
@@ -58,14 +58,14 @@ class ClippingContext {
 		 *
 		 * @type {Matrix4}
 		 */
-		this.viewMatrix = new Matrix4();
+		this.viewMatrix = mat4Create();
 
 		/**
 		 * The view normal matrix.
 		 *
 		 * @type {Matrix3}
 		 */
-		this.viewNormalMatrix = new Matrix3();
+		this.viewNormalMatrix = mat3Create();
 
 		/**
 		 * Internal cache for maintaining clipping contexts.
@@ -122,7 +122,8 @@ class ClippingContext {
 
 		for ( let i = 0; i < l; i ++ ) {
 
-			_plane.copy( source[ i ] ).applyMatrix4( this.viewMatrix, this.viewNormalMatrix );
+			planeCopy( source[ i ], _plane );
+			planeApplyMatrix4( _plane, this.viewMatrix, this.viewNormalMatrix, _plane );
 
 			const v = destination[ offset + i ];
 			const normal = _plane.normal;
@@ -146,8 +147,8 @@ class ClippingContext {
 
 		this.shadowPass = ( scene.overrideMaterial !== null && scene.overrideMaterial.isShadowPassMaterial );
 
-		this.viewMatrix.copy( camera.matrixWorldInverse );
-		this.viewNormalMatrix.getNormalMatrix( this.viewMatrix );
+		mat4Copy( camera.matrixWorldInverse, this.viewMatrix );
+		mat3GetNormalMatrix( this.viewMatrix, this.viewNormalMatrix );
 
 	}
 
@@ -209,7 +210,7 @@ class ClippingContext {
 
 			for ( let i = 0; i < l; i ++ ) {
 
-				dstClippingPlanes[ offset + i ] = new Vector4();
+				dstClippingPlanes[ offset + i ] = vec4Create();
 
 			}
 

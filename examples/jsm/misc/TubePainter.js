@@ -1,13 +1,37 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
-	Color,
 	DynamicDrawUsage,
-	Matrix4,
-	Matrix3,
 	Mesh,
 	MeshStandardMaterial,
-	Vector3
+	colorCopy,
+	colorSetHex,
+	colorToArray,
+	mat3Create,
+	mat3GetNormalMatrix,
+	mat4Copy,
+	mat4Create,
+	mat4MakeBasis,
+	vec3Add,
+	vec3AddScaledVector,
+	vec3AddVectors,
+	vec3ApplyMatrix4,
+	vec3ApplyNormalMatrix,
+	vec3Copy,
+	vec3Create,
+	vec3CrossVectors,
+	vec3DistanceToSquared,
+	vec3DivideScalar,
+	vec3Dot,
+	vec3Length,
+	vec3Lerp,
+	vec3MultiplyScalar,
+	vec3Negate,
+	vec3Normalize,
+	vec3Set,
+	vec3Sub,
+	vec3SubVectors,
+	vec3ToArray
 } from 'three';
 
 /**
@@ -48,9 +72,9 @@ function TubePainter() {
 	const mesh = new Mesh( geometry, material );
 	mesh.frustumCulled = false;
 
-	const normalMatrix = new Matrix3();
-	const normalMatrix1 = new Matrix3();
-	const normalMatrix2 = new Matrix3();
+	const normalMatrix = mat3Create();
+	const normalMatrix1 = mat3Create();
+	const normalMatrix2 = mat3Create();
 
 	//
 
@@ -65,7 +89,7 @@ function TubePainter() {
 		for ( let i = 0; i < sides; i ++ ) {
 
 			const angle = ( i / sides ) * PI2;
-			array.push( new Vector3( Math.sin( angle ) * radius, Math.cos( angle ) * radius, 0 ) );
+			array.push( vec3Set( vec3Create(), Math.sin( angle ) * radius, Math.cos( angle ) * radius, 0 ) );
 
 		}
 
@@ -75,15 +99,15 @@ function TubePainter() {
 
 	//
 
-	const vector = new Vector3();
+	const vector = vec3Create();
 
-	const vector1 = new Vector3();
-	const vector2 = new Vector3();
-	const vector3 = new Vector3();
-	const vector4 = new Vector3();
+	const vector1 = vec3Create();
+	const vector2 = vec3Create();
+	const vector3 = vec3Create();
+	const vector4 = vec3Create();
 
-	const color1 = new Color( 0xffffff );
-	const color2 = new Color( 0xffffff );
+	const color1 = colorSetHex( 0xffffff );
+	const color2 = colorSetHex( 0xffffff );
 
 	let size1 = 1;
 	let size2 = 1;
@@ -98,7 +122,7 @@ function TubePainter() {
 		const latSegments = 4;
 		const directionSign = isEndCap ? - 1 : 1;
 
-		normalMatrix.getNormalMatrix( matrix );
+		mat3GetNormalMatrix( matrix, normalMatrix );
 
 		for ( let lat = 0; lat < latSegments; lat ++ ) {
 
@@ -131,76 +155,76 @@ function TubePainter() {
 				const y4 = Math.cos( theta2 ) * r2;
 
 				// Transform to world space
-				vector1.set( x1, y1, z1 ).applyMatrix4( matrix ).add( position );
-				vector2.set( x2, y2, z1 ).applyMatrix4( matrix ).add( position );
-				vector3.set( x3, y3, z2 ).applyMatrix4( matrix ).add( position );
-				vector4.set( x4, y4, z2 ).applyMatrix4( matrix ).add( position );
+				vec3Add( vec3ApplyMatrix4( vec3Set( vector1, x1, y1, z1 ), matrix, vector1 ), position, vector1 );
+				vec3Add( vec3ApplyMatrix4( vec3Set( vector2, x2, y2, z1 ), matrix, vector2 ), position, vector2 );
+				vec3Add( vec3ApplyMatrix4( vec3Set( vector3, x3, y3, z2 ), matrix, vector3 ), position, vector3 );
+				vec3Add( vec3ApplyMatrix4( vec3Set( vector4, x4, y4, z2 ), matrix, vector4 ), position, vector4 );
 
 				// First triangle
-				normal.set( x1, y1, z1 ).applyNormalMatrix( normalMatrix );
-				vector.set( x2, y2, z1 ).applyNormalMatrix( normalMatrix );
-				side.set( x3, y3, z2 ).applyNormalMatrix( normalMatrix );
+				vec3ApplyNormalMatrix( vec3Set( normal, x1, y1, z1 ), normalMatrix, normal );
+				vec3ApplyNormalMatrix( vec3Set( vector, x2, y2, z1 ), normalMatrix, vector );
+				vec3ApplyNormalMatrix( vec3Set( side, x3, y3, z2 ), normalMatrix, side );
 
 				if ( isEndCap ) {
 
-					vector1.toArray( positions.array, count * 3 );
-					vector2.toArray( positions.array, ( count + 1 ) * 3 );
-					vector3.toArray( positions.array, ( count + 2 ) * 3 );
+					vec3ToArray( vector1, positions.array, count * 3 );
+					vec3ToArray( vector2, positions.array, ( count + 1 ) * 3 );
+					vec3ToArray( vector3, positions.array, ( count + 2 ) * 3 );
 
-					normal.toArray( normals.array, count * 3 );
-					vector.toArray( normals.array, ( count + 1 ) * 3 );
-					side.toArray( normals.array, ( count + 2 ) * 3 );
+					vec3ToArray( normal, normals.array, count * 3 );
+					vec3ToArray( vector, normals.array, ( count + 1 ) * 3 );
+					vec3ToArray( side, normals.array, ( count + 2 ) * 3 );
 
 				} else {
 
-					vector1.toArray( positions.array, count * 3 );
-					vector3.toArray( positions.array, ( count + 1 ) * 3 );
-					vector2.toArray( positions.array, ( count + 2 ) * 3 );
+					vec3ToArray( vector1, positions.array, count * 3 );
+					vec3ToArray( vector3, positions.array, ( count + 1 ) * 3 );
+					vec3ToArray( vector2, positions.array, ( count + 2 ) * 3 );
 
-					normal.toArray( normals.array, count * 3 );
-					side.toArray( normals.array, ( count + 1 ) * 3 );
-					vector.toArray( normals.array, ( count + 2 ) * 3 );
+					vec3ToArray( normal, normals.array, count * 3 );
+					vec3ToArray( side, normals.array, ( count + 1 ) * 3 );
+					vec3ToArray( vector, normals.array, ( count + 2 ) * 3 );
 
 				}
 
-				color1.toArray( colors.array, count * 3 );
-				color1.toArray( colors.array, ( count + 1 ) * 3 );
-				color1.toArray( colors.array, ( count + 2 ) * 3 );
+				colorToArray( color1, colors.array, count * 3 );
+				colorToArray( color1, colors.array, ( count + 1 ) * 3 );
+				colorToArray( color1, colors.array, ( count + 2 ) * 3 );
 
 				count += 3;
 
 				// Second triangle
 				if ( r2 > 0.001 ) {
 
-					normal.set( x2, y2, z1 ).applyNormalMatrix( normalMatrix );
-					vector.set( x4, y4, z2 ).applyNormalMatrix( normalMatrix );
-					side.set( x3, y3, z2 ).applyNormalMatrix( normalMatrix );
+					vec3ApplyNormalMatrix( vec3Set( normal, x2, y2, z1 ), normalMatrix, normal );
+					vec3ApplyNormalMatrix( vec3Set( vector, x4, y4, z2 ), normalMatrix, vector );
+					vec3ApplyNormalMatrix( vec3Set( side, x3, y3, z2 ), normalMatrix, side );
 
 					if ( isEndCap ) {
 
-						vector2.toArray( positions.array, count * 3 );
-						vector4.toArray( positions.array, ( count + 1 ) * 3 );
-						vector3.toArray( positions.array, ( count + 2 ) * 3 );
+						vec3ToArray( vector2, positions.array, count * 3 );
+						vec3ToArray( vector4, positions.array, ( count + 1 ) * 3 );
+						vec3ToArray( vector3, positions.array, ( count + 2 ) * 3 );
 
-						normal.toArray( normals.array, count * 3 );
-						vector.toArray( normals.array, ( count + 1 ) * 3 );
-						side.toArray( normals.array, ( count + 2 ) * 3 );
+						vec3ToArray( normal, normals.array, count * 3 );
+						vec3ToArray( vector, normals.array, ( count + 1 ) * 3 );
+						vec3ToArray( side, normals.array, ( count + 2 ) * 3 );
 
 					} else {
 
-						vector3.toArray( positions.array, count * 3 );
-						vector4.toArray( positions.array, ( count + 1 ) * 3 );
-						vector2.toArray( positions.array, ( count + 2 ) * 3 );
+						vec3ToArray( vector3, positions.array, count * 3 );
+						vec3ToArray( vector4, positions.array, ( count + 1 ) * 3 );
+						vec3ToArray( vector2, positions.array, ( count + 2 ) * 3 );
 
-						side.toArray( normals.array, count * 3 );
-						vector.toArray( normals.array, ( count + 1 ) * 3 );
-						normal.toArray( normals.array, ( count + 2 ) * 3 );
+						vec3ToArray( side, normals.array, count * 3 );
+						vec3ToArray( vector, normals.array, ( count + 1 ) * 3 );
+						vec3ToArray( normal, normals.array, ( count + 2 ) * 3 );
 
 					}
 
-					color1.toArray( colors.array, count * 3 );
-					color1.toArray( colors.array, ( count + 1 ) * 3 );
-					color1.toArray( colors.array, ( count + 2 ) * 3 );
+					colorToArray( color1, colors.array, count * 3 );
+					colorToArray( color1, colors.array, ( count + 1 ) * 3 );
+					colorToArray( color1, colors.array, ( count + 2 ) * 3 );
 
 					count += 3;
 
@@ -223,7 +247,7 @@ function TubePainter() {
 		const radius = 0.01 * capSize;
 		const latSegments = 4;
 
-		normalMatrix.getNormalMatrix( matrix );
+		mat3GetNormalMatrix( matrix, normalMatrix );
 
 		let count = endCapStartIndex;
 
@@ -258,49 +282,49 @@ function TubePainter() {
 				const y4 = Math.cos( theta2 ) * r2;
 
 				// Transform positions to world space
-				vector1.set( x1, y1, z1 ).applyMatrix4( matrix ).add( position );
-				vector2.set( x2, y2, z1 ).applyMatrix4( matrix ).add( position );
-				vector3.set( x3, y3, z2 ).applyMatrix4( matrix ).add( position );
-				vector4.set( x4, y4, z2 ).applyMatrix4( matrix ).add( position );
+				vec3Add( vec3ApplyMatrix4( vec3Set( vector1, x1, y1, z1 ), matrix, vector1 ), position, vector1 );
+				vec3Add( vec3ApplyMatrix4( vec3Set( vector2, x2, y2, z1 ), matrix, vector2 ), position, vector2 );
+				vec3Add( vec3ApplyMatrix4( vec3Set( vector3, x3, y3, z2 ), matrix, vector3 ), position, vector3 );
+				vec3Add( vec3ApplyMatrix4( vec3Set( vector4, x4, y4, z2 ), matrix, vector4 ), position, vector4 );
 
 				// Transform normals to world space
-				normal.set( x1, y1, z1 ).applyNormalMatrix( normalMatrix );
-				vector.set( x2, y2, z1 ).applyNormalMatrix( normalMatrix );
-				side.set( x3, y3, z2 ).applyNormalMatrix( normalMatrix );
+				vec3ApplyNormalMatrix( vec3Set( normal, x1, y1, z1 ), normalMatrix, normal );
+				vec3ApplyNormalMatrix( vec3Set( vector, x2, y2, z1 ), normalMatrix, vector );
+				vec3ApplyNormalMatrix( vec3Set( side, x3, y3, z2 ), normalMatrix, side );
 
 				// First triangle
-				vector1.toArray( positions.array, count * 3 );
-				vector2.toArray( positions.array, ( count + 1 ) * 3 );
-				vector3.toArray( positions.array, ( count + 2 ) * 3 );
+				vec3ToArray( vector1, positions.array, count * 3 );
+				vec3ToArray( vector2, positions.array, ( count + 1 ) * 3 );
+				vec3ToArray( vector3, positions.array, ( count + 2 ) * 3 );
 
-				normal.toArray( normals.array, count * 3 );
-				vector.toArray( normals.array, ( count + 1 ) * 3 );
-				side.toArray( normals.array, ( count + 2 ) * 3 );
+				vec3ToArray( normal, normals.array, count * 3 );
+				vec3ToArray( vector, normals.array, ( count + 1 ) * 3 );
+				vec3ToArray( side, normals.array, ( count + 2 ) * 3 );
 
-				color1.toArray( colors.array, count * 3 );
-				color1.toArray( colors.array, ( count + 1 ) * 3 );
-				color1.toArray( colors.array, ( count + 2 ) * 3 );
+				colorToArray( color1, colors.array, count * 3 );
+				colorToArray( color1, colors.array, ( count + 1 ) * 3 );
+				colorToArray( color1, colors.array, ( count + 2 ) * 3 );
 
 				count += 3;
 
 				// Second triangle
 				if ( r2 > 0.001 ) {
 
-					normal.set( x2, y2, z1 ).applyNormalMatrix( normalMatrix );
-					vector.set( x4, y4, z2 ).applyNormalMatrix( normalMatrix );
-					side.set( x3, y3, z2 ).applyNormalMatrix( normalMatrix );
+					vec3ApplyNormalMatrix( vec3Set( normal, x2, y2, z1 ), normalMatrix, normal );
+					vec3ApplyNormalMatrix( vec3Set( vector, x4, y4, z2 ), normalMatrix, vector );
+					vec3ApplyNormalMatrix( vec3Set( side, x3, y3, z2 ), normalMatrix, side );
 
-					vector2.toArray( positions.array, count * 3 );
-					vector4.toArray( positions.array, ( count + 1 ) * 3 );
-					vector3.toArray( positions.array, ( count + 2 ) * 3 );
+					vec3ToArray( vector2, positions.array, count * 3 );
+					vec3ToArray( vector4, positions.array, ( count + 1 ) * 3 );
+					vec3ToArray( vector3, positions.array, ( count + 2 ) * 3 );
 
-					normal.toArray( normals.array, count * 3 );
-					vector.toArray( normals.array, ( count + 1 ) * 3 );
-					side.toArray( normals.array, ( count + 2 ) * 3 );
+					vec3ToArray( normal, normals.array, count * 3 );
+					vec3ToArray( vector, normals.array, ( count + 1 ) * 3 );
+					vec3ToArray( side, normals.array, ( count + 2 ) * 3 );
 
-					color1.toArray( colors.array, count * 3 );
-					color1.toArray( colors.array, ( count + 1 ) * 3 );
-					color1.toArray( colors.array, ( count + 2 ) * 3 );
+					colorToArray( color1, colors.array, count * 3 );
+					colorToArray( color1, colors.array, ( count + 1 ) * 3 );
+					colorToArray( color1, colors.array, ( count + 2 ) * 3 );
 
 					count += 3;
 
@@ -318,15 +342,15 @@ function TubePainter() {
 
 	function stroke( position1, position2, matrix1, matrix2, size1, size2 ) {
 
-		if ( position1.distanceToSquared( position2 ) === 0 ) return;
+		if ( vec3DistanceToSquared( position1, position2 ) === 0 ) return;
 
 		let count = geometry.drawRange.count;
 
 		const points1 = getPoints( size1 );
 		const points2 = getPoints( size2 );
 
-		normalMatrix1.getNormalMatrix( matrix1 );
-		normalMatrix2.getNormalMatrix( matrix2 );
+		mat3GetNormalMatrix( matrix1, normalMatrix1 );
+		mat3GetNormalMatrix( matrix2, normalMatrix2 );
 
 		for ( let i = 0, il = points2.length; i < il; i ++ ) {
 
@@ -335,39 +359,39 @@ function TubePainter() {
 			const vertex1_1 = points1[ i ];
 			const vertex2_1 = points1[ ( i + 1 ) % il ];
 
-			vector1.copy( vertex1_2 ).applyMatrix4( matrix2 ).add( position2 );
-			vector2.copy( vertex2_2 ).applyMatrix4( matrix2 ).add( position2 );
-			vector3.copy( vertex2_1 ).applyMatrix4( matrix1 ).add( position1 );
-			vector4.copy( vertex1_1 ).applyMatrix4( matrix1 ).add( position1 );
+			vec3Add( vec3ApplyMatrix4( vec3Copy( vertex1_2, vector1 ), matrix2, vector1 ), position2, vector1 );
+			vec3Add( vec3ApplyMatrix4( vec3Copy( vertex2_2, vector2 ), matrix2, vector2 ), position2, vector2 );
+			vec3Add( vec3ApplyMatrix4( vec3Copy( vertex2_1, vector3 ), matrix1, vector3 ), position1, vector3 );
+			vec3Add( vec3ApplyMatrix4( vec3Copy( vertex1_1, vector4 ), matrix1, vector4 ), position1, vector4 );
 
-			vector1.toArray( positions.array, ( count + 0 ) * 3 );
-			vector2.toArray( positions.array, ( count + 1 ) * 3 );
-			vector4.toArray( positions.array, ( count + 2 ) * 3 );
+			vec3ToArray( vector1, positions.array, ( count + 0 ) * 3 );
+			vec3ToArray( vector2, positions.array, ( count + 1 ) * 3 );
+			vec3ToArray( vector4, positions.array, ( count + 2 ) * 3 );
 
-			vector2.toArray( positions.array, ( count + 3 ) * 3 );
-			vector3.toArray( positions.array, ( count + 4 ) * 3 );
-			vector4.toArray( positions.array, ( count + 5 ) * 3 );
+			vec3ToArray( vector2, positions.array, ( count + 3 ) * 3 );
+			vec3ToArray( vector3, positions.array, ( count + 4 ) * 3 );
+			vec3ToArray( vector4, positions.array, ( count + 5 ) * 3 );
 
-			vector1.copy( vertex1_2 ).applyNormalMatrix( normalMatrix2 );
-			vector2.copy( vertex2_2 ).applyNormalMatrix( normalMatrix2 );
-			vector3.copy( vertex2_1 ).applyNormalMatrix( normalMatrix1 );
-			vector4.copy( vertex1_1 ).applyNormalMatrix( normalMatrix1 );
+			vec3ApplyNormalMatrix( vec3Copy( vertex1_2, vector1 ), normalMatrix2, vector1 );
+			vec3ApplyNormalMatrix( vec3Copy( vertex2_2, vector2 ), normalMatrix2, vector2 );
+			vec3ApplyNormalMatrix( vec3Copy( vertex2_1, vector3 ), normalMatrix1, vector3 );
+			vec3ApplyNormalMatrix( vec3Copy( vertex1_1, vector4 ), normalMatrix1, vector4 );
 
-			vector1.toArray( normals.array, ( count + 0 ) * 3 );
-			vector2.toArray( normals.array, ( count + 1 ) * 3 );
-			vector4.toArray( normals.array, ( count + 2 ) * 3 );
+			vec3ToArray( vector1, normals.array, ( count + 0 ) * 3 );
+			vec3ToArray( vector2, normals.array, ( count + 1 ) * 3 );
+			vec3ToArray( vector4, normals.array, ( count + 2 ) * 3 );
 
-			vector2.toArray( normals.array, ( count + 3 ) * 3 );
-			vector3.toArray( normals.array, ( count + 4 ) * 3 );
-			vector4.toArray( normals.array, ( count + 5 ) * 3 );
+			vec3ToArray( vector2, normals.array, ( count + 3 ) * 3 );
+			vec3ToArray( vector3, normals.array, ( count + 4 ) * 3 );
+			vec3ToArray( vector4, normals.array, ( count + 5 ) * 3 );
 
-			color2.toArray( colors.array, ( count + 0 ) * 3 );
-			color2.toArray( colors.array, ( count + 1 ) * 3 );
-			color1.toArray( colors.array, ( count + 2 ) * 3 );
+			colorToArray( color2, colors.array, ( count + 0 ) * 3 );
+			colorToArray( color2, colors.array, ( count + 1 ) * 3 );
+			colorToArray( color1, colors.array, ( count + 2 ) * 3 );
 
-			color2.toArray( colors.array, ( count + 3 ) * 3 );
-			color1.toArray( colors.array, ( count + 4 ) * 3 );
-			color1.toArray( colors.array, ( count + 5 ) * 3 );
+			colorToArray( color2, colors.array, ( count + 3 ) * 3 );
+			colorToArray( color1, colors.array, ( count + 4 ) * 3 );
+			colorToArray( color1, colors.array, ( count + 5 ) * 3 );
 
 			count += 6;
 
@@ -379,19 +403,19 @@ function TubePainter() {
 
 	//
 
-	const direction = new Vector3();
-	const normal = new Vector3();
-	const side = new Vector3();
+	const direction = vec3Create();
+	const normal = vec3Create();
+	const side = vec3Create();
 
-	const point1 = new Vector3();
-	const point2 = new Vector3();
+	const point1 = vec3Create();
+	const point2 = vec3Create();
 
-	const matrix1 = new Matrix4();
-	const matrix2 = new Matrix4();
+	const matrix1 = mat4Create();
+	const matrix2 = mat4Create();
 
-	const lastNormal = new Vector3();
-	const prevDirection = new Vector3();
-	const rotationAxis = new Vector3();
+	const lastNormal = vec3Create();
+	const prevDirection = vec3Create();
+	const rotationAxis = vec3Create();
 
 	let isFirstSegment = true;
 
@@ -404,63 +428,63 @@ function TubePainter() {
 
 			if ( Math.abs( direction.y ) < 0.99 ) {
 
-				vector.copy( direction ).multiplyScalar( direction.y );
-				normal.set( 0, 1, 0 ).sub( vector ).normalize();
+				vec3MultiplyScalar( vec3Copy( direction, vector ), direction.y, vector );
+				vec3Normalize( vec3Sub( vec3Set( normal, 0, 1, 0 ), vector, normal ), normal );
 
 			} else {
 
-				vector.copy( direction ).multiplyScalar( direction.x );
-				normal.set( 1, 0, 0 ).sub( vector ).normalize();
+				vec3MultiplyScalar( vec3Copy( direction, vector ), direction.x, vector );
+				vec3Normalize( vec3Sub( vec3Set( normal, 1, 0, 0 ), vector, normal ), normal );
 
 			}
 
 		} else {
 
-			rotationAxis.crossVectors( prevDirection, direction );
+			vec3CrossVectors( prevDirection, direction, rotationAxis );
 
-			const rotAxisLength = rotationAxis.length();
+			const rotAxisLength = vec3Length( rotationAxis );
 
 			if ( rotAxisLength > 0.0001 ) {
 
-				rotationAxis.divideScalar( rotAxisLength );
-				vector.addVectors( prevDirection, direction );
-				const c1 = - 2.0 / ( 1.0 + prevDirection.dot( direction ) );
-				const dot = lastNormal.dot( vector );
-				normal.copy( lastNormal ).addScaledVector( vector, c1 * dot );
+				vec3DivideScalar( rotationAxis, rotAxisLength, rotationAxis );
+				vec3AddVectors( prevDirection, direction, vector );
+				const c1 = - 2.0 / ( 1.0 + vec3Dot( prevDirection, direction ) );
+				const dot = vec3Dot( lastNormal, vector );
+				vec3AddScaledVector( vec3Copy( lastNormal, normal ), vector, c1 * dot, normal );
 
 			} else {
 
-				normal.copy( lastNormal );
+				vec3Copy( lastNormal, normal );
 
 			}
 
 		}
 
-		side.crossVectors( direction, normal ).normalize();
-		normal.crossVectors( side, direction ).normalize();
+		vec3Normalize( vec3CrossVectors( direction, normal, side ), side );
+		vec3Normalize( vec3CrossVectors( side, direction, normal ), normal );
 
 		if ( isFirstSegment === false ) {
 
 			const smoothFactor = 0.3;
 
-			normal.lerp( lastNormal, smoothFactor ).normalize();
-			side.crossVectors( direction, normal ).normalize();
-			normal.crossVectors( side, direction ).normalize();
+			vec3Normalize( vec3Lerp( normal, lastNormal, smoothFactor, normal ), normal );
+			vec3Normalize( vec3CrossVectors( direction, normal, side ), side );
+			vec3Normalize( vec3CrossVectors( side, direction, normal ), normal );
 
 		}
 
-		lastNormal.copy( normal );
-		prevDirection.copy( direction );
+		vec3Copy( normal, lastNormal );
+		vec3Copy( direction, prevDirection );
 
-		matrix1.makeBasis( side, normal, vector.copy( direction ).negate() );
+		mat4MakeBasis( side, normal, vec3Negate( vec3Copy( direction, vector ), vector ), matrix1 );
 
 	}
 
 	function moveTo( position ) {
 
-		point2.copy( position );
+		vec3Copy( position, point2 );
 
-		lastNormal.set( 0, 1, 0 );
+		vec3Set( lastNormal, 0, 1, 0 );
 
 		isFirstSegment = true;
 
@@ -471,24 +495,24 @@ function TubePainter() {
 
 	function lineTo( position ) {
 
-		point1.copy( position );
+		vec3Copy( position, point1 );
 
-		direction.subVectors( point1, point2 );
+		vec3SubVectors( point1, point2, direction );
 
-		const length = direction.length();
+		const length = vec3Length( direction );
 
 		if ( length === 0 ) return;
 
-		direction.normalize();
+		vec3Normalize( direction, direction );
 
 		calculateRMF();
 
 		if ( isFirstSegment === true ) {
 
-			color2.copy( color1 );
+			colorCopy( color1, color2 );
 			size2 = size1;
 
-			matrix2.copy( matrix1 );
+			mat4Copy( matrix1, matrix2 );
 
 			addCap( point2, matrix2, false, size2 );
 
@@ -503,10 +527,10 @@ function TubePainter() {
 
 		updateEndCap( point1, matrix1, size1 );
 
-		point2.copy( point1 );
-		matrix2.copy( matrix1 );
+		vec3Copy( point1, point2 );
+		mat4Copy( matrix1, matrix2 );
 
-		color2.copy( color1 );
+		colorCopy( color1, color2 );
 		size2 = size1;
 
 		isFirstSegment = false;
@@ -521,7 +545,7 @@ function TubePainter() {
 
 	function setColor( value ) {
 
-		color1.copy( value );
+		colorCopy( value, color1 );
 
 	}
 

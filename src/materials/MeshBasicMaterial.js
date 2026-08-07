@@ -2,6 +2,8 @@ import { Material } from './Material.js';
 import { MultiplyOperation } from '../constants.js';
 import { Color } from '../math/Color.js';
 import { Euler } from '../math/Euler.js';
+import { colorCopy } from '../math/ColorFunctions.js';
+import { eulerCopy } from '../math/EulerFunctions.js';
 
 /**
  * A material for drawing geometries in a simple shaded (flat or wireframe) way.
@@ -238,7 +240,7 @@ class MeshBasicMaterial extends Material {
 
 		super.copy( source );
 
-		this.color.copy( source.color );
+		colorCopy( source.color, this.color );
 
 		this.map = source.map;
 
@@ -253,7 +255,7 @@ class MeshBasicMaterial extends Material {
 		this.alphaMap = source.alphaMap;
 
 		this.envMap = source.envMap;
-		this.envMapRotation.copy( source.envMapRotation );
+		eulerCopy( source.envMapRotation, this.envMapRotation );
 		this.combine = source.combine;
 		this.reflectivity = source.reflectivity;
 		this.refractionRatio = source.refractionRatio;

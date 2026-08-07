@@ -1,8 +1,8 @@
-import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, MathUtils, RGBFormat, RedFormat, UnsignedInt101111Type, UnsignedByteType } from 'three/webgpu';
+import { RenderTarget, TempNode, QuadMesh, NodeMaterial, RendererUtils, MathUtils, RGBFormat, RedFormat, UnsignedInt101111Type, UnsignedByteType, vec2Create, vec2Set } from 'three/webgpu';
 import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise, property, outputStruct, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _size = /*@__PURE__*/ new Vector2();
+const _size = /*@__PURE__*/ vec2Create();
 
 // From Activision GTAO paper: https://www.activision.com/cdn/research/s2016_pbs_activision_occlusion.pptx
 const _temporalRotations = [ 60, 300, 180, 240, 120, 0 ];
@@ -200,7 +200,7 @@ class SSGINode extends TempNode {
 		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
-		this._resolution = uniform( new Vector2() );
+		this._resolution = uniform( vec2Create(), 'vec2' );
 
 		/**
 		 * Used to compute the effective step radius when viewSpaceSampling is `false`.
@@ -342,7 +342,7 @@ class SSGINode extends TempNode {
 	 */
 	setSize( width, height ) {
 
-		this._resolution.value.set( width, height );
+		vec2Set( width, height, this._resolution.value );
 		this._ssgiRenderTarget.setSize( width, height );
 
 		this._halfProjScale.value = height / ( Math.tan( this._camera.fov * MathUtils.DEG2RAD * 0.5 ) * 2 ) * 0.5;
@@ -363,7 +363,7 @@ class SSGINode extends TempNode {
 		//
 
 		const size = renderer.getDrawingBufferSize( _size );
-		this.setSize( size.width, size.height );
+		this.setSize( size.x, size.y );
 
 		// update temporal uniforms
 

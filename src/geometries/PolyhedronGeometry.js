@@ -1,7 +1,14 @@
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
-import { Vector3 } from '../math/Vector3.js';
-import { Vector2 } from '../math/Vector2.js';
+import {
+	vec3Add,
+	vec3Create,
+	vec3DivideScalar,
+	vec3Lerp,
+	vec3Set,
+	vec3SetLength
+} from '../math/Vector3Functions.js';
+import { vec2Create, vec2Set } from '../math/Vector2Functions.js';
 
 /**
  * A polyhedron is a solid in three dimensions with flat faces. This class
@@ -77,9 +84,9 @@ class PolyhedronGeometry extends BufferGeometry {
 
 		function subdivide( detail ) {
 
-			const a = new Vector3();
-			const b = new Vector3();
-			const c = new Vector3();
+			const a = vec3Create();
+			const b = vec3Create();
+			const c = vec3Create();
 
 			// iterate over all faces and apply a subdivision with the given detail value
 
@@ -113,8 +120,8 @@ class PolyhedronGeometry extends BufferGeometry {
 
 				v[ i ] = [];
 
-				const aj = a.clone().lerp( c, i / cols );
-				const bj = b.clone().lerp( c, i / cols );
+				const aj = vec3Lerp( a, c, i / cols );
+				const bj = vec3Lerp( b, c, i / cols );
 
 				const rows = cols - i;
 
@@ -126,7 +133,7 @@ class PolyhedronGeometry extends BufferGeometry {
 
 					} else {
 
-						v[ i ][ j ] = aj.clone().lerp( bj, j / rows );
+						v[ i ][ j ] = vec3Lerp( aj, bj, j / rows );
 
 					}
 
@@ -164,7 +171,7 @@ class PolyhedronGeometry extends BufferGeometry {
 
 		function applyRadius( radius ) {
 
-			const vertex = new Vector3();
+			const vertex = vec3Create();
 
 			// iterate over the entire buffer and apply the radius to each vertex
 
@@ -174,7 +181,7 @@ class PolyhedronGeometry extends BufferGeometry {
 				vertex.y = vertexBuffer[ i + 1 ];
 				vertex.z = vertexBuffer[ i + 2 ];
 
-				vertex.normalize().multiplyScalar( radius );
+				vec3SetLength( vertex, radius, vertex );
 
 				vertexBuffer[ i + 0 ] = vertex.x;
 				vertexBuffer[ i + 1 ] = vertex.y;
@@ -186,7 +193,7 @@ class PolyhedronGeometry extends BufferGeometry {
 
 		function generateUVs() {
 
-			const vertex = new Vector3();
+			const vertex = vec3Create();
 
 			for ( let i = 0; i < vertexBuffer.length; i += 3 ) {
 
@@ -253,27 +260,29 @@ class PolyhedronGeometry extends BufferGeometry {
 
 		function correctUVs() {
 
-			const a = new Vector3();
-			const b = new Vector3();
-			const c = new Vector3();
+			const a = vec3Create();
+			const b = vec3Create();
+			const c = vec3Create();
 
-			const centroid = new Vector3();
+			const centroid = vec3Create();
 
-			const uvA = new Vector2();
-			const uvB = new Vector2();
-			const uvC = new Vector2();
+			const uvA = vec2Create();
+			const uvB = vec2Create();
+			const uvC = vec2Create();
 
 			for ( let i = 0, j = 0; i < vertexBuffer.length; i += 9, j += 6 ) {
 
-				a.set( vertexBuffer[ i + 0 ], vertexBuffer[ i + 1 ], vertexBuffer[ i + 2 ] );
-				b.set( vertexBuffer[ i + 3 ], vertexBuffer[ i + 4 ], vertexBuffer[ i + 5 ] );
-				c.set( vertexBuffer[ i + 6 ], vertexBuffer[ i + 7 ], vertexBuffer[ i + 8 ] );
+				vec3Set( a, vertexBuffer[ i + 0 ], vertexBuffer[ i + 1 ], vertexBuffer[ i + 2 ] );
+				vec3Set( b, vertexBuffer[ i + 3 ], vertexBuffer[ i + 4 ], vertexBuffer[ i + 5 ] );
+				vec3Set( c, vertexBuffer[ i + 6 ], vertexBuffer[ i + 7 ], vertexBuffer[ i + 8 ] );
 
-				uvA.set( uvBuffer[ j + 0 ], uvBuffer[ j + 1 ] );
-				uvB.set( uvBuffer[ j + 2 ], uvBuffer[ j + 3 ] );
-				uvC.set( uvBuffer[ j + 4 ], uvBuffer[ j + 5 ] );
+				vec2Set( uvBuffer[ j + 0 ], uvBuffer[ j + 1 ], uvA );
+				vec2Set( uvBuffer[ j + 2 ], uvBuffer[ j + 3 ], uvB );
+				vec2Set( uvBuffer[ j + 4 ], uvBuffer[ j + 5 ], uvC );
 
-				centroid.copy( a ).add( b ).add( c ).divideScalar( 3 );
+				vec3Add( a, b, centroid );
+				vec3Add( centroid, c, centroid );
+				vec3DivideScalar( centroid, 3, centroid );
 
 				const azi = azimuth( centroid );
 

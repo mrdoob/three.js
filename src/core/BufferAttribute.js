@@ -1,12 +1,19 @@
-import { Vector3 } from '../math/Vector3.js';
-import { Vector2 } from '../math/Vector2.js';
 import { denormalize, normalize } from '../math/MathUtils.js';
 import { StaticDrawUsage, FloatType } from '../constants.js';
 import { fromHalfFloat, toHalfFloat } from '../extras/DataUtils.js';
 import { EventDispatcher } from './EventDispatcher.js';
+import { vec2ApplyMatrix3, vec2Create, vec2FromBufferAttribute } from '../math/Vector2Functions.js';
+import {
+	vec3ApplyMatrix3,
+	vec3ApplyMatrix4,
+	vec3ApplyNormalMatrix,
+	vec3Create,
+	vec3FromBufferAttribute,
+	vec3TransformDirection
+} from '../math/Vector3Functions.js';
 
-const _vector = /*@__PURE__*/ new Vector3();
-const _vector2 = /*@__PURE__*/ new Vector2();
+const _vector = /*@__PURE__*/ vec3Create();
+const _vector2 = /*@__PURE__*/ vec2Create();
 
 let _id = 0;
 
@@ -266,8 +273,8 @@ class BufferAttribute extends EventDispatcher {
 
 			for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-				_vector2.fromBufferAttribute( this, i );
-				_vector2.applyMatrix3( m );
+				vec2FromBufferAttribute( this, i, _vector2 );
+				vec2ApplyMatrix3( _vector2, m, _vector2 );
 
 				this.setXY( i, _vector2.x, _vector2.y );
 
@@ -277,8 +284,8 @@ class BufferAttribute extends EventDispatcher {
 
 			for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-				_vector.fromBufferAttribute( this, i );
-				_vector.applyMatrix3( m );
+				vec3FromBufferAttribute( this, i, _vector );
+				vec3ApplyMatrix3( _vector, m, _vector );
 
 				this.setXYZ( i, _vector.x, _vector.y, _vector.z );
 
@@ -301,9 +308,8 @@ class BufferAttribute extends EventDispatcher {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector.fromBufferAttribute( this, i );
-
-			_vector.applyMatrix4( m );
+			vec3FromBufferAttribute( this, i, _vector );
+			vec3ApplyMatrix4( _vector, m, _vector );
 
 			this.setXYZ( i, _vector.x, _vector.y, _vector.z );
 
@@ -324,9 +330,8 @@ class BufferAttribute extends EventDispatcher {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector.fromBufferAttribute( this, i );
-
-			_vector.applyNormalMatrix( m );
+			vec3FromBufferAttribute( this, i, _vector );
+			vec3ApplyNormalMatrix( _vector, m, _vector );
 
 			this.setXYZ( i, _vector.x, _vector.y, _vector.z );
 
@@ -347,9 +352,8 @@ class BufferAttribute extends EventDispatcher {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector.fromBufferAttribute( this, i );
-
-			_vector.transformDirection( m );
+			vec3FromBufferAttribute( this, i, _vector );
+			vec3TransformDirection( _vector, m, _vector );
 
 			this.setXYZ( i, _vector.x, _vector.y, _vector.z );
 

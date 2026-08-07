@@ -1,8 +1,8 @@
-import { AdditiveBlending, Color, Vector2, PassNode, QuadMesh, NodeMaterial } from 'three/webgpu';
+import { AdditiveBlending, PassNode, QuadMesh, NodeMaterial, vec2Create, colorCreate } from 'three/webgpu';
 import { uniform, mrt, texture, getTextureIndex, unpremultiplyAlpha } from 'three/tsl';
 
-const _size = /*@__PURE__*/ new Vector2();
-const _clearColor = /*@__PURE__*/ new Color();
+const _size = /*@__PURE__*/ vec2Create();
+const _clearColor = /*@__PURE__*/ colorCreate();
 
 /**
  * A special render pass node that renders the scene with SSAA (Supersampling Anti-Aliasing).
@@ -103,7 +103,7 @@ class SSAAPassNode extends PassNode {
 
 		const size = renderer.getSize( _size );
 
-		this.setSize( size.width, size.height );
+		this.setSize( size.x, size.y );
 		this._sampleRenderTarget.setSize( this.renderTarget.width, this.renderTarget.height );
 
 		//

@@ -1,4 +1,13 @@
-import { Vector3 } from '../../math/Vector3.js';
+import {
+	vec3Add,
+	vec3Copy,
+	vec3Create,
+	vec3DistanceToSquared,
+	vec3FromArray,
+	vec3Set,
+	vec3SubVectors,
+	vec3ToArray
+} from '../../math/Vector3Functions.js';
 import { Curve } from '../core/Curve.js';
 
 function CubicPoly() {
@@ -77,8 +86,8 @@ function CubicPoly() {
 
 //
 
-const tmp = /*@__PURE__*/ new Vector3();
-const tmp2 = /*@__PURE__*/ new Vector3();
+const tmp = /*@__PURE__*/ vec3Create();
+const tmp2 = /*@__PURE__*/ vec3Create();
 const px = /*@__PURE__*/ new CubicPoly();
 const py = /*@__PURE__*/ new CubicPoly();
 const pz = /*@__PURE__*/ new CubicPoly();
@@ -172,7 +181,7 @@ class CatmullRomCurve3 extends Curve {
 	 * @param {Vector3} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector3} The position on the curve.
 	 */
-	getPoint( t, optionalTarget = new Vector3() ) {
+	getPoint( t, optionalTarget = vec3Create() ) {
 
 		const point = optionalTarget;
 
@@ -203,7 +212,8 @@ class CatmullRomCurve3 extends Curve {
 		} else {
 
 			// extrapolate first point
-			tmp2.subVectors( points[ 0 ], points[ 1 ] ).add( points[ 0 ] );
+			vec3SubVectors( points[ 0 ], points[ 1 ], tmp2 );
+			vec3Add( tmp2, points[ 0 ], tmp2 );
 			p0 = tmp2;
 
 		}
@@ -218,7 +228,8 @@ class CatmullRomCurve3 extends Curve {
 		} else {
 
 			// extrapolate last point
-			tmp.subVectors( points[ l - 1 ], points[ l - 2 ] ).add( points[ l - 1 ] );
+			vec3SubVectors( points[ l - 1 ], points[ l - 2 ], tmp );
+			vec3Add( tmp, points[ l - 1 ], tmp );
 			p3 = tmp;
 
 		}
@@ -227,9 +238,9 @@ class CatmullRomCurve3 extends Curve {
 
 			// init Centripetal / Chordal Catmull-Rom
 			const pow = this.curveType === 'chordal' ? 0.5 : 0.25;
-			let dt0 = Math.pow( p0.distanceToSquared( p1 ), pow );
-			let dt1 = Math.pow( p1.distanceToSquared( p2 ), pow );
-			let dt2 = Math.pow( p2.distanceToSquared( p3 ), pow );
+			let dt0 = Math.pow( vec3DistanceToSquared( p0, p1 ), pow );
+			let dt1 = Math.pow( vec3DistanceToSquared( p1, p2 ), pow );
+			let dt2 = Math.pow( vec3DistanceToSquared( p2, p3 ), pow );
 
 			// safety check for repeated points
 			if ( dt1 < 1e-4 ) dt1 = 1.0;
@@ -248,7 +259,8 @@ class CatmullRomCurve3 extends Curve {
 
 		}
 
-		point.set(
+		vec3Set(
+			point,
 			px.calc( weight ),
 			py.calc( weight ),
 			pz.calc( weight )
@@ -266,9 +278,7 @@ class CatmullRomCurve3 extends Curve {
 
 		for ( let i = 0, l = source.points.length; i < l; i ++ ) {
 
-			const point = source.points[ i ];
-
-			this.points.push( point.clone() );
+			this.points.push( vec3Copy( source.points[ i ] ) );
 
 		}
 
@@ -288,8 +298,7 @@ class CatmullRomCurve3 extends Curve {
 
 		for ( let i = 0, l = this.points.length; i < l; i ++ ) {
 
-			const point = this.points[ i ];
-			data.points.push( point.toArray() );
+			data.points.push( vec3ToArray( this.points[ i ] ) );
 
 		}
 
@@ -309,8 +318,7 @@ class CatmullRomCurve3 extends Curve {
 
 		for ( let i = 0, l = json.points.length; i < l; i ++ ) {
 
-			const point = json.points[ i ];
-			this.points.push( new Vector3().fromArray( point ) );
+			this.points.push( vec3FromArray( json.points[ i ] ) );
 
 		}
 

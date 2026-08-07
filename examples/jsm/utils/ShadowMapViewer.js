@@ -6,7 +6,8 @@ import {
 	OrthographicCamera,
 	PlaneGeometry,
 	Scene,
-	ShaderMaterial
+	ShaderMaterial,
+	vec3Set
 } from 'three';
 
 /**
@@ -51,7 +52,7 @@ class ShadowMapViewer {
 		};
 
 		const camera = new OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 10 );
-		camera.position.set( 0, 0, 2 );
+		vec3Set( camera.position, 0, 0, 2 );
 		const scene = new Scene();
 
 		//HUD for shadow map
@@ -144,7 +145,7 @@ class ShadowMapViewer {
 				this.width = width;
 				this.height = height;
 
-				mesh.scale.set( this.width / frame.width, this.height / frame.height, 1 );
+				vec3Set( mesh.scale, this.width / frame.width, this.height / frame.height, 1 );
 
 				//Reset the position as it is off when we scale stuff
 				resetPosition();
@@ -170,9 +171,9 @@ class ShadowMapViewer {
 				const width = scope.size.width;
 				const height = scope.size.height;
 
-				mesh.position.set( - window.innerWidth / 2 + width / 2 + this.x, window.innerHeight / 2 - height / 2 - this.y, 0 );
+				vec3Set( mesh.position, - window.innerWidth / 2 + width / 2 + this.x, window.innerHeight / 2 - height / 2 - this.y, 0 );
 
-				if ( doRenderLabel ) labelMesh.position.set( mesh.position.x, mesh.position.y - scope.size.height / 2 + labelCanvas.height / 2, 0 );
+				if ( doRenderLabel ) vec3Set( labelMesh.position, mesh.position.x, mesh.position.y - scope.size.height / 2 + labelCanvas.height / 2, 0 );
 
 			}
 		};

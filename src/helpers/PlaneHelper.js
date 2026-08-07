@@ -4,6 +4,7 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
+import { vec3Set } from '../math/Vector3Functions.js';
 
 /**
  * A helper object to visualize an instance of {@link Plane}.
@@ -66,9 +67,9 @@ class PlaneHelper extends Line {
 
 	updateMatrixWorld( force ) {
 
-		this.position.set( 0, 0, 0 );
+		vec3Set( this.position, 0, 0, 0 );
 
-		this.scale.set( 0.5 * this.size, 0.5 * this.size, 1 );
+		vec3Set( this.scale, 0.5 * this.size, 0.5 * this.size, 1 );
 
 		this.lookAt( this.plane.normal );
 

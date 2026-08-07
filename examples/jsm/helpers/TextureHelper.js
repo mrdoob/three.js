@@ -5,7 +5,9 @@ import {
 	Mesh,
 	PlaneGeometry,
 	ShaderMaterial,
-	Vector3,
+	vec3Create,
+	vec3FromBufferAttribute,
+	vec3Normalize
 } from 'three';
 import { mergeGeometries } from '../utils/BufferGeometryUtils.js';
 
@@ -197,11 +199,12 @@ function createCubeGeometry( width, height, depth ) {
 	const uv = geometry.attributes.uv;
 	const uvw = new BufferAttribute( new Float32Array( uv.count * 3 ), 3 );
 
-	const _direction = new Vector3();
+	const _direction = vec3Create();
 
 	for ( let j = 0, jl = uv.count; j < jl; ++ j ) {
 
-		_direction.fromBufferAttribute( position, j ).normalize();
+		vec3FromBufferAttribute( position, j, _direction );
+		vec3Normalize( _direction, _direction );
 
 		const u = _direction.x;
 		const v = _direction.y;

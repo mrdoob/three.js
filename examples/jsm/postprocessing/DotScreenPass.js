@@ -1,6 +1,8 @@
 import {
 	ShaderMaterial,
-	UniformsUtils
+	UniformsUtils,
+	vec2Copy,
+	vec2Set
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 import { DotScreenShader } from '../shaders/DotScreenShader.js';
@@ -33,7 +35,7 @@ class DotScreenPass extends Pass {
 		 * The pass uniforms. Use this object if you want to update the
 		 * `center`, `angle` or `scale` values at runtime.
 		 * ```js
-		 * pass.uniforms.center.value.copy( center );
+		 * THREE.vec2Copy( center, pass.uniforms.center.value );
 		 * pass.uniforms.angle.value = 0;
 		 * pass.uniforms.scale.value = 0.5;
 		 * ```
@@ -42,7 +44,7 @@ class DotScreenPass extends Pass {
 		 */
 		this.uniforms = UniformsUtils.clone( DotScreenShader.uniforms );
 
-		if ( center !== undefined ) this.uniforms[ 'center' ].value.copy( center );
+		if ( center !== undefined ) vec2Copy( center, this.uniforms[ 'center' ].value );
 		if ( angle !== undefined ) this.uniforms[ 'angle' ].value = angle;
 		if ( scale !== undefined ) this.uniforms[ 'scale' ].value = scale;
 
@@ -80,7 +82,7 @@ class DotScreenPass extends Pass {
 	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
 		this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
-		this.uniforms[ 'tSize' ].value.set( readBuffer.width, readBuffer.height );
+		vec2Set( readBuffer.width, readBuffer.height, this.uniforms[ 'tSize' ].value );
 
 		if ( this.renderToScreen ) {
 

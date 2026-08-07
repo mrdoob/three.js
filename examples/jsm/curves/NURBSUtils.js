@@ -1,6 +1,16 @@
 import {
-	Vector3,
-	Vector4
+	vec3Copy,
+	vec3Create,
+	vec3DivideScalar,
+	vec3MultiplyScalar,
+	vec3Set,
+	vec3Sub,
+	vec4Add,
+	vec4Copy,
+	vec4Create,
+	vec4DivideScalar,
+	vec4MultiplyScalar,
+	vec4Set
 } from 'three';
 
 /**
@@ -110,7 +120,7 @@ function calcBSplinePoint( p, U, P, u ) {
 
 	const span = findSpan( p, u, U );
 	const N = calcBasisFunctions( span, u, p, U );
-	const C = new Vector4( 0, 0, 0, 0 );
+	const C = vec4Set( 0, 0, 0, 0 );
 
 	for ( let j = 0; j <= p; ++ j ) {
 
@@ -280,7 +290,7 @@ function calcBSplineDerivatives( p, U, P, u, nd ) {
 
 	for ( let i = 0; i < P.length; ++ i ) {
 
-		const point = P[ i ].clone();
+		const point = vec4Copy( P[ i ] );
 		const w = point.w;
 
 		point.x *= w;
@@ -293,11 +303,11 @@ function calcBSplineDerivatives( p, U, P, u, nd ) {
 
 	for ( let k = 0; k <= du; ++ k ) {
 
-		const point = Pw[ span - p ].clone().multiplyScalar( nders[ k ][ 0 ] );
+		const point = vec4MultiplyScalar( Pw[ span - p ], nders[ k ][ 0 ] );
 
 		for ( let j = 1; j <= p; ++ j ) {
 
-			point.add( Pw[ span - p + j ].clone().multiplyScalar( nders[ k ][ j ] ) );
+			vec4Add( point, vec4MultiplyScalar( Pw[ span - p + j ], nders[ k ][ j ] ), point );
 
 		}
 
@@ -307,7 +317,7 @@ function calcBSplineDerivatives( p, U, P, u, nd ) {
 
 	for ( let k = du + 1; k <= nd + 1; ++ k ) {
 
-		CK[ k ] = new Vector4( 0, 0, 0 );
+		CK[ k ] = vec4Create( 0, 0, 0 );
 
 	}
 
@@ -365,7 +375,8 @@ function calcRationalCurveDerivatives( Pders ) {
 	for ( let i = 0; i < nd; ++ i ) {
 
 		const point = Pders[ i ];
-		Aders[ i ] = new Vector3( point.x, point.y, point.z );
+		Aders[ i ] = vec3Create();
+		vec3Set( Aders[ i ], point.x, point.y, point.z );
 		wders[ i ] = point.w;
 
 	}
@@ -374,15 +385,15 @@ function calcRationalCurveDerivatives( Pders ) {
 
 	for ( let k = 0; k < nd; ++ k ) {
 
-		const v = Aders[ k ].clone();
+		const v = vec3Copy( Aders[ k ] );
 
 		for ( let i = 1; i <= k; ++ i ) {
 
-			v.sub( CK[ k - i ].clone().multiplyScalar( calcKoverI( k, i ) * wders[ i ] ) );
+			vec3Sub( v, vec3MultiplyScalar( CK[ k - i ], calcKoverI( k, i ) * wders[ i ] ), v );
 
 		}
 
-		CK[ k ] = v.divideScalar( wders[ 0 ] );
+		CK[ k ] = vec3DivideScalar( v, wders[ 0 ], v );
 
 	}
 
@@ -429,29 +440,29 @@ function calcSurfacePoint( p, q, U, V, P, u, v, target ) {
 
 	for ( let l = 0; l <= q; ++ l ) {
 
-		temp[ l ] = new Vector4( 0, 0, 0, 0 );
+		temp[ l ] = vec4Set( 0, 0, 0, 0 );
 		for ( let k = 0; k <= p; ++ k ) {
 
-			const point = P[ uspan - p + k ][ vspan - q + l ].clone();
+			const point = vec4Copy( P[ uspan - p + k ][ vspan - q + l ] );
 			const w = point.w;
 			point.x *= w;
 			point.y *= w;
 			point.z *= w;
-			temp[ l ].add( point.multiplyScalar( Nu[ k ] ) );
+			vec4Add( temp[ l ], vec4MultiplyScalar( point, Nu[ k ], point ), temp[ l ] );
 
 		}
 
 	}
 
-	const Sw = new Vector4( 0, 0, 0, 0 );
+	const Sw = vec4Set( 0, 0, 0, 0 );
 	for ( let l = 0; l <= q; ++ l ) {
 
-		Sw.add( temp[ l ].multiplyScalar( Nv[ l ] ) );
+		vec4Add( Sw, vec4MultiplyScalar( temp[ l ], Nv[ l ], temp[ l ] ), Sw );
 
 	}
 
-	Sw.divideScalar( Sw.w );
-	target.set( Sw.x, Sw.y, Sw.z );
+	vec4DivideScalar( Sw, Sw.w, Sw );
+	vec3Set( target, Sw.x, Sw.y, Sw.z );
 
 }
 
@@ -486,15 +497,15 @@ function calcVolumePoint( p, q, r, U, V, W, P, u, v, w, target ) {
 
 		for ( let l = 0; l <= q; ++ l ) {
 
-			temp[ m ][ l ] = new Vector4( 0, 0, 0, 0 );
+			temp[ m ][ l ] = vec4Set( 0, 0, 0, 0 );
 			for ( let k = 0; k <= p; ++ k ) {
 
-				const point = P[ uspan - p + k ][ vspan - q + l ][ wspan - r + m ].clone();
-				const w = point.w;
-				point.x *= w;
-				point.y *= w;
-				point.z *= w;
-				temp[ m ][ l ].add( point.multiplyScalar( Nu[ k ] ) );
+				const point = vec4Copy( P[ uspan - p + k ][ vspan - q + l ][ wspan - r + m ] );
+				const pw = point.w;
+				point.x *= pw;
+				point.y *= pw;
+				point.z *= pw;
+				vec4Add( temp[ m ][ l ], vec4MultiplyScalar( point, Nu[ k ], point ), temp[ m ][ l ] );
 
 			}
 
@@ -502,19 +513,21 @@ function calcVolumePoint( p, q, r, U, V, W, P, u, v, w, target ) {
 
 	}
 
-	const Sw = new Vector4( 0, 0, 0, 0 );
+	const Sw = vec4Set( 0, 0, 0, 0 );
 	for ( let m = 0; m <= r; ++ m ) {
 
 		for ( let l = 0; l <= q; ++ l ) {
 
-			Sw.add( temp[ m ][ l ].multiplyScalar( Nw[ m ] ).multiplyScalar( Nv[ l ] ) );
+			vec4MultiplyScalar( temp[ m ][ l ], Nw[ m ], temp[ m ][ l ] );
+			vec4MultiplyScalar( temp[ m ][ l ], Nv[ l ], temp[ m ][ l ] );
+			vec4Add( Sw, temp[ m ][ l ], Sw );
 
 		}
 
 	}
 
-	Sw.divideScalar( Sw.w );
-	target.set( Sw.x, Sw.y, Sw.z );
+	vec4DivideScalar( Sw, Sw.w, Sw );
+	vec3Set( target, Sw.x, Sw.y, Sw.z );
 
 }
 

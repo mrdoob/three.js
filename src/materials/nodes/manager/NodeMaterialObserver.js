@@ -1,3 +1,12 @@
+import { Color } from '../../../math/Color.js';
+import { Vector2 } from '../../../math/Vector2.js';
+import { Euler } from '../../../math/Euler.js';
+import { Matrix4 } from '../../../math/Matrix4.js';
+import { colorCopy, colorEquals } from '../../../math/ColorFunctions.js';
+import { vec2Copy, vec2Equals } from '../../../math/Vector2Functions.js';
+import { eulerCopy, eulerEquals } from '../../../math/EulerFunctions.js';
+import { mat4Copy, mat4Equals } from '../../../math/Matrix4Functions.js';
+
 const refreshUniforms = [
 	'alphaMap',
 	'alphaTest',
@@ -56,6 +65,59 @@ const refreshUniforms = [
 	'transmission',
 	'transmissionMap'
 ];
+
+/**
+ * Clones a math value for material/render-object observation caches.
+ *
+ * @param {Object} value - The value to clone.
+ * @return {Object} A new math instance with copied contents.
+ */
+function cloneMathValue( value ) {
+
+	if ( value.isColor ) return colorCopy( value, new Color() );
+	if ( value.isVector2 ) return vec2Copy( value, new Vector2() );
+	if ( value.isEuler ) return eulerCopy( value, new Euler() );
+	if ( value.isMatrix4 ) return mat4Copy( value, new Matrix4() );
+
+	return value.clone();
+
+}
+
+/**
+ * Copies a math value into a target of the same type.
+ *
+ * @param {Object} source - The source value.
+ * @param {Object} target - The target value.
+ * @return {Object} The target.
+ */
+function copyMathValue( source, target ) {
+
+	if ( target.isColor ) return colorCopy( source, target );
+	if ( target.isVector2 ) return vec2Copy( source, target );
+	if ( target.isEuler ) return eulerCopy( source, target );
+	if ( target.isMatrix4 ) return mat4Copy( source, target );
+
+	return target.copy( source );
+
+}
+
+/**
+ * Compares two math values of the same type.
+ *
+ * @param {Object} a - The first value.
+ * @param {Object} b - The second value.
+ * @return {boolean} Whether the values are equal.
+ */
+function equalsMathValue( a, b ) {
+
+	if ( a.isColor ) return colorEquals( a, b );
+	if ( a.isVector2 ) return vec2Equals( a, b );
+	if ( a.isEuler ) return eulerEquals( a, b );
+	if ( a.isMatrix4 ) return mat4Equals( a, b );
+
+	return a.equals( b );
+
+}
 
 
 /**
@@ -190,12 +252,12 @@ class NodeMaterialObserver {
 				geometryId: geometry.id,
 				geometryVersion: this.getGeometryData( geometry )._version,
 				materialVersion: this.getMaterialData( renderObject.material )._version,
-				worldMatrix: object.matrixWorld.clone()
+				worldMatrix: mat4Copy( object.matrixWorld, new Matrix4() )
 			};
 
 			if ( object.center ) {
 
-				data.center = object.center.clone();
+				data.center = vec2Copy( object.center, new Vector2() );
 
 			}
 
@@ -223,7 +285,7 @@ class NodeMaterialObserver {
 			const { environmentIntensity, environmentRotation } = renderObject.scene;
 
 			data.environmentIntensity = environmentIntensity;
-			data.environmentRotation = environmentRotation.clone();
+			data.environmentRotation = eulerCopy( environmentRotation, new Euler() );
 
 			data.lights = this.getLightsData( renderObject.lightsNode.getBuiltinLights(), [] );
 
@@ -346,7 +408,7 @@ class NodeMaterialObserver {
 
 					} else {
 
-						data[ property ] = value.clone();
+						data[ property ] = cloneMathValue( value );
 
 					}
 
@@ -382,9 +444,9 @@ class NodeMaterialObserver {
 
 		// world matrix
 
-		if ( renderObjectData.worldMatrix.equals( object.matrixWorld ) !== true ) {
+		if ( equalsMathValue( renderObjectData.worldMatrix, object.matrixWorld ) !== true ) {
 
-			renderObjectData.worldMatrix.copy( object.matrixWorld );
+			mat4Copy( object.matrixWorld, renderObjectData.worldMatrix );
 
 			return false;
 
@@ -412,9 +474,9 @@ class NodeMaterialObserver {
 
 				if ( value.equals !== undefined ) {
 
-					if ( value.equals( mtlValue ) === false ) {
+					if ( equalsMathValue( value, mtlValue ) === false ) {
 
-						value.copy( mtlValue );
+						copyMathValue( mtlValue, value );
 
 						changed = true;
 
@@ -622,10 +684,10 @@ class NodeMaterialObserver {
 		if ( scene.environment !== null && material.envMap === null ) {
 
 			if ( renderObjectData.environmentIntensity !== scene.environmentIntensity ||
-					renderObjectData.environmentRotation.equals( scene.environmentRotation ) === false ) {
+					equalsMathValue( renderObjectData.environmentRotation, scene.environmentRotation ) === false ) {
 
 				renderObjectData.environmentIntensity = scene.environmentIntensity;
-				renderObjectData.environmentRotation.copy( scene.environmentRotation );
+				eulerCopy( scene.environmentRotation, renderObjectData.environmentRotation );
 
 				return false;
 
@@ -637,9 +699,9 @@ class NodeMaterialObserver {
 
 		if ( renderObjectData.center ) {
 
-			if ( renderObjectData.center.equals( object.center ) === false ) {
+			if ( equalsMathValue( renderObjectData.center, object.center ) === false ) {
 
-				renderObjectData.center.copy( object.center );
+				vec2Copy( object.center, renderObjectData.center );
 
 				return false;
 

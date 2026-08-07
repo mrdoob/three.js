@@ -1,5 +1,6 @@
 import {
-	Vector3
+	vec3Create,
+	vec3Set
 } from 'three';
 
 /**
@@ -20,9 +21,9 @@ const ColorCorrectionShader = {
 	uniforms: {
 
 		'tDiffuse': { value: null },
-		'powRGB': { value: new Vector3( 2, 2, 2 ) },
-		'mulRGB': { value: new Vector3( 1, 1, 1 ) },
-		'addRGB': { value: new Vector3( 0, 0, 0 ) }
+		'powRGB': { value: vec3Set( vec3Create(), 2, 2, 2 ) },
+		'mulRGB': { value: vec3Set( vec3Create(), 1, 1, 1 ) },
+		'addRGB': { value: vec3Set( vec3Create(), 0, 0, 0 ) }
 
 	},
 

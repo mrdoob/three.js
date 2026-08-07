@@ -1,7 +1,14 @@
 import {
 	Controls,
-	Quaternion,
-	Vector3
+	quatCopy,
+	quatCreate,
+	quatDot,
+	quatMultiply,
+	quatNormalize,
+	quatSet,
+	vec3Copy,
+	vec3Create,
+	vec3DistanceToSquared
 } from 'three';
 
 /**
@@ -13,7 +20,7 @@ import {
 const _changeEvent = { type: 'change' };
 
 const _EPS = 0.000001;
-const _tmpQuaternion = new Quaternion();
+const _tmpQuaternion = /*@__PURE__*/ quatCreate();
 
 /**
  * This class enables a navigation similar to fly modes in DCC tools like Blender.
@@ -70,10 +77,10 @@ class FlyControls extends Controls {
 		// internals
 
 		this._moveState = { up: 0, down: 0, left: 0, right: 0, forward: 0, back: 0, pitchUp: 0, pitchDown: 0, yawLeft: 0, yawRight: 0, rollLeft: 0, rollRight: 0 };
-		this._moveVector = new Vector3( 0, 0, 0 );
-		this._rotationVector = new Vector3( 0, 0, 0 );
-		this._lastQuaternion = new Quaternion();
-		this._lastPosition = new Vector3();
+		this._moveVector = /*@__PURE__*/ vec3Create();
+		this._rotationVector = /*@__PURE__*/ vec3Create();
+		this._lastQuaternion = /*@__PURE__*/ quatCreate();
+		this._lastPosition = /*@__PURE__*/ vec3Create();
 		this._status = 0;
 
 		// event listeners
@@ -147,17 +154,19 @@ class FlyControls extends Controls {
 		object.translateY( this._moveVector.y * moveMult );
 		object.translateZ( this._moveVector.z * moveMult );
 
-		_tmpQuaternion.set( this._rotationVector.x * rotMult, this._rotationVector.y * rotMult, this._rotationVector.z * rotMult, 1 ).normalize();
-		object.quaternion.multiply( _tmpQuaternion );
+		quatSet( this._rotationVector.x * rotMult, this._rotationVector.y * rotMult, this._rotationVector.z * rotMult, 1, _tmpQuaternion );
+		quatNormalize( _tmpQuaternion, _tmpQuaternion );
+		quatMultiply( object.quaternion, _tmpQuaternion, object.quaternion );
+		object.quaternion._onChangeCallback();
 
 		if (
-			this._lastPosition.distanceToSquared( object.position ) > _EPS ||
-			8 * ( 1 - this._lastQuaternion.dot( object.quaternion ) ) > _EPS
+			vec3DistanceToSquared( this._lastPosition, object.position ) > _EPS ||
+			8 * ( 1 - quatDot( this._lastQuaternion, object.quaternion ) ) > _EPS
 		) {
 
 			this.dispatchEvent( _changeEvent );
-			this._lastQuaternion.copy( object.quaternion );
-			this._lastPosition.copy( object.position );
+			quatCopy( object.quaternion, this._lastQuaternion );
+			vec3Copy( object.position, this._lastPosition );
 
 		}
 

@@ -1,9 +1,23 @@
-import { Matrix4 } from '../math/Matrix4.js';
 import { Ray } from '../math/Ray.js';
 import { Layers } from './Layers.js';
 import { error } from '../utils.js';
+import {
+	mat4Create,
+	mat4ExtractRotation,
+	mat4Identity
+} from '../math/Matrix4Functions.js';
+import { raySet } from '../math/RayFunctions.js';
+import {
+	vec3ApplyMatrix4,
+	vec3Normalize,
+	vec3Set,
+	vec3SetFromMatrixPosition,
+	vec3Sub,
+	vec3TransformDirection,
+	vec3Unproject
+} from '../math/Vector3Functions.js';
 
-const _matrix = /*@__PURE__*/ new Matrix4();
+const _matrix = /*@__PURE__*/ mat4Create();
 
 /**
  * This class is designed to assist with raycasting. Raycasting is used for
@@ -105,7 +119,7 @@ class Raycaster {
 
 		// direction is assumed to be normalized (for accurate distance calculations)
 
-		this.ray.set( origin, direction );
+		raySet( origin, direction, this.ray );
 
 	}
 
@@ -120,14 +134,19 @@ class Raycaster {
 
 		if ( camera.isPerspectiveCamera ) {
 
-			this.ray.origin.setFromMatrixPosition( camera.matrixWorld );
-			this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( this.ray.origin ).normalize();
+			vec3SetFromMatrixPosition( camera.matrixWorld, this.ray.origin );
+			vec3Set( this.ray.direction, coords.x, coords.y, 0.5 );
+			vec3Unproject( this.ray.direction, camera, this.ray.direction );
+			vec3Sub( this.ray.direction, this.ray.origin, this.ray.direction );
+			vec3Normalize( this.ray.direction, this.ray.direction );
 			this.camera = camera;
 
 		} else if ( camera.isOrthographicCamera ) {
 
-			this.ray.origin.set( coords.x, coords.y, camera.projectionMatrix.elements[ 14 ] ).unproject( camera ); // set origin in plane of camera
-			this.ray.direction.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld );
+			vec3Set( this.ray.origin, coords.x, coords.y, camera.projectionMatrix.elements[ 14 ] );
+			vec3Unproject( this.ray.origin, camera, this.ray.origin ); // set origin in plane of camera
+			vec3Set( this.ray.direction, 0, 0, - 1 );
+			vec3TransformDirection( this.ray.direction, camera.matrixWorld, this.ray.direction );
 			this.camera = camera;
 
 		} else {
@@ -146,10 +165,12 @@ class Raycaster {
 	 */
 	setFromXRController( controller ) {
 
-		_matrix.identity().extractRotation( controller.matrixWorld );
+		mat4Identity( _matrix );
+		mat4ExtractRotation( controller.matrixWorld, _matrix );
 
-		this.ray.origin.setFromMatrixPosition( controller.matrixWorld );
-		this.ray.direction.set( 0, 0, - 1 ).applyMatrix4( _matrix );
+		vec3SetFromMatrixPosition( controller.matrixWorld, this.ray.origin );
+		vec3Set( this.ray.direction, 0, 0, - 1 );
+		vec3ApplyMatrix4( this.ray.direction, _matrix, this.ray.direction );
 
 		return this;
 

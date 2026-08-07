@@ -1,7 +1,23 @@
 import { clamp } from '../../math/MathUtils.js';
-import { Vector2 } from '../../math/Vector2.js';
-import { Vector3 } from '../../math/Vector3.js';
-import { Matrix4 } from '../../math/Matrix4.js';
+import {
+	vec2Create,
+	vec2DistanceTo,
+	vec2Normalize,
+	vec2Sub
+} from '../../math/Vector2Functions.js';
+import {
+	vec3ApplyMatrix4,
+	vec3Copy,
+	vec3Create,
+	vec3CrossVectors,
+	vec3DistanceTo,
+	vec3Dot,
+	vec3Length,
+	vec3Normalize,
+	vec3Set,
+	vec3Sub
+} from '../../math/Vector3Functions.js';
+import { mat4Create, mat4MakeRotationAxis } from '../../math/Matrix4Functions.js';
 import { warn } from '../../utils.js';
 
 /**
@@ -168,10 +184,12 @@ class Curve {
 
 		cache.push( 0 );
 
+		const distanceTo = ( last.z === undefined ) ? vec2DistanceTo : vec3DistanceTo;
+
 		for ( let p = 1; p <= divisions; p ++ ) {
 
 			current = this.getPoint( p / divisions );
-			sum += current.distanceTo( last );
+			sum += distanceTo( current, last );
 			cache.push( sum );
 			last = current;
 
@@ -304,9 +322,20 @@ class Curve {
 		const pt1 = this.getPoint( t1 );
 		const pt2 = this.getPoint( t2 );
 
-		const tangent = optionalTarget || ( ( pt1.isVector2 ) ? new Vector2() : new Vector3() );
+		const is2D = pt1.z === undefined;
+		const tangent = optionalTarget || ( is2D ? vec2Create() : vec3Create() );
 
-		tangent.copy( pt2 ).sub( pt1 ).normalize();
+		if ( is2D ) {
+
+			vec2Sub( pt2, pt1, tangent );
+			vec2Normalize( tangent, tangent );
+
+		} else {
+
+			vec3Sub( pt2, pt1, tangent );
+			vec3Normalize( tangent, tangent );
+
+		}
 
 		return tangent;
 
@@ -339,14 +368,14 @@ class Curve {
 
 		// see http://www.cs.indiana.edu/pub/techreports/TR425.pdf
 
-		const normal = new Vector3();
+		const normal = vec3Create();
 
 		const tangents = [];
 		const normals = [];
 		const binormals = [];
 
-		const vec = new Vector3();
-		const mat = new Matrix4();
+		const vec = vec3Create();
+		const mat = mat4Create();
 
 		// compute the tangent vectors for each segment on the curve
 
@@ -354,15 +383,15 @@ class Curve {
 
 			const u = i / segments;
 
-			tangents[ i ] = this.getTangentAt( u, new Vector3() );
+			tangents[ i ] = this.getTangentAt( u, vec3Create() );
 
 		}
 
 		// select an initial normal vector perpendicular to the first tangent vector,
 		// and in the direction of the minimum tangent xyz component
 
-		normals[ 0 ] = new Vector3();
-		binormals[ 0 ] = new Vector3();
+		normals[ 0 ] = vec3Create();
+		binormals[ 0 ] = vec3Create();
 		let min = Number.MAX_VALUE;
 		const tx = Math.abs( tangents[ 0 ].x );
 		const ty = Math.abs( tangents[ 0 ].y );
@@ -371,50 +400,52 @@ class Curve {
 		if ( tx <= min ) {
 
 			min = tx;
-			normal.set( 1, 0, 0 );
+			vec3Set( normal, 1, 0, 0 );
 
 		}
 
 		if ( ty <= min ) {
 
 			min = ty;
-			normal.set( 0, 1, 0 );
+			vec3Set( normal, 0, 1, 0 );
 
 		}
 
 		if ( tz <= min ) {
 
-			normal.set( 0, 0, 1 );
+			vec3Set( normal, 0, 0, 1 );
 
 		}
 
-		vec.crossVectors( tangents[ 0 ], normal ).normalize();
+		vec3CrossVectors( tangents[ 0 ], normal, vec );
+		vec3Normalize( vec, vec );
 
-		normals[ 0 ].crossVectors( tangents[ 0 ], vec );
-		binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] );
+		vec3CrossVectors( tangents[ 0 ], vec, normals[ 0 ] );
+		vec3CrossVectors( tangents[ 0 ], normals[ 0 ], binormals[ 0 ] );
 
 
 		// compute the slowly-varying normal and binormal vectors for each segment on the curve
 
 		for ( let i = 1; i <= segments; i ++ ) {
 
-			normals[ i ] = normals[ i - 1 ].clone();
+			normals[ i ] = vec3Copy( normals[ i - 1 ] );
 
-			binormals[ i ] = binormals[ i - 1 ].clone();
+			binormals[ i ] = vec3Copy( binormals[ i - 1 ] );
 
-			vec.crossVectors( tangents[ i - 1 ], tangents[ i ] );
+			vec3CrossVectors( tangents[ i - 1 ], tangents[ i ], vec );
 
-			if ( vec.length() > Number.EPSILON ) {
+			if ( vec3Length( vec ) > Number.EPSILON ) {
 
-				vec.normalize();
+				vec3Normalize( vec, vec );
 
-				const theta = Math.acos( clamp( tangents[ i - 1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
+				const theta = Math.acos( clamp( vec3Dot( tangents[ i - 1 ], tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
 
-				normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
+				mat4MakeRotationAxis( vec, theta, mat );
+				vec3ApplyMatrix4( normals[ i ], mat, normals[ i ] );
 
 			}
 
-			binormals[ i ].crossVectors( tangents[ i ], normals[ i ] );
+			vec3CrossVectors( tangents[ i ], normals[ i ], binormals[ i ] );
 
 		}
 
@@ -422,10 +453,10 @@ class Curve {
 
 		if ( closed === true ) {
 
-			let theta = Math.acos( clamp( normals[ 0 ].dot( normals[ segments ] ), - 1, 1 ) );
+			let theta = Math.acos( clamp( vec3Dot( normals[ 0 ], normals[ segments ] ), - 1, 1 ) );
 			theta /= segments;
 
-			if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ segments ] ) ) > 0 ) {
+			if ( vec3Dot( tangents[ 0 ], vec3CrossVectors( normals[ 0 ], normals[ segments ], vec ) ) > 0 ) {
 
 				theta = - theta;
 
@@ -434,8 +465,9 @@ class Curve {
 			for ( let i = 1; i <= segments; i ++ ) {
 
 				// twist a little...
-				normals[ i ].applyMatrix4( mat.makeRotationAxis( tangents[ i ], theta * i ) );
-				binormals[ i ].crossVectors( tangents[ i ], normals[ i ] );
+				mat4MakeRotationAxis( tangents[ i ], theta * i, mat );
+				vec3ApplyMatrix4( normals[ i ], mat, normals[ i ] );
+				vec3CrossVectors( tangents[ i ], normals[ i ], binormals[ i ] );
 
 			}
 

@@ -1,5 +1,5 @@
 import {
-	Vector2
+	vec2Create
 } from 'three';
 
 /**
@@ -23,7 +23,7 @@ const FreiChenShader = {
 	uniforms: {
 
 		'tDiffuse': { value: null },
-		'aspect': { value: new Vector2( 512, 512 ) }
+		'aspect': { value: vec2Create( 512, 512 ) }
 	},
 
 	vertexShader: /* glsl */`

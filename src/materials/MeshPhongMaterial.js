@@ -3,6 +3,9 @@ import { Material } from './Material.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
 import { Euler } from '../math/Euler.js';
+import { colorCopy } from '../math/ColorFunctions.js';
+import { vec2Copy } from '../math/Vector2Functions.js';
+import { eulerCopy } from '../math/EulerFunctions.js';
 
 /**
  * A material for shiny surfaces with specular highlights.
@@ -404,8 +407,8 @@ class MeshPhongMaterial extends Material {
 
 		super.copy( source );
 
-		this.color.copy( source.color );
-		this.specular.copy( source.specular );
+		colorCopy( source.color, this.color );
+		colorCopy( source.specular, this.specular );
 		this.shininess = source.shininess;
 
 		this.map = source.map;
@@ -416,7 +419,7 @@ class MeshPhongMaterial extends Material {
 		this.aoMap = source.aoMap;
 		this.aoMapIntensity = source.aoMapIntensity;
 
-		this.emissive.copy( source.emissive );
+		colorCopy( source.emissive, this.emissive );
 		this.emissiveMap = source.emissiveMap;
 		this.emissiveIntensity = source.emissiveIntensity;
 
@@ -425,7 +428,7 @@ class MeshPhongMaterial extends Material {
 
 		this.normalMap = source.normalMap;
 		this.normalMapType = source.normalMapType;
-		this.normalScale.copy( source.normalScale );
+		vec2Copy( source.normalScale, this.normalScale );
 
 		this.displacementMap = source.displacementMap;
 		this.displacementScale = source.displacementScale;
@@ -436,7 +439,7 @@ class MeshPhongMaterial extends Material {
 		this.alphaMap = source.alphaMap;
 
 		this.envMap = source.envMap;
-		this.envMapRotation.copy( source.envMapRotation );
+		eulerCopy( source.envMapRotation, this.envMapRotation );
 		this.combine = source.combine;
 		this.reflectivity = source.reflectivity;
 		this.envMapIntensity = source.envMapIntensity;

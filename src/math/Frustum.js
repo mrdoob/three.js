@@ -1,12 +1,15 @@
-import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../constants.js';
-import { Vector2 } from './Vector2.js';
-import { Vector3 } from './Vector3.js';
-import { Sphere } from './Sphere.js';
+import { WebGLCoordinateSystem } from '../constants.js';
 import { Plane } from './Plane.js';
-
-const _sphere = /*@__PURE__*/ new Sphere();
-const _defaultSpriteCenter = /*@__PURE__*/ new Vector2( 0.5, 0.5 );
-const _vector = /*@__PURE__*/ new Vector3();
+import {
+	frustumContainsPoint,
+	frustumCopy,
+	frustumIntersectsBox,
+	frustumIntersectsObject,
+	frustumIntersectsSphere,
+	frustumIntersectsSprite,
+	frustumSet,
+	frustumSetFromProjectionMatrix
+} from './FrustumFunctions.js';
 
 /**
  * Frustums are used to determine what is inside the camera's field of view.
@@ -14,6 +17,12 @@ const _vector = /*@__PURE__*/ new Vector3();
  * frustum can safely be excluded from rendering.
  *
  * This class is mainly intended for use internally by a renderer.
+ *
+ * `Frustum` is a thin, backwards-compatible wrapper around the standalone,
+ * tree-shakeable `frustum*` functions in {@link FrustumFunctions}, which operate
+ * on any {@link FrustumLike} object. Prefer importing those functions
+ * directly if you only need a handful of operations and want unused ones
+ * eliminated from your bundle.
  */
 class Frustum {
 
@@ -51,16 +60,7 @@ class Frustum {
 	 */
 	set( p0, p1, p2, p3, p4, p5 ) {
 
-		const planes = this.planes;
-
-		planes[ 0 ].copy( p0 );
-		planes[ 1 ].copy( p1 );
-		planes[ 2 ].copy( p2 );
-		planes[ 3 ].copy( p3 );
-		planes[ 4 ].copy( p4 );
-		planes[ 5 ].copy( p5 );
-
-		return this;
+		return frustumSet( p0, p1, p2, p3, p4, p5, this );
 
 	}
 
@@ -72,15 +72,7 @@ class Frustum {
 	 */
 	copy( frustum ) {
 
-		const planes = this.planes;
-
-		for ( let i = 0; i < 6; i ++ ) {
-
-			planes[ i ].copy( frustum.planes[ i ] );
-
-		}
-
-		return this;
+		return frustumCopy( frustum, this );
 
 	}
 
@@ -94,44 +86,7 @@ class Frustum {
 	 */
 	setFromProjectionMatrix( m, coordinateSystem = WebGLCoordinateSystem, reversedDepth = false ) {
 
-		const planes = this.planes;
-		const me = m.elements;
-		const me0 = me[ 0 ], me1 = me[ 1 ], me2 = me[ 2 ], me3 = me[ 3 ];
-		const me4 = me[ 4 ], me5 = me[ 5 ], me6 = me[ 6 ], me7 = me[ 7 ];
-		const me8 = me[ 8 ], me9 = me[ 9 ], me10 = me[ 10 ], me11 = me[ 11 ];
-		const me12 = me[ 12 ], me13 = me[ 13 ], me14 = me[ 14 ], me15 = me[ 15 ];
-
-		planes[ 0 ].setComponents( me3 - me0, me7 - me4, me11 - me8, me15 - me12 ).normalize();
-		planes[ 1 ].setComponents( me3 + me0, me7 + me4, me11 + me8, me15 + me12 ).normalize();
-		planes[ 2 ].setComponents( me3 + me1, me7 + me5, me11 + me9, me15 + me13 ).normalize();
-		planes[ 3 ].setComponents( me3 - me1, me7 - me5, me11 - me9, me15 - me13 ).normalize();
-
-		if ( reversedDepth ) {
-
-			planes[ 4 ].setComponents( me2, me6, me10, me14 ).normalize(); // far
-			planes[ 5 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 ).normalize(); // near
-
-		} else {
-
-			planes[ 4 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 ).normalize(); // far
-
-			if ( coordinateSystem === WebGLCoordinateSystem ) {
-
-				planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 ).normalize(); // near
-
-			} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
-
-				planes[ 5 ].setComponents( me2, me6, me10, me14 ).normalize(); // near
-
-			} else {
-
-				throw new Error( 'THREE.Frustum.setFromProjectionMatrix(): Invalid coordinate system: ' + coordinateSystem );
-
-			}
-
-		}
-
-		return this;
+		return frustumSetFromProjectionMatrix( m, coordinateSystem, reversedDepth, this );
 
 	}
 
@@ -145,23 +100,7 @@ class Frustum {
 	 */
 	intersectsObject( object ) {
 
-		if ( object.boundingSphere !== undefined ) {
-
-			if ( object.boundingSphere === null ) object.computeBoundingSphere();
-
-			_sphere.copy( object.boundingSphere ).applyMatrix4( object.matrixWorld );
-
-		} else {
-
-			const geometry = object.geometry;
-
-			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
-
-			_sphere.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
-
-		}
-
-		return this.intersectsSphere( _sphere );
+		return frustumIntersectsObject( this, object );
 
 	}
 
@@ -173,14 +112,7 @@ class Frustum {
 	 */
 	intersectsSprite( sprite ) {
 
-		_sphere.center.set( 0, 0, 0 );
-
-		const offset = _defaultSpriteCenter.distanceTo( sprite.center );
-
-		_sphere.radius = 0.7071067811865476 + offset;
-		_sphere.applyMatrix4( sprite.matrixWorld );
-
-		return this.intersectsSphere( _sphere );
+		return frustumIntersectsSprite( this, sprite );
 
 	}
 
@@ -196,23 +128,7 @@ class Frustum {
 	 */
 	intersectsSphere( sphere ) {
 
-		const planes = this.planes;
-		const center = sphere.center;
-		const negRadius = - sphere.radius;
-
-		for ( let i = 0; i < 6; i ++ ) {
-
-			const distance = planes[ i ].distanceToPoint( center );
-
-			if ( distance < negRadius ) {
-
-				return false;
-
-			}
-
-		}
-
-		return true;
+		return frustumIntersectsSphere( this, sphere );
 
 	}
 
@@ -229,27 +145,7 @@ class Frustum {
 	 */
 	intersectsBox( box ) {
 
-		const planes = this.planes;
-
-		for ( let i = 0; i < 6; i ++ ) {
-
-			const plane = planes[ i ];
-
-			// corner at max distance
-
-			_vector.x = plane.normal.x > 0 ? box.max.x : box.min.x;
-			_vector.y = plane.normal.y > 0 ? box.max.y : box.min.y;
-			_vector.z = plane.normal.z > 0 ? box.max.z : box.min.z;
-
-			if ( plane.distanceToPoint( _vector ) < 0 ) {
-
-				return false;
-
-			}
-
-		}
-
-		return true;
+		return frustumIntersectsBox( this, box );
 
 	}
 
@@ -261,19 +157,7 @@ class Frustum {
 	 */
 	containsPoint( point ) {
 
-		const planes = this.planes;
-
-		for ( let i = 0; i < 6; i ++ ) {
-
-			if ( planes[ i ].distanceToPoint( point ) < 0 ) {
-
-				return false;
-
-			}
-
-		}
-
-		return true;
+		return frustumContainsPoint( this, point );
 
 	}
 

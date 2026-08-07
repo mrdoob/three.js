@@ -1,7 +1,7 @@
-import { Color } from '../../math/Color.js';
-import { Matrix4 } from '../../math/Matrix4.js';
-import { Vector2 } from '../../math/Vector2.js';
-import { Vector3 } from '../../math/Vector3.js';
+import { colorCreate, colorMultiplyScalar } from '../../math/ColorFunctions.js';
+import { mat4Copy, mat4Create, mat4ExtractRotation, mat4Identity, mat4PreMultiply } from '../../math/Matrix4Functions.js';
+import { vec2Create } from '../../math/Vector2Functions.js';
+import { vec3AddScaledVector, vec3ApplyMatrix4, vec3Create, vec3Set, vec3SetFromMatrixPosition, vec3Sub, vec3TransformDirection } from '../../math/Vector3Functions.js';
 import { UniformsLib } from '../shaders/UniformsLib.js';
 import { RGFormat } from '../../constants.js';
 
@@ -25,16 +25,16 @@ function UniformsCache() {
 
 				case 'DirectionalLight':
 					uniforms = {
-						direction: new Vector3(),
-						color: new Color()
+						direction: vec3Create(),
+						color: colorCreate()
 					};
 					break;
 
 				case 'SpotLight':
 					uniforms = {
-						position: new Vector3(),
-						direction: new Vector3(),
-						color: new Color(),
+						position: vec3Create(),
+						direction: vec3Create(),
+						color: colorCreate(),
 						distance: 0,
 						coneCos: 0,
 						penumbraCos: 0,
@@ -44,8 +44,8 @@ function UniformsCache() {
 
 				case 'PointLight':
 					uniforms = {
-						position: new Vector3(),
-						color: new Color(),
+						position: vec3Create(),
+						color: colorCreate(),
 						distance: 0,
 						decay: 0
 					};
@@ -53,18 +53,18 @@ function UniformsCache() {
 
 				case 'HemisphereLight':
 					uniforms = {
-						direction: new Vector3(),
-						skyColor: new Color(),
-						groundColor: new Color()
+						direction: vec3Create(),
+						skyColor: colorCreate(),
+						groundColor: colorCreate()
 					};
 					break;
 
 				case 'RectAreaLight':
 					uniforms = {
-						color: new Color(),
-						position: new Vector3(),
-						halfWidth: new Vector3(),
-						halfHeight: new Vector3()
+						color: colorCreate(),
+						position: vec3Create(),
+						halfWidth: vec3Create(),
+						halfHeight: vec3Create()
 					};
 					break;
 
@@ -104,7 +104,7 @@ function ShadowUniformsCache() {
 						shadowBias: 0,
 						shadowNormalBias: 0,
 						shadowRadius: 1,
-						shadowMapSize: new Vector2()
+						shadowMapSize: vec2Create()
 					};
 					break;
 
@@ -114,7 +114,7 @@ function ShadowUniformsCache() {
 						shadowBias: 0,
 						shadowNormalBias: 0,
 						shadowRadius: 1,
-						shadowMapSize: new Vector2()
+						shadowMapSize: vec2Create()
 					};
 					break;
 
@@ -124,7 +124,7 @@ function ShadowUniformsCache() {
 						shadowBias: 0,
 						shadowNormalBias: 0,
 						shadowRadius: 1,
-						shadowMapSize: new Vector2(),
+						shadowMapSize: vec2Create(),
 						shadowCameraNear: 1,
 						shadowCameraFar: 1000
 					};
@@ -203,17 +203,17 @@ function WebGLLights( extensions ) {
 
 	};
 
-	for ( let i = 0; i < 9; i ++ ) state.probe.push( new Vector3() );
+	for ( let i = 0; i < 9; i ++ ) state.probe.push( vec3Create() );
 
-	const vector3 = new Vector3();
-	const matrix4 = new Matrix4();
-	const matrix42 = new Matrix4();
+	const vector3 = vec3Create();
+	const matrix4 = mat4Create();
+	const matrix42 = mat4Create();
 
 	function setup( lights ) {
 
 		let r = 0, g = 0, b = 0;
 
-		for ( let i = 0; i < 9; i ++ ) state.probe[ i ].set( 0, 0, 0 );
+		for ( let i = 0; i < 9; i ++ ) vec3Set( state.probe[ i ], 0, 0, 0 );
 
 		let directionalLength = 0;
 		let pointLength = 0;
@@ -268,7 +268,7 @@ function WebGLLights( extensions ) {
 
 				for ( let j = 0; j < 9; j ++ ) {
 
-					state.probe[ j ].addScaledVector( light.sh.coefficients[ j ], intensity );
+					vec3AddScaledVector( state.probe[ j ], light.sh.coefficients[ j ], intensity, state.probe[ j ] );
 
 				}
 
@@ -278,7 +278,7 @@ function WebGLLights( extensions ) {
 
 				const uniforms = cache.get( light );
 
-				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
+				colorMultiplyScalar( light.color, light.intensity, uniforms.color );
 
 				if ( light.castShadow ) {
 
@@ -308,9 +308,9 @@ function WebGLLights( extensions ) {
 
 				const uniforms = cache.get( light );
 
-				uniforms.position.setFromMatrixPosition( light.matrixWorld );
+				vec3SetFromMatrixPosition( light.matrixWorld, uniforms.position );
 
-				uniforms.color.copy( color ).multiplyScalar( intensity );
+				colorMultiplyScalar( color, intensity, uniforms.color );
 				uniforms.distance = distance;
 
 				uniforms.coneCos = Math.cos( light.angle );
@@ -359,10 +359,10 @@ function WebGLLights( extensions ) {
 
 				const uniforms = cache.get( light );
 
-				uniforms.color.copy( color ).multiplyScalar( intensity );
+				colorMultiplyScalar( color, intensity, uniforms.color );
 
-				uniforms.halfWidth.set( light.width * 0.5, 0.0, 0.0 );
-				uniforms.halfHeight.set( 0.0, light.height * 0.5, 0.0 );
+				vec3Set( uniforms.halfWidth, light.width * 0.5, 0.0, 0.0 );
+				vec3Set( uniforms.halfHeight, 0.0, light.height * 0.5, 0.0 );
 
 				state.rectArea[ rectAreaLength ] = uniforms;
 
@@ -372,7 +372,7 @@ function WebGLLights( extensions ) {
 
 				const uniforms = cache.get( light );
 
-				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
+				colorMultiplyScalar( light.color, light.intensity, uniforms.color );
 				uniforms.distance = light.distance;
 				uniforms.decay = light.decay;
 
@@ -406,8 +406,8 @@ function WebGLLights( extensions ) {
 
 				const uniforms = cache.get( light );
 
-				uniforms.skyColor.copy( light.color ).multiplyScalar( intensity );
-				uniforms.groundColor.copy( light.groundColor ).multiplyScalar( intensity );
+				colorMultiplyScalar( light.color, intensity, uniforms.skyColor );
+				colorMultiplyScalar( light.groundColor, intensity, uniforms.groundColor );
 
 				state.hemi[ hemiLength ] = uniforms;
 
@@ -506,10 +506,10 @@ function WebGLLights( extensions ) {
 
 				const uniforms = state.directional[ directionalLength ];
 
-				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
-				vector3.setFromMatrixPosition( light.target.matrixWorld );
-				uniforms.direction.sub( vector3 );
-				uniforms.direction.transformDirection( viewMatrix );
+				vec3SetFromMatrixPosition( light.matrixWorld, uniforms.direction );
+				vec3SetFromMatrixPosition( light.target.matrixWorld, vector3 );
+				vec3Sub( uniforms.direction, vector3, uniforms.direction );
+				vec3TransformDirection( uniforms.direction, viewMatrix, uniforms.direction );
 
 				directionalLength ++;
 
@@ -517,13 +517,13 @@ function WebGLLights( extensions ) {
 
 				const uniforms = state.spot[ spotLength ];
 
-				uniforms.position.setFromMatrixPosition( light.matrixWorld );
-				uniforms.position.applyMatrix4( viewMatrix );
+				vec3SetFromMatrixPosition( light.matrixWorld, uniforms.position );
+				vec3ApplyMatrix4( uniforms.position, viewMatrix, uniforms.position );
 
-				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
-				vector3.setFromMatrixPosition( light.target.matrixWorld );
-				uniforms.direction.sub( vector3 );
-				uniforms.direction.transformDirection( viewMatrix );
+				vec3SetFromMatrixPosition( light.matrixWorld, uniforms.direction );
+				vec3SetFromMatrixPosition( light.target.matrixWorld, vector3 );
+				vec3Sub( uniforms.direction, vector3, uniforms.direction );
+				vec3TransformDirection( uniforms.direction, viewMatrix, uniforms.direction );
 
 				spotLength ++;
 
@@ -531,20 +531,20 @@ function WebGLLights( extensions ) {
 
 				const uniforms = state.rectArea[ rectAreaLength ];
 
-				uniforms.position.setFromMatrixPosition( light.matrixWorld );
-				uniforms.position.applyMatrix4( viewMatrix );
+				vec3SetFromMatrixPosition( light.matrixWorld, uniforms.position );
+				vec3ApplyMatrix4( uniforms.position, viewMatrix, uniforms.position );
 
 				// extract local rotation of light to derive width/height half vectors
-				matrix42.identity();
-				matrix4.copy( light.matrixWorld );
-				matrix4.premultiply( viewMatrix );
-				matrix42.extractRotation( matrix4 );
+				mat4Identity( matrix42 );
+				mat4Copy( light.matrixWorld, matrix4 );
+				mat4PreMultiply( matrix4, viewMatrix, matrix4 );
+				mat4ExtractRotation( matrix4, matrix42 );
 
-				uniforms.halfWidth.set( light.width * 0.5, 0.0, 0.0 );
-				uniforms.halfHeight.set( 0.0, light.height * 0.5, 0.0 );
+				vec3Set( uniforms.halfWidth, light.width * 0.5, 0.0, 0.0 );
+				vec3Set( uniforms.halfHeight, 0.0, light.height * 0.5, 0.0 );
 
-				uniforms.halfWidth.applyMatrix4( matrix42 );
-				uniforms.halfHeight.applyMatrix4( matrix42 );
+				vec3ApplyMatrix4( uniforms.halfWidth, matrix42, uniforms.halfWidth );
+				vec3ApplyMatrix4( uniforms.halfHeight, matrix42, uniforms.halfHeight );
 
 				rectAreaLength ++;
 
@@ -552,8 +552,8 @@ function WebGLLights( extensions ) {
 
 				const uniforms = state.point[ pointLength ];
 
-				uniforms.position.setFromMatrixPosition( light.matrixWorld );
-				uniforms.position.applyMatrix4( viewMatrix );
+				vec3SetFromMatrixPosition( light.matrixWorld, uniforms.position );
+				vec3ApplyMatrix4( uniforms.position, viewMatrix, uniforms.position );
 
 				pointLength ++;
 
@@ -561,8 +561,8 @@ function WebGLLights( extensions ) {
 
 				const uniforms = state.hemi[ hemiLength ];
 
-				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
-				uniforms.direction.transformDirection( viewMatrix );
+				vec3SetFromMatrixPosition( light.matrixWorld, uniforms.direction );
+				vec3TransformDirection( uniforms.direction, viewMatrix, uniforms.direction );
 
 				hemiLength ++;
 

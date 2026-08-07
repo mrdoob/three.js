@@ -2,11 +2,23 @@ import {
 	BufferGeometry,
 	Float32BufferAttribute,
 	ShapeUtils,
-	Vector2,
-	Vector3
+	vec2Create,
+	vec2Max,
+	vec2Min,
+	vec3Add,
+	vec3Create,
+	vec3CrossVectors,
+	vec3DistanceTo,
+	vec3DivideScalar,
+	vec3Dot,
+	vec3Negate,
+	vec3Normalize,
+	vec3Set,
+	vec3Sub,
+	vec3SubVectors
 } from 'three';
 
-const _vector = /*@__PURE__*/ new Vector3();
+const _vector = /*@__PURE__*/ vec3Create();
 
 /**
  * This class can be used to generate a geometry by lofting (skinning) a surface
@@ -132,7 +144,7 @@ class LoftGeometry extends BufferGeometry {
 
 			for ( let j = 0; j < columns; j ++ ) {
 
-				distance += sections[ i ][ j ].distanceTo( sections[ i - 1 ][ j ] );
+				distance += vec3DistanceTo( sections[ i ][ j ], sections[ i - 1 ][ j ] );
 
 			}
 
@@ -154,7 +166,7 @@ class LoftGeometry extends BufferGeometry {
 
 			for ( let j = 1; j < pointsPerRow; j ++ ) {
 
-				colV.push( colV[ j - 1 ] + section[ j % columns ].distanceTo( section[ ( j - 1 ) % columns ] ) );
+				colV.push( colV[ j - 1 ] + vec3DistanceTo( section[ j % columns ], section[ ( j - 1 ) % columns ] ) );
 
 			}
 
@@ -218,11 +230,12 @@ class LoftGeometry extends BufferGeometry {
 				const a = i * pointsPerRow;
 				const b = i * pointsPerRow + ( pointsPerRow - 1 );
 
-				_vector.set(
+				vec3Normalize( vec3Set(
+					_vector,
 					normals.getX( a ) + normals.getX( b ),
 					normals.getY( a ) + normals.getY( b ),
 					normals.getZ( a ) + normals.getZ( b )
-				).normalize();
+				), _vector );
 
 				normals.setXYZ( a, _vector.x, _vector.y, _vector.z );
 				normals.setXYZ( b, _vector.x, _vector.y, _vector.z );
@@ -238,15 +251,15 @@ class LoftGeometry extends BufferGeometry {
 			// compute the centroid of the section and the normal of its plane
 			// via Newell's method
 
-			const centroid = new Vector3();
-			const normal = new Vector3();
+			const centroid = vec3Create();
+			const normal = vec3Create();
 
 			for ( let i = 0; i < columns; i ++ ) {
 
 				const p = section[ i ];
 				const q = section[ ( i + 1 ) % columns ];
 
-				centroid.add( p );
+				vec3Add( centroid, p, centroid );
 
 				normal.x += ( p.y - q.y ) * ( p.z + q.z );
 				normal.y += ( p.z - q.z ) * ( p.x + q.x );
@@ -254,37 +267,38 @@ class LoftGeometry extends BufferGeometry {
 
 			}
 
-			centroid.divideScalar( columns );
-			normal.normalize();
+			vec3DivideScalar( centroid, columns, centroid );
+			vec3Normalize( normal, normal );
 
 			// make sure the cap faces away from the rest of the surface
 
 			const neighbor = sections[ sectionIndex === 0 ? 1 : rows - 2 ];
 
-			_vector.set( 0, 0, 0 );
+			vec3Set( _vector, 0, 0, 0 );
 
-			for ( let i = 0; i < columns; i ++ ) _vector.add( neighbor[ i ] );
+			for ( let i = 0; i < columns; i ++ ) vec3Add( _vector, neighbor[ i ], _vector );
 
-			_vector.divideScalar( columns ).sub( centroid );
+			vec3Sub( vec3DivideScalar( _vector, columns, _vector ), centroid, _vector );
 
-			if ( normal.dot( _vector ) > 0 ) normal.negate();
+			if ( vec3Dot( normal, _vector ) > 0 ) vec3Negate( normal, normal );
 
 			// project the section onto the cap plane
 
-			const tangent = new Vector3( 1, 0, 0 );
+			const tangent = vec3Set( vec3Create(), 1, 0, 0 );
 
-			if ( Math.abs( normal.x ) > 0.9 ) tangent.set( 0, 1, 0 );
+			if ( Math.abs( normal.x ) > 0.9 ) vec3Set( tangent, 0, 1, 0 );
 
-			const bitangent = new Vector3().crossVectors( normal, tangent ).normalize();
-			tangent.crossVectors( bitangent, normal );
+			const bitangent = vec3Create();
+			vec3Normalize( vec3CrossVectors( normal, tangent, bitangent ), bitangent );
+			vec3CrossVectors( bitangent, normal, tangent );
 
 			const contour = [];
 			const points = section.slice();
 
 			for ( let i = 0; i < columns; i ++ ) {
 
-				_vector.subVectors( points[ i ], centroid );
-				contour.push( new Vector2( _vector.dot( tangent ), _vector.dot( bitangent ) ) );
+				vec3SubVectors( points[ i ], centroid, _vector );
+				contour.push( vec2Create( vec3Dot( _vector, tangent ), vec3Dot( _vector, bitangent ) ) );
 
 			}
 
@@ -301,13 +315,13 @@ class LoftGeometry extends BufferGeometry {
 
 			// compute the bounding box of the contour for uv generation
 
-			const min = new Vector2( Infinity, Infinity );
-			const max = new Vector2( - Infinity, - Infinity );
+			const min = vec2Create( Infinity, Infinity );
+			const max = vec2Create( - Infinity, - Infinity );
 
 			for ( let i = 0; i < columns; i ++ ) {
 
-				min.min( contour[ i ] );
-				max.max( contour[ i ] );
+				vec2Min( min, contour[ i ], min );
+				vec2Max( max, contour[ i ], max );
 
 			}
 

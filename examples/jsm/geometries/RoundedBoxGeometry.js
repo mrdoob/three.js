@@ -1,9 +1,16 @@
 import {
 	BoxGeometry,
-	Vector3
+	vec3AngleTo,
+	vec3Copy,
+	vec3Create,
+	vec3DivideScalar,
+	vec3FromArray,
+	vec3Normalize,
+	vec3Set,
+	vec3SubScalar
 } from 'three';
 
-const _tempNormal = new Vector3();
+const _tempNormal = /*@__PURE__*/ vec3Create();
 
 function getUv( faceDirVector, normal, uvAxis, projectionAxis, radius, sideLength ) {
 
@@ -14,15 +21,15 @@ function getUv( faceDirVector, normal, uvAxis, projectionAxis, radius, sideLengt
 	const halfArc = Math.PI / 4;
 
 	// Get the vector projected onto the Y plane
-	_tempNormal.copy( normal );
+	vec3Copy( normal, _tempNormal );
 	_tempNormal[ projectionAxis ] = 0;
-	_tempNormal.normalize();
+	vec3Normalize( _tempNormal, _tempNormal );
 
 	// total amount of UV space alloted to a single arc
 	const arcUvRatio = 0.5 * totArcLength / ( totArcLength + centerLength );
 
 	// the distance along one arc the point is at
-	const arcAngleRatio = 1.0 - ( _tempNormal.angleTo( faceDirVector ) / halfArc );
+	const arcAngleRatio = 1.0 - ( vec3AngleTo( _tempNormal, faceDirVector ) / halfArc );
 
 	if ( Math.sign( _tempNormal[ uvAxis ] ) === 1 ) {
 
@@ -103,27 +110,29 @@ class RoundedBoxGeometry extends BoxGeometry {
 
 		//
 
-		const position = new Vector3();
-		const normal = new Vector3();
+		const position = vec3Create();
+		const normal = vec3Create();
 
-		const box = new Vector3( width, height, depth ).divideScalar( 2 ).subScalar( radius );
+		const box = vec3Set( vec3Create(), width, height, depth );
+		vec3DivideScalar( box, 2, box );
+		vec3SubScalar( box, radius, box );
 
 		const positions = this.attributes.position.array;
 		const normals = this.attributes.normal.array;
 		const uvs = this.attributes.uv.array;
 
 		const faceTris = positions.length / 6;
-		const faceDirVector = new Vector3();
+		const faceDirVector = vec3Create();
 		const halfSegmentSize = 0.5 / totalSegments;
 
 		for ( let i = 0, j = 0; i < positions.length; i += 3, j += 2 ) {
 
-			position.fromArray( positions, i );
-			normal.copy( position );
+			vec3FromArray( positions, i, position );
+			vec3Copy( position, normal );
 			normal.x -= Math.sign( normal.x ) * halfSegmentSize;
 			normal.y -= Math.sign( normal.y ) * halfSegmentSize;
 			normal.z -= Math.sign( normal.z ) * halfSegmentSize;
-			normal.normalize();
+			vec3Normalize( normal, normal );
 
 			positions[ i + 0 ] = box.x * Math.sign( position.x ) + normal.x * radius;
 			positions[ i + 1 ] = box.y * Math.sign( position.y ) + normal.y * radius;
@@ -140,7 +149,7 @@ class RoundedBoxGeometry extends BoxGeometry {
 				case 0: // right
 
 					// generate UVs along Z then Y
-					faceDirVector.set( 1, 0, 0 );
+					vec3Set( faceDirVector, 1, 0, 0 );
 					uvs[ j + 0 ] = getUv( faceDirVector, normal, 'z', 'y', radius, depth );
 					uvs[ j + 1 ] = 1.0 - getUv( faceDirVector, normal, 'y', 'z', radius, height );
 					break;
@@ -148,7 +157,7 @@ class RoundedBoxGeometry extends BoxGeometry {
 				case 1: // left
 
 					// generate UVs along Z then Y
-					faceDirVector.set( - 1, 0, 0 );
+					vec3Set( faceDirVector, - 1, 0, 0 );
 					uvs[ j + 0 ] = 1.0 - getUv( faceDirVector, normal, 'z', 'y', radius, depth );
 					uvs[ j + 1 ] = 1.0 - getUv( faceDirVector, normal, 'y', 'z', radius, height );
 					break;
@@ -156,7 +165,7 @@ class RoundedBoxGeometry extends BoxGeometry {
 				case 2: // top
 
 					// generate UVs along X then Z
-					faceDirVector.set( 0, 1, 0 );
+					vec3Set( faceDirVector, 0, 1, 0 );
 					uvs[ j + 0 ] = 1.0 - getUv( faceDirVector, normal, 'x', 'z', radius, width );
 					uvs[ j + 1 ] = getUv( faceDirVector, normal, 'z', 'x', radius, depth );
 					break;
@@ -164,7 +173,7 @@ class RoundedBoxGeometry extends BoxGeometry {
 				case 3: // bottom
 
 					// generate UVs along X then Z
-					faceDirVector.set( 0, - 1, 0 );
+					vec3Set( faceDirVector, 0, - 1, 0 );
 					uvs[ j + 0 ] = 1.0 - getUv( faceDirVector, normal, 'x', 'z', radius, width );
 					uvs[ j + 1 ] = 1.0 - getUv( faceDirVector, normal, 'z', 'x', radius, depth );
 					break;
@@ -172,7 +181,7 @@ class RoundedBoxGeometry extends BoxGeometry {
 				case 4: // front
 
 					// generate UVs along X then Y
-					faceDirVector.set( 0, 0, 1 );
+					vec3Set( faceDirVector, 0, 0, 1 );
 					uvs[ j + 0 ] = 1.0 - getUv( faceDirVector, normal, 'x', 'y', radius, width );
 					uvs[ j + 1 ] = 1.0 - getUv( faceDirVector, normal, 'y', 'x', radius, height );
 					break;
@@ -180,7 +189,7 @@ class RoundedBoxGeometry extends BoxGeometry {
 				case 5: // back
 
 					// generate UVs along X then Y
-					faceDirVector.set( 0, 0, - 1 );
+					vec3Set( faceDirVector, 0, 0, - 1 );
 					uvs[ j + 0 ] = getUv( faceDirVector, normal, 'x', 'y', radius, width );
 					uvs[ j + 1 ] = 1.0 - getUv( faceDirVector, normal, 'y', 'x', radius, height );
 					break;

@@ -1,8 +1,8 @@
-import { RedFormat, RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType, UnsignedByteType } from 'three/webgpu';
+import { RedFormat, RenderTarget, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType, UnsignedByteType, vec2Create, vec2Set } from 'three/webgpu';
 import { reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, float, Break, Loop, int, max, abs, If, interleavedGradientNoise, screenCoordinate, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, lightPosition, lightTargetPosition, fract, rand, mix, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _size = /*@__PURE__*/ new Vector2();
+const _size = /*@__PURE__*/ vec2Create();
 
 const _spatialOffsets = [ 0, 0.5, 0.25, 0.75 ];
 
@@ -187,7 +187,7 @@ class SSSNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
-		this._resolution = uniform( new Vector2() );
+		this._resolution = uniform( vec2Create(), 'vec2' );
 
 		/**
 		 * Temporal offset added to the initial ray step.
@@ -272,7 +272,7 @@ class SSSNode extends TempNode {
 		width = Math.round( this.resolutionScale * width );
 		height = Math.round( this.resolutionScale * height );
 
-		this._resolution.value.set( width, height );
+		vec2Set( width, height, this._resolution.value );
 		this._sssRenderTarget.setSize( width, height );
 
 	}
@@ -291,7 +291,7 @@ class SSSNode extends TempNode {
 		//
 
 		const size = renderer.getDrawingBufferSize( _size );
-		this.setSize( size.width, size.height );
+		this.setSize( size.x, size.y );
 
 		// update temporal uniforms
 

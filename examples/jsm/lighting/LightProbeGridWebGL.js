@@ -1,5 +1,4 @@
 import {
-	Box3,
 	CubeCamera,
 	FloatType,
 	HalfFloatType,
@@ -12,11 +11,15 @@ import {
 	RGBAFormat,
 	Scene,
 	ShaderMaterial,
-	Vector3,
-	Vector4,
 	WebGL3DRenderTarget,
 	WebGLCubeRenderTarget,
-	WebGLRenderTarget
+	WebGLRenderTarget,
+	box3Create,
+	box3SetFromCenterAndSize,
+	vec3Copy,
+	vec3Create,
+	vec3Set,
+	vec4Create
 } from 'three';
 
 // Shared fullscreen-quad scene / camera
@@ -43,10 +46,10 @@ let _batchTarget = null;
 let _batchTargetProbes = 0;
 
 // Reusable temp objects
-const _position = /*@__PURE__*/ new Vector3();
-const _size = /*@__PURE__*/ new Vector3();
-const _currentViewport = /*@__PURE__*/ new Vector4();
-const _currentScissor = /*@__PURE__*/ new Vector4();
+const _position = /*@__PURE__*/ vec3Create();
+const _size = /*@__PURE__*/ vec3Create();
+const _currentViewport = /*@__PURE__*/ vec4Create();
+const _currentScissor = /*@__PURE__*/ vec4Create();
 
 // Number of padding texels added at each boundary of every sub-volume in the atlas.
 const ATLAS_PADDING = 1;
@@ -131,9 +134,10 @@ class LightProbeGridWebGL extends Object3D {
 		/**
 		 * The number of probes along each axis.
 		 *
-		 * @type {Vector3}
+		 * @type {Vector3Like}
 		 */
-		this.resolution = new Vector3(
+		this.resolution = vec3Set(
+			vec3Create(),
 			widthProbes !== undefined ? widthProbes : Math.max( 2, Math.round( width ) + 1 ),
 			heightProbes !== undefined ? heightProbes : Math.max( 2, Math.round( height ) + 1 ),
 			depthProbes !== undefined ? depthProbes : Math.max( 2, Math.round( depth ) + 1 )
@@ -143,9 +147,9 @@ class LightProbeGridWebGL extends Object3D {
 		 * The world-space bounding box for the grid. Updated automatically
 		 * by {@link LightProbeGridWebGL#bake}.
 		 *
-		 * @type {Box3}
+		 * @type {Box3Like}
 		 */
-		this.boundingBox = new Box3();
+		this.boundingBox = box3Create();
 
 		/**
 		 * The single RGBA atlas 3D texture storing all seven packed SH sub-volumes.
@@ -174,8 +178,8 @@ class LightProbeGridWebGL extends Object3D {
 	 * @param {number} ix - X index.
 	 * @param {number} iy - Y index.
 	 * @param {number} iz - Z index.
-	 * @param {Vector3} target - The target vector.
-	 * @return {Vector3} The world-space position.
+	 * @param {Vector3Like} target - The target vector.
+	 * @return {Vector3Like} The world-space position.
 	 */
 	getProbePosition( ix, iy, iz, target ) {
 
@@ -183,13 +187,12 @@ class LightProbeGridWebGL extends Object3D {
 		const res = this.resolution;
 		const w = this.width, h = this.height, d = this.depth;
 
-		target.set(
+		return vec3Set(
+			target,
 			res.x > 1 ? pos.x - w / 2 + ix * w / ( res.x - 1 ) : pos.x,
 			res.y > 1 ? pos.y - h / 2 + iy * h / ( res.y - 1 ) : pos.y,
 			res.z > 1 ? pos.z - d / 2 + iz * d / ( res.z - 1 ) : pos.z
 		);
-
-		return target;
 
 	}
 
@@ -198,8 +201,8 @@ class LightProbeGridWebGL extends Object3D {
 	 */
 	updateBoundingBox() {
 
-		_size.set( this.width, this.height, this.depth );
-		this.boundingBox.setFromCenterAndSize( this.position, _size );
+		vec3Set( _size, this.width, this.height, this.depth );
+		box3SetFromCenterAndSize( this.position, _size, this.boundingBox );
 
 	}
 
@@ -290,7 +293,7 @@ class LightProbeGridWebGL extends Object3D {
 						const probeIndex = ix + iy * res.x + iz * res.x * res.y;
 
 						this.getProbePosition( ix, iy, iz, _position );
-						cubeCamera.position.copy( _position );
+						vec3Copy( _position, cubeCamera.position );
 						cubeCamera.update( renderer, scene );
 
 						// SH projection
@@ -324,7 +327,7 @@ class LightProbeGridWebGL extends Object3D {
 			for ( let t = 0; t < 7; t ++ ) {
 
 				_repackMaterials[ t ].uniforms.batchTexture.value = batchTarget.texture;
-				_repackMaterials[ t ].uniforms.resolution.value.copy( res );
+				vec3Copy( res, _repackMaterials[ t ].uniforms.resolution.value );
 
 				// Write data slices
 				for ( let iz = 0; iz < res.z; iz ++ ) {
@@ -356,8 +359,8 @@ class LightProbeGridWebGL extends Object3D {
 
 		// Restore renderer state
 		renderer.setRenderTarget( currentRenderTarget );
-		renderer.setViewport( _currentViewport );
-		renderer.setScissor( _currentScissor );
+		renderer.setViewport( _currentViewport.x, _currentViewport.y, _currentViewport.z, _currentViewport.w );
+		renderer.setScissor( _currentScissor.x, _currentScissor.y, _currentScissor.z, _currentScissor.w );
 		renderer.setScissorTest( currentScissorTest );
 
 		scene.matrixWorldAutoUpdate = currentMatrixWorldAutoUpdate;
@@ -577,7 +580,7 @@ function _ensureRepackResources() {
 			},
 			uniforms: {
 				batchTexture: { value: null },
-				resolution: { value: new Vector3() },
+				resolution: { value: vec3Create() },
 				sliceZ: { value: 0 }
 			},
 			vertexShader: repackVertexShader,

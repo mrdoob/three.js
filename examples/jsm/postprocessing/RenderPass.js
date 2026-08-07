@@ -1,5 +1,5 @@
 import {
-	Color
+	colorCreate
 } from 'three';
 import { Pass } from './Pass.js';
 
@@ -103,7 +103,7 @@ class RenderPass extends Pass {
 		 */
 		this.isRenderPass = true;
 
-		this._oldClearColor = new Color();
+		this._oldClearColor = colorCreate();
 
 	}
 

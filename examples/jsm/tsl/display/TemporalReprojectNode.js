@@ -1,5 +1,5 @@
 import { EPSILON, Fn, If, abs, convertToTexture, dFdx, dFdy, dot, exp, float, floor, fwidth, getViewPosition, ivec2, luminance, max, min, mix, nodeObject, normalize, passTexture, screenCoordinate, select, smoothstep, sqrt, struct, texture, textureLoad, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4, velocity, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
-import { DepthTexture, HalfFloatType, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, TempNode, Vector2, Vector3 } from 'three/webgpu';
+import { DepthTexture, HalfFloatType, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, TempNode, vec2Create, vec2Set, vec3Copy, mat4Create, mat4Copy } from 'three/webgpu';
 import { ENV_RAY_LENGTH, ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
 
 // Reprojection helpers
@@ -433,32 +433,32 @@ const velocityToUVOffset = Fn( ( [ velocity ] ) => {
  */
 function bindTemporalCameraUniforms( camera ) {
 
-	const worldMatrix = uniform( new Matrix4().copy( camera.matrixWorld ) );
-	const viewMatrix = uniform( new Matrix4().copy( camera.matrixWorldInverse ) );
-	const projectionMatrix = uniform( new Matrix4().copy( camera.projectionMatrix ) );
-	const projectionMatrixInverse = uniform( new Matrix4().copy( camera.projectionMatrixInverse ) );
-	const worldPosition = uniform( new Vector3().copy( camera.position ) );
+	const worldMatrix = uniform( mat4Copy( camera.matrixWorld ), 'mat4' );
+	const viewMatrix = uniform( mat4Copy( camera.matrixWorldInverse ), 'mat4' );
+	const projectionMatrix = uniform( mat4Copy( camera.projectionMatrix ), 'mat4' );
+	const projectionMatrixInverse = uniform( mat4Copy( camera.projectionMatrixInverse ), 'mat4' );
+	const worldPosition = uniform( vec3Copy( camera.position ), 'vec3' );
 
-	const previousWorldMatrix = uniform( new Matrix4().copy( camera.matrixWorld ) );
-	const previousViewMatrix = uniform( new Matrix4().copy( camera.matrixWorldInverse ) );
-	const previousProjectionMatrix = uniform( new Matrix4().copy( camera.projectionMatrix ) );
-	const previousProjectionMatrixInverse = uniform( new Matrix4().copy( camera.projectionMatrixInverse ) );
+	const previousWorldMatrix = uniform( mat4Copy( camera.matrixWorld ), 'mat4' );
+	const previousViewMatrix = uniform( mat4Copy( camera.matrixWorldInverse ), 'mat4' );
+	const previousProjectionMatrix = uniform( mat4Copy( camera.projectionMatrix ), 'mat4' );
+	const previousProjectionMatrixInverse = uniform( mat4Copy( camera.projectionMatrixInverse ), 'mat4' );
 
 	/**
 	 * @param {Camera} cam
 	 */
 	function updateFromCamera( cam ) {
 
-		previousWorldMatrix.value.copy( worldMatrix.value );
-		previousViewMatrix.value.copy( viewMatrix.value );
-		previousProjectionMatrix.value.copy( projectionMatrix.value );
-		previousProjectionMatrixInverse.value.copy( projectionMatrixInverse.value );
+		mat4Copy( worldMatrix.value, previousWorldMatrix.value );
+		mat4Copy( viewMatrix.value, previousViewMatrix.value );
+		mat4Copy( projectionMatrix.value, previousProjectionMatrix.value );
+		mat4Copy( projectionMatrixInverse.value, previousProjectionMatrixInverse.value );
 
-		worldMatrix.value.copy( cam.matrixWorld );
-		viewMatrix.value.copy( cam.matrixWorldInverse );
-		projectionMatrix.value.copy( cam.projectionMatrix );
-		projectionMatrixInverse.value.copy( cam.projectionMatrixInverse );
-		worldPosition.value.copy( cam.position );
+		mat4Copy( cam.matrixWorld, worldMatrix.value );
+		mat4Copy( cam.matrixWorldInverse, viewMatrix.value );
+		mat4Copy( cam.projectionMatrix, projectionMatrix.value );
+		mat4Copy( cam.projectionMatrixInverse, projectionMatrixInverse.value );
+		vec3Copy( cam.position, worldPosition.value );
 
 	}
 
@@ -478,7 +478,7 @@ function bindTemporalCameraUniforms( camera ) {
 }
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _size = /*@__PURE__*/ new Vector2();
+const _size = /*@__PURE__*/ vec2Create();
 
 let _rendererState;
 
@@ -572,7 +572,7 @@ class TemporalReprojectNode extends TempNode {
 
 		this.maxVelocityLength = DEFAULT_MAX_VELOCITY_LENGTH;
 
-		this._resolution = uniform( new Vector2() );
+		this._resolution = uniform( vec2Create(), 'vec2' );
 
 		this._cameraUniforms = bindTemporalCameraUniforms( camera );
 
@@ -596,7 +596,7 @@ class TemporalReprojectNode extends TempNode {
 
 		this._textureNode = passTexture( this, this._resolveRenderTarget.texture );
 
-		this._originalProjectionMatrix = new Matrix4();
+		this._originalProjectionMatrix = mat4Create();
 
 		this._placeholderPreviousDepthTexture = new DepthTexture( 1, 1 );
 		this._previousDepthNode = texture( this._placeholderPreviousDepthTexture );
@@ -623,14 +623,14 @@ class TemporalReprojectNode extends TempNode {
 		this._historyRenderTarget.setSize( width, height );
 		this._resolveRenderTarget.setSize( width, height );
 
-		this._resolution.value.set( width, height );
+		vec2Set( width, height, this._resolution.value );
 
 	}
 
 	setViewOffset() {
 
 		this.camera.updateProjectionMatrix();
-		this._originalProjectionMatrix.copy( this.camera.projectionMatrix );
+		mat4Copy( this.camera.projectionMatrix, this._originalProjectionMatrix );
 		velocity.setProjectionMatrix( this._originalProjectionMatrix );
 
 	}
@@ -648,8 +648,8 @@ class TemporalReprojectNode extends TempNode {
 		this._cameraUniforms.updateFromCamera( this.camera );
 
 		const drawingBufferSize = renderer.getDrawingBufferSize( _size );
-		const width = drawingBufferSize.width;
-		const height = drawingBufferSize.height;
+		const width = drawingBufferSize.x;
+		const height = drawingBufferSize.y;
 
 		if ( this._needsPostProcessingSync === true ) {
 

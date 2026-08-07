@@ -2,7 +2,7 @@
 .DS_Store
 .idea/
 .project
-.puppeteer_profile/
+.puppeteer_*
 .vs/
 .vscode/
 
@@ -11,12 +11,8 @@ npm-debug.log
 
 test/e2e/chromium
 test/e2e/output-screenshots
-test/treeshake/index.bundle.js
-test/treeshake/index.bundle.min.js
-test/treeshake/index.webgpu.bundle.js
-test/treeshake/index.webgpu.bundle.min.js
-test/treeshake/index.webgpu.nodes.bundle.js
-test/treeshake/index.webgpu.nodes.bundle.min.js
+test/treeshake/*.bundle.js
+test/treeshake/*.bundle.min.js
 test/unit/build
 
 **/node_modules

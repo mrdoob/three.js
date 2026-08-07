@@ -83,19 +83,6 @@ import {
  */
 class Matrix4 {
 
-	static {
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		Matrix4.prototype.isMatrix4 = true;
-
-	}
-
 	/**
 	 * Constructs a new 4x4 matrix. The arguments are supposed to be
 	 * in row-major order. If no arguments are provided, the constructor
@@ -119,6 +106,15 @@ class Matrix4 {
 	 * @param {number} [n44] - 4-4 matrix element.
 	 */
 	constructor( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		Object.defineProperty( this, 'isMatrix4', { value: true } );
 
 		/**
 		 * A column-major list of matrix values.
@@ -595,6 +591,14 @@ class Matrix4 {
 	decompose( position, quaternion, scale ) {
 
 		mat4Decompose( this, position, quaternion, scale );
+
+		// Preserve Quaternion↔Euler sync for Object3D (mat4Decompose writes
+		// quaternion fields directly and does not invoke class setters).
+		if ( typeof quaternion._onChangeCallback === 'function' ) {
+
+			quaternion._onChangeCallback();
+
+		}
 
 		return this;
 

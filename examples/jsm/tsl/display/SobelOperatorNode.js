@@ -1,4 +1,4 @@
-import { Vector2, TempNode, NodeUpdateType } from 'three/webgpu';
+import { TempNode, NodeUpdateType, vec2Create, vec2Set } from 'three/webgpu';
 import { Fn, uv, uniform, convertToTexture, vec2, vec3, vec4, mat3, luminance, add } from 'three/tsl';
 
 /**
@@ -48,7 +48,7 @@ class SobelOperatorNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
-		this._invSize = uniform( new Vector2() );
+		this._invSize = uniform( vec2Create(), 'vec2' );
 
 	}
 
@@ -61,7 +61,7 @@ class SobelOperatorNode extends TempNode {
 
 		const map = this.textureNode.value;
 
-		this._invSize.value.set( 1 / map.image.width, 1 / map.image.height );
+		vec2Set( 1 / map.image.width, 1 / map.image.height, this._invSize.value );
 
 	}
 

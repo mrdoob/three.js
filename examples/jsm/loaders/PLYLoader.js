@@ -10,11 +10,12 @@ import {
 	Uint8BufferAttribute,
 	Uint16BufferAttribute,
 	Uint32BufferAttribute,
-	Color,
+	colorCreate,
+	colorSetRGB,
 	SRGBColorSpace
 } from 'three';
 
-const _color = new Color();
+const _color = colorCreate();
 
 /**
  * A loader for PLY the PLY format (known as the Polygon
@@ -626,11 +627,12 @@ class PLYLoader extends Loader {
 
 					// convert to float for color space conversion
 
-					_color.setRGB(
+					colorSetRGB(
 						element[ color.names[ 0 ] ] * scale,
 						element[ color.names[ 1 ] ] * scale,
 						element[ color.names[ 2 ] ] * scale,
-						SRGBColorSpace
+						SRGBColorSpace,
+						_color
 					);
 
 					// convert back to original type
@@ -689,11 +691,12 @@ class PLYLoader extends Loader {
 
 					const scale = getColorScale( color.type );
 
-					_color.setRGB(
+					colorSetRGB(
 						element[ color.names[ 0 ] ] * scale,
 						element[ color.names[ 1 ] ] * scale,
 						element[ color.names[ 2 ] ] * scale,
-						SRGBColorSpace
+						SRGBColorSpace,
+						_color
 					);
 
 					// convert back to original type

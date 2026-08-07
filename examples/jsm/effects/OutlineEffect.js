@@ -1,9 +1,9 @@
 import {
 	BackSide,
-	Color,
 	ShaderMaterial,
 	UniformsLib,
-	UniformsUtils
+	UniformsUtils,
+	colorFromArray
 } from 'three';
 
 /**
@@ -37,7 +37,7 @@ class OutlineEffect {
 		this.enabled = true;
 
 		const defaultThickness = parameters.defaultThickness !== undefined ? parameters.defaultThickness : 0.003;
-		const defaultColor = new Color().fromArray( parameters.defaultColor !== undefined ? parameters.defaultColor : [ 0, 0, 0 ] );
+		const defaultColor = colorFromArray( parameters.defaultColor !== undefined ? parameters.defaultColor : [ 0, 0, 0 ] );
 		const defaultAlpha = parameters.defaultAlpha !== undefined ? parameters.defaultAlpha : 1.0;
 		const defaultKeepAlive = parameters.defaultKeepAlive !== undefined ? parameters.defaultKeepAlive : false;
 
@@ -266,7 +266,7 @@ class OutlineEffect {
 			if ( outlineParameters !== undefined ) {
 
 				if ( outlineParameters.thickness !== undefined ) material.uniforms.outlineThickness.value = outlineParameters.thickness;
-				if ( outlineParameters.color !== undefined ) material.uniforms.outlineColor.value.fromArray( outlineParameters.color );
+				if ( outlineParameters.color !== undefined ) colorFromArray( outlineParameters.color, 0, material.uniforms.outlineColor.value );
 				if ( outlineParameters.alpha !== undefined ) material.uniforms.outlineAlpha.value = outlineParameters.alpha;
 
 			}

@@ -1,6 +1,12 @@
 import { Curve } from '../core/Curve.js';
 import { CubicBezier } from '../core/Interpolations.js';
-import { Vector3 } from '../../math/Vector3.js';
+import {
+	vec3Copy,
+	vec3Create,
+	vec3FromArray,
+	vec3Set,
+	vec3ToArray
+} from '../../math/Vector3Functions.js';
 
 /**
  * A curve representing a 3D Cubic Bezier curve.
@@ -17,7 +23,7 @@ class CubicBezierCurve3 extends Curve {
 	 * @param {Vector3} [v2] - The second control point.
 	 * @param {Vector3} [v3] - The end point.
 	 */
-	constructor( v0 = new Vector3(), v1 = new Vector3(), v2 = new Vector3(), v3 = new Vector3() ) {
+	constructor( v0 = vec3Create(), v1 = vec3Create(), v2 = vec3Create(), v3 = vec3Create() ) {
 
 		super();
 
@@ -69,13 +75,14 @@ class CubicBezierCurve3 extends Curve {
 	 * @param {Vector3} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector3} The position on the curve.
 	 */
-	getPoint( t, optionalTarget = new Vector3() ) {
+	getPoint( t, optionalTarget = vec3Create() ) {
 
 		const point = optionalTarget;
 
 		const v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
 
-		point.set(
+		vec3Set(
+			point,
 			CubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
 			CubicBezier( t, v0.y, v1.y, v2.y, v3.y ),
 			CubicBezier( t, v0.z, v1.z, v2.z, v3.z )
@@ -89,10 +96,10 @@ class CubicBezierCurve3 extends Curve {
 
 		super.copy( source );
 
-		this.v0.copy( source.v0 );
-		this.v1.copy( source.v1 );
-		this.v2.copy( source.v2 );
-		this.v3.copy( source.v3 );
+		vec3Copy( source.v0, this.v0 );
+		vec3Copy( source.v1, this.v1 );
+		vec3Copy( source.v2, this.v2 );
+		vec3Copy( source.v3, this.v3 );
 
 		return this;
 
@@ -102,10 +109,10 @@ class CubicBezierCurve3 extends Curve {
 
 		const data = super.toJSON();
 
-		data.v0 = this.v0.toArray();
-		data.v1 = this.v1.toArray();
-		data.v2 = this.v2.toArray();
-		data.v3 = this.v3.toArray();
+		data.v0 = vec3ToArray( this.v0 );
+		data.v1 = vec3ToArray( this.v1 );
+		data.v2 = vec3ToArray( this.v2 );
+		data.v3 = vec3ToArray( this.v3 );
 
 		return data;
 
@@ -115,10 +122,10 @@ class CubicBezierCurve3 extends Curve {
 
 		super.fromJSON( json );
 
-		this.v0.fromArray( json.v0 );
-		this.v1.fromArray( json.v1 );
-		this.v2.fromArray( json.v2 );
-		this.v3.fromArray( json.v3 );
+		vec3FromArray( json.v0, 0, this.v0 );
+		vec3FromArray( json.v1, 0, this.v1 );
+		vec3FromArray( json.v2, 0, this.v2 );
+		vec3FromArray( json.v3, 0, this.v3 );
 
 		return this;
 

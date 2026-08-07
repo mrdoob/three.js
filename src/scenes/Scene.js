@@ -1,5 +1,6 @@
 import { Object3D } from '../core/Object3D.js';
 import { Euler } from '../math/Euler.js';
+import { eulerCopy, eulerToArray } from '../math/EulerFunctions.js';
 
 /**
  * Scenes allow you to set up what is to be rendered and where by three.js.
@@ -130,10 +131,10 @@ class Scene extends Object3D {
 
 		this.backgroundBlurriness = source.backgroundBlurriness;
 		this.backgroundIntensity = source.backgroundIntensity;
-		this.backgroundRotation.copy( source.backgroundRotation );
+		eulerCopy( source.backgroundRotation, this.backgroundRotation );
 
 		this.environmentIntensity = source.environmentIntensity;
-		this.environmentRotation.copy( source.environmentRotation );
+		eulerCopy( source.environmentRotation, this.environmentRotation );
 
 		if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
 
@@ -151,10 +152,10 @@ class Scene extends Object3D {
 
 		if ( this.backgroundBlurriness > 0 ) data.object.backgroundBlurriness = this.backgroundBlurriness;
 		if ( this.backgroundIntensity !== 1 ) data.object.backgroundIntensity = this.backgroundIntensity;
-		data.object.backgroundRotation = this.backgroundRotation.toArray();
+		data.object.backgroundRotation = eulerToArray( this.backgroundRotation );
 
 		if ( this.environmentIntensity !== 1 ) data.object.environmentIntensity = this.environmentIntensity;
-		data.object.environmentRotation = this.environmentRotation.toArray();
+		data.object.environmentRotation = eulerToArray( this.environmentRotation );
 
 		return data;
 

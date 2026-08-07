@@ -1,10 +1,10 @@
-import { DepthTexture, FloatType, RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, SpriteNodeMaterial, RendererUtils, NodeUpdateType } from 'three/webgpu';
+import { DepthTexture, FloatType, RenderTarget, TempNode, QuadMesh, NodeMaterial, SpriteNodeMaterial, RendererUtils, NodeUpdateType, vec2Create, vec2Copy } from 'three/webgpu';
 import { Loop, int, exp, min, float, mul, uv, vec2, vec3, Fn, textureSize, orthographicDepthToViewZ, screenUV, nodeObject, uniform, vec4, passTexture, texture, perspectiveDepthToViewZ, positionView, reference, color } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _size = /*@__PURE__*/ new Vector2();
-const _BLUR_DIRECTION_X = /*@__PURE__*/ new Vector2( 1.0, 0.0 );
-const _BLUR_DIRECTION_Y = /*@__PURE__*/ new Vector2( 0.0, 1.0 );
+const _size = /*@__PURE__*/ vec2Create();
+const _BLUR_DIRECTION_X = /*@__PURE__*/ vec2Create( 1.0, 0.0 );
+const _BLUR_DIRECTION_Y = /*@__PURE__*/ vec2Create( 0.0, 1.0 );
 
 let _rendererState;
 
@@ -216,7 +216,7 @@ class OutlineNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
-		this._blurDirection = uniform( new Vector2() );
+		this._blurDirection = uniform( vec2Create(), 'vec2' );
 
 		/**
 		 * Texture node that holds the data from the depth pre-pass.
@@ -494,7 +494,7 @@ class OutlineNode extends TempNode {
 		//
 
 		const size = renderer.getDrawingBufferSize( _size );
-		this.setSize( size.width, size.height );
+		this.setSize( size.x, size.y );
 
 		//
 
@@ -563,7 +563,7 @@ class OutlineNode extends TempNode {
 		// 5. Apply blur (half resolution)
 
 		this._blurColorTextureUniform.value = this._renderTargetEdgeBuffer1.texture;
-		this._blurDirection.value.copy( _BLUR_DIRECTION_X );
+		vec2Copy( _BLUR_DIRECTION_X, this._blurDirection.value );
 
 		_quadMesh.material = this._separableBlurMaterial;
 		_quadMesh.name = 'Outline [ Blur Half Resolution ]';
@@ -571,7 +571,7 @@ class OutlineNode extends TempNode {
 		_quadMesh.render( renderer );
 
 		this._blurColorTextureUniform.value = this._renderTargetBlurBuffer1.texture;
-		this._blurDirection.value.copy( _BLUR_DIRECTION_Y );
+		vec2Copy( _BLUR_DIRECTION_Y, this._blurDirection.value );
 
 		renderer.setRenderTarget( this._renderTargetEdgeBuffer1 );
 		_quadMesh.render( renderer );
@@ -579,7 +579,7 @@ class OutlineNode extends TempNode {
 		// 6. Apply blur (quarter resolution)
 
 		this._blurColorTextureUniform.value = this._renderTargetEdgeBuffer1.texture;
-		this._blurDirection.value.copy( _BLUR_DIRECTION_X );
+		vec2Copy( _BLUR_DIRECTION_X, this._blurDirection.value );
 
 		_quadMesh.material = this._separableBlurMaterial2;
 		_quadMesh.name = 'Outline [ Blur Quarter Resolution ]';
@@ -587,7 +587,7 @@ class OutlineNode extends TempNode {
 		_quadMesh.render( renderer );
 
 		this._blurColorTextureUniform.value = this._renderTargetBlurBuffer2.texture;
-		this._blurDirection.value.copy( _BLUR_DIRECTION_Y );
+		vec2Copy( _BLUR_DIRECTION_Y, this._blurDirection.value );
 
 		renderer.setRenderTarget( this._renderTargetEdgeBuffer2 );
 		_quadMesh.render( renderer );

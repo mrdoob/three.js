@@ -1,8 +1,9 @@
 import {
-	Color,
 	Mesh,
-	Vector3,
-	NodeMaterial
+	NodeMaterial,
+	colorSet,
+	vec3Create,
+	vec3Set
 } from 'three/webgpu';
 
 import { Fn, add, cameraPosition, div, normalize, positionWorld, sub, time, texture, vec2, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix } from 'three/tsl';
@@ -84,7 +85,7 @@ class WaterMesh extends Mesh {
 		 * @type {UniformNode<color>}
 		 * @default 0xffffff
 		 */
-		this.sunColor = uniform( new Color( options.sunColor !== undefined ? options.sunColor : 0xffffff ) );
+		this.sunColor = uniform( colorSet( options.sunColor !== undefined ? options.sunColor : 0xffffff ) );
 
 		/**
 		 * The sun direction.
@@ -92,7 +93,7 @@ class WaterMesh extends Mesh {
 		 * @type {UniformNode<vec3>}
 		 * @default (0.70707,0.70707,0.0)
 		 */
-		this.sunDirection = uniform( options.sunDirection !== undefined ? options.sunDirection : new Vector3( 0.70707, 0.70707, 0.0 ) );
+		this.sunDirection = uniform( options.sunDirection !== undefined ? options.sunDirection : vec3Set( vec3Create(), 0.70707, 0.70707, 0.0 ) );
 
 		/**
 		 * The water color.
@@ -100,7 +101,7 @@ class WaterMesh extends Mesh {
 		 * @type {UniformNode<color>}
 		 * @default 0x7f7f7f
 		 */
-		this.waterColor = uniform( new Color( options.waterColor !== undefined ? options.waterColor : 0x7f7f7f ) );
+		this.waterColor = uniform( colorSet( options.waterColor !== undefined ? options.waterColor : 0x7f7f7f ) );
 
 		/**
 		 * The distortion scale.

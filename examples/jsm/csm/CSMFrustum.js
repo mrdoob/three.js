@@ -1,6 +1,16 @@
-import { Vector3, Matrix4 } from 'three';
+import {
+	mat4Copy,
+	mat4Create,
+	mat4Invert,
+	vec3ApplyMatrix4,
+	vec3Copy,
+	vec3Create,
+	vec3LerpVectors,
+	vec3MultiplyScalar,
+	vec3Set
+} from 'three';
 
-const inverseProjectionMatrix = new Matrix4();
+const inverseProjectionMatrix = /*@__PURE__*/ mat4Create();
 
 /**
  * Represents the frustum of a CSM instance.
@@ -42,16 +52,16 @@ class CSMFrustum {
 		 */
 		this.vertices = {
 			near: [
-				new Vector3(),
-				new Vector3(),
-				new Vector3(),
-				new Vector3()
+				/*@__PURE__*/ vec3Create(),
+				/*@__PURE__*/ vec3Create(),
+				/*@__PURE__*/ vec3Create(),
+				/*@__PURE__*/ vec3Create()
 			],
 			far: [
-				new Vector3(),
-				new Vector3(),
-				new Vector3(),
-				new Vector3()
+				/*@__PURE__*/ vec3Create(),
+				/*@__PURE__*/ vec3Create(),
+				/*@__PURE__*/ vec3Create(),
+				/*@__PURE__*/ vec3Create()
 			]
 		};
 
@@ -85,30 +95,31 @@ class CSMFrustum {
 		const zFar = this.zFar;
 		const isOrthographic = projectionMatrix.elements[ 2 * 4 + 3 ] === 0;
 
-		inverseProjectionMatrix.copy( projectionMatrix ).invert();
+		mat4Copy( projectionMatrix, inverseProjectionMatrix );
+		mat4Invert( inverseProjectionMatrix, inverseProjectionMatrix );
 
 		// 3 --- 0  vertices.near/far order
 		// |     |
 		// 2 --- 1
 		// clip space spans from [-1, 1]
 
-		this.vertices.near[ 0 ].set( 1, 1, zNear );
-		this.vertices.near[ 1 ].set( 1, - 1, zNear );
-		this.vertices.near[ 2 ].set( - 1, - 1, zNear );
-		this.vertices.near[ 3 ].set( - 1, 1, zNear );
+		vec3Set( this.vertices.near[ 0 ], 1, 1, zNear );
+		vec3Set( this.vertices.near[ 1 ], 1, - 1, zNear );
+		vec3Set( this.vertices.near[ 2 ], - 1, - 1, zNear );
+		vec3Set( this.vertices.near[ 3 ], - 1, 1, zNear );
 		this.vertices.near.forEach( function ( v ) {
 
-			v.applyMatrix4( inverseProjectionMatrix );
+			vec3ApplyMatrix4( v, inverseProjectionMatrix, v );
 
 		} );
 
-		this.vertices.far[ 0 ].set( 1, 1, zFar );
-		this.vertices.far[ 1 ].set( 1, - 1, zFar );
-		this.vertices.far[ 2 ].set( - 1, - 1, zFar );
-		this.vertices.far[ 3 ].set( - 1, 1, zFar );
+		vec3Set( this.vertices.far[ 0 ], 1, 1, zFar );
+		vec3Set( this.vertices.far[ 1 ], 1, - 1, zFar );
+		vec3Set( this.vertices.far[ 2 ], - 1, - 1, zFar );
+		vec3Set( this.vertices.far[ 3 ], - 1, 1, zFar );
 		this.vertices.far.forEach( function ( v ) {
 
-			v.applyMatrix4( inverseProjectionMatrix );
+			vec3ApplyMatrix4( v, inverseProjectionMatrix, v );
 
 			const absZ = Math.abs( v.z );
 			if ( isOrthographic ) {
@@ -117,7 +128,7 @@ class CSMFrustum {
 
 			} else {
 
-				v.multiplyScalar( Math.min( maxFar / absZ, 1.0 ) );
+				vec3MultiplyScalar( v, Math.min( maxFar / absZ, 1.0 ), v );
 
 			}
 
@@ -156,7 +167,7 @@ class CSMFrustum {
 
 				for ( let j = 0; j < 4; j ++ ) {
 
-					cascade.vertices.near[ j ].copy( this.vertices.near[ j ] );
+					vec3Copy( this.vertices.near[ j ], cascade.vertices.near[ j ] );
 
 				}
 
@@ -166,7 +177,7 @@ class CSMFrustum {
 
 				for ( let j = 0; j < 4; j ++ ) {
 
-					cascade.vertices.near[ j ].lerpVectors( this.vertices.near[ j ], this.vertices.far[ j ], alpha );
+					vec3LerpVectors( this.vertices.near[ j ], this.vertices.far[ j ], alpha, cascade.vertices.near[ j ] );
 
 				}
 
@@ -176,7 +187,7 @@ class CSMFrustum {
 
 				for ( let j = 0; j < 4; j ++ ) {
 
-					cascade.vertices.far[ j ].copy( this.vertices.far[ j ] );
+					vec3Copy( this.vertices.far[ j ], cascade.vertices.far[ j ] );
 
 				}
 
@@ -186,7 +197,7 @@ class CSMFrustum {
 
 				for ( let j = 0; j < 4; j ++ ) {
 
-					cascade.vertices.far[ j ].lerpVectors( this.vertices.near[ j ], this.vertices.far[ j ], alpha );
+					vec3LerpVectors( this.vertices.near[ j ], this.vertices.far[ j ], alpha, cascade.vertices.far[ j ] );
 
 				}
 
@@ -207,13 +218,11 @@ class CSMFrustum {
 
 		for ( let i = 0; i < 4; i ++ ) {
 
-			target.vertices.near[ i ]
-				.copy( this.vertices.near[ i ] )
-				.applyMatrix4( cameraMatrix );
+			vec3Copy( this.vertices.near[ i ], target.vertices.near[ i ] );
+			vec3ApplyMatrix4( target.vertices.near[ i ], cameraMatrix, target.vertices.near[ i ] );
 
-			target.vertices.far[ i ]
-				.copy( this.vertices.far[ i ] )
-				.applyMatrix4( cameraMatrix );
+			vec3Copy( this.vertices.far[ i ], target.vertices.far[ i ] );
+			vec3ApplyMatrix4( target.vertices.far[ i ], cameraMatrix, target.vertices.far[ i ] );
 
 		}
 

@@ -6,9 +6,10 @@ import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Mesh } from '../objects/Mesh.js';
 import { Line } from '../objects/Line.js';
-import { Vector3 } from '../math/Vector3.js';
+import { colorSet } from '../math/ColorFunctions.js';
+import { vec3Copy, vec3Create, vec3Normalize, vec3Set } from '../math/Vector3Functions.js';
 
-const _axis = /*@__PURE__*/ new Vector3();
+const _axis = /*@__PURE__*/ vec3Create();
 let _lineGeometry, _coneGeometry;
 
 /**
@@ -42,7 +43,7 @@ class ArrowHelper extends Object3D {
 	 * @param {number} [headLength=length*0.2] - The length of the head of the arrow.
 	 * @param {number} [headWidth=headLength*0.2] - The width of the head of the arrow.
 	 */
-	constructor( dir = new Vector3( 0, 0, 1 ), origin = new Vector3( 0, 0, 0 ), length = 1, color = 0xffff00, headLength = length * 0.2, headWidth = headLength * 0.2 ) {
+	constructor( dir = { x: 0, y: 0, z: 1 }, origin = { x: 0, y: 0, z: 0 }, length = 1, color = 0xffff00, headLength = length * 0.2, headWidth = headLength * 0.2 ) {
 
 		super();
 
@@ -58,7 +59,7 @@ class ArrowHelper extends Object3D {
 
 		}
 
-		this.position.copy( origin );
+		vec3Copy( origin, this.position );
 
 		/**
 		 * The line part of the arrow helper.
@@ -102,7 +103,7 @@ class ArrowHelper extends Object3D {
 
 		} else {
 
-			_axis.set( dir.z, 0, - dir.x ).normalize();
+			vec3Normalize( vec3Set( _axis, dir.z, 0, - dir.x ), _axis );
 
 			const radians = Math.acos( dir.y );
 
@@ -121,10 +122,10 @@ class ArrowHelper extends Object3D {
 	 */
 	setLength( length, headLength = length * 0.2, headWidth = headLength * 0.2 ) {
 
-		this.line.scale.set( 1, Math.max( 0.0001, length - headLength ), 1 ); // see #17458
+		vec3Set( this.line.scale, 1, Math.max( 0.0001, length - headLength ), 1 ); // see #17458
 		this.line.updateMatrix();
 
-		this.cone.scale.set( headWidth, headLength, headWidth );
+		vec3Set( this.cone.scale, headWidth, headLength, headWidth );
 		this.cone.position.y = length;
 		this.cone.updateMatrix();
 
@@ -137,8 +138,8 @@ class ArrowHelper extends Object3D {
 	 */
 	setColor( color ) {
 
-		this.line.material.color.set( color );
-		this.cone.material.color.set( color );
+		colorSet( color, undefined, undefined, this.line.material.color );
+		colorSet( color, undefined, undefined, this.cone.material.color );
 
 	}
 

@@ -1,6 +1,6 @@
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
-import { Vector3 } from '../math/Vector3.js';
+import { vec3Create, vec3FromBufferAttribute } from '../math/Vector3Functions.js';
 
 /**
  * Can be used as a helper object to visualize a geometry as a wireframe.
@@ -55,8 +55,8 @@ class WireframeGeometry extends BufferGeometry {
 
 			// helper variables
 
-			const start = new Vector3();
-			const end = new Vector3();
+			const start = vec3Create();
+			const end = vec3Create();
 
 			if ( geometry.index !== null ) {
 
@@ -88,8 +88,8 @@ class WireframeGeometry extends BufferGeometry {
 							const index1 = indices.getX( i + j );
 							const index2 = indices.getX( i + ( j + 1 ) % 3 );
 
-							start.fromBufferAttribute( position, index1 );
-							end.fromBufferAttribute( position, index2 );
+							vec3FromBufferAttribute( position, index1, start );
+							vec3FromBufferAttribute( position, index2, end );
 
 							if ( isUniqueEdge( start, end, edges ) === true ) {
 
@@ -120,8 +120,8 @@ class WireframeGeometry extends BufferGeometry {
 						const index1 = 3 * i + j;
 						const index2 = 3 * i + ( ( j + 1 ) % 3 );
 
-						start.fromBufferAttribute( position, index1 );
-						end.fromBufferAttribute( position, index2 );
+						vec3FromBufferAttribute( position, index1, start );
+						vec3FromBufferAttribute( position, index2, end );
 
 						if ( isUniqueEdge( start, end, edges ) === true ) {
 

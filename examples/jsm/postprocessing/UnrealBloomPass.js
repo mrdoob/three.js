@@ -1,13 +1,15 @@
 import {
 	AdditiveBlending,
-	Color,
 	HalfFloatType,
 	MeshBasicMaterial,
 	ShaderMaterial,
 	UniformsUtils,
-	Vector2,
-	Vector3,
-	WebGLRenderTarget
+	WebGLRenderTarget,
+	colorCreate,
+	colorSet,
+	vec2Create,
+	vec3Create,
+	vec3Set
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 import { CopyShader } from '../shaders/CopyShader.js';
@@ -75,7 +77,7 @@ class UnrealBloomPass extends Pass {
 		 * @type {Vector2}
 		 * @default (256,256)
 		 */
-		this.resolution = ( resolution !== undefined ) ? new Vector2( resolution.x, resolution.y ) : new Vector2( 256, 256 );
+		this.resolution = ( resolution !== undefined ) ? vec2Create( resolution.x, resolution.y ) : vec2Create( 256, 256 );
 
 		/**
 		 * The effect's clear color
@@ -83,7 +85,7 @@ class UnrealBloomPass extends Pass {
 		 * @type {Color}
 		 * @default (0,0,0)
 		 */
-		this.clearColor = new Color( 0, 0, 0 );
+		this.clearColor = colorSet( 0, 0, 0 );
 
 		/**
 		 * Overwritten to disable the swap.
@@ -155,7 +157,7 @@ class UnrealBloomPass extends Pass {
 
 			this.separableBlurMaterials.push( this._getSeparableBlurMaterial( kernelSizeArray[ i ] ) );
 
-			this.separableBlurMaterials[ i ].uniforms[ 'invSize' ].value = new Vector2( 1 / resx, 1 / resy );
+			this.separableBlurMaterials[ i ].uniforms[ 'invSize' ].value = vec2Create( 1 / resx, 1 / resy );
 
 			resx = Math.round( resx / 2 );
 
@@ -176,7 +178,7 @@ class UnrealBloomPass extends Pass {
 
 		const bloomFactors = [ 1.0, 0.8, 0.6, 0.4, 0.2 ];
 		this.compositeMaterial.uniforms[ 'bloomFactors' ].value = bloomFactors;
-		this.bloomTintColors = [ new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ) ];
+		this.bloomTintColors = [ vec3Set( vec3Create(), 1, 1, 1 ), vec3Set( vec3Create(), 1, 1, 1 ), vec3Set( vec3Create(), 1, 1, 1 ), vec3Set( vec3Create(), 1, 1, 1 ), vec3Set( vec3Create(), 1, 1, 1 ) ];
 		this.compositeMaterial.uniforms[ 'bloomTintColors' ].value = this.bloomTintColors;
 
 		// blend material
@@ -194,7 +196,7 @@ class UnrealBloomPass extends Pass {
 			transparent: true
 		} );
 
-		this._oldClearColor = new Color();
+		this._oldClearColor = colorCreate();
 		this._oldClearAlpha = 1;
 
 		this._basic = new MeshBasicMaterial();
@@ -259,7 +261,7 @@ class UnrealBloomPass extends Pass {
 			this.renderTargetsHorizontal[ i ].setSize( resx, resy );
 			this.renderTargetsVertical[ i ].setSize( resx, resy );
 
-			this.separableBlurMaterials[ i ].uniforms[ 'invSize' ].value = new Vector2( 1 / resx, 1 / resy );
+			this.separableBlurMaterials[ i ].uniforms[ 'invSize' ].value = vec2Create( 1 / resx, 1 / resy );
 
 			resx = Math.round( resx / 2 );
 			resy = Math.round( resy / 2 );
@@ -395,8 +397,8 @@ class UnrealBloomPass extends Pass {
 
 			uniforms: {
 				'colorTexture': { value: null },
-				'invSize': { value: new Vector2( 0.5, 0.5 ) }, // inverse texture size
-				'direction': { value: new Vector2( 0.5, 0.5 ) },
+				'invSize': { value: vec2Create( 0.5, 0.5 ) }, // inverse texture size
+				'direction': { value: vec2Create( 0.5, 0.5 ) },
 				'gaussianCoefficients': { value: coefficients } // precomputed Gaussian coefficients
 			},
 
@@ -518,7 +520,7 @@ class UnrealBloomPass extends Pass {
 
 }
 
-UnrealBloomPass.BlurDirectionX = new Vector2( 1.0, 0.0 );
-UnrealBloomPass.BlurDirectionY = new Vector2( 0.0, 1.0 );
+UnrealBloomPass.BlurDirectionX = /*@__PURE__*/ vec2Create( 1.0, 0.0 );
+UnrealBloomPass.BlurDirectionY = /*@__PURE__*/ vec2Create( 0.0, 1.0 );
 
 export { UnrealBloomPass };

@@ -1,16 +1,20 @@
 import {
 	Object3D,
-	Quaternion,
-	Vector3
+	mat4Compose,
+	mat4Copy,
+	mat4Decompose,
+	mat4MultiplyMatrices,
+	quatCreate,
+	vec3Create
 } from 'three';
 
-const _translationObject = new Vector3();
-const _quaternionObject = new Quaternion();
-const _scaleObject = new Vector3();
+const _translationObject = /*@__PURE__*/ vec3Create();
+const _quaternionObject = /*@__PURE__*/ quatCreate();
+const _scaleObject = /*@__PURE__*/ vec3Create();
 
-const _translationWorld = new Vector3();
-const _quaternionWorld = new Quaternion();
-const _scaleWorld = new Vector3();
+const _translationWorld = /*@__PURE__*/ vec3Create();
+const _quaternionWorld = /*@__PURE__*/ quatCreate();
+const _scaleWorld = /*@__PURE__*/ vec3Create();
 
 /**
  * A special type of 3D object that takes a position from the scene graph hierarchy
@@ -42,17 +46,17 @@ class Gyroscope extends Object3D {
 
 			if ( this.parent !== null ) {
 
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+				mat4MultiplyMatrices( this.parent.matrixWorld, this.matrix, this.matrixWorld );
 
-				this.matrixWorld.decompose( _translationWorld, _quaternionWorld, _scaleWorld );
-				this.matrix.decompose( _translationObject, _quaternionObject, _scaleObject );
+				mat4Decompose( this.matrixWorld, _translationWorld, _quaternionWorld, _scaleWorld );
+				mat4Decompose( this.matrix, _translationObject, _quaternionObject, _scaleObject );
 
-				this.matrixWorld.compose( _translationWorld, _quaternionObject, _scaleWorld );
+				mat4Compose( _translationWorld, _quaternionObject, _scaleWorld, this.matrixWorld );
 
 
 			} else {
 
-				this.matrixWorld.copy( this.matrix );
+				mat4Copy( this.matrix, this.matrixWorld );
 
 			}
 

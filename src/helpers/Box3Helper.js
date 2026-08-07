@@ -2,6 +2,8 @@ import { LineSegments } from '../objects/LineSegments.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferAttribute, Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
+import { box3GetCenter, box3GetSize, box3IsEmpty } from '../math/Box3Functions.js';
+import { vec3MultiplyScalar } from '../math/Vector3Functions.js';
 
 /**
  * A helper object to visualize an instance of {@link Box3}.
@@ -55,13 +57,13 @@ class Box3Helper extends LineSegments {
 
 		const box = this.box;
 
-		if ( box.isEmpty() ) return;
+		if ( box3IsEmpty( box ) ) return;
 
-		box.getCenter( this.position );
+		box3GetCenter( box, this.position );
 
-		box.getSize( this.scale );
+		box3GetSize( box, this.scale );
 
-		this.scale.multiplyScalar( 0.5 );
+		vec3MultiplyScalar( this.scale, 0.5, this.scale );
 
 		super.updateMatrixWorld( force );
 

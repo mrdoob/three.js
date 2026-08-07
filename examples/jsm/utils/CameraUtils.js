@@ -1,7 +1,18 @@
 import {
 	MathUtils,
-	Quaternion,
-	Vector3
+	mat4Invert,
+	mat4Set,
+	quatCreate,
+	quatMultiply,
+	quatSetFromUnitVectors,
+	vec3ApplyQuaternion,
+	vec3Create,
+	vec3CrossVectors,
+	vec3Dot,
+	vec3Length,
+	vec3Normalize,
+	vec3Set,
+	vec3SubVectors
 } from 'three';
 
 /**
@@ -9,14 +20,14 @@ import {
  * @three_import import * as CameraUtils from 'three/addons/utils/CameraUtils.js';
  */
 
-const _va = /*@__PURE__*/ new Vector3(), // from pe to pa
-	_vb = /*@__PURE__*/ new Vector3(), // from pe to pb
-	_vc = /*@__PURE__*/ new Vector3(), // from pe to pc
-	_vr = /*@__PURE__*/ new Vector3(), // right axis of screen
-	_vu = /*@__PURE__*/ new Vector3(), // up axis of screen
-	_vn = /*@__PURE__*/ new Vector3(), // normal vector of screen
-	_vec = /*@__PURE__*/ new Vector3(), // temporary vector
-	_quat = /*@__PURE__*/ new Quaternion(); // temporary quaternion
+const _va = /*@__PURE__*/ vec3Create(), // from pe to pa
+	_vb = /*@__PURE__*/ vec3Create(), // from pe to pb
+	_vc = /*@__PURE__*/ vec3Create(), // from pe to pc
+	_vr = /*@__PURE__*/ vec3Create(), // right axis of screen
+	_vu = /*@__PURE__*/ vec3Create(), // up axis of screen
+	_vn = /*@__PURE__*/ vec3Create(), // normal vector of screen
+	_vec = /*@__PURE__*/ vec3Create(), // temporary vector
+	_quat = /*@__PURE__*/ quatCreate(); // temporary quaternion
 
 
 /**
@@ -38,32 +49,33 @@ function frameCorners( camera, bottomLeftCorner, bottomRightCorner, topLeftCorne
 	const n = camera.near; // distance of near clipping plane
 	const f = camera.far; //distance of far clipping plane
 
-	_vr.copy( pb ).sub( pa ).normalize();
-	_vu.copy( pc ).sub( pa ).normalize();
-	_vn.crossVectors( _vr, _vu ).normalize();
+	vec3Normalize( vec3SubVectors( pb, pa, _vr ), _vr );
+	vec3Normalize( vec3SubVectors( pc, pa, _vu ), _vu );
+	vec3Normalize( vec3CrossVectors( _vr, _vu, _vn ), _vn );
 
-	_va.copy( pa ).sub( pe ); // from pe to pa
-	_vb.copy( pb ).sub( pe ); // from pe to pb
-	_vc.copy( pc ).sub( pe ); // from pe to pc
+	vec3SubVectors( pa, pe, _va ); // from pe to pa
+	vec3SubVectors( pb, pe, _vb ); // from pe to pb
+	vec3SubVectors( pc, pe, _vc ); // from pe to pc
 
-	const d = - _va.dot( _vn );	// distance from eye to screen
-	const l = _vr.dot( _va ) * n / d; // distance to left screen edge
-	const r = _vr.dot( _vb ) * n / d; // distance to right screen edge
-	const b = _vu.dot( _va ) * n / d; // distance to bottom screen edge
-	const t = _vu.dot( _vc ) * n / d; // distance to top screen edge
+	const d = - vec3Dot( _va, _vn );	// distance from eye to screen
+	const l = vec3Dot( _vr, _va ) * n / d; // distance to left screen edge
+	const r = vec3Dot( _vr, _vb ) * n / d; // distance to right screen edge
+	const b = vec3Dot( _vu, _va ) * n / d; // distance to bottom screen edge
+	const t = vec3Dot( _vu, _vc ) * n / d; // distance to top screen edge
 
 	// Set the camera rotation to match the focal plane to the corners' plane
-	_quat.setFromUnitVectors( _vec.set( 0, 1, 0 ), _vu );
-	camera.quaternion.setFromUnitVectors( _vec.set( 0, 0, 1 ).applyQuaternion( _quat ), _vn ).multiply( _quat );
+	quatSetFromUnitVectors( vec3Set( _vec, 0, 1, 0 ), _vu, _quat );
+	quatSetFromUnitVectors( vec3ApplyQuaternion( vec3Set( _vec, 0, 0, 1 ), _quat, _vec ), _vn, camera.quaternion );
+	quatMultiply( camera.quaternion, _quat, camera.quaternion );
 
 	// Set the off-axis projection matrix to match the corners
-	camera.projectionMatrix.set( 2.0 * n / ( r - l ), 0.0,
+	mat4Set( camera.projectionMatrix, 2.0 * n / ( r - l ), 0.0,
 		( r + l ) / ( r - l ), 0.0, 0.0,
 		2.0 * n / ( t - b ),
 		( t + b ) / ( t - b ), 0.0, 0.0, 0.0,
 		( f + n ) / ( n - f ),
 		2.0 * f * n / ( n - f ), 0.0, 0.0, - 1.0, 0.0 );
-	camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
+	mat4Invert( camera.projectionMatrix, camera.projectionMatrixInverse );
 
 	// FoV estimation to fix frustum culling
 	if ( estimateViewFrustum ) {
@@ -72,8 +84,8 @@ function frameCorners( camera, bottomLeftCorner, bottomRightCorner, topLeftCorne
 		// to make frustum tall/wide enough to encompass it
 		camera.fov =
 			MathUtils.RAD2DEG / Math.min( 1.0, camera.aspect ) *
-			Math.atan( ( _vec.copy( pb ).sub( pa ).length() +
-							( _vec.copy( pc ).sub( pa ).length() ) ) / _va.length() );
+			Math.atan( ( vec3Length( vec3SubVectors( pb, pa, _vec ) ) +
+							( vec3Length( vec3SubVectors( pc, pa, _vec ) ) ) ) / vec3Length( _va ) );
 
 	}
 

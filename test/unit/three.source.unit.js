@@ -184,28 +184,47 @@ import './src/materials/SpriteMaterial.tests.js';
 
 //src/math
 import './src/math/Box2.tests.js';
+import './src/math/Box2Functions.tests.js';
 import './src/math/Box3.tests.js';
+import './src/math/Box3Functions.tests.js';
 import './src/math/Color.tests.js';
+import './src/math/ColorFunctions.tests.js';
 import './src/math/ColorManagement.tests.js';
 import './src/math/Cylindrical.tests.js';
+import './src/math/CylindricalFunctions.tests.js';
 import './src/math/Euler.tests.js';
+import './src/math/EulerFunctions.tests.js';
 import './src/math/Frustum.tests.js';
+import './src/math/FrustumFunctions.tests.js';
 import './src/math/Interpolant.tests.js';
 import './src/math/Line3.tests.js';
+import './src/math/Line3Functions.tests.js';
 import './src/math/MathUtils.tests.js';
+import './src/math/Matrix2Functions.tests.js';
 import './src/math/Matrix3.tests.js';
+import './src/math/Matrix3Functions.tests.js';
 import './src/math/Matrix4.tests.js';
 import './src/math/Matrix4Functions.tests.js';
 import './src/math/Plane.tests.js';
+import './src/math/PlaneFunctions.tests.js';
 import './src/math/Quaternion.tests.js';
+import './src/math/QuaternionFunctions.tests.js';
 import './src/math/Ray.tests.js';
+import './src/math/RayFunctions.tests.js';
 import './src/math/Sphere.tests.js';
+import './src/math/SphereFunctions.tests.js';
 import './src/math/Spherical.tests.js';
+import './src/math/SphericalFunctions.tests.js';
 import './src/math/SphericalHarmonics3.tests.js';
+import './src/math/SphericalHarmonics3Functions.tests.js';
 import './src/math/Triangle.tests.js';
+import './src/math/TriangleFunctions.tests.js';
 import './src/math/Vector2.tests.js';
+import './src/math/Vector2Functions.tests.js';
 import './src/math/Vector3.tests.js';
+import './src/math/Vector3Functions.tests.js';
 import './src/math/Vector4.tests.js';
+import './src/math/Vector4Functions.tests.js';
 
 //src/math/interpolants
 import './src/math/interpolants/CubicInterpolant.tests.js';

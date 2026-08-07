@@ -2,7 +2,7 @@ import { LineSegments } from '../objects/LineSegments.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
-import { Color } from '../math/Color.js';
+import { colorCreate, colorSet, colorToArray } from '../math/ColorFunctions.js';
 
 /**
  * An axis object to visualize the 3 axes in a simple way.
@@ -58,20 +58,20 @@ class AxesHelper extends LineSegments {
 	 */
 	setColors( xAxisColor, yAxisColor, zAxisColor ) {
 
-		const color = new Color();
+		const color = colorCreate();
 		const array = this.geometry.attributes.color.array;
 
-		color.set( xAxisColor );
-		color.toArray( array, 0 );
-		color.toArray( array, 3 );
+		colorSet( xAxisColor, undefined, undefined, color );
+		colorToArray( color, array, 0 );
+		colorToArray( color, array, 3 );
 
-		color.set( yAxisColor );
-		color.toArray( array, 6 );
-		color.toArray( array, 9 );
+		colorSet( yAxisColor, undefined, undefined, color );
+		colorToArray( color, array, 6 );
+		colorToArray( color, array, 9 );
 
-		color.set( zAxisColor );
-		color.toArray( array, 12 );
-		color.toArray( array, 15 );
+		colorSet( zAxisColor, undefined, undefined, color );
+		colorToArray( color, array, 12 );
+		colorToArray( color, array, 15 );
 
 		this.geometry.attributes.color.needsUpdate = true;
 

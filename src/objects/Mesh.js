@@ -1,28 +1,35 @@
 import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
-import { Sphere } from '../math/Sphere.js';
-import { Ray } from '../math/Ray.js';
-import { Matrix4 } from '../math/Matrix4.js';
+import {
+	vec3Create, vec3Set, vec3FromBufferAttribute, vec3AddScaledVector, vec3Sub, vec3Add,
+	vec3Copy, vec3ApplyMatrix4, vec3DistanceTo, vec3DistanceToSquared, vec3Dot, vec3MultiplyScalar
+} from '../math/Vector3Functions.js';
+import { sphereCreate, sphereCopy, sphereApplyMatrix4, sphereContainsPoint } from '../math/SphereFunctions.js';
+import {
+	rayCreate, rayCopy, rayRecast, rayIntersectSphere, rayApplyMatrix4, rayIntersectsBox, rayIntersectTriangle
+} from '../math/RayFunctions.js';
+import { mat4Create, mat4Copy, mat4Invert } from '../math/Matrix4Functions.js';
+import { triangleGetBarycoord, triangleGetInterpolatedAttribute, triangleGetNormal } from '../math/TriangleFunctions.js';
+import { frustumIntersectsObject } from '../math/FrustumFunctions.js';
 import { Object3D } from '../core/Object3D.js';
-import { Triangle } from '../math/Triangle.js';
 import { BackSide, FrontSide } from '../constants.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-const _inverseMatrix = /*@__PURE__*/ new Matrix4();
-const _ray = /*@__PURE__*/ new Ray();
-const _sphere = /*@__PURE__*/ new Sphere();
-const _sphereHitAt = /*@__PURE__*/ new Vector3();
+const _inverseMatrix = /*@__PURE__*/ mat4Create();
+const _ray = /*@__PURE__*/ rayCreate();
+const _sphere = /*@__PURE__*/ sphereCreate();
+const _sphereHitAt = /*@__PURE__*/ vec3Create();
 
-const _vA = /*@__PURE__*/ new Vector3();
-const _vB = /*@__PURE__*/ new Vector3();
-const _vC = /*@__PURE__*/ new Vector3();
+const _vA = /*@__PURE__*/ vec3Create();
+const _vB = /*@__PURE__*/ vec3Create();
+const _vC = /*@__PURE__*/ vec3Create();
 
-const _tempA = /*@__PURE__*/ new Vector3();
-const _morphA = /*@__PURE__*/ new Vector3();
+const _tempA = /*@__PURE__*/ vec3Create();
+const _morphA = /*@__PURE__*/ vec3Create();
 
-const _intersectionPoint = /*@__PURE__*/ new Vector3();
-const _intersectionPointWorld = /*@__PURE__*/ new Vector3();
+const _intersectionPoint = /*@__PURE__*/ vec3Create();
+const _intersectionPointWorld = /*@__PURE__*/ vec3Create();
 
 /**
  * Class representing triangular polygon mesh based objects.
@@ -180,13 +187,13 @@ class Mesh extends Object3D {
 		const morphPosition = geometry.morphAttributes.position;
 		const morphTargetsRelative = geometry.morphTargetsRelative;
 
-		target.fromBufferAttribute( position, index );
+		vec3FromBufferAttribute( position, index, target );
 
 		const morphInfluences = this.morphTargetInfluences;
 
 		if ( morphPosition && morphInfluences ) {
 
-			_morphA.set( 0, 0, 0 );
+			vec3Set( _morphA, 0, 0, 0 );
 
 			for ( let i = 0, il = morphPosition.length; i < il; i ++ ) {
 
@@ -195,21 +202,22 @@ class Mesh extends Object3D {
 
 				if ( influence === 0 ) continue;
 
-				_tempA.fromBufferAttribute( morphAttribute, index );
+				vec3FromBufferAttribute( morphAttribute, index, _tempA );
 
 				if ( morphTargetsRelative ) {
 
-					_morphA.addScaledVector( _tempA, influence );
+					vec3AddScaledVector( _morphA, _tempA, influence, _morphA );
 
 				} else {
 
-					_morphA.addScaledVector( _tempA.sub( target ), influence );
+					vec3Sub( _tempA, target, _tempA );
+					vec3AddScaledVector( _morphA, _tempA, influence, _morphA );
 
 				}
 
 			}
 
-			target.add( _morphA );
+			vec3Add( target, _morphA, target );
 
 		}
 
@@ -225,7 +233,7 @@ class Mesh extends Object3D {
 	 */
 	intersectsFrustum( frustum ) {
 
-		return frustum.intersectsObject( this );
+		return frustum.planes !== undefined ? frustumIntersectsObject( frustum, this ) : frustum.intersectsObject( this );
 
 	}
 
@@ -247,31 +255,34 @@ class Mesh extends Object3D {
 
 		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-		_sphere.copy( geometry.boundingSphere );
-		_sphere.applyMatrix4( matrixWorld );
+		sphereCopy( geometry.boundingSphere, _sphere );
+		sphereApplyMatrix4( _sphere, matrixWorld, _sphere );
 
 		// check distance from ray origin to bounding sphere
 
-		_ray.copy( raycaster.ray ).recast( raycaster.near );
+		rayCopy( raycaster.ray, _ray );
+		rayRecast( _ray, raycaster.near, _ray );
 
-		if ( _sphere.containsPoint( _ray.origin ) === false ) {
+		if ( sphereContainsPoint( _sphere, _ray.origin ) === false ) {
 
-			if ( _ray.intersectSphere( _sphere, _sphereHitAt ) === null ) return;
+			if ( rayIntersectSphere( _ray, _sphere, _sphereHitAt ) === null ) return;
 
-			if ( _ray.origin.distanceToSquared( _sphereHitAt ) > ( raycaster.far - raycaster.near ) ** 2 ) return;
+			if ( vec3DistanceToSquared( _ray.origin, _sphereHitAt ) > ( raycaster.far - raycaster.near ) ** 2 ) return;
 
 		}
 
 		// convert ray to local space of mesh
 
-		_inverseMatrix.copy( matrixWorld ).invert();
-		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
+		mat4Copy( matrixWorld, _inverseMatrix );
+		mat4Invert( _inverseMatrix, _inverseMatrix );
+		rayCopy( raycaster.ray, _ray );
+		rayApplyMatrix4( _ray, _inverseMatrix, _ray );
 
 		// test with bounding box in local space
 
 		if ( geometry.boundingBox !== null ) {
 
-			if ( _ray.intersectsBox( geometry.boundingBox ) === false ) return;
+			if ( rayIntersectsBox( _ray, geometry.boundingBox ) === false ) return;
 
 		}
 
@@ -424,26 +435,26 @@ function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point 
 
 	if ( material.side === BackSide ) {
 
-		intersect = ray.intersectTriangle( pC, pB, pA, true, point );
+		intersect = rayIntersectTriangle( ray, pC, pB, pA, true, point );
 
 	} else {
 
-		intersect = ray.intersectTriangle( pA, pB, pC, ( material.side === FrontSide ), point );
+		intersect = rayIntersectTriangle( ray, pA, pB, pC, ( material.side === FrontSide ), point );
 
 	}
 
 	if ( intersect === null ) return null;
 
-	_intersectionPointWorld.copy( point );
-	_intersectionPointWorld.applyMatrix4( object.matrixWorld );
+	vec3Copy( point, _intersectionPointWorld );
+	vec3ApplyMatrix4( _intersectionPointWorld, object.matrixWorld, _intersectionPointWorld );
 
-	const distance = raycaster.ray.origin.distanceTo( _intersectionPointWorld );
+	const distance = vec3DistanceTo( raycaster.ray.origin, _intersectionPointWorld );
 
 	if ( distance < raycaster.near || distance > raycaster.far ) return null;
 
 	return {
 		distance: distance,
-		point: _intersectionPointWorld.clone(),
+		point: new Vector3().copy( _intersectionPointWorld ),
 		object: object
 	};
 
@@ -460,27 +471,27 @@ function checkGeometryIntersection( object, material, raycaster, ray, uv, uv1, n
 	if ( intersection ) {
 
 		const barycoord = new Vector3();
-		Triangle.getBarycoord( _intersectionPoint, _vA, _vB, _vC, barycoord );
+		triangleGetBarycoord( _intersectionPoint, _vA, _vB, _vC, barycoord );
 
 		if ( uv ) {
 
-			intersection.uv = Triangle.getInterpolatedAttribute( uv, a, b, c, barycoord, new Vector2() );
+			intersection.uv = triangleGetInterpolatedAttribute( uv, a, b, c, barycoord, new Vector2() );
 
 		}
 
 		if ( uv1 ) {
 
-			intersection.uv1 = Triangle.getInterpolatedAttribute( uv1, a, b, c, barycoord, new Vector2() );
+			intersection.uv1 = triangleGetInterpolatedAttribute( uv1, a, b, c, barycoord, new Vector2() );
 
 		}
 
 		if ( normal ) {
 
-			intersection.normal = Triangle.getInterpolatedAttribute( normal, a, b, c, barycoord, new Vector3() );
+			intersection.normal = triangleGetInterpolatedAttribute( normal, a, b, c, barycoord, new Vector3() );
 
-			if ( intersection.normal.dot( ray.direction ) > 0 ) {
+			if ( vec3Dot( intersection.normal, ray.direction ) > 0 ) {
 
-				intersection.normal.multiplyScalar( - 1 );
+				vec3MultiplyScalar( intersection.normal, - 1, intersection.normal );
 
 			}
 
@@ -494,7 +505,7 @@ function checkGeometryIntersection( object, material, raycaster, ray, uv, uv1, n
 			materialIndex: 0
 		};
 
-		Triangle.getNormal( _vA, _vB, _vC, face.normal );
+		triangleGetNormal( _vA, _vB, _vC, face.normal );
 
 		intersection.face = face;
 		intersection.barycoord = barycoord;

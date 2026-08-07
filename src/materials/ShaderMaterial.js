@@ -6,6 +6,12 @@ import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { Matrix4 } from '../math/Matrix4.js';
+import { colorGetHex, colorSetHex } from '../math/ColorFunctions.js';
+import { vec2FromArray, vec2ToArray } from '../math/Vector2Functions.js';
+import { vec3FromArray, vec3ToArray } from '../math/Vector3Functions.js';
+import { vec4FromArray, vec4ToArray } from '../math/Vector4Functions.js';
+import { mat3FromArray, mat3ToArray } from '../math/Matrix3Functions.js';
+import { mat4FromArray, mat4ToArray } from '../math/Matrix4Functions.js';
 
 import default_vertex from '../renderers/shaders/ShaderChunk/default_vertex.glsl.js';
 import default_fragment from '../renderers/shaders/ShaderChunk/default_fragment.glsl.js';
@@ -331,42 +337,42 @@ class ShaderMaterial extends Material {
 
 				data.uniforms[ name ] = {
 					type: 'c',
-					value: value.getHex()
+					value: colorGetHex( value )
 				};
 
 			} else if ( value && value.isVector2 ) {
 
 				data.uniforms[ name ] = {
 					type: 'v2',
-					value: value.toArray()
+					value: vec2ToArray( value )
 				};
 
 			} else if ( value && value.isVector3 ) {
 
 				data.uniforms[ name ] = {
 					type: 'v3',
-					value: value.toArray()
+					value: vec3ToArray( value )
 				};
 
 			} else if ( value && value.isVector4 ) {
 
 				data.uniforms[ name ] = {
 					type: 'v4',
-					value: value.toArray()
+					value: vec4ToArray( value )
 				};
 
 			} else if ( value && value.isMatrix3 ) {
 
 				data.uniforms[ name ] = {
 					type: 'm3',
-					value: value.toArray()
+					value: mat3ToArray( value )
 				};
 
 			} else if ( value && value.isMatrix4 ) {
 
 				data.uniforms[ name ] = {
 					type: 'm4',
-					value: value.toArray()
+					value: mat4ToArray( value )
 				};
 
 			} else {
@@ -429,27 +435,27 @@ class ShaderMaterial extends Material {
 						break;
 
 					case 'c':
-						this.uniforms[ name ].value = new Color().setHex( uniform.value );
+						this.uniforms[ name ].value = colorSetHex( uniform.value, undefined, new Color() );
 						break;
 
 					case 'v2':
-						this.uniforms[ name ].value = new Vector2().fromArray( uniform.value );
+						this.uniforms[ name ].value = vec2FromArray( uniform.value, 0, new Vector2() );
 						break;
 
 					case 'v3':
-						this.uniforms[ name ].value = new Vector3().fromArray( uniform.value );
+						this.uniforms[ name ].value = vec3FromArray( uniform.value, 0, new Vector3() );
 						break;
 
 					case 'v4':
-						this.uniforms[ name ].value = new Vector4().fromArray( uniform.value );
+						this.uniforms[ name ].value = vec4FromArray( uniform.value, 0, new Vector4() );
 						break;
 
 					case 'm3':
-						this.uniforms[ name ].value = new Matrix3().fromArray( uniform.value );
+						this.uniforms[ name ].value = mat3FromArray( uniform.value, 0, new Matrix3() );
 						break;
 
 					case 'm4':
-						this.uniforms[ name ].value = new Matrix4().fromArray( uniform.value );
+						this.uniforms[ name ].value = mat4FromArray( uniform.value, 0, new Matrix4() );
 						break;
 
 					default:

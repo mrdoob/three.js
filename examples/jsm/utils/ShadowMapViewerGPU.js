@@ -8,7 +8,9 @@ import {
 	PlaneGeometry,
 	Scene,
 	DepthTexture,
-	Vector2
+	vec2Create,
+	vec2Set,
+	vec3Set
 } from 'three/webgpu';
 import { uv, uniform, textureLoad } from 'three/tsl';
 
@@ -54,14 +56,14 @@ class ShadowMapViewer {
 		};
 
 		const camera = new OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 10 );
-		camera.position.set( 0, 0, 2 );
+		vec3Set( camera.position, 0, 0, 2 );
 		const scene = new Scene();
 
 		//HUD for shadow map
 
 		const material = new NodeMaterial();
 
-		const textureDimension = uniform( new Vector2() );
+		const textureDimension = uniform( vec2Create() );
 
 		const shadowMapUniform = textureLoad( new DepthTexture(), uv().flipY().mul( textureDimension ) );
 		material.fragmentNode = shadowMapUniform.x.oneMinus();
@@ -129,7 +131,7 @@ class ShadowMapViewer {
 				this.width = width;
 				this.height = height;
 
-				mesh.scale.set( this.width / frame.width, this.height / frame.height, 1 );
+				vec3Set( mesh.scale, this.width / frame.width, this.height / frame.height, 1 );
 
 				//Reset the position as it is off when we scale stuff
 				resetPosition();
@@ -155,9 +157,9 @@ class ShadowMapViewer {
 				const width = scope.size.width;
 				const height = scope.size.height;
 
-				mesh.position.set( - window.innerWidth / 2 + width / 2 + this.x, window.innerHeight / 2 - height / 2 - this.y, 0 );
+				vec3Set( mesh.position, - window.innerWidth / 2 + width / 2 + this.x, window.innerHeight / 2 - height / 2 - this.y, 0 );
 
-				if ( doRenderLabel ) labelMesh.position.set( mesh.position.x, mesh.position.y - scope.size.height / 2 + labelCanvas.height / 2, 0 );
+				if ( doRenderLabel ) vec3Set( labelMesh.position, mesh.position.x, mesh.position.y - scope.size.height / 2 + labelCanvas.height / 2, 0 );
 
 			}
 		};
@@ -180,7 +182,7 @@ class ShadowMapViewer {
 				const depthTexture = light.shadow.map.depthTexture;
 
 				shadowMapUniform.value = depthTexture;
-				textureDimension.value.set( depthTexture.width, depthTexture.height );
+				vec2Set( depthTexture.width, depthTexture.height, textureDimension.value );
 
 				currentAutoClear = renderer.autoClear;
 				renderer.autoClear = false; // To allow render overlay

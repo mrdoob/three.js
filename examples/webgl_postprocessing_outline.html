@@ -108,13 +108,13 @@
 
 			gui.addColor( conf, 'visibleEdgeColor' ).onChange( function ( value ) {
 
-				outlinePass.visibleEdgeColor.set( value );
+				THREE.colorSet( value, undefined, undefined, outlinePass.visibleEdgeColor );
 
 			} );
 
 			gui.addColor( conf, 'hiddenEdgeColor' ).onChange( function ( value ) {
 
-				outlinePass.hiddenEdgeColor.set( value );
+				THREE.colorSet( value, undefined, undefined, outlinePass.hiddenEdgeColor );
 
 			} );
 

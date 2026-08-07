@@ -1,11 +1,18 @@
 import {
 	Controls,
-	Euler,
-	Vector3
+	eulerCreate,
+	eulerSetFromQuaternion,
+	quatSetFromEuler,
+	vec3AddScaledVector,
+	vec3ApplyQuaternion,
+	vec3Create,
+	vec3CrossVectors,
+	vec3Set,
+	vec3SetFromMatrixColumn
 } from 'three';
 
-const _euler = new Euler( 0, 0, 0, 'YXZ' );
-const _vector = new Vector3();
+const _euler = /*@__PURE__*/ eulerCreate( 0, 0, 0, 'YXZ' );
+const _vector = /*@__PURE__*/ vec3Create();
 
 /**
  * Fires when the user moves the mouse.
@@ -149,7 +156,8 @@ class PointerLockControls extends Controls {
 	 */
 	getDirection( v ) {
 
-		return v.set( 0, 0, - 1 ).applyQuaternion( this.object.quaternion );
+		vec3Set( v, 0, 0, - 1 );
+		return vec3ApplyQuaternion( v, this.object.quaternion, v );
 
 	}
 
@@ -167,11 +175,11 @@ class PointerLockControls extends Controls {
 
 		const camera = this.object;
 
-		_vector.setFromMatrixColumn( camera.matrix, 0 );
+		vec3SetFromMatrixColumn( camera.matrix, 0, _vector );
 
-		_vector.crossVectors( camera.up, _vector );
+		vec3CrossVectors( camera.up, _vector, _vector );
 
-		camera.position.addScaledVector( _vector, distance );
+		vec3AddScaledVector( camera.position, _vector, distance, camera.position );
 
 	}
 
@@ -186,9 +194,9 @@ class PointerLockControls extends Controls {
 
 		const camera = this.object;
 
-		_vector.setFromMatrixColumn( camera.matrix, 0 );
+		vec3SetFromMatrixColumn( camera.matrix, 0, _vector );
 
-		camera.position.addScaledVector( _vector, distance );
+		vec3AddScaledVector( camera.position, _vector, distance, camera.position );
 
 	}
 
@@ -224,14 +232,15 @@ function onMouseMove( event ) {
 	if ( this.enabled === false || this.isLocked === false ) return;
 
 	const camera = this.object;
-	_euler.setFromQuaternion( camera.quaternion );
+	eulerSetFromQuaternion( camera.quaternion, 'YXZ', _euler );
 
-	_euler.y -= event.movementX * _MOUSE_SENSITIVITY * this.pointerSpeed;
-	_euler.x -= event.movementY * _MOUSE_SENSITIVITY * this.pointerSpeed;
+	_euler._y -= event.movementX * _MOUSE_SENSITIVITY * this.pointerSpeed;
+	_euler._x -= event.movementY * _MOUSE_SENSITIVITY * this.pointerSpeed;
 
-	_euler.x = Math.max( _PI_2 - this.maxPolarAngle, Math.min( _PI_2 - this.minPolarAngle, _euler.x ) );
+	_euler._x = Math.max( _PI_2 - this.maxPolarAngle, Math.min( _PI_2 - this.minPolarAngle, _euler._x ) );
 
-	camera.quaternion.setFromEuler( _euler );
+	quatSetFromEuler( _euler, camera.quaternion );
+	camera.quaternion._onChangeCallback();
 
 	this.dispatchEvent( _changeEvent );
 

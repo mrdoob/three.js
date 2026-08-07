@@ -1,8 +1,8 @@
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import * as Curves from '../extras/curves/Curves.js';
-import { Vector2 } from '../math/Vector2.js';
-import { Vector3 } from '../math/Vector3.js';
+import { vec2Create } from '../math/Vector2Functions.js';
+import { vec3Copy, vec3Create, vec3Normalize } from '../math/Vector3Functions.js';
 
 /**
  * Creates a tube that extrudes along a 3D curve.
@@ -42,7 +42,7 @@ class TubeGeometry extends BufferGeometry {
 	 * @param {number} [radialSegments=8] - The number of segments that make up the cross-section.
 	 * @param {boolean} [closed=false] - Whether the tube is closed or not.
 	 */
-	constructor( path = new Curves[ 'QuadraticBezierCurve3' ]( new Vector3( - 1, - 1, 0 ), new Vector3( - 1, 1, 0 ), new Vector3( 1, 1, 0 ) ), tubularSegments = 64, radius = 1, radialSegments = 8, closed = false ) {
+	constructor( path = new Curves[ 'QuadraticBezierCurve3' ]( { x: - 1, y: - 1, z: 0 }, { x: - 1, y: 1, z: 0 }, { x: 1, y: 1, z: 0 } ), tubularSegments = 64, radius = 1, radialSegments = 8, closed = false ) {
 
 		super();
 
@@ -73,10 +73,10 @@ class TubeGeometry extends BufferGeometry {
 
 		// helper variables
 
-		const vertex = new Vector3();
-		const normal = new Vector3();
-		const uv = new Vector2();
-		let P = new Vector3();
+		const vertex = vec3Create();
+		const normal = vec3Create();
+		const uv = vec2Create();
+		const P = vec3Create();
 
 		// buffer
 
@@ -128,7 +128,7 @@ class TubeGeometry extends BufferGeometry {
 
 			// we use getPointAt to sample evenly distributed points from the given path
 
-			P = path.getPointAt( i / tubularSegments, P );
+			vec3Copy( path.getPointAt( i / tubularSegments ), P );
 
 			// retrieve corresponding normal and binormal
 
@@ -149,7 +149,7 @@ class TubeGeometry extends BufferGeometry {
 				normal.x = ( cos * N.x + sin * B.x );
 				normal.y = ( cos * N.y + sin * B.y );
 				normal.z = ( cos * N.z + sin * B.z );
-				normal.normalize();
+				vec3Normalize( normal, normal );
 
 				normals.push( normal.x, normal.y, normal.z );
 

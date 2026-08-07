@@ -1,8 +1,11 @@
 import {
 	NoColorSpace,
 	DoubleSide,
-	Color,
 	PropertyBinding,
+	colorGetHex,
+	colorSet,
+	mat4Determinant,
+	vec2Copy
 } from 'three';
 
 import {
@@ -704,7 +707,7 @@ function buildXform( object, usedNames, options ) {
 
 	const name = getName( object, usedNames );
 
-	if ( object.matrix.determinant() < 0 ) {
+	if ( mat4Determinant( object.matrix ) < 0 ) {
 
 		console.warn(
 			'THREE.USDZExporter: USDZ does not support negative scales',
@@ -998,8 +1001,8 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 			1002: 'mirror', // MirroredRepeatWrapping
 		};
 
-		const repeat = texture.repeat.clone();
-		const offset = texture.offset.clone();
+		const repeat = vec2Copy( texture.repeat );
+		const offset = vec2Copy( texture.offset );
 		const rotation = texture.rotation;
 
 		// rotation is around the wrong point. after rotation we need to shift offset again so that we're rotating around the right spot
@@ -1171,7 +1174,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 				`color3f inputs:emissiveColor.connect = </Materials/Material_${material.id}/Texture_${material.emissiveMap.id}_emissive.outputs:rgb>`
 			);
 
-			const emissiveColor = new Color(
+			const emissiveColor = colorSet(
 				material.emissive.r * emissiveIntensity,
 				material.emissive.g * emissiveIntensity,
 				material.emissive.b * emissiveIntensity
@@ -1183,7 +1186,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 			);
 			textureNodes.forEach( ( node ) => materialNode.addChild( node ) );
 
-		} else if ( material.emissive.getHex() > 0 ) {
+		} else if ( colorGetHex( material.emissive ) > 0 ) {
 
 			previewSurfaceNode.addProperty(
 				`color3f inputs:emissiveColor = ${buildColor( material.emissive )}`
@@ -1211,7 +1214,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 		);
 
 		const aoMapIntensity = material.aoMapIntensity ?? 1;
-		const aoColor = new Color(
+		const aoColor = colorSet(
 			aoMapIntensity,
 			aoMapIntensity,
 			aoMapIntensity
@@ -1231,7 +1234,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 			`float inputs:roughness.connect = </Materials/Material_${material.id}/Texture_${material.roughnessMap.id}_roughness.outputs:g>`
 		);
 
-		const roughnessColor = new Color(
+		const roughnessColor = colorSet(
 			material.roughness,
 			material.roughness,
 			material.roughness
@@ -1257,7 +1260,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 			`float inputs:metallic.connect = </Materials/Material_${material.id}/Texture_${material.metalnessMap.id}_metallic.outputs:b>`
 		);
 
-		const metalnessColor = new Color(
+		const metalnessColor = colorSet(
 			material.metalness,
 			material.metalness,
 			material.metalness
@@ -1303,7 +1306,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 				`float inputs:clearcoat.connect = </Materials/Material_${material.id}/Texture_${material.clearcoatMap.id}_clearcoat.outputs:r>`
 			);
 
-			const clearcoatColor = new Color(
+			const clearcoatColor = colorSet(
 				material.clearcoat,
 				material.clearcoat,
 				material.clearcoat
@@ -1329,7 +1332,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 				`float inputs:clearcoatRoughness.connect = </Materials/Material_${material.id}/Texture_${material.clearcoatRoughnessMap.id}_clearcoatRoughness.outputs:g>`
 			);
 
-			const clearcoatRoughnessColor = new Color(
+			const clearcoatRoughnessColor = colorSet(
 				material.clearcoatRoughness,
 				material.clearcoatRoughness,
 				material.clearcoatRoughness
@@ -1388,7 +1391,7 @@ function buildCamera( camera, usedNames, options ) {
 
 	const name = getName( camera, usedNames );
 
-	if ( camera.matrix.determinant() < 0 ) {
+	if ( mat4Determinant( camera.matrix ) < 0 ) {
 
 		console.warn(
 			'THREE.USDZExporter: USDZ does not support negative scales',

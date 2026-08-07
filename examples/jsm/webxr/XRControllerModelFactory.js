@@ -3,6 +3,8 @@ import {
 	MeshBasicMaterial,
 	Object3D,
 	SphereGeometry,
+	quatSlerpQuaternions,
+	vec3LerpVectors,
 } from 'three';
 
 import { GLTFLoader } from '../loaders/GLTFLoader.js';
@@ -113,16 +115,18 @@ class XRControllerModel extends Object3D {
 
 				} else if ( valueNodeProperty === MotionControllerConstants.VisualResponseProperty.TRANSFORM ) {
 
-					valueNode.quaternion.slerpQuaternions(
+					quatSlerpQuaternions(
 						minNode.quaternion,
 						maxNode.quaternion,
-						value
+						value,
+						valueNode.quaternion
 					);
 
-					valueNode.position.lerpVectors(
+					vec3LerpVectors(
 						minNode.position,
 						maxNode.position,
-						value
+						value,
+						valueNode.position
 					);
 
 				}

@@ -1,6 +1,6 @@
 import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceFront, CullFaceBack, CullFaceNone, DoubleSide, BackSide, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NoBlending, NormalBlending, AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation, ZeroFactor, OneFactor, SrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, DstColorFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor, ConstantColorFactor, OneMinusConstantColorFactor, ConstantAlphaFactor, OneMinusConstantAlphaFactor } from '../../constants.js';
-import { Color } from '../../math/Color.js';
-import { Vector4 } from '../../math/Vector4.js';
+import { colorCopy, colorCreate, colorEquals, colorSet } from '../../math/ColorFunctions.js';
+import { vec4Copy, vec4Create, vec4Equals, vec4FromArray, vec4Set } from '../../math/Vector4Functions.js';
 import { error, ReversedDepthFuncs } from '../../utils.js';
 
 function WebGLState( gl, extensions ) {
@@ -9,9 +9,9 @@ function WebGLState( gl, extensions ) {
 
 		let locked = false;
 
-		const color = new Vector4();
+		const color = vec4Create();
 		let currentColorMask = null;
-		const currentColorClear = new Vector4( 0, 0, 0, 0 );
+		const currentColorClear = vec4Create( 0, 0, 0, 0 );
 
 		return {
 
@@ -40,12 +40,12 @@ function WebGLState( gl, extensions ) {
 
 				}
 
-				color.set( r, g, b, a );
+				vec4Set( r, g, b, a, color );
 
-				if ( currentColorClear.equals( color ) === false ) {
+				if ( vec4Equals( currentColorClear, color ) === false ) {
 
 					gl.clearColor( r, g, b, a );
-					currentColorClear.copy( color );
+					vec4Copy( color, currentColorClear );
 
 				}
 
@@ -56,7 +56,7 @@ function WebGLState( gl, extensions ) {
 				locked = false;
 
 				currentColorMask = null;
-				currentColorClear.set( - 1, 0, 0, 0 ); // set to invalid state
+				vec4Set( - 1, 0, 0, 0, currentColorClear ); // set to invalid state
 
 			}
 
@@ -369,7 +369,7 @@ function WebGLState( gl, extensions ) {
 	let currentBlendEquationAlpha = null;
 	let currentBlendSrcAlpha = null;
 	let currentBlendDstAlpha = null;
-	let currentBlendColor = new Color( 0, 0, 0 );
+	let currentBlendColor = colorSet( 0, 0, 0, colorCreate() );
 	let currentBlendAlpha = 0;
 	let currentPremultipledAlpha = false;
 
@@ -405,8 +405,8 @@ function WebGLState( gl, extensions ) {
 	const scissorParam = gl.getParameter( gl.SCISSOR_BOX );
 	const viewportParam = gl.getParameter( gl.VIEWPORT );
 
-	const currentScissor = new Vector4().fromArray( scissorParam );
-	const currentViewport = new Vector4().fromArray( viewportParam );
+	const currentScissor = vec4FromArray( scissorParam );
+	const currentViewport = vec4FromArray( viewportParam );
 
 	function createTexture( type, target, count, dimensions ) {
 
@@ -699,7 +699,7 @@ function WebGLState( gl, extensions ) {
 				currentBlendDst = null;
 				currentBlendSrcAlpha = null;
 				currentBlendDstAlpha = null;
-				currentBlendColor.set( 0, 0, 0 );
+				colorSet( 0, 0, 0, currentBlendColor );
 				currentBlendAlpha = 0;
 
 				currentBlending = blending;
@@ -737,11 +737,11 @@ function WebGLState( gl, extensions ) {
 
 		}
 
-		if ( blendColor.equals( currentBlendColor ) === false || blendAlpha !== currentBlendAlpha ) {
+		if ( colorEquals( blendColor, currentBlendColor ) === false || blendAlpha !== currentBlendAlpha ) {
 
 			gl.blendColor( blendColor.r, blendColor.g, blendColor.b, blendAlpha );
 
-			currentBlendColor.copy( blendColor );
+			colorCopy( blendColor, currentBlendColor );
 			currentBlendAlpha = blendAlpha;
 
 		}
@@ -1142,10 +1142,10 @@ function WebGLState( gl, extensions ) {
 
 	function scissor( scissor ) {
 
-		if ( currentScissor.equals( scissor ) === false ) {
+		if ( vec4Equals( currentScissor, scissor ) === false ) {
 
 			gl.scissor( scissor.x, scissor.y, scissor.z, scissor.w );
-			currentScissor.copy( scissor );
+			vec4Copy( scissor, currentScissor );
 
 		}
 
@@ -1153,10 +1153,10 @@ function WebGLState( gl, extensions ) {
 
 	function viewport( viewport ) {
 
-		if ( currentViewport.equals( viewport ) === false ) {
+		if ( vec4Equals( currentViewport, viewport ) === false ) {
 
 			gl.viewport( viewport.x, viewport.y, viewport.z, viewport.w );
-			currentViewport.copy( viewport );
+			vec4Copy( viewport, currentViewport );
 
 		}
 
@@ -1290,7 +1290,7 @@ function WebGLState( gl, extensions ) {
 		currentBlendEquationAlpha = null;
 		currentBlendSrcAlpha = null;
 		currentBlendDstAlpha = null;
-		currentBlendColor = new Color( 0, 0, 0 );
+		currentBlendColor = colorSet( 0, 0, 0, colorCreate() );
 		currentBlendAlpha = 0;
 		currentPremultipledAlpha = false;
 
@@ -1302,8 +1302,8 @@ function WebGLState( gl, extensions ) {
 		currentPolygonOffsetFactor = null;
 		currentPolygonOffsetUnits = null;
 
-		currentScissor.set( 0, 0, gl.canvas.width, gl.canvas.height );
-		currentViewport.set( 0, 0, gl.canvas.width, gl.canvas.height );
+		vec4Set( 0, 0, gl.canvas.width, gl.canvas.height, currentScissor );
+		vec4Set( 0, 0, gl.canvas.width, gl.canvas.height, currentViewport );
 
 		colorBuffer.reset();
 		depthBuffer.reset();

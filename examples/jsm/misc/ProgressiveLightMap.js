@@ -1,4 +1,4 @@
-import { DoubleSide, FloatType, HalfFloatType, Mesh, MeshBasicMaterial, MeshPhongMaterial, PlaneGeometry, Scene, WebGLRenderTarget } from 'three';
+import { DoubleSide, FloatType, HalfFloatType, Mesh, MeshBasicMaterial, MeshPhongMaterial, PlaneGeometry, Scene, WebGLRenderTarget, vec3Copy } from 'three';
 import { potpack } from '../libs/potpack.module.js';
 
 /**
@@ -273,7 +273,7 @@ class ProgressiveLightMap {
 
 		if ( position !== undefined ) {
 
-			this.labelMesh.position.copy( position );
+			vec3Copy( position, this.labelMesh.position );
 
 		}
 

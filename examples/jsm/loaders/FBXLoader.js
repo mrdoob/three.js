@@ -5,10 +5,17 @@ import {
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Color,
+	colorCreate,
+	colorFromArray,
+	colorSetRGB,
+	colorToArray,
 	ColorManagement,
 	DirectionalLight,
 	EquirectangularReflectionMapping,
-	Euler,
+	eulerCreate,
+	eulerFromArray,
+	eulerSet,
+	eulerSetFromQuaternion,
 	FileLoader,
 	Float32BufferAttribute,
 	Group,
@@ -17,8 +24,19 @@ import {
 	Loader,
 	LoaderUtils,
 	MathUtils,
-	Matrix3,
-	Matrix4,
+	mat3GetNormalMatrix,
+	mat4Copy,
+	mat4CopyPosition,
+	mat4Create,
+	mat4Decompose,
+	mat4ExtractRotation,
+	mat4FromArray,
+	mat4Invert,
+	mat4MakeRotationFromEuler,
+	mat4Multiply,
+	mat4PreMultiply,
+	mat4Scale,
+	mat4SetPosition,
 	Mesh,
 	MeshLambertMaterial,
 	MeshPhongMaterial,
@@ -27,7 +45,16 @@ import {
 	PerspectiveCamera,
 	PointLight,
 	PropertyBinding,
-	Quaternion,
+	quatCreate,
+	quatDot,
+	quatFromArray,
+	quatInvert,
+	quatMultiply,
+	quatPreMultiply,
+	quatSet,
+	quatSetFromEuler,
+	quatSlerp,
+	quatToArray,
 	QuaternionKeyframeTrack,
 	RepeatWrapping,
 	SRGBColorSpace,
@@ -38,9 +65,16 @@ import {
 	Texture,
 	TextureLoader,
 	Uint16BufferAttribute,
-	Vector2,
-	Vector3,
-	Vector4,
+	vec2Create,
+	vec3Create,
+	vec3Cross,
+	vec3Dot,
+	vec3FromArray,
+	vec3Normalize,
+	vec3Set,
+	vec3SetFromMatrixScale,
+	vec3ToArray,
+	vec4FromArray,
 	VectorKeyframeTrack
 } from 'three';
 
@@ -569,12 +603,12 @@ class FBXTreeParser {
 
 		if ( materialNode.Diffuse ) {
 
-			parameters.color = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.Diffuse.value ), SRGBColorSpace );
+			parameters.color = ColorManagement.colorSpaceToWorking( colorFromArray( materialNode.Diffuse.value, 0, new Color() ), SRGBColorSpace );
 
 		} else if ( materialNode.DiffuseColor && ( materialNode.DiffuseColor.type === 'Color' || materialNode.DiffuseColor.type === 'ColorRGB' ) ) {
 
 			// The blender exporter exports diffuse here instead of in materialNode.Diffuse
-			parameters.color = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.DiffuseColor.value ), SRGBColorSpace );
+			parameters.color = ColorManagement.colorSpaceToWorking( colorFromArray( materialNode.DiffuseColor.value, 0, new Color() ), SRGBColorSpace );
 
 		}
 
@@ -586,12 +620,12 @@ class FBXTreeParser {
 
 		if ( materialNode.Emissive ) {
 
-			parameters.emissive = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.Emissive.value ), SRGBColorSpace );
+			parameters.emissive = ColorManagement.colorSpaceToWorking( colorFromArray( materialNode.Emissive.value, 0, new Color() ), SRGBColorSpace );
 
 		} else if ( materialNode.EmissiveColor && ( materialNode.EmissiveColor.type === 'Color' || materialNode.EmissiveColor.type === 'ColorRGB' ) ) {
 
 			// The blender exporter exports emissive color here instead of in materialNode.Emissive
-			parameters.emissive = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.EmissiveColor.value ), SRGBColorSpace );
+			parameters.emissive = ColorManagement.colorSpaceToWorking( colorFromArray( materialNode.EmissiveColor.value, 0, new Color() ), SRGBColorSpace );
 
 		}
 
@@ -641,12 +675,12 @@ class FBXTreeParser {
 
 		if ( materialNode.Specular ) {
 
-			parameters.specular = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.Specular.value ), SRGBColorSpace );
+			parameters.specular = ColorManagement.colorSpaceToWorking( colorFromArray( materialNode.Specular.value, 0, new Color() ), SRGBColorSpace );
 
 		} else if ( materialNode.SpecularColor && materialNode.SpecularColor.type === 'Color' ) {
 
 			// The blender exporter exports specular color here instead of in materialNode.Specular
-			parameters.specular = ColorManagement.colorSpaceToWorking( new Color().fromArray( materialNode.SpecularColor.value ), SRGBColorSpace );
+			parameters.specular = ColorManagement.colorSpaceToWorking( colorFromArray( materialNode.SpecularColor.value, 0, new Color() ), SRGBColorSpace );
 
 		}
 
@@ -827,7 +861,7 @@ class FBXTreeParser {
 				ID: child.ID,
 				indices: [],
 				weights: [],
-				transformLink: new Matrix4().fromArray( boneNode.TransformLink.a ),
+				transformLink: mat4FromArray( boneNode.TransformLink.a ),
 
 			};
 
@@ -962,7 +996,7 @@ class FBXTreeParser {
 
 		}
 
-		const tempMatrix = new Matrix4();
+		const tempMatrix = mat4Create();
 
 		sceneGraph.traverse( function ( node ) {
 
@@ -974,18 +1008,18 @@ class FBXTreeParser {
 
 					if ( node.parent ) {
 
-						tempMatrix.copy( node.parent.matrixWorld ).invert();
-						tempMatrix.multiply( bindPose );
+						mat4Invert( node.parent.matrixWorld, tempMatrix );
+						mat4Multiply( tempMatrix, bindPose, tempMatrix );
 
 					} else {
 
-						tempMatrix.copy( bindPose );
+						mat4Copy( bindPose, tempMatrix );
 
 					}
 
-					tempMatrix.decompose( node.position, node.quaternion, node.scale );
+					mat4Decompose( tempMatrix, node.position, node.quaternion, node.scale );
 					node.updateMatrix();
-					node.matrixWorld.copy( bindPose );
+					mat4Copy( bindPose, node.matrixWorld );
 
 				}
 
@@ -1106,7 +1140,7 @@ class FBXTreeParser {
 						const subBone = bone;
 						bone = new Bone();
 
-						bone.matrixWorld.copy( rawBone.transformLink );
+						mat4Copy( rawBone.transformLink, bone.matrixWorld );
 
 						// set name and id here - otherwise in cases where "subBone" is created it will not have a name / id
 
@@ -1269,7 +1303,7 @@ class FBXTreeParser {
 
 			if ( lightAttribute.Color !== undefined ) {
 
-				color = ColorManagement.colorSpaceToWorking( new Color().fromArray( lightAttribute.Color.value ), SRGBColorSpace );
+				color = ColorManagement.colorSpaceToWorking( colorFromArray( lightAttribute.Color.value, 0, new Color() ), SRGBColorSpace );
 
 			}
 
@@ -1518,12 +1552,13 @@ class FBXTreeParser {
 						// DirectionalLight, SpotLight
 						if ( model.target !== undefined ) {
 
-							model.target.position.fromArray( pos );
+							vec3FromArray( pos, 0, model.target.position );
 							sceneGraph.add( model.target );
 
 						} else { // Cameras and other Object3Ds
 
-							model.lookAt( new Vector3().fromArray( pos ) );
+							const lookAtPos = vec3FromArray( pos );
+							model.lookAt( lookAtPos.x, lookAtPos.y, lookAtPos.z );
 
 						}
 
@@ -1551,11 +1586,11 @@ class FBXTreeParser {
 
 			for ( let i = 0, l = skeleton.bones.length; i < l; i ++ ) {
 
-				const inverse = new Matrix4();
+				const inverse = mat4Create();
 
 				if ( skeleton.bones[ i ] && skeleton.rawBones[ i ] ) {
 
-					inverse.copy( skeleton.rawBones[ i ].transformLink ).invert();
+					mat4Invert( skeleton.rawBones[ i ].transformLink, inverse );
 
 				}
 
@@ -1620,13 +1655,13 @@ class FBXTreeParser {
 
 						poseNodes.forEach( function ( poseNode ) {
 
-							bindMatrices[ poseNode.Node ] = new Matrix4().fromArray( poseNode.Matrix.a );
+							bindMatrices[ poseNode.Node ] = mat4FromArray( poseNode.Matrix.a );
 
 						} );
 
 					} else {
 
-						bindMatrices[ poseNodes.Node ] = new Matrix4().fromArray( poseNodes.Matrix.a );
+						bindMatrices[ poseNodes.Node ] = mat4FromArray( poseNodes.Matrix.a );
 
 					}
 
@@ -1655,7 +1690,7 @@ class FBXTreeParser {
 
 				if ( r !== 0 || g !== 0 || b !== 0 ) {
 
-					const color = new Color().setRGB( r, g, b, SRGBColorSpace );
+					const color = colorSetRGB( r, g, b, SRGBColorSpace, new Color() );
 					sceneGraph.add( new AmbientLight( color, 1 ) );
 
 				}
@@ -1816,7 +1851,7 @@ class GeometryParser {
 
 		if ( buffers.normal.length > 0 ) {
 
-			const normalMatrix = new Matrix3().getNormalMatrix( preTransform );
+			const normalMatrix = mat3GetNormalMatrix( preTransform );
 
 			const normalAttribute = new Float32BufferAttribute( buffers.normal, 3 );
 			normalAttribute.applyNormalMatrix( normalMatrix );
@@ -2151,7 +2186,7 @@ class GeometryParser {
 	// See https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal
 	getNormalNewell( vertices ) {
 
-		const normal = new Vector3( 0.0, 0.0, 0.0 );
+		const normal = vec3Set( vec3Create(), 0.0, 0.0, 0.0 );
 
 		for ( let i = 0; i < vertices.length; i ++ ) {
 
@@ -2164,7 +2199,7 @@ class GeometryParser {
 
 		}
 
-		normal.normalize();
+		vec3Normalize( normal, normal );
 
 		return normal;
 
@@ -2174,9 +2209,9 @@ class GeometryParser {
 
 		const normalVector = this.getNormalNewell( vertices );
 		// Avoid up being equal or almost equal to normalVector
-		const up = Math.abs( normalVector.z ) > 0.5 ? new Vector3( 0.0, 1.0, 0.0 ) : new Vector3( 0.0, 0.0, 1.0 );
-		const tangent = up.cross( normalVector ).normalize();
-		const bitangent = normalVector.clone().cross( tangent ).normalize();
+		const up = Math.abs( normalVector.z ) > 0.5 ? vec3Set( vec3Create(), 0.0, 1.0, 0.0 ) : vec3Set( vec3Create(), 0.0, 0.0, 1.0 );
+		const tangent = vec3Normalize( vec3Cross( up, normalVector ), vec3Create() );
+		const bitangent = vec3Normalize( vec3Cross( normalVector, tangent ), vec3Create() );
 
 		return {
 			normal: normalVector,
@@ -2188,9 +2223,9 @@ class GeometryParser {
 
 	flattenVertex( vertex, normalTangent, normalBitangent ) {
 
-		return new Vector2(
-			vertex.dot( normalTangent ),
-			vertex.dot( normalBitangent )
+		return vec2Create(
+			vec3Dot( vertex, normalTangent ),
+			vec3Dot( vertex, normalBitangent )
 		);
 
 	}
@@ -2211,7 +2246,8 @@ class GeometryParser {
 			for ( let i = 0; i < facePositionIndexes.length; i += 3 ) {
 
 				vertices.push(
-					new Vector3(
+					vec3Set(
+						vec3Create(),
 						positions[ facePositionIndexes[ i ] ],
 						positions[ facePositionIndexes[ i + 1 ] ],
 						positions[ facePositionIndexes[ i + 2 ] ]
@@ -2369,7 +2405,7 @@ class GeometryParser {
 		// rotation/scale part. Otherwise every delta gets the geometric translation added, which
 		// shifts morphed vertices away from their intended position by `weight * translation` as
 		// the influence increases.
-		const morphPreTransform = preTransform.clone().setPosition( 0, 0, 0 );
+		const morphPreTransform = mat4SetPosition( preTransform, 0, 0, 0 );
 
 		const scope = this;
 		morphTargets.forEach( function ( morphTarget ) {
@@ -2500,11 +2536,11 @@ class GeometryParser {
 
 		}
 
-		for ( let i = 0, c = new Color(); i < buffer.length; i += 4 ) {
+		for ( let i = 0, c = colorCreate(); i < buffer.length; i += 4 ) {
 
-			c.fromArray( buffer, i );
+			colorFromArray( buffer, i, c );
 			ColorManagement.colorSpaceToWorking( c, SRGBColorSpace );
-			c.toArray( buffer, i );
+			colorToArray( c, buffer, i );
 
 		}
 
@@ -2579,7 +2615,7 @@ class GeometryParser {
 
 		for ( let i = 0, l = pointsValues.length; i < l; i += 4 ) {
 
-			controlPoints.push( new Vector4().fromArray( pointsValues, i ) );
+			controlPoints.push( vec4FromArray( pointsValues, i ) );
 
 		}
 
@@ -2824,7 +2860,7 @@ class AnimationParser {
 
 									} );
 
-									if ( ! node.transform ) node.transform = new Matrix4();
+									if ( ! node.transform ) node.transform = mat4Create();
 
 									// if the animated model is pre rotated, we'll have to apply the pre rotations to every
 									// animation value as well
@@ -2945,13 +2981,13 @@ class AnimationParser {
 
 		const tracks = [];
 
-		let initialPosition = new Vector3();
-		let initialScale = new Vector3();
+		let initialPosition = vec3Create();
+		let initialScale = vec3Create();
 
-		if ( rawTracks.transform ) rawTracks.transform.decompose( initialPosition, new Quaternion(), initialScale );
+		if ( rawTracks.transform ) mat4Decompose( rawTracks.transform, initialPosition, quatCreate(), initialScale );
 
-		initialPosition = initialPosition.toArray();
-		initialScale = initialScale.toArray();
+		initialPosition = vec3ToArray( initialPosition );
+		initialScale = vec3ToArray( initialScale );
 
 		if ( rawTracks.T !== undefined && Object.keys( rawTracks.T.curves ).length > 0 ) {
 
@@ -3032,8 +3068,7 @@ class AnimationParser {
 			preRotation = preRotation.map( MathUtils.degToRad );
 			preRotation.push( defaultEulerOrder );
 
-			preRotation = new Euler().fromArray( preRotation );
-			preRotation = new Quaternion().setFromEuler( preRotation );
+			preRotation = quatSetFromEuler( eulerFromArray( preRotation ) );
 
 		}
 
@@ -3042,13 +3077,12 @@ class AnimationParser {
 			postRotation = postRotation.map( MathUtils.degToRad );
 			postRotation.push( defaultEulerOrder );
 
-			postRotation = new Euler().fromArray( postRotation );
-			postRotation = new Quaternion().setFromEuler( postRotation ).invert();
+			postRotation = quatInvert( quatSetFromEuler( eulerFromArray( postRotation ) ) );
 
 		}
 
-		const quaternion = new Quaternion();
-		const euler = new Euler();
+		const quaternion = quatCreate();
+		const euler = eulerCreate();
 
 		const quaternionValues = [];
 
@@ -3056,29 +3090,29 @@ class AnimationParser {
 
 		for ( let i = 0; i < values.length; i += 3 ) {
 
-			euler.set( values[ i ], values[ i + 1 ], values[ i + 2 ], eulerOrder );
-			quaternion.setFromEuler( euler );
+			eulerSet( values[ i ], values[ i + 1 ], values[ i + 2 ], eulerOrder, euler );
+			quatSetFromEuler( euler, quaternion );
 
-			if ( preRotation !== undefined ) quaternion.premultiply( preRotation );
-			if ( postRotation !== undefined ) quaternion.multiply( postRotation );
+			if ( preRotation !== undefined ) quatPreMultiply( quaternion, preRotation, quaternion );
+			if ( postRotation !== undefined ) quatMultiply( quaternion, postRotation, quaternion );
 
 			// Check unroll
 			if ( i > 2 ) {
 
-				const prevQuat = new Quaternion().fromArray(
+				const prevQuat = quatFromArray(
 					quaternionValues,
 					( ( i - 3 ) / 3 ) * 4
 				);
 
-				if ( prevQuat.dot( quaternion ) < 0 ) {
+				if ( quatDot( prevQuat, quaternion ) < 0 ) {
 
-					quaternion.set( - quaternion.x, - quaternion.y, - quaternion.z, - quaternion.w );
+					quatSet( - quaternion._x, - quaternion._y, - quaternion._z, - quaternion._w, quaternion );
 
 				}
 
 			}
 
-			quaternion.toArray( quaternionValues, ( i / 3 ) * 4 );
+			quatToArray( quaternion, quaternionValues, ( i / 3 ) * 4 );
 
 		}
 
@@ -3323,16 +3357,16 @@ class AnimationParser {
 
 				const numSubIntervals = maxAbsSpan / 180;
 
-				const E1 = new Euler( ...initialValueRad, eulerOrder );
-				const E2 = new Euler( ...currentValueRad, eulerOrder );
+				const E1 = eulerCreate( ...initialValueRad, eulerOrder );
+				const E2 = eulerCreate( ...currentValueRad, eulerOrder );
 
-				const Q1 = new Quaternion().setFromEuler( E1 );
-				const Q2 = new Quaternion().setFromEuler( E2 );
+				const Q1 = quatSetFromEuler( E1 );
+				const Q2 = quatSetFromEuler( E2 );
 
 				// Check unroll
-				if ( Q1.dot( Q2 ) < 0 ) {
+				if ( quatDot( Q1, Q2 ) < 0 ) {
 
-					Q2.set( - Q2.x, - Q2.y, - Q2.z, - Q2.w );
+					quatSet( - Q2._x, - Q2._y, - Q2._z, - Q2._w, Q2 );
 
 				}
 
@@ -3340,18 +3374,18 @@ class AnimationParser {
 				const initialTime = curvex.times[ i - 1 ];
 				const timeSpan = curvex.times[ i ] - initialTime;
 
-				const Q = new Quaternion();
-				const E = new Euler();
+				const Q = quatCreate();
+				const E = eulerCreate();
 				for ( let t = 0; t < 1; t += 1 / numSubIntervals ) {
 
-					Q.copy( Q1.clone().slerp( Q2.clone(), t ) );
+					quatSlerp( Q1, Q2, t, Q );
 
 					times.push( initialTime + t * timeSpan );
-					E.setFromQuaternion( Q, eulerOrder );
+					eulerSetFromQuaternion( Q, eulerOrder, E );
 
-					values.push( E.x );
-					values.push( E.y );
-					values.push( E.z );
+					values.push( E._x );
+					values.push( E._y );
+					values.push( E._z );
 
 				}
 
@@ -4381,32 +4415,37 @@ function getData( polygonVertexIndex, polygonIndex, vertexIndex, infoObject ) {
 
 }
 
-const tempEuler = new Euler();
-const tempVec = new Vector3();
+const tempEuler = eulerCreate();
+const tempVec = vec3Create();
 
 // generate transformation from FBX transform data
 // ref: https://help.autodesk.com/view/FBX/2017/ENU/?guid=__files_GUID_10CDD63C_79C1_4F2D_BB28_AD2BE65A02ED_htm
 // ref: http://docs.autodesk.com/FBX/2014/ENU/FBX-SDK-Documentation/index.html?url=cpp_ref/_transformations_2main_8cxx-example.html,topicNumber=cpp_ref__transformations_2main_8cxx_example_htmlfc10a1e1-b18d-4e72-9dc0-70d0f1959f5e
 function generateTransform( transformData ) {
 
-	const lTranslationM = new Matrix4();
-	const lPreRotationM = new Matrix4();
-	const lRotationM = new Matrix4();
-	const lPostRotationM = new Matrix4();
+	const lTranslationM = mat4Create();
+	const lPreRotationM = mat4Create();
+	const lRotationM = mat4Create();
+	const lPostRotationM = mat4Create();
 
-	const lScalingM = new Matrix4();
-	const lScalingPivotM = new Matrix4();
-	const lScalingOffsetM = new Matrix4();
-	const lRotationOffsetM = new Matrix4();
-	const lRotationPivotM = new Matrix4();
+	const lScalingM = mat4Create();
+	const lScalingPivotM = mat4Create();
+	const lScalingOffsetM = mat4Create();
+	const lRotationOffsetM = mat4Create();
+	const lRotationPivotM = mat4Create();
 
-	const lParentGX = new Matrix4();
-	const lParentLX = new Matrix4();
-	const lGlobalT = new Matrix4();
+	const lParentGX = mat4Create();
+	const lParentLX = mat4Create();
+	const lGlobalT = mat4Create();
 
 	const inheritType = ( transformData.inheritType ) ? transformData.inheritType : 0;
 
-	if ( transformData.translation ) lTranslationM.setPosition( tempVec.fromArray( transformData.translation ) );
+	if ( transformData.translation ) {
+
+		vec3FromArray( transformData.translation, 0, tempVec );
+		mat4SetPosition( lTranslationM, tempVec.x, tempVec.y, tempVec.z, lTranslationM );
+
+	}
 
 	// For Maya models using "Joint Orient", Euler order only applies to rotation, not pre/post-rotations
 	const defaultEulerOrder = getEulerOrder( 0 );
@@ -4415,7 +4454,7 @@ function generateTransform( transformData ) {
 
 		const array = transformData.preRotation.map( MathUtils.degToRad );
 		array.push( defaultEulerOrder );
-		lPreRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
+		mat4MakeRotationFromEuler( eulerFromArray( array, tempEuler ), lPreRotationM );
 
 	}
 
@@ -4423,7 +4462,7 @@ function generateTransform( transformData ) {
 
 		const array = transformData.rotation.map( MathUtils.degToRad );
 		array.push( transformData.eulerOrder || defaultEulerOrder );
-		lRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
+		mat4MakeRotationFromEuler( eulerFromArray( array, tempEuler ), lRotationM );
 
 	}
 
@@ -4431,74 +4470,105 @@ function generateTransform( transformData ) {
 
 		const array = transformData.postRotation.map( MathUtils.degToRad );
 		array.push( defaultEulerOrder );
-		lPostRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
-		lPostRotationM.invert();
+		mat4MakeRotationFromEuler( eulerFromArray( array, tempEuler ), lPostRotationM );
+		mat4Invert( lPostRotationM, lPostRotationM );
 
 	}
 
-	if ( transformData.scale ) lScalingM.scale( tempVec.fromArray( transformData.scale ) );
+	if ( transformData.scale ) mat4Scale( lScalingM, vec3FromArray( transformData.scale, 0, tempVec ), lScalingM );
 
 	// Pivots and offsets
-	if ( transformData.scalingOffset ) lScalingOffsetM.setPosition( tempVec.fromArray( transformData.scalingOffset ) );
-	if ( transformData.scalingPivot ) lScalingPivotM.setPosition( tempVec.fromArray( transformData.scalingPivot ) );
-	if ( transformData.rotationOffset ) lRotationOffsetM.setPosition( tempVec.fromArray( transformData.rotationOffset ) );
-	if ( transformData.rotationPivot ) lRotationPivotM.setPosition( tempVec.fromArray( transformData.rotationPivot ) );
+	if ( transformData.scalingOffset ) {
+
+		vec3FromArray( transformData.scalingOffset, 0, tempVec );
+		mat4SetPosition( lScalingOffsetM, tempVec.x, tempVec.y, tempVec.z, lScalingOffsetM );
+
+	}
+
+	if ( transformData.scalingPivot ) {
+
+		vec3FromArray( transformData.scalingPivot, 0, tempVec );
+		mat4SetPosition( lScalingPivotM, tempVec.x, tempVec.y, tempVec.z, lScalingPivotM );
+
+	}
+
+	if ( transformData.rotationOffset ) {
+
+		vec3FromArray( transformData.rotationOffset, 0, tempVec );
+		mat4SetPosition( lRotationOffsetM, tempVec.x, tempVec.y, tempVec.z, lRotationOffsetM );
+
+	}
+
+	if ( transformData.rotationPivot ) {
+
+		vec3FromArray( transformData.rotationPivot, 0, tempVec );
+		mat4SetPosition( lRotationPivotM, tempVec.x, tempVec.y, tempVec.z, lRotationPivotM );
+
+	}
 
 	// parent transform
 	if ( transformData.parentMatrixWorld ) {
 
-		lParentLX.copy( transformData.parentMatrix );
-		lParentGX.copy( transformData.parentMatrixWorld );
+		mat4Copy( transformData.parentMatrix, lParentLX );
+		mat4Copy( transformData.parentMatrixWorld, lParentGX );
 
 	}
 
-	const lLRM = lPreRotationM.clone().multiply( lRotationM ).multiply( lPostRotationM );
+	const lLRM = mat4Multiply( mat4Multiply( lPreRotationM, lRotationM ), lPostRotationM );
 	// Global Rotation
-	const lParentGRM = new Matrix4();
-	lParentGRM.extractRotation( lParentGX );
+	const lParentGRM = mat4ExtractRotation( lParentGX );
 
 	// Global Shear*Scaling
-	const lParentTM = new Matrix4();
-	lParentTM.copyPosition( lParentGX );
+	const lParentTM = mat4CopyPosition( lParentGX );
 
-	const lParentGRSM = lParentTM.clone().invert().multiply( lParentGX );
-	const lParentGSM = lParentGRM.clone().invert().multiply( lParentGRSM );
+	const lParentGRSM = mat4Multiply( mat4Invert( lParentTM ), lParentGX );
+	const lParentGSM = mat4Multiply( mat4Invert( lParentGRM ), lParentGRSM );
 	const lLSM = lScalingM;
 
-	const lGlobalRS = new Matrix4();
+	const lGlobalRS = mat4Create();
 
 	if ( inheritType === 0 ) {
 
-		lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM ).multiply( lLSM );
+		mat4Multiply( mat4Multiply( mat4Multiply( lParentGRM, lLRM ), lParentGSM ), lLSM, lGlobalRS );
 
 	} else if ( inheritType === 1 ) {
 
-		lGlobalRS.copy( lParentGRM ).multiply( lParentGSM ).multiply( lLRM ).multiply( lLSM );
+		mat4Multiply( mat4Multiply( mat4Multiply( lParentGRM, lParentGSM ), lLRM ), lLSM, lGlobalRS );
 
 	} else {
 
-		const lParentLSM = new Matrix4().scale( new Vector3().setFromMatrixScale( lParentLX ) );
-		const lParentLSM_inv = lParentLSM.clone().invert();
-		const lParentGSM_noLocal = lParentGSM.clone().multiply( lParentLSM_inv );
+		const lParentLSM = mat4Scale( mat4Create(), vec3SetFromMatrixScale( lParentLX ) );
+		const lParentLSM_inv = mat4Invert( lParentLSM );
+		const lParentGSM_noLocal = mat4Multiply( lParentGSM, lParentLSM_inv );
 
-		lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM_noLocal ).multiply( lLSM );
+		mat4Multiply( mat4Multiply( mat4Multiply( lParentGRM, lLRM ), lParentGSM_noLocal ), lLSM, lGlobalRS );
 
 	}
 
-	const lRotationPivotM_inv = lRotationPivotM.clone().invert();
-	const lScalingPivotM_inv = lScalingPivotM.clone().invert();
+	const lRotationPivotM_inv = mat4Invert( lRotationPivotM );
+	const lScalingPivotM_inv = mat4Invert( lScalingPivotM );
 	// Calculate the local transform matrix
-	let lTransform = lTranslationM.clone().multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM_inv ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM_inv );
+	let lTransform = mat4Multiply( lTranslationM, lRotationOffsetM );
+	lTransform = mat4Multiply( lTransform, lRotationPivotM );
+	lTransform = mat4Multiply( lTransform, lPreRotationM );
+	lTransform = mat4Multiply( lTransform, lRotationM );
+	lTransform = mat4Multiply( lTransform, lPostRotationM );
+	lTransform = mat4Multiply( lTransform, lRotationPivotM_inv );
+	lTransform = mat4Multiply( lTransform, lScalingOffsetM );
+	lTransform = mat4Multiply( lTransform, lScalingPivotM );
+	lTransform = mat4Multiply( lTransform, lScalingM );
+	lTransform = mat4Multiply( lTransform, lScalingPivotM_inv );
 
-	const lLocalTWithAllPivotAndOffsetInfo = new Matrix4().copyPosition( lTransform );
+	const lLocalTWithAllPivotAndOffsetInfo = mat4CopyPosition( lTransform );
 
-	const lGlobalTranslation = lParentGX.clone().multiply( lLocalTWithAllPivotAndOffsetInfo );
-	lGlobalT.copyPosition( lGlobalTranslation );
+	const lGlobalTranslation = mat4Multiply( lParentGX, lLocalTWithAllPivotAndOffsetInfo );
+	mat4CopyPosition( lGlobalTranslation, lGlobalT );
 
-	lTransform = lGlobalT.clone().multiply( lGlobalRS );
+	lTransform = mat4Multiply( lGlobalT, lGlobalRS );
 
 	// from global to local
-	lTransform.premultiply( lParentGX.invert() );
+	mat4Invert( lParentGX, lParentGX );
+	mat4PreMultiply( lTransform, lParentGX, lTransform );
 
 	return lTransform;
 

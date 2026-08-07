@@ -1,6 +1,5 @@
 import {
 	AddEquation,
-	Color,
 	CustomBlending,
 	DataTexture,
 	DepthTexture,
@@ -18,9 +17,14 @@ import {
 	RepeatWrapping,
 	ShaderMaterial,
 	UniformsUtils,
-	Vector3,
 	WebGLRenderTarget,
-	ZeroFactor
+	ZeroFactor,
+	colorCreate,
+	mat4Copy,
+	vec2Set,
+	vec3Create,
+	vec3MultiplyScalar,
+	vec3Normalize
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 import { SimplexNoise } from '../math/SimplexNoise.js';
@@ -185,9 +189,9 @@ class SSAOPass extends Pass {
 		this.ssaoMaterial.uniforms[ 'kernel' ].value = this.kernel;
 		this.ssaoMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
 		this.ssaoMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
-		this.ssaoMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
-		this.ssaoMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
-		this.ssaoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
+		vec2Set( this.width, this.height, this.ssaoMaterial.uniforms[ 'resolution' ].value );
+		mat4Copy( this.camera.projectionMatrix, this.ssaoMaterial.uniforms[ 'cameraProjectionMatrix' ].value );
+		mat4Copy( this.camera.projectionMatrixInverse, this.ssaoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value );
 
 		// normal material
 
@@ -203,7 +207,7 @@ class SSAOPass extends Pass {
 			fragmentShader: SSAOBlurShader.fragmentShader
 		} );
 		this.blurMaterial.uniforms[ 'tDiffuse' ].value = this.ssaoRenderTarget.texture;
-		this.blurMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
+		vec2Set( this.width, this.height, this.blurMaterial.uniforms[ 'resolution' ].value );
 
 		// material for rendering the depth
 
@@ -239,7 +243,7 @@ class SSAOPass extends Pass {
 
 		this._fsQuad = new FullScreenQuad( null );
 
-		this._originalClearColor = new Color();
+		this._originalClearColor = colorCreate();
 
 	}
 
@@ -362,11 +366,11 @@ class SSAOPass extends Pass {
 		this.normalRenderTarget.setSize( width, height );
 		this.blurRenderTarget.setSize( width, height );
 
-		this.ssaoMaterial.uniforms[ 'resolution' ].value.set( width, height );
-		this.ssaoMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
-		this.ssaoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
+		vec2Set( width, height, this.ssaoMaterial.uniforms[ 'resolution' ].value );
+		mat4Copy( this.camera.projectionMatrix, this.ssaoMaterial.uniforms[ 'cameraProjectionMatrix' ].value );
+		mat4Copy( this.camera.projectionMatrixInverse, this.ssaoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value );
 
-		this.blurMaterial.uniforms[ 'resolution' ].value.set( width, height );
+		vec2Set( width, height, this.blurMaterial.uniforms[ 'resolution' ].value );
 
 	}
 
@@ -439,16 +443,16 @@ class SSAOPass extends Pass {
 
 		for ( let i = 0; i < kernelSize; i ++ ) {
 
-			const sample = new Vector3();
+			const sample = vec3Create();
 			sample.x = ( Math.random() * 2 ) - 1;
 			sample.y = ( Math.random() * 2 ) - 1;
 			sample.z = Math.random();
 
-			sample.normalize();
+			vec3Normalize( sample, sample );
 
 			let scale = i / kernelSize;
 			scale = MathUtils.lerp( 0.1, 1, scale * scale );
-			sample.multiplyScalar( scale );
+			vec3MultiplyScalar( sample, scale, sample );
 
 			kernel.push( sample );
 

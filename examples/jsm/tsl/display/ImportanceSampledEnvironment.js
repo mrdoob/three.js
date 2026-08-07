@@ -8,7 +8,7 @@
  */
 
 import { If, dot, equirectUV, float, luminance, max, normalize, texture, uniform, vec2, vec4 } from 'three/tsl';
-import { ClampToEdgeWrapping, DataTexture, DataUtils, FloatType, HalfFloatType, LinearFilter, RedFormat, RepeatWrapping, Source, Vector2 } from 'three/webgpu';
+import { ClampToEdgeWrapping, DataTexture, DataUtils, FloatType, HalfFloatType, LinearFilter, RedFormat, RepeatWrapping, Source, vec2Create, vec2Set } from 'three/webgpu';
 import { D_GTR, F_Schlick, GeometryTerm, SmithG, equirectDirPdf, misPowerHeuristic } from '../utils/SpecularHelpers.js';
 
 function colorToLuminance( r, g, b ) {
@@ -319,7 +319,7 @@ class ImportanceSampledEnvironment {
 		this._cdf = new EnvMapCDFGenerator();
 
 		this._totalSum = uniform( 0.0, 'float' );
-		this._size = uniform( new Vector2( 1, 1 ) );
+		this._size = uniform( vec2Create( 1, 1 ), 'vec2' );
 		this.intensity = uniform( 1.0, 'float' );
 
 		this._mapNode = null;
@@ -344,7 +344,7 @@ class ImportanceSampledEnvironment {
 
 		}
 
-		this._size.value.set( this._cdf.map.image.width, this._cdf.map.image.height );
+		vec2Set( this._cdf.map.image.width, this._cdf.map.image.height, this._size.value );
 
 		if ( this._mapNode === null ) {
 
@@ -380,7 +380,7 @@ class ImportanceSampledEnvironment {
 		this._marginalNode = null;
 		this._conditionalNode = null;
 		this._totalSum.value = 0;
-		this._size.value.set( 1, 1 );
+		vec2Set( 1, 1, this._size.value );
 
 	}
 

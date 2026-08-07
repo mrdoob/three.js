@@ -1,12 +1,17 @@
 import {
-	Matrix4,
-	Vector3
+	box3GetSize,
+	mat4Create,
+	mat4Multiply,
+	mat4MultiplyMatrices,
+	mat4PreMultiply,
+	mat4Set,
+	vec3Create
 } from 'three';
 
-const _pixelToLocal = new Matrix4();
-const _mvp = new Matrix4();
-const _viewport = new Matrix4();
-const _size = new Vector3();
+const _pixelToLocal = /*@__PURE__*/ mat4Create();
+const _mvp = /*@__PURE__*/ mat4Create();
+const _viewport = /*@__PURE__*/ mat4Create();
+const _size = /*@__PURE__*/ vec3Create();
 
 /**
  * Manages interaction for 3D objects independently of the scene graph.
@@ -142,7 +147,8 @@ class InteractionManager {
 
 		if ( cssW !== this._cachedCssW || cssH !== this._cachedCssH ) {
 
-			_viewport.set(
+			mat4Set(
+				_viewport,
 				cssW / 2, 0, 0, cssW / 2,
 				0, - cssH / 2, 0, cssH / 2,
 				0, 0, 1, 0,
@@ -179,12 +185,13 @@ class InteractionManager {
 
 			if ( ! geometry.boundingBox ) geometry.computeBoundingBox();
 
-			geometry.boundingBox.getSize( _size );
+			box3GetSize( geometry.boundingBox, _size );
 
 			// Map element pixel coords (0,0)-(elemW,elemH) to mesh local coords.
 			// Front face: top-left at (-sizeX/2, sizeY/2, maxZ), bottom-right at (sizeX/2, -sizeY/2, maxZ).
 
-			_pixelToLocal.set(
+			mat4Set(
+				_pixelToLocal,
 				_size.x / elemW, 0, 0, - _size.x / 2,
 				0, - _size.y / elemH, 0, _size.y / 2,
 				0, 0, 1, geometry.boundingBox.max.z,
@@ -193,13 +200,13 @@ class InteractionManager {
 
 			// Model-View-Projection
 
-			_mvp.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-			_mvp.multiply( object.matrixWorld );
-			_mvp.multiply( _pixelToLocal );
+			mat4MultiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse, _mvp );
+			mat4Multiply( _mvp, object.matrixWorld, _mvp );
+			mat4Multiply( _mvp, _pixelToLocal, _mvp );
 
 			// Apply viewport
 
-			_mvp.premultiply( _viewport );
+			mat4PreMultiply( _mvp, _viewport, _mvp );
 
 			// The browser performs the perspective divide (by w) when applying the matrix3d.
 

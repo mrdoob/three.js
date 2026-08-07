@@ -1,4 +1,4 @@
-import { Vector4 } from '../../math/Vector4.js';
+import { vec4Create } from '../../math/Vector4Functions.js';
 import { hashArray } from '../../nodes/core/NodeUtils.js';
 
 let _id = 0;
@@ -121,7 +121,7 @@ class RenderContext {
 		 *
 		 * @type {Vector4}
 		 */
-		this.viewportValue = new Vector4();
+		this.viewportValue = vec4Create();
 
 		/**
 		 * When the scissor test is active and scissor rectangle smaller than the
@@ -137,7 +137,7 @@ class RenderContext {
 		 *
 		 * @type {Vector4}
 		 */
-		this.scissorValue = new Vector4();
+		this.scissorValue = vec4Create();
 
 		/**
 		 * The active render target.

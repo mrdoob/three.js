@@ -1,14 +1,14 @@
 import { LineSegments } from '../objects/LineSegments.js';
-import { Matrix4 } from '../math/Matrix4.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
-import { Color } from '../math/Color.js';
-import { Vector3 } from '../math/Vector3.js';
+import { colorSet } from '../math/ColorFunctions.js';
+import { mat4Copy, mat4Create, mat4Invert, mat4MultiplyMatrices } from '../math/Matrix4Functions.js';
+import { vec3Create, vec3SetFromMatrixPosition } from '../math/Vector3Functions.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 
-const _vector = /*@__PURE__*/ new Vector3();
-const _boneMatrix = /*@__PURE__*/ new Matrix4();
-const _matrixWorldInv = /*@__PURE__*/ new Matrix4();
+const _vector = /*@__PURE__*/ vec3Create();
+const _boneMatrix = /*@__PURE__*/ mat4Create();
+const _matrixWorldInv = /*@__PURE__*/ mat4Create();
 
 /**
  * A helper object to assist with visualizing a {@link Skeleton}.
@@ -89,8 +89,8 @@ class SkeletonHelper extends LineSegments {
 
 		// colors
 
-		const color1 = new Color( 0x0000ff );
-		const color2 = new Color( 0x00ff00 );
+		const color1 = colorSet( 0x0000ff );
+		const color2 = colorSet( 0x00ff00 );
 
 		this.setColors( color1, color2 );
 
@@ -103,7 +103,8 @@ class SkeletonHelper extends LineSegments {
 		const geometry = this.geometry;
 		const position = geometry.getAttribute( 'position' );
 
-		_matrixWorldInv.copy( this.root.matrixWorld ).invert();
+		mat4Copy( this.root.matrixWorld, _matrixWorldInv );
+		mat4Invert( _matrixWorldInv, _matrixWorldInv );
 
 		for ( let i = 0, j = 0; i < bones.length; i ++ ) {
 
@@ -111,12 +112,12 @@ class SkeletonHelper extends LineSegments {
 
 			if ( bone.parent && bone.parent.isBone ) {
 
-				_boneMatrix.multiplyMatrices( _matrixWorldInv, bone.matrixWorld );
-				_vector.setFromMatrixPosition( _boneMatrix );
+				mat4MultiplyMatrices( _matrixWorldInv, bone.matrixWorld, _boneMatrix );
+				vec3SetFromMatrixPosition( _boneMatrix, _vector );
 				position.setXYZ( j, _vector.x, _vector.y, _vector.z );
 
-				_boneMatrix.multiplyMatrices( _matrixWorldInv, bone.parent.matrixWorld );
-				_vector.setFromMatrixPosition( _boneMatrix );
+				mat4MultiplyMatrices( _matrixWorldInv, bone.parent.matrixWorld, _boneMatrix );
+				vec3SetFromMatrixPosition( _boneMatrix, _vector );
 				position.setXYZ( j + 1, _vector.x, _vector.y, _vector.z );
 
 				j += 2;

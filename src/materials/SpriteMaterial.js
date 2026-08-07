@@ -1,5 +1,6 @@
 import { Material } from './Material.js';
 import { Color } from '../math/Color.js';
+import { colorCopy } from '../math/ColorFunctions.js';
 
 /**
  * A material for rendering instances of {@link Sprite}.
@@ -122,7 +123,7 @@ class SpriteMaterial extends Material {
 
 		super.copy( source );
 
-		this.color.copy( source.color );
+		colorCopy( source.color, this.color );
 
 		this.map = source.map;
 

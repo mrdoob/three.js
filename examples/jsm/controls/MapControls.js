@@ -1,11 +1,24 @@
-import { MOUSE, TOUCH, Plane, Raycaster, Vector2, Vector3 } from 'three';
+import {
+	MOUSE,
+	TOUCH,
+	planeCreate,
+	planeSetFromNormalAndCoplanarPoint,
+	Raycaster,
+	rayIntersectPlane,
+	vec2Create,
+	vec3Copy,
+	vec3Create,
+	vec3Negate,
+	vec3Set,
+	vec3Sub
+} from 'three';
 
 import { OrbitControls } from './OrbitControls.js';
 
-const _plane = new Plane();
+const _plane = /*@__PURE__*/ planeCreate();
 const _raycaster = new Raycaster();
-const _mouse = new Vector2();
-const _panCurrent = new Vector3();
+const _mouse = /*@__PURE__*/ vec2Create();
+const _panCurrent = /*@__PURE__*/ vec3Create();
 
 /**
  * This class is intended for transforming a camera over a map from bird's eye perspective.
@@ -60,7 +73,7 @@ class MapControls extends OrbitControls {
 		 */
 		this.touches = { ONE: TOUCH.PAN, TWO: TOUCH.DOLLY_ROTATE };
 
-		this._panWorldStart = new Vector3();
+		this._panWorldStart = /*@__PURE__*/ vec3Create();
 
 	}
 
@@ -68,11 +81,11 @@ class MapControls extends OrbitControls {
 
 		super._handleMouseDownPan( event );
 
-		this._panOffset.set( 0, 0, 0 );
+		vec3Set( this._panOffset, 0, 0, 0 );
 
 		if ( this.screenSpacePanning === true ) return;
 
-		_plane.setFromNormalAndCoplanarPoint( this.object.up, this.target );
+		planeSetFromNormalAndCoplanarPoint( this.object.up, this.target, _plane );
 
 		const element = this.domElement;
 		const rect = element.getBoundingClientRect();
@@ -80,7 +93,7 @@ class MapControls extends OrbitControls {
 		_mouse.y = - ( ( event.clientY - rect.top ) / rect.height ) * 2 + 1;
 
 		_raycaster.setFromCamera( _mouse, this.object );
-		_raycaster.ray.intersectPlane( _plane, this._panWorldStart );
+		rayIntersectPlane( _raycaster.ray, _plane, this._panWorldStart );
 
 	}
 
@@ -100,10 +113,11 @@ class MapControls extends OrbitControls {
 
 		_raycaster.setFromCamera( _mouse, this.object );
 
-		if ( _raycaster.ray.intersectPlane( _plane, _panCurrent ) ) {
+		if ( rayIntersectPlane( _raycaster.ray, _plane, _panCurrent ) ) {
 
-			_panCurrent.sub( this._panWorldStart );
-			this._panOffset.copy( _panCurrent ).negate();
+			vec3Sub( _panCurrent, this._panWorldStart, _panCurrent );
+			vec3Copy( _panCurrent, this._panOffset );
+			vec3Negate( this._panOffset, this._panOffset );
 
 			this.update();
 

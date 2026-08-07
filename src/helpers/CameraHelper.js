@@ -1,13 +1,14 @@
 import { Camera } from '../cameras/Camera.js';
-import { Vector3 } from '../math/Vector3.js';
+import { colorSet } from '../math/ColorFunctions.js';
+import { mat4Copy } from '../math/Matrix4Functions.js';
+import { vec3Create, vec3Set, vec3Unproject } from '../math/Vector3Functions.js';
 import { LineSegments } from '../objects/LineSegments.js';
-import { Color } from '../math/Color.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../constants.js';
 
-const _vector = /*@__PURE__*/ new Vector3();
+const _vector = /*@__PURE__*/ vec3Create();
 const _camera = /*@__PURE__*/ new Camera();
 
 /**
@@ -144,11 +145,11 @@ class CameraHelper extends LineSegments {
 
 		// colors
 
-		const colorFrustum = new Color( 0xffaa00 );
-		const colorCone = new Color( 0xff0000 );
-		const colorUp = new Color( 0x00aaff );
-		const colorTarget = new Color( 0xffffff );
-		const colorCross = new Color( 0x333333 );
+		const colorFrustum = colorSet( 0xffaa00 );
+		const colorCone = colorSet( 0xff0000 );
+		const colorUp = colorSet( 0x00aaff );
+		const colorTarget = colorSet( 0xffffff );
+		const colorCross = colorSet( 0x333333 );
 
 		this.setColors( colorFrustum, colorCone, colorUp, colorTarget, colorCross );
 
@@ -238,7 +239,7 @@ class CameraHelper extends LineSegments {
 		// we need just camera projection matrix inverse
 		// world matrix must be identity
 
-		_camera.projectionMatrixInverse.copy( this.camera.projectionMatrixInverse );
+		mat4Copy( this.camera.projectionMatrixInverse, _camera.projectionMatrixInverse );
 
 		// Adjust z values based on coordinate system
 
@@ -326,7 +327,7 @@ class CameraHelper extends LineSegments {
 
 function setPoint( point, pointMap, geometry, camera, x, y, z ) {
 
-	_vector.set( x, y, z ).unproject( camera );
+	vec3Unproject( vec3Set( _vector, x, y, z ), camera, _vector );
 
 	const points = pointMap[ point ];
 

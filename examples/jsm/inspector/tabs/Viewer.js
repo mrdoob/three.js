@@ -4,10 +4,10 @@ import { Item } from '../ui/Item.js';
 import { splitPath, splitCamelCase } from '../ui/utils.js';
 import { getItem, setItem } from '../Inspector.js';
 
-import { RendererUtils, NoToneMapping, LinearSRGBColorSpace, QuadMesh, NodeMaterial, CanvasTarget, Vector2, Color } from 'three/webgpu';
+import { RendererUtils, NoToneMapping, LinearSRGBColorSpace, QuadMesh, NodeMaterial, CanvasTarget, vec2Create, colorCreate } from 'three/webgpu';
 import { renderOutput, vec2, vec3, vec4, Fn, screenUV, step, OnMaterialUpdate, uniform, float } from 'three/tsl';
 
-const _size = /*@__PURE__*/ new Vector2();
+const _size = /*@__PURE__*/ vec2Create();
 
 const splitIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><polyline points="5 8 1 12 5 16"></polyline><polyline points="19 8 23 12 19 16"></polyline></svg>';
 const fullscreenIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
@@ -950,7 +950,7 @@ class Viewer extends Tab {
 
 			// Render the split quad to the splitCanvasTarget
 			const previousCanvasTarget = renderer.getCanvasTarget();
-			const previousClearColor = renderer.getClearColor( new Color() );
+			const previousClearColor = renderer.getClearColor( colorCreate() );
 			const previousClearAlpha = renderer.getClearAlpha();
 
 			const state = RendererUtils.resetRendererState( renderer );
@@ -1195,10 +1195,10 @@ class Viewer extends Tab {
 					const oldWidth = child.width;
 					const oldHeight = child.height;
 
-					child.width = mainSize.width;
-					child.height = mainSize.height;
+					child.width = mainSize.x;
+					child.height = mainSize.y;
 
-					child.setSize( mainSize.width, mainSize.height );
+					child.setSize( mainSize.x, mainSize.y );
 
 					rttNodes.push( {
 						node: child,

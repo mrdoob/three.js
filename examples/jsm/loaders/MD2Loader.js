@@ -4,7 +4,8 @@ import {
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
-	Vector3
+	vec3Create,
+	vec3Set
 } from 'three';
 
 const _normalData = [
@@ -252,8 +253,8 @@ class MD2Loader extends Loader {
 
 		// frames
 
-		const translation = new Vector3();
-		const scale = new Vector3();
+		const translation = vec3Create();
+		const scale = vec3Create();
 
 		const frames = [];
 
@@ -261,13 +262,15 @@ class MD2Loader extends Loader {
 
 		for ( let i = 0, l = header.num_frames; i < l; i ++ ) {
 
-			scale.set(
+			vec3Set(
+				scale,
 				data.getFloat32( offset + 0, true ),
 				data.getFloat32( offset + 4, true ),
 				data.getFloat32( offset + 8, true )
 			);
 
-			translation.set(
+			vec3Set(
+				translation,
 				data.getFloat32( offset + 12, true ),
 				data.getFloat32( offset + 16, true ),
 				data.getFloat32( offset + 20, true )

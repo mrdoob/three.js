@@ -2,7 +2,7 @@ import { LineSegments } from '../objects/LineSegments.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
-import { Color } from '../math/Color.js';
+import { colorSet, colorToArray } from '../math/ColorFunctions.js';
 
 /**
  * The helper is an object to define grids. Grids are two-dimensional
@@ -30,8 +30,8 @@ class GridHelper extends LineSegments {
 	 */
 	constructor( size = 10, divisions = 10, color1 = 0x444444, color2 = 0x888888 ) {
 
-		color1 = new Color( color1 );
-		color2 = new Color( color2 );
+		color1 = colorSet( color1 );
+		color2 = colorSet( color2 );
 
 		const center = divisions / 2;
 		const step = size / divisions;
@@ -46,10 +46,10 @@ class GridHelper extends LineSegments {
 
 			const color = i === center ? color1 : color2;
 
-			color.toArray( colors, j ); j += 3;
-			color.toArray( colors, j ); j += 3;
-			color.toArray( colors, j ); j += 3;
-			color.toArray( colors, j ); j += 3;
+			colorToArray( color, colors, j ); j += 3;
+			colorToArray( color, colors, j ); j += 3;
+			colorToArray( color, colors, j ); j += 3;
+			colorToArray( color, colors, j ); j += 3;
 
 		}
 

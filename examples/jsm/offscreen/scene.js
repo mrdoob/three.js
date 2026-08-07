@@ -9,7 +9,7 @@ function init( canvas, width, height, pixelRatio, path ) {
 
 	scene = new THREE.Scene();
 	scene.fog = new THREE.Fog( 0x444466, 100, 400 );
-	scene.background = new THREE.Color( 0x444466 );
+	scene.background = THREE.colorSetHex( 0x444466, THREE.SRGBColorSpace, new THREE.Color() );
 
 	group = new THREE.Group();
 	scene.add( group );
@@ -34,10 +34,8 @@ function init( canvas, width, height, pixelRatio, path ) {
 
 			const material = materials[ i % materials.length ];
 			const mesh = new THREE.Mesh( geometry, material );
-			mesh.position.x = random() * 200 - 100;
-			mesh.position.y = random() * 200 - 100;
-			mesh.position.z = random() * 200 - 100;
-			mesh.scale.setScalar( random() + 1 );
+			THREE.vec3Set( mesh.position, random() * 200 - 100, random() * 200 - 100, random() * 200 - 100 );
+			THREE.vec3SetScalar( mesh.scale, random() + 1 );
 			group.add( mesh );
 
 		}

@@ -1,5 +1,5 @@
-import { Matrix3 } from '../../math/Matrix3.js';
-import { Plane } from '../../math/Plane.js';
+import { mat3Create, mat3GetNormalMatrix } from '../../math/Matrix3Functions.js';
+import { planeApplyMatrix4, planeCopy, planeCreate } from '../../math/PlaneFunctions.js';
 
 function WebGLClipping( properties ) {
 
@@ -10,8 +10,8 @@ function WebGLClipping( properties ) {
 		localClippingEnabled = false,
 		renderingShadows = false;
 
-	const plane = new Plane(),
-		viewNormalMatrix = new Matrix3(),
+	const plane = planeCreate(),
+		viewNormalMatrix = mat3Create(),
 
 		uniform = { value: null, needsUpdate: false };
 
@@ -134,7 +134,7 @@ function WebGLClipping( properties ) {
 				const flatSize = dstOffset + nPlanes * 4,
 					viewMatrix = camera.matrixWorldInverse;
 
-				viewNormalMatrix.getNormalMatrix( viewMatrix );
+				mat3GetNormalMatrix( viewMatrix, viewNormalMatrix );
 
 				if ( dstArray === null || dstArray.length < flatSize ) {
 
@@ -144,9 +144,12 @@ function WebGLClipping( properties ) {
 
 				for ( let i = 0, i4 = dstOffset; i !== nPlanes; ++ i, i4 += 4 ) {
 
-					plane.copy( planes[ i ] ).applyMatrix4( viewMatrix, viewNormalMatrix );
+					planeCopy( planes[ i ], plane );
+					planeApplyMatrix4( plane, viewMatrix, viewNormalMatrix, plane );
 
-					plane.normal.toArray( dstArray, i4 );
+					dstArray[ i4 ] = plane.normal.x;
+					dstArray[ i4 + 1 ] = plane.normal.y;
+					dstArray[ i4 + 2 ] = plane.normal.z;
 					dstArray[ i4 + 3 ] = plane.constant;
 
 				}

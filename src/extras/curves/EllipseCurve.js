@@ -1,5 +1,5 @@
 import { Curve } from '../core/Curve.js';
-import { Vector2 } from '../../math/Vector2.js';
+import { vec2Create, vec2Set } from '../../math/Vector2Functions.js';
 
 /**
  * A curve representing an ellipse.
@@ -128,7 +128,7 @@ class EllipseCurve extends Curve {
 	 * @param {Vector2} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector2} The position on the curve.
 	 */
-	getPoint( t, optionalTarget = new Vector2() ) {
+	getPoint( t, optionalTarget = vec2Create() ) {
 
 		const point = optionalTarget;
 
@@ -186,7 +186,7 @@ class EllipseCurve extends Curve {
 
 		}
 
-		return point.set( x, y );
+		return vec2Set( x, y, point );
 
 	}
 

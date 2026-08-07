@@ -1,10 +1,15 @@
-import { Quaternion } from './Quaternion.js';
-import { Matrix4 } from './Matrix4.js';
-import { clamp } from './MathUtils.js';
-import { warn } from '../utils.js';
-
-const _matrix = /*@__PURE__*/ new Matrix4();
-const _quaternion = /*@__PURE__*/ new Quaternion();
+import {
+	EULER_DEFAULT_ORDER,
+	eulerCopy,
+	eulerEquals,
+	eulerFromArray,
+	eulerReorder,
+	eulerSet,
+	eulerSetFromQuaternion,
+	eulerSetFromRotationMatrix,
+	eulerSetFromVector3,
+	eulerToArray
+} from './EulerFunctions.js';
 
 /**
  * A class representing Euler angles.
@@ -21,6 +26,12 @@ const _quaternion = /*@__PURE__*/ new Quaternion();
  * const b = new THREE.Vector3( 1, 0, 1 );
  * b.applyEuler(a);
  * ```
+ *
+ * `Euler` is a thin, backwards-compatible wrapper around the standalone,
+ * tree-shakeable `euler*` functions in {@link EulerFunctions}, which operate
+ * on any {@link EulerLike} object. Prefer importing those functions
+ * directly if you only need a handful of operations and want unused ones
+ * eliminated from your bundle.
  */
 class Euler {
 
@@ -137,10 +148,7 @@ class Euler {
 	 */
 	set( x, y, z, order = this._order ) {
 
-		this._x = x;
-		this._y = y;
-		this._z = z;
-		this._order = order;
+		eulerSet( x, y, z, order, this );
 
 		this._onChangeCallback();
 
@@ -167,10 +175,7 @@ class Euler {
 	 */
 	copy( euler ) {
 
-		this._x = euler._x;
-		this._y = euler._y;
-		this._z = euler._z;
-		this._order = euler._order;
+		eulerCopy( euler, this );
 
 		this._onChangeCallback();
 
@@ -188,128 +193,7 @@ class Euler {
 	 */
 	setFromRotationMatrix( m, order = this._order, update = true ) {
 
-		const te = m.elements;
-		const m11 = te[ 0 ], m12 = te[ 4 ], m13 = te[ 8 ];
-		const m21 = te[ 1 ], m22 = te[ 5 ], m23 = te[ 9 ];
-		const m31 = te[ 2 ], m32 = te[ 6 ], m33 = te[ 10 ];
-
-		switch ( order ) {
-
-			case 'XYZ':
-
-				this._y = Math.asin( clamp( m13, - 1, 1 ) );
-
-				if ( Math.abs( m13 ) < 0.9999999 ) {
-
-					this._x = Math.atan2( - m23, m33 );
-					this._z = Math.atan2( - m12, m11 );
-
-				} else {
-
-					this._x = Math.atan2( m32, m22 );
-					this._z = 0;
-
-				}
-
-				break;
-
-			case 'YXZ':
-
-				this._x = Math.asin( - clamp( m23, - 1, 1 ) );
-
-				if ( Math.abs( m23 ) < 0.9999999 ) {
-
-					this._y = Math.atan2( m13, m33 );
-					this._z = Math.atan2( m21, m22 );
-
-				} else {
-
-					this._y = Math.atan2( - m31, m11 );
-					this._z = 0;
-
-				}
-
-				break;
-
-			case 'ZXY':
-
-				this._x = Math.asin( clamp( m32, - 1, 1 ) );
-
-				if ( Math.abs( m32 ) < 0.9999999 ) {
-
-					this._y = Math.atan2( - m31, m33 );
-					this._z = Math.atan2( - m12, m22 );
-
-				} else {
-
-					this._y = 0;
-					this._z = Math.atan2( m21, m11 );
-
-				}
-
-				break;
-
-			case 'ZYX':
-
-				this._y = Math.asin( - clamp( m31, - 1, 1 ) );
-
-				if ( Math.abs( m31 ) < 0.9999999 ) {
-
-					this._x = Math.atan2( m32, m33 );
-					this._z = Math.atan2( m21, m11 );
-
-				} else {
-
-					this._x = 0;
-					this._z = Math.atan2( - m12, m22 );
-
-				}
-
-				break;
-
-			case 'YZX':
-
-				this._z = Math.asin( clamp( m21, - 1, 1 ) );
-
-				if ( Math.abs( m21 ) < 0.9999999 ) {
-
-					this._x = Math.atan2( - m23, m22 );
-					this._y = Math.atan2( - m31, m11 );
-
-				} else {
-
-					this._x = 0;
-					this._y = Math.atan2( m13, m33 );
-
-				}
-
-				break;
-
-			case 'XZY':
-
-				this._z = Math.asin( - clamp( m12, - 1, 1 ) );
-
-				if ( Math.abs( m12 ) < 0.9999999 ) {
-
-					this._x = Math.atan2( m32, m22 );
-					this._y = Math.atan2( m13, m11 );
-
-				} else {
-
-					this._x = Math.atan2( - m23, m33 );
-					this._y = 0;
-
-				}
-
-				break;
-
-			default:
-
-				warn( 'Euler: .setFromRotationMatrix() encountered an unknown order: ' + order );
-
-		}
-
-		this._order = order;
+		eulerSetFromRotationMatrix( m, order, this );
 
 		if ( update === true ) this._onChangeCallback();
 
@@ -327,9 +211,14 @@ class Euler {
 	 */
 	setFromQuaternion( q, order, update ) {
 
-		_matrix.makeRotationFromQuaternion( q );
+		eulerSetFromQuaternion( q, order, this );
 
-		return this.setFromRotationMatrix( _matrix, order, update );
+		// Match the historical quirk: `update` is forwarded as-is to the
+		// setFromRotationMatrix path, so the default `update = true` does
+		// NOT apply when the argument is omitted (undefined !== true).
+		if ( update === true ) this._onChangeCallback();
+
+		return this;
 
 	}
 
@@ -342,7 +231,11 @@ class Euler {
 	 */
 	setFromVector3( v, order = this._order ) {
 
-		return this.set( v.x, v.y, v.z, order );
+		eulerSetFromVector3( v, order, this );
+
+		this._onChangeCallback();
+
+		return this;
 
 	}
 
@@ -358,9 +251,11 @@ class Euler {
 	 */
 	reorder( newOrder ) {
 
-		_quaternion.setFromEuler( this );
+		// Delegates through setFromQuaternion without an explicit `update`,
+		// which historically does not fire `_onChangeCallback`.
+		eulerReorder( this, newOrder, this );
 
-		return this.setFromQuaternion( _quaternion, newOrder );
+		return this;
 
 	}
 
@@ -372,7 +267,7 @@ class Euler {
 	 */
 	equals( euler ) {
 
-		return ( euler._x === this._x ) && ( euler._y === this._y ) && ( euler._z === this._z ) && ( euler._order === this._order );
+		return eulerEquals( this, euler );
 
 	}
 
@@ -386,10 +281,7 @@ class Euler {
 	 */
 	fromArray( array ) {
 
-		this._x = array[ 0 ];
-		this._y = array[ 1 ];
-		this._z = array[ 2 ];
-		if ( array[ 3 ] !== undefined ) this._order = array[ 3 ];
+		eulerFromArray( array, this );
 
 		this._onChangeCallback();
 
@@ -407,12 +299,7 @@ class Euler {
 	 */
 	toArray( array = [], offset = 0 ) {
 
-		array[ offset ] = this._x;
-		array[ offset + 1 ] = this._y;
-		array[ offset + 2 ] = this._z;
-		array[ offset + 3 ] = this._order;
-
-		return array;
+		return eulerToArray( this, array, offset );
 
 	}
 
@@ -444,6 +331,6 @@ class Euler {
  * @type {string}
  * @default 'XYZ'
  */
-Euler.DEFAULT_ORDER = 'XYZ';
+Euler.DEFAULT_ORDER = EULER_DEFAULT_ORDER;
 
 export { Euler };

@@ -2,11 +2,13 @@ import {
 	WebGLRenderTarget,
 	MeshNormalMaterial,
 	ShaderMaterial,
-	Vector2,
-	Vector4,
 	DepthTexture,
 	NearestFilter,
-	HalfFloatType
+	HalfFloatType,
+	vec2Create,
+	vec2Set,
+	vec4Create,
+	vec4Set
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 
@@ -81,8 +83,8 @@ class RenderPixelatedPass extends Pass {
 
 		// internals
 
-		this._resolution = new Vector2();
-		this._renderResolution = new Vector2();
+		this._resolution = vec2Create();
+		this._renderResolution = vec2Create();
 
 		this._normalMaterial = new MeshNormalMaterial();
 
@@ -125,12 +127,12 @@ class RenderPixelatedPass extends Pass {
 	 */
 	setSize( width, height ) {
 
-		this._resolution.set( width, height );
-		this._renderResolution.set( ( width / this.pixelSize ) | 0, ( height / this.pixelSize ) | 0 );
+		vec2Set( width, height, this._resolution );
+		vec2Set( ( width / this.pixelSize ) | 0, ( height / this.pixelSize ) | 0, this._renderResolution );
 		const { x, y } = this._renderResolution;
 		this._beautyRenderTarget.setSize( x, y );
 		this._normalRenderTarget.setSize( x, y );
-		this._fsQuad.material.uniforms.resolution.value.set( x, y, 1 / x, 1 / y );
+		vec4Set( x, y, 1 / x, 1 / y, this._fsQuad.material.uniforms.resolution.value );
 
 	}
 
@@ -201,7 +203,7 @@ class RenderPixelatedPass extends Pass {
 				tDiffuse: { value: null },
 				tDepth: { value: null },
 				tNormal: { value: null },
-				resolution: { value: new Vector4() },
+				resolution: { value: vec4Create() },
 				normalEdgeStrength: { value: 0 },
 				depthEdgeStrength: { value: 0 }
 			},

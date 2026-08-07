@@ -1,5 +1,6 @@
 import {
-	Vector2
+	vec2Create,
+	vec2MultiplyScalar
 } from 'three';
 
 /**
@@ -30,8 +31,8 @@ const DepthLimitedBlurShader = {
 
 	uniforms: {
 		'tDiffuse': { value: null },
-		'size': { value: new Vector2( 512, 512 ) },
-		'sampleUvOffsets': { value: [ new Vector2( 0, 0 ) ] },
+		'size': { value: vec2Create( 512, 512 ) },
+		'sampleUvOffsets': { value: [ vec2Create( 0, 0 ) ] },
 		'sampleWeights': { value: [ 1.0 ] },
 		'tDepth': { value: null },
 		'cameraNear': { value: 10 },
@@ -155,7 +156,7 @@ const BlurShaderUtils = {
 
 		for ( let i = 0; i <= kernelRadius; i ++ ) {
 
-			offsets.push( uvIncrement.clone().multiplyScalar( i ) );
+			offsets.push( vec2MultiplyScalar( uvIncrement, i ) );
 
 		}
 

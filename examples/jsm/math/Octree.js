@@ -1,43 +1,75 @@
 import {
-	Box3,
-	Line3,
-	Plane,
-	Sphere,
-	Triangle,
-	Vector3,
-	Layers
+	Layers,
+	box3Copy,
+	box3Create,
+	box3GetCenter,
+	box3IntersectsBox,
+	box3IntersectsTriangle,
+	box3MakeEmpty,
+	box3Translate,
+	line3ClosestPointToPoint,
+	line3Create,
+	line3Set,
+	planeCreate,
+	planeDistanceToPoint,
+	planeDistanceToSphere,
+	planeProjectPoint,
+	rayIntersectTriangle,
+	rayIntersectsBox,
+	sphereCopy,
+	sphereCreate,
+	sphereIntersectsBox,
+	sphereIntersectsPlane,
+	triangleContainsPoint,
+	triangleGetPlane,
+	vec3Add,
+	vec3AddScaledVector,
+	vec3ApplyMatrix4,
+	vec3Copy,
+	vec3Create,
+	vec3DistanceTo,
+	vec3DistanceToSquared,
+	vec3Dot,
+	vec3FromBufferAttribute,
+	vec3Length,
+	vec3Lerp,
+	vec3Multiply,
+	vec3MultiplyScalar,
+	vec3Normalize,
+	vec3Set,
+	vec3Sub
 } from 'three';
 import { Capsule } from '../math/Capsule.js';
 
 
-const _v1 = new Vector3();
-const _v2 = new Vector3();
-const _point1 = new Vector3();
-const _point2 = new Vector3();
-const _plane = new Plane();
-const _line1 = new Line3();
-const _line2 = new Line3();
-const _box = new Box3();
-const _sphere = new Sphere();
+const _v1 = /*@__PURE__*/ vec3Create();
+const _v2 = /*@__PURE__*/ vec3Create();
+const _point1 = /*@__PURE__*/ vec3Create();
+const _point2 = /*@__PURE__*/ vec3Create();
+const _plane = /*@__PURE__*/ planeCreate();
+const _line1 = /*@__PURE__*/ line3Create();
+const _line2 = /*@__PURE__*/ line3Create();
+const _box = /*@__PURE__*/ box3Create();
+const _sphere = /*@__PURE__*/ sphereCreate();
 const _capsule = new Capsule();
-const _center = new Vector3();
+const _center = /*@__PURE__*/ vec3Create();
 
-const _temp1 = new Vector3();
-const _temp2 = new Vector3();
-const _temp3 = new Vector3();
+const _temp1 = /*@__PURE__*/ vec3Create();
+const _temp2 = /*@__PURE__*/ vec3Create();
+const _temp3 = /*@__PURE__*/ vec3Create();
 const EPS = 1e-10;
 
 function lineToLineClosestPoints( line1, line2, target1 = null, target2 = null ) {
 
-	const r = _temp1.copy( line1.end ).sub( line1.start );
-	const s = _temp2.copy( line2.end ).sub( line2.start );
-	const w = _temp3.copy( line2.start ).sub( line1.start );
+	vec3Sub( vec3Copy( line1.end, _temp1 ), line1.start, _temp1 );
+	vec3Sub( vec3Copy( line2.end, _temp2 ), line2.start, _temp2 );
+	vec3Sub( vec3Copy( line2.start, _temp3 ), line1.start, _temp3 );
 
-	const a = r.dot( s ),
-		b = r.dot( r ),
-		c = s.dot( s ),
-		d = s.dot( w ),
-		e = r.dot( w );
+	const a = vec3Dot( _temp1, _temp2 ),
+		b = vec3Dot( _temp1, _temp1 ),
+		c = vec3Dot( _temp2, _temp2 ),
+		d = vec3Dot( _temp2, _temp3 ),
+		e = vec3Dot( _temp1, _temp3 );
 
 	let t1, t2;
 	const divisor = b * c - a * a;
@@ -71,13 +103,13 @@ function lineToLineClosestPoints( line1, line2, target1 = null, target2 = null )
 
 	if ( target1 ) {
 
-		target1.copy( r ).multiplyScalar( t1 ).add( line1.start );
+		vec3Add( vec3MultiplyScalar( vec3Copy( _temp1, target1 ), t1, target1 ), line1.start, target1 );
 
 	}
 
 	if ( target2 ) {
 
-		target2.copy( s ).multiplyScalar( t2 ).add( line2.start );
+		vec3Add( vec3MultiplyScalar( vec3Copy( _temp2, target2 ), t2, target2 ), line2.start, target2 );
 
 	}
 
@@ -123,7 +155,7 @@ class Octree {
 		 *
 		 * @type {Box3}
 		 */
-		this.bounds = new Box3();
+		this.bounds = box3Create();
 
 		/**
 		 * Can by used for layers configuration for refine testing.
@@ -185,7 +217,7 @@ class Octree {
 	 */
 	calcBox() {
 
-		this.box = this.bounds.clone();
+		this.box = box3Copy( this.bounds );
 
 		// offset small amount to account for regular grid
 		this.box.min.x -= 0.01;
@@ -208,7 +240,7 @@ class Octree {
 		if ( ! this.box ) return;
 
 		const subTrees = [];
-		const halfsize = _v2.copy( this.box.max ).sub( this.box.min ).multiplyScalar( 0.5 );
+		vec3MultiplyScalar( vec3Sub( vec3Copy( this.box.max, _v2 ), this.box.min, _v2 ), 0.5, _v2 );
 
 		for ( let x = 0; x < 2; x ++ ) {
 
@@ -216,11 +248,12 @@ class Octree {
 
 				for ( let z = 0; z < 2; z ++ ) {
 
-					const box = new Box3();
-					const v = _v1.set( x, y, z );
+					const box = box3Create();
 
-					box.min.copy( this.box.min ).add( v.multiply( halfsize ) );
-					box.max.copy( box.min ).add( halfsize );
+					vec3Set( _v1, x, y, z );
+
+					vec3Add( vec3Copy( this.box.min, box.min ), vec3Multiply( _v1, _v2, _v1 ), box.min );
+					vec3Add( vec3Copy( box.min, box.max ), _v2, box.max );
 
 					subTrees.push( new Octree( box ) );
 
@@ -236,7 +269,7 @@ class Octree {
 
 			for ( let i = 0; i < subTrees.length; i ++ ) {
 
-				if ( subTrees[ i ].box.intersectsTriangle( triangle ) ) {
+				if ( box3IntersectsTriangle( subTrees[ i ].box, triangle ) ) {
 
 					subTrees[ i ].triangles.push( triangle );
 
@@ -293,7 +326,7 @@ class Octree {
 		for ( let i = 0; i < this.subTrees.length; i ++ ) {
 
 			const subTree = this.subTrees[ i ];
-			if ( ! ray.intersectsBox( subTree.box ) ) continue;
+			if ( ! rayIntersectsBox( ray, subTree.box ) ) continue;
 
 			if ( subTree.triangles.length > 0 ) {
 
@@ -323,10 +356,10 @@ class Octree {
 	 */
 	triangleCapsuleIntersect( capsule, triangle ) {
 
-		triangle.getPlane( _plane );
+		triangleGetPlane( triangle, _plane );
 
-		const d1 = _plane.distanceToPoint( capsule.start ) - capsule.radius;
-		const d2 = _plane.distanceToPoint( capsule.end ) - capsule.radius;
+		const d1 = planeDistanceToPoint( _plane, capsule.start ) - capsule.radius;
+		const d2 = planeDistanceToPoint( _plane, capsule.end ) - capsule.radius;
 
 		if ( ( d1 > 0 && d2 > 0 ) || ( d1 < - capsule.radius && d2 < - capsule.radius ) ) {
 
@@ -335,17 +368,17 @@ class Octree {
 		}
 
 		const delta = Math.abs( d1 / ( Math.abs( d1 ) + Math.abs( d2 ) ) );
-		const intersectPoint = _v1.copy( capsule.start ).lerp( capsule.end, delta );
+		vec3Lerp( capsule.start, capsule.end, delta, _v1 );
 
-		if ( triangle.containsPoint( intersectPoint ) ) {
+		if ( triangleContainsPoint( _v1, triangle.a, triangle.b, triangle.c ) ) {
 
-			return { normal: _plane.normal.clone(), point: intersectPoint.clone(), depth: Math.abs( Math.min( d1, d2 ) ) };
+			return { normal: vec3Copy( _plane.normal ), point: vec3Copy( _v1 ), depth: Math.abs( Math.min( d1, d2 ) ) };
 
 		}
 
 		const r2 = capsule.radius * capsule.radius;
 
-		const line1 = _line1.set( capsule.start, capsule.end );
+		line3Set( capsule.start, capsule.end, _line1 );
 
 		const lines = [
 			[ triangle.a, triangle.b ],
@@ -355,16 +388,16 @@ class Octree {
 
 		for ( let i = 0; i < lines.length; i ++ ) {
 
-			const line2 = _line2.set( lines[ i ][ 0 ], lines[ i ][ 1 ] );
+			line3Set( lines[ i ][ 0 ], lines[ i ][ 1 ], _line2 );
 
-			lineToLineClosestPoints( line1, line2, _point1, _point2 );
+			lineToLineClosestPoints( _line1, _line2, _point1, _point2 );
 
-			if ( _point1.distanceToSquared( _point2 ) < r2 ) {
+			if ( vec3DistanceToSquared( _point1, _point2 ) < r2 ) {
 
 				return {
-					normal: _point1.clone().sub( _point2 ).normalize(),
-					point: _point2.clone(),
-					depth: capsule.radius - _point1.distanceTo( _point2 )
+					normal: vec3Normalize( vec3Sub( _point1, _point2 ) ),
+					point: vec3Copy( _point2 ),
+					depth: capsule.radius - vec3DistanceTo( _point1, _point2 )
 				};
 
 			}
@@ -400,11 +433,11 @@ class Octree {
 
 		// expensive check
 
-		if ( ! box.intersectsTriangle( triangle ) ) return false;
+		if ( ! box3IntersectsTriangle( box, triangle ) ) return false;
 
 		// there is an intersection, now compute collision data
 
-		triangle.getPlane( _plane );
+		triangleGetPlane( triangle, _plane );
 
 		// determine which corner of the box is "deepest" into the plane
 
@@ -415,16 +448,16 @@ class Octree {
 		// Calculate the distance from the plane to that corner (the distance will be negative
 		// because of the intersection)
 
-		const distance = _plane.distanceToPoint( _v1 );
+		const distance = planeDistanceToPoint( _plane, _v1 );
 
 		const intersection = {
 			depth: - distance, // Flip sign so depth is positive
-			normal: _plane.normal.clone(),
-			point: _v1.clone()
+			normal: vec3Copy( _plane.normal ),
+			point: vec3Copy( _v1 )
 		};
 
 		// project the point onto the triangle surface
-		intersection.point.addScaledVector( intersection.normal, distance );
+		vec3AddScaledVector( intersection.point, intersection.normal, distance, intersection.point );
 
 		return intersection;
 
@@ -440,18 +473,18 @@ class Octree {
 	 */
 	triangleSphereIntersect( sphere, triangle ) {
 
-		triangle.getPlane( _plane );
+		triangleGetPlane( triangle, _plane );
 
-		if ( ! sphere.intersectsPlane( _plane ) ) return false;
+		if ( ! sphereIntersectsPlane( sphere, _plane ) ) return false;
 
-		const depth = Math.abs( _plane.distanceToSphere( sphere ) );
+		const depth = Math.abs( planeDistanceToSphere( _plane, sphere ) );
 		const r2 = sphere.radius * sphere.radius - depth * depth;
 
-		const plainPoint = _plane.projectPoint( sphere.center, _v1 );
+		planeProjectPoint( _plane, sphere.center, _v1 );
 
-		if ( triangle.containsPoint( sphere.center ) ) {
+		if ( triangleContainsPoint( sphere.center, triangle.a, triangle.b, triangle.c ) ) {
 
-			return { normal: _plane.normal.clone(), point: plainPoint.clone(), depth: Math.abs( _plane.distanceToSphere( sphere ) ) };
+			return { normal: vec3Copy( _plane.normal ), point: vec3Copy( _v1 ), depth: Math.abs( planeDistanceToSphere( _plane, sphere ) ) };
 
 		}
 
@@ -463,14 +496,14 @@ class Octree {
 
 		for ( let i = 0; i < lines.length; i ++ ) {
 
-			_line1.set( lines[ i ][ 0 ], lines[ i ][ 1 ] );
-			_line1.closestPointToPoint( plainPoint, true, _v2 );
+			line3Set( lines[ i ][ 0 ], lines[ i ][ 1 ], _line1 );
+			line3ClosestPointToPoint( _line1, _v1, true, _v2 );
 
-			const d = _v2.distanceToSquared( sphere.center );
+			const d = vec3DistanceToSquared( _v2, sphere.center );
 
 			if ( d < r2 ) {
 
-				return { normal: sphere.center.clone().sub( _v2 ).normalize(), point: _v2.clone(), depth: sphere.radius - Math.sqrt( d ) };
+				return { normal: vec3Normalize( vec3Sub( sphere.center, _v2 ) ), point: vec3Copy( _v2 ), depth: sphere.radius - Math.sqrt( d ) };
 
 			}
 
@@ -492,7 +525,7 @@ class Octree {
 
 			const subTree = this.subTrees[ i ];
 
-			if ( ! sphere.intersectsBox( subTree.box ) ) continue;
+			if ( ! sphereIntersectsBox( sphere, subTree.box ) ) continue;
 
 			if ( subTree.triangles.length > 0 ) {
 
@@ -524,7 +557,7 @@ class Octree {
 
 			const subTree = this.subTrees[ i ];
 
-			if ( ! box.intersectsBox( subTree.box ) ) continue;
+			if ( ! box3IntersectsBox( box, subTree.box ) ) continue;
 
 			if ( subTree.triangles.length > 0 ) {
 
@@ -585,7 +618,7 @@ class Octree {
 	 */
 	boxIntersect( box ) {
 
-		_box.copy( box );
+		box3Copy( box, _box );
 
 		const triangles = [];
 		let result, hit = false;
@@ -598,7 +631,7 @@ class Octree {
 
 				hit = true;
 
-				_box.translate( result.normal.multiplyScalar( result.depth ) );
+				box3Translate( _box, vec3MultiplyScalar( result.normal, result.depth, result.normal ), _box );
 
 			}
 
@@ -606,10 +639,10 @@ class Octree {
 
 		if ( hit ) {
 
-			const collisionVector = _box.getCenter( _center ).sub( box.getCenter( _v1 ) );
-			const depth = collisionVector.length();
+			vec3Sub( box3GetCenter( _box, _center ), box3GetCenter( box, _v1 ), _center );
+			const depth = vec3Length( _center );
 
-			return { normal: collisionVector.normalize(), depth: depth };
+			return { normal: vec3Normalize( _center, _center ), depth: depth };
 
 		}
 
@@ -626,7 +659,7 @@ class Octree {
 	 */
 	sphereIntersect( sphere ) {
 
-		_sphere.copy( sphere );
+		sphereCopy( sphere, _sphere );
 
 		const triangles = [];
 		let result, hit = false;
@@ -639,7 +672,7 @@ class Octree {
 
 				hit = true;
 
-				_sphere.center.add( result.normal.multiplyScalar( result.depth ) );
+				vec3Add( _sphere.center, vec3MultiplyScalar( result.normal, result.depth, result.normal ), _sphere.center );
 
 			}
 
@@ -647,10 +680,10 @@ class Octree {
 
 		if ( hit ) {
 
-			const collisionVector = _sphere.center.clone().sub( sphere.center );
-			const depth = collisionVector.length();
+			const collisionVector = vec3Sub( _sphere.center, sphere.center );
+			const depth = vec3Length( collisionVector );
 
-			return { normal: collisionVector.normalize(), depth: depth };
+			return { normal: vec3Normalize( collisionVector, collisionVector ), depth: depth };
 
 		}
 
@@ -680,7 +713,7 @@ class Octree {
 
 				hit = true;
 
-				_capsule.translate( result.normal.multiplyScalar( result.depth ) );
+				_capsule.translate( vec3MultiplyScalar( result.normal, result.depth, result.normal ) );
 
 			}
 
@@ -688,10 +721,12 @@ class Octree {
 
 		if ( hit ) {
 
-			const collisionVector = _capsule.getCenter( _center ).sub( capsule.getCenter( _v1 ) );
-			const depth = collisionVector.length();
+			_capsule.getCenter( _center );
+			capsule.getCenter( _v1 );
+			vec3Sub( _center, _v1, _center );
+			const depth = vec3Length( _center );
 
-			return { normal: collisionVector.normalize(), depth: depth };
+			return { normal: vec3Normalize( _center, _center ), depth: depth };
 
 		}
 
@@ -715,15 +750,15 @@ class Octree {
 
 		for ( let i = 0; i < triangles.length; i ++ ) {
 
-			const result = ray.intersectTriangle( triangles[ i ].a, triangles[ i ].b, triangles[ i ].c, true, _v1 );
+			const result = rayIntersectTriangle( ray, triangles[ i ].a, triangles[ i ].b, triangles[ i ].c, true, _v1 );
 
 			if ( result ) {
 
-				const newdistance = result.sub( ray.origin ).length();
+				const newdistance = vec3Length( vec3Sub( result, ray.origin, _temp1 ) );
 
 				if ( distance > newdistance ) {
 
-					position = result.clone().add( ray.origin );
+					position = vec3Add( vec3Copy( _temp1 ), ray.origin );
 					distance = newdistance;
 					triangle = triangles[ i ];
 
@@ -770,15 +805,15 @@ class Octree {
 
 					for ( let i = 0; i < positionAttribute.count; i += 3 ) {
 
-						const v1 = new Vector3().fromBufferAttribute( positionAttribute, i );
-						const v2 = new Vector3().fromBufferAttribute( positionAttribute, i + 1 );
-						const v3 = new Vector3().fromBufferAttribute( positionAttribute, i + 2 );
+						const v1 = vec3FromBufferAttribute( positionAttribute, i );
+						const v2 = vec3FromBufferAttribute( positionAttribute, i + 1 );
+						const v3 = vec3FromBufferAttribute( positionAttribute, i + 2 );
 
-						v1.applyMatrix4( obj.matrixWorld );
-						v2.applyMatrix4( obj.matrixWorld );
-						v3.applyMatrix4( obj.matrixWorld );
+						vec3ApplyMatrix4( v1, obj.matrixWorld, v1 );
+						vec3ApplyMatrix4( v2, obj.matrixWorld, v2 );
+						vec3ApplyMatrix4( v3, obj.matrixWorld, v3 );
 
-						this.addTriangle( new Triangle( v1, v2, v3 ) );
+						this.addTriangle( { a: v1, b: v2, c: v3 } );
 
 					}
 
@@ -808,7 +843,7 @@ class Octree {
 	clear() {
 
 		this.box = null;
-		this.bounds.makeEmpty();
+		box3MakeEmpty( this.bounds );
 
 		this.subTrees.length = 0;
 		this.triangles.length = 0;

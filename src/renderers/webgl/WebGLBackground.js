@@ -2,23 +2,23 @@ import { BackSide, FrontSide, CubeUVReflectionMapping, SRGBTransfer } from '../.
 import { BoxGeometry } from '../../geometries/BoxGeometry.js';
 import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
-import { Color } from '../../math/Color.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
-import { Matrix3 } from '../../math/Matrix3.js';
-import { Matrix4 } from '../../math/Matrix4.js';
+import { colorCreate, colorGetRGB, colorSet } from '../../math/ColorFunctions.js';
+import { mat3Copy, mat3Create, mat3PreMultiply, mat3Set, mat3SetFromMatrix4, mat3Transpose } from '../../math/Matrix3Functions.js';
+import { mat4Create, mat4MakeRotationFromEuler } from '../../math/Matrix4Functions.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
 import { cloneUniforms, getUnlitUniformColorSpace } from '../shaders/UniformsUtils.js';
 
 const _rgb = { r: 0, b: 0, g: 0 };
-const _m1 = /*@__PURE__*/ new Matrix4();
-const _m = /*@__PURE__*/ new Matrix3();
+const _m1 = /*@__PURE__*/ mat4Create();
+const _m = /*@__PURE__*/ mat3Create();
 
-_m.set( - 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 );
+mat3Set( _m, - 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 );
 
 function WebGLBackground( renderer, environments, state, objects, alpha, premultipliedAlpha ) {
 
-	const clearColor = new Color( 0x000000 );
+	const clearColor = colorSet( 0x000000, undefined, undefined, colorCreate() );
 	let clearAlpha = alpha === true ? 0 : 1;
 
 	let planeMesh;
@@ -139,11 +139,13 @@ function WebGLBackground( renderer, environments, state, objects, alpha, premult
 
 
 			// note: since the matrix is orthonormal, we can use the more-efficient transpose() in lieu of invert()
-			boxMesh.material.uniforms.backgroundRotation.value.setFromMatrix4( _m1.makeRotationFromEuler( scene.backgroundRotation ) ).transpose();
+			mat4MakeRotationFromEuler( scene.backgroundRotation, _m1 );
+			mat3SetFromMatrix4( _m1, boxMesh.material.uniforms.backgroundRotation.value );
+			mat3Transpose( boxMesh.material.uniforms.backgroundRotation.value, boxMesh.material.uniforms.backgroundRotation.value );
 
 			if ( background.isCubeTexture && background.isRenderTargetTexture === false ) {
 
-				boxMesh.material.uniforms.backgroundRotation.value.premultiply( _m );
+				mat3PreMultiply( boxMesh.material.uniforms.backgroundRotation.value, _m, boxMesh.material.uniforms.backgroundRotation.value );
 
 			}
 
@@ -213,7 +215,7 @@ function WebGLBackground( renderer, environments, state, objects, alpha, premult
 
 			}
 
-			planeMesh.material.uniforms.uvTransform.value.copy( background.matrix );
+			mat3Copy( background.matrix, planeMesh.material.uniforms.uvTransform.value );
 
 			if ( currentBackground !== background ||
 				currentBackgroundVersion !== background.version ||
@@ -238,7 +240,7 @@ function WebGLBackground( renderer, environments, state, objects, alpha, premult
 
 	function setClear( color, alpha ) {
 
-		color.getRGB( _rgb, getUnlitUniformColorSpace( renderer ) );
+		colorGetRGB( color, _rgb, getUnlitUniformColorSpace( renderer ) );
 
 		state.buffers.color.setClear( _rgb.r, _rgb.g, _rgb.b, alpha, premultipliedAlpha );
 
@@ -275,7 +277,7 @@ function WebGLBackground( renderer, environments, state, objects, alpha, premult
 		},
 		setClearColor: function ( color, alpha = 1 ) {
 
-			clearColor.set( color );
+			colorSet( color, undefined, undefined, clearColor );
 			clearAlpha = alpha;
 			setClear( clearColor, clearAlpha );
 

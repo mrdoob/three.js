@@ -1,8 +1,8 @@
-import { Vector3 } from '../math/Vector3.js';
+import { vec3Create, vec3SetFromMatrixPosition, vec3DistanceTo } from '../math/Vector3Functions.js';
 import { Object3D } from '../core/Object3D.js';
 
-const _v1 = /*@__PURE__*/ new Vector3();
-const _v2 = /*@__PURE__*/ new Vector3();
+const _v1 = /*@__PURE__*/ vec3Create();
+const _v2 = /*@__PURE__*/ vec3Create();
 
 /**
  * A component for providing a basic Level of Detail (LOD) mechanism.
@@ -231,9 +231,9 @@ class LOD extends Object3D {
 
 		if ( levels.length > 0 ) {
 
-			_v1.setFromMatrixPosition( this.matrixWorld );
+			vec3SetFromMatrixPosition( this.matrixWorld, _v1 );
 
-			const distance = raycaster.ray.origin.distanceTo( _v1 );
+			const distance = vec3DistanceTo( raycaster.ray.origin, _v1 );
 
 			this.getObjectForDistance( distance ).raycast( raycaster, intersects );
 
@@ -253,10 +253,10 @@ class LOD extends Object3D {
 
 		if ( levels.length > 1 ) {
 
-			_v1.setFromMatrixPosition( camera.matrixWorld );
-			_v2.setFromMatrixPosition( this.matrixWorld );
+			vec3SetFromMatrixPosition( camera.matrixWorld, _v1 );
+			vec3SetFromMatrixPosition( this.matrixWorld, _v2 );
 
-			const distance = _v1.distanceTo( _v2 ) / camera.zoom;
+			const distance = vec3DistanceTo( _v1, _v2 ) / camera.zoom;
 
 			levels[ 0 ].object.visible = true;
 

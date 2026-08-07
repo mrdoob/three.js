@@ -1,3 +1,4 @@
+import { quatCopy, vec3Copy } from 'three';
 import { GLTFLoader } from '../loaders/GLTFLoader.js';
 import { clone } from '../utils/SkeletonUtils.js';
 
@@ -158,10 +159,8 @@ class XRHandMeshModel {
 
 				if ( XRJoint.visible ) {
 
-					const position = XRJoint.position;
-
-					bone.position.copy( position );
-					bone.quaternion.copy( XRJoint.quaternion );
+					vec3Copy( XRJoint.position, bone.position );
+					quatCopy( XRJoint.quaternion, bone.quaternion );
 					// bone.scale.setScalar( XRJoint.jointRadius || defaultRadius );
 
 				}

@@ -1,8 +1,20 @@
-import { clamp } from './MathUtils.js';
+import {
+	sphericalCopy,
+	sphericalMakeSafe,
+	sphericalSet,
+	sphericalSetFromCartesianCoords,
+	sphericalSetFromVector3
+} from './SphericalFunctions.js';
 
 /**
  * This class can be used to represent points in 3D space as
  * [Spherical coordinates](https://en.wikipedia.org/wiki/Spherical_coordinate_system).
+ *
+ * `Spherical` is a thin, backwards-compatible wrapper around the standalone,
+ * tree-shakeable `spherical*` functions in {@link SphericalFunctions}, which
+ * operate on any {@link SphericalLike} object. Prefer importing those
+ * functions directly if you only need a handful of operations and want
+ * unused ones eliminated from your bundle.
  */
 class Spherical {
 
@@ -51,11 +63,7 @@ class Spherical {
 	 */
 	set( radius, phi, theta ) {
 
-		this.radius = radius;
-		this.phi = phi;
-		this.theta = theta;
-
-		return this;
+		return sphericalSet( this, radius, phi, theta );
 
 	}
 
@@ -67,11 +75,7 @@ class Spherical {
 	 */
 	copy( other ) {
 
-		this.radius = other.radius;
-		this.phi = other.phi;
-		this.theta = other.theta;
-
-		return this;
+		return sphericalCopy( other, this );
 
 	}
 
@@ -83,10 +87,7 @@ class Spherical {
 	 */
 	makeSafe() {
 
-		const EPS = 0.000001;
-		this.phi = clamp( this.phi, EPS, Math.PI - EPS );
-
-		return this;
+		return sphericalMakeSafe( this, this );
 
 	}
 
@@ -99,7 +100,7 @@ class Spherical {
 	 */
 	setFromVector3( v ) {
 
-		return this.setFromCartesianCoords( v.x, v.y, v.z );
+		return sphericalSetFromVector3( v, this );
 
 	}
 
@@ -113,21 +114,7 @@ class Spherical {
 	 */
 	setFromCartesianCoords( x, y, z ) {
 
-		this.radius = Math.sqrt( x * x + y * y + z * z );
-
-		if ( this.radius === 0 ) {
-
-			this.theta = 0;
-			this.phi = 0;
-
-		} else {
-
-			this.theta = Math.atan2( x, z );
-			this.phi = Math.acos( clamp( y / this.radius, - 1, 1 ) );
-
-		}
-
-		return this;
+		return sphericalSetFromCartesianCoords( x, y, z, this );
 
 	}
 

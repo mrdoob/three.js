@@ -1,8 +1,13 @@
 import {
-	Matrix4,
 	Object3D,
 	Vector2,
-	Vector3
+	mat4Copy,
+	mat4Create,
+	mat4MultiplyMatrices,
+	vec3ApplyMatrix4,
+	vec3Create,
+	vec3DistanceToSquared,
+	vec3SetFromMatrixPosition
 } from 'three';
 
 /**
@@ -101,11 +106,11 @@ class CSS2DObject extends Object3D {
 
 //
 
-const _vector = new Vector3();
-const _viewMatrix = new Matrix4();
-const _viewProjectionMatrix = new Matrix4();
-const _a = new Vector3();
-const _b = new Vector3();
+const _vector = /*@__PURE__*/ vec3Create();
+const _viewMatrix = /*@__PURE__*/ mat4Create();
+const _viewProjectionMatrix = /*@__PURE__*/ mat4Create();
+const _a = /*@__PURE__*/ vec3Create();
+const _b = /*@__PURE__*/ vec3Create();
 
 /**
  * This renderer is a simplified version of {@link CSS3DRenderer}. The only transformations that
@@ -183,8 +188,8 @@ class CSS2DRenderer {
 			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
-			_viewMatrix.copy( camera.matrixWorldInverse );
-			_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
+			mat4Copy( camera.matrixWorldInverse, _viewMatrix );
+			mat4MultiplyMatrices( camera.projectionMatrix, _viewMatrix, _viewProjectionMatrix );
 
 			renderObject( scene, scene, camera );
 			if ( this.sortObjects ) zOrder( scene );
@@ -234,8 +239,8 @@ class CSS2DRenderer {
 
 			if ( object.isCSS2DObject ) {
 
-				_vector.setFromMatrixPosition( object.matrixWorld );
-				_vector.applyMatrix4( _viewProjectionMatrix );
+				vec3SetFromMatrixPosition( object.matrixWorld, _vector );
+				vec3ApplyMatrix4( _vector, _viewProjectionMatrix, _vector );
 
 				const visible = ( _vector.z >= - 1 && _vector.z <= 1 ) && ( object.layers.test( camera.layers ) === true );
 
@@ -289,10 +294,10 @@ class CSS2DRenderer {
 
 		function getDistanceToSquared( object1, object2 ) {
 
-			_a.setFromMatrixPosition( object1.matrixWorld );
-			_b.setFromMatrixPosition( object2.matrixWorld );
+			vec3SetFromMatrixPosition( object1.matrixWorld, _a );
+			vec3SetFromMatrixPosition( object2.matrixWorld, _b );
 
-			return _a.distanceToSquared( _b );
+			return vec3DistanceToSquared( _a, _b );
 
 		}
 

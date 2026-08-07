@@ -1,4 +1,4 @@
-import { Color, Node } from 'three/webgpu';
+import { Node, colorCreate, colorSetScalar } from 'three/webgpu';
 import { NodeUpdateType, renderGroup, uniform } from 'three/tsl';
 
 /**
@@ -18,10 +18,10 @@ class AmbientLightDataNode extends Node {
 
 		super();
 
-		this._color = new Color();
+		this._color = colorCreate();
 		this._lights = [];
 
-		this.colorNode = uniform( this._color ).setGroup( renderGroup );
+		this.colorNode = uniform( this._color, 'color' ).setGroup( renderGroup );
 		this.updateType = NodeUpdateType.RENDER;
 
 	}
@@ -36,7 +36,7 @@ class AmbientLightDataNode extends Node {
 
 	update() {
 
-		this._color.setScalar( 0 );
+		colorSetScalar( 0, this._color );
 
 		for ( let i = 0; i < this._lights.length; i ++ ) {
 

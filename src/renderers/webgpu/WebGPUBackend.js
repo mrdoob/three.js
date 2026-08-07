@@ -14,7 +14,7 @@ import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
 import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
 import { WebGPUCoordinateSystem, TimestampQuery, REVISION, HalfFloatType, Compatibility, CustomBlending } from '../../constants.js';
-import { Color } from '../../math/Color.js';
+import { colorCopy, colorCreate, colorEquals, colorSet } from '../../math/ColorFunctions.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
 import { error } from '../../utils.js';
 
@@ -1143,9 +1143,9 @@ class WebGPUBackend extends Backend {
 
 		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
 
-		if ( renderContextData.currentBlendColor === undefined ) renderContextData.currentBlendColor = new Color();
+		if ( renderContextData.currentBlendColor === undefined ) renderContextData.currentBlendColor = colorCreate();
 
-		renderContextData.currentBlendColor.setRGB( 0, 0, 0 );
+		colorSet( 0, 0, 0, renderContextData.currentBlendColor );
 		renderContextData.currentBlendAlpha = 0;
 		renderContextData.currentStencilRef = 0;
 
@@ -1459,14 +1459,14 @@ class WebGPUBackend extends Backend {
 
 					if ( renderContext.viewport ) {
 
-						const { x, y, width, height, minDepth, maxDepth } = renderContext.viewportValue;
+						const { x, y, z: width, w: height, minDepth, maxDepth } = renderContext.viewportValue;
 						renderPass.setViewport( x, y, width, height, minDepth, maxDepth );
 
 					}
 
 					if ( renderContext.scissor ) {
 
-						const { x, y, width, height } = renderContext.scissorValue;
+						const { x, y, z: width, w: height } = renderContext.scissorValue;
 						renderPass.setScissorRect( x, y, width, height );
 
 					}
@@ -1653,7 +1653,7 @@ class WebGPUBackend extends Backend {
 	updateViewport( renderContext ) {
 
 		const { currentPass } = this.get( renderContext );
-		const { x, y, width, height, minDepth, maxDepth } = renderContext.viewportValue;
+		const { x, y, z: width, w: height, minDepth, maxDepth } = renderContext.viewportValue;
 
 		currentPass.setViewport( x, y, width, height, minDepth, maxDepth );
 
@@ -1667,7 +1667,7 @@ class WebGPUBackend extends Backend {
 	updateScissor( renderContext ) {
 
 		const { currentPass } = this.get( renderContext );
-		const { x, y, width, height } = renderContext.scissorValue;
+		const { x, y, z: width, w: height } = renderContext.scissorValue;
 
 		currentPass.setScissorRect( x, y, width, height );
 
@@ -2093,7 +2093,7 @@ class WebGPUBackend extends Backend {
 			const blendColor = material.blendColor;
 			const blendAlpha = material.blendAlpha;
 
-			if ( blendColor.equals( renderContextData.currentBlendColor ) === false || blendAlpha !== renderContextData.currentBlendAlpha ) {
+			if ( colorEquals( blendColor, renderContextData.currentBlendColor ) === false || blendAlpha !== renderContextData.currentBlendAlpha ) {
 
 				_blendConstant.r = blendColor.r;
 				_blendConstant.g = blendColor.g;
@@ -2102,7 +2102,7 @@ class WebGPUBackend extends Backend {
 
 				passEncoderGPU.setBlendConstant( _blendConstant );
 
-				renderContextData.currentBlendColor.copy( blendColor );
+				colorCopy( blendColor, renderContextData.currentBlendColor );
 				renderContextData.currentBlendAlpha = blendAlpha;
 
 			}

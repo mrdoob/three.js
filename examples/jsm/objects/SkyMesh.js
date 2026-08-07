@@ -2,8 +2,9 @@ import {
 	BackSide,
 	BoxGeometry,
 	Mesh,
-	Vector3,
-	NodeMaterial
+	NodeMaterial,
+	vec3Create,
+	vec3Set
 } from 'three/webgpu';
 
 import { Fn, float, floor, fract, vec2, vec3, acos, add, mul, clamp, cos, dot, exp, max, min, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varyingProperty, vec4, uniform, cameraPosition, time, If, Loop } from 'three/tsl';
@@ -83,14 +84,14 @@ class SkyMesh extends Mesh {
 		 *
 		 * @type {UniformNode<vec3>}
 		 */
-		this.sunPosition = uniform( new Vector3() );
+		this.sunPosition = uniform( vec3Create() );
 
 		/**
 		 * The up position.
 		 *
 		 * @type {UniformNode<vec3>}
 		 */
-		this.upUniform = uniform( new Vector3( 0, 1, 0 ) );
+		this.upUniform = uniform( vec3Set( vec3Create(), 0, 1, 0 ) );
 
 		/**
 		 * The cloud scale uniform.

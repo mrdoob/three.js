@@ -1,6 +1,12 @@
 import { Curve } from '../core/Curve.js';
 import { QuadraticBezier } from '../core/Interpolations.js';
-import { Vector3 } from '../../math/Vector3.js';
+import {
+	vec3Copy,
+	vec3Create,
+	vec3FromArray,
+	vec3Set,
+	vec3ToArray
+} from '../../math/Vector3Functions.js';
 
 /**
  * A curve representing a 3D Quadratic Bezier curve.
@@ -16,7 +22,7 @@ class QuadraticBezierCurve3 extends Curve {
 	 * @param {Vector3} [v1] - The control point.
 	 * @param {Vector3} [v2] - The end point.
 	 */
-	constructor( v0 = new Vector3(), v1 = new Vector3(), v2 = new Vector3() ) {
+	constructor( v0 = vec3Create(), v1 = vec3Create(), v2 = vec3Create() ) {
 
 		super();
 
@@ -61,13 +67,14 @@ class QuadraticBezierCurve3 extends Curve {
 	 * @param {Vector3} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector3} The position on the curve.
 	 */
-	getPoint( t, optionalTarget = new Vector3() ) {
+	getPoint( t, optionalTarget = vec3Create() ) {
 
 		const point = optionalTarget;
 
 		const v0 = this.v0, v1 = this.v1, v2 = this.v2;
 
-		point.set(
+		vec3Set(
+			point,
 			QuadraticBezier( t, v0.x, v1.x, v2.x ),
 			QuadraticBezier( t, v0.y, v1.y, v2.y ),
 			QuadraticBezier( t, v0.z, v1.z, v2.z )
@@ -81,9 +88,9 @@ class QuadraticBezierCurve3 extends Curve {
 
 		super.copy( source );
 
-		this.v0.copy( source.v0 );
-		this.v1.copy( source.v1 );
-		this.v2.copy( source.v2 );
+		vec3Copy( source.v0, this.v0 );
+		vec3Copy( source.v1, this.v1 );
+		vec3Copy( source.v2, this.v2 );
 
 		return this;
 
@@ -93,9 +100,9 @@ class QuadraticBezierCurve3 extends Curve {
 
 		const data = super.toJSON();
 
-		data.v0 = this.v0.toArray();
-		data.v1 = this.v1.toArray();
-		data.v2 = this.v2.toArray();
+		data.v0 = vec3ToArray( this.v0 );
+		data.v1 = vec3ToArray( this.v1 );
+		data.v2 = vec3ToArray( this.v2 );
 
 		return data;
 
@@ -105,9 +112,9 @@ class QuadraticBezierCurve3 extends Curve {
 
 		super.fromJSON( json );
 
-		this.v0.fromArray( json.v0 );
-		this.v1.fromArray( json.v1 );
-		this.v2.fromArray( json.v2 );
+		vec3FromArray( json.v0, 0, this.v0 );
+		vec3FromArray( json.v1, 0, this.v1 );
+		vec3FromArray( json.v2, 0, this.v2 );
 
 		return this;
 

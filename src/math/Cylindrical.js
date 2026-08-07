@@ -1,3 +1,10 @@
+import {
+	cylindricalCopy,
+	cylindricalSet,
+	cylindricalSetFromCartesianCoords,
+	cylindricalSetFromVector3
+} from './CylindricalFunctions.js';
+
 /**
  * This class can be used to represent points in 3D space as
  * [Cylindrical coordinates](https://en.wikipedia.org/wiki/Cylindrical_coordinate_system).
@@ -49,11 +56,7 @@ class Cylindrical {
 	 */
 	set( radius, theta, y ) {
 
-		this.radius = radius;
-		this.theta = theta;
-		this.y = y;
-
-		return this;
+		return cylindricalSet( radius, theta, y, this );
 
 	}
 
@@ -65,11 +68,7 @@ class Cylindrical {
 	 */
 	copy( other ) {
 
-		this.radius = other.radius;
-		this.theta = other.theta;
-		this.y = other.y;
-
-		return this;
+		return cylindricalCopy( other, this );
 
 	}
 
@@ -82,7 +81,7 @@ class Cylindrical {
 	 */
 	setFromVector3( v ) {
 
-		return this.setFromCartesianCoords( v.x, v.y, v.z );
+		return cylindricalSetFromVector3( v, this );
 
 	}
 
@@ -96,11 +95,7 @@ class Cylindrical {
 	 */
 	setFromCartesianCoords( x, y, z ) {
 
-		this.radius = Math.sqrt( x * x + z * z );
-		this.theta = Math.atan2( x, z );
-		this.y = y;
-
-		return this;
+		return cylindricalSetFromCartesianCoords( x, y, z, this );
 
 	}
 

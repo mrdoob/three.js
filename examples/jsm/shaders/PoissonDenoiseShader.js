@@ -1,7 +1,8 @@
 import {
-	Matrix4,
-	Vector2,
-	Vector3,
+	mat4Create,
+	vec2Create,
+	vec3Create,
+	vec3Set
 } from 'three';
 
 /**
@@ -35,8 +36,8 @@ const PoissonDenoiseShader = {
 		'tNormal': { value: null },
 		'tDepth': { value: null },
 		'tNoise': { value: null },
-		'resolution': { value: new Vector2() },
-		'cameraProjectionMatrixInverse': { value: new Matrix4() },
+		'resolution': { value: vec2Create() },
+		'cameraProjectionMatrixInverse': { value: mat4Create() },
 		'lumaPhi': { value: 5. },
 		'depthPhi': { value: 5. },
 		'normalPhi': { value: 5. },
@@ -228,7 +229,7 @@ function generateDenoiseSamples( numSamples, numRings, radiusExponent ) {
 
 		const angle = 2 * Math.PI * numRings * i / numSamples;
 		const radius = Math.pow( i / ( numSamples - 1 ), radiusExponent );
-		samples.push( new Vector3( Math.cos( angle ), Math.sin( angle ), radius ) );
+		samples.push( vec3Set( vec3Create(), Math.cos( angle ), Math.sin( angle ), radius ) );
 
 	}
 

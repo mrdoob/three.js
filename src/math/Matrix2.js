@@ -1,3 +1,9 @@
+import {
+	mat2FromArray,
+	mat2Identity,
+	mat2Set
+} from './Matrix2Functions.js';
+
 /**
  * Represents a 2x2 matrix.
  *
@@ -23,21 +29,14 @@
  * three.js documentation shows matrices in row-major order. Just bear in
  * mind that if you are reading the source code, you'll have to take the
  * transpose of any matrices outlined here to make sense of the calculations.
+ *
+ * `Matrix2` is a thin, backwards-compatible wrapper around the standalone,
+ * tree-shakeable `mat2*` functions in {@link Matrix2Functions}, which operate
+ * on any {@link Matrix2Like} object. Prefer importing those functions
+ * directly if you only need a handful of operations and want unused ones
+ * eliminated from your bundle.
  */
-export class Matrix2 {
-
-	static {
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		Matrix2.prototype.isMatrix2 = true;
-
-	}
+class Matrix2 {
 
 	/**
 	 * Constructs a new 2x2 matrix. The arguments are supposed to be
@@ -50,6 +49,15 @@ export class Matrix2 {
 	 * @param {number} [n22] - 2-2 matrix element.
 	 */
 	constructor( n11, n12, n21, n22 ) {
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		Object.defineProperty( this, 'isMatrix2', { value: true } );
 
 		/**
 		 * A column-major list of matrix values.
@@ -76,12 +84,7 @@ export class Matrix2 {
 	 */
 	identity() {
 
-		this.set(
-			1, 0,
-			0, 1,
-		);
-
-		return this;
+		return mat2Identity( this );
 
 	}
 
@@ -94,13 +97,7 @@ export class Matrix2 {
 	 */
 	fromArray( array, offset = 0 ) {
 
-		for ( let i = 0; i < 4; i ++ ) {
-
-			this.elements[ i ] = array[ i + offset ];
-
-		}
-
-		return this;
+		return mat2FromArray( array, offset, this );
 
 	}
 
@@ -116,13 +113,10 @@ export class Matrix2 {
 	 */
 	set( n11, n12, n21, n22 ) {
 
-		const te = this.elements;
-
-		te[ 0 ] = n11; te[ 2 ] = n12;
-		te[ 1 ] = n21; te[ 3 ] = n22;
-
-		return this;
+		return mat2Set( this, n11, n12, n21, n22 );
 
 	}
 
 }
+
+export { Matrix2 };

@@ -7,22 +7,57 @@ import { Layers } from './Layers.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { generateUUID } from '../math/MathUtils.js';
 import { error } from '../utils.js';
-import { mat4Compose, mat4Copy, mat4MultiplyMatrices } from '../math/Matrix4Functions.js';
+import { eulerSetFromQuaternion } from '../math/EulerFunctions.js';
+import {
+	mat4Compose,
+	mat4Copy,
+	mat4Create,
+	mat4Decompose,
+	mat4ExtractRotation,
+	mat4Invert,
+	mat4LookAt,
+	mat4Multiply,
+	mat4MultiplyMatrices,
+	mat4PreMultiply,
+	mat4ToArray
+} from '../math/Matrix4Functions.js';
+import {
+	quatCopy,
+	quatCreate,
+	quatInvert,
+	quatMultiply,
+	quatPreMultiply,
+	quatSetFromAxisAngle,
+	quatSetFromEuler,
+	quatSetFromRotationMatrix
+} from '../math/QuaternionFunctions.js';
+import {
+	vec3Add,
+	vec3ApplyMatrix4,
+	vec3ApplyQuaternion,
+	vec3Copy,
+	vec3Create,
+	vec3MultiplyScalar,
+	vec3Normalize,
+	vec3Set,
+	vec3SetFromMatrixPosition,
+	vec3ToArray
+} from '../math/Vector3Functions.js';
 
 let _object3DId = 0;
 
-const _v1 = /*@__PURE__*/ new Vector3();
-const _q1 = /*@__PURE__*/ new Quaternion();
-const _m1 = /*@__PURE__*/ new Matrix4();
-const _target = /*@__PURE__*/ new Vector3();
+const _v1 = /*@__PURE__*/ vec3Create();
+const _q1 = /*@__PURE__*/ quatCreate();
+const _m1 = /*@__PURE__*/ mat4Create();
+const _target = /*@__PURE__*/ vec3Create();
 
-const _position = /*@__PURE__*/ new Vector3();
-const _scale = /*@__PURE__*/ new Vector3();
-const _quaternion = /*@__PURE__*/ new Quaternion();
+const _position = /*@__PURE__*/ vec3Create();
+const _scale = /*@__PURE__*/ vec3Create();
+const _quaternion = /*@__PURE__*/ quatCreate();
 
-const _xAxis = /*@__PURE__*/ new Vector3( 1, 0, 0 );
-const _yAxis = /*@__PURE__*/ new Vector3( 0, 1, 0 );
-const _zAxis = /*@__PURE__*/ new Vector3( 0, 0, 1 );
+const _xAxis = /*@__PURE__*/ vec3Set( vec3Create(), 1, 0, 0 );
+const _yAxis = /*@__PURE__*/ vec3Set( vec3Create(), 0, 1, 0 );
+const _zAxis = /*@__PURE__*/ vec3Set( vec3Create(), 0, 0, 1 );
 
 /**
  * Fires when the object has been added to its parent object.
@@ -145,13 +180,13 @@ class Object3D extends EventDispatcher {
 
 		function onRotationChange() {
 
-			quaternion.setFromEuler( rotation, false );
+			quatSetFromEuler( rotation, quaternion );
 
 		}
 
 		function onQuaternionChange() {
 
-			rotation.setFromQuaternion( quaternion, undefined, false );
+			eulerSetFromQuaternion( quaternion, undefined, rotation );
 
 		}
 
@@ -450,9 +485,9 @@ class Object3D extends EventDispatcher {
 
 		if ( this.matrixAutoUpdate ) this.updateMatrix();
 
-		this.matrix.premultiply( matrix );
+		mat4PreMultiply( this.matrix, matrix, this.matrix );
 
-		this.matrix.decompose( this.position, this.quaternion, this.scale );
+		mat4Decompose( this.matrix, this.position, this.quaternion, this.scale );
 
 	}
 
@@ -464,7 +499,8 @@ class Object3D extends EventDispatcher {
 	 */
 	applyQuaternion( q ) {
 
-		this.quaternion.premultiply( q );
+		quatPreMultiply( this.quaternion, q, this.quaternion );
+		this.quaternion._onChangeCallback();
 
 		return this;
 
@@ -480,7 +516,8 @@ class Object3D extends EventDispatcher {
 
 		// assumes axis is normalized
 
-		this.quaternion.setFromAxisAngle( axis, angle );
+		quatSetFromAxisAngle( axis, angle, this.quaternion );
+		this.quaternion._onChangeCallback();
 
 	}
 
@@ -491,7 +528,8 @@ class Object3D extends EventDispatcher {
 	 */
 	setRotationFromEuler( euler ) {
 
-		this.quaternion.setFromEuler( euler, true );
+		quatSetFromEuler( euler, this.quaternion );
+		this.quaternion._onChangeCallback();
 
 	}
 
@@ -505,7 +543,8 @@ class Object3D extends EventDispatcher {
 
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
-		this.quaternion.setFromRotationMatrix( m );
+		quatSetFromRotationMatrix( m, this.quaternion );
+		this.quaternion._onChangeCallback();
 
 	}
 
@@ -518,7 +557,8 @@ class Object3D extends EventDispatcher {
 
 		// assumes q is normalized
 
-		this.quaternion.copy( q );
+		quatCopy( q, this.quaternion );
+		this.quaternion._onChangeCallback();
 
 	}
 
@@ -534,9 +574,10 @@ class Object3D extends EventDispatcher {
 		// rotate object on axis in object space
 		// axis is assumed to be normalized
 
-		_q1.setFromAxisAngle( axis, angle );
+		quatSetFromAxisAngle( axis, angle, _q1 );
 
-		this.quaternion.multiply( _q1 );
+		quatMultiply( this.quaternion, _q1, this.quaternion );
+		this.quaternion._onChangeCallback();
 
 		return this;
 
@@ -555,9 +596,10 @@ class Object3D extends EventDispatcher {
 		// axis is assumed to be normalized
 		// method assumes no rotated parent
 
-		_q1.setFromAxisAngle( axis, angle );
+		quatSetFromAxisAngle( axis, angle, _q1 );
 
-		this.quaternion.premultiply( _q1 );
+		quatPreMultiply( this.quaternion, _q1, this.quaternion );
+		this.quaternion._onChangeCallback();
 
 		return this;
 
@@ -611,9 +653,10 @@ class Object3D extends EventDispatcher {
 		// translate object by distance along axis in object space
 		// axis is assumed to be normalized
 
-		_v1.copy( axis ).applyQuaternion( this.quaternion );
-
-		this.position.add( _v1.multiplyScalar( distance ) );
+		vec3Copy( axis, _v1 );
+		vec3ApplyQuaternion( _v1, this.quaternion, _v1 );
+		vec3MultiplyScalar( _v1, distance, _v1 );
+		vec3Add( this.position, _v1, this.position );
 
 		return this;
 
@@ -665,7 +708,7 @@ class Object3D extends EventDispatcher {
 
 		this.updateWorldMatrix( true, false );
 
-		return vector.applyMatrix4( this.matrixWorld );
+		return vec3ApplyMatrix4( vector, this.matrixWorld, vector );
 
 	}
 
@@ -679,7 +722,10 @@ class Object3D extends EventDispatcher {
 
 		this.updateWorldMatrix( true, false );
 
-		return vector.applyMatrix4( _m1.copy( this.matrixWorld ).invert() );
+		mat4Copy( this.matrixWorld, _m1 );
+		mat4Invert( _m1, _m1 );
+
+		return vec3ApplyMatrix4( vector, _m1, vector );
 
 	}
 
@@ -698,11 +744,11 @@ class Object3D extends EventDispatcher {
 
 		if ( x.isVector3 ) {
 
-			_target.copy( x );
+			vec3Copy( x, _target );
 
 		} else {
 
-			_target.set( x, y, z );
+			vec3Set( _target, x, y, z );
 
 		}
 
@@ -710,25 +756,28 @@ class Object3D extends EventDispatcher {
 
 		this.updateWorldMatrix( true, false );
 
-		_position.setFromMatrixPosition( this.matrixWorld );
+		vec3SetFromMatrixPosition( this.matrixWorld, _position );
 
 		if ( this.isCamera || this.isLight ) {
 
-			_m1.lookAt( _position, _target, this.up );
+			mat4LookAt( _position, _target, this.up, _m1 );
 
 		} else {
 
-			_m1.lookAt( _target, _position, this.up );
+			mat4LookAt( _target, _position, this.up, _m1 );
 
 		}
 
-		this.quaternion.setFromRotationMatrix( _m1 );
+		quatSetFromRotationMatrix( _m1, this.quaternion );
+		this.quaternion._onChangeCallback();
 
 		if ( parent ) {
 
-			_m1.extractRotation( parent.matrixWorld );
-			_q1.setFromRotationMatrix( _m1 );
-			this.quaternion.premultiply( _q1.invert() );
+			mat4ExtractRotation( parent.matrixWorld, _m1 );
+			quatSetFromRotationMatrix( _m1, _q1 );
+			quatInvert( _q1, _q1 );
+			quatPreMultiply( this.quaternion, _q1, this.quaternion );
+			this.quaternion._onChangeCallback();
 
 		}
 
@@ -880,13 +929,14 @@ class Object3D extends EventDispatcher {
 
 		this.updateWorldMatrix( true, false );
 
-		_m1.copy( this.matrixWorld ).invert();
+		mat4Copy( this.matrixWorld, _m1 );
+		mat4Invert( _m1, _m1 );
 
 		if ( object.parent !== null ) {
 
 			object.parent.updateWorldMatrix( true, false );
 
-			_m1.multiply( object.parent.matrixWorld );
+			mat4Multiply( _m1, object.parent.matrixWorld, _m1 );
 
 		}
 
@@ -998,7 +1048,7 @@ class Object3D extends EventDispatcher {
 
 		this.updateWorldMatrix( true, false );
 
-		return target.setFromMatrixPosition( this.matrixWorld );
+		return vec3SetFromMatrixPosition( this.matrixWorld, target );
 
 	}
 
@@ -1012,7 +1062,7 @@ class Object3D extends EventDispatcher {
 
 		this.updateWorldMatrix( true, false );
 
-		this.matrixWorld.decompose( _position, target, _scale );
+		mat4Decompose( this.matrixWorld, _position, target, _scale );
 
 		return target;
 
@@ -1028,7 +1078,7 @@ class Object3D extends EventDispatcher {
 
 		this.updateWorldMatrix( true, false );
 
-		this.matrixWorld.decompose( _position, _quaternion, target );
+		mat4Decompose( this.matrixWorld, _position, _quaternion, target );
 
 		return target;
 
@@ -1046,7 +1096,9 @@ class Object3D extends EventDispatcher {
 
 		const e = this.matrixWorld.elements;
 
-		return target.set( e[ 8 ], e[ 9 ], e[ 10 ] ).normalize();
+		vec3Set( target, e[ 8 ], e[ 9 ], e[ 10 ] );
+
+		return vec3Normalize( target, target );
 
 	}
 
@@ -1331,10 +1383,10 @@ class Object3D extends EventDispatcher {
 		if ( Object.keys( this.userData ).length > 0 ) object.userData = this.userData;
 
 		object.layers = this.layers.mask;
-		object.matrix = this.matrix.toArray();
-		object.up = this.up.toArray();
+		object.matrix = mat4ToArray( this.matrix );
+		object.up = vec3ToArray( this.up );
 
-		if ( this.pivot !== null ) object.pivot = this.pivot.toArray();
+		if ( this.pivot !== null ) object.pivot = vec3ToArray( this.pivot );
 
 		if ( this.matrixAutoUpdate === false ) object.matrixAutoUpdate = false;
 
@@ -1474,7 +1526,7 @@ class Object3D extends EventDispatcher {
 		if ( this.isSkinnedMesh ) {
 
 			object.bindMode = this.bindMode;
-			object.bindMatrix = this.bindMatrix.toArray();
+			object.bindMatrix = mat4ToArray( this.bindMatrix );
 
 			if ( this.skeleton !== undefined ) {
 
@@ -1607,17 +1659,18 @@ class Object3D extends EventDispatcher {
 
 		this.name = source.name;
 
-		this.up.copy( source.up );
+		vec3Copy( source.up, this.up );
 
-		this.position.copy( source.position );
+		vec3Copy( source.position, this.position );
 		this.rotation.order = source.rotation.order;
-		this.quaternion.copy( source.quaternion );
-		this.scale.copy( source.scale );
+		quatCopy( source.quaternion, this.quaternion );
+		this.quaternion._onChangeCallback();
+		vec3Copy( source.scale, this.scale );
 
-		this.pivot = ( source.pivot !== null ) ? source.pivot.clone() : null;
+		this.pivot = ( source.pivot !== null ) ? vec3Copy( source.pivot ) : null;
 
-		this.matrix.copy( source.matrix );
-		this.matrixWorld.copy( source.matrixWorld );
+		mat4Copy( source.matrix, this.matrix );
+		mat4Copy( source.matrixWorld, this.matrixWorld );
 
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
 

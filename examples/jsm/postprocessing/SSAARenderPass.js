@@ -1,10 +1,10 @@
 import {
 	AdditiveBlending,
-	Color,
 	HalfFloatType,
 	ShaderMaterial,
 	UniformsUtils,
-	WebGLRenderTarget
+	WebGLRenderTarget,
+	colorCreate
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 import { CopyShader } from '../shaders/CopyShader.js';
@@ -99,7 +99,7 @@ class SSAARenderPass extends Pass {
 
 		this._sampleRenderTarget = null;
 
-		this._oldClearColor = new Color();
+		this._oldClearColor = colorCreate();
 
 		this._copyUniforms = UniformsUtils.clone( CopyShader.uniforms );
 

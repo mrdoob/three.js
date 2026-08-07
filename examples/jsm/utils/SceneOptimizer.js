@@ -122,12 +122,12 @@ class SceneOptimizer {
 			} )
 			.join( '|' );
 
-		const emissiveHash = material.emissive ? material.emissive.getHexString() : 0;
+		const emissiveHash = material.emissive ? THREE.colorGetHexString( material.emissive ) : 0;
 		const attenuationHash = material.attenuationColor
-			? material.attenuationColor.getHexString()
+			? THREE.colorGetHexString( material.attenuationColor )
 			: 0;
 		const sheenColorHash = material.sheenColor
-			? material.sheenColor.getHexString()
+			? THREE.colorGetHexString( material.sheenColor )
 			: 0;
 
 		return [
@@ -256,7 +256,7 @@ class SceneOptimizer {
 			if ( batchedMaterial.color !== undefined ) {
 
 				// Reset color to white, color will be set per instance
-				batchedMaterial.color.set( 1, 1, 1 );
+				THREE.colorSet( 1, 1, 1, batchedMaterial.color );
 
 			}
 
@@ -271,12 +271,12 @@ class SceneOptimizer {
 			batchedMesh.name = `${referenceMesh.name}_batch`;
 
 			const geometryIds = new Map();
-			const inverseParentMatrix = new THREE.Matrix4();
+			const inverseParentMatrix = THREE.mat4Create();
 
 			if ( referenceMesh.parent ) {
 
 				referenceMesh.parent.updateWorldMatrix( true, false );
-				inverseParentMatrix.copy( referenceMesh.parent.matrixWorld ).invert();
+				THREE.mat4Invert( referenceMesh.parent.matrixWorld, inverseParentMatrix );
 
 			}
 
@@ -293,12 +293,12 @@ class SceneOptimizer {
 				const geometryId = geometryIds.get( geometryHash );
 				const instanceId = batchedMesh.addInstance( geometryId );
 
-				const localMatrix = new THREE.Matrix4();
+				const localMatrix = THREE.mat4Create();
 				mesh.updateWorldMatrix( true, false );
-				localMatrix.copy( mesh.matrixWorld );
+				THREE.mat4Copy( mesh.matrixWorld, localMatrix );
 				if ( referenceMesh.parent ) {
 
-					localMatrix.premultiply( inverseParentMatrix );
+					THREE.mat4PreMultiply( localMatrix, inverseParentMatrix, localMatrix );
 
 				}
 

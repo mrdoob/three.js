@@ -1,9 +1,16 @@
 import {
 	BufferGeometry,
-	Color,
 	Float32BufferAttribute,
-	Vector2,
-	Vector3
+	colorCreate,
+	colorFromArray,
+	colorLerpColors,
+	vec2Create,
+	vec2FromArray,
+	vec2LerpVectors,
+	vec3Create,
+	vec3DistanceToSquared,
+	vec3FromArray,
+	vec3LerpVectors
 } from 'three';
 
 /**
@@ -65,34 +72,34 @@ class TessellateModifier {
 		const maxIterations = this.maxIterations;
 		const maxEdgeLengthSquared = this.maxEdgeLength * this.maxEdgeLength;
 
-		const va = new Vector3();
-		const vb = new Vector3();
-		const vc = new Vector3();
-		const vm = new Vector3();
+		const va = vec3Create();
+		const vb = vec3Create();
+		const vc = vec3Create();
+		const vm = vec3Create();
 		const vs = [ va, vb, vc, vm ];
 
-		const na = new Vector3();
-		const nb = new Vector3();
-		const nc = new Vector3();
-		const nm = new Vector3();
+		const na = vec3Create();
+		const nb = vec3Create();
+		const nc = vec3Create();
+		const nm = vec3Create();
 		const ns = [ na, nb, nc, nm ];
 
-		const ca = new Color();
-		const cb = new Color();
-		const cc = new Color();
-		const cm = new Color();
+		const ca = colorCreate();
+		const cb = colorCreate();
+		const cc = colorCreate();
+		const cm = colorCreate();
 		const cs = [ ca, cb, cc, cm ];
 
-		const ua = new Vector2();
-		const ub = new Vector2();
-		const uc = new Vector2();
-		const um = new Vector2();
+		const ua = vec2Create();
+		const ub = vec2Create();
+		const uc = vec2Create();
+		const um = vec2Create();
 		const us = [ ua, ub, uc, um ];
 
-		const u2a = new Vector2();
-		const u2b = new Vector2();
-		const u2c = new Vector2();
-		const u2m = new Vector2();
+		const u2a = vec2Create();
+		const u2b = vec2Create();
+		const u2c = vec2Create();
+		const u2m = vec2Create();
 		const u2s = [ u2a, u2b, u2c, u2m ];
 
 		const attributes = geometry.attributes;
@@ -214,45 +221,45 @@ class TessellateModifier {
 
 			for ( let i = 0, i2 = 0, il = positions.length; i < il; i += 9, i2 += 6 ) {
 
-				va.fromArray( positions, i + 0 );
-				vb.fromArray( positions, i + 3 );
-				vc.fromArray( positions, i + 6 );
+				vec3FromArray( positions, i + 0, va );
+				vec3FromArray( positions, i + 3, vb );
+				vec3FromArray( positions, i + 6, vc );
 
 				if ( hasNormals ) {
 
-					na.fromArray( normals, i + 0 );
-					nb.fromArray( normals, i + 3 );
-					nc.fromArray( normals, i + 6 );
+					vec3FromArray( normals, i + 0, na );
+					vec3FromArray( normals, i + 3, nb );
+					vec3FromArray( normals, i + 6, nc );
 
 				}
 
 				if ( hasColors ) {
 
-					ca.fromArray( colors, i + 0 );
-					cb.fromArray( colors, i + 3 );
-					cc.fromArray( colors, i + 6 );
+					colorFromArray( colors, i + 0, ca );
+					colorFromArray( colors, i + 3, cb );
+					colorFromArray( colors, i + 6, cc );
 
 				}
 
 				if ( hasUVs ) {
 
-					ua.fromArray( uvs, i2 + 0 );
-					ub.fromArray( uvs, i2 + 2 );
-					uc.fromArray( uvs, i2 + 4 );
+					vec2FromArray( uvs, i2 + 0, ua );
+					vec2FromArray( uvs, i2 + 2, ub );
+					vec2FromArray( uvs, i2 + 4, uc );
 
 				}
 
 				if ( hasUV1s ) {
 
-					u2a.fromArray( uv1s, i2 + 0 );
-					u2b.fromArray( uv1s, i2 + 2 );
-					u2c.fromArray( uv1s, i2 + 4 );
+					vec2FromArray( uv1s, i2 + 0, u2a );
+					vec2FromArray( uv1s, i2 + 2, u2b );
+					vec2FromArray( uv1s, i2 + 4, u2c );
 
 				}
 
-				const dab = va.distanceToSquared( vb );
-				const dbc = vb.distanceToSquared( vc );
-				const dac = va.distanceToSquared( vc );
+				const dab = vec3DistanceToSquared( va, vb );
+				const dbc = vec3DistanceToSquared( vb, vc );
+				const dac = vec3DistanceToSquared( va, vc );
 
 				if ( dab > maxEdgeLengthSquared || dbc > maxEdgeLengthSquared || dac > maxEdgeLengthSquared ) {
 
@@ -260,33 +267,33 @@ class TessellateModifier {
 
 					if ( dab >= dbc && dab >= dac ) {
 
-						vm.lerpVectors( va, vb, 0.5 );
-						if ( hasNormals ) nm.lerpVectors( na, nb, 0.5 );
-						if ( hasColors ) cm.lerpColors( ca, cb, 0.5 );
-						if ( hasUVs ) um.lerpVectors( ua, ub, 0.5 );
-						if ( hasUV1s ) u2m.lerpVectors( u2a, u2b, 0.5 );
+						vec3LerpVectors( va, vb, 0.5, vm );
+						if ( hasNormals ) vec3LerpVectors( na, nb, 0.5, nm );
+						if ( hasColors ) colorLerpColors( ca, cb, 0.5, cm );
+						if ( hasUVs ) vec2LerpVectors( ua, ub, 0.5, um );
+						if ( hasUV1s ) vec2LerpVectors( u2a, u2b, 0.5, u2m );
 
 						addTriangle( 0, 3, 2 );
 						addTriangle( 3, 1, 2 );
 
 					} else if ( dbc >= dab && dbc >= dac ) {
 
-						vm.lerpVectors( vb, vc, 0.5 );
-						if ( hasNormals ) nm.lerpVectors( nb, nc, 0.5 );
-						if ( hasColors ) cm.lerpColors( cb, cc, 0.5 );
-						if ( hasUVs ) um.lerpVectors( ub, uc, 0.5 );
-						if ( hasUV1s ) u2m.lerpVectors( u2b, u2c, 0.5 );
+						vec3LerpVectors( vb, vc, 0.5, vm );
+						if ( hasNormals ) vec3LerpVectors( nb, nc, 0.5, nm );
+						if ( hasColors ) colorLerpColors( cb, cc, 0.5, cm );
+						if ( hasUVs ) vec2LerpVectors( ub, uc, 0.5, um );
+						if ( hasUV1s ) vec2LerpVectors( u2b, u2c, 0.5, u2m );
 
 						addTriangle( 0, 1, 3 );
 						addTriangle( 3, 2, 0 );
 
 					} else {
 
-						vm.lerpVectors( va, vc, 0.5 );
-						if ( hasNormals ) nm.lerpVectors( na, nc, 0.5 );
-						if ( hasColors ) cm.lerpColors( ca, cc, 0.5 );
-						if ( hasUVs ) um.lerpVectors( ua, uc, 0.5 );
-						if ( hasUV1s ) u2m.lerpVectors( u2a, u2c, 0.5 );
+						vec3LerpVectors( va, vc, 0.5, vm );
+						if ( hasNormals ) vec3LerpVectors( na, nc, 0.5, nm );
+						if ( hasColors ) colorLerpColors( ca, cc, 0.5, cm );
+						if ( hasUVs ) vec2LerpVectors( ua, uc, 0.5, um );
+						if ( hasUV1s ) vec2LerpVectors( u2a, u2c, 0.5, u2m );
 
 						addTriangle( 0, 1, 3 );
 						addTriangle( 3, 1, 2 );

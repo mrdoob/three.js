@@ -6,7 +6,8 @@ import {
 	MeshBasicMaterial,
 	PlaneGeometry,
 	Texture,
-	SRGBColorSpace
+	SRGBColorSpace,
+	mat4Identity
 } from 'three';
 
 /**
@@ -261,7 +262,7 @@ class VolumeSlice {
 
 			this.mesh.geometry = this.geometry;
 			//reset mesh matrix
-			this.mesh.matrix.identity();
+			mat4Identity( this.mesh.matrix );
 			this.mesh.applyMatrix4( this.matrix );
 
 		}

@@ -1,7 +1,16 @@
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
-import { Matrix4 } from '../math/Matrix4.js';
-import { Triangle } from '../math/Triangle.js';
+import {
+	vec2Create, vec2Set, vec2SubVectors, vec2AddScalar, vec2Multiply, vec2Copy
+} from '../math/Vector2Functions.js';
+import {
+	vec3Create, vec3Set, vec3SetFromMatrixScale, vec3SetFromMatrixPosition,
+	vec3MultiplyScalar, vec3Copy, vec3ApplyMatrix4, vec3DistanceTo
+} from '../math/Vector3Functions.js';
+import { mat4Create, mat4Copy, mat4MultiplyMatrices } from '../math/Matrix4Functions.js';
+import { triangleGetInterpolation } from '../math/TriangleFunctions.js';
+import { rayIntersectTriangle } from '../math/RayFunctions.js';
+import { frustumIntersectsSprite } from '../math/FrustumFunctions.js';
 import { Object3D } from '../core/Object3D.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { InterleavedBuffer } from '../core/InterleavedBuffer.js';
@@ -11,21 +20,21 @@ import { error } from '../utils.js';
 
 let _geometry;
 
-const _intersectPoint = /*@__PURE__*/ new Vector3();
-const _worldScale = /*@__PURE__*/ new Vector3();
-const _mvPosition = /*@__PURE__*/ new Vector3();
+const _intersectPoint = /*@__PURE__*/ vec3Create();
+const _worldScale = /*@__PURE__*/ vec3Create();
+const _mvPosition = /*@__PURE__*/ vec3Create();
 
-const _alignedPosition = /*@__PURE__*/ new Vector2();
-const _rotatedPosition = /*@__PURE__*/ new Vector2();
-const _viewWorldMatrix = /*@__PURE__*/ new Matrix4();
+const _alignedPosition = /*@__PURE__*/ vec2Create();
+const _rotatedPosition = /*@__PURE__*/ vec2Create();
+const _viewWorldMatrix = /*@__PURE__*/ mat4Create();
 
-const _vA = /*@__PURE__*/ new Vector3();
-const _vB = /*@__PURE__*/ new Vector3();
-const _vC = /*@__PURE__*/ new Vector3();
+const _vA = /*@__PURE__*/ vec3Create();
+const _vB = /*@__PURE__*/ vec3Create();
+const _vC = /*@__PURE__*/ vec3Create();
 
-const _uvA = /*@__PURE__*/ new Vector2();
-const _uvB = /*@__PURE__*/ new Vector2();
-const _uvC = /*@__PURE__*/ new Vector2();
+const _uvA = /*@__PURE__*/ vec2Create();
+const _uvB = /*@__PURE__*/ vec2Create();
+const _uvC = /*@__PURE__*/ vec2Create();
 
 /**
  * A sprite is a plane that always faces towards the camera, generally with a
@@ -128,7 +137,7 @@ class Sprite extends Object3D {
 	 */
 	intersectsFrustum( frustum ) {
 
-		return frustum.intersectsSprite( this );
+		return frustum.planes !== undefined ? frustumIntersectsSprite( frustum, this ) : frustum.intersectsSprite( this );
 
 	}
 
@@ -146,16 +155,16 @@ class Sprite extends Object3D {
 
 		}
 
-		_worldScale.setFromMatrixScale( this.matrixWorld );
+		vec3SetFromMatrixScale( this.matrixWorld, _worldScale );
 
-		_viewWorldMatrix.copy( raycaster.camera.matrixWorld );
-		this.modelViewMatrix.multiplyMatrices( raycaster.camera.matrixWorldInverse, this.matrixWorld );
+		mat4Copy( raycaster.camera.matrixWorld, _viewWorldMatrix );
+		mat4MultiplyMatrices( raycaster.camera.matrixWorldInverse, this.matrixWorld, this.modelViewMatrix );
 
-		_mvPosition.setFromMatrixPosition( this.modelViewMatrix );
+		vec3SetFromMatrixPosition( this.modelViewMatrix, _mvPosition );
 
 		if ( raycaster.camera.isPerspectiveCamera && this.material.sizeAttenuation === false ) {
 
-			_worldScale.multiplyScalar( - _mvPosition.z );
+			vec3MultiplyScalar( _worldScale, - _mvPosition.z, _worldScale );
 
 		}
 
@@ -171,24 +180,28 @@ class Sprite extends Object3D {
 
 		const center = this.center;
 
-		transformVertex( _vA.set( - 0.5, - 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
-		transformVertex( _vB.set( 0.5, - 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
-		transformVertex( _vC.set( 0.5, 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
+		vec3Set( _vA, - 0.5, - 0.5, 0 );
+		transformVertex( _vA, _mvPosition, center, _worldScale, sin, cos );
+		vec3Set( _vB, 0.5, - 0.5, 0 );
+		transformVertex( _vB, _mvPosition, center, _worldScale, sin, cos );
+		vec3Set( _vC, 0.5, 0.5, 0 );
+		transformVertex( _vC, _mvPosition, center, _worldScale, sin, cos );
 
-		_uvA.set( 0, 0 );
-		_uvB.set( 1, 0 );
-		_uvC.set( 1, 1 );
+		vec2Set( 0, 0, _uvA );
+		vec2Set( 1, 0, _uvB );
+		vec2Set( 1, 1, _uvC );
 
 		// check first triangle
-		let intersect = raycaster.ray.intersectTriangle( _vA, _vB, _vC, false, _intersectPoint );
+		let intersect = rayIntersectTriangle( raycaster.ray, _vA, _vB, _vC, false, _intersectPoint );
 
 		if ( intersect === null ) {
 
 			// check second triangle
-			transformVertex( _vB.set( - 0.5, 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
-			_uvB.set( 0, 1 );
+			vec3Set( _vB, - 0.5, 0.5, 0 );
+			transformVertex( _vB, _mvPosition, center, _worldScale, sin, cos );
+			vec2Set( 0, 1, _uvB );
 
-			intersect = raycaster.ray.intersectTriangle( _vA, _vC, _vB, false, _intersectPoint );
+			intersect = rayIntersectTriangle( raycaster.ray, _vA, _vC, _vB, false, _intersectPoint );
 			if ( intersect === null ) {
 
 				return;
@@ -197,15 +210,15 @@ class Sprite extends Object3D {
 
 		}
 
-		const distance = raycaster.ray.origin.distanceTo( _intersectPoint );
+		const distance = vec3DistanceTo( raycaster.ray.origin, _intersectPoint );
 
 		if ( distance < raycaster.near || distance > raycaster.far ) return;
 
 		intersects.push( {
 
 			distance: distance,
-			point: _intersectPoint.clone(),
-			uv: Triangle.getInterpolation( _intersectPoint, _vA, _vB, _vC, _uvA, _uvB, _uvC, new Vector2() ),
+			point: new Vector3().copy( _intersectPoint ),
+			uv: triangleGetInterpolation( _intersectPoint, _vA, _vB, _vC, _uvA, _uvB, _uvC, new Vector2() ),
 			face: null,
 			object: this
 
@@ -230,7 +243,9 @@ class Sprite extends Object3D {
 function transformVertex( vertexPosition, mvPosition, center, scale, sin, cos ) {
 
 	// compute position in camera space
-	_alignedPosition.subVectors( vertexPosition, center ).addScalar( 0.5 ).multiply( scale );
+	vec2SubVectors( vertexPosition, center, _alignedPosition );
+	vec2AddScalar( _alignedPosition, 0.5, _alignedPosition );
+	vec2Multiply( _alignedPosition, scale, _alignedPosition );
 
 	// to check if rotation is not zero
 	if ( sin !== undefined ) {
@@ -240,17 +255,17 @@ function transformVertex( vertexPosition, mvPosition, center, scale, sin, cos ) 
 
 	} else {
 
-		_rotatedPosition.copy( _alignedPosition );
+		vec2Copy( _alignedPosition, _rotatedPosition );
 
 	}
 
 
-	vertexPosition.copy( mvPosition );
+	vec3Copy( mvPosition, vertexPosition );
 	vertexPosition.x += _rotatedPosition.x;
 	vertexPosition.y += _rotatedPosition.y;
 
 	// transform to world space
-	vertexPosition.applyMatrix4( _viewWorldMatrix );
+	vec3ApplyMatrix4( vertexPosition, _viewWorldMatrix, vertexPosition );
 
 }
 

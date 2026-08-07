@@ -1,4 +1,5 @@
 import { Color } from '../math/Color.js';
+import { colorGetHex } from '../math/ColorFunctions.js';
 
 /**
  * This class can be used to define a linear fog that grows linearly denser
@@ -86,7 +87,7 @@ class Fog {
 		return {
 			type: 'Fog',
 			name: this.name,
-			color: this.color.getHex(),
+			color: colorGetHex( this.color ),
 			near: this.near,
 			far: this.far
 		};

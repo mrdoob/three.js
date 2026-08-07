@@ -1,13 +1,19 @@
 import {
 	LinearFilter,
 	MathUtils,
-	Matrix3,
 	NearestFilter,
 	PerspectiveCamera,
 	RGBAFormat,
 	ShaderMaterial,
-	Vector3,
-	WebGLRenderTarget
+	WebGLRenderTarget,
+	mat3FromArray,
+	mat4Compose,
+	mat4ExtractBasis,
+	mat4Invert,
+	vec3AddScaledVector,
+	vec3Copy,
+	vec3Create,
+	vec3Normalize
 } from 'three';
 import { FullScreenQuad } from '../postprocessing/Pass.js';
 import { frameCorners } from '../utils/CameraUtils.js';
@@ -16,15 +22,15 @@ const _cameraL = /*@__PURE__*/ new PerspectiveCamera();
 const _cameraR = /*@__PURE__*/ new PerspectiveCamera();
 
 // Reusable vectors for screen corner calculations
-const _eyeL = /*@__PURE__*/ new Vector3();
-const _eyeR = /*@__PURE__*/ new Vector3();
-const _screenCenter = /*@__PURE__*/ new Vector3();
-const _screenBottomLeft = /*@__PURE__*/ new Vector3();
-const _screenBottomRight = /*@__PURE__*/ new Vector3();
-const _screenTopLeft = /*@__PURE__*/ new Vector3();
-const _right = /*@__PURE__*/ new Vector3();
-const _up = /*@__PURE__*/ new Vector3();
-const _forward = /*@__PURE__*/ new Vector3();
+const _eyeL = /*@__PURE__*/ vec3Create();
+const _eyeR = /*@__PURE__*/ vec3Create();
+const _screenCenter = /*@__PURE__*/ vec3Create();
+const _screenBottomLeft = /*@__PURE__*/ vec3Create();
+const _screenBottomRight = /*@__PURE__*/ vec3Create();
+const _screenTopLeft = /*@__PURE__*/ vec3Create();
+const _right = /*@__PURE__*/ vec3Create();
+const _up = /*@__PURE__*/ vec3Create();
+const _forward = /*@__PURE__*/ vec3Create();
 
 /**
  * A class that creates an anaglyph effect using physically-correct
@@ -52,13 +58,13 @@ class AnaglyphEffect {
 
 		// Dubois matrices from https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.7.6968&rep=rep1&type=pdf#page=4
 
-		this.colorMatrixLeft = new Matrix3().fromArray( [
+		this.colorMatrixLeft = mat3FromArray( [
 			0.456100, - 0.0400822, - 0.0152161,
 			0.500484, - 0.0378246, - 0.0205971,
 			0.176381, - 0.0157589, - 0.00546856
 		] );
 
-		this.colorMatrixRight = new Matrix3().fromArray( [
+		this.colorMatrixRight = mat3FromArray( [
 			- 0.0434706, 0.378476, - 0.0721527,
 			- 0.0879388, 0.73364, - 0.112961,
 			- 0.00155529, - 0.0184503, 1.2264
@@ -189,51 +195,51 @@ class AnaglyphEffect {
 			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
 			// Get the camera's local coordinate axes from its world matrix
-			camera.matrixWorld.extractBasis( _right, _up, _forward );
-			_right.normalize();
-			_up.normalize();
-			_forward.normalize();
+			mat4ExtractBasis( camera.matrixWorld, _right, _up, _forward );
+			vec3Normalize( _right, _right );
+			vec3Normalize( _up, _up );
+			vec3Normalize( _forward, _forward );
 
 			// Calculate eye positions
 			const halfSep = this.eyeSep / 2;
-			_eyeL.copy( camera.position ).addScaledVector( _right, - halfSep );
-			_eyeR.copy( camera.position ).addScaledVector( _right, halfSep );
+			vec3AddScaledVector( camera.position, _right, - halfSep, _eyeL );
+			vec3AddScaledVector( camera.position, _right, halfSep, _eyeR );
 
 			// Calculate screen center (at planeDistance in front of the camera center)
-			_screenCenter.copy( camera.position ).addScaledVector( _forward, - this.planeDistance );
+			vec3AddScaledVector( camera.position, _forward, - this.planeDistance, _screenCenter );
 
 			// Calculate screen dimensions from camera FOV and aspect ratio
 			const halfHeight = this.planeDistance * Math.tan( MathUtils.DEG2RAD * camera.fov / 2 );
 			const halfWidth = halfHeight * camera.aspect;
 
 			// Calculate screen corners
-			_screenBottomLeft.copy( _screenCenter )
-				.addScaledVector( _right, - halfWidth )
-				.addScaledVector( _up, - halfHeight );
+			vec3Copy( _screenCenter, _screenBottomLeft );
+			vec3AddScaledVector( _screenBottomLeft, _right, - halfWidth, _screenBottomLeft );
+			vec3AddScaledVector( _screenBottomLeft, _up, - halfHeight, _screenBottomLeft );
 
-			_screenBottomRight.copy( _screenCenter )
-				.addScaledVector( _right, halfWidth )
-				.addScaledVector( _up, - halfHeight );
+			vec3Copy( _screenCenter, _screenBottomRight );
+			vec3AddScaledVector( _screenBottomRight, _right, halfWidth, _screenBottomRight );
+			vec3AddScaledVector( _screenBottomRight, _up, - halfHeight, _screenBottomRight );
 
-			_screenTopLeft.copy( _screenCenter )
-				.addScaledVector( _right, - halfWidth )
-				.addScaledVector( _up, halfHeight );
+			vec3Copy( _screenCenter, _screenTopLeft );
+			vec3AddScaledVector( _screenTopLeft, _right, - halfWidth, _screenTopLeft );
+			vec3AddScaledVector( _screenTopLeft, _up, halfHeight, _screenTopLeft );
 
 			// Set up left eye camera
-			_cameraL.position.copy( _eyeL );
+			vec3Copy( _eyeL, _cameraL.position );
 			_cameraL.near = camera.near;
 			_cameraL.far = camera.far;
 			frameCorners( _cameraL, _screenBottomLeft, _screenBottomRight, _screenTopLeft, true );
-			_cameraL.matrixWorld.compose( _cameraL.position, _cameraL.quaternion, _cameraL.scale );
-			_cameraL.matrixWorldInverse.copy( _cameraL.matrixWorld ).invert();
+			mat4Compose( _cameraL.position, _cameraL.quaternion, _cameraL.scale, _cameraL.matrixWorld );
+			mat4Invert( _cameraL.matrixWorld, _cameraL.matrixWorldInverse );
 
 			// Set up right eye camera
-			_cameraR.position.copy( _eyeR );
+			vec3Copy( _eyeR, _cameraR.position );
 			_cameraR.near = camera.near;
 			_cameraR.far = camera.far;
 			frameCorners( _cameraR, _screenBottomLeft, _screenBottomRight, _screenTopLeft, true );
-			_cameraR.matrixWorld.compose( _cameraR.position, _cameraR.quaternion, _cameraR.scale );
-			_cameraR.matrixWorldInverse.copy( _cameraR.matrixWorld ).invert();
+			mat4Compose( _cameraR.position, _cameraR.quaternion, _cameraR.scale, _cameraR.matrixWorld );
+			mat4Invert( _cameraR.matrixWorld, _cameraR.matrixWorldInverse );
 
 			// Render left eye
 			renderer.setRenderTarget( _renderTargetL );

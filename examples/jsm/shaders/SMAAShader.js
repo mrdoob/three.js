@@ -1,5 +1,5 @@
 import {
-	Vector2
+	vec2Create
 } from 'three';
 
 /**
@@ -32,7 +32,7 @@ const SMAAEdgesShader = {
 	uniforms: {
 
 		'tDiffuse': { value: null },
-		'resolution': { value: new Vector2( 1 / 1024, 1 / 512 ) }
+		'resolution': { value: vec2Create( 1 / 1024, 1 / 512 ) }
 
 	},
 
@@ -150,7 +150,7 @@ const SMAAWeightsShader = {
 		'tDiffuse': { value: null },
 		'tArea': { value: null },
 		'tSearch': { value: null },
-		'resolution': { value: new Vector2( 1 / 1024, 1 / 512 ) }
+		'resolution': { value: vec2Create( 1 / 1024, 1 / 512 ) }
 
 	},
 
@@ -402,7 +402,7 @@ const SMAABlendShader = {
 
 		'tDiffuse': { value: null },
 		'tColor': { value: null },
-		'resolution': { value: new Vector2( 1 / 1024, 1 / 512 ) }
+		'resolution': { value: vec2Create( 1 / 1024, 1 / 512 ) }
 
 	},
 

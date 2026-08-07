@@ -1,9 +1,12 @@
 import {
 	BoxGeometry,
-	Matrix4,
 	Mesh,
 	MeshBasicMaterial,
-	Object3D
+	Object3D,
+	mat4Create,
+	mat4FromArray,
+	quatSetFromRotationMatrix,
+	vec3SetFromMatrixPosition
 } from 'three';
 
 /**
@@ -30,7 +33,7 @@ class XRPlanes extends Object3D {
 
 		super();
 
-		const matrix = new Matrix4();
+		const matrix = mat4Create();
 
 		const currentPlanes = new Map();
 
@@ -66,7 +69,7 @@ class XRPlanes extends Object3D {
 				if ( currentPlanes.has( plane ) === false ) {
 
 					const pose = frame.getPose( plane.planeSpace, referenceSpace );
-					matrix.fromArray( pose.transform.matrix );
+					mat4FromArray( pose.transform.matrix, 0, matrix );
 
 					const polygon = plane.polygon;
 
@@ -91,8 +94,8 @@ class XRPlanes extends Object3D {
 					const material = new MeshBasicMaterial( { color: 0xffffff * Math.random() } );
 
 					const mesh = new Mesh( geometry, material );
-					mesh.position.setFromMatrixPosition( matrix );
-					mesh.quaternion.setFromRotationMatrix( matrix );
+					vec3SetFromMatrixPosition( matrix, mesh.position );
+					quatSetFromRotationMatrix( matrix, mesh.quaternion );
 					this.add( mesh );
 
 					currentPlanes.set( plane, mesh );

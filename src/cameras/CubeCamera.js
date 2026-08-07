@@ -1,5 +1,6 @@
 import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../constants.js';
 import { Object3D } from '../core/Object3D.js';
+import { vec3Set } from '../math/Vector3Functions.js';
 import { PerspectiveCamera } from './PerspectiveCamera.js';
 
 const fov = - 90; // negative fov is not an error
@@ -114,42 +115,42 @@ class CubeCamera extends Object3D {
 
 		if ( coordinateSystem === WebGLCoordinateSystem ) {
 
-			cameraPX.up.set( 0, 1, 0 );
+			vec3Set( cameraPX.up, 0, 1, 0 );
 			cameraPX.lookAt( 1, 0, 0 );
 
-			cameraNX.up.set( 0, 1, 0 );
+			vec3Set( cameraNX.up, 0, 1, 0 );
 			cameraNX.lookAt( - 1, 0, 0 );
 
-			cameraPY.up.set( 0, 0, - 1 );
+			vec3Set( cameraPY.up, 0, 0, - 1 );
 			cameraPY.lookAt( 0, 1, 0 );
 
-			cameraNY.up.set( 0, 0, 1 );
+			vec3Set( cameraNY.up, 0, 0, 1 );
 			cameraNY.lookAt( 0, - 1, 0 );
 
-			cameraPZ.up.set( 0, 1, 0 );
+			vec3Set( cameraPZ.up, 0, 1, 0 );
 			cameraPZ.lookAt( 0, 0, 1 );
 
-			cameraNZ.up.set( 0, 1, 0 );
+			vec3Set( cameraNZ.up, 0, 1, 0 );
 			cameraNZ.lookAt( 0, 0, - 1 );
 
 		} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
 
-			cameraPX.up.set( 0, - 1, 0 );
+			vec3Set( cameraPX.up, 0, - 1, 0 );
 			cameraPX.lookAt( - 1, 0, 0 );
 
-			cameraNX.up.set( 0, - 1, 0 );
+			vec3Set( cameraNX.up, 0, - 1, 0 );
 			cameraNX.lookAt( 1, 0, 0 );
 
-			cameraPY.up.set( 0, 0, 1 );
+			vec3Set( cameraPY.up, 0, 0, 1 );
 			cameraPY.lookAt( 0, 1, 0 );
 
-			cameraNY.up.set( 0, 0, - 1 );
+			vec3Set( cameraNY.up, 0, 0, - 1 );
 			cameraNY.lookAt( 0, - 1, 0 );
 
-			cameraPZ.up.set( 0, - 1, 0 );
+			vec3Set( cameraPZ.up, 0, - 1, 0 );
 			cameraPZ.lookAt( 0, 0, 1 );
 
-			cameraNZ.up.set( 0, - 1, 0 );
+			vec3Set( cameraNZ.up, 0, - 1, 0 );
 			cameraNZ.lookAt( 0, 0, - 1 );
 
 		} else {

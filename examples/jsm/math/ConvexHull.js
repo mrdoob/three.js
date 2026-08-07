@@ -1,18 +1,35 @@
 import {
-	Line3,
-	Plane,
-	Triangle,
-	Vector3
+	line3ClosestPointToPoint,
+	line3Create,
+	line3Set,
+	planeCreate,
+	planeDistanceToPoint,
+	planeSetFromCoplanarPoints,
+	rayAt,
+	triangleCreate,
+	triangleGetArea,
+	triangleGetMidpoint,
+	triangleGetNormal,
+	triangleSet,
+	vec3ApplyMatrix4,
+	vec3Copy,
+	vec3Create,
+	vec3DistanceTo,
+	vec3DistanceToSquared,
+	vec3Dot,
+	vec3FromBufferAttribute,
+	vec3GetComponent,
+	vec3SetComponent
 } from 'three';
 
 const Visible = 0;
 const Deleted = 1;
 
-const _v1 = new Vector3();
-const _line3 = new Line3();
-const _plane = new Plane();
-const _closestPoint = new Vector3();
-const _triangle = new Triangle();
+const _v1 = /*@__PURE__*/ vec3Create();
+const _line3 = /*@__PURE__*/ line3Create();
+const _plane = /*@__PURE__*/ planeCreate();
+const _closestPoint = /*@__PURE__*/ vec3Create();
+const _triangle = /*@__PURE__*/ triangleCreate();
 
 /**
  * Can be used to compute the convex hull in 3D space for a given set of points. It
@@ -105,9 +122,9 @@ class ConvexHull {
 
 					for ( let i = 0, l = attribute.count; i < l; i ++ ) {
 
-						const point = new Vector3();
+						const point = vec3FromBufferAttribute( attribute, i );
 
-						point.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
+						vec3ApplyMatrix4( point, node.matrixWorld, point );
 
 						points.push( point );
 
@@ -170,7 +187,7 @@ class ConvexHull {
 			// interpret faces as planes for the further computation
 
 			const vN = face.distanceToPoint( ray.origin );
-			const vD = face.normal.dot( ray.direction );
+			const vD = vec3Dot( face.normal, ray.direction );
 
 			// if the origin is on the positive side of a plane (so the plane can "see" the origin) and
 			// the ray is turned away or parallel to the plane, there is no intersection
@@ -218,11 +235,11 @@ class ConvexHull {
 
 		if ( tNear !== - Infinity ) {
 
-			ray.at( tNear, target );
+			rayAt( ray, tNear, target );
 
 		} else {
 
-			ray.at( tFar, target );
+			rayAt( ray, tFar, target );
 
 		}
 
@@ -497,8 +514,8 @@ class ConvexHull {
 	 */
 	_computeExtremes() {
 
-		const min = new Vector3();
-		const max = new Vector3();
+		const min = vec3Create();
+		const max = vec3Create();
 
 		const minVertices = [];
 		const maxVertices = [];
@@ -511,8 +528,8 @@ class ConvexHull {
 
 		}
 
-		min.copy( this.vertices[ 0 ].point );
-		max.copy( this.vertices[ 0 ].point );
+		vec3Copy( this.vertices[ 0 ].point, min );
+		vec3Copy( this.vertices[ 0 ].point, max );
 
 		// compute the min/max vertex on all six directions
 
@@ -525,9 +542,9 @@ class ConvexHull {
 
 			for ( let j = 0; j < 3; j ++ ) {
 
-				if ( point.getComponent( j ) < min.getComponent( j ) ) {
+				if ( vec3GetComponent( point, j ) < vec3GetComponent( min, j ) ) {
 
-					min.setComponent( j, point.getComponent( j ) );
+					vec3SetComponent( min, j, vec3GetComponent( point, j ) );
 					minVertices[ j ] = vertex;
 
 				}
@@ -538,9 +555,9 @@ class ConvexHull {
 
 			for ( let j = 0; j < 3; j ++ ) {
 
-				if ( point.getComponent( j ) > max.getComponent( j ) ) {
+				if ( vec3GetComponent( point, j ) > vec3GetComponent( max, j ) ) {
 
-					max.setComponent( j, point.getComponent( j ) );
+					vec3SetComponent( max, j, vec3GetComponent( point, j ) );
 					maxVertices[ j ] = vertex;
 
 				}
@@ -585,7 +602,7 @@ class ConvexHull {
 
 		for ( let i = 0; i < 3; i ++ ) {
 
-			const distance = max[ i ].point.getComponent( i ) - min[ i ].point.getComponent( i );
+			const distance = vec3GetComponent( max[ i ].point, i ) - vec3GetComponent( min[ i ].point, i );
 
 			if ( distance > maxDistance ) {
 
@@ -604,7 +621,7 @@ class ConvexHull {
 		// 2. The next vertex 'v2' is the one farthest to the line formed by 'v0' and 'v1'
 
 		maxDistance = 0;
-		_line3.set( v0.point, v1.point );
+		line3Set( v0.point, v1.point, _line3 );
 
 		for ( let i = 0, l = this.vertices.length; i < l; i ++ ) {
 
@@ -612,9 +629,9 @@ class ConvexHull {
 
 			if ( vertex !== v0 && vertex !== v1 ) {
 
-				_line3.closestPointToPoint( vertex.point, true, _closestPoint );
+				line3ClosestPointToPoint( _line3, vertex.point, true, _closestPoint );
 
-				const distance = _closestPoint.distanceToSquared( vertex.point );
+				const distance = vec3DistanceToSquared( _closestPoint, vertex.point );
 
 				if ( distance > maxDistance ) {
 
@@ -630,7 +647,7 @@ class ConvexHull {
 		// 3. The next vertex 'v3' is the one farthest to the plane 'v0', 'v1', 'v2'
 
 		maxDistance = - 1;
-		_plane.setFromCoplanarPoints( v0.point, v1.point, v2.point );
+		planeSetFromCoplanarPoints( v0.point, v1.point, v2.point, _plane );
 
 		for ( let i = 0, l = this.vertices.length; i < l; i ++ ) {
 
@@ -638,7 +655,7 @@ class ConvexHull {
 
 			if ( vertex !== v0 && vertex !== v1 && vertex !== v2 ) {
 
-				const distance = Math.abs( _plane.distanceToPoint( vertex.point ) );
+				const distance = Math.abs( planeDistanceToPoint( _plane, vertex.point ) );
 
 				if ( distance > maxDistance ) {
 
@@ -653,7 +670,7 @@ class ConvexHull {
 
 		const faces = [];
 
-		if ( _plane.distanceToPoint( v3.point ) < 0 ) {
+		if ( planeDistanceToPoint( _plane, v3.point ) < 0 ) {
 
 			// the face is not able to see the point so 'plane.normal' is pointing outside the tetrahedron
 
@@ -1072,7 +1089,7 @@ class Face {
 		 * @private
 		 * @type {Vector3}
 		 */
-		this.normal = new Vector3();
+		this.normal = vec3Create();
 
 		/**
 		 * The midpoint or centroid of the face.
@@ -1080,7 +1097,7 @@ class Face {
 		 * @private
 		 * @type {Vector3}
 		 */
-		this.midpoint = new Vector3();
+		this.midpoint = vec3Create();
 
 		/**
 		 * The area of the face.
@@ -1194,13 +1211,13 @@ class Face {
 		const b = this.edge.head();
 		const c = this.edge.next.head();
 
-		_triangle.set( a.point, b.point, c.point );
+		triangleSet( a.point, b.point, c.point, _triangle );
 
-		_triangle.getNormal( this.normal );
-		_triangle.getMidpoint( this.midpoint );
-		this.area = _triangle.getArea();
+		triangleGetNormal( a.point, b.point, c.point, this.normal );
+		triangleGetMidpoint( _triangle, this.midpoint );
+		this.area = triangleGetArea( _triangle );
 
-		this.constant = this.normal.dot( this.midpoint );
+		this.constant = vec3Dot( this.normal, this.midpoint );
 
 		return this;
 
@@ -1215,7 +1232,7 @@ class Face {
 	 */
 	distanceToPoint( point ) {
 
-		return this.normal.dot( point ) - this.constant;
+		return vec3Dot( this.normal, point ) - this.constant;
 
 	}
 
@@ -1319,7 +1336,7 @@ class HalfEdge {
 
 		if ( tail !== null ) {
 
-			return tail.point.distanceTo( head.point );
+			return vec3DistanceTo( tail.point, head.point );
 
 		}
 
@@ -1340,7 +1357,7 @@ class HalfEdge {
 
 		if ( tail !== null ) {
 
-			return tail.point.distanceToSquared( head.point );
+			return vec3DistanceToSquared( tail.point, head.point );
 
 		}
 

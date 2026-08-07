@@ -1,12 +1,12 @@
 import { FloatType } from '../../constants.js';
 import { DataArrayTexture } from '../../textures/DataArrayTexture.js';
-import { Vector4 } from '../../math/Vector4.js';
-import { Vector2 } from '../../math/Vector2.js';
+import { vec2Create } from '../../math/Vector2Functions.js';
+import { vec4Create, vec4FromBufferAttribute } from '../../math/Vector4Functions.js';
 
 function WebGLMorphtargets( gl, capabilities, textures ) {
 
 	const morphTextures = new WeakMap();
-	const morph = new Vector4();
+	const morph = vec4Create();
 
 	function update( object, geometry, program ) {
 
@@ -71,7 +71,7 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 
 					if ( hasMorphPosition === true ) {
 
-						morph.fromBufferAttribute( morphTarget, j );
+						vec4FromBufferAttribute( morphTarget, j, morph );
 
 						buffer[ offset + stride + 0 ] = morph.x;
 						buffer[ offset + stride + 1 ] = morph.y;
@@ -82,7 +82,7 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 
 					if ( hasMorphNormals === true ) {
 
-						morph.fromBufferAttribute( morphNormal, j );
+						vec4FromBufferAttribute( morphNormal, j, morph );
 
 						buffer[ offset + stride + 4 ] = morph.x;
 						buffer[ offset + stride + 5 ] = morph.y;
@@ -93,7 +93,7 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 
 					if ( hasMorphColors === true ) {
 
-						morph.fromBufferAttribute( morphColor, j );
+						vec4FromBufferAttribute( morphColor, j, morph );
 
 						buffer[ offset + stride + 8 ] = morph.x;
 						buffer[ offset + stride + 9 ] = morph.y;
@@ -109,7 +109,7 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 			entry = {
 				count: morphTargetsCount,
 				texture: texture,
-				size: new Vector2( width, height )
+				size: vec2Create( width, height )
 			};
 
 			morphTextures.set( geometry, entry );

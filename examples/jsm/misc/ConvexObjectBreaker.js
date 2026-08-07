@@ -1,12 +1,25 @@
 import {
-	Line3,
 	Mesh,
-	Plane,
-	Vector3
+	line3Create,
+	planeCoplanarPoint,
+	planeCreate,
+	planeDistanceToPoint,
+	planeIntersectLine,
+	planeSetFromCoplanarPoints,
+	quatCopy,
+	vec3Add,
+	vec3AddVectors,
+	vec3ApplyAxisAngle,
+	vec3Copy,
+	vec3Create,
+	vec3DivideScalar,
+	vec3Dot,
+	vec3Set,
+	vec3Sub
 } from 'three';
 import { ConvexGeometry } from '../geometries/ConvexGeometry.js';
 
-const _v1 = new Vector3();
+const _v1 = /*@__PURE__*/ vec3Create();
 
 /**
  * This class can be used to subdivide a convex Geometry object into pieces.
@@ -40,22 +53,22 @@ class ConvexObjectBreaker {
 		this.minSizeForBreak = minSizeForBreak;
 		this.smallDelta = smallDelta;
 
-		this.tempLine1 = new Line3();
-		this.tempPlane1 = new Plane();
-		this.tempPlane2 = new Plane();
-		this.tempPlane_Cut = new Plane();
-		this.tempCM1 = new Vector3();
-		this.tempCM2 = new Vector3();
-		this.tempVector3 = new Vector3();
-		this.tempVector3_2 = new Vector3();
-		this.tempVector3_3 = new Vector3();
-		this.tempVector3_P0 = new Vector3();
-		this.tempVector3_P1 = new Vector3();
-		this.tempVector3_P2 = new Vector3();
-		this.tempVector3_N0 = new Vector3();
-		this.tempVector3_N1 = new Vector3();
-		this.tempVector3_AB = new Vector3();
-		this.tempVector3_CB = new Vector3();
+		this.tempLine1 = line3Create();
+		this.tempPlane1 = planeCreate();
+		this.tempPlane2 = planeCreate();
+		this.tempPlane_Cut = planeCreate();
+		this.tempCM1 = vec3Create();
+		this.tempCM2 = vec3Create();
+		this.tempVector3 = vec3Create();
+		this.tempVector3_2 = vec3Create();
+		this.tempVector3_3 = vec3Create();
+		this.tempVector3_P0 = vec3Create();
+		this.tempVector3_P1 = vec3Create();
+		this.tempVector3_P2 = vec3Create();
+		this.tempVector3_N0 = vec3Create();
+		this.tempVector3_N1 = vec3Create();
+		this.tempVector3_AB = vec3Create();
+		this.tempVector3_CB = vec3Create();
 		this.tempResultObjects = { object1: null, object2: null };
 
 		this.segments = [];
@@ -81,8 +94,8 @@ class ConvexObjectBreaker {
 
 		const userData = object.userData;
 		userData.mass = mass;
-		userData.velocity = velocity.clone();
-		userData.angularVelocity = angularVelocity.clone();
+		userData.velocity = vec3Copy( velocity );
+		userData.angularVelocity = vec3Copy( angularVelocity );
 		userData.breakable = breakable;
 
 	}
@@ -105,8 +118,8 @@ class ConvexObjectBreaker {
 		const tempPlane1 = this.tempPlane1;
 		const tempPlane2 = this.tempPlane2;
 
-		this.tempVector3.addVectors( pointOfImpact, normal );
-		tempPlane1.setFromCoplanarPoints( pointOfImpact, object.position, this.tempVector3 );
+		vec3AddVectors( pointOfImpact, normal, this.tempVector3 );
+		planeSetFromCoplanarPoints( pointOfImpact, object.position, this.tempVector3, tempPlane1 );
 
 		const maxTotalIterations = maxRandomIterations + maxRadialIterations;
 
@@ -126,7 +139,7 @@ class ConvexObjectBreaker {
 
 			if ( numIterations === 0 ) {
 
-				tempPlane2.normal.copy( tempPlane1.normal );
+				vec3Copy( tempPlane1.normal, tempPlane2.normal );
 				tempPlane2.constant = tempPlane1.constant;
 
 			} else {
@@ -136,17 +149,24 @@ class ConvexObjectBreaker {
 					angle = ( endAngle - startAngle ) * ( 0.2 + 0.6 * Math.random() ) + startAngle;
 
 					// Rotate tempPlane2 at impact point around normal axis and the angle
-					scope.tempVector3_2.copy( object.position ).sub( pointOfImpact ).applyAxisAngle( normal, angle ).add( pointOfImpact );
-					tempPlane2.setFromCoplanarPoints( pointOfImpact, scope.tempVector3, scope.tempVector3_2 );
+					vec3Copy( object.position, scope.tempVector3_2 );
+					vec3Sub( scope.tempVector3_2, pointOfImpact, scope.tempVector3_2 );
+					vec3ApplyAxisAngle( scope.tempVector3_2, normal, angle, scope.tempVector3_2 );
+					vec3Add( scope.tempVector3_2, pointOfImpact, scope.tempVector3_2 );
+					planeSetFromCoplanarPoints( pointOfImpact, scope.tempVector3, scope.tempVector3_2, tempPlane2 );
 
 				} else {
 
 					angle = ( ( 0.5 * ( numIterations & 1 ) ) + 0.2 * ( 2 - Math.random() ) ) * Math.PI;
 
 					// Rotate tempPlane2 at object position around normal axis and the angle
-					scope.tempVector3_2.copy( pointOfImpact ).sub( subObject.position ).applyAxisAngle( normal, angle ).add( subObject.position );
-					scope.tempVector3_3.copy( normal ).add( subObject.position );
-					tempPlane2.setFromCoplanarPoints( subObject.position, scope.tempVector3_3, scope.tempVector3_2 );
+					vec3Copy( pointOfImpact, scope.tempVector3_2 );
+					vec3Sub( scope.tempVector3_2, subObject.position, scope.tempVector3_2 );
+					vec3ApplyAxisAngle( scope.tempVector3_2, normal, angle, scope.tempVector3_2 );
+					vec3Add( scope.tempVector3_2, subObject.position, scope.tempVector3_2 );
+					vec3Copy( normal, scope.tempVector3_3 );
+					vec3Add( scope.tempVector3_3, subObject.position, scope.tempVector3_3 );
+					planeSetFromCoplanarPoints( subObject.position, scope.tempVector3_3, scope.tempVector3_2, tempPlane2 );
 
 				}
 
@@ -241,7 +261,7 @@ class ConvexObjectBreaker {
 			const c1 = getVertexIndex( i, 2 );
 
 			// Assuming all 3 vertices have the same normal
-			n0.set( normals[ a1 ], normals[ a1 ] + 1, normals[ a1 ] + 2 );
+			vec3Set( n0, normals[ a1 ], normals[ a1 ] + 1, normals[ a1 ] + 2 );
 
 			for ( let j = i + 1; j < numFaces; j ++ ) {
 
@@ -250,9 +270,9 @@ class ConvexObjectBreaker {
 				const c2 = getVertexIndex( j, 2 );
 
 				// Assuming all 3 vertices have the same normal
-				n1.set( normals[ a2 ], normals[ a2 ] + 1, normals[ a2 ] + 2 );
+				vec3Set( n1, normals[ a2 ], normals[ a2 ] + 1, normals[ a2 ] + 2 );
 
-				const coplanar = 1 - n0.dot( n1 ) < delta;
+				const coplanar = 1 - vec3Dot( n0, n1 ) < delta;
 
 				if ( coplanar ) {
 
@@ -308,52 +328,52 @@ class ConvexObjectBreaker {
 				this.segments[ i0 * numPoints + i1 ] = true;
 				this.segments[ i1 * numPoints + i0 ] = true;
 
-				p0.set( coords[ 3 * i0 ], coords[ 3 * i0 + 1 ], coords[ 3 * i0 + 2 ] );
-				p1.set( coords[ 3 * i1 ], coords[ 3 * i1 + 1 ], coords[ 3 * i1 + 2 ] );
+				vec3Set( p0, coords[ 3 * i0 ], coords[ 3 * i0 + 1 ], coords[ 3 * i0 + 2 ] );
+				vec3Set( p1, coords[ 3 * i1 ], coords[ 3 * i1 + 1 ], coords[ 3 * i1 + 2 ] );
 
 				// mark: 1 for negative side, 2 for positive side, 3 for coplanar point
 				let mark0 = 0;
 
-				let d = localPlane.distanceToPoint( p0 );
+				let d = planeDistanceToPoint( localPlane, p0 );
 
 				if ( d > delta ) {
 
 					mark0 = 2;
-					points2.push( p0.clone() );
+					points2.push( vec3Copy( p0 ) );
 
 				} else if ( d < - delta ) {
 
 					mark0 = 1;
-					points1.push( p0.clone() );
+					points1.push( vec3Copy( p0 ) );
 
 				} else {
 
 					mark0 = 3;
-					points1.push( p0.clone() );
-					points2.push( p0.clone() );
+					points1.push( vec3Copy( p0 ) );
+					points2.push( vec3Copy( p0 ) );
 
 				}
 
 				// mark: 1 for negative side, 2 for positive side, 3 for coplanar point
 				let mark1 = 0;
 
-				d = localPlane.distanceToPoint( p1 );
+				d = planeDistanceToPoint( localPlane, p1 );
 
 				if ( d > delta ) {
 
 					mark1 = 2;
-					points2.push( p1.clone() );
+					points2.push( vec3Copy( p1 ) );
 
 				} else if ( d < - delta ) {
 
 					mark1 = 1;
-					points1.push( p1.clone() );
+					points1.push( vec3Copy( p1 ) );
 
 				}	else {
 
 					mark1 = 3;
-					points1.push( p1.clone() );
-					points2.push( p1.clone() );
+					points1.push( vec3Copy( p1 ) );
+					points2.push( vec3Copy( p1 ) );
 
 				}
 
@@ -361,11 +381,11 @@ class ConvexObjectBreaker {
 
 					// Intersection of segment with the plane
 
-					this.tempLine1.start.copy( p0 );
-					this.tempLine1.end.copy( p1 );
+					vec3Copy( p0, this.tempLine1.start );
+					vec3Copy( p1, this.tempLine1.end );
 
-					let intersection = new Vector3();
-					intersection = localPlane.intersectLine( this.tempLine1, intersection );
+					let intersection = vec3Create();
+					intersection = planeIntersectLine( localPlane, this.tempLine1, intersection );
 
 					if ( intersection === null ) {
 
@@ -378,7 +398,7 @@ class ConvexObjectBreaker {
 					}
 
 					points1.push( intersection );
-					points2.push( intersection.clone() );
+					points2.push( vec3Copy( intersection ) );
 
 				}
 
@@ -390,44 +410,44 @@ class ConvexObjectBreaker {
 		const newMass = object.userData.mass * 0.5;
 
 		// Calculate debris Center of Mass (again fast and imprecise)
-		this.tempCM1.set( 0, 0, 0 );
+		vec3Set( this.tempCM1, 0, 0, 0 );
 		let radius1 = 0;
 		const numPoints1 = points1.length;
 
 		if ( numPoints1 > 0 ) {
 
-			for ( let i = 0; i < numPoints1; i ++ ) this.tempCM1.add( points1[ i ] );
+			for ( let i = 0; i < numPoints1; i ++ ) vec3Add( this.tempCM1, points1[ i ], this.tempCM1 );
 
-			this.tempCM1.divideScalar( numPoints1 );
+			vec3DivideScalar( this.tempCM1, numPoints1, this.tempCM1 );
 			for ( let i = 0; i < numPoints1; i ++ ) {
 
 				const p = points1[ i ];
-				p.sub( this.tempCM1 );
+				vec3Sub( p, this.tempCM1, p );
 				radius1 = Math.max( radius1, p.x, p.y, p.z );
 
 			}
 
-			this.tempCM1.add( object.position );
+			vec3Add( this.tempCM1, object.position, this.tempCM1 );
 
 		}
 
-		this.tempCM2.set( 0, 0, 0 );
+		vec3Set( this.tempCM2, 0, 0, 0 );
 		let radius2 = 0;
 		const numPoints2 = points2.length;
 		if ( numPoints2 > 0 ) {
 
-			for ( let i = 0; i < numPoints2; i ++ ) this.tempCM2.add( points2[ i ] );
+			for ( let i = 0; i < numPoints2; i ++ ) vec3Add( this.tempCM2, points2[ i ], this.tempCM2 );
 
-			this.tempCM2.divideScalar( numPoints2 );
+			vec3DivideScalar( this.tempCM2, numPoints2, this.tempCM2 );
 			for ( let i = 0; i < numPoints2; i ++ ) {
 
 				const p = points2[ i ];
-				p.sub( this.tempCM2 );
+				vec3Sub( p, this.tempCM2, p );
 				radius2 = Math.max( radius2, p.x, p.y, p.z );
 
 			}
 
-			this.tempCM2.add( object.position );
+			vec3Add( this.tempCM2, object.position, this.tempCM2 );
 
 		}
 
@@ -439,8 +459,8 @@ class ConvexObjectBreaker {
 		if ( numPoints1 > 4 ) {
 
 			object1 = new Mesh( new ConvexGeometry( points1 ), object.material );
-			object1.position.copy( this.tempCM1 );
-			object1.quaternion.copy( object.quaternion );
+			vec3Copy( this.tempCM1, object1.position );
+			quatCopy( object.quaternion, object1.quaternion );
 
 			this.prepareBreakableObject( object1, newMass, object.userData.velocity, object.userData.angularVelocity, 2 * radius1 > this.minSizeForBreak );
 
@@ -451,8 +471,8 @@ class ConvexObjectBreaker {
 		if ( numPoints2 > 4 ) {
 
 			object2 = new Mesh( new ConvexGeometry( points2 ), object.material );
-			object2.position.copy( this.tempCM2 );
-			object2.quaternion.copy( object.quaternion );
+			vec3Copy( this.tempCM2, object2.position );
+			quatCopy( object.quaternion, object2.quaternion );
 
 			this.prepareBreakableObject( object2, newMass, object.userData.velocity, object.userData.angularVelocity, 2 * radius2 > this.minSizeForBreak );
 
@@ -522,15 +542,15 @@ class ConvexObjectBreaker {
 
 	static transformPlaneToLocalSpace( plane, m, resultPlane ) {
 
-		resultPlane.normal.copy( plane.normal );
+		vec3Copy( plane.normal, resultPlane.normal );
 		resultPlane.constant = plane.constant;
 
-		const referencePoint = ConvexObjectBreaker.transformTiedVectorInverse( plane.coplanarPoint( _v1 ), m );
+		const referencePoint = ConvexObjectBreaker.transformTiedVectorInverse( planeCoplanarPoint( plane, _v1 ), m );
 
 		ConvexObjectBreaker.transformFreeVectorInverse( resultPlane.normal, m );
 
 		// recalculate constant (like in setFromNormalAndCoplanarPoint)
-		resultPlane.constant = - referencePoint.dot( resultPlane.normal );
+		resultPlane.constant = - vec3Dot( referencePoint, resultPlane.normal );
 
 	}
 

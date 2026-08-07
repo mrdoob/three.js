@@ -1,6 +1,8 @@
 import { Light } from './Light.js';
 import { Color } from '../math/Color.js';
+import { colorCopy, colorGetHex } from '../math/ColorFunctions.js';
 import { Object3D } from '../core/Object3D.js';
+import { vec3Copy } from '../math/Vector3Functions.js';
 
 /**
  * A light source positioned directly above the scene, with color fading from
@@ -39,7 +41,7 @@ class HemisphereLight extends Light {
 
 		this.type = 'HemisphereLight';
 
-		this.position.copy( Object3D.DEFAULT_UP );
+		vec3Copy( Object3D.DEFAULT_UP, this.position );
 		this.updateMatrix();
 
 		/**
@@ -55,7 +57,7 @@ class HemisphereLight extends Light {
 
 		super.copy( source, recursive );
 
-		this.groundColor.copy( source.groundColor );
+		colorCopy( source.groundColor, this.groundColor );
 
 		return this;
 
@@ -65,7 +67,7 @@ class HemisphereLight extends Light {
 
 		const data = super.toJSON( meta );
 
-		data.object.groundColor = this.groundColor.getHex();
+		data.object.groundColor = colorGetHex( this.groundColor );
 
 		return data;
 

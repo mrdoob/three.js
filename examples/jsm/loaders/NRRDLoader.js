@@ -1,8 +1,13 @@
 import {
 	FileLoader,
 	Loader,
-	Matrix4,
-	Vector3
+	vec3FromArray,
+	vec3Length,
+	mat4Create,
+	mat4Set,
+	mat4MultiplyMatrices,
+	mat4Invert,
+	mat4Identity
 } from 'three';
 import { gunzipSync } from '../libs/fflate.module.js';
 import { Volume } from '../misc/Volume.js';
@@ -433,20 +438,21 @@ class NRRDLoader extends Loader {
 		}
 
 		// spacing
-		const spacingX = new Vector3().fromArray( headerObject.vectors[ 0 ] ).length();
-		const spacingY = new Vector3().fromArray( headerObject.vectors[ 1 ] ).length();
-		const spacingZ = new Vector3().fromArray( headerObject.vectors[ 2 ] ).length();
+		const spacingX = vec3Length( vec3FromArray( headerObject.vectors[ 0 ] ) );
+		const spacingY = vec3Length( vec3FromArray( headerObject.vectors[ 1 ] ) );
+		const spacingZ = vec3Length( vec3FromArray( headerObject.vectors[ 2 ] ) );
 		volume.spacing = [ spacingX, spacingY, spacingZ ];
 
 
 		// Create IJKtoRAS matrix
-		volume.matrix = new Matrix4();
+		volume.matrix = mat4Create();
 
-		const transitionMatrix = new Matrix4();
+		const transitionMatrix = mat4Create();
 
 		if ( headerObject.space === 'left-posterior-superior' ) {
 
-			transitionMatrix.set(
+			mat4Set(
+				transitionMatrix,
 				- 1, 0, 0, 0,
 				0, - 1, 0, 0,
 				0, 0, 1, 0,
@@ -455,7 +461,8 @@ class NRRDLoader extends Loader {
 
 		} else if ( headerObject.space === 'left-anterior-superior' ) {
 
-			transitionMatrix.set(
+			mat4Set(
+				transitionMatrix,
 				1, 0, 0, 0,
 				0, 1, 0, 0,
 				0, 0, - 1, 0,
@@ -467,31 +474,27 @@ class NRRDLoader extends Loader {
 
 		if ( ! headerObject.vectors ) {
 
-			volume.matrix.set(
-				1, 0, 0, 0,
-				0, 1, 0, 0,
-				0, 0, 1, 0,
-				0, 0, 0, 1 );
+			mat4Identity( volume.matrix );
 
 		} else {
 
 			const v = headerObject.vectors;
 
-			const ijk_to_transition = new Matrix4().set(
+			const ijk_to_transition = mat4Set(
+				mat4Create(),
 				v[ 0 ][ 0 ], v[ 1 ][ 0 ], v[ 2 ][ 0 ], 0,
 				v[ 0 ][ 1 ], v[ 1 ][ 1 ], v[ 2 ][ 1 ], 0,
 				v[ 0 ][ 2 ], v[ 1 ][ 2 ], v[ 2 ][ 2 ], 0,
 				0, 0, 0, 1
 			);
 
-			const transition_to_ras = new Matrix4().multiplyMatrices( ijk_to_transition, transitionMatrix );
+			const transition_to_ras = mat4MultiplyMatrices( ijk_to_transition, transitionMatrix );
 
 			volume.matrix = transition_to_ras;
 
 		}
 
-		volume.inverseMatrix = new Matrix4();
-		volume.inverseMatrix.copy( volume.matrix ).invert();
+		volume.inverseMatrix = mat4Invert( volume.matrix );
 
 		volume.RASDimensions = [
 			Math.floor( volume.xLength * spacingX ),

@@ -1,14 +1,32 @@
 import {
-	Color,
-	Matrix4,
 	Mesh,
-	Plane,
 	ShaderMaterial,
 	UniformsUtils,
-	Vector3,
-	Vector4,
 	WebGLRenderTarget,
-	HalfFloatType
+	HalfFloatType,
+	colorSet,
+	mat4Copy,
+	mat4Create,
+	mat4ExtractRotation,
+	mat4Multiply,
+	mat4Set,
+	planeApplyMatrix4,
+	planeCreate,
+	planeSetFromNormalAndCoplanarPoint,
+	vec3Add,
+	vec3ApplyMatrix4,
+	vec3Copy,
+	vec3Create,
+	vec3Dot,
+	vec3Negate,
+	vec3Reflect,
+	vec3Set,
+	vec3SetFromMatrixPosition,
+	vec3SubVectors,
+	vec4Create,
+	vec4Dot,
+	vec4MultiplyScalar,
+	vec4Set
 } from 'three';
 
 /**
@@ -75,7 +93,7 @@ class Reflector extends Mesh {
 
 		const scope = this;
 
-		const color = ( options.color !== undefined ) ? new Color( options.color ) : new Color( 0x7F7F7F );
+		const color = colorSet( options.color !== undefined ? options.color : 0x7F7F7F );
 		const textureWidth = options.textureWidth || 512;
 		const textureHeight = options.textureHeight || 512;
 		const clipBias = options.clipBias || 0;
@@ -84,19 +102,19 @@ class Reflector extends Mesh {
 
 		//
 
-		const reflectorPlane = new Plane();
-		const normal = new Vector3();
-		const reflectorWorldPosition = new Vector3();
-		const cameraWorldPosition = new Vector3();
-		const rotationMatrix = new Matrix4();
-		const lookAtPosition = new Vector3( 0, 0, - 1 );
-		const clipPlane = new Vector4();
+		const reflectorPlane = planeCreate();
+		const normal = vec3Create();
+		const reflectorWorldPosition = vec3Create();
+		const cameraWorldPosition = vec3Create();
+		const rotationMatrix = mat4Create();
+		const lookAtPosition = vec3Set( vec3Create(), 0, 0, - 1 );
+		const clipPlane = vec4Create();
 
-		const view = new Vector3();
-		const target = new Vector3();
-		const q = new Vector4();
+		const view = vec3Create();
+		const target = vec3Create();
+		const q = vec4Create();
 
-		const textureMatrix = new Matrix4();
+		const textureMatrix = mat4Create();
 
 		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { samples: multisample, type: HalfFloatType } );
 
@@ -117,62 +135,65 @@ class Reflector extends Mesh {
 
 			const reflectionCamera = this.getReflectionCamera( camera );
 
-			reflectorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
-			cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
+			vec3SetFromMatrixPosition( scope.matrixWorld, reflectorWorldPosition );
+			vec3SetFromMatrixPosition( camera.matrixWorld, cameraWorldPosition );
 
-			rotationMatrix.extractRotation( scope.matrixWorld );
+			mat4ExtractRotation( scope.matrixWorld, rotationMatrix );
 
-			normal.set( 0, 0, 1 );
-			normal.applyMatrix4( rotationMatrix );
+			vec3Set( normal, 0, 0, 1 );
+			vec3ApplyMatrix4( normal, rotationMatrix, normal );
 
-			view.subVectors( reflectorWorldPosition, cameraWorldPosition );
+			vec3SubVectors( reflectorWorldPosition, cameraWorldPosition, view );
 
 			// Avoid rendering when reflector is facing away unless forcing an update
-			const isFacingAway = view.dot( normal ) > 0;
+			const isFacingAway = vec3Dot( view, normal ) > 0;
 
 			if ( isFacingAway === true && this.forceUpdate === false ) return;
 
-			view.reflect( normal ).negate();
-			view.add( reflectorWorldPosition );
+			vec3Reflect( view, normal, view );
+			vec3Negate( view, view );
+			vec3Add( view, reflectorWorldPosition, view );
 
-			rotationMatrix.extractRotation( camera.matrixWorld );
+			mat4ExtractRotation( camera.matrixWorld, rotationMatrix );
 
-			lookAtPosition.set( 0, 0, - 1 );
-			lookAtPosition.applyMatrix4( rotationMatrix );
-			lookAtPosition.add( cameraWorldPosition );
+			vec3Set( lookAtPosition, 0, 0, - 1 );
+			vec3ApplyMatrix4( lookAtPosition, rotationMatrix, lookAtPosition );
+			vec3Add( lookAtPosition, cameraWorldPosition, lookAtPosition );
 
-			target.subVectors( reflectorWorldPosition, lookAtPosition );
-			target.reflect( normal ).negate();
-			target.add( reflectorWorldPosition );
+			vec3SubVectors( reflectorWorldPosition, lookAtPosition, target );
+			vec3Reflect( target, normal, target );
+			vec3Negate( target, target );
+			vec3Add( target, reflectorWorldPosition, target );
 
-			reflectionCamera.position.copy( view );
-			reflectionCamera.up.set( 0, 1, 0 );
-			reflectionCamera.up.applyMatrix4( rotationMatrix );
-			reflectionCamera.up.reflect( normal );
+			vec3Copy( view, reflectionCamera.position );
+			vec3Set( reflectionCamera.up, 0, 1, 0 );
+			vec3ApplyMatrix4( reflectionCamera.up, rotationMatrix, reflectionCamera.up );
+			vec3Reflect( reflectionCamera.up, normal, reflectionCamera.up );
 			reflectionCamera.lookAt( target );
 
 			reflectionCamera.far = camera.far; // Used in WebGLBackground
 
 			reflectionCamera.updateMatrixWorld();
-			reflectionCamera.projectionMatrix.copy( camera.projectionMatrix );
+			mat4Copy( camera.projectionMatrix, reflectionCamera.projectionMatrix );
 
 			// Update the texture matrix
-			textureMatrix.set(
+			mat4Set(
+				textureMatrix,
 				0.5, 0.0, 0.0, 0.5,
 				0.0, 0.5, 0.0, 0.5,
 				0.0, 0.0, 0.5, 0.5,
 				0.0, 0.0, 0.0, 1.0
 			);
-			textureMatrix.multiply( reflectionCamera.projectionMatrix );
-			textureMatrix.multiply( reflectionCamera.matrixWorldInverse );
-			textureMatrix.multiply( scope.matrixWorld );
+			mat4Multiply( textureMatrix, reflectionCamera.projectionMatrix, textureMatrix );
+			mat4Multiply( textureMatrix, reflectionCamera.matrixWorldInverse, textureMatrix );
+			mat4Multiply( textureMatrix, scope.matrixWorld, textureMatrix );
 
 			// Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
 			// Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
-			reflectorPlane.setFromNormalAndCoplanarPoint( normal, reflectorWorldPosition );
-			reflectorPlane.applyMatrix4( reflectionCamera.matrixWorldInverse );
+			planeSetFromNormalAndCoplanarPoint( normal, reflectorWorldPosition, reflectorPlane );
+			planeApplyMatrix4( reflectorPlane, reflectionCamera.matrixWorldInverse, undefined, reflectorPlane );
 
-			clipPlane.set( reflectorPlane.normal.x, reflectorPlane.normal.y, reflectorPlane.normal.z, reflectorPlane.constant );
+			vec4Set( reflectorPlane.normal.x, reflectorPlane.normal.y, reflectorPlane.normal.z, reflectorPlane.constant, clipPlane );
 
 			const projectionMatrix = reflectionCamera.projectionMatrix;
 
@@ -193,7 +214,7 @@ class Reflector extends Mesh {
 			}
 
 			// Calculate the scaled plane vector
-			clipPlane.multiplyScalar( 2.0 / clipPlane.dot( q ) );
+			vec4MultiplyScalar( clipPlane, 2.0 / vec4Dot( clipPlane, q ), clipPlane );
 
 			// Replacing the third row of the projection matrix
 			projectionMatrix.elements[ 2 ] = clipPlane.x;

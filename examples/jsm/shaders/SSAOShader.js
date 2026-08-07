@@ -1,6 +1,6 @@
 import {
-	Matrix4,
-	Vector2
+	mat4Create,
+	vec2Create
 } from 'three';
 
 /**
@@ -36,9 +36,9 @@ const SSAOShader = {
 		'kernel': { value: null },
 		'cameraNear': { value: null },
 		'cameraFar': { value: null },
-		'resolution': { value: new Vector2() },
-		'cameraProjectionMatrix': { value: new Matrix4() },
-		'cameraInverseProjectionMatrix': { value: new Matrix4() },
+		'resolution': { value: vec2Create() },
+		'cameraProjectionMatrix': { value: mat4Create() },
+		'cameraInverseProjectionMatrix': { value: mat4Create() },
 		'kernelRadius': { value: 8 },
 		'minDistance': { value: 0.005 },
 		'maxDistance': { value: 0.05 },
@@ -283,7 +283,7 @@ const SSAOBlurShader = {
 	uniforms: {
 
 		'tDiffuse': { value: null },
-		'resolution': { value: new Vector2() }
+		'resolution': { value: vec2Create() }
 
 	},
 

@@ -1,4 +1,12 @@
-import { Color, Node, Vector3 } from 'three/webgpu';
+import {
+	Node,
+	colorCreate,
+	colorCopy,
+	colorMultiplyScalar,
+	vec3Create,
+	vec3Normalize,
+	vec3SetFromMatrixPosition
+} from 'three/webgpu';
 import { Loop, NodeUpdateType, mix, normalWorld, renderGroup, uniform, uniformArray } from 'three/tsl';
 
 const warn = ( message ) => {
@@ -32,9 +40,9 @@ class HemisphereLightDataNode extends Node {
 
 		for ( let i = 0; i < maxCount; i ++ ) {
 
-			this._skyColors.push( new Color() );
-			this._groundColors.push( new Color() );
-			this._directions.push( new Vector3() );
+			this._skyColors.push( colorCreate() );
+			this._groundColors.push( colorCreate() );
+			this._directions.push( vec3Create() );
 
 		}
 
@@ -70,9 +78,14 @@ class HemisphereLightDataNode extends Node {
 
 			const light = this._lights[ i ];
 
-			this._skyColors[ i ].copy( light.color ).multiplyScalar( light.intensity );
-			this._groundColors[ i ].copy( light.groundColor ).multiplyScalar( light.intensity );
-			this._directions[ i ].setFromMatrixPosition( light.matrixWorld ).normalize();
+			colorCopy( light.color, this._skyColors[ i ] );
+			colorMultiplyScalar( this._skyColors[ i ], light.intensity, this._skyColors[ i ] );
+
+			colorCopy( light.groundColor, this._groundColors[ i ] );
+			colorMultiplyScalar( this._groundColors[ i ], light.intensity, this._groundColors[ i ] );
+
+			vec3SetFromMatrixPosition( light.matrixWorld, this._directions[ i ] );
+			vec3Normalize( this._directions[ i ], this._directions[ i ] );
 
 		}
 

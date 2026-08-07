@@ -5,7 +5,15 @@ import {
 	Line,
 	LineBasicMaterial,
 	Mesh,
-	MeshBasicMaterial
+	MeshBasicMaterial,
+	colorCopy,
+	colorMultiplyScalar,
+	colorSet,
+	mat4Copy,
+	mat4CopyPosition,
+	mat4ExtractRotation,
+	mat4Scale,
+	vec3Set
 } from 'three';
 
 /**
@@ -73,30 +81,33 @@ class RectAreaLightHelper extends Line {
 
 	updateMatrixWorld() {
 
-		this.scale.set( 0.5 * this.light.width, 0.5 * this.light.height, 1 );
+		vec3Set( this.scale, 0.5 * this.light.width, 0.5 * this.light.height, 1 );
 
 		if ( this.color !== undefined ) {
 
-			this.material.color.set( this.color );
-			this.children[ 0 ].material.color.set( this.color );
+			colorSet( this.color, undefined, undefined, this.material.color );
+			colorSet( this.color, undefined, undefined, this.children[ 0 ].material.color );
 
 		} else {
 
-			this.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+			colorCopy( this.light.color, this.material.color );
+			colorMultiplyScalar( this.material.color, this.light.intensity, this.material.color );
 
 			// prevent hue shift
 			const c = this.material.color;
 			const max = Math.max( c.r, c.g, c.b );
-			if ( max > 1 ) c.multiplyScalar( 1 / max );
+			if ( max > 1 ) colorMultiplyScalar( c, 1 / max, c );
 
-			this.children[ 0 ].material.color.copy( this.material.color );
+			colorCopy( this.material.color, this.children[ 0 ].material.color );
 
 		}
 
 		// ignore world scale on light
-		this.matrixWorld.extractRotation( this.light.matrixWorld ).scale( this.scale ).copyPosition( this.light.matrixWorld );
+		mat4ExtractRotation( this.light.matrixWorld, this.matrixWorld );
+		mat4Scale( this.matrixWorld, this.scale, this.matrixWorld );
+		mat4CopyPosition( this.light.matrixWorld, this.matrixWorld );
 
-		this.children[ 0 ].matrixWorld.copy( this.matrixWorld );
+		mat4Copy( this.matrixWorld, this.children[ 0 ].matrixWorld );
 
 	}
 

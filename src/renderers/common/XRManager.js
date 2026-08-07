@@ -1,11 +1,13 @@
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
-import { Quaternion } from '../../math/Quaternion.js';
 import { RAD2DEG } from '../../math/MathUtils.js';
-import { Vector2 } from '../../math/Vector2.js';
-import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
+import { mat4Compose, mat4Copy, mat4Decompose, mat4FromArray, mat4Invert, mat4MakePerspective, mat4Multiply, mat4MultiplyMatrices } from '../../math/Matrix4Functions.js';
+import { quatCopy, quatCreate } from '../../math/QuaternionFunctions.js';
+import { vec2Create } from '../../math/Vector2Functions.js';
+import { vec3Copy, vec3Create, vec3DistanceTo, vec3SetFromMatrixPosition } from '../../math/Vector3Functions.js';
+import { vec4Set } from '../../math/Vector4Functions.js';
 import { WebXRController } from '../webxr/WebXRController.js';
 import { AddEquation, BackSide, CustomBlending, DepthFormat, DepthStencilFormat, FrontSide, RGBAFormat, UnsignedByteType, UnsignedInt248Type, UnsignedIntType, ZeroFactor, LinearFilter } from '../../constants.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
@@ -18,8 +20,8 @@ import { warn, warnOnce } from '../../utils.js';
 import { renderOutput } from '../../nodes/display/RenderOutputNode.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 
-const _cameraLPos = /*@__PURE__*/ new Vector3();
-const _cameraRPos = /*@__PURE__*/ new Vector3();
+const _cameraLPos = /*@__PURE__*/ vec3Create();
+const _cameraRPos = /*@__PURE__*/ vec3Create();
 
 const _contextNodeLib = /*@__PURE__*/ new WeakMap();
 
@@ -236,7 +238,7 @@ class XRManager extends EventDispatcher {
 		 * @private
 		 * @type {Vector2}
 		 */
-		this._currentSize = new Vector2();
+		this._currentSize = vec2Create();
 
 		/**
 		 * Holds a reference to the user camera and its current settings.
@@ -938,8 +940,8 @@ class XRManager extends EventDispatcher {
 		material.map.offset.y = 1;
 		material.map.repeat.y = - 1;
 		const plane = new Mesh( geometry, material );
-		plane.position.copy( translation );
-		plane.quaternion.copy( quaternion );
+		vec3Copy( translation, plane.position );
+		quatCopy( quaternion, plane.quaternion );
 
 		const layer = {
 			type: 'quad',
@@ -1033,8 +1035,8 @@ class XRManager extends EventDispatcher {
 		material.map.offset.y = 1;
 		material.map.repeat.y = - 1;
 		const plane = new Mesh( geometry, material );
-		plane.position.copy( translation );
-		plane.quaternion.copy( quaternion );
+		vec3Copy( translation, plane.position );
+		quatCopy( quaternion, plane.quaternion );
 
 		const layer = {
 			type: 'cylinder',
@@ -1085,15 +1087,15 @@ class XRManager extends EventDispatcher {
 	 */
 	renderLayers( ) {
 
-		const translationObject = new Vector3();
-		const quaternionObject = new Quaternion();
+		const translationObject = vec3Create();
+		const quaternionObject = quatCreate();
 		const renderer = this._renderer;
 
 		const wasPresenting = this.isPresenting;
 
 		this.isPresenting = false;
 
-		const rendererSize = new Vector2();
+		const rendererSize = vec2Create();
 		renderer.getSize( rendererSize );
 
 		const currentRenderTarget = renderer.getRenderTarget();
@@ -1431,7 +1433,7 @@ class XRManager extends EventDispatcher {
 
 			// assume single camera setup (AR)
 
-			cameraXR.projectionMatrix.copy( cameraL.projectionMatrix );
+			mat4Copy( cameraL.projectionMatrix, cameraXR.projectionMatrix );
 
 		}
 
@@ -1484,10 +1486,10 @@ class XRManager extends EventDispatcher {
  */
 function setProjectionFromUnion( camera, cameraL, cameraR ) {
 
-	_cameraLPos.setFromMatrixPosition( cameraL.matrixWorld );
-	_cameraRPos.setFromMatrixPosition( cameraR.matrixWorld );
+	vec3SetFromMatrixPosition( cameraL.matrixWorld, _cameraLPos );
+	vec3SetFromMatrixPosition( cameraR.matrixWorld, _cameraRPos );
 
-	const ipd = _cameraLPos.distanceTo( _cameraRPos );
+	const ipd = vec3DistanceTo( _cameraLPos, _cameraRPos );
 
 	const projL = cameraL.projectionMatrix.elements;
 	const projR = cameraR.projectionMatrix.elements;
@@ -1511,11 +1513,12 @@ function setProjectionFromUnion( camera, cameraL, cameraR ) {
 	const xOffset = zOffset * - leftFov;
 
 	// TODO: Better way to apply this offset?
-	cameraL.matrixWorld.decompose( camera.position, camera.quaternion, camera.scale );
+	mat4Decompose( cameraL.matrixWorld, camera.position, camera.quaternion, camera.scale );
 	camera.translateX( xOffset );
 	camera.translateZ( zOffset );
-	camera.matrixWorld.compose( camera.position, camera.quaternion, camera.scale );
-	camera.matrixWorldInverse.copy( camera.matrixWorld ).invert();
+	mat4Compose( camera.position, camera.quaternion, camera.scale, camera.matrixWorld );
+	mat4Copy( camera.matrixWorld, camera.matrixWorldInverse );
+	mat4Invert( camera.matrixWorldInverse, camera.matrixWorldInverse );
 
 	// Check if the projection uses an infinite far plane.
 	if ( projL[ 10 ] === - 1.0 ) {
@@ -1523,8 +1526,8 @@ function setProjectionFromUnion( camera, cameraL, cameraR ) {
 		// Use the projection matrix from the left eye.
 		// The camera offset is sufficient to include the view volumes
 		// of both eyes (assuming symmetric projections).
-		camera.projectionMatrix.copy( cameraL.projectionMatrix );
-		camera.projectionMatrixInverse.copy( cameraL.projectionMatrixInverse );
+		mat4Copy( cameraL.projectionMatrix, camera.projectionMatrix );
+		mat4Copy( cameraL.projectionMatrixInverse, camera.projectionMatrixInverse );
 
 	} else {
 
@@ -1538,8 +1541,9 @@ function setProjectionFromUnion( camera, cameraL, cameraR ) {
 		const top2 = topFov * far / far2 * near2;
 		const bottom2 = bottomFov * far / far2 * near2;
 
-		camera.projectionMatrix.makePerspective( left2, right2, top2, bottom2, near2, far2 );
-		camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
+		mat4MakePerspective( left2, right2, top2, bottom2, near2, far2, camera.coordinateSystem, camera.reversedDepth, camera.projectionMatrix );
+		mat4Copy( camera.projectionMatrix, camera.projectionMatrixInverse );
+		mat4Invert( camera.projectionMatrixInverse, camera.projectionMatrixInverse );
 
 	}
 
@@ -1556,15 +1560,16 @@ function updateCamera( camera, parent ) {
 
 	if ( parent === null ) {
 
-		camera.matrixWorld.copy( camera.matrix );
+		mat4Copy( camera.matrix, camera.matrixWorld );
 
 	} else {
 
-		camera.matrixWorld.multiplyMatrices( parent.matrixWorld, camera.matrix );
+		mat4MultiplyMatrices( parent.matrixWorld, camera.matrix, camera.matrixWorld );
 
 	}
 
-	camera.matrixWorldInverse.copy( camera.matrixWorld ).invert();
+	mat4Copy( camera.matrixWorld, camera.matrixWorldInverse );
+	mat4Invert( camera.matrixWorldInverse, camera.matrixWorldInverse );
 
 }
 
@@ -1580,21 +1585,21 @@ function updateUserCamera( camera, cameraXR, parent ) {
 
 	if ( parent === null ) {
 
-		camera.matrix.copy( cameraXR.matrixWorld );
+		mat4Copy( cameraXR.matrixWorld, camera.matrix );
 
 	} else {
 
-		camera.matrix.copy( parent.matrixWorld );
-		camera.matrix.invert();
-		camera.matrix.multiply( cameraXR.matrixWorld );
+		mat4Copy( parent.matrixWorld, camera.matrix );
+		mat4Invert( camera.matrix, camera.matrix );
+		mat4Multiply( camera.matrix, cameraXR.matrixWorld, camera.matrix );
 
 	}
 
-	camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
+	mat4Decompose( camera.matrix, camera.position, camera.quaternion, camera.scale );
 	camera.updateMatrixWorld( true );
 
-	camera.projectionMatrix.copy( cameraXR.projectionMatrix );
-	camera.projectionMatrixInverse.copy( cameraXR.projectionMatrixInverse );
+	mat4Copy( cameraXR.projectionMatrix, camera.projectionMatrix );
+	mat4Copy( cameraXR.projectionMatrixInverse, camera.projectionMatrixInverse );
 
 	if ( camera.isPerspectiveCamera ) {
 
@@ -1726,7 +1731,7 @@ function onSessionEnd() {
 	renderer._animation.start();
 
 	renderer.setPixelRatio( this._currentPixelRatio );
-	renderer.setSize( this._currentSize.width, this._currentSize.height, false );
+	renderer.setSize( this._currentSize.x, this._currentSize.y, false );
 
 	if ( this._currentCameraSettings !== null ) {
 
@@ -1930,16 +1935,17 @@ function onAnimationFrame( time, frame ) {
 
 			}
 
-			camera.matrix.fromArray( view.transform.matrix );
-			camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
-			camera.projectionMatrix.fromArray( view.projectionMatrix );
-			camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
-			camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
+			mat4FromArray( view.transform.matrix, 0, camera.matrix );
+			mat4Decompose( camera.matrix, camera.position, camera.quaternion, camera.scale );
+			mat4FromArray( view.projectionMatrix, 0, camera.projectionMatrix );
+			mat4Copy( camera.projectionMatrix, camera.projectionMatrixInverse );
+			mat4Invert( camera.projectionMatrixInverse, camera.projectionMatrixInverse );
+			vec4Set( viewport.x, viewport.y, viewport.width, viewport.height, camera.viewport );
 
 			if ( i === 0 ) {
 
-				cameraXR.matrix.copy( camera.matrix );
-				cameraXR.matrix.decompose( cameraXR.position, cameraXR.quaternion, cameraXR.scale );
+				mat4Copy( camera.matrix, cameraXR.matrix );
+				mat4Decompose( cameraXR.matrix, cameraXR.position, cameraXR.quaternion, cameraXR.scale );
 
 			}
 

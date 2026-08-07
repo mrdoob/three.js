@@ -1,6 +1,12 @@
 import { Curve } from '../core/Curve.js';
 import { QuadraticBezier } from '../core/Interpolations.js';
-import { Vector2 } from '../../math/Vector2.js';
+import {
+	vec2Copy,
+	vec2Create,
+	vec2FromArray,
+	vec2Set,
+	vec2ToArray
+} from '../../math/Vector2Functions.js';
 
 /**
  * A curve representing a 2D Quadratic Bezier curve.
@@ -32,7 +38,7 @@ class QuadraticBezierCurve extends Curve {
 	 * @param {Vector2} [v1] - The control point.
 	 * @param {Vector2} [v2] - The end point.
 	 */
-	constructor( v0 = new Vector2(), v1 = new Vector2(), v2 = new Vector2() ) {
+	constructor( v0 = vec2Create(), v1 = vec2Create(), v2 = vec2Create() ) {
 
 		super();
 
@@ -77,15 +83,16 @@ class QuadraticBezierCurve extends Curve {
 	 * @param {Vector2} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector2} The position on the curve.
 	 */
-	getPoint( t, optionalTarget = new Vector2() ) {
+	getPoint( t, optionalTarget = vec2Create() ) {
 
 		const point = optionalTarget;
 
 		const v0 = this.v0, v1 = this.v1, v2 = this.v2;
 
-		point.set(
+		vec2Set(
 			QuadraticBezier( t, v0.x, v1.x, v2.x ),
-			QuadraticBezier( t, v0.y, v1.y, v2.y )
+			QuadraticBezier( t, v0.y, v1.y, v2.y ),
+			point
 		);
 
 		return point;
@@ -96,9 +103,9 @@ class QuadraticBezierCurve extends Curve {
 
 		super.copy( source );
 
-		this.v0.copy( source.v0 );
-		this.v1.copy( source.v1 );
-		this.v2.copy( source.v2 );
+		vec2Copy( source.v0, this.v0 );
+		vec2Copy( source.v1, this.v1 );
+		vec2Copy( source.v2, this.v2 );
 
 		return this;
 
@@ -108,9 +115,9 @@ class QuadraticBezierCurve extends Curve {
 
 		const data = super.toJSON();
 
-		data.v0 = this.v0.toArray();
-		data.v1 = this.v1.toArray();
-		data.v2 = this.v2.toArray();
+		data.v0 = vec2ToArray( this.v0 );
+		data.v1 = vec2ToArray( this.v1 );
+		data.v2 = vec2ToArray( this.v2 );
 
 		return data;
 
@@ -120,9 +127,9 @@ class QuadraticBezierCurve extends Curve {
 
 		super.fromJSON( json );
 
-		this.v0.fromArray( json.v0 );
-		this.v1.fromArray( json.v1 );
-		this.v2.fromArray( json.v2 );
+		vec2FromArray( json.v0, 0, this.v0 );
+		vec2FromArray( json.v1, 0, this.v1 );
+		vec2FromArray( json.v2, 0, this.v2 );
 
 		return this;
 

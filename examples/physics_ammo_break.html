@@ -554,8 +554,12 @@
 						const vel = rb0.getLinearVelocity();
 						const angVel = rb0.getAngularVelocity();
 						const fragment = debris[ j ];
-						fragment.userData.velocity.set( vel.x(), vel.y(), vel.z() );
-						fragment.userData.angularVelocity.set( angVel.x(), angVel.y(), angVel.z() );
+						fragment.userData.velocity.x = vel.x();
+						fragment.userData.velocity.y = vel.y();
+						fragment.userData.velocity.z = vel.z();
+						fragment.userData.angularVelocity.x = angVel.x();
+						fragment.userData.angularVelocity.y = angVel.y();
+						fragment.userData.angularVelocity.z = angVel.z();
 
 						createDebrisFromBreakableObject( fragment );
 
@@ -576,8 +580,12 @@
 						const vel = rb1.getLinearVelocity();
 						const angVel = rb1.getAngularVelocity();
 						const fragment = debris[ j ];
-						fragment.userData.velocity.set( vel.x(), vel.y(), vel.z() );
-						fragment.userData.angularVelocity.set( angVel.x(), angVel.y(), angVel.z() );
+						fragment.userData.velocity.x = vel.x();
+						fragment.userData.velocity.y = vel.y();
+						fragment.userData.velocity.z = vel.z();
+						fragment.userData.angularVelocity.x = angVel.x();
+						fragment.userData.angularVelocity.y = angVel.y();
+						fragment.userData.angularVelocity.z = angVel.z();
 
 						createDebrisFromBreakableObject( fragment );
 

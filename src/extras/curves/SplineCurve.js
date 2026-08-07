@@ -1,6 +1,12 @@
 import { Curve } from '../core/Curve.js';
 import { CatmullRom } from '../core/Interpolations.js';
-import { Vector2 } from '../../math/Vector2.js';
+import {
+	vec2Copy,
+	vec2Create,
+	vec2FromArray,
+	vec2Set,
+	vec2ToArray
+} from '../../math/Vector2Functions.js';
 
 /**
  * A curve representing a 2D spline curve.
@@ -64,7 +70,7 @@ class SplineCurve extends Curve {
 	 * @param {Vector2} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector2} The position on the curve.
 	 */
-	getPoint( t, optionalTarget = new Vector2() ) {
+	getPoint( t, optionalTarget = vec2Create() ) {
 
 		const point = optionalTarget;
 
@@ -79,9 +85,10 @@ class SplineCurve extends Curve {
 		const p2 = points[ intPoint > points.length - 2 ? points.length - 1 : intPoint + 1 ];
 		const p3 = points[ intPoint > points.length - 3 ? points.length - 1 : intPoint + 2 ];
 
-		point.set(
+		vec2Set(
 			CatmullRom( weight, p0.x, p1.x, p2.x, p3.x ),
-			CatmullRom( weight, p0.y, p1.y, p2.y, p3.y )
+			CatmullRom( weight, p0.y, p1.y, p2.y, p3.y ),
+			point
 		);
 
 		return point;
@@ -96,9 +103,7 @@ class SplineCurve extends Curve {
 
 		for ( let i = 0, l = source.points.length; i < l; i ++ ) {
 
-			const point = source.points[ i ];
-
-			this.points.push( point.clone() );
+			this.points.push( vec2Copy( source.points[ i ] ) );
 
 		}
 
@@ -114,8 +119,7 @@ class SplineCurve extends Curve {
 
 		for ( let i = 0, l = this.points.length; i < l; i ++ ) {
 
-			const point = this.points[ i ];
-			data.points.push( point.toArray() );
+			data.points.push( vec2ToArray( this.points[ i ] ) );
 
 		}
 
@@ -131,8 +135,7 @@ class SplineCurve extends Curve {
 
 		for ( let i = 0, l = json.points.length; i < l; i ++ ) {
 
-			const point = json.points[ i ];
-			this.points.push( new Vector2().fromArray( point ) );
+			this.points.push( vec2FromArray( json.points[ i ] ) );
 
 		}
 

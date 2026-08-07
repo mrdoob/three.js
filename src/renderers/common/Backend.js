@@ -2,7 +2,7 @@ let _vector2 = null;
 let _color4 = null;
 
 import Color4 from './Color4.js';
-import { Vector2 } from '../../math/Vector2.js';
+import { vec2Create } from '../../math/Vector2Functions.js';
 import { createCanvasElement, warnOnce } from '../../utils.js';
 import { REVISION, TimestampQuery } from '../../constants.js';
 
@@ -656,7 +656,7 @@ class Backend {
 	 */
 	getDrawingBufferSize() {
 
-		_vector2 = _vector2 || new Vector2();
+		_vector2 = _vector2 || vec2Create();
 
 		return this.renderer.getDrawingBufferSize( _vector2 );
 

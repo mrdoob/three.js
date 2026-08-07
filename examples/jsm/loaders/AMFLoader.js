@@ -1,6 +1,7 @@
 import {
 	BufferGeometry,
 	Color,
+	colorSet,
 	FileLoader,
 	Float32BufferAttribute,
 	Group,
@@ -207,7 +208,7 @@ class AMFLoader extends Loader {
 
 			loadedMaterial = new MeshPhongMaterial( {
 				flatShading: true,
-				color: new Color( color.r, color.g, color.b ),
+				color: colorSet( color.r, color.g, color.b, new Color() ),
 				name: matName
 			} );
 
@@ -487,7 +488,7 @@ class AMFLoader extends Loader {
 					const color = mesh.color;
 
 					objDefaultMaterial = defaultMaterial.clone();
-					objDefaultMaterial.color = new Color( color.r, color.g, color.b );
+					objDefaultMaterial.color = colorSet( color.r, color.g, color.b, new Color() );
 
 					if ( color.a !== 1.0 ) {
 

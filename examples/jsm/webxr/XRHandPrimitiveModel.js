@@ -4,12 +4,14 @@ import {
 	BoxGeometry,
 	MeshStandardMaterial,
 	InstancedMesh,
-	Matrix4,
-	Vector3
+	mat4Compose,
+	mat4Create,
+	vec3Create,
+	vec3SetScalar
 } from 'three';
 
-const _matrix = new Matrix4();
-const _vector = new Vector3();
+const _matrix = /*@__PURE__*/ mat4Create();
+const _vector = /*@__PURE__*/ vec3Create();
 
 /**
  * Represents one of the hand model types {@link XRHandModelFactory} might produce
@@ -120,8 +122,8 @@ class XRHandPrimitiveModel {
 
 			if ( joint.visible ) {
 
-				_vector.setScalar( joint.jointRadius || defaultRadius );
-				_matrix.compose( joint.position, joint.quaternion, _vector );
+				vec3SetScalar( _vector, joint.jointRadius || defaultRadius );
+				mat4Compose( joint.position, joint.quaternion, _vector, _matrix );
 				this.handMesh.setMatrixAt( i, _matrix );
 
 				count ++;

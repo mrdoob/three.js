@@ -1,22 +1,26 @@
-import { Sphere } from '../math/Sphere.js';
-import { Ray } from '../math/Ray.js';
-import { Matrix4 } from '../math/Matrix4.js';
+import { sphereCreate, sphereCopy, sphereApplyMatrix4 } from '../math/SphereFunctions.js';
+import { rayCreate, rayCopy, rayApplyMatrix4, rayIntersectsSphere, rayDistanceSqToSegment } from '../math/RayFunctions.js';
+import { mat4Create, mat4Copy, mat4Invert } from '../math/Matrix4Functions.js';
+import { frustumIntersectsObject } from '../math/FrustumFunctions.js';
 import { Object3D } from '../core/Object3D.js';
+import {
+	vec3Create, vec3FromBufferAttribute, vec3DistanceTo, vec3ApplyMatrix4, vec3Copy
+} from '../math/Vector3Functions.js';
 import { Vector3 } from '../math/Vector3.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { warn } from '../utils.js';
 
-const _vStart = /*@__PURE__*/ new Vector3();
-const _vEnd = /*@__PURE__*/ new Vector3();
+const _vStart = /*@__PURE__*/ vec3Create();
+const _vEnd = /*@__PURE__*/ vec3Create();
 
-const _inverseMatrix = /*@__PURE__*/ new Matrix4();
-const _ray = /*@__PURE__*/ new Ray();
-const _sphere = /*@__PURE__*/ new Sphere();
+const _inverseMatrix = /*@__PURE__*/ mat4Create();
+const _ray = /*@__PURE__*/ rayCreate();
+const _sphere = /*@__PURE__*/ sphereCreate();
 
-const _intersectPointOnRay = /*@__PURE__*/ new Vector3();
-const _intersectPointOnSegment = /*@__PURE__*/ new Vector3();
+const _intersectPointOnRay = /*@__PURE__*/ vec3Create();
+const _intersectPointOnSegment = /*@__PURE__*/ vec3Create();
 
 /**
  * A continuous line. The line are rendered by connecting consecutive
@@ -131,11 +135,11 @@ class Line extends Object3D {
 
 			for ( let i = 1, l = positionAttribute.count; i < l; i ++ ) {
 
-				_vStart.fromBufferAttribute( positionAttribute, i - 1 );
-				_vEnd.fromBufferAttribute( positionAttribute, i );
+				vec3FromBufferAttribute( positionAttribute, i - 1, _vStart );
+				vec3FromBufferAttribute( positionAttribute, i, _vEnd );
 
 				lineDistances[ i ] = lineDistances[ i - 1 ];
-				lineDistances[ i ] += _vStart.distanceTo( _vEnd );
+				lineDistances[ i ] += vec3DistanceTo( _vStart, _vEnd );
 
 			}
 
@@ -159,7 +163,7 @@ class Line extends Object3D {
 	 */
 	intersectsFrustum( frustum ) {
 
-		return frustum.intersectsObject( this );
+		return frustum.planes !== undefined ? frustumIntersectsObject( frustum, this ) : frustum.intersectsObject( this );
 
 	}
 
@@ -180,16 +184,18 @@ class Line extends Object3D {
 
 		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-		_sphere.copy( geometry.boundingSphere );
-		_sphere.applyMatrix4( matrixWorld );
+		sphereCopy( geometry.boundingSphere, _sphere );
+		sphereApplyMatrix4( _sphere, matrixWorld, _sphere );
 		_sphere.radius += threshold;
 
-		if ( raycaster.ray.intersectsSphere( _sphere ) === false ) return;
+		if ( rayIntersectsSphere( raycaster.ray, _sphere ) === false ) return;
 
 		//
 
-		_inverseMatrix.copy( matrixWorld ).invert();
-		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
+		mat4Copy( matrixWorld, _inverseMatrix );
+		mat4Invert( _inverseMatrix, _inverseMatrix );
+		rayCopy( raycaster.ray, _ray );
+		rayApplyMatrix4( _ray, _inverseMatrix, _ray );
 
 		const localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
 		const localThresholdSq = localThreshold * localThreshold;
@@ -309,25 +315,29 @@ function checkIntersection( object, raycaster, ray, thresholdSq, a, b, i ) {
 
 	const positionAttribute = object.geometry.attributes.position;
 
-	_vStart.fromBufferAttribute( positionAttribute, a );
-	_vEnd.fromBufferAttribute( positionAttribute, b );
+	vec3FromBufferAttribute( positionAttribute, a, _vStart );
+	vec3FromBufferAttribute( positionAttribute, b, _vEnd );
 
-	const distSq = ray.distanceSqToSegment( _vStart, _vEnd, _intersectPointOnRay, _intersectPointOnSegment );
+	const distSq = rayDistanceSqToSegment( ray, _vStart, _vEnd, _intersectPointOnRay, _intersectPointOnSegment );
 
 	if ( distSq > thresholdSq ) return;
 
-	_intersectPointOnRay.applyMatrix4( object.matrixWorld ); // Move back to world space for distance calculation
+	vec3ApplyMatrix4( _intersectPointOnRay, object.matrixWorld, _intersectPointOnRay ); // Move back to world space for distance calculation
 
-	const distance = raycaster.ray.origin.distanceTo( _intersectPointOnRay );
+	const distance = vec3DistanceTo( raycaster.ray.origin, _intersectPointOnRay );
 
 	if ( distance < raycaster.near || distance > raycaster.far ) return;
+
+	const point = new Vector3();
+	vec3Copy( _intersectPointOnSegment, point );
+	vec3ApplyMatrix4( point, object.matrixWorld, point );
 
 	return {
 
 		distance: distance,
 		// What do we want? intersection point on the ray or on the segment??
 		// point: raycaster.ray.at( distance ),
-		point: _intersectPointOnSegment.clone().applyMatrix4( object.matrixWorld ),
+		point: point,
 		index: i,
 		face: null,
 		faceIndex: null,

@@ -1,12 +1,12 @@
 import { Camera } from './Camera.js';
 import { RAD2DEG, DEG2RAD } from '../math/MathUtils.js';
-import { Vector2 } from '../math/Vector2.js';
-import { Vector3 } from '../math/Vector3.js';
 import { mat4Invert, mat4MakePerspective } from '../math/Matrix4Functions.js';
+import { vec2Create, vec2MultiplyScalar, vec2Set, vec2SubVectors } from '../math/Vector2Functions.js';
+import { vec3ApplyMatrix4, vec3Create, vec3Set } from '../math/Vector3Functions.js';
 
-const _v3 = /*@__PURE__*/ new Vector3();
-const _minTarget = /*@__PURE__*/ new Vector2();
-const _maxTarget = /*@__PURE__*/ new Vector2();
+const _v3 = /*@__PURE__*/ vec3Create();
+const _minTarget = /*@__PURE__*/ vec2Create();
+const _maxTarget = /*@__PURE__*/ vec2Create();
 
 /**
  * Camera that uses [perspective projection](https://en.wikipedia.org/wiki/Perspective_(graphical)).
@@ -234,13 +234,17 @@ class PerspectiveCamera extends Camera {
 	 */
 	getViewBounds( distance, minTarget, maxTarget ) {
 
-		_v3.set( - 1, - 1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
+		vec3Set( _v3, - 1, - 1, 0.5 );
+		vec3ApplyMatrix4( _v3, this.projectionMatrixInverse, _v3 );
 
-		minTarget.set( _v3.x, _v3.y ).multiplyScalar( - distance / _v3.z );
+		vec2Set( _v3.x, _v3.y, minTarget );
+		vec2MultiplyScalar( minTarget, - distance / _v3.z, minTarget );
 
-		_v3.set( 1, 1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
+		vec3Set( _v3, 1, 1, 0.5 );
+		vec3ApplyMatrix4( _v3, this.projectionMatrixInverse, _v3 );
 
-		maxTarget.set( _v3.x, _v3.y ).multiplyScalar( - distance / _v3.z );
+		vec2Set( _v3.x, _v3.y, maxTarget );
+		vec2MultiplyScalar( maxTarget, - distance / _v3.z, maxTarget );
 
 	}
 
@@ -255,7 +259,7 @@ class PerspectiveCamera extends Camera {
 
 		this.getViewBounds( distance, _minTarget, _maxTarget );
 
-		return target.subVectors( _maxTarget, _minTarget );
+		return vec2SubVectors( _maxTarget, _minTarget, target );
 
 	}
 

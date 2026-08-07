@@ -1,13 +1,40 @@
 import {
-	Box3,
-	Color,
 	DoubleSide,
-	Frustum,
-	Matrix3,
-	Matrix4,
-	Vector2,
-	Vector3,
-	Vector4
+	WebGLCoordinateSystem,
+	box3Create,
+	box3IntersectsBox,
+	box3Set,
+	box3SetFromPoints,
+	colorCreate,
+	colorFromArray,
+	frustumCreate,
+	frustumIntersectsObject,
+	frustumIntersectsSprite,
+	frustumSetFromProjectionMatrix,
+	mat3Create,
+	mat3GetNormalMatrix,
+	mat4Copy,
+	mat4Create,
+	mat4MultiplyMatrices,
+	vec2Create,
+	vec2FromArray,
+	vec3ApplyMatrix3,
+	vec3ApplyMatrix4,
+	vec3Copy,
+	vec3Create,
+	vec3Cross,
+	vec3FromArray,
+	vec3Normalize,
+	vec3Set,
+	vec3SetFromMatrixPosition,
+	vec3SubVectors,
+	vec4ApplyMatrix4,
+	vec4Copy,
+	vec4Create,
+	vec4Lerp,
+	vec4LerpVectors,
+	vec4MultiplyScalar,
+	vec4Set
 } from 'three';
 
 class RenderableObject {
@@ -36,14 +63,14 @@ class RenderableFace {
 		this.v2 = new RenderableVertex();
 		this.v3 = new RenderableVertex();
 
-		this.normalModel = new Vector3();
+		this.normalModel = vec3Create();
 
-		this.vertexNormalsModel = [ new Vector3(), new Vector3(), new Vector3() ];
+		this.vertexNormalsModel = [ vec3Create(), vec3Create(), vec3Create() ];
 		this.vertexNormalsLength = 0;
 
-		this.color = new Color();
+		this.color = colorCreate();
 		this.material = null;
-		this.uvs = [ new Vector2(), new Vector2(), new Vector2() ];
+		this.uvs = [ vec2Create(), vec2Create(), vec2Create() ];
 
 		this.z = 0;
 		this.renderOrder = 0;
@@ -58,9 +85,9 @@ class RenderableVertex {
 
 	constructor() {
 
-		this.position = new Vector3();
-		this.positionWorld = new Vector3();
-		this.positionScreen = new Vector4();
+		this.position = vec3Create();
+		this.positionWorld = vec3Create();
+		this.positionScreen = vec4Create();
 
 		this.visible = true;
 
@@ -68,8 +95,8 @@ class RenderableVertex {
 
 	copy( vertex ) {
 
-		this.positionWorld.copy( vertex.positionWorld );
-		this.positionScreen.copy( vertex.positionScreen );
+		vec3Copy( vertex.positionWorld, this.positionWorld );
+		vec4Copy( vertex.positionScreen, this.positionScreen );
 
 	}
 
@@ -86,7 +113,7 @@ class RenderableLine {
 		this.v1 = new RenderableVertex();
 		this.v2 = new RenderableVertex();
 
-		this.vertexColors = [ new Color(), new Color() ];
+		this.vertexColors = [ colorCreate(), colorCreate() ];
 		this.material = null;
 
 		this.z = 0;
@@ -111,7 +138,7 @@ class RenderableSprite {
 		this.z = 0;
 
 		this.rotation = 0;
-		this.scale = new Vector2();
+		this.scale = vec2Create();
 
 		this.material = null;
 		this.renderOrder = 0;
@@ -145,26 +172,26 @@ class Projector {
 
 			_renderData = { objects: [], lights: [], elements: [] },
 
-			_vector3 = new Vector3(),
-			_vector4 = new Vector4(),
+			_vector3 = vec3Create(),
+			_vector4 = vec4Create(),
 
-			_clipBox = new Box3( new Vector3( - 1, - 1, - 1 ), new Vector3( 1, 1, 1 ) ),
-			_boundingBox = new Box3(),
+			_clipBox = box3Set( { x: - 1, y: - 1, z: - 1 }, { x: 1, y: 1, z: 1 } ),
+			_boundingBox = box3Create(),
 			_points3 = new Array( 3 ),
 
-			_viewMatrix = new Matrix4(),
-			_viewProjectionMatrix = new Matrix4(),
+			_viewMatrix = mat4Create(),
+			_viewProjectionMatrix = mat4Create(),
 
-			_modelViewProjectionMatrix = new Matrix4(),
+			_modelViewProjectionMatrix = mat4Create(),
 
-			_frustum = new Frustum(),
+			_frustum = frustumCreate(),
 
 			_objectPool = [], _vertexPool = [], _facePool = [], _linePool = [], _spritePool = [],
 
 			_clipVertexPool = [],
-			_clipPos1 = new Vector4(),
-			_clipPos2 = new Vector4(),
-			_clipPos3 = new Vector4(),
+			_clipPos1 = vec4Create(),
+			_clipPos2 = vec4Create(),
+			_clipPos3 = vec4Create(),
 			_screenVertexPool = [],
 			_clipInputVertices = [ null, null, null ],
 
@@ -183,13 +210,13 @@ class Projector {
 
 			let object = null;
 
-			const normalMatrix = new Matrix3();
+			const normalMatrix = mat3Create();
 
 			function setObject( value ) {
 
 				object = value;
 
-				normalMatrix.getNormalMatrix( object.matrixWorld );
+				mat3GetNormalMatrix( object.matrixWorld, normalMatrix );
 
 				normals.length = 0;
 				colors.length = 0;
@@ -203,8 +230,8 @@ class Projector {
 				const positionWorld = vertex.positionWorld;
 				const positionScreen = vertex.positionScreen;
 
-				positionWorld.copy( position ).applyMatrix4( _modelMatrix );
-				positionScreen.copy( positionWorld ).applyMatrix4( _viewProjectionMatrix );
+				vec3ApplyMatrix4( vec3Copy( position, positionWorld ), _modelMatrix, positionWorld );
+				vec4ApplyMatrix4( vec4Copy( positionWorld, positionScreen ), _viewProjectionMatrix, positionScreen );
 
 				const invW = 1 / positionScreen.w;
 
@@ -221,7 +248,7 @@ class Projector {
 			function pushVertex( x, y, z ) {
 
 				_vertex = getNextVertexInPool();
-				_vertex.position.set( x, y, z );
+				vec3Set( _vertex.position, x, y, z );
 
 				projectVertex( _vertex );
 
@@ -253,7 +280,7 @@ class Projector {
 				_points3[ 1 ] = v2.positionScreen;
 				_points3[ 2 ] = v3.positionScreen;
 
-				return _clipBox.intersectsBox( _boundingBox.setFromPoints( _points3 ) );
+				return box3IntersectsBox( _clipBox, box3SetFromPoints( _points3, _boundingBox ) );
 
 			}
 
@@ -273,14 +300,14 @@ class Projector {
 
 				// Clip
 
-				v1.positionScreen.copy( v1.position ).applyMatrix4( _modelViewProjectionMatrix );
-				v2.positionScreen.copy( v2.position ).applyMatrix4( _modelViewProjectionMatrix );
+				vec4ApplyMatrix4( vec4Copy( v1.position, v1.positionScreen ), _modelViewProjectionMatrix, v1.positionScreen );
+				vec4ApplyMatrix4( vec4Copy( v2.position, v2.positionScreen ), _modelViewProjectionMatrix, v2.positionScreen );
 
 				if ( clipLine( v1.positionScreen, v2.positionScreen ) === true ) {
 
 					// Perform the perspective divide
-					v1.positionScreen.multiplyScalar( 1 / v1.positionScreen.w );
-					v2.positionScreen.multiplyScalar( 1 / v2.positionScreen.w );
+					vec4MultiplyScalar( v1.positionScreen, 1 / v1.positionScreen.w, v1.positionScreen );
+					vec4MultiplyScalar( v2.positionScreen, 1 / v2.positionScreen.w, v2.positionScreen );
 
 					_line = getNextLineInPool();
 					_line.id = object.id;
@@ -293,8 +320,8 @@ class Projector {
 
 					if ( object.material.vertexColors ) {
 
-						_line.vertexColors[ 0 ].fromArray( colors, a * 3 );
-						_line.vertexColors[ 1 ].fromArray( colors, b * 3 );
+						colorFromArray( colors, a * 3, _line.vertexColors[ 0 ] );
+						colorFromArray( colors, b * 3, _line.vertexColors[ 1 ] );
 
 					}
 
@@ -350,20 +377,20 @@ class Projector {
 						_face.renderOrder = object.renderOrder;
 
 						// face normal
-						_vector3.subVectors( v3.position, v2.position );
-						_vector4.subVectors( v1.position, v2.position );
-						_vector3.cross( _vector4 );
-						_face.normalModel.copy( _vector3 );
-						_face.normalModel.applyMatrix3( normalMatrix ).normalize();
+						vec3SubVectors( v3.position, v2.position, _vector3 );
+						vec3SubVectors( v1.position, v2.position, _vector4 );
+						vec3Cross( _vector3, _vector4, _vector3 );
+						vec3Copy( _vector3, _face.normalModel );
+						vec3Normalize( vec3ApplyMatrix3( _face.normalModel, normalMatrix, _face.normalModel ), _face.normalModel );
 
 						for ( let i = 0; i < 3; i ++ ) {
 
 							const normal = _face.vertexNormalsModel[ i ];
-							normal.fromArray( normals, arguments[ i ] * 3 );
-							normal.applyMatrix3( normalMatrix ).normalize();
+							vec3FromArray( normals, arguments[ i ] * 3, normal );
+							vec3Normalize( vec3ApplyMatrix3( normal, normalMatrix, normal ), normal );
 
 							const uv = _face.uvs[ i ];
-							uv.fromArray( uvs, arguments[ i ] * 2 );
+							vec2FromArray( uvs, arguments[ i ] * 2, uv );
 
 						}
 
@@ -373,7 +400,7 @@ class Projector {
 
 						if ( material.vertexColors ) {
 
-							_face.color.fromArray( colors, a * 3 );
+							colorFromArray( colors, a * 3, _face.color );
 
 						}
 
@@ -386,9 +413,9 @@ class Projector {
 				}
 
 				// Triangle needs clipping - reconstruct clip-space positions from NDC + w
-				_clipPos1.set( v1.positionScreen.x * w1, v1.positionScreen.y * w1, v1.positionScreen.z * w1, w1 );
-				_clipPos2.set( v2.positionScreen.x * w2, v2.positionScreen.y * w2, v2.positionScreen.z * w2, w2 );
-				_clipPos3.set( v3.positionScreen.x * w3, v3.positionScreen.y * w3, v3.positionScreen.z * w3, w3 );
+				vec4Set( v1.positionScreen.x * w1, v1.positionScreen.y * w1, v1.positionScreen.z * w1, w1, _clipPos1 );
+				vec4Set( v2.positionScreen.x * w2, v2.positionScreen.y * w2, v2.positionScreen.z * w2, w2, _clipPos2 );
+				vec4Set( v3.positionScreen.x * w3, v3.positionScreen.y * w3, v3.positionScreen.z * w3, w3, _clipPos3 );
 				_clipInputVertices[ 0 ] = _clipPos1;
 				_clipInputVertices[ 1 ] = _clipPos2;
 				_clipInputVertices[ 2 ] = _clipPos3;
@@ -412,11 +439,11 @@ class Projector {
 
 					// Perform perspective divide
 					const invW = 1 / cv.w;
-					sv.positionScreen.set( cv.x * invW, cv.y * invW, cv.z * invW, 1 );
+					vec4Set( cv.x * invW, cv.y * invW, cv.z * invW, 1, sv.positionScreen );
 
 					// Interpolate world position (simplified - using weighted average based on barycentric-like coords)
 					// For a proper implementation, we'd need to track interpolation weights
-					sv.positionWorld.copy( v1.positionWorld );
+					vec3Copy( v1.positionWorld, sv.positionWorld );
 
 					sv.visible = true;
 
@@ -441,21 +468,21 @@ class Projector {
 						_face.renderOrder = object.renderOrder;
 
 						// face normal - use original triangle's normal
-						_vector3.subVectors( v3.position, v2.position );
-						_vector4.subVectors( v1.position, v2.position );
-						_vector3.cross( _vector4 );
-						_face.normalModel.copy( _vector3 );
-						_face.normalModel.applyMatrix3( normalMatrix ).normalize();
+						vec3SubVectors( v3.position, v2.position, _vector3 );
+						vec3SubVectors( v1.position, v2.position, _vector4 );
+						vec3Cross( _vector3, _vector4, _vector3 );
+						vec3Copy( _vector3, _face.normalModel );
+						vec3Normalize( vec3ApplyMatrix3( _face.normalModel, normalMatrix, _face.normalModel ), _face.normalModel );
 
 						// Use original vertex normals and UVs (simplified - proper impl would interpolate)
 						for ( let j = 0; j < 3; j ++ ) {
 
 							const normal = _face.vertexNormalsModel[ j ];
-							normal.fromArray( normals, arguments[ j ] * 3 );
-							normal.applyMatrix3( normalMatrix ).normalize();
+							vec3FromArray( normals, arguments[ j ] * 3, normal );
+							vec3Normalize( vec3ApplyMatrix3( normal, normalMatrix, normal ), normal );
 
 							const uv = _face.uvs[ j ];
-							uv.fromArray( uvs, arguments[ j ] * 2 );
+							vec2FromArray( uvs, arguments[ j ] * 2, uv );
 
 						}
 
@@ -465,7 +492,7 @@ class Projector {
 
 						if ( material.vertexColors ) {
 
-							_face.color.fromArray( colors, a * 3 );
+							colorFromArray( colors, a * 3, _face.color );
 
 						}
 
@@ -505,14 +532,14 @@ class Projector {
 			} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
 				if ( object.material.visible === false ) return;
-				if ( object.frustumCulled === true && _frustum.intersectsObject( object ) === false ) return;
+				if ( object.frustumCulled === true && frustumIntersectsObject( _frustum, object ) === false ) return;
 
 				addObject( object );
 
 			} else if ( object.isSprite ) {
 
 				if ( object.material.visible === false ) return;
-				if ( object.frustumCulled === true && _frustum.intersectsSprite( object ) === false ) return;
+				if ( object.frustumCulled === true && frustumIntersectsSprite( _frustum, object ) === false ) return;
 
 				addObject( object );
 
@@ -534,8 +561,8 @@ class Projector {
 			_object.id = object.id;
 			_object.object = object;
 
-			_vector3.setFromMatrixPosition( object.matrixWorld );
-			_vector3.applyMatrix4( _viewProjectionMatrix );
+			vec3SetFromMatrixPosition( object.matrixWorld, _vector3 );
+			vec3ApplyMatrix4( _vector3, _viewProjectionMatrix, _vector3 );
 			_object.z = _vector3.z;
 			_object.renderOrder = object.renderOrder;
 
@@ -564,10 +591,10 @@ class Projector {
 			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
-			_viewMatrix.copy( camera.matrixWorldInverse );
-			_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
+			mat4Copy( camera.matrixWorldInverse, _viewMatrix );
+			mat4MultiplyMatrices( camera.projectionMatrix, _viewMatrix, _viewProjectionMatrix );
 
-			_frustum.setFromProjectionMatrix( _viewProjectionMatrix );
+			frustumSetFromProjectionMatrix( _viewProjectionMatrix, WebGLCoordinateSystem, false, _frustum );
 
 			//
 
@@ -761,7 +788,7 @@ class Projector {
 
 				} else if ( object.isLine ) {
 
-					_modelViewProjectionMatrix.multiplyMatrices( _viewProjectionMatrix, _modelMatrix );
+					mat4MultiplyMatrices( _viewProjectionMatrix, _modelMatrix, _modelViewProjectionMatrix );
 
 					const attributes = geometry.attributes;
 
@@ -813,7 +840,7 @@ class Projector {
 
 				} else if ( object.isPoints ) {
 
-					_modelViewProjectionMatrix.multiplyMatrices( _viewProjectionMatrix, _modelMatrix );
+					mat4MultiplyMatrices( _viewProjectionMatrix, _modelMatrix, _modelViewProjectionMatrix );
 
 					const attributes = geometry.attributes;
 
@@ -823,8 +850,8 @@ class Projector {
 
 						for ( let i = 0, l = positions.length; i < l; i += 3 ) {
 
-							_vector4.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ], 1 );
-							_vector4.applyMatrix4( _modelViewProjectionMatrix );
+							vec4Set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ], 1, _vector4 );
+							vec4ApplyMatrix4( _vector4, _modelViewProjectionMatrix, _vector4 );
 
 							pushPoint( _vector4, object, camera );
 
@@ -834,9 +861,9 @@ class Projector {
 
 				} else if ( object.isSprite ) {
 
-					object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-					_vector4.set( _modelMatrix.elements[ 12 ], _modelMatrix.elements[ 13 ], _modelMatrix.elements[ 14 ], 1 );
-					_vector4.applyMatrix4( _viewProjectionMatrix );
+					mat4MultiplyMatrices( camera.matrixWorldInverse, object.matrixWorld, object.modelViewMatrix );
+					vec4Set( _modelMatrix.elements[ 12 ], _modelMatrix.elements[ 13 ], _modelMatrix.elements[ 14 ], 1, _vector4 );
+					vec4ApplyMatrix4( _vector4, _viewProjectionMatrix, _vector4 );
 
 					pushPoint( _vector4, object, camera );
 
@@ -1035,12 +1062,12 @@ class Projector {
 						let intersection = _clipVertexPool[ outputCount ];
 						if ( ! intersection ) {
 
-							intersection = new Vector4();
+							intersection = vec4Create();
 							_clipVertexPool[ outputCount ] = intersection;
 
 						}
 
-						intersection.lerpVectors( v1, v2, t );
+						vec4LerpVectors( v1, v2, t, intersection );
 						_clipOutput[ outputCount ++ ] = intersection;
 
 					} else if ( ! v1Inside && v2Inside ) {
@@ -1050,12 +1077,12 @@ class Projector {
 						let intersection = _clipVertexPool[ outputCount ];
 						if ( ! intersection ) {
 
-							intersection = new Vector4();
+							intersection = vec4Create();
 							_clipVertexPool[ outputCount ] = intersection;
 
 						}
 
-						intersection.lerpVectors( v1, v2, t );
+						vec4LerpVectors( v1, v2, t, intersection );
 						_clipOutput[ outputCount ++ ] = intersection;
 
 					}
@@ -1136,8 +1163,8 @@ class Projector {
 				} else {
 
 					// Update the s1 and s2 vertices to match the clipped line segment.
-					s1.lerp( s2, alpha1 );
-					s2.lerp( s1, 1 - alpha2 );
+					vec4Lerp( s1, s2, alpha1, s1 );
+					vec4Lerp( s2, s1, 1 - alpha2, s2 );
 
 					return true;
 

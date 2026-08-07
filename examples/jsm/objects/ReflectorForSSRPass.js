@@ -1,18 +1,32 @@
 import {
-	Color,
-	Matrix4,
 	Mesh,
 	PerspectiveCamera,
 	ShaderMaterial,
 	UniformsUtils,
-	Vector2,
-	Vector3,
 	WebGLRenderTarget,
 	DepthTexture,
 	UnsignedShortType,
 	NearestFilter,
-	Plane,
-	HalfFloatType
+	HalfFloatType,
+	colorSet,
+	mat4Copy,
+	mat4Create,
+	mat4ExtractRotation,
+	mat4Multiply,
+	mat4Set,
+	planeSet,
+	vec2Create,
+	vec3Add,
+	vec3ApplyMatrix4,
+	vec3Copy,
+	vec3Create,
+	vec3Dot,
+	vec3Negate,
+	vec3Normalize,
+	vec3Reflect,
+	vec3Set,
+	vec3SetFromMatrixPosition,
+	vec3SubVectors
 } from 'three';
 
 /**
@@ -39,15 +53,15 @@ class ReflectorForSSRPass extends Mesh {
 
 		const scope = this;
 
-		const color = ( options.color !== undefined ) ? new Color( options.color ) : new Color( 0x7F7F7F );
+		const color = colorSet( options.color !== undefined ? options.color : 0x7F7F7F );
 		const textureWidth = options.textureWidth || 512;
 		const textureHeight = options.textureHeight || 512;
 		const clipBias = options.clipBias || 0;
 		const shader = options.shader || ReflectorForSSRPass.ReflectorShader;
 		const useDepthTexture = options.useDepthTexture === true;
-		const yAxis = new Vector3( 0, 1, 0 );
-		const vecTemp0 = new Vector3();
-		const vecTemp1 = new Vector3();
+		const yAxis = vec3Set( vec3Create(), 0, 1, 0 );
+		const vecTemp0 = vec3Create();
+		const vecTemp1 = vec3Create();
 
 		//
 
@@ -55,7 +69,7 @@ class ReflectorForSSRPass extends Mesh {
 		scope.maxDistance = ReflectorForSSRPass.ReflectorShader.uniforms.maxDistance.value;
 		scope.opacity = ReflectorForSSRPass.ReflectorShader.uniforms.opacity.value;
 		scope.color = color;
-		scope.resolution = options.resolution || new Vector2( window.innerWidth, window.innerHeight );
+		scope.resolution = options.resolution || vec2Create( window.innerWidth, window.innerHeight );
 
 
 		scope._distanceAttenuation = ReflectorForSSRPass.ReflectorShader.defines.DISTANCE_ATTENUATION;
@@ -92,16 +106,16 @@ class ReflectorForSSRPass extends Mesh {
 			}
 		} );
 
-		const normal = new Vector3();
-		const reflectorWorldPosition = new Vector3();
-		const cameraWorldPosition = new Vector3();
-		const rotationMatrix = new Matrix4();
-		const lookAtPosition = new Vector3( 0, 0, - 1 );
+		const normal = vec3Create();
+		const reflectorWorldPosition = vec3Create();
+		const cameraWorldPosition = vec3Create();
+		const rotationMatrix = mat4Create();
+		const lookAtPosition = vec3Set( vec3Create(), 0, 0, - 1 );
 
-		const view = new Vector3();
-		const target = new Vector3();
+		const view = vec3Create();
+		const target = vec3Create();
 
-		const textureMatrix = new Matrix4();
+		const textureMatrix = mat4Create();
 		const virtualCamera = new PerspectiveCamera();
 
 		let depthTexture;
@@ -144,7 +158,7 @@ class ReflectorForSSRPass extends Mesh {
 
 		this.material = material;
 
-		const globalPlane = new Plane( new Vector3( 0, 1, 0 ), clipBias );
+		const globalPlane = planeSet( { x: 0, y: 1, z: 0 }, clipBias );
 		const globalPlanes = [ globalPlane ];
 
 		this.doRender = function ( renderer, scene, camera ) {
@@ -153,47 +167,51 @@ class ReflectorForSSRPass extends Mesh {
 			material.uniforms[ 'color' ].value = scope.color;
 			material.uniforms[ 'opacity' ].value = scope.opacity;
 
-			vecTemp0.copy( camera.position ).normalize();
-			vecTemp1.copy( vecTemp0 ).reflect( yAxis );
-			material.uniforms[ 'fresnelCoe' ].value = ( vecTemp0.dot( vecTemp1 ) + 1. ) / 2.; // TODO: Also need to use glsl viewPosition and viewNormal per pixel.
+			vec3Copy( camera.position, vecTemp0 );
+			vec3Normalize( vecTemp0, vecTemp0 );
+			vec3Copy( vecTemp0, vecTemp1 );
+			vec3Reflect( vecTemp1, yAxis, vecTemp1 );
+			material.uniforms[ 'fresnelCoe' ].value = ( vec3Dot( vecTemp0, vecTemp1 ) + 1. ) / 2.; // TODO: Also need to use glsl viewPosition and viewNormal per pixel.
 
-			reflectorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
-			cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
+			vec3SetFromMatrixPosition( scope.matrixWorld, reflectorWorldPosition );
+			vec3SetFromMatrixPosition( camera.matrixWorld, cameraWorldPosition );
 
-			rotationMatrix.extractRotation( scope.matrixWorld );
+			mat4ExtractRotation( scope.matrixWorld, rotationMatrix );
 
-			normal.set( 0, 0, 1 );
-			normal.applyMatrix4( rotationMatrix );
+			vec3Set( normal, 0, 0, 1 );
+			vec3ApplyMatrix4( normal, rotationMatrix, normal );
 
-			view.subVectors( reflectorWorldPosition, cameraWorldPosition );
+			vec3SubVectors( reflectorWorldPosition, cameraWorldPosition, view );
 
 			// Avoid rendering when reflector is facing away
 
-			if ( view.dot( normal ) > 0 ) return;
+			if ( vec3Dot( view, normal ) > 0 ) return;
 
-			view.reflect( normal ).negate();
-			view.add( reflectorWorldPosition );
+			vec3Reflect( view, normal, view );
+			vec3Negate( view, view );
+			vec3Add( view, reflectorWorldPosition, view );
 
-			rotationMatrix.extractRotation( camera.matrixWorld );
+			mat4ExtractRotation( camera.matrixWorld, rotationMatrix );
 
-			lookAtPosition.set( 0, 0, - 1 );
-			lookAtPosition.applyMatrix4( rotationMatrix );
-			lookAtPosition.add( cameraWorldPosition );
+			vec3Set( lookAtPosition, 0, 0, - 1 );
+			vec3ApplyMatrix4( lookAtPosition, rotationMatrix, lookAtPosition );
+			vec3Add( lookAtPosition, cameraWorldPosition, lookAtPosition );
 
-			target.subVectors( reflectorWorldPosition, lookAtPosition );
-			target.reflect( normal ).negate();
-			target.add( reflectorWorldPosition );
+			vec3SubVectors( reflectorWorldPosition, lookAtPosition, target );
+			vec3Reflect( target, normal, target );
+			vec3Negate( target, target );
+			vec3Add( target, reflectorWorldPosition, target );
 
-			virtualCamera.position.copy( view );
-			virtualCamera.up.set( 0, 1, 0 );
-			virtualCamera.up.applyMatrix4( rotationMatrix );
-			virtualCamera.up.reflect( normal );
+			vec3Copy( view, virtualCamera.position );
+			vec3Set( virtualCamera.up, 0, 1, 0 );
+			vec3ApplyMatrix4( virtualCamera.up, rotationMatrix, virtualCamera.up );
+			vec3Reflect( virtualCamera.up, normal, virtualCamera.up );
 			virtualCamera.lookAt( target );
 
 			virtualCamera.far = camera.far; // Used in WebGLBackground
 
 			virtualCamera.updateMatrixWorld();
-			virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
+			mat4Copy( camera.projectionMatrix, virtualCamera.projectionMatrix );
 
 			material.uniforms[ 'virtualCameraNear' ].value = camera.near;
 			material.uniforms[ 'virtualCameraFar' ].value = camera.far;
@@ -203,15 +221,16 @@ class ReflectorForSSRPass extends Mesh {
 			material.uniforms[ 'resolution' ].value = scope.resolution;
 
 			// Update the texture matrix
-			textureMatrix.set(
+			mat4Set(
+				textureMatrix,
 				0.5, 0.0, 0.0, 0.5,
 				0.0, 0.5, 0.0, 0.5,
 				0.0, 0.0, 0.5, 0.5,
 				0.0, 0.0, 0.0, 1.0
 			);
-			textureMatrix.multiply( virtualCamera.projectionMatrix );
-			textureMatrix.multiply( virtualCamera.matrixWorldInverse );
-			textureMatrix.multiply( scope.matrixWorld );
+			mat4Multiply( textureMatrix, virtualCamera.projectionMatrix, textureMatrix );
+			mat4Multiply( textureMatrix, virtualCamera.matrixWorldInverse, textureMatrix );
+			mat4Multiply( textureMatrix, scope.matrixWorld, textureMatrix );
 
 			// scope.visible = false;
 
@@ -292,16 +311,16 @@ ReflectorForSSRPass.ReflectorShader = {
 		color: { value: null },
 		tDiffuse: { value: null },
 		tDepth: { value: null },
-		textureMatrix: { value: new Matrix4() },
+		textureMatrix: { value: mat4Create() },
 		maxDistance: { value: 180 },
 		opacity: { value: 0.5 },
 		fresnelCoe: { value: null },
 		virtualCameraNear: { value: null },
 		virtualCameraFar: { value: null },
-		virtualCameraProjectionMatrix: { value: new Matrix4() },
-		virtualCameraMatrixWorld: { value: new Matrix4() },
-		virtualCameraProjectionMatrixInverse: { value: new Matrix4() },
-		resolution: { value: new Vector2() },
+		virtualCameraProjectionMatrix: { value: mat4Create() },
+		virtualCameraMatrixWorld: { value: mat4Create() },
+		virtualCameraProjectionMatrixInverse: { value: mat4Create() },
+		resolution: { value: vec2Create() },
 
 	},
 

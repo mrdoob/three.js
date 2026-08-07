@@ -1,4 +1,4 @@
-import { Mesh, MeshBasicMaterial, SphereGeometry, Vector3 } from 'three';
+import { Mesh, MeshBasicMaterial, SphereGeometry, vec3Create, vec3FromBufferAttribute, vec3MultiplyScalar, vec3ToArray } from 'three';
 
 /**
  * A ground-projected skybox.
@@ -40,19 +40,19 @@ class GroundedSkybox extends Mesh {
 		geometry.scale( 1, 1, - 1 );
 
 		const pos = geometry.getAttribute( 'position' );
-		const tmp = new Vector3();
+		const tmp = vec3Create();
 
 		for ( let i = 0; i < pos.count; ++ i ) {
 
-			tmp.fromBufferAttribute( pos, i );
+			vec3FromBufferAttribute( pos, i, tmp );
 			if ( tmp.y < 0 ) {
 
 				// Smooth out the transition from flat floor to sphere:
 				const y1 = - height * 3 / 2;
 				const f =
 						tmp.y < y1 ? - height / tmp.y : ( 1 - tmp.y * tmp.y / ( 3 * y1 * y1 ) );
-				tmp.multiplyScalar( f );
-				tmp.toArray( pos.array, 3 * i );
+				vec3MultiplyScalar( tmp, f, tmp );
+				vec3ToArray( tmp, pos.array, 3 * i );
 
 			}
 

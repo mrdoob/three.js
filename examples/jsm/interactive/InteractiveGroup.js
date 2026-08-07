@@ -1,10 +1,11 @@
 import {
 	Group,
 	Raycaster,
-	Vector2
+	vec2Create,
+	vec2Set
 } from 'three';
 
-const _pointer = new Vector2();
+const _pointer = /*@__PURE__*/ vec2Create();
 const _event = { type: '', data: _pointer };
 
 // The XR events that are mapped to "standard" pointer events.
@@ -98,7 +99,7 @@ class InteractiveGroup extends Group {
 			const uv = intersection.uv;
 
 			_event.type = event.type;
-			_event.data.set( uv.x, 1 - uv.y );
+			vec2Set( uv.x, 1 - uv.y, _event.data );
 
 			object.dispatchEvent( _event );
 
@@ -122,7 +123,7 @@ class InteractiveGroup extends Group {
 			const uv = intersection.uv;
 
 			_event.type = _events[ event.type ];
-			_event.data.set( uv.x, 1 - uv.y );
+			vec2Set( uv.x, 1 - uv.y, _event.data );
 
 			object.dispatchEvent( _event );
 

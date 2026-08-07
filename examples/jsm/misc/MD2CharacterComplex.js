@@ -1,11 +1,12 @@
 import {
-	Box3,
 	MathUtils,
 	MeshLambertMaterial,
 	Object3D,
 	TextureLoader,
 	UVMapping,
-	SRGBColorSpace
+	SRGBColorSpace,
+	box3SetFromBufferAttribute,
+	vec3Set
 } from 'three';
 import { MD2Loader } from '../loaders/MD2Loader.js';
 import { MorphBlendMesh } from '../misc/MorphBlendMesh.js';
@@ -232,7 +233,7 @@ class MD2CharacterComplex {
 		// BODY
 
 		const mesh = this._createPart( original.meshBody.geometry, this.skinsBody[ 0 ] );
-		mesh.scale.set( this.scale, this.scale, this.scale );
+		vec3Set( mesh.scale, this.scale, this.scale, this.scale );
 
 		this.root.position.y = original.root.position.y;
 		this.root.add( mesh );
@@ -246,7 +247,7 @@ class MD2CharacterComplex {
 		for ( let i = 0; i < original.weapons.length; i ++ ) {
 
 			const meshWeapon = this._createPart( original.weapons[ i ].geometry, this.skinsWeapon[ i ] );
-			meshWeapon.scale.set( this.scale, this.scale, this.scale );
+			vec3Set( meshWeapon.scale, this.scale, this.scale, this.scale );
 			meshWeapon.visible = false;
 
 			meshWeapon.name = original.weapons[ i ].name;
@@ -316,13 +317,12 @@ class MD2CharacterComplex {
 
 		loader.load( config.baseUrl + config.body, function ( geo ) {
 
-			const boundingBox = new Box3();
-			boundingBox.setFromBufferAttribute( geo.attributes.position );
+			const boundingBox = box3SetFromBufferAttribute( geo.attributes.position );
 
 			scope.root.position.y = - scope.scale * boundingBox.min.y;
 
 			const mesh = scope._createPart( geo, scope.skinsBody[ 0 ] );
-			mesh.scale.set( scope.scale, scope.scale, scope.scale );
+			vec3Set( mesh.scale, scope.scale, scope.scale, scope.scale );
 
 			scope.root.add( mesh );
 
@@ -340,7 +340,7 @@ class MD2CharacterComplex {
 			return function ( geo ) {
 
 				const mesh = scope._createPart( geo, scope.skinsWeapon[ index ] );
-				mesh.scale.set( scope.scale, scope.scale, scope.scale );
+				vec3Set( mesh.scale, scope.scale, scope.scale, scope.scale );
 				mesh.visible = false;
 
 				mesh.name = name;

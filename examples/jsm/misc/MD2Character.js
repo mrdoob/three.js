@@ -1,12 +1,13 @@
 import {
 	AnimationMixer,
-	Box3,
 	Mesh,
 	MeshLambertMaterial,
 	Object3D,
 	TextureLoader,
 	UVMapping,
-	SRGBColorSpace
+	SRGBColorSpace,
+	box3SetFromBufferAttribute,
+	vec3Set
 } from 'three';
 import { MD2Loader } from '../loaders/MD2Loader.js';
 
@@ -184,13 +185,12 @@ class MD2Character {
 
 		loader.load( config.baseUrl + config.body, function ( geo ) {
 
-			const boundingBox = new Box3();
-			boundingBox.setFromBufferAttribute( geo.attributes.position );
+			const boundingBox = box3SetFromBufferAttribute( geo.attributes.position );
 
 			scope.root.position.y = - scope.scale * boundingBox.min.y;
 
 			const mesh = createPart( geo, scope.skinsBody[ 0 ] );
-			mesh.scale.set( scope.scale, scope.scale, scope.scale );
+			vec3Set( mesh.scale, scope.scale, scope.scale, scope.scale );
 
 			scope.root.add( mesh );
 
@@ -212,7 +212,7 @@ class MD2Character {
 			return function ( geo ) {
 
 				const mesh = createPart( geo, scope.skinsWeapon[ index ] );
-				mesh.scale.set( scope.scale, scope.scale, scope.scale );
+				vec3Set( mesh.scale, scope.scale, scope.scale, scope.scale );
 				mesh.visible = false;
 
 				mesh.name = name;

@@ -1,11 +1,12 @@
-import { Vector3 } from '../math/Vector3.js';
-import { Quaternion } from '../math/Quaternion.js';
+import { mat4Decompose } from '../math/Matrix4Functions.js';
+import { quatCreate } from '../math/QuaternionFunctions.js';
+import { vec3ApplyQuaternion, vec3Create, vec3Set } from '../math/Vector3Functions.js';
 import { Audio } from './Audio.js';
 
-const _position = /*@__PURE__*/ new Vector3();
-const _quaternion = /*@__PURE__*/ new Quaternion();
-const _scale = /*@__PURE__*/ new Vector3();
-const _orientation = /*@__PURE__*/ new Vector3();
+const _position = /*@__PURE__*/ vec3Create();
+const _quaternion = /*@__PURE__*/ quatCreate();
+const _scale = /*@__PURE__*/ vec3Create();
+const _orientation = /*@__PURE__*/ vec3Create();
 
 /**
  * Represents a positional audio object.
@@ -220,9 +221,9 @@ class PositionalAudio extends Audio {
 
 		if ( this.hasPlaybackControl === true && this.isPlaying === false ) return;
 
-		this.matrixWorld.decompose( _position, _quaternion, _scale );
+		mat4Decompose( this.matrixWorld, _position, _quaternion, _scale );
 
-		_orientation.set( 0, 0, 1 ).applyQuaternion( _quaternion );
+		vec3ApplyQuaternion( vec3Set( _orientation, 0, 0, 1 ), _quaternion, _orientation );
 
 		const panner = this.panner;
 

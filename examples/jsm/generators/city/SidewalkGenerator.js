@@ -20,7 +20,7 @@ import { cameraPosition, color, float, floor, Fn, fract, fwidth, If, mix, mx_noi
  *
  * ```js
  * const sidewalk = new SidewalkGenerator( { width: 90, depth: 60, height: 0.5 } );
- * scene.add( sidewalk.build( placements ) ); // placements: Matrix4[]
+ * scene.add( sidewalk.build( placements ) ); // placements: Matrix4Like[]
  * ```
  */
 class SidewalkGenerator {

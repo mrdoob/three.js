@@ -1,6 +1,8 @@
 import {
 	Curve,
-	Vector3
+	vec3Create,
+	vec3MultiplyScalar,
+	vec3Set
 } from 'three';
 
 /**
@@ -28,7 +30,7 @@ class GrannyKnot extends Curve {
 	 * @param {Vector3} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector3} The position on the curve.
 	 */
-	getPoint( t, optionalTarget = new Vector3() ) {
+	getPoint( t, optionalTarget = vec3Create() ) {
 
 		const point = optionalTarget;
 
@@ -38,7 +40,7 @@ class GrannyKnot extends Curve {
 		const y = - 0.1 * Math.cos( 2 * t ) - 0.27 * Math.sin( 2 * t ) + 0.38 * Math.cos( 4 * t ) + 0.46 * Math.sin( 4 * t );
 		const z = 0.7 * Math.cos( 3 * t ) - 0.4 * Math.sin( 3 * t );
 
-		return point.set( x, y, z ).multiplyScalar( 20 );
+		return vec3MultiplyScalar( vec3Set( point, x, y, z ), 20, point );
 
 	}
 
@@ -78,7 +80,7 @@ class HeartCurve extends Curve {
 	 * @param {Vector3} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector3} The position on the curve.
 	 */
-	getPoint( t, optionalTarget = new Vector3() ) {
+	getPoint( t, optionalTarget = vec3Create() ) {
 
 		const point = optionalTarget;
 
@@ -88,7 +90,7 @@ class HeartCurve extends Curve {
 		const y = 13 * Math.cos( t ) - 5 * Math.cos( 2 * t ) - 2 * Math.cos( 3 * t ) - Math.cos( 4 * t );
 		const z = 0;
 
-		return point.set( x, y, z ).multiplyScalar( this.scale );
+		return vec3MultiplyScalar( vec3Set( point, x, y, z ), this.scale, point );
 
 	}
 
@@ -128,7 +130,7 @@ class VivianiCurve extends Curve {
 	 * @param {Vector3} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector3} The position on the curve.
 	 */
-	getPoint( t, optionalTarget = new Vector3() ) {
+	getPoint( t, optionalTarget = vec3Create() ) {
 
 		const point = optionalTarget;
 
@@ -139,7 +141,7 @@ class VivianiCurve extends Curve {
 		const y = a * Math.sin( t );
 		const z = 2 * a * Math.sin( t / 2 );
 
-		return point.set( x, y, z );
+		return vec3Set( point, x, y, z );
 
 	}
 
@@ -160,7 +162,7 @@ class KnotCurve extends Curve {
 	 * @param {Vector3} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector3} The position on the curve.
 	 */
-	getPoint( t, optionalTarget = new Vector3() ) {
+	getPoint( t, optionalTarget = vec3Create() ) {
 
 		const point = optionalTarget;
 
@@ -173,7 +175,7 @@ class KnotCurve extends Curve {
 		const y = Math.cos( t ) * ( R + s * Math.cos( t ) );
 		const z = Math.sin( t ) * ( R + s * Math.cos( t ) );
 
-		return point.set( x, y, z );
+		return vec3Set( point, x, y, z );
 
 	}
 
@@ -194,7 +196,7 @@ class HelixCurve extends Curve {
 	 * @param {Vector3} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector3} The position on the curve.
 	 */
-	getPoint( t, optionalTarget = new Vector3() ) {
+	getPoint( t, optionalTarget = vec3Create() ) {
 
 		const point = optionalTarget;
 
@@ -207,7 +209,7 @@ class HelixCurve extends Curve {
 		const y = Math.sin( t2 ) * a;
 		const z = b * t;
 
-		return point.set( x, y, z );
+		return vec3Set( point, x, y, z );
 
 	}
 
@@ -247,7 +249,7 @@ class TrefoilKnot extends Curve {
 	 * @param {Vector3} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector3} The position on the curve.
 	 */
-	getPoint( t, optionalTarget = new Vector3() ) {
+	getPoint( t, optionalTarget = vec3Create() ) {
 
 		const point = optionalTarget;
 
@@ -257,7 +259,7 @@ class TrefoilKnot extends Curve {
 		const y = ( 2 + Math.cos( 3 * t ) ) * Math.sin( 2 * t );
 		const z = Math.sin( 3 * t );
 
-		return point.set( x, y, z ).multiplyScalar( this.scale );
+		return vec3MultiplyScalar( vec3Set( point, x, y, z ), this.scale, point );
 
 	}
 
@@ -297,7 +299,7 @@ class TorusKnot extends Curve {
 	 * @param {Vector3} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector3} The position on the curve.
 	 */
-	getPoint( t, optionalTarget = new Vector3() ) {
+	getPoint( t, optionalTarget = vec3Create() ) {
 
 		const point = optionalTarget;
 
@@ -310,7 +312,7 @@ class TorusKnot extends Curve {
 		const y = ( 2 + Math.cos( q * t ) ) * Math.sin( p * t );
 		const z = Math.sin( q * t );
 
-		return point.set( x, y, z ).multiplyScalar( this.scale );
+		return vec3MultiplyScalar( vec3Set( point, x, y, z ), this.scale, point );
 
 	}
 
@@ -350,7 +352,7 @@ class CinquefoilKnot extends Curve {
 	 * @param {Vector3} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector3} The position on the curve.
 	 */
-	getPoint( t, optionalTarget = new Vector3() ) {
+	getPoint( t, optionalTarget = vec3Create() ) {
 
 		const point = optionalTarget;
 
@@ -363,7 +365,7 @@ class CinquefoilKnot extends Curve {
 		const y = ( 2 + Math.cos( q * t ) ) * Math.sin( p * t );
 		const z = Math.sin( q * t );
 
-		return point.set( x, y, z ).multiplyScalar( this.scale );
+		return vec3MultiplyScalar( vec3Set( point, x, y, z ), this.scale, point );
 
 	}
 
@@ -403,7 +405,7 @@ class TrefoilPolynomialKnot extends Curve {
 	 * @param {Vector3} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector3} The position on the curve.
 	 */
-	getPoint( t, optionalTarget = new Vector3() ) {
+	getPoint( t, optionalTarget = vec3Create() ) {
 
 		const point = optionalTarget;
 
@@ -413,7 +415,7 @@ class TrefoilPolynomialKnot extends Curve {
 		const y = Math.pow( t, 4 ) - 4 * t * t;
 		const z = 1 / 5 * Math.pow( t, 5 ) - 2 * t;
 
-		return point.set( x, y, z ).multiplyScalar( this.scale );
+		return vec3MultiplyScalar( vec3Set( point, x, y, z ), this.scale, point );
 
 	}
 
@@ -460,7 +462,7 @@ class FigureEightPolynomialKnot extends Curve {
 	 * @param {Vector3} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector3} The position on the curve.
 	 */
-	getPoint( t, optionalTarget = new Vector3() ) {
+	getPoint( t, optionalTarget = vec3Create() ) {
 
 		const point = optionalTarget;
 
@@ -470,7 +472,7 @@ class FigureEightPolynomialKnot extends Curve {
 		const y = Math.pow( t, 4 ) - 13 * t * t;
 		const z = 1 / 10 * t * ( t * t - 4 ) * ( t * t - 9 ) * ( t * t - 12 );
 
-		return point.set( x, y, z ).multiplyScalar( this.scale );
+		return vec3MultiplyScalar( vec3Set( point, x, y, z ), this.scale, point );
 
 	}
 
@@ -510,7 +512,7 @@ class DecoratedTorusKnot4a extends Curve {
 	 * @param {Vector3} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector3} The position on the curve.
 	 */
-	getPoint( t, optionalTarget = new Vector3() ) {
+	getPoint( t, optionalTarget = vec3Create() ) {
 
 		const point = optionalTarget;
 
@@ -520,7 +522,7 @@ class DecoratedTorusKnot4a extends Curve {
 		const y = Math.sin( 2 * t ) * ( 1 + 0.6 * ( Math.cos( 5 * t ) + 0.75 * Math.cos( 10 * t ) ) );
 		const z = 0.35 * Math.sin( 5 * t );
 
-		return point.set( x, y, z ).multiplyScalar( this.scale );
+		return vec3MultiplyScalar( vec3Set( point, x, y, z ), this.scale, point );
 
 	}
 
@@ -560,7 +562,7 @@ class DecoratedTorusKnot4b extends Curve {
 	 * @param {Vector3} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector3} The position on the curve.
 	 */
-	getPoint( t, optionalTarget = new Vector3() ) {
+	getPoint( t, optionalTarget = vec3Create() ) {
 
 		const point = optionalTarget;
 
@@ -570,7 +572,7 @@ class DecoratedTorusKnot4b extends Curve {
 		const y = Math.sin( 2 * fi ) * ( 1 + 0.45 * Math.cos( 3 * fi ) + 0.4 * Math.cos( 9 * fi ) );
 		const z = 0.2 * Math.sin( 9 * fi );
 
-		return point.set( x, y, z ).multiplyScalar( this.scale );
+		return vec3MultiplyScalar( vec3Set( point, x, y, z ), this.scale, point );
 
 	}
 
@@ -610,7 +612,7 @@ class DecoratedTorusKnot5a extends Curve {
 	 * @param {Vector3} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector3} The position on the curve.
 	 */
-	getPoint( t, optionalTarget = new Vector3() ) {
+	getPoint( t, optionalTarget = vec3Create() ) {
 
 		const point = optionalTarget;
 
@@ -620,7 +622,7 @@ class DecoratedTorusKnot5a extends Curve {
 		const y = Math.sin( 3 * fi ) * ( 1 + 0.3 * Math.cos( 5 * fi ) + 0.5 * Math.cos( 10 * fi ) );
 		const z = 0.2 * Math.sin( 20 * fi );
 
-		return point.set( x, y, z ).multiplyScalar( this.scale );
+		return vec3MultiplyScalar( vec3Set( point, x, y, z ), this.scale, point );
 
 	}
 
@@ -660,7 +662,7 @@ class DecoratedTorusKnot5c extends Curve {
 	 * @param {Vector3} [optionalTarget] - The optional target vector the result is written to.
 	 * @return {Vector3} The position on the curve.
 	 */
-	getPoint( t, optionalTarget = new Vector3() ) {
+	getPoint( t, optionalTarget = vec3Create() ) {
 
 		const point = optionalTarget;
 
@@ -670,7 +672,7 @@ class DecoratedTorusKnot5c extends Curve {
 		const y = Math.sin( 4 * fi ) * ( 1 + 0.5 * ( Math.cos( 5 * fi ) + 0.4 * Math.cos( 20 * fi ) ) );
 		const z = 0.35 * Math.sin( 15 * fi );
 
-		return point.set( x, y, z ).multiplyScalar( this.scale );
+		return vec3MultiplyScalar( vec3Set( point, x, y, z ), this.scale, point );
 
 	}
 

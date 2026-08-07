@@ -1,11 +1,12 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
-	Color,
+	colorCreate,
+	colorSetRGB,
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
-	Vector3,
+	vec3Create,
 	SRGBColorSpace
 } from 'three';
 
@@ -207,7 +208,7 @@ class STLLoader extends Loader {
 			const vertices = new Float32Array( faces * 3 * 3 );
 			const normals = new Float32Array( faces * 3 * 3 );
 
-			const color = new Color();
+			const color = colorCreate();
 
 			for ( let face = 0; face < faces; face ++ ) {
 
@@ -253,7 +254,7 @@ class STLLoader extends Loader {
 
 					if ( hasColors ) {
 
-						color.setRGB( r, g, b, SRGBColorSpace );
+						colorSetRGB( r, g, b, SRGBColorSpace, color );
 
 						colors[ componentIdx ] = color.r;
 						colors[ componentIdx + 1 ] = color.g;
@@ -296,7 +297,7 @@ class STLLoader extends Loader {
 			const normals = [];
 			const groupNames = [];
 
-			const normal = new Vector3();
+			const normal = vec3Create();
 
 			let result;
 

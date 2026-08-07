@@ -1,6 +1,7 @@
 import { Mesh } from '../objects/Mesh.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { SphereGeometry } from '../geometries/SphereGeometry.js';
+import { colorCopy, colorSet } from '../math/ColorFunctions.js';
 
 /**
  * This displays a helper object consisting of a spherical mesh for
@@ -84,11 +85,11 @@ class PointLightHelper extends Mesh {
 
 		if ( this.color !== undefined ) {
 
-			this.material.color.set( this.color );
+			colorSet( this.color, undefined, undefined, this.material.color );
 
 		} else {
 
-			this.material.color.copy( this.light.color );
+			colorCopy( this.light.color, this.material.color );
 
 		}
 

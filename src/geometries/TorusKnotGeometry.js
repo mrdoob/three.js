@@ -1,6 +1,12 @@
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
-import { Vector3 } from '../math/Vector3.js';
+import {
+	vec3AddVectors,
+	vec3Create,
+	vec3CrossVectors,
+	vec3Normalize,
+	vec3SubVectors
+} from '../math/Vector3Functions.js';
 
 /**
  * Creates a torus knot, the particular shape of which is defined by a pair
@@ -63,15 +69,15 @@ class TorusKnotGeometry extends BufferGeometry {
 
 		// helper variables
 
-		const vertex = new Vector3();
-		const normal = new Vector3();
+		const vertex = vec3Create();
+		const normal = vec3Create();
 
-		const P1 = new Vector3();
-		const P2 = new Vector3();
+		const P1 = vec3Create();
+		const P2 = vec3Create();
 
-		const B = new Vector3();
-		const T = new Vector3();
-		const N = new Vector3();
+		const B = vec3Create();
+		const T = vec3Create();
+		const N = vec3Create();
 
 		// generate vertices, normals and uvs
 
@@ -89,15 +95,15 @@ class TorusKnotGeometry extends BufferGeometry {
 
 			// calculate orthonormal basis
 
-			T.subVectors( P2, P1 );
-			N.addVectors( P2, P1 );
-			B.crossVectors( T, N );
-			N.crossVectors( B, T );
+			vec3SubVectors( P2, P1, T );
+			vec3AddVectors( P2, P1, N );
+			vec3CrossVectors( T, N, B );
+			vec3CrossVectors( B, T, N );
 
 			// normalize B, N. T can be ignored, we don't use it
 
-			B.normalize();
-			N.normalize();
+			vec3Normalize( B, B );
+			vec3Normalize( N, N );
 
 			for ( let j = 0; j <= radialSegments; ++ j ) {
 
@@ -119,7 +125,7 @@ class TorusKnotGeometry extends BufferGeometry {
 
 				// normal (P1 is always the center/origin of the extrusion, thus we can use it to calculate the normal)
 
-				normal.subVectors( vertex, P1 ).normalize();
+				vec3Normalize( vec3SubVectors( vertex, P1, normal ), normal );
 
 				normals.push( normal.x, normal.y, normal.z );
 

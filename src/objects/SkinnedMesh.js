@@ -2,24 +2,38 @@ import { Mesh } from './Mesh.js';
 import { Box3 } from '../math/Box3.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Sphere } from '../math/Sphere.js';
-import { Vector3 } from '../math/Vector3.js';
-import { Vector4 } from '../math/Vector4.js';
-import { Ray } from '../math/Ray.js';
+import {
+	mat4Create, mat4Copy, mat4Invert, mat4MultiplyMatrices
+} from '../math/Matrix4Functions.js';
+import {
+	vec3Create, vec3Set, vec3AddScaledVector, vec3ApplyMatrix4
+} from '../math/Vector3Functions.js';
+import {
+	vec4Create, vec4Set, vec4Copy, vec4FromBufferAttribute, vec4GetComponent,
+	vec4ApplyMatrix4, vec4AddScaledVector, vec4MultiplyScalar, vec4ManhattanLength
+} from '../math/Vector4Functions.js';
+import {
+	sphereCreate, sphereCopy, sphereApplyMatrix4, sphereMakeEmpty, sphereExpandByPoint
+} from '../math/SphereFunctions.js';
+import {
+	rayCreate, rayCopy, rayApplyMatrix4, rayIntersectsSphere, rayIntersectsBox
+} from '../math/RayFunctions.js';
+import { box3MakeEmpty, box3ExpandByPoint } from '../math/Box3Functions.js';
 import { AttachedBindMode, DetachedBindMode } from '../constants.js';
 import { warn } from '../utils.js';
 
-const _baseVector = /*@__PURE__*/ new Vector4();
+const _baseVector = /*@__PURE__*/ vec4Create();
 
-const _skinIndex = /*@__PURE__*/ new Vector4();
-const _skinWeight = /*@__PURE__*/ new Vector4();
+const _skinIndex = /*@__PURE__*/ vec4Create();
+const _skinWeight = /*@__PURE__*/ vec4Create();
 
-const _vector4 = /*@__PURE__*/ new Vector4();
-const _matrix4 = /*@__PURE__*/ new Matrix4();
-const _vertex = /*@__PURE__*/ new Vector3();
+const _vector4 = /*@__PURE__*/ vec4Create();
+const _matrix4 = /*@__PURE__*/ mat4Create();
+const _vertex = /*@__PURE__*/ vec3Create();
 
-const _sphere = /*@__PURE__*/ new Sphere();
-const _inverseMatrix = /*@__PURE__*/ new Matrix4();
-const _ray = /*@__PURE__*/ new Ray();
+const _sphere = /*@__PURE__*/ sphereCreate();
+const _inverseMatrix = /*@__PURE__*/ mat4Create();
+const _ray = /*@__PURE__*/ rayCreate();
 
 /**
  * A mesh that has a {@link Skeleton} that can then be used to animate the
@@ -116,14 +130,14 @@ class SkinnedMesh extends Mesh {
 
 		}
 
-		this.boundingBox.makeEmpty();
+		box3MakeEmpty( this.boundingBox );
 
 		const positionAttribute = geometry.getAttribute( 'position' );
 
 		for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
 			this.getVertexPosition( i, _vertex );
-			this.boundingBox.expandByPoint( _vertex );
+			box3ExpandByPoint( this.boundingBox, _vertex, this.boundingBox );
 
 		}
 
@@ -145,14 +159,14 @@ class SkinnedMesh extends Mesh {
 
 		}
 
-		this.boundingSphere.makeEmpty();
+		sphereMakeEmpty( this.boundingSphere );
 
 		const positionAttribute = geometry.getAttribute( 'position' );
 
 		for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
 			this.getVertexPosition( i, _vertex );
-			this.boundingSphere.expandByPoint( _vertex );
+			sphereExpandByPoint( this.boundingSphere, _vertex, this.boundingSphere );
 
 		}
 
@@ -163,8 +177,8 @@ class SkinnedMesh extends Mesh {
 		super.copy( source, recursive );
 
 		this.bindMode = source.bindMode;
-		this.bindMatrix.copy( source.bindMatrix );
-		this.bindMatrixInverse.copy( source.bindMatrixInverse );
+		mat4Copy( source.bindMatrix, this.bindMatrix );
+		mat4Copy( source.bindMatrixInverse, this.bindMatrixInverse );
 
 		this.skeleton = source.skeleton;
 
@@ -186,21 +200,23 @@ class SkinnedMesh extends Mesh {
 
 		if ( this.boundingSphere === null ) this.computeBoundingSphere();
 
-		_sphere.copy( this.boundingSphere );
-		_sphere.applyMatrix4( matrixWorld );
+		sphereCopy( this.boundingSphere, _sphere );
+		sphereApplyMatrix4( _sphere, matrixWorld, _sphere );
 
-		if ( raycaster.ray.intersectsSphere( _sphere ) === false ) return;
+		if ( rayIntersectsSphere( raycaster.ray, _sphere ) === false ) return;
 
 		// convert ray to local space of skinned mesh
 
-		_inverseMatrix.copy( matrixWorld ).invert();
-		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
+		mat4Copy( matrixWorld, _inverseMatrix );
+		mat4Invert( _inverseMatrix, _inverseMatrix );
+		rayCopy( raycaster.ray, _ray );
+		rayApplyMatrix4( _ray, _inverseMatrix, _ray );
 
 		// test with bounding box in local space
 
 		if ( this.boundingBox !== null ) {
 
-			if ( _ray.intersectsBox( this.boundingBox ) === false ) return;
+			if ( rayIntersectsBox( _ray, this.boundingBox ) === false ) return;
 
 		}
 
@@ -241,8 +257,9 @@ class SkinnedMesh extends Mesh {
 
 		}
 
-		this.bindMatrix.copy( bindMatrix );
-		this.bindMatrixInverse.copy( bindMatrix ).invert();
+		mat4Copy( bindMatrix, this.bindMatrix );
+		mat4Copy( bindMatrix, this.bindMatrixInverse );
+		mat4Invert( this.bindMatrixInverse, this.bindMatrixInverse );
 
 	}
 
@@ -261,23 +278,23 @@ class SkinnedMesh extends Mesh {
 	 */
 	normalizeSkinWeights() {
 
-		const vector = new Vector4();
+		const vector = vec4Create();
 
 		const skinWeight = this.geometry.attributes.skinWeight;
 
 		for ( let i = 0, l = skinWeight.count; i < l; i ++ ) {
 
-			vector.fromBufferAttribute( skinWeight, i );
+			vec4FromBufferAttribute( skinWeight, i, vector );
 
-			const scale = 1.0 / vector.manhattanLength();
+			const scale = 1.0 / vec4ManhattanLength( vector );
 
 			if ( scale !== Infinity ) {
 
-				vector.multiplyScalar( scale );
+				vec4MultiplyScalar( vector, scale, vector );
 
 			} else {
 
-				vector.set( 1, 0, 0, 0 ); // do something reasonable
+				vec4Set( 1, 0, 0, 0, vector ); // do something reasonable
 
 			}
 
@@ -293,11 +310,13 @@ class SkinnedMesh extends Mesh {
 
 		if ( this.bindMode === AttachedBindMode ) {
 
-			this.bindMatrixInverse.copy( this.matrixWorld ).invert();
+			mat4Copy( this.matrixWorld, this.bindMatrixInverse );
+			mat4Invert( this.bindMatrixInverse, this.bindMatrixInverse );
 
 		} else if ( this.bindMode === DetachedBindMode ) {
 
-			this.bindMatrixInverse.copy( this.bindMatrix ).invert();
+			mat4Copy( this.bindMatrix, this.bindMatrixInverse );
+			mat4Invert( this.bindMatrixInverse, this.bindMatrixInverse );
 
 		} else {
 
@@ -321,34 +340,45 @@ class SkinnedMesh extends Mesh {
 		const skeleton = this.skeleton;
 		const geometry = this.geometry;
 
-		_skinIndex.fromBufferAttribute( geometry.attributes.skinIndex, index );
-		_skinWeight.fromBufferAttribute( geometry.attributes.skinWeight, index );
+		vec4FromBufferAttribute( geometry.attributes.skinIndex, index, _skinIndex );
+		vec4FromBufferAttribute( geometry.attributes.skinWeight, index, _skinWeight );
 
 		if ( target.isVector4 ) {
 
-			_baseVector.copy( target );
-			target.set( 0, 0, 0, 0 );
+			vec4Copy( target, _baseVector );
+			vec4Set( 0, 0, 0, 0, target );
 
 		} else {
 
-			_baseVector.set( ...target, 1 );
-			target.set( 0, 0, 0 );
+			vec4Set( target.x, target.y, target.z, 1, _baseVector );
+			vec3Set( target, 0, 0, 0 );
 
 		}
 
-		_baseVector.applyMatrix4( this.bindMatrix );
+		vec4ApplyMatrix4( _baseVector, this.bindMatrix, _baseVector );
 
 		for ( let i = 0; i < 4; i ++ ) {
 
-			const weight = _skinWeight.getComponent( i );
+			const weight = vec4GetComponent( _skinWeight, i );
 
 			if ( weight !== 0 ) {
 
-				const boneIndex = _skinIndex.getComponent( i );
+				const boneIndex = vec4GetComponent( _skinIndex, i );
 
-				_matrix4.multiplyMatrices( skeleton.bones[ boneIndex ].matrixWorld, skeleton.boneInverses[ boneIndex ] );
+				mat4MultiplyMatrices( skeleton.bones[ boneIndex ].matrixWorld, skeleton.boneInverses[ boneIndex ], _matrix4 );
 
-				target.addScaledVector( _vector4.copy( _baseVector ).applyMatrix4( _matrix4 ), weight );
+				vec4Copy( _baseVector, _vector4 );
+				vec4ApplyMatrix4( _vector4, _matrix4, _vector4 );
+
+				if ( target.isVector4 ) {
+
+					vec4AddScaledVector( target, _vector4, weight, target );
+
+				} else {
+
+					vec3AddScaledVector( target, _vector4, weight, target );
+
+				}
 
 			}
 
@@ -358,10 +388,11 @@ class SkinnedMesh extends Mesh {
 
 			// ensure the homogenous coordinate remains unchanged after vector operations
 			target.w = _baseVector.w;
+			return vec4ApplyMatrix4( target, this.bindMatrixInverse, target );
 
 		}
 
-		return target.applyMatrix4( this.bindMatrixInverse );
+		return vec3ApplyMatrix4( target, this.bindMatrixInverse, target );
 
 	}
 

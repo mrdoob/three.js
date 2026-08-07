@@ -1,4 +1,4 @@
-import { AnalyticLightNode, Vector3 } from 'three/webgpu';
+import { AnalyticLightNode, vec3Copy, vec3Create } from 'three/webgpu';
 import { array, getShIrradianceAt, normalWorld, positionWorld, texture3D, uniform, vec3 } from 'three/tsl';
 
 // Padding texels at each boundary of every atlas sub-volume.
@@ -71,9 +71,9 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		super( light );
 
-		this._min = uniform( new Vector3() );
-		this._max = uniform( new Vector3() );
-		this._resolution = uniform( new Vector3() );
+		this._min = uniform( vec3Create(), 'vec3' );
+		this._max = uniform( vec3Create(), 'vec3' );
+		this._resolution = uniform( vec3Create(), 'vec3' );
 		this._intensity = uniform( 1 );
 		this._falloff = uniform( 0 );
 
@@ -83,9 +83,9 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		const light = this.light;
 
-		this._min.value.copy( light.boundingBox.min );
-		this._max.value.copy( light.boundingBox.max );
-		this._resolution.value.copy( light.resolution );
+		vec3Copy( light.boundingBox.min, this._min.value );
+		vec3Copy( light.boundingBox.max, this._max.value );
+		vec3Copy( light.resolution, this._resolution.value );
 		this._intensity.value = light.intensity;
 		this._falloff.value = light.falloff;
 

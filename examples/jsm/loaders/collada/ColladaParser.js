@@ -2,9 +2,17 @@ import {
 	Color,
 	ColorManagement,
 	MathUtils,
-	Matrix4,
-	Vector3,
-	SRGBColorSpace
+	SRGBColorSpace,
+	colorFromArray,
+	mat4Create,
+	mat4FromArray,
+	mat4Transpose,
+	mat4Multiply,
+	mat4MakeTranslation,
+	mat4MakeRotationAxis,
+	mat4Scale,
+	vec3Create,
+	vec3FromArray
 } from 'three';
 
 /**
@@ -1176,7 +1184,7 @@ class ColladaParser {
 
 				case 'color':
 					const array = parseFloats( child.textContent );
-					data.color = new Color().fromArray( array );
+					data.color = colorFromArray( array, 0, new Color() );
 					ColorManagement.colorSpaceToWorking( data.color, SRGBColorSpace );
 					break;
 
@@ -1456,7 +1464,7 @@ class ColladaParser {
 		const data = {
 			sid: xml.getAttribute( 'sid' ),
 			name: xml.getAttribute( 'name' ) || '',
-			axis: new Vector3(),
+			axis: vec3Create(),
 			limits: {
 				min: 0,
 				max: 0
@@ -1477,7 +1485,7 @@ class ColladaParser {
 
 				case 'axis':
 					const array = parseFloats( child.textContent );
-					data.axis.fromArray( array );
+					vec3FromArray( array, 0, data.axis );
 					break;
 				case 'limits':
 					const max = child.getElementsByTagName( 'max' )[ 0 ];
@@ -1587,18 +1595,15 @@ class ColladaParser {
 		switch ( data.type ) {
 
 			case 'matrix':
-				data.obj = new Matrix4();
-				data.obj.fromArray( array ).transpose();
+				data.obj = mat4Transpose( mat4FromArray( array ) );
 				break;
 
 			case 'translate':
-				data.obj = new Vector3();
-				data.obj.fromArray( array );
+				data.obj = vec3FromArray( array );
 				break;
 
 			case 'rotate':
-				data.obj = new Vector3();
-				data.obj.fromArray( array );
+				data.obj = vec3FromArray( array );
 				data.angle = MathUtils.degToRad( array[ 3 ] );
 				break;
 
@@ -1763,15 +1768,15 @@ class ColladaParser {
 
 	parseNode( xml ) {
 
-		const matrix = new Matrix4();
-		const vector = new Vector3();
+		const matrix = mat4Create();
+		const vector = vec3Create();
 
 		const data = {
 			name: xml.getAttribute( 'name' ) || '',
 			type: xml.getAttribute( 'type' ),
 			id: xml.getAttribute( 'id' ),
 			sid: xml.getAttribute( 'sid' ),
-			matrix: new Matrix4(),
+			matrix: mat4Create(),
 			nodes: [],
 			instanceCameras: [],
 			instanceControllers: [],
@@ -1820,7 +1825,7 @@ class ColladaParser {
 
 				case 'matrix':
 					array = parseFloats( child.textContent );
-					data.matrix.multiply( matrix.fromArray( array ).transpose() );
+					mat4Multiply( data.matrix, mat4Transpose( mat4FromArray( array, 0, matrix ), matrix ), data.matrix );
 					{
 
 						const sid = child.getAttribute( 'sid' );
@@ -1834,8 +1839,8 @@ class ColladaParser {
 
 				case 'translate':
 					array = parseFloats( child.textContent );
-					vector.fromArray( array );
-					data.matrix.multiply( matrix.makeTranslation( vector.x, vector.y, vector.z ) );
+					vec3FromArray( array, 0, vector );
+					mat4Multiply( data.matrix, mat4MakeTranslation( vector.x, vector.y, vector.z, matrix ), data.matrix );
 					{
 
 						const sid = child.getAttribute( 'sid' );
@@ -1852,7 +1857,7 @@ class ColladaParser {
 					{
 
 						const angle = MathUtils.degToRad( array[ 3 ] );
-						data.matrix.multiply( matrix.makeRotationAxis( vector.fromArray( array ), angle ) );
+						mat4Multiply( data.matrix, mat4MakeRotationAxis( vec3FromArray( array, 0, vector ), angle, matrix ), data.matrix );
 						const sid = child.getAttribute( 'sid' );
 						data.transforms[ sid ] = child.nodeName;
 						data.transformData[ sid ] = { type: 'rotate', axis: [ array[ 0 ], array[ 1 ], array[ 2 ] ], angle: array[ 3 ] };
@@ -1864,7 +1869,7 @@ class ColladaParser {
 
 				case 'scale':
 					array = parseFloats( child.textContent );
-					data.matrix.scale( vector.fromArray( array ) );
+					mat4Scale( data.matrix, vec3FromArray( array, 0, vector ), data.matrix );
 					{
 
 						const sid = child.getAttribute( 'sid' );

@@ -5,7 +5,8 @@ import {
 	LinearFilter,
 	Loader,
 	UnsignedByteType,
-	Vector3,
+	vec3Create,
+	vec3Set,
 } from 'three';
 
 /**
@@ -126,14 +127,14 @@ export class LUTCubeLoader extends Loader {
 		const length = size ** 3 * 4;
 		const data = this.type === UnsignedByteType ? new Uint8Array( length ) : new Float32Array( length );
 
-		const domainMin = new Vector3( 0, 0, 0 );
-		const domainMax = new Vector3( 1, 1, 1 );
+		const domainMin = vec3Set( vec3Create(), 0, 0, 0 );
+		const domainMax = vec3Set( vec3Create(), 1, 1, 1 );
 
 		result = regExpDomainMin.exec( input );
 
 		if ( result !== null ) {
 
-			domainMin.set( Number( result[ 1 ] ), Number( result[ 2 ] ), Number( result[ 3 ] ) );
+			vec3Set( domainMin, Number( result[ 1 ] ), Number( result[ 2 ] ), Number( result[ 3 ] ) );
 
 		}
 
@@ -141,7 +142,7 @@ export class LUTCubeLoader extends Loader {
 
 		if ( result !== null ) {
 
-			domainMax.set( Number( result[ 1 ] ), Number( result[ 2 ] ), Number( result[ 3 ] ) );
+			vec3Set( domainMax, Number( result[ 1 ] ), Number( result[ 2 ] ), Number( result[ 3 ] ) );
 
 		}
 

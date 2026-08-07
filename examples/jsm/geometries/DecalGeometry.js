@@ -1,11 +1,19 @@
 import {
 	BufferGeometry,
-	Euler,
 	Float32BufferAttribute,
-	Matrix3,
-	Matrix4,
 	Mesh,
-	Vector3
+	mat3GetNormalMatrix,
+	mat4Create,
+	mat4Invert,
+	mat4MakeRotationFromEuler,
+	mat4SetPosition,
+	vec3ApplyMatrix4,
+	vec3ApplyNormalMatrix,
+	vec3Copy,
+	vec3Create,
+	vec3Dot,
+	vec3FromBufferAttribute,
+	vec3Set
 } from 'three';
 
 /**
@@ -33,11 +41,11 @@ class DecalGeometry extends BufferGeometry {
 	 * Constructs a new decal geometry.
 	 *
 	 * @param {Mesh} [mesh] - The base mesh the decal should be projected on.
-	 * @param {Vector3} [position] - The position of the decal projector.
-	 * @param {Euler} [orientation] - The orientation of the decal projector.
-	 * @param {Vector3} [size] - The scale of the decal projector.
+	 * @param {Vector3Like} [position] - The position of the decal projector.
+	 * @param {EulerLike} [orientation] - The orientation of the decal projector.
+	 * @param {Vector3Like} [size] - The scale of the decal projector.
 	 */
-	constructor( mesh = new Mesh(), position = new Vector3(), orientation = new Euler(), size = new Vector3( 1, 1, 1 ) ) {
+	constructor( mesh = new Mesh(), position = vec3Create(), orientation = { x: 0, y: 0, z: 0, order: 'XYZ' }, size = vec3Set( vec3Create(), 1, 1, 1 ) ) {
 
 		super();
 
@@ -49,18 +57,17 @@ class DecalGeometry extends BufferGeometry {
 
 		// helpers
 
-		const plane = new Vector3();
+		const plane = vec3Create();
 
-		const normalMatrix = new Matrix3().getNormalMatrix( mesh.matrixWorld );
+		const normalMatrix = mat3GetNormalMatrix( mesh.matrixWorld );
 
 		// this matrix represents the transformation of the decal projector
 
-		const projectorMatrix = new Matrix4();
-		projectorMatrix.makeRotationFromEuler( orientation );
-		projectorMatrix.setPosition( position );
+		const projectorMatrix = mat4Create();
+		mat4MakeRotationFromEuler( orientation, projectorMatrix );
+		mat4SetPosition( projectorMatrix, position.x, position.y, position.z, projectorMatrix );
 
-		const projectorMatrixInverse = new Matrix4();
-		projectorMatrixInverse.copy( projectorMatrix ).invert();
+		const projectorMatrixInverse = mat4Invert( projectorMatrix );
 
 		// generate buffers
 
@@ -83,8 +90,8 @@ class DecalGeometry extends BufferGeometry {
 
 			let decalVertices = [];
 
-			const vertex = new Vector3();
-			const normal = new Vector3();
+			const vertex = vec3Create();
+			const normal = vec3Create();
 
 			// handle different geometry types
 
@@ -106,11 +113,11 @@ class DecalGeometry extends BufferGeometry {
 
 				for ( let i = 0; i < index.count; i ++ ) {
 
-					vertex.fromBufferAttribute( positionAttribute, index.getX( i ) );
+					vec3FromBufferAttribute( positionAttribute, index.getX( i ), vertex );
 
 					if ( normalAttribute ) {
 
-						normal.fromBufferAttribute( normalAttribute, index.getX( i ) );
+						vec3FromBufferAttribute( normalAttribute, index.getX( i ), normal );
 						pushDecalVertex( decalVertices, vertex, normal );
 
 					} else {
@@ -129,11 +136,11 @@ class DecalGeometry extends BufferGeometry {
 
 				for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
-					vertex.fromBufferAttribute( positionAttribute, i );
+					vec3FromBufferAttribute( positionAttribute, i, vertex );
 
 					if ( normalAttribute ) {
 
-						normal.fromBufferAttribute( normalAttribute, i );
+						vec3FromBufferAttribute( normalAttribute, i, normal );
 						pushDecalVertex( decalVertices, vertex, normal );
 
 					} else {
@@ -148,12 +155,12 @@ class DecalGeometry extends BufferGeometry {
 
 			// second, clip the geometry so that it doesn't extend out from the projector
 
-			decalVertices = clipGeometry( decalVertices, plane.set( 1, 0, 0 ) );
-			decalVertices = clipGeometry( decalVertices, plane.set( - 1, 0, 0 ) );
-			decalVertices = clipGeometry( decalVertices, plane.set( 0, 1, 0 ) );
-			decalVertices = clipGeometry( decalVertices, plane.set( 0, - 1, 0 ) );
-			decalVertices = clipGeometry( decalVertices, plane.set( 0, 0, 1 ) );
-			decalVertices = clipGeometry( decalVertices, plane.set( 0, 0, - 1 ) );
+			decalVertices = clipGeometry( decalVertices, vec3Set( plane, 1, 0, 0 ) );
+			decalVertices = clipGeometry( decalVertices, vec3Set( plane, - 1, 0, 0 ) );
+			decalVertices = clipGeometry( decalVertices, vec3Set( plane, 0, 1, 0 ) );
+			decalVertices = clipGeometry( decalVertices, vec3Set( plane, 0, - 1, 0 ) );
+			decalVertices = clipGeometry( decalVertices, vec3Set( plane, 0, 0, 1 ) );
+			decalVertices = clipGeometry( decalVertices, vec3Set( plane, 0, 0, - 1 ) );
 
 			// third, generate final vertices, normals and uvs
 
@@ -170,7 +177,7 @@ class DecalGeometry extends BufferGeometry {
 
 				// transform the vertex back to world space
 
-				decalVertex.position.applyMatrix4( projectorMatrix );
+				vec3ApplyMatrix4( decalVertex.position, projectorMatrix, decalVertex.position );
 
 				// now create vertex and normal buffer data
 
@@ -190,17 +197,17 @@ class DecalGeometry extends BufferGeometry {
 
 			// transform the vertex to world space, then to projector space
 
-			vertex.applyMatrix4( mesh.matrixWorld );
-			vertex.applyMatrix4( projectorMatrixInverse );
+			vec3ApplyMatrix4( vertex, mesh.matrixWorld, vertex );
+			vec3ApplyMatrix4( vertex, projectorMatrixInverse, vertex );
 
 			if ( normal ) {
 
-				normal.applyNormalMatrix( normalMatrix );
-				decalVertices.push( new DecalVertex( vertex.clone(), normal.clone() ) );
+				vec3ApplyNormalMatrix( normal, normalMatrix, normal );
+				decalVertices.push( new DecalVertex( vec3Copy( vertex ), vec3Copy( normal ) ) );
 
 			} else {
 
-				decalVertices.push( new DecalVertex( vertex.clone() ) );
+				decalVertices.push( new DecalVertex( vec3Copy( vertex ) ) );
 
 			}
 
@@ -210,7 +217,7 @@ class DecalGeometry extends BufferGeometry {
 
 			const outVertices = [];
 
-			const s = 0.5 * Math.abs( size.dot( plane ) );
+			const s = 0.5 * Math.abs( vec3Dot( size, plane ) );
 
 			// a single iteration clips one face,
 			// which consists of three consecutive 'DecalVertex' objects
@@ -223,9 +230,9 @@ class DecalGeometry extends BufferGeometry {
 				let nV3;
 				let nV4;
 
-				const d1 = inVertices[ i + 0 ].position.dot( plane ) - s;
-				const d2 = inVertices[ i + 1 ].position.dot( plane ) - s;
-				const d3 = inVertices[ i + 2 ].position.dot( plane ) - s;
+				const d1 = vec3Dot( inVertices[ i + 0 ].position, plane ) - s;
+				const d2 = vec3Dot( inVertices[ i + 1 ].position, plane ) - s;
+				const d3 = vec3Dot( inVertices[ i + 2 ].position, plane ) - s;
 
 				const v1Out = d1 > 0;
 				const v2Out = d2 > 0;
@@ -359,12 +366,13 @@ class DecalGeometry extends BufferGeometry {
 
 		function clip( v0, v1, p, s ) {
 
-			const d0 = v0.position.dot( p ) - s;
-			const d1 = v1.position.dot( p ) - s;
+			const d0 = vec3Dot( v0.position, p ) - s;
+			const d1 = vec3Dot( v1.position, p ) - s;
 
 			const s0 = d0 / ( d0 - d1 );
 
-			const position = new Vector3(
+			const position = vec3Set(
+				vec3Create(),
 				v0.position.x + s0 * ( v1.position.x - v0.position.x ),
 				v0.position.y + s0 * ( v1.position.y - v0.position.y ),
 				v0.position.z + s0 * ( v1.position.z - v0.position.z )
@@ -374,7 +382,8 @@ class DecalGeometry extends BufferGeometry {
 
 			if ( v0.normal !== null && v1.normal !== null ) {
 
-				normal = new Vector3(
+				normal = vec3Set(
+					vec3Create(),
 					v0.normal.x + s0 * ( v1.normal.x - v0.normal.x ),
 					v0.normal.y + s0 * ( v1.normal.y - v0.normal.y ),
 					v0.normal.z + s0 * ( v1.normal.z - v0.normal.z )
@@ -408,8 +417,8 @@ class DecalVertex {
 
 	clone() {
 
-		const position = this.position.clone();
-		const normal = ( this.normal !== null ) ? this.normal.clone() : null;
+		const position = vec3Copy( this.position );
+		const normal = ( this.normal !== null ) ? vec3Copy( this.normal ) : null;
 
 		return new this.constructor( position, normal );
 

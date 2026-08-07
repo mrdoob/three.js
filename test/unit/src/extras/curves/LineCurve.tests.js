@@ -83,7 +83,7 @@ export default QUnit.module( 'Extras', () => {
 					curve.getPointAt( 1, new Vector2() )
 				];
 
-				assert.deepEqual( points, expectedPoints, 'Correct points' );
+				assert.deepEqual( points.map( p => ( { x: p.x, y: p.y } ) ), expectedPoints.map( p => ( { x: p.x, y: p.y } ) ), 'Correct points' );
 
 			} );
 
@@ -121,7 +121,7 @@ export default QUnit.module( 'Extras', () => {
 
 				let points = curve.getPoints();
 
-				assert.deepEqual( points, expectedPoints, 'Correct points for first curve' );
+				assert.deepEqual( points.map( p => ( { x: p.x, y: p.y } ) ), expectedPoints.map( p => ( { x: p.x, y: p.y } ) ), 'Correct points for first curve' );
 
 				//
 
@@ -138,7 +138,7 @@ export default QUnit.module( 'Extras', () => {
 
 				points = curve.getPoints();
 
-				assert.deepEqual( points, expectedPoints, 'Correct points for second curve' );
+				assert.deepEqual( points.map( p => ( { x: p.x, y: p.y } ) ), expectedPoints.map( p => ( { x: p.x, y: p.y } ) ), 'Correct points for second curve' );
 
 			} );
 
@@ -200,7 +200,7 @@ export default QUnit.module( 'Extras', () => {
 				const points = curve.getSpacedPoints( 4 );
 
 				assert.strictEqual( points.length, expectedPoints.length, 'Correct number of points' );
-				assert.deepEqual( points, expectedPoints, 'Correct points calculated' );
+				assert.deepEqual( points.map( p => ( { x: p.x, y: p.y } ) ), expectedPoints.map( p => ( { x: p.x, y: p.y } ) ), 'Correct points calculated' );
 
 			} );
 

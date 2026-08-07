@@ -1,20 +1,30 @@
 import {
 	CylinderGeometry,
 	CanvasTexture,
-	Color,
-	Euler,
 	Mesh,
 	MeshBasicMaterial,
 	Object3D,
 	OrthographicCamera,
-	Quaternion,
 	Raycaster,
 	Sprite,
 	SpriteMaterial,
 	SRGBColorSpace,
-	Vector2,
-	Vector3,
-	Vector4
+	eulerCreate,
+	quatAngleTo,
+	quatCopy,
+	quatCreate,
+	quatInvert,
+	quatRotateTowards,
+	quatSetFromEuler,
+	vec2Create,
+	vec3Add,
+	vec3ApplyQuaternion,
+	vec3Copy,
+	vec3Create,
+	vec3DistanceTo,
+	vec3MultiplyScalar,
+	vec3Set,
+	vec4Create
 } from 'three';
 
 /**
@@ -69,9 +79,9 @@ class ViewHelper extends Object3D {
 		/**
 		 * The helper's center point.
 		 *
-		 * @type {Vector3}
+		 * @type {{x:number,y:number,z:number}}
 		 */
-		this.center = new Vector3();
+		this.center = vec3Create();
 
 		/**
 		 * Controls the position of the helper in the viewport.
@@ -87,10 +97,10 @@ class ViewHelper extends Object3D {
 			left: null
 		};
 
-		const color1 = new Color( '#ff4466' );
-		const color2 = new Color( '#88ff44' );
-		const color3 = new Color( '#4488ff' );
-		const color4 = new Color( '#000000' );
+		const color1 = '#ff4466';
+		const color2 = '#88ff44';
+		const color3 = '#4488ff';
+		const color4 = '#000000';
 
 		const options = {};
 
@@ -98,11 +108,11 @@ class ViewHelper extends Object3D {
 
 		const interactiveObjects = [];
 		const raycaster = new Raycaster();
-		const mouse = new Vector2();
+		const mouse = vec2Create();
 		const dummy = new Object3D();
 
 		const orthoCamera = new OrthographicCamera( - 2, 2, 2, - 2, 0, 4 );
-		orthoCamera.position.set( 0, 0, 2 );
+		vec3Set( orthoCamera.position, 0, 0, 2 );
 
 		const geometry = new CylinderGeometry( 0.04, 0.04, 0.8, 5 ).rotateZ( - Math.PI / 2 ).translate( 0.4, 0, 0 );
 
@@ -161,7 +171,7 @@ class ViewHelper extends Object3D {
 		interactiveObjects.push( negYAxisHelper );
 		interactiveObjects.push( negZAxisHelper );
 
-		const point = new Vector3();
+		const point = vec3Create();
 		const dim = 128;
 		const turnRate = 2 * Math.PI; // turn rate in angles per second
 
@@ -173,11 +183,13 @@ class ViewHelper extends Object3D {
 		 */
 		this.render = function ( renderer ) {
 
-			this.quaternion.copy( this.camera.quaternion ).invert();
+			quatCopy( this.camera.quaternion, this.quaternion );
+			quatInvert( this.quaternion, this.quaternion );
+			this.quaternion._onChangeCallback();
 			this.updateMatrixWorld();
 
-			point.set( 0, 0, 1 );
-			point.applyQuaternion( this.camera.quaternion );
+			vec3Set( point, 0, 0, 1 );
+			vec3ApplyQuaternion( point, this.camera.quaternion, point );
 
 			//
 
@@ -218,12 +230,12 @@ class ViewHelper extends Object3D {
 
 		};
 
-		const targetPosition = new Vector3();
-		const targetQuaternion = new Quaternion();
+		const targetPosition = vec3Create();
+		const targetQuaternion = quatCreate();
 
-		const q1 = new Quaternion();
-		const q2 = new Quaternion();
-		const viewport = new Vector4();
+		const q1 = quatCreate();
+		const q2 = quatCreate();
+		const viewport = vec4Create();
 		let radius = 0;
 
 		/**
@@ -334,14 +346,18 @@ class ViewHelper extends Object3D {
 
 			// animate position by doing a slerp and then scaling the position on the unit sphere
 
-			q1.rotateTowards( q2, step );
-			this.camera.position.set( 0, 0, 1 ).applyQuaternion( q1 ).multiplyScalar( radius ).add( this.center );
+			quatRotateTowards( q1, q2, step, q1 );
+			vec3Set( this.camera.position, 0, 0, 1 );
+			vec3ApplyQuaternion( this.camera.position, q1, this.camera.position );
+			vec3MultiplyScalar( this.camera.position, radius, this.camera.position );
+			vec3Add( this.camera.position, this.center, this.camera.position );
 
 			// animate orientation
 
-			this.camera.quaternion.rotateTowards( targetQuaternion, step );
+			quatRotateTowards( this.camera.quaternion, targetQuaternion, step, this.camera.quaternion );
+			this.camera.quaternion._onChangeCallback();
 
-			if ( q1.angleTo( q2 ) === 0 ) {
+			if ( quatAngleTo( q1, q2 ) === 0 ) {
 
 				this.animating = false;
 
@@ -382,33 +398,33 @@ class ViewHelper extends Object3D {
 			switch ( object.userData.type ) {
 
 				case 'posX':
-					targetPosition.set( 1, 0, 0 );
-					targetQuaternion.setFromEuler( new Euler( 0, Math.PI * 0.5, 0 ) );
+					vec3Set( targetPosition, 1, 0, 0 );
+					quatSetFromEuler( eulerCreate( 0, Math.PI * 0.5, 0 ), targetQuaternion );
 					break;
 
 				case 'posY':
-					targetPosition.set( 0, 1, 0 );
-					targetQuaternion.setFromEuler( new Euler( - Math.PI * 0.5, 0, 0 ) );
+					vec3Set( targetPosition, 0, 1, 0 );
+					quatSetFromEuler( eulerCreate( - Math.PI * 0.5, 0, 0 ), targetQuaternion );
 					break;
 
 				case 'posZ':
-					targetPosition.set( 0, 0, 1 );
-					targetQuaternion.setFromEuler( new Euler() );
+					vec3Set( targetPosition, 0, 0, 1 );
+					quatSetFromEuler( eulerCreate(), targetQuaternion );
 					break;
 
 				case 'negX':
-					targetPosition.set( - 1, 0, 0 );
-					targetQuaternion.setFromEuler( new Euler( 0, - Math.PI * 0.5, 0 ) );
+					vec3Set( targetPosition, - 1, 0, 0 );
+					quatSetFromEuler( eulerCreate( 0, - Math.PI * 0.5, 0 ), targetQuaternion );
 					break;
 
 				case 'negY':
-					targetPosition.set( 0, - 1, 0 );
-					targetQuaternion.setFromEuler( new Euler( Math.PI * 0.5, 0, 0 ) );
+					vec3Set( targetPosition, 0, - 1, 0 );
+					quatSetFromEuler( eulerCreate( Math.PI * 0.5, 0, 0 ), targetQuaternion );
 					break;
 
 				case 'negZ':
-					targetPosition.set( 0, 0, - 1 );
-					targetQuaternion.setFromEuler( new Euler( 0, Math.PI, 0 ) );
+					vec3Set( targetPosition, 0, 0, - 1 );
+					quatSetFromEuler( eulerCreate( 0, Math.PI, 0 ), targetQuaternion );
 					break;
 
 				default:
@@ -418,16 +434,17 @@ class ViewHelper extends Object3D {
 
 			//
 
-			radius = scope.camera.position.distanceTo( focusPoint );
-			targetPosition.multiplyScalar( radius ).add( focusPoint );
+			radius = vec3DistanceTo( scope.camera.position, focusPoint );
+			vec3MultiplyScalar( targetPosition, radius, targetPosition );
+			vec3Add( targetPosition, focusPoint, targetPosition );
 
-			dummy.position.copy( focusPoint );
+			vec3Copy( focusPoint, dummy.position );
 
 			dummy.lookAt( scope.camera.position );
-			q1.copy( dummy.quaternion );
+			quatCopy( dummy.quaternion, q1 );
 
-			dummy.lookAt( targetPosition );
-			q2.copy( dummy.quaternion );
+			dummy.lookAt( targetPosition.x, targetPosition.y, targetPosition.z );
+			quatCopy( dummy.quaternion, q2 );
 
 		}
 
@@ -487,7 +504,7 @@ class ViewHelper extends Object3D {
 			context.beginPath();
 			context.arc( 32, 32, radius, 0, 2 * Math.PI );
 			context.closePath();
-			context.fillStyle = color.getStyle();
+			context.fillStyle = color;
 			context.fill();
 
 			if ( text ) {

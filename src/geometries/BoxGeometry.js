@@ -1,6 +1,6 @@
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
-import { Vector3 } from '../math/Vector3.js';
+import { vec3Create } from '../math/Vector3Functions.js';
 
 /**
  * A geometry class for a rectangular cuboid with a given width, height, and depth.
@@ -102,7 +102,7 @@ class BoxGeometry extends BufferGeometry {
 			let vertexCounter = 0;
 			let groupCount = 0;
 
-			const vector = new Vector3();
+			const vector = vec3Create();
 
 			// generate vertices, normals and uvs
 

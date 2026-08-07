@@ -1,12 +1,12 @@
 import DataMap from './DataMap.js';
 
-import { Vector3 } from '../../math/Vector3.js';
+import { vec3Create } from '../../math/Vector3Functions.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { DepthStencilFormat, DepthFormat, UnsignedIntType, UnsignedInt248Type, UnsignedByteType, SRGBTransfer } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 import { warn } from '../../utils.js';
 
-const _size = /*@__PURE__*/ new Vector3();
+const _size = /*@__PURE__*/ vec3Create();
 
 /**
  * This module manages the textures of the renderer.
@@ -75,8 +75,8 @@ class Textures extends DataMap {
 
 		const size = this.getSize( textures[ 0 ] );
 
-		const mipWidth = size.width >> activeMipmapLevel;
-		const mipHeight = size.height >> activeMipmapLevel;
+		const mipWidth = size.x >> activeMipmapLevel;
+		const mipHeight = size.y >> activeMipmapLevel;
 
 		let depthTexture = renderTarget.depthTexture || depthTextureMips[ activeMipmapLevel ];
 		const useDepthTexture = renderTarget.depthBuffer === true || renderTarget.stencilBuffer === true;
@@ -84,7 +84,7 @@ class Textures extends DataMap {
 		let textureNeedsUpdate = false;
 
 		const hasArrayDepthTexture = depthTexture !== undefined && depthTexture.image !== undefined && depthTexture.image.depth > 1;
-		const useArrayDepth = size.depth > 1 && ( renderTarget.useArrayDepthTexture || renderTarget.multiview || hasArrayDepthTexture );
+		const useArrayDepth = size.z > 1 && ( renderTarget.useArrayDepthTexture || renderTarget.multiview || hasArrayDepthTexture );
 
 		if ( depthTexture === undefined && useDepthTexture ) {
 
@@ -94,7 +94,7 @@ class Textures extends DataMap {
 			depthTexture.type = renderTarget.stencilBuffer ? UnsignedInt248Type : UnsignedIntType; // FloatType
 			depthTexture.image.width = mipWidth;
 			depthTexture.image.height = mipHeight;
-			depthTexture.image.depth = size.depth;
+			depthTexture.image.depth = size.z;
 			depthTexture.renderTarget = renderTarget;
 
 			depthTextureMips[ activeMipmapLevel ] = depthTexture;
@@ -107,7 +107,7 @@ class Textures extends DataMap {
 
 		}
 
-		if ( renderTargetData.width !== size.width || size.height !== renderTargetData.height ) {
+		if ( renderTargetData.width !== size.x || size.y !== renderTargetData.height ) {
 
 			textureNeedsUpdate = true;
 
@@ -116,14 +116,14 @@ class Textures extends DataMap {
 				depthTexture.needsUpdate = true;
 				depthTexture.image.width = mipWidth;
 				depthTexture.image.height = mipHeight;
-				depthTexture.image.depth = useArrayDepth ? size.depth : 1;
+				depthTexture.image.depth = useArrayDepth ? size.z : 1;
 
 			}
 
 		}
 
-		renderTargetData.width = size.width;
-		renderTargetData.height = size.height;
+		renderTargetData.width = size.x;
+		renderTargetData.height = size.y;
 		renderTargetData.textures = textures;
 		renderTargetData.depthTexture = depthTexture || null;
 		renderTargetData.depth = renderTarget.depthBuffer;
@@ -287,7 +287,7 @@ class Textures extends DataMap {
 
 		//
 
-		const { width, height, depth } = this.getSize( texture );
+		const { x: width, y: height, z: depth } = this.getSize( texture );
 
 		options.width = width;
 		options.height = height;
@@ -457,33 +457,33 @@ class Textures extends DataMap {
 
 			if ( texture.isHTMLTexture ) {
 
-				target.width = image.offsetWidth || 1;
-				target.height = image.offsetHeight || 1;
-				target.depth = 1;
+				target.x = image.offsetWidth || 1;
+				target.y = image.offsetHeight || 1;
+				target.z = 1;
 
 			} else if ( ( typeof HTMLVideoElement !== 'undefined' ) && ( image instanceof HTMLVideoElement ) ) {
 
-				target.width = image.videoWidth || 1;
-				target.height = image.videoHeight || 1;
-				target.depth = 1;
+				target.x = image.videoWidth || 1;
+				target.y = image.videoHeight || 1;
+				target.z = 1;
 
 			} else if ( ( typeof VideoFrame !== 'undefined' ) && ( image instanceof VideoFrame ) ) {
 
-				target.width = image.displayWidth || 1;
-				target.height = image.displayHeight || 1;
-				target.depth = 1;
+				target.x = image.displayWidth || 1;
+				target.y = image.displayHeight || 1;
+				target.z = 1;
 
 			} else {
 
-				target.width = image.width || 1;
-				target.height = image.height || 1;
-				target.depth = texture.isCubeTexture ? 6 : ( image.depth || 1 );
+				target.x = image.width || 1;
+				target.y = image.height || 1;
+				target.z = texture.isCubeTexture ? 6 : ( image.depth || 1 );
 
 			}
 
 		} else {
 
-			target.width = target.height = target.depth = 1;
+			target.x = target.y = target.z = 1;
 
 		}
 

@@ -1,12 +1,27 @@
 import {
 	AnimationClip,
 	AnimationMixer,
-	Matrix4,
-	Quaternion,
 	QuaternionKeyframeTrack,
 	SkeletonHelper,
-	Vector3,
-	VectorKeyframeTrack
+	VectorKeyframeTrack,
+	mat4Copy,
+	mat4CopyPosition,
+	mat4Create,
+	mat4Decompose,
+	mat4Identity,
+	mat4Invert,
+	mat4MakeRotationFromQuaternion,
+	mat4Multiply,
+	mat4Scale,
+	quatCreate,
+	quatSetFromRotationMatrix,
+	quatToArray,
+	vec3Copy,
+	vec3Create,
+	vec3Set,
+	vec3SetFromMatrixScale,
+	vec3Sub,
+	vec3ToArray
 } from 'three';
 
 /**
@@ -38,16 +53,16 @@ function getBoneName( bone, options ) {
  */
 function retarget( target, source, options = {} ) {
 
-	const quat = new Quaternion(),
-		scale = new Vector3(),
-		relativeMatrix = new Matrix4(),
-		globalMatrix = new Matrix4();
+	const quat = quatCreate(),
+		scale = vec3Create(),
+		relativeMatrix = mat4Create(),
+		globalMatrix = mat4Create();
 
 	options.preserveBoneMatrix = options.preserveBoneMatrix !== undefined ? options.preserveBoneMatrix : true;
 	options.preserveBonePositions = options.preserveBonePositions !== undefined ? options.preserveBonePositions : true;
 	options.useTargetMatrix = options.useTargetMatrix !== undefined ? options.useTargetMatrix : false;
 	options.hip = options.hip !== undefined ? options.hip : 'hip';
-	options.hipInfluence = options.hipInfluence !== undefined ? options.hipInfluence : new Vector3( 1, 1, 1 );
+	options.hipInfluence = options.hipInfluence !== undefined ? options.hipInfluence : vec3Set( vec3Create(), 1, 1, 1 );
 	options.scale = options.scale !== undefined ? options.scale : 1;
 	options.names = options.names || {};
 
@@ -76,7 +91,7 @@ function retarget( target, source, options = {} ) {
 
 		for ( let i = 0; i < bones.length; i ++ ) {
 
-			bonesPosition.push( bones[ i ].position.clone() );
+			bonesPosition.push( vec3Copy( bones[ i ].position ) );
 
 		}
 
@@ -88,7 +103,7 @@ function retarget( target, source, options = {} ) {
 
 		target.updateMatrixWorld();
 
-		target.matrixWorld.identity();
+		mat4Identity( target.matrixWorld );
 
 		// reset children matrix
 
@@ -107,7 +122,7 @@ function retarget( target, source, options = {} ) {
 
 		boneTo = getBoneByName( name, sourceBones );
 
-		globalMatrix.copy( bone.matrixWorld );
+		mat4Copy( bone.matrixWorld, globalMatrix );
 
 		if ( boneTo ) {
 
@@ -115,23 +130,24 @@ function retarget( target, source, options = {} ) {
 
 			if ( options.useTargetMatrix ) {
 
-				relativeMatrix.copy( boneTo.matrixWorld );
+				mat4Copy( boneTo.matrixWorld, relativeMatrix );
 
 			} else {
 
-				relativeMatrix.copy( target.matrixWorld ).invert();
-				relativeMatrix.multiply( boneTo.matrixWorld );
+				mat4Invert( target.matrixWorld, relativeMatrix );
+				mat4Multiply( relativeMatrix, boneTo.matrixWorld, relativeMatrix );
 
 			}
 
 			// ignore scale to extract rotation
 
-			scale.setFromMatrixScale( relativeMatrix );
-			relativeMatrix.scale( scale.set( 1 / scale.x, 1 / scale.y, 1 / scale.z ) );
+			vec3SetFromMatrixScale( relativeMatrix, scale );
+			mat4Scale( relativeMatrix, vec3Set( scale, 1 / scale.x, 1 / scale.y, 1 / scale.z ), relativeMatrix );
 
 			// apply to global matrix
 
-			globalMatrix.makeRotationFromQuaternion( quat.setFromRotationMatrix( relativeMatrix ) );
+			quatSetFromRotationMatrix( relativeMatrix, quat );
+			mat4MakeRotationFromQuaternion( quat, globalMatrix );
 
 			if ( target.isObject3D ) {
 
@@ -139,7 +155,7 @@ function retarget( target, source, options = {} ) {
 
 					if ( options.localOffsets[ bone.name ] ) {
 
-						globalMatrix.multiply( options.localOffsets[ bone.name ] );
+						mat4Multiply( globalMatrix, options.localOffsets[ bone.name ], globalMatrix );
 
 					}
 
@@ -147,7 +163,7 @@ function retarget( target, source, options = {} ) {
 
 			}
 
-			globalMatrix.copyPosition( relativeMatrix );
+			mat4CopyPosition( relativeMatrix, globalMatrix );
 
 		}
 
@@ -169,16 +185,16 @@ function retarget( target, source, options = {} ) {
 
 		if ( bone.parent ) {
 
-			bone.matrix.copy( bone.parent.matrixWorld ).invert();
-			bone.matrix.multiply( globalMatrix );
+			mat4Invert( bone.parent.matrixWorld, bone.matrix );
+			mat4Multiply( bone.matrix, globalMatrix, bone.matrix );
 
 		} else {
 
-			bone.matrix.copy( globalMatrix );
+			mat4Copy( globalMatrix, bone.matrix );
 
 		}
 
-		bone.matrix.decompose( bone.position, bone.quaternion, bone.scale );
+		mat4Decompose( bone.matrix, bone.position, bone.quaternion, bone.scale );
 
 		bone.updateMatrixWorld();
 
@@ -193,7 +209,7 @@ function retarget( target, source, options = {} ) {
 
 			if ( name !== options.hip ) {
 
-				bone.position.copy( bonesPosition[ i ] );
+				vec3Copy( bonesPosition[ i ], bone.position );
 
 			}
 
@@ -302,17 +318,17 @@ function retargetClip( target, source, clip, options = {} ) {
 
 						if ( frame === 0 ) {
 
-							positionOffset = bone.position.clone();
+							positionOffset = vec3Copy( bone.position );
 
 						}
 
-						bone.position.sub( positionOffset );
+						vec3Sub( bone.position, positionOffset, bone.position );
 
 					}
 
 					boneData.pos.times[ frame ] = time;
 
-					bone.position.toArray( boneData.pos.values, frame * 3 );
+					vec3ToArray( bone.position, boneData.pos.values, frame * 3 );
 
 				}
 
@@ -327,7 +343,7 @@ function retargetClip( target, source, clip, options = {} ) {
 
 				boneData.quat.times[ frame ] = time;
 
-				bone.quaternion.toArray( boneData.quat.values, frame * 4 );
+				quatToArray( bone.quaternion, boneData.quat.values, frame * 4 );
 
 			}
 
@@ -412,7 +428,7 @@ function clone( source ) {
 		const sourceBones = sourceMesh.skeleton.bones;
 
 		clonedMesh.skeleton = sourceMesh.skeleton.clone();
-		clonedMesh.bindMatrix.copy( sourceMesh.bindMatrix );
+		mat4Copy( sourceMesh.bindMatrix, clonedMesh.bindMatrix );
 
 		clonedMesh.skeleton.bones = sourceBones.map( function ( bone ) {
 

@@ -1,3 +1,4 @@
+import { vec3Set } from 'three';
 
 /**
  * @module ParametricFunctions
@@ -9,7 +10,7 @@
  *
  * @param {number} v - The `v` coordinate on the surface in the range `[0,1]`.
  * @param {number} u - The `u` coordinate on the surface in the range `[0,1]`.
- * @param {Vector3} target - The target vector that is used to store the method's result.
+ * @param {Vector3Like} target - The target vector that is used to store the method's result.
  */
 function klein( v, u, target ) {
 
@@ -32,7 +33,7 @@ function klein( v, u, target ) {
 
 	const y = - 2 * ( 1 - Math.cos( u ) / 2 ) * Math.sin( v );
 
-	target.set( x, y, z );
+	vec3Set( target, x, y, z );
 
 }
 
@@ -41,11 +42,11 @@ function klein( v, u, target ) {
  *
  * @param {number} u - The `u` coordinate on the surface in the range `[0,1]`.
  * @param {number} v - The `v` coordinate on the surface in the range `[0,1]`.
- * @param {Vector3} target - The target vector that is used to store the method's result.
+ * @param {Vector3Like} target - The target vector that is used to store the method's result.
  */
 function plane( u, v, target ) {
 
-	target.set( u, 0, v );
+	vec3Set( target, u, 0, v );
 
 }
 
@@ -54,7 +55,7 @@ function plane( u, v, target ) {
  *
  * @param {number} u - The `u` coordinate on the surface in the range `[0,1]`.
  * @param {number} t - The `v` coordinate on the surface in the range `[0,1]`.
- * @param {Vector3} target - The target vector that is used to store the method's result.
+ * @param {Vector3Like} target - The target vector that is used to store the method's result.
  */
 function mobius( u, t, target ) {
 
@@ -68,7 +69,7 @@ function mobius( u, t, target ) {
 	const y = Math.sin( v ) * ( a + u * Math.cos( v / 2 ) );
 	const z = u * Math.sin( v / 2 );
 
-	target.set( x, y, z );
+	vec3Set( target, x, y, z );
 
 }
 
@@ -77,7 +78,7 @@ function mobius( u, t, target ) {
  *
  * @param {number} u - The `u` coordinate on the surface in the range `[0,1]`.
  * @param {number} t - The `v` coordinate on the surface in the range `[0,1]`.
- * @param {Vector3} target - The target vector that is used to store the method's result.
+ * @param {Vector3Like} target - The target vector that is used to store the method's result.
  */
 function mobius3d( u, t, target ) {
 
@@ -93,7 +94,7 @@ function mobius3d( u, t, target ) {
 	const y = ( major + x ) * Math.sin( u );
 	x = ( major + x ) * Math.cos( u );
 
-	target.set( x, y, z );
+	vec3Set( target, x, y, z );
 
 }
 

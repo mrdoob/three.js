@@ -1,4 +1,4 @@
-import { Color } from '../../math/Color.js';
+import { colorCreate } from '../../math/ColorFunctions.js';
 
 /**
  * Saves the state of the given renderer and stores it into the given state object.
@@ -22,7 +22,7 @@ export function saveRendererState( renderer, state = {} ) {
 	state.renderObjectFunction = renderer.getRenderObjectFunction();
 	state.pixelRatio = renderer.getPixelRatio();
 	state.mrt = renderer.getMRT();
-	state.clearColor = renderer.getClearColor( state.clearColor || new Color() );
+	state.clearColor = renderer.getClearColor( state.clearColor || colorCreate() );
 	state.clearAlpha = renderer.getClearAlpha();
 	state.autoClear = renderer.autoClear;
 	state.scissorTest = renderer.getScissorTest();

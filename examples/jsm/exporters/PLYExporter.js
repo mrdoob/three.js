@@ -1,9 +1,15 @@
 import {
-	Matrix3,
-	Vector3,
-	Color,
 	ColorManagement,
-	SRGBColorSpace
+	SRGBColorSpace,
+	colorCreate,
+	colorFromBufferAttribute,
+	mat3Create,
+	mat3GetNormalMatrix,
+	vec3ApplyMatrix3,
+	vec3ApplyMatrix4,
+	vec3Create,
+	vec3FromBufferAttribute,
+	vec3Normalize
 } from 'three';
 
 /**
@@ -184,7 +190,7 @@ class PLYExporter {
 
 		} );
 
-		const tempColor = new Color();
+		const tempColor = colorCreate();
 		includeIndices = includeIndices && excludeAttributes.indexOf( 'index' ) === - 1;
 		includeNormals = includeNormals && excludeAttributes.indexOf( 'normal' ) === - 1;
 		includeColors = includeColors && excludeAttributes.indexOf( 'color' ) === - 1;
@@ -274,8 +280,8 @@ class PLYExporter {
 
 
 		// Generate attribute data
-		const vertex = new Vector3();
-		const normalMatrixWorld = new Matrix3();
+		const vertex = vec3Create();
+		const normalMatrixWorld = mat3Create();
 		let result = null;
 
 		if ( options.binary === true ) {
@@ -330,13 +336,13 @@ class PLYExporter {
 				const colors = geometry.getAttribute( 'color' );
 				const indices = geometry.getIndex();
 
-				normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
+				mat3GetNormalMatrix( mesh.matrixWorld, normalMatrixWorld );
 
 				for ( let i = 0, l = vertices.count; i < l; i ++ ) {
 
-					vertex.fromBufferAttribute( vertices, i );
+					vec3FromBufferAttribute( vertices, i, vertex );
 
-					vertex.applyMatrix4( mesh.matrixWorld );
+					vec3ApplyMatrix4( vertex, mesh.matrixWorld, vertex );
 
 
 					// Position information
@@ -354,9 +360,10 @@ class PLYExporter {
 
 						if ( normals != null ) {
 
-							vertex.fromBufferAttribute( normals, i );
+							vec3FromBufferAttribute( normals, i, vertex );
 
-							vertex.applyMatrix3( normalMatrixWorld ).normalize();
+							vec3ApplyMatrix3( vertex, normalMatrixWorld, vertex );
+							vec3Normalize( vertex, vertex );
 
 							normalWriter.write( output, vOffset, vertex.x, options.littleEndian );
 							vOffset += normalWriter.size;
@@ -410,7 +417,7 @@ class PLYExporter {
 
 						if ( colors != null ) {
 
-							tempColor.fromBufferAttribute( colors, i );
+							colorFromBufferAttribute( colors, i, tempColor );
 
 							ColorManagement.workingToColorSpace( tempColor, SRGBColorSpace );
 
@@ -545,14 +552,14 @@ class PLYExporter {
 				const colors = geometry.getAttribute( 'color' );
 				const indices = geometry.getIndex();
 
-				normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
+				mat3GetNormalMatrix( mesh.matrixWorld, normalMatrixWorld );
 
 				// form each line
 				for ( let i = 0, l = vertices.count; i < l; i ++ ) {
 
-					vertex.fromBufferAttribute( vertices, i );
+					vec3FromBufferAttribute( vertices, i, vertex );
 
-					vertex.applyMatrix4( mesh.matrixWorld );
+					vec3ApplyMatrix4( vertex, mesh.matrixWorld, vertex );
 
 
 					// Position information
@@ -566,9 +573,10 @@ class PLYExporter {
 
 						if ( normals != null ) {
 
-							vertex.fromBufferAttribute( normals, i );
+							vec3FromBufferAttribute( normals, i, vertex );
 
-							vertex.applyMatrix3( normalMatrixWorld ).normalize();
+							vec3ApplyMatrix3( vertex, normalMatrixWorld, vertex );
+							vec3Normalize( vertex, vertex );
 
 							line += ' ' +
 								encode( vertex.x, normalIsFloat ) + ' ' +
@@ -605,7 +613,7 @@ class PLYExporter {
 
 						if ( colors != null ) {
 
-							tempColor.fromBufferAttribute( colors, i );
+							colorFromBufferAttribute( colors, i, tempColor );
 
 							ColorManagement.workingToColorSpace( tempColor, SRGBColorSpace );
 

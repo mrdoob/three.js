@@ -77,30 +77,37 @@ class Source {
 	/**
 	 * Returns the dimensions of the source into the given target vector.
 	 *
-	 * @param {(Vector2|Vector3)} target - The target object the result is written into.
-	 * @return {(Vector2|Vector3)} The dimensions of the source.
+	 * @param {(Vector2Like|Vector3Like)} target - The target object the result is written into.
+	 * @return {(Vector2Like|Vector3Like)} The dimensions of the source.
 	 */
 	getSize( target ) {
 
 		const data = this.data;
 
+		let width = 0, height = 0, depth = 0;
+
 		if ( ( typeof HTMLVideoElement !== 'undefined' ) && ( data instanceof HTMLVideoElement ) ) {
 
-			target.set( data.videoWidth, data.videoHeight, 0 );
+			width = data.videoWidth;
+			height = data.videoHeight;
 
 		} else if ( ( typeof VideoFrame !== 'undefined' ) && ( data instanceof VideoFrame ) ) {
 
-			target.set( data.displayWidth, data.displayHeight, 0 );
+			width = data.displayWidth;
+			height = data.displayHeight;
 
 		} else if ( data !== null ) {
 
-			target.set( data.width, data.height, data.depth || 0 );
-
-		} else {
-
-			target.set( 0, 0, 0 );
+			width = data.width;
+			height = data.height;
+			depth = data.depth || 0;
 
 		}
+
+		target.x = width;
+		target.y = height;
+
+		if ( 'z' in target ) target.z = depth;
 
 		return target;
 

@@ -1,11 +1,13 @@
-import { Vector3 } from '../math/Vector3.js';
+import { colorCopy, colorSet } from '../math/ColorFunctions.js';
+import { mat4Copy, mat4Invert, mat4Multiply } from '../math/Matrix4Functions.js';
+import { vec3Create, vec3Set, vec3SetFromMatrixPosition } from '../math/Vector3Functions.js';
 import { Object3D } from '../core/Object3D.js';
 import { LineSegments } from '../objects/LineSegments.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-const _vector = /*@__PURE__*/ new Vector3();
+const _vector = /*@__PURE__*/ vec3Create();
 
 /**
  * This displays a cone shaped helper object for a {@link SpotLight}.
@@ -116,14 +118,13 @@ class SpotLightHelper extends Object3D {
 
 			this.parent.updateWorldMatrix( true );
 
-			this.matrix
-				.copy( this.parent.matrixWorld )
-				.invert()
-				.multiply( this.light.matrixWorld );
+			mat4Copy( this.parent.matrixWorld, this.matrix );
+			mat4Invert( this.matrix, this.matrix );
+			mat4Multiply( this.matrix, this.light.matrixWorld, this.matrix );
 
 		} else {
 
-			this.matrix.copy( this.light.matrixWorld );
+			mat4Copy( this.light.matrixWorld, this.matrix );
 
 		}
 
@@ -132,19 +133,19 @@ class SpotLightHelper extends Object3D {
 		const coneLength = this.light.distance ? this.light.distance : 1000;
 		const coneWidth = coneLength * Math.tan( this.light.angle );
 
-		this.cone.scale.set( coneWidth, coneWidth, coneLength );
+		vec3Set( this.cone.scale, coneWidth, coneWidth, coneLength );
 
-		_vector.setFromMatrixPosition( this.light.target.matrixWorld );
+		vec3SetFromMatrixPosition( this.light.target.matrixWorld, _vector );
 
-		this.cone.lookAt( _vector );
+		this.cone.lookAt( _vector.x, _vector.y, _vector.z );
 
 		if ( this.color !== undefined ) {
 
-			this.cone.material.color.set( this.color );
+			colorSet( this.color, undefined, undefined, this.cone.material.color );
 
 		} else {
 
-			this.cone.material.color.copy( this.light.color );
+			colorCopy( this.light.color, this.cone.material.color );
 
 		}
 

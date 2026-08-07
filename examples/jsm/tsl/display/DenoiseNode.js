@@ -1,4 +1,4 @@
-import { DataTexture, RepeatWrapping, Vector2, Vector3, TempNode } from 'three/webgpu';
+import { DataTexture, RepeatWrapping, TempNode, vec2Create, vec2Set, vec3Create, vec3Set } from 'three/webgpu';
 import { texture, getNormalFromDepth, getViewPosition, convertToTexture, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, luminance, vec2, vec3, vec4, uniformArray, int, dot, max, pow, abs, If, textureSize, sin, cos, mat2, PI, property } from 'three/tsl';
 import { SimplexNoise } from '../../math/SimplexNoise.js';
 
@@ -113,7 +113,7 @@ class DenoiseNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
-		this._resolution = uniform( new Vector2() );
+		this._resolution = uniform( vec2Create(), 'vec2' );
 
 		/**
 		 * An array of sample vectors.
@@ -121,7 +121,7 @@ class DenoiseNode extends TempNode {
 		 * @private
 		 * @type {UniformArrayNode<vec3>}
 		 */
-		this._sampleVectors = uniformArray( generateDenoiseSamples( 16, 2, 1 ) );
+		this._sampleVectors = uniformArray( generateDenoiseSamples( 16, 2, 1 ), 'vec3' );
 
 		/**
 		 * Represents the inverse projection matrix of the scene's camera.
@@ -142,7 +142,7 @@ class DenoiseNode extends TempNode {
 
 		const map = this.textureNode.value;
 
-		this._resolution.value.set( map.image.width, map.image.height );
+		vec2Set( map.image.width, map.image.height, this._resolution.value );
 
 	}
 
@@ -273,7 +273,7 @@ function generateDenoiseSamples( numSamples, numRings, radiusExponent ) {
 
 		const angle = 2 * Math.PI * numRings * i / numSamples;
 		const radius = Math.pow( i / ( numSamples - 1 ), radiusExponent );
-		samples.push( new Vector3( Math.cos( angle ), Math.sin( angle ), radius ) );
+		samples.push( vec3Set( vec3Create(), Math.cos( angle ), Math.sin( angle ), radius ) );
 
 	}
 

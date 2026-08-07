@@ -1,6 +1,5 @@
 import {
 	AddEquation,
-	Color,
 	NormalBlending,
 	DepthTexture,
 	SrcAlphaFactor,
@@ -14,6 +13,10 @@ import {
 	UnsignedShortType,
 	WebGLRenderTarget,
 	HalfFloatType,
+	colorCopy,
+	colorCreate,
+	mat4Copy,
+	vec2Set
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 import { SSRBlurShader, SSRDepthShader, SSRShader } from '../shaders/SSRShader.js';
@@ -133,7 +136,7 @@ class SSRPass extends Pass {
 		 */
 		this.thickness = SSRShader.uniforms.thickness.value;
 
-		this.tempColor = new Color();
+		this.tempColor = colorCreate();
 
 		this._selects = selects;
 
@@ -370,9 +373,9 @@ class SSRPass extends Pass {
 		this.ssrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
 		this.ssrMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
 		this.ssrMaterial.uniforms[ 'thickness' ].value = this.thickness;
-		this.ssrMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
-		this.ssrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
-		this.ssrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
+		vec2Set( this.width, this.height, this.ssrMaterial.uniforms[ 'resolution' ].value );
+		mat4Copy( this.camera.projectionMatrix, this.ssrMaterial.uniforms[ 'cameraProjectionMatrix' ].value );
+		mat4Copy( this.camera.projectionMatrixInverse, this.ssrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value );
 
 		// normal material
 
@@ -400,7 +403,7 @@ class SSRPass extends Pass {
 			fragmentShader: SSRBlurShader.fragmentShader
 		} );
 		this.blurMaterial.uniforms[ 'tDiffuse' ].value = this.ssrRenderTarget.texture;
-		this.blurMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
+		vec2Set( this.width, this.height, this.blurMaterial.uniforms[ 'resolution' ].value );
 
 		// blur material 2
 
@@ -411,7 +414,7 @@ class SSRPass extends Pass {
 			fragmentShader: SSRBlurShader.fragmentShader
 		} );
 		this.blurMaterial2.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.texture;
-		this.blurMaterial2.uniforms[ 'resolution' ].value.set( this.width, this.height );
+		vec2Set( this.width, this.height, this.blurMaterial2.uniforms[ 'resolution' ].value );
 
 		// // blur material 3
 
@@ -457,7 +460,7 @@ class SSRPass extends Pass {
 
 		this.fsQuad = new FullScreenQuad( null );
 
-		this.originalClearColor = new Color();
+		this.originalClearColor = colorCreate();
 
 	}
 
@@ -703,12 +706,12 @@ class SSRPass extends Pass {
 		this.blurRenderTarget2.setSize( effectiveWidth, effectiveHeight );
 		// this.blurRenderTarget3.setSize(width, height);
 
-		this.ssrMaterial.uniforms[ 'resolution' ].value.set( effectiveWidth, effectiveHeight );
-		this.ssrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
-		this.ssrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
+		vec2Set( effectiveWidth, effectiveHeight, this.ssrMaterial.uniforms[ 'resolution' ].value );
+		mat4Copy( this.camera.projectionMatrix, this.ssrMaterial.uniforms[ 'cameraProjectionMatrix' ].value );
+		mat4Copy( this.camera.projectionMatrixInverse, this.ssrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value );
 
-		this.blurMaterial.uniforms[ 'resolution' ].value.set( effectiveWidth, effectiveHeight );
-		this.blurMaterial2.uniforms[ 'resolution' ].value.set( effectiveWidth, effectiveHeight );
+		vec2Set( effectiveWidth, effectiveHeight, this.blurMaterial.uniforms[ 'resolution' ].value );
+		vec2Set( effectiveWidth, effectiveHeight, this.blurMaterial2.uniforms[ 'resolution' ].value );
 
 	}
 
@@ -717,7 +720,7 @@ class SSRPass extends Pass {
 	_renderPass( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
 
 		// save original state
-		this.originalClearColor.copy( renderer.getClearColor( this.tempColor ) );
+		colorCopy( renderer.getClearColor( this.tempColor ), this.originalClearColor );
 		const originalClearAlpha = renderer.getClearAlpha( this.tempColor );
 		const originalAutoClear = renderer.autoClear;
 
@@ -745,7 +748,7 @@ class SSRPass extends Pass {
 
 	_renderOverride( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
 
-		this.originalClearColor.copy( renderer.getClearColor( this.tempColor ) );
+		colorCopy( renderer.getClearColor( this.tempColor ), this.originalClearColor );
 		const originalClearAlpha = renderer.getClearAlpha( this.tempColor );
 		const originalAutoClear = renderer.autoClear;
 
@@ -777,7 +780,7 @@ class SSRPass extends Pass {
 
 	_renderMetalness( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
 
-		this.originalClearColor.copy( renderer.getClearColor( this.tempColor ) );
+		colorCopy( renderer.getClearColor( this.tempColor ), this.originalClearColor );
 		const originalClearAlpha = renderer.getClearAlpha( this.tempColor );
 		const originalAutoClear = renderer.autoClear;
 		const originalBackground = this.scene.background;

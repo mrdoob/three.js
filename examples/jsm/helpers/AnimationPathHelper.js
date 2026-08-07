@@ -5,7 +5,10 @@ import {
 	LineBasicMaterial,
 	Object3D,
 	Points,
-	PointsMaterial
+	PointsMaterial,
+	colorSet,
+	mat4Copy,
+	mat4Identity
 } from 'three';
 
 /**
@@ -235,15 +238,15 @@ class AnimationPathHelper extends Object3D {
 		if ( this.object && this.object.parent ) {
 
 			this.object.parent.updateWorldMatrix( true, false );
-			this.matrix.copy( this.object.parent.matrixWorld );
+			mat4Copy( this.object.parent.matrixWorld, this.matrix );
 
 		} else {
 
-			this.matrix.identity();
+			mat4Identity( this.matrix );
 
 		}
 
-		this.matrixWorld.copy( this.matrix );
+		mat4Copy( this.matrix, this.matrixWorld );
 
 		// Update children
 		for ( let i = 0; i < this.children.length; i ++ ) {
@@ -261,7 +264,7 @@ class AnimationPathHelper extends Object3D {
 	 */
 	setColor( color ) {
 
-		if ( this.line ) this.line.material.color.set( color );
+		if ( this.line ) colorSet( color, undefined, undefined, this.line.material.color );
 
 	}
 
@@ -272,7 +275,7 @@ class AnimationPathHelper extends Object3D {
 	 */
 	setMarkerColor( color ) {
 
-		if ( this.points ) this.points.material.color.set( color );
+		if ( this.points ) colorSet( color, undefined, undefined, this.points.material.color );
 
 	}
 

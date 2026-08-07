@@ -1,5 +1,5 @@
 import {
-	Color,
+	colorSet,
 	ShaderChunk,
 	ShaderLib,
 	UniformsUtils
@@ -35,7 +35,7 @@ const SubsurfaceScatteringShader = {
 		ShaderLib[ 'phong' ].uniforms,
 		{
 			'thicknessMap': { value: null },
-			'thicknessColor': { value: new Color( 0xffffff ) },
+			'thicknessColor': { value: colorSet( 0xffffff ) },
 			'thicknessDistortion': { value: 0.1 },
 			'thicknessAmbient': { value: 0.0 },
 			'thicknessAttenuation': { value: 0.1 },

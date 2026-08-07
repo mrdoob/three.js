@@ -2,7 +2,7 @@ import { LineSegments } from '../objects/LineSegments.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
-import { Color } from '../math/Color.js';
+import { colorSet } from '../math/ColorFunctions.js';
 
 /**
  * This helper is an object to define polar grids. Grids are
@@ -34,8 +34,8 @@ class PolarGridHelper extends LineSegments {
 	 */
 	constructor( radius = 10, sectors = 16, rings = 8, divisions = 64, color1 = 0x444444, color2 = 0x888888 ) {
 
-		color1 = new Color( color1 );
-		color2 = new Color( color2 );
+		color1 = colorSet( color1 );
+		color2 = colorSet( color2 );
 
 		const vertices = [];
 		const colors = [];

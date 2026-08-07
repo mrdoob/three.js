@@ -1,15 +1,16 @@
-import { Vector3 } from '../math/Vector3.js';
-import { Quaternion } from '../math/Quaternion.js';
 import { Timer } from '../core/Timer.js';
 import { Object3D } from '../core/Object3D.js';
+import { mat4Decompose } from '../math/Matrix4Functions.js';
+import { quatCreate } from '../math/QuaternionFunctions.js';
+import { vec3ApplyQuaternion, vec3Create, vec3Set } from '../math/Vector3Functions.js';
 import { AudioContext } from './AudioContext.js';
 
-const _position = /*@__PURE__*/ new Vector3();
-const _quaternion = /*@__PURE__*/ new Quaternion();
-const _scale = /*@__PURE__*/ new Vector3();
+const _position = /*@__PURE__*/ vec3Create();
+const _quaternion = /*@__PURE__*/ quatCreate();
+const _scale = /*@__PURE__*/ vec3Create();
 
-const _forward = /*@__PURE__*/ new Vector3();
-const _up = /*@__PURE__*/ new Vector3();
+const _forward = /*@__PURE__*/ vec3Create();
+const _up = /*@__PURE__*/ vec3Create();
 
 /**
  * The class represents a virtual listener of the all positional and non-positional audio effects
@@ -182,11 +183,11 @@ class AudioListener extends Object3D {
 
 		this.timeDelta = this._timer.getDelta();
 
-		this.matrixWorld.decompose( _position, _quaternion, _scale );
+		mat4Decompose( this.matrixWorld, _position, _quaternion, _scale );
 
 		// the initial forward and up directions must be orthogonal
-		_forward.set( 0, 0, - 1 ).applyQuaternion( _quaternion );
-		_up.set( 0, 1, 0 ).applyQuaternion( _quaternion );
+		vec3ApplyQuaternion( vec3Set( _forward, 0, 0, - 1 ), _quaternion, _forward );
+		vec3ApplyQuaternion( vec3Set( _up, 0, 1, 0 ), _quaternion, _up );
 
 		if ( listener.positionX ) {
 

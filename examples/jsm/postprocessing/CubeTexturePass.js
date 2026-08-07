@@ -6,7 +6,9 @@ import {
 	Scene,
 	ShaderLib,
 	ShaderMaterial,
-	UniformsUtils
+	UniformsUtils,
+	mat4Copy,
+	quatSetFromRotationMatrix
 } from 'three';
 import { Pass } from './Pass.js';
 
@@ -114,8 +116,8 @@ class CubeTexturePass extends Pass {
 		const oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		this._cubeCamera.projectionMatrix.copy( this.camera.projectionMatrix );
-		this._cubeCamera.quaternion.setFromRotationMatrix( this.camera.matrixWorld );
+		mat4Copy( this.camera.projectionMatrix, this._cubeCamera.projectionMatrix );
+		quatSetFromRotationMatrix( this.camera.matrixWorld, this._cubeCamera.quaternion );
 
 		this._cubeMesh.material.uniforms.tCube.value = this.tCube;
 		this._cubeMesh.material.uniforms.tFlip.value = ( this.tCube.isCubeTexture && this.tCube.isRenderTargetTexture === false ) ? - 1 : 1;

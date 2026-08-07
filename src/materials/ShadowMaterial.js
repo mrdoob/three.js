@@ -1,5 +1,6 @@
 import { Material } from './Material.js';
 import { Color } from '../math/Color.js';
+import { colorCopy } from '../math/ColorFunctions.js';
 
 /**
  * This material can receive shadows, but otherwise is completely transparent.
@@ -78,7 +79,7 @@ class ShadowMaterial extends Material {
 
 		super.copy( source );
 
-		this.color.copy( source.color );
+		colorCopy( source.color, this.color );
 
 		this.fog = source.fog;
 

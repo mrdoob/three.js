@@ -1,7 +1,10 @@
 import {
 	Color,
 	LinearSRGBColorSpace,
-	MathUtils
+	MathUtils,
+	colorCreate,
+	colorLerpColors,
+	colorSetHex
 } from 'three';
 
 /**
@@ -136,8 +139,8 @@ class Lut {
 		this.n = count;
 
 		const step = 1.0 / this.n;
-		const minColor = new Color();
-		const maxColor = new Color();
+		const minColor = colorCreate();
+		const maxColor = colorCreate();
 
 		this.lut.length = 0;
 
@@ -158,10 +161,11 @@ class Lut {
 					const min = this.map[ j ][ 0 ];
 					const max = this.map[ j + 1 ][ 0 ];
 
-					minColor.setHex( this.map[ j ][ 1 ], LinearSRGBColorSpace );
-					maxColor.setHex( this.map[ j + 1 ][ 1 ], LinearSRGBColorSpace );
+					colorSetHex( this.map[ j ][ 1 ], LinearSRGBColorSpace, minColor );
+					colorSetHex( this.map[ j + 1 ][ 1 ], LinearSRGBColorSpace, maxColor );
 
-					const color = new Color().lerpColors( minColor, maxColor, ( alpha - min ) / ( max - min ) );
+					const color = new Color();
+					colorLerpColors( minColor, maxColor, ( alpha - min ) / ( max - min ), color );
 
 					this.lut.push( color );
 
@@ -266,9 +270,9 @@ class Lut {
 
 		const step = 1.0 / this.n;
 
-		const minColor = new Color();
-		const maxColor = new Color();
-		const finalColor = new Color();
+		const minColor = colorCreate();
+		const maxColor = colorCreate();
+		const finalColor = colorCreate();
 
 		for ( let i = 1; i >= 0; i -= step ) {
 
@@ -279,10 +283,10 @@ class Lut {
 					const min = this.map[ j - 1 ][ 0 ];
 					const max = this.map[ j ][ 0 ];
 
-					minColor.setHex( this.map[ j - 1 ][ 1 ], LinearSRGBColorSpace );
-					maxColor.setHex( this.map[ j ][ 1 ], LinearSRGBColorSpace );
+					colorSetHex( this.map[ j - 1 ][ 1 ], LinearSRGBColorSpace, minColor );
+					colorSetHex( this.map[ j ][ 1 ], LinearSRGBColorSpace, maxColor );
 
-					finalColor.lerpColors( minColor, maxColor, ( i - min ) / ( max - min ) );
+					colorLerpColors( minColor, maxColor, ( i - min ) / ( max - min ), finalColor );
 
 					data[ k * 4 ] = Math.round( finalColor.r * 255 );
 					data[ k * 4 + 1 ] = Math.round( finalColor.g * 255 );

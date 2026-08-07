@@ -2,7 +2,7 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Shape } from '../extras/core/Shape.js';
 import { ShapeUtils } from '../extras/ShapeUtils.js';
-import { Vector2 } from '../math/Vector2.js';
+import { vec2Create } from '../math/Vector2Functions.js';
 
 /**
  * Creates an one-sided polygonal geometry from one or more path shapes.
@@ -29,7 +29,7 @@ class ShapeGeometry extends BufferGeometry {
 	 * @param {Shape|Array<Shape>} [shapes] - A shape or an array of shapes.
 	 * @param {number} [curveSegments=12] - Number of segments per shape.
 	 */
-	constructor( shapes = new Shape( [ new Vector2( 0, 0.5 ), new Vector2( - 0.5, - 0.5 ), new Vector2( 0.5, - 0.5 ) ] ), curveSegments = 12 ) {
+	constructor( shapes = new Shape( [ vec2Create( 0, 0.5 ), vec2Create( - 0.5, - 0.5 ), vec2Create( 0.5, - 0.5 ) ] ), curveSegments = 12 ) {
 
 		super();
 

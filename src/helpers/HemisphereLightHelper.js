@@ -1,14 +1,14 @@
-import { Vector3 } from '../math/Vector3.js';
-import { Color } from '../math/Color.js';
+import { colorCopy, colorCreate, colorSet } from '../math/ColorFunctions.js';
+import { vec3Create, vec3Negate, vec3SetFromMatrixPosition } from '../math/Vector3Functions.js';
 import { Object3D } from '../core/Object3D.js';
 import { Mesh } from '../objects/Mesh.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { OctahedronGeometry } from '../geometries/OctahedronGeometry.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 
-const _vector = /*@__PURE__*/ new Vector3();
-const _color1 = /*@__PURE__*/ new Color();
-const _color2 = /*@__PURE__*/ new Color();
+const _vector = /*@__PURE__*/ vec3Create();
+const _color1 = /*@__PURE__*/ colorCreate();
+const _color2 = /*@__PURE__*/ colorCreate();
 
 /**
  * Creates a visual aid consisting of a spherical mesh for a
@@ -99,14 +99,14 @@ class HemisphereLightHelper extends Object3D {
 
 		if ( this.color !== undefined ) {
 
-			this.material.color.set( this.color );
+			colorSet( this.color, undefined, undefined, this.material.color );
 
 		} else {
 
 			const colors = mesh.geometry.getAttribute( 'color' );
 
-			_color1.copy( this.light.color );
-			_color2.copy( this.light.groundColor );
+			colorCopy( this.light.color, _color1 );
+			colorCopy( this.light.groundColor, _color2 );
 
 			for ( let i = 0, l = colors.count; i < l; i ++ ) {
 
@@ -124,7 +124,9 @@ class HemisphereLightHelper extends Object3D {
 
 		this.light.updateWorldMatrix( true, false );
 
-		mesh.lookAt( _vector.setFromMatrixPosition( this.light.matrixWorld ).negate() );
+		vec3SetFromMatrixPosition( this.light.matrixWorld, _vector );
+		vec3Negate( _vector, _vector );
+		mesh.lookAt( _vector.x, _vector.y, _vector.z );
 
 	}
 

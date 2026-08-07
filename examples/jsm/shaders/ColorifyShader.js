@@ -1,5 +1,5 @@
 import {
-	Color
+	colorSet
 } from 'three';
 
 /**
@@ -20,7 +20,7 @@ const ColorifyShader = {
 	uniforms: {
 
 		'tDiffuse': { value: null },
-		'color': { value: new Color( 0xffffff ) }
+		'color': { value: colorSet( 0xffffff ) }
 
 	},
 

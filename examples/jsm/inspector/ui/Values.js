@@ -1,4 +1,4 @@
-import { EventDispatcher } from 'three';
+import { EventDispatcher, colorGetHex, colorSetHex, SRGBColorSpace } from 'three';
 
 class Value extends EventDispatcher {
 
@@ -424,7 +424,7 @@ class ValueColor extends Value {
 
 			if ( this._value.isColor ) {
 
-				this._value.setHex( parseInt( colorValue.slice( 1 ), 16 ) );
+				colorSetHex( parseInt( colorValue.slice( 1 ), 16 ), SRGBColorSpace, this._value );
 
 			} else {
 
@@ -448,7 +448,7 @@ class ValueColor extends Value {
 
 		if ( this._value && this._value.isColor ) {
 
-			this._value.setHex( parseInt( colorHex.slice( 1 ), 16 ) );
+			colorSetHex( parseInt( colorHex.slice( 1 ), 16 ), SRGBColorSpace, this._value );
 
 		} else {
 
@@ -464,7 +464,7 @@ class ValueColor extends Value {
 
 		if ( color && color.isColor ) {
 
-			color = color.getHex();
+			color = colorGetHex( color );
 
 		}
 

@@ -1,4 +1,4 @@
-import { Quaternion } from '../math/Quaternion.js';
+import { quatMultiplyQuaternionsFlat, quatSlerpFlat } from '../math/QuaternionFunctions.js';
 
 /**
  * Buffered scene graph property that allows weighted accumulation; used internally.
@@ -337,7 +337,7 @@ class PropertyMixer {
 
 	_slerp( buffer, dstOffset, srcOffset, t ) {
 
-		Quaternion.slerpFlat( buffer, dstOffset, buffer, dstOffset, buffer, srcOffset, t );
+		quatSlerpFlat( buffer, dstOffset, buffer, dstOffset, buffer, srcOffset, t );
 
 	}
 
@@ -346,10 +346,10 @@ class PropertyMixer {
 		const workOffset = this._workIndex * stride;
 
 		// Store result in intermediate buffer offset
-		Quaternion.multiplyQuaternionsFlat( buffer, workOffset, buffer, dstOffset, buffer, srcOffset );
+		quatMultiplyQuaternionsFlat( buffer, workOffset, buffer, dstOffset, buffer, srcOffset );
 
 		// Slerp to the intermediate result
-		Quaternion.slerpFlat( buffer, dstOffset, buffer, dstOffset, buffer, workOffset, t );
+		quatSlerpFlat( buffer, dstOffset, buffer, dstOffset, buffer, workOffset, t );
 
 	}
 

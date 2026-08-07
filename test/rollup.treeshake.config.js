@@ -1,4 +1,5 @@
 import { gzipSync } from 'zlib';
+import { readdirSync } from 'fs';
 import resolve from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
 
@@ -49,21 +50,28 @@ function filesize() {
 
 }
 
-export default [
+const treeshakeDir = 'test/treeshake';
+
+// Every non-bundle .js file in test/treeshake is a treeshaking test entry point.
+const entries = readdirSync( treeshakeDir )
+	.filter( name => name.endsWith( '.js' ) && ! name.includes( 'bundle' ) )
+	.map( name => name.slice( 0, - '.js'.length ) ); // e.g. 'index.vector3functions'
+
+export default entries.flatMap( ( name ) => [
 	{
-		input: 'test/treeshake/index.js',
+		input: `${treeshakeDir}/${name}.js`,
 		plugins: [
 			resolve()
 		],
 		output: [
 			{
 				format: 'esm',
-				file: 'test/treeshake/index.bundle.js'
+				file: `${treeshakeDir}/${name}.bundle.js`
 			}
 		]
 	},
 	{
-		input: 'test/treeshake/index.js',
+		input: `${treeshakeDir}/${name}.js`,
 		plugins: [
 			resolve(),
 			terser(),
@@ -72,86 +80,8 @@ export default [
 		output: [
 			{
 				format: 'esm',
-				file: 'test/treeshake/index.bundle.min.js'
-			}
-		]
-	},
-	{
-		input: 'test/treeshake/index.webgpu.js',
-		plugins: [
-			resolve()
-		],
-		output: [
-			{
-				format: 'esm',
-				file: 'test/treeshake/index.webgpu.bundle.js'
-			}
-		]
-	},
-	{
-		input: 'test/treeshake/index.webgpu.js',
-		plugins: [
-			resolve(),
-			terser(),
-			filesize()
-		],
-		output: [
-			{
-				format: 'esm',
-				file: 'test/treeshake/index.webgpu.bundle.min.js'
-			}
-		]
-	},
-	{
-		input: 'test/treeshake/index.webgpu.nodes.js',
-		plugins: [
-			resolve()
-		],
-		output: [
-			{
-				format: 'esm',
-				file: 'test/treeshake/index.webgpu.nodes.bundle.js'
-			}
-		]
-	},
-	{
-		input: 'test/treeshake/index.webgpu.nodes.js',
-		plugins: [
-			resolve(),
-			terser(),
-			filesize()
-		],
-		output: [
-			{
-				format: 'esm',
-				file: 'test/treeshake/index.webgpu.nodes.bundle.min.js'
-			}
-		]
-	},
-	{
-		input: 'test/treeshake/index.matrix4functions.js',
-		plugins: [
-			resolve()
-		],
-		output: [
-			{
-				format: 'esm',
-				file: 'test/treeshake/index.matrix4functions.bundle.js'
-			}
-		]
-	},
-	{
-		input: 'test/treeshake/index.matrix4functions.js',
-		plugins: [
-			resolve(),
-			terser(),
-			filesize()
-		],
-		output: [
-			{
-				format: 'esm',
-				file: 'test/treeshake/index.matrix4functions.bundle.min.js'
+				file: `${treeshakeDir}/${name}.bundle.min.js`
 			}
 		]
 	}
-];
+] );

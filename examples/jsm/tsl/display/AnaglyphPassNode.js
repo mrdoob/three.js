@@ -1,17 +1,28 @@
-import { Matrix3, NodeMaterial, Vector3 } from 'three/webgpu';
+import {
+	NodeMaterial,
+	mat3Create,
+	mat3FromArray,
+	mat4Compose,
+	mat4ExtractBasis,
+	mat4Invert,
+	vec3AddScaledVector,
+	vec3Copy,
+	vec3Create,
+	vec3Normalize
+} from 'three/webgpu';
 import { clamp, Fn, vec4, uv, uniform, max, context } from 'three/tsl';
 import StereoCompositePassNode from './StereoCompositePassNode.js';
 import { frameCorners } from '../../utils/CameraUtils.js';
 
-const _eyeL = /*@__PURE__*/ new Vector3();
-const _eyeR = /*@__PURE__*/ new Vector3();
-const _screenBottomLeft = /*@__PURE__*/ new Vector3();
-const _screenBottomRight = /*@__PURE__*/ new Vector3();
-const _screenTopLeft = /*@__PURE__*/ new Vector3();
-const _right = /*@__PURE__*/ new Vector3();
-const _up = /*@__PURE__*/ new Vector3();
-const _forward = /*@__PURE__*/ new Vector3();
-const _screenCenter = /*@__PURE__*/ new Vector3();
+const _eyeL = /*@__PURE__*/ vec3Create();
+const _eyeR = /*@__PURE__*/ vec3Create();
+const _screenBottomLeft = /*@__PURE__*/ vec3Create();
+const _screenBottomRight = /*@__PURE__*/ vec3Create();
+const _screenTopLeft = /*@__PURE__*/ vec3Create();
+const _right = /*@__PURE__*/ vec3Create();
+const _up = /*@__PURE__*/ vec3Create();
+const _forward = /*@__PURE__*/ vec3Create();
+const _screenCenter = /*@__PURE__*/ vec3Create();
 
 /**
  * Anaglyph algorithm types.
@@ -355,7 +366,7 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 		 * @private
 		 * @type {UniformNode<mat3>}
 		 */
-		this._colorMatrixLeft = uniform( new Matrix3() );
+		this._colorMatrixLeft = uniform( mat3Create(), 'mat3' );
 
 		/**
 		 * Color matrix node for the right eye.
@@ -363,7 +374,7 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 		 * @private
 		 * @type {UniformNode<mat3>}
 		 */
-		this._colorMatrixRight = uniform( new Matrix3() );
+		this._colorMatrixRight = uniform( mat3Create(), 'mat3' );
 
 		// Initialize with default matrices
 		this._updateMatrices();
@@ -433,8 +444,8 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 
 		const matrices = ANAGLYPH_MATRICES[ this._algorithm ][ this._colorMode ];
 
-		this._colorMatrixLeft.value.fromArray( matrices.left );
-		this._colorMatrixRight.value.fromArray( matrices.right );
+		mat3FromArray( matrices.left, 0, this._colorMatrixLeft.value );
+		mat3FromArray( matrices.right, 0, this._colorMatrixRight.value );
 
 	}
 
@@ -452,18 +463,18 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 		stereo.cameraR.coordinateSystem = coordinateSystem;
 
 		// Get the camera's local coordinate axes from its world matrix
-		camera.matrixWorld.extractBasis( _right, _up, _forward );
-		_right.normalize();
-		_up.normalize();
-		_forward.normalize();
+		mat4ExtractBasis( camera.matrixWorld, _right, _up, _forward );
+		vec3Normalize( _right, _right );
+		vec3Normalize( _up, _up );
+		vec3Normalize( _forward, _forward );
 
 		// Calculate eye positions
 		const halfSep = this.eyeSep / 2;
-		_eyeL.copy( camera.position ).addScaledVector( _right, - halfSep );
-		_eyeR.copy( camera.position ).addScaledVector( _right, halfSep );
+		vec3AddScaledVector( camera.position, _right, - halfSep, _eyeL );
+		vec3AddScaledVector( camera.position, _right, halfSep, _eyeR );
 
 		// Calculate screen center (at planeDistance in front of the camera center)
-		_screenCenter.copy( camera.position ).addScaledVector( _forward, - this.planeDistance );
+		vec3AddScaledVector( camera.position, _forward, - this.planeDistance, _screenCenter );
 
 		// Calculate screen dimensions from camera FOV and aspect ratio
 		const DEG2RAD = Math.PI / 180;
@@ -471,33 +482,33 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 		const halfWidth = halfHeight * camera.aspect;
 
 		// Calculate screen corners
-		_screenBottomLeft.copy( _screenCenter )
-			.addScaledVector( _right, - halfWidth )
-			.addScaledVector( _up, - halfHeight );
+		vec3Copy( _screenCenter, _screenBottomLeft );
+		vec3AddScaledVector( _screenBottomLeft, _right, - halfWidth, _screenBottomLeft );
+		vec3AddScaledVector( _screenBottomLeft, _up, - halfHeight, _screenBottomLeft );
 
-		_screenBottomRight.copy( _screenCenter )
-			.addScaledVector( _right, halfWidth )
-			.addScaledVector( _up, - halfHeight );
+		vec3Copy( _screenCenter, _screenBottomRight );
+		vec3AddScaledVector( _screenBottomRight, _right, halfWidth, _screenBottomRight );
+		vec3AddScaledVector( _screenBottomRight, _up, - halfHeight, _screenBottomRight );
 
-		_screenTopLeft.copy( _screenCenter )
-			.addScaledVector( _right, - halfWidth )
-			.addScaledVector( _up, halfHeight );
+		vec3Copy( _screenCenter, _screenTopLeft );
+		vec3AddScaledVector( _screenTopLeft, _right, - halfWidth, _screenTopLeft );
+		vec3AddScaledVector( _screenTopLeft, _up, halfHeight, _screenTopLeft );
 
 		// Set up left eye camera
-		stereo.cameraL.position.copy( _eyeL );
+		vec3Copy( _eyeL, stereo.cameraL.position );
 		stereo.cameraL.near = camera.near;
 		stereo.cameraL.far = camera.far;
 		frameCorners( stereo.cameraL, _screenBottomLeft, _screenBottomRight, _screenTopLeft, true );
-		stereo.cameraL.matrixWorld.compose( stereo.cameraL.position, stereo.cameraL.quaternion, stereo.cameraL.scale );
-		stereo.cameraL.matrixWorldInverse.copy( stereo.cameraL.matrixWorld ).invert();
+		mat4Compose( stereo.cameraL.position, stereo.cameraL.quaternion, stereo.cameraL.scale, stereo.cameraL.matrixWorld );
+		mat4Invert( stereo.cameraL.matrixWorld, stereo.cameraL.matrixWorldInverse );
 
 		// Set up right eye camera
-		stereo.cameraR.position.copy( _eyeR );
+		vec3Copy( _eyeR, stereo.cameraR.position );
 		stereo.cameraR.near = camera.near;
 		stereo.cameraR.far = camera.far;
 		frameCorners( stereo.cameraR, _screenBottomLeft, _screenBottomRight, _screenTopLeft, true );
-		stereo.cameraR.matrixWorld.compose( stereo.cameraR.position, stereo.cameraR.quaternion, stereo.cameraR.scale );
-		stereo.cameraR.matrixWorldInverse.copy( stereo.cameraR.matrixWorld ).invert();
+		mat4Compose( stereo.cameraR.position, stereo.cameraR.quaternion, stereo.cameraR.scale, stereo.cameraR.matrixWorld );
+		mat4Invert( stereo.cameraR.matrixWorld, stereo.cameraR.matrixWorldInverse );
 
 	}
 

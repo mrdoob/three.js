@@ -1,10 +1,12 @@
 import {
 	InstancedBufferAttribute,
 	InstancedMesh,
-	Matrix4,
 	ShaderMaterial,
 	SphereGeometry,
-	Vector3
+	mat4Create,
+	mat4MakeTranslation,
+	vec3Copy,
+	vec3Create
 } from 'three';
 
 /**
@@ -38,7 +40,7 @@ class LightProbeGridHelperWebGL extends InstancedMesh {
 			uniforms: {
 
 				probesSH: { value: null },
-				probesResolution: { value: new Vector3() },
+				probesResolution: { value: vec3Create() },
 
 			},
 
@@ -166,8 +168,8 @@ class LightProbeGridHelperWebGL extends InstancedMesh {
 		this.count = count;
 
 		const uvwArray = new Float32Array( count * 3 );
-		const matrix = new Matrix4();
-		const probePos = new Vector3();
+		const matrix = mat4Create();
+		const probePos = vec3Create();
 
 		let i = 0;
 
@@ -183,7 +185,7 @@ class LightProbeGridHelperWebGL extends InstancedMesh {
 					uvwArray[ i * 3 + 2 ] = ( iz + 0.5 ) / res.z;
 
 					probes.getProbePosition( ix, iy, iz, probePos );
-					matrix.makeTranslation( probePos.x, probePos.y, probePos.z );
+					mat4MakeTranslation( probePos.x, probePos.y, probePos.z, matrix );
 					this.setMatrixAt( i, matrix );
 
 					i ++;
@@ -201,7 +203,7 @@ class LightProbeGridHelperWebGL extends InstancedMesh {
 		// Update texture uniforms
 
 		this.material.uniforms.probesSH.value = probes.texture;
-		this.material.uniforms.probesResolution.value.copy( probes.resolution );
+		vec3Copy( probes.resolution, this.material.uniforms.probesResolution.value );
 
 	}
 

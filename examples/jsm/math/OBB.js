@@ -1,23 +1,53 @@
 import {
-	Box3,
 	MathUtils,
-	Matrix4,
 	Matrix3,
-	Ray,
-	Vector3
+	Vector3,
+	box3Create,
+	box3GetCenter,
+	box3GetSize,
+	box3SetFromCenterAndSize,
+	mat3Copy,
+	mat3Create,
+	mat3Equals,
+	mat3ExtractBasis,
+	mat3Identity,
+	mat3Multiply,
+	mat3SetFromMatrix4,
+	mat4Copy,
+	mat4Create,
+	mat4Determinant,
+	mat4Invert,
+	mat4SetFromMatrix3,
+	mat4SetPosition,
+	rayApplyMatrix4,
+	rayCopy,
+	rayCreate,
+	rayIntersectBox,
+	vec3Add,
+	vec3ApplyMatrix4,
+	vec3Copy,
+	vec3Create,
+	vec3DistanceToSquared,
+	vec3Dot,
+	vec3Equals,
+	vec3Length,
+	vec3MultiplyScalar,
+	vec3Set,
+	vec3SetFromMatrixPosition,
+	vec3SubVectors
 } from 'three';
 
 // module scope helper variables
 
 const a = {
 	c: null, // center
-	u: [ new Vector3(), new Vector3(), new Vector3() ], // basis vectors
+	u: [ /*@__PURE__*/ vec3Create(), /*@__PURE__*/ vec3Create(), /*@__PURE__*/ vec3Create() ], // basis vectors
 	e: [] // half width
 };
 
 const b = {
 	c: null, // center
-	u: [ new Vector3(), new Vector3(), new Vector3() ], // basis vectors
+	u: [ /*@__PURE__*/ vec3Create(), /*@__PURE__*/ vec3Create(), /*@__PURE__*/ vec3Create() ], // basis vectors
 	e: [] // half width
 };
 
@@ -25,17 +55,17 @@ const R = [[], [], []];
 const AbsR = [[], [], []];
 const t = [];
 
-const xAxis = new Vector3();
-const yAxis = new Vector3();
-const zAxis = new Vector3();
-const v1 = new Vector3();
-const size = new Vector3();
-const closestPoint = new Vector3();
-const rotationMatrix = new Matrix3();
-const aabb = new Box3();
-const matrix = new Matrix4();
-const inverse = new Matrix4();
-const localRay = new Ray();
+const xAxis = /*@__PURE__*/ vec3Create();
+const yAxis = /*@__PURE__*/ vec3Create();
+const zAxis = /*@__PURE__*/ vec3Create();
+const v1 = /*@__PURE__*/ vec3Create();
+const size = /*@__PURE__*/ vec3Create();
+const closestPoint = /*@__PURE__*/ vec3Create();
+const rotationMatrix = /*@__PURE__*/ mat3Create();
+const aabb = /*@__PURE__*/ box3Create();
+const matrix = /*@__PURE__*/ mat4Create();
+const inverse = /*@__PURE__*/ mat4Create();
+const localRay = /*@__PURE__*/ rayCreate();
 
 /**
  * Represents an oriented bounding box (OBB) in 3D space.
@@ -102,9 +132,9 @@ class OBB {
 	 */
 	copy( obb ) {
 
-		this.center.copy( obb.center );
-		this.halfSize.copy( obb.halfSize );
-		this.rotation.copy( obb.rotation );
+		vec3Copy( obb.center, this.center );
+		vec3Copy( obb.halfSize, this.halfSize );
+		mat3Copy( obb.rotation, this.rotation );
 
 		return this;
 
@@ -129,7 +159,7 @@ class OBB {
 	 */
 	getSize( target ) {
 
-		return target.copy( this.halfSize ).multiplyScalar( 2 );
+		return vec3MultiplyScalar( this.halfSize, 2, target );
 
 	}
 
@@ -147,23 +177,26 @@ class OBB {
 
 		const halfSize = this.halfSize;
 
-		v1.subVectors( point, this.center );
-		this.rotation.extractBasis( xAxis, yAxis, zAxis );
+		vec3SubVectors( point, this.center, v1 );
+		mat3ExtractBasis( this.rotation, xAxis, yAxis, zAxis );
 
 		// start at the center position of the OBB
 
-		target.copy( this.center );
+		vec3Copy( this.center, target );
 
 		// project the target onto the OBB axes and walk towards that point
 
-		const x = MathUtils.clamp( v1.dot( xAxis ), - halfSize.x, halfSize.x );
-		target.add( xAxis.multiplyScalar( x ) );
+		const x = MathUtils.clamp( vec3Dot( v1, xAxis ), - halfSize.x, halfSize.x );
+		vec3MultiplyScalar( xAxis, x, xAxis );
+		vec3Add( target, xAxis, target );
 
-		const y = MathUtils.clamp( v1.dot( yAxis ), - halfSize.y, halfSize.y );
-		target.add( yAxis.multiplyScalar( y ) );
+		const y = MathUtils.clamp( vec3Dot( v1, yAxis ), - halfSize.y, halfSize.y );
+		vec3MultiplyScalar( yAxis, y, yAxis );
+		vec3Add( target, yAxis, target );
 
-		const z = MathUtils.clamp( v1.dot( zAxis ), - halfSize.z, halfSize.z );
-		target.add( zAxis.multiplyScalar( z ) );
+		const z = MathUtils.clamp( vec3Dot( v1, zAxis ), - halfSize.z, halfSize.z );
+		vec3MultiplyScalar( zAxis, z, zAxis );
+		vec3Add( target, zAxis, target );
 
 		return target;
 
@@ -177,14 +210,14 @@ class OBB {
 	 */
 	containsPoint( point ) {
 
-		v1.subVectors( point, this.center );
-		this.rotation.extractBasis( xAxis, yAxis, zAxis );
+		vec3SubVectors( point, this.center, v1 );
+		mat3ExtractBasis( this.rotation, xAxis, yAxis, zAxis );
 
 		// project v1 onto each axis and check if these points lie inside the OBB
 
-		return Math.abs( v1.dot( xAxis ) ) <= this.halfSize.x &&
-				Math.abs( v1.dot( yAxis ) ) <= this.halfSize.y &&
-				Math.abs( v1.dot( zAxis ) ) <= this.halfSize.z;
+		return Math.abs( vec3Dot( v1, xAxis ) ) <= this.halfSize.x &&
+				Math.abs( vec3Dot( v1, yAxis ) ) <= this.halfSize.y &&
+				Math.abs( vec3Dot( v1, zAxis ) ) <= this.halfSize.z;
 
 	}
 
@@ -214,7 +247,7 @@ class OBB {
 
 		// if that point is inside the sphere, the OBB and sphere intersect
 
-		return closestPoint.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius );
+		return vec3DistanceToSquared( closestPoint, sphere.center ) <= ( sphere.radius * sphere.radius );
 
 	}
 
@@ -236,13 +269,13 @@ class OBB {
 		a.e[ 0 ] = this.halfSize.x;
 		a.e[ 1 ] = this.halfSize.y;
 		a.e[ 2 ] = this.halfSize.z;
-		this.rotation.extractBasis( a.u[ 0 ], a.u[ 1 ], a.u[ 2 ] );
+		mat3ExtractBasis( this.rotation, a.u[ 0 ], a.u[ 1 ], a.u[ 2 ] );
 
 		b.c = obb.center;
 		b.e[ 0 ] = obb.halfSize.x;
 		b.e[ 1 ] = obb.halfSize.y;
 		b.e[ 2 ] = obb.halfSize.z;
-		obb.rotation.extractBasis( b.u[ 0 ], b.u[ 1 ], b.u[ 2 ] );
+		mat3ExtractBasis( obb.rotation, b.u[ 0 ], b.u[ 1 ], b.u[ 2 ] );
 
 		// compute rotation matrix expressing b in a's coordinate frame
 
@@ -250,7 +283,7 @@ class OBB {
 
 			for ( let j = 0; j < 3; j ++ ) {
 
-				R[ i ][ j ] = a.u[ i ].dot( b.u[ j ] );
+				R[ i ][ j ] = vec3Dot( a.u[ i ], b.u[ j ] );
 
 			}
 
@@ -258,13 +291,13 @@ class OBB {
 
 		// compute translation vector
 
-		v1.subVectors( b.c, a.c );
+		vec3SubVectors( b.c, a.c, v1 );
 
 		// bring translation into a's coordinate frame
 
-		t[ 0 ] = v1.dot( a.u[ 0 ] );
-		t[ 1 ] = v1.dot( a.u[ 1 ] );
-		t[ 2 ] = v1.dot( a.u[ 2 ] );
+		t[ 0 ] = vec3Dot( v1, a.u[ 0 ] );
+		t[ 1 ] = vec3Dot( v1, a.u[ 1 ] );
+		t[ 2 ] = vec3Dot( v1, a.u[ 2 ] );
 
 		// compute common subexpressions. Add in an epsilon term to
 		// counteract arithmetic errors when two edges are parallel and
@@ -374,17 +407,17 @@ class OBB {
 		// Reference: Testing Box Against Plane in Real-Time Collision Detection
 		// by Christer Ericson (chapter 5.2.3)
 
-		this.rotation.extractBasis( xAxis, yAxis, zAxis );
+		mat3ExtractBasis( this.rotation, xAxis, yAxis, zAxis );
 
 		// compute the projection interval radius of this OBB onto L(t) = this->center + t * p.normal;
 
-		const r = this.halfSize.x * Math.abs( plane.normal.dot( xAxis ) ) +
-				this.halfSize.y * Math.abs( plane.normal.dot( yAxis ) ) +
-				this.halfSize.z * Math.abs( plane.normal.dot( zAxis ) );
+		const r = this.halfSize.x * Math.abs( vec3Dot( plane.normal, xAxis ) ) +
+				this.halfSize.y * Math.abs( vec3Dot( plane.normal, yAxis ) ) +
+				this.halfSize.z * Math.abs( vec3Dot( plane.normal, zAxis ) );
 
 		// compute distance of the OBB's center from the plane
 
-		const d = plane.normal.dot( this.center ) - plane.constant;
+		const d = vec3Dot( plane.normal, this.center ) - plane.constant;
 
 		// Intersection occurs when distance d falls within [-r,+r] interval
 
@@ -406,25 +439,28 @@ class OBB {
 		// of the OBB.
 
 		this.getSize( size );
-		aabb.setFromCenterAndSize( v1.set( 0, 0, 0 ), size );
+		vec3Set( v1, 0, 0, 0 );
+		box3SetFromCenterAndSize( v1, size, aabb );
 
 		// create a 4x4 transformation matrix
 
-		matrix.setFromMatrix3( this.rotation );
-		matrix.setPosition( this.center );
+		mat4SetFromMatrix3( this.rotation, matrix );
+		mat4SetPosition( matrix, this.center.x, this.center.y, this.center.z, matrix );
 
 		// transform ray to the local space of the OBB
 
-		inverse.copy( matrix ).invert();
-		localRay.copy( ray ).applyMatrix4( inverse );
+		mat4Copy( matrix, inverse );
+		mat4Invert( inverse, inverse );
+		rayCopy( ray, localRay );
+		rayApplyMatrix4( localRay, inverse, localRay );
 
 		// perform ray <-> AABB intersection test
 
-		if ( localRay.intersectBox( aabb, target ) ) {
+		if ( rayIntersectBox( localRay, aabb, target ) ) {
 
 			// transform the intersection point back to world space
 
-			return target.applyMatrix4( matrix );
+			return vec3ApplyMatrix4( target, matrix, target );
 
 		} else {
 
@@ -454,11 +490,12 @@ class OBB {
 	 */
 	fromBox3( box3 ) {
 
-		box3.getCenter( this.center );
+		box3GetCenter( box3, this.center );
 
-		box3.getSize( this.halfSize ).multiplyScalar( 0.5 );
+		box3GetSize( box3, this.halfSize );
+		vec3MultiplyScalar( this.halfSize, 0.5, this.halfSize );
 
-		this.rotation.identity();
+		mat3Identity( this.rotation );
 
 		return this;
 
@@ -472,9 +509,9 @@ class OBB {
 	 */
 	equals( obb ) {
 
-		return obb.center.equals( this.center ) &&
-			obb.halfSize.equals( this.halfSize ) &&
-			obb.rotation.equals( this.rotation );
+		return vec3Equals( obb.center, this.center ) &&
+			vec3Equals( obb.halfSize, this.halfSize ) &&
+			mat3Equals( obb.rotation, this.rotation );
 
 	}
 
@@ -490,14 +527,17 @@ class OBB {
 
 		const e = matrix.elements;
 
-		let sx = v1.set( e[ 0 ], e[ 1 ], e[ 2 ] ).length();
-		const sy = v1.set( e[ 4 ], e[ 5 ], e[ 6 ] ).length();
-		const sz = v1.set( e[ 8 ], e[ 9 ], e[ 10 ] ).length();
+		vec3Set( v1, e[ 0 ], e[ 1 ], e[ 2 ] );
+		let sx = vec3Length( v1 );
+		vec3Set( v1, e[ 4 ], e[ 5 ], e[ 6 ] );
+		const sy = vec3Length( v1 );
+		vec3Set( v1, e[ 8 ], e[ 9 ], e[ 10 ] );
+		const sz = vec3Length( v1 );
 
-		const det = matrix.determinant();
+		const det = mat4Determinant( matrix );
 		if ( det < 0 ) sx = - sx;
 
-		rotationMatrix.setFromMatrix4( matrix );
+		mat3SetFromMatrix4( matrix, rotationMatrix );
 
 		const invSX = 1 / sx;
 		const invSY = 1 / sy;
@@ -515,14 +555,14 @@ class OBB {
 		rotationMatrix.elements[ 7 ] *= invSZ;
 		rotationMatrix.elements[ 8 ] *= invSZ;
 
-		this.rotation.multiply( rotationMatrix );
+		mat3Multiply( this.rotation, rotationMatrix, this.rotation );
 
 		this.halfSize.x *= sx;
 		this.halfSize.y *= sy;
 		this.halfSize.z *= sz;
 
-		v1.setFromMatrixPosition( matrix );
-		this.center.add( v1 );
+		vec3SetFromMatrixPosition( matrix, v1 );
+		vec3Add( this.center, v1, this.center );
 
 		return this;
 

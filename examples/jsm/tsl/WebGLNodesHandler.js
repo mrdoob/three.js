@@ -2,7 +2,6 @@ import {
 	GLSL3,
 	UniformsGroup,
 	Compatibility,
-	Color,
 	UniformsLib,
 	UniformsUtils,
 } from 'three';
@@ -24,6 +23,7 @@ import {
 	GLSLNodeBuilder,
 	BasicNodeLibrary,
 	WebGLCapabilities,
+	colorCreate,
 } from 'three/webgpu';
 
 // Limitations
@@ -538,7 +538,7 @@ export class WebGLNodesHandler {
 
 		// add uniforms accessed by WebGLRenderer
 		parameters.uniforms = {
-			fogColor: { value: new Color() },
+			fogColor: { value: colorCreate() },
 			fogNear: { value: 0 },
 			fogFar: { value: 0 },
 			envMapIntensity: { value: 0 },

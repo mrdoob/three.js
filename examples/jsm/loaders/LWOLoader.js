@@ -24,7 +24,14 @@ import {
 	SRGBColorSpace,
 	TextureLoader,
 	Vector2,
-	Vector3
+	vec3Create,
+	vec3Set,
+	colorCreate,
+	colorFromArray,
+	colorSet,
+	colorSetScalar,
+	colorMultiplyScalar,
+	colorLerp
 } from 'three';
 
 import { IFFParser } from './lwo/IFFParser.js';
@@ -210,7 +217,7 @@ class LWOTreeParser {
 		const pivot = layer.pivot;
 		if ( pivot[ 0 ] !== 0 || pivot[ 1 ] !== 0 || pivot[ 2 ] !== 0 ) {
 
-			mesh.pivot = new Vector3( pivot[ 0 ], pivot[ 1 ], pivot[ 2 ] );
+			mesh.pivot = vec3Set( vec3Create(), pivot[ 0 ], pivot[ 1 ], pivot[ 2 ] );
 
 		}
 
@@ -564,7 +571,7 @@ class MaterialParser {
 		// don't use color data if color map is present
 		if ( attributes.Color && ! maps.map ) {
 
-			params.color = new Color().fromArray( attributes.Color.value );
+			params.color = colorFromArray( attributes.Color.value, 0, new Color() );
 
 		} else {
 
@@ -615,11 +622,11 @@ class MaterialParser {
 
 			if ( attributes[ 'Luminous Color' ] && ! maps.emissive ) {
 
-				params.emissive = new Color().fromArray( attributes[ 'Luminous Color' ].value );
+				params.emissive = colorFromArray( attributes[ 'Luminous Color' ].value, 0, new Color() );
 
 			} else {
 
-				params.emissive = new Color( 0x808080 );
+				params.emissive = colorSet( 0x808080, undefined, undefined, new Color() );
 
 			}
 
@@ -634,7 +641,7 @@ class MaterialParser {
 
 		if ( attributes[ 'Refraction Index' ] ) params.refractionRatio = 0.98 / attributes[ 'Refraction Index' ].value;
 
-		if ( attributes.Diffuse ) params.color.multiplyScalar( attributes.Diffuse.value );
+		if ( attributes.Diffuse ) colorMultiplyScalar( params.color, attributes.Diffuse.value, params.color );
 
 		if ( attributes.Reflection ) {
 
@@ -653,7 +660,7 @@ class MaterialParser {
 
 			} else {
 
-				params.emissive = new Color( 0x808080 );
+				params.emissive = colorSet( 0x808080, undefined, undefined, new Color() );
 
 			}
 
@@ -664,11 +671,17 @@ class MaterialParser {
 
 			if ( attributes[ 'Color Highlight' ] ) {
 
-				params.specular = new Color().setScalar( attributes.Specular.value ).lerp( params.color.clone().multiplyScalar( attributes.Specular.value ), attributes[ 'Color Highlight' ].value );
+				const highlight = colorMultiplyScalar( params.color, attributes.Specular.value );
+				params.specular = colorLerp(
+					colorSetScalar( attributes.Specular.value, colorCreate() ),
+					highlight,
+					attributes[ 'Color Highlight' ].value,
+					new Color()
+				);
 
 			} else {
 
-				params.specular = new Color().setScalar( attributes.Specular.value );
+				params.specular = colorSetScalar( attributes.Specular.value, new Color() );
 
 			}
 

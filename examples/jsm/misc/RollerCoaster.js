@@ -1,11 +1,21 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
-	Color,
-	Quaternion,
 	Raycaster,
 	SRGBColorSpace,
-	Vector3
+	colorSetRGB,
+	quatCopy,
+	quatCreate,
+	quatPreMultiply,
+	quatSetFromAxisAngle,
+	vec3Add,
+	vec3ApplyQuaternion,
+	vec3Copy,
+	vec3Create,
+	vec3CrossVectors,
+	vec3Normalize,
+	vec3Set,
+	vec3SubVectors
 } from 'three';
 
 /**
@@ -33,28 +43,28 @@ class RollerCoasterGeometry extends BufferGeometry {
 		const color1 = [ 1, 1, 1 ];
 		const color2 = [ 1, 1, 0 ];
 
-		const up = new Vector3( 0, 1, 0 );
-		const forward = new Vector3();
-		const right = new Vector3();
+		const up = vec3Set( vec3Create(), 0, 1, 0 );
+		const forward = vec3Create();
+		const right = vec3Create();
 
-		const quaternion = new Quaternion();
-		const prevQuaternion = new Quaternion();
-		prevQuaternion.setFromAxisAngle( up, Math.PI / 2 );
+		const quaternion = quatCreate();
+		const prevQuaternion = quatCreate();
+		quatSetFromAxisAngle( up, Math.PI / 2, prevQuaternion );
 
-		const point = new Vector3();
-		const prevPoint = new Vector3();
-		prevPoint.copy( curve.getPointAt( 0 ) );
+		const point = vec3Create();
+		const prevPoint = vec3Create();
+		curve.getPointAt( 0, prevPoint );
 
 		// shapes
 
 		const step = [
-			new Vector3( - 0.225, 0, 0 ),
-			new Vector3( 0, - 0.050, 0 ),
-			new Vector3( 0, - 0.175, 0 ),
+			vec3Set( vec3Create(), - 0.225, 0, 0 ),
+			vec3Set( vec3Create(), 0, - 0.050, 0 ),
+			vec3Set( vec3Create(), 0, - 0.175, 0 ),
 
-			new Vector3( 0, - 0.050, 0 ),
-			new Vector3( 0.225, 0, 0 ),
-			new Vector3( 0, - 0.175, 0 )
+			vec3Set( vec3Create(), 0, - 0.050, 0 ),
+			vec3Set( vec3Create(), 0.225, 0, 0 ),
+			vec3Set( vec3Create(), 0, - 0.175, 0 )
 		];
 
 		const PI2 = Math.PI * 2;
@@ -65,7 +75,7 @@ class RollerCoasterGeometry extends BufferGeometry {
 		for ( let i = 0; i < sides; i ++ ) {
 
 			const angle = ( i / sides ) * PI2;
-			tube1.push( new Vector3( Math.sin( angle ) * 0.06, Math.cos( angle ) * 0.06, 0 ) );
+			tube1.push( vec3Set( vec3Create(), Math.sin( angle ) * 0.06, Math.cos( angle ) * 0.06, 0 ) );
 
 		}
 
@@ -75,22 +85,22 @@ class RollerCoasterGeometry extends BufferGeometry {
 		for ( let i = 0; i < sides; i ++ ) {
 
 			const angle = ( i / sides ) * PI2;
-			tube2.push( new Vector3( Math.sin( angle ) * 0.025, Math.cos( angle ) * 0.025, 0 ) );
+			tube2.push( vec3Set( vec3Create(), Math.sin( angle ) * 0.025, Math.cos( angle ) * 0.025, 0 ) );
 
 		}
 
-		const vector = new Vector3();
-		const normal = new Vector3();
+		const vector = vec3Create();
+		const normal = vec3Create();
 
 		function drawShape( shape, color ) {
 
-			normal.set( 0, 0, - 1 ).applyQuaternion( quaternion );
+			vec3ApplyQuaternion( vec3Set( normal, 0, 0, - 1 ), quaternion, normal );
 
 			for ( let j = 0; j < shape.length; j ++ ) {
 
-				vector.copy( shape[ j ] );
-				vector.applyQuaternion( quaternion );
-				vector.add( point );
+				vec3Copy( shape[ j ], vector );
+				vec3ApplyQuaternion( vector, quaternion, vector );
+				vec3Add( vector, point, vector );
 
 				vertices.push( vector.x, vector.y, vector.z );
 				normals.push( normal.x, normal.y, normal.z );
@@ -98,13 +108,13 @@ class RollerCoasterGeometry extends BufferGeometry {
 
 			}
 
-			normal.set( 0, 0, 1 ).applyQuaternion( quaternion );
+			vec3ApplyQuaternion( vec3Set( normal, 0, 0, 1 ), quaternion, normal );
 
 			for ( let j = shape.length - 1; j >= 0; j -- ) {
 
-				vector.copy( shape[ j ] );
-				vector.applyQuaternion( quaternion );
-				vector.add( point );
+				vec3Copy( shape[ j ], vector );
+				vec3ApplyQuaternion( vector, quaternion, vector );
+				vec3Add( vector, point, vector );
 
 				vertices.push( vector.x, vector.y, vector.z );
 				normals.push( normal.x, normal.y, normal.z );
@@ -114,15 +124,15 @@ class RollerCoasterGeometry extends BufferGeometry {
 
 		}
 
-		const vector1 = new Vector3();
-		const vector2 = new Vector3();
-		const vector3 = new Vector3();
-		const vector4 = new Vector3();
+		const vector1 = vec3Create();
+		const vector2 = vec3Create();
+		const vector3 = vec3Create();
+		const vector4 = vec3Create();
 
-		const normal1 = new Vector3();
-		const normal2 = new Vector3();
-		const normal3 = new Vector3();
-		const normal4 = new Vector3();
+		const normal1 = vec3Create();
+		const normal2 = vec3Create();
+		const normal3 = vec3Create();
+		const normal4 = vec3Create();
 
 		function extrudeShape( shape, offset, color ) {
 
@@ -131,21 +141,21 @@ class RollerCoasterGeometry extends BufferGeometry {
 				const point1 = shape[ j ];
 				const point2 = shape[ ( j + 1 ) % jl ];
 
-				vector1.copy( point1 ).add( offset );
-				vector1.applyQuaternion( quaternion );
-				vector1.add( point );
+				vec3Add( vec3Copy( point1, vector1 ), offset, vector1 );
+				vec3ApplyQuaternion( vector1, quaternion, vector1 );
+				vec3Add( vector1, point, vector1 );
 
-				vector2.copy( point2 ).add( offset );
-				vector2.applyQuaternion( quaternion );
-				vector2.add( point );
+				vec3Add( vec3Copy( point2, vector2 ), offset, vector2 );
+				vec3ApplyQuaternion( vector2, quaternion, vector2 );
+				vec3Add( vector2, point, vector2 );
 
-				vector3.copy( point2 ).add( offset );
-				vector3.applyQuaternion( prevQuaternion );
-				vector3.add( prevPoint );
+				vec3Add( vec3Copy( point2, vector3 ), offset, vector3 );
+				vec3ApplyQuaternion( vector3, prevQuaternion, vector3 );
+				vec3Add( vector3, prevPoint, vector3 );
 
-				vector4.copy( point1 ).add( offset );
-				vector4.applyQuaternion( prevQuaternion );
-				vector4.add( prevPoint );
+				vec3Add( vec3Copy( point1, vector4 ), offset, vector4 );
+				vec3ApplyQuaternion( vector4, prevQuaternion, vector4 );
+				vec3Add( vector4, prevPoint, vector4 );
 
 				vertices.push( vector1.x, vector1.y, vector1.z );
 				vertices.push( vector2.x, vector2.y, vector2.z );
@@ -157,21 +167,10 @@ class RollerCoasterGeometry extends BufferGeometry {
 
 				//
 
-				normal1.copy( point1 );
-				normal1.applyQuaternion( quaternion );
-				normal1.normalize();
-
-				normal2.copy( point2 );
-				normal2.applyQuaternion( quaternion );
-				normal2.normalize();
-
-				normal3.copy( point2 );
-				normal3.applyQuaternion( prevQuaternion );
-				normal3.normalize();
-
-				normal4.copy( point1 );
-				normal4.applyQuaternion( prevQuaternion );
-				normal4.normalize();
+				vec3Normalize( vec3ApplyQuaternion( vec3Copy( point1, normal1 ), quaternion, normal1 ), normal1 );
+				vec3Normalize( vec3ApplyQuaternion( vec3Copy( point2, normal2 ), quaternion, normal2 ), normal2 );
+				vec3Normalize( vec3ApplyQuaternion( vec3Copy( point2, normal3 ), prevQuaternion, normal3 ), normal3 );
+				vec3Normalize( vec3ApplyQuaternion( vec3Copy( point1, normal4 ), prevQuaternion, normal4 ), normal4 );
 
 				normals.push( normal1.x, normal1.y, normal1.z );
 				normals.push( normal2.x, normal2.y, normal2.z );
@@ -193,39 +192,40 @@ class RollerCoasterGeometry extends BufferGeometry {
 
 		}
 
-		const offset = new Vector3();
+		const offset = vec3Create();
 
-		const sample1 = new Vector3();
-		const sample2 = new Vector3();
-		const rollQuaternion = new Quaternion();
+		const sample1 = vec3Create();
+		const sample2 = vec3Create();
+		const rollQuaternion = quatCreate();
 
 		for ( let i = 1; i <= divisions; i ++ ) {
 
-			point.copy( curve.getPointAt( i / divisions ) );
+			curve.getPointAt( i / divisions, point );
 
-			up.set( 0, 1, 0 );
+			vec3Set( up, 0, 1, 0 );
 
-			forward.subVectors( point, prevPoint ).normalize();
-			right.crossVectors( up, forward ).normalize();
-			up.crossVectors( forward, right );
+			vec3Normalize( vec3SubVectors( point, prevPoint, forward ), forward );
+			vec3Normalize( vec3CrossVectors( up, forward, right ), right );
+			vec3CrossVectors( forward, right, up );
 
 			const angle = Math.atan2( forward.x, forward.z );
 
-			quaternion.setFromAxisAngle( up, angle );
+			quatSetFromAxisAngle( up, angle, quaternion );
 
 			// banking
 
 			const bankDelta = 0.01;
 			const t = i / divisions;
 
-			sample1.copy( curve.getTangentAt( ( ( t - bankDelta ) % 1 + 1 ) % 1 ) );
-			sample2.copy( curve.getTangentAt( ( t + bankDelta ) % 1 ) );
+			curve.getTangentAt( ( ( t - bankDelta ) % 1 + 1 ) % 1, sample1 );
+			curve.getTangentAt( ( t + bankDelta ) % 1, sample2 );
 
 			let headingChange = Math.atan2( sample2.x, sample2.z ) - Math.atan2( sample1.x, sample1.z );
 			if ( headingChange > Math.PI ) headingChange -= Math.PI * 2;
 			if ( headingChange < - Math.PI ) headingChange += Math.PI * 2;
 
-			quaternion.premultiply( rollQuaternion.setFromAxisAngle( forward, - Math.atan( headingChange * 8 ) * 0.5 ) );
+			quatSetFromAxisAngle( forward, - Math.atan( headingChange * 8 ) * 0.5, rollQuaternion );
+			quatPreMultiply( quaternion, rollQuaternion, quaternion );
 
 			if ( i % 2 === 0 ) {
 
@@ -233,12 +233,12 @@ class RollerCoasterGeometry extends BufferGeometry {
 
 			}
 
-			extrudeShape( tube1, offset.set( 0, - 0.125, 0 ), color2 );
-			extrudeShape( tube2, offset.set( 0.2, 0, 0 ), color1 );
-			extrudeShape( tube2, offset.set( - 0.2, 0, 0 ), color1 );
+			extrudeShape( tube1, vec3Set( offset, 0, - 0.125, 0 ), color2 );
+			extrudeShape( tube2, vec3Set( offset, 0.2, 0, 0 ), color1 );
+			extrudeShape( tube2, vec3Set( offset, - 0.2, 0, 0 ), color1 );
 
-			prevPoint.copy( point );
-			prevQuaternion.copy( quaternion );
+			vec3Copy( point, prevPoint );
+			quatCopy( quaternion, prevQuaternion );
 
 		}
 
@@ -273,42 +273,42 @@ class RollerCoasterLiftersGeometry extends BufferGeometry {
 		const vertices = [];
 		const normals = [];
 
-		const quaternion = new Quaternion();
+		const quaternion = quatCreate();
 
-		const up = new Vector3( 0, 1, 0 );
+		const up = vec3Set( vec3Create(), 0, 1, 0 );
 
-		const point = new Vector3();
-		const tangent = new Vector3();
+		const point = vec3Create();
+		const tangent = vec3Create();
 
 		// shapes
 
 		const tube1 = [
-			new Vector3( 0, 0.05, - 0.05 ),
-			new Vector3( 0, 0.05, 0.05 ),
-			new Vector3( 0, - 0.05, 0 )
+			vec3Set( vec3Create(), 0, 0.05, - 0.05 ),
+			vec3Set( vec3Create(), 0, 0.05, 0.05 ),
+			vec3Set( vec3Create(), 0, - 0.05, 0 )
 		];
 
 		const tube2 = [
-			new Vector3( - 0.05, 0, 0.05 ),
-			new Vector3( - 0.05, 0, - 0.05 ),
-			new Vector3( 0.05, 0, 0 )
+			vec3Set( vec3Create(), - 0.05, 0, 0.05 ),
+			vec3Set( vec3Create(), - 0.05, 0, - 0.05 ),
+			vec3Set( vec3Create(), 0.05, 0, 0 )
 		];
 
 		const tube3 = [
-			new Vector3( 0.05, 0, - 0.05 ),
-			new Vector3( 0.05, 0, 0.05 ),
-			new Vector3( - 0.05, 0, 0 )
+			vec3Set( vec3Create(), 0.05, 0, - 0.05 ),
+			vec3Set( vec3Create(), 0.05, 0, 0.05 ),
+			vec3Set( vec3Create(), - 0.05, 0, 0 )
 		];
 
-		const vector1 = new Vector3();
-		const vector2 = new Vector3();
-		const vector3 = new Vector3();
-		const vector4 = new Vector3();
+		const vector1 = vec3Create();
+		const vector2 = vec3Create();
+		const vector3 = vec3Create();
+		const vector4 = vec3Create();
 
-		const normal1 = new Vector3();
-		const normal2 = new Vector3();
-		const normal3 = new Vector3();
-		const normal4 = new Vector3();
+		const normal1 = vec3Create();
+		const normal2 = vec3Create();
+		const normal3 = vec3Create();
+		const normal4 = vec3Create();
 
 		function extrudeShape( shape, fromPoint, toPoint ) {
 
@@ -317,21 +317,10 @@ class RollerCoasterLiftersGeometry extends BufferGeometry {
 				const point1 = shape[ j ];
 				const point2 = shape[ ( j + 1 ) % jl ];
 
-				vector1.copy( point1 );
-				vector1.applyQuaternion( quaternion );
-				vector1.add( fromPoint );
-
-				vector2.copy( point2 );
-				vector2.applyQuaternion( quaternion );
-				vector2.add( fromPoint );
-
-				vector3.copy( point2 );
-				vector3.applyQuaternion( quaternion );
-				vector3.add( toPoint );
-
-				vector4.copy( point1 );
-				vector4.applyQuaternion( quaternion );
-				vector4.add( toPoint );
+				vec3Add( vec3ApplyQuaternion( vec3Copy( point1, vector1 ), quaternion, vector1 ), fromPoint, vector1 );
+				vec3Add( vec3ApplyQuaternion( vec3Copy( point2, vector2 ), quaternion, vector2 ), fromPoint, vector2 );
+				vec3Add( vec3ApplyQuaternion( vec3Copy( point2, vector3 ), quaternion, vector3 ), toPoint, vector3 );
+				vec3Add( vec3ApplyQuaternion( vec3Copy( point1, vector4 ), quaternion, vector4 ), toPoint, vector4 );
 
 				vertices.push( vector1.x, vector1.y, vector1.z );
 				vertices.push( vector2.x, vector2.y, vector2.z );
@@ -343,21 +332,10 @@ class RollerCoasterLiftersGeometry extends BufferGeometry {
 
 				//
 
-				normal1.copy( point1 );
-				normal1.applyQuaternion( quaternion );
-				normal1.normalize();
-
-				normal2.copy( point2 );
-				normal2.applyQuaternion( quaternion );
-				normal2.normalize();
-
-				normal3.copy( point2 );
-				normal3.applyQuaternion( quaternion );
-				normal3.normalize();
-
-				normal4.copy( point1 );
-				normal4.applyQuaternion( quaternion );
-				normal4.normalize();
+				vec3Normalize( vec3ApplyQuaternion( vec3Copy( point1, normal1 ), quaternion, normal1 ), normal1 );
+				vec3Normalize( vec3ApplyQuaternion( vec3Copy( point2, normal2 ), quaternion, normal2 ), normal2 );
+				vec3Normalize( vec3ApplyQuaternion( vec3Copy( point2, normal3 ), quaternion, normal3 ), normal3 );
+				vec3Normalize( vec3ApplyQuaternion( vec3Copy( point1, normal4 ), quaternion, normal4 ), normal4 );
 
 				normals.push( normal1.x, normal1.y, normal1.z );
 				normals.push( normal2.x, normal2.y, normal2.z );
@@ -371,80 +349,63 @@ class RollerCoasterLiftersGeometry extends BufferGeometry {
 
 		}
 
-		const fromPoint = new Vector3();
-		const toPoint = new Vector3();
+		const fromPoint = vec3Create();
+		const toPoint = vec3Create();
 
-		const sample1 = new Vector3();
-		const sample2 = new Vector3();
-		const bankedQuaternion = new Quaternion();
-		const rollQuaternion = new Quaternion();
+		const sample1 = vec3Create();
+		const sample2 = vec3Create();
+		const bankedQuaternion = quatCreate();
+		const rollQuaternion = quatCreate();
 
 		for ( let i = 1; i <= divisions; i ++ ) {
 
-			point.copy( curve.getPointAt( i / divisions ) );
-			tangent.copy( curve.getTangentAt( i / divisions ) );
+			curve.getPointAt( i / divisions, point );
+			curve.getTangentAt( i / divisions, tangent );
 
 			const angle = Math.atan2( tangent.x, tangent.z );
 
-			quaternion.setFromAxisAngle( up, angle );
+			quatSetFromAxisAngle( up, angle, quaternion );
 
 			// banking
 
 			const bankDelta = 0.01;
 			const t = i / divisions;
 
-			sample1.copy( curve.getTangentAt( ( ( t - bankDelta ) % 1 + 1 ) % 1 ) );
-			sample2.copy( curve.getTangentAt( ( t + bankDelta ) % 1 ) );
+			curve.getTangentAt( ( ( t - bankDelta ) % 1 + 1 ) % 1, sample1 );
+			curve.getTangentAt( ( t + bankDelta ) % 1, sample2 );
 
 			let headingChange = Math.atan2( sample2.x, sample2.z ) - Math.atan2( sample1.x, sample1.z );
 			if ( headingChange > Math.PI ) headingChange -= Math.PI * 2;
 			if ( headingChange < - Math.PI ) headingChange += Math.PI * 2;
 
-			bankedQuaternion.copy( quaternion );
-			rollQuaternion.setFromAxisAngle( tangent, - Math.atan( headingChange * 8 ) * 0.5 );
-			bankedQuaternion.premultiply( rollQuaternion );
+			quatCopy( quaternion, bankedQuaternion );
+			quatSetFromAxisAngle( tangent, - Math.atan( headingChange * 8 ) * 0.5, rollQuaternion );
+			quatPreMultiply( bankedQuaternion, rollQuaternion, bankedQuaternion );
 
 			//
 
 			if ( point.y > 10 ) {
 
-				fromPoint.set( - 0.75, - 0.35, 0 );
-				fromPoint.applyQuaternion( quaternion );
-				fromPoint.add( point );
-
-				toPoint.set( 0.75, - 0.35, 0 );
-				toPoint.applyQuaternion( quaternion );
-				toPoint.add( point );
+				vec3Add( vec3ApplyQuaternion( vec3Set( fromPoint, - 0.75, - 0.35, 0 ), quaternion, fromPoint ), point, fromPoint );
+				vec3Add( vec3ApplyQuaternion( vec3Set( toPoint, 0.75, - 0.35, 0 ), quaternion, toPoint ), point, toPoint );
 
 				extrudeShape( tube1, fromPoint, toPoint );
 
-				fromPoint.set( - 0.7, - 0.3, 0 );
-				fromPoint.applyQuaternion( quaternion );
-				fromPoint.add( point );
-
-				toPoint.set( - 0.7, - point.y, 0 );
-				toPoint.applyQuaternion( quaternion );
-				toPoint.add( point );
+				vec3Add( vec3ApplyQuaternion( vec3Set( fromPoint, - 0.7, - 0.3, 0 ), quaternion, fromPoint ), point, fromPoint );
+				vec3Add( vec3ApplyQuaternion( vec3Set( toPoint, - 0.7, - point.y, 0 ), quaternion, toPoint ), point, toPoint );
 
 				extrudeShape( tube2, fromPoint, toPoint );
 
-				fromPoint.set( 0.7, - 0.3, 0 );
-				fromPoint.applyQuaternion( quaternion );
-				fromPoint.add( point );
-
-				toPoint.set( 0.7, - point.y, 0 );
-				toPoint.applyQuaternion( quaternion );
-				toPoint.add( point );
+				vec3Add( vec3ApplyQuaternion( vec3Set( fromPoint, 0.7, - 0.3, 0 ), quaternion, fromPoint ), point, fromPoint );
+				vec3Add( vec3ApplyQuaternion( vec3Set( toPoint, 0.7, - point.y, 0 ), quaternion, toPoint ), point, toPoint );
 
 				extrudeShape( tube3, fromPoint, toPoint );
 
 			} else {
 
-				fromPoint.set( 0, - 0.2, 0 );
-				fromPoint.applyQuaternion( bankedQuaternion );
-				fromPoint.add( point );
+				vec3Add( vec3ApplyQuaternion( vec3Set( fromPoint, 0, - 0.2, 0 ), bankedQuaternion, fromPoint ), point, fromPoint );
 
-				toPoint.copy( fromPoint );
+				vec3Copy( fromPoint, toPoint );
 				toPoint.y = 0;
 
 				extrudeShape( tube3, fromPoint, toPoint );
@@ -480,50 +441,39 @@ class RollerCoasterShadowGeometry extends BufferGeometry {
 
 		const vertices = [];
 
-		const up = new Vector3( 0, 1, 0 );
-		const forward = new Vector3();
+		const up = vec3Set( vec3Create(), 0, 1, 0 );
+		const forward = vec3Create();
 
-		const quaternion = new Quaternion();
-		const prevQuaternion = new Quaternion();
-		prevQuaternion.setFromAxisAngle( up, Math.PI / 2 );
+		const quaternion = quatCreate();
+		const prevQuaternion = quatCreate();
+		quatSetFromAxisAngle( up, Math.PI / 2, prevQuaternion );
 
-		const point = new Vector3();
+		const point = vec3Create();
 
-		const prevPoint = new Vector3();
-		prevPoint.copy( curve.getPointAt( 0 ) );
+		const prevPoint = vec3Create();
+		curve.getPointAt( 0, prevPoint );
 		prevPoint.y = 0;
 
-		const vector1 = new Vector3();
-		const vector2 = new Vector3();
-		const vector3 = new Vector3();
-		const vector4 = new Vector3();
+		const vector1 = vec3Create();
+		const vector2 = vec3Create();
+		const vector3 = vec3Create();
+		const vector4 = vec3Create();
 
 		for ( let i = 1; i <= divisions; i ++ ) {
 
-			point.copy( curve.getPointAt( i / divisions ) );
+			curve.getPointAt( i / divisions, point );
 			point.y = 0;
 
-			forward.subVectors( point, prevPoint );
+			vec3SubVectors( point, prevPoint, forward );
 
 			const angle = Math.atan2( forward.x, forward.z );
 
-			quaternion.setFromAxisAngle( up, angle );
+			quatSetFromAxisAngle( up, angle, quaternion );
 
-			vector1.set( - 0.3, 0, 0 );
-			vector1.applyQuaternion( quaternion );
-			vector1.add( point );
-
-			vector2.set( 0.3, 0, 0 );
-			vector2.applyQuaternion( quaternion );
-			vector2.add( point );
-
-			vector3.set( 0.3, 0, 0 );
-			vector3.applyQuaternion( prevQuaternion );
-			vector3.add( prevPoint );
-
-			vector4.set( - 0.3, 0, 0 );
-			vector4.applyQuaternion( prevQuaternion );
-			vector4.add( prevPoint );
+			vec3Add( vec3ApplyQuaternion( vec3Set( vector1, - 0.3, 0, 0 ), quaternion, vector1 ), point, vector1 );
+			vec3Add( vec3ApplyQuaternion( vec3Set( vector2, 0.3, 0, 0 ), quaternion, vector2 ), point, vector2 );
+			vec3Add( vec3ApplyQuaternion( vec3Set( vector3, 0.3, 0, 0 ), prevQuaternion, vector3 ), prevPoint, vector3 );
+			vec3Add( vec3ApplyQuaternion( vec3Set( vector4, - 0.3, 0, 0 ), prevQuaternion, vector4 ), prevPoint, vector4 );
 
 			vertices.push( vector1.x, vector1.y, vector1.z );
 			vertices.push( vector2.x, vector2.y, vector2.z );
@@ -533,8 +483,8 @@ class RollerCoasterShadowGeometry extends BufferGeometry {
 			vertices.push( vector3.x, vector3.y, vector3.z );
 			vertices.push( vector4.x, vector4.y, vector4.z );
 
-			prevPoint.copy( point );
-			prevQuaternion.copy( quaternion );
+			vec3Copy( point, prevPoint );
+			quatCopy( quaternion, prevQuaternion );
 
 		}
 
@@ -608,16 +558,16 @@ class TreesGeometry extends BufferGeometry {
 		const colors = [];
 
 		const raycaster = new Raycaster();
-		raycaster.ray.direction.set( 0, - 1, 0 );
+		vec3Set( raycaster.ray.direction, 0, - 1, 0 );
 
-		const _color = new Color();
+		const _color = { r: 0, g: 0, b: 0 };
 
 		for ( let i = 0; i < 2000; i ++ ) {
 
 			const x = Math.random() * 500 - 250;
 			const z = Math.random() * 500 - 250;
 
-			raycaster.ray.origin.set( x, 50, z );
+			vec3Set( raycaster.ray.origin, x, 50, z );
 
 			const intersections = raycaster.intersectObject( landscape );
 
@@ -643,7 +593,7 @@ class TreesGeometry extends BufferGeometry {
 
 			for ( let j = 0; j < 6; j ++ ) {
 
-				_color.setRGB( 0.2 + random, 0.4 + random, 0, SRGBColorSpace );
+				colorSetRGB( 0.2 + random, 0.4 + random, 0, SRGBColorSpace, _color );
 
 				colors.push( _color.r, _color.g, _color.b );
 

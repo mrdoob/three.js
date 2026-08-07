@@ -1,5 +1,4 @@
 import {
-	Color,
 	HalfFloatType,
 	MeshDepthMaterial,
 	NearestFilter,
@@ -7,7 +6,8 @@ import {
 	RGBADepthPacking,
 	ShaderMaterial,
 	UniformsUtils,
-	WebGLRenderTarget
+	WebGLRenderTarget,
+	colorCreate
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 import { BokehShader } from '../shaders/BokehShader.js';
@@ -117,7 +117,7 @@ class BokehPass extends Pass {
 
 		this._fsQuad = new FullScreenQuad( this.materialBokeh );
 
-		this._oldClearColor = new Color();
+		this._oldClearColor = colorCreate();
 
 	}
 

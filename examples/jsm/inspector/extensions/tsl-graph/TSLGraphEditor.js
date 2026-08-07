@@ -1,4 +1,4 @@
-import { Raycaster, Vector2, BoxHelper, error, warn } from 'three/webgpu';
+import { Raycaster, BoxHelper, error, warn, vec2Create, vec2Set, vec2DistanceTo, vec2FromArray, vec3FromArray, vec4FromArray, colorSetHex, SRGBColorSpace } from 'three/webgpu';
 import { Extension } from 'three/addons/inspector/Extension.js';
 import { TSLGraphLoader } from './TSLGraphLoader.js';
 
@@ -139,7 +139,7 @@ class TSLGraphEditor extends Extension {
 		let boundingBox = null;
 
 		const raycaster = new Raycaster();
-		const pointer = new Vector2();
+		const pointer = vec2Create();
 
 		const removeBoundingBox = () => {
 
@@ -184,11 +184,11 @@ class TSLGraphEditor extends Extension {
 
 		} );
 
-		const pointerDownPosition = new Vector2();
+		const pointerDownPosition = vec2Create();
 
 		renderer.domElement.addEventListener( 'pointerdown', ( e ) => {
 
-			pointerDownPosition.set( e.clientX, e.clientY );
+			vec2Set( e.clientX, e.clientY, pointerDownPosition );
 
 		} );
 
@@ -201,7 +201,7 @@ class TSLGraphEditor extends Extension {
 			const scene = primaryPass.scene;
 			const camera = primaryPass.camera;
 
-			if ( pointerDownPosition.distanceTo( pointer.set( e.clientX, e.clientY ) ) > 2 ) return;
+			if ( vec2DistanceTo( pointerDownPosition, vec2Set( e.clientX, e.clientY, pointer ) ) > 2 ) return;
 
 			const rect = renderer.domElement.getBoundingClientRect();
 			pointer.x = ( ( e.clientX - rect.left ) / rect.width ) * 2 - 1;
@@ -863,13 +863,21 @@ class TSLGraphEditor extends Extension {
 
 			const value = uniform.value;
 
-			if ( uniformType.startsWith( 'vec' ) ) {
+			if ( uniformType === 'vec2' ) {
 
-				uniformNode.value.fromArray( value );
+				vec2FromArray( value, 0, uniformNode.value );
+
+			} else if ( uniformType === 'vec3' ) {
+
+				vec3FromArray( value, 0, uniformNode.value );
+
+			} else if ( uniformType === 'vec4' ) {
+
+				vec4FromArray( value, 0, uniformNode.value );
 
 			} else if ( uniformType.startsWith( 'color' ) ) {
 
-				uniformNode.value.setHex( parseInt( value.slice( 1 ), 16 ) );
+				colorSetHex( parseInt( value.slice( 1 ), 16 ), SRGBColorSpace, uniformNode.value );
 
 			} else {
 

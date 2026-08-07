@@ -1,7 +1,7 @@
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
-import { Vector3 } from '../math/Vector3.js';
-import { Vector2 } from '../math/Vector2.js';
+import { vec3Create, vec3Normalize, vec3Set } from '../math/Vector3Functions.js';
+import { vec2Create } from '../math/Vector2Functions.js';
 
 /**
  * A geometry class for representing a cylinder.
@@ -94,8 +94,8 @@ class CylinderGeometry extends BufferGeometry {
 
 		function generateTorso() {
 
-			const normal = new Vector3();
-			const vertex = new Vector3();
+			const normal = vec3Create();
+			const vertex = vec3Create();
 
 			let groupCount = 0;
 
@@ -132,7 +132,7 @@ class CylinderGeometry extends BufferGeometry {
 
 					// normal
 
-					normal.set( sinTheta, slope, cosTheta ).normalize();
+					vec3Normalize( vec3Set( normal, sinTheta, slope, cosTheta ), normal );
 					normals.push( normal.x, normal.y, normal.z );
 
 					// uv
@@ -199,8 +199,8 @@ class CylinderGeometry extends BufferGeometry {
 			// save the index of the first center vertex
 			const centerIndexStart = index;
 
-			const uv = new Vector2();
-			const vertex = new Vector3();
+			const uv = vec2Create();
+			const vertex = vec3Create();
 
 			let groupCount = 0;
 

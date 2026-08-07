@@ -1,8 +1,8 @@
-import { HalfFloatType, LinearFilter, NearestFilter, RenderTarget, Texture, Vector2, QuadMesh, NodeMaterial, TempNode, RendererUtils } from 'three/webgpu';
+import { HalfFloatType, LinearFilter, NearestFilter, RenderTarget, Texture, QuadMesh, NodeMaterial, TempNode, RendererUtils, vec2Create, vec2Set } from 'three/webgpu';
 import { abs, Fn, NodeUpdateType, uv, uniform, convertToTexture, vec2, vec4, passTexture, max, step, dot, float, texture, If, Loop, int, Break, sqrt, sign, mix, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _size = /*@__PURE__*/ new Vector2();
+const _size = /*@__PURE__*/ vec2Create();
 
 let _rendererState;
 
@@ -132,7 +132,7 @@ class SMAANode extends TempNode {
 		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
-		this._invSize = uniform( new Vector2() );
+		this._invSize = uniform( vec2Create(), 'vec2' );
 
 		/**
 		 * A uniform texture node holding the area texture.
@@ -222,7 +222,7 @@ class SMAANode extends TempNode {
 	 */
 	setSize( width, height ) {
 
-		this._invSize.value.set( 1 / width, 1 / height );
+		vec2Set( 1 / width, 1 / height, this._invSize.value );
 
 		this._renderTargetEdges.setSize( width, height );
 		this._renderTargetWeights.setSize( width, height );
@@ -244,7 +244,7 @@ class SMAANode extends TempNode {
 		//
 
 		const size = renderer.getDrawingBufferSize( _size );
-		this.setSize( size.width, size.height );
+		this.setSize( size.x, size.y );
 
 		// edges
 

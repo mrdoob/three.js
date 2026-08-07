@@ -1,14 +1,46 @@
 import {
 	Controls,
 	MOUSE,
-	Quaternion,
-	Spherical,
 	TOUCH,
-	Vector2,
 	Vector3,
-	Plane,
-	Ray,
-	MathUtils
+	MathUtils,
+	planeCreate,
+	planeSetFromNormalAndCoplanarPoint,
+	quatCopy,
+	quatCreate,
+	quatDot,
+	quatInvert,
+	quatSetFromUnitVectors,
+	rayCreate,
+	rayIntersectPlane,
+	sphericalCreate,
+	sphericalMakeSafe,
+	sphericalSet,
+	sphericalSetFromVector3,
+	vec2Copy,
+	vec2Create,
+	vec2MultiplyScalar,
+	vec2Set,
+	vec2SubVectors,
+	vec3Add,
+	vec3AddScaledVector,
+	vec3ApplyQuaternion,
+	vec3ClampLength,
+	vec3Copy,
+	vec3Create,
+	vec3CrossVectors,
+	vec3DistanceTo,
+	vec3DistanceToSquared,
+	vec3Dot,
+	vec3Length,
+	vec3MultiplyScalar,
+	vec3Normalize,
+	vec3Set,
+	vec3SetFromMatrixColumn,
+	vec3SetFromSpherical,
+	vec3Sub,
+	vec3TransformDirection,
+	vec3Unproject
 } from 'three';
 
 /**
@@ -35,11 +67,12 @@ const _startEvent = { type: 'start' };
  */
 const _endEvent = { type: 'end' };
 
-const _ray = new Ray();
-const _plane = new Plane();
+const _ray = /*@__PURE__*/ rayCreate();
+const _plane = /*@__PURE__*/ planeCreate();
 const _TILT_LIMIT = Math.cos( 70 * MathUtils.DEG2RAD );
 
-const _v = new Vector3();
+const _v = /*@__PURE__*/ vec3Create();
+const _yUp = /*@__PURE__*/ vec3Set( vec3Create(), 0, 1, 0 );
 const _twoPI = 2 * Math.PI;
 
 const _STATE = {
@@ -375,14 +408,14 @@ class OrbitControls extends Controls {
 		 *
 		 * @type {Vector3}
 		 */
-		this.target0 = this.target.clone();
+		this.target0 = vec3Copy( this.target );
 
 		/**
 		 * Used internally by `saveState()` and `reset()`.
 		 *
 		 * @type {Vector3}
 		 */
-		this.position0 = this.object.position.clone();
+		this.position0 = vec3Copy( this.object.position );
 
 		/**
 		 * Used internally by `saveState()` and `reset()`.
@@ -398,35 +431,35 @@ class OrbitControls extends Controls {
 
 		// internals
 
-		this._lastPosition = new Vector3();
-		this._lastQuaternion = new Quaternion();
-		this._lastTargetPosition = new Vector3();
+		this._lastPosition = vec3Create();
+		this._lastQuaternion = quatCreate();
+		this._lastTargetPosition = vec3Create();
 
 		// so camera.up is the orbit axis
-		this._quat = new Quaternion().setFromUnitVectors( object.up, new Vector3( 0, 1, 0 ) );
-		this._quatInverse = this._quat.clone().invert();
+		this._quat = quatSetFromUnitVectors( object.up, _yUp );
+		this._quatInverse = quatInvert( this._quat );
 
 		// current position in spherical coordinates
-		this._spherical = new Spherical();
-		this._sphericalDelta = new Spherical();
+		this._spherical = sphericalCreate();
+		this._sphericalDelta = sphericalCreate();
 
 		this._scale = 1;
-		this._panOffset = new Vector3();
+		this._panOffset = vec3Create();
 
-		this._rotateStart = new Vector2();
-		this._rotateEnd = new Vector2();
-		this._rotateDelta = new Vector2();
+		this._rotateStart = vec2Create();
+		this._rotateEnd = vec2Create();
+		this._rotateDelta = vec2Create();
 
-		this._panStart = new Vector2();
-		this._panEnd = new Vector2();
-		this._panDelta = new Vector2();
+		this._panStart = vec2Create();
+		this._panEnd = vec2Create();
+		this._panDelta = vec2Create();
 
-		this._dollyStart = new Vector2();
-		this._dollyEnd = new Vector2();
-		this._dollyDelta = new Vector2();
+		this._dollyStart = vec2Create();
+		this._dollyEnd = vec2Create();
+		this._dollyDelta = vec2Create();
 
-		this._dollyDirection = new Vector3();
-		this._mouse = new Vector2();
+		this._dollyDirection = vec3Create();
+		this._mouse = vec2Create();
 		this._performCursorZoom = false;
 
 		this._pointers = [];
@@ -563,7 +596,7 @@ class OrbitControls extends Controls {
 	 */
 	getDistance() {
 
-		return this.object.position.distanceTo( this.target );
+		return vec3DistanceTo( this.object.position, this.target );
 
 	}
 
@@ -599,8 +632,8 @@ class OrbitControls extends Controls {
 	 */
 	saveState() {
 
-		this.target0.copy( this.target );
-		this.position0.copy( this.object.position );
+		vec3Copy( this.target, this.target0 );
+		vec3Copy( this.object.position, this.position0 );
 		this.zoom0 = this.object.zoom;
 
 	}
@@ -611,8 +644,8 @@ class OrbitControls extends Controls {
 	 */
 	reset() {
 
-		this.target.copy( this.target0 );
-		this.object.position.copy( this.position0 );
+		vec3Copy( this.target0, this.target );
+		vec3Copy( this.position0, this.object.position );
 		this.object.zoom = this.zoom0;
 
 		this.object.updateProjectionMatrix();
@@ -689,13 +722,13 @@ class OrbitControls extends Controls {
 
 		const position = this.object.position;
 
-		_v.copy( position ).sub( this.target );
+		vec3Sub( position, this.target, _v );
 
 		// rotate offset to "y-axis-is-up" space
-		_v.applyQuaternion( this._quat );
+		vec3ApplyQuaternion( _v, this._quat, _v );
 
 		// angle from z-axis around y-axis
-		this._spherical.setFromVector3( _v );
+		sphericalSetFromVector3( _v, this._spherical );
 
 		if ( this.autoRotate && this.state === _STATE.NONE ) {
 
@@ -743,25 +776,25 @@ class OrbitControls extends Controls {
 		// restrict phi to be between desired limits
 		this._spherical.phi = Math.max( this.minPolarAngle, Math.min( this.maxPolarAngle, this._spherical.phi ) );
 
-		this._spherical.makeSafe();
+		sphericalMakeSafe( this._spherical, this._spherical );
 
 
 		// move target to panned location
 
 		if ( this.enableDamping === true ) {
 
-			this.target.addScaledVector( this._panOffset, this.dampingFactor );
+			vec3AddScaledVector( this.target, this._panOffset, this.dampingFactor, this.target );
 
 		} else {
 
-			this.target.add( this._panOffset );
+			vec3Add( this.target, this._panOffset, this.target );
 
 		}
 
 		// Limit the target distance from the cursor to create a sphere around the center of interest
-		this.target.sub( this.cursor );
-		this.target.clampLength( this.minTargetRadius, this.maxTargetRadius );
-		this.target.add( this.cursor );
+		vec3Sub( this.target, this.cursor, this.target );
+		vec3ClampLength( this.target, this.minTargetRadius, this.maxTargetRadius, this.target );
+		vec3Add( this.target, this.cursor, this.target );
 
 		let zoomChanged = false;
 		// adjust the camera position based on zoom only if we're not zooming to the cursor or if it's an ortho camera
@@ -778,12 +811,12 @@ class OrbitControls extends Controls {
 
 		}
 
-		_v.setFromSpherical( this._spherical );
+		vec3SetFromSpherical( this._spherical, _v );
 
 		// rotate offset back to "camera-up-vector-is-up" space
-		_v.applyQuaternion( this._quatInverse );
+		vec3ApplyQuaternion( _v, this._quatInverse, _v );
 
-		position.copy( this.target ).add( _v );
+		vec3Add( this.target, _v, position );
 
 		this.object.lookAt( this.target );
 
@@ -792,13 +825,13 @@ class OrbitControls extends Controls {
 			this._sphericalDelta.theta *= ( 1 - this.dampingFactor );
 			this._sphericalDelta.phi *= ( 1 - this.dampingFactor );
 
-			this._panOffset.multiplyScalar( 1 - this.dampingFactor );
+			vec3MultiplyScalar( this._panOffset, 1 - this.dampingFactor, this._panOffset );
 
 		} else {
 
-			this._sphericalDelta.set( 0, 0, 0 );
+			sphericalSet( this._sphericalDelta, 0, 0, 0 );
 
-			this._panOffset.set( 0, 0, 0 );
+			vec3Set( this._panOffset, 0, 0, 0 );
 
 		}
 
@@ -810,11 +843,11 @@ class OrbitControls extends Controls {
 
 				// move the camera down the pointer ray
 				// this method avoids floating point error
-				const prevRadius = _v.length();
+				const prevRadius = vec3Length( _v );
 				newRadius = this._clampDistance( prevRadius * this._scale );
 
 				const radiusDelta = prevRadius - newRadius;
-				this.object.position.addScaledVector( this._dollyDirection, radiusDelta );
+				vec3AddScaledVector( this.object.position, this._dollyDirection, radiusDelta, this.object.position );
 				this.object.updateMatrixWorld();
 
 				zoomChanged = !! radiusDelta;
@@ -822,8 +855,7 @@ class OrbitControls extends Controls {
 			} else if ( this.object.isOrthographicCamera ) {
 
 				// adjust the ortho camera position based on zoom changes
-				const mouseBefore = new Vector3( this._mouse.x, this._mouse.y, 0 );
-				mouseBefore.unproject( this.object );
+				const mouseBefore = vec3Unproject( vec3Set( vec3Create(), this._mouse.x, this._mouse.y, 0 ), this.object );
 
 				const prevZoom = this.object.zoom;
 				this.object.zoom = Math.max( this.minZoom, Math.min( this.maxZoom, this.object.zoom / this._scale ) );
@@ -831,13 +863,13 @@ class OrbitControls extends Controls {
 
 				zoomChanged = prevZoom !== this.object.zoom;
 
-				const mouseAfter = new Vector3( this._mouse.x, this._mouse.y, 0 );
-				mouseAfter.unproject( this.object );
+				const mouseAfter = vec3Unproject( vec3Set( vec3Create(), this._mouse.x, this._mouse.y, 0 ), this.object );
 
-				this.object.position.sub( mouseAfter ).add( mouseBefore );
+				vec3Sub( this.object.position, mouseAfter, this.object.position );
+				vec3Add( this.object.position, mouseBefore, this.object.position );
 				this.object.updateMatrixWorld();
 
-				newRadius = _v.length();
+				newRadius = vec3Length( _v );
 
 			} else {
 
@@ -852,27 +884,28 @@ class OrbitControls extends Controls {
 				if ( this.screenSpacePanning ) {
 
 					// position the orbit target in front of the new camera position
-					this.target.set( 0, 0, - 1 )
-						.transformDirection( this.object.matrix )
-						.multiplyScalar( newRadius )
-						.add( this.object.position );
+					vec3Set( this.target, 0, 0, - 1 );
+					vec3TransformDirection( this.target, this.object.matrix, this.target );
+					vec3MultiplyScalar( this.target, newRadius, this.target );
+					vec3Add( this.target, this.object.position, this.target );
 
 				} else {
 
 					// get the ray and translation plane to compute target
-					_ray.origin.copy( this.object.position );
-					_ray.direction.set( 0, 0, - 1 ).transformDirection( this.object.matrix );
+					vec3Copy( this.object.position, _ray.origin );
+					vec3Set( _ray.direction, 0, 0, - 1 );
+					vec3TransformDirection( _ray.direction, this.object.matrix, _ray.direction );
 
 					// if the camera is 20 degrees above the horizon then don't adjust the focus target to avoid
 					// extremely large values
-					if ( Math.abs( this.object.up.dot( _ray.direction ) ) < _TILT_LIMIT ) {
+					if ( Math.abs( vec3Dot( this.object.up, _ray.direction ) ) < _TILT_LIMIT ) {
 
 						this.object.lookAt( this.target );
 
 					} else {
 
-						_plane.setFromNormalAndCoplanarPoint( this.object.up, this.target );
-						_ray.intersectPlane( _plane, this.target );
+						planeSetFromNormalAndCoplanarPoint( this.object.up, this.target, _plane );
+						rayIntersectPlane( _ray, _plane, this.target );
 
 					}
 
@@ -902,15 +935,15 @@ class OrbitControls extends Controls {
 		// using small-angle approximation cos(x/2) = 1 - x^2 / 8
 
 		if ( zoomChanged ||
-			this._lastPosition.distanceToSquared( this.object.position ) > _EPS ||
-			8 * ( 1 - this._lastQuaternion.dot( this.object.quaternion ) ) > _EPS ||
-			this._lastTargetPosition.distanceToSquared( this.target ) > _EPS ) {
+			vec3DistanceToSquared( this._lastPosition, this.object.position ) > _EPS ||
+			8 * ( 1 - quatDot( this._lastQuaternion, this.object.quaternion ) ) > _EPS ||
+			vec3DistanceToSquared( this._lastTargetPosition, this.target ) > _EPS ) {
 
 			this.dispatchEvent( _changeEvent );
 
-			this._lastPosition.copy( this.object.position );
-			this._lastQuaternion.copy( this.object.quaternion );
-			this._lastTargetPosition.copy( this.target );
+			vec3Copy( this.object.position, this._lastPosition );
+			quatCopy( this.object.quaternion, this._lastQuaternion );
+			vec3Copy( this.target, this._lastTargetPosition );
 
 			return true;
 
@@ -955,10 +988,10 @@ class OrbitControls extends Controls {
 
 	_panLeft( distance, objectMatrix ) {
 
-		_v.setFromMatrixColumn( objectMatrix, 0 ); // get X column of objectMatrix
-		_v.multiplyScalar( - distance );
+		vec3SetFromMatrixColumn( objectMatrix, 0, _v ); // get X column of objectMatrix
+		vec3MultiplyScalar( _v, - distance, _v );
 
-		this._panOffset.add( _v );
+		vec3Add( this._panOffset, _v, this._panOffset );
 
 	}
 
@@ -966,18 +999,18 @@ class OrbitControls extends Controls {
 
 		if ( this.screenSpacePanning === true ) {
 
-			_v.setFromMatrixColumn( objectMatrix, 1 );
+			vec3SetFromMatrixColumn( objectMatrix, 1, _v );
 
 		} else {
 
-			_v.setFromMatrixColumn( objectMatrix, 0 );
-			_v.crossVectors( this.object.up, _v );
+			vec3SetFromMatrixColumn( objectMatrix, 0, _v );
+			vec3CrossVectors( this.object.up, _v, _v );
 
 		}
 
-		_v.multiplyScalar( distance );
+		vec3MultiplyScalar( _v, distance, _v );
 
-		this._panOffset.add( _v );
+		vec3Add( this._panOffset, _v, this._panOffset );
 
 	}
 
@@ -990,8 +1023,8 @@ class OrbitControls extends Controls {
 
 			// perspective
 			const position = this.object.position;
-			_v.copy( position ).sub( this.target );
-			let targetDistance = _v.length();
+			vec3Sub( position, this.target, _v );
+			let targetDistance = vec3Length( _v );
 
 			// half of the fov is center to top of screen
 			targetDistance *= Math.tan( ( this.object.fov / 2 ) * Math.PI / 180.0 );
@@ -1065,7 +1098,10 @@ class OrbitControls extends Controls {
 		this._mouse.x = ( dx / w ) * 2 - 1;
 		this._mouse.y = - ( dy / h ) * 2 + 1;
 
-		this._dollyDirection.set( this._mouse.x, this._mouse.y, 1 ).unproject( this.object ).sub( this.object.position ).normalize();
+		vec3Set( this._dollyDirection, this._mouse.x, this._mouse.y, 1 );
+		vec3Unproject( this._dollyDirection, this.object, this._dollyDirection );
+		vec3Sub( this._dollyDirection, this.object.position, this._dollyDirection );
+		vec3Normalize( this._dollyDirection, this._dollyDirection );
 
 	}
 
@@ -1081,28 +1117,29 @@ class OrbitControls extends Controls {
 
 	_handleMouseDownRotate( event ) {
 
-		this._rotateStart.set( event.clientX, event.clientY );
+		vec2Set( event.clientX, event.clientY, this._rotateStart );
 
 	}
 
 	_handleMouseDownDolly( event ) {
 
 		this._updateZoomParameters( event.clientX, event.clientX );
-		this._dollyStart.set( event.clientX, event.clientY );
+		vec2Set( event.clientX, event.clientY, this._dollyStart );
 
 	}
 
 	_handleMouseDownPan( event ) {
 
-		this._panStart.set( event.clientX, event.clientY );
+		vec2Set( event.clientX, event.clientY, this._panStart );
 
 	}
 
 	_handleMouseMoveRotate( event ) {
 
-		this._rotateEnd.set( event.clientX, event.clientY );
+		vec2Set( event.clientX, event.clientY, this._rotateEnd );
 
-		this._rotateDelta.subVectors( this._rotateEnd, this._rotateStart ).multiplyScalar( this.rotateSpeed );
+		vec2SubVectors( this._rotateEnd, this._rotateStart, this._rotateDelta );
+		vec2MultiplyScalar( this._rotateDelta, this.rotateSpeed, this._rotateDelta );
 
 		const element = this.domElement;
 
@@ -1110,7 +1147,7 @@ class OrbitControls extends Controls {
 
 		this._rotateUp( _twoPI * this._rotateDelta.y / element.clientHeight );
 
-		this._rotateStart.copy( this._rotateEnd );
+		vec2Copy( this._rotateEnd, this._rotateStart );
 
 		this.update();
 
@@ -1118,9 +1155,9 @@ class OrbitControls extends Controls {
 
 	_handleMouseMoveDolly( event ) {
 
-		this._dollyEnd.set( event.clientX, event.clientY );
+		vec2Set( event.clientX, event.clientY, this._dollyEnd );
 
-		this._dollyDelta.subVectors( this._dollyEnd, this._dollyStart );
+		vec2SubVectors( this._dollyEnd, this._dollyStart, this._dollyDelta );
 
 		if ( this._dollyDelta.y > 0 ) {
 
@@ -1132,7 +1169,7 @@ class OrbitControls extends Controls {
 
 		}
 
-		this._dollyStart.copy( this._dollyEnd );
+		vec2Copy( this._dollyEnd, this._dollyStart );
 
 		this.update();
 
@@ -1140,13 +1177,14 @@ class OrbitControls extends Controls {
 
 	_handleMouseMovePan( event ) {
 
-		this._panEnd.set( event.clientX, event.clientY );
+		vec2Set( event.clientX, event.clientY, this._panEnd );
 
-		this._panDelta.subVectors( this._panEnd, this._panStart ).multiplyScalar( this.panSpeed );
+		vec2SubVectors( this._panEnd, this._panStart, this._panDelta );
+		vec2MultiplyScalar( this._panDelta, this.panSpeed, this._panDelta );
 
 		this._pan( this._panDelta.x, this._panDelta.y );
 
-		this._panStart.copy( this._panEnd );
+		vec2Copy( this._panEnd, this._panStart );
 
 		this.update();
 
@@ -1286,7 +1324,7 @@ class OrbitControls extends Controls {
 
 		if ( this._pointers.length === 1 ) {
 
-			this._rotateStart.set( event.pageX, event.pageY );
+			vec2Set( event.pageX, event.pageY, this._rotateStart );
 
 		} else {
 
@@ -1295,7 +1333,7 @@ class OrbitControls extends Controls {
 			const x = 0.5 * ( event.pageX + position.x );
 			const y = 0.5 * ( event.pageY + position.y );
 
-			this._rotateStart.set( x, y );
+			vec2Set( x, y, this._rotateStart );
 
 		}
 
@@ -1305,7 +1343,7 @@ class OrbitControls extends Controls {
 
 		if ( this._pointers.length === 1 ) {
 
-			this._panStart.set( event.pageX, event.pageY );
+			vec2Set( event.pageX, event.pageY, this._panStart );
 
 		} else {
 
@@ -1314,7 +1352,7 @@ class OrbitControls extends Controls {
 			const x = 0.5 * ( event.pageX + position.x );
 			const y = 0.5 * ( event.pageY + position.y );
 
-			this._panStart.set( x, y );
+			vec2Set( x, y, this._panStart );
 
 		}
 
@@ -1329,7 +1367,7 @@ class OrbitControls extends Controls {
 
 		const distance = Math.sqrt( dx * dx + dy * dy );
 
-		this._dollyStart.set( 0, distance );
+		vec2Set( 0, distance, this._dollyStart );
 
 	}
 
@@ -1353,7 +1391,7 @@ class OrbitControls extends Controls {
 
 		if ( this._pointers.length == 1 ) {
 
-			this._rotateEnd.set( event.pageX, event.pageY );
+			vec2Set( event.pageX, event.pageY, this._rotateEnd );
 
 		} else {
 
@@ -1362,11 +1400,12 @@ class OrbitControls extends Controls {
 			const x = 0.5 * ( event.pageX + position.x );
 			const y = 0.5 * ( event.pageY + position.y );
 
-			this._rotateEnd.set( x, y );
+			vec2Set( x, y, this._rotateEnd );
 
 		}
 
-		this._rotateDelta.subVectors( this._rotateEnd, this._rotateStart ).multiplyScalar( this.rotateSpeed );
+		vec2SubVectors( this._rotateEnd, this._rotateStart, this._rotateDelta );
+		vec2MultiplyScalar( this._rotateDelta, this.rotateSpeed, this._rotateDelta );
 
 		const element = this.domElement;
 
@@ -1374,7 +1413,7 @@ class OrbitControls extends Controls {
 
 		this._rotateUp( _twoPI * this._rotateDelta.y / element.clientHeight );
 
-		this._rotateStart.copy( this._rotateEnd );
+		vec2Copy( this._rotateEnd, this._rotateStart );
 
 	}
 
@@ -1382,7 +1421,7 @@ class OrbitControls extends Controls {
 
 		if ( this._pointers.length === 1 ) {
 
-			this._panEnd.set( event.pageX, event.pageY );
+			vec2Set( event.pageX, event.pageY, this._panEnd );
 
 		} else {
 
@@ -1391,15 +1430,16 @@ class OrbitControls extends Controls {
 			const x = 0.5 * ( event.pageX + position.x );
 			const y = 0.5 * ( event.pageY + position.y );
 
-			this._panEnd.set( x, y );
+			vec2Set( x, y, this._panEnd );
 
 		}
 
-		this._panDelta.subVectors( this._panEnd, this._panStart ).multiplyScalar( this.panSpeed );
+		vec2SubVectors( this._panEnd, this._panStart, this._panDelta );
+		vec2MultiplyScalar( this._panDelta, this.panSpeed, this._panDelta );
 
 		this._pan( this._panDelta.x, this._panDelta.y );
 
-		this._panStart.copy( this._panEnd );
+		vec2Copy( this._panEnd, this._panStart );
 
 	}
 
@@ -1412,13 +1452,13 @@ class OrbitControls extends Controls {
 
 		const distance = Math.sqrt( dx * dx + dy * dy );
 
-		this._dollyEnd.set( 0, distance );
+		vec2Set( 0, distance, this._dollyEnd );
 
-		this._dollyDelta.set( 0, Math.pow( this._dollyEnd.y / this._dollyStart.y, this.zoomSpeed ) );
+		vec2Set( 0, Math.pow( this._dollyEnd.y / this._dollyStart.y, this.zoomSpeed ), this._dollyDelta );
 
 		this._dollyOut( this._dollyDelta.y );
 
-		this._dollyStart.copy( this._dollyEnd );
+		vec2Copy( this._dollyEnd, this._dollyStart );
 
 		const centerX = ( event.pageX + position.x ) * 0.5;
 		const centerY = ( event.pageY + position.y ) * 0.5;
@@ -1486,12 +1526,12 @@ class OrbitControls extends Controls {
 
 		if ( position === undefined ) {
 
-			position = new Vector2();
+			position = vec2Create();
 			this._pointerPositions[ event.pointerId ] = position;
 
 		}
 
-		position.set( event.pageX, event.pageY );
+		vec2Set( event.pageX, event.pageY, position );
 
 	}
 

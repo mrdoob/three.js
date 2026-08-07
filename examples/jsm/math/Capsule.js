@@ -1,5 +1,9 @@
 import {
-	Vector3
+	Vector3,
+	vec3Add,
+	vec3AddVectors,
+	vec3Copy,
+	vec3MultiplyScalar
 } from 'three';
 
 /**
@@ -67,8 +71,8 @@ class Capsule {
 	 */
 	set( start, end, radius ) {
 
-		this.start.copy( start );
-		this.end.copy( end );
+		vec3Copy( start, this.start );
+		vec3Copy( end, this.end );
 		this.radius = radius;
 
 		return this;
@@ -83,8 +87,8 @@ class Capsule {
 	 */
 	copy( capsule ) {
 
-		this.start.copy( capsule.start );
-		this.end.copy( capsule.end );
+		vec3Copy( capsule.start, this.start );
+		vec3Copy( capsule.end, this.end );
 		this.radius = capsule.radius;
 
 		return this;
@@ -99,7 +103,7 @@ class Capsule {
 	 */
 	getCenter( target ) {
 
-		return target.copy( this.end ).add( this.start ).multiplyScalar( 0.5 );
+		return vec3MultiplyScalar( vec3AddVectors( this.end, this.start, target ), 0.5, target );
 
 	}
 
@@ -111,8 +115,8 @@ class Capsule {
 	 */
 	translate( v ) {
 
-		this.start.add( v );
-		this.end.add( v );
+		vec3Add( this.start, v, this.start );
+		vec3Add( this.end, v, this.end );
 
 		return this;
 

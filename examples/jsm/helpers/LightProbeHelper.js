@@ -1,7 +1,10 @@
 import {
 	Mesh,
 	ShaderMaterial,
-	SphereGeometry
+	SphereGeometry,
+	vec3Copy,
+	vec3MultiplyScalar,
+	vec3Set
 } from 'three';
 
 /**
@@ -153,9 +156,10 @@ class LightProbeHelper extends Mesh {
 
 	onBeforeRender() {
 
-		this.position.copy( this.lightProbe.position );
+		vec3Copy( this.lightProbe.position, this.position );
 
-		this.scale.set( 1, 1, 1 ).multiplyScalar( this.size );
+		vec3Set( this.scale, 1, 1, 1 );
+		vec3MultiplyScalar( this.scale, this.size, this.scale );
 
 		this.material.uniforms.intensity.value = this.lightProbe.intensity;
 

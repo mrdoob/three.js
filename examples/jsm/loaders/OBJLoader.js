@@ -11,8 +11,14 @@ import {
 	MeshPhongMaterial,
 	Points,
 	PointsMaterial,
-	Vector3,
-	Color,
+	vec3Create,
+	vec3FromArray,
+	vec3SubVectors,
+	vec3Cross,
+	vec3Normalize,
+	colorCreate,
+	colorSetRGB,
+	colorCopy,
 	SRGBColorSpace
 } from 'three';
 
@@ -26,14 +32,14 @@ const _material_use_pattern = /^usemtl /;
 const _map_use_pattern = /^usemap /;
 const _face_vertex_data_separator_pattern = /\s+/;
 
-const _vA = new Vector3();
-const _vB = new Vector3();
-const _vC = new Vector3();
+const _vA = vec3Create();
+const _vB = vec3Create();
+const _vC = vec3Create();
 
-const _ab = new Vector3();
-const _cb = new Vector3();
+const _ab = vec3Create();
+const _cb = vec3Create();
 
-const _color = new Color();
+const _color = colorCreate();
 
 function ParserState() {
 
@@ -276,15 +282,15 @@ function ParserState() {
 			const src = this.vertices;
 			const dst = this.object.geometry.normals;
 
-			_vA.fromArray( src, a );
-			_vB.fromArray( src, b );
-			_vC.fromArray( src, c );
+			vec3FromArray( src, a, _vA );
+			vec3FromArray( src, b, _vB );
+			vec3FromArray( src, c, _vC );
 
-			_cb.subVectors( _vC, _vB );
-			_ab.subVectors( _vA, _vB );
-			_cb.cross( _ab );
+			vec3SubVectors( _vC, _vB, _cb );
+			vec3SubVectors( _vA, _vB, _ab );
+			vec3Cross( _cb, _ab, _cb );
 
-			_cb.normalize();
+			vec3Normalize( _cb, _cb );
 
 			dst.push( _cb.x, _cb.y, _cb.z );
 			dst.push( _cb.x, _cb.y, _cb.z );
@@ -580,11 +586,12 @@ class OBJLoader extends Loader {
 						);
 						if ( data.length >= 7 ) {
 
-							_color.setRGB(
+							colorSetRGB(
 								parseFloat( data[ 4 ] ),
 								parseFloat( data[ 5 ] ),
 								parseFloat( data[ 6 ] ),
-								SRGBColorSpace
+								SRGBColorSpace,
+								_color
 							);
 
 							state.colors.push( _color.r, _color.g, _color.b );
@@ -826,14 +833,14 @@ class OBJLoader extends Loader {
 
 							const materialLine = new LineBasicMaterial();
 							Material.prototype.copy.call( materialLine, material );
-							materialLine.color.copy( material.color );
+							colorCopy( material.color, materialLine.color );
 							material = materialLine;
 
 						} else if ( isPoints && material && ! ( material instanceof PointsMaterial ) ) {
 
 							const materialPoints = new PointsMaterial( { size: 10, sizeAttenuation: false } );
 							Material.prototype.copy.call( materialPoints, material );
-							materialPoints.color.copy( material.color );
+							colorCopy( material.color, materialPoints.color );
 							materialPoints.map = material.map;
 							material = materialPoints;
 

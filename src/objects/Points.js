@@ -1,15 +1,17 @@
-import { Sphere } from '../math/Sphere.js';
-import { Ray } from '../math/Ray.js';
-import { Matrix4 } from '../math/Matrix4.js';
+import { sphereCreate, sphereCopy, sphereApplyMatrix4 } from '../math/SphereFunctions.js';
+import { rayCreate, rayCopy, rayApplyMatrix4, rayIntersectsSphere, rayDistanceSqToPoint, rayClosestPointToPoint } from '../math/RayFunctions.js';
+import { mat4Create, mat4Copy, mat4Invert } from '../math/Matrix4Functions.js';
+import { frustumIntersectsObject } from '../math/FrustumFunctions.js';
 import { Object3D } from '../core/Object3D.js';
+import { vec3Create, vec3FromBufferAttribute, vec3ApplyMatrix4, vec3DistanceTo } from '../math/Vector3Functions.js';
 import { Vector3 } from '../math/Vector3.js';
 import { PointsMaterial } from '../materials/PointsMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-const _inverseMatrix = /*@__PURE__*/ new Matrix4();
-const _ray = /*@__PURE__*/ new Ray();
-const _sphere = /*@__PURE__*/ new Sphere();
-const _position = /*@__PURE__*/ new Vector3();
+const _inverseMatrix = /*@__PURE__*/ mat4Create();
+const _ray = /*@__PURE__*/ rayCreate();
+const _sphere = /*@__PURE__*/ sphereCreate();
+const _position = /*@__PURE__*/ vec3Create();
 
 /**
  * A class for displaying points or point clouds.
@@ -97,7 +99,7 @@ class Points extends Object3D {
 	 */
 	intersectsFrustum( frustum ) {
 
-		return frustum.intersectsObject( this );
+		return frustum.planes !== undefined ? frustumIntersectsObject( frustum, this ) : frustum.intersectsObject( this );
 
 	}
 
@@ -118,16 +120,18 @@ class Points extends Object3D {
 
 		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-		_sphere.copy( geometry.boundingSphere );
-		_sphere.applyMatrix4( matrixWorld );
+		sphereCopy( geometry.boundingSphere, _sphere );
+		sphereApplyMatrix4( _sphere, matrixWorld, _sphere );
 		_sphere.radius += threshold;
 
-		if ( raycaster.ray.intersectsSphere( _sphere ) === false ) return;
+		if ( rayIntersectsSphere( raycaster.ray, _sphere ) === false ) return;
 
 		//
 
-		_inverseMatrix.copy( matrixWorld ).invert();
-		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
+		mat4Copy( matrixWorld, _inverseMatrix );
+		mat4Invert( _inverseMatrix, _inverseMatrix );
+		rayCopy( raycaster.ray, _ray );
+		rayApplyMatrix4( _ray, _inverseMatrix, _ray );
 
 		const localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
 		const localThresholdSq = localThreshold * localThreshold;
@@ -145,7 +149,7 @@ class Points extends Object3D {
 
 				const a = index.getX( i );
 
-				_position.fromBufferAttribute( positionAttribute, a );
+				vec3FromBufferAttribute( positionAttribute, a, _position );
 
 				testPoint( _position, a, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
@@ -158,7 +162,7 @@ class Points extends Object3D {
 
 			for ( let i = start, l = end; i < l; i ++ ) {
 
-				_position.fromBufferAttribute( positionAttribute, i );
+				vec3FromBufferAttribute( positionAttribute, i, _position );
 
 				testPoint( _position, i, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
@@ -207,16 +211,16 @@ class Points extends Object3D {
 
 function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, intersects, object ) {
 
-	const rayPointDistanceSq = _ray.distanceSqToPoint( point );
+	const rayPointDistanceSq = rayDistanceSqToPoint( _ray, point );
 
 	if ( rayPointDistanceSq < localThresholdSq ) {
 
 		const intersectPoint = new Vector3();
 
-		_ray.closestPointToPoint( point, intersectPoint );
-		intersectPoint.applyMatrix4( matrixWorld );
+		rayClosestPointToPoint( _ray, point, intersectPoint );
+		vec3ApplyMatrix4( intersectPoint, matrixWorld, intersectPoint );
 
-		const distance = raycaster.ray.origin.distanceTo( intersectPoint );
+		const distance = vec3DistanceTo( raycaster.ray.origin, intersectPoint );
 
 		if ( distance < raycaster.near || distance > raycaster.far ) return;
 

@@ -1,15 +1,18 @@
 import {
 	Timer,
-	Color,
-	Matrix4,
 	Mesh,
 	RepeatWrapping,
 	ShaderMaterial,
 	TextureLoader,
 	UniformsLib,
 	UniformsUtils,
-	Vector2,
-	Vector4
+	colorSet,
+	mat4Copy,
+	mat4Create,
+	mat4Multiply,
+	mat4Set,
+	vec2Create,
+	vec4Create
 } from 'three';
 import { Reflector } from '../objects/Reflector.js';
 import { Refractor } from '../objects/Refractor.js';
@@ -55,11 +58,11 @@ class Water extends Mesh {
 
 		const scope = this;
 
-		const color = ( options.color !== undefined ) ? new Color( options.color ) : new Color( 0xFFFFFF );
+		const color = colorSet( options.color !== undefined ? options.color : 0xFFFFFF );
 		const textureWidth = options.textureWidth !== undefined ? options.textureWidth : 512;
 		const textureHeight = options.textureHeight !== undefined ? options.textureHeight : 512;
 		const clipBias = options.clipBias !== undefined ? options.clipBias : 0;
-		const flowDirection = options.flowDirection !== undefined ? options.flowDirection : new Vector2( 1, 0 );
+		const flowDirection = options.flowDirection !== undefined ? options.flowDirection : vec2Create( 1, 0 );
 		const flowSpeed = options.flowSpeed !== undefined ? options.flowSpeed : 0.03;
 		const reflectivity = options.reflectivity !== undefined ? options.reflectivity : 0.02;
 		const scale = options.scale !== undefined ? options.scale : 1;
@@ -73,7 +76,7 @@ class Water extends Mesh {
 
 		const cycle = 0.15; // a cycle of a flow map phase
 		const halfCycle = cycle * 0.5;
-		const textureMatrix = new Matrix4();
+		const textureMatrix = mat4Create();
 		const timer = new Timer();
 
 		// internal components
@@ -165,16 +168,17 @@ class Water extends Mesh {
 
 		function updateTextureMatrix( camera ) {
 
-			textureMatrix.set(
+			mat4Set(
+				textureMatrix,
 				0.5, 0.0, 0.0, 0.5,
 				0.0, 0.5, 0.0, 0.5,
 				0.0, 0.0, 0.5, 0.5,
 				0.0, 0.0, 0.0, 1.0
 			);
 
-			textureMatrix.multiply( camera.projectionMatrix );
-			textureMatrix.multiply( camera.matrixWorldInverse );
-			textureMatrix.multiply( scope.matrixWorld );
+			mat4Multiply( textureMatrix, camera.projectionMatrix, textureMatrix );
+			mat4Multiply( textureMatrix, camera.matrixWorldInverse, textureMatrix );
+			mat4Multiply( textureMatrix, scope.matrixWorld, textureMatrix );
 
 		}
 
@@ -214,8 +218,8 @@ class Water extends Mesh {
 
 			scope.visible = false;
 
-			reflector.matrixWorld.copy( scope.matrixWorld );
-			refractor.matrixWorld.copy( scope.matrixWorld );
+			mat4Copy( scope.matrixWorld, reflector.matrixWorld );
+			mat4Copy( scope.matrixWorld, refractor.matrixWorld );
 
 			reflector.onBeforeRender( renderer, scene, camera );
 			refractor.onBeforeRender( renderer, scene, camera );
@@ -271,7 +275,7 @@ Water.WaterShader = {
 
 		'config': {
 			type: 'v4',
-			value: new Vector4()
+			value: vec4Create()
 		}
 
 	},

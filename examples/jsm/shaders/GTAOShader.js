@@ -1,9 +1,11 @@
 import {
 	DataTexture,
-	Matrix4,
+	mat4Create,
 	RepeatWrapping,
-	Vector2,
-	Vector3,
+	vec2Create,
+	vec3Create,
+	vec3Normalize,
+	vec3Set
 } from 'three';
 
 /**
@@ -39,19 +41,19 @@ const GTAOShader = {
 		tNormal: { value: null },
 		tDepth: { value: null },
 		tNoise: { value: null },
-		resolution: { value: new Vector2() },
+		resolution: { value: vec2Create() },
 		cameraNear: { value: null },
 		cameraFar: { value: null },
-		cameraProjectionMatrix: { value: new Matrix4() },
-		cameraProjectionMatrixInverse: { value: new Matrix4() },
-		cameraWorldMatrix: { value: new Matrix4() },
+		cameraProjectionMatrix: { value: mat4Create() },
+		cameraProjectionMatrixInverse: { value: mat4Create() },
+		cameraWorldMatrix: { value: mat4Create() },
 		radius: { value: 0.25 },
 		distanceExponent: { value: 1. },
 		thickness: { value: 1. },
 		distanceFallOff: { value: 1. },
 		scale: { value: 1. },
-		sceneBoxMin: { value: new Vector3( - 1, - 1, - 1 ) },
-		sceneBoxMax: { value: new Vector3( 1, 1, 1 ) },
+		sceneBoxMin: { value: vec3Set( vec3Create(), - 1, - 1, - 1 ) },
+		sceneBoxMax: { value: vec3Set( vec3Create(), 1, 1, 1 ) },
 	},
 
 	vertexShader: /* glsl */`
@@ -357,11 +359,7 @@ function generateMagicSquareNoise( size = 5 ) {
 
 		const iAng = magicSquare[ inx ];
 		const angle = ( 2 * Math.PI * iAng ) / noiseSquareSize;
-		const randomVec = new Vector3(
-			Math.cos( angle ),
-			Math.sin( angle ),
-			0
-		).normalize();
+		const randomVec = vec3Normalize( vec3Set( vec3Create(), Math.cos( angle ), Math.sin( angle ), 0 ) );
 		data[ inx * 4 ] = ( randomVec.x * 0.5 + 0.5 ) * 255;
 		data[ inx * 4 + 1 ] = ( randomVec.y * 0.5 + 0.5 ) * 255;
 		data[ inx * 4 + 2 ] = 127;

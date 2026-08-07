@@ -1,10 +1,12 @@
 import {
 	InstancedBufferAttribute,
 	InstancedMesh,
-	Matrix4,
 	NodeMaterial,
 	SphereGeometry,
-	Vector3
+	mat4Create,
+	mat4MakeTranslation,
+	vec3Copy,
+	vec3Create
 } from 'three/webgpu';
 import { array, attribute, Fn, getShIrradianceAt, normalWorld, texture3D, uniform, vec3, vec4 } from 'three/tsl';
 
@@ -55,7 +57,7 @@ class LightProbeGridHelper extends InstancedMesh {
 		// Atlas and resolution are swappable uniforms, so the shading node builds once.
 
 		this._atlas = texture3D( probes.texture );
-		this._resolution = uniform( new Vector3() );
+		this._resolution = uniform( vec3Create() );
 
 		const nz = this._resolution.z;
 		const paddedSlices = nz.add( 2.0 );
@@ -113,8 +115,8 @@ class LightProbeGridHelper extends InstancedMesh {
 		this.count = count;
 
 		const uvwArray = new Float32Array( count * 3 );
-		const matrix = new Matrix4();
-		const probePos = new Vector3();
+		const matrix = mat4Create();
+		const probePos = vec3Create();
 
 		let i = 0;
 
@@ -130,7 +132,7 @@ class LightProbeGridHelper extends InstancedMesh {
 					uvwArray[ i * 3 + 2 ] = ( iz + 0.5 ) / res.z;
 
 					probes.getProbePosition( ix, iy, iz, probePos );
-					matrix.makeTranslation( probePos.x, probePos.y, probePos.z );
+					mat4MakeTranslation( probePos.x, probePos.y, probePos.z, matrix );
 					this.setMatrixAt( i, matrix );
 
 					i ++;
@@ -146,7 +148,7 @@ class LightProbeGridHelper extends InstancedMesh {
 		this.geometry.setAttribute( 'instanceUVW', new InstancedBufferAttribute( uvwArray, 3 ) );
 
 		this._atlas.value = probes.texture;
-		this._resolution.value.copy( res );
+		vec3Copy( res, this._resolution.value );
 
 	}
 

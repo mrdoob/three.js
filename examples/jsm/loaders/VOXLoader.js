@@ -1,18 +1,21 @@
 import {
 	BufferGeometry,
-	Color,
+	colorCreate,
+	colorSetRGB,
 	Data3DTexture,
 	FileLoader,
 	Float32BufferAttribute,
 	Group,
 	Loader,
 	LinearFilter,
-	Matrix4,
+	mat4Create,
+	mat4Set,
 	Mesh,
 	MeshStandardMaterial,
 	NearestFilter,
 	RedFormat,
-	SRGBColorSpace
+	SRGBColorSpace,
+	vec3Set
 } from 'three';
 
 // Helper function to read a STRING from the data view
@@ -102,8 +105,9 @@ function decodeRotation( byte ) {
 
 	// Apply coordinate change: swap Y and Z, negate new Z
 	// This is equivalent to: C * R * C^-1
-	const m = new Matrix4();
-	m.set(
+	const m = mat4Create();
+	mat4Set(
+		m,
 		r[ 0 ][ 0 ], r[ 0 ][ 2 ], - r[ 0 ][ 1 ], 0,
 		r[ 2 ][ 0 ], r[ 2 ][ 2 ], - r[ 2 ][ 1 ], 0,
 		- r[ 1 ][ 0 ], - r[ 1 ][ 2 ], r[ 1 ][ 1 ], 0,
@@ -136,7 +140,8 @@ function applyTransform( object, node ) {
 		if ( frame.translation ) {
 
 			// VOX uses Z-up, Three.js uses Y-up
-			object.position.set(
+			vec3Set(
+				object.position,
 				frame.translation.x,
 				frame.translation.z,
 				- frame.translation.y
@@ -632,7 +637,7 @@ function buildMesh( chunk ) {
 	const indices = [];
 	const colors = [];
 
-	const _color = new Color();
+	const _color = colorCreate();
 	let hasColors = false;
 
 	// Process each of the 6 face directions
@@ -756,7 +761,7 @@ function buildMesh( chunk ) {
 
 						if ( r > 0 || g > 0 || b > 0 ) hasColors = true;
 
-						_color.setRGB( r, g, b, SRGBColorSpace );
+						colorSetRGB( r, g, b, SRGBColorSpace, _color );
 
 						// Convert VOX coords to Three.js coords (Y-up)
 						// VOX: X right, Y forward, Z up -> Three.js: X right, Y up, Z back

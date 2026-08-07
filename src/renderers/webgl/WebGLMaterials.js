@@ -1,12 +1,15 @@
 import { BackSide } from '../../constants.js';
 import { getUnlitUniformColorSpace } from '../shaders/UniformsUtils.js';
-import { Matrix3 } from '../../math/Matrix3.js';
-import { Matrix4 } from '../../math/Matrix4.js';
+import { colorCopy, colorGetRGB, colorMultiplyScalar } from '../../math/ColorFunctions.js';
+import { mat3Copy, mat3Create, mat3PreMultiply, mat3Set, mat3SetFromMatrix4, mat3Transpose } from '../../math/Matrix3Functions.js';
+import { mat4Create, mat4MakeRotationFromEuler } from '../../math/Matrix4Functions.js';
+import { vec2Copy, vec2Negate, vec2Set } from '../../math/Vector2Functions.js';
+import { vec3SetFromMatrixPosition } from '../../math/Vector3Functions.js';
 
-const _m1 = /*@__PURE__*/ new Matrix4();
-const _m = /*@__PURE__*/ new Matrix3();
+const _m1 = /*@__PURE__*/ mat4Create();
+const _m = /*@__PURE__*/ mat3Create();
 
-_m.set( - 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 );
+mat3Set( _m, - 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 );
 
 function WebGLMaterials( renderer, properties ) {
 
@@ -18,13 +21,13 @@ function WebGLMaterials( renderer, properties ) {
 
 		}
 
-		uniform.value.copy( map.matrix );
+		mat3Copy( map.matrix, uniform.value );
 
 	}
 
 	function refreshFogUniforms( uniforms, fog ) {
 
-		fog.color.getRGB( uniforms.fogColor.value, getUnlitUniformColorSpace( renderer ) );
+		colorGetRGB( fog.color, uniforms.fogColor.value, getUnlitUniformColorSpace( renderer ) );
 
 		if ( fog.isFog ) {
 
@@ -124,7 +127,7 @@ function WebGLMaterials( renderer, properties ) {
 
 		} else if ( material.isShadowMaterial ) {
 
-			uniforms.color.value.copy( material.color );
+			colorCopy( material.color, uniforms.color.value );
 			uniforms.opacity.value = material.opacity;
 
 		} else if ( material.isShaderMaterial ) {
@@ -141,13 +144,14 @@ function WebGLMaterials( renderer, properties ) {
 
 		if ( material.color ) {
 
-			uniforms.diffuse.value.copy( material.color );
+			colorCopy( material.color, uniforms.diffuse.value );
 
 		}
 
 		if ( material.emissive ) {
 
-			uniforms.emissive.value.copy( material.emissive ).multiplyScalar( material.emissiveIntensity );
+			colorCopy( material.emissive, uniforms.emissive.value );
+			colorMultiplyScalar( uniforms.emissive.value, material.emissiveIntensity, uniforms.emissive.value );
 
 		}
 
@@ -189,11 +193,11 @@ function WebGLMaterials( renderer, properties ) {
 
 			refreshTransformUniform( material.normalMap, uniforms.normalMapTransform );
 
-			uniforms.normalScale.value.copy( material.normalScale );
+			vec2Copy( material.normalScale, uniforms.normalScale.value );
 
 			if ( material.side === BackSide ) {
 
-				uniforms.normalScale.value.negate();
+				vec2Negate( uniforms.normalScale.value, uniforms.normalScale.value );
 
 			}
 
@@ -242,12 +246,14 @@ function WebGLMaterials( renderer, properties ) {
 			uniforms.envMap.value = envMap;
 
 			// note: since the matrix is orthonormal, we can use the more-efficient transpose() in lieu of invert()
-			uniforms.envMapRotation.value.setFromMatrix4( _m1.makeRotationFromEuler( envMapRotation ) ).transpose();
+			mat4MakeRotationFromEuler( envMapRotation, _m1 );
+			mat3SetFromMatrix4( _m1, uniforms.envMapRotation.value );
+			mat3Transpose( uniforms.envMapRotation.value, uniforms.envMapRotation.value );
 
 
 			if ( envMap.isCubeTexture && envMap.isRenderTargetTexture === false ) {
 
-				uniforms.envMapRotation.value.premultiply( _m );
+				mat3PreMultiply( uniforms.envMapRotation.value, _m, uniforms.envMapRotation.value );
 
 			}
 
@@ -279,7 +285,7 @@ function WebGLMaterials( renderer, properties ) {
 
 	function refreshUniformsLine( uniforms, material ) {
 
-		uniforms.diffuse.value.copy( material.color );
+		colorCopy( material.color, uniforms.diffuse.value );
 		uniforms.opacity.value = material.opacity;
 
 		if ( material.map ) {
@@ -302,7 +308,7 @@ function WebGLMaterials( renderer, properties ) {
 
 	function refreshUniformsPoints( uniforms, material, pixelRatio, height ) {
 
-		uniforms.diffuse.value.copy( material.color );
+		colorCopy( material.color, uniforms.diffuse.value );
 		uniforms.opacity.value = material.opacity;
 		uniforms.size.value = material.size * pixelRatio;
 		uniforms.scale.value = height * 0.5;
@@ -333,7 +339,7 @@ function WebGLMaterials( renderer, properties ) {
 
 	function refreshUniformsSprites( uniforms, material ) {
 
-		uniforms.diffuse.value.copy( material.color );
+		colorCopy( material.color, uniforms.diffuse.value );
 		uniforms.opacity.value = material.opacity;
 		uniforms.rotation.value = material.rotation;
 
@@ -363,7 +369,7 @@ function WebGLMaterials( renderer, properties ) {
 
 	function refreshUniformsPhong( uniforms, material ) {
 
-		uniforms.specular.value.copy( material.specular );
+		colorCopy( material.specular, uniforms.specular.value );
 		uniforms.shininess.value = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
 
 	}
@@ -416,7 +422,8 @@ function WebGLMaterials( renderer, properties ) {
 
 		if ( material.sheen > 0 ) {
 
-			uniforms.sheenColor.value.copy( material.sheenColor ).multiplyScalar( material.sheen );
+			colorCopy( material.sheenColor, uniforms.sheenColor.value );
+			colorMultiplyScalar( uniforms.sheenColor.value, material.sheen, uniforms.sheenColor.value );
 
 			uniforms.sheenRoughness.value = material.sheenRoughness;
 
@@ -465,11 +472,11 @@ function WebGLMaterials( renderer, properties ) {
 
 				refreshTransformUniform( material.clearcoatNormalMap, uniforms.clearcoatNormalMapTransform );
 
-				uniforms.clearcoatNormalScale.value.copy( material.clearcoatNormalScale );
+				vec2Copy( material.clearcoatNormalScale, uniforms.clearcoatNormalScale.value );
 
 				if ( material.side === BackSide ) {
 
-					uniforms.clearcoatNormalScale.value.negate();
+					vec2Negate( uniforms.clearcoatNormalScale.value, uniforms.clearcoatNormalScale.value );
 
 				}
 
@@ -518,7 +525,7 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.transmission.value = material.transmission;
 			uniforms.transmissionSamplerMap.value = transmissionRenderTarget.texture;
-			uniforms.transmissionSamplerSize.value.set( transmissionRenderTarget.width, transmissionRenderTarget.height );
+			vec2Set( transmissionRenderTarget.width, transmissionRenderTarget.height, uniforms.transmissionSamplerSize.value );
 
 			if ( material.transmissionMap ) {
 
@@ -539,13 +546,13 @@ function WebGLMaterials( renderer, properties ) {
 			}
 
 			uniforms.attenuationDistance.value = material.attenuationDistance;
-			uniforms.attenuationColor.value.copy( material.attenuationColor );
+			colorCopy( material.attenuationColor, uniforms.attenuationColor.value );
 
 		}
 
 		if ( material.anisotropy > 0 ) {
 
-			uniforms.anisotropyVector.value.set( material.anisotropy * Math.cos( material.anisotropyRotation ), material.anisotropy * Math.sin( material.anisotropyRotation ) );
+			vec2Set( material.anisotropy * Math.cos( material.anisotropyRotation ), material.anisotropy * Math.sin( material.anisotropyRotation ), uniforms.anisotropyVector.value );
 
 			if ( material.anisotropyMap ) {
 
@@ -558,7 +565,7 @@ function WebGLMaterials( renderer, properties ) {
 		}
 
 		uniforms.specularIntensity.value = material.specularIntensity;
-		uniforms.specularColor.value.copy( material.specularColor );
+		colorCopy( material.specularColor, uniforms.specularColor.value );
 
 		if ( material.specularColorMap ) {
 
@@ -592,7 +599,7 @@ function WebGLMaterials( renderer, properties ) {
 
 		const light = properties.get( material ).light;
 
-		uniforms.referencePosition.value.setFromMatrixPosition( light.matrixWorld );
+		vec3SetFromMatrixPosition( light.matrixWorld, uniforms.referencePosition.value );
 		uniforms.nearDistance.value = light.shadow.camera.near;
 		uniforms.farDistance.value = light.shadow.camera.far;
 
