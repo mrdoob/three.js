@@ -9,6 +9,11 @@
 		<meta property="og:url" content="https://threejs.org/examples/webgpu_gaussian_splatting.html">
 		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_gaussian_splatting.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			#info > small#license {
+				top: 45px;
+			}
+		</style>
 	</head>
 	<body>
 
@@ -20,6 +25,7 @@
 			</div>
 
 			<small id="status">WebGPU TSL Gaussian splat renderer by <a href="https://ben3d.ca">Ben Houston</a>.</small>
+			<small id="license"></small>
 		</div>
 
 		<script type="importmap">
@@ -56,7 +62,13 @@
 					loader: SPLATLoader,
 					rotation: new THREE.Euler( - Math.PI * -1.10, Math.PI * -0.10, Math.PI * 0.15 ),
 					cameraPosition: new THREE.Vector3( 0, 0.4, 1 ),
-					note: 'CC Attribution scan by Fabian Plum, from superspl.at.'
+					credit: {
+						author: 'Fabian Plum',
+						authorUrl: 'https://superspl.at/user?id=scant3d',
+						source: 'https://superspl.at/scene/3d5482d4',
+						license: 'CC Attribution',
+						licenseUrl: 'http://creativecommons.org/licenses/by/4.0/'
+					}
 				},
 				lion: {
 					name: 'Lion (SPZ)',
@@ -64,7 +76,13 @@
 					loader: SPZLoader,
 					rotation: new THREE.Euler( Math.PI, 0, 0 ),
 					cameraPosition: new THREE.Vector3( 0, 0.2, 1 ),
-					note: 'CC Attribution scan by Renaud, from superspl.at.'
+					credit: {
+						author: 'Renaud',
+						authorUrl: 'https://superspl.at/user?id=rohls',
+						source: 'https://superspl.at/scene/56155c3f',
+						license: 'CC Attribution',
+						licenseUrl: 'http://creativecommons.org/licenses/by/4.0/'
+					}
 				}
 			};
 			const sourceNames = Object.values( sources ).map( ( source ) => source.name );
@@ -151,6 +169,26 @@
 				scene.add( splatRoot );
 
 				fitCameraToSplats( splats, source );
+
+				updateLicenseInfo( source );
+
+			}
+
+			function updateLicenseInfo( source ) {
+
+				const license = document.getElementById( 'license' );
+				const credit = source.credit;
+
+				if ( credit === undefined ) {
+
+					license.innerHTML = '';
+					return;
+
+				}
+
+				license.innerHTML = 'Model by <a href="' + credit.authorUrl + '" target="_blank" rel="noopener">' + credit.author + '</a>, ' +
+					'via <a href="' + credit.source + '" target="_blank" rel="noopener">superspl.at</a>. ' +
+					'Licensed under <a href="' + credit.licenseUrl + '" target="_blank" rel="noopener">' + credit.license + '</a>.';
 
 			}
 
