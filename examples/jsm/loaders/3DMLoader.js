@@ -261,14 +261,7 @@ class Rhino3dmLoader extends Loader {
 	 */
 	parse( data, onLoad, onError ) {
 
-		this.decodeObjects( data, '' )
-			.then( result => {
-
-				result.userData.warnings = this.warnings;
-				onLoad( result );
-
-			} )
-			.catch( e => onError( e ) );
+		this.parseAsync( data ).then( onLoad ).catch( onError );
 
 	}
 
@@ -1143,7 +1136,7 @@ function Rhino3dmWorker() {
 
 				taskID = message.id;
 				const buffer = message.buffer;
-				const subdivisionLevel = message.subdivisionLevel != null ? message.subdivisionLevel : 3;
+				const subdivisionLevel = message.subdivisionLevel;
 				libraryPending.then( () => {
 
 					try {
