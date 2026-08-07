@@ -3,6 +3,7 @@ import { Matrix4 } from '../math/Matrix4.js';
 import { Object3D } from '../core/Object3D.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Quaternion } from '../math/Quaternion.js';
+import { mat4Compose, mat4Copy, mat4Decompose, mat4Invert } from '../math/Matrix4Functions.js';
 
 const _position = /*@__PURE__*/ new Vector3();
 const _quaternion = /*@__PURE__*/ new Quaternion();
@@ -113,19 +114,7 @@ class Camera extends Object3D {
 
 		super.updateMatrixWorld( force );
 
-		// exclude scale from view matrix to be glTF conform
-
-		this.matrixWorld.decompose( _position, _quaternion, _scale );
-
-		if ( _scale.x === 1 && _scale.y === 1 && _scale.z === 1 ) {
-
-			this.matrixWorldInverse.copy( this.matrixWorld ).invert();
-
-		} else {
-
-			this.matrixWorldInverse.compose( _position, _quaternion, _scale.set( 1, 1, 1 ) ).invert();
-
-		}
+		this._updateMatrixWorldInverse();
 
 	}
 
@@ -133,17 +122,26 @@ class Camera extends Object3D {
 
 		super.updateWorldMatrix( updateParents, updateChildren, force );
 
+		this._updateMatrixWorldInverse();
+
+	}
+
+	_updateMatrixWorldInverse() {
+
 		// exclude scale from view matrix to be glTF conform
 
-		this.matrixWorld.decompose( _position, _quaternion, _scale );
+		mat4Decompose( this.matrixWorld, _position, _quaternion, _scale );
 
 		if ( _scale.x === 1 && _scale.y === 1 && _scale.z === 1 ) {
 
-			this.matrixWorldInverse.copy( this.matrixWorld ).invert();
+			mat4Copy( this.matrixWorld, this.matrixWorldInverse );
+			mat4Invert( this.matrixWorldInverse, this.matrixWorldInverse );
 
 		} else {
 
-			this.matrixWorldInverse.compose( _position, _quaternion, _scale.set( 1, 1, 1 ) ).invert();
+			_scale.set( 1, 1, 1 );
+			mat4Compose( _position, _quaternion, _scale, this.matrixWorldInverse );
+			mat4Invert( this.matrixWorldInverse, this.matrixWorldInverse );
 
 		}
 

@@ -2,6 +2,7 @@ import { Camera } from './Camera.js';
 import { RAD2DEG, DEG2RAD } from '../math/MathUtils.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
+import { mat4Invert, mat4MakePerspective } from '../math/Matrix4Functions.js';
 
 const _v3 = /*@__PURE__*/ new Vector3();
 const _minTarget = /*@__PURE__*/ new Vector2();
@@ -374,9 +375,9 @@ class PerspectiveCamera extends Camera {
 		const skew = this.filmOffset;
 		if ( skew !== 0 ) left += near * skew / this.getFilmWidth();
 
-		this.projectionMatrix.makePerspective( left, left + width, top, top - height, near, this.far, this.coordinateSystem, this.reversedDepth );
+		mat4MakePerspective( left, left + width, top, top - height, near, this.far, this.coordinateSystem, this.reversedDepth, this.projectionMatrix );
 
-		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
+		mat4Invert( this.projectionMatrix, this.projectionMatrixInverse );
 
 	}
 

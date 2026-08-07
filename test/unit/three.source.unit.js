@@ -195,6 +195,7 @@ import './src/math/Line3.tests.js';
 import './src/math/MathUtils.tests.js';
 import './src/math/Matrix3.tests.js';
 import './src/math/Matrix4.tests.js';
+import './src/math/Matrix4Functions.tests.js';
 import './src/math/Plane.tests.js';
 import './src/math/Quaternion.tests.js';
 import './src/math/Ray.tests.js';

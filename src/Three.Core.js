@@ -123,6 +123,45 @@ export { FrustumArray } from './math/FrustumArray.js';
 export { Sphere } from './math/Sphere.js';
 export { Ray } from './math/Ray.js';
 export { Matrix4 } from './math/Matrix4.js';
+export {
+	mat4Compose,
+	mat4Copy,
+	mat4CopyPosition,
+	mat4Create,
+	mat4Decompose,
+	mat4Determinant,
+	mat4DeterminantAffine,
+	mat4Equals,
+	mat4ExtractBasis,
+	mat4ExtractRotation,
+	mat4FromArray,
+	mat4GetMaxScaleOnAxis,
+	mat4Identity,
+	mat4Invert,
+	mat4LookAt,
+	mat4MakeBasis,
+	mat4MakeOrthographic,
+	mat4MakePerspective,
+	mat4MakeRotationAxis,
+	mat4MakeRotationFromEuler,
+	mat4MakeRotationFromQuaternion,
+	mat4MakeRotationX,
+	mat4MakeRotationY,
+	mat4MakeRotationZ,
+	mat4MakeScale,
+	mat4MakeShear,
+	mat4MakeTranslation,
+	mat4Multiply,
+	mat4MultiplyMatrices,
+	mat4MultiplyScalar,
+	mat4PreMultiply,
+	mat4Scale,
+	mat4Set,
+	mat4SetFromMatrix3,
+	mat4SetPosition,
+	mat4ToArray,
+	mat4Transpose
+} from './math/Matrix4Functions.js';
 export { Matrix3 } from './math/Matrix3.js';
 export { Matrix2 } from './math/Matrix2.js';
 export { Box3 } from './math/Box3.js';

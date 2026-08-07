@@ -7,6 +7,7 @@ import { Layers } from './Layers.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { generateUUID } from '../math/MathUtils.js';
 import { error } from '../utils.js';
+import { mat4Compose, mat4Copy, mat4MultiplyMatrices } from '../math/Matrix4Functions.js';
 
 let _object3DId = 0;
 
@@ -1143,7 +1144,7 @@ class Object3D extends EventDispatcher {
 	 */
 	updateMatrix() {
 
-		this.matrix.compose( this.position, this.quaternion, this.scale );
+		mat4Compose( this.position, this.quaternion, this.scale, this.matrix );
 
 		const pivot = this.pivot;
 
@@ -1183,11 +1184,11 @@ class Object3D extends EventDispatcher {
 
 				if ( this.parent === null ) {
 
-					this.matrixWorld.copy( this.matrix );
+					mat4Copy( this.matrix, this.matrixWorld );
 
 				} else {
 
-					this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+					mat4MultiplyMatrices( this.parent.matrixWorld, this.matrix, this.matrixWorld );
 
 				}
 
@@ -1240,11 +1241,11 @@ class Object3D extends EventDispatcher {
 
 				if ( this.parent === null ) {
 
-					this.matrixWorld.copy( this.matrix );
+					mat4Copy( this.matrix, this.matrixWorld );
 
 				} else {
 
-					this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+					mat4MultiplyMatrices( this.parent.matrixWorld, this.matrix, this.matrixWorld );
 
 				}
 

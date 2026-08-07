@@ -1,4 +1,5 @@
 import { Camera } from './Camera.js';
+import { mat4Invert, mat4MakeOrthographic } from '../math/Matrix4Functions.js';
 
 /**
  * Camera that uses [orthographic projection](https://en.wikipedia.org/wiki/Orthographic_projection).
@@ -216,9 +217,9 @@ class OrthographicCamera extends Camera {
 
 		}
 
-		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far, this.coordinateSystem, this.reversedDepth );
+		mat4MakeOrthographic( left, right, top, bottom, this.near, this.far, this.coordinateSystem, this.reversedDepth, this.projectionMatrix );
 
-		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
+		mat4Invert( this.projectionMatrix, this.projectionMatrixInverse );
 
 	}
 
