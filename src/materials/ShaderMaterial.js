@@ -389,6 +389,11 @@ class ShaderMaterial extends Material {
 		data.lights = this.lights;
 		data.clipping = this.clipping;
 
+		// these defaults differ from Material so its toJSON() would omit the opposite value
+
+		data.fog = this.fog;
+		data.forceSinglePass = this.forceSinglePass;
+
 		const extensions = {};
 
 		for ( const key in this.extensions ) {

@@ -86,6 +86,18 @@ class ShadowMaterial extends Material {
 
 	}
 
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		// transparent defaults to true here so Material.toJSON() would omit a false value
+
+		data.transparent = this.transparent;
+
+		return data;
+
+	}
+
 }
 
 export { ShadowMaterial };
