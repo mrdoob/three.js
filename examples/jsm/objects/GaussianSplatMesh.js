@@ -1,6 +1,5 @@
 import {
 	BufferAttribute,
-	DynamicDrawUsage,
 	InstancedBufferGeometry,
 	Matrix4,
 	Mesh,
@@ -14,11 +13,7 @@ import {
 	Discard,
 	Fn,
 	If,
-	Loop,
 	atan,
-	atomicAdd,
-	atomicLoad,
-	atomicStore,
 	cameraProjectionMatrix,
 	cos,
 	dot,
@@ -40,6 +35,8 @@ import {
 	vec3,
 	vec4
 } from 'three/tsl';
+
+import { CountingSort } from '../gpgpu/CountingSort.js';
 
 const BIN_COUNT = 4096;
 const WORKGROUP_SIZE = 256;
@@ -93,7 +90,8 @@ class GaussianSplatMesh extends Mesh {
 
 		const geometry = createGeometry( count );
 		const buffers = createStorageBuffers( count, positionAttribute.array, covarianceAttribute.array, colorAttribute.array );
-		const material = createMaterial( buffers );
+		const sort = new CountingSort( count, { binCount: BIN_COUNT, workgroupSize: WORKGROUP_SIZE } );
+		const material = createMaterial( buffers, sort );
 
 		super( geometry, material );
 
@@ -125,17 +123,30 @@ class GaussianSplatMesh extends Mesh {
 		this.frustumCulled = false;
 
 		this._buffers = buffers;
+		this._sort = sort;
 		this._sortMatrix = uniform( new Matrix4() );
 		this._sortDepthRange = uniform( new Vector2( 0, 1 ) );
 		this._sortInitialized = false;
 		this._lastSortPosition = new Vector3( Infinity, Infinity, Infinity );
 		this._lastSortDirection = new Vector3( 0, 0, - 1 );
 		this._positionAttribute = positionAttribute;
-		this._webGLSortBins = new Uint32Array( count );
-		this._webGLSortCounts = new Uint32Array( BIN_COUNT );
-		this._webGLSortOffsets = new Uint32Array( BIN_COUNT );
 
-		createSortNodes( this );
+		const centerRead = buffers.centerRead;
+		const sortMatrix = this._sortMatrix;
+		const sortDepthRange = this._sortDepthRange;
+
+		sort.setBinNode( () => {
+
+			const center = centerRead.element( instanceIndex ).xyz.toVar( 'center' );
+			const viewCenter = sortMatrix.mul( vec4( center, 1 ) ).xyz.toVar( 'viewCenter' );
+			const depth = viewCenter.z.negate().toVar( 'depth' );
+			const range = max( sortDepthRange.y.sub( sortDepthRange.x ), 0.0001 ).toVar( 'range' );
+			const normalized = depth.sub( sortDepthRange.x ).div( range ).clamp( 0, 1 ).toVar( 'normalized' );
+			const depthBin = uint( normalized.mul( BIN_COUNT - 1 ) ).toVar( 'depthBin' );
+
+			return uint( BIN_COUNT - 1 ).sub( depthBin );
+
+		} );
 
 		this.onBeforeRender = ( renderer, scene, camera ) => {
 
@@ -165,14 +176,12 @@ class GaussianSplatMesh extends Mesh {
 			if ( renderer.backend && renderer.backend.isWebGLBackend === true ) {
 
 				enableWebGLBuffers( this._buffers );
+				this._sort.enableWebGLBuffers();
 				this._sortCPU();
 
 			} else {
 
-				renderer.compute( this._resetHistogramNode );
-				renderer.compute( this._histogramNode );
-				renderer.compute( this._prefixNode );
-				renderer.compute( this._scatterNode );
+				this._sort.compute( renderer );
 
 			}
 
@@ -230,53 +239,21 @@ class GaussianSplatMesh extends Mesh {
 
 	_sortCPU() {
 
-		const buffers = this._buffers;
 		const centers = this._positionAttribute.array;
-		const order = buffers.orderAttribute.array;
-		const bins = this._webGLSortBins;
-		const counts = this._webGLSortCounts;
-		const offsets = this._webGLSortOffsets;
 		const matrix = this._sortMatrix.value.elements;
 		const nearDepth = this._sortDepthRange.value.x;
 		const range = Math.max( this._sortDepthRange.value.y - nearDepth, 0.0001 );
 		const scale = ( BIN_COUNT - 1 ) / range;
 
-		counts.fill( 0 );
-
-		for ( let i = 0, l = buffers.count; i < l; i ++ ) {
+		this._sort.computeCPU( ( i ) => {
 
 			const i3 = i * 3;
 			const depth = - ( matrix[ 2 ] * centers[ i3 ] + matrix[ 6 ] * centers[ i3 + 1 ] + matrix[ 10 ] * centers[ i3 + 2 ] + matrix[ 14 ] );
 			const depthBin = Math.min( BIN_COUNT - 1, Math.max( 0, Math.floor( ( depth - nearDepth ) * scale ) ) );
-			const bin = BIN_COUNT - 1 - depthBin;
 
-			bins[ i ] = bin;
-			counts[ bin ] ++;
+			return BIN_COUNT - 1 - depthBin;
 
-		}
-
-		let sum = 0;
-
-		for ( let i = 0; i < BIN_COUNT; i ++ ) {
-
-			offsets[ i ] = sum;
-			sum += counts[ i ];
-
-		}
-
-		for ( let i = 0, l = buffers.count; i < l; i ++ ) {
-
-			order[ offsets[ bins[ i ] ] ++ ] = i;
-
-		}
-
-		buffers.orderAttribute.needsUpdate = true;
-
-		if ( buffers.orderAttribute.pbo !== undefined ) {
-
-			buffers.orderAttribute.pbo.needsUpdate = true;
-
-		}
+		} );
 
 	}
 
@@ -304,8 +281,6 @@ function createStorageBuffers( count, centers, covariances, colors ) {
 	const covarianceAData = new Float32Array( count * 4 );
 	const covarianceBData = new Float32Array( count * 4 );
 	const colorData = new Float32Array( count * 4 );
-	const orderData = new Uint32Array( count );
-	const binData = new Uint32Array( count );
 
 	for ( let i = 0; i < count; i ++ ) {
 
@@ -330,33 +305,20 @@ function createStorageBuffers( count, centers, covariances, colors ) {
 		colorData[ i4 + 2 ] = colors[ i4 + 2 ] / 255;
 		colorData[ i4 + 3 ] = colors[ i4 + 3 ] / 255;
 
-		orderData[ i ] = i;
-
 	}
 
 	const centerAttribute = new StorageBufferAttribute( centerData, 4 );
 	const covarianceAAttribute = new StorageBufferAttribute( covarianceAData, 4 );
 	const covarianceBAttribute = new StorageBufferAttribute( covarianceBData, 4 );
 	const colorAttribute = new StorageBufferAttribute( colorData, 4 );
-	const orderAttribute = new StorageBufferAttribute( orderData, 1, Uint32Array );
-	const binAttribute = new StorageBufferAttribute( binData, 1, Uint32Array );
-	const histogramAttribute = new StorageBufferAttribute( new Uint32Array( BIN_COUNT ), 1, Uint32Array );
-	const offsetAttribute = new StorageBufferAttribute( new Uint32Array( BIN_COUNT ), 1, Uint32Array );
 
 	return {
 		count,
-		orderAttribute,
 		webGLBuffersEnabled: false,
 		centerRead: storage( centerAttribute, 'vec4', count ).toReadOnly(),
 		covarianceARead: storage( covarianceAAttribute, 'vec4', count ).toReadOnly(),
 		covarianceBRead: storage( covarianceBAttribute, 'vec4', count ).toReadOnly(),
-		colorRead: storage( colorAttribute, 'vec4', count ).toReadOnly(),
-		orderRead: storage( orderAttribute, 'uint', count ).toReadOnly(),
-		orderWrite: storage( orderAttribute, 'uint', count ),
-		binRead: storage( binAttribute, 'uint', count ).toReadOnly(),
-		binWrite: storage( binAttribute, 'uint', count ),
-		histogramAtomic: storage( histogramAttribute, 'uint', BIN_COUNT ).toAtomic(),
-		offsetAtomic: storage( offsetAttribute, 'uint', BIN_COUNT ).toAtomic()
+		colorRead: storage( colorAttribute, 'vec4', count ).toReadOnly()
 	};
 
 }
@@ -365,24 +327,22 @@ function enableWebGLBuffers( buffers ) {
 
 	if ( buffers.webGLBuffersEnabled === true ) return;
 
-	buffers.orderAttribute.setUsage( DynamicDrawUsage );
 	buffers.centerRead.setPBO( true );
 	buffers.covarianceARead.setPBO( true );
 	buffers.covarianceBRead.setPBO( true );
 	buffers.colorRead.setPBO( true );
-	buffers.orderRead.setPBO( true );
 	buffers.webGLBuffersEnabled = true;
 
 }
 
-function createMaterial( buffers ) {
+function createMaterial( buffers, sort ) {
 
 	const splatUv = varyingProperty( 'vec2', 'vSplatUv' );
 	const splatColor = varyingProperty( 'vec4', 'vSplatColor' );
 
 	const vertexNode = Fn( () => {
 
-		const splatIndex = buffers.orderRead.element( instanceIndex ).toVar( 'splatIndex' );
+		const splatIndex = sort.orderRead.element( instanceIndex ).toVar( 'splatIndex' );
 		const center = buffers.centerRead.element( splatIndex ).xyz.toVar( 'center' );
 		const covA = buffers.covarianceARead.element( splatIndex ).toVar( 'covA' );
 		const covB = buffers.covarianceBRead.element( splatIndex ).toVar( 'covB' );
@@ -508,58 +468,6 @@ function createMaterial( buffers ) {
 	material.fog = false;
 
 	return material;
-
-}
-
-function createSortNodes( mesh ) {
-
-	const { _buffers: buffers } = mesh;
-	const sortMatrix = mesh._sortMatrix;
-	const sortDepthRange = mesh._sortDepthRange;
-
-	mesh._resetHistogramNode = Fn( () => {
-
-		atomicStore( buffers.histogramAtomic.element( instanceIndex ), uint( 0 ) );
-		atomicStore( buffers.offsetAtomic.element( instanceIndex ), uint( 0 ) );
-
-	} )().compute( BIN_COUNT, [ WORKGROUP_SIZE ] ).setName( 'GaussianSplatSortReset' );
-
-	mesh._histogramNode = Fn( () => {
-
-		const center = buffers.centerRead.element( instanceIndex ).xyz.toVar( 'center' );
-		const viewCenter = sortMatrix.mul( vec4( center, 1 ) ).xyz.toVar( 'viewCenter' );
-		const depth = viewCenter.z.negate().toVar( 'depth' );
-		const range = max( sortDepthRange.y.sub( sortDepthRange.x ), 0.0001 ).toVar( 'range' );
-		const normalized = depth.sub( sortDepthRange.x ).div( range ).clamp( 0, 1 ).toVar( 'normalized' );
-		const depthBin = uint( normalized.mul( BIN_COUNT - 1 ) ).toVar( 'depthBin' );
-		const bin = uint( BIN_COUNT - 1 ).sub( depthBin ).toVar( 'bin' );
-
-		buffers.binWrite.element( instanceIndex ).assign( bin );
-		atomicAdd( buffers.histogramAtomic.element( bin ), uint( 1 ) );
-
-	} )().compute( buffers.count, [ WORKGROUP_SIZE ] ).setName( 'GaussianSplatSortHistogram' );
-
-	mesh._prefixNode = Fn( () => {
-
-		const sum = uint( 0 ).toVar( 'sum' );
-
-		Loop( { start: 0, end: BIN_COUNT, type: 'uint', name: 'bin', condition: '<' }, ( { bin } ) => {
-
-			const count = atomicLoad( buffers.histogramAtomic.element( bin ) ).toVar( 'count' );
-			atomicStore( buffers.offsetAtomic.element( bin ), sum );
-			sum.addAssign( count );
-
-		} );
-
-	} )().compute( 1 ).setName( 'GaussianSplatSortPrefix' );
-
-	mesh._scatterNode = Fn( () => {
-
-		const bin = buffers.binRead.element( instanceIndex ).toVar( 'bin' );
-		const targetIndex = atomicAdd( buffers.offsetAtomic.element( bin ), uint( 1 ) ).toVar( 'targetIndex' );
-		buffers.orderWrite.element( targetIndex ).assign( instanceIndex );
-
-	} )().compute( buffers.count, [ WORKGROUP_SIZE ] ).setName( 'GaussianSplatSortScatter' );
 
 }
 
