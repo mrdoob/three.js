@@ -39,6 +39,19 @@ import {
 class Matrix2 {
 
 	/**
+	 * This flag can be used for type testing.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 * @default true
+	 */
+	get isMatrix2() {
+
+		return true;
+
+	}
+
+	/**
 	 * Constructs a new 2x2 matrix. The arguments are supposed to be
 	 * in row-major order. If no arguments are provided, the constructor
 	 * initializes the matrix as an identity matrix.
@@ -49,15 +62,6 @@ class Matrix2 {
 	 * @param {number} [n22] - 2-2 matrix element.
 	 */
 	constructor( n11, n12, n21, n22 ) {
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		Object.defineProperty( this, 'isMatrix2', { value: true } );
 
 		/**
 		 * A column-major list of matrix values.

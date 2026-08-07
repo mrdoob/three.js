@@ -62,6 +62,19 @@ import {
 class Matrix3 {
 
 	/**
+	 * This flag can be used for type testing.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 * @default true
+	 */
+	get isMatrix3() {
+
+		return true;
+
+	}
+
+	/**
 	 * Constructs a new 3x3 matrix. The arguments are supposed to be
 	 * in row-major order. If no arguments are provided, the constructor
 	 * initializes the matrix as an identity matrix.
@@ -77,15 +90,6 @@ class Matrix3 {
 	 * @param {number} [n33] - 3-3 matrix element.
 	 */
 	constructor( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		Object.defineProperty( this, 'isMatrix3', { value: true } );
 
 		/**
 		 * A column-major list of matrix values.

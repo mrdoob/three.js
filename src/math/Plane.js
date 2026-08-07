@@ -36,21 +36,25 @@ import {
 class Plane {
 
 	/**
+	 * This flag can be used for type testing.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 * @default true
+	 */
+	get isPlane() {
+
+		return true;
+
+	}
+
+	/**
 	 * Constructs a new plane.
 	 *
 	 * @param {Vector3} [normal=(1,0,0)] - A unit length vector defining the normal of the plane.
 	 * @param {number} [constant=0] - The signed distance from the origin to the plane.
 	 */
 	constructor( normal = new Vector3( 1, 0, 0 ), constant = 0 ) {
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		Object.defineProperty( this, 'isPlane', { value: true } );
 
 		/**
 		 * A unit length vector defining the normal of the plane.

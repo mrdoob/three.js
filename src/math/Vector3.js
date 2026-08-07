@@ -107,6 +107,19 @@ import {
 class Vector3 {
 
 	/**
+	 * This flag can be used for type testing.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 * @default true
+	 */
+	get isVector3() {
+
+		return true;
+
+	}
+
+	/**
 	 * Constructs a new 3D vector.
 	 *
 	 * @param {number} [x=0] - The x value of this vector.
@@ -114,15 +127,6 @@ class Vector3 {
 	 * @param {number} [z=0] - The z value of this vector.
 	 */
 	constructor( x = 0, y = 0, z = 0 ) {
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		Object.defineProperty( this, 'isVector3', { value: true } );
 
 		/**
 		 * The x value of this vector.

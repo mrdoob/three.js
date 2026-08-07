@@ -81,6 +81,19 @@ import {
 class Vector4 {
 
 	/**
+	 * This flag can be used for type testing.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 * @default true
+	 */
+	get isVector4() {
+
+		return true;
+
+	}
+
+	/**
 	 * Constructs a new 4D vector.
 	 *
 	 * @param {number} [x=0] - The x value of this vector.
@@ -89,15 +102,6 @@ class Vector4 {
 	 * @param {number} [w=1] - The w value of this vector.
 	 */
 	constructor( x = 0, y = 0, z = 0, w = 1 ) {
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		Object.defineProperty( this, 'isVector4', { value: true } );
 
 		/**
 		 * The x value of this vector.

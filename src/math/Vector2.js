@@ -84,21 +84,25 @@ import {
 class Vector2 {
 
 	/**
+	 * This flag can be used for type testing.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 * @default true
+	 */
+	get isVector2() {
+
+		return true;
+
+	}
+
+	/**
 	 * Constructs a new 2D vector.
 	 *
 	 * @param {number} [x=0] - The x value of this vector.
 	 * @param {number} [y=0] - The y value of this vector.
 	 */
 	constructor( x = 0, y = 0 ) {
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		Object.defineProperty( this, 'isVector2', { value: true } );
 
 		/**
 		 * The x value of this vector.

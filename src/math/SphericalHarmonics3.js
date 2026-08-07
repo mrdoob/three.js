@@ -31,18 +31,22 @@ import {
 class SphericalHarmonics3 {
 
 	/**
+	 * This flag can be used for type testing.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 * @default true
+	 */
+	get isSphericalHarmonics3() {
+
+		return true;
+
+	}
+
+	/**
 	 * Constructs a new spherical harmonics.
 	 */
 	constructor() {
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		Object.defineProperty( this, 'isSphericalHarmonics3', { value: true } );
 
 		/**
 		 * An array holding the (9) SH coefficients.
