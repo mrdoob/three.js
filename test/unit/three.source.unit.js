@@ -266,6 +266,9 @@ import './src/renderers/webgl/WebGLTextures.tests.js';
 import './src/renderers/webgl/WebGLUniforms.tests.js';
 import './src/renderers/webgl/WebGLUtils.tests.js';
 
+//src/renderers/webgpu
+import './src/renderers/webgpu/WGSLNodeBuilder.tests.js';
+
 
 //src/scenes
 import './src/scenes/Fog.tests.js';

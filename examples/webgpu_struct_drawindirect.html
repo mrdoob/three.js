@@ -142,21 +142,19 @@
 					offset: 'uint'
 				}, 'DrawBuffer' );
 
-				const drawStorage = storage( drawBuffer, drawBufferStruct, drawBuffer.count );
+				const drawInfo = storage( drawBuffer, drawBufferStruct, drawBuffer.count ).element( 0 );
 
 				computeDrawBuffer = Fn( () => {
 
 					const halfTime = sin( time.mul( 0.5 ) );
 
 					const instanceCount = max( ( pow( halfTime.add( 1 ), 4.0 ) ).mul( instances ), 100 ).toVar( 'instanceCount' );
-					atomicStore( drawStorage.get( 'instanceCount' ), instanceCount );
+					atomicStore( drawInfo.get( 'instanceCount' ), instanceCount );
 			
 				} )().compute( instances );
 
 				computeInitDrawBuffer = Fn( () => {
 
-					const drawInfo = drawStorage;
-			
 					drawInfo.get( 'vertexCount' ).assign( 3 );
 					atomicStore( drawInfo.get( 'instanceCount' ), uint( 0 ) );
 					drawInfo.get( 'firstVertex' ).assign( 0 );
