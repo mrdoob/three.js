@@ -2280,6 +2280,10 @@ class NodeBuilder {
 		let property = this.getPropertyName( node );
 		let index = 1;
 
+		// If this exact node is already registered under its current name, skip — it's a re-registration, not a conflict.
+
+		if ( declarations[ property ] === node ) return;
+
 		// Automatically renames the property if the name is already in use or reserved.
 
 		while ( ( checkKeywords && this.isReservedKeyword( name ) ) || declarations[ property ] !== undefined ) {
