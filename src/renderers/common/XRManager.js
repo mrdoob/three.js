@@ -17,6 +17,7 @@ import { Mesh } from '../../objects/Mesh.js';
 import { warn, warnOnce } from '../../utils.js';
 import { renderOutput } from '../../nodes/display/RenderOutputNode.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
+import { context } from '../../nodes/core/ContextNode.js';
 
 const _cameraLPos = /*@__PURE__*/ new Vector3();
 const _cameraRPos = /*@__PURE__*/ new Vector3();
@@ -1125,13 +1126,15 @@ class XRManager extends EventDispatcher {
 
 					// Apply ToneMapping and OutputColorSpace directly in the material shader
 
-					contextNode = currentContextNode.context( {
+					contextNode = context( {
 
 						getOutput: ( outputNode ) => {
 
 							return renderOutput( outputNode, renderer.toneMapping, renderer.outputColorSpace );
 
-						}
+						},
+
+						... currentContextNode.getFlowContextData()
 
 					} );
 

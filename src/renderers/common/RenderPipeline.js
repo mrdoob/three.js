@@ -169,6 +169,46 @@ class RenderPipeline {
 	}
 
 	/**
+	 * Updates the context data.
+	 *
+	 * @private
+	 */
+	_updateContext() {
+
+		const toneMapping = this._toneMapping;
+		const outputColorSpace = this._outputColorSpace;
+
+		const contextData = {
+			renderPipeline: this,
+			renderPipelineState: {
+				viewOffsetOwner: null
+			},
+			onBeforePipelineCallbacks: [],
+			onAfterPipelineCallbacks: []
+		};
+
+		let outputNode = this.outputNode;
+
+		if ( this.outputColorTransform === true ) {
+
+			outputNode = renderOutput( outputNode, toneMapping, outputColorSpace );
+
+		} else {
+
+			contextData.toneMapping = toneMapping;
+			contextData.outputColorSpace = outputColorSpace;
+
+		}
+
+		this._contextData = contextData;
+
+		this._quadMesh.material.contextNode = context( contextData );
+		this._quadMesh.material.fragmentNode = outputNode;
+		this._quadMesh.material.needsUpdate = true;
+
+	}
+
+	/**
 	 * Updates the state of the module.
 	 *
 	 * @private
@@ -191,36 +231,7 @@ class RenderPipeline {
 
 		if ( this.needsUpdate === true ) {
 
-			const toneMapping = this._toneMapping;
-			const outputColorSpace = this._outputColorSpace;
-
-			const contextData = {
-				renderPipeline: this,
-				renderPipelineState: {
-					viewOffsetOwner: null
-				},
-				onBeforePipelineCallbacks: [],
-				onAfterPipelineCallbacks: []
-			};
-
-			let outputNode = this.outputNode;
-
-			if ( this.outputColorTransform === true ) {
-
-				outputNode = renderOutput( outputNode, toneMapping, outputColorSpace );
-
-			} else {
-
-				contextData.toneMapping = toneMapping;
-				contextData.outputColorSpace = outputColorSpace;
-
-			}
-
-			this._contextData = contextData;
-
-			this._quadMesh.material.contextNode = context( contextData );
-			this._quadMesh.material.fragmentNode = outputNode;
-			this._quadMesh.material.needsUpdate = true;
+			this._updateContext();
 
 			this.needsUpdate = false;
 
