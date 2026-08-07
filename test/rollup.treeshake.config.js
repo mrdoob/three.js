@@ -127,5 +127,31 @@ export default [
 				file: 'test/treeshake/index.webgpu.nodes.bundle.min.js'
 			}
 		]
+	},
+	{
+		input: 'test/treeshake/index.matrix4functions.js',
+		plugins: [
+			resolve()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'test/treeshake/index.matrix4functions.bundle.js'
+			}
+		]
+	},
+	{
+		input: 'test/treeshake/index.matrix4functions.js',
+		plugins: [
+			resolve(),
+			terser(),
+			filesize()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'test/treeshake/index.matrix4functions.bundle.min.js'
+			}
+		]
 	}
 ];

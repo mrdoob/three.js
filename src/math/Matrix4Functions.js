@@ -1109,21 +1109,16 @@ export function mat4Decompose( m, position, quaternion, scale ) {
 	const invSY = 1 / sy;
 	const invSZ = 1 / sz;
 
-	// scale the rotation part into a plain matrix-like object, avoiding any class dependency
-	const rotation = {
+	// scale the rotation part into a shared, plain matrix-like scratch object so this
+	// allocation-free hot path (e.g. Camera#updateMatrixWorld) does not depend on Matrix4
+	const re = _decomposeRotation.elements;
 
-		elements: [
+	re[ 0 ] = te[ 0 ] * invSX; re[ 1 ] = te[ 1 ] * invSX; re[ 2 ] = te[ 2 ] * invSX; re[ 3 ] = 0;
+	re[ 4 ] = te[ 4 ] * invSY; re[ 5 ] = te[ 5 ] * invSY; re[ 6 ] = te[ 6 ] * invSY; re[ 7 ] = 0;
+	re[ 8 ] = te[ 8 ] * invSZ; re[ 9 ] = te[ 9 ] * invSZ; re[ 10 ] = te[ 10 ] * invSZ; re[ 11 ] = 0;
+	re[ 12 ] = 0; re[ 13 ] = 0; re[ 14 ] = 0; re[ 15 ] = 1;
 
-			te[ 0 ] * invSX, te[ 1 ] * invSX, te[ 2 ] * invSX, 0,
-			te[ 4 ] * invSY, te[ 5 ] * invSY, te[ 6 ] * invSY, 0,
-			te[ 8 ] * invSZ, te[ 9 ] * invSZ, te[ 10 ] * invSZ, 0,
-			0, 0, 0, 1
-
-		]
-
-	};
-
-	quaternion.setFromRotationMatrix( rotation );
+	quaternion.setFromRotationMatrix( _decomposeRotation );
 
 	scale.x = sx;
 	scale.y = sy;
@@ -1336,5 +1331,6 @@ export function mat4ToArray( m, array = [], offset = 0 ) {
 
 }
 
-const _zero = /*@__PURE__*/ { x: 0, y: 0, z: 0 };
-const _one = /*@__PURE__*/ { x: 1, y: 1, z: 1 };
+const _zero = { x: 0, y: 0, z: 0 };
+const _one = { x: 1, y: 1, z: 1 };
+const _decomposeRotation = /*@__PURE__*/ mat4Create();
