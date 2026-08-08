@@ -17,7 +17,6 @@ import {
 	cameraProjectionMatrix,
 	cos,
 	dot,
-	exp,
 	float,
 	highpModelViewMatrix,
 	instanceIndex,
@@ -454,7 +453,16 @@ function createMaterial( buffers, sort ) {
 
 		} );
 
-		return vec4( splatColor.rgb, exp( r2.mul( - 0.5 ) ).mul( splatColor.a ) );
+		// Using a polynomial approximation to avoid stalls on mobile devices per:
+		// https://arxiv.org/html/2603.18707
+		// We use a quadratic rather than their
+		// recommended first-order fit because our discard cutoff above already limits the
+		// domain to r2 <= 4 (tighter than their 1/255-alpha cutoff of r2 <= 11.1); over
+		// this narrower range a constrained linear fit has ~0.14 max error (visibly too
+		// coarse), while this quadratic (Horner form, exact at r2 = 0) has only ~0.021.
+		const falloff = max( float( 1 ).add( r2.mul( float( - 0.4298496 ).add( r2.mul( 0.0547243 ) ) ) ), 0 ).toVar( 'falloff' );
+
+		return vec4( splatColor.rgb, falloff.mul( splatColor.a ) );
 
 	} )();
 
