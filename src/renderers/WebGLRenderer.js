@@ -3066,6 +3066,29 @@ class WebGLRenderer {
 
 		};
 
+		function isRenderTargetReadable( renderTarget, textureIndex ) {
+
+			const texture = renderTarget.textures[ textureIndex ];
+			const textureProperties = properties.get( texture );
+
+			if ( textureProperties.__readFormatSupported === undefined || textureProperties.__cachedFormat !== texture.format ) {
+
+				textureProperties.__cachedFormat = texture.format;
+				textureProperties.__readFormatSupported = capabilities.textureFormatReadable( texture.format );
+
+			}
+
+			if ( textureProperties.__readTypeSupported === undefined || textureProperties.__cachedType !== texture.type ) {
+
+				textureProperties.__cachedType = texture.type;
+				textureProperties.__readTypeSupported = capabilities.textureTypeReadable( texture.type );
+
+			}
+
+			return textureProperties.__readFormatSupported && textureProperties.__readTypeSupported;
+
+		}
+
 		/**
 		 * Reads the pixel data from the given render target into the given buffer.
 		 *
@@ -3109,16 +3132,9 @@ class WebGLRenderer {
 
 					if ( renderTarget.textures.length > 1 ) _gl.readBuffer( _gl.COLOR_ATTACHMENT0 + textureIndex );
 
-					if ( ! capabilities.textureFormatReadable( textureFormat ) ) {
+					if ( ! isRenderTargetReadable( renderTarget, textureIndex ) ) {
 
-						error( 'WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
-						return;
-
-					}
-
-					if ( ! capabilities.textureTypeReadable( textureType ) ) {
-
-						error( 'WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
+						error( 'WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA/UnsignedByteType or implementation defined format/type.' );
 						return;
 
 					}
@@ -3191,16 +3207,9 @@ class WebGLRenderer {
 
 					if ( renderTarget.textures.length > 1 ) _gl.readBuffer( _gl.COLOR_ATTACHMENT0 + textureIndex );
 
+					if ( ! isRenderTargetReadable( renderTarget, textureIndex ) ) {
 
-					if ( ! capabilities.textureFormatReadable( textureFormat ) ) {
-
-						throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in RGBA or implementation defined format.' );
-
-					}
-
-					if ( ! capabilities.textureTypeReadable( textureType ) ) {
-
-						throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in UnsignedByteType or implementation defined type.' );
+						throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in RGBA/UnsignedByteType or implementation defined format/type.' );
 
 					}
 
