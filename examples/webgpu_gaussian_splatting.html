@@ -44,11 +44,10 @@
 			import * as THREE from 'three/webgpu';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { SPLATLoader } from 'three/addons/loaders/SPLATLoader.js';
 			import { SPZLoader } from 'three/addons/loaders/SPZLoader.js';
 			import { GaussianSplatMesh } from 'three/addons/objects/GaussianSplatMesh.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer, controls, splats, splatRoot;
 			THREE.ColorManagement.workingColorSpace = THREE.SRGBColorSpace;
@@ -60,7 +59,7 @@
 					name: 'Millipede (SPLAT)',
 					url: './models/splat/millipede.splat',
 					loader: SPLATLoader,
-					rotation: new THREE.Euler( - Math.PI * -1.10, Math.PI * -0.10, Math.PI * 0.15 ),
+					rotation: new THREE.Euler( - Math.PI * - 1.10, Math.PI * - 0.10, Math.PI * 0.15 ),
 					cameraPosition: new THREE.Vector3( 0, 0.4, 1 ),
 					credit: {
 						author: 'Fabian Plum',
@@ -86,22 +85,13 @@
 				}
 			};
 			const sourceNames = Object.values( sources ).map( ( source ) => source.name );
-			const urlParams = new URLSearchParams( window.location.search );
 			const params = {
-				source: sources.lion.name,
-				forceWebGL: urlParams.get( 'forceWebGL' ) === 'true'
+				source: sources.lion.name
 			};
 
 			init();
 
 			async function init() {
-
-				if ( params.forceWebGL === false && WebGPU.isAvailable() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-					throw new Error( 'No WebGPU support' );
-
-				}
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100 );
 				camera.position.set( 0, 0.35, 3.2 );
@@ -109,10 +99,11 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x07080f );
 
-				renderer = new THREE.WebGPURenderer( { antialias: false, forceWebGL: params.forceWebGL } );
+				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( render );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				await renderer.init();
@@ -124,27 +115,10 @@
 				controls.target.set( 0, 0, 0 );
 				controls.update();
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Building' );
 				gui.add( params, 'source', sourceNames ).name( 'Splat' ).onChange( async ( value ) => {
 
 					await loadSplatSource( getSourceKeyByName( value ) );
-
-				} );
-				gui.add( params, 'forceWebGL' ).name( 'forceWebGL' ).onChange( function ( value ) {
-
-					const url = new URL( window.location.href );
-
-					if ( value === true ) {
-
-						url.searchParams.set( 'forceWebGL', 'true' );
-
-					} else {
-
-						url.searchParams.delete( 'forceWebGL' );
-
-					}
-
-					window.location.href = url.href;
 
 				} );
 
@@ -239,7 +213,7 @@
 
 			}
 
-			function render() {
+			function animate() {
 
 				controls.update();
 
