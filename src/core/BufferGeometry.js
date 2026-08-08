@@ -1241,7 +1241,7 @@ class BufferGeometry extends EventDispatcher {
 
 		data.uuid = this.uuid;
 		data.type = ( this.parameters !== undefined && this._transformed === true ) ? 'BufferGeometry' : this.type;
-		if ( this.name !== '' ) data.name = this.name;
+		data.name = this.name;
 		if ( Object.keys( this.userData ).length > 0 ) data.userData = this.userData;
 
 		if ( this.parameters !== undefined && this._transformed !== true ) {
