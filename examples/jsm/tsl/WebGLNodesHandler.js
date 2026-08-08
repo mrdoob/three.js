@@ -34,7 +34,6 @@ import {
 // - Storage textures not supported
 // - Fog / environment do not automatically update - must call "dispose"
 // - instanced mesh geometry cannot be shared
-// - Node materials cannot be used with "compile" function
 
 // hash any object parameters that will impact the resulting shader so we can force
 // a program update
@@ -114,21 +113,26 @@ class SceneContext {
 
 	}
 
-	update() {
+	update( object = null ) {
 
 		const { scene, lightsNode } = this;
 
 		// update lighting
 		const sceneLights = [];
-		scene.traverse( object => {
+		const collectLight = child => {
 
-			if ( object.isLight ) {
+			if ( child.isLight ) {
 
-				sceneLights.push( object );
+				sceneLights.push( child );
 
 			}
 
-		} );
+		};
+
+		scene.traverse( collectLight );
+
+		// compile() can receive an object that has not been added to the target scene yet.
+		if ( object !== null && object !== scene ) object.traverse( collectLight );
 
 		lightsNode.setLights( sceneLights );
 
@@ -402,23 +406,23 @@ export class WebGLNodesHandler {
 	}
 
 
-	renderStart( scene, camera ) {
+	renderStart( scene, camera, targetScene = scene ) {
 
 		const { nodeFrame, renderStack, renderer, sceneContexts } = this;
 		nodeFrame.update();
 		nodeFrame.camera = camera;
-		nodeFrame.scene = scene;
+		nodeFrame.scene = targetScene;
 		nodeFrame.frameId ++;
 
-		let sceneContext = sceneContexts.get( scene );
+		let sceneContext = sceneContexts.get( targetScene );
 		if ( ! sceneContext ) {
 
-			sceneContext = new SceneContext( renderer, scene );
-			sceneContexts.set( scene, sceneContext );
+			sceneContext = new SceneContext( renderer, targetScene );
+			sceneContexts.set( targetScene, sceneContext );
 
 		}
 
-		sceneContext.update();
+		sceneContext.update( scene );
 		renderStack.push( { sceneContext, camera } );
 
 		// ensure all node material callbacks are initialized before
@@ -455,6 +459,12 @@ export class WebGLNodesHandler {
 			nodeFrame.scene = sceneContext.scene;
 
 		}
+
+	}
+
+	prepare( object ) {
+
+		this.nodeFrame.object = object;
 
 	}
 
