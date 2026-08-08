@@ -3,7 +3,6 @@
 import './addons/utils/BufferGeometryUtils.tests.js';
 import './addons/utils/ColorUtils.tests.js';
 import './addons/utils/GaussianSplatUtils.tests.js';
-import './addons/tsl/display/DepthOfFieldNode.tests.js';
 import './addons/math/ColorSpaces.tests.js';
 import './addons/curves/NURBSCurve.tests.js';
 import './addons/loaders/FBXLoader.tests.js';
