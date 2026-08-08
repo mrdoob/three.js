@@ -540,13 +540,14 @@ class DepthOfFieldNode extends TempNode {
 		this._blur16NearRT.dispose();
 		this._blur16FarRT.dispose();
 		this._compositeRT.dispose();
-		this._CoCBlurNode.dispose();
 
 		this._CoCMaterial.dispose();
 		this._CoCBlurredMaterial.dispose();
 		this._blur64Material.dispose();
 		this._blur16Material.dispose();
 		this._compositeMaterial.dispose();
+
+		this._CoCBlurNode.dispose();
 
 	}
 
