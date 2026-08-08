@@ -191,6 +191,14 @@ class DepthOfFieldNode extends TempNode {
 		this._CoCTextureNode = texture( this._CoCRT.texture );
 
 		/**
+		 * The Gaussian blur node used to blur the near field's circle of confusion.
+		 *
+		 * @private
+		 * @type {GaussianBlurNode}
+		 */
+		this._CoCBlurNode = gaussianBlur( this._CoCTextureNode, 1, 2 );
+
+		/**
 		 * The result of the blur64 pass as a texture node.
 		 *
 		 * @private
@@ -381,7 +389,7 @@ class DepthOfFieldNode extends TempNode {
 
 		// blurred CoC for near field
 
-		this._CoCBlurredMaterial.colorNode = gaussianBlur( this._CoCTextureNode, 1, 2 );
+		this._CoCBlurredMaterial.colorNode = this._CoCBlurNode;
 		this._CoCBlurredMaterial.needsUpdate = true;
 
 		// bokeh 64 blur pass
@@ -532,6 +540,7 @@ class DepthOfFieldNode extends TempNode {
 		this._blur16NearRT.dispose();
 		this._blur16FarRT.dispose();
 		this._compositeRT.dispose();
+		this._CoCBlurNode.dispose();
 
 		this._CoCMaterial.dispose();
 		this._CoCBlurredMaterial.dispose();
