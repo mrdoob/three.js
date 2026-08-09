@@ -26,6 +26,7 @@ export { default as NodeUniform } from './core/NodeUniform.js';
 export { default as NodeVar } from './core/NodeVar.js';
 export { default as NodeVarying } from './core/NodeVarying.js';
 export { default as OutputStructNode } from './core/OutputStructNode.js';
+export { default as OverrideContextNode } from './core/OverrideContextNode.js';
 export { default as ParameterNode } from './core/ParameterNode.js';
 export { default as PropertyNode } from './core/PropertyNode.js';
 export { default as StackNode } from './core/StackNode.js';

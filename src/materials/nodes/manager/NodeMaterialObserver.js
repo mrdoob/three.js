@@ -1,3 +1,5 @@
+import { RenderObjectRefreshType, DynamicDrawUsage } from '../../../constants.js';
+
 const refreshUniforms = [
 	'alphaMap',
 	'alphaTest',
@@ -9,27 +11,36 @@ const refreshUniforms = [
 	'attenuationColor',
 	'attenuationDistance',
 	'bumpMap',
+	'bumpScale',
 	'clearcoat',
 	'clearcoatMap',
 	'clearcoatNormalMap',
 	'clearcoatNormalScale',
 	'clearcoatRoughness',
 	'color',
+	'dashOffset',
+	'dashSize',
 	'dispersion',
+	'displacementBias',
 	'displacementMap',
+	'displacementScale',
 	'emissive',
 	'emissiveIntensity',
 	'emissiveMap',
 	'envMap',
 	'envMapIntensity',
+	'envMapRotation',
+	'gapSize',
 	'gradientMap',
 	'ior',
 	'iridescence',
 	'iridescenceIOR',
 	'iridescenceMap',
+	'iridescenceThickness',
 	'iridescenceThicknessMap',
 	'lightMap',
 	'lightMapIntensity',
+	'linewidth',
 	'map',
 	'matcap',
 	'metalness',
@@ -37,19 +48,26 @@ const refreshUniforms = [
 	'normalMap',
 	'normalScale',
 	'opacity',
+	'reflectivity',
+	'retroreflectivity',
+	'rotation',
 	'roughness',
 	'roughnessMap',
+	'scale',
 	'sheen',
 	'sheenColor',
 	'sheenColorMap',
+	'sheenRoughness',
 	'sheenRoughnessMap',
 	'shininess',
+	'size',
 	'specular',
 	'specularColor',
 	'specularColorMap',
 	'specularIntensity',
 	'specularIntensityMap',
 	'specularMap',
+	'steps',
 	'thickness',
 	'transmission',
 	'transmissionMap'
@@ -157,6 +175,20 @@ class NodeMaterialObserver {
 	}
 
 	/**
+	 * Returns `true` if the given 3D object uses instance buffers with dynamic draw usage.
+	 * Such buffers must be uploaded once per render so the render object requires a full refresh.
+	 *
+	 * @param {Object3D} object - The 3D object.
+	 * @return {boolean} Whether the given 3D object uses instance buffers with dynamic draw usage or not.
+	 */
+	hasDynamicInstancing( object ) {
+
+		return object.isInstancedMesh === true && ( object.instanceMatrix.usage === DynamicDrawUsage ||
+			( object.instanceColor !== null && object.instanceColor.usage === DynamicDrawUsage ) );
+
+	}
+
+	/**
 	 * Returns `true` if the current rendering produces motion vectors.
 	 *
 	 * @param {Renderer} renderer - The renderer.
@@ -186,6 +218,8 @@ class NodeMaterialObserver {
 
 			data = {
 				geometryId: geometry.id,
+				geometryVersion: this.getGeometryData( geometry )._version,
+				materialVersion: this.getMaterialData( renderObject.material )._version,
 				worldMatrix: object.matrixWorld.clone()
 			};
 
@@ -198,6 +232,22 @@ class NodeMaterialObserver {
 			if ( object.morphTargetInfluences ) {
 
 				data.morphTargetInfluences = object.morphTargetInfluences.slice();
+
+			}
+
+			if ( object.isInstancedMesh === true ) {
+
+				data.instanceMatrixVersion = object.instanceMatrix.version;
+				data.instanceColorVersion = object.instanceColor !== null ? object.instanceColor.version : null;
+				data.morphTextureVersion = object.morphTexture !== null ? object.morphTexture.version : null;
+
+			}
+
+			if ( object.isBatchedMesh === true ) {
+
+				data.matricesTextureVersion = object._matricesTexture.version;
+				data.colorsTextureVersion = object._colorsTexture !== null ? object._colorsTexture.version : null;
+				data.indirectTextureVersion = object._indirectTexture.version;
 
 			}
 
@@ -216,7 +266,12 @@ class NodeMaterialObserver {
 
 			}
 
-			data.lights = this.getLightsData( renderObject.lightsNode.getLights(), [] );
+			const { environmentIntensity, environmentRotation } = renderObject.scene;
+
+			data.environmentIntensity = environmentIntensity;
+			data.environmentRotation = environmentRotation.clone();
+
+			data.lights = this.getLightsData( renderObject.lightsNode.getBuiltinLights(), [] );
 
 			this.renderObjects.set( renderObject, data );
 
@@ -292,7 +347,7 @@ class NodeMaterialObserver {
 
 			data = {
 				_renderId: - 1,
-				_equal: false,
+				_version: 0,
 
 				attributes: this.getAttributesData( geometry.attributes ),
 				indexId: geometry.index ? geometry.index.id : null,
@@ -321,7 +376,7 @@ class NodeMaterialObserver {
 
 		if ( data === undefined ) {
 
-			data = { _renderId: - 1, _equal: false };
+			data = { _renderId: - 1, _version: 0 };
 
 			for ( const property of this.refreshUniforms ) {
 
@@ -363,7 +418,7 @@ class NodeMaterialObserver {
 	 * @param {RenderObject} renderObject - The render object.
 	 * @param {Array<Light>} lightsData - The current material lights.
 	 * @param {number} renderId - The current render ID.
-	 * @return {boolean} Whether the given render object has changed its state or not.
+	 * @return {boolean} Whether the given render object is equal to its cached state or not.
 	 */
 	equals( renderObject, lightsData, renderId ) {
 
@@ -385,11 +440,13 @@ class NodeMaterialObserver {
 
 		const materialData = this.getMaterialData( renderObject.material );
 
-		// check the material for the "equal" state just once per render for all render objects
+		// check the material properties just once per render for all render objects
 
 		if ( materialData._renderId !== renderId ) {
 
 			materialData._renderId = renderId;
+
+			let changed = false;
 
 			for ( const property in materialData ) {
 
@@ -397,7 +454,7 @@ class NodeMaterialObserver {
 				const mtlValue = material[ property ];
 
 				if ( property === '_renderId' ) continue;
-				if ( property === '_equal' ) continue;
+				if ( property === '_version' ) continue;
 
 				if ( value.equals !== undefined ) {
 
@@ -405,8 +462,7 @@ class NodeMaterialObserver {
 
 						value.copy( mtlValue );
 
-						materialData._equal = false;
-						return false;
+						changed = true;
 
 					}
 
@@ -417,8 +473,7 @@ class NodeMaterialObserver {
 						value.id = mtlValue.id;
 						value.version = mtlValue.version;
 
-						materialData._equal = false;
-						return false;
+						changed = true;
 
 					}
 
@@ -426,34 +481,38 @@ class NodeMaterialObserver {
 
 					materialData[ property ] = mtlValue;
 
-					materialData._equal = false;
-					return false;
+					changed = true;
 
 				}
 
 			}
 
-			if ( materialData.transmission > 0 ) {
+			if ( changed === true ) materialData._version ++;
 
-				const { width, height } = renderObject.context;
+		}
 
-				if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
+		// a version mismatch means the material has changed since this render object was last refreshed
 
-					renderObjectData.bufferWidth = width;
-					renderObjectData.bufferHeight = height;
+		if ( renderObjectData.materialVersion !== materialData._version ) {
 
-					materialData._equal = false;
-					return false;
+			renderObjectData.materialVersion = materialData._version;
 
-				}
+			return false;
+
+		}
+
+		if ( materialData.transmission > 0 ) {
+
+			const { width, height } = renderObject.context;
+
+			if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
+
+				renderObjectData.bufferWidth = width;
+				renderObjectData.bufferHeight = height;
+
+				return false;
 
 			}
-
-			materialData._equal = true;
-
-		} else {
-
-			if ( materialData._equal === false ) return false;
 
 		}
 
@@ -468,11 +527,13 @@ class NodeMaterialObserver {
 
 		const geometryData = this.getGeometryData( renderObject.geometry );
 
-		// check the geoemtry for the "equal" state just once per render for all render objects
+		// check the geometry properties just once per render for all render objects
 
 		if ( geometryData._renderId !== renderId ) {
 
 			geometryData._renderId = renderId;
+
+			let changed = false;
 
 			// attributes
 
@@ -496,8 +557,8 @@ class NodeMaterialObserver {
 					// attribute was removed
 					delete storedAttributes[ name ];
 
-					geometryData._equal = false;
-					return false;
+					changed = true;
+					continue;
 
 				}
 
@@ -509,8 +570,7 @@ class NodeMaterialObserver {
 					storedAttributeData.id = id;
 					storedAttributeData.version = version;
 
-					geometryData._equal = false;
-					return false;
+					changed = true;
 
 				}
 
@@ -520,26 +580,22 @@ class NodeMaterialObserver {
 
 				geometryData.attributes = this.getAttributesData( attributes );
 
-				geometryData._equal = false;
-				return false;
+				changed = true;
 
 			}
 
 			// check index
 
 			const index = geometry.index;
-			const storedIndexId = geometryData.indexId;
-			const storedIndexVersion = geometryData.indexVersion;
 			const currentIndexId = index ? index.id : null;
 			const currentIndexVersion = index ? index.version : null;
 
-			if ( storedIndexId !== currentIndexId || storedIndexVersion !== currentIndexVersion ) {
+			if ( geometryData.indexId !== currentIndexId || geometryData.indexVersion !== currentIndexVersion ) {
 
 				geometryData.indexId = currentIndexId;
 				geometryData.indexVersion = currentIndexVersion;
 
-				geometryData._equal = false;
-				return false;
+				changed = true;
 
 			}
 
@@ -550,16 +606,21 @@ class NodeMaterialObserver {
 				geometryData.drawRange.start = geometry.drawRange.start;
 				geometryData.drawRange.count = geometry.drawRange.count;
 
-				geometryData._equal = false;
-				return false;
+				changed = true;
 
 			}
 
-			geometryData._equal = true;
+			if ( changed === true ) geometryData._version ++;
 
-		} else {
+		}
 
-			if ( geometryData._equal === false ) return false;
+		// a version mismatch means the geometry has changed since this render object was last refreshed
+
+		if ( renderObjectData.geometryVersion !== geometryData._version ) {
+
+			renderObjectData.geometryVersion = geometryData._version;
+
+			return false;
 
 		}
 
@@ -584,6 +645,47 @@ class NodeMaterialObserver {
 
 		}
 
+		// instancing
+
+		if ( object.isInstancedMesh === true ) {
+
+			const instanceColorVersion = object.instanceColor !== null ? object.instanceColor.version : null;
+			const morphTextureVersion = object.morphTexture !== null ? object.morphTexture.version : null;
+
+			if ( renderObjectData.instanceMatrixVersion !== object.instanceMatrix.version ||
+				renderObjectData.instanceColorVersion !== instanceColorVersion ||
+				renderObjectData.morphTextureVersion !== morphTextureVersion ) {
+
+				renderObjectData.instanceMatrixVersion = object.instanceMatrix.version;
+				renderObjectData.instanceColorVersion = instanceColorVersion;
+				renderObjectData.morphTextureVersion = morphTextureVersion;
+
+				return false;
+
+			}
+
+		}
+
+		// batching
+
+		if ( object.isBatchedMesh === true ) {
+
+			const colorsTextureVersion = object._colorsTexture !== null ? object._colorsTexture.version : null;
+
+			if ( renderObjectData.matricesTextureVersion !== object._matricesTexture.version ||
+				renderObjectData.colorsTextureVersion !== colorsTextureVersion ||
+				renderObjectData.indirectTextureVersion !== object._indirectTexture.version ) {
+
+				renderObjectData.matricesTextureVersion = object._matricesTexture.version;
+				renderObjectData.colorsTextureVersion = colorsTextureVersion;
+				renderObjectData.indirectTextureVersion = object._indirectTexture.version;
+
+				return false;
+
+			}
+
+		}
+
 		// lights
 
 		if ( renderObjectData.lights ) {
@@ -600,6 +702,24 @@ class NodeMaterialObserver {
 
 		}
 
+		// scene
+
+		const scene = renderObject.scene;
+
+		if ( scene.environment !== null && material.envMap === null ) {
+
+			if ( renderObjectData.environmentIntensity !== scene.environmentIntensity ||
+					renderObjectData.environmentRotation.equals( scene.environmentRotation ) === false ) {
+
+				renderObjectData.environmentIntensity = scene.environmentIntensity;
+				renderObjectData.environmentRotation.copy( scene.environmentRotation );
+
+				return false;
+
+			}
+
+		}
+
 		// center
 
 		if ( renderObjectData.center ) {
@@ -608,7 +728,7 @@ class NodeMaterialObserver {
 
 				renderObjectData.center.copy( object.center );
 
-				return true;
+				return false;
 
 			}
 
@@ -677,7 +797,7 @@ class NodeMaterialObserver {
 		}
 
 		cached.renderId = renderId;
-		this.getLightsData( lightsNode.getLights(), cached.lightsData );
+		this.getLightsData( lightsNode.getBuiltinLights(), cached.lightsData );
 
 		return cached.lightsData;
 
@@ -688,20 +808,27 @@ class NodeMaterialObserver {
 	 *
 	 * @param {RenderObject} renderObject - The render object.
 	 * @param {NodeFrame} nodeFrame - The current node frame.
-	 * @return {boolean} Whether the given render object requires a refresh or not.
+	 * @return {number} The refresh type, see {@link RenderObjectRefreshType}.
 	 */
 	needsRefresh( renderObject, nodeFrame ) {
 
-		if ( this.hasNode || this.hasAnimation || this.firstInitialization( renderObject ) || this.needsVelocity( nodeFrame.renderer ) )
-			return true;
+		if ( this.hasNode || this.hasAnimation || this.hasDynamicInstancing( renderObject.object ) || this.firstInitialization( renderObject ) || this.needsVelocity( nodeFrame.renderer ) )
+			return RenderObjectRefreshType.FULL;
 
 		const { renderId } = nodeFrame;
+
+		let refreshType = RenderObjectRefreshType.NONE;
+
+		// shared UBOs are potentially never updated when objects don't change. Below block
+		// make sure these UBOs are updated at least once.
 
 		if ( this.renderId !== renderId ) {
 
 			this.renderId = renderId;
 
-			return true;
+			// no early out here. instead, use the equals() code path below so the internal cache state gets synched
+
+			refreshType = RenderObjectRefreshType.SHARED;
 
 		}
 
@@ -709,12 +836,17 @@ class NodeMaterialObserver {
 		const isBundle = renderObject.bundle !== null && renderObject.bundle.static === true && this.getRenderObjectData( renderObject ).version === renderObject.bundle.version;
 
 		if ( isStatic || isBundle )
-			return false;
+			return refreshType;
 
 		const lightsData = this.getLights( renderObject.lightsNode, renderId );
-		const notEqual = this.equals( renderObject, lightsData, renderId ) !== true;
 
-		return notEqual;
+		if ( this.equals( renderObject, lightsData, renderId ) === false ) {
+
+			refreshType = RenderObjectRefreshType.FULL;
+
+		}
+
+		return refreshType;
 
 	}
 

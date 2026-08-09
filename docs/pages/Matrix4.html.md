@@ -179,6 +179,16 @@ Based on the method outlined [here](http://www.euclideanspace.com/maths/algebra/
 
 **Returns:** The determinant.
 
+### .determinantAffine() : number
+
+Computes and returns the determinant of the 4x4 matrix, but assumes the matrix is affine, saving some computations.
+
+For affine matrices (like an object's world matrix), this value equals the full 4x4 [Matrix4#determinant](Matrix4.html#determinant) but is cheaper to compute.
+
+Assumes the bottom row is \[0, 0, 0, 1\].
+
+**Returns:** The determinant of the matrix.
+
 ### .equals( matrix : Matrix4 ) : boolean
 
 Returns `true` if this matrix is equal with the given one.

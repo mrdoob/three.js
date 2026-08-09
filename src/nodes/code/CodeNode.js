@@ -102,7 +102,7 @@ class CodeNode extends Node {
 
 		for ( const include of includes ) {
 
-			include.build( builder );
+			include.build( builder, 'void' );
 
 		}
 

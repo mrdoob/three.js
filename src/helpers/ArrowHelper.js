@@ -159,6 +159,8 @@ class ArrowHelper extends Object3D {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this.line.geometry.dispose();
 		this.line.material.dispose();
 		this.cone.geometry.dispose();

@@ -127,15 +127,6 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 
 	}
 
-	copy( source ) {
-
-		this.shininessNode = source.shininessNode;
-		this.specularNode = source.specularNode;
-
-		return super.copy( source );
-
-	}
-
 }
 
 export default MeshPhongNodeMaterial;

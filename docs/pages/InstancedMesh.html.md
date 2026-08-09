@@ -64,12 +64,6 @@ Represents the morph target weights of all instances. You have to set its [Textu
 
 Default is `null`.
 
-### .previousInstanceMatrix : InstancedBufferAttribute
-
-Represents the local transformation of all instances of the previous frame. Required for computing velocity. Maintained in [InstanceNode](InstanceNode.html).
-
-Default is `null`.
-
 ## Methods
 
 ### .computeBoundingBox()

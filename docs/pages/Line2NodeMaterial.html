@@ -107,8 +107,10 @@ is not supported, yet.</p>
 					<h3 class="name" id="lineColorNode" translate="no">.<a href="#lineColorNode">lineColorNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
 					<div class="description">
 						<p>Defines the lines color.</p>
-						<p>Default is <code>null</code>.</p>
 					</div>
+						<dl class="details">
+							<dt class="important tag-deprecated"><strong>Deprecated:</strong> since r185. Use <a href="NodeMaterial.html#colorNode">NodeMaterial#colorNode</a> instead.</dt>
+						</dl>
 				</div>
 				<div class="member">
 					<h3 class="name" id="offsetNode" translate="no">.<a href="#offsetNode">offsetNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
@@ -136,34 +138,11 @@ When set to <code>false</code> the unit is pixel.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( source : <span class="param-type"><a href="Line2NodeMaterial.html">Line2NodeMaterial</a></span> )</span><span class="type-signature"> : <a href="Line2NodeMaterial.html">Line2NodeMaterial</a></span> </h3>
+					<h3 class="name name-method" id="setupDiffuseColor" translate="no">.<a href="#setupDiffuseColor">setupDiffuseColor</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Copies the properties of the given material to this instance.</p>
-						</div>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong translate="no">source</strong>
-									</td>
-									<td class="description last">
-										<p>The material to copy.</p>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#copy">NodeMaterial#copy</a></dt>
-						</dl>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> A reference to this material.</dt>
-						</dl>
-					</div>
-					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>Setups the vertex and fragment stage of this node material.</p>
+							<p>Setups the diffuse color of the line material in the fragment stage.
+Overrides the base setup to incorporate line/dash rendering and blending.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -178,7 +157,32 @@ When set to <code>false</code> the unit is pixel.</p>
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#setup">NodeMaterial#setup</a></dt>
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#setupDiffuseColor">NodeMaterial#setupDiffuseColor</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupModelViewProjection" translate="no">.<a href="#setupModelViewProjection">setupModelViewProjection</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec4></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the position in clip space for the vertex stage of the fat line.
+Overrides the default model-view-projection to return the expanded fat line vertex coordinates.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#setupModelViewProjection">NodeMaterial#setupModelViewProjection</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The position of the fat line vertex in clip space.</dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

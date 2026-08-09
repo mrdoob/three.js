@@ -517,9 +517,9 @@ function SidebarScene( editor ) {
 
 				const openerElement = option.querySelector( ':scope > .opener' );
 
-				const openerHTML = openerElement ? openerElement.outerHTML : '';
+				option.innerHTML = buildHTML( object );
 
-				option.innerHTML = openerHTML + buildHTML( object );
+				if ( openerElement !== null ) option.insertBefore( openerElement, option.firstChild );
 
 				return;
 

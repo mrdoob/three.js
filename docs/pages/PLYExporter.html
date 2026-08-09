@@ -131,6 +131,19 @@ indices are excluded, then a point cloud is exported.</p>
 						<p>Default is <code>false</code>.</p>
 			</td>
 		</tr>
+		<tr>
+				<td class="name">
+					<strong>customPropertyMapping</strong>
+						<br>
+<span class="param-type">Object.&lt;string, Array.&lt;string>></span>
+				</td>
+			<td class="description last">
+				<p>A mapping that allows
+exporting custom buffer attributes as PLY vertex properties. Each entry maps a buffer attribute
+name to an array of PLY property names. The number of property names must match the item size
+of the buffer attribute. This is the inverse of <code>PLYLoader.setCustomPropertyNameMapping()</code>.</p>
+			</td>
+		</tr>
 	</tbody>
 </table>
 				</div>

@@ -7,6 +7,7 @@ export * from './core/AttributeNode.js';
 export * from './core/BypassNode.js';
 export * from './core/IsolateNode.js';
 export * from './core/ContextNode.js';
+export * from './core/OverrideContextNode.js';
 export * from './core/IndexNode.js';
 export * from './core/ParameterNode.js';
 export * from './core/PropertyNode.js';
@@ -146,7 +147,6 @@ export * from './lighting/PointLightNode.js';
 
 // pmrem
 export * from './pmrem/PMREMNode.js';
-export * from './pmrem/PMREMUtils.js';
 
 // procedural
 export * from './procedural/Checker.js';

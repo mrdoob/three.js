@@ -24,75 +24,85 @@ Returns a new frustum array with copied values from this instance.
 
 **Returns:** A clone of this instance.
 
-### .containsPoint( point : Vector3, cameraArray : Object ) : boolean
+### .containsPoint( point : Vector3 ) : boolean
 
-Returns `true` if the given point lies within any frustum from the camera array.
+Returns `true` if the given point lies within any cached frustum.
+
+[FrustumArray#setFromArrayCamera](FrustumArray.html#setFromArrayCamera) must be called once per render before this method.
 
 **point**
 
 The point to test.
 
-**cameraArray**
-
-An object with a cameras property containing an array of cameras.
-
 **Returns:** Whether the point is visible in any camera.
 
-### .intersectsBox( box : Box3, cameraArray : Object ) : boolean
+### .copy( frustumArray : FrustumArray ) : FrustumArray
 
-Returns `true` if the given bounding box is intersecting any frustum from the camera array.
+Copies the values of the given frustum array to this instance.
+
+**frustumArray**
+
+The frustum array to copy.
+
+**Returns:** A reference to this frustum array.
+
+### .intersectsBox( box : Box3 ) : boolean
+
+Returns `true` if the given bounding box is intersecting any cached frustum.
+
+[FrustumArray#setFromArrayCamera](FrustumArray.html#setFromArrayCamera) must be called once per render before this method.
 
 **box**
 
 The bounding box to test.
 
-**cameraArray**
-
-An object with a cameras property containing an array of cameras.
-
 **Returns:** Whether the box is visible in any camera.
 
-### .intersectsObject( object : Object3D, cameraArray : Object ) : boolean
+### .intersectsObject( object : Object3D ) : boolean
 
-Returns `true` if the 3D object's bounding sphere is intersecting any frustum from the camera array.
+Returns `true` if the 3D object's bounding sphere is intersecting any cached frustum.
+
+[FrustumArray#setFromArrayCamera](FrustumArray.html#setFromArrayCamera) must be called once per render before this method.
 
 **object**
 
 The 3D object to test.
 
-**cameraArray**
-
-An object with a cameras property containing an array of cameras.
-
 **Returns:** Whether the 3D object is visible in any camera.
 
-### .intersectsSphere( sphere : Sphere, cameraArray : Object ) : boolean
+### .intersectsSphere( sphere : Sphere ) : boolean
 
-Returns `true` if the given bounding sphere is intersecting any frustum from the camera array.
+Returns `true` if the given bounding sphere is intersecting any cached frustum.
+
+[FrustumArray#setFromArrayCamera](FrustumArray.html#setFromArrayCamera) must be called once per render before this method.
 
 **sphere**
 
 The bounding sphere to test.
 
-**cameraArray**
-
-An object with a cameras property containing an array of cameras.
-
 **Returns:** Whether the sphere is visible in any camera.
 
-### .intersectsSprite( sprite : Sprite, cameraArray : Object ) : boolean
+### .intersectsSprite( sprite : Sprite ) : boolean
 
-Returns `true` if the given sprite is intersecting any frustum from the camera array.
+Returns `true` if the given sprite is intersecting any cached frustum.
+
+[FrustumArray#setFromArrayCamera](FrustumArray.html#setFromArrayCamera) must be called once per render before this method.
 
 **sprite**
 
 The sprite to test.
 
+**Returns:** Whether the sprite is visible in any camera.
+
+### .setFromArrayCamera( cameraArray : ArrayCamera ) : FrustumArray
+
+Computes and caches a frustum for each camera of the given array camera.
+
 **cameraArray**
 
-An object with a cameras property containing an array of cameras.
+The array camera whose sub-cameras define the frustums.
 
-**Returns:** Whether the sprite is visible in any camera.
+**Returns:** A reference to this frustum array.
 
 ## Source
 

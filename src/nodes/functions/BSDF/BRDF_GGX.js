@@ -9,16 +9,16 @@ import { iridescence, alphaT, anisotropyT, anisotropyB } from '../../core/Proper
 import { Fn, defined } from '../../tsl/TSLBase.js';
 
 // GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
-const BRDF_GGX = /*@__PURE__*/ Fn( ( { lightDirection, f0, f90, roughness, f, normalView = NormalView, USE_IRIDESCENCE, USE_ANISOTROPY } ) => {
+const BRDF_GGX = /*@__PURE__*/ Fn( ( { lightDirection, f0, f90, roughness, f, normalView = NormalView, viewDirection = positionViewDirection, USE_IRIDESCENCE, USE_ANISOTROPY } ) => {
 
 	const alpha = roughness.pow2(); // UE4's roughness
 
-	const halfDir = lightDirection.add( positionViewDirection ).normalize();
+	const halfDir = lightDirection.add( viewDirection ).normalize();
 
 	const dotNL = normalView.dot( lightDirection ).clamp();
-	const dotNV = normalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
+	const dotNV = normalView.dot( viewDirection ).clamp(); // @ TODO: Move to core dotNV
 	const dotNH = normalView.dot( halfDir ).clamp();
-	const dotVH = positionViewDirection.dot( halfDir ).clamp();
+	const dotVH = viewDirection.dot( halfDir ).clamp();
 
 	let F = F_Schlick( { f0, f90, dotVH } );
 	let V, D;
@@ -32,10 +32,10 @@ const BRDF_GGX = /*@__PURE__*/ Fn( ( { lightDirection, f0, f90, roughness, f, no
 	if ( defined( USE_ANISOTROPY ) ) {
 
 		const dotTL = anisotropyT.dot( lightDirection );
-		const dotTV = anisotropyT.dot( positionViewDirection );
+		const dotTV = anisotropyT.dot( viewDirection );
 		const dotTH = anisotropyT.dot( halfDir );
 		const dotBL = anisotropyB.dot( lightDirection );
-		const dotBV = anisotropyB.dot( positionViewDirection );
+		const dotBV = anisotropyB.dot( viewDirection );
 		const dotBH = anisotropyB.dot( halfDir );
 
 		V = V_GGX_SmithCorrelated_Anisotropic( { alphaT, alphaB: alpha, dotTV, dotBV, dotTL, dotBL, dotNV, dotNL } );

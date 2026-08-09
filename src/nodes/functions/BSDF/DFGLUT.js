@@ -5,7 +5,8 @@ import { DataTexture } from '../../../textures/DataTexture.js';
 import { RGFormat, HalfFloatType, LinearFilter, ClampToEdgeWrapping } from '../../../constants.js';
 
 /**
- * Precomputed DFG LUT for Image-Based Lighting
+ * Precomputed DFG LUT for physically based specular lighting, used by both
+ * image-based lighting and direct-light multi-scattering energy compensation
  * Resolution: 16x16
  * Samples: 4096 per texel
  * Format: RG16F (2 half floats per texel: scale, bias)

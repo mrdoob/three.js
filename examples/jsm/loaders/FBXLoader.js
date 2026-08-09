@@ -86,6 +86,16 @@ class FBXLoader extends Loader {
 
 		super( manager );
 
+		/**
+		 * Whether to trim animation clips to the time range of their
+		 * animation stacks and shift them to start at time zero. Useful
+		 * for assets that define multiple clips on a single timeline.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.trimAnimationClips = false;
+
 	}
 
 	/**
@@ -172,7 +182,7 @@ class FBXLoader extends Loader {
 
 		const textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
-		return new FBXTreeParser( textureLoader, this.manager ).parse( fbxTree );
+		return new FBXTreeParser( textureLoader, this.manager, this.trimAnimationClips ).parse( fbxTree );
 
 	}
 
@@ -181,10 +191,11 @@ class FBXLoader extends Loader {
 // Parse the FBXTree object returned by the BinaryParser or TextParser and return a Group
 class FBXTreeParser {
 
-	constructor( textureLoader, manager ) {
+	constructor( textureLoader, manager, trimAnimationClips ) {
 
 		this.textureLoader = textureLoader;
 		this.manager = manager;
+		this.trimAnimationClips = trimAnimationClips;
 
 	}
 
@@ -1000,7 +1011,7 @@ class FBXTreeParser {
 		// without a BindPose section).
 		this.bindSkeleton( deformers.skeletons, geometryMap, modelMap );
 
-		const animations = new AnimationParser().parse();
+		const animations = new AnimationParser( this.trimAnimationClips ).parse();
 
 		// if all the models where already combined in a single group, just return that
 		if ( sceneGraph.children.length === 1 && sceneGraph.children[ 0 ].isGroup ) {
@@ -2614,6 +2625,12 @@ class GeometryParser {
 // parse animation data from FBXTree
 class AnimationParser {
 
+	constructor( trimAnimationClips ) {
+
+		this.trimAnimationClips = trimAnimationClips;
+
+	}
+
 	// take raw animation clips and turn them into three.js animation clips
 	parse() {
 
@@ -2912,11 +2929,14 @@ class AnimationParser {
 			}
 
 			const layer = layersMap.get( children[ 0 ].ID );
+			const rawStack = rawStacks[ nodeID ];
 
 			rawClips[ nodeID ] = {
 
-				name: rawStacks[ nodeID ].attrName,
+				name: rawStack.attrName,
 				layer: layer,
+				localStart: rawStack.LocalStart !== undefined ? convertFBXTimeToSeconds( Number( rawStack.LocalStart.value ) ) : 0,
+				localStop: rawStack.LocalStop !== undefined ? convertFBXTimeToSeconds( Number( rawStack.LocalStop.value ) ) : 0,
 
 			};
 
@@ -2937,7 +2957,62 @@ class AnimationParser {
 
 		} );
 
+		if ( this.trimAnimationClips === true && rawClip.localStop > rawClip.localStart ) {
+
+			tracks = this.trimTracks( tracks, rawClip.localStart, rawClip.localStop );
+
+		}
+
 		return new AnimationClip( rawClip.name, - 1, tracks );
+
+	}
+
+	// trims the given tracks to the time range [ startTime, endTime ] and shifts
+	// them so they start at time zero. tracks without keyframes in the range are discarded
+	trimTracks( tracks, startTime, endTime ) {
+
+		// track times are stored as float32 so compare against float32 boundaries
+		// to keep keyframes lying exactly on the range limits
+
+		const start = Math.fround( startTime );
+		const end = Math.fround( endTime );
+
+		const trimmedTracks = [];
+
+		for ( let i = 0; i < tracks.length; i ++ ) {
+
+			const track = tracks[ i ];
+			const stride = track.getValueSize();
+
+			const times = [];
+			const values = [];
+
+			for ( let j = 0; j < track.times.length; j ++ ) {
+
+				const time = track.times[ j ];
+
+				if ( time < start || time > end ) continue;
+
+				times.push( time - start );
+
+				for ( let k = 0; k < stride; k ++ ) {
+
+					values.push( track.values[ j * stride + k ] );
+
+				}
+
+			}
+
+			if ( times.length === 0 ) continue;
+
+			track.times = new Float32Array( times );
+			track.values = new Float32Array( values );
+
+			trimmedTracks.push( track );
+
+		}
+
+		return trimmedTracks;
 
 	}
 

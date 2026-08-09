@@ -204,7 +204,7 @@ async function JoltPhysics() {
 
 	}
 
-	function setMeshVelocity( mesh, velocity, index = 0 ) {
+	function setMeshVelocity( /*mesh, velocity, index = 0*/ ) {
 
 		/*
 		let body = meshMap.get( mesh );

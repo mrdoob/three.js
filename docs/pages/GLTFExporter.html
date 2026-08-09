@@ -299,9 +299,12 @@ corresponding texture utils <a href="WebGLTextureUtils.html">WebGLTextureUtils</
 					<strong>animations</strong>
 						<br>
 <span class="param-type">Array.&lt;<a href="AnimationClip.html">AnimationClip</a>></span>
+|
+<span class="param-type">Array.&lt;Array.&lt;<a href="AnimationClip.html">AnimationClip</a>>></span>
 				</td>
 			<td class="description last">
-				<p>List of animations to be included in the export.</p>
+				<p>List of animations to be included in the export. When exporting a single 3D object or scene, this is a flat list of clips.
+When exporting an array of multiple scenes, this must be a nested array with one list of clips per scene, matched to the input by index.</p>
 						<p>Default is <code>[]</code>.</p>
 			</td>
 		</tr>

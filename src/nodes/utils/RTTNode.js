@@ -2,6 +2,7 @@ import { nodeObject } from '../tsl/TSLCore.js';
 import TextureNode from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uv } from '../accessors/UV.js';
+import { context } from '../core/ContextNode.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 
@@ -107,15 +108,6 @@ class RTTNode extends TextureNode {
 		this._resolutionScale = 1;
 
 		/**
-		 * The node which is used with the quad mesh for RTT.
-		 *
-		 * @private
-		 * @type {Node}
-		 * @default null
-		 */
-		this._rttNode = null;
-
-		/**
 		 * The internal quad mesh for RTT.
 		 *
 		 * @private
@@ -149,7 +141,8 @@ class RTTNode extends TextureNode {
 
 	setup( builder ) {
 
-		this._rttNode = this.node.context( builder.getSharedContext() );
+		this._quadMesh.material.contextNode = context( builder.getSharedContext() );
+		this._quadMesh.material.fragmentNode = this.node;
 		this._quadMesh.material.name = 'RTT';
 		this._quadMesh.material.needsUpdate = true;
 
@@ -243,8 +236,6 @@ class RTTNode extends TextureNode {
 
 		}
 
-
-		this._quadMesh.material.fragmentNode = this._rttNode;
 		this._quadMesh.name = name;
 
 		//

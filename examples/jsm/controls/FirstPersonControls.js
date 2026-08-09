@@ -9,6 +9,7 @@ const _lookDirection = new Vector3();
 const _spherical = new Spherical();
 const _target = new Vector3();
 const _targetPosition = new Vector3();
+const _targetVelocity = new Vector3();
 
 /**
  * This class is an alternative implementation of {@link FlyControls}.
@@ -43,6 +44,15 @@ class FirstPersonControls extends Controls {
 		 * @default 0.005
 		 */
 		this.lookSpeed = 0.005;
+
+		/**
+		 * How quickly the movement and look velocity catches up to the input. Lower
+		 * values feel heavier (more inertia), `1` disables damping.
+		 *
+		 * @type {number}
+		 * @default 0.1
+		 */
+		this.dampingFactor = 0.1;
 
 		/**
 		 * Whether it's possible to vertically look around or not.
@@ -128,7 +138,7 @@ class FirstPersonControls extends Controls {
 
 		// internals
 
-		this._autoSpeedFactor = 0.0;
+		this._velocity = new Vector3();
 
 		this._pointerX = 0;
 		this._pointerY = 0;
@@ -138,13 +148,22 @@ class FirstPersonControls extends Controls {
 
 		this._pointerCount = 0;
 
-		this._moveForward = false;
-		this._moveBackward = false;
+		// forward / backward come from keys and the pointer, tracked per source so they don't
+		// clobber: while a forward / backward key is held, a click only looks
+		this._keyForward = false;
+		this._keyBackward = false;
+		this._pointerForward = false;
+		this._pointerBackward = false;
 		this._moveLeft = false;
 		this._moveRight = false;
+		this._moveUp = false;
+		this._moveDown = false;
 
 		this._lat = 0;
 		this._lon = 0;
+
+		this._lonVelocity = 0;
+		this._latVelocity = 0;
 
 		// event listeners
 
@@ -174,10 +193,14 @@ class FirstPersonControls extends Controls {
 		window.addEventListener( 'keydown', this._onKeyDown );
 		window.addEventListener( 'keyup', this._onKeyUp );
 
-		this.domElement.addEventListener( 'pointermove', this._onPointerMove );
 		this.domElement.addEventListener( 'pointerdown', this._onPointerDown );
-		this.domElement.addEventListener( 'pointerup', this._onPointerUp );
 		this.domElement.addEventListener( 'contextmenu', this._onContextMenu );
+
+		const { ownerDocument } = this.domElement;
+
+		ownerDocument.addEventListener( 'pointermove', this._onPointerMove );
+		ownerDocument.addEventListener( 'pointerup', this._onPointerUp );
+		ownerDocument.addEventListener( 'pointercancel', this._onPointerUp );
 
 		this.domElement.style.touchAction = 'none'; // Disable touch scroll
 
@@ -188,10 +211,14 @@ class FirstPersonControls extends Controls {
 		window.removeEventListener( 'keydown', this._onKeyDown );
 		window.removeEventListener( 'keyup', this._onKeyUp );
 
-		this.domElement.removeEventListener( 'pointermove', this._onPointerMove );
 		this.domElement.removeEventListener( 'pointerdown', this._onPointerDown );
-		this.domElement.removeEventListener( 'pointerup', this._onPointerUp );
 		this.domElement.removeEventListener( 'contextmenu', this._onContextMenu );
+
+		const { ownerDocument } = this.domElement;
+
+		ownerDocument.removeEventListener( 'pointermove', this._onPointerMove );
+		ownerDocument.removeEventListener( 'pointerup', this._onPointerUp );
+		ownerDocument.removeEventListener( 'pointercancel', this._onPointerUp );
 
 		this.domElement.style.touchAction = ''; // Restore touch scroll
 
@@ -235,31 +262,59 @@ class FirstPersonControls extends Controls {
 
 		if ( this.enabled === false ) return;
 
+		let drive = ( this._keyForward ? 1 : 0 ) - ( this._keyBackward ? 1 : 0 );
+		let lookMove = ( this._pointerForward ? 1 : 0 ) - ( this._pointerBackward ? 1 : 0 );
+
+		if ( this.autoForward && drive === 0 && lookMove === 0 ) lookMove = 1;
+
+		// faster forward movement the higher the camera is
+
+		let forwardSpeed = this.movementSpeed;
+
 		if ( this.heightSpeed ) {
 
 			const y = MathUtils.clamp( this.object.position.y, this.heightMin, this.heightMax );
-			const heightDelta = y - this.heightMin;
-
-			this._autoSpeedFactor = delta * ( heightDelta * this.heightCoef );
-
-		} else {
-
-			this._autoSpeedFactor = 0.0;
+			forwardSpeed += ( y - this.heightMin ) * this.heightCoef;
 
 		}
 
-		const actualMoveSpeed = delta * this.movementSpeed;
+		// target velocity in world space: keys are world axis aligned, moving in the
+		// XZ plane from the camera's yaw only (Q / E along world Y), while pointer
+		// and touch input moves along the look direction
 
-		if ( this._moveForward || ( this.autoForward && ! this._moveBackward ) ) this.object.translateZ( - ( actualMoveSpeed + this._autoSpeedFactor ) );
-		if ( this._moveBackward ) this.object.translateZ( actualMoveSpeed );
+		const yaw = MathUtils.degToRad( this._lon );
+		const sinYaw = Math.sin( yaw );
+		const cosYaw = Math.cos( yaw );
 
-		if ( this._moveLeft ) this.object.translateX( - actualMoveSpeed );
-		if ( this._moveRight ) this.object.translateX( actualMoveSpeed );
+		let strafe = ( this._moveRight ? 1 : 0 ) - ( this._moveLeft ? 1 : 0 );
+		let climb = ( this._moveUp ? 1 : 0 ) - ( this._moveDown ? 1 : 0 );
 
-		if ( this._moveUp ) this.object.translateY( actualMoveSpeed );
-		if ( this._moveDown ) this.object.translateY( - actualMoveSpeed );
+		// normalize combined key input so diagonal movement isn't faster
 
-		const actualLookSpeed = delta * this.lookSpeed;
+		const keyScale = 1 / Math.max( 1, Math.sqrt( strafe * strafe + climb * climb + drive * drive ) );
+
+		strafe *= this.movementSpeed * keyScale;
+		climb *= this.movementSpeed * keyScale;
+		drive *= ( drive > 0 ? forwardSpeed : this.movementSpeed ) * keyScale;
+
+		_targetVelocity.set(
+			sinYaw * drive - cosYaw * strafe,
+			climb,
+			cosYaw * drive + sinYaw * strafe
+		);
+
+		if ( lookMove !== 0 ) {
+
+			_lookDirection.set( 0, 0, - 1 ).applyQuaternion( this.object.quaternion );
+			_targetVelocity.addScaledVector( _lookDirection, lookMove * ( lookMove > 0 ? forwardSpeed : this.movementSpeed ) );
+
+		}
+
+		// ease toward the target velocity for smooth acceleration and deceleration
+
+		this._velocity.lerp( _targetVelocity, this.dampingFactor );
+
+		this.object.position.addScaledVector( this._velocity, delta );
 
 		let verticalLookRatio = 1;
 
@@ -269,12 +324,16 @@ class FirstPersonControls extends Controls {
 
 		}
 
-		if ( this.mouseDragOn ) {
+		// target look velocity, zero when not dragging so the view eases to a stop
 
-			this._lon -= this._pointerX * actualLookSpeed;
-			if ( this.lookVertical ) this._lat -= this._pointerY * actualLookSpeed * verticalLookRatio;
+		const targetLon = this.mouseDragOn ? - this._pointerX * this.lookSpeed : 0;
+		const targetLat = ( this.mouseDragOn && this.lookVertical ) ? - this._pointerY * this.lookSpeed * verticalLookRatio : 0;
 
-		}
+		this._lonVelocity = MathUtils.lerp( this._lonVelocity, targetLon, this.dampingFactor );
+		this._latVelocity = MathUtils.lerp( this._latVelocity, targetLat, this.dampingFactor );
+
+		this._lon += this._lonVelocity * delta;
+		this._lat += this._latVelocity * delta;
 
 		this._lat = Math.max( - 85, Math.min( 85, this._lat ) );
 
@@ -332,15 +391,15 @@ function onPointerDown( event ) {
 
 	if ( event.pointerType === 'touch' ) {
 
-		this._moveForward = this._pointerCount === 1;
-		this._moveBackward = this._pointerCount >= 2;
+		this._pointerForward = this._pointerCount === 1;
+		this._pointerBackward = this._pointerCount >= 2;
 
 	} else {
 
 		switch ( event.button ) {
 
-			case 0: this._moveForward = true; break;
-			case 2: this._moveBackward = true; break;
+			case 0: if ( ! this._keyForward && ! this._keyBackward ) this._pointerForward = true; break;
+			case 2: if ( ! this._keyForward && ! this._keyBackward ) this._pointerBackward = true; break;
 
 		}
 
@@ -358,21 +417,23 @@ function onPointerDown( event ) {
 
 function onPointerUp( event ) {
 
+	if ( this.mouseDragOn === false ) return;
+
 	this.domElement.releasePointerCapture( event.pointerId );
 
 	this._pointerCount --;
 
 	if ( event.pointerType === 'touch' ) {
 
-		this._moveForward = this._pointerCount === 1;
-		this._moveBackward = false;
+		this._pointerForward = this._pointerCount === 1;
+		this._pointerBackward = false;
 
 	} else {
 
 		switch ( event.button ) {
 
-			case 0: this._moveForward = false; break;
-			case 2: this._moveBackward = false; break;
+			case 0: this._pointerForward = false; break;
+			case 2: this._pointerBackward = false; break;
 
 		}
 
@@ -399,19 +460,19 @@ function onKeyDown( event ) {
 	switch ( event.code ) {
 
 		case 'ArrowUp':
-		case 'KeyW': this._moveForward = true; break;
+		case 'KeyW': this._keyForward = true; break;
 
 		case 'ArrowLeft':
 		case 'KeyA': this._moveLeft = true; break;
 
 		case 'ArrowDown':
-		case 'KeyS': this._moveBackward = true; break;
+		case 'KeyS': this._keyBackward = true; break;
 
 		case 'ArrowRight':
 		case 'KeyD': this._moveRight = true; break;
 
-		case 'KeyR': this._moveUp = true; break;
-		case 'KeyF': this._moveDown = true; break;
+		case 'KeyE': this._moveUp = true; break;
+		case 'KeyQ': this._moveDown = true; break;
 
 	}
 
@@ -422,19 +483,19 @@ function onKeyUp( event ) {
 	switch ( event.code ) {
 
 		case 'ArrowUp':
-		case 'KeyW': this._moveForward = false; break;
+		case 'KeyW': this._keyForward = false; break;
 
 		case 'ArrowLeft':
 		case 'KeyA': this._moveLeft = false; break;
 
 		case 'ArrowDown':
-		case 'KeyS': this._moveBackward = false; break;
+		case 'KeyS': this._keyBackward = false; break;
 
 		case 'ArrowRight':
 		case 'KeyD': this._moveRight = false; break;
 
-		case 'KeyR': this._moveUp = false; break;
-		case 'KeyF': this._moveDown = false; break;
+		case 'KeyE': this._moveUp = false; break;
+		case 'KeyQ': this._moveDown = false; break;
 
 	}
 

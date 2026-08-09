@@ -107,7 +107,7 @@ The full width of the volume along X.
 
 ### .bake( renderer : WebGLRenderer, scene : Scene, options : Object )
 
-Bakes all probes by rendering cubemaps at each probe position and projecting to L2 SH. Fully GPU-resident with zero CPU readback.
+Bakes all probes by rendering cubemaps at each probe position and projecting to L2 SH. Optionally iterates additional passes to capture indirect bounces — each extra pass samples the previous pass's atlas as indirect light, so a grid added to the scene before baking accumulates one bounce per extra pass.
 
 **renderer**
 
@@ -138,6 +138,12 @@ Default is `0.1`.
 Far plane for the cube camera.
 
 Default is `100`.
+
+**bounces**
+
+Additional bounce passes after the initial direct pass.
+
+Default is `0`.
 
 ### .dispose()
 

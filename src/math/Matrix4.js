@@ -229,7 +229,7 @@ class Matrix4 {
 	}
 
 	/**
-	 * Extracts the basis of this matrix into the three axis vectors provided.
+	 * Extracts the basis vectors of this matrix into the three vectors provided.
 	 *
 	 * @param {Vector3} xAxis - The basis's x axis.
 	 * @param {Vector3} yAxis - The basis's y axis.
@@ -238,7 +238,7 @@ class Matrix4 {
 	 */
 	extractBasis( xAxis, yAxis, zAxis ) {
 
-		if ( this.determinant() === 0 ) {
+		if ( this.determinantAffine() === 0 ) {
 
 			xAxis.set( 1, 0, 0 );
 			yAxis.set( 0, 1, 0 );
@@ -288,7 +288,7 @@ class Matrix4 {
 	 */
 	extractRotation( m ) {
 
-		if ( m.determinant() === 0 ) {
+		if ( m.determinantAffine() === 0 ) {
 
 			return this.identity();
 
@@ -650,6 +650,31 @@ class Matrix4 {
 	}
 
 	/**
+	 * Computes and returns the determinant of the 4x4 matrix, but assumes the
+	 * matrix is affine, saving some computations.
+	 *
+	 * For affine matrices (like an object's world matrix), this value equals the
+	 * full 4x4 {@link Matrix4#determinant} but is cheaper to compute.
+	 *
+	 * Assumes the bottom row is [0, 0, 0, 1].
+	 *
+	 * @return {number} The determinant of the matrix.
+	 */
+	determinantAffine() {
+
+		const te = this.elements;
+
+		const n11 = te[ 0 ], n12 = te[ 4 ], n13 = te[ 8 ];
+		const n21 = te[ 1 ], n22 = te[ 5 ], n23 = te[ 9 ];
+		const n31 = te[ 2 ], n32 = te[ 6 ], n33 = te[ 10 ];
+
+		return n11 * ( n22 * n33 - n23 * n32 ) -
+			n12 * ( n21 * n33 - n23 * n31 ) +
+			n13 * ( n21 * n32 - n22 * n31 );
+
+	}
+
+	/**
 	 * Transposes this matrix in place.
 	 *
 	 * @return {Matrix4} A reference to this matrix.
@@ -763,7 +788,7 @@ class Matrix4 {
 	}
 
 	/**
-	 * Multiplies the columns of this matrix by the given vector.
+	 * Scales each of the first three columns of this matrix by the corresponding component of the given vector.
 	 *
 	 * @param {Vector3} v - The scale vector.
 	 * @return {Matrix4} A reference to this matrix.
@@ -1058,7 +1083,7 @@ class Matrix4 {
 		position.y = te[ 13 ];
 		position.z = te[ 14 ];
 
-		const det = this.determinant();
+		const det = this.determinantAffine();
 
 		if ( det === 0 ) {
 

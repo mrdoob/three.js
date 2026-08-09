@@ -2,7 +2,12 @@ import { Parameters } from './Parameters.js';
 import { WebGPURenderer, WebGLBackend, Node } from 'three/webgpu';
 import { getItem, setItem } from '../Inspector.js';
 
-const _EXTENSIONS_PATH = '../extensions/extensions.json';
+const _extensions = [
+	{
+		name: 'TSL Graph',
+		url: '../extensions/tsl-graph/TSLGraphEditor.js'
+	}
+];
 
 const _init = WebGPURenderer.prototype.init;
 
@@ -109,6 +114,16 @@ class Settings extends Parameters {
 			location.reload();
 
 		} );
+
+		// Render Modes
+
+		const modesGroup = this.createGroup( 'Render Modes' );
+
+		modesGroup.add( { overdraw: false }, 'overdraw' ).name( 'Overdraw' ).onChange( ( enable ) => {
+
+			this.inspector.overdraw = enable;
+
+		} ).info( 'Shows how many times each pixel is shaded.' );
 
 	}
 
@@ -261,7 +276,7 @@ Shares the same state across any page within the current origin.` );
 
 		extension.active = true;
 
-		const extUrl = new URL( extension.url, new URL( _EXTENSIONS_PATH, import.meta.url ) ).href;
+		const extUrl = new URL( extension.url, import.meta.url ).href;
 
 		const module = await import( extUrl );
 
@@ -282,11 +297,7 @@ Shares the same state across any page within the current origin.` );
 
 	async _getExtensions() {
 
-		const url = new URL( _EXTENSIONS_PATH, import.meta.url );
-
-		const extensions = await fetch( url ).then( res => res.json() );
-
-		return extensions;
+		return _extensions;
 
 	}
 

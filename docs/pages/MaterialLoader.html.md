@@ -97,6 +97,18 @@ The material type.
 
 **Returns:** The new material.
 
+### .registerMaterial( type : string, materialClass : Material.constructor )
+
+Registers the given material at the internal material library.
+
+**type**
+
+The material type.
+
+**materialClass**
+
+The material class.
+
 ## Source
 
 [src/loaders/MaterialLoader.js](https://github.com/mrdoob/three.js/blob/master/src/loaders/MaterialLoader.js)

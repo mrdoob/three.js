@@ -62,12 +62,6 @@ Default is `true`.
 
 The node to render a texture with.
 
-### .pixelRatio : number
-
-The pixel ratio
-
-Default is `1`.
-
 ### .renderTarget : RenderTarget
 
 The render target
@@ -94,13 +88,21 @@ Default is `null`.
 
 ## Methods
 
-### .setPixelRatio( pixelRatio : number )
+### .getResolutionScale() : number
 
-Sets the pixel ratio. This will also resize the render target.
+Gets the resolution scale.
 
-**pixelRatio**
+**Returns:** The resolution scale.
 
-The pixel ratio to set.
+### .setResolutionScale( resolutionScale : number ) : RTTNode
+
+Sets the resolution scale. The resolution scale is a factor that is multiplied with the renderer's width and height.
+
+**resolutionScale**
+
+The resolution scale to set. A value of `1` means full resolution.
+
+**Returns:** A reference to this node.
 
 ### .setSize( width : number, height : number )
 

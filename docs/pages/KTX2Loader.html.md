@@ -115,9 +115,9 @@ Executed when errors occur.
 
 ### .setTranscoderPath( path : string ) : KTX2Loader
 
-Sets the transcoder path.
+Sets the transcoder path to optionally set the decoder load path from a CDN.
 
-The WASM transcoder and JS wrapper are available from the `examples/jsm/libs/basis` directory.
+By default The WASM transcoder and JS wrapper are loaded from the `examples/jsm/libs/basis` directory.
 
 **path**
 

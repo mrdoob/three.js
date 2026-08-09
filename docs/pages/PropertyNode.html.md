@@ -14,7 +14,7 @@ const threshold = property( 'float', 'threshold' ).assign( THRESHOLD );
 
 ## Constructor
 
-### new PropertyNode( nodeType : string, name : string, varying : boolean )
+### new PropertyNode( nodeType : string, name : string, varying : boolean, placeholderNode : Node )
 
 Constructs a new property node.
 
@@ -33,6 +33,12 @@ Default is `null`.
 Whether this property is a varying or not.
 
 Default is `false`.
+
+**placeholderNode**
+
+The placeholder node if not assigned.
+
+Default is `null`.
 
 ## Properties
 
@@ -57,6 +63,12 @@ The name of the property in the shader. If no name is defined, the node system a
 Default is `null`.
 
 **Overrides:** [Node#name](Node.html#name)
+
+### .placeholderNode : Node
+
+The placeholder node of the property if it is not assigned.
+
+Default is `null`.
 
 ### .varying : boolean
 

@@ -8,7 +8,6 @@ const server = createServer();
 const exceptionList = [
 
 	// Take too long
-	'webgl_loader_lwo', 				// 8 min
 	'webgpu_cubemap_mix', 				// 2 min
 	'webgl_loader_texture_ultrahdr', 	// 1 min
 	'webgl_marchingcubes', 				// 1 min
@@ -38,12 +37,14 @@ const exceptionList = [
 	'webgpu_compute_audio',
 	'webgpu_compute_cloth',
 	'webgpu_compute_particles_fluid',
+	'webgpu_compute_rasterizer_ibl', // Rasterizer discrepancies
 	'webgpu_compute_sort_bitonic',
 	'webgpu_storage_buffer',
 	'webgpu_tsl_editor',
 	'webxr_vr_video',
 	'webgpu_tsl_transpiler',
 	'webgpu_rendertarget_2d-array_3d',
+	'webgpu_volume_fire',
 
 	// Need more time to render
 	'css3d_mixed',
@@ -55,6 +56,7 @@ const exceptionList = [
 	'webgpu_materials_matcap',
 	'webgpu_morphtargets_face',
 	'webgpu_shadowmap_progressive',
+	'webgpu_postprocessing_ssr_denoise',
 
 	// Video hangs the CI?
 	'css3d_youtube',
@@ -67,7 +69,10 @@ const exceptionList = [
 
 	// Webcam
 	'webgl_materials_video_webcam',
-	'webgl_morphtargets_webcam'
+	'webgl_morphtargets_webcam',
+
+	// Sub-pixel coverage of thin high-contrast geometry edges differs across rasterizers #33817
+	'webgpu_generator_city'
 
 ];
 

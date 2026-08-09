@@ -85,6 +85,8 @@ class USDAParser {
 
 			} else if ( line.endsWith( '{' ) ) {
 
+				string = line.slice( 0, - 1 ).trim() || string;
+
 				const group = target[ string ] || {};
 				stack.push( group );
 

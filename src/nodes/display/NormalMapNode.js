@@ -5,7 +5,7 @@ import { TBNViewMatrix } from '../accessors/AccessorsUtils.js';
 import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking } from '../../constants.js';
-import { directionToFaceDirection } from './FrontFacingNode.js';
+import { negateOnBackSide } from './FrontFacingNode.js';
 import { unpackNormal } from '../utils/Packing.js';
 import { error } from '../../utils.js';
 
@@ -107,7 +107,7 @@ class NormalMapNode extends TempNode {
 
 			if ( builder.isFlatShading() === true ) {
 
-				scale = directionToFaceDirection( scale );
+				scale = negateOnBackSide( scale );
 
 			}
 

@@ -20,6 +20,8 @@ An object with one or more properties defining the material's appearance. Any pr
 
 The texture to create a bump map. The black and white values map to the perceived depth in relation to the lights. Bump doesn't actually affect the geometry of the object, only the lighting. If a normal map is defined this will be ignored.
 
+`bumpMap` represents non-color data. Any texture assigned must have `texture.colorSpace = NoColorSpace` (default).
+
 Default is `null`.
 
 ### .bumpScale : number
@@ -61,6 +63,8 @@ Default is `true`.
 ### .normalMap : Texture
 
 The texture to create a normal map. The RGB values affect the surface normal for each pixel fragment and change the way the color is lit. Normal maps do not change the actual shape of the surface, only the lighting. In case the material has a normal map authored using the left handed convention, the `y` component of `normalScale` should be negated to compensate for the different handedness.
+
+`normalMap` represents non-color data. Any texture assigned must have `texture.colorSpace = NoColorSpace` (default).
 
 Default is `null`.
 

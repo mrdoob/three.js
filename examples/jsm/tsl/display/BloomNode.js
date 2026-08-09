@@ -1,5 +1,5 @@
 import { HalfFloatType, RenderTarget, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, NodeUpdateType } from 'three/webgpu';
-import { nodeObject, Fn, float, uv, passTexture, uniform, Loop, texture, luminance, smoothstep, mix, vec4, uniformArray, add, int } from 'three/tsl';
+import { nodeObject, Fn, float, uv, passTexture, uniform, Loop, texture, luminance, smoothstep, mix, vec4, uniformArray, add, int, array, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -105,6 +105,15 @@ class BloomNode extends TempNode {
 		 * @type {UniformNode<float>}
 		 */
 		this.smoothWidth = uniform( 0.01 );
+
+		/**
+		 * A per-mip tint color for the bloom, applied during the composite pass.
+		 * Defaults to white (no tint) for each of the mips. Mutate the vectors to
+		 * colorize the bloom (e.g. for a warm or anamorphic look).
+		 *
+		 * @type {Array<Vector3>}
+		 */
+		this.bloomTintColors = [ new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ) ];
 
 		/**
 		 * Scale factor for the internal render targets.
@@ -399,10 +408,13 @@ class BloomNode extends TempNode {
 	 */
 	setup( builder ) {
 
+		const sharedContext = context( builder.getSharedContext() );
+
 		// luminosity high pass material
 
 		this._highPassFilterMaterial = this._highPassFilterMaterial || new NodeMaterial();
-		this._highPassFilterMaterial.fragmentNode = this.highPassFn( { input: this.inputNode, threshold: this.threshold, smoothWidth: this.smoothWidth } ).context( builder.getSharedContext() );
+		this._highPassFilterMaterial.contextNode = sharedContext;
+		this._highPassFilterMaterial.fragmentNode = this.highPassFn( { input: this.inputNode, threshold: this.threshold, smoothWidth: this.smoothWidth } );
 		this._highPassFilterMaterial.name = 'Bloom_highPass';
 		this._highPassFilterMaterial.needsUpdate = true;
 
@@ -414,29 +426,14 @@ class BloomNode extends TempNode {
 
 		for ( let i = 0; i < this._nMips; i ++ ) {
 
-			this._separableBlurMaterials.push( this._getSeparableBlurMaterial( builder, kernelSizeArray[ i ] ) );
+			this._separableBlurMaterials.push( this._getSeparableBlurMaterial( sharedContext, kernelSizeArray[ i ] ) );
 
 		}
 
 		// composite material
 
-		const bloomFactors = uniformArray( [ 1.0, 0.8, 0.6, 0.4, 0.2 ] );
-		const bloomTintColors = uniformArray( [ new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ) ] );
-
-		const lerpBloomFactor = Fn( ( [ factor, radius ] ) => {
-
-			const mirrorFactor = float( 1.2 ).sub( factor );
-			return mix( factor, mirrorFactor, radius );
-
-		} ).setLayout( {
-			name: 'lerpBloomFactor',
-			type: 'float',
-			inputs: [
-				{ name: 'factor', type: 'float' },
-				{ name: 'radius', type: 'float' },
-			]
-		} );
-
+		const bloomFactors = array( [ 1.0, 0.8, 0.6, 0.4, 0.2 ] );
+		const bloomTintColors = uniformArray( this.bloomTintColors );
 
 		const compositePass = Fn( () => {
 
@@ -453,7 +450,8 @@ class BloomNode extends TempNode {
 		} );
 
 		this._compositeMaterial = this._compositeMaterial || new NodeMaterial();
-		this._compositeMaterial.fragmentNode = compositePass().context( builder.getSharedContext() );
+		this._compositeMaterial.contextNode = sharedContext;
+		this._compositeMaterial.fragmentNode = compositePass();
 		this._compositeMaterial.name = 'Bloom_comp';
 		this._compositeMaterial.needsUpdate = true;
 
@@ -498,11 +496,11 @@ class BloomNode extends TempNode {
 	 * Create a separable blur material for the given kernel radius.
 	 *
 	 * @private
-	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {NodeContext} sharedContext
 	 * @param {number} kernelRadius - The kernel radius.
 	 * @return {NodeMaterial}
 	 */
-	_getSeparableBlurMaterial( builder, kernelRadius ) {
+	_getSeparableBlurMaterial( sharedContext, kernelRadius ) {
 
 		const coefficients = [];
 		const sigma = kernelRadius / 3;
@@ -513,10 +511,28 @@ class BloomNode extends TempNode {
 
 		}
 
+		// Merge adjacent taps into single bilinear fetches (linear sampling).
+
+		const centerWeight = coefficients[ 0 ];
+		const offsets = [];
+		const weights = [];
+
+		for ( let i = 1; i < kernelRadius; i += 2 ) {
+
+			const wa = coefficients[ i ];
+			const wb = ( i + 1 ) < kernelRadius ? coefficients[ i + 1 ] : 0;
+			const w = wa + wb;
+
+			offsets.push( ( i * wa + ( i + 1 ) * wb ) / w );
+			weights.push( w );
+
+		}
+
 		//
 
 		const colorTexture = texture( null );
-		const gaussianCoefficients = uniformArray( coefficients );
+		const gaussianOffsets = array( offsets );
+		const gaussianWeights = array( weights );
 		const invSize = uniform( new Vector2() );
 		const direction = uniform( new Vector2( 0.5, 0.5 ) );
 
@@ -525,13 +541,12 @@ class BloomNode extends TempNode {
 
 		const separableBlurPass = Fn( () => {
 
-			const diffuseSum = sampleTexel( uvNode ).rgb.mul( gaussianCoefficients.element( 0 ) ).toVar();
+			const diffuseSum = sampleTexel( uvNode ).rgb.mul( centerWeight ).toVar();
 
-			Loop( { start: int( 1 ), end: int( kernelRadius ), type: 'int', condition: '<' }, ( { i } ) => {
+			Loop( { start: int( 0 ), end: int( offsets.length ), type: 'int', condition: '<' }, ( { i } ) => {
 
-				const x = float( i );
-				const w = gaussianCoefficients.element( i );
-				const uvOffset = direction.mul( invSize ).mul( x );
+				const w = gaussianWeights.element( i );
+				const uvOffset = direction.mul( invSize ).mul( gaussianOffsets.element( i ) );
 				const sample1 = sampleTexel( uvNode.add( uvOffset ) ).rgb;
 				const sample2 = sampleTexel( uvNode.sub( uvOffset ) ).rgb;
 				diffuseSum.addAssign( add( sample1, sample2 ).mul( w ) );
@@ -543,7 +558,8 @@ class BloomNode extends TempNode {
 		} );
 
 		const separableBlurMaterial = new NodeMaterial();
-		separableBlurMaterial.fragmentNode = separableBlurPass().context( builder.getSharedContext() );
+		separableBlurMaterial.contextNode = sharedContext;
+		separableBlurMaterial.fragmentNode = separableBlurPass();
 		separableBlurMaterial.name = 'Bloom_separable';
 		separableBlurMaterial.needsUpdate = true;
 
@@ -557,6 +573,13 @@ class BloomNode extends TempNode {
 	}
 
 }
+
+const lerpBloomFactor = Fn( ( { factor, radius } ) => {
+
+	const mirrorFactor = float( 1.2 ).sub( factor );
+	return mix( factor, mirrorFactor, radius );
+
+}, { factor: 'float', radius: 'float', return: 'float' } );
 
 /**
  * TSL function for creating a bloom effect.

@@ -134,6 +134,8 @@ const VolumeRenderShader1 = {
 
 				vec4 apply_colormap(float val) {
 						val = (val - u_clim[0]) / (u_clim[1] - u_clim[0]);
+						float n = float(textureSize(u_cmdata, 0).x); // see #33842
+						val = (val * (n - 1.0) + 0.5) / n;
 						return texture2D(u_cmdata, vec2(val, 0.5));
 				}
 

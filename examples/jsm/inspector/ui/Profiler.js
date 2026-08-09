@@ -1,5 +1,6 @@
 import { EventDispatcher } from 'three';
 import { Style } from './Style.js';
+import { Graph } from './Graph.js';
 import { getItem, setItem } from '../Inspector.js';
 
 export class Profiler extends EventDispatcher {
@@ -19,16 +20,33 @@ export class Profiler extends EventDispatcher {
 		this.maxZIndex = 1002; // Track the highest z-index for detached windows (starts at base z-index from CSS)
 		this.nextTabOriginalIndex = 0; // Track the original order of tabs as they are added
 
+		this.horizontalAlign = 'right'; // 'left' or 'right'
+		this.verticalAlign = 'top'; // 'top' or 'bottom'
+
 		this.setupShell();
 		this.setupResizing();
 
 		Style.init( this.domElement );
+
+		this.updateWidgetPosition();
 
 		// Setup window resize listener and update mobile status
 		this.setupWindowResizeListener();
 
 		// Setup orientation change listener for mobile devices
 		this.setupOrientationListener();
+
+		this.checkHeaderScroll();
+
+		this.panel.addEventListener( 'transitionend', ( e ) => {
+
+			if ( e.target === this.panel && ( e.propertyName === 'width' || e.propertyName === 'height' || e.propertyName === 'transform' ) ) {
+
+				this.checkHeaderScroll();
+
+			}
+
+		} );
 
 	}
 
@@ -180,6 +198,7 @@ export class Profiler extends EventDispatcher {
 
 			constrainDetachedWindows();
 			constrainMainPanel();
+			this.checkHeaderScroll();
 
 		} );
 
@@ -240,6 +259,9 @@ export class Profiler extends EventDispatcher {
 
 		this.domElement.classList.add( 'three-inspector' );
 
+		this.domElement.addEventListener( 'keydown', ( e ) => e.stopPropagation() );
+		this.domElement.addEventListener( 'keyup', ( e ) => e.stopPropagation() );
+
 		this.toggleButton = document.createElement( 'button' );
 		this.toggleButton.classList.add( 'profiler-toggle' );
 		this.toggleButton.innerHTML = `
@@ -250,6 +272,10 @@ export class Profiler extends EventDispatcher {
 </span>
 <span class="toggle-icon">
 	<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-device-ipad-horizontal-search"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11.5 20h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v5.5" /><path d="M9 17h2" /><path d="M18 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M20.2 20.2l1.8 1.8" /></svg>
+	<span class="console-badge-container">
+		<span class="console-badge error" style="display: none;">0</span>
+		<span class="console-badge warn" style="display: none;">0</span>
+	</span>
 </span>
 `;
 		this.toggleButton.onclick = () => this.togglePanel();
@@ -338,6 +364,12 @@ export class Profiler extends EventDispatcher {
 
 		}
 
+		// Create a background performance graph for the toggle button
+		this.toggleGraph = new Graph( 80 );
+		this.toggleGraph.addLine( 'fps', '#4c4c6bff' );
+		this.toggleGraph.domElement.className = 'profiler-toggle-graph';
+		this.toggleButton.appendChild( this.toggleGraph.domElement );
+
 	}
 
 	setupResizing() {
@@ -386,6 +418,7 @@ export class Profiler extends EventDispatcher {
 				}
 
 				this.dispatchEvent( { type: 'resize' } );
+				this.checkHeaderScroll();
 
 			};
 
@@ -431,6 +464,7 @@ export class Profiler extends EventDispatcher {
 		if ( this.panel.classList.contains( 'maximized' ) ) {
 
 			this.panel.classList.remove( 'maximized' );
+			this.domElement.classList.remove( 'maximized' );
 
 			// Restore size based on current position
 			if ( this.position === 'bottom' ) {
@@ -461,23 +495,26 @@ export class Profiler extends EventDispatcher {
 			}
 
 			this.panel.classList.add( 'maximized' );
+			this.domElement.classList.add( 'maximized' );
 
 			// Maximize based on current position
 			if ( this.position === 'bottom' ) {
 
-				this.panel.style.height = '100vh';
+				this.panel.style.height = '100%';
 				this.panel.style.width = '100%';
 
 			} else if ( this.position === 'right' ) {
 
 				this.panel.style.height = '100%';
-				this.panel.style.width = '100vw';
+				this.panel.style.width = '100%';
 
 			}
 
 			this.maximizeBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>';
 
 		}
+
+		this.updateWidgetPosition();
 
 		this.dispatchEvent( { type: 'resize' } );
 
@@ -753,6 +790,7 @@ export class Profiler extends EventDispatcher {
 			if ( this.panel.classList.contains( 'maximized' ) ) {
 
 				this.panel.classList.remove( 'maximized' );
+				this.domElement.classList.remove( 'maximized' );
 				this.maximizeBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
 
 			}
@@ -760,7 +798,7 @@ export class Profiler extends EventDispatcher {
 			// No tabs visible - set to minimum size
 			if ( this.position === 'bottom' ) {
 
-				this.panel.style.height = '38px';
+				this.panel.style.height = '32px';
 
 			} else if ( this.position === 'right' ) {
 
@@ -779,7 +817,7 @@ export class Profiler extends EventDispatcher {
 				if ( this.position === 'bottom' ) {
 
 					const currentHeight = parseInt( this.panel.style.height );
-					if ( currentHeight === 38 ) {
+					if ( currentHeight === 32 || currentHeight === 38 ) {
 
 						this.panel.style.height = `${ this.lastHeightBottom }px`;
 
@@ -801,6 +839,29 @@ export class Profiler extends EventDispatcher {
 		}
 
 		this.dispatchEvent( { type: 'resize' } );
+		this.checkHeaderScroll();
+
+	}
+
+	checkHeaderScroll() {
+
+		const header = this.panel.querySelector( '.profiler-header' );
+
+		if ( header ) {
+
+			const hasScroll = header.scrollWidth > header.clientWidth + 1;
+
+			if ( hasScroll ) {
+
+				this.panel.classList.add( 'has-horizontal-scroll' );
+
+			} else {
+
+				this.panel.classList.remove( 'has-horizontal-scroll' );
+
+			}
+
+		}
 
 	}
 
@@ -1124,13 +1185,7 @@ export class Profiler extends EventDispatcher {
 		windowPanel.style.left = `${ constrainedX }px`;
 		windowPanel.style.top = `${ constrainedY }px`;
 
-		if ( ! this.panel.classList.contains( 'visible' ) ) {
 
-			windowPanel.style.opacity = '0';
-			windowPanel.style.visibility = 'hidden';
-			windowPanel.style.pointerEvents = 'none';
-
-		}
 
 		// Hide detached window if tab is not visible
 		if ( ! tab.isVisible ) {
@@ -1485,6 +1540,8 @@ export class Profiler extends EventDispatcher {
 
 				}
 
+				this.dispatchEvent( { type: 'resize' } );
+
 			};
 
 			const onResizeEnd = () => {
@@ -1565,8 +1622,8 @@ export class Profiler extends EventDispatcher {
 
 			}
 
-			// Count only non-detached tabs that come before this one
-			if ( ! t.isDetached ) {
+			// Count only non-detached, non-builtin tabs that come before this one
+			if ( ! t.isDetached && ! t.builtin ) {
 
 				insertIndex ++;
 
@@ -1610,11 +1667,20 @@ export class Profiler extends EventDispatcher {
 
 		if ( this.tabs[ id ] ) {
 
-			this.tabs[ id ].setActive( true );
+			const tab = this.tabs[ id ];
+
+			if ( ! tab.isVisible ) {
+
+				tab.show();
+
+			}
+
+			tab.setActive( true );
 
 		}
 
 		this.saveLayout();
+		this.checkHeaderScroll();
 
 	}
 
@@ -1626,23 +1692,13 @@ export class Profiler extends EventDispatcher {
 
 		const isVisible = this.panel.classList.contains( 'visible' );
 
-		this.detachedWindows.forEach( detachedWindow => {
+		if ( isVisible && this.activeTabId && this.tabs[ this.activeTabId ] ) {
 
-			if ( isVisible ) {
+			this.tabs[ this.activeTabId ].setActive( true );
 
-				detachedWindow.panel.style.opacity = '';
-				detachedWindow.panel.style.visibility = '';
-				detachedWindow.panel.style.pointerEvents = '';
+		}
 
-			} else {
-
-				detachedWindow.panel.style.opacity = '0';
-				detachedWindow.panel.style.visibility = 'hidden';
-				detachedWindow.panel.style.pointerEvents = 'none';
-
-			}
-
-		} );
+		this.updateWidgetPosition();
 
 		this.dispatchEvent( { type: 'resize' } );
 
@@ -1676,8 +1732,6 @@ export class Profiler extends EventDispatcher {
 			// Apply right position styles
 			this.panel.classList.remove( 'position-bottom' );
 			this.panel.classList.add( 'position-right' );
-			this.toggleButton.classList.add( 'position-right' );
-			this.miniPanel.classList.add( 'position-right' );
 			this.panel.style.bottom = '';
 			this.panel.style.top = '0';
 			this.panel.style.right = '0';
@@ -1686,7 +1740,7 @@ export class Profiler extends EventDispatcher {
 			// Apply size based on maximized state
 			if ( isMaximized ) {
 
-				this.panel.style.width = '100vw';
+				this.panel.style.width = '100%';
 				this.panel.style.height = '100%';
 
 			} else {
@@ -1706,8 +1760,6 @@ export class Profiler extends EventDispatcher {
 			// Apply bottom position styles
 			this.panel.classList.remove( 'position-right' );
 			this.panel.classList.add( 'position-bottom' );
-			this.toggleButton.classList.remove( 'position-right' );
-			this.miniPanel.classList.remove( 'position-right' );
 			this.panel.style.top = '';
 			this.panel.style.right = '';
 			this.panel.style.bottom = '0';
@@ -1717,7 +1769,7 @@ export class Profiler extends EventDispatcher {
 			if ( isMaximized ) {
 
 				this.panel.style.width = '100%';
-				this.panel.style.height = '100vh';
+				this.panel.style.height = '100%';
 
 			} else {
 
@@ -1727,6 +1779,8 @@ export class Profiler extends EventDispatcher {
 			}
 
 		}
+
+		this.updateWidgetPosition();
 
 		// Re-enable transition after a brief delay
 		setTimeout( () => {
@@ -1950,6 +2004,9 @@ export class Profiler extends EventDispatcher {
 			// Update panel size after loading layout
 			this.updatePanelSize();
 
+			// Update widget position (toggle and mini panel alignment)
+			this.updateWidgetPosition();
+
 			// Ensure initial open state applies to mini panel as well
 			if ( this.panel.classList.contains( 'visible' ) ) {
 
@@ -2067,6 +2124,96 @@ export class Profiler extends EventDispatcher {
 
 		// Update panel size after restoring detached tabs
 		this.updatePanelSize();
+
+	}
+
+	setHorizontalAlign( value ) {
+
+		this.horizontalAlign = value;
+		this.updateWidgetPosition();
+
+		return this;
+
+	}
+
+	setVerticalAlign( value ) {
+
+		this.verticalAlign = value;
+		this.updateWidgetPosition();
+
+		return this;
+
+	}
+
+	updateWidgetPosition() {
+
+		const isVisible = this.panel.classList.contains( 'visible' );
+		const isMaximized = this.panel.classList.contains( 'maximized' );
+		const isRight = this.position === 'right';
+
+		let horizontal = this.horizontalAlign; // 'left' or 'right'
+		let vertical = this.verticalAlign; // 'top' or 'bottom'
+
+		if ( isVisible ) {
+
+			if ( isRight ) {
+
+				// If panel is open on the right:
+				// Toggle should be on the opposite side of 'right' if default is 'right' to avoid overlapping the panel.
+				if ( this.horizontalAlign === 'right' ) {
+
+					horizontal = 'left';
+
+				}
+
+			} else {
+
+				// If panel is open at the bottom:
+				if ( ! isMaximized ) {
+
+					// If default is bottom, we must move to top to avoid overlapping the panel at the bottom.
+					if ( this.verticalAlign === 'bottom' ) {
+
+						vertical = 'top';
+
+					}
+
+				} else {
+
+					// If maximized, move to the opposite vertical position to avoid overlap with header/tabs.
+					vertical = this.verticalAlign === 'top' ? 'bottom' : 'top';
+
+				}
+
+			}
+
+		}
+
+		// Apply horizontal class
+		if ( horizontal === 'left' ) {
+
+			this.toggleButton.classList.add( 'toggle-left' );
+			this.miniPanel.classList.add( 'toggle-left' );
+
+		} else {
+
+			this.toggleButton.classList.remove( 'toggle-left' );
+			this.miniPanel.classList.remove( 'toggle-left' );
+
+		}
+
+		// Apply vertical class
+		if ( vertical === 'bottom' ) {
+
+			this.toggleButton.classList.add( 'toggle-bottom' );
+			this.miniPanel.classList.add( 'toggle-bottom' );
+
+		} else {
+
+			this.toggleButton.classList.remove( 'toggle-bottom' );
+			this.miniPanel.classList.remove( 'toggle-bottom' );
+
+		}
 
 	}
 

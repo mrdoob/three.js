@@ -26,7 +26,8 @@ class Performance extends Tab {
 
 		const graph = new Graph();
 		graph.addLine( 'fps', 'var( --color-fps )' );
-		//graph.addLine( 'gpu', 'var( --color-yellow )' );
+		graph.addLine( 'cpu', 'var( --color-yellow )' );
+		graph.addLine( 'gpu', 'var( --color-green )' );
 		graphContainer.append( graph.domElement );
 
 		//
@@ -161,9 +162,22 @@ class Performance extends Tab {
 
 	}
 
-	updateGraph( inspector/*, frame*/ ) {
+	updateGraph( inspector, frame ) {
 
-		this.graph.addPoint( 'fps', inspector.fps );
+		const fps = inspector.fps;
+
+		this.graph.addPoint( 'fps', fps );
+
+		if ( frame ) {
+
+			const cpuValue = Math.min( ( ( frame.cpu || 0 ) * fps ) / 1000, 1.0 ) * fps;
+			const gpuValue = Math.min( ( ( frame.gpu || 0 ) * fps ) / 1000, 1.0 ) * fps;
+
+			this.graph.addPoint( 'cpu', cpuValue );
+			this.graph.addPoint( 'gpu', gpuValue );
+
+		}
+
 		this.graph.update();
 
 	}
@@ -249,7 +263,7 @@ class Performance extends Tab {
 		//
 
 		setText( this.frameStats.data[ 1 ], frame.cpu.toFixed( 2 ) );
-		setText( this.frameStats.data[ 2 ], frame.gpu.toFixed( 2 ) );
+		setText( this.frameStats.data[ 2 ], inspector.getRenderer().backend.hasTimestamp ? frame.gpu.toFixed( 2 ) : '-' );
 		setText( this.frameStats.data[ 3 ], frame.total.toFixed( 2 ) );
 
 		//

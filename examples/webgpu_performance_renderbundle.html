@@ -47,7 +47,7 @@
 			let camera, scene, renderer;
 			let controls;
 			let gui;
-			let geometries, group;
+			let geometries, group, instancedMesh;
 
 			//
 
@@ -55,6 +55,9 @@
 			const rotation = new THREE.Euler();
 			const quaternion = new THREE.Quaternion();
 			const scale = new THREE.Vector3();
+
+			const instanceMatrix = new THREE.Matrix4();
+			const rotationMatrix = new THREE.Matrix4();
 
 			//
 
@@ -122,13 +125,6 @@
 
 			function initMesh( count ) {
 
-				initRegularMesh( count );
-
-			}
-
-
-			function initRegularMesh( count ) {
-
 				group = api.renderBundle ? new THREE.BundleGroup() : new THREE.Group();
 
 				for ( let i = 0; i < count; i ++ ) {
@@ -146,6 +142,26 @@
 					group.add( child );
 
 				}
+
+				// instanced meshes are supported inside a bundle group, too
+
+				instancedMesh = new THREE.InstancedMesh( geometries[ 0 ], new THREE.MeshToonNodeMaterial(), 10 );
+				instancedMesh.userData.rotationSpeeds = [];
+
+				const matrix = new THREE.Matrix4();
+
+				for ( let i = 0; i < instancedMesh.count; i ++ ) {
+
+					randomizeMatrix( matrix );
+					instancedMesh.setMatrixAt( i, matrix );
+
+					instancedMesh.userData.rotationSpeeds.push( randomizeRotationSpeed( new THREE.Euler() ) );
+
+				}
+
+				group.add( instancedMesh );
+
+				//
 
 				scene.add( group );
 
@@ -245,10 +261,11 @@
 
 				function animateMeshes() {
 
-					const count = api.count;
-					const loopNum = api.dynamic ? count : 0;
+					if ( api.dynamic === false ) return;
 
-					for ( let i = 0; i < loopNum; i ++ ) {
+					// rotate the regular meshes
+
+					for ( let i = 0; i < api.count; i ++ ) {
 
 						const child = group.children[ i ];
 						const rotationSpeed = child.userData.rotationSpeed;
@@ -260,6 +277,22 @@
 						);
 
 					}
+
+					// rotate each instance of the instanced mesh individually
+
+					const rotationSpeeds = instancedMesh.userData.rotationSpeeds;
+
+					for ( let i = 0; i < instancedMesh.count; i ++ ) {
+
+						rotationMatrix.makeRotationFromEuler( rotationSpeeds[ i ] );
+
+						instancedMesh.getMatrixAt( i, instanceMatrix );
+						instanceMatrix.multiply( rotationMatrix );
+						instancedMesh.setMatrixAt( i, instanceMatrix );
+
+					}
+
+					instancedMesh.instanceMatrix.needsUpdate = true;
 
 				}
 

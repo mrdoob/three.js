@@ -1657,7 +1657,7 @@ class SVGLoader extends Loader {
 				const tx = parseFloatWithUnits( node.getAttribute( 'x' ) || 0 );
 				const ty = parseFloatWithUnits( node.getAttribute( 'y' ) || 0 );
 
-				transform.translate( tx, ty );
+				transform.makeTranslation( tx, ty );
 
 			}
 
@@ -1709,7 +1709,7 @@ class SVGLoader extends Loader {
 
 								}
 
-								currentTransform.translate( tx, ty );
+								currentTransform.makeTranslation( tx, ty );
 
 							}
 
@@ -1758,7 +1758,7 @@ class SVGLoader extends Loader {
 
 								}
 
-								currentTransform.scale( scaleX, scaleY );
+								currentTransform.makeScale( scaleX, scaleY );
 
 							}
 

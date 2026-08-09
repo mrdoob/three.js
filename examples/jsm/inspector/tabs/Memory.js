@@ -80,7 +80,6 @@ class Memory extends Tab {
 	updateGraph( inspector ) {
 
 		const renderer = inspector.getRenderer();
-		if ( ! renderer ) return;
 
 		const memory = renderer.info.memory;
 
@@ -95,7 +94,6 @@ class Memory extends Tab {
 	updateText( inspector ) {
 
 		const renderer = inspector.getRenderer();
-		if ( ! renderer ) return;
 
 		const memory = renderer.info.memory;
 

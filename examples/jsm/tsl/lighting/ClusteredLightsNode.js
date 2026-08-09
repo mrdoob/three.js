@@ -212,7 +212,7 @@ class ClusteredLightsNode extends LightsNode {
 
 		for ( const light of lights ) {
 
-			if ( light.isPointLight === true ) {
+			if ( light.isPointLight === true && light.castShadow !== true ) {
 
 				clusteredLights[ clusteredIndex ++ ] = light;
 
@@ -227,7 +227,13 @@ class ClusteredLightsNode extends LightsNode {
 		materialLights.length = materialIndex;
 		clusteredLights.length = clusteredIndex;
 
-		return super.setLights( materialLights );
+		return super.setLights( lights );
+
+	}
+
+	getBuiltinLights() {
+
+		return this.materialLights;
 
 	}
 
@@ -586,12 +592,6 @@ class ClusteredLightsNode extends LightsNode {
 		this._lightsTexture = lightsTexture;
 		this._zSliceRangesTexture = zSliceRangesTexture;
 		this._zSliceRangesData = zSliceRangesData;
-
-	}
-
-	get hasLights() {
-
-		return super.hasLights || this.clusteredLights.length > 0;
 
 	}
 

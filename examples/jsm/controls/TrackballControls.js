@@ -839,7 +839,6 @@ function onMouseMove( event ) {
 
 	if ( state === _STATE.ROTATE && ! this.noRotate ) {
 
-		this._movePrev.copy( this._moveCurr );
 		this._moveCurr.copy( this._getMouseOnCircle( event.pageX, event.pageY ) );
 
 	} else if ( state === _STATE.ZOOM && ! this.noZoom ) {
@@ -939,7 +938,6 @@ function onTouchMove( event ) {
 	switch ( this._pointers.length ) {
 
 		case 1:
-			this._movePrev.copy( this._moveCurr );
 			this._moveCurr.copy( this._getMouseOnCircle( event.pageX, event.pageY ) );
 			break;
 

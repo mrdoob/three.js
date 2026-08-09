@@ -42,6 +42,12 @@ Whether or not looking around is vertically constrained by `verticalMin` and `ve
 
 Default is `false`.
 
+### .dampingFactor : number
+
+How quickly the movement and look velocity catches up to the input. Lower values feel heavier (more inertia), `1` disables damping.
+
+Default is `0.1`.
+
 ### .heightCoef : number
 
 Determines how much faster the camera moves when it's y-component is near `heightMax`.
