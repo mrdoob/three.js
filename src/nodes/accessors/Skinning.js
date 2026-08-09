@@ -1,5 +1,5 @@
 
-import { Fn, add, uniform, mat3 } from '../tsl/TSLBase.js';
+import { Fn, add, uniform, int, ivec2, mat3, mat4 } from '../tsl/TSLBase.js';
 import { attribute } from '../core/AttributeNode.js';
 import { OnObjectUpdate } from '../utils/EventNode.js';
 import { normalLocal } from './Normal.js';
@@ -7,6 +7,7 @@ import { positionLocal, positionPrevious } from './Position.js';
 import { tangentLocal } from './Tangent.js';
 import { reference, referenceBuffer } from './ReferenceNode.js';
 import { buffer } from './BufferNode.js';
+import { texture } from './TextureNode.js';
 import { storage } from './StorageBufferNode.js';
 import { instanceIndex } from '../core/IndexNode.js';
 
@@ -124,6 +125,52 @@ function getPreviousSkinnedPosition( skinnedMesh, bindMatrixNode, bindMatrixInve
 }
 
 /**
+ * Returns an accessor for the skeleton's bone matrices. Small skeletons use a
+ * uniform buffer; when the bone count exceeds the backend's uniform buffer
+ * capacity, the matrices are stored in the skeleton's bone texture instead,
+ * like `WebGLRenderer` does.
+ *
+ * @param {Skeleton} skeleton - The skeleton.
+ * @param {NodeBuilder} builder - The current node builder.
+ * @returns {Object} An accessor exposing `element( index )` like a buffer node.
+ */
+function getBoneMatricesNode( skeleton, builder ) {
+
+	const limit = ( builder.renderer.backend.isWebGPUBackend === true ) ? 1000 : 250; // WebGL 2 ensures only 16KB
+
+	if ( skeleton.bones.length <= limit ) {
+
+		return referenceBuffer( 'skeleton.boneMatrices', 'mat4', skeleton.bones.length );
+
+	}
+
+	if ( skeleton.boneTexture === null ) skeleton.computeBoneTexture();
+
+	const boneTexture = texture( skeleton.boneTexture );
+	const size = skeleton.boneTexture.image.width;
+
+	return {
+
+		element: ( i ) => {
+
+			const j = int( i ).mul( 4 );
+			const y = j.div( size );
+			const x = j.sub( y.mul( size ) );
+
+			return mat4(
+				boneTexture.load( ivec2( x, y ) ),
+				boneTexture.load( ivec2( x.add( 1 ), y ) ),
+				boneTexture.load( ivec2( x.add( 2 ), y ) ),
+				boneTexture.load( ivec2( x.add( 3 ), y ) )
+			);
+
+		}
+
+	};
+
+}
+
+/**
  * TSL function representing the standard skeletal animation vertex shader setup.
  * Transforms positionLocal, normalLocal, and tangentLocal in-place.
  *
@@ -137,7 +184,7 @@ export const skinning = /*@__PURE__*/ Fn( ( [ skinnedMesh ], builder ) => {
 	const skinWeightNode = attribute( 'skinWeight', 'vec4' );
 	const bindMatrixNode = reference( 'bindMatrix', 'mat4' );
 	const bindMatrixInverseNode = reference( 'bindMatrixInverse', 'mat4' );
-	const boneMatricesNode = referenceBuffer( 'skeleton.boneMatrices', 'mat4', skinnedMesh.skeleton.bones.length );
+	const boneMatricesNode = getBoneMatricesNode( skinnedMesh.skeleton, builder );
 
 	OnObjectUpdate( ( { object, frameId } ) => {
 
