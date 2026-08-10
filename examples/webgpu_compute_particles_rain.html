@@ -188,8 +188,6 @@
 				rainMaterial.positionNode = positionGeometry.add( positionBuffer.toAttribute() );
 				rainMaterial.vertexNode = billboarding( { horizontalRotation: true } );
 				rainMaterial.opacity = .2;
-				rainMaterial.side = THREE.DoubleSide;
-				rainMaterial.forceSinglePass = true;
 				rainMaterial.depthWrite = false;
 				rainMaterial.depthTest = true;
 				rainMaterial.transparent = true;
