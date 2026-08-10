@@ -171,7 +171,7 @@ function createGaussianSplatMesh( geometry, primitiveDef ) {
 
 	const centers = new Float32Array( count * 3 );
 	const covariances = new Float32Array( count * 6 );
-	const colors = new Uint8Array( count * 4 );
+	const colors = new Uint8ClampedArray( count * 4 );
 
 	for ( let i = 0; i < count; i ++ ) {
 
