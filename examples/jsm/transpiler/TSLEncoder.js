@@ -481,6 +481,38 @@ ${ this.tab }} )`;
 
 	}
 
+	isVariableUsed( node, varName ) {
+
+		if ( ! node ) return false;
+
+		if ( node.isAccessor && node.property === varName ) return true;
+
+		for ( const key in node ) {
+
+			if ( key === 'parent' ) continue;
+
+			const child = node[ key ];
+
+			if ( Array.isArray( child ) ) {
+
+				for ( const item of child ) {
+
+					if ( this.isVariableUsed( item, varName ) ) return true;
+
+				}
+
+			} else if ( child && child.isASTNode ) {
+
+				if ( this.isVariableUsed( child, varName ) ) return true;
+
+			}
+
+		}
+
+		return false;
+
+	}
+
 	emitLoop( node ) {
 
 		const start = this.emitExpression( node.initialization.value );
@@ -518,7 +550,22 @@ ${ this.tab }} )`;
 
 		}
 
-		let loopStr = `Loop( { start: ${ start }, end: ${ end + nameParam + typeParam + conditionParam + updateParam } }, ( { ${ name } } ) => {\n\n`;
+		let loopParams;
+
+		if ( start === '0' && nameParam === '' && typeParam === '' && conditionParam === '' && updateParam === '' ) {
+
+			loopParams = end;
+
+		} else {
+
+			loopParams = `{ start: ${ start }, end: ${ end + nameParam + typeParam + conditionParam + updateParam } }`;
+
+		}
+
+		const isUsed = this.isVariableUsed( node.body, name );
+		const callbackParams = isUsed ? `( { ${ name } } ) =>` : '() =>';
+
+		let loopStr = `Loop( ${ loopParams }, ${ callbackParams } {\n\n`;
 
 		loopStr += this.emitBody( node.body ) + '\n\n';
 
@@ -634,7 +681,30 @@ ${ this.tab }} )`;
 
 	}
 
+	emitDoWhile( node ) {
+
+		const condition = this.emitExpression( node.condition );
+		const body = this.emitBody( node.body );
+
+		let loopStr = `Loop( () => {\n\n${ body }\n\n${ this.tab }\tIf( ${ condition }.not(), () => {\n\n${ this.tab }\t\tBreak();\n\n${ this.tab }\t} );\n\n`;
+
+		loopStr += this.tab + '} )';
+
+		this.imports.add( 'Loop' );
+		this.imports.add( 'If' );
+		this.imports.add( 'Break' );
+
+		return loopStr;
+
+	}
+
 	emitWhile( node ) {
+
+		if ( node.doWhile ) {
+
+			return this.emitDoWhile( node );
+
+		}
 
 		const condition = this.emitExpression( node.condition );
 

@@ -612,12 +612,13 @@ export class For extends ASTNode {
 
 export class While extends ASTNode {
 
-	constructor( condition, body = [] ) {
+	constructor( condition, body = [], doWhile = false ) {
 
 		super();
 
 		this.condition = condition;
 		this.body = body;
+		this.doWhile = doWhile;
 
 		this.isWhile = true;
 
