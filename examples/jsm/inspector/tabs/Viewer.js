@@ -616,18 +616,28 @@ class Viewer extends Tab {
 
 	startSplitMode( canvasData ) {
 
+		if ( this.profiler && this.profiler.panel.classList.contains( 'visible' ) ) {
+
+			this.profiler.togglePanel();
+
+		}
+
 		this.splitActive = true;
 		this.splitCanvasData = canvasData;
 
 		const renderer = this.inspector.getRenderer();
 		const mainCanvas = renderer.domElement;
 		const rect = mainCanvas.getBoundingClientRect();
+		const targetParent = document.fullscreenElement || this.profiler.domElement;
+		const parentRect = targetParent.getBoundingClientRect();
+		const localLeft = rect.left - parentRect.left;
+		const localTop = rect.top - parentRect.top;
 
 		// Position target canvas on top of main canvas
 		if ( ! this.splitCanvas ) {
 
 			this.splitCanvas = document.createElement( 'canvas' );
-			this.splitCanvas.style.position = 'fixed';
+			this.splitCanvas.style.position = 'absolute';
 			this.splitCanvas.style.pointerEvents = 'none';
 			this.splitCanvas.style.zIndex = '998';
 
@@ -636,15 +646,15 @@ class Viewer extends Tab {
 
 		}
 
-		this.splitCanvas.style.left = `${ rect.left }px`;
-		this.splitCanvas.style.top = `${ rect.top }px`;
+		this.splitCanvas.style.left = `${ localLeft }px`;
+		this.splitCanvas.style.top = `${ localTop }px`;
 		this.splitCanvas.style.width = `${ rect.width }px`;
 		this.splitCanvas.style.height = `${ rect.height }px`;
 
 		this.splitCanvasTarget.setSize( rect.width, rect.height );
 		renderer.backend.delete( this.splitCanvasTarget );
 
-		document.body.appendChild( this.splitCanvas );
+		targetParent.appendChild( this.splitCanvas );
 
 		// Overlay divider line (only in split/non-fullscreen mode)
 		if ( ! this.splitFullscreen ) {
@@ -652,7 +662,7 @@ class Viewer extends Tab {
 			if ( ! this.splitOverlay ) {
 
 				const overlay = document.createElement( 'div' );
-				overlay.className = 'split-screen-overlay';
+				overlay.className = 'split-screen-overlay three-inspector';
 
 				const line = document.createElement( 'div' );
 				line.className = 'split-screen-line';
@@ -672,9 +682,9 @@ class Viewer extends Tab {
 
 					if ( ! isDragging ) return;
 
-					const minPadding = 10; // Keep the line at least 15px away from the edges for easy grabbing
-					const x = Math.max( minPadding, Math.min( window.innerWidth - minPadding, e.clientX ) );
-					const pct = x / window.innerWidth;
+					const r = mainCanvas.getBoundingClientRect();
+					const localX = e.clientX - r.left;
+					const pct = Math.max( 0, Math.min( 1, localX / r.width ) );
 					this.splitX = pct;
 					line.style.left = `${ pct * 100 }%`;
 
@@ -701,9 +711,13 @@ class Viewer extends Tab {
 
 			}
 
+			this.splitOverlay.style.left = `${ localLeft }px`;
+			this.splitOverlay.style.top = `${ localTop }px`;
+			this.splitOverlay.style.width = `${ rect.width }px`;
+			this.splitOverlay.style.height = `${ rect.height }px`;
 			this.splitLine.style.left = '50%';
 
-			this.profiler.domElement.appendChild( this.splitOverlay );
+			targetParent.appendChild( this.splitOverlay );
 
 		} else {
 
@@ -720,13 +734,13 @@ class Viewer extends Tab {
 
 			this.splitUniforms = {
 				splitX: uniform( 0.5 ),
-				viewportWidth: uniform( window.innerWidth )
+				viewportWidth: uniform( rect.width )
 			};
 
 		}
 
 		this.splitUniforms.splitX.value = 0.5;
-		this.splitUniforms.viewportWidth.value = renderer.domElement.width;
+		this.splitUniforms.viewportWidth.value = rect.width;
 
 		// Recreate or setup material for split screen comparison
 		const node = canvasData.node;
@@ -931,18 +945,48 @@ class Viewer extends Tab {
 
 		if ( this.splitActive ) {
 
-			// Resize canvas target to match the main canvas if window resized
 			const mainCanvas = renderer.domElement;
 			const rect = mainCanvas.getBoundingClientRect();
+			const targetParent = document.fullscreenElement || this.profiler.domElement;
+			const parentRect = targetParent.getBoundingClientRect();
+			const localLeft = rect.left - parentRect.left;
+			const localTop = rect.top - parentRect.top;
+
+			if ( this.splitCanvas.parentElement !== targetParent ) {
+
+				targetParent.appendChild( this.splitCanvas );
+
+			}
+
+			if ( this.splitOverlay && ! this.splitFullscreen && this.splitOverlay.parentElement !== targetParent ) {
+
+				targetParent.appendChild( this.splitOverlay );
+
+			}
+
+			this.splitCanvas.style.left = `${ localLeft }px`;
+			this.splitCanvas.style.top = `${ localTop }px`;
+			this.splitCanvas.style.width = `${ rect.width }px`;
+			this.splitCanvas.style.height = `${ rect.height }px`;
+
+			if ( this.splitOverlay && ! this.splitFullscreen ) {
+
+				this.splitOverlay.style.left = `${ localLeft }px`;
+				this.splitOverlay.style.top = `${ localTop }px`;
+				this.splitOverlay.style.width = `${ rect.width }px`;
+				this.splitOverlay.style.height = `${ rect.height }px`;
+
+			}
 
 			if ( this.splitCanvasTarget.domElement.width !== rect.width || this.splitCanvasTarget.domElement.height !== rect.height ) {
 
-				this.splitCanvas.style.width = `${ rect.width }px`;
-				this.splitCanvas.style.height = `${ rect.height }px`;
-				this.splitCanvas.style.left = `${ rect.left }px`;
-				this.splitCanvas.style.top = `${ rect.top }px`;
-
 				this.splitCanvasTarget.setSize( rect.width, rect.height );
+
+				if ( this.splitUniforms && this.splitUniforms.viewportWidth ) {
+
+					this.splitUniforms.viewportWidth.value = rect.width;
+
+				}
 
 				renderer.backend.delete( this.splitCanvasTarget );
 
