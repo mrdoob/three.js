@@ -123,6 +123,32 @@ class UniformNode extends InputNode {
 
 	}
 
+	/**
+	 * Uniforms with the same hash share a single uniform, see {@link UniformNode#getUniformHash}.
+	 * This method returns the node the shared uniform refers to which is the first node
+	 * registered for the hash.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {UniformNode} The node the shared uniform refers to.
+	 */
+	getSharedNode( builder ) {
+
+		const hash = this.getUniformHash( builder );
+
+		let sharedNode = builder.getNodeFromHash( hash );
+
+		if ( sharedNode === undefined ) {
+
+			builder.setHashNode( this, hash );
+
+			sharedNode = this;
+
+		}
+
+		return sharedNode;
+
+	}
+
 	onUpdate( callback, updateType ) {
 
 		callback = callback.bind( this );
@@ -159,18 +185,7 @@ class UniformNode extends InputNode {
 
 		const type = this.getNodeType( builder );
 
-		const hash = this.getUniformHash( builder );
-
-		let sharedNode = builder.getNodeFromHash( hash );
-
-		if ( sharedNode === undefined ) {
-
-			builder.setHashNode( this, hash );
-
-			sharedNode = this;
-
-		}
-
+		const sharedNode = this.getSharedNode( builder );
 		const sharedNodeType = sharedNode.getInputType( builder );
 
 		const nodeUniform = builder.getUniformFromNode( sharedNode, sharedNodeType, builder.shaderStage, this.name || builder.context.nodeName );
