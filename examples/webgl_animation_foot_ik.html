@@ -11,18 +11,18 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: white;
+				color: #000;
 			}
 
-			#info a {
-				color: #4d6675;
+			a {
+				color: #2983ff;
 			}
 		</style>
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - animation - foot ik - <a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a><br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - animation - <a href="https://github.com/hh-hang/three-player-controller/tree/master/src/plugins/foot-ik" target="_blank" rel="noopener">foot ik</a> - <a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a><br/>
 			WASD move, Shift sprint, mouse orbit<br/>
 			Soldier model from <a href="https://www.mixamo.com" target="_blank" rel="noopener">https://www.mixamo.com</a>.
 		</div>
@@ -32,7 +32,8 @@
 				"imports": {
 					"three": "../build/three.module.js",
 					"three/addons/": "./jsm/",
-					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.13/build/index.module.js"
+					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.13/build/index.module.js",
+					"three-player-controller/foot-ik": "https://cdn.jsdelivr.net/npm/three-player-controller@0.5.0/dist/foot-ik.mjs"
 				}
 			}
 		</script>
@@ -48,16 +49,14 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
-			import { MeshBVH, StaticGeometryGenerator, acceleratedRaycast } from 'three-mesh-bvh';
-			import { FootIK } from 'three/addons/misc/FootIK.js';
-
-			THREE.Mesh.prototype.raycast = acceleratedRaycast;
+			import { MeshBVH, StaticGeometryGenerator } from 'three-mesh-bvh';
+			import { FootIK } from 'three-player-controller/foot-ik';
 
 			const GRAVITY = - 30;
 			const PHYSICS_STEPS = 5;
 			const PLAYER_MODEL_SCALE = 0.5;
-			const CAPSULE_RADIUS = 0.175;
-			const BODY_SEGMENT = 0.5;
+			const CAPSULE_RADIUS = 0.15;
+			const BODY_SEGMENT = 0.6;
 			const RIDE_HEIGHT = 0.2;
 			const COLLIDER_HEIGHT = BODY_SEGMENT + 2 * CAPSULE_RADIUS - RIDE_HEIGHT;
 			const CAPSULE_SEGMENT = COLLIDER_HEIGHT - 2 * CAPSULE_RADIUS;
@@ -100,7 +99,9 @@
 				playerModel: null,
 				playerIsOnGround: false,
 				playerModelConfig: {
-					scale: PLAYER_MODEL_SCALE,
+					// FootIK distances use a 180-tall baseline; this scene skips that normalize
+					// and scales the ~1.8 model by PLAYER_MODEL_SCALE, so config.scale = PLAYER_MODEL_SCALE * (1.8/180).
+					scale: PLAYER_MODEL_SCALE * 0.01,
 					walkAnim: 'Walk',
 					runAnim: 'Run'
 				},
@@ -197,6 +198,13 @@
 				window.addEventListener( 'resize', onWindowResize );
 				document.addEventListener( 'keydown', onKeyDown );
 				document.addEventListener( 'keyup', onKeyUp );
+				window.addEventListener( 'blur', () => {
+
+					moveControls.key[ 2 ] = 0;
+					orbitControls.mouseButtons.LEFT = THREE.MOUSE.ROTATE;
+					orbitControls.mouseButtons.RIGHT = THREE.MOUSE.PAN;
+
+				} );
 
 				renderer.setAnimationLoop( animate );
 
@@ -367,9 +375,9 @@
 								}
 							}
 						},
-						soleSkinThickness: 0.015
+						soleSkinThickness: 1.6,
 					} );
-					footIK.attach( playerHost );
+					footIK.onAttach( playerHost );
 
 					createDebugPanel();
 
@@ -430,22 +438,22 @@
 				debugFolder.open();
 
 				const soleFolder = gui.addFolder( 'Sole Layout' );
-				soleFolder.add( params, 'soleHalfWidth', 0, 0.12, 0.001 ).name( 'Half Width' ).onChange( ( value ) => {
+				soleFolder.add( params, 'soleHalfWidth', 0, 24, 0.1 ).name( 'Half Width' ).onChange( ( value ) => {
 
 					footIK.configure( { soleHalfWidth: value } );
 
 				} );
-				soleFolder.add( params, 'soleToeExtend', 0, 0.12, 0.001 ).name( 'Toe Extend' ).onChange( ( value ) => {
+				soleFolder.add( params, 'soleToeExtend', 0, 24, 0.1 ).name( 'Toe Extend' ).onChange( ( value ) => {
 
 					footIK.configure( { soleToeExtend: value } );
 
 				} );
-				soleFolder.add( params, 'soleHeelExtend', 0, 0.12, 0.001 ).name( 'Heel Extend' ).onChange( ( value ) => {
+				soleFolder.add( params, 'soleHeelExtend', 0, 24, 0.1 ).name( 'Heel Extend' ).onChange( ( value ) => {
 
 					footIK.configure( { soleHeelExtend: value } );
 
 				} );
-				soleFolder.add( params, 'soleSkinThickness', 0, 0.08, 0.001 ).name( 'Skin Thickness' ).onChange( ( value ) => {
+				soleFolder.add( params, 'soleSkinThickness', 0, 16, 0.1 ).name( 'Skin Thickness' ).onChange( ( value ) => {
 
 					footIK.configure( { soleSkinThickness: value } );
 
@@ -643,7 +651,11 @@
 					case 'ArrowDown': case 'KeyS': key[ 0 ] = 1; break;
 					case 'ArrowLeft': case 'KeyA': key[ 1 ] = - 1; break;
 					case 'ArrowRight': case 'KeyD': key[ 1 ] = 1; break;
-					case 'ShiftLeft': case 'ShiftRight': key[ 2 ] = 1; break;
+					case 'ShiftLeft': case 'ShiftRight':
+						key[ 2 ] = 1;
+						orbitControls.mouseButtons.LEFT = THREE.MOUSE.PAN;
+						orbitControls.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
+						break;
 
 				}
 
@@ -659,7 +671,11 @@
 					case 'ArrowDown': case 'KeyS': key[ 0 ] = key[ 0 ] > 0 ? 0 : key[ 0 ]; break;
 					case 'ArrowLeft': case 'KeyA': key[ 1 ] = key[ 1 ] < 0 ? 0 : key[ 1 ]; break;
 					case 'ArrowRight': case 'KeyD': key[ 1 ] = key[ 1 ] > 0 ? 0 : key[ 1 ]; break;
-					case 'ShiftLeft': case 'ShiftRight': key[ 2 ] = 0; break;
+					case 'ShiftLeft': case 'ShiftRight':
+						key[ 2 ] = 0;
+						orbitControls.mouseButtons.LEFT = THREE.MOUSE.ROTATE;
+						orbitControls.mouseButtons.RIGHT = THREE.MOUSE.PAN;
+						break;
 
 				}
 
@@ -885,9 +901,9 @@
 
 					updatePlayerFacing( delta );
 
-					footIK.restore();
+					footIK.onBeforeAnimationUpdate( delta );
 					mixer.update( delta );
-					footIK.update( delta );
+					footIK.onAfterAnimationUpdate( delta );
 
 				}
 
