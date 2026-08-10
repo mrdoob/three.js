@@ -281,6 +281,25 @@ class GLSLDecoder {
 
 	}
 
+	getTokenPosition( token ) {
+
+		if ( ! token || token.pos === undefined || ! token.tokenizer || ! token.tokenizer.source ) {
+
+			return '';
+
+		}
+
+		const source = token.tokenizer.source;
+		const textBefore = source.slice( 0, token.pos );
+
+		const lines = textBefore.split( '\n' );
+		const lineNumber = lines.length;
+		const columnNumber = lines[ lines.length - 1 ].length + 1;
+
+		return ` (line ${ lineNumber }, column ${ columnNumber })`;
+
+	}
+
 	getToken( offset = 0 ) {
 
 		return this.tokens[ this.index + offset ];
@@ -481,6 +500,14 @@ class GLSLDecoder {
 
 			return left;
 
+		} else if ( firstToken.str === '{' ) {
+
+			const internalTokens = tokens.slice( 1, tokens.length - 1 );
+
+			const paramsTokens = this.parseFunctionParametersFromTokens( internalTokens );
+
+			return new FunctionCall( 'array', paramsTokens );
+
 		}
 
 		// primitives and accessors
@@ -558,6 +585,20 @@ class GLSLDecoder {
 
 				} else if ( secondToken.str === '[' ) {
 
+					const bracketTokens = this.getTokensUntil( ']', tokens, 1 );
+					const parenToken = tokens[ 1 + bracketTokens.length ];
+
+					if ( parenToken && parenToken.str === '(' ) {
+
+						// array constructor: type[N](args...) or type[](args...)
+						const parenIndex = 1 + bracketTokens.length;
+						const internalTokens = this.getTokensUntil( ')', tokens, parenIndex ).slice( 1, - 1 );
+						const paramsTokens = this.parseFunctionParametersFromTokens( internalTokens );
+
+						return new FunctionCall( 'array', paramsTokens );
+
+					}
+
 					// array accessor
 
 					const elements = this.parseAccessorElementsFromTokens( tokens.slice( 1 ) );
@@ -571,6 +612,8 @@ class GLSLDecoder {
 			return new Accessor( firstToken.str );
 
 		}
+
+		throw new Error( 'THREE.GLSLDecoder: Unexpected token "' + firstToken.str + '"' + this.getTokenPosition( firstToken ) );
 
 	}
 
@@ -606,9 +649,7 @@ class GLSLDecoder {
 
 			} else {
 
-				console.error( 'Unknown accessor expression', token );
-
-				break;
+				throw new Error( 'THREE.GLSLDecoder: Unknown accessor expression token "' + token.str + '"' + this.getTokenPosition( token ) );
 
 			}
 
@@ -623,19 +664,26 @@ class GLSLDecoder {
 		if ( tokens.length === 0 ) return [];
 
 		const expression = this.parseExpressionFromTokens( tokens );
+
+		if ( ! expression ) {
+
+			throw new Error( 'THREE.GLSLDecoder: Invalid parameter expression' + this.getTokenPosition( tokens[ 0 ] ) );
+
+		}
+
 		const params = [];
 
 		let current = expression;
 
-		while ( current.type === ',' ) {
+		while ( current && current.type === ',' ) {
 
-			params.push( current.left );
+			if ( current.left ) params.push( current.left );
 
 			current = current.right;
 
 		}
 
-		params.push( current );
+		if ( current ) params.push( current );
 
 		return params;
 
@@ -711,10 +759,19 @@ class GLSLDecoder {
 		type = type || tokens[ index ++ ].str;
 		const name = tokens[ index ++ ].str;
 
-		const token = tokens[ index ];
+		let token = tokens[ index ];
 
 		let init = null;
 		let next = null;
+
+		if ( token && token.str === '[' ) {
+
+			const bracketTokens = this.getTokensUntil( ']', tokens, index );
+
+			index += bracketTokens.length;
+			token = tokens[ index ];
+
+		}
 
 		if ( token ) {
 

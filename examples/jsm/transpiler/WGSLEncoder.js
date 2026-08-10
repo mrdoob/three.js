@@ -194,6 +194,23 @@ class WGSLEncoder {
 
 				code += `( ${ params } )`;
 
+			} else if ( fnName === 'array' ) {
+
+				const params = node.params.map( p => this.emitExpression( p ) );
+
+				if ( node.params.length > 0 && node.params[ 0 ].getType() ) {
+
+					const elemType = this.getWgslType( node.params[ 0 ].getType() );
+					const count = node.params.length;
+
+					code = `array<${ elemType }, ${ count }>( ${ params.join( ', ' ) } )`;
+
+				} else {
+
+					code = `array( ${ params.join( ', ' ) } )`;
+
+				}
+
 			} else if ( fnName.startsWith( 'texture' ) ) {
 
 				// Handle texture functions separately due to sampler handling
@@ -335,9 +352,7 @@ class WGSLEncoder {
 
 		} else {
 
-			console.warn( 'Unknown node type in WGSL Encoder:', node );
-
-			code = `/* unknown node: ${ node.constructor.name } */`;
+			throw new Error( 'THREE.WGSLEncoder: Unknown AST node type "' + node.constructor.name + '"' );
 
 		}
 
@@ -577,7 +592,15 @@ class WGSLEncoder {
 
 			}
 
-			declarations.push( `${ keyword } ${ current.name }: ${ type }${ valueStr }` );
+			let typeStr = `: ${ type }`;
+
+			if ( current.value && current.value.isFunctionCall && current.value.name === 'array' ) {
+
+				typeStr = '';
+
+			}
+
+			declarations.push( `${ keyword } ${ current.name }${ typeStr }${ valueStr }` );
 
 			current = current.next;
 

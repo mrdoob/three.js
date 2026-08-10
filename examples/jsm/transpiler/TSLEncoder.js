@@ -188,9 +188,13 @@ class TSLEncoder {
 
 			}
 
-			// handle texture lookup function calls in separate branch
+			if ( node.name === 'array' ) {
 
-			if ( textureLookupFunctions.includes( node.name ) ) {
+				this.addImport( 'array' );
+
+				code = `array( [ ${ params.join( ', ' ) } ] )`;
+
+			} else if ( textureLookupFunctions.includes( node.name ) ) {
 
 				code = `${ params[ 0 ] }.sample( ${ params[ 1 ] } )`;
 
@@ -368,11 +372,9 @@ class TSLEncoder {
 
 		} else {
 
-			console.warn( 'Unknown node type', node );
+			throw new Error( 'THREE.TSLEncoder: Unknown AST node type "' + ( node ? node.constructor.name : node ) + '"' );
 
 		}
-
-		if ( ! code ) code = '/* unknown statement */';
 
 		return code;
 
@@ -504,7 +506,7 @@ ${ this.tab }} )`;
 
 		} else if ( node.afterthought.isOperator ) {
 
-			if ( node.afterthought.right.isAccessor || node.afterthought.right.isNumber ) {
+			if ( node.afterthought.right && ( node.afterthought.right.isAccessor || node.afterthought.right.isNumber ) ) {
 
 				updateParam = `, update: ${ this.emitExpression( node.afterthought.right ) }`;
 
@@ -590,10 +592,10 @@ ${ this.tab }} )`;
 		const { initialization, condition, afterthought } = node;
 
 		if ( ( initialization && initialization.isVariableDeclaration && initialization.next === null ) &&
-			( condition && condition.left.isAccessor && condition.left.property === initialization.name ) &&
+			( condition && condition.left && condition.left.isAccessor && condition.left.property === initialization.name ) &&
 			( afterthought && (
-				( afterthought.isUnary && ( initialization.name === afterthought.expression.property ) ) ||
-				( afterthought.isOperator && ( initialization.name === afterthought.left.property ) )
+				( afterthought.isUnary && afterthought.expression && ( initialization.name === afterthought.expression.property ) ) ||
+				( afterthought.isOperator && afterthought.left && ( initialization.name === afterthought.left.property ) )
 			) )
 		) {
 
