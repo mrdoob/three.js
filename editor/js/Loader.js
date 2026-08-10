@@ -9,7 +9,7 @@ import { LoaderUtils } from './LoaderUtils.js';
 
 import { GLTFImportDialog } from './GLTFImportDialog.js';
 
-import { unzipSync, strFromU8 } from 'three/addons/libs/fflate.module.js';
+import { unzipSync, strFromU8 } from 'three/addons/libs/fflate.unzip.module.js';
 
 function Loader( editor ) {
 

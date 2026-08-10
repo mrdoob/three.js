@@ -4,7 +4,7 @@ import {
 	Loader
 } from 'three';
 
-import { gunzipSync } from '../libs/fflate.module.js';
+import { gunzipSync } from '../libs/fflate.unzip.module.js';
 import { SH_C0, createGaussianSplatGeometry, writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const SPZ_MAGIC = 0x5053474e;

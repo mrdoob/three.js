@@ -1,4 +1,4 @@
-import { unzipSync } from '../../libs/fflate.module.js';
+import { unzipSync } from '../../libs/fflate.unzip.module.js';
 
 const _textDecoder = new TextDecoder();
 

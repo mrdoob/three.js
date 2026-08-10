@@ -4,7 +4,7 @@ import {
 	Matrix4,
 	Vector3
 } from 'three';
-import { gunzipSync } from '../libs/fflate.module.js';
+import { gunzipSync } from '../libs/fflate.unzip.module.js';
 import { Volume } from '../misc/Volume.js';
 
 /**

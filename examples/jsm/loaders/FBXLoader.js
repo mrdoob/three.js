@@ -44,7 +44,7 @@ import {
 	VectorKeyframeTrack
 } from 'three';
 
-import { unzlibSync } from '../libs/fflate.module.js';
+import { unzlibSync } from '../libs/fflate.unzip.module.js';
 import { NURBSCurve } from '../curves/NURBSCurve.js';
 
 let fbxTree;

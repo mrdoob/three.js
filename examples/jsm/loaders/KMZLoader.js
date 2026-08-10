@@ -5,7 +5,7 @@ import {
 	LoadingManager
 } from 'three';
 import { ColladaLoader } from '../loaders/ColladaLoader.js';
-import { unzipSync } from '../libs/fflate.module.js';
+import { unzipSync } from '../libs/fflate.unzip.module.js';
 
 /**
  * A loader for the KMZ format.

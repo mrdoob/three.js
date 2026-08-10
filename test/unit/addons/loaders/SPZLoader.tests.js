@@ -1,5 +1,5 @@
 import { BufferGeometry } from 'three';
-import { gzipSync } from '../../../../examples/jsm/libs/fflate.module.js';
+import { gzipSync } from '../../../../examples/jsm/libs/fflate.zip.module.js';
 import { SPZLoader } from '../../../../examples/jsm/loaders/SPZLoader.js';
 
 const EPS = 1e-6;

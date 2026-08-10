@@ -7,7 +7,7 @@ import {
 	Loader,
 	SRGBColorSpace
 } from 'three';
-import { unzlibSync } from '../libs/fflate.module.js';
+import { unzlibSync } from '../libs/fflate.unzip.module.js';
 
 /**
  * A loader for the VTK format.

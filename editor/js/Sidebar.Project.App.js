@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { zipSync, strToU8 } from 'three/addons/libs/fflate.module.js';
+import { zipSync, strToU8 } from 'three/addons/libs/fflate.zip.module.js';
 
 import { UIButton, UICheckbox, UIPanel, UIInput, UIRow, UIText } from './libs/ui.js';
 

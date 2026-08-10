@@ -4,7 +4,7 @@ import {
 	LoaderUtils
 } from 'three';
 
-import { unzipSync } from '../libs/fflate.module.js';
+import { unzipSync } from '../libs/fflate.unzip.module.js';
 import { USDAParser } from './usd/USDAParser.js';
 import { USDCParser } from './usd/USDCParser.js';
 import { USDComposer } from './usd/USDComposer.js';

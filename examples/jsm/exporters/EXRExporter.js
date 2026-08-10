@@ -4,7 +4,7 @@ import {
 	RGBAFormat,
 	DataUtils,
 } from 'three';
-import * as fflate from '../libs/fflate.module.js';
+import { zlibSync } from '../libs/fflate.zip.module.js';
 
 const textEncoder = new TextEncoder();
 
@@ -375,7 +375,7 @@ function compressZIP( data, tmpBuffer ) {
 
 	}
 
-	const deflate = fflate.zlibSync( tmpBuffer );
+	const deflate = zlibSync( tmpBuffer );
 
 	return deflate;
 
