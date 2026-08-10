@@ -269,7 +269,7 @@ class PCDLoader extends Loader {
 
 			// remove comments
 
-			PCDheader.str = PCDheader.str.replace(/^#.*/gim, '');
+			PCDheader.str = PCDheader.str.replace( /^#.*/gm, '' );
 
 			// parse
 
