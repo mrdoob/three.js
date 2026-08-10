@@ -1,4 +1,4 @@
-import { toFloatType } from './TranspilerUtils.js';
+import { toFloatType, isBuiltinType } from './TranspilerUtils.js';
 
 export class ASTNode {
 
@@ -433,6 +433,24 @@ export class FunctionCall extends ASTNode {
 		this.isFunctionCall = true;
 
 		this.initialize();
+
+	}
+
+	getType() {
+
+		if ( isBuiltinType( this.name ) ) {
+
+			return this.name;
+
+		}
+
+		if ( this.linker.reference ) {
+
+			return this.linker.reference.getType();
+
+		}
+
+		return super.getType();
 
 	}
 
