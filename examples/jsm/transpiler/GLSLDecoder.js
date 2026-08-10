@@ -1204,7 +1204,8 @@ class GLSLDecoder {
 
 			if ( macros.has( name ) ) {
 
-				const val = macros.get( name );
+				const macro = macros.get( name );
+				const val = macro.body;
 				return val !== '' ? val : '1';
 
 			}
@@ -1231,6 +1232,49 @@ class GLSLDecoder {
 
 	}
 
+	extractMacroArgs( str ) {
+
+		const args = [];
+		let currentArg = '';
+		let parenDepth = 0;
+
+		for ( let i = 0; i < str.length; i ++ ) {
+
+			const char = str[ i ];
+
+			if ( char === '(' || char === '[' || char === '{' ) {
+
+				parenDepth ++;
+				currentArg += char;
+
+			} else if ( char === ')' || char === ']' || char === '}' ) {
+
+				parenDepth --;
+				currentArg += char;
+
+			} else if ( char === ',' && parenDepth === 0 ) {
+
+				args.push( currentArg.trim() );
+				currentArg = '';
+
+			} else {
+
+				currentArg += char;
+
+			}
+
+		}
+
+		if ( currentArg.trim() !== '' || args.length > 0 ) {
+
+			args.push( currentArg.trim() );
+
+		}
+
+		return args;
+
+	}
+
 	expandMacros( line, macros ) {
 
 		if ( macros.size === 0 ) return line;
@@ -1243,16 +1287,73 @@ class GLSLDecoder {
 
 			let changed = false;
 
-			for ( const [ name, value ] of macros ) {
+			for ( const [ name, macro ] of macros ) {
 
-				if ( value === '' ) continue;
+				if ( macro.params !== null ) {
 
-				const regex = new RegExp( `\\b${ name }\\b`, 'g' );
+					const regex = new RegExp( `\\b${ name }\\s*\\(`, 'g' );
+					let match;
 
-				if ( regex.test( result ) ) {
+					while ( ( match = regex.exec( result ) ) !== null ) {
 
-					result = result.replace( regex, value );
-					changed = true;
+						const startIdx = match.index;
+						const parenStartIdx = startIdx + match[ 0 ].length - 1;
+
+						let parenDepth = 1;
+						let parenEndIdx = - 1;
+
+						for ( let i = parenStartIdx + 1; i < result.length; i ++ ) {
+
+							if ( result[ i ] === '(' ) parenDepth ++;
+							else if ( result[ i ] === ')' ) parenDepth --;
+
+							if ( parenDepth === 0 ) {
+
+								parenEndIdx = i;
+								break;
+
+							}
+
+						}
+
+						if ( parenEndIdx !== - 1 ) {
+
+							const rawArgs = result.slice( parenStartIdx + 1, parenEndIdx );
+							const args = this.extractMacroArgs( rawArgs );
+
+							let substitutedBody = macro.body;
+
+							for ( let p = 0; p < macro.params.length; p ++ ) {
+
+								const paramName = macro.params[ p ];
+								const argVal = args[ p ] !== undefined ? args[ p ] : '';
+								const paramRegex = new RegExp( `\\b${ paramName }\\b`, 'g' );
+
+								substitutedBody = substitutedBody.replace( paramRegex, argVal );
+
+							}
+
+							result = result.slice( 0, startIdx ) + substitutedBody + result.slice( parenEndIdx + 1 );
+							changed = true;
+
+							break;
+
+						}
+
+					}
+
+				} else {
+
+					if ( macro.body === '' ) continue;
+
+					const regex = new RegExp( `\\b${ name }\\b`, 'g' );
+
+					if ( regex.test( result ) ) {
+
+						result = result.replace( regex, macro.body );
+						changed = true;
+
+					}
 
 				}
 
@@ -1339,14 +1440,28 @@ class GLSLDecoder {
 
 					if ( isExecuting() ) {
 
-						const match = args.match( /^(\w+)(?:\s+(.*))?$/ );
+						const fnMatch = args.match( /^(\w+)\((.*?)\)\s*(.*)$/ );
 
-						if ( match ) {
+						if ( fnMatch ) {
 
-							const name = match[ 1 ];
-							const value = match[ 2 ] !== undefined ? match[ 2 ].trim() : '';
+							const name = fnMatch[ 1 ];
+							const params = fnMatch[ 2 ].split( ',' ).map( p => p.trim() ).filter( p => p !== '' );
+							const body = fnMatch[ 3 ] !== undefined ? fnMatch[ 3 ].trim() : '';
 
-							macros.set( name, value );
+							macros.set( name, { params, body } );
+
+						} else {
+
+							const objMatch = args.match( /^(\w+)(?:\s+(.*))?$/ );
+
+							if ( objMatch ) {
+
+								const name = objMatch[ 1 ];
+								const value = objMatch[ 2 ] !== undefined ? objMatch[ 2 ].trim() : '';
+
+								macros.set( name, { params: null, body: value } );
+
+							}
 
 						}
 
