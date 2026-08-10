@@ -3,7 +3,7 @@
  * Copyright 2010-2026 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-import { DynamicDrawUsage, RenderObjectRefreshType, Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, UnsignedIntType, IntType, error, RedFormat, RedIntegerFormat, DepthFormat, DepthStencilFormat, AlphaFormat, RGFormat, RGIntegerFormat, RGBFormat, RGBIntegerFormat, EventDispatcher, MathUtils, warn, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBufferAttribute, InterleavedBuffer, NoColorSpace, log as log$1, warnOnce, Texture, Compatibility, LessCompare, LessEqualCompare, GreaterCompare, GreaterEqualCompare, NearestFilter, Sphere, BackSide, DoubleSide, CubeTexture, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking, ObjectSpaceNormalMap, RED_GREEN_RGTC2_Format, RG11_EAC_Format, InstancedBufferAttribute, InstancedInterleavedBuffer, DataTexture, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, SRGBColorSpace, RenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, HalfFloatType, ClampToEdgeWrapping, BufferGeometry, OrthographicCamera, PerspectiveCamera, LinearSRGBColorSpace, RGBAFormat, CubeUVReflectionMapping, BufferAttribute, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, ByteType, UnsignedByteType, ShortType, UnsignedShortType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedInt101111Type, NormalBlending, SrcAlphaFactor, OneMinusSrcAlphaFactor, AddEquation, MaterialBlending, Object3D, LinearMipMapLinearFilter, Plane, Float32BufferAttribute, UVMapping, PCFShadowMap, VSMShadowMap, BasicShadowMap, CubeDepthTexture, SphereGeometry, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, yieldToMain, REVISION, ArrayCamera, PlaneGeometry, FrontSide, CustomBlending, ZeroFactor, CylinderGeometry, Quaternion, WebXRController, RAD2DEG, PCFSoftShadowMap, FrustumArray, Frustum, RGBAIntegerFormat, TimestampQuery, createCanvasElement, MaxEquation, MinEquation, ReverseSubtractEquation, SubtractEquation, OneMinusConstantAlphaFactor, ConstantAlphaFactor, OneMinusConstantColorFactor, ConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcColorFactor, OneFactor, CullFaceNone, CullFaceBack, CullFaceFront, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, ReversedDepthFuncs, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, R11_EAC_Format, SIGNED_R11_EAC_Format, SIGNED_RG11_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, RepeatWrapping, NearestMipmapNearestFilter, NotEqualCompare, EqualCompare, AlwaysCompare, NeverCompare, LinearTransfer, getByteLength, isTypedArray, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
+import { DynamicDrawUsage, RenderObjectRefreshType, Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, UnsignedIntType, IntType, error, RedFormat, RedIntegerFormat, DepthFormat, DepthStencilFormat, AlphaFormat, RGFormat, RGIntegerFormat, RGBFormat, RGBIntegerFormat, EventDispatcher, MathUtils, warn, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBufferAttribute, InterleavedBuffer, NoColorSpace, log as log$1, warnOnce, Texture, Compatibility, LessCompare, LessEqualCompare, GreaterCompare, GreaterEqualCompare, NearestFilter, Sphere, BackSide, DoubleSide, CubeTexture, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking, ObjectSpaceNormalMap, RED_GREEN_RGTC2_Format, RG11_EAC_Format, InstancedBufferAttribute, InstancedInterleavedBuffer, DataTexture, RGBAFormat, FloatType, DataArrayTexture, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, SRGBColorSpace, RenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, HalfFloatType, ClampToEdgeWrapping, BufferGeometry, OrthographicCamera, PerspectiveCamera, LinearSRGBColorSpace, CubeUVReflectionMapping, BufferAttribute, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, ByteType, UnsignedByteType, ShortType, UnsignedShortType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedInt101111Type, NormalBlending, SrcAlphaFactor, OneMinusSrcAlphaFactor, AddEquation, MaterialBlending, Object3D, LinearMipMapLinearFilter, Plane, Float32BufferAttribute, UVMapping, PCFShadowMap, VSMShadowMap, BasicShadowMap, CubeDepthTexture, SphereGeometry, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, yieldToMain, REVISION, ArrayCamera, PlaneGeometry, FrontSide, CustomBlending, ZeroFactor, CylinderGeometry, Quaternion, WebXRController, RAD2DEG, PCFSoftShadowMap, FrustumArray, Frustum, RGBAIntegerFormat, TimestampQuery, createCanvasElement, MaxEquation, MinEquation, ReverseSubtractEquation, SubtractEquation, OneMinusConstantAlphaFactor, ConstantAlphaFactor, OneMinusConstantColorFactor, ConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcColorFactor, OneFactor, CullFaceNone, CullFaceBack, CullFaceFront, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, ReversedDepthFuncs, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, R11_EAC_Format, SIGNED_R11_EAC_Format, SIGNED_RG11_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, RepeatWrapping, NearestMipmapNearestFilter, NotEqualCompare, EqualCompare, AlwaysCompare, NeverCompare, LinearTransfer, getByteLength, isTypedArray, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
 export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, BezierInterpolant, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, Euler, ExternalTexture, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HTMLTexture, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateBezier, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, KeyframeTrack, LOD, LatheGeometry, Layers, Light, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, Path, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, Timer, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, getConsoleFunction, setConsoleFunction } from './three.core.js';
 
 const refreshUniforms = [
@@ -5782,6 +5782,31 @@ class UniformNode extends InputNode {
 
 	}
 
+	/**
+	 * Uniform nodes with the same hash share a single uniform. This method returns the node
+	 * the shared uniform refers to which is the first node registered for the hash.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {UniformNode} The node the shared uniform refers to.
+	 */
+	getSharedNode( builder ) {
+
+		const hash = this.getUniformHash( builder );
+
+		let sharedNode = builder.getNodeFromHash( hash );
+
+		if ( sharedNode === undefined ) {
+
+			builder.setHashNode( this, hash );
+
+			sharedNode = this;
+
+		}
+
+		return sharedNode;
+
+	}
+
 	onUpdate( callback, updateType ) {
 
 		callback = callback.bind( this );
@@ -5818,18 +5843,7 @@ class UniformNode extends InputNode {
 
 		const type = this.getNodeType( builder );
 
-		const hash = this.getUniformHash( builder );
-
-		let sharedNode = builder.getNodeFromHash( hash );
-
-		if ( sharedNode === undefined ) {
-
-			builder.setHashNode( this, hash );
-
-			sharedNode = this;
-
-		}
-
+		const sharedNode = this.getSharedNode( builder );
 		const sharedNodeType = sharedNode.getInputType( builder );
 
 		const nodeUniform = builder.getUniformFromNode( sharedNode, sharedNodeType, builder.shaderStage, this.name || builder.context.nodeName );
@@ -12694,6 +12708,15 @@ class TextureNode extends UniformNode {
 		 */
 		this._flipYUniform = null;
 
+		/**
+		 * Whether the node is used as a comparison sampler, e.g. via `samplerComparison()`.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._samplerComparison = false;
+
 		this.setUpdateMatrix( uvNode === null );
 
 	}
@@ -13059,6 +13082,18 @@ class TextureNode extends UniformNode {
 
 		if ( /^sampler/.test( output ) ) {
 
+			if ( output === 'samplerComparison' ) {
+
+				this._samplerComparison = true;
+
+				// texture nodes with the same texture share a single uniform so it's
+				// important to set the flag on the node the binding refers to as well
+
+				const sharedNode = this.getSharedNode( builder );
+				sharedNode._samplerComparison = true;
+
+			}
+
 			return textureProperty + '_sampler';
 
 		} else if ( builder.isReference( output ) ) {
@@ -13338,14 +13373,14 @@ class TextureNode extends UniformNode {
 	}
 
 	/**
-	 * Returns `true` if the texture is sampled with a plain gather (`textureGather`),
-	 * meaning a gather without a compare value.
+	 * Returns `true` if the texture is sampled with a depth comparison,
+	 * meaning the node must be bound with a comparison sampler.
 	 *
-	 * @return {boolean} Whether a plain gather is used or not.
+	 * @return {boolean} Whether comparison sampling is used or not.
 	 */
-	isPlainGather() {
+	isSampleCompare() {
 
-		return this.gatherNode !== null && this.compareNode === null;
+		return this.compareNode !== null || this._samplerComparison === true;
 
 	}
 
@@ -14118,7 +14153,7 @@ class ScreenNode extends Node {
 	/**
 	 * Constructs a new screen node.
 	 *
-	 * @param {('coordinate'|'viewport'|'size'|'uv'|'dpr')} scope - The node's scope.
+	 * @param {('coordinate'|'viewport'|'size'|'uv')} scope - The node's scope.
 	 */
 	constructor( scope ) {
 
@@ -14131,20 +14166,10 @@ class ScreenNode extends Node {
 		 * - `ScreenNode.VIEWPORT`: The current viewport defined as a four-dimensional vector.
 		 * - `ScreenNode.SIZE`: The dimensions of the current bound framebuffer.
 		 * - `ScreenNode.UV`: Normalized coordinates.
-		 * - `ScreenNode.DPR`: Device pixel ratio.
 		 *
-		 * @type {('coordinate'|'viewport'|'size'|'uv'|'dpr')}
+		 * @type {('coordinate'|'viewport'|'size'|'uv')}
 		 */
 		this.scope = scope;
-
-		/**
-		 * This output node.
-		 *
-		 * @private
-		 * @type {?Node}
-		 * @default null
-		 */
-		this._output = null;
 
 		/**
 		 * This flag can be used for type testing.
@@ -14160,11 +14185,10 @@ class ScreenNode extends Node {
 	/**
 	 * This method is overwritten since the node type depends on the selected scope.
 	 *
-	 * @return {('float'|'vec2'|'vec4')} The node type.
+	 * @return {('vec2'|'vec4')} The node type.
 	 */
 	generateNodeType() {
 
-		if ( this.scope === ScreenNode.DPR ) return 'float';
 		if ( this.scope === ScreenNode.VIEWPORT ) return 'vec4';
 		else return 'vec2';
 
@@ -14179,7 +14203,7 @@ class ScreenNode extends Node {
 
 		let updateType = NodeUpdateType.NONE;
 
-		if ( this.scope === ScreenNode.SIZE || this.scope === ScreenNode.VIEWPORT || this.scope === ScreenNode.DPR ) {
+		if ( this.scope === ScreenNode.SIZE || this.scope === ScreenNode.VIEWPORT ) {
 
 			updateType = NodeUpdateType.RENDER;
 
@@ -14215,10 +14239,6 @@ class ScreenNode extends Node {
 
 			}
 
-		} else if ( this.scope === ScreenNode.DPR ) {
-
-			this._output.value = renderer.getPixelRatio();
-
 		} else {
 
 			if ( renderTarget !== null ) {
@@ -14250,17 +14270,11 @@ class ScreenNode extends Node {
 
 			output = uniform( _viewportVec || ( _viewportVec = new Vector4() ) ).setGroup( renderGroup );
 
-		} else if ( scope === ScreenNode.DPR ) {
-
-			output = uniform( 1 ).setGroup( renderGroup );
-
 		} else {
 
 			output = vec2( screenCoordinate.div( screenSize ) );
 
 		}
-
-		this._output = output;
 
 		return output;
 
@@ -14296,7 +14310,6 @@ ScreenNode.COORDINATE = 'coordinate';
 ScreenNode.VIEWPORT = 'viewport';
 ScreenNode.SIZE = 'size';
 ScreenNode.UV = 'uv';
-ScreenNode.DPR = 'dpr';
 
 // Screen
 
@@ -14304,9 +14317,9 @@ ScreenNode.DPR = 'dpr';
  * TSL object that represents the current DPR.
  *
  * @tsl
- * @type {ScreenNode<float>}
+ * @type {UniformNode<float>}
  */
-const screenDPR = /*@__PURE__*/ nodeImmutable( ScreenNode, ScreenNode.DPR );
+const screenDPR = /*@__PURE__*/ uniform( 1 ).setGroup( renderGroup ).onRenderUpdate( ( { renderer } ) => renderer.getPixelRatio() );
 
 /**
  * TSL object that represents normalized screen coordinates, unitless in `[0, 1]`.
@@ -18982,6 +18995,76 @@ const _skeletonsUpdated = /*@__PURE__*/ new WeakMap();
 const _previousBoneMatricesData = /*@__PURE__*/ new WeakMap();
 
 /**
+ * Creates an accessor for bone matrices stored in a bone texture.
+ *
+ * @param {TextureNode} boneTexture - The bone texture node.
+ * @returns {Object} An accessor with the same `element()` interface as a buffer node.
+ */
+function getBoneTextureMatrices( boneTexture ) {
+
+	return {
+		element: ( i ) => {
+
+			const size = int( textureSize( boneTexture ).x ).toConst();
+			const j = int( i ).mul( 4 ).toConst();
+			const y = j.div( size ).toConst();
+			const x = j.sub( y.mul( size ) ).toConst();
+
+			return mat4(
+				boneTexture.load( ivec2( x, y ) ),
+				boneTexture.load( ivec2( x.add( 1 ), y ) ),
+				boneTexture.load( ivec2( x.add( 2 ), y ) ),
+				boneTexture.load( ivec2( x.add( 3 ), y ) )
+			);
+
+		}
+	};
+
+}
+
+/**
+ * Creates the bone matrices node. Skeletons that fit within the uniform buffer limit
+ * use a uniform buffer, larger skeletons fall back to a bone texture.
+ *
+ * @param {NodeBuilder} builder - The current node builder.
+ * @param {Skeleton} skeleton - The skeleton.
+ * @returns {Object} The bone matrices node.
+ */
+function getBoneMatricesNode( builder, skeleton ) {
+
+	let node;
+
+	const uniformBufferSize = skeleton.bones.length * 16 * 4;
+
+	if ( uniformBufferSize <= builder.getUniformBufferLimit() ) {
+
+		node = referenceBuffer( 'skeleton.boneMatrices', 'mat4', skeleton.bones.length );
+
+	} else {
+
+		if ( skeleton.boneTexture === null ) skeleton.computeBoneTexture();
+
+		const boneTexture = texture( skeleton.boneTexture );
+
+		OnObjectUpdate( ( { object } ) => {
+
+			const skeleton = object.skeleton;
+
+			if ( skeleton.boneTexture === null ) skeleton.computeBoneTexture();
+
+			boneTexture.value = skeleton.boneTexture;
+
+		} );
+
+		node = getBoneTextureMatrices( boneTexture );
+
+	}
+
+	return node;
+
+}
+
+/**
  * Computes the skinned position by applying bone matrices based on weights.
  *
  * @param {Node} boneMatrices - The bone matrices buffer or storage node.
@@ -19057,6 +19140,7 @@ function getSkinnedNormalAndTangent( boneMatrices, normal, tangent, bindMatrix, 
  * Retrieves or initializes the previous frame skinned position node for motion vectors.
  * Uses a WeakMap to cache previous frame bone matrix arrays and their TSL buffer nodes.
  *
+ * @param {NodeBuilder} builder - The current node builder.
  * @param {SkinnedMesh} skinnedMesh - The skinned mesh.
  * @param {Node<mat4>} bindMatrixNode - The bind matrix node.
  * @param {Node<mat4>} bindMatrixInverseNode - The inverse bind matrix node.
@@ -19064,7 +19148,7 @@ function getSkinnedNormalAndTangent( boneMatrices, normal, tangent, bindMatrix, 
  * @param {Node<vec4>} skinWeightNode - The skin weight attribute.
  * @returns {Node<vec3>} The skinned position from the previous frame.
  */
-function getPreviousSkinnedPosition( skinnedMesh, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode ) {
+function getPreviousSkinnedPosition( builder, skinnedMesh, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode ) {
 
 	const skeleton = skinnedMesh.skeleton;
 
@@ -19074,12 +19158,35 @@ function getPreviousSkinnedPosition( skinnedMesh, bindMatrixNode, bindMatrixInve
 
 		skeleton.update();
 
-		const previousBoneMatrices = new Float32Array( skeleton.boneMatrices );
+		const uniformBufferSize = skeleton.bones.length * 16 * 4;
 
-		data = {
-			previousBoneMatrices,
-			node: buffer( previousBoneMatrices, 'mat4', skeleton.bones.length )
-		};
+		if ( uniformBufferSize <= builder.getUniformBufferLimit() ) {
+
+			const previousBoneMatrices = new Float32Array( skeleton.boneMatrices );
+
+			data = {
+				previousBoneMatrices,
+				previousBoneTexture: null,
+				node: buffer( previousBoneMatrices, 'mat4', skeleton.bones.length )
+			};
+
+		} else {
+
+			if ( skeleton.boneTexture === null ) skeleton.computeBoneTexture();
+
+			const { width, height } = skeleton.boneTexture.image;
+
+			const previousBoneMatrices = new Float32Array( skeleton.boneMatrices );
+			const previousBoneTexture = new DataTexture( previousBoneMatrices, width, height, RGBAFormat, FloatType );
+			previousBoneTexture.needsUpdate = true;
+
+			data = {
+				previousBoneMatrices,
+				previousBoneTexture,
+				node: getBoneTextureMatrices( texture( previousBoneTexture ) )
+			};
+
+		}
 
 		_previousBoneMatricesData.set( skeleton, data );
 
@@ -19103,7 +19210,7 @@ const skinning = /*@__PURE__*/ Fn( ( [ skinnedMesh ], builder ) => {
 	const skinWeightNode = attribute( 'skinWeight', 'vec4' );
 	const bindMatrixNode = reference( 'bindMatrix', 'mat4' );
 	const bindMatrixInverseNode = reference( 'bindMatrixInverse', 'mat4' );
-	const boneMatricesNode = referenceBuffer( 'skeleton.boneMatrices', 'mat4', skinnedMesh.skeleton.bones.length );
+	const boneMatricesNode = getBoneMatricesNode( builder, skinnedMesh.skeleton );
 
 	OnObjectUpdate( ( { object, frameId } ) => {
 
@@ -19119,6 +19226,12 @@ const skinning = /*@__PURE__*/ Fn( ( [ skinnedMesh ], builder ) => {
 
 				skeletonData.previousBoneMatrices.set( skeleton.boneMatrices );
 
+				if ( skeletonData.previousBoneTexture !== null ) {
+
+					skeletonData.previousBoneTexture.needsUpdate = true;
+
+				}
+
 			}
 
 			skeleton.update();
@@ -19129,7 +19242,7 @@ const skinning = /*@__PURE__*/ Fn( ( [ skinnedMesh ], builder ) => {
 
 	if ( builder.needsPreviousData() ) {
 
-		const previousSkinnedPosition = getPreviousSkinnedPosition( skinnedMesh, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
+		const previousSkinnedPosition = getPreviousSkinnedPosition( builder, skinnedMesh, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
 
 		positionPrevious.assign( previousSkinnedPosition );
 
@@ -19186,6 +19299,12 @@ const computeSkinning = /*@__PURE__*/ Fn( ( [ skinnedMesh, toPosition = null ], 
 
 				state.previousBoneMatrices.set( skeleton.boneMatrices );
 
+				if ( state.previousBoneTexture !== null ) {
+
+					state.previousBoneTexture.needsUpdate = true;
+
+				}
+
 			}
 
 			skeleton.update();
@@ -19196,7 +19315,7 @@ const computeSkinning = /*@__PURE__*/ Fn( ( [ skinnedMesh, toPosition = null ], 
 
 	if ( builder.needsPreviousData() ) {
 
-		const previousSkinnedPosition = getPreviousSkinnedPosition( skinnedMesh, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
+		const previousSkinnedPosition = getPreviousSkinnedPosition( builder, skinnedMesh, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
 
 		positionPrevious.assign( previousSkinnedPosition );
 
@@ -37745,51 +37864,86 @@ const spherizeUV = /*@__PURE__*/ Fn( ( [ uv, strength, center = vec2( 0.5 ) ] ) 
  * @tsl
  * @function
  * @param {Object} config - The configuration object.
- * @param {?Node<vec3>} [config.position=null] - Can be used to define the vertex positions in world space.
+ * @param {?Node<vec3>} [config.position=null] - Can be used to define the billboard center position directly.
+ * When null, the center is derived automatically from `positionWorld`.
  * @param {boolean} [config.horizontal=true] - Whether to follow the camera rotation horizontally or not.
  * @param {boolean} [config.vertical=false] - Whether to follow the camera rotation vertically or not.
+ * @param {boolean} [config.horizontalRotation=false] - Whether to rotate around the Y axis to face the camera.
  * @return {Node<vec3>} The updated vertex position in clip space.
  */
-const billboarding = /*@__PURE__*/ Fn( ( { position = null, horizontal = true, vertical = false } ) => {
+const billboarding = /*@__PURE__*/ Fn( ( { position = null, horizontal = true, vertical = false, horizontalRotation = false } ) => {
 
-	let worldMatrix;
+	let center;
 
 	if ( position !== null ) {
 
-		worldMatrix = modelWorldMatrix.toVar();
-		worldMatrix[ 3 ][ 0 ] = position.x;
-		worldMatrix[ 3 ][ 1 ] = position.y;
-		worldMatrix[ 3 ][ 2 ] = position.z;
+		center = nodeObject( position );
 
 	} else {
 
-		worldMatrix = modelWorldMatrix;
+		center = positionWorld.sub( modelWorldMatrix.mul( vec4( positionGeometry, 0 ) ).xyz );
 
 	}
+
+	const worldMatrix = modelWorldMatrix.toVar();
+	worldMatrix[ 3 ][ 0 ] = center.x;
+	worldMatrix[ 3 ][ 1 ] = center.y;
+	worldMatrix[ 3 ][ 2 ] = center.z;
 
 	const modelViewMatrix = cameraViewMatrix.mul( worldMatrix );
 
-	if ( defined( horizontal ) ) {
+	const scaleX = modelWorldMatrix[ 0 ].length();
+	const scaleY = modelWorldMatrix[ 1 ].length();
+	const scaleZ = modelWorldMatrix[ 2 ].length();
 
-		modelViewMatrix[ 0 ][ 0 ] = modelWorldMatrix[ 0 ].length();
-		modelViewMatrix[ 0 ][ 1 ] = 0;
-		modelViewMatrix[ 0 ][ 2 ] = 0;
+	let right, up, forward;
+
+	if ( defined( horizontalRotation ) ) {
+
+		const worldPosition = worldMatrix[ 3 ].xyz;
+		const look = cameraPosition.sub( worldPosition );
+		const lookXZ = vec3( look.x, 0, look.z ).normalize();
+
+		const right_w = vec3( lookXZ.z, 0, lookXZ.x.negate() );
+
+		right = cameraViewMatrix.mul( vec4( right_w, 0 ) ).xyz.mul( scaleX );
+		up = cameraViewMatrix[ 1 ].xyz.mul( scaleY );
+		forward = cameraViewMatrix.mul( vec4( lookXZ, 0 ) ).xyz.mul( scaleZ );
+
+	} else {
+
+		if ( defined( horizontal ) ) right = vec3( scaleX, 0, 0 );
+		if ( defined( vertical ) ) up = vec3( 0, scaleY, 0 );
+
+		forward = vec3( 0, 0, 1 );
 
 	}
 
-	if ( defined( vertical ) ) {
+	if ( right ) {
 
-		modelViewMatrix[ 1 ][ 0 ] = 0;
-		modelViewMatrix[ 1 ][ 1 ] = modelWorldMatrix[ 1 ].length();
-		modelViewMatrix[ 1 ][ 2 ] = 0;
+		modelViewMatrix[ 0 ][ 0 ] = right.x;
+		modelViewMatrix[ 0 ][ 1 ] = right.y;
+		modelViewMatrix[ 0 ][ 2 ] = right.z;
 
 	}
 
-	modelViewMatrix[ 2 ][ 0 ] = 0;
-	modelViewMatrix[ 2 ][ 1 ] = 0;
-	modelViewMatrix[ 2 ][ 2 ] = 1;
+	if ( up ) {
 
-	return cameraProjectionMatrix.mul( modelViewMatrix ).mul( positionLocal );
+		modelViewMatrix[ 1 ][ 0 ] = up.x;
+		modelViewMatrix[ 1 ][ 1 ] = up.y;
+		modelViewMatrix[ 1 ][ 2 ] = up.z;
+
+	}
+
+	if ( forward ) {
+
+		modelViewMatrix[ 2 ][ 0 ] = forward.x;
+		modelViewMatrix[ 2 ][ 1 ] = forward.y;
+		modelViewMatrix[ 2 ][ 2 ] = forward.z;
+
+	}
+
+	return cameraProjectionMatrix.mul( modelViewMatrix ).mul( positionGeometry );
 
 } );
 
@@ -66196,7 +66350,7 @@ ${ flowData.code }
 
 					snippet = `${typePrefix}sampler3D ${ uniform.name };`;
 
-				} else if ( texture.compareFunction && textureNode.isPlainGather() === false ) {
+				} else if ( texture.compareFunction && textureNode.isSampleCompare() ) {
 
 					if ( texture.isArrayTexture === true ) {
 
@@ -77777,7 +77931,7 @@ class WebGPUTextureUtils {
 		const texture = binding.texture;
 		const textureNode = binding.textureNode;
 
-		const isComparison = texture.isDepthTexture === true && texture.compareFunction !== null && textureNode.isPlainGather() === false && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE );
+		const isComparison = texture.isDepthTexture === true && texture.compareFunction !== null && textureNode.isSampleCompare() && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE );
 
 		const samplerKey = texture.minFilter + '-' + texture.magFilter + '-' +
 			texture.wrapS + '-' + texture.wrapT + '-' + ( texture.wrapR || '0' ) + '-' +
@@ -81827,7 +81981,7 @@ ${ flowData.code }
 
 				if ( needsSampler ) {
 
-					if ( this.isSampleCompare( texture ) && textureNode.isPlainGather() === false ) {
+					if ( this.isSampleCompare( texture ) && textureNode.isSampleCompare() ) {
 
 						bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : sampler_comparison;` );
 
@@ -83568,7 +83722,7 @@ class WebGPUBindingUtils {
 
 				if ( binding.texture.isDepthTexture ) {
 
-					if ( binding.texture.compareFunction !== null && binding.textureNode.isPlainGather() === false && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ) {
+					if ( binding.texture.compareFunction !== null && binding.textureNode.isSampleCompare() && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ) {
 
 						sampler.type = GPUSamplerBindingType.Comparison;
 
