@@ -28,7 +28,7 @@ a {
 	pointer-events: none;
 }
 
-#info > a {
+#info a {
 	pointer-events: auto;
 }
 
@@ -60,10 +60,6 @@ a {
 	line-height: 20px;
 }
 
-.title-wrapper a {
-	pointer-events: auto;
-}
-
 .title-wrapper > a {
 	font-weight: 600;
 }
@@ -78,7 +74,6 @@ a {
 #info > small a {
 	color: #ff0;
 	text-decoration: none;
-	pointer-events: auto;
 }
 
 #info > small a:hover {
