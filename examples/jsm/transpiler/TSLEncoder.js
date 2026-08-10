@@ -481,6 +481,38 @@ ${ this.tab }} )`;
 
 	}
 
+	isVariableUsed( node, varName ) {
+
+		if ( ! node ) return false;
+
+		if ( node.isAccessor && node.property === varName ) return true;
+
+		for ( const key in node ) {
+
+			if ( key === 'parent' ) continue;
+
+			const child = node[ key ];
+
+			if ( Array.isArray( child ) ) {
+
+				for ( const item of child ) {
+
+					if ( this.isVariableUsed( item, varName ) ) return true;
+
+				}
+
+			} else if ( child && child.isASTNode ) {
+
+				if ( this.isVariableUsed( child, varName ) ) return true;
+
+			}
+
+		}
+
+		return false;
+
+	}
+
 	emitLoop( node ) {
 
 		const start = this.emitExpression( node.initialization.value );
@@ -530,7 +562,10 @@ ${ this.tab }} )`;
 
 		}
 
-		let loopStr = `Loop( ${ loopParams }, ( { ${ name } } ) => {\n\n`;
+		const isUsed = this.isVariableUsed( node.body, name );
+		const callbackParams = isUsed ? `( { ${ name } } ) =>` : '() =>';
+
+		let loopStr = `Loop( ${ loopParams }, ${ callbackParams } {\n\n`;
 
 		loopStr += this.emitBody( node.body ) + '\n\n';
 
