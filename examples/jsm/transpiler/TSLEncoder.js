@@ -372,7 +372,7 @@ class TSLEncoder {
 
 		} else {
 
-			throw new Error( 'THREE.TSLEncoder: Unknown AST node type "' + ( node ? node.constructor.name : node ) + '"' );
+			throw new Error( 'THREE.TSLEncoder: Unknown AST node type "' + node.constructor.name + '"' );
 
 		}
 
