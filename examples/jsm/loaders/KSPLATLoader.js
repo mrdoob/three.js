@@ -169,7 +169,7 @@ class KSPLATLoader extends Loader {
 		const compression = COMPRESSION_LEVELS[ header.compressionLevel ];
 		const centers = new Float32Array( header.splatCount * 3 );
 		const covariances = new Float32Array( header.splatCount * 6 );
-		const colors = new Uint8Array( header.splatCount * 4 );
+		const colors = new Uint8ClampedArray( header.splatCount * 4 );
 		let splatOffset = 0;
 		let sectionBase = sectionDataOffset;
 

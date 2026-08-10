@@ -5,7 +5,7 @@ import {
 } from 'three';
 
 import { gunzipSync } from '../libs/fflate.module.js';
-import { SH_C0, createGaussianSplatGeometry, writeColorBytes, writeCovariance } from '../utils/GaussianSplatUtils.js';
+import { SH_C0, createGaussianSplatGeometry, writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const SPZ_MAGIC = 0x5053474e;
 const HEADER_SIZE_BYTES = 16;
@@ -13,6 +13,33 @@ const MAX_SPLATS = 10000000;
 const SPZ_COLOR_SCALE = SH_C0 / 0.15;
 const FLAG_LOD = 0x80;
 const SH_DEGREE_TO_VECTORS = [ 0, 3, 8, 15 ];
+
+// Scales and colors are stored as single bytes, so all 256 possible outputs
+// of their decode functions can be precomputed once.
+const SCALE_LUT = new Float32Array( 256 );
+const COLOR_LUT = new Uint8ClampedArray( 256 );
+
+for ( let i = 0; i < 256; i ++ ) {
+
+	SCALE_LUT[ i ] = Math.exp( i / 16 - 10 );
+	COLOR_LUT[ i ] = ( ( i / 255 - 0.5 ) * SPZ_COLOR_SCALE + 0.5 ) * 255;
+
+}
+
+// Quaternion components are 10-bit sign-magnitude values (bit 9 is the sign,
+// bits 0-8 are the magnitude scaled to [0, 1/sqrt(2)]), so all 1024 possible
+// decoded values can be precomputed, avoiding an unpredictable sign branch in
+// the hot loop.
+const QUAT_COMPONENT_LUT = new Float64Array( 1024 );
+
+for ( let i = 0; i < 1024; i ++ ) {
+
+	const value = Math.SQRT1_2 * ( ( i & 511 ) / 511 );
+	QUAT_COMPONENT_LUT[ i ] = ( i & 512 ) !== 0 ? - value : value;
+
+}
+
+const _quaternion = [ 0, 0, 0, 0 ];
 
 /**
  * A loader for compressed Gaussian splat `.spz` files.
@@ -150,7 +177,7 @@ class SPZLoader extends Loader {
 		let offset = HEADER_SIZE_BYTES;
 		const centers = new Float32Array( count * 3 );
 		const covariances = new Float32Array( count * 6 );
-		const colors = new Uint8Array( count * 4 );
+		const colors = new Uint8ClampedArray( count * 4 );
 		const positionsSize = count * 3 * ( version === 1 ? 2 : 3 );
 		const rotationsSize = count * ( version === 3 ? 4 : 3 );
 		const shSize = count * SH_DEGREE_TO_VECTORS[ shDegree ] * 3;
@@ -163,7 +190,7 @@ class SPZLoader extends Loader {
 
 		}
 
-		offset = readCenters( view, centers, offset, count, version, fractionalBits );
+		offset = readCenters( bytes, centers, offset, count, version, fractionalBits );
 
 		const alphaOffset = offset;
 		offset += count;
@@ -176,25 +203,39 @@ class SPZLoader extends Loader {
 
 		const rotationOffset = offset;
 
+		// Copy the rotation section into an aligned Uint32Array so the hot loop
+		// avoids per-splat DataView reads (the section offset within the file is
+		// not guaranteed to be 4-byte aligned).
+		const packedRotations = version === 3 ?
+			new Uint32Array( bytes.buffer.slice( bytes.byteOffset + rotationOffset, bytes.byteOffset + rotationOffset + count * 4 ) ) :
+			null;
+
+		const quaternion = _quaternion;
+
 		for ( let i = 0; i < count; i ++ ) {
 
 			const i3 = i * 3;
-			const sx = Math.exp( bytes[ scaleOffset + i3 ] / 16 - 10 );
-			const sy = Math.exp( bytes[ scaleOffset + i3 + 1 ] / 16 - 10 );
-			const sz = Math.exp( bytes[ scaleOffset + i3 + 2 ] / 16 - 10 );
-			const rotation = version === 3 ?
-				readSmallestThreeQuaternion( view, rotationOffset + i * 4 ) :
-				readXYZQuaternion( bytes, rotationOffset + i * 3 );
+			const i4 = i * 4;
+			const sx = SCALE_LUT[ bytes[ scaleOffset + i3 ] ];
+			const sy = SCALE_LUT[ bytes[ scaleOffset + i3 + 1 ] ];
+			const sz = SCALE_LUT[ bytes[ scaleOffset + i3 + 2 ] ];
 
-			writeCovariance( covariances, i * 6, sx, sy, sz, rotation[ 0 ], rotation[ 1 ], rotation[ 2 ], rotation[ 3 ] );
-			writeColorBytes(
-				colors,
-				i * 4,
-				( ( bytes[ colorOffset + i3 ] / 255 - 0.5 ) * SPZ_COLOR_SCALE + 0.5 ) * 255,
-				( ( bytes[ colorOffset + i3 + 1 ] / 255 - 0.5 ) * SPZ_COLOR_SCALE + 0.5 ) * 255,
-				( ( bytes[ colorOffset + i3 + 2 ] / 255 - 0.5 ) * SPZ_COLOR_SCALE + 0.5 ) * 255,
-				bytes[ alphaOffset + i ]
-			);
+			if ( version === 3 ) {
+
+				readSmallestThreeQuaternion( packedRotations[ i ], quaternion );
+
+			} else {
+
+				readXYZQuaternion( bytes, rotationOffset + i3, quaternion );
+
+			}
+
+			writeCovariance( covariances, i * 6, sx, sy, sz, quaternion[ 0 ], quaternion[ 1 ], quaternion[ 2 ], quaternion[ 3 ] );
+
+			colors[ i4 ] = COLOR_LUT[ bytes[ colorOffset + i3 ] ];
+			colors[ i4 + 1 ] = COLOR_LUT[ bytes[ colorOffset + i3 + 1 ] ];
+			colors[ i4 + 2 ] = COLOR_LUT[ bytes[ colorOffset + i3 + 2 ] ];
+			colors[ i4 + 3 ] = bytes[ alphaOffset + i ];
 
 		}
 
@@ -204,7 +245,7 @@ class SPZLoader extends Loader {
 
 }
 
-function readCenters( view, centers, offset, count, version, fractionalBits ) {
+function readCenters( bytes, centers, offset, count, version, fractionalBits ) {
 
 	if ( version === 1 ) {
 
@@ -213,9 +254,9 @@ function readCenters( view, centers, offset, count, version, fractionalBits ) {
 			const i3 = i * 3;
 			const rowOffset = offset + i3 * 2;
 
-			centers[ i3 ] = DataUtils.fromHalfFloat( view.getUint16( rowOffset, true ) );
-			centers[ i3 + 1 ] = DataUtils.fromHalfFloat( view.getUint16( rowOffset + 2, true ) );
-			centers[ i3 + 2 ] = DataUtils.fromHalfFloat( view.getUint16( rowOffset + 4, true ) );
+			centers[ i3 ] = DataUtils.fromHalfFloat( bytes[ rowOffset ] | ( bytes[ rowOffset + 1 ] << 8 ) );
+			centers[ i3 + 1 ] = DataUtils.fromHalfFloat( bytes[ rowOffset + 2 ] | ( bytes[ rowOffset + 3 ] << 8 ) );
+			centers[ i3 + 2 ] = DataUtils.fromHalfFloat( bytes[ rowOffset + 4 ] | ( bytes[ rowOffset + 5 ] << 8 ) );
 
 		}
 
@@ -230,9 +271,9 @@ function readCenters( view, centers, offset, count, version, fractionalBits ) {
 		const i3 = i * 3;
 		const rowOffset = offset + i * 9;
 
-		centers[ i3 ] = readInt24( view, rowOffset ) * fixedScale;
-		centers[ i3 + 1 ] = readInt24( view, rowOffset + 3 ) * fixedScale;
-		centers[ i3 + 2 ] = readInt24( view, rowOffset + 6 ) * fixedScale;
+		centers[ i3 ] = readInt24( bytes, rowOffset ) * fixedScale;
+		centers[ i3 + 1 ] = readInt24( bytes, rowOffset + 3 ) * fixedScale;
+		centers[ i3 + 2 ] = readInt24( bytes, rowOffset + 6 ) * fixedScale;
 
 	}
 
@@ -240,64 +281,56 @@ function readCenters( view, centers, offset, count, version, fractionalBits ) {
 
 }
 
-function readInt24( view, offset ) {
+function readInt24( bytes, offset ) {
 
-	let value = view.getUint8( offset ) | ( view.getUint8( offset + 1 ) << 8 ) | ( view.getUint8( offset + 2 ) << 16 );
-
-	if ( ( value & 0x800000 ) !== 0 ) {
-
-		value |= 0xff000000;
-
-	}
-
-	return value;
+	// The left shift by 8 followed by an arithmetic right shift sign-extends
+	// the 24-bit value.
+	return ( ( bytes[ offset ] << 8 ) | ( bytes[ offset + 1 ] << 16 ) | ( bytes[ offset + 2 ] << 24 ) ) >> 8;
 
 }
 
-function readXYZQuaternion( bytes, offset ) {
+function readXYZQuaternion( bytes, offset, target ) {
 
 	const qx = bytes[ offset ] / 127.5 - 1;
 	const qy = bytes[ offset + 1 ] / 127.5 - 1;
 	const qz = bytes[ offset + 2 ] / 127.5 - 1;
-	const qw = Math.sqrt( Math.max( 0, 1 - qx * qx - qy * qy - qz * qz ) );
 
-	return [ qx, qy, qz, qw ];
+	target[ 0 ] = qx;
+	target[ 1 ] = qy;
+	target[ 2 ] = qz;
+	target[ 3 ] = Math.sqrt( Math.max( 0, 1 - qx * qx - qy * qy - qz * qz ) );
 
 }
 
-function readSmallestThreeQuaternion( view, offset ) {
+function readSmallestThreeQuaternion( packed, target ) {
 
-	const maxValue = Math.SQRT1_2;
-	const valueMask = ( 1 << 9 ) - 1;
-	const quaternion = [ 0, 0, 0, 0 ];
-	const packed = view.getUint32( offset, true );
 	const largestIndex = packed >>> 30;
-	let remainingValues = packed;
-	let sumSquares = 0;
 
-	for ( let i = 3; i >= 0; i -- ) {
+	// The three smallest components are packed from the lowest bits upward,
+	// filling the non-largest indices in descending order: the low 10 bits go
+	// to the highest remaining index, the top 10 bits to the lowest.
+	const a = QUAT_COMPONENT_LUT[ packed & 1023 ];
+	const b = QUAT_COMPONENT_LUT[ ( packed >>> 10 ) & 1023 ];
+	const c = QUAT_COMPONENT_LUT[ ( packed >>> 20 ) & 1023 ];
 
-		if ( i === largestIndex ) continue;
+	switch ( largestIndex ) {
 
-		const value = remainingValues & valueMask;
-		const sign = ( remainingValues >>> 9 ) & 1;
-		remainingValues >>>= 10;
-
-		quaternion[ i ] = maxValue * ( value / valueMask );
-
-		if ( sign !== 0 ) {
-
-			quaternion[ i ] = - quaternion[ i ];
-
-		}
-
-		sumSquares += quaternion[ i ] * quaternion[ i ];
+		case 0:
+			target[ 1 ] = c; target[ 2 ] = b; target[ 3 ] = a;
+			break;
+		case 1:
+			target[ 0 ] = c; target[ 2 ] = b; target[ 3 ] = a;
+			break;
+		case 2:
+			target[ 0 ] = c; target[ 1 ] = b; target[ 3 ] = a;
+			break;
+		default:
+			target[ 0 ] = c; target[ 1 ] = b; target[ 2 ] = a;
+			break;
 
 	}
 
-	quaternion[ largestIndex ] = Math.sqrt( Math.max( 0, 1 - sumSquares ) );
-
-	return quaternion;
+	target[ largestIndex ] = Math.sqrt( Math.max( 0, 1 - ( a * a + b * b + c * c ) ) );
 
 }
 

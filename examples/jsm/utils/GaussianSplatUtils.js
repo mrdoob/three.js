@@ -11,24 +11,20 @@ const GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING = {
 	opacity: [ 'opacity' ]
 };
 
-function clampByte( value ) {
-
-	return Math.min( 255, Math.max( 0, Math.round( value ) ) );
-
-}
-
 function sigmoid( value ) {
 
 	return 1 / ( 1 + Math.exp( - value ) );
 
 }
 
+// The target is expected to be a Uint8ClampedArray, which clamps and rounds
+// assigned values natively.
 function writeColorBytes( target, offset, r, g, b, a ) {
 
-	target[ offset ] = clampByte( r );
-	target[ offset + 1 ] = clampByte( g );
-	target[ offset + 2 ] = clampByte( b );
-	target[ offset + 3 ] = clampByte( a );
+	target[ offset ] = r;
+	target[ offset + 1 ] = g;
+	target[ offset + 2 ] = b;
+	target[ offset + 3 ] = a;
 
 }
 
@@ -59,7 +55,9 @@ function writeColorBytesFromSH0( target, offset, r, g, b, a ) {
 
 function writeCovariance( target, offset, sx, sy, sz, qx, qy, qz, qw ) {
 
-	const length = Math.hypot( qx, qy, qz, qw );
+	// Math.sqrt is significantly faster than Math.hypot, and the overflow
+	// protection of Math.hypot is unnecessary for quaternion components.
+	const length = Math.sqrt( qx * qx + qy * qy + qz * qz + qw * qw );
 
 	if ( length === 0 ) {
 
@@ -168,7 +166,7 @@ function createGaussianSplatGeometryFromPLYGeometry( geometry, {
 
 	const centers = new Float32Array( count * 3 );
 	const covariances = new Float32Array( count * 6 );
-	const colors = new Uint8Array( count * 4 );
+	const colors = new Uint8ClampedArray( count * 4 );
 
 	for ( let i = 0; i < count; i ++ ) {
 
@@ -206,7 +204,6 @@ function createGaussianSplatGeometryFromPLYGeometry( geometry, {
 export {
 	GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING,
 	SH_C0,
-	clampByte,
 	createGaussianSplatGeometry,
 	createGaussianSplatGeometryFromPLYGeometry,
 	linearToSH0,
