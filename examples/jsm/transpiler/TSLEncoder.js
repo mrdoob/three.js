@@ -634,7 +634,30 @@ ${ this.tab }} )`;
 
 	}
 
+	emitDoWhile( node ) {
+
+		const condition = this.emitExpression( node.condition );
+		const body = this.emitBody( node.body );
+
+		let loopStr = `Loop( () => {\n\n${ body }\n\n${ this.tab }\tIf( ${ condition }.not(), () => {\n\n${ this.tab }\t\tBreak();\n\n${ this.tab }\t} );\n\n`;
+
+		loopStr += this.tab + '} )';
+
+		this.imports.add( 'Loop' );
+		this.imports.add( 'If' );
+		this.imports.add( 'Break' );
+
+		return loopStr;
+
+	}
+
 	emitWhile( node ) {
+
+		if ( node.doWhile ) {
+
+			return this.emitDoWhile( node );
+
+		}
 
 		const condition = this.emitExpression( node.condition );
 

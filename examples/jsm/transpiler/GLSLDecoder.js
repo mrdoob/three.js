@@ -921,6 +921,45 @@ class GLSLDecoder {
 
 	}
 
+	parseDoWhile() {
+
+		this.readToken(); // skip 'do'
+
+		let body;
+
+		if ( this.getToken().str === '{' ) {
+
+			body = this.parseBlock();
+
+		} else {
+
+			body = [ this.parseExpression() ];
+
+		}
+
+		if ( this.getToken() && this.getToken().str === 'while' ) {
+
+			this.readToken(); // skip 'while'
+
+		} else {
+
+			throw new Error( 'THREE.GLSLDecoder: Expected \'while\' after \'do\' block' + this.getTokenPosition( this.getToken() ) );
+
+		}
+
+		const condTokens = this.readTokensUntil( ')' );
+		const condition = this.parseExpressionFromTokens( condTokens.slice( 1, - 1 ) );
+
+		if ( this.getToken() && this.getToken().str === ';' ) {
+
+			this.readToken(); // skip trailing ';'
+
+		}
+
+		return new While( condition, body, true );
+
+	}
+
 	parseFor() {
 
 		this.readToken(); // skip 'for'
@@ -1218,6 +1257,10 @@ class GLSLDecoder {
 				} else if ( token.str === 'while' ) {
 
 					statement = this.parseWhile();
+
+				} else if ( token.str === 'do' ) {
+
+					statement = this.parseDoWhile();
 
 				} else if ( token.str === 'switch' ) {
 

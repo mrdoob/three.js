@@ -509,6 +509,12 @@ class WGSLEncoder {
 		const cond = this.emitExpression( node.condition );
 		const body = this.emitBody( node.body );
 
+		if ( node.doWhile ) {
+
+			return `loop {\n\n${ body }\n\n${ this.tab }\tcontinuing {\n${ this.tab }\t\tbreak if ( ! ( ${ cond } ) );\n${ this.tab }\t}\n${ this.tab }}`;
+
+		}
+
 		return `while ( ${ cond } ) {\n\n${ body }\n\n${ this.tab }}`;
 
 	}
