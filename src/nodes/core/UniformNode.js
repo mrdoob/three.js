@@ -124,9 +124,8 @@ class UniformNode extends InputNode {
 	}
 
 	/**
-	 * Uniforms with the same hash share a single uniform, see {@link UniformNode#getUniformHash}.
-	 * This method returns the node the shared uniform refers to which is the first node
-	 * registered for the hash.
+	 * Uniform nodes with the same hash share a single uniform. This method returns the node
+	 * the shared uniform refers to which is the first node registered for the hash.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {UniformNode} The node the shared uniform refers to.
