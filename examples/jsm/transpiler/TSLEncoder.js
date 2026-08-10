@@ -518,7 +518,19 @@ ${ this.tab }} )`;
 
 		}
 
-		let loopStr = `Loop( { start: ${ start }, end: ${ end + nameParam + typeParam + conditionParam + updateParam } }, ( { ${ name } } ) => {\n\n`;
+		let loopParams;
+
+		if ( start === '0' && nameParam === '' && typeParam === '' && conditionParam === '' && updateParam === '' ) {
+
+			loopParams = end;
+
+		} else {
+
+			loopParams = `{ start: ${ start }, end: ${ end + nameParam + typeParam + conditionParam + updateParam } }`;
+
+		}
+
+		let loopStr = `Loop( ${ loopParams }, ( { ${ name } } ) => {\n\n`;
 
 		loopStr += this.emitBody( node.body ) + '\n\n';
 
