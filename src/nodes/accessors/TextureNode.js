@@ -180,6 +180,15 @@ class TextureNode extends UniformNode {
 		 */
 		this._flipYUniform = null;
 
+		/**
+		 * Whether the node is used as a comparison sampler, e.g. via `samplerComparison()`.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._samplerComparison = false;
+
 		this.setUpdateMatrix( uvNode === null );
 
 	}
@@ -545,6 +554,18 @@ class TextureNode extends UniformNode {
 
 		if ( /^sampler/.test( output ) ) {
 
+			if ( output === 'samplerComparison' ) {
+
+				this._samplerComparison = true;
+
+				// texture nodes with the same texture share a single uniform so it's
+				// important to set the flag on the node the binding refers to as well
+
+				const sharedNode = this.getSharedNode( builder );
+				sharedNode._samplerComparison = true;
+
+			}
+
 			return textureProperty + '_sampler';
 
 		} else if ( builder.isReference( output ) ) {
@@ -824,14 +845,14 @@ class TextureNode extends UniformNode {
 	}
 
 	/**
-	 * Returns `true` if the texture is sampled with a plain gather (`textureGather`),
-	 * meaning a gather without a compare value.
+	 * Returns `true` if the texture is sampled with a depth comparison,
+	 * meaning the node must be bound with a comparison sampler.
 	 *
-	 * @return {boolean} Whether a plain gather is used or not.
+	 * @return {boolean} Whether comparison sampling is used or not.
 	 */
-	isPlainGather() {
+	isSampleCompare() {
 
-		return this.gatherNode !== null && this.compareNode === null;
+		return this.compareNode !== null || this._samplerComparison === true;
 
 	}
 

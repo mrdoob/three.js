@@ -157,7 +157,7 @@ class WebGPUTextureUtils {
 		const texture = binding.texture;
 		const textureNode = binding.textureNode;
 
-		const isComparison = texture.isDepthTexture === true && texture.compareFunction !== null && textureNode.isPlainGather() === false && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE );
+		const isComparison = texture.isDepthTexture === true && texture.compareFunction !== null && textureNode.isSampleCompare() && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE );
 
 		const samplerKey = texture.minFilter + '-' + texture.magFilter + '-' +
 			texture.wrapS + '-' + texture.wrapT + '-' + ( texture.wrapR || '0' ) + '-' +
