@@ -87,9 +87,37 @@ class Box3 {
 
 		this.makeEmpty();
 
-		for ( let i = 0, il = attribute.count; i < il; i ++ ) {
+		const array = attribute.array;
 
-			this.expandByPoint( _vector.fromBufferAttribute( attribute, i ) );
+		if ( attribute.isInterleavedBufferAttribute !== true && attribute.normalized === false &&
+			attribute.itemSize === 3 && ( array instanceof Float32Array || array instanceof Float64Array ) ) {
+
+			// fast path: read the typed array directly, avoiding per-vertex getter calls.
+			// Math.min/max are used (instead of comparisons) so NaN values propagate to min/max.
+
+			let minX = + Infinity, minY = + Infinity, minZ = + Infinity;
+			let maxX = - Infinity, maxY = - Infinity, maxZ = - Infinity;
+
+			for ( let i = 0, il = attribute.count * 3; i < il; i += 3 ) {
+
+				const x = array[ i ], y = array[ i + 1 ], z = array[ i + 2 ];
+
+				minX = Math.min( minX, x ); maxX = Math.max( maxX, x );
+				minY = Math.min( minY, y ); maxY = Math.max( maxY, y );
+				minZ = Math.min( minZ, z ); maxZ = Math.max( maxZ, z );
+
+			}
+
+			this.min.set( minX, minY, minZ );
+			this.max.set( maxX, maxY, maxZ );
+
+		} else {
+
+			for ( let i = 0, il = attribute.count; i < il; i ++ ) {
+
+				this.expandByPoint( _vector.fromBufferAttribute( attribute, i ) );
+
+			}
 
 		}
 

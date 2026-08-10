@@ -779,11 +779,35 @@ class BufferGeometry extends EventDispatcher {
 
 			let maxRadiusSq = 0;
 
-			for ( let i = 0, il = position.count; i < il; i ++ ) {
+			const array = position.array;
 
-				_vector.fromBufferAttribute( position, i );
+			if ( position.isInterleavedBufferAttribute !== true && position.normalized === false &&
+				position.itemSize === 3 && ( array instanceof Float32Array || array instanceof Float64Array ) ) {
 
-				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector ) );
+				// fast path: read the typed array directly, avoiding per-vertex getter calls.
+				// Math.max is used (instead of a comparison) so NaN values propagate to the radius.
+
+				const cx = center.x, cy = center.y, cz = center.z;
+
+				for ( let i = 0, il = position.count * 3; i < il; i += 3 ) {
+
+					const dx = array[ i ] - cx;
+					const dy = array[ i + 1 ] - cy;
+					const dz = array[ i + 2 ] - cz;
+
+					maxRadiusSq = Math.max( maxRadiusSq, dx * dx + dy * dy + dz * dz );
+
+				}
+
+			} else {
+
+				for ( let i = 0, il = position.count; i < il; i ++ ) {
+
+					_vector.fromBufferAttribute( position, i );
+
+					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector ) );
+
+				}
 
 			}
 
