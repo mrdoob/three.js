@@ -146,6 +146,7 @@ function getGaussianSplatPLYPropertyMapping( sphericalHarmonicsDegree = 0 ) {
 function createPackedSphericalHarmonicsBand( count, degree ) {
 
 	const packed = new Uint32Array( count * SH_BAND_WORDS[ degree ] );
+	packed.fill( 0x80808080 );
 
 	return {
 		packed,
