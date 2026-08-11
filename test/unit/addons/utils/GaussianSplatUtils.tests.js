@@ -12,14 +12,16 @@ import {
 	createGaussianSplatGeometry,
 	createGaussianSplatGeometryFromPLYGeometry,
 	getGaussianSplatPLYPropertyMapping,
-	getSphericalHarmonicsCoefficientLocation,
 	getSphericalHarmonicsDegree,
 	linearToSH0,
-	packSphericalHarmonicsBand,
 	sh0ToLinear,
-	sigmoid,
-	unpackSphericalHarmonicsBand
+	sigmoid
 } from '../../../../examples/jsm/utils/GaussianSplatUtils.js';
+import {
+	getSphericalHarmonicsCoefficientLocation,
+	packSphericalHarmonicsBand,
+	unpackSphericalHarmonicsBand
+} from './GaussianSplatTestUtils.js';
 
 const EPS = 1e-6;
 
@@ -90,12 +92,13 @@ export default QUnit.module( 'Addons', () => {
 			QUnit.test( 'creates Gaussian splat geometry with spherical harmonics attributes', ( assert ) => {
 
 				const coefficients = new Uint8ClampedArray( [ 129, 130, 131, 132, 133, 134, 135, 136, 137 ] );
+				const packedWords = packSphericalHarmonicsBand( coefficients, 1, 1 );
 				const data = createGaussianSplatGeometry(
 					new Float32Array( [ 1, 2, 3 ] ),
 					new Float32Array( [ 4, 0, 0, 9, 0, 16 ] ),
 					new Uint8Array( [ 128, 128, 128, 128 ] ),
 					{
-						sh1: coefficients
+						sh1: packedWords
 					}
 				);
 				const packed = data.getAttribute( 'sphericalHarmonics1' );
@@ -103,15 +106,11 @@ export default QUnit.module( 'Addons', () => {
 				assert.strictEqual( getSphericalHarmonicsDegree( data ), 1, 'degree' );
 				assert.strictEqual( packed.itemSize, SH_BAND_WORDS[ 1 ], 'item size' );
 				assert.ok( packed.array instanceof Uint32Array, 'stores packed uint32 words' );
+				assert.strictEqual( packed.array, packedWords, 'reuses the packed buffer' );
 				assert.deepEqual(
 					Array.from( unpackSphericalHarmonicsBand( packed.array, 1, 1 ) ),
 					Array.from( coefficients ),
 					'coefficients round-trip through packed words'
-				);
-				assert.deepEqual(
-					Array.from( packed.array ),
-					Array.from( packSphericalHarmonicsBand( coefficients, 1, 1 ) ),
-					'matches packSphericalHarmonicsBand'
 				);
 
 			} );
@@ -127,7 +126,18 @@ export default QUnit.module( 'Addons', () => {
 						{ sh1: new Float32Array( 9 ) }
 					);
 
-				}, /must use clamped byte components or packed uint32 words/, 'rejects floating-point SH attributes' );
+				}, /must use packed uint32 words/, 'rejects floating-point SH attributes' );
+
+				assert.throws( () => {
+
+					createGaussianSplatGeometry(
+						new Float32Array( [ 1, 2, 3 ] ),
+						new Float32Array( [ 4, 0, 0, 9, 0, 16 ] ),
+						new Uint8Array( [ 128, 128, 128, 128 ] ),
+						{ sh1: new Uint8ClampedArray( 9 ) }
+					);
+
+				}, /must use packed uint32 words/, 'rejects unpacked byte SH attributes' );
 
 			} );
 

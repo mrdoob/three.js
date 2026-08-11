@@ -1,6 +1,6 @@
 import { GLTFLoader } from '../../../../examples/jsm/loaders/GLTFLoader.js';
 import { GLTFGaussianSplatLoaderExtension } from '../../../../examples/jsm/loaders/GLTFGaussianSplatLoaderExtension.js';
-import { unpackSphericalHarmonicsBand } from '../../../../examples/jsm/utils/GaussianSplatUtils.js';
+import { unpackSphericalHarmonicsBand } from '../utils/GaussianSplatTestUtils.js';
 
 const EPS = 1e-6;
 const FLOAT = 5126;

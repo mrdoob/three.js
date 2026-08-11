@@ -3,7 +3,7 @@ import {
 } from 'three';
 
 import { GaussianSplatMesh } from '../objects/GaussianSplatMesh.js';
-import { SH_BAND_COMPONENTS, createGaussianSplatGeometry, writeColorBytesFromSH0, writeCovariance } from '../utils/GaussianSplatUtils.js';
+import { SH_BAND_WORDS, createGaussianSplatGeometry, createPackedSphericalHarmonicsBand, writeColorBytesFromSH0, writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const EXTENSION_NAME = 'KHR_gaussian_splatting';
 const POINTS = 0;
@@ -239,14 +239,16 @@ function createGLTFSphericalHarmonicsAttributes( geometry, primitiveDef, count )
 
 		}
 
-		const target = new Uint8ClampedArray( count * SH_BAND_COMPONENTS[ degree ] );
+		const band = createPackedSphericalHarmonicsBand( count, degree );
+		const target = band.bytes;
+		const byteStride = SH_BAND_WORDS[ degree ] * 4;
 
 		for ( let i = 0; i < count; i ++ ) {
 
 			for ( let coefficient = 0; coefficient < coefficientCount; coefficient ++ ) {
 
 				const attribute = attributes[ coefficient ];
-				const targetOffset = i * SH_BAND_COMPONENTS[ degree ] + coefficient * 3;
+				const targetOffset = i * byteStride + coefficient * 3;
 
 				target[ targetOffset ] = attribute.getX( i ) * 128 + 128;
 				target[ targetOffset + 1 ] = attribute.getY( i ) * 128 + 128;
@@ -256,7 +258,7 @@ function createGLTFSphericalHarmonicsAttributes( geometry, primitiveDef, count )
 
 		}
 
-		sphericalHarmonics[ `sh${ degree }` ] = target;
+		sphericalHarmonics[ `sh${ degree }` ] = band.packed;
 
 	}
 

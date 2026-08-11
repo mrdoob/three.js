@@ -143,118 +143,34 @@ function getGaussianSplatPLYPropertyMapping( sphericalHarmonicsDegree = 0 ) {
 
 }
 
-/**
- * Maps an SH scalar coefficient index within a band to its packed uint32
- * storage location. Coefficients are RGB-interleaved within each band
- * (vector0.rgb, vector1.rgb, ...).
- *
- * @param {number} coefficient - Scalar coefficient index within the band.
- * @return {{ word: number, shift: number }} Packed word index and bit shift.
- */
-function getSphericalHarmonicsCoefficientLocation( coefficient ) {
+function createPackedSphericalHarmonicsBand( count, degree ) {
+
+	const packed = new Uint32Array( count * SH_BAND_WORDS[ degree ] );
 
 	return {
-		word: coefficient >> 2,
-		shift: ( coefficient & 3 ) << 3
+		packed,
+		bytes: new Uint8ClampedArray( packed.buffer )
 	};
-
-}
-
-/**
- * Packs clamped-byte SH coefficients into uint32 words (four bytes per word).
- * Each coefficient uses the geometry encoding `( value - 128 ) / 128`.
- *
- * @param {Uint8Array|Uint8ClampedArray} source - Clamped-byte coefficients.
- * @param {number} count - Splat count.
- * @param {number} degree - Spherical harmonics band degree in `[1, 3]`.
- * @return {Uint32Array} Packed words with `count * SH_BAND_WORDS[ degree ]` elements.
- */
-function packSphericalHarmonicsBand( source, count, degree ) {
-
-	const componentCount = SH_BAND_COMPONENTS[ degree ];
-	const words = SH_BAND_WORDS[ degree ];
-	const data = new Uint32Array( count * words );
-
-	for ( let i = 0; i < count; i ++ ) {
-
-		const sourceBase = i * componentCount;
-		const targetBase = i * words;
-
-		for ( let j = 0; j < componentCount; j ++ ) {
-
-			const { word, shift } = getSphericalHarmonicsCoefficientLocation( j );
-			data[ targetBase + word ] |= source[ sourceBase + j ] << shift;
-
-		}
-
-	}
-
-	return data;
-
-}
-
-/**
- * Unpacks uint32 SH words back to clamped-byte coefficients.
- *
- * @param {Uint32Array} packed - Packed words from {@link packSphericalHarmonicsBand}.
- * @param {number} count - Splat count.
- * @param {number} degree - Spherical harmonics band degree in `[1, 3]`.
- * @return {Uint8ClampedArray} Clamped-byte coefficients.
- */
-function unpackSphericalHarmonicsBand( packed, count, degree ) {
-
-	const componentCount = SH_BAND_COMPONENTS[ degree ];
-	const words = SH_BAND_WORDS[ degree ];
-	const data = new Uint8ClampedArray( count * componentCount );
-
-	for ( let i = 0; i < count; i ++ ) {
-
-		const sourceBase = i * words;
-		const targetBase = i * componentCount;
-
-		for ( let j = 0; j < componentCount; j ++ ) {
-
-			const { word, shift } = getSphericalHarmonicsCoefficientLocation( j );
-			data[ targetBase + j ] = ( packed[ sourceBase + word ] >>> shift ) & 0xff;
-
-		}
-
-	}
-
-	return data;
 
 }
 
 function createSphericalHarmonicsAttribute( values, count, degree ) {
 
 	const words = SH_BAND_WORDS[ degree ];
-	const componentCount = SH_BAND_COMPONENTS[ degree ];
 
-	if ( values instanceof Uint32Array ) {
+	if ( values instanceof Uint32Array === false ) {
 
-		if ( values.length !== count * words ) {
-
-			throw new Error( `THREE.createGaussianSplatGeometry: Invalid sphericalHarmonics${ degree } packed length.` );
-
-		}
-
-		return new BufferAttribute( values, words );
+		throw new Error( `THREE.createGaussianSplatGeometry: sphericalHarmonics${ degree } must use packed uint32 words.` );
 
 	}
 
-	if ( values instanceof Uint8Array === false && values instanceof Uint8ClampedArray === false ) {
+	if ( values.length !== count * words ) {
 
-		throw new Error( `THREE.createGaussianSplatGeometry: sphericalHarmonics${ degree } must use clamped byte components or packed uint32 words.` );
-
-	}
-
-	if ( values.length !== count * componentCount ) {
-
-		throw new Error( `THREE.createGaussianSplatGeometry: Invalid sphericalHarmonics${ degree } byte length.` );
+		throw new Error( `THREE.createGaussianSplatGeometry: Invalid sphericalHarmonics${ degree } packed length.` );
 
 	}
 
-	return new BufferAttribute( packSphericalHarmonicsBand( values, count, degree ), words );
+	return new BufferAttribute( values, words );
 
 }
 
@@ -318,15 +234,14 @@ function getSphericalHarmonicsDegree( geometry ) {
 
 /**
  * Creates Gaussian splat geometry from packed attribute arrays. Higher-order
- * spherical harmonics may be supplied as clamped-byte coefficients
- * (`( value - 128 ) / 128`) or as already packed `Uint32Array` words
- * (`SH_BAND_WORDS[ degree ]` words per splat, four bytes per word). The
- * resulting geometry always stores the packed uint32 form.
+ * spherical harmonics must be supplied as packed `Uint32Array` words
+ * (`SH_BAND_WORDS[ degree ]` words per splat, four clamped-byte coefficients
+ * per word using `( value - 128 ) / 128`).
  *
  * @param {Float32Array} centers - Splat centers.
  * @param {Float32Array} covariances - Splat covariance matrices.
  * @param {Uint8Array|Uint8ClampedArray} colors - RGBA colors.
- * @param {Object} [sphericalHarmonics={}] - Optional SH band arrays.
+ * @param {Object} [sphericalHarmonics={}] - Optional packed SH band arrays.
  * @return {BufferGeometry} The Gaussian splat geometry.
  */
 function createGaussianSplatGeometry( centers, covariances, colors, sphericalHarmonics = {} ) {
@@ -404,10 +319,15 @@ function createGaussianSplatGeometryFromPLYGeometry( geometry, {
 	const colors = new Uint8ClampedArray( count * 4 );
 	const sphericalHarmonicsDegree = getPLYRestSphericalHarmonicsDegree( shRest );
 	const sphericalHarmonics = {};
+	const sphericalHarmonicsBytes = {};
 
-	if ( sphericalHarmonicsDegree >= 1 ) sphericalHarmonics.sh1 = new Uint8ClampedArray( count * SH_BAND_COMPONENTS[ 1 ] );
-	if ( sphericalHarmonicsDegree >= 2 ) sphericalHarmonics.sh2 = new Uint8ClampedArray( count * SH_BAND_COMPONENTS[ 2 ] );
-	if ( sphericalHarmonicsDegree >= 3 ) sphericalHarmonics.sh3 = new Uint8ClampedArray( count * SH_BAND_COMPONENTS[ 3 ] );
+	for ( let degree = 1; degree <= sphericalHarmonicsDegree; degree ++ ) {
+
+		const band = createPackedSphericalHarmonicsBand( count, degree );
+		sphericalHarmonics[ `sh${ degree }` ] = band.packed;
+		sphericalHarmonicsBytes[ `sh${ degree }` ] = band.bytes;
+
+	}
 
 	for ( let i = 0; i < count; i ++ ) {
 
@@ -438,7 +358,7 @@ function createGaussianSplatGeometryFromPLYGeometry( geometry, {
 
 		if ( sphericalHarmonicsDegree > 0 ) {
 
-			writeSphericalHarmonicsFromPLYRest( sphericalHarmonics, i, shRest );
+			writeSphericalHarmonicsFromPLYRest( sphericalHarmonicsBytes, i, shRest );
 
 		}
 
@@ -464,39 +384,27 @@ function getPLYRestSphericalHarmonicsDegree( shRest ) {
 
 }
 
-function writeSphericalHarmonicsFromPLYRest( sphericalHarmonics, index, shRest ) {
+function writeSphericalHarmonicsFromPLYRest( sphericalHarmonicsBytes, index, shRest ) {
 
 	const stride = shRest.itemSize / 3;
 	const source = shRest.array;
 	const sourceOffset = index * shRest.itemSize;
 
-	for ( let j = 0; j < SH_BAND_COMPONENTS[ 1 ]; j ++ ) {
+	for ( let degree = 1; degree <= 3; degree ++ ) {
 
-		const coefficient = Math.floor( j / 3 );
-		const channel = j % 3;
-		sphericalHarmonics.sh1[ index * SH_BAND_COMPONENTS[ 1 ] + j ] = source[ sourceOffset + coefficient + channel * stride ] * 128 + 128;
+		const target = sphericalHarmonicsBytes[ `sh${ degree }` ];
 
-	}
+		if ( target === undefined ) break;
 
-	if ( sphericalHarmonics.sh2 !== undefined ) {
+		const bandOffset = degree === 1 ? 0 : degree === 2 ? 3 : 8;
+		const byteStride = SH_BAND_WORDS[ degree ] * 4;
+		const targetOffset = index * byteStride;
 
-		for ( let j = 0; j < SH_BAND_COMPONENTS[ 2 ]; j ++ ) {
-
-			const coefficient = Math.floor( j / 3 );
-			const channel = j % 3;
-			sphericalHarmonics.sh2[ index * SH_BAND_COMPONENTS[ 2 ] + j ] = source[ sourceOffset + 3 + coefficient + channel * stride ] * 128 + 128;
-
-		}
-
-	}
-
-	if ( sphericalHarmonics.sh3 !== undefined ) {
-
-		for ( let j = 0; j < SH_BAND_COMPONENTS[ 3 ]; j ++ ) {
+		for ( let j = 0; j < SH_BAND_COMPONENTS[ degree ]; j ++ ) {
 
 			const coefficient = Math.floor( j / 3 );
 			const channel = j % 3;
-			sphericalHarmonics.sh3[ index * SH_BAND_COMPONENTS[ 3 ] + j ] = source[ sourceOffset + 8 + coefficient + channel * stride ] * 128 + 128;
+			target[ targetOffset + j ] = source[ sourceOffset + bandOffset + coefficient + channel * stride ] * 128 + 128;
 
 		}
 
@@ -512,14 +420,12 @@ export {
 	SH_DEGREE_TO_COMPONENTS,
 	createGaussianSplatGeometry,
 	createGaussianSplatGeometryFromPLYGeometry,
+	createPackedSphericalHarmonicsBand,
 	getGaussianSplatPLYPropertyMapping,
-	getSphericalHarmonicsCoefficientLocation,
 	getSphericalHarmonicsDegree,
 	linearToSH0,
-	packSphericalHarmonicsBand,
 	sh0ToLinear,
 	sigmoid,
-	unpackSphericalHarmonicsBand,
 	writeColorBytes,
 	writeColorBytesFromSH0,
 	writeCovariance

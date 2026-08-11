@@ -1,7 +1,7 @@
 import { BufferGeometry } from 'three';
 import { gzipSync } from '../../../../examples/jsm/libs/fflate.module.js';
 import { SPZLoader } from '../../../../examples/jsm/loaders/SPZLoader.js';
-import { unpackSphericalHarmonicsBand } from '../../../../examples/jsm/utils/GaussianSplatUtils.js';
+import { unpackSphericalHarmonicsBand } from '../utils/GaussianSplatTestUtils.js';
 
 const EPS = 1e-6;
 const SPZ_MAGIC = 0x5053474e;

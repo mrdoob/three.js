@@ -4,7 +4,7 @@ import {
 	Loader
 } from 'three';
 
-import { SH_BAND_COMPONENTS, createGaussianSplatGeometry, writeColorBytes, writeCovariance } from '../utils/GaussianSplatUtils.js';
+import { SH_BAND_COMPONENTS, SH_BAND_WORDS, createGaussianSplatGeometry, createPackedSphericalHarmonicsBand, writeColorBytes, writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const HEADER_SIZE_BYTES = 4096;
 const SECTION_HEADER_SIZE_BYTES = 1024;
@@ -179,6 +179,7 @@ class KSPLATLoader extends Loader {
 		const covariances = new Float32Array( header.splatCount * 6 );
 		const colors = new Uint8ClampedArray( header.splatCount * 4 );
 		const sphericalHarmonics = {};
+		const sphericalHarmonicsBytes = {};
 		let splatOffset = 0;
 		let sectionBase = sectionDataOffset;
 
@@ -223,6 +224,7 @@ class KSPLATLoader extends Loader {
 					covariances,
 					colors,
 					sphericalHarmonics,
+					sphericalHarmonicsBytes,
 					header
 				);
 
@@ -279,7 +281,7 @@ function parseSectionHeader( view, offset, compression ) {
 
 }
 
-function readSection( view, bytes, section, compression, sectionBase, bucketsMetaDataSizeBytes, bucketsStorageSizeBytes, bytesPerSplat, splatOffset, centers, covariances, colors, sphericalHarmonics, header ) {
+function readSection( view, bytes, section, compression, sectionBase, bucketsMetaDataSizeBytes, bucketsStorageSizeBytes, bytesPerSplat, splatOffset, centers, covariances, colors, sphericalHarmonics, sphericalHarmonicsBytes, header ) {
 
 	const bucketsBase = sectionBase + bucketsMetaDataSizeBytes;
 	const dataBase = sectionBase + bucketsStorageSizeBytes;
@@ -289,7 +291,7 @@ function readSection( view, bytes, section, compression, sectionBase, bucketsMet
 	let partialBucketIndex = section.fullBucketCount;
 	let partialBucketBase = fullBucketSplats;
 
-	ensureSphericalHarmonics( sphericalHarmonics, header.splatCount, section.sphericalHarmonicsDegree );
+	ensureSphericalHarmonics( sphericalHarmonics, sphericalHarmonicsBytes, header.splatCount, section.sphericalHarmonicsDegree );
 
 	for ( let i = 0; i < section.splatCount; i ++ ) {
 
@@ -342,9 +344,10 @@ function readSection( view, bytes, section, compression, sectionBase, bucketsMet
 		for ( let degree = 1; degree <= section.sphericalHarmonicsDegree; degree ++ ) {
 
 			writeKSPLATSphericalHarmonicsBand(
-				sphericalHarmonics[ `sh${ degree }` ],
+				sphericalHarmonicsBytes[ `sh${ degree }` ],
 				outIndex,
 				SH_BAND_COMPONENTS[ degree ],
+				SH_BAND_WORDS[ degree ] * 4,
 				SH_BAND_INDEX[ degree ],
 				view,
 				rowOffset + sphericalHarmonicsOffset,
@@ -358,13 +361,15 @@ function readSection( view, bytes, section, compression, sectionBase, bucketsMet
 
 }
 
-function ensureSphericalHarmonics( sphericalHarmonics, count, degree ) {
+function ensureSphericalHarmonics( sphericalHarmonics, sphericalHarmonicsBytes, count, degree ) {
 
 	for ( let i = 1; i <= degree; i ++ ) {
 
 		if ( sphericalHarmonics[ `sh${ i }` ] === undefined ) {
 
-			sphericalHarmonics[ `sh${ i }` ] = new Uint8ClampedArray( count * SH_BAND_COMPONENTS[ i ] );
+			const band = createPackedSphericalHarmonicsBand( count, i );
+			sphericalHarmonics[ `sh${ i }` ] = band.packed;
+			sphericalHarmonicsBytes[ `sh${ i }` ] = band.bytes;
 
 		}
 
@@ -372,9 +377,9 @@ function ensureSphericalHarmonics( sphericalHarmonics, count, degree ) {
 
 }
 
-function writeKSPLATSphericalHarmonicsBand( target, index, bandComponents, componentIndexes, view, rowOffset, bytesPerComponent, header ) {
+function writeKSPLATSphericalHarmonicsBand( target, index, bandComponents, byteStride, componentIndexes, view, rowOffset, bytesPerComponent, header ) {
 
-	const targetOffset = index * bandComponents;
+	const targetOffset = index * byteStride;
 
 	for ( let i = 0; i < bandComponents; i ++ ) {
 

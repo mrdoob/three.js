@@ -1,6 +1,6 @@
 import { BufferGeometry } from 'three';
 import { KSPLATLoader } from '../../../../examples/jsm/loaders/KSPLATLoader.js';
-import { unpackSphericalHarmonicsBand } from '../../../../examples/jsm/utils/GaussianSplatUtils.js';
+import { unpackSphericalHarmonicsBand } from '../utils/GaussianSplatTestUtils.js';
 
 const EPS = 1e-6;
 const HEADER_SIZE_BYTES = 4096;

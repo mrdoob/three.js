@@ -5,7 +5,7 @@ import {
 } from 'three';
 
 import { gunzipSync } from '../libs/fflate.module.js';
-import { SH_BAND_COMPONENTS, SH_C0, createGaussianSplatGeometry, writeCovariance } from '../utils/GaussianSplatUtils.js';
+import { SH_BAND_COMPONENTS, SH_BAND_WORDS, SH_C0, createGaussianSplatGeometry, createPackedSphericalHarmonicsBand, writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const SPZ_MAGIC = 0x5053474e;
 const HEADER_SIZE_BYTES = 16;
@@ -267,22 +267,30 @@ function readSphericalHarmonics( bytes, offset, count, degree, sphericalHarmonic
 
 	if ( degree === 0 ) return;
 
+	const bands = [];
+
 	for ( let band = 1; band <= degree; band ++ ) {
 
-		sphericalHarmonics[ `sh${ band }` ] = new Uint8ClampedArray( count * SH_BAND_COMPONENTS[ band ] );
+		const packed = createPackedSphericalHarmonicsBand( count, band );
+		sphericalHarmonics[ `sh${ band }` ] = packed.packed;
+		bands.push( {
+			bytes: packed.bytes,
+			components: SH_BAND_COMPONENTS[ band ],
+			stride: SH_BAND_WORDS[ band ] * 4
+		} );
 
 	}
 
 	for ( let i = 0; i < count; i ++ ) {
 
-		for ( let band = 1; band <= degree; band ++ ) {
+		for ( let bandIndex = 0; bandIndex < bands.length; bandIndex ++ ) {
 
-			const target = sphericalHarmonics[ `sh${ band }` ];
-			const bandOffset = i * SH_BAND_COMPONENTS[ band ];
+			const band = bands[ bandIndex ];
+			const targetOffset = i * band.stride;
 
-			for ( let j = 0; j < SH_BAND_COMPONENTS[ band ]; j ++ ) {
+			for ( let j = 0; j < band.components; j ++ ) {
 
-				target[ bandOffset + j ] = bytes[ offset ++ ];
+				band.bytes[ targetOffset + j ] = bytes[ offset ++ ];
 
 			}
 
