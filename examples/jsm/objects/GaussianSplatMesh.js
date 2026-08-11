@@ -14,6 +14,7 @@ import {
 	Fn,
 	If,
 	atan,
+	cameraPosition,
 	cameraProjectionMatrix,
 	cos,
 	dot,
@@ -23,6 +24,8 @@ import {
 	instanceIndex,
 	max,
 	min,
+	modelWorldMatrixInverse,
+	normalize,
 	positionGeometry,
 	screenSize,
 	sin,
@@ -37,6 +40,11 @@ import {
 } from 'three/tsl';
 
 import { CountingSort } from '../gpgpu/CountingSort.js';
+import {
+	SH_BAND_WORDS,
+	getSphericalHarmonicsCoefficientLocation,
+	getSphericalHarmonicsDegree
+} from '../utils/GaussianSplatUtils.js';
 
 const BIN_COUNT = 4096;
 const WORKGROUP_SIZE = 256;
@@ -74,7 +82,7 @@ class GaussianSplatMesh extends Mesh {
 	/**
 	 * Constructs a new Gaussian splat mesh.
 	 *
-	 * @param {BufferGeometry} splatGeometry - The splat geometry to render.
+	 * @param {BufferGeometry} splatGeometry - The splat geometry to render. Higher-order spherical harmonics attributes must use packed `Uint32Array` words from {@link createGaussianSplatGeometry} (`SH_BAND_WORDS[ degree ]` words per splat, four clamped-byte coefficients per word).
 	 * @param {Object} [options] - Options.
 	 * @param {boolean} [options.autoSort=true] - Whether to sort automatically in `onBeforeRender`.
 	 */
@@ -83,13 +91,19 @@ class GaussianSplatMesh extends Mesh {
 		const positionAttribute = splatGeometry.getAttribute( 'position' );
 		const covarianceAttribute = splatGeometry.getAttribute( 'covariance' );
 		const colorAttribute = splatGeometry.getAttribute( 'color' );
+		const sphericalHarmonicsDegree = getSphericalHarmonicsDegree( splatGeometry );
 		const count = positionAttribute.count;
 
 		if ( splatGeometry.boundingBox === null ) splatGeometry.computeBoundingBox();
 		if ( splatGeometry.boundingSphere === null ) splatGeometry.computeBoundingSphere();
 
 		const geometry = createGeometry( count );
-		const buffers = createStorageBuffers( count, positionAttribute.array, covarianceAttribute.array, colorAttribute.array );
+		const buffers = createStorageBuffers( count, positionAttribute.array, covarianceAttribute.array, colorAttribute.array, {
+			degree: sphericalHarmonicsDegree,
+			sh1: sphericalHarmonicsDegree >= 1 ? splatGeometry.getAttribute( 'sphericalHarmonics1' ).array : undefined,
+			sh2: sphericalHarmonicsDegree >= 2 ? splatGeometry.getAttribute( 'sphericalHarmonics2' ).array : undefined,
+			sh3: sphericalHarmonicsDegree >= 3 ? splatGeometry.getAttribute( 'sphericalHarmonics3' ).array : undefined
+		} );
 		const sort = new CountingSort( count, { binCount: BIN_COUNT, workgroupSize: WORKGROUP_SIZE } );
 		const material = createMaterial( buffers, sort );
 
@@ -275,12 +289,13 @@ function createGeometry( count ) {
 
 }
 
-function createStorageBuffers( count, centers, covariances, colors ) {
+function createStorageBuffers( count, centers, covariances, colors, sphericalHarmonics ) {
 
 	const centerData = new Float32Array( count * 4 );
 	const covarianceAData = new Float32Array( count * 4 );
 	const covarianceBData = new Float32Array( count * 4 );
 	const colorData = new Float32Array( count * 4 );
+	const sphericalHarmonicsDegree = sphericalHarmonics.degree;
 
 	for ( let i = 0; i < count; i ++ ) {
 
@@ -312,14 +327,28 @@ function createStorageBuffers( count, centers, covariances, colors ) {
 	const covarianceBAttribute = new StorageBufferAttribute( covarianceBData, 4 );
 	const colorAttribute = new StorageBufferAttribute( colorData, 4 );
 
-	return {
+	const buffers = {
 		count,
+		sphericalHarmonicsDegree,
 		webGLBuffersEnabled: false,
 		centerRead: storage( centerAttribute, 'vec4', count ).toReadOnly(),
 		covarianceARead: storage( covarianceAAttribute, 'vec4', count ).toReadOnly(),
 		covarianceBRead: storage( covarianceBAttribute, 'vec4', count ).toReadOnly(),
 		colorRead: storage( colorAttribute, 'vec4', count ).toReadOnly()
 	};
+
+	for ( let degree = 1; degree <= sphericalHarmonicsDegree; degree ++ ) {
+
+		const words = SH_BAND_WORDS[ degree ];
+		const attribute = new StorageBufferAttribute( sphericalHarmonics[ `sh${ degree }` ], 1 );
+
+		buffers[ `sphericalHarmonics${ degree }Attribute` ] = attribute;
+		buffers[ `sphericalHarmonics${ degree }Read` ] = storage( attribute, 'uint', count * words ).toReadOnly();
+		buffers[ `sphericalHarmonics${ degree }Words` ] = words;
+
+	}
+
+	return buffers;
 
 }
 
@@ -331,7 +360,108 @@ function enableWebGLBuffers( buffers ) {
 	buffers.covarianceARead.setPBO( true );
 	buffers.covarianceBRead.setPBO( true );
 	buffers.colorRead.setPBO( true );
+
+	for ( let degree = 1; degree <= buffers.sphericalHarmonicsDegree; degree ++ ) {
+
+		buffers[ `sphericalHarmonics${ degree }Read` ].setPBO( true );
+
+	}
+
 	buffers.webGLBuffersEnabled = true;
+
+}
+
+function unpackSphericalHarmonicsCoefficient( buffer, splatIndex, words, coefficient ) {
+
+	const { word, shift } = getSphericalHarmonicsCoefficientLocation( coefficient );
+	const packed = buffer.element( splatIndex.mul( words ).add( word ) );
+	const byte = packed.shiftRight( shift ).bitAnd( 0xff );
+
+	return float( byte ).sub( 128 ).div( 128 );
+
+}
+
+function unpackSphericalHarmonicsVector( buffer, splatIndex, words, vector ) {
+
+	const coefficient = vector * 3;
+
+	return vec3(
+		unpackSphericalHarmonicsCoefficient( buffer, splatIndex, words, coefficient ),
+		unpackSphericalHarmonicsCoefficient( buffer, splatIndex, words, coefficient + 1 ),
+		unpackSphericalHarmonicsCoefficient( buffer, splatIndex, words, coefficient + 2 )
+	);
+
+}
+
+function applySphericalHarmonics( rgb, center, splatIndex, buffers ) {
+
+	const localCameraPosition = modelWorldMatrixInverse.mul( vec4( cameraPosition, 1 ) ).xyz.toVar( 'sphericalHarmonicsLocalCameraPosition' );
+	const viewDirection = normalize( center.sub( localCameraPosition ) ).toVar( 'sphericalHarmonicsViewDirection' );
+	const x = viewDirection.x;
+	const y = viewDirection.y;
+	const z = viewDirection.z;
+	const sh1 = buffers.sphericalHarmonics1Read;
+	const sh1Words = buffers.sphericalHarmonics1Words;
+
+	const sh1_0 = unpackSphericalHarmonicsVector( sh1, splatIndex, sh1Words, 0 ).toVar( 'sh1_0' );
+	const sh1_1 = unpackSphericalHarmonicsVector( sh1, splatIndex, sh1Words, 1 ).toVar( 'sh1_1' );
+	const sh1_2 = unpackSphericalHarmonicsVector( sh1, splatIndex, sh1Words, 2 ).toVar( 'sh1_2' );
+
+	rgb.addAssign(
+		sh1_0.mul( y.mul( - 0.4886025 ) )
+			.add( sh1_1.mul( z.mul( 0.4886025 ) ) )
+			.add( sh1_2.mul( x.mul( - 0.4886025 ) ) )
+	);
+
+	if ( buffers.sphericalHarmonicsDegree >= 2 ) {
+
+		const sh2 = buffers.sphericalHarmonics2Read;
+		const sh2Words = buffers.sphericalHarmonics2Words;
+		const sh2_0 = unpackSphericalHarmonicsVector( sh2, splatIndex, sh2Words, 0 ).toVar( 'sh2_0' );
+		const sh2_1 = unpackSphericalHarmonicsVector( sh2, splatIndex, sh2Words, 1 ).toVar( 'sh2_1' );
+		const sh2_2 = unpackSphericalHarmonicsVector( sh2, splatIndex, sh2Words, 2 ).toVar( 'sh2_2' );
+		const sh2_3 = unpackSphericalHarmonicsVector( sh2, splatIndex, sh2Words, 3 ).toVar( 'sh2_3' );
+		const sh2_4 = unpackSphericalHarmonicsVector( sh2, splatIndex, sh2Words, 4 ).toVar( 'sh2_4' );
+
+		const xx = x.mul( x ).toVar( 'shXX' );
+		const yy = y.mul( y ).toVar( 'shYY' );
+		const zz = z.mul( z ).toVar( 'shZZ' );
+
+		rgb.addAssign(
+			sh2_0.mul( x.mul( y ).mul( 1.0925484 ) )
+				.add( sh2_1.mul( y.mul( z ).mul( - 1.0925484 ) ) )
+				.add( sh2_2.mul( zz.mul( 2 ).sub( xx ).sub( yy ).mul( 0.3153915 ) ) )
+				.add( sh2_3.mul( x.mul( z ).mul( - 1.0925484 ) ) )
+				.add( sh2_4.mul( xx.sub( yy ).mul( 0.5462742 ) ) )
+		);
+
+		if ( buffers.sphericalHarmonicsDegree >= 3 ) {
+
+			const sh3 = buffers.sphericalHarmonics3Read;
+			const sh3Words = buffers.sphericalHarmonics3Words;
+			const sh3_0 = unpackSphericalHarmonicsVector( sh3, splatIndex, sh3Words, 0 ).toVar( 'sh3_0' );
+			const sh3_1 = unpackSphericalHarmonicsVector( sh3, splatIndex, sh3Words, 1 ).toVar( 'sh3_1' );
+			const sh3_2 = unpackSphericalHarmonicsVector( sh3, splatIndex, sh3Words, 2 ).toVar( 'sh3_2' );
+			const sh3_3 = unpackSphericalHarmonicsVector( sh3, splatIndex, sh3Words, 3 ).toVar( 'sh3_3' );
+			const sh3_4 = unpackSphericalHarmonicsVector( sh3, splatIndex, sh3Words, 4 ).toVar( 'sh3_4' );
+			const sh3_5 = unpackSphericalHarmonicsVector( sh3, splatIndex, sh3Words, 5 ).toVar( 'sh3_5' );
+			const sh3_6 = unpackSphericalHarmonicsVector( sh3, splatIndex, sh3Words, 6 ).toVar( 'sh3_6' );
+
+			const xy = x.mul( y ).toVar( 'shXY' );
+
+			rgb.addAssign(
+				sh3_0.mul( y.mul( xx.mul( 3 ).sub( yy ) ).mul( - 0.5900436 ) )
+					.add( sh3_1.mul( xy.mul( z ).mul( 2.8906114 ) ) )
+					.add( sh3_2.mul( y.mul( zz.mul( 4 ).sub( xx ).sub( yy ) ).mul( - 0.4570458 ) ) )
+					.add( sh3_3.mul( z.mul( zz.mul( 2 ).sub( xx.mul( 3 ) ).sub( yy.mul( 3 ) ) ).mul( 0.3731763 ) ) )
+					.add( sh3_4.mul( x.mul( zz.mul( 4 ).sub( xx ).sub( yy ) ).mul( - 0.4570458 ) ) )
+					.add( sh3_5.mul( z.mul( xx.sub( yy ) ).mul( 1.4453057 ) ) )
+					.add( sh3_6.mul( x.mul( xx.sub( yy.mul( 3 ) ) ).mul( - 0.5900436 ) ) )
+			);
+
+		}
+
+	}
 
 }
 
@@ -347,12 +477,19 @@ function createMaterial( buffers, sort ) {
 		const covA = buffers.covarianceARead.element( splatIndex ).toVar( 'covA' );
 		const covB = buffers.covarianceBRead.element( splatIndex ).toVar( 'covB' );
 		const color = buffers.colorRead.element( splatIndex ).toVar( 'splatColor' );
+		const rgb = color.rgb.toVar( 'splatRgb' );
 
 		splatUv.assign( positionGeometry.xy );
 
 		const viewCenter4 = highpModelViewMatrix.mul( vec4( center, 1 ) ).toVar( 'viewCenter4' );
 		const viewCenter = viewCenter4.xyz.toVar( 'viewCenter' );
 		const centerClip = cameraProjectionMatrix.mul( viewCenter4 ).toVar( 'centerClip' );
+
+		if ( buffers.sphericalHarmonicsDegree > 0 ) {
+
+			applySphericalHarmonics( rgb, center, splatIndex, buffers );
+
+		}
 
 		const m = highpModelViewMatrix;
 		const r0 = vec3( m[ 0 ].x, m[ 1 ].x, m[ 2 ].x ).toVar( 'r0' );
@@ -403,7 +540,7 @@ function createMaterial( buffers, sort ) {
 		const det = a.mul( c ).sub( b.mul( b ) ).toVar( 'det' );
 		const alphaScale = sqrt( max( detBase.div( max( det, 0.000001 ) ), 0 ) ).toVar( 'alphaScale' );
 
-		splatColor.assign( vec4( color.rgb, color.a.mul( alphaScale ) ) );
+		splatColor.assign( vec4( rgb.clamp( 0, 1 ), color.a.mul( alphaScale ) ) );
 
 		const halfTrace = a.add( c ).mul( 0.5 ).toVar( 'halfTrace' );
 		const radius = sqrt( max( a.sub( c ).mul( 0.5 ).pow2().add( b.mul( b ) ), 0.0000001 ) ).toVar( 'radius' );

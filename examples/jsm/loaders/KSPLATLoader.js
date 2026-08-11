@@ -4,7 +4,7 @@ import {
 	Loader
 } from 'three';
 
-import { createGaussianSplatGeometry, writeColorBytes, writeCovariance } from '../utils/GaussianSplatUtils.js';
+import { SH_BAND_COMPONENTS, createGaussianSplatGeometry, writeColorBytes, writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const HEADER_SIZE_BYTES = 4096;
 const SECTION_HEADER_SIZE_BYTES = 1024;
@@ -12,6 +12,9 @@ const CURRENT_VERSION_MAJOR = 0;
 const CURRENT_VERSION_MINOR = 1;
 const MAX_SPLATS = 10000000;
 const SH_DEGREE_TO_COMPONENTS = [ 0, 9, 24, 45 ];
+const SH1_INDEX = [ 0, 3, 6, 1, 4, 7, 2, 5, 8 ];
+const SH2_INDEX = [ 9, 14, 19, 10, 15, 20, 11, 16, 21, 12, 17, 22, 13, 18, 23 ];
+const SH3_INDEX = [ 24, 31, 38, 25, 32, 39, 26, 33, 40, 27, 34, 41, 28, 35, 42, 29, 36, 43, 30, 37, 44 ];
 const COMPRESSION_LEVELS = {
 	0: {
 		bytesPerCenter: 12,
@@ -52,8 +55,10 @@ const COMPRESSION_LEVELS = {
  * A loader for GaussianSplats3D `.ksplat` files.
  *
  * This loader decodes the format into `BufferGeometry` for use with
- * `GaussianSplatMesh`. Spherical harmonics payloads are skipped because the
- * current renderer uses the stored degree-0 color.
+ * `GaussianSplatMesh`. Higher-order spherical harmonics are exposed as optional
+ * `sphericalHarmonics1` through `sphericalHarmonics3` packed uint32 geometry
+ * attributes (`SH_BAND_WORDS[ degree ]` words per splat). Coefficients use the
+ * clamped-byte encoding `( value - 128 ) / 128`, four bytes per word.
  *
  * ```js
  * const loader = new KSPLATLoader();
@@ -170,6 +175,7 @@ class KSPLATLoader extends Loader {
 		const centers = new Float32Array( header.splatCount * 3 );
 		const covariances = new Float32Array( header.splatCount * 6 );
 		const colors = new Uint8ClampedArray( header.splatCount * 4 );
+		const sphericalHarmonics = {};
 		let splatOffset = 0;
 		let sectionBase = sectionDataOffset;
 
@@ -212,7 +218,9 @@ class KSPLATLoader extends Loader {
 					splatOffset,
 					centers,
 					covariances,
-					colors
+					colors,
+					sphericalHarmonics,
+					header
 				);
 
 				splatOffset += section.splatCount;
@@ -229,7 +237,7 @@ class KSPLATLoader extends Loader {
 
 		}
 
-		return createGaussianSplatGeometry( centers, covariances, colors );
+		return createGaussianSplatGeometry( centers, covariances, colors, sphericalHarmonics );
 
 	}
 
@@ -244,7 +252,9 @@ function parseHeader( view ) {
 		sectionCount: view.getUint32( 8, true ),
 		maxSplatCount: view.getUint32( 12, true ),
 		splatCount: view.getUint32( 16, true ),
-		compressionLevel: view.getUint16( 20, true )
+		compressionLevel: view.getUint16( 20, true ),
+		minSphericalHarmonicsCoeff: view.getFloat32( 36, true ) || - 1.5,
+		maxSphericalHarmonicsCoeff: view.getFloat32( 40, true ) || 1.5
 	};
 
 }
@@ -266,14 +276,17 @@ function parseSectionHeader( view, offset, compression ) {
 
 }
 
-function readSection( view, bytes, section, compression, sectionBase, bucketsMetaDataSizeBytes, bucketsStorageSizeBytes, bytesPerSplat, splatOffset, centers, covariances, colors ) {
+function readSection( view, bytes, section, compression, sectionBase, bucketsMetaDataSizeBytes, bucketsStorageSizeBytes, bytesPerSplat, splatOffset, centers, covariances, colors, sphericalHarmonics, header ) {
 
 	const bucketsBase = sectionBase + bucketsMetaDataSizeBytes;
 	const dataBase = sectionBase + bucketsStorageSizeBytes;
 	const fullBucketSplats = section.fullBucketCount * section.bucketSize;
 	const compressionScaleFactor = section.bucketBlockSize / 2 / section.compressionScaleRange;
+	const sphericalHarmonicsOffset = compression.colorOffsetBytes + compression.bytesPerColor;
 	let partialBucketIndex = section.fullBucketCount;
 	let partialBucketBase = fullBucketSplats;
+
+	ensureSphericalHarmonics( sphericalHarmonics, header.splatCount, section.sphericalHarmonicsDegree );
 
 	for ( let i = 0; i < section.splatCount; i ++ ) {
 
@@ -323,6 +336,76 @@ function readSection( view, bytes, section, compression, sectionBase, bucketsMet
 			bytes[ rowOffset + compression.colorOffsetBytes + 3 ]
 		);
 
+		if ( section.sphericalHarmonicsDegree >= 1 ) {
+
+			writeKSPLATSphericalHarmonicsBand(
+				sphericalHarmonics.sh1,
+				outIndex,
+				SH_BAND_COMPONENTS[ 1 ],
+				SH1_INDEX,
+				view,
+				rowOffset + sphericalHarmonicsOffset,
+				compression.bytesPerSphericalHarmonicsComponent,
+				header
+			);
+
+			if ( section.sphericalHarmonicsDegree >= 2 ) {
+
+				writeKSPLATSphericalHarmonicsBand(
+					sphericalHarmonics.sh2,
+					outIndex,
+					SH_BAND_COMPONENTS[ 2 ],
+					SH2_INDEX,
+					view,
+					rowOffset + sphericalHarmonicsOffset,
+					compression.bytesPerSphericalHarmonicsComponent,
+					header
+				);
+
+			}
+
+			if ( section.sphericalHarmonicsDegree >= 3 ) {
+
+				writeKSPLATSphericalHarmonicsBand(
+					sphericalHarmonics.sh3,
+					outIndex,
+					SH_BAND_COMPONENTS[ 3 ],
+					SH3_INDEX,
+					view,
+					rowOffset + sphericalHarmonicsOffset,
+					compression.bytesPerSphericalHarmonicsComponent,
+					header
+				);
+
+			}
+
+		}
+
+	}
+
+}
+
+function ensureSphericalHarmonics( sphericalHarmonics, count, degree ) {
+
+	if ( degree >= 1 && sphericalHarmonics.sh1 === undefined ) sphericalHarmonics.sh1 = new Uint8ClampedArray( count * SH_BAND_COMPONENTS[ 1 ] );
+	if ( degree >= 2 && sphericalHarmonics.sh2 === undefined ) sphericalHarmonics.sh2 = new Uint8ClampedArray( count * SH_BAND_COMPONENTS[ 2 ] );
+	if ( degree >= 3 && sphericalHarmonics.sh3 === undefined ) sphericalHarmonics.sh3 = new Uint8ClampedArray( count * SH_BAND_COMPONENTS[ 3 ] );
+
+}
+
+function writeKSPLATSphericalHarmonicsBand( target, index, bandComponents, componentIndexes, view, rowOffset, bytesPerComponent, header ) {
+
+	const targetOffset = index * bandComponents;
+
+	for ( let i = 0; i < bandComponents; i ++ ) {
+
+		target[ targetOffset + i ] = readCompressedSphericalHarmonic(
+			view,
+			rowOffset + componentIndexes[ i ] * bytesPerComponent,
+			bytesPerComponent,
+			header
+		) * 128 + 128;
+
 	}
 
 }
@@ -370,6 +453,26 @@ function readCompressedFloat( view, offset, bytesPerVector ) {
 	}
 
 	return DataUtils.fromHalfFloat( view.getUint16( offset, true ) );
+
+}
+
+function readCompressedSphericalHarmonic( view, offset, bytesPerComponent, header ) {
+
+	if ( bytesPerComponent === 4 ) {
+
+		return view.getFloat32( offset, true );
+
+	}
+
+	if ( bytesPerComponent === 2 ) {
+
+		return DataUtils.fromHalfFloat( view.getUint16( offset, true ) );
+
+	}
+
+	const t = view.getUint8( offset ) / 255;
+
+	return header.minSphericalHarmonicsCoeff + t * ( header.maxSphericalHarmonicsCoeff - header.minSphericalHarmonicsCoeff );
 
 }
 

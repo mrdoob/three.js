@@ -1,9 +1,11 @@
 import { BufferGeometry } from 'three';
 import { KSPLATLoader } from '../../../../examples/jsm/loaders/KSPLATLoader.js';
+import { unpackSphericalHarmonicsBand } from '../../../../examples/jsm/utils/GaussianSplatUtils.js';
 
 const EPS = 1e-6;
 const HEADER_SIZE_BYTES = 4096;
 const SECTION_HEADER_SIZE_BYTES = 1024;
+const SH_DEGREE_TO_COMPONENTS = [ 0, 9, 24, 45 ];
 
 function closeTo( assert, actual, expected, message ) {
 
@@ -11,13 +13,14 @@ function closeTo( assert, actual, expected, message ) {
 
 }
 
-function createKSPLATBuffer() {
+function createKSPLATBuffer( sphericalHarmonicsDegree = 0 ) {
 
 	const compression = {
-		bytesPerSplat: 44,
+		bytesPerSplat: 44 + SH_DEGREE_TO_COMPONENTS[ sphericalHarmonicsDegree ] * 4,
 		scaleOffsetBytes: 12,
 		rotationOffsetBytes: 24,
 		colorOffsetBytes: 40,
+		sphericalHarmonicsOffsetBytes: 44,
 		bucketBytes: 0
 	};
 	const buffer = new ArrayBuffer( HEADER_SIZE_BYTES + SECTION_HEADER_SIZE_BYTES + compression.bytesPerSplat );
@@ -43,7 +46,7 @@ function createKSPLATBuffer() {
 	view.setUint32( sectionOffset + 24, 32767, true );
 	view.setUint32( sectionOffset + 32, 0, true );
 	view.setUint32( sectionOffset + 36, 0, true );
-	view.setUint16( sectionOffset + 40, 0, true );
+	view.setUint16( sectionOffset + 40, sphericalHarmonicsDegree, true );
 
 	view.setFloat32( dataOffset, 1, true );
 	view.setFloat32( dataOffset + 4, 2, true );
@@ -57,6 +60,12 @@ function createKSPLATBuffer() {
 	view.setFloat32( dataOffset + compression.rotationOffsetBytes + 12, 0, true );
 
 	bytes.set( [ 10, 20, 30, 40 ], dataOffset + compression.colorOffsetBytes );
+
+	for ( let i = 0; i < SH_DEGREE_TO_COMPONENTS[ sphericalHarmonicsDegree ]; i ++ ) {
+
+		view.setFloat32( dataOffset + compression.sphericalHarmonicsOffsetBytes + i * 4, ( i + 1 ) / 128, true );
+
+	}
 
 	return buffer;
 
@@ -85,6 +94,15 @@ export default QUnit.module( 'Addons', () => {
 				closeTo( assert, covariances[ 4 ], 0, 'covariance yz' );
 				closeTo( assert, covariances[ 5 ], 16, 'covariance zz' );
 				assert.deepEqual( Array.from( data.getAttribute( 'color' ).array ), [ 10, 20, 30, 40 ], 'colors' );
+
+			} );
+
+			QUnit.test( 'parses uncompressed KSPLAT spherical harmonics data', ( assert ) => {
+
+				const loader = new KSPLATLoader();
+				const data = loader.parse( createKSPLATBuffer( 1 ) );
+
+				assert.deepEqual( Array.from( unpackSphericalHarmonicsBand( data.getAttribute( 'sphericalHarmonics1' ).array, 1, 1 ) ), [ 129, 132, 135, 130, 133, 136, 131, 134, 137 ], 'SH1 coefficients are remapped to RGB triplets' );
 
 			} );
 

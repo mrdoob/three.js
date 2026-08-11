@@ -5,7 +5,7 @@ import {
 } from 'three';
 
 import { gunzipSync } from '../libs/fflate.module.js';
-import { SH_C0, createGaussianSplatGeometry, writeCovariance } from '../utils/GaussianSplatUtils.js';
+import { SH_BAND_COMPONENTS, SH_C0, createGaussianSplatGeometry, writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const SPZ_MAGIC = 0x5053474e;
 const HEADER_SIZE_BYTES = 16;
@@ -45,8 +45,10 @@ const _quaternion = [ 0, 0, 0, 0 ];
  * A loader for compressed Gaussian splat `.spz` files.
  *
  * This loader decodes the format into `BufferGeometry` for use with
- * `GaussianSplatMesh`. The current renderer supports degree-0 color only, so
- * higher-order spherical harmonics are parsed only enough to skip their payload.
+ * `GaussianSplatMesh`. Higher-order spherical harmonics are exposed as optional
+ * `sphericalHarmonics1` through `sphericalHarmonics3` packed uint32 geometry
+ * attributes (`SH_BAND_WORDS[ degree ]` words per splat). Coefficients use the
+ * clamped-byte encoding `( value - 128 ) / 128`, four bytes per word.
  *
  * ```js
  * const loader = new SPZLoader();
@@ -122,6 +124,18 @@ class SPZLoader extends Loader {
 	 */
 	parse( buffer ) {
 
+		if ( buffer.byteLength >= 8 ) {
+
+			const view = new DataView( buffer );
+
+			if ( view.getUint32( 0, true ) === SPZ_MAGIC && view.getUint32( 4, true ) >= 4 ) {
+
+				throw new Error( `THREE.SPZLoader: SPZ version ${ view.getUint32( 4, true ) } is not supported.` );
+
+			}
+
+		}
+
 		const decompressed = gunzipSync( new Uint8Array( buffer ) );
 
 		return this.parseRawSPZ( decompressed );
@@ -158,7 +172,7 @@ class SPZLoader extends Loader {
 
 		if ( version < 1 || version > 3 ) {
 
-			throw new Error( `THREE.SPZLoader: Unsupported SPZ version ${ version }.` );
+			throw new Error( `THREE.SPZLoader: SPZ version ${ version } is not supported.` );
 
 		}
 
@@ -178,6 +192,7 @@ class SPZLoader extends Loader {
 		const centers = new Float32Array( count * 3 );
 		const covariances = new Float32Array( count * 6 );
 		const colors = new Uint8ClampedArray( count * 4 );
+		const sphericalHarmonics = {};
 		const positionsSize = count * 3 * ( version === 1 ? 2 : 3 );
 		const rotationsSize = count * ( version === 3 ? 4 : 3 );
 		const shSize = count * SH_DEGREE_TO_VECTORS[ shDegree ] * 3;
@@ -202,6 +217,7 @@ class SPZLoader extends Loader {
 		offset += count * 3;
 
 		const rotationOffset = offset;
+		const sphericalHarmonicsOffset = rotationOffset + rotationsSize;
 
 		// Copy the rotation section into an aligned Uint32Array so the hot loop
 		// avoids per-splat DataView reads (the section offset within the file is
@@ -239,7 +255,55 @@ class SPZLoader extends Loader {
 
 		}
 
-		return createGaussianSplatGeometry( centers, covariances, colors );
+		readSphericalHarmonics( bytes, sphericalHarmonicsOffset, count, shDegree, sphericalHarmonics );
+
+		return createGaussianSplatGeometry( centers, covariances, colors, sphericalHarmonics );
+
+	}
+
+}
+
+function readSphericalHarmonics( bytes, offset, count, degree, sphericalHarmonics ) {
+
+	if ( degree === 0 ) return;
+
+	if ( degree >= 1 ) sphericalHarmonics.sh1 = new Uint8ClampedArray( count * SH_BAND_COMPONENTS[ 1 ] );
+	if ( degree >= 2 ) sphericalHarmonics.sh2 = new Uint8ClampedArray( count * SH_BAND_COMPONENTS[ 2 ] );
+	if ( degree >= 3 ) sphericalHarmonics.sh3 = new Uint8ClampedArray( count * SH_BAND_COMPONENTS[ 3 ] );
+
+	for ( let i = 0; i < count; i ++ ) {
+
+		const sh1Offset = i * SH_BAND_COMPONENTS[ 1 ];
+
+		for ( let j = 0; j < SH_BAND_COMPONENTS[ 1 ]; j ++ ) {
+
+			sphericalHarmonics.sh1[ sh1Offset + j ] = bytes[ offset ++ ];
+
+		}
+
+		if ( sphericalHarmonics.sh2 !== undefined ) {
+
+			const sh2Offset = i * SH_BAND_COMPONENTS[ 2 ];
+
+			for ( let j = 0; j < SH_BAND_COMPONENTS[ 2 ]; j ++ ) {
+
+				sphericalHarmonics.sh2[ sh2Offset + j ] = bytes[ offset ++ ];
+
+			}
+
+		}
+
+		if ( sphericalHarmonics.sh3 !== undefined ) {
+
+			const sh3Offset = i * SH_BAND_COMPONENTS[ 3 ];
+
+			for ( let j = 0; j < SH_BAND_COMPONENTS[ 3 ]; j ++ ) {
+
+				sphericalHarmonics.sh3[ sh3Offset + j ] = bytes[ offset ++ ];
+
+			}
+
+		}
 
 	}
 

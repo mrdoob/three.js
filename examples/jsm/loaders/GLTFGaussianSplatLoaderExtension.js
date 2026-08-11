@@ -3,7 +3,7 @@ import {
 } from 'three';
 
 import { GaussianSplatMesh } from '../objects/GaussianSplatMesh.js';
-import { createGaussianSplatGeometry, writeColorBytesFromSH0, writeCovariance } from '../utils/GaussianSplatUtils.js';
+import { SH_BAND_COMPONENTS, createGaussianSplatGeometry, writeColorBytesFromSH0, writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const EXTENSION_NAME = 'KHR_gaussian_splatting';
 const POINTS = 0;
@@ -158,20 +158,10 @@ function createGaussianSplatMesh( geometry, primitiveDef ) {
 
 	}
 
-	for ( const semantic in primitiveDef.attributes ) {
-
-		if ( /^KHR_gaussian_splatting:SH_DEGREE_[1-3]_COEF_/.test( semantic ) ) {
-
-			console.warn( 'THREE.GLTFGaussianSplatLoaderExtension: KHR_gaussian_splatting spherical harmonics above degree 0 are ignored.' );
-			break;
-
-		}
-
-	}
-
 	const centers = new Float32Array( count * 3 );
 	const covariances = new Float32Array( count * 6 );
 	const colors = new Uint8ClampedArray( count * 4 );
+	const sphericalHarmonics = createGLTFSphericalHarmonicsAttributes( geometry, primitiveDef, count );
 
 	for ( let i = 0; i < count; i ++ ) {
 
@@ -204,12 +194,85 @@ function createGaussianSplatMesh( geometry, primitiveDef ) {
 
 	}
 
-	const mesh = new GaussianSplatMesh( createGaussianSplatGeometry( centers, covariances, colors ) );
+	const mesh = new GaussianSplatMesh( createGaussianSplatGeometry( centers, covariances, colors, sphericalHarmonics ) );
 
 	mesh.userData.gltfExtensions = mesh.userData.gltfExtensions || {};
 	mesh.userData.gltfExtensions[ EXTENSION_NAME ] = Object.assign( {}, extensionDef );
 
 	return mesh;
+
+}
+
+function createGLTFSphericalHarmonicsAttributes( geometry, primitiveDef, count ) {
+
+	const sphericalHarmonics = {};
+
+	for ( let degree = 1; degree <= 3; degree ++ ) {
+
+		const coefficientCount = degree * 2 + 1;
+		const attributes = [];
+
+		for ( let coefficient = 0; coefficient < coefficientCount; coefficient ++ ) {
+
+			const semantic = `KHR_gaussian_splatting:SH_DEGREE_${ degree }_COEF_${ coefficient }`;
+			const attribute = getOptionalGaussianSplatAttribute( geometry, primitiveDef, semantic );
+
+			if ( attribute !== undefined ) {
+
+				if ( attribute.count !== count || attribute.itemSize !== 3 ) {
+
+					throw new Error( `THREE.GLTFGaussianSplatLoaderExtension: Invalid ${ semantic } attribute.` );
+
+				}
+
+			}
+
+			attributes.push( attribute );
+
+		}
+
+		if ( attributes.every( attribute => attribute === undefined ) ) break;
+
+		if ( attributes.some( attribute => attribute === undefined ) ) {
+
+			throw new Error( `THREE.GLTFGaussianSplatLoaderExtension: Incomplete KHR_gaussian_splatting SH degree ${ degree } coefficients.` );
+
+		}
+
+		const target = new Uint8ClampedArray( count * SH_BAND_COMPONENTS[ degree ] );
+
+		for ( let i = 0; i < count; i ++ ) {
+
+			for ( let coefficient = 0; coefficient < coefficientCount; coefficient ++ ) {
+
+				const attribute = attributes[ coefficient ];
+				const targetOffset = i * SH_BAND_COMPONENTS[ degree ] + coefficient * 3;
+
+				target[ targetOffset ] = attribute.getX( i ) * 128 + 128;
+				target[ targetOffset + 1 ] = attribute.getY( i ) * 128 + 128;
+				target[ targetOffset + 2 ] = attribute.getZ( i ) * 128 + 128;
+
+			}
+
+		}
+
+		sphericalHarmonics[ `sh${ degree }` ] = target;
+
+	}
+
+	for ( const semantic in primitiveDef.attributes ) {
+
+		const match = semantic.match( /^KHR_gaussian_splatting:SH_DEGREE_([1-3])_COEF_/ );
+
+		if ( match !== null && sphericalHarmonics[ `sh${ match[ 1 ] }` ] === undefined ) {
+
+			throw new Error( 'THREE.GLTFGaussianSplatLoaderExtension: KHR_gaussian_splatting spherical harmonics attributes must be contiguous.' );
+
+		}
+
+	}
+
+	return sphericalHarmonics;
 
 }
 
@@ -231,6 +294,16 @@ function getGaussianSplatAttribute( geometry, primitiveDef, semantic ) {
 	}
 
 	return attribute;
+
+}
+
+function getOptionalGaussianSplatAttribute( geometry, primitiveDef, semantic ) {
+
+	if ( primitiveDef.attributes[ semantic ] === undefined ) return undefined;
+
+	const attributeName = ATTRIBUTES[ semantic ] || semantic.toLowerCase();
+
+	return geometry.getAttribute( attributeName );
 
 }
 
