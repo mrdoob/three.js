@@ -12,9 +12,12 @@ const CURRENT_VERSION_MAJOR = 0;
 const CURRENT_VERSION_MINOR = 1;
 const MAX_SPLATS = 10000000;
 const SH_DEGREE_TO_COMPONENTS = [ 0, 9, 24, 45 ];
-const SH1_INDEX = [ 0, 3, 6, 1, 4, 7, 2, 5, 8 ];
-const SH2_INDEX = [ 9, 14, 19, 10, 15, 20, 11, 16, 21, 12, 17, 22, 13, 18, 23 ];
-const SH3_INDEX = [ 24, 31, 38, 25, 32, 39, 26, 33, 40, 27, 34, 41, 28, 35, 42, 29, 36, 43, 30, 37, 44 ];
+const SH_BAND_INDEX = [
+	null,
+	[ 0, 3, 6, 1, 4, 7, 2, 5, 8 ],
+	[ 9, 14, 19, 10, 15, 20, 11, 16, 21, 12, 17, 22, 13, 18, 23 ],
+	[ 24, 31, 38, 25, 32, 39, 26, 33, 40, 27, 34, 41, 28, 35, 42, 29, 36, 43, 30, 37, 44 ]
+];
 const COMPRESSION_LEVELS = {
 	0: {
 		bytesPerCenter: 12,
@@ -336,48 +339,18 @@ function readSection( view, bytes, section, compression, sectionBase, bucketsMet
 			bytes[ rowOffset + compression.colorOffsetBytes + 3 ]
 		);
 
-		if ( section.sphericalHarmonicsDegree >= 1 ) {
+		for ( let degree = 1; degree <= section.sphericalHarmonicsDegree; degree ++ ) {
 
 			writeKSPLATSphericalHarmonicsBand(
-				sphericalHarmonics.sh1,
+				sphericalHarmonics[ `sh${ degree }` ],
 				outIndex,
-				SH_BAND_COMPONENTS[ 1 ],
-				SH1_INDEX,
+				SH_BAND_COMPONENTS[ degree ],
+				SH_BAND_INDEX[ degree ],
 				view,
 				rowOffset + sphericalHarmonicsOffset,
 				compression.bytesPerSphericalHarmonicsComponent,
 				header
 			);
-
-			if ( section.sphericalHarmonicsDegree >= 2 ) {
-
-				writeKSPLATSphericalHarmonicsBand(
-					sphericalHarmonics.sh2,
-					outIndex,
-					SH_BAND_COMPONENTS[ 2 ],
-					SH2_INDEX,
-					view,
-					rowOffset + sphericalHarmonicsOffset,
-					compression.bytesPerSphericalHarmonicsComponent,
-					header
-				);
-
-			}
-
-			if ( section.sphericalHarmonicsDegree >= 3 ) {
-
-				writeKSPLATSphericalHarmonicsBand(
-					sphericalHarmonics.sh3,
-					outIndex,
-					SH_BAND_COMPONENTS[ 3 ],
-					SH3_INDEX,
-					view,
-					rowOffset + sphericalHarmonicsOffset,
-					compression.bytesPerSphericalHarmonicsComponent,
-					header
-				);
-
-			}
 
 		}
 
@@ -387,9 +360,15 @@ function readSection( view, bytes, section, compression, sectionBase, bucketsMet
 
 function ensureSphericalHarmonics( sphericalHarmonics, count, degree ) {
 
-	if ( degree >= 1 && sphericalHarmonics.sh1 === undefined ) sphericalHarmonics.sh1 = new Uint8ClampedArray( count * SH_BAND_COMPONENTS[ 1 ] );
-	if ( degree >= 2 && sphericalHarmonics.sh2 === undefined ) sphericalHarmonics.sh2 = new Uint8ClampedArray( count * SH_BAND_COMPONENTS[ 2 ] );
-	if ( degree >= 3 && sphericalHarmonics.sh3 === undefined ) sphericalHarmonics.sh3 = new Uint8ClampedArray( count * SH_BAND_COMPONENTS[ 3 ] );
+	for ( let i = 1; i <= degree; i ++ ) {
+
+		if ( sphericalHarmonics[ `sh${ i }` ] === undefined ) {
+
+			sphericalHarmonics[ `sh${ i }` ] = new Uint8ClampedArray( count * SH_BAND_COMPONENTS[ i ] );
+
+		}
+
+	}
 
 }
 

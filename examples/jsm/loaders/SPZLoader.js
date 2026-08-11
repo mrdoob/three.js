@@ -267,39 +267,22 @@ function readSphericalHarmonics( bytes, offset, count, degree, sphericalHarmonic
 
 	if ( degree === 0 ) return;
 
-	if ( degree >= 1 ) sphericalHarmonics.sh1 = new Uint8ClampedArray( count * SH_BAND_COMPONENTS[ 1 ] );
-	if ( degree >= 2 ) sphericalHarmonics.sh2 = new Uint8ClampedArray( count * SH_BAND_COMPONENTS[ 2 ] );
-	if ( degree >= 3 ) sphericalHarmonics.sh3 = new Uint8ClampedArray( count * SH_BAND_COMPONENTS[ 3 ] );
+	for ( let band = 1; band <= degree; band ++ ) {
+
+		sphericalHarmonics[ `sh${ band }` ] = new Uint8ClampedArray( count * SH_BAND_COMPONENTS[ band ] );
+
+	}
 
 	for ( let i = 0; i < count; i ++ ) {
 
-		const sh1Offset = i * SH_BAND_COMPONENTS[ 1 ];
+		for ( let band = 1; band <= degree; band ++ ) {
 
-		for ( let j = 0; j < SH_BAND_COMPONENTS[ 1 ]; j ++ ) {
+			const target = sphericalHarmonics[ `sh${ band }` ];
+			const bandOffset = i * SH_BAND_COMPONENTS[ band ];
 
-			sphericalHarmonics.sh1[ sh1Offset + j ] = bytes[ offset ++ ];
+			for ( let j = 0; j < SH_BAND_COMPONENTS[ band ]; j ++ ) {
 
-		}
-
-		if ( sphericalHarmonics.sh2 !== undefined ) {
-
-			const sh2Offset = i * SH_BAND_COMPONENTS[ 2 ];
-
-			for ( let j = 0; j < SH_BAND_COMPONENTS[ 2 ]; j ++ ) {
-
-				sphericalHarmonics.sh2[ sh2Offset + j ] = bytes[ offset ++ ];
-
-			}
-
-		}
-
-		if ( sphericalHarmonics.sh3 !== undefined ) {
-
-			const sh3Offset = i * SH_BAND_COMPONENTS[ 3 ];
-
-			for ( let j = 0; j < SH_BAND_COMPONENTS[ 3 ]; j ++ ) {
-
-				sphericalHarmonics.sh3[ sh3Offset + j ] = bytes[ offset ++ ];
+				target[ bandOffset + j ] = bytes[ offset ++ ];
 
 			}
 

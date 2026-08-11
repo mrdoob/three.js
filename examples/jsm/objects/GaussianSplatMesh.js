@@ -41,8 +41,8 @@ import {
 
 import { CountingSort } from '../gpgpu/CountingSort.js';
 import {
+	SH_BAND_COMPONENTS,
 	SH_BAND_WORDS,
-	getSphericalHarmonicsCoefficientLocation,
 	getSphericalHarmonicsDegree
 } from '../utils/GaussianSplatUtils.js';
 
@@ -371,25 +371,71 @@ function enableWebGLBuffers( buffers ) {
 
 }
 
-function unpackSphericalHarmonicsCoefficient( buffer, splatIndex, words, coefficient ) {
+function unpackSphericalHarmonicsCoefficients( buffer, splatIndex, words, componentCount ) {
 
-	const { word, shift } = getSphericalHarmonicsCoefficientLocation( coefficient );
-	const packed = buffer.element( splatIndex.mul( words ).add( word ) );
-	const byte = packed.shiftRight( shift ).bitAnd( 0xff );
+	const coefficients = [];
+	let remaining = componentCount;
 
-	return float( byte ).sub( 128 ).div( 128 );
+	for ( let word = 0; word < words && remaining > 0; word ++ ) {
+
+		const packed = buffer.element( splatIndex.mul( words ).add( word ) ).toVar();
+		const bytesInWord = Math.min( 4, remaining );
+
+		for ( let byteIndex = 0; byteIndex < bytesInWord; byteIndex ++ ) {
+
+			const byte = packed.shiftRight( byteIndex * 8 ).bitAnd( 0xff );
+			coefficients.push( float( byte ).sub( 128 ).div( 128 ) );
+
+		}
+
+		remaining -= bytesInWord;
+
+	}
+
+	return coefficients;
 
 }
 
-function unpackSphericalHarmonicsVector( buffer, splatIndex, words, vector ) {
+function assembleSphericalHarmonicsVectors( coefficients, name ) {
 
-	const coefficient = vector * 3;
+	const vectors = [];
+	const vectorCount = coefficients.length / 3;
 
-	return vec3(
-		unpackSphericalHarmonicsCoefficient( buffer, splatIndex, words, coefficient ),
-		unpackSphericalHarmonicsCoefficient( buffer, splatIndex, words, coefficient + 1 ),
-		unpackSphericalHarmonicsCoefficient( buffer, splatIndex, words, coefficient + 2 )
-	);
+	for ( let i = 0; i < vectorCount; i ++ ) {
+
+		const offset = i * 3;
+		vectors.push( vec3(
+			coefficients[ offset ],
+			coefficients[ offset + 1 ],
+			coefficients[ offset + 2 ]
+		).toVar( `${ name }${ i }` ) );
+
+	}
+
+	return vectors;
+
+}
+
+function accumulateSphericalHarmonics( vectors, weights ) {
+
+	let result = vectors[ 0 ].mul( weights[ 0 ] );
+
+	for ( let i = 1; i < vectors.length; i ++ ) {
+
+		result = result.add( vectors[ i ].mul( weights[ i ] ) );
+
+	}
+
+	return result;
+
+}
+
+function applySphericalHarmonicsBand( buffer, splatIndex, words, componentCount, name, weights ) {
+
+	const coefficients = unpackSphericalHarmonicsCoefficients( buffer, splatIndex, words, componentCount );
+	const vectors = assembleSphericalHarmonicsVectors( coefficients, name );
+
+	return accumulateSphericalHarmonics( vectors, weights );
 
 }
 
@@ -400,64 +446,61 @@ function applySphericalHarmonics( rgb, center, splatIndex, buffers ) {
 	const x = viewDirection.x;
 	const y = viewDirection.y;
 	const z = viewDirection.z;
-	const sh1 = buffers.sphericalHarmonics1Read;
-	const sh1Words = buffers.sphericalHarmonics1Words;
 
-	const sh1_0 = unpackSphericalHarmonicsVector( sh1, splatIndex, sh1Words, 0 ).toVar( 'sh1_0' );
-	const sh1_1 = unpackSphericalHarmonicsVector( sh1, splatIndex, sh1Words, 1 ).toVar( 'sh1_1' );
-	const sh1_2 = unpackSphericalHarmonicsVector( sh1, splatIndex, sh1Words, 2 ).toVar( 'sh1_2' );
-
-	rgb.addAssign(
-		sh1_0.mul( y.mul( - 0.4886025 ) )
-			.add( sh1_1.mul( z.mul( 0.4886025 ) ) )
-			.add( sh1_2.mul( x.mul( - 0.4886025 ) ) )
-	);
+	rgb.addAssign( applySphericalHarmonicsBand(
+		buffers.sphericalHarmonics1Read,
+		splatIndex,
+		buffers.sphericalHarmonics1Words,
+		SH_BAND_COMPONENTS[ 1 ],
+		'sh1_',
+		[
+			y.mul( - 0.4886025 ),
+			z.mul( 0.4886025 ),
+			x.mul( - 0.4886025 )
+		]
+	) );
 
 	if ( buffers.sphericalHarmonicsDegree >= 2 ) {
-
-		const sh2 = buffers.sphericalHarmonics2Read;
-		const sh2Words = buffers.sphericalHarmonics2Words;
-		const sh2_0 = unpackSphericalHarmonicsVector( sh2, splatIndex, sh2Words, 0 ).toVar( 'sh2_0' );
-		const sh2_1 = unpackSphericalHarmonicsVector( sh2, splatIndex, sh2Words, 1 ).toVar( 'sh2_1' );
-		const sh2_2 = unpackSphericalHarmonicsVector( sh2, splatIndex, sh2Words, 2 ).toVar( 'sh2_2' );
-		const sh2_3 = unpackSphericalHarmonicsVector( sh2, splatIndex, sh2Words, 3 ).toVar( 'sh2_3' );
-		const sh2_4 = unpackSphericalHarmonicsVector( sh2, splatIndex, sh2Words, 4 ).toVar( 'sh2_4' );
 
 		const xx = x.mul( x ).toVar( 'shXX' );
 		const yy = y.mul( y ).toVar( 'shYY' );
 		const zz = z.mul( z ).toVar( 'shZZ' );
 
-		rgb.addAssign(
-			sh2_0.mul( x.mul( y ).mul( 1.0925484 ) )
-				.add( sh2_1.mul( y.mul( z ).mul( - 1.0925484 ) ) )
-				.add( sh2_2.mul( zz.mul( 2 ).sub( xx ).sub( yy ).mul( 0.3153915 ) ) )
-				.add( sh2_3.mul( x.mul( z ).mul( - 1.0925484 ) ) )
-				.add( sh2_4.mul( xx.sub( yy ).mul( 0.5462742 ) ) )
-		);
+		rgb.addAssign( applySphericalHarmonicsBand(
+			buffers.sphericalHarmonics2Read,
+			splatIndex,
+			buffers.sphericalHarmonics2Words,
+			SH_BAND_COMPONENTS[ 2 ],
+			'sh2_',
+			[
+				x.mul( y ).mul( 1.0925484 ),
+				y.mul( z ).mul( - 1.0925484 ),
+				zz.mul( 2 ).sub( xx ).sub( yy ).mul( 0.3153915 ),
+				x.mul( z ).mul( - 1.0925484 ),
+				xx.sub( yy ).mul( 0.5462742 )
+			]
+		) );
 
 		if ( buffers.sphericalHarmonicsDegree >= 3 ) {
 
-			const sh3 = buffers.sphericalHarmonics3Read;
-			const sh3Words = buffers.sphericalHarmonics3Words;
-			const sh3_0 = unpackSphericalHarmonicsVector( sh3, splatIndex, sh3Words, 0 ).toVar( 'sh3_0' );
-			const sh3_1 = unpackSphericalHarmonicsVector( sh3, splatIndex, sh3Words, 1 ).toVar( 'sh3_1' );
-			const sh3_2 = unpackSphericalHarmonicsVector( sh3, splatIndex, sh3Words, 2 ).toVar( 'sh3_2' );
-			const sh3_3 = unpackSphericalHarmonicsVector( sh3, splatIndex, sh3Words, 3 ).toVar( 'sh3_3' );
-			const sh3_4 = unpackSphericalHarmonicsVector( sh3, splatIndex, sh3Words, 4 ).toVar( 'sh3_4' );
-			const sh3_5 = unpackSphericalHarmonicsVector( sh3, splatIndex, sh3Words, 5 ).toVar( 'sh3_5' );
-			const sh3_6 = unpackSphericalHarmonicsVector( sh3, splatIndex, sh3Words, 6 ).toVar( 'sh3_6' );
-
 			const xy = x.mul( y ).toVar( 'shXY' );
 
-			rgb.addAssign(
-				sh3_0.mul( y.mul( xx.mul( 3 ).sub( yy ) ).mul( - 0.5900436 ) )
-					.add( sh3_1.mul( xy.mul( z ).mul( 2.8906114 ) ) )
-					.add( sh3_2.mul( y.mul( zz.mul( 4 ).sub( xx ).sub( yy ) ).mul( - 0.4570458 ) ) )
-					.add( sh3_3.mul( z.mul( zz.mul( 2 ).sub( xx.mul( 3 ) ).sub( yy.mul( 3 ) ) ).mul( 0.3731763 ) ) )
-					.add( sh3_4.mul( x.mul( zz.mul( 4 ).sub( xx ).sub( yy ) ).mul( - 0.4570458 ) ) )
-					.add( sh3_5.mul( z.mul( xx.sub( yy ) ).mul( 1.4453057 ) ) )
-					.add( sh3_6.mul( x.mul( xx.sub( yy.mul( 3 ) ) ).mul( - 0.5900436 ) ) )
-			);
+			rgb.addAssign( applySphericalHarmonicsBand(
+				buffers.sphericalHarmonics3Read,
+				splatIndex,
+				buffers.sphericalHarmonics3Words,
+				SH_BAND_COMPONENTS[ 3 ],
+				'sh3_',
+				[
+					y.mul( xx.mul( 3 ).sub( yy ) ).mul( - 0.5900436 ),
+					xy.mul( z ).mul( 2.8906114 ),
+					y.mul( zz.mul( 4 ).sub( xx ).sub( yy ) ).mul( - 0.4570458 ),
+					z.mul( zz.mul( 2 ).sub( xx.mul( 3 ) ).sub( yy.mul( 3 ) ) ).mul( 0.3731763 ),
+					x.mul( zz.mul( 4 ).sub( xx ).sub( yy ) ).mul( - 0.4570458 ),
+					z.mul( xx.sub( yy ) ).mul( 1.4453057 ),
+					x.mul( xx.sub( yy.mul( 3 ) ) ).mul( - 0.5900436 )
+				]
+			) );
 
 		}
 
