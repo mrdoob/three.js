@@ -272,6 +272,7 @@ class BatchedMesh extends Mesh {
 		this._multiDrawCounts = new Int32Array( maxInstanceCount );
 		this._multiDrawStarts = new Int32Array( maxInstanceCount );
 		this._multiDrawCount = 0;
+		this._multiDrawBytesPerElement = 1;
 
 		// Local matrix per geometry by using data texture
 		this._matricesTexture = null;
@@ -1474,6 +1475,7 @@ class BatchedMesh extends Mesh {
 		this._geometryInitialized = source._geometryInitialized;
 		this._multiDrawCounts = source._multiDrawCounts.slice();
 		this._multiDrawStarts = source._multiDrawStarts.slice();
+		this._multiDrawBytesPerElement = source._multiDrawBytesPerElement;
 
 		this._indirectTexture = source._indirectTexture.clone();
 		this._indirectTexture.image.data = this._indirectTexture.image.data.slice();
@@ -1678,6 +1680,7 @@ class BatchedMesh extends Mesh {
 
 		indirectTexture.needsUpdate = true;
 		this._multiDrawCount = multiDrawCount;
+		this._multiDrawBytesPerElement = bytesPerElement;
 		this._visibilityChanged = false;
 
 	}
