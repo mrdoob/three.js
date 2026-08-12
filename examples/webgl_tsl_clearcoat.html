@@ -173,9 +173,8 @@
 
 				particleLight = new THREE.Mesh(
 					new THREE.SphereGeometry( .05, 8, 8 ),
-					new THREE.MeshBasicMaterial( { color: 0xffffff } )
+					new THREE.MeshBasicNodeMaterial( { color: 0xffffff } )
 				);
-				scene.add( particleLight );
 
 				particleLight.add( new THREE.PointLight( 0xffffff, 30 ) );
 
@@ -183,7 +182,6 @@
 				renderer.setNodesHandler( new WebGLNodesHandler() );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -198,6 +196,13 @@
 				controls.maxDistance = 30;
 
 				window.addEventListener( 'resize', onWindowResize );
+
+				renderer.compileAsync( particleLight, camera, scene ).then( () => {
+
+					scene.add( particleLight );
+					renderer.setAnimationLoop( animate );
+
+				} ).catch( console.error );
 
 			}
 
