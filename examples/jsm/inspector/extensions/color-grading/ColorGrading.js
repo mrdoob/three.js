@@ -1978,14 +1978,13 @@ export class ColorGrading extends Extension {
 			}
 
 			// Remove cards not used by this preset (except renderer)
-			Object.keys( this.componentsMap ).forEach( id => {
+			this.componentsMap.forEach( ( comp, id ) => {
 
-				if ( id !== 'renderer' && ! targetOrder.includes( id ) ) {
+				if ( id !== 'renderer' && id !== 'output' && ! targetOrder.includes( id ) ) {
 
-					const comp = this.componentsMap[ id ];
 					if ( comp && comp.domElement ) comp.domElement.remove();
-					delete this.componentsMap[ id ];
-					delete this.cardsMap[ id ];
+					this.componentsMap.delete( id );
+					this.cardsMap.delete( id );
 
 				}
 
@@ -1996,15 +1995,16 @@ export class ColorGrading extends Extension {
 
 				if ( modId === 'renderer' ) {
 
-					if ( this.componentsMap.renderer && ( params.rendererToneMapping !== undefined || params.rendererExposure !== undefined ) ) {
+					const rendererComp = this.componentsMap.get( 'renderer' );
+					if ( rendererComp && ( params.rendererToneMapping !== undefined || params.rendererExposure !== undefined ) ) {
 
-						const toneMapping = params.rendererToneMapping !== undefined ? params.rendererToneMapping : this.componentsMap.renderer.params.toneMapping;
-						const exposure = params.rendererExposure !== undefined ? params.rendererExposure : this.componentsMap.renderer.params.exposure;
-						this.componentsMap.renderer.fromJSON( { params: { toneMapping, exposure } } );
+						const toneMapping = params.rendererToneMapping !== undefined ? params.rendererToneMapping : rendererComp.params.toneMapping;
+						const exposure = params.rendererExposure !== undefined ? params.rendererExposure : rendererComp.params.exposure;
+						rendererComp.fromJSON( { params: { toneMapping, exposure } } );
 
 					}
 
-				} else if ( this.componentsMap[ modId ] ) {
+				} else if ( this.componentsMap.has( modId ) ) {
 
 					this._applyParamsToModule( modId, params );
 
@@ -2023,22 +2023,24 @@ export class ColorGrading extends Extension {
 				Object.keys( params.importedCubes ).forEach( modId => {
 
 					const cubeData = params.importedCubes[ modId ];
-					if ( ! this.componentsMap[ modId ] ) {
+					const comp = this.componentsMap.get( modId );
 
-						const comp = new ImportedCubeModule(
+					if ( ! comp ) {
+
+						const newComp = new ImportedCubeModule(
 							modId,
 							cubeData,
 							() => this._onParamChange(),
 							( removeId ) => this._removeCard( removeId )
 						);
 
-						this.componentsMap[ modId ] = comp;
-						this.cardsMap[ modId ] = comp.domElement;
-						this._setupCardDragAndDrop( comp.domElement, modId );
+						this.componentsMap.set( modId, newComp );
+						this.cardsMap.set( modId, newComp.domElement );
+						this._setupCardDragAndDrop( newComp.domElement, modId );
 
 					} else {
 
-						this.componentsMap[ modId ].fromJSON( { params: cubeData } );
+						comp.fromJSON( { params: cubeData } );
 
 					}
 
