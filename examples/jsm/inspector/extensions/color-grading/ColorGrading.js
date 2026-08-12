@@ -457,14 +457,13 @@ export class ColorGrading extends Extension {
 				this.pipelineOrder = [ ...DEFAULT_PIPELINE_ORDER ];
 
 				// Remove any custom or duplicated cards if present
-				Object.keys( this.componentsMap ).forEach( modId => {
+				this.componentsMap.forEach( ( comp, modId ) => {
 
 					if ( ! DEFAULT_PIPELINE_ORDER.includes( modId ) ) {
 
-						const comp = this.componentsMap[ modId ];
 						if ( comp && comp.domElement ) comp.domElement.remove();
-						delete this.componentsMap[ modId ];
-						delete this.cardsMap[ modId ];
+						this.componentsMap.delete( modId );
+						this.cardsMap.delete( modId );
 
 					}
 
@@ -474,7 +473,7 @@ export class ColorGrading extends Extension {
 				this._renderCardsFlow();
 
 				// Reset all module components
-				Object.values( this.componentsMap ).forEach( comp => {
+				this.componentsMap.forEach( ( comp ) => {
 
 					if ( comp && typeof comp.reset === 'function' ) {
 
@@ -1443,9 +1442,9 @@ export class ColorGrading extends Extension {
 			e.preventDefault();
 			e.dataTransfer.dropEffect = 'move';
 
-			if ( this._draggedModuleId && this.cardsMap[ this._draggedModuleId ] ) {
+			if ( this._draggedModuleId && this.cardsMap.has( this._draggedModuleId ) ) {
 
-				const draggedCard = this.cardsMap[ this._draggedModuleId ];
+				const draggedCard = this.cardsMap.get( this._draggedModuleId );
 				if ( card === draggedCard ) return;
 
 				const rect = card.getBoundingClientRect();
@@ -1543,7 +1542,7 @@ export class ColorGrading extends Extension {
 		const activeModules = [];
 		for ( let i = 0; i < this.pipelineOrder.length; i ++ ) {
 
-			const mod = this.componentsMap[ this.pipelineOrder[ i ] ];
+			const mod = this.componentsMap.get( this.pipelineOrder[ i ] );
 			if ( mod && mod.enabled ) {
 
 				activeModules.push( mod );
@@ -1587,9 +1586,11 @@ export class ColorGrading extends Extension {
 
 	_getExportFileName( defaultBase = 'My Color Grading' ) {
 
-		if ( this.componentsMap.output && this.componentsMap.output.params && this.componentsMap.output.params.fileName ) {
+		const outputComp = this.componentsMap.get( 'output' );
 
-			return this.componentsMap.output.params.fileName;
+		if ( outputComp && outputComp.params && outputComp.params.fileName ) {
+
+			return outputComp.params.fileName;
 
 		}
 
