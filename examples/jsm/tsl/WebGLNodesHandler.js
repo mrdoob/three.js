@@ -87,15 +87,6 @@ class WebGLNodeBuilder extends GLSLNodeBuilder {
 
 }
 
-const _lights = new Set();
-let _camera = null;
-
-function collectLight( child ) {
-
-	if ( child.isLight && child.layers.test( _camera.layers ) ) _lights.add( child );
-
-}
-
 // produce and update reusable nodes for a scene
 class SceneContext {
 
@@ -104,7 +95,6 @@ class SceneContext {
 		// TODO: can / should we update the fog and environment node every frame for recompile?
 		this.renderer = renderer;
 		this.scene = scene;
-		this.sceneLights = [];
 		this.lightsNode = renderer.lighting.getNode( scene );
 		this.fogNode = null;
 		this.environmentNode = null;
@@ -123,25 +113,9 @@ class SceneContext {
 
 	}
 
-	update( object, camera ) {
+	update() {
 
-		const { scene, lightsNode, sceneLights } = this;
-
-		// update lighting
-		_camera = camera;
-		_lights.clear();
-
-		scene.traverseVisible( collectLight );
-
-		// compile() can receive an object that has not been added to the target scene yet.
-		if ( object !== scene ) object.traverseVisible( collectLight );
-
-		_camera = null;
-
-		sceneLights.length = 0;
-		sceneLights.push( ..._lights );
-
-		lightsNode.setLights( sceneLights );
+		const { scene } = this;
 
 		// update fog
 		if ( this.prevFog !== scene.fog ) {
@@ -413,17 +387,6 @@ export class WebGLNodesHandler {
 	}
 
 
-	setupNodeMaterial( material ) {
-
-		if ( material && material.isNodeMaterial ) {
-
-			material.customProgramCacheKey = this.customProgramCacheKeyCallback;
-			material.onBeforeRender = this.onBeforeRenderCallback;
-
-		}
-
-	}
-
 	renderStart( scene, camera, targetScene = scene ) {
 
 		const { nodeFrame, renderStack, renderer, sceneContexts } = this;
@@ -440,40 +403,25 @@ export class WebGLNodesHandler {
 
 		}
 
-		sceneContext.update( scene, camera );
+		renderer.lighting.beginRender( targetScene );
+		sceneContext.update();
 		renderStack.push( { sceneContext, camera } );
 
-		// ensure all node material callbacks are initialized before
-		// traversal and build
-		scene.traverse( object => {
+	}
 
-			const material = object.material;
+	updateLights( lights ) {
 
-			if ( material === undefined ) return;
-
-			if ( Array.isArray( material ) ) {
-
-				for ( let i = 0; i < material.length; i ++ ) {
-
-					this.setupNodeMaterial( material[ i ] );
-
-				}
-
-			} else {
-
-				this.setupNodeMaterial( material );
-
-			}
-
-		} );
+		const frame = this.renderStack[ this.renderStack.length - 1 ];
+		frame.sceneContext.lightsNode.setLights( lights );
 
 	}
 
 	renderEnd() {
 
-		const { nodeFrame, renderStack } = this;
+		const { nodeFrame, renderer, renderStack } = this;
 
-		renderStack.pop();
+		const { sceneContext } = renderStack.pop();
+		renderer.lighting.finishRender( sceneContext.scene );
 
 		const frame = renderStack[ renderStack.length - 1 ];
 		if ( frame ) {
@@ -486,9 +434,11 @@ export class WebGLNodesHandler {
 
 	}
 
-	setObject( object ) {
+	setObject( object, material ) {
 
 		this.nodeFrame.object = object;
+		material.customProgramCacheKey = this.customProgramCacheKeyCallback;
+		material.onBeforeRender = this.onBeforeRenderCallback;
 
 	}
 
