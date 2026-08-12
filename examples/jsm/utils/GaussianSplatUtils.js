@@ -1,6 +1,10 @@
 import {
 	BufferAttribute,
-	BufferGeometry
+	BufferGeometry,
+	Matrix3,
+	Matrix4,
+	Quaternion,
+	Vector3
 } from 'three';
 
 const SH_C0 = 0.2820947917738781;
@@ -14,6 +18,13 @@ const GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING = {
 	f_dc: [ 'f_dc_0', 'f_dc_1', 'f_dc_2' ],
 	opacity: [ 'opacity' ]
 };
+
+const _covarianceMatrix = new Matrix3();
+const _covarianceMatrixTranspose = new Matrix3();
+const _rotationScaleMatrix = new Matrix4();
+const _quaternion = new Quaternion();
+const _scale = new Vector3();
+const _zero = new Vector3();
 
 function sigmoid( value ) {
 
@@ -59,60 +70,22 @@ function writeColorBytesFromSH0( target, offset, r, g, b, a ) {
 
 function writeCovariance( target, offset, sx, sy, sz, qx, qy, qz, qw ) {
 
-	// Math.sqrt is significantly faster than Math.hypot, and the overflow
-	// protection of Math.hypot is unnecessary for quaternion components.
-	const length = Math.sqrt( qx * qx + qy * qy + qz * qz + qw * qw );
+	_quaternion.set( qx, qy, qz, qw ).normalize();
+	_scale.set( sx, sy, sz );
+	_rotationScaleMatrix.compose( _zero, _quaternion, _scale );
 
-	if ( length === 0 ) {
+	_covarianceMatrix.setFromMatrix4( _rotationScaleMatrix );
+	_covarianceMatrixTranspose.copy( _covarianceMatrix ).transpose();
+	_covarianceMatrix.multiply( _covarianceMatrixTranspose );
 
-		qx = 0;
-		qy = 0;
-		qz = 0;
-		qw = 1;
+	const elements = _covarianceMatrix.elements;
 
-	} else {
-
-		const invLength = 1 / length;
-		qx *= invLength;
-		qy *= invLength;
-		qz *= invLength;
-		qw *= invLength;
-
-	}
-
-	const x2 = qx + qx;
-	const y2 = qy + qy;
-	const z2 = qz + qz;
-	const xx = qx * x2;
-	const xy = qx * y2;
-	const xz = qx * z2;
-	const yy = qy * y2;
-	const yz = qy * z2;
-	const zz = qz * z2;
-	const wx = qw * x2;
-	const wy = qw * y2;
-	const wz = qw * z2;
-
-	const r00 = 1 - ( yy + zz );
-	const r01 = xy - wz;
-	const r02 = xz + wy;
-	const r10 = xy + wz;
-	const r11 = 1 - ( xx + zz );
-	const r12 = yz - wx;
-	const r20 = xz - wy;
-	const r21 = yz + wx;
-	const r22 = 1 - ( xx + yy );
-
-	const sxx = sx * sx;
-	const syy = sy * sy;
-	const szz = sz * sz;
-
-	target[ offset ] = r00 * r00 * sxx + r01 * r01 * syy + r02 * r02 * szz;
-	target[ offset + 1 ] = r00 * r10 * sxx + r01 * r11 * syy + r02 * r12 * szz;
-	target[ offset + 2 ] = r00 * r20 * sxx + r01 * r21 * syy + r02 * r22 * szz;
-	target[ offset + 3 ] = r10 * r10 * sxx + r11 * r11 * syy + r12 * r12 * szz;
-	target[ offset + 4 ] = r10 * r20 * sxx + r11 * r21 * syy + r12 * r22 * szz;
-	target[ offset + 5 ] = r20 * r20 * sxx + r21 * r21 * syy + r22 * r22 * szz;
+	target[ offset ] = elements[ 0 ];
+	target[ offset + 1 ] = elements[ 3 ];
+	target[ offset + 2 ] = elements[ 6 ];
+	target[ offset + 3 ] = elements[ 4 ];
+	target[ offset + 4 ] = elements[ 7 ];
+	target[ offset + 5 ] = elements[ 8 ];
 
 }
 
