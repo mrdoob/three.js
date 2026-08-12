@@ -45,7 +45,7 @@ export class Extension extends Tab {
 
 		const data = getItem( this.name );
 
-		if ( data && typeof data === 'object' && Object.keys( data ).length > 0 ) {
+		if ( Object.keys( data ).length > 0 ) {
 
 			this.deserialize( data );
 

@@ -1331,27 +1331,23 @@ export class ColorGrading extends Extension {
 
 		}
 
-		if ( comp ) {
+		this.componentsMap[ modId ] = comp;
+		this.cardsMap[ modId ] = comp.domElement;
 
-			this.componentsMap[ modId ] = comp;
-			this.cardsMap[ modId ] = comp.domElement;
+		const targetIdx = Math.max( 0, Math.min( this.pipelineOrder.length, insertIndex ) );
+		this.pipelineOrder.splice( targetIdx, 0, modId );
 
-			const targetIdx = Math.max( 0, Math.min( this.pipelineOrder.length, insertIndex ) );
-			this.pipelineOrder.splice( targetIdx, 0, modId );
+		this._setupCardDragAndDrop( comp.domElement, modId );
+		this._renderCardsFlow();
+		this._onParamChange();
 
-			this._setupCardDragAndDrop( comp.domElement, modId );
-			this._renderCardsFlow();
-			this._onParamChange();
+		if ( comp.domElement ) {
 
-			if ( comp.domElement ) {
+			setTimeout( () => {
 
-				setTimeout( () => {
+				comp.domElement.scrollIntoView( { behavior: 'smooth', block: 'nearest', inline: 'center' } );
 
-					comp.domElement.scrollIntoView( { behavior: 'smooth', block: 'nearest', inline: 'center' } );
-
-				}, 50 );
-
-			}
+			}, 50 );
 
 		}
 

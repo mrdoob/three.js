@@ -241,7 +241,7 @@ export function applyColorTransform( r, g, b, params, pipelineOrder = null ) {
 
 				}
 
-				if ( params.brightness && params.brightness !== 0 ) {
+				if ( params.brightness ) {
 
 					cr += params.brightness;
 					cg += params.brightness;
@@ -249,7 +249,7 @@ export function applyColorTransform( r, g, b, params, pipelineOrder = null ) {
 
 				}
 
-				if ( params.hueShift && params.hueShift !== 0 ) {
+				if ( params.hueShift ) {
 
 					const [ origH, s, v ] = rgbToHsv( Math.max( 0, cr ), Math.max( 0, cg ), Math.max( 0, cb ) );
 					let h = ( origH + params.hueShift / 360 ) % 1;
