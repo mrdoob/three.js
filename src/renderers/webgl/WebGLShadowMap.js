@@ -171,6 +171,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 			_shadowMapSize.copy( shadow.mapSize );
 
+			const viewportCount = shadow.getViewportCount();
 			const shadowFrameExtents = shadow.getFrameExtents();
 
 			_shadowMapSize.multiply( shadowFrameExtents );
@@ -278,10 +279,51 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 			}
 
-			// For cube render targets (PointLights), render all 6 faces. Otherwise, render once.
-			const faceCount = shadow.map.isWebGLCubeRenderTarget ? 6 : 1;
+			if ( shadow.map.isWebGLCubeRenderTarget !== true && ( shadow.map.width !== _shadowMapSize.x || shadow.map.height !== _shadowMapSize.y ) ) {
+
+				shadow.map.setSize( _shadowMapSize.x, _shadowMapSize.y );
+
+			}
+
+			// For cube render targets (PointLights), render all 6 faces. Sun lights
+			// render one atlas viewport per cascade.
+			const faceCount = shadow.map.isWebGLCubeRenderTarget ? 6 : viewportCount;
+
+			if ( light.isPointLight !== true ) shadow.updateMatrices( light, camera );
 
 			for ( let face = 0; face < faceCount; face ++ ) {
+
+				const shadowCamera = shadow.getCamera( face );
+
+				if ( light.isPointLight ) {
+
+					const camera = shadow.camera;
+					const shadowMatrix = shadow.matrix;
+
+					const far = light.distance || camera.far;
+
+					if ( far !== camera.far ) {
+
+						camera.far = far;
+						camera.updateProjectionMatrix();
+
+					}
+
+					_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
+					camera.position.copy( _lightPositionWorld );
+
+					_lookTarget.copy( camera.position );
+					_lookTarget.add( _cubeDirections[ face ] );
+					camera.up.copy( _cubeUps[ face ] );
+					camera.lookAt( _lookTarget );
+					camera.updateMatrixWorld();
+
+					shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
+
+					_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+					shadow._frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
+
+				}
 
 				// For cube render targets, render to each face separately
 				if ( shadow.map.isWebGLCubeRenderTarget ) {
@@ -312,43 +354,9 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 				}
 
-				if ( light.isPointLight ) {
+				_frustum = shadow.getFrustum( face );
 
-					const camera = shadow.camera;
-					const shadowMatrix = shadow.matrix;
-
-					const far = light.distance || camera.far;
-
-					if ( far !== camera.far ) {
-
-						camera.far = far;
-						camera.updateProjectionMatrix();
-
-					}
-
-					_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
-					camera.position.copy( _lightPositionWorld );
-
-					_lookTarget.copy( camera.position );
-					_lookTarget.add( _cubeDirections[ face ] );
-					camera.up.copy( _cubeUps[ face ] );
-					camera.lookAt( _lookTarget );
-					camera.updateMatrixWorld();
-
-					shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
-
-					_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-					shadow._frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
-
-				} else {
-
-					shadow.updateMatrices( light );
-
-				}
-
-				_frustum = shadow.getFrustum();
-
-				renderObject( scene, camera, shadow.camera, light, this.type );
+				renderObject( scene, camera, shadowCamera, light, this.type );
 
 			}
 
@@ -393,12 +401,16 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 				type: HalfFloatType
 			} );
 
+		} else if ( shadow.mapPass.width !== shadow.map.width || shadow.mapPass.height !== shadow.map.height ) {
+
+			shadow.mapPass.setSize( shadow.map.width, shadow.map.height );
+
 		}
 
 		// vertical pass - read from native depth texture
 
 		shadowMaterialVertical.uniforms.shadow_pass.value = shadow.map.depthTexture;
-		shadowMaterialVertical.uniforms.resolution.value = shadow.mapSize;
+		shadowMaterialVertical.uniforms.resolution.value.set( shadow.map.width, shadow.map.height );
 		shadowMaterialVertical.uniforms.radius.value = shadow.radius;
 		renderer.setRenderTarget( shadow.mapPass );
 		renderer.clear();
@@ -407,7 +419,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 		// horizontal pass
 
 		shadowMaterialHorizontal.uniforms.shadow_pass.value = shadow.mapPass.texture;
-		shadowMaterialHorizontal.uniforms.resolution.value = shadow.mapSize;
+		shadowMaterialHorizontal.uniforms.resolution.value.set( shadow.map.width, shadow.map.height );
 		shadowMaterialHorizontal.uniforms.radius.value = shadow.radius;
 		renderer.setRenderTarget( shadow.map );
 		renderer.clear();

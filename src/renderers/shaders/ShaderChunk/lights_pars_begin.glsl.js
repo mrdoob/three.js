@@ -76,6 +76,25 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 
 }
 
+#if NUM_SUN_LIGHTS > 0
+
+	struct SunLight {
+		vec3 direction;
+		vec3 color;
+	};
+
+	uniform SunLight sunLights[ NUM_SUN_LIGHTS ];
+
+	void getSunLightInfo( const in SunLight sunLight, out IncidentLight light ) {
+
+		light.color = sunLight.color;
+		light.direction = sunLight.direction;
+		light.visible = true;
+
+	}
+
+#endif
+
 #if NUM_DIR_LIGHTS > 0
 
 	struct DirectionalLight {

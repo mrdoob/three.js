@@ -18,6 +18,7 @@ import {
 	LinearMipmapLinearFilter
 } from '../constants.js';
 import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
+import { SunLight } from '../lights/SunLight.js';
 import { Color } from '../math/Color.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Object3D } from '../core/Object3D.js';
@@ -918,6 +919,12 @@ class ObjectLoader extends Loader {
 			case 'AmbientLight':
 
 				object = new AmbientLight( data.color, data.intensity );
+
+				break;
+
+			case 'SunLight':
+
+				object = new SunLight( data.color, data.intensity );
 
 				break;
 
