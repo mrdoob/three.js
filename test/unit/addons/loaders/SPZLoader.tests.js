@@ -1,9 +1,11 @@
 import { BufferGeometry } from 'three';
 import { gzipSync } from '../../../../examples/jsm/libs/fflate.module.js';
 import { SPZLoader } from '../../../../examples/jsm/loaders/SPZLoader.js';
+import { unpackSphericalHarmonicsBand } from '../utils/GaussianSplatTestUtils.js';
 
 const EPS = 1e-6;
 const SPZ_MAGIC = 0x5053474e;
+const SH_DEGREE_TO_VECTORS = [ 0, 3, 8, 15 ];
 
 function closeTo( assert, actual, expected, message ) {
 
@@ -19,16 +21,16 @@ function writeInt24( view, offset, value ) {
 
 }
 
-function createSPZBuffer() {
+function createSPZBuffer( shDegree = 0 ) {
 
-	const raw = new Uint8Array( 16 + 9 + 1 + 3 + 3 + 3 );
+	const raw = new Uint8Array( 16 + 9 + 1 + 3 + 3 + 3 + SH_DEGREE_TO_VECTORS[ shDegree ] * 3 );
 	const view = new DataView( raw.buffer );
 	let offset = 0;
 
 	view.setUint32( 0, SPZ_MAGIC, true );
 	view.setUint32( 4, 2, true );
 	view.setUint32( 8, 1, true );
-	view.setUint8( 12, 0 );
+	view.setUint8( 12, shDegree );
 	view.setUint8( 13, 4 );
 	view.setUint8( 14, 0 );
 	view.setUint8( 15, 0 );
@@ -45,8 +47,25 @@ function createSPZBuffer() {
 	raw.set( [ 160, 160, 160 ], offset );
 	offset += 3;
 	raw.set( [ 128, 128, 128 ], offset );
+	offset += 3;
+
+	for ( let i = 0, il = SH_DEGREE_TO_VECTORS[ shDegree ] * 3; i < il; i ++ ) {
+
+		raw[ offset ++ ] = 129 + i;
+
+	}
 
 	return gzipSync( raw ).buffer;
+
+}
+
+function createUnsupportedSPZBuffer( version ) {
+
+	const raw = new ArrayBuffer( 32 );
+	const view = new DataView( raw );
+	view.setUint32( 0, SPZ_MAGIC, true );
+	view.setUint32( 4, version, true );
+	return raw;
 
 }
 
@@ -70,6 +89,60 @@ export default QUnit.module( 'Addons', () => {
 				closeTo( assert, covariances[ 3 ], 1, 'covariance yy' );
 				closeTo( assert, covariances[ 5 ], 1, 'covariance zz' );
 				assert.deepEqual( Array.from( data.getAttribute( 'color' ).array ), [ 128, 128, 128, 64 ], 'degree-0 color and alpha' );
+
+			} );
+
+			QUnit.test( 'rejects SPZ version 4 and later', ( assert ) => {
+
+				const loader = new SPZLoader();
+
+				assert.throws( () => loader.parse( createUnsupportedSPZBuffer( 4 ) ), /SPZ version 4 is not supported/, 'SPZ v4' );
+				assert.throws( () => loader.parse( createUnsupportedSPZBuffer( 5 ) ), /SPZ version 5 is not supported/, 'SPZ v5' );
+
+			} );
+
+			QUnit.test( 'parses SPZ spherical harmonics degree 1 data', ( assert ) => {
+
+				const loader = new SPZLoader();
+				const data = loader.parse( createSPZBuffer( 1 ) );
+
+				assert.deepEqual( Array.from( unpackSphericalHarmonicsBand( data.getAttribute( 'sphericalHarmonics1' ).array, 1, 1 ) ), [
+					129, 130, 131,
+					132, 133, 134,
+					135, 136, 137
+				], 'SH1 coefficients' );
+
+			} );
+
+			QUnit.test( 'parses SPZ spherical harmonics degree 2 data', ( assert ) => {
+
+				const loader = new SPZLoader();
+				const data = loader.parse( createSPZBuffer( 2 ) );
+
+				assert.deepEqual( Array.from( unpackSphericalHarmonicsBand( data.getAttribute( 'sphericalHarmonics2' ).array, 1, 2 ) ), [
+					138, 139, 140,
+					141, 142, 143,
+					144, 145, 146,
+					147, 148, 149,
+					150, 151, 152
+				], 'SH2 coefficients' );
+
+			} );
+
+			QUnit.test( 'parses SPZ spherical harmonics degree 3 data', ( assert ) => {
+
+				const loader = new SPZLoader();
+				const data = loader.parse( createSPZBuffer( 3 ) );
+
+				assert.deepEqual( Array.from( unpackSphericalHarmonicsBand( data.getAttribute( 'sphericalHarmonics3' ).array, 1, 3 ) ), [
+					153, 154, 155,
+					156, 157, 158,
+					159, 160, 161,
+					162, 163, 164,
+					165, 166, 167,
+					168, 169, 170,
+					171, 172, 173
+				], 'SH3 coefficients' );
 
 			} );
 
