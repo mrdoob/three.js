@@ -2484,12 +2484,7 @@ export class ColorGrading extends Extension {
 
 			}
 
-			if ( typeof this._createdPipeline.dispose === 'function' ) {
-
-				this._createdPipeline.dispose();
-
-			}
-
+			this._createdPipeline.dispose();
 			this._createdPipeline = null;
 
 		}
