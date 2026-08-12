@@ -86,7 +86,7 @@ export class ColorGrading extends Extension {
 		this._lutSizeChanged = false;
 		this.activeTab = 'wheels';
 
-		this.componentsMap = new Map();
+		this.modulesMap = new Map();
 		this.cardsMap = new Map();
 
 		// Container Setup matching Inspector tabs
@@ -457,12 +457,12 @@ export class ColorGrading extends Extension {
 				this.pipelineOrder = [ ...DEFAULT_PIPELINE_ORDER ];
 
 				// Remove any custom or duplicated cards if present
-				this.componentsMap.forEach( ( comp, modId ) => {
+				this.modulesMap.forEach( ( comp, modId ) => {
 
 					if ( ! DEFAULT_PIPELINE_ORDER.includes( modId ) ) {
 
 						if ( comp && comp.domElement ) comp.domElement.remove();
-						this.componentsMap.delete( modId );
+						this.modulesMap.delete( modId );
 						this.cardsMap.delete( modId );
 
 					}
@@ -473,7 +473,7 @@ export class ColorGrading extends Extension {
 				this._renderCardsFlow();
 
 				// Reset all module components
-				this.componentsMap.forEach( ( comp ) => {
+				this.modulesMap.forEach( ( comp ) => {
 
 					if ( comp && typeof comp.reset === 'function' ) {
 
@@ -546,7 +546,7 @@ export class ColorGrading extends Extension {
 		const vibranceComp = new VibranceModule( this.params, onParamChange, () => this._removeCard( 'vibrance' ) );
 		const outputComp = new OutputModule( {}, onParamChange );
 
-		this.componentsMap = new Map( [
+		this.modulesMap = new Map( [
 			[ 'renderer', rendererComp ],
 			[ 'whiteBalance', wbComp ],
 			[ 'lift', liftComp ],
@@ -561,7 +561,7 @@ export class ColorGrading extends Extension {
 
 		this.cardsMap = new Map();
 
-		this.componentsMap.forEach( ( comp, id ) => {
+		this.modulesMap.forEach( ( comp, id ) => {
 
 			this.cardsMap.set( id, comp.domElement );
 			this._setupCardDragAndDrop( comp.domElement, id );
@@ -903,7 +903,7 @@ export class ColorGrading extends Extension {
 		// Re-append cards in current pipelineOrder
 		this.pipelineOrder.forEach( ( modId ) => {
 
-			const comp = this.componentsMap.get( modId );
+			const comp = this.modulesMap.get( modId );
 			if ( comp && comp.domElement ) {
 
 				comp.domElement.classList.remove( 'lut-card-moving' );
@@ -1330,7 +1330,7 @@ export class ColorGrading extends Extension {
 
 		}
 
-		this.componentsMap.set( modId, comp );
+		this.modulesMap.set( modId, comp );
 		this.cardsMap.set( modId, comp.domElement );
 
 		const targetIdx = Math.max( 0, Math.min( this.pipelineOrder.length, insertIndex ) );
@@ -1356,11 +1356,11 @@ export class ColorGrading extends Extension {
 
 	_removeCard( modId ) {
 
-		const comp = this.componentsMap.get( modId );
+		const comp = this.modulesMap.get( modId );
 		if ( comp ) {
 
 			if ( comp.domElement ) comp.domElement.remove();
-			this.componentsMap.delete( modId );
+			this.modulesMap.delete( modId );
 			this.cardsMap.delete( modId );
 
 		}
@@ -1542,7 +1542,7 @@ export class ColorGrading extends Extension {
 		const activeModules = [];
 		for ( let i = 0; i < this.pipelineOrder.length; i ++ ) {
 
-			const mod = this.componentsMap.get( this.pipelineOrder[ i ] );
+			const mod = this.modulesMap.get( this.pipelineOrder[ i ] );
 			if ( mod && mod.enabled ) {
 
 				activeModules.push( mod );
@@ -1586,7 +1586,7 @@ export class ColorGrading extends Extension {
 
 	_getExportFileName( defaultBase = 'My Color Grading' ) {
 
-		const outputComp = this.componentsMap.get( 'output' );
+		const outputComp = this.modulesMap.get( 'output' );
 
 		if ( outputComp && outputComp.params && outputComp.params.fileName ) {
 
@@ -1637,7 +1637,7 @@ export class ColorGrading extends Extension {
 		const params = {};
 		const modulesData = {};
 
-		this.componentsMap.forEach( ( comp, id ) => {
+		this.modulesMap.forEach( ( comp, id ) => {
 
 			if ( ! comp ) return;
 
@@ -1752,7 +1752,7 @@ export class ColorGrading extends Extension {
 
 	_applyParamsToModule( modId, params ) {
 
-		const comp = this.componentsMap.get( modId );
+		const comp = this.modulesMap.get( modId );
 		if ( ! comp ) return;
 
 		switch ( modId ) {
@@ -1852,7 +1852,7 @@ export class ColorGrading extends Extension {
 		if ( typeof json.selectedToneMapping === 'number' ) {
 
 			this.selectedToneMapping = json.selectedToneMapping;
-			const rendererComp = this.componentsMap.get( 'renderer' );
+			const rendererComp = this.modulesMap.get( 'renderer' );
 			if ( rendererComp ) {
 
 				rendererComp.fromJSON( { params: { toneMapping: this.selectedToneMapping } } );
@@ -1864,12 +1864,7 @@ export class ColorGrading extends Extension {
 		if ( typeof json.sceneGradingEnabled === 'boolean' ) {
 
 			this.sceneGradingEnabled = json.sceneGradingEnabled;
-			if ( typeof this.updateGradingBtnState === 'function' ) {
-
-				this.updateGradingBtnState();
-
-			}
-
+			this.updateGradingBtnState();
 			this._toggleSceneGrading( this.sceneGradingEnabled );
 
 		}
@@ -1882,12 +1877,12 @@ export class ColorGrading extends Extension {
 
 		if ( json.modules && typeof json.modules === 'object' ) {
 
-			this.componentsMap.forEach( ( comp, id ) => {
+			this.modulesMap.forEach( ( comp, id ) => {
 
 				if ( id !== 'renderer' && id !== 'output' && ! this.pipelineOrder.includes( id ) ) {
 
 					if ( comp.domElement ) comp.domElement.remove();
-					this.componentsMap.delete( id );
+					this.modulesMap.delete( id );
 					this.cardsMap.delete( id );
 
 				}
@@ -1899,16 +1894,16 @@ export class ColorGrading extends Extension {
 				const mData = json.modules[ id ];
 				if ( id === 'renderer' ) {
 
-					const rendererComp = this.componentsMap.get( 'renderer' );
+					const rendererComp = this.modulesMap.get( 'renderer' );
 					if ( rendererComp ) {
 
 						rendererComp.fromJSON( { params: mData.params } );
 
 					}
 
-				} else if ( this.componentsMap.has( id ) ) {
+				} else if ( this.modulesMap.has( id ) ) {
 
-					this.componentsMap.get( id ).fromJSON( { params: mData.params } );
+					this.modulesMap.get( id ).fromJSON( { params: mData.params } );
 
 				} else {
 
@@ -1921,7 +1916,7 @@ export class ColorGrading extends Extension {
 							( removeId ) => this._removeCard( removeId )
 						);
 
-						this.componentsMap.set( id, comp );
+						this.modulesMap.set( id, comp );
 						this.cardsMap.set( id, comp.domElement );
 						this._setupCardDragAndDrop( comp.domElement, id );
 
@@ -1979,12 +1974,12 @@ export class ColorGrading extends Extension {
 			}
 
 			// Remove cards not used by this preset (except renderer)
-			this.componentsMap.forEach( ( comp, id ) => {
+			this.modulesMap.forEach( ( comp, id ) => {
 
 				if ( id !== 'renderer' && id !== 'output' && ! targetOrder.includes( id ) ) {
 
 					if ( comp && comp.domElement ) comp.domElement.remove();
-					this.componentsMap.delete( id );
+					this.modulesMap.delete( id );
 					this.cardsMap.delete( id );
 
 				}
@@ -1996,7 +1991,7 @@ export class ColorGrading extends Extension {
 
 				if ( modId === 'renderer' ) {
 
-					const rendererComp = this.componentsMap.get( 'renderer' );
+					const rendererComp = this.modulesMap.get( 'renderer' );
 					if ( rendererComp && ( params.rendererToneMapping !== undefined || params.rendererExposure !== undefined ) ) {
 
 						const toneMapping = params.rendererToneMapping !== undefined ? params.rendererToneMapping : rendererComp.params.toneMapping;
@@ -2005,7 +2000,7 @@ export class ColorGrading extends Extension {
 
 					}
 
-				} else if ( this.componentsMap.has( modId ) ) {
+				} else if ( this.modulesMap.has( modId ) ) {
 
 					this._applyParamsToModule( modId, params );
 
@@ -2024,7 +2019,7 @@ export class ColorGrading extends Extension {
 				Object.keys( params.importedCubes ).forEach( modId => {
 
 					const cubeData = params.importedCubes[ modId ];
-					const comp = this.componentsMap.get( modId );
+					const comp = this.modulesMap.get( modId );
 
 					if ( ! comp ) {
 
@@ -2035,7 +2030,7 @@ export class ColorGrading extends Extension {
 							( removeId ) => this._removeCard( removeId )
 						);
 
-						this.componentsMap.set( modId, newComp );
+						this.modulesMap.set( modId, newComp );
 						this.cardsMap.set( modId, newComp.domElement );
 						this._setupCardDragAndDrop( newComp.domElement, modId );
 
@@ -2115,8 +2110,8 @@ export class ColorGrading extends Extension {
 			( removeId ) => this._removeCard( removeId )
 		);
 
-		this.componentsMap[ modId ] = comp;
-		this.cardsMap[ modId ] = comp.domElement;
+		this.modulesMap.set( modId, comp );
+		this.cardsMap.set( modId, comp.domElement );
 
 		return comp.domElement;
 
@@ -2178,8 +2173,8 @@ export class ColorGrading extends Extension {
 						( removeId ) => this._removeCard( removeId )
 					);
 
-					this.componentsMap[ modId ] = comp;
-					this.cardsMap[ modId ] = comp.domElement;
+					this.modulesMap.set( modId, comp );
+					this.cardsMap.set( modId, comp.domElement );
 
 					const targetIdx = ( typeof insertIndex === 'number' ) ? Math.max( 0, Math.min( this.pipelineOrder.length, insertIndex ) ) : this.pipelineOrder.length;
 					this.pipelineOrder.splice( targetIdx, 0, modId );
@@ -2226,7 +2221,7 @@ export class ColorGrading extends Extension {
 		super.init( inspector );
 
 		const renderer = inspector.getRenderer();
-		const rendererComp = this.componentsMap.get( 'renderer' );
+		const rendererComp = this.modulesMap.get( 'renderer' );
 
 		if ( renderer && rendererComp ) {
 
@@ -2293,10 +2288,7 @@ export class ColorGrading extends Extension {
 
 	_getRenderPipeline( renderer ) {
 
-		return ( this.options && ( this.options.renderPipeline || this.options.pipeline ) ) ||
-			this.renderPipeline ||
-			( this.inspector && ( this.inspector.renderPipeline || this.inspector.pipeline ) ) ||
-			_rendererPipelines.get( renderer );
+		return _rendererPipelines.get( renderer );
 
 	}
 
@@ -2355,11 +2347,9 @@ export class ColorGrading extends Extension {
 		}
 
 		const renderer = this.inspector.getRenderer();
-		if ( ! renderer ) return;
+		let renderPipeline = _rendererPipelines.get( renderer );
 
-		let renderPipeline = this._getRenderPipeline( renderer );
-
-		const primaryPass = this.inspector.getPrimaryPass ? this.inspector.getPrimaryPass() : this.inspector.primaryPass;
+		const primaryPass = this.inspector.getPrimaryPass();
 		const scene = primaryPass ? primaryPass.scene : null;
 		const camera = primaryPass ? primaryPass.camera : null;
 
@@ -2420,9 +2410,10 @@ export class ColorGrading extends Extension {
 			if ( renderer.toneMapping !== undefined ) {
 
 				this.selectedToneMapping = renderer.toneMapping;
-				if ( this.componentsMap.renderer ) {
+				const rendererComp = this.modulesMap.get( 'renderer' );
+				if ( rendererComp ) {
 
-					this.componentsMap.renderer.fromJSON( { params: { toneMapping: this.selectedToneMapping } } );
+					rendererComp.fromJSON( { params: { toneMapping: this.selectedToneMapping } } );
 
 				}
 
@@ -2455,8 +2446,8 @@ export class ColorGrading extends Extension {
 
 	_removeLiveGrading() {
 
-		const renderer = this.inspector ? this.inspector.getRenderer() : null;
-		const renderPipeline = this._getRenderPipeline( renderer ) || this._createdPipeline;
+		const renderer = this.inspector.getRenderer();
+		const renderPipeline = _rendererPipelines.get( renderer );
 
 		if ( this._originalPipelineSettings ) {
 
@@ -2532,7 +2523,7 @@ export class ColorGrading extends Extension {
 
 		}
 
-		this.componentsMap.clear();
+		this.modulesMap.clear();
 		this.cardsMap.clear();
 
 		super.dispose();
