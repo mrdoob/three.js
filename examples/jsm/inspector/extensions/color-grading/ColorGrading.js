@@ -86,8 +86,8 @@ export class ColorGrading extends Extension {
 		this._lutSizeChanged = false;
 		this.activeTab = 'wheels';
 
-		this.componentsMap = {};
-		this.cardsMap = {};
+		this.componentsMap = new Map();
+		this.cardsMap = new Map();
 
 		// Container Setup matching Inspector tabs
 		this.content.style.overflow = 'hidden';
@@ -547,24 +547,24 @@ export class ColorGrading extends Extension {
 		const vibranceComp = new VibranceModule( this.params, onParamChange, () => this._removeCard( 'vibrance' ) );
 		const outputComp = new OutputModule( {}, onParamChange );
 
-		this.componentsMap = {
-			renderer: rendererComp,
-			whiteBalance: wbComp,
-			lift: liftComp,
-			gammaBal: gammaBalComp,
-			gain: gainComp,
-			offset: offsetComp,
-			curves: curvesComp,
-			saturation: satComp,
-			vibrance: vibranceComp,
-			output: outputComp
-		};
+		this.componentsMap = new Map( [
+			[ 'renderer', rendererComp ],
+			[ 'whiteBalance', wbComp ],
+			[ 'lift', liftComp ],
+			[ 'gammaBal', gammaBalComp ],
+			[ 'gain', gainComp ],
+			[ 'offset', offsetComp ],
+			[ 'curves', curvesComp ],
+			[ 'saturation', satComp ],
+			[ 'vibrance', vibranceComp ],
+			[ 'output', outputComp ]
+		] );
 
-		// Map DOM elements for cards setup
-		Object.keys( this.componentsMap ).forEach( id => {
+		this.cardsMap = new Map();
 
-			const comp = this.componentsMap[ id ];
-			this.cardsMap[ id ] = comp.domElement;
+		this.componentsMap.forEach( ( comp, id ) => {
+
+			this.cardsMap.set( id, comp.domElement );
 			this._setupCardDragAndDrop( comp.domElement, id );
 
 		} );
@@ -904,7 +904,7 @@ export class ColorGrading extends Extension {
 		// Re-append cards in current pipelineOrder
 		this.pipelineOrder.forEach( ( modId ) => {
 
-			const comp = this.componentsMap[ modId ];
+			const comp = this.componentsMap.get( modId );
 			if ( comp && comp.domElement ) {
 
 				comp.domElement.classList.remove( 'lut-card-moving' );
@@ -1331,8 +1331,8 @@ export class ColorGrading extends Extension {
 
 		}
 
-		this.componentsMap[ modId ] = comp;
-		this.cardsMap[ modId ] = comp.domElement;
+		this.componentsMap.set( modId, comp );
+		this.cardsMap.set( modId, comp.domElement );
 
 		const targetIdx = Math.max( 0, Math.min( this.pipelineOrder.length, insertIndex ) );
 		this.pipelineOrder.splice( targetIdx, 0, modId );
@@ -1357,12 +1357,12 @@ export class ColorGrading extends Extension {
 
 	_removeCard( modId ) {
 
-		const comp = this.componentsMap[ modId ];
+		const comp = this.componentsMap.get( modId );
 		if ( comp ) {
 
 			if ( comp.domElement ) comp.domElement.remove();
-			delete this.componentsMap[ modId ];
-			delete this.cardsMap[ modId ];
+			this.componentsMap.delete( modId );
+			this.cardsMap.delete( modId );
 
 		}
 
@@ -1636,9 +1636,8 @@ export class ColorGrading extends Extension {
 		const params = {};
 		const modulesData = {};
 
-		Object.keys( this.componentsMap ).forEach( id => {
+		this.componentsMap.forEach( ( comp, id ) => {
 
-			const comp = this.componentsMap[ id ];
 			if ( ! comp ) return;
 
 			let modType = 'whiteBalance';
@@ -1752,7 +1751,7 @@ export class ColorGrading extends Extension {
 
 	_applyParamsToModule( modId, params ) {
 
-		const comp = this.componentsMap[ modId ];
+		const comp = this.componentsMap.get( modId );
 		if ( ! comp ) return;
 
 		switch ( modId ) {
@@ -1852,9 +1851,10 @@ export class ColorGrading extends Extension {
 		if ( typeof json.selectedToneMapping === 'number' ) {
 
 			this.selectedToneMapping = json.selectedToneMapping;
-			if ( this.componentsMap.renderer ) {
+			const rendererComp = this.componentsMap.get( 'renderer' );
+			if ( rendererComp ) {
 
-				this.componentsMap.renderer.fromJSON( { params: { toneMapping: this.selectedToneMapping } } );
+				rendererComp.fromJSON( { params: { toneMapping: this.selectedToneMapping } } );
 
 			}
 
@@ -1881,14 +1881,13 @@ export class ColorGrading extends Extension {
 
 		if ( json.modules && typeof json.modules === 'object' ) {
 
-			Object.keys( this.componentsMap ).forEach( id => {
+			this.componentsMap.forEach( ( comp, id ) => {
 
-				if ( id !== 'renderer' && ! json.modules[ id ] ) {
+				if ( id !== 'renderer' && id !== 'output' && ! this.pipelineOrder.includes( id ) ) {
 
-					const comp = this.componentsMap[ id ];
-					if ( comp && comp.domElement ) comp.domElement.remove();
-					delete this.componentsMap[ id ];
-					delete this.cardsMap[ id ];
+					if ( comp.domElement ) comp.domElement.remove();
+					this.componentsMap.delete( id );
+					this.cardsMap.delete( id );
 
 				}
 
@@ -1899,15 +1898,16 @@ export class ColorGrading extends Extension {
 				const mData = json.modules[ id ];
 				if ( id === 'renderer' ) {
 
-					if ( this.componentsMap.renderer ) {
+					const rendererComp = this.componentsMap.get( 'renderer' );
+					if ( rendererComp ) {
 
-						this.componentsMap.renderer.fromJSON( { params: mData.params } );
+						rendererComp.fromJSON( { params: mData.params } );
 
 					}
 
-				} else if ( this.componentsMap[ id ] ) {
+				} else if ( this.componentsMap.has( id ) ) {
 
-					this.componentsMap[ id ].fromJSON( { params: mData.params } );
+					this.componentsMap.get( id ).fromJSON( { params: mData.params } );
 
 				} else {
 
@@ -1920,8 +1920,8 @@ export class ColorGrading extends Extension {
 							( removeId ) => this._removeCard( removeId )
 						);
 
-						this.componentsMap[ id ] = comp;
-						this.cardsMap[ id ] = comp.domElement;
+						this.componentsMap.set( id, comp );
+						this.cardsMap.set( id, comp.domElement );
 						this._setupCardDragAndDrop( comp.domElement, id );
 
 					} else {
@@ -2223,7 +2223,7 @@ export class ColorGrading extends Extension {
 		super.init( inspector );
 
 		const renderer = inspector.getRenderer();
-		const rendererComp = this.componentsMap.renderer;
+		const rendererComp = this.componentsMap.get( 'renderer' );
 
 		if ( renderer && rendererComp ) {
 
@@ -2529,8 +2529,8 @@ export class ColorGrading extends Extension {
 
 		}
 
-		this.componentsMap = {};
-		this.cardsMap = {};
+		this.componentsMap.clear();
+		this.cardsMap.clear();
 
 		super.dispose();
 
