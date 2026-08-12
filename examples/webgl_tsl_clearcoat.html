@@ -176,10 +176,13 @@
 					new THREE.MeshBasicNodeMaterial( { color: 0xffffff } )
 				);
 
-				particleLight.add( new THREE.PointLight( 0xffffff, 30 ) );
+				const pointLight = new THREE.PointLight( 0xffffff, 30 );
+				pointLight.castShadow = true;
+				particleLight.add( pointLight );
 
 				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setNodesHandler( new WebGLNodesHandler() );
+				renderer.shadowMap.enabled = true;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

@@ -462,7 +462,7 @@ export class WebGLNodesHandler {
 
 	}
 
-	prepare( object ) {
+	setObject( object ) {
 
 		this.nodeFrame.object = object;
 

@@ -1353,7 +1353,7 @@ class WebGLRenderer {
 
 		function prepareMaterial( material, scene, object ) {
 
-			if ( _nodesHandler !== null && material.isNodeMaterial ) _nodesHandler.prepare( object );
+			if ( _nodesHandler !== null && material.isNodeMaterial ) _nodesHandler.setObject( object );
 
 			if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
 
