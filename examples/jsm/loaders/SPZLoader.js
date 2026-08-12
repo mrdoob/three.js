@@ -5,14 +5,18 @@ import {
 } from 'three';
 
 import { gunzipSync } from '../libs/fflate.module.js';
+import { ZSTDDecoder } from '../libs/zstddec.module.js';
 import { SH_BAND_COMPONENTS, SH_BAND_WORDS, SH_C0, createGaussianSplatGeometry, createPackedSphericalHarmonicsBand, writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const SPZ_MAGIC = 0x5053474e;
 const HEADER_SIZE_BYTES = 16;
-const MAX_SPLATS = 10000000;
 const SPZ_COLOR_SCALE = SH_C0 / 0.15;
 const FLAG_LOD = 0x80;
-const SH_DEGREE_TO_VECTORS = [ 0, 3, 8, 15 ];
+const FLAG_HAS_EXTENSIONS = 0x02;
+const MAX_SUPPORTED_SH_DEGREE = 3;
+const SH_DEGREE_TO_VECTORS = [ 0, 3, 8, 15, 24 ];
+
+let _zstd;
 
 // Scales and colors are stored as single bytes, so all 256 possible outputs
 // of their decode functions can be precomputed once.
@@ -92,11 +96,7 @@ class SPZLoader extends Loader {
 		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( buffer ) {
 
-			try {
-
-				onLoad( scope.parse( buffer ) );
-
-			} catch ( e ) {
+			scope.parse( buffer, onLoad, function ( e ) {
 
 				if ( onError ) {
 
@@ -110,7 +110,7 @@ class SPZLoader extends Loader {
 
 				scope.manager.itemError( url );
 
-			}
+			} );
 
 		}, onProgress, onError );
 
@@ -119,26 +119,63 @@ class SPZLoader extends Loader {
 	/**
 	 * Decompresses and parses the given `.spz` data.
 	 *
-	 * @param {ArrayBuffer} buffer - The raw gzip-compressed SPZ file as an array buffer.
-	 * @return {BufferGeometry} The parsed splat geometry.
+	 * @param {ArrayBuffer} buffer - The raw SPZ file as an array buffer.
+	 * @param {function(BufferGeometry)} [onLoad] - Executed when the parsing process has been finished.
+	 * @param {onErrorCallback} [onError] - Executed when errors occur.
+	 * @return {BufferGeometry|Promise<BufferGeometry>|undefined} The parsed splat geometry, or a promise for SPZ v4 data.
 	 */
-	parse( buffer ) {
+	parse( buffer, onLoad, onError ) {
 
-		if ( buffer.byteLength >= 8 ) {
+		try {
 
-			const view = new DataView( buffer );
+			if ( buffer.byteLength >= 8 ) {
 
-			if ( view.getUint32( 0, true ) === SPZ_MAGIC && view.getUint32( 4, true ) >= 4 ) {
+				const view = new DataView( buffer );
+				const magic = view.getUint32( 0, true );
+				const version = view.getUint32( 4, true );
 
-				throw new Error( `THREE.SPZLoader: SPZ version ${ view.getUint32( 4, true ) } is not supported.` );
+				if ( magic === SPZ_MAGIC ) {
+
+					if ( version !== 4 ) {
+
+						throw new Error( `THREE.SPZLoader: SPZ version ${ version } is not supported.` );
+
+					}
+
+					const promise = getZSTDDecoder()
+						.then( ( zstd ) => this.parseRawSPZV4( new Uint8Array( buffer ), zstd ) );
+
+					if ( onLoad !== undefined ) {
+
+						promise.then( onLoad ).catch( onError );
+
+					}
+
+					return promise;
+
+				}
 
 			}
 
+			const decompressed = gunzipSync( new Uint8Array( buffer ) );
+			const data = this.parseRawSPZ( decompressed );
+
+			if ( onLoad !== undefined ) onLoad( data );
+
+			return data;
+
+		} catch ( e ) {
+
+			if ( onError !== undefined ) {
+
+				onError( e );
+				return;
+
+			}
+
+			throw e;
+
 		}
-
-		const decompressed = gunzipSync( new Uint8Array( buffer ) );
-
-		return this.parseRawSPZ( decompressed );
 
 	}
 
@@ -160,7 +197,7 @@ class SPZLoader extends Loader {
 		const magic = view.getUint32( 0, true );
 		const version = view.getUint32( 4, true );
 		const count = view.getUint32( 8, true );
-		const shDegree = view.getUint8( 12 );
+		const storedShDegree = view.getUint8( 12 );
 		const fractionalBits = view.getUint8( 13 );
 		const flags = view.getUint8( 14 );
 
@@ -176,26 +213,19 @@ class SPZLoader extends Loader {
 
 		}
 
-		if ( count > MAX_SPLATS ) {
+		if ( storedShDegree >= SH_DEGREE_TO_VECTORS.length ) {
 
-			throw new Error( `THREE.SPZLoader: SPZ file contains too many splats (${ count }).` );
-
-		}
-
-		if ( shDegree > 3 ) {
-
-			throw new Error( `THREE.SPZLoader: Unsupported SPZ spherical harmonics degree ${ shDegree }.` );
+			throw new Error( `THREE.SPZLoader: Unsupported SPZ spherical harmonics degree ${ storedShDegree }.` );
 
 		}
 
-		let offset = HEADER_SIZE_BYTES;
-		const centers = new Float32Array( count * 3 );
-		const covariances = new Float32Array( count * 6 );
-		const colors = new Uint8ClampedArray( count * 4 );
-		const sphericalHarmonics = {};
+		// Data beyond the supported degree is still present in the file and
+		// accounted for below, it's just not decoded into an attribute.
+		const shDegree = Math.min( storedShDegree, MAX_SUPPORTED_SH_DEGREE );
+
 		const positionsSize = count * 3 * ( version === 1 ? 2 : 3 );
 		const rotationsSize = count * ( version === 3 ? 4 : 3 );
-		const shSize = count * SH_DEGREE_TO_VECTORS[ shDegree ] * 3;
+		const shSize = count * SH_DEGREE_TO_VECTORS[ storedShDegree ] * 3;
 		const lodSize = ( flags & FLAG_LOD ) !== 0 ? count * 6 : 0;
 		const expectedSize = HEADER_SIZE_BYTES + positionsSize + count + count * 3 + count * 3 + rotationsSize + shSize + lodSize;
 
@@ -205,65 +235,201 @@ class SPZLoader extends Loader {
 
 		}
 
-		offset = readCenters( bytes, centers, offset, count, version, fractionalBits );
-
-		const alphaOffset = offset;
+		let offset = HEADER_SIZE_BYTES;
+		const positions = bytes.subarray( offset, offset + positionsSize );
+		offset += positionsSize;
+		const alphas = bytes.subarray( offset, offset + count );
 		offset += count;
-
-		const colorOffset = offset;
+		const colors = bytes.subarray( offset, offset + count * 3 );
 		offset += count * 3;
-
-		const scaleOffset = offset;
+		const scales = bytes.subarray( offset, offset + count * 3 );
 		offset += count * 3;
+		const rotations = bytes.subarray( offset, offset + rotationsSize );
+		offset += rotationsSize;
+		const sphericalHarmonics = bytes.subarray( offset, offset + shSize );
 
-		const rotationOffset = offset;
-		const sphericalHarmonicsOffset = rotationOffset + rotationsSize;
+		return parseSPZAttributes( {
+			positions,
+			alphas,
+			colors,
+			scales,
+			rotations,
+			sphericalHarmonics,
+			count,
+			version,
+			fractionalBits,
+			shDegree,
+			storedShDegree
+		} );
 
-		// Copy the rotation section into an aligned Uint32Array so the hot loop
-		// avoids per-splat DataView reads (the section offset within the file is
-		// not guaranteed to be 4-byte aligned).
-		const packedRotations = version === 3 ?
-			new Uint32Array( bytes.buffer.slice( bytes.byteOffset + rotationOffset, bytes.byteOffset + rotationOffset + count * 4 ) ) :
-			null;
+	}
 
-		const quaternion = _quaternion;
+	/**
+	 * Parses raw SPZ v4 data.
+	 *
+	 * @param {Uint8Array} bytes - The raw SPZ v4 data.
+	 * @param {ZSTDDecoder} zstd - The initialized ZSTD decoder.
+	 * @return {BufferGeometry} The parsed splat geometry.
+	 */
+	parseRawSPZV4( bytes, zstd ) {
 
-		for ( let i = 0; i < count; i ++ ) {
+		const view = new DataView( bytes.buffer, bytes.byteOffset, bytes.byteLength );
+		const count = view.getUint32( 8, true );
+		const storedShDegree = view.getUint8( 12 );
+		const shDegree = Math.min( storedShDegree, MAX_SUPPORTED_SH_DEGREE );
+		const fractionalBits = view.getUint8( 13 );
+		const flags = view.getUint8( 14 );
+		const numStreams = view.getUint8( 15 );
+		const tocByteOffset = view.getUint32( 16, true );
 
-			const i3 = i * 3;
-			const i4 = i * 4;
-			const sx = SCALE_LUT[ bytes[ scaleOffset + i3 ] ];
-			const sy = SCALE_LUT[ bytes[ scaleOffset + i3 + 1 ] ];
-			const sz = SCALE_LUT[ bytes[ scaleOffset + i3 + 2 ] ];
+		if ( ( flags & FLAG_HAS_EXTENSIONS ) !== 0 ) {
 
-			if ( version === 3 ) {
-
-				readSmallestThreeQuaternion( packedRotations[ i ], quaternion );
-
-			} else {
-
-				readXYZQuaternion( bytes, rotationOffset + i3, quaternion );
-
-			}
-
-			writeCovariance( covariances, i * 6, sx, sy, sz, quaternion[ 0 ], quaternion[ 1 ], quaternion[ 2 ], quaternion[ 3 ] );
-
-			colors[ i4 ] = COLOR_LUT[ bytes[ colorOffset + i3 ] ];
-			colors[ i4 + 1 ] = COLOR_LUT[ bytes[ colorOffset + i3 + 1 ] ];
-			colors[ i4 + 2 ] = COLOR_LUT[ bytes[ colorOffset + i3 + 2 ] ];
-			colors[ i4 + 3 ] = bytes[ alphaOffset + i ];
+			console.warn( 'THREE.SPZLoader: SPZ vendor extensions are not supported and will be skipped.' );
 
 		}
 
-		readSphericalHarmonics( bytes, sphericalHarmonicsOffset, count, shDegree, sphericalHarmonics );
+		const positionsSize = count * 3 * 3;
+		const rotationsSize = count * 4;
+		const shSize = count * SH_DEGREE_TO_VECTORS[ storedShDegree ] * 3;
+		const streamSizes = [ positionsSize, count, count * 3, count * 3, rotationsSize, shSize ];
+		const toc = [];
+		let compressedOffset = tocByteOffset + numStreams * 16;
 
-		return createGaussianSplatGeometry( centers, covariances, colors, sphericalHarmonics );
+		for ( let i = 0; i < numStreams; i ++ ) {
+
+			const entryOffset = tocByteOffset + i * 16;
+			const compressedSize = Number( view.getBigUint64( entryOffset, true ) );
+			toc.push( {
+				compressedOffset,
+				compressedSize
+			} );
+			compressedOffset += compressedSize;
+
+		}
+
+		const streams = [];
+		let streamIndex = 0;
+
+		for ( let i = 0; i < streamSizes.length; i ++ ) {
+
+			const streamSize = streamSizes[ i ];
+
+			if ( streamSize === 0 ) {
+
+				streams.push( new Uint8Array() );
+				continue;
+
+			}
+
+			const stream = toc[ streamIndex ++ ];
+			const compressed = bytes.subarray( stream.compressedOffset, stream.compressedOffset + stream.compressedSize );
+			streams.push( zstd.decode( compressed, streamSize ) );
+
+		}
+
+		return parseSPZAttributes( {
+			positions: streams[ 0 ],
+			alphas: streams[ 1 ],
+			colors: streams[ 2 ],
+			scales: streams[ 3 ],
+			rotations: streams[ 4 ],
+			sphericalHarmonics: streams[ 5 ],
+			count,
+			version: 4,
+			fractionalBits,
+			shDegree,
+			storedShDegree
+		} );
 
 	}
 
 }
 
-function readSphericalHarmonics( bytes, offset, count, degree, sphericalHarmonics ) {
+function getZSTDDecoder() {
+
+	if ( _zstd === undefined ) {
+
+		const decoder = new ZSTDDecoder();
+		_zstd = decoder.init().then( () => decoder ).catch( ( e ) => {
+
+			_zstd = undefined;
+			throw e;
+
+		} );
+
+	}
+
+	return _zstd;
+
+}
+
+function parseSPZAttributes( {
+	positions,
+	alphas,
+	colors,
+	scales,
+	rotations,
+	sphericalHarmonics,
+	count,
+	version,
+	fractionalBits,
+	shDegree,
+	storedShDegree
+} ) {
+
+	const centers = new Float32Array( count * 3 );
+	const covariances = new Float32Array( count * 6 );
+	const colorBytes = new Uint8ClampedArray( count * 4 );
+	const sphericalHarmonicsBands = {};
+
+	readCenters( positions, centers, 0, count, version, fractionalBits );
+
+	// The hot loop below avoids per-splat DataView reads by indexing into an
+	// aligned Uint32Array. When the rotation section is already 4-byte aligned
+	// (e.g. a freshly decoded ZSTD stream) it's read in place; otherwise it's
+	// copied into a new, aligned buffer first.
+	const packedRotations = version >= 3 ?
+		( rotations.byteOffset % 4 === 0 ?
+			new Uint32Array( rotations.buffer, rotations.byteOffset, count ) :
+			new Uint32Array( rotations.buffer.slice( rotations.byteOffset, rotations.byteOffset + count * 4 ) ) ) :
+		null;
+
+	const quaternion = _quaternion;
+
+	for ( let i = 0; i < count; i ++ ) {
+
+		const i3 = i * 3;
+		const i4 = i * 4;
+		const sx = SCALE_LUT[ scales[ i3 ] ];
+		const sy = SCALE_LUT[ scales[ i3 + 1 ] ];
+		const sz = SCALE_LUT[ scales[ i3 + 2 ] ];
+
+		if ( version >= 3 ) {
+
+			readSmallestThreeQuaternion( packedRotations[ i ], quaternion );
+
+		} else {
+
+			readXYZQuaternion( rotations, i3, quaternion );
+
+		}
+
+		writeCovariance( covariances, i * 6, sx, sy, sz, quaternion[ 0 ], quaternion[ 1 ], quaternion[ 2 ], quaternion[ 3 ] );
+
+		colorBytes[ i4 ] = COLOR_LUT[ colors[ i3 ] ];
+		colorBytes[ i4 + 1 ] = COLOR_LUT[ colors[ i3 + 1 ] ];
+		colorBytes[ i4 + 2 ] = COLOR_LUT[ colors[ i3 + 2 ] ];
+		colorBytes[ i4 + 3 ] = alphas[ i ];
+
+	}
+
+	readSphericalHarmonics( sphericalHarmonics, 0, count, shDegree, sphericalHarmonicsBands, storedShDegree );
+
+	return createGaussianSplatGeometry( centers, covariances, colorBytes, sphericalHarmonicsBands );
+
+}
+
+function readSphericalHarmonics( bytes, offset, count, degree, sphericalHarmonics, storedDegree = degree ) {
 
 	if ( degree === 0 ) return;
 
@@ -281,7 +447,12 @@ function readSphericalHarmonics( bytes, offset, count, degree, sphericalHarmonic
 
 	}
 
+	const sourceStride = SH_DEGREE_TO_VECTORS[ storedDegree ] * 3;
+
 	for ( let i = 0; i < count; i ++ ) {
+
+		const sourceOffset = offset + i * sourceStride;
+		let bandOffset = sourceOffset;
 
 		for ( let bandIndex = 0; bandIndex < bands.length; bandIndex ++ ) {
 
@@ -290,7 +461,7 @@ function readSphericalHarmonics( bytes, offset, count, degree, sphericalHarmonic
 
 			for ( let j = 0; j < band.components; j ++ ) {
 
-				band.bytes[ targetOffset + j ] = bytes[ offset ++ ];
+				band.bytes[ targetOffset + j ] = bytes[ bandOffset ++ ];
 
 			}
 
@@ -315,7 +486,7 @@ function readCenters( bytes, centers, offset, count, version, fractionalBits ) {
 
 		}
 
-		return offset + count * 3 * 2;
+		return;
 
 	}
 
@@ -331,8 +502,6 @@ function readCenters( bytes, centers, offset, count, version, fractionalBits ) {
 		centers[ i3 + 2 ] = readInt24( bytes, rowOffset + 6 ) * fixedScale;
 
 	}
-
-	return offset + count * 3 * 3;
 
 }
 
