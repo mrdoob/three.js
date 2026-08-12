@@ -19,8 +19,8 @@ import {
 	RGBAFormat,
 	RepeatWrapping,
 	Scene,
-	Source,
 	SRGBColorSpace,
+	TextureSource,
 	CompressedTexture,
 	Vector3,
 	Quaternion,
@@ -1033,7 +1033,7 @@ class GLTFWriter {
 
 		const texture = reference.clone();
 
-		texture.source = new Source( canvas );
+		texture.source = new TextureSource( canvas );
 		texture.colorSpace = NoColorSpace;
 		texture.channel = ( metalnessMap || roughnessMap ).channel;
 
@@ -1095,7 +1095,7 @@ class GLTFWriter {
 		context.putImageData( imageData, 0, 0 );
 
 		const texture = normalMap.clone();
-		texture.source = new Source( canvas );
+		texture.source = new TextureSource( canvas );
 
 		return texture;
 
