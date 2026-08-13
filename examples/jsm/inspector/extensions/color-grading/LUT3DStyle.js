@@ -446,7 +446,7 @@ export class LUT3DStyle {
 		align-items: center !important;
 		justify-content: center !important;
 		position: relative !important;
-		width: 100% !important;
+		width: calc(100% + 16px) !important;
 		min-height: 28px !important;
 		margin-bottom: 6px !important;
 		padding: 0 20px !important;
