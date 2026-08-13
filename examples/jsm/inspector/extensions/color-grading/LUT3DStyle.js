@@ -137,7 +137,7 @@ export class LUT3DStyle {
 		color: var(--color-accent, #00aaff) !important;
 	}
 
-	.lut-dock-btn:active {
+	.lut-dock-btn:active:not(:has(.lut-context-menu)) {
 		transform: scale(0.95);
 	}
 
@@ -202,6 +202,10 @@ export class LUT3DStyle {
 	.lut-menu-item:hover {
 		background: rgba(0, 170, 255, 0.15);
 		color: var(--color-accent, #00aaff);
+	}
+
+	.lut-menu-item:active:not(:has(.lut-context-menu)) {
+		transform: scale(0.98);
 	}
 
 	.lut-menu-item svg {
@@ -354,7 +358,7 @@ export class LUT3DStyle {
 		background: rgba(30, 30, 36, 0.85) !important;
 		border: 1px solid rgba(74, 74, 90, 0.4) !important;
 		border-radius: 8px !important;
-		padding: 6px 10px 8px 10px !important;
+		padding: 1px 10px 8px 10px !important;
 		width: 175px !important;
 		min-width: 175px !important;
 		max-width: 175px !important;
@@ -443,8 +447,7 @@ export class LUT3DStyle {
 		justify-content: center !important;
 		position: relative !important;
 		width: 100% !important;
-		min-height: 24px !important;
-		height: 24px !important;
+		min-height: 28px !important;
 		margin-bottom: 6px !important;
 		padding: 0 20px !important;
 		border-bottom: 1px solid rgba(74, 74, 90, 0.3) !important;
@@ -456,7 +459,7 @@ export class LUT3DStyle {
 		left: 4px !important;
 		top: 0px !important;
 		bottom: 0px !important;
-		margin: -4px 0 0 0 !important;
+		margin: 0 !important;
 		height: 100% !important;
 		display: flex !important;
 		align-items: center !important;
@@ -468,7 +471,7 @@ export class LUT3DStyle {
 		right: 4px !important;
 		top: 0px !important;
 		bottom: 0px !important;
-		margin: -4px 0 0 0 !important;
+		margin: 0 !important;
 		height: 100% !important;
 		display: flex !important;
 		align-items: center !important;
@@ -501,8 +504,7 @@ export class LUT3DStyle {
 		font-weight: 600 !important;
 		color: var(--text-primary, #e0e0e0) !important;
 		letter-spacing: 0.3px !important;
-		line-height: 23px !important;
-		margin: -6px 0 0 0 !important;
+		margin: 0 !important;
 		padding: 0 !important;
 		white-space: nowrap !important;
 		overflow: hidden !important;
@@ -516,8 +518,8 @@ export class LUT3DStyle {
 		cursor: pointer !important;
 		padding: 0 !important;
 		margin: 0 !important;
-		width: 18px !important;
-		height: 18px !important;
+		width: 20px !important;
+		height: 100% !important;
 		display: flex !important;
 		align-items: center !important;
 		justify-content: center !important;
@@ -528,7 +530,7 @@ export class LUT3DStyle {
 	.lut-card-reset-btn:hover, .lut-container .card-reset-btn:hover {
 		color: var(--color-accent, #00aaff) !important;
 		opacity: 1 !important;
-		transform: rotate(-45deg);
+		transform: scale(1.1);
 	}
 
 	/* Flow Connector Nodes between Cards */
@@ -957,7 +959,7 @@ export class LUT3DStyle {
 	.lut-card-remove-btn:hover {
 		color: var(--color-accent, #00aaff) !important;
 		opacity: 1 !important;
-		transform: scale(1.2);
+		transform: scale(1.1);
 	}
 
 	/* Add Card Modal Window Overlay */
