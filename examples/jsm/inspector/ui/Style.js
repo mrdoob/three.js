@@ -408,6 +408,8 @@ export class Style {
 		margin-left: 6px;
 		cursor: help;
 		position: relative;
+		vertical-align: middle;
+		top: -1px;
 	}
 
 	.info-icon.active {
