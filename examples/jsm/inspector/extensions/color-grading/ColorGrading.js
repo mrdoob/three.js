@@ -213,6 +213,7 @@ export class ColorGrading extends Extension {
 			this.sceneGradingEnabled = ! this.sceneGradingEnabled;
 			updateGradingBtnState();
 			this._toggleSceneGrading( this.sceneGradingEnabled );
+			this.save();
 
 		};
 
@@ -530,6 +531,8 @@ export class ColorGrading extends Extension {
 					this._applyLiveGrading();
 
 				}
+
+				this.save();
 
 			}
 		);
