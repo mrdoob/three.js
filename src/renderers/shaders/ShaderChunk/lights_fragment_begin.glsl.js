@@ -60,7 +60,7 @@ vec3 geometryClearcoatNormal = vec3( 0.0 );
 
 	material.dfg = texture2D( dfgLUT, vec2( material.roughness, dotNVms ) ).rg;
 
-	#if ( NUM_DIR_LIGHTS > 0 || NUM_POINT_LIGHTS > 0 || NUM_SPOT_LIGHTS > 0 )
+	#if ( NUM_SUN_LIGHTS > 0 || NUM_DIR_LIGHTS > 0 || NUM_POINT_LIGHTS > 0 || NUM_SPOT_LIGHTS > 0 )
 
 		// Multi-scattering energy compensation for direct lighting
 		// Based on "Practical Multiple Scattering Compensation for Microfacet Models"
