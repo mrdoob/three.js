@@ -34,7 +34,6 @@ import {
 // - Storage textures not supported
 // - Fog / environment do not automatically update - must call "dispose"
 // - instanced mesh geometry cannot be shared
-// - Node materials cannot be used with "compile" function
 
 // hash any object parameters that will impact the resulting shader so we can force
 // a program update
@@ -108,27 +107,34 @@ class SceneContext {
 
 		const { lightsNode, environmentNode, fogNode } = this;
 		const lightsHash = lightsNode.getCacheKey();
-		const envHash = environmentNode ? environmentNode.getCacheKey : 0;
+		const envHash = environmentNode ? environmentNode.getCacheKey() : 0;
 		const fogHash = fogNode ? fogNode.getCacheKey() : 0;
 		return NodeUtils.hashArray( [ lightsHash, envHash, fogHash ] );
 
 	}
 
-	update() {
+	update( object, camera ) {
 
 		const { scene, lightsNode } = this;
 
 		// update lighting
 		const sceneLights = [];
-		scene.traverse( object => {
+		const seenLights = new Set();
+		const collectLight = child => {
 
-			if ( object.isLight ) {
+			if ( child.isLight && child.layers.test( camera.layers ) && seenLights.has( child ) === false ) {
 
-				sceneLights.push( object );
+				seenLights.add( child );
+				sceneLights.push( child );
 
 			}
 
-		} );
+		};
+
+		scene.traverseVisible( collectLight );
+
+		// compile() can receive an object that has not been added to the target scene yet.
+		if ( object !== scene ) object.traverseVisible( collectLight );
 
 		lightsNode.setLights( sceneLights );
 
@@ -402,38 +408,55 @@ export class WebGLNodesHandler {
 	}
 
 
-	renderStart( scene, camera ) {
+	setupNodeMaterial( material ) {
+
+		if ( material && material.isNodeMaterial ) {
+
+			material.customProgramCacheKey = this.customProgramCacheKeyCallback;
+			material.onBeforeRender = this.onBeforeRenderCallback;
+
+		}
+
+	}
+
+	renderStart( scene, camera, targetScene = scene ) {
 
 		const { nodeFrame, renderStack, renderer, sceneContexts } = this;
 		nodeFrame.update();
 		nodeFrame.camera = camera;
-		nodeFrame.scene = scene;
+		nodeFrame.scene = targetScene;
 		nodeFrame.frameId ++;
 
-		let sceneContext = sceneContexts.get( scene );
+		let sceneContext = sceneContexts.get( targetScene );
 		if ( ! sceneContext ) {
 
-			sceneContext = new SceneContext( renderer, scene );
-			sceneContexts.set( scene, sceneContext );
+			sceneContext = new SceneContext( renderer, targetScene );
+			sceneContexts.set( targetScene, sceneContext );
 
 		}
 
-		sceneContext.update();
+		sceneContext.update( scene, camera );
 		renderStack.push( { sceneContext, camera } );
 
 		// ensure all node material callbacks are initialized before
 		// traversal and build
-		const {
-			customProgramCacheKeyCallback,
-			onBeforeRenderCallback,
-		} = this;
-
 		scene.traverse( object => {
 
-			if ( object.material && object.material.isNodeMaterial ) {
+			const material = object.material;
 
-				object.material.customProgramCacheKey = customProgramCacheKeyCallback;
-				object.material.onBeforeRender = onBeforeRenderCallback;
+			if ( material === undefined ) return;
+
+			if ( Array.isArray( material ) ) {
+
+				for ( let i = 0; i < material.length; i ++ ) {
+
+					this.setupNodeMaterial( material[ i ] );
+
+				}
+
+			} else {
+
+				this.setupNodeMaterial( material );
 
 			}
 
@@ -455,6 +478,12 @@ export class WebGLNodesHandler {
 			nodeFrame.scene = sceneContext.scene;
 
 		}
+
+	}
+
+	setObject( object ) {
+
+		this.nodeFrame.object = object;
 
 	}
 
