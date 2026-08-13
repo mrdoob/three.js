@@ -65,8 +65,8 @@ class SunLight extends Light {
 	/**
 	 * Orients the light from sky coordinates.
 	 *
-	 * @param {number} elevation - The angle above the horizon, in radians.
-	 * @param {number} azimuth - The angle around the up axis, in radians.
+	 * @param {number} elevation - The angle above the horizontal xz-plane, in radians.
+	 * @param {number} azimuth - The angle around the y-axis, measured from the positive z-axis, in radians.
 	 * @return {SunLight} A reference to this light.
 	 */
 	setFromSphericalAngles( elevation, azimuth ) {
