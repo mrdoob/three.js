@@ -61,6 +61,15 @@ class Animation {
 		 */
 		this._requestId = null;
 
+		/**
+		 * Indicates whether the current frame needs to be finished
+		 * at the start of the next animation frame.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._needsFinishFrame = false;
+
 	}
 
 	/**
@@ -72,17 +81,35 @@ class Animation {
 
 			this._requestId = this._context.requestAnimationFrame( update );
 
+			if ( this._needsFinishFrame ) {
+
+				this.renderer._inspector.finish();
+
+				this._needsFinishFrame = false;
+
+			}
+
 			if ( this.info.autoReset === true ) this.info.reset();
 
 			this.nodes.nodeFrame.update();
 
 			this.info.frame = this.nodes.nodeFrame.frameId;
 
-			this.renderer._inspector.begin();
+			if ( this._animationLoop !== null ) {
 
-			if ( this._animationLoop !== null ) this._animationLoop( time, xrFrame );
+				this.renderer._inspector.begin();
 
-			this.renderer._inspector.finish();
+				this._animationLoop( time, xrFrame );
+
+				this.renderer._inspector.finish();
+
+			} else if ( this.renderer.hasInitialized() ) {
+
+				this.renderer._inspector.begin();
+
+				this._needsFinishFrame = true;
+
+			}
 
 		};
 

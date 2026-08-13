@@ -839,14 +839,13 @@ class Renderer {
 
 			//
 
-			this._animation.start();
+			this._inspector.init();
+
 			this._initialized = true;
 
 			//
 
-			this._inspector.init();
-
-			//
+			this._animation.start();
 
 			resolve( this );
 
