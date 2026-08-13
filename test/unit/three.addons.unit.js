@@ -13,4 +13,5 @@ import './addons/loaders/SPLATLoader.tests.js';
 import './addons/loaders/SPZLoader.tests.js';
 import './addons/loaders/USDLoader.tests.js';
 import './addons/exporters/USDZExporter.tests.js';
+import './addons/objects/GaussianSplatMesh.tests.js';
 import './addons/tsl/WebGLNodesHandler.tests.js';
