@@ -150,21 +150,23 @@
 				ground.receiveShadow = true;
 				scene.add( ground );
 
+				const dummy = new THREE.Object3D();
+
 				// an avenue of thin posts shows the shadow resolution from up close
 				// all the way down to the shadow distance
 
-				const postGeometry = new THREE.BoxGeometry( 1, 10, 1 );
-				const postMaterial = new THREE.MeshStandardMaterial( { color: 0x475161 } );
+				const posts = new THREE.InstancedMesh( new THREE.BoxGeometry( 1, 10, 1 ), new THREE.MeshStandardMaterial( { color: 0x475161 } ), 120 );
+				posts.castShadow = true;
+				posts.receiveShadow = true;
+				scene.add( posts );
 
 				for ( let i = 0; i < 60; i ++ ) {
 
 					for ( const side of [ - 1, 1 ] ) {
 
-						const post = new THREE.Mesh( postGeometry, postMaterial );
-						post.position.set( 30 - i * 17, 5, side * 13 );
-						post.castShadow = true;
-						post.receiveShadow = true;
-						scene.add( post );
+						dummy.position.set( 30 - i * 17, 5, side * 13 );
+						dummy.updateMatrix();
+						posts.setMatrixAt( i * 2 + ( side + 1 ) / 2, dummy.matrix );
 
 					}
 
@@ -172,11 +174,12 @@
 
 				// towers for large shadows in the distance
 
-				const towerGeometry = new THREE.BoxGeometry( 10, 1, 10 );
-				const towerMaterials = [
-					new THREE.MeshStandardMaterial( { color: 0x08d9d6 } ),
-					new THREE.MeshStandardMaterial( { color: 0xff2e63 } )
-				];
+				const towers = new THREE.InstancedMesh( new THREE.BoxGeometry( 10, 1, 10 ), new THREE.MeshStandardMaterial(), 60 );
+				towers.castShadow = true;
+				towers.receiveShadow = true;
+				scene.add( towers );
+
+				const towerColors = [ new THREE.Color( 0x08d9d6 ), new THREE.Color( 0xff2e63 ) ];
 
 				THREE.MathUtils.seededRandom( 6 );
 
@@ -186,12 +189,13 @@
 
 						const height = 20 + THREE.MathUtils.seededRandom() * 40;
 
-						const tower = new THREE.Mesh( towerGeometry, towerMaterials[ ( i + ( side + 1 ) / 2 ) % 2 ] );
-						tower.position.set( - 40 - i * 32 - THREE.MathUtils.seededRandom() * 10, height / 2, side * ( 38 + THREE.MathUtils.seededRandom() * 55 ) );
-						tower.scale.y = height;
-						tower.castShadow = true;
-						tower.receiveShadow = true;
-						scene.add( tower );
+						dummy.position.set( - 40 - i * 32 - THREE.MathUtils.seededRandom() * 10, height / 2, side * ( 38 + THREE.MathUtils.seededRandom() * 55 ) );
+						dummy.scale.y = height;
+						dummy.updateMatrix();
+
+						const index = i * 2 + ( side + 1 ) / 2;
+						towers.setMatrixAt( index, dummy.matrix );
+						towers.setColorAt( index, towerColors[ ( i + ( side + 1 ) / 2 ) % 2 ] );
 
 					}
 
@@ -199,7 +203,7 @@
 
 				// gui
 
-				const materials = [ ground.material, postMaterial, ...towerMaterials ];
+				const materials = [ ground.material, posts.material, towers.material ];
 
 				const gui = new GUI();
 
