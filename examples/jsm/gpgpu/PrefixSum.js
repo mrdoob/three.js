@@ -594,7 +594,7 @@ export class PrefixSum {
 
 			} );
 
-		} )().compute( this.dispatchSize, [ this.workgroupSize ] );
+		} )().compute( this.dispatchSize, [ this.workgroupSize ] ).setName( 'PrefixSumReduce' );
 
 		return fnDef;
 
@@ -629,7 +629,7 @@ export class PrefixSum {
 
 			reductionBuffer.element( invocationSubgroupIndex ).assign( subgroupInclusiveAdd( reductionBuffer.element( invocationSubgroupIndex ) ) );
 
-		} )().compute( this.numWorkgroups, [ this.workgroupSize ] );
+		} )().compute( this.numWorkgroups, [ this.workgroupSize ] ).setName( 'PrefixSumSpineScanShort' );
 
 		return fnDef;
 
@@ -802,7 +802,7 @@ export class PrefixSum {
 
 			} );
 
-		} )().compute( this.numWorkgroups, [ this.workgroupSize ] );
+		} )().compute( this.numWorkgroups, [ this.workgroupSize ] ).setName( 'PrefixSumSpineScanLong' );
 
 		return fnDef;
 
@@ -1071,7 +1071,7 @@ export class PrefixSum {
 
 			}
 
-		} )().compute( this.dispatchSize, [ this.workgroupSize ] );
+		} )().compute( this.dispatchSize, [ this.workgroupSize ] ).setName( 'PrefixSumDownsweep' );
 
 		return fnDef;
 
