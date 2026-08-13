@@ -1,11 +1,9 @@
 import {
 	StorageInstancedBufferAttribute,
 } from 'three';
-import { Fn, If, instancedArray, invocationLocalIndex, countTrailingZeros, Loop, workgroupArray, subgroupSize, workgroupBarrier, workgroupId, uint, select, invocationSubgroupIndex, dot, uvec4, vec4, float, subgroupAdd, array, subgroupShuffle, subgroupInclusiveAdd, subgroupBroadcast, invocationSubgroupMetaIndex, storage, atomicLoad, atomicStore } from 'three/tsl';
+import { Fn, If, instancedArray, invocationLocalIndex, countTrailingZeros, Loop, workgroupArray, subgroupSize, workgroupBarrier, workgroupId, uint, select, invocationSubgroupIndex, dot, uvec4, vec4, float, subgroupAdd, array, subgroupShuffle, subgroupInclusiveAdd, subgroupBroadcast, invocationSubgroupMetaIndex, storage } from 'three/tsl';
 
 const divRoundUp = ( size, part_size ) => {
-
-	console.log( Math.floor( ( size + part_size - 1 ) / part_size ) );
 
 	return Math.floor( ( size + part_size - 1 ) / part_size );
 
@@ -79,21 +77,30 @@ let id = 0;
  * @property {Node<uint>} spineSizeLog - A node that evaluates to n in 2^n = spineSize.
  */
 
-
 /**
-	* A class that represents a prefix sum running under the reduce/scan strategy.
-	* Currently limited to one-dimensional data buffers.
+	* A reusable GPU Prefix Sum which runs the most optimal prefix sum algorithm for the target device.
+	* By default, this class will run an inclusive prefix sum on the GPU. Currently, prefix sums are
+	* limited to one-dimensional data buffers ('float', 'int', 'uint') and will run either a serial or a reduce/scan prefix
+	* sum depending on the capabilities of the client device.
 	*
-	* @param {StorageBufferNode} dataBuffer - The data buffer to sum.
+	* @param {BufferAttribute|TypedArray} input - The data to sum.
 	* @param {Object} [options={}] - Options that modify the reduce/scan prefix sum.
 	*/
 export class PrefixSum {
 
 	/**
-	 * @param {TypedArray} inputArray - The data buffer to sum. Must have n % 4 == 0 num elements
+	 * @param {BufferAttribute|TypedArray} input - The data to sum. A typed array is copied into a new
+	 * storage attribute, zero padded so that its length is a multiple of four. A buffer attribute is used
+	 * directly and must therefore already hold n % 4 == 0 elements.
 	 * @param {Object} [options={}] - Options that modify the behavior of the prefix sum.
+	 * @param {BufferAttribute} [options.outputAttribute] - The attribute the prefix sum is written into.
+	 * Defaults to a new attribute matching the size and type of the input.
+	 * @param {boolean} [options.isInclusive=true] - A flag determining whether to execute an exclusive prefix sum instead of the default inclusive prefix sum.
+	 * @param {number} [options.workPerInvocation=4] - The number of vec4 elements read per invocation.
+	 * @param {number} [options.workgroupSize=64] - The workgroup size of the compute shaders.
+	 * @param {number} [options.minSubgroupSize=4] - The smallest subgroup size the generated shaders have to stay correct for. Defaults to the WGSL minimum of 4.
 	 */
-	constructor( renderer, inputArray, options = {} ) {
+	constructor( input, options = {} ) {
 
 		/**
 		 * @type {PrefixSumStorageObjects}
@@ -111,12 +118,34 @@ export class PrefixSum {
 		 */
 		this.utilityNodes = {};
 
+		// Accepting an attribute rather than a typed array lets a caller hand over a buffer it
+		// already binds elsewhere (e.g. CountingSort's histogram) so that this class can build its own
+		// vec4 view of it. A vec4 storage node cannot be derived from an existing scalar storage node.
+
+		/**
+		 * The attribute holding the data to sum.
+		 *
+		 * @type {BufferAttribute}
+		 */
+		this.inputAttribute = ( input.isBufferAttribute === true )
+			? input
+			: new StorageInstancedBufferAttribute( input, 1 );
+
+		/**
+		 * The attribute the prefix sum is written into.
+		 *
+		 * @type {BufferAttribute}
+		 */
+		this.outputAttribute = ( options.outputAttribute !== undefined )
+			? options.outputAttribute
+			: new StorageInstancedBufferAttribute( new this.inputAttribute.array.constructor( this.inputAttribute.array.length ), 1 );
+
 		/**
 		 * The type of each individual data element.
 		 *
 		 * @type {number}
 		 */
-		this.type = getTypeFromTypedArray( inputArray );
+		this.type = getTypeFromTypedArray( this.inputAttribute.array );
 
 		this.vecType = 'vec4';
 
@@ -135,22 +164,16 @@ export class PrefixSum {
 		 *
 		 * @type {number}
 		 */
-		this.count = inputArray.length;
+		this.count = this.inputAttribute.array.length;
 
-		// Allign size of buffer to vec4
-		if ( inputArray.length % 4 !== 0 ) {
-
-			const missingElements = ( 4 - inputArray.length % 4 );
-			const bytesToAdd = missingElements * inputArray.constructor.BYTES_PER_ELEMENT;
-			this.inputArrayBuffer = new inputArray.constructor( new ArrayBuffer( inputArray.byteLength + bytesToAdd ) );
-			this.inputArrayBuffer.set( [ ...inputArray, ...Array( missingElements ).fill( 0 ) ] );
-
-		} else {
-
-			this.inputArrayBuffer = new inputArray.constructor( new ArrayBuffer( inputArray.byteLength ) );
-			this.inputArrayBuffer.set( inputArray );
-
-		}
+		/**
+		 * The number of elements every write into the output buffer is shifted by. An offset of one
+		 * Because the first element of an exclusive prefix sum is always zero, an offset of
+	   * one turns the inclusive prefix sum this class computes into an exclusive one.
+		 *
+		 * @type {number}
+		 */
+		this.isInclusive = options.isInclusive !== undefined ? options.isInclusive : true;
 
 		/**
 		 * The number of 4-dimensional vectors needed to fully represent the data in the data buffer.
@@ -184,16 +207,15 @@ export class PrefixSum {
 		 *
 		 * @type {number}
 		*/
-		this.workgroupSize = options.workgroupSize;
-		// ? options.workgroupSize : Math.min( this.vecCount, this.renderer.backend.device.limits.maxComputeWorkgroupSizeX );
+		this.workgroupSize = options.workgroupSize !== undefined ? options.workgroupSize : 64;
 
 		/**
-		 * The minimumn subgroup size specified by the renderer's graphics device.
-		 * Only properly initialized
+		 * The minimumn subgroup size the generated shaders have to stay correct for. Defaults to the
+		 * WGSL minimum of 4 and is refined once a renderer is available in `_handleSubgroupInfo`.
 		 *
 		 * @type {number}
 		*/
-		this.minSubgroupSize = ( this.renderer.backend.device.adapterInfo && this.renderer.backend.device.adapterInfo.subgroupMinSize ) ? this.renderer.backend.device.adapterInfo.subgroupMinSize : 4;
+		this.minSubgroupSize = options.minSubgroupSize !== undefined ? options.minSubgroupSize : 4;
 
 		/**
 		 * The maximum number of elements that will be read by an individual workgroup in the reduction step.
@@ -230,7 +252,7 @@ export class PrefixSum {
 
 		// Subgroup capable functions
 		this.computeFunctions.reduceFn = this._getReduceFn();
-		this.computeFunctions.spineScanShortFn = this._getSpineScanFn();
+		this.computeFunctions.spineScanShortFn = this._getSpineScanShortFn();
 		this.computeFunctions.spineScanLongFn = this._getSpineScanLongFn();
 		this.computeFunctions.downsweepFn = this._getDownsweepFn();
 		// Single invocation prefix sum (default)
@@ -250,17 +272,13 @@ export class PrefixSum {
 
 	_createStorageBuffers() {
 
-		this.outputArrayBuffer = new this.inputArrayBuffer.constructor( new ArrayBuffer( this.inputArrayBuffer.byteLength ) );
-		this.outputArrayBuffer.set( this.inputArrayBuffer );
-
-		const inputAttribute = new StorageInstancedBufferAttribute( this.inputArrayBuffer, 1 );
-		const outputAttribute = new StorageInstancedBufferAttribute( this.outputArrayBuffer, 1 );
+		const { inputAttribute, outputAttribute } = this;
 
 		this.storageBuffers.dataBuffer = storage( inputAttribute, this.vecType, this.vecCount ).setName( `Prefix_Sum_Input_Vec_${id}` );
-		this.storageBuffers.unvectorizedDataBuffer = storage( inputAttribute, this.type, inputAttribute.count ).setName( `Prefix_Sum_Input_Unvec_${id}` );
+		this.storageBuffers.unvectorizedDataBuffer = storage( inputAttribute, this.type, inputAttribute.array.length ).setName( `Prefix_Sum_Input_Unvec_${id}` );
 
 		this.storageBuffers.outputBuffer = storage( outputAttribute, this.vecType, this.vecCount ).setName( `Prefix_Sum_Output_Vec_${id}` );
-		this.storageBuffers.unvectorizedOutputBuffer = storage( outputAttribute, this.type, outputAttribute.count ).setName( `Prefix_Sum_Output_Unvec_${id}` );
+		this.storageBuffers.unvectorizedOutputBuffer = storage( outputAttribute, this.type, outputAttribute.array.length ).setName( `Prefix_Sum_Output_Unvec_${id}` );
 
 		this.storageBuffers.reductionBuffer = instancedArray( this.numWorkgroups, this.type ).setPBO( true ).setName( `Prefix_Sum_Reduction_${id}` );
 
@@ -372,23 +390,57 @@ export class PrefixSum {
 
 	}
 
+	/**
+	 * Create the compute shader that performs the whole prefix sum on a single invocation. Used as a
+	 * fallback on devices without subgroup support.
+	 *
+	 * @private
+	 * @returns {ComputeNode} - A compute shader that executes a serial prefix sum.
+	 */
 	_getSingleThreadPrefixFn() {
+
+		const { unvectorizedDataBuffer, unvectorizedOutputBuffer } = this.storageBuffers;
+		const { count, isInclusive } = this;
 
 		const fnDef = Fn( () => {
 
-			const sum = uint( 0 ).toVar( 'sum' );
+			const sum = this._getZeroNode().toVar( 'sum' );
 
-			Loop( { start: 0, end: this.count, type: 'uint', name: 'bin', condition: '<' }, ( { bin } ) => {
+			Loop( { start: 0, end: count, type: 'uint', name: 'i', condition: '<' }, ( { i } ) => {
 
-				const binCountValue = atomicLoad( this.histogramAtomic.element( bin ) ).toVar( 'count' );
-				atomicStore( this.offsetAtomic.element( bin ), sum );
-				sum.addAssign( binCountValue );
+				const value = unvectorizedDataBuffer.element( i );
+
+				if ( isInclusive ) {
+
+					sum.addAssign( value );
+
+				}
+
+				unvectorizedOutputBuffer.element( i ).assign( sum );
+
+				if ( ! isInclusive ) {
+
+					sum.addAssign( value );
+
+				}
 
 			} );
 
 		} )().compute( 1 ).setName( 'SingleThreadPrefix' );
 
 		return fnDef;
+
+	}
+
+	/**
+	 * Returns a zero valued node matching the element type of the data buffer.
+	 *
+	 * @private
+	 * @returns {Node} - A zero valued node.
+	 */
+	_getZeroNode() {
+
+		return this.type === 'float' ? float( 0 ) : uint( 0 );
 
 	}
 
@@ -594,18 +646,6 @@ export class PrefixSum {
 
 		const { reductionBuffer } = this.storageBuffers;
 
-		if ( this.numWorkgroups <= this.minSubgroupSize ) {
-
-			const fnDef = Fn( () => {
-
-				reductionBuffer.element( invocationSubgroupIndex ).assign( subgroupInclusiveAdd( reductionBuffer.element( invocationSubgroupIndex ) ) );
-
-			} )().compute( this.numWorkgroups, [ this.workgroupSize ] );
-
-			return fnDef;
-
-		}
-
 		const { subgroupReductionArray, unvectorizedSubgroupOffset, spineSize, subgroupSizeLog } = this.utilityNodes;
 		const { unvectorizedWorkPerInvocation } = this;
 
@@ -662,11 +702,11 @@ export class PrefixSum {
 
 				} );
 
-				if ( invocationSubgroupIndex.equal( subgroupSize.sub( 1 ) ) ) {
+				If( invocationSubgroupIndex.equal( subgroupSize.sub( 1 ) ), () => {
 
 					subgroupReductionArray.element( invocationSubgroupMetaIndex ).assign( prev );
 
-				}
+				} );
 
 				workgroupBarrier();
 
@@ -770,10 +810,12 @@ export class PrefixSum {
 
 	_getDownsweepFn() {
 
-		const { dataBuffer, reductionBuffer, outputBuffer } = this.storageBuffers;
+		const { dataBuffer, reductionBuffer, unvectorizedOutputBuffer } = this.storageBuffers;
 		const { subgroupOffset, workgroupOffset, subgroupReductionArray, subgroupSizeLog, spineSize } = this.utilityNodes;
 
-		const { workPerInvocation, vecCount } = this;
+		const { workPerInvocation, vecCount, isInclusive } = this;
+
+		const outputIndexOffset = isInclusive ? 0 : 1;
 
 		const fnDef = Fn( () => {
 
@@ -799,8 +841,6 @@ export class PrefixSum {
 
 				const scanIn = dataBuffer.element( startThread );
 				const currentTScanElement = tScan.element( currentSubgroupInBlock );
-
-				console.log( currentTScanElement );
 
 				currentTScanElement.assign( scanIn );
 
@@ -987,23 +1027,49 @@ export class PrefixSum {
 
 			startThread.assign( startThreadBase );
 
-			this._workPerInvocationBlock( ( currentSubgroupInBlock ) => {
+			// The sweep value is written one component at a time into an unvectorized view of
+			// the output buffer
+			const writeSweepValue = ( currentSubgroupInBlock ) => {
 
-				const sweepValue = tScan.element( currentSubgroupInBlock ).add( prev );
-				outputBuffer.element( startThread ).assign( sweepValue );
+				const outputIndex = startThread.mul( 4 ).add( uint( outputIndexOffset ) ).toVar();
+				const outputValueToWrite = tScan.element( currentSubgroupInBlock ).add( prev ).toVar();
+
+				unvectorizedOutputBuffer.element( outputIndex ).assign( outputValueToWrite.x );
+				unvectorizedOutputBuffer.element( outputIndex.add( 1 ) ).assign( outputValueToWrite.y );
+				unvectorizedOutputBuffer.element( outputIndex.add( 2 ) ).assign( outputValueToWrite.z );
+				unvectorizedOutputBuffer.element( outputIndex.add( 3 ) ).assign( outputValueToWrite.w );
+
 				startThread.addAssign( subgroupSize );
 
-			}, ( currentSubgroupInBlock ) => {
+			};
+
+			this._workPerInvocationBlock( writeSweepValue, ( currentSubgroupInBlock ) => {
 
 				If( startThread.lessThan( uint( vecCount ) ), () => {
 
-					const sweepValue = tScan.element( currentSubgroupInBlock ).add( prev );
-					outputBuffer.element( startThread ).assign( sweepValue );
-					startThread.addAssign( subgroupSize );
+					writeSweepValue( currentSubgroupInBlock );
 
 				} );
 
 			} );
+
+			// If there is an output offset, append additional code to the downsweep
+			// shader ensuring invocation 0 zeros out all data in the range [0-outputIndexOffset]
+			if ( outputIndexOffset > 0 ) {
+
+				workgroupBarrier();
+
+				If( workgroupId.x.equal( uint( 0 ) ).and( invocationLocalIndex.equal( uint( 0 ) ) ), () => {
+
+					Loop( { start: 0, end: outputIndexOffset, type: 'uint', condition: '<', name: 'x' }, ( { x } ) => {
+
+						unvectorizedOutputBuffer.element( x ).assign( this._getZeroNode() );
+
+					} );
+
+				} );
+
+			}
 
 		} )().compute( this.dispatchSize, [ this.workgroupSize ] );
 
@@ -1011,17 +1077,29 @@ export class PrefixSum {
 
 	}
 
-	_handleSubgroupInfo() {
+	_handleSubgroupInfo( renderer ) {
 
-		this.minSubgroupSize = this.renderer.backend.device.adapterInfo.subgroupMinSize;
+		const device = renderer.backend.device;
+
+		if ( device !== undefined && device.adapterInfo && device.adapterInfo.subgroupMinSize ) {
+
+			this.minSubgroupSize = device.adapterInfo.subgroupMinSize;
+
+		} else {
+
+			return false;
+
+		}
+
 		if ( this.numWorkgroups <= this.minSubgroupSize ) {
 
 			this.computeFunctions.spineScanFn = this.computeFunctions.spineScanShortFn;
-			return;
+			return true;
 
 		}
 
 		this.computeFunctions.spineScanFn = this.computeFunctions.spineScanLongFn;
+		return true;
 
 	}
 
@@ -1029,10 +1107,14 @@ export class PrefixSum {
 
 		if ( renderer.hasFeature( 'subgroups' ) ) {
 
-			this._handleSubgroupInfo();
-			this._computeWithSubgroups( renderer );
-			this.compute = this._computeWithSubgroups;
-			return;
+			const hasParsedSubgroupInfo = this._handleSubgroupInfo( renderer );
+			if ( hasParsedSubgroupInfo ) {
+
+				this._computeWithSubgroups( renderer );
+				this.compute = this._computeWithSubgroups;
+				return;
+
+			}
 
 		}
 
@@ -1044,7 +1126,7 @@ export class PrefixSum {
 
 	_computeWithSingleInvocation( renderer ) {
 
-		renderer.compute( this.computeFunctions.singleThreadPrefixSumFn );
+		renderer.compute( this.computeFunctions.singleThreadPrefixFn );
 
 	}
 

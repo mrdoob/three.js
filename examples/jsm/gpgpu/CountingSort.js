@@ -1,5 +1,6 @@
 import { StorageBufferAttribute, DynamicDrawUsage } from 'three/webgpu';
-import { Fn, Loop, atomicAdd, atomicLoad, atomicStore, instanceIndex, storage, uint } from 'three/tsl';
+import { Fn, atomicAdd, atomicStore, instanceIndex, storage, uint } from 'three/tsl';
+import { PrefixSum } from './PrefixSum.js';
 
 /**
  * A reusable GPU counting sort.
@@ -39,7 +40,7 @@ class CountingSort {
 	 *
 	 * @param {number} count - The number of elements to sort.
 	 * @param {Object} [options={}] - Options that modify the counting sort.
-	 * @param {number} [options.binCount=4096] - The number of bins/buckets the sort key is quantized into. Larger values improve sort accuracy at the cost of a longer (but still single-pass) prefix sum.
+	 * @param {number} [options.binCount=4096] - The number of bins/buckets the sort key is quantized into. Larger values improve sort accuracy at the cost of a longer (but still single-pass) prefix sum. Rounded up to a multiple of four.
 	 * @param {number} [options.workgroupSize=256] - The workgroup size of the compute shaders executed during the sort.
 	 */
 	constructor( count, { binCount = 4096, workgroupSize = 256 } = {} ) {
@@ -77,8 +78,20 @@ class CountingSort {
 		this.orderAttribute = new StorageBufferAttribute( orderData, 1, Uint32Array );
 
 		const binAttribute = new StorageBufferAttribute( new Uint32Array( count ), 1, Uint32Array );
-		const histogramAttribute = new StorageBufferAttribute( new Uint32Array( binCount ), 1, Uint32Array );
-		const offsetAttribute = new StorageBufferAttribute( new Uint32Array( binCount ), 1, Uint32Array );
+
+		/**
+		 * The buffer attribute holding the per-bin histogram.
+		 *
+		 * @type {StorageBufferAttribute}
+		 */
+		this.histogramAttribute = new StorageBufferAttribute( new Uint32Array( binCount ), 1, Uint32Array );
+
+		/**
+		 * The buffer attribute holding the exclusive prefix sum of the histogram.
+		 *
+		 * @type {StorageBufferAttribute}
+		 */
+		this.offsetAttribute = new StorageBufferAttribute( new Uint32Array( binCount ), 1, Uint32Array );
 
 		/**
 		 * A read-only storage node for the sorted order buffer.
@@ -113,7 +126,7 @@ class CountingSort {
 		 *
 		 * @type {StorageBufferNode}
 		 */
-		this.histogramAtomic = storage( histogramAttribute, 'uint', binCount ).toAtomic();
+		this.histogramAtomic = storage( this.histogramAttribute, 'uint', binCount ).toAtomic();
 
 		/**
 		 * An atomic storage node used both for the exclusive prefix sum of the histogram and, during
@@ -121,7 +134,21 @@ class CountingSort {
 		 *
 		 * @type {StorageBufferNode}
 		 */
-		this.offsetAtomic = storage( offsetAttribute, 'uint', binCount ).toAtomic();
+		this.offsetAtomic = storage( this.offsetAttribute, 'uint', binCount ).toAtomic();
+
+		/**
+		 * The prefix sum turning the histogram into the per-bin write offsets. It is handed the raw
+		 * attributes rather than the atomic storage nodes above so that it can build its own vectorized
+		 * view of them.
+		 *
+		 * @private
+		 * @type {PrefixSum}
+		 */
+		this._prefixSum = new PrefixSum( this.histogramAttribute, {
+			outputAttribute: this.offsetAttribute,
+			isInclusive: false,
+			workgroupSize
+		} );
 
 		this._webGLBuffersEnabled = false;
 
@@ -131,7 +158,6 @@ class CountingSort {
 
 		this._resetNode = null;
 		this._histogramNode = null;
-		this._prefixNode = null;
 		this._scatterNode = null;
 
 	}
@@ -162,20 +188,6 @@ class CountingSort {
 
 		} )().compute( count, [ workgroupSize ] ).setName( 'CountingSortHistogram' );
 
-		this._prefixNode = Fn( () => {
-
-			const sum = uint( 0 ).toVar( 'sum' );
-
-			Loop( { start: 0, end: binCount, type: 'uint', name: 'bin', condition: '<' }, ( { bin } ) => {
-
-				const binCountValue = atomicLoad( this.histogramAtomic.element( bin ) ).toVar( 'count' );
-				atomicStore( this.offsetAtomic.element( bin ), sum );
-				sum.addAssign( binCountValue );
-
-			} );
-
-		} )().compute( 1 ).setName( 'CountingSortPrefix' );
-
 		this._scatterNode = Fn( () => {
 
 			const bin = this.binRead.element( instanceIndex ).toVar( 'bin' );
@@ -196,7 +208,7 @@ class CountingSort {
 
 		renderer.compute( this._resetNode );
 		renderer.compute( this._histogramNode );
-		renderer.compute( this._prefixNode );
+		this._prefixSum.compute( renderer );
 		renderer.compute( this._scatterNode );
 
 	}
