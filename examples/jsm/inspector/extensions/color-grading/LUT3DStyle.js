@@ -584,8 +584,12 @@ export class LUT3DStyle {
 		cursor: grabbing !important;
 	}
 
+	.lut-card-nodrag .lut-card-header {
+		cursor: default !important;
+	}
+
 	.lut-card.lut-card-moving {
-		opacity: 0.85 !important;
+		opacity: 0.2 !important;
 		border: 1px solid var(--color-accent, #00aaff) !important;
 		box-shadow: 0 4px 16px rgba(0, 170, 255, 0.3) !important;
 		z-index: 10;

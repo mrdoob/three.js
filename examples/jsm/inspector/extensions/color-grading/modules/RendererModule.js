@@ -23,6 +23,8 @@ export class RendererModule extends Module {
 			exposure: initialExposure
 		} );
 
+		this.dragAndDrop = false;
+
 		this.defaultToneMapping = initialToneMapping;
 		this.defaultExposure = initialExposure;
 

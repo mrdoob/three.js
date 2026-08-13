@@ -12,6 +12,8 @@ export class OutputModule extends Module {
 			fileName: initialFileName
 		} );
 
+		this.dragAndDrop = false;
+
 		this.onChange = onChange;
 
 		const card = document.createElement( 'div' );

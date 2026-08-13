@@ -13,6 +13,7 @@ export class Module {
 		this.enabled = true;
 		this.domElement = null;
 		this.onChange = null;
+		this.dragAndDrop = true;
 
 	}
 

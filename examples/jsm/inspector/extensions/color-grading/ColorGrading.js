@@ -1384,59 +1384,87 @@ export class ColorGrading extends Extension {
 
 		card.setAttribute( 'data-module-id', moduleId );
 
+		const comp = this.modulesMap.get( moduleId );
+		const isDraggable = comp ? comp.dragAndDrop !== false : true;
+
+		if ( ! isDraggable ) {
+
+			card.classList.add( 'lut-card-nodrag' );
+
+		}
+
 		const header = card.querySelector( '.lut-card-header' );
 
 		if ( header ) {
 
-			header.draggable = true;
+			if ( isDraggable ) {
 
-			if ( ! header.querySelector( '.lut-card-drag-handle' ) ) {
+				header.draggable = true;
 
-				const dragHandle = document.createElement( 'div' );
-				dragHandle.className = 'lut-card-drag-handle';
-				header.insertBefore( dragHandle, header.firstChild );
+				if ( ! header.querySelector( '.lut-card-drag-handle' ) ) {
 
-			}
-
-			header.ondragstart = ( e ) => {
-
-				e.dataTransfer.setData( 'text/plain', moduleId );
-				e.dataTransfer.effectAllowed = 'move';
-				card.classList.add( 'lut-card-moving' );
-				this._draggedModuleId = moduleId;
-
-				this._updateLiveFlowConnectors();
-
-			};
-
-			header.ondragend = () => {
-
-				card.classList.remove( 'lut-card-moving' );
-				this._draggedModuleId = null;
-
-				const newOrder = [];
-				const childCards = this.cardsRow.querySelectorAll( '.lut-card' );
-				childCards.forEach( childCard => {
-
-					const id = childCard.getAttribute( 'data-module-id' );
-					if ( id && ! newOrder.includes( id ) ) {
-
-						newOrder.push( id );
-
-					}
-
-				} );
-
-				if ( newOrder.length > 0 ) {
-
-					this.pipelineOrder = newOrder;
+					const dragHandle = document.createElement( 'div' );
+					dragHandle.className = 'lut-card-drag-handle';
+					header.insertBefore( dragHandle, header.firstChild );
 
 				}
 
-				this._renderCardsFlow();
-				this._onParamChange();
+				header.ondragstart = ( e ) => {
 
-			};
+					e.dataTransfer.setData( 'text/plain', moduleId );
+					e.dataTransfer.effectAllowed = 'move';
+
+					const rect = card.getBoundingClientRect();
+					const xOffset = e.clientX - rect.left;
+					const yOffset = e.clientY - rect.top;
+					e.dataTransfer.setDragImage( card, xOffset, yOffset );
+
+					this._draggedModuleId = moduleId;
+
+					setTimeout( () => {
+
+						card.classList.add( 'lut-card-moving' );
+
+					}, 0 );
+
+					this._updateLiveFlowConnectors();
+
+				};
+
+				header.ondragend = () => {
+
+					card.classList.remove( 'lut-card-moving' );
+					this._draggedModuleId = null;
+
+					const newOrder = [];
+					const childCards = this.cardsRow.querySelectorAll( '.lut-card' );
+					childCards.forEach( childCard => {
+
+						const id = childCard.getAttribute( 'data-module-id' );
+						if ( id && ! newOrder.includes( id ) ) {
+
+							newOrder.push( id );
+
+						}
+
+					} );
+
+					if ( newOrder.length > 0 ) {
+
+						this.pipelineOrder = newOrder;
+
+					}
+
+					this._renderCardsFlow();
+					this._onParamChange();
+
+				};
+
+			} else {
+
+				header.draggable = false;
+
+			}
 
 		}
 
@@ -1450,26 +1478,82 @@ export class ColorGrading extends Extension {
 				const draggedCard = this.cardsMap.get( this._draggedModuleId );
 				if ( card === draggedCard ) return;
 
+				const targetComp = this.modulesMap.get( moduleId );
+				if ( targetComp && targetComp.dragAndDrop === false ) return;
+
+				const draggedComp = this.modulesMap.get( this._draggedModuleId );
+				if ( draggedComp && draggedComp.dragAndDrop === false ) return;
+
 				const rect = card.getBoundingClientRect();
-				const midX = rect.left + rect.width / 2;
+				const isVert = this._isVerticalMode();
+
+				const childCards = Array.from( this.cardsRow.querySelectorAll( '.lut-card' ) );
+				const draggedIndex = childCards.indexOf( draggedCard );
+				const targetIndex = childCards.indexOf( card );
 
 				let changed = false;
 
-				if ( e.clientX < midX ) {
+				if ( isVert ) {
 
-					if ( card.previousSibling !== draggedCard ) {
+					const relativeY = ( e.clientY - rect.top ) / rect.height;
 
-						this.cardsRow.insertBefore( draggedCard, card );
-						changed = true;
+					if ( draggedIndex < targetIndex ) {
+
+						if ( relativeY > 0.05 ) {
+
+							if ( card.nextSibling !== draggedCard ) {
+
+								this.cardsRow.insertBefore( draggedCard, card.nextSibling );
+								changed = true;
+
+							}
+
+						}
+
+					} else {
+
+						if ( relativeY < 0.95 ) {
+
+							if ( card.previousSibling !== draggedCard ) {
+
+								this.cardsRow.insertBefore( draggedCard, card );
+								changed = true;
+
+							}
+
+						}
 
 					}
 
 				} else {
 
-					if ( card.nextSibling !== draggedCard ) {
+					const relativeX = ( e.clientX - rect.left ) / rect.width;
 
-						this.cardsRow.insertBefore( draggedCard, card.nextSibling );
-						changed = true;
+					if ( draggedIndex < targetIndex ) {
+
+						if ( relativeX > 0.05 ) {
+
+							if ( card.nextSibling !== draggedCard ) {
+
+								this.cardsRow.insertBefore( draggedCard, card.nextSibling );
+								changed = true;
+
+							}
+
+						}
+
+					} else {
+
+						if ( relativeX < 0.95 ) {
+
+							if ( card.previousSibling !== draggedCard ) {
+
+								this.cardsRow.insertBefore( draggedCard, card );
+								changed = true;
+
+							}
+
+						}
 
 					}
 
