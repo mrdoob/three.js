@@ -1349,7 +1349,9 @@ class Timeline extends Tab {
 		this.renderTimelineTrack( frame );
 
 		// Update UI texts
-		const isCompact = this.profiler.panel.offsetWidth < 800;
+		const panelWidth = this.content.offsetWidth;
+
+		const isCompact = panelWidth < 800;
 		const frameLabel = isCompact ? '' : 'Frame: ';
 		const fpsSuffix = isCompact ? '' : ' FPS';
 		const callsSuffix = isCompact ? '' : ' calls';
