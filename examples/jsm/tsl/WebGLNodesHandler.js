@@ -87,6 +87,15 @@ class WebGLNodeBuilder extends GLSLNodeBuilder {
 
 }
 
+const _lights = new Set();
+let _camera = null;
+
+function collectLight( child ) {
+
+	if ( child.isLight && child.layers.test( _camera.layers ) ) _lights.add( child );
+
+}
+
 // produce and update reusable nodes for a scene
 class SceneContext {
 
@@ -95,6 +104,7 @@ class SceneContext {
 		// TODO: can / should we update the fog and environment node every frame for recompile?
 		this.renderer = renderer;
 		this.scene = scene;
+		this.sceneLights = [];
 		this.lightsNode = renderer.lighting.getNode( scene );
 		this.fogNode = null;
 		this.environmentNode = null;
@@ -115,26 +125,21 @@ class SceneContext {
 
 	update( object, camera ) {
 
-		const { scene, lightsNode } = this;
+		const { scene, lightsNode, sceneLights } = this;
 
 		// update lighting
-		const sceneLights = [];
-		const seenLights = new Set();
-		const collectLight = child => {
-
-			if ( child.isLight && child.layers.test( camera.layers ) && seenLights.has( child ) === false ) {
-
-				seenLights.add( child );
-				sceneLights.push( child );
-
-			}
-
-		};
+		_camera = camera;
+		_lights.clear();
 
 		scene.traverseVisible( collectLight );
 
 		// compile() can receive an object that has not been added to the target scene yet.
 		if ( object !== scene ) object.traverseVisible( collectLight );
+
+		_camera = null;
+
+		sceneLights.length = 0;
+		sceneLights.push( ..._lights );
 
 		lightsNode.setLights( sceneLights );
 
