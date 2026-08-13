@@ -40,7 +40,7 @@ class CountingSort {
 	 *
 	 * @param {number} count - The number of elements to sort.
 	 * @param {Object} [options={}] - Options that modify the counting sort.
-	 * @param {number} [options.binCount=4096] - The number of bins/buckets the sort key is quantized into. Larger values improve sort accuracy at the cost of a longer (but still single-pass) prefix sum. Rounded up to a multiple of four.
+	 * @param {number} [options.binCount=4096] - The number of bins/buckets the sort key is quantized into. Larger values improve sort accuracy at the cost of a longer (but still single-pass) prefix sum.
 	 * @param {number} [options.workgroupSize=256] - The workgroup size of the compute shaders executed during the sort.
 	 */
 	constructor( count, { binCount = 4096, workgroupSize = 256 } = {} ) {
@@ -78,20 +78,8 @@ class CountingSort {
 		this.orderAttribute = new StorageBufferAttribute( orderData, 1, Uint32Array );
 
 		const binAttribute = new StorageBufferAttribute( new Uint32Array( count ), 1, Uint32Array );
-
-		/**
-		 * The buffer attribute holding the per-bin histogram.
-		 *
-		 * @type {StorageBufferAttribute}
-		 */
-		this.histogramAttribute = new StorageBufferAttribute( new Uint32Array( binCount ), 1, Uint32Array );
-
-		/**
-		 * The buffer attribute holding the exclusive prefix sum of the histogram.
-		 *
-		 * @type {StorageBufferAttribute}
-		 */
-		this.offsetAttribute = new StorageBufferAttribute( new Uint32Array( binCount ), 1, Uint32Array );
+		const histogramAttribute = new StorageBufferAttribute( new Uint32Array( binCount ), 1, Uint32Array );
+		const offsetAttribute = new StorageBufferAttribute( new Uint32Array( binCount ), 1, Uint32Array );
 
 		/**
 		 * A read-only storage node for the sorted order buffer.
@@ -126,7 +114,7 @@ class CountingSort {
 		 *
 		 * @type {StorageBufferNode}
 		 */
-		this.histogramAtomic = storage( this.histogramAttribute, 'uint', binCount ).toAtomic();
+		this.histogramAtomic = storage( histogramAttribute, 'uint', binCount ).toAtomic();
 
 		/**
 		 * An atomic storage node used both for the exclusive prefix sum of the histogram and, during
@@ -134,7 +122,7 @@ class CountingSort {
 		 *
 		 * @type {StorageBufferNode}
 		 */
-		this.offsetAtomic = storage( this.offsetAttribute, 'uint', binCount ).toAtomic();
+		this.offsetAtomic = storage( offsetAttribute, 'uint', binCount ).toAtomic();
 
 		/**
 		 * The prefix sum turning the histogram into the per-bin write offsets. It is handed the raw
@@ -144,8 +132,8 @@ class CountingSort {
 		 * @private
 		 * @type {PrefixSum}
 		 */
-		this._prefixSum = new PrefixSum( this.histogramAttribute, {
-			outputAttribute: this.offsetAttribute,
+		this._prefixSum = new PrefixSum( histogramAttribute, {
+			outputAttribute: offsetAttribute,
 			isInclusive: false,
 			workgroupSize
 		} );
