@@ -264,4 +264,6 @@ export class Tab extends EventDispatcher {
 
 	}
 
+	dispose() { }
+
 }

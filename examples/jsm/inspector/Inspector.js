@@ -22,6 +22,8 @@ class Inspector extends RendererInspector {
 
 		const profiler = new Profiler( this );
 		profiler.addEventListener( 'resize', ( e ) => this.dispatchEvent( e ) );
+		profiler.addEventListener( 'orientationchange', ( e ) => this.dispatchEvent( e ) );
+		profiler.addEventListener( 'layoutchange', ( e ) => this.dispatchEvent( e ) );
 
 		const parameters = new Parameters( {
 			builtin: true,
@@ -92,6 +94,12 @@ class Inspector extends RendererInspector {
 	get domElement() {
 
 		return this.profiler.domElement;
+
+	}
+
+	isVertical() {
+
+		return this.profiler ? this.profiler.isVertical() : false;
 
 	}
 
@@ -188,6 +196,8 @@ class Inspector extends RendererInspector {
 	}
 
 	removeTab( tab ) {
+
+		tab.dispose();
 
 		this.profiler.removeTab( tab );
 
