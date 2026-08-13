@@ -55,25 +55,19 @@
 
 				scene.fog = new THREE.Fog( 0x99DDFF, 5000, 10000 );
 
-				const light = new THREE.DirectionalLight( 0xffffff, 1 );
+				const light = new THREE.SunLight( 0xffffff, 2 );
 
-				light.position.set( 200, 1000, 50 );
+				light.setFromSphericalAngles( THREE.MathUtils.degToRad( 80 ), THREE.MathUtils.degToRad( 75 ) );
 
 				light.castShadow = true;
 
-				light.shadow.camera.left = - 5000;
-				light.shadow.camera.right = 5000;
-				light.shadow.camera.top = 5000;
-				light.shadow.camera.bottom = - 5000;
-				light.shadow.camera.far = 2000;
+				light.shadow.camera.far = 10000;
 
-				light.shadow.bias = - 0.01;
-
-				light.shadow.camera.updateProjectionMatrix();
+				light.shadow.mapSize.setScalar( 2048 );
 
 				scene.add( light );
 
-				const hemi = new THREE.HemisphereLight( 0x99DDFF, 0x669933, 1 / 3 );
+				const hemi = new THREE.HemisphereLight( 0x99DDFF, 0x669933, 0.5 );
 
 				scene.add( hemi );
 
@@ -135,7 +129,6 @@
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.VSMShadowMap;
 				//
 
 				stats = new Stats();

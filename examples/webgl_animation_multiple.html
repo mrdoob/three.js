@@ -61,18 +61,11 @@
 				hemiLight.position.set( 0, 20, 0 );
 				scene.add( hemiLight );
 
-				const dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
-				dirLight.position.set( - 3, 10, - 10 );
-				dirLight.castShadow = true;
-				dirLight.shadow.camera.top = 4;
-				dirLight.shadow.camera.bottom = - 4;
-				dirLight.shadow.camera.left = - 4;
-				dirLight.shadow.camera.right = 4;
-				dirLight.shadow.camera.near = 0.1;
-				dirLight.shadow.camera.far = 40;
-				scene.add( dirLight );
-
-				// scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
+				const sunLight = new THREE.SunLight( 0xffffff, 3 );
+				sunLight.setFromSphericalAngles( THREE.MathUtils.degToRad( 45 ), THREE.MathUtils.degToRad( - 165 ) );
+				sunLight.castShadow = true;
+				sunLight.shadow.camera.far = 20;
+				scene.add( sunLight );
 
 				// ground
 
