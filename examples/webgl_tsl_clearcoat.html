@@ -165,6 +165,13 @@
 							scene.background = texture;
 							scene.environment = texture;
 
+							renderer.compileAsync( particleLight, camera, scene ).then( () => {
+
+								scene.add( particleLight );
+								renderer.setAnimationLoop( animate );
+
+							} ).catch( console.error );
+
 						}
 
 					);
@@ -175,6 +182,7 @@
 					new THREE.SphereGeometry( .05, 8, 8 ),
 					new THREE.MeshBasicNodeMaterial( { color: 0xffffff } )
 				);
+				particleLight.receiveShadow = true;
 
 				const pointLight = new THREE.PointLight( 0xffffff, 30 );
 				pointLight.castShadow = true;
@@ -199,13 +207,6 @@
 				controls.maxDistance = 30;
 
 				window.addEventListener( 'resize', onWindowResize );
-
-				renderer.compileAsync( particleLight, camera, scene ).then( () => {
-
-					scene.add( particleLight );
-					renderer.setAnimationLoop( animate );
-
-				} ).catch( console.error );
 
 			}
 

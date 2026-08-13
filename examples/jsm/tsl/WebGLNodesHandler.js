@@ -107,32 +107,34 @@ class SceneContext {
 
 		const { lightsNode, environmentNode, fogNode } = this;
 		const lightsHash = lightsNode.getCacheKey();
-		const envHash = environmentNode ? environmentNode.getCacheKey : 0;
+		const envHash = environmentNode ? environmentNode.getCacheKey() : 0;
 		const fogHash = fogNode ? fogNode.getCacheKey() : 0;
 		return NodeUtils.hashArray( [ lightsHash, envHash, fogHash ] );
 
 	}
 
-	update( object = null ) {
+	update( object, camera ) {
 
 		const { scene, lightsNode } = this;
 
 		// update lighting
 		const sceneLights = [];
+		const seenLights = new Set();
 		const collectLight = child => {
 
-			if ( child.isLight ) {
+			if ( child.isLight && child.layers.test( camera.layers ) && seenLights.has( child ) === false ) {
 
+				seenLights.add( child );
 				sceneLights.push( child );
 
 			}
 
 		};
 
-		scene.traverse( collectLight );
+		scene.traverseVisible( collectLight );
 
 		// compile() can receive an object that has not been added to the target scene yet.
-		if ( object !== null && object !== scene ) object.traverse( collectLight );
+		if ( object !== scene ) object.traverseVisible( collectLight );
 
 		lightsNode.setLights( sceneLights );
 
@@ -422,7 +424,7 @@ export class WebGLNodesHandler {
 
 		}
 
-		sceneContext.update( scene );
+		sceneContext.update( scene, camera );
 		renderStack.push( { sceneContext, camera } );
 
 		// ensure all node material callbacks are initialized before
@@ -434,10 +436,15 @@ export class WebGLNodesHandler {
 
 		scene.traverse( object => {
 
-			if ( object.material && object.material.isNodeMaterial ) {
+			const materials = Array.isArray( object.material ) ? object.material : [ object.material ];
+			for ( const material of materials ) {
 
-				object.material.customProgramCacheKey = customProgramCacheKeyCallback;
-				object.material.onBeforeRender = onBeforeRenderCallback;
+				if ( material && material.isNodeMaterial ) {
+
+					material.customProgramCacheKey = customProgramCacheKeyCallback;
+					material.onBeforeRender = onBeforeRenderCallback;
+
+				}
 
 			}
 
