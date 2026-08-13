@@ -32,6 +32,8 @@ const _cascadeFade = 0.1;
  * whichever is smaller), and adjacent cascades blend into each other over a
  * small depth range. `camera.left/right/top/bottom` are ignored.
  *
+ * The default `mapSize` is `1024x1024` per cascade.
+ *
  * @augments LightShadow
  */
 class SunLightShadow extends LightShadow {
@@ -51,6 +53,8 @@ class SunLightShadow extends LightShadow {
 		 * @default true
 		 */
 		this.isSunLightShadow = true;
+
+		this.mapSize.set( 1024, 1024 );
 
 		this._cameras = [];
 		this._matrices = [];
