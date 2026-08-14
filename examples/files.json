@@ -301,6 +301,7 @@
 		"webgl_tsl_shadowmap",
 		"webgl_tsl_skinning",
 		"webgl_tsl_clearcoat",
+		"webgl_tsl_compile_async",
 		"webgl_tsl_instancing"
 	],
 	"webgpu": [
