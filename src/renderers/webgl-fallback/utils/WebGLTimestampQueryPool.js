@@ -222,6 +222,8 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 			const frames = [];
 
+			this.timestamps.clear();
+
 			for ( const [ uid, promise ] of resolvePromises ) {
 
 				const match = uid.match( /^(.*):f(\d+)$/ );
@@ -386,6 +388,8 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 		this.queries = [];
 		this.queryStates.clear();
 		this.queryOffsets.clear();
+		this.timestamps.clear();
+		this.frames = [];
 		this.lastValue = 0;
 		this.activeQuery = null;
 
