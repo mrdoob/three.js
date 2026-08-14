@@ -3,7 +3,6 @@ import { EventDispatcher } from '../../core/EventDispatcher.js';
 /**
  * InspectorBase is the base class for all inspectors.
  *
- * @class InspectorBase
  * @augments EventDispatcher
  */
 class InspectorBase extends EventDispatcher {
