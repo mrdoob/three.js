@@ -47,8 +47,6 @@
 			let modelSize = null;
 			let sunLight = null, sky = null;
 			
-			const sun = new THREE.Vector3();
-
 			const _box = new THREE.Box3();
 			const _size = new THREE.Vector3();
 
@@ -170,10 +168,8 @@
 					const elevation = THREE.MathUtils.degToRad( params.lightElevation );
 					const azimuth = THREE.MathUtils.degToRad( params.lightAzimuth );
 
-					sunLight.setFromSphericalAngles( elevation, azimuth );
-
-					sun.setFromSphericalCoords( 1, Math.PI / 2 - elevation, azimuth );
-					sky.material.uniforms[ 'sunPosition' ].value.copy( sun );
+					sunLight.position.setFromSphericalCoords( 1, Math.PI / 2 - elevation, azimuth );
+					sky.material.uniforms[ 'sunPosition' ].value.copy( sunLight.position );
 
 				}
 

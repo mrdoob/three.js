@@ -57,7 +57,7 @@
 
 				const light = new THREE.SunLight( 0xffffff, 2 );
 
-				light.setFromSphericalAngles( THREE.MathUtils.degToRad( 80 ), THREE.MathUtils.degToRad( 75 ) );
+				light.position.set( 200, 1000, 50 );
 
 				light.castShadow = true;
 

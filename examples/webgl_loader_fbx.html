@@ -91,7 +91,7 @@
 				scene.add( hemiLight );
 
 				const sunLight = new THREE.SunLight( 0xffffff, 5 );
-				sunLight.setFromSphericalAngles( THREE.MathUtils.degToRad( 65 ), THREE.MathUtils.degToRad( 0 ) );
+				sunLight.position.set( 0, 200, 100 );
 				sunLight.castShadow = true;
 				scene.add( sunLight );
 

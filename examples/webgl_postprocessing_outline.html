@@ -152,7 +152,7 @@
 				scene.add( new THREE.AmbientLight( 0xaaaaaa, 0.6 ) );
 
 				const light = new THREE.SunLight( 0xddffdd, 2 );
-				light.setFromSphericalAngles( THREE.MathUtils.degToRad( 35 ), THREE.MathUtils.degToRad( 45 ) );
+				light.position.set( 5, 5, 5 );
 				light.castShadow = true;
 				light.shadow.camera.far = 40;
 				light.shadow.mapSize.setScalar( 2048 );

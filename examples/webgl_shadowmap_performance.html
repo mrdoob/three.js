@@ -80,7 +80,7 @@
 				scene.add( ambient );
 
 				const sunLight = new THREE.SunLight( 0xffffff, 3 );
-				sunLight.setFromSphericalAngles( THREE.MathUtils.degToRad( 55 ), THREE.MathUtils.degToRad( 0 ) );
+				sunLight.position.set( 0, 1500, 1000 );
 				sunLight.castShadow = true;
 				sunLight.shadow.camera.far = FAR;
 				sunLight.shadow.normalBias = 1;

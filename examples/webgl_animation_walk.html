@@ -92,7 +92,7 @@
 				scene.add( group );
 
 				const sunLight = new THREE.SunLight( 0xffffff, 5 );
-				sunLight.setFromSphericalAngles( THREE.MathUtils.degToRad( 55 ), THREE.MathUtils.degToRad( - 145 ) );
+				sunLight.position.set( - 2, 5, - 3 );
 				sunLight.castShadow = true;
 				sunLight.shadow.camera.far = 20;
 				scene.add( sunLight );

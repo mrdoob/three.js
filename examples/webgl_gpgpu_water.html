@@ -217,7 +217,7 @@
 				scene = new THREE.Scene();
 
 				sun = new THREE.SunLight( 0xFFFFFF, 4.0 );
-				sun.setFromSphericalAngles( THREE.MathUtils.degToRad( 55 ), THREE.MathUtils.degToRad( - 35 ) );
+				sun.position.set( - 1, 2.6, 1.4 );
 				scene.add( sun );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );

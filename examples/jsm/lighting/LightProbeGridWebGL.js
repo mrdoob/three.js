@@ -96,7 +96,7 @@ function _replaceSunLights( scene ) {
 		bakeLight.shadow.camera.near = radius * 0.5;
 		bakeLight.shadow.camera.far = radius * 3.5;
 
-		_sunDirection.setFromMatrixColumn( sunLight.matrixWorld, 2 ).normalize();
+		_sunDirection.setFromMatrixPosition( sunLight.matrixWorld ).normalize();
 		bakeLight.target.position.copy( center );
 		bakeLight.position.copy( center ).addScaledVector( _sunDirection, radius * 2 );
 
