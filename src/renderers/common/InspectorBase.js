@@ -29,6 +29,22 @@ class InspectorBase extends EventDispatcher {
 		 */
 		this.currentFrame = null;
 
+		/**
+		 * Indicates whether the inspector is running.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.isRunning = false;
+
+		/**
+		 * Indicates whether the inspector is enabled.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.enabled = true;
+
 	}
 
 	/**
@@ -75,12 +91,20 @@ class InspectorBase extends EventDispatcher {
 	/**
 	 * Called when a frame begins.
 	 */
-	begin() { }
+	begin() {
+
+		this.isRunning = true;
+
+	}
 
 	/**
 	 * Called when a frame ends.
 	 */
-	finish() { }
+	finish() {
+
+		this.isRunning = false;
+
+	}
 
 	/**
 	 * Inspects a node.

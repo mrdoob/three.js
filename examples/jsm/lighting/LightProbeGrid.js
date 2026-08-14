@@ -457,6 +457,10 @@ class LightProbeGrid extends Light {
 
 		const { cubemapSize = 8, near = 0.1, far = 100, bounces = 0, sampleCount = 512 } = options;
 
+		const currentInspectorEnabled = renderer.inspector.enabled;
+
+		renderer.inspector.enabled = false;
+
 		this._ensureTextures();
 		this.updateBoundingBox();
 
@@ -602,6 +606,8 @@ class LightProbeGrid extends Light {
 			for ( const { light, autoUpdate } of shadowLights ) light.shadow.autoUpdate = autoUpdate;
 
 			this.visible = true;
+
+			renderer.inspector.enabled = currentInspectorEnabled;
 
 		}
 
