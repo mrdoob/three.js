@@ -490,9 +490,9 @@ class Inspector extends RendererInspector {
 
 	resolveFrame( frame ) {
 
-		const nextFrame = this.getFrameById( frame.frameId + 1 );
+		const previousFrame = this.getFrameById( frame.frameId - 1 );
 
-		if ( ! nextFrame ) return;
+		if ( ! previousFrame ) return;
 
 		frame.cpu = 0;
 		frame.gpu = 0;
@@ -510,9 +510,9 @@ class Inspector extends RendererInspector {
 
 		}
 
-		// improve stats using next frame
+		// improve stats using previous frame
 
-		frame.deltaTime = nextFrame.startTime - frame.startTime;
+		frame.deltaTime = frame.startTime - previousFrame.startTime;
 		frame.miscellaneous = frame.deltaTime - frame.total;
 
 		if ( frame.miscellaneous < 0 ) {

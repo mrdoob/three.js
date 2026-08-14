@@ -100,6 +100,8 @@ export class RendererInspector extends InspectorBase {
 
 	begin() {
 
+		super.begin();
+
 		this.currentFrame = this._createFrame();
 		this.currentRender = this.currentFrame;
 		this.currentNodes = [];
@@ -107,6 +109,8 @@ export class RendererInspector extends InspectorBase {
 	}
 
 	finish() {
+
+		super.finish();
 
 		const now = performance.now();
 
@@ -368,9 +372,9 @@ export class RendererInspector extends InspectorBase {
 
 						}
 
-						const nextFrame = this.getFrameById( frame.frameId + 1 );
+						const previousFrame = this.getFrameById( frame.frameId - 1 );
 
-						if ( nextFrame === null ) continue;
+						if ( previousFrame === null ) continue;
 
 						if ( frame.resolvedCompute === false ) {
 
