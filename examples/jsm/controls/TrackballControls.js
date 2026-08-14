@@ -122,6 +122,15 @@ class TrackballControls extends Controls {
 		this.noPan = false;
 
 		/**
+		 * Whether the two finger twist gesture rolls 
+		 * the camera around its view axis or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.multiTouchRotate = false;
+
+		/**
 		 * Whether damping is disabled or not.
 		 *
 		 * @type {boolean}
@@ -212,6 +221,8 @@ class TrackballControls extends Controls {
 		this._lastZoom = 1;
 		this._touchZoomDistanceStart = 0;
 		this._touchZoomDistanceEnd = 0;
+		this._touchRotationAngle = 0;
+		this._touchRotationPointerIds = '';
 		this._lastAngle = 0;
 
 		this._eye = new Vector3();
@@ -330,6 +341,12 @@ class TrackballControls extends Controls {
 		if ( ! this.noRotate ) {
 
 			this._rotateCamera();
+
+			if ( this.multiTouchRotate === true ) {
+
+				this._rollCamera();
+
+			}
 
 		}
 
@@ -486,6 +503,60 @@ class TrackballControls extends Controls {
 		}
 
 		this._movePrev.copy( this._moveCurr );
+
+	}
+
+	_rollCamera() {
+
+		const first = this._pointers[ 0 ];
+		const second = this._pointers[ 1 ];
+
+		if ( second === undefined || first.pointerType !== 'touch' || second.pointerType !== 'touch' ) {
+
+			this._touchRotationPointerIds = '';
+			return;
+
+		}
+
+		const pointerIds = `${ first.pointerId },${ second.pointerId }`;
+
+		const positionFirst = this._pointerPositions[ first.pointerId ];
+		const positionSecond = this._pointerPositions[ second.pointerId ];
+
+		const rotationAngle = Math.atan2( positionSecond.y - positionFirst.y, positionSecond.x - positionFirst.x );
+
+		// fingeres changed or new gesture started
+		if ( pointerIds !== this._touchRotationPointerIds ) {
+
+			this._touchRotationPointerIds = pointerIds;
+			this._touchRotationAngle = rotationAngle;
+			return;
+
+		}
+
+		let angle = rotationAngle - this._touchRotationAngle;
+		this._touchRotationAngle = rotationAngle;
+
+		if ( angle > Math.PI ) {
+
+			angle -= 2 * Math.PI;
+
+		} else if ( angle < - Math.PI ) {
+
+			angle += 2 * Math.PI;
+
+		}
+
+		if ( angle === 0 ) {
+
+			return;
+
+		}
+
+		_eyeDirection.copy( this._eye ).normalize();
+		_quaternion.setFromAxisAngle( _eyeDirection, angle * this.rotateSpeed );
+
+		this.object.up.applyQuaternion( _quaternion );
 
 	}
 

@@ -47,7 +47,8 @@
 			let perspectiveCamera, orthographicCamera, controls, scene, renderer, stats;
 
 			const params = {
-				orthographicCamera: false
+				orthographicCamera: false,
+				multiTouchRotate: true
 			};
 
 			const frustumSize = 400;
@@ -124,6 +125,12 @@
 
 				} );
 
+				gui.add( params, 'multiTouchRotate' ).name( 'multi touch rotate' ).onChange( function ( value ) {
+
+					controls.multiTouchRotate = value;
+
+				} );
+
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -139,6 +146,8 @@
 				controls.rotateSpeed = 1.0;
 				controls.zoomSpeed = 1.2;
 				controls.panSpeed = 0.8;
+
+				controls.multiTouchRotate = params.multiTouchRotate;
 
 				controls.keys = [ 'KeyA', 'KeyS', 'KeyD' ];
 
