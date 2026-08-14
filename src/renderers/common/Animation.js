@@ -103,6 +103,8 @@ class Animation {
 	 */
 	stop() {
 
+		if ( this.renderer._inspector.isRunning ) this.renderer._inspector.finish();
+
 		if ( this._context !== null ) this._context.cancelAnimationFrame( this._requestId );
 
 		this._requestId = null;
