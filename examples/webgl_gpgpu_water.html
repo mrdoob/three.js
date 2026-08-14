@@ -216,7 +216,7 @@
 
 				scene = new THREE.Scene();
 
-				sun = new THREE.DirectionalLight( 0xFFFFFF, 4.0 );
+				sun = new THREE.SunLight( 0xFFFFFF, 4.0 );
 				sun.position.set( - 1, 2.6, 1.4 );
 				scene.add( sun );
 
@@ -444,23 +444,15 @@
 
 					renderer.shadowMap.type = THREE.VSMShadowMap;
 					const shadow = sun.shadow;
-					shadow.mapSize.width = shadow.mapSize.height = 2048;
 					shadow.radius = 2;
 					shadow.bias = - 0.0005;
-					const shadowCam = shadow.camera, s = 5;
-					shadowCam.near = 0.1;
-					shadowCam.far = 6;
-					shadowCam.right = shadowCam.top	= s;
-					shadowCam.left = shadowCam.bottom = - s;
+					shadow.camera.far = 6;
 
 				} else {
 
 					if ( sun.shadow ) sun.shadow.dispose();
 
 				}
-
-				// debug shadow
-				//scene.add(  new THREE.CameraHelper(shadowCam) );
 
 			}
 
