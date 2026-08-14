@@ -457,6 +457,8 @@ export class RendererInspector extends InspectorBase {
 
 	inspect( node ) {
 
+		if ( this.enabled === false ) return;
+
 		const currentNodes = this.currentNodes;
 
 		if ( currentNodes !== null ) {

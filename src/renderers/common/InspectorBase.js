@@ -38,6 +38,14 @@ class InspectorBase extends EventDispatcher {
 		 */
 		this.isRunning = false;
 
+		/**
+		 * Indicates whether the inspector is enabled.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.enabled = true;
+
 	}
 
 	/**
