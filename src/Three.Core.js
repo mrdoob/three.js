@@ -60,6 +60,8 @@ export { SpotLight } from './lights/SpotLight.js';
 export { PointLight } from './lights/PointLight.js';
 export { RectAreaLight } from './lights/RectAreaLight.js';
 export { HemisphereLight } from './lights/HemisphereLight.js';
+export { SunLight } from './lights/SunLight.js';
+export { SunLightShadow } from './lights/SunLightShadow.js';
 export { DirectionalLight } from './lights/DirectionalLight.js';
 export { AmbientLight } from './lights/AmbientLight.js';
 export { Light } from './lights/Light.js';
