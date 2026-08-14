@@ -565,7 +565,7 @@ function WebGLLights( extensions ) {
 
 				const uniforms = state.sun[ sunLength ];
 
-				uniforms.direction.setFromMatrixColumn( light.matrixWorld, 2 );
+				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
 				uniforms.direction.transformDirection( viewMatrix );
 
 				sunLength ++;

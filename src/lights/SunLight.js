@@ -1,24 +1,20 @@
 import { Light } from './Light.js';
 import { SunLightShadow } from './SunLightShadow.js';
-import { Vector3 } from '../math/Vector3.js';
-
-const _direction = /*@__PURE__*/ new Vector3();
-const _zAxis = /*@__PURE__*/ new Vector3( 0, 0, 1 );
 
 /**
  * A sun-like light that gets emitted in a specific direction, with rays that
  * are all parallel, and casts cascaded shadow maps via {@link SunLightShadow},
  * suited for lighting large scenes.
  *
- * Unlike {@link DirectionalLight}, the light has no target: it shines along
- * its local negative z-axis, like a camera, and points straight down by
- * default. Use {@link SunLight#setFromSphericalAngles} to orient it from sky
- * coordinates.
+ * Unlike {@link DirectionalLight}, the light has no target: like
+ * {@link HemisphereLight}, its direction is defined by its position. The
+ * light shines from its position towards the origin and points straight
+ * down by default.
  *
  * ```js
  * const sun = new SunLight( 0xfff2e3, 3 );
+ * sun.position.set( 1, 1, 1 );
  * sun.castShadow = true;
- * sun.setFromSphericalAngles( Math.PI / 4, Math.PI / 2 );
  * scene.add( sun );
  * ```
  *
@@ -57,25 +53,8 @@ class SunLight extends Light {
 		 */
 		this.shadow = new SunLightShadow();
 
-		this.setFromSphericalAngles( Math.PI / 2, 0 );
+		this.position.set( 0, 1, 0 );
 		this.updateMatrix();
-
-	}
-
-	/**
-	 * Orients the light from sky coordinates.
-	 *
-	 * @param {number} elevation - The angle above the horizontal xz-plane, in radians.
-	 * @param {number} azimuth - The angle around the y-axis, measured from the positive z-axis, in radians.
-	 * @return {SunLight} A reference to this light.
-	 */
-	setFromSphericalAngles( elevation, azimuth ) {
-
-		_direction.setFromSphericalCoords( 1, Math.PI / 2 - elevation, azimuth );
-
-		this.quaternion.setFromUnitVectors( _zAxis, _direction );
-
-		return this;
 
 	}
 

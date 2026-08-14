@@ -45,7 +45,6 @@
 				elevation: 10
 			};
 
-			const _sunDirection = new THREE.Vector3();
 			const _sunDay = new THREE.Color( 0xfff2e3 ), _sunDusk = new THREE.Color( 0xff8a3d );
 			const _fogDay = new THREE.Color( 0xd8e2ea ), _fogDusk = new THREE.Color( 0xd9a273 );
 
@@ -71,7 +70,7 @@
 
 			function updateSun() {
 
-				sunLight.setFromSphericalAngles( THREE.MathUtils.degToRad( params.elevation ), THREE.MathUtils.degToRad( params.azimuth ) );
+				sunLight.position.setFromSphericalCoords( 1, THREE.MathUtils.degToRad( 90 - params.elevation ), THREE.MathUtils.degToRad( params.azimuth ) );
 
 				// the sun light warms up and fades towards the horizon
 
@@ -82,8 +81,7 @@
 
 				scene.fog.color.lerpColors( _fogDusk, _fogDay, daylight );
 
-				_sunDirection.set( 0, 0, 1 ).applyQuaternion( sunLight.quaternion );
-				sky.material.uniforms.sunPosition.value.copy( _sunDirection );
+				sky.material.uniforms.sunPosition.value.copy( sunLight.position );
 
 				// light the scene with the sky itself
 

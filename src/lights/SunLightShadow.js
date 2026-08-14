@@ -160,7 +160,7 @@ class SunLightShadow extends LightShadow {
 
 		splits[ _cascadeCount ] = cameraFar;
 
-		_lightDirection.setFromMatrixColumn( light.matrixWorld, 2 ).negate().normalize();
+		_lightDirection.setFromMatrixPosition( light.matrixWorld ).negate().normalize();
 
 		_up.set( 0, 1, 0 );
 		if ( Math.abs( _up.dot( _lightDirection ) ) > 0.99 ) _up.set( 0, 0, 1 );

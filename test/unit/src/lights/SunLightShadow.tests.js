@@ -46,7 +46,7 @@ export default QUnit.module( 'Lights', () => {
 			const light = new SunLight();
 			const camera = new PerspectiveCamera( 60, 1, 0.1, 100 );
 			const shadow = light.shadow;
-			light.setFromSphericalAngles( 0.9, 0.7 );
+			light.position.setFromSphericalCoords( 1, Math.PI / 2 - 0.9, 0.7 );
 			light.updateMatrixWorld();
 			camera.updateMatrixWorld();
 
@@ -82,7 +82,7 @@ export default QUnit.module( 'Lights', () => {
 			const light = new SunLight();
 			const camera = new PerspectiveCamera( 60, 1, 0.1, 100 );
 			const shadow = light.shadow;
-			light.setFromSphericalAngles( 0.9, 0.7 );
+			light.position.setFromSphericalCoords( 1, Math.PI / 2 - 0.9, 0.7 );
 			light.updateMatrixWorld();
 			camera.updateMatrixWorld();
 
@@ -108,13 +108,13 @@ export default QUnit.module( 'Lights', () => {
 			const light = new SunLight();
 			const camera = new PerspectiveCamera( 60, 1, 0.1, 100 );
 			const shadow = light.shadow;
-			light.setFromSphericalAngles( 0.9, 0.7 );
+			light.position.setFromSphericalCoords( 1, Math.PI / 2 - 0.9, 0.7 );
 			light.updateMatrixWorld();
 			camera.updateMatrixWorld();
 			shadow.camera.far = 100;
 			shadow.updateMatrices( light, camera );
 
-			const lightDirection = new Vector3( 0, 0, - 1 ).applyQuaternion( light.quaternion );
+			const lightDirection = light.position.clone().normalize().negate();
 
 			for ( let i = 0; i < 4; i ++ ) {
 
@@ -131,7 +131,7 @@ export default QUnit.module( 'Lights', () => {
 			const light = new SunLight();
 			const camera = new PerspectiveCamera( 60, 1, 0.01, 0.1 );
 			const shadow = light.shadow;
-			light.setFromSphericalAngles( 0.9, 0.7 );
+			light.position.setFromSphericalCoords( 1, Math.PI / 2 - 0.9, 0.7 );
 			light.updateMatrixWorld();
 			camera.updateMatrixWorld();
 			shadow.camera.far = 1;
@@ -169,7 +169,7 @@ export default QUnit.module( 'Lights', () => {
 			const camera = new PerspectiveCamera( 60, 1, 1, 10 );
 			const shadow = light.shadow;
 			camera.updateMatrixWorld();
-			light.setFromSphericalAngles( 0.6, Math.PI / 4 );
+			light.position.setFromSphericalCoords( 1, Math.PI / 2 - 0.6, Math.PI / 4 );
 			light.updateMatrixWorld();
 
 			shadow.mapSize.set( 16, 16 );
@@ -199,7 +199,7 @@ export default QUnit.module( 'Lights', () => {
 			const light = new SunLight();
 			const camera = new PerspectiveCamera( 60, 1, 0.1, 100 );
 			const shadow = light.shadow;
-			light.setFromSphericalAngles( 0.9, 0.7 );
+			light.position.setFromSphericalCoords( 1, Math.PI / 2 - 0.9, 0.7 );
 			light.updateMatrixWorld();
 			camera.updateMatrixWorld();
 
