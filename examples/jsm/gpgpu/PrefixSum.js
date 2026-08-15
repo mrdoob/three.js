@@ -1,7 +1,7 @@
 import {
 	StorageInstancedBufferAttribute,
 } from 'three/webgpu';
-import { Fn, If, instancedArray, invocationLocalIndex, countTrailingZeros, Loop, workgroupArray, subgroupSize, workgroupBarrier, workgroupId, uint, select, invocationSubgroupIndex, dot, uvec4, vec4, float, subgroupAdd, array, subgroupShuffle, subgroupInclusiveAdd, subgroupBroadcast, invocationSubgroupMetaIndex, storage } from 'three/tsl';
+import { Fn, If, instancedArray, invocationLocalIndex, countTrailingZeros, Loop, workgroupArray, subgroupSize, workgroupBarrier, workgroupId, uint, select, invocationSubgroupIndex, dot, uvec4, vec4, float, subgroupAdd, array, subgroupShuffle, subgroupInclusiveAdd, subgroupBroadcast, subgroupIndex, storage } from 'three/tsl';
 
 const divRoundUp = ( size, part_size ) => {
 
@@ -288,8 +288,8 @@ export class PrefixSum {
 
 		this.utilityNodes.subgroupReductionArray = workgroupArray( this.type, Math.ceil( this.workgroupSize / 4 ) );
 		this.utilityNodes.workgroupOffset = workgroupId.x.mul( uint( this.workgroupSize ).mul( this.workPerInvocation ) ).toVar( 'workgroupOffset' );
-		this.utilityNodes.subgroupOffset = invocationSubgroupMetaIndex.mul( subgroupSize ).mul( this.workPerInvocation ).toVar( 'subgroupOffset' );
-		this.utilityNodes.unvectorizedSubgroupOffset = invocationSubgroupMetaIndex.mul( subgroupSize ).mul( this.unvectorizedWorkPerInvocation ).toVar( 'unvectorizedSubgroupOffset' );
+		this.utilityNodes.subgroupOffset = subgroupIndex.mul( subgroupSize ).mul( this.workPerInvocation ).toVar( 'subgroupOffset' );
+		this.utilityNodes.unvectorizedSubgroupOffset = subgroupIndex.mul( subgroupSize ).mul( this.unvectorizedWorkPerInvocation ).toVar( 'unvectorizedSubgroupOffset' );
 		this.utilityNodes.subgroupSizeLog = countTrailingZeros( subgroupSize ).toVar( 'subgroupSizeLog' );
 		this.utilityNodes.spineSize = uint( this.workgroupSize ).shiftRight( this.utilityNodes.subgroupSizeLog ).toVar( 'spineSize' );
 		this.utilityNodes.spineSizeLog = countTrailingZeros( this.utilityNodes.spineSize ).toVar( 'spineSizeLog' );
@@ -531,7 +531,7 @@ export class PrefixSum {
 			// Delegate one thread per subgroup to assign each subgroup's reduction to the workgroup array
 			If( invocationSubgroupIndex.equal( uint( 0 ) ), () => {
 
-				subgroupReductionArray.element( invocationSubgroupMetaIndex ).assign( subgroupReduction );
+				subgroupReductionArray.element( subgroupIndex ).assign( subgroupReduction );
 
 			} );
 
@@ -704,7 +704,7 @@ export class PrefixSum {
 
 				If( invocationSubgroupIndex.equal( subgroupSize.sub( 1 ) ), () => {
 
-					subgroupReductionArray.element( invocationSubgroupMetaIndex ).assign( prev );
+					subgroupReductionArray.element( subgroupIndex ).assign( prev );
 
 				} );
 
@@ -769,8 +769,8 @@ export class PrefixSum {
 				workgroupBarrier();
 
 				const lastSubgroupReduction = select(
-					invocationSubgroupMetaIndex.notEqual( 0 ),
-					subgroupReductionArray.element( invocationSubgroupMetaIndex.sub( 1 ) ),
+					subgroupIndex.notEqual( 0 ),
+					subgroupReductionArray.element( subgroupIndex.sub( 1 ) ),
 					uint( 0 )
 				).uniformFlow();
 
@@ -937,7 +937,7 @@ export class PrefixSum {
 
 			If( invocationSubgroupIndex.equal( uint( 0 ) ), () => {
 
-				subgroupReductionArray.element( invocationSubgroupMetaIndex ).assign( prev );
+				subgroupReductionArray.element( subgroupIndex ).assign( prev );
 
 			} );
 
@@ -1016,8 +1016,8 @@ export class PrefixSum {
 			).uniformFlow();
 
 			const downsweepSubgroupReduction = select(
-				invocationSubgroupMetaIndex.notEqual( 0 ),
-				subgroupReductionArray.element( invocationSubgroupMetaIndex.sub( 1 ) ),
+				subgroupIndex.notEqual( 0 ),
+				subgroupReductionArray.element( subgroupIndex.sub( 1 ) ),
 				uint( 0 )
 			).uniformFlow();
 
