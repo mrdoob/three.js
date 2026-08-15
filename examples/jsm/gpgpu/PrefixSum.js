@@ -1,6 +1,6 @@
 import {
 	StorageInstancedBufferAttribute,
-} from 'three';
+} from 'three/webgpu';
 import { Fn, If, instancedArray, invocationLocalIndex, countTrailingZeros, Loop, workgroupArray, subgroupSize, workgroupBarrier, workgroupId, uint, select, invocationSubgroupIndex, dot, uvec4, vec4, float, subgroupAdd, array, subgroupShuffle, subgroupInclusiveAdd, subgroupBroadcast, invocationSubgroupMetaIndex, storage } from 'three/tsl';
 
 const divRoundUp = ( size, part_size ) => {
