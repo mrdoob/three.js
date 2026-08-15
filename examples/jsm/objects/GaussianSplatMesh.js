@@ -7,6 +7,7 @@ import {
 	Matrix4,
 	Mesh,
 	NodeMaterial,
+	Ray,
 	Sphere,
 	StorageBufferAttribute,
 	Vector2,
@@ -54,6 +55,8 @@ const SORT_DIRECTION_THRESHOLD = 0.9995;
 const SORT_POSITION_THRESHOLD = 0.0025;
 const KERNEL_2D_SIZE = 0.3;
 const SPLAT_KERNEL_CUTOFF = 2;
+const COVARIANCE_EPSILON = 1e-12;
+const MIN_RAYCAST_OPACITY = 0.2;
 const MAX_SCREEN_SPACE_SPLAT_SIZE = 1024;
 const CLIP_XY = 1.4;
 
@@ -64,6 +67,9 @@ const _cameraPosition = /*@__PURE__*/ new Vector3();
 const _cameraDirection = /*@__PURE__*/ new Vector3();
 const _sortDepthRange = /*@__PURE__*/ new Vector2();
 const _worldMatrixInverse = /*@__PURE__*/ new Matrix4();
+const _inverseMatrix = /*@__PURE__*/ new Matrix4();
+const _ray = /*@__PURE__*/ new Ray();
+const _sphere = /*@__PURE__*/ new Sphere();
 const _splatBox = /*@__PURE__*/ new Box3();
 const _splat = /*@__PURE__*/ { position: new Vector3(), covariance: new Matrix3(), color: new Color(), opacity: 0 };
 
@@ -480,6 +486,97 @@ class GaussianSplatMesh extends Mesh {
 		} );
 
 	}
+
+}
+
+// Intersects the ray with the splat's gaussian, treated as the ellipsoid
+// "transpose( x - center ) * inverse( covariance ) * ( x - center ) = cutoff * cutoff".
+// Substituting the ray gives a quadratic in t whose smaller root is the near surface.
+function testSplat( splat, index, matrixWorld, raycaster, intersects, object ) {
+
+	const center = splat.position;
+
+	// column major, and symmetric, so the upper triangle is enough
+	const e = splat.covariance.elements;
+	const c00 = e[ 0 ];
+	const c01 = e[ 1 ];
+	const c02 = e[ 2 ];
+	const c11 = e[ 4 ];
+	const c12 = e[ 5 ];
+	const c22 = e[ 8 ];
+
+	// inverse of the symmetric covariance, by cofactors
+	const i00 = c11 * c22 - c12 * c12;
+	const i01 = c02 * c12 - c01 * c22;
+	const i02 = c01 * c12 - c02 * c11;
+	const determinant = c00 * i00 + c01 * i01 + c02 * i02;
+
+	// a degenerate splat has no volume to hit
+	if ( Math.abs( determinant ) < COVARIANCE_EPSILON ) return;
+
+	const i11 = c00 * c22 - c02 * c02;
+	const i12 = c02 * c01 - c00 * c12;
+	const i22 = c00 * c11 - c01 * c01;
+	const inverseDeterminant = 1 / determinant;
+
+	const m00 = i00 * inverseDeterminant;
+	const m01 = i01 * inverseDeterminant;
+	const m02 = i02 * inverseDeterminant;
+	const m11 = i11 * inverseDeterminant;
+	const m12 = i12 * inverseDeterminant;
+	const m22 = i22 * inverseDeterminant;
+
+	const ox = _ray.origin.x - center.x;
+	const oy = _ray.origin.y - center.y;
+	const oz = _ray.origin.z - center.z;
+	const dx = _ray.direction.x;
+	const dy = _ray.direction.y;
+	const dz = _ray.direction.z;
+
+	// inverse( covariance ) applied to the ray direction and to the origin offset
+	const mdx = m00 * dx + m01 * dy + m02 * dz;
+	const mdy = m01 * dx + m11 * dy + m12 * dz;
+	const mdz = m02 * dx + m12 * dy + m22 * dz;
+	const mox = m00 * ox + m01 * oy + m02 * oz;
+	const moy = m01 * ox + m11 * oy + m12 * oz;
+	const moz = m02 * ox + m12 * oy + m22 * oz;
+
+	const a = dx * mdx + dy * mdy + dz * mdz;
+
+	if ( a <= 0 ) return;
+
+	const b = 2 * ( ox * mdx + oy * mdy + oz * mdz );
+	const c = ox * mox + oy * moy + oz * moz - SPLAT_KERNEL_CUTOFF * SPLAT_KERNEL_CUTOFF;
+
+	const discriminant = b * b - 4 * a * c;
+
+	if ( discriminant < 0 ) return;
+
+	const sqrtDiscriminant = Math.sqrt( discriminant );
+	let t = ( - b - sqrtDiscriminant ) / ( 2 * a );
+
+	// the near surface is behind the origin when the ray starts inside the splat
+	if ( t < 0 ) t = ( - b + sqrtDiscriminant ) / ( 2 * a );
+	if ( t < 0 ) return;
+
+	const intersectPoint = new Vector3();
+	_ray.at( t, intersectPoint ).applyMatrix4( matrixWorld );
+
+	const distance = raycaster.ray.origin.distanceTo( intersectPoint );
+
+	if ( distance < raycaster.near || distance > raycaster.far ) return;
+
+	intersects.push( {
+
+		distance: distance,
+		point: intersectPoint,
+		index: index,
+		face: null,
+		faceIndex: null,
+		barycoord: null,
+		object: object
+
+	} );
 
 }
 
