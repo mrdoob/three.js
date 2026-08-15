@@ -98,6 +98,14 @@ class TrackballControls extends Controls {
 		this.panSpeed = 0.3;
 
 		/**
+		 * The roll speed.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.rollSpeed = 1.0;
+
+		/**
 		 * Whether rotation is disabled or not.
 		 *
 		 * @type {boolean}
@@ -344,11 +352,11 @@ class TrackballControls extends Controls {
 
 			this._rotateCamera();
 
-			if ( this.multiTouchRoll === true ) {
+		}
 
-				this._rollCamera();
+		if ( this.multiTouchRoll === true ) {
 
-			}
+			this._rollCamera();
 
 		}
 
@@ -524,7 +532,7 @@ class TrackballControls extends Controls {
 
 		if ( angle ) {
 
-			this._lastRollAngle = angle * this.rotateSpeed;
+			this._lastRollAngle = angle * this.rollSpeed;
 
 		} else if ( ! this.staticMoving && this._lastRollAngle ) {
 
