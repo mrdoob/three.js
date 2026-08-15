@@ -3,6 +3,7 @@ import {
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Color,
+	CylinderGeometry,
 	FileLoader,
 	Float32BufferAttribute,
 	Group,
@@ -16,7 +17,9 @@ import {
 	MirroredRepeatWrapping,
 	NearestFilter,
 	RepeatWrapping,
+	SphereGeometry,
 	TextureLoader,
+	Vector3,
 	SRGBColorSpace
 } from 'three';
 import { unzipSync } from '../libs/fflate.module.js';
@@ -429,7 +432,7 @@ class ThreeMFLoader extends Loader {
 					const attrib = portNodes[ i ].attributes[ j ];
 					if ( attrib.specified ) {
 
-		 				args[ attrib.name ] = attrib.value;
+						args[ attrib.name ] = attrib.value;
 
 					}
 
@@ -524,6 +527,25 @@ class ThreeMFLoader extends Loader {
 
 		}
 
+		function getChildElementsByTagName( parent, localName ) {
+
+			const results = [];
+			const elements = parent.getElementsByTagNameNS( '*', localName );
+
+			for ( let i = 0; i < elements.length; i ++ ) {
+
+				if ( elements[ i ].parentNode === parent ) {
+
+					results.push( elements[ i ] );
+
+				}
+
+			}
+
+			return results;
+
+		}
+
 		function parseMeshNode( meshNode ) {
 
 			const meshData = {};
@@ -603,6 +625,73 @@ class ThreeMFLoader extends Loader {
 
 			meshData[ 'triangleProperties' ] = triangleProperties;
 			meshData[ 'triangles' ] = new Uint32Array( triangles );
+
+			const beamLatticeNodes = meshNode.getElementsByTagNameNS( '*', 'beamlattice' );
+
+			if ( beamLatticeNodes.length > 0 ) {
+
+				const beamLatticeNode = beamLatticeNodes[ 0 ];
+
+				const beamLatticeData = {
+					radius: parseFloat( beamLatticeNode.getAttribute( 'radius' ) ),
+					beams: [],
+					balls: []
+				};
+
+				const beamsNodes = getChildElementsByTagName( beamLatticeNode, 'beams' );
+
+				if ( beamsNodes.length > 0 ) {
+
+					const beamNodes = getChildElementsByTagName( beamsNodes[ 0 ], 'beam' );
+
+					for ( let i = 0; i < beamNodes.length; i ++ ) {
+
+						const beamNode = beamNodes[ i ];
+
+						const beamData = {
+							v1: parseInt( beamNode.getAttribute( 'v1' ), 10 ),
+							v2: parseInt( beamNode.getAttribute( 'v2' ), 10 )
+						};
+
+						const r1 = beamNode.getAttribute( 'r1' );
+						const r2 = beamNode.getAttribute( 'r2' );
+
+						if ( r1 !== null ) beamData.r1 = parseFloat( r1 );
+						if ( r2 !== null ) beamData.r2 = parseFloat( r2 );
+
+						beamLatticeData.beams.push( beamData );
+
+					}
+
+				}
+
+				const ballsNodes = getChildElementsByTagName( beamLatticeNode, 'balls' );
+
+				if ( ballsNodes.length > 0 ) {
+
+					const ballNodes = getChildElementsByTagName( ballsNodes[ 0 ], 'ball' );
+
+					for ( let i = 0; i < ballNodes.length; i ++ ) {
+
+						const ballNode = ballNodes[ i ];
+
+						const ballData = {
+							vindex: parseInt( ballNode.getAttribute( 'vindex' ), 10 )
+						};
+
+						const radius = ballNode.getAttribute( 'r' );
+
+						if ( radius !== null ) ballData.radius = parseFloat( radius );
+
+						beamLatticeData.balls.push( ballData );
+
+					}
+
+				}
+
+				meshData[ 'beamLattice' ] = beamLatticeData;
+
+			}
 
 			return meshData;
 
@@ -1211,6 +1300,76 @@ class ThreeMFLoader extends Loader {
 
 		}
 
+		function buildBeamLattice( meshData ) {
+
+			const group = new Group();
+			const beamLattice = meshData.beamLattice;
+			const vertices = meshData.vertices;
+			const defaultRadius = beamLattice.radius;
+
+			const material = new MeshPhongMaterial( {
+				name: Loader.DEFAULT_MATERIAL_NAME,
+				color: 0xffffff,
+				flatShading: true
+			} );
+
+			const p1 = new Vector3();
+			const p2 = new Vector3();
+			const endpointDistance = new Vector3();
+			const midpoint = new Vector3();
+			const defaultOrientation = new Vector3( 0, 1, 0 );
+
+			for ( let i = 0; i < beamLattice.beams.length; i ++ ) {
+
+				const beam = beamLattice.beams[ i ];
+				const v1 = beam.v1;
+				const v2 = beam.v2;
+
+				p1.set( vertices[ v1 * 3 ], vertices[ v1 * 3 + 1 ], vertices[ v1 * 3 + 2 ] );
+				p2.set( vertices[ v2 * 3 ], vertices[ v2 * 3 + 1 ], vertices[ v2 * 3 + 2 ] );
+
+				endpointDistance.subVectors( p2, p1 );
+				const height = endpointDistance.length();
+
+				if ( height === 0 ) continue;
+
+				const radiusTop = beam.r2 !== undefined ? beam.r2 : ( beam.r1 !== undefined ? beam.r1 : defaultRadius );
+				const radiusBottom = beam.r1 !== undefined ? beam.r1 : defaultRadius;
+
+				const geometry = new CylinderGeometry( radiusTop, radiusBottom, height, 8 );
+				const mesh = new Mesh( geometry, material );
+
+				midpoint.addVectors( p1, p2 ).multiplyScalar( 0.5 );
+				mesh.position.copy( midpoint );
+
+				endpointDistance.normalize();
+				mesh.quaternion.setFromUnitVectors( defaultOrientation, endpointDistance );
+
+				group.add( mesh );
+
+			}
+
+			for ( let i = 0; i < beamLattice.balls.length; i ++ ) {
+
+				const ball = beamLattice.balls[ i ];
+				const vindex = ball.vindex;
+
+				p1.set( vertices[ vindex * 3 ], vertices[ vindex * 3 + 1 ], vertices[ vindex * 3 + 2 ] );
+
+				const radius = ball.radius !== undefined ? ball.radius : defaultRadius;
+
+				const geometry = new SphereGeometry( radius, 16, 8 );
+				const mesh = new Mesh( geometry, material );
+				mesh.position.copy( p1 );
+
+				group.add( mesh );
+
+			}
+
+			return group;
+
+		}
+
 		function buildMeshes( resourceMap, meshData, objects, modelData, textureData, objectData ) {
 
 			const keys = Object.keys( resourceMap );
@@ -1326,12 +1485,22 @@ class ThreeMFLoader extends Loader {
 
 			const group = new Group();
 
-			const resourceMap = analyzeObject( meshData, objectData );
-			const meshes = buildMeshes( resourceMap, meshData, objects, modelData, textureData, objectData );
+			if ( meshData.triangles.length > 0 ) {
 
-			for ( let i = 0, l = meshes.length; i < l; i ++ ) {
+				const resourceMap = analyzeObject( meshData, objectData );
+				const meshes = buildMeshes( resourceMap, meshData, objects, modelData, textureData, objectData );
 
-				group.add( meshes[ i ] );
+				for ( let i = 0, l = meshes.length; i < l; i ++ ) {
+
+					group.add( meshes[ i ] );
+
+				}
+
+			}
+
+			if ( meshData.beamLattice ) {
+
+				group.add( buildBeamLattice( meshData ) );
 
 			}
 
