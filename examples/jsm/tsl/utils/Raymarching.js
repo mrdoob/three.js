@@ -61,7 +61,7 @@ export const RaymarchingBox = ( steps, callback ) => {
 
 	Loop( { type: 'float', start: bounds.x, end: bounds.y, update: delta }, () => {
 
-		callback( { positionRay } );
+		callback( { positionRay, delta } );
 
 		positionRay.addAssign( rayDir.mul( delta ) );
 
