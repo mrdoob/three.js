@@ -1,6 +1,9 @@
 import {
+	Box3,
 	BufferAttribute,
+	Color,
 	InstancedBufferGeometry,
+	Matrix3,
 	Matrix4,
 	Mesh,
 	NodeMaterial,
@@ -255,6 +258,123 @@ class GaussianSplatMesh extends Mesh {
 		renderer.compute( this._sphericalHarmonicsComputeNode );
 
 		return true;
+
+	}
+
+	/**
+	 * Returns the splat at the given index.
+	 *
+	 * Members that the target does not already have are created, so an empty object can be passed
+	 * and then reused across calls to avoid allocating.
+	 *
+	 * @param {number} index - The splat index.
+	 * @param {Object} [target] - The object the splat is written to.
+	 * @return {Object} The target, with `position`, `covariance`, `color`, `opacity` and `radius` set.
+	 */
+	getSplat( index, target = {} ) {
+
+		const geometry = this.splatGeometry;
+		const positionAttribute = geometry.getAttribute( 'position' );
+		const covarianceAttribute = geometry.getAttribute( 'covariance' );
+		const colorAttribute = geometry.getAttribute( 'color' );
+
+		if ( target.position === undefined ) {
+
+			target.position = new Vector3();
+
+		}
+
+		if ( target.covariance === undefined ) {
+
+			target.covariance = new Matrix3();
+
+		}
+
+		if ( target.color === undefined ) {
+
+			target.color = new Color();
+
+		}
+
+		target.position.fromBufferAttribute( positionAttribute, index );
+
+		const c00 = covarianceAttribute.getComponent( index, 0 );
+		const c01 = covarianceAttribute.getComponent( index, 1 );
+		const c02 = covarianceAttribute.getComponent( index, 2 );
+		const c11 = covarianceAttribute.getComponent( index, 3 );
+		const c12 = covarianceAttribute.getComponent( index, 4 );
+		const c22 = covarianceAttribute.getComponent( index, 5 );
+
+		// the attribute holds the upper triangle of the symmetric covariance
+		target.covariance.set(
+			c00, c01, c02,
+			c01, c11, c12,
+			c02, c12, c22
+		);
+
+		target.color.fromBufferAttribute( colorAttribute, index );
+		target.opacity = colorAttribute.getW( index );
+
+		// the radius of the drawn largest extent
+		target.radius = SPLAT_KERNEL_CUTOFF * Math.sqrt( Math.max( c00, c11, c22, 0 ) );
+
+		return target;
+
+	}
+
+	/**
+	 * Computes the bounding box of the splats, updating {@link GaussianSplatMesh#boundingBox}.
+	 *
+	 * Each splat is expanded by its own extent rather than treated as a point, so the bounds cover
+	 * what is drawn. Only the splats within the draw range are included.
+	 */
+	computeBoundingBox() {
+
+		if ( this.boundingBox === null ) this.boundingBox = new Box3();
+
+		this.boundingBox.makeEmpty();
+
+		const { start, end } = this._getSplatRange();
+
+		for ( let i = start; i < end; i ++ ) {
+
+			this.getSplat( i, _splat );
+
+			_splatBox.set( _splat.position, _splat.position ).expandByScalar( _splat.radius );
+			this.boundingBox.union( _splatBox );
+
+		}
+
+	}
+
+	/**
+	 * Computes the bounding sphere of the splats, updating {@link GaussianSplatMesh#boundingSphere}.
+	 *
+	 * Each splat is expanded by its own extent rather than treated as a point, so the bounds cover
+	 * what is drawn. Only the splats within the draw range are included.
+	 */
+	computeBoundingSphere() {
+
+		if ( this.boundingSphere === null ) this.boundingSphere = new Sphere();
+
+		this.computeBoundingBox();
+		this.boundingBox.getBoundingSphere( this.boundingSphere );
+
+		// the box corners overstate the radius, so grow it only where a splat actually reaches
+		let maxRadiusSq = 0;
+		const center = this.boundingSphere.center;
+		const { start, end } = this._getSplatRange();
+
+		for ( let i = start; i < end; i ++ ) {
+
+			this.getSplat( i, _splat );
+
+			const distance = center.distanceTo( _splat.position ) + _splat.radius;
+			maxRadiusSq = Math.max( maxRadiusSq, distance * distance );
+
+		}
+
+		this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
 
 	}
 
