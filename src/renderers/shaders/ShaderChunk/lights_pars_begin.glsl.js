@@ -95,6 +95,7 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 
 #endif
 
+
 #if NUM_DIR_LIGHTS > 0
 
 	struct DirectionalLight {

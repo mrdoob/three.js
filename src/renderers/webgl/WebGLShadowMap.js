@@ -171,7 +171,6 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 			_shadowMapSize.copy( shadow.mapSize );
 
-			const viewportCount = shadow.getViewportCount();
 			const shadowFrameExtents = shadow.getFrameExtents();
 
 			_shadowMapSize.multiply( shadowFrameExtents );
@@ -287,7 +286,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 			// For cube render targets (PointLights), render all 6 faces. Sun lights
 			// render one atlas viewport per cascade.
-			const faceCount = shadow.map.isWebGLCubeRenderTarget ? 6 : viewportCount;
+			const faceCount = shadow.map.isWebGLCubeRenderTarget ? 6 : shadow.getViewportCount();
 
 			if ( light.isPointLight !== true ) shadow.updateMatrices( light, camera );
 
