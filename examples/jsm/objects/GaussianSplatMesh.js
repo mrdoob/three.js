@@ -7,6 +7,7 @@ import {
 	Matrix4,
 	Mesh,
 	NodeMaterial,
+	Sphere,
 	StorageBufferAttribute,
 	Vector2,
 	Vector3
@@ -52,6 +53,7 @@ const WORKGROUP_SIZE = 256;
 const SORT_DIRECTION_THRESHOLD = 0.9995;
 const SORT_POSITION_THRESHOLD = 0.0025;
 const KERNEL_2D_SIZE = 0.3;
+const SPLAT_KERNEL_CUTOFF = 2;
 const MAX_SCREEN_SPACE_SPLAT_SIZE = 1024;
 const CLIP_XY = 1.4;
 
@@ -62,6 +64,8 @@ const _cameraPosition = /*@__PURE__*/ new Vector3();
 const _cameraDirection = /*@__PURE__*/ new Vector3();
 const _sortDepthRange = /*@__PURE__*/ new Vector2();
 const _worldMatrixInverse = /*@__PURE__*/ new Matrix4();
+const _splatBox = /*@__PURE__*/ new Box3();
+const _splat = /*@__PURE__*/ { position: new Vector3(), covariance: new Matrix3(), color: new Color(), opacity: 0 };
 
 /**
  * A minimal renderer for 3D Gaussian splat geometry.
@@ -326,7 +330,7 @@ class GaussianSplatMesh extends Mesh {
 	 * Computes the bounding box of the splats, updating {@link GaussianSplatMesh#boundingBox}.
 	 *
 	 * Each splat is expanded by its own extent rather than treated as a point, so the bounds cover
-	 * what is drawn. Only the splats within the draw range are included.
+	 * what is drawn.
 	 */
 	computeBoundingBox() {
 
@@ -334,9 +338,9 @@ class GaussianSplatMesh extends Mesh {
 
 		this.boundingBox.makeEmpty();
 
-		const { start, end } = this._getSplatRange();
+		const count = this.splatGeometry.getAttribute( 'position' ).count;
 
-		for ( let i = start; i < end; i ++ ) {
+		for ( let i = 0; i < count; i ++ ) {
 
 			this.getSplat( i, _splat );
 
@@ -351,7 +355,7 @@ class GaussianSplatMesh extends Mesh {
 	 * Computes the bounding sphere of the splats, updating {@link GaussianSplatMesh#boundingSphere}.
 	 *
 	 * Each splat is expanded by its own extent rather than treated as a point, so the bounds cover
-	 * what is drawn. Only the splats within the draw range are included.
+	 * what is drawn.
 	 */
 	computeBoundingSphere() {
 
@@ -363,9 +367,9 @@ class GaussianSplatMesh extends Mesh {
 		// the box corners overstate the radius, so grow it only where a splat actually reaches
 		let maxRadiusSq = 0;
 		const center = this.boundingSphere.center;
-		const { start, end } = this._getSplatRange();
+		const count = this.splatGeometry.getAttribute( 'position' ).count;
 
-		for ( let i = start; i < end; i ++ ) {
+		for ( let i = 0; i < count; i ++ ) {
 
 			this.getSplat( i, _splat );
 
@@ -441,11 +445,13 @@ class GaussianSplatMesh extends Mesh {
 
 		this._sortMatrix.value.multiplyMatrices( camera.matrixWorldInverse, this.matrixWorld );
 
-		_worldCenter.copy( this.splatGeometry.boundingSphere.center ).applyMatrix4( this.matrixWorld );
+		if ( this.boundingSphere === null ) this.computeBoundingSphere();
+
+		_worldCenter.copy( this.boundingSphere.center ).applyMatrix4( this.matrixWorld );
 		_viewCenter.copy( _worldCenter ).applyMatrix4( camera.matrixWorldInverse );
 		this.getWorldScale( _worldScale );
 
-		const radius = this.splatGeometry.boundingSphere.radius * Math.max( _worldScale.x, _worldScale.y, _worldScale.z );
+		const radius = this.boundingSphere.radius * Math.max( _worldScale.x, _worldScale.y, _worldScale.z );
 		const depth = - _viewCenter.z;
 		const nearDepth = Math.max( camera.near, depth - radius );
 		const farDepth = Math.max( nearDepth + 0.0001, depth + radius );
