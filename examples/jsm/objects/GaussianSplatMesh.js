@@ -491,7 +491,7 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 	const centerData = new Float32Array( count * 4 );
 	const covarianceAData = new Float32Array( count * 4 );
 	const covarianceBData = new Float32Array( count * 4 );
-	const colorData = new Float32Array( count * 4 );
+	const colorData = new Uint32Array( count );
 	const sphericalHarmonicsDegree = sphericalHarmonics.degree;
 
 	for ( let i = 0; i < count; i ++ ) {
@@ -512,17 +512,17 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 		covarianceBData[ i4 ] = covariances[ i6 + 4 ];
 		covarianceBData[ i4 + 1 ] = covariances[ i6 + 5 ];
 
-		colorData[ i4 ] = colors[ i4 ] / 255;
-		colorData[ i4 + 1 ] = colors[ i4 + 1 ] / 255;
-		colorData[ i4 + 2 ] = colors[ i4 + 2 ] / 255;
-		colorData[ i4 + 3 ] = colors[ i4 + 3 ] / 255;
+		colorData[ i ] = ( colors[ i4 ] |
+			colors[ i4 + 1 ] << 8 |
+			colors[ i4 + 2 ] << 16 |
+			colors[ i4 + 3 ] << 24 ) >>> 0;
 
 	}
 
 	const centerAttribute = new StorageBufferAttribute( centerData, 4 );
 	const covarianceAAttribute = new StorageBufferAttribute( covarianceAData, 4 );
 	const covarianceBAttribute = new StorageBufferAttribute( covarianceBData, 4 );
-	const colorAttribute = new StorageBufferAttribute( colorData, 4 );
+	const colorAttribute = new StorageBufferAttribute( colorData, 1 );
 
 	const buffers = {
 		count,
@@ -531,7 +531,7 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 		centerRead: storage( centerAttribute, 'vec4', count ).toReadOnly(),
 		covarianceARead: storage( covarianceAAttribute, 'vec4', count ).toReadOnly(),
 		covarianceBRead: storage( covarianceBAttribute, 'vec4', count ).toReadOnly(),
-		colorRead: storage( colorAttribute, 'vec4', count ).toReadOnly()
+		colorRead: storage( colorAttribute, 'uint', count ).toReadOnly()
 	};
 
 	for ( let degree = 1; degree <= sphericalHarmonicsDegree; degree ++ ) {
@@ -736,6 +736,19 @@ function createSphericalHarmonicsComputeNode( buffers, localCameraPosition ) {
 
 }
 
+function readColor( buffers, splatIndex ) {
+
+	const packed = buffers.colorRead.element( splatIndex ).toVar( 'packedColor' );
+
+	return vec4(
+		float( packed.bitAnd( 0xff ) ),
+		float( packed.shiftRight( 8 ).bitAnd( 0xff ) ),
+		float( packed.shiftRight( 16 ).bitAnd( 0xff ) ),
+		float( packed.shiftRight( 24 ).bitAnd( 0xff ) )
+	).mul( 1 / 255 ).toVar( 'splatColor' );
+
+}
+
 function createMaterialNodes( buffers, sort, localCameraPosition ) {
 
 	const splatUv = varyingProperty( 'vec2', 'vSplatUv' );
@@ -747,7 +760,7 @@ function createMaterialNodes( buffers, sort, localCameraPosition ) {
 		const center = buffers.centerRead.element( splatIndex ).xyz.toVar( 'center' );
 		const covA = buffers.covarianceARead.element( splatIndex ).toVar( 'covA' );
 		const covB = buffers.covarianceBRead.element( splatIndex ).toVar( 'covB' );
-		const color = buffers.colorRead.element( splatIndex ).toVar( 'splatColor' );
+		const color = readColor( buffers, splatIndex );
 		const rgb = color.rgb.toVar( 'splatRgb' );
 
 		if ( buffers.sphericalHarmonicsDegree > 0 ) {
