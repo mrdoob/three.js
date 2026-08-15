@@ -51,7 +51,6 @@ import {
 const BIN_COUNT = 4096;
 const WORKGROUP_SIZE = 256;
 const SORT_DIRECTION_THRESHOLD = 0.9995;
-const SORT_POSITION_THRESHOLD = 0.0025;
 const KERNEL_2D_SIZE = 0.3;
 const SPLAT_KERNEL_CUTOFF = 2;
 const MAX_SCREEN_SPACE_SPLAT_SIZE = 1024;
@@ -60,10 +59,10 @@ const CLIP_XY = 1.4;
 const _worldCenter = /*@__PURE__*/ new Vector3();
 const _viewCenter = /*@__PURE__*/ new Vector3();
 const _worldScale = /*@__PURE__*/ new Vector3();
-const _cameraPosition = /*@__PURE__*/ new Vector3();
-const _cameraDirection = /*@__PURE__*/ new Vector3();
+const _sortDirection = /*@__PURE__*/ new Vector3();
 const _sortDepthRange = /*@__PURE__*/ new Vector2();
 const _worldMatrixInverse = /*@__PURE__*/ new Matrix4();
+const _modelViewMatrix = /*@__PURE__*/ new Matrix4();
 const _splatBox = /*@__PURE__*/ new Box3();
 const _splat = {};
 
@@ -167,8 +166,7 @@ class GaussianSplatMesh extends Mesh {
 		this._sortMatrix = uniform( new Matrix4() );
 		this._sortDepthRange = uniform( new Vector2( 0, 1 ) );
 		this._sortInitialized = false;
-		this._lastSortPosition = new Vector3( Infinity, Infinity, Infinity );
-		this._lastSortDirection = new Vector3( 0, 0, - 1 );
+		this._lastSortDirection = new Vector3();
 		this._localCameraPosition = localCameraPosition;
 		this._sphericalHarmonicsComputeNode = sphericalHarmonicsComputeNode;
 		this._sphericalHarmonicsInitialized = false;
@@ -383,7 +381,8 @@ class GaussianSplatMesh extends Mesh {
 	}
 
 	/**
-	 * Updates the draw order if the camera has moved enough to need a new sort.
+	 * Updates the draw order if the camera or mesh orientation has changed enough
+	 * to need a new sort.
 	 *
 	 * @param {Renderer} renderer - The renderer.
 	 * @param {Camera} camera - The camera used for rendering.
@@ -391,7 +390,11 @@ class GaussianSplatMesh extends Mesh {
 	 */
 	updateSort( renderer, camera ) {
 
-		if ( this._sortInitialized === false || this._needsSort( camera ) === true ) {
+		this.updateWorldMatrix( true, false );
+
+		const needsSort = this._needsSort( camera );
+
+		if ( this._sortInitialized === false || needsSort === true ) {
 
 			this._updateSortUniforms( camera );
 
@@ -408,6 +411,7 @@ class GaussianSplatMesh extends Mesh {
 			}
 
 			this._sortInitialized = true;
+			this._lastSortDirection.copy( _sortDirection );
 
 			return true;
 
@@ -419,29 +423,16 @@ class GaussianSplatMesh extends Mesh {
 
 	_needsSort( camera ) {
 
-		_cameraPosition.setFromMatrixPosition( camera.matrixWorld );
+		_modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, this.matrixWorld );
 
-		const e = camera.matrixWorld.elements;
-		_cameraDirection.set( - e[ 8 ], - e[ 9 ], - e[ 10 ] ).normalize();
+		const e = _modelViewMatrix.elements;
+		_sortDirection.set( e[ 2 ], e[ 6 ], e[ 10 ] ).normalize();
 
-		const positionChanged = _cameraPosition.distanceToSquared( this._lastSortPosition ) > SORT_POSITION_THRESHOLD * SORT_POSITION_THRESHOLD;
-		const directionChanged = _cameraDirection.dot( this._lastSortDirection ) < SORT_DIRECTION_THRESHOLD;
-
-		if ( positionChanged === true || directionChanged === true ) {
-
-			this._lastSortPosition.copy( _cameraPosition );
-			this._lastSortDirection.copy( _cameraDirection );
-			return true;
-
-		}
-
-		return false;
+		return _sortDirection.dot( this._lastSortDirection ) < SORT_DIRECTION_THRESHOLD;
 
 	}
 
 	_updateSortUniforms( camera ) {
-
-		this.updateWorldMatrix( true, false );
 
 		this._sortMatrix.value.multiplyMatrices( camera.matrixWorldInverse, this.matrixWorld );
 
@@ -449,7 +440,8 @@ class GaussianSplatMesh extends Mesh {
 
 		_worldCenter.copy( this.boundingSphere.center ).applyMatrix4( this.matrixWorld );
 		_viewCenter.copy( _worldCenter ).applyMatrix4( camera.matrixWorldInverse );
-		this.getWorldScale( _worldScale );
+
+		_worldScale.setFromMatrixScale( this.matrixWorld );
 
 		const radius = this.boundingSphere.radius * Math.max( _worldScale.x, _worldScale.y, _worldScale.z );
 		const depth = - _viewCenter.z;
