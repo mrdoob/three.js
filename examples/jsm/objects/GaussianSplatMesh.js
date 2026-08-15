@@ -138,9 +138,6 @@ class GaussianSplatMesh extends Mesh {
 		/**
 		 * The bounding box of the splats. Can be computed via {@link GaussianSplatMesh#computeBoundingBox}.
 		 *
-		 * The geometry holds a single billboard quad rather than the splats, so the bounds live on
-		 * the mesh, as they do for {@link SkinnedMesh}.
-		 *
 		 * @type {?Box3}
 		 * @default null
 		 */
