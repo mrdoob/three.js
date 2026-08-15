@@ -122,13 +122,13 @@ class TrackballControls extends Controls {
 		this.noPan = false;
 
 		/**
-		 * Whether the two finger twist gesture rolls 
+		 * Whether two finger twist gesture rolls
 		 * the camera around its view axis or not.
 		 *
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.multiTouchRotate = false;
+		this.multiTouchRoll = false;
 
 		/**
 		 * Whether damping is disabled or not.
@@ -218,12 +218,14 @@ class TrackballControls extends Controls {
 		this.keyState = _STATE.NONE;
 
 		this._lastPosition = new Vector3();
+		this._lastUp = new Vector3();
 		this._lastZoom = 1;
 		this._touchZoomDistanceStart = 0;
 		this._touchZoomDistanceEnd = 0;
-		this._touchRotationAngle = 0;
-		this._touchRotationPointerIds = '';
+		this._touchRollAngle = 0;
+		this._touchRollPointerIds = '';
 		this._lastAngle = 0;
+		this._lastRollAngle = 0;
 
 		this._eye = new Vector3();
 
@@ -342,7 +344,7 @@ class TrackballControls extends Controls {
 
 			this._rotateCamera();
 
-			if ( this.multiTouchRotate === true ) {
+			if ( this.multiTouchRoll === true ) {
 
 				this._rollCamera();
 
@@ -370,11 +372,15 @@ class TrackballControls extends Controls {
 
 			this.object.lookAt( this.target );
 
-			if ( this._lastPosition.distanceToSquared( this.object.position ) > _EPS ) {
+			const positionChanged = this._lastPosition.distanceToSquared( this.object.position ) > _EPS;
+			const rollChanged = this._lastUp.distanceToSquared( this.object.up ) > _EPS;
+
+			if ( positionChanged || rollChanged ) {
 
 				this.dispatchEvent( _changeEvent );
 
 				this._lastPosition.copy( this.object.position );
+				this._lastUp.copy( this.object.up );
 
 			}
 
@@ -382,11 +388,16 @@ class TrackballControls extends Controls {
 
 			this.object.lookAt( this.target );
 
-			if ( this._lastPosition.distanceToSquared( this.object.position ) > _EPS || this._lastZoom !== this.object.zoom ) {
+			const positionChanged = this._lastPosition.distanceToSquared( this.object.position ) > _EPS;
+			const rollChanged = this._lastUp.distanceToSquared( this.object.up ) > _EPS;
+			const zoomChanged = this._lastZoom !== this.object.zoom;
+
+			if ( positionChanged || rollChanged || zoomChanged ) {
 
 				this.dispatchEvent( _changeEvent );
 
 				this._lastPosition.copy( this.object.position );
+				this._lastUp.copy( this.object.up );
 				this._lastZoom = this.object.zoom;
 
 			}
@@ -421,6 +432,7 @@ class TrackballControls extends Controls {
 		this.dispatchEvent( _changeEvent );
 
 		this._lastPosition.copy( this.object.position );
+		this._lastUp.copy( this.object.up );
 		this._lastZoom = this.object.zoom;
 
 	}
@@ -508,13 +520,38 @@ class TrackballControls extends Controls {
 
 	_rollCamera() {
 
+		const angle = this._getTouchRollAngle();
+
+		if ( angle ) {
+
+			this._lastRollAngle = angle * this.rotateSpeed;
+
+		} else if ( ! this.staticMoving && this._lastRollAngle ) {
+
+			this._lastRollAngle *= Math.sqrt( 1.0 - this.dynamicDampingFactor );
+
+		} else {
+
+			return;
+
+		}
+
+		_eyeDirection.copy( this._eye ).normalize();
+		_quaternion.setFromAxisAngle( _eyeDirection, this._lastRollAngle );
+
+		this.object.up.applyQuaternion( _quaternion );
+
+	}
+
+	_getTouchRollAngle() {
+
 		const first = this._pointers[ 0 ];
 		const second = this._pointers[ 1 ];
 
 		if ( second === undefined || first.pointerType !== 'touch' || second.pointerType !== 'touch' ) {
 
-			this._touchRotationPointerIds = '';
-			return;
+			this._touchRollPointerIds = '';
+			return 0;
 
 		}
 
@@ -523,19 +560,19 @@ class TrackballControls extends Controls {
 		const positionFirst = this._pointerPositions[ first.pointerId ];
 		const positionSecond = this._pointerPositions[ second.pointerId ];
 
-		const rotationAngle = Math.atan2( positionSecond.y - positionFirst.y, positionSecond.x - positionFirst.x );
+		const rollAngle = Math.atan2( positionSecond.y - positionFirst.y, positionSecond.x - positionFirst.x );
 
-		// fingeres changed or new gesture started
-		if ( pointerIds !== this._touchRotationPointerIds ) {
+		// fingers changed or new gesture started
+		if ( pointerIds !== this._touchRollPointerIds ) {
 
-			this._touchRotationPointerIds = pointerIds;
-			this._touchRotationAngle = rotationAngle;
-			return;
+			this._touchRollPointerIds = pointerIds;
+			this._touchRollAngle = rollAngle;
+			return 0;
 
 		}
 
-		let angle = rotationAngle - this._touchRotationAngle;
-		this._touchRotationAngle = rotationAngle;
+		let angle = rollAngle - this._touchRollAngle;
+		this._touchRollAngle = rollAngle;
 
 		if ( angle > Math.PI ) {
 
@@ -547,16 +584,7 @@ class TrackballControls extends Controls {
 
 		}
 
-		if ( angle === 0 ) {
-
-			return;
-
-		}
-
-		_eyeDirection.copy( this._eye ).normalize();
-		_quaternion.setFromAxisAngle( _eyeDirection, angle * this.rotateSpeed );
-
-		this.object.up.applyQuaternion( _quaternion );
+		return angle;
 
 	}
 

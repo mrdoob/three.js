@@ -48,7 +48,7 @@
 
 			const params = {
 				orthographicCamera: false,
-				multiTouchRotate: true
+				multiTouchRoll: true
 			};
 
 			const frustumSize = 400;
@@ -125,9 +125,9 @@
 
 				} );
 
-				gui.add( params, 'multiTouchRotate' ).name( 'multi touch rotate' ).onChange( function ( value ) {
+				gui.add( params, 'multiTouchRoll' ).name( 'multi touch roll' ).onChange( function ( value ) {
 
-					controls.multiTouchRotate = value;
+					controls.multiTouchRoll = value;
 
 				} );
 
@@ -147,7 +147,7 @@
 				controls.zoomSpeed = 1.2;
 				controls.panSpeed = 0.8;
 
-				controls.multiTouchRotate = params.multiTouchRotate;
+				controls.multiTouchRoll = params.multiTouchRoll;
 
 				controls.keys = [ 'KeyA', 'KeyS', 'KeyD' ];
 
