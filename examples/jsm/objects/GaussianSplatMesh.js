@@ -71,7 +71,7 @@ const _inverseMatrix = /*@__PURE__*/ new Matrix4();
 const _ray = /*@__PURE__*/ new Ray();
 const _sphere = /*@__PURE__*/ new Sphere();
 const _splatBox = /*@__PURE__*/ new Box3();
-const _splat = /*@__PURE__*/ { position: new Vector3(), covariance: new Matrix3(), color: new Color(), opacity: 0 };
+const _splat = {};
 
 /**
  * A minimal renderer for 3D Gaussian splat geometry.
