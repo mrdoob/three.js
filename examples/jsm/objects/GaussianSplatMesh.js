@@ -130,13 +130,30 @@ class GaussianSplatMesh extends Mesh {
 		this.splatGeometry = splatGeometry;
 
 		/**
+		 * The bounding box of the splats. Can be computed via {@link GaussianSplatMesh#computeBoundingBox}.
+		 *
+		 * The geometry holds a single billboard quad rather than the splats, so the bounds live on
+		 * the mesh, as they do for {@link SkinnedMesh}.
+		 *
+		 * @type {?Box3}
+		 * @default null
+		 */
+		this.boundingBox = null;
+
+		/**
+		 * The bounding sphere of the splats. Can be computed via {@link GaussianSplatMesh#computeBoundingSphere}.
+		 *
+		 * @type {?Sphere}
+		 * @default null
+		 */
+		this.boundingSphere = null;
+
+		/**
 		 * Whether to sort automatically in `onBeforeRender`.
 		 *
 		 * @type {boolean}
 		 */
 		this.autoSort = autoSort;
-
-		this.frustumCulled = false;
 
 		this._buffers = buffers;
 		this._sort = sort;
