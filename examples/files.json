@@ -421,6 +421,7 @@
 		"webgpu_multisampled_renderbuffers",
 		"webgpu_occlusion",
 		"webgpu_ocean",
+		"webgpu_oit",
 		"webgpu_parallax_uv",
 		"webgpu_particles",
 		"webgpu_particles_soft",
