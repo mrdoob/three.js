@@ -409,6 +409,14 @@ class GaussianSplatMesh extends Mesh {
 		_inverseMatrix.copy( matrixWorld ).invert();
 		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
 
+		// test with bounding box in local space
+
+		if ( this.boundingBox !== null ) {
+
+			if ( _ray.intersectsBox( this.boundingBox ) === false ) return;
+
+		}
+
 		const count = this.splatGeometry.getAttribute( 'position' ).count;
 
 		for ( let i = 0; i < count; i ++ ) {
