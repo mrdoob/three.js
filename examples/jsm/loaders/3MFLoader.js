@@ -3,6 +3,7 @@ import {
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Color,
+	CylinderGeometry,
 	FileLoader,
 	Float32BufferAttribute,
 	Group,
@@ -16,8 +17,10 @@ import {
 	MirroredRepeatWrapping,
 	NearestFilter,
 	RepeatWrapping,
+	SphereGeometry,
 	TextureLoader,
-	SRGBColorSpace
+	SRGBColorSpace,
+	Vector3
 } from 'three';
 import { unzipSync } from '../libs/fflate.module.js';
 
@@ -38,6 +41,7 @@ const COLOR_SPACE_3MF = SRGBColorSpace;
  * - Texture 2D Groups
  * - Color Groups (Vertex Colors)
  * - Metallic Display Properties (PBR)
+ * - Beam Lattice (Beams and Balls)
  *
  * ```js
  * const loader = new ThreeMFLoader();
@@ -604,7 +608,123 @@ class ThreeMFLoader extends Loader {
 			meshData[ 'triangleProperties' ] = triangleProperties;
 			meshData[ 'triangles' ] = new Uint32Array( triangles );
 
+			const beamLatticeNode = getChildNode( meshNode, 'beamlattice' );
+
+			if ( beamLatticeNode ) {
+
+				meshData[ 'beamlattice' ] = parseBeamLatticeNode( beamLatticeNode );
+
+			}
+
 			return meshData;
+
+		}
+
+		function getChildNode( node, name ) {
+
+			const childNodes = node.children;
+
+			for ( let i = 0; i < childNodes.length; i ++ ) {
+
+				if ( childNodes[ i ].localName === name ) return childNodes[ i ];
+
+			}
+
+			return null;
+
+		}
+
+		function getChildNodes( node, name ) {
+
+			const nodes = [];
+			const childNodes = node.children;
+
+			for ( let i = 0; i < childNodes.length; i ++ ) {
+
+				if ( childNodes[ i ].localName === name ) nodes.push( childNodes[ i ] );
+
+			}
+
+			return nodes;
+
+		}
+
+		function getOptionalFloatAttribute( node, name ) {
+
+			const value = node.getAttribute( name );
+			return value === null ? undefined : parseFloat( value );
+
+		}
+
+		function getOptionalAttribute( node, name ) {
+
+			const value = node.getAttribute( name );
+			return value === null ? undefined : value;
+
+		}
+
+		function parseBeamLatticeNode( beamLatticeNode ) {
+
+			const beamLatticeData = {
+				minlength: parseFloat( beamLatticeNode.getAttribute( 'minlength' ) ),
+				radius: parseFloat( beamLatticeNode.getAttribute( 'radius' ) ),
+				cap: beamLatticeNode.getAttribute( 'cap' ) || 'sphere',
+				ballmode: beamLatticeNode.getAttribute( 'ballmode' ) || 'none',
+				ballradius: getOptionalFloatAttribute( beamLatticeNode, 'ballradius' ),
+				pid: getOptionalAttribute( beamLatticeNode, 'pid' ),
+				pindex: getOptionalAttribute( beamLatticeNode, 'pindex' ),
+				beams: [],
+				balls: []
+			};
+
+			const beamsNode = getChildNode( beamLatticeNode, 'beams' );
+
+			if ( beamsNode ) {
+
+				const beamNodes = getChildNodes( beamsNode, 'beam' );
+
+				for ( let i = 0; i < beamNodes.length; i ++ ) {
+
+					const beamNode = beamNodes[ i ];
+
+					beamLatticeData.beams.push( {
+						v1: parseInt( beamNode.getAttribute( 'v1' ), 10 ),
+						v2: parseInt( beamNode.getAttribute( 'v2' ), 10 ),
+						r1: getOptionalFloatAttribute( beamNode, 'r1' ),
+						r2: getOptionalFloatAttribute( beamNode, 'r2' ),
+						pid: getOptionalAttribute( beamNode, 'pid' ),
+						p1: getOptionalAttribute( beamNode, 'p1' ),
+						p2: getOptionalAttribute( beamNode, 'p2' ),
+						cap1: getOptionalAttribute( beamNode, 'cap1' ),
+						cap2: getOptionalAttribute( beamNode, 'cap2' )
+					} );
+
+				}
+
+			}
+
+			const ballsNode = getChildNode( beamLatticeNode, 'balls' );
+
+			if ( ballsNode ) {
+
+				const ballNodes = getChildNodes( ballsNode, 'ball' );
+
+				for ( let i = 0; i < ballNodes.length; i ++ ) {
+
+					const ballNode = ballNodes[ i ];
+
+					beamLatticeData.balls.push( {
+						vindex: parseInt( ballNode.getAttribute( 'vindex' ), 10 ),
+						r: getOptionalFloatAttribute( ballNode, 'r' ),
+						pid: getOptionalAttribute( ballNode, 'pid' ),
+						p: getOptionalAttribute( ballNode, 'p' )
+					} );
+
+				}
+
+			}
+
+			return beamLatticeData;
 
 		}
 
@@ -1335,7 +1455,187 @@ class ThreeMFLoader extends Loader {
 
 			}
 
+			if ( meshData.beamlattice ) {
+
+				const beamLatticeMeshes = buildBeamLatticeMeshes( meshData, objects, modelData, textureData, objectData );
+
+				for ( let i = 0; i < beamLatticeMeshes.length; i ++ ) {
+
+					group.add( beamLatticeMeshes[ i ] );
+
+				}
+
+			}
+
 			return group;
+
+		}
+
+		function buildBeamLatticeMeshes( meshData, objects, modelData, textureData, objectData ) {
+
+			const beamLatticeData = meshData.beamlattice;
+			const vertices = meshData.vertices;
+			const meshes = [];
+			const endpointIndices = new Set();
+			const balls = new Map();
+			const materialCache = {};
+			const up = new Vector3( 0, 1, 0 );
+
+			for ( let i = 0; i < beamLatticeData.beams.length; i ++ ) {
+
+				const beam = beamLatticeData.beams[ i ];
+				endpointIndices.add( beam.v1 );
+				endpointIndices.add( beam.v2 );
+
+			}
+
+			if ( beamLatticeData.ballmode !== 'none' ) {
+
+				for ( let i = 0; i < beamLatticeData.balls.length; i ++ ) {
+
+					const ball = beamLatticeData.balls[ i ];
+					balls.set( ball.vindex, ball );
+
+				}
+
+			}
+
+			if ( beamLatticeData.ballmode === 'all' ) {
+
+				for ( const vertexIndex of endpointIndices ) {
+
+					if ( ! balls.has( vertexIndex ) ) balls.set( vertexIndex, { vindex: vertexIndex } );
+
+				}
+
+			}
+
+			function getVertex( index ) {
+
+				const offset = index * 3;
+
+				if ( index < 0 || offset + 2 >= vertices.length ) return null;
+
+				return new Vector3( vertices[ offset ], vertices[ offset + 1 ], vertices[ offset + 2 ] );
+
+			}
+
+			function getMaterial( elementData, propertyIndex ) {
+
+				const pid = elementData.pid !== undefined ? elementData.pid : ( beamLatticeData.pid !== undefined ? beamLatticeData.pid : objectData.pid );
+				const pindex = propertyIndex !== undefined ? propertyIndex : ( beamLatticeData.pindex !== undefined ? beamLatticeData.pindex : objectData.pindex );
+				const key = `${ pid || 'default' }:${ pindex || 0 }`;
+
+				if ( materialCache[ key ] !== undefined ) return materialCache[ key ];
+
+				if ( pid !== undefined && getResourceType( pid, modelData ) === 'material' ) {
+
+					const basematerials = modelData.resources.basematerials[ pid ];
+					const materialData = basematerials.basematerials[ pindex !== undefined ? pindex : 0 ];
+
+					if ( materialData ) {
+
+						materialCache[ key ] = getBuild( materialData, objects, modelData, textureData, objectData, buildBasematerial );
+						return materialCache[ key ];
+
+					}
+
+				}
+
+				materialCache[ key ] = new MeshPhongMaterial( {
+					name: Loader.DEFAULT_MATERIAL_NAME,
+					color: 0xffffff,
+					flatShading: true
+				} );
+
+				return materialCache[ key ];
+
+			}
+
+			function addSphere( center, radius, material, direction ) {
+
+				if ( ! Number.isFinite( radius ) || radius <= 0 ) return;
+
+				const geometry = direction ? new SphereGeometry( radius, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2 ) : new SphereGeometry( radius, 12, 8 );
+				const sphere = new Mesh( geometry, material );
+				sphere.position.copy( center );
+
+				if ( direction ) sphere.quaternion.setFromUnitVectors( up, direction );
+
+				meshes.push( sphere );
+
+			}
+
+			for ( let i = 0; i < beamLatticeData.beams.length; i ++ ) {
+
+				const beam = beamLatticeData.beams[ i ];
+				const start = getVertex( beam.v1 );
+				const end = getVertex( beam.v2 );
+
+				if ( start === null || end === null ) continue;
+
+				const direction = end.clone().sub( start );
+				const length = direction.length();
+
+				if ( ! Number.isFinite( length ) || length < beamLatticeData.minlength ) continue;
+
+				direction.divideScalar( length );
+
+				const radius1 = beam.r1 !== undefined ? beam.r1 : beamLatticeData.radius;
+				const radius2 = beam.r2 !== undefined ? beam.r2 : radius1;
+
+				if ( ! Number.isFinite( radius1 ) || ! Number.isFinite( radius2 ) || radius1 <= 0 || radius2 <= 0 ) continue;
+
+				const material = getMaterial( beam, beam.p1 );
+				const geometry = new CylinderGeometry( radius2, radius1, length, 12 );
+				const mesh = new Mesh( geometry, material );
+				mesh.position.copy( start ).add( end ).multiplyScalar( 0.5 );
+				mesh.quaternion.setFromUnitVectors( up, direction );
+				meshes.push( mesh );
+
+				const caps = [
+					{ vertexIndex: beam.v1, position: start, radius: radius1, cap: beam.cap1 || beamLatticeData.cap, direction: direction.clone().negate() },
+					{ vertexIndex: beam.v2, position: end, radius: radius2, cap: beam.cap2 || beamLatticeData.cap, direction: direction }
+				];
+
+				for ( let j = 0; j < caps.length; j ++ ) {
+
+					const cap = caps[ j ];
+					const ball = balls.get( cap.vertexIndex );
+					const ballRadius = ball && ball.r !== undefined ? ball.r : beamLatticeData.ballradius;
+
+					if ( cap.cap === 'sphere' ) {
+
+						addSphere( cap.position, ballRadius !== undefined ? Math.max( cap.radius, ballRadius ) : cap.radius, material );
+						if ( ball ) balls.delete( cap.vertexIndex );
+
+					} else if ( cap.cap === 'hemisphere' ) {
+
+						if ( ballRadius === undefined || ballRadius < cap.radius ) addSphere( cap.position, cap.radius, material, cap.direction );
+
+						if ( ball && ballRadius >= cap.radius ) {
+
+							addSphere( cap.position, ballRadius, material );
+							balls.delete( cap.vertexIndex );
+
+						}
+
+					}
+
+				}
+
+			}
+
+			for ( const ball of balls.values() ) {
+
+				const position = getVertex( ball.vindex );
+				const radius = ball.r !== undefined ? ball.r : beamLatticeData.ballradius;
+
+				if ( position ) addSphere( position, radius, getMaterial( ball, ball.p ) );
+
+			}
+
+			return meshes;
 
 		}
 
