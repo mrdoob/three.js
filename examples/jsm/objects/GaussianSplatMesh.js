@@ -249,6 +249,8 @@ class GaussianSplatMesh extends Mesh {
 	 */
 	updateSort( renderer, camera ) {
 
+		this.updateWorldMatrix( true, false );
+
 		const needsSort = this._needsSort( camera );
 
 		if ( this._sortInitialized === false || needsSort === true ) {
@@ -280,7 +282,6 @@ class GaussianSplatMesh extends Mesh {
 
 	_needsSort( camera ) {
 
-		this.updateWorldMatrix( true, false );
 		_modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, this.matrixWorld );
 
 		const e = _modelViewMatrix.elements;
@@ -292,13 +293,12 @@ class GaussianSplatMesh extends Mesh {
 
 	_updateSortUniforms( camera ) {
 
-		this.updateWorldMatrix( true, false );
-
 		this._sortMatrix.value.multiplyMatrices( camera.matrixWorldInverse, this.matrixWorld );
 
 		_worldCenter.copy( this.splatGeometry.boundingSphere.center ).applyMatrix4( this.matrixWorld );
 		_viewCenter.copy( _worldCenter ).applyMatrix4( camera.matrixWorldInverse );
-		this.getWorldScale( _worldScale );
+
+		_worldScale.setFromMatrixScale( this.matrixWorld );
 
 		const radius = this.splatGeometry.boundingSphere.radius * Math.max( _worldScale.x, _worldScale.y, _worldScale.z );
 		const depth = - _viewCenter.z;
