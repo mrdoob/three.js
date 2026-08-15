@@ -10,10 +10,31 @@ const _viewToLightMatrix = /*@__PURE__*/ new Matrix4();
 const _lightDirection = /*@__PURE__*/ new Vector3();
 const _up = /*@__PURE__*/ new Vector3();
 const _center = /*@__PURE__*/ new Vector3();
-const _corner = /*@__PURE__*/ new Vector3();
-const _nearCorners = [ new Vector3(), new Vector3(), new Vector3(), new Vector3() ];
-const _farCorners = [ new Vector3(), new Vector3(), new Vector3(), new Vector3() ];
-const _cascadeCorners = [ new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3() ];
+
+const _nearCorners = [
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3()
+];
+
+const _farCorners = [
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3()
+];
+
+const _cascadeCorners = [
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3()
+];
 
 // must match the cascade count in the sun shadow shader chunks
 
@@ -140,6 +161,10 @@ class SunLightShadow extends LightShadow {
 
 		}
 
+		const resolutionX = this.mapSize.x * ( 1 - 2 * insetX );
+		const resolutionY = this.mapSize.y * ( 1 - 2 * insetY );
+		const resolution = Math.min( resolutionX, resolutionY );
+
 		const camera = this.camera;
 		const cameraNear = viewCamera.near;
 		const cameraFar = Math.max( cameraNear + 1e-6, Math.min( camera.far, viewCamera.far ) );
@@ -249,10 +274,6 @@ class SunLightShadow extends LightShadow {
 
 			// snap to the texel grid to avoid shimmering when the view camera moves
 
-			const resolutionX = this.mapSize.width * this._viewports[ i ].z;
-			const resolutionY = this.mapSize.height * this._viewports[ i ].w;
-			const resolution = Math.min( resolutionX, resolutionY );
-
 			if ( resolution > 1 ) {
 
 				// pad by half a texel so snapping cannot clip a frustum corner
@@ -271,8 +292,7 @@ class SunLightShadow extends LightShadow {
 
 			const cascadeCamera = this._cameras[ i ];
 			cascadeCamera.position.copy( _center );
-			cascadeCamera.up.copy( _up );
-			cascadeCamera.lookAt( _corner.copy( _center ).add( _lightDirection ) );
+			cascadeCamera.quaternion.setFromRotationMatrix( _lightOrientationMatrix );
 			cascadeCamera.left = - radius;
 			cascadeCamera.right = radius;
 			cascadeCamera.top = radius;
