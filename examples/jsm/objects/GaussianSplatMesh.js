@@ -389,6 +389,47 @@ class GaussianSplatMesh extends Mesh {
 	}
 
 	/**
+	 * Computes intersection points between a casted ray and the splats.
+	 *
+	 * Each splat is an anisotropic gaussian, so the ray is tested against the ellipsoid its
+	 * covariance describes, cut off at the same extent the fragment shader draws.
+	 *
+	 * @param {Raycaster} raycaster - The raycaster.
+	 * @param {Array<Object>} intersects - The target array that holds the intersection points.
+	 */
+	raycast( raycaster, intersects ) {
+
+		const matrixWorld = this.matrixWorld;
+
+		// Checking boundingSphere distance to ray
+
+		if ( this.boundingSphere === null ) this.computeBoundingSphere();
+
+		_sphere.copy( this.boundingSphere );
+		_sphere.applyMatrix4( matrixWorld );
+
+		if ( raycaster.ray.intersectsSphere( _sphere ) === false ) return;
+
+		//
+
+		_inverseMatrix.copy( matrixWorld ).invert();
+		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
+
+		const count = this.splatGeometry.getAttribute( 'position' ).count;
+
+		for ( let i = 0; i < count; i ++ ) {
+
+			this.getSplat( i, _splat );
+
+			if ( _splat.opacity < MIN_RAYCAST_OPACITY ) continue;
+
+			testSplat( _splat, i, matrixWorld, raycaster, intersects, this );
+
+		}
+
+	}
+
+	/**
 	 * Updates the draw order if the camera has moved enough to need a new sort.
 	 *
 	 * @param {Renderer} renderer - The renderer.
