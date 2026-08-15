@@ -371,7 +371,7 @@ class GaussianSplatMesh extends Mesh {
 		this.boundingBox.getBoundingSphere( this.boundingSphere );
 
 		// the box corners overstate the radius, so grow it only where a splat actually reaches
-		let maxRadiusSq = 0;
+		let maxRadius = 0;
 		const center = this.boundingSphere.center;
 		const count = this.splatGeometry.getAttribute( 'position' ).count;
 
@@ -379,12 +379,11 @@ class GaussianSplatMesh extends Mesh {
 
 			this.getSplat( i, _splat );
 
-			const distance = center.distanceTo( _splat.position ) + _splat.radius;
-			maxRadiusSq = Math.max( maxRadiusSq, distance * distance );
+			maxRadius = Math.max( maxRadius, center.distanceTo( _splat.position ) + _splat.radius );
 
 		}
 
-		this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
+		this.boundingSphere.radius = maxRadius;
 
 	}
 
