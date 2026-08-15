@@ -18,8 +18,11 @@ import { SunLightShadow } from './SunLightShadow.js';
  * scene.add( sun );
  * ```
  *
- * This light is only supported by `WebGLRenderer`. When using `WebGPURenderer`,
- * use {@link DirectionalLight} with `CSMShadowNode` instead.
+ * When used with `WebGPURenderer`, the light must be registered with the
+ * renderer's node library first:
+ * ```js
+ * renderer.library.addLight( SunLightNode, SunLight );
+ * ```
  *
  * @augments Light
  * @three_import import { SunLight } from 'three/addons/lights/SunLight.js';

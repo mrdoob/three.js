@@ -377,6 +377,7 @@
 		"webgpu_lights_rectarealight",
 		"webgpu_lights_selective",
 		"webgpu_lights_spotlight",
+		"webgpu_lights_sunlight",
 		"webgpu_lines_fat_raycasting",
 		"webgpu_lines_fat_wireframe",
 		"webgpu_lines_fat",

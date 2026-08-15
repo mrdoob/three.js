@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - lights - sunlight</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - lights - sunlight">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_lights_sunlight.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_lights_sunlight.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Sun Light</span>
+			</div>
+
+			<small>WASD to move, mouse to look around.</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { cos, float, output, positionView, rangeFogFactor, reference, step, vec3, vec4 } from 'three/tsl';
+
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
+			import { SunLight } from 'three/addons/lights/SunLight.js';
+
+			let renderer, scene, camera, controls, timer, sunLight, sky, sceneEnv, pmremGenerator, renderTarget;
+
+			const params = {
+				showCascades: false,
+				far: 1000,
+				resolution: 2048,
+				azimuth: 135,
+				elevation: 10
+			};
+
+			const _sunDay = new THREE.Color( 0xfff2e3 ), _sunDusk = new THREE.Color( 0xff8a3d );
+			const _fogDay = new THREE.Color( 0xd8e2ea ), _fogDusk = new THREE.Color( 0xd9a273 );
+
+			// tints each fragment by its cascade, using the data of the built-in sun shadow node
+
+			function tintCascades() {
+
+				const cascadeData = reference( '_cascadeData', 'vec4', sunLight.shadow );
+				const viewDepth = positionView.z.negate();
+
+				let cascade = float( 0 );
+
+				for ( let i = 0; i < 2; i ++ ) cascade = cascade.add( step( cascadeData.element( i ).y, viewDepth ) );
+
+				const tint = cos( cascade.mul( 1.2 ).add( vec3( 0, 4.2, 2.1 ) ) ).mul( 0.3 ).add( 0.7 );
+
+				// tint before the fog by wrapping the scene fog
+
+				const fogColor = reference( 'color', 'color', scene.fog );
+				const fogFactor = rangeFogFactor( reference( 'near', 'float', scene.fog ), reference( 'far', 'float', scene.fog ) );
+
+				return vec4( fogFactor.mix( output.rgb.mul( tint ), fogColor ), output.a );
+
+			}
+
+			init();
+
+			function updateSun() {
+
+				sunLight.position.setFromSphericalCoords( 1, THREE.MathUtils.degToRad( 90 - params.elevation ), THREE.MathUtils.degToRad( params.azimuth ) );
+
+				// the sun light warms up and fades towards the horizon
+
+				const daylight = Math.min( 1, params.elevation / 30 );
+
+				sunLight.color.lerpColors( _sunDusk, _sunDay, daylight );
+				sunLight.intensity = 3 + daylight * 2;
+
+				scene.fog.color.lerpColors( _fogDusk, _fogDay, daylight );
+
+				sky.sunPosition.value.copy( sunLight.position );
+
+				// light the scene with the sky itself
+
+				if ( renderTarget !== undefined ) renderTarget.dispose();
+
+				sceneEnv.add( sky );
+				renderTarget = pmremGenerator.fromScene( sceneEnv );
+				scene.add( sky );
+
+				scene.environment = renderTarget.texture;
+
+			}
+
+			function init() {
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x000000, 500, 4000 );
+				scene.environmentIntensity = 0.5;
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.5, 5000 );
+				camera.position.set( 60, 8, 0 );
+				camera.lookAt( - 60, 8, 0 );
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.library.addLight( THREE.SunLightNode, SunLight );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.shadowMap.enabled = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 0.6;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				controls = new FirstPersonControls( camera, renderer.domElement );
+				controls.movementSpeed = 40;
+				controls.lookSpeed = 0.05;
+
+				timer = new THREE.Timer();
+				pmremGenerator = new THREE.PMREMGenerator( renderer );
+				sceneEnv = new THREE.Scene();
+
+				// sky and sun
+
+				sky = new SkyMesh();
+				sky.scale.setScalar( 9000 );
+				scene.add( sky );
+
+				sky.turbidity.value = 3;
+				sky.rayleigh.value = 2;
+				sky.cloudSpeed.value = 0; // keep the clouds static, like the WebGL version
+				sky.showSunDisc.value = false; // the sun is represented by the light
+
+				sunLight = new SunLight();
+				sunLight.castShadow = true;
+				sunLight.shadow.camera.far = params.far; // maximum shadow distance
+				sunLight.shadow.mapSize.setScalar( params.resolution );
+				sunLight.shadow.normalBias = 0.05;
+				scene.add( sunLight );
+
+				renderer.init().then( updateSun );
+
+				// ground
+
+				const ground = new THREE.Mesh( new THREE.PlaneGeometry( 10000, 10000 ), new THREE.MeshStandardMaterial( { color: 0xa39f8e } ) );
+				ground.rotation.x = - Math.PI / 2;
+				ground.receiveShadow = true;
+				scene.add( ground );
+
+				const dummy = new THREE.Object3D();
+
+				// an avenue of thin posts shows the shadow resolution from up close
+				// all the way down to the shadow distance
+
+				const posts = new THREE.InstancedMesh( new THREE.BoxGeometry( 1, 10, 1 ), new THREE.MeshStandardMaterial( { color: 0x475161 } ), 120 );
+				posts.castShadow = true;
+				posts.receiveShadow = true;
+				scene.add( posts );
+
+				for ( let i = 0; i < 60; i ++ ) {
+
+					for ( const side of [ - 1, 1 ] ) {
+
+						dummy.position.set( 30 - i * 17, 5, side * 13 );
+						dummy.updateMatrix();
+						posts.setMatrixAt( i * 2 + ( side + 1 ) / 2, dummy.matrix );
+
+					}
+
+				}
+
+				// towers for large shadows in the distance
+
+				const towers = new THREE.InstancedMesh( new THREE.BoxGeometry( 10, 1, 10 ), new THREE.MeshStandardMaterial(), 60 );
+				towers.castShadow = true;
+				towers.receiveShadow = true;
+				scene.add( towers );
+
+				const towerColors = [ new THREE.Color( 0x08d9d6 ), new THREE.Color( 0xff2e63 ) ];
+
+				THREE.MathUtils.seededRandom( 6 );
+
+				for ( let i = 0; i < 30; i ++ ) {
+
+					for ( const side of [ - 1, 1 ] ) {
+
+						const height = 20 + THREE.MathUtils.seededRandom() * 40;
+
+						dummy.position.set( - 40 - i * 32 - THREE.MathUtils.seededRandom() * 10, height / 2, side * ( 38 + THREE.MathUtils.seededRandom() * 55 ) );
+						dummy.scale.y = height;
+						dummy.updateMatrix();
+
+						const index = i * 2 + ( side + 1 ) / 2;
+						towers.setMatrixAt( index, dummy.matrix );
+						towers.setColorAt( index, towerColors[ ( i + ( side + 1 ) / 2 ) % 2 ] );
+
+					}
+
+				}
+
+				// gui
+
+				const gui = renderer.inspector.createParameters( 'Sun Light' );
+
+				gui.add( params, 'showCascades' ).name( 'show cascades' ).onChange( function ( value ) {
+
+					scene.fogNode = value ? tintCascades() : null;
+
+				} );
+
+				gui.add( params, 'far', 100, 3000 ).step( 1 ).name( 'shadow far' ).onChange( function ( value ) {
+
+					sunLight.shadow.camera.far = value;
+
+				} );
+
+				gui.add( params, 'resolution', [ 256, 512, 1024, 2048, 4096 ] ).name( 'shadow resolution' ).onChange( function ( value ) {
+
+					sunLight.shadow.mapSize.setScalar( value );
+
+				} );
+
+				gui.add( params, 'azimuth', 0, 360 ).onChange( updateSun );
+				gui.add( params, 'elevation', 5, 80 ).onChange( updateSun );
+
+				window.addEventListener( 'resize', function () {
+
+					camera.aspect = window.innerWidth / window.innerHeight;
+					camera.updateProjectionMatrix();
+
+					renderer.setSize( window.innerWidth, window.innerHeight );
+					controls.handleResize();
+
+				} );
+
+			}
+
+			function animate() {
+
+				timer.update();
+
+				controls.update( timer.getDelta() );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

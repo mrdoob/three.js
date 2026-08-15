@@ -123,6 +123,8 @@ export { default as RectAreaLightNode } from './lighting/RectAreaLightNode.js';
 export { default as ShadowBaseNode } from './lighting/ShadowBaseNode.js';
 export { default as ShadowNode } from './lighting/ShadowNode.js';
 export { default as SpotLightNode } from './lighting/SpotLightNode.js';
+export { default as SunLightNode } from './lighting/SunLightNode.js';
+export { default as SunShadowNode } from './lighting/SunShadowNode.js';
 
 // math
 export { default as BitcastNode } from './math/BitcastNode.js';
