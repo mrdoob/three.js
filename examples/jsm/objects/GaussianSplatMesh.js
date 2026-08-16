@@ -344,9 +344,6 @@ class GaussianSplatMesh extends Mesh {
 	/**
 	 * Computes intersection points between a casted ray and the splats.
 	 *
-	 * Each splat is an anisotropic gaussian, so the ray is tested against the ellipsoid its
-	 * covariance describes, cut off at the same extent the fragment shader draws.
-	 *
 	 * @param {Raycaster} raycaster - The raycaster.
 	 * @param {Array<Object>} intersects - The target array that holds the intersection points.
 	 */
@@ -383,9 +380,7 @@ class GaussianSplatMesh extends Mesh {
 
 		for ( let i = 0; i < count; i ++ ) {
 
-			if ( colorAttribute.getW( i ) < MIN_RAYCAST_OPACITY ) continue;
-
-			testSplat( positionAttribute, covarianceAttribute, i, matrixWorld, raycaster, intersects, this );
+			testSplat( positionAttribute, covarianceAttribute, colorAttribute, i, matrixWorld, raycaster, intersects, this );
 
 		}
 
@@ -486,33 +481,36 @@ class GaussianSplatMesh extends Mesh {
 
 }
 
-// Intersects the ray with the splat's gaussian, treated as the ellipsoid
-// "transpose( x - center ) * inverse( covariance ) * ( x - center ) = cutoff * cutoff".
-// Substituting the ray gives a quadratic in t whose smaller root is the near surface.
-function testSplat( positionAttribute, covarianceAttribute, index, matrixWorld, raycaster, intersects, object ) {
+// Intersects the ray with the ellipsoid the splat's covariance describes, which reduces to a
+// quadratic in t whose smaller root is the near surface.
+function testSplat( positionAttribute, covarianceAttribute, colorAttribute, index, matrixWorld, raycaster, intersects, object ) {
 
-	const centerX = positionAttribute.getX( index );
-	const centerY = positionAttribute.getY( index );
-	const centerZ = positionAttribute.getZ( index );
+	// skip faint splats
+	if ( colorAttribute.getW( index ) < MIN_RAYCAST_OPACITY ) {
+
+		return;
+
+	}
 
 	// the attribute holds the upper triangle of the symmetric covariance
 	const c01 = covarianceAttribute.getComponent( index, 1 );
 	const c02 = covarianceAttribute.getComponent( index, 2 );
 	const c12 = covarianceAttribute.getComponent( index, 4 );
 
-	// A splat is commonly flat enough along one axis that its covariance is singular, and its
-	// determinant is the product of the squared extents, so it falls away with the sixth power of
-	// the splat size. Testing that against a fixed epsilon throws away most of a small scene, so
-	// the thinnest axis is instead floored relative to the widest, which leaves the quadratic
-	// solvable and independent of the scale the splats happen to be authored at.
 	const maxVariance = Math.max(
 		covarianceAttribute.getComponent( index, 0 ),
 		covarianceAttribute.getComponent( index, 3 ),
 		covarianceAttribute.getComponent( index, 5 )
 	);
 
-	if ( maxVariance <= 0 ) return;
+	if ( maxVariance <= 0 ) {
 
+		return;
+
+	}
+
+	// splats are often flat enough to make the covariance singular, so the thinnest axis is floored
+	// relative to the widest to keep the quadratic solvable
 	const minVariance = maxVariance * COVARIANCE_FLATNESS;
 	const c00 = covarianceAttribute.getComponent( index, 0 ) + minVariance;
 	const c11 = covarianceAttribute.getComponent( index, 3 ) + minVariance;
@@ -524,7 +522,11 @@ function testSplat( positionAttribute, covarianceAttribute, index, matrixWorld, 
 	const i02 = c01 * c12 - c02 * c11;
 	const determinant = c00 * i00 + c01 * i01 + c02 * i02;
 
-	if ( determinant <= 0 ) return;
+	if ( determinant <= 0 ) {
+
+		return;
+
+	}
 
 	const i11 = c00 * c22 - c02 * c02;
 	const i12 = c02 * c01 - c00 * c12;
@@ -538,9 +540,10 @@ function testSplat( positionAttribute, covarianceAttribute, index, matrixWorld, 
 	const m12 = i12 * inverseDeterminant;
 	const m22 = i22 * inverseDeterminant;
 
-	const ox = _ray.origin.x - centerX;
-	const oy = _ray.origin.y - centerY;
-	const oz = _ray.origin.z - centerZ;
+	const center = _vector.fromBufferAttribute( positionAttribute, index );
+	const ox = _ray.origin.x - center.x;
+	const oy = _ray.origin.y - center.y;
+	const oz = _ray.origin.z - center.z;
 	const dx = _ray.direction.x;
 	const dy = _ray.direction.y;
 	const dz = _ray.direction.z;
@@ -555,28 +558,47 @@ function testSplat( positionAttribute, covarianceAttribute, index, matrixWorld, 
 
 	const a = dx * mdx + dy * mdy + dz * mdz;
 
-	if ( a <= 0 ) return;
+	if ( a <= 0 ) {
+
+		return;
+
+	}
 
 	const b = 2 * ( ox * mdx + oy * mdy + oz * mdz );
 	const c = ox * mox + oy * moy + oz * moz - SPLAT_KERNEL_CUTOFF * SPLAT_KERNEL_CUTOFF;
-
 	const discriminant = b * b - 4 * a * c;
 
-	if ( discriminant < 0 ) return;
+	if ( discriminant < 0 ) {
+
+		return;
+
+	}
 
 	const sqrtDiscriminant = Math.sqrt( discriminant );
 	let t = ( - b - sqrtDiscriminant ) / ( 2 * a );
 
 	// the near surface is behind the origin when the ray starts inside the splat
-	if ( t < 0 ) t = ( - b + sqrtDiscriminant ) / ( 2 * a );
-	if ( t < 0 ) return;
+	if ( t < 0 ) {
+
+		t = ( - b + sqrtDiscriminant ) / ( 2 * a );
+
+	}
+
+	if ( t < 0 ) {
+
+		return;
+
+	}
 
 	const intersectPoint = new Vector3();
 	_ray.at( t, intersectPoint ).applyMatrix4( matrixWorld );
 
 	const distance = raycaster.ray.origin.distanceTo( intersectPoint );
+	if ( distance < raycaster.near || distance > raycaster.far ) {
 
-	if ( distance < raycaster.near || distance > raycaster.far ) return;
+		return;
+
+	}
 
 	intersects.push( {
 
