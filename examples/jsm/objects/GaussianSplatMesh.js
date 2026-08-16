@@ -33,6 +33,7 @@ import {
 	storage,
 	uint,
 	uniform,
+	unpackUnorm4x8,
 	varyingProperty,
 	vec2,
 	vec3,
@@ -695,19 +696,6 @@ function createSphericalHarmonicsComputeNode( buffers, localCameraPosition ) {
 
 }
 
-function readColor( buffers, splatIndex ) {
-
-	const packed = buffers.colorRead.element( splatIndex ).toVar( 'packedColor' );
-
-	return vec4(
-		float( packed.bitAnd( 0xff ) ),
-		float( packed.shiftRight( 8 ).bitAnd( 0xff ) ),
-		float( packed.shiftRight( 16 ).bitAnd( 0xff ) ),
-		float( packed.shiftRight( 24 ).bitAnd( 0xff ) )
-	).mul( 1 / 255 ).toVar( 'splatColor' );
-
-}
-
 function createMaterialNodes( buffers, sort, localCameraPosition ) {
 
 	const splatUv = varyingProperty( 'vec2', 'vSplatUv' );
@@ -719,7 +707,7 @@ function createMaterialNodes( buffers, sort, localCameraPosition ) {
 		const center = buffers.centerRead.element( splatIndex ).xyz.toVar( 'center' );
 		const covA = buffers.covarianceARead.element( splatIndex ).toVar( 'covA' );
 		const covB = buffers.covarianceBRead.element( splatIndex ).toVar( 'covB' );
-		const color = readColor( buffers, splatIndex );
+		const color = unpackUnorm4x8( buffers.colorRead.element( splatIndex ) ).toVar( 'splatColor' );
 		const rgb = color.rgb.toVar( 'splatRgb' );
 
 		if ( buffers.sphericalHarmonicsDegree > 0 ) {
