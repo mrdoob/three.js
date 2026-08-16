@@ -1,5 +1,6 @@
 import { Light } from './Light.js';
 import { SunLightShadow } from './SunLightShadow.js';
+import { Object3D } from '../core/Object3D.js';
 
 /**
  * A sun-like light that gets emitted in a specific direction, with rays that
@@ -46,15 +47,15 @@ class SunLight extends Light {
 
 		this.type = 'SunLight';
 
+		this.position.copy( Object3D.DEFAULT_UP );
+		this.updateMatrix();
+
 		/**
-		 * The light's shadow configuration.
+		 * This property holds the light's shadow configuration.
 		 *
 		 * @type {SunLightShadow}
 		 */
 		this.shadow = new SunLightShadow();
-
-		this.position.set( 0, 1, 0 );
-		this.updateMatrix();
 
 	}
 

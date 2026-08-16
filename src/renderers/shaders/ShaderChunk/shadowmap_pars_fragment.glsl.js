@@ -296,7 +296,7 @@ export default /* glsl */`
 				sampler2D shadowMap,
 			#endif
 			SunLightShadow sunLightShadow,
-			const in int shadowIndex
+			int shadowIndex
 		) {
 
 			vec4 shadowWorldPosition = vec4( vSunShadowWorldPosition.xyz + vSunShadowWorldNormal * sunLightShadow.shadowNormalBias, 1.0 );
@@ -317,7 +317,7 @@ export default /* glsl */`
 
 					float cascadeShadow = getShadow( shadowMap, sunLightShadow.shadowMapSize, sunLightShadow.shadowIntensity, sunLightShadow.shadowBias, sunLightShadow.shadowRadius, sunShadowMatrix[ cascadeOffset + i ] * shadowWorldPosition );
 
-					shadow = viewDepth < cascade.z ? cascadeShadow : mix( cascadeShadow, shadow, smoothstep( cascade.z, cascade.y, viewDepth ) );
+					shadow = mix( cascadeShadow, shadow, smoothstep( cascade.z, cascade.y, viewDepth ) );
 
 				}
 
