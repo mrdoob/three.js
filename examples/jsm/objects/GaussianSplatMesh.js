@@ -1,9 +1,7 @@
 import {
 	Box3,
 	BufferAttribute,
-	Color,
 	InstancedBufferGeometry,
-	Matrix3,
 	Matrix4,
 	Mesh,
 	NodeMaterial,
