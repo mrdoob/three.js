@@ -98,7 +98,7 @@ class TrackballControls extends Controls {
 		this.panSpeed = 0.3;
 
 		/**
-		 * The roll speed.
+		 * The roll speed used for multi-touch roll.
 		 *
 		 * @type {number}
 		 * @default 1
