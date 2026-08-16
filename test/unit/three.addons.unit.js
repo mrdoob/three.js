@@ -14,3 +14,4 @@ import './addons/loaders/SPZLoader.tests.js';
 import './addons/loaders/USDLoader.tests.js';
 import './addons/exporters/USDZExporter.tests.js';
 import './addons/tsl/WebGLNodesHandler.tests.js';
+import './addons/webxr/XRControllerModelFactory.tests.js';

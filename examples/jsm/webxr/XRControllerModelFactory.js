@@ -325,6 +325,7 @@ class XRControllerModelFactory {
 
 		const controllerModel = new XRControllerModel();
 		let scene = null;
+		let activeInputSource = null;
 
 		controller.addEventListener( 'connected', ( event ) => {
 
@@ -332,15 +333,22 @@ class XRControllerModelFactory {
 
 			if ( xrInputSource.targetRayMode !== 'tracked-pointer' || ! xrInputSource.gamepad || xrInputSource.hand ) return;
 
+			activeInputSource = xrInputSource;
+
 			fetchProfile( xrInputSource, this.path, DEFAULT_PROFILE ).then( ( { profile, assetPath } ) => {
 
-				controllerModel.motionController = new MotionController(
+				// Discard the result if the input source was replaced while the profile was being fetched.
+				if ( activeInputSource !== xrInputSource ) return;
+
+				const motionController = new MotionController(
 					xrInputSource,
 					profile,
 					assetPath
 				);
 
-				const cachedAsset = this._assetCache[ controllerModel.motionController.assetUrl ];
+				controllerModel.motionController = motionController;
+
+				const cachedAsset = this._assetCache[ motionController.assetUrl ];
 				if ( cachedAsset ) {
 
 					scene = cachedAsset.scene.clone();
@@ -358,9 +366,11 @@ class XRControllerModelFactory {
 					}
 
 					this.gltfLoader.setPath( '' );
-					this.gltfLoader.load( controllerModel.motionController.assetUrl, ( asset ) => {
+					this.gltfLoader.load( motionController.assetUrl, ( asset ) => {
 
-						this._assetCache[ controllerModel.motionController.assetUrl ] = asset;
+						this._assetCache[ motionController.assetUrl ] = asset;
+
+						if ( activeInputSource !== xrInputSource ) return;
 
 						scene = asset.scene.clone();
 
@@ -372,7 +382,7 @@ class XRControllerModelFactory {
 					null,
 					() => {
 
-						throw new Error( `THREE.XRControllerModelFactory: Asset ${controllerModel.motionController.assetUrl} missing or malformed.` );
+						throw new Error( `THREE.XRControllerModelFactory: Asset ${motionController.assetUrl} missing or malformed.` );
 
 					} );
 
@@ -388,6 +398,7 @@ class XRControllerModelFactory {
 
 		controller.addEventListener( 'disconnected', () => {
 
+			activeInputSource = null;
 			controllerModel.motionController = null;
 			controllerModel.remove( scene );
 			scene = null;
