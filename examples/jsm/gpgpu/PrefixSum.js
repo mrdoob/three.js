@@ -167,9 +167,7 @@ export class PrefixSum {
 		this.count = this.inputAttribute.array.length;
 
 		/**
-		 * The number of elements every write into the output buffer is shifted by. An offset of one
-		 * Because the first element of an exclusive prefix sum is always zero, an offset of
-	   * one turns the inclusive prefix sum this class computes into an exclusive one.
+		 * A flag designating whether the module will execute an exclusive or inclusive prefix sum.
 		 *
 		 * @type {number}
 		 */
