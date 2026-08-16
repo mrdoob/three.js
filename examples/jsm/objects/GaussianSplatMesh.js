@@ -535,12 +535,23 @@ function testSplat( splat, index, matrixWorld, raycaster, intersects, object ) {
 
 	// column major, and symmetric, so the upper triangle is enough
 	const e = splat.covariance.elements;
-	const c00 = e[ 0 ];
 	const c01 = e[ 1 ];
 	const c02 = e[ 2 ];
-	const c11 = e[ 4 ];
 	const c12 = e[ 5 ];
-	const c22 = e[ 8 ];
+
+	// A splat is commonly flat enough along one axis that its covariance is singular, and its
+	// determinant is the product of the squared extents, so it falls away with the sixth power of
+	// the splat size. Testing that against a fixed epsilon throws away most of a small scene, so
+	// the thinnest axis is instead floored relative to the widest, which leaves the quadratic
+	// solvable and independent of the scale the splats happen to be authored at.
+	const maxVariance = Math.max( e[ 0 ], e[ 4 ], e[ 8 ] );
+
+	if ( maxVariance <= 0 ) return;
+
+	const minVariance = maxVariance * COVARIANCE_FLATNESS;
+	const c00 = e[ 0 ] + minVariance;
+	const c11 = e[ 4 ] + minVariance;
+	const c22 = e[ 8 ] + minVariance;
 
 	// inverse of the symmetric covariance, by cofactors
 	const i00 = c11 * c22 - c12 * c12;
@@ -548,8 +559,7 @@ function testSplat( splat, index, matrixWorld, raycaster, intersects, object ) {
 	const i02 = c01 * c12 - c02 * c11;
 	const determinant = c00 * i00 + c01 * i01 + c02 * i02;
 
-	// a degenerate splat has no volume to hit
-	if ( Math.abs( determinant ) < COVARIANCE_EPSILON ) return;
+	if ( determinant <= 0 ) return;
 
 	const i11 = c00 * c22 - c02 * c02;
 	const i12 = c02 * c01 - c00 * c12;
