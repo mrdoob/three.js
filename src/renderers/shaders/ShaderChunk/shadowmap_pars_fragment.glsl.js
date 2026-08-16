@@ -13,6 +13,35 @@ export default /* glsl */`
 
 #ifdef USE_SHADOWMAP
 
+	#if NUM_SUN_LIGHT_SHADOWS > 0
+
+		#if defined( SHADOWMAP_TYPE_PCF )
+
+			uniform sampler2DShadow sunShadowMap[ NUM_SUN_LIGHT_SHADOWS ];
+
+		#else
+
+			uniform sampler2D sunShadowMap[ NUM_SUN_LIGHT_SHADOWS ];
+
+		#endif
+
+		uniform mat4 sunShadowMatrix[ NUM_SUN_LIGHT_SHADOWS * 4 ];
+		uniform vec4 sunShadowCascade[ NUM_SUN_LIGHT_SHADOWS * 4 ];
+		varying vec4 vSunShadowWorldPosition;
+		varying vec3 vSunShadowWorldNormal;
+
+		struct SunLightShadow {
+			float shadowIntensity;
+			float shadowBias;
+			float shadowNormalBias;
+			float shadowRadius;
+			vec2 shadowMapSize;
+		};
+
+		uniform SunLightShadow sunLightShadows[ NUM_SUN_LIGHT_SHADOWS ];
+
+	#endif
+
 	#if NUM_DIR_LIGHT_SHADOWS > 0
 
 		#if defined( SHADOWMAP_TYPE_PCF )
@@ -253,6 +282,48 @@ export default /* glsl */`
 			}
 
 			return mix( 1.0, shadow, shadowIntensity );
+
+		}
+
+	#endif
+
+	#if NUM_SUN_LIGHT_SHADOWS > 0
+
+		float getSunShadow(
+			#if defined( SHADOWMAP_TYPE_PCF )
+				sampler2DShadow shadowMap,
+			#else
+				sampler2D shadowMap,
+			#endif
+			SunLightShadow sunLightShadow,
+			int shadowIndex
+		) {
+
+			vec4 shadowWorldPosition = vec4( vSunShadowWorldPosition.xyz + vSunShadowWorldNormal * sunLightShadow.shadowNormalBias, 1.0 );
+			float viewDepth = vSunShadowWorldPosition.w;
+			int cascadeOffset = shadowIndex * 4;
+
+			float shadow = 1.0;
+
+			// walk the cascades back to front so each fade band can blend with the shadow behind it
+
+			for ( int i = 3; i >= 0; i -- ) {
+
+				// ( begin, end, fade start ) view depths of the cascade
+
+				vec4 cascade = sunShadowCascade[ cascadeOffset + i ];
+
+				if ( viewDepth >= cascade.x && viewDepth < cascade.y ) {
+
+					float cascadeShadow = getShadow( shadowMap, sunLightShadow.shadowMapSize, sunLightShadow.shadowIntensity, sunLightShadow.shadowBias, sunLightShadow.shadowRadius, sunShadowMatrix[ cascadeOffset + i ] * shadowWorldPosition );
+
+					shadow = mix( cascadeShadow, shadow, smoothstep( cascade.z, cascade.y, viewDepth ) );
+
+				}
+
+			}
+
+			return shadow;
 
 		}
 

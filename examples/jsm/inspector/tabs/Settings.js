@@ -4,6 +4,10 @@ import { getItem, setItem } from '../Inspector.js';
 
 const _extensions = [
 	{
+		name: 'Color Grading',
+		url: '../extensions/color-grading/ColorGrading.js'
+	},
+	{
 		name: 'TSL Graph',
 		url: '../extensions/tsl-graph/TSLGraphEditor.js'
 	}

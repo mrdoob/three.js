@@ -188,7 +188,7 @@ class FrustumArray {
 	/**
 	 * Copies the values of the given frustum array to this instance.
 	 *
-	 * @param {FrustumArray} frustumArray - The frustum array to copy.
+	 * @param {FrustumArray} source - The frustum array to copy.
 	 * @return {FrustumArray} A reference to this frustum array.
 	 */
 	copy( source ) {

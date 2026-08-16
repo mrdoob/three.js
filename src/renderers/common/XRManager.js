@@ -17,6 +17,7 @@ import { Mesh } from '../../objects/Mesh.js';
 import { warn, warnOnce } from '../../utils.js';
 import { renderOutput } from '../../nodes/display/RenderOutputNode.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
+import { context } from '../../nodes/core/ContextNode.js';
 
 const _cameraLPos = /*@__PURE__*/ new Vector3();
 const _cameraRPos = /*@__PURE__*/ new Vector3();
@@ -230,15 +231,6 @@ class XRManager extends EventDispatcher {
 		this._currentPixelRatio = null;
 
 		/**
-		 * The renderer's sample count before XR temporarily overrides it.
-		 *
-		 * @private
-		 * @type {?number}
-		 * @default null
-		 */
-		this._currentSamples = null;
-
-		/**
 		 * The current size of the renderer's canvas
 		 * in logical pixel unit.
 		 *
@@ -246,6 +238,15 @@ class XRManager extends EventDispatcher {
 		 * @type {Vector2}
 		 */
 		this._currentSize = new Vector2();
+
+		/**
+		 * Holds a reference to the user camera and its current settings.
+		 *
+		 * @private
+		 * @type {?Object}
+		 * @default null
+		 */
+		this._currentCameraSettings = null;
 
 		/**
 		 * The default event listener for handling events inside a XR session.
@@ -737,22 +738,11 @@ class XRManager extends EventDispatcher {
 	 */
 	_validateWebGPUSession() {
 
-		const renderer = this._renderer;
-
-		if ( renderer.backend.isWebGPUBackend !== true ) return;
+		if ( this._renderer.backend.isWebGPUBackend !== true ) return;
 
 		if ( this._session.enabledFeatures.includes( 'webgpu' ) === false ) {
 
 			throw new Error( 'THREE.XRManager: WebGPU XR sessions require the "webgpu" session feature. Use VRButtonGPU/XRButton with "webgpu" enabled or use a WebGL backend.' );
-
-		}
-
-		if ( renderer.samples > 0 ) {
-
-			warnOnce( 'THREE.XRManager: WebGPU XR does not support MSAA yet. Disabling MSAA for this XR session.' );
-
-			if ( this._currentSamples === null ) this._currentSamples = renderer.samples;
-			renderer._samples = 0;
 
 		}
 
@@ -770,8 +760,7 @@ class XRManager extends EventDispatcher {
 
 		const webgpuBinding = this.getWebGPUBinding();
 		const glProjLayer = webgpuBinding.createProjectionLayer( {
-			colorFormat: webgpuBinding.getPreferredColorFormat(),
-			depthStencilFormat: 'depth24plus'
+			colorFormat: webgpuBinding.getPreferredColorFormat()
 		} );
 
 		this._glProjLayer = glProjLayer;
@@ -787,7 +776,10 @@ class XRManager extends EventDispatcher {
 			depthBuffer: true,
 			multiview: false,
 			useArrayDepthTexture: true,
-			samples: 0
+			storeMultisampledColorBuffer: false,
+			storeMultisampledDepthBuffer: false,
+			storeMultisampledStencilBuffer: false,
+			samples: this._renderer.samples
 		} );
 
 		this._xrRenderTarget.texture.isArrayTexture = true;
@@ -810,38 +802,10 @@ class XRManager extends EventDispatcher {
 	_disposeWebGPUSession() {
 
 		const renderer = this._renderer;
+		const backend = renderer.backend;
 		const xrRenderTarget = this._xrRenderTarget;
 
-		if ( xrRenderTarget === null || renderer.backend.isWebGPUBackend !== true ) return;
-
-		// XR textures are external (from XRGPUBinding), so clear cached state before disposal.
-		const backend = renderer.backend;
-		const texturesModule = renderer._textures;
-
-		const renderTargetData = backend.get ? backend.get( xrRenderTarget ) : null;
-		if ( renderTargetData ) {
-
-			renderTargetData.descriptors = undefined;
-
-		}
-
-		const deleteResource = ( resource ) => {
-
-			if ( resource === null || resource === undefined ) return;
-
-			if ( backend.delete ) backend.delete( resource );
-			if ( texturesModule.delete ) texturesModule.delete( resource );
-
-		};
-
-		for ( let i = 0; i < xrRenderTarget.textures.length; i ++ ) {
-
-			deleteResource( xrRenderTarget.textures[ i ] );
-
-		}
-
-		deleteResource( xrRenderTarget.depthTexture );
-		deleteResource( xrRenderTarget );
+		if ( xrRenderTarget === null || backend.isWebGPUBackend !== true ) return;
 
 		if ( renderer._renderContexts && renderer._renderContexts.dispose ) {
 
@@ -850,6 +814,15 @@ class XRManager extends EventDispatcher {
 		}
 
 		xrRenderTarget.dispose();
+
+		// The external texture can be registered before the render target is initialized.
+		for ( const texture of xrRenderTarget.textures ) {
+
+			if ( backend.has( texture ) ) backend.destroyTexture( texture );
+
+		}
+
+		backend.delete( xrRenderTarget );
 
 	}
 
@@ -1153,13 +1126,15 @@ class XRManager extends EventDispatcher {
 
 					// Apply ToneMapping and OutputColorSpace directly in the material shader
 
-					contextNode = currentContextNode.context( {
+					contextNode = context( {
 
 						getOutput: ( outputNode ) => {
 
 							return renderOutput( outputNode, renderer.toneMapping, renderer.outputColorSpace );
 
-						}
+						},
+
+						... currentContextNode.getFlowContextData()
 
 					} );
 
@@ -1371,11 +1346,7 @@ class XRManager extends EventDispatcher {
 						format: RGBAFormat,
 						type: UnsignedByteType,
 						colorSpace: renderer.outputColorSpace,
-						stencilBuffer: renderer.stencil,
-						resolveDepthBuffer: ( glBaseLayer.ignoreDepthValues === false ),
-						resolveStencilBuffer: ( glBaseLayer.ignoreDepthValues === false ),
-						storeMultisampledDepthBuffer: ( glBaseLayer.ignoreDepthValues === false ),
-						storeMultisampledStencilBuffer: ( glBaseLayer.ignoreDepthValues === false ),
+						stencilBuffer: renderer.stencil
 					}
 				);
 
@@ -1468,6 +1439,12 @@ class XRManager extends EventDispatcher {
 		}
 
 		// update user camera and its children
+
+		if ( this._currentCameraSettings === null && camera.isPerspectiveCamera ) {
+
+			this._currentCameraSettings = { camera: camera, fov: camera.fov, zoom: camera.zoom };
+
+		}
 
 		updateUserCamera( camera, cameraXR, parent );
 
@@ -1683,13 +1660,6 @@ function onSessionEnd() {
 	this._currentDepthNear = null;
 	this._currentDepthFar = null;
 
-	if ( this._currentSamples !== null ) {
-
-		renderer._samples = this._currentSamples;
-		this._currentSamples = null;
-
-	}
-
 	// restore framebuffer/rendering state
 
 	renderer._resetXRState();
@@ -1760,6 +1730,18 @@ function onSessionEnd() {
 
 	renderer.setPixelRatio( this._currentPixelRatio );
 	renderer.setSize( this._currentSize.width, this._currentSize.height, false );
+
+	if ( this._currentCameraSettings !== null ) {
+
+		const camera = this._currentCameraSettings.camera;
+
+		camera.fov = this._currentCameraSettings.fov;
+		camera.zoom = this._currentCameraSettings.zoom;
+		camera.updateProjectionMatrix();
+
+		this._currentCameraSettings = null;
+
+	}
 
 	this.dispatchEvent( { type: 'sessionend' } );
 
@@ -1985,6 +1967,14 @@ function onAnimationFrame( time, frame ) {
 		renderer.setOutputRenderTarget( this._xrRenderTarget );
 
 		const frameBufferTarget = renderer._getFrameBufferTarget();
+
+		if ( webgpuViewData !== null ) {
+
+			this._xrRenderTarget.samples = frameBufferTarget === null ? renderer.samples : 0;
+			this._xrRenderTarget.depthBuffer = frameBufferTarget === null;
+
+		}
+
 		renderer.xr.foveateBoundTexture( frameBufferTarget );
 
 	}

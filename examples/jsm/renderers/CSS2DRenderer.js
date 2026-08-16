@@ -256,10 +256,10 @@ class CSS2DRenderer {
 
 					// coordinates
 					const tx = _vector.x * _widthHalf + _widthHalf;
-					const ty = -_vector.y * _heightHalf + _heightHalf;
+					const ty = - _vector.y * _heightHalf + _heightHalf;
 
 					// transform
-					element.style.transform = `translate(${-cx}%, ${-cy}%) translate(${tx}px, ${ty}px) rotate(${angle}rad)`;
+					element.style.transform = `translate(${- cx}%, ${- cy}%) translate(${tx}px, ${ty}px) rotate(${angle}rad)`;
 
 					if ( element.parentNode !== domElement ) {
 

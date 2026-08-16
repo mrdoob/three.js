@@ -13,7 +13,8 @@ import WebGPUCapabilities from './utils/WebGPUCapabilities.js';
 import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
 import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
-import { WebGPUCoordinateSystem, TimestampQuery, REVISION, HalfFloatType, Compatibility } from '../../constants.js';
+import { WebGPUCoordinateSystem, TimestampQuery, REVISION, HalfFloatType, Compatibility, CustomBlending } from '../../constants.js';
+import { Color } from '../../math/Color.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
 import { error } from '../../utils.js';
 
@@ -27,10 +28,12 @@ import GPURenderPassDepthStencilAttachment from './descriptors/GPURenderPassDept
 import GPURenderPassDescriptor from './descriptors/GPURenderPassDescriptor.js';
 import GPURenderPassTimestampWrites from './descriptors/GPURenderPassTimestampWrites.js';
 import GPUTexelCopyTextureInfo from './descriptors/GPUTexelCopyTextureInfo.js';
+import GPUTextureDescriptor from './descriptors/GPUTextureDescriptor.js';
 import GPUTextureViewDescriptor from './descriptors/GPUTextureViewDescriptor.js';
 import GPUExtent3D from './descriptors/GPUExtent3D.js';
 
 const _clearValue = { r: 0, g: 0, b: 0, a: 1 };
+const _blendConstant = { r: 0, g: 0, b: 0, a: 0 };
 const _bufferDescriptor = new GPUBufferDescriptor();
 const _commandEncoderDescriptor = new GPUCommandEncoderDescriptor();
 const _computePassDescriptor = new GPUComputePassDescriptor();
@@ -39,6 +42,7 @@ const _shaderModuleDescriptor = new GPUShaderModuleDescriptor();
 const _renderPassTimestampWrites = new GPURenderPassTimestampWrites();
 const _texelCopyTextureInfoSrc = new GPUTexelCopyTextureInfo();
 const _texelCopyTextureInfoDst = new GPUTexelCopyTextureInfo();
+const _textureDescriptor = new GPUTextureDescriptor();
 const _viewDescriptor = new GPUTextureViewDescriptor();
 const _extent3D = new GPUExtent3D();
 
@@ -306,13 +310,14 @@ class WebGPUBackend extends Backend {
 	 */
 	setXRRenderTargetTextures( renderTarget, colorTexture, viewDescriptors = null ) {
 
-		this.set( renderTarget.texture, {
-			texture: colorTexture,
-			format: colorTexture.format,
-			externalTexture: true,
-			xrViewDescriptors: viewDescriptors,
-			initialized: true
-		} );
+		// Update the external XR texture without replacing the cached MSAA attachments.
+		const textureData = this.get( renderTarget.texture );
+
+		textureData.texture = colorTexture;
+		textureData.format = colorTexture.format;
+		textureData.externalTexture = true;
+		textureData.xrViewDescriptors = viewDescriptors;
+		textureData.initialized = true;
 
 	}
 
@@ -529,6 +534,81 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
+	 * Returns multisampled color textures for an external render target.
+	 *
+	 * @private
+	 * @param {RenderContext} renderContext - The render context.
+	 * @param {Object} textureData - The backend data for the external texture.
+	 * @param {number} count - The number of textures to create.
+	 * @return {?Array<GPUTexture>} The multisampled textures.
+	 */
+	_getExternalMSAATextures( renderContext, textureData, count ) {
+
+		const samples = this.utils.getSampleCount( renderContext.sampleCount );
+
+		if ( samples === 1 ) {
+
+			if ( textureData.msaaTextures !== undefined ) {
+
+				for ( const texture of textureData.msaaTextures ) texture.destroy();
+
+				textureData.msaaTextures = undefined;
+
+			}
+
+			return null;
+
+		}
+
+		const renderTarget = renderContext.renderTarget;
+		const width = renderTarget.width;
+		const height = renderTarget.height;
+		const format = textureData.format;
+
+		if ( textureData.msaaTextures === undefined ||
+			textureData.msaaTextures.length !== count ||
+			textureData.msaaWidth !== width ||
+			textureData.msaaHeight !== height ||
+			textureData.msaaSamples !== samples ||
+			textureData.msaaFormat !== format ) {
+
+			if ( textureData.msaaTextures !== undefined ) {
+
+				for ( const texture of textureData.msaaTextures ) texture.destroy();
+
+			}
+
+			_textureDescriptor.size.width = width;
+			_textureDescriptor.size.height = height;
+			_textureDescriptor.sampleCount = samples;
+			_textureDescriptor.format = format;
+			// Layered rendering can resume after a framebuffer copy,
+			// so these attachments must support loading.
+			_textureDescriptor.usage = GPUTextureUsage.RENDER_ATTACHMENT;
+
+			textureData.msaaTextures = [];
+
+			for ( let i = 0; i < count; i ++ ) {
+
+				_textureDescriptor.label = renderTarget.texture.name + '-msaa-' + i;
+				textureData.msaaTextures.push( this.device.createTexture( _textureDescriptor ) );
+
+			}
+
+			_textureDescriptor.reset();
+
+			textureData.msaaWidth = width;
+			textureData.msaaHeight = height;
+			textureData.msaaSamples = samples;
+			textureData.msaaFormat = format;
+
+		}
+
+		return textureData.msaaTextures;
+
+	}
+
+	/**
 	 * Creates attachment views for an external texture render target.
 	 *
 	 * @private
@@ -540,14 +620,19 @@ class WebGPUBackend extends Backend {
 
 		const textureViews = [];
 		const camera = renderContext.camera;
+		const viewDescriptors = textureData.xrViewDescriptors;
+		const viewCount = Math.max( viewDescriptors?.length || 0, renderContext.activeCubeFace + 1, 1 );
+		const msaaTextures = this._getExternalMSAATextures( renderContext, textureData, viewCount );
 
-		if ( textureData.xrViewDescriptors && camera !== null && camera.isArrayCamera === true ) {
+		if ( viewDescriptors && camera !== null && camera.isArrayCamera === true ) {
 
-			for ( let i = 0; i < textureData.xrViewDescriptors.length; i ++ ) {
+			for ( let i = 0; i < viewDescriptors.length; i ++ ) {
+
+				const textureView = textureData.texture.createView( viewDescriptors[ i ] );
 
 				textureViews.push( {
-					view: textureData.texture.createView( textureData.xrViewDescriptors[ i ] ),
-					resolveTarget: undefined,
+					view: msaaTextures !== null ? msaaTextures[ i ].createView() : textureView,
+					resolveTarget: msaaTextures !== null && renderContext.renderTarget.resolveColorBuffer === true ? textureView : undefined,
 					depthSlice: undefined
 				} );
 
@@ -555,13 +640,16 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
+			const layer = renderContext.activeCubeFace;
+			const textureView = textureData.texture.createView( {
+				dimension: GPUTextureViewDimension.TwoD,
+				baseArrayLayer: layer,
+				arrayLayerCount: 1
+			} );
+
 			textureViews.push( {
-				view: textureData.texture.createView( {
-					dimension: GPUTextureViewDimension.TwoD,
-					baseArrayLayer: renderContext.activeCubeFace,
-					arrayLayerCount: 1
-				} ),
-				resolveTarget: undefined,
+				view: msaaTextures !== null ? msaaTextures[ layer ].createView() : textureView,
+				resolveTarget: msaaTextures !== null && renderContext.renderTarget.resolveColorBuffer === true ? textureView : undefined,
 				depthSlice: undefined
 			} );
 
@@ -649,9 +737,10 @@ class WebGPUBackend extends Backend {
 							_viewDescriptor.dimension = GPUTextureViewDimension.TwoD;
 
 							const textureView = textureData.texture.createView( _viewDescriptor );
+							const msaaTexture = textureData.msaaTextures?.[ layer ];
 							textureViews.push( {
-								view: textureView,
-								resolveTarget: undefined,
+								view: msaaTexture !== undefined ? msaaTexture.createView() : textureView,
+								resolveTarget: msaaTexture !== undefined && renderTarget.resolveColorBuffer === true ? textureView : undefined,
 								depthSlice: undefined
 							} );
 
@@ -674,6 +763,11 @@ class WebGPUBackend extends Backend {
 					if ( textureData.msaaTexture !== undefined ) {
 
 						view = textureData.msaaTexture.createView();
+						resolveTarget = renderTarget.resolveColorBuffer === true ? textureView : undefined;
+
+					} else if ( textureData.msaaTextures !== undefined ) {
+
+						view = textureData.msaaTextures[ renderContext.activeCubeFace ].createView();
 						resolveTarget = renderTarget.resolveColorBuffer === true ? textureView : undefined;
 
 					} else {
@@ -727,7 +821,8 @@ class WebGPUBackend extends Backend {
 				}
 
 				const depthStencilAttachment = new GPURenderPassDepthStencilAttachment();
-				depthStencilAttachment.view = depthTextureData.texture.createView( _viewDescriptor );
+				const msaaDepthTexture = depthTextureData.msaaTextures?.[ renderContext.activeCubeFace ];
+				depthStencilAttachment.view = msaaDepthTexture !== undefined ? msaaDepthTexture.createView() : depthTextureData.texture.createView( _viewDescriptor );
 				descriptorBase.depthStencilAttachment = depthStencilAttachment;
 
 				_viewDescriptor.reset();
@@ -851,6 +946,12 @@ class WebGPUBackend extends Backend {
 
 		const depthStencilAttachment = descriptor.depthStencilAttachment;
 		const renderTarget = renderContext.renderTarget;
+		const discardColor = renderContext.sampleCount > 1 && renderTarget?.storeMultisampledColorBuffer === false;
+		const discardDepth = renderContext.sampleCount > 1 && renderTarget?.storeMultisampledDepthBuffer === false;
+		const discardStencil = renderContext.sampleCount > 1 && renderTarget?.storeMultisampledStencilBuffer === false;
+
+		// A fullscreen pass overwrites the external texture, so its previous contents do not need to be loaded.
+		const clearExternalColor = renderContext.fullscreenPass === true && this._hasExternalTexture( renderContext );
 
 		if ( renderContext.textures !== null ) {
 
@@ -860,9 +961,15 @@ class WebGPUBackend extends Backend {
 
 				const colorAttachment = colorAttachments[ i ];
 
-				if ( renderContext.clearColor ) {
+				if ( renderContext.clearColor || discardColor || clearExternalColor ) {
 
-					if ( i === 0 ) {
+					const clearColor = renderContext.mrt ? renderContext.mrt.getClearColor( renderContext.textures[ i ].name ) : null;
+
+					if ( clearColor !== null ) {
+
+						colorAttachment.clearValue = clearColor;
+
+					} else if ( i === 0 ) {
 
 						colorAttachment.clearValue = renderContext.clearColorValue;
 
@@ -885,7 +992,7 @@ class WebGPUBackend extends Backend {
 
 				}
 
-				if ( renderContext.sampleCount > 1 && renderTarget?.storeMultisampledColorBuffer === false ) {
+				if ( discardColor ) {
 
 					colorAttachment.storeOp = GPUStoreOp.Discard;
 
@@ -920,7 +1027,7 @@ class WebGPUBackend extends Backend {
 
 		if ( renderContext.depth ) {
 
-			if ( renderContext.clearDepth ) {
+			if ( renderContext.clearDepth || discardDepth ) {
 
 				depthStencilAttachment.depthClearValue = renderContext.clearDepthValue;
 				depthStencilAttachment.depthLoadOp = GPULoadOp.Clear;
@@ -931,7 +1038,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			if ( renderContext.sampleCount > 1 && renderTarget?.storeMultisampledDepthBuffer === false ) {
+			if ( discardDepth ) {
 
 				depthStencilAttachment.depthStoreOp = GPUStoreOp.Discard;
 
@@ -945,7 +1052,7 @@ class WebGPUBackend extends Backend {
 
 		if ( renderContext.stencil ) {
 
-		  if ( renderContext.clearStencil ) {
+		  if ( renderContext.clearStencil || discardStencil ) {
 
 				depthStencilAttachment.stencilClearValue = renderContext.clearStencilValue;
 				depthStencilAttachment.stencilLoadOp = GPULoadOp.Clear;
@@ -956,7 +1063,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			if ( renderContext.sampleCount > 1 && renderTarget?.storeMultisampledStencilBuffer === false ) {
+			if ( discardStencil ) {
 
 				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Discard;
 
@@ -986,7 +1093,7 @@ class WebGPUBackend extends Backend {
 
 			} else {
 
-				this._updateArrayCameraLayerDescriptors( renderContext, renderContextData, cameras );
+				this._updateArrayCameraLayerDescriptors( renderContext, renderContextData, descriptor, cameras );
 
 			}
 
@@ -1023,8 +1130,30 @@ class WebGPUBackend extends Backend {
 
 		renderContextData.descriptor = descriptor;
 		renderContextData.encoder = encoder;
-		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
 		renderContextData.renderBundles = [];
+
+		this._resetRenderContextData( renderContextData );
+
+	}
+
+	/**
+	 * Resets the state cache of the given render context data.
+	 *
+	 * A new render pass encoder starts with a blend constant and a stencil reference
+	 * of zero so the cached values must be reset as well.
+	 *
+	 * @private
+	 * @param {Object} renderContextData - The render context data.
+	 */
+	_resetRenderContextData( renderContextData ) {
+
+		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
+
+		if ( renderContextData.currentBlendColor === undefined ) renderContextData.currentBlendColor = new Color();
+
+		renderContextData.currentBlendColor.setRGB( 0, 0, 0 );
+		renderContextData.currentBlendAlpha = 0;
+		renderContextData.currentStencilRef = 0;
 
 	}
 
@@ -1109,11 +1238,12 @@ class WebGPUBackend extends Backend {
 		for ( let i = 0; i < cameras.length; i ++ ) {
 
 			const sourceAttachment = descriptor.colorAttachments[ 0 ];
+			const layerAttachment = descriptor.colorAttachments[ i ];
 
 			const layerColorAttachment = new GPURenderPassColorAttachment();
-			layerColorAttachment.view = descriptor.colorAttachments[ i ].view;
-			layerColorAttachment.depthSlice = sourceAttachment.depthSlice;
-			layerColorAttachment.resolveTarget = sourceAttachment.resolveTarget;
+			layerColorAttachment.view = layerAttachment.view;
+			layerColorAttachment.depthSlice = layerAttachment.depthSlice;
+			layerColorAttachment.resolveTarget = layerAttachment.resolveTarget;
 			layerColorAttachment.loadOp = sourceAttachment.loadOp;
 			layerColorAttachment.storeOp = sourceAttachment.storeOp;
 			layerColorAttachment.clearValue = sourceAttachment.clearValue;
@@ -1130,11 +1260,21 @@ class WebGPUBackend extends Backend {
 
 				if ( ! depthTextureData.viewCache[ layerIndex ] ) {
 
-					_viewDescriptor.dimension = GPUTextureViewDimension.TwoD;
-					_viewDescriptor.baseArrayLayer = i;
-					_viewDescriptor.arrayLayerCount = 1;
+					const msaaTexture = depthTextureData.msaaTextures?.[ layerIndex ];
 
-					depthTextureData.viewCache[ layerIndex ] = depthTextureData.texture.createView( _viewDescriptor );
+					if ( msaaTexture !== undefined ) {
+
+						depthTextureData.viewCache[ layerIndex ] = msaaTexture.createView();
+
+					} else {
+
+						_viewDescriptor.dimension = GPUTextureViewDimension.TwoD;
+						_viewDescriptor.baseArrayLayer = i;
+						_viewDescriptor.arrayLayerCount = 1;
+
+						depthTextureData.viewCache[ layerIndex ] = depthTextureData.texture.createView( _viewDescriptor );
+
+					}
 
 					_viewDescriptor.reset();
 
@@ -1183,14 +1323,29 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {Object} renderContextData - The render context data.
+	 * @param {Object} descriptor - The render pass descriptor.
 	 * @param {ArrayCamera} cameras - The array camera.
 	 *
 	 */
-	_updateArrayCameraLayerDescriptors( renderContext, renderContextData, cameras ) {
+	_updateArrayCameraLayerDescriptors( renderContext, renderContextData, descriptor, cameras ) {
+
+		const renderTarget = renderContext.renderTarget;
+		const discardDepth = renderContext.sampleCount > 1 && renderTarget?.storeMultisampledDepthBuffer === false;
+		const discardStencil = renderContext.sampleCount > 1 && renderTarget?.storeMultisampledStencilBuffer === false;
 
 		for ( let i = 0; i < cameras.length; i ++ ) {
 
 			const layerDescriptor = renderContextData.layerDescriptors[ i ];
+			const sourceColorAttachment = descriptor.colorAttachments[ 0 ];
+			const layerColorAttachment = descriptor.colorAttachments[ i ];
+			const colorAttachment = layerDescriptor.colorAttachments[ 0 ];
+
+			colorAttachment.view = layerColorAttachment.view;
+			colorAttachment.resolveTarget = layerColorAttachment.resolveTarget;
+			colorAttachment.depthSlice = layerColorAttachment.depthSlice;
+			colorAttachment.loadOp = sourceColorAttachment.loadOp;
+			colorAttachment.storeOp = sourceColorAttachment.storeOp;
+			colorAttachment.clearValue = sourceColorAttachment.clearValue;
 
 			if ( layerDescriptor.depthStencilAttachment ) {
 
@@ -1198,7 +1353,7 @@ class WebGPUBackend extends Backend {
 
 				if ( renderContext.depth ) {
 
-					if ( renderContext.clearDepth ) {
+					if ( renderContext.clearDepth || discardDepth ) {
 
 						depthAttachment.depthClearValue = renderContext.clearDepthValue;
 						depthAttachment.depthLoadOp = GPULoadOp.Clear;
@@ -1213,7 +1368,7 @@ class WebGPUBackend extends Backend {
 
 				if ( renderContext.stencil ) {
 
-					if ( renderContext.clearStencil ) {
+					if ( renderContext.clearStencil || discardStencil ) {
 
 						depthAttachment.stencilClearValue = renderContext.clearStencilValue;
 						depthAttachment.stencilLoadOp = GPULoadOp.Clear;
@@ -1272,13 +1427,40 @@ class WebGPUBackend extends Backend {
 
 				const layerDescriptor = renderContextData.layerDescriptors[ i ];
 				const colorLoadOps = layerDescriptor.colorAttachments.map( attachment => attachment.loadOp );
+				const colorStoreOps = layerDescriptor.colorAttachments.map( attachment => attachment.storeOp );
 				const depthLoadOp = layerDescriptor.depthStencilAttachment?.depthLoadOp;
+				const depthStoreOp = layerDescriptor.depthStencilAttachment?.depthStoreOp;
 				const stencilLoadOp = layerDescriptor.depthStencilAttachment?.stencilLoadOp;
+				const stencilStoreOp = layerDescriptor.depthStencilAttachment?.stencilStoreOp;
 
 				for ( let stageIndex = 0; stageIndex < renderStages.length; stageIndex ++ ) {
 
 					const renderStage = renderStages[ stageIndex ];
 					const bundle = renderStage.bundles[ i ];
+					const isLastStage = stageIndex === renderStages.length - 1;
+
+					for ( let j = 0; j < layerDescriptor.colorAttachments.length; j ++ ) {
+
+						const attachment = layerDescriptor.colorAttachments[ j ];
+						attachment.loadOp = stageIndex === 0 ? colorLoadOps[ j ] : GPULoadOp.Load;
+						attachment.storeOp = isLastStage ? colorStoreOps[ j ] : GPUStoreOp.Store;
+
+					}
+
+					if ( renderContext.depth ) {
+
+						layerDescriptor.depthStencilAttachment.depthLoadOp = stageIndex === 0 ? depthLoadOp : GPULoadOp.Load;
+						layerDescriptor.depthStencilAttachment.depthStoreOp = isLastStage ? depthStoreOp : GPUStoreOp.Store;
+
+					}
+
+					if ( renderContext.stencil ) {
+
+						layerDescriptor.depthStencilAttachment.stencilLoadOp = stageIndex === 0 ? stencilLoadOp : GPULoadOp.Load;
+						layerDescriptor.depthStencilAttachment.stencilStoreOp = isLastStage ? stencilStoreOp : GPUStoreOp.Store;
+
+					}
+
 					const renderPass = encoder.beginRenderPass( layerDescriptor );
 
 					if ( renderContext.viewport ) {
@@ -1307,25 +1489,28 @@ class WebGPUBackend extends Backend {
 
 					}
 
-					if ( stageIndex < renderStages.length - 1 ) {
-
-						for ( const attachment of layerDescriptor.colorAttachments ) attachment.loadOp = GPULoadOp.Load;
-
-						if ( renderContext.depth ) layerDescriptor.depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
-						if ( renderContext.stencil ) layerDescriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
-
-					}
-
 				}
 
 				for ( let j = 0; j < layerDescriptor.colorAttachments.length; j ++ ) {
 
 					layerDescriptor.colorAttachments[ j ].loadOp = colorLoadOps[ j ];
+					layerDescriptor.colorAttachments[ j ].storeOp = colorStoreOps[ j ];
 
 				}
 
-				if ( renderContext.depth ) layerDescriptor.depthStencilAttachment.depthLoadOp = depthLoadOp;
-				if ( renderContext.stencil ) layerDescriptor.depthStencilAttachment.stencilLoadOp = stencilLoadOp;
+				if ( renderContext.depth ) {
+
+					layerDescriptor.depthStencilAttachment.depthLoadOp = depthLoadOp;
+					layerDescriptor.depthStencilAttachment.depthStoreOp = depthStoreOp;
+
+				}
+
+				if ( renderContext.stencil ) {
+
+					layerDescriptor.depthStencilAttachment.stencilLoadOp = stencilLoadOp;
+					layerDescriptor.depthStencilAttachment.stencilStoreOp = stencilStoreOp;
+
+				}
 
 			}
 
@@ -1907,19 +2092,35 @@ class WebGPUBackend extends Backend {
 
 		}
 
+		// blend constant
+
+		if ( material.blending === CustomBlending && passEncoderGPU.setBlendConstant !== undefined ) {
+
+			const blendColor = material.blendColor;
+			const blendAlpha = material.blendAlpha;
+
+			if ( blendColor.equals( renderContextData.currentBlendColor ) === false || blendAlpha !== renderContextData.currentBlendAlpha ) {
+
+				_blendConstant.r = blendColor.r;
+				_blendConstant.g = blendColor.g;
+				_blendConstant.b = blendColor.b;
+				_blendConstant.a = blendAlpha;
+
+				passEncoderGPU.setBlendConstant( _blendConstant );
+
+				renderContextData.currentBlendColor.copy( blendColor );
+				renderContextData.currentBlendAlpha = blendAlpha;
+
+			}
+
+		}
+
 		if ( object.isBatchedMesh === true ) {
 
 			const starts = object._multiDrawStarts;
 			const counts = object._multiDrawCounts;
 			const drawCount = object._multiDrawCount;
-
-			let bytesPerElement = ( hasIndex === true ) ? index.array.BYTES_PER_ELEMENT : 1;
-
-			if ( material.wireframe ) {
-
-				bytesPerElement = object.geometry.attributes.position.count > 65535 ? 4 : 2;
-
-			}
+			const bytesPerElement = object._multiDrawBytesPerElement;
 
 			for ( let i = 0; i < drawCount; i ++ ) {
 
@@ -2940,7 +3141,8 @@ class WebGPUBackend extends Backend {
 			if ( renderContext.stencil ) descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
 
 			renderContextData.currentPass = encoder.beginRenderPass( descriptor );
-			renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
+
+			this._resetRenderContextData( renderContextData );
 
 			if ( renderContext.viewport ) {
 

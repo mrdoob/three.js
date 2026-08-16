@@ -38,7 +38,7 @@
 
 			const manager = new THREE.LoadingManager();
 
-			let camera, scene, renderer, stats, object, loader, guiMorphsFolder;
+			let camera, scene, renderer, stats, object, loader, guiMorphsFolder, guiAnimationsFolder;
 			let mixer;
 
 			const timer = new THREE.Timer();
@@ -62,6 +62,7 @@
 				'exampleWindow',
 				'Head_69',
 				'morph-translation',
+				'ball_anims_asc_2018',
 			];
 
 			const scales = new Map();
@@ -69,6 +70,7 @@
 			scales.set( 'archer/ArcherRi01', 100 );
 			scales.set( 'stanford-bunny', 0.001 );
 			scales.set( 'Head_69', 100 );
+			scales.set( 'ball_anims_asc_2018', 50 );
 
 			init();
 
@@ -88,16 +90,10 @@
 				hemiLight.position.set( 0, 200, 0 );
 				scene.add( hemiLight );
 
-				const dirLight = new THREE.DirectionalLight( 0xffffff, 5 );
-				dirLight.position.set( 0, 200, 100 );
-				dirLight.castShadow = true;
-				dirLight.shadow.camera.top = 180;
-				dirLight.shadow.camera.bottom = - 100;
-				dirLight.shadow.camera.left = - 120;
-				dirLight.shadow.camera.right = 120;
-				scene.add( dirLight );
-
-				// scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
+				const sunLight = new THREE.SunLight( 0xffffff, 5 );
+				sunLight.position.set( 0, 200, 100 );
+				sunLight.castShadow = true;
+				scene.add( sunLight );
 
 				// ground
 				const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
@@ -138,10 +134,13 @@
 				} );
 
 				guiMorphsFolder = gui.addFolder( 'Morphs' ).hide();
+				guiAnimationsFolder = gui.addFolder( 'Animations' ).hide();
 
 			}
 
 			function loadAsset( asset ) {
+
+				loader.trimAnimationClips = ( asset === 'ball_anims_asc_2018' );
 
 				loader.load( 'models/fbx/' + asset + '.fbx', function ( group ) {
 
@@ -182,12 +181,28 @@
 					const scale = scales.get( asset );
 					object.scale.setScalar( scale || 1 );
 
+					guiAnimationsFolder.children.forEach( ( child ) => child.destroy() );
+					guiAnimationsFolder.hide();
+
 					if ( object.animations && object.animations.length ) {
 
 						mixer = new THREE.AnimationMixer( object );
 
 						const action = mixer.clipAction( object.animations[ 0 ] );
 						action.play();
+
+						const clips = object.animations;
+						const animationParams = { clip: clips[ 0 ].name };
+
+						guiAnimationsFolder.show();
+						guiAnimationsFolder.add( animationParams, 'clip', clips.map( ( clip ) => clip.name ) ).onChange( function ( name ) {
+
+							mixer.stopAllAction();
+
+							const clip = THREE.AnimationClip.findByName( clips, name );
+							mixer.clipAction( clip ).play();
+
+						} );
 
 					} else {
 

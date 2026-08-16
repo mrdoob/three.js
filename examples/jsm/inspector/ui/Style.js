@@ -28,6 +28,7 @@ export class Style {
 		height: 100%;
 		pointer-events: none;
 		z-index: 1000;
+		overflow: hidden;
 	}
 
 	:scope * {
@@ -407,6 +408,8 @@ export class Style {
 		margin-left: 6px;
 		cursor: help;
 		position: relative;
+		vertical-align: middle;
+		top: -1px;
 	}
 
 	.info-icon.active {
@@ -2081,7 +2084,7 @@ export class Style {
 	}
 
 	.split-screen-overlay {
-		position: fixed;
+		position: absolute;
 		top: 0;
 		left: 0;
 		width: 100%;
@@ -2089,6 +2092,7 @@ export class Style {
 		pointer-events: none !important;
 		z-index: 999;
 		touch-action: none;
+		overflow: hidden;
 	}
 
 	.split-screen-line {

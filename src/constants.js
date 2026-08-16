@@ -1711,6 +1711,18 @@ export const Compatibility = {
 };
 
 /**
+ * Represents the refresh types of render objects.
+ *
+ * @type {ConstantsRenderObjectRefreshType}
+ * @constant
+ */
+export const RenderObjectRefreshType = {
+	NONE: 0,
+	SHARED: 1,
+	FULL: 2
+};
+
+/**
  * This type represents mouse buttons and interaction types in context of controls.
  *
  * @typedef {Object} ConstantsMouse
@@ -1758,4 +1770,13 @@ export const Compatibility = {
  * @property {string} SAMPLE - Sample-specific sampling mode.
  * @property {string} FIRST - Flat interpolation using the first vertex.
  * @property {string} EITHER - Flat interpolation using either vertex.
+ */
+
+/**
+ * Represents the refresh types of render objects.
+ *
+ * @typedef {Object} ConstantsRenderObjectRefreshType
+ * @property {number} NONE - No refresh required.
+ * @property {number} SHARED - Only shared uniform buffers require an update.
+ * @property {number} FULL - The render object requires a full refresh.
  */

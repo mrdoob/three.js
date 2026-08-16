@@ -284,7 +284,7 @@ class InterleavedBuffer {
 			stride: this.stride
 		};
 
-		if ( this.usage !== StaticDrawUsage ) json.usage = this.usage;
+		json.usage = this.usage;
 
 		return json;
 

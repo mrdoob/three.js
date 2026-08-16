@@ -22,6 +22,8 @@ class Inspector extends RendererInspector {
 
 		const profiler = new Profiler( this );
 		profiler.addEventListener( 'resize', ( e ) => this.dispatchEvent( e ) );
+		profiler.addEventListener( 'orientationchange', ( e ) => this.dispatchEvent( e ) );
+		profiler.addEventListener( 'layoutchange', ( e ) => this.dispatchEvent( e ) );
 
 		const parameters = new Parameters( {
 			builtin: true,
@@ -92,6 +94,12 @@ class Inspector extends RendererInspector {
 	get domElement() {
 
 		return this.profiler.domElement;
+
+	}
+
+	isVertical() {
+
+		return this.profiler ? this.profiler.isVertical() : false;
 
 	}
 
@@ -188,6 +196,8 @@ class Inspector extends RendererInspector {
 	}
 
 	removeTab( tab ) {
+
+		tab.dispose();
 
 		this.profiler.removeTab( tab );
 
@@ -480,9 +490,9 @@ class Inspector extends RendererInspector {
 
 	resolveFrame( frame ) {
 
-		const nextFrame = this.getFrameById( frame.frameId + 1 );
+		const previousFrame = this.getFrameById( frame.frameId - 1 );
 
-		if ( ! nextFrame ) return;
+		if ( ! previousFrame ) return;
 
 		frame.cpu = 0;
 		frame.gpu = 0;
@@ -500,9 +510,9 @@ class Inspector extends RendererInspector {
 
 		}
 
-		// improve stats using next frame
+		// improve stats using previous frame
 
-		frame.deltaTime = nextFrame.startTime - frame.startTime;
+		frame.deltaTime = frame.startTime - previousFrame.startTime;
 		frame.miscellaneous = frame.deltaTime - frame.total;
 
 		if ( frame.miscellaneous < 0 ) {

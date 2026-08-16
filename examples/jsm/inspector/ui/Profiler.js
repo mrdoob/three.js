@@ -21,7 +21,7 @@ export class Profiler extends EventDispatcher {
 		this.nextTabOriginalIndex = 0; // Track the original order of tabs as they are added
 
 		this.horizontalAlign = 'right'; // 'left' or 'right'
-		this.verticalAlign = 'top';     // 'top' or 'bottom'
+		this.verticalAlign = 'top'; // 'top' or 'bottom'
 
 		this.setupShell();
 		this.setupResizing();
@@ -199,6 +199,7 @@ export class Profiler extends EventDispatcher {
 			constrainDetachedWindows();
 			constrainMainPanel();
 			this.checkHeaderScroll();
+			this.notifyLayoutChange();
 
 		} );
 
@@ -601,11 +602,18 @@ export class Profiler extends EventDispatcher {
 
 		}
 
+		// Set profiler reference
+		tab.profiler = this;
+
 		// Update panel size when tabs change
 		this.updatePanelSize();
 
-		// Set profiler reference
-		tab.profiler = this;
+		// If newly added tab matches activeTabId from saved layout, activate it
+		if ( this.activeTabId && tab.id === this.activeTabId ) {
+
+			this.setActiveTab( tab.id );
+
+		}
 
 	}
 
@@ -2152,7 +2160,7 @@ export class Profiler extends EventDispatcher {
 		const isRight = this.position === 'right';
 
 		let horizontal = this.horizontalAlign; // 'left' or 'right'
-		let vertical = this.verticalAlign;     // 'top' or 'bottom'
+		let vertical = this.verticalAlign; // 'top' or 'bottom'
 
 		if ( isVisible ) {
 
@@ -2214,6 +2222,24 @@ export class Profiler extends EventDispatcher {
 			this.miniPanel.classList.remove( 'toggle-bottom' );
 
 		}
+
+		this.notifyLayoutChange();
+
+	}
+
+	isVertical() {
+
+		return this.position === 'left' || this.position === 'right' ||
+			( this.panel && ( this.panel.classList.contains( 'position-left' ) || this.panel.classList.contains( 'position-right' ) ) );
+
+	}
+
+	notifyLayoutChange() {
+
+		const isVert = this.isVertical();
+
+		this.dispatchEvent( { type: 'orientationchange', position: this.position, isVertical: isVert } );
+		this.dispatchEvent( { type: 'layoutchange', position: this.position, isVertical: isVert } );
 
 	}
 

@@ -104,7 +104,8 @@ import { clone } from '../utils/SkeletonUtils.js';
  * - EXT_texture_avif
  * - EXT_texture_webp
  *
- * The following glTF 2.0 extension is supported by an external user plugin:
+ * The following glTF 2.0 extensions are supported by separately registered plugins:
+ * - KHR_gaussian_splatting
  * - [KHR_materials_variants](https://github.com/takahirox/three-gltf-extensions)
  * - [MSFT_texture_dds](https://github.com/takahirox/three-gltf-extensions)
  * - [KHR_animation_pointer](https://github.com/needle-tools/three-animation-pointer)
@@ -3884,7 +3885,7 @@ class GLTFParser {
 
 		pending.push( parser.loadGeometries( primitives ) );
 
-		return Promise.all( pending ).then( function ( results ) {
+		return Promise.all( pending ).then( async function ( results ) {
 
 			const materials = results.slice( 0, results.length - 1 );
 			const geometries = results[ results.length - 1 ];

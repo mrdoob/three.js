@@ -38,8 +38,6 @@
 			import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
-			const SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 1024;
-
 			let SCREEN_WIDTH = window.innerWidth;
 			let SCREEN_HEIGHT = window.innerHeight;
 			const FLOOR = - 250;
@@ -81,21 +79,12 @@
 				const ambient = new THREE.AmbientLight( 0xffffff );
 				scene.add( ambient );
 
-				const light = new THREE.DirectionalLight( 0xffffff, 3 );
-				light.position.set( 0, 1500, 1000 );
-				light.castShadow = true;
-				light.shadow.camera.top = 2000;
-				light.shadow.camera.bottom = - 2000;
-				light.shadow.camera.left = - 2000;
-				light.shadow.camera.right = 2000;
-				light.shadow.camera.near = 1200;
-				light.shadow.camera.far = 2500;
-				light.shadow.bias = 0.0001;
-
-				light.shadow.mapSize.width = SHADOW_MAP_WIDTH;
-				light.shadow.mapSize.height = SHADOW_MAP_HEIGHT;
-
-				scene.add( light );
+				const sunLight = new THREE.SunLight( 0xffffff, 3 );
+				sunLight.position.set( 0, 1500, 1000 );
+				sunLight.castShadow = true;
+				sunLight.shadow.camera.far = FAR;
+				sunLight.shadow.normalBias = 1;
+				scene.add( sunLight );
 
 				createScene();
 
