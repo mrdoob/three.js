@@ -1001,7 +1001,7 @@ export class PrefixSum {
 
 				} );
 
-				offset1.addAssign( subgroupSize );
+				offset1.addAssign( subgroupSizeLog );
 
 			} );
 
