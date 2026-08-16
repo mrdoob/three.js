@@ -352,11 +352,11 @@ class TrackballControls extends Controls {
 
 			this._rotateCamera();
 
-		}
+			if ( this.multiTouchRoll === true ) {
 
-		if ( this.multiTouchRoll === true ) {
+				this._rollCamera();
 
-			this._rollCamera();
+			}
 
 		}
 
