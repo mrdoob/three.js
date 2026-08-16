@@ -155,14 +155,15 @@ class WebGPUBindingUtils {
 
 			if ( bindingsData.groups === undefined ) {
 
-				bindingsData.groups = [];
-				bindingsData.versions = [];
+				bindingsData.groups = new Map();
 
 			}
 
-			if ( bindingsData.versions[ cacheIndex ] === version ) {
+			const cached = bindingsData.groups.get( cacheIndex );
 
-				bindGroupGPU = bindingsData.groups[ cacheIndex ];
+			if ( cached !== undefined && cached.version === version ) {
+
+				bindGroupGPU = cached.group;
 
 			}
 
@@ -174,8 +175,7 @@ class WebGPUBindingUtils {
 
 			if ( cacheIndex > 0 ) {
 
-				bindingsData.groups[ cacheIndex ] = bindGroupGPU;
-				bindingsData.versions[ cacheIndex ] = version;
+				bindingsData.groups.set( cacheIndex, { group: bindGroupGPU, version: version } );
 
 			}
 

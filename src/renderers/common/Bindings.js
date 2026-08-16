@@ -441,10 +441,13 @@ class Bindings extends DataMap {
 
 					cacheBindings = false;
 
-				} else {
+				} else if ( cacheBindings === true ) {
 
-					cacheIndex = cacheIndex * 10 + texture.id;
-					version += texture.version;
+					// fold ids/versions with proper bit mixing since e.g. "cacheIndex * 10 + id"
+					// collides for different texture id sequences (ids 12,3 vs 1,23)
+
+					cacheIndex = ( Math.imul( cacheIndex, 0x9E3779B1 ) + ( texture.id + 1 ) ) >>> 0;
+					version = ( Math.imul( version, 31 ) + texture.version ) >>> 0;
 
 				}
 

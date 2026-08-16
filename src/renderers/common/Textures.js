@@ -616,7 +616,6 @@ class Textures extends DataMap {
 					const bindingsData = this.backend.get( bindGroup );
 
 					bindingsData.groups = undefined;
-					bindingsData.versions = undefined;
 
 					// go through all bindings and if one points to the destroyed texture, trigger dispose as well
 
