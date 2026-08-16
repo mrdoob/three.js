@@ -2308,8 +2308,9 @@ class WebGPUBackend extends Backend {
 			// Regular single camera rendering
 			if ( renderContextData.currentPass ) {
 
-				// Handle occlusion queries
-				if ( renderContextData.occlusionQuerySet !== undefined ) {
+				// Handle occlusion queries (unsupported by GPURenderBundleEncoder, so
+				// objects drawn into a render bundle must not begin/end a query)
+				if ( renderContextData.occlusionQuerySet !== undefined && renderContextData.insideBundle !== true ) {
 
 					const lastObject = renderContextData.lastOcclusionObject;
 					if ( lastObject !== object ) {
@@ -2671,6 +2672,7 @@ class WebGPUBackend extends Backend {
 
 		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
 		renderContextData.currentPass = this.pipelineUtils.createBundleEncoder( renderContext );
+		renderContextData.insideBundle = true;
 
 	}
 
@@ -2695,6 +2697,7 @@ class WebGPUBackend extends Backend {
 		renderContextData.currentPass = renderContextData._currentPass;
 		renderContextData._currentPass = null;
 		renderContextData._currentSets = null;
+		renderContextData.insideBundle = false;
 
 	}
 
