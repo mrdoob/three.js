@@ -325,7 +325,7 @@ class XRControllerModelFactory {
 
 		const controllerModel = new XRControllerModel();
 		let scene = null;
-		let activeInputSource = null;
+		let activeConnection = 0;
 
 		controller.addEventListener( 'connected', ( event ) => {
 
@@ -333,12 +333,12 @@ class XRControllerModelFactory {
 
 			if ( xrInputSource.targetRayMode !== 'tracked-pointer' || ! xrInputSource.gamepad || xrInputSource.hand ) return;
 
-			activeInputSource = xrInputSource;
+			const connection = ++ activeConnection;
 
 			fetchProfile( xrInputSource, this.path, DEFAULT_PROFILE ).then( ( { profile, assetPath } ) => {
 
 				// Discard the result if the input source was replaced while the profile was being fetched.
-				if ( activeInputSource !== xrInputSource ) return;
+				if ( connection !== activeConnection ) return;
 
 				const motionController = new MotionController(
 					xrInputSource,
@@ -370,7 +370,7 @@ class XRControllerModelFactory {
 
 						this._assetCache[ motionController.assetUrl ] = asset;
 
-						if ( activeInputSource !== xrInputSource ) return;
+						if ( connection !== activeConnection ) return;
 
 						scene = asset.scene.clone();
 
@@ -398,7 +398,7 @@ class XRControllerModelFactory {
 
 		controller.addEventListener( 'disconnected', () => {
 
-			activeInputSource = null;
+			activeConnection ++;
 			controllerModel.motionController = null;
 			controllerModel.remove( scene );
 			scene = null;

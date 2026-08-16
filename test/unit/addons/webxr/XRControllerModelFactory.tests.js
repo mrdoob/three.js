@@ -66,12 +66,19 @@ export default QUnit.module( 'Addons', () => {
 
 		QUnit.module( 'XRControllerModelFactory', () => {
 
-			QUnit.test( 'createControllerModel - interaction profile change', async ( assert ) => {
+			const fetch = globalThis.fetch;
+
+			QUnit.testDone( () => {
+
+				globalThis.fetch = fetch;
+
+			} );
+
+			QUnit.test( 'discards assets of replaced input sources', async ( assert ) => {
 
 				const profiles = { profileA: createProfile( 'profileA' ), profileB: createProfile( 'profileB' ) };
 				const profilesList = { profileA: { path: 'profileA' }, profileB: { path: 'profileB' } };
 
-				const fetch = globalThis.fetch;
 				globalThis.fetch = async ( url ) => {
 
 					const name = url.slice( PROFILES_PATH.length + 1 );
@@ -111,8 +118,6 @@ export default QUnit.module( 'Addons', () => {
 				// the asset of the second profile arrives before the one of the first profile
 				onLoadCallbacks[ 1 ]( createAsset( 'profileB' ) );
 				onLoadCallbacks[ 0 ]( createAsset( 'profileA' ) );
-
-				globalThis.fetch = fetch;
 
 				const visualResponse = controllerModel.motionController.components.trigger.visualResponses.pressed;
 
