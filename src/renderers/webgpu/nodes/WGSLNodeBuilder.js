@@ -235,9 +235,13 @@ const wgslMethods = {
 	floatpack_snorm_2x16: 'pack2x16snorm',
 	floatpack_unorm_2x16: 'pack2x16unorm',
 	floatpack_float16_2x16: 'pack2x16float',
+	floatpack_snorm_4x8: 'pack4x8snorm',
+	floatpack_unorm_4x8: 'pack4x8unorm',
 	floatunpack_snorm_2x16: 'unpack2x16snorm',
 	floatunpack_unorm_2x16: 'unpack2x16unorm',
-	floatunpack_float16_2x16: 'unpack2x16float'
+	floatunpack_float16_2x16: 'unpack2x16float',
+	floatunpack_snorm_4x8: 'unpack4x8snorm',
+	floatunpack_unorm_4x8: 'unpack4x8unorm'
 };
 
 // See: https://www.w3.org/TR/WGSL/#keyword-summary and #reserved-words-section
@@ -988,7 +992,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {string} gatherSnippet - A WGSL snippet that represents the index of the channel to read.
 	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
-	 * @param {?string} flipYSnippet - A WGSL snippet that represents the y-flip. Only used for WebGL.
 	 * @return {string} The WGSL snippet.
 	 */
 	generateTextureGather( texture, textureProperty, uvSnippet, gatherSnippet, depthSnippet, offsetSnippet ) {
@@ -1026,7 +1029,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {string} compareSnippet - A WGSL snippet that represents the reference value.
 	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
-	 * @param {?string} flipYSnippet - A WGSL snippet that represents the y-flip. Only used for WebGL.
 	 * @return {string} The WGSL snippet.
 	 */
 	generateTextureGatherCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, offsetSnippet ) {
@@ -1062,7 +1064,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {string} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
-	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
 	 * @return {string} The WGSL snippet.
 	 */
 	generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, offsetSnippet ) {
@@ -2142,7 +2143,7 @@ ${ flowData.code }
 
 				if ( needsSampler ) {
 
-					if ( this.isSampleCompare( texture ) && textureNode.isPlainGather() === false ) {
+					if ( this.isSampleCompare( texture ) && textureNode.isSampleCompare() ) {
 
 						bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : sampler_comparison;` );
 
@@ -2461,11 +2462,12 @@ ${ flowData.code }
 	 * Returns the float packing method name for a given numeric encoding.
 	 *
 	 * @param {string} encoding - The numeric encoding that describes how the float values are mapped to the integer range.
+	 * @param {string} [layout='2x16'] - The component layout of the packed integer.
 	 * @returns {string} The resolve WGSL float packing method name.
 	 */
-	getFloatPackingMethod( encoding ) {
+	getFloatPackingMethod( encoding, layout = '2x16' ) {
 
-		return this.getMethod( `floatpack_${ encoding }_2x16` );
+		return this.getMethod( `floatpack_${ encoding }_${ layout }` );
 
 	}
 
@@ -2473,11 +2475,12 @@ ${ flowData.code }
 	 * Returns the float unpacking method name for a given numeric encoding.
 	 *
 	 * @param {string} encoding - The numeric encoding that describes how the integer values are mapped to the float range.
+	 * @param {string} [layout='2x16'] - The component layout of the packed integer.
 	 * @returns {string} The resolve WGSL float unpacking method name.
 	 */
-	getFloatUnpackingMethod( encoding ) {
+	getFloatUnpackingMethod( encoding, layout = '2x16' ) {
 
-		return this.getMethod( `floatunpack_${ encoding }_2x16` );
+		return this.getMethod( `floatunpack_${ encoding }_${ layout }` );
 
 	}
 

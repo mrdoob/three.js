@@ -963,7 +963,13 @@ class WebGPUBackend extends Backend {
 
 				if ( renderContext.clearColor || discardColor || clearExternalColor ) {
 
-					if ( i === 0 ) {
+					const clearColor = renderContext.mrt ? renderContext.mrt.getClearColor( renderContext.textures[ i ].name ) : null;
+
+					if ( clearColor !== null ) {
+
+						colorAttachment.clearValue = clearColor;
+
+					} else if ( i === 0 ) {
 
 						colorAttachment.clearValue = renderContext.clearColorValue;
 
@@ -2114,14 +2120,7 @@ class WebGPUBackend extends Backend {
 			const starts = object._multiDrawStarts;
 			const counts = object._multiDrawCounts;
 			const drawCount = object._multiDrawCount;
-
-			let bytesPerElement = ( hasIndex === true ) ? index.array.BYTES_PER_ELEMENT : 1;
-
-			if ( material.wireframe ) {
-
-				bytesPerElement = object.geometry.attributes.position.count > 65535 ? 4 : 2;
-
-			}
+			const bytesPerElement = object._multiDrawBytesPerElement;
 
 			for ( let i = 0; i < drawCount; i ++ ) {
 

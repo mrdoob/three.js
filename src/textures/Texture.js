@@ -14,7 +14,7 @@ import { generateUUID } from '../math/MathUtils.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Matrix3 } from '../math/Matrix3.js';
-import { Source } from './Source.js';
+import { TextureSource } from './TextureSource.js';
 import { warn } from '../utils.js';
 
 let _textureId = 0;
@@ -88,9 +88,9 @@ class Texture extends EventDispatcher {
 		 * where multiple textures render the same data but with different texture
 		 * transformations.
 		 *
-		 * @type {Source}
+		 * @type {TextureSource}
 		 */
-		this.source = new Source( image );
+		this.source = new TextureSource( image );
 
 		/**
 		 * An array holding user-defined mipmaps.

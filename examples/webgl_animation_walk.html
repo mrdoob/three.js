@@ -43,7 +43,7 @@
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			let scene, renderer, camera, floor, orbitControls;
-			let group, followGroup, model, skeleton, mixer, timer;
+			let group, model, skeleton, mixer, timer;
 
 			let actions;
 
@@ -91,22 +91,11 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				followGroup = new THREE.Group();
-				scene.add( followGroup );
-
-				const dirLight = new THREE.DirectionalLight( 0xffffff, 5 );
-				dirLight.position.set( - 2, 5, - 3 );
-				dirLight.castShadow = true;
-				const cam = dirLight.shadow.camera;
-				cam.top = cam.right = 2;
-				cam.bottom = cam.left = - 2;
-				cam.near = 3;
-				cam.far = 8;
-				dirLight.shadow.mapSize.set( 1024, 1024 );
-				followGroup.add( dirLight );
-				followGroup.add( dirLight.target );
-
-				//scene.add( new THREE.CameraHelper( cam ) );
+				const sunLight = new THREE.SunLight( 0xffffff, 5 );
+				sunLight.position.set( - 2, 5, - 3 );
+				sunLight.castShadow = true;
+				sunLight.shadow.camera.far = 20;
+				scene.add( sunLight );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -336,7 +325,6 @@
 					group.quaternion.rotateTowards( rotate, controls.rotateSpeed );
 
 					orbitControls.target.copy( position ).add( { x: 0, y: 1, z: 0 } );
-					followGroup.position.copy( position );
 
 					// Move the floor without any limit
 					const dx = ( position.x - floor.position.x );

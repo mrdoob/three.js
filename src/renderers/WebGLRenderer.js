@@ -1353,6 +1353,8 @@ class WebGLRenderer {
 
 		function prepareMaterial( material, scene, object ) {
 
+			if ( _nodesHandler !== null && material.isNodeMaterial ) _nodesHandler.setObject( object, material );
+
 			if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
 
 				material.side = BackSide;
@@ -1388,6 +1390,7 @@ class WebGLRenderer {
 		this.compile = function ( scene, camera, targetScene = null ) {
 
 			if ( targetScene === null ) targetScene = scene;
+			if ( _nodesHandler !== null ) _nodesHandler.renderStart( scene, camera, targetScene );
 
 			currentRenderState = renderStates.get( targetScene );
 			currentRenderState.init( camera );
@@ -1433,6 +1436,11 @@ class WebGLRenderer {
 			}
 
 			currentRenderState.setupLights();
+			if ( _nodesHandler !== null ) _nodesHandler.updateLights( currentRenderState.state.lightsArray );
+
+			// node materials reference the shadow map when they are built, so it must exist by now
+
+			if ( _nodesHandler !== null ) shadowMap.render( currentRenderState.state.shadowsArray, targetScene, camera );
 
 			// Only initialize materials in the new scene, not the targetScene.
 
@@ -1473,6 +1481,7 @@ class WebGLRenderer {
 			} );
 
 			currentRenderState = renderStateStack.pop();
+			if ( _nodesHandler !== null ) _nodesHandler.renderEnd();
 
 			return materials;
 
@@ -1689,6 +1698,7 @@ class WebGLRenderer {
 			projectObject( scene, camera, 0, _this.sortObjects );
 
 			currentRenderList.finish();
+			if ( _nodesHandler !== null ) _nodesHandler.updateLights( currentRenderState.state.lightsArray );
 
 			if ( _this.sortObjects === true ) {
 
@@ -2133,6 +2143,7 @@ class WebGLRenderer {
 
 		function renderObject( object, scene, camera, geometry, material, group ) {
 
+			if ( _nodesHandler !== null && material.isNodeMaterial ) _nodesHandler.setObject( object, material );
 			object.onBeforeRender( _this, scene, camera, geometry, material, group );
 
 			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
@@ -2253,6 +2264,8 @@ class WebGLRenderer {
 
 				uniforms.ambientLightColor.value = lights.state.ambient;
 				uniforms.lightProbe.value = lights.state.probe;
+				uniforms.sunLights.value = lights.state.sun;
+				uniforms.sunLightShadows.value = lights.state.sunShadow;
 				uniforms.directionalLights.value = lights.state.directional;
 				uniforms.directionalLightShadows.value = lights.state.directionalShadow;
 				uniforms.spotLights.value = lights.state.spot;
@@ -2264,6 +2277,8 @@ class WebGLRenderer {
 				uniforms.pointLightShadows.value = lights.state.pointShadow;
 				uniforms.hemisphereLights.value = lights.state.hemi;
 
+				uniforms.sunShadowMatrix.value = lights.state.sunShadowMatrix;
+				uniforms.sunShadowCascade.value = lights.state.sunShadowCascade;
 				uniforms.directionalShadowMatrix.value = lights.state.directionalShadowMatrix;
 				uniforms.spotLightMatrix.value = lights.state.spotLightMatrix;
 				uniforms.spotLightMap.value = lights.state.spotLightMap;
@@ -2628,6 +2643,12 @@ class WebGLRenderer {
 			if ( materialProperties.needsLights ) {
 
 				// Set shadow map uniforms first to ensure they get the first texture units
+				if ( lights.state.sunShadowMap.length > 0 ) {
+
+					p_uniforms.setValue( _gl, 'sunShadowMap', lights.state.sunShadowMap, textures );
+
+				}
+
 				if ( lights.state.directionalShadowMap.length > 0 ) {
 
 					p_uniforms.setValue( _gl, 'directionalShadowMap', lights.state.directionalShadowMap, textures );
@@ -2807,6 +2828,8 @@ class WebGLRenderer {
 			uniforms.ambientLightColor.needsUpdate = value;
 			uniforms.lightProbe.needsUpdate = value;
 
+			uniforms.sunLights.needsUpdate = value;
+			uniforms.sunLightShadows.needsUpdate = value;
 			uniforms.directionalLights.needsUpdate = value;
 			uniforms.directionalLightShadows.needsUpdate = value;
 			uniforms.pointLights.needsUpdate = value;

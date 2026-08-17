@@ -28,7 +28,7 @@ a {
 	pointer-events: none;
 }
 
-#info > a {
+#info a {
 	pointer-events: auto;
 }
 

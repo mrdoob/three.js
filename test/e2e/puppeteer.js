@@ -41,6 +41,7 @@ const exceptionList = [
 	'webgpu_compute_sort_bitonic',
 	'webgpu_storage_buffer',
 	'webgpu_tsl_editor',
+	'webgpu_tsl_graph',
 	'webxr_vr_video',
 	'webgpu_tsl_transpiler',
 	'webgpu_rendertarget_2d-array_3d',

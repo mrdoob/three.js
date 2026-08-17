@@ -2702,6 +2702,7 @@ function denormalize( value, array ) {
 			return value / 65535.0;
 
 		case Uint8Array:
+		case Uint8ClampedArray:
 
 			return value / 255.0;
 
@@ -2749,6 +2750,7 @@ function normalize( value, array ) {
 			return Math.round( value * 65535.0 );
 
 		case Uint8Array:
+		case Uint8ClampedArray:
 
 			return Math.round( value * 255.0 );
 
@@ -7030,10 +7032,10 @@ let _sourceId = 0;
  * The main purpose of this class is to decouple the data definition from the texture
  * definition so the same data can be used with multiple texture instances.
  */
-class Source {
+class TextureSource {
 
 	/**
-	 * Constructs a new video texture.
+	 * Constructs a new texture source.
 	 *
 	 * @param {any} [data=null] - The data definition of a texture.
 	 */
@@ -7046,12 +7048,12 @@ class Source {
 		 * @readonly
 		 * @default true
 		 */
-		this.isSource = true;
+		this.isTextureSource = true;
 
 		/**
 		 * The ID of the source.
 		 *
-		 * @name Source#id
+		 * @name TextureSource#id
 		 * @type {number}
 		 * @readonly
 		 */
@@ -7073,7 +7075,7 @@ class Source {
 		this.data = data;
 
 		/**
-		 * This property is only relevant when {@link Source#needsUpdate} is set to `true` and
+		 * This property is only relevant when {@link TextureSource#needsUpdate} is set to `true` and
 		 * provides more control on how texture data should be processed. When `dataReady` is set
 		 * to `false`, the engine performs the memory allocation (if necessary) but does not transfer
 		 * the data into the GPU memory.
@@ -7084,7 +7086,7 @@ class Source {
 		this.dataReady = true;
 
 		/**
-		 * This starts at `0` and counts how many times {@link Source#needsUpdate} is set to `true`.
+		 * This starts at `0` and counts how many times {@link TextureSource#needsUpdate} is set to `true`.
 		 *
 		 * @type {number}
 		 * @readonly
@@ -7247,6 +7249,37 @@ function serializeImage( image ) {
 
 }
 
+/**
+ * @deprecated since r186. Use {@link TextureSource} instead. `Source` has been renamed to `TextureSource`.
+ */
+class Source extends TextureSource {
+
+	/**
+	 * Constructs a new texture source.
+	 *
+	 * @param {any} [data=null] - The data definition of a texture.
+	 * @deprecated since r186. Use {@link TextureSource} instead.
+	 */
+	constructor( data = null ) {
+
+		warnOnce( 'Source: "Source" has been renamed to "TextureSource". Please update your code to use "THREE.TextureSource" instead.' ); // @deprecated, r186
+
+		super( data );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @deprecated since r186. Use {@link TextureSource#isTextureSource} instead.
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isSource = true;
+
+	}
+
+}
+
 let _textureId = 0;
 
 const _tempVec3 = /*@__PURE__*/ new Vector3();
@@ -7318,9 +7351,9 @@ class Texture extends EventDispatcher {
 		 * where multiple textures render the same data but with different texture
 		 * transformations.
 		 *
-		 * @type {Source}
+		 * @type {TextureSource}
 		 */
-		this.source = new Source( image );
+		this.source = new TextureSource( image );
 
 		/**
 		 * An array holding user-defined mipmaps.
@@ -9533,7 +9566,7 @@ class RenderTarget extends EventDispatcher {
 			// ensure image object is not shared, see #20328
 
 			const image = Object.assign( {}, source.textures[ i ].image );
-			this.textures[ i ].source = new Source( image );
+			this.textures[ i ].source = new TextureSource( image );
 
 		}
 
@@ -13185,13 +13218,15 @@ class Object3D extends EventDispatcher {
 		object.uuid = this.uuid;
 		object.type = this.type;
 
-		if ( this.name !== '' ) object.name = this.name;
-		if ( this.castShadow === true ) object.castShadow = true;
-		if ( this.receiveShadow === true ) object.receiveShadow = true;
-		if ( this.visible === false ) object.visible = false;
-		if ( this.frustumCulled === false ) object.frustumCulled = false;
-		if ( this.renderOrder !== 0 ) object.renderOrder = this.renderOrder;
-		if ( this.static !== false ) object.static = this.static;
+		object.name = this.name;
+		object.castShadow = this.castShadow;
+		object.receiveShadow = this.receiveShadow;
+		object.visible = this.visible;
+		object.frustumCulled = this.frustumCulled;
+		object.renderOrder = this.renderOrder;
+		object.static = this.static;
+		object.matrixAutoUpdate = this.matrixAutoUpdate;
+
 		if ( Object.keys( this.userData ).length > 0 ) object.userData = this.userData;
 
 		object.layers = this.layers.mask;
@@ -13199,8 +13234,6 @@ class Object3D extends EventDispatcher {
 		object.up = this.up.toArray();
 
 		if ( this.pivot !== null ) object.pivot = this.pivot.toArray();
-
-		if ( this.matrixAutoUpdate === false ) object.matrixAutoUpdate = false;
 
 		if ( this.morphTargetDictionary !== undefined ) object.morphTargetDictionary = Object.assign( {}, this.morphTargetDictionary );
 		if ( this.morphTargetInfluences !== undefined ) object.morphTargetInfluences = this.morphTargetInfluences.slice();
@@ -15331,11 +15364,11 @@ class Scene extends Object3D {
 
 		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
 
-		if ( this.backgroundBlurriness > 0 ) data.object.backgroundBlurriness = this.backgroundBlurriness;
-		if ( this.backgroundIntensity !== 1 ) data.object.backgroundIntensity = this.backgroundIntensity;
+		data.object.backgroundBlurriness = this.backgroundBlurriness;
+		data.object.backgroundIntensity = this.backgroundIntensity;
 		data.object.backgroundRotation = this.backgroundRotation.toArray();
 
-		if ( this.environmentIntensity !== 1 ) data.object.environmentIntensity = this.environmentIntensity;
+		data.object.environmentIntensity = this.environmentIntensity;
 		data.object.environmentRotation = this.environmentRotation.toArray();
 
 		return data;
@@ -16411,13 +16444,13 @@ class Box3 {
 		}
 
 		// compute box center and extents
-		this.getCenter( _center );
-		_extents.subVectors( this.max, _center );
+		this.getCenter( _center$1 );
+		_extents.subVectors( this.max, _center$1 );
 
 		// translate triangle to aabb origin
-		_v0$1.subVectors( triangle.a, _center );
-		_v1$4.subVectors( triangle.b, _center );
-		_v2$3.subVectors( triangle.c, _center );
+		_v0$1.subVectors( triangle.a, _center$1 );
+		_v1$4.subVectors( triangle.b, _center$1 );
+		_v2$3.subVectors( triangle.c, _center$1 );
 
 		// compute edge vectors for triangle
 		_f0.subVectors( _v1$4, _v0$1 );
@@ -16655,7 +16688,7 @@ const _f0 = /*@__PURE__*/ new Vector3();
 const _f1 = /*@__PURE__*/ new Vector3();
 const _f2 = /*@__PURE__*/ new Vector3();
 
-const _center = /*@__PURE__*/ new Vector3();
+const _center$1 = /*@__PURE__*/ new Vector3();
 const _extents = /*@__PURE__*/ new Vector3();
 const _triangleNormal = /*@__PURE__*/ new Vector3();
 const _testAxis = /*@__PURE__*/ new Vector3();
@@ -17560,9 +17593,9 @@ class BufferAttribute extends EventDispatcher {
 			normalized: this.normalized
 		};
 
-		if ( this.name !== '' ) data.name = this.name;
-		if ( this.usage !== StaticDrawUsage ) data.usage = this.usage;
-		if ( this.gpuType !== FloatType ) data.gpuType = this.gpuType;
+		data.name = this.name;
+		data.usage = this.usage;
+		data.gpuType = this.gpuType;
 
 		return data;
 
@@ -19578,7 +19611,7 @@ class BufferGeometry extends EventDispatcher {
 
 		data.uuid = this.uuid;
 		data.type = ( this.parameters !== undefined && this._transformed === true ) ? 'BufferGeometry' : this.type;
-		if ( this.name !== '' ) data.name = this.name;
+		data.name = this.name;
 		if ( Object.keys( this.userData ).length > 0 ) data.userData = this.userData;
 
 		if ( this.parameters !== undefined && this._transformed !== true ) {
@@ -20097,7 +20130,7 @@ class InterleavedBuffer {
 			stride: this.stride
 		};
 
-		if ( this.usage !== StaticDrawUsage ) json.usage = this.usage;
+		json.usage = this.usage;
 
 		return json;
 
@@ -21663,10 +21696,61 @@ class Material extends EventDispatcher {
 		};
 
 		// standard Material serialization
+
 		data.uuid = this.uuid;
 		data.type = this.type;
 
-		if ( this.name !== '' ) data.name = this.name;
+		data.blending = this.blending;
+		data.side = this.side;
+		data.shadowSide = this.shadowSide;
+		data.vertexColors = this.vertexColors;
+
+		data.opacity = this.opacity;
+		data.transparent = this.transparent;
+
+		data.blendSrc = this.blendSrc;
+		data.blendDst = this.blendDst;
+		data.blendEquation = this.blendEquation;
+		data.blendSrcAlpha = this.blendSrcAlpha;
+		data.blendDstAlpha = this.blendDstAlpha;
+		data.blendEquationAlpha = this.blendEquationAlpha;
+		data.blendColor = this.blendColor.getHex();
+		data.blendAlpha = this.blendAlpha;
+
+		data.depthFunc = this.depthFunc;
+		data.depthTest = this.depthTest;
+		data.depthWrite = this.depthWrite;
+		data.colorWrite = this.colorWrite;
+
+		data.clipIntersection = this.clipIntersection;
+		data.clipShadows = this.clipShadows;
+
+		data.stencilWriteMask = this.stencilWriteMask;
+		data.stencilFunc = this.stencilFunc;
+		data.stencilRef = this.stencilRef;
+		data.stencilFuncMask = this.stencilFuncMask;
+		data.stencilFail = this.stencilFail;
+		data.stencilZFail = this.stencilZFail;
+		data.stencilZPass = this.stencilZPass;
+		data.stencilWrite = this.stencilWrite;
+
+		data.polygonOffset = this.polygonOffset;
+		data.polygonOffsetFactor = this.polygonOffsetFactor;
+		data.polygonOffsetUnits = this.polygonOffsetUnits;
+
+		data.dithering = this.dithering;
+
+		data.alphaTest = this.alphaTest;
+		data.alphaHash = this.alphaHash;
+		data.alphaToCoverage = this.alphaToCoverage;
+		data.premultipliedAlpha = this.premultipliedAlpha;
+		data.forceSinglePass = this.forceSinglePass;
+		data.allowOverride = this.allowOverride;
+
+		data.visible = this.visible;
+		data.toneMapped = this.toneMapped;
+
+		data.name = this.name;
 
 		if ( this.color && this.color.isColor ) data.color = this.color.getHex();
 
@@ -21677,7 +21761,7 @@ class Material extends EventDispatcher {
 		if ( this.sheenColor && this.sheenColor.isColor ) data.sheenColor = this.sheenColor.getHex();
 		if ( this.sheenRoughness !== undefined ) data.sheenRoughness = this.sheenRoughness;
 		if ( this.emissive && this.emissive.isColor ) data.emissive = this.emissive.getHex();
-		if ( this.emissiveIntensity !== undefined && this.emissiveIntensity !== 1 ) data.emissiveIntensity = this.emissiveIntensity;
+		if ( this.emissiveIntensity !== undefined ) data.emissiveIntensity = this.emissiveIntensity;
 
 		if ( this.specular && this.specular.isColor ) data.specular = this.specular.getHex();
 		if ( this.specularIntensity !== undefined ) data.specularIntensity = this.specularIntensity;
@@ -21817,33 +21901,11 @@ class Material extends EventDispatcher {
 		if ( this.transmissionMap && this.transmissionMap.isTexture ) data.transmissionMap = this.transmissionMap.toJSON( meta ).uuid;
 		if ( this.thickness !== undefined ) data.thickness = this.thickness;
 		if ( this.thicknessMap && this.thicknessMap.isTexture ) data.thicknessMap = this.thicknessMap.toJSON( meta ).uuid;
-		if ( this.attenuationDistance !== undefined && this.attenuationDistance !== Infinity ) data.attenuationDistance = this.attenuationDistance;
+		if ( this.attenuationDistance !== undefined ) data.attenuationDistance = this.attenuationDistance;
 		if ( this.attenuationColor !== undefined ) data.attenuationColor = this.attenuationColor.getHex();
 
 		if ( this.size !== undefined ) data.size = this.size;
-		if ( this.shadowSide !== null ) data.shadowSide = this.shadowSide;
 		if ( this.sizeAttenuation !== undefined ) data.sizeAttenuation = this.sizeAttenuation;
-
-		if ( this.blending !== NormalBlending ) data.blending = this.blending;
-		if ( this.side !== FrontSide ) data.side = this.side;
-		if ( this.vertexColors === true ) data.vertexColors = true;
-
-		if ( this.opacity < 1 ) data.opacity = this.opacity;
-		if ( this.transparent === true ) data.transparent = true;
-
-		if ( this.blendSrc !== SrcAlphaFactor ) data.blendSrc = this.blendSrc;
-		if ( this.blendDst !== OneMinusSrcAlphaFactor ) data.blendDst = this.blendDst;
-		if ( this.blendEquation !== AddEquation ) data.blendEquation = this.blendEquation;
-		if ( this.blendSrcAlpha !== null ) data.blendSrcAlpha = this.blendSrcAlpha;
-		if ( this.blendDstAlpha !== null ) data.blendDstAlpha = this.blendDstAlpha;
-		if ( this.blendEquationAlpha !== null ) data.blendEquationAlpha = this.blendEquationAlpha;
-		if ( this.blendColor && this.blendColor.isColor ) data.blendColor = this.blendColor.getHex();
-		if ( this.blendAlpha !== 0 ) data.blendAlpha = this.blendAlpha;
-
-		if ( this.depthFunc !== LessEqualDepth ) data.depthFunc = this.depthFunc;
-		if ( this.depthTest === false ) data.depthTest = this.depthTest;
-		if ( this.depthWrite === false ) data.depthWrite = this.depthWrite;
-		if ( this.colorWrite === false ) data.colorWrite = this.colorWrite;
 
 		if ( Array.isArray( this.clippingPlanes ) && this.clippingPlanes.length > 0 ) {
 
@@ -21851,56 +21913,27 @@ class Material extends EventDispatcher {
 
 		}
 
-		if ( this.clipIntersection === true ) data.clipIntersection = true;
-		if ( this.clipShadows === true ) data.clipShadows = true;
-
-		if ( this.stencilWriteMask !== 0xff ) data.stencilWriteMask = this.stencilWriteMask;
-		if ( this.stencilFunc !== AlwaysStencilFunc ) data.stencilFunc = this.stencilFunc;
-		if ( this.stencilRef !== 0 ) data.stencilRef = this.stencilRef;
-		if ( this.stencilFuncMask !== 0xff ) data.stencilFuncMask = this.stencilFuncMask;
-		if ( this.stencilFail !== KeepStencilOp ) data.stencilFail = this.stencilFail;
-		if ( this.stencilZFail !== KeepStencilOp ) data.stencilZFail = this.stencilZFail;
-		if ( this.stencilZPass !== KeepStencilOp ) data.stencilZPass = this.stencilZPass;
-		if ( this.stencilWrite === true ) data.stencilWrite = this.stencilWrite;
-
 		// rotation (SpriteMaterial)
-		if ( this.rotation !== undefined && this.rotation !== 0 ) data.rotation = this.rotation;
+		if ( this.rotation !== undefined ) data.rotation = this.rotation;
 
 		// depthPacking (MeshDepthMaterial)
-		if ( this.depthPacking !== undefined && this.depthPacking !== BasicDepthPacking ) data.depthPacking = this.depthPacking;
+		if ( this.depthPacking !== undefined ) data.depthPacking = this.depthPacking;
 
-		if ( this.polygonOffset === true ) data.polygonOffset = true;
-		if ( this.polygonOffsetFactor !== 0 ) data.polygonOffsetFactor = this.polygonOffsetFactor;
-		if ( this.polygonOffsetUnits !== 0 ) data.polygonOffsetUnits = this.polygonOffsetUnits;
-
-		if ( this.linewidth !== undefined && this.linewidth !== 1 ) data.linewidth = this.linewidth;
-		if ( this.linecap !== undefined && this.linecap !== 'round' ) data.linecap = this.linecap;
-		if ( this.linejoin !== undefined && this.linejoin !== 'round' ) data.linejoin = this.linejoin;
+		if ( this.linewidth !== undefined ) data.linewidth = this.linewidth;
+		if ( this.linecap !== undefined ) data.linecap = this.linecap;
+		if ( this.linejoin !== undefined ) data.linejoin = this.linejoin;
 		if ( this.dashSize !== undefined ) data.dashSize = this.dashSize;
 		if ( this.gapSize !== undefined ) data.gapSize = this.gapSize;
 		if ( this.scale !== undefined ) data.scale = this.scale;
 
-		if ( this.dithering === true ) data.dithering = true;
+		if ( this.wireframe !== undefined ) data.wireframe = this.wireframe;
+		if ( this.wireframeLinewidth !== undefined ) data.wireframeLinewidth = this.wireframeLinewidth;
+		if ( this.wireframeLinecap !== undefined ) data.wireframeLinecap = this.wireframeLinecap;
+		if ( this.wireframeLinejoin !== undefined ) data.wireframeLinejoin = this.wireframeLinejoin;
 
-		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
-		if ( this.alphaHash === true ) data.alphaHash = true;
-		if ( this.alphaToCoverage === true ) data.alphaToCoverage = true;
-		if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = true;
-		if ( this.forceSinglePass === true ) data.forceSinglePass = true;
-		if ( this.allowOverride === false ) data.allowOverride = false;
+		if ( this.flatShading !== undefined ) data.flatShading = this.flatShading;
 
-		if ( this.wireframe === true ) data.wireframe = true;
-		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
-		if ( this.wireframeLinecap !== 'round' ) data.wireframeLinecap = this.wireframeLinecap;
-		if ( this.wireframeLinejoin !== 'round' ) data.wireframeLinejoin = this.wireframeLinejoin;
-
-		if ( this.flatShading === true ) data.flatShading = true;
-
-		if ( this.visible === false ) data.visible = false;
-
-		if ( this.toneMapped === false ) data.toneMapped = false;
-
-		if ( this.fog === false ) data.fog = false;
+		if ( this.fog !== undefined ) data.fog = this.fog;
 
 		if ( Object.keys( this.userData ).length > 0 ) data.userData = this.userData;
 
@@ -22950,7 +22983,7 @@ class LOD extends Object3D {
 
 		const data = super.toJSON( meta );
 
-		if ( this.autoUpdate === false ) data.object.autoUpdate = false;
+		data.object.autoUpdate = this.autoUpdate;
 
 		data.object.levels = [];
 
@@ -26528,6 +26561,7 @@ class BatchedMesh extends Mesh {
 		this._multiDrawCounts = new Int32Array( maxInstanceCount );
 		this._multiDrawStarts = new Int32Array( maxInstanceCount );
 		this._multiDrawCount = 0;
+		this._multiDrawBytesPerElement = 1;
 
 		// Local matrix per geometry by using data texture
 		this._matricesTexture = null;
@@ -27730,6 +27764,7 @@ class BatchedMesh extends Mesh {
 		this._geometryInitialized = source._geometryInitialized;
 		this._multiDrawCounts = source._multiDrawCounts.slice();
 		this._multiDrawStarts = source._multiDrawStarts.slice();
+		this._multiDrawBytesPerElement = source._multiDrawBytesPerElement;
 
 		this._indirectTexture = source._indirectTexture.clone();
 		this._indirectTexture.image.data = this._indirectTexture.image.data.slice();
@@ -27934,6 +27969,7 @@ class BatchedMesh extends Mesh {
 
 		indirectTexture.needsUpdate = true;
 		this._multiDrawCount = multiDrawCount;
+		this._multiDrawBytesPerElement = bytesPerElement;
 		this._visibilityChanged = false;
 
 	}
@@ -29644,7 +29680,7 @@ class DepthTexture extends Texture {
 
 		super.copy( source );
 
-		this.source = new Source( Object.assign( {}, source.image ) ); // see #30540
+		this.source = new TextureSource( Object.assign( {}, source.image ) ); // see #30540
 		this.compareFunction = source.compareFunction;
 
 		return this;
@@ -29655,7 +29691,7 @@ class DepthTexture extends Texture {
 
 		const data = super.toJSON( meta );
 
-		if ( this.compareFunction !== null ) data.compareFunction = this.compareFunction;
+		data.compareFunction = this.compareFunction;
 
 		return data;
 
@@ -46052,77 +46088,6 @@ class Light extends Object3D {
 
 }
 
-/**
- * A light source positioned directly above the scene, with color fading from
- * the sky color to the ground color.
- *
- * This light cannot be used to cast shadows.
- *
- * ```js
- * const light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
- * scene.add( light );
- * ```
- *
- * @augments Light
- */
-class HemisphereLight extends Light {
-
-	/**
-	 * Constructs a new hemisphere light.
-	 *
-	 * @param {(number|Color|string)} [skyColor=0xffffff] - The light's sky color.
-	 * @param {(number|Color|string)} [groundColor=0xffffff] - The light's ground color.
-	 * @param {number} [intensity=1] - The light's strength/intensity.
-	 */
-	constructor( skyColor, groundColor, intensity ) {
-
-		super( skyColor, intensity );
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isHemisphereLight = true;
-
-		this.type = 'HemisphereLight';
-
-		this.position.copy( Object3D.DEFAULT_UP );
-		this.updateMatrix();
-
-		/**
-		 * The light's ground color.
-		 *
-		 * @type {Color}
-		 */
-		this.groundColor = new Color( groundColor );
-
-	}
-
-	copy( source, recursive ) {
-
-		super.copy( source, recursive );
-
-		this.groundColor.copy( source.groundColor );
-
-		return this;
-
-	}
-
-	toJSON( meta ) {
-
-		const data = super.toJSON( meta );
-
-		data.object.groundColor = this.groundColor.getHex();
-
-		return data;
-
-	}
-
-}
-
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld = /*@__PURE__*/ new Vector3();
 const _lookTarget = /*@__PURE__*/ new Vector3();
@@ -46301,6 +46266,18 @@ class LightShadow {
 	}
 
 	/**
+	 * Used internally by the renderer to get the camera that renders the given viewport.
+	 *
+	 * @param {number} [viewportIndex=0] - The viewport index.
+	 * @return {Camera} The shadow camera.
+	 */
+	getCamera( /* viewportIndex */ ) {
+
+		return this.camera;
+
+	}
+
+	/**
 	 * Gets the shadow cameras frustum. Used internally by the renderer to cull objects.
 	 *
 	 * @return {Frustum} The shadow camera frustum.
@@ -46319,23 +46296,41 @@ class LightShadow {
 	updateMatrices( light ) {
 
 		const shadowCamera = this.camera;
-		const shadowMatrix = this.matrix;
-
 		_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
 		shadowCamera.position.copy( _lightPositionWorld );
 
 		_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
 		shadowCamera.lookAt( _lookTarget );
 		shadowCamera.updateMatrixWorld();
+		this._updateMatrix( shadowCamera, this.matrix, this._frustum );
+
+	}
+
+	/**
+	 * Updates a shadow projection matrix and its corresponding frustum.
+	 *
+	 * @private
+	 * @param {Camera} shadowCamera - The shadow camera.
+	 * @param {Matrix4} shadowMatrix - The target shadow matrix.
+	 * @param {Frustum} frustum - The target frustum.
+	 * @param {Vector4} [viewport] - The viewport within the shadow atlas.
+	 */
+	_updateMatrix( shadowCamera, shadowMatrix, frustum, viewport ) {
 
 		_projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
-		this._frustum.setFromProjectionMatrix( _projScreenMatrix, shadowCamera.coordinateSystem, shadowCamera.reversedDepth );
+		frustum.setFromProjectionMatrix( _projScreenMatrix, shadowCamera.coordinateSystem, shadowCamera.reversedDepth );
+
+		const frameExtents = this._frameExtents;
+		const scaleX = viewport ? viewport.z / frameExtents.x : 1;
+		const scaleY = viewport ? viewport.w / frameExtents.y : 1;
+		const offsetX = viewport ? viewport.x / frameExtents.x : 0;
+		const offsetY = viewport ? viewport.y / frameExtents.y : 0;
 
 		if ( shadowCamera.coordinateSystem === WebGPUCoordinateSystem || shadowCamera.reversedDepth ) {
 
 			shadowMatrix.set(
-				0.5, 0.0, 0.0, 0.5,
-				0.0, 0.5, 0.0, 0.5,
+				0.5 * scaleX, 0.0, 0.0, 0.5 * scaleX + offsetX,
+				0.0, 0.5 * scaleY, 0.0, 0.5 * scaleY + offsetY,
 				0.0, 0.0, 1.0, 0.0, // Identity Z (preserving the correct [0, 1] range from the projection matrix)
 				0.0, 0.0, 0.0, 1.0
 			);
@@ -46343,8 +46338,8 @@ class LightShadow {
 		} else {
 
 			shadowMatrix.set(
-				0.5, 0.0, 0.0, 0.5,
-				0.0, 0.5, 0.0, 0.5,
+				0.5 * scaleX, 0.0, 0.0, 0.5 * scaleX + offsetX,
+				0.0, 0.5 * scaleY, 0.0, 0.5 * scaleY + offsetY,
 				0.0, 0.0, 0.5, 0.5,
 				0.0, 0.0, 0.0, 1.0
 			);
@@ -46447,12 +46442,12 @@ class LightShadow {
 
 		const object = {};
 
-		if ( this.intensity !== 1 ) object.intensity = this.intensity;
-		if ( this.bias !== 0 ) object.bias = this.bias;
-		if ( this.normalBias !== 0 ) object.normalBias = this.normalBias;
-		if ( this.radius !== 1 ) object.radius = this.radius;
-		if ( this.blurSamples !== 8 ) object.blurSamples = this.blurSamples;
-		if ( this.mapSize.x !== 512 || this.mapSize.y !== 512 ) object.mapSize = this.mapSize.toArray();
+		object.intensity = this.intensity;
+		object.bias = this.bias;
+		object.normalBias = this.normalBias;
+		object.radius = this.radius;
+		object.blurSamples = this.blurSamples;
+		object.mapSize = this.mapSize.toArray();
 
 		object.camera = this.camera.toJSON( false ).object;
 		delete object.camera.matrix;
@@ -46611,6 +46606,713 @@ class Camera extends Object3D {
 	clone() {
 
 		return new this.constructor().copy( this );
+
+	}
+
+}
+
+/**
+ * Camera that uses [orthographic projection](https://en.wikipedia.org/wiki/Orthographic_projection).
+ *
+ * In this projection mode, an object's size in the rendered image stays
+ * constant regardless of its distance from the camera. This can be useful
+ * for rendering 2D scenes and UI elements, amongst other things.
+ *
+ * ```js
+ * const camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
+ * scene.add( camera );
+ * ```
+ *
+ * @augments Camera
+ */
+class OrthographicCamera extends Camera {
+
+	/**
+	 * Constructs a new orthographic camera.
+	 *
+	 * @param {number} [left=-1] - The left plane of the camera's frustum.
+	 * @param {number} [right=1] - The right plane of the camera's frustum.
+	 * @param {number} [top=1] - The top plane of the camera's frustum.
+	 * @param {number} [bottom=-1] - The bottom plane of the camera's frustum.
+	 * @param {number} [near=0.1] - The camera's near plane.
+	 * @param {number} [far=2000] - The camera's far plane.
+	 */
+	constructor( left = -1, right = 1, top = 1, bottom = -1, near = 0.1, far = 2000 ) {
+
+		super();
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isOrthographicCamera = true;
+
+		this.type = 'OrthographicCamera';
+
+		/**
+		 * The zoom factor of the camera.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.zoom = 1;
+
+		/**
+		 * Represents the frustum window specification. This property should not be edited
+		 * directly but via {@link PerspectiveCamera#setViewOffset} and {@link PerspectiveCamera#clearViewOffset}.
+		 *
+		 * @type {?Object}
+		 * @default null
+		 */
+		this.view = null;
+
+		/**
+		 * The left plane of the camera's frustum.
+		 *
+		 * @type {number}
+		 * @default -1
+		 */
+		this.left = left;
+
+		/**
+		 * The right plane of the camera's frustum.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.right = right;
+
+		/**
+		 * The top plane of the camera's frustum.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.top = top;
+
+		/**
+		 * The bottom plane of the camera's frustum.
+		 *
+		 * @type {number}
+		 * @default -1
+		 */
+		this.bottom = bottom;
+
+		/**
+		 * The camera's near plane. The valid range is greater than `0`
+		 * and less than the current value of {@link OrthographicCamera#far}.
+		 *
+		 * Note that, unlike for the {@link PerspectiveCamera}, `0` is a
+		 * valid value for an orthographic camera's near plane.
+		 *
+		 * @type {number}
+		 * @default 0.1
+		 */
+		this.near = near;
+
+		/**
+		 * The camera's far plane. Must be greater than the
+		 * current value of {@link OrthographicCamera#near}.
+		 *
+		 * @type {number}
+		 * @default 2000
+		 */
+		this.far = far;
+
+		this.updateProjectionMatrix();
+
+	}
+
+	copy( source, recursive ) {
+
+		super.copy( source, recursive );
+
+		this.left = source.left;
+		this.right = source.right;
+		this.top = source.top;
+		this.bottom = source.bottom;
+		this.near = source.near;
+		this.far = source.far;
+
+		this.zoom = source.zoom;
+		this.view = source.view === null ? null : Object.assign( {}, source.view );
+
+		return this;
+
+	}
+
+	/**
+	 * Sets an offset in a larger frustum. This is useful for multi-window or
+	 * multi-monitor/multi-machine setups.
+	 *
+	 * @param {number} fullWidth - The full width of multiview setup.
+	 * @param {number} fullHeight - The full height of multiview setup.
+	 * @param {number} x - The horizontal offset of the subcamera.
+	 * @param {number} y - The vertical offset of the subcamera.
+	 * @param {number} width - The width of subcamera.
+	 * @param {number} height - The height of subcamera.
+	 * @see {@link PerspectiveCamera#setViewOffset}
+	 */
+	setViewOffset( fullWidth, fullHeight, x, y, width, height ) {
+
+		if ( this.view === null ) {
+
+			this.view = {
+				enabled: true,
+				fullWidth: 1,
+				fullHeight: 1,
+				offsetX: 0,
+				offsetY: 0,
+				width: 1,
+				height: 1
+			};
+
+		}
+
+		this.view.enabled = true;
+		this.view.fullWidth = fullWidth;
+		this.view.fullHeight = fullHeight;
+		this.view.offsetX = x;
+		this.view.offsetY = y;
+		this.view.width = width;
+		this.view.height = height;
+
+		this.updateProjectionMatrix();
+
+	}
+
+	/**
+	 * Removes the view offset from the projection matrix.
+	 */
+	clearViewOffset() {
+
+		if ( this.view !== null ) {
+
+			this.view.enabled = false;
+
+		}
+
+		this.updateProjectionMatrix();
+
+	}
+
+	/**
+	 * Updates the camera's projection matrix. Must be called after any change of
+	 * camera properties.
+	 */
+	updateProjectionMatrix() {
+
+		const dx = ( this.right - this.left ) / ( 2 * this.zoom );
+		const dy = ( this.top - this.bottom ) / ( 2 * this.zoom );
+		const cx = ( this.right + this.left ) / 2;
+		const cy = ( this.top + this.bottom ) / 2;
+
+		let left = cx - dx;
+		let right = cx + dx;
+		let top = cy + dy;
+		let bottom = cy - dy;
+
+		if ( this.view !== null && this.view.enabled ) {
+
+			const scaleW = ( this.right - this.left ) / this.view.fullWidth / this.zoom;
+			const scaleH = ( this.top - this.bottom ) / this.view.fullHeight / this.zoom;
+
+			left += scaleW * this.view.offsetX;
+			right = left + scaleW * this.view.width;
+			top -= scaleH * this.view.offsetY;
+			bottom = top - scaleH * this.view.height;
+
+		}
+
+		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far, this.coordinateSystem, this.reversedDepth );
+
+		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
+
+	}
+
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		data.object.zoom = this.zoom;
+		data.object.left = this.left;
+		data.object.right = this.right;
+		data.object.top = this.top;
+		data.object.bottom = this.bottom;
+		data.object.near = this.near;
+		data.object.far = this.far;
+
+		if ( this.view !== null ) data.object.view = Object.assign( {}, this.view );
+
+		return data;
+
+	}
+
+}
+
+const _lightOrientationMatrix = /*@__PURE__*/ new Matrix4();
+const _viewToLightMatrix = /*@__PURE__*/ new Matrix4();
+const _lightDirection = /*@__PURE__*/ new Vector3();
+const _up$1 = /*@__PURE__*/ new Vector3();
+const _center = /*@__PURE__*/ new Vector3();
+
+const _nearCorners = [
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3()
+];
+
+const _farCorners = [
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3()
+];
+
+const _cascadeCorners = [
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3()
+];
+
+// must match the cascade count in the sun shadow shader chunks
+
+const _cascadeCount = 4;
+
+// fraction of each cascade's depth range that blends into the next cascade
+
+const _cascadeFade = 0.1;
+
+/**
+ * Represents the shadow configuration of {@link SunLight}, using four
+ * cascaded shadow maps (CSM).
+ *
+ * The shadow camera projection is fitted automatically to slices of the view
+ * frustum, up to a distance of `camera.far` (or the view camera's far plane,
+ * whichever is smaller), and adjacent cascades blend into each other over a
+ * small depth range. `camera.left/right/top/bottom` are ignored.
+ *
+ * The default `mapSize` is `1024x1024` per cascade.
+ *
+ * @augments LightShadow
+ */
+class SunLightShadow extends LightShadow {
+
+	/**
+	 * Constructs a new sun light shadow.
+	 */
+	constructor() {
+
+		super( new OrthographicCamera( -5, 5, 5, -5, 0.5, 500 ) );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isSunLightShadow = true;
+
+		this.mapSize.set( 1024, 1024 );
+
+		this._cameras = [];
+		this._matrices = [];
+		this._frustums = [];
+		this._cascadeSplits = new Array( _cascadeCount + 1 ).fill( 0 );
+
+		// per cascade ( begin, end, fade start ) view depths, consumed by the renderer
+
+		this._cascadeData = [];
+
+		this._viewportCount = _cascadeCount;
+		this._frameExtents.set( 2, 2 );
+
+		for ( let i = 0; i < _cascadeCount; i ++ ) {
+
+			this._cameras.push( new OrthographicCamera() );
+			this._matrices.push( new Matrix4() );
+			this._frustums.push( new Frustum() );
+			this._cascadeData.push( new Vector4() );
+
+		}
+
+		while ( this._viewports.length < _cascadeCount ) this._viewports.push( new Vector4() );
+
+	}
+
+	/**
+	 * Returns the shadow camera of the given cascade.
+	 *
+	 * @param {number} [cascadeIndex=0] - The cascade index.
+	 * @return {OrthographicCamera} The shadow camera.
+	 */
+	getCamera( cascadeIndex = 0 ) {
+
+		return this._cameras[ cascadeIndex ];
+
+	}
+
+	/**
+	 * Returns the shadow matrix of the given cascade.
+	 *
+	 * @param {number} [cascadeIndex=0] - The cascade index.
+	 * @return {Matrix4} The shadow matrix.
+	 */
+	getMatrix( cascadeIndex = 0 ) {
+
+		return this._matrices[ cascadeIndex ];
+
+	}
+
+	/**
+	 * Returns the shadow camera frustum of the given cascade. Used internally by
+	 * the renderer to cull objects.
+	 *
+	 * @param {number} [cascadeIndex=0] - The cascade index.
+	 * @return {Frustum} The shadow camera frustum.
+	 */
+	getFrustum( cascadeIndex = 0 ) {
+
+		return this._frustums[ cascadeIndex ];
+
+	}
+
+	/**
+	 * Update the matrices for the cascade cameras and shadows, used internally
+	 * by the renderer.
+	 *
+	 * @param {Light} light - The light for which the shadow is being rendered.
+	 * @param {Camera} viewCamera - The camera the scene is rendered with.
+	 */
+	updateMatrices( light, viewCamera ) {
+
+		if ( viewCamera === undefined ) return;
+
+		// inset the cascade viewports so shadow filtering cannot read across atlas tiles
+
+		const insetX = Math.min( 0.25, ( Math.ceil( this.radius ) + 1 ) / this.mapSize.x );
+		const insetY = Math.min( 0.25, ( Math.ceil( this.radius ) + 1 ) / this.mapSize.y );
+
+		for ( let i = 0; i < _cascadeCount; i ++ ) {
+
+			this._viewports[ i ].set( i % 2 + insetX, Math.floor( i / 2 ) + insetY, 1 - 2 * insetX, 1 - 2 * insetY );
+
+		}
+
+		const resolutionX = this.mapSize.x * ( 1 - 2 * insetX );
+		const resolutionY = this.mapSize.y * ( 1 - 2 * insetY );
+		const resolution = Math.min( resolutionX, resolutionY );
+
+		const camera = this.camera;
+		const cameraNear = viewCamera.near;
+		const cameraFar = Math.max( cameraNear + 1e-6, Math.min( camera.far, viewCamera.far ) );
+
+		// practical split scheme: the average of uniform and logarithmic splits
+
+		const splits = this._cascadeSplits;
+		splits[ 0 ] = cameraNear;
+
+		for ( let i = 1; i < _cascadeCount; i ++ ) {
+
+			const amount = i / _cascadeCount;
+			const uniform = cameraNear + ( cameraFar - cameraNear ) * amount;
+			const logarithmic = cameraNear > 0 ? cameraNear * Math.pow( cameraFar / cameraNear, amount ) : uniform;
+			splits[ i ] = ( uniform + logarithmic ) * 0.5;
+
+		}
+
+		splits[ _cascadeCount ] = cameraFar;
+
+		_lightDirection.setFromMatrixPosition( light.matrixWorld ).negate().normalize();
+
+		_up$1.set( 0, 1, 0 );
+		if ( Math.abs( _up$1.dot( _lightDirection ) ) > 0.99 ) _up$1.set( 0, 0, 1 );
+
+		_lightOrientationMatrix.lookAt( _center.set( 0, 0, 0 ), _lightDirection, _up$1 );
+		_viewToLightMatrix.copy( _lightOrientationMatrix ).transpose().multiply( viewCamera.matrixWorld );
+
+		// view frustum corners in light space; the rotation preserves distances,
+		// so the cascades can be fitted and snapped directly in this space
+
+		const zNear = viewCamera.reversedDepth ? 1 : -1;
+		const inverseProjectionMatrix = viewCamera.projectionMatrixInverse;
+
+		let globalMaxZ = - Infinity;
+
+		for ( let i = 0; i < 4; i ++ ) {
+
+			const x = i === 0 || i === 1 ? 1 : -1;
+			const y = i === 0 || i === 3 ? 1 : -1;
+
+			const nearCorner = _nearCorners[ i ].set( x, y, zNear ).applyMatrix4( inverseProjectionMatrix );
+			const farCorner = _farCorners[ i ];
+
+			if ( viewCamera.isPerspectiveCamera === true ) {
+
+				farCorner.copy( nearCorner ).multiplyScalar( cameraFar / cameraNear );
+
+			} else {
+
+				farCorner.set( nearCorner.x, nearCorner.y, - cameraFar );
+
+			}
+
+			nearCorner.applyMatrix4( _viewToLightMatrix );
+			farCorner.applyMatrix4( _viewToLightMatrix );
+
+			globalMaxZ = Math.max( globalMaxZ, nearCorner.z, farCorner.z );
+
+		}
+
+		// raise the ceiling one shadow range towards the light so casters outside
+		// the view frustum still cast into it
+
+		globalMaxZ += cameraFar;
+
+		const shadowNear = camera.near;
+
+		for ( let i = 0; i < _cascadeCount; i ++ ) {
+
+			// each cascade covers the fade band of the previous one so both can be sampled while blending
+
+			const cascadeNear = i === 0 ? splits[ 0 ] : this._cascadeData[ i - 1 ].z;
+			const cascadeFar = splits[ i + 1 ];
+			const fadeStart = cascadeFar - _cascadeFade * ( cascadeFar - splits[ i ] );
+
+			this._cascadeData[ i ].set( i === 0 ? -1e10 : cascadeNear, cascadeFar, fadeStart, 0 );
+
+			// bounding sphere of the cascade slice for a rotation-stable projection
+
+			const nearAlpha = ( cascadeNear - cameraNear ) / ( cameraFar - cameraNear );
+			const farAlpha = ( cascadeFar - cameraNear ) / ( cameraFar - cameraNear );
+
+			_center.set( 0, 0, 0 );
+
+			for ( let j = 0; j < 4; j ++ ) {
+
+				_cascadeCorners[ j * 2 ].lerpVectors( _nearCorners[ j ], _farCorners[ j ], nearAlpha );
+				_cascadeCorners[ j * 2 + 1 ].lerpVectors( _nearCorners[ j ], _farCorners[ j ], farAlpha );
+				_center.add( _cascadeCorners[ j * 2 ] ).add( _cascadeCorners[ j * 2 + 1 ] );
+
+			}
+
+			_center.multiplyScalar( 1 / 8 );
+
+			let radiusSq = 0;
+			let minZ = Infinity;
+
+			for ( let j = 0; j < 8; j ++ ) {
+
+				radiusSq = Math.max( radiusSq, _cascadeCorners[ j ].distanceToSquared( _center ) );
+				minZ = Math.min( minZ, _cascadeCorners[ j ].z );
+
+			}
+
+			let radius = Math.sqrt( radiusSq );
+
+			// snap to the texel grid to avoid shimmering when the view camera moves
+
+			if ( resolution > 1 ) {
+
+				// pad by half a texel so snapping cannot clip a frustum corner
+				radius /= 1 - 1 / resolution;
+				const texelSizeX = 2 * radius / resolutionX;
+				const texelSizeY = 2 * radius / resolutionY;
+				_center.x = Math.round( _center.x / texelSizeX ) * texelSizeX;
+				_center.y = Math.round( _center.y / texelSizeY ) * texelSizeY;
+
+			}
+
+			// place the near plane at the caster ceiling
+
+			_center.z = globalMaxZ + shadowNear;
+			_center.applyMatrix4( _lightOrientationMatrix );
+
+			const cascadeCamera = this._cameras[ i ];
+			cascadeCamera.position.copy( _center );
+			cascadeCamera.quaternion.setFromRotationMatrix( _lightOrientationMatrix );
+			cascadeCamera.left = - radius;
+			cascadeCamera.right = radius;
+			cascadeCamera.top = radius;
+			cascadeCamera.bottom = - radius;
+			cascadeCamera.near = shadowNear;
+			cascadeCamera.far = globalMaxZ - minZ + 2 * shadowNear;
+			cascadeCamera.coordinateSystem = camera.coordinateSystem;
+			cascadeCamera._reversedDepth = camera.reversedDepth;
+			cascadeCamera.updateProjectionMatrix();
+			cascadeCamera.updateMatrixWorld();
+
+			this._updateMatrix( cascadeCamera, this._matrices[ i ], this._frustums[ i ], this._viewports[ i ] );
+
+		}
+
+	}
+
+}
+
+/**
+ * A sun-like light that gets emitted in a specific direction, with rays that
+ * are all parallel, and casts cascaded shadow maps via {@link SunLightShadow},
+ * suited for lighting large scenes.
+ *
+ * Unlike {@link DirectionalLight}, the light has no target: like
+ * {@link HemisphereLight}, its direction is defined by its position. The
+ * light shines from its position towards the origin and points straight
+ * down by default.
+ *
+ * ```js
+ * const sun = new SunLight( 0xfff2e3, 3 );
+ * sun.position.set( 1, 1, 1 );
+ * sun.castShadow = true;
+ * scene.add( sun );
+ * ```
+ *
+ * This light is only supported by `WebGLRenderer`. When using `WebGPURenderer`,
+ * use {@link DirectionalLight} with `CSMShadowNode` instead.
+ *
+ * @augments Light
+ */
+class SunLight extends Light {
+
+	/**
+	 * Constructs a new sun light.
+	 *
+	 * @param {(number|Color|string)} [color=0xffffff] - The light's color.
+	 * @param {number} [intensity=1] - The light's strength/intensity.
+	 */
+	constructor( color, intensity ) {
+
+		super( color, intensity );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isSunLight = true;
+
+		this.type = 'SunLight';
+
+		this.position.copy( Object3D.DEFAULT_UP );
+		this.updateMatrix();
+
+		/**
+		 * This property holds the light's shadow configuration.
+		 *
+		 * @type {SunLightShadow}
+		 */
+		this.shadow = new SunLightShadow();
+
+	}
+
+	dispose() {
+
+		super.dispose();
+
+		this.shadow.dispose();
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.shadow = source.shadow.clone();
+
+		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		data.object.shadow = this.shadow.toJSON();
+
+		return data;
+
+	}
+
+}
+
+/**
+ * A light source positioned directly above the scene, with color fading from
+ * the sky color to the ground color.
+ *
+ * This light cannot be used to cast shadows.
+ *
+ * ```js
+ * const light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+ * scene.add( light );
+ * ```
+ *
+ * @augments Light
+ */
+class HemisphereLight extends Light {
+
+	/**
+	 * Constructs a new hemisphere light.
+	 *
+	 * @param {(number|Color|string)} [skyColor=0xffffff] - The light's sky color.
+	 * @param {(number|Color|string)} [groundColor=0xffffff] - The light's ground color.
+	 * @param {number} [intensity=1] - The light's strength/intensity.
+	 */
+	constructor( skyColor, groundColor, intensity ) {
+
+		super( skyColor, intensity );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isHemisphereLight = true;
+
+		this.type = 'HemisphereLight';
+
+		this.position.copy( Object3D.DEFAULT_UP );
+		this.updateMatrix();
+
+		/**
+		 * The light's ground color.
+		 *
+		 * @type {Color}
+		 */
+		this.groundColor = new Color( groundColor );
+
+	}
+
+	copy( source, recursive ) {
+
+		super.copy( source, recursive );
+
+		this.groundColor.copy( source.groundColor );
+
+		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		data.object.groundColor = this.groundColor.getHex();
+
+		return data;
 
 	}
 
@@ -47101,8 +47803,8 @@ class SpotLightShadow extends LightShadow {
 
 		const object = super.toJSON();
 
-		if ( this.focus !== 1 ) object.focus = this.focus;
-		if ( this.aspect !== 1 ) object.aspect = this.aspect;
+		object.focus = this.focus;
+		object.aspect = this.aspect;
 
 		return object;
 
@@ -47446,248 +48148,6 @@ class PointLight extends Light {
 		data.object.decay = this.decay;
 
 		data.object.shadow = this.shadow.toJSON();
-
-		return data;
-
-	}
-
-}
-
-/**
- * Camera that uses [orthographic projection](https://en.wikipedia.org/wiki/Orthographic_projection).
- *
- * In this projection mode, an object's size in the rendered image stays
- * constant regardless of its distance from the camera. This can be useful
- * for rendering 2D scenes and UI elements, amongst other things.
- *
- * ```js
- * const camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
- * scene.add( camera );
- * ```
- *
- * @augments Camera
- */
-class OrthographicCamera extends Camera {
-
-	/**
-	 * Constructs a new orthographic camera.
-	 *
-	 * @param {number} [left=-1] - The left plane of the camera's frustum.
-	 * @param {number} [right=1] - The right plane of the camera's frustum.
-	 * @param {number} [top=1] - The top plane of the camera's frustum.
-	 * @param {number} [bottom=-1] - The bottom plane of the camera's frustum.
-	 * @param {number} [near=0.1] - The camera's near plane.
-	 * @param {number} [far=2000] - The camera's far plane.
-	 */
-	constructor( left = -1, right = 1, top = 1, bottom = -1, near = 0.1, far = 2000 ) {
-
-		super();
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isOrthographicCamera = true;
-
-		this.type = 'OrthographicCamera';
-
-		/**
-		 * The zoom factor of the camera.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.zoom = 1;
-
-		/**
-		 * Represents the frustum window specification. This property should not be edited
-		 * directly but via {@link PerspectiveCamera#setViewOffset} and {@link PerspectiveCamera#clearViewOffset}.
-		 *
-		 * @type {?Object}
-		 * @default null
-		 */
-		this.view = null;
-
-		/**
-		 * The left plane of the camera's frustum.
-		 *
-		 * @type {number}
-		 * @default -1
-		 */
-		this.left = left;
-
-		/**
-		 * The right plane of the camera's frustum.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.right = right;
-
-		/**
-		 * The top plane of the camera's frustum.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.top = top;
-
-		/**
-		 * The bottom plane of the camera's frustum.
-		 *
-		 * @type {number}
-		 * @default -1
-		 */
-		this.bottom = bottom;
-
-		/**
-		 * The camera's near plane. The valid range is greater than `0`
-		 * and less than the current value of {@link OrthographicCamera#far}.
-		 *
-		 * Note that, unlike for the {@link PerspectiveCamera}, `0` is a
-		 * valid value for an orthographic camera's near plane.
-		 *
-		 * @type {number}
-		 * @default 0.1
-		 */
-		this.near = near;
-
-		/**
-		 * The camera's far plane. Must be greater than the
-		 * current value of {@link OrthographicCamera#near}.
-		 *
-		 * @type {number}
-		 * @default 2000
-		 */
-		this.far = far;
-
-		this.updateProjectionMatrix();
-
-	}
-
-	copy( source, recursive ) {
-
-		super.copy( source, recursive );
-
-		this.left = source.left;
-		this.right = source.right;
-		this.top = source.top;
-		this.bottom = source.bottom;
-		this.near = source.near;
-		this.far = source.far;
-
-		this.zoom = source.zoom;
-		this.view = source.view === null ? null : Object.assign( {}, source.view );
-
-		return this;
-
-	}
-
-	/**
-	 * Sets an offset in a larger frustum. This is useful for multi-window or
-	 * multi-monitor/multi-machine setups.
-	 *
-	 * @param {number} fullWidth - The full width of multiview setup.
-	 * @param {number} fullHeight - The full height of multiview setup.
-	 * @param {number} x - The horizontal offset of the subcamera.
-	 * @param {number} y - The vertical offset of the subcamera.
-	 * @param {number} width - The width of subcamera.
-	 * @param {number} height - The height of subcamera.
-	 * @see {@link PerspectiveCamera#setViewOffset}
-	 */
-	setViewOffset( fullWidth, fullHeight, x, y, width, height ) {
-
-		if ( this.view === null ) {
-
-			this.view = {
-				enabled: true,
-				fullWidth: 1,
-				fullHeight: 1,
-				offsetX: 0,
-				offsetY: 0,
-				width: 1,
-				height: 1
-			};
-
-		}
-
-		this.view.enabled = true;
-		this.view.fullWidth = fullWidth;
-		this.view.fullHeight = fullHeight;
-		this.view.offsetX = x;
-		this.view.offsetY = y;
-		this.view.width = width;
-		this.view.height = height;
-
-		this.updateProjectionMatrix();
-
-	}
-
-	/**
-	 * Removes the view offset from the projection matrix.
-	 */
-	clearViewOffset() {
-
-		if ( this.view !== null ) {
-
-			this.view.enabled = false;
-
-		}
-
-		this.updateProjectionMatrix();
-
-	}
-
-	/**
-	 * Updates the camera's projection matrix. Must be called after any change of
-	 * camera properties.
-	 */
-	updateProjectionMatrix() {
-
-		const dx = ( this.right - this.left ) / ( 2 * this.zoom );
-		const dy = ( this.top - this.bottom ) / ( 2 * this.zoom );
-		const cx = ( this.right + this.left ) / 2;
-		const cy = ( this.top + this.bottom ) / 2;
-
-		let left = cx - dx;
-		let right = cx + dx;
-		let top = cy + dy;
-		let bottom = cy - dy;
-
-		if ( this.view !== null && this.view.enabled ) {
-
-			const scaleW = ( this.right - this.left ) / this.view.fullWidth / this.zoom;
-			const scaleH = ( this.top - this.bottom ) / this.view.fullHeight / this.zoom;
-
-			left += scaleW * this.view.offsetX;
-			right = left + scaleW * this.view.width;
-			top -= scaleH * this.view.offsetY;
-			bottom = top - scaleH * this.view.height;
-
-		}
-
-		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far, this.coordinateSystem, this.reversedDepth );
-
-		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
-
-	}
-
-	toJSON( meta ) {
-
-		const data = super.toJSON( meta );
-
-		data.object.zoom = this.zoom;
-		data.object.left = this.left;
-		data.object.right = this.right;
-		data.object.top = this.top;
-		data.object.bottom = this.bottom;
-		data.object.near = this.near;
-		data.object.far = this.far;
-
-		if ( this.view !== null ) data.object.view = Object.assign( {}, this.view );
 
 		return data;
 
@@ -49407,14 +49867,14 @@ class ObjectLoader extends Loader {
 
 					}
 
-					images[ image.uuid ] = new Source( imageArray );
+					images[ image.uuid ] = new TextureSource( imageArray );
 
 				} else {
 
 					// load single image
 
 					const deserializedImage = deserializeImage( image.url );
-					images[ image.uuid ] = new Source( deserializedImage );
+					images[ image.uuid ] = new TextureSource( deserializedImage );
 
 
 				}
@@ -49504,14 +49964,14 @@ class ObjectLoader extends Loader {
 
 					}
 
-					images[ image.uuid ] = new Source( imageArray );
+					images[ image.uuid ] = new TextureSource( imageArray );
 
 				} else {
 
 					// load single image
 
 					const deserializedImage = await deserializeImage( image.url );
-					images[ image.uuid ] = new Source( deserializedImage );
+					images[ image.uuid ] = new TextureSource( deserializedImage );
 
 				}
 
@@ -49777,6 +50237,12 @@ class ObjectLoader extends Loader {
 			case 'AmbientLight':
 
 				object = new AmbientLight( data.color, data.intensity );
+
+				break;
+
+			case 'SunLight':
+
+				object = new SunLight( data.color, data.intensity );
 
 				break;
 
@@ -60451,4 +60917,4 @@ if ( typeof window !== 'undefined' ) {
 
 }
 
-export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BackSide, BasicDepthPacking, BasicShadowMap, BatchedMesh, BezierInterpolant, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxGeometry, BoxHelper, BufferAttribute, BufferGeometry, BufferGeometryLoader, ByteType, Cache, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CineonToneMapping, CircleGeometry, ClampToEdgeWrapping, Clock, Color, ColorKeyframeTrack, ColorManagement, Compatibility, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeCamera, CubeDepthTexture, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeUVReflectionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderGeometry, Cylindrical, Data3DTexture, DataArrayTexture, DataTexture, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DepthFormat, DepthStencilFormat, DepthTexture, DetachedBindMode, DirectionalLight, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExternalTexture, ExtrudeGeometry, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, Fog, FogExp2, FramebufferTexture, FrontSide, Frustum, FrustumArray, GLBufferAttribute, GLSL1, GLSL3, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HTMLTexture, HalfFloatType, HemisphereLight, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateBezier, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, InvertStencilOp, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry, Layers, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LineSegments, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, Material, MaterialBlending, MaterialLoader, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, NormalAnimationBlendMode, NormalBlending, NormalGAPacking, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, ObjectSpaceNormalMap, OctahedronGeometry, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, Path, PerspectiveCamera, Plane, PlaneGeometry, PlaneHelper, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, R11_EAC_Format, RAD2DEG, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBDepthPacking, RGBFormat, RGBIntegerFormat, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGDepthPacking, RGFormat, RGIntegerFormat, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RedFormat, RedIntegerFormat, ReinhardToneMapping, RenderObjectRefreshType, RenderTarget, RenderTarget3D, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, ReversedDepthFuncs, RingGeometry, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, Scene, ShaderMaterial, ShadowMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, Source, Sphere, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SpotLight, SpotLightHelper, Sprite, SpriteMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TOUCH, TangentSpaceNormalMap, TetrahedronGeometry, Texture, TextureLoader, TextureUtils, Timer, TimestampQuery, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, UniformsUtils, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLCoordinateSystem, WebGLRenderTarget, WebGPUCoordinateSystem, WebXRController, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, cloneUniforms, createCanvasElement, createElementNS, error, getByteLength, getConsoleFunction, getUnlitUniformColorSpace, isTypedArray, log, mergeUniforms, probeAsync, setConsoleFunction, warn, warnOnce, yieldToMain };
+export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BackSide, BasicDepthPacking, BasicShadowMap, BatchedMesh, BezierInterpolant, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxGeometry, BoxHelper, BufferAttribute, BufferGeometry, BufferGeometryLoader, ByteType, Cache, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CineonToneMapping, CircleGeometry, ClampToEdgeWrapping, Clock, Color, ColorKeyframeTrack, ColorManagement, Compatibility, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeCamera, CubeDepthTexture, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeUVReflectionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderGeometry, Cylindrical, Data3DTexture, DataArrayTexture, DataTexture, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DepthFormat, DepthStencilFormat, DepthTexture, DetachedBindMode, DirectionalLight, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExternalTexture, ExtrudeGeometry, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, Fog, FogExp2, FramebufferTexture, FrontSide, Frustum, FrustumArray, GLBufferAttribute, GLSL1, GLSL3, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HTMLTexture, HalfFloatType, HemisphereLight, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateBezier, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, InvertStencilOp, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry, Layers, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LineSegments, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, Material, MaterialBlending, MaterialLoader, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, NormalAnimationBlendMode, NormalBlending, NormalGAPacking, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, ObjectSpaceNormalMap, OctahedronGeometry, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, Path, PerspectiveCamera, Plane, PlaneGeometry, PlaneHelper, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, R11_EAC_Format, RAD2DEG, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBDepthPacking, RGBFormat, RGBIntegerFormat, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGDepthPacking, RGFormat, RGIntegerFormat, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RedFormat, RedIntegerFormat, ReinhardToneMapping, RenderObjectRefreshType, RenderTarget, RenderTarget3D, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, ReversedDepthFuncs, RingGeometry, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, Scene, ShaderMaterial, ShadowMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, Source, Sphere, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SpotLight, SpotLightHelper, Sprite, SpriteMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, SunLight, TOUCH, TangentSpaceNormalMap, TetrahedronGeometry, Texture, TextureLoader, TextureSource, TextureUtils, Timer, TimestampQuery, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, UniformsUtils, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLCoordinateSystem, WebGLRenderTarget, WebGPUCoordinateSystem, WebXRController, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, cloneUniforms, createCanvasElement, createElementNS, error, getByteLength, getConsoleFunction, getUnlitUniformColorSpace, isTypedArray, log, mergeUniforms, probeAsync, setConsoleFunction, warn, warnOnce, yieldToMain };

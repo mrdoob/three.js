@@ -1,5 +1,6 @@
 import { GLTFLoader } from '../../../../examples/jsm/loaders/GLTFLoader.js';
 import { GLTFGaussianSplatLoaderExtension } from '../../../../examples/jsm/loaders/GLTFGaussianSplatLoaderExtension.js';
+import { unpackSphericalHarmonicsBand } from '../utils/GaussianSplatTestUtils.js';
 
 const EPS = 1e-6;
 const FLOAT = 5126;
@@ -26,11 +27,12 @@ function arrayBufferToBase64( buffer ) {
 
 }
 
-function createGaussianSplatGLTF() {
+function createGaussianSplatGLTF( { sphericalHarmonicsDegree = 0 } = {} ) {
 
 	const chunks = [];
 	const bufferViews = [];
 	const accessors = [];
+	const attributes = {};
 	let byteOffset = 0;
 
 	function addAccessor( array, type, componentType, normalized = false, min = undefined, max = undefined ) {
@@ -71,6 +73,29 @@ function createGaussianSplatGLTF() {
 	const rotation = addAccessor( new Int8Array( [ 0, 0, 0, 127 ] ), 'VEC4', 5120, true );
 	const opacity = addAccessor( new Uint8Array( [ 128 ] ), 'SCALAR', UNSIGNED_BYTE, true );
 	const sh0 = addAccessor( new Float32Array( [ 0, 0, 0 ] ), 'VEC3', FLOAT );
+
+	attributes.POSITION = position;
+	attributes[ 'KHR_gaussian_splatting:SCALE' ] = scale;
+	attributes[ 'KHR_gaussian_splatting:ROTATION' ] = rotation;
+	attributes[ 'KHR_gaussian_splatting:OPACITY' ] = opacity;
+	attributes[ 'KHR_gaussian_splatting:SH_DEGREE_0_COEF_0' ] = sh0;
+
+	for ( let degree = 1; degree <= sphericalHarmonicsDegree; degree ++ ) {
+
+		const coefficientCount = degree * 2 + 1;
+
+		for ( let coefficient = 0; coefficient < coefficientCount; coefficient ++ ) {
+
+			attributes[ `KHR_gaussian_splatting:SH_DEGREE_${ degree }_COEF_${ coefficient }` ] = addAccessor(
+				new Float32Array( [ ( coefficient + 1 ) / 128, ( coefficient + 2 ) / 128, ( coefficient + 3 ) / 128 ] ),
+				'VEC3',
+				FLOAT
+			);
+
+		}
+
+	}
+
 	const buffer = new Uint8Array( byteOffset );
 	let offset = 0;
 
@@ -89,13 +114,7 @@ function createGaussianSplatGLTF() {
 		meshes: [ {
 			primitives: [ {
 				mode: 0,
-				attributes: {
-					POSITION: position,
-					'KHR_gaussian_splatting:SCALE': scale,
-					'KHR_gaussian_splatting:ROTATION': rotation,
-					'KHR_gaussian_splatting:OPACITY': opacity,
-					'KHR_gaussian_splatting:SH_DEGREE_0_COEF_0': sh0
-				},
+				attributes,
 				extensions: {
 					KHR_gaussian_splatting: {
 						kernel: 'ellipse',
@@ -140,6 +159,26 @@ export default QUnit.module( 'Addons', () => {
 				closeTo( assert, covariances[ 3 ], 9, 'covariance yy' );
 				closeTo( assert, covariances[ 5 ], 16, 'covariance zz' );
 				assert.deepEqual( Array.from( mesh.splatGeometry.getAttribute( 'color' ).array ), [ 128, 128, 128, 128 ], 'loads degree-0 color and opacity' );
+
+			} );
+
+			QUnit.test( 'loads KHR_gaussian_splatting spherical harmonics attributes', async ( assert ) => {
+
+				const loader = new GLTFLoader();
+				loader.register( function ( parser ) {
+
+					return new GLTFGaussianSplatLoaderExtension( parser );
+
+				} );
+
+				const gltf = await loader.parseAsync( JSON.stringify( createGaussianSplatGLTF( { sphericalHarmonicsDegree: 1 } ) ), '' );
+				const mesh = gltf.scene.children[ 0 ];
+
+				assert.deepEqual( Array.from( unpackSphericalHarmonicsBand( mesh.splatGeometry.getAttribute( 'sphericalHarmonics1' ).array, 1, 1 ) ), [
+					129, 130, 131,
+					130, 131, 132,
+					131, 132, 133
+				], 'loads SH1 coefficients' );
 
 			} );
 

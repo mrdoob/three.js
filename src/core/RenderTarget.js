@@ -2,7 +2,7 @@ import { EventDispatcher } from './EventDispatcher.js';
 import { Texture } from '../textures/Texture.js';
 import { LinearFilter } from '../constants.js';
 import { Vector4 } from '../math/Vector4.js';
-import { Source } from '../textures/Source.js';
+import { TextureSource } from '../textures/TextureSource.js';
 
 /**
  * A render target is a buffer where the video card draws pixels for a scene
@@ -438,7 +438,7 @@ class RenderTarget extends EventDispatcher {
 			// ensure image object is not shared, see #20328
 
 			const image = Object.assign( {}, source.textures[ i ].image );
-			this.textures[ i ].source = new Source( image );
+			this.textures[ i ].source = new TextureSource( image );
 
 		}
 

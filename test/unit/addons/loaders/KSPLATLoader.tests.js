@@ -1,9 +1,11 @@
 import { BufferGeometry } from 'three';
 import { KSPLATLoader } from '../../../../examples/jsm/loaders/KSPLATLoader.js';
+import { unpackSphericalHarmonicsBand } from '../utils/GaussianSplatTestUtils.js';
 
 const EPS = 1e-6;
 const HEADER_SIZE_BYTES = 4096;
 const SECTION_HEADER_SIZE_BYTES = 1024;
+const SH_DEGREE_TO_COMPONENTS = [ 0, 9, 24, 45 ];
 
 function closeTo( assert, actual, expected, message ) {
 
@@ -11,52 +13,62 @@ function closeTo( assert, actual, expected, message ) {
 
 }
 
-function createKSPLATBuffer() {
+function createKSPLATBuffer( sphericalHarmonicsDegree = 0 ) {
 
-	const compression = {
-		bytesPerSplat: 44,
-		scaleOffsetBytes: 12,
-		rotationOffsetBytes: 24,
-		colorOffsetBytes: 40,
-		bucketBytes: 0
-	};
-	const buffer = new ArrayBuffer( HEADER_SIZE_BYTES + SECTION_HEADER_SIZE_BYTES + compression.bytesPerSplat );
+	const degrees = Array.isArray( sphericalHarmonicsDegree ) ? sphericalHarmonicsDegree : [ sphericalHarmonicsDegree ];
+	const bytesPerSplat = degrees.map( degree => 44 + SH_DEGREE_TO_COMPONENTS[ degree ] * 4 );
+	const sectionHeadersSize = SECTION_HEADER_SIZE_BYTES * degrees.length;
+	const buffer = new ArrayBuffer( HEADER_SIZE_BYTES + sectionHeadersSize + bytesPerSplat.reduce( ( sum, size ) => sum + size, 0 ) );
 	const view = new DataView( buffer );
 	const bytes = new Uint8Array( buffer );
-	const sectionOffset = HEADER_SIZE_BYTES;
-	const dataOffset = HEADER_SIZE_BYTES + SECTION_HEADER_SIZE_BYTES;
 
 	view.setUint8( 0, 0 );
 	view.setUint8( 1, 1 );
-	view.setUint32( 4, 1, true );
-	view.setUint32( 8, 1, true );
-	view.setUint32( 12, 1, true );
-	view.setUint32( 16, 1, true );
+	view.setUint32( 4, degrees.length, true );
+	view.setUint32( 8, degrees.length, true );
+	view.setUint32( 12, degrees.length, true );
+	view.setUint32( 16, degrees.length, true );
 	view.setUint16( 20, 0, true );
 
-	view.setUint32( sectionOffset, 1, true );
-	view.setUint32( sectionOffset + 4, 1, true );
-	view.setUint32( sectionOffset + 8, 0, true );
-	view.setUint32( sectionOffset + 12, 0, true );
-	view.setFloat32( sectionOffset + 16, 4, true );
-	view.setUint16( sectionOffset + 20, compression.bucketBytes, true );
-	view.setUint32( sectionOffset + 24, 32767, true );
-	view.setUint32( sectionOffset + 32, 0, true );
-	view.setUint32( sectionOffset + 36, 0, true );
-	view.setUint16( sectionOffset + 40, 0, true );
+	let dataOffset = HEADER_SIZE_BYTES + sectionHeadersSize;
 
-	view.setFloat32( dataOffset, 1, true );
-	view.setFloat32( dataOffset + 4, 2, true );
-	view.setFloat32( dataOffset + 8, 3, true );
-	view.setFloat32( dataOffset + compression.scaleOffsetBytes, 2, true );
-	view.setFloat32( dataOffset + compression.scaleOffsetBytes + 4, 3, true );
-	view.setFloat32( dataOffset + compression.scaleOffsetBytes + 8, 4, true );
-	view.setFloat32( dataOffset + compression.rotationOffsetBytes, 1, true );
-	view.setFloat32( dataOffset + compression.rotationOffsetBytes + 4, 0, true );
-	view.setFloat32( dataOffset + compression.rotationOffsetBytes + 8, 0, true );
-	view.setFloat32( dataOffset + compression.rotationOffsetBytes + 12, 0, true );
+	for ( let sectionIndex = 0; sectionIndex < degrees.length; sectionIndex ++ ) {
 
-	bytes.set( [ 10, 20, 30, 40 ], dataOffset + compression.colorOffsetBytes );
+		const degree = degrees[ sectionIndex ];
+		const sectionOffset = HEADER_SIZE_BYTES + sectionIndex * SECTION_HEADER_SIZE_BYTES;
+
+		view.setUint32( sectionOffset, 1, true );
+		view.setUint32( sectionOffset + 4, 1, true );
+		view.setUint32( sectionOffset + 8, 0, true );
+		view.setUint32( sectionOffset + 12, 0, true );
+		view.setFloat32( sectionOffset + 16, 4, true );
+		view.setUint16( sectionOffset + 20, 0, true );
+		view.setUint32( sectionOffset + 24, 32767, true );
+		view.setUint32( sectionOffset + 32, 0, true );
+		view.setUint32( sectionOffset + 36, 0, true );
+		view.setUint16( sectionOffset + 40, degree, true );
+
+		view.setFloat32( dataOffset, sectionIndex + 1, true );
+		view.setFloat32( dataOffset + 4, 2, true );
+		view.setFloat32( dataOffset + 8, 3, true );
+		view.setFloat32( dataOffset + 12, 2, true );
+		view.setFloat32( dataOffset + 16, 3, true );
+		view.setFloat32( dataOffset + 20, 4, true );
+		view.setFloat32( dataOffset + 24, 1, true );
+		view.setFloat32( dataOffset + 28, 0, true );
+		view.setFloat32( dataOffset + 32, 0, true );
+		view.setFloat32( dataOffset + 36, 0, true );
+		bytes.set( [ 10, 20, 30, 40 ], dataOffset + 40 );
+
+		for ( let i = 0; i < SH_DEGREE_TO_COMPONENTS[ degree ]; i ++ ) {
+
+			view.setFloat32( dataOffset + 44 + i * 4, ( i + 1 ) / 128, true );
+
+		}
+
+		dataOffset += bytesPerSplat[ sectionIndex ];
+
+	}
 
 	return buffer;
 
@@ -85,6 +97,27 @@ export default QUnit.module( 'Addons', () => {
 				closeTo( assert, covariances[ 4 ], 0, 'covariance yz' );
 				closeTo( assert, covariances[ 5 ], 16, 'covariance zz' );
 				assert.deepEqual( Array.from( data.getAttribute( 'color' ).array ), [ 10, 20, 30, 40 ], 'colors' );
+
+			} );
+
+			QUnit.test( 'parses uncompressed KSPLAT spherical harmonics data', ( assert ) => {
+
+				const loader = new KSPLATLoader();
+				const data = loader.parse( createKSPLATBuffer( 1 ) );
+
+				assert.deepEqual( Array.from( unpackSphericalHarmonicsBand( data.getAttribute( 'sphericalHarmonics1' ).array, 1, 1 ) ), [ 129, 132, 135, 130, 133, 136, 131, 134, 137 ], 'SH1 coefficients are remapped to RGB triplets' );
+
+			} );
+
+			QUnit.test( 'initializes missing KSPLAT spherical harmonics coefficients to zero', ( assert ) => {
+
+				const loader = new KSPLATLoader();
+				const data = loader.parse( createKSPLATBuffer( [ 0, 1 ] ) );
+
+				assert.deepEqual( Array.from( unpackSphericalHarmonicsBand( data.getAttribute( 'sphericalHarmonics1' ).array, 2, 1 ) ), [
+					128, 128, 128, 128, 128, 128, 128, 128, 128,
+					129, 132, 135, 130, 133, 136, 131, 134, 137
+				], 'missing SH1 coefficients remain neutral' );
 
 			} );
 

@@ -337,6 +337,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			morphTargetsCount: morphTargetsCount,
 			morphTextureStride: morphTextureStride,
 
+			numSunLights: lights.sun.length,
 			numDirLights: lights.directional.length,
 			numPointLights: lights.point.length,
 			numSpotLights: lights.spot.length,
@@ -344,6 +345,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			numRectAreaLights: lights.rectArea.length,
 			numHemiLights: lights.hemi.length,
 
+			numSunLightShadows: lights.sunShadowMap.length,
 			numDirLightShadows: lights.directionalShadowMap.length,
 			numPointLightShadows: lights.pointShadowMap.length,
 			numSpotLightShadows: lights.spotShadowMap.length,
@@ -471,12 +473,14 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 		array.push( parameters.sizeAttenuation );
 		array.push( parameters.morphTargetsCount );
 		array.push( parameters.morphAttributeCount );
+		array.push( parameters.numSunLights );
 		array.push( parameters.numDirLights );
 		array.push( parameters.numPointLights );
 		array.push( parameters.numSpotLights );
 		array.push( parameters.numSpotLightMaps );
 		array.push( parameters.numHemiLights );
 		array.push( parameters.numRectAreaLights );
+		array.push( parameters.numSunLightShadows );
 		array.push( parameters.numDirLightShadows );
 		array.push( parameters.numPointLightShadows );
 		array.push( parameters.numSpotLightShadows );

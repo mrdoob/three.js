@@ -123,11 +123,17 @@ class ContextNode extends Node {
 
 	analyze( builder ) {
 
-		const previousContext = builder.addContext( this.value );
+		const usageCount = builder.increaseUsage( this );
 
-		this.node.build( builder );
+		if ( usageCount === 1 ) {
 
-		builder.setContext( previousContext );
+			const previousContext = builder.addContext( this.value );
+
+			this.node.build( builder, this );
+
+			builder.setContext( previousContext );
+
+		}
 
 	}
 
@@ -135,9 +141,11 @@ class ContextNode extends Node {
 
 		const previousContext = builder.addContext( this.value );
 
-		this.node.build( builder );
+		const node = this.node.build( builder );
 
 		builder.setContext( previousContext );
+
+		return node;
 
 	}
 
