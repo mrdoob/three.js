@@ -11,9 +11,11 @@ import {
 	SH_BAND_WORDS,
 	createGaussianSplatGeometry,
 	createGaussianSplatGeometryFromPLYGeometry,
+	detectGaussianSplatPLYSphericalHarmonicsDegree,
 	getGaussianSplatPLYPropertyMapping,
 	getSphericalHarmonicsDegree,
 	linearToSH0,
+	parseGaussianSplatPLY,
 	sh0ToLinear,
 	sigmoid
 } from '../../../../examples/jsm/utils/GaussianSplatUtils.js';
@@ -245,6 +247,87 @@ export default QUnit.module( 'Addons', () => {
 				const geometry = loader.parse( ply );
 				const data = createGaussianSplatGeometryFromPLYGeometry( geometry );
 
+				assert.deepEqual(
+					Array.from( unpackSphericalHarmonicsBand( data.getAttribute( 'sphericalHarmonics1' ).array, 1, 1 ) ),
+					[ 128, 131, 134, 129, 132, 135, 130, 133, 136 ],
+					'channel-blocked coefficients are remapped to RGB triplets'
+				);
+
+			} );
+
+			QUnit.test( 'detects the spherical harmonics degree straight from a PLY header', ( assert ) => {
+
+				const header = ( properties ) => [
+					'ply',
+					'format ascii 1.0',
+					'element vertex 1',
+					'property float x',
+					'property float y',
+					'property float z',
+					'property float scale_0',
+					'property float scale_1',
+					'property float scale_2',
+					'property float rot_0',
+					'property float rot_1',
+					'property float rot_2',
+					'property float rot_3',
+					'property float f_dc_0',
+					'property float f_dc_1',
+					'property float f_dc_2',
+					'property float opacity',
+					...properties,
+					'end_header',
+					'0'
+				].join( '\n' );
+
+				assert.strictEqual( detectGaussianSplatPLYSphericalHarmonicsDegree( header( [] ) ), 0, 'degree 0, no f_rest properties' );
+
+				const degree1Properties = Array.from( { length: 9 }, ( _, i ) => `property float f_rest_${ i }` );
+				assert.strictEqual( detectGaussianSplatPLYSphericalHarmonicsDegree( header( degree1Properties ) ), 1, 'degree 1, 9 f_rest properties' );
+
+				const degree3Properties = Array.from( { length: 45 }, ( _, i ) => `property float f_rest_${ i }` );
+				assert.strictEqual( detectGaussianSplatPLYSphericalHarmonicsDegree( header( degree3Properties ) ), 3, 'degree 3, 45 f_rest properties' );
+
+			} );
+
+			QUnit.test( 'parses a Gaussian splat PLY with no pre-setup required', ( assert ) => {
+
+				const ply = [
+					'ply',
+					'format ascii 1.0',
+					'element vertex 1',
+					'property float x',
+					'property float y',
+					'property float z',
+					'property float scale_0',
+					'property float scale_1',
+					'property float scale_2',
+					'property float rot_0',
+					'property float rot_1',
+					'property float rot_2',
+					'property float rot_3',
+					'property float f_dc_0',
+					'property float f_dc_1',
+					'property float f_dc_2',
+					'property float opacity',
+					'property float f_rest_0',
+					'property float f_rest_1',
+					'property float f_rest_2',
+					'property float f_rest_3',
+					'property float f_rest_4',
+					'property float f_rest_5',
+					'property float f_rest_6',
+					'property float f_rest_7',
+					'property float f_rest_8',
+					'end_header',
+					`1 2 3 ${ Math.log( 2 ) } ${ Math.log( 3 ) } ${ Math.log( 4 ) } 1 0 0 0 0 0 0 0 ${ Array.from( { length: 9 }, ( _, i ) => i / 128 ).join( ' ' ) }`
+				].join( '\n' );
+
+				// No setCustomPropertyNameMapping()/getGaussianSplatPLYPropertyMapping()
+				// pre-setup - the degree is inferred straight from the PLY header.
+				const data = parseGaussianSplatPLY( ply );
+
+				assert.deepEqual( Array.from( data.getAttribute( 'position' ).array ), [ 1, 2, 3 ], 'centers' );
 				assert.deepEqual(
 					Array.from( unpackSphericalHarmonicsBand( data.getAttribute( 'sphericalHarmonics1' ).array, 1, 1 ) ),
 					[ 128, 131, 134, 129, 132, 135, 130, 133, 136 ],

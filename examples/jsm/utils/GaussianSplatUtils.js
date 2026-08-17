@@ -1,14 +1,21 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
+	FileLoader,
 	Matrix3,
 	Matrix4,
 	Quaternion,
 	Vector3
 } from 'three';
+import { PLYLoader } from '../loaders/PLYLoader.js';
 
 const SH_C0 = 0.2820947917738781;
 const SH_DEGREE_TO_COMPONENTS = [ 0, 9, 24, 45 ];
+// PLY headers are plain ASCII text terminated by an "end_header" line, and
+// real-world Gaussian splat headers (a few dozen "property ..." lines) are a
+// few KB at most - this bounds how much of the file we decode to text when
+// looking for it, without depending on PLYLoader's own header parsing.
+const PLY_HEADER_SCAN_LIMIT = 65536;
 const SH_BAND_COMPONENTS = [ 0, 9, 15, 21 ];
 // GPU upload packs four clamped-byte coefficients per uint32 word.
 const SH_BAND_WORDS = [ 0, 3, 4, 6 ];
@@ -113,6 +120,117 @@ function getGaussianSplatPLYPropertyMapping( sphericalHarmonicsDegree = 0 ) {
 	}
 
 	return mapping;
+
+}
+
+// PLY headers are always plain ASCII text, regardless of whether the vertex
+// data itself is ascii or binary, and always precede the vertex data - so
+// the header can be inspected up front without parsing the rest of the file.
+function extractPLYHeaderText( data ) {
+
+	if ( typeof data === 'string' ) {
+
+		const end = data.indexOf( 'end_header' );
+		return end === - 1 ? data : data.slice( 0, end );
+
+	}
+
+	const bytes = new Uint8Array( data, 0, Math.min( data.byteLength, PLY_HEADER_SCAN_LIMIT ) );
+	const text = new TextDecoder().decode( bytes );
+	const end = text.indexOf( 'end_header' );
+
+	if ( end === - 1 ) {
+
+		throw new Error( `THREE.extractPLYHeaderText: Could not find "end_header" within the first ${ PLY_HEADER_SCAN_LIMIT } bytes of the PLY file.` );
+
+	}
+
+	return text.slice( 0, end );
+
+}
+
+/**
+ * Inspects a Gaussian splat PLY file's header to determine the spherical
+ * harmonics degree it was trained with, by counting its `f_rest_N`
+ * properties - so the degree never needs to be known or specified ahead of
+ * time.
+ *
+ * @param {ArrayBuffer|string} data - The raw PLY data, exactly as would be
+ * passed to `PLYLoader.parse()`.
+ * @return {number} The inferred spherical harmonics degree (0-3).
+ */
+function detectGaussianSplatPLYSphericalHarmonicsDegree( data ) {
+
+	const headerText = extractPLYHeaderText( data );
+	const propertyPattern = /^property\s+\S+\s+f_rest_(\d+)\s*$/gm;
+
+	let restComponentCount = 0;
+	let match;
+
+	while ( ( match = propertyPattern.exec( headerText ) ) !== null ) {
+
+		restComponentCount = Math.max( restComponentCount, parseInt( match[ 1 ], 10 ) + 1 );
+
+	}
+
+	const degree = SH_DEGREE_TO_COMPONENTS.indexOf( restComponentCount );
+
+	if ( degree === - 1 ) {
+
+		throw new Error( `THREE.detectGaussianSplatPLYSphericalHarmonicsDegree: Unsupported number of f_rest properties in PLY header (${ restComponentCount }).` );
+
+	}
+
+	return degree;
+
+}
+
+/**
+ * Parses raw Gaussian splat PLY data straight into Gaussian splat geometry,
+ * with no pre-setup required: the spherical harmonics degree is detected
+ * automatically from the file's header.
+ *
+ * ```js
+ * const splatGeometry = parseGaussianSplatPLY( await ( await fetch( 'point_cloud.ply' ) ).arrayBuffer() );
+ * ```
+ *
+ * @param {ArrayBuffer|string} data - The raw PLY data, exactly as would be
+ * passed to `PLYLoader.parse()`.
+ * @return {BufferGeometry} The Gaussian splat geometry.
+ */
+function parseGaussianSplatPLY( data ) {
+
+	const sphericalHarmonicsDegree = detectGaussianSplatPLYSphericalHarmonicsDegree( data );
+
+	const loader = new PLYLoader();
+	loader.setCustomPropertyNameMapping( getGaussianSplatPLYPropertyMapping( sphericalHarmonicsDegree ) );
+
+	const plyGeometry = loader.parse( data );
+
+	return createGaussianSplatGeometryFromPLYGeometry( plyGeometry );
+
+}
+
+/**
+ * Loads a Gaussian splat PLY file straight into Gaussian splat geometry,
+ * with no pre-setup required: the spherical harmonics degree is detected
+ * automatically from the file's header.
+ *
+ * ```js
+ * const splatGeometry = await loadGaussianSplatPLY( 'point_cloud.ply' );
+ * ```
+ *
+ * @param {string} url - The path/URL of the PLY file to load.
+ * @param {LoadingManager} [manager] - The loading manager.
+ * @return {Promise<BufferGeometry>} A promise that resolves with the
+ * Gaussian splat geometry.
+ */
+function loadGaussianSplatPLY( url, manager ) {
+
+	const fileLoader = new FileLoader( manager );
+	fileLoader.setResponseType( 'arraybuffer' );
+
+	return fileLoader.loadAsync( url ).then( parseGaussianSplatPLY );
 
 }
 
@@ -395,9 +513,12 @@ export {
 	createGaussianSplatGeometry,
 	createGaussianSplatGeometryFromPLYGeometry,
 	createPackedSphericalHarmonicsBand,
+	detectGaussianSplatPLYSphericalHarmonicsDegree,
 	getGaussianSplatPLYPropertyMapping,
 	getSphericalHarmonicsDegree,
 	linearToSH0,
+	loadGaussianSplatPLY,
+	parseGaussianSplatPLY,
 	sh0ToLinear,
 	sigmoid,
 	writeColorBytes,
