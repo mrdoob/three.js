@@ -35,6 +35,102 @@ class Attributes extends DataMap {
 		 */
 		this.info = info;
 
+		/**
+		 * Generation values for attributes. These values are kept separately from
+		 * the attribute data so disposal can remove renderer data without losing
+		 * the replacement generation.
+		 *
+		 * @private
+		 * @type {WeakMap<BufferAttribute, number>}
+		 */
+		this.attributeGenerations = new WeakMap();
+
+	}
+
+	/**
+	 * Returns the generation for the given attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The attribute.
+	 * @return {number} The attribute generation.
+	 */
+	getGeneration( attribute ) {
+
+		return this.attributeGenerations.get( attribute ) || 0;
+
+	}
+
+	/**
+	 * Registers a bind group as using the given attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The attribute.
+	 * @param {BindGroup} bindGroup - The bind group.
+	 * @return {boolean} Whether the bind group has been registered or not.
+	 */
+	addBindGroup( attribute, bindGroup ) {
+
+		const data = this.data.get( attribute );
+
+		if ( data !== undefined ) {
+
+			if ( data.bindGroups === undefined ) {
+
+				data.bindGroups = new Set();
+
+			}
+
+			data.bindGroups.add( bindGroup );
+			return true;
+
+		}
+
+		return false;
+
+	}
+
+	/**
+	 * Registers a render bundle as using the given attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The attribute.
+	 * @param {RenderBundle} renderBundle - The render bundle.
+	 * @return {boolean} Whether the render bundle has been registered or not.
+	 */
+	addRenderBundle( attribute, renderBundle ) {
+
+		const data = this.data.get( attribute );
+
+		if ( data !== undefined ) {
+
+			if ( data.renderBundles === undefined ) {
+
+				data.renderBundles = new Set();
+
+			}
+
+			data.renderBundles.add( renderBundle );
+			return true;
+
+		}
+
+		return false;
+
+	}
+
+	/**
+	 * Removes a render bundle from the attribute usage list.
+	 *
+	 * @param {BufferAttribute} attribute - The attribute.
+	 * @param {RenderBundle} renderBundle - The render bundle.
+	 */
+	removeRenderBundle( attribute, renderBundle ) {
+
+		const data = this.data.get( attribute );
+
+		if ( data !== undefined && data.renderBundles !== undefined ) {
+
+			data.renderBundles.delete( renderBundle );
+
+		}
+
 	}
 
 	/**
@@ -48,6 +144,45 @@ class Attributes extends DataMap {
 		const attributeData = super.delete( attribute );
 
 		if ( attributeData !== null ) {
+
+			if ( attributeData.onDispose !== undefined ) {
+
+				attribute.removeEventListener( 'dispose', attributeData.onDispose );
+
+			}
+
+			if ( this.backend.isWebGPUBackend === true ) {
+
+				if ( attributeData.bindGroups !== undefined ) {
+
+					for ( const bindGroup of attributeData.bindGroups ) {
+
+						const bindGroupData = this.backend.get( bindGroup );
+
+						bindGroupData.groups = undefined;
+						bindGroupData.versions = undefined;
+
+					}
+
+				}
+
+				if ( attributeData.renderBundles !== undefined ) {
+
+					for ( const renderBundle of attributeData.renderBundles ) {
+
+						const renderBundleData = this.backend.get( renderBundle );
+
+						renderBundleData.bundleGPU = undefined;
+						renderBundleData.version = undefined;
+						renderBundleData.renderObjects = undefined;
+
+					}
+
+				}
+
+				this.attributeGenerations.set( attribute, this.getGeneration( attribute ) + 1 );
+
+			}
 
 			this.backend.destroyAttribute( attribute );
 
@@ -69,6 +204,7 @@ class Attributes extends DataMap {
 	update( attribute, type ) {
 
 		const data = this.get( attribute );
+		const bufferAttribute = this._getBufferAttribute( attribute );
 
 		if ( data.version === undefined ) {
 
@@ -94,11 +230,20 @@ class Attributes extends DataMap {
 
 			}
 
-			data.version = this._getBufferAttribute( attribute ).version;
+			if ( this.backend.isWebGPUBackend === true ) {
+
+				if ( attribute.isBufferAttribute === true ) {
+
+					data.onDispose = () => this.delete( attribute );
+					attribute.addEventListener( 'dispose', data.onDispose );
+
+				}
+
+			}
+
+			data.version = bufferAttribute.version;
 
 		} else {
-
-			const bufferAttribute = this._getBufferAttribute( attribute );
 
 			if ( data.version < bufferAttribute.version || bufferAttribute.usage === DynamicDrawUsage ) {
 
@@ -124,6 +269,17 @@ class Attributes extends DataMap {
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
 		return attribute;
+
+	}
+
+	/**
+	 * Frees internal resources.
+	 */
+	dispose() {
+
+		super.dispose();
+
+		this.attributeGenerations = new WeakMap();
 
 	}
 
