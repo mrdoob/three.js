@@ -9,37 +9,19 @@ const divRoundUp = ( size, part_size ) => {
 
 };
 
-const getTypeFromTypedArray = ( typedArray ) => {
+const intType = { type: 'int', vecType: 'ivec4', scalarNode: int, vectorNode: ivec4 };
+const uintType = { type: 'uint', vecType: 'uvec4', scalarNode: uint, vectorNode: uvec4 };
+const floatType = { type: 'float', vecType: 'vec4', scalarNode: float, vectorNode: vec4 };
 
-	switch ( typedArray.constructor.name ) {
-
-		case 'Float32Array': {
-
-			return 'float';
-
-		}
-
-		case 'Int32Array': {
-
-			return 'int';
-
-		}
-
-		case 'Uint32Array': {
-
-			return 'uint';
-
-		}
-
-		default: {
-
-			return typedArray.constructor.name.substring( 0, - 6 ).toLowerCase();
-
-		}
-
-	}
-
-};
+const typeFromArray = new Map( [
+	[ Int8Array, intType ],
+	[ Int16Array, intType ],
+	[ Int32Array, intType ],
+	[ Uint8Array, uintType ],
+	[ Uint16Array, uintType ],
+	[ Uint32Array, uintType ],
+	[ Float32Array, floatType ]
+] );
 
 /**
  * Storage buffers needed to execute a reduce-then-scan prefix sum`.
@@ -88,9 +70,7 @@ const getTypeFromTypedArray = ( typedArray ) => {
 export class PrefixSum {
 
 	/**
-	 * @param {BufferAttribute|TypedArray} input - The data to sum. A typed array is copied into a new
-	 * storage attribute, zero padded so that its length is a multiple of four. A buffer attribute is used
-	 * directly and must therefore already hold n % 4 == 0 elements.
+	 * @param {BufferAttribute|TypedArray} input - The data buffer to sum. Typed arrays will be converted to buffer attributes.
 	 * @param {Object} [options={}] - Options that modify the behavior of the prefix sum.
 	 * @param {BufferAttribute} [options.outputAttribute] - The attribute the prefix sum is written into.
 	 * Defaults to a new attribute matching the size and type of the input.
@@ -134,36 +114,36 @@ export class PrefixSum {
 			? options.outputAttribute
 			: new StorageInstancedBufferAttribute( new this.inputAttribute.array.constructor( this.inputAttribute.array.length ), 1 );
 
+
+		const typeInformation = typeFromArray.get( this.inputAttribute.array.constructor );
+
 		/**
 		 * The type of each individual data element.
 		 *
 		 * @type {string}
 		 */
-		this.type = getTypeFromTypedArray( this.inputAttribute.array );
+		this.type = typeInformation.type;
 
 		/**
 		 * The corresponding vector type for the prefix sum's scalar type.
 		 *
 		 * @type {string}
 		 */
-		this.vecType = 'vec4';
+		this.vecType = typeInformation.vecType;
 
-		this.scalarNode = float;
-		this.vectorNode = vec4;
+		/**
+		 * The correspodning scalar node for the data.
+		 *
+		 * @type {string}
+		 */
+		this.scalarNode = typeInformation.scalarNode;
 
-		if ( this.type === 'int' ) {
-
-			this.vecType = 'ivec4';
-			this.scalarNode = int;
-			this.vectorNode = ivec4;
-
-		} else if ( this.type === 'uint' ) {
-
-			this.vecType = 'uvec4';
-			this.scalarNode = uint;
-			this.vectorNode = uvec4;
-
-		}
+		/**
+		 * The correspodning vector node for the data.
+		 *
+		 * @type {string}
+		 */
+		this.vectorNode = typeInformation.vectorNode;
 
 		/**
 		 * The size of the data.
@@ -181,8 +161,6 @@ export class PrefixSum {
 
 		/**
 		 * The number of 4-dimensional vectors needed to fully represent the data in the data buffer.
-		 * Buffers where this.count % 4 !== 0 will need an additional vec4 to hold the data buffer's
-		 * remaining elements.
 		 *
 		 * @type {number}
 		 */
@@ -424,7 +402,7 @@ export class PrefixSum {
 			this._workPerInvocationBlock( () => {
 
 				const val = dataBuffer.element( startThread );
-				subgroupReduction.addAssign( dot( vectorNode( 0 ), val ) );
+				subgroupReduction.addAssign( dot( vectorNode( 1 ), val ) );
 				startThread.addAssign( subgroupSize );
 
 			}, () => {
@@ -457,7 +435,7 @@ export class PrefixSum {
 					select(
 						isValidSubgroupIndex,
 						subgroupReductionArray.element( subgroupIndex ),
-						0
+						scalarNode( 0 )
 					).uniformFlow()
 				).toVar( 't' );
 
@@ -511,15 +489,15 @@ export class PrefixSum {
 		const { reductionBuffer } = this.storageBuffers;
 
 		const { subgroupReductionArray, unvectorizedSubgroupOffset, spineSize, subgroupSizeLog } = this.utilityNodes;
-		const { unvectorizedWorkPerInvocation } = this;
+		const { unvectorizedWorkPerInvocation, scalarNode } = this;
 
 		const fnDef = Fn( () => {
 
 			const subgroupAlignedSize = this._getSubgroupAlignedSize();
 			const spineAlignedSize = this._getSpineAlignedSize();
 
-			const t_scan = array( 'uint', 16 ).toVar();
-			const previousReduction = uint( 0 ).toVar( 'previousReduction' );
+			const t_scan = array( this.type, 16 ).toVar();
+			const previousReduction = scalarNode( 0 ).toVar( 'previousReduction' );
 			const s_offset = unvectorizedSubgroupOffset.add( invocationSubgroupIndex ).toVar( 's_offset' );
 
 			this._getSpineAlignedBlock( spineAlignedSize, ( devOffset ) => {
@@ -544,7 +522,7 @@ export class PrefixSum {
 
 				} );
 
-				const prev = uint( 0 ).toVar( 'prev' );
+				const prev = scalarNode( 0 ).toVar( 'prev' );
 				Loop( {
 					start: uint( 0 ),
 					end: uint( unvectorizedWorkPerInvocation ),
@@ -579,7 +557,7 @@ export class PrefixSum {
 
 					const i0 = ( invocationLocalIndex.add( offset0 ) ).shiftLeft( offset1 ).sub( isValidSubgroupInt );
 					const pred0 = i0.lessThan( spineSize );
-					const t0 = subgroupInclusiveAdd( select( pred0, subgroupReductionArray.element( i0 ), uint( 0 ) ).uniformFlow() ).toVar();
+					const t0 = subgroupInclusiveAdd( select( pred0, subgroupReductionArray.element( i0 ), scalarNode( 0 ) ).uniformFlow() ).toVar();
 
 					If( pred0, () => {
 
@@ -596,7 +574,7 @@ export class PrefixSum {
 						If( weirdValue.greaterThanEqual( rShift ), () => {
 
 							const pred1 = i1.lessThan( spineSize );
-							const t1 = select( pred1, subgroupReductionArray.element( this._maskLowerBits( i1, offset1 ).sub( 1 ) ), 0 ).uniformFlow();
+							const t1 = select( pred1, subgroupReductionArray.element( this._maskLowerBits( i1, offset1 ).sub( 1 ) ), scalarNode( 0 ) ).uniformFlow();
 
 							If(
 								pred1.and(
@@ -624,7 +602,7 @@ export class PrefixSum {
 				const lastSubgroupReduction = select(
 					subgroupIndex.notEqual( 0 ),
 					subgroupReductionArray.element( subgroupIndex.sub( 1 ) ),
-					uint( 0 )
+					scalarNode( 0 )
 				).uniformFlow();
 
 				const newPrev = lastSubgroupReduction.add( previousReduction );
@@ -677,7 +655,7 @@ export class PrefixSum {
 
 			for ( let i = 0; i < workPerInvocation; i ++ ) {
 
-				vec4FilledWithZeroArray.push( uvec4( 0 ) );
+				vec4FilledWithZeroArray.push( vectorNode( 0 ) );
 
 			}
 
@@ -714,7 +692,7 @@ export class PrefixSum {
 
 			} );
 
-			const prev = uint( 0 ).toVar();
+			const prev = scalarNode( 0 ).toVar();
 			const laneMask = subgroupSize.sub( 1 ).toVar( 'laneMask' );
 			const clockwiseShift = ( invocationSubgroupIndex.add( laneMask ) ).bitAnd( laneMask ).toVar( 'clockwiseShift' );
 
@@ -762,7 +740,7 @@ export class PrefixSum {
 				const pred0 = i0.lessThan( spineSize );
 
 				const t0 = subgroupInclusiveAdd(
-					select( pred0, subgroupReductionArray.element( i0 ), uint( 0 ) ).uniformFlow()
+					select( pred0, subgroupReductionArray.element( i0 ), scalarNode( 0 ) ).uniformFlow()
 				).toVar();
 
 				If( pred0, () => {
@@ -783,7 +761,7 @@ export class PrefixSum {
 						const t1 = select(
 							pred1,
 							subgroupReductionArray.element( this._maskLowerBits( i1, offset1 ).sub( 1 ) ),
-							uint( 0 )
+							scalarNode( 0 )
 						).uniformFlow();
 
 						If(
@@ -813,13 +791,13 @@ export class PrefixSum {
 			const spineScanWorkgroupReduction = select(
 				workgroupId.x.notEqual( uint( 0 ) ),
 				reductionBuffer.element( workgroupId.x.sub( 1 ) ),
-				uint( 0 )
+				scalarNode( 0 )
 			).uniformFlow();
 
 			const downsweepSubgroupReduction = select(
 				subgroupIndex.notEqual( 0 ),
 				subgroupReductionArray.element( subgroupIndex.sub( 1 ) ),
-				uint( 0 )
+				scalarNode( 0 )
 			).uniformFlow();
 
 			prev.assign( spineScanWorkgroupReduction.add( downsweepSubgroupReduction ) );
