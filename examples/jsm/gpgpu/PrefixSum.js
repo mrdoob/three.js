@@ -356,7 +356,7 @@ export class PrefixSum {
 		const { unvectorizedDataBuffer, unvectorizedOutputBuffer } = this.storageBuffers;
 		const { count, isInclusive, scalarNode } = this;
 
-		const fnDef = Fn( () => {
+		return Fn( () => {
 
 			const sum = scalarNode( 0 ).toVar( 'sum' );
 
@@ -382,8 +382,6 @@ export class PrefixSum {
 
 		} )().compute( 1 ).setName( 'SingleThreadPrefix' );
 
-		return fnDef;
-
 	}
 
 	_getReduceFn() {
@@ -392,7 +390,7 @@ export class PrefixSum {
 		const { vecCount, scalarNode, vectorNode } = this;
 		const { subgroupSizeLog, subgroupReductionArray, subgroupOffset, workgroupOffset, spineSize } = this.utilityNodes;
 
-		const fnDef = Fn( () => {
+		return Fn( () => {
 
 			const threadSubgroupOffset = subgroupOffset.add( invocationSubgroupIndex ).toVar( 'threadSubgroupOffset' );
 			const startThreadBase = threadSubgroupOffset.add( workgroupOffset ).toVar( 'startThreadBase' );
@@ -460,8 +458,6 @@ export class PrefixSum {
 
 		} )().compute( this.dispatchSize, [ this.workgroupSize ] ).setName( 'PrefixSumReduce' );
 
-		return fnDef;
-
 	}
 
 	_maskLowerBits( inputNode, maskNode ) {
@@ -474,24 +470,96 @@ export class PrefixSum {
 
 		const { reductionBuffer } = this.storageBuffers;
 
-		const fnDef = Fn( () => {
+		return Fn( () => {
 
 			reductionBuffer.element( invocationSubgroupIndex ).assign( subgroupInclusiveAdd( reductionBuffer.element( invocationSubgroupIndex ) ) );
 
 		} )().compute( this.numWorkgroups, [ this.workgroupSize ] ).setName( 'PrefixSumSpineScanShort' );
 
-		return fnDef;
+	}
+
+	// Subgroup size agnostic scan of subgroup reduction
+	_subgroupScanReductionBlock( getIndexOffsetFunction = null ) {
+
+		const { subgroupReductionArray, subgroupSizeLog, spineSize } = this.utilityNodes;
+		const { scalarNode } = this;
+
+		workgroupBarrier();
+
+		const subgroupAlignedSize = this._getSubgroupAlignedSize();
+
+		const offset0 = uint( 0 ).toVar();
+		const offset1 = uint( 0 ).toVar();
+
+		this._subgroupAlignedSizeBlock( subgroupAlignedSize, ( j ) => {
+
+			const isValidSubgroupIndex = j.notEqual( subgroupSize );
+			const indexOffset = getIndexOffsetFunction ? getIndexOffsetFunction( isValidSubgroupIndex ) : offset0;
+
+			const i0 = (
+				( invocationLocalIndex.add( offset0 ) ).shiftLeft( offset1 )
+			).sub( indexOffset );
+
+			const pred0 = i0.lessThan( spineSize );
+
+			const t0 = subgroupInclusiveAdd(
+				select( pred0, subgroupReductionArray.element( i0 ), scalarNode( 0 ) ).uniformFlow()
+			).toVar();
+
+			If( pred0, () => {
+
+				subgroupReductionArray.element( i0 ).assign( t0 );
+
+			} );
+
+			workgroupBarrier();
+
+			If( isValidSubgroupIndex, () => {
+
+				const rShift = j.shiftRight( subgroupSizeLog );
+				const i1 = invocationLocalIndex.add( rShift );
+				If( ( i1.bitAnd( j.sub( 1 ) ) ).greaterThanEqual( rShift ), () => {
+
+					const pred1 = i1.lessThan( spineSize );
+					const t1 = select(
+						pred1,
+						subgroupReductionArray.element( this._maskLowerBits( i1, offset1 ).sub( 1 ) ),
+						scalarNode( 0 )
+					).uniformFlow();
+
+					If(
+						pred1.and(
+							( i1.add( 1 ) ).bitAnd( rShift.sub( 1 ) ).notEqual( uint( 0 ) ) )
+						, () => {
+
+							subgroupReductionArray.element( i1 ).addAssign( t1 );
+
+						}
+					);
+
+				} );
+
+			} ).Else( () => {
+
+				offset0.addAssign( 1 );
+
+			} );
+
+			offset1.addAssign( subgroupSizeLog );
+
+		} );
+
+		workgroupBarrier();
 
 	}
 
 	_getSpineScanLongFn() {
 
 		const { reductionBuffer } = this.storageBuffers;
-
-		const { subgroupReductionArray, unvectorizedSubgroupOffset, spineSize, subgroupSizeLog } = this.utilityNodes;
+		const { subgroupReductionArray, unvectorizedSubgroupOffset } = this.utilityNodes;
 		const { unvectorizedWorkPerInvocation, scalarNode } = this;
 
-		const fnDef = Fn( () => {
+		return Fn( () => {
 
 			const subgroupAlignedSize = this._getSubgroupAlignedSize();
 			const spineAlignedSize = this._getSpineAlignedSize();
@@ -545,59 +613,9 @@ export class PrefixSum {
 
 				} );
 
-				workgroupBarrier();
-
-				const offset0 = uint( 0 ).toVar();
-				const offset1 = uint( 0 ).toVar();
-
-				this._subgroupAlignedSizeBlock( subgroupAlignedSize, ( j ) => {
-
-					const isValidSubgroupIndex = j.notEqual( subgroupSize );
-					const isValidSubgroupInt = select( isValidSubgroupIndex, uint( 1 ), uint( 0 ) ).uniformFlow();
-
-					const i0 = ( invocationLocalIndex.add( offset0 ) ).shiftLeft( offset1 ).sub( isValidSubgroupInt );
-					const pred0 = i0.lessThan( spineSize );
-					const t0 = subgroupInclusiveAdd( select( pred0, subgroupReductionArray.element( i0 ), scalarNode( 0 ) ).uniformFlow() ).toVar();
-
-					If( pred0, () => {
-
-						subgroupReductionArray.element( i0 ).assign( t0 );
-
-					} );
-
-					If( isValidSubgroupIndex, () => {
-
-						const rShift = j.shiftRight( subgroupSizeLog );
-						const i1 = invocationLocalIndex.add( rShift );
-						const weirdValue = i1.bitAnd( j.sub( 1 ) );
-
-						If( weirdValue.greaterThanEqual( rShift ), () => {
-
-							const pred1 = i1.lessThan( spineSize );
-							const t1 = select( pred1, subgroupReductionArray.element( this._maskLowerBits( i1, offset1 ).sub( 1 ) ), scalarNode( 0 ) ).uniformFlow();
-
-							If(
-								pred1.and(
-									( i1.add( 1 ).bitAnd( rShift.sub( 1 ) ) ).notEqual( 0 )
-								), () => {
-
-									subgroupReductionArray.element( i1 ).addAssign( t1 );
-
-								} );
-
-						} );
-
-					} ).Else( () => {
-
-						offset0.addAssign( 1 );
-
-					} );
-
-					offset1.addAssign( subgroupSizeLog );
-
-				} );
-
-				workgroupBarrier();
+				this._subgroupScanReductionBlock(
+					( isValidSubgroupIndex ) => select( isValidSubgroupIndex, uint( 1 ), uint( 0 ) ).uniformFlow(),
+				);
 
 				const lastSubgroupReduction = select(
 					subgroupIndex.notEqual( 0 ),
@@ -634,19 +652,17 @@ export class PrefixSum {
 
 		} )().compute( this.numWorkgroups, [ this.workgroupSize ] ).setName( 'PrefixSumSpineScanLong' );
 
-		return fnDef;
-
 	}
 
 	_getDownsweepFn() {
 
 		const { dataBuffer, reductionBuffer, unvectorizedOutputBuffer } = this.storageBuffers;
-		const { subgroupOffset, workgroupOffset, subgroupReductionArray, subgroupSizeLog, spineSize } = this.utilityNodes;
+		const { subgroupOffset, workgroupOffset, subgroupReductionArray } = this.utilityNodes;
 		const { workPerInvocation, vecCount, isInclusive, scalarNode, vectorNode } = this;
 
 		const outputIndexOffset = isInclusive ? 0 : 1;
 
-		const fnDef = Fn( () => {
+		return Fn( () => {
 
 			const threadSubgroupOffset = subgroupOffset.add( invocationSubgroupIndex );
 			const startThreadBase = threadSubgroupOffset.add( workgroupOffset );
@@ -724,69 +740,7 @@ export class PrefixSum {
 
 			} );
 
-			workgroupBarrier();
-
-			const offset0 = uint( 0 ).toVar();
-			const offset1 = uint( 0 ).toVar();
-
-			const subgroupAlignedSize = this._getSubgroupAlignedSize();
-
-			this._subgroupAlignedSizeBlock( subgroupAlignedSize, ( j ) => {
-
-				const i0 = (
-					( invocationLocalIndex.add( offset0 ) ).shiftLeft( offset1 )
-				).sub( offset0 );
-
-				const pred0 = i0.lessThan( spineSize );
-
-				const t0 = subgroupInclusiveAdd(
-					select( pred0, subgroupReductionArray.element( i0 ), scalarNode( 0 ) ).uniformFlow()
-				).toVar();
-
-				If( pred0, () => {
-
-					subgroupReductionArray.element( i0 ).assign( t0 );
-
-				} );
-
-				workgroupBarrier();
-
-				If( j.notEqual( subgroupSize ), () => {
-
-					const rShift = j.shiftRight( subgroupSizeLog );
-					const i1 = invocationLocalIndex.add( rShift );
-					If( ( i1.bitAnd( j.sub( 1 ) ) ).greaterThanEqual( rShift ), () => {
-
-						const pred1 = i1.lessThan( spineSize );
-						const t1 = select(
-							pred1,
-							subgroupReductionArray.element( this._maskLowerBits( i1, offset1 ).sub( 1 ) ),
-							scalarNode( 0 )
-						).uniformFlow();
-
-						If(
-							pred1.and(
-								( i1.add( 1 ) ).bitAnd( rShift.sub( 1 ) ).notEqual( uint( 0 ) ) )
-							, () => {
-
-								subgroupReductionArray.element( i1 ).addAssign( t1 );
-
-							}
-						);
-
-					} );
-
-				} ).Else( () => {
-
-					offset0.addAssign( 1 );
-
-				} );
-
-				offset1.addAssign( subgroupSizeLog );
-
-			} );
-
-			workgroupBarrier();
+			this._subgroupScanReductionBlock();
 
 			const spineScanWorkgroupReduction = select(
 				workgroupId.x.notEqual( uint( 0 ) ),
@@ -846,8 +800,6 @@ export class PrefixSum {
 			}
 
 		} )().compute( this.dispatchSize, [ this.workgroupSize ] ).setName( 'PrefixSumDownsweep' );
-
-		return fnDef;
 
 	}
 
