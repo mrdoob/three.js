@@ -319,13 +319,7 @@ export class PrefixSum {
 
 		If( workgroupId.x.lessThan( uint( numWorkgroups ).sub( 1 ) ), () => {
 
-			Loop( {
-				start: uint( 0 ),
-				end: workPerInvocation,
-				type: 'uint',
-				condition: '<',
-				name: 'currentSubgroupInBlock'
-			}, ( { currentSubgroupInBlock } ) => {
+			Loop( { start: uint( 0 ), end: workPerInvocation, type: 'uint', condition: '<', name: 'currentSubgroupInBlock' }, ( { currentSubgroupInBlock } ) => {
 
 				workgroupCallback( currentSubgroupInBlock );
 
@@ -335,13 +329,7 @@ export class PrefixSum {
 
 		If( workgroupId.x.equal( uint( numWorkgroups ).sub( 1 ) ), () => {
 
-			Loop( {
-				start: uint( 0 ),
-				end: workPerInvocation,
-				type: 'uint',
-				condition: '<',
-				name: 'currentSubgroupInBlock'
-			}, ( { currentSubgroupInBlock } ) => {
+			Loop( { start: uint( 0 ), end: workPerInvocation, type: 'uint', condition: '<', name: 'currentSubgroupInBlock' }, ( { currentSubgroupInBlock } ) => {
 
 				lastWorkgroupCallback( currentSubgroupInBlock );
 
@@ -572,13 +560,7 @@ export class PrefixSum {
 
 				const reducedWorkgroupIndex = s_offset.add( devOffset );
 
-				Loop( {
-					start: uint( 0 ),
-					end: uint( unvectorizedWorkPerInvocation ),
-					type: 'uint',
-					condition: '<',
-					name: 'k'
-				}, ( { k } ) => {
+				Loop( { start: uint( 0 ), end: uint( unvectorizedWorkPerInvocation ), type: 'uint', condition: '<', name: 'k' }, ( { k } ) => {
 
 					If( reducedWorkgroupIndex.lessThan( this.numWorkgroups ), () => {
 
@@ -591,14 +573,7 @@ export class PrefixSum {
 				} );
 
 				const prev = scalarNode( 0 ).toVar( 'prev' );
-				Loop( {
-					start: uint( 0 ),
-					end: uint( unvectorizedWorkPerInvocation ),
-					type: 'uint',
-					condition: '<',
-					update: '+= 1u',
-					name: 'k'
-				}, ( { k } ) => {
+				Loop( { start: uint( 0 ), end: uint( unvectorizedWorkPerInvocation ), type: 'uint', condition: '<', update: '+= 1u', name: 'k' }, ( { k } ) => {
 
 					const tScanElement = t_scan.element( k );
 
@@ -626,13 +601,7 @@ export class PrefixSum {
 				const newPrev = lastSubgroupReduction.add( previousReduction );
 				const i = s_offset.add( devOffset );
 
-				Loop( {
-					start: uint( 0 ),
-					end: uint( unvectorizedWorkPerInvocation ),
-					type: 'uint',
-					condition: '<',
-					name: 'k'
-				}, ( { k } ) => {
+				Loop( { start: uint( 0 ), end: uint( unvectorizedWorkPerInvocation ), type: 'uint', condition: '<', name: 'k' }, ( { k } ) => {
 
 					If( i.lessThan( this.numWorkgroups ), () => {
 
@@ -712,13 +681,7 @@ export class PrefixSum {
 			const laneMask = subgroupSize.sub( 1 ).toVar( 'laneMask' );
 			const clockwiseShift = ( invocationSubgroupIndex.add( laneMask ) ).bitAnd( laneMask ).toVar( 'clockwiseShift' );
 
-			Loop( {
-				start: uint( 0 ),
-				end: uint( workPerInvocation ),
-				type: 'uint',
-				condition: '<',
-				name: 'currentSubgroupInBlock'
-			}, ( { currentSubgroupInBlock } ) => {
+			Loop( { start: uint( 0 ), end: uint( workPerInvocation ), type: 'uint', condition: '<', name: 'currentSubgroupInBlock' }, ( { currentSubgroupInBlock } ) => {
 
 				// previous greatest accumulated value
 				const prevAccGreatestValue = subgroupShuffle(
@@ -817,14 +780,10 @@ export class PrefixSum {
 
 		}
 
-		if ( this.numWorkgroups <= this.minSubgroupSize ) {
+		this.computeFunctions.spineScanFn = this.numWorkgroups <= this.minSubgroupSize
+			? this.computeFunctions.spineScanShortFn
+			: this.computeFunctions.spineScanLongFn;
 
-			this.computeFunctions.spineScanFn = this.computeFunctions.spineScanShortFn;
-			return true;
-
-		}
-
-		this.computeFunctions.spineScanFn = this.computeFunctions.spineScanLongFn;
 		return true;
 
 	}
