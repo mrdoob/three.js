@@ -24,8 +24,21 @@ const GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING = {
 	opacity: [ 'opacity' ]
 };
 
+// Property names a Gaussian splat PLY must declare in its header. Checked
+// up front against the header text rather than the parsed geometry, since
+// PLYLoader still creates a (garbage-filled) attribute for a custom property
+// name that's missing from the file instead of omitting it.
+const REQUIRED_PLY_PROPERTIES = [
+	'x', 'y', 'z',
+	...GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING.scale,
+	...GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING.rotation,
+	...GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING.f_dc,
+	...GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING.opacity
+];
+
 const _headerPattern = /^ply([\s\S]*?)end_header/;
-const _propertyPattern = /^property\s+\S+\s+(f_rest_\d+)\s*$/;
+const _propertyPattern = /^property\s+\S+\s+(\S+)\s*$/;
+const _restPropertyPattern = /^f_rest_\d+$/;
 
 /**
  * A loader for Gaussian splat PLY files, e.g. as exported by the original
@@ -129,10 +142,11 @@ class PLYGaussianSplatLoader extends Loader {
 
 }
 
-// Scans the PLY header text for "f_rest_N" vertex properties and maps the
-// count found to a spherical harmonics degree. PLY headers are always
-// plain ASCII text that fully precedes the vertex data, so this can run
-// before the file is parsed by the generic PLYLoader.
+// Scans the PLY header text for its vertex properties, verifying the
+// required Gaussian splat properties are present and mapping the number of
+// "f_rest_N" properties found to a spherical harmonics degree. PLY headers
+// are always plain ASCII text that fully precedes the vertex data, so this
+// can run before the file is parsed by the generic PLYLoader.
 function detectSphericalHarmonicsDegree( data ) {
 
 	const headerText = typeof data === 'string' ? data : decodeHeaderText( new Uint8Array( data ) );
@@ -144,11 +158,24 @@ function detectSphericalHarmonicsDegree( data ) {
 
 	}
 
+	const propertyNames = new Set();
 	let restComponentCount = 0;
 
 	for ( const line of headerMatch[ 1 ].split( /\r\n|\r|\n/ ) ) {
 
-		if ( _propertyPattern.test( line.trim() ) ) restComponentCount ++;
+		const propertyMatch = _propertyPattern.exec( line.trim() );
+
+		if ( propertyMatch === null ) continue;
+
+		propertyNames.add( propertyMatch[ 1 ] );
+
+		if ( _restPropertyPattern.test( propertyMatch[ 1 ] ) ) restComponentCount ++;
+
+	}
+
+	if ( REQUIRED_PLY_PROPERTIES.some( name => ! propertyNames.has( name ) ) ) {
+
+		throw new Error( 'THREE.PLYGaussianSplatLoader: PLY file requires position, scale, rotation, f_dc and opacity properties.' );
 
 	}
 
