@@ -77,7 +77,6 @@ export class PrefixSum {
 	 * @param {boolean} [options.isInclusive=true] - A flag determining whether to execute an exclusive prefix sum instead of the default inclusive prefix sum.
 	 * @param {number} [options.workPerInvocation=4] - The number of vec4 elements read per invocation.
 	 * @param {number} [options.workgroupSize=64] - The workgroup size of the compute shaders.
-	 * @param {number} [options.minSubgroupSize=4] - The smallest subgroup size the generated shaders have to stay correct for. Defaults to the WGSL minimum of 4.
 	 */
 	constructor( input, options = {} ) {
 
@@ -190,14 +189,6 @@ export class PrefixSum {
 		 * @type {number}
 		*/
 		this.workgroupSize = options.workgroupSize !== undefined ? options.workgroupSize : 64;
-
-		/**
-		 * The minimumn subgroup size the generated shaders have to stay correct for. Defaults to the
-		 * WGSL minimum of 4 and is refined once a renderer is available in `_handleSubgroupInfo`.
-		 *
-		 * @type {number}
-		*/
-		this.minSubgroupSize = options.minSubgroupSize !== undefined ? options.minSubgroupSize : 4;
 
 		/**
 		 * The maximum number of elements that will be read by an individual workgroup in the reduction step.
@@ -646,7 +637,7 @@ export class PrefixSum {
 
 			const tScan = array( vec4FilledWithZeroArray ).toVar();
 
-			this._workPerInvocationBlock( ( currentSubgroupInBlock ) => {
+			const getVectorData = ( currentSubgroupInBlock ) => {
 
 				const scanIn = dataBuffer.element( startThread );
 				const currentTScanElement = tScan.element( currentSubgroupInBlock );
@@ -658,20 +649,17 @@ export class PrefixSum {
 
 				startThread.addAssign( subgroupSize );
 
+			};
+
+			this._workPerInvocationBlock( ( currentSubgroupInBlock ) => {
+
+				getVectorData( currentSubgroupInBlock );
+
 			}, ( currentSubgroupInBlock ) => {
 
 				If( startThread.lessThan( uint( vecCount ) ), () => {
 
-					const scanIn = dataBuffer.element( startThread );
-					const currentTScanElement = tScan.element( currentSubgroupInBlock );
-
-					currentTScanElement.assign( scanIn );
-
-					currentTScanElement.y.addAssign( currentTScanElement.x );
-					currentTScanElement.z.addAssign( currentTScanElement.y );
-					currentTScanElement.w.addAssign( currentTScanElement.z );
-
-					startThread.addAssign( subgroupSize );
+					getVectorData( currentSubgroupInBlock );
 
 				} );
 
@@ -769,18 +757,13 @@ export class PrefixSum {
 	_handleSubgroupInfo( renderer ) {
 
 		const device = renderer.backend.device;
-
-		if ( device !== undefined && device.adapterInfo && device.adapterInfo.subgroupMinSize ) {
-
-			this.minSubgroupSize = device.adapterInfo.subgroupMinSize;
-
-		} else {
+		if ( ! device || ! device.adapterInfo || ! device.adapterInfo.subgroupMinSize ) {
 
 			return false;
 
 		}
 
-		this.computeFunctions.spineScanFn = this.numWorkgroups <= this.minSubgroupSize
+		this.computeFunctions.spineScanFn = this.numWorkgroups <= device.adapterInfo.subgroupMinSize
 			? this.computeFunctions.spineScanShortFn
 			: this.computeFunctions.spineScanLongFn;
 
