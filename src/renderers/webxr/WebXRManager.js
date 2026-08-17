@@ -755,9 +755,8 @@ class WebXRManager extends EventDispatcher {
 		 * the XR camera. If you need the fov on app level, you have to compute in
 		 * manually from the XR camera's projection matrices.
 		 *
-		 * The camera's projection matrix is copied from the first sub camera and does
-		 * not enclose all views. If you need a combined projection matrix on app level,
-		 * you have to compute it manually from the sub cameras.
+		 * The camera's transformation and projection matrix are derived from the first
+		 * sub camera (e.g. the left eye in a stereo setup).
 		 *
 		 * @return {ArrayCamera} The XR camera.
 		 */
