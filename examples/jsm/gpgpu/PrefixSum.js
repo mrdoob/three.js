@@ -1,7 +1,7 @@
 import {
 	StorageInstancedBufferAttribute,
 } from 'three/webgpu';
-import { Fn, If, instancedArray, invocationLocalIndex, countTrailingZeros, Loop, workgroupArray, subgroupSize, workgroupBarrier, workgroupId, uint, select, invocationSubgroupIndex, dot, uvec4, vec4, float, subgroupAdd, array, subgroupShuffle, subgroupInclusiveAdd, subgroupBroadcast, subgroupIndex, storage } from 'three/tsl';
+import { Fn, If, instancedArray, invocationLocalIndex, countTrailingZeros, Loop, workgroupArray, subgroupSize, workgroupBarrier, workgroupId, uint, select, invocationSubgroupIndex, dot, uvec4, vec4, float, subgroupAdd, array, subgroupShuffle, subgroupInclusiveAdd, subgroupBroadcast, subgroupIndex, storage, int } from 'three/tsl';
 
 const divRoundUp = ( size, part_size ) => {
 
@@ -40,8 +40,6 @@ const getTypeFromTypedArray = ( typedArray ) => {
 	}
 
 };
-
-let id = 0;
 
 /**
  * Storage buffers needed to execute a reduce-then-scan prefix sum`.
@@ -112,7 +110,6 @@ export class PrefixSum {
 		 */
 		this.computeFunctions = {};
 
-
 		/**
 		 * @type {PrefixSumUtilityNodes}
 		 */
@@ -130,6 +127,8 @@ export class PrefixSum {
 		this.inputAttribute = ( input.isBufferAttribute === true )
 			? input
 			: new StorageInstancedBufferAttribute( input, 1 );
+
+		console.log( this.inputAttribute );
 
 		/**
 		 * The attribute the prefix sum is written into.
@@ -264,8 +263,6 @@ export class PrefixSum {
 		*/
 		this.compute = this._computeInitial;
 
-		id += 1;
-
 	}
 
 	_createStorageBuffers() {
@@ -308,13 +305,12 @@ export class PrefixSum {
 
 	}
 
-
 	// NOTE: subgroupSizeLog needs to be defined in this._getSubgroupAlignedSize before this block can execute
 	_subgroupAlignedSizeBlock( subgroupAlignedSize, subgroupAllignedBlockCallback ) {
 
 		// In cases where the number of subgroups in a workgroup is greater than the subgroup size itself,
 		// we need to iterate over the array again to capture all the data in the workgroup array buffer
-		// In many cases this loop will only run once
+		// In many subgroupSize/workgroupSize combinations, this loop with only run once
 		Loop( { start: subgroupSize, end: subgroupAlignedSize, condition: '<=', name: 'j', type: 'uint', update: '<<= subgroupSizeLog' }, ( { j } ) => {
 
 			subgroupAllignedBlockCallback( j );
@@ -388,13 +384,6 @@ export class PrefixSum {
 
 	}
 
-	/**
-	 * Create the compute shader that performs the whole prefix sum on a single invocation. Used as a
-	 * fallback on devices without subgroup support.
-	 *
-	 * @private
-	 * @returns {ComputeNode} - A compute shader that executes a serial prefix sum.
-	 */
 	_getSingleThreadPrefixFn() {
 
 		const { unvectorizedDataBuffer, unvectorizedOutputBuffer } = this.storageBuffers;
@@ -430,24 +419,32 @@ export class PrefixSum {
 
 	}
 
-	/**
-	 * Returns a zero valued node matching the element type of the data buffer.
-	 *
-	 * @private
-	 * @returns {Node} - A zero valued node.
-	 */
 	_getZeroNode() {
 
-		return this.type === 'float' ? float( 0 ) : uint( 0 );
+		switch ( this.type ) {
+
+			case 'float': {
+
+				return float( 0 );
+
+			}
+
+			case 'int': {
+
+				return int( 0 );
+
+			}
+
+			case 'uint': {
+
+				return uint( 0 );
+
+			}
+
+		}
 
 	}
 
-	/**
-	 * Create the compute shader that performs the reduce operation.
-	 *
-	 * @private
-	 * @returns {ComputeNode} - A compute shader that executes a full local swap.
-	 */
 	_getReduceFn() {
 
 		const { reductionBuffer, dataBuffer } = this.storageBuffers;
@@ -537,17 +534,10 @@ export class PrefixSum {
 			// from each of it's subgroups
 			workgroupBarrier();
 
-			// WORKGROUP LEVEL REDUCE
-
 			const subgroupAlignedSize = this._getSubgroupAlignedSize();
-
-			// aligned size 2 * 4
 
 			const offset = uint( 0 );
 
-			// In cases where the number of subgroups in a workgroup is greater than the subgroup size itself,
-			// we need to iterate over the array again to capture all the data in the workgroup array buffer
-			// In many cases this loop will only run once
 			this._subgroupAlignedSizeBlock( subgroupAlignedSize, () => {
 
 				const subgroupIndex = ( ( invocationLocalIndex.add( 1 ) ).shiftLeft( offset ) ).sub( 1 );
@@ -598,27 +588,12 @@ export class PrefixSum {
 
 	}
 
-	/**
-	 * Executes a downsweep operation on the data buffer.
-	 *
-	 * @param {Node<number>} inputNode - The input node.
-	 * @param {Node<number> | number} maskNode - The number of bits to mask.
-	 * @return {Node<uint>}
-	 */
 	_maskLowerBits( inputNode, maskNode ) {
 
 		return ( inputNode.shiftRight( maskNode ) ).shiftLeft( maskNode );
 
 	}
 
-
-
-	/**
-	 * Returns a shorter spine scan function depending on the size of the buffer.
-	 *
-	 * @private
-	 * @returns {ComputeNode} - A compute shader that executes a full local swap.
-	 */
 	_getSpineScanShortFn() {
 
 		const { reductionBuffer } = this.storageBuffers;
@@ -633,13 +608,6 @@ export class PrefixSum {
 
 	}
 
-
-	/**
-	 * Create the compute shader that performs the spine scan operation.
-	 *
-	 * @private
-	 * @returns {ComputeNode} - A compute shader that executes a full local swap.
-	 */
 	_getSpineScanLongFn() {
 
 		const { reductionBuffer } = this.storageBuffers;
@@ -911,7 +879,7 @@ export class PrefixSum {
 
 				let addEle;
 
-				// Vector read by lane 0 does not get changed by since it is already prefix summed
+				// Vector read by lane 0 does not get changed since it is already prefix summed
 				// within context of its subgroup, so we don't want to add greatest value for it.
 				// The purpose of shuffling to all lanes of the subgroup including lane 0 is simply
 				// to have the greatest value accessible for the broadcast from lane 0.
@@ -928,7 +896,7 @@ export class PrefixSum {
 
 				tScan.element( currentSubgroupInBlock ).addAssign( addEle );
 
-				// Broadcast value of invocationSubgroupIndex 0 (which is usually largest value ) to prev
+				// Broadcast value of invocationSubgroupIndex 0 ( which is usually largest value ) to prev
 				prev.addAssign( subgroupBroadcast( prevAccGreatestValue, uint( 0 ) ) );
 
 			} );
@@ -941,15 +909,11 @@ export class PrefixSum {
 
 			workgroupBarrier();
 
-
 			const offset0 = uint( 0 ).toVar();
 			const offset1 = uint( 0 ).toVar();
 
-
 			const subgroupAlignedSize = this._getSubgroupAlignedSize();
 
-			// In cases where the number of subgroups in a workgroup is greater than the subgroup size itself,
-			// we need to iterate over the array again to capture all the data in the workgroup array buffer
 			this._subgroupAlignedSizeBlock( subgroupAlignedSize, ( j ) => {
 
 				const i0 = (
@@ -1120,7 +1084,6 @@ export class PrefixSum {
 		this.compute = this._computeWithSingleInvocation;
 
 	}
-
 
 	_computeWithSingleInvocation( renderer ) {
 
