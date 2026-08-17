@@ -9,6 +9,7 @@ import './addons/loaders/FBXLoader.tests.js';
 import './addons/loaders/GLTFLoader.tests.js';
 import './addons/loaders/HDRLoader.tests.js';
 import './addons/loaders/KSPLATLoader.tests.js';
+import './addons/loaders/PLYGaussianSplatLoader.tests.js';
 import './addons/loaders/SPLATLoader.tests.js';
 import './addons/loaders/SPZLoader.tests.js';
 import './addons/loaders/USDLoader.tests.js';
