@@ -128,8 +128,6 @@ export class PrefixSum {
 			? input
 			: new StorageInstancedBufferAttribute( input, 1 );
 
-		console.log( this.inputAttribute );
-
 		/**
 		 * The attribute the prefix sum is written into.
 		 *
@@ -269,13 +267,13 @@ export class PrefixSum {
 
 		const { inputAttribute, outputAttribute } = this;
 
-		this.storageBuffers.dataBuffer = storage( inputAttribute, this.vecType, this.vecCount ).setName( `Prefix_Sum_Input_Vec_${id}` );
-		this.storageBuffers.unvectorizedDataBuffer = storage( inputAttribute, this.type, inputAttribute.array.length ).setName( `Prefix_Sum_Input_Unvec_${id}` );
+		this.storageBuffers.dataBuffer = storage( inputAttribute, this.vecType, this.vecCount ).setName( 'Prefix_Sum_Input_Vec' );
+		this.storageBuffers.unvectorizedDataBuffer = storage( inputAttribute, this.type, inputAttribute.array.length ).setName( 'Prefix_Sum_Input_Unvec' );
 
-		this.storageBuffers.outputBuffer = storage( outputAttribute, this.vecType, this.vecCount ).setName( `Prefix_Sum_Output_Vec_${id}` );
-		this.storageBuffers.unvectorizedOutputBuffer = storage( outputAttribute, this.type, outputAttribute.array.length ).setName( `Prefix_Sum_Output_Unvec_${id}` );
+		this.storageBuffers.outputBuffer = storage( outputAttribute, this.vecType, this.vecCount ).setName( 'Prefix_Sum_Output_Vec' );
+		this.storageBuffers.unvectorizedOutputBuffer = storage( outputAttribute, this.type, outputAttribute.array.length ).setName( 'Prefix_Sum_Output_Unvec' );
 
-		this.storageBuffers.reductionBuffer = instancedArray( this.numWorkgroups, this.type ).setPBO( true ).setName( `Prefix_Sum_Reduction_${id}` );
+		this.storageBuffers.reductionBuffer = instancedArray( this.numWorkgroups, this.type ).setPBO( true ).setName( 'Prefix_Sum_Reduction' );
 
 	}
 
