@@ -498,14 +498,14 @@ function computeRayIntersection( positionAttribute, covarianceAttribute, colorAt
 	}
 
 	// the attribute holds the upper triangle of the symmetric covariance
-	const rawC00 = covarianceAttribute.getComponent( index, 0 );
+	const c00 = covarianceAttribute.getComponent( index, 0 );
 	const c01 = covarianceAttribute.getComponent( index, 1 );
 	const c02 = covarianceAttribute.getComponent( index, 2 );
-	const rawC11 = covarianceAttribute.getComponent( index, 3 );
+	const c11 = covarianceAttribute.getComponent( index, 3 );
 	const c12 = covarianceAttribute.getComponent( index, 4 );
-	const rawC22 = covarianceAttribute.getComponent( index, 5 );
+	const c22 = covarianceAttribute.getComponent( index, 5 );
 
-	const maxVariance = Math.max( rawC00, rawC11, rawC22 );
+	const maxVariance = Math.max( c00, c11, c22 );
 
 	if ( maxVariance <= 0 ) {
 
@@ -516,14 +516,11 @@ function computeRayIntersection( positionAttribute, covarianceAttribute, colorAt
 	// splats are often flat enough to make the covariance singular, so the thinnest axis is floored
 	// relative to the widest to keep the quadratic solvable
 	const minVariance = maxVariance * COVARIANCE_FLATNESS;
-	const c00 = rawC00 + minVariance;
-	const c11 = rawC11 + minVariance;
-	const c22 = rawC22 + minVariance;
 
 	_covarianceMatrix.set(
-		c00, c01, c02,
-		c01, c11, c12,
-		c02, c12, c22
+		c00 + minVariance, c01, c02,
+		c01, c11 + minVariance, c12,
+		c02, c12, c22 + minVariance
 	);
 
 	const determinant = _covarianceMatrix.determinant();
@@ -537,12 +534,9 @@ function computeRayIntersection( positionAttribute, covarianceAttribute, colorAt
 	// inverse( covariance ), applied below to the ray direction and to the origin offset
 	_covarianceMatrix.invert();
 
-	const center = _vector.fromBufferAttribute( positionAttribute, index );
-	_originOffset.copy( _ray.origin ).sub( center );
-
 	_mDirection.copy( _ray.direction ).applyMatrix3( _covarianceMatrix );
-	_mOriginOffset.copy( _originOffset ).applyMatrix3( _covarianceMatrix );
 
+	// squared length of the ray direction in the ellipsoid's metric; must be positive for a valid covariance
 	const a = _ray.direction.dot( _mDirection );
 
 	if ( a <= 0 ) {
@@ -550,6 +544,11 @@ function computeRayIntersection( positionAttribute, covarianceAttribute, colorAt
 		return;
 
 	}
+
+	const center = _vector.fromBufferAttribute( positionAttribute, index );
+	_originOffset.copy( _ray.origin ).sub( center );
+	_mOriginOffset.copy( _originOffset ).applyMatrix3( _covarianceMatrix );
+
 
 	const b = 2 * _originOffset.dot( _mDirection );
 	const c = _originOffset.dot( _mOriginOffset ) - SPLAT_KERNEL_CUTOFF * SPLAT_KERNEL_CUTOFF;
