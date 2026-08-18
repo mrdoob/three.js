@@ -2041,10 +2041,10 @@ class WebGPUBackend extends Backend {
 
 			if ( i === cameraIndexSlot ) continue;
 
-			// compare the GPU bind group instead of the BindGroup id since the GPU object
-			// can be replaced for the same BindGroup (e.g. when a texture version changes)
+			// compare native bind groups
 
-			const bindGroupGPU = this.get( bindings[ i ] ).group;
+			const bindGroup = bindings[ i ];
+			const bindGroupGPU = this.get( bindGroup ).group;
 
 			if ( currentBindingGroups[ i ] !== bindGroupGPU ) {
 
