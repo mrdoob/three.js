@@ -162,7 +162,7 @@ class Bindings extends DataMap {
 
 			for ( const binding of bindGroup.bindings ) {
 
-				if ( binding.isUniformBuffer === true && binding.groupNode?.shared === true ) {
+				if ( ( binding.isNodeUniformsGroup === true || binding.isNodeUniformBuffer === true ) && binding.groupNode.shared === true ) {
 
 					const updatedGroup = this.nodes.updateGroup( binding );
 
