@@ -1042,6 +1042,7 @@ export {
 	WORKGROUP_SIZE,
 	SORT_DIRECTION_THRESHOLD,
 	SPLAT_KERNEL_CUTOFF,
+	applySphericalHarmonics,
 	createGeometry,
 	createMaterial,
 	createMaterialNodes,

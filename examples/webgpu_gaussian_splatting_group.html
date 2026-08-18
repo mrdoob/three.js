@@ -235,6 +235,11 @@
 
 			function animate() {
 
+				// init() loads the SPZ assets asynchronously, but the animation loop is
+				// already running by then (renderer.setAnimationLoop is set up before the
+				// await), so skip frames until the splats and group actually exist
+				if ( group === undefined ) return;
+
 				const delta = clock.getDelta();
 
 				controls.update();
@@ -259,7 +264,14 @@
 					// reproduces the interleaving artifact of two independently sorted
 					// meshes for comparison. Each mesh's own autoSort (default true)
 					// keeps it correctly sorted with itself, just not with the other mesh.
-					group.visible = false;
+					//
+					// `group` must stay visible=true here (just with nothing of its own to
+					// draw) rather than being hidden outright: the renderer's scene
+					// traversal skips an invisible object's entire subtree, so a hidden
+					// group would take splatLion/splatTomatoes down with it even though
+					// their own `visible` is true.
+					group.visible = true;
+					group.geometry.instanceCount = 0;
 					splatLion.visible = true;
 					splatTomatoes.visible = true;
 
