@@ -2014,6 +2014,7 @@ class WebGPUBackend extends Backend {
 	 * @param {{vertexCount: number, firstVertex: number, instanceCount: number, firstInstance: number}} drawParams - The draw parameters.
 	 * @param {GPURenderPassEncoder|GPURenderBundleEncoder} passEncoderGPU - The GPU pass encoder used for recording draw commands.
 	 * @param {Object} currentSets - Tracking object for currently set pipeline, attributes, bind groups, and index state.
+	 * @param {number} [cameraIndexSlot=-1] - Index of the binding slot holding the camera index bind group.
 	 */
 	_draw( renderObject, info, renderContextData, pipelineGPU, bindings, vertexBuffers, drawParams, passEncoderGPU, currentSets, cameraIndexSlot = - 1 ) {
 
