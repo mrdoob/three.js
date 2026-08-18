@@ -38,21 +38,21 @@ class BarrierNode extends Node {
 		const { scope } = this;
 		const { renderer, shaderStage } = builder;
 
-		const barrierName = `${scope}Barrier()`;
+		const barrierMethod = `${scope}Barrier`;
 
 		if ( shaderStage !== 'compute' ) {
 
-			warn( `BarrierNode: ${barrierName} is not supported in the ${shaderStage} stage and can only be executed in compute.` );
+			warn( `BarrierNode: ${barrierMethod} is not supported in the ${shaderStage} stage and can only be executed in compute.` );
 
 		}
 
 		if ( renderer.backend.isWebGLBackend === true ) {
 
-			builder.addFlowCode( `\t// ${scope}Barrier() \n` );
+			builder.addFlowCode( `\t// ${barrierMethod}() \n` );
 
 		} else {
 
-			builder.addLineFlowCode( `${scope}Barrier()`, this );
+			builder.addLineFlowCode( `${barrierMethod}()`, this );
 
 		}
 
