@@ -12,6 +12,7 @@ import './addons/loaders/KSPLATLoader.tests.js';
 import './addons/loaders/PLYGaussianSplatLoader.tests.js';
 import './addons/loaders/SPLATLoader.tests.js';
 import './addons/loaders/SPZLoader.tests.js';
+import './addons/loaders/STLLoader.tests.js';
 import './addons/loaders/USDLoader.tests.js';
 import './addons/exporters/USDZExporter.tests.js';
 import './addons/tsl/WebGLNodesHandler.tests.js';

@@ -121,6 +121,12 @@ class STLLoader extends Loader {
 
 			const reader = new DataView( data );
 			const face_size = ( 32 / 8 * 3 ) + ( ( 32 / 8 * 3 ) * 3 ) + ( 16 / 8 );
+
+			// A binary STL is an 80 byte header followed by a 4 byte face count, so
+			// anything shorter cannot be one. Reading the count first would throw.
+
+			if ( reader.byteLength < 84 ) return false;
+
 			const n_faces = reader.getUint32( 80, true );
 			const expect = 80 + ( 32 / 8 ) + ( n_faces * face_size );
 
