@@ -396,11 +396,21 @@ class NodeMaterialObserver {
 
 			// force refresh on dispose
 
-			texture.addEventListener( 'dispose', () => {
+			const onDispose = () => {
 
 				data._version ++;
 
-			} );
+			};
+
+			if ( texture.renderTarget !== null ) {
+
+				texture.renderTarget.addEventListener( 'dispose', onDispose );
+
+			} else {
+
+				texture.addEventListener( 'dispose', onDispose );
+
+			}
 
 			_textureCache.set( texture, data );
 
