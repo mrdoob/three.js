@@ -2,6 +2,7 @@ import {
 	Box3,
 	BufferAttribute,
 	InstancedBufferGeometry,
+	Matrix3,
 	Matrix4,
 	Mesh,
 	NodeMaterial,
@@ -68,6 +69,10 @@ const _modelViewMatrix = /*@__PURE__*/ new Matrix4();
 const _inverseMatrix = /*@__PURE__*/ new Matrix4();
 const _ray = /*@__PURE__*/ new Ray();
 const _sphere = /*@__PURE__*/ new Sphere();
+const _covarianceMatrix = /*@__PURE__*/ new Matrix3();
+const _originOffset = /*@__PURE__*/ new Vector3();
+const _mDirection = /*@__PURE__*/ new Vector3();
+const _mOriginOffset = /*@__PURE__*/ new Vector3();
 const _vector = /*@__PURE__*/ new Vector3();
 
 /**
@@ -493,15 +498,14 @@ function computeRayIntersection( positionAttribute, covarianceAttribute, colorAt
 	}
 
 	// the attribute holds the upper triangle of the symmetric covariance
+	const rawC00 = covarianceAttribute.getComponent( index, 0 );
 	const c01 = covarianceAttribute.getComponent( index, 1 );
 	const c02 = covarianceAttribute.getComponent( index, 2 );
+	const rawC11 = covarianceAttribute.getComponent( index, 3 );
 	const c12 = covarianceAttribute.getComponent( index, 4 );
+	const rawC22 = covarianceAttribute.getComponent( index, 5 );
 
-	const maxVariance = Math.max(
-		covarianceAttribute.getComponent( index, 0 ),
-		covarianceAttribute.getComponent( index, 3 ),
-		covarianceAttribute.getComponent( index, 5 )
-	);
+	const maxVariance = Math.max( rawC00, rawC11, rawC22 );
 
 	if ( maxVariance <= 0 ) {
 
@@ -512,15 +516,17 @@ function computeRayIntersection( positionAttribute, covarianceAttribute, colorAt
 	// splats are often flat enough to make the covariance singular, so the thinnest axis is floored
 	// relative to the widest to keep the quadratic solvable
 	const minVariance = maxVariance * COVARIANCE_FLATNESS;
-	const c00 = covarianceAttribute.getComponent( index, 0 ) + minVariance;
-	const c11 = covarianceAttribute.getComponent( index, 3 ) + minVariance;
-	const c22 = covarianceAttribute.getComponent( index, 5 ) + minVariance;
+	const c00 = rawC00 + minVariance;
+	const c11 = rawC11 + minVariance;
+	const c22 = rawC22 + minVariance;
 
-	// inverse of the symmetric covariance, by cofactors
-	const i00 = c11 * c22 - c12 * c12;
-	const i01 = c02 * c12 - c01 * c22;
-	const i02 = c01 * c12 - c02 * c11;
-	const determinant = c00 * i00 + c01 * i01 + c02 * i02;
+	_covarianceMatrix.set(
+		c00, c01, c02,
+		c01, c11, c12,
+		c02, c12, c22
+	);
+
+	const determinant = _covarianceMatrix.determinant();
 
 	if ( determinant <= 0 ) {
 
@@ -528,35 +534,16 @@ function computeRayIntersection( positionAttribute, covarianceAttribute, colorAt
 
 	}
 
-	const i11 = c00 * c22 - c02 * c02;
-	const i12 = c02 * c01 - c00 * c12;
-	const i22 = c00 * c11 - c01 * c01;
-	const inverseDeterminant = 1 / determinant;
-
-	const m00 = i00 * inverseDeterminant;
-	const m01 = i01 * inverseDeterminant;
-	const m02 = i02 * inverseDeterminant;
-	const m11 = i11 * inverseDeterminant;
-	const m12 = i12 * inverseDeterminant;
-	const m22 = i22 * inverseDeterminant;
+	// inverse( covariance ), applied below to the ray direction and to the origin offset
+	_covarianceMatrix.invert();
 
 	const center = _vector.fromBufferAttribute( positionAttribute, index );
-	const ox = _ray.origin.x - center.x;
-	const oy = _ray.origin.y - center.y;
-	const oz = _ray.origin.z - center.z;
-	const dx = _ray.direction.x;
-	const dy = _ray.direction.y;
-	const dz = _ray.direction.z;
+	_originOffset.copy( _ray.origin ).sub( center );
 
-	// inverse( covariance ) applied to the ray direction and to the origin offset
-	const mdx = m00 * dx + m01 * dy + m02 * dz;
-	const mdy = m01 * dx + m11 * dy + m12 * dz;
-	const mdz = m02 * dx + m12 * dy + m22 * dz;
-	const mox = m00 * ox + m01 * oy + m02 * oz;
-	const moy = m01 * ox + m11 * oy + m12 * oz;
-	const moz = m02 * ox + m12 * oy + m22 * oz;
+	_mDirection.copy( _ray.direction ).applyMatrix3( _covarianceMatrix );
+	_mOriginOffset.copy( _originOffset ).applyMatrix3( _covarianceMatrix );
 
-	const a = dx * mdx + dy * mdy + dz * mdz;
+	const a = _ray.direction.dot( _mDirection );
 
 	if ( a <= 0 ) {
 
@@ -564,8 +551,8 @@ function computeRayIntersection( positionAttribute, covarianceAttribute, colorAt
 
 	}
 
-	const b = 2 * ( ox * mdx + oy * mdy + oz * mdz );
-	const c = ox * mox + oy * moy + oz * moz - SPLAT_KERNEL_CUTOFF * SPLAT_KERNEL_CUTOFF;
+	const b = 2 * _originOffset.dot( _mDirection );
+	const c = _originOffset.dot( _mOriginOffset ) - SPLAT_KERNEL_CUTOFF * SPLAT_KERNEL_CUTOFF;
 	const discriminant = b * b - 4 * a * c;
 
 	if ( discriminant < 0 ) {
