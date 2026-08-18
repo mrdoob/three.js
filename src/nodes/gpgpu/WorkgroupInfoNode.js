@@ -209,6 +209,12 @@ class WorkgroupInfoNode extends Node {
 
 	generate( builder ) {
 
+		if ( builder.shaderStage !== 'compute' ) {
+
+			warn( 'WorkgroupInfoNode: workgroupArray() can only be executed within the compute shader stage' );
+
+		}
+
 		const name = ( this.name !== '' ) ? this.name : `${this.scope}Array_${this.id}`;
 
 		return builder.getScopedArray( name, this.scope.toLowerCase(), this.bufferType, this.bufferCount );
