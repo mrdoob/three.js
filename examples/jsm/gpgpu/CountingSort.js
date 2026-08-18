@@ -80,6 +80,10 @@ class CountingSort {
 		const histogramAttribute = new StorageBufferAttribute( new Uint32Array( binCount ), 1, Uint32Array );
 		const offsetAttribute = new StorageBufferAttribute( new Uint32Array( binCount ), 1, Uint32Array );
 
+		this._binAttribute = binAttribute;
+		this._histogramAttribute = histogramAttribute;
+		this._offsetAttribute = offsetAttribute;
+
 		/**
 		 * A read-only storage node for the sorted order buffer.
 		 *
@@ -263,6 +267,20 @@ class CountingSort {
 		this.orderRead.setPBO( true );
 
 		this._webGLBuffersEnabled = true;
+
+	}
+
+	/**
+	 * Frees the GPU buffers backing this counting sort. Call this when replacing a
+	 * {@link CountingSort} instance (e.g. because `count` changed) to avoid leaking
+	 * the previous instance's storage buffers.
+	 */
+	dispose() {
+
+		this.orderAttribute.dispose();
+		this._binAttribute.dispose();
+		this._histogramAttribute.dispose();
+		this._offsetAttribute.dispose();
 
 	}
 

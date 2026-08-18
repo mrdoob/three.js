@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - gaussian splatting group</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - gaussian splatting group">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_gaussian_splatting_group.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_gaussian_splatting_group.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			#info > small#license {
+				top: 45px;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Gaussian Splatting Group</span>
+			</div>
+
+			<small id="status">Cross-mesh sorted Gaussian splat rendering via GaussianSplatGroup, by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.</small>
+			<small id="license"></small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { SPZLoader } from 'three/addons/loaders/SPZLoader.js';
+			import { GaussianSplatMesh } from 'three/addons/objects/GaussianSplatMesh.js';
+			import { GaussianSplatGroup } from 'three/addons/objects/GaussianSplatGroup.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			let camera, scene, renderer, controls, clock, hitMarker;
+			let group, splatLion, splatTomatoes;
+			let mode = 'Grouped (correct blending)';
+			let rotateTomatoes = true;
+
+			THREE.ColorManagement.workingColorSpace = THREE.SRGBColorSpace;
+
+			const MODE_NAMES = [ 'Grouped (correct blending)', 'Independent (per-mesh sort)' ];
+			const TOMATOES_ROTATION_SPEED = 1.2; // radians/second
+
+			// hit testing is always on, independent of the grouped/independent toggle above,
+			// so it exercises GaussianSplatGroup.raycast() (which delegates to each child's
+			// own per-splat raycast) regardless of which rendering mode is active
+			const raycaster = new THREE.Raycaster();
+			const pointer = new THREE.Vector2();
+			const CLICK_DRAG_THRESHOLD = 4;
+			const HIT_MARKER_SIZE_RATIO = 1 / 50;
+			let pointerDownX = 0;
+			let pointerDownY = 0;
+
+			init();
+
+			async function init() {
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100 );
+				camera.position.set( 0, 0.35, 3.2 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x07080f );
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.minDistance = 1.2;
+				controls.maxDistance = 8;
+				controls.target.set( 0, 0, 0 );
+				controls.update();
+
+				clock = new THREE.Clock();
+
+				const gui = renderer.inspector.createParameters( 'Building' );
+				gui.add( { mode }, 'mode', MODE_NAMES ).name( 'Rendering' ).onChange( ( value ) => {
+
+					mode = value;
+
+				} );
+				gui.add( { rotateTomatoes }, 'rotateTomatoes' ).name( 'Rotate Tomatoes' ).onChange( ( value ) => {
+
+					rotateTomatoes = value;
+
+				} );
+
+				hitMarker = new THREE.Mesh(
+					new THREE.SphereGeometry( 1, 16, 12 ),
+					new THREE.MeshBasicMaterial( { color: 0xff0000, depthTest: false } )
+				);
+				hitMarker.visible = false;
+				scene.add( hitMarker );
+
+				renderer.domElement.addEventListener( 'pointerdown', onPointerDown );
+				renderer.domElement.addEventListener( 'click', onClick );
+
+				const loader = new SPZLoader();
+
+				const [ lionGeometry, tomatoesGeometry ] = await Promise.all( [
+					loader.loadAsync( './models/spz/lion.v3.spz' ),
+					loader.loadAsync( './models/spz/tomatoes.v4.spz' )
+				] );
+
+				// two independently loaded splat sets, deliberately overlapping so the
+				// grouped-vs-independent blending difference is visible where they intersect
+				splatLion = new GaussianSplatMesh( lionGeometry );
+				splatLion.rotation.set( Math.PI, 0, 0 );
+				splatLion.position.set( - 0.12, 0, 0 );
+
+				splatTomatoes = new GaussianSplatMesh( tomatoesGeometry );
+				splatTomatoes.position.set( 0.12, 0, 0.05 );
+				// the tomatoes SPZ scene is modeled roughly 10x larger than the lion scene
+				splatTomatoes.scale.setScalar( 0.06 );
+
+				group = new GaussianSplatGroup();
+				group.add( splatLion, splatTomatoes );
+				scene.add( group );
+
+				// populates the group's bounding sphere so the camera can be fit to it
+				group.update( renderer, camera );
+
+				fitCameraToGroup( group );
+				updateHitMarkerSize( group );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function fitCameraToGroup( group ) {
+
+				group.updateWorldMatrix( true, false );
+
+				const sphere = group.boundingSphere.clone().applyMatrix4( group.matrixWorld );
+				const radius = Math.max( sphere.radius, 0.01 );
+				const distance = radius / Math.sin( THREE.MathUtils.degToRad( camera.fov ) * 0.5 );
+
+				controls.minDistance = radius * 1.1;
+				controls.maxDistance = radius * 8;
+				controls.target.copy( sphere.center );
+				camera.position.set( 0, 0.15, 1 ).normalize().multiplyScalar( distance * 1.15 ).add( sphere.center );
+				camera.near = Math.max( distance / 1000, 0.001 );
+				camera.far = Math.max( distance * 10, 10 );
+
+				camera.updateProjectionMatrix();
+				controls.update();
+
+			}
+
+			function updateHitMarkerSize( group ) {
+
+				group.updateWorldMatrix( true, false );
+
+				const sphere = group.boundingSphere.clone().applyMatrix4( group.matrixWorld );
+				hitMarker.scale.setScalar( Math.max( sphere.radius * HIT_MARKER_SIZE_RATIO, 0.0001 ) );
+
+			}
+
+			function onPointerDown( event ) {
+
+				pointerDownX = event.clientX;
+				pointerDownY = event.clientY;
+
+			}
+
+			function onClick( event ) {
+
+				// ignore drags (camera orbiting), only treat this as a hit-test click
+				const dx = event.clientX - pointerDownX;
+				const dy = event.clientY - pointerDownY;
+
+				if ( Math.sqrt( dx * dx + dy * dy ) > CLICK_DRAG_THRESHOLD ) return;
+
+				pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+				raycaster.setFromCamera( pointer, camera );
+
+				// call GaussianSplatGroup.raycast() directly rather than through
+				// raycaster.intersectObject(), since that delegates to each child's own
+				// per-splat raycast regardless of the children's `visible` flag (which
+				// GaussianSplatGroup toggles for rendering purposes only) - this way hit
+				// testing works identically in both the grouped and independent modes.
+				const intersects = [];
+				group.raycast( raycaster, intersects );
+				intersects.sort( ( a, b ) => a.distance - b.distance );
+
+				const hit = intersects[ 0 ];
+
+				if ( hit ) {
+
+					hitMarker.position.copy( hit.point );
+					hitMarker.visible = true;
+
+				} else {
+
+					hitMarker.visible = false;
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				const delta = clock.getDelta();
+
+				controls.update();
+
+				if ( rotateTomatoes === true ) {
+
+					// continuously moves splatTomatoes's matrixWorld relative to the group,
+					// exercising GaussianSplatGroup's per-child transform-change detection
+					// and re-merge/re-sort path every frame instead of only on add/remove
+					splatTomatoes.rotation.y += delta * TOMATOES_ROTATION_SPEED;
+
+				}
+
+				if ( mode === 'Grouped (correct blending)' ) {
+
+					group.update( renderer, camera );
+
+				} else {
+
+					// GaussianSplatGroup.update() is what suppresses each child's own
+					// rendering, so skipping it and showing the children directly
+					// reproduces the interleaving artifact of two independently sorted
+					// meshes for comparison. Each mesh's own autoSort (default true)
+					// keeps it correctly sorted with itself, just not with the other mesh.
+					group.visible = false;
+					splatLion.visible = true;
+					splatTomatoes.visible = true;
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

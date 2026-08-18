@@ -1036,4 +1036,16 @@ function createMaterial( vertexNode, fragmentNode ) {
 
 }
 
-export { GaussianSplatMesh };
+export {
+	GaussianSplatMesh,
+	BIN_COUNT,
+	WORKGROUP_SIZE,
+	SORT_DIRECTION_THRESHOLD,
+	SPLAT_KERNEL_CUTOFF,
+	createGeometry,
+	createMaterial,
+	createMaterialNodes,
+	createSphericalHarmonicsComputeNode,
+	enableWebGLBuffers,
+	ensureSphericalHarmonicsContributionBuffer
+};
