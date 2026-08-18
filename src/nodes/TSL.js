@@ -134,7 +134,8 @@ export * from './geometry/RangeNode.js';
 export * from './gpgpu/ComputeNode.js';
 export * from './gpgpu/ComputeBuiltinNode.js';
 export * from './gpgpu/BarrierNode.js';
-export * from './gpgpu/WorkgroupInfoNode.js';
+export * from './gpgpu/ScopedVariableNode.js';
+export * from './gpgpu/ScopedArrayNode.js';
 export * from './gpgpu/AtomicFunctionNode.js';
 export * from './gpgpu/SubgroupFunctionNode.js';
 

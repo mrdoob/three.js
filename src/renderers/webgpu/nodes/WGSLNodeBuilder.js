@@ -338,11 +338,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		/**
 		 * A map for managing variables scoped to specific address spaces.
-		 * Only relevant for when using {@link WorkgroupInfoNode} in context of compute shaders.
+		 * Only relevant for when using {@link ScopedVariableNode} in context of compute shaders.
 		 *
 		 * @type {Map<string,Object>}
 		 */
-		this.scoppedVariables = new Map();
+		this.scopedVariables = new Map();
 
 		/**
 		 * A flag that indicates that early returns are allowed.
