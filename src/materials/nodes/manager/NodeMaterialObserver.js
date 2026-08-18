@@ -744,7 +744,12 @@ class NodeMaterialObserver {
 
 			for ( let i = 0; i < lightsData.length; i ++ ) {
 
-				if ( renderObjectData.lights[ i ].map !== lightsData[ i ].map ) {
+				const lightData = renderObjectData.lights[ i ];
+
+				if ( lightData.map !== lightsData[ i ].map || lightData.cacheVersion !== lightsData[ i ].cacheVersion ) {
+
+					lightData.map = lightsData[ i ].map;
+					lightData.cacheVersion = lightsData[ i ].cacheVersion;
 
 					return false;
 
@@ -814,7 +819,7 @@ class NodeMaterialObserver {
 
 				// only add lights that have a map
 
-				lights.push( { map: light.map.version } );
+				lights.push( { map: light.map.version, cacheVersion: this.getTextureData( light.map )._version } );
 
 			}
 
