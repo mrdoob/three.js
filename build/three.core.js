@@ -10629,8 +10629,6 @@ class Matrix4 {
 	/**
 	 * Computes and returns the determinant of this matrix.
 	 *
-	 * Based on the method outlined [here](http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.html).
-	 *
 	 * @return {number} The determinant.
 	 */
 	determinant() {
@@ -10946,16 +10944,11 @@ class Matrix4 {
 	 * Sets this matrix as a rotational transformation around the given axis by
 	 * the given angle.
 	 *
-	 * This is a somewhat controversial but mathematically sound alternative to
-	 * rotating via Quaternions. See the discussion [here](https://www.gamedev.net/articles/programming/math-and-physics/do-we-really-need-quaternions-r1199).
-	 *
 	 * @param {Vector3} axis - The normalized rotation axis.
 	 * @param {number} angle - The rotation in radians.
 	 * @return {Matrix4} A reference to this matrix.
 	 */
 	makeRotationAxis( axis, angle ) {
-
-		// Based on http://www.gamedev.net/reference/articles/article1199.asp
 
 		const c = Math.cos( angle );
 		const s = Math.sin( angle );
@@ -15468,8 +15461,6 @@ class Triangle {
 	 * @return {?Vector3} The barycentric coordinates for the given point
 	 */
 	static getBarycoord( point, a, b, c, target ) {
-
-		// based on: http://www.blackpawn.com/texts/pointinpoly/default.html
 
 		_v0$2.subVectors( c, a );
 		_v1$5.subVectors( b, a );
@@ -20686,7 +20677,7 @@ const _normalMatrix = /*@__PURE__*/ new Matrix3();
 
 /**
  * A two dimensional surface that extends infinitely in 3D space, represented
- * in [Hessian normal form](http://mathworld.wolfram.com/HessianNormalForm.html)
+ * in [Hessian normal form](https://mathworld.wolfram.com/HessianNormalForm.html)
  * by a unit length normal vector and a constant.
  */
 class Plane {
