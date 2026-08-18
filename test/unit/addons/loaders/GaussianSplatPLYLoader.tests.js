@@ -1,6 +1,6 @@
 import { BufferGeometry } from 'three';
 
-import { PLYGaussianSplatLoader } from '../../../../examples/jsm/loaders/PLYGaussianSplatLoader.js';
+import { GaussianSplatPLYLoader } from '../../../../examples/jsm/loaders/GaussianSplatPLYLoader.js';
 import { unpackSphericalHarmonicsBand } from '../utils/GaussianSplatTestUtils.js';
 
 const EPS = 1e-6;
@@ -65,11 +65,11 @@ export default QUnit.module( 'Addons', () => {
 
 	QUnit.module( 'Loaders', () => {
 
-		QUnit.module( 'PLYGaussianSplatLoader', () => {
+		QUnit.module( 'GaussianSplatPLYLoader', () => {
 
 			QUnit.test( 'parses a Gaussian splat PLY with no spherical harmonics', ( assert ) => {
 
-				const loader = new PLYGaussianSplatLoader();
+				const loader = new GaussianSplatPLYLoader();
 				const data = loader.parse( createGaussianSplatPLY() );
 				const covariances = data.getAttribute( 'covariance' ).array;
 
@@ -84,7 +84,7 @@ export default QUnit.module( 'Addons', () => {
 
 			QUnit.test( 'detects spherical harmonics degree from the header and converts f_rest', ( assert ) => {
 
-				const loader = new PLYGaussianSplatLoader();
+				const loader = new GaussianSplatPLYLoader();
 				const data = loader.parse( createGaussianSplatPLY( 9 ) );
 
 				assert.deepEqual(
@@ -97,7 +97,7 @@ export default QUnit.module( 'Addons', () => {
 
 			QUnit.test( 'requires no pre-setup for each supported spherical harmonics degree', ( assert ) => {
 
-				const loader = new PLYGaussianSplatLoader();
+				const loader = new GaussianSplatPLYLoader();
 
 				for ( const [ degree, count ] of [[ 0, 0 ], [ 1, 9 ], [ 2, 24 ], [ 3, 45 ]] ) {
 
@@ -110,7 +110,7 @@ export default QUnit.module( 'Addons', () => {
 
 			QUnit.test( 'rejects an unsupported number of f_rest coefficients', ( assert ) => {
 
-				const loader = new PLYGaussianSplatLoader();
+				const loader = new GaussianSplatPLYLoader();
 
 				assert.throws(
 					() => loader.parse( createGaussianSplatPLY( 5 ) ),
@@ -133,7 +133,7 @@ export default QUnit.module( 'Addons', () => {
 					'1 2 3'
 				].join( '\n' );
 
-				const loader = new PLYGaussianSplatLoader();
+				const loader = new GaussianSplatPLYLoader();
 
 				assert.throws(
 					() => loader.parse( ply ),

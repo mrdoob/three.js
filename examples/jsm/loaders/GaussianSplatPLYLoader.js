@@ -54,15 +54,15 @@ const _restPropertyPattern = /^f_rest_\d+$/;
  * Gaussian splat geometry.
  *
  * ```js
- * const loader = new PLYGaussianSplatLoader();
+ * const loader = new GaussianSplatPLYLoader();
  * const geometry = await loader.loadAsync( './models/gsplat/point_cloud.ply' );
  * scene.add( new GaussianSplatMesh( geometry ) );
  * ```
  *
  * @augments Loader
- * @three_import import { PLYGaussianSplatLoader } from 'three/addons/loaders/PLYGaussianSplatLoader.js';
+ * @three_import import { GaussianSplatPLYLoader } from 'three/addons/loaders/GaussianSplatPLYLoader.js';
  */
-class PLYGaussianSplatLoader extends Loader {
+class GaussianSplatPLYLoader extends Loader {
 
 	/**
 	 * Constructs a new Gaussian splat PLY loader.
@@ -154,7 +154,7 @@ function detectSphericalHarmonicsDegree( data ) {
 
 	if ( headerMatch === null ) {
 
-		throw new Error( 'THREE.PLYGaussianSplatLoader: Missing PLY header.' );
+		throw new Error( 'THREE.GaussianSplatPLYLoader: Missing PLY header.' );
 
 	}
 
@@ -175,7 +175,7 @@ function detectSphericalHarmonicsDegree( data ) {
 
 	if ( REQUIRED_PLY_PROPERTIES.some( name => ! propertyNames.has( name ) ) ) {
 
-		throw new Error( 'THREE.PLYGaussianSplatLoader: PLY file requires position, scale, rotation, f_dc and opacity properties.' );
+		throw new Error( 'THREE.GaussianSplatPLYLoader: PLY file requires position, scale, rotation, f_dc and opacity properties.' );
 
 	}
 
@@ -183,7 +183,7 @@ function detectSphericalHarmonicsDegree( data ) {
 
 	if ( degree === - 1 ) {
 
-		throw new Error( `THREE.PLYGaussianSplatLoader: Unsupported number of f_rest spherical harmonics coefficients (${ restComponentCount }).` );
+		throw new Error( `THREE.GaussianSplatPLYLoader: Unsupported number of f_rest spherical harmonics coefficients (${ restComponentCount }).` );
 
 	}
 
@@ -267,7 +267,7 @@ function convertPLYGeometry( geometry ) {
 
 	if ( position === undefined || scale === undefined || rotation === undefined || sh0 === undefined || opacity === undefined ) {
 
-		throw new Error( 'THREE.PLYGaussianSplatLoader: PLY file requires position, scale, rotation, f_dc and opacity properties.' );
+		throw new Error( 'THREE.GaussianSplatPLYLoader: PLY file requires position, scale, rotation, f_dc and opacity properties.' );
 
 	}
 
@@ -275,13 +275,13 @@ function convertPLYGeometry( geometry ) {
 
 	if ( position.itemSize !== 3 || scale.itemSize !== 3 || rotation.itemSize !== 4 || sh0.itemSize !== 3 || opacity.itemSize !== 1 ) {
 
-		throw new Error( 'THREE.PLYGaussianSplatLoader: Invalid Gaussian splat PLY property itemSize.' );
+		throw new Error( 'THREE.GaussianSplatPLYLoader: Invalid Gaussian splat PLY property itemSize.' );
 
 	}
 
 	if ( scale.count !== count || rotation.count !== count || sh0.count !== count || opacity.count !== count ) {
 
-		throw new Error( 'THREE.PLYGaussianSplatLoader: Gaussian splat PLY property counts must match position.' );
+		throw new Error( 'THREE.GaussianSplatPLYLoader: Gaussian splat PLY property counts must match position.' );
 
 	}
 
@@ -347,7 +347,7 @@ function getRestSphericalHarmonicsDegree( shRest ) {
 
 	if ( degree === - 1 ) {
 
-		throw new Error( 'THREE.PLYGaussianSplatLoader: Unsupported number of f_rest spherical harmonics coefficients.' );
+		throw new Error( 'THREE.GaussianSplatPLYLoader: Unsupported number of f_rest spherical harmonics coefficients.' );
 
 	}
 
@@ -383,4 +383,4 @@ function writeSphericalHarmonicsFromRest( sphericalHarmonicsBytes, index, shRest
 
 }
 
-export { PLYGaussianSplatLoader };
+export { GaussianSplatPLYLoader };
