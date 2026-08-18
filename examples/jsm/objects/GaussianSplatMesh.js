@@ -490,21 +490,19 @@ class GaussianSplatMesh extends Mesh {
 // quadratic in t whose smaller root is the near surface.
 function computeRayIntersection( positionAttribute, covarianceAttribute, colorAttribute, index, matrixWorld, raycaster, intersects, object ) {
 
-	// skip faint splats
+	// skip faint splats - cheapest possible rejection, a single attribute read
 	if ( colorAttribute.getW( index ) < MIN_RAYCAST_OPACITY ) {
 
 		return;
 
 	}
 
-	// the attribute holds the upper triangle of the symmetric covariance
+	// the diagonal of the covariance bounds the splat's drawn extent (same radius used by
+	// computeBoundingBox/computeBoundingSphere); reject rays that don't pass near the splat
+	// at all before doing any of the more expensive matrix work below
 	const c00 = covarianceAttribute.getComponent( index, 0 );
-	const c01 = covarianceAttribute.getComponent( index, 1 );
-	const c02 = covarianceAttribute.getComponent( index, 2 );
 	const c11 = covarianceAttribute.getComponent( index, 3 );
-	const c12 = covarianceAttribute.getComponent( index, 4 );
 	const c22 = covarianceAttribute.getComponent( index, 5 );
-
 	const maxVariance = Math.max( c00, c11, c22 );
 
 	if ( maxVariance <= 0 ) {
@@ -512,6 +510,20 @@ function computeRayIntersection( positionAttribute, covarianceAttribute, colorAt
 		return;
 
 	}
+
+	const center = _vector.fromBufferAttribute( positionAttribute, index );
+	const boundingRadius = SPLAT_KERNEL_CUTOFF * Math.sqrt( maxVariance );
+
+	if ( _ray.distanceSqToPoint( center ) > boundingRadius * boundingRadius ) {
+
+		return;
+
+	}
+
+	// the attribute holds the upper triangle of the symmetric covariance
+	const c01 = covarianceAttribute.getComponent( index, 1 );
+	const c02 = covarianceAttribute.getComponent( index, 2 );
+	const c12 = covarianceAttribute.getComponent( index, 4 );
 
 	// splats are often flat enough to make the covariance singular, so the thinnest axis is floored
 	// relative to the widest to keep the quadratic solvable
@@ -545,10 +557,8 @@ function computeRayIntersection( positionAttribute, covarianceAttribute, colorAt
 
 	}
 
-	const center = _vector.fromBufferAttribute( positionAttribute, index );
 	_originOffset.copy( _ray.origin ).sub( center );
 	_mOriginOffset.copy( _originOffset ).applyMatrix3( _covarianceMatrix );
-
 
 	const b = 2 * _originOffset.dot( _mDirection );
 	const c = _originOffset.dot( _mOriginOffset ) - SPLAT_KERNEL_CUTOFF * SPLAT_KERNEL_CUTOFF;
