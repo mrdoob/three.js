@@ -380,7 +380,7 @@ class GaussianSplatMesh extends Mesh {
 
 		for ( let i = 0; i < count; i ++ ) {
 
-			testSplat( positionAttribute, covarianceAttribute, colorAttribute, i, matrixWorld, raycaster, intersects, this );
+			computeRayIntersection( positionAttribute, covarianceAttribute, colorAttribute, i, matrixWorld, raycaster, intersects, this );
 
 		}
 
@@ -483,7 +483,7 @@ class GaussianSplatMesh extends Mesh {
 
 // Intersects the ray with the ellipsoid the splat's covariance describes, which reduces to a
 // quadratic in t whose smaller root is the near surface.
-function testSplat( positionAttribute, covarianceAttribute, colorAttribute, index, matrixWorld, raycaster, intersects, object ) {
+function computeRayIntersection( positionAttribute, covarianceAttribute, colorAttribute, index, matrixWorld, raycaster, intersects, object ) {
 
 	// skip faint splats
 	if ( colorAttribute.getW( index ) < MIN_RAYCAST_OPACITY ) {
