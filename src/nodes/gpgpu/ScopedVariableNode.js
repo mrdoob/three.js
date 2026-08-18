@@ -79,8 +79,7 @@ class ScopedVariableNode extends Node {
 	}
 
 	/**
-	 * Returns the name the variable is declared with in the shader. Falls back to
-	 * a generated, unique name when no explicit name was assigned.
+	 * Returns the name the variable is declared with, or falls back to a generated name.
 	 *
 	 * @return {string} The name of the scoped variable.
 	 */
@@ -131,14 +130,3 @@ export const workgroupVariable = ( type ) => new ScopedVariableNode( 'workgroup'
  * @returns {ScopedVariableNode}
  */
 export const privateVariable = ( type ) => new ScopedVariableNode( 'private', type );
-
-/**
- * TSL function for creating a scoped variable node.
- * Creates a new 'function' scoped variable.
- *
- * @tsl
- * @function
- * @param {string} type - The data type of the variable.
- * @returns {ScopedVariableNode}
- */
-export const functionVariable = ( type ) => new ScopedVariableNode( 'function', type );

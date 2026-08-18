@@ -134,15 +134,3 @@ export const workgroupArray = ( type, count ) => new ScopedArrayNode( 'workgroup
  * @returns {ScopedArrayNode}
  */
 export const privateArray = ( type, count ) => new ScopedArrayNode( 'private', type, count );
-
-/**
- * TSL function for creating a scoped array node.
- * Creates a new 'function' scoped array buffer.
- *
- * @tsl
- * @function
- * @param {string} type - The data type of a 'workgroup' scoped buffer element.
- * @param {number} [count] - The number of elements in the buffer.
- * @returns {ScopedArrayNode}
- */
-export const functionArray = ( type, count ) => new ScopedArrayNode( 'function', type, count );

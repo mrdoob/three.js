@@ -1,7 +1,7 @@
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 
 /**
- * Represents an element of a scoped array, e.g. a `workgroup` scoped buffer.
+ * Represents an element of a scoped array.
  *
  * @augments ArrayElementNode
  */
@@ -39,8 +39,6 @@ class ScopedArrayElementNode extends ArrayElementNode {
 			snippet = builder.format( snippet, type, output );
 
 		}
-
-		// TODO: Possibly activate clip distance index on index access rather than from clipping context
 
 		return snippet;
 
