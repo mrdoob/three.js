@@ -16455,10 +16455,6 @@ class WebGLRenderer {
 
 		} catch ( e ) {
 
-			canvas.removeEventListener( 'webglcontextlost', onContextLost, false );
-			canvas.removeEventListener( 'webglcontextrestored', onContextRestore, false );
-			canvas.removeEventListener( 'webglcontextcreationerror', onContextCreationError, false );
-
 			error( 'WebGLRenderer: ' + e.message );
 			throw e;
 
@@ -16593,20 +16589,7 @@ class WebGLRenderer {
 
 		}
 
-		try {
-
-			initGLContext();
-
-		} catch ( e ) {
-
-			canvas.removeEventListener( 'webglcontextlost', onContextLost, false );
-			canvas.removeEventListener( 'webglcontextrestored', onContextRestore, false );
-			canvas.removeEventListener( 'webglcontextcreationerror', onContextCreationError, false );
-
-			error( 'WebGLRenderer: ' + e.message );
-			throw e;
-
-		}
+		initGLContext();
 
 		// initialize internal render target for non-UnsignedByteType color buffer
 
