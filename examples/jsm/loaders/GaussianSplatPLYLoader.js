@@ -24,10 +24,11 @@ const GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING = {
 	opacity: [ 'opacity' ]
 };
 
-// Property names a Gaussian splat PLY must declare in its header. Checked
-// up front against the header text rather than the parsed geometry, since
-// PLYLoader still creates a (garbage-filled) attribute for a custom property
-// name that's missing from the file instead of omitting it.
+// Property names a Gaussian splat PLY must declare in its header. This is
+// checked against the header text before the file is parsed, because
+// PLYLoader creates a (garbage-filled) attribute for a custom property name
+// that's missing from the file rather than omitting it, so a missing
+// property can't be detected from the parsed geometry.
 const REQUIRED_PLY_PROPERTIES = [
 	'x', 'y', 'z',
 	...GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING.scale,

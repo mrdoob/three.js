@@ -51,9 +51,7 @@ const _vector = /*@__PURE__*/ new Vector3();
  * This class always draws exactly one self-contained splat cloud, sorted against
  * itself only. To draw many splat clouds - each independently positioned - alpha-blended
  * correctly against *each other*, use {@link GaussianSplatGroup} instead, which merges
- * many raw splat `BufferGeometry`s into one shared, globally sorted buffer set. The two
- * classes are independent: `GaussianSplatGroup` does not wrap or otherwise depend on
- * `GaussianSplatMesh`.
+ * many raw splat `BufferGeometry`s into one shared, globally sorted buffer set.
  *
  * @augments Mesh
  * @three_import import { GaussianSplatMesh } from 'three/addons/objects/GaussianSplatMesh.js';
@@ -239,8 +237,8 @@ class GaussianSplatMesh extends Mesh {
 	/**
 	 * Computes the bounding box of the splats, updating {@link GaussianSplatMesh#boundingBox}.
 	 *
-	 * Each splat is expanded by its own extent rather than treated as a point, so the bounds cover
-	 * what is drawn.
+	 * Each splat is expanded by its own extent, not just its center point, so the bounds
+	 * cover what is drawn.
 	 */
 	computeBoundingBox() {
 
@@ -275,8 +273,8 @@ class GaussianSplatMesh extends Mesh {
 	/**
 	 * Computes the bounding sphere of the splats, updating {@link GaussianSplatMesh#boundingSphere}.
 	 *
-	 * Each splat is expanded by its own extent rather than treated as a point, so the bounds cover
-	 * what is drawn.
+	 * Each splat is expanded by its own extent, not just its center point, so the bounds
+	 * cover what is drawn.
 	 */
 	computeBoundingSphere() {
 

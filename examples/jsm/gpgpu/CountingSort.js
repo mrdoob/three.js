@@ -326,8 +326,8 @@ class CountingSort {
 	}
 
 	/**
-	 * Frees the GPU buffers backing this counting sort. Assign {@link CountingSort#count}
-	 * rather than replacing the instance when the number of elements to sort changes.
+	 * Frees the GPU buffers backing this counting sort. To change the number of elements
+	 * to sort, assign {@link CountingSort#count}; there is no need to construct a new instance.
 	 */
 	dispose() {
 

@@ -45,8 +45,7 @@ const _ray = /*@__PURE__*/ new Ray();
  * globally correct back-to-front order across clouds.
  *
  * `GaussianSplatGroup` owns its splat data directly - the same model {@link BatchedMesh}
- * uses for merging many geometries into one draw call - rather than wrapping independent
- * scene-graph children:
+ * uses for merging many geometries into one draw call:
  *
  * ```js
  * const group = new GaussianSplatGroup();
@@ -61,48 +60,23 @@ const _ray = /*@__PURE__*/ new Ray();
  * renderer.render( scene, camera );
  * ```
  *
- * Unlike an earlier design that added independent {@link GaussianSplatMesh} instances as
- * scene-graph children, `GaussianSplatGroup` does not import or otherwise depend on
- * `GaussianSplatMesh` at all - it takes a raw `BufferGeometry` per splat cloud via
- * {@link GaussianSplatGroup#addSplat}. This means all of the group's work (merging changed
- * instances into the shared buffers, sorting, toggling visibility) happens inside its own
- * `onBeforeRender`, exactly like any other `Mesh` - there is no separate `update()` call to
- * remember to make before `renderer.render()`, and no race between a child's visibility and
- * the renderer's render-list construction, because there are no scene-graph children.
+ * `GaussianSplatGroup` does not wrap independent scene-graph children - it takes a raw
+ * `BufferGeometry` per splat cloud via {@link GaussianSplatGroup#addSplat}. All of the
+ * group's work (merging, sorting, toggling visibility) happens automatically inside its own
+ * `onBeforeRender`, so there is no separate `update()` method to call before
+ * `renderer.render()`.
  *
- * `setMatrixAt` marks only the affected splat range dirty for re-merging - moving one splat
- * cloud does not re-merge any other cloud. `addSplat`/`deleteSplat`/`setVisibleAt` change
- * which ranges are packed into the shared buffers at all, so they trigger a full layout
- * rebuild (every included splat cloud re-merges) the next time the group renders.
+ * `setMatrixAt` only re-merges the moved splat cloud. `addSplat`, `deleteSplat` and
+ * `setVisibleAt` change which ranges are packed into the shared buffers, so they trigger a
+ * full rebuild (every included splat cloud re-merges) on the next render.
  *
- * The practical ceiling on total live splats across all added geometries is set by the
- * `maxStorageBufferBindingSize` WebGPU limit, not by compute dispatch limits (three.js
- * auto-folds large dispatches into a 2D `dispatchWorkgroups` call, see
- * `WebGPUBackend.computeGroupCount`) or by raw VRAM. The group's largest buffers
- * (`center`, `covarianceA`, `covarianceB`) are 16 bytes/splat each, one binding apiece.
- * Per web3dsurvey.com WebGPU limit data: 100% of surveyed devices support at least a
- * 128 MB binding (~8.4M splats), 97% support 256 MB (~16.8M splats), and 90% support
- * ~1 GB (~67M splats). Design/test against roughly 8-16M total live splats as the
- * "works on effectively all WebGPU hardware" target.
+ * The practical ceiling on total live splats is set by the `maxStorageBufferBindingSize`
+ * WebGPU limit; design/test against roughly 8-16M total live splats as a target that works
+ * on effectively all WebGPU hardware.
  *
- * The compute kernels that merge splats into the shared buffers (see
- * `createMergeKernelSet()`) and the merged {@link CountingSort} are both built once, in
- * the constructor, and reused for the group's entire lifetime. Per-splat data (source
- * buffers, destination offset, relative transform) is passed in via uniforms and
- * swappable storage node `.value`s rather than baked into the kernel, and the sort's
- * `count` is simply reassigned rather than the sort being replaced, so adding/removing
- * splats or resizing the shared buffers (`resizeGroupBufferState()`) never recompiles a
- * pipeline - only spherical harmonics needs more than one merge kernel variant, since its
- * shading math branches on SH degree at shader-build time; `getOrCreateSHKernel()`
- * compiles one kernel per distinct degree encountered (at most 4) and caches it.
- *
- * This class requires {@link WebGPURenderer} with real WebGPU compute support. The
- * `forceWebGL` (WebGL2) backend is not yet supported - `onBeforeRender` throws rather
- * than silently drawing nothing or drawing an incorrectly ordered result. A future
- * WebGL2 fallback would draw each splat cloud with its own draw call, sorted coarsely
- * against the others by bounding-sphere centroid depth (no cross-cloud per-splat sort,
- * unlike the WebGPU path) - until then, use independent {@link GaussianSplatMesh}
- * instances on WebGL2.
+ * This class requires {@link WebGPURenderer} with real WebGPU compute support - the
+ * `forceWebGL` (WebGL2) backend is not yet supported, and `onBeforeRender` throws if used
+ * with it. Use independent {@link GaussianSplatMesh} instances on WebGL2 instead.
  *
  * @augments Mesh
  * @three_import import { GaussianSplatGroup } from 'three/addons/objects/GaussianSplatGroup.js';
@@ -120,10 +94,10 @@ class GaussianSplatGroup extends Mesh {
 
 		const geometry = createGeometry( 0 );
 
-		// Built with real (if empty) buffers/sort rather than null nodes, so the group is
-		// safe to compile and draw - 0 instances, nothing visible - from construction. This
-		// is what lets `visible` stay a normal, user-owned Object3D property instead of
-		// something this class has to flip on/off internally (see `onBeforeRender`).
+		// Built with real (if empty) buffers/sort, so the group is safe to compile and draw -
+		// 0 instances, nothing visible - from construction. This is what lets `visible` stay
+		// a normal, user-owned Object3D property, with no internal flipping on/off needed
+		// (see `onBeforeRender`).
 		const buffers = createGroupBufferState();
 		const localCameraPosition = uniform( new Vector3() );
 		const sort = new CountingSort( 0, { binCount, workgroupSize } );
@@ -633,7 +607,7 @@ class GaussianSplatGroup extends Mesh {
 
 	// SH coefficients are authored relative to each splat cloud's own unrotated local axes,
 	// so contribution is computed per instance, against that instance's own local buffers
-	// and local camera position, rather than once for the merged (rotated) group.
+	// and local camera position.
 	_updateSphericalHarmonics( renderer, camera ) {
 
 		if ( this._maxSphericalHarmonicsDegree === 0 ) return;
