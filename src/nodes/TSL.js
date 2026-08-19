@@ -49,7 +49,6 @@ export * from './utils/RTTNode.js';
 export * from './utils/PostProcessingUtils.js';
 export * from './utils/SampleNode.js';
 export * from './utils/EventNode.js';
-export * from './utils/CubeMapNode.js';
 export * from './utils/StorageArrayElementNode.js';
 
 // three.js shading language
@@ -145,13 +144,12 @@ export * from './lighting/LightsNode.js';
 export * from './lighting/LightingContextNode.js';
 export * from './lighting/ShadowBaseNode.js';
 export * from './lighting/ShadowNode.js';
-export * from './lighting/ShadowFilterNode.js';
+export { BasicShadowFilter, PCFShadowFilter, VSMShadowFilter, getShadowMaterial } from './lighting/ShadowFilterNode.js';
 export * from './lighting/PointShadowNode.js';
 export * from './lighting/PointLightNode.js';
 
 // pmrem
 export * from './pmrem/PMREMNode.js';
-export * from './pmrem/PMREMUtils.js';
 
 // procedural
 export * from './procedural/Checker.js';
@@ -171,14 +169,12 @@ export { default as D_GGX_Anisotropic } from './functions/BSDF/D_GGX_Anisotropic
 export { default as DFGLUT } from './functions/BSDF/DFGLUT.js';
 export { default as EnvironmentBRDF } from './functions/BSDF/EnvironmentBRDF.js';
 export { default as F_Schlick } from './functions/BSDF/F_Schlick.js';
-export * from './functions/BSDF/LTC.js';
 export { default as Schlick_to_F0 } from './functions/BSDF/Schlick_to_F0.js';
 export { default as V_GGX_SmithCorrelated } from './functions/BSDF/V_GGX_SmithCorrelated.js';
 export { default as V_GGX_SmithCorrelated_Anisotropic } from './functions/BSDF/V_GGX_SmithCorrelated_Anisotropic.js';
 
 export * from './lighting/LightUtils.js';
 
-export { default as getAlphaHashThreshold } from './functions/material/getAlphaHashThreshold.js';
 export { default as getGeometryRoughness } from './functions/material/getGeometryRoughness.js';
 export { default as getParallaxCorrectNormal } from './functions/material/getParallaxCorrectNormal.js';
 export { default as getRoughness } from './functions/material/getRoughness.js';
