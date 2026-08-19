@@ -287,7 +287,7 @@ class GaussianSplatMesh extends Mesh {
 		if ( this.boundingSphere === null ) this.boundingSphere = new Sphere();
 
 		this.computeBoundingBox();
-		this.boundingBox.getBoundingSphere( this.boundingSphere );
+		this.boundingBox.getCenter( this.boundingSphere.center );
 
 		const positionAttribute = this.splatGeometry.getAttribute( 'position' );
 		const covarianceAttribute = this.splatGeometry.getAttribute( 'covariance' );
