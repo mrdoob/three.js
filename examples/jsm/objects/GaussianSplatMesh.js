@@ -15,7 +15,6 @@ import { getSphericalHarmonicsDegree } from '../utils/GaussianSplatUtils.js';
 import {
 	BIN_COUNT,
 	WORKGROUP_SIZE,
-	SORT_DIRECTION_THRESHOLD,
 	SPLAT_KERNEL_CUTOFF,
 	createGeometry,
 	createMaterial,
@@ -24,16 +23,13 @@ import {
 	createStorageBuffers,
 	computeRayIntersection,
 	enableWebGLBuffers,
-	ensureSphericalHarmonicsContributionBuffer
+	ensureSphericalHarmonicsContributionBuffer,
+	needsSort,
+	updateLastSortDirection,
+	updateSortDepthRange
 } from '../utils/GaussianSplatShadingUtils.js';
 
-const _worldCenter = /*@__PURE__*/ new Vector3();
-const _viewCenter = /*@__PURE__*/ new Vector3();
-const _worldScale = /*@__PURE__*/ new Vector3();
-const _sortDirection = /*@__PURE__*/ new Vector3();
-const _sortDepthRange = /*@__PURE__*/ new Vector2();
 const _worldMatrixInverse = /*@__PURE__*/ new Matrix4();
-const _modelViewMatrix = /*@__PURE__*/ new Matrix4();
 const _inverseMatrix = /*@__PURE__*/ new Matrix4();
 const _ray = /*@__PURE__*/ new Ray();
 const _sphere = /*@__PURE__*/ new Sphere();
@@ -374,9 +370,9 @@ class GaussianSplatMesh extends Mesh {
 
 		this.updateWorldMatrix( true, false );
 
-		const needsSort = this._needsSort( camera );
+		const needsResort = this._needsSort( camera );
 
-		if ( this._sortInitialized === false || needsSort === true ) {
+		if ( this._sortInitialized === false || needsResort === true ) {
 
 			this._updateSortUniforms( camera );
 
@@ -393,7 +389,7 @@ class GaussianSplatMesh extends Mesh {
 			}
 
 			this._sortInitialized = true;
-			this._lastSortDirection.copy( _sortDirection );
+			updateLastSortDirection( this._lastSortDirection );
 
 			return true;
 
@@ -405,12 +401,7 @@ class GaussianSplatMesh extends Mesh {
 
 	_needsSort( camera ) {
 
-		_modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, this.matrixWorld );
-
-		const e = _modelViewMatrix.elements;
-		_sortDirection.set( e[ 2 ], e[ 6 ], e[ 10 ] ).normalize();
-
-		return _sortDirection.dot( this._lastSortDirection ) < SORT_DIRECTION_THRESHOLD;
+		return needsSort( camera, this.matrixWorld, this._lastSortDirection );
 
 	}
 
@@ -420,18 +411,7 @@ class GaussianSplatMesh extends Mesh {
 
 		if ( this.boundingSphere === null ) this.computeBoundingSphere();
 
-		_worldCenter.copy( this.boundingSphere.center ).applyMatrix4( this.matrixWorld );
-		_viewCenter.copy( _worldCenter ).applyMatrix4( camera.matrixWorldInverse );
-
-		_worldScale.setFromMatrixScale( this.matrixWorld );
-
-		const radius = this.boundingSphere.radius * Math.max( _worldScale.x, _worldScale.y, _worldScale.z );
-		const depth = - _viewCenter.z;
-		const nearDepth = Math.max( camera.near, depth - radius );
-		const farDepth = Math.max( nearDepth + 0.0001, depth + radius );
-
-		_sortDepthRange.set( nearDepth, farDepth );
-		this._sortDepthRange.value.copy( _sortDepthRange );
+		updateSortDepthRange( camera, this.matrixWorld, this.boundingSphere, this._sortDepthRange.value );
 
 	}
 

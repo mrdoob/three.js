@@ -2,6 +2,7 @@ import {
 	BufferAttribute,
 	InstancedBufferGeometry,
 	Matrix3,
+	Matrix4,
 	NodeMaterial,
 	StorageBufferAttribute,
 	Vector3
@@ -61,6 +62,72 @@ const _covarianceMatrix = /*@__PURE__*/ new Matrix3();
 const _originOffset = /*@__PURE__*/ new Vector3();
 const _mDirection = /*@__PURE__*/ new Vector3();
 const _mOriginOffset = /*@__PURE__*/ new Vector3();
+
+const _modelViewMatrix = /*@__PURE__*/ new Matrix4();
+const _sortDirection = /*@__PURE__*/ new Vector3();
+const _worldCenter = /*@__PURE__*/ new Vector3();
+const _viewCenter = /*@__PURE__*/ new Vector3();
+const _worldScale = /*@__PURE__*/ new Vector3();
+
+/**
+ * Whether the camera has rotated relative to `worldMatrix` enough, since
+ * `lastSortDirection`, to warrant a new sort. Shared by {@link GaussianSplatMesh}
+ * and {@link GaussianSplatGroup}, whose sort scheduling is otherwise identical.
+ *
+ * @param {Camera} camera - The camera used for rendering.
+ * @param {Matrix4} worldMatrix - The world matrix of the splat cloud or group.
+ * @param {Vector3} lastSortDirection - The view direction as of the last sort.
+ * @return {boolean} Whether a new sort is needed.
+ */
+function needsSort( camera, worldMatrix, lastSortDirection ) {
+
+	_modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, worldMatrix );
+
+	const e = _modelViewMatrix.elements;
+	_sortDirection.set( e[ 2 ], e[ 6 ], e[ 10 ] ).normalize();
+
+	return _sortDirection.dot( lastSortDirection ) < SORT_DIRECTION_THRESHOLD;
+
+}
+
+/**
+ * Records the view direction used for the sort just dispatched, so the next
+ * {@link needsSort} call can measure how far the camera has turned since.
+ * Must be called only after a {@link needsSort} call for the same frame.
+ *
+ * @param {Vector3} lastSortDirection - Updated in place to the current sort direction.
+ */
+function updateLastSortDirection( lastSortDirection ) {
+
+	lastSortDirection.copy( _sortDirection );
+
+}
+
+/**
+ * Recomputes the near/far depth range - in view space, along the sort direction -
+ * spanned by a splat cloud's bounding sphere, and writes it into a `vec2` sort
+ * uniform value as `( near, far )`.
+ *
+ * @param {Camera} camera - The camera used for rendering.
+ * @param {Matrix4} worldMatrix - The world matrix of the splat cloud or group.
+ * @param {Sphere} boundingSphere - The bounding sphere, in local space.
+ * @param {Vector2} sortDepthRangeValue - Updated in place with the new depth range.
+ */
+function updateSortDepthRange( camera, worldMatrix, boundingSphere, sortDepthRangeValue ) {
+
+	_worldCenter.copy( boundingSphere.center ).applyMatrix4( worldMatrix );
+	_viewCenter.copy( _worldCenter ).applyMatrix4( camera.matrixWorldInverse );
+
+	_worldScale.setFromMatrixScale( worldMatrix );
+
+	const radius = boundingSphere.radius * Math.max( _worldScale.x, _worldScale.y, _worldScale.z );
+	const depth = - _viewCenter.z;
+	const nearDepth = Math.max( camera.near, depth - radius );
+	const farDepth = Math.max( nearDepth + 0.0001, depth + radius );
+
+	sortDepthRangeValue.set( nearDepth, farDepth );
+
+}
 
 /**
  * Builds the shared instanced quad geometry drawn once per splat.
@@ -737,5 +804,8 @@ export {
 	applySphericalHarmonics,
 	enableWebGLBuffers,
 	ensureSphericalHarmonicsContributionBuffer,
-	computeRayIntersection
+	computeRayIntersection,
+	needsSort,
+	updateLastSortDirection,
+	updateSortDepthRange
 };

@@ -107,6 +107,7 @@
 				gui.add( { mode }, 'mode', MODE_NAMES ).name( 'Rendering' ).onChange( ( value ) => {
 
 					mode = value;
+					applyRenderMode();
 
 				} );
 				gui.add( { rotateTomatoes }, 'rotateTomatoes' ).name( 'Rotate Tomatoes' ).onChange( ( value ) => {
@@ -119,6 +120,7 @@
 					showLion = value;
 
 					group.setVisibleAt( lionId, showLion );
+					applyRenderMode();
 
 				} );
 
@@ -173,14 +175,26 @@
 				splatTomatoes.visible = false;
 				scene.add( splatTomatoes );
 
-				// populates the group's bounding sphere so the camera can be fit to it - no
-				// renderer/GPU work needed, unlike the old update( renderer, camera ) call
+				applyRenderMode();
+
 				group.computeBoundingSphere();
 
 				fitCameraToGroup( group );
 				updateHitMarkerSize( group );
 
 				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			// Which of the two comparison objects is drawn only changes on a GUI edit, not
+			// every frame, so it's applied here rather than in animate()'s hot loop.
+			function applyRenderMode() {
+
+				const grouped = mode === 'Grouped (correct blending)';
+
+				group.visible = grouped;
+				splatLion.visible = grouped === false && showLion === true;
+				splatTomatoes.visible = grouped === false;
 
 			}
 
@@ -280,20 +294,6 @@
 
 					group.setMatrixAt( tomatoesId, tomatoesMatrix );
 					splatTomatoes.matrix.copy( tomatoesMatrix );
-
-				}
-
-				if ( mode === 'Grouped (correct blending)' ) {
-
-					group.visible = true;
-					splatLion.visible = false;
-					splatTomatoes.visible = false;
-
-				} else {
-
-					group.visible = false;
-					splatLion.visible = showLion;
-					splatTomatoes.visible = true;
 
 				}
 

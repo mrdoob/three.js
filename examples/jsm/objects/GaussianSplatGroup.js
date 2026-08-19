@@ -16,21 +16,18 @@ import { SH_BAND_WORDS, getSphericalHarmonicsDegree } from '../utils/GaussianSpl
 import {
 	BIN_COUNT,
 	WORKGROUP_SIZE,
-	SORT_DIRECTION_THRESHOLD,
 	applySphericalHarmonics,
 	computeRayIntersection,
 	createGeometry,
 	createMaterial,
 	createMaterialNodes,
 	createStorageBuffers,
-	disposeStorageBuffers
+	disposeStorageBuffers,
+	needsSort,
+	updateLastSortDirection,
+	updateSortDepthRange
 } from '../utils/GaussianSplatShadingUtils.js';
 
-const _worldCenter = /*@__PURE__*/ new Vector3();
-const _viewCenter = /*@__PURE__*/ new Vector3();
-const _worldScale = /*@__PURE__*/ new Vector3();
-const _sortDirection = /*@__PURE__*/ new Vector3();
-const _modelViewMatrix = /*@__PURE__*/ new Matrix4();
 const _box = /*@__PURE__*/ new Box3();
 const _sphere = /*@__PURE__*/ new Sphere();
 const _groupWorldMatrixInverse = /*@__PURE__*/ new Matrix4();
@@ -124,7 +121,16 @@ class GaussianSplatGroup extends Mesh {
 	constructor( { binCount = BIN_COUNT, workgroupSize = WORKGROUP_SIZE, growthSlack = 1.25 } = {} ) {
 
 		const geometry = createGeometry( 0 );
-		const material = createMaterial( null, null );
+
+		// Built with real (if empty) buffers/sort rather than null nodes, so the group is
+		// safe to compile and draw - 0 instances, nothing visible - from construction. This
+		// is what lets `visible` stay a normal, user-owned Object3D property instead of
+		// something this class has to flip on/off internally (see `onBeforeRender`).
+		const buffers = createGroupBufferState();
+		const localCameraPosition = uniform( new Vector3() );
+		const sort = new CountingSort( 0, { binCount, workgroupSize, growthSlack } );
+		const materialNodes = createMaterialNodes( buffers, sort, localCameraPosition );
+		const material = createMaterial( materialNodes.vertexNode, materialNodes.fragmentNode );
 
 		super( geometry, material );
 
@@ -162,8 +168,10 @@ class GaussianSplatGroup extends Mesh {
 		this.growthSlack = growthSlack;
 
 		/**
-		 * The bounding box of the merged splats, in this group's local space. Can be
-		 * computed via {@link GaussianSplatGroup#computeBoundingBox}.
+		 * The bounding box of the merged splats, in this group's local space. Not computed
+		 * by default - call {@link GaussianSplatGroup#computeBoundingBox} explicitly, or
+		 * read {@link GaussianSplatGroup#boundingSphere}, otherwise it stays `null`. Matches
+		 * {@link BatchedMesh#boundingBox}, the class this one otherwise mirrors.
 		 *
 		 * @type {?Box3}
 		 * @default null
@@ -171,8 +179,10 @@ class GaussianSplatGroup extends Mesh {
 		this.boundingBox = null;
 
 		/**
-		 * The bounding sphere of the merged splats, in this group's local space. Can be
-		 * computed via {@link GaussianSplatGroup#computeBoundingSphere}.
+		 * The bounding sphere of the merged splats, in this group's local space. Not computed
+		 * by default - call {@link GaussianSplatGroup#computeBoundingSphere} explicitly,
+		 * otherwise it stays `null`. Matches {@link BatchedMesh#boundingSphere}, the class
+		 * this one otherwise mirrors.
 		 *
 		 * @type {?Sphere}
 		 * @default null
@@ -183,13 +193,13 @@ class GaussianSplatGroup extends Mesh {
 		this._maxSphericalHarmonicsDegree = 0;
 
 		// All three live for the group's entire lifetime - see the class documentation.
-		this._buffers = createGroupBufferState();
+		this._buffers = buffers;
 		this._mergeKernels = createMergeKernelSet( this._buffers, this.workgroupSize );
 
 		this._sortMatrix = uniform( new Matrix4() );
 		this._sortDepthRange = uniform( new Vector2( 0, 1 ) );
 
-		this._sort = new CountingSort( 0, { binCount: this.binCount, workgroupSize: this.workgroupSize, growthSlack } );
+		this._sort = sort;
 		this._sort.setBinNode( () => {
 
 			const center = this._buffers.centerRead.element( instanceIndex ).xyz.toVar( 'center' );
@@ -220,12 +230,7 @@ class GaussianSplatGroup extends Mesh {
 
 		// Unused placeholder required by `createMaterialNodes()`'s signature; the group only
 		// ever uses the precomputed-spherical-harmonics vertex node (see `_rebuildMaterial`).
-		this._localCameraPosition = uniform( new Vector3() );
-
-		// Nothing has been added yet; avoid the renderer building a pipeline for the
-		// placeholder null-node material above. `onBeforeRender` makes this visible once
-		// real buffers/material exist.
-		this.visible = false;
+		this._localCameraPosition = localCameraPosition;
 
 	}
 
@@ -375,14 +380,11 @@ class GaussianSplatGroup extends Mesh {
 
 		if ( this._layoutDirty === true ) this._rebuildLayout();
 
-		if ( this._total === 0 ) {
+		// `visible` is left alone here - it's plain user-owned Object3D state. With nothing
+		// included, `geometry.instanceCount` is already 0 (see `_rebuildLayout`), which alone
+		// is enough to draw nothing.
+		if ( this._total === 0 ) return;
 
-			this.visible = false;
-			return;
-
-		}
-
-		this.visible = true;
 		this.updateWorldMatrix( true, false );
 
 		let mergedAny = false;
@@ -402,15 +404,15 @@ class GaussianSplatGroup extends Mesh {
 
 		this._updateSphericalHarmonics( renderer, camera );
 
-		const needsSort = this._sortInitialized === false || mergedAny === true || this._needsSort( camera );
+		const needsResort = this._sortInitialized === false || mergedAny === true || this._needsSort( camera );
 
-		if ( needsSort === true ) {
+		if ( needsResort === true ) {
 
 			this._updateSortUniforms( camera );
 			this._sort.compute( renderer );
 
 			this._sortInitialized = true;
-			this._lastSortDirection.copy( _sortDirection );
+			updateLastSortDirection( this._lastSortDirection );
 
 		}
 
@@ -700,12 +702,7 @@ class GaussianSplatGroup extends Mesh {
 
 	_needsSort( camera ) {
 
-		_modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, this.matrixWorld );
-
-		const e = _modelViewMatrix.elements;
-		_sortDirection.set( e[ 2 ], e[ 6 ], e[ 10 ] ).normalize();
-
-		return _sortDirection.dot( this._lastSortDirection ) < SORT_DIRECTION_THRESHOLD;
+		return needsSort( camera, this.matrixWorld, this._lastSortDirection );
 
 	}
 
@@ -715,17 +712,7 @@ class GaussianSplatGroup extends Mesh {
 
 		if ( this.boundingSphere === null ) this.computeBoundingSphere();
 
-		_worldCenter.copy( this.boundingSphere.center ).applyMatrix4( this.matrixWorld );
-		_viewCenter.copy( _worldCenter ).applyMatrix4( camera.matrixWorldInverse );
-
-		_worldScale.setFromMatrixScale( this.matrixWorld );
-
-		const radius = this.boundingSphere.radius * Math.max( _worldScale.x, _worldScale.y, _worldScale.z );
-		const depth = - _viewCenter.z;
-		const nearDepth = Math.max( camera.near, depth - radius );
-		const farDepth = Math.max( nearDepth + 0.0001, depth + radius );
-
-		this._sortDepthRange.value.set( nearDepth, farDepth );
+		updateSortDepthRange( camera, this.matrixWorld, this.boundingSphere, this._sortDepthRange.value );
 
 	}
 
