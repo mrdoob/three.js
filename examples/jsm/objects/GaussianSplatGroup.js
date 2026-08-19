@@ -2,81 +2,83 @@ import {
 	Box3,
 	Matrix4,
 	Mesh,
+	Ray,
 	Sphere,
 	StorageBufferAttribute,
 	Vector2,
 	Vector3
 } from 'three/webgpu';
 
-import {
-	Fn,
-	dot,
-	instanceIndex,
-	max,
-	storage,
-	uint,
-	uniform,
-	vec3,
-	vec4
-} from 'three/tsl';
+import { Fn, dot, instanceIndex, max, storage, uint, uniform, vec3, vec4 } from 'three/tsl';
 
 import { CountingSort } from '../gpgpu/CountingSort.js';
-import { SH_BAND_WORDS } from '../utils/GaussianSplatUtils.js';
+import { SH_BAND_WORDS, getSphericalHarmonicsDegree } from '../utils/GaussianSplatUtils.js';
 import {
 	BIN_COUNT,
 	WORKGROUP_SIZE,
 	SORT_DIRECTION_THRESHOLD,
 	applySphericalHarmonics,
+	computeRayIntersection,
 	createGeometry,
 	createMaterial,
-	createMaterialNodes
-} from './GaussianSplatMesh.js';
+	createMaterialNodes,
+	createStorageBuffers,
+	disposeStorageBuffers
+} from '../utils/GaussianSplatShadingUtils.js';
 
 const _worldCenter = /*@__PURE__*/ new Vector3();
 const _viewCenter = /*@__PURE__*/ new Vector3();
 const _worldScale = /*@__PURE__*/ new Vector3();
 const _sortDirection = /*@__PURE__*/ new Vector3();
 const _modelViewMatrix = /*@__PURE__*/ new Matrix4();
-const _worldMatrixInverse = /*@__PURE__*/ new Matrix4();
-const _groupWorldMatrixInverse = /*@__PURE__*/ new Matrix4();
 const _box = /*@__PURE__*/ new Box3();
 const _sphere = /*@__PURE__*/ new Sphere();
+const _groupWorldMatrixInverse = /*@__PURE__*/ new Matrix4();
+const _cameraPositionInGroup = /*@__PURE__*/ new Vector3();
+const _instanceMatrixInverse = /*@__PURE__*/ new Matrix4();
+const _instanceWorldMatrix = /*@__PURE__*/ new Matrix4();
+const _instanceWorldMatrixInverse = /*@__PURE__*/ new Matrix4();
+const _ray = /*@__PURE__*/ new Ray();
 
 /**
- * A container that merges multiple {@link GaussianSplatMesh} children into one shared
- * set of storage buffers, sorts the merged set once, and draws it with a single
- * instanced draw call. This is what makes overlapping `GaussianSplatMesh` instances
- * alpha-blend correctly with each other: each mesh sorting and drawing itself
- * independently cannot produce a globally correct back-to-front order across meshes.
+ * A container that merges many independent Gaussian splat `BufferGeometry`s into one
+ * shared set of storage buffers, sorts the merged set once, and draws it with a single
+ * instanced draw call. This is what makes overlapping splat clouds alpha-blend correctly
+ * with each other: each cloud sorting and drawing itself independently cannot produce a
+ * globally correct back-to-front order across clouds.
  *
- * Only children with `isGaussianSplatMesh === true` are merged; other children are
- * rendered normally by the standard scene traversal.
- *
- * Like {@link GaussianSplatMesh}, this class requires {@link WebGPURenderer} with real
- * WebGPU compute support. On the `forceWebGL` (WebGL2) backend, `GaussianSplatGroup`
- * draws nothing and its children fall back to rendering themselves independently
- * (correct within each mesh, but not correctly interleaved across meshes).
- *
- * Because whether a child renders itself or is suppressed in favor of the group's
- * merged draw is decided by `child.visible` - which the renderer reads while building
- * its render list, before any object's `onBeforeRender` runs - `GaussianSplatGroup`
- * cannot make this decision from inside `onBeforeRender`. Call {@link GaussianSplatGroup#update}
- * once per frame *before* `renderer.render( scene, camera )`:
+ * `GaussianSplatGroup` owns its splat data directly - the same model {@link BatchedMesh}
+ * uses for merging many geometries into one draw call - rather than wrapping independent
+ * scene-graph children:
  *
  * ```js
  * const group = new GaussianSplatGroup();
- * group.add( splatsA, splatsB );
  * scene.add( group );
  *
- * function animate() {
+ * const idA = group.addSplat( splatGeometryA );
+ * const idB = group.addSplat( splatGeometryB );
  *
- * 	group.update( renderer, camera );
- * 	renderer.render( scene, camera );
+ * group.setMatrixAt( idA, matrixA );
+ * group.setMatrixAt( idB, matrixB );
  *
- * }
+ * renderer.render( scene, camera );
  * ```
  *
- * The practical ceiling on total live splats across all children is set by the
+ * Unlike an earlier design that added independent {@link GaussianSplatMesh} instances as
+ * scene-graph children, `GaussianSplatGroup` does not import or otherwise depend on
+ * `GaussianSplatMesh` at all - it takes a raw `BufferGeometry` per splat cloud via
+ * {@link GaussianSplatGroup#addSplat}. This means all of the group's work (merging changed
+ * instances into the shared buffers, sorting, toggling visibility) happens inside its own
+ * `onBeforeRender`, exactly like any other `Mesh` - there is no separate `update()` call to
+ * remember to make before `renderer.render()`, and no race between a child's visibility and
+ * the renderer's render-list construction, because there are no scene-graph children.
+ *
+ * `setMatrixAt` marks only the affected splat range dirty for re-merging - moving one splat
+ * cloud does not re-merge any other cloud. `addSplat`/`deleteSplat`/`setVisibleAt` change
+ * which ranges are packed into the shared buffers at all, so they trigger a full layout
+ * rebuild (every included splat cloud re-merges) the next time the group renders.
+ *
+ * The practical ceiling on total live splats across all added geometries is set by the
  * `maxStorageBufferBindingSize` WebGPU limit, not by compute dispatch limits (three.js
  * auto-folds large dispatches into a 2D `dispatchWorkgroups` call, see
  * `WebGPUBackend.computeGroupCount`) or by raw VRAM. The group's largest buffers
@@ -87,16 +89,24 @@ const _sphere = /*@__PURE__*/ new Sphere();
  * (~67M splats, ~54M with slack). Design/test against roughly 8-16M total live splats
  * as the "works on effectively all WebGPU hardware" target.
  *
- * The compute kernels that merge children into the shared buffers (see
+ * The compute kernels that merge splats into the shared buffers (see
  * `createMergeKernelSet()`) and the merged {@link CountingSort} are both built once, in
- * the constructor, and reused for the group's entire lifetime. Per-child data (source
+ * the constructor, and reused for the group's entire lifetime. Per-splat data (source
  * buffers, destination offset, relative transform) is passed in via uniforms and
  * swappable storage node `.value`s rather than baked into the kernel, and the sort's
  * `count` is simply reassigned rather than the sort being replaced, so adding/removing
- * children or growing the shared buffers (`growGroupBufferState()`) never recompiles a
+ * splats or growing the shared buffers (`growGroupBufferState()`) never recompiles a
  * pipeline - only spherical harmonics needs more than one merge kernel variant, since its
  * shading math branches on SH degree at shader-build time; `getOrCreateSHKernel()`
  * compiles one kernel per distinct degree encountered (at most 4) and caches it.
+ *
+ * This class requires {@link WebGPURenderer} with real WebGPU compute support. The
+ * `forceWebGL` (WebGL2) backend is not yet supported - `onBeforeRender` throws rather
+ * than silently drawing nothing or drawing an incorrectly ordered result. A future
+ * WebGL2 fallback would draw each splat cloud with its own draw call, sorted coarsely
+ * against the others by bounding-sphere centroid depth (no cross-cloud per-splat sort,
+ * unlike the WebGPU path) - until then, use independent {@link GaussianSplatMesh}
+ * instances on WebGL2.
  *
  * @augments Mesh
  * @three_import import { GaussianSplatGroup } from 'three/addons/objects/GaussianSplatGroup.js';
@@ -107,9 +117,9 @@ class GaussianSplatGroup extends Mesh {
 	 * Constructs a new Gaussian splat group.
 	 *
 	 * @param {Object} [options] - Options.
-	 * @param {number} [options.binCount=4096] - The number of depth bins used by the group's merged {@link CountingSort}. Larger values improve sort accuracy when children are spread across a large combined depth range, at the cost of a longer (but still single-pass) prefix sum.
+	 * @param {number} [options.binCount=4096] - The number of depth bins used by the group's merged {@link CountingSort}. Larger values improve sort accuracy when splats are spread across a large combined depth range, at the cost of a longer (but still single-pass) prefix sum.
 	 * @param {number} [options.workgroupSize=256] - The workgroup size of the compute shaders used for merging and sorting.
-	 * @param {number} [options.growthSlack=1.25] - How much extra capacity to allocate in the shared storage buffers beyond the current splat total, to avoid reallocating on every child add/remove.
+	 * @param {number} [options.growthSlack=1.25] - How much extra capacity to allocate in the shared storage buffers beyond the current splat total, to avoid reallocating on every `addSplat`/`deleteSplat`.
 	 */
 	constructor( { binCount = BIN_COUNT, workgroupSize = WORKGROUP_SIZE, growthSlack = 1.25 } = {} ) {
 
@@ -145,7 +155,7 @@ class GaussianSplatGroup extends Mesh {
 
 		/**
 		 * How much extra capacity to allocate in the shared storage buffers beyond the
-		 * current splat total, to avoid reallocating on every child add/remove.
+		 * current splat total, to avoid reallocating on every `addSplat`/`deleteSplat`.
 		 *
 		 * @type {number}
 		 */
@@ -171,7 +181,6 @@ class GaussianSplatGroup extends Mesh {
 
 		this._total = 0;
 		this._maxSphericalHarmonicsDegree = 0;
-		this._mappingDirty = true;
 
 		// All three live for the group's entire lifetime - see the class documentation.
 		this._buffers = createGroupBufferState();
@@ -194,116 +203,198 @@ class GaussianSplatGroup extends Mesh {
 
 		} );
 
-		// GaussianSplatMesh -> { base, count, relativeMatrix, lastMatrix,
+		// id -> { geometry, buffers, count, base, matrix, visible, included, matrixDirty,
 		// sphericalHarmonicsDegree, shLocalCameraPosition, lastSHCameraMatrix,
-		// lastSHWorldMatrix } - see `_rebuildMapping` and `_updateSphericalHarmonics`.
-		this._childState = new Map();
+		// lastSHGroupWorldMatrix, lastSHMatrix, lastSHBase } - see `addSplat` and `_rebuildLayout`.
+		this._instances = new Map();
+		this._nextId = 0;
+
+		// Set by addSplat/deleteSplat/setVisibleAt: which splat ranges are packed into the
+		// shared buffers, and at what offsets, changes - so every included instance needs
+		// re-merging. setMatrixAt does NOT set this; it only marks that one instance dirty,
+		// since moving one splat cloud doesn't change anyone else's offset.
+		this._layoutDirty = true;
 
 		this._sortInitialized = false;
 		this._lastSortDirection = new Vector3();
-		this._lastGroupWorldMatrix = null;
 
-		// Unused placeholder required by `createMaterialNodes()`'s signature; spherical
-		// harmonics is computed per child in `_updateSphericalHarmonics()` instead.
+		// Unused placeholder required by `createMaterialNodes()`'s signature; the group only
+		// ever uses the precomputed-spherical-harmonics vertex node (see `_rebuildMaterial`).
 		this._localCameraPosition = uniform( new Vector3() );
 
-		// Nothing has been merged yet; avoid the renderer building a pipeline for the
-		// placeholder null-node material above. `update()` makes this visible once
+		// Nothing has been added yet; avoid the renderer building a pipeline for the
+		// placeholder null-node material above. `onBeforeRender` makes this visible once
 		// real buffers/material exist.
 		this.visible = false;
-
-		this.addEventListener( 'childadded', () => {
-
-			this._mappingDirty = true;
-
-		} );
-
-		this.addEventListener( 'childremoved', () => {
-
-			this._mappingDirty = true;
-
-		} );
 
 	}
 
 	/**
-	 * Merges every `GaussianSplatMesh` child into the group's shared buffers (only
-	 * re-transforming children whose transform changed since the last call), re-sorts
-	 * the merged set if the camera has moved enough, and toggles child/group visibility
-	 * for the current backend. Must be called once per frame *before* `renderer.render()`
-	 * - see the class documentation for why.
+	 * Adds a splat cloud to the group.
+	 *
+	 * @param {BufferGeometry} splatGeometry - The splat geometry to add. Same attribute contract as {@link GaussianSplatMesh}'s constructor.
+	 * @return {number} An id identifying this splat cloud, for use with {@link GaussianSplatGroup#setMatrixAt}/{@link GaussianSplatGroup#setVisibleAt}/{@link GaussianSplatGroup#deleteSplat}.
+	 */
+	addSplat( splatGeometry ) {
+
+		const positionAttribute = splatGeometry.getAttribute( 'position' );
+		const covarianceAttribute = splatGeometry.getAttribute( 'covariance' );
+		const colorAttribute = splatGeometry.getAttribute( 'color' );
+		const sphericalHarmonicsDegree = getSphericalHarmonicsDegree( splatGeometry );
+		const count = positionAttribute.count;
+
+		if ( splatGeometry.boundingBox === null ) splatGeometry.computeBoundingBox();
+		if ( splatGeometry.boundingSphere === null ) splatGeometry.computeBoundingSphere();
+
+		const buffers = createStorageBuffers( count, positionAttribute.array, covarianceAttribute.array, colorAttribute.array, {
+			degree: sphericalHarmonicsDegree,
+			sh1: sphericalHarmonicsDegree >= 1 ? splatGeometry.getAttribute( 'sphericalHarmonics1' ).array : undefined,
+			sh2: sphericalHarmonicsDegree >= 2 ? splatGeometry.getAttribute( 'sphericalHarmonics2' ).array : undefined,
+			sh3: sphericalHarmonicsDegree >= 3 ? splatGeometry.getAttribute( 'sphericalHarmonics3' ).array : undefined
+		} );
+
+		const id = this._nextId ++;
+
+		this._instances.set( id, {
+			id,
+			geometry: splatGeometry,
+			buffers,
+			count,
+			sphericalHarmonicsDegree,
+			base: 0,
+			matrix: new Matrix4(),
+			visible: true,
+			included: false,
+			matrixDirty: true,
+			shLocalCameraPosition: new Vector3(),
+			lastSHCameraMatrix: null,
+			lastSHGroupWorldMatrix: null,
+			lastSHMatrix: null,
+			lastSHBase: - 1
+		} );
+
+		this._layoutDirty = true;
+
+		return id;
+
+	}
+
+	/**
+	 * Removes a splat cloud from the group, freeing its GPU buffers.
+	 *
+	 * @param {number} id - The id returned by {@link GaussianSplatGroup#addSplat}.
+	 */
+	deleteSplat( id ) {
+
+		const record = this._instances.get( id );
+
+		if ( record === undefined ) return;
+
+		disposeStorageBuffers( record.buffers );
+		this._instances.delete( id );
+
+		this._layoutDirty = true;
+
+	}
+
+	/**
+	 * Sets a splat cloud's transform, relative to this group.
+	 *
+	 * @param {number} id - The id returned by {@link GaussianSplatGroup#addSplat}.
+	 * @param {Matrix4} matrix - The transform, relative to this group's local space.
+	 */
+	setMatrixAt( id, matrix ) {
+
+		const record = this._getInstance( id );
+
+		record.matrix.copy( matrix );
+		record.matrixDirty = true;
+
+	}
+
+	/**
+	 * Reads a splat cloud's transform back.
+	 *
+	 * @param {number} id - The id returned by {@link GaussianSplatGroup#addSplat}.
+	 * @param {Matrix4} [target] - The target matrix.
+	 * @return {Matrix4} The transform, relative to this group's local space.
+	 */
+	getMatrixAt( id, target = new Matrix4() ) {
+
+		return target.copy( this._getInstance( id ).matrix );
+
+	}
+
+	/**
+	 * Sets whether a splat cloud is drawn. Unlike {@link GaussianSplatGroup#setMatrixAt},
+	 * this changes which splat ranges are packed into the shared buffers, so it triggers a
+	 * full layout rebuild (every included splat cloud re-merges) on the next render.
+	 *
+	 * @param {number} id - The id returned by {@link GaussianSplatGroup#addSplat}.
+	 * @param {boolean} visible - Whether to draw this splat cloud.
+	 */
+	setVisibleAt( id, visible ) {
+
+		const record = this._getInstance( id );
+
+		if ( record.visible === visible ) return;
+
+		record.visible = visible;
+		this._layoutDirty = true;
+
+	}
+
+	/**
+	 * Reads a splat cloud's visibility back.
+	 *
+	 * @param {number} id - The id returned by {@link GaussianSplatGroup#addSplat}.
+	 * @return {boolean} Whether this splat cloud is drawn.
+	 */
+	getVisibleAt( id ) {
+
+		return this._getInstance( id ).visible;
+
+	}
+
+	/**
+	 * Merges every dirty splat cloud into the group's shared buffers, re-sorts the merged
+	 * set if the camera has moved enough (or a merge happened), and updates draw state.
+	 * Called automatically by the renderer - there is no need to call this directly.
 	 *
 	 * @param {Renderer} renderer - The renderer.
+	 * @param {Object3D} scene - The scene.
 	 * @param {Camera} camera - The camera used for rendering.
-	 * @return {boolean} Whether the group has splats to draw this frame.
 	 */
-	update( renderer, camera ) {
+	onBeforeRender( renderer, scene, camera ) {
 
-		const isWebGLBackend = renderer.backend && renderer.backend.isWebGLBackend === true;
+		if ( renderer.backend && renderer.backend.isWebGLBackend === true ) {
 
-		if ( isWebGLBackend === true ) {
-
-			// keep this group itself traversable so its children are still visited by
-			// the renderer - `this.visible = false` would also hide them, since scene
-			// traversal skips an invisible object's entire subtree (see Renderer's
-			// `_projectObject`). Suppress only this group's own (stale/empty) merged
-			// draw call by zeroing its instance count.
-			this._setChildrenVisible( true );
-			this.visible = true;
-			this.geometry.instanceCount = 0;
-
-			return false;
+			throw new Error( 'THREE.GaussianSplatGroup: the WebGL2 (forceWebGL) backend is not yet supported - see the class documentation. Use independent GaussianSplatMesh instances instead.' );
 
 		}
 
-		this._setChildrenVisible( false );
-
-		if ( this._mappingDirty === true ) this._rebuildMapping();
+		if ( this._layoutDirty === true ) this._rebuildLayout();
 
 		if ( this._total === 0 ) {
 
 			this.visible = false;
-
-			return false;
+			return;
 
 		}
 
 		this.visible = true;
-
-		// reasserted on every successful merge pass (not just when `_rebuildMapping()`
-		// runs) so external code that suppresses this group's own draw by zeroing
-		// `geometry.instanceCount` - e.g. to fall back to per-child rendering, as
-		// `update()`'s own WebGL-backend branch above does - can't leave it stuck at 0
-		// once merging resumes here.
-		this.geometry.instanceCount = this._total;
 		this.updateWorldMatrix( true, false );
 
-		const groupMoved = this._lastGroupWorldMatrix === null || this._lastGroupWorldMatrix.equals( this.matrixWorld ) === false;
 		let mergedAny = false;
 
-		for ( const [ child, state ] of this._childState ) {
+		for ( const record of this._instances.values() ) {
 
-			child.updateWorldMatrix( true, false );
+			if ( record.included === false || record.matrixDirty === false ) continue;
 
-			if ( groupMoved === true || state.lastMatrix === null || state.lastMatrix.equals( child.matrixWorld ) === false ) {
+			this._dispatchInstanceMerge( renderer, record );
 
-				console.debug( `[GaussianSplatGroup] update() - merging child (groupMoved=${ groupMoved } firstMerge=${ state.lastMatrix === null })` );
-
-				_groupWorldMatrixInverse.copy( this.matrixWorld ).invert();
-				state.relativeMatrix.multiplyMatrices( _groupWorldMatrixInverse, child.matrixWorld );
-
-				this._dispatchChildMerge( renderer, child, state );
-
-				state.lastMatrix = ( state.lastMatrix || new Matrix4() ).copy( child.matrixWorld );
-				mergedAny = true;
-
-			}
-
-		}
-
-		if ( groupMoved === true ) {
-
-			this._lastGroupWorldMatrix = ( this._lastGroupWorldMatrix || new Matrix4() ).copy( this.matrixWorld );
+			record.matrixDirty = false;
+			mergedAny = true;
 
 		}
 
@@ -315,8 +406,6 @@ class GaussianSplatGroup extends Mesh {
 
 		if ( needsSort === true ) {
 
-			console.debug( `[GaussianSplatGroup] update() - sorting (sortInitialized=${ this._sortInitialized } mergedAny=${ mergedAny } camera moved=${ this._sortInitialized && ! mergedAny })` );
-
 			this._updateSortUniforms( camera );
 			this._sort.compute( renderer );
 
@@ -325,26 +414,26 @@ class GaussianSplatGroup extends Mesh {
 
 		}
 
-		return true;
-
 	}
 
 	/**
 	 * Computes the bounding box of the merged splats, in this group's local space,
-	 * as the union of each child's own bounding box transformed by that child's
-	 * transform relative to this group.
+	 * as the union of each included splat cloud's own geometry bounding box transformed
+	 * by that cloud's {@link GaussianSplatGroup#setMatrixAt} transform.
 	 */
 	computeBoundingBox() {
+
+		if ( this._layoutDirty === true ) this._rebuildLayout();
 
 		if ( this.boundingBox === null ) this.boundingBox = new Box3();
 
 		this.boundingBox.makeEmpty();
 
-		for ( const [ child, state ] of this._childState ) {
+		for ( const record of this._instances.values() ) {
 
-			if ( child.boundingBox === null ) child.computeBoundingBox();
+			if ( record.included === false ) continue;
 
-			_box.copy( child.boundingBox ).applyMatrix4( state.relativeMatrix );
+			_box.copy( record.geometry.boundingBox ).applyMatrix4( record.matrix );
 			this.boundingBox.union( _box );
 
 		}
@@ -363,11 +452,11 @@ class GaussianSplatGroup extends Mesh {
 
 		let maxRadius = 0;
 
-		for ( const [ child, state ] of this._childState ) {
+		for ( const record of this._instances.values() ) {
 
-			if ( child.boundingSphere === null ) child.computeBoundingSphere();
+			if ( record.included === false ) continue;
 
-			_sphere.copy( child.boundingSphere ).applyMatrix4( state.relativeMatrix );
+			_sphere.copy( record.geometry.boundingSphere ).applyMatrix4( record.matrix );
 			maxRadius = Math.max( maxRadius, this.boundingSphere.center.distanceTo( _sphere.center ) + _sphere.radius );
 
 		}
@@ -377,19 +466,45 @@ class GaussianSplatGroup extends Mesh {
 	}
 
 	/**
-	 * Computes intersection points between a casted ray and the splats, by delegating
-	 * to each `GaussianSplatMesh` child's own {@link GaussianSplatMesh#raycast}
-	 * (bypassing the normal recursive-raycast visibility check, since children are kept
-	 * invisible - for rendering purposes only - while merged into this group).
+	 * Computes intersection points between a casted ray and the splats, tagging each
+	 * intersection with the {@link GaussianSplatGroup#addSplat} id of the splat cloud hit
+	 * (`intersect.instanceId`), analogous to {@link BatchedMesh}'s `batchId`.
 	 *
 	 * @param {Raycaster} raycaster - The raycaster.
 	 * @param {Array<Object>} intersects - The target array that holds the intersection points.
 	 */
 	raycast( raycaster, intersects ) {
 
-		for ( const child of this.children ) {
+		if ( this._layoutDirty === true ) this._rebuildLayout();
 
-			if ( child.isGaussianSplatMesh === true ) child.raycast( raycaster, intersects );
+		for ( const record of this._instances.values() ) {
+
+			if ( record.included === false ) continue;
+
+			_instanceWorldMatrix.multiplyMatrices( this.matrixWorld, record.matrix );
+
+			_sphere.copy( record.geometry.boundingSphere ).applyMatrix4( _instanceWorldMatrix );
+
+			if ( raycaster.ray.intersectsSphere( _sphere ) === false ) continue;
+
+			_instanceWorldMatrixInverse.copy( _instanceWorldMatrix ).invert();
+			_ray.copy( raycaster.ray ).applyMatrix4( _instanceWorldMatrixInverse );
+
+			if ( record.geometry.boundingBox !== null && _ray.intersectsBox( record.geometry.boundingBox ) === false ) continue;
+
+			const positionAttribute = record.geometry.getAttribute( 'position' );
+			const covarianceAttribute = record.geometry.getAttribute( 'covariance' );
+			const colorAttribute = record.geometry.getAttribute( 'color' );
+			const count = positionAttribute.count;
+			const before = intersects.length;
+
+			for ( let i = 0; i < count; i ++ ) {
+
+				computeRayIntersection( positionAttribute, covarianceAttribute, colorAttribute, i, _instanceWorldMatrix, _ray, raycaster, intersects, this );
+
+			}
+
+			for ( let i = before; i < intersects.length; i ++ ) intersects[ i ].instanceId = record.id;
 
 		}
 
@@ -397,7 +512,7 @@ class GaussianSplatGroup extends Mesh {
 
 	/**
 	 * Frees the GPU resources owned by this group (shared storage buffers, sort
-	 * buffers, geometry and material). Does not dispose its children.
+	 * buffers, geometry, material, and every added splat cloud's source buffers).
 	 */
 	dispose() {
 
@@ -405,41 +520,46 @@ class GaussianSplatGroup extends Mesh {
 		disposeMergeKernels( this._mergeKernels );
 		this._sort.dispose();
 
+		for ( const record of this._instances.values() ) disposeStorageBuffers( record.buffers );
+		this._instances.clear();
+
 		this.geometry.dispose();
 		this.material.dispose();
 
 	}
 
-	_setChildrenVisible( visible ) {
+	_getInstance( id ) {
 
-		for ( const child of this.children ) {
+		const record = this._instances.get( id );
 
-			if ( child.isGaussianSplatMesh === true ) child.visible = visible;
+		if ( record === undefined ) throw new Error( `THREE.GaussianSplatGroup: no splat with id ${ id }.` );
 
-		}
+		return record;
 
 	}
 
-	_rebuildMapping() {
+	_rebuildLayout() {
 
-		console.debug( '[GaussianSplatGroup] _rebuildMapping() - mapping dirty (child added/removed)' );
-
-		this._mappingDirty = false;
-
-		const children = this.children.filter( ( child ) => child.isGaussianSplatMesh === true );
+		this._layoutDirty = false;
 
 		let total = 0;
 		let maxDegree = 0;
 
-		for ( const child of children ) {
+		for ( const record of this._instances.values() ) {
 
-			total += child.splatGeometry.getAttribute( 'position' ).count;
-			maxDegree = Math.max( maxDegree, child._buffers.sphericalHarmonicsDegree );
+			record.included = record.visible === true;
+
+			if ( record.included === true ) {
+
+				total += record.count;
+				maxDegree = Math.max( maxDegree, record.sphericalHarmonicsDegree );
+
+			}
 
 		}
 
 		this._total = total;
-		this._childState.clear();
+		this._sort.count = total;
 
 		if ( total === 0 ) {
 
@@ -453,9 +573,7 @@ class GaussianSplatGroup extends Mesh {
 		// headroom for the next addition
 		if ( total > this._buffers.capacity ) {
 
-			const capacity = Math.max( 1, Math.ceil( total * this.growthSlack ) );
-			console.debug( `[GaussianSplatGroup] growing group buffers ${ this._buffers.capacity } -> ${ capacity } (total=${ total })` );
-			growGroupBufferState( this._buffers, capacity );
+			growGroupBufferState( this._buffers, Math.max( 1, Math.ceil( total * this.growthSlack ) ) );
 
 		}
 
@@ -466,26 +584,18 @@ class GaussianSplatGroup extends Mesh {
 
 		let base = 0;
 
-		for ( const child of children ) {
+		for ( const record of this._instances.values() ) {
 
-			const count = child.splatGeometry.getAttribute( 'position' ).count;
+			if ( record.included === false ) continue;
 
-			this._childState.set( child, {
-				base,
-				count,
-				relativeMatrix: new Matrix4(),
-				lastMatrix: null,
-				sphericalHarmonicsDegree: child._buffers.sphericalHarmonicsDegree,
-				shLocalCameraPosition: new Vector3(),
-				lastSHCameraMatrix: null,
-				lastSHWorldMatrix: null
-			} );
+			// base offsets may have shifted for any included instance, even ones whose own
+			// transform didn't change - always remerge on a layout rebuild
+			record.base = base;
+			record.matrixDirty = true;
 
-			base += count;
+			base += record.count;
 
 		}
-
-		this._sort.count = total;
 
 		this._rebuildMaterial( total );
 
@@ -494,8 +604,6 @@ class GaussianSplatGroup extends Mesh {
 	}
 
 	_rebuildMaterial( total ) {
-
-		console.debug( `[GaussianSplatGroup] _rebuildMaterial() - rebuilding geometry/material (total=${ total })` );
 
 		const materialNodes = createMaterialNodes( this._buffers, this._sort, this._localCameraPosition );
 
@@ -512,67 +620,78 @@ class GaussianSplatGroup extends Mesh {
 
 	}
 
-	_dispatchChildMerge( renderer, child, state ) {
+	_dispatchInstanceMerge( renderer, record ) {
 
 		const kernels = this._mergeKernels;
-		const childBuffers = child._buffers;
 
-		kernels.baseIndex.value = state.base;
-		kernels.relativeMatrix.value.copy( state.relativeMatrix );
+		kernels.baseIndex.value = record.base;
+		kernels.relativeMatrix.value.copy( record.matrix );
 
-		kernels.sourceCenterRead.value = childBuffers.centerRead.value;
-		kernels.sourceCovarianceARead.value = childBuffers.covarianceARead.value;
-		kernels.sourceCovarianceBRead.value = childBuffers.covarianceBRead.value;
+		kernels.sourceCenterRead.value = record.buffers.centerRead.value;
+		kernels.sourceCovarianceARead.value = record.buffers.covarianceARead.value;
+		kernels.sourceCovarianceBRead.value = record.buffers.covarianceBRead.value;
 
-		kernels.transformKernel.count = state.count;
+		kernels.transformKernel.count = record.count;
 		renderer.compute( kernels.transformKernel );
 
-		kernels.sourceColorRead.value = childBuffers.colorRead.value;
+		kernels.sourceColorRead.value = record.buffers.colorRead.value;
 
-		kernels.colorKernel.count = state.count;
+		kernels.colorKernel.count = record.count;
 		renderer.compute( kernels.colorKernel );
 
 	}
 
-	// SH coefficients are authored relative to each child's own unrotated local axes, so
-	// contribution is computed per child, against that child's own local buffers and
-	// local camera position, rather than once for the merged (rotated) group.
+	// SH coefficients are authored relative to each splat cloud's own unrotated local axes,
+	// so contribution is computed per instance, against that instance's own local buffers
+	// and local camera position, rather than once for the merged (rotated) group.
 	_updateSphericalHarmonics( renderer, camera ) {
 
 		if ( this._maxSphericalHarmonicsDegree === 0 ) return;
 
 		const kernels = this._mergeKernels;
 
-		for ( const [ child, state ] of this._childState ) {
+		_groupWorldMatrixInverse.copy( this.matrixWorld ).invert();
+		_cameraPositionInGroup.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _groupWorldMatrixInverse );
 
-			const needsUpdate = state.lastSHCameraMatrix === null ||
-				camera.matrixWorld.equals( state.lastSHCameraMatrix ) === false ||
-				state.lastSHWorldMatrix === null ||
-				child.matrixWorld.equals( state.lastSHWorldMatrix ) === false;
+		for ( const record of this._instances.values() ) {
+
+			if ( record.included === false || record.sphericalHarmonicsDegree === 0 ) continue;
+
+			// record.base can change - shifting where this instance's contribution belongs
+			// in the shared buffer - on a layout rebuild that never touches this instance's
+			// own camera/group/instance matrices at all (e.g. a *different* instance's
+			// visibility was toggled), so it has to be checked independently of them.
+			const needsUpdate = record.lastSHCameraMatrix === null ||
+				camera.matrixWorld.equals( record.lastSHCameraMatrix ) === false ||
+				record.lastSHGroupWorldMatrix === null ||
+				this.matrixWorld.equals( record.lastSHGroupWorldMatrix ) === false ||
+				record.lastSHMatrix === null ||
+				record.matrix.equals( record.lastSHMatrix ) === false ||
+				record.base !== record.lastSHBase;
 
 			if ( needsUpdate === false ) continue;
 
-			console.debug( '[GaussianSplatGroup] _updateSphericalHarmonics() - dispatching (camera or child matrix changed)' );
+			_instanceMatrixInverse.copy( record.matrix ).invert();
+			record.shLocalCameraPosition.copy( _cameraPositionInGroup ).applyMatrix4( _instanceMatrixInverse );
 
-			_worldMatrixInverse.copy( child.matrixWorld ).invert();
-			state.shLocalCameraPosition.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _worldMatrixInverse );
+			record.lastSHCameraMatrix = ( record.lastSHCameraMatrix || new Matrix4() ).copy( camera.matrixWorld );
+			record.lastSHGroupWorldMatrix = ( record.lastSHGroupWorldMatrix || new Matrix4() ).copy( this.matrixWorld );
+			record.lastSHMatrix = ( record.lastSHMatrix || new Matrix4() ).copy( record.matrix );
+			record.lastSHBase = record.base;
 
-			state.lastSHCameraMatrix = ( state.lastSHCameraMatrix || new Matrix4() ).copy( camera.matrixWorld );
-			state.lastSHWorldMatrix = ( state.lastSHWorldMatrix || new Matrix4() ).copy( child.matrixWorld );
-
-			const childBuffers = child._buffers;
-			const degree = state.sphericalHarmonicsDegree;
+			const childBuffers = record.buffers;
+			const degree = record.sphericalHarmonicsDegree;
 			const kernel = getOrCreateSHKernel( kernels, this._buffers, degree, this.workgroupSize );
 
-			kernels.baseIndex.value = state.base;
-			kernels.shLocalCameraPosition.value.copy( state.shLocalCameraPosition );
+			kernels.baseIndex.value = record.base;
+			kernels.shLocalCameraPosition.value.copy( record.shLocalCameraPosition );
 			kernels.sourceCenterRead.value = childBuffers.centerRead.value;
 
 			if ( degree >= 1 ) kernels.sourceSH1Read.value = childBuffers.sphericalHarmonics1Read.value;
 			if ( degree >= 2 ) kernels.sourceSH2Read.value = childBuffers.sphericalHarmonics2Read.value;
 			if ( degree >= 3 ) kernels.sourceSH3Read.value = childBuffers.sphericalHarmonics3Read.value;
 
-			kernel.count = state.count;
+			kernel.count = record.count;
 			renderer.compute( kernel );
 
 		}
@@ -700,7 +819,7 @@ function growGroupBufferState( state, capacity ) {
 
 }
 
-// Lazily allocates the spherical harmonics contribution buffer the first time any child
+// Lazily allocates the spherical harmonics contribution buffer the first time any instance
 // carries SH data - most groups never need it.
 function ensureSphericalHarmonicsContributionNodes( state ) {
 
@@ -725,9 +844,9 @@ function disposeGroupBufferState( state ) {
 
 }
 
-// Builds the compute kernels that transform any child's local-space splats into the
+// Builds the compute kernels that transform any instance's local-space splats into the
 // group's shared buffers. Reads go through "source" storage nodes whose `.value` is
-// repointed at a specific child's real buffer right before that child's dispatch. Split
+// repointed at a specific instance's real buffer right before that instance's dispatch. Split
 // into separate transform/color/SH kernels because each simultaneously-bound storage
 // buffer counts against `maxStorageBuffersPerShaderStage`, whose universal baseline is 8.
 function createMergeKernelSet( groupBuffers, workgroupSize ) {
@@ -740,7 +859,7 @@ function createMergeKernelSet( groupBuffers, workgroupSize ) {
 	const sourceCovarianceBRead = storage( createPlaceholderVec4Attribute(), 'vec4', 0 ).toReadOnly();
 	const sourceColorRead = storage( createPlaceholderUintAttribute(), 'uint', 0 ).toReadOnly();
 
-	// position + covariance: 6 storage buffers (3 child reads, 3 group writes)
+	// position + covariance: 6 storage buffers (3 instance reads, 3 group writes)
 	const transformKernel = Fn( () => {
 
 		const srcIndex = instanceIndex;
@@ -809,14 +928,12 @@ function createMergeKernelSet( groupBuffers, workgroupSize ) {
 
 // Returns the shared spherical harmonics kernel for `degree`, building and caching it the
 // first time this degree is encountered. The degree-0 kernel just zeroes the contribution,
-// for children with no SH data of their own.
+// for instances with no SH data of their own.
 function getOrCreateSHKernel( kernels, groupBuffers, degree, workgroupSize ) {
 
 	let kernel = kernels.shKernelsByDegree.get( degree );
 
 	if ( kernel !== undefined ) return kernel;
-
-	console.debug( `[GaussianSplatGroup] getOrCreateSHKernel() - building spherical harmonics kernel for degree ${ degree } (first time seen)` );
 
 	if ( kernels.shLocalCameraPosition === null ) kernels.shLocalCameraPosition = uniform( new Vector3() );
 
@@ -828,10 +945,10 @@ function getOrCreateSHKernel( kernels, groupBuffers, degree, workgroupSize ) {
 	const shLocalCameraPosition = kernels.shLocalCameraPosition;
 	const baseIndex = kernels.baseIndex;
 
-	// A minimal stand-in for a `GaussianSplatMesh` buffers object, exposing just what
+	// A minimal stand-in for a storage buffer state, exposing just what
 	// `applySphericalHarmonics()` reads: this degree's fixed word counts and this
 	// kernel set's own shared (swappable) per-band source nodes.
-	const syntheticChildBuffers = {
+	const syntheticInstanceBuffers = {
 		sphericalHarmonicsDegree: degree,
 		sphericalHarmonics1Read: kernels.sourceSH1Read,
 		sphericalHarmonics1Words: SH_BAND_WORDS[ 1 ],
@@ -850,7 +967,7 @@ function getOrCreateSHKernel( kernels, groupBuffers, degree, workgroupSize ) {
 		if ( degree > 0 ) {
 
 			const center = sourceCenterRead.element( srcIndex ).xyz.toVar( 'center' );
-			applySphericalHarmonics( rgb, center, shLocalCameraPosition, srcIndex, syntheticChildBuffers );
+			applySphericalHarmonics( rgb, center, shLocalCameraPosition, srcIndex, syntheticInstanceBuffers );
 
 		}
 

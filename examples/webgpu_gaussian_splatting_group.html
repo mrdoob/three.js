@@ -50,7 +50,15 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer, controls, clock, hitMarker;
-			let group, splatLion, splatTomatoes;
+			let group, lionId, tomatoesId;
+			let splatLion, splatTomatoes;
+			const tomatoesPosition = new THREE.Vector3( 0.12, 0, 0.05 );
+			const tomatoesQuaternion = new THREE.Quaternion();
+
+			// the tomatoes SPZ scene is modeled roughly 10x larger than the lion scene
+			const tomatoesScale = new THREE.Vector3( 0.06, 0.06, 0.06 );
+			let tomatoesRotationY = 0;
+			const tomatoesMatrix = new THREE.Matrix4();
 			let mode = 'Grouped (correct blending)';
 			let rotateTomatoes = false;
 			let showLion = true;
@@ -60,9 +68,6 @@
 			const MODE_NAMES = [ 'Grouped (correct blending)', 'Independent (per-mesh sort)' ];
 			const TOMATOES_ROTATION_SPEED = 1.2; // radians/second
 
-			// hit testing is always on, independent of the grouped/independent toggle above,
-			// so it exercises GaussianSplatGroup.raycast() (which delegates to each child's
-			// own per-splat raycast) regardless of which rendering mode is active
 			const raycaster = new THREE.Raycaster();
 			const pointer = new THREE.Vector2();
 			const CLICK_DRAG_THRESHOLD = 4;
@@ -109,24 +114,11 @@
 					rotateTomatoes = value;
 
 				} );
-				// exercises GaussianSplatGroup's add/remove path repeatedly - each toggle
-				// dirties the group's mapping (`childadded`/`childremoved`) and forces a
-				// re-merge of the remaining children, without rebuilding any compute kernel
-				// or (thanks to the pre-sized shared buffers) even reallocating GPU memory
-				// in the common case - see GaussianSplatGroup's class documentation.
 				gui.add( { showLion }, 'showLion' ).name( 'Show Lion' ).onChange( ( value ) => {
 
 					showLion = value;
 
-					if ( showLion === true ) {
-
-						if ( splatLion.parent !== group ) group.add( splatLion );
-
-					} else {
-
-						if ( splatLion.parent === group ) group.remove( splatLion );
-
-					}
+					group.setVisibleAt( lionId, showLion );
 
 				} );
 
@@ -149,21 +141,41 @@
 
 				// two independently loaded splat sets, deliberately overlapping so the
 				// grouped-vs-independent blending difference is visible where they intersect
-				splatLion = new GaussianSplatMesh( lionGeometry );
-				splatLion.rotation.set( Math.PI, 0, 0 );
-				splatLion.position.set( - 0.12, 0, 0 );
+				const lionMatrix = new THREE.Matrix4().compose(
+					new THREE.Vector3( - 0.12, 0, 0 ),
+					new THREE.Quaternion().setFromEuler( new THREE.Euler( Math.PI, 0, 0 ) ),
+					new THREE.Vector3( 1, 1, 1 )
+				);
 
-				splatTomatoes = new GaussianSplatMesh( tomatoesGeometry );
-				splatTomatoes.position.set( 0.12, 0, 0.05 );
-				// the tomatoes SPZ scene is modeled roughly 10x larger than the lion scene
-				splatTomatoes.scale.setScalar( 0.06 );
+				tomatoesMatrix.compose( tomatoesPosition, tomatoesQuaternion, tomatoesScale );
 
 				group = new GaussianSplatGroup();
-				group.add( splatLion, splatTomatoes );
 				scene.add( group );
 
-				// populates the group's bounding sphere so the camera can be fit to it
-				group.update( renderer, camera );
+				lionId = group.addSplat( lionGeometry );
+				tomatoesId = group.addSplat( tomatoesGeometry );
+
+				group.setMatrixAt( lionId, lionMatrix );
+				group.setMatrixAt( tomatoesId, tomatoesMatrix );
+
+				// standalone copies for the "Independent (per-mesh sort)" comparison mode -
+				// same geometry and transform as their group counterparts, but each is its own
+				// self-contained GaussianSplatMesh, sorted only against itself
+				splatLion = new GaussianSplatMesh( lionGeometry );
+				splatLion.matrix.copy( lionMatrix );
+				splatLion.matrixAutoUpdate = false;
+				splatLion.visible = false;
+				scene.add( splatLion );
+
+				splatTomatoes = new GaussianSplatMesh( tomatoesGeometry );
+				splatTomatoes.matrix.copy( tomatoesMatrix );
+				splatTomatoes.matrixAutoUpdate = false;
+				splatTomatoes.visible = false;
+				scene.add( splatTomatoes );
+
+				// populates the group's bounding sphere so the camera can be fit to it - no
+				// renderer/GPU work needed, unlike the old update( renderer, camera ) call
+				group.computeBoundingSphere();
 
 				fitCameraToGroup( group );
 				updateHitMarkerSize( group );
@@ -221,16 +233,7 @@
 
 				raycaster.setFromCamera( pointer, camera );
 
-				// call GaussianSplatGroup.raycast() directly rather than through
-				// raycaster.intersectObject(), since that delegates to each child's own
-				// per-splat raycast regardless of the children's `visible` flag (which
-				// GaussianSplatGroup toggles for rendering purposes only) - this way hit
-				// testing works identically in both the grouped and independent modes.
-				const intersects = [];
-				group.raycast( raycaster, intersects );
-				intersects.sort( ( a, b ) => a.distance - b.distance );
-
-				const hit = intersects[ 0 ];
+				const hit = raycaster.intersectObject( group )[ 0 ];
 
 				if ( hit ) {
 
@@ -267,33 +270,29 @@
 
 				if ( rotateTomatoes === true ) {
 
-					// continuously moves splatTomatoes's matrixWorld relative to the group,
-					// exercising GaussianSplatGroup's per-child transform-change detection
-					// and re-merge/re-sort path every frame instead of only on add/remove
-					splatTomatoes.rotation.y += delta * TOMATOES_ROTATION_SPEED;
+					// continuously recomposes the tomatoes' transform, exercising
+					// GaussianSplatGroup.setMatrixAt()'s cheap per-instance re-merge path every
+					// frame instead of only on add/remove/visibility changes - the lion's splat
+					// range is untouched and is not re-merged
+					tomatoesRotationY += delta * TOMATOES_ROTATION_SPEED;
+					tomatoesQuaternion.setFromEuler( new THREE.Euler( 0, tomatoesRotationY, 0 ) );
+					tomatoesMatrix.compose( tomatoesPosition, tomatoesQuaternion, tomatoesScale );
+
+					group.setMatrixAt( tomatoesId, tomatoesMatrix );
+					splatTomatoes.matrix.copy( tomatoesMatrix );
 
 				}
 
 				if ( mode === 'Grouped (correct blending)' ) {
 
-					group.update( renderer, camera );
+					group.visible = true;
+					splatLion.visible = false;
+					splatTomatoes.visible = false;
 
 				} else {
 
-					// GaussianSplatGroup.update() is what suppresses each child's own
-					// rendering, so skipping it and showing the children directly
-					// reproduces the interleaving artifact of two independently sorted
-					// meshes for comparison. Each mesh's own autoSort (default true)
-					// keeps it correctly sorted with itself, just not with the other mesh.
-					//
-					// `group` must stay visible=true here (just with nothing of its own to
-					// draw) rather than being hidden outright: the renderer's scene
-					// traversal skips an invisible object's entire subtree, so a hidden
-					// group would take splatLion/splatTomatoes down with it even though
-					// their own `visible` is true.
-					group.visible = true;
-					group.geometry.instanceCount = 0;
-					splatLion.visible = true;
+					group.visible = false;
+					splatLion.visible = showLion;
 					splatTomatoes.visible = true;
 
 				}
