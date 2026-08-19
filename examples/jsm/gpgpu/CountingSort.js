@@ -162,8 +162,6 @@ class CountingSort {
 			// grows, so a `CountingSort` whose `count` never changes doesn't over-allocate
 			const capacity = Math.max( 1, this._capacity === 0 ? value : Math.ceil( value * this.growthSlack ) );
 
-			console.debug( `[CountingSort] growing order/bin buffers ${ this._capacity } -> ${ capacity } (count=${ value })` );
-
 			this._growOrderBuffers( capacity );
 
 		}
