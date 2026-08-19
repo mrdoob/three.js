@@ -349,7 +349,7 @@
 		"webgpu_furnace_test",
 		"webgpu_gaussian_splat",
 		"webgpu_gaussian_splatting",
-		"webgpu_gaussian_splatting_group",
+		"webgpu_gaussian_splat_group",
 		"webgpu_generator_building",
 		"webgpu_generator_city",
 		"webgpu_geometry_loft",
