@@ -57,7 +57,7 @@ const _restPropertyPattern = /^f_rest_\d+$/;
  * ```js
  * const loader = new GaussianSplatPLYLoader();
  * const geometry = await loader.loadAsync( './models/gsplat/point_cloud.ply' );
- * scene.add( new GaussianSplatMesh( geometry ) );
+ * scene.add( new GaussianSplat( geometry ) );
  * ```
  *
  * @augments Loader

@@ -45,7 +45,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { SPZLoader } from 'three/addons/loaders/SPZLoader.js';
-			import { GaussianSplatMesh } from 'three/addons/objects/GaussianSplatMesh.js';
+			import { GaussianSplat } from 'three/addons/objects/GaussianSplat.js';
 			import { GaussianSplatGroup } from 'three/addons/objects/GaussianSplatGroup.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -162,14 +162,14 @@
 
 				// standalone copies for the "Independent (per-mesh sort)" comparison mode -
 				// same geometry and transform as their group counterparts, but each is its own
-				// self-contained GaussianSplatMesh, sorted only against itself
-				splatLion = new GaussianSplatMesh( lionGeometry );
+				// self-contained GaussianSplat, sorted only against itself
+				splatLion = new GaussianSplat( lionGeometry );
 				splatLion.matrix.copy( lionMatrix );
 				splatLion.matrixAutoUpdate = false;
 				splatLion.visible = false;
 				scene.add( splatLion );
 
-				splatTomatoes = new GaussianSplatMesh( tomatoesGeometry );
+				splatTomatoes = new GaussianSplat( tomatoesGeometry );
 				splatTomatoes.matrix.copy( tomatoesMatrix );
 				splatTomatoes.matrixAutoUpdate = false;
 				splatTomatoes.visible = false;

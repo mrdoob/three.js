@@ -140,7 +140,7 @@ export default QUnit.module( 'Addons', () => {
 
 		QUnit.module( 'GLTFLoader', () => {
 
-			QUnit.test( 'loads KHR_gaussian_splatting primitives as GaussianSplatMesh', async ( assert ) => {
+			QUnit.test( 'loads KHR_gaussian_splatting primitives as GaussianSplat', async ( assert ) => {
 
 				const loader = new GLTFLoader();
 				loader.register( function ( parser ) {
@@ -153,7 +153,7 @@ export default QUnit.module( 'Addons', () => {
 				const mesh = gltf.scene.children[ 0 ];
 				const covariances = mesh.splatGeometry.getAttribute( 'covariance' ).array;
 
-				assert.ok( mesh.isGaussianSplatMesh, 'creates GaussianSplatMesh' );
+				assert.ok( mesh.isGaussianSplat, 'creates GaussianSplat' );
 				assert.deepEqual( Array.from( mesh.splatGeometry.getAttribute( 'position' ).array ), [ 1, 2, 3 ], 'loads centers' );
 				closeTo( assert, covariances[ 0 ], 4, 'covariance xx' );
 				closeTo( assert, covariances[ 3 ], 9, 'covariance yy' );

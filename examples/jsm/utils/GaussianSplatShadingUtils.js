@@ -38,7 +38,7 @@ import {
 import { SH_BAND_COMPONENTS, SH_BAND_WORDS } from './GaussianSplatUtils.js';
 
 /**
- * Shading, geometry and buffer-layout logic shared by {@link GaussianSplatMesh}
+ * Shading, geometry and buffer-layout logic shared by {@link GaussianSplat}
  * (one self-contained splat cloud) and {@link GaussianSplatGroup} (many splat
  * clouds merged into one shared buffer set and sorted together). Neither class
  * depends on the other; this module is what they both depend on instead, so
@@ -71,7 +71,7 @@ const _worldScale = /*@__PURE__*/ new Vector3();
 
 /**
  * Whether the camera has rotated relative to `worldMatrix` enough, since
- * `lastSortDirection`, to warrant a new sort. Shared by {@link GaussianSplatMesh}
+ * `lastSortDirection`, to warrant a new sort. Shared by {@link GaussianSplat}
  * and {@link GaussianSplatGroup}, whose sort scheduling is otherwise identical.
  *
  * @param {Camera} camera - The camera used for rendering.
@@ -164,7 +164,7 @@ function createGeometry( count ) {
  * @param {Float32Array} covariances - Splat covariances, 6 floats per splat (upper triangle).
  * @param {Uint8Array|Uint8ClampedArray} colors - Splat RGBA colors, 4 bytes per splat.
  * @param {Object} [sphericalHarmonics={}] - `{ degree, sh1, sh2, sh3 }`, packed uint32 SH bands.
- * @return {Object} The storage buffer state - see the class documentation of `GaussianSplatMesh`/`GaussianSplatGroup`.
+ * @return {Object} The storage buffer state - see the class documentation of `GaussianSplat`/`GaussianSplatGroup`.
  */
 function createStorageBuffers( count, centers, covariances, colors, sphericalHarmonics = {} ) {
 
@@ -655,7 +655,7 @@ function createMaterial( vertexNode, fragmentNode ) {
 /**
  * Intersects a ray with the ellipsoid a splat's covariance describes, which reduces to a
  * quadratic in `t` whose smaller root is the near surface. Used by both
- * `GaussianSplatMesh#raycast` and `GaussianSplatGroup#raycast`.
+ * `GaussianSplat#raycast` and `GaussianSplatGroup#raycast`.
  *
  * @param {BufferAttribute} positionAttribute - The splat centers.
  * @param {BufferAttribute} covarianceAttribute - The splat covariances (upper triangle, 6 components).

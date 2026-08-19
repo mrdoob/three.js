@@ -76,7 +76,7 @@ const _ray = /*@__PURE__*/ new Ray();
  *
  * This class requires {@link WebGPURenderer} with real WebGPU compute support - the
  * `forceWebGL` (WebGL2) backend is not yet supported, and `onBeforeRender` throws if used
- * with it. Use independent {@link GaussianSplatMesh} instances on WebGL2 instead.
+ * with it. Use independent {@link GaussianSplat} instances on WebGL2 instead.
  *
  * @augments Mesh
  * @three_import import { GaussianSplatGroup } from 'three/addons/objects/GaussianSplatGroup.js';
@@ -201,7 +201,7 @@ class GaussianSplatGroup extends Mesh {
 	/**
 	 * Adds a splat cloud to the group.
 	 *
-	 * @param {BufferGeometry} splatGeometry - The splat geometry to add. Same attribute contract as {@link GaussianSplatMesh}'s constructor.
+	 * @param {BufferGeometry} splatGeometry - The splat geometry to add. Same attribute contract as {@link GaussianSplat}'s constructor.
 	 * @return {number} An id identifying this splat cloud, for use with {@link GaussianSplatGroup#setMatrixAt}/{@link GaussianSplatGroup#setVisibleAt}/{@link GaussianSplatGroup#deleteSplat}.
 	 */
 	addSplat( splatGeometry ) {
@@ -338,7 +338,7 @@ class GaussianSplatGroup extends Mesh {
 
 		if ( renderer.backend && renderer.backend.isWebGLBackend === true ) {
 
-			throw new Error( 'THREE.GaussianSplatGroup: the WebGL2 (forceWebGL) backend is not yet supported - see the class documentation. Use independent GaussianSplatMesh instances instead.' );
+			throw new Error( 'THREE.GaussianSplatGroup: the WebGL2 (forceWebGL) backend is not yet supported - see the class documentation. Use independent GaussianSplat instances instead.' );
 
 		}
 
