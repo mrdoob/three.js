@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - async node compilation</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - async node compilation">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_tsl_compile_async.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_tsl_compile_async.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			#stats {
+				position: fixed;
+				top: 80px;
+				left: 20px;
+				background: rgba(0,0,0,0.7);
+				color: #fff;
+				padding: 10px 15px;
+				font-family: monospace;
+				font-size: 12px;
+				border-radius: 4px;
+				z-index: 100;
+				min-width: 220px;
+			}
+			#stats .label { color: #888; }
+			#stats .value { color: #0f0; font-weight: bold; }
+			#stats .value.bad { color: #f55; }
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Async Node Compilation</span>
+			</div>
+
+			<small id="description">Compare rendering directly with precompiling <span id="materialCount">16</span> unique TSL materials against an existing lit scene.</small>
+		</div>
+
+		<div id="stats">
+			<div><span class="label">Longest frame: </span><span id="longestFrame" class="value">-</span></div>
+			<div><span class="label">Meshes in scene: </span><span id="meshCount" class="value">0 / 16</span></div>
+			<div><span class="label">Mode: </span><span id="compileMode" class="value">-</span></div>
+			<div><span class="label">Compile time: </span><span id="compileTime" class="value">-</span></div>
+		</div>
+
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { PMREMGenerator, WebGLRenderer } from 'three';
+			import { uv, float, vec3, hash, mx_noise_vec3, mx_worley_noise_vec3, mx_cell_noise_float, mx_fractal_noise_vec3 } from 'three/tsl';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { WebGLNodesHandler } from 'three/addons/tsl/WebGLNodesHandler.js';
+
+			const MESH_COUNT = 16;
+			const GRID_SIZE = 4;
+			const ADD_DELAY = 750;
+
+			let camera, scene, renderer;
+			let sphere;
+			let gui;
+
+			// Frame timing
+			let lastFrameTime = 0;
+			let longestFrameTime = 0;
+			let isTracking = false;
+			let shouldStartTracking = false;
+			let sphereStartTime = 0;
+			let currentMode = '';
+			let framesAfterComplete = 0;
+			let testDone = false;
+			let meshGroup = null;
+
+			const longestFrameEl = document.getElementById( 'longestFrame' );
+			const meshCountEl = document.getElementById( 'meshCount' );
+			const compileModeEl = document.getElementById( 'compileMode' );
+			const compileTimeEl = document.getElementById( 'compileTime' );
+
+			const params = {
+				withoutCompile: function () {
+
+					window.location.href = window.location.pathname + '?mode=no-compile';
+
+				},
+				withCompileAsync: function () {
+
+					window.location.href = window.location.pathname + '?mode=compile-async';
+
+				}
+			};
+
+			init();
+
+			async function init() {
+
+				// GUI
+				gui = new GUI();
+				gui.add( params, 'withoutCompile' ).name( 'Build on render' );
+				gui.add( params, 'withCompileAsync' ).name( 'Pre-build (compileAsync)' );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 6, 18 );
+				camera.lookAt( 0, 4, 0 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x20242b );
+
+				// The target scene's lighting and environment must be ready before precompiling content for it.
+				const pointLight = new THREE.PointLight( 0xffffff, 500, 30 );
+				pointLight.position.set( - 3, 7, 4 );
+				pointLight.castShadow = true;
+				pointLight.shadow.mapSize.set( 512, 512 );
+				scene.add( pointLight );
+				scene.add( new THREE.HemisphereLight( 0xbfd8ff, 0x302820, 1.5 ) );
+
+				// Create animated sphere
+				const sphereGeometry = new THREE.SphereGeometry( 0.5, 32, 32 );
+				const sphereMaterial = new THREE.MeshNormalMaterial();
+				sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+				sphere.position.y = 9;
+				scene.add( sphere );
+
+				renderer = new WebGLRenderer( { antialias: true } );
+				renderer.setNodesHandler( new WebGLNodesHandler() );
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.autoUpdate = false;
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				document.body.appendChild( renderer.domElement );
+
+				const environment = new RoomEnvironment();
+				const pmremGenerator = new PMREMGenerator( renderer );
+				scene.environment = pmremGenerator.fromScene( environment ).texture;
+				environment.dispose();
+				pmremGenerator.dispose();
+
+				const groundMaterial = new THREE.MeshStandardMaterial( { color: 0x555c66, roughness: 0.8 } );
+				const ground = new THREE.Mesh( new THREE.PlaneGeometry( 30, 30 ), groundMaterial );
+				ground.rotation.x = - Math.PI / 2;
+				ground.receiveShadow = true;
+				scene.add( ground );
+
+				const shadowCaster = new THREE.Mesh(
+					new THREE.CylinderGeometry( 0.6, 0.8, 3, 32 ),
+					new THREE.MeshStandardMaterial( { color: 0xb0b8c4, roughness: 0.25 } )
+				);
+				shadowCaster.position.set( - 3, 1.5, 0 );
+				shadowCaster.castShadow = true;
+				scene.add( shadowCaster );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 4, 0 );
+				controls.update();
+
+				// Get mode from URL
+				const urlParams = new URLSearchParams( window.location.search );
+				const mode = urlParams.get( 'mode' ) || 'compile-async';
+
+				const modeLabel = mode === 'compile-async' ? 'Pre-build (compileAsync)' : 'Build on render';
+				compileModeEl.textContent = modeLabel;
+
+				// Start sphere animation
+				sphereStartTime = performance.now();
+
+				// Schedule mesh addition after delay
+				setTimeout( () => addMeshes( mode ), ADD_DELAY );
+
+			}
+
+			function createUniqueMaterial( index ) {
+
+				const material = new THREE.MeshStandardNodeMaterial( { metalness: 0.1, roughness: 0.35 } );
+
+				const seed = float( index * 0.1 + 1.0 );
+				const scale = float( ( index % 5 ) + 2.0 );
+				const uvNode = uv().mul( scale ).add( hash( float( index ) ) );
+
+				const noiseType = index % 4;
+				let colorNode;
+
+				switch ( noiseType ) {
+
+					case 0:
+						colorNode = mx_noise_vec3( uvNode.mul( seed ) ).mul( 0.5 ).add( 0.5 );
+						break;
+
+					case 1:
+						colorNode = mx_worley_noise_vec3( uvNode.mul( seed.mul( 0.5 ) ) );
+						break;
+
+					case 2:
+						const cellNoise = mx_cell_noise_float( uvNode.mul( seed ) );
+						colorNode = vec3( cellNoise, cellNoise.mul( 0.7 ), cellNoise.mul( 0.4 ) );
+						break;
+
+					case 3:
+						colorNode = mx_fractal_noise_vec3( uvNode.mul( seed.mul( 0.3 ) ), float( 3 ), float( 2.0 ), float( 0.5 ) )
+							.mul( 0.5 ).add( 0.5 );
+						break;
+
+				}
+
+				const tintR = hash( float( index * 3 ) );
+				const tintG = hash( float( index * 3 + 1 ) );
+				const tintB = hash( float( index * 3 + 2 ) );
+				const tint = vec3( tintR, tintG, tintB ).mul( 0.3 ).add( 0.7 );
+
+				material.colorNode = colorNode.mul( tint );
+
+				return material;
+
+			}
+
+			async function addMeshes( mode ) {
+
+				const geometry = new THREE.PlaneGeometry( 0.95, 0.95 );
+				const spacing = 1.05;
+				const start = - ( GRID_SIZE - 1 ) * spacing / 2;
+
+				meshGroup = new THREE.Group();
+
+				for ( let i = 0; i < MESH_COUNT; i ++ ) {
+
+					const material = createUniqueMaterial( i );
+					const mesh = new THREE.Mesh( geometry, material );
+
+					const col = i % GRID_SIZE;
+					const row = Math.floor( i / GRID_SIZE );
+
+					mesh.position.set( start + col * spacing, 0.5 + row * spacing, 0 );
+					mesh.receiveShadow = true;
+
+					meshGroup.add( mesh );
+
+				}
+
+				currentMode = mode;
+
+				if ( mode === 'compile-async' ) {
+
+					// Compile detached content against the scene it will be added to. The scene already
+					// contains its final lights and environment, so the resulting programs can be reused.
+					shouldStartTracking = true;
+
+					const startTime = performance.now();
+					await renderer.compileAsync( meshGroup, camera, scene );
+					compileTimeEl.textContent = ( performance.now() - startTime ).toFixed( 1 ) + ' ms';
+
+					scene.add( meshGroup );
+					renderer.shadowMap.needsUpdate = true;
+					testDone = true;
+
+				} else {
+
+					// Add all meshes at once - renderer compiles on-demand
+					// Meshes appear progressively as they compile
+					scene.add( meshGroup );
+					renderer.shadowMap.needsUpdate = true;
+
+					// Start tracking on next animate() frame
+					shouldStartTracking = true;
+					testDone = true;
+
+				}
+
+			}
+
+			function finishTest() {
+
+				isTracking = false;
+
+				longestFrameEl.textContent = longestFrameTime.toFixed( 1 ) + ' ms';
+				longestFrameEl.className = longestFrameTime > 100 ? 'value bad' : 'value';
+
+			}
+
+			function onWindowResize() {
+
+				if ( ! renderer || ! camera ) return;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				const now = performance.now();
+
+				// Initialize tracking on first frame after meshes added
+				if ( shouldStartTracking ) {
+
+					shouldStartTracking = false;
+					isTracking = true;
+					lastFrameTime = now;
+					longestFrameTime = 0;
+					framesAfterComplete = 0;
+
+				}
+
+				// Track longest frame during test
+				if ( isTracking && lastFrameTime > 0 && lastFrameTime !== now ) {
+
+					const frameTime = now - lastFrameTime;
+					if ( frameTime > longestFrameTime ) {
+
+						longestFrameTime = frameTime;
+
+					}
+
+				}
+
+				lastFrameTime = now;
+
+				// Animate sphere left to right
+				if ( sphere && sphereStartTime > 0 ) {
+
+					const elapsed = ( now - sphereStartTime ) / 1000;
+					sphere.position.x = Math.sin( elapsed * 2 ) * 5;
+					sphere.rotation.x = elapsed;
+					sphere.rotation.y = elapsed * 1.5;
+
+				}
+
+				renderer.render( scene, camera );
+
+				// Update mesh count display
+				if ( meshGroup ) {
+
+					const meshCount = meshGroup.parent === scene ? meshGroup.children.length : 0;
+					meshCountEl.textContent = meshCount + ' / ' + MESH_COUNT;
+
+				}
+
+				// Finish test - wait a few frames after testDone to capture frame times
+				if ( isTracking && testDone ) {
+
+					framesAfterComplete ++;
+
+					// Wait longer for deferred mode (meshes compile progressively)
+					const framesToWait = currentMode === 'compile-async' ? 2 : 60;
+
+					if ( framesAfterComplete >= framesToWait ) {
+
+						finishTest();
+
+					}
+
+				}
+
+			}
+
+		</script>
+	</body>
+</html>

@@ -1444,7 +1444,7 @@ class WebGLRenderer {
 
 			// node materials reference the shadow map when they are built, so it must exist by now
 
-			if ( _nodesHandler !== null ) shadowMap.render( currentRenderState.state.shadowsArray, targetScene, camera );
+			if ( _nodesHandler !== null ) shadowMap.setup( currentRenderState.state.shadowsArray, targetScene );
 
 			// Only initialize materials in the new scene, not the targetScene.
 
