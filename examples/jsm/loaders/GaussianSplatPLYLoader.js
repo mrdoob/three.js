@@ -289,6 +289,7 @@ function convertPLYGeometry( geometry ) {
 	const covariances = new Float32Array( count * 6 );
 	const colors = new Uint8ClampedArray( count * 4 );
 	const sphericalHarmonicsDegree = getRestSphericalHarmonicsDegree( shRest );
+	const shRestStride = sphericalHarmonicsDegree > 0 ? shRest.itemSize / 3 : 0;
 	const sphericalHarmonics = {};
 	const sphericalHarmonicsBytes = {};
 
@@ -329,7 +330,7 @@ function convertPLYGeometry( geometry ) {
 
 		if ( sphericalHarmonicsDegree > 0 ) {
 
-			writeSphericalHarmonicsFromRest( sphericalHarmonicsBytes, i, shRest );
+			writeSphericalHarmonicsFromRest( sphericalHarmonicsBytes, i, shRest, shRestStride );
 
 		}
 
@@ -355,9 +356,8 @@ function getRestSphericalHarmonicsDegree( shRest ) {
 
 }
 
-function writeSphericalHarmonicsFromRest( sphericalHarmonicsBytes, index, shRest ) {
+function writeSphericalHarmonicsFromRest( sphericalHarmonicsBytes, index, shRest, stride ) {
 
-	const stride = shRest.itemSize / 3;
 	const source = shRest.array;
 	const sourceOffset = index * shRest.itemSize;
 
