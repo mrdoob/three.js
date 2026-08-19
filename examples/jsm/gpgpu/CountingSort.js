@@ -41,9 +41,8 @@ class CountingSort {
 	 * @param {Object} [options={}] - Options that modify the counting sort.
 	 * @param {number} [options.binCount=4096] - The number of bins/buckets the sort key is quantized into. Larger values improve sort accuracy at the cost of a longer (but still single-pass) prefix sum.
 	 * @param {number} [options.workgroupSize=256] - The workgroup size of the compute shaders executed during the sort.
-	 * @param {number} [options.growthSlack=1.25] - How much extra capacity to allocate in the order/bin buffers beyond the current `count`, to avoid reallocating on every small change to {@link CountingSort#count}.
 	 */
-	constructor( count, { binCount = 4096, workgroupSize = 256, growthSlack = 1.25 } = {} ) {
+	constructor( count, { binCount = 4096, workgroupSize = 256 } = {} ) {
 
 		this._count = 0;
 
@@ -60,14 +59,6 @@ class CountingSort {
 		 * @type {number}
 		 */
 		this.workgroupSize = workgroupSize;
-
-		/**
-		 * How much extra capacity to allocate in the order/bin buffers beyond the current
-		 * `count`, to avoid reallocating on every small increase to `count`.
-		 *
-		 * @type {number}
-		 */
-		this.growthSlack = growthSlack;
 
 		this._capacity = 0;
 
@@ -93,7 +84,7 @@ class CountingSort {
 		this.offsetAtomic = storage( offsetAttribute, 'uint', binCount ).toAtomic();
 
 		// order/bin buffers are sized by `count` - built once against 1-element
-		// placeholders and grown in place by `_growOrderBuffers` as `count` grows.
+		// placeholders and resized in place by `_resizeOrderBuffers` as `count` changes.
 		this.orderAttribute = new StorageBufferAttribute( new Uint32Array( 1 ), 1, Uint32Array );
 		this._binAttribute = new StorageBufferAttribute( new Uint32Array( 1 ), 1, Uint32Array );
 
@@ -141,10 +132,11 @@ class CountingSort {
 	}
 
 	/**
-	 * The number of elements to sort. Assigning a larger value than the order/bin buffers
-	 * currently hold grows them in place (see `_growOrderBuffers`) and updates the dispatch
-	 * bounds of the compute kernels set up by {@link CountingSort#setBinNode}, if any -
-	 * unlike constructing a new {@link CountingSort}, this never rebuilds those kernels.
+	 * The number of elements to sort. Assigning a value different from what the order/bin
+	 * buffers currently hold resizes them in place, to exactly fit the new value (see
+	 * `_resizeOrderBuffers`), and updates the dispatch bounds of the compute kernels set up
+	 * by {@link CountingSort#setBinNode}, if any - unlike constructing a new
+	 * {@link CountingSort}, this never rebuilds those kernels.
 	 *
 	 * @type {number}
 	 */
@@ -156,13 +148,9 @@ class CountingSort {
 
 	set count( value ) {
 
-		if ( value > this._capacity ) {
+		if ( value !== this._capacity ) {
 
-			// the very first allocation is sized exactly - `growthSlack` only pads later
-			// grows, so a `CountingSort` whose `count` never changes doesn't over-allocate
-			const capacity = Math.max( 1, this._capacity === 0 ? value : Math.ceil( value * this.growthSlack ) );
-
-			this._growOrderBuffers( capacity );
+			this._resizeOrderBuffers( Math.max( 1, value ) );
 
 		}
 
@@ -177,11 +165,11 @@ class CountingSort {
 
 	}
 
-	// Reallocates the order/bin buffers to fit `capacity` elements and repoints
+	// Reallocates the order/bin buffers to exactly fit `capacity` elements and repoints
 	// `orderRead`/`orderWrite`/`binRead`/`binWrite` at them, without touching the
 	// histogram/offset buffers (sized by `binCount`, which never changes) or any
 	// compute kernel.
-	_growOrderBuffers( capacity ) {
+	_resizeOrderBuffers( capacity ) {
 
 		const oldOrderAttribute = this.orderAttribute;
 		const oldBinAttribute = this._binAttribute;

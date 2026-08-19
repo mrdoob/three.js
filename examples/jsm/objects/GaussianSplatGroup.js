@@ -81,10 +81,9 @@ const _ray = /*@__PURE__*/ new Ray();
  * `WebGPUBackend.computeGroupCount`) or by raw VRAM. The group's largest buffers
  * (`center`, `covarianceA`, `covarianceB`) are 16 bytes/splat each, one binding apiece.
  * Per web3dsurvey.com WebGPU limit data: 100% of surveyed devices support at least a
- * 128 MB binding (~8.4M splats, ~6.7M with this class's default 1.25x growth slack),
- * 97% support 256 MB (~16.8M splats, ~13.4M with slack), and 90% support ~1 GB
- * (~67M splats, ~54M with slack). Design/test against roughly 8-16M total live splats
- * as the "works on effectively all WebGPU hardware" target.
+ * 128 MB binding (~8.4M splats), 97% support 256 MB (~16.8M splats), and 90% support
+ * ~1 GB (~67M splats). Design/test against roughly 8-16M total live splats as the
+ * "works on effectively all WebGPU hardware" target.
  *
  * The compute kernels that merge splats into the shared buffers (see
  * `createMergeKernelSet()`) and the merged {@link CountingSort} are both built once, in
@@ -92,7 +91,7 @@ const _ray = /*@__PURE__*/ new Ray();
  * buffers, destination offset, relative transform) is passed in via uniforms and
  * swappable storage node `.value`s rather than baked into the kernel, and the sort's
  * `count` is simply reassigned rather than the sort being replaced, so adding/removing
- * splats or growing the shared buffers (`growGroupBufferState()`) never recompiles a
+ * splats or resizing the shared buffers (`resizeGroupBufferState()`) never recompiles a
  * pipeline - only spherical harmonics needs more than one merge kernel variant, since its
  * shading math branches on SH degree at shader-build time; `getOrCreateSHKernel()`
  * compiles one kernel per distinct degree encountered (at most 4) and caches it.
@@ -116,9 +115,8 @@ class GaussianSplatGroup extends Mesh {
 	 * @param {Object} [options] - Options.
 	 * @param {number} [options.binCount=4096] - The number of depth bins used by the group's merged {@link CountingSort}. Larger values improve sort accuracy when splats are spread across a large combined depth range, at the cost of a longer (but still single-pass) prefix sum.
 	 * @param {number} [options.workgroupSize=256] - The workgroup size of the compute shaders used for merging and sorting.
-	 * @param {number} [options.growthSlack=1.25] - How much extra capacity to allocate in the shared storage buffers beyond the current splat total, to avoid reallocating on every `addSplat`/`deleteSplat`.
 	 */
-	constructor( { binCount = BIN_COUNT, workgroupSize = WORKGROUP_SIZE, growthSlack = 1.25 } = {} ) {
+	constructor( { binCount = BIN_COUNT, workgroupSize = WORKGROUP_SIZE } = {} ) {
 
 		const geometry = createGeometry( 0 );
 
@@ -128,7 +126,7 @@ class GaussianSplatGroup extends Mesh {
 		// something this class has to flip on/off internally (see `onBeforeRender`).
 		const buffers = createGroupBufferState();
 		const localCameraPosition = uniform( new Vector3() );
-		const sort = new CountingSort( 0, { binCount, workgroupSize, growthSlack } );
+		const sort = new CountingSort( 0, { binCount, workgroupSize } );
 		const materialNodes = createMaterialNodes( buffers, sort, localCameraPosition );
 		const material = createMaterial( materialNodes.vertexNode, materialNodes.fragmentNode );
 
@@ -158,14 +156,6 @@ class GaussianSplatGroup extends Mesh {
 		 * @type {number}
 		 */
 		this.workgroupSize = workgroupSize;
-
-		/**
-		 * How much extra capacity to allocate in the shared storage buffers beyond the
-		 * current splat total, to avoid reallocating on every `addSplat`/`deleteSplat`.
-		 *
-		 * @type {number}
-		 */
-		this.growthSlack = growthSlack;
 
 		/**
 		 * The bounding box of the merged splats, in this group's local space. Not computed
@@ -563,19 +553,17 @@ class GaussianSplatGroup extends Mesh {
 		this._total = total;
 		this._sort.count = total;
 
+		if ( total !== this._buffers.capacity ) {
+
+			resizeGroupBufferState( this._buffers, Math.max( 1, total ) );
+
+		}
+
 		if ( total === 0 ) {
 
 			this.geometry.instanceCount = 0;
 
 			return;
-
-		}
-
-		// buffers are never shrunk back down on removal - growthSlack already keeps
-		// headroom for the next addition
-		if ( total > this._buffers.capacity ) {
-
-			growGroupBufferState( this._buffers, Math.max( 1, Math.ceil( total * this.growthSlack ) ) );
 
 		}
 
@@ -733,7 +721,7 @@ function createPlaceholderUintAttribute() {
 
 // Builds the group's shared storage nodes once - a writable and a read-only node per
 // attribute, the same pattern CountingSort uses for orderRead/orderWrite. `capacity`
-// tracks the size of the currently allocated buffers (0 until the first grow).
+// tracks the size of the currently allocated buffers (0 until the first resize).
 function createGroupBufferState() {
 
 	const centerAttribute = createPlaceholderVec4Attribute();
@@ -763,9 +751,9 @@ function createGroupBufferState() {
 
 }
 
-// Reallocates `state`'s backing GPU buffers at `capacity` and repoints its permanent
-// storage nodes at them - see `createGroupBufferState`.
-function growGroupBufferState( state, capacity ) {
+// Reallocates `state`'s backing GPU buffers to exactly `capacity` and repoints its
+// permanent storage nodes at them - see `createGroupBufferState`.
+function resizeGroupBufferState( state, capacity ) {
 
 	const oldCenterAttribute = state.centerAttribute;
 	const oldCovarianceAAttribute = state.covarianceAAttribute;
