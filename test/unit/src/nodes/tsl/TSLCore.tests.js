@@ -1,4 +1,4 @@
-import { Fn, vec3 } from '../../../../../src/nodes/tsl/TSLCore.js';
+import { Fn, vec3, float } from '../../../../../src/nodes/tsl/TSLCore.js';
 
 function mockBuilder() {
 
@@ -19,8 +19,10 @@ function mockBuilder() {
 
 function invokeFn( jsFunc, argument ) {
 
-	const callNode = Fn( jsFunc )( argument );
-	callNode.call( mockBuilder() );
+	// Bypass toVarIntent so we hit ShaderCallNodeInternal.call() (where the
+	// argument proxy is built) without needing a real node builder / stack.
+	const shaderCall = Fn( jsFunc ).shaderNode.call( [ argument ] );
+	shaderCall.call( mockBuilder() );
 
 }
 
@@ -64,19 +66,19 @@ export default QUnit.module( 'Nodes', () => {
 
 			} );
 
-			QUnit.test( 'Fn proxy still exposes named properties from a plain-object parameter', ( assert ) => {
+			QUnit.test( 'Fn proxy still exposes named properties from a parameter object', ( assert ) => {
 
+				const param = float( 1 );
 				let named;
-				const argument = { marker: 42 };
 
 				invokeFn( ( inputs ) => {
 
-					named = inputs.marker;
+					named = inputs.a;
 					return vec3( 0 );
 
-				}, argument );
+				}, { a: param } );
 
-				assert.strictEqual( named, 42, 'named property access on a plain object parameter still works' );
+				assert.strictEqual( named, param, 'named property access on a parameter object still returns the node' );
 
 			} );
 
