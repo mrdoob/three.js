@@ -53,6 +53,7 @@
 			let group, splatLion, splatTomatoes;
 			let mode = 'Grouped (correct blending)';
 			let rotateTomatoes = true;
+			let showLion = true;
 
 			THREE.ColorManagement.workingColorSpace = THREE.SRGBColorSpace;
 
@@ -106,6 +107,26 @@
 				gui.add( { rotateTomatoes }, 'rotateTomatoes' ).name( 'Rotate Tomatoes' ).onChange( ( value ) => {
 
 					rotateTomatoes = value;
+
+				} );
+				// exercises GaussianSplatGroup's add/remove path repeatedly - each toggle
+				// dirties the group's mapping (`childadded`/`childremoved`) and forces a
+				// re-merge of the remaining children, without rebuilding any compute kernel
+				// or (thanks to the pre-sized shared buffers) even reallocating GPU memory
+				// in the common case - see GaussianSplatGroup's class documentation.
+				gui.add( { showLion }, 'showLion' ).name( 'Show Lion' ).onChange( ( value ) => {
+
+					showLion = value;
+
+					if ( showLion === true ) {
+
+						if ( splatLion.parent !== group ) group.add( splatLion );
+
+					} else {
+
+						if ( splatLion.parent === group ) group.remove( splatLion );
+
+					}
 
 				} );
 

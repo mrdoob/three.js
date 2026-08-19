@@ -21,6 +21,7 @@ import {
 } from 'three/tsl';
 
 import { CountingSort } from '../gpgpu/CountingSort.js';
+import { SH_BAND_WORDS } from '../utils/GaussianSplatUtils.js';
 import {
 	BIN_COUNT,
 	WORKGROUP_SIZE,
@@ -28,8 +29,7 @@ import {
 	applySphericalHarmonics,
 	createGeometry,
 	createMaterial,
-	createMaterialNodes,
-	ensureSphericalHarmonicsContributionBuffer
+	createMaterialNodes
 } from './GaussianSplatMesh.js';
 
 const _worldCenter = /*@__PURE__*/ new Vector3();
@@ -86,6 +86,16 @@ const _sphere = /*@__PURE__*/ new Sphere();
  * 97% support 256 MB (~16.8M splats, ~13.4M with slack), and 90% support ~1 GB
  * (~67M splats, ~54M with slack). Design/test against roughly 8-16M total live splats
  * as the "works on effectively all WebGPU hardware" target.
+ *
+ * The compute kernels that merge children into the shared buffers (see
+ * `createMergeKernelSet()`) are built once, in the constructor, and reused for the
+ * group's entire lifetime. Per-child data (source buffers, destination offset, relative
+ * transform) is passed in via uniforms and swappable storage node `.value`s rather than
+ * baked into the kernel, so adding/removing children or growing the shared buffers
+ * (`growGroupBufferState()`) never recompiles a pipeline - only spherical harmonics needs
+ * more than one kernel variant, since its shading math branches on SH degree at
+ * shader-build time; `getOrCreateSHKernel()` compiles one kernel per distinct degree
+ * encountered (at most 4) and caches it.
  *
  * @augments Mesh
  * @three_import import { GaussianSplatGroup } from 'three/addons/objects/GaussianSplatGroup.js';
@@ -158,16 +168,19 @@ class GaussianSplatGroup extends Mesh {
 		 */
 		this.boundingSphere = null;
 
-		this._capacity = 0;
 		this._total = 0;
 		this._maxSphericalHarmonicsDegree = 0;
 		this._mappingDirty = true;
 
-		this._buffers = null;
+		// Both live for the group's entire lifetime - see the class documentation.
+		this._buffers = createGroupBufferState();
+		this._mergeKernels = createMergeKernelSet( this._buffers, this.workgroupSize );
+
 		this._sort = null;
-		// GaussianSplatMesh -> { kernels, relativeMatrix, lastMatrix, shKernel,
-		// shLocalCameraPosition, lastSHCameraMatrix, lastSHWorldMatrix } - see
-		// `createChildMergeKernels` and `_updateSphericalHarmonics`.
+
+		// GaussianSplatMesh -> { base, count, relativeMatrix, lastMatrix,
+		// sphericalHarmonicsDegree, shLocalCameraPosition, lastSHCameraMatrix,
+		// lastSHWorldMatrix } - see `_rebuildMapping` and `_updateSphericalHarmonics`.
 		this._childState = new Map();
 
 		this._sortMatrix = uniform( new Matrix4() );
@@ -176,13 +189,8 @@ class GaussianSplatGroup extends Mesh {
 		this._lastSortDirection = new Vector3();
 		this._lastGroupWorldMatrix = null;
 
-		// Unused placeholder passed to `createMaterialNodes()`: that function's
-		// non-precomputed spherical harmonics path (which is the only path that reads
-		// this uniform) is never selected for a GaussianSplatGroup - see
-		// `_rebuildSortAndMaterial()` and `_updateSphericalHarmonics()`, which compute
-		// spherical harmonics per child instead of once for the whole group (a single
-		// shared camera-position uniform can't be correct once children have different
-		// rotations relative to the group - see `_updateSphericalHarmonics()`).
+		// Unused placeholder required by `createMaterialNodes()`'s signature; spherical
+		// harmonics is computed per child in `_updateSphericalHarmonics()` instead.
 		this._localCameraPosition = uniform( new Vector3() );
 
 		// Nothing has been merged yet; avoid the renderer building a pipeline for the
@@ -266,9 +274,9 @@ class GaussianSplatGroup extends Mesh {
 			if ( groupMoved === true || state.lastMatrix === null || state.lastMatrix.equals( child.matrixWorld ) === false ) {
 
 				_groupWorldMatrixInverse.copy( this.matrixWorld ).invert();
-				state.relativeMatrix.value.multiplyMatrices( _groupWorldMatrixInverse, child.matrixWorld );
+				state.relativeMatrix.multiplyMatrices( _groupWorldMatrixInverse, child.matrixWorld );
 
-				for ( const kernel of state.kernels ) renderer.compute( kernel );
+				this._dispatchChildMerge( renderer, child, state );
 
 				state.lastMatrix = ( state.lastMatrix || new Matrix4() ).copy( child.matrixWorld );
 				mergedAny = true;
@@ -318,7 +326,7 @@ class GaussianSplatGroup extends Mesh {
 
 			if ( child.boundingBox === null ) child.computeBoundingBox();
 
-			_box.copy( child.boundingBox ).applyMatrix4( state.relativeMatrix.value );
+			_box.copy( child.boundingBox ).applyMatrix4( state.relativeMatrix );
 			this.boundingBox.union( _box );
 
 		}
@@ -341,7 +349,7 @@ class GaussianSplatGroup extends Mesh {
 
 			if ( child.boundingSphere === null ) child.computeBoundingSphere();
 
-			_sphere.copy( child.boundingSphere ).applyMatrix4( state.relativeMatrix.value );
+			_sphere.copy( child.boundingSphere ).applyMatrix4( state.relativeMatrix );
 			maxRadius = Math.max( maxRadius, this.boundingSphere.center.distanceTo( _sphere.center ) + _sphere.radius );
 
 		}
@@ -375,7 +383,8 @@ class GaussianSplatGroup extends Mesh {
 	 */
 	dispose() {
 
-		if ( this._buffers !== null ) disposeGroupBuffers( this._buffers );
+		disposeGroupBufferState( this._buffers );
+		disposeMergeKernels( this._mergeKernels );
 		if ( this._sort !== null ) this._sort.dispose();
 
 		this.geometry.dispose();
@@ -420,27 +429,32 @@ class GaussianSplatGroup extends Mesh {
 
 		}
 
-		const needsGrow = this._buffers === null || total > this._capacity || maxDegree !== this._maxSphericalHarmonicsDegree;
+		// buffers are never shrunk back down on removal - growthSlack already keeps
+		// headroom for the next addition
+		if ( total > this._buffers.capacity ) {
 
-		if ( needsGrow === true ) {
-
-			this._growBuffers( Math.max( 1, Math.ceil( total * this.growthSlack ) ), maxDegree );
+			growGroupBufferState( this._buffers, Math.max( 1, Math.ceil( total * this.growthSlack ) ) );
 
 		}
+
+		if ( maxDegree > 0 ) ensureSphericalHarmonicsContributionNodes( this._buffers );
+
+		this._maxSphericalHarmonicsDegree = maxDegree;
+		this._buffers.sphericalHarmonicsDegree = maxDegree;
 
 		let base = 0;
 
 		for ( const child of children ) {
 
 			const count = child.splatGeometry.getAttribute( 'position' ).count;
-			const merge = createChildMergeKernels( child, this._buffers, base, this._maxSphericalHarmonicsDegree, this.workgroupSize );
 
 			this._childState.set( child, {
-				kernels: merge.kernels,
-				relativeMatrix: merge.relativeMatrix,
+				base,
+				count,
+				relativeMatrix: new Matrix4(),
 				lastMatrix: null,
-				shKernel: merge.shKernel,
-				shLocalCameraPosition: merge.shLocalCameraPosition,
+				sphericalHarmonicsDegree: child._buffers.sphericalHarmonicsDegree,
+				shLocalCameraPosition: new Vector3(),
 				lastSHCameraMatrix: null,
 				lastSHWorldMatrix: null
 			} );
@@ -452,18 +466,6 @@ class GaussianSplatGroup extends Mesh {
 		this._rebuildSortAndMaterial( total );
 
 		this.geometry.instanceCount = total;
-
-	}
-
-	_growBuffers( capacity, maxDegree ) {
-
-		if ( this._buffers !== null ) disposeGroupBuffers( this._buffers );
-
-		this._buffers = createGroupBuffers( capacity, maxDegree );
-		this._capacity = capacity;
-		this._maxSphericalHarmonicsDegree = maxDegree;
-
-		if ( maxDegree > 0 ) ensureSphericalHarmonicsContributionBuffer( this._buffers );
 
 	}
 
@@ -507,28 +509,38 @@ class GaussianSplatGroup extends Mesh {
 
 	}
 
-	// Spherical harmonics coefficients are authored relative to each source mesh's own
-	// (unrotated) local axes, but the merge kernels above transform each child's splats
-	// - center and covariance alike - into the group's local space by its `relativeMatrix`,
-	// which includes that child's rotation relative to the group. Evaluating the merged
-	// (rotated) center against a single shared group-space camera position, as a naive
-	// group-level "merge everything, then run one SH pass" would, rotates the view
-	// direction fed into each child's SH coefficients by exactly that child's relative
-	// rotation without rotating the coefficients themselves to match - producing
-	// view-dependent shading that silently drifts from the same mesh's standalone
-	// (`GaussianSplatMesh`) rendering as soon as it's rotated relative to the group.
-	// So SH contribution is computed per child instead, each against that child's own
-	// (unrotated) local buffers and its own local camera position - identical to what
-	// `GaussianSplatMesh.updateSphericalHarmonics` does standalone - and written into
-	// the shared group buffer at that child's `base` offset. See `createChildMergeKernels`
-	// for where each child's kernel and camera-position uniform are built.
+	_dispatchChildMerge( renderer, child, state ) {
+
+		const kernels = this._mergeKernels;
+		const childBuffers = child._buffers;
+
+		kernels.baseIndex.value = state.base;
+		kernels.relativeMatrix.value.copy( state.relativeMatrix );
+
+		kernels.sourceCenterRead.value = childBuffers.centerRead.value;
+		kernels.sourceCovarianceARead.value = childBuffers.covarianceARead.value;
+		kernels.sourceCovarianceBRead.value = childBuffers.covarianceBRead.value;
+
+		kernels.transformKernel.count = state.count;
+		renderer.compute( kernels.transformKernel );
+
+		kernels.sourceColorRead.value = childBuffers.colorRead.value;
+
+		kernels.colorKernel.count = state.count;
+		renderer.compute( kernels.colorKernel );
+
+	}
+
+	// SH coefficients are authored relative to each child's own unrotated local axes, so
+	// contribution is computed per child, against that child's own local buffers and
+	// local camera position, rather than once for the merged (rotated) group.
 	_updateSphericalHarmonics( renderer, camera ) {
 
 		if ( this._maxSphericalHarmonicsDegree === 0 ) return;
 
-		for ( const [ child, state ] of this._childState ) {
+		const kernels = this._mergeKernels;
 
-			if ( state.shKernel === null ) continue;
+		for ( const [ child, state ] of this._childState ) {
 
 			const needsUpdate = state.lastSHCameraMatrix === null ||
 				camera.matrixWorld.equals( state.lastSHCameraMatrix ) === false ||
@@ -538,12 +550,25 @@ class GaussianSplatGroup extends Mesh {
 			if ( needsUpdate === false ) continue;
 
 			_worldMatrixInverse.copy( child.matrixWorld ).invert();
-			state.shLocalCameraPosition.value.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _worldMatrixInverse );
+			state.shLocalCameraPosition.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _worldMatrixInverse );
 
 			state.lastSHCameraMatrix = ( state.lastSHCameraMatrix || new Matrix4() ).copy( camera.matrixWorld );
 			state.lastSHWorldMatrix = ( state.lastSHWorldMatrix || new Matrix4() ).copy( child.matrixWorld );
 
-			renderer.compute( state.shKernel );
+			const childBuffers = child._buffers;
+			const degree = state.sphericalHarmonicsDegree;
+			const kernel = getOrCreateSHKernel( kernels, this._buffers, degree, this.workgroupSize );
+
+			kernels.baseIndex.value = state.base;
+			kernels.shLocalCameraPosition.value.copy( state.shLocalCameraPosition );
+			kernels.sourceCenterRead.value = childBuffers.centerRead.value;
+
+			if ( degree >= 1 ) kernels.sourceSH1Read.value = childBuffers.sphericalHarmonics1Read.value;
+			if ( degree >= 2 ) kernels.sourceSH2Read.value = childBuffers.sphericalHarmonics2Read.value;
+			if ( degree >= 3 ) kernels.sourceSH3Read.value = childBuffers.sphericalHarmonics3Read.value;
+
+			kernel.count = state.count;
+			renderer.compute( kernel );
 
 		}
 
@@ -582,84 +607,147 @@ class GaussianSplatGroup extends Mesh {
 
 }
 
-// Allocates the group's shared storage buffers at `capacity`, with both a writable
-// node (merge-kernel destination) and a read-only node (render-shader source)
-// wrapping each attribute - the same pattern CountingSort uses for orderRead/orderWrite.
-//
-// Unlike `GaussianSplatMesh`, this does *not* allocate raw per-band spherical harmonics
-// storage: `sphericalHarmonicsDegree` here only records the group's merged maximum (for
-// `ensureSphericalHarmonicsContributionBuffer` and the material's shading branch), since
-// each child's own raw SH coefficients are read directly from that child's buffers and
-// reduced to a per-splat contribution by its own kernel - see `createChildMergeKernels`'s
-// spherical harmonics kernel and `GaussianSplatGroup._updateSphericalHarmonics` for why
-// that has to happen per child rather than once for the whole merged group.
-function createGroupBuffers( capacity, sphericalHarmonicsDegree ) {
+// 1-element placeholder, replaced once real data is available.
+function createPlaceholderVec4Attribute() {
 
-	const centerAttribute = new StorageBufferAttribute( new Float32Array( capacity * 4 ), 4 );
-	const covarianceAAttribute = new StorageBufferAttribute( new Float32Array( capacity * 4 ), 4 );
-	const covarianceBAttribute = new StorageBufferAttribute( new Float32Array( capacity * 4 ), 4 );
-	const colorAttribute = new StorageBufferAttribute( new Uint32Array( capacity ), 1 );
+	return new StorageBufferAttribute( new Float32Array( 4 ), 4 );
+
+}
+
+function createPlaceholderUintAttribute() {
+
+	return new StorageBufferAttribute( new Uint32Array( 1 ), 1 );
+
+}
+
+// Builds the group's shared storage nodes once - a writable and a read-only node per
+// attribute, the same pattern CountingSort uses for orderRead/orderWrite. `capacity`
+// tracks the size of the currently allocated buffers (0 until the first grow).
+function createGroupBufferState() {
+
+	const centerAttribute = createPlaceholderVec4Attribute();
+	const covarianceAAttribute = createPlaceholderVec4Attribute();
+	const covarianceBAttribute = createPlaceholderVec4Attribute();
+	const colorAttribute = createPlaceholderUintAttribute();
 
 	return {
-		count: capacity,
-		sphericalHarmonicsDegree,
+		capacity: 0,
+		sphericalHarmonicsDegree: 0,
 		centerAttribute,
 		covarianceAAttribute,
 		covarianceBAttribute,
 		colorAttribute,
-		centerWrite: storage( centerAttribute, 'vec4', capacity ),
-		centerRead: storage( centerAttribute, 'vec4', capacity ).toReadOnly(),
-		covarianceAWrite: storage( covarianceAAttribute, 'vec4', capacity ),
-		covarianceARead: storage( covarianceAAttribute, 'vec4', capacity ).toReadOnly(),
-		covarianceBWrite: storage( covarianceBAttribute, 'vec4', capacity ),
-		covarianceBRead: storage( covarianceBAttribute, 'vec4', capacity ).toReadOnly(),
-		colorWrite: storage( colorAttribute, 'uint', capacity ),
-		colorRead: storage( colorAttribute, 'uint', capacity ).toReadOnly()
+		centerWrite: storage( centerAttribute, 'vec4', 0 ),
+		centerRead: storage( centerAttribute, 'vec4', 0 ).toReadOnly(),
+		covarianceAWrite: storage( covarianceAAttribute, 'vec4', 0 ),
+		covarianceARead: storage( covarianceAAttribute, 'vec4', 0 ).toReadOnly(),
+		covarianceBWrite: storage( covarianceBAttribute, 'vec4', 0 ),
+		covarianceBRead: storage( covarianceBAttribute, 'vec4', 0 ).toReadOnly(),
+		colorWrite: storage( colorAttribute, 'uint', 0 ),
+		colorRead: storage( colorAttribute, 'uint', 0 ).toReadOnly(),
+		sphericalHarmonicsContributionAttribute: null,
+		sphericalHarmonicsContributionRead: null,
+		sphericalHarmonicsContributionWrite: null
 	};
 
 }
 
-function disposeGroupBuffers( buffers ) {
+// Reallocates `state`'s backing GPU buffers at `capacity` and repoints its permanent
+// storage nodes at them - see `createGroupBufferState`.
+function growGroupBufferState( state, capacity ) {
 
-	buffers.centerAttribute.dispose();
-	buffers.covarianceAAttribute.dispose();
-	buffers.covarianceBAttribute.dispose();
-	buffers.colorAttribute.dispose();
+	const oldCenterAttribute = state.centerAttribute;
+	const oldCovarianceAAttribute = state.covarianceAAttribute;
+	const oldCovarianceBAttribute = state.covarianceBAttribute;
+	const oldColorAttribute = state.colorAttribute;
+	const oldContributionAttribute = state.sphericalHarmonicsContributionAttribute;
+
+	state.centerAttribute = new StorageBufferAttribute( new Float32Array( capacity * 4 ), 4 );
+	state.covarianceAAttribute = new StorageBufferAttribute( new Float32Array( capacity * 4 ), 4 );
+	state.covarianceBAttribute = new StorageBufferAttribute( new Float32Array( capacity * 4 ), 4 );
+	state.colorAttribute = new StorageBufferAttribute( new Uint32Array( capacity ), 1 );
+
+	state.centerWrite.value = state.centerAttribute;
+	state.centerRead.value = state.centerAttribute;
+	state.covarianceAWrite.value = state.covarianceAAttribute;
+	state.covarianceARead.value = state.covarianceAAttribute;
+	state.covarianceBWrite.value = state.covarianceBAttribute;
+	state.covarianceBRead.value = state.covarianceBAttribute;
+	state.colorWrite.value = state.colorAttribute;
+	state.colorRead.value = state.colorAttribute;
+
+	if ( oldContributionAttribute !== null ) {
+
+		state.sphericalHarmonicsContributionAttribute = new StorageBufferAttribute( new Float32Array( capacity * 4 ), 4 );
+		state.sphericalHarmonicsContributionRead.value = state.sphericalHarmonicsContributionAttribute;
+		state.sphericalHarmonicsContributionWrite.value = state.sphericalHarmonicsContributionAttribute;
+
+		oldContributionAttribute.dispose();
+
+	}
+
+	state.capacity = capacity;
+
+	oldCenterAttribute.dispose();
+	oldCovarianceAAttribute.dispose();
+	oldCovarianceBAttribute.dispose();
+	oldColorAttribute.dispose();
 
 }
 
-// Builds the compute kernels that transform a single child's local-space splats into
-// the group's shared buffers at `base`, using a uniform `relativeMatrix` (the child's
-// transform relative to the group) that can be updated every frame without rebuilding
-// any kernel. Position transforms by the full 4x4 matrix; covariance transforms by its
-// 3x3 linear part only (C' = A * C * A^T), following the same row-extraction pattern
-// GaussianSplatMesh's vertex shader uses for view-space covariance.
-//
-// This is split into several small kernels (transform, color, spherical harmonics)
-// rather than one kernel touching every buffer, because each simultaneously-bound
-// storage buffer counts against `maxStorageBuffersPerShaderStage`, whose universal
-// (100% of surveyed devices) baseline is only 8.
-function createChildMergeKernels( child, groupBuffers, base, maxSphericalHarmonicsDegree, workgroupSize ) {
+// Lazily allocates the spherical harmonics contribution buffer the first time any child
+// carries SH data - most groups never need it.
+function ensureSphericalHarmonicsContributionNodes( state ) {
 
-	const count = child.splatGeometry.getAttribute( 'position' ).count;
-	const childBuffers = child._buffers;
+	if ( state.sphericalHarmonicsContributionRead !== null ) return;
+
+	const attribute = new StorageBufferAttribute( new Float32Array( Math.max( 1, state.capacity ) * 4 ), 4 );
+
+	state.sphericalHarmonicsContributionAttribute = attribute;
+	state.sphericalHarmonicsContributionRead = storage( attribute, 'vec4', 0 ).toReadOnly();
+	state.sphericalHarmonicsContributionWrite = storage( attribute, 'vec4', 0 );
+
+}
+
+function disposeGroupBufferState( state ) {
+
+	state.centerAttribute.dispose();
+	state.covarianceAAttribute.dispose();
+	state.covarianceBAttribute.dispose();
+	state.colorAttribute.dispose();
+
+	if ( state.sphericalHarmonicsContributionAttribute !== null ) state.sphericalHarmonicsContributionAttribute.dispose();
+
+}
+
+// Builds the compute kernels that transform any child's local-space splats into the
+// group's shared buffers. Reads go through "source" storage nodes whose `.value` is
+// repointed at a specific child's real buffer right before that child's dispatch. Split
+// into separate transform/color/SH kernels because each simultaneously-bound storage
+// buffer counts against `maxStorageBuffersPerShaderStage`, whose universal baseline is 8.
+function createMergeKernelSet( groupBuffers, workgroupSize ) {
+
+	const baseIndex = uniform( 0, 'uint' );
 	const relativeMatrix = uniform( new Matrix4() );
-	const baseIndex = uint( base );
-	const kernels = [];
+
+	const sourceCenterRead = storage( createPlaceholderVec4Attribute(), 'vec4', 0 ).toReadOnly();
+	const sourceCovarianceARead = storage( createPlaceholderVec4Attribute(), 'vec4', 0 ).toReadOnly();
+	const sourceCovarianceBRead = storage( createPlaceholderVec4Attribute(), 'vec4', 0 ).toReadOnly();
+	const sourceColorRead = storage( createPlaceholderUintAttribute(), 'uint', 0 ).toReadOnly();
 
 	// position + covariance: 6 storage buffers (3 child reads, 3 group writes)
-	kernels.push( Fn( () => {
+	const transformKernel = Fn( () => {
 
 		const srcIndex = instanceIndex;
 		const dstIndex = baseIndex.add( srcIndex ).toVar( 'dstIndex' );
 
-		const localCenter = childBuffers.centerRead.element( srcIndex ).xyz.toVar( 'localCenter' );
+		const localCenter = sourceCenterRead.element( srcIndex ).xyz.toVar( 'localCenter' );
 		const worldCenter = relativeMatrix.mul( vec4( localCenter, 1 ) ).xyz.toVar( 'worldCenter' );
 
 		groupBuffers.centerWrite.element( dstIndex ).assign( vec4( worldCenter, 0 ) );
 
-		const covA = childBuffers.covarianceARead.element( srcIndex ).toVar( 'covA' );
-		const covB = childBuffers.covarianceBRead.element( srcIndex ).toVar( 'covB' );
+		const covA = sourceCovarianceARead.element( srcIndex ).toVar( 'covA' );
+		const covB = sourceCovarianceBRead.element( srcIndex ).toVar( 'covB' );
 
 		const cov0 = vec3( covA.x, covA.y, covA.z ).toVar( 'cov0' );
 		const cov1 = vec3( covA.y, covA.w, covB.x ).toVar( 'cov1' );
@@ -684,48 +772,106 @@ function createChildMergeKernels( child, groupBuffers, base, maxSphericalHarmoni
 		groupBuffers.covarianceAWrite.element( dstIndex ).assign( vec4( c00, c01, c02, c11 ) );
 		groupBuffers.covarianceBWrite.element( dstIndex ).assign( vec4( c12, c22, 0, 0 ) );
 
-	} )().compute( count, [ workgroupSize ] ).setName( 'GaussianSplatGroupMergeTransform' ) );
+	} )().compute( 1, [ workgroupSize ] ).setName( 'GaussianSplatGroupMergeTransform' );
 
 	// color: 2 storage buffers
-	kernels.push( Fn( () => {
+	const colorKernel = Fn( () => {
 
 		const dstIndex = baseIndex.add( instanceIndex );
 
-		groupBuffers.colorWrite.element( dstIndex ).assign( childBuffers.colorRead.element( instanceIndex ) );
+		groupBuffers.colorWrite.element( dstIndex ).assign( sourceColorRead.element( instanceIndex ) );
 
-	} )().compute( count, [ workgroupSize ] ).setName( 'GaussianSplatGroupMergeColor' ) );
+	} )().compute( 1, [ workgroupSize ] ).setName( 'GaussianSplatGroupMergeColor' );
 
-	// Spherical harmonics contribution: computed directly from this child's own
-	// (unrotated) local buffers and its own local camera position - exactly like
-	// `GaussianSplatMesh.updateSphericalHarmonics` does standalone - rather than from a
-	// group-space center against a shared group camera position, which would evaluate
-	// this child's (unrotated) SH coefficients against a direction rotated by this
-	// child's transform relative to the group. See `GaussianSplatGroup._updateSphericalHarmonics`.
-	//
-	// Built (and dispatched) even for a child with no SH data of its own, whenever the
-	// group carries a nonzero maximum degree, so it overwrites any stale contribution
-	// left in this destination range by a previous mapping that placed a different,
-	// SH-carrying child there - `rgb` simply stays zero in that case.
-	const shLocalCameraPosition = maxSphericalHarmonicsDegree > 0 ? uniform( new Vector3() ) : null;
+	return {
+		baseIndex,
+		relativeMatrix,
+		sourceCenterRead,
+		sourceCovarianceARead,
+		sourceCovarianceBRead,
+		sourceColorRead,
+		transformKernel,
+		colorKernel,
+		// spherical harmonics kernels/nodes are built lazily by `getOrCreateSHKernel`
+		shLocalCameraPosition: null,
+		sourceSH1Read: null,
+		sourceSH2Read: null,
+		sourceSH3Read: null,
+		shKernelsByDegree: new Map()
+	};
 
-	const shKernel = maxSphericalHarmonicsDegree > 0 ? Fn( () => {
+}
+
+// Returns the shared spherical harmonics kernel for `degree`, building and caching it the
+// first time this degree is encountered. The degree-0 kernel just zeroes the contribution,
+// for children with no SH data of their own.
+function getOrCreateSHKernel( kernels, groupBuffers, degree, workgroupSize ) {
+
+	let kernel = kernels.shKernelsByDegree.get( degree );
+
+	if ( kernel !== undefined ) return kernel;
+
+	if ( kernels.shLocalCameraPosition === null ) kernels.shLocalCameraPosition = uniform( new Vector3() );
+
+	if ( degree >= 1 && kernels.sourceSH1Read === null ) kernels.sourceSH1Read = storage( createPlaceholderUintAttribute(), 'uint', 0 ).toReadOnly();
+	if ( degree >= 2 && kernels.sourceSH2Read === null ) kernels.sourceSH2Read = storage( createPlaceholderUintAttribute(), 'uint', 0 ).toReadOnly();
+	if ( degree >= 3 && kernels.sourceSH3Read === null ) kernels.sourceSH3Read = storage( createPlaceholderUintAttribute(), 'uint', 0 ).toReadOnly();
+
+	const sourceCenterRead = kernels.sourceCenterRead;
+	const shLocalCameraPosition = kernels.shLocalCameraPosition;
+	const baseIndex = kernels.baseIndex;
+
+	// A minimal stand-in for a `GaussianSplatMesh` buffers object, exposing just what
+	// `applySphericalHarmonics()` reads: this degree's fixed word counts and this
+	// kernel set's own shared (swappable) per-band source nodes.
+	const syntheticChildBuffers = {
+		sphericalHarmonicsDegree: degree,
+		sphericalHarmonics1Read: kernels.sourceSH1Read,
+		sphericalHarmonics1Words: SH_BAND_WORDS[ 1 ],
+		sphericalHarmonics2Read: kernels.sourceSH2Read,
+		sphericalHarmonics2Words: SH_BAND_WORDS[ 2 ],
+		sphericalHarmonics3Read: kernels.sourceSH3Read,
+		sphericalHarmonics3Words: SH_BAND_WORDS[ 3 ]
+	};
+
+	kernel = Fn( () => {
 
 		const srcIndex = instanceIndex;
 		const dstIndex = baseIndex.add( srcIndex );
 		const rgb = vec3( 0 ).toVar( 'sphericalHarmonicsContribution' );
 
-		if ( childBuffers.sphericalHarmonicsDegree > 0 ) {
+		if ( degree > 0 ) {
 
-			const center = childBuffers.centerRead.element( srcIndex ).xyz.toVar( 'center' );
-			applySphericalHarmonics( rgb, center, shLocalCameraPosition, srcIndex, childBuffers );
+			const center = sourceCenterRead.element( srcIndex ).xyz.toVar( 'center' );
+			applySphericalHarmonics( rgb, center, shLocalCameraPosition, srcIndex, syntheticChildBuffers );
 
 		}
 
 		groupBuffers.sphericalHarmonicsContributionWrite.element( dstIndex ).assign( vec4( rgb, 0 ) );
 
-	} )().compute( count, [ workgroupSize ] ).setName( 'GaussianSplatGroupSphericalHarmonics' ) : null;
+	} )().compute( 1, [ workgroupSize ] ).setName( `GaussianSplatGroupSphericalHarmonics${ degree }` );
 
-	return { kernels, relativeMatrix, shKernel, shLocalCameraPosition };
+	kernels.shKernelsByDegree.set( degree, kernel );
+
+	return kernel;
+
+}
+
+function disposeMergeKernels( kernels ) {
+
+	kernels.transformKernel.dispose();
+	kernels.colorKernel.dispose();
+
+	for ( const shKernel of kernels.shKernelsByDegree.values() ) shKernel.dispose();
+
+	kernels.sourceCenterRead.value.dispose();
+	kernels.sourceCovarianceARead.value.dispose();
+	kernels.sourceCovarianceBRead.value.dispose();
+	kernels.sourceColorRead.value.dispose();
+
+	if ( kernels.sourceSH1Read !== null ) kernels.sourceSH1Read.value.dispose();
+	if ( kernels.sourceSH2Read !== null ) kernels.sourceSH2Read.value.dispose();
+	if ( kernels.sourceSH3Read !== null ) kernels.sourceSH3Read.value.dispose();
 
 }
 
