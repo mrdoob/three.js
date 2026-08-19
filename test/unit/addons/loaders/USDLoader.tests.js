@@ -1,11 +1,92 @@
 import { LoadingManager } from 'three';
 import { USDLoader } from '../../../../examples/jsm/loaders/USDLoader.js';
+import { USDComposer, SpecType } from '../../../../examples/jsm/loaders/usd/USDComposer.js';
+import { USDCParser } from '../../../../examples/jsm/loaders/usd/USDCParser.js';
 
 export default QUnit.module( 'Addons', () => {
 
 	QUnit.module( 'Loaders', () => {
 
 		QUnit.module( 'USDLoader', () => {
+
+			QUnit.test( 'reads the USDC string table after its count prefix', ( assert ) => {
+
+				const parser = new USDCParser();
+				const stringIndices = [ 4, 7, 9 ];
+				let readIndex = 0;
+				let seekOffset = null;
+
+				parser.sections = { STRINGS: { start: 32, size: 20 } };
+				parser.reader = {
+					seek( offset ) {
+
+						seekOffset = offset;
+
+					},
+					readUint64() {
+
+						return stringIndices.length;
+
+					},
+					readUint32() {
+
+						return stringIndices[ readIndex ++ ];
+
+					}
+				};
+
+				parser._readStrings();
+
+				assert.strictEqual( seekOffset, 32, 'The string section start is used.' );
+				assert.deepEqual( parser.strings, stringIndices, 'Only string indices after the count are read.' );
+
+			} );
+
+			QUnit.test( 'resolves inherited material bindings by strength', ( assert ) => {
+
+				const composer = new USDComposer();
+				const parentBinding = {
+					specType: SpecType.Relationship,
+					fields: {
+						bindMaterialAs: 'strongerThanDescendants',
+						targetPaths: [ '/Root/Materials/Green' ]
+					}
+				};
+
+				composer.externalVariantSelections = {};
+				composer.specsByPath = {
+					'/Root': {
+						specType: SpecType.Prim,
+						fields: {
+							typeName: 'Xform',
+							variantSelection: { Material: 'Green' },
+							variantSetChildren: [ 'Material' ]
+						}
+					},
+					'/Root/{Material=Green}/Parent.material:binding': parentBinding,
+					'/Root/Parent/Mesh.material:binding': {
+						specType: SpecType.Relationship,
+						fields: {
+							bindMaterialAs: 'weakerThanDescendants',
+							targetPaths: [ '/Root/Materials/White' ]
+						}
+					}
+				};
+
+				assert.strictEqual(
+					composer._getMaterialBindingTarget( '/Root/Parent/Mesh' ),
+					'/Root/Materials/Green',
+					'A stronger inherited variant binding overrides the descendant binding.'
+				);
+
+				parentBinding.fields.bindMaterialAs = 'weakerThanDescendants';
+				assert.strictEqual(
+					composer._getMaterialBindingTarget( '/Root/Parent/Mesh' ),
+					'/Root/Materials/White',
+					'A descendant binding overrides a weaker inherited binding.'
+				);
+
+			} );
 
 			QUnit.test( 'resolves connected asset inputs before fallback values', ( assert ) => {
 

@@ -1664,22 +1664,16 @@ class USDComposer {
 	}
 
 	/**
-	 * Get material binding target path, checking variant paths if needed.
+	 * Get the material binding relationship for a prim, including overrides from
+	 * active variants.
 	 */
-	_getMaterialBindingTarget( primPath ) {
+	_getMaterialBindingSpec( primPath ) {
 
 		const attrName = 'material:binding';
-
-		// First check direct path
 		const directPath = primPath + '.' + attrName;
-		const directSpec = this.specsByPath[ directPath ];
-		if ( directSpec?.fields?.targetPaths?.length > 0 ) {
+		let bindingSpec = this.specsByPath[ directPath ] || null;
 
-			return directSpec.fields.targetPaths[ 0 ];
-
-		}
-
-		// Check variant paths at ancestor levels
+		// A variant on any ancestor may override this prim's relationship.
 		const parts = primPath.split( '/' );
 		for ( let i = 1; i < parts.length; i ++ ) {
 
@@ -1694,7 +1688,7 @@ class USDComposer {
 
 				if ( overrideSpec?.fields?.targetPaths?.length > 0 ) {
 
-					return overrideSpec.fields.targetPaths[ 0 ];
+					bindingSpec = overrideSpec;
 
 				}
 
@@ -1702,7 +1696,35 @@ class USDComposer {
 
 		}
 
-		return null;
+		return bindingSpec;
+
+	}
+
+	/**
+	 * Get the resolved material binding target for a prim. Material bindings are
+	 * inherited, and an ancestor marked strongerThanDescendants takes precedence
+	 * over bindings authored on its descendants.
+	 */
+	_getMaterialBindingTarget( primPath ) {
+
+		const parts = primPath.split( '/' ).filter( Boolean );
+		let resolvedBinding = null;
+
+		for ( let i = 0; i < parts.length; i ++ ) {
+
+			const ancestorPath = '/' + parts.slice( 0, i + 1 ).join( '/' );
+			const bindingSpec = this._getMaterialBindingSpec( ancestorPath );
+			if ( ! bindingSpec?.fields?.targetPaths?.length ) continue;
+
+			if ( ! resolvedBinding || resolvedBinding.fields?.bindMaterialAs !== 'strongerThanDescendants' ) {
+
+				resolvedBinding = bindingSpec;
+
+			}
+
+		}
+
+		return resolvedBinding?.fields.targetPaths[ 0 ] || null;
 
 	}
 
@@ -2947,21 +2969,7 @@ class USDComposer {
 	 */
 	_applyMaterialBinding( mesh, primPath ) {
 
-		// Look for material:binding on this prim
-		const bindingPath = primPath + '.material:binding';
-		const bindingSpec = this.specsByPath[ bindingPath ];
-
-		if ( ! bindingSpec ) return;
-
-		let materialPath = null;
-		const targetPaths = bindingSpec.fields?.targetPaths || bindingSpec.fields?.default;
-
-		if ( targetPaths ) {
-
-			materialPath = Array.isArray( targetPaths ) ? targetPaths[ 0 ] : targetPaths;
-
-		}
-
+		let materialPath = this._getMaterialBindingTarget( primPath );
 		if ( ! materialPath ) return;
 
 		// Clean the material path
