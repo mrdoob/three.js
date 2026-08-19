@@ -41,15 +41,11 @@ class CountingSort {
 	 * @param {Object} [options={}] - Options that modify the counting sort.
 	 * @param {number} [options.binCount=4096] - The number of bins/buckets the sort key is quantized into. Larger values improve sort accuracy at the cost of a longer (but still single-pass) prefix sum.
 	 * @param {number} [options.workgroupSize=256] - The workgroup size of the compute shaders executed during the sort.
+	 * @param {number} [options.growthSlack=1.25] - How much extra capacity to allocate in the order/bin buffers beyond the current `count`, to avoid reallocating on every small change to {@link CountingSort#count}.
 	 */
-	constructor( count, { binCount = 4096, workgroupSize = 256 } = {} ) {
+	constructor( count, { binCount = 4096, workgroupSize = 256, growthSlack = 1.25 } = {} ) {
 
-		/**
-		 * The number of elements to sort.
-		 *
-		 * @type {number}
-		 */
-		this.count = count;
+		this._count = 0;
 
 		/**
 		 * The number of bins/buckets the sort key is quantized into.
@@ -65,52 +61,21 @@ class CountingSort {
 		 */
 		this.workgroupSize = workgroupSize;
 
-		const orderData = new Uint32Array( count );
-		for ( let i = 0; i < count; i ++ ) orderData[ i ] = i;
-
 		/**
-		 * The buffer attribute holding the sorted order (a permutation of `[0, count)`). This is
-		 * also the attribute that is kept up to date by {@link CountingSort#computeCPU}.
+		 * How much extra capacity to allocate in the order/bin buffers beyond the current
+		 * `count`, to avoid reallocating on every small increase to `count`.
 		 *
-		 * @type {StorageBufferAttribute}
+		 * @type {number}
 		 */
-		this.orderAttribute = new StorageBufferAttribute( orderData, 1, Uint32Array );
+		this.growthSlack = growthSlack;
 
-		const binAttribute = new StorageBufferAttribute( new Uint32Array( count ), 1, Uint32Array );
+		this._capacity = 0;
+
 		const histogramAttribute = new StorageBufferAttribute( new Uint32Array( binCount ), 1, Uint32Array );
 		const offsetAttribute = new StorageBufferAttribute( new Uint32Array( binCount ), 1, Uint32Array );
 
-		this._binAttribute = binAttribute;
 		this._histogramAttribute = histogramAttribute;
 		this._offsetAttribute = offsetAttribute;
-
-		/**
-		 * A read-only storage node for the sorted order buffer.
-		 *
-		 * @type {StorageBufferNode}
-		 */
-		this.orderRead = storage( this.orderAttribute, 'uint', count ).toReadOnly();
-
-		/**
-		 * A writable storage node for the sorted order buffer.
-		 *
-		 * @type {StorageBufferNode}
-		 */
-		this.orderWrite = storage( this.orderAttribute, 'uint', count );
-
-		/**
-		 * A read-only storage node holding each element's bin, computed during the histogram pass.
-		 *
-		 * @type {StorageBufferNode}
-		 */
-		this.binRead = storage( binAttribute, 'uint', count ).toReadOnly();
-
-		/**
-		 * A writable storage node holding each element's bin.
-		 *
-		 * @type {StorageBufferNode}
-		 */
-		this.binWrite = storage( binAttribute, 'uint', count );
 
 		/**
 		 * An atomic storage node used to accumulate the per-bin histogram.
@@ -127,9 +92,42 @@ class CountingSort {
 		 */
 		this.offsetAtomic = storage( offsetAttribute, 'uint', binCount ).toAtomic();
 
+		// order/bin buffers are sized by `count` - built once against 1-element
+		// placeholders and grown in place by `_growOrderBuffers` as `count` grows.
+		this.orderAttribute = new StorageBufferAttribute( new Uint32Array( 1 ), 1, Uint32Array );
+		this._binAttribute = new StorageBufferAttribute( new Uint32Array( 1 ), 1, Uint32Array );
+
+		/**
+		 * A read-only storage node for the sorted order buffer.
+		 *
+		 * @type {StorageBufferNode}
+		 */
+		this.orderRead = storage( this.orderAttribute, 'uint', 0 ).toReadOnly();
+
+		/**
+		 * A writable storage node for the sorted order buffer.
+		 *
+		 * @type {StorageBufferNode}
+		 */
+		this.orderWrite = storage( this.orderAttribute, 'uint', 0 );
+
+		/**
+		 * A read-only storage node holding each element's bin, computed during the histogram pass.
+		 *
+		 * @type {StorageBufferNode}
+		 */
+		this.binRead = storage( this._binAttribute, 'uint', 0 ).toReadOnly();
+
+		/**
+		 * A writable storage node holding each element's bin.
+		 *
+		 * @type {StorageBufferNode}
+		 */
+		this.binWrite = storage( this._binAttribute, 'uint', 0 );
+
 		this._webGLBuffersEnabled = false;
 
-		this._cpuBins = new Uint32Array( count );
+		this._cpuBins = new Uint32Array( 0 );
 		this._cpuCounts = new Uint32Array( binCount );
 		this._cpuOffsets = new Uint32Array( binCount );
 
@@ -137,6 +135,75 @@ class CountingSort {
 		this._histogramNode = null;
 		this._prefixNode = null;
 		this._scatterNode = null;
+
+		this.count = count;
+
+	}
+
+	/**
+	 * The number of elements to sort. Assigning a larger value than the order/bin buffers
+	 * currently hold grows them in place (see `_growOrderBuffers`) and updates the dispatch
+	 * bounds of the compute kernels set up by {@link CountingSort#setBinNode}, if any -
+	 * unlike constructing a new {@link CountingSort}, this never rebuilds those kernels.
+	 *
+	 * @type {number}
+	 */
+	get count() {
+
+		return this._count;
+
+	}
+
+	set count( value ) {
+
+		if ( value > this._capacity ) {
+
+			// the very first allocation is sized exactly - `growthSlack` only pads later
+			// grows, so a `CountingSort` whose `count` never changes doesn't over-allocate
+			const capacity = this._capacity === 0 ? value : Math.ceil( value * this.growthSlack );
+
+			this._growOrderBuffers( Math.max( 1, capacity ) );
+
+		}
+
+		this._count = value;
+
+		if ( this._histogramNode !== null ) {
+
+			this._histogramNode.count = value;
+			this._scatterNode.count = value;
+
+		}
+
+	}
+
+	// Reallocates the order/bin buffers to fit `capacity` elements and repoints
+	// `orderRead`/`orderWrite`/`binRead`/`binWrite` at them, without touching the
+	// histogram/offset buffers (sized by `binCount`, which never changes) or any
+	// compute kernel.
+	_growOrderBuffers( capacity ) {
+
+		const oldOrderAttribute = this.orderAttribute;
+		const oldBinAttribute = this._binAttribute;
+
+		const orderData = new Uint32Array( capacity );
+		for ( let i = 0; i < capacity; i ++ ) orderData[ i ] = i;
+
+		this.orderAttribute = new StorageBufferAttribute( orderData, 1, Uint32Array );
+		this._binAttribute = new StorageBufferAttribute( new Uint32Array( capacity ), 1, Uint32Array );
+
+		if ( this._webGLBuffersEnabled === true ) this.orderAttribute.setUsage( DynamicDrawUsage );
+
+		this.orderRead.value = this.orderAttribute;
+		this.orderWrite.value = this.orderAttribute;
+		this.binRead.value = this._binAttribute;
+		this.binWrite.value = this._binAttribute;
+
+		this._cpuBins = new Uint32Array( capacity );
+		this._capacity = capacity;
+
+		oldOrderAttribute.dispose();
+		oldBinAttribute.dispose();
 
 	}
 
@@ -271,9 +338,8 @@ class CountingSort {
 	}
 
 	/**
-	 * Frees the GPU buffers backing this counting sort. Call this when replacing a
-	 * {@link CountingSort} instance (e.g. because `count` changed) to avoid leaking
-	 * the previous instance's storage buffers.
+	 * Frees the GPU buffers backing this counting sort. Assign {@link CountingSort#count}
+	 * rather than replacing the instance when the number of elements to sort changes.
 	 */
 	dispose() {
 

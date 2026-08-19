@@ -88,14 +88,15 @@ const _sphere = /*@__PURE__*/ new Sphere();
  * as the "works on effectively all WebGPU hardware" target.
  *
  * The compute kernels that merge children into the shared buffers (see
- * `createMergeKernelSet()`) are built once, in the constructor, and reused for the
- * group's entire lifetime. Per-child data (source buffers, destination offset, relative
- * transform) is passed in via uniforms and swappable storage node `.value`s rather than
- * baked into the kernel, so adding/removing children or growing the shared buffers
- * (`growGroupBufferState()`) never recompiles a pipeline - only spherical harmonics needs
- * more than one kernel variant, since its shading math branches on SH degree at
- * shader-build time; `getOrCreateSHKernel()` compiles one kernel per distinct degree
- * encountered (at most 4) and caches it.
+ * `createMergeKernelSet()`) and the merged {@link CountingSort} are both built once, in
+ * the constructor, and reused for the group's entire lifetime. Per-child data (source
+ * buffers, destination offset, relative transform) is passed in via uniforms and
+ * swappable storage node `.value`s rather than baked into the kernel, and the sort's
+ * `count` is simply reassigned rather than the sort being replaced, so adding/removing
+ * children or growing the shared buffers (`growGroupBufferState()`) never recompiles a
+ * pipeline - only spherical harmonics needs more than one merge kernel variant, since its
+ * shading math branches on SH degree at shader-build time; `getOrCreateSHKernel()`
+ * compiles one kernel per distinct degree encountered (at most 4) and caches it.
  *
  * @augments Mesh
  * @three_import import { GaussianSplatGroup } from 'three/addons/objects/GaussianSplatGroup.js';
@@ -172,19 +173,32 @@ class GaussianSplatGroup extends Mesh {
 		this._maxSphericalHarmonicsDegree = 0;
 		this._mappingDirty = true;
 
-		// Both live for the group's entire lifetime - see the class documentation.
+		// All three live for the group's entire lifetime - see the class documentation.
 		this._buffers = createGroupBufferState();
 		this._mergeKernels = createMergeKernelSet( this._buffers, this.workgroupSize );
 
-		this._sort = null;
+		this._sortMatrix = uniform( new Matrix4() );
+		this._sortDepthRange = uniform( new Vector2( 0, 1 ) );
+
+		this._sort = new CountingSort( 0, { binCount: this.binCount, workgroupSize: this.workgroupSize, growthSlack } );
+		this._sort.setBinNode( () => {
+
+			const center = this._buffers.centerRead.element( instanceIndex ).xyz.toVar( 'center' );
+			const viewCenter = this._sortMatrix.mul( vec4( center, 1 ) ).xyz.toVar( 'viewCenter' );
+			const depth = viewCenter.z.negate().toVar( 'depth' );
+			const range = max( this._sortDepthRange.y.sub( this._sortDepthRange.x ), 0.0001 ).toVar( 'range' );
+			const normalized = depth.sub( this._sortDepthRange.x ).div( range ).clamp( 0, 1 ).toVar( 'normalized' );
+			const depthBin = uint( normalized.mul( this.binCount - 1 ) ).toVar( 'depthBin' );
+
+			return uint( this.binCount - 1 ).sub( depthBin );
+
+		} );
 
 		// GaussianSplatMesh -> { base, count, relativeMatrix, lastMatrix,
 		// sphericalHarmonicsDegree, shLocalCameraPosition, lastSHCameraMatrix,
 		// lastSHWorldMatrix } - see `_rebuildMapping` and `_updateSphericalHarmonics`.
 		this._childState = new Map();
 
-		this._sortMatrix = uniform( new Matrix4() );
-		this._sortDepthRange = uniform( new Vector2( 0, 1 ) );
 		this._sortInitialized = false;
 		this._lastSortDirection = new Vector3();
 		this._lastGroupWorldMatrix = null;
@@ -385,7 +399,7 @@ class GaussianSplatGroup extends Mesh {
 
 		disposeGroupBufferState( this._buffers );
 		disposeMergeKernels( this._mergeKernels );
-		if ( this._sort !== null ) this._sort.dispose();
+		this._sort.dispose();
 
 		this.geometry.dispose();
 		this.material.dispose();
@@ -463,38 +477,17 @@ class GaussianSplatGroup extends Mesh {
 
 		}
 
-		this._rebuildSortAndMaterial( total );
+		this._sort.count = total;
+
+		this._rebuildMaterial( total );
 
 		this.geometry.instanceCount = total;
 
 	}
 
-	_rebuildSortAndMaterial( total ) {
+	_rebuildMaterial( total ) {
 
-		if ( this._sort !== null ) this._sort.dispose();
-
-		this._sort = new CountingSort( total, { binCount: this.binCount, workgroupSize: this.workgroupSize } );
-
-		const buffers = this._buffers;
-		const sort = this._sort;
-		const sortMatrix = this._sortMatrix;
-		const sortDepthRange = this._sortDepthRange;
-		const binCount = this.binCount;
-
-		sort.setBinNode( () => {
-
-			const center = buffers.centerRead.element( instanceIndex ).xyz.toVar( 'center' );
-			const viewCenter = sortMatrix.mul( vec4( center, 1 ) ).xyz.toVar( 'viewCenter' );
-			const depth = viewCenter.z.negate().toVar( 'depth' );
-			const range = max( sortDepthRange.y.sub( sortDepthRange.x ), 0.0001 ).toVar( 'range' );
-			const normalized = depth.sub( sortDepthRange.x ).div( range ).clamp( 0, 1 ).toVar( 'normalized' );
-			const depthBin = uint( normalized.mul( binCount - 1 ) ).toVar( 'depthBin' );
-
-			return uint( binCount - 1 ).sub( depthBin );
-
-		} );
-
-		const materialNodes = createMaterialNodes( buffers, sort, this._localCameraPosition );
+		const materialNodes = createMaterialNodes( this._buffers, this._sort, this._localCameraPosition );
 
 		const oldGeometry = this.geometry;
 		const oldMaterial = this.material;
