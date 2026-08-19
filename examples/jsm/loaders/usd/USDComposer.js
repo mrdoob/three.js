@@ -1082,6 +1082,47 @@ class USDComposer {
 	}
 
 	/**
+	 * Resolve an attribute's authored value, following connections before using
+	 * local fallback values.
+	 */
+	_resolveAttributeValue( path, visited = new Set() ) {
+
+		const cleanPath = String( path ).replace( /<|>/g, '' );
+		if ( visited.has( cleanPath ) ) return undefined;
+
+		const fields = this.specsByPath[ cleanPath ]?.fields;
+		if ( ! fields ) return undefined;
+
+		const nextVisited = new Set( visited );
+		nextVisited.add( cleanPath );
+
+		if ( fields.connectionPaths ) {
+
+			for ( const connectionPath of fields.connectionPaths ) {
+
+				const value = this._resolveAttributeValue( connectionPath, nextVisited );
+				if ( value !== undefined ) return value;
+
+			}
+
+		}
+
+		if ( fields.default !== undefined ) return fields.default;
+
+		const { times, values } = fields.timeSamples || {};
+		if ( times && values && times.length > 0 ) {
+
+			// Find time 0, or use the first available time (rest pose).
+			const index = times.indexOf( 0 );
+			return values[ index >= 0 ? index : 0 ];
+
+		}
+
+		return undefined;
+
+	}
+
+	/**
 	 * Get attributes for a path from attribute specs.
 	 */
 	_getAttributes( path ) {
@@ -1141,21 +1182,10 @@ class USDComposer {
 
 		for ( const [ attrName, attrSpec ] of attrMap ) {
 
-			if ( attrSpec.fields?.default !== undefined ) {
+			const value = this._resolveAttributeValue( path + '.' + attrName );
+			if ( value !== undefined ) {
 
-				attrs[ attrName ] = attrSpec.fields.default;
-
-			} else if ( attrSpec.fields?.timeSamples ) {
-
-				// For animated attributes without default, use the first time sample (rest pose)
-				const { times, values } = attrSpec.fields.timeSamples;
-				if ( times && values && times.length > 0 ) {
-
-					// Find time 0, or use the first available time
-					const idx = times.indexOf( 0 );
-					attrs[ attrName ] = idx >= 0 ? values[ idx ] : values[ 0 ];
-
-				}
+				attrs[ attrName ] = value;
 
 			}
 
