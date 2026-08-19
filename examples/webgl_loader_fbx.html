@@ -38,7 +38,7 @@
 
 			const manager = new THREE.LoadingManager();
 
-			let camera, scene, renderer, stats, object, loader, guiMorphsFolder, guiAnimationsFolder;
+			let camera, scene, renderer, controls, stats, object, loader, guiMorphsFolder, guiAnimationsFolder;
 			let mixer;
 
 			const timer = new THREE.Timer();
@@ -116,7 +116,10 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableZoom = false;
+				controls.enablePan = false;
+				controls.enableDamping = true;
 				controls.target.set( 0, 100, 0 );
 				controls.update();
 
@@ -260,6 +263,8 @@
 				const delta = timer.getDelta();
 
 				if ( mixer ) mixer.update( delta );
+
+				controls.update();
 
 				renderer.render( scene, camera );
 

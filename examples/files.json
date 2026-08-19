@@ -347,6 +347,7 @@
 		"webgpu_equirectangular",
 		"webgpu_fog_height",
 		"webgpu_furnace_test",
+		"webgpu_gaussian_splat",
 		"webgpu_gaussian_splatting",
 		"webgpu_gaussian_splatting_group",
 		"webgpu_generator_building",

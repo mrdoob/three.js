@@ -8,16 +8,9 @@ import {
 } from 'three';
 
 const SH_C0 = 0.2820947917738781;
-const SH_DEGREE_TO_COMPONENTS = [ 0, 9, 24, 45 ];
 const SH_BAND_COMPONENTS = [ 0, 9, 15, 21 ];
 // GPU upload packs four clamped-byte coefficients per uint32 word.
 const SH_BAND_WORDS = [ 0, 3, 4, 6 ];
-const GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING = {
-	scale: [ 'scale_0', 'scale_1', 'scale_2' ],
-	rotation: [ 'rot_0', 'rot_1', 'rot_2', 'rot_3' ],
-	f_dc: [ 'f_dc_0', 'f_dc_1', 'f_dc_2' ],
-	opacity: [ 'opacity' ]
-};
 
 const _covarianceMatrix = new Matrix3();
 const _covarianceMatrixTranspose = new Matrix3();
@@ -86,33 +79,6 @@ function writeCovariance( target, offset, sx, sy, sz, qx, qy, qz, qw ) {
 	target[ offset + 3 ] = elements[ 4 ];
 	target[ offset + 4 ] = elements[ 7 ];
 	target[ offset + 5 ] = elements[ 8 ];
-
-}
-
-function getGaussianSplatPLYPropertyMapping( sphericalHarmonicsDegree = 0 ) {
-
-	const restComponentCount = SH_DEGREE_TO_COMPONENTS[ sphericalHarmonicsDegree ];
-
-	if ( restComponentCount === undefined ) {
-
-		throw new Error( `THREE.getGaussianSplatPLYPropertyMapping: Unsupported spherical harmonics degree ${ sphericalHarmonicsDegree }.` );
-
-	}
-
-	const mapping = {
-		scale: GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING.scale,
-		rotation: GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING.rotation,
-		f_dc: GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING.f_dc,
-		opacity: GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING.opacity
-	};
-
-	if ( restComponentCount > 0 ) {
-
-		mapping.f_rest = Array.from( { length: restComponentCount }, ( _, i ) => `f_rest_${ i }` );
-
-	}
-
-	return mapping;
 
 }
 
@@ -247,155 +213,12 @@ function createGaussianSplatGeometry( centers, covariances, colors, sphericalHar
 
 }
 
-function createGaussianSplatGeometryFromPLYGeometry( geometry, {
-	scaleAttribute = 'scale',
-	rotationAttribute = 'rotation',
-	sh0Attribute = 'f_dc',
-	shRestAttribute = 'f_rest',
-	opacityAttribute = 'opacity'
-} = {} ) {
-
-	if ( geometry === undefined || geometry.isBufferGeometry !== true ) {
-
-		throw new Error( 'THREE.createGaussianSplatGeometryFromPLYGeometry: PLY geometry must be a BufferGeometry.' );
-
-	}
-
-	const position = geometry.getAttribute( 'position' );
-	const scale = geometry.getAttribute( scaleAttribute );
-	const rotation = geometry.getAttribute( rotationAttribute );
-	const sh0 = geometry.getAttribute( sh0Attribute );
-	const shRest = geometry.getAttribute( shRestAttribute );
-	const opacity = geometry.getAttribute( opacityAttribute );
-
-	if ( position === undefined || scale === undefined || rotation === undefined || sh0 === undefined || opacity === undefined ) {
-
-		throw new Error( 'THREE.createGaussianSplatGeometryFromPLYGeometry: PLY geometry requires position, scale, rotation, f_dc and opacity attributes.' );
-
-	}
-
-	const count = position.count;
-
-	if ( position.itemSize !== 3 || scale.itemSize !== 3 || rotation.itemSize !== 4 || sh0.itemSize !== 3 || opacity.itemSize !== 1 ) {
-
-		throw new Error( 'THREE.createGaussianSplatGeometryFromPLYGeometry: Invalid Gaussian splat PLY attribute itemSize.' );
-
-	}
-
-	if ( scale.count !== count || rotation.count !== count || sh0.count !== count || opacity.count !== count ) {
-
-		throw new Error( 'THREE.createGaussianSplatGeometryFromPLYGeometry: Gaussian splat PLY attribute counts must match position.' );
-
-	}
-
-	const centers = new Float32Array( count * 3 );
-	const covariances = new Float32Array( count * 6 );
-	const colors = new Uint8ClampedArray( count * 4 );
-	const sphericalHarmonicsDegree = getPLYRestSphericalHarmonicsDegree( shRest );
-	const sphericalHarmonics = {};
-	const sphericalHarmonicsBytes = {};
-
-	for ( let degree = 1; degree <= sphericalHarmonicsDegree; degree ++ ) {
-
-		const band = createPackedSphericalHarmonicsBand( count, degree );
-		sphericalHarmonics[ `sh${ degree }` ] = band.packed;
-		sphericalHarmonicsBytes[ `sh${ degree }` ] = band.bytes;
-
-	}
-
-	for ( let i = 0; i < count; i ++ ) {
-
-		const i3 = i * 3;
-		centers[ i3 ] = position.getX( i );
-		centers[ i3 + 1 ] = position.getY( i );
-		centers[ i3 + 2 ] = position.getZ( i );
-
-		const sx = Math.exp( scale.getX( i ) );
-		const sy = Math.exp( scale.getY( i ) );
-		const sz = Math.exp( scale.getZ( i ) );
-
-		// GraphDECO/INRIA PLY stores quaternions as rot_0=w, rot_1=x, rot_2=y, rot_3=z.
-		const qw = rotation.getX( i );
-		const qx = rotation.getY( i );
-		const qy = rotation.getZ( i );
-		const qz = rotation.getW( i );
-
-		writeCovariance( covariances, i * 6, sx, sy, sz, qx, qy, qz, qw );
-		writeColorBytesFromSH0(
-			colors,
-			i * 4,
-			sh0.getX( i ),
-			sh0.getY( i ),
-			sh0.getZ( i ),
-			sigmoid( opacity.getX( i ) )
-		);
-
-		if ( sphericalHarmonicsDegree > 0 ) {
-
-			writeSphericalHarmonicsFromPLYRest( sphericalHarmonicsBytes, i, shRest );
-
-		}
-
-	}
-
-	return createGaussianSplatGeometry( centers, covariances, colors, sphericalHarmonics );
-
-}
-
-function getPLYRestSphericalHarmonicsDegree( shRest ) {
-
-	if ( shRest === undefined ) return 0;
-
-	const degree = SH_DEGREE_TO_COMPONENTS.indexOf( shRest.itemSize );
-
-	if ( degree === - 1 ) {
-
-		throw new Error( 'THREE.createGaussianSplatGeometryFromPLYGeometry: Unsupported number of f_rest spherical harmonics coefficients.' );
-
-	}
-
-	return degree;
-
-}
-
-function writeSphericalHarmonicsFromPLYRest( sphericalHarmonicsBytes, index, shRest ) {
-
-	const stride = shRest.itemSize / 3;
-	const source = shRest.array;
-	const sourceOffset = index * shRest.itemSize;
-
-	for ( let degree = 1; degree <= 3; degree ++ ) {
-
-		const target = sphericalHarmonicsBytes[ `sh${ degree }` ];
-
-		if ( target === undefined ) break;
-
-		const bandOffset = degree === 1 ? 0 : degree === 2 ? 3 : 8;
-		const byteStride = SH_BAND_WORDS[ degree ] * 4;
-		const targetOffset = index * byteStride;
-
-		for ( let j = 0; j < SH_BAND_COMPONENTS[ degree ]; j ++ ) {
-
-			const coefficient = Math.floor( j / 3 );
-			const channel = j % 3;
-			target[ targetOffset + j ] = source[ sourceOffset + bandOffset + coefficient + channel * stride ] * 128 + 128;
-
-		}
-
-	}
-
-}
-
 export {
-	GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING,
 	SH_BAND_COMPONENTS,
 	SH_BAND_WORDS,
 	SH_C0,
-	SH_DEGREE_TO_COMPONENTS,
 	createGaussianSplatGeometry,
-	createGaussianSplatGeometryFromPLYGeometry,
 	createPackedSphericalHarmonicsBand,
-	getGaussianSplatPLYPropertyMapping,
 	getSphericalHarmonicsDegree,
 	linearToSH0,
 	sh0ToLinear,
