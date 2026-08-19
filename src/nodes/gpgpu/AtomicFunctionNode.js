@@ -1,7 +1,7 @@
 import Node from '../core/Node.js';
 import { expression } from '../code/ExpressionNode.js';
 import { nodeProxy } from '../tsl/TSLCore.js';
-import { warn } from '../../utils.js';
+import { error } from '../../utils.js';
 
 /**
  * `AtomicFunctionNode` represents any function that can operate on atomic variable types
@@ -95,7 +95,7 @@ class AtomicFunctionNode extends Node {
 
 		if ( builder.shaderStage === 'vertex' ) {
 
-			warn( `AtomicFunctionNode: ${this.method} is not supported in the vertex stage.` );
+			error( `AtomicFunctionNode: ${this.method} is not supported in the vertex stage.` );
 
 		}
 

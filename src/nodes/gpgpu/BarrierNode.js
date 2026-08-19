@@ -1,4 +1,4 @@
-import { warn } from '../../utils.js';
+import { error } from '../../utils.js';
 import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLCore.js';
 
@@ -42,7 +42,7 @@ class BarrierNode extends Node {
 
 		if ( shaderStage !== 'compute' ) {
 
-			warn( `BarrierNode: ${barrierMethod} is not supported in the ${shaderStage} stage and can only be executed in compute.` );
+			error( `BarrierNode: ${barrierMethod} is not supported in the ${shaderStage} stage and can only be executed in compute.` );
 
 		}
 

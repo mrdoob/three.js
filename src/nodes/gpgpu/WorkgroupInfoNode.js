@@ -1,6 +1,6 @@
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import Node from '../core/Node.js';
-import { warn } from '../../utils.js';
+import { error, warn } from '../../utils.js';
 import StackTrace from '../core/StackTrace.js';
 
 /**
@@ -211,7 +211,7 @@ class WorkgroupInfoNode extends Node {
 
 		if ( builder.shaderStage !== 'compute' ) {
 
-			warn( 'WorkgroupInfoNode: workgroupArray() can only be executed within the compute shader stage' );
+			error( 'WorkgroupInfoNode: workgroupArray() can only be executed within the compute shader stage' );
 
 		}
 

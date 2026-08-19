@@ -1,4 +1,4 @@
-import { warn } from '../../utils.js';
+import { error } from '../../utils.js';
 import TempNode from '../core/TempNode.js';
 import { nodeProxyIntent } from '../tsl/TSLCore.js';
 
@@ -102,7 +102,7 @@ class SubgroupFunctionNode extends TempNode {
 
 		if ( builder.shaderStage === 'vertex' ) {
 
-			warn( `SubgroupFunctionNode: ${this.method} is not supported in the vertex shader stage.` );
+			error( `SubgroupFunctionNode: ${this.method} is not supported in the vertex shader stage.` );
 
 		}
 
