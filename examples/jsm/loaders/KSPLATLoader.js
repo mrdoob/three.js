@@ -288,21 +288,15 @@ function readSection( view, bytes, section, compression, sectionBase, bucketsMet
 	const fullBucketSplats = section.fullBucketCount * section.bucketSize;
 	const compressionScaleFactor = section.bucketBlockSize / 2 / section.compressionScaleRange;
 	const sphericalHarmonicsOffset = compression.colorOffsetBytes + compression.bytesPerColor;
-	let partialBucketIndex = section.fullBucketCount;
-	let partialBucketBase = fullBucketSplats;
+	const scaleStep = compression.bytesPerScale / 3;
+	const rotationStep = compression.bytesPerRotation / 4;
+	const bucketIndex = { value: 0, partialBucketIndex: section.fullBucketCount, partialBucketBase: fullBucketSplats };
 
 	ensureSphericalHarmonics( sphericalHarmonics, sphericalHarmonicsBytes, header.splatCount, section.sphericalHarmonicsDegree );
 
 	for ( let i = 0; i < section.splatCount; i ++ ) {
 
-		const bucketIndex = getBucketIndex( view, section, sectionBase, i, fullBucketSplats, partialBucketIndex, partialBucketBase );
-
-		if ( bucketIndex.partialBucketIndex !== undefined ) {
-
-			partialBucketIndex = bucketIndex.partialBucketIndex;
-			partialBucketBase = bucketIndex.partialBucketBase;
-
-		}
+		getBucketIndex( view, section, sectionBase, i, fullBucketSplats, bucketIndex );
 
 		const rowOffset = dataBase + i * bytesPerSplat;
 		const outIndex = splatOffset + i;
@@ -324,12 +318,12 @@ function readSection( view, bytes, section, compression, sectionBase, bucketsMet
 		}
 
 		const sx = readCompressedFloat( view, rowOffset + compression.scaleOffsetBytes, compression.bytesPerScale );
-		const sy = readCompressedFloat( view, rowOffset + compression.scaleOffsetBytes + compression.bytesPerScale / 3, compression.bytesPerScale );
-		const sz = readCompressedFloat( view, rowOffset + compression.scaleOffsetBytes + compression.bytesPerScale / 3 * 2, compression.bytesPerScale );
+		const sy = readCompressedFloat( view, rowOffset + compression.scaleOffsetBytes + scaleStep, compression.bytesPerScale );
+		const sz = readCompressedFloat( view, rowOffset + compression.scaleOffsetBytes + scaleStep * 2, compression.bytesPerScale );
 		const qw = readCompressedFloat( view, rowOffset + compression.rotationOffsetBytes, compression.bytesPerRotation );
-		const qx = readCompressedFloat( view, rowOffset + compression.rotationOffsetBytes + compression.bytesPerRotation / 4, compression.bytesPerRotation );
-		const qy = readCompressedFloat( view, rowOffset + compression.rotationOffsetBytes + compression.bytesPerRotation / 4 * 2, compression.bytesPerRotation );
-		const qz = readCompressedFloat( view, rowOffset + compression.rotationOffsetBytes + compression.bytesPerRotation / 4 * 3, compression.bytesPerRotation );
+		const qx = readCompressedFloat( view, rowOffset + compression.rotationOffsetBytes + rotationStep, compression.bytesPerRotation );
+		const qy = readCompressedFloat( view, rowOffset + compression.rotationOffsetBytes + rotationStep * 2, compression.bytesPerRotation );
+		const qz = readCompressedFloat( view, rowOffset + compression.rotationOffsetBytes + rotationStep * 3, compression.bytesPerRotation );
 
 		writeCovariance( covariances, outIndex * 6, sx, sy, sz, qx, qy, qz, qw );
 		writeColorBytes(
@@ -394,33 +388,36 @@ function writeKSPLATSphericalHarmonicsBand( target, index, bandComponents, byteS
 
 }
 
-function getBucketIndex( view, section, sectionBase, splatIndex, fullBucketSplats, partialBucketIndex, partialBucketBase ) {
+function getBucketIndex( view, section, sectionBase, splatIndex, fullBucketSplats, bucketIndex ) {
 
 	if ( section.bucketCount === 0 ) {
 
-		return { value: 0 };
+		bucketIndex.value = 0;
+		return;
 
 	}
 
 	if ( splatIndex < fullBucketSplats ) {
 
-		return { value: Math.floor( splatIndex / section.bucketSize ) };
+		bucketIndex.value = Math.floor( splatIndex / section.bucketSize );
+		return;
 
 	}
 
-	while ( partialBucketIndex < section.bucketCount ) {
+	while ( bucketIndex.partialBucketIndex < section.bucketCount ) {
 
-		const partialIndex = partialBucketIndex - section.fullBucketCount;
+		const partialIndex = bucketIndex.partialBucketIndex - section.fullBucketCount;
 		const bucketLength = view.getUint32( sectionBase + partialIndex * 4, true );
 
-		if ( splatIndex < partialBucketBase + bucketLength ) {
+		if ( splatIndex < bucketIndex.partialBucketBase + bucketLength ) {
 
-			return { value: partialBucketIndex, partialBucketIndex, partialBucketBase };
+			bucketIndex.value = bucketIndex.partialBucketIndex;
+			return;
 
 		}
 
-		partialBucketIndex ++;
-		partialBucketBase += bucketLength;
+		bucketIndex.partialBucketIndex ++;
+		bucketIndex.partialBucketBase += bucketLength;
 
 	}
 
