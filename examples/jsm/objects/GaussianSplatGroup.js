@@ -287,6 +287,8 @@ class GaussianSplatGroup extends Mesh {
 
 			if ( groupMoved === true || state.lastMatrix === null || state.lastMatrix.equals( child.matrixWorld ) === false ) {
 
+				console.debug( `[GaussianSplatGroup] update() - merging child (groupMoved=${ groupMoved } firstMerge=${ state.lastMatrix === null })` );
+
 				_groupWorldMatrixInverse.copy( this.matrixWorld ).invert();
 				state.relativeMatrix.multiplyMatrices( _groupWorldMatrixInverse, child.matrixWorld );
 
@@ -312,6 +314,8 @@ class GaussianSplatGroup extends Mesh {
 		const needsSort = this._sortInitialized === false || mergedAny === true || this._needsSort( camera );
 
 		if ( needsSort === true ) {
+
+			console.debug( `[GaussianSplatGroup] update() - sorting (sortInitialized=${ this._sortInitialized } mergedAny=${ mergedAny } camera moved=${ this._sortInitialized && ! mergedAny })` );
 
 			this._updateSortUniforms( camera );
 			this._sort.compute( renderer );
@@ -418,6 +422,8 @@ class GaussianSplatGroup extends Mesh {
 
 	_rebuildMapping() {
 
+		console.debug( '[GaussianSplatGroup] _rebuildMapping() - mapping dirty (child added/removed)' );
+
 		this._mappingDirty = false;
 
 		const children = this.children.filter( ( child ) => child.isGaussianSplatMesh === true );
@@ -447,7 +453,9 @@ class GaussianSplatGroup extends Mesh {
 		// headroom for the next addition
 		if ( total > this._buffers.capacity ) {
 
-			growGroupBufferState( this._buffers, Math.max( 1, Math.ceil( total * this.growthSlack ) ) );
+			const capacity = Math.max( 1, Math.ceil( total * this.growthSlack ) );
+			console.debug( `[GaussianSplatGroup] growing group buffers ${ this._buffers.capacity } -> ${ capacity } (total=${ total })` );
+			growGroupBufferState( this._buffers, capacity );
 
 		}
 
@@ -486,6 +494,8 @@ class GaussianSplatGroup extends Mesh {
 	}
 
 	_rebuildMaterial( total ) {
+
+		console.debug( `[GaussianSplatGroup] _rebuildMaterial() - rebuilding geometry/material (total=${ total })` );
 
 		const materialNodes = createMaterialNodes( this._buffers, this._sort, this._localCameraPosition );
 
@@ -541,6 +551,8 @@ class GaussianSplatGroup extends Mesh {
 				child.matrixWorld.equals( state.lastSHWorldMatrix ) === false;
 
 			if ( needsUpdate === false ) continue;
+
+			console.debug( '[GaussianSplatGroup] _updateSphericalHarmonics() - dispatching (camera or child matrix changed)' );
 
 			_worldMatrixInverse.copy( child.matrixWorld ).invert();
 			state.shLocalCameraPosition.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _worldMatrixInverse );
@@ -803,6 +815,8 @@ function getOrCreateSHKernel( kernels, groupBuffers, degree, workgroupSize ) {
 	let kernel = kernels.shKernelsByDegree.get( degree );
 
 	if ( kernel !== undefined ) return kernel;
+
+	console.debug( `[GaussianSplatGroup] getOrCreateSHKernel() - building spherical harmonics kernel for degree ${ degree } (first time seen)` );
 
 	if ( kernels.shLocalCameraPosition === null ) kernels.shLocalCameraPosition = uniform( new Vector3() );
 
