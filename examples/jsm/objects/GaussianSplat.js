@@ -1,9 +1,7 @@
 import {
 	Box3,
 	BufferAttribute,
-	Color,
 	InstancedBufferGeometry,
-	Matrix3,
 	Matrix4,
 	Mesh,
 	NodeMaterial,
@@ -35,6 +33,7 @@ import {
 	storage,
 	uint,
 	uniform,
+	unpackUnorm4x8,
 	varyingProperty,
 	vec2,
 	vec3,
@@ -63,8 +62,7 @@ const _sortDirection = /*@__PURE__*/ new Vector3();
 const _sortDepthRange = /*@__PURE__*/ new Vector2();
 const _worldMatrixInverse = /*@__PURE__*/ new Matrix4();
 const _modelViewMatrix = /*@__PURE__*/ new Matrix4();
-const _splatBox = /*@__PURE__*/ new Box3();
-const _splat = {};
+const _vector = /*@__PURE__*/ new Vector3();
 
 /**
  * A minimal renderer for 3D Gaussian splat geometry.
@@ -75,14 +73,14 @@ const _splat = {};
  * both `three/webgpu` and `three/tsl`.
  *
  * ```js
- * const splats = new GaussianSplatMesh( geometry );
+ * const splats = new GaussianSplat( geometry );
  * scene.add( splats );
  * ```
  *
  * @augments Mesh
- * @three_import import { GaussianSplatMesh } from 'three/addons/objects/GaussianSplatMesh.js';
+ * @three_import import { GaussianSplat } from 'three/addons/objects/GaussianSplat.js';
  */
-class GaussianSplatMesh extends Mesh {
+class GaussianSplat extends Mesh {
 
 	/**
 	 * Constructs a new Gaussian splat mesh.
@@ -124,9 +122,9 @@ class GaussianSplatMesh extends Mesh {
 		 * @readonly
 		 * @default true
 		 */
-		this.isGaussianSplatMesh = true;
+		this.isGaussianSplat = true;
 
-		this.type = 'GaussianSplatMesh';
+		this.type = 'GaussianSplat';
 
 		/**
 		 * The source splat geometry.
@@ -136,7 +134,7 @@ class GaussianSplatMesh extends Mesh {
 		this.splatGeometry = splatGeometry;
 
 		/**
-		 * The bounding box of the splats. Can be computed via {@link GaussianSplatMesh#computeBoundingBox}.
+		 * The bounding box of the splats. Can be computed via {@link GaussianSplat#computeBoundingBox}.
 		 *
 		 * @type {?Box3}
 		 * @default null
@@ -144,7 +142,7 @@ class GaussianSplatMesh extends Mesh {
 		this.boundingBox = null;
 
 		/**
-		 * The bounding sphere of the splats. Can be computed via {@link GaussianSplatMesh#computeBoundingSphere}.
+		 * The bounding sphere of the splats. Can be computed via {@link GaussianSplat#computeBoundingSphere}.
 		 *
 		 * @type {?Sphere}
 		 * @default null
@@ -261,68 +259,7 @@ class GaussianSplatMesh extends Mesh {
 	}
 
 	/**
-	 * Returns the splat at the given index.
-	 *
-	 * Members that the target does not already have are created, so an empty object can be passed
-	 * and then reused across calls to avoid allocating.
-	 *
-	 * @param {number} index - The splat index.
-	 * @param {Object} [target] - The object the splat is written to.
-	 * @return {Object} The target, with `position`, `covariance`, `color`, `opacity` and `radius` set.
-	 */
-	getSplat( index, target = {} ) {
-
-		const geometry = this.splatGeometry;
-		const positionAttribute = geometry.getAttribute( 'position' );
-		const covarianceAttribute = geometry.getAttribute( 'covariance' );
-		const colorAttribute = geometry.getAttribute( 'color' );
-
-		if ( target.position === undefined ) {
-
-			target.position = new Vector3();
-
-		}
-
-		if ( target.covariance === undefined ) {
-
-			target.covariance = new Matrix3();
-
-		}
-
-		if ( target.color === undefined ) {
-
-			target.color = new Color();
-
-		}
-
-		target.position.fromBufferAttribute( positionAttribute, index );
-
-		const c00 = covarianceAttribute.getComponent( index, 0 );
-		const c01 = covarianceAttribute.getComponent( index, 1 );
-		const c02 = covarianceAttribute.getComponent( index, 2 );
-		const c11 = covarianceAttribute.getComponent( index, 3 );
-		const c12 = covarianceAttribute.getComponent( index, 4 );
-		const c22 = covarianceAttribute.getComponent( index, 5 );
-
-		// the attribute holds the upper triangle of the symmetric covariance
-		target.covariance.set(
-			c00, c01, c02,
-			c01, c11, c12,
-			c02, c12, c22
-		);
-
-		target.color.fromBufferAttribute( colorAttribute, index );
-		target.opacity = colorAttribute.getW( index );
-
-		// the radius of the drawn largest extent
-		target.radius = SPLAT_KERNEL_CUTOFF * Math.sqrt( Math.max( c00, c11, c22, 0 ) );
-
-		return target;
-
-	}
-
-	/**
-	 * Computes the bounding box of the splats, updating {@link GaussianSplatMesh#boundingBox}.
+	 * Computes the bounding box of the splats, updating {@link GaussianSplat#boundingBox}.
 	 *
 	 * Each splat is expanded by its own extent rather than treated as a point, so the bounds cover
 	 * what is drawn.
@@ -333,21 +270,32 @@ class GaussianSplatMesh extends Mesh {
 
 		this.boundingBox.makeEmpty();
 
-		const count = this.splatGeometry.getAttribute( 'position' ).count;
+		const positionAttribute = this.splatGeometry.getAttribute( 'position' );
+		const covarianceAttribute = this.splatGeometry.getAttribute( 'covariance' );
+		const count = positionAttribute.count;
 
 		for ( let i = 0; i < count; i ++ ) {
 
-			this.getSplat( i, _splat );
+			const x = positionAttribute.getX( i );
+			const y = positionAttribute.getY( i );
+			const z = positionAttribute.getZ( i );
 
-			_splatBox.set( _splat.position, _splat.position ).expandByScalar( _splat.radius );
-			this.boundingBox.union( _splatBox );
+			const c00 = covarianceAttribute.getComponent( i, 0 );
+			const c11 = covarianceAttribute.getComponent( i, 3 );
+			const c22 = covarianceAttribute.getComponent( i, 5 );
+
+			// the radius of the drawn largest extent
+			const radius = SPLAT_KERNEL_CUTOFF * Math.sqrt( Math.max( c00, c11, c22 ) );
+
+			this.boundingBox.expandByPoint( _vector.set( x - radius, y - radius, z - radius ) );
+			this.boundingBox.expandByPoint( _vector.set( x + radius, y + radius, z + radius ) );
 
 		}
 
 	}
 
 	/**
-	 * Computes the bounding sphere of the splats, updating {@link GaussianSplatMesh#boundingSphere}.
+	 * Computes the bounding sphere of the splats, updating {@link GaussianSplat#boundingSphere}.
 	 *
 	 * Each splat is expanded by its own extent rather than treated as a point, so the bounds cover
 	 * what is drawn.
@@ -359,15 +307,27 @@ class GaussianSplatMesh extends Mesh {
 		this.computeBoundingBox();
 		this.boundingBox.getBoundingSphere( this.boundingSphere );
 
-		let maxRadius = 0;
+		const positionAttribute = this.splatGeometry.getAttribute( 'position' );
+		const covarianceAttribute = this.splatGeometry.getAttribute( 'covariance' );
+		const count = positionAttribute.count;
 		const center = this.boundingSphere.center;
-		const count = this.splatGeometry.getAttribute( 'position' ).count;
+
+		let maxRadius = 0;
 
 		for ( let i = 0; i < count; i ++ ) {
 
-			this.getSplat( i, _splat );
+			const x = positionAttribute.getX( i );
+			const y = positionAttribute.getY( i );
+			const z = positionAttribute.getZ( i );
 
-			maxRadius = Math.max( maxRadius, center.distanceTo( _splat.position ) + _splat.radius );
+			const c00 = covarianceAttribute.getComponent( i, 0 );
+			const c11 = covarianceAttribute.getComponent( i, 3 );
+			const c22 = covarianceAttribute.getComponent( i, 5 );
+
+			// the radius of the drawn largest extent
+			const radius = SPLAT_KERNEL_CUTOFF * Math.sqrt( Math.max( c00, c11, c22 ) );
+
+			maxRadius = Math.max( maxRadius, center.distanceTo( _vector.set( x, y, z ) ) + radius );
 
 		}
 
@@ -491,7 +451,7 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 	const centerData = new Float32Array( count * 4 );
 	const covarianceAData = new Float32Array( count * 4 );
 	const covarianceBData = new Float32Array( count * 4 );
-	const colorData = new Float32Array( count * 4 );
+	const colorData = new Uint32Array( count );
 	const sphericalHarmonicsDegree = sphericalHarmonics.degree;
 
 	for ( let i = 0; i < count; i ++ ) {
@@ -512,17 +472,17 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 		covarianceBData[ i4 ] = covariances[ i6 + 4 ];
 		covarianceBData[ i4 + 1 ] = covariances[ i6 + 5 ];
 
-		colorData[ i4 ] = colors[ i4 ] / 255;
-		colorData[ i4 + 1 ] = colors[ i4 + 1 ] / 255;
-		colorData[ i4 + 2 ] = colors[ i4 + 2 ] / 255;
-		colorData[ i4 + 3 ] = colors[ i4 + 3 ] / 255;
+		colorData[ i ] = ( colors[ i4 ] |
+			colors[ i4 + 1 ] << 8 |
+			colors[ i4 + 2 ] << 16 |
+			colors[ i4 + 3 ] << 24 ) >>> 0;
 
 	}
 
 	const centerAttribute = new StorageBufferAttribute( centerData, 4 );
 	const covarianceAAttribute = new StorageBufferAttribute( covarianceAData, 4 );
 	const covarianceBAttribute = new StorageBufferAttribute( covarianceBData, 4 );
-	const colorAttribute = new StorageBufferAttribute( colorData, 4 );
+	const colorAttribute = new StorageBufferAttribute( colorData, 1 );
 
 	const buffers = {
 		count,
@@ -531,7 +491,7 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 		centerRead: storage( centerAttribute, 'vec4', count ).toReadOnly(),
 		covarianceARead: storage( covarianceAAttribute, 'vec4', count ).toReadOnly(),
 		covarianceBRead: storage( covarianceBAttribute, 'vec4', count ).toReadOnly(),
-		colorRead: storage( colorAttribute, 'vec4', count ).toReadOnly()
+		colorRead: storage( colorAttribute, 'uint', count ).toReadOnly()
 	};
 
 	for ( let degree = 1; degree <= sphericalHarmonicsDegree; degree ++ ) {
@@ -747,7 +707,7 @@ function createMaterialNodes( buffers, sort, localCameraPosition ) {
 		const center = buffers.centerRead.element( splatIndex ).xyz.toVar( 'center' );
 		const covA = buffers.covarianceARead.element( splatIndex ).toVar( 'covA' );
 		const covB = buffers.covarianceBRead.element( splatIndex ).toVar( 'covB' );
-		const color = buffers.colorRead.element( splatIndex ).toVar( 'splatColor' );
+		const color = unpackUnorm4x8( buffers.colorRead.element( splatIndex ) ).toVar( 'splatColor' );
 		const rgb = color.rgb.toVar( 'splatRgb' );
 
 		if ( buffers.sphericalHarmonicsDegree > 0 ) {
@@ -896,4 +856,4 @@ function createMaterial( vertexNode, fragmentNode ) {
 
 }
 
-export { GaussianSplatMesh };
+export { GaussianSplat };

@@ -58,7 +58,7 @@ const COMPRESSION_LEVELS = {
  * A loader for GaussianSplats3D `.ksplat` files.
  *
  * This loader decodes the format into `BufferGeometry` for use with
- * `GaussianSplatMesh`. Higher-order spherical harmonics are exposed as optional
+ * `GaussianSplat`. Higher-order spherical harmonics are exposed as optional
  * `sphericalHarmonics1` through `sphericalHarmonics3` packed uint32 geometry
  * attributes (`SH_BAND_WORDS[ degree ]` words per splat). Coefficients use the
  * clamped-byte encoding `( value - 128 ) / 128`, four bytes per word.
@@ -66,7 +66,7 @@ const COMPRESSION_LEVELS = {
  * ```js
  * const loader = new KSPLATLoader();
  * const data = await loader.loadAsync( './models/gsplat/example.ksplat' );
- * scene.add( new GaussianSplatMesh( data ) );
+ * scene.add( new GaussianSplat( data ) );
  * ```
  *
  * @augments Loader

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 import { DynamicDrawUsage, RenderObjectRefreshType, Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, UnsignedIntType, IntType, error, RedFormat, RedIntegerFormat, DepthFormat, DepthStencilFormat, AlphaFormat, RGFormat, RGIntegerFormat, RGBFormat, RGBIntegerFormat, EventDispatcher, MathUtils, warn, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBufferAttribute, InterleavedBuffer, NoColorSpace, log as log$1, warnOnce, Texture, Compatibility, LessCompare, LessEqualCompare, GreaterCompare, GreaterEqualCompare, NearestFilter, Sphere, BackSide, DoubleSide, CubeTexture, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking, ObjectSpaceNormalMap, RED_GREEN_RGTC2_Format, RG11_EAC_Format, InstancedBufferAttribute, InstancedInterleavedBuffer, DataTexture, RGBAFormat, FloatType, DataArrayTexture, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, SRGBColorSpace, RenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, HalfFloatType, ClampToEdgeWrapping, BufferGeometry, OrthographicCamera, PerspectiveCamera, LinearSRGBColorSpace, CubeUVReflectionMapping, BufferAttribute, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, ByteType, UnsignedByteType, ShortType, UnsignedShortType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedInt101111Type, NormalBlending, SrcAlphaFactor, OneMinusSrcAlphaFactor, AddEquation, MaterialBlending, Object3D, LinearMipMapLinearFilter, Plane, Float32BufferAttribute, UVMapping, PCFShadowMap, VSMShadowMap, BasicShadowMap, CubeDepthTexture, SphereGeometry, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, yieldToMain, REVISION, ArrayCamera, PlaneGeometry, FrontSide, CustomBlending, ZeroFactor, CylinderGeometry, Quaternion, WebXRController, RAD2DEG, PCFSoftShadowMap, FrustumArray, Frustum, RGBAIntegerFormat, TimestampQuery, createCanvasElement, MaxEquation, MinEquation, ReverseSubtractEquation, SubtractEquation, OneMinusConstantAlphaFactor, ConstantAlphaFactor, OneMinusConstantColorFactor, ConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcColorFactor, OneFactor, CullFaceNone, CullFaceBack, CullFaceFront, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, ReversedDepthFuncs, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, R11_EAC_Format, SIGNED_R11_EAC_Format, SIGNED_RG11_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, RepeatWrapping, NearestMipmapNearestFilter, NotEqualCompare, EqualCompare, AlwaysCompare, NeverCompare, LinearTransfer, getByteLength, isTypedArray, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
-export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, BezierInterpolant, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, Euler, ExternalTexture, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HTMLTexture, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateBezier, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, KeyframeTrack, LOD, LatheGeometry, Layers, Light, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, Path, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SunLight, SunLightShadow, TOUCH, TetrahedronGeometry, TextureLoader, TextureSource, TextureUtils, Timer, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, getConsoleFunction, setConsoleFunction } from './three.core.js';
+export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, BezierInterpolant, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, Euler, ExternalTexture, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HTMLTexture, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateBezier, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, KeyframeTrack, LOD, LatheGeometry, Layers, Light, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, Path, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SunLight, TOUCH, TetrahedronGeometry, TextureLoader, TextureSource, TextureUtils, Timer, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, getConsoleFunction, setConsoleFunction } from './three.core.js';
 
 const refreshUniforms = [
 	'alphaMap',
@@ -104,6 +104,14 @@ const _materialCache = new WeakMap();
  * @type {WeakMap<BufferGeometry,Object>}
  */
 const _geometryCache = new WeakMap();
+
+/**
+ * Holds the texture data for comparison.
+ *
+ * @private
+ * @type {WeakMap<Texture,Object>}
+ */
+const _textureCache = new WeakMap();
 
 /**
  * This class is used by {@link WebGPURenderer} as management component.
@@ -361,7 +369,56 @@ class NodeMaterialObserver {
 				drawRange: { start: geometry.drawRange.start, count: geometry.drawRange.count }
 			};
 
+			// force refresh on dispose
+
+			geometry.addEventListener( 'dispose', () => {
+
+				data._version ++;
+
+			} );
+
 			_geometryCache.set( geometry, data );
+
+		}
+
+		return data;
+
+	}
+
+	/**
+	 * Returns a texture data structure holding the texture state for
+	 * monitoring.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @return {Object} An object for monitoring the texture.
+	 */
+	getTextureData( texture ) {
+
+		let data = _textureCache.get( texture );
+
+		if ( data === undefined ) {
+
+			data = { _version: 0 };
+
+			// force refresh on dispose
+
+			const onDispose = () => {
+
+				data._version ++;
+
+			};
+
+			if ( texture.renderTarget !== null ) {
+
+				texture.renderTarget.addEventListener( 'dispose', onDispose );
+
+			} else {
+
+				texture.addEventListener( 'dispose', onDispose );
+
+			}
+
+			_textureCache.set( texture, data );
 
 		}
 
@@ -388,13 +445,17 @@ class NodeMaterialObserver {
 
 				const value = material[ property ];
 
-				if ( value === null || value === undefined ) continue;
+				if ( value === undefined ) continue;
 
-				if ( typeof value === 'object' && value.clone !== undefined ) {
+				if ( value === null ) {
+
+					data[ property ] = null; // track unset properties
+
+				} else if ( typeof value === 'object' && value.clone !== undefined ) {
 
 					if ( value.isTexture === true ) {
 
-						data[ property ] = { id: value.id, version: 0 };
+						data[ property ] = { id: value.id, version: 0, cacheVersion: this.getTextureData( value )._version };
 
 					} else {
 
@@ -462,7 +523,35 @@ class NodeMaterialObserver {
 				if ( property === '_renderId' ) continue;
 				if ( property === '_version' ) continue;
 
-				if ( value.equals !== undefined ) {
+				if ( value === null || mtlValue === null || mtlValue === undefined ) {
+
+					// a property was assigned or removed since the last observation so a new snapshot is required
+
+					if ( value !== ( mtlValue === undefined ? null : mtlValue ) ) {
+
+						if ( mtlValue === null || mtlValue === undefined ) {
+
+							materialData[ property ] = null;
+
+						} else if ( mtlValue.isTexture === true ) {
+
+							materialData[ property ] = { id: mtlValue.id, version: mtlValue.version, cacheVersion: this.getTextureData( mtlValue )._version };
+
+						} else if ( typeof mtlValue === 'object' && mtlValue.clone !== undefined ) {
+
+							materialData[ property ] = mtlValue.clone();
+
+						} else {
+
+							materialData[ property ] = mtlValue;
+
+						}
+
+						changed = true;
+
+					}
+
+				} else if ( value.equals !== undefined ) {
 
 					if ( value.equals( mtlValue ) === false ) {
 
@@ -474,10 +563,13 @@ class NodeMaterialObserver {
 
 				} else if ( mtlValue.isTexture === true ) {
 
-					if ( value.id !== mtlValue.id || value.version !== mtlValue.version ) {
+					const textureData = this.getTextureData( mtlValue );
+
+					if ( value.id !== mtlValue.id || value.version !== mtlValue.version || value.cacheVersion !== textureData._version ) {
 
 						value.id = mtlValue.id;
 						value.version = mtlValue.version;
+						value.cacheVersion = textureData._version;
 
 						changed = true;
 
@@ -527,6 +619,8 @@ class NodeMaterialObserver {
 		if ( renderObjectData.geometryId !== geometry.id ) {
 
 			renderObjectData.geometryId = geometry.id;
+			renderObjectData.geometryVersion = this.getGeometryData( geometry )._version;
+
 			return false;
 
 		}
@@ -698,7 +792,12 @@ class NodeMaterialObserver {
 
 			for ( let i = 0; i < lightsData.length; i ++ ) {
 
-				if ( renderObjectData.lights[ i ].map !== lightsData[ i ].map ) {
+				const lightData = renderObjectData.lights[ i ];
+
+				if ( lightData.map !== lightsData[ i ].map || lightData.cacheVersion !== lightsData[ i ].cacheVersion ) {
+
+					lightData.map = lightsData[ i ].map;
+					lightData.cacheVersion = lightsData[ i ].cacheVersion;
 
 					return false;
 
@@ -768,7 +867,7 @@ class NodeMaterialObserver {
 
 				// only add lights that have a map
 
-				lights.push( { map: light.map.version } );
+				lights.push( { map: light.map.version, cacheVersion: this.getTextureData( light.map )._version } );
 
 			}
 
@@ -33212,7 +33311,7 @@ class Bindings extends DataMap {
 
 			for ( const binding of bindGroup.bindings ) {
 
-				if ( binding.isNodeUniformsGroup === true && binding.groupNode.shared === true ) {
+				if ( ( binding.isNodeUniformsGroup === true || binding.isNodeUniformBuffer === true ) && binding.groupNode.shared === true ) {
 
 					const updatedGroup = this.nodes.updateGroup( binding );
 
@@ -33312,7 +33411,7 @@ class Bindings extends DataMap {
 
 				// each object defines an array of bindings (ubos, textures, samplers etc.)
 
-				this.backend.createBindings( bindGroup, bindings, 0 );
+				this.backend.createBindings( bindGroup, bindings, '' );
 
 				groupData.bindGroup = bindGroup;
 				groupData.usedTimes = 1;
@@ -33409,7 +33508,7 @@ class Bindings extends DataMap {
 
 		let needsBindingsUpdate = false;
 		let cacheBindings = true;
-		let cacheIndex = 0;
+		let cacheKey = '';
 		let version = 0;
 
 		// iterate over all bindings and check if buffer updates or a new binding group is required
@@ -33493,7 +33592,7 @@ class Bindings extends DataMap {
 
 				} else {
 
-					cacheIndex = cacheIndex * 10 + texture.id;
+					cacheKey += texture.id + ',';
 					version += texture.version;
 
 				}
@@ -33546,7 +33645,7 @@ class Bindings extends DataMap {
 
 		if ( needsBindingsUpdate === true ) {
 
-			this.backend.updateBindings( bindGroup, bindings, cacheBindings ? cacheIndex : 0, version );
+			this.backend.updateBindings( bindGroup, bindings, cacheBindings ? cacheKey : '', version );
 
 		}
 
@@ -37374,6 +37473,14 @@ class PackFloatNode extends TempNode {
 		this.encoding = encoding;
 
 		/**
+		 * The component layout of the packed integer.
+		 *
+		 * @type {'2x16' | '4x8'}
+		 * @default '2x16'
+		 */
+		this.layout = '2x16';
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -37393,7 +37500,7 @@ class PackFloatNode extends TempNode {
 	generate( builder ) {
 
 		const inputType = this.vectorNode.getNodeType( builder );
-		return `${ builder.getFloatPackingMethod( this.encoding ) }(${ this.vectorNode.build( builder, inputType )})`;
+		return `${ builder.getFloatPackingMethod( this.encoding, this.layout ) }(${ this.vectorNode.build( builder, inputType )})`;
 
 	}
 
@@ -37432,6 +37539,26 @@ const packUnorm2x16 = /*@__PURE__*/ nodeProxyIntent( PackFloatNode, 'unorm' ).se
 const packHalf2x16 = /*@__PURE__*/ nodeProxyIntent( PackFloatNode, 'float16' ).setParameterLength( 1 );
 
 /**
+ * Converts each component of the normalized float to 8-bit integer values. The results are packed into a single unsigned integer.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec4>} value - The 4-component vector to be packed
+ * @returns {Node}
+ */
+const packSnorm4x8 = /*@__PURE__*/ nodeProxyIntent( PackFloatNode, 'snorm', null, { layout: '4x8' } ).setParameterLength( 1 );
+
+/**
+ * Converts each component of the normalized float to 8-bit integer values. The results are packed into a single unsigned integer.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec4>} value - The 4-component vector to be packed
+ * @returns {Node}
+ */
+const packUnorm4x8 = /*@__PURE__*/ nodeProxyIntent( PackFloatNode, 'unorm', null, { layout: '4x8' } ).setParameterLength( 1 );
+
+/**
  * This node represents an operation that unpacks values from a 32-bit unsigned integer, reinterpreting the results as a floating-point vector
  *
  * @augments TempNode
@@ -37468,6 +37595,14 @@ class UnpackFloatNode extends TempNode {
 		this.encoding = encoding;
 
 		/**
+		 * The component layout of the packed integer.
+		 *
+		 * @type {'2x16' | '4x8'}
+		 * @default '2x16'
+		 */
+		this.layout = '2x16';
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -37480,14 +37615,14 @@ class UnpackFloatNode extends TempNode {
 
 	generateNodeType() {
 
-		return 'vec2';
+		return this.layout === '4x8' ? 'vec4' : 'vec2';
 
 	}
 
 	generate( builder ) {
 
 		const inputType = this.uintNode.getNodeType( builder );
-		return `${ builder.getFloatUnpackingMethod( this.encoding ) }(${ this.uintNode.build( builder, inputType )})`;
+		return `${ builder.getFloatUnpackingMethod( this.encoding, this.layout ) }(${ this.uintNode.build( builder, inputType )})`;
 
 	}
 
@@ -37522,6 +37657,26 @@ const unpackUnorm2x16 = /*@__PURE__*/ nodeProxyIntent( UnpackFloatNode, 'unorm' 
  * @returns {Node}
  */
 const unpackHalf2x16 = /*@__PURE__*/ nodeProxyIntent( UnpackFloatNode, 'float16' ).setParameterLength( 1 );
+
+/**
+ * Unpacks a 32-bit unsigned integer into four 8-bit values, interpreted as normalized signed integers. Returns a vec4 with all values.
+ *
+ * @tsl
+ * @function
+ * @param {Node<uint>} value - The unsigned integer to be unpacked
+ * @returns {Node}
+ */
+const unpackSnorm4x8 = /*@__PURE__*/ nodeProxyIntent( UnpackFloatNode, 'snorm', null, { layout: '4x8' } ).setParameterLength( 1 );
+
+/**
+ * Unpacks a 32-bit unsigned integer into four 8-bit values, interpreted as normalized unsigned integers. Returns a vec4 with all values.
+ *
+ * @tsl
+ * @function
+ * @param {Node<uint>} value - The unsigned integer to be unpacked
+ * @returns {Node}
+ */
+const unpackUnorm4x8 = /*@__PURE__*/ nodeProxyIntent( UnpackFloatNode, 'unorm', null, { layout: '4x8' } ).setParameterLength( 1 );
 
 // https://github.com/cabbibo/glsl-tri-noise-3d
 
@@ -49575,7 +49730,9 @@ var TSL = /*#__PURE__*/Object.freeze({
 	packHalf2x16: packHalf2x16,
 	packNormalToRGB: packNormalToRGB,
 	packSnorm2x16: packSnorm2x16,
+	packSnorm4x8: packSnorm4x8,
 	packUnorm2x16: packUnorm2x16,
+	packUnorm4x8: packUnorm4x8,
 	parabola: parabola,
 	parallaxDirection: parallaxDirection,
 	parallaxUV: parallaxUV,
@@ -49752,7 +49909,9 @@ var TSL = /*#__PURE__*/Object.freeze({
 	unpackNormal: unpackNormal,
 	unpackRGBToNormal: unpackRGBToNormal,
 	unpackSnorm2x16: unpackSnorm2x16,
+	unpackSnorm4x8: unpackSnorm4x8,
 	unpackUnorm2x16: unpackUnorm2x16,
+	unpackUnorm4x8: unpackUnorm4x8,
 	unpremultiplyAlpha: unpremultiplyAlpha,
 	userData: userData,
 	uv: uv$1,
@@ -65571,7 +65730,11 @@ vec4 tsl_textureGatherCompare_array( sampler2DArrayShadow map, vec3 coord, ivec2
 	);
 	return flipY ? ret.wzyx : ret;
 }
-` )
+` ),
+	floatpack_snorm_4x8: new CodeNode( /* glsl */'uint tsl_packSnorm4x8( vec4 v ) { uvec4 u = uvec4( ivec4( round( clamp( v, -1.0, 1.0 ) * 127.0 ) ) & 0xff ); return u.x | u.y << 8 | u.z << 16 | u.w << 24; }' ),
+	floatpack_unorm_4x8: new CodeNode( /* glsl */'uint tsl_packUnorm4x8( vec4 v ) { uvec4 u = uvec4( round( clamp( v, 0.0, 1.0 ) * 255.0 ) ); return u.x | u.y << 8 | u.z << 16 | u.w << 24; }' ),
+	floatunpack_snorm_4x8: new CodeNode( /* glsl */'vec4 tsl_unpackSnorm4x8( uint x ) { return max( vec4( ivec4( x << 24, x << 16, x << 8, x ) >> 24 ) / 127.0, -1.0 ); }' ),
+	floatunpack_unorm_4x8: new CodeNode( /* glsl */'vec4 tsl_unpackUnorm4x8( uint x ) { return vec4( uvec4( x, x >> 8, x >> 16, x >> 24 ) & 0xffu ) / 255.0; }' )
 };
 
 const glslMethods = {
@@ -65585,9 +65748,13 @@ const glslMethods = {
 	floatpack_snorm_2x16: 'packSnorm2x16',
 	floatpack_unorm_2x16: 'packUnorm2x16',
 	floatpack_float16_2x16: 'packHalf2x16',
+	floatpack_snorm_4x8: 'tsl_packSnorm4x8',
+	floatpack_unorm_4x8: 'tsl_packUnorm4x8',
 	floatunpack_snorm_2x16: 'unpackSnorm2x16',
 	floatunpack_unorm_2x16: 'unpackUnorm2x16',
-	floatunpack_float16_2x16: 'unpackHalf2x16'
+	floatunpack_float16_2x16: 'unpackHalf2x16',
+	floatunpack_snorm_4x8: 'tsl_unpackSnorm4x8',
+	floatunpack_unorm_4x8: 'tsl_unpackUnorm4x8'
 };
 
 const precisionLib = {
@@ -65777,11 +65944,12 @@ class GLSLNodeBuilder extends NodeBuilder {
 	 * Returns the float packing method name for a given numeric encoding.
 	 *
 	 * @param {string} encoding - The numeric encoding that describes how the float values are mapped to the integer range.
+	 * @param {string} [layout='2x16'] - The component layout of the packed integer.
 	 * @returns {string} The resolved GLSL float packing method name.
 	 */
-	getFloatPackingMethod( encoding ) {
+	getFloatPackingMethod( encoding, layout = '2x16' ) {
 
-		return this.getMethod( `floatpack_${ encoding }_2x16` );
+		return this.getMethod( `floatpack_${ encoding }_${ layout }` );
 
 	}
 
@@ -65789,11 +65957,12 @@ class GLSLNodeBuilder extends NodeBuilder {
 	 * Returns the float unpacking method name for a given numeric encoding.
 	 *
 	 * @param {string} encoding - The numeric encoding that describes how the integer values are mapped to the float range.
+	 * @param {string} [layout='2x16'] - The component layout of the packed integer.
 	 * @returns {string} The resolved GLSL float unpacking method name.
 	 */
-	getFloatUnpackingMethod( encoding ) {
+	getFloatUnpackingMethod( encoding, layout = '2x16' ) {
 
-		return this.getMethod( `floatunpack_${ encoding }_2x16` );
+		return this.getMethod( `floatunpack_${ encoding }_${ layout }` );
 
 	}
 
@@ -67551,10 +67720,10 @@ class Backend {
 	 * @abstract
 	 * @param {BindGroup} bindGroup - The bind group.
 	 * @param {Array<BindGroup>} bindings - Array of bind groups.
-	 * @param {number} cacheIndex - The cache index.
+	 * @param {string} cacheKey - The cache key.
 	 * @param {number} version - The version.
 	 */
-	createBindings( /*bindGroup, bindings, cacheIndex, version*/ ) { }
+	createBindings( /*bindGroup, bindings, cacheKey, version*/ ) { }
 
 	/**
 	 * Updates the given bind group definition.
@@ -67562,10 +67731,10 @@ class Backend {
 	 * @abstract
 	 * @param {BindGroup} bindGroup - The bind group.
 	 * @param {Array<BindGroup>} bindings - Array of bind groups.
-	 * @param {number} cacheIndex - The cache index.
+	 * @param {string} cacheKey - The cache key.
 	 * @param {number} version - The version.
 	 */
-	updateBindings( /*bindGroup, bindings, cacheIndex, version*/ ) { }
+	updateBindings( /*bindGroup, bindings, cacheKey, version*/ ) { }
 
 	/**
 	 * Updates a buffer binding.
@@ -74405,10 +74574,10 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {BindGroup} bindGroup - The bind group.
 	 * @param {Array<BindGroup>} bindings - Array of bind groups.
-	 * @param {number} cacheIndex - The cache index.
+	 * @param {string} cacheKey - The cache key.
 	 * @param {number} version - The version.
 	 */
-	createBindings( bindGroup, bindings /*, cacheIndex, version*/ ) {
+	createBindings( bindGroup, bindings /*, cacheKey, version*/ ) {
 
 		if ( this._knownBindings.has( bindings ) === false ) {
 
@@ -74444,10 +74613,10 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {BindGroup} bindGroup - The bind group.
 	 * @param {Array<BindGroup>} bindings - Array of bind groups.
-	 * @param {number} cacheIndex - The cache index.
+	 * @param {string} cacheKey - The cache key.
 	 * @param {number} version - The version.
 	 */
-	updateBindings( bindGroup /*, bindings, cacheIndex, version*/ ) {
+	updateBindings( bindGroup /*, bindings, cacheKey, version*/ ) {
 
 		const { gl } = this;
 
@@ -80120,9 +80289,13 @@ const wgslMethods = {
 	floatpack_snorm_2x16: 'pack2x16snorm',
 	floatpack_unorm_2x16: 'pack2x16unorm',
 	floatpack_float16_2x16: 'pack2x16float',
+	floatpack_snorm_4x8: 'pack4x8snorm',
+	floatpack_unorm_4x8: 'pack4x8unorm',
 	floatunpack_snorm_2x16: 'unpack2x16snorm',
 	floatunpack_unorm_2x16: 'unpack2x16unorm',
-	floatunpack_float16_2x16: 'unpack2x16float'
+	floatunpack_float16_2x16: 'unpack2x16float',
+	floatunpack_snorm_4x8: 'unpack4x8snorm',
+	floatunpack_unorm_4x8: 'unpack4x8unorm'
 };
 
 // See: https://www.w3.org/TR/WGSL/#keyword-summary and #reserved-words-section
@@ -82343,11 +82516,12 @@ ${ flowData.code }
 	 * Returns the float packing method name for a given numeric encoding.
 	 *
 	 * @param {string} encoding - The numeric encoding that describes how the float values are mapped to the integer range.
+	 * @param {string} [layout='2x16'] - The component layout of the packed integer.
 	 * @returns {string} The resolve WGSL float packing method name.
 	 */
-	getFloatPackingMethod( encoding ) {
+	getFloatPackingMethod( encoding, layout = '2x16' ) {
 
-		return this.getMethod( `floatpack_${ encoding }_2x16` );
+		return this.getMethod( `floatpack_${ encoding }_${ layout }` );
 
 	}
 
@@ -82355,11 +82529,12 @@ ${ flowData.code }
 	 * Returns the float unpacking method name for a given numeric encoding.
 	 *
 	 * @param {string} encoding - The numeric encoding that describes how the integer values are mapped to the float range.
+	 * @param {string} [layout='2x16'] - The component layout of the packed integer.
 	 * @returns {string} The resolve WGSL float unpacking method name.
 	 */
-	getFloatUnpackingMethod( encoding ) {
+	getFloatUnpackingMethod( encoding, layout = '2x16' ) {
 
-		return this.getMethod( `floatunpack_${ encoding }_2x16` );
+		return this.getMethod( `floatunpack_${ encoding }_${ layout }` );
 
 	}
 
@@ -83318,10 +83493,10 @@ class WebGPUBindingUtils {
 	 *
 	 * @param {BindGroup} bindGroup - The bind group.
 	 * @param {Array<BindGroup>} bindings - Array of bind groups.
-	 * @param {number} cacheIndex - The cache index.
+	 * @param {string} cacheKey - The cache key.
 	 * @param {number} version - The version.
 	 */
-	createBindings( bindGroup, bindings, cacheIndex, version = 0 ) {
+	createBindings( bindGroup, bindings, cacheKey, version = 0 ) {
 
 		const { backend } = this;
 		const bindingsData = backend.get( bindGroup );
@@ -83332,18 +83507,18 @@ class WebGPUBindingUtils {
 
 		let bindGroupGPU;
 
-		if ( cacheIndex > 0 ) {
+		if ( cacheKey !== '' ) {
 
 			if ( bindingsData.groups === undefined ) {
 
-				bindingsData.groups = [];
-				bindingsData.versions = [];
+				bindingsData.groups = {};
+				bindingsData.versions = {};
 
 			}
 
-			if ( bindingsData.versions[ cacheIndex ] === version ) {
+			if ( bindingsData.versions[ cacheKey ] === version ) {
 
-				bindGroupGPU = bindingsData.groups[ cacheIndex ];
+				bindGroupGPU = bindingsData.groups[ cacheKey ];
 
 			}
 
@@ -83353,10 +83528,10 @@ class WebGPUBindingUtils {
 
 			bindGroupGPU = this.createBindGroup( bindGroup, bindLayoutGPU );
 
-			if ( cacheIndex > 0 ) {
+			if ( cacheKey !== '' ) {
 
-				bindingsData.groups[ cacheIndex ] = bindGroupGPU;
-				bindingsData.versions[ cacheIndex ] = version;
+				bindingsData.groups[ cacheKey ] = bindGroupGPU;
+				bindingsData.versions[ cacheKey ] = version;
 
 			}
 
@@ -87487,8 +87662,9 @@ class WebGPUBackend extends Backend {
 	 * @param {{vertexCount: number, firstVertex: number, instanceCount: number, firstInstance: number}} drawParams - The draw parameters.
 	 * @param {GPURenderPassEncoder|GPURenderBundleEncoder} passEncoderGPU - The GPU pass encoder used for recording draw commands.
 	 * @param {Object} currentSets - Tracking object for currently set pipeline, attributes, bind groups, and index state.
+	 * @param {number} [cameraIndexSlot=-1] - Index of the binding slot holding the camera index bind group.
 	 */
-	_draw( renderObject, info, renderContextData, pipelineGPU, bindings, vertexBuffers, drawParams, passEncoderGPU, currentSets ) {
+	_draw( renderObject, info, renderContextData, pipelineGPU, bindings, vertexBuffers, drawParams, passEncoderGPU, currentSets, cameraIndexSlot = -1 ) {
 
 		const { object, material, context } = renderObject;
 
@@ -87510,14 +87686,19 @@ class WebGPUBackend extends Backend {
 
 		for ( let i = 0, l = bindings.length; i < l; i ++ ) {
 
+			// the camera index slot is bound per sub-camera in draw()
+
+			if ( i === cameraIndexSlot ) continue;
+
+			// compare native bind groups
+
 			const bindGroup = bindings[ i ];
+			const bindGroupGPU = this.get( bindGroup ).group;
 
-			if ( currentBindingGroups[ i ] !== bindGroup.id ) {
+			if ( currentBindingGroups[ i ] !== bindGroupGPU ) {
 
-				const bindingsData = this.get( bindGroup );
-
-				passEncoderGPU.setBindGroup( i, bindingsData.group );
-				currentBindingGroups[ i ] = bindGroup.id;
+				passEncoderGPU.setBindGroup( i, bindGroupGPU );
+				currentBindingGroups[ i ] = bindGroupGPU;
 
 			}
 
@@ -87725,6 +87906,7 @@ class WebGPUBackend extends Backend {
 			}
 
 			const pixelRatio = this.renderer.getPixelRatio();
+			const indexPos = cameraIndex ? bindings.indexOf( cameraIndex ) : -1;
 
 			for ( let i = 0, len = cameras.length; i < len; i ++ ) {
 
@@ -87762,15 +87944,20 @@ class WebGPUBackend extends Backend {
 					}
 
 					// Set camera index binding for this layer
-					if ( cameraIndex && cameraData.indexesGPU ) {
+					if ( indexPos !== -1 && cameraData.indexesGPU ) {
 
-						const indexPos = bindings.indexOf( cameraIndex );
-						pass.setBindGroup( indexPos, cameraData.indexesGPU[ i ] );
-						sets.bindingGroups[ indexPos ] = cameraIndex.id;
+						const cameraIndexGPU = cameraData.indexesGPU[ i ];
+
+						if ( sets.bindingGroups[ indexPos ] !== cameraIndexGPU ) {
+
+							pass.setBindGroup( indexPos, cameraIndexGPU );
+							sets.bindingGroups[ indexPos ] = cameraIndexGPU;
+
+						}
 
 					}
 
-					this._draw( renderObject, info, renderContextData, pipelineGPU, bindings, vertexBuffers, drawParams, pass, sets );
+					this._draw( renderObject, info, renderContextData, pipelineGPU, bindings, vertexBuffers, drawParams, pass, sets, indexPos );
 
 				}
 
@@ -87782,7 +87969,16 @@ class WebGPUBackend extends Backend {
 			if ( renderContextData.currentPass ) {
 
 				// Handle occlusion queries
-				if ( renderContextData.occlusionQuerySet !== undefined ) {
+
+				if ( renderContextData.currentPass instanceof GPURenderBundleEncoder ) {
+
+					if ( object.occlusionTest === true ) {
+
+						warnOnce( 'WebGPUBackend: Occlusion queries can not be recorded into render bundles.' );
+
+					}
+
+				} else if ( renderContextData.occlusionQuerySet !== undefined ) {
 
 					const lastObject = renderContextData.lastOcclusionObject;
 					if ( lastObject !== object ) {
@@ -88258,12 +88454,12 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {BindGroup} bindGroup - The bind group.
 	 * @param {Array<BindGroup>} bindings - Array of bind groups.
-	 * @param {number} cacheIndex - The cache index.
+	 * @param {string} cacheKey - The cache key.
 	 * @param {number} version - The version.
 	 */
-	createBindings( bindGroup, bindings, cacheIndex, version ) {
+	createBindings( bindGroup, bindings, cacheKey, version ) {
 
-		this.bindingUtils.createBindings( bindGroup, bindings, cacheIndex, version );
+		this.bindingUtils.createBindings( bindGroup, bindings, cacheKey, version );
 
 	}
 
@@ -88272,12 +88468,12 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {BindGroup} bindGroup - The bind group.
 	 * @param {Array<BindGroup>} bindings - Array of bind groups.
-	 * @param {number} cacheIndex - The cache index.
+	 * @param {string} cacheKey - The cache key.
 	 * @param {number} version - The version.
 	 */
-	updateBindings( bindGroup, bindings, cacheIndex, version ) {
+	updateBindings( bindGroup, bindings, cacheKey, version ) {
 
-		this.bindingUtils.createBindings( bindGroup, bindings, cacheIndex, version );
+		this.bindingUtils.createBindings( bindGroup, bindings, cacheKey, version );
 
 	}
 

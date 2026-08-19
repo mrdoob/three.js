@@ -164,7 +164,7 @@ export * from './modifiers/SimplifyModifier.js';
 export * from './modifiers/TessellateModifier.js';
 
 export * from './objects/GroundedSkybox.js';
-export * from './objects/GaussianSplatMesh.js';
+export * from './objects/GaussianSplat.js';
 export * from './objects/Lensflare.js';
 export * from './objects/MarchingCubes.js';
 export * from './objects/Reflector.js';
