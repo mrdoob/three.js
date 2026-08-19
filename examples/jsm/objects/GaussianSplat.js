@@ -73,14 +73,14 @@ const _vector = /*@__PURE__*/ new Vector3();
  * both `three/webgpu` and `three/tsl`.
  *
  * ```js
- * const splats = new GaussianSplatMesh( geometry );
+ * const splats = new GaussianSplat( geometry );
  * scene.add( splats );
  * ```
  *
  * @augments Mesh
- * @three_import import { GaussianSplatMesh } from 'three/addons/objects/GaussianSplatMesh.js';
+ * @three_import import { GaussianSplat } from 'three/addons/objects/GaussianSplat.js';
  */
-class GaussianSplatMesh extends Mesh {
+class GaussianSplat extends Mesh {
 
 	/**
 	 * Constructs a new Gaussian splat mesh.
@@ -122,9 +122,9 @@ class GaussianSplatMesh extends Mesh {
 		 * @readonly
 		 * @default true
 		 */
-		this.isGaussianSplatMesh = true;
+		this.isGaussianSplat = true;
 
-		this.type = 'GaussianSplatMesh';
+		this.type = 'GaussianSplat';
 
 		/**
 		 * The source splat geometry.
@@ -134,7 +134,7 @@ class GaussianSplatMesh extends Mesh {
 		this.splatGeometry = splatGeometry;
 
 		/**
-		 * The bounding box of the splats. Can be computed via {@link GaussianSplatMesh#computeBoundingBox}.
+		 * The bounding box of the splats. Can be computed via {@link GaussianSplat#computeBoundingBox}.
 		 *
 		 * @type {?Box3}
 		 * @default null
@@ -142,7 +142,7 @@ class GaussianSplatMesh extends Mesh {
 		this.boundingBox = null;
 
 		/**
-		 * The bounding sphere of the splats. Can be computed via {@link GaussianSplatMesh#computeBoundingSphere}.
+		 * The bounding sphere of the splats. Can be computed via {@link GaussianSplat#computeBoundingSphere}.
 		 *
 		 * @type {?Sphere}
 		 * @default null
@@ -259,7 +259,7 @@ class GaussianSplatMesh extends Mesh {
 	}
 
 	/**
-	 * Computes the bounding box of the splats, updating {@link GaussianSplatMesh#boundingBox}.
+	 * Computes the bounding box of the splats, updating {@link GaussianSplat#boundingBox}.
 	 *
 	 * Each splat is expanded by its own extent rather than treated as a point, so the bounds cover
 	 * what is drawn.
@@ -295,7 +295,7 @@ class GaussianSplatMesh extends Mesh {
 	}
 
 	/**
-	 * Computes the bounding sphere of the splats, updating {@link GaussianSplatMesh#boundingSphere}.
+	 * Computes the bounding sphere of the splats, updating {@link GaussianSplat#boundingSphere}.
 	 *
 	 * Each splat is expanded by its own extent rather than treated as a point, so the bounds cover
 	 * what is drawn.
@@ -856,4 +856,4 @@ function createMaterial( vertexNode, fragmentNode ) {
 
 }
 
-export { GaussianSplatMesh };
+export { GaussianSplat };

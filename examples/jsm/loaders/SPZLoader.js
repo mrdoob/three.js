@@ -49,7 +49,7 @@ const _quaternion = [ 0, 0, 0, 0 ];
  * A loader for compressed Gaussian splat `.spz` files.
  *
  * This loader decodes the format into `BufferGeometry` for use with
- * `GaussianSplatMesh`. Higher-order spherical harmonics are exposed as optional
+ * `GaussianSplat`. Higher-order spherical harmonics are exposed as optional
  * `sphericalHarmonics1` through `sphericalHarmonics3` packed uint32 geometry
  * attributes (`SH_BAND_WORDS[ degree ]` words per splat). Coefficients use the
  * clamped-byte encoding `( value - 128 ) / 128`, four bytes per word.
@@ -57,7 +57,7 @@ const _quaternion = [ 0, 0, 0, 0 ];
  * ```js
  * const loader = new SPZLoader();
  * const data = await loader.loadAsync( './models/gsplat/example.spz' );
- * scene.add( new GaussianSplatMesh( data ) );
+ * scene.add( new GaussianSplat( data ) );
  * ```
  *
  * @augments Loader
