@@ -35,6 +35,7 @@ class RTTNode extends TextureNode {
 	 * @param {?number} [width=null] - The width of the internal render target. If not width is applied, the render target is automatically resized.
 	 * @param {?number} [height=null] - The height of the internal render target.
 	 * @param {Object} [options={}] - The options for the internal render target.
+	 * @param {number} [options.type=HalfFloatType] - The texture type.
 	 * @param {boolean} [options.autoUpdate=true] - Whether the texture should automatically be updated or not.
 	 * @param {number} [options.resolutionScale=1] - The resolution scale.
 	 */
@@ -278,6 +279,7 @@ export default RTTNode;
  * @param {?number} [width=null] - The width of the internal render target. If not width is applied, the render target is automatically resized.
  * @param {?number} [height=null] - The height of the internal render target.
  * @param {Object} [options={}] - The options for the internal render target.
+ * @param {number} [options.type=HalfFloatType] - The texture type.
  * @param {boolean} [options.autoUpdate=true] - Whether the texture should automatically be updated or not.
  * @param {number} [options.resolutionScale=1] - The resolution scale.
  * @returns {RTTNode}
@@ -293,6 +295,7 @@ export const rtt = ( node, ...params ) => new RTTNode( nodeObject( node ), ...pa
  * @param {?number} [width=null] - The width of the internal render target. If not width is applied, the render target is automatically resized.
  * @param {?number} [height=null] - The height of the internal render target.
  * @param {Object} [options={}] - The options for the internal render target.
+ * @param {number} [options.type=HalfFloatType] - The texture type.
  * @param {boolean} [options.autoUpdate=true] - Whether the texture should automatically be updated or not.
  * @param {number} [options.resolutionScale=1] - The resolution scale.
  * @returns {RTTNode}
