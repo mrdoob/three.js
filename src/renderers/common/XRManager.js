@@ -415,11 +415,11 @@ class XRManager extends EventDispatcher {
 
 		/**
 		 * Stores params and video elements for equirect layers.
+		 * When swapping to WebGL XR fallback copy the layers to the new renderer.
 		 *
-		 * @private
 		 * @type {Array<Object>}
 		 */
-		this._mediaLayers = [];
+		this.mediaLayers = [];
 
 		/**
 		 * Stores the created equrect layers for updating render state.
@@ -1067,7 +1067,7 @@ class XRManager extends EventDispatcher {
 
 			};
 
-			updateOrPrepend( updateAtIndex, this._mediaLayers, layer );
+			updateOrPrepend( updateAtIndex, this.mediaLayers, layer );
 
 			if ( this._session !== null ) {
 
@@ -1504,9 +1504,9 @@ class XRManager extends EventDispatcher {
 					}
 
 					//Creates the equirect or quad media layers on session creation
-					if ( this._mediaLayers.length ) {
+					if ( this.mediaLayers.length ) {
 
-						this._createdMediaLayers = this._mediaLayers.map( layer => {
+						this._createdMediaLayers = this.mediaLayers.map( layer => {
 
 							layer.xrlayer = this._createXRLayer( layer );
 							return layer.xrlayer;
@@ -1514,7 +1514,7 @@ class XRManager extends EventDispatcher {
 						} );
 
 						//disable 2D media mesh layers to be replaced with native media layers
-						for ( const mediaLayer of this._mediaLayers ) {
+						for ( const mediaLayer of this.mediaLayers ) {
 
 							toggleBlendLayerRender( mediaLayer, true );
 
@@ -1926,7 +1926,7 @@ function onSessionEnd() {
 		}
 
 		//reenable 2D media mesh layers on session end
-		for ( const mediaLayer of this._mediaLayers ) {
+		for ( const mediaLayer of this.mediaLayers ) {
 
 			toggleBlendLayerRender( mediaLayer, false );
 
