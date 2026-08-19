@@ -49,6 +49,8 @@ export * from './utils/RTTNode.js';
 export * from './utils/PostProcessingUtils.js';
 export * from './utils/SampleNode.js';
 export * from './utils/EventNode.js';
+export * from './utils/CubeMapNode.js';
+export * from './utils/StorageArrayElementNode.js';
 
 // three.js shading language
 export * from './tsl/TSLBase.js';
@@ -58,6 +60,8 @@ export * from './accessors/AccessorsUtils.js';
 export * from './accessors/Arrays.js';
 export * from './accessors/UniformArrayNode.js';
 export * from './accessors/Bitangent.js';
+export * from './accessors/ClippingNode.js';
+export * from './accessors/TangentUtils.js';
 export * from './accessors/BufferAttributeNode.js';
 export * from './accessors/BufferNode.js';
 export * from './accessors/BuiltinNode.js';
@@ -147,6 +151,7 @@ export * from './lighting/PointLightNode.js';
 
 // pmrem
 export * from './pmrem/PMREMNode.js';
+export * from './pmrem/PMREMUtils.js';
 
 // procedural
 export * from './procedural/Checker.js';
@@ -160,14 +165,20 @@ export * from './materialx/MaterialXNodes.js';
 // functions
 export { default as BRDF_GGX } from './functions/BSDF/BRDF_GGX.js';
 export { default as BRDF_Lambert } from './functions/BSDF/BRDF_Lambert.js';
+export { default as BRDF_Sheen } from './functions/BSDF/BRDF_Sheen.js';
 export { default as D_GGX } from './functions/BSDF/D_GGX.js';
+export { default as D_GGX_Anisotropic } from './functions/BSDF/D_GGX_Anisotropic.js';
 export { default as DFGLUT } from './functions/BSDF/DFGLUT.js';
+export { default as EnvironmentBRDF } from './functions/BSDF/EnvironmentBRDF.js';
 export { default as F_Schlick } from './functions/BSDF/F_Schlick.js';
+export * from './functions/BSDF/LTC.js';
 export { default as Schlick_to_F0 } from './functions/BSDF/Schlick_to_F0.js';
 export { default as V_GGX_SmithCorrelated } from './functions/BSDF/V_GGX_SmithCorrelated.js';
+export { default as V_GGX_SmithCorrelated_Anisotropic } from './functions/BSDF/V_GGX_SmithCorrelated_Anisotropic.js';
 
 export * from './lighting/LightUtils.js';
 
+export { default as getAlphaHashThreshold } from './functions/material/getAlphaHashThreshold.js';
 export { default as getGeometryRoughness } from './functions/material/getGeometryRoughness.js';
 export { default as getParallaxCorrectNormal } from './functions/material/getParallaxCorrectNormal.js';
 export { default as getRoughness } from './functions/material/getRoughness.js';
