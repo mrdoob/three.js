@@ -543,6 +543,14 @@ class GaussianSplatGroup extends Mesh {
 
 		if ( maxDegree > 0 ) ensureSphericalHarmonicsContributionNodes( this._buffers );
 
+		// The vertex/fragment node graphs bake `sphericalHarmonicsDegree > 0` in as a JS-level
+		// branch (see `createMaterialNodes`), so the material only needs rebuilding - forcing a
+		// shader/pipeline recompile - when that degree actually changes. Every other layout
+		// change (adding/removing/hiding a splat cloud without changing the merged set's max SH
+		// degree) can reuse the existing material as-is: its storage nodes already track the
+		// group's buffers by reference, and are repointed in place by `resizeGroupBufferState`.
+		const degreeChanged = maxDegree !== this._maxSphericalHarmonicsDegree;
+
 		this._maxSphericalHarmonicsDegree = maxDegree;
 		this._buffers.sphericalHarmonicsDegree = maxDegree;
 
@@ -561,9 +569,15 @@ class GaussianSplatGroup extends Mesh {
 
 		}
 
-		this._rebuildMaterial( total );
+		if ( degreeChanged === true ) {
 
-		this.geometry.instanceCount = total;
+			this._rebuildMaterial( total );
+
+		} else {
+
+			this.geometry.instanceCount = total;
+
+		}
 
 	}
 
