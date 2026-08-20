@@ -21,11 +21,24 @@ npm run test-e2e
 Merge only those commits that pass the tests, otherwise all next commits will also fail.
 
 ### How it works
-- ci configs with parallelism
+- one Chromium process is shared by the whole run; each example gets its own
+  tab, opened right before it runs and closed right after, so no state
+  (console listeners, request interception, DOM, storage, in-flight
+  requests) leaks between examples. A `p-limit` limiter caps how many tabs
+  actually run concurrently, giving real local parallelism instead of the
+  old one-example-at-a-time loop. Concurrency defaults to the CPU core
+  count, override with `E2E_WORKERS=<n>`. A small pool of tabs is kept
+  pre-opened ahead of need, and closing a finished tab doesn't block the
+  next example from starting.
+- CI additionally shards across a 5-way job matrix (`CI=0..4`) - independent
+  from the local concurrency within each job.
 - deterministic random/timer/rAF/video for screenshots
 - increased robustness with hided text, datgui, different flags and timeouts.
 - pipeline: turn off rAF -> 'networkidle0' -> networkTax -> turn on rAF -> render promise
-- added 3 progressive attempts for robustness
+- on a `WebGPU Device Lost` error, the affected tab is closed and the
+  example gets one retry in a brand-new tab before failing - no need to
+  restart the shared browser process, since each example already runs in
+  its own isolated tab.
 
 ### Development progress
 

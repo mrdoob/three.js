@@ -103,6 +103,7 @@
     "jpeg-js": "^0.4.4",
     "jsdoc": "^4.0.5",
     "magic-string": "^1.0.0",
+    "p-limit": "^3.1.0",
     "pngjs": "^7.0.0",
     "puppeteer": "^25.0.0",
     "rollup": "^4.6.0",

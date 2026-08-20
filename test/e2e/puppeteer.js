@@ -1,4 +1,6 @@
 import puppeteer from 'puppeteer';
+import pLimit from 'p-limit';
+import * as os from 'os';
 import { Image } from './image.js';
 import * as fs from 'fs/promises';
 import { createServer } from '../../utils/server.js';
@@ -83,8 +85,9 @@ const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxDifferentPixels = 0.1; // at most 0.1% different pixels
 
-const idleTime = 2; // 2 seconds - for how long there should be no network requests
-const parseTime = 1; // 1 second per megabyte
+const idleTime = 0.4; // seconds - for how long there should be no network requests. Was 2s,
+// tuned for real network latency; localhost round-trips are near-instant so a much shorter
+// window is enough to catch a late-firing follow-up request.
 
 const networkTimeout = 5; // 5 minutes, set to 0 to disable
 const renderTimeout = 5; // 5 seconds, set to 0 to disable
@@ -95,11 +98,57 @@ const height = 250;
 const viewScale = 2;
 const jpgQuality = 95;
 
+// Number of tabs allowed to run concurrently in the shared browser process.
+// Override with E2E_WORKERS. Software rendering is CPU-bound, so going past
+// the physical core count has shown no further speedup in testing (measured
+// on an 8-core machine: 8 vs 16 was a wash) - default to the core count
+// rather than oversubscribing.
+const CONCURRENCY = Number( process.env.E2E_WORKERS ) || Math.max( 1, os.cpus().length );
+
 console.red = msg => console.log( `\x1b[31m${msg}\x1b[39m` );
 console.green = msg => console.log( `\x1b[32m${msg}\x1b[39m` );
 console.yellow = msg => console.log( `\x1b[33m${msg}\x1b[39m` );
 
 let browser;
+
+/* Shared page pool; every example runs in its own tab so no state
+ * (console listeners, request interception, DOM, storage, in-flight
+ * requests) can leak between examples that run concurrently. */
+
+let injection, builds;
+
+const PAGE_QUEUE_SIZE = Math.min( 4, CONCURRENCY );
+const pageQueue = [];
+
+async function openPage() {
+
+	const page = await browser.newPage();
+	await preparePage( page, injection, builds );
+	return page;
+
+}
+
+// Kept topped up to PAGE_QUEUE_SIZE. Opening a tab isn't instant, so
+// pre-warming a few ahead of time means an example that's ready to start
+// usually finds one already opening (or open) instead of paying that
+// latency itself.
+function getPage() {
+
+	while ( pageQueue.length < PAGE_QUEUE_SIZE ) pageQueue.push( openPage() );
+
+	return pageQueue.shift();
+
+}
+
+async function closePage( page ) {
+
+	try {
+
+		await page.close();
+
+	} catch ( e ) {}
+
+}
 
 /* Launch server */
 
@@ -233,55 +282,24 @@ async function main() {
 		.replace( /this\.trackTimestamp\s*=\s*\(\s*parameters\.trackTimestamp\s*===\s*true\s*\);/g, 'Object.defineProperty(this, \'trackTimestamp\', { get: () => false, set: () => {} });' );
 
 	const cleanPage = await fs.readFile( 'test/e2e/clean-page.js', 'utf8' );
-	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
+	injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
 
-	const builds = {
+	builds = {
 		'three.core.js': buildInjection( await fs.readFile( 'build/three.core.js', 'utf8' ) ),
 		'three.module.js': buildInjection( await fs.readFile( 'build/three.module.js', 'utf8' ) ),
 		'three.webgpu.js': buildInjection( await fs.readFile( 'build/three.webgpu.js', 'utf8' ) )
 	};
 
-	/* Prepare page */
+	browser = await puppeteer.launch( launchOptions );
 
-	const errorMessagesCache = [];
-
-	const launchPage = async () => {
-
-		browser = await puppeteer.launch( launchOptions );
-		const page = await browser.newPage();
-		await preparePage( page, injection, builds, errorMessagesCache );
-		return page;
-
-	};
-
-	const ctx = {
-		page: await launchPage(),
-		async restart() {
-
-			// SIGKILL the whole Chrome process tree; browser.close() can hang after a wedged GPU process
-			const proc = browser.process();
-			if ( proc ) {
-
-				proc.kill( 'SIGKILL' );
-				await new Promise( resolve => proc.once( 'exit', resolve ) );
-
-			}
-
-			errorMessagesCache.length = 0;
-			ctx.page = await launchPage();
-
-		}
-	};
-
-	/* Loop for each file */
+	/* Run every file, up to CONCURRENCY tabs at a time */
 
 	const failedScreenshots = [];
+	const limit = pLimit( CONCURRENCY );
 
-	for ( const file of files ) {
+	console.log( `Testing ${ files.length } example(s) with up to ${ CONCURRENCY } concurrent tab(s)${ isMakeScreenshot ? ' (generating screenshots)' : '' }.` );
 
-		await checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file );
-
-	}
+	await Promise.all( files.map( file => limit( () => checkFile( failedScreenshots, cleanPage, isMakeScreenshot, file ) ) ) );
 
 	/* Finish */
 
@@ -314,10 +332,14 @@ async function main() {
 
 }
 
-async function preparePage( page, injection, builds, errorMessages ) {
+async function preparePage( page, injection, builds ) {
 
 	await page.evaluateOnNewDocument( injection );
 	await page.setRequestInterception( true );
+
+	// Print-only dedup, scoped to this page/tab so a genuine repeated error
+	// in another concurrently-running example is never suppressed.
+	const seenMessages = new Set();
 
 	page.on( 'console', async msg => {
 
@@ -352,6 +374,11 @@ async function preparePage( page, injection, builds, errorMessages ) {
 		text = text.trim();
 		if ( text === '' ) return;
 		if ( text.includes( 'Timestamp tracking is disabled' ) ) return;
+		// ANGLE's SwiftShader backend (SwANGLE) never implements
+		// GL_KHR_parallel_shader_compile on any platform - it's not a flag or
+		// config gap, so this warning is expected/unavoidable under the
+		// software rendering this suite deliberately uses for reproducibility.
+		if ( text.includes( 'KHR_parallel_shader_compile extension not supported' ) ) return;
 
 		text = file + ': ' + text.replace( /\[\.WebGL-(.+?)\] /g, '' );
 
@@ -361,41 +388,29 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 		}
 
-		if ( errorMessages.includes( text ) ) {
+		if ( type === 'error' ) {
+
+			page.error = text;
+
+		}
+
+		if ( seenMessages.has( text ) ) {
 
 			return;
 
 		}
 
-		errorMessages.push( text );
+		seenMessages.add( text );
 
 		if ( type === 'warning' ) {
 
 			console.yellow( text );
 
-		} else if ( type === 'error' ) {
-
-			page.error = text;
-
-		} else {
+		} else if ( type !== 'error' ) {
 
 			console.log( `[Browser] ${text}` );
 
 		}
-
-	} );
-
-	page.on( 'response', async ( response ) => {
-
-		try {
-
-			if ( response.status === 200 ) {
-
-				await response.buffer().then( buffer => page.pageSize += buffer.length );
-
-			}
-
-		} catch ( e ) {}
 
 	} );
 
@@ -425,96 +440,139 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 }
 
-async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file ) {
+async function renderAndScreenshot( page, cleanPage, file ) {
 
-	const page = ctx.page;
-	const pageStart = performance.now();
+	page.file = file;
+	page.error = undefined;
+
+	/* Load target page */
 
 	try {
 
-		page.file = file;
-		page.pageSize = 0;
-		page.error = undefined;
+		await page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
+			waitUntil: 'networkidle0',
+			timeout: networkTimeout * 60000
+		} );
 
-		/* Load target page */
+	} catch ( e ) {
+
+		throw new Error( `Error happened while loading file ${ file }: ${ e }` );
+
+	}
+
+	try {
+
+		/* Render page */
+
+		await page.evaluate( cleanPage );
+
+		await page.waitForNetworkIdle( {
+			timeout: networkTimeout * 60000,
+			idleTime: idleTime * 1000
+		} );
+
+		await page.evaluate( async ( { renderTimeout } ) => {
+
+			// Wait for the main thread to actually go idle (worker-based
+			// decode, shader compile, texture upload, etc. all show up as
+			// scheduled work) instead of guessing a fixed delay from the
+			// downloaded byte count.
+			await new Promise( resolve => {
+
+				if ( 'requestIdleCallback' in window ) requestIdleCallback( resolve, { timeout: 500 } );
+				else setTimeout( resolve, 50 );
+
+			} );
+
+			/* Resolve render promise */
+
+			window._renderStarted = true;
+
+			await new Promise( function ( resolve, reject ) {
+
+				const renderStart = performance._now();
+
+				const waitingLoop = setInterval( function () {
+
+					const renderTimeoutExceeded = ( renderTimeout > 0 ) && ( performance._now() - renderStart > 1000 * renderTimeout );
+
+					if ( renderTimeoutExceeded ) {
+
+						clearInterval( waitingLoop );
+						reject( 'Render timeout exceeded' );
+
+					} else if ( window._renderFinished ) {
+
+						clearInterval( waitingLoop );
+						resolve();
+
+					}
+
+				}, 16 );
+
+			} );
+
+		}, { renderTimeout } );
+
+	} catch ( e ) {
+
+		if ( e.includes && e.includes( 'Render timeout exceeded' ) === false ) {
+
+			throw new Error( `Error happened while rendering file ${ file }: ${ e }` );
+
+		} /* else { // This can mean that the example doesn't use requestAnimationFrame loop
+
+			console.yellow( `Render timeout exceeded in file ${ file }` );
+
+		} */ // TODO: fix this
+
+	}
+
+	const screenshot = ( await Image.read( await page.screenshot() ) ).scale( 1 / viewScale );
+
+	if ( page.error !== undefined ) throw new Error( page.error );
+
+	return screenshot;
+
+}
+
+async function checkFile( failedScreenshots, cleanPage, isMakeScreenshot, file ) {
+
+	const pageStart = performance.now();
+	let page = await getPage();
+
+	try {
+
+		let screenshot;
 
 		try {
 
-			await page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
-				waitUntil: 'networkidle0',
-				timeout: networkTimeout * 60000
-			} );
+			screenshot = await renderAndScreenshot( page, cleanPage, file );
 
 		} catch ( e ) {
 
-			throw new Error( `Error happened while loading file ${ file }: ${ e }` );
+			if ( String( e ).includes( 'WebGPU Device Lost' ) ) {
 
-		}
+				// A wedged GPU device tends to only affect the tab it happened
+				// in - replace this one tab with a fresh one and retry once,
+				// rather than tearing down the whole shared browser (which
+				// would also kill every other example currently in flight).
+				console.yellow( `${ e }` );
+				console.yellow( `Restarting tab for ${ file } after device loss...` );
+				closePage( page ); // fire-and-forget; the wedged tab doesn't need to finish closing before we retry
+				page = await getPage();
 
-		try {
+				screenshot = await renderAndScreenshot( page, cleanPage, file );
 
-			/* Render page */
+			} else {
 
-			await page.evaluate( cleanPage );
+				throw e;
 
-			await page.waitForNetworkIdle( {
-				timeout: networkTimeout * 60000,
-				idleTime: idleTime * 1000
-			} );
-
-			await page.evaluate( async ( renderTimeout, parseTime ) => {
-
-				await new Promise( resolve => setTimeout( resolve, parseTime ) );
-
-				/* Resolve render promise */
-
-				window._renderStarted = true;
-
-				await new Promise( function ( resolve, reject ) {
-
-					const renderStart = performance._now();
-
-					const waitingLoop = setInterval( function () {
-
-						const renderTimeoutExceeded = ( renderTimeout > 0 ) && ( performance._now() - renderStart > 1000 * renderTimeout );
-
-						if ( renderTimeoutExceeded ) {
-
-							clearInterval( waitingLoop );
-							reject( 'Render timeout exceeded' );
-
-						} else if ( window._renderFinished ) {
-
-							clearInterval( waitingLoop );
-							resolve();
-
-						}
-
-					}, 100 );
-
-				} );
-
-			}, renderTimeout, page.pageSize / 1024 / 1024 * parseTime * 1000 );
-
-		} catch ( e ) {
-
-			if ( e.includes && e.includes( 'Render timeout exceeded' ) === false ) {
-
-				throw new Error( `Error happened while rendering file ${ file }: ${ e }` );
-
-			} /* else { // This can mean that the example doesn't use requestAnimationFrame loop
-
-				console.yellow( `Render timeout exceeded in file ${ file }` );
-
-			} */ // TODO: fix this
+			}
 
 		}
 
 		const pageElapsed = ( performance.now() - pageStart ) / 1000;
-
-		const screenshot = ( await Image.read( await page.screenshot() ) ).scale( 1 / viewScale );
-
-		if ( page.error !== undefined ) throw new Error( page.error );
 
 		if ( isMakeScreenshot ) {
 
@@ -579,22 +637,15 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 	} catch ( e ) {
 
-		if ( String( e ).includes( 'WebGPU Device Lost' ) ) {
-
-			console.yellow( `${ e }` );
-			console.yellow( 'Restarting browser...' );
-			await ctx.restart();
-
-		} else {
-
-			console.red( e );
-			failedScreenshots.push( file );
-
-		}
+		console.red( e );
+		failedScreenshots.push( file );
 
 	} finally {
 
-		page.file = undefined; // release lock
+		// Fire-and-forget: closing the tab doesn't affect this file's
+		// outcome, so don't make the run wait on it - let it close in the
+		// background while the next queued example gets going.
+		closePage( page );
 
 	}
 
