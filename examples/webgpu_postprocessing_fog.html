@@ -139,7 +139,10 @@
 
 				} );
 
-				groundMaterial.colorNode = prototypeGrid();
+				const gridNode = prototypeGrid();
+				const solidColorNode = color( 0x999999 );
+
+				groundMaterial.colorNode = solidColorNode;
 
 				const ground = new THREE.Mesh( groundGeometry, groundMaterial );
 				ground.position.set( 0, - 1, 0 );
@@ -209,7 +212,8 @@
 
 				// Volumetric Cloud Fog Uniforms
 
-				const steps = uniform( 12 );
+				const resolutionScale = uniform( 0.5 );
+				const steps = uniform( 16 );
 				const fogDensity = uniform( 1.05 );
 				const heightFalloff = uniform( 0.85 );
 				const fogHeight = uniform( 0.6 );
@@ -293,7 +297,7 @@
 				} );
 
 				// Joint Bilateral Upsampling (JBU) Pass: Kopf et al. 2007
-				// Reconstructs full-resolution fog from a half-resolution buffer using high-resolution scene depth as a guide
+				// Reconstructs full-resolution fog from a low-resolution buffer using high-resolution scene depth as a guide
 				// https://johanneskopf.de/publications/jbu/
 
 				const jointBilateralUpsampling = Fn( ( [ lowResTexture, depthTexture, spatialSig, depthSens ] ) => {
@@ -303,8 +307,8 @@
 					// High-resolution guide: Full-resolution linear scene depth at the output pixel
 					const centerDepth = getViewPosition( centerCoord, depthTexture.sample( centerCoord ).r, cameraProjectionMatrixInverseUniform ).z.negate().max( 0.001 );
 
-					// Low-resolution texel footprint (fwidth at full res scaled by 2.0 for 0.5x resolution)
-					const lowResTexel = fwidth( centerCoord ).mul( 2.0 );
+					// Low-resolution texel footprint based on resolutionScale
+					const lowResTexel = fwidth( centerCoord ).div( resolutionScale );
 
 					// Precomputed Gaussian factors
 					const spatialSigmaFactor = float( - 0.5 ).div( spatialSig.mul( spatialSig ).max( 0.01 ) );
@@ -343,12 +347,12 @@
 
 				} );
 
-				// Low-Resolution Volumetric Fog Pass RTT (Half-resolution for high performance)
+				// Low-Resolution Volumetric Fog Pass RTT
 
-				const lowResFogPass = rtt( vec4( volumetricFogPass() ), null, null, {
+				const lowResFogPass = rtt( volumetricFogPass(), null, null, {
 					type: THREE.UnsignedByteType,
 					format: THREE.RedFormat,
-					resolutionScale: 0.5
+					resolutionScale: resolutionScale.value
 				} ).setName( 'lowResFogPass' ).toInspector( 'Volumetric Fog' );
 
 				// Denoising Options: JBU, Gaussian Blur, Disabled (Raw)
@@ -397,6 +401,26 @@
 
 				}
 
+				const groundParams = {
+					mode: 'Solid Color'
+				};
+
+				function updateGround() {
+
+					if ( groundParams.mode === 'Grid' ) {
+
+						groundMaterial.colorNode = gridNode;
+
+					} else {
+
+						groundMaterial.colorNode = solidColorNode;
+
+					}
+
+					groundMaterial.needsUpdate = true;
+
+				}
+
 				// Controls
 
 				controls = new OrbitControls( camera, renderer.domElement );
@@ -411,6 +435,7 @@
 
 				const gui = renderer.inspector.createParameters( 'Volumetric Fog' );
 				gui.add( filterParams, 'mode', [ 'JBU', 'Gaussian Blur', 'Disabled' ] ).name( 'denoiser' ).onChange( () => updateFilterMode() );
+				gui.add( resolutionScale, 'value', 0.25, 0.75, 0.05 ).name( 'resolution scale' ).onChange( ( value ) => lowResFogPass.setResolutionScale( value ) );
 				gui.add( steps, 'value', 4, 32, 1 ).name( 'steps' );
 				gui.add( cloudThreshold, 'value', 0.0, 0.8, 0.02 ).name( 'cloud threshold' );
 				gui.add( cloudScale, 'value', 0.02, 0.15, 0.005 ).name( 'cloud scale' );
@@ -421,9 +446,12 @@
 				gui.add( cloudSpeed, 'value', 0.0, 0.2, 0.005 ).name( 'cloud speed' );
 				gui.add( rangeFogNear, 'value', 0.0, 100.0, 0.5 ).name( 'range fog near' );
 				gui.add( rangeFogFar, 'value', 5.0, 150.0, 0.5 ).name( 'range fog far' );
+
 				const ctrlSpatialSigma = gui.add( spatialSigma, 'value', 0.5, 3.0, 0.1 ).name( 'spatial sigma' );
 				const ctrlDepthSensitivity = gui.add( depthSensitivity, 'value', 1.0, 100.0, 1.0 ).name( 'depth sensitivity' );
 				const ctrlGaussianBlur = gui.add( blurRadius, 'value', 0.0, 1.0, 0.01 ).name( 'gaussian blur' );
+
+				gui.add( groundParams, 'mode', [ 'Solid Color', 'Grid' ] ).name( 'ground' ).onChange( () => updateGround() );
 
 				updateFilterMode();
 
