@@ -29,6 +29,7 @@ export class Style {
 		pointer-events: none;
 		z-index: 1000;
 		overflow: hidden;
+		color-scheme: dark;
 	}
 
 	:scope * {
@@ -1437,6 +1438,7 @@ export class Style {
 		font-family: var(--font-mono);
 		width: 100%;
 		box-sizing: border-box;
+		color-scheme: dark;
 	}
 
 	.param-control input:focus {
@@ -2019,6 +2021,16 @@ export class Style {
 		background-color: rgba(255, 255, 255, 0.05);
 	}
 
+	select {
+		color-scheme: dark;
+	}
+
+	select option,
+	option {
+		background-color: #1e1e24;
+		color: var(--text-primary);
+	}
+
 	.select {
 		background: var(--profiler-background);
 		border: 1px solid var(--profiler-border);
@@ -2029,6 +2041,7 @@ export class Style {
 		font-size: 12px;
 		outline: none;
 		cursor: pointer;
+		color-scheme: dark;
 		appearance: none;
 		-webkit-appearance: none;
 		-moz-appearance: none;
@@ -2099,14 +2112,14 @@ export class Style {
 		position: absolute;
 		top: 0;
 		bottom: 0;
-		width: 4px;
-		margin-left: -2px;
+		width: 0;
 		left: 50%;
-		background: var(--profiler-border);
+		background: transparent;
 		cursor: ew-resize;
 		pointer-events: auto !important;
 		z-index: 10;
 		touch-action: none;
+		transform: translateX(-50%);
 	}
 
 	.split-screen-line::before {
@@ -2114,10 +2127,35 @@ export class Style {
 		position: absolute;
 		top: 0;
 		bottom: 0;
-		left: -10px;
+		left: -12px;
 		width: 24px;
 		background: transparent;
 		cursor: ew-resize;
+	}
+
+	.split-screen-line::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: -7px;
+		width: 14px;
+		pointer-events: none;
+		background-image:
+			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'%3E%3Cpath d='M1 0.5 L13 0.5 L7 7 Z' fill='%239a9aab' stroke='%231e1e24' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E"),
+			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'%3E%3Cpath d='M1 7.5 L13 7.5 L7 1 Z' fill='%239a9aab' stroke='%231e1e24' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E");
+		background-position: top center, bottom center;
+		background-repeat: no-repeat;
+		opacity: 0.8;
+		transition: opacity 0.2s, filter 0.2s;
+	}
+
+	.split-screen-line:hover::after {
+		opacity: 1;
+		background-image:
+			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'%3E%3Cpath d='M1 0.5 L13 0.5 L7 7 Z' fill='%2300aaff' stroke='%231e1e24' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E"),
+			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'%3E%3Cpath d='M1 7.5 L13 7.5 L7 1 Z' fill='%2300aaff' stroke='%231e1e24' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E");
+		filter: drop-shadow(0 0 4px rgba(0, 170, 255, 0.8));
 	}
 
 	/* Grid Mode styles for List component */
