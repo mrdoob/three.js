@@ -702,7 +702,9 @@ class BufferGeometry extends EventDispatcher {
 
 		}
 
-		if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
+		if ( position !== undefined && ( isNaN( this.boundingBox.min.x ) ||
+			 ( position.itemSize > 1 && isNaN( this.boundingBox.min.y ) ) ||
+			 ( position.itemSize > 2 && isNaN( this.boundingBox.min.z ) ) ) ) {
 
 			error( 'BufferGeometry.computeBoundingBox(): Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
 
