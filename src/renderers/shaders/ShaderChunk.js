@@ -54,6 +54,7 @@ import lights_physical_pars_fragment from './ShaderChunk/lights_physical_pars_fr
 import lights_fragment_begin from './ShaderChunk/lights_fragment_begin.glsl.js';
 import lights_fragment_maps from './ShaderChunk/lights_fragment_maps.glsl.js';
 import lights_fragment_end from './ShaderChunk/lights_fragment_end.glsl.js';
+import lightprobes_pars_fragment from './ShaderChunk/lightprobes_pars_fragment.glsl.js';
 import logdepthbuf_fragment from './ShaderChunk/logdepthbuf_fragment.glsl.js';
 import logdepthbuf_pars_fragment from './ShaderChunk/logdepthbuf_pars_fragment.glsl.js';
 import logdepthbuf_pars_vertex from './ShaderChunk/logdepthbuf_pars_vertex.glsl.js';
@@ -181,6 +182,7 @@ export const ShaderChunk = {
 	lights_fragment_begin: lights_fragment_begin,
 	lights_fragment_maps: lights_fragment_maps,
 	lights_fragment_end: lights_fragment_end,
+	lightprobes_pars_fragment: lightprobes_pars_fragment,
 	logdepthbuf_fragment: logdepthbuf_fragment,
 	logdepthbuf_pars_fragment: logdepthbuf_pars_fragment,
 	logdepthbuf_pars_vertex: logdepthbuf_pars_vertex,

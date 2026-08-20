@@ -4,6 +4,10 @@
 		<title>three.js webgpu - point lights</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - point lights">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_lights_pointlights.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_lights_pointlights.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
@@ -53,6 +57,7 @@
 				camera.position.z = 100;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
 
 				timer = new THREE.Timer();
 				timer.connect( document );

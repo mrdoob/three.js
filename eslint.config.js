@@ -45,7 +45,7 @@ export default [
 			jsdoc
 		},
 		languageOptions: {
-			ecmaVersion: 2018,
+			ecmaVersion: 2022,
 			sourceType: 'module',
 			globals: {
 				...globals.browser,
@@ -134,7 +134,7 @@ export default [
 		name: 'editor rules',
 		files: [ 'editor/**/*.js' ],
 		languageOptions: {
-			ecmaVersion: 2020,
+			ecmaVersion: 2022,
 			sourceType: 'module'
 		}
 	}

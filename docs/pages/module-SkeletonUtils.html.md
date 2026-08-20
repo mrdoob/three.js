@@ -20,33 +20,37 @@ The 3D object to clone.
 
 **Returns:** The cloned 3D object.
 
-### .retarget( target : Object3D, source : Object3D, options : module:SkeletonUtils~RetargetOptions ) (inner)
+### .retarget( target : Object3D | Skeleton, source : Object3D | Skeleton, options : module:SkeletonUtils~RetargetOptions ) (inner)
 
-Retargets the skeleton from the given source 3D object to the target 3D object.
+Retargets the skeleton from the given source to the target.
+
+Both `target` and `source` can be a 3D object with a skeleton property (e.g. a skinned mesh) or a [Skeleton](Skeleton.html) directly.
 
 **target**
 
-The target 3D object.
+The target object.
 
 **source**
 
-The source 3D object.
+The source object.
 
 **options**
 
 The options.
 
-### .retargetClip( target : Object3D, source : Object3D, clip : AnimationClip, options : module:SkeletonUtils~RetargetOptions ) : AnimationClip (inner)
+### .retargetClip( target : Object3D, source : Object3D | Skeleton, clip : AnimationClip, options : module:SkeletonUtils~RetargetOptions ) : AnimationClip (inner)
 
-Retargets the animation clip of the source object to the target 3D object.
+Retargets the animation clip of the source to the target 3D object.
+
+The `source` can be a 3D object with a skeleton property (e.g. a skinned mesh) or a [Skeleton](Skeleton.html) directly.
 
 **target**
 
-The target 3D object.
+The target 3D object. Must have a `skeleton` property.
 
 **source**
 
-The source 3D object.
+The source object.
 
 **clip**
 
@@ -132,6 +136,16 @@ number
 The scale.
 
 Default is `1`.
+
+**localOffsets**  
+Object.<string, [Matrix4](Matrix4.html)\>
+
+Per-bone local offset matrices, keyed by bone name.
+
+**hipPosition**  
+[Vector3](Vector3.html)
+
+An additional position offset applied to the hip bone.
 
 ## Source
 

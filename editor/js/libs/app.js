@@ -34,12 +34,12 @@ const APP = {
 			if ( project.renderer === 'WebGPURenderer' ) {
 
 				const { WebGPURenderer } = await import( 'three/webgpu' );
-				renderer = new WebGPURenderer( { antialias: true, logarithmicDepthBuffer: true } );
+				renderer = new WebGPURenderer( { antialias: true, reversedDepthBuffer: true } );
 				await renderer.init();
 
 			} else {
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, reversedDepthBuffer: true } );
 
 			}
 
@@ -125,8 +125,7 @@ const APP = {
 		this.setCamera = function ( value ) {
 
 			camera = value;
-			camera.aspect = this.width / this.height;
-			camera.updateProjectionMatrix();
+			setCameraAspect( camera, this.width / this.height );
 
 		};
 
@@ -155,8 +154,7 @@ const APP = {
 
 			if ( camera ) {
 
-				camera.aspect = this.width / this.height;
-				camera.updateProjectionMatrix();
+				setCameraAspect( camera, this.width / this.height );
 
 			}
 
@@ -167,6 +165,25 @@ const APP = {
 			}
 
 		};
+
+		function setCameraAspect( camera, aspect ) {
+
+			if ( camera.isPerspectiveCamera ) {
+
+				camera.aspect = aspect;
+
+			} else {
+
+				const frustumHeight = camera.top - camera.bottom;
+
+				camera.left = - frustumHeight * aspect / 2;
+				camera.right = frustumHeight * aspect / 2;
+
+			}
+
+			camera.updateProjectionMatrix();
+
+		}
 
 		function dispatch( array, event ) {
 

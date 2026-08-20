@@ -96,10 +96,10 @@ the current contents of the bound framebuffer for each render call.</p>
 						</dl>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="getTextureForReference" translate="no">.<a href="#getTextureForReference">getTextureForReference</a><span class="signature">( reference : <span class="param-type"><a href="RenderTarget.html">RenderTarget</a></span> )</span><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<h3 class="name name-method" id="getTextureForReference" translate="no">.<a href="#getTextureForReference">getTextureForReference</a><span class="signature">( reference : <span class="param-type"><a href="RenderTarget.html">RenderTarget</a> | <a href="CanvasTarget.html">CanvasTarget</a></span> )</span><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>This methods returns a texture for the given render target reference.</p>
+							<p>This methods returns a texture for the given render target or canvas target reference.</p>
 <p>To avoid rendering errors, <code>ViewportTextureNode</code> must use unique framebuffer textures
 for different render contexts.</p>
 						</div>
@@ -110,7 +110,7 @@ for different render contexts.</p>
 										<strong translate="no">reference</strong>
 									</td>
 									<td class="description last">
-										<p>The render target reference.</p>
+										<p>The render target or canvas target reference.</p>
 										<p>Default is <code>null</code>.</p>
 									</td>
 								</tr>

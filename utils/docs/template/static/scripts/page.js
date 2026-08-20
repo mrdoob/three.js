@@ -30,9 +30,15 @@ if ( typeof hljs !== 'undefined' ) {
 
 	if ( hash ) {
 
-		const element = document.getElementById( hash );
+		window.history.scrollRestoration = 'manual';
 
-		if ( element ) element.scrollIntoView();
+		window.addEventListener( 'pageshow', function () {
+
+			const element = document.getElementById( hash );
+
+			if ( element ) element.scrollIntoView();
+
+		}, { once: true } );
 
 	}
 

@@ -2,7 +2,7 @@
 
 # ComputeNode
 
-TODO
+Represents a compute shader node.
 
 ## Constructor
 
@@ -12,21 +12,29 @@ Constructs a new compute node.
 
 **computeNode**
 
-TODO
+The node that defines the compute shader logic.
 
 **workgroupSize**
 
-TODO.
+An array defining the X, Y, and Z dimensions of the workgroup for compute shader execution.
 
 ## Properties
 
 ### .computeNode : Node
 
-TODO
+The node that defines the compute shader logic.
 
 ### .count : number | Array.<number>
 
-TODO
+The total number of threads (invocations) to execute. If it is a number, it will be used to automatically generate bounds checking against `instanceIndex`.
+
+### .countNode : UniformNode
+
+A uniform node holding the dispatch count for bounds checking. Created automatically when `count` is a number.
+
+### .dispatchSize : number | Array.<number>
+
+The dispatch size for workgroups on X, Y, and Z axes. Used directly if `count` is not provided.
 
 ### .isComputeNode : boolean (readonly)
 
@@ -44,7 +52,7 @@ Default is `''`.
 
 ### .onInitFunction : function
 
-TODO
+A callback executed when the compute node finishes initialization.
 
 ### .updateBeforeType : string
 
@@ -56,13 +64,13 @@ Default is `'object'`.
 
 ### .version : number
 
-TODO
+The version of the node.
 
 **Overrides:** [Node#version](Node.html#version)
 
 ### .workgroupSize : Array.<number>
 
-TODO
+An array defining the X, Y, and Z dimensions of the workgroup for compute shader execution.
 
 Default is `[ 64 ]`.
 
@@ -73,10 +81,6 @@ Default is `[ 64 ]`.
 Executes the `dispose` event for this node.
 
 **Overrides:** [Node#dispose](Node.html#dispose)
-
-### .getCount() : number | Array.<number>
-
-TODO
 
 ### .label( name : string ) : ComputeNode
 
@@ -92,21 +96,13 @@ The name of the uniform.
 
 ### .onInit( callback : function ) : ComputeNode
 
-TODO
+Sets the callback to run during initialization.
 
 **callback**
 
-TODO.
+The callback function.
 
 **Returns:** A reference to this node.
-
-### .setCount( count : number | Array.<number> ) : ComputeNode
-
-TODO
-
-**count**
-
-Array with \[ x, y, z \] values for dispatch or a single number for the count
 
 ### .setName( name : string ) : ComputeNode
 

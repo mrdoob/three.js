@@ -5,6 +5,7 @@ import { uniform } from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
+import { CubeUVReflectionMapping } from '../../constants.js';
 import { Texture } from '../../textures/Texture.js';
 import PMREMGenerator from '../../renderers/common/extras/PMREMGenerator.js';
 import { materialEnvRotation } from '../accessors/MaterialProperties.js';
@@ -79,6 +80,31 @@ function _getPMREMFromTexture( texture, renderer, generator ) {
 		}
 
 		cacheTexture.pmremVersion = texture.pmremVersion;
+
+		// add dispose event listener for new PMREMs
+
+		if ( cache.has( texture ) === false ) {
+
+			const onDispose = () => {
+
+				texture.removeEventListener( 'dispose', onDispose );
+
+				const pmrem = cache.get( texture );
+
+				if ( pmrem !== undefined ) {
+
+					pmrem.dispose();
+					cache.delete( texture );
+
+				}
+
+			};
+
+			texture.addEventListener( 'dispose', onDispose );
+
+		}
+
+		//
 
 		cache.set( texture, cacheTexture );
 
@@ -270,7 +296,7 @@ class PMREMNode extends TempNode {
 
 		if ( pmremVersion !== texture.pmremVersion ) {
 
-			if ( texture.isPMREMTexture === true ) {
+			if ( texture.isPMREMTexture === true || texture.mapping === CubeUVReflectionMapping ) {
 
 				pmrem = texture;
 
@@ -314,7 +340,12 @@ class PMREMNode extends TempNode {
 
 		//
 
-		uvNode = materialEnvRotation.mul( vec3( uvNode.x, uvNode.y.negate(), uvNode.z ) );
+		// PMREMGenerator renders into a render target with inverted Y, so its output needs the Y
+		// flip on sampling. Externally authored PMREMs follow the standard convention and don't.
+
+		uvNode = this._pmrem === null || this._pmrem.isRenderTargetTexture
+			? materialEnvRotation.mul( vec3( uvNode.x, uvNode.y.negate(), uvNode.z ) )
+			: materialEnvRotation.mul( uvNode );
 
 		//
 

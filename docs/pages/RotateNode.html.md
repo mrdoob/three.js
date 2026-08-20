@@ -30,7 +30,7 @@ Represents the rotation that is applied to the position node. Depending on wheth
 
 ## Methods
 
-### .getNodeType( builder : NodeBuilder ) : string
+### .generateNodeType( builder : NodeBuilder ) : string
 
 The type of the [RotateNode#positionNode](RotateNode.html#positionNode) defines the node's type.
 
@@ -38,7 +38,7 @@ The type of the [RotateNode#positionNode](RotateNode.html#positionNode) defines 
 
 The current node builder.
 
-**Overrides:** [TempNode#getNodeType](TempNode.html#getNodeType)
+**Overrides:** [TempNode#generateNodeType](TempNode.html#generateNodeType)
 
 **Returns:** The node's type.
 

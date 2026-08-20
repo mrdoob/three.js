@@ -9,6 +9,8 @@ References:
 *   [https://alextardif.com/TAA.html](https://alextardif.com/TAA.html)
 *   [https://www.elopezr.com/temporal-aa-and-the-quest-for-the-holy-trail/](https://www.elopezr.com/temporal-aa-and-the-quest-for-the-holy-trail/)
 
+Note: MSAA must be disabled when TRAA is in use.
+
 ## Import
 
 TRAANode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).

@@ -8,6 +8,12 @@ export default /* glsl */`
 		vTangent = normalize( transformedTangent );
 		vBitangent = normalize( cross( vNormal, vTangent ) * tangent.w );
 
+		#ifdef FLIP_SIDED
+
+			vBitangent = - vBitangent;
+
+		#endif
+
 	#endif
 
 #endif

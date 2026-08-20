@@ -35,6 +35,14 @@ class EventNode extends Node {
 
 			this.updateType = NodeUpdateType.RENDER;
 
+		} else if ( eventType === EventNode.FRAME ) {
+
+			this.updateType = NodeUpdateType.FRAME;
+
+		} else if ( eventType === EventNode.AFTER_OBJECT ) {
+
+			this.updateAfterType = NodeUpdateType.OBJECT;
+
 		} else if ( eventType === EventNode.BEFORE_OBJECT ) {
 
 			this.updateBeforeType = NodeUpdateType.OBJECT;
@@ -43,7 +51,41 @@ class EventNode extends Node {
 
 			this.updateBeforeType = NodeUpdateType.RENDER;
 
+		} else if ( eventType === EventNode.BEFORE_FRAME ) {
+
+			this.updateBeforeType = NodeUpdateType.FRAME;
+
 		}
+
+	}
+
+	setup( builder ) {
+
+		const { eventType, callback } = this;
+
+		if ( eventType === EventNode.BEFORE_RENDER_PIPELINE ) {
+
+			const callbacks = builder.context.onBeforePipelineCallbacks;
+
+			if ( callbacks ) {
+
+				callbacks.push( callback );
+
+			}
+
+		} else if ( eventType === EventNode.AFTER_RENDER_PIPELINE ) {
+
+			const callbacks = builder.context.onAfterPipelineCallbacks;
+
+			if ( callbacks ) {
+
+				callbacks.push( callback );
+
+			}
+
+		}
+
+		return super.setup( builder );
 
 	}
 
@@ -59,12 +101,23 @@ class EventNode extends Node {
 
 	}
 
+	updateAfter( frame ) {
+
+		this.callback( frame );
+
+	}
+
 }
 
 EventNode.OBJECT = 'object';
 EventNode.MATERIAL = 'material';
+EventNode.FRAME = 'frame';
+EventNode.AFTER_OBJECT = 'afterObject';
 EventNode.BEFORE_OBJECT = 'beforeObject';
 EventNode.BEFORE_MATERIAL = 'beforeMaterial';
+EventNode.BEFORE_FRAME = 'beforeFrame';
+EventNode.BEFORE_RENDER_PIPELINE = 'beforeRenderPipeline';
+EventNode.AFTER_RENDER_PIPELINE = 'afterRenderPipeline';
 
 export default EventNode;
 
@@ -98,6 +151,26 @@ export const OnObjectUpdate = ( callback ) => createEvent( EventNode.OBJECT, cal
 export const OnMaterialUpdate = ( callback ) => createEvent( EventNode.MATERIAL, callback );
 
 /**
+ * Creates an event that triggers a function every frame.
+ *
+ * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+export const OnFrameUpdate = ( callback ) => createEvent( EventNode.FRAME, callback );
+
+/**
+ * Creates an event that triggers a function every time an object (Mesh|Sprite) has been rendered.
+ *
+ * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+export const OnAfterObjectUpdate = ( callback ) => createEvent( EventNode.AFTER_OBJECT, callback );
+
+/**
  * Creates an event that triggers a function before an object (Mesh|Sprite) is updated.
  *
  * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
@@ -116,3 +189,35 @@ export const OnBeforeObjectUpdate = ( callback ) => createEvent( EventNode.BEFOR
  * @returns {EventNode}
  */
 export const OnBeforeMaterialUpdate = ( callback ) => createEvent( EventNode.BEFORE_MATERIAL, callback );
+
+/**
+ * Creates an event that triggers a function before every frame.
+ *
+ * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+export const OnBeforeFrameUpdate = ( callback ) => createEvent( EventNode.BEFORE_FRAME, callback );
+
+/**
+ * Creates an event that triggers a function before the render pipeline is rendered.
+ *
+ * The node must be part of a node chain that is used as the output of a `RenderPipeline`,
+ * otherwise the event is ignored.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+export const OnBeforeRenderPipeline = ( callback ) => createEvent( EventNode.BEFORE_RENDER_PIPELINE, callback );
+
+/**
+ * Creates an event that triggers a function after the render pipeline is rendered.
+ *
+ * The node must be part of a node chain that is used as the output of a `RenderPipeline`,
+ * otherwise the event is ignored.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+export const OnAfterRenderPipeline = ( callback ) => createEvent( EventNode.AFTER_RENDER_PIPELINE, callback );

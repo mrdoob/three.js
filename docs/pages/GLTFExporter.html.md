@@ -21,6 +21,7 @@ GLTFExporter supports the [glTF 2.0 extensions](https://github.com/KhronosGroup/
 *   KHR\_texture\_transform
 *   EXT\_materials\_bump
 *   EXT\_mesh\_gpu\_instancing
+*   EXT\_texture\_webp
 
 The following glTF 2.0 extension is supported by an external user plugin:
 
@@ -174,9 +175,9 @@ Restricts the image maximum size (both width and height) to the given value.
 Default is `Infinity`.
 
 **animations**  
-Array.<[AnimationClip](AnimationClip.html)\>
+Array.<[AnimationClip](AnimationClip.html)\> | Array.<Array.<[AnimationClip](AnimationClip.html)\>>
 
-List of animations to be included in the export.
+List of animations to be included in the export. When exporting a single 3D object or scene, this is a flat list of clips. When exporting an array of multiple scenes, this must be a nested array with one list of clips per scene, matched to the input by index.
 
 Default is `[]`.
 

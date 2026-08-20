@@ -27,13 +27,7 @@ import { clamp } from './MathUtils.js';
  */
 class Vector2 {
 
-	/**
-	 * Constructs a new 2D vector.
-	 *
-	 * @param {number} [x=0] - The x value of this vector.
-	 * @param {number} [y=0] - The y value of this vector.
-	 */
-	constructor( x = 0, y = 0 ) {
+	static {
 
 		/**
 		 * This flag can be used for type testing.
@@ -43,6 +37,16 @@ class Vector2 {
 		 * @default true
 		 */
 		Vector2.prototype.isVector2 = true;
+
+	}
+
+	/**
+	 * Constructs a new 2D vector.
+	 *
+	 * @param {number} [x=0] - The x value of this vector.
+	 * @param {number} [y=0] - The y value of this vector.
+	 */
+	constructor( x = 0, y = 0 ) {
 
 		/**
 		 * The x value of this vector.
@@ -166,7 +170,7 @@ class Vector2 {
 
 			case 0: this.x = value; break;
 			case 1: this.y = value; break;
-			default: throw new Error( 'index is out of range: ' + index );
+			default: throw new Error( 'THREE.Vector2: index is out of range: ' + index );
 
 		}
 
@@ -186,7 +190,7 @@ class Vector2 {
 
 			case 0: return this.x;
 			case 1: return this.y;
-			default: throw new Error( 'index is out of range: ' + index );
+			default: throw new Error( 'THREE.Vector2: index is out of range: ' + index );
 
 		}
 

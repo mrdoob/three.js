@@ -131,6 +131,8 @@ import './src/helpers/SpotLightHelper.tests.js';
 import './src/lights/AmbientLight.tests.js';
 import './src/lights/DirectionalLight.tests.js';
 import './src/lights/DirectionalLightShadow.tests.js';
+import './src/lights/SunLight.tests.js';
+import './src/lights/SunLightShadow.tests.js';
 import './src/lights/HemisphereLight.tests.js';
 import './src/lights/Light.tests.js';
 import './src/lights/LightProbe.tests.js';
@@ -208,6 +210,7 @@ import './src/math/Vector4.tests.js';
 
 //src/math/interpolants
 import './src/math/interpolants/CubicInterpolant.tests.js';
+import './src/math/interpolants/CustomInterpolant.tests.js';
 import './src/math/interpolants/DiscreteInterpolant.tests.js';
 import './src/math/interpolants/LinearInterpolant.tests.js';
 import './src/math/interpolants/QuaternionLinearInterpolant.tests.js';
@@ -282,8 +285,8 @@ import './src/textures/DataArrayTexture.tests.js';
 import './src/textures/DataTexture.tests.js';
 import './src/textures/DepthTexture.tests.js';
 import './src/textures/FramebufferTexture.tests.js';
-import './src/textures/Source.tests.js';
 import './src/textures/Texture.tests.js';
+import './src/textures/TextureSource.tests.js';
 import './src/textures/VideoTexture.tests.js';
 
 

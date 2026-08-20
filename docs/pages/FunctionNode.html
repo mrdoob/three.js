@@ -78,6 +78,30 @@ material.colorNode = someWGSLFn( { color: texture( map ) } );
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="generateNodeType" translate="no">.<a href="#generateNodeType">generateNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the type of this function node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="CodeNode.html#generateNodeType">CodeNode#generateNodeType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The type.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="getInputs" translate="no">.<a href="#getInputs">getInputs</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : Array.&lt;<a href="NodeFunctionInput.html">NodeFunctionInput</a>></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -150,30 +174,6 @@ material.colorNode = someWGSLFn( { color: texture( map ) } );
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The node function.</dt>
-						</dl>
-					</div>
-					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>Returns the type of this function node.</p>
-						</div>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong translate="no">builder</strong>
-									</td>
-									<td class="description last">
-										<p>The current node builder.</p>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="CodeNode.html#getNodeType">CodeNode#getNodeType</a></dt>
-						</dl>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The type.</dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

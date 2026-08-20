@@ -81,6 +81,14 @@ class AfterImageNode extends TempNode {
 		this._textureNodeOld = texture( this._oldRT.texture );
 
 		/**
+		 * The material for the composite pass.
+		 *
+		 * @private
+		 * @type {?NodeMaterial}
+		 */
+		this._materialComposed = null;
+
+		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
 		 * its effect once per frame in `updateBefore()`.
 		 *
@@ -225,6 +233,8 @@ class AfterImageNode extends TempNode {
 
 		this._compRT.dispose();
 		this._oldRT.dispose();
+
+		if ( this._materialComposed !== null ) this._materialComposed.dispose();
 
 	}
 

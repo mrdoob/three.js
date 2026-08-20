@@ -1,6 +1,4 @@
-import { Color } from '../../../../src/math/Color.js';
-import { ColorManagement } from '../../../../src/math/ColorManagement.js';
-import { LinearSRGBColorSpace } from '../../../../src/constants.js';
+import { Color, ColorManagement, LinearSRGBColorSpace } from 'three';
 import {
 	DisplayP3ColorSpace,
 	DisplayP3ColorSpaceImpl,

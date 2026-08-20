@@ -212,7 +212,7 @@ class PropertyBinding {
 
 		if ( matches === null ) {
 
-			throw new Error( 'PropertyBinding: Cannot parse trackName: ' + trackName );
+			throw new Error( 'THREE.PropertyBinding: Cannot parse trackName: ' + trackName );
 
 		}
 
@@ -246,7 +246,7 @@ class PropertyBinding {
 
 		if ( results.propertyName === null || results.propertyName.length === 0 ) {
 
-			throw new Error( 'PropertyBinding: can not parse propertyName from trackName: ' + trackName );
+			throw new Error( 'THREE.PropertyBinding: can not parse propertyName from trackName: ' + trackName );
 
 		}
 

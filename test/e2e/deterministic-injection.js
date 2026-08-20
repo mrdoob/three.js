@@ -30,22 +30,17 @@
 
 		if ( window._renderFinished === true ) return;
 
-		if ( window._renderStarted === false ) {
+		const intervalId = setInterval( function () {
 
-			const intervalId = setInterval( function () {
+			if ( window._renderStarted === true ) {
 
-				if ( window._renderStarted === true ) {
+				clearInterval( intervalId );
+				window._renderFinished = true;
+				cb( now() );
 
-					cb( now() );
+			}
 
-					clearInterval( intervalId );
-					window._renderFinished = true;
-
-				}
-
-			}, 100 );
-
-		}
+		}, 100 );
 
 	};
 

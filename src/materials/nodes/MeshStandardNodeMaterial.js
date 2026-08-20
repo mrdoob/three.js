@@ -171,17 +171,6 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 	}
 
-	copy( source ) {
-
-		this.emissiveNode = source.emissiveNode;
-
-		this.metalnessNode = source.metalnessNode;
-		this.roughnessNode = source.roughnessNode;
-
-		return super.copy( source );
-
-	}
-
 }
 
 export default MeshStandardNodeMaterial;

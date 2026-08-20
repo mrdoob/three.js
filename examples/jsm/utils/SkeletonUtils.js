@@ -27,11 +27,13 @@ function getBoneName( bone, options ) {
 }
 
 /**
- * Retargets the skeleton from the given source 3D object to the
- * target 3D object.
+ * Retargets the skeleton from the given source to the target.
  *
- * @param {Object3D} target - The target 3D object.
- * @param {Object3D} source - The source 3D object.
+ * Both `target` and `source` can be a 3D object with a skeleton property (e.g. a skinned mesh)
+ * or a {@link Skeleton} directly.
+ *
+ * @param {Object3D|Skeleton} target - The target object.
+ * @param {Object3D|Skeleton} source - The source object.
  * @param {module:SkeletonUtils~RetargetOptions} options - The options.
  */
 function retarget( target, source, options = {} ) {
@@ -210,11 +212,13 @@ function retarget( target, source, options = {} ) {
 }
 
 /**
- * Retargets the animation clip of the source object to the
- * target 3D object.
+ * Retargets the animation clip of the source to the target 3D object.
  *
- * @param {Object3D} target - The target 3D object.
- * @param {Object3D} source - The source 3D object.
+ * The `source` can be a 3D object with a skeleton property (e.g. a skinned mesh)
+ * or a {@link Skeleton} directly.
+ *
+ * @param {Object3D} target - The target 3D object. Must have a `skeleton` property.
+ * @param {Object3D|Skeleton} source - The source object.
  * @param {AnimationClip} clip - The animation clip.
  * @param {module:SkeletonUtils~RetargetOptions} options - The options.
  * @return {AnimationClip} The retargeted animation clip.
@@ -481,6 +485,8 @@ function parallelTraverse( a, b, callback ) {
  * @property {string} [hip='hip'] - The name of the source's hip bone.
  * @property {Vector3} [hipInfluence=(1,1,1)] - The hip influence.
  * @property {number} [scale=1] - The scale.
+ * @property {Object<string,Matrix4>} [localOffsets] - Per-bone local offset matrices, keyed by bone name.
+ * @property {Vector3} [hipPosition] - An additional position offset applied to the hip bone.
  **/
 
 export {

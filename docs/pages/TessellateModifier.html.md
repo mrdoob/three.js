@@ -53,7 +53,7 @@ Default is `0.1`.
 
 ### .modify( geometry : BufferGeometry ) : BufferGeometry
 
-Returns a new, modified version of the given geometry by applying a tesselation. Please note that the resulting geometry is always non-indexed.
+Returns a new, modified version of the given geometry by applying a tessellation. Please note that the resulting geometry is always non-indexed.
 
 **geometry**
 

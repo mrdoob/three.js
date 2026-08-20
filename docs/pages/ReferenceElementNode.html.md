@@ -46,19 +46,19 @@ Default is `null`.
 
 ## Methods
 
-### .getNodeType() : string
+### .generateNodeType() : string
 
 This method is overwritten since the node type is inferred from the uniform type of the reference node.
 
-**Overrides:** [ArrayElementNode#getNodeType](ArrayElementNode.html#getNodeType)
+**Overrides:** [ArrayElementNode#generateNodeType](ArrayElementNode.html#generateNodeType)
 
 **Returns:** The node type.
 
-### .getNodeType() : string
+### .generateNodeType() : string
 
 This method is overwritten since the node type is inferred from the uniform type of the reference node.
 
-**Overrides:** [ArrayElementNode#getNodeType](ArrayElementNode.html#getNodeType)
+**Overrides:** [ArrayElementNode#generateNodeType](ArrayElementNode.html#generateNodeType)
 
 **Returns:** The node type.
 
@@ -110,19 +110,19 @@ Default is `null`.
 
 ## Methods
 
-### .getNodeType() : string
+### .generateNodeType() : string
 
 This method is overwritten since the node type is inferred from the uniform type of the reference node.
 
-**Overrides:** [ArrayElementNode#getNodeType](ArrayElementNode.html#getNodeType)
+**Overrides:** [ArrayElementNode#generateNodeType](ArrayElementNode.html#generateNodeType)
 
 **Returns:** The node type.
 
-### .getNodeType() : string
+### .generateNodeType() : string
 
 This method is overwritten since the node type is inferred from the uniform type of the reference node.
 
-**Overrides:** [ArrayElementNode#getNodeType](ArrayElementNode.html#getNodeType)
+**Overrides:** [ArrayElementNode#generateNodeType](ArrayElementNode.html#generateNodeType)
 
 **Returns:** The node type.
 

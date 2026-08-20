@@ -4,6 +4,10 @@
 		<title>three.js webgpu - materials</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - materials">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_materials.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_materials.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
@@ -65,6 +69,7 @@
 				camera.position.set( 0, 200, 800 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
 
 				// Grid
 

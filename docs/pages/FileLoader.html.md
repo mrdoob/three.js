@@ -45,7 +45,7 @@ Aborts ongoing fetch requests.
 
 **Returns:** A reference to this instance.
 
-### .load( url : string, onLoad : function, onProgress : onProgressCallback, onError : onErrorCallback ) : any | undefined
+### .load( url : string, onLoad : function, onProgress : onProgressCallback, onError : onErrorCallback )
 
 Starts loading from the given URL and pass the loaded response to the `onLoad()` callback.
 
@@ -66,8 +66,6 @@ Executed while the loading is in progress.
 Executed when errors occur.
 
 **Overrides:** [Loader#load](Loader.html#load)
-
-**Returns:** The cached resource if available.
 
 ### .setMimeType( value : string ) : FileLoader
 

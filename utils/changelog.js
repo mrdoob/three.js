@@ -1,4 +1,4 @@
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 
 // Path-based categories (used as fallback for non-JS files)
 // Ordered from most specific to least specific
@@ -9,8 +9,10 @@ const categoryPaths = [
 	[ 'src/renderers/common', 'Renderer' ],
 
 	// Main sections
+	[ 'utils/docs', 'Docs' ],
 	[ 'docs', 'Docs' ],
 	[ 'manual', 'Manual' ],
+	[ 'devtools', 'Devtools' ],
 	[ 'editor', 'Editor' ],
 	[ 'test', 'Tests' ],
 	[ 'playground', 'Playground' ],
@@ -34,17 +36,21 @@ const skipPatterns = [
 	/^Update copyright year/i,
 	/^Update \w+\.js\.?$/i, // Generic "Update File.js" commits
 	/^Updated? docs\.?$/i,
-	/^Update REVISION/i
+	/^Update REVISION/i,
+	/^r\d+(\s*\(bis\))*$/i
 ];
 
-// Categories that map to sections
-const sectionCategories = [ 'Docs', 'Manual', 'Examples', 'Editor', 'Tests', 'Utils', 'Build' ];
+// Authors to skip (bots)
+const skipAuthors = new Set( [ 'dependabot', 'app/renovate', 'renovate[bot]' ] );
 
-function exec( command ) {
+// Categories that map to sections
+const sectionCategories = [ 'Docs', 'Manual', 'Examples', 'Devtools', 'Editor', 'Tests', 'Utils', 'Build' ];
+
+function exec( file, args ) {
 
 	try {
 
-		return execSync( command, { encoding: 'utf8', maxBuffer: 50 * 1024 * 1024 } ).trim();
+		return execFileSync( file, args, { encoding: 'utf8', maxBuffer: 50 * 1024 * 1024, stdio: [ 'ignore', 'pipe', 'ignore' ] } ).trim();
 
 	} catch ( error ) {
 
@@ -54,16 +60,10 @@ function exec( command ) {
 
 }
 
-function getLastTag() {
+function getCommitsBetweenTags( fromTag, toTag ) {
 
-	return exec( 'git describe --tags --abbrev=0' );
-
-}
-
-function getCommitsSinceTag( tag ) {
-
-	// Get commits since tag, oldest first, excluding merge commits
-	const log = exec( `git log ${tag}..HEAD --no-merges --reverse --format="%H|%s|%an"` );
+	// Get commits between tags (exclusive fromTag, inclusive toTag), oldest first, excluding merge commits
+	const log = exec( 'git', [ 'log', `${fromTag}..${toTag}`, '--no-merges', '--reverse', '--format=%H|%s|%an' ] );
 
 	if ( ! log ) return [];
 
@@ -78,16 +78,23 @@ function getCommitsSinceTag( tag ) {
 
 function getChangedFiles( hash ) {
 
-	const files = exec( `git diff-tree --no-commit-id --name-only -r ${hash}` );
+	const files = exec( 'git', [ 'diff-tree', '--no-commit-id', '--name-only', '-r', hash ] );
 	return files ? files.split( '\n' ).filter( Boolean ) : [];
 
 }
 
-function getCoAuthors( hash ) {
+function getCoAuthorsFromPR( prNumber ) {
 
-	const body = exec( `git log -1 --format="%b" ${hash}` );
+	const result = exec( 'gh', [ 'pr', 'view', prNumber, '--json', 'commits', '--jq', '[.commits[].authors[].login] | unique | .[]' ] );
+	return result ? result.split( '\n' ).filter( Boolean ) : [];
+
+}
+
+function getCoAuthorsFromCommit( hash ) {
+
+	const body = exec( 'git', [ 'log', '-1', '--format=%b', hash ] );
 	const regex = /Co-authored-by:\s*([^<]+)\s*<[^>]+>/gi;
-	return [ ...body.matchAll( regex ) ].map( m => m[ 1 ].trim() );
+	return [ ...body.matchAll( regex ) ].map( m => normalizeAuthor( m[ 1 ].trim() ) );
 
 }
 
@@ -101,7 +108,7 @@ function extractPRNumber( subject ) {
 
 function getPRInfo( prNumber ) {
 
-	const result = exec( `gh pr view ${prNumber} --json author,title,files --jq '{author: .author.login, title: .title, files: [.files[].path]}' 2>/dev/null` );
+	const result = exec( 'gh', [ 'pr', 'view', prNumber, '--json', 'author,title,files', '--jq', '{author: .author.login, title: .title, files: [.files[].path]}' ] );
 
 	try {
 
@@ -123,6 +130,9 @@ function categorizeFile( file ) {
 		const isAddon = file.startsWith( 'examples/jsm/' );
 
 		if ( file.startsWith( 'src/' ) || isAddon ) {
+
+			// Skip barrel/index files
+			if ( /\/Three(\.\w+)?\.js$/.test( file ) ) return { category: 'Global', isAddon: false };
 
 			const match = file.match( /\/([^/]+)\.js$/ );
 			if ( match ) return { category: match[ 1 ], isAddon };
@@ -152,7 +162,10 @@ function categorizeFile( file ) {
 
 function categorizeCommit( files ) {
 
+	files = files.filter( f => ! f.startsWith( 'examples/screenshots/' ) );
+
 	const categoryCounts = {};
+	const srcCategoryCounts = {};
 	const sectionCounts = {};
 	let hasAddon = false;
 	let addonCategory = null;
@@ -167,7 +180,12 @@ function categorizeCommit( files ) {
 		categoryCounts[ cat ] = ( categoryCounts[ cat ] || 0 ) + 1;
 
 		// Track src files vs addon files
-		if ( file.startsWith( 'src/' ) ) srcCount ++;
+		if ( file.startsWith( 'src/' ) ) {
+
+			srcCount ++;
+			srcCategoryCounts[ cat ] = ( srcCategoryCounts[ cat ] || 0 ) + 1;
+
+		}
 
 		if ( result.isAddon ) {
 
@@ -213,15 +231,19 @@ function categorizeCommit( files ) {
 
 	}
 
-	// Find the most common section (excluding Tests unless it's dominant)
+	// If commit touches src/, treat as core change — category from src/ files only
+	if ( srcCount > 0 ) {
+
+		const srcCategory = Object.entries( srcCategoryCounts ).sort( ( a, b ) => b[ 1 ] - a[ 1 ] )[ 0 ][ 0 ];
+		return { category: srcCategory, isAddon: false, section: null };
+
+	}
+
+	// Find the most common section
 	let maxSection = null;
 	let maxSectionCount = 0;
-	const totalFiles = files.length;
 
 	for ( const [ sec, count ] of Object.entries( sectionCounts ) ) {
-
-		// Only use Tests/Build section if it's the majority of files
-		if ( ( sec === 'Tests' || sec === 'Build' ) && count < totalFiles * 0.5 ) continue;
 
 		if ( count > maxSectionCount ) {
 
@@ -330,9 +352,9 @@ function addToGroup( groups, key, value ) {
 
 }
 
-function validateEnvironment() {
+function validateEnvironment( tag ) {
 
-	if ( ! exec( 'gh --version 2>/dev/null' ) ) {
+	if ( ! exec( 'gh', [ '--version' ] ) ) {
 
 		console.error( 'GitHub CLI (gh) is required but not installed.' );
 		console.error( 'Install from: https://cli.github.com/' );
@@ -340,16 +362,38 @@ function validateEnvironment() {
 
 	}
 
-	const lastTag = getLastTag();
+	if ( ! tag ) {
 
-	if ( ! lastTag ) {
-
-		console.error( 'No tags found in repository' );
+		console.error( 'Usage: node utils/changelog.js <tag>' );
+		console.error( 'Example: node utils/changelog.js r185' );
 		process.exit( 1 );
 
 	}
 
-	return lastTag;
+	// Verify the tag exists
+	const resolved = exec( 'git', [ 'rev-parse', '--verify', tag ] );
+
+	if ( ! resolved ) {
+
+		console.error( `Invalid tag: ${tag}` );
+		process.exit( 1 );
+
+	}
+
+	// Get the previous tag
+	const version = parseInt( tag.replace( 'r', '' ) );
+	const previousTag = `r${version - 1}`;
+
+	const previousResolved = exec( 'git', [ 'rev-parse', '--verify', previousTag ] );
+
+	if ( ! previousResolved ) {
+
+		console.error( `Previous tag not found: ${previousTag}` );
+		process.exit( 1 );
+
+	}
+
+	return { tag, previousTag, version };
 
 }
 
@@ -393,6 +437,9 @@ function processCommit( commit, revertedTitles ) {
 
 		if ( prInfo ) {
 
+			// Skip commits from bots
+			if ( skipAuthors.has( prInfo.author ) ) return null;
+
 			author = prInfo.author;
 			if ( prInfo.title ) subject = prInfo.title;
 			if ( prInfo.files && prInfo.files.length > 0 ) files = prInfo.files;
@@ -405,19 +452,26 @@ function processCommit( commit, revertedTitles ) {
 	if ( ! files ) files = getChangedFiles( commit.hash );
 	if ( ! author ) author = commit.author;
 
+	// Skip commits from bots (check normalized name for git author fallback)
+	if ( skipAuthors.has( normalizeAuthor( author ) ) ) return null;
+
 	const result = categorizeCommit( files );
 	let { category, section } = result;
 	const { isAddon } = result;
 
-	// Override category if title has a clear prefix
-	const titleCategory = extractCategoryFromTitle( subject );
+	// Use title prefix as category only if file-based didn't assign a section
+	if ( ! section ) {
 
-	if ( titleCategory ) {
+		const titleCategory = extractCategoryFromTitle( subject );
 
-		category = titleCategory;
-		if ( category === 'Puppeteer' ) category = 'Tests';
-		if ( category === 'Scripts' ) category = 'Utils';
-		section = sectionCategories.includes( category ) ? category : null;
+		if ( titleCategory ) {
+
+			category = titleCategory;
+			if ( category === 'Scripts' ) category = 'Utils';
+			if ( category === 'Puppeteer' || category === 'E2E' ) category = 'Tests';
+			section = sectionCategories.includes( category ) ? category : null;
+
+		}
 
 	}
 
@@ -428,7 +482,7 @@ function processCommit( commit, revertedTitles ) {
 
 	}
 
-	const coAuthors = getCoAuthors( commit.hash );
+	const coAuthors = ( prNumber ? getCoAuthorsFromPR( prNumber ) : getCoAuthorsFromCommit( commit.hash ) ).filter( login => login !== author );
 
 	return {
 		entry: {
@@ -445,15 +499,13 @@ function processCommit( commit, revertedTitles ) {
 
 }
 
-function formatOutput( lastTag, coreChanges, addonChanges, sections ) {
+function formatOutput( version, coreChanges, addonChanges, sections ) {
 
 	let output = '';
 
-	// Migration guide and milestone links
-	const version = lastTag.replace( 'r', '' );
-	const nextVersion = parseInt( version ) + 1;
-	output += `https://github.com/mrdoob/three.js/wiki/Migration-Guide#${version}--${nextVersion}\n`;
-	output += 'https://github.com/mrdoob/three.js/milestone/XX?closed=1\n\n';
+	const previousVersion = version - 1;
+	output += `https://github.com/mrdoob/three.js/wiki/Migration-Guide#${previousVersion}--${version}\n`;
+	output += `https://github.com/mrdoob/three.js/milestone/${version - 87}?closed=1\n\n`;
 
 	// Core changes (Global first, then alphabetically)
 	const sortedCore = Object.keys( coreChanges ).sort( ( a, b ) => {
@@ -477,7 +529,7 @@ function formatOutput( lastTag, coreChanges, addonChanges, sections ) {
 	}
 
 	// Output sections in order
-	const sectionOrder = [ 'Docs', 'Manual', 'Examples', 'Addons', 'Editor', 'Tests', 'Utils', 'Build' ];
+	const sectionOrder = [ 'Docs', 'Manual', 'Examples', 'Addons', 'Devtools', 'Editor', 'Tests', 'Utils', 'Build' ];
 
 	for ( const sectionName of sectionOrder ) {
 
@@ -530,15 +582,15 @@ function formatOutput( lastTag, coreChanges, addonChanges, sections ) {
 
 function generateChangelog() {
 
-	const lastTag = validateEnvironment();
+	const { tag, previousTag, version } = validateEnvironment( process.argv[ 2 ] );
 
-	console.error( `Generating changelog since ${lastTag}...\n` );
+	console.error( `Generating changelog ${previousTag}..${tag}\n` );
 
-	const commits = getCommitsSinceTag( lastTag );
+	const commits = getCommitsBetweenTags( previousTag, tag );
 
 	if ( commits.length === 0 ) {
 
-		console.error( 'No commits found since last tag' );
+		console.error( `No commits found between ${previousTag} and ${tag}` );
 		process.exit( 1 );
 
 	}
@@ -554,6 +606,7 @@ function generateChangelog() {
 		Docs: [],
 		Manual: [],
 		Examples: [],
+		Devtools: [],
 		Editor: [],
 		Tests: [],
 		Utils: [],
@@ -608,7 +661,7 @@ function generateChangelog() {
 
 	}
 
-	console.log( formatOutput( lastTag, coreChanges, addonChanges, sections ) );
+	console.log( formatOutput( version, coreChanges, addonChanges, sections ) );
 
 }
 

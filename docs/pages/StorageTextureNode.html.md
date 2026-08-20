@@ -152,6 +152,18 @@ The current node builder.
 
 **Returns:** The input type.
 
+### .getTransformedUV( uvNode : Node ) : Node
+
+Overwrites the default implementation since storage texture coordinates are texel coordinates and should not be transformed by the texture uv matrix.
+
+**uvNode**
+
+The uv node.
+
+**Overrides:** [TextureNode#getTransformedUV](TextureNode.html#getTransformedUV)
+
+**Returns:** The unmodified uv node.
+
 ### .setAccess( value : string ) : StorageTextureNode
 
 Defines the node access.
@@ -171,6 +183,22 @@ Sets the mip level to write to.
 The mip level.
 
 **Returns:** A reference to this node.
+
+### .store( uvNode : Node.<(vec2|vec3)>, storeNode : Node ) : StorageTextureNode
+
+Stores a value in this storage texture at the given coordinates.
+
+**uvNode**
+
+The storage texture coordinates.
+
+**storeNode**
+
+The value node that should be stored in the texture.
+
+Default is `null`.
+
+**Returns:** A storage texture node representing the store operation.
 
 ### .toReadOnly() : StorageTextureNode
 

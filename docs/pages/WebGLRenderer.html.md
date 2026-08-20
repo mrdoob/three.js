@@ -591,6 +591,14 @@ Sets the post-processing effects to be applied after rendering.
 
 An array of post-processing effects.
 
+### .setNodesHandler( nodesHandler : WebGLNodesHandler )
+
+Sets a compatibility node builder for rendering node materials with WebGLRenderer. This enables using TSL (Three.js Shading Language) node materials to prepare for migration to WebGPURenderer.
+
+**nodesHandler**
+
+The node builder instance.
+
 ### .setOpaqueSort( method : function )
 
 Sets a custom opaque sort function for the render lists. Pass `null` to use the default `painterSortStable` function.

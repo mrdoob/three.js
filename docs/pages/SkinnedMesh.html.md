@@ -58,9 +58,9 @@ Default is `true`.
 
 ## Methods
 
-### .applyBoneTransform( index : number, target : Vector3 ) : Vector3
+### .applyBoneTransform( index : number, target : Vector3 | Vector4 ) : Vector3 | Vector4
 
-Applies the bone transform associated with the given index to the given vertex position. Returns the updated vector.
+Applies the bone transform associated with the given index to the given vector. Can be used to transform positions or direction vectors by providing a Vector4 with 1 or 0 in the w component respectively. Returns the updated vector.
 
 **index**
 
@@ -68,9 +68,9 @@ The vertex index.
 
 **target**
 
-The target object that is used to store the method's result. the skinned mesh's world matrix will be used instead.
+The target object that is used to store the method's result.
 
-**Returns:** The updated vertex position.
+**Returns:** The updated vertex attribute data.
 
 ### .bind( skeleton : Skeleton, bindMatrix : Matrix4 )
 

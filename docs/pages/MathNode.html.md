@@ -64,6 +64,18 @@ The method name.
 
 ## Methods
 
+### .generateNodeType( builder : NodeBuilder ) : string
+
+The selected method as well as the input type determine the node type of this node.
+
+**builder**
+
+The current node builder.
+
+**Overrides:** [TempNode#generateNodeType](TempNode.html#generateNodeType)
+
+**Returns:** The node type.
+
 ### .getInputType( builder : NodeBuilder ) : string
 
 The input type is inferred from the node types of the input nodes.
@@ -73,18 +85,6 @@ The input type is inferred from the node types of the input nodes.
 The current node builder.
 
 **Returns:** The input type.
-
-### .getNodeType( builder : NodeBuilder ) : string
-
-The selected method as well as the input type determine the node type of this node.
-
-**builder**
-
-The current node builder.
-
-**Overrides:** [TempNode#getNodeType](TempNode.html#getNodeType)
-
-**Returns:** The node type.
 
 ## Source
 

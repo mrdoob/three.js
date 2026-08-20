@@ -192,7 +192,7 @@ its effect once per frame in <code>updateBefore()</code>.</p>
 					<h3 class="name" id="useScreenSpaceSampling" translate="no">.<a href="#useScreenSpaceSampling">useScreenSpaceSampling</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;bool></span> </h3>
 					<div class="description">
 						<p>Makes the sample distance in screen space instead of world-space (helps having more detail up close).</p>
-						<p>Default is <code>false</code>.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -218,13 +218,22 @@ when the effect is no longer required.</p>
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#dispose">TempNode#dispose</a></dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getTextureNode" translate="no">.<a href="#getTextureNode">getTextureNode</a><span class="signature">()</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
+					<h3 class="name name-method" id="getAONode" translate="no">.<a href="#getAONode">getAONode</a><span class="signature">()</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Returns the result of the effect as a texture node.</p>
+							<p>Returns the AO result of the effect as a texture node.</p>
 						</div>
 						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> A texture node that represents the result of the effect.</dt>
+							<dt class="tag-returns"><strong>Returns:</strong> A texture node that represents the AO result of the effect.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getGINode" translate="no">.<a href="#getGINode">getGINode</a><span class="signature">()</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the GI result of the effect as a texture node.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A texture node that represents the GI result of the effect.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="setSize" translate="no">.<a href="#setSize">setSize</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span> )</span> </h3>

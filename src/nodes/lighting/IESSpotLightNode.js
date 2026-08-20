@@ -16,6 +16,25 @@ class IESSpotLightNode extends SpotLightNode {
 	}
 
 	/**
+	 * Constructs a new IES spot light node.
+	 *
+	 * @param {?SpotLight} [light=null] - The spot light source.
+	 */
+	constructor( light = null ) {
+
+		super( light );
+
+		/**
+		 * The texture node representing the IES texture.
+		 *
+		 * @type {?TextureNode}
+		 * @default null
+		 */
+		this._iesTextureNode = null;
+
+	}
+
+	/**
 	 * Overwrites the default implementation to compute an IES conform spot attenuation.
 	 *
 	 * @param {NodeBuilder} builder - The node builder.
@@ -32,15 +51,34 @@ class IESSpotLightNode extends SpotLightNode {
 
 			const angle = angleCosine.acos().mul( 1.0 / Math.PI );
 
-			spotAttenuation = texture( iesMap, vec2( angle, 0 ), 0 ).r;
+			this._iesTextureNode = texture( iesMap, vec2( angle, 0 ), 0 );
+
+			spotAttenuation = this._iesTextureNode.r;
 
 		} else {
 
-			spotAttenuation = super.getSpotAttenuation( angleCosine );
+			spotAttenuation = super.getSpotAttenuation( builder, angleCosine );
 
 		}
 
 		return spotAttenuation;
+
+	}
+
+	/**
+	 * Overwritten to update the IES spot light texture.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
+	update( frame ) {
+
+		super.update( frame );
+
+		if ( this._iesTextureNode !== null && this.light.iesMap ) {
+
+			this._iesTextureNode.value = this.light.iesMap;
+
+		}
 
 	}
 

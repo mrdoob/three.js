@@ -8,32 +8,9 @@ import { Parameters } from './tabs/Parameters.js';
 import { Settings } from './tabs/Settings.js';
 import { Viewer } from './tabs/Viewer.js';
 import { Timeline } from './tabs/Timeline.js';
-import { setText, splitPath, splitCamelCase } from './ui/utils.js';
+import { setText } from './ui/utils.js';
 
-import { QuadMesh, NodeMaterial, CanvasTarget, setConsoleFunction, REVISION, NoToneMapping } from 'three/webgpu';
-import { renderOutput, vec2, vec3, vec4, Fn, screenUV, step, OnMaterialUpdate, uniform } from 'three/tsl';
-
-const aspectRatioUV = /*@__PURE__*/ Fn( ( [ uv, textureNode ] ) => {
-
-	const aspect = uniform( 0 );
-
-	OnMaterialUpdate( () => {
-
-		const { width, height } = textureNode.value;
-
-		aspect.value = width / height;
-
-	} );
-
-	const centered = uv.sub( 0.5 );
-	const corrected = vec2( centered.x.div( aspect ), centered.y );
-	const finalUV = corrected.add( 0.5 );
-
-	const inBounds = step( 0.0, finalUV.x ).mul( step( finalUV.x, 1.0 ) ).mul( step( 0.0, finalUV.y ) ).mul( step( finalUV.y, 1.0 ) );
-
-	return vec3( finalUV, inBounds );
-
-} );
+import { setConsoleFunction, REVISION } from 'three/webgpu';
 
 class Inspector extends RendererInspector {
 
@@ -43,7 +20,10 @@ class Inspector extends RendererInspector {
 
 		// init profiler
 
-		const profiler = new Profiler();
+		const profiler = new Profiler( this );
+		profiler.addEventListener( 'resize', ( e ) => this.dispatchEvent( e ) );
+		profiler.addEventListener( 'orientationchange', ( e ) => this.dispatchEvent( e ) );
+		profiler.addEventListener( 'layoutchange', ( e ) => this.dispatchEvent( e ) );
 
 		const parameters = new Parameters( {
 			builtin: true,
@@ -80,7 +60,6 @@ class Inspector extends RendererInspector {
 		}
 
 		this.statsData = new Map();
-		this.canvasNodes = new Map();
 		this.profiler = profiler;
 		this.performance = performance;
 		this.memory = memory;
@@ -88,7 +67,9 @@ class Inspector extends RendererInspector {
 		this.parameters = parameters;
 		this.viewer = viewer;
 		this.timeline = timeline;
+		this.settings = settings;
 		this.once = {};
+		this.extensionsData = new WeakMap();
 
 		this.displayCycle = {
 			text: {
@@ -100,6 +81,11 @@ class Inspector extends RendererInspector {
 				needsUpdate: false,
 				duration: .02,
 				time: 0
+			},
+			toggleGraph: {
+				needsUpdate: false,
+				duration: .02,
+				time: 0
 			}
 		};
 
@@ -108,6 +94,122 @@ class Inspector extends RendererInspector {
 	get domElement() {
 
 		return this.profiler.domElement;
+
+	}
+
+	isVertical() {
+
+		return this.profiler ? this.profiler.isVertical() : false;
+
+	}
+
+	onExtension( name, callback ) {
+
+		const extensionAdded = ( e ) => {
+
+			if ( e.name === name ) {
+
+				callback( e.tab );
+
+				this.settings.removeEventListener( 'extensionadded', extensionAdded );
+
+			}
+
+		};
+
+		if ( this.settings.extensions[ name ] && this.settings.extensions[ name ].loaded ) {
+
+			callback( this.settings.extensions[ name ] );
+
+		} else {
+
+			this.settings.addEventListener( 'extensionadded', extensionAdded );
+
+		}
+
+		return this;
+
+	}
+
+	hide() {
+
+		this.profiler.hide();
+
+	}
+
+	show() {
+
+		this.profiler.show();
+
+	}
+
+	setVisible( value ) {
+
+		this.domElement.style.display = value ? '' : 'none';
+
+		return this;
+
+	}
+
+	getVisible() {
+
+		return this.domElement.style.display !== 'none';
+
+	}
+
+	getSize() {
+
+		return this.profiler.getSize();
+
+	}
+
+	setActiveTab( tab ) {
+
+		this.profiler.setActiveTab( tab.id );
+
+		return this;
+
+	}
+
+	setHorizontalAlign( value ) {
+
+		this.profiler.setHorizontalAlign( value );
+
+		return this;
+
+	}
+
+	setVerticalAlign( value ) {
+
+		this.profiler.setVerticalAlign( value );
+
+		return this;
+
+	}
+
+	addTab( tab ) {
+
+		this.profiler.addTab( tab );
+
+		return this;
+
+	}
+
+	removeTab( tab ) {
+
+		tab.dispose();
+
+		this.profiler.removeTab( tab );
+
+		return this;
+
+	}
+
+	setActiveExtension( name, value ) {
+
+		this.settings.setActiveExtension( name, value );
+
+		return this;
 
 	}
 
@@ -194,9 +296,28 @@ class Inspector extends RendererInspector {
 
 		//
 
-		if ( renderer.inspector.domElement.parentElement === null && renderer.domElement.parentElement !== null ) {
+		if ( renderer.inspector.domElement.parentElement === null ) {
 
-			renderer.domElement.parentElement.appendChild( renderer.inspector.domElement );
+			if ( renderer.domElement.parentElement !== null ) {
+
+				renderer.domElement.parentElement.appendChild( renderer.inspector.domElement );
+
+			} else {
+
+				const observer = new MutationObserver( () => {
+
+					if ( renderer.domElement.parentElement !== null ) {
+
+						renderer.domElement.parentElement.appendChild( renderer.inspector.domElement );
+						observer.disconnect();
+
+					}
+
+				} );
+
+				observer.observe( document.body || document.documentElement, { childList: true, subtree: true } );
+
+			}
 
 		}
 
@@ -308,88 +429,9 @@ class Inspector extends RendererInspector {
 
 	}
 
-	getCanvasDataByNode( node ) {
+	getNodes() {
 
-		let canvasData = this.canvasNodes.get( node );
-
-		if ( canvasData === undefined ) {
-
-			const renderer = this.getRenderer();
-
-			const canvas = document.createElement( 'canvas' );
-
-			const canvasTarget = new CanvasTarget( canvas );
-			canvasTarget.setPixelRatio( window.devicePixelRatio );
-			canvasTarget.setSize( 140, 140 );
-
-			const id = node.id;
-
-			const { path, name } = splitPath( splitCamelCase( node.getName() || '(unnamed)' ) );
-
-			const target = node.context( { getUV: ( textureNode ) => {
-
-				const uvData = aspectRatioUV( screenUV, textureNode );
-				const correctedUV = uvData.xy;
-				const mask = uvData.z;
-
-				return correctedUV.mul( mask );
-
-			} } );
-
-			let output = vec4( vec3( target ), 1 );
-			output = renderOutput( output, NoToneMapping, renderer.outputColorSpace );
-			output = output.context( { inspector: true } );
-
-			const material = new NodeMaterial();
-			material.outputNode = output;
-
-			const quad = new QuadMesh( material );
-			quad.name = 'Viewer - ' + name;
-
-			canvasData = {
-				id,
-				name,
-				path,
-				node,
-				quad,
-				canvasTarget,
-				material
-			};
-
-			this.canvasNodes.set( node, canvasData );
-
-		}
-
-		return canvasData;
-
-	}
-
-	resolveViewer() {
-
-		const nodes = this.currentNodes;
-		const renderer = this.getRenderer();
-
-		if ( nodes.length === 0 ) return;
-
-		if ( ! renderer.backend.isWebGPUBackend ) {
-
-			this.resolveConsoleOnce( 'warn', 'Inspector: Viewer is only available with WebGPU.' );
-
-			return;
-
-		}
-
-		//
-
-		if ( ! this.viewer.isVisible ) {
-
-			this.viewer.show();
-
-		}
-
-		const canvasDataList = nodes.map( node => this.getCanvasDataByNode( node ) );
-
-		this.viewer.update( renderer, canvasDataList );
+		return this.currentNodes;
 
 	}
 
@@ -420,11 +462,37 @@ class Inspector extends RendererInspector {
 
 	}
 
+	updateTabs() {
+
+		// tabs
+
+		const tabs = Object.values( this.profiler.tabs );
+
+		for ( const tab of tabs ) {
+
+			let tabData = this.extensionsData.get( tab );
+
+			if ( tabData === undefined ) {
+
+				tab.init( this );
+
+				tabData = {};
+
+				this.extensionsData.set( tab, tabData );
+
+			}
+
+			tab.update( this );
+
+		}
+
+	}
+
 	resolveFrame( frame ) {
 
-		const nextFrame = this.getFrameById( frame.frameId + 1 );
+		const previousFrame = this.getFrameById( frame.frameId - 1 );
 
-		if ( ! nextFrame ) return;
+		if ( ! previousFrame ) return;
 
 		frame.cpu = 0;
 		frame.gpu = 0;
@@ -442,9 +510,9 @@ class Inspector extends RendererInspector {
 
 		}
 
-		// improve stats using next frame
+		// improve stats using previous frame
 
-		frame.deltaTime = nextFrame.startTime - frame.startTime;
+		frame.deltaTime = frame.startTime - previousFrame.startTime;
 		frame.miscellaneous = frame.deltaTime - frame.total;
 
 		if ( frame.miscellaneous < 0 ) {
@@ -459,13 +527,25 @@ class Inspector extends RendererInspector {
 
 		this.updateCycle( this.displayCycle.text );
 		this.updateCycle( this.displayCycle.graph );
+		this.updateCycle( this.displayCycle.toggleGraph );
 
 		if ( this.displayCycle.text.needsUpdate ) {
 
-			setText( 'fps-counter', this.fps.toFixed() );
+			setText( this.profiler.toggleButton.querySelector( '.fps-counter' ), this.fps.toFixed() );
 
 			this.performance.updateText( this, frame );
 			this.memory.updateText( this );
+
+		}
+
+		if ( this.displayCycle.toggleGraph.needsUpdate ) {
+
+			if ( this.profiler.toggleGraph ) {
+
+				this.profiler.toggleGraph.addPoint( 'fps', this.fps );
+				this.profiler.toggleGraph.update();
+
+			}
 
 		}
 
@@ -478,6 +558,7 @@ class Inspector extends RendererInspector {
 
 		this.displayCycle.text.needsUpdate = false;
 		this.displayCycle.graph.needsUpdate = false;
+		this.displayCycle.toggleGraph.needsUpdate = false;
 
 	}
 
@@ -496,4 +577,44 @@ class Inspector extends RendererInspector {
 
 }
 
-export { Inspector };
+function getItem( id ) {
+
+	const data = JSON.parse( localStorage.getItem( 'threejs-inspector' ) || '{}' );
+
+	if ( data.version !== REVISION ||
+		 data.settings && ( data.settings.storage === 'url' && data.settings.url !== location.href ) ) {
+
+		localStorage.removeItem( 'threejs-inspector' );
+
+		return {};
+
+	}
+
+	return data[ id ] || {};
+
+}
+
+function setItem( id, state ) {
+
+	const data = JSON.parse( localStorage.getItem( 'threejs-inspector' ) || '{}' );
+
+	if ( state === null ) {
+
+		delete data[ id ];
+
+	} else {
+
+		data[ id ] = state;
+
+	}
+
+	data.settings = data.settings || {};
+	data.settings.url = data.settings.url || location.href;
+	data.settings.storage = data.settings.storage || 'url';
+	data.version = REVISION;
+
+	localStorage.setItem( 'threejs-inspector', JSON.stringify( data ) );
+
+}
+
+export { Inspector, getItem, setItem };

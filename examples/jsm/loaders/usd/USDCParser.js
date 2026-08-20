@@ -552,7 +552,7 @@ class USDCParser {
 		const magic = reader.readString( 8 );
 		if ( magic !== 'PXR-USDC' ) {
 
-			throw new Error( 'Not a valid USDC file' );
+			throw new Error( 'THREE.USDCParser: Not a valid USDC file.' );
 
 		}
 

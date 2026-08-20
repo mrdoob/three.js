@@ -4,6 +4,10 @@
 	<title>three.js webgl - volume rendering example</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - volume rendering example">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_texture3d.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_texture3d.jpg">
 	<link type="text/css" rel="stylesheet" href="main.css">
 </head>
 
@@ -50,7 +54,7 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
 
-			// Create camera (The volume renderer does not work very well with perspective yet)
+			// Create camera
 			const h = 512; // frustum height
 			const aspect = window.innerWidth / window.innerHeight;
 			camera = new THREE.OrthographicCamera( - h * aspect / 2, h * aspect / 2, h / 2, - h / 2, 1, 1000 );

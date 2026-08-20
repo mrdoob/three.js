@@ -119,6 +119,19 @@ class AsciiEffect {
 
 		}
 
+		const htmlEscapes = {
+			'&': '&amp;',
+			'<': '&lt;',
+			'>': '&gt;',
+		};
+
+		const reUnescapedHtml = /[&<>]/g;
+
+		function escapeHTML( s ) {
+
+			return s.replace( reUnescapedHtml, ( ch ) => htmlEscapes[ ch ] );
+
+		}
 
 		const strFont = 'courier new, monospace';
 
@@ -141,7 +154,7 @@ class AsciiEffect {
 		let aCharList;
 		if ( charSet ) {
 
-			aCharList = ( charSet ).split( '' );
+			aCharList = ( charSet ).split( '' ).map( escapeHTML );
 
 		} else {
 

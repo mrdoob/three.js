@@ -78,6 +78,11 @@ Whether the binary export uses little or big endian.
 
 Default is `false`.
 
+**customPropertyMapping**  
+Object.<string, Array.<string>>
+
+A mapping that allows exporting custom buffer attributes as PLY vertex properties. Each entry maps a buffer attribute name to an array of PLY property names. The number of property names must match the item size of the buffer attribute. This is the inverse of `PLYLoader.setCustomPropertyNameMapping()`.
+
 ## Source
 
 [examples/jsm/exporters/PLYExporter.js](https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/PLYExporter.js)

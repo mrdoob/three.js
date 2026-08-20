@@ -32,7 +32,7 @@ class GroundedSkybox extends Mesh {
 
 		if ( height <= 0 || radius <= 0 || resolution <= 0 ) {
 
-			throw new Error( 'GroundedSkybox height, radius, and resolution must be positive.' );
+			throw new Error( 'THREE.GroundedSkybox: height, radius, and resolution must be positive.' );
 
 		}
 

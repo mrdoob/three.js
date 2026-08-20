@@ -16,6 +16,9 @@
 color space</i>, which defaults to <code>LinearSRGBColorSpace</code>. Inputs
 conventionally using <code>SRGBColorSpace</code> (such as hexadecimals and CSS
 strings) are converted to the working color space automatically.</p>
+<pre><code class="language-js">// converted automatically from SRGBColorSpace to LinearSRGBColorSpace
+const color = new THREE.Color().setHex( 0x112233 );
+</code></pre>
 <p>Source color spaces may be specified explicitly, to ensure correct conversions.</p>
 <pre><code class="language-js">// assumed already LinearSRGBColorSpace; no conversion
 const color = new THREE.Color().setRGB( 0.5, 0.5, 0.5 );
@@ -40,10 +43,6 @@ const color5 = new THREE.Color( 'skyblue' );
 const color6 = new THREE.Color(&quot;hsl(0, 100%, 50%)&quot;);
 //Separate RGB values between 0 and 1
 const color7 = new THREE.Color( 1, 0, 0 );
-</code></pre></div>
-				<h2>Code Example</h2>
-				<div translate="no"><pre><code class="language-js">// converted automatically from SRGBColorSpace to LinearSRGBColorSpace
-const color = new THREE.Color().setHex( 0x112233 );
 </code></pre></div>
 			</header>
 			<article>

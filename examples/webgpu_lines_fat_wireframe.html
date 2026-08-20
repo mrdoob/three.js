@@ -4,6 +4,10 @@
 		<title>three.js webgpu - fat wireframe</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - fat wireframe">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_lines_fat_wireframe.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_lines_fat_wireframe.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
@@ -61,7 +65,7 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x000000, 0.0 );
+				renderer.setClearColor( 0x000000 );
 				renderer.setAnimationLoop( animate );
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
@@ -138,8 +142,6 @@
 			function animate() {
 
 				// main scene
-
-				renderer.setClearColor( 0x000000, 0 );
 
 				renderer.setViewport( 0, 0, window.innerWidth, window.innerHeight );
 

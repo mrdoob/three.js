@@ -13,6 +13,12 @@ struct PhysicalMaterial {
 	float metalness;
 	float specularF90;
 	float dispersion;
+	vec2 dfg;
+	vec3 multiScatteringCompensation;
+
+	#ifdef USE_RETROREFLECTION
+		float retroreflectivity;
+	#endif
 
 	#ifdef USE_CLEARCOAT
 		float clearcoat;
@@ -26,9 +32,8 @@ struct PhysicalMaterial {
 		float iridescenceIOR;
 		float iridescenceThickness;
 		vec3 iridescenceFresnel;
-		vec3 iridescenceF0;
-		vec3 iridescenceFresnelDielectric;
-		vec3 iridescenceFresnelMetallic;
+		vec3 iridescenceF0Dielectric;
+		vec3 iridescenceF0Metallic;
 	#endif
 
 	#ifdef USE_SHEEN
@@ -103,9 +108,7 @@ float D_GGX( const in float alpha, const in float dotNH ) {
 
 		float gv = dotNL * length( vec3( alphaT * dotTV, alphaB * dotBV, dotNV ) );
 		float gl = dotNV * length( vec3( alphaT * dotTL, alphaB * dotBL, dotNL ) );
-		float v = 0.5 / ( gv + gl );
-
-		return v;
+		return 0.5 / max( gv + gl, EPSILON );
 
 	}
 
@@ -389,13 +392,10 @@ vec3 EnvironmentBRDF( const in vec3 normal, const in vec3 viewDir, const in vec3
 // Approximates multiscattering in order to preserve energy.
 // http://www.jcgt.org/published/0008/01/03/
 #ifdef USE_IRIDESCENCE
-void computeMultiscatteringIridescence( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float iridescence, const in vec3 iridescenceF0, const in float roughness, inout vec3 singleScatter, inout vec3 multiScatter ) {
+void computeMultiscatteringIridescence( const in vec2 fab, const in vec3 specularColor, const in float specularF90, const in float iridescence, const in vec3 iridescenceF0, inout vec3 singleScatter, inout vec3 multiScatter ) {
 #else
-void computeMultiscattering( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float roughness, inout vec3 singleScatter, inout vec3 multiScatter ) {
+void computeMultiscattering( const in vec2 fab, const in vec3 specularColor, const in float specularF90, inout vec3 singleScatter, inout vec3 multiScatter ) {
 #endif
-
-	float dotNV = saturate( dot( normal, viewDir ) );
-	vec2 fab = texture2D( dfgLUT, vec2( roughness, dotNV ) ).rg;
 
 	#ifdef USE_IRIDESCENCE
 
@@ -417,48 +417,6 @@ void computeMultiscattering( const in vec3 normal, const in vec3 viewDir, const 
 
 	singleScatter += FssEss;
 	multiScatter += Fms * Ems;
-
-}
-
-// GGX BRDF with multi-scattering energy compensation for direct lighting
-// Based on "Practical Multiple Scattering Compensation for Microfacet Models"
-// https://blog.selfshadow.com/publications/turquin/ms_comp_final.pdf
-vec3 BRDF_GGX_Multiscatter( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material ) {
-
-	// Single-scattering BRDF (standard GGX)
-	vec3 singleScatter = BRDF_GGX( lightDir, viewDir, normal, material );
-
-	// Multi-scattering compensation
-	float dotNL = saturate( dot( normal, lightDir ) );
-	float dotNV = saturate( dot( normal, viewDir ) );
-
-	// Precomputed DFG values for view and light directions
-	vec2 dfgV = texture2D( dfgLUT, vec2( material.roughness, dotNV ) ).rg;
-	vec2 dfgL = texture2D( dfgLUT, vec2( material.roughness, dotNL ) ).rg;
-
-	// Single-scattering energy for view and light
-	vec3 FssEss_V = material.specularColorBlended * dfgV.x + material.specularF90 * dfgV.y;
-	vec3 FssEss_L = material.specularColorBlended * dfgL.x + material.specularF90 * dfgL.y;
-
-	float Ess_V = dfgV.x + dfgV.y;
-	float Ess_L = dfgL.x + dfgL.y;
-
-	// Energy lost to multiple scattering
-	float Ems_V = 1.0 - Ess_V;
-	float Ems_L = 1.0 - Ess_L;
-
-	// Average Fresnel reflectance
-	vec3 Favg = material.specularColorBlended + ( 1.0 - material.specularColorBlended ) * 0.047619; // 1/21
-
-	// Multiple scattering contribution
-	vec3 Fms = FssEss_V * FssEss_L * Favg / ( 1.0 - Ems_V * Ems_L * Favg + EPSILON );
-
-	// Energy compensation factor
-	float compensationFactor = Ems_V * Ems_L;
-
-	vec3 multiScatter = Fms * compensationFactor;
-
-	return singleScatter + multiScatter;
 
 }
 
@@ -555,18 +513,62 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
  
  	#endif
 
-	reflectedLight.directSpecular += irradiance * BRDF_GGX_Multiscatter( directLight.direction, geometryViewDir, geometryNormal, material );
+	vec3 specularBRDF = BRDF_GGX( directLight.direction, geometryViewDir, geometryNormal, material );
 
-	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseContribution );
+	#ifdef USE_RETROREFLECTION
+
+		// Minimal Retroreflective Microfacet Model:
+		// https://jcgt.org/published/0015/01/04/
+		vec3 retroViewDir = reflect( - geometryViewDir, geometryNormal );
+		vec3 retroSpecularBRDF = BRDF_GGX( directLight.direction, retroViewDir, geometryNormal, material );
+
+		specularBRDF = mix( specularBRDF, retroSpecularBRDF, saturate( material.retroreflectivity ) );
+
+	#endif
+
+	reflectedLight.directSpecular += irradiance * specularBRDF * material.multiScatteringCompensation;
+
+	// Light reflected by the specular interface is not available to the diffuse layer ( glTF fresnel_mix )
+	vec3 halfDir = normalize( directLight.direction + geometryViewDir );
+	float dotVH = saturate( dot( geometryViewDir, halfDir ) );
+	vec3 F = F_Schlick( material.specularColor, material.specularF90, dotVH );
+
+	#ifdef USE_RETROREFLECTION
+
+		vec3 retroHalfDir = normalize( directLight.direction + retroViewDir );
+		float dotRetroVH = saturate( dot( retroViewDir, retroHalfDir ) );
+		vec3 retroF = F_Schlick( material.specularColor, material.specularF90, dotRetroVH );
+
+		F = mix( F, retroF, saturate( material.retroreflectivity ) );
+
+	#endif
+
+	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseContribution ) * ( 1.0 - F );
 }
 
 void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
 
-	vec3 diffuse = irradiance * BRDF_Lambert( material.diffuseContribution );
+	// Energy reflected by the specular lobe is not available to the diffuse layer
+	vec3 singleScattering = vec3( 0.0 );
+	vec3 multiScattering = vec3( 0.0 );
+
+	#ifdef USE_IRIDESCENCE
+
+		computeMultiscatteringIridescence( material.dfg, material.specularColor, material.specularF90, material.iridescence, material.iridescenceF0Dielectric, singleScattering, multiScattering );
+
+	#else
+
+		computeMultiscattering( material.dfg, material.specularColor, material.specularF90, singleScattering, multiScattering );
+
+	#endif
+
+	vec3 diffuse = irradiance * BRDF_Lambert( material.diffuseContribution ) * ( 1.0 - singleScattering - multiScattering );
 
 	#ifdef USE_SHEEN
 
 		float sheenAlbedo = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );
+
+		sheenSpecularIndirect += irradiance * material.sheenColor * sheenAlbedo * RECIPROCAL_PI;
 
 		float sheenEnergyComp = 1.0 - max3( material.sheenColor ) * sheenAlbedo;
 
@@ -603,13 +605,13 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	#ifdef USE_IRIDESCENCE
 
-		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.iridescence, material.iridescenceFresnelDielectric, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
-		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.diffuseColor, material.specularF90, material.iridescence, material.iridescenceFresnelMetallic, material.roughness, singleScatteringMetallic, multiScatteringMetallic );
+		computeMultiscatteringIridescence( material.dfg, material.specularColor, material.specularF90, material.iridescence, material.iridescenceF0Dielectric, singleScatteringDielectric, multiScatteringDielectric );
+		computeMultiscatteringIridescence( material.dfg, material.diffuseColor, material.specularF90, material.iridescence, material.iridescenceF0Metallic, singleScatteringMetallic, multiScatteringMetallic );
 
 	#else
 
-		computeMultiscattering( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
-		computeMultiscattering( geometryNormal, geometryViewDir, material.diffuseColor, material.specularF90, material.roughness, singleScatteringMetallic, multiScatteringMetallic );
+		computeMultiscattering( material.dfg, material.specularColor, material.specularF90, singleScatteringDielectric, multiScatteringDielectric );
+		computeMultiscattering( material.dfg, material.diffuseColor, material.specularF90, singleScatteringMetallic, multiScatteringMetallic );
 
 	#endif
 

@@ -122,6 +122,15 @@ class Buffer extends Binding {
 
 	}
 
+	/**
+	 * Releases the buffer.
+	 */
+	release() {
+
+		this._buffer = null;
+
+	}
+
 }
 
 export default Buffer;

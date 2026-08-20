@@ -1,26 +1,28 @@
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
+import QuadMesh from '../../renderers/common/QuadMesh.js';
+import ChainMap from '../../renderers/common/ChainMap.js';
 import ShadowBaseNode, { shadowPositionWorld } from './ShadowBaseNode.js';
-import { float, vec2, vec3, int, Fn } from '../tsl/TSLBase.js';
+import { float, vec2, vec3, vec4, int, Fn } from '../tsl/TSLCore.js';
 import { reference } from '../accessors/ReferenceNode.js';
-import { texture, textureLoad } from '../accessors/TextureNode.js';
+import { texture } from '../accessors/TextureNode.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { normalWorld } from '../accessors/Normal.js';
 import { mix, sqrt } from '../math/MathNode.js';
 import { add } from '../math/OperatorNode.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
-import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
-import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { Loop } from '../utils/LoopNode.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
-import { Compatibility, GreaterEqualCompare, HalfFloatType, LessEqualCompare, LinearFilter, NearestFilter, PCFShadowMap, PCFSoftShadowMap, RGFormat, VSMShadowMap } from '../../constants.js';
+import { Compatibility, GreaterEqualCompare, HalfFloatType, LessEqualCompare, LinearFilter, NearestFilter, PCFShadowMap, RGFormat, VSMShadowMap } from '../../constants.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
-import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
+import { viewZToLogarithmicDepth, perspectiveDepthToViewZ, orthographicDepthToViewZ, viewZToOrthographicDepth } from '../display/ViewportDepthNode.js';
 import { lightShadowMatrix } from '../accessors/Lights.js';
 import { resetRendererAndSceneState, restoreRendererAndSceneState } from '../../renderers/common/RendererUtils.js';
 import { getDataFromObject } from '../core/NodeUtils.js';
-import { getShadowMaterial, disposeShadowMaterial, BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilter, VSMShadowFilter } from './ShadowFilterNode.js';
-import ChainMap from '../../renderers/common/ChainMap.js';
-import { textureSize } from '../accessors/TextureSizeNode.js';
-import { uv } from '../accessors/UV.js';
+import { getShadowMaterial, disposeShadowMaterial, BasicShadowFilter, PCFShadowFilter, VSMShadowFilter } from './ShadowFilterNode.js';
+import { positionLocal } from '../accessors/Position.js';
+import { uniform } from '../core/UniformNode.js';
+import { equirectDirection } from '../utils/EquirectUV.js';
+import { context } from '../core/ContextNode.js';
 
 //
 
@@ -47,7 +49,7 @@ export const getShadowRenderObjectFunction = ( renderer, shadow, shadowType, use
 
 	if ( renderObjectFunction === undefined || ( renderObjectFunction.shadowType !== shadowType || renderObjectFunction.useVelocity !== useVelocity ) ) {
 
-		renderObjectFunction = ( object, scene, _camera, geometry, material, group, ...params ) => {
+		renderObjectFunction = ( object, scene, _camera, geometry, material, group, lightsNode, clippingContext, passId ) => {
 
 			if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
 
@@ -59,7 +61,7 @@ export const getShadowRenderObjectFunction = ( renderer, shadow, shadowType, use
 
 				object.onBeforeShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
 
-				renderer.renderObject( object, scene, _camera, geometry, material, group, ...params );
+				renderer.renderObject( object, scene, _camera, geometry, material, group, lightsNode, clippingContext, passId );
 
 				object.onAfterShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
 
@@ -173,7 +175,7 @@ const VSMPassHorizontal = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPas
 
 } );
 
-const _shadowFilterLib = [ BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilter, VSMShadowFilter ];
+const _shadowFilterLib = [ BasicShadowFilter, PCFShadowFilter, null /* PCFSoftShadowMap, removed */, VSMShadowFilter ];
 
 //
 
@@ -422,7 +424,7 @@ class ShadowNode extends ShadowBaseNode {
 		const shadowMapType = renderer.shadowMap.type;
 		const hasTextureCompare = renderer.hasCompatibility( Compatibility.TEXTURE_COMPARE );
 
-		if ( ( shadowMapType === PCFShadowMap || shadowMapType === PCFSoftShadowMap ) && hasTextureCompare ) {
+		if ( shadowMapType === PCFShadowMap && hasTextureCompare ) {
 
 			depthTexture.minFilter = LinearFilter;
 			depthTexture.magFilter = LinearFilter;
@@ -491,12 +493,16 @@ class ShadowNode extends ShadowBaseNode {
 			const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
 			const size = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
 
+			const sharedContext = context( builder.getSharedContext() );
+
 			let material = this.vsmMaterialVertical || ( this.vsmMaterialVertical = new NodeMaterial() );
-			material.fragmentNode = VSMPassVertical( { samples, radius, size, shadowPass: shadowPassVertical, depthLayer: this.depthLayer } ).context( builder.getSharedContext() );
+			material.contextNode = sharedContext;
+			material.fragmentNode = VSMPassVertical( { samples, radius, size, shadowPass: shadowPassVertical, depthLayer: this.depthLayer } );
 			material.name = 'VSMVertical';
 
 			material = this.vsmMaterialHorizontal || ( this.vsmMaterialHorizontal = new NodeMaterial() );
-			material.fragmentNode = VSMPassHorizontal( { samples, radius, size, shadowPass: shadowPassHorizontal, depthLayer: this.depthLayer } ).context( builder.getSharedContext() );
+			material.contextNode = sharedContext;
+			material.fragmentNode = VSMPassHorizontal( { samples, radius, size, shadowPass: shadowPassHorizontal, depthLayer: this.depthLayer } );
 			material.name = 'VSMHorizontal';
 
 		}
@@ -506,7 +512,27 @@ class ShadowNode extends ShadowBaseNode {
 		const shadowIntensity = reference( 'intensity', 'float', shadow ).setGroup( renderGroup );
 		const normalBias = reference( 'normalBias', 'float', shadow ).setGroup( renderGroup );
 
-		const shadowPosition = lightShadowMatrix( light ).mul( shadowPositionWorld.add( normalWorld.mul( normalBias ) ) );
+		const shadowMatrix = lightShadowMatrix( light );
+		const shadowNormalBias = normalWorld.mul( normalBias );
+
+		let shadowPosition;
+
+		if ( ! renderer.highPrecision || builder.material.receivedShadowPositionNode || builder.context.shadowPositionWorld ) {
+
+			shadowPosition = shadowMatrix.mul( shadowPositionWorld.add( shadowNormalBias ) );
+
+		} else {
+
+			const highpShadowModelMatrix = uniform( 'mat4' ).onObjectUpdate( ( { object }, self ) => {
+
+				return self.value.multiplyMatrices( shadowMatrix.value, object.matrixWorld );
+
+			} );
+
+			shadowPosition = highpShadowModelMatrix.mul( positionLocal ).add( shadowMatrix.mul( vec4( shadowNormalBias, 0 ) ) );
+
+		}
+
 		const shadowCoord = this.setupShadowCoord( builder, shadowPosition );
 
 		//
@@ -573,7 +599,7 @@ class ShadowNode extends ShadowBaseNode {
 
 				if ( this.shadowMap.texture.isCubeTexture ) {
 
-					return cubeTexture( this.shadowMap.texture );
+					return cubeTexture( this.shadowMap.texture, equirectDirection() );
 
 				}
 
@@ -585,15 +611,36 @@ class ShadowNode extends ShadowBaseNode {
 
 		return shadowOutput.toInspector( `${ inspectName } / Depth`, () => {
 
-			// TODO: Use linear depth
+			const shadowCameraNear = reference( 'near', 'float', this.shadow.camera );
+			const shadowCameraFar = reference( 'far', 'float', this.shadow.camera );
+
+			let depthNode;
 
 			if ( this.shadowMap.texture.isCubeTexture ) {
 
-				return cubeTexture( this.shadowMap.texture ).r.oneMinus();
+				depthNode = cubeTexture( this.shadowMap.depthTexture, equirectDirection() ).r;
+
+			} else {
+
+				depthNode = texture( this.shadowMap.depthTexture ).r;
 
 			}
 
-			return textureLoad( this.shadowMap.depthTexture, uv().mul( textureSize( texture( this.shadowMap.depthTexture ) ) ) ).r.oneMinus();
+			let linearDepth;
+
+			if ( this.shadow.camera.isPerspectiveCamera ) {
+
+				linearDepth = perspectiveDepthToViewZ( depthNode, shadowCameraNear, shadowCameraFar );
+
+			} else {
+
+				linearDepth = orthographicDepthToViewZ( depthNode, shadowCameraNear, shadowCameraFar );
+
+			}
+
+			linearDepth = viewZToOrthographicDepth( linearDepth, shadowCameraNear, shadowCameraFar );
+
+			return linearDepth.oneMinus();
 
 		} );
 
@@ -808,19 +855,23 @@ class ShadowNode extends ShadowBaseNode {
 	 */
 	updateBefore( frame ) {
 
+		// do not render shadow maps during precompilation
+
+		if ( frame.renderer._isPreCompiling === true ) return;
+
 		const { shadow } = this;
 
 		let needsUpdate = shadow.needsUpdate || shadow.autoUpdate;
 
 		if ( needsUpdate ) {
 
-			if ( this._cameraFrameId[ frame.camera ] === frame.frameId ) {
+			if ( this._cameraFrameId.get( frame.camera ) === frame.frameId ) {
 
 				needsUpdate = false;
 
 			}
 
-			this._cameraFrameId[ frame.camera ] = frame.frameId;
+			this._cameraFrameId.set( frame.camera, frame.frameId );
 
 		}
 

@@ -38,6 +38,8 @@ Constructs a new LWO loader.
 
 The loading manager.
 
+**Deprecated:** since r185.
+
 ## Methods
 
 ### .load( url : string, onLoad : function, onProgress : onProgressCallback, onError : onErrorCallback )

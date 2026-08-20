@@ -1,7 +1,5 @@
-import { BlendColorFactor, OneMinusBlendColorFactor, } from '../../common/Constants.js';
-
 import {
-	GPUFrontFace, GPUCullMode, GPUColorWriteFlags, GPUCompareFunction, GPUBlendFactor, GPUBlendOperation, GPUIndexFormat, GPUStencilOperation
+	GPUFrontFace, GPUCullMode, GPUColorWriteFlags, GPUCompareFunction, GPUBlendFactor, GPUBlendOperation, GPUIndexFormat, GPUStencilOperation, GPUPrimitiveTopology
 } from './WebGPUConstants.js';
 
 import {
@@ -10,12 +8,23 @@ import {
 	NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending, MaterialBlending,
 	ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstColorFactor,
 	OneMinusDstColorFactor, DstAlphaFactor, OneMinusDstAlphaFactor, SrcAlphaSaturateFactor,
+	ConstantColorFactor, OneMinusConstantColorFactor, ConstantAlphaFactor, OneMinusConstantAlphaFactor,
 	AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation,
 	KeepStencilOp, ZeroStencilOp, ReplaceStencilOp, InvertStencilOp, IncrementStencilOp, DecrementStencilOp, IncrementWrapStencilOp, DecrementWrapStencilOp,
 	NeverStencilFunc, AlwaysStencilFunc, LessStencilFunc, LessEqualStencilFunc, EqualStencilFunc, GreaterEqualStencilFunc, GreaterStencilFunc, NotEqualStencilFunc
 } from '../../../constants.js';
 
-import { error, ReversedDepthFuncs, warnOnce } from '../../../utils.js';
+import { error, ReversedDepthFuncs, warn, warnOnce } from '../../../utils.js';
+
+import GPUComputePipelineDescriptor from '../descriptors/GPUComputePipelineDescriptor.js';
+import GPUPipelineLayoutDescriptor from '../descriptors/GPUPipelineLayoutDescriptor.js';
+import GPURenderBundleEncoderDescriptor from '../descriptors/GPURenderBundleEncoderDescriptor.js';
+import GPURenderPipelineDescriptor from '../descriptors/GPURenderPipelineDescriptor.js';
+
+const _computePipelineDescriptor = new GPUComputePipelineDescriptor();
+const _pipelineLayoutDescriptor = new GPUPipelineLayoutDescriptor();
+const _renderBundleEncoderDescriptor = new GPURenderBundleEncoderDescriptor();
+const _renderPipelineDescriptor = new GPURenderPipelineDescriptor();
 
 /**
  * A WebGPU backend utility module for managing pipelines.
@@ -37,35 +46,6 @@ class WebGPUPipelineUtils {
 		 * @type {WebGPUBackend}
 		 */
 		this.backend = backend;
-
-		/**
-		 * A Weak Map that tracks the active pipeline for render or compute passes.
-		 *
-		 * @private
-		 * @type {WeakMap<(GPURenderPassEncoder|GPUComputePassEncoder),(GPURenderPipeline|GPUComputePipeline)>}
-		 */
-		this._activePipelines = new WeakMap();
-
-	}
-
-	/**
-	 * Sets the given pipeline for the given pass. The method makes sure to only set the
-	 * pipeline when necessary.
-	 *
-	 * @param {(GPURenderPassEncoder|GPUComputePassEncoder)} pass - The pass encoder.
-	 * @param {(GPURenderPipeline|GPUComputePipeline)} pipeline - The pipeline.
-	 */
-	setPipeline( pass, pipeline ) {
-
-		const currentPipeline = this._activePipelines.get( pass );
-
-		if ( currentPipeline !== pipeline ) {
-
-			pass.setPipeline( pipeline );
-
-			this._activePipelines.set( pass, pipeline );
-
-		}
 
 	}
 
@@ -218,20 +198,19 @@ class WebGPUPipelineUtils {
 
 		const sampleCount = this._getSampleCount( renderObject.context );
 
-		const pipelineDescriptor = {
-			label: `renderPipeline_${ material.name || material.type }_${ material.id }`,
-			vertex: Object.assign( {}, vertexModule, { buffers: vertexBuffers } ),
-			fragment: Object.assign( {}, fragmentModule, { targets } ),
-			primitive: primitiveState,
-			multisample: {
-				count: sampleCount,
-				alphaToCoverageEnabled: material.alphaToCoverage && sampleCount > 1
-			},
-			layout: device.createPipelineLayout( {
-				bindGroupLayouts
-			} )
-		};
+		_pipelineLayoutDescriptor.bindGroupLayouts = bindGroupLayouts;
 
+		const pipelineLayout = device.createPipelineLayout( _pipelineLayoutDescriptor );
+
+		_pipelineLayoutDescriptor.reset();
+
+		_renderPipelineDescriptor.label = `renderPipeline_${ material.name || material.type }_${ material.id }`;
+		_renderPipelineDescriptor.vertex = Object.assign( {}, vertexModule, { buffers: vertexBuffers } );
+		_renderPipelineDescriptor.fragment = Object.assign( {}, fragmentModule, { targets } );
+		_renderPipelineDescriptor.primitive = primitiveState;
+		_renderPipelineDescriptor.multisample.count = sampleCount;
+		_renderPipelineDescriptor.multisample.alphaToCoverageEnabled = material.alphaToCoverage && sampleCount > 1;
+		_renderPipelineDescriptor.layout = pipelineLayout;
 
 		const depthStencil = {};
 		const renderDepth = renderObject.context.depth;
@@ -256,7 +235,7 @@ class WebGPUPipelineUtils {
 
 			}
 
-			if ( material.polygonOffset === true ) {
+			if ( material.polygonOffset === true && ( primitiveState.topology === GPUPrimitiveTopology.TriangleList ) ) {
 
 				depthStencil.depthBias = material.polygonOffsetUnits;
 				depthStencil.depthBiasSlopeScale = material.polygonOffsetFactor;
@@ -264,7 +243,7 @@ class WebGPUPipelineUtils {
 
 			}
 
-			pipelineDescriptor.depthStencil = depthStencil;
+			_renderPipelineDescriptor.depthStencil = depthStencil;
 
 		}
 
@@ -272,9 +251,17 @@ class WebGPUPipelineUtils {
 
 		device.pushErrorScope( 'validation' );
 
+		const stages = [
+			{ program: vertexProgram, module: vertexModule.module },
+			{ program: fragmentProgram, module: fragmentModule.module }
+		];
+		const pipelineLabel = _renderPipelineDescriptor.label;
+
 		if ( promises === null ) {
 
-			pipelineData.pipeline = device.createRenderPipeline( pipelineDescriptor );
+			pipelineData.pipeline = device.createRenderPipeline( _renderPipelineDescriptor );
+
+			_renderPipelineDescriptor.reset();
 
 			device.popErrorScope().then( ( err ) => {
 
@@ -282,7 +269,9 @@ class WebGPUPipelineUtils {
 
 					pipelineData.error = true;
 
-					error( err.message );
+					error( `WebGPURenderer: Render pipeline creation failed (${ pipelineLabel }): ${ err.message }` );
+
+					this._reportShaderDiagnostics( stages, pipelineLabel );
 
 				}
 
@@ -294,21 +283,55 @@ class WebGPUPipelineUtils {
 
 				try {
 
-					pipelineData.pipeline = await device.createRenderPipelineAsync( pipelineDescriptor );
+					let asyncError = null;
+					let pipelinePromise = null;
 
-				} catch ( err ) { }
+					try {
 
-				const errorScope = await device.popErrorScope();
+						pipelinePromise = device.createRenderPipelineAsync( _renderPipelineDescriptor );
 
-				if ( errorScope !== null ) {
+					} catch ( err ) {
 
-					pipelineData.error = true;
+						asyncError = err;
 
-					error( errorScope.message );
+					}
+
+					_renderPipelineDescriptor.reset();
+
+					if ( pipelinePromise !== null ) {
+
+						try {
+
+							pipelineData.pipeline = await pipelinePromise;
+
+						} catch ( err ) {
+
+							asyncError = err;
+
+						}
+
+					}
+
+					const errorScope = await device.popErrorScope();
+
+					if ( errorScope !== null || asyncError !== null ) {
+
+						pipelineData.error = true;
+
+						const reason = ( errorScope && errorScope.message ) || ( asyncError && asyncError.message ) || 'unknown';
+						error( `WebGPURenderer: Async render pipeline creation failed (${ pipelineLabel }): ${ reason }` );
+
+						await this._reportShaderDiagnostics( stages, pipelineLabel );
+
+					}
+
+				} finally {
+
+					// Guarantee resolution so `compileAsync`'s Promise.all cannot hang on an
+					// unexpected throw from any await above.
+					resolve();
 
 				}
-
-				resolve();
 
 			} );
 
@@ -334,14 +357,16 @@ class WebGPUPipelineUtils {
 		const colorFormats = utils.getCurrentColorFormats( renderContext );
 		const sampleCount = this._getSampleCount( renderContext );
 
-		const descriptor = {
-			label,
-			colorFormats,
-			depthStencilFormat,
-			sampleCount
-		};
+		_renderBundleEncoderDescriptor.label = label;
+		_renderBundleEncoderDescriptor.colorFormats = colorFormats;
+		_renderBundleEncoderDescriptor.depthStencilFormat = depthStencilFormat;
+		_renderBundleEncoderDescriptor.sampleCount = sampleCount;
 
-		return device.createRenderBundleEncoder( descriptor );
+		const bundleEncoder = device.createRenderBundleEncoder( _renderBundleEncoderDescriptor );
+
+		_renderBundleEncoderDescriptor.reset();
+
+		return bundleEncoder;
 
 	}
 
@@ -350,8 +375,9 @@ class WebGPUPipelineUtils {
 	 *
 	 * @param {ComputePipeline} pipeline - The compute pipeline.
 	 * @param {Array<BindGroup>} bindings - The bindings.
+	 * @param {?Array<Promise>} [promises=null] - Optional compilation promises.
 	 */
-	createComputePipeline( pipeline, bindings ) {
+	createComputePipeline( pipeline, bindings, promises = null ) {
 
 		const backend = this.backend;
 		const device = backend.device;
@@ -373,12 +399,145 @@ class WebGPUPipelineUtils {
 
 		}
 
-		pipelineGPU.pipeline = device.createComputePipeline( {
-			compute: computeProgram,
-			layout: device.createPipelineLayout( {
-				bindGroupLayouts
-			} )
-		} );
+		const computeStage = pipeline.computeProgram;
+		const pipelineLabel = `computePipeline_${ computeStage.stage }${ computeStage.name ? `_${ computeStage.name }` : '' }`;
+
+		device.pushErrorScope( 'validation' );
+
+		_pipelineLayoutDescriptor.bindGroupLayouts = bindGroupLayouts;
+
+		const pipelineLayout = device.createPipelineLayout( _pipelineLayoutDescriptor );
+
+		_pipelineLayoutDescriptor.reset();
+
+		_computePipelineDescriptor.label = pipelineLabel;
+		_computePipelineDescriptor.compute = computeProgram;
+		_computePipelineDescriptor.layout = pipelineLayout;
+
+		if ( promises === null ) {
+
+			pipelineGPU.pipeline = device.createComputePipeline( _computePipelineDescriptor );
+
+			_computePipelineDescriptor.reset();
+
+			device.popErrorScope().then( ( err ) => {
+
+				if ( err !== null ) {
+
+					pipelineGPU.error = true;
+
+					error( `WebGPURenderer: Compute pipeline creation failed (${ pipelineLabel }): ${ err.message }` );
+
+					this._reportShaderDiagnostics( [ { program: computeStage, module: computeProgram.module } ], pipelineLabel );
+
+				}
+
+			} );
+
+		} else {
+
+			const promise = new Promise( async ( resolve /*, reject*/ ) => {
+
+				try {
+
+					let asyncError = null;
+					let pipelinePromise = null;
+
+					try {
+
+						pipelinePromise = device.createComputePipelineAsync( _computePipelineDescriptor );
+
+					} catch ( err ) {
+
+						asyncError = err;
+
+					}
+
+					_computePipelineDescriptor.reset();
+
+					if ( pipelinePromise !== null ) {
+
+						try {
+
+							pipelineGPU.pipeline = await pipelinePromise;
+
+						} catch ( err ) {
+
+							asyncError = err;
+
+						}
+
+					}
+
+					const errorScope = await device.popErrorScope();
+
+					if ( errorScope !== null || asyncError !== null ) {
+
+						pipelineGPU.error = true;
+
+						const reason = ( errorScope && errorScope.message ) || ( asyncError && asyncError.message ) || 'unknown';
+						error( `WebGPURenderer: Async compute pipeline creation failed (${ pipelineLabel }): ${ reason }` );
+
+						await this._reportShaderDiagnostics( [ { program: computeStage, module: computeProgram.module } ], pipelineLabel );
+
+					}
+
+				} finally {
+
+					// Guarantee resolution so `compileComputeAsync`'s Promise.all cannot hang on an
+					// unexpected throw from any await above.
+					resolve();
+
+				}
+
+			} );
+
+			promises.push( promise );
+
+		}
+
+	}
+
+	/**
+	 * Reads line-accurate diagnostics from shader modules and logs them.
+	 * Called from pipeline creation error paths to turn opaque validation
+	 * failures into actionable WGSL feedback.
+	 *
+	 * @private
+	 * @param {Array<{program: ProgrammableStage, module: GPUShaderModule}>} stages - Pairs of program + compiled shader module.
+	 * @param {string} pipelineLabel - Label of the owning pipeline, used as log prefix.
+	 * @return {Promise<void>}
+	 */
+	async _reportShaderDiagnostics( stages, pipelineLabel ) {
+
+		for ( const { program, module } of stages ) {
+
+			const info = await module.getCompilationInfo();
+			if ( info.messages.length === 0 ) continue;
+
+			const sourceLines = program.code.split( '\n' );
+
+			for ( const msg of info.messages ) {
+
+				const location = msg.lineNum > 0
+					? ` at line ${ msg.lineNum }${ msg.linePos > 0 ? `:${ msg.linePos }` : '' }`
+					: '';
+
+				const header = `WebGPURenderer [${ pipelineLabel } / ${ program.stage } ${ msg.type }]${ location }: ${ msg.message }`;
+
+				let excerpt = '';
+				if ( msg.lineNum > 0 && msg.lineNum <= sourceLines.length ) {
+
+					excerpt = `\n  ${ sourceLines[ msg.lineNum - 1 ] }`;
+					if ( msg.linePos > 0 ) excerpt += `\n  ${ ' '.repeat( msg.linePos - 1 ) }^`;
+
+				}
+
+				( msg.type === 'error' ? error : warn )( header + excerpt );
+
+			}
+
+		}
 
 	}
 
@@ -554,11 +713,13 @@ class WebGPUPipelineUtils {
 				blendFactor = GPUBlendFactor.SrcAlphaSaturated;
 				break;
 
-			case BlendColorFactor:
+			case ConstantColorFactor:
+			case ConstantAlphaFactor: // WebGPU has no dedicated constant alpha blend factors
 				blendFactor = GPUBlendFactor.Constant;
 				break;
 
-			case OneMinusBlendColorFactor:
+			case OneMinusConstantColorFactor:
+			case OneMinusConstantAlphaFactor: // WebGPU has no dedicated constant alpha blend factors
 				blendFactor = GPUBlendFactor.OneMinusConstant;
 				break;
 
@@ -752,7 +913,7 @@ class WebGPUPipelineUtils {
 
 		let flipSided = ( material.side === BackSide );
 
-		if ( object.isMesh && object.matrixWorld.determinant() < 0 ) flipSided = ! flipSided;
+		if ( object.isMesh && object.matrixWorld.determinantAffine() < 0 ) flipSided = ! flipSided;
 
 		descriptor.frontFace = ( flipSided === true ) ? GPUFrontFace.CW : GPUFrontFace.CCW;
 

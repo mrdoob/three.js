@@ -1,4 +1,5 @@
 import { Matrix3 } from '../../math/Matrix3.js';
+import { Matrix4 } from '../../math/Matrix4.js';
 import { Plane } from '../../math/Plane.js';
 import { Vector4 } from '../../math/Vector4.js';
 
@@ -53,6 +54,13 @@ class ClippingContext {
 		this.shadowPass = false;
 
 		/**
+		 * The view matrix.
+		 *
+		 * @type {Matrix4}
+		 */
+		this.viewMatrix = new Matrix4();
+
+		/**
 		 * The view normal matrix.
 		 *
 		 * @type {Matrix3}
@@ -90,11 +98,11 @@ class ClippingContext {
 
 		if ( parentContext !== null ) {
 
+			this.viewMatrix = parentContext.viewMatrix;
 			this.viewNormalMatrix = parentContext.viewNormalMatrix;
 			this.clippingGroupContexts = parentContext.clippingGroupContexts;
 
 			this.shadowPass = parentContext.shadowPass;
-			this.viewMatrix = parentContext.viewMatrix;
 
 		}
 
@@ -137,8 +145,8 @@ class ClippingContext {
 	updateGlobal( scene, camera ) {
 
 		this.shadowPass = ( scene.overrideMaterial !== null && scene.overrideMaterial.isShadowPassMaterial );
-		this.viewMatrix = camera.matrixWorldInverse;
 
+		this.viewMatrix.copy( camera.matrixWorldInverse );
 		this.viewNormalMatrix.getNormalMatrix( this.viewMatrix );
 
 	}

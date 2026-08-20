@@ -74,7 +74,7 @@ Default is `true`.
 
 Defines the lines color.
 
-Default is `null`.
+**Deprecated:** since r185. Use [NodeMaterial#colorNode](NodeMaterial.html#colorNode) instead.
 
 ### .offsetNode : Node.<float>
 
@@ -98,15 +98,27 @@ Default is `false`.
 
 ## Methods
 
-### .setup( builder : NodeBuilder )
+### .setupDiffuseColor( builder : NodeBuilder )
 
-Setups the vertex and fragment stage of this node material.
+Setups the diffuse color of the line material in the fragment stage. Overrides the base setup to incorporate line/dash rendering and blending.
 
 **builder**
 
 The current node builder.
 
-**Overrides:** [NodeMaterial#setup](NodeMaterial.html#setup)
+**Overrides:** [NodeMaterial#setupDiffuseColor](NodeMaterial.html#setupDiffuseColor)
+
+### .setupModelViewProjection( builder : NodeBuilder ) : Node.<vec4>
+
+Setups the position in clip space for the vertex stage of the fat line. Overrides the default model-view-projection to return the expanded fat line vertex coordinates.
+
+**builder**
+
+The current node builder.
+
+**Overrides:** [NodeMaterial#setupModelViewProjection](NodeMaterial.html#setupModelViewProjection)
+
+**Returns:** The position of the fat line vertex in clip space.
 
 ## Source
 

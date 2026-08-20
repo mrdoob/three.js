@@ -121,6 +121,18 @@ class Sprite extends Object3D {
 	}
 
 	/**
+	 * Returns `true` if this sprite intersects the given frustum.
+	 *
+	 * @param {Frustum|FrustumArray} frustum - The frustum to test.
+	 * @return {boolean} Whether this sprite intersects the given frustum or not.
+	 */
+	intersectsFrustum( frustum ) {
+
+		return frustum.intersectsSprite( this );
+
+	}
+
+	/**
 	 * Computes intersection points between a casted ray and this sprite.
 	 *
 	 * @param {Raycaster} raycaster - The raycaster.

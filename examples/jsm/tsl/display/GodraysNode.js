@@ -1,5 +1,5 @@
-import { Frustum, Matrix4, RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType, Vector3, Plane, WebGPUCoordinateSystem } from 'three/webgpu';
-import { cubeTexture, clamp, viewZToPerspectiveDepth, logarithmicDepthToViewZ, float, Loop, max, Fn, passTexture, uv, dot, uniformArray, If, getViewPosition, uniform, vec4, add, interleavedGradientNoise, screenCoordinate, round, mul, uint, mix, exp, vec3, distance, pow, reference, lightPosition, vec2, bool, texture, perspectiveDepthToViewZ, lightShadowMatrix } from 'three/tsl';
+import { Frustum, Matrix4, RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType, Vector3, Plane } from 'three/webgpu';
+import { cubeTexture, clamp, viewZToPerspectiveDepth, logarithmicDepthToViewZ, float, Loop, max, Fn, passTexture, uv, dot, uniformArray, If, getViewPosition, uniform, vec4, add, interleavedGradientNoise, screenCoordinate, round, mul, uint, mix, exp, vec3, distance, pow, reference, lightPosition, vec2, bool, texture, perspectiveDepthToViewZ, lightShadowMatrix, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -351,8 +351,6 @@ class GodraysNode extends TempNode {
 	 */
 	setup( builder ) {
 
-		const { renderer } = builder;
-
 		const uvNode = uv();
 		const lightPos = lightPosition( this._light );
 
@@ -389,15 +387,8 @@ class GodraysNode extends TempNode {
 
 			const shadowPosition = lightShadowMatrix( this._light ).mul( worldPos );
 			const shadowCoord = shadowPosition.xyz.div( shadowPosition.w );
-			let coordZ = shadowCoord.z;
 
-			if ( renderer.coordinateSystem === WebGPUCoordinateSystem ) {
-
-				coordZ = coordZ.mul( 2 ).sub( 1 ); // WebGPU: Conversion [ 0, 1 ] to [ - 1, 1 ]
-
-			}
-
-			return vec3( shadowCoord.x, shadowCoord.y.oneMinus(), coordZ );
+			return vec3( shadowCoord.x, shadowCoord.y.oneMinus(), shadowCoord.z );
 
 		};
 
@@ -443,7 +434,7 @@ class GodraysNode extends TempNode {
 
 			} else {
 
-				throw new Error( 'GodraysNode: Unsupported light type.' );
+				throw new Error( 'THREE.GodraysNode: Unsupported light type.' );
 
 			}
 
@@ -588,7 +579,8 @@ class GodraysNode extends TempNode {
 
 		} );
 
-		this._material.fragmentNode = godrays().context( builder.getSharedContext() );
+		this._material.contextNode = context( builder.getSharedContext() );
+		this._material.fragmentNode = godrays();
 		this._material.needsUpdate = true;
 
 		return this._textureNode;

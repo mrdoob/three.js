@@ -14,6 +14,9 @@
 		<section>
 			<header>
 				<div class="class-description"><p>This module offers a variety of ways to implement loops in TSL. In it's basic form it's:</p>
+<pre><code class="language-js">Loop( count, ( { i } ) => {
+} );
+</code></pre>
 <p>However, it is also possible to define a start and end ranges, data types and loop conditions:</p>
 <pre><code class="language-js">Loop( { start: int( 0 ), end: int( 10 ), type: 'int', condition: '&lt;' }, ( { i } ) => {
 } );
@@ -32,10 +35,6 @@ Loop( value.lessThan( 10 ), () => {
 } );
 </code></pre>
 <p>The module also provides <code>Break()</code> and <code>Continue()</code> TSL expression for loop control.</p></div>
-				<h2>Code Example</h2>
-				<div translate="no"><pre><code class="language-js">Loop( count, ( { i } ) => {
-} );
-</code></pre></div>
 			</header>
 			<article>
 				<div class="container-overview">

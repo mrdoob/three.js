@@ -1,5 +1,7 @@
 import Node from './Node.js';
 import StructTypeNode from './StructTypeNode.js';
+import { nodeObject, nodeProxyConstructor } from '../tsl/TSLCore.js';
+import { isArrayAsParameter } from './NodeUtils.js';
 
 /**
  * StructNode allows to create custom structures with multiple members.
@@ -94,7 +96,7 @@ export default StructNode;
  */
 export const struct = ( membersLayout, name = null ) => {
 
-	const structLayout = new StructTypeNode( membersLayout, name );
+	const structType = new StructTypeNode( membersLayout, name );
 
 	const struct = ( ...params ) => {
 
@@ -102,7 +104,7 @@ export const struct = ( membersLayout, name = null ) => {
 
 		if ( params.length > 0 ) {
 
-			if ( params[ 0 ].isNode ) {
+			if ( isArrayAsParameter( params ) ) {
 
 				values = {};
 
@@ -110,7 +112,7 @@ export const struct = ( membersLayout, name = null ) => {
 
 				for ( let i = 0; i < params.length; i ++ ) {
 
-					values[ names[ i ] ] = params[ i ];
+					values[ names[ i ] ] = nodeObject( params[ i ] );
 
 				}
 
@@ -122,13 +124,10 @@ export const struct = ( membersLayout, name = null ) => {
 
 		}
 
-		return new StructNode( structLayout, values );
+		return new StructNode( structType, values );
 
 	};
 
-	struct.layout = structLayout;
-	struct.isStruct = true;
-
-	return struct;
+	return nodeProxyConstructor( struct, structType );
 
 };

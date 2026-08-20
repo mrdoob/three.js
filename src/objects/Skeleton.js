@@ -71,15 +71,6 @@ class Skeleton {
 		this.boneMatrices = null;
 
 		/**
-		 * An array buffer holding the bone data of the previous frame.
-		 * Required for computing velocity. Maintained in {@link SkinningNode}.
-		 *
-		 * @type {?Float32Array}
-		 * @default null
-		 */
-		this.previousBoneMatrices = null;
-
-		/**
 		 * A texture holding the bone data for use
 		 * in the vertex shader.
 		 *

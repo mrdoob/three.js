@@ -24,30 +24,14 @@ class Sampler extends Binding {
 		 * @private
 		 * @type {?Texture}
 		 */
-		this._texture = null;
-
-		/**
-		 * An event listener which is added to {@link texture}'s dispose event.
-		 *
-		 * @private
-		 * @type {Function}
-		 */
-		this._onTextureDispose = () => {
-
-			this.generation = null;
-			this.version = - 1;
-
-		};
-
-		// Assignment to the texture via a setter must occur after "_onTextureDispose" is initialized.
-		this.texture = texture;
+		this._texture = texture;
 
 		/**
 		 * The binding's version.
 		 *
 		 * @type {number}
 		 */
-		this.version = texture ? texture.version : - 1;
+		this.version = - 1;
 
 		/**
 		 * The binding's generation which is an additional version
@@ -86,22 +70,9 @@ class Sampler extends Binding {
 
 		if ( this._texture === value ) return;
 
-		if ( this._texture ) {
-
-			this._texture.removeEventListener( 'dispose', this._onTextureDispose );
-
-		}
-
 		this._texture = value;
 
-		this.generation = null;
-		this.version = - 1;
-
-		if ( this._texture ) {
-
-			this._texture.addEventListener( 'dispose', this._onTextureDispose );
-
-		}
+		this.reset();
 
 	}
 
@@ -137,26 +108,23 @@ class Sampler extends Binding {
 
 	}
 
+	/**
+	 * Resets the version and generation. This is used when the texture
+	 * the binding is pointing to is disposed or exchanged.
+	 */
+	reset() {
 
-	clone() {
+		this.generation = null;
+		this.version = - 1;
 
-		const clonedSampler = super.clone();
+	}
 
-		// fix dispose handler for cloned instances
-		// TODO: Find better solution, see #31747
+	/**
+	 * Releases the texture reference.
+	 */
+	release() {
 
-		clonedSampler._texture = null;
-
-		clonedSampler._onTextureDispose = () => {
-
-			clonedSampler.generation = null;
-			clonedSampler.version = - 1;
-
-		};
-
-		clonedSampler.texture = this.texture;
-
-		return clonedSampler;
+		this._texture = null;
 
 	}
 

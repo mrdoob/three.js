@@ -302,6 +302,14 @@ to the GPU and ensures correct texture parameter configuration.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="normalized" translate="no">.<a href="#normalized">normalized</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the texture should use one of the 16 bit integer formats which are normalized
+to [0, 1] or [-1, 1] (depending on signed/unsigned) when sampled.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="offset" translate="no">.<a href="#offset">offset</a><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
 					<div class="description">
 						<p>How much a single repetition of the texture is offset from the beginning,
@@ -600,7 +608,7 @@ method whenever this instance is no longer used in your app.</p>
 					<h3 class="name name-method" id="updateMatrix" translate="no">.<a href="#updateMatrix">updateMatrix</a><span class="signature">()</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Updates the texture transformation matrix from the from the properties <a href="Texture.html#offset">Texture#offset</a>,
+							<p>Updates the texture transformation matrix from the properties <a href="Texture.html#offset">Texture#offset</a>,
 <a href="Texture.html#repeat">Texture#repeat</a>, <a href="Texture.html#rotation">Texture#rotation</a>, and <a href="Texture.html#center">Texture#center</a>.</p>
 						</div>
 					</div>

@@ -21,6 +21,10 @@
 <li>There is perhaps some question as to how valid it is to always assume little-endian-ness.</li>
 <li>ASCII decoding assumes file is UTF-8.</li>
 </ul>
+<pre><code class="language-js">const loader = new STLLoader();
+const geometry = await loader.loadAsync( './models/stl/slotted_disk.stl' )
+scene.add( new THREE.Mesh( geometry ) );
+</code></pre>
 <p>For binary STLs geometry might contain colors for vertices. To use it:</p>
 <pre><code class="language-js">// use the same code to load STL as above
 if ( geometry.hasColors ) {
@@ -38,11 +42,6 @@ for ( let i = 0; i &lt; nGeometryGroups; i ++ ) {
 	materials.push( material );
 }
 const mesh = new THREE.Mesh(geometry, materials);
-</code></pre></div>
-				<h2>Code Example</h2>
-				<div translate="no"><pre><code class="language-js">const loader = new STLLoader();
-const geometry = await loader.loadAsync( './models/stl/slotted_disk.stl' )
-scene.add( new THREE.Mesh( geometry ) );
 </code></pre></div>
 			</header>
 			<article>

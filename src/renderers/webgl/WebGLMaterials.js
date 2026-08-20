@@ -41,7 +41,11 @@ function WebGLMaterials( renderer, properties ) {
 
 	function refreshMaterialUniforms( uniforms, material, pixelRatio, height, transmissionRenderTarget ) {
 
-		if ( material.isMeshBasicMaterial ) {
+		if ( material.isNodeMaterial ) {
+
+			material.uniformsNeedUpdate = false;
+
+		} else if ( material.isMeshBasicMaterial ) {
 
 			refreshUniformsCommon( uniforms, material );
 
@@ -476,6 +480,12 @@ function WebGLMaterials( renderer, properties ) {
 		if ( material.dispersion > 0 ) {
 
 			uniforms.dispersion.value = material.dispersion;
+
+		}
+
+		if ( material.retroreflectivity > 0 ) {
+
+			uniforms.retroreflectivity.value = material.retroreflectivity;
 
 		}
 

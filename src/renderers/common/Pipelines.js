@@ -81,9 +81,10 @@ class Pipelines extends DataMap {
 	 *
 	 * @param {Node} computeNode - The compute node.
 	 * @param {Array<BindGroup>} bindings - The bindings.
+	 * @param {?Array<Promise>} [promises=null] - An array of compilation promises which is only relevant in context of `Renderer.compileComputeAsync()`.
 	 * @return {ComputePipeline} The compute pipeline.
 	 */
-	getForCompute( computeNode, bindings ) {
+	getForCompute( computeNode, bindings, promises = null ) {
 
 		const { backend } = this;
 
@@ -116,6 +117,7 @@ class Pipelines extends DataMap {
 				this.programs.compute.set( nodeBuilderState.computeShader, stageCompute );
 
 				backend.createProgram( stageCompute );
+				this.info.createProgram( stageCompute );
 
 			}
 
@@ -129,7 +131,7 @@ class Pipelines extends DataMap {
 
 				if ( previousPipeline && previousPipeline.usedTimes === 0 ) this._releasePipeline( previousPipeline );
 
-				pipeline = this._getComputePipeline( computeNode, stageCompute, cacheKey, bindings );
+				pipeline = this._getComputePipeline( computeNode, stageCompute, cacheKey, bindings, promises );
 
 			}
 
@@ -192,6 +194,7 @@ class Pipelines extends DataMap {
 				this.programs.vertex.set( nodeBuilderState.vertexShader, stageVertex );
 
 				backend.createProgram( stageVertex );
+				this.info.createProgram( stageVertex );
 
 			}
 
@@ -205,6 +208,7 @@ class Pipelines extends DataMap {
 				this.programs.fragment.set( nodeBuilderState.fragmentShader, stageFragment );
 
 				backend.createProgram( stageFragment );
+				this.info.createProgram( stageFragment );
 
 			}
 
@@ -339,9 +343,10 @@ class Pipelines extends DataMap {
 	 * @param {ProgrammableStage} stageCompute - The programmable stage representing the compute shader.
 	 * @param {string} cacheKey - The cache key.
 	 * @param {Array<BindGroup>} bindings - The bindings.
+	 * @param {?Array<Promise>} promises - An array of compilation promises which is only relevant in context of `Renderer.compileComputeAsync()`.
 	 * @return {ComputePipeline} The compute pipeline.
 	 */
-	_getComputePipeline( computeNode, stageCompute, cacheKey, bindings ) {
+	_getComputePipeline( computeNode, stageCompute, cacheKey, bindings, promises ) {
 
 		// check for existing pipeline
 
@@ -355,9 +360,7 @@ class Pipelines extends DataMap {
 
 			this.caches.set( cacheKey, pipeline );
 
-			this.backend.createComputePipeline( pipeline, bindings );
-
-			this.info.memory.programs ++;
+			this.backend.createComputePipeline( pipeline, bindings, promises );
 
 		}
 
@@ -397,8 +400,6 @@ class Pipelines extends DataMap {
 			// pending promises that resolve when the render pipelines are ready for rendering.
 
 			this.backend.createRenderPipeline( renderObject, promises );
-
-			this.info.memory.programs ++;
 
 		}
 
@@ -445,8 +446,6 @@ class Pipelines extends DataMap {
 
 		this.caches.delete( pipeline.cacheKey );
 
-		this.info.memory.programs --;
-
 	}
 
 	/**
@@ -461,6 +460,8 @@ class Pipelines extends DataMap {
 		const stage = program.stage;
 
 		this.programs[ stage ].delete( code );
+
+		this.info.destroyProgram( program );
 
 	}
 

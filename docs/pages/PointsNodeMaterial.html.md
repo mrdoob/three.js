@@ -8,16 +8,14 @@ This material can be used in two ways:
 
 *   By rendering point primitives with [Points](Points.html). Since WebGPU only supports point primitives with a pixel size of `1`, it's not possible to define a size.
 
+```js
+const pointCloud = new THREE.Points( geometry, new THREE.PointsNodeMaterial() );
+```
+
 *   By rendering point primitives with Sprites. In this case, size is honored, see [PointsNodeMaterial#sizeNode](PointsNodeMaterial.html#sizeNode).
 
 ```js
 const instancedPoints = new THREE.Sprite( new THREE.PointsNodeMaterial( { positionNode: instancedBufferAttribute( positionAttribute ) } ) );
-```
-
-## Code Example
-
-```js
-const pointCloud = new THREE.Points( geometry, new THREE.PointsNodeMaterial() );
 ```
 
 ## Constructor

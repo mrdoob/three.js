@@ -12,7 +12,7 @@ In most cases, the predefined nodes `objectGroup`, `renderGroup` and `frameGroup
 
 ## Constructor
 
-### new UniformGroupNode( name : string, shared : boolean, order : number )
+### new UniformGroupNode( name : string, shared : boolean, order : number, updateType : string | null )
 
 Constructs a new uniform group node.
 
@@ -31,6 +31,12 @@ Default is `false`.
 Influences the internal sorting.
 
 Default is `1`.
+
+**updateType**
+
+The update type of the uniform group node.
+
+Default is `null`.
 
 ## Properties
 
@@ -57,6 +63,42 @@ Default is `1`.
 Whether this uniform group node is shared or not.
 
 Default is `false`.
+
+### .updateType : string | null
+
+The update type of the uniform group node.
+
+Default is `null`.
+
+**Overrides:** [Node#updateType](Node.html#updateType)
+
+## Methods
+
+### .deserialize( data : Object )
+
+Deserializes the uniform group node from a JSON object.
+
+**data**
+
+The object containing the serialized data.
+
+**Overrides:** [Node#deserialize](Node.html#deserialize)
+
+### .serialize( data : Object )
+
+Serializes the uniform group node to a JSON object.
+
+**data**
+
+The object to store the serialized data.
+
+**Overrides:** [Node#serialize](Node.html#serialize)
+
+### .update()
+
+Marks the uniform group node as needing an update. This will trigger the necessary updates in the rendering process.
+
+**Overrides:** [Node#update](Node.html#update)
 
 ## Source
 

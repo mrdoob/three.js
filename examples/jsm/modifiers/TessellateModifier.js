@@ -46,7 +46,7 @@ class TessellateModifier {
 	}
 
 	/**
-	 * Returns a new, modified version of the given geometry by applying a tesselation.
+	 * Returns a new, modified version of the given geometry by applying a tessellation.
 	 * Please note that the resulting geometry is always non-indexed.
 	 *
 	 * @param {BufferGeometry} geometry - The geometry to modify.

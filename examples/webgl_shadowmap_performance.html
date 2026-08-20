@@ -4,13 +4,17 @@
 		<title>three.js webgl - shadow map</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - shadow map">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_shadowmap_performance.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_shadowmap_performance.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 
 		<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - shadowmap - models by <a href="https://mirada.com/" target="_blank" rel="noopener">mirada</a> from <a href="http://www.ro.me" target="_blank" rel="noopener">rome</a><br />
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - shadowmap - models by <a href="https://mirada.com/" target="_blank" rel="noopener">mirada</a> from <a href="https://rome.mrdoob.com" target="_blank" rel="noopener">rome</a><br />
 		move camera with WASD / RF + mouse
 		</div>
 
@@ -33,8 +37,6 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
-
-			const SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 1024;
 
 			let SCREEN_WIDTH = window.innerWidth;
 			let SCREEN_HEIGHT = window.innerHeight;
@@ -77,21 +79,12 @@
 				const ambient = new THREE.AmbientLight( 0xffffff );
 				scene.add( ambient );
 
-				const light = new THREE.DirectionalLight( 0xffffff, 3 );
-				light.position.set( 0, 1500, 1000 );
-				light.castShadow = true;
-				light.shadow.camera.top = 2000;
-				light.shadow.camera.bottom = - 2000;
-				light.shadow.camera.left = - 2000;
-				light.shadow.camera.right = 2000;
-				light.shadow.camera.near = 1200;
-				light.shadow.camera.far = 2500;
-				light.shadow.bias = 0.0001;
-
-				light.shadow.mapSize.width = SHADOW_MAP_WIDTH;
-				light.shadow.mapSize.height = SHADOW_MAP_HEIGHT;
-
-				scene.add( light );
+				const sunLight = new THREE.SunLight( 0xffffff, 3 );
+				sunLight.position.set( 0, 1500, 1000 );
+				sunLight.castShadow = true;
+				sunLight.shadow.camera.far = FAR;
+				sunLight.shadow.normalBias = 1;
+				scene.add( sunLight );
 
 				createScene();
 
@@ -140,8 +133,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
-				controls.handleResize();
 
 			}
 

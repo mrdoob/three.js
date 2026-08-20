@@ -48,7 +48,7 @@ The current node builder.
 
 **Returns:** Whether the node builder's material uses node properties or not.
 
-### .equals( renderObject : RenderObject, lightsData : Array.<Light> ) : boolean
+### .equals( renderObject : RenderObject, lightsData : Array.<Light>, renderId : number ) : boolean
 
 Returns `true` if the given render object has not changed its state.
 
@@ -60,7 +60,11 @@ The render object.
 
 The current material lights.
 
-**Returns:** Whether the given render object has changed its state or not.
+**renderId**
+
+The current render ID.
+
+**Returns:** Whether the given render object is equal to its cached state or not.
 
 ### .firstInitialization( renderObject : RenderObject ) : boolean
 
@@ -81,6 +85,16 @@ Returns an attribute data structure holding the attributes versions for monitori
 The geometry attributes.
 
 **Returns:** An object for monitoring the versions of attributes.
+
+### .getGeometryData( geometry : BufferGeometry ) : Object
+
+Returns a geometry data structure holding the geometry property values for monitoring.
+
+**geometry**
+
+The geometry.
+
+**Returns:** An object for monitoring geometry properties.
 
 ### .getLights( lightsNode : LightsNode, renderId : number ) : Array.<Object>
 

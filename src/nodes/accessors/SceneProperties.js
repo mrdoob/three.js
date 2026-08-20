@@ -1,10 +1,8 @@
 import { UVMapping } from '../../constants.js';
-import { Euler } from '../../math/Euler.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { uniform } from '../tsl/TSLBase.js';
 
-const _e1 = /*@__PURE__*/ new Euler();
 const _m1 = /*@__PURE__*/ new Matrix4();
 
 /**
@@ -33,14 +31,10 @@ export const backgroundRotation = /*@__PURE__*/ uniform( new Matrix4() ).setGrou
 
 	const background = scene.background;
 
-	if ( background !== null && background.isTexture && background.mapping !== UVMapping ) {
+	if ( ( background !== null && background.isTexture && background.mapping !== UVMapping ) || ( scene.backgroundNode && scene.backgroundNode.isNode ) ) {
 
-		_e1.copy( scene.backgroundRotation );
-
-		// accommodate left-handed frame
-		_e1.x *= - 1; _e1.y *= - 1; _e1.z *= - 1;
-
-		_m1.makeRotationFromEuler( _e1 );
+		// note: since the matrix is orthonormal, we can use the more-efficient transpose() in lieu of invert()
+		_m1.makeRotationFromEuler( scene.backgroundRotation ).transpose();
 
 	} else {
 

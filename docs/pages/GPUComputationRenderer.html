@@ -24,6 +24,8 @@ as inputs to render the textures of the next frame.</p>
 <p>Variable names should be valid identifiers and should not collide with THREE GLSL used identifiers.
 a common approach could be to use 'texture' prefixing the variable name; i.e texturePosition, textureVelocity...</p>
 <p>The size of the computation (sizeX * sizeY) is defined as 'resolution' automatically in the shader. For example:</p>
+<pre class="prettyprint source"><code>#DEFINE resolution vec2( 1024.0, 1024.0 )
+</code></pre>
 <p>Basic use:</p>
 <pre><code class="language-js">// Initialization...
 // Create computation renderer
@@ -68,9 +70,6 @@ myMaterial.uniforms.map.value = outputRenderTarget.texture;
 // And compute each frame, before rendering to screen:
 gpuCompute.doRenderTarget( myFilter1, myRenderTarget );
 gpuCompute.doRenderTarget( myFilter2, outputRenderTarget );
-</code></pre></div>
-				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source"><code>#DEFINE resolution vec2( 1024.0, 1024.0 )
 </code></pre></div>
 			</header>
 			<article>

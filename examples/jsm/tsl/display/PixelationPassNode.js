@@ -1,5 +1,5 @@
 import { NearestFilter, Vector4, TempNode, NodeUpdateType, PassNode } from 'three/webgpu';
-import { nodeObject, Fn, float, uv, uniform, convertToTexture, vec2, vec3, clamp, floor, dot, smoothstep, If, sign, step, mrt, output, normalView, property } from 'three/tsl';
+import { nodeObject, Fn, float, uv, uniform, convertToTexture, vec2, vec3, clamp, floor, dot, smoothstep, If, sign, step, mrt, output, normalView, property, vec4 } from 'three/tsl';
 
 /**
  * A inner node definition that implements the actual pixelation TSL code.
@@ -202,7 +202,7 @@ class PixelationNode extends TempNode {
 
 			const strength = dei.greaterThan( 0 ).select( float( 1.0 ).sub( dei.mul( this.depthEdgeStrength ) ), nei.mul( this.normalEdgeStrength ).add( 1 ) );
 
-			return texel.mul( strength );
+			return vec4( texel.mul( strength ).rgb, texel.a );
 
 		} );
 

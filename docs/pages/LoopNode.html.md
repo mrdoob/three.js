@@ -4,6 +4,11 @@
 
 This module offers a variety of ways to implement loops in TSL. In it's basic form it's:
 
+```js
+Loop( count, ( { i } ) => {
+} );
+```
+
 However, it is also possible to define a start and end ranges, data types and loop conditions:
 
 ```js
@@ -34,13 +39,6 @@ Loop( value.lessThan( 10 ), () => {
 ```
 
 The module also provides `Break()` and `Continue()` TSL expression for loop control.
-
-## Code Example
-
-```js
-Loop( count, ( { i } ) => {
-} );
-```
 
 ## Constructor
 

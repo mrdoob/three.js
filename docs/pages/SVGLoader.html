@@ -152,6 +152,27 @@ SVG XML document.</dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".createFillMaterial" translate="no">.<a href="#.createFillMaterial">createFillMaterial</a><span class="signature">( shapePath : <span class="param-type"><a href="ShapePath.html">ShapePath</a></span> )</span><span class="type-signature"> : <a href="MeshBasicMaterial.html">MeshBasicMaterial</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a material for rendering the fill of the given path.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">shapePath</strong>
+									</td>
+									<td class="description last">
+										<p>The shape path.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The fill material. <code>null</code> if the path has no fill.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id=".createShapes" translate="no">.<a href="#.createShapes">createShapes</a><span class="signature">( shapePath : <span class="param-type"><a href="ShapePath.html">ShapePath</a></span> )</span><span class="type-signature"> : Array.&lt;<a href="Shape.html">Shape</a>></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -170,7 +191,31 @@ SVG XML document.</dt>
 							</tbody>
 						</table>
 						<dl class="details">
+							<dt class="important tag-deprecated"><strong>Deprecated:</strong> since 185.</dt>
+						</dl>
+						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> An array of shapes.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".createStrokeMaterial" translate="no">.<a href="#.createStrokeMaterial">createStrokeMaterial</a><span class="signature">( shapePath : <span class="param-type"><a href="ShapePath.html">ShapePath</a></span> )</span><span class="type-signature"> : <a href="MeshBasicMaterial.html">MeshBasicMaterial</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a material for rendering the stroke of the given path.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">shapePath</strong>
+									</td>
+									<td class="description last">
+										<p>The shape path.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The stroke material. <code>null</code> if the path has no stroke.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id=".getStrokeStyle" translate="no">.<a href="#.getStrokeStyle">getStrokeStyle</a><span class="signature">( width : <span class="param-type">number</span>, color : <span class="param-type">string</span>, lineJoin : <span class="param-type">'round' | 'bevel' | 'miter' | 'miter-limit'</span>, lineCap : <span class="param-type">'round' | 'square' | 'butt'</span>, miterLimit : <span class="param-type">number</span> )</span><span class="type-signature"> : Object</span> </h3>

@@ -1,7 +1,36 @@
 import { Tab } from '../ui/Tab.js';
 import { Graph } from '../ui/Graph.js';
+import { getItem, setItem } from '../Inspector.js';
+import { info } from '../ui/utils.js';
+import {
+	ByteType,
+	FloatType,
+	HalfFloatType,
+	IntType,
+	ShortType,
+	UnsignedByteType,
+	UnsignedInt101111Type,
+	UnsignedInt248Type,
+	UnsignedInt5999Type,
+	UnsignedIntType,
+	UnsignedShort4444Type,
+	UnsignedShort5551Type,
+	UnsignedShortType,
+	AlphaFormat,
+	RGBFormat,
+	RGBAFormat,
+	DepthFormat,
+	DepthStencilFormat,
+	RedFormat,
+	RedIntegerFormat,
+	RGFormat,
+	RGIntegerFormat,
+	RGBIntegerFormat,
+	RGBAIntegerFormat
+} from 'three';
 
 const LIMIT = 500;
+const TRIANGLES_GRAPH_LIMIT = 60;
 
 class Timeline extends Tab {
 
@@ -9,11 +38,15 @@ class Timeline extends Tab {
 
 		super( 'Timeline', options );
 
+		this.content.style.overflow = 'hidden';
 		this.isRecording = false;
 		this.frames = []; // Array of { id: number, calls: [] }
+
+		this.baseTriangles = 0;
 		this.currentFrame = null;
 		this.isHierarchicalView = true;
-
+		this.activeBlocks = new Map();
+		this.domPool = [];
 		this.originalBackend = null;
 		this.originalMethods = new Map();
 		this.renderer = null;
@@ -22,6 +55,7 @@ class Timeline extends Tab {
 		// Make lines in timeline graph
 		this.graph.addLine( 'fps', 'var( --color-fps )' );
 		this.graph.addLine( 'calls', 'var( --color-call )' );
+		this.graph.addLine( 'triangles', 'var( --color-red )' );
 
 		this.buildHeader();
 		this.buildUI();
@@ -29,7 +63,7 @@ class Timeline extends Tab {
 		// Bind window resize to update graph bounds
 		window.addEventListener( 'resize', () => {
 
-			if ( ! this.isRecording && this.frames.length > 0 ) {
+			if ( this.isActive && ! this.isRecording && this.frames.length > 0 ) {
 
 				this.renderSlider();
 
@@ -39,10 +73,38 @@ class Timeline extends Tab {
 
 	}
 
+	init( inspector ) {
+
+		super.init( inspector );
+
+		this.profiler.addEventListener( 'resize', () => {
+
+			if ( this.isActive && ! this.isRecording && this.frames.length > 0 ) {
+
+				this.renderSlider();
+
+			}
+
+		} );
+
+	}
+
+	setActive( isActive ) {
+
+		super.setActive( isActive );
+
+		if ( isActive && ! this.isRecording && this.frames.length > 0 ) {
+
+			this.renderSlider();
+
+		}
+
+	}
+
 	buildHeader() {
 
 		const header = document.createElement( 'div' );
-		header.className = 'console-header';
+		header.className = 'toolbar';
 
 		this.recordButton = document.createElement( 'button' );
 		this.recordButton.className = 'console-copy-button'; // Reusing style
@@ -64,16 +126,26 @@ class Timeline extends Tab {
 		clearButton.style.alignItems = 'center';
 		clearButton.addEventListener( 'click', () => this.clear() );
 
-		this.viewModeButton = document.createElement( 'button' );
-		this.viewModeButton.className = 'console-copy-button';
-		this.viewModeButton.title = 'Toggle View Mode';
-		this.viewModeButton.textContent = 'Mode: Hierarchy';
-		this.viewModeButton.style.padding = '0 10px';
-		this.viewModeButton.style.lineHeight = '24px';
-		this.viewModeButton.addEventListener( 'click', () => {
+		this.viewModeSelect = document.createElement( 'select' );
+		this.viewModeSelect.className = 'select';
+		this.viewModeSelect.style.width = '120px';
+		this.viewModeSelect.style.marginRight = '10px';
 
-			this.isHierarchicalView = ! this.isHierarchicalView;
-			this.viewModeButton.textContent = this.isHierarchicalView ? 'Mode: Hierarchy' : 'Mode: Counts';
+		const hierarchyOption = document.createElement( 'option' );
+		hierarchyOption.value = 'hierarchy';
+		hierarchyOption.textContent = 'Hierarchy';
+		this.viewModeSelect.appendChild( hierarchyOption );
+
+		const countsOption = document.createElement( 'option' );
+		countsOption.value = 'counts';
+		countsOption.textContent = 'Count';
+		this.viewModeSelect.appendChild( countsOption );
+
+		this.viewModeSelect.value = this.isHierarchicalView ? 'hierarchy' : 'counts';
+
+		this.viewModeSelect.addEventListener( 'change', () => {
+
+			this.isHierarchicalView = this.viewModeSelect.value === 'hierarchy';
 
 			if ( this.selectedFrameIndex !== undefined && this.selectedFrameIndex !== - 1 ) {
 
@@ -93,38 +165,46 @@ class Timeline extends Tab {
 		this.recordRefreshButton.style.alignItems = 'center';
 		this.recordRefreshButton.addEventListener( 'click', () => {
 
-			const storage = JSON.parse( localStorage.getItem( 'threejs-inspector' ) || '{}' );
-			storage.timeline = storage.timeline || {};
-			storage.timeline.recording = true;
-			localStorage.setItem( 'threejs-inspector', JSON.stringify( storage ) );
+			const timelineSettings = getItem( 'timeline' );
+			timelineSettings.recording = true;
+			setItem( 'timeline', timelineSettings );
 
 			window.location.reload();
 
 		} );
 
+		this.exportButton = document.createElement( 'button' );
+		this.exportButton.className = 'console-copy-button';
+		this.exportButton.title = 'Export';
+		this.exportButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>';
+		this.exportButton.style.padding = '0 10px';
+		this.exportButton.style.lineHeight = '24px';
+		this.exportButton.style.display = 'flex';
+		this.exportButton.style.alignItems = 'center';
+		this.exportButton.addEventListener( 'click', () => this.exportData() );
+
 		const buttonsGroup = document.createElement( 'div' );
 		buttonsGroup.className = 'console-buttons-group';
-		buttonsGroup.appendChild( this.viewModeButton );
 		buttonsGroup.appendChild( this.recordButton );
 		buttonsGroup.appendChild( this.recordRefreshButton );
+		buttonsGroup.appendChild( this.exportButton );
 		buttonsGroup.appendChild( clearButton );
 
-		header.style.display = 'flex';
-		header.style.justifyContent = 'space-between';
-		header.style.padding = '6px';
-		header.style.borderBottom = '1px solid var(--border-color)';
-
 		const titleElement = document.createElement( 'div' );
-		titleElement.textContent = 'Backend Calls Timeline';
+		titleElement.style.display = 'flex';
+		titleElement.style.alignItems = 'center';
 		titleElement.style.color = 'var(--text-primary)';
 		titleElement.style.alignSelf = 'center';
-		titleElement.style.paddingLeft = '5px';
 
 		this.frameInfo = document.createElement( 'span' );
-		this.frameInfo.style.marginLeft = '15px';
+		this.frameInfo.style.display = 'inline-flex';
+		this.frameInfo.style.alignItems = 'center';
+		this.frameInfo.style.marginLeft = '5px';
 		this.frameInfo.style.fontFamily = 'monospace';
 		this.frameInfo.style.color = 'var(--text-secondary)';
 		this.frameInfo.style.fontSize = '12px';
+
+		titleElement.appendChild( this.viewModeSelect );
 		titleElement.appendChild( this.frameInfo );
 
 		header.appendChild( titleElement );
@@ -138,7 +218,9 @@ class Timeline extends Tab {
 		const container = document.createElement( 'div' );
 		container.style.display = 'flex';
 		container.style.flexDirection = 'column';
-		container.style.height = 'calc(100% - 37px)'; // Subtract header height
+		container.style.flex = '1';
+		container.style.minHeight = '0';
+		container.style.marginTop = '10px';
 		container.style.width = '100%';
 
 		// Top Player/Graph Slider using Graph.js SVG
@@ -153,11 +235,13 @@ class Timeline extends Tab {
 		this.graphSlider.style.margin = '0 10px';
 		this.graphSlider.style.position = 'relative';
 		this.graphSlider.style.cursor = 'crosshair';
+		this.graphSlider.style.touchAction = 'none';
 
 		graphContainer.appendChild( this.graphSlider );
 
 		// Setup SVG from Graph
-		this.graph.domElement.style.width = '100%';
+		this.graph.domElement.style.width = '0';
+		this.graph.domElement.style.minWidth = '100%';
 		this.graph.domElement.style.height = '100%';
 		this.graphSlider.appendChild( this.graph.domElement );
 
@@ -205,12 +289,12 @@ class Timeline extends Tab {
 		this.graphSlider.tabIndex = 0;
 		this.graphSlider.style.outline = 'none';
 
-		// Mouse interactivity on the graph
+		// Pointer interactivity on the graph
 		let isDragging = false;
 
 		const updatePlayheadFromEvent = ( e ) => {
 
-			if ( this.frames.length === 0 ) return;
+			if ( this.isRecording || this.frames.length === 0 ) return;
 
 			const rect = this.graphSlider.getBoundingClientRect();
 			let x = e.clientX - rect.left;
@@ -254,7 +338,9 @@ class Timeline extends Tab {
 
 		};
 
-		this.graphSlider.addEventListener( 'mousedown', ( e ) => {
+		this.graphSlider.addEventListener( 'pointerdown', ( e ) => {
+
+			if ( this.isRecording ) return;
 
 			isDragging = true;
 			this.isManualScrubbing = true;
@@ -263,7 +349,7 @@ class Timeline extends Tab {
 
 		} );
 
-		this.graphSlider.addEventListener( 'mouseenter', () => {
+		this.graphSlider.addEventListener( 'pointerenter', () => {
 
 			if ( this.frames.length > 0 && ! this.isRecording ) {
 
@@ -273,13 +359,13 @@ class Timeline extends Tab {
 
 		} );
 
-		this.graphSlider.addEventListener( 'mouseleave', () => {
+		this.graphSlider.addEventListener( 'pointerleave', () => {
 
 			this.hoverIndicator.style.display = 'none';
 
 		} );
 
-		this.graphSlider.addEventListener( 'mousemove', ( e ) => {
+		this.graphSlider.addEventListener( 'pointermove', ( e ) => {
 
 			if ( this.frames.length === 0 || this.isRecording ) return;
 
@@ -363,7 +449,7 @@ class Timeline extends Tab {
 
 		} );
 
-		window.addEventListener( 'mousemove', ( e ) => {
+		window.addEventListener( 'pointermove', ( e ) => {
 
 			if ( isDragging ) {
 
@@ -398,7 +484,7 @@ class Timeline extends Tab {
 
 		} );
 
-		window.addEventListener( 'mouseup', () => {
+		window.addEventListener( 'pointerup', () => {
 
 			isDragging = false;
 			this.isManualScrubbing = false;
@@ -419,8 +505,25 @@ class Timeline extends Tab {
 		this.timelineTrack.style.flex = '1';
 		this.timelineTrack.style.overflowY = 'auto';
 		this.timelineTrack.style.margin = '10px';
+		this.timelineTrack.style.marginTop = '8px';
 		this.timelineTrack.style.backgroundColor = 'var(--background-color)';
+		this.timelineTrack.style.position = 'relative';
 		mainArea.appendChild( this.timelineTrack );
+
+		this.timelineContent = document.createElement( 'div' );
+		this.timelineContent.style.position = 'relative';
+		this.timelineContent.style.width = '100%';
+		this.timelineTrack.appendChild( this.timelineContent );
+
+		this.timelineTrack.addEventListener( 'scroll', () => {
+
+			if ( ! this.isRecording && this.frames.length > 0 ) {
+
+				this.updateVisibleBlocks();
+
+			}
+
+		} );
 
 		container.appendChild( mainArea );
 		this.content.appendChild( container );
@@ -431,12 +534,12 @@ class Timeline extends Tab {
 
 		this.renderer = renderer;
 
-		const storage = JSON.parse( localStorage.getItem( 'threejs-inspector' ) || '{}' );
+		const timelineSettings = getItem( 'timeline' );
 
-		if ( storage.timeline && storage.timeline.recording ) {
+		if ( timelineSettings.recording ) {
 
-			storage.timeline.recording = false;
-			localStorage.setItem( 'threejs-inspector', JSON.stringify( storage ) );
+			timelineSettings.recording = false;
+			setItem( 'timeline', timelineSettings );
 
 			this.toggleRecording();
 
@@ -523,13 +626,38 @@ class Timeline extends Tab {
 
 							}
 
+							const t = this.currentFrame.triangles || 0;
+
+							if ( t > this.baseTriangles ) {
+
+								const oldBase = this.baseTriangles;
+								this.baseTriangles = t;
+
+								if ( oldBase > 0 ) {
+
+									const ratio = oldBase / this.baseTriangles;
+									const points = this.graph.lines[ 'triangles' ].points;
+
+									for ( let i = 0; i < points.length; i ++ ) {
+
+										points[ i ] *= ratio;
+
+									}
+
+								}
+
+							}
+
+							const normalizedTriangles = this.baseTriangles > 0 ? ( t / this.baseTriangles ) * TRIANGLES_GRAPH_LIMIT : 0;
+
 							this.graph.addPoint( 'calls', this.currentFrame.calls.length );
 							this.graph.addPoint( 'fps', this.currentFrame.fps );
+							this.graph.addPoint( 'triangles', normalizedTriangles );
 							this.graph.update();
 
 						}
 
-						this.currentFrame = { id: frameNumber, calls: [], fps: 0 };
+						this.currentFrame = { id: frameNumber, calls: [], fps: 0, triangles: 0 };
 						this.frames.push( this.currentFrame );
 
 						if ( this.frames.length > LIMIT ) {
@@ -538,67 +666,26 @@ class Timeline extends Tab {
 
 						}
 
-						// Sync playhead when new frames are added if user is actively watching a frame
-						if ( ! this.isManualScrubbing ) {
 
-							if ( this.isTrackingLatest ) {
 
-								const targetIndex = this.frames.length > 1 ? this.frames.length - 2 : 0;
-								this.selectFrame( targetIndex );
+					}
 
-							} else if ( this.selectedFrameIndex !== - 1 ) {
+					const call = { method: prop, target: args[ 0 ] };
+					const details = this.getCallDetail( prop, args );
 
-								const pointCount = this.graph.lines[ 'calls' ].points.length;
+					if ( details ) {
 
-								if ( pointCount > 0 ) {
+						call.details = details;
 
-									const rect = this.graphSlider.getBoundingClientRect();
-									const pointStep = rect.width / ( this.graph.maxPoints - 1 );
-									const offset = rect.width - ( ( pointCount - 1 ) * pointStep );
+						if ( details.triangles !== undefined ) {
 
-									let localFrameIndex = Math.round( ( this.fixedScreenX - offset ) / pointStep );
-									localFrameIndex = Math.max( 0, Math.min( localFrameIndex, pointCount - 1 ) );
-
-									let newFrameIndex = localFrameIndex;
-
-									if ( this.frames.length > pointCount ) {
-
-										newFrameIndex += this.frames.length - pointCount;
-
-									}
-
-									this.selectFrame( newFrameIndex );
-
-								}
-
-							}
+							this.currentFrame.triangles += details.triangles;
 
 						}
 
 					}
 
-					let methodLabel = prop;
-
-					if ( prop === 'beginRender' ) {
-
-						if ( this.renderer.inspector && this.renderer.inspector.currentRender ) {
-
-							methodLabel += ' - ' + this.renderer.inspector.currentRender.name;
-
-						}
-
-					} else if ( prop === 'beginCompute' ) {
-
-						if ( this.renderer.inspector && this.renderer.inspector.currentCompute ) {
-
-							methodLabel += ' - ' + this.renderer.inspector.currentCompute.name;
-
-						}
-
-					}
-
-					// Only record method name as requested, skipping detail arguments
-					this.currentFrame.calls.push( { method: methodLabel } );
+					this.currentFrame.calls.push( call );
 
 					return originalFunc.apply( backend, args );
 
@@ -637,13 +724,544 @@ class Timeline extends Tab {
 	clear() {
 
 		this.frames = [];
-		this.timelineTrack.innerHTML = '';
+		this.clearActiveBlocks();
+		this.timelineContent.innerHTML = '';
+		this.timelineContent.style.height = '0px';
 		this.playhead.style.display = 'none';
 		this.frameInfo.textContent = '';
+		this.baseTriangles = 0;
 		this.graph.lines[ 'calls' ].points = [];
 		this.graph.lines[ 'fps' ].points = [];
+		this.graph.lines[ 'triangles' ].points = [];
 		this.graph.resetLimit();
 		this.graph.update();
+
+	}
+
+	exportData() {
+
+		if ( this.frames.length === 0 ) return;
+
+		const data = JSON.stringify( this.frames, null, '\t' );
+		const blob = new Blob( [ data ], { type: 'application/json' } );
+		const url = URL.createObjectURL( blob );
+		const a = document.createElement( 'a' );
+		a.href = url;
+		a.download = 'threejs-timeline.json';
+		a.click();
+		URL.revokeObjectURL( url );
+
+	}
+
+	getRenderTargetDetails( renderTarget ) {
+
+		const textures = renderTarget.textures;
+		const attachments = [];
+
+		const getBPC = ( texture ) => {
+
+			switch ( texture.type ) {
+
+				case ByteType:
+				case UnsignedByteType:
+					return '8';
+				case ShortType:
+				case UnsignedShortType:
+				case HalfFloatType:
+				case UnsignedShort4444Type:
+				case UnsignedShort5551Type:
+					return '16';
+				case IntType:
+				case UnsignedIntType:
+				case FloatType:
+				case UnsignedInt248Type:
+				case UnsignedInt5999Type:
+				case UnsignedInt101111Type:
+					return '32';
+				default:
+					return '?';
+
+			}
+
+		};
+
+		const getFormat = ( texture ) => {
+
+			switch ( texture.format ) {
+
+				case AlphaFormat:
+					return 'a';
+				case RedFormat:
+				case RedIntegerFormat:
+					return 'r';
+				case RGFormat:
+				case RGIntegerFormat:
+					return 'rg';
+				case RGBFormat:
+				case RGBIntegerFormat:
+					return 'rgb';
+				case DepthFormat:
+					return 'depth';
+				case DepthStencilFormat:
+					return 'depth-stencil';
+				case RGBAFormat:
+				case RGBAIntegerFormat:
+				default:
+					return 'rgba';
+
+			}
+
+		};
+
+		for ( let i = 0; i < textures.length; i ++ ) {
+
+			const texture = textures[ i ];
+
+			const bpc = getBPC( texture );
+			const format = getFormat( texture );
+
+			let description = `[${ i }]`;
+
+			if ( texture.name && ! ( texture.isDepthTexture && texture.name === 'depth' ) ) {
+
+				description += ` ${ texture.name }`;
+
+			}
+
+			description += ` ${ format } ${ bpc } bpc`;
+
+			attachments.push( description );
+
+		}
+
+		const details = {
+			target: renderTarget.name || 'RenderTarget',
+			[ `attachments(${ textures.length })` ]: '\n' + attachments.join( '\n' )
+		};
+
+		if ( renderTarget.depthTexture ) {
+
+			details.depth = `${ getBPC( renderTarget.depthTexture ) } bpc`;
+
+		}
+
+		return details;
+
+	}
+
+	getCallDetail( method, args ) {
+
+		switch ( method ) {
+
+			case 'draw': {
+
+				const renderObject = args[ 0 ];
+
+				const details = {
+					object: renderObject.object.name || renderObject.object.type,
+					material: renderObject.material.name || renderObject.material.type,
+					geometry: renderObject.geometry.name || renderObject.geometry.type
+				};
+
+				if ( renderObject.getDrawParameters ) {
+
+					const drawParams = renderObject.getDrawParameters();
+
+					if ( drawParams ) {
+
+						if ( renderObject.object.isMesh || renderObject.object.isSprite ) {
+
+							details.triangles = drawParams.vertexCount / 3;
+
+							if ( renderObject.object.count > 1 ) {
+
+								details.instance = renderObject.object.count;
+
+								details[ 'triangles per instance' ] = details.triangles;
+								details.triangles *= details.instance;
+
+							}
+
+						}
+
+					}
+
+				}
+
+				return details;
+
+			}
+
+			case 'beginRender': {
+
+				const renderContext = args[ 0 ];
+
+				const details = {
+					scene: this.renderer.inspector.currentRender.name || 'unknown',
+					camera: renderContext.camera.name || renderContext.camera.type
+				};
+
+				if ( renderContext.renderTarget && ! renderContext.renderTarget.isPostProcessingRenderTarget ) {
+
+					Object.assign( details, this.getRenderTargetDetails( renderContext.renderTarget ) );
+
+				} else {
+
+					details.target = 'CanvasTarget';
+
+				}
+
+				return details;
+
+			}
+
+			case 'beginCompute': {
+
+				const details = {
+					compute: this.renderer.inspector.currentCompute.name || 'unknown'
+				};
+
+				return details;
+
+			}
+
+			case 'compute': {
+
+				const computeNode = args[ 1 ];
+				const bindings = args[ 2 ];
+				const dispatchSize = args[ 4 ] || computeNode.dispatchSize || computeNode.count;
+
+				const node = computeNode.name || computeNode.type || 'unknown';
+
+				// bindings
+
+				let bindingsCount = 0;
+
+				if ( bindings ) {
+
+					bindingsCount = bindings.length;
+
+				}
+
+				// dispatch
+
+				let dispatch;
+
+				if ( dispatchSize.isIndirectStorageBufferAttribute ) {
+
+					dispatch = 'indirect';
+
+				} else if ( Array.isArray( dispatchSize ) ) {
+
+					dispatch = dispatchSize.join( ', ' );
+
+				} else {
+
+					dispatch = dispatchSize;
+
+				}
+
+				// details
+
+				return {
+					node,
+					bindings: bindingsCount,
+					dispatch
+				};
+
+			}
+
+			case 'updateBinding': {
+
+				const binding = args[ 0 ];
+
+				return { group: binding.name || 'unknown' };
+
+			}
+
+			case 'clear': {
+
+				const renderContext = args[ 3 ];
+
+				const details = {
+					color: args[ 0 ],
+					depth: args[ 1 ],
+					stencil: args[ 2 ]
+				};
+
+				if ( renderContext.renderTarget && ! renderContext.renderTarget.isPostProcessingRenderTarget ) {
+
+					const renderTargetDetails = this.getRenderTargetDetails( renderContext.renderTarget );
+
+					if ( renderTargetDetails.depth ) {
+
+						renderTargetDetails[ 'depth texture' ] = renderTargetDetails.depth;
+
+						delete renderTargetDetails.depth;
+
+					}
+
+					Object.assign( details, renderTargetDetails );
+
+				} else {
+
+					details.target = 'CanvasTarget';
+
+				}
+
+				return details;
+
+			}
+
+			case 'updateViewport': {
+
+				const renderContext = args[ 0 ];
+				const { x, y, width, height } = renderContext.viewportValue;
+
+				return { x, y, width, height };
+
+			}
+
+			case 'updateScissor': {
+
+				const renderContext = args[ 0 ];
+				const { x, y, width, height } = renderContext.scissorValue;
+
+				return { x, y, width, height };
+
+			}
+
+			case 'createProgram':
+			case 'destroyProgram': {
+
+				const program = args[ 0 ];
+				return { stage: program.stage, name: program.name || 'unknown' };
+
+			}
+
+			case 'createRenderPipeline': {
+
+				const renderObject = args[ 0 ];
+				const details = {
+					object: renderObject.object ? ( renderObject.object.name || renderObject.object.type || 'unknown' ) : 'unknown',
+					material: renderObject.material ? ( renderObject.material.name || renderObject.material.type || 'unknown' ) : 'unknown'
+				};
+
+				return details;
+
+			}
+
+			case 'createComputePipeline':
+			case 'destroyComputePipeline': {
+
+				const pipeline = args[ 0 ];
+				return { name: pipeline.name || 'unknown' };
+
+			}
+
+			case 'createBindings':
+			case 'updateBindings': {
+
+				const bindGroup = args[ 0 ];
+
+				const details = {
+					group: bindGroup.name || 'unknown',
+					count: bindGroup.bindings.length
+				};
+
+				return details;
+
+			}
+
+			case 'createUniformBuffer':
+			case 'destroyUniformBuffer': {
+
+				const binding = args[ 0 ];
+
+				const details = {
+					group: binding.groupNode.name || 'unknown',
+					size: binding.byteLength + ' bytes'
+				};
+
+				if ( binding.name !== details.group ) {
+
+					details.name = binding.name;
+
+				}
+
+				return details;
+
+			}
+
+			case 'createNodeBuilder': {
+
+				const object = args[ 0 ];
+				const details = { object: object.name || object.type || 'unknown' };
+
+				if ( object.material ) {
+
+					details.material = object.material.name || object.material.type || 'unknown';
+
+				}
+
+				return details;
+
+			}
+
+			case 'createAttribute':
+			case 'createIndexAttribute':
+			case 'createStorageAttribute':
+			case 'destroyAttribute':
+			case 'destroyIndexAttribute':
+			case 'destroyStorageAttribute': {
+
+				const attribute = args[ 0 ];
+				const details = {};
+
+				if ( attribute.name ) details.name = attribute.name;
+				if ( attribute.count !== undefined ) details.count = attribute.count;
+				if ( attribute.itemSize !== undefined ) details.itemSize = attribute.itemSize;
+
+				return details;
+
+			}
+
+			case 'copyFramebufferToTexture': {
+
+				const target = args[ 0 ];
+				const rectangle = args[ 2 ];
+
+				const details = {
+					target: this.getTextureName( target ),
+					width: rectangle.z,
+					height: rectangle.w
+				};
+
+				return details;
+
+			}
+
+			case 'copyTextureToTexture': {
+
+				const srcTexture = args[ 0 ];
+				const dstTexture = args[ 1 ];
+
+				const details = {
+					source: this.getTextureName( srcTexture ),
+					destination: this.getTextureName( dstTexture )
+				};
+
+				return details;
+
+			}
+
+			case 'updateSampler': {
+
+				const texture = args[ 0 ];
+
+				const details = {
+					magFilter: this.getTextureFilterName( texture.magFilter ),
+					minFilter: this.getTextureFilterName( texture.minFilter ),
+					wrapS: this.getTextureWrapName( texture.wrapS ),
+					wrapT: this.getTextureWrapName( texture.wrapT ),
+					anisotropy: texture.anisotropy
+				};
+
+				return details;
+
+			}
+
+			case 'updateTexture':
+			case 'generateMipmaps':
+			case 'createTexture':
+			case 'destroyTexture': {
+
+				const texture = args[ 0 ];
+				const name = this.getTextureName( texture );
+				const details = { texture: name };
+
+				if ( texture.image ) {
+
+					if ( texture.image.width !== undefined ) details.width = texture.image.width;
+					if ( texture.image.height !== undefined ) details.height = texture.image.height;
+
+				}
+
+				return details;
+
+			}
+
+		}
+
+		return null;
+
+	}
+
+	getTextureName( texture ) {
+
+		if ( texture.name ) return texture.name;
+
+		const types = [
+			'isFramebufferTexture', 'isDepthTexture', 'isDataArrayTexture',
+			'isData3DTexture', 'isDataTexture', 'isCompressedArrayTexture',
+			'isCompressedTexture', 'isCubeTexture', 'isVideoTexture',
+			'isCanvasTexture', 'isTexture'
+		];
+
+		for ( const type of types ) {
+
+			if ( texture[ type ] ) return type.replace( 'is', '' );
+
+		}
+
+		return 'Texture';
+
+	}
+
+	getTextureFilterName( filter ) {
+
+		const filters = {
+			1003: 'Nearest',
+			1004: 'NearestMipmapNearest',
+			1005: 'NearestMipmapLinear',
+			1006: 'Linear',
+			1007: 'LinearMipmapNearest',
+			1008: 'LinearMipmapLinear'
+		};
+
+		return filters[ filter ] || filter;
+
+	}
+
+	getTextureWrapName( wrap ) {
+
+		const wrappings = {
+			1000: 'Repeat',
+			1001: 'ClampToEdge',
+			1002: 'MirroredRepeat'
+		};
+
+		return wrappings[ wrap ] || wrap;
+
+	}
+
+	formatDetails( details ) {
+
+		const parts = [];
+
+		for ( const key in details ) {
+
+			if ( details[ key ] !== undefined ) {
+
+				parts.push( `<span style="opacity: 0.5">${key}:</span> <span style="color: var(--text-secondary); opacity: 1">${details[ key ]}</span>` );
+
+			}
+
+		}
+
+		if ( parts.length === 0 ) return '';
+
+		return `<span style="font-size: 11px; margin-left: 8px; color: var(--text-secondary); opacity: 1;">{ ${parts.join( '<span style="opacity: 0.5">, </span>' )} }</span>`;
 
 	}
 
@@ -660,6 +1278,7 @@ class Timeline extends Tab {
 		// Reset graph safely to fit recorded frames exactly up to maxPoints
 		this.graph.lines[ 'calls' ].points = [];
 		this.graph.lines[ 'fps' ].points = [];
+		this.graph.lines[ 'triangles' ].points = [];
 		this.graph.resetLimit();
 
 		// If recorded frames exceed SVG Graph maxPoints, we sample/slice it
@@ -673,11 +1292,28 @@ class Timeline extends Tab {
 
 		}
 
+		let maxTriangles = 0;
+
 		for ( let i = 0; i < framesToRender.length; i ++ ) {
+
+			const t = framesToRender[ i ].triangles || 0;
+			if ( t > maxTriangles ) {
+
+				maxTriangles = t;
+
+			}
+
+		}
+
+		for ( let i = 0; i < framesToRender.length; i ++ ) {
+
+			const t = framesToRender[ i ].triangles || 0;
+			const normalizedTriangles = maxTriangles > 0 ? ( t / maxTriangles ) * TRIANGLES_GRAPH_LIMIT : 0;
 
 			// Adding calls length to the Graph SVG to visualize workload geometry
 			this.graph.addPoint( 'calls', framesToRender[ i ].calls.length );
 			this.graph.addPoint( 'fps', framesToRender[ i ].fps || 0 );
+			this.graph.addPoint( 'triangles', normalizedTriangles );
 
 		}
 
@@ -703,6 +1339,8 @@ class Timeline extends Tab {
 
 	selectFrame( index ) {
 
+		if ( this.isRecording ) return;
+
 		if ( index < 0 || index >= this.frames.length ) return;
 
 		this.selectedFrameIndex = index;
@@ -711,7 +1349,18 @@ class Timeline extends Tab {
 		this.renderTimelineTrack( frame );
 
 		// Update UI texts
-		this.frameInfo.textContent = 'Frame: ' + frame.id + ' [' + frame.calls.length + ' calls] [' + ( frame.fps || 0 ).toFixed( 1 ) + ' FPS]';
+		const panelWidth = this.content.offsetWidth;
+
+		const isCompact = panelWidth < 800;
+		const frameLabel = isCompact ? '' : 'Frame: ';
+		const fpsSuffix = isCompact ? '' : ' FPS';
+		const callsSuffix = isCompact ? '' : ' calls';
+		const trianglesSuffix = isCompact ? '' : ' triangles';
+
+		const group = ( c, text ) => `<span style="display:inline-flex;align-items:center;margin-left:12px;flex-shrink:0;"><span style="width:6px;height:6px;border-radius:50%;background-color:${c};margin-right:6px;flex-shrink:0;"></span>${text}</span>`;
+		const maxTriangles = Math.max( this.baseTriangles, frame.triangles || 0 );
+		const trianglesText = isCompact ? ( frame.triangles || 0 ) : ( frame.triangles || 0 ) + ' / ' + maxTriangles + trianglesSuffix;
+		this.frameInfo.innerHTML = frameLabel + frame.id + group( 'var(--color-fps)', ( frame.fps || 0 ).toFixed( 1 ) + fpsSuffix ) + group( 'var(--color-call)', frame.calls.length + callsSuffix ) + group( 'var(--color-red)', trianglesText );
 
 		// Update playhead position
 		const rect = this.graphSlider.getBoundingClientRect();
@@ -744,20 +1393,228 @@ class Timeline extends Tab {
 
 	}
 
+	createBlock() {
+
+		const block = document.createElement( 'div' );
+		block.style.display = 'flex';
+		block.style.alignItems = 'center';
+		block.style.padding = '4px 8px';
+		block.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
+		block.style.fontFamily = 'monospace';
+		block.style.fontSize = '12px';
+		block.style.color = 'var(--text-primary)';
+		block.style.overflow = 'hidden';
+		block.style.position = 'absolute';
+		block.style.left = '0';
+		block.style.right = '0';
+		block.style.height = '24px';
+		block.style.boxSizing = 'border-box';
+
+		block.arrow = document.createElement( 'span' );
+		block.arrow.style.fontSize = '10px';
+		block.arrow.style.marginRight = '8px';
+		block.arrow.style.cursor = 'pointer';
+		block.arrow.style.width = '35px';
+		block.arrow.style.textAlign = 'center';
+		block.arrow.style.flexShrink = '0';
+		block.arrow.style.whiteSpace = 'nowrap';
+		block.appendChild( block.arrow );
+
+		block.titleSpan = document.createElement( 'span' );
+		block.titleSpan.style.flex = '1';
+		block.titleSpan.style.minWidth = '0';
+		block.titleSpan.style.overflow = 'hidden';
+		block.titleSpan.style.textOverflow = 'ellipsis';
+		block.titleSpan.style.whiteSpace = 'nowrap';
+		block.appendChild( block.titleSpan );
+
+		block.addEventListener( 'click', ( e ) => {
+
+			if ( ! block._groupId ) return;
+
+			e.stopPropagation();
+
+			if ( this.collapsedGroups.has( block._groupId ) ) {
+
+				this.collapsedGroups.delete( block._groupId );
+
+			} else {
+
+				this.collapsedGroups.add( block._groupId );
+
+			}
+
+			this.renderTimelineTrack( this.frames[ this.selectedFrameIndex ] );
+
+		} );
+
+		return block;
+
+	}
+
+	clearActiveBlocks() {
+
+		if ( this.activeBlocks ) {
+
+			for ( const block of this.activeBlocks.values() ) {
+
+				block.remove();
+				this.domPool.push( block );
+
+			}
+
+			this.activeBlocks.clear();
+
+		}
+
+	}
+
+	updateVisibleBlocks() {
+
+		if ( ! this.flatList || this.flatList.length === 0 ) {
+
+			this.clearActiveBlocks();
+			return;
+
+		}
+
+		const ROW_HEIGHT = 26;
+		const BUFFER_ROWS = 5;
+
+		const scrollTop = this.timelineTrack.scrollTop;
+		const viewportHeight = this.timelineTrack.clientHeight;
+
+		let startIndex = Math.floor( scrollTop / ROW_HEIGHT ) - BUFFER_ROWS;
+		let endIndex = Math.ceil( ( scrollTop + viewportHeight ) / ROW_HEIGHT ) + BUFFER_ROWS;
+
+		startIndex = Math.max( 0, startIndex );
+		endIndex = Math.min( this.flatList.length - 1, endIndex );
+
+		const nextActiveBlocks = new Map();
+
+		for ( const [ index, block ] of this.activeBlocks.entries() ) {
+
+			if ( index < startIndex || index > endIndex ) {
+
+				block.remove();
+				this.domPool.push( block );
+
+			} else {
+
+				nextActiveBlocks.set( index, block );
+
+			}
+
+		}
+
+		this.activeBlocks = nextActiveBlocks;
+
+		for ( let i = startIndex; i <= endIndex; i ++ ) {
+
+			let block = this.activeBlocks.get( i );
+
+			if ( ! block ) {
+
+				block = this.domPool.pop() || this.createBlock();
+				this.timelineContent.appendChild( block );
+				this.activeBlocks.set( i, block );
+
+			}
+
+			const item = this.flatList[ i ];
+			const call = item.call;
+
+			block.style.top = ( i * ROW_HEIGHT ) + 'px';
+			block.style.marginLeft = ( item.indent * 24 ) + 'px';
+			block.style.borderLeft = '4px solid ' + this.getColorForMethod( call.method );
+			block._groupId = item.groupId;
+
+			const directInfoIcon = block.querySelector( ':scope > .info-icon' );
+			if ( directInfoIcon ) {
+
+				directInfoIcon.remove();
+
+			}
+
+			block.titleSpan.textContent = '';
+
+			const methodSpan = document.createElement( 'span' );
+			methodSpan.textContent = call.method;
+			block.titleSpan.appendChild( methodSpan );
+
+			if ( call.details ) {
+
+				let tooltipText = `### ${call.method}\n`;
+				for ( const key in call.details ) {
+
+					if ( call.details[ key ] !== undefined ) {
+
+						tooltipText += `**${key}**: ${call.details[ key ]}\n`;
+
+					}
+
+				}
+
+				const infoIcon = info( block.titleSpan, tooltipText );
+				infoIcon.style.flexShrink = '0';
+				infoIcon.style.marginLeft = '6px';
+				infoIcon.style.display = 'inline-flex';
+				infoIcon.style.verticalAlign = 'middle';
+
+			}
+
+			const detailsAndCountSpan = document.createElement( 'span' );
+			let detailsAndCountHTML = ( call.formatedDetails ? call.formatedDetails : '' );
+			if ( call.count > 1 ) {
+
+				detailsAndCountHTML += ` <span style="opacity: 0.5">( ${call.count} )</span>`;
+
+			}
+
+			if ( detailsAndCountHTML ) {
+
+				detailsAndCountSpan.innerHTML = detailsAndCountHTML;
+				block.titleSpan.appendChild( detailsAndCountSpan );
+
+			}
+
+			if ( item.groupId ) {
+
+				block.style.cursor = 'pointer';
+				block.arrow.style.display = 'inline-block';
+				block.arrow.textContent = item.isCollapsed ? '[ + ]' : '[ - ]';
+
+			} else {
+
+				block.style.cursor = 'default';
+				block.arrow.style.display = 'none';
+
+			}
+
+		}
+
+	}
+
 	renderTimelineTrack( frame ) {
 
-		this.timelineTrack.innerHTML = '';
+		if ( this.isRecording ) return;
 
-		if ( ! frame || frame.calls.length === 0 ) return;
+		this.flatList = [];
 
-		// Track collapsed states
+		if ( ! frame || frame.calls.length === 0 ) {
+
+			this.clearActiveBlocks();
+			this.timelineContent.innerHTML = '';
+			this.timelineContent.style.height = '0px';
+			return;
+
+		}
+
 		if ( ! this.collapsedGroups ) {
 
 			this.collapsedGroups = new Set();
 
 		}
-
-		const frag = document.createDocumentFragment();
 
 		if ( this.isHierarchicalView ) {
 
@@ -768,14 +1625,15 @@ class Timeline extends Tab {
 
 				const call = frame.calls[ i ];
 				const isStructural = call.method.startsWith( 'begin' ) || call.method.startsWith( 'finish' );
+				const formatedDetails = call.details ? this.formatDetails( call.details ) : '';
 
-				if ( currentGroup && currentGroup.method === call.method && ! isStructural ) {
+				if ( currentGroup && currentGroup.method === call.method && currentGroup.formatedDetails === formatedDetails && ! isStructural ) {
 
 					currentGroup.count ++;
 
 				} else {
 
-					currentGroup = { method: call.method, count: 1 };
+					currentGroup = { method: call.method, count: 1, formatedDetails, target: call.target, details: call.details };
 					groupedCalls.push( currentGroup );
 
 				}
@@ -783,93 +1641,55 @@ class Timeline extends Tab {
 			}
 
 			let currentIndent = 0;
-			const indentSize = 24;
-
-			// Stack to keep track of parent elements and their collapsed state
-			const elementStack = [ { element: frag, isCollapsed: false, id: '' } ];
+			const elementStack = [ { isCollapsed: false, id: '', beginCount: 0 } ];
+			const instanceCounts = new WeakMap();
 
 			for ( let i = 0; i < groupedCalls.length; i ++ ) {
 
 				const call = groupedCalls[ i ];
+				let instanceIndex = 0;
 
-				const block = document.createElement( 'div' );
-				block.style.padding = '4px 8px';
-				block.style.margin = '2px 0';
-				block.style.marginLeft = ( currentIndent * indentSize ) + 'px';
-				block.style.borderLeft = '4px solid ' + this.getColorForMethod( call.method );
-				block.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
-				block.style.fontFamily = 'monospace';
-				block.style.fontSize = '12px';
-				block.style.color = 'var(--text-primary)';
-				block.style.whiteSpace = 'nowrap';
-				block.style.overflow = 'hidden';
-				block.style.textOverflow = 'ellipsis';
-				block.style.display = 'flex';
-				block.style.alignItems = 'center';
+				if ( call.target && typeof call.target === 'object' ) {
+
+					instanceIndex = instanceCounts.get( call.target ) || 0;
+					instanceCounts.set( call.target, instanceIndex + 1 );
+
+				}
 
 				const currentParent = elementStack[ elementStack.length - 1 ];
 
-				// Only add to DOM if parent is not collapsed
+				let groupId = null;
+				let isCollapsed = false;
+
+				if ( call.method.startsWith( 'begin' ) ) {
+
+					const beginIndex = currentParent.beginCount ++;
+					groupId = currentParent.id + '/' + call.method + '-' + beginIndex;
+					isCollapsed = this.collapsedGroups.has( groupId );
+
+				}
+
 				if ( ! currentParent.isCollapsed ) {
 
-					frag.appendChild( block );
+					this.flatList.push( {
+						call,
+						indent: currentIndent,
+						groupId,
+						isCollapsed,
+						instanceIndex
+					} );
 
 				}
 
 				if ( call.method.startsWith( 'begin' ) ) {
 
-					const groupId = currentParent.id + '/' + call.method + '-' + i;
-					const isCollapsed = this.collapsedGroups.has( groupId );
-
-					// Add toggle arrow
-					const arrow = document.createElement( 'span' );
-					arrow.textContent = isCollapsed ? '[ + ]' : '[ - ]';
-					arrow.style.fontSize = '10px';
-					arrow.style.marginRight = '10px';
-					arrow.style.cursor = 'pointer';
-					arrow.style.width = '26px';
-					arrow.style.display = 'inline-block';
-					arrow.style.textAlign = 'center';
-					block.appendChild( arrow );
-
-					block.style.cursor = 'pointer';
-
-					// Title
-					const title = document.createElement( 'span' );
-					title.textContent = call.method + ( call.count > 1 ? ` ( ${call.count} )` : '' );
-					block.appendChild( title );
-
-					block.addEventListener( 'click', ( e ) => {
-
-						e.stopPropagation();
-						if ( isCollapsed ) {
-
-							this.collapsedGroups.delete( groupId );
-
-						} else {
-
-							this.collapsedGroups.add( groupId );
-
-						}
-
-						// Re-render to apply changes
-						this.renderTimelineTrack( this.frames[ this.selectedFrameIndex ] );
-
-					} );
-
 					currentIndent ++;
-					elementStack.push( { element: block, isCollapsed: currentParent.isCollapsed || isCollapsed, id: groupId } );
+					elementStack.push( { isCollapsed: currentParent.isCollapsed || isCollapsed, id: groupId, beginCount: 0 } );
 
 				} else if ( call.method.startsWith( 'finish' ) ) {
 
-					block.textContent = call.method + ( call.count > 1 ? ` ( ${call.count} )` : '' );
-
 					currentIndent = Math.max( 0, currentIndent - 1 );
 					elementStack.pop();
-
-				} else {
-
-					block.textContent = call.method + ( call.count > 1 ? ` ( ${call.count} )` : '' );
 
 				}
 
@@ -896,27 +1716,21 @@ class Timeline extends Tab {
 
 				const call = sortedCalls[ i ];
 
-				const block = document.createElement( 'div' );
-				block.style.padding = '4px 8px';
-				block.style.margin = '2px 0';
-				block.style.borderLeft = '4px solid ' + this.getColorForMethod( call.method );
-				block.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
-				block.style.fontFamily = 'monospace';
-				block.style.fontSize = '12px';
-				block.style.color = 'var(--text-primary)';
-				block.style.whiteSpace = 'nowrap';
-				block.style.overflow = 'hidden';
-				block.style.textOverflow = 'ellipsis';
-
-				block.textContent = call.method + ( call.count > 1 ? ` ( ${call.count} )` : '' );
-
-				frag.appendChild( block );
+				this.flatList.push( {
+					call,
+					indent: 0,
+					groupId: null,
+					isCollapsed: false,
+					instanceIndex: 0
+				} );
 
 			}
 
 		}
 
-		this.timelineTrack.appendChild( frag );
+		const ROW_HEIGHT = 26;
+		this.timelineContent.style.height = ( this.flatList.length * ROW_HEIGHT ) + 'px';
+		this.updateVisibleBlocks();
 
 	}
 

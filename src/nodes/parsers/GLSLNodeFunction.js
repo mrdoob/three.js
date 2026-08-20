@@ -95,7 +95,7 @@ const parse = ( source ) => {
 
 	} else {
 
-		throw new Error( 'FunctionNode: Function is not a GLSL code.' );
+		throw new Error( 'THREE.FunctionNode: Function is not a GLSL code.' );
 
 	}
 

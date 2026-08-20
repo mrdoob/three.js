@@ -40,7 +40,7 @@ Must be set to `true` when the output node changes.
 
 Whether the default output tone mapping and color space transformation should be enabled or not.
 
-It is enabled by default by it must be disabled when effects must be executed after tone mapping and color space conversion. A typical example is FXAA which requires sRGB input.
+This is enabled by default but it must be disabled for effects that expect to be executed after tone mapping and color space conversion. A typical example is FXAA which requires sRGB input.
 
 When set to `false`, the app must control the output transformation with `RenderOutputNode`.
 

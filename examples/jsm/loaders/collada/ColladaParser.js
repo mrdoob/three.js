@@ -140,7 +140,8 @@ class ColladaParser {
 			visualScenes: {},
 			kinematicsModels: {},
 			physicsModels: {},
-			kinematicsScenes: {}
+			kinematicsScenes: {},
+			joints: {}
 		};
 
 		this.library = library;
@@ -157,6 +158,7 @@ class ColladaParser {
 		this.parseLibrary( collada, 'library_geometries', 'geometry', this.parseGeometry.bind( this ) );
 		this.parseLibrary( collada, 'library_nodes', 'node', this.parseNode.bind( this ) );
 		this.parseLibrary( collada, 'library_visual_scenes', 'visual_scene', this.parseVisualScene.bind( this ) );
+		this.parseLibrary( collada, 'library_joints', 'joint', this.parseLibraryJoint.bind( this ) );
 		this.parseLibrary( collada, 'library_kinematics_models', 'kinematics_model', this.parseKinematicsModel.bind( this ) );
 		this.parseLibrary( collada, 'library_physics_models', 'physics_model', this.parsePhysicsModel.bind( this ) );
 		this.parseLibrary( collada, 'scene', 'instance_kinematics_scene', this.parseKinematicsScene.bind( this ) );
@@ -1231,9 +1233,6 @@ class ColladaParser {
 					break;
 
 				case 'polygons':
-					console.warn( 'THREE.ColladaLoader: Unsupported primitive type: ', child.nodeName );
-					break;
-
 				case 'lines':
 				case 'linestrips':
 				case 'polylist':
@@ -1353,11 +1352,23 @@ class ColladaParser {
 
 		}
 
+		if ( primitive.type === 'polygons' ) {
+
+			primitive.vcount = [ primitive.p.length / primitive.stride ];
+
+		}
+
 		return primitive;
 
 	}
 
 	// kinematics
+
+	parseLibraryJoint( xml ) {
+
+		this.library.joints[ xml.getAttribute( 'id' ) ] = this.parseKinematicsJoint( xml );
+
+	}
 
 	parseKinematicsModel( xml ) {
 
@@ -1399,6 +1410,10 @@ class ColladaParser {
 
 				case 'joint':
 					data.joints[ child.getAttribute( 'sid' ) ] = this.parseKinematicsJoint( child );
+					break;
+
+				case 'instance_joint':
+					data.joints[ child.getAttribute( 'sid' ) ] = this.library.joints[ parseId( child.getAttribute( 'url' ) ) ];
 					break;
 
 				case 'link':

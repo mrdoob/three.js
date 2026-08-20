@@ -1426,7 +1426,7 @@ when <a href="Object3D.html#matrixWorldNeedsUpdate">Object3D#matrixWorldNeedsUpd
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="updateWorldMatrix" translate="no">.<a href="#updateWorldMatrix">updateWorldMatrix</a><span class="signature">( updateParents : <span class="param-type">boolean</span>, updateChildren : <span class="param-type">boolean</span> )</span> </h3>
+					<h3 class="name name-method" id="updateWorldMatrix" translate="no">.<a href="#updateWorldMatrix">updateWorldMatrix</a><span class="signature">( updateParents : <span class="param-type">boolean</span>, updateChildren : <span class="param-type">boolean</span>, force : <span class="param-type">boolean</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>An alternative version of <a href="Object3D.html#updateMatrixWorld">Object3D#updateMatrixWorld</a> with more control over the
@@ -1449,6 +1449,16 @@ update of ancestor and descendant nodes.</p>
 									</td>
 									<td class="description last">
 										<p>Whether descendant nodes should be updated or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">force</strong>
+									</td>
+									<td class="description last">
+										<p>When set to <code>true</code>, a recomputation of world matrices is forced even
+when <a href="Object3D.html#matrixWorldNeedsUpdate">Object3D#matrixWorldNeedsUpdate</a> is <code>false</code>.</p>
 										<p>Default is <code>false</code>.</p>
 									</td>
 								</tr>

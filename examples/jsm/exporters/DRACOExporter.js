@@ -15,9 +15,15 @@ import { Color, ColorManagement, SRGBColorSpace } from 'three';
  * inside of a glTF file. A normal glTF file can be converted to a Draco-compressed glTF file
  * using [glTF-Pipeline](https://github.com/AnalyticalGraphicsInc/gltf-pipeline).
  *
+ * The exporter requires the Draco encoder to be loaded as a global script in advance:
+ *
+ * ```html
+ * <script src="https://cdn.jsdelivr.net/gh/google/draco@1.5.7/javascript/draco_encoder.js"></script>
+ * ```
+ *
  * ```js
  * const exporter = new DRACOExporter();
- * const data = exporter.parse( mesh, options );
+ * const data = await exporter.parseAsync( mesh, options );
  * ```
  *
  * @three_import import { DRACOExporter } from 'three/addons/exporters/DRACOExporter.js';
@@ -27,11 +33,12 @@ class DRACOExporter {
 	/**
 	 * Parses the given mesh or point cloud and generates the Draco output.
 	 *
+	 * @async
 	 * @param {(Mesh|Points)} object - The mesh or point cloud to export.
 	 * @param {DRACOExporter~Options} options - The export options.
-	 * @return {Int8Array} The exported Draco.
+	 * @return {Promise<Int8Array>} A Promise that resolves with the exported Draco.
 	 */
-	parse( object, options = {} ) {
+	async parseAsync( object, options = {} ) {
 
 		options = Object.assign( {
 			decodeSpeed: 5,
@@ -43,7 +50,7 @@ class DRACOExporter {
 			exportColor: false,
 		}, options );
 
-		if ( DracoEncoderModule === undefined ) {
+		if ( typeof DracoEncoderModule === 'undefined' ) {
 
 			throw new Error( 'THREE.DRACOExporter: required the draco_encoder to work.' );
 
@@ -51,7 +58,12 @@ class DRACOExporter {
 
 		const geometry = object.geometry;
 
-		const dracoEncoder = DracoEncoderModule();
+		let dracoEncoder = DracoEncoderModule();
+
+		// older encoder builds expose the module synchronously, newer builds return a promise
+
+		if ( dracoEncoder.Encoder === undefined ) dracoEncoder = await dracoEncoder;
+
 		const encoder = new dracoEncoder.Encoder();
 		let builder;
 		let dracoObject;
@@ -146,7 +158,7 @@ class DRACOExporter {
 
 		} else {
 
-			throw new Error( 'DRACOExporter: Unsupported object type.' );
+			throw new Error( 'THREE.DRACOExporter: Unsupported object type.' );
 
 		}
 
@@ -219,6 +231,15 @@ class DRACOExporter {
 		dracoEncoder.destroy( builder );
 
 		return outputData;
+
+	}
+
+	/**
+	 * @deprecated Use {@link DRACOExporter#parseAsync} instead.
+	 */
+	parse() {
+
+		throw new Error( 'THREE.DRACOExporter: parse() has been replaced by parseAsync().' );
 
 	}
 

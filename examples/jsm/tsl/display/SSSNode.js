@@ -1,5 +1,5 @@
 import { RedFormat, RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType, UnsignedByteType } from 'three/webgpu';
-import { reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, float, Break, Loop, int, max, abs, If, interleavedGradientNoise, screenCoordinate, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, lightPosition, lightTargetPosition, fract, rand, mix } from 'three/tsl';
+import { reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, float, Break, Loop, int, max, abs, If, interleavedGradientNoise, screenCoordinate, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, lightPosition, lightTargetPosition, fract, rand, mix, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -30,7 +30,7 @@ let _rendererState;
  *
  * - Ideally the maximum shadow length should not exceed `1` meter. Otherwise the effect gets
  * computationally very expensive since more samples during the ray marching process are evaluated.
- * You can mitigate this issue by reducing the `quality` paramter.
+ * You can mitigate this issue by reducing the `quality` parameter.
  * - The effect can only be used with a single directional light, the main light of your scene.
  * This main light usually represents the sun or daylight.
  * - Like other Screen-Space techniques SSS can only honor objects in the shadowing computation that
@@ -121,7 +121,7 @@ class SSSNode extends TempNode {
 
 		/**
 		 * Whether to use temporal filtering or not. Setting this property to
-		 * `true` requires the usage of `TRAANode`. This will help to reduce noice
+		 * `true` requires the usage of `TRAANode`. This will help to reduce noise
 		 * although it introduces typical TAA artifacts like ghosting and temporal
 		 * instabilities.
 		 *
@@ -454,7 +454,8 @@ class SSSNode extends TempNode {
 
 		} );
 
-		this._material.fragmentNode = sss().context( builder.getSharedContext() );
+		this._material.contextNode = context( builder.getSharedContext() );
+		this._material.fragmentNode = sss();
 		this._material.needsUpdate = true;
 
 		return this._textureNode;

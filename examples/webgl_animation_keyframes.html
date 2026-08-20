@@ -4,6 +4,10 @@
 		<title>three.js webgl - animation - keyframes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - animation - keyframes">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_animation_keyframes.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_animation_keyframes.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
@@ -46,7 +50,7 @@
 			import { Sky } from 'three/addons/objects/Sky.js';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { DRACOLoader, DRACO_GLTF_CONFIG } from 'three/addons/loaders/DRACOLoader.js';
 
 			let mixer;
 
@@ -91,7 +95,7 @@
 			controls.update();
 
 			const dracoLoader = new DRACOLoader();
-			dracoLoader.setDecoderPath( 'jsm/libs/draco/gltf/' );
+			dracoLoader.setDecoderPath( DRACO_GLTF_CONFIG );
 
 			const loader = new GLTFLoader();
 			loader.setDRACOLoader( dracoLoader );

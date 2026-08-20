@@ -18,6 +18,16 @@ The loading manager.
 
 ## Methods
 
+### .createDataTexture( buffer : ArrayBuffer ) : DataTexture
+
+Parses the given buffer and returns a configured data texture. Use this method for parsing texture data that is already in memory (e.g. drag and drop or data loaded from a server) without going through [DataTextureLoader#load](DataTextureLoader.html#load).
+
+**buffer**
+
+The raw texture data.
+
+**Returns:** The data texture.
+
 ### .load( url : string, onLoad : function, onProgress : onProgressCallback, onError : onErrorCallback ) : DataTexture
 
 Starts loading from the given URL and passes the loaded data texture to the `onLoad()` callback. The method also returns a new texture object which can directly be used for material creation. If you do it this way, the texture may pop up in your scene once the respective loading process is finished.

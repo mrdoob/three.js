@@ -30,12 +30,6 @@ Default is `null`.
 
 ## Properties
 
-### .activeLook : boolean
-
-Whether it's possible to look around or not.
-
-Default is `true`.
-
 ### .autoForward : boolean
 
 Whether the camera is automatically moved forward or not.
@@ -47,6 +41,12 @@ Default is `false`.
 Whether or not looking around is vertically constrained by `verticalMin` and `verticalMax`.
 
 Default is `false`.
+
+### .dampingFactor : number
+
+How quickly the movement and look velocity catches up to the input. Lower values feel heavier (more inertia), `1` disables damping.
+
+Default is `0.1`.
 
 ### .heightCoef : number
 
@@ -111,8 +111,6 @@ Default is `0`.
 ## Methods
 
 ### .handleResize()
-
-Must be called if the application window is resized.
 
 ### .lookAt( x : number | Vector3, y : number, z : number ) : FirstPersonControls
 

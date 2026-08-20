@@ -14,7 +14,7 @@
 		<section>
 			<header>
 				<div class="class-description"><p>A loader for the OpenEXR texture format.</p>
-<p><code>EXRLoader</code> currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression.
+<p><code>EXRLoader</code> currently supports uncompressed, ZIP(S), RLE, PIZ, B44/A and DWA/B compression.
 Supports reading as UnsignedByte, HalfFloat and Float type data texture.</p></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const loader = new EXRLoader();
@@ -52,6 +52,13 @@ const texture = await loader.loadAsync( 'textures/memorial.exr' );
 					<div class="description">
 						<p>Texture output format.</p>
 						<p>Default is <code>RGBAFormat</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="part" translate="no">.<a href="#part">part</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>For multi-part EXR files, the index of the part to load.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -120,6 +127,27 @@ const texture = await loader.loadAsync( 'textures/memorial.exr' );
 									</td>
 									<td class="description last">
 										<p>Texture output format.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setPart" translate="no">.<a href="#setPart">setPart</a><span class="signature">( value : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="EXRLoader.html">EXRLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>For multi-part EXR files, sets which part to load.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">value</strong>
+									</td>
+									<td class="description last">
+										<p>The part index to load.</p>
 									</td>
 								</tr>
 							</tbody>

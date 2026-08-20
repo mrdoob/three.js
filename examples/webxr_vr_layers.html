@@ -4,6 +4,10 @@
 		<title>three.js vr - layers</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<meta property="og:title" content="three.js vr - layers">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webxr_vr_layers.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webxr_vr_layers.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -401,7 +405,7 @@
 
 					const glayer = xr.getBinding().getSubImage( quadLayerPlain, frame );
 					renderer.state.bindTexture( gl.TEXTURE_2D, glayer.colorTexture );
-					gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
+					renderer.state.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
 					gl.texSubImage2D( gl.TEXTURE_2D, 0,
 						( snellenConfig.textureSizePx - snellenConfig.widthPx ) / 2,
 						( snellenConfig.textureSizePx - snellenConfig.heightPx ) / 2,
@@ -415,7 +419,7 @@
 
 					const glayer = xr.getBinding().getSubImage( quadLayerMips, frame );
 					renderer.state.bindTexture( gl.TEXTURE_2D, glayer.colorTexture );
-					gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
+					renderer.state.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
 					gl.texSubImage2D( gl.TEXTURE_2D, 0,
 						( snellenConfig.textureSizePx - snellenConfig.widthPx ) / 2,
 						( snellenConfig.textureSizePx - snellenConfig.heightPx ) / 2,
@@ -430,7 +434,7 @@
 
 					const glayer = xr.getBinding().getSubImage( guiLayer, frame );
 					renderer.state.bindTexture( gl.TEXTURE_2D, glayer.colorTexture );
-					gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
+					renderer.state.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
 					const canvas = guiMesh.material.map.image;
 					gl.texSubImage2D( gl.TEXTURE_2D, 0, 0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, canvas );
 					guiLayer.needsUpdate = false;

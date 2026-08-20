@@ -204,7 +204,11 @@ class CCDIKSolver {
 
 					if ( c > 1.0 ) c = 1.0;
 
-					const c2 = math.sqrt( 1 - c * c );
+					// preserve sign of the rotation along the limitation axis,
+					// otherwise negative rotations get mirrored to positive
+					const dot = link.quaternion.x * limitation.x + link.quaternion.y * limitation.y + link.quaternion.z * limitation.z;
+					const sign = dot < 0 ? - 1 : 1;
+					const c2 = sign * math.sqrt( 1 - c * c );
 					link.quaternion.set( limitation.x * c2,
 					                     limitation.y * c2,
 					                     limitation.z * c2,

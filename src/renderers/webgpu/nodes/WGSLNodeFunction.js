@@ -50,6 +50,7 @@ const wgslTypeLib = {
 	'mat4x4f': 'mat4',
 
 	'sampler': 'sampler',
+	'sampler_comparison': 'samplerComparison',
 
 	'texture_1d': 'texture',
 
@@ -138,7 +139,7 @@ const parse = ( source ) => {
 
 	} else {
 
-		throw new Error( 'FunctionNode: Function is not a WGSL code.' );
+		throw new Error( 'THREE.WGSLNodeFunction: Function is not a WGSL code.' );
 
 	}
 

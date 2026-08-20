@@ -26,7 +26,7 @@
 			}
 		</script>
 
-		<script src="../examples/jsm/libs/draco/draco_encoder.js"></script>
+		<script src="https://cdn.jsdelivr.net/gh/google/draco@1.5.7/javascript/draco_encoder.js"></script>
 
 		<link rel="stylesheet" href="js/libs/codemirror/codemirror.css">
 		<link rel="stylesheet" href="js/libs/codemirror/theme/monokai.css">
@@ -54,7 +54,6 @@
 		<script src="js/libs/ternjs/comment.js"></script>
 		<script src="js/libs/ternjs/infer.js"></script>
 		<script src="js/libs/ternjs/doc_comment.js"></script>
-		<script src="js/libs/tern-threejs/threejs.js"></script>
 		<script src="js/libs/signals.min.js"></script>
 
 		<script type="module">
@@ -72,6 +71,8 @@
 			import { AnimationResizer } from './js/AnimationResizer.js';
 			import { Animation } from './js/Animation.js';
 
+			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+
 			window.URL = window.URL || window.webkitURL;
 			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
 
@@ -81,6 +82,8 @@
 
 			window.editor = editor; // Expose editor to Console
 			window.THREE = THREE; // Expose THREE to APP Scripts and Console
+
+			THREE.ObjectLoader.registerGeometry( 'TextGeometry', TextGeometry );
 
 			const viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );
@@ -192,6 +195,7 @@
 
 				const signals = editor.signals;
 
+				signals.cameraResetted.add( saveState );
 				signals.geometryChanged.add( saveState );
 				signals.objectAdded.add( saveState );
 				signals.objectChanged.add( saveState );

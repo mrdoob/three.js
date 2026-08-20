@@ -4,6 +4,10 @@
 		<title>three.js webgl - lines - fat</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - lines - fat">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_lines_fat.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_lines_fat.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -196,8 +200,8 @@
 				const param = {
 					'line type': 0,
 					'world units': false,
-					'width': 5,
-					'alphaToCoverage': true,
+					'width': 10,
+					'alphaToCoverage': false,
 					'dashed': false,
 					'dash scale': 1,
 					'dash / gap': 1
@@ -228,10 +232,20 @@
 				gui.add( param, 'world units' ).onChange( function ( val ) {
 
 					matLine.worldUnits = val;
+					matLine.needsUpdate = true;
+
+					if ( val ) {
+
+						widthController.name( 'width (world units)' ).min( 0.1 ).max( 0.5 ).setValue( 0.5 );
+
+					} else {
+
+						widthController.name( 'width (pixels)' ).min( 1 ).max( 10 ).setValue( 10 );
+					}
 
 				} );
 
-				gui.add( param, 'width', 1, 10 ).onChange( function ( val ) {
+				const widthController = gui.add( param, 'width', 1, 10 ).name( 'width (pixels)' ).onChange( function ( val ) {
 
 					matLine.linewidth = val;
 

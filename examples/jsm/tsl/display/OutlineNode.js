@@ -366,6 +366,17 @@ class OutlineNode extends TempNode {
 		this._selectionCache = new Set();
 
 		/**
+		 * The number of selected objects from the previous frame. Used to detect
+		 * the transition to an empty selection so the composite render target can
+		 * be cleared once and avoid leaving a stale outline on screen.
+		 *
+		 * @private
+		 * @type {number}
+		 * @default 0
+		 */
+		this._lastSelectionCount = 0;
+
+		/**
 		 * The result of the effect is represented as a separate texture node.
 		 *
 		 * @private
@@ -449,6 +460,35 @@ class OutlineNode extends TempNode {
 		const { renderer } = frame;
 		const { camera, scene } = this;
 
+		this._updateSelectionCache();
+
+		// If no objects are selected, all subsequent passes can be skipped since
+		// the outline would be empty anyway. The composite render target is cleared
+		// once when transitioning to an empty selection so a previously rendered
+		// outline does not linger on screen.
+
+		if ( this._selectionCache.size === 0 ) {
+
+			if ( this._lastSelectionCount > 0 ) {
+
+				_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
+
+				renderer.setRenderTarget( this._renderTargetComposite );
+				renderer.setClearColor( 0x000000, 0 );
+				renderer.clear();
+
+				RendererUtils.restoreRendererState( renderer, _rendererState );
+
+				this._lastSelectionCount = 0;
+
+			}
+
+			return;
+
+		}
+
+		this._lastSelectionCount = this._selectionCache.size;
+
 		_rendererState = RendererUtils.resetRendererAndSceneState( renderer, scene, _rendererState );
 
 		//
@@ -459,8 +499,6 @@ class OutlineNode extends TempNode {
 		//
 
 		renderer.setClearColor( 0xffffff, 1 );
-
-		this._updateSelectionCache();
 
 		const currentSceneName = scene.name;
 

@@ -1,5 +1,6 @@
 import TempNode from '../core/TempNode.js';
-import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
+import { addMethodChaining, nodeObject, vec4 } from '../tsl/TSLCore.js';
+import { premultiplyAlpha, unpremultiplyAlpha } from './PremultiplyAlphaFunctions.js';
 
 import { NoColorSpace, NoToneMapping } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
@@ -108,9 +109,15 @@ class RenderOutputNode extends TempNode {
 
 		let outputNode = this.colorNode || context.color;
 
-		// tone mapping
+		// clamp alpha
+		outputNode = vec4( outputNode.rgb, outputNode.a.clamp( 0.0, 1.0 ) );
 
+		// unpremultiply
+		outputNode = unpremultiplyAlpha( outputNode );
+
+		// tone mapping
 		const toneMapping = ( this._toneMapping !== null ? this._toneMapping : context.toneMapping ) || NoToneMapping;
+
 		const outputColorSpace = ( this.outputColorSpace !== null ? this.outputColorSpace : context.outputColorSpace ) || NoColorSpace;
 
 		if ( toneMapping !== NoToneMapping ) {
@@ -120,12 +127,14 @@ class RenderOutputNode extends TempNode {
 		}
 
 		// working to output color space
-
 		if ( outputColorSpace !== NoColorSpace && outputColorSpace !== ColorManagement.workingColorSpace ) {
 
 			outputNode = outputNode.workingToColorSpace( outputColorSpace );
 
 		}
+
+		// premultiply in output color space
+		outputNode = premultiplyAlpha( outputNode );
 
 		return outputNode;
 

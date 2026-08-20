@@ -4,6 +4,10 @@
 		<title>three.js webgl - exporter - GCode</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - exporter - GCode">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/misc_exporter_gcode.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/misc_exporter_gcode.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -25,7 +29,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import Polyslice from 'https://unpkg.com/@jgphilpott/polyslice@25.12.8/dist/index.browser.esm.js';
+			import Polyslice from 'https://cdn.jsdelivr.net/npm/@jgphilpott/polyslice@26.4.0/dist/index.browser.esm.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -125,7 +129,7 @@
 					// Check if Polyslice is loaded
 					if ( typeof Polyslice === 'undefined' ) {
 
-						alert( 'Polyslice library failed to load from CDN.\n\nPossible solutions:\n1. Disable ad blockers or browser extensions\n2. Check your network connection\n3. Ensure unpkg.com is not blocked by your firewall' );
+						alert( 'Polyslice library failed to load from CDN.\n\nPossible solutions:\n1. Disable ad blockers or browser extensions\n2. Check your network connection\n3. Ensure cdn.jsdelivr.net is not blocked by your firewall' );
 						return;
 
 					}

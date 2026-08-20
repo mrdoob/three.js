@@ -162,7 +162,7 @@ class TileShadowNode extends ShadowBaseNode {
 		const depthTexture = new DepthTexture( shadowWidth, shadowHeight, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, tileCount );
 		depthTexture.compareFunction = LessCompare;
 		depthTexture.name = 'ShadowDepthArrayTexture';
-		const shadowMap = builder.createRenderTarget( shadowWidth, shadowHeight, { format: RedFormat, depth: tileCount } );
+		const shadowMap = builder.createRenderTarget( shadowWidth, shadowHeight, { format: RedFormat, depth: tileCount, useArrayDepthTexture: true } );
 		shadowMap.depthTexture = depthTexture;
 		shadowMap.texture.name = 'ShadowTexture';
 		this.shadowMap = shadowMap;

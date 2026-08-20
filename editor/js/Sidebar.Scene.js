@@ -503,6 +503,8 @@ function SidebarScene( editor ) {
 
 	signals.sceneGraphChanged.add( refreshUI );
 
+	signals.cameraResetted.add( refreshUI );
+
 	signals.objectChanged.add( function ( object ) {
 
 		const options = outliner.options;
@@ -515,9 +517,9 @@ function SidebarScene( editor ) {
 
 				const openerElement = option.querySelector( ':scope > .opener' );
 
-				const openerHTML = openerElement ? openerElement.outerHTML : '';
+				option.innerHTML = buildHTML( object );
 
-				option.innerHTML = openerHTML + buildHTML( object );
+				if ( openerElement !== null ) option.insertBefore( openerElement, option.firstChild );
 
 				return;
 

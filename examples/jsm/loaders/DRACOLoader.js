@@ -8,10 +8,20 @@ import {
 	LinearSRGBColorSpace,
 	SRGBColorSpace,
 	InterleavedBuffer,
-	InterleavedBufferAttribute
+	InterleavedBufferAttribute,
+	LoaderUtils
 } from 'three';
 
 const _taskCache = new WeakMap();
+
+const WASM_BIN_URL = new URL( '../libs/draco/draco_decoder.wasm', import.meta.url ).toString();
+const WASM_JS_URL = new URL( '../libs/draco/draco_wasm_wrapper.js', import.meta.url ).toString();
+const JS_URL = new URL( '../libs/draco/draco_decoder.js', import.meta.url ).toString();
+
+const DRACO_GLTF_CONFIG = {
+	js: new URL( '../libs/draco/gltf/draco_wasm_wrapper.js', import.meta.url ).toString(),
+	wasm: new URL( '../libs/draco/gltf/draco_decoder.wasm', import.meta.url ).toString(),
+};
 
 /**
  * A loader for the Draco format.
@@ -34,12 +44,10 @@ const _taskCache = new WeakMap();
  *
  * ```js
  * const loader = new DRACOLoader();
- * loader.setDecoderPath( '/examples/jsm/libs/draco/' );
- *
- * const geometry = await dracoLoader.loadAsync( 'models/draco/bunny.drc' );
+ * const geometry = await loader.loadAsync( 'models/draco/bunny.drc' );
  * geometry.computeVertexNormals(); // optional
  *
- * dracoLoader.dispose();
+ * loader.dispose();
  * ```
  *
  * @augments Loader
@@ -56,7 +64,11 @@ class DRACOLoader extends Loader {
 
 		super( manager );
 
-		this.decoderPath = '';
+		this.decoderPaths = {
+			js: WASM_JS_URL,
+			wasm: WASM_BIN_URL,
+			dep_js: JS_URL,
+		};
 		this.decoderConfig = {};
 		this.decoderBinary = null;
 		this.decoderPending = null;
@@ -84,12 +96,25 @@ class DRACOLoader extends Loader {
 	/**
 	 * Provides configuration for the decoder libraries. Configuration cannot be changed after decoding begins.
 	 *
-	 * @param {string} path - The decoder path.
+	 * @param {string|{js:string, wasm:string}} path - The decoder path, or a config object with explicit URLs for each decoder file.
 	 * @return {DRACOLoader} A reference to this loader.
 	 */
 	setDecoderPath( path ) {
 
-		this.decoderPath = path;
+		const { decoderPaths } = this;
+		if ( typeof path === 'object' ) {
+
+			decoderPaths.js = path.js;
+			decoderPaths.wasm = path.wasm;
+			decoderPaths.dep_js = null;
+
+		} else {
+
+			decoderPaths.js = LoaderUtils.resolveURL( 'draco_wasm_wrapper.js', path );
+			decoderPaths.wasm = LoaderUtils.resolveURL( 'draco_decoder.wasm', path );
+			decoderPaths.dep_js = LoaderUtils.resolveURL( 'draco_decoder.js', path );
+
+		}
 
 		return this;
 
@@ -98,11 +123,13 @@ class DRACOLoader extends Loader {
 	/**
 	 * Provides configuration for the decoder libraries. Configuration cannot be changed after decoding begins.
 	 *
+	 * @deprecated
 	 * @param {{type:('js'|'wasm')}} config - The decoder config.
 	 * @return {DRACOLoader} A reference to this loader.
 	 */
 	setDecoderConfig( config ) {
 
+		console.warn( 'THREE.DRACOLoader: setDecoderConfig to has been deprecated and will be removed in r194.' );
 		this.decoderConfig = config;
 
 		return this;
@@ -331,7 +358,6 @@ class DRACOLoader extends Loader {
 	_loadLibrary( url, responseType ) {
 
 		const loader = new FileLoader( this.manager );
-		loader.setPath( this.decoderPath );
 		loader.setResponseType( responseType );
 		loader.setWithCredentials( this.withCredentials );
 
@@ -358,14 +384,21 @@ class DRACOLoader extends Loader {
 		const useJS = typeof WebAssembly !== 'object' || this.decoderConfig.type === 'js';
 		const librariesPending = [];
 
+		const { decoderPaths } = this;
 		if ( useJS ) {
 
-			librariesPending.push( this._loadLibrary( 'draco_decoder.js', 'text' ) );
+			if ( decoderPaths.dep_js === null ) {
+
+				throw new Error( 'THREE.DRACOLoader: WebAssembly is required when using a custom decoder paths.' );
+
+			}
+
+			librariesPending.push( this._loadLibrary( decoderPaths.dep_js, 'text' ) );
 
 		} else {
 
-			librariesPending.push( this._loadLibrary( 'draco_wasm_wrapper.js', 'text' ) );
-			librariesPending.push( this._loadLibrary( 'draco_decoder.wasm', 'arraybuffer' ) );
+			librariesPending.push( this._loadLibrary( decoderPaths.js, 'text' ) );
+			librariesPending.push( this._loadLibrary( decoderPaths.wasm, 'arraybuffer' ) );
 
 		}
 
@@ -736,4 +769,4 @@ function DRACOWorker() {
 
 }
 
-export { DRACOLoader };
+export { DRACOLoader, DRACO_GLTF_CONFIG };

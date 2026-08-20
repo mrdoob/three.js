@@ -101,6 +101,16 @@ The raw SVG data as a string.
 
 ## Static Methods
 
+### .createFillMaterial( shapePath : ShapePath ) : MeshBasicMaterial
+
+Creates a material for rendering the fill of the given path.
+
+**shapePath**
+
+The shape path.
+
+**Returns:** The fill material. `null` if the path has no fill.
+
 ### .createShapes( shapePath : ShapePath ) : Array.<Shape>
 
 Creates from the given shape path and array of shapes.
@@ -109,7 +119,19 @@ Creates from the given shape path and array of shapes.
 
 The shape path.
 
+**Deprecated:** since 185.
+
 **Returns:** An array of shapes.
+
+### .createStrokeMaterial( shapePath : ShapePath ) : MeshBasicMaterial
+
+Creates a material for rendering the stroke of the given path.
+
+**shapePath**
+
+The shape path.
+
+**Returns:** The stroke material. `null` if the path has no stroke.
 
 ### .getStrokeStyle( width : number, color : string, lineJoin : 'round' | 'bevel' | 'miter' | 'miter-limit', lineCap : 'round' | 'square' | 'butt', miterLimit : number ) : Object
 

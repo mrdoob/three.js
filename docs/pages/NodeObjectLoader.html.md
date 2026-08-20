@@ -42,6 +42,18 @@ The onLoad callback function.
 
 **Returns:** . The parsed 3D object.
 
+### .parseAsync( json : Object ) : Promise.<Object3D> (async)
+
+Async version of [NodeObjectLoader#parse](NodeObjectLoader.html#parse).
+
+**json**
+
+The JSON definition
+
+**Overrides:** [ObjectLoader#parseAsync](ObjectLoader.html#parseAsync)
+
+**Returns:** A Promise that resolves with the parsed 3D object.
+
 ### .parseMaterials( json : Object, textures : Object.<string, Texture> ) : Object.<string, NodeMaterial>
 
 Parses the node objects from the given JSON and textures.

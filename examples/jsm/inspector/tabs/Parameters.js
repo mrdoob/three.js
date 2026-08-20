@@ -1,17 +1,17 @@
 import { Tab } from '../ui/Tab.js';
 import { List } from '../ui/List.js';
 import { Item } from '../ui/Item.js';
-import { createValueSpan } from '../ui/utils.js';
-import { ValueNumber, ValueSlider, ValueSelect, ValueCheckbox, ValueColor, ValueButton } from '../ui/Values.js';
+import { createValueSpan, info } from '../ui/utils.js';
+import { ValueString, ValueNumber, ValueSlider, ValueSelect, ValueCheckbox, ValueColor, ValueButton } from '../ui/Values.js';
 
 class ParametersGroup {
 
 	constructor( parameters, name ) {
 
 		this.parameters = parameters;
-		this.name = name;
 
 		this.paramList = new Item( name );
+		this.paramList.setCollapsible( true );
 
 		this.objects = [];
 
@@ -20,6 +20,30 @@ class ParametersGroup {
 	close() {
 
 		this.paramList.close();
+
+		return this;
+
+	}
+
+	name( name ) {
+
+		this.paramList.setValue( 0, name );
+
+		return this;
+
+	}
+
+	show() {
+
+		this.paramList.show();
+
+		return this;
+
+	}
+
+	hide() {
+
+		this.paramList.hide();
 
 		return this;
 
@@ -52,6 +76,10 @@ class ParametersGroup {
 
 			item = this.addBoolean( object, property );
 
+		} else if ( type === 'string' ) {
+
+			item = this.addString( object, property );
+
 		} else if ( type === 'function' ) {
 
 			item = this.addButton( object, property, ...params );
@@ -62,15 +90,36 @@ class ParametersGroup {
 
 	}
 
+	_addInfo( editor, itemNode ) {
+
+		editor.info = ( text ) => {
+
+			info( itemNode, text );
+			return editor;
+
+		};
+
+	}
+
 	_addParameter( object, property, editor, subItem ) {
 
 		editor.name = ( name ) => {
 
-			subItem.data[ 0 ].textContent = name;
+			if ( subItem.data[ 0 ].childNodes.length > 0 && subItem.data[ 0 ].firstChild.nodeType === 3 /* Node.TEXT_NODE */ ) {
+
+				subItem.data[ 0 ].firstChild.textContent = name;
+
+			} else {
+
+				subItem.data[ 0 ].insertBefore( document.createTextNode( name ), subItem.data[ 0 ].firstChild );
+
+			}
 
 			return editor;
 
 		};
+
+		this._addInfo( editor, subItem.data[ 0 ] );
 
 		editor.listen = () => {
 
@@ -103,6 +152,37 @@ class ParametersGroup {
 	_registerParameter( object, property, editor, subItem ) {
 
 		this.objects.push( { object: object, key: property, editor: editor, subItem: subItem } );
+
+		editor.addEventListener( 'show', () => subItem.show() );
+		editor.addEventListener( 'hide', () => subItem.hide() );
+
+	}
+
+	addString( object, property ) {
+
+		const value = object[ property ];
+
+		const editor = new ValueString( { value } );
+		editor.addEventListener( 'change', ( { value } ) => {
+
+			object[ property ] = value;
+
+		} );
+
+		const description = createValueSpan();
+		description.textContent = property;
+
+		const subItem = new Item( description, editor.domElement );
+		this.paramList.add( subItem );
+
+		const itemRow = subItem.domElement.firstChild;
+		itemRow.classList.add( 'actionable' );
+
+		// extend object property
+
+		this._addParameter( object, property, editor, subItem );
+
+		return editor;
 
 	}
 
@@ -296,11 +376,23 @@ class ParametersGroup {
 
 		editor.name = ( name ) => {
 
-			editor.domElement.childNodes[ 0 ].textContent = name;
+			const buttonNode = editor.domElement.childNodes[ 0 ];
+
+			if ( buttonNode.childNodes.length > 0 && buttonNode.firstChild.nodeType === 3 /* Node.TEXT_NODE */ ) {
+
+				buttonNode.firstChild.textContent = name;
+
+			} else {
+
+				buttonNode.insertBefore( document.createTextNode( name ), buttonNode.firstChild );
+
+			}
 
 			return editor;
 
 		};
+
+		this._addInfo( editor, editor.domElement.childNodes[ 0 ] );
 
 		this._registerParameter( object, property, editor, subItem );
 

@@ -6,7 +6,7 @@ Represents the depth of the current viewport as a texture. This module can be us
 
 ## Constructor
 
-### new ViewportDepthTextureNode( uvNode : Node, levelNode : Node )
+### new ViewportDepthTextureNode( uvNode : Node, levelNode : Node, depthTexture : DepthTexture )
 
 Constructs a new viewport depth texture node.
 
@@ -22,15 +22,11 @@ The level node.
 
 Default is `null`.
 
-## Methods
+**depthTexture**
 
-### .getTextureForReference() : DepthTexture
+A depth texture. If not provided, uses a shared depth texture.
 
-Overwritten so the method always returns the unique shared depth texture.
-
-**Overrides:** [ViewportTextureNode#getTextureForReference](ViewportTextureNode.html#getTextureForReference)
-
-**Returns:** The shared depth texture.
+Default is `null`.
 
 ## Source
 

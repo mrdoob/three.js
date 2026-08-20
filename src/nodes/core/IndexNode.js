@@ -1,5 +1,6 @@
 import Node from './Node.js';
-import { nodeImmutable, varying } from '../tsl/TSLBase.js';
+import { nodeImmutable } from '../tsl/TSLCore.js';
+import { varying } from './VaryingNode.js';
 
 /**
  * This class represents shader indices of different types. The following predefined node

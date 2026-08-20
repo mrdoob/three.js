@@ -1,5 +1,27 @@
 import DataMap from '../../common/DataMap.js';
 import { GPUFilterMode, GPULoadOp, GPUStoreOp } from './WebGPUConstants.js';
+import { submit } from './WebGPUUtils.js';
+import GPUBindGroupDescriptor from '../descriptors/GPUBindGroupDescriptor.js';
+import GPUBufferDescriptor from '../descriptors/GPUBufferDescriptor.js';
+import GPUCommandEncoderDescriptor from '../descriptors/GPUCommandEncoderDescriptor.js';
+import GPURenderBundleEncoderDescriptor from '../descriptors/GPURenderBundleEncoderDescriptor.js';
+import GPURenderPassColorAttachment from '../descriptors/GPURenderPassColorAttachment.js';
+import GPURenderPassDescriptor from '../descriptors/GPURenderPassDescriptor.js';
+import GPURenderPipelineDescriptor from '../descriptors/GPURenderPipelineDescriptor.js';
+import GPUShaderModuleDescriptor from '../descriptors/GPUShaderModuleDescriptor.js';
+import GPUTextureDescriptor from '../descriptors/GPUTextureDescriptor.js';
+import GPUTextureViewDescriptor from '../descriptors/GPUTextureViewDescriptor.js';
+
+const _bindGroupDescriptor = new GPUBindGroupDescriptor();
+const _bufferDescriptor = new GPUBufferDescriptor();
+const _commandEncoderDescriptor = new GPUCommandEncoderDescriptor();
+const _renderBundleEncoderDescriptor = new GPURenderBundleEncoderDescriptor();
+const _renderPassDescriptor = new GPURenderPassDescriptor();
+const _renderPipelineDescriptor = new GPURenderPipelineDescriptor();
+const _colorAttachment = new GPURenderPassColorAttachment();
+const _shaderModuleDescriptor = new GPUShaderModuleDescriptor();
+const _textureDescriptor = new GPUTextureDescriptor();
+const _viewDescriptor = new GPUTextureViewDescriptor();
 
 /**
  * A WebGPU backend utility module used by {@link WebGPUTextureUtils}.
@@ -118,20 +140,25 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		 * flip uniform buffer
 		 * @type {GPUBuffer}
 		 */
-		this.flipUniformBuffer = device.createBuffer( {
-			size: 4,
-			usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
-		} );
+		_bufferDescriptor.size = 4;
+		_bufferDescriptor.usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
+
+		this.flipUniformBuffer = device.createBuffer( _bufferDescriptor );
+
+		_bufferDescriptor.reset();
+
 		device.queue.writeBuffer( this.flipUniformBuffer, 0, new Uint32Array( [ 1 ] ) );
 
 		/**
 		 * no flip uniform buffer
 		 * @type {GPUBuffer}
 		 */
-		this.noFlipUniformBuffer = device.createBuffer( {
-			size: 4,
-			usage: GPUBufferUsage.UNIFORM
-		} );
+		_bufferDescriptor.size = 4;
+		_bufferDescriptor.usage = GPUBufferUsage.UNIFORM;
+
+		this.noFlipUniformBuffer = device.createBuffer( _bufferDescriptor );
+
+		_bufferDescriptor.reset();
 
 		/**
 		 * A cache for GPU render pipelines used for copy/transfer passes.
@@ -146,10 +173,12 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		 *
 		 * @type {GPUShaderModule}
 		 */
-		this.mipmapShaderModule = device.createShaderModule( {
-			label: 'mipmap',
-			code: mipmapSource
-		} );
+		_shaderModuleDescriptor.label = 'mipmap';
+		_shaderModuleDescriptor.code = mipmapSource;
+
+		this.mipmapShaderModule = device.createShaderModule( _shaderModuleDescriptor );
+
+		_shaderModuleDescriptor.reset();
 
 	}
 
@@ -169,18 +198,18 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 		if ( pipeline === undefined ) {
 
-			pipeline = this.device.createRenderPipeline( {
-				label: `mipmap-${ format }-${ textureBindingViewDimension }`,
-				vertex: {
-					module: this.mipmapShaderModule,
-				},
-				fragment: {
-					module: this.mipmapShaderModule,
-					entryPoint: `main_${ textureBindingViewDimension.replace( '-', '_' ) }`,
-					targets: [ { format } ]
-				},
-				layout: 'auto'
-			} );
+			_renderPipelineDescriptor.label = `mipmap-${ format }-${ textureBindingViewDimension }`;
+			_renderPipelineDescriptor.vertex = { module: this.mipmapShaderModule };
+			_renderPipelineDescriptor.fragment = {
+				module: this.mipmapShaderModule,
+				entryPoint: `main_${ textureBindingViewDimension.replace( '-', '_' ) }`,
+				targets: [ { format } ]
+			};
+			_renderPipelineDescriptor.layout = 'auto';
+
+			pipeline = this.device.createRenderPipeline( _renderPipelineDescriptor );
+
+			_renderPipelineDescriptor.reset();
 
 			this.transferPipelines[ key ] = pipeline;
 
@@ -202,52 +231,66 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		const format = textureGPUDescriptor.format;
 		const { width, height } = textureGPUDescriptor.size;
 
-		const tempTexture = this.device.createTexture( {
-			size: { width, height },
-			format,
-			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-		} );
+		_textureDescriptor.size.width = width;
+		_textureDescriptor.size.height = height;
+		_textureDescriptor.format = format;
+		_textureDescriptor.usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING;
+
+		const tempTexture = this.device.createTexture( _textureDescriptor );
+
+		_textureDescriptor.reset();
 
 		const copyTransferPipeline = this.getTransferPipeline( format, textureGPU.textureBindingViewDimension );
 		const flipTransferPipeline = this.getTransferPipeline( format, tempTexture.textureBindingViewDimension );
 
-		const commandEncoder = this.device.createCommandEncoder( {} );
+		const commandEncoder = this.device.createCommandEncoder( _commandEncoderDescriptor );
 
 		const pass = ( pipeline, sourceTexture, sourceArrayLayer, destinationTexture, destinationArrayLayer, flipY ) => {
 
 			const bindGroupLayout = pipeline.getBindGroupLayout( 0 ); // @TODO: Consider making this static.
 
-			const bindGroup = this.device.createBindGroup( {
-				layout: bindGroupLayout,
-				entries: [ {
-					binding: 0,
-					resource: this.flipYSampler
-				}, {
-					binding: 1,
-					resource: sourceTexture.createView( {
-						dimension: sourceTexture.textureBindingViewDimension || '2d-array',
-						baseMipLevel: 0,
-						mipLevelCount: 1,
-					} ),
-				}, {
-					binding: 2,
-					resource: { buffer: flipY ? this.flipUniformBuffer : this.noFlipUniformBuffer }
-				} ]
+			_viewDescriptor.dimension = sourceTexture.textureBindingViewDimension || '2d-array';
+			_viewDescriptor.mipLevelCount = 1;
+
+			const sourceView = sourceTexture.createView( _viewDescriptor );
+
+			_viewDescriptor.reset();
+
+			_bindGroupDescriptor.layout = bindGroupLayout;
+			_bindGroupDescriptor.entries.push( {
+				binding: 0,
+				resource: this.flipYSampler
+			}, {
+				binding: 1,
+				resource: sourceView,
+			}, {
+				binding: 2,
+				resource: { buffer: flipY ? this.flipUniformBuffer : this.noFlipUniformBuffer }
 			} );
 
-			const passEncoder = commandEncoder.beginRenderPass( {
-				colorAttachments: [ {
-					view: destinationTexture.createView( {
-						dimension: '2d',
-						baseMipLevel: 0,
-						mipLevelCount: 1,
-						baseArrayLayer: destinationArrayLayer,
-						arrayLayerCount: 1,
-					} ),
-					loadOp: GPULoadOp.Clear,
-					storeOp: GPUStoreOp.Store,
-				} ]
-			} );
+			const bindGroup = this.device.createBindGroup( _bindGroupDescriptor );
+
+			_bindGroupDescriptor.reset();
+
+			_viewDescriptor.dimension = '2d';
+			_viewDescriptor.mipLevelCount = 1;
+			_viewDescriptor.baseArrayLayer = destinationArrayLayer;
+			_viewDescriptor.arrayLayerCount = 1;
+
+			const destinationView = destinationTexture.createView( _viewDescriptor );
+
+			_viewDescriptor.reset();
+
+			_colorAttachment.view = destinationView;
+			_colorAttachment.loadOp = GPULoadOp.Clear;
+			_colorAttachment.storeOp = GPUStoreOp.Store;
+
+			_renderPassDescriptor.colorAttachments.push( _colorAttachment );
+
+			const passEncoder = commandEncoder.beginRenderPass( _renderPassDescriptor );
+
+			_renderPassDescriptor.reset();
+			_colorAttachment.reset();
 
 			passEncoder.setPipeline( pipeline );
 			passEncoder.setBindGroup( 0, bindGroup );
@@ -259,7 +302,7 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 		pass( copyTransferPipeline, textureGPU, baseArrayLayer, tempTexture, 0, false );
 		pass( flipTransferPipeline, tempTexture, 0, textureGPU, baseArrayLayer, true );
 
-		this.device.queue.submit( [ commandEncoder.finish() ] );
+		submit( this.device, commandEncoder.finish() );
 
 		tempTexture.destroy();
 
@@ -277,11 +320,19 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 		const passes = textureData.layers || this._mipmapCreateBundles( textureGPU );
 
-		const commandEncoder = encoder || this.device.createCommandEncoder( { label: 'mipmapEncoder' } );
+		let commandEncoder = encoder;
+
+		if ( commandEncoder === null ) {
+
+			_commandEncoderDescriptor.label = 'mipmapEncoder';
+			commandEncoder = this.device.createCommandEncoder( _commandEncoderDescriptor );
+			_commandEncoderDescriptor.reset();
+
+		}
 
 		this._mipmapRunBundles( commandEncoder, passes );
 
-		if ( encoder === null ) this.device.queue.submit( [ commandEncoder.finish() ] );
+		if ( encoder === null ) submit( this.device, commandEncoder.finish() );
 
 		textureData.layers = passes;
 
@@ -307,41 +358,53 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 			for ( let baseArrayLayer = 0; baseArrayLayer < textureGPU.depthOrArrayLayers; baseArrayLayer ++ ) {
 
-				const bindGroup = this.device.createBindGroup( {
-					layout: bindGroupLayout,
-					entries: [ {
-						binding: 0,
-						resource: this.mipmapSampler
-					}, {
-						binding: 1,
-						resource: textureGPU.createView( {
-							dimension: textureBindingViewDimension,
-							baseMipLevel: baseMipLevel - 1,
-							mipLevelCount: 1,
-						} ),
-					}, {
-						binding: 2,
-						resource: { buffer: this.noFlipUniformBuffer }
-					} ]
+				_viewDescriptor.dimension = textureBindingViewDimension;
+				_viewDescriptor.baseMipLevel = baseMipLevel - 1;
+				_viewDescriptor.mipLevelCount = 1;
+
+				const sourceView = textureGPU.createView( _viewDescriptor );
+
+				_viewDescriptor.reset();
+
+				_bindGroupDescriptor.layout = bindGroupLayout;
+				_bindGroupDescriptor.entries.push( {
+					binding: 0,
+					resource: this.mipmapSampler
+				}, {
+					binding: 1,
+					resource: sourceView,
+				}, {
+					binding: 2,
+					resource: { buffer: this.noFlipUniformBuffer }
 				} );
 
-				const passDescriptor = {
-					colorAttachments: [ {
-						view: textureGPU.createView( {
-							dimension: '2d',
-							baseMipLevel,
-							mipLevelCount: 1,
-							baseArrayLayer,
-							arrayLayerCount: 1,
-						} ),
-						loadOp: GPULoadOp.Clear,
-						storeOp: GPUStoreOp.Store,
-					} ]
-				};
+				const bindGroup = this.device.createBindGroup( _bindGroupDescriptor );
 
-				const passEncoder = this.device.createRenderBundleEncoder( {
-					colorFormats: [ textureGPU.format ]
-				} );
+				_bindGroupDescriptor.reset();
+
+				_viewDescriptor.dimension = '2d';
+				_viewDescriptor.baseMipLevel = baseMipLevel;
+				_viewDescriptor.mipLevelCount = 1;
+				_viewDescriptor.baseArrayLayer = baseArrayLayer;
+				_viewDescriptor.arrayLayerCount = 1;
+
+				const destinationView = textureGPU.createView( _viewDescriptor );
+
+				_viewDescriptor.reset();
+
+				const passColorAttachment = new GPURenderPassColorAttachment();
+				passColorAttachment.view = destinationView;
+				passColorAttachment.loadOp = GPULoadOp.Clear;
+				passColorAttachment.storeOp = GPUStoreOp.Store;
+
+				const passDescriptor = new GPURenderPassDescriptor();
+				passDescriptor.colorAttachments.push( passColorAttachment );
+
+				_renderBundleEncoderDescriptor.colorFormats = [ textureGPU.format ];
+
+				const passEncoder = this.device.createRenderBundleEncoder( _renderBundleEncoderDescriptor );
+
+				_renderBundleEncoderDescriptor.reset();
 
 				passEncoder.setPipeline( pipeline );
 				passEncoder.setBindGroup( 0, bindGroup );

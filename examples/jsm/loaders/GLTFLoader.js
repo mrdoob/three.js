@@ -104,7 +104,8 @@ import { clone } from '../utils/SkeletonUtils.js';
  * - EXT_texture_avif
  * - EXT_texture_webp
  *
- * The following glTF 2.0 extension is supported by an external user plugin:
+ * The following glTF 2.0 extensions are supported by separately registered plugins:
+ * - KHR_gaussian_splatting
  * - [KHR_materials_variants](https://github.com/takahirox/three-gltf-extensions)
  * - [MSFT_texture_dds](https://github.com/takahirox/three-gltf-extensions)
  * - [KHR_animation_pointer](https://github.com/needle-tools/three-animation-pointer)
@@ -1273,6 +1274,8 @@ class GLTFMaterialsIorExtension {
 
 		materialParams.ior = extension.ior !== undefined ? extension.ior : 1.5;
 
+		if ( materialParams.ior === 0 ) materialParams.ior = 1000; // see #26167
+
 		return Promise.resolve();
 
 	}
@@ -1784,6 +1787,9 @@ class GLTFMeshGpuInstancing {
 				}
 
 				// Add instance attributes to the geometry, excluding TRS.
+
+				let instanceGeometry = null;
+
 				for ( const attributeName in attributes ) {
 
 					if ( attributeName === '_COLOR_0' ) {
@@ -1795,7 +1801,36 @@ class GLTFMeshGpuInstancing {
 						 attributeName !== 'ROTATION' &&
 						 attributeName !== 'SCALE' ) {
 
-						mesh.geometry.setAttribute( attributeName, attributes[ attributeName ] );
+						if ( instanceGeometry === null ) {
+
+							// do a shallow clone of the goemetry so per-instance data are not shared
+
+							const source = instancedMesh.geometry;
+							instanceGeometry = new BufferGeometry();
+							instanceGeometry.name = source.name;
+
+							for ( const name in source.attributes ) instanceGeometry.setAttribute( name, source.attributes[ name ] );
+							for ( const name in source.morphAttributes ) instanceGeometry.morphAttributes[ name ] = source.morphAttributes[ name ];
+							if ( source.index !== null ) instanceGeometry.setIndex( source.index );
+
+							instanceGeometry.morphTargetsRelative = source.morphTargetsRelative;
+
+							for ( const group of source.groups ) instanceGeometry.addGroup( group.start, group.count, group.materialIndex );
+
+							if ( source.boundingBox !== null ) instanceGeometry.boundingBox = source.boundingBox.clone();
+							if ( source.boundingSphere !== null ) instanceGeometry.boundingSphere = source.boundingSphere.clone();
+
+							instanceGeometry.drawRange.start = source.drawRange.start;
+							instanceGeometry.drawRange.count = source.drawRange.count;
+
+							instanceGeometry.userData = Object.assign( {}, source.userData );
+
+							instancedMesh.geometry = instanceGeometry;
+
+						}
+
+						const attr = attributes[ attributeName ];
+						instanceGeometry.setAttribute( attributeName, new InstancedBufferAttribute( attr.array, attr.itemSize, attr.normalized ) );
 
 					}
 
@@ -2035,6 +2070,27 @@ class GLTFTextureTransformExtension {
 		if ( transform.scale !== undefined ) {
 
 			texture.repeat.fromArray( transform.scale );
+
+		}
+
+		if ( transform.rotation !== undefined ) {
+
+			// glTF's KHR_texture_transform order differs from three.js:
+			// glTF defines the UV transform as T * R * S
+			// three.js defines the UV transform as T * S * R
+			//
+			// To fix this, we need to override the matrix with the value computed per glTF spec
+			// We still set the other fields so that you can inspect/export the resulting object.
+
+			const c = Math.cos( texture.rotation );
+			const s = Math.sin( texture.rotation );
+
+			texture.matrix.set(
+				texture.repeat.x * c, texture.repeat.y * s, texture.offset.x,
+				- texture.repeat.x * s, texture.repeat.y * c, texture.offset.y,
+				0, 0, 1
+			);
+			texture.matrixAutoUpdate = false;
 
 		}
 
@@ -3774,6 +3830,18 @@ class GLTFParser {
 
 				}
 
+				// Convert strip/fan primitives to triangles
+
+				if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_STRIP ) {
+
+					geometryPromise = geometryPromise.then( geometry => toTrianglesDrawMode( geometry, TriangleStripDrawMode ) );
+
+				} else if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_FAN ) {
+
+					geometryPromise = geometryPromise.then( geometry => toTrianglesDrawMode( geometry, TriangleFanDrawMode ) );
+
+				}
+
 				// Cache this geometry
 				cache[ cacheKey ] = { primitive: primitive, promise: geometryPromise };
 
@@ -3817,7 +3885,7 @@ class GLTFParser {
 
 		pending.push( parser.loadGeometries( primitives ) );
 
-		return Promise.all( pending ).then( function ( results ) {
+		return Promise.all( pending ).then( async function ( results ) {
 
 			const materials = results.slice( 0, results.length - 1 );
 			const geometries = results[ results.length - 1 ];
@@ -3840,8 +3908,17 @@ class GLTFParser {
 						primitive.mode === WEBGL_CONSTANTS.TRIANGLE_FAN ||
 						primitive.mode === undefined ) {
 
+					const needsSkinning = meshDef.isSkinnedMesh === true;
+					const hasSkinningAttributes = geometry.hasAttribute( 'skinIndex' ) && geometry.hasAttribute( 'skinWeight' );
+
+					if ( needsSkinning && hasSkinningAttributes === false ) {
+
+						console.warn( 'THREE.GLTFLoader: Missing skinIndex or skinWeight attributes. Skinning disabled.' );
+
+					}
+
 					// .isSkinnedMesh isn't in glTF spec. See ._markDefs()
-					mesh = meshDef.isSkinnedMesh === true
+					mesh = ( needsSkinning && hasSkinningAttributes )
 						? new SkinnedMesh( geometry, material )
 						: new Mesh( geometry, material );
 
@@ -3849,16 +3926,6 @@ class GLTFParser {
 
 						// normalize skin weights to fix malformed assets (see #15319)
 						mesh.normalizeSkinWeights();
-
-					}
-
-					if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_STRIP ) {
-
-						mesh.geometry = toTrianglesDrawMode( mesh.geometry, TriangleStripDrawMode );
-
-					} else if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_FAN ) {
-
-						mesh.geometry = toTrianglesDrawMode( mesh.geometry, TriangleFanDrawMode );
 
 					}
 

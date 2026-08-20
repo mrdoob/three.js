@@ -26,6 +26,10 @@ The paths that have been generated for this shape.
 
 Default is `null`.
 
+### .userData : Object
+
+An object that can be used to store custom data about the shape path. Mainly used by SVGLoader to store style information.
+
 ## Methods
 
 ### .bezierCurveTo( aCP1x : number, aCP1y : number, aCP2x : number, aCP2y : number, aX : number, aY : number ) : ShapePath
@@ -118,13 +122,9 @@ An array of points in 2D space.
 
 **Returns:** A reference to this shape path.
 
-### .toShapes( isCCW : boolean ) : Array.<Shape>
+### .toShapes() : Array.<Shape>
 
 Converts the paths into an array of shapes.
-
-**isCCW**
-
-By default solid shapes are defined clockwise (CW) and holes are defined counterclockwise (CCW). If this flag is set to `true`, then those are flipped.
 
 **Returns:** An array of shapes.
 

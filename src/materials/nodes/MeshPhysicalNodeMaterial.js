@@ -1,5 +1,5 @@
-import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, specularColorBlended, specularF90, diffuseColor, metalness, roughness, anisotropy, alphaT, anisotropyT, anisotropyB, ior, transmission, thickness, attenuationDistance, attenuationColor, dispersion } from '../../nodes/core/PropertyNode.js';
-import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialSpecularIntensity, materialSpecularColor, materialAnisotropy, materialIOR, materialTransmission, materialThickness, materialAttenuationDistance, materialAttenuationColor, materialDispersion } from '../../nodes/accessors/MaterialNode.js';
+import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, specularColorBlended, specularF90, diffuseColor, metalness, roughness, anisotropy, alphaT, anisotropyT, anisotropyB, ior, transmission, thickness, attenuationDistance, attenuationColor, dispersion, retroreflectivity } from '../../nodes/core/PropertyNode.js';
+import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialSpecularIntensity, materialSpecularColor, materialAnisotropy, materialIOR, materialTransmission, materialThickness, materialAttenuationDistance, materialAttenuationColor, materialDispersion, materialRetroreflectivity } from '../../nodes/accessors/MaterialNode.js';
 import { float, vec2, vec3, If } from '../../nodes/tsl/TSLBase.js';
 import getRoughness from '../../nodes/functions/material/getRoughness.js';
 import { TBNViewMatrix } from '../../nodes/accessors/AccessorsUtils.js';
@@ -252,6 +252,19 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		this.dispersionNode = null;
 
 		/**
+		 * The retroreflective strength of physical materials is by default inferred from the
+		 * `retroreflectivity` property. This node property allows to overwrite the default
+		 * and define the retroreflective strength with a node instead.
+		 *
+		 * If you don't want to overwrite the retroreflective strength but modify the existing
+		 * value instead, use {@link materialRetroreflectivity}.
+		 *
+		 * @type {?Node<float>}
+		 * @default null
+		 */
+		this.retroreflectivityNode = null;
+
+		/**
 		 * The anisotropy of physical materials is by default inferred from the
 		 * `anisotropy` property. This node property allows to overwrite the default
 		 * and define the anisotropy with a node instead.
@@ -343,16 +356,30 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	}
 
 	/**
+	 * Whether the lighting model should use retroreflection or not.
+	 *
+	 * @type {boolean}
+	 * @default true
+	 */
+	get useRetroreflection() {
+
+		return this.retroreflectivity > 0 || this.retroreflectivityNode !== null;
+
+	}
+
+	/**
 	 * Setups the specular related node variables.
 	 */
 	setupSpecular() {
 
 		const iorNode = this.iorNode ? float( this.iorNode ) : materialIOR;
+		const specularColorNode = this.specularColorNode ? vec3( this.specularColorNode ) : materialSpecularColor;
+		const specularIntensityNode = this.specularIntensityNode ? float( this.specularIntensityNode ) : materialSpecularIntensity;
 
 		ior.assign( iorNode );
-		specularColor.assign( min( pow2( ior.sub( 1.0 ).div( ior.add( 1.0 ) ) ).mul( materialSpecularColor ), vec3( 1.0 ) ).mul( materialSpecularIntensity ) );
+		specularColor.assign( min( pow2( ior.sub( 1.0 ).div( ior.add( 1.0 ) ) ).mul( specularColorNode ), vec3( 1.0 ) ).mul( specularIntensityNode ) );
 		specularColorBlended.assign( mix( specularColor, diffuseColor.rgb, metalness ) );
-		specularF90.assign( mix( materialSpecularIntensity, 1.0, metalness ) );
+		specularF90.assign( mix( specularIntensityNode, 1.0, metalness ) );
 
 	}
 
@@ -363,7 +390,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	 */
 	setupLightingModel( /*builder*/ ) {
 
-		return new PhysicalLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useAnisotropy, this.useTransmission, this.useDispersion );
+		return new PhysicalLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useAnisotropy, this.useTransmission, this.useDispersion, this.useRetroreflection );
 
 	}
 
@@ -397,6 +424,16 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 			sheen.assign( sheenNode );
 			sheenRoughness.assign( sheenRoughnessNode );
+
+		}
+
+		// RETROREFLECTION
+
+		if ( this.useRetroreflection ) {
+
+			const retroreflectivityNode = this.retroreflectivityNode ? float( this.retroreflectivityNode ) : materialRetroreflectivity;
+
+			retroreflectivity.assign( retroreflectivityNode );
 
 		}
 
@@ -483,36 +520,6 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		builder.context.setupClearcoatNormal = () => subBuild( this.setupClearcoatNormal( builder ), 'NORMAL', 'vec3' );
 
 		super.setup( builder );
-
-	}
-
-	copy( source ) {
-
-		this.clearcoatNode = source.clearcoatNode;
-		this.clearcoatRoughnessNode = source.clearcoatRoughnessNode;
-		this.clearcoatNormalNode = source.clearcoatNormalNode;
-
-		this.sheenNode = source.sheenNode;
-		this.sheenRoughnessNode = source.sheenRoughnessNode;
-
-		this.iridescenceNode = source.iridescenceNode;
-		this.iridescenceIORNode = source.iridescenceIORNode;
-		this.iridescenceThicknessNode = source.iridescenceThicknessNode;
-
-		this.specularIntensityNode = source.specularIntensityNode;
-		this.specularColorNode = source.specularColorNode;
-
-		this.iorNode = source.iorNode;
-
-		this.transmissionNode = source.transmissionNode;
-		this.thicknessNode = source.thicknessNode;
-		this.attenuationDistanceNode = source.attenuationDistanceNode;
-		this.attenuationColorNode = source.attenuationColorNode;
-		this.dispersionNode = source.dispersionNode;
-
-		this.anisotropyNode = source.anisotropyNode;
-
-		return super.copy( source );
 
 	}
 

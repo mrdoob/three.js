@@ -1,4 +1,4 @@
-import { cameraViewMatrix } from './Camera.js';
+import { cameraWorldMatrix } from './Camera.js';
 import { normalView } from './Normal.js';
 import { positionViewDirection } from './Position.js';
 import { materialRefractionRatio } from './MaterialProperties.js';
@@ -25,7 +25,7 @@ export const refractView = /*@__PURE__*/ positionViewDirection.negate().refract(
  * @tsl
  * @type {Node<vec3>}
  */
-export const reflectVector = /*@__PURE__*/ reflectView.transformDirection( cameraViewMatrix ).toVar( 'reflectVector' );
+export const reflectVector = /*@__PURE__*/ reflectView.transformDirection( cameraWorldMatrix ).toVar( 'reflectVector' );
 
 /**
  * Used for sampling cube maps when using cube refraction mapping.
@@ -33,4 +33,4 @@ export const reflectVector = /*@__PURE__*/ reflectView.transformDirection( camer
  * @tsl
  * @type {Node<vec3>}
  */
-export const refractVector = /*@__PURE__*/ refractView.transformDirection( cameraViewMatrix ).toVar( 'reflectVector' );
+export const refractVector = /*@__PURE__*/ refractView.transformDirection( cameraWorldMatrix ).toVar( 'refractVector' );

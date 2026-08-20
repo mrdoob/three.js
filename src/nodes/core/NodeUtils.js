@@ -6,6 +6,20 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 
+import {
+	IntType,
+	UnsignedIntType,
+	AlphaFormat,
+	RedFormat,
+	RedIntegerFormat,
+	RGFormat,
+	RGIntegerFormat,
+	RGBFormat,
+	RGBIntegerFormat,
+	DepthFormat,
+	DepthStencilFormat
+} from '../../constants.js';
+
 import { error } from '../../utils.js';
 import StackTrace from '../core/StackTrace.js';
 
@@ -18,7 +32,7 @@ function cyrb53( value, seed = 0 ) {
 
 	let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
 
-	if ( value instanceof Array ) {
+	if ( Array.isArray( value ) ) {
 
 		for ( let i = 0, val; i < value.length; i ++ ) {
 
@@ -148,7 +162,7 @@ export function getTypedArrayFromType( type ) {
  */
 export function getLengthFromType( type ) {
 
-	if ( /float|int|uint/.test( type ) ) return 1;
+	if ( /float|int|uint|bool/.test( type ) ) return 1;
 	if ( /vec2/.test( type ) ) return 2;
 	if ( /vec3/.test( type ) ) return 3;
 	if ( /vec4/.test( type ) ) return 4;
@@ -161,16 +175,16 @@ export function getLengthFromType( type ) {
 }
 
 /**
- * Returns the gpu memory length for the given data type.
+ * Returns the gpu memory length for the given data type in 4-byte elements.
  *
  * @private
  * @method
  * @param {string} type - The data type.
- * @return {number} The length.
+ * @return {number} The memory length in 4-byte elements.
  */
 export function getMemoryLengthFromType( type ) {
 
-	if ( /float|int|uint/.test( type ) ) return 1;
+	if ( /float|int|uint|bool/.test( type ) ) return 1;
 	if ( /vec2/.test( type ) ) return 2;
 	if ( /vec3/.test( type ) ) return 3;
 	if ( /vec4/.test( type ) ) return 4;
@@ -183,22 +197,22 @@ export function getMemoryLengthFromType( type ) {
 }
 
 /**
- * Returns the alignment requirement for the given data type.
+ * Returns the alignment requirement for the given data type in 4-byte elements.
  *
  * @private
  * @method
  * @param {string} type - The data type.
- * @return {number} The alignment requirement in bytes.
+ * @return {number} The alignment requirement in 4-byte elements.
  */
 export function getAlignmentFromType( type ) {
 
-	if ( /float|int|uint/.test( type ) ) return 4;
-	if ( /vec2/.test( type ) ) return 8;
-	if ( /vec3/.test( type ) ) return 16;
-	if ( /vec4/.test( type ) ) return 16;
-	if ( /mat2/.test( type ) ) return 8;
-	if ( /mat3/.test( type ) ) return 16;
-	if ( /mat4/.test( type ) ) return 16;
+	if ( /float|int|uint|bool/.test( type ) ) return 1;
+	if ( /vec2/.test( type ) ) return 2;
+	if ( /vec3/.test( type ) ) return 4;
+	if ( /vec4/.test( type ) ) return 4;
+	if ( /mat2/.test( type ) ) return 2;
+	if ( /mat3/.test( type ) ) return 4;
+	if ( /mat4/.test( type ) ) return 4;
 
 	error( `TSL: Unsupported type: ${ type }`, new StackTrace() );
 
@@ -273,6 +287,74 @@ export function getValueType( value ) {
 	}
 
 	return null;
+
+}
+
+/**
+ * Returns the node data type for the given texture.
+ *
+ * @private
+ * @method
+ * @param {Texture} texture - The texture.
+ * @return {string} The data type.
+ */
+export function getTextureType( texture ) {
+
+	if ( texture.isDepthTexture === true ) {
+
+		return 'float';
+
+	}
+
+	const format = texture.format;
+
+	let length;
+
+	if ( format === RedFormat || format === RedIntegerFormat || format === DepthFormat || format === DepthStencilFormat || format === AlphaFormat ) {
+
+		length = 1;
+
+	} else if ( format === RGFormat || format === RGIntegerFormat ) {
+
+		length = 2;
+
+	} else if ( format === RGBFormat || format === RGBIntegerFormat ) {
+
+		length = 3;
+
+	} else {
+
+		length = 4;
+
+	}
+
+	let componentType;
+
+	if ( texture.type === UnsignedIntType ) {
+
+		componentType = 'uint';
+
+	} else if ( texture.type === IntType ) {
+
+		componentType = 'int';
+
+	} else {
+
+		componentType = 'float';
+
+	}
+
+	if ( length === 1 ) return componentType;
+
+	let baseType = getTypeFromLength( length );
+
+	if ( componentType !== 'float' ) {
+
+		baseType = componentType[ 0 ] + baseType;
+
+	}
+
+	return baseType;
 
 }
 
@@ -404,5 +486,11 @@ export function arrayBufferToBase64( arrayBuffer ) {
 export function base64ToArrayBuffer( base64 ) {
 
 	return Uint8Array.from( atob( base64 ), c => c.charCodeAt( 0 ) ).buffer;
+
+}
+
+export function isArrayAsParameter( params ) {
+
+	return ( params[ 0 ] !== undefined && params[ 0 ] !== null ) && ( params[ 0 ].isNode || Object.getPrototypeOf( params[ 0 ] ) !== Object.prototype );
 
 }

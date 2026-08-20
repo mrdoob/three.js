@@ -66,7 +66,7 @@ class WaterNode extends TempNode {
 
 		this.normalMap0 = texture( options.normalMap0 );
 		this.normalMap1 = texture( options.normalMap1 );
-		this.flowMap = texture( options.flowMap !== undefined ? options.flowMap : null );
+		this.flowMap = texture( options.flowMap );
 
 		this.color = uniform( options.color !== undefined ? new Color( options.color ) : new Color( 0xffffff ) );
 		this.flowDirection = uniform( options.flowDirection !== undefined ? options.flowDirection : new Vector2( 1, 0 ) );

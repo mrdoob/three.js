@@ -1,17 +1,13 @@
 # AmmoPhysics
 
-Can be used to include Ammo.js as a Physics engine into `three.js` apps. Make sure to include `ammo.wasm.js` first:
+Can be used to include Ammo.js as a Physics engine into `three.js` apps. The API can be initialized via:
 
-It is then possible to initialize the API via:
-
-```js
-const physics = await AmmoPhysics();
-```
+The component automatically imports Ammo.js from a CDN so make sure to use the component with an active Internet connection.
 
 ## Code Example
 
 ```js
-<script src="jsm/libs/ammo.wasm.js"></script>
+const physics = await AmmoPhysics();
 ```
 
 ## Import

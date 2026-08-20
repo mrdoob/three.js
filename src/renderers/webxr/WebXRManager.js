@@ -67,6 +67,7 @@ class WebXRManager extends EventDispatcher {
 
 		const currentSize = new Vector2();
 		let currentPixelRatio = null;
+		let currentCameraSettings = null;
 
 		//
 
@@ -262,6 +263,18 @@ class WebXRManager extends EventDispatcher {
 			renderer.setPixelRatio( currentPixelRatio );
 			renderer.setSize( currentSize.width, currentSize.height, false );
 
+			if ( currentCameraSettings !== null ) {
+
+				const camera = currentCameraSettings.camera;
+
+				camera.fov = currentCameraSettings.fov;
+				camera.zoom = currentCameraSettings.zoom;
+				camera.updateProjectionMatrix();
+
+				currentCameraSettings = null;
+
+			}
+
 			scope.dispatchEvent( { type: 'sessionend' } );
 
 		}
@@ -451,7 +464,9 @@ class WebXRManager extends EventDispatcher {
 							colorSpace: renderer.outputColorSpace,
 							stencilBuffer: attributes.stencil,
 							resolveDepthBuffer: ( glBaseLayer.ignoreDepthValues === false ),
-							resolveStencilBuffer: ( glBaseLayer.ignoreDepthValues === false )
+							resolveStencilBuffer: ( glBaseLayer.ignoreDepthValues === false ),
+							storeMultisampledDepthBuffer: ( glBaseLayer.ignoreDepthValues === false ),
+							storeMultisampledStencilBuffer: ( glBaseLayer.ignoreDepthValues === false )
 
 						}
 					);
@@ -496,7 +511,9 @@ class WebXRManager extends EventDispatcher {
 							colorSpace: renderer.outputColorSpace,
 							samples: attributes.antialias ? 4 : 0,
 							resolveDepthBuffer: ( glProjLayer.ignoreDepthValues === false ),
-							resolveStencilBuffer: ( glProjLayer.ignoreDepthValues === false )
+							resolveStencilBuffer: ( glProjLayer.ignoreDepthValues === false ),
+							storeMultisampledDepthBuffer: ( glProjLayer.ignoreDepthValues === false ),
+							storeMultisampledStencilBuffer: ( glProjLayer.ignoreDepthValues === false )
 						} );
 
 				}
@@ -778,6 +795,12 @@ class WebXRManager extends EventDispatcher {
 			}
 
 			// update user camera and its children
+
+			if ( currentCameraSettings === null && camera.isPerspectiveCamera ) {
+
+				currentCameraSettings = { camera: camera, fov: camera.fov, zoom: camera.zoom };
+
+			}
 
 			updateUserCamera( camera, cameraXR, parent );
 

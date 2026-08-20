@@ -114,7 +114,7 @@ export class LUT3dlLoader extends Loader {
 
 		if ( result === null ) {
 
-			throw new Error( 'LUT3dlLoader: Missing grid information' );
+			throw new Error( 'THREE.LUT3dlLoader: Missing grid information' );
 
 		}
 
@@ -127,7 +127,7 @@ export class LUT3dlLoader extends Loader {
 
 			if ( gridStep !== ( gridLines[ i ] - gridLines[ i - 1 ] ) ) {
 
-				throw new Error( 'LUT3dlLoader: Inconsistent grid size' );
+				throw new Error( 'THREE.LUT3dlLoader: Inconsistent grid size' );
 
 			}
 

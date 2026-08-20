@@ -1,12 +1,10 @@
 import Node from '../core/Node.js';
-import StackTrace from '../core/StackTrace.js';
 import { NodeUpdateType } from '../core/constants.js';
+import { renderGroup } from '../core/UniformGroupNode.js';
 import { uniform } from '../core/UniformNode.js';
-import { Fn, nodeImmutable, vec2 } from '../tsl/TSLBase.js';
-
+import { nodeImmutable, vec2 } from '../tsl/TSLBase.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
-import { warn } from '../../utils.js';
 
 let _screenSizeVec, _viewportVec;
 
@@ -28,7 +26,7 @@ class ScreenNode extends Node {
 	/**
 	 * Constructs a new screen node.
 	 *
-	 * @param {('coordinate'|'viewport'|'size'|'uv'|'dpr')} scope - The node's scope.
+	 * @param {('coordinate'|'viewport'|'size'|'uv')} scope - The node's scope.
 	 */
 	constructor( scope ) {
 
@@ -41,20 +39,10 @@ class ScreenNode extends Node {
 		 * - `ScreenNode.VIEWPORT`: The current viewport defined as a four-dimensional vector.
 		 * - `ScreenNode.SIZE`: The dimensions of the current bound framebuffer.
 		 * - `ScreenNode.UV`: Normalized coordinates.
-		 * - `ScreenNode.DPR`: Device pixel ratio.
 		 *
-		 * @type {('coordinate'|'viewport'|'size'|'uv'|'dpr')}
+		 * @type {('coordinate'|'viewport'|'size'|'uv')}
 		 */
 		this.scope = scope;
-
-		/**
-		 * This output node.
-		 *
-		 * @private
-		 * @type {?Node}
-		 * @default null
-		 */
-		this._output = null;
 
 		/**
 		 * This flag can be used for type testing.
@@ -70,11 +58,10 @@ class ScreenNode extends Node {
 	/**
 	 * This method is overwritten since the node type depends on the selected scope.
 	 *
-	 * @return {('float'|'vec2'|'vec4')} The node type.
+	 * @return {('vec2'|'vec4')} The node type.
 	 */
 	generateNodeType() {
 
-		if ( this.scope === ScreenNode.DPR ) return 'float';
 		if ( this.scope === ScreenNode.VIEWPORT ) return 'vec4';
 		else return 'vec2';
 
@@ -89,7 +76,7 @@ class ScreenNode extends Node {
 
 		let updateType = NodeUpdateType.NONE;
 
-		if ( this.scope === ScreenNode.SIZE || this.scope === ScreenNode.VIEWPORT || this.scope === ScreenNode.DPR ) {
+		if ( this.scope === ScreenNode.SIZE || this.scope === ScreenNode.VIEWPORT ) {
 
 			updateType = NodeUpdateType.RENDER;
 
@@ -125,10 +112,6 @@ class ScreenNode extends Node {
 
 			}
 
-		} else if ( this.scope === ScreenNode.DPR ) {
-
-			this._output.value = renderer.getPixelRatio();
-
 		} else {
 
 			if ( renderTarget !== null ) {
@@ -154,23 +137,17 @@ class ScreenNode extends Node {
 
 		if ( scope === ScreenNode.SIZE ) {
 
-			output = uniform( _screenSizeVec || ( _screenSizeVec = new Vector2() ) );
+			output = uniform( _screenSizeVec || ( _screenSizeVec = new Vector2() ) ).setGroup( renderGroup );
 
 		} else if ( scope === ScreenNode.VIEWPORT ) {
 
-			output = uniform( _viewportVec || ( _viewportVec = new Vector4() ) );
-
-		} else if ( scope === ScreenNode.DPR ) {
-
-			output = uniform( 1 );
+			output = uniform( _viewportVec || ( _viewportVec = new Vector4() ) ).setGroup( renderGroup );
 
 		} else {
 
 			output = vec2( screenCoordinate.div( screenSize ) );
 
 		}
-
-		this._output = output;
 
 		return output;
 
@@ -206,7 +183,6 @@ ScreenNode.COORDINATE = 'coordinate';
 ScreenNode.VIEWPORT = 'viewport';
 ScreenNode.SIZE = 'size';
 ScreenNode.UV = 'uv';
-ScreenNode.DPR = 'dpr';
 
 export default ScreenNode;
 
@@ -216,9 +192,9 @@ export default ScreenNode;
  * TSL object that represents the current DPR.
  *
  * @tsl
- * @type {ScreenNode<float>}
+ * @type {UniformNode<float>}
  */
-export const screenDPR = /*@__PURE__*/ nodeImmutable( ScreenNode, ScreenNode.DPR );
+export const screenDPR = /*@__PURE__*/ uniform( 1 ).setGroup( renderGroup ).onRenderUpdate( ( { renderer } ) => renderer.getPixelRatio() );
 
 /**
  * TSL object that represents normalized screen coordinates, unitless in `[0, 1]`.
@@ -278,15 +254,3 @@ export const viewportCoordinate = /*@__PURE__*/ screenCoordinate.sub( viewport.x
  */
 export const viewportUV = /*@__PURE__*/ viewportCoordinate.div( viewportSize );
 
-// Deprecated
-
-/**
- * @deprecated since r169. Use {@link screenSize} instead.
- */
-export const viewportResolution = /*@__PURE__*/ ( Fn( () => { // @deprecated, r169
-
-	warn( 'TSL: "viewportResolution" is deprecated. Use "screenSize" instead.', new StackTrace() );
-
-	return screenSize;
-
-}, 'vec2' ).once() )();

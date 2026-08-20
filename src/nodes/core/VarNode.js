@@ -175,6 +175,14 @@ class VarNode extends Node {
 
 		const builder = params[ 0 ];
 
+		const refNode = this.getShared( builder );
+
+		if ( this !== refNode ) {
+
+			return refNode.build( ...params );
+
+		}
+
 		if ( this._hasStack( builder ) === false && builder.buildStage === 'setup' ) {
 
 			if ( builder.context.nodeLoop || builder.context.nodeBlock ) {
@@ -351,7 +359,6 @@ export const Const = ( node, name = null ) => createVar( node, name, true ).toSt
  * @tsl
  * @function
  * @param {Node} node - The node for which a variable should be created.
- * @param {?string} name - The name of the variable in the shader.
  * @returns {VarNode}
  */
 export const VarIntent = ( node ) => {

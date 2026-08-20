@@ -40,6 +40,12 @@ class EditorControls extends THREE.EventDispatcher {
 
 		var changeEvent = { type: 'change' };
 
+		this.setCamera = function ( camera ) {
+
+			object = camera;
+
+		};
+
 		this.focus = function ( target ) {
 
 			var distance;
@@ -66,13 +72,22 @@ class EditorControls extends THREE.EventDispatcher {
 
 			object.position.copy( center ).add( delta );
 
+			if ( object.isOrthographicCamera ) {
+
+				object.zoom = ( object.top - object.bottom ) / ( distance * 2 );
+				object.updateProjectionMatrix();
+
+			}
+
 			scope.dispatchEvent( changeEvent );
 
 		};
 
 		this.pan = function ( delta ) {
 
-			var distance = object.position.distanceTo( center );
+			var distance = object.isOrthographicCamera
+				? ( object.top - object.bottom ) / object.zoom
+				: object.position.distanceTo( center );
 
 			delta.multiplyScalar( distance * scope.panSpeed );
 			delta.applyMatrix3( normalMatrix.getNormalMatrix( object.matrix ) );
@@ -86,15 +101,24 @@ class EditorControls extends THREE.EventDispatcher {
 
 		this.zoom = function ( delta ) {
 
-			var distance = object.position.distanceTo( center );
+			if ( object.isOrthographicCamera ) {
 
-			delta.multiplyScalar( distance * scope.zoomSpeed );
+				object.zoom = Math.max( 0.0001, object.zoom * Math.pow( 0.95, delta.z ) );
+				object.updateProjectionMatrix();
 
-			if ( delta.length() > distance ) return;
+			} else {
 
-			delta.applyMatrix3( normalMatrix.getNormalMatrix( object.matrix ) );
+				var distance = object.position.distanceTo( center );
 
-			object.position.add( delta );
+				delta.multiplyScalar( distance * scope.zoomSpeed );
+
+				if ( delta.length() > distance ) return;
+
+				delta.applyMatrix3( normalMatrix.getNormalMatrix( object.matrix ) );
+
+				object.position.add( delta );
+
+			}
 
 			scope.dispatchEvent( changeEvent );
 

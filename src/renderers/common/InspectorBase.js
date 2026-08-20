@@ -1,14 +1,18 @@
+import { EventDispatcher } from '../../core/EventDispatcher.js';
+
 /**
  * InspectorBase is the base class for all inspectors.
  *
- * @class InspectorBase
+ * @augments EventDispatcher
  */
-class InspectorBase {
+class InspectorBase extends EventDispatcher {
 
 	/**
 	 * Creates a new InspectorBase.
 	 */
 	constructor() {
+
+		super();
 
 		/**
 		 * The renderer associated with this inspector.
@@ -24,6 +28,22 @@ class InspectorBase {
 		 * @type {Object}
 		 */
 		this.currentFrame = null;
+
+		/**
+		 * Indicates whether the inspector is running.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.isRunning = false;
+
+		/**
+		 * Indicates whether the inspector is enabled.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.enabled = true;
 
 	}
 
@@ -71,12 +91,20 @@ class InspectorBase {
 	/**
 	 * Called when a frame begins.
 	 */
-	begin() { }
+	begin() {
+
+		this.isRunning = true;
+
+	}
 
 	/**
 	 * Called when a frame ends.
 	 */
-	finish() { }
+	finish() {
+
+		this.isRunning = false;
+
+	}
 
 	/**
 	 * Inspects a node.

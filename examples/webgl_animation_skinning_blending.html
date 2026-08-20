@@ -4,6 +4,10 @@
 		<title>three.js webgl - animation - skinning</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - animation - skinning">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_animation_skinning_blending.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_animation_skinning_blending.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			a {
@@ -70,18 +74,11 @@
 				hemiLight.position.set( 0, 20, 0 );
 				scene.add( hemiLight );
 
-				const dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
-				dirLight.position.set( - 3, 10, - 10 );
-				dirLight.castShadow = true;
-				dirLight.shadow.camera.top = 2;
-				dirLight.shadow.camera.bottom = - 2;
-				dirLight.shadow.camera.left = - 2;
-				dirLight.shadow.camera.right = 2;
-				dirLight.shadow.camera.near = 0.1;
-				dirLight.shadow.camera.far = 40;
-				scene.add( dirLight );
-
-				// scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
+				const sunLight = new THREE.SunLight( 0xffffff, 3 );
+				sunLight.position.set( - 3, 10, - 10 );
+				sunLight.castShadow = true;
+				sunLight.shadow.camera.far = 20;
+				scene.add( sunLight );
 
 				// ground
 

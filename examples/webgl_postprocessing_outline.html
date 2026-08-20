@@ -4,11 +4,15 @@
 		<title>three.js webgl - post processing - Outline Pass</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - post processing - Outline Pass">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_postprocessing_outline.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_postprocessing_outline.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Outline Pass by <a href="http://eduperiment.com" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Outline Pass by <a href="https://github.com/spidersharma03" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://ben3d.ca/" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
 		</div>
 
 		<script type="importmap">
@@ -147,20 +151,11 @@
 
 				scene.add( new THREE.AmbientLight( 0xaaaaaa, 0.6 ) );
 
-				const light = new THREE.DirectionalLight( 0xddffdd, 2 );
+				const light = new THREE.SunLight( 0xddffdd, 2 );
 				light.position.set( 5, 5, 5 );
 				light.castShadow = true;
-				light.shadow.mapSize.width = 1024;
-				light.shadow.mapSize.height = 1024;
-
-				const d = 10;
-
-				light.shadow.camera.left = - d;
-				light.shadow.camera.right = d;
-				light.shadow.camera.top = d;
-				light.shadow.camera.bottom = - d;
-				light.shadow.camera.far = 25;
-
+				light.shadow.camera.far = 40;
+				light.shadow.mapSize.setScalar( 2048 );
 				scene.add( light );
 
 				// model

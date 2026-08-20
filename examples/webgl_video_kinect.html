@@ -4,9 +4,14 @@
 		<title>three.js - kinect</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js - kinect">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_video_kinect.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_video_kinect.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - kinect</div>
 
 		<video id="video" loop muted crossOrigin="anonymous" playsinline style="display:none">
 			<source src="textures/kinect.webm">
@@ -93,11 +98,6 @@
 
 				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
-
-				const info = document.createElement( 'div' );
-				info.id = 'info';
-				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - kinect';
-				document.body.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 0, 500 );

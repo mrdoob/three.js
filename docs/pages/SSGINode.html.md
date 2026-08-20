@@ -136,7 +136,7 @@ Default is `false`.
 
 Makes the sample distance in screen space instead of world-space (helps having more detail up close).
 
-Default is `false`.
+Default is `true`.
 
 ### .useTemporalFiltering : boolean
 
@@ -154,11 +154,17 @@ Frees internal resources. This method should be called when the effect is no lon
 
 **Overrides:** [TempNode#dispose](TempNode.html#dispose)
 
-### .getTextureNode() : PassTextureNode
+### .getAONode() : PassTextureNode
 
-Returns the result of the effect as a texture node.
+Returns the AO result of the effect as a texture node.
 
-**Returns:** A texture node that represents the result of the effect.
+**Returns:** A texture node that represents the AO result of the effect.
+
+### .getGINode() : PassTextureNode
+
+Returns the GI result of the effect as a texture node.
+
+**Returns:** A texture node that represents the GI result of the effect.
 
 ### .setSize( width : number, height : number )
 

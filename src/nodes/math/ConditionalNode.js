@@ -7,12 +7,12 @@ import { warn } from '../../utils.js';
  * Represents a logical `if/else` statement. Can be used as an alternative
  * to the `If()`/`Else()` syntax.
  *
- * The corresponding TSL `select()` looks like so:
+ * The `select()` method is called in a chaining fashion on a condition. The parameter nodes of `select()`
+ * determine the outcome of the entire statement.
+ *
  * ```js
  * velocity = position.greaterThanEqual( limit ).select( velocity.negate(), velocity );
  * ```
- * The `select()` method is called in a chaining fashion on a condition. The parameter nodes of `select()`
- * determine the outcome of the entire statement.
  *
  * @augments Node
  */

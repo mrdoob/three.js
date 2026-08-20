@@ -212,6 +212,12 @@ Setting this property to `true` indicates the engine the texture must be updated
 
 Default is `false`.
 
+### .normalized : boolean
+
+Whether the texture should use one of the 16 bit integer formats which are normalized to \[0, 1\] or \[-1, 1\] (depending on signed/unsigned) when sampled.
+
+Default is `false`.
+
 ### .offset : Vector2
 
 How much a single repetition of the texture is offset from the beginning, in each direction U and V. Typical range is `0.0` to `1.0`.
@@ -400,7 +406,7 @@ The uv vector.
 
 ### .updateMatrix()
 
-Updates the texture transformation matrix from the from the properties [Texture#offset](Texture.html#offset), [Texture#repeat](Texture.html#repeat), [Texture#rotation](Texture.html#rotation), and [Texture#center](Texture.html#center).
+Updates the texture transformation matrix from the properties [Texture#offset](Texture.html#offset), [Texture#repeat](Texture.html#repeat), [Texture#rotation](Texture.html#rotation), and [Texture#center](Texture.html#center).
 
 ## Events
 

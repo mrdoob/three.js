@@ -58,15 +58,15 @@ Default is `'render'`.
 
 ## Methods
 
-### .getTextureForReference( reference : RenderTarget ) : Texture
+### .getTextureForReference( reference : RenderTarget | CanvasTarget ) : Texture
 
-This methods returns a texture for the given render target reference.
+This methods returns a texture for the given render target or canvas target reference.
 
 To avoid rendering errors, `ViewportTextureNode` must use unique framebuffer textures for different render contexts.
 
 **reference**
 
-The render target reference.
+The render target or canvas target reference.
 
 Default is `null`.
 

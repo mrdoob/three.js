@@ -5,7 +5,7 @@ import { context } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
 import { viewZToOrthographicDepth, perspectiveDepthToViewZ } from './ViewportDepthNode.js';
 
-import { HalfFloatType/*, FloatType*/ } from '../../constants.js';
+import { HalfFloatType, FloatType } from '../../constants.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
@@ -155,6 +155,7 @@ class PassMultipleTextureNode extends PassTextureNode {
 		newNode.depthNode = this.depthNode;
 		newNode.compareNode = this.compareNode;
 		newNode.gradNode = this.gradNode;
+		newNode.gatherNode = this.gatherNode;
 		newNode.offsetNode = this.offsetNode;
 
 		return newNode;
@@ -227,15 +228,6 @@ class PassNode extends TempNode {
 		this.options = options;
 
 		/**
-		 * The pass's pixel ratio. Will be kept automatically kept in sync with the renderer's pixel ratio.
-		 *
-		 * @private
-		 * @type {number}
-		 * @default 1
-		 */
-		this._pixelRatio = 1;
-
-		/**
 		 * The pass's pixel width. Will be kept automatically kept in sync with the renderer's width.
 		 * @private
 		 * @type {number}
@@ -251,14 +243,21 @@ class PassNode extends TempNode {
 		 */
 		this._height = 1;
 
-		const depthTexture = new DepthTexture();
-		depthTexture.isRenderTargetTexture = true;
-		//depthTexture.type = FloatType;
-		depthTexture.name = 'depth';
-
-		const renderTarget = new RenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, { type: HalfFloatType, ...options, } );
+		const renderTarget = new RenderTarget( this._width, this._height, { type: HalfFloatType, ...options, } );
 		renderTarget.texture.name = 'output';
-		renderTarget.depthTexture = depthTexture;
+
+		let depthTexture = null;
+
+		if ( this.scope === PassNode.DEPTH || options.depthBuffer !== false ) {
+
+			depthTexture = options.depthTexture || new DepthTexture();
+			depthTexture.isRenderTargetTexture = true;
+			//depthTexture.type = FloatType;
+			depthTexture.name = 'depth';
+
+			renderTarget.depthTexture = depthTexture;
+
+		}
 
 		/**
 		 * The pass's render target.
@@ -290,6 +289,40 @@ class PassNode extends TempNode {
 		 */
 		this.opaque = true;
 
+		this.lighting = null;
+
+		/**
+		 * Whether the renderer should automatically clear before rendering the pass.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.autoClear = options.autoClear !== undefined ? options.autoClear : true;
+
+		/**
+		 * Whether the color buffer should be cleared.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.autoClearColor = options.autoClearColor !== undefined ? options.autoClearColor : true;
+
+		/**
+		 * Whether the depth buffer should be cleared.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.autoClearDepth = options.autoClearDepth !== undefined ? options.autoClearDepth : true;
+
+		/**
+		 * Whether the stencil buffer should be cleared.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.autoClearStencil = options.autoClearStencil !== undefined ? options.autoClearStencil : true;
+
 		/**
 		 * An optional global context for the pass.
 		 *
@@ -310,12 +343,17 @@ class PassNode extends TempNode {
 		 * A dictionary holding the internal result textures.
 		 *
 		 * @private
-		 * @type {Object<string, Texture>}
+		 * @type {{ output: Texture, depth: ?DepthTexture }}
 		 */
 		this._textures = {
-			output: renderTarget.texture,
-			depth: depthTexture
+			output: renderTarget.texture
 		};
+
+		if ( depthTexture !== null ) {
+
+			this._textures.depth = depthTexture;
+
+		}
 
 		/**
 		 * A dictionary holding the internal texture nodes.
@@ -567,6 +605,12 @@ class PassNode extends TempNode {
 
 		if ( texture === undefined ) {
 
+			if ( name === 'depth' ) {
+
+				throw new Error( 'THREE.PassNode: Depth texture is not available for this pass.' );
+
+			}
+
 			const refTexture = this.renderTarget.texture;
 
 			texture = refTexture.clone();
@@ -757,6 +801,12 @@ class PassNode extends TempNode {
 
 		this.renderTarget.texture.type = renderer.getOutputBufferType();
 
+		if ( renderer.reversedDepthBuffer === true && this.renderTarget.depthTexture !== null ) {
+
+			this.renderTarget.depthTexture.type = FloatType;
+
+		}
+
 		return this.scope === PassNode.COLOR ? this.getTextureNode() : this.getLinearDepthNode();
 
 	}
@@ -767,13 +817,11 @@ class PassNode extends TempNode {
 		const { scene } = this;
 
 		let camera;
-		let pixelRatio;
 
 		const outputRenderTarget = renderer.getOutputRenderTarget();
 
 		if ( outputRenderTarget && outputRenderTarget.isXRRenderTarget === true ) {
 
-			pixelRatio = 1;
 			camera = renderer.xr.getCamera();
 
 			renderer.xr.updateCamera( camera );
@@ -783,21 +831,22 @@ class PassNode extends TempNode {
 		} else {
 
 			camera = this.camera;
-			pixelRatio = renderer.getPixelRatio();
 
-			renderer.getSize( _size );
+			renderer.getDrawingBufferSize( _size );
 
 		}
-
-		this._pixelRatio = pixelRatio;
 
 		this.setSize( _size.width, _size.height );
 
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentMRT = renderer.getMRT();
 		const currentAutoClear = renderer.autoClear;
+		const currentAutoClearColor = renderer.autoClearColor;
+		const currentAutoClearDepth = renderer.autoClearDepth;
+		const currentAutoClearStencil = renderer.autoClearStencil;
 		const currentTransparent = renderer.transparent;
 		const currentOpaque = renderer.opaque;
+		const currentLighting = renderer.lighting;
 		const currentMask = camera.layers.mask;
 		const currentContextNode = renderer.contextNode;
 		const currentOverrideMaterial = scene.overrideMaterial;
@@ -825,9 +874,18 @@ class PassNode extends TempNode {
 
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setMRT( this._mrt );
-		renderer.autoClear = true;
+		renderer.autoClear = this.autoClear;
+		renderer.autoClearColor = this.autoClearColor;
+		renderer.autoClearDepth = this.autoClearDepth;
+		renderer.autoClearStencil = this.autoClearStencil;
 		renderer.transparent = this.transparent;
 		renderer.opaque = this.opaque;
+
+		if ( this.lighting !== null ) {
+
+			renderer.lighting = this.lighting;
+
+		}
 
 		if ( this.contextNode !== null ) {
 
@@ -856,9 +914,13 @@ class PassNode extends TempNode {
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
 		renderer.autoClear = currentAutoClear;
+		renderer.autoClearColor = currentAutoClearColor;
+		renderer.autoClearDepth = currentAutoClearDepth;
+		renderer.autoClearStencil = currentAutoClearStencil;
 		renderer.transparent = currentTransparent;
 		renderer.opaque = currentOpaque;
 		renderer.contextNode = currentContextNode;
+		renderer.lighting = currentLighting;
 
 		camera.layers.mask = currentMask;
 
@@ -875,13 +937,31 @@ class PassNode extends TempNode {
 		this._width = width;
 		this._height = height;
 
-		const effectiveWidth = Math.floor( this._width * this._pixelRatio * this._resolutionScale );
-		const effectiveHeight = Math.floor( this._height * this._pixelRatio * this._resolutionScale );
+		const effectiveWidth = Math.floor( this._width * this._resolutionScale );
+		const effectiveHeight = Math.floor( this._height * this._resolutionScale );
 
 		this.renderTarget.setSize( effectiveWidth, effectiveHeight );
 
-		if ( this._scissor !== null ) this.renderTarget.scissor.copy( this._scissor );
-		if ( this._viewport !== null ) this.renderTarget.viewport.copy( this._viewport );
+		// scissor
+
+		if ( this._scissor !== null ) {
+
+			this.renderTarget.scissor.copy( this._scissor ).multiplyScalar( this._resolutionScale ).floor();
+			this.renderTarget.scissorTest = true;
+
+		} else {
+
+			this.renderTarget.scissorTest = false;
+
+		}
+
+		// viewport
+
+		if ( this._viewport !== null ) {
+
+			this.renderTarget.viewport.copy( this._viewport ).multiplyScalar( this._resolutionScale ).floor();
+
+		}
 
 	}
 
@@ -915,8 +995,6 @@ class PassNode extends TempNode {
 				this._scissor.set( x, y, width, height );
 
 			}
-
-			this._scissor.multiplyScalar( this._pixelRatio * this._resolutionScale ).floor();
 
 		}
 
@@ -952,22 +1030,7 @@ class PassNode extends TempNode {
 
 			}
 
-			this._viewport.multiplyScalar( this._pixelRatio * this._resolutionScale ).floor();
-
 		}
-
-	}
-
-	/**
-	 * Sets the pixel ratio the pass's render target and updates the size.
-	 *
-	 * @param {number} pixelRatio - The pixel ratio to set.
-	 */
-	setPixelRatio( pixelRatio ) {
-
-		this._pixelRatio = pixelRatio;
-
-		this.setSize( this._width, this._height );
 
 	}
 

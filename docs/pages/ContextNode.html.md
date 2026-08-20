@@ -54,6 +54,18 @@ Default is `{}`.
 
 ## Methods
 
+### .generateNodeType( builder : NodeBuilder ) : string
+
+This method is overwritten to ensure it returns the type of [ContextNode#node](ContextNode.html#node).
+
+**builder**
+
+The current node builder.
+
+**Overrides:** [Node#generateNodeType](Node.html#generateNodeType)
+
+**Returns:** The node type.
+
 ### .getFlowContextData() : Object
 
 Gathers the context data from all parent context nodes.
@@ -75,18 +87,6 @@ The member name.
 **Overrides:** [Node#getMemberType](Node.html#getMemberType)
 
 **Returns:** The member type.
-
-### .getNodeType( builder : NodeBuilder ) : string
-
-This method is overwritten to ensure it returns the type of [ContextNode#node](ContextNode.html#node).
-
-**builder**
-
-The current node builder.
-
-**Overrides:** [Node#getNodeType](Node.html#getNodeType)
-
-**Returns:** The node type.
 
 ### .getScope() : Node
 

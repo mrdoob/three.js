@@ -1,11 +1,12 @@
 import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
-import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp } from 'three/tsl';
+import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 
 // From Activision GTAO paper: https://www.activision.com/cdn/research/s2016_pbs_activision_occlusion.pptx
 const _temporalRotations = [ 60, 300, 180, 240, 120, 0 ];
+const _spatialOffsets = [ 0, 0.5, 0.25, 0.75 ];
 
 let _rendererState;
 
@@ -14,19 +15,30 @@ let _rendererState;
  * ```js
  * const renderPipeline = new THREE.RenderPipeline( renderer );
  *
- * const scenePass = pass( scene, camera );
- * scenePass.setMRT( mrt( {
- * 	output: output,
- * 	normal: normalView
+ * // pre-pass for normals and depth
+ *
+ * const prePass = pass( scene, camera );
+ * prePass.setMRT( mrt( {
+ * 	output: normalView
  * } ) );
  *
- * const scenePassColor = scenePass.getTextureNode( 'output' );
- * const scenePassNormal = scenePass.getTextureNode( 'normal' );
- * const scenePassDepth = scenePass.getTextureNode( 'depth' );
+ * const prePassNormal = prePass.getTextureNode();
+ * const prePassDepth = prePass.getTextureNode( 'depth' );
  *
- * const aoPass = ao( scenePassDepth, scenePassNormal, camera );
+ * // scene pass
  *
- * renderPipeline.outputNode = aoPass.getTextureNode().mul( scenePassColor );
+ * const scenePass = pass( scene, camera );
+ *
+ * // ao
+ *
+ * const aoPass = ao( prePassDepth, prePassNormal, camera );
+ * const aoPassOutput = aoPass.getTextureNode();
+ *
+ * // apply the ambient occlusion to the scene
+ *
+ * scenePass.contextNode = builtinAOContext( aoPassOutput.sample( screenUV ).r );
+ *
+ * renderPipeline.outputNode = scenePass;
  * ```
  *
  * Reference: [Practical Real-Time Strategies for Accurate Indirect Occlusion](https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf).
@@ -106,14 +118,6 @@ class GTAONode extends TempNode {
 		this.radius = uniform( 0.25 );
 
 		/**
-		 * The resolution of the effect. Can be scaled via
-		 * `resolutionScale`.
-		 *
-		 * @type {UniformNode<vec2>}
-		 */
-		this.resolution = uniform( new Vector2() );
-
-		/**
 		 * The thickness of the ambient occlusion.
 		 *
 		 * @type {UniformNode<float>}
@@ -121,17 +125,16 @@ class GTAONode extends TempNode {
 		this.thickness = uniform( 1 );
 
 		/**
-		 * Another option to tweak the occlusion. The recommended range is
-		 * `[1,2]` for attenuating the AO.
+		 * @deprecated since r186. The new distance model "Quadratic Ray Stepping"
+		 * does not need it anymore.
 		 *
 		 * @type {UniformNode<float>}
 		 */
 		this.distanceExponent = uniform( 1 );
 
 		/**
-		 * The distance fall off value of the ambient occlusion.
-		 * A lower value leads to a larger AO effect. The value
-		 * should lie in the range `[0,1]`.
+		 * @deprecated since r186. The new distance model "Quadratic Ray Stepping"
+		 * does not need it anymore.
 		 *
 		 * @type {UniformNode<float>}
 		 */
@@ -148,6 +151,8 @@ class GTAONode extends TempNode {
 		 * How many samples are used to compute the AO.
 		 * A higher value results in better quality but also
 		 * in a more expensive runtime behavior.
+		 *
+		 * Note: Changing this member triggers a shader recompilation.
 		 *
 		 * @type {UniformNode<float>}
 		 */
@@ -166,6 +171,14 @@ class GTAONode extends TempNode {
 		 * @default false
 		 */
 		this.useTemporalFiltering = false;
+
+		/**
+		 * The resolution of the effect. Can be scaled via `resolutionScale`.
+		 *
+		 * @private
+		 * @type {UniformNode<vec2>}
+		 */
+		this._resolution = uniform( new Vector2() );
 
 		/**
 		 * The node represents the internal noise texture used by the AO.
@@ -216,6 +229,48 @@ class GTAONode extends TempNode {
 		this._temporalDirection = uniform( 0 );
 
 		/**
+		 * Temporal offset added to the initial ray step.
+		 *
+		 * @private
+		 * @type {UniformNode<float>}
+		 */
+		this._temporalOffset = uniform( 0 );
+
+		/**
+		 * Resolution scale uniform.
+		 *
+		 * @private
+		 * @type {UniformNode<float>}
+		 */
+		this._resolutionScale = uniform( 0 );
+
+		/**
+		 * The TSL function that computes the AO. Required for rebuild.
+		 *
+		 * @private
+		 * @type {?Function}
+		 * @default null
+		 */
+		this._ao = null;
+
+		/**
+		 * The sample count currently baked into the shader.
+		 *
+		 * @private
+		 * @type {number}
+		 */
+		this._currentSamples = - 1;
+
+		/**
+		 * The shared builder context.  Required for rebuild.
+		 *
+		 * @private
+		 * @type {?Object}
+		 * @default null
+		 */
+		this._sharedContext = null;
+
+		/**
 		 * The material that is used to render the effect.
 		 *
 		 * @private
@@ -256,7 +311,8 @@ class GTAONode extends TempNode {
 		width = Math.round( this.resolutionScale * width );
 		height = Math.round( this.resolutionScale * height );
 
-		this.resolution.value.set( width, height );
+		this._resolutionScale.value = this.resolutionScale;
+		this._resolution.value.set( width, height );
 		this._aoRenderTarget.setSize( width, height );
 
 	}
@@ -279,10 +335,24 @@ class GTAONode extends TempNode {
 			const frameId = frame.frameId;
 
 			this._temporalDirection.value = _temporalRotations[ frameId % 6 ] / 360;
+			this._temporalOffset.value = _spatialOffsets[ frameId % 4 ];
 
 		} else {
 
 			this._temporalDirection.value = 0;
+			this._temporalOffset.value = 1;
+
+		}
+
+		// rebuild the material if the sample count has changed
+
+		if ( this.samples.value !== this._currentSamples ) {
+
+			this._currentSamples = this.samples.value;
+
+			this._material.contextNode = context( this._sharedContext );
+			this._material.fragmentNode = this._ao();
+			this._material.needsUpdate = true;
 
 		}
 
@@ -319,9 +389,7 @@ class GTAONode extends TempNode {
 
 		const uvNode = uv();
 
-		const sampleDepth = ( uv ) => {
-
-			const depth = this.depthNode.sample( uv ).r;
+		const linearizeDepth = ( depth ) => {
 
 			if ( builder.renderer.logarithmicDepthBuffer === true ) {
 
@@ -335,23 +403,39 @@ class GTAONode extends TempNode {
 
 		};
 
+		const sampleDepth = ( uv ) => linearizeDepth( this.depthNode.sample( uv ).r );
+
+		const sampleCenterDepth = ( uv ) => {
+
+			// Sidestep the nearest-rounding during depth access for the unjittered center pixel to avoid banding
+
+			const g = this.depthNode.gather().sample( uv );
+			const depth = min( min( g.x, g.y ), min( g.z, g.w ) );
+
+			return linearizeDepth( depth );
+
+		};
+
 		const sampleNoise = ( uv ) => this._noiseNode.sample( uv );
 		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.sample( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
 
-		const ao = Fn( () => {
+		this._ao = Fn( () => {
 
-			const depth = sampleDepth( uvNode ).toVar();
+			const depth = this._resolutionScale.lessThan( 1 ).select( sampleCenterDepth( uvNode ), sampleDepth( uvNode ) ).toConst();
 
 			depth.greaterThanEqual( 1.0 ).discard();
 
-			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toVar();
-			const viewNormal = sampleNormal( uvNode ).toVar();
+			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toConst();
+			const viewNormal = sampleNormal( uvNode ).toConst();
 
-			const radiusToUse = this.radius;
+			const radius = this.radius;
+			const invRadius = radius.reciprocal().toConst();
+			const viewDir = normalize( viewPosition.xyz.negate() ).toConst();
+			const clipPosition = this._cameraProjectionMatrix.mul( vec4( viewPosition, 1.0 ) ).toConst();
 
 			const noiseResolution = textureSize( this._noiseNode, 0 );
 			let noiseUv = vec2( uvNode.x, uvNode.y.oneMinus() );
-			noiseUv = noiseUv.mul( this.resolution.div( noiseResolution ) );
+			noiseUv = noiseUv.mul( this._resolution.div( noiseResolution ) );
 
 			const noiseTexel = sampleNoise( noiseUv );
 			const randomVec = noiseTexel.xyz.mul( 2.0 ).sub( 1.0 );
@@ -359,74 +443,122 @@ class GTAONode extends TempNode {
 			const bitangent = vec3( tangent.y.mul( - 1.0 ), tangent.x, 0.0 );
 			const kernelMatrix = mat3( tangent, bitangent, vec3( 0.0, 0.0, 1.0 ) );
 
-			const DIRECTIONS = this.samples.lessThan( 30 ).select( 3, 5 ).toVar();
-			const STEPS = add( this.samples, DIRECTIONS.sub( 1 ) ).div( DIRECTIONS ).toVar();
+			// The sample count is baked into the shader so loop unrolling works
+
+			const SAMPLES = this.samples.value;
+			const DIRECTIONS = SAMPLES < 30 ? 3 : 5;
+			const STEPS = Math.ceil( SAMPLES / DIRECTIONS );
+			const invSteps = 1 / STEPS;
 
 			const ao = float( 0 ).toVar();
 
 			// Each iteration analyzes one vertical "slice" of the 3D space around the fragment.
 
-			Loop( { start: int( 0 ), end: DIRECTIONS, type: 'int', condition: '<' }, ( { i } ) => {
+			// Per-step phase jitter for spatio-temporal decorrelation.
+			const noiseJitterIdx = this._temporalDirection.mul( 0.02 );
+			const stepJitter = interleavedGradientNoise( screenCoordinate.add( this._temporalOffset ) ).add( rand( uvNode.add( noiseJitterIdx ).mul( 2 ).sub( 1 ) ) );
 
-				const angle = float( i ).div( float( DIRECTIONS ) ).mul( PI ).add( this._temporalDirection ).toVar();
-				const sampleDir = vec4( cos( angle ), sin( angle ), 0., add( 0.5, mul( 0.5, noiseTexel.w ) ) );
-				sampleDir.xyz = normalize( kernelMatrix.mul( sampleDir.xyz ) );
+			Loop( { start: int( 0 ), end: int( DIRECTIONS ), type: 'int', condition: '<' }, ( { i } ) => {
 
-				const viewDir = normalize( viewPosition.xyz.negate() ).toVar();
-				const sliceBitangent = normalize( cross( sampleDir.xyz, viewDir ) ).toVar();
-				const sliceTangent = cross( sliceBitangent, viewDir );
-				const normalInSlice = normalize( viewNormal.sub( sliceBitangent.mul( dot( viewNormal, sliceBitangent ) ) ) );
+				const angle = float( i ).div( DIRECTIONS ).mul( PI ).add( this._temporalDirection ).toConst();
+				const sampleDir = kernelMatrix.mul( vec3( cos( angle ), sin( angle ), 0 ) ).toConst();
+				const clipDirRadius = this._cameraProjectionMatrix.mul( vec4( sampleDir, 0.0 ) ).mul( radius ).toConst();
 
-				const tangentToNormalInSlice = cross( normalInSlice, sliceBitangent ).toVar();
-				const cosHorizons = vec2( dot( viewDir, tangentToNormalInSlice ), dot( viewDir, tangentToNormalInSlice.negate() ) ).toVar();
+				const sliceBitangent = normalize( cross( sampleDir, viewDir ) ).toConst();
+				const sliceTangent = cross( sliceBitangent, viewDir ).toConst();
+
+				// Project the view normal onto the slice plane (remove component along sliceBitangent).
+				// The unnormalized length is the foreshortening weight applied at slice integration.
+				// (Activision GTAO paper, Section 3.2 "Per-pixel sampling".)
+				const projNRaw = viewNormal.sub( sliceBitangent.mul( dot( viewNormal, sliceBitangent ) ) ).toConst();
+				const projNLen = projNRaw.length().toConst();
+				const projN = projNRaw.div( max( projNLen, float( 0.0001 ) ) ).toConst();
+
+				// γ — angle of projN within the slice plane, signed by the tangent direction.
+				const nSin = dot( projN, sliceTangent ).toConst();
+				const nCos = clamp( dot( projN, viewDir ), 0, 1 ).toConst();
+				const signNSin = nSin.greaterThanEqual( 0 ).select( float( 1 ), float( - 1 ) );
+				const angleN = signNSin.mul( acos( nCos ) ).toConst();
+
+				const tangentToNormalInSlice = cross( projN, sliceBitangent ).toConst();
+				const cosHorizon = dot( viewDir, tangentToNormalInSlice ).toConst();
+				const cosHorizons = vec2( cosHorizon, cosHorizon.negate() ).toVar();
 
 				// For each slice, the inner loop performs ray marching to find the horizons.
 
-				Loop( { end: STEPS, type: 'int', name: 'j', condition: '<' }, ( { j } ) => {
+				Loop( { end: int( STEPS ), type: 'int', name: 'j', condition: '<' }, ( { j } ) => {
 
-					const sampleViewOffset = sampleDir.xyz.mul( radiusToUse ).mul( sampleDir.w ).mul( pow( div( float( j ).add( 1.0 ), float( STEPS ) ), this.distanceExponent ) );
+					// Quadratic step distribution ( sampleDist = t² ) concentrates samples in the
+					// near-field. (Blender's Eevee adaptation)
+					const t = float( j ).add( 1.0 ).add( stepJitter ).mul( invSteps ).toConst();
+					const sampleDist = t.mul( t );
+					const clipOffset = clipDirRadius.mul( sampleDist ).toConst();
 
 					// The loop marches in two opposite directions (x and y) along the slice's line to find the horizon on both sides.
 
 					// x
 
-					const sampleScreenPositionX = getScreenPosition( viewPosition.add( sampleViewOffset ), this._cameraProjectionMatrix ).toVar();
-					const sampleDepthX = sampleDepth( sampleScreenPositionX ).toVar();
-					const sampleSceneViewPositionX = getViewPosition( sampleScreenPositionX, sampleDepthX, this._cameraProjectionMatrixInverse ).toVar();
-					const viewDeltaX = sampleSceneViewPositionX.sub( viewPosition ).toVar();
+					const sampleScreenPositionX = getScreenPositionFromClip( clipPosition.add( clipOffset ) ).toConst();
+					const sampleDepthX = sampleDepth( sampleScreenPositionX ).toConst();
+					const sampleSceneViewPositionX = getViewPosition( sampleScreenPositionX, sampleDepthX, this._cameraProjectionMatrixInverse ).toConst();
+					const viewDeltaX = sampleSceneViewPositionX.sub( viewPosition ).toConst();
+					const lenX = viewDeltaX.length().toConst();
+
+					// Manual normalize guards against zero-length delta.
+					const sHX = dot( viewDir, viewDeltaX ).div( max( lenX, float( 0.0001 ) ) );
+
+					// Sphere falloff: ( dist / radius )² fades the sample's horizon contribution
+					// back toward the prior horizon as it approaches the radius boundary.
+					// (squared variant of the paper's near-field attenuation;
+					// Activision GTAO paper, Section 4.3 "Bounding the sampling area")
+					const distFacX = min( lenX.mul( invRadius ), 1 );
+					const distFacSqX = distFacX.mul( distFacX );
 
 					If( abs( viewDeltaX.z ).lessThan( this.thickness ), () => {
 
-						const sampleCosHorizon = dot( viewDir, normalize( viewDeltaX ) );
-						cosHorizons.x.addAssign( max( 0, mul( sampleCosHorizon.sub( cosHorizons.x ), mix( 1.0, float( 2.0 ).div( float( j ).add( 2 ) ), this.distanceFallOff ) ) ) );
+						cosHorizons.x.assign( mix( max( cosHorizons.x, sHX ), cosHorizons.x, distFacSqX ) );
 
 					} );
 
 					// y
 
-					const sampleScreenPositionY = getScreenPosition( viewPosition.sub( sampleViewOffset ), this._cameraProjectionMatrix ).toVar();
-					const sampleDepthY = sampleDepth( sampleScreenPositionY ).toVar();
-					const sampleSceneViewPositionY = getViewPosition( sampleScreenPositionY, sampleDepthY, this._cameraProjectionMatrixInverse ).toVar();
-					const viewDeltaY = sampleSceneViewPositionY.sub( viewPosition ).toVar();
+					const sampleScreenPositionY = getScreenPositionFromClip( clipPosition.sub( clipOffset ) ).toConst();
+					const sampleDepthY = sampleDepth( sampleScreenPositionY ).toConst();
+					const sampleSceneViewPositionY = getViewPosition( sampleScreenPositionY, sampleDepthY, this._cameraProjectionMatrixInverse ).toConst();
+					const viewDeltaY = sampleSceneViewPositionY.sub( viewPosition ).toConst();
+					const lenY = viewDeltaY.length().toConst();
+
+					const sHY = dot( viewDir, viewDeltaY ).div( max( lenY, float( 0.0001 ) ) );
+
+					const distFacY = min( lenY.mul( invRadius ), 1 );
+					const distFacSqY = distFacY.mul( distFacY );
 
 					If( abs( viewDeltaY.z ).lessThan( this.thickness ), () => {
 
-						const sampleCosHorizon = dot( viewDir, normalize( viewDeltaY ) );
-						cosHorizons.y.addAssign( max( 0, mul( sampleCosHorizon.sub( cosHorizons.y ), mix( 1.0, float( 2.0 ).div( float( j ).add( 2 ) ), this.distanceFallOff ) ) ) );
+						cosHorizons.y.assign( mix( max( cosHorizons.y, sHY ), cosHorizons.y, distFacSqY ) );
 
 					} );
 
 				} );
 
-				// After the horizons are found for a given slice, their contribution to the total occlusion is calculated.
+				// Cosine-weighted inner integral, closed-form (Activision GTAO paper, Eq. 7).
+				// Per horizon h_i:    term_i = −cos( 2 h_i − γ ) + cos( γ ) + 2 h_i sin( γ )
+				// The 0.25 factor is ½ (integral normalization) × ½ (averaging the two horizons).
+				//
+				// In this slice setup `sliceTangent = cross( sliceBitangent, viewDir )` works out
+				// opposite to `sampleDir`, so the +sampleDir samples (cosHorizons.x) live on the
+				// −T side of the slice and −sampleDir samples (cosHorizons.y) on the +T side.
+				// γ is signed by +T (sliceTangent), so hPos must read from cosHorizons.y.
 
-				const sinHorizons = sqrt( sub( 1.0, cosHorizons.mul( cosHorizons ) ) ).toVar();
-				const nx = dot( normalInSlice, sliceTangent );
-				const ny = dot( normalInSlice, viewDir );
-				const nxb = mul( 0.5, acos( cosHorizons.y ).sub( acos( cosHorizons.x ) ).add( sinHorizons.x.mul( cosHorizons.x ).sub( sinHorizons.y.mul( cosHorizons.y ) ) ) );
-				const nyb = mul( 0.5, sub( 2.0, cosHorizons.x.mul( cosHorizons.x ) ).sub( cosHorizons.y.mul( cosHorizons.y ) ) );
-				const occlusion = nx.mul( nxb ).add( ny.mul( nyb ) );
-				ao.addAssign( occlusion );
+				const hPos = acos( cosHorizons.y ).toConst();
+				const hNeg = acos( cosHorizons.x ).negate().toConst();
+
+				const termPos = cos( hPos.mul( 2 ).sub( angleN ) ).negate().add( nCos ).add( hPos.mul( 2 ).mul( nSin ) );
+				const termNeg = cos( hNeg.mul( 2 ).sub( angleN ) ).negate().add( nCos ).add( hNeg.mul( 2 ).mul( nSin ) );
+				const a = termPos.add( termNeg ).mul( 0.25 );
+
+				// |projN| is the foreshortening weight from the per-slice normal projection.
+				ao.addAssign( projNLen.mul( a ) );
 
 			} );
 
@@ -437,7 +569,11 @@ class GTAONode extends TempNode {
 
 		} );
 
-		this._material.fragmentNode = ao().context( builder.getSharedContext() );
+		this._sharedContext = builder.getSharedContext();
+		this._currentSamples = this.samples.value;
+
+		this._material.contextNode = context( builder.getSharedContext() );
+		this._material.fragmentNode = this._ao();
 		this._material.needsUpdate = true;
 
 		//

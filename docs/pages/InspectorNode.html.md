@@ -34,11 +34,7 @@ Returns the type of the node.
 
 ## Methods
 
-### .getName() : string
-
-Returns the name of the inspector node.
-
-### .getNodeType( builder : NodeBuilder ) : string
+### .generateNodeType( builder : NodeBuilder ) : string
 
 Returns the type of the wrapped node.
 
@@ -46,7 +42,11 @@ Returns the type of the wrapped node.
 
 The node builder.
 
-**Overrides:** [Node#getNodeType](Node.html#getNodeType)
+**Overrides:** [Node#generateNodeType](Node.html#generateNodeType)
+
+### .getName() : string
+
+Returns the name of the inspector node.
 
 ### .setup( builder : NodeBuilder ) : Node
 

@@ -4,6 +4,10 @@
 		<title>three.js webgpu - logarithmic depth buffer</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - logarithmic depth buffer">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_camera_logarithmicdepthbuffer.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_camera_logarithmicdepthbuffer.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 		<style>
 
@@ -171,6 +175,7 @@
 			function initScene( font ) {
 
 				const scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
 
 				scene.add( new THREE.AmbientLight( 0x777777 ) );
 

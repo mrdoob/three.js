@@ -4,6 +4,10 @@
 		<title>three.js webgl - interactive lines</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - interactive lines">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_interactive_lines.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_interactive_lines.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
@@ -16,6 +20,8 @@
 		</style>
 	</head>
 	<body>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive lines</div>
+
 		<script type="importmap">
 			{
 				"imports": {
@@ -44,14 +50,6 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
-
-				const info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive lines';
-				container.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 

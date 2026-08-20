@@ -21,6 +21,15 @@ class BarrierNode extends Node {
 
 		this.scope = scope;
 
+		this.isBarrierNode = true;
+
+	}
+
+	setup( builder ) {
+
+		builder.allowEarlyReturns = false;
+		builder.allowGlobalVariables = false;
+
 	}
 
 	generate( builder ) {

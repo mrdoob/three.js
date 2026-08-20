@@ -159,7 +159,10 @@ class CSMShadowNode extends ShadowBaseNode {
 
 		this.camera = camera;
 
-		const data = { webGL: renderer.coordinateSystem === WebGLCoordinateSystem };
+		const data = {
+			webGL: renderer.coordinateSystem === WebGLCoordinateSystem,
+			reversedDepth: renderer.reversedDepthBuffer
+		};
 		this.mainFrustum = new CSMFrustum( data );
 
 		const light = this.light;
@@ -488,6 +491,16 @@ class CSMShadowNode extends ShadowBaseNode {
 
 	}
 
+	build( builder ) {
+
+		// register before the shadow nodes so `updateBefore()` runs first
+
+		builder.addSequentialNode( this );
+
+		return super.build( builder );
+
+	}
+
 	setup( builder ) {
 
 		if ( this.camera === null ) this._init( builder );
@@ -559,6 +572,9 @@ class CSMShadowNode extends ShadowBaseNode {
 			lwLight.target.position.copy( _center );
 			lwLight.target.position.add( _lightDirection );
 
+			lwLight.updateMatrixWorld();
+			lwLight.target.updateMatrixWorld();
+
 		}
 
 	}
@@ -574,8 +590,12 @@ class CSMShadowNode extends ShadowBaseNode {
 			const light = this.lights[ i ];
 			const parent = light.parent;
 
-			parent.remove( light.target );
-			parent.remove( light );
+			if ( parent !== null ) {
+
+				parent.remove( light.target );
+				parent.remove( light );
+
+			}
 
 		}
 

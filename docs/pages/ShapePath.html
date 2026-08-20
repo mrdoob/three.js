@@ -46,6 +46,13 @@ shapes. It is specifically used in context of fonts and SVG.</p></div>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
+				<div class="member">
+					<h3 class="name" id="userData" translate="no">.<a href="#userData">userData</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>An object that can be used to store custom data about the shape path.
+Mainly used by SVGLoader to store style information.</p>
+					</div>
+				</div>
 				<h2 class="subsection-title">Methods</h2>
 					<h3 class="name name-method" id="bezierCurveTo" translate="no">.<a href="#bezierCurveTo">bezierCurveTo</a><span class="signature">( aCP1x : <span class="param-type">number</span>, aCP1y : <span class="param-type">number</span>, aCP2x : <span class="param-type">number</span>, aCP2y : <span class="param-type">number</span>, aX : <span class="param-type">number</span>, aY : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="ShapePath.html">ShapePath</a></span> </h3>
 					<div class="method">
@@ -236,24 +243,11 @@ the current point with the given list of points.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this shape path.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="toShapes" translate="no">.<a href="#toShapes">toShapes</a><span class="signature">( isCCW : <span class="param-type">boolean</span> )</span><span class="type-signature"> : Array.&lt;<a href="Shape.html">Shape</a>></span> </h3>
+					<h3 class="name name-method" id="toShapes" translate="no">.<a href="#toShapes">toShapes</a><span class="signature">()</span><span class="type-signature"> : Array.&lt;<a href="Shape.html">Shape</a>></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Converts the paths into an array of shapes.</p>
 						</div>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong translate="no">isCCW</strong>
-									</td>
-									<td class="description last">
-										<p>By default solid shapes are  defined clockwise (CW) and holes are defined counterclockwise (CCW).
-If this flag is set to <code>true</code>, then those are flipped.</p>
-									</td>
-								</tr>
-							</tbody>
-						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> An array of shapes.</dt>
 						</dl>

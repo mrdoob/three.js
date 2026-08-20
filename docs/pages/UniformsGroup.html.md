@@ -130,6 +130,12 @@ Frees the GPU-related resources allocated by this instance. Call this method whe
 
 *   [Texture#event:dispose](Texture.html#event:dispose)
 
+### .release()
+
+Releases the buffer.
+
+**Overrides:** [UniformBuffer#release](UniformBuffer.html#release)
+
 ### .remove( uniform : Uniform ) : UniformsGroup
 
 Removes the given uniform from this uniforms group.

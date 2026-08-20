@@ -9,8 +9,11 @@ A loader for the glTF 2.0 format.
 `GLTFLoader` supports the following glTF 2.0 extensions:
 
 *   KHR\_draco\_mesh\_compression
+*   KHR\_lights\_punctual
+*   KHR\_materials\_anisotropy
 *   KHR\_materials\_clearcoat
 *   KHR\_materials\_dispersion
+*   KHR\_materials\_emissive\_strength
 *   KHR\_materials\_ior
 *   KHR\_materials\_specular
 *   KHR\_materials\_transmission
@@ -19,12 +22,13 @@ A loader for the glTF 2.0 format.
 *   KHR\_materials\_volume
 *   KHR\_mesh\_quantization
 *   KHR\_meshopt\_compression
-*   KHR\_lights\_punctual
 *   KHR\_texture\_basisu
 *   KHR\_texture\_transform
-*   EXT\_texture\_webp
+*   EXT\_materials\_bump
 *   EXT\_meshopt\_compression
 *   EXT\_mesh\_gpu\_instancing
+*   EXT\_texture\_avif
+*   EXT\_texture\_webp
 
 The following glTF 2.0 extension is supported by an external user plugin:
 

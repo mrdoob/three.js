@@ -14,6 +14,10 @@ Variable names should be valid identifiers and should not collide with THREE GLS
 
 The size of the computation (sizeX \* sizeY) is defined as 'resolution' automatically in the shader. For example:
 
+```js
+#DEFINE resolution vec2( 1024.0, 1024.0 )
+```
+
 Basic use:
 
 ```js
@@ -62,12 +66,6 @@ myMaterial.uniforms.map.value = outputRenderTarget.texture;
 // And compute each frame, before rendering to screen:
 gpuCompute.doRenderTarget( myFilter1, myRenderTarget );
 gpuCompute.doRenderTarget( myFilter2, outputRenderTarget );
-```
-
-## Code Example
-
-```js
-#DEFINE resolution vec2( 1024.0, 1024.0 )
 ```
 
 ## Import

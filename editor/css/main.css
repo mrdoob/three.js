@@ -936,6 +936,78 @@ hr {
 	margin-top: 15px;
 }
 
+.TextureParametersDialog-content {
+	min-width: 480px;
+}
+
+.TextureParametersDialog-split {
+	display: flex;
+	gap: 20px;
+}
+
+.TextureParametersDialog-preview {
+	flex: 0 0 auto;
+}
+
+.TextureParametersDialog-preview canvas {
+	border: 1px solid #888;
+	background: #000;
+	display: block;
+	max-width: 100%;
+	height: auto;
+}
+
+.TextureParametersDialog-form {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+@media all and ( max-width: 600px ) {
+
+	.TextureParametersDialog-content {
+		min-width: 0;
+		width: 90vw;
+	}
+
+	.TextureParametersDialog-split {
+		flex-direction: column;
+	}
+
+	.TextureParametersDialog-preview {
+		align-self: center;
+		max-width: 100%;
+	}
+
+}
+
+.TextureParametersDialog-groupHeading {
+	margin: 12px 0 6px;
+	padding-bottom: 2px;
+	border-bottom: 1px solid #ccc;
+	font-weight: bold;
+	text-transform: uppercase;
+	font-size: 11px;
+	color: #666;
+}
+
+.TextureParametersDialog-groupHeading:first-child {
+	margin-top: 0;
+}
+
+@media ( prefers-color-scheme: dark ) {
+
+	.TextureParametersDialog-groupHeading {
+		border-bottom-color: #444;
+		color: #888;
+	}
+
+}
+
+.TextureSettingsButton {
+	padding: 0 4px;
+	line-height: 16px;
+}
+
 @media ( prefers-color-scheme: dark ) {
 
 	.Dialog-content {

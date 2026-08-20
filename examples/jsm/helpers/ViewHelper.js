@@ -50,6 +50,14 @@ class ViewHelper extends Object3D {
 		this.isViewHelper = true;
 
 		/**
+		 * The camera whose transformation is visualized. It can be reassigned at
+		 * any time to rebind the helper to a different camera.
+		 *
+		 * @type {Camera}
+		 */
+		this.camera = camera;
+
+		/**
 		 * Whether the helper is currently animating or not.
 		 *
 		 * @type {boolean}
@@ -85,6 +93,8 @@ class ViewHelper extends Object3D {
 		const color4 = new Color( '#000000' );
 
 		const options = {};
+
+		const scope = this;
 
 		const interactiveObjects = [];
 		const raycaster = new Raycaster();
@@ -163,11 +173,11 @@ class ViewHelper extends Object3D {
 		 */
 		this.render = function ( renderer ) {
 
-			this.quaternion.copy( camera.quaternion ).invert();
+			this.quaternion.copy( this.camera.quaternion ).invert();
 			this.updateMatrixWorld();
 
 			point.set( 0, 0, 1 );
-			point.applyQuaternion( camera.quaternion );
+			point.applyQuaternion( this.camera.quaternion );
 
 			//
 
@@ -325,11 +335,11 @@ class ViewHelper extends Object3D {
 			// animate position by doing a slerp and then scaling the position on the unit sphere
 
 			q1.rotateTowards( q2, step );
-			camera.position.set( 0, 0, 1 ).applyQuaternion( q1 ).multiplyScalar( radius ).add( this.center );
+			this.camera.position.set( 0, 0, 1 ).applyQuaternion( q1 ).multiplyScalar( radius ).add( this.center );
 
 			// animate orientation
 
-			camera.quaternion.rotateTowards( targetQuaternion, step );
+			this.camera.quaternion.rotateTowards( targetQuaternion, step );
 
 			if ( q1.angleTo( q2 ) === 0 ) {
 
@@ -408,12 +418,12 @@ class ViewHelper extends Object3D {
 
 			//
 
-			radius = camera.position.distanceTo( focusPoint );
+			radius = scope.camera.position.distanceTo( focusPoint );
 			targetPosition.multiplyScalar( radius ).add( focusPoint );
 
 			dummy.position.copy( focusPoint );
 
-			dummy.lookAt( camera.position );
+			dummy.lookAt( scope.camera.position );
 			q1.copy( dummy.quaternion );
 
 			dummy.lookAt( targetPosition );
