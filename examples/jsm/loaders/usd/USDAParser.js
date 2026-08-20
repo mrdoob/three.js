@@ -2,6 +2,8 @@
 const DEF_MATCH_REGEX = /^def\s+(?:(\w+)\s+)?"?([^"]+)"?$/;
 const VARIANT_STRING_REGEX = /^string\s+(\w+)$/;
 const ATTR_MATCH_REGEX = /^(?:uniform\s+)?(\w+(?:\[\])?)\s+(.+)$/;
+// Preserve metadata blocks without changing the legacy parseText value shape.
+const VALUE_METADATA = Symbol( 'valueMetadata' );
 
 // Spec types (must match USDCParser/USDComposer)
 const SpecType = {
@@ -55,10 +57,12 @@ class USDAParser {
 
 					// see #28631
 
-					const values = rhs.slice( 0, - 1 );
+					const values = rhs.slice( 0, - 1 ).trim();
 					target[ lhs ] = values;
 
 					const meta = {};
+					if ( target[ VALUE_METADATA ] === undefined ) target[ VALUE_METADATA ] = {};
+					target[ VALUE_METADATA ][ lhs ] = meta;
 					stack.push( meta );
 
 					target = meta;
@@ -621,9 +625,18 @@ class USDAParser {
 				const relName = key.slice( 4 );
 				const relPath = path + '.' + relName;
 				const target = data[ key ].replace( /[<>]/g, '' );
+				const metadata = data[ VALUE_METADATA ]?.[ key ];
+				const fields = { targetPaths: [ target ] };
+
+				if ( metadata?.bindMaterialAs !== undefined ) {
+
+					fields.bindMaterialAs = this._parseString( String( metadata.bindMaterialAs ).trim() );
+
+				}
+
 				specsByPath[ relPath ] = {
 					specType: SpecType.Relationship,
-					fields: { targetPaths: [ target ] }
+					fields
 				};
 				continue;
 

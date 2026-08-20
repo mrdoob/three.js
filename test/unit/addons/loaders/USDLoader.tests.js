@@ -1,6 +1,7 @@
 import { LoadingManager } from 'three';
 import { USDLoader } from '../../../../examples/jsm/loaders/USDLoader.js';
 import { USDComposer, SpecType } from '../../../../examples/jsm/loaders/usd/USDComposer.js';
+import { USDAParser } from '../../../../examples/jsm/loaders/usd/USDAParser.js';
 import { USDCParser } from '../../../../examples/jsm/loaders/usd/USDCParser.js';
 
 export default QUnit.module( 'Addons', () => {
@@ -84,6 +85,61 @@ export default QUnit.module( 'Addons', () => {
 					composer._getMaterialBindingTarget( '/Root/Parent/Mesh' ),
 					'/Root/Materials/White',
 					'A descendant binding overrides a weaker inherited binding.'
+				);
+
+			} );
+
+			QUnit.test( 'reads USDA material binding strength metadata', ( assert ) => {
+
+				const usda = `#usda 1.0
+
+def Xform "Root"
+{
+	def Xform "Parent"
+	{
+		rel material:binding = </Root/Materials/Green> (
+			bindMaterialAs = "strongerThanDescendants"
+		)
+
+		def Mesh "Mesh"
+		{
+			rel material:binding = </Root/Materials/White> (
+				bindMaterialAs = "weakerThanDescendants"
+			)
+		}
+	}
+}`;
+
+				const parsedData = new USDAParser().parseData( usda );
+				const parentBinding = parsedData.specsByPath[ '/Root/Parent.material:binding' ];
+				const childBinding = parsedData.specsByPath[ '/Root/Parent/Mesh.material:binding' ];
+
+				assert.strictEqual(
+					parentBinding.fields.bindMaterialAs,
+					'strongerThanDescendants',
+					'The parent relationship preserves stronger binding metadata.'
+				);
+				assert.strictEqual(
+					childBinding.fields.bindMaterialAs,
+					'weakerThanDescendants',
+					'The child relationship preserves weaker binding metadata.'
+				);
+
+				const composer = new USDComposer();
+				composer.externalVariantSelections = {};
+				composer.specsByPath = parsedData.specsByPath;
+
+				assert.strictEqual(
+					composer._getMaterialBindingTarget( '/Root/Parent/Mesh' ),
+					'/Root/Materials/Green',
+					'A stronger USDA parent binding overrides the descendant binding.'
+				);
+
+				parentBinding.fields.bindMaterialAs = 'weakerThanDescendants';
+				assert.strictEqual(
+					composer._getMaterialBindingTarget( '/Root/Parent/Mesh' ),
+					'/Root/Materials/White',
+					'A USDA descendant binding overrides a weaker parent binding.'
 				);
 
 			} );
