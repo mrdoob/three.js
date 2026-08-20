@@ -14,7 +14,7 @@ import {
 	Quaternion
 } from 'three/webgpu';
 
-import { min, Fn, shadow, NodeUpdateType, getShadowMaterial, getShadowRenderObjectFunction } from 'three/tsl';
+import { min, Fn, shadow, NodeUpdateType } from 'three/tsl';
 
 const { resetRendererAndSceneState, restoreRendererAndSceneState } = RendererUtils;
 let _rendererState;
@@ -273,13 +273,10 @@ class TileShadowNode extends ShadowBaseNode {
 		const depthVersion = shadowMap.depthTexture.version;
 		this._depthVersionCached = depthVersion;
 		const currentRenderObjectFunction = renderer.getRenderObjectFunction();
-		const currentMRT = renderer.getMRT();
-		const useVelocity = currentMRT ? currentMRT.has( 'velocity' ) : false;
 
 		_rendererState = resetRendererAndSceneState( renderer, scene, _rendererState );
-		scene.overrideMaterial = getShadowMaterial( light );
+		scene.overrideMaterial = this.getShadowMaterial( );
 		renderer.setRenderTarget( this.shadowMap );
-
 
 		for ( let index = 0; index < this.lights.length; index ++ ) {
 
@@ -297,7 +294,7 @@ class TileShadowNode extends ShadowBaseNode {
 
 			shadow.updateMatrices( light );
 
-			renderer.setRenderObjectFunction( getShadowRenderObjectFunction( renderer, shadow, shadowType, useVelocity ) );
+			renderer.setRenderObjectFunction( this.getShadowRenderObjectFunction( renderer, shadow ) );
 			this.shadowMap.setSize( shadow.mapSize.width, shadow.mapSize.height, shadowMap.depth );
 
 		}
@@ -447,6 +444,7 @@ class TileShadowNode extends ShadowBaseNode {
 
 		// Dispose lights, nodes, and shadow map
 		this.disposeLightsAndNodes();
+		this.disposeShadowMaterial();
 		super.dispose();
 
 	}
