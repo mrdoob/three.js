@@ -686,7 +686,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		scene.overrideMaterial = this.getShadowMaterial();
 
-		renderer.setRenderObjectFunction( this.getShadowRenderObjectFunction( renderer ) );
+		renderer.setRenderObjectFunction( this.getShadowRenderObjectFunction( renderer, this.shadow || this.light.shadow ) );
 
 		renderer.setClearColor( 0x000000, 0 );
 
@@ -828,19 +828,6 @@ class ShadowNode extends ShadowBaseNode {
 }
 
 export default ShadowNode;
-
-/**
- * Shadow Render Object Function.
- *
- * @function shadowRenderObjectFunction
- * @param {Object3D} object - The 3D object to render.
- * @param {Scene} scene - The scene containing the object.
- * @param {Camera} _camera - The camera used for rendering.
- * @param {BufferGeometry} geometry - The geometry of the object.
- * @param {Material} material - The material of the object.
- * @param {Group} group - The group the object belongs to.
- * @param {...any} params - Additional parameters for rendering.
- */
 
 /**
  * TSL function for creating an instance of `ShadowNode`.

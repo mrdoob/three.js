@@ -275,7 +275,7 @@ class TileShadowNode extends ShadowBaseNode {
 		const currentRenderObjectFunction = renderer.getRenderObjectFunction();
 
 		_rendererState = resetRendererAndSceneState( renderer, scene, _rendererState );
-		scene.overrideMaterial = this.getShadowMaterial( );
+		scene.overrideMaterial = this.getShadowMaterial();
 		renderer.setRenderTarget( this.shadowMap );
 
 		for ( let index = 0; index < this.lights.length; index ++ ) {
