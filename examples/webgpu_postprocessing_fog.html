@@ -209,12 +209,13 @@
 
 				// Volumetric Cloud Fog Uniforms
 
+				const steps = uniform( 12 );
 				const fogDensity = uniform( 1.05 );
 				const heightFalloff = uniform( 0.85 );
 				const fogHeight = uniform( 0.6 );
-				const cloudScale = uniform( 0.05 );
+				const cloudScale = uniform( 0.07 );
 				const cloudThreshold = uniform( 0.44 );
-				const maxRayDist = uniform( 50.0 );
+				const maxRayDist = uniform( 100.0 );
 				const spatialSigma = uniform( 1.2 );
 				const depthSensitivity = uniform( 30.0 );
 				const blurRadius = uniform( 0.5 );
@@ -262,7 +263,6 @@
 					const totalDist = rayVector.length().min( maxRayDist );
 					const rayDir = rayVector.normalize();
 
-					const steps = 24;
 					const stepSize = totalDist.div( float( steps ) );
 					const stepVector = rayDir.mul( stepSize );
 
@@ -411,9 +411,10 @@
 
 				const gui = renderer.inspector.createParameters( 'Volumetric Fog' );
 				gui.add( filterParams, 'mode', [ 'JBU', 'Gaussian Blur', 'Disabled' ] ).name( 'denoiser' ).onChange( () => updateFilterMode() );
+				gui.add( steps, 'value', 4, 32, 1 ).name( 'steps' );
 				gui.add( cloudThreshold, 'value', 0.0, 0.8, 0.02 ).name( 'cloud threshold' );
 				gui.add( cloudScale, 'value', 0.02, 0.15, 0.005 ).name( 'cloud scale' );
-				gui.add( maxRayDist, 'value', 10.0, 100.0, 1.0 ).name( 'max ray dist' );
+				gui.add( maxRayDist, 'value', 10.0, 70.0, 1.0 ).name( 'max ray dist' );
 				gui.add( fogDensity, 'value', 0.0, 3.0, 0.05 ).name( 'fog density' );
 				gui.add( heightFalloff, 'value', 0.0, 2.0, 0.05 ).name( 'height falloff' );
 				gui.add( fogHeight, 'value', - 2.0, 5.0, 0.1 ).name( 'fog height' );
