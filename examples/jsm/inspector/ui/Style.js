@@ -2142,19 +2142,20 @@ export class Style {
 		width: 14px;
 		pointer-events: none;
 		background-image:
-			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'%3E%3Cpath d='M1 0.5 L13 0.5 L7 7 Z' fill='%239a9aab' stroke='%231e1e24' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E"),
-			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'%3E%3Cpath d='M1 7.5 L13 7.5 L7 1 Z' fill='%239a9aab' stroke='%231e1e24' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E");
+			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'%3E%3Cpath d='M0 0 L14 0 L7 8 Z' fill='%239a9aab'/%3E%3C/svg%3E"),
+			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'%3E%3Cpath d='M0 8 L14 8 L7 0 Z' fill='%239a9aab'/%3E%3C/svg%3E");
 		background-position: top center, bottom center;
 		background-repeat: no-repeat;
 		opacity: 0.8;
+		filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
 		transition: opacity 0.2s, filter 0.2s;
 	}
 
 	.split-screen-line:hover::after {
 		opacity: 1;
 		background-image:
-			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'%3E%3Cpath d='M1 0.5 L13 0.5 L7 7 Z' fill='%2300aaff' stroke='%231e1e24' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E"),
-			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'%3E%3Cpath d='M1 7.5 L13 7.5 L7 1 Z' fill='%2300aaff' stroke='%231e1e24' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E");
+			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'%3E%3Cpath d='M0 0 L14 0 L7 8 Z' fill='%2300aaff'/%3E%3C/svg%3E"),
+			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'%3E%3Cpath d='M0 8 L14 8 L7 0 Z' fill='%2300aaff'/%3E%3C/svg%3E");
 		filter: drop-shadow(0 0 4px rgba(0, 170, 255, 0.8));
 	}
 
