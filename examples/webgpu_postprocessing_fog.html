@@ -198,7 +198,7 @@
 				renderPipeline = new THREE.RenderPipeline( renderer );
 
 				const scenePass = pass( scene, camera );
-				const sceneColor = scenePass.getTextureNode( 'output' );
+				const sceneColor = scenePass.getTextureNode( 'output' ).toInspector( 'scene' );
 				const sceneDepth = scenePass.getTextureNode( 'depth' );
 
 				// Camera Uniforms for Post-Processing (ensures perspective camera matrices are used instead of quad orthographic camera)
@@ -379,7 +379,7 @@
 
 					}
 
-					renderPipeline.outputNode = selectedFog.mix( sceneColor.rgb.toInspector( 'scene' ), color( 0xffffff ) );
+					renderPipeline.outputNode = selectedFog.mix( sceneColor.rgb, color( 0xffffff ) );
 					renderPipeline.needsUpdate = true;
 
 					updateDenoiserControls();
