@@ -522,7 +522,7 @@ function writeCanary( buffer, row ) {
 // the same test fails outright (`getBufferSubData: no buffer`). Every caller
 // here already needs to read that same buffer's full data right afterwards
 // anyway, so read once and pass the array to both.
-function assertKernelRan( assert, data, row, name ) {
+function assertKernelRan( assert, data, row, name, kind = 'gpuTest' ) {
 
 	const value = data[ row * 4 ];
 	const ran = Math.abs( value - CANARY_VALUE ) < 1e-3;
@@ -533,7 +533,7 @@ function assertKernelRan( assert, data, row, name ) {
 			result: false,
 			actual: value,
 			expected: CANARY_VALUE,
-			message: `gpuTest "${ name }": the compute kernel never ran (canary value missing -- ` +
+			message: `${ kind } "${ name }": the compute kernel never ran (canary value missing -- ` +
 				`got ${ value }, expected ${ CANARY_VALUE }). This means the shader failed to build ` +
 				'(invalid WGSL/GLSL, most likely a NaN or otherwise malformed literal reaching ' +
 				'generated shader source) -- check the console for the underlying WebGPU/WebGL compile ' +
@@ -597,6 +597,24 @@ export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webg
 		const maxUsableAssertions = maxAssertions - 1;
 
 		const kernel = Fn( () => {
+
+			// TSL callbacks passed to Fn()/If() are not guaranteed to run
+			// exactly once -- three.js builds nodes across multiple stages
+			// (setup/analyze/generate), and this callback can be invoked more
+			// than once during that process. `nodes` is a side effect *outside*
+			// the node graph (CPU-side bookkeeping: "which buffer row does
+			// assertion N read back from"), so it has to be reset on every
+			// invocation of this callback rather than accumulated across
+			// invocations -- otherwise a second (or later) pass appends
+			// duplicate/phantom entries whose `baseRow` never matches what the
+			// *final* pass actually generated (confirmed: this is exactly what
+			// broke the `gpuFuzzTest` canary attempt below -- see
+			// tsl-unit-test-findings.md). Resetting here is safe specifically
+			// because rebuilding is idempotent: each invocation walks buildFn
+			// in the same order and recomputes identical baseRow values from
+			// scratch, so only the *last* invocation's bookkeeping needs to
+			// survive to match the actually-compiled kernel.
+			nodes.length = 0;
 
 			writeCanary( actualBuffer, canaryRow );
 
@@ -713,6 +731,15 @@ export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, ma
 		const actualBuffers = []; // actualBuffers[site][column]
 		const expectedBuffers = [];
 
+		// The *last* fuzz instance is reserved for the "did this kernel
+		// actually run" canary -- see `gpuTest`'s matching comment for why
+		// this reuses an existing slot instead of growing the dispatch/
+		// buffers by one (that overran the WebGL2 fallback's vertex buffer
+		// sizing and crashed the whole page). This costs one real fuzz
+		// instance out of `count`, negligible for the counts fuzz tests use.
+		const canaryRow = count - 1;
+		const maxUsableCount = count - 1;
+
 		for ( let site = 0; site < maxSitesPerInstance; site ++ ) {
 
 			const actualColumns = [];
@@ -731,6 +758,8 @@ export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, ma
 		}
 
 		const kernel = Fn( () => {
+
+			writeCanary( actualBuffers[ 0 ][ 0 ], canaryRow );
 
 			const makeNode = ( kind, tolerance, message ) => ( value1, value2 ) => {
 
@@ -766,7 +795,32 @@ export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, ma
 
 			};
 
-			buildFn( { instanceIndex, assert: buildAssertAPI( makeNode ) } );
+			// Guarded so the canary's reserved last instance never also runs
+			// buildFn's real per-instance writes (which would overwrite the
+			// canary value it just wrote, and would be an out-of-bounds
+			// concern if any buffer were sized tighter than `count`).
+			//
+			// Critically, THIS callback -- not the outer Fn() callback -- is
+			// the one TSL invokes more than once during node-graph
+			// construction (confirmed empirically: nesting `buildFn` inside
+			// an extra `If()` like this is exactly what triggers a second
+			// build pass over it here). `nodes`/`site` numbering is a side
+			// effect outside the node graph, so it has to be reset at the
+			// start of *this specific* callback -- not just once at the top
+			// of the outer Fn() -- or a second pass appends a phantom
+			// duplicate site whose buffer the final compiled kernel never
+			// actually writes (confirmed root cause of the "Cannot read
+			// properties of undefined (reading 'size')" failure recorded in
+			// tsl-unit-test-findings.md). Resetting here is safe because
+			// rebuilding is idempotent: each invocation walks buildFn in the
+			// same order and recomputes identical site numbers from scratch.
+			If( instanceIndex.lessThan( maxUsableCount ), () => {
+
+				nodes.length = 0;
+
+				buildFn( { instanceIndex, assert: buildAssertAPI( makeNode ) } );
+
+			} );
 
 		} )().compute( count );
 
@@ -774,9 +828,17 @@ export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, ma
 
 		// One set of column-buffers per site (not shared across sites, unlike
 		// gpuTest's shared buffer), so read each site's data back once and
-		// slice per instance below.
+		// slice per instance below. Site 0 is read unconditionally (even if
+		// buildFn made zero assert.* calls) since that's the canary's host
+		// buffer, and assertKernelRan needs its already-read data -- see
+		// assertKernelRan's own comment for why it must not be read twice.
 		const actualData = [];
 		const expectedData = [];
+
+		actualData[ 0 ] = await Promise.all( actualBuffers[ 0 ].map( ( buf ) => readBuffer( renderer, buf ) ) );
+		expectedData[ 0 ] = await Promise.all( expectedBuffers[ 0 ].map( ( buf ) => readBuffer( renderer, buf ) ) );
+
+		if ( ! assertKernelRan( assert, actualData[ 0 ][ 0 ], canaryRow, name, 'gpuFuzzTest' ) ) return;
 
 		for ( const node of nodes ) {
 
@@ -789,7 +851,7 @@ export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, ma
 
 		}
 
-		for ( let instance = 0; instance < count; instance ++ ) {
+		for ( let instance = 0; instance < maxUsableCount; instance ++ ) {
 
 			for ( const node of nodes ) {
 
