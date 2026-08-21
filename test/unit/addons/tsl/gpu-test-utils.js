@@ -7,16 +7,17 @@
 // https://github.com/bhouston/threeify (see packages/core/src/shaders/tests/
 // and packages/core/src/shaders/**/*.test.glsl). threeify renders a fullscreen
 // quad and packs one pass/fail byte per pixel via `gl.readPixels()`, since
-// WebGL2 has no compute shaders; this harness instead uses TSL compute +
-// storage-buffer readback, which is available here, to capture full raw
-// values (not just a pass/fail bit) and resolve types automatically -- see
-// below for the specifics of that departure.
+// WebGL2 has no compute shaders. This harness follows the same "one row per
+// test" idea, but via TSL compute + storage-buffer readback (available here),
+// which lets each row capture full raw values (not just a pass/fail bit) and
+// resolve types automatically -- see below.
 //
-// Design: a compute kernel captures raw values (not pass/fail bits) into a flat
-// float32 storage buffer, one fixed-stride "record" per assertion. The CPU reads
-// the buffer back and does the comparison + tolerance handling + diagnostic
-// formatting itself, so failures report actual vs. expected values (and, for
-// vectors, a per-component diff) instead of a bare test id.
+// Design: every assertion gets its own row, addressed by `instanceIndex`, in
+// a pair of `vec4` storage buffers (`actual`/`expected`) -- one compute
+// invocation per assertion. The CPU reads both buffers back and does the
+// comparison + tolerance handling + diagnostic formatting itself, so failures
+// report actual vs. expected values (and, for vectors, a per-component diff)
+// instead of a bare test id.
 //
 // DX goal: tests should read like ordinary vitest/chai-style assertions --
 //   assert.closeAbs( roundTrip, srgb, 1e-4 )
@@ -25,48 +26,36 @@
 // an expression evaluates to (`node.getNodeType(builder)`), which is only
 // available from inside a node's own `setup(builder)` -- so each assertion
 // compiles down to a tiny custom Node (AssertWriteNode) whose setup() asks
-// the builder for the real type and then emits the right number of
-// component writes, whatever that expression turns out to be (float, vec2,
-// vec3, vec4 -- matN is a documented follow-up, see below).
+// the builder for the real type and then writes it as a single zero-padded
+// vec4, whatever that expression turns out to be (float, vec2, vec3, vec4 --
+// matN is a documented follow-up, see below).
 //
 // Two entry points:
-//   - gpuTest( name, buildFn )                    -- N declarative assertions,
-//                                                     one compute invocation.
-//                                                     WebGPU only (see below).
-//   - gpuFuzzTest( name, count, buildFn )          -- assertions dispatched
-//                                                     over `count` instances,
-//                                                     each free to generate
-//                                                     its own inputs from
-//                                                     `instanceIndex` (property/
-//                                                     fuzz-style testing at
-//                                                     GPU scale). Works on both
-//                                                     WebGPU and WebGPURenderer's
-//                                                     WebGL2 fallback backend.
-//
-// Record layout (float32, fixed stride) -- gpuTest only:
-//   [0..3]  actual value   (up to vec4, zero-padded)
-//   [4..7]  expected value (up to vec4, zero-padded)
-//
-// Why gpuTest is WebGPU-only: it packs every assertion in a suite into one
-// compute invocation, writing each at its own compile-time-constant offset
-// into a shared buffer -- an arbitrary scatter-write, which real compute
-// shaders support fine. WebGPURenderer's WebGL2 fallback backend emulates
-// `compute()` via transform feedback, which can only write each invocation's
-// designated output to a buffer slot equal to that invocation's own
-// `instanceIndex` -- confirmed empirically: any write target other than the
-// bare `instanceIndex` node collapses onto slot 0 there instead of landing at
-// the requested offset. gpuFuzzTest already dispatches one invocation per
-// case addressed by `instanceIndex`, so it naturally fits that constraint
-// once each assertion writes to its own dedicated buffer (see
-// AssertVecWriteNode below) -- which is why it, not gpuTest, is the
-// cross-backend entry point.
+//   - gpuTest( name, buildFn )              -- N declarative assertions, one
+//                                               compute invocation per
+//                                               assertion (row = instanceIndex).
+//   - gpuFuzzTest( name, count, buildFn )    -- assertions dispatched over
+//                                               `count` instances, each free
+//                                               to generate its own inputs
+//                                               from `instanceIndex`
+//                                               (property/fuzz-style testing
+//                                               at GPU scale).
+// Both run on WebGPU and WebGPURenderer's WebGL2 fallback backend, since both
+// only ever write via the bare `instanceIndex` node -- the one write pattern
+// transform-feedback-based backends (WebGL2 fallback) support. Confirmed
+// empirically: any write target other than the bare `instanceIndex` node
+// (e.g. an arithmetic offset, or a JS-constant index) collapses onto slot 0
+// there instead of landing at the requested offset. gpuTest gets one
+// distinct expression per row despite that constraint by guarding each
+// assertion's write with `If( instanceIndex.equal( row ), ... )` -- only the
+// invocation whose `instanceIndex` matches that row ever takes the branch, so
+// the actual write is still always to the bare `instanceIndex`, just
+// conditionally which value it carries.
 
-import { Fn, instanceIndex, instancedArray, float, vec4 } from 'three/tsl';
+import { Fn, If, instanceIndex, instancedArray, float, vec4 } from 'three/tsl';
 import { WebGPURenderer } from 'three/webgpu';
 import Node from '../../../../src/nodes/core/Node.js';
 import { Stack } from '../../../../src/nodes/tsl/TSLCore.js';
-
-export const STRIDE = 8; // 4 floats per value, 2 values per record
 
 export const Kind = {
 	EQ: 'eq',
@@ -80,27 +69,41 @@ export const Kind = {
 
 const SWIZZLE = [ 'x', 'y', 'z', 'w' ];
 
-// `offset` may be a plain JS number (compile-time constant, gpuTest's case)
-// or a TSL node (instanceIndex-derived, gpuFuzzTest's case).
-function addOffset( offset, i ) {
+// Zero-pads `value` (a resolved-`count`-component node) out to a vec4, so it
+// can be written with a single `.assign()` -- one write, whatever the real
+// component count turns out to be.
+function toVec4( value, count ) {
 
-	return typeof offset === 'number' ? offset + i : offset.add( i );
+	if ( count === 4 ) return value;
+
+	const components = [];
+
+	for ( let i = 0; i < 4; i ++ ) {
+
+		components.push( i < count ? float( count === 1 ? value : value[ SWIZZLE[ i ] ] ) : float( 0 ) );
+
+	}
+
+	return vec4( ...components );
 
 }
 
 // A statement node: at real shader-build time (setup(builder), when a real
 // NodeBuilder -- and therefore real type information -- exists) it asks the
-// builder what type `value1`/`value2` resolved to, and writes their
-// components into `buffer` at `base`/`base+4`. `resolvedType`/`resolvedCount`
-// are stashed on the instance for the CPU harness to read back afterwards.
+// builder what type `value1`/`value2` resolved to, and writes each as a
+// single zero-padded vec4 to `actualBuffer`/`expectedBuffer` at `this.index`
+// (always the bare `instanceIndex` node -- see file header). `resolvedType`/
+// `resolvedCount` are stashed on the instance for the CPU harness to read
+// back afterwards.
 class AssertWriteNode extends Node {
 
-	constructor( buffer, base, value1, value2 ) {
+	constructor( actualBuffer, expectedBuffer, index, value1, value2 ) {
 
 		super( 'void' );
 
-		this.buffer = buffer;
-		this.base = base;
+		this.actualBuffer = actualBuffer;
+		this.expectedBuffer = expectedBuffer;
+		this.index = index;
 		this.value1 = value1;
 		this.value2 = value2;
 
@@ -125,94 +128,6 @@ class AssertWriteNode extends Node {
 		if ( count > 4 ) {
 
 			throw new Error( `gpuTest: type "${ type1 }" (${ count } components) is not supported yet -- matrix support is a follow-up.` );
-
-		}
-
-		this.resolvedType = type1;
-		this.resolvedCount = count;
-
-		if ( count === 1 ) {
-
-			this.buffer.element( this.base ).assign( float( this.value1 ) );
-			this.buffer.element( addOffset( this.base, 4 ) ).assign( float( this.value2 ) );
-
-		} else {
-
-			for ( let i = 0; i < count; i ++ ) {
-
-				this.buffer.element( addOffset( this.base, i ) ).assign( float( this.value1[ SWIZZLE[ i ] ] ) );
-				this.buffer.element( addOffset( this.base, 4 + i ) ).assign( float( this.value2[ SWIZZLE[ i ] ] ) );
-
-			}
-
-		}
-
-		return undefined;
-
-	}
-
-}
-
-// Zero-pads `value` (a resolved-`count`-component node) out to a vec4, so it
-// can be written with a single `.assign()` -- one write, whatever the real
-// component count turns out to be. Used by AssertVecWriteNode so every write
-// is a single "whole value" assign, which is what transform-feedback-based
-// backends (WebGL2 fallback) support.
-function toVec4( value, count ) {
-
-	if ( count === 4 ) return value;
-
-	const components = [];
-
-	for ( let i = 0; i < 4; i ++ ) {
-
-		components.push( i < count ? float( count === 1 ? value : value[ SWIZZLE[ i ] ] ) : float( 0 ) );
-
-	}
-
-	return vec4( ...components );
-
-}
-
-// gpuFuzzTest's statement node: writes exactly one vec4 to `actualBuffer` and
-// one to `expectedBuffer`, both at `this.index` (always the bare
-// `instanceIndex` node, never an arithmetic expression) -- the one write
-// pattern transform-feedback-based backends (WebGL2 fallback) support. Each
-// call site gets its own dedicated buffer pair (see gpuFuzzTest) so multiple
-// assertions per instance never collide on a single write.
-class AssertVecWriteNode extends Node {
-
-	constructor( actualBuffer, expectedBuffer, index, value1, value2 ) {
-
-		super( 'void' );
-
-		this.actualBuffer = actualBuffer;
-		this.expectedBuffer = expectedBuffer;
-		this.index = index;
-		this.value1 = value1;
-		this.value2 = value2;
-
-		this.resolvedType = null;
-		this.resolvedCount = null;
-
-	}
-
-	setup( builder ) {
-
-		const type1 = this.value1.getNodeType( builder );
-		const type2 = this.value2.getNodeType( builder );
-
-		if ( type1 !== type2 ) {
-
-			throw new Error( `gpuFuzzTest: type mismatch -- comparing "${ type1 }" against "${ type2 }".` );
-
-		}
-
-		const count = builder.getTypeLength( type1 );
-
-		if ( count > 4 ) {
-
-			throw new Error( `gpuFuzzTest: type "${ type1 }" (${ count } components) is not supported yet -- matrix support is a follow-up.` );
 
 		}
 
@@ -370,26 +285,13 @@ function evaluateAssertion( assert, actual, expected, meta ) {
 
 }
 
-// gpuTest's record layout is a flat float buffer, STRIDE floats per
-// assertion; slice actual/expected out of it before evaluating.
-function evaluateStridedRecord( assert, data, id, meta ) {
-
-	const base = id * STRIDE;
-	const count = meta.count;
-	const actual = Array.from( data.slice( base, base + count ) );
-	const expected = Array.from( data.slice( base + 4, base + 4 + count ) );
-
-	evaluateAssertion( assert, actual, expected, meta );
-
-}
-
 // Builds the assertion object handed to test bodies -- names follow QUnit's
 // own assertion terminology (`equal`/`notEqual` style: full words, no
 // abbreviations) for the relational checks, alongside the tolerance-based
 // `closeAbs`/`closeRel` pair. `makeNode(kind, tolerance)` returns a function
 // that creates and registers an AssertWriteNode for one (value1, value2)
 // pair; each concrete TSL entry point (gpuTest / gpuFuzzTest) supplies its
-// own `makeNode` since the two differ in how they compute `base`.
+// own `makeNode` since the two differ in how a row is selected/populated.
 function buildAssertAPI( makeNode ) {
 
 	return {
@@ -412,9 +314,9 @@ function buildAssertAPI( makeNode ) {
 // real WebGPU backend. Meant for CI environments where WebGPU support isn't
 // reliably available: WebGPURenderer would otherwise silently fall back to
 // the WebGL2 backend with a runtime warning, which makes a "WebGPU" test
-// pass without actually having exercised WebGPU. Suites that only use the
-// WebGL2 fallback backend (`gpuFuzzTest(..., { backends: [ 'webgl' ] })`)
-// are unaffected and still run.
+// pass without actually having exercised WebGPU. Suites that only request the
+// WebGL2 fallback backend (`backends: [ 'webgl' ]`) are unaffected and still
+// run.
 const SKIP_WEBGPU = typeof window !== 'undefined' && new URLSearchParams( window.location.search ).has( 'skipWebGPU' );
 
 if ( SKIP_WEBGPU ) {
@@ -447,33 +349,57 @@ function declareTest( name, backends, run ) {
 
 }
 
+// Shared by gpuTest and gpuFuzzTest: reads `actualBuffer`/`expectedBuffer`
+// (vec4-typed, one row per `nodes` entry unless `rowOf` says otherwise) back
+// and evaluates every collected AssertWriteNode against them.
+async function readAndEvaluate( assert, renderer, nodes, actualBuffer, expectedBuffer, rowOf, labelOf ) {
+
+	const actualData = new Float32Array( await renderer.getArrayBufferAsync( actualBuffer.value ) );
+	const expectedData = new Float32Array( await renderer.getArrayBufferAsync( expectedBuffer.value ) );
+
+	nodes.forEach( ( node, index ) => {
+
+		const base = rowOf( node, index ) * 4;
+		const count = node.resolvedCount;
+		const actual = Array.from( actualData.slice( base, base + count ) );
+		const expected = Array.from( expectedData.slice( base, base + count ) );
+
+		evaluateAssertion( assert, actual, expected, {
+			label: labelOf( node, index ),
+			kind: node.kind,
+			tolerance: node.tolerance
+		} );
+
+	} );
+
+}
+
 /**
  * Declare a GPU-native test suite. `buildFn` runs once (at graph-build time)
  * and receives `{ assert }` with `assert.eq/closeAbs/closeRel(actual, expected,
- * [tolerance], [message])`; the whole suite executes as a single compute
- * invocation, then every assertion is decoded and checked on the CPU with a
- * full actual-vs-expected diagnostic on failure.
+ * [tolerance], [message])`. Each assertion gets its own row (`vec4` pair),
+ * dispatched as one compute invocation per row and guarded by
+ * `If( instanceIndex.equal( row ), ... )` so only that invocation's write
+ * actually commits -- see the file header for why that's required for
+ * WebGL2 fallback compatibility. Every assertion is then decoded and checked
+ * on the CPU with a full actual-vs-expected diagnostic on failure.
  *
- * `maxAssertions` (default 64) sizes the backing buffer generously so callers
- * don't need to pre-count assertions; override via the options object if a
- * suite exceeds it.
+ * `maxAssertions` (default 64) sizes the backing buffers and dispatch count
+ * generously so callers don't need to pre-count assertions; override via the
+ * options object if a suite exceeds it.
  *
- * WebGPU only -- see the file header for why. For a suite that should also
- * run against the WebGL2 fallback backend, use `gpuFuzzTest` instead (it
- * naturally supports both).
+ * `backends` (default `[ 'webgpu', 'webgl' ]`) selects which renderer
+ * backend(s) to run the suite against -- both by default, so a backend
+ * regression can't slip by unnoticed; narrow it (e.g. `[ 'webgpu' ]`) only
+ * for a node that's deliberately WebGPU-only.
  */
-export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webgpu' ] } = {} ) {
-
-	if ( backends.some( ( b ) => b !== 'webgpu' ) ) {
-
-		throw new Error( `gpuTest "${ name }": only the "webgpu" backend is supported (declarative suites need scatter-writes that WebGL2's fallback backend can't do) -- use gpuFuzzTest for cross-backend suites.` );
-
-	}
+export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webgpu', 'webgl' ] } = {} ) {
 
 	declareTest( name, backends, async ( assert, renderer ) => {
 
 		const nodes = [];
-		const buffer = instancedArray( maxAssertions * STRIDE, 'float' );
+		const actualBuffer = instancedArray( maxAssertions, 'vec4' );
+		const expectedBuffer = instancedArray( maxAssertions, 'vec4' );
 
 		const kernel = Fn( () => {
 
@@ -485,35 +411,33 @@ export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webg
 
 				}
 
-				const base = nodes.length * STRIDE;
-				const node = new AssertWriteNode( buffer, base, value1, value2 );
+				const row = nodes.length;
+				const node = new AssertWriteNode( actualBuffer, expectedBuffer, instanceIndex, value1, value2 );
 				node.kind = kind;
 				node.tolerance = tolerance;
 				node.message = message;
 
 				nodes.push( node );
-				Stack( node );
+
+				If( instanceIndex.equal( row ), () => {
+
+					Stack( node );
+
+				} );
 
 			};
 
 			buildFn( { assert: buildAssertAPI( makeNode ) } );
 
-		} )().compute( 1 );
+		} )().compute( maxAssertions );
 
 		await renderer.computeAsync( kernel );
 
-		const data = new Float32Array( await renderer.getArrayBufferAsync( buffer.value ) );
-
-		nodes.forEach( ( node, id ) => {
-
-			evaluateStridedRecord( assert, data, id, {
-				label: node.message || `${ name } #${ id }`,
-				kind: node.kind,
-				tolerance: node.tolerance,
-				count: node.resolvedCount
-			} );
-
-		} );
+		await readAndEvaluate(
+			assert, renderer, nodes, actualBuffer, expectedBuffer,
+			( node, id ) => id,
+			( node, id ) => node.message || `${ name } #${ id }`
+		);
 
 	} );
 
@@ -527,15 +451,12 @@ export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webg
  *
  * `maxSitesPerInstance` (default 4) bounds how many `assert.*` calls buildFn
  * may make per invocation; override via options if a test needs more. Each
- * site gets its own dedicated pair of buffers (see AssertVecWriteNode) so
- * sites never collide on a single write -- the property that makes this
- * entry point (unlike `gpuTest`) safe on WebGL2 fallback.
+ * site gets its own dedicated pair of buffers so sites never collide on a
+ * single write.
  *
- * `backends` (default `[ 'webgpu' ]`) selects which renderer backend(s) to
- * run against -- pass `[ 'webgpu', 'webgl' ]` to also check WebGPURenderer's
- * WebGL2 fallback backend, for nodes that don't rely on WebGPU-only features.
+ * `backends` (default `[ 'webgpu', 'webgl' ]`) -- see `gpuTest`.
  */
-export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, backends = [ 'webgpu' ] } = {} ) {
+export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, backends = [ 'webgpu', 'webgl' ] } = {} ) {
 
 	declareTest( name, backends, async ( assert, renderer ) => {
 
@@ -562,7 +483,7 @@ export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, ba
 
 				}
 
-				const node = new AssertVecWriteNode( actualBuffers[ site ], expectedBuffers[ site ], instanceIndex, value1, value2 );
+				const node = new AssertWriteNode( actualBuffers[ site ], expectedBuffers[ site ], instanceIndex, value1, value2 );
 				node.kind = kind;
 				node.tolerance = tolerance;
 				node.message = message;
@@ -579,13 +500,19 @@ export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, ba
 
 		await renderer.computeAsync( kernel );
 
+		// One buffer pair per site (not a single shared pair, unlike gpuTest),
+		// so read each site's data back once and slice per instance below.
 		const actualData = [];
 		const expectedData = [];
 
 		for ( const node of nodes ) {
 
-			actualData[ node.site ] = new Float32Array( await renderer.getArrayBufferAsync( actualBuffers[ node.site ].value ) );
-			expectedData[ node.site ] = new Float32Array( await renderer.getArrayBufferAsync( expectedBuffers[ node.site ].value ) );
+			if ( actualData[ node.site ] === undefined ) {
+
+				actualData[ node.site ] = new Float32Array( await renderer.getArrayBufferAsync( actualBuffers[ node.site ].value ) );
+				expectedData[ node.site ] = new Float32Array( await renderer.getArrayBufferAsync( expectedBuffers[ node.site ].value ) );
+
+			}
 
 		}
 
@@ -599,11 +526,7 @@ export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, ba
 				const expected = Array.from( expectedData[ node.site ].slice( base, base + componentCount ) );
 				const label = node.message ? `${ name } #${ instance }: ${ node.message }` : `${ name } #${ instance }`;
 
-				evaluateAssertion( assert, actual, expected, {
-					label,
-					kind: node.kind,
-					tolerance: node.tolerance
-				} );
+				evaluateAssertion( assert, actual, expected, { label, kind: node.kind, tolerance: node.tolerance } );
 
 			}
 

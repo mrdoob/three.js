@@ -45,7 +45,7 @@ export default QUnit.module( 'TSL', () => {
 
 			assert.closeAbs( roundTrip, srgb, 1e-3 );
 
-		}, { backends: [ 'webgpu', 'webgl' ] } );
+		} );
 
 	} );
 
