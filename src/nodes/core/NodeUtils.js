@@ -129,21 +129,22 @@ export function getTypeFromLength( length ) {
 export function getTypedArrayFromType( type ) {
 
 	// Handle component type for vectors and matrices
-	if ( /[iu]?vec\d/.test( type ) ) {
+	if ( /[iuh]?vec\d/.test( type ) ) {
 
 		// Handle int vectors
 		if ( type.startsWith( 'ivec' ) ) return Int32Array;
 		// Handle uint vectors
 		if ( type.startsWith( 'uvec' ) ) return Uint32Array;
-		// Default to float vectors
+		// Default to float vectors (also covers half vectors, stored as f32 on the CPU side)
 		return Float32Array;
 
 	}
 
-	// Handle matrices (always float)
+	// Handle matrices (always float, half matrices included)
 	if ( /mat\d/.test( type ) ) return Float32Array;
 
 	// Basic types
+	if ( type === 'half' ) return Float32Array;
 	if ( /float/.test( type ) ) return Float32Array;
 	if ( /uint/.test( type ) ) return Uint32Array;
 	if ( /int/.test( type ) ) return Int32Array;
@@ -162,7 +163,7 @@ export function getTypedArrayFromType( type ) {
  */
 export function getLengthFromType( type ) {
 
-	if ( /float|int|uint|bool/.test( type ) ) return 1;
+	if ( /float|int|uint|bool|half/.test( type ) ) return 1;
 	if ( /vec2/.test( type ) ) return 2;
 	if ( /vec3/.test( type ) ) return 3;
 	if ( /vec4/.test( type ) ) return 4;
@@ -184,7 +185,7 @@ export function getLengthFromType( type ) {
  */
 export function getMemoryLengthFromType( type ) {
 
-	if ( /float|int|uint|bool/.test( type ) ) return 1;
+	if ( /float|int|uint|bool|half/.test( type ) ) return 1;
 	if ( /vec2/.test( type ) ) return 2;
 	if ( /vec3/.test( type ) ) return 3;
 	if ( /vec4/.test( type ) ) return 4;
@@ -206,7 +207,7 @@ export function getMemoryLengthFromType( type ) {
  */
 export function getAlignmentFromType( type ) {
 
-	if ( /float|int|uint|bool/.test( type ) ) return 1;
+	if ( /float|int|uint|bool|half/.test( type ) ) return 1;
 	if ( /vec2/.test( type ) ) return 2;
 	if ( /vec3/.test( type ) ) return 4;
 	if ( /vec4/.test( type ) ) return 4;
@@ -411,7 +412,7 @@ export function getValueFromType( type, ...params ) {
 
 		return params[ 0 ] || false;
 
-	} else if ( ( type === 'float' ) || ( type === 'int' ) || ( type === 'uint' ) ) {
+	} else if ( ( type === 'float' ) || ( type === 'int' ) || ( type === 'uint' ) || ( type === 'half' ) ) {
 
 		return params[ 0 ] || 0;
 

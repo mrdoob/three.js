@@ -904,7 +904,7 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 		}
 
-		if ( params.length === 0 || ( ! [ 'bool', 'float', 'int', 'uint' ].includes( type ) && params.every( param => {
+		if ( params.length === 0 || ( ! [ 'bool', 'float', 'int', 'uint', 'half' ].includes( type ) && params.every( param => {
 
 			const paramType = typeof param;
 
@@ -1215,6 +1215,16 @@ export const int = new ConvertType( 'int', cacheMaps.ints );
 export const uint = new ConvertType( 'uint', cacheMaps.uint );
 export const bool = new ConvertType( 'bool', cacheMaps.bool );
 
+/**
+ * Constructs a half-precision (fp16) scalar. On backends/hardware that don't support
+ * native fp16 shader math (e.g. WebGL, or WebGPU without the `shader-f16` feature),
+ * this transparently falls back to fp32.
+ *
+ * @tsl
+ * @function
+ */
+export const half = new ConvertType( 'half' );
+
 export const vec2 = new ConvertType( 'vec2' );
 export const ivec2 = new ConvertType( 'ivec2' );
 export const uvec2 = new ConvertType( 'uvec2' );
@@ -1234,26 +1244,42 @@ export const mat2 = new ConvertType( 'mat2' );
 export const mat3 = new ConvertType( 'mat3' );
 export const mat4 = new ConvertType( 'mat4' );
 
+// half-precision (fp16) vector/matrix types - see `half` above for fallback behavior.
+export const hvec2 = new ConvertType( 'hvec2' );
+export const hvec3 = new ConvertType( 'hvec3' );
+export const hvec4 = new ConvertType( 'hvec4' );
+
+export const hmat2 = new ConvertType( 'hmat2' );
+export const hmat3 = new ConvertType( 'hmat3' );
+export const hmat4 = new ConvertType( 'hmat4' );
+
 addMethodChaining( 'toColor', color );
 addMethodChaining( 'toFloat', float );
 addMethodChaining( 'toInt', int );
 addMethodChaining( 'toUint', uint );
 addMethodChaining( 'toBool', bool );
+addMethodChaining( 'toHalf', half );
 addMethodChaining( 'toVec2', vec2 );
 addMethodChaining( 'toIVec2', ivec2 );
 addMethodChaining( 'toUVec2', uvec2 );
 addMethodChaining( 'toBVec2', bvec2 );
+addMethodChaining( 'toHVec2', hvec2 );
 addMethodChaining( 'toVec3', vec3 );
 addMethodChaining( 'toIVec3', ivec3 );
 addMethodChaining( 'toUVec3', uvec3 );
 addMethodChaining( 'toBVec3', bvec3 );
+addMethodChaining( 'toHVec3', hvec3 );
 addMethodChaining( 'toVec4', vec4 );
 addMethodChaining( 'toIVec4', ivec4 );
 addMethodChaining( 'toUVec4', uvec4 );
 addMethodChaining( 'toBVec4', bvec4 );
+addMethodChaining( 'toHVec4', hvec4 );
 addMethodChaining( 'toMat2', mat2 );
 addMethodChaining( 'toMat3', mat3 );
 addMethodChaining( 'toMat4', mat4 );
+addMethodChaining( 'toHMat2', hmat2 );
+addMethodChaining( 'toHMat3', hmat3 );
+addMethodChaining( 'toHMat4', hmat4 );
 
 // basic nodes
 

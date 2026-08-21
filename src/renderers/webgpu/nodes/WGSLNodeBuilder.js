@@ -73,7 +73,27 @@ const wgslTypeLib = {
 
 	mat2: 'mat2x2<f32>',
 	mat3: 'mat3x3<f32>',
-	mat4: 'mat4x4<f32>'
+	mat4: 'mat4x4<f32>',
+
+	half: 'f16',
+	hvec2: 'vec2<f16>',
+	hvec3: 'vec3<f16>',
+	hvec4: 'vec4<f16>',
+	hmat2: 'mat2x2<f16>',
+	hmat3: 'mat3x3<f16>',
+	hmat4: 'mat4x4<f16>'
+};
+
+// Fallback mapping used when the `shader-f16` GPU feature is unavailable - half types are
+// transparently upgraded to their fp32 equivalent so authored TSL code doesn't have to branch.
+const wgslHalfFallbackTypeLib = {
+	half: 'float',
+	hvec2: 'vec2',
+	hvec3: 'vec3',
+	hvec4: 'vec4',
+	hmat2: 'mat2',
+	hmat3: 'mat3',
+	hmat4: 'mat4'
 };
 
 const wgslCodeCache = {};
@@ -2507,6 +2527,20 @@ ${ flowData.code }
 	 */
 	getType( type ) {
 
+		if ( wgslHalfFallbackTypeLib[ type ] !== undefined ) {
+
+			if ( this.isAvailable( 'shaderF16' ) ) {
+
+				this.enableShaderF16();
+
+			} else {
+
+				type = wgslHalfFallbackTypeLib[ type ];
+
+			}
+
+		}
+
 		return wgslTypeLib[ type ] || type;
 
 	}
@@ -2530,6 +2564,10 @@ ${ flowData.code }
 			} else if ( name === 'clipDistance' ) {
 
 				result = this.renderer.hasFeature( 'clip-distances' );
+
+			} else if ( name === 'shaderF16' ) {
+
+				result = this.renderer.hasFeature( 'shader-f16' );
 
 			}
 

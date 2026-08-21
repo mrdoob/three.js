@@ -49,6 +49,26 @@ const wgslTypeLib = {
 	'mat4x4<f32>': 'mat4',
 	'mat4x4f': 'mat4',
 
+	'f16': 'half',
+
+	'vec2<f16>': 'hvec2',
+	'vec2h': 'hvec2',
+
+	'vec3<f16>': 'hvec3',
+	'vec3h': 'hvec3',
+
+	'vec4<f16>': 'hvec4',
+	'vec4h': 'hvec4',
+
+	'mat2x2<f16>': 'hmat2',
+	'mat2x2h': 'hmat2',
+
+	'mat3x3<f16>': 'hmat3',
+	'mat3x3h': 'hmat3',
+
+	'mat4x4<f16>': 'hmat4',
+	'mat4x4h': 'hmat4',
+
 	'sampler': 'sampler',
 	'sampler_comparison': 'samplerComparison',
 

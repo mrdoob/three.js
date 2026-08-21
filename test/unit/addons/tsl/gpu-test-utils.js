@@ -28,10 +28,15 @@
 // compiles down to a tiny custom Node (AssertWriteNode) whose setup() asks
 // the builder for the real type.
 //
-// Matrix support (mat3/mat4): a single `vec4` row can't hold 9 or 16 floats.
-// A matrix value is represented as `columns` column-vectors (mat3: 3 x vec3,
-// mat4: 4 x vec4 -- see `MATRIX_LAYOUT`/NodeBuilder.getElementType), each
-// zero-padded to a vec4 exactly like a plain vector value. `AssertWriteNode`
+// Matrix support (mat2/mat3/mat4): a single `vec4` row can't hold 4, 9 or 16
+// floats. A matrix value is represented as `columns` column-vectors (mat2:
+// 2 x vec2, mat3: 3 x vec3, mat4: 4 x vec4 -- see `MATRIX_LAYOUT`/
+// NodeBuilder.getElementType), each zero-padded to a vec4 exactly like a
+// plain vector value. Half-precision matrices (hmat2/hmat3/hmat4) share the
+// exact same column layout as their fp32 counterparts -- only the component
+// precision differs, and every column is cast back to float on readback
+// regardless -- so `resolveLayout` promotes an `hmat*` type to its `mat*`
+// layout rather than needing its own entries. `AssertWriteNode`
 // resolves this layout once real type info exists (`setup(builder)`) and
 // then, for each column, calls a `writeColumn(c, actualVec4, expectedVec4)`
 // callback supplied by the caller -- `gpuTest` and `gpuFuzzTest` each
@@ -81,9 +86,12 @@ export const Kind = {
 const SWIZZLE = [ 'x', 'y', 'z', 'w' ];
 
 // Matrix types are represented as `columns` column-vectors of `columnLength`
-// components each (mat3: 3 x vec3, mat4: 4 x vec4) -- see gpu-test-utils.js
-// file header and NodeBuilder.getTypeLength/getElementType.
+// components each (mat2: 2 x vec2, mat3: 3 x vec3, mat4: 4 x vec4) -- see
+// gpu-test-utils.js file header and NodeBuilder.getTypeLength/getElementType.
+// Only the fp32 keys are listed here -- `resolveLayout` below promotes
+// hmat2/hmat3/hmat4 to these same entries rather than duplicating them.
 const MATRIX_LAYOUT = {
+	mat2: { columns: 2, columnLength: 2 },
 	mat3: { columns: 3, columnLength: 3 },
 	mat4: { columns: 4, columnLength: 4 }
 };
@@ -117,7 +125,12 @@ function toVec4( value, count ) {
 // `MATRIX_LAYOUT`-many columns of their own (shorter) length.
 function resolveLayout( type, builder ) {
 
-	const matrixLayout = MATRIX_LAYOUT[ type ];
+	// A plain fp32 matrix type resolves directly; a half-precision matrix
+	// (hmat2/hmat3/hmat4) has no entry of its own -- it's promoted to its
+	// fp32 counterpart's layout (see the comment on MATRIX_LAYOUT above).
+	// `builder.isMatrix()` guards this so a bare scalar `half` (which also
+	// starts with 'h', but isn't a matrix) never gets misinterpreted here.
+	const matrixLayout = MATRIX_LAYOUT[ type ] || ( builder.isMatrix( type ) ? MATRIX_LAYOUT[ type.replace( /^h/, '' ) ] : undefined );
 
 	if ( matrixLayout !== undefined ) {
 

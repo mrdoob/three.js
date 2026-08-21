@@ -98,6 +98,17 @@ const glslMethods = {
 	floatunpack_unorm_4x8: 'tsl_unpackUnorm4x8'
 };
 
+// GLSL has no native fp16 compute type - half types always resolve to their fp32 equivalent.
+const glslHalfFallbackTypeLib = {
+	half: 'float',
+	hvec2: 'vec2',
+	hvec3: 'vec3',
+	hvec4: 'vec4',
+	hmat2: 'mat2',
+	hmat3: 'mat3',
+	hmat4: 'mat4'
+};
+
 const precisionLib = {
 	low: 'lowp',
 	medium: 'mediump',
@@ -247,6 +258,21 @@ class GLSLNodeBuilder extends NodeBuilder {
 		this.addInclude( codeNode );
 
 		return codeNode;
+
+	}
+
+	/**
+	 * Returns the GLSL type of the given node data type. GLSL has no native fp16 compute
+	 * type, so half-precision types are always upgraded to their fp32 equivalent here.
+	 *
+	 * @param {string} type - The node data type.
+	 * @return {string} The GLSL type.
+	 */
+	getType( type ) {
+
+		const floatType = glslHalfFallbackTypeLib[ type ];
+
+		return floatType !== undefined ? floatType : super.getType( type );
 
 	}
 
