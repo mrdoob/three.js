@@ -2702,15 +2702,8 @@ class Renderer {
 
 			this.info.dispose();
 
-			// Dispose the render objects before the backend so their cleanup
-			// (e.g. releasing bindings and samplers) still runs against live
-			// backend caches, like it does at runtime.
-
-			this._objects.dispose();
-
-			this.backend.dispose();
-
 			this._animation.dispose();
+			this._objects.dispose();
 			this._geometries.dispose();
 			this._pipelines.dispose();
 			this._nodes.dispose();
@@ -2730,6 +2723,8 @@ class Renderer {
 				if ( queryPool !== null ) queryPool.dispose();
 
 			} );
+
+			this.backend.dispose();
 
 		}
 
