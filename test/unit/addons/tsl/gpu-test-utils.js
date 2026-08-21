@@ -26,9 +26,21 @@
 // an expression evaluates to (`node.getNodeType(builder)`), which is only
 // available from inside a node's own `setup(builder)` -- so each assertion
 // compiles down to a tiny custom Node (AssertWriteNode) whose setup() asks
-// the builder for the real type and then writes it as a single zero-padded
-// vec4, whatever that expression turns out to be (float, vec2, vec3, vec4 --
-// matN is a documented follow-up, see below).
+// the builder for the real type.
+//
+// Matrix support (mat3/mat4): a single `vec4` row can't hold 9 or 16 floats.
+// A matrix value is represented as `columns` column-vectors (mat3: 3 x vec3,
+// mat4: 4 x vec4 -- see `MATRIX_LAYOUT`/NodeBuilder.getElementType), each
+// zero-padded to a vec4 exactly like a plain vector value. `AssertWriteNode`
+// resolves this layout once real type info exists (`setup(builder)`) and
+// then, for each column, calls a `writeColumn(c, actualVec4, expectedVec4)`
+// callback supplied by the caller -- `gpuTest` and `gpuFuzzTest` each
+// implement that callback differently, because they use two different
+// addressing strategies (see each function's own comment below). Crucially,
+// resource cost (buffer count / dispatch size) only grows where the caller
+// chooses to pay for it -- a plain gpuTest scalar/vector assertion and a
+// gpuFuzzTest site with the default options cost exactly what they did
+// before matrices existed.
 //
 // Two entry points:
 //   - gpuTest( name, buildFn )              -- N declarative assertions, one
@@ -45,12 +57,13 @@
 // transform-feedback-based backends (WebGL2 fallback) support. Confirmed
 // empirically: any write target other than the bare `instanceIndex` node
 // (e.g. an arithmetic offset, or a JS-constant index) collapses onto slot 0
-// there instead of landing at the requested offset. gpuTest gets one
-// distinct expression per row despite that constraint by guarding each
-// assertion's write with `If( instanceIndex.equal( row ), ... )` -- only the
-// invocation whose `instanceIndex` matches that row ever takes the branch, so
-// the actual write is still always to the bare `instanceIndex`, just
-// conditionally which value it carries.
+// there instead of landing at the requested offset. Also confirmed
+// empirically: WebGL2's transform-feedback fallback only guarantees a small,
+// fixed number of simultaneously-bound output buffers (the spec-minimum
+// `MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS` is 4) -- so the number of
+// storage buffers a kernel writes to is a hard resource budget, not just a
+// memory-size concern; see `gpuFuzzTest`'s `maxColumnsPerSite` option below
+// for where that budget is spent explicitly rather than by accident.
 
 import { Fn, If, instanceIndex, instancedArray, float, vec4 } from 'three/tsl';
 import { WebGPURenderer } from 'three/webgpu';
@@ -68,6 +81,19 @@ export const Kind = {
 };
 
 const SWIZZLE = [ 'x', 'y', 'z', 'w' ];
+
+// Matrix types are represented as `columns` column-vectors of `columnLength`
+// components each (mat3: 3 x vec3, mat4: 4 x vec4) -- see gpu-test-utils.js
+// file header and NodeBuilder.getTypeLength/getElementType.
+const MATRIX_LAYOUT = {
+	mat3: { columns: 3, columnLength: 3 },
+	mat4: { columns: 4, columnLength: 4 }
+};
+
+// The widest supported type (mat4) needs 4 columns -- callers that reserve
+// resources up front (gpuTest's per-assertion row stride, gpuFuzzTest's
+// opt-in `maxColumnsPerSite`) size against this constant.
+const MAX_COLUMNS = 4;
 
 // Zero-pads `value` (a resolved-`count`-component node) out to a vec4, so it
 // can be written with a single `.assign()` -- one write, whatever the real
@@ -88,27 +114,60 @@ function toVec4( value, count ) {
 
 }
 
+// Resolves how many "columns" a type needs and how long each column is.
+// Vectors/scalars are a single column of their own length; mat3/mat4 are
+// `MATRIX_LAYOUT`-many columns of their own (shorter) length.
+function resolveLayout( type, builder ) {
+
+	const matrixLayout = MATRIX_LAYOUT[ type ];
+
+	if ( matrixLayout !== undefined ) {
+
+		return { columns: matrixLayout.columns, columnLength: matrixLayout.columnLength, isMatrix: true };
+
+	}
+
+	const count = builder.getTypeLength( type );
+
+	if ( count > 4 ) {
+
+		throw new Error( `gpuTest: type "${ type }" (${ count } components) is not supported -- only scalars, vecN, mat3 and mat4 are.` );
+
+	}
+
+	return { columns: 1, columnLength: count, isMatrix: false };
+
+}
+
 // A statement node: at real shader-build time (setup(builder), when a real
 // NodeBuilder -- and therefore real type information -- exists) it asks the
-// builder what type `value1`/`value2` resolved to, and writes each as a
-// single zero-padded vec4 to `actualBuffer`/`expectedBuffer` at `this.index`
-// (always the bare `instanceIndex` node -- see file header). `resolvedType`/
-// `resolvedCount` are stashed on the instance for the CPU harness to read
-// back afterwards.
+// builder what type `value1`/`value2` resolved to, then hands each column
+// (1 for scalars/vectors, 3 or 4 for mat3/mat4), zero-padded to a vec4, to
+// the caller-supplied `writeColumn(columnIndex, actualVec4, expectedVec4)`.
+// How -- and at what addressing cost -- a column actually gets written to a
+// buffer is entirely up to `writeColumn`; see `gpuTest`/`gpuFuzzTest` for the
+// two different strategies. `resolved*` fields are stashed on the instance
+// for the CPU harness to read back afterwards.
 class AssertWriteNode extends Node {
 
-	constructor( actualBuffer, expectedBuffer, index, value1, value2 ) {
+	constructor( writeColumn, value1, value2 ) {
 
 		super( 'void' );
 
-		this.actualBuffer = actualBuffer;
-		this.expectedBuffer = expectedBuffer;
-		this.index = index;
+		this.writeColumn = writeColumn;
 		this.value1 = value1;
 		this.value2 = value2;
 
 		this.resolvedType = null;
-		this.resolvedCount = null;
+		this.resolvedColumns = null;
+		this.resolvedColumnLength = null;
+		this.resolvedIsMatrix = null;
+
+	}
+
+	get resolvedCount() {
+
+		return this.resolvedColumns * this.resolvedColumnLength;
 
 	}
 
@@ -123,19 +182,27 @@ class AssertWriteNode extends Node {
 
 		}
 
-		const count = builder.getTypeLength( type1 );
+		const { columns, columnLength, isMatrix } = resolveLayout( type1, builder );
 
-		if ( count > 4 ) {
+		if ( columns > MAX_COLUMNS ) {
 
-			throw new Error( `gpuTest: type "${ type1 }" (${ count } components) is not supported yet -- matrix support is a follow-up.` );
+			throw new Error( `gpuTest: type "${ type1 }" needs ${ columns } columns, more than the supported ${ MAX_COLUMNS }.` );
 
 		}
 
 		this.resolvedType = type1;
-		this.resolvedCount = count;
+		this.resolvedColumns = columns;
+		this.resolvedColumnLength = columnLength;
+		this.resolvedIsMatrix = isMatrix;
 
-		this.actualBuffer.element( this.index ).assign( toVec4( this.value1, count ) );
-		this.expectedBuffer.element( this.index ).assign( toVec4( this.value2, count ) );
+		for ( let c = 0; c < columns; c ++ ) {
+
+			const column1 = isMatrix ? this.value1.element( c ) : this.value1;
+			const column2 = isMatrix ? this.value2.element( c ) : this.value2;
+
+			this.writeColumn( c, toVec4( column1, columnLength ), toVec4( column2, columnLength ) );
+
+		}
 
 		return undefined;
 
@@ -252,6 +319,29 @@ const RELATIONAL_OPS = {
 	[ Kind.LE ]: '<='
 };
 
+// Per-component labels for diagnostic output: swizzle letters for a plain
+// vector/scalar (`x`, `y`, ...), or `col0.x`-style labels for a matrix, whose
+// flattened component order is column-major (matching `resolveLayout`).
+function componentLabels( columns, columnLength ) {
+
+	if ( columns === 1 ) return SWIZZLE.slice( 0, columnLength );
+
+	const labels = [];
+
+	for ( let c = 0; c < columns; c ++ ) {
+
+		for ( let r = 0; r < columnLength; r ++ ) {
+
+			labels.push( `col${ c }.${ SWIZZLE[ r ] }` );
+
+		}
+
+	}
+
+	return labels;
+
+}
+
 function describeExpectation( d, kind, tolerance ) {
 
 	const op = RELATIONAL_OPS[ kind ];
@@ -267,7 +357,7 @@ function describeExpectation( d, kind, tolerance ) {
 
 }
 
-function formatFailure( label, diffs, tolerance, kind ) {
+function formatFailure( label, diffs, tolerance, kind, labels ) {
 
 	const bad = diffs.filter( ( d ) => d.bad );
 
@@ -279,7 +369,7 @@ function formatFailure( label, diffs, tolerance, kind ) {
 
 	}
 
-	const lines = bad.map( ( d ) => `  [${ SWIZZLE[ d.index ] }]: ${ describeExpectation( d, kind, tolerance ) }` );
+	const lines = bad.map( ( d ) => `  [${ labels[ d.index ] }]: ${ describeExpectation( d, kind, tolerance ) }` );
 	const reason = RELATIONAL_OPS[ kind ] !== undefined ? 'fail the comparison' : `exceed tolerance ${ tolerance }`;
 
 	return `${ label }: ${ bad.length }/${ diffs.length } components ${ reason }\n${ lines.join( '\n' ) }`;
@@ -288,8 +378,9 @@ function formatFailure( label, diffs, tolerance, kind ) {
 
 function evaluateAssertion( assert, actual, expected, meta ) {
 
+	const labels = componentLabels( meta.columns, meta.columnLength );
 	const diffs = diffComponents( actual, expected, meta.tolerance, meta.kind );
-	const failure = formatFailure( meta.label, diffs, meta.tolerance, meta.kind );
+	const failure = formatFailure( meta.label, diffs, meta.tolerance, meta.kind, labels );
 
 	assert.pushResult( {
 		result: failure === null,
@@ -356,40 +447,31 @@ function declareTest( name, backends, run ) {
 
 }
 
-// Shared by gpuTest and gpuFuzzTest: reads `actualBuffer`/`expectedBuffer`
-// (vec4-typed, one row per `nodes` entry unless `rowOf` says otherwise) back
-// and evaluates every collected AssertWriteNode against them.
-async function readAndEvaluate( assert, renderer, nodes, actualBuffer, expectedBuffer, rowOf, labelOf ) {
+async function readBuffer( renderer, buffer ) {
 
-	const actualData = new Float32Array( await renderer.getArrayBufferAsync( actualBuffer.value ) );
-	const expectedData = new Float32Array( await renderer.getArrayBufferAsync( expectedBuffer.value ) );
-
-	nodes.forEach( ( node, index ) => {
-
-		const base = rowOf( node, index ) * 4;
-		const count = node.resolvedCount;
-		const actual = Array.from( actualData.slice( base, base + count ) );
-		const expected = Array.from( expectedData.slice( base, base + count ) );
-
-		evaluateAssertion( assert, actual, expected, {
-			label: labelOf( node, index ),
-			kind: node.kind,
-			tolerance: node.tolerance
-		} );
-
-	} );
+	return new Float32Array( await renderer.getArrayBufferAsync( buffer.value ) );
 
 }
 
 /**
  * Declare a GPU-native test suite. `buildFn` runs once (at graph-build time)
  * and receives `{ assert }` with `assert.eq/closeAbs/closeRel(actual, expected,
- * [tolerance], [message])`. Each assertion gets its own row (`vec4` pair),
- * dispatched as one compute invocation per row and guarded by
- * `If( instanceIndex.equal( row ), ... )` so only that invocation's write
- * actually commits -- see the file header for why that's required for
- * WebGL2 fallback compatibility. Every assertion is then decoded and checked
- * on the CPU with a full actual-vs-expected diagnostic on failure.
+ * [tolerance], [message])`.
+ *
+ * Addressing strategy: a single shared `actual`/`expected` buffer pair, sized
+ * `maxAssertions * MAX_COLUMNS` rows -- every assertion reserves a fixed
+ * `MAX_COLUMNS`-row stride (`row = assertionIndex * MAX_COLUMNS`), and only
+ * uses as many of those rows as its resolved type needs (1 for a scalar/
+ * vector, up to `MAX_COLUMNS` for a mat3/mat4). Each row is still written
+ * only via the bare `instanceIndex` node, guarded by
+ * `If( instanceIndex.equal( row ), ... )`, per the file header's WebGL2
+ * addressing constraint. This costs a larger (but cheap: still just 2
+ * buffers total) dispatch -- `maxAssertions * MAX_COLUMNS` compute
+ * invocations -- rather than more simultaneously-bound buffers, which is
+ * the resource that's actually scarce on the WebGL2 fallback.
+ *
+ * Supports scalars, vecN and mat3/mat4 -- see the file header's "Matrix
+ * support" section.
  *
  * `maxAssertions` (default 64) sizes the backing buffers and dispatch count
  * generously so callers don't need to pre-count assertions; override via the
@@ -405,8 +487,8 @@ export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webg
 	declareTest( name, backends, async ( assert, renderer ) => {
 
 		const nodes = [];
-		const actualBuffer = instancedArray( maxAssertions, 'vec4' );
-		const expectedBuffer = instancedArray( maxAssertions, 'vec4' );
+		const actualBuffer = instancedArray( maxAssertions * MAX_COLUMNS, 'vec4' );
+		const expectedBuffer = instancedArray( maxAssertions * MAX_COLUMNS, 'vec4' );
 
 		const kernel = Fn( () => {
 
@@ -418,33 +500,62 @@ export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webg
 
 				}
 
-				const row = nodes.length;
-				const node = new AssertWriteNode( actualBuffer, expectedBuffer, instanceIndex, value1, value2 );
+				const baseRow = nodes.length * MAX_COLUMNS;
+
+				const writeColumn = ( c, actualVec4, expectedVec4 ) => {
+
+					If( instanceIndex.equal( baseRow + c ), () => {
+
+						actualBuffer.element( instanceIndex ).assign( actualVec4 );
+						expectedBuffer.element( instanceIndex ).assign( expectedVec4 );
+
+					} );
+
+				};
+
+				const node = new AssertWriteNode( writeColumn, value1, value2 );
 				node.kind = kind;
 				node.tolerance = tolerance;
 				node.message = message;
+				node.baseRow = baseRow;
 
 				nodes.push( node );
 
-				If( instanceIndex.equal( row ), () => {
-
-					Stack( node );
-
-				} );
+				Stack( node );
 
 			};
 
 			buildFn( { assert: buildAssertAPI( makeNode ) } );
 
-		} )().compute( maxAssertions );
+		} )().compute( maxAssertions * MAX_COLUMNS );
 
 		await renderer.computeAsync( kernel );
 
-		await readAndEvaluate(
-			assert, renderer, nodes, actualBuffer, expectedBuffer,
-			( node, id ) => id,
-			( node, id ) => node.message || `${ name } #${ id }`
-		);
+		const actualData = await readBuffer( renderer, actualBuffer );
+		const expectedData = await readBuffer( renderer, expectedBuffer );
+
+		nodes.forEach( ( node, id ) => {
+
+			const actual = [];
+			const expected = [];
+
+			for ( let c = 0; c < node.resolvedColumns; c ++ ) {
+
+				const base = ( node.baseRow + c ) * 4;
+				actual.push( ...actualData.slice( base, base + node.resolvedColumnLength ) );
+				expected.push( ...expectedData.slice( base, base + node.resolvedColumnLength ) );
+
+			}
+
+			evaluateAssertion( assert, actual, expected, {
+				label: node.message || `${ name } #${ id }`,
+				kind: node.kind,
+				tolerance: node.tolerance,
+				columns: node.resolvedColumns,
+				columnLength: node.resolvedColumnLength
+			} );
+
+		} );
 
 	} );
 
@@ -456,25 +567,47 @@ export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webg
  * assert }` so it can derive per-invocation inputs from `instanceIndex` and
  * assert on them the same way as `gpuTest`.
  *
+ * Addressing strategy: each call site gets its own dedicated set of
+ * column-buffers (1 by default, up to `maxColumnsPerSite` -- see below), all
+ * written *unconditionally* at the bare `instanceIndex` (which already
+ * uniquely addresses "this fuzz instance", so no `If`-guard is needed here,
+ * unlike `gpuTest`).
+ *
  * `maxSitesPerInstance` (default 4) bounds how many `assert.*` calls buildFn
- * may make per invocation; override via options if a test needs more. Each
- * site gets its own dedicated pair of buffers so sites never collide on a
- * single write.
+ * may make per invocation. `maxColumnsPerSite` (default 1) bounds how wide a
+ * single site's value may be: 1 covers every scalar/vector type; pass 3 or 4
+ * to allow a site to assert on a mat3/mat4. Both knobs spend the same scarce
+ * resource -- WebGL2's fallback guarantees only a handful of simultaneously-
+ * bound output buffers (spec minimum is 4) -- so `maxSitesPerInstance *
+ * maxColumnsPerSite` total buffer pairs is a real budget, not just memory;
+ * widen `maxColumnsPerSite` only for the sites that actually need it by
+ * splitting matrix-asserting fuzz tests out from scalar/vector-heavy ones
+ * rather than raising it globally.
  *
  * `backends` (default `[ 'webgpu', 'webgl' ]`) -- see `gpuTest`.
  */
-export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, backends = [ 'webgpu', 'webgl' ] } = {} ) {
+export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, maxColumnsPerSite = 1, backends = [ 'webgpu', 'webgl' ] } = {} ) {
 
 	declareTest( name, backends, async ( assert, renderer ) => {
 
 		const nodes = []; // one entry per call site (not per instance)
-		const actualBuffers = [];
+		const actualBuffers = []; // actualBuffers[site][column]
 		const expectedBuffers = [];
 
 		for ( let site = 0; site < maxSitesPerInstance; site ++ ) {
 
-			actualBuffers.push( instancedArray( count, 'vec4' ) );
-			expectedBuffers.push( instancedArray( count, 'vec4' ) );
+			const actualColumns = [];
+			const expectedColumns = [];
+
+			for ( let c = 0; c < maxColumnsPerSite; c ++ ) {
+
+				actualColumns.push( instancedArray( count, 'vec4' ) );
+				expectedColumns.push( instancedArray( count, 'vec4' ) );
+
+			}
+
+			actualBuffers.push( actualColumns );
+			expectedBuffers.push( expectedColumns );
 
 		}
 
@@ -490,7 +623,20 @@ export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, ba
 
 				}
 
-				const node = new AssertWriteNode( actualBuffers[ site ], expectedBuffers[ site ], instanceIndex, value1, value2 );
+				const writeColumn = ( c, actualVec4, expectedVec4 ) => {
+
+					if ( c >= maxColumnsPerSite ) {
+
+						throw new Error( `gpuFuzzTest "${ name }": a value at site ${ site } needs column ${ c + 1 }, more than maxColumnsPerSite (${ maxColumnsPerSite }); raise that option to assert on wider values (e.g. mat3/mat4).` );
+
+					}
+
+					actualBuffers[ site ][ c ].element( instanceIndex ).assign( actualVec4 );
+					expectedBuffers[ site ][ c ].element( instanceIndex ).assign( expectedVec4 );
+
+				};
+
+				const node = new AssertWriteNode( writeColumn, value1, value2 );
 				node.kind = kind;
 				node.tolerance = tolerance;
 				node.message = message;
@@ -507,8 +653,9 @@ export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, ba
 
 		await renderer.computeAsync( kernel );
 
-		// One buffer pair per site (not a single shared pair, unlike gpuTest),
-		// so read each site's data back once and slice per instance below.
+		// One set of column-buffers per site (not shared across sites, unlike
+		// gpuTest's shared buffer), so read each site's data back once and
+		// slice per instance below.
 		const actualData = [];
 		const expectedData = [];
 
@@ -516,8 +663,8 @@ export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, ba
 
 			if ( actualData[ node.site ] === undefined ) {
 
-				actualData[ node.site ] = new Float32Array( await renderer.getArrayBufferAsync( actualBuffers[ node.site ].value ) );
-				expectedData[ node.site ] = new Float32Array( await renderer.getArrayBufferAsync( expectedBuffers[ node.site ].value ) );
+				actualData[ node.site ] = await Promise.all( actualBuffers[ node.site ].map( ( buf ) => readBuffer( renderer, buf ) ) );
+				expectedData[ node.site ] = await Promise.all( expectedBuffers[ node.site ].map( ( buf ) => readBuffer( renderer, buf ) ) );
 
 			}
 
@@ -527,13 +674,26 @@ export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, ba
 
 			for ( const node of nodes ) {
 
-				const base = instance * 4;
-				const componentCount = node.resolvedCount;
-				const actual = Array.from( actualData[ node.site ].slice( base, base + componentCount ) );
-				const expected = Array.from( expectedData[ node.site ].slice( base, base + componentCount ) );
+				const actual = [];
+				const expected = [];
+
+				for ( let c = 0; c < node.resolvedColumns; c ++ ) {
+
+					const base = instance * 4;
+					actual.push( ...actualData[ node.site ][ c ].slice( base, base + node.resolvedColumnLength ) );
+					expected.push( ...expectedData[ node.site ][ c ].slice( base, base + node.resolvedColumnLength ) );
+
+				}
+
 				const label = node.message ? `${ name } #${ instance }: ${ node.message }` : `${ name } #${ instance }`;
 
-				evaluateAssertion( assert, actual, expected, { label, kind: node.kind, tolerance: node.tolerance } );
+				evaluateAssertion( assert, actual, expected, {
+					label,
+					kind: node.kind,
+					tolerance: node.tolerance,
+					columns: node.resolvedColumns,
+					columnLength: node.resolvedColumnLength
+				} );
 
 			}
 
