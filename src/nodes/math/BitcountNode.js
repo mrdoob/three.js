@@ -388,13 +388,27 @@ class BitcountNode extends MathNode {
 
 	}
 
+	static get COUNT_TRAILING_ZEROS() {
+
+		return 'countTrailingZeros';
+
+	}
+
+	static get COUNT_LEADING_ZEROS() {
+
+		return 'countLeadingZeros';
+
+	}
+
+	static get COUNT_ONE_BITS() {
+
+		return 'countOneBits';
+
+	}
+
 }
 
 export default BitcountNode;
-
-BitcountNode.COUNT_TRAILING_ZEROS = 'countTrailingZeros';
-BitcountNode.COUNT_LEADING_ZEROS = 'countLeadingZeros';
-BitcountNode.COUNT_ONE_BITS = 'countOneBits';
 
 /**
  * Finds the number of consecutive 0 bits from the least significant bit of the input value,
