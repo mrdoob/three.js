@@ -72,6 +72,15 @@ class RenderObjects {
 		 */
 		this.chainMaps = {};
 
+		/**
+		 * All render objects created by this component. Chain maps are backed
+		 * by WeakMaps and can't be enumerated, so this set is required to
+		 * dispose all render objects when the renderer is disposed.
+		 *
+		 * @type {Set<RenderObject>}
+		 */
+		this.renderObjects = new Set();
+
 	}
 
 	/**
@@ -172,6 +181,18 @@ class RenderObjects {
 	 */
 	dispose() {
 
+		// Dispose the render objects so they remove their 'dispose' event
+		// listeners. Listeners left on long-lived objects (e.g. the shared
+		// geometry of QuadMesh) would otherwise keep the disposed renderer
+		// reachable and prevent its garbage collection.
+
+		for ( const renderObject of Array.from( this.renderObjects ) ) {
+
+			renderObject.dispose();
+
+		}
+
+		this.renderObjects.clear();
 		this.chainMaps = {};
 
 	}
@@ -206,7 +227,11 @@ class RenderObjects {
 
 			chainMap.delete( renderObject.getChainArray() );
 
+			this.renderObjects.delete( renderObject );
+
 		};
+
+		this.renderObjects.add( renderObject );
 
 		return renderObject;
 
