@@ -34,12 +34,7 @@ jobs:
         run: npm run test-unit
 
       - name: === Unit addons testing ===
-        # --skipWebGPU: GitHub-hosted runners have no real GPU, only software
-        # Vulkan (lavapipe) -- skip (not fail) tests that require a real WebGPU
-        # backend rather than depend on that software path staying reliable.
-        # WebGL2-fallback-backend GPU-native TSL tests still run. Drop the flag
-        # once WebGPU-via-lavapipe is confirmed stable in this CI environment.
-        run: npm run test-unit-addons -- --skipWebGPU
+        run: npm run test-unit-addons
 
       - name: === Examples ready for release ===
         run: npm run test-e2e-cov

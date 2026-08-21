@@ -82,13 +82,6 @@ function main() {
 
 		}
 
-		// Not positional -- may appear anywhere after the script path, e.g.
-		// `npm run test-unit-addons -- --skipWebGPU`. Forwarded to the test
-		// page as a URL param; gpu-test-utils.js reads it to skip (not fail)
-		// tests that require a real WebGPU backend, for CI environments where
-		// WebGPU may not be reliably available.
-		const skipWebGPU = process.argv.includes( '--skipWebGPU' );
-
 		browser = await puppeteer.launch( {
 			headless: testMode === 'headless',
 			args: flags,
@@ -161,7 +154,7 @@ function main() {
 
 		} );
 
-		const testUrl = `http://localhost:${port}/test/unit/${testPage}${ skipWebGPU ? '?skipWebGPU' : '' }`;
+		const testUrl = `http://localhost:${port}/test/unit/${testPage}`;
 
 		// Load the test page
 		await page.goto( testUrl, {
