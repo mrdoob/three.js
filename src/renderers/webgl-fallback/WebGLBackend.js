@@ -821,6 +821,7 @@ class WebGLBackend extends Backend {
 			const clearStencil = renderer.getClearStencil();
 
 			if ( depth ) this.state.setDepthMask( true );
+			if ( stencil ) this.state.setStencilMask( 0xffffffff );
 
 			if ( descriptor.textures === null ) {
 

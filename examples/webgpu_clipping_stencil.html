@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - clipping stencil</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - clipping stencil">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_clipping_stencil.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_clipping_stencil.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Clipping Stencil</span>
+			</div>
+
+			<small>Solid geometry with clip planes and stencil materials.</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			let camera, scene, renderer, object;
+			let planes, planeObjects, planeHelpers;
+			let timer;
+
+			const params = {
+
+				animate: true,
+				planeX: {
+
+					constant: 0,
+					negated: false,
+					displayHelper: false
+
+				},
+				planeY: {
+
+					constant: 0,
+					negated: false,
+					displayHelper: false
+
+				},
+				planeZ: {
+
+					constant: 0,
+					negated: false,
+					displayHelper: false
+
+				}
+
+
+			};
+
+			init();
+
+			function createPlaneStencilGroup( geometry, plane, stencilBit, renderOrder ) {
+
+				const group = new THREE.ClippingGroup();
+				group.clippingPlanes = [ plane ];
+
+				const material = new THREE.MeshBasicNodeMaterial();
+				material.side = THREE.DoubleSide;
+				material.depthWrite = false;
+				material.depthTest = false;
+				material.colorWrite = false;
+				material.stencilWrite = true;
+				material.stencilWriteMask = stencilBit;
+				material.stencilFunc = THREE.AlwaysStencilFunc;
+				material.stencilFail = THREE.InvertStencilOp;
+				material.stencilZFail = THREE.InvertStencilOp;
+				material.stencilZPass = THREE.InvertStencilOp;
+
+				const mesh = new THREE.Mesh( geometry, material );
+				mesh.renderOrder = renderOrder;
+				group.add( mesh );
+
+				return group;
+
+			}
+
+			function init() {
+
+				timer = new THREE.Timer();
+				timer.connect( document );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x263238 );
+
+				camera = new THREE.PerspectiveCamera( 36, window.innerWidth / window.innerHeight, 1, 100 );
+				camera.position.set( 2, 2, 2 );
+
+				scene.add( new THREE.AmbientLight( 0xffffff, 1.5 ) );
+
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
+				dirLight.position.set( 5, 10, 7.5 );
+				dirLight.castShadow = true;
+				dirLight.shadow.camera.right = 2;
+				dirLight.shadow.camera.left = - 2;
+				dirLight.shadow.camera.top	= 2;
+				dirLight.shadow.camera.bottom = - 2;
+
+				dirLight.shadow.mapSize.width = 1024;
+				dirLight.shadow.mapSize.height = 1024;
+				scene.add( dirLight );
+
+				planes = [
+					new THREE.Plane( new THREE.Vector3( - 1, 0, 0 ), 0 ),
+					new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), 0 ),
+					new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), 0 )
+				];
+
+				planeHelpers = planes.map( p => new THREE.PlaneHelper( p, 2, 0xffffff ) );
+				planeHelpers.forEach( ph => {
+
+					ph.visible = false;
+					scene.add( ph );
+
+				} );
+
+				const geometry = new THREE.TorusKnotGeometry( 0.4, 0.15, 220, 60 );
+				object = new THREE.Group();
+				scene.add( object );
+
+				// Set up clip plane rendering
+
+				planeObjects = [];
+				const planeGeom = new THREE.PlaneGeometry( 4, 4 );
+
+				for ( let i = 0; i < 3; i ++ ) {
+
+					const plane = planes[ i ];
+					const stencilBit = 1 << i;
+
+					const stencilGroup = createPlaneStencilGroup( geometry, plane, stencilBit, i + 1 );
+					object.add( stencilGroup );
+
+					// the cap is only rendered where the stencil bit of its plane is set
+					// and is clipped by the other clipping planes
+
+					const planeMat =
+						new THREE.MeshStandardNodeMaterial( {
+
+							color: 0xE91E63,
+							metalness: 0.1,
+							roughness: 0.75,
+
+							stencilWrite: true,
+							stencilRef: 0,
+							stencilFuncMask: stencilBit,
+							stencilWriteMask: stencilBit,
+							stencilFunc: THREE.NotEqualStencilFunc,
+							stencilFail: THREE.ReplaceStencilOp,
+							stencilZFail: THREE.ReplaceStencilOp,
+							stencilZPass: THREE.ReplaceStencilOp,
+
+						} );
+					const po = new THREE.Mesh( planeGeom, planeMat );
+					po.renderOrder = i + 1.1;
+
+					const poGroup = new THREE.ClippingGroup();
+					poGroup.clippingPlanes = planes.filter( p => p !== plane );
+					poGroup.add( po );
+
+					planeObjects.push( po );
+					scene.add( poGroup );
+
+				}
+
+				const clippingGroup = new THREE.ClippingGroup();
+				clippingGroup.clippingPlanes = planes;
+				clippingGroup.clipShadows = true;
+				object.add( clippingGroup );
+
+				const material = new THREE.MeshStandardNodeMaterial( {
+
+					color: 0xFFC107,
+					metalness: 0.1,
+					roughness: 0.75,
+					shadowSide: THREE.DoubleSide
+
+				} );
+
+				// add the color
+
+				const clippedColorFront = new THREE.Mesh( geometry, material );
+				clippedColorFront.castShadow = true;
+				clippedColorFront.renderOrder = 6;
+				clippingGroup.add( clippedColorFront );
+
+				const ground = new THREE.Mesh(
+					new THREE.PlaneGeometry( 9, 9, 1, 1 ),
+					new THREE.ShadowNodeMaterial( { color: 0x000000, opacity: 0.25, side: THREE.DoubleSide } )
+				);
+
+				ground.rotation.x = - Math.PI / 2; // rotates X/Y to X/Z
+				ground.position.y = - 1;
+				ground.receiveShadow = true;
+				scene.add( ground );
+
+				// Renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true, stencil: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				// Controls
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 2;
+				controls.maxDistance = 20;
+				controls.update();
+
+				// GUI
+
+				const gui = renderer.inspector.createParameters( 'Clipping settings' );
+				gui.add( params, 'animate' );
+
+				const planeX = gui.addFolder( 'planeX' );
+				planeX.add( params.planeX, 'displayHelper' ).onChange( v => planeHelpers[ 0 ].visible = v );
+				planeX.add( params.planeX, 'constant', - 1, 1 ).onChange( d => planes[ 0 ].constant = d );
+				planeX.add( params.planeX, 'negated' ).onChange( () => {
+
+					planes[ 0 ].negate();
+					params.planeX.constant = planes[ 0 ].constant;
+
+				} );
+
+				const planeY = gui.addFolder( 'planeY' );
+				planeY.add( params.planeY, 'displayHelper' ).onChange( v => planeHelpers[ 1 ].visible = v );
+				planeY.add( params.planeY, 'constant', - 1, 1 ).onChange( d => planes[ 1 ].constant = d );
+				planeY.add( params.planeY, 'negated' ).onChange( () => {
+
+					planes[ 1 ].negate();
+					params.planeY.constant = planes[ 1 ].constant;
+
+				} );
+
+				const planeZ = gui.addFolder( 'planeZ' );
+				planeZ.add( params.planeZ, 'displayHelper' ).onChange( v => planeHelpers[ 2 ].visible = v );
+				planeZ.add( params.planeZ, 'constant', - 1, 1 ).onChange( d => planes[ 2 ].constant = d );
+				planeZ.add( params.planeZ, 'negated' ).onChange( () => {
+
+					planes[ 2 ].negate();
+					params.planeZ.constant = planes[ 2 ].constant;
+
+				} );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				timer.update();
+
+				const delta = timer.getDelta();
+
+				if ( params.animate ) {
+
+					object.rotation.x += delta * 0.5;
+					object.rotation.y += delta * 0.2;
+
+				}
+
+				for ( let i = 0; i < planeObjects.length; i ++ ) {
+
+					const plane = planes[ i ];
+					const po = planeObjects[ i ];
+					plane.coplanarPoint( po.position );
+					po.lookAt(
+						po.position.x - plane.normal.x,
+						po.position.y - plane.normal.y,
+						po.position.z - plane.normal.z,
+					);
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

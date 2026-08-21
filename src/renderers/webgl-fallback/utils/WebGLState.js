@@ -959,27 +959,26 @@ class WebGLState {
 			? this.enable( gl.SAMPLE_ALPHA_TO_COVERAGE )
 			: this.disable( gl.SAMPLE_ALPHA_TO_COVERAGE );
 
-		if ( hardwareClippingPlanes > 0 ) {
 
-			if ( this.currentClippingPlanes !== hardwareClippingPlanes ) {
+		if ( this.currentClippingPlanes !== hardwareClippingPlanes ) {
 
-				const CLIP_DISTANCE0_WEBGL = 0x3000;
+			const CLIP_DISTANCE0_WEBGL = 0x3000;
 
-				for ( let i = 0; i < 8; i ++ ) {
+			for ( let i = 0; i < 8; i ++ ) {
 
-					if ( i < hardwareClippingPlanes ) {
+				if ( i < hardwareClippingPlanes ) {
 
-						this.enable( CLIP_DISTANCE0_WEBGL + i );
+					this.enable( CLIP_DISTANCE0_WEBGL + i );
 
-					} else {
+				} else {
 
-						this.disable( CLIP_DISTANCE0_WEBGL + i );
-
-					}
+					this.disable( CLIP_DISTANCE0_WEBGL + i );
 
 				}
 
 			}
+
+			this.currentClippingPlanes = hardwareClippingPlanes;
 
 		}
 
