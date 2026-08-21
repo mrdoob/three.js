@@ -40,14 +40,14 @@ const _cascadeCorners = [
 
 // must match the cascade count in the sun shadow shader chunks
 
-const _cascadeCount = 4;
+const _cascadeCount = 2;
 
 // fraction of each cascade's depth range that blends into the next cascade
 
 const _cascadeFade = 0.1;
 
 /**
- * Represents the shadow configuration of {@link SunLight}, using four
+ * Represents the shadow configuration of {@link SunLight}, using two
  * cascaded shadow maps (CSM).
  *
  * The shadow camera projection is fitted automatically to slices of the view
@@ -90,7 +90,7 @@ class SunLightShadow extends LightShadow {
 		this._cascadeData = [];
 
 		this._viewportCount = _cascadeCount;
-		this._frameExtents.set( 2, 2 );
+		this._frameExtents.set( 2, 1 );
 
 		for ( let i = 0; i < _cascadeCount; i ++ ) {
 
@@ -160,7 +160,7 @@ class SunLightShadow extends LightShadow {
 
 		for ( let i = 0; i < _cascadeCount; i ++ ) {
 
-			this._viewports[ i ].set( i % 2 + insetX, Math.floor( i / 2 ) + insetY, 1 - 2 * insetX, 1 - 2 * insetY );
+			this._viewports[ i ].set( i + insetX, insetY, 1 - 2 * insetX, 1 - 2 * insetY );
 
 		}
 

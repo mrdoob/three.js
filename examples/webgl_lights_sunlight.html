@@ -59,7 +59,7 @@
 					#if defined( USE_SHADOWMAP ) && NUM_SUN_LIGHT_SHADOWS > 0
 
 						float cascade = 0.0;
-						for ( int i = 0; i < 4; i ++ ) cascade += step( sunShadowCascade[ i ].y, vSunShadowWorldPosition.w );
+						for ( int i = 0; i < 2; i ++ ) cascade += step( sunShadowCascade[ i ].y, vSunShadowWorldPosition.w );
 						gl_FragColor.rgb *= 0.7 + 0.3 * cos( cascade * 1.2 + vec3( 0.0, 4.2, 2.1 ) );
 
 					#endif
