@@ -65,10 +65,8 @@
 // memory-size concern; see `gpuFuzzTest`'s `maxColumnsPerSite` option below
 // for where that budget is spent explicitly rather than by accident.
 
-import { Fn, If, instanceIndex, instancedArray, float, vec4 } from 'three/tsl';
-import { WebGPURenderer } from 'three/webgpu';
-import Node from '../../../../src/nodes/core/Node.js';
-import { Stack } from '../../../../src/nodes/tsl/TSLCore.js';
+import { Fn, If, Stack, instanceIndex, instancedArray, float, vec4 } from 'three/tsl';
+import { WebGPURenderer, Node } from 'three/webgpu';
 
 export const Kind = {
 	EQ: 'eq',
