@@ -1,9 +1,11 @@
-import { LightShadow } from './LightShadow.js';
-import { OrthographicCamera } from '../cameras/OrthographicCamera.js';
-import { Frustum } from '../math/Frustum.js';
-import { Matrix4 } from '../math/Matrix4.js';
-import { Vector3 } from '../math/Vector3.js';
-import { Vector4 } from '../math/Vector4.js';
+import {
+	Frustum,
+	LightShadow,
+	Matrix4,
+	OrthographicCamera,
+	Vector3,
+	Vector4
+} from 'three';
 
 const _lightOrientationMatrix = /*@__PURE__*/ new Matrix4();
 const _viewToLightMatrix = /*@__PURE__*/ new Matrix4();
@@ -56,6 +58,7 @@ const _cascadeFade = 0.1;
  * The default `mapSize` is `1024x1024` per cascade.
  *
  * @augments LightShadow
+ * @three_import import { SunLightShadow } from 'three/addons/lights/SunLightShadow.js';
  */
 class SunLightShadow extends LightShadow {
 
