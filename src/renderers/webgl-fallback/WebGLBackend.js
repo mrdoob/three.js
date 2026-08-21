@@ -1264,9 +1264,9 @@ class WebGLBackend extends Backend {
 
 			}
 
-			const pixelRatio = this.renderer.getPixelRatio();
-
 			const renderTarget = this._currentContext.renderTarget;
+
+			const pixelRatio = renderTarget !== null ? 1 : this.renderer.getPixelRatio();
 			const isRenderCameraDepthArray = this._isRenderCameraDepthArray( this._currentContext );
 			const prevActiveCubeFace = this._currentContext.activeCubeFace;
 
