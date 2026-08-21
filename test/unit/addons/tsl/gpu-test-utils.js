@@ -195,10 +195,27 @@ class AssertWriteNode extends Node {
 		this.resolvedColumnLength = columnLength;
 		this.resolvedIsMatrix = isMatrix;
 
+		// Force value1/value2 to evaluate ONCE, here, unconditionally --
+		// *before* any of writeColumn's per-column branching (an `If` per
+		// column, for gpuTest's addressing scheme; see gpuTest's own comment).
+		// Skipping this and reading `this.value1.element(c)` directly from
+		// inside each column's conditional branch is a real, confirmed trap:
+		// a node's generated value gets cached/declared in whichever branch
+		// happens to build it first, so any *sibling* conditional branch that
+		// references the same node sees an uninitialized (zero) variable
+		// instead of re-evaluating it. `.toVar()` sidesteps this by forcing
+		// the evaluation to happen up front, outside every branch, so each
+		// column's branch only ever *reads* an already-computed variable.
+		// (Recall multi-column values only arise for mat3/mat4 here since
+		// scalars/vectors are always a single column -- but `.toVar()` is
+		// cheap and correct for those too, so it's applied unconditionally.)
+		const v1 = this.value1.toVar();
+		const v2 = this.value2.toVar();
+
 		for ( let c = 0; c < columns; c ++ ) {
 
-			const column1 = isMatrix ? this.value1.element( c ) : this.value1;
-			const column2 = isMatrix ? this.value2.element( c ) : this.value2;
+			const column1 = isMatrix ? v1.element( c ) : v1;
+			const column2 = isMatrix ? v2.element( c ) : v2;
 
 			this.writeColumn( c, toVec4( column1, columnLength ), toVec4( column2, columnLength ) );
 
@@ -583,6 +600,15 @@ export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webg
  * widen `maxColumnsPerSite` only for the sites that actually need it by
  * splitting matrix-asserting fuzz tests out from scalar/vector-heavy ones
  * rather than raising it globally.
+ *
+ * In practice the default of 4 sites is itself already close to some
+ * software/CI WebGL2 implementations' actual (not just spec-guaranteed)
+ * ceiling -- confirmed empirically: 3 simultaneous sites silently corrupted
+ * one site's readback (to all-zero) on this project's sandboxed lavapipe
+ * WebGL2 fallback, while 2 sites worked reliably. If a fuzz test with
+ * several `assert.*` calls starts seeing implausible all-zero failures,
+ * try splitting it into multiple smaller `gpuFuzzTest` calls before
+ * suspecting the node under test.
  *
  * `backends` (default `[ 'webgpu', 'webgl' ]`) -- see `gpuTest`.
  */
