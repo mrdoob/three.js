@@ -31,6 +31,7 @@
 
 			import * as THREE from 'three';
 
+			import { SunLight } from 'three/addons/lights/SunLight.js';
 			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 			import { Sky } from 'three/addons/objects/Sky.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -132,7 +133,7 @@
 				sky.material.uniforms.rayleigh.value = 2;
 				sky.material.uniforms.showSunDisc.value = false; // the sun is represented by the light
 
-				sunLight = new THREE.SunLight();
+				sunLight = new SunLight();
 				sunLight.castShadow = true;
 				sunLight.shadow.camera.far = params.far; // maximum shadow distance
 				sunLight.shadow.mapSize.setScalar( params.resolution );

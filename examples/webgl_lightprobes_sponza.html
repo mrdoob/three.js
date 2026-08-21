@@ -32,6 +32,7 @@
 
 			import * as THREE from 'three';
 
+			import { SunLight } from 'three/addons/lights/SunLight.js';
 			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -137,7 +138,7 @@
 				let isBaking = false;
 				let bakeQueued = false;
 
-				sunLight = new THREE.SunLight( 0xfff2dc, 100.0 );
+				sunLight = new SunLight( 0xfff2dc, 100.0 );
 				sunLight.castShadow = true;
 				sunLight.shadow.camera.far = 50;
 				sunLight.shadow.mapSize.setScalar( 2048 );
