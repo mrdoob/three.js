@@ -131,8 +131,6 @@ import './src/helpers/SpotLightHelper.tests.js';
 import './src/lights/AmbientLight.tests.js';
 import './src/lights/DirectionalLight.tests.js';
 import './src/lights/DirectionalLightShadow.tests.js';
-import './src/lights/SunLight.tests.js';
-import './src/lights/SunLightShadow.tests.js';
 import './src/lights/HemisphereLight.tests.js';
 import './src/lights/Light.tests.js';
 import './src/lights/LightProbe.tests.js';

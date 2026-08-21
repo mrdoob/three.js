@@ -34,6 +34,7 @@
 
 			import * as THREE from 'three';
 
+			import { SunLight } from 'three/addons/lights/SunLight.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { ThreeMFLoader } from 'three/addons/loaders/3MFLoader.js';
 
@@ -57,7 +58,7 @@
 				hemiLight.position.set( 0, 100, 0 );
 				scene.add( hemiLight );
 
-				const sunLight = new THREE.SunLight( 0xffffff, 3 );
+				const sunLight = new SunLight( 0xffffff, 3 );
 				sunLight.position.set( 0, 40, 50 );
 				sunLight.castShadow = true;
 				sunLight.shadow.camera.far = 100;
