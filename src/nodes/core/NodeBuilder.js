@@ -2344,10 +2344,24 @@ class NodeBuilder {
 
 		const { flowCodes, flowCodeBlock } = this.getDataFromNode( node );
 
-		let needsFlowCode = true;
+		// `flowCodeBlock` is only created lazily, by `addLineFlowCodeBlock()`,
+		// and only when the node's *first* build happened while
+		// `this.context.nodeBlock` was set (i.e. inside some conditional
+		// code-block) -- see `addLineFlowCode()`. If the first build instead
+		// happened at the top level of a function body (no enclosing block at
+		// all), `flowCodeBlock` is still `undefined` here even though the
+		// node's assignment line was already unconditionally flowed into that
+		// top-level scope. An unconditional top-level assignment is in scope
+		// from every block nested inside it, so no re-flow is ever needed in
+		// that case -- `needsFlowCode` is correctly `false`, not a crash from
+		// calling `.get()` on `undefined` (confirmed reproducible via
+		// `neutralToneMapping()`, whose `min()`/`max()` MathNode temps are
+		// first built unconditionally before the function's own `If()`, then
+		// referenced again from inside it).
+		let needsFlowCode = flowCodeBlock !== undefined;
 		let nodeBlockHierarchy = nodeBlock;
 
-		while ( nodeBlockHierarchy ) {
+		while ( needsFlowCode && nodeBlockHierarchy ) {
 
 			if ( flowCodeBlock.get( nodeBlockHierarchy ) === true ) {
 
