@@ -468,6 +468,85 @@ async function readBuffer( renderer, buffer ) {
 
 }
 
+// Detects a silent kernel-build/dispatch failure that would otherwise be
+// invisible to the CPU-side harness. Confirmed root cause: when a compute
+// pipeline fails to build (e.g. invalid WGSL/GLSL generated from a genuine
+// TSL bug -- a `NaN` literal reaching a shader source position, say), the
+// backing renderer (`WebGPURenderer`, on both its native WebGPU and WebGL2
+// fallback paths) reports the failure asynchronously via a console
+// error/"uncaptured device error" -- it does **not** reject the
+// `computeAsync()` promise or throw. The dispatch that would have written
+// this suite's `actual`/`expected` buffers simply never runs, so BOTH sides
+// read back as their zero-initialized default -- not just `actual`, since
+// `expected` is itself computed and written by the same (now-unrun) kernel,
+// not supplied as a precomputed CPU-side constant. Every assertion in that
+// kernel then silently compares `0` against `0` and passes, regardless of
+// what it actually claimed to check -- confirmed by deliberately reproducing
+// the exact shape of the original `pcurve()`/`sinc()` compile-failure bugs:
+// a `gpuTest` block whose 3 assertions expected `0`, `0.5` and `1` reported
+// all 3 as passing, because all 3 read back `0` against `0`.
+//
+// The fix: an unconditional "canary" write, in the *same* kernel, of a
+// value that can't arise from an uninitialized (zero) buffer by chance. If
+// the kernel fails to build, the canary is never written either (a shader
+// module either compiles as a whole or not at all), and its absence proves
+// the whole dispatch never ran -- so the caller can fail loudly instead of
+// silently trusting a buffer that only *looks* like a real 0-vs-0 pass.
+//
+// The canary deliberately reuses one extra reserved row of a caller-supplied
+// buffer (rather than allocating a dedicated buffer, which tipped some call
+// sites over the WebGL2 fallback's tight simultaneously-bound-buffer budget)
+// -- see `gpuTest`'s own comment for where that row lives and why. Currently
+// only wired into `gpuTest`; `gpuFuzzTest` doesn't use this yet -- extending
+// its `count`-many-instances/multi-site addressing to reserve a row safely
+// turned out riskier (a native-WebGPU-only `getArrayBufferAsync()` failure,
+// "Cannot read properties of undefined (reading 'size')", specifically when
+// reusing an unused site/instance for the canary) and needs a more careful
+// follow-up pass rather than shipping alongside this fix.
+const CANARY_VALUE = 12345.6789;
+
+function writeCanary( buffer, row ) {
+
+	If( instanceIndex.equal( row ), () => {
+
+		buffer.element( instanceIndex ).assign( vec4( CANARY_VALUE, 0, 0, 0 ) );
+
+	} );
+
+}
+
+// Takes an already-read `Float32Array` (not a buffer + renderer) rather than
+// reading the canary's own host buffer a second time -- confirmed the WebGL2
+// fallback's storage buffers are effectively single-read: a second
+// `getArrayBufferAsync()` call against a buffer already read once earlier in
+// the same test fails outright (`getBufferSubData: no buffer`). Every caller
+// here already needs to read that same buffer's full data right afterwards
+// anyway, so read once and pass the array to both.
+function assertKernelRan( assert, data, row, name ) {
+
+	const value = data[ row * 4 ];
+	const ran = Math.abs( value - CANARY_VALUE ) < 1e-3;
+
+	if ( ! ran ) {
+
+		assert.pushResult( {
+			result: false,
+			actual: value,
+			expected: CANARY_VALUE,
+			message: `gpuTest "${ name }": the compute kernel never ran (canary value missing -- ` +
+				`got ${ value }, expected ${ CANARY_VALUE }). This means the shader failed to build ` +
+				'(invalid WGSL/GLSL, most likely a NaN or otherwise malformed literal reaching ' +
+				'generated shader source) -- check the console for the underlying WebGPU/WebGL compile ' +
+				'error. Every assertion below would otherwise have silently compared a never-written 0 ' +
+				'against a never-written 0 and passed regardless of what it claimed to check.'
+		} );
+
+	}
+
+	return ran;
+
+}
+
 /**
  * Declare a GPU-native test suite. `buildFn` runs once (at graph-build time)
  * and receives `{ assert }` with `assert.eq/closeAbs/closeRel(actual, expected,
@@ -502,14 +581,28 @@ export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webg
 	declareTest( name, backends, async ( assert, renderer ) => {
 
 		const nodes = [];
-		const actualBuffer = instancedArray( maxAssertions * MAX_COLUMNS, 'vec4' );
-		const expectedBuffer = instancedArray( maxAssertions * MAX_COLUMNS, 'vec4' );
+		const totalRows = maxAssertions * MAX_COLUMNS;
+		const actualBuffer = instancedArray( totalRows, 'vec4' );
+		const expectedBuffer = instancedArray( totalRows, 'vec4' );
+
+		// The *last* row is reserved for the "did this kernel actually run"
+		// canary (see `writeCanary`/`assertKernelRan`) rather than a growing
+		// the buffers/dispatch by one extra slot -- growing them (tried
+		// first) silently overran the WebGL2 fallback's transform-feedback
+		// vertex buffer sizing and crashed the whole test page, not just
+		// this one test. Reusing an existing row costs exactly one
+		// assertion's worth of capacity out of `maxAssertions`, with no
+		// buffer-size or dispatch-count change at all.
+		const canaryRow = totalRows - 1;
+		const maxUsableAssertions = maxAssertions - 1;
 
 		const kernel = Fn( () => {
 
+			writeCanary( actualBuffer, canaryRow );
+
 			const makeNode = ( kind, tolerance, message ) => ( value1, value2 ) => {
 
-				if ( nodes.length >= maxAssertions ) {
+				if ( nodes.length >= maxUsableAssertions ) {
 
 					throw new Error( `gpuTest "${ name }": exceeded maxAssertions (${ maxAssertions }); pass a higher value via options.` );
 
@@ -542,12 +635,14 @@ export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webg
 
 			buildFn( { assert: buildAssertAPI( makeNode ) } );
 
-		} )().compute( maxAssertions * MAX_COLUMNS );
+		} )().compute( totalRows );
 
 		await renderer.computeAsync( kernel );
 
 		const actualData = await readBuffer( renderer, actualBuffer );
 		const expectedData = await readBuffer( renderer, expectedBuffer );
+
+		if ( ! assertKernelRan( assert, actualData, canaryRow, name ) ) return;
 
 		nodes.forEach( ( node, id ) => {
 
