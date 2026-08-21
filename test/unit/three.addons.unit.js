@@ -17,3 +17,4 @@ import './addons/exporters/USDZExporter.tests.js';
 import './addons/tsl/WebGLNodesHandler.tests.js';
 import './addons/tsl/GPUTest.tests.js';
 import './addons/tsl/TSLMatrixInverseRoundTrip.tests.js';
+import './addons/tsl/TSLNeutralToneMapping.tests.js';
