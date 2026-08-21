@@ -181,12 +181,7 @@ class RenderObjects {
 	 */
 	dispose() {
 
-		// Dispose the render objects so they remove their 'dispose' event
-		// listeners. Listeners left on long-lived objects (e.g. the shared
-		// geometry of QuadMesh) would otherwise keep the disposed renderer
-		// reachable and prevent its garbage collection.
-
-		for ( const renderObject of Array.from( this.renderObjects ) ) {
+		for ( const renderObject of this.renderObjects ) {
 
 			renderObject.dispose();
 
