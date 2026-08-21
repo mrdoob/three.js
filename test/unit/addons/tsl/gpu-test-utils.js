@@ -32,19 +32,36 @@
 // Two entry points:
 //   - gpuTest( name, buildFn )                    -- N declarative assertions,
 //                                                     one compute invocation.
+//                                                     WebGPU only (see below).
 //   - gpuFuzzTest( name, count, buildFn )          -- assertions dispatched
 //                                                     over `count` instances,
 //                                                     each free to generate
 //                                                     its own inputs from
 //                                                     `instanceIndex` (property/
 //                                                     fuzz-style testing at
-//                                                     GPU scale).
+//                                                     GPU scale). Works on both
+//                                                     WebGPU and WebGPURenderer's
+//                                                     WebGL2 fallback backend.
 //
-// Record layout (float32, fixed stride):
+// Record layout (float32, fixed stride) -- gpuTest only:
 //   [0..3]  actual value   (up to vec4, zero-padded)
 //   [4..7]  expected value (up to vec4, zero-padded)
+//
+// Why gpuTest is WebGPU-only: it packs every assertion in a suite into one
+// compute invocation, writing each at its own compile-time-constant offset
+// into a shared buffer -- an arbitrary scatter-write, which real compute
+// shaders support fine. WebGPURenderer's WebGL2 fallback backend emulates
+// `compute()` via transform feedback, which can only write each invocation's
+// designated output to a buffer slot equal to that invocation's own
+// `instanceIndex` -- confirmed empirically: any write target other than the
+// bare `instanceIndex` node collapses onto slot 0 there instead of landing at
+// the requested offset. gpuFuzzTest already dispatches one invocation per
+// case addressed by `instanceIndex`, so it naturally fits that constraint
+// once each assertion writes to its own dedicated buffer (see
+// AssertVecWriteNode below) -- which is why it, not gpuTest, is the
+// cross-backend entry point.
 
-import { Fn, instanceIndex, instancedArray, float } from 'three/tsl';
+import { Fn, instanceIndex, instancedArray, float, vec4 } from 'three/tsl';
 import { WebGPURenderer } from 'three/webgpu';
 import Node from '../../../../src/nodes/core/Node.js';
 import { Stack } from '../../../../src/nodes/tsl/TSLCore.js';
@@ -136,18 +153,110 @@ class AssertWriteNode extends Node {
 
 }
 
-let sharedRenderer = null;
+// Zero-pads `value` (a resolved-`count`-component node) out to a vec4, so it
+// can be written with a single `.assign()` -- one write, whatever the real
+// component count turns out to be. Used by AssertVecWriteNode so every write
+// is a single "whole value" assign, which is what transform-feedback-based
+// backends (WebGL2 fallback) support.
+function toVec4( value, count ) {
 
-async function getSharedRenderer() {
+	if ( count === 4 ) return value;
 
-	if ( sharedRenderer === null ) {
+	const components = [];
 
-		sharedRenderer = new WebGPURenderer( { antialias: false } );
-		await sharedRenderer.init();
+	for ( let i = 0; i < 4; i ++ ) {
+
+		components.push( i < count ? float( count === 1 ? value : value[ SWIZZLE[ i ] ] ) : float( 0 ) );
 
 	}
 
-	return sharedRenderer;
+	return vec4( ...components );
+
+}
+
+// gpuFuzzTest's statement node: writes exactly one vec4 to `actualBuffer` and
+// one to `expectedBuffer`, both at `this.index` (always the bare
+// `instanceIndex` node, never an arithmetic expression) -- the one write
+// pattern transform-feedback-based backends (WebGL2 fallback) support. Each
+// call site gets its own dedicated buffer pair (see gpuFuzzTest) so multiple
+// assertions per instance never collide on a single write.
+class AssertVecWriteNode extends Node {
+
+	constructor( actualBuffer, expectedBuffer, index, value1, value2 ) {
+
+		super( 'void' );
+
+		this.actualBuffer = actualBuffer;
+		this.expectedBuffer = expectedBuffer;
+		this.index = index;
+		this.value1 = value1;
+		this.value2 = value2;
+
+		this.resolvedType = null;
+		this.resolvedCount = null;
+
+	}
+
+	setup( builder ) {
+
+		const type1 = this.value1.getNodeType( builder );
+		const type2 = this.value2.getNodeType( builder );
+
+		if ( type1 !== type2 ) {
+
+			throw new Error( `gpuFuzzTest: type mismatch -- comparing "${ type1 }" against "${ type2 }".` );
+
+		}
+
+		const count = builder.getTypeLength( type1 );
+
+		if ( count > 4 ) {
+
+			throw new Error( `gpuFuzzTest: type "${ type1 }" (${ count } components) is not supported yet -- matrix support is a follow-up.` );
+
+		}
+
+		this.resolvedType = type1;
+		this.resolvedCount = count;
+
+		this.actualBuffer.element( this.index ).assign( toVec4( this.value1, count ) );
+		this.expectedBuffer.element( this.index ).assign( toVec4( this.value2, count ) );
+
+		return undefined;
+
+	}
+
+}
+
+// One shared renderer per backend, reused across all tests in the suite.
+// `'webgpu'` is the real WebGPU backend (when available); `'webgl'` forces
+// WebGPURenderer's WebGL2 fallback backend (`forceWebGL: true`), so the same
+// TSL expression can be checked against both -- useful since not every node
+// is (or needs to be) WebGL2-compatible, but most math/color/BRDF nodes are.
+const BACKEND_OPTIONS = {
+	webgpu: {},
+	webgl: { forceWebGL: true }
+};
+
+const sharedRenderers = {};
+
+async function getSharedRenderer( backend ) {
+
+	if ( BACKEND_OPTIONS[ backend ] === undefined ) {
+
+		throw new Error( `gpuTest: unknown backend "${ backend }" -- expected one of ${ Object.keys( BACKEND_OPTIONS ).join( ', ' ) }.` );
+
+	}
+
+	if ( sharedRenderers[ backend ] === undefined ) {
+
+		const renderer = new WebGPURenderer( { antialias: false, ...BACKEND_OPTIONS[ backend ] } );
+		await renderer.init();
+		sharedRenderers[ backend ] = renderer;
+
+	}
+
+	return sharedRenderers[ backend ];
 
 }
 
@@ -247,12 +356,7 @@ function formatFailure( label, diffs, tolerance, kind ) {
 
 }
 
-function assertRecord( assert, data, id, meta ) {
-
-	const base = id * STRIDE;
-	const count = meta.count;
-	const actual = Array.from( data.slice( base, base + count ) );
-	const expected = Array.from( data.slice( base + 4, base + 4 + count ) );
+function evaluateAssertion( assert, actual, expected, meta ) {
 
 	const diffs = diffComponents( actual, expected, meta.tolerance, meta.kind );
 	const failure = formatFailure( meta.label, diffs, meta.tolerance, meta.kind );
@@ -263,6 +367,19 @@ function assertRecord( assert, data, id, meta ) {
 		expected: expected.length === 1 ? expected[ 0 ] : expected,
 		message: failure || `${ meta.label }: OK`
 	} );
+
+}
+
+// gpuTest's record layout is a flat float buffer, STRIDE floats per
+// assertion; slice actual/expected out of it before evaluating.
+function evaluateStridedRecord( assert, data, id, meta ) {
+
+	const base = id * STRIDE;
+	const count = meta.count;
+	const actual = Array.from( data.slice( base, base + count ) );
+	const expected = Array.from( data.slice( base + 4, base + 4 + count ) );
+
+	evaluateAssertion( assert, actual, expected, meta );
 
 }
 
@@ -287,6 +404,49 @@ function buildAssertAPI( makeNode ) {
 
 }
 
+// Registers one QUnit.test per requested backend. When only one backend is
+// requested (the default), the test name is left untouched; with more than
+// one, each gets a `[backend]` suffix so failures say which backend failed.
+// `?skipWebGPU` on the test page URL (forwarded by `puppeteer.unit.js
+// --skipWebGPU`) skips -- rather than fails -- every test that requires a
+// real WebGPU backend. Meant for CI environments where WebGPU support isn't
+// reliably available: WebGPURenderer would otherwise silently fall back to
+// the WebGL2 backend with a runtime warning, which makes a "WebGPU" test
+// pass without actually having exercised WebGPU. Suites that only use the
+// WebGL2 fallback backend (`gpuFuzzTest(..., { backends: [ 'webgl' ] })`)
+// are unaffected and still run.
+const SKIP_WEBGPU = typeof window !== 'undefined' && new URLSearchParams( window.location.search ).has( 'skipWebGPU' );
+
+if ( SKIP_WEBGPU ) {
+
+	console.warn( 'gpu-test-utils: --skipWebGPU is set -- skipping GPU-native TSL tests that require a real WebGPU backend.' );
+
+}
+
+function declareTest( name, backends, run ) {
+
+	for ( const backend of backends ) {
+
+		const testName = backends.length > 1 ? `${ name } [${ backend }]` : name;
+
+		if ( backend === 'webgpu' && SKIP_WEBGPU ) {
+
+			QUnit.skip( testName );
+			continue;
+
+		}
+
+		QUnit.test( testName, async ( assert ) => {
+
+			const renderer = await getSharedRenderer( backend );
+			await run( assert, renderer );
+
+		} );
+
+	}
+
+}
+
 /**
  * Declare a GPU-native test suite. `buildFn` runs once (at graph-build time)
  * and receives `{ assert }` with `assert.eq/closeAbs/closeRel(actual, expected,
@@ -297,12 +457,20 @@ function buildAssertAPI( makeNode ) {
  * `maxAssertions` (default 64) sizes the backing buffer generously so callers
  * don't need to pre-count assertions; override via the options object if a
  * suite exceeds it.
+ *
+ * WebGPU only -- see the file header for why. For a suite that should also
+ * run against the WebGL2 fallback backend, use `gpuFuzzTest` instead (it
+ * naturally supports both).
  */
-export function gpuTest( name, buildFn, { maxAssertions = 64 } = {} ) {
+export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webgpu' ] } = {} ) {
 
-	QUnit.test( name, async ( assert ) => {
+	if ( backends.some( ( b ) => b !== 'webgpu' ) ) {
 
-		const renderer = await getSharedRenderer();
+		throw new Error( `gpuTest "${ name }": only the "webgpu" backend is supported (declarative suites need scatter-writes that WebGL2's fallback backend can't do) -- use gpuFuzzTest for cross-backend suites.` );
+
+	}
+
+	declareTest( name, backends, async ( assert, renderer ) => {
 
 		const nodes = [];
 		const buffer = instancedArray( maxAssertions * STRIDE, 'float' );
@@ -338,7 +506,7 @@ export function gpuTest( name, buildFn, { maxAssertions = 64 } = {} ) {
 
 		nodes.forEach( ( node, id ) => {
 
-			assertRecord( assert, data, id, {
+			evaluateStridedRecord( assert, data, id, {
 				label: node.message || `${ name } #${ id }`,
 				kind: node.kind,
 				tolerance: node.tolerance,
@@ -358,16 +526,29 @@ export function gpuTest( name, buildFn, { maxAssertions = 64 } = {} ) {
  * assert on them the same way as `gpuTest`.
  *
  * `maxSitesPerInstance` (default 4) bounds how many `assert.*` calls buildFn
- * may make per invocation; override via options if a test needs more.
+ * may make per invocation; override via options if a test needs more. Each
+ * site gets its own dedicated pair of buffers (see AssertVecWriteNode) so
+ * sites never collide on a single write -- the property that makes this
+ * entry point (unlike `gpuTest`) safe on WebGL2 fallback.
+ *
+ * `backends` (default `[ 'webgpu' ]`) selects which renderer backend(s) to
+ * run against -- pass `[ 'webgpu', 'webgl' ]` to also check WebGPURenderer's
+ * WebGL2 fallback backend, for nodes that don't rely on WebGPU-only features.
  */
-export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4 } = {} ) {
+export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, backends = [ 'webgpu' ] } = {} ) {
 
-	QUnit.test( name, async ( assert ) => {
-
-		const renderer = await getSharedRenderer();
+	declareTest( name, backends, async ( assert, renderer ) => {
 
 		const nodes = []; // one entry per call site (not per instance)
-		const buffer = instancedArray( count * maxSitesPerInstance * STRIDE, 'float' );
+		const actualBuffers = [];
+		const expectedBuffers = [];
+
+		for ( let site = 0; site < maxSitesPerInstance; site ++ ) {
+
+			actualBuffers.push( instancedArray( count, 'vec4' ) );
+			expectedBuffers.push( instancedArray( count, 'vec4' ) );
+
+		}
 
 		const kernel = Fn( () => {
 
@@ -381,8 +562,7 @@ export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4 } =
 
 				}
 
-				const base = instanceIndex.mul( maxSitesPerInstance ).add( site ).mul( STRIDE );
-				const node = new AssertWriteNode( buffer, base, value1, value2 );
+				const node = new AssertVecWriteNode( actualBuffers[ site ], expectedBuffers[ site ], instanceIndex, value1, value2 );
 				node.kind = kind;
 				node.tolerance = tolerance;
 				node.message = message;
@@ -399,20 +579,30 @@ export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4 } =
 
 		await renderer.computeAsync( kernel );
 
-		const data = new Float32Array( await renderer.getArrayBufferAsync( buffer.value ) );
+		const actualData = [];
+		const expectedData = [];
+
+		for ( const node of nodes ) {
+
+			actualData[ node.site ] = new Float32Array( await renderer.getArrayBufferAsync( actualBuffers[ node.site ].value ) );
+			expectedData[ node.site ] = new Float32Array( await renderer.getArrayBufferAsync( expectedBuffers[ node.site ].value ) );
+
+		}
 
 		for ( let instance = 0; instance < count; instance ++ ) {
 
 			for ( const node of nodes ) {
 
-				const id = instance * maxSitesPerInstance + node.site;
+				const base = instance * 4;
+				const componentCount = node.resolvedCount;
+				const actual = Array.from( actualData[ node.site ].slice( base, base + componentCount ) );
+				const expected = Array.from( expectedData[ node.site ].slice( base, base + componentCount ) );
 				const label = node.message ? `${ name } #${ instance }: ${ node.message }` : `${ name } #${ instance }`;
 
-				assertRecord( assert, data, id, {
+				evaluateAssertion( assert, actual, expected, {
 					label,
 					kind: node.kind,
-					tolerance: node.tolerance,
-					count: node.resolvedCount
+					tolerance: node.tolerance
 				} );
 
 			}
