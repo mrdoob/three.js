@@ -1,5 +1,5 @@
 import { Parameters } from './Parameters.js';
-import { WebGPURenderer, WebGLBackend, Node } from 'three/webgpu';
+import { WebGPURenderer, Node } from 'three/webgpu';
 import { getItem, setItem } from '../Inspector.js';
 
 const _extensions = [
@@ -21,13 +21,8 @@ function forceWebGL( enable ) {
 
 		WebGPURenderer.prototype.init = async function () {
 
-			if ( this.backend.isWebGLBackend !== true ) {
-
-				const parameters = this.backend.parameters;
-
-				this.backend = new WebGLBackend( parameters );
-
-			}
+			// makes the renderer load its WebGL fallback instead of initializing WebGPU
+			this.backend.parameters.forceWebGL = true;
 
 			return _init.call( this );
 

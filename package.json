@@ -16,6 +16,7 @@
     "./addons/*": "./examples/jsm/*",
     "./src/*": "./src/*",
     "./webgpu": "./build/three.webgpu.js",
+    "./webgpu/fallback": "./build/three.webgpu.fallback.js",
     "./tsl": "./build/three.tsl.js"
   },
   "repository": {

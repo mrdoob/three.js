@@ -21,10 +21,9 @@ import {
 	NodeFrame,
 	Lighting,
 	InspectorBase,
-	GLSLNodeBuilder,
 	BasicNodeLibrary,
-	WebGLCapabilities,
 } from 'three/webgpu';
+import { GLSLNodeBuilder, WebGLCapabilities } from 'three/webgpu/fallback';
 
 // Limitations
 // - VSM shadows not supported
