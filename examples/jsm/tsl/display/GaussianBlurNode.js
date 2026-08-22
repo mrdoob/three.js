@@ -335,13 +335,18 @@ class GaussianBlurNode extends TempNode {
 		const coefficients = [];
 		const sigma = kernelRadius / 3;
 
-		for ( let i = 0; i < kernelRadius; i ++ ) {
+		let sum = 1;
+		coefficients.push( 1 );
 
-			coefficients.push( 0.39894 * Math.exp( - 0.5 * i * i / ( sigma * sigma ) ) / sigma );
+		for ( let i = 1; i < kernelRadius; i ++ ) {
+
+			const w = Math.exp( - 0.5 * i * i / ( sigma * sigma ) );
+			coefficients.push( w );
+			sum += 2 * w;
 
 		}
 
-		return coefficients;
+		return coefficients.map( c => c / sum );
 
 	}
 
