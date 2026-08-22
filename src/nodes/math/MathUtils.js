@@ -1,6 +1,5 @@
 import { sub, mul, div, add } from './OperatorNode.js';
 import { PI, pow, sin, abs } from './MathNode.js';
-import { select } from './ConditionalNode.js';
 
 /**
  * A function that remaps the `[0,1]` interval into the `[0,1]` interval.
@@ -54,7 +53,8 @@ export const pcurve = ( x, a, b ) => pow( div( pow( x, a ), add( pow( x, a ), po
  */
 export const sinc = ( x, k ) => {
 
-	const arg = PI.mul( k.mul( x ).sub( 1.0 ) ).toVar();
-	return select( abs( arg ).lessThan( 1e-6 ), 1.0, sin( arg ).div( arg ) );
+	const arg = abs( PI.mul( k.mul( x ).sub( 1.0 ) ) ).max( 1e-6 ).toConst();
+
+	return sin( arg ).div( arg );
 
 };
