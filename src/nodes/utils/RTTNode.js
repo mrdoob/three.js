@@ -9,6 +9,7 @@ import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { HalfFloatType } from '../../constants.js';
+import { error } from '../../utils.js';
 
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -32,7 +33,7 @@ class RTTNode extends TextureNode {
 	 * Constructs a new RTT node.
 	 *
 	 * @param {Node} node - The node to render a texture with.
-	 * @param {?number} [width=null] - The width of the internal render target. If not width is applied, the render target is automatically resized.
+	 * @param {?number} [width=null] - The width of the internal render target. If no width is applied, the render target is automatically resized.
 	 * @param {?number} [height=null] - The height of the internal render target.
 	 * @param {Object} [options={}] - The options for the internal render target.
 	 * @param {number} [options.type=HalfFloatType] - The texture type.
@@ -159,10 +160,10 @@ class RTTNode extends TextureNode {
 	}
 
 	/**
-	 * Sets the size of the internal render target
+	 * Sets the size of the internal render target.
 	 *
 	 * @param {number} width - The width to set.
-	 * @param {number} height - The width to set.
+	 * @param {number} height - The height to set.
 	 */
 	setSize( width, height ) {
 
@@ -208,14 +209,28 @@ class RTTNode extends TextureNode {
 	}
 
 	/**
-	 * Reuse the same texture reference.
+	 * Overwritten since the value is defined by the internal render target.
 	 *
-	 * @param {Frame} frame - The frame.
-	 * @returns {Texture} The texture of the internal render target.
+	 * @param {Texture} value - The texture value.
 	 */
-	updateReference( /*state*/ ) {
+	set value( value ) {
 
-		return this.renderTarget.texture;
+		if ( this.renderTarget && value !== this.renderTarget.texture ) {
+
+			error( 'TSL: "rtt()" does not allow overwriting the value.' );
+
+		}
+
+	}
+
+	/**
+	 * The texture of the internal render target.
+	 *
+	 * @type {Texture}
+	 */
+	get value() {
+
+		return this.renderTarget ? this.renderTarget.texture : null;
 
 	}
 
@@ -289,6 +304,18 @@ class RTTNode extends TextureNode {
 
 	}
 
+	/**
+	 * Frees internal resources. Should be called when the node is no longer in use.
+	 */
+	dispose() {
+
+		this.renderTarget.dispose();
+		this._quadMesh.material.dispose();
+
+		super.dispose();
+
+	}
+
 }
 
 export default RTTNode;
@@ -299,7 +326,7 @@ export default RTTNode;
  * @tsl
  * @function
  * @param {Node} node - The node to render a texture with.
- * @param {?number} [width=null] - The width of the internal render target. If not width is applied, the render target is automatically resized.
+ * @param {?number} [width=null] - The width of the internal render target. If no width is applied, the render target is automatically resized.
  * @param {?number} [height=null] - The height of the internal render target.
  * @param {Object} [options={}] - The options for the internal render target.
  * @param {number} [options.type=HalfFloatType] - The texture type.
@@ -315,7 +342,7 @@ export const rtt = ( node, ...params ) => new RTTNode( nodeObject( node ), ...pa
  * @tsl
  * @function
  * @param {Node} node - The node to render a texture with.
- * @param {?number} [width=null] - The width of the internal render target. If not width is applied, the render target is automatically resized.
+ * @param {?number} [width=null] - The width of the internal render target. If no width is applied, the render target is automatically resized.
  * @param {?number} [height=null] - The height of the internal render target.
  * @param {Object} [options={}] - The options for the internal render target.
  * @param {number} [options.type=HalfFloatType] - The texture type.
