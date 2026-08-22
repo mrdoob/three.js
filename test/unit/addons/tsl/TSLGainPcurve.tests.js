@@ -1,7 +1,4 @@
-import {
-	float
-} from 'three/tsl';
-import { gain, pcurve } from 'three/tsl';
+import { float, gain, pcurve } from 'three/tsl';
 import { gpuTest } from './gpu-test-utils.js';
 
 export default QUnit.module( 'TSL', () => {
