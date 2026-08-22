@@ -100,6 +100,14 @@ const _materialCache = new WeakMap();
 const _geometryCache = new WeakMap();
 
 /**
+ * Holds the texture data for comparison.
+ *
+ * @private
+ * @type {WeakMap<Texture,Object>}
+ */
+const _textureCache = new WeakMap();
+
+/**
  * This class is used by {@link WebGPURenderer} as management component.
  * It's primary purpose is to determine whether render objects require a
  * refresh right before they are going to be rendered or not.
@@ -355,7 +363,56 @@ class NodeMaterialObserver {
 				drawRange: { start: geometry.drawRange.start, count: geometry.drawRange.count }
 			};
 
+			// force refresh on dispose
+
+			geometry.addEventListener( 'dispose', () => {
+
+				data._version ++;
+
+			} );
+
 			_geometryCache.set( geometry, data );
+
+		}
+
+		return data;
+
+	}
+
+	/**
+	 * Returns a texture data structure holding the texture state for
+	 * monitoring.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @return {Object} An object for monitoring the texture.
+	 */
+	getTextureData( texture ) {
+
+		let data = _textureCache.get( texture );
+
+		if ( data === undefined ) {
+
+			data = { _version: 0 };
+
+			// force refresh on dispose
+
+			const onDispose = () => {
+
+				data._version ++;
+
+			};
+
+			if ( texture.renderTarget !== null ) {
+
+				texture.renderTarget.addEventListener( 'dispose', onDispose );
+
+			} else {
+
+				texture.addEventListener( 'dispose', onDispose );
+
+			}
+
+			_textureCache.set( texture, data );
 
 		}
 
@@ -382,13 +439,17 @@ class NodeMaterialObserver {
 
 				const value = material[ property ];
 
-				if ( value === null || value === undefined ) continue;
+				if ( value === undefined ) continue;
 
-				if ( typeof value === 'object' && value.clone !== undefined ) {
+				if ( value === null ) {
+
+					data[ property ] = null; // track unset properties
+
+				} else if ( typeof value === 'object' && value.clone !== undefined ) {
 
 					if ( value.isTexture === true ) {
 
-						data[ property ] = { id: value.id, version: 0 };
+						data[ property ] = { id: value.id, version: 0, cacheVersion: this.getTextureData( value )._version };
 
 					} else {
 
@@ -456,7 +517,35 @@ class NodeMaterialObserver {
 				if ( property === '_renderId' ) continue;
 				if ( property === '_version' ) continue;
 
-				if ( value.equals !== undefined ) {
+				if ( value === null || mtlValue === null || mtlValue === undefined ) {
+
+					// a property was assigned or removed since the last observation so a new snapshot is required
+
+					if ( value !== ( mtlValue === undefined ? null : mtlValue ) ) {
+
+						if ( mtlValue === null || mtlValue === undefined ) {
+
+							materialData[ property ] = null;
+
+						} else if ( mtlValue.isTexture === true ) {
+
+							materialData[ property ] = { id: mtlValue.id, version: mtlValue.version, cacheVersion: this.getTextureData( mtlValue )._version };
+
+						} else if ( typeof mtlValue === 'object' && mtlValue.clone !== undefined ) {
+
+							materialData[ property ] = mtlValue.clone();
+
+						} else {
+
+							materialData[ property ] = mtlValue;
+
+						}
+
+						changed = true;
+
+					}
+
+				} else if ( value.equals !== undefined ) {
 
 					if ( value.equals( mtlValue ) === false ) {
 
@@ -468,10 +557,13 @@ class NodeMaterialObserver {
 
 				} else if ( mtlValue.isTexture === true ) {
 
-					if ( value.id !== mtlValue.id || value.version !== mtlValue.version ) {
+					const textureData = this.getTextureData( mtlValue );
+
+					if ( value.id !== mtlValue.id || value.version !== mtlValue.version || value.cacheVersion !== textureData._version ) {
 
 						value.id = mtlValue.id;
 						value.version = mtlValue.version;
+						value.cacheVersion = textureData._version;
 
 						changed = true;
 
@@ -521,6 +613,8 @@ class NodeMaterialObserver {
 		if ( renderObjectData.geometryId !== geometry.id ) {
 
 			renderObjectData.geometryId = geometry.id;
+			renderObjectData.geometryVersion = this.getGeometryData( geometry )._version;
+
 			return false;
 
 		}
@@ -692,7 +786,12 @@ class NodeMaterialObserver {
 
 			for ( let i = 0; i < lightsData.length; i ++ ) {
 
-				if ( renderObjectData.lights[ i ].map !== lightsData[ i ].map ) {
+				const lightData = renderObjectData.lights[ i ];
+
+				if ( lightData.map !== lightsData[ i ].map || lightData.cacheVersion !== lightsData[ i ].cacheVersion ) {
+
+					lightData.map = lightsData[ i ].map;
+					lightData.cacheVersion = lightsData[ i ].cacheVersion;
 
 					return false;
 
@@ -762,7 +861,7 @@ class NodeMaterialObserver {
 
 				// only add lights that have a map
 
-				lights.push( { map: light.map.version } );
+				lights.push( { map: light.map.version, cacheVersion: this.getTextureData( light.map )._version } );
 
 			}
 

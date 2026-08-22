@@ -1,9 +1,11 @@
-import { LightShadow } from './LightShadow.js';
-import { OrthographicCamera } from '../cameras/OrthographicCamera.js';
-import { Frustum } from '../math/Frustum.js';
-import { Matrix4 } from '../math/Matrix4.js';
-import { Vector3 } from '../math/Vector3.js';
-import { Vector4 } from '../math/Vector4.js';
+import {
+	Frustum,
+	LightShadow,
+	Matrix4,
+	OrthographicCamera,
+	Vector3,
+	Vector4
+} from 'three';
 
 const _lightOrientationMatrix = /*@__PURE__*/ new Matrix4();
 const _viewToLightMatrix = /*@__PURE__*/ new Matrix4();
@@ -38,14 +40,14 @@ const _cascadeCorners = [
 
 // must match the cascade count in the sun shadow shader chunks
 
-const _cascadeCount = 4;
+const _cascadeCount = 2;
 
 // fraction of each cascade's depth range that blends into the next cascade
 
 const _cascadeFade = 0.1;
 
 /**
- * Represents the shadow configuration of {@link SunLight}, using four
+ * Represents the shadow configuration of {@link SunLight}, using two
  * cascaded shadow maps (CSM).
  *
  * The shadow camera projection is fitted automatically to slices of the view
@@ -56,6 +58,7 @@ const _cascadeFade = 0.1;
  * The default `mapSize` is `1024x1024` per cascade.
  *
  * @augments LightShadow
+ * @three_import import { SunLightShadow } from 'three/addons/lights/SunLightShadow.js';
  */
 class SunLightShadow extends LightShadow {
 
@@ -87,7 +90,7 @@ class SunLightShadow extends LightShadow {
 		this._cascadeData = [];
 
 		this._viewportCount = _cascadeCount;
-		this._frameExtents.set( 2, 2 );
+		this._frameExtents.set( 2, 1 );
 
 		for ( let i = 0; i < _cascadeCount; i ++ ) {
 
@@ -157,7 +160,7 @@ class SunLightShadow extends LightShadow {
 
 		for ( let i = 0; i < _cascadeCount; i ++ ) {
 
-			this._viewports[ i ].set( i % 2 + insetX, Math.floor( i / 2 ) + insetY, 1 - 2 * insetX, 1 - 2 * insetY );
+			this._viewports[ i ].set( i + insetX, insetY, 1 - 2 * insetX, 1 - 2 * insetY );
 
 		}
 

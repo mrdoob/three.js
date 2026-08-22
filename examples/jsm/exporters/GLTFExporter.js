@@ -246,7 +246,7 @@ class GLTFExporter {
 	 * Sets the texture utils for this exporter. Only relevant when compressed textures have to be exported.
 	 *
 	 * Depending on whether you use {@link WebGLRenderer} or {@link WebGPURenderer}, you must inject the
-	 * corresponding texture utils {@link WebGLTextureUtils} or {@link WebGPUTextureUtils}.
+	 * corresponding texture utils {@link module:WebGLTextureUtils} or {@link module:WebGPUTextureUtils}.
 	 *
 	 * @param {WebGLTextureUtils|WebGPUTextureUtils} utils - The texture utils.
 	 * @return {GLTFExporter} A reference to this exporter.

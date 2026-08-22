@@ -36,6 +36,7 @@
 
 			import * as THREE from 'three';
 
+			import { SunLight } from 'three/addons/lights/SunLight.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -91,7 +92,7 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				const sunLight = new THREE.SunLight( 0xffffff, 5 );
+				const sunLight = new SunLight( 0xffffff, 5 );
 				sunLight.position.set( - 2, 5, - 3 );
 				sunLight.castShadow = true;
 				sunLight.shadow.camera.far = 20;

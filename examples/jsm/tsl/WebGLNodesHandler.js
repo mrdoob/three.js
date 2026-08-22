@@ -230,6 +230,12 @@ class RendererProxy {
 
 	}
 
+	getCanvasTarget() {
+
+		return null;
+
+	}
+
 	hasCompatibility( name ) {
 
 		if ( name === Compatibility.TEXTURE_COMPARE ) {

@@ -2701,7 +2701,6 @@ class Renderer {
 		if ( this._initialized === true ) {
 
 			this.info.dispose();
-			this.backend.dispose();
 
 			this._animation.dispose();
 			this._objects.dispose();
@@ -2724,6 +2723,8 @@ class Renderer {
 				if ( queryPool !== null ) queryPool.dispose();
 
 			} );
+
+			this.backend.dispose();
 
 		}
 

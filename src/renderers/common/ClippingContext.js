@@ -5,6 +5,8 @@ import { Vector4 } from '../../math/Vector4.js';
 
 const _plane = /*@__PURE__*/ new Plane();
 
+let _clippingContextId = 0;
+
 /**
  * Represents the state that is used to perform clipping via clipping planes.
  * There is a default clipping context for each render context. When the
@@ -21,6 +23,14 @@ class ClippingContext {
 	 * @param {?ClippingContext} [parentContext=null] - A reference to the parent clipping context.
 	 */
 	constructor( parentContext = null ) {
+
+		/**
+		 * The id of the clipping context.
+		 *
+		 * @type {number}
+		 * @readonly
+		 */
+		this.id = _clippingContextId ++;
 
 		/**
 		 * The clipping context's version.
@@ -222,7 +232,7 @@ class ClippingContext {
 		if ( update ) {
 
 			this.version ++;
-			this.cacheKey = `${ this.intersectionPlanes.length }:${ this.unionPlanes.length }`;
+			this.cacheKey = `${ this.id }:${ this.intersectionPlanes.length }:${ this.unionPlanes.length }`;
 
 		}
 

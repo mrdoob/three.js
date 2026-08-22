@@ -378,7 +378,7 @@ class FBXTreeParser {
 		} else { // Binary Format
 
 			const array = new Uint8Array( content );
-			return window.URL.createObjectURL( new Blob( [ array ], { type: type } ) );
+			return URL.createObjectURL( new Blob( [ array ], { type: type } ) );
 
 		}
 
@@ -1017,6 +1017,7 @@ class FBXTreeParser {
 		if ( sceneGraph.children.length === 1 && sceneGraph.children[ 0 ].isGroup ) {
 
 			sceneGraph.children[ 0 ].animations = animations;
+			Object.assign( sceneGraph.children[ 0 ].userData, sceneGraph.userData );
 			sceneGraph = sceneGraph.children[ 0 ];
 
 		}

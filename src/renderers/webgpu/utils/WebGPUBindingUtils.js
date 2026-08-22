@@ -137,10 +137,10 @@ class WebGPUBindingUtils {
 	 *
 	 * @param {BindGroup} bindGroup - The bind group.
 	 * @param {Array<BindGroup>} bindings - Array of bind groups.
-	 * @param {number} cacheIndex - The cache index.
+	 * @param {string} cacheKey - The cache key.
 	 * @param {number} version - The version.
 	 */
-	createBindings( bindGroup, bindings, cacheIndex, version = 0 ) {
+	createBindings( bindGroup, bindings, cacheKey, version = 0 ) {
 
 		const { backend } = this;
 		const bindingsData = backend.get( bindGroup );
@@ -151,18 +151,18 @@ class WebGPUBindingUtils {
 
 		let bindGroupGPU;
 
-		if ( cacheIndex > 0 ) {
+		if ( cacheKey !== '' ) {
 
 			if ( bindingsData.groups === undefined ) {
 
-				bindingsData.groups = [];
-				bindingsData.versions = [];
+				bindingsData.groups = {};
+				bindingsData.versions = {};
 
 			}
 
-			if ( bindingsData.versions[ cacheIndex ] === version ) {
+			if ( bindingsData.versions[ cacheKey ] === version ) {
 
-				bindGroupGPU = bindingsData.groups[ cacheIndex ];
+				bindGroupGPU = bindingsData.groups[ cacheKey ];
 
 			}
 
@@ -172,10 +172,10 @@ class WebGPUBindingUtils {
 
 			bindGroupGPU = this.createBindGroup( bindGroup, bindLayoutGPU );
 
-			if ( cacheIndex > 0 ) {
+			if ( cacheKey !== '' ) {
 
-				bindingsData.groups[ cacheIndex ] = bindGroupGPU;
-				bindingsData.versions[ cacheIndex ] = version;
+				bindingsData.groups[ cacheKey ] = bindGroupGPU;
+				bindingsData.versions[ cacheKey ] = version;
 
 			}
 

@@ -1,6 +1,5 @@
-import { Light } from './Light.js';
+import { Light, Object3D } from 'three';
 import { SunLightShadow } from './SunLightShadow.js';
-import { Object3D } from '../core/Object3D.js';
 
 /**
  * A sun-like light that gets emitted in a specific direction, with rays that
@@ -23,6 +22,7 @@ import { Object3D } from '../core/Object3D.js';
  * use {@link DirectionalLight} with `CSMShadowNode` instead.
  *
  * @augments Light
+ * @three_import import { SunLight } from 'three/addons/lights/SunLight.js';
  */
 class SunLight extends Light {
 

@@ -624,6 +624,7 @@ class Viewer extends Tab {
 
 		this.splitActive = true;
 		this.splitCanvasData = canvasData;
+		this.splitX = 0.5;
 
 		const renderer = this.inspector.getRenderer();
 		const mainCanvas = renderer.domElement;
@@ -756,13 +757,11 @@ class Viewer extends Tab {
 
 		} else {
 
-			const thickness = float( 1 ).div( this.splitUniforms.viewportWidth );
-			const isLine = screenUV.x.sub( this.splitUniforms.splitX ).abs().lessThan( thickness );
 			finalColor = Fn( () => {
 
 				screenUV.x.lessThan( this.splitUniforms.splitX ).discard();
 
-				return isLine.select( vec4( 0.29, 0.29, 0.35, 1.0 ), targetColorCtx );
+				return targetColorCtx;
 
 			} )();
 
@@ -978,7 +977,7 @@ class Viewer extends Tab {
 
 			}
 
-			if ( this.splitCanvasTarget.domElement.width !== rect.width || this.splitCanvasTarget.domElement.height !== rect.height ) {
+			if ( this.splitCanvasTarget.width !== rect.width || this.splitCanvasTarget.height !== rect.height ) {
 
 				this.splitCanvasTarget.setSize( rect.width, rect.height );
 

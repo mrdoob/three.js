@@ -131,7 +131,7 @@ export const getNormalFromDepth = /*@__PURE__*/ Fn( ( [ uv, depthTexture, projec
  * @param {Node<vec2>} position - The input position, usually screen coordinates.
  * @return {Node<float>} The noise value.
  */
-export const interleavedGradientNoise = Fn( ( [ position ] ) => {
+export const interleavedGradientNoise = /*@__PURE__*/ Fn( ( [ position ] ) => {
 
 	return fract( float( 52.9829189 ).mul( fract( dot( position, vec2( 0.06711056, 0.00583715 ) ) ) ) );
 
@@ -157,7 +157,7 @@ export const interleavedGradientNoise = Fn( ( [ position ] ) => {
  * @param {Node<float>} phi - Rotation angle in radians (typically from IGN * 2π).
  * @return {Node<vec2>} A 2D point on the unit disk.
  */
-export const vogelDiskSample = Fn( ( [ sampleIndex, samplesCount, phi ] ) => {
+export const vogelDiskSample = /*@__PURE__*/ Fn( ( [ sampleIndex, samplesCount, phi ] ) => {
 
 	const goldenAngle = float( 2.399963229728653 ); // 2π * (2 - φ) where φ is golden ratio
 	const r = sqrt( float( sampleIndex ).add( 0.5 ).div( float( samplesCount ) ) );

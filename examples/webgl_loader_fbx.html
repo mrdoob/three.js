@@ -32,13 +32,14 @@
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
+			import { SunLight } from 'three/addons/lights/SunLight.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			const manager = new THREE.LoadingManager();
 
-			let camera, scene, renderer, stats, object, loader, guiMorphsFolder, guiAnimationsFolder;
+			let camera, scene, renderer, controls, stats, object, loader, guiMorphsFolder, guiAnimationsFolder;
 			let mixer;
 
 			const timer = new THREE.Timer();
@@ -90,7 +91,7 @@
 				hemiLight.position.set( 0, 200, 0 );
 				scene.add( hemiLight );
 
-				const sunLight = new THREE.SunLight( 0xffffff, 5 );
+				const sunLight = new SunLight( 0xffffff, 5 );
 				sunLight.position.set( 0, 200, 100 );
 				sunLight.castShadow = true;
 				scene.add( sunLight );
@@ -116,7 +117,10 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableZoom = false;
+				controls.enablePan = false;
+				controls.enableDamping = true;
 				controls.target.set( 0, 100, 0 );
 				controls.update();
 
@@ -260,6 +264,8 @@
 				const delta = timer.getDelta();
 
 				if ( mixer ) mixer.update( delta );
+
+				controls.update();
 
 				renderer.render( scene, camera );
 

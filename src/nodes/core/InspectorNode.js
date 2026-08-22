@@ -117,7 +117,7 @@ export default InspectorNode;
  * @param {Function|null} [callback=null] - Optional callback to modify the node during setup.
  * @returns {Node} The inspector node.
  */
-export function inspector( node, name = '', callback = null ) {
+export function inspect( node, name = '', callback = null ) {
 
 	node = nodeObject( node );
 
@@ -125,4 +125,4 @@ export function inspector( node, name = '', callback = null ) {
 
 }
 
-addMethodChaining( 'toInspector', inspector );
+addMethodChaining( 'toInspector', inspect );

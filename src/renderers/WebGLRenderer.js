@@ -375,6 +375,14 @@ class WebGLRenderer {
 
 		}
 
+		let extensions, capabilities, state, info;
+		let properties, textures, environments, attributes, geometries, objects;
+		let programCache, materials, renderLists, renderStates, clipping, shadowMap;
+
+		let background, morphtargets, bufferRenderer, indexedBufferRenderer;
+
+		let utils, bindingStates, uniformsGroups;
+
 		try {
 
 			const contextAttributes = {
@@ -418,20 +426,18 @@ class WebGLRenderer {
 
 			}
 
+			initGLContext();
+
 		} catch ( e ) {
+
+			canvas.removeEventListener( 'webglcontextlost', onContextLost, false );
+			canvas.removeEventListener( 'webglcontextrestored', onContextRestore, false );
+			canvas.removeEventListener( 'webglcontextcreationerror', onContextCreationError, false );
 
 			error( 'WebGLRenderer: ' + e.message );
 			throw e;
 
 		}
-
-		let extensions, capabilities, state, info;
-		let properties, textures, environments, attributes, geometries, objects;
-		let programCache, materials, renderLists, renderStates, clipping, shadowMap;
-
-		let background, morphtargets, bufferRenderer, indexedBufferRenderer;
-
-		let utils, bindingStates, uniformsGroups;
 
 		function initGLContext() {
 
@@ -553,8 +559,6 @@ class WebGLRenderer {
 			_this.info = info;
 
 		}
-
-		initGLContext();
 
 		// initialize internal render target for non-UnsignedByteType color buffer
 
@@ -3252,6 +3256,7 @@ class WebGLRenderer {
 					_gl.bufferData( _gl.PIXEL_PACK_BUFFER, buffer.byteLength, _gl.STREAM_READ );
 
 					_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), 0 );
+					_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, null );
 
 					// reset the frame buffer to the currently set buffer before waiting
 					const currFramebuffer = _currentRenderTarget !== null ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
@@ -3267,6 +3272,7 @@ class WebGLRenderer {
 					// read the data and delete the buffer
 					_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
 					_gl.getBufferSubData( _gl.PIXEL_PACK_BUFFER, 0, buffer );
+					_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, null );
 					_gl.deleteBuffer( glBuffer );
 					_gl.deleteSync( sync );
 
