@@ -13,6 +13,8 @@ export default [
 			'**/node_modules/**',
 			'**/build/**',
 			'examples/jsm/libs/**',
+			'test/treeshake/*.bundle.js',
+			'test/treeshake/*.bundle.min.js',
 			'editor/js/libs/acorn/**',
 			'editor/js/libs/codemirror/**',
 			'editor/js/libs/tern-threejs/**',
