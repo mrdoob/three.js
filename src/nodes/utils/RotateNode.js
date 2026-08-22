@@ -21,8 +21,9 @@ class RotateNode extends TempNode {
 	 * @param {Node} positionNode - The position node.
 	 * @param {Node} rotationNode - Represents the rotation that is applied to the position node. Depending
 	 * on whether the position data are 2D or 3D, the rotation is expressed a single float value or an Euler value.
+	 * @param {string} [order='XYZ'] - The Euler rotation order string (e.g., 'YXZ', 'ZXY'). Only used for 3D rotations.
 	 */
-	constructor( positionNode, rotationNode ) {
+	constructor( positionNode, rotationNode, order = 'XYZ' ) {
 
 		super();
 
@@ -41,6 +42,14 @@ class RotateNode extends TempNode {
 		 */
 		this.rotationNode = rotationNode;
 
+		/**
+		 * The Euler rotation order.
+		 *
+		 * @type {string}
+		 * @default 'XYZ'
+		 */
+		this.order = order;
+
 	}
 
 	/**
@@ -57,7 +66,7 @@ class RotateNode extends TempNode {
 
 	setup( builder ) {
 
-		const { rotationNode, positionNode } = this;
+		const { rotationNode, positionNode, order } = this;
 
 		const nodeType = this.getNodeType( builder );
 
@@ -80,9 +89,35 @@ class RotateNode extends TempNode {
 			const rotationYMatrix = mat4( vec4( cos( rotation.y ), 0.0, sin( rotation.y ).negate(), 0.0 ), vec4( 0.0, 1.0, 0.0, 0.0 ), vec4( sin( rotation.y ), 0.0, cos( rotation.y ), 0.0 ), vec4( 0.0, 0.0, 0.0, 1.0 ) );
 			const rotationZMatrix = mat4( vec4( cos( rotation.z ), sin( rotation.z ), 0.0, 0.0 ), vec4( sin( rotation.z ).negate(), cos( rotation.z ), 0.0, 0.0 ), vec4( 0.0, 0.0, 1.0, 0.0 ), vec4( 0.0, 0.0, 0.0, 1.0 ) );
 
-			return rotationXMatrix.mul( rotationYMatrix ).mul( rotationZMatrix ).mul( vec4( positionNode, 1.0 ) ).xyz;
+			const matrixMap = {
+				'X': rotationXMatrix,
+				'Y': rotationYMatrix,
+				'Z': rotationZMatrix
+			};
+
+			const customMatrixChain = matrixMap[ order.charAt( 0 ) ]
+				.mul( matrixMap[ order.charAt( 1 ) ] )
+				.mul( matrixMap[ order.charAt( 2 ) ] );
+
+			return customMatrixChain.mul( vec4( positionNode, 1.0 ) ).xyz;
 
 		}
+
+	}
+
+	serialize( data ) {
+
+		super.serialize( data );
+
+		data.order = this.order;
+
+	}
+
+	deserialize( data ) {
+
+		super.deserialize( data );
+
+		this.order = data.order;
 
 	}
 
@@ -98,6 +133,7 @@ export default RotateNode;
  * @param {Node} positionNode - The position node.
  * @param {Node} rotationNode - Represents the rotation that is applied to the position node. Depending
  * on whether the position data are 2D or 3D, the rotation is expressed a single float value or an Euler value.
+ * @param {string} [order='XYZ'] - The Euler rotation order string (e.g., 'YXZ', 'ZXY'). Only used for 3D rotations.
  * @returns {RotateNode}
  */
-export const rotate = /*@__PURE__*/ nodeProxy( RotateNode ).setParameterLength( 2 );
+export const rotate = /*@__PURE__*/ nodeProxy( RotateNode ).setParameterLength( 2, 3 );
