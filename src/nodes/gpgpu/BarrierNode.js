@@ -61,7 +61,7 @@ export default BarrierNode;
  * @param {string} scope - The scope defines the behavior of the node..
  * @returns {BarrierNode}
  */
-const barrier = nodeProxy( BarrierNode );
+const barrier = /*@__PURE__*/ nodeProxy( BarrierNode );
 
 /**
  * TSL function for creating a workgroup barrier. All compute shader

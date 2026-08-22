@@ -151,7 +151,7 @@ export const cdl = /*@__PURE__*/ Fn( ( [
  * @param {Node} stepsNode - Controls the intensity of the posterization effect. A lower number results in a more blocky appearance.
  * @returns {Node} The posterized color.
  */
-export const posterize = Fn( ( [ source, steps ] ) => {
+export const posterize = /*@__PURE__*/ Fn( ( [ source, steps ] ) => {
 
 	return source.mul( steps ).floor().div( steps );
 
