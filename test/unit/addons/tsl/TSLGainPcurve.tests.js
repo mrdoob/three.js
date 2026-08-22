@@ -4,28 +4,6 @@ import {
 import { gain, pcurve } from 'three/tsl';
 import { gpuTest } from './gpu-test-utils.js';
 
-// Regression coverage for two independent bugs in src/nodes/math/MathUtils.js:
-//
-// gain(x, k) had two stacked bugs:
-//   1. Broken branch selection -- the implementation was
-//      `x.lessThan(0.5) ? A : B`, a *native JS* ternary applied directly to
-//      a TSL Node. `x.lessThan(0.5)` returns a Node object, which is always
-//      truthy in JS, so this unconditionally evaluated to `A` regardless of
-//      x's actual runtime value -- there was no GPU branching at all.
-//   2. Wrong base formula, independent of the branch-selection bug -- even
-//      with correct branching, the implementation built gain() out of
-//      parabola() (pow(4x(1-x), k)), which does not satisfy the documented
-//      contract ("k=1 is the identity curve"). The reference this file
-//      cites (Inigo Quilez) defines gain from a plain pow(2x, k)/2 (not the
-//      parabola), which does satisfy the identity property at k=1.
-//   Fixed by rewriting gain() to use TSL's select() (real GPU branching)
-//   instead of a JS ternary, and rebuilding it from pow(2x, k) instead of
-//   parabola(2x, k).
-//
-// pcurve(x, a, b)'s exponent used native JS division on a Node (`1.0 / a`),
-// where `a` is a TSL Node, not a JS number -- Node has no custom valueOf()/
-// toString(), so JS's numeric coercion falls through to NaN. Fixed by using
-// TSL's div() node constructor instead of the native `/` operator.
 export default QUnit.module( 'TSL', () => {
 
 	QUnit.module( 'gain() and pcurve()', () => {
