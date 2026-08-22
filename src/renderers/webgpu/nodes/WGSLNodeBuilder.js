@@ -231,6 +231,7 @@ const wgslMethods = {
 	inverse_mat3: 'tsl_inverse_mat3',
 	inverse_mat4: 'tsl_inverse_mat4',
 	inversesqrt: 'inverseSqrt',
+	faceforward: 'faceForward',
 	bitcast: 'bitcast<f32>',
 	floatpack_snorm_2x16: 'pack2x16snorm',
 	floatpack_unorm_2x16: 'pack2x16unorm',

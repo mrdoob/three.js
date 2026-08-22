@@ -1,5 +1,4 @@
-import { hash, vec3, float } from 'three/tsl';
-import { sRGBTransferEOTF, sRGBTransferOETF } from 'three/tsl';
+import { hash, vec3, float, sRGBTransferEOTF, sRGBTransferOETF } from 'three/tsl';
 import { gpuTest, gpuFuzzTest } from './gpu-test-utils.js';
 
 export default QUnit.module( 'TSL', () => {
