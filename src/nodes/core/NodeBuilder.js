@@ -13,7 +13,8 @@ import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js
 
 import {
 	NumberNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
-	ColorNodeUniform, Matrix2NodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
+	ColorNodeUniform, HalfNodeUniform, HVec2NodeUniform, HVec3NodeUniform, HVec4NodeUniform,
+	Matrix2NodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
 } from '../../renderers/common/nodes/NodeUniform.js';
 
 import { stack } from './StackNode.js';
@@ -3335,7 +3336,32 @@ class NodeBuilder {
 			else if ( type === 'mat2' ) node = new Matrix2NodeUniform( uniformNode );
 			else if ( type === 'mat3' ) node = new Matrix3NodeUniform( uniformNode );
 			else if ( type === 'mat4' ) node = new Matrix4NodeUniform( uniformNode );
-			else {
+			else if ( type === 'half' || type === 'hvec2' || type === 'hvec3' || type === 'hvec4' ) {
+
+				// Half-precision uniforms only get a real, bit-packed fp16 CPU representation
+				// when the backend genuinely supports native fp16 shader math (WGSL's
+				// `shader-f16` feature - see WGSLNodeBuilder.getType()/enableShaderF16()).
+				// Otherwise the exact same fp32 uniform classes used for `float`/`vec2/3/4`
+				// are reused as-is: the shader-side type is already transparently aliased to
+				// its fp32 equivalent in that case, so the CPU-side value needs no special
+				// handling at all.
+				if ( this.isAvailable( 'shaderF16' ) ) {
+
+					if ( type === 'half' ) node = new HalfNodeUniform( uniformNode );
+					else if ( type === 'hvec2' ) node = new HVec2NodeUniform( uniformNode );
+					else if ( type === 'hvec3' ) node = new HVec3NodeUniform( uniformNode );
+					else node = new HVec4NodeUniform( uniformNode );
+
+				} else {
+
+					if ( type === 'half' ) node = new NumberNodeUniform( uniformNode );
+					else if ( type === 'hvec2' ) node = new Vector2NodeUniform( uniformNode );
+					else if ( type === 'hvec3' ) node = new Vector3NodeUniform( uniformNode );
+					else node = new Vector4NodeUniform( uniformNode );
+
+				}
+
+			} else {
 
 				throw new Error( `THREE.NodeBuilder: Uniform "${ type }" not implemented.` );
 

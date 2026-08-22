@@ -79,8 +79,11 @@ class WebGPUAttributeUtils {
 
 			let array = bufferAttribute.array;
 
-			// patch for INT16 and UINT16
-			if ( attribute.normalized === false && attribute.isInterleavedBufferAttribute !== true ) {
+			// patch for INT16 and UINT16 - explicitly excludes Float16BufferAttribute, whose
+			// backing Uint16Array holds fp16 *bit patterns*, not integers: widening it to
+			// Uint32Array here would corrupt every value (each 2-byte half float would land in
+			// a 4-byte slot the GPU still reads as raw fp16 lanes at the wrong stride/alignment).
+			if ( attribute.normalized === false && attribute.isInterleavedBufferAttribute !== true && attribute.isFloat16BufferAttribute !== true ) {
 
 				if ( array.constructor === Int16Array || array.constructor === Int8Array ) {
 
@@ -517,7 +520,19 @@ class WebGPUAttributeUtils {
 
 		if ( itemSize === 1 ) {
 
-			format = typeArraysToVertexFormatPrefixForItemSize1.get( ArrayType );
+			// Float16BufferAttribute's backing array is a Uint16Array (see its class doc),
+			// which would otherwise be misread as 'uint16' here - checked by attribute
+			// constructor, same as the itemSize > 1 branch below does via
+			// typedAttributeToVertexFormatPrefix.
+			if ( AttributeType === Float16BufferAttribute ) {
+
+				format = 'float16';
+
+			} else {
+
+				format = typeArraysToVertexFormatPrefixForItemSize1.get( ArrayType );
+
+			}
 
 		} else {
 

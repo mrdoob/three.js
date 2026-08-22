@@ -128,28 +128,52 @@ export function getTypeFromLength( length ) {
  */
 export function getTypedArrayFromType( type ) {
 
+	// Half-precision (fp16) types are packed as raw Uint16Array bit patterns - see
+	// toHalfFloat()/fromHalfFloat() in extras/DataUtils.js, and Float16BufferAttribute, which
+	// uses the same convention (JS has no broadly-supported native fp16 typed array). This
+	// matters most for storage-buffer arrays (e.g. instancedArray(n, 'hmat4')), where real
+	// 2-byte-per-component packing in the `storage` address space is the whole point - unlike
+	// the `uniform` address space, WGSL doesn't force a 16-byte array-element-stride floor
+	// there, so packing genuinely halves the buffer size and, more importantly, lets the GPU
+	// do the matrix/vector math at native fp16 throughput.
+	if ( isHalfType( type ) ) return Uint16Array;
+
 	// Handle component type for vectors and matrices
-	if ( /[iuh]?vec\d/.test( type ) ) {
+	if ( /[iu]?vec\d/.test( type ) ) {
 
 		// Handle int vectors
 		if ( type.startsWith( 'ivec' ) ) return Int32Array;
 		// Handle uint vectors
 		if ( type.startsWith( 'uvec' ) ) return Uint32Array;
-		// Default to float vectors (also covers half vectors, stored as f32 on the CPU side)
+		// Default to float vectors
 		return Float32Array;
 
 	}
 
-	// Handle matrices (always float, half matrices included)
+	// Handle matrices (always float)
 	if ( /mat\d/.test( type ) ) return Float32Array;
 
 	// Basic types
-	if ( type === 'half' ) return Float32Array;
 	if ( /float/.test( type ) ) return Float32Array;
 	if ( /uint/.test( type ) ) return Uint32Array;
 	if ( /int/.test( type ) ) return Int32Array;
 
 	throw new Error( `THREE.NodeUtils: Unsupported type: ${type}` );
+
+}
+
+/**
+ * Whether the given TSL type name is part of the half-precision (fp16) type family - the
+ * scalar `half`, the vectors `hvec2`/`hvec3`/`hvec4`, or the matrices `hmat2`/`hmat3`/`hmat4`.
+ *
+ * @private
+ * @method
+ * @param {string} type - The data type.
+ * @return {boolean} Whether the type is a half-precision type.
+ */
+export function isHalfType( type ) {
+
+	return type === 'half' || /^hvec[234]$/.test( type ) || /^hmat[234]$/.test( type );
 
 }
 

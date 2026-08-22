@@ -62,6 +62,7 @@ export const GPUVertexFormat = {
 	Unorm16x4: 'unorm16x4',
 	Snorm16x2: 'snorm16x2',
 	Snorm16x4: 'snorm16x4',
+	Float16: 'float16',
 	Float16x2: 'float16x2',
 	Float16x4: 'float16x4',
 	Float32: 'float32',

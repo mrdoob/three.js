@@ -7,6 +7,7 @@ import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
 import NodeStorageBuffer from '../../common/nodes/NodeStorageBuffer.js';
 
 import { NodeBuilder, CodeNode } from '../../../nodes/Nodes.js';
+import { isHalfType } from '../../../nodes/core/NodeUtils.js';
 
 import { getFormat } from '../utils/WebGPUTextureUtils.js';
 
@@ -2241,7 +2242,20 @@ ${ flowData.code }
 			} else if ( uniform.type === 'buffer' || uniform.type === 'storageBuffer' || uniform.type === 'indirectStorageBuffer' ) {
 
 				const bufferNode = uniform.node;
-				const bufferType = this.getType( bufferNode.getNodeType( this ) );
+				const rawBufferType = bufferNode.getNodeType( this );
+
+				// Unlike shader-internal half-precision math or half uniforms, a half-typed
+				// storage buffer's CPU-side data is packed as raw fp16 bit patterns (see
+				// NodeUtils.getTypedArrayFromType()) - there's no safe fp32 fallback to alias
+				// to the way getType() does elsewhere, since the bytes themselves would be
+				// misinterpreted. Fail loudly here rather than silently reading garbage.
+				if ( isHalfType( rawBufferType ) && this.isAvailable( 'shaderF16' ) === false ) {
+
+					throw new Error( `THREE.WGSLNodeBuilder: Half-precision storage buffer type "${ rawBufferType }" requires the 'shader-f16' GPU feature, which is not available on this device.` );
+
+				}
+
+				const bufferType = this.getType( rawBufferType );
 				const bufferCount = bufferNode.bufferCount;
 				const bufferCountSnippet = bufferCount > 0 && uniform.type === 'buffer' ? ', ' + bufferCount : '';
 				const bufferAccessMode = bufferNode.isStorageBufferNode ? `storage, ${ this.getStorageAccess( bufferNode, shaderStage ) }` : 'uniform';
@@ -2278,7 +2292,8 @@ ${ flowData.code }
 
 							const type = sharedUniform.getType();
 							const vectorType = this.getType( this.getVectorType( type ) );
-							snippets.push( `\t${ sharedUniform.name } : ${ vectorType }` );
+							const layoutAttribute = this._getHalfUniformLayoutAttribute( type );
+							snippets.push( `\t${ layoutAttribute }${ sharedUniform.name } : ${ vectorType }` );
 
 						}
 
@@ -2542,6 +2557,33 @@ ${ flowData.code }
 		}
 
 		return wgslTypeLib[ type ] || type;
+
+	}
+
+	/**
+	 * Returns the WGSL `@align`/`@size` attribute prefix (if any) a uniform-buffer struct
+	 * member needs for a half-precision type. This exists purely to match the packed CPU-side
+	 * layout `UniformsGroup`'s half-precision uniform classes use (see `Uniform.js`'s
+	 * `HalfUniform`/`HVec3Uniform` docs): a scalar `half` naturally has WGSL align/size 2/2, but
+	 * is packed into a full 4-byte slot on the CPU side, so it needs `@align(4) @size(4)`; a
+	 * `hvec3` naturally has size 6, but is packed into 8 bytes (2 slots) on the CPU side, so it
+	 * needs `@size(8)`. `hvec2`/`hvec4`'s natural WGSL align/size already exactly match their
+	 * CPU-side packed layout, so they need no override. Only relevant when `shader-f16` is
+	 * genuinely available - when it isn't, half types are aliased to their fp32 equivalent by
+	 * `getType()` and the CPU-side uniform is a plain fp32 uniform to match (see
+	 * `NodeBuilder.getNodeUniform()`), so no attribute override is needed either.
+	 *
+	 * @param {string} type - The node data type.
+	 * @return {string} The attribute prefix (including a trailing space), or an empty string.
+	 */
+	_getHalfUniformLayoutAttribute( type ) {
+
+		if ( this.isAvailable( 'shaderF16' ) === false ) return '';
+
+		if ( type === 'half' ) return '@align(4) @size(4) ';
+		if ( type === 'hvec3' ) return '@size(8) ';
+
+		return '';
 
 	}
 

@@ -266,6 +266,161 @@ class ColorUniform extends Uniform {
 }
 
 /**
+ * Represents a half-precision (fp16) scalar uniform. Used only when the backend genuinely
+ * supports native fp16 shader math (WGSL's `shader-f16` feature) - otherwise `half`-typed
+ * uniforms are represented as a plain {@link NumberUniform} instead (see
+ * `NodeBuilder.getNodeUniform()`), so this class only ever exists on WebGPU with `shader-f16`
+ * enabled.
+ *
+ * A single fp16 value is packed into the low 16 bits of one 4-byte buffer slot (the high 16
+ * bits are unused padding) so it can share the existing 4-byte-element layout machinery in
+ * {@link UniformsGroup} without a wider rewrite - see `UniformsGroup.updateHalf()`.
+ *
+ * @private
+ * @augments Uniform
+ */
+class HalfUniform extends Uniform {
+
+	/**
+	 * Constructs a new half-precision uniform.
+	 *
+	 * @param {string} name - The uniform's name.
+	 * @param {number} value - The uniform's value.
+	 */
+	constructor( name, value = 0 ) {
+
+		super( name, value );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isHalfUniform = true;
+
+		this.boundary = 4;
+		this.itemSize = 1;
+
+	}
+
+}
+
+/**
+ * Represents a half-precision (fp16) 2-component vector uniform. Both components are bit-packed
+ * into a single 4-byte buffer slot (`vec2<f16>`'s natural WGSL alignment/size, 4 bytes, already
+ * matches one slot exactly) - see `UniformsGroup.updateHVec2()`. Only used when `shader-f16` is
+ * genuinely available; see the note on {@link HalfUniform}.
+ *
+ * @private
+ * @augments Uniform
+ */
+class HVec2Uniform extends Uniform {
+
+	/**
+	 * Constructs a new half-precision Vector2 uniform.
+	 *
+	 * @param {string} name - The uniform's name.
+	 * @param {Vector2} value - The uniform's value.
+	 */
+	constructor( name, value = new Vector2() ) {
+
+		super( name, value );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isHVec2Uniform = true;
+
+		this.boundary = 4;
+		this.itemSize = 1;
+
+	}
+
+}
+
+/**
+ * Represents a half-precision (fp16) 3-component vector uniform. `vec3<f16>`'s natural WGSL
+ * size (6 bytes) is inflated to 8 bytes (an explicit `@size(8)` override, see
+ * `WGSLNodeBuilder.getUniforms()`) so it always occupies exactly 2 of the existing 4-byte
+ * slots: slot 0 packs x/y, slot 1 packs z (with 16 bits of unused padding) - see
+ * `UniformsGroup.updateHVec3()`. Only used when `shader-f16` is genuinely available; see the
+ * note on {@link HalfUniform}.
+ *
+ * @private
+ * @augments Uniform
+ */
+class HVec3Uniform extends Uniform {
+
+	/**
+	 * Constructs a new half-precision Vector3 uniform.
+	 *
+	 * @param {string} name - The uniform's name.
+	 * @param {Vector3} value - The uniform's value.
+	 */
+	constructor( name, value = new Vector3() ) {
+
+		super( name, value );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isHVec3Uniform = true;
+
+		this.boundary = 8;
+		this.itemSize = 2;
+
+	}
+
+}
+
+/**
+ * Represents a half-precision (fp16) 4-component vector uniform. `vec4<f16>`'s natural WGSL
+ * alignment/size (8 bytes) already matches 2 of the existing 4-byte slots exactly: slot 0
+ * packs x/y, slot 1 packs z/w - see `UniformsGroup.updateHVec4()`. Only used when `shader-f16`
+ * is genuinely available; see the note on {@link HalfUniform}.
+ *
+ * @private
+ * @augments Uniform
+ */
+class HVec4Uniform extends Uniform {
+
+	/**
+	 * Constructs a new half-precision Vector4 uniform.
+	 *
+	 * @param {string} name - The uniform's name.
+	 * @param {Vector4} value - The uniform's value.
+	 */
+	constructor( name, value = new Vector4() ) {
+
+		super( name, value );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isHVec4Uniform = true;
+
+		this.boundary = 8;
+		this.itemSize = 2;
+
+	}
+
+}
+
+/**
  * Represents a Matrix2 uniform.
  *
  * @private
@@ -371,5 +526,6 @@ class Matrix4Uniform extends Uniform {
 export {
 	NumberUniform,
 	Vector2Uniform, Vector3Uniform, Vector4Uniform, ColorUniform,
+	HalfUniform, HVec2Uniform, HVec3Uniform, HVec4Uniform,
 	Matrix2Uniform, Matrix3Uniform, Matrix4Uniform
 };

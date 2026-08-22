@@ -1,6 +1,7 @@
 import UniformBuffer from './UniformBuffer.js';
 import { GPU_CHUNK_BYTES } from './Constants.js';
 import { error } from '../../utils.js';
+import { toHalfFloat } from '../../extras/DataUtils.js';
 
 /**
  * This class represents a uniform buffer binding but with
@@ -274,6 +275,11 @@ class UniformsGroup extends UniformBuffer {
 		if ( uniform.isVector3Uniform ) return this.updateVector3( uniform );
 		if ( uniform.isVector4Uniform ) return this.updateVector4( uniform );
 		if ( uniform.isColorUniform ) return this.updateColor( uniform );
+		if ( uniform.isHalfUniform ) return this.updateHalf( uniform );
+		if ( uniform.isHVec2Uniform ) return this.updateHVec2( uniform );
+		if ( uniform.isHVec3Uniform ) return this.updateHVec3( uniform );
+		if ( uniform.isHVec4Uniform ) return this.updateHVec4( uniform );
+		if ( uniform.isMatrix2Uniform ) return this.updateMatrix2( uniform );
 		if ( uniform.isMatrix3Uniform ) return this.updateMatrix3( uniform );
 		if ( uniform.isMatrix4Uniform ) return this.updateMatrix4( uniform );
 
@@ -431,6 +437,167 @@ class UniformsGroup extends UniformBuffer {
 			b[ offset + 0 ] = a[ offset + 0 ] = c.r;
 			b[ offset + 1 ] = a[ offset + 1 ] = c.g;
 			b[ offset + 2 ] = a[ offset + 2 ] = c.b;
+
+			updated = true;
+
+			this.addUniformUpdateRange( uniform );
+
+		}
+
+		return updated;
+
+	}
+
+	/**
+	 * Updates a given half-precision (fp16) scalar uniform. Only ever called for a real
+	 * {@link HalfUniform} instance, i.e. only when the backend genuinely supports `shader-f16`
+	 * (see `NodeBuilder.getNodeUniform()`) - a `half` uniform on an unsupporting backend is a
+	 * plain {@link NumberUniform} and goes through `updateNumber()` instead.
+	 *
+	 * The fp16 value is bit-packed into the low 16 bits of its 4-byte buffer slot (see the
+	 * class doc on {@link HalfUniform}), so this bypasses the shared `this.values` shadow
+	 * array (which is float32-per-slot and can't represent a packed half value) and tracks its
+	 * own last-written value on the uniform instance instead.
+	 *
+	 * @param {HalfUniform} uniform - The half-precision uniform.
+	 * @return {boolean} Whether the uniform has been updated or not.
+	 */
+	updateHalf( uniform ) {
+
+		const v = uniform.getValue();
+
+		if ( uniform._cachedValue === v ) return false;
+
+		const view = new Uint32Array( this.buffer.buffer );
+		const offset = uniform.offset;
+
+		view[ offset ] = toHalfFloat( v ) & 0xffff;
+
+		uniform._cachedValue = v;
+
+		this.addUniformUpdateRange( uniform );
+
+		return true;
+
+	}
+
+	/**
+	 * Updates a given half-precision (fp16) Vector2 uniform. Both components are bit-packed
+	 * into the single 4-byte slot this uniform occupies (see {@link HVec2Uniform}). Only ever
+	 * called for a real `HVec2Uniform` instance - see the note on `updateHalf()`.
+	 *
+	 * @param {HVec2Uniform} uniform - The half-precision Vector2 uniform.
+	 * @return {boolean} Whether the uniform has been updated or not.
+	 */
+	updateHVec2( uniform ) {
+
+		const v = uniform.getValue();
+
+		if ( uniform._cachedX === v.x && uniform._cachedY === v.y ) return false;
+
+		const view = new Uint32Array( this.buffer.buffer );
+		const offset = uniform.offset;
+
+		view[ offset ] = ( toHalfFloat( v.x ) & 0xffff ) | ( ( toHalfFloat( v.y ) & 0xffff ) << 16 );
+
+		uniform._cachedX = v.x;
+		uniform._cachedY = v.y;
+
+		this.addUniformUpdateRange( uniform );
+
+		return true;
+
+	}
+
+	/**
+	 * Updates a given half-precision (fp16) Vector3 uniform. x/y are bit-packed into the first
+	 * of this uniform's two 4-byte slots, z into the low 16 bits of the second (see
+	 * {@link HVec3Uniform}). Only ever called for a real `HVec3Uniform` instance - see the note
+	 * on `updateHalf()`.
+	 *
+	 * @param {HVec3Uniform} uniform - The half-precision Vector3 uniform.
+	 * @return {boolean} Whether the uniform has been updated or not.
+	 */
+	updateHVec3( uniform ) {
+
+		const v = uniform.getValue();
+
+		if ( uniform._cachedX === v.x && uniform._cachedY === v.y && uniform._cachedZ === v.z ) return false;
+
+		const view = new Uint32Array( this.buffer.buffer );
+		const offset = uniform.offset;
+
+		view[ offset + 0 ] = ( toHalfFloat( v.x ) & 0xffff ) | ( ( toHalfFloat( v.y ) & 0xffff ) << 16 );
+		view[ offset + 1 ] = toHalfFloat( v.z ) & 0xffff;
+
+		uniform._cachedX = v.x;
+		uniform._cachedY = v.y;
+		uniform._cachedZ = v.z;
+
+		this.addUniformUpdateRange( uniform );
+
+		return true;
+
+	}
+
+	/**
+	 * Updates a given half-precision (fp16) Vector4 uniform. x/y are bit-packed into the first
+	 * of this uniform's two 4-byte slots, z/w into the second (see {@link HVec4Uniform}). Only
+	 * ever called for a real `HVec4Uniform` instance - see the note on `updateHalf()`.
+	 *
+	 * @param {HVec4Uniform} uniform - The half-precision Vector4 uniform.
+	 * @return {boolean} Whether the uniform has been updated or not.
+	 */
+	updateHVec4( uniform ) {
+
+		const v = uniform.getValue();
+
+		if ( uniform._cachedX === v.x && uniform._cachedY === v.y && uniform._cachedZ === v.z && uniform._cachedW === v.w ) return false;
+
+		const view = new Uint32Array( this.buffer.buffer );
+		const offset = uniform.offset;
+
+		view[ offset + 0 ] = ( toHalfFloat( v.x ) & 0xffff ) | ( ( toHalfFloat( v.y ) & 0xffff ) << 16 );
+		view[ offset + 1 ] = ( toHalfFloat( v.z ) & 0xffff ) | ( ( toHalfFloat( v.w ) & 0xffff ) << 16 );
+
+		uniform._cachedX = v.x;
+		uniform._cachedY = v.y;
+		uniform._cachedZ = v.z;
+		uniform._cachedW = v.w;
+
+		this.addUniformUpdateRange( uniform );
+
+		return true;
+
+	}
+
+	/**
+	 * Updates a given Matrix2 uniform.
+	 *
+	 * Note: this was previously missing from `updateByType()`'s dispatch entirely, meaning a
+	 * plain `mat2` uniform threw `'Unsupported uniform type.'` - fixed here alongside adding
+	 * half-precision uniform support, since `hmat2` uniforms would otherwise inherit the same
+	 * gap.
+	 *
+	 * @param {Matrix2Uniform} uniform - The Matrix2 uniform.
+	 * @return {boolean} Whether the uniform has been updated or not.
+	 */
+	updateMatrix2( uniform ) {
+
+		let updated = false;
+
+		const a = this.values;
+		const e = uniform.getValue().elements;
+		const offset = uniform.offset;
+
+		if ( a[ offset + 0 ] !== e[ 0 ] || a[ offset + 1 ] !== e[ 1 ] || a[ offset + 2 ] !== e[ 2 ] || a[ offset + 3 ] !== e[ 3 ] ) {
+
+			const b = this.buffer;
+
+			b[ offset + 0 ] = a[ offset + 0 ] = e[ 0 ];
+			b[ offset + 1 ] = a[ offset + 1 ] = e[ 1 ];
+			b[ offset + 2 ] = a[ offset + 2 ] = e[ 2 ];
+			b[ offset + 3 ] = a[ offset + 3 ] = e[ 3 ];
 
 			updated = true;
 

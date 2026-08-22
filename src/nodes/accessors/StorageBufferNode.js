@@ -3,7 +3,7 @@ import { bufferAttribute } from './BufferAttributeNode.js';
 import { varying } from '../tsl/TSLBase.js';
 import { storageElement } from '../utils/StorageArrayElementNode.js';
 import { NodeAccess } from '../core/constants.js';
-import { getTypeFromLength } from '../core/NodeUtils.js';
+import { getTypeFromLength, isHalfType } from '../core/NodeUtils.js';
 
 /**
  * This node is used in context of compute shaders and allows to define a
@@ -317,6 +317,26 @@ class StorageBufferNode extends BufferNode {
 	}
 
 	/**
+	 * Backends without real storage-buffer support (e.g. the WebGL fallback) instead convert
+	 * this node into a per-invocation `bufferAttribute()`/`varying()` pair - a fundamentally
+	 * different access mechanism with no real indexed array semantics. On top of that, a
+	 * half-precision element type's CPU-side data is a raw `Uint16Array` of packed fp16 bit
+	 * patterns (see `NodeUtils.getTypedArrayFromType()`), which that fallback path has no
+	 * concept of unpacking - it would just read the wrong bytes as fp32. Rather than silently
+	 * misinterpreting that data, fail loudly and explain why.
+	 *
+	 */
+	_assertNoUnsupportedHalfPrecision() {
+
+		if ( isHalfType( this.nodeType ) ) {
+
+			throw new Error( `THREE.StorageBufferNode: Half-precision storage buffer type "${ this.nodeType }" requires a backend with real storage buffer support (WebGPU with the 'shader-f16' GPU feature) - it has no fp32 fallback on this backend.` );
+
+		}
+
+	}
+
+	/**
 	 * This method is overwritten since the node type from the availability of storage buffers
 	 * and the attribute data.
 	 *
@@ -336,6 +356,8 @@ class StorageBufferNode extends BufferNode {
 			return super.generateNodeType( builder );
 
 		}
+
+		this._assertNoUnsupportedHalfPrecision( builder );
 
 		const { attribute } = this.getAttributeData();
 
@@ -377,6 +399,8 @@ class StorageBufferNode extends BufferNode {
 			return super.generate( builder );
 
 		}
+
+		this._assertNoUnsupportedHalfPrecision( builder );
 
 		const { attribute, varying } = this.getAttributeData();
 

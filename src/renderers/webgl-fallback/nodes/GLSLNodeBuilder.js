@@ -986,7 +986,13 @@ ${ flowData.code }
 						for ( const sharedUniform of sharedUniformGroup.uniforms ) {
 
 							const type = sharedUniform.getType();
-							const vectorType = this.getVectorType( type );
+							// this.getType() (not just getVectorType()) is required here so a
+							// half-precision type (which has no native GLSL fp16 compute type)
+							// is aliased to its fp32 equivalent - see this class's own
+							// getType() override. Omitting it previously let a literal 'half'/
+							// 'hvecN' leak straight into the generated GLSL, which doesn't
+							// compile.
+							const vectorType = this.getType( this.getVectorType( type ) );
 							const precision = sharedUniform.nodeUniform.node.precision;
 
 							let uniformSnippet = `${ vectorType } ${ sharedUniform.name };`;
