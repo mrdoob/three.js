@@ -54,16 +54,6 @@ export const pcurve = ( x, a, b ) => pow( div( pow( x, a ), add( pow( x, a ), po
  */
 export const sinc = ( x, k ) => {
 
-	// `arg` has a removable singularity at `arg == 0` (i.e. `x == 1/k`):
-	// mathematically sin(arg)/arg -> 1 as arg -> 0, but naively dividing
-	// would compute an actual 0/0 there -- NaN at runtime, and on WGSL
-	// backends a hard shader-compile error when `arg` constant-folds to
-	// exactly zero. Guard it explicitly with the analytic limit instead of
-	// evaluating the division at that point.
-	// `.toVar()` also keeps `arg` (and therefore the division below) from
-	// being folded into a compile-time constant expression -- WGSL rejects
-	// an exact `0.0 / 0.0` constant fold even when it's guarded by a
-	// runtime `select()`/`if` that never actually takes that branch.
 	const arg = PI.mul( k.mul( x ).sub( 1.0 ) ).toVar();
 	return select( abs( arg ).lessThan( 1e-6 ), 1.0, sin( arg ).div( arg ) );
 
