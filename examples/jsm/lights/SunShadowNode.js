@@ -1,21 +1,22 @@
-import ShadowNode from './ShadowNode.js';
-import { shadowPositionWorld } from './ShadowBaseNode.js';
-import { float, vec4, If, Fn } from '../tsl/TSLCore.js';
-import { reference } from '../accessors/ReferenceNode.js';
-import { texture } from '../accessors/TextureNode.js';
-import { normalWorld } from '../accessors/Normal.js';
-import { positionView } from '../accessors/Position.js';
-import { mix, smoothstep } from '../math/MathNode.js';
-import { DepthTexture } from '../../textures/DepthTexture.js';
-import { Compatibility, GreaterEqualCompare, LessEqualCompare, LinearFilter, NearestFilter, PCFShadowMap, VSMShadowMap } from '../../constants.js';
-import { renderGroup } from '../core/UniformGroupNode.js';
-import { uniform } from '../core/UniformNode.js';
-import { warnOnce } from '../../utils.js';
-import { Vector2 } from '../../math/Vector2.js';
+import {
+	Compatibility,
+	DepthTexture,
+	GreaterEqualCompare,
+	LessEqualCompare,
+	LinearFilter,
+	NearestFilter,
+	PCFShadowMap,
+	ShadowNode,
+	Vector2,
+	VSMShadowMap
+} from 'three/webgpu';
+import { Fn, If, float, mix, normalWorld, positionView, reference, renderGroup, shadowPositionWorld, smoothstep, texture, uniform, vec4 } from 'three/tsl';
 
 // must match the cascade count in SunLightShadow
 
 const _cascadeCount = 2;
+
+let _vsmWarned = false;
 
 /**
  * Represents the cascaded shadow map of a {@link SunLight}.
@@ -25,6 +26,7 @@ const _cascadeCount = 2;
  * cascades back to front, blending across the fade bands between them.
  *
  * @augments ShadowNode
+ * @three_import import { sunShadow } from 'three/addons/lights/SunShadowNode.js';
  */
 class SunShadowNode extends ShadowNode {
 
@@ -120,7 +122,12 @@ class SunShadowNode extends ShadowNode {
 
 			// the cascade atlas cannot be blurred as one map
 
-			warnOnce( 'THREE.SunShadowNode: VSM is not supported, falling back to PCF.' );
+			if ( _vsmWarned === false ) {
+
+				console.warn( 'THREE.SunShadowNode: VSM is not supported, falling back to PCF.' );
+				_vsmWarned = true;
+
+			}
 
 			shadowMapType = PCFShadowMap;
 
@@ -296,7 +303,7 @@ class SunShadowNode extends ShadowNode {
 
 }
 
-export default SunShadowNode;
+export { SunShadowNode };
 
 /**
  * TSL function for creating an instance of `SunShadowNode`.

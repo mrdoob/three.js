@@ -1,12 +1,16 @@
-import AnalyticLightNode from './AnalyticLightNode.js';
-import { lightPosition } from '../accessors/Lights.js';
-import { cameraViewMatrix } from '../accessors/Camera.js';
+import { AnalyticLightNode } from 'three/webgpu';
+import { cameraViewMatrix, lightPosition } from 'three/tsl';
 import { sunShadow } from './SunShadowNode.js';
 
 /**
- * Module for representing sun lights as nodes.
+ * Module for representing sun lights as nodes. Register it with the
+ * renderer's node library to use {@link SunLight} with `WebGPURenderer`:
+ * ```js
+ * renderer.library.addLight( SunLightNode, SunLight );
+ * ```
  *
  * @augments AnalyticLightNode
+ * @three_import import { SunLightNode } from 'three/addons/lights/SunLightNode.js';
  */
 class SunLightNode extends AnalyticLightNode {
 
@@ -49,4 +53,4 @@ class SunLightNode extends AnalyticLightNode {
 
 }
 
-export default SunLightNode;
+export { SunLightNode };

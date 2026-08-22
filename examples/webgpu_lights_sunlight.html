@@ -43,6 +43,7 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
 			import { SunLight } from 'three/addons/lights/SunLight.js';
+			import { SunLightNode } from 'three/addons/lights/SunLightNode.js';
 
 			let renderer, scene, camera, controls, timer, sunLight, sky, sceneEnv, pmremGenerator, renderTarget;
 
@@ -119,7 +120,7 @@
 				camera.lookAt( - 60, 8, 0 );
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
-				renderer.library.addLight( THREE.SunLightNode, SunLight );
+				renderer.library.addLight( SunLightNode, SunLight );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
