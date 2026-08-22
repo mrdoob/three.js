@@ -3,30 +3,6 @@ import {
 } from 'three/tsl';
 import { gpuTest } from './gpu-test-utils.js';
 
-// Regression coverage for a NodeBuilder.addFlowCodeHierarchy() crash
-// ("Cannot read properties of undefined (reading 'get')") that fired
-// whenever a cached temp node's *first* reference was unconditional and a
-// *later* reference was inside a conditional block.
-//
-// `flowCodeBlock` is created lazily by `addLineFlowCodeBlock()`, but only
-// when the node's first build happened inside some enclosing conditional
-// block. If the first build instead happens at the top level of a function
-// body, `flowCodeBlock` stays `undefined` -- and if that same node is later
-// referenced again from inside an `If()`, `addFlowCodeHierarchy()` used to
-// crash outright calling `.get()` on `undefined`.
-//
-// neutralToneMapping() (src/nodes/display/ToneMappingFunctions.js) hits this
-// exactly: it builds min()/max()-style MathNode temps unconditionally near
-// the top of the function, then references one of them again from inside
-// its own `If(peak.lessThan(StartCompression), () => { return color; })`.
-// This test's own gpuTest() harness wraps each assertion write in an If()
-// too, which is what actually triggers the crash reliably on both backends.
-//
-// neutralToneMapping() is split into three separate gpuTest() calls (one
-// assertion each), unlike most of this codebase's other tone-mapping
-// tests -- calling it more than once inside a single gpuTest's shared
-// kernel triggers a separate, unrelated harness-side error, so splitting
-// keeps this test isolated to the one bug it's meant to cover.
 export default QUnit.module( 'TSL', () => {
 
 	QUnit.module( 'addFlowCodeHierarchy() / neutralToneMapping()', () => {

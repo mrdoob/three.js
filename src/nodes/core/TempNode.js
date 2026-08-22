@@ -59,21 +59,7 @@ class TempNode extends Node {
 
 			if ( nodeData.propertyName !== undefined ) {
 
-				// This node was already assigned to a temp variable on an
-				// earlier reference. That assignment was flowed into whatever
-				// code-block was active *then* -- if this reference is from a
-				// different block (e.g. a sibling `If`/`Else` branch that
-				// doesn't share an ancestor with the original one), the
-				// variable is never actually assigned along this branch's
-				// control path, so it silently reads its default-initialized
-				// value instead of the intended result. `addFlowCodeHierarchy`
-				// re-flows the assignment into this block when needed -- see
-				// its own doc comment ("create their variables locally if the
-				// Node is only used inside one of these conditionals"). The
-				// plain (non-Temp) caching path in Node.build() already does
-				// this on every cache hit; this mirrors that here so
-				// TempNode's own propertyName-cache fast path gets the same
-				// safety net.
+				// re-flow cached node assignment into current code block if inside a conditional
 				if ( builder.context.nodeBlock !== undefined ) {
 
 					builder.addFlowCodeHierarchy( this, builder.context.nodeBlock );
