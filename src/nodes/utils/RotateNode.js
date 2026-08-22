@@ -75,14 +75,6 @@ class RotateNode extends TempNode {
 
 		} else {
 
-			// Note: mat4( v0, v1, v2, v3 ) takes v0..v3 as *columns* (standard
-			// GLSL/WGSL constructor semantics), unlike TSL's flat 16-scalar
-			// mat4(a,b,...,p) constructor, which is row-major (see docs). Each
-			// matrix below is therefore written column-by-column so it matches
-			// the conventional row-major right-hand-rule rotation matrix it's
-			// meant to represent -- e.g. rotationZMatrix's columns are
-			// (cos,sin,0,0)/(-sin,cos,0,0)/(0,0,1,0)/(0,0,0,1), i.e. the
-			// standard [[cos,-sin,0],[sin,cos,0],[0,0,1]] read column-first.
 			const rotation = rotationNode;
 			const rotationXMatrix = mat4( vec4( 1.0, 0.0, 0.0, 0.0 ), vec4( 0.0, cos( rotation.x ), sin( rotation.x ), 0.0 ), vec4( 0.0, sin( rotation.x ).negate(), cos( rotation.x ), 0.0 ), vec4( 0.0, 0.0, 0.0, 1.0 ) );
 			const rotationYMatrix = mat4( vec4( cos( rotation.y ), 0.0, sin( rotation.y ).negate(), 0.0 ), vec4( 0.0, 1.0, 0.0, 0.0 ), vec4( sin( rotation.y ), 0.0, cos( rotation.y ), 0.0 ), vec4( 0.0, 0.0, 0.0, 1.0 ) );
