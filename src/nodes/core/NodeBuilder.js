@@ -2363,6 +2363,8 @@ class NodeBuilder {
 
 		if ( needsFlowCode ) {
 
+			flowCodeBlock.set( nodeBlock, true );
+
 			for ( const flowCode of flowCodes ) {
 
 				this.addLineFlowCode( flowCode );
