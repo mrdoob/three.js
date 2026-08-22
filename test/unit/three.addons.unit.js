@@ -18,4 +18,5 @@ import './addons/tsl/WebGLNodesHandler.tests.js';
 import './addons/tsl/GPUTest.tests.js';
 import './addons/tsl/TSLDeterminant.tests.js';
 import './addons/tsl/TSLFaceForward.tests.js';
+import './addons/tsl/TSLRotate.tests.js';
 import './addons/tsl/TSLSinc.tests.js';
