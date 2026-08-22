@@ -1,5 +1,5 @@
 import { sub, mul, div, add } from './OperatorNode.js';
-import { PI, pow, sin } from './MathNode.js';
+import { PI, pow, sin, abs } from './MathNode.js';
 import { select } from './ConditionalNode.js';
 
 /**
@@ -56,4 +56,10 @@ export const pcurve = ( x, a, b ) => pow( div( pow( x, a ), add( pow( x, a ), po
  * @param {Node<float>} k - Controls the amount of bounces.
  * @return {Node<float>} The result value.
  */
-export const sinc = ( x, k ) => sin( PI.mul( k.mul( x ).sub( 1.0 ) ) ).div( PI.mul( k.mul( x ).sub( 1.0 ) ) );
+export const sinc = ( x, k ) => {
+
+	const arg = abs( PI.mul( k.mul( x ).sub( 1.0 ) ) ).max( 1e-6 ).toConst();
+
+	return sin( arg ).div( arg );
+
+};
