@@ -3,23 +3,6 @@ import {
 } from 'three/tsl';
 import { gpuTest } from './gpu-test-utils.js';
 
-// Regression coverage for a rotate() direction bug: rotate()'s 3D
-// (Euler-angle) path rotated in the opposite direction from its own
-// documented 2D case, on all three axes.
-//
-// mat4(v0,v1,v2,v3) (four vec4 arguments) takes v0..v3 as *columns*,
-// matching standard GLSL/WGSL constructor semantics -- unlike TSL's *other*
-// mat4(a,b,...,p) constructor (16 flat scalars), which is row-major. The 3D
-// rotation matrices were written as if the vec4-args form were also
-// row-major -- each vec4(...) argument spelled out a textbook rotation-
-// matrix *row* -- but the constructor actually consumed it as *column* 0.
-// The resulting matrix was the transpose of the intended one, which for a
-// rotation matrix means the exact same rotation run backwards (clockwise
-// instead of counter-clockwise).
-//
-// Caught by cross-checking the 3D single-axis case directly against the 2D
-// case: rotating only about one axis, with the other two Euler angles at 0,
-// must produce exactly the same in-plane rotation as the 2D rotate().
 export default QUnit.module( 'TSL', () => {
 
 	QUnit.module( 'rotate()', () => {
