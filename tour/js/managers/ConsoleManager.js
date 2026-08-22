@@ -233,6 +233,8 @@ class ConsoleManager {
 
 			}
 
+			this.updateConsoleButtonsState();
+
 		};
 
 		this.onLog = ( event ) => {
@@ -305,36 +307,39 @@ class ConsoleManager {
 	appendConsoleLine( message, color, clickableEvent = null ) {
 
 		const line = document.createElement( 'div' );
+		line.className = 'console-line';
 		line.style.color = color;
-		line.style.padding = '6px 14px';
-		line.style.borderBottom = '1px solid rgba(255, 255, 255, 0.05)';
-		line.textContent = message;
+
+		const textSpan = document.createElement( 'span' );
+		textSpan.className = 'console-line-text';
+		textSpan.textContent = message;
+		line.appendChild( textSpan );
 
 		if ( clickableEvent && clickableEvent.line !== null && clickableEvent.line > 0 && this.tour.codeEditor ) {
 
-			line.style.cursor = 'pointer';
-			line.title = 'Click to jump to error';
-			line.onclick = () => {
+			const jumpBtn = document.createElement( 'button' );
+			jumpBtn.className = 'console-jump-btn';
+			jumpBtn.title = 'Click to jump to error';
 
+			const icon = document.createElement( 'i' );
+			icon.setAttribute( 'data-icon', 'external-link' );
+			jumpBtn.appendChild( icon );
+
+			jumpBtn.onclick = ( e ) => {
+
+				e.stopPropagation();
 				this.tour.codeEditor.revealLine( clickableEvent.line, clickableEvent.column || 1 );
 
 			};
 
-			line.addEventListener( 'mouseenter', () => {
-
-				line.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-
-			} );
-
-			line.addEventListener( 'mouseleave', () => {
-
-				line.style.backgroundColor = 'transparent';
-
-			} );
+			line.appendChild( jumpBtn );
 
 		}
 
 		this.tour.dom.consoleErrorMessage.appendChild( line );
+
+		// Instantiate icons if any were added
+		this.tour.createIcons( line );
 
 		while ( this.tour.dom.consoleErrorMessage.childElementCount > 100 ) {
 
@@ -343,6 +348,8 @@ class ConsoleManager {
 		}
 
 		this.tour.dom.consoleErrorMessage.scrollTop = this.tour.dom.consoleErrorMessage.scrollHeight;
+
+		this.updateConsoleButtonsState();
 
 	}
 
@@ -370,6 +377,67 @@ class ConsoleManager {
 		if ( this.tour.codeEditor ) {
 
 			this.tour.codeEditor.layout();
+
+		}
+
+	}
+
+	clearConsole() {
+
+		this.tour.dom.consoleErrorMessage.textContent = '';
+		this.updateConsoleButtonsState();
+
+	}
+
+	copyConsole() {
+
+		const lines = Array.from( this.tour.dom.consoleErrorMessage.querySelectorAll( '.console-line-text' ) )
+			.map( span => span.textContent );
+		const text = lines.join( '\n' );
+		if ( ! text ) return;
+
+		navigator.clipboard.writeText( text ).then( () => {
+
+			const btn = this.tour.dom.consoleCopyBtn;
+			btn.classList.add( 'success' );
+			btn.innerHTML = '<i data-icon="check" style="width: 0.95rem; height: 0.95rem;"></i>';
+			this.tour.createIcons( btn );
+
+			setTimeout( () => {
+
+				btn.classList.remove( 'success' );
+				btn.innerHTML = '<i data-icon="copy" style="width: 0.95rem; height: 0.95rem;"></i>';
+				this.tour.createIcons( btn );
+
+			}, 2000 );
+
+		} );
+
+	}
+
+	updateConsoleButtonsState() {
+
+		const hasLogs = this.tour.dom.consoleErrorMessage.childElementCount > 0;
+		const clearBtn = this.tour.dom.consoleClearBtn;
+		const copyBtn = this.tour.dom.consoleCopyBtn;
+
+		if ( hasLogs ) {
+
+			clearBtn.removeAttribute( 'disabled' );
+
+		} else {
+
+			clearBtn.setAttribute( 'disabled', 'true' );
+
+		}
+
+		if ( hasLogs ) {
+
+			copyBtn.removeAttribute( 'disabled' );
+
+		} else {
+
+			copyBtn.setAttribute( 'disabled', 'true' );
 
 		}
 

@@ -1,4 +1,5 @@
 import { EventDispatcher } from 'three';
+import * as acorn from 'acorn';
 
 let importMap = { imports: {} };
 
@@ -18,6 +19,236 @@ try {
 }
 
 //
+
+function parseScript( code ) {
+
+	const importDeclarations = [];
+	const declaredSymbols = new Set();
+
+	let ast;
+	try {
+
+		ast = acorn.parse( code, { ecmaVersion: 'latest', sourceType: 'module' } );
+
+	} catch {
+
+		return { importDeclarations, declaredSymbols };
+
+	}
+
+	const extractPattern = ( pattern ) => {
+
+		if ( ! pattern ) return;
+		if ( pattern.type === 'Identifier' ) {
+
+			declaredSymbols.add( pattern.name );
+
+		} else if ( pattern.type === 'ObjectPattern' ) {
+
+			pattern.properties.forEach( prop => extractPattern( prop.value || prop.argument ) );
+
+		} else if ( pattern.type === 'ArrayPattern' ) {
+
+			pattern.elements.forEach( elem => extractPattern( elem ) );
+
+		} else if ( pattern.type === 'AssignmentPattern' ) {
+
+			extractPattern( pattern.left );
+
+		} else if ( pattern.type === 'RestElement' ) {
+
+			extractPattern( pattern.argument );
+
+		}
+
+	};
+
+	ast.body.forEach( node => {
+
+		if ( node.type === 'ImportDeclaration' ) {
+
+			const moduleName = node.source.value;
+			const fullMatch = code.substring( node.start, node.end );
+
+			const specifiers = [];
+			node.specifiers.forEach( spec => {
+
+				if ( spec.type === 'ImportSpecifier' ) {
+
+					specifiers.push( {
+						type: 'named',
+						imported: spec.imported.type === 'Identifier' ? spec.imported.name : spec.imported.value,
+						local: spec.local.name
+					} );
+
+				} else if ( spec.type === 'ImportDefaultSpecifier' ) {
+
+					specifiers.push( {
+						type: 'default',
+						imported: 'default',
+						local: spec.local.name
+					} );
+
+				} else if ( spec.type === 'ImportNamespaceSpecifier' ) {
+
+					specifiers.push( {
+						type: 'namespace',
+						imported: '*',
+						local: spec.local.name
+					} );
+
+				}
+
+			} );
+
+			importDeclarations.push( {
+				start: node.start,
+				end: node.end,
+				moduleName: moduleName,
+				fullMatch: fullMatch,
+				specifiers: specifiers
+			} );
+
+		}
+
+		let decl = node;
+		if ( node.type === 'ExportNamedDeclaration' || node.type === 'ExportDefaultDeclaration' ) {
+
+			decl = node.declaration;
+			if ( node.specifiers ) {
+
+				node.specifiers.forEach( s => {
+
+					if ( s.local ) declaredSymbols.add( s.local.name );
+
+				} );
+
+			}
+
+		}
+
+		if ( decl ) {
+
+			if ( decl.type === 'VariableDeclaration' ) {
+
+				decl.declarations.forEach( d => extractPattern( d.id ) );
+
+			} else if ( decl.type === 'FunctionDeclaration' || decl.type === 'ClassDeclaration' ) {
+
+				if ( decl.id ) declaredSymbols.add( decl.id.name );
+
+			}
+
+		}
+
+	} );
+
+	return { importDeclarations, declaredSymbols };
+
+}
+
+function stripImportDeclarations( code, declarations ) {
+
+	const sorted = [ ...declarations ].sort( ( a, b ) => b.start - a.start );
+	let result = code;
+	sorted.forEach( decl => {
+
+		const snippet = code.substring( decl.start, decl.end );
+		const linePreserved = snippet.replace( /[^\n]/g, '' );
+		result = result.substring( 0, decl.start ) + linePreserved + result.substring( decl.end );
+
+	} );
+	return result;
+
+}
+
+function processExportDeclarations( code ) {
+
+	let cleanText = code;
+	const exportedSymbols = [];
+
+	// 1. Parse braced exports (e.g., export { foo, bar as baz };)
+	const bracedExportRegex = /export\s*\{([\s\S]*?)\};?/g;
+	let bracedMatch;
+	while ( ( bracedMatch = bracedExportRegex.exec( cleanText ) ) !== null ) {
+
+		const symbolList = bracedMatch[ 1 ].split( ',' ).map( s => s.trim() ).filter( Boolean );
+		symbolList.forEach( symbol => {
+
+			let localName = symbol;
+			let exportName = symbol;
+			if ( symbol.includes( ' as ' ) ) {
+
+				const parts = symbol.split( /\s+as\s+/ );
+				localName = parts[ 0 ].trim();
+				exportName = parts[ 1 ].trim();
+
+			}
+
+			exportedSymbols.push( { local: localName, export: exportName } );
+
+		} );
+
+	}
+
+	cleanText = cleanText.replace( bracedExportRegex, '' );
+
+	// 2. Parse inline variable exports (e.g., export const foo = 1; or export let a = 1, b = 2;)
+	cleanText = cleanText.replace( /export\s+(const|let|var)\s+([^;\n]+)/g, ( match, type, decls ) => {
+
+		const parts = decls.split( ',' );
+		parts.forEach( p => {
+
+			const name = p.trim().split( '=' )[ 0 ].trim().split( /\s+/ )[ 0 ];
+			if ( /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test( name ) ) {
+
+				exportedSymbols.push( { local: name, export: name } );
+
+			}
+
+		} );
+
+		return `${type} ${decls}`;
+
+	} );
+
+	// 3. Parse inline function or class exports (e.g., export function foo() {}, export async function foo() {})
+	cleanText = cleanText.replace( /export\s+(async\s+)?(function\*?|class)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)/g, ( match, asyncPrefix, type, name ) => {
+
+		exportedSymbols.push( { local: name, export: name } );
+		return `${asyncPrefix || ''}${type} ${name}`;
+
+	} );
+
+	// 4. Parse default function/class declaration exports (e.g., export default function foo() {})
+	cleanText = cleanText.replace( /export\s+default\s+(async\s+)?(function\*?|class)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)/g, ( match, asyncPrefix, type, name ) => {
+
+		exportedSymbols.push( { local: name, export: 'default' } );
+		return `${asyncPrefix || ''}${type} ${name}`;
+
+	} );
+
+	// 5. Parse default anonymous function/class exports (e.g., export default function() {})
+	cleanText = cleanText.replace( /export\s+default\s+(async\s+)?(function\*?|class)\s*\(/g, ( match, asyncPrefix, type ) => {
+
+		const name = '__default_export__';
+		exportedSymbols.push( { local: name, export: 'default' } );
+		return `${asyncPrefix || ''}${type} ${name}(`;
+
+	} );
+
+	// 6. Parse default expression exports (e.g., export default foo;)
+	cleanText = cleanText.replace( /export\s+default\s+([^;]+);?/g, ( match, expression ) => {
+
+		const name = '__default_export__';
+		exportedSymbols.push( { local: name, export: 'default' } );
+		return `const ${name} = ${expression};`;
+
+	} );
+
+	return { cleanText, exportedSymbols };
+
+}
 
 function serializeArg( arg, depth = 0, seen = new WeakSet() ) {
 
@@ -116,6 +347,40 @@ function isStandardModule( moduleName, imports ) {
 
 }
 
+function resolvePath( importerName, importPath ) {
+
+	if ( importPath.startsWith( './' ) || importPath.startsWith( '../' ) ) {
+
+		const importerParts = importerName.split( '/' );
+		importerParts.pop(); // Remove the filename/leaf name
+
+		const importParts = importPath.split( '/' );
+		for ( const part of importParts ) {
+
+			if ( part === '.' ) {
+
+				continue;
+
+			} else if ( part === '..' ) {
+
+				importerParts.pop();
+
+			} else if ( part !== '' ) {
+
+				importerParts.push( part );
+
+			}
+
+		}
+
+		return importerParts.join( '/' );
+
+	}
+
+	return importPath;
+
+}
+
 
 const LIFECYCLE_METHODS = [ 'init', 'refresh', 'update', 'resize', 'dispose' ];
 
@@ -181,10 +446,39 @@ class CodeRunner extends EventDispatcher {
 
 	}
 
+	activateScript( name ) {
+
+		const scriptConfig = this.scripts[ name ];
+		if ( ! scriptConfig ) return;
+
+		if ( scriptConfig.dependencies ) {
+
+			for ( const dep of scriptConfig.dependencies ) {
+
+				this.activateScript( dep );
+
+			}
+
+		}
+
+		if ( ! this.activeScriptNames.includes( name ) ) {
+
+			this.activeScriptNames.push( name );
+
+		}
+
+	}
+
 	async load( name ) {
 
 		const scriptConfig = this.scripts[ name ];
 		if ( ! scriptConfig ) return null;
+
+		if ( ! scriptConfig.dependencies ) {
+
+			scriptConfig.dependencies = [];
+
+		}
 
 		if ( scriptConfig.instance ) return scriptConfig.instance;
 
@@ -221,41 +515,14 @@ class CodeRunner extends EventDispatcher {
 
 					}
 
-					const importRegex = /import\s+{(.+?)}\s+from\s+['"]([^'"]+)['"];?/g;
-					const namespaceImportRegex = /import\s+\*\s+as\s+(\w+)\s+from\s+['"]([^'"]+)['"];?/g;
-					let importMatch;
-					const declaredVariables = new Set();
-					const declRegex = /(?:let|const|var)\s+([^;=]+)/g;
-					let declMatch;
-					while ( ( declMatch = declRegex.exec( text ) ) !== null ) {
-
-						const vars = declMatch[ 1 ].split( ',' ).map( v => v.trim().split( /\s*=\s*/ )[ 0 ].split( /\s+/ ).pop() );
-						vars.forEach( v => {
-
-							if ( v && /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test( v ) ) {
-
-								declaredVariables.add( v );
-
-							}
-
-						} );
-
-					}
-
-					const funcRegex = /function\s+([a-zA-Z_$][a-zA-Z0-9_$]*)/g;
-					let funcMatch;
-					while ( ( funcMatch = funcRegex.exec( text ) ) !== null ) {
-
-						declaredVariables.add( funcMatch[ 1 ] );
-
-					}
+					const { importDeclarations, declaredSymbols } = parseScript( text );
 
 					const symbols = [];
 					const values = [];
 
 					for ( const [ key, val ] of Object.entries( this.env ) ) {
 
-						if ( ! declaredVariables.has( key ) ) {
+						if ( ! declaredSymbols.has( key ) ) {
 
 							symbols.push( key );
 							values.push( val );
@@ -267,16 +534,12 @@ class CodeRunner extends EventDispatcher {
 					symbols.push( 'console' );
 					values.push( this.customConsole );
 
-					let cleanText = text;
 					const importPromises = [];
 
-					while ( ( importMatch = importRegex.exec( text ) ) !== null ) {
+					importDeclarations.forEach( decl => {
 
-						const symbolListStr = importMatch[ 1 ];
-						const moduleName = importMatch[ 2 ];
-						const fullMatch = importMatch[ 0 ];
-
-						cleanText = cleanText.replace( fullMatch, '' );
+						const moduleName = decl.moduleName;
+						const fullMatch = decl.fullMatch;
 
 						importPromises.push( ( async () => {
 
@@ -286,15 +549,22 @@ class CodeRunner extends EventDispatcher {
 								const isStandard = isStandardModule( moduleName, this.imports );
 								if ( ! isStandard ) {
 
-									const cleanName = moduleName.replace( /^\.\//, '' ).replace( /^\.\..+/, '' );
-									const baseName = cleanName.replace( /\.js$/, '' );
+									const resolvedPath = resolvePath( name, moduleName );
+									const baseName = resolvedPath.replace( /\.js$/, '' );
 									if ( ! this.scripts[ baseName ] ) {
 
 										this.scripts[ baseName ] = {
 											url: `./js/imports/scripts/${baseName}.js`,
 											instance: null,
-											promise: null
+											promise: null,
+											dependencies: []
 										};
+
+									}
+
+									if ( ! scriptConfig.dependencies.includes( baseName ) ) {
+
+										scriptConfig.dependencies.push( baseName );
 
 									}
 
@@ -322,21 +592,24 @@ class CodeRunner extends EventDispatcher {
 
 							if ( moduleObj ) {
 
-								const symbolList = symbolListStr.split( ',' ).map( s => s.trim() ).filter( Boolean );
-								symbolList.forEach( symbol => {
+								decl.specifiers.forEach( spec => {
 
-									let localName = symbol;
-									let exportName = symbol;
-									if ( symbol.includes( ' as ' ) ) {
+									if ( spec.type === 'named' ) {
 
-										const parts = symbol.split( /\s+as\s+/ );
-										exportName = parts[ 0 ].trim();
-										localName = parts[ 1 ].trim();
+										symbols.push( spec.local );
+										values.push( moduleObj[ spec.imported ] );
+
+									} else if ( spec.type === 'namespace' ) {
+
+										symbols.push( spec.local );
+										values.push( moduleObj );
+
+									} else if ( spec.type === 'default' ) {
+
+										symbols.push( spec.local );
+										values.push( moduleObj[ 'default' ] );
 
 									}
-
-									symbols.push( localName );
-									values.push( moduleObj[ exportName ] );
 
 								} );
 
@@ -344,132 +617,7 @@ class CodeRunner extends EventDispatcher {
 
 						} )() );
 
-					}
-
-					let namespaceMatch;
-					while ( ( namespaceMatch = namespaceImportRegex.exec( text ) ) !== null ) {
-
-						const localName = namespaceMatch[ 1 ];
-						const moduleName = namespaceMatch[ 2 ];
-						const fullMatch = namespaceMatch[ 0 ];
-
-						cleanText = cleanText.replace( fullMatch, '' );
-
-						importPromises.push( ( async () => {
-
-							let moduleObj = this.imports[ moduleName ];
-							if ( ! moduleObj ) {
-
-								const isStandard = isStandardModule( moduleName, this.imports );
-								if ( ! isStandard ) {
-
-									const cleanName = moduleName.replace( /^\.\//, '' ).replace( /^\.\..+/, '' );
-									const baseName = cleanName.replace( /\.js$/, '' );
-									if ( ! this.scripts[ baseName ] ) {
-
-										this.scripts[ baseName ] = {
-											url: `./js/imports/scripts/${baseName}.js`,
-											instance: null,
-											promise: null
-										};
-
-									}
-
-									moduleObj = await this.load( baseName );
-
-								} else {
-
-									try {
-
-										moduleObj = await import( moduleName );
-
-									} catch ( err ) {
-
-										const charIndex = text.indexOf( fullMatch );
-										const lineNumber = charIndex !== - 1 ? text.substring( 0, charIndex ).split( '\n' ).length : 1;
-										const error = new Error( `Failed to load import "${moduleName}" in script "${name}.js". Make sure the module path is correct.` );
-										error.customLineNumber = lineNumber;
-										throw error;
-
-									}
-
-								}
-
-							}
-
-							if ( moduleObj ) {
-
-								symbols.push( localName );
-								values.push( moduleObj );
-
-							}
-
-						} )() );
-
-					}
-
-					const defaultImportRegex = /import\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s+from\s+['"]([^'"]+)['"];?/g;
-					let defaultMatch;
-					while ( ( defaultMatch = defaultImportRegex.exec( text ) ) !== null ) {
-
-						const localName = defaultMatch[ 1 ];
-						const moduleName = defaultMatch[ 2 ];
-						const fullMatch = defaultMatch[ 0 ];
-
-						cleanText = cleanText.replace( fullMatch, '' );
-
-						importPromises.push( ( async () => {
-
-							let moduleObj = this.imports[ moduleName ];
-							if ( ! moduleObj ) {
-
-								const isStandard = isStandardModule( moduleName, this.imports );
-								if ( ! isStandard ) {
-
-									const cleanName = moduleName.replace( /^\.\//, '' ).replace( /^\.\..+/, '' );
-									const baseName = cleanName.replace( /\.js$/, '' );
-									if ( ! this.scripts[ baseName ] ) {
-
-										this.scripts[ baseName ] = {
-											url: `./js/imports/scripts/${baseName}.js`,
-											instance: null,
-											promise: null
-										};
-
-									}
-
-									moduleObj = await this.load( baseName );
-
-								} else {
-
-									try {
-
-										moduleObj = await import( moduleName );
-
-									} catch ( err ) {
-
-										const charIndex = text.indexOf( fullMatch );
-										const lineNumber = charIndex !== - 1 ? text.substring( 0, charIndex ).split( '\n' ).length : 1;
-										const error = new Error( `Failed to load import "${moduleName}" in script "${name}.js". Make sure the module path is correct.` );
-										error.customLineNumber = lineNumber;
-										throw error;
-
-									}
-
-								}
-
-							}
-
-							if ( moduleObj ) {
-
-								symbols.push( localName );
-								values.push( moduleObj[ 'default' ] );
-
-							}
-
-						} )() );
-
-					}
+					} );
 
 					if ( importPromises.length > 0 ) {
 
@@ -477,86 +625,48 @@ class CodeRunner extends EventDispatcher {
 
 					}
 
-					const exportedSymbols = [];
-
-					// 1. Parse braced exports (e.g., export { foo, bar as baz };)
-					const bracedExportRegex = /export\s+{(.+?)}/g;
-					let bracedMatch;
-					while ( ( bracedMatch = bracedExportRegex.exec( cleanText ) ) !== null ) {
-
-						const symbolList = bracedMatch[ 1 ].split( ',' ).map( s => s.trim() ).filter( Boolean );
-						symbolList.forEach( symbol => {
-
-							let localName = symbol;
-							let exportName = symbol;
-							if ( symbol.includes( ' as ' ) ) {
-
-								const parts = symbol.split( /\s+as\s+/ );
-								localName = parts[ 0 ].trim();
-								exportName = parts[ 1 ].trim();
-
-							}
-
-							exportedSymbols.push( { local: localName, export: exportName } );
-
-						} );
-
-					}
-
-					cleanText = cleanText.replace( bracedExportRegex, '' );
-
-					// 2. Parse inline variable exports (e.g., export const foo = 1;)
-					cleanText = cleanText.replace( /export\s+(const|let|var)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)/g, ( match, type, name ) => {
-
-						exportedSymbols.push( { local: name, export: name } );
-						return `${type} ${name}`;
-
-					} );
-
-					// 3. Parse inline function or class exports (e.g., export function foo() {})
-					cleanText = cleanText.replace( /export\s+(async\s+)?(function|class)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)/g, ( match, asyncPrefix, type, name ) => {
-
-						exportedSymbols.push( { local: name, export: name } );
-						return `${asyncPrefix || ''}${type} ${name}`;
-
-					} );
-
-					// 4. Parse default function/class declaration exports (e.g., export default function foo() {})
-					cleanText = cleanText.replace( /export\s+default\s+(async\s+)?(function|class)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)/g, ( match, asyncPrefix, type, name ) => {
-
-						exportedSymbols.push( { local: name, export: 'default' } );
-						return `${asyncPrefix || ''}${type} ${name}`;
-
-					} );
-
-					// 5. Parse default anonymous function/class exports (e.g., export default function() {})
-					cleanText = cleanText.replace( /export\s+default\s+(async\s+)?(function|class)\s*\(/g, ( match, asyncPrefix, type ) => {
-
-						const name = '__default_export__';
-						exportedSymbols.push( { local: name, export: 'default' } );
-						return `${asyncPrefix || ''}${type} ${name}(`;
-
-					} );
-
-					// 6. Parse default expression exports (e.g., export default foo;)
-					cleanText = cleanText.replace( /export\s+default\s+([^;]+);?/g, ( match, expression ) => {
-
-						const name = '__default_export__';
-						exportedSymbols.push( { local: name, export: 'default' } );
-						return `const ${name} = ${expression};`;
-
-					} );
+					const cleanImportsText = stripImportDeclarations( text, importDeclarations );
+					const { cleanText, exportedSymbols } = processExportDeclarations( cleanImportsText );
 
 					const returnFields = LIFECYCLE_METHODS.map( name => `${name}: typeof ${name} !== 'undefined' ? ${name} : undefined` );
 					exportedSymbols.forEach( symbol => {
 
-						returnFields.push( `get "${symbol.export}"() { return typeof ${symbol.local} !== \'undefined\' ? ${symbol.local} : undefined; }` );
+						if ( ! LIFECYCLE_METHODS.includes( symbol.export ) ) {
+
+							returnFields.push( `get "${symbol.export}"() { return typeof ${symbol.local} !== \'undefined\' ? ${symbol.local} : undefined; }` );
+
+						}
 
 					} );
 
 					const wrapperFn = new Function( ...symbols, `${cleanText}\nreturn { ${returnFields.join( ', ' )} };\n//# sourceURL=${name}.js` );
 
 					scriptConfig.instance = wrapperFn( ...values );
+
+					if ( scriptConfig.instance ) {
+
+						for ( const key of Object.keys( scriptConfig.instance ) ) {
+
+							if ( ! LIFECYCLE_METHODS.includes( key ) ) {
+
+								Object.defineProperty( this.env, key, {
+									get: () => scriptConfig.instance ? scriptConfig.instance[ key ] : undefined,
+									configurable: true,
+									enumerable: true
+								} );
+
+							}
+
+						}
+
+					}
+
+					if ( scriptConfig.instance && scriptConfig.instance.init ) {
+
+						await scriptConfig.instance.init();
+
+					}
+
 					return scriptConfig.instance;
 
 				} finally {
@@ -601,44 +711,34 @@ class CodeRunner extends EventDispatcher {
 
 		try {
 
-			// Strip comments and strings for analysis while keeping active imports intact
-			const parserRegex = /(\/\*[\s\S]*?\*\/|\/\/.+)|(import\s*(?:[\w\s,\*\{\}]+\s+from\s+)?['"][^'"]+['"])|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)/gi;
-			const cleanCodeForAnalysis = code.replace( parserRegex, ( m, comment, imp, str ) => {
+			const { importDeclarations, declaredSymbols } = parseScript( code );
 
-				if ( comment ) return '';
-				if ( imp ) return imp;
-				if ( str ) return '""';
-				return m;
-
-			} );
-
-			// Parse imports
-			const importRegex = /import\s+{(.+?)}\s+from\s+['"]([^'"]+)['"];?/g;
-			let match;
 			const symbols = [];
 			const values = [];
 
-			while ( ( match = importRegex.exec( cleanCodeForAnalysis ) ) !== null ) {
+			const importedCustomScripts = [];
 
-				const symbolList = match[ 1 ].split( ',' ).map( s => s.trim() ).filter( Boolean );
-				const moduleName = match[ 2 ];
-				let moduleObj = this.imports[ moduleName ];
+			for ( const decl of importDeclarations ) {
 
-				if ( ! moduleObj ) {
+				const moduleName = decl.moduleName;
+				const fullMatch = decl.fullMatch;
 
-					const isStandard = isStandardModule( moduleName, this.imports );
-					if ( ! isStandard ) {
+				const isStandard = isStandardModule( moduleName, this.imports );
+				if ( ! isStandard ) {
 
-						const cleanName = moduleName.replace( /^\.\//, '' ).replace( /^\.\..+/, '' );
-						const baseName = cleanName.replace( /\.js$/, '' );
-						const scriptConfig = this.scripts[ baseName ];
-						if ( scriptConfig && scriptConfig.instance ) {
+					const resolvedPath = resolvePath( '__main__', moduleName );
+					const baseName = resolvedPath.replace( /\.js$/, '' );
+					if ( ! importedCustomScripts.includes( baseName ) ) {
 
-							moduleObj = scriptConfig.instance;
+						importedCustomScripts.push( baseName );
 
-						}
+					}
 
-					} else {
+				} else {
+
+					let moduleObj = this.imports[ moduleName ];
+
+					if ( ! moduleObj ) {
 
 						try {
 
@@ -646,7 +746,7 @@ class CodeRunner extends EventDispatcher {
 
 						} catch ( err ) {
 
-							const charIndex = code.indexOf( match[ 0 ] );
+							const charIndex = code.indexOf( fullMatch );
 							const lineNumber = charIndex !== - 1 ? code.substring( 0, charIndex ).split( '\n' ).length : 1;
 							const error = new Error( `Failed to load import "${moduleName}" in script. Make sure the module path/importmap is correct.` );
 							error.customLineNumber = lineNumber;
@@ -656,140 +756,40 @@ class CodeRunner extends EventDispatcher {
 
 					}
 
-				}
+					if ( moduleObj ) {
 
-				if ( moduleObj ) {
+						decl.specifiers.forEach( spec => {
 
-					symbolList.forEach( symbol => {
+							if ( spec.type === 'named' ) {
 
-						let localName = symbol;
-						let exportName = symbol;
-						if ( symbol.includes( ' as ' ) ) {
+								if ( ! symbols.includes( spec.local ) ) {
 
-							const parts = symbol.split( /\s+as\s+/ );
-							exportName = parts[ 0 ].trim();
-							localName = parts[ 1 ].trim();
+									symbols.push( spec.local );
+									values.push( moduleObj[ spec.imported ] );
 
-						}
+								}
 
-						if ( ! symbols.includes( localName ) ) {
+							} else if ( spec.type === 'namespace' ) {
 
-							symbols.push( localName );
-							values.push( moduleObj[ exportName ] );
+								if ( ! symbols.includes( spec.local ) ) {
 
-						}
+									symbols.push( spec.local );
+									values.push( moduleObj );
 
-					} );
+								}
 
-				}
+							} else if ( spec.type === 'default' ) {
 
-			}
+								if ( ! symbols.includes( spec.local ) ) {
 
-			// Parse namespace imports in main code
-			const namespaceImportRegex = /import\s+\*\s+as\s+(\w+)\s+from\s+['"]([^'"]+)['"];?/g;
-			let namespaceMatch;
-			while ( ( namespaceMatch = namespaceImportRegex.exec( cleanCodeForAnalysis ) ) !== null ) {
+									symbols.push( spec.local );
+									values.push( moduleObj[ 'default' ] );
 
-				const localName = namespaceMatch[ 1 ];
-				const moduleName = namespaceMatch[ 2 ];
-				let moduleObj = this.imports[ moduleName ];
+								}
 
-				if ( ! moduleObj ) {
+							}
 
-					const isStandard = isStandardModule( moduleName, this.imports );
-					if ( ! isStandard ) {
-
-						const cleanName = moduleName.replace( /^\.\//, '' ).replace( /^\.\..+/, '' );
-						const baseName = cleanName.replace( /\.js$/, '' );
-						const scriptConfig = this.scripts[ baseName ];
-						if ( scriptConfig && scriptConfig.instance ) {
-
-							moduleObj = scriptConfig.instance;
-
-						}
-
-					} else {
-
-						try {
-
-							moduleObj = await import( moduleName );
-
-						} catch ( err ) {
-
-							const charIndex = code.indexOf( namespaceMatch[ 0 ] );
-							const lineNumber = charIndex !== - 1 ? code.substring( 0, charIndex ).split( '\n' ).length : 1;
-							const error = new Error( `Failed to load import "${moduleName}" in script. Make sure the module path/importmap is correct.` );
-							error.customLineNumber = lineNumber;
-							throw error;
-
-						}
-
-					}
-
-				}
-
-				if ( moduleObj ) {
-
-					if ( ! symbols.includes( localName ) ) {
-
-						symbols.push( localName );
-						values.push( moduleObj );
-
-					}
-
-				}
-
-			}
-
-			// Parse default imports in main code
-			const defaultImportRegex = /import\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s+from\s+['"]([^'"]+)['"];?/g;
-			let defaultMatch;
-			while ( ( defaultMatch = defaultImportRegex.exec( cleanCodeForAnalysis ) ) !== null ) {
-
-				const localName = defaultMatch[ 1 ];
-				const moduleName = defaultMatch[ 2 ];
-				let moduleObj = this.imports[ moduleName ];
-
-				if ( ! moduleObj ) {
-
-					const isStandard = isStandardModule( moduleName, this.imports );
-					if ( ! isStandard ) {
-
-						const cleanName = moduleName.replace( /^\.\//, '' ).replace( /^\.\..+/, '' );
-						const baseName = cleanName.replace( /\.js$/, '' );
-						const scriptConfig = this.scripts[ baseName ];
-						if ( scriptConfig && scriptConfig.instance ) {
-
-							moduleObj = scriptConfig.instance;
-
-						}
-
-					} else {
-
-						try {
-
-							moduleObj = await import( moduleName );
-
-						} catch ( err ) {
-
-							const charIndex = code.indexOf( defaultMatch[ 0 ] );
-							const lineNumber = charIndex !== - 1 ? code.substring( 0, charIndex ).split( '\n' ).length : 1;
-							const error = new Error( `Failed to load import "${moduleName}" in script. Make sure the module path/importmap is correct.` );
-							error.customLineNumber = lineNumber;
-							throw error;
-
-						}
-
-					}
-
-				}
-
-				if ( moduleObj ) {
-
-					if ( ! symbols.includes( localName ) ) {
-
-						symbols.push( localName );
-						values.push( moduleObj[ 'default' ] );
+						} );
 
 					}
 
@@ -801,112 +801,6 @@ class CodeRunner extends EventDispatcher {
 			const activeModules = {};
 			const prevActiveCustomScripts = this.activeScriptNames.filter( name => name !== '__main__' );
 
-			const importedCustomScripts = [];
-
-			// Parse custom script imports (e.g. import 'teapot' or import 'teapot.js')
-			const customImportRegex = /import\s+['"]([^'"]+)['"];?/gi;
-			let customMatch;
-			while ( ( customMatch = customImportRegex.exec( cleanCodeForAnalysis ) ) !== null ) {
-
-				const importedName = customMatch[ 1 ];
-				const isStandard = isStandardModule( importedName, this.imports );
-				if ( ! isStandard ) {
-
-					const cleanName = importedName.replace( /^\.\//, '' ).replace( /^\.\..+/, '' );
-					const baseName = cleanName.replace( /\.js$/, '' );
-					if ( ! importedCustomScripts.includes( baseName ) ) {
-
-						importedCustomScripts.push( baseName );
-
-					}
-
-				}
-
-			}
-
-			// Parse custom script imports from named imports (e.g. import { foo } from 'helper')
-			const namedImportRegex = /import\s+{(.+?)}\s+from\s+['"]([^'"]+)['"];?/gi;
-			let namedMatch;
-			while ( ( namedMatch = namedImportRegex.exec( cleanCodeForAnalysis ) ) !== null ) {
-
-				const importedName = namedMatch[ 2 ];
-				const isStandard = isStandardModule( importedName, this.imports );
-				if ( ! isStandard ) {
-
-					const cleanName = importedName.replace( /^\.\//, '' ).replace( /^\.\..+/, '' );
-					const baseName = cleanName.replace( /\.js$/, '' );
-					if ( ! importedCustomScripts.includes( baseName ) ) {
-
-						importedCustomScripts.push( baseName );
-
-					}
-
-				}
-
-			}
-
-			// Parse custom script imports from namespace imports (e.g. import * as helper from 'helper')
-			const customNamespaceImportRegex = /import\s+\*\s+as\s+(\w+)\s+from\s+['"]([^'"]+)['"];?/gi;
-			let customNamespaceMatch;
-			while ( ( customNamespaceMatch = customNamespaceImportRegex.exec( cleanCodeForAnalysis ) ) !== null ) {
-
-				const importedName = customNamespaceMatch[ 2 ];
-				const isStandard = isStandardModule( importedName, this.imports );
-				if ( ! isStandard ) {
-
-					const cleanName = importedName.replace( /^\.\//, '' ).replace( /^\.\..+/, '' );
-					const baseName = cleanName.replace( /\.js$/, '' );
-					if ( ! importedCustomScripts.includes( baseName ) ) {
-
-						importedCustomScripts.push( baseName );
-
-					}
-
-				}
-
-			}
-
-			// Parse custom script imports from default imports (e.g. import helper from 'helper')
-			const namedDefaultImportRegex = /import\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s+from\s+['"]([^'"]+)['"];?/gi;
-			let namedDefaultMatch;
-			while ( ( namedDefaultMatch = namedDefaultImportRegex.exec( cleanCodeForAnalysis ) ) !== null ) {
-
-				const importedName = namedDefaultMatch[ 2 ];
-				const isStandard = isStandardModule( importedName, this.imports );
-				if ( ! isStandard ) {
-
-					const cleanName = importedName.replace( /^\.\//, '' ).replace( /^\.\..+/, '' );
-					const baseName = cleanName.replace( /\.js$/, '' );
-					if ( ! importedCustomScripts.includes( baseName ) ) {
-
-						importedCustomScripts.push( baseName );
-
-					}
-
-				}
-
-			}
-
-			// Dispose and clear removed scripts
-			const removedCustomScripts = prevActiveCustomScripts.filter( name => ! importedCustomScripts.includes( name ) );
-			for ( const baseName of removedCustomScripts ) {
-
-				const scriptConfig = this.scripts[ baseName ];
-				if ( scriptConfig ) {
-
-					if ( scriptConfig.instance && scriptConfig.instance.dispose ) {
-
-						scriptConfig.instance.dispose();
-
-					}
-
-					scriptConfig.instance = null;
-					scriptConfig.promise = null;
-
-				}
-
-			}
-
 			this.activeScriptNames = [];
 
 			// Load / Create active scripts
@@ -917,62 +811,20 @@ class CodeRunner extends EventDispatcher {
 					this.scripts[ baseName ] = {
 						url: `./js/imports/scripts/${baseName}.js`,
 						instance: null,
-						promise: null
+						promise: null,
+						dependencies: []
 					};
 
 				}
 
 				try {
 
-					const scriptConfig = this.scripts[ baseName ];
-					const hadInstance = scriptConfig.instance !== null;
-					const instance = await this.load( baseName );
-					if ( instance ) {
-
-						const isNew = ! hadInstance || ! prevActiveCustomScripts.includes( baseName );
-						if ( isNew && instance.init ) {
-
-							await instance.init();
-
-						}
-
-						if ( instance.refresh ) {
-
-							await instance.refresh();
-
-						}
-
-						if ( instance.resize && this.env.renderer ) {
-
-							const width = this.env.renderer.domElement.clientWidth;
-							const height = this.env.renderer.domElement.clientHeight;
-							if ( width > 0 && height > 0 ) {
-
-								instance.resize( width, height );
-
-							}
-
-						}
-
-						for ( const key of Object.keys( instance ) ) {
-
-							if ( ! LIFECYCLE_METHODS.includes( key ) && instance[ key ] !== undefined ) {
-
-								activeModules[ key ] = instance[ key ];
-								this.env[ key ] = instance[ key ];
-
-							}
-
-						}
-
-						this.activeScriptNames.push( baseName );
-
-					}
+					await this.load( baseName );
 
 				} catch ( err ) {
 
 					// Find where the script was imported in the main editor code
-					const matchRegex = new RegExp( `import\\s+['"](\\.\\/)?${baseName}(\\.js)?['"];?`, 'i' );
+					const matchRegex = new RegExp( `import\\s+(?:[\\s\\S]*?\\s+from\\s+)?['"](\\.\\/)?${baseName}(\\.js)?['"];?`, 'i' );
 					const match = code.match( matchRegex );
 					if ( match ) {
 
@@ -991,26 +843,135 @@ class CodeRunner extends EventDispatcher {
 
 			}
 
+			// Activate scripts recursively (building correct activeScriptNames order)
+			for ( const baseName of importedCustomScripts ) {
+
+				this.activateScript( baseName );
+
+			}
+
+			// Dispose and clear removed scripts (using complete activeScriptNames list)
+			const removedCustomScripts = prevActiveCustomScripts.filter( name => ! this.activeScriptNames.includes( name ) );
+			for ( const baseName of removedCustomScripts ) {
+
+				const scriptConfig = this.scripts[ baseName ];
+				if ( scriptConfig ) {
+
+					if ( scriptConfig.instance ) {
+
+						if ( scriptConfig.instance.dispose ) {
+
+							scriptConfig.instance.dispose();
+
+						}
+
+						for ( const key of Object.keys( scriptConfig.instance ) ) {
+
+							if ( ! LIFECYCLE_METHODS.includes( key ) ) {
+
+								delete this.env[ key ];
+
+							}
+
+						}
+
+					}
+
+					scriptConfig.instance = null;
+					scriptConfig.promise = null;
+
+				}
+
+			}
+
+			// Refresh, resize, and expose exports for all active custom scripts
+			for ( const baseName of this.activeScriptNames ) {
+
+				const scriptConfig = this.scripts[ baseName ];
+				const instance = scriptConfig ? scriptConfig.instance : null;
+				if ( instance ) {
+
+					if ( instance.refresh ) {
+
+						await instance.refresh();
+
+					}
+
+					if ( instance.resize && this.env.renderer ) {
+
+						const width = this.env.renderer.domElement.clientWidth;
+						const height = this.env.renderer.domElement.clientHeight;
+						if ( width > 0 && height > 0 ) {
+
+							instance.resize( width, height );
+
+						}
+
+					}
+
+					for ( const key of Object.keys( instance ) ) {
+
+						if ( ! LIFECYCLE_METHODS.includes( key ) && instance[ key ] !== undefined ) {
+
+							activeModules[ key ] = instance[ key ];
+
+							const desc = Object.getOwnPropertyDescriptor( this.env, key );
+							if ( ! desc || ! desc.get ) {
+
+								this.env[ key ] = instance[ key ];
+
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
 			// Inject active modules into parameters
 			for ( const [ name, obj ] of Object.entries( activeModules ) ) {
 
-				symbols.push( name );
-				values.push( obj );
+				if ( ! symbols.includes( name ) ) {
+
+					symbols.push( name );
+					values.push( obj );
+
+				}
+
+			}
+
+			// Inject runner env variables (e.g. renderer) not shadowed by local declarations
+			for ( const [ key, val ] of Object.entries( this.env ) ) {
+
+				if ( ! symbols.includes( key ) && ! declaredSymbols.has( key ) ) {
+
+					symbols.push( key );
+					values.push( val );
+
+				}
 
 			}
 
 			symbols.push( 'console' );
 			values.push( this.customConsole );
 
-
-			// Strip all import statements from code so it can run inside Function body
-			const strippedCode = code
-				.replace( /import\s+{(.+?)}\s+from\s+['"]([^'"]+)['"];?/g, ( match ) => match.replace( /[^\n]/g, '' ) )
-				.replace( /import\s+\*\s+as\s+(\w+)\s+from\s+['"]([^'"]+)['"];?/g, ( match ) => match.replace( /[^\n]/g, '' ) )
-				.replace( /import\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s+from\s+['"]([^'"]+)['"];?/g, ( match ) => match.replace( /[^\n]/g, '' ) )
-				.replace( /import\s+['"]([^'"]+)['"];?/gi, ( match ) => match.replace( /[^\n]/g, '' ) );
+			// Strip all import and export statements from code so it can run inside Function body
+			const strippedImportsCode = stripImportDeclarations( code, importDeclarations );
+			const { cleanText: strippedCode, exportedSymbols } = processExportDeclarations( strippedImportsCode );
 
 			const returnFields = LIFECYCLE_METHODS.map( name => `${name}: typeof ${name} !== 'undefined' ? ${name} : undefined` );
+			exportedSymbols.forEach( symbol => {
+
+				if ( ! LIFECYCLE_METHODS.includes( symbol.export ) ) {
+
+					returnFields.push( `get "${symbol.export}"() { return typeof ${symbol.local} !== \'undefined\' ? ${symbol.local} : undefined; }` );
+
+				}
+
+			} );
+
 			const executor = new Function( ...symbols, `${strippedCode}\nreturn { ${returnFields.join( ', ' )} };\n//# sourceURL=playground-eval.js` );
 			const instance = executor( ...values );
 
@@ -1096,6 +1057,46 @@ class CodeRunner extends EventDispatcher {
 			} );
 
 		}
+
+	}
+
+	dispose() {
+
+		for ( const baseName of Object.keys( this.scripts ) ) {
+
+			const scriptConfig = this.scripts[ baseName ];
+			if ( scriptConfig && scriptConfig.instance ) {
+
+				if ( scriptConfig.instance.dispose ) {
+
+					try {
+
+						scriptConfig.instance.dispose();
+
+					} catch ( e ) {
+
+						console.error( `Error disposing script ${baseName}:`, e );
+
+					}
+
+				}
+
+				for ( const key of Object.keys( scriptConfig.instance ) ) {
+
+					if ( ! LIFECYCLE_METHODS.includes( key ) ) {
+
+						delete this.env[ key ];
+
+					}
+
+				}
+
+			}
+
+		}
+
+		this.scripts = {};
+		this.activeScriptNames = [];
 
 	}
 

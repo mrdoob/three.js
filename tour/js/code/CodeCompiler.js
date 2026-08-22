@@ -361,7 +361,7 @@ class CodeCompiler {
 				if ( ! pattern ) return;
 				if ( pattern.type === 'Identifier' ) {
 
-					if ( pattern.name !== 'debug' && ! [ 'init', 'update', 'resize', 'dispose' ].includes( pattern.name ) ) {
+					if ( pattern.name !== 'debug' && ! [ 'init', 'refresh', 'update', 'resize', 'dispose' ].includes( pattern.name ) ) {
 
 						set.add( pattern.name );
 
@@ -409,7 +409,7 @@ class CodeCompiler {
 
 						node.specifiers.forEach( spec => {
 
-							if ( spec.local && ! [ 'init', 'update', 'resize', 'dispose' ].includes( spec.local.name ) ) {
+							if ( spec.local && ! [ 'init', 'refresh', 'update', 'resize', 'dispose' ].includes( spec.local.name ) ) {
 
 								declared.add( spec.local.name );
 								exported.add( spec.local.name );
@@ -423,7 +423,7 @@ class CodeCompiler {
 				} else if ( node.type === 'ExportDefaultDeclaration' ) {
 
 					decl = node.declaration;
-					if ( decl && ( decl.type === 'FunctionDeclaration' || decl.type === 'ClassDeclaration' ) && decl.id && ! [ 'init', 'update', 'resize', 'dispose' ].includes( decl.id.name ) ) {
+					if ( decl && ( decl.type === 'FunctionDeclaration' || decl.type === 'ClassDeclaration' ) && decl.id && ! [ 'init', 'refresh', 'update', 'resize', 'dispose' ].includes( decl.id.name ) ) {
 
 						declared.add( decl.id.name );
 						exported.add( decl.id.name );
@@ -449,7 +449,7 @@ class CodeCompiler {
 
 					} else if ( decl.type === 'FunctionDeclaration' || decl.type === 'ClassDeclaration' ) {
 
-						if ( decl.id && ! [ 'init', 'update', 'resize', 'dispose' ].includes( decl.id.name ) ) {
+						if ( decl.id && ! [ 'init', 'refresh', 'update', 'resize', 'dispose' ].includes( decl.id.name ) ) {
 
 							declared.add( decl.id.name );
 							if ( node.type === 'ExportNamedDeclaration' ) {
@@ -807,7 +807,7 @@ class CodeCompiler {
 				if ( node.type === 'FunctionDeclaration' ) {
 
 					const fnName = node.id ? node.id.name : '__default_export__';
-					if ( [ 'init', 'update', 'resize', 'dispose' ].includes( fnName ) ) {
+					if ( [ 'init', 'refresh', 'update', 'resize', 'dispose' ].includes( fnName ) ) {
 
 						const params = node.params.map( p => fileCode.substring( p.start, p.end ) );
 						const body = fileCode.substring( node.body.start + 1, node.body.end - 1 );

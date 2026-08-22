@@ -286,67 +286,74 @@ function parse( md ) {
 
 	html = parts.join( '`' );
 
-	// Group consecutive > Important: callout blocks
-	const importantRegex = /(?:^|\n)[ \t]*>[ \t]*Important:[ \t]*([^\n]+(?:\n[ \t]*[^\n<>:|]+)*)/gi;
-	const impMatches = [];
-	let impMatch;
-	while ( ( impMatch = importantRegex.exec( html ) ) !== null ) {
+	// Helper to parse callout blocks (Important, Note, etc.)
+	const parseCallouts = ( tag, title, icon, className ) => {
 
-		impMatches.push( {
-			index: impMatch.index,
-			length: impMatch[ 0 ].length,
-			content: impMatch[ 1 ].trim()
-		} );
+		const regex = new RegExp( `(?:^|\\n)[ \\t]*>[ \\t]*${tag}:[ \\t]*([^\\n]+(?:\\n[ \\t]*[^\\n<>:|]+)*)`, 'gi' );
+		const matches = [];
+		let match;
+		while ( ( match = regex.exec( html ) ) !== null ) {
 
-	}
+			matches.push( {
+				index: match.index,
+				length: match[ 0 ].length,
+				content: match[ 1 ].trim()
+			} );
 
-	const impGroups = [];
-	let currentImpGroup = [];
-	for ( let i = 0; i < impMatches.length; i ++ ) {
+		}
 
-		const m = impMatches[ i ];
-		if ( currentImpGroup.length === 0 ) {
+		const groups = [];
+		let currentGroup = [];
+		for ( let i = 0; i < matches.length; i ++ ) {
 
-			currentImpGroup.push( m );
+			const m = matches[ i ];
+			if ( currentGroup.length === 0 ) {
 
-		} else {
-
-			const prev = currentImpGroup[ currentImpGroup.length - 1 ];
-			const between = html.substring( prev.index + prev.length, m.index );
-			if ( /^\s*$/.test( between ) ) {
-
-				currentImpGroup.push( m );
+				currentGroup.push( m );
 
 			} else {
 
-				impGroups.push( currentImpGroup );
-				currentImpGroup = [ m ];
+				const prev = currentGroup[ currentGroup.length - 1 ];
+				const between = html.substring( prev.index + prev.length, m.index );
+				if ( /^\s*$/.test( between ) ) {
+
+					currentGroup.push( m );
+
+				} else {
+
+					groups.push( currentGroup );
+					currentGroup = [ m ];
+
+				}
 
 			}
 
 		}
 
-	}
+		if ( currentGroup.length > 0 ) {
 
-	if ( currentImpGroup.length > 0 ) {
+			groups.push( currentGroup );
 
-		impGroups.push( currentImpGroup );
+		}
 
-	}
+		for ( let g = groups.length - 1; g >= 0; g -- ) {
 
-	for ( let g = impGroups.length - 1; g >= 0; g -- ) {
+			const group = groups[ g ];
+			const first = group[ 0 ];
+			const last = group[ group.length - 1 ];
 
-		const group = impGroups[ g ];
-		const first = group[ 0 ];
-		const last = group[ group.length - 1 ];
+			const itemsHtml = group.map( item => `<div class="${className}-item">${marked.parseInline( item.content )}</div>` ).join( `<div class="${className}-divider"></div>` );
 
-		const itemsHtml = group.map( item => `<div class="tour-important-item">${marked.parseInline( item.content )}</div>` ).join( '<div class="tour-important-divider"></div>' );
+			const groupHtml = `\n\n<div class="${className}-block"><div class="${className}-header"><span class="${className}-icon">${icon}</span> ${title}</div><div class="${className}-content">${itemsHtml}</div></div>\n\n`;
 
-		const groupHtml = `\n\n<div class="tour-important-block"><div class="tour-important-header"><span class="tour-important-icon">⚠️</span> Important</div><div class="tour-important-content">${itemsHtml}</div></div>\n\n`;
+			html = html.substring( 0, first.index ) + groupHtml + html.substring( last.index + last.length );
 
-		html = html.substring( 0, first.index ) + groupHtml + html.substring( last.index + last.length );
+		}
 
-	}
+	};
+
+	parseCallouts( 'Important', 'Important', '⚠️', 'tour-important' );
+	parseCallouts( 'Note', 'Note', '📌', 'tour-note' );
 
 	// Group consecutive API blocks
 	const apiBlockRegex = /::: api\s+([^\n]+?)(?:\s*:::\s*(?=\n|$)|(?:\r?\n([\s\S]*?):::))/gi;
@@ -507,7 +514,7 @@ function formatSignatureArgs( argsText ) {
 
 	if ( ! argsText || ! argsText.trim() ) return '';
 
-	const args = argsText.split( ',' ).map( a => a.trim() );
+	const args = argsText.split( ',' ).map( a => a.trim() ).filter( Boolean );
 	const formattedArgs = [];
 
 	for ( const arg of args ) {
@@ -515,17 +522,17 @@ function formatSignatureArgs( argsText ) {
 		let cleanArg = arg;
 		let isOptional = false;
 
-		// Check if parameter name has `?` (e.g. `adjustment?` or `adjustment? = 1`)
-		if ( cleanArg.includes( '?' ) ) {
+		// Check if parameter has `?` or default value `= ...`
+		if ( cleanArg.includes( '?' ) || cleanArg.includes( '=' ) ) {
 
 			isOptional = true;
 			cleanArg = cleanArg.replace( '?', '' );
 
 		}
 
-		const optionalHtml = isOptional ? `<span class="tsl-sig-param-optional">?</span>` : '';
+		const optionalHtml = isOptional ? '<span class="tsl-sig-param-optional">?</span>' : '';
 
-		// Check if it has a colon (typed argument like `callback: Function`)
+		// Check if it has a colon (typed argument like `callback: Function` or `type: string = null`)
 		const colonMatch = cleanArg.match( /^(\.*)?([a-zA-Z0-9_./-]+)\s*:\s*(.+)$/ );
 		if ( colonMatch ) {
 
@@ -583,7 +590,7 @@ function formatSignatureArgs( argsText ) {
 function formatApiFunctionName( funcName ) {
 
 	const dotIndex = funcName.lastIndexOf( '.' );
-	if ( dotIndex !== -1 ) {
+	if ( dotIndex !== - 1 ) {
 
 		const prefix = funcName.substring( 0, dotIndex ).trim();
 		const name = funcName.substring( dotIndex + 1 ).trim();
@@ -591,7 +598,16 @@ function formatApiFunctionName( funcName ) {
 		let prefixHtml = '';
 		if ( prefix ) {
 
-			prefixHtml = `<span class="tsl-sig-param-val">${prefix}</span>`;
+			if ( prefix.endsWith( '()' ) ) {
+
+				const base = prefix.substring( 0, prefix.length - 2 );
+				prefixHtml = `<span class="tsl-sig-func-name">${base}</span><span class="tsl-sig-paren">()</span>`;
+
+			} else {
+
+				prefixHtml = `<span class="tsl-sig-param-val">${prefix}</span>`;
+
+			}
 
 		}
 
@@ -603,13 +619,103 @@ function formatApiFunctionName( funcName ) {
 
 }
 
+function formatApiParameters( argsText ) {
+
+	if ( ! argsText || ! argsText.trim() ) return '';
+
+	const args = argsText.split( ',' ).map( a => a.trim() ).filter( Boolean );
+	let paramsHtml = '';
+
+	for ( const arg of args ) {
+
+		let cleanArg = arg;
+		let isOptional = false;
+
+		if ( cleanArg.includes( '?' ) || cleanArg.includes( '=' ) ) {
+
+			isOptional = true;
+			cleanArg = cleanArg.replace( '?', '' );
+
+		}
+
+		const optionalHtml = isOptional ? '<span class="tsl-sig-param-optional">?</span>' : '';
+
+		const typedArgMatch = cleanArg.match( /^(\.*)?([a-zA-Z0-9_./-]+)\s*:\s*(.+)$/ );
+		if ( typedArgMatch ) {
+
+			const dots = typedArgMatch[ 1 ] || '';
+			const paramName = typedArgMatch[ 2 ].trim();
+			const typesAndDefault = typedArgMatch[ 3 ].trim();
+			const fullName = dots + paramName;
+
+			let typesText = typesAndDefault;
+			let defaultVal = '';
+			if ( typesAndDefault.includes( '=' ) ) {
+
+				const eqIdx = typesAndDefault.indexOf( '=' );
+				typesText = typesAndDefault.substring( 0, eqIdx ).trim();
+				defaultVal = typesAndDefault.substring( eqIdx + 1 ).trim();
+
+			}
+
+			const typeTokens = typesText.split( '|' ).map( t => t.trim() );
+			let typeHtml = '';
+			for ( let i = 0; i < typeTokens.length; i ++ ) {
+
+				if ( i > 0 ) typeHtml += ' <span class="tsl-param-type-separator">|</span> ';
+
+				let token = typeTokens[ i ];
+				const isString = ( token.startsWith( '\'' ) && token.endsWith( '\'' ) ) || ( token.startsWith( '"' ) && token.endsWith( '"' ) );
+				const isKeyword = token === 'null' || token === 'true' || token === 'false';
+
+				token = token.replace( /</g, '&lt;' ).replace( />/g, '&gt;' );
+
+				let className = 'tsl-param-type';
+				if ( isString ) className += ' tsl-param-type-string';
+				else if ( isKeyword ) className += ' tsl-param-type-keyword';
+
+				typeHtml += `<span class="${className}">${token}</span>`;
+
+			}
+
+			if ( defaultVal ) {
+
+				const isString = ( defaultVal.startsWith( '\'' ) && defaultVal.endsWith( '\'' ) ) || ( defaultVal.startsWith( '"' ) && defaultVal.endsWith( '"' ) );
+				const isKeyword = defaultVal === 'null' || defaultVal === 'true' || defaultVal === 'false';
+				const isNumber = ! isNaN( Number( defaultVal ) ) && ! isKeyword;
+
+				let className = 'tsl-param-type';
+				if ( isString ) className = 'tsl-param-type-string';
+				else if ( isKeyword ) className = 'tsl-param-type-keyword';
+				else if ( isNumber ) className = 'tsl-param-type-number';
+
+				typeHtml += ` <span class="tsl-sig-param-op">=</span> <span class="${className}">${defaultVal}</span>`;
+
+			}
+
+			paramsHtml += `
+		<div class="tsl-param">
+			<div class="tsl-param-header">
+				<span class="tsl-param-name">${fullName}</span>${optionalHtml}
+				${typeHtml}
+			</div>
+		</div>`;
+
+		}
+
+	}
+
+	return paramsHtml;
+
+}
+
 function renderSingleApiCard( signature, body ) {
 
 	let sigText = signature;
 	let rowDesc = '';
 	let returnTypeHtml = '';
 
-	const sigMatch = sigText.match( /^([^\s:\-—–]+(?:\([^\)]*\))?)(?:\s*(?::|->)\s*([a-zA-Z0-9_|`\s]+?))?\s*[\-—–]\s*(.+)$/ );
+	const sigMatch = sigText.match( /^(.*?)(?:\s*(?::|->)\s*([a-zA-Z0-9_|`<>\[\]\s]+?))?\s*[\-—–]\s*(.+)$/ );
 	if ( sigMatch ) {
 
 		sigText = sigMatch[ 1 ].trim();
@@ -626,7 +732,8 @@ function renderSingleApiCard( signature, body ) {
 			for ( let i = 0; i < retTypeTokens.length; i ++ ) {
 
 				if ( i > 0 ) retHtml += ' <span class="tsl-param-type-separator">|</span> ';
-				retHtml += `<span class="tsl-param-type">${retTypeTokens[ i ]}</span>`;
+				const escapedToken = retTypeTokens[ i ].replace( /</g, '&lt;' ).replace( />/g, '&gt;' );
+				retHtml += `<span class="tsl-param-type">${escapedToken}</span>`;
 
 			}
 
@@ -639,7 +746,7 @@ function renderSingleApiCard( signature, body ) {
 	let sigHtml = '';
 	let paramsHtml = '';
 
-	const parenMatch = sigText.match( /^(.*?)\((.*?)\)$/ );
+	const parenMatch = sigText.match( /^(.*)\(([^()]*)\)$/ );
 	if ( parenMatch ) {
 
 		const funcName = parenMatch[ 1 ].trim();
@@ -647,42 +754,20 @@ function renderSingleApiCard( signature, body ) {
 
 		const argsHtml = formatSignatureArgs( argsText );
 		const funcNameHtml = formatApiFunctionName( funcName );
-		sigHtml = `<div class="tsl-api-sig-left"><code>${funcNameHtml}<span class="tsl-sig-paren">(</span></code>${argsHtml}<code><span class="tsl-sig-paren">)</span></code></div>`;
 
-		// Auto-generate single parameter descriptor for single-argument typed signatures
-		const typedArgMatch = argsText.match( /^(\.*)?([a-zA-Z0-9_./-]+)\s*:\s*(.+)$/ );
-		if ( typedArgMatch ) {
+		if ( argsHtml ) {
 
-			const dots = typedArgMatch[ 1 ] || '';
-			const paramName = typedArgMatch[ 2 ].trim();
-			const typesText = typedArgMatch[ 3 ].trim();
-			const fullName = dots + paramName;
+			sigHtml = `<div class="tsl-api-sig-left"><code>${funcNameHtml}<span class="tsl-sig-paren">( </span>${argsHtml}<span class="tsl-sig-paren"> )</span></code></div>`;
 
-			const typeTokens = typesText.split( '|' ).map( t => t.trim() );
-			let typeHtml = '';
-			for ( let i = 0; i < typeTokens.length; i ++ ) {
+		} else {
 
-				if ( i > 0 ) typeHtml += ' <span class="tsl-param-type-separator">|</span> ';
+			sigHtml = `<div class="tsl-api-sig-left"><code>${funcNameHtml}<span class="tsl-sig-paren">()</span></code></div>`;
 
-				const token = typeTokens[ i ];
-				const isString = ( token.startsWith( '\'' ) && token.endsWith( '\'' ) ) || ( token.startsWith( '"' ) && token.endsWith( '"' ) );
-				const isKeyword = token === 'null' || token === 'true' || token === 'false';
+		}
 
-				let className = 'tsl-param-type';
-				if ( isString ) className += ' tsl-param-type-string';
-				else if ( isKeyword ) className += ' tsl-param-type-keyword';
+		if ( ! body || ! body.trim() ) {
 
-				typeHtml += `<span class="${className}">${token}</span>`;
-
-			}
-
-			paramsHtml = `
-		<div class="tsl-param">
-			<div class="tsl-param-header">
-				<span class="tsl-param-name">${fullName}</span>
-				${typeHtml}
-			</div>
-		</div>`;
+			paramsHtml = formatApiParameters( argsText );
 
 		}
 
@@ -704,9 +789,19 @@ function renderSingleApiCard( signature, body ) {
 			const paramMatch = line.match( /^[\-\*]\s+\*\*([a-zA-Z0-9_./-]+)\*\*\s*:\s*`([^`]+)`\s*(?:[\u2014\-]\s*)?([\s\S]*)$/ );
 			if ( paramMatch ) {
 
-				const name = paramMatch[ 1 ].trim();
+				let name = paramMatch[ 1 ].trim();
 				const type = paramMatch[ 2 ].trim();
 				const desc = paramMatch[ 3 ].trim();
+				let isOptional = false;
+
+				if ( name.includes( '?' ) || desc.toLowerCase().startsWith( '(optional)' ) || type.includes( '=' ) ) {
+
+					isOptional = true;
+					name = name.replace( '?', '' );
+
+				}
+
+				const optionalHtml = isOptional ? '<span class="tsl-sig-param-optional">?</span>' : '';
 
 				const parsedDesc = marked.parseInline( desc ).replace( /<code>([^<]+)<\/code>/g, ( m, content ) => {
 
@@ -740,7 +835,7 @@ function renderSingleApiCard( signature, body ) {
 				paramsHtml += `
 		<div class="tsl-param">
 			<div class="tsl-param-header">
-				<span class="tsl-param-name">${name}</span>
+				<span class="tsl-param-name">${name}</span>${optionalHtml}
 				${typeHtml}
 			</div>
 			<div class="tsl-param-desc">${parsedDesc}</div>
@@ -781,7 +876,7 @@ function renderApiTableCard( group ) {
 		let rowDesc = '';
 		let returnTypeHtml = '';
 
-		const sigMatch = sigText.match( /^([^\s:\-—–]+(?:\([^\)]*\))?)(?:\s*(?::|->)\s*([a-zA-Z0-9_|`\s]+?))?\s*[\-—–]\s*(.+)$/ );
+		const sigMatch = sigText.match( /^(.*?)(?:\s*(?::|->)\s*([a-zA-Z0-9_|`<>\[\]\s]+?))?\s*[\-—–]\s*(.+)$/ );
 		if ( sigMatch ) {
 
 			sigText = sigMatch[ 1 ].trim();
@@ -798,7 +893,8 @@ function renderApiTableCard( group ) {
 				for ( let i = 0; i < retTypeTokens.length; i ++ ) {
 
 					if ( i > 0 ) retHtml += ' <span class="tsl-param-type-separator">|</span> ';
-					retHtml += `<span class="tsl-param-type">${retTypeTokens[ i ]}</span>`;
+					const escapedToken = retTypeTokens[ i ].replace( /</g, '&lt;' ).replace( />/g, '&gt;' );
+					retHtml += `<span class="tsl-param-type">${escapedToken}</span>`;
 
 				}
 
@@ -811,7 +907,7 @@ function renderApiTableCard( group ) {
 		let sigHtml = '';
 		let paramsHtml = '';
 
-		const parenMatch = sigText.match( /^(.*?)\((.*?)\)$/ );
+		const parenMatch = sigText.match( /^(.*)\(([^()]*)\)$/ );
 		if ( parenMatch ) {
 
 			const funcName = parenMatch[ 1 ].trim();
@@ -819,42 +915,20 @@ function renderApiTableCard( group ) {
 
 			const argsHtml = formatSignatureArgs( argsText );
 			const funcNameHtml = formatApiFunctionName( funcName );
-			sigHtml = `<div class="tsl-api-sig-left"><code>${funcNameHtml}<span class="tsl-sig-paren">(</span></code>${argsHtml}<code><span class="tsl-sig-paren">)</span></code></div>`;
 
-			// Auto-generate single parameter descriptor for single-argument typed signatures
-			const typedArgMatch = argsText.match( /^(\.*)?([a-zA-Z0-9_./-]+)\s*:\s*(.+)$/ );
-			if ( typedArgMatch ) {
+			if ( argsHtml ) {
 
-				const dots = typedArgMatch[ 1 ] || '';
-				const paramName = typedArgMatch[ 2 ].trim();
-				const typesText = typedArgMatch[ 3 ].trim();
-				const fullName = dots + paramName;
+				sigHtml = `<div class="tsl-api-sig-left"><code>${funcNameHtml}<span class="tsl-sig-paren">( </span>${argsHtml}<span class="tsl-sig-paren"> )</span></code></div>`;
 
-				const typeTokens = typesText.split( '|' ).map( t => t.trim() );
-				let typeHtml = '';
-				for ( let i = 0; i < typeTokens.length; i ++ ) {
+			} else {
 
-					if ( i > 0 ) typeHtml += ' <span class="tsl-param-type-separator">|</span> ';
+				sigHtml = `<div class="tsl-api-sig-left"><code>${funcNameHtml}<span class="tsl-sig-paren">()</span></code></div>`;
 
-					const token = typeTokens[ i ];
-					const isString = ( token.startsWith( '\'' ) && token.endsWith( '\'' ) ) || ( token.startsWith( '"' ) && token.endsWith( '"' ) );
-					const isKeyword = token === 'null' || token === 'true' || token === 'false';
+			}
 
-					let className = 'tsl-param-type';
-					if ( isString ) className += ' tsl-param-type-string';
-					else if ( isKeyword ) className += ' tsl-param-type-keyword';
+			if ( ! block.body || ! block.body.trim() ) {
 
-					typeHtml += `<span class="${className}">${token}</span>`;
-
-				}
-
-				paramsHtml = `
-			<div class="tsl-param">
-				<div class="tsl-param-header">
-					<span class="tsl-param-name">${fullName}</span>
-					${typeHtml}
-				</div>
-			</div>`;
+				paramsHtml = formatApiParameters( argsText );
 
 			}
 
@@ -973,7 +1047,7 @@ function renderTweetGroup( tweets ) {
 
 	const gridClass = tweets.length > 1 ? 'x-tweets-grid' : 'x-tweet-single';
 
-	return `\n\n<div class="${gridClass}">${tweetsHtml}</div>\n<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>\n\n`;
+	return `\n\n<div class="${gridClass}">${tweetsHtml}</div>\n\n`;
 
 }
 
@@ -987,8 +1061,8 @@ function tokenizeInlineCode( codeContent ) {
 		.replace( /&lt;/g, '<' )
 		.replace( /&amp;/g, '&' )
 		.replace( /&quot;/g, '"' )
-		.replace( /&#39;/g, "'" )
-		.replace( /&apos;/g, "'" );
+		.replace( /&#39;/g, '\'' )
+		.replace( /&apos;/g, '\'' );
 
 	// Helper to escape characters back to HTML entities safely
 	const escapeHtml = ( str ) => {
@@ -1091,4 +1165,4 @@ function isTslBuiltIn( name ) {
 
 }
 
-export { parseTour, parse };
+export { parseTour, parse, tokenizeInlineCode };

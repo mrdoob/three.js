@@ -31,9 +31,6 @@
 			}
 		</script>
 
-		<!-- Monaco Editor -->
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.46.0/min/vs/loader.min.js"></script>
-
 	</head>
 
 	<body class="app-container loading">
@@ -55,7 +52,7 @@
 						</svg>
 					</div>
 				</div>
-				<div class="loading-text-container">
+				<div class="loading-text-container" style="display: none">
 					<div class="loading-text"><span class="loading-text-light">Tour of </span><span class="loading-text-bold">TSL</span></div>
 					<div class="loading-subtext">Loading</div>
 				</div>
@@ -212,6 +209,12 @@
 							<div class="console-header" id="console-header">
 								<div class="console-title">&gt; CONSOLE</div>
 								<div class="console-header-actions">
+									<button class="console-close" id="console-copy-btn" title="Copy Console Logs">
+										<i data-icon="copy" id="console-copy-icon" style="width: 0.95rem; height: 0.95rem;"></i>
+									</button>
+									<button class="console-close" id="console-clear-btn" title="Clear Console">
+										<i data-icon="broom" id="console-clear-icon" style="width: 0.95rem; height: 0.95rem;"></i>
+									</button>
 									<button class="console-close" id="console-toggle-btn" title="Toggle Console">
 										<i data-icon="chevron-up" id="console-toggle-icon" style="width: 0.95rem; height: 0.95rem;"></i>
 									</button>

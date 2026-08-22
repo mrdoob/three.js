@@ -4,12 +4,13 @@ import { EventDispatcher } from 'three';
 import { generateDeclarations } from '../utils/CodeEditorUtils.js';
 import { CodeCompiler } from '../code/CodeCompiler.js';
 
+let _monaco;
 let _monacoConfigured = false;
+let _currentImportedSymbolsStr = '';
 
 const tslConstants = new Set();
 const tslFunctions = new Set();
 const tslChaining = new Set();
-let _currentImportedSymbolsStr = '';
 
 const buildRegex = ( words, prefix = '', suffix = '\\b' ) => {
 
@@ -28,7 +29,7 @@ const updateTokenizerForCode = async () => {
 		const importRegex = /import\s*\{([^}]+)\}\s*from\s*['"](?:three\/tsl|three\/addons\/tsl\/[^'"]+)['"]/g;
 
 		// Gather imports from all open models in Monaco
-		window.monaco.editor.getModels().forEach( model => {
+		_monaco.editor.getModels().forEach( model => {
 
 			const langId = model.getLanguageId();
 			if ( langId === 'javascript' || langId === 'typescript' ) {
@@ -62,7 +63,7 @@ const updateTokenizerForCode = async () => {
 		const activeConstants = Array.from( tslConstants ).filter( key => importedSymbols.has( key ) );
 		const activeFunctions = Array.from( tslFunctions ).filter( key => importedSymbols.has( key ) );
 
-		const allLangs = window.monaco.languages.getLanguages();
+		const allLangs = _monaco.languages.getLanguages();
 		for ( const langId of [ 'javascript', 'typescript' ] ) {
 
 			const langDef = allLangs.find( ( { id } ) => id === langId );
@@ -114,7 +115,7 @@ const updateTokenizerForCode = async () => {
 
 					}
 
-					window.monaco.languages.setMonarchTokensProvider( langId, lang );
+					_monaco.languages.setMonarchTokensProvider( langId, lang );
 
 				}
 
@@ -197,6 +198,39 @@ const ADDONS_TSL_IMPORTS = {
 	softParticles: 'three/addons/tsl/utils/SoftParticles.js'
 };
 
+let _monacoLoaderPromise = null;
+
+function ensureMonaco() {
+
+	if ( _monaco ) return Promise.resolve( _monaco );
+	if ( _monacoLoaderPromise ) return _monacoLoaderPromise;
+
+	_monacoLoaderPromise = new Promise( ( resolve, reject ) => {
+
+		const script = document.createElement( 'script' );
+		script.src = 'https://cdn.jsdelivr.net/npm/monaco-editor@0.55.1/min/vs/loader.js';
+		script.onload = () => {
+
+			require.config( { paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.55.1/min/vs' } } );
+			require( [ 'vs/editor/editor.main' ], () => {
+
+				_monaco = window.monaco;
+
+				resolve( _monaco );
+
+			}, reject );
+
+		};
+
+		script.onerror = reject;
+		document.head.appendChild( script );
+
+	} );
+
+	return _monacoLoaderPromise;
+
+}
+
 class CodeEditor extends EventDispatcher {
 
 	constructor( { container, value = '', readOnly = false, language = 'javascript', scrollable = true } = {} ) {
@@ -218,19 +252,11 @@ class CodeEditor extends EventDispatcher {
 
 	_initMonaco() {
 
-		if ( typeof window.require === 'undefined' ) {
-
-			console.error( 'RequireJS / Monaco loader script is missing.' );
-			return;
-
-		}
-
-		window.require.config( { paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.55.1/min/vs' } } );
-		window.require( [ 'vs/editor/editor.main' ], () => {
+		ensureMonaco().then( () => {
 
 			if ( ! _monacoConfigured ) {
 
-				window.monaco.editor.defineTheme( 'chatgpt-dark', {
+				_monaco.editor.defineTheme( 'chatgpt-dark', {
 					base: 'vs-dark',
 					inherit: true,
 					rules: [
@@ -318,72 +344,72 @@ class CodeEditor extends EventDispatcher {
 				const customSnippets = [
 					{
 						label: 'Fn',
-						kind: window.monaco.languages.CompletionItemKind.Snippet,
+						kind: _monaco.languages.CompletionItemKind.Snippet,
 						detail: 'TSL Function (Object parameters)',
 						insertText: 'Fn( ( { ${1:arg} } ) => {\n\t${0}\n} )',
-						insertTextRules: window.monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+						insertTextRules: _monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 						moduleName: 'three/tsl'
 					},
 					{
 						label: 'Fn',
-						kind: window.monaco.languages.CompletionItemKind.Snippet,
+						kind: _monaco.languages.CompletionItemKind.Snippet,
 						detail: 'TSL Function (Array parameters)',
 						insertText: 'Fn( ( [ ${1:arg} ] ) => {\n\t${0}\n} )',
-						insertTextRules: window.monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+						insertTextRules: _monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 						moduleName: 'three/tsl'
 					},
 					{
 						label: 'If',
-						kind: window.monaco.languages.CompletionItemKind.Snippet,
+						kind: _monaco.languages.CompletionItemKind.Snippet,
 						detail: 'TSL Conditional branch',
 						insertText: 'If( ${1:condition}, () => {\n\t${0}\n} )',
-						insertTextRules: window.monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+						insertTextRules: _monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 						moduleName: 'three/tsl'
 					},
 					{
 						label: 'ElseIf',
-						kind: window.monaco.languages.CompletionItemKind.Snippet,
+						kind: _monaco.languages.CompletionItemKind.Snippet,
 						detail: 'TSL ElseIf chain',
 						insertText: 'ElseIf( ${1:condition}, () => {\n\t${0}\n} )',
-						insertTextRules: window.monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+						insertTextRules: _monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
 					},
 					{
 						label: 'Else',
-						kind: window.monaco.languages.CompletionItemKind.Snippet,
+						kind: _monaco.languages.CompletionItemKind.Snippet,
 						detail: 'TSL Else chain',
 						insertText: 'Else( () => {\n\t${0}\n} )',
-						insertTextRules: window.monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+						insertTextRules: _monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
 					},
 					{
 						label: 'Loop',
-						kind: window.monaco.languages.CompletionItemKind.Snippet,
+						kind: _monaco.languages.CompletionItemKind.Snippet,
 						detail: 'TSL Loop (count)',
 						insertText: 'Loop( ${1:count}, ( { i } ) => {\n\t${0}\n} )',
-						insertTextRules: window.monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+						insertTextRules: _monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 						moduleName: 'three/tsl'
 					},
 					{
 						label: 'Loop',
-						kind: window.monaco.languages.CompletionItemKind.Snippet,
+						kind: _monaco.languages.CompletionItemKind.Snippet,
 						detail: 'TSL Loop (range)',
 						insertText: 'Loop( { start: ${1:int( 0 )}, end: ${2:int( 10 )}, type: \'int\' }, ( { i } ) => {\n\t${0}\n} )',
-						insertTextRules: window.monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+						insertTextRules: _monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 						moduleName: 'three/tsl'
 					},
 					{
 						label: 'Switch',
-						kind: window.monaco.languages.CompletionItemKind.Snippet,
+						kind: _monaco.languages.CompletionItemKind.Snippet,
 						detail: 'TSL Switch-Case',
 						insertText: 'Switch( ${1:value} )\n\t.Case( ${2:0}, () => {\n\t\t${3}\n\t} )\n\t.Default( () => {\n\t\t${4}\n\t} );',
-						insertTextRules: window.monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+						insertTextRules: _monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 						moduleName: 'three/tsl'
 					},
 					{
 						label: 'uniform',
-						kind: window.monaco.languages.CompletionItemKind.Snippet,
+						kind: _monaco.languages.CompletionItemKind.Snippet,
 						detail: 'TSL uniform variable',
 						insertText: 'uniform( ${1:value} )',
-						insertTextRules: window.monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+						insertTextRules: _monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 						moduleName: 'three/tsl'
 					}
 				];
@@ -394,7 +420,7 @@ class CodeEditor extends EventDispatcher {
 
 				suggestionsTemplates.push( {
 					label: 'THREE',
-					kind: window.monaco.languages.CompletionItemKind.Module,
+					kind: _monaco.languages.CompletionItemKind.Module,
 					detail: 'Auto-import THREE namespace',
 					insertText: 'THREE',
 					moduleName: 'three-namespace'
@@ -407,10 +433,10 @@ class CodeEditor extends EventDispatcher {
 						if ( overriddenKeys.has( key ) ) return;
 
 						const val = TSL[ key ];
-						let kind = window.monaco.languages.CompletionItemKind.Variable;
+						let kind = _monaco.languages.CompletionItemKind.Variable;
 						if ( typeof val === 'function' ) {
 
-							kind = window.monaco.languages.CompletionItemKind.Function;
+							kind = _monaco.languages.CompletionItemKind.Function;
 
 						}
 
@@ -431,16 +457,16 @@ class CodeEditor extends EventDispatcher {
 					if ( /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test( key ) ) {
 
 						const val = THREE[ key ];
-						let kind = window.monaco.languages.CompletionItemKind.Variable;
+						let kind = _monaco.languages.CompletionItemKind.Variable;
 						if ( typeof val === 'function' ) {
 
 							if ( key[ 0 ] === key[ 0 ].toUpperCase() ) {
 
-								kind = window.monaco.languages.CompletionItemKind.Class;
+								kind = _monaco.languages.CompletionItemKind.Class;
 
 							} else {
 
-								kind = window.monaco.languages.CompletionItemKind.Function;
+								kind = _monaco.languages.CompletionItemKind.Function;
 
 							}
 
@@ -460,10 +486,10 @@ class CodeEditor extends EventDispatcher {
 
 				Object.entries( ADDONS_TSL_IMPORTS ).forEach( ( [ key, modulePath ] ) => {
 
-					let kind = window.monaco.languages.CompletionItemKind.Function;
+					let kind = _monaco.languages.CompletionItemKind.Function;
 					if ( key[ 0 ] === key[ 0 ].toUpperCase() ) {
 
-						kind = window.monaco.languages.CompletionItemKind.Class;
+						kind = _monaco.languages.CompletionItemKind.Class;
 
 					}
 
@@ -477,7 +503,7 @@ class CodeEditor extends EventDispatcher {
 
 				} );
 
-				window.monaco.languages.registerCompletionItemProvider( 'javascript', {
+				_monaco.languages.registerCompletionItemProvider( 'javascript', {
 
 					provideCompletionItems: ( model, position ) => {
 
@@ -509,7 +535,7 @@ class CodeEditor extends EventDispatcher {
 
 								return [
 									{
-										range: new window.monaco.Range( 1, 1, 1, 1 ),
+										range: new _monaco.Range( 1, 1, 1, 1 ),
 										text: 'import * as THREE from \'three\';\n'
 									}
 								];
@@ -547,7 +573,7 @@ class CodeEditor extends EventDispatcher {
 
 								return [
 									{
-										range: new window.monaco.Range( startPos.lineNumber, startPos.column, endPos.lineNumber, endPos.column ),
+										range: new _monaco.Range( startPos.lineNumber, startPos.column, endPos.lineNumber, endPos.column ),
 										text: newImportStatement
 									}
 								];
@@ -556,7 +582,7 @@ class CodeEditor extends EventDispatcher {
 
 								return [
 									{
-										range: new window.monaco.Range( 1, 1, 1, 1 ),
+										range: new _monaco.Range( 1, 1, 1, 1 ),
 										text: `import { ${baseSymbol} } from '${moduleName}';\n`
 									}
 								];
@@ -593,13 +619,13 @@ class CodeEditor extends EventDispatcher {
 				} );
 
 				// Configure TypeScript/JavaScript language service settings
-				const typescriptDefaults = window.monaco.languages.typescript.javascriptDefaults;
+				const typescriptDefaults = _monaco.languages.typescript.javascriptDefaults;
 
 				typescriptDefaults.setCompilerOptions( {
-					target: window.monaco.languages.typescript.ScriptTarget.ES2020,
+					target: _monaco.languages.typescript.ScriptTarget.ES2020,
 					allowNonTsExtensions: true,
 					checkJs: true,
-					moduleResolution: window.monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+					moduleResolution: _monaco.languages.typescript.ModuleResolutionKind.NodeJs,
 					allowSyntheticDefaultImports: true,
 					autoImportSuggestions: false
 				} );
@@ -615,7 +641,7 @@ class CodeEditor extends EventDispatcher {
 				typescriptDefaults.addExtraLib( dtsContent, 'ts:three-tsl.d.ts' );
 
 				// Register formatting provider
-				window.monaco.languages.registerDocumentFormattingEditProvider( 'javascript', {
+				_monaco.languages.registerDocumentFormattingEditProvider( 'javascript', {
 
 					provideDocumentFormattingEdits: async ( model ) => {
 
@@ -695,7 +721,7 @@ class CodeEditor extends EventDispatcher {
 
 			}
 
-			this.editor = window.monaco.editor.create( this.container, options );
+			this.editor = _monaco.editor.create( this.container, options );
 
 			// Dynamic TSL syntax highlighting updates based on file imports
 			const updateHighlights = () => {
@@ -808,7 +834,7 @@ class CodeEditor extends EventDispatcher {
 
 			document.fonts.ready.then( () => {
 
-				window.monaco.editor.remeasureFonts();
+				_monaco.editor.remeasureFonts();
 				if ( ! this.scrollable && this.editor ) {
 
 					const contentHeight = this.editor.getContentHeight();
@@ -909,24 +935,24 @@ class CodeEditor extends EventDispatcher {
 
 	clearMarkers() {
 
-		if ( ! this.editor || ! window.monaco ) return;
-		window.monaco.editor.setModelMarkers( this.editor.getModel(), 'tsl', [] );
+		if ( ! this.editor || ! _monaco ) return;
+		_monaco.editor.setModelMarkers( this.editor.getModel(), 'tsl', [] );
 
 	}
 
 	setErrorMarker( line, column, message ) {
 
-		if ( ! this.editor || ! window.monaco ) return;
+		if ( ! this.editor || ! _monaco ) return;
 		const lineCount = this.editor.getModel().getLineCount();
 		if ( line <= lineCount ) {
 
-			window.monaco.editor.setModelMarkers( this.editor.getModel(), 'tsl', [ {
+			_monaco.editor.setModelMarkers( this.editor.getModel(), 'tsl', [ {
 				startLineNumber: line,
 				startColumn: column || 1,
 				endLineNumber: line,
 				endColumn: ( column || 1 ) + 100,
 				message: message,
-				severity: window.monaco.MarkerSeverity.Error
+				severity: _monaco.MarkerSeverity.Error
 			} ] );
 
 		}

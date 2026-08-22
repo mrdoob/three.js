@@ -334,20 +334,34 @@ class PlaygroundManager {
 
 		// Create Clean & Format button
 		const cleanBtn = document.createElement( 'button' );
-		cleanBtn.className = 'playground-history-btn playground-clean-btn';
-		cleanBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; display: block;"><path d="m19 2 3 3L6 21l-3-3L19 2Z"/><path d="M11.5 6.5 13 8M16 12h5M12 16h3M18 17.5 21 19M18 8.5 21 7"/></svg>';
+		cleanBtn.className = 'playground-tab-btn playground-clean-btn';
+		cleanBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; display: block;"><path d="m19 2 3 3L6 21l-3-3L19 2Z"/><path d="M11.5 6.5 13 8M16 12h5M12 16h3M18 17.5 21 19M18 8.5 21 7"/></svg>';
 		cleanBtn.title = 'Clean imports & Format code';
 		cleanBtn.onclick = async ( e ) => {
 
 			e.stopPropagation();
+
 			await this.cleanAndFormatActiveTab();
+
+		};
+
+		// Create Refresh button
+		const refreshBtn = document.createElement( 'button' );
+		refreshBtn.className = 'playground-tab-btn playground-refresh-btn';
+		refreshBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-refresh" style="width: 16px; height: 16px; display: block;"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>';
+		refreshBtn.title = 'Refresh WebGPU Renderer & Runner';
+		refreshBtn.onclick = async ( e ) => {
+
+			e.stopPropagation();
+
+			await this.tour.refresh();
 
 		};
 
 		// Create Undo & Redo buttons
 		const undoBtn = document.createElement( 'button' );
-		undoBtn.className = 'playground-history-btn playground-undo-btn';
-		undoBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; display: block;"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>';
+		undoBtn.className = 'playground-tab-btn playground-undo-btn';
+		undoBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; display: block;"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>';
 		undoBtn.title = 'Undo';
 		undoBtn.onclick = ( e ) => {
 
@@ -357,8 +371,8 @@ class PlaygroundManager {
 		};
 
 		const redoBtn = document.createElement( 'button' );
-		redoBtn.className = 'playground-history-btn playground-redo-btn';
-		redoBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; display: block;"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>';
+		redoBtn.className = 'playground-tab-btn playground-redo-btn';
+		redoBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; display: block;"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>';
 		redoBtn.title = 'Redo';
 		redoBtn.onclick = ( e ) => {
 
@@ -370,6 +384,7 @@ class PlaygroundManager {
 		this.tour.dom.tabsBar.appendChild( cleanBtn );
 		this.tour.dom.tabsBar.appendChild( undoBtn );
 		this.tour.dom.tabsBar.appendChild( redoBtn );
+		this.tour.dom.tabsBar.appendChild( refreshBtn );
 
 		this.updateUndoRedoButtons();
 
@@ -575,8 +590,8 @@ class PlaygroundManager {
 		const encoded = await compressString( JSON.stringify( {
 			tabs: this.playgroundTabs
 		} ) );
-		const release = THREE.RELEASE || THREE.REVISION;
-		const newHash = 'playground=' + encoded + ( release ? '&release=' + release : '' );
+		const revision = THREE.REVISION;
+		const newHash = 'playground=' + encoded + '&release=' + revision;
 		window.location.hash = newHash;
 
 	}

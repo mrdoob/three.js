@@ -2,10 +2,9 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 import { Fn, float, fract, fwidth, abs, saturate, max, smoothstep, length, positionWorld, vec4, reflector, pass } from 'three/tsl';
+import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
-let scene, camera, controls, defaultPass, renderPipeline, floor, reflection, dragging = false;
-
-const resetCameraOnRefresh = false;
+let scene, camera, controls, defaultPass, defaultAA, renderPipeline, floor, reflection, dragging = false;
 
 const gridTexture = Fn( ( [ coord, lineWidth = float( 0.01 ), dotSize = float( 0.03 ) ] ) => {
 
@@ -26,16 +25,6 @@ const gridTexture = Fn( ( [ coord, lineWidth = float( 0.01 ), dotSize = float( 0
 
 } );
 
-function refreshCamera() {
-
-	camera.position.set( 2, 3, 4 );
-	camera.lookAt( 0, 1, 0 );
-
-	controls.target.set( 0, 1, 0 );
-	controls.update();
-
-}
-
 function refresh() {
 
 	scene.clear();
@@ -48,18 +37,27 @@ function refresh() {
 
 	floor.visible = true;
 
-	renderPipeline.outputNode = defaultPass;
+	camera.position.set( 2, 3, 4 );
+	camera.lookAt( 0, 1, 0 );
+
+	controls.target.set( 0, 1, 0 );
+	controls.update();
+
+	renderPipeline.outputNode = defaultAA;
 	renderPipeline.needsUpdate = true;
-
-	if ( resetCameraOnRefresh ) {
-
-		refreshCamera();
-
-	}
 
 }
 
+const resetScene = refresh;
+
 async function init() {
+
+	if ( scene ) {
+
+		refresh();
+		return;
+
+	}
 
 	scene = new THREE.Scene();
 
@@ -67,6 +65,7 @@ async function init() {
 	camera.position.set( 2, 3, 4 );
 
 	defaultPass = pass( scene, camera );
+	defaultAA = smaa( defaultPass );
 
 	renderPipeline = new THREE.RenderPipeline( renderer );
 
@@ -119,7 +118,7 @@ async function init() {
 	scene.backgroundBlurriness = 0.65;
 	scene.backgroundIntensity = 0.15;
 
-	refreshCamera();
+	refresh();
 
 }
 
@@ -149,4 +148,4 @@ function debug() {
 
 }
 
-export { scene, camera, controls, defaultPass, renderPipeline, floor, dragging, init, refresh, update, resize, dispose, debug };
+export { scene, camera, controls, defaultPass, defaultAA, renderPipeline, floor, dragging, resetScene, refresh, debug };

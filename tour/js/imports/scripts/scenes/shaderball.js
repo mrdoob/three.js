@@ -3,11 +3,10 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 import { Fn, float, fract, fwidth, abs, saturate, max, smoothstep, length, positionWorld, positionLocal, vec4, reflector, pass } from 'three/tsl';
+import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
-let scene, camera, controls, defaultPass, renderPipeline, prefab, previewMesh, calibrationMesh, floor, reflection, dragging = false;
+let scene, camera, controls, defaultPass, defaultAA, renderPipeline, prefab, previewMesh, calibrationMesh, floor, reflection, dragging = false;
 let model;
-
-const resetCameraOnRefresh = false;
 
 const gridTexture = Fn( ( [ coord, lineWidth = float( 0.01 ), dotSize = float( 0.03 ) ] ) => {
 
@@ -28,49 +27,6 @@ const gridTexture = Fn( ( [ coord, lineWidth = float( 0.01 ), dotSize = float( 0
 
 } );
 
-function refreshCamera() {
-
-	camera.position.set( 2, 3, 4 );
-	camera.lookAt( 0, 1, 0 );
-
-	controls.target.set( 0, 1, 0 );
-	controls.update();
-
-}
-
-function refresh() {
-
-	scene.fogNode = null;
-	scene.backgroundNode = null;
-
-	floor.visible = true;
-
-	prefab.rotation.set( 0, 0, 0 );
-
-	previewMesh.material.dispose();
-	calibrationMesh.material.dispose();
-
-	previewMesh.material = new THREE.MeshStandardNodeMaterial( { roughness: 0.8, metalness: 0.2 } );
-
-	// White checker calibration board material
-	const calibMaterial = new THREE.MeshStandardNodeMaterial( { roughness: 0.5, metalness: 0.0 } );
-	const calibGridColor = vec4( 0.25, 0.25, 0.25, 1.0 ); // Darker crisp grey lines
-	const calibBaseColor = vec4( 0.95, 0.95, 0.95, 1.0 ); // Clean off-white squares
-	calibMaterial.colorNode = gridTexture( positionLocal.xy.mul( 10.0 ), 0.02, 0.0 ).mix( calibBaseColor, calibGridColor );
-
-	calibrationMesh.material = calibMaterial;
-
-	renderPipeline.outputNode = defaultPass;
-	renderPipeline.needsUpdate = true;
-
-	if ( resetCameraOnRefresh ) {
-
-		refreshCamera();
-
-	}
-
-}
-
 async function init() {
 
 	scene = new THREE.Scene();
@@ -79,6 +35,7 @@ async function init() {
 	camera.position.set( 2, 3, 4 );
 
 	defaultPass = pass( scene, camera );
+	defaultAA = smaa( defaultPass );
 
 	renderPipeline = new THREE.RenderPipeline( renderer );
 
@@ -178,7 +135,7 @@ async function init() {
 
 	model = previewMesh;
 
-	refreshCamera();
+	refresh();
 
 }
 
@@ -199,11 +156,42 @@ function resize( width, height ) {
 
 }
 
+function refresh() {
+
+	scene.fogNode = null;
+	scene.backgroundNode = null;
+
+	floor.visible = true;
+
+	camera.position.set( 2, 3, 4 );
+	camera.lookAt( 0, 1, 0 );
+
+	controls.target.set( 0, 1, 0 );
+	controls.update();
+
+	prefab.rotation.set( 0, 0, 0 );
+
+	previewMesh.material.dispose();
+	calibrationMesh.material.dispose();
+
+	previewMesh.material = new THREE.MeshStandardNodeMaterial( { roughness: 0.8, metalness: 0.2 } );
+
+	// White checker calibration board material
+	const calibMaterial = new THREE.MeshStandardNodeMaterial( { roughness: 0.5, metalness: 0.0 } );
+	const calibGridColor = vec4( 0.25, 0.25, 0.25, 1.0 ); // Darker crisp grey lines
+	const calibBaseColor = vec4( 0.95, 0.95, 0.95, 1.0 ); // Clean off-white squares
+	calibMaterial.colorNode = gridTexture( positionLocal.xy.mul( 10.0 ), 0.02, 0.0 ).mix( calibBaseColor, calibGridColor );
+
+	calibrationMesh.material = calibMaterial;
+
+	renderPipeline.outputNode = defaultAA;
+	renderPipeline.needsUpdate = true;
+
+}
+
 function dispose() {
 
 	// TODO: Implement dispose
-
-	refreshCamera();
 
 }
 
@@ -213,4 +201,4 @@ function debug() {
 
 }
 
-export { scene, camera, controls, defaultPass, renderPipeline, model, floor, dragging, init, refresh, update, resize, dispose, debug };
+export { scene, camera, controls, defaultPass, defaultAA, renderPipeline, model, floor, dragging, debug };

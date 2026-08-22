@@ -86,25 +86,26 @@ body {
 }
 
 .markdown-content blockquote {
-	margin: 0.5rem 0;
-	padding: 0.75rem 1.25rem;
-	border-left: 4px solid #1ca3ec;
-	background-color: #181820;
-	border-radius: 0 8px 8px 0;
-	color: #a3a3a3;
+	margin: 1.5rem 0;
+	padding: 0.85rem 1.25rem;
+	border: 1px solid rgba(0, 170, 255, 0.15);
+	border-left: 4px solid var(--accent, #00aaff);
+	background-color: rgba(0, 170, 255, 0.04);
+	border-radius: 6px;
+	color: #d1d5db;
 }
 
 .markdown-content blockquote p {
 	margin-top: 0;
 	margin-bottom: 0;
-	line-height: 1.25;
-	font-style: italic;
-	color: #a3a3a3;
+	line-height: 1.75;
+	font-style: normal;
+	color: #d1d5db;
 }
 
 .markdown-content code {
 	background: #15151a;
-	padding: 0.2rem 0.4rem;
+	padding: 0.2rem 0.45rem;
 	border-radius: 6px;
 	font-family: 'Fira Code', monospace;
 	font-size: 0.85em;
@@ -113,8 +114,27 @@ body {
 	white-space: nowrap;
 }
 
+.markdown-content pre {
+	background-color: #15151a;
+	border: 1px solid var(--border-color);
+	border-radius: 8px;
+	padding: 1.1rem 1.35rem;
+	margin: 1.5rem 0;
+	overflow-x: auto;
+	line-height: 1.65;
+}
+
 .markdown-content pre code {
-	white-space: pre-wrap;
+	background: transparent;
+	border: none;
+	padding: 0;
+	border-radius: 0;
+	color: #e0e0e8;
+	font-size: 0.88rem;
+	white-space: pre;
+	word-break: normal;
+	overflow-wrap: normal;
+	display: block;
 }
 
 .markdown-content ul {
@@ -190,15 +210,23 @@ body {
 	background-color: var(--bg-card);
 	color: #f9fafb;
 	font-weight: 600;
-	padding: 0.75rem 1rem;
+	padding: 0.85rem 1rem;
 	border: 1px solid var(--border-color);
+	line-height: 1.5;
 }
 
 .markdown-content td {
-	padding: 0.75rem 1rem;
+	padding: 0.95rem 1rem;
 	border: 1px solid var(--border-color);
 	color: #d1d5db;
 	vertical-align: top;
+	line-height: 1.7;
+}
+
+.markdown-content td code {
+	display: inline-block;
+	vertical-align: baseline;
+	margin: 0.1rem 0;
 }
 
 .markdown-content tr:nth-child(even) {
@@ -246,7 +274,7 @@ body {
 /* Link styles for virtual navigation */
 .markdown-content a,
 .nav-link {
-	color: #fff;
+	color: var(--accent);
 	text-decoration: underline;
 	cursor: pointer;
 	transition: color 0.15s ease;
@@ -324,7 +352,7 @@ body.preview-hidden .code-modifier-inline-btn.active {
 
 .markdown-content a:hover,
 .nav-link:hover {
-	color: var(--accent);
+	color: #fff;
 }
 
 /* Layout & Header */
@@ -808,6 +836,7 @@ body.preview-hidden .code-modifier-inline-btn.active {
 	overflow: hidden;
 	position: relative;
 }
+
 .h-resizer-container {
 	position: relative;
 	width: 4px;
@@ -845,11 +874,11 @@ body.preview-hidden .code-modifier-inline-btn.active {
 		background-color: var(--accent);
 	}
 
-	.resizer-toggle-btn:hover ~ .resizer-h-line {
+	.resizer-toggle-btn:hover~.resizer-h-line {
 		background-color: var(--accent);
 	}
 
-	.resizer-toggle-btn:hover ~ .resizer-h.collapsed + .resizer-h-line {
+	.resizer-toggle-btn:hover~.resizer-h.collapsed+.resizer-h-line {
 		background-color: var(--accent);
 		left: auto;
 		right: 0;
@@ -861,17 +890,17 @@ body.preview-hidden .code-modifier-inline-btn.active {
 	background-color: var(--accent);
 }
 
-.resizer-toggle-btn:active ~ .resizer-h-line {
+.resizer-toggle-btn:active~.resizer-h-line {
 	background-color: var(--accent);
 }
 
-.resizer-toggle-btn:active ~ .resizer-h.collapsed + .resizer-h-line {
+.resizer-toggle-btn:active~.resizer-h.collapsed+.resizer-h-line {
 	background-color: var(--accent);
 	left: auto;
 	right: 0;
 }
 
-.resizer-h.collapsed ~ .resizer-h-line {
+.resizer-h.collapsed~.resizer-h-line {
 	left: auto;
 	right: 0;
 	background-color: var(--border-color);
@@ -1003,16 +1032,17 @@ body.preview-hidden .code-modifier-inline-btn.active {
 	pointer-events: none;
 	transition: all 0.2s ease;
 }
+
 @media (hover: hover) {
 	.resizer-v:not(.collapsed):not(.editor-collapsed):hover {
 		background-color: var(--accent);
 	}
 
-	.resizer-v-toggle-btn:hover ~ .resizer-v-line {
+	.resizer-v-toggle-btn:hover~.resizer-v-line {
 		background-color: var(--accent);
 	}
 
-	.resizer-v-toggle-btn:hover ~ .resizer-v.collapsed + .resizer-v-line {
+	.resizer-v-toggle-btn:hover~.resizer-v.collapsed+.resizer-v-line {
 		background-color: var(--accent);
 		top: 0;
 	}
@@ -1028,17 +1058,17 @@ body.preview-hidden .code-modifier-inline-btn.active {
 	pointer-events: none;
 }
 
-.resizer-v-toggle-btn:active ~ .resizer-v-line {
+.resizer-v-toggle-btn:active~.resizer-v-line {
 	background-color: var(--accent);
 	top: -1px;
 }
 
-.resizer-v-toggle-btn:active ~ .resizer-v.collapsed + .resizer-v-line {
+.resizer-v-toggle-btn:active~.resizer-v.collapsed+.resizer-v-line {
 	background-color: var(--accent);
 	top: 0;
 }
 
-.resizer-v.collapsed + .resizer-v-line {
+.resizer-v.collapsed+.resizer-v-line {
 	background-color: var(--border-color);
 	top: 0;
 }
@@ -1329,6 +1359,7 @@ body.v-resizer-editor-collapsed .resizer-v-toggle-btn.inverted::after {
 }
 
 @media (hover: hover) {
+
 	.v-resizer-container:has(.resizer-v.editor-collapsed) .resizer-v-toggle-btn.inverted:hover,
 	body.v-resizer-editor-collapsed .resizer-v-toggle-btn.inverted:hover {
 		background-color: var(--bg-card);
@@ -1522,6 +1553,7 @@ body:not(.playground-mode).collapsed-workspace #code-container {
 body:not(.playground-mode).collapsed-workspace #editor-console {
 	display: none !important;
 }
+
 .collapsed-workspace .v-resizer-container {
 	display: none !important;
 }
@@ -1829,6 +1861,17 @@ body.preview-maximized .preview-hide-btn {
 	background-color: rgba(255, 255, 255, 0.05);
 }
 
+.console-close.success {
+	opacity: 1;
+	color: #10b981;
+}
+
+.console-close:disabled {
+	opacity: 0.2;
+	cursor: default;
+	pointer-events: none;
+}
+
 .console-body {
 	flex: 1;
 	font-family: 'Fira Code', monospace;
@@ -1848,6 +1891,46 @@ body.preview-maximized .preview-hide-btn {
 
 #editor-console.minimized .console-header {
 	border-bottom: none;
+}
+
+.console-line {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	padding: 6px 14px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+	gap: 8px;
+}
+
+.console-line-text {
+	flex: 1;
+}
+
+.console-jump-btn {
+	background: transparent;
+	border: none;
+	color: inherit;
+	cursor: pointer;
+	opacity: 0.6;
+	transition: all 0.2s ease;
+	padding: 3px;
+	border-radius: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	margin-top: -1px;
+}
+
+.console-jump-btn:hover {
+	opacity: 1;
+}
+
+.console-jump-btn i,
+.console-jump-btn svg {
+	width: 0.9rem;
+	height: 0.9rem;
+	display: block;
 }
 
 /* Sidebar Search styling */
@@ -2110,6 +2193,7 @@ body.preview-maximized .preview-hide-btn {
 		border-right: none !important;
 		box-shadow: -4px 4px 16px rgba(0, 0, 0, 0.5) !important;
 	}
+
 	/* On mobile, make resizer bar 1px wide when expanded to prevent double border lines */
 	body:not(.collapsed-workspace) .h-resizer-container {
 		width: 0px !important;
@@ -2273,8 +2357,8 @@ body.preview-maximized .preview-hide-btn {
 	border-radius: 2px;
 }
 
-/* Playground History (Undo/Redo) Styles */
-.playground-history-btn {
+/* Playground Tab Buttons Styles */
+.playground-tab-btn {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -2288,11 +2372,17 @@ body.preview-maximized .preview-hide-btn {
 	transition: color 0.15s, opacity 0.15s;
 }
 
-.playground-history-btn:hover:not(:disabled) {
+.playground-tab-btn svg {
+	width: 16px;
+	height: 16px;
+	display: block;
+}
+
+.playground-tab-btn:hover:not(:disabled) {
 	color: #ffffff;
 }
 
-.playground-history-btn:disabled {
+.playground-tab-btn:disabled {
 	opacity: 0.35;
 	cursor: not-allowed;
 }
@@ -2310,7 +2400,8 @@ body.preview-maximized .preview-hide-btn {
 
 .video-container {
 	position: relative;
-	padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+	padding-bottom: 56.25%;
+	/* 16:9 Aspect Ratio */
 	height: 0;
 	overflow: hidden;
 	margin-top: 1rem;
@@ -2464,7 +2555,7 @@ body.preview-maximized .preview-hide-btn {
 
 /* Disable scroll/clipping and clear positioning on all intermediate parents when an embed is maximized */
 .content-col:has(.tsl-embed-preview.maximized) .content-area-wrap,
-.content-col:has(.tsl-embed-preview.maximized) .content-area-wrap > div,
+.content-col:has(.tsl-embed-preview.maximized) .content-area-wrap>div,
 .content-col:has(.tsl-embed-preview.maximized) .tsl-embed-container {
 	position: static !important;
 	overflow: visible !important;
@@ -2480,7 +2571,8 @@ body.preview-maximized .preview-hide-btn {
 	z-index: 999 !important;
 	background-color: var(--bg-main) !important;
 	border-bottom: none !important;
-	border-radius: 8px; /* Match the rounded corners of .content-col if applicable, or keep it square */
+	border-radius: 8px;
+	/* Match the rounded corners of .content-col if applicable, or keep it square */
 }
 
 .tsl-embed-preview.maximized .tsl-embed-lock-overlay {
@@ -2701,6 +2793,15 @@ body.preview-maximized .preview-hide-btn {
 	color: #9cdcfe;
 }
 
+.tsl-sig-param-optional {
+	font-family: 'Fira Code', monospace;
+	font-size: 0.85rem;
+	color: #9cdcfe;
+	font-weight: 500;
+	margin-left: 0.05rem;
+	opacity: 0.85;
+}
+
 .tsl-sig-param-colon {
 	color: #d4d4d4;
 	margin-right: 0.15rem;
@@ -2744,12 +2845,54 @@ body.preview-maximized .preview-hide-btn {
 .tour-important-content {
 	font-size: 0.9rem;
 	color: #d1d5db;
-	line-height: 1.5;
+	line-height: 1.75;
+}
+
+.tour-important-item {
+	line-height: 1.75;
 }
 
 .tour-important-divider {
 	height: 1px;
 	background: rgba(240, 160, 0, 0.15);
+	margin: 0.65rem 0;
+}
+
+/* Tour Note Callout Block */
+.tour-note-block {
+	margin: 1.5rem 0;
+	background-color: rgba(0, 170, 255, 0.04);
+	border: 1px solid rgba(0, 170, 255, 0.15);
+	border-left: 4px solid var(--accent, #00aaff);
+	border-radius: 6px;
+	padding: 0.85rem 1.25rem;
+}
+
+.tour-note-header {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	font-weight: 700;
+	font-size: 0.9rem;
+	color: var(--accent, #00aaff);
+	margin-bottom: 0.5rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.tour-note-content {
+	font-size: 0.9rem;
+	color: #d1d5db;
+	line-height: 1.75;
+}
+
+.tour-note-item {
+	line-height: 1.75;
+}
+
+.tour-note-divider {
+	height: 1px;
+	background: rgba(0, 170, 255, 0.15);
 	margin: 0.65rem 0;
 }
 
@@ -2790,37 +2933,45 @@ body.preview-maximized .preview-hide-btn {
 
 /* API Signature Syntax Highlighting */
 .tsl-sig-func-name {
-	color: #dcdcaa !important; /* Golden/warm yellow for Monaco functions */
+	color: #dcdcaa !important;
+	/* Golden/warm yellow for Monaco functions */
 	font-weight: 500;
 }
 
 .tsl-sig-const-name {
-	color: #00aeff !important; /* Soft orange for TSL constants/properties */
+	color: #00aeff !important;
+	/* Soft orange for TSL constants/properties */
 	font-weight: 500;
 }
 
 .tsl-sig-param-op {
-	color: #d4d4d4 !important; /* Neutral gray for operators (= and :) */
+	color: #d4d4d4 !important;
+	/* Neutral gray for operators (= and :) */
 }
 
 .tsl-param-type-number {
-	color: #b5cea8 !important; /* Light green for numbers */
+	color: #b5cea8 !important;
+	/* Light green for numbers */
 }
 
 .tsl-sig-param-val {
-	color: #9cdcfe !important; /* Monaco light blue for identifiers/variables */
+	color: #9cdcfe !important;
+	/* Monaco light blue for identifiers/variables */
 }
 
 .tsl-sig-dot {
-	color: #d4d4d4 !important; /* Neutral white/gray for dots */
+	color: #d4d4d4 !important;
+	/* Neutral white/gray for dots */
 }
 
 .tsl-sig-paren {
-	color: #ffd700 !important; /* Gold/yellow Monaco parenthesis matching */
+	color: #ffd700 !important;
+	/* Gold/yellow Monaco parenthesis matching */
 }
 
 .tsl-sig-param-optional {
-	color: #569cd6 !important; /* Monaco / TypeScript keyword blue for optional ? */
+	color: #569cd6 !important;
+	/* Monaco / TypeScript keyword blue for optional ? */
 	font-weight: bold;
 }
 
@@ -3044,13 +3195,11 @@ body.loading .app-header {
 	margin-top: -450px;
 	margin-left: -450px;
 	border-radius: 50%;
-	background: radial-gradient(
-		circle at 50% 50%,
-		rgba(0, 229, 255, 0.15) 0%,
-		rgba(147, 51, 234, 0.09) 35%,
-		rgba(59, 130, 246, 0.04) 60%,
-		transparent 75%
-	);
+	background: radial-gradient(circle at 50% 50%,
+			rgba(0, 229, 255, 0.15) 0%,
+			rgba(147, 51, 234, 0.09) 35%,
+			rgba(59, 130, 246, 0.04) 60%,
+			transparent 75%);
 	pointer-events: none;
 	animation: forward-zoom 12s cubic-bezier(0.1, 0.7, 0.3, 1) infinite;
 }
@@ -3130,6 +3279,7 @@ body.loading .app-header {
 		-webkit-mask-position: 150% 0;
 		mask-position: 150% 0;
 	}
+
 	100% {
 		-webkit-mask-position: -50% 0;
 		mask-position: -50% 0;
@@ -3141,12 +3291,15 @@ body.loading .app-header {
 		opacity: 0.1;
 		transform: scale(0.35);
 	}
+
 	40% {
 		opacity: 0.5;
 	}
+
 	70% {
 		opacity: 0.5;
 	}
+
 	100% {
 		opacity: 0.1;
 		transform: scale(2.8);
@@ -3188,10 +3341,12 @@ body.loading .app-header {
 		stroke-dasharray: 1, 150;
 		stroke-dashoffset: 0;
 	}
+
 	50% {
 		stroke-dasharray: 90, 150;
 		stroke-dashoffset: -35;
 	}
+
 	100% {
 		stroke-dasharray: 90, 150;
 		stroke-dashoffset: -124;
@@ -3205,9 +3360,10 @@ body.loading .app-header {
 	align-items: center;
 	background: transparent !important;
 	border: none !important;
-	padding: 0 !important;
+	padding: 0.5rem 0 !important;
 	margin: 2rem 0;
 	width: 100%;
+	overflow-x: auto;
 }
 
 .mermaid svg {
@@ -3215,3 +3371,185 @@ body.loading .app-header {
 	height: auto;
 }
 
+.mermaid,
+.mermaid svg,
+.mermaid .node,
+.mermaid .cluster,
+.mermaid text,
+.mermaid tspan,
+.mermaid span,
+.mermaid div,
+.mermaid p,
+.mermaid label {
+	font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+	-webkit-font-smoothing: antialiased !important;
+	-moz-osx-font-smoothing: grayscale !important;
+}
+
+.mermaid .node rect,
+.mermaid .node polygon,
+.mermaid .node circle {
+	fill: #202028 !important;
+	stroke: #38384a !important;
+	stroke-width: 1.2px !important;
+	rx: 8px;
+	ry: 8px;
+}
+
+.mermaid .cluster rect {
+	fill: url(#cluster-radial-gradient) !important;
+	stroke: #2b2b38 !important;
+	stroke-width: 1.2px !important;
+	rx: 10px;
+	ry: 10px;
+}
+
+/* Cluster Subgraph Title */
+.mermaid .cluster span.nodeLabel,
+.mermaid .cluster-label span,
+.mermaid .cluster text {
+	color: #00aaff !important;
+	fill: #00aaff !important;
+	font-weight: 700 !important;
+	font-size: 0.74rem !important;
+	text-transform: uppercase !important;
+	letter-spacing: 0.08em !important;
+	display: inline-block !important;
+	padding: 8px 16px 14px 16px !important;
+}
+
+/* Node Label & Subtitles */
+.mermaid .node .label,
+.mermaid .node foreignObject div,
+.mermaid .node span.nodeLabel {
+	color: #9da0b2 !important;
+	fill: #9da0b2 !important;
+	font-weight: 400 !important;
+	font-size: 0.80rem !important;
+	letter-spacing: normal !important;
+	line-height: 1.4 !important;
+	padding: 0 !important;
+	margin: 0 !important;
+}
+
+.mermaid .node b,
+.mermaid .node strong {
+	color: #ffffff !important;
+	font-weight: 600 !important;
+	font-size: 0.90rem !important;
+	letter-spacing: -0.01em !important;
+	display: inline-block !important;
+	margin-bottom: 10px !important;
+}
+
+.mermaid .node small {
+	color: #9da0b2 !important;
+	font-weight: 400 !important;
+	font-size: 0.78rem !important;
+	display: inline-block !important;
+	line-height: 1.8 !important;
+}
+
+.mermaid .edgePath path.path {
+	stroke: #00aaff !important;
+	stroke-width: 1.75px !important;
+	opacity: 0.9;
+}
+
+.mermaid .edgeLabel {
+	background: transparent !important;
+	border: none !important;
+}
+
+.mermaid .edgeLabel div,
+.mermaid .edgeLabel foreignObject {
+	background: transparent !important;
+	border: none !important;
+	padding: 0 !important;
+	margin: 0 !important;
+}
+
+/* Hide empty edge labels */
+.mermaid .edgeLabel:empty,
+.mermaid .edgeLabel span:empty,
+.mermaid .edgeLabel span.edgeLabel:empty {
+	display: none !important;
+	border: none !important;
+	padding: 0 !important;
+	background: transparent !important;
+}
+
+/* Edge Label badge (only when text exists) */
+.mermaid .edgeLabel span.edgeLabel:not(:empty),
+.mermaid .edgeLabel span:not(:empty) {
+	background-color: #191921 !important;
+	color: #a5a5b8 !important;
+	fill: #a5a5b8 !important;
+	font-size: 0.68rem !important;
+	font-weight: 500 !important;
+	padding: 2px 7px !important;
+	border-radius: 4px !important;
+	border: 1px solid rgba(255, 255, 255, 0.1) !important;
+	display: inline-block !important;
+	line-height: 1.25 !important;
+	margin: 0 !important;
+}
+
+/* Prevent double borders on nested spans */
+.mermaid .edgeLabel span span {
+	background: transparent !important;
+	border: none !important;
+	padding: 0 !important;
+}
+
+.mermaid .edgeLabel rect {
+	fill: transparent !important;
+	stroke: none !important;
+}
+
+.mermaid marker path {
+	fill: #00aaff !important;
+	stroke: #00aaff !important;
+}
+
+.mermaid code {
+	background: rgba(0, 170, 255, 0.08) !important;
+	color: #9cdcfe !important;
+	font-family: 'Fira Code', monospace !important;
+	font-size: 0.88em !important;
+	font-weight: 500 !important;
+	padding: 2px 6px !important;
+	margin: 3px 2px !important;
+	border-radius: 4px !important;
+	border: 1px solid rgba(0, 170, 255, 0.25) !important;
+	display: inline-block !important;
+	white-space: nowrap !important;
+	vertical-align: middle !important;
+}
+
+.mermaid code .tsl-param-type-string {
+	color: #ce9178 !important;
+}
+
+.mermaid code .tsl-param-type-number {
+	color: #b5cea8 !important;
+}
+
+.mermaid code .tsl-param-type-keyword {
+	color: #569cd6 !important;
+}
+
+.mermaid code .tsl-function,
+.mermaid code .tsl-function-builtin {
+	color: #dcdcaa !important;
+}
+
+.mermaid code .tsl-operator,
+.mermaid code .tsl-bracket,
+.mermaid code .tsl-brace {
+	color: #d4d4d4 !important;
+}
+
+.mermaid code .tsl-identifier {
+	color: #9cdcfe !important;
+}

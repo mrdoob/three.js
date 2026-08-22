@@ -3,7 +3,7 @@ import * as TSL from 'three/tsl';
 
 import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-import { parseTour, parse } from './utils/MarkdownUtils.js';
+import { parseTour, parse, tokenizeInlineCode } from './utils/MarkdownUtils.js';
 import { CodeRunner } from './code/CodeRunner.js';
 import { CodeCompiler } from './code/CodeCompiler.js';
 import { CodeEditor } from './editor/CodeEditor.js';
@@ -50,8 +50,9 @@ function getTwitterWidgets() {
 
 class Tour {
 
-	constructor() {
+	constructor( title = 'Tour of *TSL*' ) {
 
+		this.tourTitle = title;
 		this.pages = [];
 		this.pageTree = [];
 		this.currentPageIndex = 0;
@@ -73,6 +74,7 @@ class Tour {
 		this.readOnlyEditors = [];
 		this.isPlaygroundActive = false;
 		this.isContentRendered = false;
+		this.hasCriticalError = false;
 		this.searchManager = new SearchManager( this );
 		this.historyManager = new HistoryManager( this );
 		this.layoutManager = new LayoutManager( this );
@@ -89,12 +91,109 @@ class Tour {
 
 		mermaid.initialize( {
 			startOnLoad: false,
-			theme: 'dark',
+			theme: 'base',
+			themeVariables: {
+				darkMode: true,
+				background: '#1e1e24',
+				mainBkg: '#2a2a33',
+				primaryColor: '#2a2a33',
+				primaryTextColor: '#f3f4f6',
+				primaryBorderColor: '#3f3f4e',
+				lineColor: '#00aaff',
+				secondaryColor: '#15151a',
+				tertiaryColor: '#1e1e24',
+				secondaryBorderColor: '#3f3f4e',
+				secondaryTextColor: '#d1d5db',
+				fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+				fontSize: '13px',
+				edgeLabelBackground: 'transparent',
+				clusterBkg: 'rgba(21, 21, 26, 0.65)',
+				clusterBorder: '#3f3f4e',
+				titleColor: '#00aaff',
+				nodeBorder: '#3f3f4e'
+			},
 			flowchart: {
 				useMaxWidth: true,
-				htmlLabels: true
+				htmlLabels: true,
+				curve: 'linear',
+				padding: 14,
+				nodeSpacing: 28,
+				rankSpacing: 34,
+				subGraphTitleMargin: {
+					top: 20,
+					bottom: 28
+				}
 			}
 		} );
+
+		this.setTitle( title );
+
+	}
+
+	setTitle( title ) {
+
+		this.tourTitle = title;
+
+		const parseParts = ( str ) => {
+
+			const parts = [];
+			const regex = /\*([^*]+)\*/g;
+			let lastIndex = 0;
+			let match;
+
+			while ( ( match = regex.exec( str ) ) !== null ) {
+
+				if ( match.index > lastIndex ) {
+
+					parts.push( { text: str.substring( lastIndex, match.index ), highlight: false } );
+
+				}
+
+				parts.push( { text: match[ 1 ], highlight: true } );
+				lastIndex = regex.lastIndex;
+
+			}
+
+			if ( lastIndex < str.length ) {
+
+				parts.push( { text: str.substring( lastIndex ), highlight: false } );
+
+			}
+
+			return parts;
+
+		};
+
+		const parts = parseParts( this.tourTitle );
+
+		const headerHtml = parts.map( ( part ) => {
+
+			const cls = part.highlight ? 'header-title-accent' : 'header-title-prefix';
+			return `<span class="${cls}">${part.text}</span>`;
+
+		} ).join( '' );
+
+		const loadingHtml = parts.map( ( part ) => {
+
+			const cls = part.highlight ? 'loading-text-bold' : 'loading-text-light';
+			return `<span class="${cls}">${part.text}</span>`;
+
+		} ).join( '' );
+
+		const cleanTitle = this.tourTitle.replace( /\*/g, '' );
+
+		const headerTitleEl = this.dom?.headerTitle || document.querySelector( '.header-title' );
+		headerTitleEl.innerHTML = headerHtml;
+
+		const loadingTextEl = this.dom?.loadingText || document.querySelector( '.loading-text' );
+		loadingTextEl.innerHTML = loadingHtml;
+
+		/*const loadingTextContainer = document.querySelector( '.loading-text-container' );
+		loadingTextContainer.style.display = 'flex';*/
+
+		document.title = `${cleanTitle} - Interactive Guide`;
+
+		return this;
 
 	}
 
@@ -124,6 +223,8 @@ class Tour {
 
 		// Cache DOM Elements
 		this.dom = {
+			headerTitle: document.querySelector( '.header-title' ),
+			loadingText: document.querySelector( '.loading-text' ),
 			contentArea: document.getElementById( 'content-area' ),
 			codeContainer: document.getElementById( 'code-container' ),
 			previewContainer: document.getElementById( 'preview-container' ),
@@ -149,6 +250,8 @@ class Tour {
 			previewCopy: document.getElementById( 'preview-copy' ),
 			editorConsole: document.getElementById( 'editor-console' ),
 			consoleHeader: document.getElementById( 'console-header' ),
+			consoleClearBtn: document.getElementById( 'console-clear-btn' ),
+			consoleCopyBtn: document.getElementById( 'console-copy-btn' ),
 			consoleToggleBtn: document.getElementById( 'console-toggle-btn' ),
 			consoleToggleIcon: document.getElementById( 'console-toggle-icon' ),
 			consoleErrorMessage: document.getElementById( 'console-error-message' ),
@@ -249,6 +352,9 @@ class Tour {
 		// Initialize Lucide Icons
 		this.createIcons();
 
+		// Set initial state for console clear and copy buttons
+		this.consoleManager.updateConsoleButtonsState();
+
 		if ( window.innerWidth < MOBILE_BREAKPOINT ) {
 
 			document.body.classList.add( 'preview-hidden' );
@@ -261,6 +367,20 @@ class Tour {
 
 			if ( e.target.closest( '.console-header-actions' ) ) return;
 			this.toggleConsole();
+
+		};
+
+		this.dom.consoleClearBtn.onclick = ( e ) => {
+
+			e.stopPropagation();
+			this.clearConsole();
+
+		};
+
+		this.dom.consoleCopyBtn.onclick = ( e ) => {
+
+			e.stopPropagation();
+			this.copyConsole();
 
 		};
 
@@ -278,17 +398,7 @@ class Tour {
 		//THREE.Node.captureStackTrace = true;
 
 		// Setup 3D Preview
-		this.renderer = new THREE.WebGPURenderer( { antialias: true, alpha: true } );
-		this.renderer.setPixelRatio( window.devicePixelRatio );
-		this.renderer.setSize( Math.max( this.dom.previewContainer.clientWidth, 1 ), Math.max( this.dom.previewContainer.clientHeight, 1 ) );
-		this.renderer.setAnimationLoop( this.animate );
-		this.renderer.inspector = new Inspector();
-		this.renderer.inspector.setHorizontalAlign( 'left' );
-		this.renderer.inspector.setVerticalAlign( 'top' );
-		this.renderer.shadowMap.enabled = true;
-		this.renderer.shadowMap.type = THREE.PCFShadowMap;
-		this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-		this.dom.previewContainer.appendChild( this.renderer.domElement );
+		this.createRenderer();
 
 		// Hide inspector when in collapsed-workspace (.preview-box) mode
 		const updateInspectorVisibility = () => {
@@ -915,23 +1025,32 @@ class Tour {
 			clearTimeout( timeout );
 			timeout = setTimeout( async () => {
 
-				this.renderer.setAnimationLoop( null );
+				if ( this.hasCriticalError ) {
 
-				try {
+					this.hasCriticalError = false;
+					await this.refresh();
 
-					if ( this.isPlaygroundActive ) {
+				} else {
 
-						await this.runPlayground();
+					this.renderer.setAnimationLoop( null );
 
-					} else {
+					try {
 
-						await this.runner.run( currentCode );
+						if ( this.isPlaygroundActive ) {
+
+							await this.runPlayground();
+
+						} else {
+
+							await this.runner.run( currentCode );
+
+						}
+
+					} finally {
+
+						this.renderer.setAnimationLoop( this.animate );
 
 					}
-
-				} finally {
-
-					this.renderer.setAnimationLoop( this.animate );
 
 				}
 
@@ -1008,6 +1127,8 @@ class Tour {
 				this.searchManager.restoreSearchFromHash( initialHash );
 
 			}
+
+			this.setTitle( this.tourTitle );
 
 			document.body.classList.remove( 'loading' );
 			const loadingScreen = document.getElementById( 'loading-screen' );
@@ -1121,6 +1242,60 @@ class Tour {
 
 		mermaid.run( {
 			querySelector: '.mermaid'
+		} ).then( () => {
+
+			this.dom.contentArea.querySelectorAll( '.mermaid svg' ).forEach( ( svg ) => {
+
+				let defs = svg.querySelector( 'defs' );
+				if ( ! defs ) {
+
+					defs = document.createElementNS( 'http://www.w3.org/2000/svg', 'defs' );
+					svg.insertBefore( defs, svg.firstChild );
+
+				}
+
+				if ( ! svg.querySelector( '#cluster-radial-gradient' ) ) {
+
+					const grad = document.createElementNS( 'http://www.w3.org/2000/svg', 'radialGradient' );
+					grad.setAttribute( 'id', 'cluster-radial-gradient' );
+					grad.setAttribute( 'cx', '50%' );
+					grad.setAttribute( 'cy', '100%' );
+					grad.setAttribute( 'r', '80%' );
+					grad.setAttribute( 'fx', '50%' );
+					grad.setAttribute( 'fy', '100%' );
+					grad.innerHTML = `
+						<stop offset="0%" stop-color="#19243a" stop-opacity="0.95" />
+						<stop offset="45%" stop-color="#161a24" stop-opacity="0.95" />
+						<stop offset="100%" stop-color="#14141a" stop-opacity="0.95" />
+					`;
+					defs.appendChild( grad );
+
+				}
+
+				svg.querySelectorAll( '.cluster rect' ).forEach( ( rect ) => {
+
+					rect.setAttribute( 'fill', 'url(#cluster-radial-gradient)' );
+
+				} );
+
+			} );
+
+			this.dom.contentArea.querySelectorAll( '.mermaid .edgeLabel' ).forEach( ( el ) => {
+
+				if ( ! el.textContent.trim() ) {
+
+					el.style.display = 'none';
+
+				}
+
+			} );
+
+			this.dom.contentArea.querySelectorAll( '.mermaid code' ).forEach( ( el ) => {
+
+				el.innerHTML = tokenizeInlineCode( el.innerHTML );
+
+			} );
+
 		} ).catch( err => console.error( 'Mermaid render error:', err ) );
 
 		getTwitterWidgets().ready( ( twttr ) => {
@@ -1220,11 +1395,7 @@ class Tour {
 		} );
 
 		// Initialize Read-Only Monaco Editors for inline ```js blocks
-		if ( this.readOnlyEditors ) {
-
-			this.readOnlyEditors.forEach( editor => editor.dispose() );
-
-		}
+		this.readOnlyEditors.forEach( editor => editor.dispose() );
 
 		this.readOnlyEditors = [];
 
@@ -2153,6 +2324,18 @@ class Tour {
 
 	}
 
+	clearConsole() {
+
+		this.consoleManager.clearConsole();
+
+	}
+
+	copyConsole() {
+
+		this.consoleManager.copyConsole();
+
+	}
+
 	togglePlayground( active ) {
 
 		this.playgroundManager.togglePlayground( active );
@@ -2191,6 +2374,80 @@ class Tour {
 		this.renderer.clear();
 
 		this.runner.call( 'update', t );
+
+	}
+
+	async createRenderer() {
+
+		this.renderer = new THREE.WebGPURenderer( { antialias: false, alpha: true } );
+		this.renderer.setPixelRatio( window.devicePixelRatio );
+		this.renderer.setSize( Math.max( this.dom.previewContainer.clientWidth, 1 ), Math.max( this.dom.previewContainer.clientHeight, 1 ) );
+		this.renderer.setAnimationLoop( this.animate );
+		this.renderer.inspector = new Inspector();
+		this.renderer.inspector.setHorizontalAlign( 'left' );
+		this.renderer.inspector.setVerticalAlign( 'top' );
+		this.renderer.shadowMap.enabled = true;
+		this.renderer.shadowMap.type = THREE.PCFShadowMap;
+		this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+		this.dom.previewContainer.appendChild( this.renderer.domElement );
+
+		try {
+
+			await this.renderer.init();
+
+			const device = this.renderer.backend.device;
+
+			device.addEventListener( 'uncapturederror', () => {
+
+				this.renderer.setAnimationLoop( null );
+				this.hasCriticalError = true;
+
+			} );
+
+		} catch ( err ) {
+
+			console.error( 'Failed to initialize WebGPU renderer:', err );
+
+		}
+
+		this.runner.setValue( 'renderer', this.renderer );
+
+		const isCollapsed = document.body.classList.contains( 'collapsed-workspace' );
+		this.renderer.inspector.setVisible( ! isCollapsed );
+
+	}
+
+	disposeRenderer() {
+
+		this.renderer.setAnimationLoop( null );
+
+		this.renderer.inspector.domElement.remove();
+
+		this.renderer.domElement.remove();
+
+		this.renderer.dispose();
+
+	}
+
+	async refresh() {
+
+		this.disposeRenderer();
+
+		this.runner.dispose();
+
+		await this.createRenderer();
+
+		const currentCode = this.codeEditor.getValue();
+
+		if ( this.isPlaygroundActive ) {
+
+			await this.runPlayground();
+
+		} else {
+
+			await this.runner.run( currentCode );
+
+		}
 
 	}
 
