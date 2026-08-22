@@ -54,8 +54,7 @@
 				screenCoordinate,
 				screenUV,
 				smoothstep,
-				time,
-				triNoise3D,
+				texture3D,
 				uniform,
 				vec2,
 				vec3,
@@ -68,15 +67,15 @@
 			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let camera, scene, renderer, renderPipeline, controls;
-			let lucyMesh;
+			let camera, scene, renderer, renderPipeline, controls, timer;
+			let lucyMesh, cloudSpeed, cloudTimeUniform;
 
 			init();
 
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.set( 10, 2, 1 );
+				camera.position.set( 10, 4, 1 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
@@ -93,7 +92,7 @@
 
 				const groundGeometry = new THREE.PlaneGeometry( 200, 200 );
 				const groundMaterial = new THREE.MeshStandardNodeMaterial( {
-					roughness: 0.25,
+					roughness: 1.0,
 					metalness: 0.0
 				} );
 
@@ -196,6 +195,94 @@
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
+				// Precomputed High-Detail Seamless 3D Fractal Tri-Noise Texture (Turbulent Wispy Cloud Structure)
+
+				function createNoise3DTexture( size = 96 ) {
+
+					const data = new Uint8Array( size * size * size );
+					let idx = 0;
+
+					const tri = ( x ) => Math.abs( ( ( x % 1.0 ) + 1.0 ) % 1.0 - 0.5 );
+
+					const tri3 = ( x, y, z ) => [
+						tri( z + tri( y ) ),
+						tri( z + tri( x ) ),
+						tri( y + tri( x ) )
+					];
+
+					const triNoise = ( x, y, z ) => {
+
+						let px = x, py = y, pz = z;
+						let bpx = x, bpy = y, bpz = z;
+						let zFactor = 1.4;
+						let rz = 0.0;
+
+						for ( let i = 0; i < 4; i ++ ) {
+
+							const [ dgx, dgy, dgz ] = tri3( bpx * 2.0, bpy * 2.0, bpz * 2.0 );
+							px += dgx;
+							py += dgy;
+							pz += dgz;
+
+							bpx = bpx * 1.8 + 0.14;
+							bpy = bpy * 1.8 + 0.14;
+							bpz = bpz * 1.8 + 0.14;
+
+							zFactor *= 1.5;
+							px *= 1.2;
+							py *= 1.2;
+							pz *= 1.2;
+
+							const t = tri( pz + tri( px + tri( py ) ) );
+							rz += t / zFactor;
+
+						}
+
+						return rz;
+
+					};
+
+					for ( let z = 0; z < size; z ++ ) {
+
+						for ( let y = 0; y < size; y ++ ) {
+
+							for ( let x = 0; x < size; x ++ ) {
+
+								const u = x / size;
+								const v = y / size;
+								const w = z / size;
+
+								// Fractal turbulent octaves with high-frequency detail
+								const n1 = triNoise( u * 4.0, v * 4.0, w * 4.0 );
+								const n2 = triNoise( u * 8.0 + 1.7, v * 8.0 + 0.9, w * 8.0 + 2.5 ) * 0.45;
+
+								const val = Math.min( Math.max( ( n1 + n2 ) * 1.15 * 255, 0 ), 255 );
+
+								data[ idx ++ ] = Math.floor( val );
+
+							}
+
+						}
+
+					}
+
+					const texture = new THREE.Data3DTexture( data, size, size, size );
+					texture.format = THREE.RedFormat;
+					texture.type = THREE.UnsignedByteType;
+					texture.minFilter = THREE.LinearFilter;
+					texture.magFilter = THREE.LinearFilter;
+					texture.wrapS = THREE.RepeatWrapping;
+					texture.wrapT = THREE.RepeatWrapping;
+					texture.wrapR = THREE.RepeatWrapping;
+					texture.unpackAlignment = 1;
+					texture.needsUpdate = true;
+
+					return texture;
+
+				}
+
+				const noise3DTexture = createNoise3DTexture( 96 );
+
 				// Post-Processing RenderPipeline
 
 				renderPipeline = new THREE.RenderPipeline( renderer );
@@ -212,41 +299,47 @@
 
 				// Volumetric Cloud Fog Uniforms
 
-				const resolutionScale = uniform( 0.5 );
-				const steps = uniform( 16 );
+				const resolutionScale = uniform( 0.25 );
+				const steps = uniform( 20 );
 				const fogDensity = uniform( 1.05 );
-				const heightFalloff = uniform( 0.85 );
-				const fogHeight = uniform( 0.6 );
-				const cloudScale = uniform( 0.07 );
-				const cloudThreshold = uniform( 0.44 );
-				const maxRayDist = uniform( 100.0 );
+				const heightFalloff = uniform( 1.2 );
+				const fogHeight = uniform( 3.5 );
+				const cloudScale = uniform( 0.019 );
+				const cloudThreshold = uniform( 0.66 );
+				const maxRayDist = uniform( 70.0 );
 				const spatialSigma = uniform( 1.2 );
 				const depthSensitivity = uniform( 30.0 );
 				const blurRadius = uniform( 0.5 );
-				const cloudSpeed = uniform( 0.125 );
-				const rangeFogNear = uniform( 37.0 );
+				cloudSpeed = uniform( 0.04 );
+				cloudTimeUniform = uniform( 0.0 );
+				timer = new THREE.Timer();
+
+				const rangeFogNear = uniform( 62.5 );
 				const rangeFogFar = uniform( 100.0 );
 
-				// 3D Procedural Volumetric Cloud Fog Density function (Optimized 2-octave self-warping noise)
+				const groundLevelY = float( - 1.0 );
+
+				// 3D Procedural Volumetric Cloud Fog Density function (Optimized hardware-accelerated 3D texture sampling)
 
 				const sampleCloudDensity = Fn( ( [ pos ] ) => {
 
-					const t = time.mul( cloudSpeed );
+					const t = cloudTimeUniform;
 					const p = vec3( pos.mul( cloudScale ) ).toVar();
 
-					// Primary cloud octave with forward atmospheric wind drift and internal time evolution
+					// Primary cloud octave with forward atmospheric wind drift
 					const wind1 = vec3( t.mul( 0.3 ), t.mul( 0.05 ), t.mul( 0.2 ) );
-					const n1 = triNoise3D( p.add( wind1 ), float( 0.6 ), t.mul( 0.8 ) );
+					const n1 = texture3D( noise3DTexture, p.add( wind1 ) ).r;
 
 					// Secondary octave warped by n1 with opposing counter-current drift for organic shape deformation
 					const wind2 = vec3( t.negate().mul( 0.15 ), t.mul( 0.1 ), t.mul( 0.08 ) );
-					const p2 = p.mul( 2.2 ).add( vec3( 1.7, 0.9, 2.5 ) ).add( wind2 ).add( n1.mul( 0.8 ) );
-					const n2 = triNoise3D( p2, float( 0.8 ), t.mul( 1.2 ) ).mul( 0.5 );
+					const p2 = p.mul( 2.2 ).add( vec3( 1.7, 0.9, 2.5 ) ).add( wind2 ).add( n1.mul( 0.5 ) );
+					const n2 = texture3D( noise3DTexture, p2 ).r.mul( 0.5 );
 
 					const noise3D = n1.add( n2 );
 
-					// Exponential height falloff relative to fog ground level
-					const heightFactor = pos.y.sub( fogHeight ).mul( heightFalloff ).negate().exp();
+					// Physical height in meters relative to ground level (y = -1.0)
+					const relHeight = pos.y.sub( groundLevelY ).div( fogHeight.max( 0.01 ) );
+					const heightFactor = float( 1.0 ).sub( relHeight ).clamp( 0.0, 1.0 ).pow( heightFalloff );
 
 					// Cloud shaping via thresholding
 					const cloud = noise3D.sub( cloudThreshold ).max( 0.0 ).mul( heightFactor );
@@ -264,14 +357,30 @@
 					const targetWorldPos = cameraWorldMatrixUniform.mul( vec4( viewPos, 1.0 ) ).xyz;
 
 					const rayVector = targetWorldPos.sub( cameraPositionUniform );
-					const totalDist = rayVector.length().min( maxRayDist );
+					const surfaceDist = rayVector.length();
 					const rayDir = rayVector.normalize();
 
-					const stepSize = totalDist.div( float( steps ) );
+					// Ray-Slab: intersect ray with the physical fog layer [groundLevelY, groundLevelY + fogHeight]
+					const fogBottomY = groundLevelY;
+					const fogTopY = groundLevelY.add( fogHeight );
+
+					const dirY = rayDir.y.greaterThanEqual( 0.0 ).select( rayDir.y.max( 0.00001 ), rayDir.y.min( - 0.00001 ) );
+					const t0 = fogBottomY.sub( cameraPositionUniform.y ).div( dirY );
+					const t1 = fogTopY.sub( cameraPositionUniform.y ).div( dirY );
+
+					const tNearSlab = t0.min( t1 );
+					const tFarSlab = t0.max( t1 );
+
+					// Constrain ray range exclusively to the intersection within the fog volume
+					const tStart = tNearSlab.max( 0.0 );
+					const tEnd = tFarSlab.min( surfaceDist ).min( tStart.add( maxRayDist ) );
+					const marchDist = tEnd.sub( tStart ).max( 0.0 );
+
+					const stepSize = marchDist.div( float( steps ) );
 					const stepVector = rayDir.mul( stepSize );
 
 					const ditherOffset = interleavedGradientNoise( screenCoordinate.xy );
-					const positionRay = cameraPositionUniform.add( stepVector.mul( ditherOffset ) ).toVar();
+					const positionRay = cameraPositionUniform.add( rayDir.mul( tStart ) ).add( stepVector.mul( ditherOffset ) ).toVar();
 
 					const accumulation = float( 0.0 ).toVar();
 
@@ -288,7 +397,6 @@
 					const cloudFog = float( 1.0 ).sub( accumulation.negate().exp() );
 
 					// Linear range fog based on distance from camera
-					const surfaceDist = rayVector.length();
 					const rangeFog = surfaceDist.sub( rangeFogNear ).div( rangeFogFar.sub( rangeFogNear ).max( 0.001 ) ).clamp( 0.0, 1.0 );
 
 					// Seamlessly blend volumetric cloud fog with distant range fog
@@ -438,11 +546,11 @@
 				gui.add( resolutionScale, 'value', 0.25, 0.75, 0.05 ).name( 'resolution scale' ).onChange( ( value ) => lowResFogPass.setResolutionScale( value ) );
 				gui.add( steps, 'value', 4, 32, 1 ).name( 'steps' );
 				gui.add( cloudThreshold, 'value', 0.0, 0.8, 0.02 ).name( 'cloud threshold' );
-				gui.add( cloudScale, 'value', 0.02, 0.15, 0.005 ).name( 'cloud scale' );
+				gui.add( cloudScale, 'value', 0.001, 0.15, 0.001 ).name( 'cloud scale' );
 				gui.add( maxRayDist, 'value', 10.0, 70.0, 1.0 ).name( 'max ray dist' );
 				gui.add( fogDensity, 'value', 0.0, 3.0, 0.05 ).name( 'fog density' );
-				gui.add( heightFalloff, 'value', 0.0, 2.0, 0.05 ).name( 'height falloff' );
-				gui.add( fogHeight, 'value', - 2.0, 5.0, 0.1 ).name( 'fog height' );
+				gui.add( heightFalloff, 'value', 0.2, 4.0, 0.1 ).name( 'height falloff' );
+				gui.add( fogHeight, 'value', 0.2, 8.0, 0.1 ).name( 'fog height (m)' );
 				gui.add( cloudSpeed, 'value', 0.0, 0.2, 0.005 ).name( 'cloud speed' );
 				gui.add( rangeFogNear, 'value', 0.0, 100.0, 0.5 ).name( 'range fog near' );
 				gui.add( rangeFogFar, 'value', 5.0, 150.0, 0.5 ).name( 'range fog far' );
@@ -469,6 +577,12 @@
 			}
 
 			function animate() {
+
+				timer.update();
+
+				const delta = timer.getDelta();
+
+				cloudTimeUniform.value += delta * cloudSpeed.value;
 
 				controls.update();
 
