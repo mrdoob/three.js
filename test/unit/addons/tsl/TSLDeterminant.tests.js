@@ -3,18 +3,6 @@ import {
 } from 'three/tsl';
 import { gpuTest } from './gpu-test-utils.js';
 
-// Regression coverage for a determinant() type-inference bug:
-// determinant(m) genuinely computes and codegens a scalar (float) at the
-// shader level, but MathNode.DETERMINANT was missing from the list of
-// methods special-cased to report 'float' from generateNodeType(). It fell
-// through to getInputType(), which for a single-matrix-argument call returns
-// the *matrix's own type* (e.g. 'mat3') -- so determinant(mat3).getNodeType()
-// answered 'mat3', not 'float': correct shader code, wrong type metadata.
-// Any downstream TSL composition relying on automatic type inference for a
-// determinant() result (comparisons, swizzles, or -- as here -- a test
-// harness deciding how to store/compare the value) would get incorrect
-// behavior purely from the type-metadata bug, independent of the arithmetic
-// being right.
 export default QUnit.module( 'TSL', () => {
 
 	QUnit.module( 'determinant()', () => {
