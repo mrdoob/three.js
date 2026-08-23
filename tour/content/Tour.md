@@ -2337,20 +2337,229 @@ renderPipeline.outputNode = fractalVal.mix( color( 0x050510 ), color( 0x3b82f6 )
 
 <page name="Context">
 
-In TSL, **Context** acts as a cascading configuration system that flows downward during node compilation. It allows nodes to access dynamic context properties or override parameters based on where they reside in the rendering tree.
+In TSL, `ContextNode` is a cascading configuration and environment system that flows downward through the node graph (Abstract Syntax Tree) during compilation.
+
+It allows materials, render passes, and individual sub-graphs to inject configuration parameters, override global behaviors (such as UV coordinates, shadow sampling, or ambient occlusion), and assign custom variable names without modifying the underlying nodes.
+
+<code name="contextExample" default="true">Context Showcase</code>
+
+::: api context( nodeOrValue, value ) : ContextNode - Wraps a node with contextual dictionary data that flows downward to all child nodes during compilation.
+- **nodeOrValue**: `Node | Object` - The target node to wrap, or the context dictionary object if creating a standalone context wrapper.
+- **value**: `Object` - Key-value dictionary containing contextual parameters and hooks.
+:::
+
+::: api .context( value ) : ContextNode - Method chaining helper to wrap the current node expression with contextual data. :::
+
+### Context Properties
+
+::: api getUV : Function - Callback `( builder ) => Node` to override the UV coordinate used by all textures and UV-dependent nodes in the active sub-tree. :::
+
+::: api getShadow : Function - Callback `( { light, shadowColorNode } ) => Node` to customize or filter shadow calculations across the contextual sub-tree. :::
+
+::: api getAO : Function - Callback `( inputNode, { material } ) => Node` to customize or modulate ambient occlusion evaluation across the sub-tree. :::
 
 ### Context Hierarchy Cascade
 
-Here is how the Context wraps and flows down from the Renderer to individual Nodes:
+Context configuration flows downward from the highest level of the rendering engine down to individual node expressions:
 
 ```mermaid
-graph TD
-	WebGPURenderer --> PassNode
-	PassNode --> RenderPipeline
-	RenderPipeline --> NodeMaterial
-	NodeMaterial --> ContextNode
-	ContextNode --> Node
+flowchart TD
+    Renderer["<b>WebGPURenderer</b><br/><small><code>renderer.contextNode</code><br/>Global scene context</small>"]
+    Pass["<b>RenderPipeline / PassNode</b><br/><small><code>pass.contextNode</code><br/>Per-pass context</small>"]
+    Material["<b>NodeMaterial</b><br/><small><code>material.contextNode</code><br/>Material-wide context</small>"]
+    SubGraph["<b>ContextNode / Sub-Graph</b><br/><small><code>node.context( { ... } )</code><br/>Scoped expression context</small>"]
+    Target["<b>Target Nodes</b><br/><small>Inherit and evaluate within active context</small>"]
+
+    Renderer --> Pass
+    Pass --> Material
+    Material --> SubGraph
+    SubGraph --> Target
 ```
+
+#### Overriding UVs for All Child Textures
+Assigning `getUV` to `material.contextNode` or wrapping an expression automatically redirects texture sampling across the entire sub-tree:
+
+```js
+import * as THREE from 'three';
+import { uv, vec2, time, texture } from 'three/tsl';
+
+const map = new THREE.TextureLoader().load( '../examples/textures/uv_grid_opengl.jpg' );
+map.wrapS = THREE.RepeatWrapping;
+map.wrapT = THREE.RepeatWrapping;
+
+// Dynamic animated and scaled UV coordinates
+const animatedUV = uv().mul( 3.0 ).add( vec2( time.mul( 0.2 ), 0.0 ) );
+
+// All textures in this material automatically use animatedUV instead of standard uv()
+material.contextNode = material.context( {
+	getUV: () => animatedUV
+} );
+
+material.colorNode = texture( map );
+```
+
+```tsl contextExample
+import 'scenes/shaderball';
+import * as THREE from 'three';
+import { uv, time, texture, vec2 } from 'three/tsl';
+
+// Load texture map
+const map = new THREE.TextureLoader().load( '../examples/textures/uv_grid_opengl.jpg' );
+map.wrapS = THREE.RepeatWrapping;
+map.wrapT = THREE.RepeatWrapping;
+
+// 1. Custom animated and scaled UV coordinates
+const animatedUV = uv().mul( 3.0 ).add( vec2( time.mul( 0.2 ), 0.0 ) );
+
+// 2. Wrap material context to redirect getUV for all textures across the material
+model.material.contextNode = uv().context( {
+	getUV: () => animatedUV
+} );
+
+// 3. Texture sampling automatically inherits the contextual animated UVs
+model.material.colorNode = texture( map );
+model.material.roughness = 0.2;
+model.material.metalness = 0.5;
+```
+
+</page>
+
+<page name="setName">
+
+In TSL, **`setName()`** (and `.setName()`) assigns an explicit, readable identifier name to a node expression in the generated shader source code (WGSL or GLSL).
+
+By default, `NodeBuilder` names intermediate variables with auto-incrementing identifiers (e.g. `nodeVar0`, `nodeVar1`, `nodeVar2`). Using `setName()` makes compiled shaders clean, self-documenting, and easy to inspect in browser developer tools (such as Chrome WebGPU DevTools, Spector.js, or RenderDoc).
+
+<code name="setNameExample" default="true">Named Variables Showcase</code>
+
+::: api setName( node, name ) : ContextNode - Assigns an explicit variable name to a node in the generated shader code.
+- **node**: `Node` - The target node to assign an identifier name.
+- **name**: `string` - The identifier name to emit in the compiled shader.
+:::
+
+::: api .setName( name ) : ContextNode - Method chaining helper to assign an explicit variable name to the current node expression. :::
+
+### Generated Code Comparison
+
+```js
+import { positionLocal, normalView, time, color } from 'three/tsl';
+
+// 1. Without setName: NodeBuilder generates generic identifiers
+const waveA = positionLocal.y.mul( 8.0 ).add( time.mul( 2.0 ) ).sin();
+// Emits: var nodeVar0: f32 = sin((positionLocal.y * 8.0) + (time * 2.0));
+
+// 2. With setName: NodeBuilder uses explicit, readable identifiers
+const waveB = positionLocal.y.mul( 8.0 ).add( time.mul( 2.0 ) ).sin().setName( 'waveHeight' );
+// Emits: var waveHeight: f32 = sin((positionLocal.y * 8.0) + (time * 2.0));
+
+const rim = normalView.z.oneMinus().pow( 2.5 ).setName( 'fresnelRim' );
+// Emits: var fresnelRim: f32 = pow(1.0 - normalView.z, 2.5);
+```
+
+> AI: `label()` was previously used for this purpose and is deprecated in favor of `setName()`.
+
+```tsl setNameExample
+import 'scenes/shaderball';
+import { positionLocal, normalView, time, color, mix } from 'three/tsl';
+
+// Assign clear, explicit variable names for easy shader debugging
+const waveHeight = positionLocal.y.mul( 10.0 ).add( time.mul( 2.0 ) ).sin().setName( 'waveHeight' );
+const fresnelRim = normalView.z.oneMinus().pow( 2.5 ).setName( 'fresnelRim' );
+const baseColor = color( 0x070b1a ).setName( 'baseColor' );
+const neonCyan = color( 0x00f0ff ).setName( 'neonCyan' );
+
+// Composite final material nodes
+const surfacePattern = mix( baseColor, neonCyan, waveHeight.abs() ).setName( 'surfacePattern' );
+
+model.material.colorNode = surfacePattern;
+model.material.roughness = 0.2;
+model.material.metalness = 0.85;
+model.material.emissiveNode = neonCyan.mul( fresnelRim ).setName( 'emissiveRim' );
+```
+
+</page>
+
+<page name="uniformFlow">
+
+In modern graphics APIs like **WebGPU (WGSL)**, texture sampling operations that rely on implicit screen-space derivatives (such as mipmap selection and anisotropic filtering) require execution within **Uniform Control Flow**.
+
+When texture sampling or derivative-dependent math is placed inside a divergent conditional branch (e.g. inside an `If( dynamicCondition )` or a dynamic loop where adjacent fragment threads take different execution paths), it can cause undefined derivative values, mipmapping distortion, or GPU validation errors.
+
+`uniformFlow( node )` (or `.uniformFlow()`) forces `NodeBuilder` to hoist and evaluate all dependencies of a node in the root uniform scope *before* entering non-uniform conditional branches.
+
+<code name="uniformFlowExample" default="true">Uniform Flow Showcase</code>
+
+::: api uniformFlow( node ) : ContextNode - Enforces that all child node dependencies execute strictly within uniform control-flow paths.
+- **node**: `Node` - The node whose dependencies must evaluate in uniform control flow.
+:::
+
+::: api .uniformFlow() : ContextNode - Method chaining helper to enforce uniform control-flow execution on the current node expression. :::
+
+### How Uniform Flow Works
+
+```mermaid
+flowchart TD
+    subgraph Without["Without uniformFlow (Divergent Execution)"]
+        IfBranch1["<b>If ( dynamicCondition )</b><br/><small>Threads diverge across pixels</small>"]
+        Sample1["<code>texture( map, uv )</code><br/><small>Evaluated inside branch (Invalid derivatives)</small>"]
+        IfBranch1 --> Sample1
+    end
+
+    subgraph With["With uniformFlow (Safe Uniform Hoisting)"]
+        Hoisted["<code>texture( map, uv ).uniformFlow()</code><br/><small>Evaluated in root uniform scope (Valid derivatives)</small>"]
+        IfBranch2["<b>If ( dynamicCondition )</b><br/><small>Threads safely consume pre-calculated sample</small>"]
+        Hoisted --> IfBranch2
+    end
+```
+
+### Practical Usage
+
+```js
+import { texture, uv, uniformFlow, If, color } from 'three/tsl';
+
+// Force texture sample to execute in uniform scope before branching
+const diffuseMap = texture( map, uv() ).uniformFlow();
+
+If( surfaceCondition, () => {
+
+	// Safe to use diffuseMap inside dynamic branches without derivative artifacts
+	material.colorNode = diffuseMap.mul( color( 0x00ffaa ) );
+
+} ).Else( () => {
+
+	material.colorNode = diffuseMap.mul( color( 0xff0055 ) );
+
+} );
+```
+
+```tsl uniformFlowExample
+import 'scenes/shaderball';
+import { positionLocal, time, color, If, float } from 'three/tsl';
+
+// Calculate procedural coordinates in uniform flow
+const ripple = positionLocal.y.mul( 12.0 ).add( time.mul( 2.5 ) ).sin().abs().uniformFlow();
+
+const cyan = color( 0x00e1ff );
+const magenta = color( 0xff0077 );
+const darkBase = color( 0x080e1c );
+
+// Dynamically branch shading while consuming uniformFlow nodes safely
+const condition = positionLocal.x.greaterThan( float( 0.0 ) );
+
+If( condition, () => {
+
+	model.material.colorNode = darkBase.add( cyan.mul( ripple ) );
+
+} ).Else( () => {
+
+	model.material.colorNode = darkBase.add( magenta.mul( ripple ) );
+
+} );
+
+model.material.roughness = 0.2;
+model.material.metalness = 0.8;
+```
+
 </page>
 
 <page name="Override Node">
@@ -4983,10 +5192,13 @@ Rotation functions allow you to rotate 2D coordinates or 3D positions/vectors. T
 
 <code name="teapotEmitter" default="true">Teapot Emitter</code>
 
-::: api rotate( position, rotation ) : Node - Applies a rotation to the given position or vector node.
+::: api rotate( position, rotation, order='XYZ' ) : Node - Applies a rotation to the given position or vector node.
 - **position**: `vec2 | vec3` - The 2D or 3D vector to rotate.
 - **rotation**: `float | vec3` - For 2D positions, a single float angle (in radians). For 3D positions, a Euler rotation vector containing rotation angles for the X, Y, and Z axes.
+- **order**: `string` - The Euler rotation order (e.g. `'XYZ'`, `'YZX'`, `'ZXY'`, `'XZY'`, `'YXZ'`, `'ZYX'`). Only used for 3D rotation. Defaults to `'XYZ'`.
 :::
+
+::: api .rotate( rotation, order='XYZ' ) : Node - Method chaining helper to rotate the current position or vector node. :::
 
 ```tsl teapotEmitter
 import 'scenes/empty';
