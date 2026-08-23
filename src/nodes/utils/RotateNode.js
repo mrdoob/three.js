@@ -1,6 +1,7 @@
 import TempNode from '../core/TempNode.js';
 import { nodeProxy, vec4, mat2, mat4 } from '../tsl/TSLBase.js';
 import { cos, sin } from '../math/MathNode.js';
+import { hashString } from '../core/NodeUtils.js';
 
 /**
  * Applies a rotation to the given position node.
@@ -21,7 +22,7 @@ class RotateNode extends TempNode {
 	 * @param {Node} positionNode - The position node.
 	 * @param {Node} rotationNode - Represents the rotation that is applied to the position node. Depending
 	 * on whether the position data are 2D or 3D, the rotation is expressed a single float value or an Euler value.
-	 * @param {string} [order='XYZ'] - The Euler rotation order string (e.g., 'YXZ', 'ZXY'). Only used for 3D rotations.
+	 * @param {string} [order='XYZ'] - The Euler rotation order. Only used for 3D rotation.
 	 */
 	constructor( positionNode, rotationNode, order = 'XYZ' ) {
 
@@ -35,8 +36,8 @@ class RotateNode extends TempNode {
 		this.positionNode = positionNode;
 
 		/**
-		 *  Represents the rotation that is applied to the position node.
-		 *  Depending on whether the position data are 2D or 3D, the rotation is expressed a single float value or an Euler value.
+		 * Represents the rotation that is applied to the position node.
+		 * Depending on whether the position data are 2D or 3D, the rotation is expressed a single float value or an Euler value.
 		 *
 		 * @type {Node}
 		 */
@@ -45,10 +46,48 @@ class RotateNode extends TempNode {
 		/**
 		 * The Euler rotation order.
 		 *
+		 * @private
 		 * @type {string}
 		 * @default 'XYZ'
 		 */
-		this.order = order;
+		this._order = order;
+
+	}
+
+	/**
+	 * Overwrites the default `customCacheKey()` implementation by including the
+	 * Euler order into the cache key.
+	 *
+	 * @return {number} The hash.
+	 */
+	customCacheKey() {
+
+		return hashString( this._order );
+
+	}
+
+	/**
+	 * Sets the Euler rotation order.
+	 *
+	 * @param {string} value - The Euler rotation order.
+	 * @return {RotateNode} A reference to this node.
+	 */
+	setOrder( value ) {
+
+		this._order = value;
+
+		return this;
+
+	}
+
+	/**
+	 * Gets the Euler rotation order.
+	 *
+	 * @return {string} The Euler rotation order.
+	 */
+	getOrder() {
+
+		return this._order;
 
 	}
 
@@ -66,7 +105,7 @@ class RotateNode extends TempNode {
 
 	setup( builder ) {
 
-		const { rotationNode, positionNode, order } = this;
+		const { rotationNode, positionNode } = this;
 
 		const nodeType = this.getNodeType( builder );
 
@@ -85,6 +124,8 @@ class RotateNode extends TempNode {
 		} else {
 
 			const rotation = rotationNode;
+			const order = this._order;
+
 			const rotationXMatrix = mat4( vec4( 1.0, 0.0, 0.0, 0.0 ), vec4( 0.0, cos( rotation.x ), sin( rotation.x ), 0.0 ), vec4( 0.0, sin( rotation.x ).negate(), cos( rotation.x ), 0.0 ), vec4( 0.0, 0.0, 0.0, 1.0 ) );
 			const rotationYMatrix = mat4( vec4( cos( rotation.y ), 0.0, sin( rotation.y ).negate(), 0.0 ), vec4( 0.0, 1.0, 0.0, 0.0 ), vec4( sin( rotation.y ), 0.0, cos( rotation.y ), 0.0 ), vec4( 0.0, 0.0, 0.0, 1.0 ) );
 			const rotationZMatrix = mat4( vec4( cos( rotation.z ), sin( rotation.z ), 0.0, 0.0 ), vec4( sin( rotation.z ).negate(), cos( rotation.z ), 0.0, 0.0 ), vec4( 0.0, 0.0, 1.0, 0.0 ), vec4( 0.0, 0.0, 0.0, 1.0 ) );
@@ -109,7 +150,7 @@ class RotateNode extends TempNode {
 
 		super.serialize( data );
 
-		data.order = this.order;
+		data.order = this._order;
 
 	}
 
@@ -117,7 +158,7 @@ class RotateNode extends TempNode {
 
 		super.deserialize( data );
 
-		this.order = data.order;
+		this._order = data.order;
 
 	}
 
@@ -133,7 +174,7 @@ export default RotateNode;
  * @param {Node} positionNode - The position node.
  * @param {Node} rotationNode - Represents the rotation that is applied to the position node. Depending
  * on whether the position data are 2D or 3D, the rotation is expressed a single float value or an Euler value.
- * @param {string} [order='XYZ'] - The Euler rotation order string (e.g., 'YXZ', 'ZXY'). Only used for 3D rotations.
+ * @param {string} [order='XYZ'] - The Euler rotation order. Only used for 3D rotation.
  * @returns {RotateNode}
  */
 export const rotate = /*@__PURE__*/ nodeProxy( RotateNode ).setParameterLength( 2, 3 );
