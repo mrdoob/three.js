@@ -63,22 +63,21 @@ export default QUnit.module( 'TSL', () => {
 		gpuTest( 'countTrailingZeros() matches a hand-computed trailing-zero count', ( { assert } ) => {
 
 			// Computed independently in plain JS: the position of the
-			// lowest set bit. countTrailingZeros(0) is deliberately NOT
-			// exercised here: it's a well-known undefined-input edge case
-			// for trailing-zero-count implementations (the classic
-			// `x & -x` bit trick used to implement it is itself undefined
-			// at 0), and it's confirmed to disagree between backends here
-			// (WebGPU returns 32, the WebGL fallback returns 2^32) --
-			// there's nothing to protect against regressing to, so this
-			// only asserts inputs with at least one set bit.
+			// lowest set bit, or 32 if there is none -- matching
+			// countLeadingZeros(0)'s own "no bits set, count all 32"
+			// convention (see BitcountNode.js's WebGL polyfill, which
+			// explicitly special-cases zero the same way for both
+			// functions).
 			const ctz = ( x ) => {
 
+				if ( x === 0 ) return 32;
 				let n = 0;
 				while ( ( x & 1 ) === 0 ) { n ++; x >>>= 1; }
 				return n;
 
 			};
 
+			assert.eq( countTrailingZeros( uint( 0 ) ), uint( ctz( 0 ) ), 'countTrailingZeros(0) == 32' );
 			assert.eq( countTrailingZeros( uint( 8 ) ), uint( ctz( 8 ) ), 'countTrailingZeros(8) == 3' );
 			assert.eq( countTrailingZeros( uint( 0xF0 ) ), uint( ctz( 0xF0 ) ), 'countTrailingZeros(0xF0) == 4' );
 			assert.eq( countTrailingZeros( uint( 1 ) ), uint( ctz( 1 ) ), 'countTrailingZeros(1) == 0' );
