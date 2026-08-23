@@ -264,65 +264,59 @@ function serializeArg( arg, depth = 0, seen = new WeakSet() ) {
 
 	}
 
-	if ( typeof arg === 'object' ) {
+	if ( seen.has( arg ) ) return '[Circular]';
+	seen.add( arg );
 
-		if ( seen.has( arg ) ) return '[Circular]';
-		seen.add( arg );
+	if ( arg instanceof HTMLElement ) {
 
-		if ( arg instanceof HTMLElement ) {
-
-			return `<${arg.tagName.toLowerCase()}${arg.id ? '#' + arg.id : ''}${arg.className ? '.' + arg.className.split( ' ' ).join( '.' ) : ''}>`;
-
-		}
-
-		if ( Array.isArray( arg ) ) {
-
-			if ( depth > 2 ) return '[Array]';
-			const items = arg.slice( 0, 10 ).map( item => serializeArg( item, depth + 1, seen ) );
-			if ( arg.length > 10 ) items.push( `... ${arg.length - 10} more` );
-			return `[ ${items.join( ', ' )} ]`;
-
-		}
-
-		const constructorName = arg.constructor ? arg.constructor.name : 'Object';
-		if ( constructorName && constructorName !== 'Object' ) {
-
-			if ( [ 'Vector2', 'Vector3', 'Vector4', 'Color' ].includes( constructorName ) ) {
-
-				if ( constructorName === 'Color' ) {
-
-					return `Color( r: ${arg.r}, g: ${arg.g}, b: ${arg.b} )`;
-
-				}
-
-				const coords = [ arg.x, arg.y, arg.z, arg.w ].filter( v => v !== undefined );
-				return `${constructorName}( ${coords.join( ', ' )} )`;
-
-			}
-
-			const desc = [];
-			if ( arg.type ) desc.push( `type: "${arg.type}"` );
-			if ( arg.name ) desc.push( `name: "${arg.name}"` );
-			if ( arg.uuid ) desc.push( `uuid: "${arg.uuid.substring( 0, 8 )}..."` );
-
-			const descStr = desc.length > 0 ? ` { ${desc.join( ', ' )} }` : '';
-			return `${constructorName}${descStr}`;
-
-		}
-
-		if ( depth > 2 ) return '[Object]';
-		const keys = Object.keys( arg );
-		const entries = keys.slice( 0, 10 ).map( key => {
-
-			return `${key}: ${serializeArg( arg[ key ], depth + 1, seen )}`;
-
-		} );
-		if ( keys.length > 10 ) entries.push( `... ${keys.length - 10} more` );
-		return `{ ${entries.join( ', ' )} }`;
+		return `<${arg.tagName.toLowerCase()}${arg.id ? '#' + arg.id : ''}${arg.className ? '.' + arg.className.split( ' ' ).join( '.' ) : ''}>`;
 
 	}
 
-	return String( arg );
+	if ( Array.isArray( arg ) ) {
+
+		if ( depth > 2 ) return '[Array]';
+		const items = arg.slice( 0, 10 ).map( item => serializeArg( item, depth + 1, seen ) );
+		if ( arg.length > 10 ) items.push( `... ${arg.length - 10} more` );
+		return `[ ${items.join( ', ' )} ]`;
+
+	}
+
+	const constructorName = arg.constructor ? arg.constructor.name : 'Object';
+	if ( constructorName && constructorName !== 'Object' ) {
+
+		if ( [ 'Vector2', 'Vector3', 'Vector4', 'Color' ].includes( constructorName ) ) {
+
+			if ( constructorName === 'Color' ) {
+
+				return `Color( r: ${arg.r}, g: ${arg.g}, b: ${arg.b} )`;
+
+			}
+
+			const coords = [ arg.x, arg.y, arg.z, arg.w ].filter( v => v !== undefined );
+			return `${constructorName}( ${coords.join( ', ' )} )`;
+
+		}
+
+		const desc = [];
+		if ( arg.type ) desc.push( `type: "${arg.type}"` );
+		if ( arg.name ) desc.push( `name: "${arg.name}"` );
+		if ( arg.uuid ) desc.push( `uuid: "${arg.uuid.substring( 0, 8 )}..."` );
+
+		const descStr = desc.length > 0 ? ` { ${desc.join( ', ' )} }` : '';
+		return `${constructorName}${descStr}`;
+
+	}
+
+	if ( depth > 2 ) return '[Object]';
+	const keys = Object.keys( arg );
+	const entries = keys.slice( 0, 10 ).map( key => {
+
+		return `${key}: ${serializeArg( arg[ key ], depth + 1, seen )}`;
+
+	} );
+	if ( keys.length > 10 ) entries.push( `... ${keys.length - 10} more` );
+	return `{ ${entries.join( ', ' )} }`;
 
 }
 

@@ -53,7 +53,7 @@ class LayoutManager {
 			document.body.classList.add( 'v-resizer-collapsed' );
 
 			document.body.classList.add( 'preview-hidden' );
-			this.tour.dom.headerPreviewToggle.innerHTML = `<i data-icon="eye-off" style="width: 1.25rem; height: 1.25rem;"></i>`;
+			this.tour.dom.headerPreviewToggle.innerHTML = '<i data-icon="eye-off" style="width: 1.25rem; height: 1.25rem;"></i>';
 			this.tour.createIcons( this.tour.dom.headerPreviewToggle );
 			this.tour.isPreviewVisible = false;
 
@@ -65,7 +65,7 @@ class LayoutManager {
 			if ( ! isEditorCollapsed ) {
 
 				document.body.classList.remove( 'preview-hidden' );
-				this.tour.dom.headerPreviewToggle.innerHTML = `<i data-icon="eye" style="width: 1.25rem; height: 1.25rem;"></i>`;
+				this.tour.dom.headerPreviewToggle.innerHTML = '<i data-icon="eye" style="width: 1.25rem; height: 1.25rem;"></i>';
 				this.tour.createIcons( this.tour.dom.headerPreviewToggle );
 				this.tour.isPreviewVisible = true;
 

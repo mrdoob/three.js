@@ -183,6 +183,7 @@ class SearchManager {
 						} );
 
 					}
+
 					if ( ! featuredPage ) {
 
 						featuredPage = this.tour.pages.find( p => {
@@ -458,10 +459,23 @@ class SearchManager {
 	getCleanText( md ) {
 
 		if ( ! md ) return '';
-		return md
-			.replace( /```tsl[\s\S]*?```/gi, '' ) // Remove code blocks
-			.replace( /<[^>]*>/g, '' ) // Remove HTML tags
-			.replace( /\[([^\]]+)\]\(([^)]+)\)/g, '$1' ) // Remove links keeping text
+
+		let text = md.replace( /```[\s\S]*?```/gi, '' ); // Remove code blocks
+
+		// Strip HTML tags repeatedly until no more tags remain
+		let prev;
+		do {
+
+			prev = text;
+			text = text.replace( /<[^<>]*>/g, '' );
+
+		} while ( text !== prev );
+
+		// Strip remaining standalone angle brackets
+		text = text.replace( /[<>]/g, ' ' );
+
+		return text
+			.replace( /\[([^\]]+)\]\([^)]+\)/g, '$1' ) // Remove links keeping text
 			.replace( /\*\*([^*]+)\*\*/g, '$1' ) // Remove bold
 			.replace( /__([^_]+)__/g, '$1' )
 			.replace( /\*([^*]+)\*/g, '$1' ) // Remove italic
@@ -477,19 +491,30 @@ class SearchManager {
 
 	highlightSearchTerms( text, queryTerms ) {
 
-		if ( ! queryTerms || queryTerms.length === 0 ) return text;
+		if ( ! text ) return '';
+
+		const escapeHtml = ( str ) => str
+			.replace( /&/g, '&amp;' )
+			.replace( /</g, '&lt;' )
+			.replace( />/g, '&gt;' )
+			.replace( /"/g, '&quot;' )
+			.replace( /'/g, '&#39;' );
+
+		const safeText = escapeHtml( text );
+
+		if ( ! queryTerms || queryTerms.length === 0 ) return safeText;
 
 		const escapeRegExp = ( string ) => string.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
 
 		const patterns = queryTerms.map( t => {
 
-			const escaped = escapeRegExp( t );
+			const escaped = escapeRegExp( escapeHtml( t ) );
 			return `\\w*${escaped}\\w*|${escaped}`;
 
 		} );
 
 		const regex = new RegExp( `(${patterns.join( '|' )})`, 'gi' );
-		return text.replace( regex, '<span style="color: var(--accent); font-weight: 600;">$1</span>' );
+		return safeText.replace( regex, '<span style="color: var(--accent); font-weight: 600;">$1</span>' );
 
 	}
 
@@ -623,8 +648,8 @@ function getLevenshteinDistance( a, b ) {
 
 				matrix[ i ][ j ] = Math.min(
 					matrix[ i - 1 ][ j - 1 ] + 1, // substitution
-					matrix[ i ][ j - 1 ] + 1,     // insertion
-					matrix[ i - 1 ][ j ] + 1      // deletion
+					matrix[ i ][ j - 1 ] + 1, // insertion
+					matrix[ i - 1 ][ j ] + 1 // deletion
 				);
 
 			}

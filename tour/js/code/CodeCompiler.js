@@ -470,7 +470,7 @@ class CodeCompiler {
 
 		};
 
-		const renameScript = ( scriptKey, fileCode ) => {
+		const renameScript = ( fileCode ) => {
 
 			const { declared, exported } = getAstInfo( fileCode );
 			let updatedCode = fileCode;
@@ -514,14 +514,14 @@ class CodeCompiler {
 
 			if ( scriptTexts[ scriptName ] ) {
 
-				scriptTexts[ scriptName ] = renameScript( scriptName, scriptTexts[ scriptName ] );
+				scriptTexts[ scriptName ] = renameScript( scriptTexts[ scriptName ] );
 				scripts[ scriptName ].text = scriptTexts[ scriptName ];
 
 			}
 
 		} );
 
-		code = renameScript( 'main', scriptTexts[ 'main' ] );
+		code = renameScript( scriptTexts[ 'main' ] );
 
 		// Build scriptBasenameMap to avoid naming conflicts while using simple names
 		const scriptBasenameMap = new Map();

@@ -31,6 +31,7 @@ body {
 	height: 100%;
 	height: 100dvh;
 	font-family: 'Inter', system-ui, -apple-system, sans-serif;
+	font-feature-settings: 'calt' 0;
 	line-height: 1.5;
 	background-color: var(--bg-main);
 	color: #d1d5db;
@@ -199,6 +200,7 @@ body {
 /* Tables */
 .markdown-content table {
 	width: 100%;
+	max-width: 100%;
 	border-collapse: collapse;
 	margin-bottom: 1.5rem;
 	font-size: 0.9rem;
@@ -219,7 +221,7 @@ body {
 	padding: 0.95rem 1rem;
 	border: 1px solid var(--border-color);
 	color: #d1d5db;
-	vertical-align: top;
+	vertical-align: middle;
 	line-height: 1.7;
 }
 
@@ -227,6 +229,8 @@ body {
 	display: inline-block;
 	vertical-align: baseline;
 	margin: 0.1rem 0;
+	white-space: normal;
+	word-break: break-word;
 }
 
 .markdown-content tr:nth-child(even) {

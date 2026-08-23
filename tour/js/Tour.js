@@ -166,30 +166,37 @@ class Tour {
 
 		const parts = parseParts( this.tourTitle );
 
-		const headerHtml = parts.map( ( part ) => {
-
-			const cls = part.highlight ? 'header-title-accent' : 'header-title-prefix';
-			return `<span class="${cls}">${part.text}</span>`;
-
-		} ).join( '' );
-
-		const loadingHtml = parts.map( ( part ) => {
-
-			const cls = part.highlight ? 'loading-text-bold' : 'loading-text-light';
-			return `<span class="${cls}">${part.text}</span>`;
-
-		} ).join( '' );
-
 		const cleanTitle = this.tourTitle.replace( /\*/g, '' );
 
 		const headerTitleEl = this.dom?.headerTitle || document.querySelector( '.header-title' );
-		headerTitleEl.innerHTML = headerHtml;
+		if ( headerTitleEl ) {
+
+			headerTitleEl.textContent = '';
+			parts.forEach( ( part ) => {
+
+				const span = document.createElement( 'span' );
+				span.className = part.highlight ? 'header-title-accent' : 'header-title-prefix';
+				span.textContent = part.text;
+				headerTitleEl.appendChild( span );
+
+			} );
+
+		}
 
 		const loadingTextEl = this.dom?.loadingText || document.querySelector( '.loading-text' );
-		loadingTextEl.innerHTML = loadingHtml;
+		if ( loadingTextEl ) {
 
-		/*const loadingTextContainer = document.querySelector( '.loading-text-container' );
-		loadingTextContainer.style.display = 'flex';*/
+			loadingTextEl.textContent = '';
+			parts.forEach( ( part ) => {
+
+				const span = document.createElement( 'span' );
+				span.className = part.highlight ? 'loading-text-bold' : 'loading-text-light';
+				span.textContent = part.text;
+				loadingTextEl.appendChild( span );
+
+			} );
+
+		}
 
 		document.title = `${cleanTitle} - Interactive Guide`;
 
@@ -1038,7 +1045,7 @@ class Tour {
 
 						if ( this.isPlaygroundActive ) {
 
-							await this.runPlayground();
+							this.runPlayground();
 
 						} else {
 
@@ -1292,7 +1299,7 @@ class Tour {
 
 			this.dom.contentArea.querySelectorAll( '.mermaid code' ).forEach( ( el ) => {
 
-				el.innerHTML = tokenizeInlineCode( el.innerHTML );
+				el.innerHTML = tokenizeInlineCode( el.textContent );
 
 			} );
 
@@ -1380,8 +1387,7 @@ class Tour {
 			if ( nodeName ) {
 
 				const textVal = codeTag.textContent.trim();
-				codeTag.innerHTML = '';
-				codeTag.appendChild( document.createTextNode( textVal ) );
+				codeTag.textContent = textVal;
 
 				const button = document.createElement( 'button' );
 				button.className = 'code-modifier-inline-btn';
@@ -1902,12 +1908,12 @@ class Tour {
 
 		if ( suggestion ) {
 
-			this.dom.searchSuggestionContainer.innerHTML = `
-				Did you mean: <a href="#" class="search-suggestion-link">${suggestion}</a>?
-			`;
-			this.dom.searchSuggestionContainer.style.display = 'flex';
-
-			this.dom.searchSuggestionContainer.querySelector( '.search-suggestion-link' ).onclick = ( e ) => {
+			this.dom.searchSuggestionContainer.textContent = 'Did you mean: ';
+			const link = document.createElement( 'a' );
+			link.href = '#';
+			link.className = 'search-suggestion-link';
+			link.textContent = suggestion;
+			link.onclick = ( e ) => {
 
 				e.preventDefault();
 				this.dom.searchInput.value = suggestion;
@@ -1917,14 +1923,18 @@ class Tour {
 
 			};
 
+			this.dom.searchSuggestionContainer.appendChild( link );
+			this.dom.searchSuggestionContainer.appendChild( document.createTextNode( '?' ) );
+			this.dom.searchSuggestionContainer.style.display = 'flex';
+
 		} else {
 
-			this.dom.searchSuggestionContainer.innerHTML = '';
+			this.dom.searchSuggestionContainer.textContent = '';
 			this.dom.searchSuggestionContainer.style.display = 'none';
 
 		}
 
-		this.dom.tocList.innerHTML = '';
+		this.dom.tocList.textContent = '';
 
 		if ( tree.length === 0 && ! featuredPage && this.dom.searchInput.value.trim().length > 0 ) {
 
@@ -1952,19 +1962,23 @@ class Tour {
 
 				}
 
+				const titleSpan = document.createElement( 'span' );
+				titleSpan.style.paddingLeft = `${ level * 0.75 }rem`;
+				titleSpan.style.display = 'inline-flex';
+				titleSpan.style.alignItems = 'center';
+				titleSpan.textContent = node.title;
+				btn.appendChild( titleSpan );
+
 				if ( node.children.length === 0 ) {
 
-					btn.innerHTML = `
-						<span style="padding-left: ${ level * 0.75 }rem; display: inline-flex; align-items: center;">${node.title}</span>
-					`;
 					btn.disabled = true;
 
 				} else {
 
-					btn.innerHTML = `
-						<span style="padding-left: ${ level * 0.75 }rem; display: inline-flex; align-items: center;">${node.title}</span>
-						<i data-icon="chevron-down" class="toc-chevron"></i>
-					`;
+					const chevron = document.createElement( 'i' );
+					chevron.setAttribute( 'data-icon', 'chevron-down' );
+					chevron.className = 'toc-chevron';
+					btn.appendChild( chevron );
 
 					btn.onclick = () => {
 
@@ -2018,20 +2032,33 @@ class Tour {
 
 					}
 
-					btn.innerHTML = `
-						<span style="padding-left: ${ level * 0.75 }rem; display: inline-flex; align-items: center;">${node.title}</span>
-						<span class="toc-chevron-btn" style="display: inline-flex; align-items: center; padding: 0.2rem 0 0.2rem 0.5rem;">
-							<i data-icon="chevron-down" class="toc-chevron"></i>
-						</span>
-					`;
+					const titleSpan = document.createElement( 'span' );
+					titleSpan.style.paddingLeft = `${ level * 0.75 }rem`;
+					titleSpan.style.display = 'inline-flex';
+					titleSpan.style.alignItems = 'center';
+					titleSpan.textContent = node.title;
+					btn.appendChild( titleSpan );
 
-					btn.querySelector( '.toc-chevron-btn' ).onclick = ( e ) => {
+					const chevronBtn = document.createElement( 'span' );
+					chevronBtn.className = 'toc-chevron-btn';
+					chevronBtn.style.display = 'inline-flex';
+					chevronBtn.style.alignItems = 'center';
+					chevronBtn.style.padding = '0.2rem 0 0.2rem 0.5rem';
+
+					const chevron = document.createElement( 'i' );
+					chevron.setAttribute( 'data-icon', 'chevron-down' );
+					chevron.className = 'toc-chevron';
+					chevronBtn.appendChild( chevron );
+
+					chevronBtn.onclick = ( e ) => {
 
 						e.stopPropagation();
 						if ( this.dom.searchInput.value.trim().length > 0 ) return;
 						container.classList.toggle( 'collapsed' );
 
 					};
+
+					btn.appendChild( chevronBtn );
 
 					btn.onclick = () => {
 
@@ -2120,9 +2147,12 @@ class Tour {
 
 					}
 
-					btn.innerHTML = `
-						<span style="padding-left: ${ level * 0.75 }rem; display: inline-flex; align-items: center;">${node.title}</span>
-					`;
+					const titleSpan = document.createElement( 'span' );
+					titleSpan.style.paddingLeft = `${ level * 0.75 }rem`;
+					titleSpan.style.display = 'inline-flex';
+					titleSpan.style.alignItems = 'center';
+					titleSpan.textContent = node.title;
+					btn.appendChild( titleSpan );
 
 					btn.onclick = () => {
 
@@ -2441,7 +2471,7 @@ class Tour {
 
 		if ( this.isPlaygroundActive ) {
 
-			await this.runPlayground();
+			this.runPlayground();
 
 		} else {
 

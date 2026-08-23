@@ -369,8 +369,8 @@ TSL is based on Nodes, so don’t worry about sharing your **functions** and **u
 const sharedColor = uniform( new THREE.Color() );
 
 materialA.colorNode = sharedColor.div( 2 );
-materialB.colorNode = sharedColor.mul( .5 );
-materialC.colorNode = sharedColor.add( .5 );
+materialB.colorNode = sharedColor.mul( 0.5 );
+materialC.colorNode = sharedColor.add( 0.5 );
 ```
 
 #### Deferred Function: High level of customization, goodby `#defines`
@@ -378,7 +378,7 @@ materialC.colorNode = sharedColor.add( .5 );
 Access **material**, **geometry**, **object**, **camera**, **scene**, **renderer** and more directly from a TSL function. Function calls are only performed at the time of building the shader allowing you to customize the function according to the object's setup.
 
 ```js
-// Returns an uniform of the material's custom color if it exists 
+// Returns an uniform of the material's custom color if it exists
 
 const customColor = Fn( ( { material, geometry, object } ) => {
 
@@ -439,7 +439,6 @@ const mainTask = Fn( () => {
 		return a.add( b ).mul( 0.5 );
 
 	} );
-
 
 	return task2( color( 0x00ff00 ), color( 0x0000ff ) );
 
@@ -508,25 +507,25 @@ import { clouds } from 'tsl-textures';
 
 const position = positionLocal.add( time.mul( 0.1 ) );
 
-model.material.colorNode = clouds ( {
+model.material.colorNode = clouds( {
 	position,
 	scale: 2,
 	density: 0.5,
 	opacity: 1,
-	color: new THREE.Color(16777215),
-	subcolor: new THREE.Color(10526896),
+	color: new THREE.Color( 0xffffff ),
+	subcolor: new THREE.Color( 0xa0a0a0 ),
 	seed: 0
 } );
 
 model.material.transparent = true;
 model.material.side = THREE.DoubleSide;
-model.material.opacityNode = clouds.opacity ( {
+model.material.opacityNode = clouds.opacity( {
 	position,
 	scale: 2,
 	density: 0.5,
 	opacity: 1,
-	color: new THREE.Color(16777215),
-	subcolor: new THREE.Color(10526896),
+	color: new THREE.Color( 0xffffff ),
+	subcolor: new THREE.Color( 0xa0a0a0 ),
 	seed: 0
 } );
 
@@ -541,12 +540,12 @@ Use normal JavaScript operators like `+`, `-`, `*`, `/`, `%`, `**`, `+=`, `>`, `
 `vite-plugin-tsl-operator` is a plug-and-play Vite plugin for Three.js Shading Language (TSL), WebGPU, and shader node projects. It rewrites readable operator syntax to TSL node methods during Vite transforms, so you can write shader logic naturally without hand-chaining `.add()`, `.mul()`, `.greaterThan()`, and friends.
 
 ```js
-import { uniform, Fn } from "three/tsl";
+import { uniform, Fn } from 'three/tsl';
 
 const myFn = Fn( () => {
 
-	let alpha = uniform( 1 );
-	let color = uniform( new THREE.Color() );
+	const alpha = uniform( 1 );
+	const color = uniform( new THREE.Color() );
 
 	let x = 1 - alpha * color.r;
 	x = x * 4;
@@ -556,6 +555,39 @@ const myFn = Fn( () => {
 } );
 
 model.material.colorNode = myFn();
+```
+
+### TypeGPU
+
+https://github.com/software-mansion/TypeGPU
+
+TypeGPU brings TypeScript type safety and a JavaScript-friendly syntax to WebGPU and TSL. Through the `@typegpu/three` package, you can write shaders with standard JS/TS constructs (such as `if`, `for`, and typed data structures) and seamlessly convert them to TSL nodes with `toTSL()`, or access TSL nodes inside TypeGPU using `fromTSL()`.
+
+Just like TypeScript requires compilation, TypeGPU functions marked with `'use gpu'` rely on a build-time compiler/bundler plugin (such as `unplugin-typegpu` for Vite, Webpack, Rollup, or Babel) to transpile the code into GPU shaders.
+
+```js
+import * as THREE from 'three';
+import * as t3 from '@typegpu/three';
+import * as d from 'typegpu/data';
+import { fract } from 'typegpu/std';
+
+const material = new THREE.MeshBasicNodeMaterial();
+
+material.colorNode = t3.toTSL( () => {
+
+	'use gpu';
+
+	const uv = t3.uv().$;
+
+	if ( uv.x < 0.5 ) {
+
+		return d.vec4f( fract( uv.mul( 4 ) ), 0, 1 );
+
+	}
+
+	return d.vec4f( 1, 0, 0, 1 );
+
+} );
 ```
 
 ### TSL Sandbox
@@ -748,6 +780,8 @@ import { positionWorld } from 'three/tsl';
 
 // conversion
 material.colorNode = positionWorld.toVec2(); // result positionWorld.xy
+```
+
 ```tsl
 import 'scenes/shaderball';
 import { color } from 'three/tsl';
@@ -1196,7 +1230,6 @@ const col = Fn( ( { r, g, b } ) => {
 
 } );
 
-
 // Any of the options below will return a green color.
 
 material.colorNode = col( 0, 1, 0 ); // option 1
@@ -1356,7 +1389,7 @@ const clampColorLayout = Fn( ( { val } ) => {
 
 ```tsl layoutExample
 import 'scenes/shaderball';
-import { Fn, color, vec3, time, uv, float, If } from 'three/tsl';
+import { Fn, color, vec3, time, uv, If } from 'three/tsl';
 
 // 1. No-Layout (Default): inlined function using assignments across branches
 const getThresholdColor = Fn( ( { baseColor, threshold } ) => {
@@ -1668,7 +1701,7 @@ import { array, vec3, int, time } from 'three/tsl';
 const colors = array( [
 	vec3( 1, 0, 0 ), // Red
 	vec3( 0, 1, 0 ), // Green
-	vec3( 0, 0, 1 )  // Blue
+	vec3( 0, 0, 1 ) // Blue
 ] );
 
 // Dynamically cycle the index from 0 to 2 using time
@@ -1711,7 +1744,7 @@ const bb2 = BoundingBox( { min: vec3( 0 ), max: vec3( 1 ) } ); // style 2
 const min = bb.get( 'min' );
 
 // Assign a new value to a member
-min.assign( vec3( -1, -1, -1 ) );
+min.assign( vec3( - 1, - 1, - 1 ) );
 
 // Define a custom struct with atomic fields
 const Cell = struct( {
@@ -1793,8 +1826,8 @@ const energySphere = Fn( () => {
 		// 2. Synchronize spatial frequency, animation phase, and ripple curvature
 		waveParams.value.set(
 			Math.sin( t * 1.3 ) * 3.0 + 9.0, // frequency
-			t * 2.5,                         // phase
-			Math.cos( t * 0.8 ) * 0.5 + 1.0  // swirl
+			t * 2.5, // phase
+			Math.cos( t * 0.8 ) * 0.5 + 1.0 // swirl
 		);
 
 		// 3. Compute pulsating energy burst intensity
@@ -2571,7 +2604,7 @@ GPU compute execution is structured into a hierarchy of execution units:
 ```tsl computeGeometry
 import 'scenes/empty';
 import * as THREE from 'three';
-import { Fn, storage, attributeArray, instanceIndex, time, vertexIndex, OnBeforeMaterialUpdate } from 'three/tsl';
+import { Fn, storage, attributeArray, instanceIndex, time, vertexIndex } from 'three/tsl';
 
 // 1. Create a Torus geometry
 const geometry = new THREE.TorusGeometry( 1, 0.35, 64, 128 );
@@ -2593,7 +2626,7 @@ const computeWave = Fn( () => {
 
 	currentPos.assign( displacedPos );
 
- 	return currentPositions.element( vertexIndex );
+	return currentPositions.element( vertexIndex );
 
 } )().compute( count );
 
@@ -2637,7 +2670,7 @@ const computeInit = Fn( () => {
 
 	// Small downward starting velocity
 	vel.x = hash( instanceIndex.add( 3.0 ) ).sub( 0.5 ).mul( 0.02 );
-	vel.y = hash( instanceIndex.add( 4.0 ) ).mul( -0.02 );
+	vel.y = hash( instanceIndex.add( 4.0 ) ).mul( - 0.02 );
 	vel.z = hash( instanceIndex.add( 5.0 ) ).sub( 0.5 ).mul( 0.02 );
 
 } )().compute( particleCount );
@@ -2655,7 +2688,7 @@ const computeUpdate = Fn( () => {
 	pos.addAssign( vel );
 
 	// Floor collision (grid helper height in scenes/empty is -2)
-	const floorLevel = -2.0;
+	const floorLevel = - 2.0;
 	If( pos.y.lessThan( floorLevel ), () => {
 
 		pos.y = floorLevel;
@@ -2676,7 +2709,7 @@ const computeUpdate = Fn( () => {
 			pos.z = hash( instanceIndex.add( time.add( 1.0 ) ) ).sub( 0.5 ).mul( area.depth );
 
 			vel.x = hash( instanceIndex.add( time.add( 2.0 ) ) ).sub( 0.5 ).mul( 0.02 );
-			vel.y = hash( instanceIndex.add( time.add( 3.0 ) ) ).mul( -0.02 ); // Falling start
+			vel.y = hash( instanceIndex.add( time.add( 3.0 ) ) ).mul( - 0.02 ); // Falling start
 			vel.z = hash( instanceIndex.add( time.add( 4.0 ) ) ).sub( 0.5 ).mul( 0.02 );
 
 		} );
@@ -2723,7 +2756,7 @@ scene.add( particles );
 ```tsl computeWorkgroup
 import 'scenes/empty';
 import * as THREE from 'three';
-import { Fn, workgroupArray, workgroupBarrier, localId, instanceIndex, uvec2, vec3, vec4, float, uint, time, sin, cos, texture, textureStore } from 'three/tsl';
+import { Fn, workgroupArray, workgroupBarrier, localId, instanceIndex, uvec2, vec3, vec4, float, uint, time, texture, textureStore } from 'three/tsl';
 
 // 1. Create a 2D grid (128x128) and Storage Texture displayed on a Plane
 const width = 128, height = 128;
@@ -2814,7 +2847,7 @@ By wrapping this complex pipeline, the workflow for creating volumetric material
 ```tsl raymarchingExample
 import 'scenes/empty';
 import * as THREE from 'three';
-import { Fn, vec4, vec3, time, mix, If, smoothstep, exp, Break, modelWorldMatrixInverse, triNoise3D, pmremTexture, modelWorldMatrix } from 'three/tsl';
+import { Fn, vec4, vec3, time, If, smoothstep, exp, Break, modelWorldMatrixInverse, triNoise3D, pmremTexture, modelWorldMatrix } from 'three/tsl';
 import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js';
 
 // Volumetric cloud density calculator (simplified ellipsoid shape with warping and edge noise erosion)
@@ -2835,7 +2868,7 @@ const getCloudDensity = Fn( ( [ p ] ) => {
 	const shape = baseMask.sub( noiseVal.mul( baseMask.pow( 2 ).oneMinus().mul( 0.48 ) ) );
 
 	// Soft threshold to get beautiful rounded boundaries with smooth fade-out
-	return smoothstep( -0.02, 0.35, shape );
+	return smoothstep( - 0.02, 0.35, shape );
 
 } );
 
@@ -3339,7 +3372,7 @@ import { uniformArray, int, time } from 'three/tsl';
 const tintColors = uniformArray( [
 	new THREE.Color( 1, 0, 0 ), // Red
 	new THREE.Color( 0, 1, 0 ), // Green
-	new THREE.Color( 0, 0, 1 )  // Blue
+	new THREE.Color( 0, 0, 1 ) // Blue
 ] );
 
 // Dynamically select the element index based on time
@@ -3387,7 +3420,7 @@ Unlike standard uniforms, storage buffers can be modified directly on the GPU �
 ```tsl storageExample
 import 'scenes/shaderball';
 import * as THREE from 'three';
-import { storage, Fn, instanceIndex, time, float, vec3, color, positionLocal, normalLocal } from 'three/tsl';
+import { storage, Fn, instanceIndex, time, float, color, positionLocal, normalLocal } from 'three/tsl';
 
 // 1. Create a storage buffer for dynamic vertex displacement
 const count = 1024;
@@ -3551,7 +3584,7 @@ Under the hood, `attributeArray` creates a `StorageBufferAttribute`:
 Example:
 
 ```js
-const myArray = attributeArray( new Float32Array( [ 0.05, 0.1, 0.15 ] ), 'float' )
+const myArray = attributeArray( new Float32Array( [ 0.05, 0.1, 0.15 ] ), 'float' );
 ```
 
 ```tsl
@@ -3565,7 +3598,7 @@ const colorPalette = attributeArray( new Float32Array( [
 	0.95, 0.85, 0.00, // Neon Yellow
 	0.05, 0.85, 0.45, // Teal Green
 	0.05, 0.45, 0.95, // Bright Blue
-	0.75, 0.05, 0.95  // Electric Purple
+	0.75, 0.05, 0.95 // Electric Purple
 ] ), 'vec3' );
 
 // Calculate the 3D distance from the center of the preview sphere (0, 1, 0)
@@ -4054,7 +4087,7 @@ You can decouple an individual material from global scene lights by assigning a 
 ```tsl tslLightingSystem
 import 'scenes/shaderball';
 import * as THREE from 'three';
-import { lights, color, float } from 'three/tsl';
+import { lights, color } from 'three/tsl';
 
 // 1. Create distinct scene lights
 const keyLight = new THREE.PointLight( 0x00d4ff, 80, 10 );
@@ -4132,7 +4165,7 @@ These functions return uniform nodes that update automatically when light object
 ```tsl lightFunctionsExample
 import 'scenes/empty';
 import * as THREE from 'three';
-import { Fn, lightProjectionUV, color, float, vec3, time } from 'three/tsl';
+import { Fn, lightProjectionUV, color, time } from 'three/tsl';
 
 // 1. Create a dynamic SpotLight in the empty scene
 const spotLight = new THREE.SpotLight( 0xffffff, 80, 20, Math.PI / 4, 0.4 );
@@ -4208,9 +4241,9 @@ import 'scenes/shaderball';
 import { fog, positionWorld, cameraPosition, float, color } from 'three/tsl';
 
 // Volumetric Fog Parameters (Beer-Lambert Law)
-const groundDensity = float( 1.00 );   // Base ground fog density (m⁻¹)
-const heightFalloff = float( 1.25 );   // Exponential height scale
-const fogGroundHeight = float( 0.0 );  // Ground height Y
+const groundDensity = float( 1.00 ); // Base ground fog density (m⁻¹)
+const heightFalloff = float( 1.25 ); // Exponential height scale
+const fogGroundHeight = float( 0.0 ); // Ground height Y
 const atmosphericHaze = float( 0.02 ); // Uniform background haze density
 
 // 1. Ray vector from camera to fragment
@@ -4329,7 +4362,7 @@ camera.position.set( 4, 1, 4 );
 
 ```tsl auroraSky
 import 'scenes/empty';
-import { positionWorldDirection, color, float, vec3, time, smoothstep } from 'three/tsl';
+import { positionWorldDirection, color, float, time, smoothstep } from 'three/tsl';
 
 // 1. Continuous 3D Direction Vector
 const dir = positionWorldDirection;
@@ -4430,7 +4463,7 @@ renderPipeline.outputNode = finalOutput;
 
 ```tsl postProcessing
 import 'scenes/shaderball';
-import { pass, screenUV, vec2, color } from 'three/tsl';
+import { pass, screenUV, vec2 } from 'three/tsl';
 
 // 1. Create a scene render pass
 const scenePass = pass( scene, camera );
@@ -4498,6 +4531,74 @@ const isRightSide = step( 0.5, screenUV.x );
 const splitScreen = isRightSide.mix( colorTexture, normalTexture );
 
 renderPipeline.outputNode = splitScreen;
+```
+
+</page>
+
+<page name="Output Color Transform">
+
+By default, **`RenderPipeline`** automatically applies tone mapping and color space transformation to `renderPipeline.outputNode` as the final step before presenting pixels to the screen framebuffer `outputColorTransform = true`.
+
+However, in advanced post-processing setups, applying color transformation at the very end can be too late. Certain screen-space effects—such as **FXAA** (Fast Approximate Anti-Aliasing) or stylization filters—expect **sRGB** (display-referred) input rather than linear HDR values.
+
+For such scenarios, set **`renderPipeline.outputColorTransform = false`** and use **`renderOutput()`** to explicitly apply tone mapping and color space conversion at the exact desired position in your effect chain.
+
+### Automatic vs. Manual Color Transformation
+
+| Output Color Transform | Description |
+| :--- | :--- |
+| `true` (Default) | `RenderPipeline` automatically wraps the final `outputNode` with `renderOutput( outputNode, toneMapping, outputColorSpace )` at the end of the pipeline. Ideal for standard rendering pipelines and linear-space post-processing effects (such as Bloom, Depth of Field, or Motion Blur). |
+| `false` (Manual) | Disables automatic end-of-pipeline conversion. You must manually insert `renderOutput()` in the effect chain before any passes that require sRGB input (such as FXAA). |
+
+<code name="outputColorTransform" default="true">Output Color Transform</code>
+
+::: api renderPipeline.outputColorTransform : boolean - Controls whether default tone mapping and color space transformation are automatically applied to the pipeline's output node. Defaults to `true`. :::
+
+::: api renderOutput( colorNode, toneMapping?, outputColorSpace? ) : RenderOutputNode - Applies tone mapping and color space transformation to a color node.
+- **colorNode**: `Node` - The color or pass node to transform.
+- **toneMapping**: `number` - (Optional) Tone mapping technique to apply. Defaults to the renderer's active tone mapping.
+- **outputColorSpace**: `string` - (Optional) Target color space. Defaults to the renderer's active output color space (typically `SRGBColorSpace`).
+:::
+
+```js
+import { pass, renderOutput } from 'three/tsl';
+import { fxaa } from 'three/addons/tsl/display/FXAANode.js';
+
+// 1. Disable automatic output color transform at the end of the pipeline
+renderPipeline.outputColorTransform = false;
+
+// 2. Render the scene pass
+const scenePass = pass( scene, camera );
+
+// 3. Manually convert from linear HDR to output color space (sRGB) with tone mapping
+const outputPass = renderOutput( scenePass );
+
+// 4. Compute FXAA in sRGB color space
+const fxaaPass = fxaa( outputPass );
+
+// 5. Assign to the pipeline output
+renderPipeline.outputNode = fxaaPass;
+```
+
+```tsl outputColorTransform
+import 'scenes/shaderball';
+import { pass, renderOutput } from 'three/tsl';
+import { fxaa } from 'three/addons/tsl/display/FXAANode.js';
+
+// 1. Disable default automatic output color transformation
+renderPipeline.outputColorTransform = false;
+
+// 2. Create the 3D scene pass
+const scenePass = pass( scene, camera );
+
+// 3. Manually apply tone mapping and color space transformation (Linear -> sRGB)
+const outputPass = renderOutput( scenePass );
+
+// 4. Apply FXAA after color transformation (FXAA requires sRGB input)
+const fxaaPass = fxaa( outputPass );
+
+// 5. Output the anti-aliased image
+renderPipeline.outputNode = fxaaPass;
 ```
 
 </page>
@@ -4652,8 +4753,8 @@ const drawWave = ( waveFunc, offset ) => {
 };
 
 // 1. Color-code each wave in its respective vertical track (each 0.25 high)
-const color0 = color( 0x00ffcc ).mul( drawWave( oscSine, 0.045 ) );     // Track 0: Sine (bottom)
-const color1 = color( 0xffaa00 ).mul( drawWave( oscSquare, 0.295 ) );   // Track 1: Square
+const color0 = color( 0x00ffcc ).mul( drawWave( oscSine, 0.045 ) ); // Track 0: Sine (bottom)
+const color1 = color( 0xffaa00 ).mul( drawWave( oscSquare, 0.295 ) ); // Track 1: Square
 const color2 = color( 0xff00bb ).mul( drawWave( oscTriangle, 0.545 ) ); // Track 2: Triangle
 const color3 = color( 0x00aaff ).mul( drawWave( oscSawtooth, 0.795 ) ); // Track 3: Sawtooth (top)
 
@@ -4684,7 +4785,7 @@ Rotation functions allow you to rotate 2D coordinates or 3D positions/vectors. T
 import 'scenes/empty';
 import * as THREE from 'three';
 import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
-import { Fn, time, uv, color, float, vec3, vec4, mix, range, rotate, positionLocal, normalLocal } from 'three/tsl';
+import { time, color, vec3, vec4, mix, range, rotate, positionLocal, normalLocal } from 'three/tsl';
 
 // Instantiate the instanced mesh geometry and material
 const geometry = new TeapotGeometry( 0.25, 8 );
@@ -4770,7 +4871,7 @@ TSL provides utilities for generating pseudo-random values. These are useful for
 ```tsl rangeExample
 import 'scenes/empty';
 import * as THREE from 'three';
-import { time, color, float, vec3, mix, range, positionLocal } from 'three/tsl';
+import { time, color, vec3, range, positionLocal } from 'three/tsl';
 
 // Instantiate 100 spheres using a standard Mesh with .count
 const geometry = new THREE.SphereGeometry( 0.15, 16, 16 );
@@ -4988,7 +5089,7 @@ const sparkScatterZ = hash( instanceIndex.add( 99.0 ) ).sub( 0.5 ).mul( 1.5 ).mu
 const sparkNoiseCoord = vec3(
 	sparkOffset.mul( 5.0 ),
 	sparkLife.mul( 0.6 ), // slow vertical progression along noise field
-	speedTime.mul( 0.15 )  // slow field animation
+	speedTime.mul( 0.15 ) // slow field animation
 );
 const sparkNoiseOffset = curlNoise( sparkNoiseCoord ).mul( 0.35 ).mul( sparkLife.pow( 1.0 ) );
 const sparkPos = sparkBasePos.add( vec3( sparkScatterX, float( 0.0 ), sparkScatterZ ) ).add( sparkNoiseOffset );
@@ -5034,7 +5135,7 @@ fireLight.colorNode = color( 0xff5500 ).mul( lightIntensity );
 scene.add( fireLight );
 
 // Adjust camera angle for a better view
-camera.position.set( - 4, .4, - 1 );
+camera.position.set( - 4, 0.4, - 1 );
 ```
 
 </page>
@@ -5180,11 +5281,11 @@ const normalTexture = texture( normalTex );
 // 3. Sample the packed normal at the 4 cardinal neighboring pixels (Sobel kernel)
 const px = vec2( 1.0 ).div( viewportSize ); // one texel size in UV space
 
-const nC  = unpackRGBToNormal( normalTexture.sample( screenUV ).rgb );
-const nN  = unpackRGBToNormal( normalTexture.sample( screenUV.add( vec2(  0,  1 ).mul( px ) ) ).rgb );
-const nS  = unpackRGBToNormal( normalTexture.sample( screenUV.add( vec2(  0, -1 ).mul( px ) ) ).rgb );
-const nE  = unpackRGBToNormal( normalTexture.sample( screenUV.add( vec2(  1,  0 ).mul( px ) ) ).rgb );
-const nW  = unpackRGBToNormal( normalTexture.sample( screenUV.add( vec2( -1,  0 ).mul( px ) ) ).rgb );
+const nC = unpackRGBToNormal( normalTexture.sample( screenUV ).rgb );
+const nN = unpackRGBToNormal( normalTexture.sample( screenUV.add( vec2( 0, 1 ).mul( px ) ) ).rgb );
+const nS = unpackRGBToNormal( normalTexture.sample( screenUV.add( vec2( 0, - 1 ).mul( px ) ) ).rgb );
+const nE = unpackRGBToNormal( normalTexture.sample( screenUV.add( vec2( 1, 0 ).mul( px ) ) ).rgb );
+const nW = unpackRGBToNormal( normalTexture.sample( screenUV.add( vec2( - 1, 0 ).mul( px ) ) ).rgb );
 
 // 4. Detect normal discontinuities — large differences between neighbors signal edges
 const edgeH = abs( dot( nC, nN ).oneMinus() ).add( abs( dot( nC, nS ).oneMinus() ) );
@@ -5485,7 +5586,7 @@ When referenced in a TSL graph, nodes like `materialColor`, `materialRoughness`,
 ```tsl materialInputsExample
 import 'scenes/shaderball';
 import * as THREE from 'three';
-import { materialColor, materialRoughness, materialMetalness, normalView, positionViewDirection, color, float, vec3 } from 'three/tsl';
+import { materialColor, materialRoughness, materialMetalness, normalView, positionViewDirection, color, float } from 'three/tsl';
 
 // 1. Configure base material inputs in JavaScript
 model.material.color = new THREE.Color( 0x0a1e3f );
@@ -5785,16 +5886,420 @@ MaterialX standard helper functions for procedural ramps, anti-aliased transitio
 <page name="Native">
 
 <page name="Transpiler">
+
+The Three.js **Transpiler** is an AST-driven shader translation system that converts shader code between different shading languages. It allows developers to automatically translate legacy **GLSL** shaders into modern **TSL** (Three.js Shading Language) or native **WGSL** (WebGPU Shading Language).
+
+<code name="glslTFnExample" default="true">glslTFn (Cross-Backend)</code>
+
+<code name="manualTranspileExample">Manual Transpilation</code>
+
+### Architecture
+
+The transpiler relies on a modular architecture where a **Decoder** parses source code into an intermediate Abstract Syntax Tree (AST), the **Linker** resolves symbol dependencies, and an **Encoder** generates the target language:
+
+| Language | Decoder | Encoder |
+| :--- | :--- | :--- |
+| **GLSL** | `GLSLDecoder` | - |
+| **WGSL** | - | `WGSLEncoder` |
+| **TSL** | - | `TSLEncoder` |
+
+```js
+import Transpiler from 'three/addons/transpiler/Transpiler.js';
+import GLSLDecoder from 'three/addons/transpiler/GLSLDecoder.js';
+import TSLEncoder from 'three/addons/transpiler/TSLEncoder.js';
+import WGSLEncoder from 'three/addons/transpiler/WGSLEncoder.js';
+
+const glslCode = `
+	vec3 desaturate( vec3 color ) {
+		vec3 lum = vec3( 0.299, 0.587, 0.114 );
+		return vec3( dot( lum, color ) );
+	}
+`;
+
+// Transpile GLSL to TSL JavaScript
+const tslTranspiler = new Transpiler( new GLSLDecoder(), new TSLEncoder() );
+const tslCode = tslTranspiler.parse( glslCode );
+
+// Transpile GLSL to WGSL
+const wgslTranspiler = new Transpiler( new GLSLDecoder(), new WGSLEncoder() );
+const wgslCode = wgslTranspiler.parse( glslCode );
+```
+
+### Cross-Backend Functions: `glslTFn`
+
+While `glslFn` runs natively on WebGL backends, WebGPU requires WGSL. By leveraging the second `builder` parameter inside a TSL `Fn()`, we can create **`glslTFn`**: a hybrid function node that detects the active renderer backend and dynamically transpiles GLSL to WGSL on WebGPU, while retaining native GLSL execution on WebGL.
+
+```js
+import Transpiler from 'three/addons/transpiler/Transpiler.js';
+import GLSLDecoder from 'three/addons/transpiler/GLSLDecoder.js';
+import WGSLEncoder from 'three/addons/transpiler/WGSLEncoder.js';
+import { Fn, glslFn, wgslFn } from 'three/tsl';
+
+export const glslTFn = ( code, includes = [] ) => {
+
+	let compiledWGSLFn = null;
+	let compiledGLSLFn = null;
+
+	return Fn( ( params, builder ) => {
+
+		// Detect active renderer backend
+		if ( builder.renderer.backend.isWebGPUBackend ) {
+
+			if ( compiledWGSLFn === null ) {
+
+				const transpiler = new Transpiler( new GLSLDecoder(), new WGSLEncoder() );
+				const wgslCode = transpiler.parse( code );
+
+				compiledWGSLFn = wgslFn( wgslCode, includes );
+
+			}
+
+			return compiledWGSLFn( ...params );
+
+		} else {
+
+			if ( compiledGLSLFn === null ) {
+
+				compiledGLSLFn = glslFn( code, includes );
+
+			}
+
+			return compiledGLSLFn( ...params );
+
+		}
+
+	} );
+
+};
+```
+
+```tsl glslTFnExample
+import 'scenes/shaderball';
+import Transpiler from 'three/addons/transpiler/Transpiler.js';
+import GLSLDecoder from 'three/addons/transpiler/GLSLDecoder.js';
+import WGSLEncoder from 'three/addons/transpiler/WGSLEncoder.js';
+import { Fn, glslFn, wgslFn, positionLocal, time } from 'three/tsl';
+
+// Dynamic transpiling GLSL function helper
+const glslTFn = ( code, includes = [] ) => {
+
+	let compiledWGSLFn = null;
+	let compiledGLSLFn = null;
+
+	return Fn( ( params, builder ) => {
+
+		if ( builder.renderer.backend.isWebGPUBackend ) {
+
+			if ( compiledWGSLFn === null ) {
+
+				const transpiler = new Transpiler( new GLSLDecoder(), new WGSLEncoder() );
+				const wgslCode = transpiler.parse( code );
+
+				compiledWGSLFn = wgslFn( wgslCode, includes );
+
+			}
+
+			return compiledWGSLFn( ...params );
+
+		} else {
+
+			if ( compiledGLSLFn === null ) {
+
+				compiledGLSLFn = glslFn( code, includes );
+
+			}
+
+			return compiledGLSLFn( ...params );
+
+		}
+
+	} );
+
+};
+
+// Standard GLSL code running seamlessly on both WebGPU and WebGL
+const verticalWaves = glslTFn( `
+	vec3 verticalWaves( vec3 pos, float t ) {
+
+		float wave = sin( pos.y * 12.0 + t * 3.0 ) * 0.5 + 0.5;
+
+		return mix( vec3( 0.05, 0.8, 0.7 ), vec3( 0.95, 0.2, 0.4 ), wave );
+
+	}
+` );
+
+model.material.colorNode = verticalWaves( { pos: positionLocal, t: time } );
+```
+
+```tsl manualTranspileExample
+import 'scenes/shaderball';
+import Transpiler from 'three/addons/transpiler/Transpiler.js';
+import GLSLDecoder from 'three/addons/transpiler/GLSLDecoder.js';
+import WGSLEncoder from 'three/addons/transpiler/WGSLEncoder.js';
+import { wgslFn, positionLocal, time } from 'three/tsl';
+
+// 1. Original GLSL shader code
+const glslSource = `
+	vec3 verticalWaves( vec3 pos, float t ) {
+
+		float wave = sin( pos.y * 12.0 + t * 3.0 ) * 0.5 + 0.5;
+
+		return mix( vec3( 0.05, 0.8, 0.7 ), vec3( 0.95, 0.2, 0.4 ), wave );
+
+	}
+`;
+
+// 2. Transpile to WGSL using Transpiler
+const transpiler = new Transpiler( new GLSLDecoder(), new WGSLEncoder() );
+const wgslSource = transpiler.parse( glslSource );
+
+// 3. Create native WGSL node
+const verticalWavesWGSL = wgslFn( wgslSource );
+
+model.material.colorNode = verticalWavesWGSL( { pos: positionLocal, t: time } );
+```
+
 </page>
 
 <page name="WGSL">
+
+**WebGPU Shading Language (WGSL)** is the native shader programming language of WebGPU. While TSL enables writing node-based shaders using pure JavaScript, Three.js also provides **`wgslFn`** to integrate raw native WGSL code directly into your TSL graphs.
+
+Native functions declared with `wgslFn` behave like standard TSL nodes: they accept TSL expressions as inputs, output typed values, and can be composed with other native functions or node materials.
+
+<code name="wgslBasicExample" default="true">Basic WGSL</code>
+
+<code name="wgslIncludesExample">WGSL with Includes</code>
+
+<code name="wgslTextureExample">WGSL Texture Sampling</code>
+
+### Defining WGSL Functions
+
+To define a native WGSL function, pass a standard WGSL function string to `wgslFn`. The function signature defines the input parameter names and types, as well as the return type.
+
+::: api wgslFn( code, includes? ) : FunctionNode - Creates a native WGSL shader function node from a WGSL function definition.
+- **code**: `string` - The WGSL function source code.
+- **includes**: `Array<FunctionNode>` - (Optional) Array of dependency WGSL function nodes included in the generated shader. Defaults to `[]`.
+:::
+
+```js
+import { wgslFn, positionLocal, time } from 'three/tsl';
+
+// 1. Define a native WGSL function
+const proceduralPattern = wgslFn( `
+	fn proceduralPattern( pos: vec3<f32>, t: f32 ) -> vec3<f32> {
+
+		let waves = sin( pos.x * 6.0 + t ) * cos( pos.y * 6.0 - t );
+		let glow = sin( pos.z * 10.0 + t * 2.0 ) * 0.5 + 0.5;
+
+		let r = sin( waves * 3.14159 ) * 0.5 + 0.5;
+		let g = glow;
+		let b = cos( waves * 3.14159 ) * 0.5 + 0.5;
+
+		return vec3<f32>( r, g, b );
+
+	}
+` );
+
+// 2. Call the function node with named parameters or positional arguments
+material.colorNode = proceduralPattern( { pos: positionLocal, t: time } );
+```
+
+### Passing Parameters
+
+WGSL functions can be called either with an object containing keys matching the function parameter names, or with positional arguments:
+
+```js
+// Named parameters (recommended for clarity)
+material.colorNode = proceduralPattern( { pos: positionLocal, t: time } );
+
+// Positional arguments
+material.colorNode = proceduralPattern( positionLocal, time );
+```
+
+### Why Modular Functions?
+
+| Aspect | Modular Functions (`wgslFn` / TSL) | Monolithic Shader Files |
+| :--- | :--- | :--- |
+| **Composability & Integration** | Effortlessly connects with other TSL nodes, materials, post-processing passes, and ecosystem extensions (such as `tsl-textures` or TypeGPU) with flexible parameter exchange. | Rigid structure; difficult to interface with other components or reuse without manual string manipulation and global uniforms. |
+| **Maintainability** | Isolated single-responsibility functions make debugging, unit testing, and refactoring math simple without cascading side effects. | Fragile; updating logic risks breaking unrelated shader parts and requires maintaining large complex files. |
+| **Automatic Imports** | Dependencies, helper functions, structs, and uniform bindings are automatically resolved and injected into the shader on demand as needed. | Requires manually maintaining `#include` directives, forward declarations, struct definitions, and strict declaration order. |
+| **Tree Shaking** | Only imported and referenced functions are bundled into the application. | The entire shader file is bundled even if most logic is unused. |
+| **Encapsulation** | Isolated local scope and explicit parameters; no name collisions. | Shared global namespace; frequent variable and uniform collisions. |
+
+```tsl wgslBasicExample
+import 'scenes/shaderball';
+import { wgslFn, positionLocal, time } from 'three/tsl';
+
+// Define a native WGSL function
+const proceduralPattern = wgslFn( `
+	fn proceduralPattern( pos: vec3<f32>, t: f32 ) -> vec3<f32> {
+
+		let waves = sin( pos.x * 6.0 + t ) * cos( pos.y * 6.0 - t );
+		let glow = sin( pos.z * 10.0 + t * 2.0 ) * 0.5 + 0.5;
+
+		let r = sin( waves * 3.14159 ) * 0.5 + 0.5;
+		let g = glow;
+		let b = cos( waves * 3.14159 ) * 0.5 + 0.5;
+
+		return vec3<f32>( r, g, b );
+
+	}
+` );
+
+// Assign to material colorNode
+model.material.colorNode = proceduralPattern( { pos: positionLocal, t: time } );
+```
+
+```tsl wgslIncludesExample
+import 'scenes/shaderball';
+import { wgslFn, positionLocal, time, color } from 'three/tsl';
+
+// 1. Helper WGSL function: luminance calculation
+const luminanceWGSL = wgslFn( `
+	fn calcLuminance( rgb: vec3<f32> ) -> f32 {
+
+		let weights = vec3<f32>( 0.299, 0.587, 0.114 );
+
+		return dot( rgb, weights );
+
+	}
+` );
+
+// 2. Main WGSL function that includes and calls the helper function
+const duotoneWGSL = wgslFn( `
+	fn duotone( pos: vec3<f32>, t: f32, colorA: vec3<f32>, colorB: vec3<f32> ) -> vec3<f32> {
+
+		let rawPattern = sin( pos * 4.0 + vec3<f32>( t ) ) * 0.5 + 0.5;
+		let lum = calcLuminance( rawPattern );
+
+		return mix( colorA, colorB, lum );
+
+	}
+`, [ luminanceWGSL ] );
+
+// 3. Invoke with named arguments
+model.material.colorNode = duotoneWGSL( {
+	pos: positionLocal,
+	t: time,
+	colorA: color( 0x0055ff ),
+	colorB: color( 0xffaa00 )
+} );
+```
+
+```tsl wgslTextureExample
+import 'scenes/shaderball';
+import * as THREE from 'three';
+import { wgslFn, texture, uv, color } from 'three/tsl';
+
+const map = new THREE.TextureLoader().load( '../examples/textures/uv_grid_opengl.jpg' );
+map.wrapS = THREE.RepeatWrapping;
+map.wrapT = THREE.RepeatWrapping;
+
+// Native WGSL function receiving a texture and sampler
+const sampleWGSL = wgslFn( `
+	fn sampleAndTint( tex: texture_2d<f32>, texSampler: sampler, uvCoord: vec2<f32>, tintColor: vec3<f32> ) -> vec4<f32> {
+
+		let sampled = textureSample( tex, texSampler, uvCoord * 2.0 );
+
+		return vec4<f32>( sampled.rgb * tintColor, sampled.a );
+
+	}
+` );
+
+const textureNode = texture( map );
+
+model.material.colorNode = sampleWGSL( {
+	tex: textureNode,
+	texSampler: textureNode,
+	uvCoord: uv(),
+	tintColor: color( 0x00ff88 )
+} );
+```
+
 </page>
 
 <page name="GLSL">
+
+**OpenGL Shading Language (GLSL)** is the traditional shading language of WebGL and OpenGL. Three.js provides **`glslFn`** to integrate existing or legacy GLSL function code directly into your TSL node graphs.
+
+Using `glslFn`, you can easily reuse shader code from previous WebGL projects, Shadertoy snippets, or community libraries, allowing seamless interoperability and gradual migration to the new node system.
+
+### Defining GLSL Functions
+
+To define a native GLSL function, pass a standard GLSL function string to `glslFn`. The function signature defines the input parameter names and types, as well as the return type.
+
+::: api glslFn( code, includes? ) : FunctionNode - Creates a native GLSL shader function node from a GLSL function definition.
+- **code**: `string` - The GLSL function source code.
+- **includes**: `Array<FunctionNode>` - (Optional) Array of dependency GLSL function nodes included in the generated shader. Defaults to `[]`.
+:::
+
+```js
+import { glslFn, positionLocal, time } from 'three/tsl';
+
+// 1. Define a native GLSL function
+const proceduralGLSL = glslFn( `
+	vec3 proceduralPattern( vec3 pos, float t ) {
+
+		float waves = sin( pos.x * 6.0 + t ) * cos( pos.y * 6.0 - t );
+		float glow = sin( pos.z * 10.0 + t * 2.0 ) * 0.5 + 0.5;
+
+		float r = sin( waves * 3.14159 ) * 0.5 + 0.5;
+		float g = glow;
+		float b = cos( waves * 3.14159 ) * 0.5 + 0.5;
+
+		return vec3( r, g, b );
+
+	}
+` );
+
+// 2. Call the function node with named parameters or positional arguments
+material.colorNode = proceduralGLSL( { pos: positionLocal, t: time } );
+```
+
+### Passing Parameters
+
+GLSL functions can be called either with an object containing keys matching the function parameter names, or with positional arguments:
+
+```js
+// Named parameters (recommended for clarity)
+material.colorNode = proceduralGLSL( { pos: positionLocal, t: time } );
+
+// Positional arguments
+material.colorNode = proceduralGLSL( positionLocal, time );
+```
+
+### Automatic Stage Resolution
+
+In traditional GLSL shaders, passing data from vertex to fragment stages required manual plumbing: defining attributes, calculating projections in the vertex shader, declaring `varying` variables, and assigning values across stages.
+
+In TSL, **Vertex Stage** and **Fragment Stage** are resolved automatically by the nodes themselves (`NodeBuilder`). When you reference nodes such as `positionWorld`, `normalView`, or `uv()` inside a fragment property (like `material.colorNode`), TSL automatically determines what geometry data must be fetched, generates the vertex calculations, and transparently routes the interpolated varyings to the fragment stage without requiring manual transportation.
+
+### GLSL to TSL Mapping
+
+| Vertex (GLSL) | Fragment (GLSL) | TSL Equivalent |
+| :--- | :--- | :--- |
+| `gl_Position` | - | `modelViewProjection` |
+| `position` | `vPosition` | `positionLocal` / `positionWorld` |
+| `normal` | `vNormal` | `normalLocal` / `normalWorld` |
+| `uv` | `vUv` | `uv()` |
+| `attribute <type> name` | `varying <type> name` | `attribute( 'name' )` |
+| `modelMatrix` | - | `modelWorldMatrix` |
+| `modelViewMatrix` | - | `modelViewMatrix` |
+| `projectionMatrix` | - | `cameraProjectionMatrix` |
+| `normalMatrix` | - | `modelNormalMatrix` |
+| `varying = ...` | `vName` | `varying( node )` / `.toVarying()` |
+| `position + offset` | - | `material.positionNode` |
+| - | `gl_FragColor` | `material.colorNode` |
+| `uniform <type> name` | `uniform <type> name` | `uniform( value )` |
+| `uniform float time` | `uniform float time` | `time` |
+| - | `cameraPosition` | `cameraPosition` |
+| - | `texture2D( map, uv )` | `texture( map, uv() )` |
+| - | `discard;` | `Discard()` / `discard()` |
+| - | `dFdx()`, `dFdy()` | `dFdx()`, `dFdy()` |
+
 </page>
 
-<page name="GLSL Migration">
 </page>
 
-</page>
 

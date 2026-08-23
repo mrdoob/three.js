@@ -677,6 +677,11 @@ class CodeEditor extends EventDispatcher {
 					renderLineHighlight: 'none',
 					hideCursorInOverviewRuler: true,
 					overviewRulerBorder: false,
+					fontSize: 13,
+					fontFamily: '\'Fira Code\', monospace',
+					tabSize: 4,
+					insertSpaces: false,
+					detectIndentation: false,
 					padding: { top: 12, bottom: 12 },
 					scrollbar: {
 						vertical: 'hidden',
@@ -698,6 +703,7 @@ class CodeEditor extends EventDispatcher {
 					fixedOverflowWidgets: true,
 					fontSize: 13,
 					fontFamily: '\'Fira Code\', monospace',
+					tabSize: 4,
 					padding: { top: 16, bottom: 16 },
 					insertSpaces: false,
 					detectIndentation: false,
@@ -722,6 +728,18 @@ class CodeEditor extends EventDispatcher {
 			}
 
 			this.editor = _monaco.editor.create( this.container, options );
+
+			const model = this.editor.getModel();
+			if ( model ) {
+
+				model.updateOptions( {
+					tabSize: 4,
+					insertSpaces: false,
+					detectIndentation: false,
+					trimAutoWhitespace: true
+				} );
+
+			}
 
 			// Dynamic TSL syntax highlighting updates based on file imports
 			const updateHighlights = () => {
@@ -872,6 +890,19 @@ class CodeEditor extends EventDispatcher {
 		try {
 
 			this.editor.setValue( value );
+
+			const model = this.editor.getModel();
+			if ( model ) {
+
+				model.updateOptions( {
+					tabSize: 4,
+					insertSpaces: false,
+					detectIndentation: false,
+					trimAutoWhitespace: true
+				} );
+
+			}
+
 			this.editor.setScrollTop( 0 );
 			this.editor.setScrollLeft( 0 );
 			this.editor.setPosition( { lineNumber: 1, column: 1 } );

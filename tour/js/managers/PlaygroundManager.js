@@ -770,7 +770,7 @@ class PlaygroundManager {
 
 		}
 
-		if ( ! scene || ! camera || ! object ) {
+		if ( ! scene || ! camera ) {
 
 			this.tour.debugCodeEditor.setValue( 'Invalid debug data. Ensure scene, camera, and object are provided.' );
 

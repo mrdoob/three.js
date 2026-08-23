@@ -497,7 +497,13 @@ function parse( md ) {
 
 	html = newLines.join( '\n' );
 
+	// Protect tabs inside code fences so marked doesn't convert them to spaces
+	html = html.replace( /(```[\s\S]*?```)/g, match => match.replace( /\t/g, '\uE000' ) );
+
 	let parsedHtml = marked.parse( html );
+
+	// Restore tabs
+	parsedHtml = parsedHtml.replace( /\uE000/g, '\t' );
 
 	// Tokenize and style inline code tags to match Monaco editor colors
 	parsedHtml = parsedHtml.replace( /<code>([\s\S]*?)<\/code>/gi, ( match, codeContent ) => {
@@ -1027,17 +1033,19 @@ function renderTweetGroup( tweets ) {
 	for ( const tweet of tweets ) {
 
 		const shortAttributes = tweet.isShort ? 'data-cards="hidden" data-conversation="none"' : '';
+		const safeUrl = `https://x.com/${encodeURIComponent( tweet.username )}/status/${encodeURIComponent( tweet.id )}`;
+		const safeUsername = encodeURIComponent( tweet.username );
 
 		tweetsHtml += `
 		<div class="x-tweet-card">
 			<blockquote class="twitter-tweet" data-theme="dark" ${shortAttributes}>
 				<div class="x-tweet-fallback">
 					<div class="x-tweet-fallback-header">
-						<span class="x-tweet-author">@${tweet.username}</span>
+						<span class="x-tweet-author">@${safeUsername}</span>
 						<span class="x-tweet-platform-icon">𝕏</span>
 					</div>
 					<div class="x-tweet-fallback-body">
-						<a href="${tweet.url}" target="_blank" rel="noopener noreferrer">View post on X</a>
+						<a href="${safeUrl}" target="_blank" rel="noopener noreferrer">View post on X</a>
 					</div>
 				</div>
 			</blockquote>
@@ -1055,14 +1063,15 @@ function tokenizeInlineCode( codeContent ) {
 
 	if ( codeContent.includes( 'class="tsl-' ) ) return codeContent;
 
-	// Decode HTML entities so we can parse actual operators like > or <
+	// Decode HTML entities so we can parse actual operators like > or < (&amp; must be unescaped last to avoid double unescaping)
 	const decoded = codeContent
 		.replace( /&gt;/g, '>' )
 		.replace( /&lt;/g, '<' )
-		.replace( /&amp;/g, '&' )
 		.replace( /&quot;/g, '"' )
+		.replace( /&#34;/g, '"' )
 		.replace( /&#39;/g, '\'' )
-		.replace( /&apos;/g, '\'' );
+		.replace( /&apos;/g, '\'' )
+		.replace( /&amp;/g, '&' );
 
 	// Helper to escape characters back to HTML entities safely
 	const escapeHtml = ( str ) => {
