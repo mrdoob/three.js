@@ -2900,6 +2900,108 @@ body.preview-maximized .preview-hide-btn {
 	margin: 0.65rem 0;
 }
 
+/* Tour AI / LLM Accordion Callout Block */
+.tour-ai-accordion {
+	margin: 1.5rem 0;
+	background: linear-gradient(135deg, rgba(168, 85, 247, 0.07) 0%, rgba(99, 102, 241, 0.04) 100%);
+	border: 1px solid rgba(168, 85, 247, 0.25);
+	border-left: 4px solid #a855f7;
+	border-radius: 8px;
+	overflow: hidden;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.tour-ai-accordion:hover {
+	border-color: rgba(168, 85, 247, 0.45);
+	box-shadow: 0 4px 20px -4px rgba(168, 85, 247, 0.15);
+}
+
+.tour-ai-summary {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.85rem 1.25rem;
+	cursor: pointer;
+	user-select: none;
+	list-style: none;
+	background: transparent;
+	transition: background 0.15s ease;
+}
+
+.tour-ai-summary::-webkit-details-marker,
+.tour-ai-summary::marker {
+	display: none;
+}
+
+.tour-ai-summary:hover {
+	background: rgba(168, 85, 247, 0.06);
+}
+
+.tour-ai-summary-left {
+	display: flex;
+	align-items: center;
+	gap: 0.55rem;
+}
+
+.tour-ai-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: #c084fc;
+}
+
+.tour-ai-badge {
+	font-weight: 700;
+	font-size: 0.85rem;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	background: linear-gradient(135deg, #c084fc, #818cf8);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.tour-ai-hint {
+	font-size: 0.78rem;
+	color: #9ca3af;
+	opacity: 0.65;
+	margin-left: 0.35rem;
+	font-style: italic;
+}
+
+.tour-ai-chevron {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: #a855f7;
+	transition: transform 0.25s ease;
+}
+
+details.tour-ai-accordion[open] .tour-ai-chevron {
+	transform: rotate(180deg);
+}
+
+details.tour-ai-accordion[open] .tour-ai-hint {
+	display: none;
+}
+
+.tour-ai-content {
+	padding: 0.85rem 1.25rem 1rem 1.25rem;
+	font-size: 0.9rem;
+	color: #d1d5db;
+	line-height: 1.75;
+	border-top: 1px solid rgba(168, 85, 247, 0.15);
+	background: rgba(0, 0, 0, 0.15);
+}
+
+.tour-ai-item {
+	line-height: 1.75;
+	margin-bottom: 0.5rem;
+}
+
+.tour-ai-item:last-child {
+	margin-bottom: 0;
+}
+
 /* Inline Code Comments styling */
 .tsl-comment {
 	color: #6a9955 !important;

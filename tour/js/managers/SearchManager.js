@@ -298,7 +298,7 @@ class SearchManager {
 		const queryTerms = query.toLowerCase().split( /\s+/ ).filter( t => t.length > 0 );
 		if ( queryTerms.length === 0 ) return;
 
-		const elements = this.tour.dom.contentArea.querySelectorAll( 'p, h1, h2, h3, li, td, code, blockquote, .tour-note-block, .tour-important-block, .tsl-api-table-row' );
+		const elements = this.tour.dom.contentArea.querySelectorAll( 'p, h1, h2, h3, li, td, code, blockquote, .tour-note-block, .tour-important-block, .tour-ai-accordion, .tour-ai-content, .tsl-api-table-row' );
 		let targetElement = null;
 
 		for ( const el of elements ) {
@@ -308,6 +308,8 @@ class SearchManager {
 			if ( matches ) {
 
 				targetElement = el;
+				const details = el.closest( 'details' );
+				if ( details ) details.open = true;
 				break;
 
 			}

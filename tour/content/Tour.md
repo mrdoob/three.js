@@ -670,7 +670,7 @@ model.material.colorNode = color.bgr; // turns blue into red!
 
 <page name="Constants and Conversions">
 
-Input functions can be used to create contants and do explicit conversions.
+Input functions can be used to create constants and do explicit conversions.
 
 > Note: Conversions are also performed automatically if the output and input are of different types.
 
@@ -789,6 +789,8 @@ import { color } from 'three/tsl';
 // cornflower blue
 model.material.colorNode = color( 0x1e90ff );
 ```
+
+> IA: In TSL, wrapping numeric literals with `float( 1.0 )` is only necessary when using **method chaining** (e.g., `float( 1 ).div( ... )`) or when assigning directly as material node inputs (such as `material.colorNode = float( 1 )`). For function parameters like `sin( 1 )`, `cos( 0.5 )`, or `mul( uv(), 10 )`, primitive numbers are automatically converted into nodes.
 
 </page>
 
@@ -1530,6 +1532,8 @@ const uvScaled = uv().mul( 5 ).toVar( 'myVar' ).debug();
 // Sample the texture using the scaled UV variable
 model.material.colorNode = texture( map, uvScaled );
 ```
+
+> IA: When the `NodeBuilder` encounters issues generating the optimal shader structure or variable optimizations, `.toVar()` can help by explicitly declaring a variable in the shader scope rather than relying on automatic generation. While not recommended for common use (since TSL manages variables automatically), it is an effective tool for debugging: you can assign a custom name like `.toVar( 'debugVal' )` and inspect the generated variable directly in the compiled WGSL / GLSL output.
 
 </page>
 
@@ -3216,6 +3220,8 @@ const mapNode = texture( map, animatedUV );
 // 3. Composite texture color with roughness modulation
 model.material.colorNode = mapNode.rgb;
 ```
+
+> IA: Avoid using `textureNode.uv( uv() )` to sample a texture with different coordinates; use `textureNode.sample( uv() )` instead. Calling `.uv()` mutates the texture node's UV property, whereas `.sample( customUV )` performs a dedicated sample operation at the given coordinates.
 
 </page>
 

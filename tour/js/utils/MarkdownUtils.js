@@ -355,6 +355,44 @@ function parse( md ) {
 	parseCallouts( 'Important', 'Important', '⚠️', 'tour-important' );
 	parseCallouts( 'Note', 'Note', '📌', 'tour-note' );
 
+	// Helper to parse collapsible accordion callout blocks for AI / LLM (> IA: or > AI: or > LLM:)
+	const parseAccordionCallouts = ( tag, title, icon, className ) => {
+
+		const regex = new RegExp( `(?:^|\\n)[ \\t]*>[ \\t]*${tag}:[ \\t]*([^\\n]+(?:\\n[ \\t]*(?:>[ \\t]*)?[^\\n<>:|]+)*)`, 'gi' );
+		const matches = [];
+		let match;
+		while ( ( match = regex.exec( html ) ) !== null ) {
+
+			const cleanedContent = match[ 1 ]
+				.split( '\n' )
+				.map( line => line.replace( /^[ \t]*>[ \t]?/, '' ).trim() )
+				.filter( Boolean )
+				.join( '\n' );
+
+			matches.push( {
+				index: match.index,
+				length: match[ 0 ].length,
+				content: cleanedContent
+			} );
+
+		}
+
+		for ( let i = matches.length - 1; i >= 0; i -- ) {
+
+			const m = matches[ i ];
+			const lines = m.content.split( '\n' );
+			const itemsHtml = lines.map( l => `<div class="${className}-item">${marked.parseInline( l )}</div>` ).join( '' );
+
+			const accordionHtml = `\n\n<details class="${className}-accordion"><summary class="${className}-summary"><div class="${className}-summary-left"><span class="${className}-icon"><i data-icon="${icon}" style="width: 1.1rem; height: 1.1rem;"></i></span> <span class="${className}-badge">${title}</span> <span class="${className}-hint">Click to expand</span></div><span class="${className}-chevron"><i data-icon="chevron-down" style="width: 1rem; height: 1rem;"></i></span></summary><div class="${className}-content">${itemsHtml}</div></details>\n\n`;
+
+			html = html.substring( 0, m.index ) + accordionHtml + html.substring( m.index + m.length );
+
+		}
+
+	};
+
+	parseAccordionCallouts( '(?:IA|AI|LLM)', 'AI / LLM Guide', 'sparkles', 'tour-ai' );
+
 	// Group consecutive API blocks
 	const apiBlockRegex = /::: api\s+([^\n]+?)(?:\s*:::\s*(?=\n|$)|(?:\r?\n([\s\S]*?):::))/gi;
 	const matches = [];
