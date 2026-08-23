@@ -10,7 +10,7 @@ TSL (Three.js Shading Language) is the new shader standard for Three.js, built t
 
 - **Improved Productivity**: Write modular, reusable shader functions, import them like regular JS modules, and enjoy full IDE autocomplete and instant feedback.
 
-- **Easier Maintenance**: Instead of relying on fragile string concatenation, TSL provides structured, type-aware expressions that are easier to understand, reuse, and refactor.
+- **Easier Maintenance**: Instead of relying on fragile string concatenation, TSL provides structured node expressions that are easier to understand, reuse, and refactor. Its component-based architecture allows you to maintain, update, and modify individual parts of the shader and pipeline independently, avoiding variable and layout collisions.
 
 - **Future-Proof Portability**: TSL is backend-agnostic, compiling automatically to WebGPU (WGSL) or WebGL (GLSL) behind the scenes, ensuring your visuals run everywhere.
 
@@ -109,62 +109,177 @@ Let's say that you import positionWorld into your code, even if another componen
 
 <page name="Architecture">
 
-All TSL components are extended from Node class. The Node allows it to communicate with any other, value conversions can be automatic or manual, a Node can receive the output value expected by the parent Node and modify its own output snippet. It's possible to modulate them using tree shaking in the shader construction process, the Node will have important information such as geometry, material, renderer as well as the backend, which can influence the type and value of output.
+All TSL components are extended from the `Node` class. The `Node` allows it to communicate with any other, value conversions can be automatic or manual, a `Node` can receive the output value expected by the parent `Node` and modify its own output snippet. It's possible to modulate them using tree shaking in the shader construction process, the `Node` will have important information such as geometry, material, renderer as well as the backend, which can influence the type and value of output.
 
-The main class responsible for creating the code is NodeBuilder. This class can be extended to any output programming language, so you can use TSL for a third language if you wish. Currently NodeBuilder has two extended classes, the WGSLNodeBuilder aimed at WebGPU and GLSLNodeBuilder aimed at WebGL2.
+The main class responsible for creating the code and pipeline configuration is `NodeBuilder`. This class can be extended to any output programming language, so you can use TSL for a third language if you wish. Currently `NodeBuilder` has two extended classes, the `WGSLNodeBuilder` aimed at WebGPU and `GLSLNodeBuilder` aimed at WebGL2.
+
+Beyond generating shader source code, `NodeBuilder` orchestrates GPU memory allocation and pipeline layouts: GPU buffers (uniform buffers, storage buffers, and attributes) can be dedicated per-object or shared across multiple materials and passes, avoiding redundant GPU memory allocations and state transitions.
+
+### Compilation Process
 
 The build process is based on three pillars: setup, analyze and generate.
 
-| | |
-| -- | -- |
-| setup | Use TSL to create a completely customized code for the Node output. The Node can use many others within itself, have countless inputs, but there will always be a single output. |
-| analyze | This proccess will check the nodes that were created in order to create useful information for generate the snippet, such as the need to create or not a cache/variable for optimizing a node. |
-| generate | An output of string will be returned from each node. Any node will also be able to create code in the flow of shader, supporting multiple lines. |
+```mermaid
+flowchart TD
+    subgraph TSL["TSL"]
+        Graph["<b>Node Graph (AST)</b><br/><small>JavaScript Objects</small>"]
+    end
 
-Node also have a native update process invoked by the `update()` and `updateBefore()` function, these events be called by frame, render call and object draw.
+    subgraph Material["Node Material"]
+        Inputs["<b>Material Inputs</b><br/><small><code>colorNode, opacityNode, ...</code></small>"]
+    end
 
-It is also possible to serialize or deserialize a Node using `serialize()` and `deserialize()` functions.
+    subgraph Phases["Node Builder (Target Backend)"]
+        Setup["<b>Setup</b><br/><small><code>node.setup( builder )</code></small>"]
+        Analyze["<b>Analyze</b><br/><small><code>node.analyze( builder )</code></small>"]
+        Generate["<b>Generate</b><br/><small><code>node.generate( builder, output )</code></small>"]
+        Setup --> Analyze --> Generate
+    end
+
+    subgraph Buffers["GPU Buffers"]
+        BufferItems["<b>Uniforms & Storage Buffers</b><br/><small>Dedicated or Shared Buffers</small>"]
+    end
+
+    subgraph Bindings["GPU Bindings"]
+        direction TB
+        Attributes["<b>Attributes</b><br/><small><code>@location(0), @location(1)...</code></small>"]
+        BindGroups["<b>Bind Groups</b><br/><small><code>@group(0), @group(1)...</code></small>"]
+        Attributes --> BindGroups
+    end
+
+    subgraph Shaders["GPU Shaders"]
+        direction TB
+        ShaderItems["<b>WGSL / GLSL</b><br/><small>Vertex, Fragment, Compute</small>"]
+    end
+
+    subgraph Events["CPU Lifecycle"]
+        direction TB
+        LifeItems["<b>Execution Hooks</b><br/><small><code>updateBefore</code> &rarr; <code>update</code> &rarr; <code>updateAfter</code></small>"]
+    end
+
+    subgraph Operations["Runtime Operations"]
+        direction TB
+        Ops1["<b>Compute & Draw Calls</b><br/><small>Pre-passes, shadow maps, compute dispatches</small>"]
+        Ops2["<b>Viewport Texture Sampling</b><br/><small>Capture viewport color / depth textures</small>"]
+        Ops3["<b>Uniform & Buffer Updates</b><br/><small>Dynamic matrices, uniforms, buffer swaps</small>"]
+        Ops4["<b>Custom Logic & Passes</b><br/><small>User callbacks, custom pipelines & readbacks</small>"]
+        Ops1 --> Ops2 --> Ops3 --> Ops4
+    end
+
+    TSL --> Material
+    Material --> Phases
+    Phases --> Shaders
+    Phases --> Buffers
+    Buffers --> Bindings
+    Phases --> Events
+    Events --> Operations
+```
+
+### Node
+
+The `Node` class is the fundamental abstraction representing every operation, value, texture sample, uniform, and expression within the TSL shading graph. Each node defines its own sub-graph, manages how it is compiled into backend shader code, and interfaces with the compilation pipeline through three primary stages:
+
+::: api .setup( builder ) : Node - Use TSL to create customized logic for the node output, transforming expressions into child node connections. :::
+
+::: api .analyze( builder, output ) : void - Analyzes the node graph to determine reference counts and assign cached variables for optimization. :::
+
+::: api .generate( builder, output ) : string - Emits and returns the concrete shader code string snippet for the active graphics backend. :::
+
+### Update Events & Lifecycle
+
+Nodes can manage CPU-side operations and synchronize data with the GPU during the rendering loop through lifecycle hooks and execution frequency properties:
+
+::: api .updateBeforeType : NodeUpdateType - The update frequency for `.updateBefore()`, executed before rendering begins. :::
+
+::: api .updateType : NodeUpdateType - The update frequency ('frame', 'render', 'object') for `.update()`. :::
+
+::: api .updateAfterType : NodeUpdateType - The update frequency for `.updateAfter()`, executed after rendering completes. :::
+
+::: api .updateBefore( frame ) : void - Executed before rendering operations begin. Ideal for pre-pass setup, allocating dynamic storage buffers and render targets, or evaluating simulation states. :::
+
+::: api .update( frame ) : void - Executed during object preparation right before drawing. Used to update node uniforms, animation matrices, or dynamic parameters. :::
+
+::: api .updateAfter( frame ) : void - Executed after rendering operations have completed. Used for post-render cleanup, ping-pong buffer swaps, or GPU readbacks. :::
+
+#### Update Frequencies
+
+Constants defined in `NodeUpdateType` controlling the execution frequency of update properties:
+
+::: api NodeUpdateType.NONE : string - The update method is disabled and will not be executed ('none'). :::
+
+::: api NodeUpdateType.FRAME : string - Executed once per animation frame (per requestAnimationFrame tick) ('frame'). :::
+
+::: api NodeUpdateType.RENDER : string - Executed once per renderer.render() call (useful for multi-pass rendering, shadow maps, and cubemaps) ('render'). :::
+
+::: api NodeUpdateType.OBJECT : string - Executed once per individual Object3D drawn with the material or node ('object'). :::
+
+### Serialization
+
+Nodes support JSON-based serialization and deserialization, allowing entire node graphs, materials, and custom shader configurations to be saved to disk, shared across projects, or integrated with visual node editors:
+
+::: api .serialize( json ) : object - Serializes the node structure and connections into a JSON object for storage, material exchange, or visual node editors. :::
+
+::: api .deserialize( json ) : void - Restores the node state and connections from a serialized JSON representation. :::
 
 </page>
 
-<page name="What is TSL?">
+<page name="Component-Based">
 
-TSL (Three.js Shading Language) is a Node-based shader and rendering abstraction written in JavaScript. While its syntax and mathematical functions are inspired by GLSL, TSL operates on a fundamentally different paradigm than traditional shading languages.
+TSL (Three.js Shading Language) elevates shader development from a monolithic script model to a **Component-Based Architecture**, allowing developers to maintain, test, and share individual parts of the shader and rendering pipeline independently, scalably, and without collisions.
 
-### Traditional Shaders vs. Node System
+### Architectural Approaches
 
-Traditional shading languages (such as WGSL, GLSL, and HLSL) and standard shader abstraction languages are designed solely to author **GPU shaders**.
+| Aspect | Traditional Shaders (Direct GPU Code) | Node System (TSL Abstraction) |
+| --- | --- | --- |
+| **Structure** | Text-based programs (GLSL / WGSL source files) | Composable JavaScript node graph (AST) |
+| **Workflow** | Direct imperative shader code (`main()`, explicit steps) | Declarative channel assignment (`colorNode`, `normalNode`, etc.) |
+| **Pipeline Integration** | Focuses strictly on per-draw GPU execution | Extends to multi-pass orchestration, compute stages, and CPU hooks |
+| **Scope & Sharing** | Uniforms and bindings are scoped to individual programs | Nodes and uniforms can be shared across materials, MRT, and post-processing |
+| **Stage Interfacing** | Manual declaration and management of varyings across stages | Automatic varying allocation and stage routing (e.g. `.toVertexStage()`) |
+| **Backend Target** | Written specifically for a single backend (e.g. GLSL or WGSL) | Backend-agnostic; compiles automatically to WGSL or GLSL |
 
-- **Traditional Shaders (Passive Execution)**:
-  - A traditional shader is executed strictly during a single `draw()` call or `compute()` dispatch.
-  - It receives fixed inputs (attributes, uniforms, textures), executes instructions per thread on the GPU, and outputs results.
-  - It is passive: it has no control over the broader rendering pipeline, cannot allocate render targets, cannot orchestrate multi-pass workflows, and cannot hook into host-side lifecycle events.
+### Imperative Code vs. Declarative Nodes
 
-- **Nodes (Active Pipeline Orchestration)**:
-  - In TSL, compiling GPU shader code is just **one** of many capabilities of a Node.
-  - A **Node** is an active component capable of **manipulating and orchestrating the rendering and compute process itself**, influencing the pipeline to execute different tasks across CPU and GPU:
-    - **Pipeline & Pass Manipulation**: Nodes can schedule and trigger new render passes dynamically (such as multi-pass Gaussian blurs, depth pre-passes, or screen-space effects) directly from within a material or post-processing graph.
-    - **Integrated Compute**: Nodes can inject compute stages into the pipeline lifecycle, executing GPGPU calculations and updating simulation or geometry buffers in coordination with object rendering.
-    - **Dynamic Resource Management**: Nodes can allocate render targets, access rendered buffers via `viewportSharedTexture()` and `viewportLinearDepth()`, and preserve render-order dependencies automatically.
-    - **CPU-GPU Lifecycle Hooks**: Nodes hook into CPU update events like `update()` and `updateBefore()` (per-frame, per-render, and per-draw) to update uniforms, allocate buffers, or configure pipeline states before the GPU program executes.
+- **Direct Imperative Shaders (GLSL / WGSL)**:
+  Developers write explicit, step-by-step instructions executed sequentially inside stage entry points like `void main()` or `@fragment fn main()`. Variables, varyings, texture sampling, and output registers (`gl_FragColor` / `@location(0)`) must be manually declared and wired:
 
-<page name="Nodes vs Traditional Shaders">
+  ```glsl
+  // Imperative step-by-step instructions in entry point
+  void main() {
+      vec3 normal = normalize( vNormal );
+      float diff = max( dot( normal, uLightDirection ), 0.0 );
+      gl_FragColor = vec4( uBaseColor * diff, 1.0 );
+  }
+  ```
 
-# DRAFT - WORK IN PROGRESS PAGE
+- **Declarative Node System (TSL)**:
+  Developers declare *what* each channel or material should compute by assigning composable nodes. `NodeBuilder` automatically resolves execution stages, routes varyings, deduplicates calculations into cached variables, and synthesizes the optimal GPU program:
 
-In traditional shader programming (GLSL/WGSL), composing features from different parts of an engine is notoriously difficult: merging materials, dynamic lighting, MRT outputs, and fog requires brittle string concatenation, manual varying plumbing, and fragile `#ifdef` chains that frequently suffer from variable collisions and layout mismatches.
+  ```js
+  // Declarative component assignment
+  const diff = normalView.dot( lightDirection ).max( 0.0 );
+  material.colorNode = baseColor.mul( diff );
+  ```
 
-TSL eliminates these conflicts entirely. Different decoupled subsystems—such as **Materials**, **Lighting models**, **Render Pipelines (MRT)**, and **Post-Processing**—independently declare and share expressive node objects (e.g. `normalView`, `positionWorld`). The **TSL Node Engine (`NodeBuilder`)** compiles the entire dependency graph as an Abstract Syntax Tree (AST), deduplicates calculations, and generates a single unified GPU shader with zero code conflicts.
+### Component-Based Design
+
+In TSL, materials and rendering pipelines are built by composing independent node components:
+
+- **Modular Maintenance**: Individual shading components (e.g. lighting, diffuse color, normal evaluation) are maintained independently, avoiding variable name collisions and layout conflicts.
+- **Cross-Pipeline Sharing**: A single node or uniform instance can be connected simultaneously to surface materials, deferred MRT channels, post-processing passes (`pass( scene, camera )`), and compute shaders.
+- **Rendering Orchestration**: Nodes can interact with the broader pipeline by scheduling compute dispatches, requesting viewport textures (`viewportSharedTexture`), and hooking into CPU lifecycle events (`updateBefore`, `update`, `updateAfter`).
+- **Graph Compilation & Optimization**: `NodeBuilder` analyzes the dependency graph, deduplicates repeated expressions, and generates optimized, backend-specific GPU programs.
 
 ```mermaid
 flowchart TD
     Position["<b>positionView</b>"]
     Normal["<b>normalView</b>"]
+    Custom["<b>customNode</b>"]
 
     Scene["<b>Scene</b><br/><small><code>fogNode = fog( color, positionView.z.negate() )</code></small>"]
     Light["<b>Lighting & Shadows</b><br/><small><code>...normalView.dot( lightDirection )</code></small>"]
-    Mat["<b>Material</b><br/><small><code>normalNode = normalView</code></small>"]
-    MRT["<b>Multiple Render Target</b><br/><small><code>mrt( { normal: normalView } )</code></small>"]
+    Mat["<b>Material</b><br/><small><code>normalNode = normalView, colorNode = customNode</code></small>"]
+    MRT["<b>Multiple Render Target</b><br/><small><code>mrt( { normal: normalView, custom: customNode } )</code></small>"]
 
     Pipeline["<b>Render Pipeline</b><br/><small><code>pass( scene, camera )</code></small>"]
 
@@ -176,7 +291,7 @@ flowchart TD
         AST --> Cache --> Wiring
     end
 
-    Shader["<b>Compiled Unified Shader</b><br/><small>Single conflict-free WGSL / GLSL program<br/>Zero duplicate variables • Max performance</small>"]
+    Shader["<b>Compiled Unified Shader</b><br/><small>Conflict-free<br/>WGSL / GLSL program</small>"]
 
     Scene ~~~ Light
     Light ~~~ Mat
@@ -189,6 +304,9 @@ flowchart TD
     Normal --> Mat
     Normal --> MRT
 
+    Custom --> Mat
+    Custom --> MRT
+
     Scene --> Pipeline
     Light --> Pipeline
     Mat --> Pipeline
@@ -198,123 +316,9 @@ flowchart TD
     NodeBuilder -->|"Emit Shader"| Shader
 ```
 
-### Monolithic Script vs. Modular Graph
-
-- **Traditional Shaders**: Force all lighting, textures, varyings, and output targets into a single monolithic file. Any modification risks breaking the fragile balance of variables and execution flow.
-- **Node System**: Composed of independent, interconnected nodes forming an intelligent dependency graph. Nodes are self-contained, completely reusable across different materials, post-processing, and compute passes without code duplication.
-
-### Imperative Code vs. Declarative Composition
-
-- **Traditional Shaders**: Require you to micromanage the *how* — manually writing line-by-line instructions, passing varyings between stages, and hardcoding layout binding registers.
-- **Node System**: You simply declare the *what* — assigning expressive nodes to material channels like `colorNode`, `roughnessNode`, `normalNode`, or `mrtNode`. Node System automatically deduplicates shared operations, resolves variable scopes, and generates optimized, backend-specific GPU code for WebGPU or WebGL.
-
-### Sequential Script vs. Component-Based Architecture
-
-- **Traditional Shaders**:
-  - Execution order is rigid and linear; injecting or overriding behaviors requires modifying the entire shader program or resorting to complex `#ifdef` chains.
-  - Communicating between vertex and fragment stages requires manually declaring, tracking, and wiring matching varyings or output/input structs scattered across separate files.
-
-- **Node System**:
-  - Material channels are decoupled components (`positionNode`, `colorNode`, `roughnessNode`, `normalNode`). Assignment order does not matter, and pipeline stages are determined automatically by the target inputs.
-  - Manual, scattered varying declarations are unnecessary. When an operation inside a fragment channel should run per-vertex for performance, simply chain `.toVertexStage()` — Node System automatically allocates the varying register, calculates the expression in the vertex stage, and interpolates it to the fragment stage.
-
-```js
-import { texture, float, modelNormalMatrix, normalLocal } from 'three/tsl';
-
-// Independent components — assignment order does not matter
-material.roughnessNode = float( 0.2 );
-material.colorNode = texture( map );
-
-// Automatic vertex-stage execution and seamless interpolation to fragment stage
-const normalView = modelNormalMatrix.mul( normalLocal ).toVertexStage();
-material.normalNode = normalView.normalize();
-```
-
-### Dynamic Context & CPU/GPU Synergy
-
-Traditional shaders are completely isolated from host JavaScript objects — they can only receive raw values fed into predefined uniforms. In contrast, TSL functions have full dynamic access to the Three.js scene graph and engine lifecycle:
-
-- **Dynamic Context Access**: Functions can directly query `geometry`, `material`, `object`, `camera`, `scene`, and `renderer` at shader build time, dynamically adapting shading logic to the specific object:
-  ```js
-  const customColor = Fn( ( { material, geometry, object, renderer } ) => {
-  	// Dynamically configure logic based on object or material properties
-  	if ( material.userData.customColor ) {
-  		return uniform( material.userData.customColor );
-  	}
-  	return vec3( 0 );
-  } );
-  ```
-
-- **Complete Code Freedom & Effortless Sharing**:
-  - In traditional shaders, uniforms and buffers are locked to a single shader program. Sharing a value across multiple materials requires repetitive CPU-side wiring, manual binding per program, and explicit synchronization.
-  - In the Node System, **all code is completely free and unconstrained**:
-    - **Declare Anywhere**: Uniforms `uniform()`, storage buffers `storage()`, and textures can be declared anywhere — inside a TSL function `Fn()` or outside as standalone JavaScript variables and modules.
-    - **Frictionless Sharing**: A single `uniform()` or buffer instance can be shared directly across any number of completely different materials, post-processing passes, and compute shaders.
-    - **Instant Sync**: Mutating `sharedColor.value` updates all materials across the entire scene automatically — with zero manual binding or shader re-linking.
-
-  ```js
-  // Complete code freedom: declare outside or inside functions and share across materials
-  const sharedColor = uniform( new THREE.Color( 0x00aaff ) );
-  const sharedIntensity = uniform( 1.5 );
-
-  // Share the exact same uniform across multiple independent materials
-  materialA.colorNode = texture( map ).mul( sharedColor );
-  materialB.colorNode = sharedColor.mul( sharedIntensity );
-  materialC.roughnessNode = sharedIntensity.mul( 0.5 );
-
-  // Mutating .value once updates all materials across the GPU automatically
-  sharedColor.value.setHex( 0xff5500 );
-  ```
-
-- **Hybrid CPU/GPU Objects**: Nodes combine JavaScript state management, asset loading, CPU lifecycle hooks (`update()`, `updateBefore()`), and GPU instructions into a single cohesive entity.
-
-### Pipeline & Renderer Manipulation
-
-Traditional shaders are passive programs executed strictly during a single draw call. Nodes can actively control the renderer and manipulate the pipeline:
-
-- **Multi-Pass Orchestration**: Nodes can trigger and manage multiple render passes on their own (e.g. `gaussianBlur()`, `viewportSharedTexture()`, `viewportLinearDepth()`) without altering renderer core code.
-- **Integrated Compute**: Inject compute stages directly into the rendering lifecycle to update particle buffers, physics, or skinning in coordination with draw passes.
-- **Multiple Render Targets (MRT)**: In traditional shaders, writing to multiple render targets requires manually declaring layout locations, managing output struct signatures, and writing sequential fragment assignments:
-
-```glsl
-layout(location = 0) out vec4 gColor;
-layout(location = 1) out vec4 gNormal;
-```
-
-With TSL, outputs are declared composably and effortlessly with `mrt()`:
-
-```js
-import { mrt, output, normalView } from 'three/tsl';
-
-material.mrtNode = mrt( {
-	output,
-	normal: normalView
-} );
-```
-
-Node System automatically configures layout locations, resolves shader dependencies, and adapts to the active render pipeline — completely eliminating boilerplate and fragile wiring.
-
-### Comparison Summary
-
-| Feature | Traditional Shaders (WGSL / GLSL) | Node System (TSL) |
-| --- | --- | --- |
-| **Architecture** | Monolithic linear scripts (vertex/fragment files) | Modular, interconnected dependency graph |
-| **Paradigm** | Imperative (step-by-step instructions, manual wiring) | Declarative (intent-driven channels like `colorNode`, `normalNode`) |
-| **Execution Scope** | Confined strictly to a single `draw()` or `compute()` dispatch | Orchestrates the entire pipeline, multi-pass rendering, and compute |
-| **Pipeline Control** | Passive execution per draw call | Direct renderer manipulation (render passes, shared buffers, compute stages) |
-| **Context Access** | None (isolated shader code unaware of CPU objects) | Dynamic access to `geometry`, `material`, `object`, `camera`, `renderer` |
-| **Resource Creation & Sharing** | Locked to specific programs; declared externally | Declare anywhere (inside/outside functions); share across materials/passes |
-| **CPU/GPU Synergy** | Disconnected files requiring manual synchronization | Unified hybrid objects managing CPU state, lifecycle hooks, and GPU code |
-| **Inter-Stage Wiring (Varyings)** | Manual varying declarations across separate vertex & fragment files | Automatic with `.toVertexStage()` or `.toVarying()` on any expression |
-| **Reusability** | Fragile copy-pasting or macro `#include` chains | First-class JavaScript modules with full encapsulation & tree-shaking |
-| **Pipeline Adaptation** | Manual layout bindings (`layout(location = N)`) and varyings | Automatic layout configuration, varying wiring, and `mrt()` support |
-| **Optimization** | Manual deduplication and variable management | Automatic graph analysis, dead code elimination, and sharing |
-| **Host Lifecycle** | Isolated from CPU state; manual uniform management | Native CPU hooks (`update()`, `updateBefore()`) across render lifecycle |
-| **Portability** | Tied to a specific backend (WGSL for WebGPU, GLSL for WebGL) | Backend-agnostic; compiles automatically to WGSL or GLSL |
-
 </page>
 
-<page name="Seamless Integration with JavaScript">
+<page name="Seamless Integration">
 
 - Unified Code
   - Write shader logic directly in JS/TS, eliminating the need to manipulate strings.
@@ -770,25 +774,44 @@ For **MRT (Multiple Render Targets)** and **Post-Processing**, it is recommended
 
 ```tsl nodeMaterialExample
 import 'scenes/shaderball';
-import { positionLocal, normalLocal, time, sin, cos, color, float, mix } from 'three/tsl';
+import * as THREE from 'three';
+import { normalView, positionLocal, time, color, vec3, mix } from 'three/tsl';
 
-// 1. Procedural vertex displacement on positionNode
-const waveFreq = float( 4.0 );
-const waveSpeed = time.mul( 2.0 );
-const displacement = sin( positionLocal.y.mul( waveFreq ).add( waveSpeed ) )
-	.mul( cos( positionLocal.x.mul( waveFreq ).add( waveSpeed ) ) )
-	.mul( 0.08 );
+// 1. Holographic spectral coordinates
+const spectralCoord = normalView.z
+	.mul( 3.0 )
+	.add( positionLocal.y.mul( 5.0 ) )
+	.add( time.mul( 0.6 ) );
 
-model.material.positionNode = positionLocal.add( normalLocal.mul( displacement ) );
+// 2. Full-spectrum continuous rainbow
+const rainbow = vec3(
+	spectralCoord.cos(),
+	spectralCoord.add( 2.094 ).cos(),
+	spectralCoord.add( 4.188 ).cos()
+).mul( 0.5 ).add( 0.5 );
 
-// 2. Dynamic PBR properties via node slots
-const pulse = sin( time.mul( 3.0 ) ).mul( 0.5 ).add( 0.5 );
-const baseColor = color( 0x050c1a );
-const accentColor = color( 0x00ffcc );
+// 3. Smooth transition from Cyber Blue to Full Rainbow spectrum
+const cyberBlue = color( 0x00d4ff );
+const colorCycle = time.mul( 0.5 ).sin().mul( 0.5 ).add( 0.5 );
+const holoColor = mix( cyberBlue, rainbow, colorCycle );
 
-model.material.colorNode = mix( baseColor, accentColor, pulse.mul( displacement.abs().mul( 10.0 ) ) );
-model.material.roughnessNode = pulse.mul( 0.6 ).add( 0.2 );
-model.material.metalnessNode = float( 0.85 );
+// 4. Holographic scanlines & subtle projector flicker
+const scanline = positionLocal.y.mul( 35.0 ).sub( time.mul( 2.5 ) ).sin().mul( 0.5 ).add( 0.5 );
+const flicker = time.mul( 25.0 ).sin().mul( 0.03 ).add( 0.97 );
+
+// 5. View-angle Fresnel glow
+const fresnel = normalView.z.oneMinus().pow( 2.0 );
+
+// 6. Composite glowing hologram beam
+const holoBeam = holoColor.mul( scanline.mul( 0.5 ).add( 0.5 ) ).mul( flicker );
+
+model.material.transparent = true;
+model.material.side = THREE.DoubleSide;
+model.material.colorNode = holoColor.mul( 0.2 );
+model.material.emissiveNode = holoBeam.mul( fresnel.mul( 2.2 ).add( scanline.mul( 0.6 ) ) );
+model.material.opacityNode = fresnel.mul( 0.7 ).add( scanline.mul( 0.2 ) ).add( 0.15 );
+model.material.roughness = 0.1;
+model.material.metalness = 0.8;
 ```
 
 </page>
