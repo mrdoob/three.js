@@ -464,6 +464,89 @@ function parse( md ) {
 
 	}
 
+	// Helper to parse hierarchical class API accordion containers (::: api-class or ::: api-group)
+	// Example: ::: api-class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial [open] ... :::
+	const apiClassContainerRegex = /(?:^|\n)[ \t]*:::\s*(?:api-class|api-group)\s+([^\n]+?)\r?\n([\s\S]*?)\r?\n[ \t]*:::[ \t]*(?=\n|$)/gi;
+	const classBlocks = [];
+	const classMap = new Map();
+	let classMatch;
+
+	while ( ( classMatch = apiClassContainerRegex.exec( html ) ) !== null ) {
+
+		let headerText = classMatch[ 1 ].trim();
+		const isOpen = /\[open\]|\bopen\b/i.test( headerText );
+		headerText = headerText.replace( /\[open\]/gi, '' ).replace( /\bopen\b/gi, '' ).trim();
+
+		const extendsMatch = headerText.match( /^(.*?)\s+(?:extends|:)\s+(.*)$/i );
+		let className = headerText;
+		let extendsClass = null;
+
+		if ( extendsMatch ) {
+
+			className = extendsMatch[ 1 ].trim();
+			extendsClass = extendsMatch[ 2 ].trim();
+
+		}
+
+		const bodyContent = classMatch[ 2 ];
+		const countMatches = ( bodyContent.match( /class='tsl-api-table-row'/g ) || bodyContent.match( /class="tsl-api-table-row"/g ) || [] ).length +
+			( bodyContent.match( /class='tsl-api-card'/g ) || bodyContent.match( /class="tsl-api-card"/g ) || [] ).length;
+
+		const blockData = {
+			index: classMatch.index,
+			length: classMatch[ 0 ].length,
+			className,
+			extendsClass,
+			isOpen,
+			bodyContent,
+			count: countMatches
+		};
+
+		classBlocks.push( blockData );
+		classMap.set( className, blockData );
+
+	}
+
+	for ( let i = classBlocks.length - 1; i >= 0; i -- ) {
+
+		const block = classBlocks[ i ];
+		const openAttr = block.isOpen ? ' open' : '';
+		const extendsHtml = block.extendsClass ? ` <span class='tsl-api-class-extends'><span class='tsl-api-class-extends-keyword'>extends</span> <span class='tsl-api-class-extends-name'>${block.extendsClass}</span></span>` : '';
+		const countBadgeHtml = block.count > 0 ? `<span class='tsl-api-class-count'>${block.count} ${block.count === 1 ? 'property' : 'properties'}</span>` : '';
+
+		// Build inherited accordion blocks from parent chain
+		let inheritedHtml = '';
+		let currParent = block.extendsClass;
+		const visited = new Set( [ block.className ] );
+
+		while ( currParent && classMap.has( currParent ) && ! visited.has( currParent ) ) {
+
+			visited.add( currParent );
+			const parentObj = classMap.get( currParent );
+			const parentContent = parentObj.bodyContent.trim();
+			const parentCount = parentObj.count;
+
+			if ( parentContent ) {
+
+				const pCountBadge = parentCount > 0 ? `<span class='tsl-api-class-count'>${parentCount} ${parentCount === 1 ? 'property' : 'properties'}</span>` : '';
+
+				inheritedHtml += `\n<details class='tsl-api-inherited-accordion'><summary class='tsl-api-inherited-summary'><div class='tsl-api-inherited-summary-left'><span class='tsl-api-inherited-icon'><i data-icon='layers' style='width: 1rem; height: 1rem;'></i></span><span class='tsl-api-inherited-label'>Inherited from</span> <span class='tsl-api-class-extends-name'>${currParent}</span></div><div class='tsl-api-inherited-summary-right'>${pCountBadge}<span class='tsl-api-class-chevron'><i data-icon='chevron-down' style='width: 0.9rem; height: 0.9rem;'></i></span></div></summary><div class='tsl-api-inherited-content'>\n\n${parentContent}\n\n</div></details>`;
+
+			}
+
+			currParent = parentObj.extendsClass;
+
+		}
+
+		const inheritedGroupHtml = inheritedHtml ? `\n<div class='tsl-api-inherited-group'>${inheritedHtml}</div>` : '';
+		const fullContent = block.bodyContent.trim() + inheritedGroupHtml;
+
+		const accordionHtml = `\n\n<details class='tsl-api-class-accordion'${openAttr}><summary class='tsl-api-class-summary'><div class='tsl-api-class-summary-left'><span class='tsl-api-class-icon'><i data-icon='box' style='width: 1.15rem; height: 1.15rem;'></i></span><span class='tsl-api-class-name'>${block.className}</span>${extendsHtml}</div><div class='tsl-api-class-summary-right'>${countBadgeHtml}<span class='tsl-api-class-chevron'><i data-icon='chevron-down' style='width: 1rem; height: 1rem;'></i></span></div></summary><div class='tsl-api-class-content'>\n\n${fullContent}\n\n</div></details>\n\n`;
+
+		html = html.substring( 0, block.index ) + accordionHtml + html.substring( block.index + block.length );
+
+	}
+
 	// Replace standalone YouTube watch URLs
 	html = html.replace( /(?:^|\n)[ \t]*(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)(?:&\S*)?[ \t]*(?=\n|$)/gi, ( match, videoId ) => {
 

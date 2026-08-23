@@ -2097,6 +2097,18 @@ body.preview-maximized .preview-hide-btn {
 	}
 }
 
+@keyframes search-flash-overlay {
+	0% {
+		opacity: 1;
+		background-color: rgba(28, 163, 236, 0.5);
+	}
+
+	100% {
+		opacity: 0;
+		background-color: transparent;
+	}
+}
+
 @keyframes search-flash-glow {
 	0% {
 		box-shadow: 0 0 15px rgba(0, 170, 255, 0.7);
@@ -2117,12 +2129,19 @@ body.preview-maximized .preview-hide-btn {
 	animation: search-flash-glow 1.5s ease-out;
 }
 
-.tsl-api-table-row.search-match-flash {
+.tsl-api-table-row.search-match-flash,
+.tsl-api-signature.search-match-flash,
+.tsl-api-class-summary.search-match-flash,
+.tsl-api-inherited-summary.search-match-flash {
+	animation: none !important;
 	position: relative;
 	z-index: 10;
 }
 
-.tsl-api-table-row.search-match-flash::after {
+.tsl-api-table-row.search-match-flash::after,
+.tsl-api-signature.search-match-flash::after,
+.tsl-api-class-summary.search-match-flash::after,
+.tsl-api-inherited-summary.search-match-flash::after {
 	content: '';
 	position: absolute;
 	top: 0;
@@ -2130,9 +2149,9 @@ body.preview-maximized .preview-hide-btn {
 	right: 0;
 	bottom: 0;
 	pointer-events: none;
-	animation: search-flash 1.5s ease-out;
+	animation: search-flash-overlay 1.5s ease-out forwards;
 	z-index: 10;
-	border-radius: 4px;
+	border-radius: inherit;
 }
 
 
@@ -3003,6 +3022,233 @@ details.tour-ai-accordion[open] .tour-ai-hint {
 
 .tour-ai-item:last-child {
 	margin-bottom: 0;
+}
+
+/* TSL API Class Accordion */
+.tsl-api-class-accordion {
+	margin: 1.25rem 0;
+	background-color: var(--bg-sidebar);
+	border: 1px solid var(--border-color);
+	border-radius: 8px;
+	overflow: hidden;
+	transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.tsl-api-class-accordion:hover {
+	border-color: rgba(0, 170, 255, 0.4);
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.tsl-api-class-accordion[open] {
+	border-color: var(--border-color);
+}
+
+.tsl-api-class-summary {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.85rem 1.25rem;
+	background-color: var(--bg-card);
+	cursor: pointer;
+	user-select: none;
+	list-style: none;
+	border-bottom: 1px solid transparent;
+	transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.tsl-api-class-summary::-webkit-details-marker,
+.tsl-api-class-summary::marker {
+	display: none;
+}
+
+.tsl-api-class-accordion[open] .tsl-api-class-summary {
+	border-bottom-color: var(--border-color);
+}
+
+.tsl-api-class-summary:hover {
+	background-color: #1ca3ec3d;
+}
+
+.tsl-api-class-summary-left {
+	display: flex;
+	align-items: center;
+	gap: 0.65rem;
+	flex-wrap: wrap;
+}
+
+.tsl-api-class-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--accent);
+}
+
+.tsl-api-class-name {
+	font-family: 'Fira Code', monospace;
+	font-weight: 500;
+	font-size: 0.95rem;
+	color: #ffffff;
+	letter-spacing: 0.02em;
+}
+
+.tsl-api-class-extends {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.15rem 0.55rem;
+	background: rgba(0, 170, 255, 0.08);
+	border: 1px solid rgba(0, 170, 255, 0.25);
+	border-radius: 4px;
+	font-size: 0.75rem;
+}
+
+.tsl-api-class-extends-keyword {
+	color: var(--text-muted);
+	font-style: italic;
+}
+
+.tsl-api-class-extends-name {
+	font-family: 'Fira Code', monospace;
+	color: var(--accent);
+	font-weight: 500;
+}
+
+.tsl-api-class-summary-right {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.tsl-api-class-count {
+	font-size: 0.75rem;
+	color: var(--text-muted);
+	background: rgba(0, 0, 0, 0.35);
+	padding: 0.15rem 0.55rem;
+	border-radius: 4px;
+	border: 1px solid var(--border-color);
+}
+
+.tsl-api-class-chevron {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--text-muted);
+	transition: transform 0.25s ease, color 0.2s ease;
+}
+
+.tsl-api-class-summary:hover .tsl-api-class-chevron {
+	color: var(--accent);
+}
+
+.tsl-api-class-accordion[open] .tsl-api-class-chevron {
+	transform: rotate(180deg);
+}
+
+.tsl-api-class-content {
+	padding: 0.75rem 1rem 1rem 1rem;
+	background: var(--bg-sidebar);
+}
+
+.tsl-api-class-content .tsl-api-table-card {
+	margin: 0;
+	border: 1px solid var(--border-color);
+	border-radius: 6px;
+}
+
+.tsl-api-class-desc {
+	margin: 0.5rem 0.25rem 0.75rem 0.25rem;
+	font-size: 0.85rem;
+	color: var(--text-muted);
+}
+
+/* Inherited Properties Accordion inside API Class */
+.tsl-api-inherited-group {
+	margin-top: 1rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.tsl-api-inherited-accordion {
+	background-color: var(--bg-sidebar);
+	border: 1px solid var(--border-color);
+	border-radius: 6px;
+	overflow: hidden;
+	transition: border-color 0.2s ease;
+}
+
+.tsl-api-inherited-accordion:hover {
+	border-color: rgba(0, 170, 255, 0.4);
+}
+
+.tsl-api-inherited-accordion[open] {
+	border-color: var(--border-color);
+}
+
+.tsl-api-inherited-summary {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.65rem 1rem;
+	background-color: var(--bg-card);
+	cursor: pointer;
+	user-select: none;
+	list-style: none;
+	border-bottom: 1px solid transparent;
+	transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.tsl-api-inherited-summary::-webkit-details-marker,
+.tsl-api-inherited-summary::marker {
+	display: none;
+}
+
+.tsl-api-inherited-accordion[open] .tsl-api-inherited-summary {
+	border-bottom-color: var(--border-color);
+}
+
+.tsl-api-inherited-summary:hover {
+	background-color: #1ca3ec3d;
+}
+
+.tsl-api-inherited-summary-left {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.tsl-api-inherited-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--accent);
+}
+
+.tsl-api-inherited-label {
+	font-size: 0.8rem;
+	color: var(--text-muted);
+	font-weight: 400;
+}
+
+.tsl-api-inherited-summary-right {
+	display: flex;
+	align-items: center;
+	gap: 0.65rem;
+}
+
+.tsl-api-inherited-accordion[open] .tsl-api-class-chevron {
+	transform: rotate(180deg);
+}
+
+.tsl-api-inherited-content {
+	padding: 0.6rem 0.8rem;
+	background: var(--bg-sidebar);
+}
+
+.tsl-api-inherited-content .tsl-api-table-card {
+	margin: 0;
+	border: 1px solid var(--border-color);
+	border-radius: 6px;
 }
 
 /* Inline Code Comments styling */

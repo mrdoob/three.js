@@ -21,7 +21,7 @@ class SearchManager {
 				this.getCleanText( page.description || '' )
 			].join( ' ' );
 
-			const casedWords = rawContent.split( /[^a-zA-Z0-9]+/ ).filter( w => w.length > 1 );
+			const casedWords = rawContent.split( /[^a-zA-Z0-9_]+/ ).filter( w => w.length > 1 );
 			casedWords.forEach( word => {
 
 				const lower = word.toLowerCase();
@@ -35,7 +35,7 @@ class SearchManager {
 
 			const content = rawContent.toLowerCase();
 
-			const words = content.split( /[^a-z0-9]+/ ).filter( w => w.length > 1 );
+			const words = content.split( /[^a-z0-9_]+/ ).filter( w => w.length > 1 );
 			words.forEach( word => {
 
 				if ( ! this.index.has( word ) ) {
@@ -57,17 +57,20 @@ class SearchManager {
 		const trimmed = query.trim().toLowerCase();
 		if ( ! trimmed ) return null;
 
-		const terms = trimmed.split( /\s+/ ).filter( t => t.length > 0 );
-		if ( terms.length === 0 ) return null;
+		const rawTerms = trimmed.split( /\s+/ ).filter( t => t.length > 0 );
+		if ( rawTerms.length === 0 ) return null;
 
 		let results = null;
 
-		terms.forEach( term => {
+		rawTerms.forEach( rawTerm => {
+
+			const cleanTerm = rawTerm.replace( /^[^a-z0-9_]+|[^a-z0-9_]+$/g, '' );
+			const term = cleanTerm || rawTerm;
 
 			const termMatches = new Set();
 			for ( const [ word, ids ] of this.index.entries() ) {
 
-				if ( word.startsWith( term ) ) {
+				if ( word.startsWith( term ) || word.includes( term ) ) {
 
 					ids.forEach( id => termMatches.add( id ) );
 
@@ -119,28 +122,23 @@ class SearchManager {
 			const queryLower = trimmed.toLowerCase();
 			let featuredPage = null;
 
-			// 1. Check exact match
+			// 1. Check exact match on title
 			featuredPage = this.tour.pages.find( p => p.title.toLowerCase() === queryLower );
 
-			// 2. Check if the query contains a page title (e.g. "normalview" contains "normal")
-			if ( ! featuredPage ) {
+			// 2. Check if page title starts with query (e.g. "shad" -> "ShaderBall", "meth" -> "Method Chaining")
+			if ( ! featuredPage && queryLower.length >= 3 ) {
 
-				featuredPage = this.tour.pages.find( p => {
-
-					const titleLower = p.title.toLowerCase();
-					return titleLower.length >= 3 && queryLower.includes( titleLower );
-
-				} );
+				featuredPage = this.tour.pages.find( p => p.title.toLowerCase().startsWith( queryLower ) );
 
 			}
 
-			// 3. Check if any page title contains the query (e.g. "normal" starts with "norm")
+			// 3. Check if query is exact word in multi-word title
 			if ( ! featuredPage ) {
 
 				featuredPage = this.tour.pages.find( p => {
 
-					const titleLower = p.title.toLowerCase();
-					return queryLower.length >= 3 && titleLower.includes( queryLower );
+					const words = p.title.toLowerCase().split( /\s+/ );
+					return words.includes( queryLower );
 
 				} );
 
@@ -173,25 +171,9 @@ class SearchManager {
 					const suggTrimmed = suggestion.trim().toLowerCase();
 
 					featuredPage = this.tour.pages.find( p => p.title.toLowerCase() === suggTrimmed );
-					if ( ! featuredPage ) {
+					if ( ! featuredPage && suggTrimmed.length >= 3 ) {
 
-						featuredPage = this.tour.pages.find( p => {
-
-							const titleLower = p.title.toLowerCase();
-							return titleLower.length >= 3 && suggTrimmed.includes( titleLower );
-
-						} );
-
-					}
-
-					if ( ! featuredPage ) {
-
-						featuredPage = this.tour.pages.find( p => {
-
-							const titleLower = p.title.toLowerCase();
-							return suggTrimmed.length >= 3 && titleLower.includes( suggTrimmed );
-
-						} );
+						featuredPage = this.tour.pages.find( p => p.title.toLowerCase().startsWith( suggTrimmed ) );
 
 					}
 
@@ -295,22 +277,68 @@ class SearchManager {
 		const query = this.tour.dom.searchInput.value.trim();
 		if ( query.length === 0 ) return;
 
-		const queryTerms = query.toLowerCase().split( /\s+/ ).filter( t => t.length > 0 );
+		const queryTerms = query.toLowerCase().split( /\s+/ ).map( t => t.replace( /^[^a-z0-9_]+|[^a-z0-9_]+$/g, '' ) ).filter( t => t.length > 0 );
 		if ( queryTerms.length === 0 ) return;
 
-		const elements = this.tour.dom.contentArea.querySelectorAll( 'p, h1, h2, h3, li, td, code, blockquote, .tour-note-block, .tour-important-block, .tour-ai-accordion, .tour-ai-content, .tsl-api-table-row' );
 		let targetElement = null;
 
-		for ( const el of elements ) {
+		// 1. Prioritize API classes, summaries, signatures, and rows
+		const apiElements = this.tour.dom.contentArea.querySelectorAll( '.tsl-api-class-summary, .tsl-api-class-name, .tsl-api-class-extends-name, .tsl-api-table-row, .tsl-api-signature, .tsl-api-sig-name, .tsl-api-card, .tsl-api-param, .tsl-api-inherited-summary' );
+		for ( const el of apiElements ) {
 
 			const text = el.textContent.toLowerCase();
 			const matches = queryTerms.every( term => text.includes( term ) );
 			if ( matches ) {
 
-				targetElement = el;
-				const details = el.closest( 'details' );
-				if ( details ) details.open = true;
+				targetElement = el.closest( '.tsl-api-table-row' ) || el.closest( '.tsl-api-class-summary' ) || el.closest( '.tsl-api-inherited-summary' ) || el;
+
+				let parent = targetElement.parentElement;
+				while ( parent && parent !== this.tour.dom.contentArea ) {
+
+					if ( parent.tagName === 'DETAILS' ) {
+
+						parent.open = true;
+
+					}
+
+					parent = parent.parentElement;
+
+				}
+
 				break;
+
+			}
+
+		}
+
+		// 2. If no API element matched, check general text elements
+		if ( ! targetElement ) {
+
+			const generalElements = this.tour.dom.contentArea.querySelectorAll( 'h1, h2, h3, p, li, td, code, blockquote, .tour-note-block, .tour-important-block, .tour-ai-accordion, .tour-ai-content' );
+			for ( const el of generalElements ) {
+
+				const text = el.textContent.toLowerCase();
+				const matches = queryTerms.every( term => text.includes( term ) );
+				if ( matches ) {
+
+					targetElement = el;
+
+					let parent = el.parentElement;
+					while ( parent && parent !== this.tour.dom.contentArea ) {
+
+						if ( parent.tagName === 'DETAILS' ) {
+
+							parent.open = true;
+
+						}
+
+						parent = parent.parentElement;
+
+					}
+
+					break;
+
+				}
 
 			}
 
@@ -463,6 +491,13 @@ class SearchManager {
 		if ( ! md ) return '';
 
 		let text = md.replace( /```[\s\S]*?```/gi, '' ); // Remove code blocks
+
+		// Strip API container headers and preserve class names & inheritance
+		// e.g. "::: api-class MeshStandardNodeMaterial extends NodeMaterial [open]" -> "MeshStandardNodeMaterial extends NodeMaterial"
+		text = text.replace( /:::\s*(?:api-class|api-group)\s+([^\n]+)/gi, '$1\n' );
+		text = text.replace( /:::\s*api\s+([^\n]+)/gi, '$1\n' );
+		text = text.replace( /:::/g, ' ' );
+		text = text.replace( /\[open\]/gi, '' );
 
 		// Strip HTML tags repeatedly until no more tags remain
 		let prev;

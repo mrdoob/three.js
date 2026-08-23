@@ -617,6 +617,182 @@ https://www.youtube.com/watch?v=C2gDL9Qk_vo
 
 <page name="Syntax">
 
+<page name="Node Material">
+
+`NodeMaterial` is the core foundation for shader creation and material rendering in Three.js when using WebGPU and TSL.
+
+It constructs a dynamic, modular node graph where every property—from diffuse colors and normal maps to physical properties and vertex displacement—is expressed as a composable TSL node.
+
+<code name="nodeMaterialExample" default="true">NodeMaterial Showcase</code>
+
+### How NodeMaterial Works
+
+In Three.js WebGPU, standard material classes (`MeshStandardMaterial`, `MeshPhysicalMaterial`, `MeshBasicMaterial`, etc.) automatically inherit from or map to their `*NodeMaterial` counterparts (`MeshStandardNodeMaterial`, `MeshPhysicalNodeMaterial`, `MeshBasicNodeMaterial`, etc.).
+
+This means you can assign TSL nodes directly to any material's `*Node` properties while retaining full compatibility with standard material properties (like `.roughness`, `.metalness`, and `.map`).
+
+```js
+import * as THREE from 'three';
+import { color, sin, time, uv } from 'three/tsl';
+
+// Works with both standard and explicit node material constructors
+const material = new THREE.MeshStandardNodeMaterial();
+
+// 1. Procedural color via colorNode
+material.colorNode = color( 0x00aaff ).mul( sin( time ).mul( 0.5 ).add( 0.5 ) );
+
+// 2. Dynamic roughness via roughnessNode
+material.roughnessNode = uv().y;
+material.metalness = 0.8;
+```
+
+### Node Material Inputs
+
+`NodeMaterial` provides modular node slots (`*Node`) that control and override individual stages of the shader pipeline—including surface color, vertex displacement, lighting evaluation, shadows, and alpha testing:
+
+::: api-class NodeMaterial [open]
+
+::: api .colorNode : vec3 - Diffuse / base surface color. Overrides `color` and `map`. :::
+
+::: api .positionNode : vec3 - Local vertex displacement before model-view transformation. :::
+
+::: api .normalNode : vec3 - Surface normal direction in view space. Overrides `normalMap` and `bumpMap`. :::
+
+::: api .opacityNode : float - Surface alpha / opacity value. Overrides `opacity` and `alphaMap`. :::
+
+::: api .alphaTestNode : float - Threshold for discarding transparent fragments. :::
+
+::: api .emissiveNode : vec3 - Emissive light color emitted by the surface. :::
+
+::: api .envNode : vec3 - Custom environment reflections and PBR IBL lighting. :::
+
+::: api .aoNode : float - Ambient occlusion influence on diffuse and ambient light. :::
+
+::: api .outputNode : vec4 - Final output color composite, retaining lighting evaluation. :::
+
+::: api .fragmentNode : vec4 - Complete override of the fragment shader stage. :::
+
+::: api .vertexNode : vec4 - Complete override of the vertex shader stage. :::
+
+::: api .depthNode : float - Custom fragment depth written to the depth buffer. :::
+
+::: api .backdropNode : vec3 - Background texture sampled behind transparent surfaces. :::
+
+::: api .backdropAlphaNode : float - Modulates the influence of `backdropNode` on outgoing light. :::
+
+::: api .lightsNode : LightsNode - Selective lighting node restricting which scene lights illuminate the material. :::
+
+::: api .castShadowNode : vec4 - Defines custom color and opacity for cast shadows. :::
+
+::: api .receivedShadowNode : vec4 - Custom shading logic for received shadows. :::
+
+:::
+
+::: api-class MeshStandardNodeMaterial extends NodeMaterial [open]
+
+::: api .roughnessNode : float - Surface roughness factor (smooth vs rough surface). :::
+
+::: api .metalnessNode : float - Surface metalness factor (dielectric vs conductive metal). :::
+
+:::
+
+::: api-class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial
+
+::: api .clearcoatNode : float - Clearcoat layer intensity. :::
+
+::: api .clearcoatRoughnessNode : float - Clearcoat layer roughness factor. :::
+
+::: api .clearcoatNormalNode : vec3 - Normal direction override for the clearcoat layer. :::
+
+::: api .sheenNode : vec3 - Sheen layer tint color. :::
+
+::: api .sheenRoughnessNode : float - Sheen layer roughness factor. :::
+
+::: api .transmissionNode : float - Optical transmission factor through transparent media. :::
+
+::: api .thicknessNode : float - Volume thickness for transmission and subsurface scattering. :::
+
+::: api .iorNode : float - Index of Refraction (IOR) for physical reflections and refractions. :::
+
+::: api .iridescenceNode : float - Thin-film iridescence layer intensity. :::
+
+::: api .iridescenceIORNode : float - Index of refraction for the thin-film iridescence layer. :::
+
+::: api .iridescenceThicknessNode : float - Physical thickness of the thin-film layer in nanometers. :::
+
+::: api .specularColorNode : vec3 - Specular highlight tint color. :::
+
+::: api .specularIntensityNode : float - Specular reflection intensity factor. :::
+
+::: api .anisotropyNode : vec2 - Directional anisotropy vector for brushed metal surfaces. :::
+
+::: api .dispersionNode : float - Chromatic dispersion (Abbe number) splitting light into spectral colors. :::
+
+::: api .attenuationColorNode : vec3 - Medium absorption color for light traveling through the volume. :::
+
+::: api .attenuationDistanceNode : float - Distance light must travel through the medium to reach attenuation color. :::
+
+:::
+
+::: api-class MeshPhongNodeMaterial extends NodeMaterial
+
+::: api .specularNode : vec3 - Specular highlight color. :::
+
+::: api .shininessNode : float - Shininess exponent controlling the sharpness of specular highlights. :::
+
+:::
+
+::: api-class PointsNodeMaterial extends NodeMaterial
+
+::: api .sizeNode : float - Point size in pixels or world units. :::
+
+:::
+
+### Modifying vs Overriding Inputs
+
+When you assign a node to a slot like `material.colorNode`, it completely replaces the default color calculation. If you instead want to **tint or modulate** the material's existing textures and properties, use **Material Accessor Nodes** (such as `materialColor`, `materialRoughness`, `materialNormal`):
+
+```js
+import { materialColor, materialRoughness, color, float } from 'three/tsl';
+
+// Modulate the existing texture map by multiplying with a custom tint
+material.colorNode = materialColor.mul( color( 0xff5500 ) );
+
+// Scale existing roughness map values
+material.roughnessNode = materialRoughness.mul( float( 0.5 ) );
+```
+
+See the [Material Inputs](#material-inputs) page for the full list of material accessor nodes and how they reactively evaluate textures, factors, and colors.
+
+For **MRT (Multiple Render Targets)** and **Post-Processing**, it is recommended to use [Properties](#properties) (such as `diffuseColor`, `roughness`, `metalness`, `normalView`, `output`) instead, as they capture the internal evaluated variables computed during lighting execution.
+
+> IA: In WebGPU, all standard Three.js materials are automatically node-ready and support `*Node` properties (such as `.colorNode`, `.roughnessNode`, `.positionNode`). When modifying existing material maps instead of replacing them, use accessor nodes like `materialColor` and `materialNormal`. For MRT attachments and post-processing passes, prefer using [Properties](#properties) (`diffuseColor`, `roughness`, `output`).
+
+```tsl nodeMaterialExample
+import 'scenes/shaderball';
+import { positionLocal, normalLocal, time, sin, cos, color, float, mix } from 'three/tsl';
+
+// 1. Procedural vertex displacement on positionNode
+const waveFreq = float( 4.0 );
+const waveSpeed = time.mul( 2.0 );
+const displacement = sin( positionLocal.y.mul( waveFreq ).add( waveSpeed ) )
+	.mul( cos( positionLocal.x.mul( waveFreq ).add( waveSpeed ) ) )
+	.mul( 0.08 );
+
+model.material.positionNode = positionLocal.add( normalLocal.mul( displacement ) );
+
+// 2. Dynamic PBR properties via node slots
+const pulse = sin( time.mul( 3.0 ) ).mul( 0.5 ).add( 0.5 );
+const baseColor = color( 0x050c1a );
+const accentColor = color( 0x00ffcc );
+
+model.material.colorNode = mix( baseColor, accentColor, pulse.mul( displacement.abs().mul( 10.0 ) ) );
+model.material.roughnessNode = pulse.mul( 0.6 ).add( 0.2 );
+model.material.metalnessNode = float( 0.85 );
+```
+
+</page>
+
 <page name="Method Chaining">
 
 Method chaining will only be including operators, converters, math and some core functions. These functions, however, can be used on any __Node__.
@@ -626,6 +802,8 @@ Example:
 `oneMinus()` is a mathematical function like `abs()`, `sin()`, `cos()`, etc..
 
 This example uses `.oneMinus()` as a built-in function in the class that returns a new node instead of classic C function like `oneMinus( node.x )`, you can use `node.x.oneMinus()` too.
+
+> IA: Prefer using **method chaining** (e.g., `node.mul( 1 ).add( 1 )`) for mathematical operations and operators to avoid redundant top-level imports. Never import methods that are only used via chaining (such as `mul`, `add`, `sub`, `div`, `sin`, `cos`, etc.) from `'three/tsl'` to prevent unnecessary imports.
 
 ```tsl
 import 'scenes/shaderball';
@@ -5318,6 +5496,74 @@ renderPipeline.outputNode = finalOutput;
 </page>
 
 <page name="Debug">
+
+Debugging shader graphs involves inspecting intermediate mathematical values, checking variable generation, and analyzing compiled backend shader code (WGSL or GLSL).
+
+TSL provides the built-in `debug()` utility for logging compilation state and isolating node expressions during the build process.
+
+<code name="debugExample" default="true">Debug Node</code>
+
+### Functions
+
+::: api debug( node, callback? ) : DebugNode - Creates a debug node that logs the compiled shader code and highlights the current node expression during shader generation.
+- **node**: `Node` - The node or expression to debug.
+- **callback**: `Function` - (Optional) Custom callback function with signature `( builder, snippet ) => void`. If omitted, prints formatted shader code with surrounding context to the console.
+:::
+
+::: api .debug( callback? ) : DebugNode - Chainable method to attach debugging to any existing node or expression.
+- **callback**: `Function` - (Optional) Custom callback function with signature `( builder, snippet ) => void`.
+:::
+
+### Code Inspection with `debug()`
+
+When `.debug()` or `debug()` is attached to an expression, TSL intercepts shader generation during the build process:
+
+1. It identifies the active shader stage (`vertex`, `fragment`, or `compute`).
+2. It prints the generated shader flow lines up to that node in the console.
+3. It clearly demarcates the current node's generated code snippet with `/* ... */ <snippet> /* ... */`.
+
+```js
+import { uv, sin, time, color } from 'three/tsl';
+
+// Attach .debug() to inspect the generated code for the wave calculation
+const wave = sin( uv().x.mul( 10.0 ).add( time ) ).debug();
+
+material.colorNode = color( 0x00ffcc ).mul( wave );
+```
+
+#### Custom Callback
+
+You can pass a custom callback to receive the active `NodeBuilder` instance and the generated snippet string:
+
+```js
+const node = uv().x.mul( 2.0 ).debug( ( builder, snippet ) => {
+
+	console.log( `Stage: ${ builder.shaderStage }, Snippet: ${ snippet }` );
+
+} );
+```
+
+```tsl debugExample
+import 'scenes/shaderball';
+import { uv, sin, time, color, float } from 'three/tsl';
+
+// 1. Calculate an animated pulse wave
+const wave = sin( uv().x.mul( 12.0 ).add( time.mul( 3.0 ) ) ).mul( 0.5 ).add( 0.5 );
+
+// 2. Debug the wave calculation
+// debug() or .debug() outputs the generated shader flow and highlights the node in the console below
+const debuggedWave = wave.debug();
+
+// 3. Apply color blending driven by the debugged wave
+const colorBase = color( 0x050c1a );
+const colorHighlight = color( 0x00f0ff );
+const finalColor = colorBase.mix( colorHighlight, debuggedWave );
+
+model.material.colorNode = finalColor;
+model.material.roughness = float( 0.2 );
+model.material.metalness = float( 0.85 );
+```
+
 </page>
 
 </page>

@@ -1746,6 +1746,55 @@ class Tour {
 
 		this.createIcons( this.dom.contentArea );
 
+		// Auto-scroll when user clicks to expand API class accordions to frame them in view
+		const apiAccordions = this.dom.contentArea.querySelectorAll( '.tsl-api-class-accordion, .tsl-api-inherited-accordion' );
+		apiAccordions.forEach( ( details ) => {
+
+			const summary = details.querySelector( 'summary' );
+			if ( summary ) {
+
+				summary.addEventListener( 'click', () => {
+
+					// If currently closed, it will open after click
+					const willOpen = ! details.open;
+					if ( willOpen ) {
+
+						setTimeout( () => {
+
+							const contentRect = this.dom.contentArea.getBoundingClientRect();
+							const detailsRect = details.getBoundingClientRect();
+							const currentScrollTop = this.dom.contentArea.scrollTop;
+
+							let targetOffset;
+
+							if ( detailsRect.height < contentRect.height ) {
+
+								// Center vertically in viewport if the accordion fits
+								const centerMargin = ( contentRect.height - detailsRect.height ) / 2;
+								targetOffset = detailsRect.top - contentRect.top + currentScrollTop - centerMargin;
+
+							} else {
+
+								// Align to the top with a 20px padding if larger than viewport
+								targetOffset = detailsRect.top - contentRect.top + currentScrollTop - 20;
+
+							}
+
+							this.dom.contentArea.scrollTo( {
+								top: Math.max( 0, targetOffset ),
+								behavior: 'smooth'
+							} );
+
+						}, 60 );
+
+					}
+
+				} );
+
+			}
+
+		} );
+
 		// Hide/Show layout division depending on whether the page contains a TSL code example
 		const hash = window.location.hash.substring( 1 );
 		const isInitialPlayground = hash.startsWith( 'playground=' ) || hash.startsWith( 'playground/' );
