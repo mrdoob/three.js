@@ -264,6 +264,7 @@ class Tour {
 			consoleToggleIcon: document.getElementById( 'console-toggle-icon' ),
 			consoleErrorMessage: document.getElementById( 'console-error-message' ),
 			copyCodeBtnHeader: document.getElementById( 'copy-code-btn-header' ),
+			shareBtnHeader: document.getElementById( 'share-btn-header' ),
 			playgroundBtn: document.getElementById( 'playground-btn' ),
 			debugContainer: document.getElementById( 'debug-container' ),
 			debugEditorContainer: document.getElementById( 'debug-editor-container' ),
@@ -734,6 +735,48 @@ class Tour {
 		this.dom.headerEditorToggle.onclick = () => {
 
 			this.dom.hResizerToggle.click();
+
+		};
+
+		this.dom.shareBtnHeader.onclick = async () => {
+
+			if ( ! this.isPlaygroundActive ) return;
+
+			if ( this.playgroundManager.playgroundTabs && this.codeEditor ) {
+
+				const activeTab = this.playgroundManager.playgroundTabs.find( t => t.name === this.playgroundManager.activePlaygroundTabName );
+				if ( activeTab ) {
+
+					activeTab.code = this.codeEditor.getValue();
+
+				}
+
+			}
+
+			const encoded = await compressString( JSON.stringify( {
+				tabs: this.playgroundManager.playgroundTabs
+			} ) );
+			const release = THREE.RELEASE || THREE.REVISION;
+			const newHash = 'playground=' + encoded + ( release ? '&release=' + release : '' );
+			window.location.hash = newHash;
+
+			const shareUrl = window.location.href;
+
+			navigator.clipboard.writeText( shareUrl ).then( () => {
+
+				this.dom.shareBtnHeader.classList.add( 'success' );
+				this.dom.shareBtnHeader.innerHTML = '<i data-icon="check" style="width: 1.25rem; height: 1.25rem;"></i>';
+				this.createIcons( this.dom.shareBtnHeader );
+
+				setTimeout( () => {
+
+					this.dom.shareBtnHeader.classList.remove( 'success' );
+					this.dom.shareBtnHeader.innerHTML = '<i data-icon="share-2" style="width: 1.25rem; height: 1.25rem;"></i>';
+					this.createIcons( this.dom.shareBtnHeader );
+
+				}, 2000 );
+
+			} );
 
 		};
 
@@ -1884,7 +1927,8 @@ class Tour {
 
 		this.dom.headerEditorToggle.style.display = showEditorToggle ? 'flex' : 'none';
 		this.dom.headerPreviewToggle.style.display = showHeaderToggles ? 'flex' : 'none';
-		this.dom.copyCodeBtnHeader.style.display = showHeaderToggles ? 'flex' : 'none';
+		this.dom.copyCodeBtnHeader.style.display = ( showHeaderToggles && ! this.isPlaygroundActive ) ? 'flex' : 'none';
+		this.dom.shareBtnHeader.style.display = this.isPlaygroundActive ? 'flex' : 'none';
 
 		// Manage hResizer display
 		if ( isMobile && this.isPlaygroundActive ) {

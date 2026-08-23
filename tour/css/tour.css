@@ -783,9 +783,18 @@ body.preview-hidden .code-modifier-inline-btn.active {
 	display: none !important;
 }
 
-#copy-code-btn-header.success {
+#copy-code-btn-header.success,
+#share-btn-header.success {
 	color: #4caf50 !important;
 	background: rgba(76, 175, 80, 0.08) !important;
+}
+
+#share-btn-header {
+	display: none;
+}
+
+body.playground-mode #share-btn-header {
+	display: flex !important;
 }
 
 /* Right Column (Editor) */
