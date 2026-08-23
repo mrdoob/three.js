@@ -162,16 +162,7 @@ function main() {
 			timeout: networkTimeout * 60000
 		} );
 
-		// Wait for the QUnit test results. Note: `window.QUnit.done` is
-		// QUnit's legacy callback-registration *method* (`QUnit.done(fn)`),
-		// not a "run finished" flag -- it's a function reference and is
-		// therefore truthy the instant the QUnit script loads, long before
-		// any tests have run. Waiting on it only happened to work because
-		// the whole suite historically finished before Puppeteer's next
-		// poll; a larger suite (or a slower/GPU-less CI runner) can outrun
-		// that race and read `window._QUnitStats` while it's still
-		// `undefined`. Wait on the actual completion signal set by the
-		// 'runEnd' handler in the test page instead.
+		// Wait for the QUnit test results
 		await page.waitForFunction( () => {
 
 			return window._QUnitStats !== undefined;
