@@ -165,7 +165,7 @@ function main() {
 		// Wait for the QUnit test results
 		await page.waitForFunction( () => {
 
-			return window.QUnit && window.QUnit.done;
+			return window._QUnitStats !== undefined;
 
 		} );
 
