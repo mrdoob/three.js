@@ -27,7 +27,7 @@ const gridTexture = Fn( ( [ coord, lineWidth = float( 0.01 ), dotSize = float( 0
 
 } );
 
-async function init() {
+export async function init() {
 
 	scene = new THREE.Scene();
 
@@ -139,7 +139,7 @@ async function init() {
 
 }
 
-function update() {
+export function update() {
 
 	// TODO: Probably a cache-key issue, see #normal and goto playground
 	model.material.needsUpdate = true;
@@ -149,14 +149,14 @@ function update() {
 
 }
 
-function resize( width, height ) {
+export function resize( width, height ) {
 
 	camera.aspect = width / height;
 	camera.updateProjectionMatrix();
 
 }
 
-function refresh() {
+export function refresh() {
 
 	scene.fogNode = null;
 	scene.backgroundNode = null;
@@ -189,16 +189,16 @@ function refresh() {
 
 }
 
-function dispose() {
+export function dispose() {
 
 	// TODO: Implement dispose
 
 }
 
-function debug() {
+export function debug() {
 
 	return { scene, camera, object: previewMesh || model };
 
 }
 
-export { scene, camera, controls, defaultPass, defaultAA, renderPipeline, model, floor, dragging, debug };
+export { scene, camera, controls, defaultPass, defaultAA, renderPipeline, model, floor, dragging };

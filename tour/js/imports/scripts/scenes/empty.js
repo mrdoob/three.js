@@ -25,7 +25,7 @@ const gridTexture = Fn( ( [ coord, lineWidth = float( 0.01 ), dotSize = float( 0
 
 } );
 
-function refresh() {
+export function refresh() {
 
 	scene.clear();
 
@@ -48,9 +48,7 @@ function refresh() {
 
 }
 
-const resetScene = refresh;
-
-async function init() {
+export async function init() {
 
 	if ( scene ) {
 
@@ -122,30 +120,30 @@ async function init() {
 
 }
 
-function update() {
+export function update() {
 
 	controls.update();
 	renderPipeline.render();
 
 }
 
-function resize( width, height ) {
+export function resize( width, height ) {
 
 	camera.aspect = width / height;
 	camera.updateProjectionMatrix();
 
 }
 
-function dispose() {
+export function dispose() {
 
 	// Implement dispose
 
 }
 
-function debug() {
+export function debug() {
 
 	return { scene, camera, object: floor };
 
 }
 
-export { scene, camera, controls, defaultPass, defaultAA, renderPipeline, floor, dragging, resetScene, refresh, debug };
+export { scene, camera, controls, defaultPass, defaultAA, renderPipeline, floor, dragging };
