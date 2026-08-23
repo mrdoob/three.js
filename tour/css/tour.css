@@ -1582,7 +1582,8 @@ body:not(.playground-mode).collapsed-workspace #editor-console {
 .preview-hide-btn,
 .preview-fullscreen-btn,
 .preview-copy-btn,
-.preview-playground-btn {
+.preview-playground-btn,
+.preview-refresh-btn {
 	width: 32px;
 	height: 32px;
 	display: flex;
@@ -1602,7 +1603,8 @@ body:not(.playground-mode).collapsed-workspace #editor-console {
 .preview-hide-btn:hover,
 .preview-fullscreen-btn:hover,
 .preview-copy-btn:hover,
-.preview-playground-btn:hover {
+.preview-playground-btn:hover,
+.preview-refresh-btn:hover {
 	background: rgba(255, 255, 255, 0.08);
 	border-color: rgba(255, 255, 255, 0.35);
 	color: #fff;
@@ -1613,7 +1615,8 @@ body:not(.collapsed-workspace) .preview-hide-btn {
 	display: none !important;
 }
 
-body.playground-mode .preview-playground-btn {
+body.playground-mode .preview-playground-btn,
+body.playground-mode .preview-refresh-btn {
 	display: none !important;
 }
 

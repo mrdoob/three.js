@@ -253,6 +253,7 @@ class Tour {
 			headerPreviewToggle: document.getElementById( 'header-preview-toggle' ),
 			previewHide: document.getElementById( 'preview-hide' ),
 			previewFullscreen: document.getElementById( 'preview-fullscreen' ),
+			previewRefresh: document.getElementById( 'preview-refresh' ),
 			previewPlayground: document.getElementById( 'preview-playground' ),
 			previewCopy: document.getElementById( 'preview-copy' ),
 			editorConsole: document.getElementById( 'editor-console' ),
@@ -869,6 +870,12 @@ class Tour {
 				}, 2000 );
 
 			} );
+
+		};
+
+		this.dom.previewRefresh.onclick = async () => {
+
+			await this.refresh();
 
 		};
 
