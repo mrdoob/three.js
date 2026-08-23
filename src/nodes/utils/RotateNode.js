@@ -136,11 +136,11 @@ class RotateNode extends TempNode {
 				'Z': rotationZMatrix
 			};
 
-			const customMatrixChain = matrixMap[ order.charAt( 0 ) ]
+			const matrixChain = matrixMap[ order.charAt( 0 ) ]
 				.mul( matrixMap[ order.charAt( 1 ) ] )
 				.mul( matrixMap[ order.charAt( 2 ) ] );
 
-			return customMatrixChain.mul( vec4( positionNode, 1.0 ) ).xyz;
+			return matrixChain.mul( vec4( positionNode, 1.0 ) ).xyz;
 
 		}
 
