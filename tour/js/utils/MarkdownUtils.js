@@ -1174,4 +1174,83 @@ function isTslBuiltIn( name ) {
 
 }
 
-export { parseTour, parse, tokenizeInlineCode };
+function tokenizeCodeToElement( codeContent, targetElement ) {
+
+	targetElement.textContent = '';
+
+	// Decode HTML entities so we can parse actual operators like > or < (&amp; must be unescaped last to avoid double unescaping)
+	const decoded = codeContent
+		.replace( /&gt;/g, '>' )
+		.replace( /&lt;/g, '<' )
+		.replace( /&quot;/g, '"' )
+		.replace( /&#34;/g, '"' )
+		.replace( /&#39;/g, '\'' )
+		.replace( /&apos;/g, '\'' )
+		.replace( /&amp;/g, '&' );
+
+	const tokenRegex = new RegExp(
+		'(\\/\\/.*|\\/\\*[\\s\\S]*?\\*\\/)|' +
+		'(\'[^\']*\'|\"[^\"]*\")|' +
+		'(\\b\\d+(?:\\.\\d+)?\\b)|' +
+		'(\\b(?:const|let|var|function|return|true|false|null|if|else|for|while|new)\\b)|' +
+		'(\\b[a-zA-Z_][a-zA-Z0-9_]*\\b(?=\\s*\\())|' +
+		'(\\bTSL\\b)|' +
+		'(\\b[a-zA-Z_][a-zA-Z0-9_]*\\b)|' +
+		'([\\(\\)])|' +
+		'([\\{\\}])|' +
+		'([\\[\\]\\.\\+\\-\\*\\/=,;:<>!&|~^%?])',
+		'g'
+	);
+
+	let lastIndex = 0;
+	let match;
+
+	while ( ( match = tokenRegex.exec( decoded ) ) !== null ) {
+
+		const index = match.index;
+		if ( index > lastIndex ) {
+
+			targetElement.appendChild( document.createTextNode( decoded.substring( lastIndex, index ) ) );
+
+		}
+
+		const [ fullMatch, comment, str, num, keyword, func, namespace, ident, paren, brace, op ] = match;
+
+		let className = '';
+		if ( comment ) className = 'tsl-comment';
+		else if ( str ) className = 'tsl-param-type-string';
+		else if ( num ) className = 'tsl-param-type-number';
+		else if ( keyword ) className = 'tsl-param-type-keyword';
+		else if ( func ) className = isTslBuiltIn( func ) ? 'tsl-function-builtin' : 'tsl-function';
+		else if ( namespace ) className = 'tsl-namespace';
+		else if ( ident ) className = isTslBuiltIn( ident ) ? 'tsl-function-builtin' : 'tsl-identifier';
+		else if ( paren ) className = 'tsl-bracket';
+		else if ( brace ) className = 'tsl-brace';
+		else if ( op ) className = 'tsl-operator';
+
+		if ( className ) {
+
+			const span = document.createElement( 'span' );
+			span.className = className;
+			span.textContent = fullMatch;
+			targetElement.appendChild( span );
+
+		} else {
+
+			targetElement.appendChild( document.createTextNode( fullMatch ) );
+
+		}
+
+		lastIndex = tokenRegex.lastIndex;
+
+	}
+
+	if ( lastIndex < decoded.length ) {
+
+		targetElement.appendChild( document.createTextNode( decoded.substring( lastIndex ) ) );
+
+	}
+
+}
+
+export { parseTour, parse, tokenizeInlineCode, tokenizeCodeToElement };

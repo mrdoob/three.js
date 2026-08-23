@@ -3,7 +3,7 @@ import * as TSL from 'three/tsl';
 
 import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-import { parseTour, parse, tokenizeInlineCode } from './utils/MarkdownUtils.js';
+import { parseTour, parse, tokenizeCodeToElement } from './utils/MarkdownUtils.js';
 import { CodeRunner } from './code/CodeRunner.js';
 import { CodeCompiler } from './code/CodeCompiler.js';
 import { CodeEditor } from './editor/CodeEditor.js';
@@ -1299,7 +1299,7 @@ class Tour {
 
 			this.dom.contentArea.querySelectorAll( '.mermaid code' ).forEach( ( el ) => {
 
-				el.innerHTML = tokenizeInlineCode( el.textContent );
+				tokenizeCodeToElement( el.textContent, el );
 
 			} );
 
