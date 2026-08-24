@@ -89,8 +89,10 @@ class GaussianSplatGroup extends Mesh {
 	 * @param {Object} [options] - Options.
 	 * @param {number} [options.binCount=4096] - The number of depth bins used by the group's merged {@link CountingSort}. Larger values improve sort accuracy when splats are spread across a large combined depth range, at the cost of a longer (but still single-pass) prefix sum.
 	 * @param {number} [options.workgroupSize=256] - The workgroup size of the compute shaders used for merging and sorting.
+	 * @param {boolean} [options.autoCompact=true] - Whether the group's shared storage buffers are kept sized to exactly fit the current live splat total. When `true`, every add/remove/visibility change that changes the total resizes the buffers, growing or shrinking them to fit. When `false`, the buffers only grow - shrinking the live total never reallocates smaller buffers on its own; call {@link GaussianSplatGroup#compact} to shrink them to fit. Can be changed at any time; a change only takes effect the next time buffer sizes are checked, i.e. the next `addSplat`/`deleteSplat`/`setVisibleAt` (or explicit {@link GaussianSplatGroup#compact} call). Defaults to `false` when `initialSize` is given, since preallocating a fixed size and then having it silently shrink would defeat the point - pass `autoCompact: true` explicitly alongside `initialSize` if that's actually what's wanted.
+	 * @param {number} [options.initialSize] - Preallocates the shared storage buffers to this many splats up front, so the group doesn't reallocate as splat clouds are added until the live total exceeds it. Useful to size a group for its expected peak (e.g. 2,000,000) once, up front. Implies `autoCompact: false` unless `autoCompact` is explicitly passed.
 	 */
-	constructor( { binCount = BIN_COUNT, workgroupSize = WORKGROUP_SIZE } = {} ) {
+	constructor( { binCount = BIN_COUNT, workgroupSize = WORKGROUP_SIZE, autoCompact, initialSize } = {} ) {
 
 		const geometry = createGeometry( 0 );
 
@@ -99,6 +101,9 @@ class GaussianSplatGroup extends Mesh {
 		// a normal, user-owned Object3D property, with no internal flipping on/off needed
 		// (see `onBeforeRender`).
 		const buffers = createGroupBufferState();
+
+		if ( initialSize !== undefined && initialSize > 0 ) resizeGroupBufferState( buffers, initialSize );
+
 		const localCameraPosition = uniform( new Vector3() );
 		const sort = new CountingSort( 0, { binCount, workgroupSize } );
 		const materialNodes = createMaterialNodes( buffers, sort, localCameraPosition );
@@ -130,6 +135,17 @@ class GaussianSplatGroup extends Mesh {
 		 * @type {number}
 		 */
 		this.workgroupSize = workgroupSize;
+
+		/**
+		 * Whether the group's shared storage buffers are kept sized to exactly fit the
+		 * current live splat total (see the constructor's `autoCompact` option for the full
+		 * contract). Safe to change at any time; takes effect the next time buffer sizes are
+		 * checked, i.e. the next `addSplat`/`deleteSplat`/`setVisibleAt`/{@link GaussianSplatGroup#compact}.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.autoCompact = autoCompact !== undefined ? autoCompact : ( initialSize === undefined );
 
 		/**
 		 * The bounding box of the merged splats, in this group's local space. Not computed
@@ -322,6 +338,56 @@ class GaussianSplatGroup extends Mesh {
 	getVisibleAt( id ) {
 
 		return this._getInstance( id ).visible;
+
+	}
+
+	/**
+	 * The number of splats the group's shared storage buffers currently have room for.
+	 * Always `>=` {@link GaussianSplatGroup#splatCount}; the two are equal exactly when the
+	 * buffers are compact - always true while {@link GaussianSplatGroup#autoCompact} is
+	 * `true`, and after an explicit {@link GaussianSplatGroup#compact} call otherwise.
+	 *
+	 * @type {number}
+	 * @readonly
+	 */
+	get capacity() {
+
+		return this._buffers.capacity;
+
+	}
+
+	/**
+	 * The number of live (included, i.e. added and visible) splats currently merged into
+	 * the group's shared buffers. Not to be confused with the inherited {@link Mesh#count}
+	 * draw-call instance count, which this class manages internally.
+	 *
+	 * @type {number}
+	 * @readonly
+	 */
+	get splatCount() {
+
+		if ( this._layoutDirty === true ) this._rebuildLayout();
+
+		return this._total;
+
+	}
+
+	/**
+	 * Shrinks the group's shared storage buffers to exactly fit the current live splat
+	 * total, freeing any slack accumulated while {@link GaussianSplatGroup#autoCompact} was
+	 * `false` (grow-only mode) or while the group was preallocated via the constructor's
+	 * `initialSize` option. A no-op if the buffers already fit exactly. Not needed when
+	 * `autoCompact` is `true`, since buffers are already kept sized to fit.
+	 */
+	compact() {
+
+		if ( this._layoutDirty === true ) this._rebuildLayout();
+
+		const target = Math.max( 1, this._total );
+
+		if ( target === this._buffers.capacity ) return;
+
+		this._resizeBuffers( target );
 
 	}
 
@@ -527,9 +593,14 @@ class GaussianSplatGroup extends Mesh {
 		this._total = total;
 		this._sort.count = total;
 
-		if ( total !== this._buffers.capacity ) {
+		const requiredCapacity = Math.max( 1, total );
 
-			resizeGroupBufferState( this._buffers, Math.max( 1, total ) );
+		// `autoCompact` (see the constructor) decides whether shrinking is automatic: `true`
+		// resizes to exactly fit on every change (grow or shrink), `false` only ever grows -
+		// see `compact()` for the manual shrink path.
+		if ( this.autoCompact === true ? requiredCapacity !== this._buffers.capacity : requiredCapacity > this._buffers.capacity ) {
+
+			this._resizeBuffers( requiredCapacity );
 
 		}
 
@@ -576,6 +647,27 @@ class GaussianSplatGroup extends Mesh {
 		} else {
 
 			this.geometry.instanceCount = total;
+
+		}
+
+	}
+
+	// Reallocates the shared buffers to `capacity` and marks every currently-included
+	// instance for a full re-merge - both the transform/color merge (`matrixDirty`) and the
+	// spherical harmonics contribution (`lastSHBase` reset to an impossible value) - since
+	// `resizeGroupBufferState` allocates fresh, zeroed buffers rather than copying old
+	// contents forward (the group's buffers are a derived cache, not owned data - see the
+	// class documentation).
+	_resizeBuffers( capacity ) {
+
+		resizeGroupBufferState( this._buffers, capacity );
+
+		for ( const record of this._instances.values() ) {
+
+			if ( record.included === false ) continue;
+
+			record.matrixDirty = true;
+			record.lastSHBase = - 1;
 
 		}
 

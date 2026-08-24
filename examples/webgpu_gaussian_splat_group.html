@@ -123,6 +123,17 @@
 					applyRenderMode();
 
 				} );
+				gui.add( { autoCompact: false }, 'autoCompact' ).name( 'Auto Compact' ).onChange( ( value ) => {
+
+					// Toggle GaussianSplatGroup's buffer-shrinking behavior at runtime: `true`
+					// keeps the shared storage buffers sized to exactly fit the live splat total
+					// on every change, `false` (the default here) only ever grows them - toggling
+					// Show Lion with it off leaves the buffers at their high-water mark until
+					// Compact Now is used - see the class documentation for the full contract.
+					group.autoCompact = value;
+
+				} );
+				gui.add( { compactNow: () => group.compact() }, 'compactNow' ).name( 'Compact Now' );
 
 				hitMarker = new THREE.Mesh(
 					new THREE.SphereGeometry( 1, 16, 12 ),
@@ -151,7 +162,7 @@
 
 				tomatoesMatrix.compose( tomatoesPosition, tomatoesQuaternion, tomatoesScale );
 
-				group = new GaussianSplatGroup();
+				group = new GaussianSplatGroup( { autoCompact: false } );
 				scene.add( group );
 
 				lionId = group.addSplat( lionGeometry );
