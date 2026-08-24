@@ -1,5 +1,56 @@
 import { sub, mul, div, add } from './OperatorNode.js';
 import { PI, pow, sin } from './MathNode.js';
+import { mat3, vec3, vec4 } from '../tsl/TSLCore.js';
+
+/**
+ * Builds a symmetric covariance matrix from the packed upper-triangle representation
+ * used by Gaussian covariance data.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec4>} covA - The packed values `( c00, c01, c02, c11 )`.
+ * @param {Node<vec4>} covB - The packed values `( c12, c22, unused, unused )`.
+ * @return {Node<mat3>} The covariance matrix.
+ */
+export const covarianceToMatrix = ( covA, covB ) => mat3(
+	vec3( covA.x, covA.y, covA.z ),
+	vec3( covA.y, covA.w, covB.x ),
+	vec3( covA.z, covB.x, covB.y )
+);
+
+/**
+ * Packs a symmetric covariance matrix into two `vec4` nodes.
+ *
+ * @tsl
+ * @function
+ * @param {Node<mat3>} covariance - The covariance matrix.
+ * @return {{covA: Node<vec4>, covB: Node<vec4>}} The packed covariance.
+ */
+export const covarianceFromMatrix = ( covariance ) => ( {
+	covA: vec4(
+		covariance[ 0 ].x,
+		covariance[ 0 ].y,
+		covariance[ 0 ].z,
+		covariance[ 1 ].y
+	),
+	covB: vec4(
+		covariance[ 1 ].z,
+		covariance[ 2 ].z,
+		0,
+		0
+	)
+} );
+
+/**
+ * Transforms a covariance matrix by the given linear transform.
+ *
+ * @tsl
+ * @function
+ * @param {Node<mat3>} covariance - The covariance matrix.
+ * @param {Node<mat3>} matrix - The linear transform.
+ * @return {Node<mat3>} The transformed covariance matrix.
+ */
+export const transformCovariance = ( covariance, matrix ) => matrix.mul( covariance ).mul( matrix.transpose() );
 
 /**
  * A function that remaps the `[0,1]` interval into the `[0,1]` interval.

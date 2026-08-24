@@ -48,7 +48,7 @@
 			import { GaussianSplatGroup } from 'three/addons/objects/GaussianSplatGroup.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let camera, scene, renderer, controls, clock, hitMarker;
+			let camera, scene, renderer, controls, timer, hitMarker;
 			let group, lionId, tomatoesId;
 			const tomatoesPosition = new THREE.Vector3( 0.12, 0, 0.05 );
 			const tomatoesQuaternion = new THREE.Quaternion();
@@ -97,7 +97,7 @@
 				controls.target.set( 0, 0, 0 );
 				controls.update();
 
-				clock = new THREE.Clock();
+				timer = new THREE.Timer();
 
 				const gui = renderer.inspector.createParameters( 'Building' );
 				gui.add( { rotateTomatoes }, 'rotateTomatoes' ).name( 'Rotate Tomatoes' ).onChange( ( value ) => {
@@ -151,7 +151,7 @@
 
 				tomatoesMatrix.compose( tomatoesPosition, tomatoesQuaternion, tomatoesScale );
 
-				group = new GaussianSplatGroup( { autoCompact: false } );
+				group = new GaussianSplatGroup( { autoCompact: false, shDegree: 2 } );
 				scene.add( group );
 
 				lionId = group.addSplat( lionGeometry );
@@ -249,7 +249,8 @@
 				// await), so skip frames until the splats and group actually exist
 				if ( group === undefined ) return;
 
-				const delta = clock.getDelta();
+				timer.update();
+				const delta = timer.getDelta();
 
 				controls.update();
 

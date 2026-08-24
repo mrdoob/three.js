@@ -15,19 +15,28 @@ import {
 	atan,
 	cameraProjectionMatrix,
 	cos,
+	covarianceFromMatrix,
+	covarianceToMatrix,
 	dot,
 	exp,
 	float,
 	highpModelViewMatrix,
 	instanceIndex,
+	mat3,
+	mat4,
 	max,
 	min,
 	normalize,
 	positionGeometry,
 	screenSize,
 	sin,
+	sphericalHarmonicsRadianceBand1,
+	sphericalHarmonicsRadianceBand2,
+	sphericalHarmonicsRadianceBand3,
 	sqrt,
 	storage,
+	transformCovariance,
+	uint,
 	unpackUnorm4x8,
 	varyingProperty,
 	vec2,
@@ -155,8 +164,8 @@ function createGeometry( count ) {
  * Packs raw splat attribute arrays into the read-only GPU storage buffers used
  * by both {@link createMaterialNodes} (rendering) and the merge kernels built
  * by `GaussianSplatGroup` (cross-instance merging). This is the per-splat
- * source data layout - `centerRead`/`covarianceARead`/`covarianceBRead`/
- * `colorRead` plus, for degree > 0, one `sphericalHarmonics{1,2,3}Read` per
+ * source data layout - `centerRead`/`covarianceRead`/`colorRead`
+ * plus, for degree > 0, one `sphericalHarmonics{1,2,3}Read` per
  * band actually present.
  *
  * @param {number} count - The number of splats.
@@ -169,8 +178,7 @@ function createGeometry( count ) {
 function createStorageBuffers( count, centers, covariances, colors, sphericalHarmonics = {} ) {
 
 	const centerData = new Float32Array( count * 4 );
-	const covarianceAData = new Float32Array( count * 4 );
-	const covarianceBData = new Float32Array( count * 4 );
+	const covarianceData = new Float32Array( count * 8 );
 	const colorData = new Uint32Array( count );
 	const sphericalHarmonicsDegree = sphericalHarmonics.degree || 0;
 
@@ -179,18 +187,18 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 		const i3 = i * 3;
 		const i4 = i * 4;
 		const i6 = i * 6;
+		const i8 = i * 8;
 
 		centerData[ i4 ] = centers[ i3 ];
 		centerData[ i4 + 1 ] = centers[ i3 + 1 ];
 		centerData[ i4 + 2 ] = centers[ i3 + 2 ];
 
-		covarianceAData[ i4 ] = covariances[ i6 ];
-		covarianceAData[ i4 + 1 ] = covariances[ i6 + 1 ];
-		covarianceAData[ i4 + 2 ] = covariances[ i6 + 2 ];
-		covarianceAData[ i4 + 3 ] = covariances[ i6 + 3 ];
-
-		covarianceBData[ i4 ] = covariances[ i6 + 4 ];
-		covarianceBData[ i4 + 1 ] = covariances[ i6 + 5 ];
+		covarianceData[ i8 ] = covariances[ i6 ];
+		covarianceData[ i8 + 1 ] = covariances[ i6 + 1 ];
+		covarianceData[ i8 + 2 ] = covariances[ i6 + 2 ];
+		covarianceData[ i8 + 3 ] = covariances[ i6 + 3 ];
+		covarianceData[ i8 + 4 ] = covariances[ i6 + 4 ];
+		covarianceData[ i8 + 5 ] = covariances[ i6 + 5 ];
 
 		colorData[ i ] = ( colors[ i4 ] |
 			colors[ i4 + 1 ] << 8 |
@@ -200,8 +208,7 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 	}
 
 	const centerAttribute = new StorageBufferAttribute( centerData, 4 );
-	const covarianceAAttribute = new StorageBufferAttribute( covarianceAData, 4 );
-	const covarianceBAttribute = new StorageBufferAttribute( covarianceBData, 4 );
+	const covarianceAttribute = new StorageBufferAttribute( covarianceData, 4 );
 	const colorAttribute = new StorageBufferAttribute( colorData, 1 );
 
 	const buffers = {
@@ -209,8 +216,7 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 		sphericalHarmonicsDegree,
 		webGLBuffersEnabled: false,
 		centerRead: storage( centerAttribute, 'vec4', count ).toReadOnly(),
-		covarianceARead: storage( covarianceAAttribute, 'vec4', count ).toReadOnly(),
-		covarianceBRead: storage( covarianceBAttribute, 'vec4', count ).toReadOnly(),
+		covarianceRead: storage( covarianceAttribute, 'vec4', count * 2 ).toReadOnly(),
 		colorRead: storage( colorAttribute, 'uint', count ).toReadOnly()
 	};
 
@@ -237,8 +243,7 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 function disposeStorageBuffers( buffers ) {
 
 	buffers.centerRead.value.dispose();
-	buffers.covarianceARead.value.dispose();
-	buffers.covarianceBRead.value.dispose();
+	buffers.covarianceRead.value.dispose();
 	buffers.colorRead.value.dispose();
 
 	for ( let degree = 1; degree <= buffers.sphericalHarmonicsDegree; degree ++ ) {
@@ -287,8 +292,7 @@ function enableWebGLBuffers( buffers ) {
 	if ( buffers.webGLBuffersEnabled === true ) return;
 
 	buffers.centerRead.setPBO( true );
-	buffers.covarianceARead.setPBO( true );
-	buffers.covarianceBRead.setPBO( true );
+	buffers.covarianceRead.setPBO( true );
 	buffers.colorRead.setPBO( true );
 
 	for ( let degree = 1; degree <= buffers.sphericalHarmonicsDegree; degree ++ ) {
@@ -346,29 +350,6 @@ function assembleSphericalHarmonicsVectors( coefficients, name ) {
 
 }
 
-function accumulateSphericalHarmonics( vectors, weights ) {
-
-	let result = vectors[ 0 ].mul( weights[ 0 ] );
-
-	for ( let i = 1; i < vectors.length; i ++ ) {
-
-		result = result.add( vectors[ i ].mul( weights[ i ] ) );
-
-	}
-
-	return result;
-
-}
-
-function applySphericalHarmonicsBand( buffer, splatIndex, words, componentCount, name, weights ) {
-
-	const coefficients = unpackSphericalHarmonicsCoefficients( buffer, splatIndex, words, componentCount );
-	const vectors = assembleSphericalHarmonicsVectors( coefficients, name );
-
-	return accumulateSphericalHarmonics( vectors, weights );
-
-}
-
 /**
  * Adds this splat's view-dependent spherical harmonics contribution to `rgb`, reading
  * band coefficients from `buffers` (a storage buffer state - see {@link createStorageBuffers} -
@@ -384,68 +365,84 @@ function applySphericalHarmonicsBand( buffer, splatIndex, words, componentCount,
 function applySphericalHarmonics( rgb, center, localCameraPosition, splatIndex, buffers ) {
 
 	const viewDirection = normalize( center.sub( localCameraPosition ) ).toVar( 'sphericalHarmonicsViewDirection' );
-	const x = viewDirection.x;
-	const y = viewDirection.y;
-	const z = viewDirection.z;
+	const sh1 = assembleSphericalHarmonicsVectors(
+		unpackSphericalHarmonicsCoefficients(
+			buffers.sphericalHarmonics1Read,
+			splatIndex,
+			buffers.sphericalHarmonics1Words,
+			SH_BAND_COMPONENTS[ 1 ]
+		),
+		'sh1_'
+	);
 
-	rgb.addAssign( applySphericalHarmonicsBand(
-		buffers.sphericalHarmonics1Read,
-		splatIndex,
-		buffers.sphericalHarmonics1Words,
-		SH_BAND_COMPONENTS[ 1 ],
-		'sh1_',
-		[
-			y.mul( - 0.4886025 ),
-			z.mul( 0.4886025 ),
-			x.mul( - 0.4886025 )
-		]
-	) );
+	rgb.addAssign( sphericalHarmonicsRadianceBand1( sh1[ 0 ].negate(), sh1[ 1 ], sh1[ 2 ].negate(), viewDirection ) );
 
 	if ( buffers.sphericalHarmonicsDegree >= 2 ) {
 
-		const xx = x.mul( x ).toVar( 'shXX' );
-		const yy = y.mul( y ).toVar( 'shYY' );
-		const zz = z.mul( z ).toVar( 'shZZ' );
+		const sh2 = assembleSphericalHarmonicsVectors(
+			unpackSphericalHarmonicsCoefficients(
+				buffers.sphericalHarmonics2Read,
+				splatIndex,
+				buffers.sphericalHarmonics2Words,
+				SH_BAND_COMPONENTS[ 2 ]
+			),
+			'sh2_'
+		);
 
-		rgb.addAssign( applySphericalHarmonicsBand(
-			buffers.sphericalHarmonics2Read,
-			splatIndex,
-			buffers.sphericalHarmonics2Words,
-			SH_BAND_COMPONENTS[ 2 ],
-			'sh2_',
-			[
-				x.mul( y ).mul( 1.0925484 ),
-				y.mul( z ).mul( - 1.0925484 ),
-				zz.mul( 2 ).sub( xx ).sub( yy ).mul( 0.3153915 ),
-				x.mul( z ).mul( - 1.0925484 ),
-				xx.sub( yy ).mul( 0.5462742 )
-			]
-		) );
+		rgb.addAssign( sphericalHarmonicsRadianceBand2( sh2[ 0 ], sh2[ 1 ].negate(), sh2[ 2 ], sh2[ 3 ].negate(), sh2[ 4 ], viewDirection ) );
 
 		if ( buffers.sphericalHarmonicsDegree >= 3 ) {
 
-			const xy = x.mul( y ).toVar( 'shXY' );
+			const sh3 = assembleSphericalHarmonicsVectors(
+				unpackSphericalHarmonicsCoefficients(
+					buffers.sphericalHarmonics3Read,
+					splatIndex,
+					buffers.sphericalHarmonics3Words,
+					SH_BAND_COMPONENTS[ 3 ]
+				),
+				'sh3_'
+			);
 
-			rgb.addAssign( applySphericalHarmonicsBand(
-				buffers.sphericalHarmonics3Read,
-				splatIndex,
-				buffers.sphericalHarmonics3Words,
-				SH_BAND_COMPONENTS[ 3 ],
-				'sh3_',
-				[
-					y.mul( xx.mul( 3 ).sub( yy ) ).mul( - 0.5900436 ),
-					xy.mul( z ).mul( 2.8906114 ),
-					y.mul( zz.mul( 4 ).sub( xx ).sub( yy ) ).mul( - 0.4570458 ),
-					z.mul( zz.mul( 2 ).sub( xx.mul( 3 ) ).sub( yy.mul( 3 ) ) ).mul( 0.3731763 ),
-					x.mul( zz.mul( 4 ).sub( xx ).sub( yy ) ).mul( - 0.4570458 ),
-					z.mul( xx.sub( yy ) ).mul( 1.4453057 ),
-					x.mul( xx.sub( yy.mul( 3 ) ) ).mul( - 0.5900436 )
-				]
-			) );
+			rgb.addAssign( sphericalHarmonicsRadianceBand3( sh3[ 0 ], sh3[ 1 ], sh3[ 2 ], sh3[ 3 ], sh3[ 4 ], sh3[ 5 ], sh3[ 6 ], viewDirection ) );
 
 		}
 
 	}
+
+}
+
+function createLinearMatrix3( row0, row1, row2, name ) {
+
+	return mat3(
+		vec3( row0.x, row1.x, row2.x ),
+		vec3( row0.y, row1.y, row2.y ),
+		vec3( row0.z, row1.z, row2.z )
+	).toVar( name );
+
+}
+
+function createAffineMatrix4( row0, row1, row2, name ) {
+
+	return mat4(
+		vec4( row0.x, row1.x, row2.x, 0 ),
+		vec4( row0.y, row1.y, row2.y, 0 ),
+		vec4( row0.z, row1.z, row2.z, 0 ),
+		vec4( row0.w, row1.w, row2.w, 1 )
+	).toVar( name );
+
+}
+
+function transformPackedCovariance( covA, covB, matrix, name ) {
+
+	const covariance = covarianceToMatrix( covA, covB ).toVar( `${ name }InputCovariance` );
+	const transformed = transformCovariance( covariance, matrix ).toVar( `${ name }Covariance` );
+	const packed = covarianceFromMatrix( transformed );
+
+	return {
+		matrix: transformed,
+		covA: packed.covA.toVar( `${ name }CovA` ),
+		covB: packed.covB.toVar( `${ name }CovB` )
+	};
 
 }
 
@@ -494,9 +491,11 @@ function createMaterialNodes( buffers, sort, localCameraPosition, recordTransfor
 	const createVertexNode = ( usePrecomputedSphericalHarmonics ) => Fn( () => {
 
 		const splatIndex = sort.orderRead.element( instanceIndex ).toVar( 'splatIndex' );
-		let center = buffers.centerRead.element( splatIndex ).xyz.toVar( 'center' );
-		let covA = buffers.covarianceARead.element( splatIndex ).toVar( 'covA' );
-		let covB = buffers.covarianceBRead.element( splatIndex ).toVar( 'covB' );
+		const covarianceIndex = splatIndex.mul( 2 ).toVar( 'covarianceIndex' );
+		const centerRecord = buffers.centerRead.element( splatIndex ).toVar( 'centerRecord' );
+		let center = centerRecord.xyz.toVar( 'center' );
+		let covA = buffers.covarianceRead.element( covarianceIndex ).toVar( 'covA' );
+		let covB = buffers.covarianceRead.element( covarianceIndex.add( 1 ) ).toVar( 'covB' );
 		const color = unpackUnorm4x8( buffers.colorRead.element( splatIndex ) ).toVar( 'splatColor' );
 		const rgb = color.rgb.toVar( 'splatRgb' );
 		let shLocalCameraPosition = localCameraPosition;
@@ -504,40 +503,21 @@ function createMaterialNodes( buffers, sort, localCameraPosition, recordTransfor
 
 		if ( recordTransform !== null ) {
 
-			const recordIndex = recordTransform.recordIndexRead.element( splatIndex ).toVar( 'recordIndex' );
-			const matrix0 = recordTransform.matrix0Read.element( recordIndex ).toVar( 'recordMatrix0' );
-			const matrix1 = recordTransform.matrix1Read.element( recordIndex ).toVar( 'recordMatrix1' );
-			const matrix2 = recordTransform.matrix2Read.element( recordIndex ).toVar( 'recordMatrix2' );
+			const recordIndex = uint( centerRecord.w ).toVar( 'recordIndex' );
+			const recordDataIndex = recordIndex.mul( 4 ).toVar( 'recordDataIndex' );
+			const matrix0 = recordTransform.recordDataRead.element( recordDataIndex ).toVar( 'recordMatrix0' );
+			const matrix1 = recordTransform.recordDataRead.element( recordDataIndex.add( 1 ) ).toVar( 'recordMatrix1' );
+			const matrix2 = recordTransform.recordDataRead.element( recordDataIndex.add( 2 ) ).toVar( 'recordMatrix2' );
 			const localCenter = center.toVar( 'localCenter' );
 			shCenter = localCenter;
-			const cov0 = vec3( covA.x, covA.y, covA.z ).toVar( 'localCov0' );
-			const cov1 = vec3( covA.y, covA.w, covB.x ).toVar( 'localCov1' );
-			const cov2 = vec3( covA.z, covB.x, covB.y ).toVar( 'localCov2' );
-			const r0 = matrix0.xyz.toVar( 'recordRow0' );
-			const r1 = matrix1.xyz.toVar( 'recordRow1' );
-			const r2 = matrix2.xyz.toVar( 'recordRow2' );
-			const vc0 = vec3( dot( r0, cov0 ), dot( r0, cov1 ), dot( r0, cov2 ) ).toVar( 'recordVC0' );
-			const vc1 = vec3( dot( r1, cov0 ), dot( r1, cov1 ), dot( r1, cov2 ) ).toVar( 'recordVC1' );
-			const vc2 = vec3( dot( r2, cov0 ), dot( r2, cov1 ), dot( r2, cov2 ) ).toVar( 'recordVC2' );
+			const recordTransformMatrix = createAffineMatrix4( matrix0, matrix1, matrix2, 'recordTransformMatrix' );
+			const recordLinearMatrix = createLinearMatrix3( matrix0.xyz, matrix1.xyz, matrix2.xyz, 'recordLinearMatrix' );
+			const transformedCovariance = transformPackedCovariance( covA, covB, recordLinearMatrix, 'record' );
 
-			center = vec3(
-				dot( r0, localCenter ).add( matrix0.w ),
-				dot( r1, localCenter ).add( matrix1.w ),
-				dot( r2, localCenter ).add( matrix2.w )
-			).toVar( 'transformedCenter' );
-			covA = vec4(
-				dot( vc0, r0 ),
-				dot( vc0, r1 ),
-				dot( vc0, r2 ),
-				dot( vc1, r1 )
-			).toVar( 'transformedCovA' );
-			covB = vec4(
-				dot( vc1, r2 ),
-				dot( vc2, r2 ),
-				0,
-				0
-			).toVar( 'transformedCovB' );
-			shLocalCameraPosition = recordTransform.localCameraPositionRead.element( recordIndex ).xyz;
+			center = recordTransformMatrix.mul( vec4( localCenter, 1 ) ).xyz.toVar( 'transformedCenter' );
+			covA = transformedCovariance.covA;
+			covB = transformedCovariance.covB;
+			shLocalCameraPosition = recordTransform.recordDataRead.element( recordDataIndex.add( 3 ) ).xyz;
 
 		}
 
@@ -561,25 +541,8 @@ function createMaterialNodes( buffers, sort, localCameraPosition, recordTransfor
 		const viewCenter = viewCenter4.xyz.toVar( 'viewCenter' );
 		const centerClip = cameraProjectionMatrix.mul( viewCenter4 ).toVar( 'centerClip' );
 
-		const m = highpModelViewMatrix;
-		const r0 = vec3( m[ 0 ].x, m[ 1 ].x, m[ 2 ].x ).toVar( 'r0' );
-		const r1 = vec3( m[ 0 ].y, m[ 1 ].y, m[ 2 ].y ).toVar( 'r1' );
-		const r2 = vec3( m[ 0 ].z, m[ 1 ].z, m[ 2 ].z ).toVar( 'r2' );
-
-		const cov0 = vec3( covA.x, covA.y, covA.z ).toVar( 'cov0' );
-		const cov1 = vec3( covA.y, covA.w, covB.x ).toVar( 'cov1' );
-		const cov2 = vec3( covA.z, covB.x, covB.y ).toVar( 'cov2' );
-
-		const vc0 = vec3( dot( r0, cov0 ), dot( r0, cov1 ), dot( r0, cov2 ) ).toVar( 'vc0' );
-		const vc1 = vec3( dot( r1, cov0 ), dot( r1, cov1 ), dot( r1, cov2 ) ).toVar( 'vc1' );
-		const vc2 = vec3( dot( r2, cov0 ), dot( r2, cov1 ), dot( r2, cov2 ) ).toVar( 'vc2' );
-
-		const c00 = dot( vc0, r0 ).toVar( 'c00' );
-		const c01 = dot( vc0, r1 ).toVar( 'c01' );
-		const c02 = dot( vc0, r2 ).toVar( 'c02' );
-		const c11 = dot( vc1, r1 ).toVar( 'c11' );
-		const c12 = dot( vc1, r2 ).toVar( 'c12' );
-		const c22 = dot( vc2, r2 ).toVar( 'c22' );
+		const viewLinearMatrix = mat3( highpModelViewMatrix ).toVar( 'viewLinearMatrix' );
+		const viewCovariance = transformPackedCovariance( covA, covB, viewLinearMatrix, 'view' );
 
 		const z = min( viewCenter.z, - 0.01 ).toVar( 'z' );
 		const invZ = float( 1 ).div( z ).toVar( 'invZ' );
@@ -590,20 +553,15 @@ function createMaterialNodes( buffers, sort, localCameraPosition, recordTransfor
 		const j11 = focal.y.negate().mul( invZ ).toVar( 'j11' );
 		const j02 = focal.x.mul( viewCenter.x ).mul( invZ2 ).toVar( 'j02' );
 		const j12 = focal.y.mul( viewCenter.y ).mul( invZ2 ).toVar( 'j12' );
-
-		const aBase = j00.mul( j00 ).mul( c00 )
-			.add( j00.mul( j02 ).mul( c02 ).mul( 2 ) )
-			.add( j02.mul( j02 ).mul( c22 ) )
-			.toVar( 'cov2dABase' );
-		const b = j00.mul( j11 ).mul( c01 )
-			.add( j00.mul( j12 ).mul( c02 ) )
-			.add( j02.mul( j11 ).mul( c12 ) )
-			.add( j02.mul( j12 ).mul( c22 ) )
-			.toVar( 'cov2dB' );
-		const cBase = j11.mul( j11 ).mul( c11 )
-			.add( j11.mul( j12 ).mul( c12 ).mul( 2 ) )
-			.add( j12.mul( j12 ).mul( c22 ) )
-			.toVar( 'cov2dCBase' );
+		const projectionJacobian = mat3(
+			vec3( j00, 0, 0 ),
+			vec3( 0, j11, 0 ),
+			vec3( j02, j12, 0 )
+		).toVar( 'projectionJacobian' );
+		const covariance2d = projectionJacobian.mul( viewCovariance.matrix ).mul( projectionJacobian.transpose() ).toVar( 'covariance2d' );
+		const aBase = covariance2d[ 0 ].x.toVar( 'cov2dABase' );
+		const b = covariance2d[ 1 ].x.toVar( 'cov2dB' );
+		const cBase = covariance2d[ 1 ].y.toVar( 'cov2dCBase' );
 		const a = aBase.add( KERNEL_2D_SIZE ).toVar( 'cov2dA' );
 		const c = cBase.add( KERNEL_2D_SIZE ).toVar( 'cov2dC' );
 		const detBase = aBase.mul( cBase ).sub( b.mul( b ) ).toVar( 'detBase' );
@@ -847,6 +805,8 @@ export {
 	enableWebGLBuffers,
 	ensureSphericalHarmonicsContributionBuffer,
 	computeRayIntersection,
+	createAffineMatrix4,
+	createLinearMatrix3,
 	needsSort,
 	updateLastSortDirection,
 	updateSortDepthRange

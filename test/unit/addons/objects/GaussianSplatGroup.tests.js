@@ -42,6 +42,7 @@ export default QUnit.module( 'Addons', () => {
 				const group = new GaussianSplatGroup();
 
 				assert.strictEqual( group.autoCompact, true, 'autoCompact defaults to true' );
+				assert.strictEqual( group._maxSphericalHarmonicsDegree, 2, 'shDegree defaults to 2' );
 				assert.strictEqual( sync( group ), 0, 'splatCount starts at 0' );
 				assert.strictEqual( group.capacity, 1, 'buffers settle at capacity 1 (max(1, 0 splats))' );
 
@@ -216,7 +217,7 @@ export default QUnit.module( 'Addons', () => {
 
 			QUnit.test( 'checks the current sort direction when layout already requires sorting', ( assert ) => {
 
-				const group = new GaussianSplatGroup();
+				const group = new GaussianSplatGroup( { shDegree: 0 } );
 
 				group.addSplat( createTestSplatGeometry( 1 ) );
 				sync( group );
@@ -251,7 +252,7 @@ export default QUnit.module( 'Addons', () => {
 
 			QUnit.test( 'pads lower-degree spherical harmonics with neutral coefficients', ( assert ) => {
 
-				const group = new GaussianSplatGroup();
+				const group = new GaussianSplatGroup( { shDegree: 3 } );
 				const neutral = 0x80808080;
 
 				group.addSplat( createGaussianSplatGeometry(
@@ -268,7 +269,7 @@ export default QUnit.module( 'Addons', () => {
 
 				sync( group );
 
-				assert.strictEqual( group._maxSphericalHarmonicsDegree, 3, 'the packed group uses the maximum SH degree' );
+				assert.strictEqual( group._maxSphericalHarmonicsDegree, 3, 'the packed group uses its fixed SH degree' );
 				assert.deepEqual( Array.from( group._buffers.sphericalHarmonics1Attribute.array.slice( 3, 6 ) ), [ neutral, neutral, neutral ], 'degree 1 padding is neutral' );
 				assert.deepEqual( Array.from( group._buffers.sphericalHarmonics2Attribute.array.slice( 4, 8 ) ), [ neutral, neutral, neutral, neutral ], 'degree 2 padding is neutral' );
 				assert.deepEqual( Array.from( group._buffers.sphericalHarmonics3Attribute.array.slice( 6, 12 ) ), [ neutral, neutral, neutral, neutral, neutral, neutral ], 'degree 3 padding is neutral' );
@@ -277,9 +278,35 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
+			QUnit.test( 'uses fixed shDegree instead of upgrading when higher-degree splats are added', ( assert ) => {
+
+				const group = new GaussianSplatGroup( { shDegree: 2 } );
+
+				group.addSplat( createGaussianSplatGeometry(
+					new Float32Array( [ 1, 2, 3 ] ),
+					new Float32Array( [ 1, 0, 0, 1, 0, 1 ] ),
+					new Uint8Array( [ 255, 255, 255, 255 ] ),
+					{
+						sh1: new Uint32Array( [ 1, 2, 3 ] ),
+						sh2: new Uint32Array( [ 4, 5, 6, 7 ] ),
+						sh3: new Uint32Array( [ 8, 9, 10, 11, 12, 13 ] )
+					}
+				) );
+
+				sync( group );
+
+				assert.strictEqual( group._maxSphericalHarmonicsDegree, 2, 'fixed degree does not upgrade to the source degree' );
+				assert.ok( group._buffers.sphericalHarmonics1Attribute, 'degree 1 buffer is allocated' );
+				assert.ok( group._buffers.sphericalHarmonics2Attribute, 'degree 2 buffer is allocated' );
+				assert.strictEqual( group._buffers.sphericalHarmonics3Attribute, undefined, 'degree 3 buffer is not allocated' );
+
+				group.dispose();
+
+			} );
+
 			QUnit.test( 'WebGL backend uses CPU sort without dispatching merge compute', ( assert ) => {
 
-				const group = new GaussianSplatGroup();
+				const group = new GaussianSplatGroup( { shDegree: 0 } );
 				const id = group.addSplat( createGaussianSplatGeometry(
 					new Float32Array( [ 1, 2, 3 ] ),
 					new Float32Array( [ 1, 0, 0, 1, 0, 1 ] ),
@@ -312,15 +339,13 @@ export default QUnit.module( 'Addons', () => {
 				}, null, {} );
 
 				const centers = group._buffers.centerAttribute.array;
-				const matrix0 = group._buffers.matrix0Attribute.array;
-				const matrix1 = group._buffers.matrix1Attribute.array;
-				const matrix2 = group._buffers.matrix2Attribute.array;
+				const recordData = group._buffers.recordDataAttribute.array;
 
 				assert.strictEqual( computeCalls, 0, 'the packed WebGL path does not dispatch merge compute work' );
 				assert.deepEqual( Array.from( centers.slice( 0, 4 ) ), [ 1, 2, 3, 0 ], 'source centers stay packed in local space' );
-				assert.deepEqual( Array.from( matrix0.slice( 0, 4 ) ), [ 1, 0, 0, 4 ], 'matrix row 0 is uploaded separately' );
-				assert.deepEqual( Array.from( matrix1.slice( 0, 4 ) ), [ 0, 1, 0, 5 ], 'matrix row 1 is uploaded separately' );
-				assert.deepEqual( Array.from( matrix2.slice( 0, 4 ) ), [ 0, 0, 1, 6 ], 'matrix row 2 is uploaded separately' );
+				assert.deepEqual( Array.from( recordData.slice( 0, 4 ) ), [ 1, 0, 0, 4 ], 'matrix row 0 is uploaded into record data' );
+				assert.deepEqual( Array.from( recordData.slice( 4, 8 ) ), [ 0, 1, 0, 5 ], 'matrix row 1 is uploaded into record data' );
+				assert.deepEqual( Array.from( recordData.slice( 8, 12 ) ), [ 0, 0, 1, 6 ], 'matrix row 2 is uploaded into record data' );
 				assert.true( group._buffers.webGLBuffersEnabled, 'the packed buffers are enabled for WebGL reads' );
 				assert.true( sorted, 'the shared sort is performed on the CPU' );
 
