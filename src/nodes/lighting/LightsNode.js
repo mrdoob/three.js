@@ -155,6 +155,12 @@ class LightsNode extends Node {
 			_hashData.push( light.id );
 			_hashData.push( light.castShadow ? 1 : 0 );
 
+			if ( light.castShadow === true && light.shadow !== undefined ) {
+
+				_hashData.push( light.shadow.mapSize.width, light.shadow.mapSize.height );
+
+			}
+
 			if ( light.isSpotLight === true ) {
 
 				const hashMap = ( light.map !== null ) ? light.map.id : - 1;
