@@ -1,3 +1,4 @@
+import { DataTexture } from 'three';
 import { createGaussianSplatGeometry } from '../../../../examples/jsm/utils/GaussianSplatUtils.js';
 import { GaussianSplatGroup } from '../../../../examples/jsm/objects/GaussianSplatGroup.js';
 
@@ -348,6 +349,40 @@ export default QUnit.module( 'Addons', () => {
 				assert.deepEqual( Array.from( recordData.slice( 8, 12 ) ), [ 0, 0, 1, 6 ], 'matrix row 2 is uploaded into record data' );
 				assert.true( group._buffers.webGLBuffersEnabled, 'the packed buffers are enabled for WebGL reads' );
 				assert.true( sorted, 'the shared sort is performed on the CPU' );
+
+				group.dispose();
+
+			} );
+
+			QUnit.test( 'compact replaces WebGL PBO textures when the layout size changes', ( assert ) => {
+
+				const group = new GaussianSplatGroup( { autoCompact: false, shDegree: 0 } );
+				const largeId = group.addSplat( createTestSplatGeometry( 64 ) );
+				group.addSplat( createTestSplatGeometry( 4 ) );
+				sync( group );
+
+				const oldAttribute = group._buffers.centerAttribute;
+				const oldPBO = new DataTexture( oldAttribute.array, 8, 8 );
+				let disposed = false;
+				oldPBO.addEventListener( 'dispose', () => {
+
+					disposed = true;
+
+				} );
+				oldAttribute.pbo = oldPBO;
+				oldAttribute.pboNode = { value: oldPBO };
+
+				group.setVisibleAt( largeId, false );
+				group.compact();
+				sync( group );
+
+				const newAttribute = group._buffers.centerAttribute;
+
+				assert.notStrictEqual( newAttribute.pbo, oldPBO, 'a new PBO texture is created for the compacted size' );
+				assert.strictEqual( newAttribute.pboNode.value, newAttribute.pbo, 'the storage node keeps its PBO node and points it at the new texture' );
+				assert.true( disposed, 'the previous PBO texture is disposed' );
+				assert.strictEqual( newAttribute.pbo.image.width, 2, 'compacted PBO width matches the new packed layout' );
+				assert.strictEqual( newAttribute.pbo.image.height, 2, 'compacted PBO height matches the new packed layout' );
 
 				group.dispose();
 

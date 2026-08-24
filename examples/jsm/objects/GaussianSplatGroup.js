@@ -1,5 +1,6 @@
 import {
 	Box3,
+	DataTexture,
 	DynamicDrawUsage,
 	Matrix4,
 	Mesh,
@@ -942,24 +943,40 @@ function retargetPBOAttribute( oldAttribute, newAttribute ) {
 	if ( oldAttribute.pbo === undefined ) return;
 
 	const originalArray = newAttribute.array;
-	const numElements = newAttribute.count * newAttribute.itemSize;
-	const width = Math.pow( 2, Math.ceil( Math.log2( Math.sqrt( numElements / newAttribute.itemSize ) ) ) );
-	let height = Math.ceil( ( numElements / newAttribute.itemSize ) / width );
+	const itemSize = newAttribute.itemSize;
+	const numElements = newAttribute.count * itemSize;
+	const width = Math.pow( 2, Math.ceil( Math.log2( Math.sqrt( numElements / itemSize ) ) ) );
+	let height = Math.ceil( ( numElements / itemSize ) / width );
 
-	if ( width * height * newAttribute.itemSize < numElements ) height ++;
+	if ( width * height * itemSize < numElements ) height ++;
 
-	const paddedArray = new originalArray.constructor( width * height * newAttribute.itemSize );
+	const paddedArray = new originalArray.constructor( width * height * itemSize );
 	paddedArray.set( originalArray );
 
 	newAttribute.array = paddedArray;
 	newAttribute.pboNode = oldAttribute.pboNode;
-	newAttribute.pbo = oldAttribute.pbo;
-	newAttribute.pbo.image = {
-		data: paddedArray,
-		width,
-		height
-	};
-	newAttribute.pbo.needsUpdate = true;
+
+	const oldPBO = oldAttribute.pbo;
+
+	// WebGL allocates PBO textures with texStorage2D, which cannot change size.
+	// The shader indexes with textureSize(), so keeping a stale GPU width after
+	// compact() mis-reads every splat. Rebuild the texture when the layout changes.
+	if ( oldPBO.image.width !== width || oldPBO.image.height !== height ) {
+
+		const newPBO = new DataTexture( paddedArray, width, height, oldPBO.format, oldPBO.type );
+		newPBO.isPBOTexture = true;
+		newPBO.needsUpdate = true;
+		oldAttribute.pboNode.value = newPBO;
+		newAttribute.pbo = newPBO;
+		oldPBO.dispose();
+
+	} else {
+
+		newAttribute.pbo = oldPBO;
+		oldPBO.image.data = paddedArray;
+		oldPBO.needsUpdate = true;
+
+	}
 
 }
 
