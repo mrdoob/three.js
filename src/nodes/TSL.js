@@ -49,6 +49,7 @@ export * from './utils/RTTNode.js';
 export * from './utils/PostProcessingUtils.js';
 export * from './utils/SampleNode.js';
 export * from './utils/EventNode.js';
+export * from './utils/StorageArrayElementNode.js';
 
 // three.js shading language
 export * from './tsl/TSLBase.js';
@@ -58,6 +59,8 @@ export * from './accessors/AccessorsUtils.js';
 export * from './accessors/Arrays.js';
 export * from './accessors/UniformArrayNode.js';
 export * from './accessors/Bitangent.js';
+export * from './accessors/ClippingNode.js';
+export * from './accessors/TangentUtils.js';
 export * from './accessors/BufferAttributeNode.js';
 export * from './accessors/BufferNode.js';
 export * from './accessors/BuiltinNode.js';
@@ -140,8 +143,8 @@ export * from './accessors/Lights.js';
 export * from './lighting/LightsNode.js';
 export * from './lighting/LightingContextNode.js';
 export * from './lighting/ShadowBaseNode.js';
-export * from './lighting/ShadowNode.js';
-export * from './lighting/ShadowFilterNode.js';
+export { shadow } from './lighting/ShadowNode.js';
+export { BasicShadowFilter, PCFShadowFilter, VSMShadowFilter } from './lighting/ShadowFilterNode.js';
 export * from './lighting/PointShadowNode.js';
 export * from './lighting/PointLightNode.js';
 
@@ -160,11 +163,16 @@ export * from './materialx/MaterialXNodes.js';
 // functions
 export { default as BRDF_GGX } from './functions/BSDF/BRDF_GGX.js';
 export { default as BRDF_Lambert } from './functions/BSDF/BRDF_Lambert.js';
+export { default as BRDF_Sheen } from './functions/BSDF/BRDF_Sheen.js';
 export { default as D_GGX } from './functions/BSDF/D_GGX.js';
+export { default as D_GGX_Anisotropic } from './functions/BSDF/D_GGX_Anisotropic.js';
 export { default as DFGLUT } from './functions/BSDF/DFGLUT.js';
+export { default as EnvironmentBRDF } from './functions/BSDF/EnvironmentBRDF.js';
 export { default as F_Schlick } from './functions/BSDF/F_Schlick.js';
 export { default as Schlick_to_F0 } from './functions/BSDF/Schlick_to_F0.js';
 export { default as V_GGX_SmithCorrelated } from './functions/BSDF/V_GGX_SmithCorrelated.js';
+export { default as V_GGX_SmithCorrelated_Anisotropic } from './functions/BSDF/V_GGX_SmithCorrelated_Anisotropic.js';
+export { LTC_Evaluate, LTC_Evaluate_Volume, LTC_Uv } from './functions/BSDF/LTC.js';
 
 export * from './lighting/LightUtils.js';
 
