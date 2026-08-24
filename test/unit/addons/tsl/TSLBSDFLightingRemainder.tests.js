@@ -1,15 +1,15 @@
 import {
-	float, vec2, vec3, mat3, array,
-	directPointLight, getDistanceAttenuation, getShIrradianceAt,
+	float, vec2, vec3, mat3,
+	directPointLight, getDistanceAttenuation,
 	LTC_Evaluate, LTC_Evaluate_Volume, LTC_Uv
 } from 'three/tsl';
 import { gpuTest } from './gpu-test-utils.js';
 
 // Coverage for the remaining, previously-uncovered BSDF/lighting building
-// blocks: src/nodes/lighting/PointLightNode.js's `directPointLight`,
-// src/nodes/functions/material/getShIrradianceAt.js, and the LTC
-// (Linearly Transformed Cosines) area-light math in
-// src/nodes/functions/BSDF/LTC.js. Every expected value below is a plain-JS
+// blocks: src/nodes/lighting/PointLightNode.js's `directPointLight`, and the
+// LTC (Linearly Transformed Cosines) area-light math in
+// src/nodes/functions/BSDF/LTC.js. (getShIrradianceAt() coverage moved to
+// TSL.Irradiance.tests.js.) Every expected value below is a plain-JS
 // transliteration of each function's own documented formula, computed
 // independently -- never by re-running the TSL expression under test.
 export default QUnit.module( 'TSL', () => {
@@ -126,78 +126,6 @@ export default QUnit.module( 'TSL', () => {
 			} );
 
 			assert.closeAbs( result.lightColor, vec3( atten, atten, atten ), 1e-5, 'directPointLight: lightColor with color=(1,1,1) matches getDistanceAttenuation(...) directly' );
-
-		} );
-
-	} );
-
-	QUnit.module( 'getShIrradianceAt()', () => {
-
-		// Plain-JS transliteration of getShIrradianceAt's own 9-term spherical
-		// harmonics evaluation (getShIrradianceAt.js): each of the 9 `sh[i]`
-		// terms is itself a vec3 (one SH coefficient triple per color channel),
-		// scaled by a fixed band constant and, for bands 1/2, by the normal's
-		// components.
-		const shIrradiance = ( normal, sh ) => {
-
-			const [ x, y, z ] = normal;
-			const scaleAdd = ( acc, coeff, scalar ) => acc.map( ( v, i ) => v + coeff[ i ] * scalar );
-
-			let result = sh[ 0 ].map( ( v ) => v * 0.886227 );
-			result = scaleAdd( result, sh[ 1 ], 2.0 * 0.511664 * y );
-			result = scaleAdd( result, sh[ 2 ], 2.0 * 0.511664 * z );
-			result = scaleAdd( result, sh[ 3 ], 2.0 * 0.511664 * x );
-			result = scaleAdd( result, sh[ 4 ], 2.0 * 0.429043 * x * y );
-			result = scaleAdd( result, sh[ 5 ], 2.0 * 0.429043 * y * z );
-			result = scaleAdd( result, sh[ 6 ], z * z * 0.743125 - 0.247708 );
-			result = scaleAdd( result, sh[ 7 ], 2.0 * 0.429043 * x * z );
-			result = scaleAdd( result, sh[ 8 ], 0.429043 * ( x * x - y * y ) );
-
-			return result;
-
-		};
-
-		// A fixed, arbitrary-but-deterministic set of 9 SH coefficient triples
-		// (one per color channel) shared by every case below.
-		const shValues = [
-			[ 1, 0, 0 ], [ 0, 1, 0 ], [ 0, 0, 1 ],
-			[ 0.5, 0.5, 0 ], [ 0.2, 0, 0.3 ], [ 0, 0.4, 0 ],
-			[ 0.1, 0.1, 0.1 ], [ 0, 0, 0.6 ], [ 0.3, 0, 0 ]
-		];
-
-		const makeShArray = ( values ) => array( values.map( ( v ) => vec3( ...v ) ) );
-
-		gpuTest( 'getShIrradianceAt() matches the hand-computed 9-term SH evaluation for several normals', ( { assert } ) => {
-
-			const shArray = makeShArray( shValues );
-
-			const cases = [
-				[ 0, 0, 1 ],
-				[ 1, 0, 0 ],
-				[ 1 / Math.sqrt( 3 ), 1 / Math.sqrt( 3 ), 1 / Math.sqrt( 3 ) ]
-			];
-
-			for ( const normal of cases ) {
-
-				const expected = shIrradiance( normal, shValues );
-
-				assert.closeAbs(
-					getShIrradianceAt( vec3( ...normal ), shArray ),
-					vec3( ...expected ), 1e-4,
-					`getShIrradianceAt(normal=${ JSON.stringify( normal ) }) matches the hand-computed SH evaluation`
-				);
-
-			}
-
-		} );
-
-		gpuTest( 'getShIrradianceAt() is exactly zero for all-zero SH coefficients, regardless of normal', ( { assert } ) => {
-
-			const zeroValues = new Array( 9 ).fill( [ 0, 0, 0 ] );
-			const shArray = makeShArray( zeroValues );
-
-			assert.closeAbs( getShIrradianceAt( vec3( 0, 1, 0 ), shArray ), vec3( 0, 0, 0 ), 1e-6, 'getShIrradianceAt is 0 with all-zero SH coefficients (normal (0,1,0))' );
-			assert.closeAbs( getShIrradianceAt( vec3( 0.6, 0, 0.8 ), shArray ), vec3( 0, 0, 0 ), 1e-6, 'getShIrradianceAt is 0 with all-zero SH coefficients (normal (0.6,0,0.8))' );
 
 		} );
 

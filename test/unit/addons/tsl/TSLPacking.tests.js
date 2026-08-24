@@ -1,5 +1,5 @@
 import {
-	float, vec2, vec3, vec4, hash, abs,
+	float, uint, vec2, vec3, vec4, hash, abs,
 	packSnorm2x16, unpackSnorm2x16,
 	packUnorm2x16, unpackUnorm2x16,
 	packHalf2x16, unpackHalf2x16,
@@ -8,6 +8,7 @@ import {
 	packNormalToRGB, unpackRGBToNormal, unpackNormal,
 	length
 } from 'three/tsl';
+import { toHalfFloat } from '../../../../src/extras/DataUtils.js';
 import { gpuTest, gpuFuzzTest } from './gpu-test-utils.js';
 
 // Packing/unpacking coverage: every round-trip test checks a value that was
@@ -50,6 +51,19 @@ export default QUnit.module( 'TSL', () => {
 
 			const v = vec2( 123.5, -0.0009765625 ); // second value is an exact float16 value (2^-10)
 			assert.closeAbs( unpackHalf2x16( packHalf2x16( v ) ), v, 1e-3, 'exact float16-representable values round-trip exactly (within tolerance)' );
+
+			// packHalf2x16's bits themselves, checked against an independent
+			// FP32->FP16 conversion (DataUtils.toHalfFloat, src/extras/DataUtils.js)
+			// rather than only the round trip above -- a pack() and unpack() that
+			// were both wrong in matching ways couldn't be caught by round-tripping
+			// alone. GLSL/WGSL both pack the first component into the 16
+			// least-significant bits and the second into the 16 most-significant
+			// bits (packHalf2x16 / pack2x16float).
+			const lo = toHalfFloat( 123.5 ) & 0xffff;
+			const hi = toHalfFloat( -0.0009765625 ) & 0xffff;
+			const expectedBits = ( lo | ( hi << 16 ) ) >>> 0;
+
+			assert.eq( packHalf2x16( v ), uint( expectedBits ), 'packHalf2x16(v) matches the bit pattern from DataUtils.toHalfFloat()' );
 
 		} );
 
