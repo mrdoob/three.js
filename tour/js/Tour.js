@@ -2549,13 +2549,13 @@ class Tour {
 
 	disposeRenderer() {
 
+		this.renderer.inspector.dispose();
+
 		this.renderer.setAnimationLoop( null );
 
-		this.renderer.inspector.domElement.remove();
+		this.renderer.dispose();
 
 		this.renderer.domElement.remove();
-
-		this.renderer.dispose();
 
 	}
 

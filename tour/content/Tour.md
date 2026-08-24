@@ -2442,50 +2442,50 @@ By default, `NodeBuilder` names intermediate variables with auto-incrementing id
 ### Generated Code Comparison
 
 ```js
-import { positionLocal, normalView, time, color } from 'three/tsl';
+import { uniform, color } from 'three/tsl';
 
-// 1. Without setName: NodeBuilder generates generic identifiers
-const waveA = positionLocal.y.mul( 8.0 ).add( time.mul( 2.0 ) ).sin();
-// Emits: var nodeVar0: f32 = sin((positionLocal.y * 8.0) + (time * 2.0));
+// 1. Without setName: NodeBuilder generates generic uniform identifiers
+const speedA = uniform( 2.0 );
+// Emits uniform buffer member: nodeUniform0: f32
 
-// 2. With setName: NodeBuilder uses explicit, readable identifiers
-const waveB = positionLocal.y.mul( 8.0 ).add( time.mul( 2.0 ) ).sin().setName( 'waveHeight' );
-// Emits: var waveHeight: f32 = sin((positionLocal.y * 8.0) + (time * 2.0));
+// 2. With setName: NodeBuilder emits clear, self-documenting uniform names
+const speedB = uniform( 2.0 ).setName( 'waveSpeed' );
+// Emits uniform buffer member: waveSpeed: f32
 
-const rim = normalView.z.oneMinus().pow( 2.5 ).setName( 'fresnelRim' );
-// Emits: var fresnelRim: f32 = pow(1.0 - normalView.z, 2.5);
+const glowColor = uniform( color( 0x00f0ff ) ).setName( 'glowColor' );
+// Emits uniform buffer member: glowColor: vec3<f32>
 ```
 
 > AI: `label()` was previously used for this purpose and is deprecated in favor of `setName()`.
 
 ```tsl setNameExample
 import 'scenes/shaderball';
-import { positionLocal, normalView, time, color, mix } from 'three/tsl';
+import { uniform, color, positionLocal, time } from 'three/tsl';
 
-// Assign clear, explicit variable names for easy shader debugging
-const waveHeight = positionLocal.y.mul( 10.0 ).add( time.mul( 2.0 ) ).sin().setName( 'waveHeight' );
-const fresnelRim = normalView.z.oneMinus().pow( 2.5 ).setName( 'fresnelRim' );
-const baseColor = color( 0x070b1a ).setName( 'baseColor' );
-const neonCyan = color( 0x00f0ff ).setName( 'neonCyan' );
+// Define explicit named uniforms for shader inspection
+const speed = uniform( 2.0 ).setName( 'waveSpeed' );
+const frequency = uniform( 10.0 ).setName( 'waveFrequency' );
+const glowColor = uniform( color( 0x00f0ff ) ).setName( 'glowColor' );
+const baseColor = uniform( color( 0x070b1a ) ).setName( 'baseColor' );
 
-// Composite final material nodes
-const surfacePattern = mix( baseColor, neonCyan, waveHeight.abs() ).setName( 'surfacePattern' );
+// Named intermediate calculation
+const wave = positionLocal.y.mul( frequency ).add( time.mul( speed ) ).sin().abs().setName( 'wavePattern' );
 
-model.material.colorNode = surfacePattern;
+model.material.colorNode = baseColor.add( glowColor.mul( wave ) );
 model.material.roughness = 0.2;
-model.material.metalness = 0.85;
-model.material.emissiveNode = neonCyan.mul( fresnelRim ).setName( 'emissiveRim' );
+model.material.metalness = 0.8;
+model.material.emissiveNode = glowColor.mul( wave.pow( 2.0 ) );
 ```
 
 </page>
 
 <page name="uniformFlow">
 
-In modern graphics APIs like **WebGPU (WGSL)**, texture sampling operations that rely on implicit screen-space derivatives (such as mipmap selection and anisotropic filtering) require execution within **Uniform Control Flow**.
+In modern graphics APIs like **WebGPU (WGSL)**, operations that rely on implicit screen-space derivatives (such as `fwidth()`, `dFdx()`, `dFdy()`, or mipmapped texture sampling) require execution within **Uniform Control Flow**.
 
-When texture sampling or derivative-dependent math is placed inside a divergent conditional branch (e.g. inside an `If( dynamicCondition )` or a dynamic loop where adjacent fragment threads take different execution paths), it can cause undefined derivative values, mipmapping distortion, or GPU validation errors.
+On the GPU, derivatives are calculated by comparing values between adjacent 2×2 fragment pixels (quads). When calculations with derivatives are placed inside a divergent conditional branch (where adjacent pixels take different execution paths), neighboring quad threads become desynchronized, causing corrupted derivatives and visual artifacts along the boundary.
 
-`uniformFlow( node )` (or `.uniformFlow()`) forces `NodeBuilder` to hoist and evaluate all dependencies of a node in the root uniform scope *before* entering non-uniform conditional branches.
+`uniformFlow( node )` (or `.uniformFlow()`) forces `NodeBuilder` to evaluate all expressions in the root uniform scope across all threads *before* selecting the result.
 
 <code name="uniformFlowExample" default="true">Uniform Flow Showcase</code>
 
@@ -2495,69 +2495,81 @@ When texture sampling or derivative-dependent math is placed inside a divergent 
 
 ::: api .uniformFlow() : ContextNode - Method chaining helper to enforce uniform control-flow execution on the current node expression. :::
 
-### How Uniform Flow Works
+### Example
 
-```mermaid
-flowchart TD
-    subgraph Without["Without uniformFlow (Divergent Execution)"]
-        IfBranch1["<b>If ( dynamicCondition )</b><br/><small>Threads diverge across pixels</small>"]
-        Sample1["<code>texture( map, uv )</code><br/><small>Evaluated inside branch (Invalid derivatives)</small>"]
-        IfBranch1 --> Sample1
-    end
-
-    subgraph With["With uniformFlow (Safe Uniform Hoisting)"]
-        Hoisted["<code>texture( map, uv ).uniformFlow()</code><br/><small>Evaluated in root uniform scope (Valid derivatives)</small>"]
-        IfBranch2["<b>If ( dynamicCondition )</b><br/><small>Threads safely consume pre-calculated sample</small>"]
-        Hoisted --> IfBranch2
-    end
-```
-
-### Practical Usage
+Conditionals compile into dynamic `if/else` branching (evaluated locally). When inside a `uniformFlow()`, the code uses native `select()`, executing both branches instead of only one.
 
 ```js
-import { texture, uv, uniformFlow, If, color } from 'three/tsl';
+// 1. Without uniformFlow(): emits dynamic if/else branching
+const resultA = select( condition, valueA, valueB );
 
-// Force texture sample to execute in uniform scope before branching
-const diffuseMap = texture( map, uv() ).uniformFlow();
-
-If( surfaceCondition, () => {
-
-	// Safe to use diffuseMap inside dynamic branches without derivative artifacts
-	material.colorNode = diffuseMap.mul( color( 0x00ffaa ) );
-
-} ).Else( () => {
-
-	material.colorNode = diffuseMap.mul( color( 0xff0055 ) );
-
-} );
+// 2. With uniformFlow(): evaluates both branches uniformly before selecting
+const resultB = select( condition, valueA, valueB ).uniformFlow();
 ```
 
+> Important: Because `uniformFlow()` evaluates both branches unconditionally to maintain quad thread synchronization, it can impact performance if the branches involve heavy math or expensive texture lookups.
+
 ```tsl uniformFlowExample
-import 'scenes/shaderball';
-import { positionLocal, time, color, If, float } from 'three/tsl';
+import 'scenes/plane';
+import { uv, time, select, fwidth, color, float, fract } from 'three/tsl';
 
-// Calculate procedural coordinates in uniform flow
-const ripple = positionLocal.y.mul( 12.0 ).add( time.mul( 2.5 ) ).sin().abs().uniformFlow();
+// 1. Dynamic animated division boundary across the plane
+const splitPos = time.mul( 0.4 ).sin().mul( 0.3 ).add( 0.5 );
+const condition = uv().x.greaterThan( splitPos );
 
-const cyan = color( 0x00e1ff );
-const magenta = color( 0xff0077 );
-const darkBase = color( 0x080e1c );
+// 2. Anti-aliased procedural stripe pattern that relies on fwidth() derivatives
+const stripePattern = ( scale ) => {
 
-// Dynamically branch shading while consuming uniformFlow nodes safely
-const condition = positionLocal.x.greaterThan( float( 0.0 ) );
+	const coord = uv().mul( scale );
+	const f = fract( coord.x );
+	const fw = fwidth( coord.x ); // Screen-space derivative across neighbor pixels in 2x2 quad
+	return f.div( fw.mul( 100.0 ) ).clamp( 0.0, 1.0 );
 
-If( condition, () => {
+};
 
-	model.material.colorNode = darkBase.add( cyan.mul( ripple ) );
+const patternA = stripePattern( float( 10.0 ) );
+const patternB = stripePattern( float( 25.0 ) );
 
-} ).Else( () => {
+const cyan = color( 0x00f0ff ).mul( patternA );
+const magenta = color( 0xff0055 ).mul( patternB );
 
-	model.material.colorNode = darkBase.add( magenta.mul( ripple ) );
+// 3. select() with uniformFlow():
+// - WITH uniformFlow(): quad threads evaluate derivatives synchronously in uniform scope (clean boundary)
+// - WITHOUT uniformFlow(): quad threads diverge across the split, corrupting the derivative along the boundary seam
+const finalColor = select( condition, cyan, magenta ).uniformFlow();
 
-} );
+// 4. Assign to plane material
+plane.material.colorNode = finalColor.debug();
+```
 
-model.material.roughness = 0.2;
-model.material.metalness = 0.8;
+</page>
+
+<page name="Builtin Context">
+
+TSL provides pre-built context helpers such as **`builtinAOContext()`** and **`builtinShadowContext()`** to quickly modify ambient occlusion and lighting shadow behavior across a material or node sub-graph without manually writing custom `getAO` or `getShadow` context handler objects.
+
+::: api builtinAOContext( aoNode, node = null ) : ContextNode - Intercepts `getAO` to modulate ambient occlusion for non-transparent materials by `aoNode`.
+- **aoNode**: `Node` - The ambient occlusion node to multiply.
+- **node**: `Node` - Optional node expression to wrap with this AO context. Defaults to `null`.
+:::
+
+::: api .builtinAOContext( aoNode ) : ContextNode - Method chaining helper to wrap the current node expression with a built-in AO context. :::
+
+::: api builtinShadowContext( shadowNode, light, node = null ) : ContextNode - Intercepts `getShadow` to modulate the shadow color of a specific light by `shadowNode`.
+- **shadowNode**: `Node` - The shadow modulation node.
+- **light**: `Light` - The target light whose shadow should be modulated.
+- **node**: `Node` - Optional node expression to wrap with this shadow context. Defaults to `null`.
+:::
+
+::: api .builtinShadowContext( shadowNode, light ) : ContextNode - Method chaining helper to wrap the current node expression with a built-in shadow context. :::
+
+### Example
+
+```js
+import { builtinAOContext } from 'three/tsl';
+
+// Modulate global ambient occlusion and shadow for the material
+myPass.contextNode = builtinAOContext( screenSpaceAO ).builtinShadowContext( screenSpaceShadow, dirLight );
 ```
 
 </page>
@@ -3168,7 +3180,7 @@ scene.add( particles );
 ```
 
 ```tsl computeWorkgroup
-import 'scenes/empty';
+import 'scenes/plane';
 import * as THREE from 'three';
 import { Fn, workgroupArray, workgroupBarrier, localId, instanceIndex, uvec2, vec3, vec4, float, uint, time, texture, textureStore } from 'three/tsl';
 
@@ -3221,14 +3233,8 @@ export function update() {
 
 }
 
-// 5. Create a Plane in the scene and map the storage texture
-const geometry = new THREE.PlaneGeometry( 3, 3 );
-const material = new THREE.MeshBasicNodeMaterial( { side: THREE.DoubleSide } );
-material.colorNode = texture( storageTex );
-
-const plane = new THREE.Mesh( geometry, material );
-plane.position.set( 0, 1.5, 0 );
-scene.add( plane );
+// 5. Display the storage texture on the plane
+plane.material.colorNode = texture( storageTex );
 ```
 
 #### Related
@@ -5264,6 +5270,92 @@ scene.add( spotLight );
 
 // Set camera perspective further back to capture the whole area and shadows
 camera.position.set( 0, 3.0, 8.0 );
+```
+
+</page>
+
+<page name="UV">
+
+TSL provides dedicated utility functions for transforming 2D UV texture coordinates, such as rotating around pivot centers and applying spherical lens distortion.
+
+<code name="uvExample" default="true">UV Manipulation</code>
+
+::: api rotateUV( uv, rotation, center? ) : vec2 - Rotates the given UV coordinates around a specified 2D center point.
+- **uv**: `vec2` - The UV coordinates to rotate.
+- **rotation**: `float` - The rotation angle defined in radians.
+- **center**: `vec2` - (Optional) The pivot center of rotation. Defaults to `vec2( 0.5, 0.5 )`.
+:::
+
+::: api spherizeUV( uv, strength, center? ) : vec2 - Applies a spherical warping (fisheye / lens bulge) effect to the given UV coordinates.
+- **uv**: `vec2` - The UV coordinates.
+- **strength**: `float` - The strength and direction of the spherical warping effect.
+- **center**: `vec2` - (Optional) The center point of the spherical distortion. Defaults to `vec2( 0.5, 0.5 )`.
+:::
+
+### Replace Default UV
+
+`replaceDefaultUV()` creates a context that intercepts and overrides default UV coordinates for all textures within a material or node sub-graph.
+
+<code name="replaceDefaultUVExample">Replace Default UV</code>
+
+::: api replaceDefaultUV( callback, node = null ) : ContextNode - Replaces the default UV coordinates used in texture lookups across a material or sub-graph.
+- **callback**: `Function(Node): Node<vec2> | Node<vec2>` - A callback receiving the texture node and returning the new UV coordinates, or a replacement UV node directly.
+- **node**: `Node` - (Optional) An optional target node to which the context will be applied. Defaults to `null`.
+:::
+
+### Example
+
+```js
+import { rotateUV, replaceDefaultUV, materialColor, uv, time, vec2 } from 'three/tsl';
+
+// 1. Assign standard texture map
+material.map = myTexture;
+
+// 2. Override default UV coordinates for materialColor
+material.colorNode = replaceDefaultUV( rotateUV( uv(), time, vec2( 0.5 ) ), materialColor );
+```
+
+```tsl replaceDefaultUVExample
+import 'scenes/plane';
+import * as THREE from 'three';
+import { uv, time, rotateUV, replaceDefaultUV, materialColor, vec2 } from 'three/tsl';
+
+// Load texture map
+const map = new THREE.TextureLoader().load( '../examples/textures/uv_grid_opengl.jpg' );
+map.wrapS = THREE.RepeatWrapping;
+map.wrapT = THREE.RepeatWrapping;
+
+// 1. Assign texture map to the plane material
+plane.material.map = map;
+
+// 2. Continuous rotation angle
+const angle = time.mul( 0.5 );
+
+// 3. Override default UVs for materialColor
+plane.material.colorNode = replaceDefaultUV( rotateUV( uv().mul( 2.0 ), angle, vec2( 0.5 ) ), materialColor );
+```
+
+```tsl uvExample
+import 'scenes/plane';
+import * as THREE from 'three';
+import { uv, time, texture, rotateUV, spherizeUV, vec2 } from 'three/tsl';
+
+// Load texture map
+const map = new THREE.TextureLoader().load( '../examples/textures/uv_grid_opengl.jpg' );
+map.wrapS = THREE.RepeatWrapping;
+map.wrapT = THREE.RepeatWrapping;
+
+// 1. Continuous rotation angle in radians
+const angle = time.mul( 0.5 );
+
+// 2. Dynamic pulsating spherical warp strength
+const strength = time.mul( 2.0 ).sin().mul( 1.2 );
+
+// 3. Rotate UV coordinates and apply spherical lens distortion
+const transformedUV = spherizeUV( rotateUV( uv().mul( 2.0 ), angle, vec2( 0.5 ) ), strength, vec2( 0.5 ) );
+
+// 4. Sample texture on the plane material
+plane.material.colorNode = texture( map, transformedUV );
 ```
 
 </page>
