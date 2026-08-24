@@ -47,13 +47,8 @@ import {
 import { SH_BAND_COMPONENTS, SH_BAND_WORDS } from './GaussianSplatUtils.js';
 
 /**
- * Shading, geometry and buffer-layout logic shared by {@link GaussianSplat}
- * (one self-contained splat cloud) and {@link GaussianSplatGroup} (many splat
- * clouds packed into one shared buffer set and sorted together). Neither class
- * depends on the other; this module is what they both depend on instead, so
- * the splat rendering algorithm - the vertex/fragment shading, the per-splat
- * source storage buffer layout, and the spherical harmonics math - exists in
- * exactly one place.
+ * Geometry, storage buffers, and NodeMaterial shading shared by
+ * {@link GaussianSplat} and {@link GaussianSplatGroup}.
  */
 
 const BIN_COUNT = 4096;
@@ -78,10 +73,38 @@ const _worldCenter = /*@__PURE__*/ new Vector3();
 const _viewCenter = /*@__PURE__*/ new Vector3();
 const _worldScale = /*@__PURE__*/ new Vector3();
 
+function packSplatStorage( centerArray, covarianceArray, colorArray, sourceIndex, targetIndex, positions, covariances, colors, recordIndex = 0 ) {
+
+	const source3 = sourceIndex * 3;
+	const source4 = sourceIndex * 4;
+	const source6 = sourceIndex * 6;
+	const target4 = targetIndex * 4;
+	const target8 = targetIndex * 8;
+
+	centerArray[ target4 ] = positions[ source3 ];
+	centerArray[ target4 + 1 ] = positions[ source3 + 1 ];
+	centerArray[ target4 + 2 ] = positions[ source3 + 2 ];
+	centerArray[ target4 + 3 ] = recordIndex;
+
+	covarianceArray[ target8 ] = covariances[ source6 ];
+	covarianceArray[ target8 + 1 ] = covariances[ source6 + 1 ];
+	covarianceArray[ target8 + 2 ] = covariances[ source6 + 2 ];
+	covarianceArray[ target8 + 3 ] = covariances[ source6 + 3 ];
+	covarianceArray[ target8 + 4 ] = covariances[ source6 + 4 ];
+	covarianceArray[ target8 + 5 ] = covariances[ source6 + 5 ];
+	covarianceArray[ target8 + 6 ] = 0;
+	covarianceArray[ target8 + 7 ] = 0;
+
+	colorArray[ targetIndex ] = ( colors[ source4 ] |
+		colors[ source4 + 1 ] << 8 |
+		colors[ source4 + 2 ] << 16 |
+		colors[ source4 + 3 ] << 24 ) >>> 0;
+
+}
+
 /**
- * Whether the camera has rotated relative to `worldMatrix` enough, since
- * `lastSortDirection`, to warrant a new sort. Shared by {@link GaussianSplat}
- * and {@link GaussianSplatGroup}, whose sort scheduling is otherwise identical.
+ * Returns whether the camera has turned far enough since the last sort to
+ * need a new one.
  *
  * @param {Camera} camera - The camera used for rendering.
  * @param {Matrix4} worldMatrix - The world matrix of the splat cloud or group.
@@ -100,9 +123,7 @@ function needsSort( camera, worldMatrix, lastSortDirection ) {
 }
 
 /**
- * Records the view direction used for the sort just dispatched, so the next
- * {@link needsSort} call can measure how far the camera has turned since.
- * Must be called only after a {@link needsSort} call for the same frame.
+ * Stores the view direction of the sort just issued. Call after {@link needsSort}.
  *
  * @param {Vector3} lastSortDirection - Updated in place to the current sort direction.
  */
@@ -113,9 +134,7 @@ function updateLastSortDirection( lastSortDirection ) {
 }
 
 /**
- * Recomputes the near/far depth range - in view space, along the sort direction -
- * spanned by a splat cloud's bounding sphere, and writes it into a `vec2` sort
- * uniform value as `( near, far )`.
+ * Writes the view-space near/far depth of `boundingSphere` into `sortDepthRangeValue` as `( near, far )`.
  *
  * @param {Camera} camera - The camera used for rendering.
  * @param {Matrix4} worldMatrix - The world matrix of the splat cloud or group.
@@ -139,9 +158,9 @@ function updateSortDepthRange( camera, worldMatrix, boundingSphere, sortDepthRan
 }
 
 /**
- * Builds the shared instanced quad geometry drawn once per splat.
+ * Creates the instanced quad drawn once per splat.
  *
- * @param {number} count - The number of splats (instances) to draw.
+ * @param {number} count - The number of splats to draw.
  * @return {InstancedBufferGeometry} The geometry.
  */
 function createGeometry( count ) {
@@ -161,19 +180,14 @@ function createGeometry( count ) {
 }
 
 /**
- * Packs raw splat attribute arrays into the read-only GPU storage buffers used
- * by both {@link createMaterialNodes} (rendering) and the merge kernels built
- * by `GaussianSplatGroup` (cross-instance merging). This is the per-splat
- * source data layout - `centerRead`/`covarianceRead`/`colorRead`
- * plus, for degree > 0, one `sphericalHarmonics{1,2,3}Read` per
- * band actually present.
+ * Packs splat attribute arrays into the GPU storage buffers used for shading.
  *
  * @param {number} count - The number of splats.
  * @param {Float32Array} centers - Splat centers, 3 floats per splat.
  * @param {Float32Array} covariances - Splat covariances, 6 floats per splat (upper triangle).
  * @param {Uint8Array|Uint8ClampedArray} colors - Splat RGBA colors, 4 bytes per splat.
  * @param {Object} [sphericalHarmonics={}] - `{ degree, sh1, sh2, sh3 }`, packed uint32 SH bands.
- * @return {Object} The storage buffer state - see the class documentation of `GaussianSplat`/`GaussianSplatGroup`.
+ * @return {Object} The storage buffer state used by {@link GaussianSplat} and {@link GaussianSplatGroup}.
  */
 function createStorageBuffers( count, centers, covariances, colors, sphericalHarmonics = {} ) {
 
@@ -184,26 +198,7 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 
 	for ( let i = 0; i < count; i ++ ) {
 
-		const i3 = i * 3;
-		const i4 = i * 4;
-		const i6 = i * 6;
-		const i8 = i * 8;
-
-		centerData[ i4 ] = centers[ i3 ];
-		centerData[ i4 + 1 ] = centers[ i3 + 1 ];
-		centerData[ i4 + 2 ] = centers[ i3 + 2 ];
-
-		covarianceData[ i8 ] = covariances[ i6 ];
-		covarianceData[ i8 + 1 ] = covariances[ i6 + 1 ];
-		covarianceData[ i8 + 2 ] = covariances[ i6 + 2 ];
-		covarianceData[ i8 + 3 ] = covariances[ i6 + 3 ];
-		covarianceData[ i8 + 4 ] = covariances[ i6 + 4 ];
-		covarianceData[ i8 + 5 ] = covariances[ i6 + 5 ];
-
-		colorData[ i ] = ( colors[ i4 ] |
-			colors[ i4 + 1 ] << 8 |
-			colors[ i4 + 2 ] << 16 |
-			colors[ i4 + 3 ] << 24 ) >>> 0;
+		packSplatStorage( centerData, covarianceData, colorData, i, i, centers, covariances, colors );
 
 	}
 
