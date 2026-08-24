@@ -6874,7 +6874,7 @@ In TSL, **Vertex Stage** and **Fragment Stage** are resolved automatically by th
 | `uniform float time` | `uniform float time` | `time` |
 | - | `cameraPosition` | `cameraPosition` |
 | - | `texture2D( map, uv )` | `texture( map, uv() )` |
-| - | `discard;` | `Discard()` / `discard()` |
+| - | `discard;` | `Discard()` / `.discard()` |
 | - | `dFdx()`, `dFdy()` | `dFdx()`, `dFdy()` |
 
 </page>
