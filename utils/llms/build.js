@@ -7,7 +7,7 @@ const packageJson = JSON.parse( fs.readFileSync( 'package.json', 'utf8' ) );
 const version = packageJson.version;
 
 // Read TSL specification
-const tslSpec = fs.readFileSync( 'docs/TSL.md', 'utf8' );
+const tslSpec = fs.readFileSync( 'tsl/content/Tour.md', 'utf8' );
 
 // Setup Turndown for HTML to Markdown conversion
 const turndown = new TurndownService( {
