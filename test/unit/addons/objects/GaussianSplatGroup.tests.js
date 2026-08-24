@@ -2,8 +2,7 @@ import { createGaussianSplatGeometry } from '../../../../examples/jsm/utils/Gaus
 import { GaussianSplatGroup } from '../../../../examples/jsm/objects/GaussianSplatGroup.js';
 
 // Builds a minimal splat cloud geometry with `count` splats - real enough to drive
-// `GaussianSplatGroup`'s buffer bookkeeping without needing a GPU (these tests never call
-// `onBeforeRender`/`renderer.compute`, only the CPU-side layout/capacity logic).
+// `GaussianSplatGroup`'s buffer bookkeeping and CPU fallback logic without needing a GPU.
 function createTestSplatGeometry( count ) {
 
 	const centers = new Float32Array( count * 3 );
@@ -280,6 +279,53 @@ export default QUnit.module( 'Addons', () => {
 
 				assert.strictEqual( dispatchedKernel, clearKernel, 'the degree-zero clearing kernel is dispatched' );
 				assert.false( record.shDirty, 'the shared slots are marked clean after clearing' );
+
+				group.dispose();
+
+			} );
+
+			QUnit.test( 'WebGL backend mirrors centers on CPU and keeps GPU merge for the grouped draw', ( assert ) => {
+
+				const group = new GaussianSplatGroup();
+				const id = group.addSplat( createGaussianSplatGeometry(
+					new Float32Array( [ 1, 2, 3 ] ),
+					new Float32Array( [ 1, 0, 0, 1, 0, 1 ] ),
+					new Uint8Array( [ 10, 20, 30, 255 ] )
+				) );
+				const matrix = group.matrixWorld.clone().makeTranslation( 4, 5, 6 );
+				let computeCalls = 0;
+				let sorted = false;
+
+				group.setMatrixAt( id, matrix );
+				sync( group );
+
+				group._updateSphericalHarmonicsCPU = () => {};
+
+				group._needsSort = () => false;
+
+				group._updateSortUniforms = () => {};
+
+				group._sortCPU = () => {
+
+					sorted = true;
+
+				};
+
+				group.onBeforeRender( {
+					backend: { isWebGLBackend: true },
+					compute() {
+
+						computeCalls ++;
+
+					}
+				}, null, {} );
+
+				const centers = group._sortCenters;
+
+				assert.strictEqual( computeCalls, 2, 'the existing transform and color merge kernels still run' );
+				assert.deepEqual( Array.from( centers.slice( 0, 4 ) ), [ 5, 7, 9, 0 ], 'transformed centers are mirrored on the CPU for sorting' );
+				assert.true( group._buffers.webGLBuffersEnabled, 'the merged buffers are enabled for WebGL reads' );
+				assert.true( sorted, 'the shared sort is performed on the CPU' );
 
 				group.dispose();
 

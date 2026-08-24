@@ -4,6 +4,7 @@ import {
 	Mesh,
 	Ray,
 	Sphere,
+	DynamicDrawUsage,
 	StorageBufferAttribute,
 	Vector2,
 	Vector3
@@ -23,6 +24,7 @@ import {
 	createMaterialNodes,
 	createStorageBuffers,
 	disposeStorageBuffers,
+	enableWebGLBuffers,
 	needsSort,
 	updateLastSortDirection,
 	updateSortDepthRange
@@ -90,8 +92,8 @@ class SplatRecord {
  * with each other: each cloud sorting and drawing itself independently cannot produce a
  * globally correct back-to-front order across clouds.
  *
- * `GaussianSplatGroup` owns its splat data directly - the same model {@link BatchedMesh}
- * uses for merging many geometries into one draw call:
+ * Add each source geometry with {@link GaussianSplatGroup#addSplat}, then set its
+ * transform with {@link GaussianSplatGroup#setMatrixAt}:
  *
  * ```js
  * const group = new GaussianSplatGroup();
@@ -114,15 +116,17 @@ class SplatRecord {
  *
  * `setMatrixAt` only re-merges the moved splat cloud. `addSplat`, `deleteSplat` and
  * `setVisibleAt` change which ranges are packed into the shared buffers, so they trigger a
- * full rebuild (every included splat cloud re-merges) on the next render.
+ * full rebuild (every visible splat cloud re-merges) on the next render. With real WebGPU
+ * these updates run as compute passes. With the WebGL2 fallback backend, the render buffers
+ * are merged with transform feedback while JavaScript mirrors transformed centers for the
+ * CPU sort.
  *
- * The practical ceiling on total live splats is set by the `maxStorageBufferBindingSize`
- * WebGPU limit; design/test against roughly 8-16M total live splats as a target that works
- * on effectively all WebGPU hardware.
+ * The practical ceiling on total live splats is set by the renderer's storage buffer size
+ * limit; roughly 8-16M live splats is a portable target for WebGPU hardware.
  *
- * This class requires {@link WebGPURenderer} with real WebGPU compute support - the
- * `forceWebGL` (WebGL2) backend is not yet supported, and `onBeforeRender` throws if used
- * with it. Use independent {@link GaussianSplat} instances on WebGL2 instead.
+ * This class requires {@link WebGPURenderer}. Its `forceWebGL` (WebGL2) fallback backend is
+ * supported, but sorting runs on the CPU there, so large splat groups are expected to be
+ * significantly slower than on WebGPU.
  *
  * @augments Mesh
  * @three_import import { GaussianSplatGroup } from 'three/addons/objects/GaussianSplatGroup.js';
@@ -142,10 +146,8 @@ class GaussianSplatGroup extends Mesh {
 
 		const geometry = createGeometry( 0 );
 
-		// Built with real (if empty) buffers/sort, so the group is safe to compile and draw -
-		// 0 instances, nothing visible - from construction. This is what lets `visible` stay
-		// a normal, user-owned Object3D property, with no internal flipping on/off needed
-		// (see `onBeforeRender`).
+		// Start with empty draw buffers so the group can be added to a scene before any
+		// splat clouds are loaded.
 		const buffers = createGroupBufferState();
 
 		if ( initialSize !== undefined && initialSize > 0 ) resizeGroupBufferState( buffers, initialSize );
@@ -196,8 +198,7 @@ class GaussianSplatGroup extends Mesh {
 		/**
 		 * The bounding box of the merged splats, in this group's local space. Not computed
 		 * by default - call {@link GaussianSplatGroup#computeBoundingBox} explicitly, or
-		 * read {@link GaussianSplatGroup#boundingSphere}, otherwise it stays `null`. Matches
-		 * {@link BatchedMesh#boundingBox}, the class this one otherwise mirrors.
+		 * read {@link GaussianSplatGroup#boundingSphere}, otherwise it stays `null`.
 		 *
 		 * @type {?Box3}
 		 * @default null
@@ -207,8 +208,7 @@ class GaussianSplatGroup extends Mesh {
 		/**
 		 * The bounding sphere of the merged splats, in this group's local space. Not computed
 		 * by default - call {@link GaussianSplatGroup#computeBoundingSphere} explicitly,
-		 * otherwise it stays `null`. Matches {@link BatchedMesh#boundingSphere}, the class
-		 * this one otherwise mirrors.
+		 * otherwise it stays `null`.
 		 *
 		 * @type {?Sphere}
 		 * @default null
@@ -218,7 +218,6 @@ class GaussianSplatGroup extends Mesh {
 		this._splatCount = 0;
 		this._maxSphericalHarmonicsDegree = 0;
 
-		// All three live for the group's entire lifetime - see the class documentation.
 		this._buffers = buffers;
 		this._mergeKernels = createMergeKernelSet( this._buffers, this.workgroupSize );
 
@@ -226,6 +225,7 @@ class GaussianSplatGroup extends Mesh {
 		this._sortDepthRange = uniform( new Vector2( 0, 1 ) );
 
 		this._sort = sort;
+		this._sortCenters = new Float32Array( Math.max( 1, this._buffers.capacity ) * 4 );
 		this._sort.setBinNode( () => {
 
 			const center = this._buffers.centerRead.element( instanceIndex ).xyz.toVar( 'center' );
@@ -242,10 +242,8 @@ class GaussianSplatGroup extends Mesh {
 		this._records = new Map();
 		this._nextId = 0;
 
-		// Set by addSplat/deleteSplat/setVisibleAt: which splat ranges are packed into the
-		// shared buffers, and at what offsets, changes - so every included instance needs
-		// re-merging. setMatrixAt does NOT set this; it only marks that one instance dirty,
-		// since moving one splat cloud doesn't change anyone else's offset.
+		// Set when visible splat ranges or offsets change. Matrix changes only mark the
+		// affected record dirty because other records keep their offsets.
 		this._layoutDirty = true;
 
 		this._sortValid = false;
@@ -257,8 +255,7 @@ class GaussianSplatGroup extends Mesh {
 
 		this._boundsDirty = true;
 
-		// Unused placeholder required by `createMaterialNodes()`'s signature; the group only
-		// ever uses the precomputed-spherical-harmonics vertex node (see `_rebuildMaterial`).
+		// Required by `createMaterialNodes()`; grouped splats use precomputed SH contribution.
 		this._localCameraPosition = localCameraPosition;
 
 	}
@@ -347,7 +344,7 @@ class GaussianSplatGroup extends Mesh {
 	/**
 	 * Sets whether a splat cloud is drawn. Unlike {@link GaussianSplatGroup#setMatrixAt},
 	 * this changes which splat ranges are packed into the shared buffers, so it triggers a
-	 * full layout rebuild (every included splat cloud re-merges) on the next render.
+	 * full layout rebuild (every visible splat cloud re-merges) on the next render.
 	 *
 	 * @param {number} id - The id returned by {@link GaussianSplatGroup#addSplat}.
 	 * @param {boolean} visible - Whether to draw this splat cloud.
@@ -392,7 +389,7 @@ class GaussianSplatGroup extends Mesh {
 	}
 
 	/**
-	 * The number of live (included, i.e. added and visible) splats currently merged into
+	 * The number of live (added and visible) splats currently merged into
 	 * the group's shared buffers. Not to be confused with the inherited {@link Mesh#count}
 	 * draw-call instance count, which this class manages internally.
 	 *
@@ -437,18 +434,19 @@ class GaussianSplatGroup extends Mesh {
 	 */
 	onBeforeRender( renderer, scene, camera ) {
 
-		if ( renderer.backend && renderer.backend.isWebGLBackend === true ) {
-
-			throw new Error( 'THREE.GaussianSplatGroup: the WebGL2 (forceWebGL) backend is not yet supported - see the class documentation. Use independent GaussianSplat instances instead.' );
-
-		}
-
 		if ( this._layoutDirty === true ) this._rebuildLayout();
 
-		// `visible` is left alone here - it's plain user-owned Object3D state. With nothing
-		// included, `geometry.instanceCount` is already 0 (see `_rebuildLayout`), which alone
-		// is enough to draw nothing.
+		// Keep Object3D.visible user-controlled; an empty group draws zero instances.
 		if ( this._splatCount === 0 ) return;
+
+		const isWebGLBackend = renderer.backend && renderer.backend.isWebGLBackend === true;
+
+		if ( isWebGLBackend === true ) {
+
+			enableGroupWebGLBuffers( this._buffers );
+			this._sort.enableWebGLBuffers();
+
+		}
 
 		this.updateWorldMatrix( true, false );
 
@@ -458,24 +456,49 @@ class GaussianSplatGroup extends Mesh {
 
 			if ( record.visible === false || record.mergeDirty === false ) continue;
 
-			this._dispatchInstanceMerge( renderer, record );
+			if ( isWebGLBackend === true ) {
+
+				enableWebGLBuffers( record.buffers );
+				this._dispatchInstanceMerge( renderer, record );
+				this._mergeCentersCPU( record );
+
+			} else {
+
+				this._dispatchInstanceMerge( renderer, record );
+
+			}
 
 			record.mergeDirty = false;
 			mergedAny = true;
 
 		}
 
-		this._updateSphericalHarmonics( renderer, camera );
+		if ( isWebGLBackend === true ) {
 
-		// `_needsSort` must run even when another condition already forces a sort because
-		// `updateLastSortDirection` records the direction calculated by that call.
+			this._updateSphericalHarmonicsCPU( camera );
+
+		} else {
+
+			this._updateSphericalHarmonics( renderer, camera );
+
+		}
+
+		// Refresh the current view direction before recording it after a sort.
 		const directionChanged = this._needsSort( camera );
 		const needsResort = this._sortValid === false || mergedAny === true || directionChanged === true;
 
 		if ( needsResort === true ) {
 
 			this._updateSortUniforms( camera );
-			this._sort.compute( renderer );
+			if ( isWebGLBackend === true ) {
+
+				this._sortCPU();
+
+			} else {
+
+				this._sort.compute( renderer );
+
+			}
 
 			this._sortValid = true;
 			updateLastSortDirection( this._lastSortDirection );
@@ -486,7 +509,7 @@ class GaussianSplatGroup extends Mesh {
 
 	/**
 	 * Computes the bounding box of the merged splats, in this group's local space,
-	 * as the union of each included splat cloud's own geometry bounding box transformed
+	 * as the union of each visible splat cloud's own geometry bounding box transformed
 	 * by that cloud's {@link GaussianSplatGroup#setMatrixAt} transform.
 	 */
 	computeBoundingBox() {
@@ -630,9 +653,7 @@ class GaussianSplatGroup extends Mesh {
 
 		const requiredCapacity = Math.max( 1, total );
 
-		// `autoCompact` (see the constructor) decides whether shrinking is automatic: `true`
-		// resizes to exactly fit on every change (grow or shrink), `false` only ever grows -
-		// see `compact()` for the manual shrink path.
+		// autoCompact controls whether capacity shrinks automatically or only via compact().
 		if ( this.autoCompact === true ? requiredCapacity !== this._buffers.capacity : requiredCapacity > this._buffers.capacity ) {
 
 			this._resizeBuffers( requiredCapacity );
@@ -650,12 +671,8 @@ class GaussianSplatGroup extends Mesh {
 
 		if ( maxDegree > 0 ) ensureSphericalHarmonicsContributionNodes( this._buffers );
 
-		// The vertex/fragment node graphs bake `sphericalHarmonicsDegree > 0` in as a JS-level
-		// branch (see `createMaterialNodes`), so the material only needs rebuilding - forcing a
-		// shader/pipeline recompile - when that degree actually changes. Every other layout
-		// change (adding/removing/hiding a splat cloud without changing the merged set's max SH
-		// degree) can reuse the existing material as-is: its storage nodes already track the
-		// group's buffers by reference, and are repointed in place by `resizeGroupBufferState`.
+		// The material graph depends on whether the merged set uses spherical harmonics.
+		// Other layout changes can reuse the existing storage nodes.
 		const degreeChanged = maxDegree !== this._maxSphericalHarmonicsDegree;
 
 		this._maxSphericalHarmonicsDegree = maxDegree;
@@ -667,12 +684,7 @@ class GaussianSplatGroup extends Mesh {
 
 			if ( record.visible === false ) continue;
 
-			// Offsets may have shifted for any visible record, even ones whose own
-			// transform didn't change - always remerge on a layout rebuild. This also has to
-			// force a spherical harmonics recompute even when the offset happens to land back
-			// on the same value it had before: while hidden, its old
-			// slots in the shared SH contribution buffer are fair game for a different instance
-			// to reuse.
+			// Offsets define where each cloud writes into the shared buffers.
 			record.setOffset( offset );
 
 			offset += record.count;
@@ -693,14 +705,12 @@ class GaussianSplatGroup extends Mesh {
 
 	}
 
-	// Reallocates the shared buffers to `capacity` and marks every visible record for a full
-	// transform/color merge and spherical harmonics update, since
-	// `resizeGroupBufferState` allocates fresh, zeroed buffers rather than copying old
-	// contents forward (the group's buffers are a derived cache, not owned data - see the
-	// class documentation).
+	// Shared buffers are derived from the source splat clouds, so resizing invalidates every
+	// visible record's merged data.
 	_resizeBuffers( capacity ) {
 
 		resizeGroupBufferState( this._buffers, capacity );
+		this._sortCenters = new Float32Array( capacity * 4 );
 
 		for ( const record of this._records.values() ) {
 
@@ -747,6 +757,30 @@ class GaussianSplatGroup extends Mesh {
 
 		kernels.colorKernel.count = record.count;
 		renderer.compute( kernels.colorKernel );
+
+	}
+
+	_mergeCentersCPU( record ) {
+
+		const sourceCenter = record.buffers.centerRead.value.array;
+		const targetCenter = this._sortCenters;
+		const e = record.matrix.elements;
+
+		for ( let i = 0; i < record.count; i ++ ) {
+
+			const sourceIndex = i * 4;
+			const targetSplat = record.offset + i;
+			const targetIndex = targetSplat * 4;
+			const x = sourceCenter[ sourceIndex ];
+			const y = sourceCenter[ sourceIndex + 1 ];
+			const z = sourceCenter[ sourceIndex + 2 ];
+
+			targetCenter[ targetIndex ] = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ] * z + e[ 12 ];
+			targetCenter[ targetIndex + 1 ] = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ] * z + e[ 13 ];
+			targetCenter[ targetIndex + 2 ] = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ];
+			targetCenter[ targetIndex + 3 ] = 0;
+
+		}
 
 	}
 
@@ -806,6 +840,69 @@ class GaussianSplatGroup extends Mesh {
 
 	}
 
+	_updateSphericalHarmonicsCPU( camera ) {
+
+		if ( this._maxSphericalHarmonicsDegree === 0 ) return;
+
+		const contribution = this._buffers.sphericalHarmonicsContributionAttribute.array;
+		let updated = false;
+
+		_groupWorldMatrixInverse.copy( this.matrixWorld ).invert();
+		_cameraPositionInGroup.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _groupWorldMatrixInverse );
+
+		const viewChanged = this._sphericalHarmonicsInitialized === false ||
+			camera.matrixWorld.equals( this._lastSHCameraMatrix ) === false ||
+			this.matrixWorld.equals( this._lastSHGroupWorldMatrix ) === false;
+
+		for ( const record of this._records.values() ) {
+
+			if ( record.visible === false ) continue;
+
+			const degree = record.sphericalHarmonicsDegree;
+
+			if ( record.shDirty === false && ( degree === 0 || viewChanged === false ) ) continue;
+
+			if ( degree > 0 ) {
+
+				_instanceMatrixInverse.copy( record.matrix ).invert();
+				record.shLocalCameraPosition.copy( _cameraPositionInGroup ).applyMatrix4( _instanceMatrixInverse );
+
+			}
+
+			const center = record.buffers.centerRead.value.array;
+
+			for ( let i = 0; i < record.count; i ++ ) {
+
+				const targetIndex = ( record.offset + i ) * 4;
+
+				if ( degree === 0 ) {
+
+					contribution[ targetIndex ] = 0;
+					contribution[ targetIndex + 1 ] = 0;
+					contribution[ targetIndex + 2 ] = 0;
+					contribution[ targetIndex + 3 ] = 0;
+
+				} else {
+
+					evaluateSphericalHarmonicsCPU( record.buffers, i, center, record.shLocalCameraPosition, contribution, targetIndex );
+
+				}
+
+			}
+
+			record.shDirty = false;
+			updated = true;
+
+		}
+
+		if ( updated === true ) updateStorageAttribute( this._buffers.sphericalHarmonicsContributionAttribute );
+
+		this._lastSHCameraMatrix.copy( camera.matrixWorld );
+		this._lastSHGroupWorldMatrix.copy( this.matrixWorld );
+		this._sphericalHarmonicsInitialized = true;
+
+	}
+
 	_needsSort( camera ) {
 
 		return needsSort( camera, this.matrixWorld, this._lastSortDirection );
@@ -822,9 +919,160 @@ class GaussianSplatGroup extends Mesh {
 
 	}
 
+	_sortCPU() {
+
+		const centers = this._sortCenters;
+		const matrix = this._sortMatrix.value.elements;
+		const nearDepth = this._sortDepthRange.value.x;
+		const range = Math.max( this._sortDepthRange.value.y - nearDepth, 0.0001 );
+		const scale = ( this.binCount - 1 ) / range;
+
+		this._sort.computeCPU( ( i ) => {
+
+			const i4 = i * 4;
+			const depth = - ( matrix[ 2 ] * centers[ i4 ] + matrix[ 6 ] * centers[ i4 + 1 ] + matrix[ 10 ] * centers[ i4 + 2 ] + matrix[ 14 ] );
+			const depthBin = Math.min( this.binCount - 1, Math.max( 0, Math.floor( ( depth - nearDepth ) * scale ) ) );
+
+			return this.binCount - 1 - depthBin;
+
+		} );
+
+	}
+
 }
 
-// 1-element placeholder, replaced once real data is available.
+function updateStorageAttribute( attribute ) {
+
+	attribute.needsUpdate = true;
+
+	if ( attribute.pbo !== undefined ) attribute.pbo.needsUpdate = true;
+
+}
+
+function enableGroupWebGLBuffers( state ) {
+
+	if ( state.webGLBuffersEnabled === true ) return;
+
+	state.centerAttribute.setUsage( DynamicDrawUsage );
+	state.covarianceAAttribute.setUsage( DynamicDrawUsage );
+	state.covarianceBAttribute.setUsage( DynamicDrawUsage );
+	state.colorAttribute.setUsage( DynamicDrawUsage );
+
+	state.centerRead.setPBO( true );
+	state.covarianceARead.setPBO( true );
+	state.covarianceBRead.setPBO( true );
+	state.colorRead.setPBO( true );
+
+	if ( state.sphericalHarmonicsContributionAttribute !== null ) {
+
+		state.sphericalHarmonicsContributionAttribute.setUsage( DynamicDrawUsage );
+		state.sphericalHarmonicsContributionRead.setPBO( true );
+
+	}
+
+	state.webGLBuffersEnabled = true;
+
+}
+
+function unpackSphericalHarmonicsCoefficientCPU( words, component ) {
+
+	const packed = words[ component >> 2 ];
+	const byte = ( packed >> ( ( component & 3 ) * 8 ) ) & 0xff;
+
+	return ( byte - 128 ) / 128;
+
+}
+
+function accumulateSphericalHarmonicsBandCPU( band, componentCount, weights, target, targetIndex ) {
+
+	for ( let i = 0; i < componentCount / 3; i ++ ) {
+
+		const weight = weights[ i ];
+		const coefficientIndex = i * 3;
+
+		target[ targetIndex ] += unpackSphericalHarmonicsCoefficientCPU( band, coefficientIndex ) * weight;
+		target[ targetIndex + 1 ] += unpackSphericalHarmonicsCoefficientCPU( band, coefficientIndex + 1 ) * weight;
+		target[ targetIndex + 2 ] += unpackSphericalHarmonicsCoefficientCPU( band, coefficientIndex + 2 ) * weight;
+
+	}
+
+}
+
+function evaluateSphericalHarmonicsCPU( buffers, splatIndex, center, localCameraPosition, target, targetIndex ) {
+
+	const centerIndex = splatIndex * 4;
+	let x = center[ centerIndex ] - localCameraPosition.x;
+	let y = center[ centerIndex + 1 ] - localCameraPosition.y;
+	let z = center[ centerIndex + 2 ] - localCameraPosition.z;
+	const length = Math.sqrt( x * x + y * y + z * z );
+
+	if ( length > 0 ) {
+
+		x /= length;
+		y /= length;
+		z /= length;
+
+	}
+
+	target[ targetIndex ] = 0;
+	target[ targetIndex + 1 ] = 0;
+	target[ targetIndex + 2 ] = 0;
+	target[ targetIndex + 3 ] = 0;
+
+	const sh1 = buffers.sphericalHarmonics1Read.value.array.subarray(
+		splatIndex * SH_BAND_WORDS[ 1 ],
+		( splatIndex + 1 ) * SH_BAND_WORDS[ 1 ]
+	);
+
+	accumulateSphericalHarmonicsBandCPU( sh1, 9, [
+		y * - 0.4886025,
+		z * 0.4886025,
+		x * - 0.4886025
+	], target, targetIndex );
+
+	if ( buffers.sphericalHarmonicsDegree >= 2 ) {
+
+		const xx = x * x;
+		const yy = y * y;
+		const zz = z * z;
+		const sh2 = buffers.sphericalHarmonics2Read.value.array.subarray(
+			splatIndex * SH_BAND_WORDS[ 2 ],
+			( splatIndex + 1 ) * SH_BAND_WORDS[ 2 ]
+		);
+
+		accumulateSphericalHarmonicsBandCPU( sh2, 15, [
+			x * y * 1.0925484,
+			y * z * - 1.0925484,
+			( zz * 2 - xx - yy ) * 0.3153915,
+			x * z * - 1.0925484,
+			( xx - yy ) * 0.5462742
+		], target, targetIndex );
+
+		if ( buffers.sphericalHarmonicsDegree >= 3 ) {
+
+			const xy = x * y;
+			const sh3 = buffers.sphericalHarmonics3Read.value.array.subarray(
+				splatIndex * SH_BAND_WORDS[ 3 ],
+				( splatIndex + 1 ) * SH_BAND_WORDS[ 3 ]
+			);
+
+			accumulateSphericalHarmonicsBandCPU( sh3, 21, [
+				y * ( xx * 3 - yy ) * - 0.5900436,
+				xy * z * 2.8906114,
+				y * ( zz * 4 - xx - yy ) * - 0.4570458,
+				z * ( zz * 2 - xx * 3 - yy * 3 ) * 0.3731763,
+				x * ( zz * 4 - xx - yy ) * - 0.4570458,
+				z * ( xx - yy ) * 1.4453057,
+				x * ( xx - yy * 3 ) * - 0.5900436
+			], target, targetIndex );
+
+		}
+
+	}
+
+}
+
+// Storage nodes need a valid attribute even before any splats are added.
 function createPlaceholderVec4Attribute() {
 
 	return new StorageBufferAttribute( new Float32Array( 4 ), 4 );
@@ -837,9 +1085,7 @@ function createPlaceholderUintAttribute() {
 
 }
 
-// Builds the group's shared storage nodes once - a writable and a read-only node per
-// attribute, the same pattern CountingSort uses for orderRead/orderWrite. `capacity`
-// tracks the size of the currently allocated buffers (0 until the first resize).
+// Builds the shared storage nodes used by the grouped draw and merge kernels.
 function createGroupBufferState() {
 
 	const centerAttribute = createPlaceholderVec4Attribute();
@@ -850,6 +1096,7 @@ function createGroupBufferState() {
 	return {
 		capacity: 0,
 		sphericalHarmonicsDegree: 0,
+		webGLBuffersEnabled: false,
 		centerAttribute,
 		covarianceAAttribute,
 		covarianceBAttribute,
@@ -869,8 +1116,7 @@ function createGroupBufferState() {
 
 }
 
-// Reallocates `state`'s backing GPU buffers to exactly `capacity` and repoints its
-// permanent storage nodes at them - see `createGroupBufferState`.
+// Resizes the shared storage attributes while keeping their storage nodes stable.
 function resizeGroupBufferState( state, capacity ) {
 
 	const oldCenterAttribute = state.centerAttribute;
@@ -904,6 +1150,7 @@ function resizeGroupBufferState( state, capacity ) {
 	}
 
 	state.capacity = capacity;
+	state.webGLBuffersEnabled = false;
 
 	oldCenterAttribute.dispose();
 	oldCovarianceAAttribute.dispose();
@@ -912,8 +1159,7 @@ function resizeGroupBufferState( state, capacity ) {
 
 }
 
-// Lazily allocates the spherical harmonics contribution buffer the first time any instance
-// carries SH data - most groups never need it.
+// Groups without spherical harmonics skip this extra contribution buffer.
 function ensureSphericalHarmonicsContributionNodes( state ) {
 
 	if ( state.sphericalHarmonicsContributionRead !== null ) return;
@@ -937,11 +1183,8 @@ function disposeGroupBufferState( state ) {
 
 }
 
-// Builds the compute kernels that transform any instance's local-space splats into the
-// group's shared buffers. Reads go through "source" storage nodes whose `.value` is
-// repointed at a specific instance's real buffer right before that instance's dispatch. Split
-// into separate transform/color/SH kernels because each simultaneously-bound storage
-// buffer counts against `maxStorageBuffersPerShaderStage`, whose universal baseline is 8.
+// Builds kernels that transform one splat cloud at a time into the shared buffers.
+// The source storage nodes are repointed to the current record before each dispatch.
 function createMergeKernelSet( groupBuffers, workgroupSize ) {
 
 	const baseIndex = uniform( 0, 'uint' );
@@ -952,7 +1195,7 @@ function createMergeKernelSet( groupBuffers, workgroupSize ) {
 	const sourceCovarianceBRead = storage( createPlaceholderVec4Attribute(), 'vec4', 0 ).toReadOnly();
 	const sourceColorRead = storage( createPlaceholderUintAttribute(), 'uint', 0 ).toReadOnly();
 
-	// position + covariance: 6 storage buffers (3 instance reads, 3 group writes)
+	// Position and covariance use six storage buffers total.
 	const transformKernel = Fn( () => {
 
 		const srcIndex = instanceIndex;
@@ -991,7 +1234,7 @@ function createMergeKernelSet( groupBuffers, workgroupSize ) {
 
 	} )().compute( 1, [ workgroupSize ] ).setName( 'GaussianSplatGroupMergeTransform' );
 
-	// color: 2 storage buffers
+	// Color is split out to stay below portable storage-buffer limits.
 	const colorKernel = Fn( () => {
 
 		const dstIndex = baseIndex.add( instanceIndex );
@@ -1009,7 +1252,7 @@ function createMergeKernelSet( groupBuffers, workgroupSize ) {
 		sourceColorRead,
 		transformKernel,
 		colorKernel,
-		// spherical harmonics kernels/nodes are built lazily by `getOrCreateSHKernel`
+		// Spherical harmonics kernels are created only when needed.
 		shLocalCameraPosition: null,
 		sourceSH1Read: null,
 		sourceSH2Read: null,
@@ -1019,9 +1262,7 @@ function createMergeKernelSet( groupBuffers, workgroupSize ) {
 
 }
 
-// Returns the shared spherical harmonics kernel for `degree`, building and caching it the
-// first time this degree is encountered. The degree-0 kernel just zeroes the contribution,
-// for instances with no SH data of their own.
+// Returns the spherical harmonics contribution kernel for the requested degree.
 function getOrCreateSHKernel( kernels, groupBuffers, degree, workgroupSize ) {
 
 	let kernel = kernels.shKernelsByDegree.get( degree );
@@ -1038,9 +1279,7 @@ function getOrCreateSHKernel( kernels, groupBuffers, degree, workgroupSize ) {
 	const shLocalCameraPosition = kernels.shLocalCameraPosition;
 	const baseIndex = kernels.baseIndex;
 
-	// A minimal stand-in for a storage buffer state, exposing just what
-	// `applySphericalHarmonics()` reads: this degree's fixed word counts and this
-	// kernel set's own shared (swappable) per-band source nodes.
+	// `applySphericalHarmonics()` only needs the degree, word counts, and band buffers.
 	const syntheticInstanceBuffers = {
 		sphericalHarmonicsDegree: degree,
 		sphericalHarmonics1Read: kernels.sourceSH1Read,

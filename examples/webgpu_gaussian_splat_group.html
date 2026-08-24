@@ -45,13 +45,11 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { SPZLoader } from 'three/addons/loaders/SPZLoader.js';
-			import { GaussianSplat } from 'three/addons/objects/GaussianSplat.js';
 			import { GaussianSplatGroup } from 'three/addons/objects/GaussianSplatGroup.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer, controls, clock, hitMarker;
 			let group, lionId, tomatoesId;
-			let splatLion, splatTomatoes;
 			const tomatoesPosition = new THREE.Vector3( 0.12, 0, 0.05 );
 			const tomatoesQuaternion = new THREE.Quaternion();
 
@@ -59,13 +57,11 @@
 			const tomatoesScale = new THREE.Vector3( 0.06, 0.06, 0.06 );
 			let tomatoesRotationY = 0;
 			const tomatoesMatrix = new THREE.Matrix4();
-			let mode = 'Grouped (correct blending)';
 			let rotateTomatoes = false;
 			let showLion = true;
 
 			THREE.ColorManagement.workingColorSpace = THREE.SRGBColorSpace;
 
-			const MODE_NAMES = [ 'Grouped (correct blending)', 'Independent (per-mesh sort)' ];
 			const TOMATOES_ROTATION_SPEED = 1.2; // radians/second
 
 			const raycaster = new THREE.Raycaster();
@@ -104,12 +100,6 @@
 				clock = new THREE.Clock();
 
 				const gui = renderer.inspector.createParameters( 'Building' );
-				gui.add( { mode }, 'mode', MODE_NAMES ).name( 'Rendering' ).onChange( ( value ) => {
-
-					mode = value;
-					applyRenderMode();
-
-				} );
 				gui.add( { rotateTomatoes }, 'rotateTomatoes' ).name( 'Rotate Tomatoes' ).onChange( ( value ) => {
 
 					rotateTomatoes = value;
@@ -120,7 +110,6 @@
 					showLion = value;
 
 					group.setVisibleAt( lionId, showLion );
-					applyRenderMode();
 
 				} );
 				gui.add( { autoCompact: false }, 'autoCompact' ).name( 'Auto Compact' ).onChange( ( value ) => {
@@ -171,41 +160,12 @@
 				group.setMatrixAt( lionId, lionMatrix );
 				group.setMatrixAt( tomatoesId, tomatoesMatrix );
 
-				// standalone copies for the "Independent (per-mesh sort)" comparison mode -
-				// same geometry and transform as their group counterparts, but each is its own
-				// self-contained GaussianSplat, sorted only against itself
-				splatLion = new GaussianSplat( lionGeometry );
-				splatLion.matrix.copy( lionMatrix );
-				splatLion.matrixAutoUpdate = false;
-				splatLion.visible = false;
-				scene.add( splatLion );
-
-				splatTomatoes = new GaussianSplat( tomatoesGeometry );
-				splatTomatoes.matrix.copy( tomatoesMatrix );
-				splatTomatoes.matrixAutoUpdate = false;
-				splatTomatoes.visible = false;
-				scene.add( splatTomatoes );
-
-				applyRenderMode();
-
 				group.computeBoundingSphere();
 
 				fitCameraToGroup( group );
 				updateHitMarkerSize( group );
 
 				window.addEventListener( 'resize', onWindowResize );
-
-			}
-
-			// Which of the two comparison objects is drawn only changes on a GUI edit, not
-			// every frame, so it's applied here rather than in animate()'s hot loop.
-			function applyRenderMode() {
-
-				const grouped = mode === 'Grouped (correct blending)';
-
-				group.visible = grouped;
-				splatLion.visible = grouped === false && showLion === true;
-				splatTomatoes.visible = grouped === false;
 
 			}
 
@@ -304,7 +264,6 @@
 					tomatoesMatrix.compose( tomatoesPosition, tomatoesQuaternion, tomatoesScale );
 
 					group.setMatrixAt( tomatoesId, tomatoesMatrix );
-					splatTomatoes.matrix.copy( tomatoesMatrix );
 
 				}
 
