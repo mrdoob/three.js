@@ -40,7 +40,7 @@ import { SH_BAND_COMPONENTS, SH_BAND_WORDS } from './GaussianSplatUtils.js';
 /**
  * Shading, geometry and buffer-layout logic shared by {@link GaussianSplat}
  * (one self-contained splat cloud) and {@link GaussianSplatGroup} (many splat
- * clouds merged into one shared buffer set and sorted together). Neither class
+ * clouds packed into one shared buffer set and sorted together). Neither class
  * depends on the other; this module is what they both depend on instead, so
  * the splat rendering algorithm - the vertex/fragment shading, the per-splat
  * source storage buffer layout, and the spherical harmonics math - exists in
@@ -483,9 +483,10 @@ function createSphericalHarmonicsComputeNode( buffers, localCameraPosition ) {
  * @param {Object} buffers - A storage buffer state returned by {@link createStorageBuffers}.
  * @param {CountingSort} sort - The sort whose `orderRead` determines draw order (back-to-front).
  * @param {UniformNode<vec3>} localCameraPosition - The camera position, in the same local space as `buffers.centerRead`. Only read when `usePrecomputedSphericalHarmonics` is `false`.
+ * @param {?Object} [recordTransform=null] - Optional per-splat record transform storage used by `GaussianSplatGroup`.
  * @return {{vertexNode: Node, sphericalHarmonicsVertexNode: ?Node, fragmentNode: Node}} The material nodes. `sphericalHarmonicsVertexNode` is `null` for degree-0 buffers.
  */
-function createMaterialNodes( buffers, sort, localCameraPosition ) {
+function createMaterialNodes( buffers, sort, localCameraPosition, recordTransform = null ) {
 
 	const splatUv = varyingProperty( 'vec2', 'vSplatUv' );
 	const splatColor = varyingProperty( 'vec4', 'vSplatColor' );
@@ -493,11 +494,52 @@ function createMaterialNodes( buffers, sort, localCameraPosition ) {
 	const createVertexNode = ( usePrecomputedSphericalHarmonics ) => Fn( () => {
 
 		const splatIndex = sort.orderRead.element( instanceIndex ).toVar( 'splatIndex' );
-		const center = buffers.centerRead.element( splatIndex ).xyz.toVar( 'center' );
-		const covA = buffers.covarianceARead.element( splatIndex ).toVar( 'covA' );
-		const covB = buffers.covarianceBRead.element( splatIndex ).toVar( 'covB' );
+		let center = buffers.centerRead.element( splatIndex ).xyz.toVar( 'center' );
+		let covA = buffers.covarianceARead.element( splatIndex ).toVar( 'covA' );
+		let covB = buffers.covarianceBRead.element( splatIndex ).toVar( 'covB' );
 		const color = unpackUnorm4x8( buffers.colorRead.element( splatIndex ) ).toVar( 'splatColor' );
 		const rgb = color.rgb.toVar( 'splatRgb' );
+		let shLocalCameraPosition = localCameraPosition;
+		let shCenter = center;
+
+		if ( recordTransform !== null ) {
+
+			const recordIndex = recordTransform.recordIndexRead.element( splatIndex ).toVar( 'recordIndex' );
+			const matrix0 = recordTransform.matrix0Read.element( recordIndex ).toVar( 'recordMatrix0' );
+			const matrix1 = recordTransform.matrix1Read.element( recordIndex ).toVar( 'recordMatrix1' );
+			const matrix2 = recordTransform.matrix2Read.element( recordIndex ).toVar( 'recordMatrix2' );
+			const localCenter = center.toVar( 'localCenter' );
+			shCenter = localCenter;
+			const cov0 = vec3( covA.x, covA.y, covA.z ).toVar( 'localCov0' );
+			const cov1 = vec3( covA.y, covA.w, covB.x ).toVar( 'localCov1' );
+			const cov2 = vec3( covA.z, covB.x, covB.y ).toVar( 'localCov2' );
+			const r0 = matrix0.xyz.toVar( 'recordRow0' );
+			const r1 = matrix1.xyz.toVar( 'recordRow1' );
+			const r2 = matrix2.xyz.toVar( 'recordRow2' );
+			const vc0 = vec3( dot( r0, cov0 ), dot( r0, cov1 ), dot( r0, cov2 ) ).toVar( 'recordVC0' );
+			const vc1 = vec3( dot( r1, cov0 ), dot( r1, cov1 ), dot( r1, cov2 ) ).toVar( 'recordVC1' );
+			const vc2 = vec3( dot( r2, cov0 ), dot( r2, cov1 ), dot( r2, cov2 ) ).toVar( 'recordVC2' );
+
+			center = vec3(
+				dot( r0, localCenter ).add( matrix0.w ),
+				dot( r1, localCenter ).add( matrix1.w ),
+				dot( r2, localCenter ).add( matrix2.w )
+			).toVar( 'transformedCenter' );
+			covA = vec4(
+				dot( vc0, r0 ),
+				dot( vc0, r1 ),
+				dot( vc0, r2 ),
+				dot( vc1, r1 )
+			).toVar( 'transformedCovA' );
+			covB = vec4(
+				dot( vc1, r2 ),
+				dot( vc2, r2 ),
+				0,
+				0
+			).toVar( 'transformedCovB' );
+			shLocalCameraPosition = recordTransform.localCameraPositionRead.element( recordIndex ).xyz;
+
+		}
 
 		if ( buffers.sphericalHarmonicsDegree > 0 ) {
 
@@ -507,7 +549,7 @@ function createMaterialNodes( buffers, sort, localCameraPosition ) {
 
 			} else {
 
-				applySphericalHarmonics( rgb, center, localCameraPosition, splatIndex, buffers );
+				applySphericalHarmonics( rgb, shCenter, shLocalCameraPosition, splatIndex, buffers );
 
 			}
 
@@ -609,7 +651,7 @@ function createMaterialNodes( buffers, sort, localCameraPosition ) {
 
 	} )();
 
-	const vertexNode = createVertexNode( true );
+	const vertexNode = createVertexNode( recordTransform === null );
 	const sphericalHarmonicsVertexNode = buffers.sphericalHarmonicsDegree > 0 ? createVertexNode( false ) : null;
 
 	const fragmentNode = Fn( () => {

@@ -214,7 +214,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'checks the current sort direction when a merge already requires sorting', ( assert ) => {
+			QUnit.test( 'checks the current sort direction when layout already requires sorting', ( assert ) => {
 
 				const group = new GaussianSplatGroup();
 
@@ -223,10 +223,6 @@ export default QUnit.module( 'Addons', () => {
 
 				let directionChecked = false;
 				let sorted = false;
-
-				group._dispatchInstanceMerge = () => {};
-
-				group._updateSphericalHarmonics = () => {};
 
 				group._needsSort = () => {
 
@@ -246,45 +242,42 @@ export default QUnit.module( 'Addons', () => {
 
 				group.onBeforeRender( {}, null, {} );
 
-				assert.true( directionChecked, 'the direction is captured even when merging already requires a sort' );
-				assert.true( sorted, 'the merged data is sorted' );
+				assert.true( directionChecked, 'the direction is captured even when layout already requires a sort' );
+				assert.true( sorted, 'the packed data is sorted' );
 
 				group.dispose();
 
 			} );
 
-			QUnit.test( 'clears stale spherical harmonics data from reused degree-zero slots', ( assert ) => {
+			QUnit.test( 'pads lower-degree spherical harmonics with neutral coefficients', ( assert ) => {
 
 				const group = new GaussianSplatGroup();
-				const id = group.addSplat( createTestSplatGeometry( 1 ) );
+				const neutral = 0x80808080;
+
+				group.addSplat( createGaussianSplatGeometry(
+					new Float32Array( [ 1, 2, 3 ] ),
+					new Float32Array( [ 1, 0, 0, 1, 0, 1 ] ),
+					new Uint8Array( [ 255, 255, 255, 255 ] ),
+					{
+						sh1: new Uint32Array( [ 1, 2, 3 ] ),
+						sh2: new Uint32Array( [ 4, 5, 6, 7 ] ),
+						sh3: new Uint32Array( [ 8, 9, 10, 11, 12, 13 ] )
+					}
+				) );
+				group.addSplat( createTestSplatGeometry( 1 ) );
 
 				sync( group );
 
-				const record = group._records.get( id );
-				const clearKernel = { count: 0, dispose() {} };
-				let dispatchedKernel = null;
-
-				// Model a mixed-degree layout in which this degree-zero record occupies slots
-				// previously used by a record with spherical harmonics data.
-				group._maxSphericalHarmonicsDegree = 1;
-				group._mergeKernels.shKernelsByDegree.set( 0, clearKernel );
-
-				group._updateSphericalHarmonics( {
-					compute( kernel ) {
-
-						dispatchedKernel = kernel;
-
-					}
-				}, { matrixWorld: group.matrixWorld.clone() } );
-
-				assert.strictEqual( dispatchedKernel, clearKernel, 'the degree-zero clearing kernel is dispatched' );
-				assert.false( record.shDirty, 'the shared slots are marked clean after clearing' );
+				assert.strictEqual( group._maxSphericalHarmonicsDegree, 3, 'the packed group uses the maximum SH degree' );
+				assert.deepEqual( Array.from( group._buffers.sphericalHarmonics1Attribute.array.slice( 3, 6 ) ), [ neutral, neutral, neutral ], 'degree 1 padding is neutral' );
+				assert.deepEqual( Array.from( group._buffers.sphericalHarmonics2Attribute.array.slice( 4, 8 ) ), [ neutral, neutral, neutral, neutral ], 'degree 2 padding is neutral' );
+				assert.deepEqual( Array.from( group._buffers.sphericalHarmonics3Attribute.array.slice( 6, 12 ) ), [ neutral, neutral, neutral, neutral, neutral, neutral ], 'degree 3 padding is neutral' );
 
 				group.dispose();
 
 			} );
 
-			QUnit.test( 'WebGL backend mirrors centers on CPU and keeps GPU merge for the grouped draw', ( assert ) => {
+			QUnit.test( 'WebGL backend uses CPU sort without dispatching merge compute', ( assert ) => {
 
 				const group = new GaussianSplatGroup();
 				const id = group.addSplat( createGaussianSplatGeometry(
@@ -298,8 +291,6 @@ export default QUnit.module( 'Addons', () => {
 
 				group.setMatrixAt( id, matrix );
 				sync( group );
-
-				group._updateSphericalHarmonicsCPU = () => {};
 
 				group._needsSort = () => false;
 
@@ -320,11 +311,17 @@ export default QUnit.module( 'Addons', () => {
 					}
 				}, null, {} );
 
-				const centers = group._sortCenters;
+				const centers = group._buffers.centerAttribute.array;
+				const matrix0 = group._buffers.matrix0Attribute.array;
+				const matrix1 = group._buffers.matrix1Attribute.array;
+				const matrix2 = group._buffers.matrix2Attribute.array;
 
-				assert.strictEqual( computeCalls, 2, 'the existing transform and color merge kernels still run' );
-				assert.deepEqual( Array.from( centers.slice( 0, 4 ) ), [ 5, 7, 9, 0 ], 'transformed centers are mirrored on the CPU for sorting' );
-				assert.true( group._buffers.webGLBuffersEnabled, 'the merged buffers are enabled for WebGL reads' );
+				assert.strictEqual( computeCalls, 0, 'the packed WebGL path does not dispatch merge compute work' );
+				assert.deepEqual( Array.from( centers.slice( 0, 4 ) ), [ 1, 2, 3, 0 ], 'source centers stay packed in local space' );
+				assert.deepEqual( Array.from( matrix0.slice( 0, 4 ) ), [ 1, 0, 0, 4 ], 'matrix row 0 is uploaded separately' );
+				assert.deepEqual( Array.from( matrix1.slice( 0, 4 ) ), [ 0, 1, 0, 5 ], 'matrix row 1 is uploaded separately' );
+				assert.deepEqual( Array.from( matrix2.slice( 0, 4 ) ), [ 0, 0, 1, 6 ], 'matrix row 2 is uploaded separately' );
+				assert.true( group._buffers.webGLBuffersEnabled, 'the packed buffers are enabled for WebGL reads' );
 				assert.true( sorted, 'the shared sort is performed on the CPU' );
 
 				group.dispose();

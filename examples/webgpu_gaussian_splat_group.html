@@ -256,9 +256,9 @@
 				if ( rotateTomatoes === true ) {
 
 					// continuously recomposes the tomatoes' transform, exercising
-					// GaussianSplatGroup.setMatrixAt()'s cheap per-instance re-merge path every
-					// frame instead of only on add/remove/visibility changes - the lion's splat
-					// range is untouched and is not re-merged
+					// GaussianSplatGroup.setMatrixAt()'s cheap per-record transform update every
+					// frame instead of rebuilding the packed layout - the lion's splat range is
+					// untouched
 					tomatoesRotationY += delta * TOMATOES_ROTATION_SPEED;
 					tomatoesQuaternion.setFromEuler( new THREE.Euler( 0, tomatoesRotationY, 0 ) );
 					tomatoesMatrix.compose( tomatoesPosition, tomatoesQuaternion, tomatoesScale );
