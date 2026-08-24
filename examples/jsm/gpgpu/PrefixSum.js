@@ -79,19 +79,10 @@ export class PrefixSum {
 		 */
 		this.vecType = typeInformation.vecType;
 
-		/**
-		 * The correspodning scalar node for the data.
-		 *
-		 * @type {string}
-		 */
-		this.scalarNode = typeInformation.scalarNode;
+		// Create corresponding nodes for the data types
 
-		/**
-		 * The correspodning vector node for the data.
-		 *
-		 * @type {string}
-		 */
-		this.vectorNode = typeInformation.vectorNode;
+		this._scalarNode = typeInformation.scalarNode;
+		this._vectorNode = typeInformation.vectorNode;
 
 		/**
 		 * The size of the data.
@@ -291,11 +282,11 @@ export class PrefixSum {
 	_getSingleThreadPrefixFn() {
 
 		const { unvectorizedDataBuffer, unvectorizedOutputBuffer } = this._storageBuffers;
-		const { count, isInclusive, scalarNode } = this;
+		const { count, isInclusive, _scalarNode } = this;
 
 		return Fn( () => {
 
-			const sum = scalarNode( 0 ).toVar( 'sum' );
+			const sum = _scalarNode( 0 ).toVar( 'sum' );
 
 			Loop( { start: 0, end: count, type: 'uint', name: 'i', condition: '<' }, ( { i } ) => {
 
@@ -324,7 +315,7 @@ export class PrefixSum {
 	_getReduceFn() {
 
 		const { reductionBuffer, dataBuffer } = this._storageBuffers;
-		const { vecCount, scalarNode, vectorNode } = this;
+		const { vecCount, _scalarNode, _vectorNode } = this;
 		const { subgroupSizeLog, subgroupReductionArray, subgroupOffset, workgroupOffset, spineSize } = this._utilityNodes;
 
 		return Fn( () => {
@@ -332,18 +323,18 @@ export class PrefixSum {
 			const threadSubgroupOffset = subgroupOffset.add( invocationSubgroupIndex ).toVar( 'threadSubgroupOffset' );
 			const startThreadBase = threadSubgroupOffset.add( workgroupOffset ).toVar( 'startThreadBase' );
 			const startThread = startThreadBase.toVar( 'startThread' );
-			const subgroupReduction = scalarNode( 0 );
+			const subgroupReduction = _scalarNode( 0 );
 
 			this._workPerInvocationBlock( () => {
 
 				const val = dataBuffer.element( startThread );
-				subgroupReduction.addAssign( dot( vectorNode( 1 ), val ) );
+				subgroupReduction.addAssign( dot( _vectorNode( 1 ), val ) );
 				startThread.addAssign( subgroupSize );
 
 			}, () => {
 
-				const val = select( startThread.lessThan( uint( vecCount ) ), dataBuffer.element( startThread ), vectorNode( 0 ) ).uniformFlow();
-				subgroupReduction.addAssign( dot( val, vectorNode( 1 ) ) );
+				const val = select( startThread.lessThan( uint( vecCount ) ), dataBuffer.element( startThread ), _vectorNode( 0 ) ).uniformFlow();
+				subgroupReduction.addAssign( dot( val, _vectorNode( 1 ) ) );
 				startThread.addAssign( subgroupSize );
 
 			} );
@@ -370,7 +361,7 @@ export class PrefixSum {
 					select(
 						isValidSubgroupIndex,
 						subgroupReductionArray.element( subgroupIndex ),
-						scalarNode( 0 )
+						_scalarNode( 0 )
 					).uniformFlow()
 				).toVar( 't' );
 
@@ -419,7 +410,7 @@ export class PrefixSum {
 	_subgroupScanReductionBlock( getIndexOffsetFunction = null ) {
 
 		const { subgroupReductionArray, subgroupSizeLog, spineSize } = this._utilityNodes;
-		const { scalarNode } = this;
+		const { _scalarNode } = this;
 
 		workgroupBarrier();
 
@@ -440,7 +431,7 @@ export class PrefixSum {
 			const pred0 = i0.lessThan( spineSize );
 
 			const t0 = subgroupInclusiveAdd(
-				select( pred0, subgroupReductionArray.element( i0 ), scalarNode( 0 ) ).uniformFlow()
+				select( pred0, subgroupReductionArray.element( i0 ), _scalarNode( 0 ) ).uniformFlow()
 			).toVar();
 
 			If( pred0, () => {
@@ -461,7 +452,7 @@ export class PrefixSum {
 					const t1 = select(
 						pred1,
 						subgroupReductionArray.element( this._maskLowerBits( i1, offset1 ).sub( 1 ) ),
-						scalarNode( 0 )
+						_scalarNode( 0 )
 					).uniformFlow();
 
 					If(
@@ -494,7 +485,7 @@ export class PrefixSum {
 
 		const { reductionBuffer } = this._storageBuffers;
 		const { subgroupReductionArray, unvectorizedSubgroupOffset } = this._utilityNodes;
-		const { unvectorizedWorkPerInvocation, scalarNode } = this;
+		const { unvectorizedWorkPerInvocation, _scalarNode } = this;
 
 		return Fn( () => {
 
@@ -502,7 +493,7 @@ export class PrefixSum {
 			const spineAlignedSize = this._getSpineAlignedSize();
 
 			const t_scan = array( this.type, 16 ).toVar();
-			const previousReduction = scalarNode( 0 ).toVar( 'previousReduction' );
+			const previousReduction = _scalarNode( 0 ).toVar( 'previousReduction' );
 			const s_offset = unvectorizedSubgroupOffset.add( invocationSubgroupIndex ).toVar( 's_offset' );
 
 			this._getSpineAlignedBlock( spineAlignedSize, ( devOffset ) => {
@@ -521,7 +512,7 @@ export class PrefixSum {
 
 				} );
 
-				const prev = scalarNode( 0 ).toVar( 'prev' );
+				const prev = _scalarNode( 0 ).toVar( 'prev' );
 				Loop( { start: uint( 0 ), end: uint( unvectorizedWorkPerInvocation ), type: 'uint', condition: '<', update: '+= 1u', name: 'k' }, ( { k } ) => {
 
 					const tScanElement = t_scan.element( k );
@@ -544,7 +535,7 @@ export class PrefixSum {
 				const lastSubgroupReduction = select(
 					subgroupIndex.notEqual( 0 ),
 					subgroupReductionArray.element( subgroupIndex.sub( 1 ) ),
-					scalarNode( 0 )
+					_scalarNode( 0 )
 				).uniformFlow();
 
 				const newPrev = lastSubgroupReduction.add( previousReduction );
@@ -576,7 +567,7 @@ export class PrefixSum {
 
 		const { dataBuffer, reductionBuffer, unvectorizedOutputBuffer } = this._storageBuffers;
 		const { subgroupOffset, workgroupOffset, subgroupReductionArray } = this._utilityNodes;
-		const { workPerInvocation, vecCount, isInclusive, scalarNode, vectorNode } = this;
+		const { workPerInvocation, vecCount, isInclusive, _scalarNode, _vectorNode } = this;
 
 		const outputIndexOffset = isInclusive ? 0 : 1;
 
@@ -589,7 +580,7 @@ export class PrefixSum {
 
 			for ( let i = 0; i < workPerInvocation; i ++ ) {
 
-				vec4FilledWithZeroArray.push( vectorNode( 0 ) );
+				vec4FilledWithZeroArray.push( _vectorNode( 0 ) );
 
 			}
 
@@ -623,7 +614,7 @@ export class PrefixSum {
 
 			} );
 
-			const prev = scalarNode( 0 ).toVar();
+			const prev = _scalarNode( 0 ).toVar();
 			const laneMask = subgroupSize.sub( 1 ).toVar( 'laneMask' );
 			const clockwiseShift = ( invocationSubgroupIndex.add( laneMask ) ).bitAnd( laneMask ).toVar( 'clockwiseShift' );
 
@@ -636,7 +627,7 @@ export class PrefixSum {
 				).toVar( 'prevAccGreatestValue' );
 
 				const isNotInvocationSubgroupIndex0 = invocationSubgroupIndex.notEqual( uint( 0 ) );
-				const addEle = prev.add( select( isNotInvocationSubgroupIndex0, prevAccGreatestValue, vectorNode( 0 ) ).uniformFlow() );
+				const addEle = prev.add( select( isNotInvocationSubgroupIndex0, prevAccGreatestValue, _vectorNode( 0 ) ).uniformFlow() );
 
 				tScan.element( currentSubgroupInBlock ).addAssign( addEle );
 				prev.addAssign( subgroupBroadcast( prevAccGreatestValue, uint( 0 ) ) );
@@ -654,13 +645,13 @@ export class PrefixSum {
 			const spineScanWorkgroupReduction = select(
 				workgroupId.x.notEqual( uint( 0 ) ),
 				reductionBuffer.element( workgroupId.x.sub( 1 ) ),
-				scalarNode( 0 )
+				_scalarNode( 0 )
 			).uniformFlow();
 
 			const downsweepSubgroupReduction = select(
 				subgroupIndex.notEqual( 0 ),
 				subgroupReductionArray.element( subgroupIndex.sub( 1 ) ),
-				scalarNode( 0 )
+				_scalarNode( 0 )
 			).uniformFlow();
 
 			prev.assign( spineScanWorkgroupReduction.add( downsweepSubgroupReduction ) );
@@ -700,7 +691,7 @@ export class PrefixSum {
 
 					Loop( { start: 0, end: outputIndexOffset, type: 'uint', condition: '<', name: 'x' }, ( { x } ) => {
 
-						unvectorizedOutputBuffer.element( x ).assign( scalarNode( 0 ) );
+						unvectorizedOutputBuffer.element( x ).assign( _scalarNode( 0 ) );
 
 					} );
 

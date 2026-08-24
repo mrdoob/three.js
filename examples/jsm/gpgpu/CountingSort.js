@@ -138,6 +138,8 @@ class CountingSort {
 			workgroupSize
 		} );
 
+		console.log( this._prefixSum );
+
 		this._webGLBuffersEnabled = false;
 
 		this._cpuBins = new Uint32Array( count );
