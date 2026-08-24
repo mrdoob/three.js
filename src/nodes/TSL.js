@@ -172,6 +172,7 @@ export { default as F_Schlick } from './functions/BSDF/F_Schlick.js';
 export { default as Schlick_to_F0 } from './functions/BSDF/Schlick_to_F0.js';
 export { default as V_GGX_SmithCorrelated } from './functions/BSDF/V_GGX_SmithCorrelated.js';
 export { default as V_GGX_SmithCorrelated_Anisotropic } from './functions/BSDF/V_GGX_SmithCorrelated_Anisotropic.js';
+export { LTC_Evaluate, LTC_Evaluate_Volume, LTC_Uv } from './functions/BSDF/LTC.js';
 
 export * from './lighting/LightUtils.js';
 
