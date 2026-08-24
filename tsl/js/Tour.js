@@ -69,6 +69,7 @@ class Tour {
 		this.runner = new CodeRunner();
 
 		this.renderer = null;
+		this._refreshPromise = null;
 		this.codeEditor = null;
 		this.debugCodeEditor = null;
 		this.readOnlyEditors = [];
@@ -2528,7 +2529,10 @@ class Tour {
 	animate( t ) {
 
 		const page = this.pages[ this.currentPageIndex ];
-		if ( ! page || ( ! page.hasCode && ! page.hasEmbed && ! this.isPlaygroundActive ) || ( ! page.hasEmbed && ! this.isPreviewVisible ) ) return;
+		const isInitialized = this.renderer.hasInitialized();
+
+		if ( ! isInitialized || ! page || ( ! page.hasCode && ! page.hasEmbed && ! this.isPlaygroundActive ) || ( ! page.hasEmbed && ! this.isPreviewVisible ) ) return;
+
 
 		this.renderer.clear();
 
@@ -2578,31 +2582,63 @@ class Tour {
 
 	disposeRenderer() {
 
-		this.renderer.dispose();
+		if ( this.renderer ) {
 
-		this.renderer.domElement.remove();
+			this.renderer.dispose();
+
+			this.renderer.domElement.remove();
+
+			this.renderer = null;
+
+		}
 
 	}
 
 	async refresh() {
 
-		this.disposeRenderer();
+		if ( this._refreshPromise !== null ) {
 
-		this.runner.dispose();
-
-		await this.createRenderer();
-
-		const currentCode = this.codeEditor.getValue();
-
-		if ( this.isPlaygroundActive ) {
-
-			this.runPlayground();
-
-		} else {
-
-			await this.runner.run( currentCode );
+			return this._refreshPromise;
 
 		}
+
+		this._refreshPromise = new Promise( async ( resolve, reject ) => {
+
+			try {
+
+				this.disposeRenderer();
+
+				this.runner.dispose();
+
+				await this.createRenderer();
+
+				const currentCode = this.codeEditor.getValue();
+
+				if ( this.isPlaygroundActive ) {
+
+					this.runPlayground();
+
+				} else {
+
+					await this.runner.run( currentCode );
+
+				}
+
+				resolve();
+
+			} catch ( error ) {
+
+				reject( error );
+
+			} finally {
+
+				this._refreshPromise = null;
+
+			}
+
+		} );
+
+		return this._refreshPromise;
 
 	}
 
