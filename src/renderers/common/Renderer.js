@@ -2700,8 +2700,6 @@ class Renderer {
 
 		if ( this._initialized === true ) {
 
-			await this.backend.dispose();
-
 			this.info.dispose();
 
 			this._animation.dispose();
@@ -2719,6 +2717,8 @@ class Renderer {
 				canvasTarget.dispose();
 
 			}
+
+			await this.backend.dispose();
 
 		}
 
