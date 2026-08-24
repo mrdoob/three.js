@@ -632,9 +632,16 @@ class GaussianSplatGroup extends Mesh {
 			if ( record.included === false ) continue;
 
 			// base offsets may have shifted for any included instance, even ones whose own
-			// transform didn't change - always remerge on a layout rebuild
+			// transform didn't change - always remerge on a layout rebuild. This also has to
+			// force a spherical harmonics recompute (not just rely on `_updateSphericalHarmonics`'s
+			// own base-changed check) even when this instance's base happens to land back on the
+			// same value it had before: while excluded (e.g. hidden via `setVisibleAt`) its old
+			// slots in the shared SH contribution buffer are fair game for a different instance
+			// to reuse, so an unchanged base number doesn't mean the buffer contents there are
+			// still this instance's - see the class documentation.
 			record.base = base;
 			record.matrixDirty = true;
+			record.lastSHBase = - 1;
 
 			base += record.count;
 
