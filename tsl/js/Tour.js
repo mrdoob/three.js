@@ -556,13 +556,25 @@ class Tour {
 		const updateSearchFocus = () => {
 
 			const query = this.dom.searchInput.value;
-			if ( document.activeElement === this.dom.searchInput || query.trim().length > 0 ) {
+			const isInputFocused = ( document.activeElement === this.dom.searchInput );
+
+			if ( isInputFocused || query.trim().length > 0 ) {
 
 				this.dom.searchContainer.classList.add( 'focused' );
 
 			} else {
 
 				this.dom.searchContainer.classList.remove( 'focused' );
+
+			}
+
+			if ( isInputFocused ) {
+
+				this.dom.tocList.classList.add( 'search-focused' );
+
+			} else {
+
+				this.dom.tocList.classList.remove( 'search-focused' );
 
 			}
 
@@ -2347,6 +2359,23 @@ class Tour {
 			this.dom.tocList.appendChild( createTOCNode( rootNode, 0 ) );
 
 		} );
+
+		if ( this.dom.searchInput && this.dom.searchInput.value.trim().length > 0 ) {
+
+			const firstWrapper = this.dom.tocList.querySelector( '.toc-item-wrapper' );
+			if ( firstWrapper ) {
+
+				firstWrapper.classList.add( 'first-search-result' );
+
+			}
+
+			if ( document.activeElement === this.dom.searchInput ) {
+
+				this.dom.tocList.classList.add( 'search-focused' );
+
+			}
+
+		}
 
 		// Re-initialize Lucide icons to render the chevrons
 		this.createIcons( this.dom.tocList );

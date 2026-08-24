@@ -44,6 +44,7 @@ export function refresh() {
 	controls.update();
 
 	renderPipeline.outputNode = defaultAA;
+	renderPipeline.outputColorTransform = true;
 	renderPipeline.needsUpdate = true;
 
 }

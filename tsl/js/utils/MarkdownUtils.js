@@ -224,6 +224,18 @@ function parseTour( rawMarkdown ) {
 
 		// Check if it has no content of its own (no description and no code)
 		node.isFolder = description.length === 0 && ! node.hasCode;
+		node.level = level;
+		node.category = node.category || parentCategory;
+
+		const fullPath = [ ...path ];
+
+		if ( node.category && fullPath.length === 0 ) {
+
+			fullPath.push( node.category );
+
+		}
+
+		node.path = fullPath;
 
 		if ( ! node.isFolder ) {
 
@@ -237,18 +249,6 @@ function parseTour( rawMarkdown ) {
 			node.description = finalDescription;
 			node.code = code;
 			node.defaultNode = defaultNode;
-			node.level = level;
-			node.category = node.category || parentCategory;
-
-			const fullPath = [ ...path ];
-
-			if ( node.category && fullPath.length === 0 ) {
-
-				fullPath.push( node.category );
-
-			}
-
-			node.path = fullPath;
 
 			pages.push( node );
 

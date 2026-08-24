@@ -2072,6 +2072,30 @@ body.preview-maximized .preview-hide-btn {
 	border-left-color: var(--accent);
 }
 
+.search-active.search-focused .first-search-result .toc-btn,
+.sidebar:has(.sidebar-search-input:focus) .search-active .first-search-result .toc-btn {
+	background-color: var(--bg-card);
+	color: #ececec;
+}
+
+.search-active.search-focused .first-search-result .toc-search-snippet,
+.sidebar:has(.sidebar-search-input:focus) .search-active .first-search-result .toc-search-snippet {
+	color: #ececec;
+	background-color: rgba(255, 255, 255, 0.02);
+	border-left-color: var(--accent);
+}
+
+.toc-list.search-active:has(.toc-item-wrapper:hover) .first-search-result:not(:hover) .toc-btn {
+	background-color: transparent;
+	color: var(--text-muted);
+}
+
+.toc-list.search-active:has(.toc-item-wrapper:hover) .first-search-result:not(:hover) .toc-search-snippet {
+	color: var(--text-muted);
+	background-color: transparent;
+	border-left-color: rgba(0, 170, 255, 0.2);
+}
+
 .toc-btn.active+.toc-search-snippet {
 	border-left-color: var(--accent);
 	color: #fff;

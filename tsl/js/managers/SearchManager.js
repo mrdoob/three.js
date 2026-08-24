@@ -3,7 +3,7 @@ class SearchManager {
 	constructor( tour ) {
 
 		this.tour = tour;
-		this.index = new Map(); // word -> Set of page IDs
+		this.index = new Map(); // word -> Set of page IDs / node references
 		this.casedVocabulary = new Map(); // lowercase -> original case
 		this.debounceTimeout = null;
 
@@ -13,12 +13,34 @@ class SearchManager {
 
 		this.index.clear();
 		this.casedVocabulary.clear();
-		this.tour.pages.forEach( page => {
+
+		// Index words from all pages and category folders
+		const collectAllNodes = ( nodes ) => {
+
+			const all = [];
+			for ( const n of nodes ) {
+
+				all.push( n );
+				if ( n.children && n.children.length > 0 ) {
+
+					all.push( ...collectAllNodes( n.children ) );
+
+				}
+
+			}
+
+			return all;
+
+		};
+
+		const allNodes = collectAllNodes( this.tour.pageTree || [] );
+
+		allNodes.forEach( node => {
 
 			const rawContent = [
-				page.title || '',
-				( page.path || [] ).join( ' ' ),
-				this.getCleanText( page.description || '' )
+				node.title || '',
+				( node.path || [] ).join( ' ' ),
+				this.getCleanText( node.description || '' )
 			].join( ' ' );
 
 			const casedWords = rawContent.split( /[^a-zA-Z0-9_]+/ ).filter( w => w.length > 1 );
@@ -34,7 +56,6 @@ class SearchManager {
 			} );
 
 			const content = rawContent.toLowerCase();
-
 			const words = content.split( /[^a-z0-9_]+/ ).filter( w => w.length > 1 );
 			words.forEach( word => {
 
@@ -44,7 +65,7 @@ class SearchManager {
 
 				}
 
-				this.index.get( word ).add( page.id );
+				this.index.get( word ).add( node.id || node.title );
 
 			} );
 
@@ -52,51 +73,220 @@ class SearchManager {
 
 	}
 
-	search( query ) {
+	calculateScore( item, rawQuery, queryTerms ) {
 
-		const trimmed = query.trim().toLowerCase();
-		if ( ! trimmed ) return null;
+		const title = item.title || '';
+		const titleLower = title.toLowerCase();
+		const queryLower = rawQuery.toLowerCase();
+		const pathText = ( item.path || [] ).join( ' ' ).toLowerCase();
+		const rawDesc = item.description || '';
+		const cleanDesc = rawDesc ? this.getCleanText( rawDesc ).toLowerCase() : '';
 
-		const rawTerms = trimmed.split( /\s+/ ).filter( t => t.length > 0 );
-		if ( rawTerms.length === 0 ) return null;
+		let score = 0;
+		let matchedTermsCount = 0;
 
-		let results = null;
+		// 1. Exact Match on Title
+		if ( titleLower === queryLower ) {
 
-		rawTerms.forEach( rawTerm => {
+			score += 10000;
 
-			const cleanTerm = rawTerm.replace( /^[^a-z0-9_]+|[^a-z0-9_]+$/g, '' );
-			const term = cleanTerm || rawTerm;
+		} else if ( titleLower.startsWith( queryLower ) ) {
 
-			const termMatches = new Set();
-			for ( const [ word, ids ] of this.index.entries() ) {
+			score += 6000;
 
-				if ( word.startsWith( term ) || word.includes( term ) ) {
+		} else if ( titleLower.includes( queryLower ) ) {
 
-					ids.forEach( id => termMatches.add( id ) );
+			score += 4000;
+
+		}
+
+		// 2. Term-by-term Title Matching
+		const titleWords = titleLower.split( /[^a-z0-9_]+/ ).filter( Boolean );
+		let termsInTitleCount = 0;
+
+		for ( const term of queryTerms ) {
+
+			let termMatched = false;
+
+			if ( titleWords.includes( term ) ) {
+
+				score += 1500;
+				termMatched = true;
+				termsInTitleCount ++;
+
+			} else if ( titleWords.some( w => w.startsWith( term ) ) ) {
+
+				score += 1000;
+				termMatched = true;
+				termsInTitleCount ++;
+
+			} else if ( titleLower.includes( term ) ) {
+
+				score += 600;
+				termMatched = true;
+				termsInTitleCount ++;
+
+			}
+
+			// Path / Category matches
+			if ( pathText.includes( term ) ) {
+
+				score += 300;
+				termMatched = true;
+
+			}
+
+			// API signatures match (::: api name or .name)
+			if ( rawDesc ) {
+
+				const apiRegex = new RegExp( `:::\\s*api\\s+\\.?${term}`, 'i' );
+				if ( apiRegex.test( rawDesc ) ) {
+
+					score += 2500;
+					termMatched = true;
+
+				} else if ( cleanDesc.includes( term ) ) {
+
+					score += 150;
+					termMatched = true;
+
+					const freq = ( cleanDesc.split( term ).length - 1 );
+					score += Math.min( freq * 15, 150 );
 
 				}
 
 			}
 
-			if ( results === null ) {
+			if ( termMatched ) {
 
-				results = termMatches;
-
-			} else {
-
-				results = new Set( [ ...results ].filter( id => termMatches.has( id ) ) );
+				matchedTermsCount ++;
 
 			}
 
-		} );
+		}
 
-		return results || new Set();
+		// All terms matched in title bonus
+		if ( queryTerms.length > 1 && termsInTitleCount === queryTerms.length ) {
+
+			score += 3500;
+
+		}
+
+		// Exact phrase in description
+		if ( cleanDesc && queryLower.length > 3 && cleanDesc.includes( queryLower ) ) {
+
+			score += 1000;
+
+		}
+
+		// Folder title boost: if a category/folder matches the query, rank it very high
+		if ( item.isFolder && ( titleLower === queryLower || titleLower.includes( queryLower ) || termsInTitleCount > 0 ) ) {
+
+			score += 5000;
+
+		}
+
+		// Coverage Multiplier:
+		// Highly favor matches that cover ALL search terms vs only 1 term in multi-term queries
+		if ( queryTerms.length > 1 ) {
+
+			const ratio = matchedTermsCount / queryTerms.length;
+			if ( ratio >= 1.0 ) {
+
+				score *= 2.5;
+
+			} else if ( ratio >= 0.5 ) {
+
+				score *= 0.8;
+
+			} else {
+
+				score *= 0.2;
+
+			}
+
+		}
+
+		return Math.round( score );
+
+	}
+
+	getRankedTree( tree, query, queryTerms ) {
+
+		const processNodes = ( nodes ) => {
+
+			const result = [];
+
+			for ( const node of nodes ) {
+
+				const copy = { ...node };
+				const nodeScore = this.calculateScore( node, query, queryTerms );
+
+				let filteredChildren = [];
+				let childrenMaxScore = 0;
+
+				if ( node.children && node.children.length > 0 ) {
+
+					filteredChildren = processNodes( node.children );
+					if ( filteredChildren.length > 0 ) {
+
+						childrenMaxScore = Math.max( ...filteredChildren.map( c => c.searchScore || 0 ) );
+
+					}
+
+				}
+
+				// If the folder itself matched strongly, but some children had 0 individual score,
+				// include all children so the category contents are visible!
+				if ( node.isFolder && nodeScore > 2000 && filteredChildren.length === 0 && node.children.length > 0 ) {
+
+					filteredChildren = node.children.map( c => ( {
+						...c,
+						searchScore: nodeScore - 500
+					} ) );
+
+				}
+
+				const isMatch = ( nodeScore > 0 ) || ( filteredChildren.length > 0 );
+
+				if ( isMatch ) {
+
+					copy.children = filteredChildren;
+					copy.searchScore = Math.max( nodeScore, childrenMaxScore );
+
+					// Generate snippet for leaf pages
+					if ( ! copy.isFolder && copy.description ) {
+
+						const cleanText = this.getCleanText( copy.description );
+						copy.searchSnippet = this.getSearchSnippet( cleanText, queryTerms, copy.title );
+
+					} else {
+
+						delete copy.searchSnippet;
+
+					}
+
+					result.push( copy );
+
+				}
+
+			}
+
+			// Sort by searchScore descending!
+			result.sort( ( a, b ) => ( b.searchScore || 0 ) - ( a.searchScore || 0 ) );
+
+			return result;
+
+		};
+
+		return processNodes( tree );
 
 	}
 
 	performSearch( query ) {
 
-		const trimmed = query.trim().toLowerCase();
+		const trimmed = query.trim();
+
 		if ( trimmed.length === 0 ) {
 
 			this.tour.dom.tocList.classList.remove( 'search-active' );
@@ -106,6 +296,7 @@ class SearchManager {
 				nodes.forEach( n => {
 
 					delete n.searchSnippet;
+					delete n.searchScore;
 					if ( n.children ) cleanTree( n.children );
 
 				} );
@@ -120,85 +311,25 @@ class SearchManager {
 			this.tour.dom.tocList.classList.add( 'search-active' );
 
 			const queryLower = trimmed.toLowerCase();
-			let featuredPage = null;
+			const queryTerms = queryLower.split( /\s+/ ).map( t => t.replace( /^[^a-z0-9_]+|[^a-z0-9_]+$/g, '' ) ).filter( Boolean );
 
-			// 1. Check exact match on title
-			featuredPage = this.tour.pages.find( p => p.title.toLowerCase() === queryLower );
-
-			// 2. Check if page title starts with query (e.g. "shad" -> "ShaderBall", "meth" -> "Method Chaining")
-			if ( ! featuredPage && queryLower.length >= 3 ) {
-
-				featuredPage = this.tour.pages.find( p => p.title.toLowerCase().startsWith( queryLower ) );
-
-			}
-
-			// 3. Check if query is exact word in multi-word title
-			if ( ! featuredPage ) {
-
-				featuredPage = this.tour.pages.find( p => {
-
-					const words = p.title.toLowerCase().split( /\s+/ );
-					return words.includes( queryLower );
-
-				} );
-
-			}
-
-			const matchingPageIds = this.search( query ) || new Set();
-
-			if ( featuredPage ) {
-
-				matchingPageIds.add( featuredPage.id );
-
-			}
-
-			const otherMatchingPageIds = new Set( matchingPageIds );
-			if ( featuredPage ) {
-
-				otherMatchingPageIds.delete( featuredPage.id );
-
-			}
-
-			const queryTerms = trimmed.split( /\s+/ ).filter( t => t.length > 0 );
-			let filteredTree = this.getFilteredTree( this.tour.pageTree, otherMatchingPageIds, queryTerms );
+			let rankedTree = this.getRankedTree( this.tour.pageTree, trimmed, queryTerms );
 
 			let suggestion = null;
-			if ( filteredTree.length === 0 && ! featuredPage ) {
+			if ( rankedTree.length === 0 ) {
 
 				suggestion = this.getSpellingSuggestion( query );
 				if ( suggestion ) {
 
 					const suggTrimmed = suggestion.trim().toLowerCase();
-
-					featuredPage = this.tour.pages.find( p => p.title.toLowerCase() === suggTrimmed );
-					if ( ! featuredPage && suggTrimmed.length >= 3 ) {
-
-						featuredPage = this.tour.pages.find( p => p.title.toLowerCase().startsWith( suggTrimmed ) );
-
-					}
-
-					const suggMatchingPageIds = this.search( suggestion ) || new Set();
-					if ( featuredPage ) {
-
-						suggMatchingPageIds.add( featuredPage.id );
-
-					}
-
-					const suggOtherMatchingPageIds = new Set( suggMatchingPageIds );
-					if ( featuredPage ) {
-
-						suggOtherMatchingPageIds.delete( featuredPage.id );
-
-					}
-
-					const suggQueryTerms = suggTrimmed.split( /\s+/ ).filter( t => t.length > 0 );
-					filteredTree = this.getFilteredTree( this.tour.pageTree, suggOtherMatchingPageIds, suggQueryTerms );
+					const suggQueryTerms = suggTrimmed.split( /\s+/ ).map( t => t.replace( /^[^a-z0-9_]+|[^a-z0-9_]+$/g, '' ) ).filter( Boolean );
+					rankedTree = this.getRankedTree( this.tour.pageTree, suggestion, suggQueryTerms );
 
 				}
 
 			}
 
-			this.tour.setupTOC( filteredTree, featuredPage, suggestion );
+			this.tour.setupTOC( rankedTree, null, suggestion );
 
 		}
 
@@ -208,67 +339,6 @@ class SearchManager {
 			sidebarContent.scrollTop = 0;
 
 		}
-
-	}
-
-	getFilteredTree( tree, matchingPageIds, queryTerms ) {
-
-		const filterNodes = ( nodes ) => {
-
-			const result = [];
-
-			for ( const node of nodes ) {
-
-				const hasChildren = node.children && node.children.length > 0;
-				let filteredChildren = [];
-
-				if ( hasChildren ) {
-
-					filteredChildren = filterNodes( node.children );
-
-				}
-
-				const matchesSelf = ! node.isFolder && matchingPageIds && matchingPageIds.has( node.id );
-
-				if ( matchesSelf || filteredChildren.length > 0 ) {
-
-					const copy = { ...node };
-					if ( hasChildren ) {
-
-						copy.children = filteredChildren;
-
-					}
-
-					if ( matchesSelf ) {
-
-						const page = this.tour.pages.find( p => p.id === node.id );
-						let snippet = '';
-						if ( page && page.description ) {
-
-							const cleanText = this.getCleanText( page.description );
-							snippet = this.getSearchSnippet( cleanText, queryTerms, page.title );
-
-						}
-
-						copy.searchSnippet = snippet;
-
-					} else {
-
-						delete copy.searchSnippet;
-
-					}
-
-					result.push( copy );
-
-				}
-
-			}
-
-			return result;
-
-		};
-
-		return filterNodes( tree );
 
 	}
 

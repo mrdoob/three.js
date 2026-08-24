@@ -52,6 +52,7 @@ export function refresh() {
 	}
 
 	renderPipeline.outputNode = defaultAA;
+	renderPipeline.outputColorTransform = true;
 	renderPipeline.needsUpdate = true;
 
 }

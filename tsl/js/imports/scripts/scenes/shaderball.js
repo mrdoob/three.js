@@ -185,6 +185,7 @@ export function refresh() {
 	calibrationMesh.material = calibMaterial;
 
 	renderPipeline.outputNode = defaultAA;
+	renderPipeline.outputColorTransform = true;
 	renderPipeline.needsUpdate = true;
 
 }
