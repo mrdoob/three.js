@@ -24,41 +24,6 @@ const typeFromArray = new Map( [
 ] );
 
 /**
- * Storage buffers needed to execute a reduce-then-scan prefix sum`.
- *
- * @typedef {Object} PrefixSumStorageObjects
- * @property {StorageBufferNode} reductionBuffer - Storage data buffer holding the reduction of each workgroup from the reduce step.
- * @property {StorageBufferNode} dataBuffer - Storage data buffer holding the vectorized input data.
- * @property {StorageBufferNode} unvectorizedDataBuffer - Storage data buffer holding the unvectorized input data.
- * @property {StorageBufferNode} outputBuffer - Storage data buffer that returns the unvectorized output data of the prefix sum.
- */
-
-/**
- * Compute functions needed to execute a reduce-then-scan prefix sum`.
- *
- * @typedef {Object} PrefixSumComputeFunctions
- * @property {ComputeNode} reduceFn - A compute shader that executes the reduce step of a reduce-then-scan prefix sum.
- * @property {ComputeNode} spineScanShortFn - A compute shader that executes the spine scan step of a reduce-then-scan prefix sum. Assigned to this.computeFunctions.spineScanFn if data size is small enough.
- * @property {ComputeNode} spineScanLongFn - A compute shader that executes the spine scan step of a reduce-then-scan prefix sum. Assigned to this.computeFunctions.spineScanFn if data size is large enough.
- * @property {ComputeNode} spineScanFn - A compute shader that executes the spine scan step of a reduce-then-scan prefix sum.
- * @property {ComputeNode} downsweepFn - A compute shader that executes the downsweep step of a reduce-then-scan prefix sum.
- * @property {ComputeNode} singleThreadPrefixFn - A compute shader that executes a serialized prefix sum in a single compute invocation.
- */
-
-/**
- * Utility nodes used in multiple shaders across the reduce-then-scan prefix sum`.
- *
- * @typedef {Object} PrefixSumUtilityNodes
- * @property {WorkgroupInfoNode} subgroupReductionArray - A workgroup memory buffer representing a workgroup scoped buffer that holds the result of a subgroup operation from each subgroup in a workgroup. Sized to account for minimumn WGSL subgroup size of 4.
- * @property {Node<uint>} workgroupOffset - A node representing the vec4-alligned offset at which the workgroup with index 'workgroupId.x' will begin reading vec4 elements from the data buffer.
- * @property {Node<uint>} subgroupOffset - A node representing the vec4-alligned offset from 'this.workgroupOffset' at which the subgroup with index 'subgroupMetaRank' will begin reading vec4 elements from a data buffer.
- * @property {Node<uint>} unvectorizedSubgroupOffset - A node representing the uint-alligned offset from 'this.workgroupOffset' at which the subgroup with index 'subgroupMetaRank' will begin reading uint elements from a data buffer.
- * @property {Node<uint>} subgroupSizeLog - A node that evaulates to n in 2^n = subgroupSize.
- * @property {Node<uint>} spineSize - A node that calculates the number of partial reductions in a workgroup scan, or the number of subgroups in a workgroup on the current device.
- * @property {Node<uint>} spineSizeLog - A node that evaluates to n in 2^n = spineSize.
- */
-
-/**
 	* A reusable GPU Prefix Sum which runs the most optimal prefix sum algorithm for the target device.
 	* By default, this class will run an inclusive prefix sum on the GPU. Currently, prefix sums are
 	* limited to one-dimensional data buffers ('float', 'int', 'uint') and will run either a serial or a reduce/scan prefix
@@ -81,21 +46,6 @@ export class PrefixSum {
 	constructor( input, options = {} ) {
 
 		/**
-		 * @type {PrefixSumStorageObjects}
-		 */
-		this.storageBuffers = {};
-
-		/**
-		 * @type {PrefixSumComputeFunctions}
-		 */
-		this.computeFunctions = {};
-
-		/**
-		 * @type {PrefixSumUtilityNodes}
-		 */
-		this.utilityNodes = {};
-
-		/**
 		 * The attribute holding the data to sum.
 		 *
 		 * @type {BufferAttribute}
@@ -112,7 +62,6 @@ export class PrefixSum {
 		this.outputAttribute = ( options.outputAttribute !== undefined )
 			? options.outputAttribute
 			: new StorageInstancedBufferAttribute( new this.inputAttribute.array.constructor( this.inputAttribute.array.length ), 1 );
-
 
 		const typeInformation = typeFromArray.get( this.inputAttribute.array.constructor );
 
@@ -213,15 +162,6 @@ export class PrefixSum {
 		*/
 		this.dispatchSize = this.numWorkgroups * this.workgroupSize;
 
-		this._createStorageBuffers();
-		this._createUtilityNodes();
-
-		this.computeFunctions.reduceFn = this._getReduceFn();
-		this.computeFunctions.spineScanShortFn = this._getSpineScanShortFn();
-		this.computeFunctions.spineScanLongFn = this._getSpineScanLongFn();
-		this.computeFunctions.downsweepFn = this._getDownsweepFn();
-		this.computeFunctions.singleThreadPrefixFn = this._getSingleThreadPrefixFn();
-
 		/**
 		 * A function that takes a renderer and either runs a prefix sum or uses the renderer
 		 * information to determine which prefix sum to run.
@@ -230,35 +170,53 @@ export class PrefixSum {
 		*/
 		this.compute = this._computeInitial;
 
+		this._storageBuffers = {};
+		this._computeFunctions = {};
+		this._utilityNodes = {};
+
+		this._createStorageBuffers();
+		this._createUtilityNodes();
+		this._createComputeFunctions();
+
 	}
 
 	_createStorageBuffers() {
 
 		const { inputAttribute, outputAttribute } = this;
 
-		this.storageBuffers.dataBuffer = storage( inputAttribute, this.vecType, this.vecCount ).setName( 'Prefix_Sum_Input_Vec' );
-		this.storageBuffers.unvectorizedDataBuffer = storage( inputAttribute, this.type, inputAttribute.array.length ).setName( 'Prefix_Sum_Input_Unvec' );
-		this.storageBuffers.outputBuffer = storage( outputAttribute, this.vecType, this.vecCount ).setName( 'Prefix_Sum_Output_Vec' );
-		this.storageBuffers.unvectorizedOutputBuffer = storage( outputAttribute, this.type, outputAttribute.array.length ).setName( 'Prefix_Sum_Output_Unvec' );
-		this.storageBuffers.reductionBuffer = instancedArray( this.numWorkgroups, this.type ).setPBO( true ).setName( 'Prefix_Sum_Reduction' );
+		this._storageBuffers.dataBuffer = storage( inputAttribute, this.vecType, this.vecCount ).setName( 'Prefix_Sum_Input_Vec' );
+		this._storageBuffers.unvectorizedDataBuffer = storage( inputAttribute, this.type, inputAttribute.array.length ).setName( 'Prefix_Sum_Input_Unvec' );
+		this._storageBuffers.outputBuffer = storage( outputAttribute, this.vecType, this.vecCount ).setName( 'Prefix_Sum_Output_Vec' );
+		this._storageBuffers.unvectorizedOutputBuffer = storage( outputAttribute, this.type, outputAttribute.array.length ).setName( 'Prefix_Sum_Output_Unvec' );
+		this._storageBuffers.reductionBuffer = instancedArray( this.numWorkgroups, this.type ).setPBO( true ).setName( 'Prefix_Sum_Reduction' );
 
 	}
 
 	_createUtilityNodes() {
 
-		this.utilityNodes.subgroupReductionArray = workgroupArray( this.type, Math.ceil( this.workgroupSize / 4 ) );
-		this.utilityNodes.workgroupOffset = workgroupId.x.mul( uint( this.workgroupSize ).mul( this.workPerInvocation ) ).toVar( 'workgroupOffset' );
-		this.utilityNodes.subgroupOffset = subgroupIndex.mul( subgroupSize ).mul( this.workPerInvocation ).toVar( 'subgroupOffset' );
-		this.utilityNodes.unvectorizedSubgroupOffset = subgroupIndex.mul( subgroupSize ).mul( this.unvectorizedWorkPerInvocation ).toVar( 'unvectorizedSubgroupOffset' );
-		this.utilityNodes.subgroupSizeLog = countTrailingZeros( subgroupSize ).toVar( 'subgroupSizeLog' );
-		this.utilityNodes.spineSize = uint( this.workgroupSize ).shiftRight( this.utilityNodes.subgroupSizeLog ).toVar( 'spineSize' );
-		this.utilityNodes.spineSizeLog = countTrailingZeros( this.utilityNodes.spineSize ).toVar( 'spineSizeLog' );
+		this._utilityNodes.subgroupReductionArray = workgroupArray( this.type, Math.ceil( this.workgroupSize / 4 ) );
+		this._utilityNodes.workgroupOffset = workgroupId.x.mul( uint( this.workgroupSize ).mul( this.workPerInvocation ) ).toVar( 'workgroupOffset' );
+		this._utilityNodes.subgroupOffset = subgroupIndex.mul( subgroupSize ).mul( this.workPerInvocation ).toVar( 'subgroupOffset' );
+		this._utilityNodes.unvectorizedSubgroupOffset = subgroupIndex.mul( subgroupSize ).mul( this.unvectorizedWorkPerInvocation ).toVar( 'unvectorizedSubgroupOffset' );
+		this._utilityNodes.subgroupSizeLog = countTrailingZeros( subgroupSize ).toVar( 'subgroupSizeLog' );
+		this._utilityNodes.spineSize = uint( this.workgroupSize ).shiftRight( this._utilityNodes.subgroupSizeLog ).toVar( 'spineSize' );
+		this._utilityNodes.spineSizeLog = countTrailingZeros( this._utilityNodes.spineSize ).toVar( 'spineSizeLog' );
+
+	}
+
+	_createComputeFunctions() {
+
+		this._computeFunctions.reduceFn = this._getReduceFn();
+		this._computeFunctions.spineScanShortFn = this._getSpineScanShortFn();
+		this._computeFunctions.spineScanLongFn = this._getSpineScanLongFn();
+		this._computeFunctions.downsweepFn = this._getDownsweepFn();
+		this._computeFunctions.singleThreadPrefixFn = this._getSingleThreadPrefixFn();
 
 	}
 
 	_getSubgroupAlignedSize() {
 
-		const { spineSizeLog, subgroupSizeLog } = this.utilityNodes;
+		const { spineSizeLog, subgroupSizeLog } = this._utilityNodes;
 
 		// Align size to powers of subgroupSize
 		const squaredSubgroupLog = ( spineSizeLog.add( subgroupSizeLog ).sub( 1 ) );
@@ -332,7 +290,7 @@ export class PrefixSum {
 
 	_getSingleThreadPrefixFn() {
 
-		const { unvectorizedDataBuffer, unvectorizedOutputBuffer } = this.storageBuffers;
+		const { unvectorizedDataBuffer, unvectorizedOutputBuffer } = this._storageBuffers;
 		const { count, isInclusive, scalarNode } = this;
 
 		return Fn( () => {
@@ -365,9 +323,9 @@ export class PrefixSum {
 
 	_getReduceFn() {
 
-		const { reductionBuffer, dataBuffer } = this.storageBuffers;
+		const { reductionBuffer, dataBuffer } = this._storageBuffers;
 		const { vecCount, scalarNode, vectorNode } = this;
-		const { subgroupSizeLog, subgroupReductionArray, subgroupOffset, workgroupOffset, spineSize } = this.utilityNodes;
+		const { subgroupSizeLog, subgroupReductionArray, subgroupOffset, workgroupOffset, spineSize } = this._utilityNodes;
 
 		return Fn( () => {
 
@@ -447,7 +405,7 @@ export class PrefixSum {
 
 	_getSpineScanShortFn() {
 
-		const { reductionBuffer } = this.storageBuffers;
+		const { reductionBuffer } = this._storageBuffers;
 
 		return Fn( () => {
 
@@ -460,7 +418,7 @@ export class PrefixSum {
 	// Subgroup size agnostic scan of subgroup reduction
 	_subgroupScanReductionBlock( getIndexOffsetFunction = null ) {
 
-		const { subgroupReductionArray, subgroupSizeLog, spineSize } = this.utilityNodes;
+		const { subgroupReductionArray, subgroupSizeLog, spineSize } = this._utilityNodes;
 		const { scalarNode } = this;
 
 		workgroupBarrier();
@@ -534,8 +492,8 @@ export class PrefixSum {
 
 	_getSpineScanLongFn() {
 
-		const { reductionBuffer } = this.storageBuffers;
-		const { subgroupReductionArray, unvectorizedSubgroupOffset } = this.utilityNodes;
+		const { reductionBuffer } = this._storageBuffers;
+		const { subgroupReductionArray, unvectorizedSubgroupOffset } = this._utilityNodes;
 		const { unvectorizedWorkPerInvocation, scalarNode } = this;
 
 		return Fn( () => {
@@ -616,8 +574,8 @@ export class PrefixSum {
 
 	_getDownsweepFn() {
 
-		const { dataBuffer, reductionBuffer, unvectorizedOutputBuffer } = this.storageBuffers;
-		const { subgroupOffset, workgroupOffset, subgroupReductionArray } = this.utilityNodes;
+		const { dataBuffer, reductionBuffer, unvectorizedOutputBuffer } = this._storageBuffers;
+		const { subgroupOffset, workgroupOffset, subgroupReductionArray } = this._utilityNodes;
 		const { workPerInvocation, vecCount, isInclusive, scalarNode, vectorNode } = this;
 
 		const outputIndexOffset = isInclusive ? 0 : 1;
@@ -763,9 +721,9 @@ export class PrefixSum {
 
 		}
 
-		this.computeFunctions.spineScanFn = this.numWorkgroups <= device.adapterInfo.subgroupMinSize
-			? this.computeFunctions.spineScanShortFn
-			: this.computeFunctions.spineScanLongFn;
+		this._computeFunctions.spineScanFn = this.numWorkgroups <= device.adapterInfo.subgroupMinSize
+			? this._computeFunctions.spineScanShortFn
+			: this._computeFunctions.spineScanLongFn;
 
 		return true;
 
@@ -793,15 +751,15 @@ export class PrefixSum {
 
 	_computeWithSingleInvocation( renderer ) {
 
-		renderer.compute( this.computeFunctions.singleThreadPrefixFn );
+		renderer.compute( this._computeFunctions.singleThreadPrefixFn );
 
 	}
 
 	_computeWithSubgroups( renderer ) {
 
-		renderer.compute( this.computeFunctions.reduceFn );
-		renderer.compute( this.computeFunctions.spineScanFn );
-		renderer.compute( this.computeFunctions.downsweepFn );
+		renderer.compute( this._computeFunctions.reduceFn );
+		renderer.compute( this._computeFunctions.spineScanFn );
+		renderer.compute( this._computeFunctions.downsweepFn );
 
 	}
 
