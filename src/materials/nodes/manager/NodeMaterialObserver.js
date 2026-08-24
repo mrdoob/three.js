@@ -787,15 +787,11 @@ class NodeMaterialObserver {
 			for ( let i = 0; i < lightsData.length; i ++ ) {
 
 				const lightData = renderObjectData.lights[ i ];
-				const currentLightData = lightsData[ i ];
 
-				if ( lightData.map !== currentLightData.map || lightData.cacheVersion !== currentLightData.cacheVersion ||
-					lightData.shadowMapWidth !== currentLightData.shadowMapWidth || lightData.shadowMapHeight !== currentLightData.shadowMapHeight ) {
+				if ( lightData.map !== lightsData[ i ].map || lightData.cacheVersion !== lightsData[ i ].cacheVersion ) {
 
-					lightData.map = currentLightData.map;
-					lightData.cacheVersion = currentLightData.cacheVersion;
-					lightData.shadowMapWidth = currentLightData.shadowMapWidth;
-					lightData.shadowMapHeight = currentLightData.shadowMapHeight;
+					lightData.map = lightsData[ i ].map;
+					lightData.cacheVersion = lightsData[ i ].cacheVersion;
 
 					return false;
 
@@ -861,29 +857,13 @@ class NodeMaterialObserver {
 
 		for ( const light of materialLights ) {
 
-			let data = null;
-
 			if ( light.isSpotLight === true && light.map !== null ) {
 
 				// only add lights that have a map
 
-				data = { map: light.map.version, cacheVersion: this.getTextureData( light.map )._version };
+				lights.push( { map: light.map.version, cacheVersion: this.getTextureData( light.map )._version } );
 
 			}
-
-			if ( light.castShadow === true ) {
-
-				// resizing a shadow map recreates its textures so the bindings
-				// of all related render objects must be updated
-
-				if ( data === null ) data = {};
-
-				data.shadowMapWidth = light.shadow.mapSize.width;
-				data.shadowMapHeight = light.shadow.mapSize.height;
-
-			}
-
-			if ( data !== null ) lights.push( data );
 
 		}
 
