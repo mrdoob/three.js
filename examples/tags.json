@@ -30,8 +30,8 @@
 	"webgl_geometries": [ "geometry" ],
 	"webgl_geometry_colors_lookuptable": [ "vertex" ],
 	"webgl_geometry_csg": [ "community", "csg", "bvh", "constructive", "solid", "geometry", "games", "level" ],
-	"webgpu_geometry_loft": [ "sweep", "skin", "sections", "surface", "tsl", "procedural" ],
-	"webgpu_gaussian_splat": [ "splatting", "point cloud", "loader", "compute", "tsl" ],
+	"webgpu_geometry_loft": [ "sweep", "skin", "sections", "surface", "procedural" ],
+	"webgpu_gaussian_splat": [ "splatting", "point cloud", "loader", "compute" ],
 	"webgl_geometry_nurbs": [ "curve", "surface" ],
 	"webgl_geometry_spline_editor": [ "curve" ],
 	"webgl_geometry_terrain": [ "fog" ],
@@ -178,5 +178,6 @@
 	"webgpu_ocean": [ "water" ],
 	"webgpu_video_frame": [ "webcodecs" ],
 	"webgpu_shadowmap_array": [ "tile" ],
-	"webgpu_shadow_contact": [ "shadow", "soft", "tsl" ]
+	"webgpu_shadow_contact": [ "shadow", "soft" ],
+	"webgpu_postprocessing_fog": [ "fog", "volumetric", "jbu", "gaussian", "raymarching" ]
 }
