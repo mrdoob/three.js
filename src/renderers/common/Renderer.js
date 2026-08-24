@@ -2696,9 +2696,11 @@ class Renderer {
 	 * Frees all internal resources of the renderer. Call this method if the renderer
 	 * is no longer in use by your app.
 	 */
-	dispose() {
+	async dispose() {
 
 		if ( this._initialized === true ) {
+
+			await this.backend.dispose();
 
 			this.info.dispose();
 
@@ -2717,14 +2719,6 @@ class Renderer {
 				canvasTarget.dispose();
 
 			}
-
-			Object.values( this.backend.timestampQueryPool ).forEach( queryPool => {
-
-				if ( queryPool !== null ) queryPool.dispose();
-
-			} );
-
-			this.backend.dispose();
 
 		}
 

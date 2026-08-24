@@ -2929,7 +2929,9 @@ class WebGLBackend extends Backend {
 	/**
 	 * Frees internal resources.
 	 */
-	dispose() {
+	async dispose() {
+
+		await super.dispose();
 
 		if ( this.textureUtils !== null ) this.textureUtils.dispose();
 
