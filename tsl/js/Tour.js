@@ -2558,14 +2558,27 @@ class Tour {
 
 			await this.renderer.init();
 
-			const device = this.renderer.backend.device;
+			const onError = this.renderer.onError;
+			const onDeviceLost = this.renderer.onDeviceLost;
 
-			device.addEventListener( 'uncapturederror', () => {
+			this.renderer.onError = ( info ) => {
+
+				onError( info );
 
 				this.renderer.setAnimationLoop( null );
 				this.hasCriticalError = true;
 
-			} );
+			};
+
+			this.renderer.onDeviceLost = ( info ) => {
+
+				onDeviceLost( info );
+
+				this.renderer.setAnimationLoop( null );
+				this.hasCriticalError = true;
+
+			};
+
 
 		} catch ( err ) {
 
