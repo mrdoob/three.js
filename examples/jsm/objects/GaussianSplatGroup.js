@@ -37,6 +37,52 @@ const _instanceWorldMatrix = /*@__PURE__*/ new Matrix4();
 const _instanceWorldMatrixInverse = /*@__PURE__*/ new Matrix4();
 const _ray = /*@__PURE__*/ new Ray();
 
+class SplatRecord {
+
+	constructor( id, geometry, buffers, count, sphericalHarmonicsDegree ) {
+
+		this.id = id;
+		this.geometry = geometry;
+		this.buffers = buffers;
+		this.count = count;
+		this.sphericalHarmonicsDegree = sphericalHarmonicsDegree;
+		this.offset = 0;
+		this.matrix = new Matrix4();
+		this.visible = true;
+		this.mergeDirty = true;
+		this.shDirty = true;
+		this.shLocalCameraPosition = new Vector3();
+
+	}
+
+	setMatrix( matrix ) {
+
+		if ( this.matrix.equals( matrix ) ) return false;
+
+		this.matrix.copy( matrix );
+		this.mergeDirty = true;
+		this.shDirty = true;
+
+		return true;
+
+	}
+
+	setOffset( offset ) {
+
+		this.offset = offset;
+		this.invalidateDerivedData();
+
+	}
+
+	invalidateDerivedData() {
+
+		this.mergeDirty = true;
+		this.shDirty = true;
+
+	}
+
+}
+
 /**
  * A container that merges many independent Gaussian splat `BufferGeometry`s into one
  * shared set of storage buffers, sorts the merged set once, and draws it with a single
@@ -169,7 +215,7 @@ class GaussianSplatGroup extends Mesh {
 		 */
 		this.boundingSphere = null;
 
-		this._total = 0;
+		this._splatCount = 0;
 		this._maxSphericalHarmonicsDegree = 0;
 
 		// All three live for the group's entire lifetime - see the class documentation.
@@ -193,10 +239,7 @@ class GaussianSplatGroup extends Mesh {
 
 		} );
 
-		// id -> { geometry, buffers, count, base, matrix, visible, included, matrixDirty,
-		// sphericalHarmonicsDegree, shLocalCameraPosition, lastSHCameraMatrix,
-		// lastSHGroupWorldMatrix, lastSHMatrix, lastSHBase } - see `addSplat` and `_rebuildLayout`.
-		this._instances = new Map();
+		this._records = new Map();
 		this._nextId = 0;
 
 		// Set by addSplat/deleteSplat/setVisibleAt: which splat ranges are packed into the
@@ -205,8 +248,14 @@ class GaussianSplatGroup extends Mesh {
 		// since moving one splat cloud doesn't change anyone else's offset.
 		this._layoutDirty = true;
 
-		this._sortInitialized = false;
+		this._sortValid = false;
 		this._lastSortDirection = new Vector3();
+
+		this._sphericalHarmonicsInitialized = false;
+		this._lastSHCameraMatrix = new Matrix4();
+		this._lastSHGroupWorldMatrix = new Matrix4();
+
+		this._boundsDirty = true;
 
 		// Unused placeholder required by `createMaterialNodes()`'s signature; the group only
 		// ever uses the precomputed-spherical-harmonics vertex node (see `_rebuildMaterial`).
@@ -240,25 +289,10 @@ class GaussianSplatGroup extends Mesh {
 
 		const id = this._nextId ++;
 
-		this._instances.set( id, {
-			id,
-			geometry: splatGeometry,
-			buffers,
-			count,
-			sphericalHarmonicsDegree,
-			base: 0,
-			matrix: new Matrix4(),
-			visible: true,
-			included: false,
-			matrixDirty: true,
-			shLocalCameraPosition: new Vector3(),
-			lastSHCameraMatrix: null,
-			lastSHGroupWorldMatrix: null,
-			lastSHMatrix: null,
-			lastSHBase: - 1
-		} );
+		this._records.set( id, new SplatRecord( id, splatGeometry, buffers, count, sphericalHarmonicsDegree ) );
 
 		this._layoutDirty = true;
+		this._boundsDirty = true;
 
 		return id;
 
@@ -271,14 +305,15 @@ class GaussianSplatGroup extends Mesh {
 	 */
 	deleteSplat( id ) {
 
-		const record = this._instances.get( id );
+		const record = this._records.get( id );
 
 		if ( record === undefined ) return;
 
 		disposeStorageBuffers( record.buffers );
-		this._instances.delete( id );
+		this._records.delete( id );
 
 		this._layoutDirty = true;
+		this._boundsDirty = true;
 
 	}
 
@@ -290,10 +325,9 @@ class GaussianSplatGroup extends Mesh {
 	 */
 	setMatrixAt( id, matrix ) {
 
-		const record = this._getInstance( id );
+		const record = this._getRecord( id );
 
-		record.matrix.copy( matrix );
-		record.matrixDirty = true;
+		if ( record.setMatrix( matrix ) === true ) this._boundsDirty = true;
 
 	}
 
@@ -306,7 +340,7 @@ class GaussianSplatGroup extends Mesh {
 	 */
 	getMatrixAt( id, target = new Matrix4() ) {
 
-		return target.copy( this._getInstance( id ).matrix );
+		return target.copy( this._getRecord( id ).matrix );
 
 	}
 
@@ -320,12 +354,13 @@ class GaussianSplatGroup extends Mesh {
 	 */
 	setVisibleAt( id, visible ) {
 
-		const record = this._getInstance( id );
+		const record = this._getRecord( id );
 
 		if ( record.visible === visible ) return;
 
 		record.visible = visible;
 		this._layoutDirty = true;
+		this._boundsDirty = true;
 
 	}
 
@@ -337,7 +372,7 @@ class GaussianSplatGroup extends Mesh {
 	 */
 	getVisibleAt( id ) {
 
-		return this._getInstance( id ).visible;
+		return this._getRecord( id ).visible;
 
 	}
 
@@ -368,7 +403,7 @@ class GaussianSplatGroup extends Mesh {
 
 		if ( this._layoutDirty === true ) this._rebuildLayout();
 
-		return this._total;
+		return this._splatCount;
 
 	}
 
@@ -383,7 +418,7 @@ class GaussianSplatGroup extends Mesh {
 
 		if ( this._layoutDirty === true ) this._rebuildLayout();
 
-		const target = Math.max( 1, this._total );
+		const target = Math.max( 1, this._splatCount );
 
 		if ( target === this._buffers.capacity ) return;
 
@@ -413,35 +448,36 @@ class GaussianSplatGroup extends Mesh {
 		// `visible` is left alone here - it's plain user-owned Object3D state. With nothing
 		// included, `geometry.instanceCount` is already 0 (see `_rebuildLayout`), which alone
 		// is enough to draw nothing.
-		if ( this._total === 0 ) return;
+		if ( this._splatCount === 0 ) return;
 
 		this.updateWorldMatrix( true, false );
 
 		let mergedAny = false;
 
-		for ( const record of this._instances.values() ) {
+		for ( const record of this._records.values() ) {
 
-			if ( record.included === false || record.matrixDirty === false ) continue;
+			if ( record.visible === false || record.mergeDirty === false ) continue;
 
 			this._dispatchInstanceMerge( renderer, record );
 
-			record.matrixDirty = false;
+			record.mergeDirty = false;
 			mergedAny = true;
 
 		}
 
-		if ( mergedAny === true ) this.computeBoundingSphere();
-
 		this._updateSphericalHarmonics( renderer, camera );
 
-		const needsResort = this._sortInitialized === false || mergedAny === true || this._needsSort( camera );
+		// `_needsSort` must run even when another condition already forces a sort because
+		// `updateLastSortDirection` records the direction calculated by that call.
+		const directionChanged = this._needsSort( camera );
+		const needsResort = this._sortValid === false || mergedAny === true || directionChanged === true;
 
 		if ( needsResort === true ) {
 
 			this._updateSortUniforms( camera );
 			this._sort.compute( renderer );
 
-			this._sortInitialized = true;
+			this._sortValid = true;
 			updateLastSortDirection( this._lastSortDirection );
 
 		}
@@ -461,9 +497,9 @@ class GaussianSplatGroup extends Mesh {
 
 		this.boundingBox.makeEmpty();
 
-		for ( const record of this._instances.values() ) {
+		for ( const record of this._records.values() ) {
 
-			if ( record.included === false ) continue;
+			if ( record.visible === false ) continue;
 
 			_box.copy( record.geometry.boundingBox ).applyMatrix4( record.matrix );
 			this.boundingBox.union( _box );
@@ -484,9 +520,9 @@ class GaussianSplatGroup extends Mesh {
 
 		let maxRadius = 0;
 
-		for ( const record of this._instances.values() ) {
+		for ( const record of this._records.values() ) {
 
-			if ( record.included === false ) continue;
+			if ( record.visible === false ) continue;
 
 			_sphere.copy( record.geometry.boundingSphere ).applyMatrix4( record.matrix );
 			maxRadius = Math.max( maxRadius, this.boundingSphere.center.distanceTo( _sphere.center ) + _sphere.radius );
@@ -494,6 +530,7 @@ class GaussianSplatGroup extends Mesh {
 		}
 
 		this.boundingSphere.radius = Math.max( this.boundingSphere.radius, maxRadius );
+		this._boundsDirty = false;
 
 	}
 
@@ -509,9 +546,9 @@ class GaussianSplatGroup extends Mesh {
 
 		if ( this._layoutDirty === true ) this._rebuildLayout();
 
-		for ( const record of this._instances.values() ) {
+		for ( const record of this._records.values() ) {
 
-			if ( record.included === false ) continue;
+			if ( record.visible === false ) continue;
 
 			_instanceWorldMatrix.multiplyMatrices( this.matrixWorld, record.matrix );
 
@@ -552,17 +589,17 @@ class GaussianSplatGroup extends Mesh {
 		disposeMergeKernels( this._mergeKernels );
 		this._sort.dispose();
 
-		for ( const record of this._instances.values() ) disposeStorageBuffers( record.buffers );
-		this._instances.clear();
+		for ( const record of this._records.values() ) disposeStorageBuffers( record.buffers );
+		this._records.clear();
 
 		this.geometry.dispose();
 		this.material.dispose();
 
 	}
 
-	_getInstance( id ) {
+	_getRecord( id ) {
 
-		const record = this._instances.get( id );
+		const record = this._records.get( id );
 
 		if ( record === undefined ) throw new Error( `THREE.GaussianSplatGroup: no splat with id ${ id }.` );
 
@@ -577,11 +614,9 @@ class GaussianSplatGroup extends Mesh {
 		let total = 0;
 		let maxDegree = 0;
 
-		for ( const record of this._instances.values() ) {
+		for ( const record of this._records.values() ) {
 
-			record.included = record.visible === true;
-
-			if ( record.included === true ) {
+			if ( record.visible === true ) {
 
 				total += record.count;
 				maxDegree = Math.max( maxDegree, record.sphericalHarmonicsDegree );
@@ -590,7 +625,7 @@ class GaussianSplatGroup extends Mesh {
 
 		}
 
-		this._total = total;
+		this._splatCount = total;
 		this._sort.count = total;
 
 		const requiredCapacity = Math.max( 1, total );
@@ -607,6 +642,7 @@ class GaussianSplatGroup extends Mesh {
 		if ( total === 0 ) {
 
 			this.geometry.instanceCount = 0;
+			this._boundsDirty = true;
 
 			return;
 
@@ -625,27 +661,25 @@ class GaussianSplatGroup extends Mesh {
 		this._maxSphericalHarmonicsDegree = maxDegree;
 		this._buffers.sphericalHarmonicsDegree = maxDegree;
 
-		let base = 0;
+		let offset = 0;
 
-		for ( const record of this._instances.values() ) {
+		for ( const record of this._records.values() ) {
 
-			if ( record.included === false ) continue;
+			if ( record.visible === false ) continue;
 
-			// base offsets may have shifted for any included instance, even ones whose own
+			// Offsets may have shifted for any visible record, even ones whose own
 			// transform didn't change - always remerge on a layout rebuild. This also has to
-			// force a spherical harmonics recompute (not just rely on `_updateSphericalHarmonics`'s
-			// own base-changed check) even when this instance's base happens to land back on the
-			// same value it had before: while excluded (e.g. hidden via `setVisibleAt`) its old
+			// force a spherical harmonics recompute even when the offset happens to land back
+			// on the same value it had before: while hidden, its old
 			// slots in the shared SH contribution buffer are fair game for a different instance
-			// to reuse, so an unchanged base number doesn't mean the buffer contents there are
-			// still this instance's - see the class documentation.
-			record.base = base;
-			record.matrixDirty = true;
-			record.lastSHBase = - 1;
+			// to reuse.
+			record.setOffset( offset );
 
-			base += record.count;
+			offset += record.count;
 
 		}
+
+		this._boundsDirty = true;
 
 		if ( degreeChanged === true ) {
 
@@ -659,9 +693,8 @@ class GaussianSplatGroup extends Mesh {
 
 	}
 
-	// Reallocates the shared buffers to `capacity` and marks every currently-included
-	// instance for a full re-merge - both the transform/color merge (`matrixDirty`) and the
-	// spherical harmonics contribution (`lastSHBase` reset to an impossible value) - since
+	// Reallocates the shared buffers to `capacity` and marks every visible record for a full
+	// transform/color merge and spherical harmonics update, since
 	// `resizeGroupBufferState` allocates fresh, zeroed buffers rather than copying old
 	// contents forward (the group's buffers are a derived cache, not owned data - see the
 	// class documentation).
@@ -669,12 +702,11 @@ class GaussianSplatGroup extends Mesh {
 
 		resizeGroupBufferState( this._buffers, capacity );
 
-		for ( const record of this._instances.values() ) {
+		for ( const record of this._records.values() ) {
 
-			if ( record.included === false ) continue;
+			if ( record.visible === false ) continue;
 
-			record.matrixDirty = true;
-			record.lastSHBase = - 1;
+			record.invalidateDerivedData();
 
 		}
 
@@ -693,7 +725,7 @@ class GaussianSplatGroup extends Mesh {
 		oldGeometry.dispose();
 		oldMaterial.dispose();
 
-		this._sortInitialized = false;
+		this._sortValid = false;
 
 	}
 
@@ -701,7 +733,7 @@ class GaussianSplatGroup extends Mesh {
 
 		const kernels = this._mergeKernels;
 
-		kernels.baseIndex.value = record.base;
+		kernels.baseIndex.value = record.offset;
 		kernels.relativeMatrix.value.copy( record.matrix );
 
 		kernels.sourceCenterRead.value = record.buffers.centerRead.value;
@@ -730,48 +762,47 @@ class GaussianSplatGroup extends Mesh {
 		_groupWorldMatrixInverse.copy( this.matrixWorld ).invert();
 		_cameraPositionInGroup.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _groupWorldMatrixInverse );
 
-		for ( const record of this._instances.values() ) {
+		const viewChanged = this._sphericalHarmonicsInitialized === false ||
+			camera.matrixWorld.equals( this._lastSHCameraMatrix ) === false ||
+			this.matrixWorld.equals( this._lastSHGroupWorldMatrix ) === false;
 
-			if ( record.included === false || record.sphericalHarmonicsDegree === 0 ) continue;
+		for ( const record of this._records.values() ) {
 
-			// record.base can change - shifting where this instance's contribution belongs
-			// in the shared buffer - on a layout rebuild that never touches this instance's
-			// own camera/group/instance matrices at all (e.g. a *different* instance's
-			// visibility was toggled), so it has to be checked independently of them.
-			const needsUpdate = record.lastSHCameraMatrix === null ||
-				camera.matrixWorld.equals( record.lastSHCameraMatrix ) === false ||
-				record.lastSHGroupWorldMatrix === null ||
-				this.matrixWorld.equals( record.lastSHGroupWorldMatrix ) === false ||
-				record.lastSHMatrix === null ||
-				record.matrix.equals( record.lastSHMatrix ) === false ||
-				record.base !== record.lastSHBase;
+			if ( record.visible === false ) continue;
 
-			if ( needsUpdate === false ) continue;
+			const degree = record.sphericalHarmonicsDegree;
 
-			_instanceMatrixInverse.copy( record.matrix ).invert();
-			record.shLocalCameraPosition.copy( _cameraPositionInGroup ).applyMatrix4( _instanceMatrixInverse );
+			// Degree-zero records still need one update after a layout change to clear any
+			// contribution left in slots previously occupied by a record with SH data.
+			if ( record.shDirty === false && ( degree === 0 || viewChanged === false ) ) continue;
 
-			record.lastSHCameraMatrix = ( record.lastSHCameraMatrix || new Matrix4() ).copy( camera.matrixWorld );
-			record.lastSHGroupWorldMatrix = ( record.lastSHGroupWorldMatrix || new Matrix4() ).copy( this.matrixWorld );
-			record.lastSHMatrix = ( record.lastSHMatrix || new Matrix4() ).copy( record.matrix );
-			record.lastSHBase = record.base;
+			if ( degree > 0 ) {
+
+				_instanceMatrixInverse.copy( record.matrix ).invert();
+				record.shLocalCameraPosition.copy( _cameraPositionInGroup ).applyMatrix4( _instanceMatrixInverse );
+
+			}
 
 			const childBuffers = record.buffers;
-			const degree = record.sphericalHarmonicsDegree;
 			const kernel = getOrCreateSHKernel( kernels, this._buffers, degree, this.workgroupSize );
 
-			kernels.baseIndex.value = record.base;
-			kernels.shLocalCameraPosition.value.copy( record.shLocalCameraPosition );
+			kernels.baseIndex.value = record.offset;
 			kernels.sourceCenterRead.value = childBuffers.centerRead.value;
 
+			if ( degree > 0 ) kernels.shLocalCameraPosition.value.copy( record.shLocalCameraPosition );
 			if ( degree >= 1 ) kernels.sourceSH1Read.value = childBuffers.sphericalHarmonics1Read.value;
 			if ( degree >= 2 ) kernels.sourceSH2Read.value = childBuffers.sphericalHarmonics2Read.value;
 			if ( degree >= 3 ) kernels.sourceSH3Read.value = childBuffers.sphericalHarmonics3Read.value;
 
 			kernel.count = record.count;
 			renderer.compute( kernel );
+			record.shDirty = false;
 
 		}
+
+		this._lastSHCameraMatrix.copy( camera.matrixWorld );
+		this._lastSHGroupWorldMatrix.copy( this.matrixWorld );
+		this._sphericalHarmonicsInitialized = true;
 
 	}
 
@@ -785,7 +816,7 @@ class GaussianSplatGroup extends Mesh {
 
 		this._sortMatrix.value.multiplyMatrices( camera.matrixWorldInverse, this.matrixWorld );
 
-		if ( this.boundingSphere === null ) this.computeBoundingSphere();
+		if ( this.boundingSphere === null || this._boundsDirty === true ) this.computeBoundingSphere();
 
 		updateSortDepthRange( camera, this.matrixWorld, this.boundingSphere, this._sortDepthRange.value );
 

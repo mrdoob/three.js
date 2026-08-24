@@ -215,6 +215,76 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
+			QUnit.test( 'checks the current sort direction when a merge already requires sorting', ( assert ) => {
+
+				const group = new GaussianSplatGroup();
+
+				group.addSplat( createTestSplatGeometry( 1 ) );
+				sync( group );
+
+				let directionChecked = false;
+				let sorted = false;
+
+				group._dispatchInstanceMerge = () => {};
+
+				group._updateSphericalHarmonics = () => {};
+
+				group._needsSort = () => {
+
+					directionChecked = true;
+
+					return false;
+
+				};
+
+				group._updateSortUniforms = () => {};
+
+				group._sort.compute = () => {
+
+					sorted = true;
+
+				};
+
+				group.onBeforeRender( {}, null, {} );
+
+				assert.true( directionChecked, 'the direction is captured even when merging already requires a sort' );
+				assert.true( sorted, 'the merged data is sorted' );
+
+				group.dispose();
+
+			} );
+
+			QUnit.test( 'clears stale spherical harmonics data from reused degree-zero slots', ( assert ) => {
+
+				const group = new GaussianSplatGroup();
+				const id = group.addSplat( createTestSplatGeometry( 1 ) );
+
+				sync( group );
+
+				const record = group._records.get( id );
+				const clearKernel = { count: 0, dispose() {} };
+				let dispatchedKernel = null;
+
+				// Model a mixed-degree layout in which this degree-zero record occupies slots
+				// previously used by a record with spherical harmonics data.
+				group._maxSphericalHarmonicsDegree = 1;
+				group._mergeKernels.shKernelsByDegree.set( 0, clearKernel );
+
+				group._updateSphericalHarmonics( {
+					compute( kernel ) {
+
+						dispatchedKernel = kernel;
+
+					}
+				}, { matrixWorld: group.matrixWorld.clone() } );
+
+				assert.strictEqual( dispatchedKernel, clearKernel, 'the degree-zero clearing kernel is dispatched' );
+				assert.false( record.shDirty, 'the shared slots are marked clean after clearing' );
+
+				group.dispose();
+
+			} );
+
 		} );
 
 	} );
