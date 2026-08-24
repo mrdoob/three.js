@@ -148,9 +148,14 @@ class CountingSort {
 
 	set count( value ) {
 
-		if ( value !== this._capacity ) {
+		const capacity = Math.max( 1, value );
 
-			this._resizeOrderBuffers( Math.max( 1, value ) );
+		// Once WebGL PBO mode is enabled, avoid replacing the order buffer just because
+		// the live count shrank. Keeping the backing buffer stable prevents stale PBO
+		// bindings while still sorting and drawing only the first `count` entries.
+		if ( capacity > this._capacity || ( this._webGLBuffersEnabled === false && capacity !== this._capacity ) ) {
+
+			this._resizeOrderBuffers( capacity );
 
 		}
 

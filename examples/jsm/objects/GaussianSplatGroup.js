@@ -226,7 +226,7 @@ class GaussianSplatGroup extends Mesh {
 		this._sort.setBinNode( () => {
 
 			const centerRecord = this._buffers.centerRead.element( instanceIndex ).toVar( 'centerRecord' );
-			const recordIndex = uint( centerRecord.w ).toVar( 'recordIndex' );
+			const recordIndex = uint( centerRecord.w.add( 0.5 ) ).toVar( 'recordIndex' );
 			const center = transformCenter( centerRecord.xyz, this._buffers, recordIndex ).toVar( 'center' );
 			const viewCenter = this._sortMatrix.mul( vec4( center, 1 ) ).xyz.toVar( 'viewCenter' );
 			const depth = viewCenter.z.negate().toVar( 'depth' );
@@ -853,7 +853,7 @@ class GaussianSplatGroup extends Mesh {
 		this._sort.computeCPU( ( i ) => {
 
 			const i4 = i * 4;
-			const record16 = centers[ i4 + 3 ] * 16;
+			const record16 = Math.round( centers[ i4 + 3 ] ) * 16;
 			const x = centers[ i4 ];
 			const y = centers[ i4 + 1 ];
 			const z = centers[ i4 + 2 ];
@@ -937,6 +937,32 @@ function enableGroupWebGLBuffers( state ) {
 
 }
 
+function retargetPBOAttribute( oldAttribute, newAttribute ) {
+
+	if ( oldAttribute.pbo === undefined ) return;
+
+	const originalArray = newAttribute.array;
+	const numElements = newAttribute.count * newAttribute.itemSize;
+	const width = Math.pow( 2, Math.ceil( Math.log2( Math.sqrt( numElements / newAttribute.itemSize ) ) ) );
+	let height = Math.ceil( ( numElements / newAttribute.itemSize ) / width );
+
+	if ( width * height * newAttribute.itemSize < numElements ) height ++;
+
+	const paddedArray = new originalArray.constructor( width * height * newAttribute.itemSize );
+	paddedArray.set( originalArray );
+
+	newAttribute.array = paddedArray;
+	newAttribute.pboNode = oldAttribute.pboNode;
+	newAttribute.pbo = oldAttribute.pbo;
+	newAttribute.pbo.image = {
+		data: paddedArray,
+		width,
+		height
+	};
+	newAttribute.pbo.needsUpdate = true;
+
+}
+
 // Storage nodes need a valid attribute even before any splats are added.
 function createPlaceholderVec4Attribute() {
 
@@ -988,6 +1014,11 @@ function resizeGroupBufferState( state, capacity, recordCapacity, sphericalHarmo
 	state.colorAttribute = new StorageBufferAttribute( new Uint32Array( capacity ), 1 );
 	state.recordDataAttribute = new StorageBufferAttribute( new Float32Array( recordCapacity * 16 ), 4 );
 
+	retargetPBOAttribute( oldCenterAttribute, state.centerAttribute );
+	retargetPBOAttribute( oldCovarianceAttribute, state.covarianceAttribute );
+	retargetPBOAttribute( oldColorAttribute, state.colorAttribute );
+	retargetPBOAttribute( oldRecordDataAttribute, state.recordDataAttribute );
+
 	state.centerRead.value = state.centerAttribute;
 	state.covarianceRead.value = state.covarianceAttribute;
 	state.colorRead.value = state.colorAttribute;
@@ -1004,6 +1035,7 @@ function resizeGroupBufferState( state, capacity, recordCapacity, sphericalHarmo
 			const attribute = new StorageBufferAttribute( new Uint32Array( capacity * SH_BAND_WORDS[ degree ] ), 1 );
 
 			state[ `sphericalHarmonics${ degree }Attribute` ] = attribute;
+			if ( oldAttribute !== undefined ) retargetPBOAttribute( oldAttribute, attribute );
 
 			if ( state[ `sphericalHarmonics${ degree }Read` ] === undefined ) {
 

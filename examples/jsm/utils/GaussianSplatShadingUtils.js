@@ -503,7 +503,7 @@ function createMaterialNodes( buffers, sort, localCameraPosition, recordTransfor
 
 		if ( recordTransform !== null ) {
 
-			const recordIndex = uint( centerRecord.w ).toVar( 'recordIndex' );
+			const recordIndex = uint( centerRecord.w.add( 0.5 ) ).toVar( 'recordIndex' );
 			const recordDataIndex = recordIndex.mul( 4 ).toVar( 'recordDataIndex' );
 			const matrix0 = recordTransform.recordDataRead.element( recordDataIndex ).toVar( 'recordMatrix0' );
 			const matrix1 = recordTransform.recordDataRead.element( recordDataIndex.add( 1 ) ).toVar( 'recordMatrix1' );
