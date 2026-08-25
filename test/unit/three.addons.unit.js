@@ -43,3 +43,4 @@ import './addons/tsl/TSLBSDFLightingRemainder.tests.js';
 import './addons/tsl/TSL.Irradiance.tests.js';
 import './addons/tsl/TSLUtilsMisc.tests.js';
 import './addons/tsl/TSLHalfPrecision.tests.js';
+import './addons/ntc/NTC.tests.js';
