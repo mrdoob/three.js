@@ -56,12 +56,13 @@ class Textures extends DataMap {
 		this._htmlTextures = new Set();
 
 		/**
-		 * Stores the event listeners attached to textures and render targets.
+		 * Stores weak references to the textures and render targets
+		 * with attached `dispose` event listeners.
 		 *
 		 * @private
-		 * @type {Map<(Texture|RenderTarget),Function>}
+		 * @type {Set<WeakRef<(Texture|RenderTarget)>>}
 		 */
-		this._disposeListeners = new Map();
+		this._tracked = new Set();
 
 	}
 
@@ -70,13 +71,27 @@ class Textures extends DataMap {
 	 */
 	dispose() {
 
-		for ( const [ object, onDispose ] of this._disposeListeners.entries() ) {
+		for ( const ref of this._tracked ) {
 
-			object.removeEventListener( 'dispose', onDispose );
+			const object = ref.deref();
+
+			if ( object === undefined || this.has( object ) === false ) continue;
+
+			if ( object.isRenderTarget === true ) {
+
+				this._destroyRenderTarget( object );
+
+			} else {
+
+				this._destroyTexture( object );
+
+			}
 
 		}
 
-		this._disposeListeners.clear();
+		this._tracked.clear();
+
+		this._htmlTextures.clear();
 
 		super.dispose();
 
@@ -214,7 +229,11 @@ class Textures extends DataMap {
 
 			renderTarget.addEventListener( 'dispose', renderTargetData.onDispose );
 
-			this._disposeListeners.set( renderTarget, renderTargetData.onDispose );
+			// see #34368 why tracking separate remove listeners is required right now
+			// TODO: Re-evaluate how onDispose() is managed in this component
+			renderTargetData.ref = new WeakRef( renderTarget );
+
+			this._tracked.add( renderTargetData.ref );
 
 		}
 
@@ -436,7 +455,11 @@ class Textures extends DataMap {
 
 			texture.addEventListener( 'dispose', textureData.onDispose );
 
-			this._disposeListeners.set( texture, textureData.onDispose );
+			// see #34368 why tracking separate remove listeners is required right now
+			// TODO: Re-evaluate how onDispose() is managed in this component
+			textureData.ref = new WeakRef( texture );
+
+			this._tracked.add( textureData.ref );
 
 		}
 
@@ -589,7 +612,7 @@ class Textures extends DataMap {
 
 			renderTarget.removeEventListener( 'dispose', renderTargetData.onDispose );
 
-			this._disposeListeners.delete( renderTarget );
+			this._tracked.delete( renderTargetData.ref );
 
 			//
 
@@ -630,7 +653,7 @@ class Textures extends DataMap {
 
 			texture.removeEventListener( 'dispose', textureData.onDispose );
 
-			this._disposeListeners.delete( texture );
+			this._tracked.delete( textureData.ref );
 
 			// if a texture is not ready for use, it falls back to a default texture so it's possible
 			// to use it for rendering. If a texture in this state is disposed, it's important to

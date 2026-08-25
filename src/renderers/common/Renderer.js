@@ -2700,8 +2700,6 @@ class Renderer {
 
 		if ( this._initialized === true ) {
 
-			this.info.dispose();
-
 			this._animation.dispose();
 			this._objects.dispose();
 			this._geometries.dispose();
@@ -2717,6 +2715,11 @@ class Renderer {
 				canvasTarget.dispose();
 
 			}
+
+			// dispose `info` last since destroying textures and render targets
+			// in the modules above updates its counters
+
+			this.info.dispose();
 
 			await this.backend.dispose();
 
