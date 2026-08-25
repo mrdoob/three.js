@@ -64,6 +64,16 @@ class Textures extends DataMap {
 		 */
 		this._tracked = new Set();
 
+		/**
+		 * Removes weak references from `_tracked` when their texture or
+		 * render target has been garbage collected without an explicit
+		 * `dispose()`.
+		 *
+		 * @private
+		 * @type {FinalizationRegistry}
+		 */
+		this._registry = new FinalizationRegistry( ( ref ) => this._tracked.delete( ref ) );
+
 	}
 
 	/**
@@ -234,6 +244,7 @@ class Textures extends DataMap {
 			renderTargetData.ref = new WeakRef( renderTarget );
 
 			this._tracked.add( renderTargetData.ref );
+			this._registry.register( renderTarget, renderTargetData.ref, renderTargetData.ref );
 
 		}
 
@@ -460,6 +471,7 @@ class Textures extends DataMap {
 			textureData.ref = new WeakRef( texture );
 
 			this._tracked.add( textureData.ref );
+			this._registry.register( texture, textureData.ref, textureData.ref );
 
 		}
 
@@ -613,6 +625,7 @@ class Textures extends DataMap {
 			renderTarget.removeEventListener( 'dispose', renderTargetData.onDispose );
 
 			this._tracked.delete( renderTargetData.ref );
+			this._registry.unregister( renderTargetData.ref );
 
 			//
 
@@ -654,6 +667,7 @@ class Textures extends DataMap {
 			texture.removeEventListener( 'dispose', textureData.onDispose );
 
 			this._tracked.delete( textureData.ref );
+			this._registry.unregister( textureData.ref );
 
 			// if a texture is not ready for use, it falls back to a default texture so it's possible
 			// to use it for rendering. If a texture in this state is disposed, it's important to
