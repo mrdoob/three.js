@@ -181,12 +181,20 @@ class GTAONode extends TempNode {
 		this._resolution = uniform( new Vector2() );
 
 		/**
+		 * The internal noise texture used by the AO.
+		 *
+		 * @private
+		 * @type {DataTexture}
+		 */
+		this._noiseTexture = generateMagicSquareNoise();
+
+		/**
 		 * The node represents the internal noise texture used by the AO.
 		 *
 		 * @private
 		 * @type {TextureNode}
 		 */
-		this._noiseNode = texture( generateMagicSquareNoise() );
+		this._noiseNode = texture( this._noiseTexture );
 
 		/**
 		 * Represents the projection matrix of the scene's camera.
@@ -589,7 +597,8 @@ class GTAONode extends TempNode {
 	dispose() {
 
 		this._aoRenderTarget.dispose();
-		this._noiseNode.value.dispose();
+
+		this._noiseTexture.dispose();
 
 		this._material.dispose();
 
