@@ -57,8 +57,6 @@ class Textures extends DataMap {
 
 		/**
 		 * Stores the event listeners attached to textures and render targets.
-		 * Required to remove the listeners from textures and render targets
-		 * that outlive the renderer, see `dispose()`.
 		 *
 		 * @private
 		 * @type {Map<(Texture|RenderTarget),Function>}
@@ -68,11 +66,7 @@ class Textures extends DataMap {
 	}
 
 	/**
-	 * Frees internal resources. Removes the `dispose` event listeners from
-	 * all tracked textures and render targets. Without this, shared textures
-	 * that outlive the renderer (e.g. module-level LUTs or textures reused
-	 * across renderers) would accumulate listeners whose closures retain the
-	 * renderer and its backend.
+	 * Frees internal resources.
 	 */
 	dispose() {
 
