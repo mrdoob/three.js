@@ -55,6 +55,37 @@ class Textures extends DataMap {
 		 */
 		this._htmlTextures = new Set();
 
+		/**
+		 * Stores the event listeners attached to textures and render targets.
+		 * Required to remove the listeners from textures and render targets
+		 * that outlive the renderer, see `dispose()`.
+		 *
+		 * @private
+		 * @type {Map<(Texture|RenderTarget),Function>}
+		 */
+		this._disposeListeners = new Map();
+
+	}
+
+	/**
+	 * Frees internal resources. Removes the `dispose` event listeners from
+	 * all tracked textures and render targets. Without this, shared textures
+	 * that outlive the renderer (e.g. module-level LUTs or textures reused
+	 * across renderers) would accumulate listeners whose closures retain the
+	 * renderer and its backend.
+	 */
+	dispose() {
+
+		for ( const [ object, onDispose ] of this._disposeListeners.entries() ) {
+
+			object.removeEventListener( 'dispose', onDispose );
+
+		}
+
+		this._disposeListeners.clear();
+
+		super.dispose();
+
 	}
 
 	/**
@@ -188,6 +219,8 @@ class Textures extends DataMap {
 			};
 
 			renderTarget.addEventListener( 'dispose', renderTargetData.onDispose );
+
+			this._disposeListeners.set( renderTarget, renderTargetData.onDispose );
 
 		}
 
@@ -409,6 +442,8 @@ class Textures extends DataMap {
 
 			texture.addEventListener( 'dispose', textureData.onDispose );
 
+			this._disposeListeners.set( texture, textureData.onDispose );
+
 		}
 
 		//
@@ -560,6 +595,8 @@ class Textures extends DataMap {
 
 			renderTarget.removeEventListener( 'dispose', renderTargetData.onDispose );
 
+			this._disposeListeners.delete( renderTarget );
+
 			//
 
 			for ( let i = 0; i < textures.length; i ++ ) {
@@ -598,6 +635,8 @@ class Textures extends DataMap {
 			//
 
 			texture.removeEventListener( 'dispose', textureData.onDispose );
+
+			this._disposeListeners.delete( texture );
 
 			// if a texture is not ready for use, it falls back to a default texture so it's possible
 			// to use it for rendering. If a texture in this state is disposed, it's important to
