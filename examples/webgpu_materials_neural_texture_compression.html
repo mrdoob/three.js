@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>threejs webgpu - materials - neural texture compression</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="threejs webgpu - materials - neural texture compression">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_materials_neural_texture_compression.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_materials_neural_texture_compression.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			.ntc-label {
+				color: #fff;
+				font-family: Arial, sans-serif;
+				font-size: 13px;
+				text-shadow: 0 1px 3px rgba( 0, 0, 0, 0.8 );
+				white-space: nowrap;
+				pointer-events: none;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>webgpu - materials - neural texture compression</span>
+			</div>
+
+			<small>
+				<a href="https://research.nvidia.com/labs/rtr/neural_texture_compression/" target="_blank" rel="noopener">Neural texture compression</a>
+				loader/decoder by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>. Each of the 5 materials is
+				represented by 32KB of data (a 3-level multiresolution feature grid + a multi-layer perceptron), requiring ~500 FLOPs
+				per texel to decode.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+			import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import { NTCLoader } from 'three/addons/loaders/NTCLoader.js';
+			import { applyNTCToMaterial } from 'three/addons/ntc/NTCMLPNode.js';
+
+			// Two rows - 3 on top, 2 on bottom - laid out on a grid wide/tall
+			// enough for a radius-1 sphere plus a bit of breathing room between
+			// neighbors.
+			const SPACING = 2.6;
+			const ASSETS = [
+				{ name: 'Brick', file: 'ntc/brick.ntc', row: 0, col: 0 },
+				{ name: 'Gold', file: 'ntc/gold.ntc', row: 0, col: 1 },
+				{ name: 'Wave Normal', file: 'ntc/wave_normal.ntc', row: 0, col: 2 },
+				{ name: 'Glass Dispersion', file: 'ntc/glass_dispersion.ntc', row: 1, col: 0.5 },
+				{ name: 'Rainbow Emissive', file: 'ntc/rainbow_emissive.ntc', row: 1, col: 1.5 }
+			];
+
+			const BACKGROUND_COLOR = 0x15171c;
+
+			let camera, scene, renderer, labelRenderer, controls;
+
+			init();
+
+			async function init() {
+
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+					throw new Error( 'No WebGPU support' );
+
+				}
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 0.6, 15 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( BACKGROUND_COLOR );
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 0.9;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+				await renderer.init();
+
+				labelRenderer = new CSS2DRenderer();
+				labelRenderer.setSize( window.innerWidth, window.innerHeight );
+				labelRenderer.domElement.style.position = 'absolute';
+				labelRenderer.domElement.style.top = '0px';
+				labelRenderer.domElement.style.pointerEvents = 'none';
+				document.body.appendChild( labelRenderer.domElement );
+
+				const environmentMap = await new HDRLoader()
+					.setPath( 'textures/equirectangular/' )
+					.loadAsync( 'san_giuseppe_bridge_2k.hdr' );
+				environmentMap.mapping = THREE.EquirectangularReflectionMapping;
+				scene.environment = environmentMap;
+				scene.background = environmentMap;
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 0, 0 );
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				await Promise.all( ASSETS.map( ( asset ) => loadAsset( asset ) ) );
+
+				renderer.setAnimationLoop( render );
+
+			}
+
+			// Grid position for an asset's { row, col } - row 0 (3 columns) is
+			// centered over row 1 (2 columns, offset by half a column) so both
+			// rows read as one balanced 3-over-2 arrangement.
+			function gridPosition( asset ) {
+
+				const x = ( asset.col - 1 ) * SPACING;
+				const y = ( 0.5 - asset.row ) * SPACING;
+
+				return new THREE.Vector3( x, y, 0 );
+
+			}
+
+			async function loadAsset( asset ) {
+
+				const position = gridPosition( asset );
+
+				try {
+
+					const { name, cpuModel, channelClassification } = await new NTCLoader().loadAsync( asset.file );
+
+					// normal/clearcoatNormal channels decode in tangent space and
+					// need a real tangentWorld/bitangentWorld basis - computeTangents()
+					// requires uv + normal attributes and an index buffer, all of
+					// which SphereGeometry already provides.
+					const geometry = new THREE.SphereGeometry( 1, 128, 64 );
+					geometry.computeTangents();
+
+					const material = new THREE.MeshPhysicalNodeMaterial();
+					applyNTCToMaterial( material, cpuModel, channelClassification, { renderer } );
+
+					const mesh = new THREE.Mesh( geometry, material );
+					mesh.position.copy( position );
+					scene.add( mesh );
+
+					const labelDiv = document.createElement( 'div' );
+					labelDiv.className = 'ntc-label';
+					labelDiv.textContent = name || asset.name;
+					const label = new CSS2DObject( labelDiv );
+					label.position.set( 0, - 1.3, 0 );
+					mesh.add( label );
+
+					return { asset, mesh };
+
+				} catch ( error ) {
+
+					console.error( `${asset.name}:`, error );
+
+					const labelDiv = document.createElement( 'div' );
+					labelDiv.className = 'ntc-label';
+					labelDiv.textContent = `${asset.name} (failed to load)`;
+					const label = new CSS2DObject( labelDiv );
+					label.position.copy( position );
+					scene.add( label );
+
+					return { asset, error };
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				labelRenderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function render() {
+
+				controls.update();
+				renderer.render( scene, camera );
+				labelRenderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
