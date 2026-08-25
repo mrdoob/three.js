@@ -2707,7 +2707,7 @@ class Renderer {
 			this._nodes.dispose();
 			this._bindings.dispose();
 			this._renderLists.dispose();
-			this._renderContexts.dispose();	
+			this._renderContexts.dispose();
 
 			for ( const canvasTarget of this._frameBufferTargets.keys() ) {
 
