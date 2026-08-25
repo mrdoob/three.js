@@ -6,6 +6,7 @@ An extension of the [MeshStandardMaterial](MeshStandardMaterial.html), providing
 
 *   Anisotropy: Ability to represent the anisotropic property of materials as observable with brushed metals.
 *   Clearcoat: Some materials — like car paints, carbon fiber, and wet surfaces — require a clear, reflective layer on top of another layer that may be irregular or rough. Clearcoat approximates this effect, without the need for a separate transparent surface.
+*   Diffuse roughness: Produces the flatter appearance and enhanced backscattering of rough diffuse surfaces such as clay, concrete, and unpolished materials.
 *   Iridescence: Allows to render the effect where hue varies depending on the viewing angle and illumination angle. This can be seen on soap bubbles, oil films, or on the wings of many insects.
 *   Physically-based transparency: One limitation of [Material#opacity](Material.html#opacity) is that highly transparent materials are less reflective. Physically-based transmission provides a more realistic option for thin, transparent surfaces like glass.
 *   Advanced reflectivity: More flexible reflectivity for non-metallic materials.
@@ -98,6 +99,14 @@ The green channel of this texture is multiplied against `clearcoatRoughness`, fo
 `clearcoatRoughnessMap` represents non-color data. Any texture assigned must have `texture.colorSpace = NoColorSpace` (default).
 
 Default is `null`.
+
+### .diffuseRoughness : number
+
+Roughness of the diffuse layer, from `0.0` to `1.0`. A value of `0.0` uses Lambertian diffuse reflection. Values above `0.0` use the [energy-preserving Oren-Nayar (EON)](https://jcgt.org/published/0014/01/06/) rough diffuse model.
+
+EON is evaluated directly for directional, point, spot, and sun lights. Indirect lighting uses the model's directional albedo integral. Rectangular area lights continue to use the existing Lambertian LTC approximation.
+
+Default is `0`.
 
 ### .dispersion : number
 
