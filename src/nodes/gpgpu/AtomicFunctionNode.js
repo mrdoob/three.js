@@ -95,7 +95,7 @@ class AtomicFunctionNode extends Node {
 
 		if ( builder.shaderStage === 'vertex' ) {
 
-			error( `TSL: ${this.method} is not supported in the vertex stage.` );
+			error( `TSL: "${this.method}" is not supported in the vertex stage.` );
 
 		}
 

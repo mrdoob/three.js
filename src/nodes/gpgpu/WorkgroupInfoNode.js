@@ -211,7 +211,7 @@ class WorkgroupInfoNode extends Node {
 
 		if ( builder.shaderStage !== 'compute' ) {
 
-			error( 'TSL: workgroupArray() can only be executed within the compute shader stage' );
+			error( 'TSL: "workgroupArray()" can only be executed within the compute shader stage' );
 
 		}
 

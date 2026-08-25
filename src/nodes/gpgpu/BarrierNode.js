@@ -42,7 +42,7 @@ class BarrierNode extends Node {
 
 		if ( shaderStage !== 'compute' ) {
 
-			error( `BarrierNode: ${barrierMethod} is not supported in the ${shaderStage} stage and can only be executed in compute.` );
+			error( `TSL: "${barrierMethod}" is not supported in the ${shaderStage} stage and can only be executed in compute.` );
 
 		}
 

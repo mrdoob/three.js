@@ -102,7 +102,7 @@ class SubgroupFunctionNode extends TempNode {
 
 		if ( builder.shaderStage === 'vertex' ) {
 
-			error( `TSL: ${this.method} is not supported in the vertex shader stage.` );
+			error( `TSL: "${this.method}" is not supported in the vertex shader stage.` );
 
 		}
 
