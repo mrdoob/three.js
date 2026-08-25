@@ -32,7 +32,7 @@ class SSAAPassNode extends PassNode {
 	 */
 	constructor( scene, camera ) {
 
-		super( PassNode.COLOR, scene, camera );
+		super( PassNode.COLOR, scene, camera, { samples: 0 } );
 
 		/**
 		 * This flag can be used for type testing.
