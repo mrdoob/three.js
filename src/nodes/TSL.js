@@ -161,6 +161,7 @@ export * from './shapes/Shapes.js';
 export * from './materialx/MaterialXNodes.js';
 
 // functions
+export { default as BRDF_EON, EON_DirectionalAlbedo } from './functions/BSDF/BRDF_EON.js';
 export { default as BRDF_GGX } from './functions/BSDF/BRDF_GGX.js';
 export { default as BRDF_Lambert } from './functions/BSDF/BRDF_Lambert.js';
 export { default as BRDF_Sheen } from './functions/BSDF/BRDF_Sheen.js';

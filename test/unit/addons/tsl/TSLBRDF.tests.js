@@ -2,7 +2,7 @@ import {
 	float, vec3,
 	D_GGX, D_GGX_Anisotropic, F_Schlick, Schlick_to_F0,
 	V_GGX_SmithCorrelated, V_GGX_SmithCorrelated_Anisotropic,
-	BRDF_Lambert, BRDF_GGX, getDistanceAttenuation
+	BRDF_EON, BRDF_Lambert, BRDF_GGX, EON_DirectionalAlbedo, getDistanceAttenuation
 } from 'three/tsl';
 import { gpuTest } from './gpu-test-utils.js';
 
@@ -176,6 +176,83 @@ export default QUnit.module( 'TSL', () => {
 			// Punctual-light Lambertian diffuse term -- the function's own
 			// source comment: "diffuseColor.mul(1/Math.PI)".
 			assert.closeAbs( BRDF_Lambert( { diffuseColor: vec3( 0.8, 0.4, 0.2 ) } ), vec3( 0.8 / Math.PI, 0.4 / Math.PI, 0.2 / Math.PI ), 1e-5, 'BRDF_Lambert(c) == c/PI' );
+
+		} );
+
+		gpuTest( 'BRDF_EON() matches the energy-preserving rough diffuse model', ( { assert } ) => {
+
+			const eon = ( rho, roughness, dotNV, dotNL, dotVL ) => {
+
+				const a = 1 / ( 1 + ( 0.5 - 2 / ( 3 * Math.PI ) ) * roughness );
+				const s = dotVL - dotNV * dotNL;
+				const sOverT = s > 0 ? s / Math.max( dotNV, dotNL, 1e-7 ) : s;
+				const singleScatter = rho / Math.PI * a * ( 1 + roughness * sOverT );
+
+				const directionalAlbedo = ( mu ) => {
+
+					const muComp = 1 - mu;
+					const gOverPi = muComp * ( 0.0571085289 + muComp * ( 0.491881867 + muComp * ( - 0.332181442 + muComp * 0.0714429953 ) ) );
+					return a * ( 1 + roughness * gOverPi );
+
+				};
+
+				const averageAlbedo = a * ( 1 + ( 2 / 3 - 28 / ( 15 * Math.PI ) ) * roughness );
+				const rhoMultiScatter = rho * rho * averageAlbedo / Math.max( 1e-7, 1 - rho * ( 1 - averageAlbedo ) );
+				const multiScatter = rhoMultiScatter / Math.PI
+					* Math.max( 1e-7, 1 - directionalAlbedo( dotNV ) )
+					* Math.max( 1e-7, 1 - directionalAlbedo( dotNL ) )
+					/ Math.max( 1e-7, 1 - averageAlbedo );
+
+				return singleScatter + multiScatter;
+
+			};
+
+			const normal = vec3( 0, 0, 1 );
+			const viewDirection = vec3( 0.6, 0, 0.8 );
+			const lightDirection = vec3( 0.6, 0, 0.8 );
+			const diffuseColor = [ 0.8, 0.4, 0.2 ];
+			const roughness = 0.7;
+			const expected = diffuseColor.map( rho => eon( rho, roughness, 0.8, 0.8, 1.0 ) );
+
+			assert.closeAbs(
+				BRDF_EON( { lightDirection, diffuseColor: vec3( ...diffuseColor ), roughness: float( roughness ), normalView: normal, viewDirection } ),
+				vec3( ...expected ), 1e-4, 'BRDF_EON matches Listing 1 for a rough backscattering configuration'
+			);
+
+			assert.closeAbs(
+				BRDF_EON( { lightDirection, diffuseColor: vec3( ...diffuseColor ), roughness: float( 0 ), normalView: normal, viewDirection } ),
+				vec3( ...diffuseColor.map( value => value / Math.PI ) ), 1e-5, 'BRDF_EON reduces exactly to Lambert at zero roughness'
+			);
+
+		} );
+
+		gpuTest( 'EON_DirectionalAlbedo() preserves energy in a white furnace', ( { assert } ) => {
+
+			const directionalAlbedo = ( rho, roughness, dotNV ) => {
+
+				const a = 1 / ( 1 + ( 0.5 - 2 / ( 3 * Math.PI ) ) * roughness );
+				const muComp = 1 - dotNV;
+				const gOverPi = muComp * ( 0.0571085289 + muComp * ( 0.491881867 + muComp * ( - 0.332181442 + muComp * 0.0714429953 ) ) );
+				const fonAlbedo = a * ( 1 + roughness * gOverPi );
+				const averageAlbedo = a * ( 1 + ( 2 / 3 - 28 / ( 15 * Math.PI ) ) * roughness );
+				const rhoMultiScatter = rho * rho * averageAlbedo / Math.max( 1e-7, 1 - rho * ( 1 - averageAlbedo ) );
+
+				return rho * fonAlbedo + rhoMultiScatter * ( 1 - fonAlbedo );
+
+			};
+
+			assert.closeAbs(
+				EON_DirectionalAlbedo( { diffuseColor: vec3( 1 ), roughness: float( 0.9 ), dotNV: float( 0.2 ) } ),
+				vec3( 1 ), 1e-5, 'A white EON surface has unit directional albedo'
+			);
+
+			const diffuseColor = [ 0.8, 0.4, 0.2 ];
+			const expected = diffuseColor.map( rho => directionalAlbedo( rho, 0.7, 0.3 ) );
+
+			assert.closeAbs(
+				EON_DirectionalAlbedo( { diffuseColor: vec3( ...diffuseColor ), roughness: float( 0.7 ), dotNV: float( 0.3 ) } ),
+				vec3( ...expected ), 1e-5, 'Colored directional albedo includes the nonlinear multiple-scattering tint'
+			);
 
 		} );
 
