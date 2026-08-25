@@ -21,10 +21,4 @@ for the format itself.
 
 This branch (`ntc_16bit_tsl`) ships inference only - `NTCLoader.js` and
 `NTCMLPNode.js` - and does not carry the trainer that produced these files.
-They were trained offline against the same MaterialX samples using the
-`neural-appearance-ibl` branch's training tools (`NeuralTextureTrainer`,
-`classifyMaterialChannels`/`bakeMaterialToTextures` from
-`neural-material/NeuralMaterialSource.js`), then converted to the `.ntc`
-wrapper format - the underlying latent grid/MLP byte payloads are already
-uint8/float16-encoded by the trainer's own export path, so converting from
-a `.neuralMaterial` export is a JSON key rename, not a re-encode.
+They were trained offline against the same MaterialX samples.
