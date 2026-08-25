@@ -2707,8 +2707,7 @@ class Renderer {
 			this._nodes.dispose();
 			this._bindings.dispose();
 			this._renderLists.dispose();
-			this._renderContexts.dispose();
-			this._textures.dispose();
+			this._renderContexts.dispose();	
 
 			for ( const canvasTarget of this._frameBufferTargets.keys() ) {
 
@@ -2716,9 +2715,7 @@ class Renderer {
 
 			}
 
-			// dispose `info` last since destroying textures and render targets
-			// in the modules above updates its counters
-
+			this._textures.dispose();
 			this.info.dispose();
 
 			await this.backend.dispose();
