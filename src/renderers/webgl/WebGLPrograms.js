@@ -139,6 +139,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 
 		const HAS_ANISOTROPY = material.anisotropy > 0;
 		const HAS_CLEARCOAT = material.clearcoat > 0;
+		const HAS_DIFFUSE_ROUGHNESS = material.diffuseRoughness > 0;
 		const HAS_DISPERSION = material.dispersion > 0;
 		const HAS_RETROREFLECTION = material.retroreflectivity > 0;
 		const HAS_IRIDESCENCE = material.iridescence > 0;
@@ -240,6 +241,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			clearcoatNormalMap: HAS_CLEARCOAT_NORMALMAP,
 			clearcoatRoughnessMap: HAS_CLEARCOAT_ROUGHNESSMAP,
 
+			diffuseRoughness: HAS_DIFFUSE_ROUGHNESS,
 			dispersion: HAS_DISPERSION,
 			retroreflection: HAS_RETROREFLECTION,
 
@@ -540,6 +542,8 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			_programLayers.enable( 19 );
 		if ( parameters.retroreflection )
 			_programLayers.enable( 24 );
+		if ( parameters.diffuseRoughness )
+			_programLayers.enable( 25 );
 		if ( parameters.batchingColor )
 			_programLayers.enable( 20 );
 		if ( parameters.gradientMap )

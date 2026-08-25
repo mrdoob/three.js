@@ -11,6 +11,12 @@ material.roughness = max( roughnessFactor, 0.0525 );// 0.0525 corresponds to the
 material.roughness += geometryRoughness;
 material.roughness = min( material.roughness, 1.0 );
 
+#ifdef USE_DIFFUSE_ROUGHNESS
+
+	material.diffuseRoughness = saturate( diffuseRoughness );
+
+#endif
+
 #ifdef IOR
 
 	material.ior = ior;

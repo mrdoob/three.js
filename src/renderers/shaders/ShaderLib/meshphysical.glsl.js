@@ -95,6 +95,10 @@ uniform float opacity;
 	uniform float clearcoatRoughness;
 #endif
 
+#ifdef USE_DIFFUSE_ROUGHNESS
+	uniform float diffuseRoughness;
+#endif
+
 #ifdef USE_DISPERSION
 	uniform float dispersion;
 #endif

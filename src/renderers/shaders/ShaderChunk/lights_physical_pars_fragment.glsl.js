@@ -16,6 +16,10 @@ struct PhysicalMaterial {
 	vec2 dfg;
 	vec3 multiScatteringCompensation;
 
+	#ifdef USE_DIFFUSE_ROUGHNESS
+		float diffuseRoughness;
+	#endif
+
 	#ifdef USE_RETROREFLECTION
 		float retroreflectivity;
 	#endif
@@ -75,6 +79,66 @@ vec3 Schlick_to_F0( const in vec3 f, const in float f90, const in float dotVH ) 
 
     return ( f - vec3( f90 ) * x5 ) / ( 1.0 - x5 );
 }
+
+#ifdef USE_DIFFUSE_ROUGHNESS
+
+	// Portsmouth et al. 2025, "EON: A Practical Energy-Preserving Rough Diffuse BRDF"
+	// https://jcgt.org/published/0014/01/06/
+	const float EON_EPSILON = 1e-7;
+
+	float FON_DirectionalAlbedo( const in float mu, const in float roughness, const in float A ) {
+
+		float muComp = 1.0 - mu;
+		float gOverPi = muComp * ( 0.0571085289 + muComp * ( 0.491881867 + muComp * ( - 0.332181442 + muComp * 0.0714429953 ) ) );
+
+		return A * ( 1.0 + roughness * gOverPi );
+
+	}
+
+	vec3 BRDF_EON( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in vec3 diffuseColor, const in float roughness ) {
+
+		vec3 rho = saturate( diffuseColor );
+
+		if ( roughness <= EON_EPSILON ) return BRDF_Lambert( rho );
+
+		float dotNL = saturate( dot( normal, lightDir ) );
+		float dotNV = saturate( dot( normal, viewDir ) );
+		float s = dot( lightDir, viewDir ) - dotNL * dotNV;
+		float sOverT = ( s > 0.0 ) ? s / max( max( dotNL, dotNV ), EON_EPSILON ) : s;
+
+		float A = 1.0 / ( 1.0 + ( 0.5 - 2.0 / ( 3.0 * PI ) ) * roughness );
+		vec3 singleScatter = rho * RECIPROCAL_PI * A * ( 1.0 + roughness * sOverT );
+
+		float averageAlbedo = A * ( 1.0 + ( 2.0 / 3.0 - 28.0 / ( 15.0 * PI ) ) * roughness );
+		float albedoV = FON_DirectionalAlbedo( dotNV, roughness, A );
+		float albedoL = FON_DirectionalAlbedo( dotNL, roughness, A );
+
+		vec3 rhoMultiScatter = rho * rho * averageAlbedo / max( vec3( EON_EPSILON ), vec3( 1.0 ) - rho * ( 1.0 - averageAlbedo ) );
+		vec3 multiScatter = rhoMultiScatter * RECIPROCAL_PI
+			* max( EON_EPSILON, 1.0 - albedoV )
+			* max( EON_EPSILON, 1.0 - albedoL )
+			/ max( EON_EPSILON, 1.0 - averageAlbedo );
+
+		return singleScatter + multiScatter;
+
+	}
+
+	vec3 EON_DirectionalAlbedo( const in vec3 diffuseColor, const in float roughness, const in float dotNV ) {
+
+		vec3 rho = saturate( diffuseColor );
+
+		if ( roughness <= EON_EPSILON ) return rho;
+
+		float A = 1.0 / ( 1.0 + ( 0.5 - 2.0 / ( 3.0 * PI ) ) * roughness );
+		float directionalAlbedo = FON_DirectionalAlbedo( dotNV, roughness, A );
+		float averageAlbedo = A * ( 1.0 + ( 2.0 / 3.0 - 28.0 / ( 15.0 * PI ) ) * roughness );
+		vec3 rhoMultiScatter = rho * rho * averageAlbedo / max( vec3( EON_EPSILON ), vec3( 1.0 ) - rho * ( 1.0 - averageAlbedo ) );
+
+		return rho * directionalAlbedo + rhoMultiScatter * ( 1.0 - directionalAlbedo );
+
+	}
+
+#endif
 
 // Moving Frostbite to Physically Based Rendering 3.0 - page 12, listing 2
 // https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
@@ -543,7 +607,17 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
 
 	#endif
 
-	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseContribution ) * ( 1.0 - F );
+	#ifdef USE_DIFFUSE_ROUGHNESS
+
+		vec3 diffuseBRDF = BRDF_EON( directLight.direction, geometryViewDir, geometryNormal, material.diffuseColor, material.diffuseRoughness ) * ( 1.0 - material.metalness );
+
+	#else
+
+		vec3 diffuseBRDF = BRDF_Lambert( material.diffuseContribution );
+
+	#endif
+
+	reflectedLight.directDiffuse += irradiance * diffuseBRDF * ( 1.0 - F );
 }
 
 void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
@@ -562,7 +636,19 @@ void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in vec3 geomet
 
 	#endif
 
-	vec3 diffuse = irradiance * BRDF_Lambert( material.diffuseContribution ) * ( 1.0 - singleScattering - multiScattering );
+	#ifdef USE_DIFFUSE_ROUGHNESS
+
+		float dotNV = saturate( dot( geometryNormal, geometryViewDir ) );
+		// Irradiance has already integrated the cosine term, so use the directional
+		// albedo to approximate EON under locally uniform incident radiance.
+		vec3 diffuseAlbedo = EON_DirectionalAlbedo( material.diffuseColor, material.diffuseRoughness, dotNV ) * ( 1.0 - material.metalness );
+		vec3 diffuse = irradiance * RECIPROCAL_PI * diffuseAlbedo * ( 1.0 - singleScattering - multiScattering );
+
+	#else
+
+		vec3 diffuse = irradiance * BRDF_Lambert( material.diffuseContribution ) * ( 1.0 - singleScattering - multiScattering );
+
+	#endif
 
 	#ifdef USE_SHEEN
 
@@ -621,7 +707,16 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	// Diffuse energy conservation uses dielectric path
 	vec3 totalScatteringDielectric = singleScatteringDielectric + multiScatteringDielectric;
-	vec3 diffuse = material.diffuseContribution * ( 1.0 - totalScatteringDielectric );
+	#ifdef USE_DIFFUSE_ROUGHNESS
+
+		float dotNV = saturate( dot( geometryNormal, geometryViewDir ) );
+		vec3 diffuse = EON_DirectionalAlbedo( material.diffuseColor, material.diffuseRoughness, dotNV ) * ( 1.0 - material.metalness ) * ( 1.0 - totalScatteringDielectric );
+
+	#else
+
+		vec3 diffuse = material.diffuseContribution * ( 1.0 - totalScatteringDielectric );
+
+	#endif
 
 	vec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;
 
