@@ -2700,8 +2700,6 @@ class Renderer {
 
 		if ( this._initialized === true ) {
 
-			this.info.dispose();
-
 			this._animation.dispose();
 			this._objects.dispose();
 			this._geometries.dispose();
@@ -2710,13 +2708,15 @@ class Renderer {
 			this._bindings.dispose();
 			this._renderLists.dispose();
 			this._renderContexts.dispose();
-			this._textures.dispose();
 
 			for ( const canvasTarget of this._frameBufferTargets.keys() ) {
 
 				canvasTarget.dispose();
 
 			}
+
+			this._textures.dispose();
+			this.info.dispose();
 
 			await this.backend.dispose();
 

@@ -55,6 +55,56 @@ class Textures extends DataMap {
 		 */
 		this._htmlTextures = new Set();
 
+		/**
+		 * Stores weak references to the textures and render targets
+		 * with attached `dispose` event listeners.
+		 *
+		 * @private
+		 * @type {Set<WeakRef<(Texture|RenderTarget)>>}
+		 */
+		this._tracked = new Set();
+
+		/**
+		 * Removes weak references from `_tracked` when their texture or
+		 * render target has been garbage collected without an explicit
+		 * `dispose()`.
+		 *
+		 * @private
+		 * @type {FinalizationRegistry}
+		 */
+		this._registry = new FinalizationRegistry( ( ref ) => this._tracked.delete( ref ) );
+
+	}
+
+	/**
+	 * Frees internal resources.
+	 */
+	dispose() {
+
+		for ( const ref of this._tracked ) {
+
+			const object = ref.deref();
+
+			if ( object === undefined || this.has( object ) === false ) continue;
+
+			if ( object.isRenderTarget === true ) {
+
+				this._destroyRenderTarget( object );
+
+			} else {
+
+				this._destroyTexture( object );
+
+			}
+
+		}
+
+		this._tracked.clear();
+
+		this._htmlTextures.clear();
+
+		super.dispose();
+
 	}
 
 	/**
@@ -188,6 +238,13 @@ class Textures extends DataMap {
 			};
 
 			renderTarget.addEventListener( 'dispose', renderTargetData.onDispose );
+
+			// see #34368 why tracking separate remove listeners is required right now
+			// TODO: Re-evaluate how onDispose() is managed in this component
+			renderTargetData.ref = new WeakRef( renderTarget );
+
+			this._tracked.add( renderTargetData.ref );
+			this._registry.register( renderTarget, renderTargetData.ref, renderTargetData.ref );
 
 		}
 
@@ -409,6 +466,13 @@ class Textures extends DataMap {
 
 			texture.addEventListener( 'dispose', textureData.onDispose );
 
+			// see #34368 why tracking separate remove listeners is required right now
+			// TODO: Re-evaluate how onDispose() is managed in this component
+			textureData.ref = new WeakRef( texture );
+
+			this._tracked.add( textureData.ref );
+			this._registry.register( texture, textureData.ref, textureData.ref );
+
 		}
 
 		//
@@ -560,6 +624,9 @@ class Textures extends DataMap {
 
 			renderTarget.removeEventListener( 'dispose', renderTargetData.onDispose );
 
+			this._tracked.delete( renderTargetData.ref );
+			this._registry.unregister( renderTargetData.ref );
+
 			//
 
 			for ( let i = 0; i < textures.length; i ++ ) {
@@ -598,6 +665,9 @@ class Textures extends DataMap {
 			//
 
 			texture.removeEventListener( 'dispose', textureData.onDispose );
+
+			this._tracked.delete( textureData.ref );
+			this._registry.unregister( textureData.ref );
 
 			// if a texture is not ready for use, it falls back to a default texture so it's possible
 			// to use it for rendering. If a texture in this state is disposed, it's important to
