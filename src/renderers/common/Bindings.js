@@ -366,14 +366,12 @@ class Bindings extends DataMap {
 
 		for ( const binding of bindGroup.bindings ) {
 
-			const updatedGroup = this.nodes.updateGroup( binding );
-
-			// every uniforms group is a uniform buffer. So if no update is required,
-			// we move one with the next binding. Otherwise the next if block will update the group.
-
-			if ( updatedGroup === false ) continue;
-
-			//
+			// A storage node's `.value` can be repointed to a different attribute without the
+			// enclosing render/frame group ever being invalidated (the group tracks per-frame
+			// invalidation, not the node's own attribute identity). So the attribute-sync/cache-key
+			// logic below has to run unconditionally, independent of `updateGroup()`'s result -- unlike
+			// the uniform-buffer/texture/sampler branches further down, which are fine being skipped
+			// when their group hasn't changed.
 
 			if ( binding.isStorageBuffer ) {
 
@@ -398,7 +396,34 @@ class Bindings extends DataMap {
 				cacheKey += attribute.id + ',';
 				version += attribute.version;
 
+				// keep track which bind groups refer to the current attribute so cached bind
+				// groups can be evicted when the attribute is disposed (mirrors the texture
+				// bind group tracking below, which exists for the same reason)
+
+				const attributeData = this.attributes.get( attribute );
+
+				if ( attributeData.bindGroups === undefined ) {
+
+					attributeData.bindGroups = new Set();
+
+					const onDispose = () => this._destroyStorageBufferBindGroups( attribute );
+
+					attribute.addEventListener( 'dispose', onDispose );
+
+				}
+
+				attributeData.bindGroups.add( bindGroup );
+
 			}
+
+			const updatedGroup = this.nodes.updateGroup( binding );
+
+			// every uniforms group is a uniform buffer. So if no update is required,
+			// we move one with the next binding. Otherwise the next if block will update the group.
+
+			if ( updatedGroup === false ) continue;
+
+			//
 
 			if ( binding.isUniformBuffer ) {
 
@@ -474,21 +499,29 @@ class Bindings extends DataMap {
 
 			} else if ( binding.isSampler ) {
 
-				const updated = binding.update();
+				// `binding.update()` only reports a change when the bound texture's `version`
+				// bumps, but sampler settings (wrap/filter/anisotropy) don't bump that version.
+				// So the sampler key has to be recomputed and compared unconditionally -- gating
+				// it behind `update()` would mean a sampler-only settings change is never even
+				// detected, let alone folded into the cache key below.
 
-				if ( updated ) {
+				binding.update();
 
-					const samplerKey = this.textures.updateSampler( binding );
+				const samplerKey = this.textures.updateSampler( binding );
 
-					if ( binding.samplerKey !== samplerKey ) {
+				if ( binding.samplerKey !== samplerKey ) {
 
-						binding.samplerKey = samplerKey;
+					binding.samplerKey = samplerKey;
 
-						needsBindingsUpdate = true;
-
-					}
+					needsBindingsUpdate = true;
 
 				}
+
+				// Fold the sampler's key into the cache key, mirroring the isSampledTexture
+				// branch above, so a bind group isn't reused after only the sampler's own
+				// settings changed.
+
+				cacheKey += binding.samplerKey + ',';
 
 			}
 
@@ -503,6 +536,35 @@ class Bindings extends DataMap {
 		if ( needsBindingsUpdate === true ) {
 
 			this.backend.updateBindings( bindGroup, bindings, cacheBindings ? cacheKey : '', version );
+
+		}
+
+	}
+
+	/**
+	 * Evicts every cached bind group entry tied to the given storage attribute. Called when
+	 * the attribute is disposed, so a bind group's per-cache-key GPU objects (keyed in part by
+	 * `attribute.id`, see `_update()`) don't keep accumulating for an attribute id that will
+	 * never be referenced again. Mirrors the cleanup `Textures.js` performs for disposed textures.
+	 *
+	 * @param {BufferAttribute} attribute - The disposed storage attribute.
+	 */
+	_destroyStorageBufferBindGroups( attribute ) {
+
+		const attributeData = this.attributes.get( attribute );
+
+		if ( attributeData.bindGroups ) {
+
+			for ( const bindGroup of attributeData.bindGroups ) {
+
+				const bindingsData = this.backend.get( bindGroup );
+
+				bindingsData.groups = undefined;
+				bindingsData.versions = undefined;
+
+			}
+
+			attributeData.bindGroups.clear();
 
 		}
 
