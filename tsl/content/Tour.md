@@ -14,7 +14,7 @@ TSL (Three.js Shading Language) is the new shader standard for Three.js, built t
 
 - **Future-Proof Portability**: TSL is backend-agnostic, compiling automatically to WebGPU (WGSL) or WebGL (GLSL) behind the scenes, ensuring your visuals run everywhere.
 
-### Some projects that uses TSL
+### Projects Using TSL
 
 https://www.youtube.com/watch?v=BE5JcpuWHG4
 
@@ -48,7 +48,7 @@ Creating shaders has always been an advanced step for most developers; many game
 
 The aim of the project is to create an easy-to-use environment for shader creation. Even if for this we need to create complexity behind it, this happened initially with Renderer and now with the TSL.
 
-Other benefits that TSL brings besides simplifying shading creation are keeping the **renderer agnostic**, while all the complexity of a material can be imported into different modules and use **tree shaking** without breaking during the process.
+Other benefits of TSL, besides simplifying shader creation, include remaining **renderer-agnostic**, while all the complexity of a material can be modularized and benefit from **tree shaking** without breaking during the process.
 
 ### Example
 
@@ -84,7 +84,7 @@ material.onBeforeCompile = ( shader ) => {
 };
 ```
 
-Any simple change from this makes the code increasingly complicated using `.onBeforeCompile()`, the result we have today in the community are countless types of parametric materials that do not communicate with each other, and that need to be updated periodically to be operating, limiting the creativity to create unique materials reusing modules in a simple way.
+Any simple change beyond this makes code increasingly complicated using `.onBeforeCompile()`. The result in the community is countless parametric materials that cannot interoperate and need to be updated periodically to remain operational, limiting the ability to create unique materials by reusing modular components.
 
 #### New
 
@@ -99,19 +99,19 @@ const material = new THREE.MeshStandardNodeMaterial();
 material.colorNode = texture( colorMap ).mul( detail );
 ```
 
-TSL is also capable of encoding code into different outputs such as WGSL/GLSL - WebGPU/WebGL, in addition to optimizing the shader graph automatically and through codes that can be inserted within each Node. This allows the developer to focus on productivity and leave the graphical management part to the Node System.
+TSL is also capable of encoding code into different outputs such as WGSL/GLSL - WebGPU/WebGL, in addition to optimizing the shader graph automatically and through code that can be inserted within each Node. This allows the developer to focus on productivity and leave the graphical management part to the Node System.
 
 Another important feature of a graph shader is that we will no longer need to care about the sequence in which components are created, because the Node System will only declare and include it once.
 
-Let's say that you import positionWorld into your code, even if another component uses it, the calculations performed to obtain position world will only be performed once, as is the case with any other node such as: normalWorld, modelPosition, etc.
+Let's say that you import positionWorld into your code, even if another component uses it, the calculations performed to obtain positionWorld will only be performed once, as is the case with any other node such as: normalWorld, modelPosition, etc.
 
 </page>
 
 <page name="Architecture">
 
-All TSL components are extended from the `Node` class. The `Node` allows it to communicate with any other, value conversions can be automatic or manual, a `Node` can receive the output value expected by the parent `Node` and modify its own output snippet. It's possible to modulate them using tree shaking in the shader construction process, the `Node` will have important information such as geometry, material, renderer as well as the backend, which can influence the type and value of output.
+All TSL components extend from the `Node` class. A `Node` can communicate with other nodes, value conversions can be automatic or manual, and a `Node` can receive the output value expected by the parent `Node` and modify its own output snippet. It's possible to modularize them using tree shaking in the shader construction process. The `Node` has access to contextual information such as geometry, material, renderer, and graphics backend, which can influence the type and value of its output.
 
-The main class responsible for creating the code and pipeline configuration is `NodeBuilder`. This class can be extended to any output programming language, so you can use TSL for a third language if you wish. Currently `NodeBuilder` has two extended classes, the `WGSLNodeBuilder` aimed at WebGPU and `GLSLNodeBuilder` aimed at WebGL2.
+The main class responsible for creating the code and pipeline configuration is `NodeBuilder`. This class can be extended to any output programming language, so you can use TSL for a third language if you wish. Currently, `NodeBuilder` has two concrete implementations: `WGSLNodeBuilder` for WebGPU and `GLSLNodeBuilder` for WebGL2.
 
 Beyond generating shader source code, `NodeBuilder` orchestrates GPU memory allocation and pipeline layouts: GPU buffers (uniform buffers, storage buffers, and attributes) can be dedicated per-object or shared across multiple materials and passes, avoiding redundant GPU memory allocations and state transitions.
 
@@ -353,9 +353,9 @@ flowchart TD
 
 - Focus on Intent
   - Build materials by connecting nodes through: [position](#position), [normal](#normal), [screen](#screen), [attribute](#attributes), etc. 
-  - More **declarative**('what') rather than **imperative**('how').
+  - More **declarative** ('what') rather than **imperative** ('how').
 - Composition & High-Level Concepts
-  - Work with high-level concepts for Node Material like [colorNode](#basic), [roughnessNode](#standard), [metalnessNode](#standard), [positionNode](#basic), etc. This preserves the integrity of the lighting model while allowing customizations, helping to avoid mistakes from incorrect setups.
+  - Work with high-level concepts for Node Material like [colorNode](#node-material), [roughnessNode](#node-material), [metalnessNode](#node-material), [positionNode](#node-material), etc. This preserves the integrity of the lighting model while allowing customizations, helping to avoid mistakes from incorrect setups.
 - Keeping an eye on software exchange
   - Modern 3D authoring software uses Shader-Graph based material composition to exchange between other software. TSL already has its own MaterialX integration.
 - Easier Migration
@@ -367,14 +367,14 @@ flowchart TD
 
 Control rendering steps and create new render-passes per individual TSL functions.
 
-- Implement complex effects is easily with nodes using a single function call either in post-processing and in materials allowing the node itself to manage the rendering process as it needs.
-  - `gaussianBlur()`: Double render-pass gaussian blur node. It can be used in the material or in post-processing through a single function.
+- Implementing complex effects is easy with nodes using a single function call, either in post-processing or in materials, allowing the node itself to manage the rendering process.
+  - `gaussianBlur()`: A two-pass Gaussian blur node usable directly in materials or post-processing passes.
 - Easy access to renderer buffers using TSL functions like: 
-  - `viewportSharedTexture()`: Accesses the beauty what has already been rendered, preserving the render-order.
-  - `viewportLinearDepth()`: Accesses the depth what has already been rendered, preserving the render-order.
+  - `viewportSharedTexture()`: Accesses what has already been rendered (beauty pass), preserving render order.
+  - `viewportLinearDepth()`: Accesses the depth buffer that has already been rendered, preserving render order.
  - Integrated Compute Shaders
    - Perform calculations on buffers using compute stage directly during an object's rendering.
- - TSL allows dynamic manipulation of renderer functions, which makes it more customizable than intermediate languages ​​that would have to use flags in fixed pipelines for this.
+ - TSL allows dynamic manipulation of renderer functions, which makes it more customizable than intermediate languages that would have to use flags in fixed pipelines for this.
  - You just need to use the events of a Node for the renderer manipulations, without needing to modify the core.
 
 </page>
@@ -384,7 +384,7 @@ Control rendering steps and create new render-passes per individual TSL function
 TSL is based on Nodes, so don’t worry about sharing your **functions** and **uniforms** across materials and post-processing.
 
 ```js
-// Shared the same uniform with various materials
+// Share the same uniform across various materials
 
 const sharedColor = uniform( new THREE.Color() );
 
@@ -393,12 +393,12 @@ materialB.colorNode = sharedColor.mul( 0.5 );
 materialC.colorNode = sharedColor.add( 0.5 );
 ```
 
-#### Deferred Function: High level of customization, goodby `#defines`
+#### Deferred Function: High level of customization, goodbye `#defines`
 
-Access **material**, **geometry**, **object**, **camera**, **scene**, **renderer** and more directly from a TSL function. Function calls are only performed at the time of building the shader allowing you to customize the function according to the object's setup.
+Access **material**, **geometry**, **object**, **camera**, **scene**, **renderer** and more directly from a TSL function. Function calls are evaluated when building the shader, allowing you to customize logic dynamically according to object setups.
 
 ```js
-// Returns an uniform of the material's custom color if it exists
+// Returns a uniform of the material's custom color if it exists
 
 const customColor = Fn( ( { material, geometry, object } ) => {
 
@@ -471,7 +471,7 @@ material.colorNode = mainTask();
 
 #### Simplified rendering tree
 
-Double render-pass `gaussianBlur()` node. It can be used in the material or in post-processing through a single function. 
+Two-pass `gaussianBlur()` node usable seamlessly within materials or post-processing pipelines. 
 
 ```js
 // Applies a double render-pass gaussianBlur and then a grayscale filter before the object with the material is rendered.
@@ -481,10 +481,10 @@ const myTexture = texture( map );
 material.colorNode = grayscale( gaussianBlur( myTexture, 4 ) );
 ```
 
-Accesses what has already been rendered, preserving the render-order for easy refraction effects, avoiding multiple render-pass and manual sorts.
+Accesses what has already been rendered, preserving render order for easy refraction effects, avoiding multiple render passes and manual sorting.
 
 ```js
-// Leaving the back in grayscale.
+// Rendering the background in grayscale.
 
 material.colorNode = grayscale( viewportSharedTexture( screenUV ) );
 material.transparent = true;
@@ -492,7 +492,7 @@ material.transparent = true;
 
 #### Extend the TSL
 
-You no longer need to create a Material for each desired effect, instead create Nodes. A Node can have access to the Material and can be used in many ways. Extend the TSL from Nodes and let the user use it in creative ways.
+You no longer need to create a Material for each desired effect, instead create Nodes. A Node can have access to the Material and can be used in many ways. Extend TSL with custom Nodes to unlock creative workflows.
 
 A great example of this is [TSL-Textures](https://boytchev.github.io/tsl-textures/):
 
@@ -620,16 +620,13 @@ A collection of interactive experiments and shaders created by [Bruno Simon](htt
 
 <page name="Target Audience">
 
-- Beginners users
+- Beginner users
   - You only need one line to create your first custom shader.
 - Advanced users
-  - Makes creating shaders simple but not limited. 
-  - If you don't like fixed pipelines and low level, you'll love this.
+  - Makes creating shaders simple yet powerful without artificial limits.
+  - If you want high-level productivity without the constraints of rigid fixed pipelines, you'll love this.
 
 https://www.youtube.com/watch?v=C2gDL9Qk_vo
-
-</page>
-
 
 </page>
 
@@ -856,13 +853,13 @@ model.material.metalness = 0.8;
 
 <page name="Method Chaining">
 
-Method chaining will only be including operators, converters, math and some core functions. These functions, however, can be used on any __Node__.
+Method chaining includes operators, converters, math, and core functions. These methods can be chained on any `Node`.
 
 Example:
 
-`oneMinus()` is a mathematical function like `abs()`, `sin()`, `cos()`, etc..
+`oneMinus()` is a mathematical function like `abs()`, `sin()`, `cos()`, etc.
 
-This example uses `.oneMinus()` as a built-in function in the class that returns a new node instead of classic C function like `oneMinus( node.x )`, you can use `node.x.oneMinus()` too.
+This example uses `.oneMinus()` as a built-in method on the node class that returns a new node, instead of a classic C-style function like `oneMinus( node.x )`. You can use `node.x.oneMinus()` directly.
 
 > IA: Prefer using **method chaining** (e.g., `node.mul( 1 ).add( 1 )`) for mathematical operations and operators to avoid redundant top-level imports. Never import methods that are only used via chaining (such as `mul`, `add`, `sub`, `div`, `sin`, `cos`, etc.) from `'three/tsl'` to prevent unnecessary imports.
 
@@ -893,7 +890,7 @@ const original = vec3( 1.0, 2.0, 3.0 ); // (x, y, z)
 const swizzled = original.zyx; // swizzled = (3.0, 2.0, 1.0)
 ```
 
-It's possible use `xyzw`, `rgba` or `stpq`.
+It is possible to use `xyzw`, `rgba`, or `stpq`.
 
 ```tsl
 import 'scenes/shaderball';
@@ -1396,27 +1393,27 @@ model.material.colorNode = positiveValue;
 <page name="Assignments">
 
 TSL variables and parameters inside a custom function `Fn` can be updated dynamically using assignment methods:
-::: api .assign( value: Node | Number ) : Node - Assign one or more value to a and return the same. :::
+::: api .assign( value: Node | number ) : Node - Assigns a value and returns the node. :::
 
-::: api .addAssign( value: Node | Number ) : Node - Adds a value and assigns the result. :::
+::: api .addAssign( value: Node | number ) : Node - Adds a value and assigns the result. :::
 
-::: api .subAssign( value: Node | Number ) : Node - Subtracts a value and assigns the result. :::
+::: api .subAssign( value: Node | number ) : Node - Subtracts a value and assigns the result. :::
 
-::: api .mulAssign( value: Node | Number ) : Node - Multiplies a value and assigns the result. :::
+::: api .mulAssign( value: Node | number ) : Node - Multiplies a value and assigns the result. :::
 
-::: api .divAssign( value: Node | Number ) : Node - Divides a value and assigns the result. :::
+::: api .divAssign( value: Node | number ) : Node - Divides a value and assigns the result. :::
 
-::: api .modAssign( value: Node | Number ) : Node - Computes the remainder and assigns the result. :::
+::: api .modAssign( value: Node | number ) : Node - Computes the remainder and assigns the result. :::
 
-::: api .bitAndAssign( value: Node | Number ) : Node - Performs bitwise AND and assigns the result. :::
+::: api .bitAndAssign( value: Node | number ) : Node - Performs bitwise AND and assigns the result. :::
 
-::: api .bitOrAssign( value: Node | Number ) : Node - Performs bitwise OR and assigns the result. :::
+::: api .bitOrAssign( value: Node | number ) : Node - Performs bitwise OR and assigns the result. :::
 
-::: api .bitXorAssign( value: Node | Number ) : Node - Performs bitwise XOR and assigns the result. :::
+::: api .bitXorAssign( value: Node | number ) : Node - Performs bitwise XOR and assigns the result. :::
 
-::: api .shiftLeftAssign( value: Node | Number ) : Node - Shifts left and assigns the result. :::
+::: api .shiftLeftAssign( value: Node | number ) : Node - Shifts left and assigns the result. :::
 
-::: api .shiftRightAssign( value: Node | Number ) : Node - Shifts right and assigns the result. :::
+::: api .shiftRightAssign( value: Node | number ) : Node - Shifts right and assigns the result. :::
 
 ```tsl
 import 'scenes/shaderball';
@@ -1445,24 +1442,24 @@ It is possible to use classic JS functions or a `Fn()` interface. The main diffe
 
 ```js
 // tsl function
-const oscSine = Fn( ( [ t = time ] ) => {
+export const oscSine = Fn( ( [ t = time ] ) => {
 
 	return t.add( 0.75 ).mul( Math.PI * 2 ).sin().mul( 0.5 ).add( 0.5 );
 
 } );
 
 // inline function
-export const oscSine = ( t = time ) => t.add( 0.75 ).mul( Math.PI * 2 ).sin().mul( 0.5 ).add( 0.5 );
+export const oscSineInline = ( t = time ) => t.add( 0.75 ).mul( Math.PI * 2 ).sin().mul( 0.5 ).add( 0.5 );
 ```
-> Note: Both above can be called with `oscSine( value )`.
+> Note: Both above can be called with `oscSine( value )` or `oscSineInline( value )`.
 
 <code name="oscSine">oscSine example</code>
 
-### Parameters as Object
+### Parameters as an Object
 
-TSL allows the entry of parameters as object, this is useful in functions that have many optional arguments.
+TSL allows passing parameters as an object, which is useful in functions with many optional arguments.
 
-Parameters as object also allows traditional calls as an array, enabling different types of usage.
+Passing parameters as an object also allows traditional positional arguments as an array, enabling flexible usage styles:
 
 ```js
 const col = Fn( ( { r, g, b } ) => {
@@ -1471,19 +1468,19 @@ const col = Fn( ( { r, g, b } ) => {
 
 } );
 
-// Any of the options below will return a green color.
+// Any of the options below will return a green color:
 
-material.colorNode = col( 0, 1, 0 ); // option 1
-material.colorNode = col( { r: 0, g: 1, b: 0 } ); // option 2
+material.colorNode = col( 0, 1, 0 ); // option 1 (positional)
+material.colorNode = col( { r: 0, g: 1, b: 0 } ); // option 2 (named object)
 ```
 
-If you want to use an export function compatible with **tree shaking**, remember to use `/*@__PURE__*/`
+If you want to export a function compatible with **tree shaking**, remember to annotate with `/*@__PURE__*/`:
 
 ```js
 export const oscSawtooth = /*@__PURE__*/ Fn( ( [ timer = time ] ) => timer.fract() );
 ```
 
-The second parameter of the function, if there are any parameters, will always be the first if there are none, and is dedicated to __NodeBuilder__. In __NodeBuilder__ you can find out details about the current construction process and also obtain objects related to the shader construction, such as **material**, **geometry**, **object**, **camera**, etc.
+In a TSL `Fn()`, the `NodeBuilder` instance is automatically passed as the last parameter (or the first if no custom arguments are defined). Through `NodeBuilder`, you can inspect the current compilation context and access scene objects such as **material**, **geometry**, **object**, **camera**, etc.
 
 <code name="accessingMaterial">Accessing Material example</code>
 
@@ -1712,7 +1709,7 @@ model.material.colorNode = createChecker( 8.0 );
 ```
 
 #### Related
-  - [Sub-Builds and Once](#sub-builds-and-once)
+  - [Sub-Builds](#sub-builds)
   - [JavaScript Synergy](#javascript-synergy)
 
 
@@ -1996,6 +1993,8 @@ const Cell = struct( {
 	mass: { type: 'int', atomic: true }
 } );
 ```
+
+<code name="structExample" default="true">Struct Showcase</code>
 
 ```tsl structExample
 import 'scenes/shaderball';
@@ -2851,6 +2850,8 @@ flowchart TD
     FnCall -->|"Inside positionNode"| PosScope
     FnCall -->|"Inside colorNode"| FragScope
 ```
+
+<code name="positionWorldSubBuildExample" default="true">Sub-Builds Showcase</code>
 
 ```tsl positionWorldSubBuildExample
 import 'scenes/shaderball';
