@@ -5,22 +5,13 @@ import {
 } from 'three/tsl';
 import { getSharedRenderer } from './gpu-test-utils.js';
 
-// A minimal, FFT-independent repro of the mechanism suspected in FFT2D.js's ping-pong buffer
-// sharing attempt (see that file's constructor comment): a *single* compiled compute kernel,
-// built once, whose storage buffer nodes are repointed (`.value = someOtherAttribute`) at a
-// *different* buffer immediately before each of many back-to-back `renderer.compute()` calls,
-// with no `await` between them. FFT2D's version of this pattern intermittently corrupted data on
-// real hardware for large (non-fused, many-dispatch-per-transform) images; this test strips away
-// the FFT math entirely to isolate just the repointing mechanism, so a failure here would confirm
-// a genuine three.js/TSL WebGPU-backend bug rather than anything FFT-specific.
-//
-// Two ping-pong `StorageBufferAttribute`s (`bufA`/`bufB`), one `float` each, `count` elements.
-// One kernel, built once: `out[i] = in[i] + 1`. `count` iterations run back-to-back, alternating
-// which buffer is "in" and which is "out" (mirroring `FFT2D`'s reverted `_dispatchPingPong`), all
-// recorded before the first readback. If every dispatch's bind group correctly captured the
-// node values *at the time `renderer.compute()` was called*, the final live buffer holds
-// `initial + iterations` in every element; any staleness/aliasing in that repointing would show
-// up as a wrong value there.
+// Minimal reproduction for a WebGPU bind-group caching bug: when a storage buffer node's
+// `.value` is repointed at a different `BufferAttribute` (`node.value = otherAttribute`) between
+// `renderer.compute()` calls, the new attribute wasn't folded into the bind group's cache
+// key/version, so a stale bind group -- still wired to the previous attribute -- could be reused.
+// Each test below builds a compute kernel once, then repoints its storage node(s) immediately
+// before each dispatch, with no `await` in between, and checks that every dispatch actually wrote
+// to the buffer it was pointed at.
 
 function makeBuffer( count, initialValue ) {
 
@@ -38,8 +29,7 @@ async function readBuffer( renderer, attribute, count ) {
 
 }
 
-// `vec2`-typed buffer, matching FFT2D's actual `(real, imag)` element type (as opposed to the
-// `float` used above) and, in the tests below, FFT2D's actual `width*height` element counts.
+// `vec2`-typed buffer, for tests that exercise a 2-component element type instead of `float`.
 function makeVec2Buffer( count, initialX, initialY ) {
 
 	const data = new Float32Array( count * 2 );
@@ -105,8 +95,7 @@ export default QUnit.module( 'TSL', () => {
 				const attrA = makeBuffer( count, initialValue );
 				const attrB = makeBuffer( count, 0 );
 
-				// One shared, repointable read/write node pair -- exactly the pattern reverted in
-				// FFT2D.js. `readNode` is read-only, matching FFT2D's usage.
+				// One shared, repointable read/write node pair.
 				const readNode = storage( attrA, 'float', count ).toReadOnly();
 				const writeNode = storage( attrB, 'float', count );
 
@@ -165,10 +154,10 @@ export default QUnit.module( 'TSL', () => {
 
 		repointTest( 'two distinct kernels sharing one repointed node pair stay correct when interleaved', async ( assert, renderer ) => {
 
-			// Closer to FFT2D's real shape: several *different* compiled kernels (not just one)
-			// all referencing the same shared read/write node pair, dispatched in an interleaved
-			// sequence -- in case cross-kernel bind-group aliasing on the shared nodes, rather
-			// than same-kernel reuse, is what matters.
+			// Several *different* compiled kernels (not just one) all referencing the same shared
+			// read/write node pair, dispatched in an interleaved sequence -- in case cross-kernel
+			// bind-group aliasing on the shared nodes, rather than same-kernel reuse, is what
+			// matters.
 
 			const count = 64;
 			const iterations = 64;
@@ -238,9 +227,8 @@ export default QUnit.module( 'TSL', () => {
 		repointTest( 'repeated repoint-and-dispatch runs stay correct across many separate calls (not just one long chain)', async ( assert, renderer ) => {
 
 			// Runs the single-kernel repoint chain from the first test many times over, each with
-			// its own fresh buffers/kernel, to catch nondeterministic ("sometimes") corruption that
-			// a single run might not hit -- matching what was actually observed (works most of the
-			// time, occasionally doesn't).
+			// its own fresh buffers/kernel, to catch nondeterministic corruption that a single run
+			// might not hit.
 
 			const count = 64;
 			const iterations = 32;
@@ -305,13 +293,9 @@ export default QUnit.module( 'TSL', () => {
 
 		} );
 
-		// From here down: closer in *scale* and *shape* to FFT2D's actual butterfly-stage kernels
-		// (which is where the real corruption showed up), not just the mechanism in isolation --
-		// `vec2` elements at FFT2D's real `width*height` element counts, and a uniform value
-		// changed on every dispatch in lockstep with the storage-node repointing, exactly
-		// mirroring `_runAxisPass`'s non-fused fallback loop (`this._pUniform.value = 1 << s;
-		// renderer.compute(...)`). If the isolated, small-scale repoint above is safe but this
-		// isn't, that would point at scale/uniform-interaction rather than repointing itself.
+		// From here down: larger scale (`vec2` elements, up to 1,048,576 elements) and a uniform
+		// value changed on every dispatch in lockstep with the storage-node repointing, to check
+		// that scale and a concurrently-changing uniform don't affect the fix.
 
 		[ 65536, 1048576 ].forEach( ( count ) => {
 
@@ -377,13 +361,11 @@ export default QUnit.module( 'TSL', () => {
 
 		repointTest( 'uniform value changed every dispatch alongside repointed storage nodes (per-stage fallback shape, 1048576 elements x 20 stages)', async ( assert, renderer ) => {
 
-			// This is the closest analog to what actually broke: FFT2D's `buildMultiDispatchStage`
-			// fallback dispatches once per stage (`log2(N)` times) over the *whole* buffer, at real
-			// image scale, changing `_pUniform.value` and repointing the storage nodes together
-			// immediately before each `renderer.compute()` call, with zero `await` between stages.
+			// A uniform value and the storage-node repointing both change together immediately
+			// before each `renderer.compute()` call, with zero `await` between stages.
 
-			const count = 1048576; // 1024x1024, matching the reported "brick"/"hardwood" scale
-			const stages = 20; // comfortably more than log2(1048576) = 20 for a single axis
+			const count = 1048576; // 1024x1024
+			const stages = 20;
 
 			const attrA = makeVec2Buffer( count, 0, 0 );
 			const attrB = makeVec2Buffer( count, 0, 0 );
@@ -392,9 +374,8 @@ export default QUnit.module( 'TSL', () => {
 			const writeNode = storage( attrB, 'vec2', count );
 			const stageUniform = uniform( 1, 'uint' );
 
-			// out[i] = in[i] + stageUniform -- mirrors `_pUniform` being read inside the real
-			// per-stage kernel body, just with trivial (but exactly verifiable) math instead of the
-			// real butterfly.
+			// out[i] = in[i] + stageUniform, kept trivial so the expected result stays exactly
+			// verifiable.
 			const kernel = Fn( () => {
 
 				const v = readNode.element( instanceIndex ).toVar();
@@ -449,7 +430,7 @@ export default QUnit.module( 'TSL', () => {
 		repointTest( 'per-stage fallback shape repeated across 6 separate runs (1048576 elements x 20 stages each)', async ( assert, renderer ) => {
 
 			// Same as the previous test, but repeated -- to catch nondeterministic corruption a
-			// single run might not hit, at the scale most likely to matter.
+			// single run might not hit.
 
 			const count = 1048576;
 			const stages = 20;
@@ -517,16 +498,13 @@ export default QUnit.module( 'TSL', () => {
 
 		} );
 
-		// A faithful copy of FFT2D.js's `buildTransposeStage` (minus the conjugate/scale option):
-		// a tiled, workgroup-shared-memory, 2D-dispatched transpose, with an explicit
-		// `workgroupBarrier()` between the load and store phases. Every other kernel in this file
-		// is a flat, global-memory-only, 1D-dispatched kernel -- structurally nothing like this.
-		// `_runButterflyPasses` in FFT2D.js alternates between exactly these two *kinds* of kernel
-		// (global-memory row/column passes, shared-memory transpose passes) sharing the same
-		// repointed nodes throughout, which nothing above actually exercises. Since a transpose is
-		// a pure permutation (it moves values, never changes them), composing
-		// transpose-forward + transpose-back is the identity -- so a value-preserving invariant
-		// stays checkable even through the permutation.
+		// A tiled, workgroup-shared-memory, 2D-dispatched transpose kernel, with an explicit
+		// `workgroupBarrier()` between the load and store phases -- structurally different from
+		// the flat, global-memory-only, 1D-dispatched kernels used above, to check that kernels
+		// alternating between these two shapes while sharing the same repointed nodes stay
+		// correct. Since a transpose is a pure permutation (it moves values, never changes them),
+		// composing transpose-forward + transpose-back is the identity -- so a value-preserving
+		// invariant stays checkable even through the permutation.
 		function buildTransposeKernel( rows, cols, tile, readNode, writeNode ) {
 
 			const sharedTile = workgroupArray( 'vec2', tile * tile );
@@ -569,13 +547,13 @@ export default QUnit.module( 'TSL', () => {
 
 			repointTest( `mixed global-memory / shared-memory kernels sharing repointed nodes, matching _runButterflyPasses' shape (${ width }x${ height })`, async ( assert, renderer ) => {
 
-				// Mirrors _runButterflyPasses' literal sequence: row pass (several per-stage
-				// dispatches, global memory) -> transpose (one dispatch, shared memory + barrier)
-				// -> column pass (several per-stage dispatches, global memory) -> transpose back
-				// (one dispatch, shared memory + barrier) -- all sharing the same 2 repointed nodes,
-				// no `await` anywhere in the sequence. The row/column "butterfly" math is replaced
-				// by a simple, position-independent `x += stageValue` so the expected result stays
-				// exactly checkable regardless of how the transposes permute element positions.
+				// A row pass (several per-stage dispatches, global memory) -> transpose (one
+				// dispatch, shared memory + barrier) -> column pass (several per-stage dispatches,
+				// global memory) -> transpose back (one dispatch, shared memory + barrier) -- all
+				// sharing the same 2 repointed nodes, no `await` anywhere in the sequence. The
+				// row/column math is a simple, position-independent `x += stageValue` so the
+				// expected result stays exactly checkable regardless of how the transposes permute
+				// element positions.
 
 				const count = width * height;
 				const tile = 16;
@@ -664,8 +642,8 @@ export default QUnit.module( 'TSL', () => {
 
 		repointTest( 'mixed global-memory / shared-memory kernel sequence repeated across 6 separate runs (1024x1024)', async ( assert, renderer ) => {
 
-			// Same sequence as above, repeated -- the actual report was "fails about 1 out of 2
-			// times", so a single run is not enough to trust a pass.
+			// Same sequence as above, repeated, since a single run is not enough to trust a pass
+			// against nondeterministic corruption.
 
 			const width = 1024, height = 1024;
 			const count = width * height;
