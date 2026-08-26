@@ -2243,4 +2243,24 @@ export class Profiler extends EventDispatcher {
 
 	}
 
+	dispose() {
+
+		for ( const tab of Object.values( this.tabs ) ) {
+
+			tab.dispose();
+
+		}
+
+		this.domElement.remove();
+
+		for ( const detachedWindow of this.detachedWindows ) {
+
+			detachedWindow.panel.remove();
+
+		}
+
+		this.toggleGraph.dispose();
+
+	}
+
 }

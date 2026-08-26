@@ -82,7 +82,6 @@ Sky.SkyShader = {
 		'mieCoefficient': { value: 0.005 },
 		'mieDirectionalG': { value: 0.8 },
 		'sunPosition': { value: new Vector3() },
-		'up': { value: new Vector3( 0, 1, 0 ) },
 		'cloudScale': { value: 0.0002 },
 		'cloudSpeed': { value: 0.0001 },
 		'cloudCoverage': { value: 0.4 },
@@ -97,7 +96,6 @@ Sky.SkyShader = {
 		uniform float rayleigh;
 		uniform float turbidity;
 		uniform float mieCoefficient;
-		uniform vec3 up;
 
 		varying vec3 vWorldPosition;
 		varying vec3 vSunDirection;
@@ -149,7 +147,7 @@ Sky.SkyShader = {
 
 			vSunDirection = normalize( sunPosition );
 
-			vSunE = sunIntensity( dot( vSunDirection, up ) );
+			vSunE = sunIntensity( vSunDirection.y );
 
 			vSunfade = 1.0 - clamp( 1.0 - exp( ( sunPosition.y / 450000.0 ) ), 0.0, 1.0 );
 
@@ -172,7 +170,6 @@ Sky.SkyShader = {
 		varying float vSunE;
 
 		uniform float mieDirectionalG;
-		uniform vec3 up;
 		uniform float cloudScale;
 		uniform float cloudSpeed;
 		uniform float cloudCoverage;
@@ -245,7 +242,7 @@ Sky.SkyShader = {
 
 			// optical length
 			// cutoff angle at 90 to avoid singularity in next formula.
-			float zenithAngle = acos( max( 0.0, dot( up, direction ) ) );
+			float zenithAngle = acos( max( 0.0, direction.y ) );
 			float inverse = 1.0 / ( cos( zenithAngle ) + 0.15 * pow( 93.885 - ( ( zenithAngle * 180.0 ) / pi ), -1.253 ) );
 			float sR = rayleighZenithLength * inverse;
 			float sM = mieZenithLength * inverse;
@@ -263,7 +260,7 @@ Sky.SkyShader = {
 			vec3 betaMTheta = vBetaM * mPhase;
 
 			vec3 Lin = pow( vSunE * ( ( betaRTheta + betaMTheta ) / ( vBetaR + vBetaM ) ) * ( 1.0 - Fex ), vec3( 1.5 ) );
-			Lin *= mix( vec3( 1.0 ), pow( vSunE * ( ( betaRTheta + betaMTheta ) / ( vBetaR + vBetaM ) ) * Fex, vec3( 1.0 / 2.0 ) ), clamp( pow( 1.0 - dot( up, vSunDirection ), 5.0 ), 0.0, 1.0 ) );
+			Lin *= mix( vec3( 1.0 ), pow( vSunE * ( ( betaRTheta + betaMTheta ) / ( vBetaR + vBetaM ) ) * Fex, vec3( 1.0 / 2.0 ) ), clamp( pow( 1.0 - vSunDirection.y, 5.0 ), 0.0, 1.0 ) );
 
 			// nightsky
 			float theta = acos( direction.y ); // elevation --> y-axis, [-pi/2, pi/2]
