@@ -22,6 +22,7 @@ import {
 	dot,
 	exp,
 	float,
+	highpModelViewMatrix,
 	instanceIndex,
 	max,
 	mediumpModelViewMatrix,
@@ -54,6 +55,12 @@ const KERNEL_2D_SIZE = 0.3;
 const SPLAT_KERNEL_CUTOFF = 2;
 const MAX_SCREEN_SPACE_SPLAT_SIZE = 1024;
 const CLIP_XY = 1.4;
+
+const splatModelViewMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
+
+	return camera.isArrayCamera && camera.cameras.length > 0 ? mediumpModelViewMatrix : highpModelViewMatrix;
+
+} ).once() )();
 
 const _worldCenter = /*@__PURE__*/ new Vector3();
 const _viewCenter = /*@__PURE__*/ new Vector3();
@@ -726,11 +733,11 @@ function createMaterialNodes( buffers, sort, localCameraPosition ) {
 
 		splatUv.assign( positionGeometry.xy );
 
-		const viewCenter4 = mediumpModelViewMatrix.mul( vec4( center, 1 ) ).toVar( 'viewCenter4' );
+		const viewCenter4 = splatModelViewMatrix.mul( vec4( center, 1 ) ).toVar( 'viewCenter4' );
 		const viewCenter = viewCenter4.xyz.toVar( 'viewCenter' );
 		const centerClip = cameraProjectionMatrix.mul( viewCenter4 ).toVar( 'centerClip' );
 
-		const m = mediumpModelViewMatrix;
+		const m = splatModelViewMatrix;
 		const r0 = vec3( m[ 0 ].x, m[ 1 ].x, m[ 2 ].x ).toVar( 'r0' );
 		const r1 = vec3( m[ 0 ].y, m[ 1 ].y, m[ 2 ].y ).toVar( 'r1' );
 		const r2 = vec3( m[ 0 ].z, m[ 1 ].z, m[ 2 ].z ).toVar( 'r2' );
