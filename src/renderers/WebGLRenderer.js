@@ -1521,7 +1521,10 @@ class WebGLRenderer {
 						const materialProperties = properties.get( material );
 						const program = materialProperties.currentProgram;
 
-						if ( program.isReady() ) {
+						// the material may have been disposed while compilation was still pending
+						// (e.g. it was removed from the scene and its GPU resources released) -
+						// stop waiting for it instead of throwing on a program that no longer exists.
+						if ( program === undefined || program.isReady() ) {
 
 							// remove any programs that report they're ready to use from the list
 							materials.delete( material );
