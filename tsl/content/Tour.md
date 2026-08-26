@@ -244,11 +244,20 @@ TSL (Three.js Shading Language) elevates shader development from a monolithic sc
   Developers write explicit, step-by-step instructions executed sequentially inside stage entry points like `void main()` or `@fragment fn main()`. Variables, varyings, texture sampling, and output registers (`gl_FragColor` / `@location(0)`) must be manually declared and wired:
 
   ```glsl
+  // Uniforms and varyings must be manually declared and managed
+  uniform vec3 uLightDirection;
+  uniform vec3 uBaseColor;
+
+  varying vec3 vNormal;
+
   // Imperative step-by-step instructions in entry point
   void main() {
-      vec3 normal = normalize( vNormal );
-      float diff = max( dot( normal, uLightDirection ), 0.0 );
-      gl_FragColor = vec4( uBaseColor * diff, 1.0 );
+
+  	vec3 normal = normalize( vNormal );
+  	float diff = max( dot( normal, uLightDirection ), 0.0 );
+
+  	gl_FragColor = vec4( uBaseColor * diff, 1.0 );
+
   }
   ```
 
@@ -256,8 +265,15 @@ TSL (Three.js Shading Language) elevates shader development from a monolithic sc
   Developers declare *what* each channel or material should compute by assigning composable nodes. `NodeBuilder` automatically resolves execution stages, routes varyings, deduplicates calculations into cached variables, and synthesizes the optimal GPU program:
 
   ```js
+  import * as THREE from 'three';
+  import { normalView, uniform } from 'three/tsl';
+
   // Declarative component assignment
+  const lightDirection = uniform( new THREE.Vector3( 0.0, 1.0, 0.0 ) );
+  const baseColor = uniform( new THREE.Color( 0x0066ff ) );
+
   const diff = normalView.dot( lightDirection ).max( 0.0 );
+
   material.colorNode = baseColor.mul( diff );
   ```
 
