@@ -1,0 +1,440 @@
+<html lang="en">
+	<head>
+		<title>three.js webgpu - 2D FFT</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - 2D FFT">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_fft.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_fft.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			#status {
+				position: absolute;
+				left: 0;
+				bottom: 0;
+				width: 100%;
+				box-sizing: border-box;
+				padding: 8px 12px;
+				font-family: monospace;
+				font-size: 13px;
+				color: #fff;
+				background: rgba( 0, 0, 0, 0.5 );
+				pointer-events: none;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a>
+				<span>webgpu - 2D FFT</span>
+			</div>
+
+			<small>
+				GPU 2D complex FFT (<a href="https://github.com/mrdoob/three.js/blob/dev/examples/jsm/gpgpu/FFT.js" target="_blank" rel="noopener">FFT2D</a>) via TSL compute shaders, WebGPU only.<br/>
+				Left: original &middot; middle: log-magnitude spectrum (DC centered) &middot; right: inverse-FFT reconstruction.
+			</small>
+		</div>
+
+		<div id="status">Loading&hellip;</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { texture } from 'three/tsl';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { FFT2D } from 'three/addons/gpgpu/FFT.js';
+
+			// A curated set of power-of-two textures from the shared examples/textures folder --
+			// FFT2D only supports power-of-two width/height (see its own comment for why: it's what
+			// lets the Stockham FFT skip a separate bit-reversal permutation pass).
+			const PRESETS = [
+				{ name: 'UV Grid (1024x1024)', url: 'textures/uv_grid_opengl.jpg' },
+				{ name: 'Grid (64x64)', url: 'textures/grid.png' },
+				{ name: 'Colors (128x128)', url: 'textures/colors.png' },
+				{ name: 'Checkerboard (512x512)', url: 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg' },
+				{ name: 'Disturb (512x512)', url: 'textures/disturb.jpg' },
+				{ name: 'Brick (1024x1024)', url: 'textures/brick_diffuse.jpg' },
+				{ name: 'Hardwood (2048x1024)', url: 'textures/hardwood2_diffuse.jpg' },
+				{ name: 'Earth (2048x1024)', url: 'textures/land_ocean_ice_cloud_2048.jpg' }
+			];
+
+			let camera, scene, renderer, controls;
+			let quadOriginal, quadSpectrum, quadReconstructed;
+
+			let fft = null;
+			let loadedTexture = null;
+			let textureNode = null;
+			let spectrumTexture = null;
+			let reconstructedTexture = null;
+			let originalLuminance = null; // CPU copy, for the reconstruction-error readout only.
+
+			// 'spatial' (freshly loaded/packed image) or 'frequency' (forward FFT has been run) --
+			// gates which of the two buttons makes sense to press next.
+			let domain = 'spatial';
+
+			// True while a preset is loading/being packed -- guards both buttons against acting on
+			// an `fft`/textures that `loadPreset` is mid-way through tearing down and rebuilding.
+			let loading = true;
+
+			const statusEl = document.getElementById( 'status' );
+			const textureLoader = new THREE.TextureLoader();
+
+			const params = {
+				image: PRESETS[ 0 ].name,
+				'Compute Forward FFT': computeForwardFFT,
+				'Compute Inverse FFT': computeInverseFFT
+			};
+
+			init();
+
+			async function init() {
+
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU support' );
+
+				}
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111111 );
+
+				camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 10 );
+				camera.position.z = 5;
+
+				// Materials are (re)created with their `map` set at construction time, in
+				// `applyQuadTextures` below, rather than assigned post-hoc -- reassigning `.map` on
+				// an already-built material after load doesn't reliably trigger WebGPURenderer's
+				// node-graph rebuild, and per-preset a fresh texture/material pair is needed anyway.
+				quadOriginal = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicMaterial() );
+				quadSpectrum = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicMaterial() );
+				quadReconstructed = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicMaterial() );
+
+				scene.add( quadOriginal, quadSpectrum, quadReconstructed );
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableRotate = false;
+
+				// GUI, via the inspector's built-in parameter panel (see webgpu_ocean.html for the
+				// same `renderer.inspector.createParameters(...)` convention).
+
+				const gui = renderer.inspector.createParameters( 'FFT' );
+
+				gui.add( params, 'image', PRESETS.map( ( p ) => p.name ) ).name( 'image' ).onChange( ( name ) => {
+
+					const preset = PRESETS.find( ( p ) => p.name === name );
+
+					// Fire-and-forget from the GUI callback -- `loading` (checked by both button
+					// handlers below) is what actually gates against acting on a preset that's only
+					// partway loaded, not awaiting this promise here.
+					loadPreset( preset );
+
+				} );
+
+				gui.add( params, 'Compute Forward FFT' );
+				gui.add( params, 'Compute Inverse FFT' );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				await loadPreset( PRESETS[ 0 ] );
+
+			}
+
+			async function loadPreset( preset ) {
+
+				loading = true;
+
+				setStatus( `Loading ${ preset.name }…` );
+
+				const newTexture = await textureLoader.loadAsync( preset.url );
+
+				newTexture.colorSpace = THREE.NoColorSpace;
+				newTexture.flipY = false;
+				newTexture.magFilter = THREE.NearestFilter;
+				newTexture.minFilter = THREE.NearestFilter;
+				newTexture.generateMipmaps = false;
+				newTexture.wrapS = THREE.ClampToEdgeWrapping;
+				newTexture.wrapT = THREE.ClampToEdgeWrapping;
+
+				const width = newTexture.image.width;
+				const height = newTexture.image.height;
+
+				if ( isPowerOfTwo( width ) === false || isPowerOfTwo( height ) === false ) {
+
+					setStatus( `"${ preset.name }" is ${ width }x${ height }, which is not power-of-two -- skipped.` );
+					newTexture.dispose();
+					return;
+
+				}
+
+				// Tear down the previous preset's GPU resources before building new ones sized for
+				// this image.
+
+				fft?.dispose();
+				loadedTexture?.dispose();
+				spectrumTexture?.dispose();
+				reconstructedTexture?.dispose();
+
+				loadedTexture = newTexture;
+				textureNode = texture( loadedTexture );
+
+				fft = new FFT2D( width, height );
+
+				spectrumTexture = new THREE.StorageTexture( width, height );
+				reconstructedTexture = new THREE.StorageTexture( width, height );
+
+				// A brand-new material per quad, with `map` set at construction time, replacing the
+				// old one outright (rather than mutating `.map` on the existing material) -- see the
+				// comment at `quadOriginal`'s construction in `init()` for why.
+				setQuadMaterial( quadOriginal, loadedTexture );
+				setQuadMaterial( quadSpectrum, spectrumTexture );
+				setQuadMaterial( quadReconstructed, reconstructedTexture );
+
+				layoutQuads( width, height );
+
+				fft.packTexture( renderer, textureNode );
+
+				// CPU-side luminance copy of the source image, used only to compute the
+				// reconstruction-error readout after an inverse FFT -- not part of the GPU pipeline.
+				originalLuminance = computeLuminanceCPU( newTexture.image, width, height );
+
+				domain = 'spatial';
+				loading = false;
+
+				setStatus( `Loaded ${ preset.name } (${ width }x${ height }). Click "Compute Forward FFT".` );
+
+				render();
+
+			}
+
+			function setQuadMaterial( quad, map ) {
+
+				quad.material.dispose();
+				quad.material = new THREE.MeshBasicMaterial( { map } );
+
+			}
+
+			async function computeForwardFFT() {
+
+				if ( loading ) {
+
+					setStatus( 'Still loading the image -- try again in a moment.' );
+					return;
+
+				}
+
+				if ( domain !== 'spatial' ) {
+
+					setStatus( 'Already in the frequency domain -- click "Compute Inverse FFT", or switch images to start over.' );
+					return;
+
+				}
+
+				fft.computeForward( renderer );
+
+				// Auto-normalize the spectrum's log scale to use the full [0, 1] grayscale range
+				// with no manual tuning -- see `FFT2D#unpackSpectrum`'s own comment for why the DC
+				// bin's magnitude (read back here) is always the correct value to normalize against
+				// for a non-negative-real input like this image's luminance.
+				const dc = await fft.readBin( renderer, 0 );
+				const maxMagnitude = Math.hypot( dc.real, dc.imag );
+
+				fft.unpackSpectrum( renderer, spectrumTexture, maxMagnitude );
+
+				domain = 'frequency';
+
+				setStatus( 'Computed forward FFT -- middle quad shows the log-magnitude spectrum (DC centered). Click "Compute Inverse FFT" to reconstruct.' );
+
+				render();
+
+			}
+
+			async function computeInverseFFT() {
+
+				if ( loading ) {
+
+					setStatus( 'Still loading the image -- try again in a moment.' );
+					return;
+
+				}
+
+				if ( domain !== 'frequency' ) {
+
+					setStatus( 'Nothing to invert yet -- click "Compute Forward FFT" first.' );
+					return;
+
+				}
+
+				fft.computeInverse( renderer );
+				fft.unpackImage( renderer, reconstructedTexture );
+
+				domain = 'spatial'; // buffers are back in the spatial domain, but sourced from the
+				                    // reconstruction rather than the original texture -- forward FFT
+				                    // is disabled until a fresh preset load re-packs the source image,
+				                    // so as not to re-transform an already-reconstructed buffer.
+
+				const data = await fft.readData( renderer );
+
+				let maxDiff = 0;
+				let sumSq = 0;
+
+				for ( let i = 0; i < fft.count; i ++ ) {
+
+					const diff = data[ i * 2 ] - originalLuminance[ i ];
+					maxDiff = Math.max( maxDiff, Math.abs( diff ) );
+					sumSq += diff * diff;
+
+				}
+
+				const rms = Math.sqrt( sumSq / fft.count );
+
+				setStatus( `Reconstructed. Round-trip error vs. original luminance -- max |diff|: ${ maxDiff.toExponential( 3 ) }, RMS: ${ rms.toExponential( 3 ) }.` );
+
+				render();
+
+			}
+
+			function computeLuminanceCPU( image, width, height ) {
+
+				const canvas = document.createElement( 'canvas' );
+				canvas.width = width;
+				canvas.height = height;
+
+				const ctx = canvas.getContext( '2d' );
+				ctx.drawImage( image, 0, 0, width, height );
+
+				const { data } = ctx.getImageData( 0, 0, width, height );
+				const coeffs = THREE.ColorManagement.getLuminanceCoefficients( new THREE.Vector3() );
+				const luminance = new Float32Array( width * height );
+
+				for ( let i = 0; i < luminance.length; i ++ ) {
+
+					const r = data[ i * 4 ] / 255;
+					const g = data[ i * 4 + 1 ] / 255;
+					const b = data[ i * 4 + 2 ] / 255;
+
+					luminance[ i ] = r * coeffs.x + g * coeffs.y + b * coeffs.z;
+
+				}
+
+				return luminance;
+
+			}
+
+			// Content size (world units) of the 3-quad layout, with margin -- kept at module scope
+			// so `fitCamera` can refit on window resize without needing the image dimensions again.
+			let contentWidth = 3;
+			let contentHeight = 1;
+
+			function layoutQuads( width, height ) {
+
+				const aspect = width / height;
+				const quadHeight = 2;
+				const quadWidth = quadHeight * aspect;
+				const gap = quadWidth * 0.15;
+				const spacing = quadWidth + gap;
+
+				for ( const [ quad, x ] of [ [ quadOriginal, - spacing ], [ quadSpectrum, 0 ], [ quadReconstructed, spacing ] ] ) {
+
+					quad.scale.set( quadWidth, quadHeight, 1 );
+					quad.position.set( x, 0, 0 );
+
+				}
+
+				const margin = 1.2;
+				contentWidth = ( spacing * 2 + quadWidth ) * margin;
+				contentHeight = quadHeight * margin;
+
+				controls.target.set( 0, 0, 0 );
+				fitCamera();
+
+			}
+
+			// Fits an orthographic frustum of `contentWidth` x `contentHeight` world units into the
+			// current window aspect ratio, letterboxing whichever dimension has room to spare.
+			function fitCamera() {
+
+				const windowAspect = window.innerWidth / window.innerHeight;
+				const contentAspect = contentWidth / contentHeight;
+
+				let viewWidth, viewHeight;
+
+				if ( windowAspect > contentAspect ) {
+
+					viewHeight = contentHeight;
+					viewWidth = viewHeight * windowAspect;
+
+				} else {
+
+					viewWidth = contentWidth;
+					viewHeight = viewWidth / windowAspect;
+
+				}
+
+				camera.left = - viewWidth / 2;
+				camera.right = viewWidth / 2;
+				camera.top = viewHeight / 2;
+				camera.bottom = - viewHeight / 2;
+				camera.updateProjectionMatrix();
+
+			}
+
+			function isPowerOfTwo( value ) {
+
+				return value > 0 && ( value & ( value - 1 ) ) === 0;
+
+			}
+
+			function setStatus( message ) {
+
+				statusEl.textContent = message;
+
+			}
+
+			function onWindowResize() {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				fitCamera();
+
+				render();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

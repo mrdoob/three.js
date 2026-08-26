@@ -1,5 +1,8 @@
 import { StorageBufferAttribute } from 'three/webgpu';
-import { Fn, instanceIndex, storage, uint, uniform, float, vec2, cos, sin } from 'three/tsl';
+import {
+	Fn, instanceIndex, storage, uint, int, ivec2, uvec2, uniform, float, vec2, vec4, cos, sin,
+	storageTexture, textureStore, luminance, NodeAccess
+} from 'three/tsl';
 
 /**
  * Returns `true` if `value` is a power of two.
@@ -158,6 +161,10 @@ class FFT2D {
 		this.readB = storage( this._attributeB, 'vec2', count ).toReadOnly();
 		this.writeB = storage( this._attributeB, 'vec2', count );
 
+		this._probeAttribute = new StorageBufferAttribute( 1, 2 );
+		this._probeWrite = storage( this._probeAttribute, 'vec2', 1 );
+		this._probeIndex = uniform( 0, 'uint' );
+
 		this._pUniform = uniform( 1, 'uint' );
 
 		this._stagesRow = Math.log2( width );
@@ -292,6 +299,182 @@ class FFT2D {
 	}
 
 	/**
+	 * Writes a loaded image's luminance into whichever buffer currently holds the live data (with
+	 * a zero imaginary part), entirely on the GPU -- no CPU readback of the image is involved. The
+	 * texture is sampled with an exact (unfiltered) texel fetch, so it must be exactly `width` by
+	 * `height` in size.
+	 *
+	 * The compute kernels are built once per distinct `textureNode` and cached, so calling this
+	 * repeatedly with the same node (e.g. once per frame) is cheap.
+	 *
+	 * @param {Renderer} renderer
+	 * @param {TextureNode} textureNode - A `texture( someLoadedTexture )` TSL node.
+	 */
+	packTexture( renderer, textureNode ) {
+
+		if ( this._packSource !== textureNode ) {
+
+			this._packSource = textureNode;
+
+			const width = this.width;
+
+			const build = ( writeNode ) => Fn( () => {
+
+				const x = instanceIndex.mod( uint( width ) );
+				const y = instanceIndex.div( uint( width ) );
+
+				const texel = textureNode.load( ivec2( int( x ), int( y ) ) );
+				const value = luminance( texel.rgb );
+
+				writeNode.element( instanceIndex ).assign( vec2( value, 0 ) );
+
+			} )().compute( this.count );
+
+			this._packToA = build( this.writeA );
+			this._packToB = build( this.writeB );
+
+		}
+
+		renderer.compute( this.current === 'A' ? this._packToA : this._packToB );
+
+	}
+
+	/**
+	 * Renders whichever buffer currently holds the live data into `storageTexture` as a
+	 * grayscale log-magnitude spectrum, quadrant-shifted so the DC (zero-frequency) bin lands at
+	 * the texture's center -- the conventional way to display a 2D spectrum. Intended to be
+	 * called right after `computeForward`.
+	 *
+	 * The log scale is normalized by `maxMagnitude` so the display uses the full `[0, 1]`
+	 * grayscale range with no manual tuning: for a non-negative-real input (e.g. an image's
+	 * luminance, always >= 0), the DC bin (index 0 before this method's quadrant shift) is
+	 * *guaranteed* -- by the triangle inequality applied to the DFT sum -- to have the largest
+	 * magnitude of any bin, so passing that bin's magnitude (see `readData`) as `maxMagnitude`
+	 * always saturates to exactly 1 at the DC peak and never clips anywhere else.
+	 *
+	 * The compute kernels are built once per distinct `storageTexture` and cached.
+	 *
+	 * @param {Renderer} renderer
+	 * @param {StorageTexture} target - Must be exactly `width` by `height` in size.
+	 * @param {number} maxMagnitude - The magnitude to normalize the log scale against (typically the DC bin's magnitude -- see above).
+	 */
+	unpackSpectrum( renderer, target, maxMagnitude ) {
+
+		if ( this._spectrumTarget !== target ) {
+
+			this._spectrumTarget = target;
+			this._spectrumLogNorm = uniform( 1 );
+
+			const { width, height, count } = this;
+			const halfW = width >> 1;
+			const halfH = height >> 1;
+
+			const writeTex = storageTexture( target ).setAccess( NodeAccess.WRITE_ONLY );
+
+			const build = ( readNode ) => Fn( () => {
+
+				const x = instanceIndex.mod( uint( width ) );
+				const y = instanceIndex.div( uint( width ) );
+
+				// Quadrant shift: read from the bin that, after wrap-around, is `width/2,
+				// height/2` away -- this moves the DC bin (index 0,0) to the texture center.
+				const sx = x.add( uint( halfW ) ).mod( uint( width ) );
+				const sy = y.add( uint( halfH ) ).mod( uint( height ) );
+				const srcIndex = sy.mul( uint( width ) ).add( sx );
+
+				const v = readNode.element( srcIndex ).toVar();
+				const magnitude = v.length();
+				const value = magnitude.add( 1 ).log().div( this._spectrumLogNorm ).clamp( 0, 1 );
+
+				textureStore( writeTex, uvec2( x, y ), vec4( value, value, value, 1 ) );
+
+			} )().compute( count );
+
+			this._spectrumFromA = build( this.readA );
+			this._spectrumFromB = build( this.readB );
+
+		}
+
+		this._spectrumLogNorm.value = Math.log( 1 + maxMagnitude );
+
+		renderer.compute( this.current === 'A' ? this._spectrumFromA : this._spectrumFromB );
+
+	}
+
+	/**
+	 * Renders whichever buffer currently holds the live data into `storageTexture` as a grayscale
+	 * spatial-domain image (its real part, clamped to `[0, 1]`). Intended to be called right after
+	 * `computeInverse`.
+	 *
+	 * The compute kernels are built once per distinct `storageTexture` and cached.
+	 *
+	 * @param {Renderer} renderer
+	 * @param {StorageTexture} target - Must be exactly `width` by `height` in size.
+	 */
+	unpackImage( renderer, target ) {
+
+		if ( this._imageTarget !== target ) {
+
+			this._imageTarget = target;
+
+			const { width, count } = this;
+			const writeTex = storageTexture( target ).setAccess( NodeAccess.WRITE_ONLY );
+
+			const build = ( readNode ) => Fn( () => {
+
+				const x = instanceIndex.mod( uint( width ) );
+				const y = instanceIndex.div( uint( width ) );
+
+				const value = readNode.element( instanceIndex ).x.clamp( 0, 1 );
+
+				textureStore( writeTex, uvec2( x, y ), vec4( value, value, value, 1 ) );
+
+			} )().compute( count );
+
+			this._imageFromA = build( this.readA );
+			this._imageFromB = build( this.readB );
+
+		}
+
+		renderer.compute( this.current === 'A' ? this._imageFromA : this._imageFromB );
+
+	}
+
+	/**
+	 * Reads back a single complex bin from whichever buffer currently holds the live data, without
+	 * transferring the whole (potentially large) buffer -- useful e.g. for reading just the DC
+	 * bin (`index = 0`) to normalize a spectrum visualization (see `unpackSpectrum`).
+	 *
+	 * @param {Renderer} renderer
+	 * @param {number} [index=0] - The linear (`y * width + x`) index of the bin to read.
+	 * @returns {Promise<{real: number, imag: number}>}
+	 */
+	async readBin( renderer, index = 0 ) {
+
+		if ( this._probeFromA === undefined ) {
+
+			const build = ( readNode ) => Fn( () => {
+
+				this._probeWrite.element( 0 ).assign( readNode.element( this._probeIndex ) );
+
+			} )().compute( 1 );
+
+			this._probeFromA = build( this.readA );
+			this._probeFromB = build( this.readB );
+
+		}
+
+		this._probeIndex.value = index;
+
+		renderer.compute( this.current === 'A' ? this._probeFromA : this._probeFromB );
+
+		const data = new Float32Array( await renderer.getArrayBufferAsync( this._probeWrite.value ) );
+
+		return { real: data[ 0 ], imag: data[ 1 ] };
+
+	}
+
+	/**
 	 * Reads back whichever buffer currently holds the live data.
 	 *
 	 * @param {Renderer} renderer
@@ -312,6 +495,7 @@ class FFT2D {
 
 		this._attributeA.dispose?.();
 		this._attributeB.dispose?.();
+		this._probeAttribute.dispose?.();
 
 	}
 
