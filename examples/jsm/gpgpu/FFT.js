@@ -1,8 +1,8 @@
 import { StorageBufferAttribute } from 'three/webgpu';
 import {
-	Fn, instanceIndex, storage, uint, int, ivec2, uvec2, uniform, float, vec2, vec4, cos, sin,
+	Fn, If, instanceIndex, storage, uint, int, ivec2, uvec2, uniform, float, vec2, vec4, cos, sin,
 	storageTexture, textureStore, luminance, NodeAccess,
-	workgroupArray, workgroupBarrier, workgroupId, invocationLocalIndex
+	workgroupArray, workgroupBarrier, workgroupId, invocationLocalIndex, globalId, localId
 } from 'three/tsl';
 
 /**
@@ -25,11 +25,12 @@ function isPowerOfTwo( value ) {
  * 2x this storage size), which is exactly why `FFT2D` queries the actual device instead of
  * hardcoding around this floor.
  *
- * @type {{maxComputeInvocationsPerWorkgroup: number, maxComputeWorkgroupSizeX: number, maxComputeWorkgroupStorageSize: number}}
+ * @type {{maxComputeInvocationsPerWorkgroup: number, maxComputeWorkgroupSizeX: number, maxComputeWorkgroupSizeY: number, maxComputeWorkgroupStorageSize: number}}
  */
 const MINIMUM_COMPUTE_LIMITS = {
 	maxComputeInvocationsPerWorkgroup: 256,
 	maxComputeWorkgroupSizeX: 256,
+	maxComputeWorkgroupSizeY: 256,
 	maxComputeWorkgroupStorageSize: 16384
 };
 
@@ -88,12 +89,42 @@ function computeMaxFusedLineLength( limits ) {
 }
 
 /**
- * Builds one radix-2 Stockham "autosort" FFT butterfly stage, generalized so it can process
- * many independent 1D lines of a 2D buffer at once -- a "row pass" (`lineStride = width`,
- * `elementStride = 1`) transforms every row, a "column pass" (`lineStride = 1`, `elementStride
- * = width`) transforms every column. This is the row/column decomposition of the 2D FFT: the
- * 2D transform is exactly a 1D FFT along each row followed by a 1D FFT along each column (order
- * doesn't matter).
+ * Computes the largest square tile edge length `buildTransposeStage` can safely use on a device
+ * with the given compute limits: `tile * tile` invocations per workgroup (bounded by the
+ * per-workgroup invocation count and both the X and Y workgroup-size limits, since a transpose
+ * dispatch is 2D), and one shared `vec2` tile of `tile * tile` elements (`8 * tile * tile` bytes)
+ * within the workgroup storage budget. Returns the largest power of two satisfying both.
+ *
+ * @param {Object} limits - A `GPUSupportedLimits`-shaped object, e.g. from `getComputeLimits`.
+ * @returns {number} The largest safe tile edge length (a power of two, `>= 2`).
+ */
+function computeTransposeTileSize( limits ) {
+
+	const maxInvocations = Math.min(
+		limits.maxComputeInvocationsPerWorkgroup,
+		limits.maxComputeWorkgroupSizeX,
+		limits.maxComputeWorkgroupSizeY
+	);
+	const maxStorageBytes = limits.maxComputeWorkgroupStorageSize;
+
+	let T = 2;
+
+	while ( ( T * 2 ) * ( T * 2 ) <= maxInvocations && 8 * ( T * 2 ) * ( T * 2 ) <= maxStorageBytes ) {
+
+		T *= 2;
+
+	}
+
+	return T;
+
+}
+
+/**
+ * Builds one radix-2 Stockham "autosort" FFT butterfly stage, generalized so it can process many
+ * independent, *contiguous* 1D lines of a 2D buffer at once (`lineStride` = a line's length,
+ * `elementStride = 1`). Used directly for the row pass, and again for the column pass after
+ * `buildTransposeStage` has turned each column into a contiguous line -- see `FFT2D` for the
+ * full row/transpose/column/transpose-back pipeline this is one piece of.
  *
  * The Stockham formulation ping-pongs between two buffers every stage and never needs a
  * separate bit-reversal permutation pass, at the cost of alternating which buffer holds the
@@ -111,9 +142,9 @@ function computeMaxFusedLineLength( limits ) {
  * @private
  * @param {Object} params
  * @param {number} params.N - The length of each 1D line being transformed (a power of two).
- * @param {number} params.lineStride - Address increment between lines (`width` for a row pass, `1` for a column pass).
- * @param {number} params.elementStride - Address increment between consecutive elements of a line (`1` for a row pass, `width` for a column pass).
- * @param {number} params.lineCount - How many independent lines are transformed in parallel (`height` for a row pass, `width` for a column pass).
+ * @param {number} params.lineStride - Address increment between lines (each line's length -- `width` for a row pass, `height` for a post-transpose column pass).
+ * @param {number} params.elementStride - Address increment between consecutive elements of a line. Always `1` here -- both callers only ever pass contiguous lines.
+ * @param {number} params.lineCount - How many independent lines are transformed in parallel (`height` for a row pass, `width` for a post-transpose column pass).
  * @param {Node<uint>} params.pUniform - The per-stage span uniform (doubles every stage, from 1 to N/2).
  * @param {StorageBufferNode} readNode - The buffer this stage reads from.
  * @param {StorageBufferNode} writeNode - The buffer this stage writes to.
@@ -184,8 +215,8 @@ function buildMultiDispatchStage( { N, lineStride, elementStride, lineCount, pUn
  * @private
  * @param {Object} params
  * @param {number} params.N - The length of each 1D line being transformed (a power of two, `<= computeMaxFusedLineLength(...)` for the target device).
- * @param {number} params.lineStride - Address increment between lines (`width` for a row pass, `1` for a column pass).
- * @param {number} params.elementStride - Address increment between consecutive elements of a line (`1` for a row pass, `width` for a column pass).
+ * @param {number} params.lineStride - Address increment between lines (each line's length -- `width` for a row pass, `height` for a post-transpose column pass).
+ * @param {number} params.elementStride - Address increment between consecutive elements of a line. Always `1` here -- both callers only ever pass contiguous lines.
  * @param {number} params.lineCount - How many independent lines are transformed in parallel (one workgroup each).
  * @param {StorageBufferNode} readNode - The buffer this pass reads from.
  * @param {StorageBufferNode} writeNode - The buffer this pass writes to.
@@ -268,10 +299,92 @@ function buildFusedLineStage( { N, lineStride, elementStride, lineCount }, readN
 }
 
 /**
+ * Builds a tiled matrix-transpose compute pass: reads a `rows x cols` row-major buffer and writes
+ * its `cols x rows` transpose, using a workgroup-shared-memory tile so that *both* the read and
+ * the write are coalesced.
+ *
+ * This exists to fix the column pass's naturally strided memory access: naively transforming a
+ * column directly means `elementStride = width` (see the pre-transpose version of this class), so
+ * consecutive invocations touch memory `width` floats apart -- a textbook uncoalesced access
+ * pattern, and a much worse bandwidth bottleneck than the row pass's contiguous one. Transposing
+ * first turns the column pass into a second contiguous, `buildFusedLineStage`/
+ * `buildMultiDispatchStage`-shaped "row pass" over the transposed data (see `FFT2D`'s full
+ * row/transpose/column/transpose-back pipeline), at the cost of the two transpose passes
+ * themselves -- which this tiling keeps cheap by making even *those* fully coalesced in both
+ * directions, unlike a naive read-transposed-write-plain (or read-plain-write-transposed) kernel,
+ * which can only ever coalesce one side.
+ *
+ * The trick: each workgroup loads a `tile x tile` block from the source into a shared array
+ * (contiguous, since consecutive invocations along the source's fast axis land on contiguous
+ * source addresses), then writes it back out with the *local* x/y coordinates swapped -- not the
+ * global ones -- which keeps the destination write contiguous too, despite every element ending
+ * up at a transposed global position. `globalId`/`localId`/`workgroupId` are used directly here
+ * (rather than the flattened `instanceIndex`/`invocationLocalIndex` the other stages use) because
+ * the tile math is inherently 2D.
+ *
+ * @tsl
+ * @private
+ * @param {Object} params
+ * @param {number} params.rows - Row count of the buffer `readNode` is read as (row-major, row length `cols`).
+ * @param {number} params.cols - Column count (row length) of the buffer `readNode` is read as.
+ * @param {number} params.tile - Tile edge length; the workgroup is `tile x tile` (see `computeTransposeTileSize`).
+ * @param {StorageBufferNode} readNode - The buffer this pass reads from, as `rows x cols`.
+ * @param {StorageBufferNode} writeNode - The buffer this pass writes to, as `cols x rows` (the transpose).
+ * @returns {Function} A parameterless TSL function ready to `.compute( [ numWorkgroupsX, numWorkgroupsY ], [ tile, tile ] )`.
+ */
+function buildTransposeStage( { rows, cols, tile }, readNode, writeNode ) {
+
+	const sharedTile = workgroupArray( 'vec2', tile * tile );
+
+	const numWorkgroupsX = Math.ceil( cols / tile );
+	const numWorkgroupsY = Math.ceil( rows / tile );
+
+	const fn = Fn( () => {
+
+		const gx = globalId.x;
+		const gy = globalId.y;
+		const lx = localId.x;
+		const ly = localId.y;
+		const wx = workgroupId.x;
+		const wy = workgroupId.y;
+
+		// Load phase: (gx, gy) in the source (rows x cols) buffer is contiguous as gx varies, so
+		// this read is coalesced. `.compute()` with an explicit 2D workgroup count (see below)
+		// doesn't get an automatic bounds check the way a plain numeric count does, so guard it
+		// by hand -- `rows`/`cols` won't generally be exact multiples of `tile`.
+		If( gx.lessThan( uint( cols ) ).and( gy.lessThan( uint( rows ) ) ), () => {
+
+			sharedTile.element( ly.mul( uint( tile ) ).add( lx ) ).assign( readNode.element( gy.mul( uint( cols ) ).add( gx ) ) );
+
+		} );
+
+		workgroupBarrier();
+
+		// Store phase: write this tile's data to its transposed position, `outY * rows + outX`,
+		// with local x/y swapped relative to the load -- `outX` (built from `lx`, the fast local
+		// axis) is the destination's contiguous axis, so this write is coalesced too.
+		const outX = wy.mul( uint( tile ) ).add( lx );
+		const outY = wx.mul( uint( tile ) ).add( ly );
+
+		If( outX.lessThan( uint( rows ) ).and( outY.lessThan( uint( cols ) ) ), () => {
+
+			writeNode.element( outY.mul( uint( rows ) ).add( outX ) ).assign( sharedTile.element( lx.mul( uint( tile ) ).add( ly ) ) );
+
+		} );
+
+	} )().compute( [ numWorkgroupsX, numWorkgroupsY ], [ tile, tile ] );
+
+	return fn;
+
+}
+
+/**
  * A GPU 2D complex-to-complex FFT (WebGPU only), implemented as a row/column decomposition of
  * two iterative radix-2 Stockham autosort 1D FFTs -- see `buildFusedLineStage` (used whenever a
  * row/column fits in workgroup-shared memory) and `buildMultiDispatchStage` (the fallback for
- * longer lines).
+ * longer lines). Both the row and column passes run as contiguous, coalesced line transforms:
+ * the column pass runs on data transposed by `buildTransposeStage` first (then transposed back
+ * afterwards), rather than reading/writing the original buffer with a `width`-sized stride.
  *
  * `width` and `height` must both be powers of two.
  *
@@ -465,11 +578,12 @@ class FFT2D {
 	}
 
 	/**
-	 * Builds the row/column butterfly kernels on first use, choosing -- independently per axis --
-	 * between `buildFusedLineStage` and `buildMultiDispatchStage` based on the real device's
-	 * compute limits (see `getComputeLimits`, `computeMaxFusedLineLength`). Deferred out of the
-	 * constructor because those limits aren't known until `renderer.init()` has resolved, and the
-	 * constructor doesn't take a renderer. A no-op after the first call.
+	 * Builds the row/transpose/column/transpose-back kernels on first use, choosing --
+	 * independently per axis -- between `buildFusedLineStage` and `buildMultiDispatchStage` based
+	 * on the real device's compute limits (see `getComputeLimits`, `computeMaxFusedLineLength`,
+	 * `computeTransposeTileSize`). Deferred out of the constructor because those limits aren't
+	 * known until `renderer.init()` has resolved, and the constructor doesn't take a renderer. A
+	 * no-op after the first call.
 	 *
 	 * @private
 	 * @param {Renderer} renderer
@@ -482,7 +596,9 @@ class FFT2D {
 
 		const { width, height } = this;
 
-		const maxFusedLineLength = computeMaxFusedLineLength( getComputeLimits( renderer ) );
+		const limits = getComputeLimits( renderer );
+		const maxFusedLineLength = computeMaxFusedLineLength( limits );
+		const tile = computeTransposeTileSize( limits );
 
 		// Row and column axes are chosen independently since `width` and `height` can straddle
 		// the cutoff differently (e.g. a 2048x512 image fuses its column passes but not its row
@@ -495,14 +611,29 @@ class FFT2D {
 
 		this._rowAtoB = buildRow( { N: width, lineStride: width, elementStride: 1, lineCount: height, pUniform: this._pUniform }, this.readA, this.writeB );
 		this._rowBtoA = buildRow( { N: width, lineStride: width, elementStride: 1, lineCount: height, pUniform: this._pUniform }, this.readB, this.writeA );
-		this._colAtoB = buildCol( { N: height, lineStride: 1, elementStride: width, lineCount: width, pUniform: this._pUniform }, this.readA, this.writeB );
-		this._colBtoA = buildCol( { N: height, lineStride: 1, elementStride: width, lineCount: width, pUniform: this._pUniform }, this.readB, this.writeA );
+
+		// Transpose so the column pass -- like the row pass -- runs against contiguous
+		// (`elementStride = 1`) addresses instead of a `width`-sized stride; see
+		// `buildTransposeStage`. After this, the buffer is laid out as `width` lines of length
+		// `height` each (row-major with row length `height`), i.e. `lineStride: height`.
+		this._transposeFwdAtoB = buildTransposeStage( { rows: height, cols: width, tile }, this.readA, this.writeB );
+		this._transposeFwdBtoA = buildTransposeStage( { rows: height, cols: width, tile }, this.readB, this.writeA );
+
+		this._colAtoB = buildCol( { N: height, lineStride: height, elementStride: 1, lineCount: width, pUniform: this._pUniform }, this.readA, this.writeB );
+		this._colBtoA = buildCol( { N: height, lineStride: height, elementStride: 1, lineCount: width, pUniform: this._pUniform }, this.readB, this.writeA );
+
+		// Transpose back to the original `height` lines of length `width` layout, so every other
+		// method (`readData`, `unpackSpectrum`, `packTexture`, ...) sees the same row-major
+		// `address = y * width + x` convention as before this optimization.
+		this._transposeBackAtoB = buildTransposeStage( { rows: width, cols: height, tile }, this.readA, this.writeB );
+		this._transposeBackBtoA = buildTransposeStage( { rows: width, cols: height, tile }, this.readB, this.writeA );
 
 	}
 
 	/**
-	 * Runs the forward-transform butterfly stages (row pass, then column pass), ping-ponging
-	 * between the two buffers. Does not itself flip any sign or apply conjugation -- both
+	 * Runs the forward-transform butterfly stages -- row pass, transpose, column pass, transpose
+	 * back -- ping-ponging between the two buffers throughout (see `buildTransposeStage` for why
+	 * the transposes are there). Does not itself flip any sign or apply conjugation -- both
 	 * `computeForward` and `computeInverse` call this as their shared core.
 	 *
 	 * @private
@@ -513,7 +644,14 @@ class FFT2D {
 		this._ensureButterfliesBuilt( renderer );
 
 		this._runAxisPass( renderer, this._rowFused, this._stagesRow, this._rowAtoB, this._rowBtoA );
+
+		renderer.compute( this.current === 'A' ? this._transposeFwdAtoB : this._transposeFwdBtoA );
+		this.current = this.current === 'A' ? 'B' : 'A';
+
 		this._runAxisPass( renderer, this._colFused, this._stagesCol, this._colAtoB, this._colBtoA );
+
+		renderer.compute( this.current === 'A' ? this._transposeBackAtoB : this._transposeBackBtoA );
+		this.current = this.current === 'A' ? 'B' : 'A';
 
 	}
 
