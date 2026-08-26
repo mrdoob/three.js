@@ -396,10 +396,8 @@ class FFT2D {
 		this._attributeA = new StorageBufferAttribute( count, 2 );
 		this._attributeB = new StorageBufferAttribute( count, 2 );
 
-		this._readA = storage( this._attributeA, 'vec2', count ).toReadOnly();
-		this._writeA = storage( this._attributeA, 'vec2', count );
-		this._readB = storage( this._attributeB, 'vec2', count ).toReadOnly();
-		this._writeB = storage( this._attributeB, 'vec2', count );
+		this._readNode = storage( this._attributeA, 'vec2', count ).toReadOnly();
+		this._writeNode = storage( this._attributeB, 'vec2', count );
 
 		this._pUniform = uniform( 1, 'uint' );
 
@@ -410,21 +408,33 @@ class FFT2D {
 		// fallback choice needs the real device's compute limits, not known until `renderer.init()`.
 		this._built = false;
 
-		this._conjugateAtoB = Fn( () => {
+		this._conjugateKernel = Fn( () => {
 
-			const v = this._readA.element( instanceIndex ).toVar();
-			this._writeB.element( instanceIndex ).assign( vec2( v.x, v.y.negate() ) );
-
-		} )().compute( count, [ DEFAULT_WORKGROUP_SIZE ] );
-
-		this._conjugateBtoA = Fn( () => {
-
-			const v = this._readB.element( instanceIndex ).toVar();
-			this._writeA.element( instanceIndex ).assign( vec2( v.x, v.y.negate() ) );
+			const v = this._readNode.element( instanceIndex ).toVar();
+			this._writeNode.element( instanceIndex ).assign( vec2( v.x, v.y.negate() ) );
 
 		} )().compute( count, [ DEFAULT_WORKGROUP_SIZE ] );
 
 		this._current = 'A';
+
+	}
+
+	/**
+	 * Repoints the shared read/write storage nodes at the current/opposite ping-pong buffer,
+	 * dispatches `kernel`, and flips `_current`.
+	 *
+	 * @private
+	 * @param {Renderer} renderer
+	 * @param {Function} kernel
+	 */
+	_dispatchPingPong( renderer, kernel ) {
+
+		this._readNode.value = this._current === 'A' ? this._attributeA : this._attributeB;
+		this._writeNode.value = this._current === 'A' ? this._attributeB : this._attributeA;
+
+		renderer.compute( kernel );
+
+		this._current = this._current === 'A' ? 'B' : 'A';
 
 	}
 
@@ -435,15 +445,13 @@ class FFT2D {
 	 * @param {Renderer} renderer
 	 * @param {boolean} fused
 	 * @param {number} stages
-	 * @param {Function} atoB
-	 * @param {Function} btoA
+	 * @param {Function} kernel
 	 */
-	_runAxisPass( renderer, fused, stages, atoB, btoA ) {
+	_runAxisPass( renderer, fused, stages, kernel ) {
 
 		if ( fused ) {
 
-			renderer.compute( this._current === 'A' ? atoB : btoA );
-			this._current = this._current === 'A' ? 'B' : 'A';
+			this._dispatchPingPong( renderer, kernel );
 
 			return;
 
@@ -452,8 +460,7 @@ class FFT2D {
 		for ( let s = 0; s < stages; s ++ ) {
 
 			this._pUniform.value = 1 << s;
-			renderer.compute( this._current === 'A' ? atoB : btoA );
-			this._current = this._current === 'A' ? 'B' : 'A';
+			this._dispatchPingPong( renderer, kernel );
 
 		}
 
@@ -487,33 +494,26 @@ class FFT2D {
 		const buildRow = this._rowFused ? buildFusedLineStage : buildMultiDispatchStage;
 		const buildCol = this._colFused ? buildFusedLineStage : buildMultiDispatchStage;
 
-		this._rowAtoB = buildRow( { N: width, lineStride: width, elementStride: 1, lineCount: height, pUniform: this._pUniform }, this._readA, this._writeB );
-		this._rowBtoA = buildRow( { N: width, lineStride: width, elementStride: 1, lineCount: height, pUniform: this._pUniform }, this._readB, this._writeA );
+		this._rowKernel = buildRow( { N: width, lineStride: width, elementStride: 1, lineCount: height, pUniform: this._pUniform }, this._readNode, this._writeNode );
 
 		// Only worth building a conjugate-input row variant when the row axis is fused; the
 		// fallback path's kernel is reused across stages via `_pUniform`, so a standalone
-		// `_conjugateAtoB`/`_conjugateBtoA` pass handles that case instead.
+		// `_conjugateKernel` pass handles that case instead.
 		if ( this._rowFused ) {
 
-			this._rowConjAtoB = buildFusedLineStage( { N: width, lineStride: width, elementStride: 1, lineCount: height, conjugateInput: true }, this._readA, this._writeB );
-			this._rowConjBtoA = buildFusedLineStage( { N: width, lineStride: width, elementStride: 1, lineCount: height, conjugateInput: true }, this._readB, this._writeA );
+			this._rowConjKernel = buildFusedLineStage( { N: width, lineStride: width, elementStride: 1, lineCount: height, conjugateInput: true }, this._readNode, this._writeNode );
 
 		}
 
 		// After this, the buffer is `width` lines of length `height` (row-major, row length `height`).
-		this._transposeFwdAtoB = buildTransposeStage( { rows: height, cols: width, tile }, this._readA, this._writeB );
-		this._transposeFwdBtoA = buildTransposeStage( { rows: height, cols: width, tile }, this._readB, this._writeA );
+		this._transposeFwdKernel = buildTransposeStage( { rows: height, cols: width, tile }, this._readNode, this._writeNode );
 
-		this._colAtoB = buildCol( { N: height, lineStride: height, elementStride: 1, lineCount: width, pUniform: this._pUniform }, this._readA, this._writeB );
-		this._colBtoA = buildCol( { N: height, lineStride: height, elementStride: 1, lineCount: width, pUniform: this._pUniform }, this._readB, this._writeA );
+		this._colKernel = buildCol( { N: height, lineStride: height, elementStride: 1, lineCount: width, pUniform: this._pUniform }, this._readNode, this._writeNode );
 
 		// Transpose back to the original `height` lines of length `width` layout. This stage is
 		// always a single dispatch, so the trailing conjugate-and-scale always folds into it.
-		this._transposeBackAtoB = buildTransposeStage( { rows: width, cols: height, tile }, this._readA, this._writeB );
-		this._transposeBackBtoA = buildTransposeStage( { rows: width, cols: height, tile }, this._readB, this._writeA );
-
-		this._transposeBackConjScaleAtoB = buildTransposeStage( { rows: width, cols: height, tile, conjugateScaleOutput: true, invCount }, this._readA, this._writeB );
-		this._transposeBackConjScaleBtoA = buildTransposeStage( { rows: width, cols: height, tile, conjugateScaleOutput: true, invCount }, this._readB, this._writeA );
+		this._transposeBackKernel = buildTransposeStage( { rows: width, cols: height, tile }, this._readNode, this._writeNode );
+		this._transposeBackConjScaleKernel = buildTransposeStage( { rows: width, cols: height, tile, conjugateScaleOutput: true, invCount }, this._readNode, this._writeNode );
 
 	}
 
@@ -534,21 +534,17 @@ class FFT2D {
 		// The leading conjugate only folds into the row pass when it's fused; otherwise
 		// `computeInverse` has already run it as a standalone pass.
 		const foldLeadingConjugate = inverse && this._rowFused;
-		const rowAtoB = foldLeadingConjugate ? this._rowConjAtoB : this._rowAtoB;
-		const rowBtoA = foldLeadingConjugate ? this._rowConjBtoA : this._rowBtoA;
+		const rowKernel = foldLeadingConjugate ? this._rowConjKernel : this._rowKernel;
 
-		this._runAxisPass( renderer, this._rowFused, this._stagesRow, rowAtoB, rowBtoA );
+		this._runAxisPass( renderer, this._rowFused, this._stagesRow, rowKernel );
 
-		renderer.compute( this._current === 'A' ? this._transposeFwdAtoB : this._transposeFwdBtoA );
-		this._current = this._current === 'A' ? 'B' : 'A';
+		this._dispatchPingPong( renderer, this._transposeFwdKernel );
 
-		this._runAxisPass( renderer, this._colFused, this._stagesCol, this._colAtoB, this._colBtoA );
+		this._runAxisPass( renderer, this._colFused, this._stagesCol, this._colKernel );
 
-		const transposeBackAtoB = inverse ? this._transposeBackConjScaleAtoB : this._transposeBackAtoB;
-		const transposeBackBtoA = inverse ? this._transposeBackConjScaleBtoA : this._transposeBackBtoA;
+		const transposeBackKernel = inverse ? this._transposeBackConjScaleKernel : this._transposeBackKernel;
 
-		renderer.compute( this._current === 'A' ? transposeBackAtoB : transposeBackBtoA );
-		this._current = this._current === 'A' ? 'B' : 'A';
+		this._dispatchPingPong( renderer, transposeBackKernel );
 
 	}
 
@@ -563,28 +559,26 @@ class FFT2D {
 	 */
 	_load( renderer, sourceTexture ) {
 
-		if ( this._loadNode === undefined ) {
+		if ( this._loadKernel === undefined ) {
 
 			const width = this.width;
-			this._loadNode = texture( sourceTexture );
+			this._loadTextureNode = texture( sourceTexture );
 
-			const build = ( writeNode ) => Fn( () => {
+			this._loadKernel = Fn( () => {
 
 				const x = instanceIndex.mod( uint( width ) );
 				const y = instanceIndex.div( uint( width ) );
 
-				writeNode.element( instanceIndex ).assign( this._loadNode.load( ivec2( int( x ), int( y ) ) ).rg );
+				this._writeNode.element( instanceIndex ).assign( this._loadTextureNode.load( ivec2( int( x ), int( y ) ) ).rg );
 
 			} )().compute( this.count, [ DEFAULT_WORKGROUP_SIZE ] );
 
-			this._loadToA = build( this._writeA );
-			this._loadToB = build( this._writeB );
-
 		}
 
-		this._loadNode.value = sourceTexture;
+		this._loadTextureNode.value = sourceTexture;
+		this._writeNode.value = this._current === 'A' ? this._attributeA : this._attributeB;
 
-		renderer.compute( this._current === 'A' ? this._loadToA : this._loadToB );
+		renderer.compute( this._loadKernel );
 
 	}
 
@@ -598,30 +592,28 @@ class FFT2D {
 	 */
 	_store( renderer, destinationTexture ) {
 
-		if ( this._storeNode === undefined ) {
+		if ( this._storeKernel === undefined ) {
 
-			const { width, count } = this;
-			this._storeNode = storageTexture( destinationTexture ).setAccess( NodeAccess.WRITE_ONLY );
+			const width = this.width;
+			this._storeTextureNode = storageTexture( destinationTexture ).setAccess( NodeAccess.WRITE_ONLY );
 
-			const build = ( readNode ) => Fn( () => {
+			this._storeKernel = Fn( () => {
 
 				const x = instanceIndex.mod( uint( width ) );
 				const y = instanceIndex.div( uint( width ) );
 
-				const v = readNode.element( instanceIndex );
+				const v = this._readNode.element( instanceIndex );
 
-				textureStore( this._storeNode, uvec2( x, y ), vec4( v.x, v.y, 0, 1 ) );
+				textureStore( this._storeTextureNode, uvec2( x, y ), vec4( v.x, v.y, 0, 1 ) );
 
-			} )().compute( count, [ DEFAULT_WORKGROUP_SIZE ] );
-
-			this._storeFromA = build( this._readA );
-			this._storeFromB = build( this._readB );
+			} )().compute( this.count, [ DEFAULT_WORKGROUP_SIZE ] );
 
 		}
 
-		this._storeNode.value = destinationTexture;
+		this._storeTextureNode.value = destinationTexture;
+		this._readNode.value = this._current === 'A' ? this._attributeA : this._attributeB;
 
-		renderer.compute( this._current === 'A' ? this._storeFromA : this._storeFromB );
+		renderer.compute( this._storeKernel );
 
 	}
 
@@ -659,8 +651,7 @@ class FFT2D {
 
 		if ( ! this._rowFused ) {
 
-			renderer.compute( this._current === 'A' ? this._conjugateAtoB : this._conjugateBtoA );
-			this._current = this._current === 'A' ? 'B' : 'A';
+			this._dispatchPingPong( renderer, this._conjugateKernel );
 
 		}
 
