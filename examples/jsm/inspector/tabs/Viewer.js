@@ -948,6 +948,13 @@ class Viewer extends Tab {
 
 			const mainCanvas = renderer.domElement;
 			const rect = mainCanvas.getBoundingClientRect();
+
+			if ( rect.width <= 0 || rect.height <= 0 ) {
+
+				return;
+
+			}
+
 			const targetParent = document.fullscreenElement || this.profiler.domElement;
 			const parentRect = targetParent.getBoundingClientRect();
 			const localLeft = rect.left - parentRect.left;
@@ -1021,7 +1028,7 @@ class Viewer extends Tab {
 
 			if ( ! renderer.backend.isWebGPUBackend ) {
 
-				inspector.resolveConsoleOnce( 'warn', 'Inspector: Viewer is only available with WebGPU.' );
+				// Viewer is only available with WebGPU.
 
 				return;
 
@@ -1312,6 +1319,53 @@ class Viewer extends Tab {
 			}
 
 		}
+
+	}
+
+	dispose() {
+
+		if ( this.splitActive ) {
+
+			this.stopSplitMode();
+
+		}
+
+		if ( this.splitCanvas ) {
+
+			if ( this.splitCanvas.parentElement ) {
+
+				this.splitCanvas.parentElement.removeChild( this.splitCanvas );
+
+			}
+
+			this.splitCanvas = null;
+
+		}
+
+		if ( this.splitCanvasTarget ) {
+
+			this.splitCanvasTarget.dispose();
+			this.splitCanvasTarget = null;
+
+		}
+
+		if ( this.splitMaterial ) {
+
+			this.splitMaterial.dispose();
+			this.splitMaterial = null;
+
+		}
+
+		for ( const canvasData of this.canvasNodes.values() ) {
+
+			canvasData.canvasTarget.dispose();
+			canvasData.material.dispose();
+
+		}
+
+		this.canvasNodes.clear();
+
+		super.dispose();
 
 	}
 
