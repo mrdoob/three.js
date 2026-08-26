@@ -127,7 +127,7 @@ export default QUnit.module( 'TSL', () => {
 				const result = await readBuffer( renderer, liveAttribute, count );
 
 				const expected = initialValue + iterations;
-				let firstWrong = -1;
+				let firstWrong = - 1;
 
 				for ( let i = 0; i < count; i ++ ) {
 
@@ -140,7 +140,7 @@ export default QUnit.module( 'TSL', () => {
 
 				}
 
-				assert.ok( firstWrong === -1, firstWrong === -1
+				assert.ok( firstWrong === - 1, firstWrong === - 1
 					? `all ${ count } elements equal ${ expected } after ${ iterations } repointed dispatches`
 					: `element ${ firstWrong } was ${ result[ firstWrong ] }, expected ${ expected } after ${ iterations } repointed dispatches (first mismatch)`
 				);
@@ -201,7 +201,7 @@ export default QUnit.module( 'TSL', () => {
 			const liveAttribute = current === 'A' ? attrA : attrB;
 			const result = await readBuffer( renderer, liveAttribute, count );
 
-			let firstWrong = -1;
+			let firstWrong = - 1;
 
 			for ( let i = 0; i < count; i ++ ) {
 
@@ -214,7 +214,7 @@ export default QUnit.module( 'TSL', () => {
 
 			}
 
-			assert.ok( firstWrong === -1, firstWrong === -1
+			assert.ok( firstWrong === - 1, firstWrong === - 1
 				? `all ${ count } elements equal ${ expected } after ${ iterations } interleaved dispatches across 2 kernels`
 				: `element ${ firstWrong } was ${ result[ firstWrong ] }, expected ${ expected } (first mismatch)`
 			);
@@ -268,7 +268,7 @@ export default QUnit.module( 'TSL', () => {
 				const result = await readBuffer( renderer, liveAttribute, count );
 
 				const expected = initialValue + iterations;
-				let firstWrong = -1;
+				let firstWrong = - 1;
 
 				for ( let i = 0; i < count; i ++ ) {
 
@@ -281,7 +281,7 @@ export default QUnit.module( 'TSL', () => {
 
 				}
 
-				assert.ok( firstWrong === -1, firstWrong === -1
+				assert.ok( firstWrong === - 1, firstWrong === - 1
 					? `run ${ run }: all elements equal ${ expected }`
 					: `run ${ run }: element ${ firstWrong } was ${ result[ firstWrong ] }, expected ${ expected } (first mismatch)`
 				);
@@ -303,7 +303,7 @@ export default QUnit.module( 'TSL', () => {
 
 				const iterations = 32;
 
-				const attrA = makeVec2Buffer( count, 1, -1 );
+				const attrA = makeVec2Buffer( count, 1, - 1 );
 				const attrB = makeVec2Buffer( count, 0, 0 );
 
 				const readNode = storage( attrA, 'vec2', count ).toReadOnly();
@@ -333,8 +333,8 @@ export default QUnit.module( 'TSL', () => {
 				const { x, y } = await readVec2Buffer( renderer, liveAttribute, count );
 
 				const expectedX = 1 + iterations;
-				const expectedY = -1 - iterations;
-				let firstWrong = -1;
+				const expectedY = - 1 - iterations;
+				let firstWrong = - 1;
 
 				for ( let i = 0; i < count; i ++ ) {
 
@@ -347,7 +347,7 @@ export default QUnit.module( 'TSL', () => {
 
 				}
 
-				assert.ok( firstWrong === -1, firstWrong === -1
+				assert.ok( firstWrong === - 1, firstWrong === - 1
 					? `all ${ count } elements equal (${ expectedX }, ${ expectedY }) after ${ iterations } repointed dispatches`
 					: `element ${ firstWrong } was (${ x[ firstWrong ] }, ${ y[ firstWrong ] }), expected (${ expectedX }, ${ expectedY }) (first mismatch)`
 				);
@@ -404,7 +404,7 @@ export default QUnit.module( 'TSL', () => {
 			const liveAttribute = current === 'A' ? attrA : attrB;
 			const { x, y } = await readVec2Buffer( renderer, liveAttribute, count );
 
-			let firstWrong = -1;
+			let firstWrong = - 1;
 
 			for ( let i = 0; i < count; i ++ ) {
 
@@ -417,7 +417,7 @@ export default QUnit.module( 'TSL', () => {
 
 			}
 
-			assert.ok( firstWrong === -1, firstWrong === -1
+			assert.ok( firstWrong === - 1, firstWrong === - 1
 				? `all ${ count } elements equal ${ expected } after ${ stages } stages of repointed dispatches`
 				: `element ${ firstWrong } was (${ x[ firstWrong ] }, ${ y[ firstWrong ] }), expected (${ expected }, 0) after ${ stages } stages (first mismatch)`
 			);
@@ -473,7 +473,7 @@ export default QUnit.module( 'TSL', () => {
 				const liveAttribute = current === 'A' ? attrA : attrB;
 				const { x, y } = await readVec2Buffer( renderer, liveAttribute, count );
 
-				let firstWrong = -1;
+				let firstWrong = - 1;
 
 				for ( let i = 0; i < count; i ++ ) {
 
@@ -486,7 +486,7 @@ export default QUnit.module( 'TSL', () => {
 
 				}
 
-				assert.ok( firstWrong === -1, firstWrong === -1
+				assert.ok( firstWrong === - 1, firstWrong === - 1
 					? `run ${ run }: all elements equal ${ expected }`
 					: `run ${ run }: element ${ firstWrong } was (${ x[ firstWrong ] }, ${ y[ firstWrong ] }), expected (${ expected }, 0) (first mismatch)`
 				);
@@ -543,7 +543,7 @@ export default QUnit.module( 'TSL', () => {
 
 		}
 
-		[ [ 1024, 1024 ], [ 2048, 1024 ] ].forEach( ( [ width, height ] ) => {
+		[[ 1024, 1024 ], [ 2048, 1024 ]].forEach( ( [ width, height ] ) => {
 
 			repointTest( `mixed global-memory / shared-memory kernels sharing repointed nodes, matching _runButterflyPasses' shape (${ width }x${ height })`, async ( assert, renderer ) => {
 
@@ -615,7 +615,7 @@ export default QUnit.module( 'TSL', () => {
 				const liveAttribute = current === 'A' ? attrA : attrB;
 				const { x, y } = await readVec2Buffer( renderer, liveAttribute, count );
 
-				let firstWrong = -1;
+				let firstWrong = - 1;
 
 				for ( let i = 0; i < count; i ++ ) {
 
@@ -628,7 +628,7 @@ export default QUnit.module( 'TSL', () => {
 
 				}
 
-				assert.ok( firstWrong === -1, firstWrong === -1
+				assert.ok( firstWrong === - 1, firstWrong === - 1
 					? `all ${ count } elements equal ${ expected } after the full row/transpose/col/transpose-back sequence`
 					: `element ${ firstWrong } was (${ x[ firstWrong ] }, ${ y[ firstWrong ] }), expected (${ expected }, 0) (first mismatch)`
 				);
@@ -709,7 +709,7 @@ export default QUnit.module( 'TSL', () => {
 				const liveAttribute = current === 'A' ? attrA : attrB;
 				const { x, y } = await readVec2Buffer( renderer, liveAttribute, count );
 
-				let firstWrong = -1;
+				let firstWrong = - 1;
 
 				for ( let i = 0; i < count; i ++ ) {
 
@@ -722,7 +722,7 @@ export default QUnit.module( 'TSL', () => {
 
 				}
 
-				assert.ok( firstWrong === -1, firstWrong === -1
+				assert.ok( firstWrong === - 1, firstWrong === - 1
 					? `run ${ run }: all elements equal ${ expected }`
 					: `run ${ run }: element ${ firstWrong } was (${ x[ firstWrong ] }, ${ y[ firstWrong ] }), expected (${ expected }, 0) (first mismatch)`
 				);
@@ -793,7 +793,7 @@ export default QUnit.module( 'TSL', () => {
 				const { x, y } = await readVec2Buffer( renderer, liveAttribute, count );
 
 				const expectedX = iterations;
-				let firstWrong = -1;
+				let firstWrong = - 1;
 
 				for ( let i = 0; i < count; i ++ ) {
 
@@ -806,7 +806,7 @@ export default QUnit.module( 'TSL', () => {
 
 				}
 
-				assert.ok( firstWrong === -1, firstWrong === -1
+				assert.ok( firstWrong === - 1, firstWrong === - 1
 					? `all ${ count } elements equal (${ expectedX }, 0) after ${ iterations } dispatches of a slow kernel`
 					: `element ${ firstWrong } was (${ x[ firstWrong ] }, ${ y[ firstWrong ] }), expected (${ expectedX }, 0) (first mismatch)`
 				);
@@ -867,7 +867,7 @@ export default QUnit.module( 'TSL', () => {
 				const { x, y } = await readVec2Buffer( renderer, liveAttribute, count );
 
 				const expected = rowStages + colStages;
-				let firstWrong = -1;
+				let firstWrong = - 1;
 
 				for ( let i = 0; i < count; i ++ ) {
 
@@ -880,7 +880,7 @@ export default QUnit.module( 'TSL', () => {
 
 				}
 
-				assert.ok( firstWrong === -1, firstWrong === -1
+				assert.ok( firstWrong === - 1, firstWrong === - 1
 					? `run ${ run }: all elements equal (${ expected }, 0)`
 					: `run ${ run }: element ${ firstWrong } was (${ x[ firstWrong ] }, ${ y[ firstWrong ] }), expected (${ expected }, 0) (first mismatch)`
 				);
@@ -918,8 +918,8 @@ export default QUnit.module( 'TSL', () => {
 			const sourceTexture = new THREE.DataTexture( sourceData, width, height, THREE.RGBAFormat, THREE.FloatType );
 			sourceTexture.needsUpdate = true;
 
-			const attrA = makeVec2Buffer( count, -1, -1 );
-			const attrB = makeVec2Buffer( count, -1, -1 );
+			const attrA = makeVec2Buffer( count, - 1, - 1 );
+			const attrB = makeVec2Buffer( count, - 1, - 1 );
 
 			const sourceNode = texture( sourceTexture );
 			const writeNode = storage( attrA, 'vec2', count );
@@ -937,12 +937,12 @@ export default QUnit.module( 'TSL', () => {
 			} )().compute( count );
 
 			let target = 'A';
-			let firstWrong = -1;
-			let firstWrongCall = -1;
+			let firstWrong = - 1;
+			let firstWrongCall = - 1;
 			let firstWrongValue = null;
 			let firstWrongOtherBuffer = null;
 
-			for ( let call = 0; call < calls && firstWrong === -1; call ++ ) {
+			for ( let call = 0; call < calls && firstWrong === - 1; call ++ ) {
 
 				// Both buffers were seeded with (-1, -1) above, so a stale bind group that
 				// silently keeps writing to the *other* buffer (or doesn't write at all) shows up
@@ -974,7 +974,7 @@ export default QUnit.module( 'TSL', () => {
 
 			}
 
-			assert.ok( firstWrong === -1, firstWrong === -1
+			assert.ok( firstWrong === - 1, firstWrong === - 1
 				? `all ${ calls } calls (alternating storage target, same reused texture) wrote (7, 3) correctly`
 				: `call ${ firstWrongCall }: element ${ firstWrong } was (${ firstWrongValue.x }, ${ firstWrongValue.y }), expected (7, 3); other buffer's element ${ firstWrong } is (${ firstWrongOtherBuffer.x[ firstWrong ] }, ${ firstWrongOtherBuffer.y[ firstWrong ] })`
 			);

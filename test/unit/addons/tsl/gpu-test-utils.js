@@ -242,7 +242,7 @@ const BACKEND_OPTIONS = {
 // so availability is detected empirically per backend rather than assumed.
 const sharedRenderers = {};
 
-async function getSharedRenderer( backend ) {
+export async function getSharedRenderer( backend ) {
 
 	if ( BACKEND_OPTIONS[ backend ] === undefined ) {
 
