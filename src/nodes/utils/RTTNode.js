@@ -47,7 +47,7 @@ class RTTNode extends TextureNode {
 			resolutionScale = 1
 		} = options;
 
-		const renderTarget = new RenderTarget( width, height, { type: HalfFloatType, ...options } );
+		const renderTarget = new RenderTarget( width ?? 1, height ?? 1, { type: HalfFloatType, ...options } );
 
 		super( renderTarget.texture, uv() );
 
