@@ -65,6 +65,31 @@
 			// One FFT2D instance per color channel -- see FFT2D's own class-level comment on why
 			// full-color support is 3 single-channel instances run in lockstep plus a small custom
 			// combine kernel, rather than a dedicated multi-channel API.
+			//
+			// Cached per image size (`"WxH"`) rather than rebuilt per preset: constructing an
+			// `FFT2D` is cheap, but its *first* `computeForward`/`computeInverse` call lazily
+			// builds and compiles its row/column/transpose kernels (`FFT2D#_ensureButterfliesBuilt`),
+			// which depend only on `(width, height, the device's compute limits)` -- never on which
+			// image is loaded. Presets that repeat a size (or any app cycling through many
+			// same-size images) reuse that size's 3 instances instead of paying to rebuild them.
+			const fftCache = new Map(); // "WxH" -> { r: FFT2D, g: FFT2D, b: FFT2D }
+
+			function getFFTs( width, height ) {
+
+				const key = `${ width }x${ height }`;
+				let entry = fftCache.get( key );
+
+				if ( entry === undefined ) {
+
+					entry = { r: new FFT2D( width, height ), g: new FFT2D( width, height ), b: new FFT2D( width, height ) };
+					fftCache.set( key, entry );
+
+				}
+
+				return entry;
+
+			}
+
 			let ffts = null;
 			let loadedTexture = null;
 			let textureNode = null;
@@ -197,10 +222,11 @@
 
 				}
 
-				// Tear down the previous preset's GPU resources before building new ones sized for
-				// this image.
+				// Tear down the previous preset's texture/target resources -- but *not* `ffts`: those
+				// come from `getFFTs`'s size-keyed cache, which deliberately keeps every size's
+				// instances alive across presets so that revisiting a size (including the one just
+				// left) reuses its already-built kernels instead of paying to rebuild them.
 
-				if ( ffts ) { ffts.r.dispose(); ffts.g.dispose(); ffts.b.dispose(); }
 				loadedTexture?.dispose();
 				spectrumTexture?.dispose();
 				reconstructedTexture?.dispose();
@@ -208,7 +234,7 @@
 				loadedTexture = newTexture;
 				textureNode = texture( loadedTexture );
 
-				ffts = { r: new FFT2D( width, height ), g: new FFT2D( width, height ), b: new FFT2D( width, height ) };
+				ffts = getFFTs( width, height );
 
 				spectrumTexture = new THREE.StorageTexture( width, height );
 				reconstructedTexture = new THREE.StorageTexture( width, height );
