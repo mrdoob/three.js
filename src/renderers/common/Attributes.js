@@ -49,6 +49,12 @@ class Attributes extends DataMap {
 
 		if ( attributeData !== null ) {
 
+			if ( attributeData.onDispose !== undefined && typeof attribute.removeEventListener === 'function' ) {
+
+				attribute.removeEventListener( 'dispose', attributeData.onDispose );
+
+			}
+
 			this.backend.destroyAttribute( attribute );
 
 			this.info.destroyAttribute( attribute );
@@ -91,6 +97,14 @@ class Attributes extends DataMap {
 
 				this.backend.createIndirectStorageAttribute( attribute );
 				this.info.createIndirectStorageAttribute( attribute );
+
+			}
+
+			if ( typeof attribute.addEventListener === 'function' ) {
+
+				const onDispose = () => this.delete( attribute );
+				attribute.addEventListener( 'dispose', onDispose );
+				data.onDispose = onDispose;
 
 			}
 
