@@ -218,11 +218,12 @@ function buildMultiDispatchStage( { N, lineStride, elementStride, lineCount, pUn
  * @param {number} params.lineStride - Address increment between lines (each line's length -- `width` for a row pass, `height` for a post-transpose column pass).
  * @param {number} params.elementStride - Address increment between consecutive elements of a line. Always `1` here -- both callers only ever pass contiguous lines.
  * @param {number} params.lineCount - How many independent lines are transformed in parallel (one workgroup each).
+ * @param {boolean} [params.conjugateInput=false] - If `true`, negate the imaginary part of every element as it's loaded, folding the inverse transform's leading conjugate pass (see `FFT2D#computeInverse`) into this stage's one-time global read instead of running it as a separate full-buffer pass beforehand.
  * @param {StorageBufferNode} readNode - The buffer this pass reads from.
  * @param {StorageBufferNode} writeNode - The buffer this pass writes to.
  * @returns {Function} A parameterless TSL function ready to `.compute( dispatchCount, [ half ] )`.
  */
-function buildFusedLineStage( { N, lineStride, elementStride, lineCount }, readNode, writeNode ) {
+function buildFusedLineStage( { N, lineStride, elementStride, lineCount, conjugateInput = false }, readNode, writeNode ) {
 
 	const half = N / 2;
 	const stages = Math.log2( N );
@@ -242,9 +243,16 @@ function buildFusedLineStage( { N, lineStride, elementStride, lineCount }, readN
 		const lineBase = line.mul( uint( lineStride ) );
 		const t2 = t.add( uint( half ) );
 
+		const load = ( addr ) => {
+
+			const v = readNode.element( addr );
+			return conjugateInput ? vec2( v.x, v.y.negate() ) : v;
+
+		};
+
 		// Load the whole line into shared memory once -- everything below happens on-chip.
-		localA.element( t ).assign( readNode.element( lineBase.add( t.mul( uint( elementStride ) ) ) ) );
-		localA.element( t2 ).assign( readNode.element( lineBase.add( t2.mul( uint( elementStride ) ) ) ) );
+		localA.element( t ).assign( load( lineBase.add( t.mul( uint( elementStride ) ) ) ) );
+		localA.element( t2 ).assign( load( lineBase.add( t2.mul( uint( elementStride ) ) ) ) );
 
 		workgroupBarrier();
 
@@ -261,8 +269,12 @@ function buildFusedLineStage( { N, lineStride, elementStride, lineCount }, readN
 			const idx1 = hi.mul( uint( p ) ).add( lo );
 			const idx2 = idx1.add( uint( half ) );
 
-			const v0 = readBuf.element( idx1 ).toVar( 'v0' );
-			const v1 = readBuf.element( idx2 ).toVar( 'v1' );
+			// Named uniquely per stage (`v0_0`, `v0_1`, ...) rather than reusing `'v0'`/`'v1'`: this
+			// loop is unrolled in JS, so every stage's `.toVar()` call declares a variable in the
+			// *same* generated shader function body -- a repeated name would still be handled
+			// correctly (TSL renames the later declarations to disambiguate), just noisily.
+			const v0 = readBuf.element( idx1 ).toVar( `v0_${ s }` );
+			const v1 = readBuf.element( idx2 ).toVar( `v1_${ s }` );
 
 			// Same forward-transform kernel as `buildMultiDispatchStage` -- see its comment on
 			// the angle/sign convention -- just reading/writing shared memory instead of global.
@@ -324,15 +336,25 @@ function buildFusedLineStage( { N, lineStride, elementStride, lineCount }, readN
  *
  * @tsl
  * @private
+ * When this is the *last* stage of an inverse transform (the transpose-back that restores the
+ * original row-major layout -- see `FFT2D`'s pipeline), `conjugateScaleOutput` folds the inverse
+ * transform's trailing conjugate-and-scale pass (see `FFT2D#computeInverse`) directly into this
+ * stage's one-time global write, instead of running it as a separate full-buffer pass afterward.
+ * This is always available here (unlike the leading conjugate, folded into the row pass only when
+ * that axis is fused -- see `buildFusedLineStage`) because the transpose stages are always a
+ * single dispatch, never split per-stage the way `buildMultiDispatchStage` splits a fallback axis.
+ *
  * @param {Object} params
  * @param {number} params.rows - Row count of the buffer `readNode` is read as (row-major, row length `cols`).
  * @param {number} params.cols - Column count (row length) of the buffer `readNode` is read as.
  * @param {number} params.tile - Tile edge length; the workgroup is `tile x tile` (see `computeTransposeTileSize`).
+ * @param {boolean} [params.conjugateScaleOutput=false] - If `true`, negate the imaginary part and scale both components by `invCount` as each element is written.
+ * @param {number} [params.invCount=1] - `1 / (width * height)`, used only when `conjugateScaleOutput` is `true`.
  * @param {StorageBufferNode} readNode - The buffer this pass reads from, as `rows x cols`.
  * @param {StorageBufferNode} writeNode - The buffer this pass writes to, as `cols x rows` (the transpose).
  * @returns {Function} A parameterless TSL function ready to `.compute( [ numWorkgroupsX, numWorkgroupsY ], [ tile, tile ] )`.
  */
-function buildTransposeStage( { rows, cols, tile }, readNode, writeNode ) {
+function buildTransposeStage( { rows, cols, tile, conjugateScaleOutput = false, invCount = 1 }, readNode, writeNode ) {
 
 	const sharedTile = workgroupArray( 'vec2', tile * tile );
 
@@ -368,7 +390,10 @@ function buildTransposeStage( { rows, cols, tile }, readNode, writeNode ) {
 
 		If( outX.lessThan( uint( rows ) ).and( outY.lessThan( uint( cols ) ) ), () => {
 
-			writeNode.element( outY.mul( uint( rows ) ).add( outX ) ).assign( sharedTile.element( lx.mul( uint( tile ) ).add( ly ) ) );
+			const v = sharedTile.element( lx.mul( uint( tile ) ).add( ly ) ).toVar();
+			const out = conjugateScaleOutput ? vec2( v.x.mul( invCount ), v.y.negate().mul( invCount ) ) : v;
+
+			writeNode.element( outY.mul( uint( rows ) ).add( outX ) ).assign( out );
 
 		} );
 
@@ -481,6 +506,13 @@ class FFT2D {
 		// use. See `computeMaxFusedLineLength`/`getComputeLimits`.
 		this._built = false;
 
+		// The inverse transform's *leading* conjugate is only ever run standalone here when the
+		// row axis falls back to `buildMultiDispatchStage` (its per-stage kernel is reused across
+		// every stage via `_pUniform`, so there's no single "first read" location to fold the
+		// conjugate into the way there is for a fused row axis -- see `_ensureButterfliesBuilt`'s
+		// `_rowConjAtoB`/`_rowConjBtoA`). The trailing conjugate-and-scale never needs a standalone
+		// pass at all: the transpose-back stage is always a single dispatch (see
+		// `buildTransposeStage`'s `conjugateScaleOutput`), so it's always folded in.
 		this._conjugateAtoB = Fn( () => {
 
 			const v = this.readA.element( instanceIndex ).toVar();
@@ -492,22 +524,6 @@ class FFT2D {
 
 			const v = this.readB.element( instanceIndex ).toVar();
 			this.writeA.element( instanceIndex ).assign( vec2( v.x, v.y.negate() ) );
-
-		} )().compute( count );
-
-		const invCount = 1 / count;
-
-		this._conjugateScaleAtoB = Fn( () => {
-
-			const v = this.readA.element( instanceIndex ).toVar();
-			this.writeB.element( instanceIndex ).assign( vec2( v.x.mul( invCount ), v.y.negate().mul( invCount ) ) );
-
-		} )().compute( count );
-
-		this._conjugateScaleBtoA = Fn( () => {
-
-			const v = this.readB.element( instanceIndex ).toVar();
-			this.writeA.element( instanceIndex ).assign( vec2( v.x.mul( invCount ), v.y.negate().mul( invCount ) ) );
 
 		} )().compute( count );
 
@@ -594,7 +610,8 @@ class FFT2D {
 
 		this._built = true;
 
-		const { width, height } = this;
+		const { width, height, count } = this;
+		const invCount = 1 / count;
 
 		const limits = getComputeLimits( renderer );
 		const maxFusedLineLength = computeMaxFusedLineLength( limits );
@@ -612,6 +629,21 @@ class FFT2D {
 		this._rowAtoB = buildRow( { N: width, lineStride: width, elementStride: 1, lineCount: height, pUniform: this._pUniform }, this.readA, this.writeB );
 		this._rowBtoA = buildRow( { N: width, lineStride: width, elementStride: 1, lineCount: height, pUniform: this._pUniform }, this.readB, this.writeA );
 
+		// A second copy of the row pass, used only during `computeInverse`, with the leading
+		// conjugate folded into its one-time load (see `buildFusedLineStage`'s `conjugateInput`)
+		// instead of running as a separate full-buffer pass first. Only worth building when the
+		// row axis is fused: `buildMultiDispatchStage`'s kernel is reused across every stage via
+		// `_pUniform`, so there's no single "first read" to fold into without a second, stage-0-only
+		// kernel variant -- not worth the extra complexity for what both `FFT2D`'s docs and this
+		// optimization's own motivation call a small, non-dominant saving. The standalone
+		// `_conjugateAtoB`/`_conjugateBtoA` pass handles that (rarer, large-line) case instead.
+		if ( this._rowFused ) {
+
+			this._rowConjAtoB = buildFusedLineStage( { N: width, lineStride: width, elementStride: 1, lineCount: height, conjugateInput: true }, this.readA, this.writeB );
+			this._rowConjBtoA = buildFusedLineStage( { N: width, lineStride: width, elementStride: 1, lineCount: height, conjugateInput: true }, this.readB, this.writeA );
+
+		}
+
 		// Transpose so the column pass -- like the row pass -- runs against contiguous
 		// (`elementStride = 1`) addresses instead of a `width`-sized stride; see
 		// `buildTransposeStage`. After this, the buffer is laid out as `width` lines of length
@@ -624,33 +656,56 @@ class FFT2D {
 
 		// Transpose back to the original `height` lines of length `width` layout, so every other
 		// method (`readData`, `unpackSpectrum`, `packTexture`, ...) sees the same row-major
-		// `address = y * width + x` convention as before this optimization.
+		// `address = y * width + x` convention as before this optimization. This stage is always a
+		// single dispatch regardless of whether the column axis is fused, so -- unlike the leading
+		// conjugate above -- the trailing conjugate-and-scale (see `computeInverse`) is *always*
+		// folded into its one-time write (`conjugateScaleOutput`) rather than ever needing a
+		// separate pass.
 		this._transposeBackAtoB = buildTransposeStage( { rows: width, cols: height, tile }, this.readA, this.writeB );
 		this._transposeBackBtoA = buildTransposeStage( { rows: width, cols: height, tile }, this.readB, this.writeA );
+
+		this._transposeBackConjScaleAtoB = buildTransposeStage( { rows: width, cols: height, tile, conjugateScaleOutput: true, invCount }, this.readA, this.writeB );
+		this._transposeBackConjScaleBtoA = buildTransposeStage( { rows: width, cols: height, tile, conjugateScaleOutput: true, invCount }, this.readB, this.writeA );
 
 	}
 
 	/**
-	 * Runs the forward-transform butterfly stages -- row pass, transpose, column pass, transpose
-	 * back -- ping-ponging between the two buffers throughout (see `buildTransposeStage` for why
-	 * the transposes are there). Does not itself flip any sign or apply conjugation -- both
-	 * `computeForward` and `computeInverse` call this as their shared core.
+	 * Runs the butterfly stages -- row pass, transpose, column pass, transpose back -- ping-ponging
+	 * between the two buffers throughout (see `buildTransposeStage` for why the transposes are
+	 * there). Both `computeForward` and `computeInverse` call this as their shared core; `inverse`
+	 * selects the row-pass and transpose-back kernel variants that fold the inverse transform's
+	 * leading conjugate / trailing conjugate-and-scale into this pipeline's existing reads and
+	 * writes -- see `computeInverse` and the `conjugateInput`/`conjugateScaleOutput` options on
+	 * `buildFusedLineStage`/`buildTransposeStage` -- instead of running them as separate passes.
 	 *
 	 * @private
 	 * @param {Renderer} renderer
+	 * @param {boolean} [inverse=false]
 	 */
-	_runButterflyPasses( renderer ) {
+	_runButterflyPasses( renderer, inverse = false ) {
 
 		this._ensureButterfliesBuilt( renderer );
 
-		this._runAxisPass( renderer, this._rowFused, this._stagesRow, this._rowAtoB, this._rowBtoA );
+		// The leading conjugate only folds into the row pass when that axis is fused (see
+		// `_ensureButterfliesBuilt`'s `_rowConjAtoB`/`_rowConjBtoA`); otherwise `computeInverse`
+		// has already run it as a standalone pass, and the row pass here runs unmodified.
+		const foldLeadingConjugate = inverse && this._rowFused;
+		const rowAtoB = foldLeadingConjugate ? this._rowConjAtoB : this._rowAtoB;
+		const rowBtoA = foldLeadingConjugate ? this._rowConjBtoA : this._rowBtoA;
+
+		this._runAxisPass( renderer, this._rowFused, this._stagesRow, rowAtoB, rowBtoA );
 
 		renderer.compute( this.current === 'A' ? this._transposeFwdAtoB : this._transposeFwdBtoA );
 		this.current = this.current === 'A' ? 'B' : 'A';
 
 		this._runAxisPass( renderer, this._colFused, this._stagesCol, this._colAtoB, this._colBtoA );
 
-		renderer.compute( this.current === 'A' ? this._transposeBackAtoB : this._transposeBackBtoA );
+		// The trailing conjugate-and-scale always folds into the transpose-back write -- that
+		// stage is always a single dispatch, so there's no fused/fallback split to worry about.
+		const transposeBackAtoB = inverse ? this._transposeBackConjScaleAtoB : this._transposeBackAtoB;
+		const transposeBackBtoA = inverse ? this._transposeBackConjScaleBtoA : this._transposeBackBtoA;
+
+		renderer.compute( this.current === 'A' ? transposeBackAtoB : transposeBackBtoA );
 		this.current = this.current === 'A' ? 'B' : 'A';
 
 	}
@@ -671,19 +726,27 @@ class FFT2D {
 	/**
 	 * Computes the inverse 2D FFT of whichever buffer currently holds the live data, via
 	 * `ifft(x) = conj( fft( conj(x) ) ) / count` -- reuses the forward butterfly kernels rather
-	 * than shipping a second set of shaders with negated twiddle factors.
+	 * than shipping a second set of shaders with negated twiddle factors. The leading conjugate and
+	 * trailing conjugate-and-scale are folded directly into the butterfly pipeline's existing reads
+	 * and writes wherever possible (see `_runButterflyPasses`) rather than run as extra full-buffer
+	 * passes; the only case that still needs a standalone leading-conjugate pass is a row axis too
+	 * long to fuse (see `_ensureButterfliesBuilt`), which is why that decision has to be made
+	 * (`_ensureButterfliesBuilt`) before choosing whether to run it here.
 	 *
 	 * @param {Renderer} renderer
 	 */
 	computeInverse( renderer ) {
 
-		renderer.compute( this.current === 'A' ? this._conjugateAtoB : this._conjugateBtoA );
-		this.current = this.current === 'A' ? 'B' : 'A';
+		this._ensureButterfliesBuilt( renderer );
 
-		this._runButterflyPasses( renderer );
+		if ( ! this._rowFused ) {
 
-		renderer.compute( this.current === 'A' ? this._conjugateScaleAtoB : this._conjugateScaleBtoA );
-		this.current = this.current === 'A' ? 'B' : 'A';
+			renderer.compute( this.current === 'A' ? this._conjugateAtoB : this._conjugateBtoA );
+			this.current = this.current === 'A' ? 'B' : 'A';
+
+		}
+
+		this._runButterflyPasses( renderer, true );
 
 	}
 
