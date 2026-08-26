@@ -420,6 +420,9 @@ class ClusteredLightsNode extends LightsNode {
 
 		const { tileSize, maxLights, zSlices, maxLightsPerCluster, _chunksPerCluster: chunksPerCluster } = this;
 
+		if ( this._compute !== null ) this._compute.dispose();
+		if ( this._lightIndexes !== null ) this._lightIndexes.value.dispose();
+
 		const bufferSize = new Vector2( width, height );
 
 		const NX = Math.floor( bufferSize.width / tileSize );
@@ -431,13 +434,26 @@ class ClusteredLightsNode extends LightsNode {
 
 		// Lights data texture (same layout as TiledLightsNode)
 
-		const lightsData = new Float32Array( maxLights * 4 * 2 );
-		const lightsTexture = new DataTexture( lightsData, lightsData.length / 8, 2, RGBAFormat, FloatType );
+		let lightsTexture = this._lightsTexture;
+
+		if ( lightsTexture === null ) {
+
+			const lightsData = new Float32Array( maxLights * 4 * 2 );
+			lightsTexture = new DataTexture( lightsData, lightsData.length / 8, 2, RGBAFormat, FloatType );
+
+		}
 
 		// Per Z-slice light range for Z-culling (CPU-sorted, uploaded each frame)
 
-		const zSliceRangesData = new Float32Array( NZ * 4 );
-		const zSliceRangesTexture = new DataTexture( zSliceRangesData, NZ, 1, RGBAFormat, FloatType );
+		let zSliceRangesData = this._zSliceRangesData;
+		let zSliceRangesTexture = this._zSliceRangesTexture;
+
+		if ( zSliceRangesData === null || zSliceRangesTexture === null ) {
+
+			zSliceRangesData = new Float32Array( NZ * 4 );
+			zSliceRangesTexture = new DataTexture( zSliceRangesData, NZ, 1, RGBAFormat, FloatType );
+
+		}
 
 		// Per-cluster light-index storage (ivec4 chunks)
 
