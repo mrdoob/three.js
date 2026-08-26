@@ -62,6 +62,23 @@
 				{ name: 'Earth (2048x1024)', url: 'textures/land_ocean_ice_cloud_2048.jpg' }
 			];
 
+			// The 3 color channels FFT2D is run on in lockstep, in `packChannel`'s channel-index
+			// order (`0`/`1`/`2`) -- iterated over wherever the same per-channel step (pack,
+			// forward/inverse FFT, DC-bin readback) would otherwise be written out 3 times.
+			const CHANNELS = [ 'r', 'g', 'b' ];
+
+			// Builds a `{ r, g, b }` object by calling `fn(channel)` once per channel -- e.g.
+			// `buildPerChannel( () => new FFT2D( width, height ) )`.
+			function buildPerChannel( fn ) {
+
+				const result = {};
+
+				for ( const c of CHANNELS ) result[ c ] = fn( c );
+
+				return result;
+
+			}
+
 			let camera, scene, renderer, controls;
 			let quadOriginal, quadSpectrum, quadReconstructed;
 
@@ -121,11 +138,11 @@
 			// actual `packChannel` call) -- any correctly-shaped texture would do.
 			function buildResources( width, height, sourceTexture ) {
 
-				const ffts = { r: new FFT2D( width, height ), g: new FFT2D( width, height ), b: new FFT2D( width, height ) };
+				const ffts = buildPerChannel( () => new FFT2D( width, height ) );
 
-				const complexSource = { r: createComplexTexture( width, height ), g: createComplexTexture( width, height ), b: createComplexTexture( width, height ) };
-				const complexSpectrum = { r: createComplexTexture( width, height ), g: createComplexTexture( width, height ), b: createComplexTexture( width, height ) };
-				const complexReconstructed = { r: createComplexTexture( width, height ), g: createComplexTexture( width, height ), b: createComplexTexture( width, height ) };
+				const complexSource = buildPerChannel( () => createComplexTexture( width, height ) );
+				const complexSpectrum = buildPerChannel( () => createComplexTexture( width, height ) );
+				const complexReconstructed = buildPerChannel( () => createComplexTexture( width, height ) );
 
 				const spectrumTexture = new THREE.StorageTexture( width, height );
 				const reconstructedTexture = new THREE.StorageTexture( width, height );
@@ -291,49 +308,45 @@
 				layoutQuads( width, height );
 
 				// Pack each color channel of the loaded image into its own complex source texture
-				// (real = channel value, imag = 0) -- this example's own helper, not part of
-				// `FFT2D`'s core contract (see FFT.js's class comment).
-				packChannel( renderer, resources, loadedTexture, complexSource.r, 0 );
-				packChannel( renderer, resources, loadedTexture, complexSource.g, 1 );
-				packChannel( renderer, resources, loadedTexture, complexSource.b, 2 );
+				// (real = channel value, imag = 0), run its forward FFT, and read back its DC bin
+				// -- 3 independent per-channel steps (each channel's forward FFT only needs that
+				// channel's own packed source, and its DC bin is ready the moment its own forward
+				// FFT finishes), so one loop over `CHANNELS` does all 3 rather than 3 separate
+				// loops. There's no user-facing step between loading an image and seeing all 3
+				// quads, so this is just a straight-line continuation of the function rather than
+				// separate button-triggered handlers.
+				//
+				// The DC-bin magnitudes collected here feed the spectrum's shared log-scale
+				// normalization below: for a non-negative-real input (a raw color channel, always
+				// >= 0), the DC bin is *guaranteed* -- by the triangle inequality applied to the
+				// DFT sum -- to have the largest magnitude of any bin in that channel, and using
+				// one shared scale (the single largest of the 3 channels' DC magnitudes) rather
+				// than normalizing each channel independently preserves each texel's actual R:G:B
+				// ratio (independent per-channel normalization would wash the color balance out
+				// toward white). `readBin` is awaited here (not run concurrently across channels):
+				// all 3 channels share one cached probe kernel/buffer (see `buildProbeKernel`), so
+				// concurrent dispatches would race on it.
+				const dcMagnitudes = [];
 
-				// The rest of the pipeline (forward FFT -> spectrum, inverse FFT -> reconstruction)
-				// runs automatically -- there's no user-facing step between loading an image and
-				// seeing all 3 quads, so it's just a straight-line continuation of this function
-				// rather than separate button-triggered handlers.
+				for ( let i = 0; i < CHANNELS.length; i ++ ) {
 
-				ffts.r.computeForward( renderer, complexSource.r, complexSpectrum.r );
-				ffts.g.computeForward( renderer, complexSource.g, complexSpectrum.g );
-				ffts.b.computeForward( renderer, complexSource.b, complexSpectrum.b );
+					const c = CHANNELS[ i ];
 
-				// Auto-normalize the spectrum's log scale to use the full [0, 1] range with no
-				// manual tuning: for a non-negative-real input (a raw color channel, always >= 0),
-				// the DC bin (read back here) is *guaranteed* -- by the triangle inequality applied
-				// to the DFT sum -- to have the largest magnitude of any bin in that channel. The
-				// same scale is then shared across R/G/B (the single largest of the 3 channels'
-				// DC magnitudes) rather than normalizing each channel independently -- an
-				// independent per-channel normalization would rescale each channel's brightness
-				// relative to the others and wash the color balance out toward white; a shared
-				// scale preserves each texel's actual R:G:B ratio. Read sequentially (not
-				// `Promise.all`): all 3 channels share one cached probe kernel/buffer (see
-				// `buildProbeKernel`), so concurrent dispatches would race on it.
-				const dcR = await readBin( renderer, resources, complexSpectrum.r, 0 );
-				const dcG = await readBin( renderer, resources, complexSpectrum.g, 0 );
-				const dcB = await readBin( renderer, resources, complexSpectrum.b, 0 );
+					packChannel( renderer, resources, loadedTexture, complexSource[ c ], i );
+					ffts[ c ].computeForward( renderer, complexSource[ c ], complexSpectrum[ c ] );
+
+					const dc = await readBin( renderer, resources, complexSpectrum[ c ], 0 );
+					dcMagnitudes.push( Math.hypot( dc.real, dc.imag ) );
+
+				}
 
 				if ( myGeneration !== generation ) return; // superseded mid-readback
 
-				const maxMagnitude = Math.max(
-					Math.hypot( dcR.real, dcR.imag ),
-					Math.hypot( dcG.real, dcG.imag ),
-					Math.hypot( dcB.real, dcB.imag )
-				);
+				const maxMagnitude = Math.max( ...dcMagnitudes );
 
 				combineChannels( renderer, resources, complexSpectrum, spectrumTexture, { mode: 'log', scale: 1 / Math.log( 1 + maxMagnitude ), shift: true } );
 
-				ffts.r.computeInverse( renderer, complexSpectrum.r, complexReconstructed.r );
-				ffts.g.computeInverse( renderer, complexSpectrum.g, complexReconstructed.g );
-				ffts.b.computeInverse( renderer, complexSpectrum.b, complexReconstructed.b );
+				for ( const c of CHANNELS ) ffts[ c ].computeInverse( renderer, complexSpectrum[ c ], complexReconstructed[ c ] );
 
 				combineChannels( renderer, resources, complexReconstructed, reconstructedTexture, { mode: 'linear', scale: 1 } );
 
