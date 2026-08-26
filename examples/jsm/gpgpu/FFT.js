@@ -1,7 +1,8 @@
 import { StorageBufferAttribute } from 'three/webgpu';
 import {
 	Fn, instanceIndex, storage, uint, int, ivec2, uvec2, uniform, float, vec2, vec4, cos, sin,
-	storageTexture, textureStore, luminance, NodeAccess
+	storageTexture, textureStore, luminance, NodeAccess,
+	workgroupArray, workgroupBarrier, workgroupId, invocationLocalIndex
 } from 'three/tsl';
 
 /**
@@ -13,6 +14,76 @@ import {
 function isPowerOfTwo( value ) {
 
 	return value > 0 && ( value & ( value - 1 ) ) === 0;
+
+}
+
+/**
+ * The WebGPU spec's *guaranteed-minimum* compute limits -- every conformant device supports at
+ * least this much, so these are the values assumed when the real device's limits can't be read
+ * (see `getComputeLimits`). Real hardware is usually far more generous (as of 2026, real-world
+ * WebGPU device surveys put ~94-99% of devices at 4x these invocation/workgroup-size numbers and
+ * 2x this storage size), which is exactly why `FFT2D` queries the actual device instead of
+ * hardcoding around this floor.
+ *
+ * @type {{maxComputeInvocationsPerWorkgroup: number, maxComputeWorkgroupSizeX: number, maxComputeWorkgroupStorageSize: number}}
+ */
+const MINIMUM_COMPUTE_LIMITS = {
+	maxComputeInvocationsPerWorkgroup: 256,
+	maxComputeWorkgroupSizeX: 256,
+	maxComputeWorkgroupStorageSize: 16384
+};
+
+/**
+ * Reads the real `GPUDevice.limits` behind a renderer, falling back to `MINIMUM_COMPUTE_LIMITS`
+ * when they're not available (a non-WebGPU backend, or a WebGPU backend that hasn't finished
+ * `renderer.init()` yet). `renderer.backend.device` is guaranteed populated as soon as
+ * `renderer.init()` resolves, so this is safe to call from `computeForward`/`computeInverse`,
+ * which always run after that.
+ *
+ * @param {Renderer} renderer
+ * @returns {Object} A `GPUSupportedLimits`-shaped object (real or the guaranteed-minimum fallback).
+ */
+function getComputeLimits( renderer ) {
+
+	const backend = renderer.backend;
+
+	if ( backend.isWebGPUBackend === true && backend.device !== null ) {
+
+		return backend.device.limits;
+
+	}
+
+	return MINIMUM_COMPUTE_LIMITS;
+
+}
+
+/**
+ * Computes the longest line length (row width or column height) that `buildFusedLineStage` can
+ * safely transform in a single dispatch, one workgroup per line, entirely in workgroup-shared
+ * memory, given a device's real compute limits.
+ *
+ * A fused line of length `N` needs `half = N / 2` invocations per workgroup (bounded by both the
+ * per-workgroup invocation count and the workgroup's X-dimension size -- fused dispatches here are
+ * always 1D) and 2 shared `vec2` buffers of `N` elements each (`16 * N` bytes total) within the
+ * workgroup storage budget. This returns the largest power of two satisfying both.
+ *
+ * @param {Object} limits - A `GPUSupportedLimits`-shaped object, e.g. from `getComputeLimits`.
+ * @returns {number} The largest fusable line length (a power of two, `>= 2`).
+ */
+function computeMaxFusedLineLength( limits ) {
+
+	const maxInvocations = Math.min( limits.maxComputeInvocationsPerWorkgroup, limits.maxComputeWorkgroupSizeX );
+	const maxStorageBytes = limits.maxComputeWorkgroupStorageSize;
+
+	let N = 2;
+
+	while ( ( N * 2 ) / 2 <= maxInvocations && 16 * ( N * 2 ) <= maxStorageBytes ) {
+
+		N *= 2;
+
+	}
+
+	return N;
 
 }
 
@@ -29,6 +100,13 @@ function isPowerOfTwo( value ) {
  * live data after every stage -- see `FFT2D` for how the ping-pong bookkeeping is driven from
  * the CPU side.
  *
+ * This is the fallback used only for lines longer than the device can fuse (see
+ * `computeMaxFusedLineLength`): it dispatches once *per stage*, reading and writing the whole
+ * buffer through global (VRAM) storage every time. `buildFusedLineStage` does the same math but
+ * for a whole line's worth of stages in one dispatch, entirely in on-chip workgroup-shared memory,
+ * and is preferred whenever a line is short enough to fit -- see `FFT2D#_ensureButterfliesBuilt`
+ * for the per-axis choice between the two.
+ *
  * @tsl
  * @private
  * @param {Object} params
@@ -41,7 +119,7 @@ function isPowerOfTwo( value ) {
  * @param {StorageBufferNode} writeNode - The buffer this stage writes to.
  * @returns {Function} A parameterless TSL function ready to `.compute( dispatchCount )`.
  */
-function buildButterflyStage( { N, lineStride, elementStride, lineCount, pUniform }, readNode, writeNode ) {
+function buildMultiDispatchStage( { N, lineStride, elementStride, lineCount, pUniform }, readNode, writeNode ) {
 
 	const half = N / 2;
 	const dispatchCount = half * lineCount;
@@ -88,8 +166,112 @@ function buildButterflyStage( { N, lineStride, elementStride, lineCount, pUnifor
 }
 
 /**
+ * Builds an entire 1D line's radix-2 Stockham FFT -- every stage, for one row or one column --
+ * as a *single* dispatch, one workgroup per line, running entirely in on-chip workgroup-shared
+ * memory. This replaces `log2(N)` separate dispatches (one per stage, each a full round trip
+ * through global VRAM via `buildMultiDispatchStage`) with exactly one dispatch that does one
+ * global read, all `log2(N)` butterfly stages against two shared-memory ping-pong buffers
+ * (swapped in JS between stages, mirroring the CPU-side bookkeeping in
+ * `FFT2D#_runButterflyPasses`), and one global write.
+ *
+ * Only usable when a whole line's working set -- `half = N / 2` invocations plus two `vec2`
+ * shared buffers of `N` elements -- fits within a single workgroup; see `computeMaxFusedLineLength`.
+ * The stage loop is unrolled in JavaScript at build time (stage count is fixed per `FFT2D`
+ * instance), so `p` is a compile-time constant per stage rather than a uniform, and there is no
+ * bit-reversal or extra bookkeeping beyond the shared-buffer swap.
+ *
+ * @tsl
+ * @private
+ * @param {Object} params
+ * @param {number} params.N - The length of each 1D line being transformed (a power of two, `<= computeMaxFusedLineLength(...)` for the target device).
+ * @param {number} params.lineStride - Address increment between lines (`width` for a row pass, `1` for a column pass).
+ * @param {number} params.elementStride - Address increment between consecutive elements of a line (`1` for a row pass, `width` for a column pass).
+ * @param {number} params.lineCount - How many independent lines are transformed in parallel (one workgroup each).
+ * @param {StorageBufferNode} readNode - The buffer this pass reads from.
+ * @param {StorageBufferNode} writeNode - The buffer this pass writes to.
+ * @returns {Function} A parameterless TSL function ready to `.compute( dispatchCount, [ half ] )`.
+ */
+function buildFusedLineStage( { N, lineStride, elementStride, lineCount }, readNode, writeNode ) {
+
+	const half = N / 2;
+	const stages = Math.log2( N );
+	const dispatchCount = lineCount * half;
+
+	const localA = workgroupArray( 'vec2', N );
+	const localB = workgroupArray( 'vec2', N );
+
+	return Fn( () => {
+
+		// One workgroup per line: `workgroupId.x` picks the line, `invocationLocalIndex` is this
+		// invocation's position within it (0..half-1) -- the same roles `line`/`tt` play in
+		// `buildMultiDispatchStage`, just addressed locally instead of via a flattened `instanceIndex`.
+		const line = workgroupId.x;
+		const t = invocationLocalIndex;
+
+		const lineBase = line.mul( uint( lineStride ) );
+		const t2 = t.add( uint( half ) );
+
+		// Load the whole line into shared memory once -- everything below happens on-chip.
+		localA.element( t ).assign( readNode.element( lineBase.add( t.mul( uint( elementStride ) ) ) ) );
+		localA.element( t2 ).assign( readNode.element( lineBase.add( t2.mul( uint( elementStride ) ) ) ) );
+
+		workgroupBarrier();
+
+		let readBuf = localA;
+		let writeBuf = localB;
+
+		for ( let s = 0; s < stages; s ++ ) {
+
+			const p = 1 << s;
+
+			const hi = t.div( uint( p ) );
+			const lo = t.mod( uint( p ) );
+
+			const idx1 = hi.mul( uint( p ) ).add( lo );
+			const idx2 = idx1.add( uint( half ) );
+
+			const v0 = readBuf.element( idx1 ).toVar( 'v0' );
+			const v1 = readBuf.element( idx2 ).toVar( 'v1' );
+
+			// Same forward-transform kernel as `buildMultiDispatchStage` -- see its comment on
+			// the angle/sign convention -- just reading/writing shared memory instead of global.
+			const angle = float( -Math.PI ).mul( float( lo ) ).div( float( p ) );
+			const c = cos( angle );
+			const si = sin( angle );
+
+			const v1r = v1.x.mul( c ).sub( v1.y.mul( si ) );
+			const v1i = v1.x.mul( si ).add( v1.y.mul( c ) );
+
+			const out0 = vec2( v0.x.add( v1r ), v0.y.add( v1i ) );
+			const out1 = vec2( v0.x.sub( v1r ), v0.y.sub( v1i ) );
+
+			const j = hi.mul( uint( p * 2 ) ).add( lo );
+			const j2 = j.add( uint( p ) );
+
+			writeBuf.element( j ).assign( out0 );
+			writeBuf.element( j2 ).assign( out1 );
+
+			// Every invocation in the workgroup must finish writing this stage's outputs before
+			// any of them starts reading as inputs to the next stage.
+			workgroupBarrier();
+
+			[ readBuf, writeBuf ] = [ writeBuf, readBuf ];
+
+		}
+
+		// After the loop, `readBuf` is whichever shared buffer the last stage wrote to.
+		writeNode.element( lineBase.add( t.mul( uint( elementStride ) ) ) ).assign( readBuf.element( t ) );
+		writeNode.element( lineBase.add( t2.mul( uint( elementStride ) ) ) ).assign( readBuf.element( t2 ) );
+
+	} )().compute( dispatchCount, [ half ] );
+
+}
+
+/**
  * A GPU 2D complex-to-complex FFT (WebGPU only), implemented as a row/column decomposition of
- * two iterative radix-2 Stockham autosort 1D FFTs -- see `buildButterflyStage`.
+ * two iterative radix-2 Stockham autosort 1D FFTs -- see `buildFusedLineStage` (used whenever a
+ * row/column fits in workgroup-shared memory) and `buildMultiDispatchStage` (the fallback for
+ * longer lines).
  *
  * `width` and `height` must both be powers of two.
  *
@@ -178,10 +360,13 @@ class FFT2D {
 		this._stagesRow = Math.log2( width );
 		this._stagesCol = Math.log2( height );
 
-		this._rowAtoB = buildButterflyStage( { N: width, lineStride: width, elementStride: 1, lineCount: height, pUniform: this._pUniform }, this.readA, this.writeB );
-		this._rowBtoA = buildButterflyStage( { N: width, lineStride: width, elementStride: 1, lineCount: height, pUniform: this._pUniform }, this.readB, this.writeA );
-		this._colAtoB = buildButterflyStage( { N: height, lineStride: 1, elementStride: width, lineCount: width, pUniform: this._pUniform }, this.readA, this.writeB );
-		this._colBtoA = buildButterflyStage( { N: height, lineStride: 1, elementStride: width, lineCount: width, pUniform: this._pUniform }, this.readB, this.writeA );
+		// The row/column butterfly kernels (`_rowAtoB`, `_colAtoB`, etc.) aren't built here --
+		// whether an axis can be fused (see `buildFusedLineStage`) depends on the real WebGPU
+		// device's compute limits, which aren't known until `renderer.init()` has resolved. Since
+		// the constructor doesn't receive a renderer, that choice -- and the kernel build itself
+		// -- is deferred to `_ensureButterfliesBuilt`, called from `_runButterflyPasses` on first
+		// use. See `computeMaxFusedLineLength`/`getComputeLimits`.
+		this._built = false;
 
 		this._conjugateAtoB = Fn( () => {
 
@@ -247,6 +432,75 @@ class FFT2D {
 	}
 
 	/**
+	 * Runs one axis's pass (row or column): a single dispatch if that axis was built fused (see
+	 * the constructor's `_rowFused`/`_colFused`), or one dispatch per stage -- re-pointing
+	 * `_pUniform` each time -- if it fell back to the per-stage, global-memory version.
+	 *
+	 * @private
+	 * @param {Renderer} renderer
+	 * @param {boolean} fused
+	 * @param {number} stages
+	 * @param {Function} atoB
+	 * @param {Function} btoA
+	 */
+	_runAxisPass( renderer, fused, stages, atoB, btoA ) {
+
+		if ( fused ) {
+
+			renderer.compute( this.current === 'A' ? atoB : btoA );
+			this.current = this.current === 'A' ? 'B' : 'A';
+
+			return;
+
+		}
+
+		for ( let s = 0; s < stages; s ++ ) {
+
+			this._pUniform.value = 1 << s;
+			renderer.compute( this.current === 'A' ? atoB : btoA );
+			this.current = this.current === 'A' ? 'B' : 'A';
+
+		}
+
+	}
+
+	/**
+	 * Builds the row/column butterfly kernels on first use, choosing -- independently per axis --
+	 * between `buildFusedLineStage` and `buildMultiDispatchStage` based on the real device's
+	 * compute limits (see `getComputeLimits`, `computeMaxFusedLineLength`). Deferred out of the
+	 * constructor because those limits aren't known until `renderer.init()` has resolved, and the
+	 * constructor doesn't take a renderer. A no-op after the first call.
+	 *
+	 * @private
+	 * @param {Renderer} renderer
+	 */
+	_ensureButterfliesBuilt( renderer ) {
+
+		if ( this._built ) return;
+
+		this._built = true;
+
+		const { width, height } = this;
+
+		const maxFusedLineLength = computeMaxFusedLineLength( getComputeLimits( renderer ) );
+
+		// Row and column axes are chosen independently since `width` and `height` can straddle
+		// the cutoff differently (e.g. a 2048x512 image fuses its column passes but not its row
+		// passes).
+		this._rowFused = width <= maxFusedLineLength;
+		this._colFused = height <= maxFusedLineLength;
+
+		const buildRow = this._rowFused ? buildFusedLineStage : buildMultiDispatchStage;
+		const buildCol = this._colFused ? buildFusedLineStage : buildMultiDispatchStage;
+
+		this._rowAtoB = buildRow( { N: width, lineStride: width, elementStride: 1, lineCount: height, pUniform: this._pUniform }, this.readA, this.writeB );
+		this._rowBtoA = buildRow( { N: width, lineStride: width, elementStride: 1, lineCount: height, pUniform: this._pUniform }, this.readB, this.writeA );
+		this._colAtoB = buildCol( { N: height, lineStride: 1, elementStride: width, lineCount: width, pUniform: this._pUniform }, this.readA, this.writeB );
+		this._colBtoA = buildCol( { N: height, lineStride: 1, elementStride: width, lineCount: width, pUniform: this._pUniform }, this.readB, this.writeA );
+
+	}
+
+	/**
 	 * Runs the forward-transform butterfly stages (row pass, then column pass), ping-ponging
 	 * between the two buffers. Does not itself flip any sign or apply conjugation -- both
 	 * `computeForward` and `computeInverse` call this as their shared core.
@@ -256,21 +510,10 @@ class FFT2D {
 	 */
 	_runButterflyPasses( renderer ) {
 
-		for ( let s = 0; s < this._stagesRow; s ++ ) {
+		this._ensureButterfliesBuilt( renderer );
 
-			this._pUniform.value = 1 << s;
-			renderer.compute( this.current === 'A' ? this._rowAtoB : this._rowBtoA );
-			this.current = this.current === 'A' ? 'B' : 'A';
-
-		}
-
-		for ( let s = 0; s < this._stagesCol; s ++ ) {
-
-			this._pUniform.value = 1 << s;
-			renderer.compute( this.current === 'A' ? this._colAtoB : this._colBtoA );
-			this.current = this.current === 'A' ? 'B' : 'A';
-
-		}
+		this._runAxisPass( renderer, this._rowFused, this._stagesRow, this._rowAtoB, this._rowBtoA );
+		this._runAxisPass( renderer, this._colFused, this._stagesCol, this._colAtoB, this._colBtoA );
 
 	}
 
