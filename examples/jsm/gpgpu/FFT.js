@@ -1,21 +1,9 @@
-import { StorageBufferAttribute } from 'three/webgpu';
+import { StorageBufferAttribute, MathUtils } from 'three/webgpu';
 import {
 	Fn, If, instanceIndex, storage, texture, uint, int, ivec2, uvec2, uniform, float, vec2, vec4, cos, sin,
 	storageTexture, textureStore, NodeAccess,
 	workgroupArray, workgroupBarrier, workgroupId, invocationLocalIndex, globalId, localId
 } from 'three/tsl';
-
-/**
- * Returns `true` if `value` is a power of two.
- *
- * @param {number} value
- * @returns {boolean}
- */
-function isPowerOfTwo( value ) {
-
-	return value > 0 && ( value & ( value - 1 ) ) === 0;
-
-}
 
 /**
  * The workgroup size used for every kernel here that doesn't otherwise compute its own -- the
@@ -479,7 +467,7 @@ class FFT2D {
 	 */
 	constructor( width, height ) {
 
-		if ( ! isPowerOfTwo( width ) || ! isPowerOfTwo( height ) ) {
+		if ( ! MathUtils.isPowerOfTwo( width ) || ! MathUtils.isPowerOfTwo( height ) ) {
 
 			throw new Error( `FFT2D: width (${ width }) and height (${ height }) must both be powers of two.` );
 

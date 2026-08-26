@@ -68,7 +68,7 @@
 			// Everything GPU-side that only depends on `(width, height)` -- never on which image is
 			// loaded -- lives in one size-keyed cache entry: the 3 (one per color channel) `FFT2D`
 			// instances, their complex textures, the display targets, and every compute kernel this
-			// example builds for itself (`pack`/`combine`/`probe`/`readback` below). Each of those
+			// example builds for itself (`pack`/`combine`/`probe` below). Each of those
 			// kernels is genuinely shape-only -- which *texture* they read/write and which channel/
 			// mode/scale they use are all runtime-adjustable (uniforms, and TSL texture nodes whose
 			// `.value` can be repointed at a different texture -- see e.g. `webgpu_compute_rasterizer_
@@ -114,11 +114,11 @@
 			}
 
 			// Builds everything one `(width, height)` needs: the 3 `FFT2D` instances, their complex
-			// textures, the 2 color display targets, and the 4 example-only compute kernels
-			// (`pack`/`combine`/`probe`/`readback`) -- see `resourceCache`'s comment for why each
-			// kernel is built exactly once here rather than per call. `sourceTexture` only seeds the
-			// pack kernel's initial texture-node value (immediately overwritten by the real one on
-			// every actual `packChannel` call) -- any correctly-shaped texture would do.
+			// textures, the 2 color display targets, and the 3 example-only compute kernels
+			// (`pack`/`combine`/`probe`) -- see `resourceCache`'s comment for why each kernel is
+			// built exactly once here rather than per call. `sourceTexture` only seeds the pack
+			// kernel's initial texture-node value (immediately overwritten by the real one on every
+			// actual `packChannel` call) -- any correctly-shaped texture would do.
 			function buildResources( width, height, sourceTexture ) {
 
 				const ffts = { r: new FFT2D( width, height ), g: new FFT2D( width, height ), b: new FFT2D( width, height ) };
@@ -145,14 +145,12 @@
 					width, height, ffts, complexSource, complexSpectrum, complexReconstructed, spectrumTexture, reconstructedTexture,
 					pack: buildPackKernel( width, height, sourceTexture, complexSource.r ),
 					combine: buildCombineKernel( width, height, complexSpectrum, spectrumTexture ),
-					probe: buildProbeKernel( width, complexSpectrum.r ),
-					readback: buildReadbackKernel( width, height, complexReconstructed.r )
+					probe: buildProbeKernel( width, complexSpectrum.r )
 				};
 
 			}
 
 			let loadedTexture = null;
-			let originalChannels = null; // CPU copy ({r, g, b} Float32Arrays), for the round-trip-error console log only.
 
 			// Bumped on every `loadPreset` call and captured by each in-flight one -- lets a call
 			// that's superseded by a newer image selection (e.g. rapid dropdown changes) recognize
@@ -255,8 +253,7 @@
 				// and show up wrong (e.g. an ICC-profiled image briefly rendering desaturated),
 				// while a later load of the same URL hits the browser's already-fully-decoded image
 				// cache and looks correct. `decode()` is the standard way to await full decode
-				// before the image is used for anything (GPU upload here, and the canvas draw in
-				// `computeChannelsCPU` below).
+				// before the image is used for anything (the GPU upload here).
 				await newTexture.image.decode();
 
 				if ( myGeneration !== generation ) { newTexture.dispose(); return; } // superseded
@@ -271,14 +268,6 @@
 
 				const width = newTexture.image.width;
 				const height = newTexture.image.height;
-
-				if ( isPowerOfTwo( width ) === false || isPowerOfTwo( height ) === false ) {
-
-					console.warn( `webgpu_fft: "${ preset.name }" is ${ width }x${ height }, which is not power-of-two -- skipped.` );
-					newTexture.dispose();
-					return;
-
-				}
 
 				// Only the previous preset's *decoded image* is torn down here -- every other GPU
 				// resource (the FFT instances, complex textures, display targets, and this example's
@@ -307,12 +296,6 @@
 				packChannel( renderer, resources, loadedTexture, complexSource.r, 0 );
 				packChannel( renderer, resources, loadedTexture, complexSource.g, 1 );
 				packChannel( renderer, resources, loadedTexture, complexSource.b, 2 );
-
-				// CPU-side per-channel copy of the source image, used only to compute the
-				// round-trip-error console log after an inverse FFT -- not part of the GPU pipeline.
-				originalChannels = computeChannelsCPU( newTexture.image, width, height );
-
-				render();
 
 				// The rest of the pipeline (forward FFT -> spectrum, inverse FFT -> reconstruction)
 				// runs automatically -- there's no user-facing step between loading an image and
@@ -348,42 +331,11 @@
 
 				combineChannels( renderer, resources, complexSpectrum, spectrumTexture, { mode: 'log', scale: 1 / Math.log( 1 + maxMagnitude ), shift: true } );
 
-				render();
-
 				ffts.r.computeInverse( renderer, complexSpectrum.r, complexReconstructed.r );
 				ffts.g.computeInverse( renderer, complexSpectrum.g, complexReconstructed.g );
 				ffts.b.computeInverse( renderer, complexSpectrum.b, complexReconstructed.b );
 
 				combineChannels( renderer, resources, complexReconstructed, reconstructedTexture, { mode: 'linear', scale: 1 } );
-
-				// Sequential for the same reason as the `readBin` calls above: one cached
-				// readback kernel/buffer per size, shared across all 3 channels.
-				const dataR = await readComplexTexture( renderer, resources, complexReconstructed.r );
-				const dataG = await readComplexTexture( renderer, resources, complexReconstructed.g );
-				const dataB = await readComplexTexture( renderer, resources, complexReconstructed.b );
-
-				if ( myGeneration !== generation ) return; // superseded mid-readback
-
-				let maxDiff = 0;
-				let sumSq = 0;
-				let n = 0;
-
-				for ( const [ data, original ] of [ [ dataR, originalChannels.r ], [ dataG, originalChannels.g ], [ dataB, originalChannels.b ] ] ) {
-
-					for ( let i = 0; i < width * height; i ++ ) {
-
-						const diff = data[ i * 2 ] - original[ i ];
-						maxDiff = Math.max( maxDiff, Math.abs( diff ) );
-						sumSq += diff * diff;
-						n ++;
-
-					}
-
-				}
-
-				const rms = Math.sqrt( sumSq / n );
-
-				console.log( `webgpu_fft: "${ preset.name }" round-trip error vs. original color -- max |diff|: ${ maxDiff.toExponential( 3 ) }, RMS: ${ rms.toExponential( 3 ) }.` );
 
 				render();
 
@@ -396,8 +348,8 @@
 			// transforms complex numbers between two textures it's handed (see FFT.js's class
 			// comment for why packing/display/probing live here instead of on the class). Each
 			// `build*Kernel` function is called exactly once per size (from `buildResources`); the
-			// matching `pack`/`combine`/`readBin`/`readComplexTexture` call just re-points that
-			// kernel's uniforms/texture-node values and dispatches it again.
+			// matching `pack`/`combine`/`readBin` call just re-points that kernel's uniforms/
+			// texture-node values and dispatches it again.
 
 			// Builds the pack kernel for one size: a single compiled shader shared by all 3 color
 			// channels, which color channel to extract (`'r'`=0/`'g'`=1/`'b'`=2) selected at runtime
@@ -578,77 +530,12 @@
 
 			}
 
-			// Builds the whole-texture readback kernel for one size, shared across every
-			// `readComplexTexture` call for that size -- `sourceNode.value` is re-pointed on each
-			// actual call instead of rebuilding.
-			function buildReadbackKernel( width, height, initialSourceTexture ) {
-
-				const count = width * height;
-
-				const sourceNode = texture( initialSourceTexture );
-				const readAttribute = new THREE.StorageBufferAttribute( count, 2 );
-				const readWrite = storage( readAttribute, 'vec2', count );
-
-				const kernel = Fn( () => {
-
-					const x = instanceIndex.mod( uint( width ) );
-					const y = instanceIndex.div( uint( width ) );
-
-					readWrite.element( instanceIndex ).assign( sourceNode.load( ivec2( int( x ), int( y ) ) ).rg );
-
-				} )().compute( count );
-
-				return { kernel, sourceNode, readWrite };
-
-			}
-
-			// Reads back a whole complex texture as interleaved `(real, imag)` pairs -- used only
-			// for the round-trip-error console log above, not part of the render pipeline.
-			async function readComplexTexture( renderer, resources, sourceTexture ) {
-
-				const { kernel, sourceNode, readWrite } = resources.readback;
-
-				sourceNode.value = sourceTexture;
-
-				renderer.compute( kernel );
-
-				return new Float32Array( await renderer.getArrayBufferAsync( readWrite.value ) );
-
-			}
-
 			// -------------------------------------------------------------------------------------
 
 			function setQuadMaterial( quad, map ) {
 
 				quad.material.dispose();
 				quad.material = new THREE.MeshBasicMaterial( { map } );
-
-			}
-
-			function computeChannelsCPU( image, width, height ) {
-
-				const canvas = document.createElement( 'canvas' );
-				canvas.width = width;
-				canvas.height = height;
-
-				const ctx = canvas.getContext( '2d' );
-				ctx.drawImage( image, 0, 0, width, height );
-
-				const { data } = ctx.getImageData( 0, 0, width, height );
-				const count = width * height;
-				const r = new Float32Array( count );
-				const g = new Float32Array( count );
-				const b = new Float32Array( count );
-
-				for ( let i = 0; i < count; i ++ ) {
-
-					r[ i ] = data[ i * 4 ] / 255;
-					g[ i ] = data[ i * 4 + 1 ] / 255;
-					b[ i ] = data[ i * 4 + 2 ] / 255;
-
-				}
-
-				return { r, g, b };
 
 			}
 
@@ -753,12 +640,6 @@
 				camera.top = viewHeight / 2;
 				camera.bottom = - viewHeight / 2;
 				camera.updateProjectionMatrix();
-
-			}
-
-			function isPowerOfTwo( value ) {
-
-				return value > 0 && ( value & ( value - 1 ) ) === 0;
 
 			}
 
