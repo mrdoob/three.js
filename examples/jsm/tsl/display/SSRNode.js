@@ -956,6 +956,8 @@ class SSRNode extends TempNode {
 
 					const envColor = vec3( 0 ).toVar();
 
+					if ( this._importanceEnvironment === null ) return envColor;
+
 					if ( this.envImportanceSampling ) {
 
 						const Xi2 = bindAnalyticNoise( this._resolution, 59 )( uvPos, this._noiseIndex );
