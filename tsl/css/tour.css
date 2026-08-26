@@ -284,17 +284,24 @@ body {
 	transition: color 0.15s ease;
 }
 
+.markdown-content code[name],
 .markdown-content code:has(.code-modifier-inline-btn) {
+	display: inline-flex;
+	align-items: center;
+	vertical-align: middle;
+	margin: 0.25rem 0.4rem 0.25rem 0;
 	cursor: pointer;
-	padding: 0.4rem 0.7rem;
+	padding: 0.2rem 0.7rem;
 	transition: background-color 0.2s, border-color 0.2s, color 0.2s;
 }
 
+.markdown-content code[name]:hover,
 .markdown-content code:has(.code-modifier-inline-btn):hover {
 	background: #1e1e24 !important;
 	border-color: rgba(255, 255, 255, 0.25) !important;
 }
 
+.markdown-content code[name].active,
 .markdown-content code:has(.code-modifier-inline-btn.active) {
 	background: rgba(0, 102, 255, 0.08) !important;
 	border-color: rgba(0, 102, 255, 0.3) !important;

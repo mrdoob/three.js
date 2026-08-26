@@ -76,6 +76,7 @@ class Tour {
 		this.isPlaygroundActive = false;
 		this.isContentRendered = false;
 		this.hasCriticalError = false;
+		this.refreshOnPageChange = true;
 		this.searchManager = new SearchManager( this );
 		this.historyManager = new HistoryManager( this );
 		this.layoutManager = new LayoutManager( this );
@@ -1502,13 +1503,21 @@ class Tour {
 
 			if ( ! this.isPlaygroundActive && ! isInitialPlayground && ! page.hasEmbed ) {
 
-				if ( this.renderer.domElement.parentElement !== this.dom.previewContainer ) {
+				if ( this.refreshOnPageChange ) {
 
-					this.dom.previewContainer.appendChild( this.renderer.domElement );
+					this.refresh();
+
+				} else {
+
+					if ( this.renderer && this.renderer.domElement.parentElement !== this.dom.previewContainer ) {
+
+						this.dom.previewContainer.appendChild( this.renderer.domElement );
+
+					}
+
+					this.runner.run( pageCode );
 
 				}
-
-				this.runner.run( pageCode );
 
 			}
 

@@ -33,6 +33,7 @@ export async function init() {
 
 	camera = new THREE.PerspectiveCamera( 45, renderer.domElement.clientWidth / renderer.domElement.clientHeight, 0.1, 100 );
 	camera.position.set( 2, 3, 4 );
+	camera.lookAt( 0, 1, 0 );
 
 	defaultPass = pass( scene, camera );
 	defaultAA = smaa( defaultPass );
@@ -46,6 +47,7 @@ export async function init() {
 	controls.target.set( 0, 1, 0 );
 	controls.addEventListener( 'start', () => dragging = true );
 	controls.addEventListener( 'end', () => dragging = false );
+	controls.update();
 
 	// Ground plane with procedural grid (glossy reflective showroom floor)
 	const floorMaterial = new THREE.MeshStandardNodeMaterial( { roughness: 0.6, metalness: 0.8 } );
@@ -162,12 +164,6 @@ export function refresh() {
 	scene.backgroundNode = null;
 
 	floor.visible = true;
-
-	camera.position.set( 2, 3, 4 );
-	camera.lookAt( 0, 1, 0 );
-
-	controls.target.set( 0, 1, 0 );
-	controls.update();
 
 	prefab.rotation.set( 0, 0, 0 );
 

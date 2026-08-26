@@ -16,6 +16,7 @@ class ConsoleManager {
 	_initConsoleOverrides() {
 
 		const previousConsoleFn = getConsoleFunction();
+		const handledMessages = new Set();
 
 		setConsoleFunction( ( type, message, ...params ) => {
 
@@ -24,6 +25,9 @@ class ConsoleManager {
 				previousConsoleFn( type, message, ...params );
 
 			}
+
+			handledMessages.add( message );
+			queueMicrotask( () => handledMessages.delete( message ) );
 
 			if ( typeof message === 'string' && message.includes( '%c' ) ) {
 
@@ -111,7 +115,8 @@ class ConsoleManager {
 			this.originalConsoleError.apply( console, args );
 
 			const firstArg = args[ 0 ];
-			if ( typeof firstArg === 'string' && firstArg.includes( '%c' ) ) {
+			const rawMsg = firstArg instanceof Error ? firstArg.message : firstArg;
+			if ( typeof rawMsg === 'string' && ( rawMsg.includes( '%c' ) || handledMessages.has( rawMsg ) ) ) {
 
 				return;
 
@@ -184,7 +189,8 @@ class ConsoleManager {
 			this.originalConsoleWarn.apply( console, args );
 
 			const firstArg = args[ 0 ];
-			if ( typeof firstArg === 'string' && firstArg.includes( '%c' ) ) {
+			const rawMsg = firstArg instanceof Error ? firstArg.message : firstArg;
+			if ( typeof rawMsg === 'string' && ( rawMsg.includes( '%c' ) || handledMessages.has( rawMsg ) ) ) {
 
 				return;
 

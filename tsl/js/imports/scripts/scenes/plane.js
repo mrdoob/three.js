@@ -37,12 +37,6 @@ export function refresh() {
 
 	floor.visible = true;
 
-	camera.position.set( 2, 3, 4 );
-	camera.lookAt( 0, 1, 0 );
-
-	controls.target.set( 0, 1.5, 0 );
-	controls.update();
-
 	if ( plane ) {
 
 		plane.material.dispose();
@@ -59,17 +53,11 @@ export function refresh() {
 
 export async function init() {
 
-	if ( scene ) {
-
-		refresh();
-		return;
-
-	}
-
 	scene = new THREE.Scene();
 
 	camera = new THREE.PerspectiveCamera( 45, renderer.domElement.clientWidth / renderer.domElement.clientHeight, 0.1, 100 );
 	camera.position.set( 2, 3, 4 );
+	camera.lookAt( 0, 1.5, 0 );
 
 	defaultPass = pass( scene, camera );
 	defaultAA = smaa( defaultPass );
@@ -80,9 +68,10 @@ export async function init() {
 	controls.enableDamping = true;
 	controls.minDistance = 2;
 	controls.maxDistance = 20;
-	controls.target.set( 0, 1, 0 );
+	controls.target.set( 0, 1.5, 0 );
 	controls.addEventListener( 'start', () => dragging = true );
 	controls.addEventListener( 'end', () => dragging = false );
+	controls.update();
 
 	// Ground plane with procedural grid (glossy reflective showroom floor)
 	const floorMaterial = new THREE.MeshStandardNodeMaterial( { roughness: 0.6, metalness: 0.8 } );
