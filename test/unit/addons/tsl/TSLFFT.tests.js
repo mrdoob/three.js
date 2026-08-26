@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu';
 import { texture, storage, Fn, instanceIndex, uint, int, ivec2 } from 'three/tsl';
-import { FFT2D } from '../../../../examples/jsm/gpgpu/FFT.js';
+import { FFT2D } from '../../../../examples/jsm/gpgpu/FFT2D.js';
 import { getSharedRenderer } from './gpu-test-utils.js';
 
 // Naive O(N^4) 2D DFT, computed entirely on the CPU in plain JS. This is the ground-truth

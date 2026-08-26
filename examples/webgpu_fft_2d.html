@@ -5,8 +5,8 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<meta property="og:title" content="three.js webgpu - 2D FFT">
 		<meta property="og:type" content="website">
-		<meta property="og:url" content="https://threejs.org/examples/webgpu_fft.html">
-		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_fft.jpg">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_fft_2d.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_fft_2d.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
@@ -20,7 +20,7 @@
 			</div>
 
 			<small>
-				GPU 2D complex FFT (<a href="https://github.com/mrdoob/three.js/blob/dev/examples/jsm/gpgpu/FFT.js" target="_blank" rel="noopener">FFT2D</a>) via TSL compute shaders, WebGPU only, by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.
+				GPU 2D complex FFT (<a href="https://github.com/mrdoob/three.js/blob/dev/examples/jsm/gpgpu/FFT2D.js" target="_blank" rel="noopener">FFT2D</a>) via TSL compute shaders, WebGPU only, by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.
 			</small>
 		</div>
 
@@ -46,7 +46,7 @@
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { FFT2D } from 'three/addons/gpgpu/FFT.js';
+			import { FFT2D } from 'three/addons/gpgpu/FFT2D.js';
 
 			// FFT2D requires power-of-two width/height.
 			const PRESETS = [

@@ -346,7 +346,7 @@
 		"webgpu_depth_texture",
 		"webgpu_display_stereo",
 		"webgpu_equirectangular",
-		"webgpu_fft",
+		"webgpu_fft_2d",
 		"webgpu_fog_height",
 		"webgpu_furnace_test",
 		"webgpu_gaussian_splat",

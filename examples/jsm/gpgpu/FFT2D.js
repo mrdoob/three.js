@@ -342,7 +342,7 @@ function buildTransposeStage( { rows, cols, tile, conjugateScaleOutput = false, 
  *
  * Anything beyond "transform these complex numbers" -- packing a color channel into a complex
  * source texture, rendering a spectrum/reconstruction as a displayable image, reading back a
- * single bin -- is left to the caller; see `examples/webgpu_fft.html` for worked examples,
+ * single bin -- is left to the caller; see `examples/webgpu_fft_2d.html` for worked examples,
  * including running one `FFT2D` instance per color channel for a full-color image.
  *
  * ```js
@@ -352,7 +352,7 @@ function buildTransposeStage( { rows, cols, tile, conjugateScaleOutput = false, 
  * await fft.computeInverse( renderer, spectrumTexture, reconstructedTexture );
  * ```
  *
- * @three_import import { FFT2D } from 'three/addons/gpgpu/FFT.js';
+ * @three_import import { FFT2D } from 'three/addons/gpgpu/FFT2D.js';
  */
 class FFT2D {
 
@@ -557,27 +557,23 @@ class FFT2D {
 	 * live data, entirely on the GPU. The texture is sampled with an exact texel fetch, so it
 	 * must be exactly `width` by `height`.
 	 *
-	 * Compute kernels are built once per distinct `sourceTexture` and cached.
-	 *
 	 * @private
 	 * @param {Renderer} renderer
 	 * @param {Texture} sourceTexture - A float texture, `width` by `height`, with at least 2 channels.
 	 */
 	_load( renderer, sourceTexture ) {
 
-		if ( this._loadSource !== sourceTexture ) {
-
-			this._loadSource = sourceTexture;
+		if ( this._loadNode === undefined ) {
 
 			const width = this.width;
-			const sourceNode = texture( sourceTexture );
+			this._loadNode = texture( sourceTexture );
 
 			const build = ( writeNode ) => Fn( () => {
 
 				const x = instanceIndex.mod( uint( width ) );
 				const y = instanceIndex.div( uint( width ) );
 
-				writeNode.element( instanceIndex ).assign( sourceNode.load( ivec2( int( x ), int( y ) ) ).rg );
+				writeNode.element( instanceIndex ).assign( this._loadNode.load( ivec2( int( x ), int( y ) ) ).rg );
 
 			} )().compute( this.count, [ DEFAULT_WORKGROUP_SIZE ] );
 
@@ -585,6 +581,8 @@ class FFT2D {
 			this._loadToB = build( this._writeB );
 
 		}
+
+		this._loadNode.value = sourceTexture;
 
 		renderer.compute( this._current === 'A' ? this._loadToA : this._loadToB );
 
@@ -594,20 +592,16 @@ class FFT2D {
 	 * Writes whichever ping-pong buffer currently holds the live data into `destinationTexture`'s
 	 * `.rg` channels, leaving other channels as `(0, 1)`.
 	 *
-	 * Compute kernels are built once per distinct `destinationTexture` and cached.
-	 *
 	 * @private
 	 * @param {Renderer} renderer
 	 * @param {StorageTexture} destinationTexture - Must be exactly `width` by `height` in size.
 	 */
 	_store( renderer, destinationTexture ) {
 
-		if ( this._storeTarget !== destinationTexture ) {
-
-			this._storeTarget = destinationTexture;
+		if ( this._storeNode === undefined ) {
 
 			const { width, count } = this;
-			const writeTex = storageTexture( destinationTexture ).setAccess( NodeAccess.WRITE_ONLY );
+			this._storeNode = storageTexture( destinationTexture ).setAccess( NodeAccess.WRITE_ONLY );
 
 			const build = ( readNode ) => Fn( () => {
 
@@ -616,7 +610,7 @@ class FFT2D {
 
 				const v = readNode.element( instanceIndex );
 
-				textureStore( writeTex, uvec2( x, y ), vec4( v.x, v.y, 0, 1 ) );
+				textureStore( this._storeNode, uvec2( x, y ), vec4( v.x, v.y, 0, 1 ) );
 
 			} )().compute( count, [ DEFAULT_WORKGROUP_SIZE ] );
 
@@ -624,6 +618,8 @@ class FFT2D {
 			this._storeFromB = build( this._readB );
 
 		}
+
+		this._storeNode.value = destinationTexture;
 
 		renderer.compute( this._current === 'A' ? this._storeFromA : this._storeFromB );
 
