@@ -168,13 +168,14 @@ export const highpModelViewMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 		}
 
-		const modelViewMatrices = uniformArray( matrices ).onObjectUpdate( ( { object, camera } ) => {
+		const modelViewMatrices = uniformArray( matrices ).onObjectUpdate( ( { object, camera }, self ) => {
 
-			const cameras = camera.cameras;
+			const subCameras = camera.cameras;
+			const array = self.array;
 
-			for ( let i = 0; i < matrices.length; i ++ ) {
+			for ( let i = 0, l = subCameras.length; i < l; i ++ ) {
 
-				matrices[ i ].multiplyMatrices( cameras[ i ].matrixWorldInverse, object.matrixWorld );
+				array[ i ].multiplyMatrices( subCameras[ i ].matrixWorldInverse, object.matrixWorld );
 
 			}
 
@@ -221,15 +222,16 @@ export const highpModelNormalViewMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 		}
 
-		const normalViewMatrices = uniformArray( matrices ).onObjectUpdate( ( { object, camera } ) => {
+		const normalViewMatrices = uniformArray( matrices ).onObjectUpdate( ( { object, camera }, self ) => {
 
-			const cameras = camera.cameras;
+			const subCameras = camera.cameras;
+			const array = self.array;
 
-			for ( let i = 0; i < matrices.length; i ++ ) {
+			for ( let i = 0, l = subCameras.length; i < l; i ++ ) {
 
-				_modelViewMatrix.multiplyMatrices( cameras[ i ].matrixWorldInverse, object.matrixWorld );
+				_modelViewMatrix.multiplyMatrices( subCameras[ i ].matrixWorldInverse, object.matrixWorld );
 
-				matrices[ i ].getNormalMatrix( _modelViewMatrix );
+				array[ i ].getNormalMatrix( _modelViewMatrix );
 
 			}
 
