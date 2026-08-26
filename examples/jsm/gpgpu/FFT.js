@@ -1,7 +1,7 @@
 import { StorageBufferAttribute } from 'three/webgpu';
 import {
-	Fn, If, instanceIndex, storage, uint, int, ivec2, uvec2, uniform, float, vec2, vec4, cos, sin,
-	storageTexture, textureStore, luminance, NodeAccess,
+	Fn, If, instanceIndex, storage, texture, uint, int, ivec2, uvec2, uniform, float, vec2, vec4, cos, sin,
+	storageTexture, textureStore, NodeAccess,
 	workgroupArray, workgroupBarrier, workgroupId, invocationLocalIndex, globalId, localId
 } from 'three/tsl';
 
@@ -20,7 +20,7 @@ function isPowerOfTwo( value ) {
 /**
  * The workgroup size used for every kernel here that doesn't otherwise compute its own -- the
  * per-stage fallback butterfly stage (`buildMultiDispatchStage`) and the plain elementwise passes
- * (conjugate, `packTexture`, `unpackSpectrum`, `unpackImage`). 256 is the WebGPU spec's
+ * (conjugate, `_load`, `_store`). 256 is the WebGPU spec's
  * guaranteed-minimum `maxComputeInvocationsPerWorkgroup`/`maxComputeWorkgroupSizeX`, so it's valid
  * on every conformant device without needing to query real limits (unlike `buildFusedLineStage`/
  * `buildTransposeStage`, which size themselves off the real device via `getComputeLimits` because
@@ -430,31 +430,41 @@ function buildTransposeStage( { rows, cols, tile, conjugateScaleOutput = false, 
  *
  * `width` and `height` must both be powers of two.
  *
- * Data is stored as `count = width * height` complex numbers (`vec2`, `(real, imag)`), row-major,
- * across two ping-pong storage buffers. A real-valued image is transformed by writing it in with
- * a zero imaginary part -- the result is still fully complex in general (a real input's spectrum
- * has Hermitian symmetry, `X[k] == conj(X[-k])`, but is not itself real, except at the DC and, for
+ * The public surface is deliberately narrow: `computeForward`/`computeInverse` each take a
+ * source and a destination float texture and do exactly one thing -- read `width * height`
+ * complex numbers (the `.rg` channels, `(real, imag)`) out of `sourceTexture`, transform them,
+ * and write the result into `destinationTexture`'s `.rg` channels (any other channels present,
+ * e.g. `.ba` on an RGBA texture, are written as `(0, 1)`). Both textures must be exactly `width`
+ * by `height`, and `destinationTexture` must be a `StorageTexture` (it's written via
+ * `textureStore`). A real-valued image is transformed by packing it into a texture with a zero
+ * `.g` channel first -- the result is still fully complex in general (a real input's spectrum has
+ * Hermitian symmetry, `X[k] == conj(X[-k])`, but is not itself real, except at the DC and, for
  * even sizes, Nyquist bins).
  *
  * The inverse transform reuses the exact same forward butterfly kernels via the standard
  * conjugation identity `ifft(x) = conj( fft( conj(x) ) ) / (width*height)`, rather than shipping a
  * second set of shaders with negated twiddle factors.
  *
- * Each `FFT2D` instance transforms a single scalar channel (see `packTexture`'s `channel` option:
- * a combined luminance value, or one raw color channel). To FFT/reconstruct a full-color image,
- * run 3 instances in lockstep -- one per color channel -- and combine their outputs yourself with
- * a small custom compute pass reading each instance's `readA`/`readB`/`current` (see
- * `examples/webgpu_fft.html` for a worked example); there's no dedicated multi-channel API here,
- * since combining 3 single-channel results into one RGBA output is a one-line `vec4(...)` away and
- * doesn't need its own abstraction.
+ * Internally the data still moves through two ping-pong `StorageBufferAttribute`s between the
+ * texture read and the texture write -- that's what makes the row/column/transpose butterfly
+ * passes fast (coalesced storage-buffer access, not per-texel texture fetches) -- but none of
+ * that is part of the public contract; it's an implementation detail that could change without
+ * affecting callers.
+ *
+ * Anything beyond "transform these complex numbers" -- packing a color channel or luminance value
+ * into a complex source texture, rendering a spectrum/reconstruction as a displayable grayscale
+ * image, reading back a single bin -- is intentionally left out of this class. Those are one-line
+ * TSL compute passes of their own with no shared state, and are kept as plain helper functions
+ * next to their call site (see `examples/webgpu_fft.html` for worked versions of all three). Each
+ * `FFT2D` instance also only ever transforms a single complex channel; to FFT/reconstruct a
+ * full-color image, run 3 instances in lockstep -- one per color channel -- and combine their
+ * output textures yourself with a small custom compute pass, again as done in that example.
  *
  * ```js
  * const fft = new FFT2D( 64, 64 );
- * fft.setData( renderer, realValues ); // Float32Array, length 64*64
- * await fft.computeForward( renderer );
- * const spectrum = await fft.readData( renderer ); // Float32Array, length 64*64*2, interleaved (real, imag)
- * await fft.computeInverse( renderer );
- * const reconstructed = await fft.readData( renderer );
+ * // sourceTexture/spectrumTexture/reconstructedTexture: StorageTexture, 64x64, float, >= 2 channels.
+ * await fft.computeForward( renderer, sourceTexture, spectrumTexture );
+ * await fft.computeInverse( renderer, spectrumTexture, reconstructedTexture );
  * ```
  *
  * @three_import import { FFT2D } from 'three/addons/gpgpu/FFT.js';
@@ -501,14 +511,10 @@ class FFT2D {
 		this._attributeA = new StorageBufferAttribute( count, 2 );
 		this._attributeB = new StorageBufferAttribute( count, 2 );
 
-		this.readA = storage( this._attributeA, 'vec2', count ).toReadOnly();
-		this.writeA = storage( this._attributeA, 'vec2', count );
-		this.readB = storage( this._attributeB, 'vec2', count ).toReadOnly();
-		this.writeB = storage( this._attributeB, 'vec2', count );
-
-		this._probeAttribute = new StorageBufferAttribute( 1, 2 );
-		this._probeWrite = storage( this._probeAttribute, 'vec2', 1 );
-		this._probeIndex = uniform( 0, 'uint' );
+		this._readA = storage( this._attributeA, 'vec2', count ).toReadOnly();
+		this._writeA = storage( this._attributeA, 'vec2', count );
+		this._readB = storage( this._attributeB, 'vec2', count ).toReadOnly();
+		this._writeB = storage( this._attributeB, 'vec2', count );
 
 		this._pUniform = uniform( 1, 'uint' );
 
@@ -532,48 +538,22 @@ class FFT2D {
 		// `buildTransposeStage`'s `conjugateScaleOutput`), so it's always folded in.
 		this._conjugateAtoB = Fn( () => {
 
-			const v = this.readA.element( instanceIndex ).toVar();
-			this.writeB.element( instanceIndex ).assign( vec2( v.x, v.y.negate() ) );
+			const v = this._readA.element( instanceIndex ).toVar();
+			this._writeB.element( instanceIndex ).assign( vec2( v.x, v.y.negate() ) );
 
 		} )().compute( count, [ DEFAULT_WORKGROUP_SIZE ] );
 
 		this._conjugateBtoA = Fn( () => {
 
-			const v = this.readB.element( instanceIndex ).toVar();
-			this.writeA.element( instanceIndex ).assign( vec2( v.x, v.y.negate() ) );
+			const v = this._readB.element( instanceIndex ).toVar();
+			this._writeA.element( instanceIndex ).assign( vec2( v.x, v.y.negate() ) );
 
 		} )().compute( count, [ DEFAULT_WORKGROUP_SIZE ] );
 
-		/**
-		 * Which of the two ping-pong buffers ('A' or 'B') currently holds the live data.
-		 *
-		 * @type {'A'|'B'}
-		 */
-		this.current = 'A';
-
-	}
-
-	/**
-	 * Writes complex data into whichever buffer currently holds the live data (see `current`).
-	 * Intended to be called before the first `computeForward`/`computeInverse` -- subsequent
-	 * passes read/write via compute shaders and don't sync back to this array automatically.
-	 *
-	 * @param {Float32Array} real - Real values, length `count`.
-	 * @param {Float32Array} [imag] - Imaginary values, length `count`. Defaults to all zero.
-	 */
-	setData( real, imag = null ) {
-
-		const attribute = this.current === 'A' ? this._attributeA : this._attributeB;
-		const array = attribute.array;
-
-		for ( let i = 0; i < this.count; i ++ ) {
-
-			array[ i * 2 ] = real[ i ];
-			array[ i * 2 + 1 ] = imag ? imag[ i ] : 0;
-
-		}
-
-		attribute.needsUpdate = true;
+		// Which of the two ping-pong buffers ('A' or 'B') currently holds the live data --
+		// purely an implementation detail of the texture-in/texture-out pipeline below, not part
+		// of the public contract.
+		this._current = 'A';
 
 	}
 
@@ -593,8 +573,8 @@ class FFT2D {
 
 		if ( fused ) {
 
-			renderer.compute( this.current === 'A' ? atoB : btoA );
-			this.current = this.current === 'A' ? 'B' : 'A';
+			renderer.compute( this._current === 'A' ? atoB : btoA );
+			this._current = this._current === 'A' ? 'B' : 'A';
 
 			return;
 
@@ -603,8 +583,8 @@ class FFT2D {
 		for ( let s = 0; s < stages; s ++ ) {
 
 			this._pUniform.value = 1 << s;
-			renderer.compute( this.current === 'A' ? atoB : btoA );
-			this.current = this.current === 'A' ? 'B' : 'A';
+			renderer.compute( this._current === 'A' ? atoB : btoA );
+			this._current = this._current === 'A' ? 'B' : 'A';
 
 		}
 
@@ -643,8 +623,8 @@ class FFT2D {
 		const buildRow = this._rowFused ? buildFusedLineStage : buildMultiDispatchStage;
 		const buildCol = this._colFused ? buildFusedLineStage : buildMultiDispatchStage;
 
-		this._rowAtoB = buildRow( { N: width, lineStride: width, elementStride: 1, lineCount: height, pUniform: this._pUniform }, this.readA, this.writeB );
-		this._rowBtoA = buildRow( { N: width, lineStride: width, elementStride: 1, lineCount: height, pUniform: this._pUniform }, this.readB, this.writeA );
+		this._rowAtoB = buildRow( { N: width, lineStride: width, elementStride: 1, lineCount: height, pUniform: this._pUniform }, this._readA, this._writeB );
+		this._rowBtoA = buildRow( { N: width, lineStride: width, elementStride: 1, lineCount: height, pUniform: this._pUniform }, this._readB, this._writeA );
 
 		// A second copy of the row pass, used only during `computeInverse`, with the leading
 		// conjugate folded into its one-time load (see `buildFusedLineStage`'s `conjugateInput`)
@@ -656,8 +636,8 @@ class FFT2D {
 		// `_conjugateAtoB`/`_conjugateBtoA` pass handles that (rarer, large-line) case instead.
 		if ( this._rowFused ) {
 
-			this._rowConjAtoB = buildFusedLineStage( { N: width, lineStride: width, elementStride: 1, lineCount: height, conjugateInput: true }, this.readA, this.writeB );
-			this._rowConjBtoA = buildFusedLineStage( { N: width, lineStride: width, elementStride: 1, lineCount: height, conjugateInput: true }, this.readB, this.writeA );
+			this._rowConjAtoB = buildFusedLineStage( { N: width, lineStride: width, elementStride: 1, lineCount: height, conjugateInput: true }, this._readA, this._writeB );
+			this._rowConjBtoA = buildFusedLineStage( { N: width, lineStride: width, elementStride: 1, lineCount: height, conjugateInput: true }, this._readB, this._writeA );
 
 		}
 
@@ -665,24 +645,24 @@ class FFT2D {
 		// (`elementStride = 1`) addresses instead of a `width`-sized stride; see
 		// `buildTransposeStage`. After this, the buffer is laid out as `width` lines of length
 		// `height` each (row-major with row length `height`), i.e. `lineStride: height`.
-		this._transposeFwdAtoB = buildTransposeStage( { rows: height, cols: width, tile }, this.readA, this.writeB );
-		this._transposeFwdBtoA = buildTransposeStage( { rows: height, cols: width, tile }, this.readB, this.writeA );
+		this._transposeFwdAtoB = buildTransposeStage( { rows: height, cols: width, tile }, this._readA, this._writeB );
+		this._transposeFwdBtoA = buildTransposeStage( { rows: height, cols: width, tile }, this._readB, this._writeA );
 
-		this._colAtoB = buildCol( { N: height, lineStride: height, elementStride: 1, lineCount: width, pUniform: this._pUniform }, this.readA, this.writeB );
-		this._colBtoA = buildCol( { N: height, lineStride: height, elementStride: 1, lineCount: width, pUniform: this._pUniform }, this.readB, this.writeA );
+		this._colAtoB = buildCol( { N: height, lineStride: height, elementStride: 1, lineCount: width, pUniform: this._pUniform }, this._readA, this._writeB );
+		this._colBtoA = buildCol( { N: height, lineStride: height, elementStride: 1, lineCount: width, pUniform: this._pUniform }, this._readB, this._writeA );
 
-		// Transpose back to the original `height` lines of length `width` layout, so every other
-		// method (`readData`, `unpackSpectrum`, `packTexture`, ...) sees the same row-major
-		// `address = y * width + x` convention as before this optimization. This stage is always a
+		// Transpose back to the original `height` lines of length `width` layout, so `_store`
+		// sees the same row-major `address = y * width + x` convention as before this
+		// optimization. This stage is always a
 		// single dispatch regardless of whether the column axis is fused, so -- unlike the leading
 		// conjugate above -- the trailing conjugate-and-scale (see `computeInverse`) is *always*
 		// folded into its one-time write (`conjugateScaleOutput`) rather than ever needing a
 		// separate pass.
-		this._transposeBackAtoB = buildTransposeStage( { rows: width, cols: height, tile }, this.readA, this.writeB );
-		this._transposeBackBtoA = buildTransposeStage( { rows: width, cols: height, tile }, this.readB, this.writeA );
+		this._transposeBackAtoB = buildTransposeStage( { rows: width, cols: height, tile }, this._readA, this._writeB );
+		this._transposeBackBtoA = buildTransposeStage( { rows: width, cols: height, tile }, this._readB, this._writeA );
 
-		this._transposeBackConjScaleAtoB = buildTransposeStage( { rows: width, cols: height, tile, conjugateScaleOutput: true, invCount }, this.readA, this.writeB );
-		this._transposeBackConjScaleBtoA = buildTransposeStage( { rows: width, cols: height, tile, conjugateScaleOutput: true, invCount }, this.readB, this.writeA );
+		this._transposeBackConjScaleAtoB = buildTransposeStage( { rows: width, cols: height, tile, conjugateScaleOutput: true, invCount }, this._readA, this._writeB );
+		this._transposeBackConjScaleBtoA = buildTransposeStage( { rows: width, cols: height, tile, conjugateScaleOutput: true, invCount }, this._readB, this._writeA );
 
 	}
 
@@ -712,8 +692,8 @@ class FFT2D {
 
 		this._runAxisPass( renderer, this._rowFused, this._stagesRow, rowAtoB, rowBtoA );
 
-		renderer.compute( this.current === 'A' ? this._transposeFwdAtoB : this._transposeFwdBtoA );
-		this.current = this.current === 'A' ? 'B' : 'A';
+		renderer.compute( this._current === 'A' ? this._transposeFwdAtoB : this._transposeFwdBtoA );
+		this._current = this._current === 'A' ? 'B' : 'A';
 
 		this._runAxisPass( renderer, this._colFused, this._stagesCol, this._colAtoB, this._colBtoA );
 
@@ -722,240 +702,137 @@ class FFT2D {
 		const transposeBackAtoB = inverse ? this._transposeBackConjScaleAtoB : this._transposeBackAtoB;
 		const transposeBackBtoA = inverse ? this._transposeBackConjScaleBtoA : this._transposeBackBtoA;
 
-		renderer.compute( this.current === 'A' ? transposeBackAtoB : transposeBackBtoA );
-		this.current = this.current === 'A' ? 'B' : 'A';
+		renderer.compute( this._current === 'A' ? transposeBackAtoB : transposeBackBtoA );
+		this._current = this._current === 'A' ? 'B' : 'A';
 
 	}
 
 	/**
-	 * Computes the forward 2D FFT of whichever buffer currently holds the live data (see
-	 * `current`, `setData`). Leaves the result in `current` (which may have flipped to the other
-	 * buffer).
+	 * Reads `sourceTexture`'s `.rg` channels into whichever ping-pong buffer currently holds
+	 * the live data (see `_current`), entirely on the GPU -- no CPU readback is involved. The
+	 * texture is sampled with an exact (unfiltered) texel fetch, so it must be exactly `width`
+	 * by `height` in size.
 	 *
+	 * The compute kernels are built once per distinct `sourceTexture` and cached, so calling this
+	 * repeatedly with the same texture (e.g. once per frame) is cheap.
+	 *
+	 * @private
 	 * @param {Renderer} renderer
+	 * @param {Texture} sourceTexture - A float texture, `width` by `height`, with at least 2 channels.
 	 */
-	computeForward( renderer ) {
+	_load( renderer, sourceTexture ) {
 
-		this._runButterflyPasses( renderer );
+		if ( this._loadSource !== sourceTexture ) {
 
-	}
-
-	/**
-	 * Computes the inverse 2D FFT of whichever buffer currently holds the live data, via
-	 * `ifft(x) = conj( fft( conj(x) ) ) / count` -- reuses the forward butterfly kernels rather
-	 * than shipping a second set of shaders with negated twiddle factors. The leading conjugate and
-	 * trailing conjugate-and-scale are folded directly into the butterfly pipeline's existing reads
-	 * and writes wherever possible (see `_runButterflyPasses`) rather than run as extra full-buffer
-	 * passes; the only case that still needs a standalone leading-conjugate pass is a row axis too
-	 * long to fuse (see `_ensureButterfliesBuilt`), which is why that decision has to be made
-	 * (`_ensureButterfliesBuilt`) before choosing whether to run it here.
-	 *
-	 * @param {Renderer} renderer
-	 */
-	computeInverse( renderer ) {
-
-		this._ensureButterfliesBuilt( renderer );
-
-		if ( ! this._rowFused ) {
-
-			renderer.compute( this.current === 'A' ? this._conjugateAtoB : this._conjugateBtoA );
-			this.current = this.current === 'A' ? 'B' : 'A';
-
-		}
-
-		this._runButterflyPasses( renderer, true );
-
-	}
-
-	/**
-	 * Writes one scalar channel of a loaded image into whichever buffer currently holds the live
-	 * data (with a zero imaginary part), entirely on the GPU -- no CPU readback of the image is
-	 * involved. The texture is sampled with an exact (unfiltered) texel fetch, so it must be
-	 * exactly `width` by `height` in size.
-	 *
-	 * The compute kernels are built once per distinct `(textureNode, channel)` pair and cached, so
-	 * calling this repeatedly with the same arguments (e.g. once per frame) is cheap.
-	 *
-	 * @param {Renderer} renderer
-	 * @param {TextureNode} textureNode - A `texture( someLoadedTexture )` TSL node.
-	 * @param {'luminance'|'r'|'g'|'b'} [channel='luminance'] - Which scalar to extract per texel. `'luminance'` combines all 3 color channels; `'r'`/`'g'`/`'b'` extract a single color channel, e.g. for running one `FFT2D` instance per channel to reconstruct in full color (see the class-level comment above).
-	 */
-	packTexture( renderer, textureNode, channel = 'luminance' ) {
-
-		if ( this._packSource !== textureNode || this._packChannel !== channel ) {
-
-			this._packSource = textureNode;
-			this._packChannel = channel;
+			this._loadSource = sourceTexture;
 
 			const width = this.width;
+			const sourceNode = texture( sourceTexture );
 
 			const build = ( writeNode ) => Fn( () => {
 
 				const x = instanceIndex.mod( uint( width ) );
 				const y = instanceIndex.div( uint( width ) );
 
-				const texel = textureNode.load( ivec2( int( x ), int( y ) ) );
-				const value = channel === 'luminance' ? luminance( texel.rgb ) : texel[ channel ];
-
-				writeNode.element( instanceIndex ).assign( vec2( value, 0 ) );
+				writeNode.element( instanceIndex ).assign( sourceNode.load( ivec2( int( x ), int( y ) ) ).rg );
 
 			} )().compute( this.count, [ DEFAULT_WORKGROUP_SIZE ] );
 
-			this._packToA = build( this.writeA );
-			this._packToB = build( this.writeB );
+			this._loadToA = build( this._writeA );
+			this._loadToB = build( this._writeB );
 
 		}
 
-		renderer.compute( this.current === 'A' ? this._packToA : this._packToB );
+		renderer.compute( this._current === 'A' ? this._loadToA : this._loadToB );
 
 	}
 
 	/**
-	 * Renders whichever buffer currently holds the live data into `storageTexture` as a
-	 * grayscale log-magnitude spectrum, quadrant-shifted so the DC (zero-frequency) bin lands at
-	 * the texture's center -- the conventional way to display a 2D spectrum. Intended to be
-	 * called right after `computeForward`.
+	 * Writes whichever ping-pong buffer currently holds the live data into `destinationTexture`'s
+	 * `.rg` channels, leaving any other channels (e.g. `.ba` on an RGBA texture) as `(0, 1)`.
 	 *
-	 * The log scale is normalized by `maxMagnitude` so the display uses the full `[0, 1]`
-	 * grayscale range with no manual tuning: for a non-negative-real input (e.g. an image's
-	 * luminance, always >= 0), the DC bin (index 0 before this method's quadrant shift) is
-	 * *guaranteed* -- by the triangle inequality applied to the DFT sum -- to have the largest
-	 * magnitude of any bin, so passing that bin's magnitude (see `readData`) as `maxMagnitude`
-	 * always saturates to exactly 1 at the DC peak and never clips anywhere else.
+	 * The compute kernels are built once per distinct `destinationTexture` and cached.
 	 *
-	 * The compute kernels are built once per distinct `storageTexture` and cached.
-	 *
+	 * @private
 	 * @param {Renderer} renderer
-	 * @param {StorageTexture} target - Must be exactly `width` by `height` in size.
-	 * @param {number} maxMagnitude - The magnitude to normalize the log scale against (typically the DC bin's magnitude -- see above).
+	 * @param {StorageTexture} destinationTexture - Must be exactly `width` by `height` in size.
 	 */
-	unpackSpectrum( renderer, target, maxMagnitude ) {
+	_store( renderer, destinationTexture ) {
 
-		if ( this._spectrumTarget !== target ) {
+		if ( this._storeTarget !== destinationTexture ) {
 
-			this._spectrumTarget = target;
-			this._spectrumLogNorm = uniform( 1 );
-
-			const { width, height, count } = this;
-			const halfW = width >> 1;
-			const halfH = height >> 1;
-
-			const writeTex = storageTexture( target ).setAccess( NodeAccess.WRITE_ONLY );
-
-			const build = ( readNode ) => Fn( () => {
-
-				const x = instanceIndex.mod( uint( width ) );
-				const y = instanceIndex.div( uint( width ) );
-
-				// Quadrant shift: read from the bin that, after wrap-around, is `width/2,
-				// height/2` away -- this moves the DC bin (index 0,0) to the texture center.
-				const sx = x.add( uint( halfW ) ).mod( uint( width ) );
-				const sy = y.add( uint( halfH ) ).mod( uint( height ) );
-				const srcIndex = sy.mul( uint( width ) ).add( sx );
-
-				const v = readNode.element( srcIndex ).toVar();
-				const magnitude = v.length();
-				const value = magnitude.add( 1 ).log().div( this._spectrumLogNorm ).clamp( 0, 1 );
-
-				textureStore( writeTex, uvec2( x, y ), vec4( value, value, value, 1 ) );
-
-			} )().compute( count, [ DEFAULT_WORKGROUP_SIZE ] );
-
-			this._spectrumFromA = build( this.readA );
-			this._spectrumFromB = build( this.readB );
-
-		}
-
-		this._spectrumLogNorm.value = Math.log( 1 + maxMagnitude );
-
-		renderer.compute( this.current === 'A' ? this._spectrumFromA : this._spectrumFromB );
-
-	}
-
-	/**
-	 * Renders whichever buffer currently holds the live data into `storageTexture` as a grayscale
-	 * spatial-domain image (its real part, clamped to `[0, 1]`). Intended to be called right after
-	 * `computeInverse`.
-	 *
-	 * The compute kernels are built once per distinct `storageTexture` and cached.
-	 *
-	 * @param {Renderer} renderer
-	 * @param {StorageTexture} target - Must be exactly `width` by `height` in size.
-	 */
-	unpackImage( renderer, target ) {
-
-		if ( this._imageTarget !== target ) {
-
-			this._imageTarget = target;
+			this._storeTarget = destinationTexture;
 
 			const { width, count } = this;
-			const writeTex = storageTexture( target ).setAccess( NodeAccess.WRITE_ONLY );
+			const writeTex = storageTexture( destinationTexture ).setAccess( NodeAccess.WRITE_ONLY );
 
 			const build = ( readNode ) => Fn( () => {
 
 				const x = instanceIndex.mod( uint( width ) );
 				const y = instanceIndex.div( uint( width ) );
 
-				const value = readNode.element( instanceIndex ).x.clamp( 0, 1 );
+				const v = readNode.element( instanceIndex );
 
-				textureStore( writeTex, uvec2( x, y ), vec4( value, value, value, 1 ) );
+				textureStore( writeTex, uvec2( x, y ), vec4( v.x, v.y, 0, 1 ) );
 
 			} )().compute( count, [ DEFAULT_WORKGROUP_SIZE ] );
 
-			this._imageFromA = build( this.readA );
-			this._imageFromB = build( this.readB );
+			this._storeFromA = build( this._readA );
+			this._storeFromB = build( this._readB );
 
 		}
 
-		renderer.compute( this.current === 'A' ? this._imageFromA : this._imageFromB );
+		renderer.compute( this._current === 'A' ? this._storeFromA : this._storeFromB );
 
 	}
 
 	/**
-	 * Reads back a single complex bin from whichever buffer currently holds the live data, without
-	 * transferring the whole (potentially large) buffer -- useful e.g. for reading just the DC
-	 * bin (`index = 0`) to normalize a spectrum visualization (see `unpackSpectrum`).
+	 * Computes the forward 2D FFT: reads `sourceTexture`'s `.rg` channels as `width * height`
+	 * complex numbers, transforms them, and writes the result into `destinationTexture`'s `.rg`
+	 * channels.
 	 *
 	 * @param {Renderer} renderer
-	 * @param {number} [index=0] - The linear (`y * width + x`) index of the bin to read.
-	 * @returns {Promise<{real: number, imag: number}>}
+	 * @param {Texture} sourceTexture - A float texture, `width` by `height`, with at least 2 channels.
+	 * @param {StorageTexture} destinationTexture - A float `StorageTexture`, `width` by `height`, with at least 2 channels.
 	 */
-	async readBin( renderer, index = 0 ) {
+	computeForward( renderer, sourceTexture, destinationTexture ) {
 
-		if ( this._probeFromA === undefined ) {
-
-			const build = ( readNode ) => Fn( () => {
-
-				this._probeWrite.element( 0 ).assign( readNode.element( this._probeIndex ) );
-
-			} )().compute( 1 );
-
-			this._probeFromA = build( this.readA );
-			this._probeFromB = build( this.readB );
-
-		}
-
-		this._probeIndex.value = index;
-
-		renderer.compute( this.current === 'A' ? this._probeFromA : this._probeFromB );
-
-		const data = new Float32Array( await renderer.getArrayBufferAsync( this._probeWrite.value ) );
-
-		return { real: data[ 0 ], imag: data[ 1 ] };
+		this._load( renderer, sourceTexture );
+		this._runButterflyPasses( renderer );
+		this._store( renderer, destinationTexture );
 
 	}
 
 	/**
-	 * Reads back whichever buffer currently holds the live data.
+	 * Computes the inverse 2D FFT, via `ifft(x) = conj( fft( conj(x) ) ) / count` -- reuses the
+	 * forward butterfly kernels rather than shipping a second set of shaders with negated twiddle
+	 * factors. The leading conjugate and trailing conjugate-and-scale are folded directly into the
+	 * butterfly pipeline's existing reads and writes wherever possible (see `_runButterflyPasses`)
+	 * rather than run as extra full-buffer passes; the only case that still needs a standalone
+	 * leading-conjugate pass is a row axis too long to fuse (see `_ensureButterfliesBuilt`), which
+	 * is why that decision has to be made (`_ensureButterfliesBuilt`) before choosing whether to
+	 * run it here.
 	 *
 	 * @param {Renderer} renderer
-	 * @returns {Promise<Float32Array>} Interleaved `(real, imag)` pairs, length `count * 2`.
+	 * @param {Texture} sourceTexture - A float texture, `width` by `height`, with at least 2 channels (typically a spectrum produced by `computeForward`).
+	 * @param {StorageTexture} destinationTexture - A float `StorageTexture`, `width` by `height`, with at least 2 channels.
 	 */
-	async readData( renderer ) {
+	computeInverse( renderer, sourceTexture, destinationTexture ) {
 
-		const node = this.current === 'A' ? this.writeA : this.writeB;
+		this._ensureButterfliesBuilt( renderer );
 
-		return new Float32Array( await renderer.getArrayBufferAsync( node.value ) );
+		this._load( renderer, sourceTexture );
+
+		if ( ! this._rowFused ) {
+
+			renderer.compute( this._current === 'A' ? this._conjugateAtoB : this._conjugateBtoA );
+			this._current = this._current === 'A' ? 'B' : 'A';
+
+		}
+
+		this._runButterflyPasses( renderer, true );
+
+		this._store( renderer, destinationTexture );
 
 	}
 
@@ -966,7 +843,6 @@ class FFT2D {
 
 		this._attributeA.dispose?.();
 		this._attributeB.dispose?.();
-		this._probeAttribute.dispose?.();
 
 	}
 

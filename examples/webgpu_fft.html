@@ -38,7 +38,10 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { texture, Fn, instanceIndex, uint, uvec2, vec4, storageTexture, textureStore, NodeAccess } from 'three/tsl';
+			import {
+				texture, storage, Fn, instanceIndex, uint, int, ivec2, uvec2, vec4, mix,
+				storageTexture, textureStore, uniform, NodeAccess
+			} from 'three/tsl';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -62,27 +65,31 @@
 			let camera, scene, renderer, controls;
 			let quadOriginal, quadSpectrum, quadReconstructed;
 
-			// One FFT2D instance per color channel -- see FFT2D's own class-level comment on why
-			// full-color support is 3 single-channel instances run in lockstep plus a small custom
-			// combine kernel, rather than a dedicated multi-channel API.
+			// Everything GPU-side that only depends on `(width, height)` -- never on which image is
+			// loaded -- lives in one size-keyed cache entry: the 3 (one per color channel) `FFT2D`
+			// instances, their complex textures, the display targets, and every compute kernel this
+			// example builds for itself (`pack`/`combine`/`probe`/`readback` below). Each of those
+			// kernels is genuinely shape-only -- which *texture* they read/write and which channel/
+			// mode/scale they use are all runtime-adjustable (uniforms, and TSL texture nodes whose
+			// `.value` can be repointed at a different texture -- see e.g. `webgpu_compute_rasterizer_
+			// ibl.html`'s `depthSourceTexNode.value = ...` for the same pattern elsewhere in the
+			// examples), so exactly one of each is ever compiled per size, no matter how many presets
+			// of that size get loaded, or how many times forward/inverse runs.
 			//
-			// Cached per image size (`"WxH"`) rather than rebuilt per preset: constructing an
-			// `FFT2D` is cheap, but its *first* `computeForward`/`computeInverse` call lazily
-			// builds and compiles its row/column/transpose kernels (`FFT2D#_ensureButterfliesBuilt`),
-			// which depend only on `(width, height, the device's compute limits)` -- never on which
-			// image is loaded. Presets that repeat a size (or any app cycling through many
-			// same-size images) reuse that size's 3 instances instead of paying to rebuild them.
-			const fftCache = new Map(); // "WxH" -> { r: FFT2D, g: FFT2D, b: FFT2D }
+			// Only `loadedTexture` (the actual decoded preset image) is deliberately left out of this
+			// cache and freed every `loadPreset` call -- it's the one piece of GPU state that's
+			// legitimately different per image, not per size.
+			const resourceCache = new Map(); // "WxH" -> see `buildResources`
 
-			function getFFTs( width, height ) {
+			function getResources( width, height, sourceTexture ) {
 
 				const key = `${ width }x${ height }`;
-				let entry = fftCache.get( key );
+				let entry = resourceCache.get( key );
 
 				if ( entry === undefined ) {
 
-					entry = { r: new FFT2D( width, height ), g: new FFT2D( width, height ), b: new FFT2D( width, height ) };
-					fftCache.set( key, entry );
+					entry = buildResources( width, height, sourceTexture );
+					resourceCache.set( key, entry );
 
 				}
 
@@ -90,11 +97,61 @@
 
 			}
 
-			let ffts = null;
+			// A float `StorageTexture` with (at least) 2 channels -- `FFT2D`'s complex-number
+			// currency, `(real, imag)` in `.rg`. Used for the per-channel packed source, the
+			// spectrum, and the reconstruction; `.b`/`.a` are unused (written as `0`/`1` by
+			// `FFT2D#computeForward`/`computeInverse`, per its own contract).
+			function createComplexTexture( width, height ) {
+
+				const tex = new THREE.StorageTexture( width, height );
+				tex.type = THREE.FloatType;
+				tex.magFilter = THREE.NearestFilter;
+				tex.minFilter = THREE.NearestFilter;
+				tex.generateMipmaps = false;
+
+				return tex;
+
+			}
+
+			// Builds everything one `(width, height)` needs: the 3 `FFT2D` instances, their complex
+			// textures, the 2 color display targets, and the 4 example-only compute kernels
+			// (`pack`/`combine`/`probe`/`readback`) -- see `resourceCache`'s comment for why each
+			// kernel is built exactly once here rather than per call. `sourceTexture` only seeds the
+			// pack kernel's initial texture-node value (immediately overwritten by the real one on
+			// every actual `packChannel` call) -- any correctly-shaped texture would do.
+			function buildResources( width, height, sourceTexture ) {
+
+				const ffts = { r: new FFT2D( width, height ), g: new FFT2D( width, height ), b: new FFT2D( width, height ) };
+
+				const complexSource = { r: createComplexTexture( width, height ), g: createComplexTexture( width, height ), b: createComplexTexture( width, height ) };
+				const complexSpectrum = { r: createComplexTexture( width, height ), g: createComplexTexture( width, height ), b: createComplexTexture( width, height ) };
+				const complexReconstructed = { r: createComplexTexture( width, height ), g: createComplexTexture( width, height ), b: createComplexTexture( width, height ) };
+
+				const spectrumTexture = new THREE.StorageTexture( width, height );
+				const reconstructedTexture = new THREE.StorageTexture( width, height );
+
+				// Match the source image's exact, unfiltered point-sampling so the 3 quads are
+				// visually comparable pixel-for-pixel (no mipmap/linear-filtering discrepancy when a
+				// texture ends up displayed smaller than its native size on screen).
+				for ( const tex of [ spectrumTexture, reconstructedTexture ] ) {
+
+					tex.magFilter = THREE.NearestFilter;
+					tex.minFilter = THREE.NearestFilter;
+					tex.generateMipmaps = false;
+
+				}
+
+				return {
+					width, height, ffts, complexSource, complexSpectrum, complexReconstructed, spectrumTexture, reconstructedTexture,
+					pack: buildPackKernel( width, height, sourceTexture, complexSource.r ),
+					combine: buildCombineKernel( width, height, complexSpectrum, spectrumTexture ),
+					probe: buildProbeKernel( width, complexSpectrum.r ),
+					readback: buildReadbackKernel( width, height, complexReconstructed.r )
+				};
+
+			}
+
 			let loadedTexture = null;
-			let textureNode = null;
-			let spectrumTexture = null;
-			let reconstructedTexture = null;
 			let originalChannels = null; // CPU copy ({r, g, b} Float32Arrays), for the round-trip-error console log only.
 
 			// Bumped on every `loadPreset` call and captured by each in-flight one -- lets a call
@@ -131,7 +188,8 @@
 				// `setQuadMaterial` below, rather than assigned post-hoc -- reassigning `.map` on an
 				// already-built material doesn't reliably trigger WebGPURenderer's node-graph
 				// rebuild (confirmed: it's flaky, not just cosmetic -- the mesh can keep showing
-				// stale/blank content), and per-preset a fresh texture/material pair is needed anyway.
+				// stale/blank content), and per-preset a fresh material is cheap regardless of
+				// whether its texture is a fresh one or (see `resourceCache`) a reused one.
 				quadOriginal = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicMaterial() );
 				quadSpectrum = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicMaterial() );
 				quadReconstructed = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicMaterial() );
@@ -222,33 +280,17 @@
 
 				}
 
-				// Tear down the previous preset's texture/target resources -- but *not* `ffts`: those
-				// come from `getFFTs`'s size-keyed cache, which deliberately keeps every size's
-				// instances alive across presets so that revisiting a size (including the one just
-				// left) reuses its already-built kernels instead of paying to rebuild them.
+				// Only the previous preset's *decoded image* is torn down here -- every other GPU
+				// resource (the FFT instances, complex textures, display targets, and this example's
+				// own compute kernels) comes from `getResources`'s size-keyed cache and deliberately
+				// stays alive across presets, so revisiting a size (including the one just left)
+				// reuses everything already built for it instead of paying to rebuild any of it.
 
 				loadedTexture?.dispose();
-				spectrumTexture?.dispose();
-				reconstructedTexture?.dispose();
-
 				loadedTexture = newTexture;
-				textureNode = texture( loadedTexture );
 
-				ffts = getFFTs( width, height );
-
-				spectrumTexture = new THREE.StorageTexture( width, height );
-				reconstructedTexture = new THREE.StorageTexture( width, height );
-
-				// Match `loadedTexture`'s exact, unfiltered point-sampling so the 3 quads are
-				// visually comparable pixel-for-pixel (no mipmap/linear-filtering discrepancy when a
-				// texture ends up displayed smaller than its native size on screen).
-				for ( const tex of [ spectrumTexture, reconstructedTexture ] ) {
-
-					tex.magFilter = THREE.NearestFilter;
-					tex.minFilter = THREE.NearestFilter;
-					tex.generateMipmaps = false;
-
-				}
+				const resources = getResources( width, height, loadedTexture );
+				const { ffts, complexSource, complexSpectrum, complexReconstructed, spectrumTexture, reconstructedTexture } = resources;
 
 				// A brand-new material per quad, with `map` set at construction time, replacing the
 				// old one outright (rather than mutating `.map` on the existing material) -- see the
@@ -259,9 +301,12 @@
 
 				layoutQuads( width, height );
 
-				ffts.r.packTexture( renderer, textureNode, 'r' );
-				ffts.g.packTexture( renderer, textureNode, 'g' );
-				ffts.b.packTexture( renderer, textureNode, 'b' );
+				// Pack each color channel of the loaded image into its own complex source texture
+				// (real = channel value, imag = 0) -- this example's own helper, not part of
+				// `FFT2D`'s core contract (see FFT.js's class comment).
+				packChannel( renderer, resources, loadedTexture, complexSource.r, 0 );
+				packChannel( renderer, resources, loadedTexture, complexSource.g, 1 );
+				packChannel( renderer, resources, loadedTexture, complexSource.b, 2 );
 
 				// CPU-side per-channel copy of the source image, used only to compute the
 				// round-trip-error console log after an inverse FFT -- not part of the GPU pipeline.
@@ -272,41 +317,50 @@
 				// The rest of the pipeline (forward FFT -> spectrum, inverse FFT -> reconstruction)
 				// runs automatically -- there's no user-facing step between loading an image and
 				// seeing all 3 quads, so it's just a straight-line continuation of this function
-				// rather than separate button-triggered handlers. `ffts.r/g/b` are always run in
-				// lockstep (same calls, same order) so they stay on the same ping-pong buffer at
-				// every point -- `combineSpectrum`/`combineReconstructed` below rely on that to only
-				// need 2 kernel variants (all-A / all-B) instead of 8.
+				// rather than separate button-triggered handlers.
 
-				ffts.r.computeForward( renderer );
-				ffts.g.computeForward( renderer );
-				ffts.b.computeForward( renderer );
+				ffts.r.computeForward( renderer, complexSource.r, complexSpectrum.r );
+				ffts.g.computeForward( renderer, complexSource.g, complexSpectrum.g );
+				ffts.b.computeForward( renderer, complexSource.b, complexSpectrum.b );
 
-				// Auto-normalize each channel's spectrum log scale to use the full [0, 1] range with
-				// no manual tuning: for a non-negative-real input (a raw color channel, always >= 0),
+				// Auto-normalize the spectrum's log scale to use the full [0, 1] range with no
+				// manual tuning: for a non-negative-real input (a raw color channel, always >= 0),
 				// the DC bin (read back here) is *guaranteed* -- by the triangle inequality applied
-				// to the DFT sum -- to have the largest magnitude of any bin in that channel. See
-				// `FFT2D#unpackSpectrum`'s own comment for the full argument.
-				const [ dcR, dcG, dcB ] = await Promise.all( [ ffts.r.readBin( renderer, 0 ), ffts.g.readBin( renderer, 0 ), ffts.b.readBin( renderer, 0 ) ] );
+				// to the DFT sum -- to have the largest magnitude of any bin in that channel. The
+				// same scale is then shared across R/G/B (the single largest of the 3 channels'
+				// DC magnitudes) rather than normalizing each channel independently -- an
+				// independent per-channel normalization would rescale each channel's brightness
+				// relative to the others and wash the color balance out toward white; a shared
+				// scale preserves each texel's actual R:G:B ratio. Read sequentially (not
+				// `Promise.all`): all 3 channels share one cached probe kernel/buffer (see
+				// `buildProbeKernel`), so concurrent dispatches would race on it.
+				const dcR = await readBin( renderer, resources, complexSpectrum.r, 0 );
+				const dcG = await readBin( renderer, resources, complexSpectrum.g, 0 );
+				const dcB = await readBin( renderer, resources, complexSpectrum.b, 0 );
 
 				if ( myGeneration !== generation ) return; // superseded mid-readback
 
-				const maxMagnitude = {
-					r: Math.hypot( dcR.real, dcR.imag ),
-					g: Math.hypot( dcG.real, dcG.imag ),
-					b: Math.hypot( dcB.real, dcB.imag )
-				};
+				const maxMagnitude = Math.max(
+					Math.hypot( dcR.real, dcR.imag ),
+					Math.hypot( dcG.real, dcG.imag ),
+					Math.hypot( dcB.real, dcB.imag )
+				);
 
-				combineSpectrum( ffts, spectrumTexture, maxMagnitude );
+				combineChannels( renderer, resources, complexSpectrum, spectrumTexture, { mode: 'log', scale: 1 / Math.log( 1 + maxMagnitude ), shift: true } );
 
 				render();
 
-				ffts.r.computeInverse( renderer );
-				ffts.g.computeInverse( renderer );
-				ffts.b.computeInverse( renderer );
+				ffts.r.computeInverse( renderer, complexSpectrum.r, complexReconstructed.r );
+				ffts.g.computeInverse( renderer, complexSpectrum.g, complexReconstructed.g );
+				ffts.b.computeInverse( renderer, complexSpectrum.b, complexReconstructed.b );
 
-				combineReconstructed( ffts, reconstructedTexture );
+				combineChannels( renderer, resources, complexReconstructed, reconstructedTexture, { mode: 'linear', scale: 1 } );
 
-				const [ dataR, dataG, dataB ] = await Promise.all( [ ffts.r.readData( renderer ), ffts.g.readData( renderer ), ffts.b.readData( renderer ) ] );
+				// Sequential for the same reason as the `readBin` calls above: one cached
+				// readback kernel/buffer per size, shared across all 3 channels.
+				const dataR = await readComplexTexture( renderer, resources, complexReconstructed.r );
+				const dataG = await readComplexTexture( renderer, resources, complexReconstructed.g );
+				const dataB = await readComplexTexture( renderer, resources, complexReconstructed.b );
 
 				if ( myGeneration !== generation ) return; // superseded mid-readback
 
@@ -316,7 +370,7 @@
 
 				for ( const [ data, original ] of [ [ dataR, originalChannels.r ], [ dataG, originalChannels.g ], [ dataB, originalChannels.b ] ] ) {
 
-					for ( let i = 0; i < ffts.r.count; i ++ ) {
+					for ( let i = 0; i < width * height; i ++ ) {
 
 						const diff = data[ i * 2 ] - original[ i ];
 						maxDiff = Math.max( maxDiff, Math.abs( diff ) );
@@ -335,83 +389,234 @@
 
 			}
 
-			// `ffts.r/g/b` always share the same `current` buffer (see the lockstep comment above),
-			// so each combine kernel only needs 2 variants -- reading all 3 channels' A buffers, or
-			// all 3 B buffers -- selected once per call via `ffts.r.current`.
-			function runCombine( kernels, ffts, renderer ) {
+			// --- Example-only helpers -----------------------------------------------------------
+			//
+			// Everything below reads/writes plain textures and has no shared state of its own beyond
+			// what `buildResources` builds once per size -- unlike `FFT2D`, which only ever
+			// transforms complex numbers between two textures it's handed (see FFT.js's class
+			// comment for why packing/display/probing live here instead of on the class). Each
+			// `build*Kernel` function is called exactly once per size (from `buildResources`); the
+			// matching `pack`/`combine`/`readBin`/`readComplexTexture` call just re-points that
+			// kernel's uniforms/texture-node values and dispatches it again.
 
-				renderer.compute( ffts.r.current === 'A' ? kernels.allA : kernels.allB );
+			// Builds the pack kernel for one size: a single compiled shader shared by all 3 color
+			// channels, which color channel to extract (`'r'`=0/`'g'`=1/`'b'`=2) selected at runtime
+			// by `channelUniform` via `select()` rather than baked in at compile time -- see
+			// `resourceCache`'s comment. `sourceNode.value`/`writeTex.value` are repointed at the
+			// real source/destination textures on every actual `packChannel` call.
+			function buildPackKernel( width, height, initialSourceTexture, initialDestinationTexture ) {
 
-			}
+				const sourceNode = texture( initialSourceTexture );
+				const writeTex = storageTexture( initialDestinationTexture ).setAccess( NodeAccess.WRITE_ONLY );
+				const channelUniform = uniform( 0, 'uint' );
 
-			// Combines the 3 channels' current (spatial-domain) buffers into one RGBA texture, no
-			// shift or scaling needed -- this is meant to be called right after `computeInverse`.
-			function combineReconstructed( ffts, target ) {
-
-				const { width, count } = ffts.r;
-
-				const writeTex = storageTexture( target ).setAccess( NodeAccess.WRITE_ONLY );
-
-				const build = ( r, g, b ) => Fn( () => {
+				const kernel = Fn( () => {
 
 					const x = instanceIndex.mod( uint( width ) );
 					const y = instanceIndex.div( uint( width ) );
 
-					const value = vec4(
-						r.element( instanceIndex ).x.clamp( 0, 1 ),
-						g.element( instanceIndex ).x.clamp( 0, 1 ),
-						b.element( instanceIndex ).x.clamp( 0, 1 ),
-						1
-					);
+					const texel = sourceNode.load( ivec2( int( x ), int( y ) ) );
+					const value = channelUniform.equal( uint( 0 ) ).select( texel.r, channelUniform.equal( uint( 1 ) ).select( texel.g, texel.b ) );
 
-					textureStore( writeTex, uvec2( x, y ), value );
+					textureStore( writeTex, uvec2( x, y ), vec4( value, 0, 0, 1 ) );
 
-				} )().compute( count );
+				} )().compute( width * height );
 
-				runCombine( { allA: build( ffts.r.readA, ffts.g.readA, ffts.b.readA ), allB: build( ffts.r.readB, ffts.g.readB, ffts.b.readB ) }, ffts, renderer );
+				return { kernel, sourceNode, writeTex, channelUniform };
 
 			}
 
-			// Combines the 3 channels' current (frequency-domain) buffers into one color-coded
-			// log-magnitude spectrum -- each channel shows its own quadrant-shifted, independently
-			// auto-normalized log-magnitude in its own color channel. This is meant to be called
-			// right after `computeForward`; see `FFT2D#unpackSpectrum` for the single-channel
-			// equivalent this mirrors (shift math included).
-			function combineSpectrum( ffts, target, maxMagnitude ) {
+			// Packs one color channel (`channelIndex`: 0/1/2 for r/g/b) of `sourceTexture` into
+			// `destinationTexture`'s `.rg` channels as a complex number (real = channel value,
+			// imag = 0) -- `FFT2D`'s input format. `sourceTexture` is sampled with an exact
+			// (unfiltered) texel fetch, so it must be exactly as large as `destinationTexture`.
+			function packChannel( renderer, resources, sourceTexture, destinationTexture, channelIndex ) {
 
-				const { width, height, count } = ffts.r;
+				const { kernel, sourceNode, writeTex, channelUniform } = resources.pack;
+
+				sourceNode.value = sourceTexture;
+				writeTex.value = destinationTexture;
+				channelUniform.value = channelIndex;
+
+				renderer.compute( kernel );
+
+			}
+
+			// Builds the combine kernel for one size: a single compiled shader shared by both the
+			// spectrum and reconstruction views (see `combineChannels`'s comment for what those
+			// views mean) -- every way they differ is a uniform here rather than a separate kernel:
+			// `modeUniform` (0 = linear/real-part, 1 = log-magnitude, blended via `mix()`),
+			// `shiftUniform` (0/1, added into the sample coordinate so it's a no-op when off, instead
+			// of a compile-time branch), and `scaleUniform`. `rNode`/`gNode`/`bNode`/`writeTex` start
+			// out pointed at the spectrum textures/target simply because those exist at this point;
+			// every actual `combineChannels` call repoints all 4 anyway.
+			function buildCombineKernel( width, height, initialChannels, initialTarget ) {
+
 				const halfW = width >> 1;
 				const halfH = height >> 1;
 
-				const normR = Math.log( 1 + maxMagnitude.r );
-				const normG = Math.log( 1 + maxMagnitude.g );
-				const normB = Math.log( 1 + maxMagnitude.b );
+				const rNode = texture( initialChannels.r );
+				const gNode = texture( initialChannels.g );
+				const bNode = texture( initialChannels.b );
+				const writeTex = storageTexture( initialTarget ).setAccess( NodeAccess.WRITE_ONLY );
 
-				const writeTex = storageTexture( target ).setAccess( NodeAccess.WRITE_ONLY );
+				const modeUniform = uniform( 0 );
+				const shiftUniform = uniform( 0, 'uint' );
+				const scaleUniform = uniform( 1 );
 
-				const build = ( r, g, b ) => Fn( () => {
+				const extract = ( channelNode, coord ) => {
+
+					const texel = channelNode.load( coord );
+					const linearValue = texel.r;
+					const logValue = texel.rg.length().add( 1 ).log();
+
+					return mix( linearValue, logValue, modeUniform ).mul( scaleUniform ).clamp( 0, 1 );
+
+				};
+
+				const kernel = Fn( () => {
 
 					const x = instanceIndex.mod( uint( width ) );
 					const y = instanceIndex.div( uint( width ) );
 
-					const sx = x.add( uint( halfW ) ).mod( uint( width ) );
-					const sy = y.add( uint( halfH ) ).mod( uint( height ) );
-					const srcIndex = sy.mul( uint( width ) ).add( sx );
+					// Quadrant shift (spectrum view only): read from the bin that, after
+					// wrap-around, is `width/2, height/2` away -- this moves the DC bin (index 0,0)
+					// to the texture center. Adding `halfW/halfH * shiftUniform` is a no-op when
+					// `shiftUniform` is 0, so this is one expression covering both views rather than
+					// a runtime or compile-time branch.
+					const sx = x.add( uint( halfW ).mul( shiftUniform ) ).mod( uint( width ) );
+					const sy = y.add( uint( halfH ).mul( shiftUniform ) ).mod( uint( height ) );
+					const coord = ivec2( int( sx ), int( sy ) );
 
 					const value = vec4(
-						r.element( srcIndex ).toVar().length().add( 1 ).log().div( normR ).clamp( 0, 1 ),
-						g.element( srcIndex ).toVar().length().add( 1 ).log().div( normG ).clamp( 0, 1 ),
-						b.element( srcIndex ).toVar().length().add( 1 ).log().div( normB ).clamp( 0, 1 ),
+						extract( rNode, coord ),
+						extract( gNode, coord ),
+						extract( bNode, coord ),
 						1
 					);
 
 					textureStore( writeTex, uvec2( x, y ), value );
 
-				} )().compute( count );
+				} )().compute( width * height );
 
-				runCombine( { allA: build( ffts.r.readA, ffts.g.readA, ffts.b.readA ), allB: build( ffts.r.readB, ffts.g.readB, ffts.b.readB ) }, ffts, renderer );
+				return { kernel, rNode, gNode, bNode, writeTex, modeUniform, shiftUniform, scaleUniform };
 
 			}
+
+			// `ffts.r/g/b`'s 3 complex textures combined into one RGBA display texture -- shared by
+			// the spectrum and reconstruction views, which differ only in what scalar they extract
+			// per texel and how it's scaled:
+			//
+			//  - `mode: 'log'` reads each channel's *magnitude* (`length(real, imag)`) and displays
+			//    `log(1 + magnitude) * scale`, quadrant-shifted so the DC (zero-frequency) bin lands
+			//    at the texture's center -- the conventional way to display a 2D spectrum. Meant to
+			//    be called right after `computeForward`.
+			//  - `mode: 'linear'` reads each channel's *real part* directly and displays
+			//    `real * scale`, unshifted. Meant to be called right after `computeInverse`.
+			//
+			// `scale` is a single number shared by all 3 channels -- e.g. the spectrum view passes
+			// `1 / log(1 + maxDCMagnitude)`, the single largest DC magnitude across R/G/B (see
+			// `readBin`), so its log scale saturates to exactly 1 at the strongest channel's DC
+			// peak without rescaling the other two channels independently, which would distort
+			// each texel's R:G:B ratio (push everything toward white) instead of just brightening
+			// it. The reconstruction view just passes `scale: 1` (already `[0, 1]`-ranged).
+			function combineChannels( renderer, resources, channels, target, { mode = 'linear', scale = 1, shift = false } = {} ) {
+
+				const { kernel, rNode, gNode, bNode, writeTex, modeUniform, shiftUniform, scaleUniform } = resources.combine;
+
+				rNode.value = channels.r;
+				gNode.value = channels.g;
+				bNode.value = channels.b;
+				writeTex.value = target;
+				modeUniform.value = mode === 'log' ? 1 : 0;
+				shiftUniform.value = shift ? 1 : 0;
+				scaleUniform.value = scale;
+
+				renderer.compute( kernel );
+
+			}
+
+			// Builds the single-bin probe kernel for one size, shared across every `readBin` call
+			// for that size (all 3 color channels, every preset) -- `sourceNode.value` and
+			// `indexUniform` are re-pointed/re-set on each actual call instead of rebuilding.
+			function buildProbeKernel( width, initialSourceTexture ) {
+
+				const sourceNode = texture( initialSourceTexture );
+				const indexUniform = uniform( 0, 'uint' );
+
+				const probeAttribute = new THREE.StorageBufferAttribute( 1, 2 );
+				const probeWrite = storage( probeAttribute, 'vec2', 1 );
+
+				const kernel = Fn( () => {
+
+					const x = indexUniform.mod( uint( width ) );
+					const y = indexUniform.div( uint( width ) );
+
+					probeWrite.element( 0 ).assign( sourceNode.load( ivec2( int( x ), int( y ) ) ).rg );
+
+				} )().compute( 1 );
+
+				return { kernel, sourceNode, indexUniform, probeWrite };
+
+			}
+
+			// Reads back a single complex bin (real, imag) from `sourceTexture` at `index` (a
+			// linear `y * width + x` index), without transferring the whole texture -- used above
+			// to read just the DC bin (`index = 0`) for `combineChannels`'s log-scale normalization.
+			async function readBin( renderer, resources, sourceTexture, index = 0 ) {
+
+				const { kernel, sourceNode, indexUniform, probeWrite } = resources.probe;
+
+				sourceNode.value = sourceTexture;
+				indexUniform.value = index;
+
+				renderer.compute( kernel );
+
+				const data = new Float32Array( await renderer.getArrayBufferAsync( probeWrite.value ) );
+
+				return { real: data[ 0 ], imag: data[ 1 ] };
+
+			}
+
+			// Builds the whole-texture readback kernel for one size, shared across every
+			// `readComplexTexture` call for that size -- `sourceNode.value` is re-pointed on each
+			// actual call instead of rebuilding.
+			function buildReadbackKernel( width, height, initialSourceTexture ) {
+
+				const count = width * height;
+
+				const sourceNode = texture( initialSourceTexture );
+				const readAttribute = new THREE.StorageBufferAttribute( count, 2 );
+				const readWrite = storage( readAttribute, 'vec2', count );
+
+				const kernel = Fn( () => {
+
+					const x = instanceIndex.mod( uint( width ) );
+					const y = instanceIndex.div( uint( width ) );
+
+					readWrite.element( instanceIndex ).assign( sourceNode.load( ivec2( int( x ), int( y ) ) ).rg );
+
+				} )().compute( count );
+
+				return { kernel, sourceNode, readWrite };
+
+			}
+
+			// Reads back a whole complex texture as interleaved `(real, imag)` pairs -- used only
+			// for the round-trip-error console log above, not part of the render pipeline.
+			async function readComplexTexture( renderer, resources, sourceTexture ) {
+
+				const { kernel, sourceNode, readWrite } = resources.readback;
+
+				sourceNode.value = sourceTexture;
+
+				renderer.compute( kernel );
+
+				return new Float32Array( await renderer.getArrayBufferAsync( readWrite.value ) );
+
+			}
+
+			// -------------------------------------------------------------------------------------
 
 			function setQuadMaterial( quad, map ) {
 

@@ -1,3 +1,5 @@
+import * as THREE from 'three/webgpu';
+import { texture, storage, Fn, instanceIndex, uint, int, ivec2 } from 'three/tsl';
 import { FFT2D } from '../../../../examples/jsm/gpgpu/FFT.js';
 import { getSharedRenderer } from './gpu-test-utils.js';
 
@@ -86,7 +88,7 @@ function maxAbsDiff( a, b ) {
 
 }
 
-// Deinterleaves FFT2D#readData's (real, imag) pairs into separate arrays.
+// Deinterleaves (real, imag) pairs (as returned by `readComplexTexture`) into separate arrays.
 function deinterleave( data ) {
 
 	const count = data.length / 2;
@@ -101,6 +103,68 @@ function deinterleave( data ) {
 	}
 
 	return { real, imag };
+
+}
+
+// Builds a float source texture holding `real`/`imag` (row-major, length `width*height`) in its
+// `.rg` channels -- `FFT2D#computeForward`/`computeInverse`'s input format. A plain `DataTexture`
+// is enough here: `FFT2D` only ever reads a source texture, never writes one.
+function makeComplexSourceTexture( real, imag, width, height ) {
+
+	const data = new Float32Array( width * height * 4 );
+
+	for ( let i = 0; i < width * height; i ++ ) {
+
+		data[ i * 4 ] = real[ i ];
+		data[ i * 4 + 1 ] = imag ? imag[ i ] : 0;
+		data[ i * 4 + 2 ] = 0;
+		data[ i * 4 + 3 ] = 1;
+
+	}
+
+	const tex = new THREE.DataTexture( data, width, height, THREE.RGBAFormat, THREE.FloatType );
+	tex.needsUpdate = true;
+
+	return tex;
+
+}
+
+// A float `StorageTexture` with (at least) 2 channels, `FFT2D`'s destination format.
+function makeComplexDestinationTexture( width, height ) {
+
+	const tex = new THREE.StorageTexture( width, height );
+	tex.type = THREE.FloatType;
+
+	return tex;
+
+}
+
+// Reads a complex texture's `.rg` channels back to the CPU, as interleaved `(real, imag)` pairs
+// -- the GPU-side mirror of `makeComplexSourceTexture`, used to check `FFT2D`'s output.
+async function readComplexTexture( renderer, sourceTexture, width, height ) {
+
+	const count = width * height;
+
+	const sourceNode = texture( sourceTexture );
+	const readAttribute = new THREE.StorageBufferAttribute( count, 2 );
+	const readWrite = storage( readAttribute, 'vec2', count );
+
+	const kernel = Fn( () => {
+
+		const x = instanceIndex.mod( uint( width ) );
+		const y = instanceIndex.div( uint( width ) );
+
+		readWrite.element( instanceIndex ).assign( sourceNode.load( ivec2( int( x ), int( y ) ) ).rg );
+
+	} )().compute( count );
+
+	renderer.compute( kernel );
+
+	const data = new Float32Array( await renderer.getArrayBufferAsync( readWrite.value ) );
+
+	readAttribute.dispose?.();
+
+	return data;
 
 }
 
@@ -137,17 +201,21 @@ export default QUnit.module( 'TSL', () => {
 
 				const input = makeTestImage( width, height, width * 7 + 1 );
 
-				const fft = new FFT2D( width, height );
-				fft.setData( input );
-				fft.computeForward( renderer );
+				const source = makeComplexSourceTexture( input, null, width, height );
+				const destination = makeComplexDestinationTexture( width, height );
 
-				const { real, imag } = deinterleave( await fft.readData( renderer ) );
+				const fft = new FFT2D( width, height );
+				fft.computeForward( renderer, source, destination );
+
+				const { real, imag } = deinterleave( await readComplexTexture( renderer, destination, width, height ) );
 				const expected = naiveDFT2D( input, new Float32Array( width * height ), width, height );
 
 				assert.ok( maxAbsDiff( real, expected.real ) < 1e-3, `real part within tolerance (max diff ${ maxAbsDiff( real, expected.real ) })` );
 				assert.ok( maxAbsDiff( imag, expected.imag ) < 1e-3, `imag part within tolerance (max diff ${ maxAbsDiff( imag, expected.imag ) })` );
 
 				fft.dispose();
+				source.dispose();
+				destination.dispose();
 
 			} );
 
@@ -159,17 +227,21 @@ export default QUnit.module( 'TSL', () => {
 
 				const input = makeTestImage( width, height, width * 13 + height * 3 + 1 );
 
-				const fft = new FFT2D( width, height );
-				fft.setData( input );
-				fft.computeForward( renderer );
+				const source = makeComplexSourceTexture( input, null, width, height );
+				const destination = makeComplexDestinationTexture( width, height );
 
-				const { real, imag } = deinterleave( await fft.readData( renderer ) );
+				const fft = new FFT2D( width, height );
+				fft.computeForward( renderer, source, destination );
+
+				const { real, imag } = deinterleave( await readComplexTexture( renderer, destination, width, height ) );
 				const expected = naiveDFT2D( input, new Float32Array( width * height ), width, height );
 
 				assert.ok( maxAbsDiff( real, expected.real ) < 1e-2, `real part within tolerance (max diff ${ maxAbsDiff( real, expected.real ) })` );
 				assert.ok( maxAbsDiff( imag, expected.imag ) < 1e-2, `imag part within tolerance (max diff ${ maxAbsDiff( imag, expected.imag ) })` );
 
 				fft.dispose();
+				source.dispose();
+				destination.dispose();
 
 			} );
 
@@ -181,12 +253,15 @@ export default QUnit.module( 'TSL', () => {
 
 				const input = makeTestImage( width, height, width * 101 + height * 7 + 3 );
 
-				const fft = new FFT2D( width, height );
-				fft.setData( input );
-				fft.computeForward( renderer );
-				fft.computeInverse( renderer );
+				const source = makeComplexSourceTexture( input, null, width, height );
+				const spectrum = makeComplexDestinationTexture( width, height );
+				const reconstructed = makeComplexDestinationTexture( width, height );
 
-				const { real, imag } = deinterleave( await fft.readData( renderer ) );
+				const fft = new FFT2D( width, height );
+				fft.computeForward( renderer, source, spectrum );
+				fft.computeInverse( renderer, spectrum, reconstructed );
+
+				const { real, imag } = deinterleave( await readComplexTexture( renderer, reconstructed, width, height ) );
 
 				const diff = maxAbsDiff( real, input );
 				assert.ok( diff < 1e-3, `reconstructed real part within tolerance (max diff ${ diff })` );
@@ -195,6 +270,9 @@ export default QUnit.module( 'TSL', () => {
 				assert.ok( maxImag < 1e-3, `reconstructed imaginary part is ~0 (max ${ maxImag })` );
 
 				fft.dispose();
+				source.dispose();
+				spectrum.dispose();
+				reconstructed.dispose();
 
 			} );
 
@@ -210,11 +288,13 @@ export default QUnit.module( 'TSL', () => {
 
 				const input = makeTestImage( width, height, width * 29 + height * 11 + 5 );
 
-				const fft = new FFT2D( width, height );
-				fft.setData( input );
-				fft.computeForward( renderer );
+				const source = makeComplexSourceTexture( input, null, width, height );
+				const destination = makeComplexDestinationTexture( width, height );
 
-				const { real, imag } = deinterleave( await fft.readData( renderer ) );
+				const fft = new FFT2D( width, height );
+				fft.computeForward( renderer, source, destination );
+
+				const { real, imag } = deinterleave( await readComplexTexture( renderer, destination, width, height ) );
 
 				let maxDiff = 0;
 
@@ -238,6 +318,8 @@ export default QUnit.module( 'TSL', () => {
 				assert.ok( maxDiff < 1e-3, `Hermitian symmetry holds within tolerance (max diff ${ maxDiff })` );
 
 				fft.dispose();
+				source.dispose();
+				destination.dispose();
 
 			} );
 
