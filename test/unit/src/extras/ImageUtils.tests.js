@@ -1,6 +1,5 @@
 import { ImageUtils } from '../../../../src/extras/ImageUtils.js';
 import { SRGBToLinear } from '../../../../src/math/ColorManagement.js';
-import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
 // These tests need a real canvas, so they only run in a browser environment --
 // which is how the suite is executed (see test/unit/README.md).
@@ -160,14 +159,31 @@ export default QUnit.module( 'Extras', () => {
 
 		QUnit.test( 'sRGBToLinear - returns an unsupported image unchanged and warns', ( assert ) => {
 
-			console.level = CONSOLE_LEVEL.ERROR;
+			// The warning is captured rather than merely silenced, so the "and
+			// warns" half of this test's name is actually asserted. The console
+			// wrapper routes through console._warn, so swapping that out records
+			// the message without printing it. Restored in `finally` so a failure
+			// here cannot leave the rest of the suite with a patched console.
+			const warnings = [];
+			const originalWarn = console._warn;
+			console._warn = ( ...args ) => warnings.push( args.join( ' ' ) );
 
 			const image = { width: 1, height: 1 };
-			const result = ImageUtils.sRGBToLinear( image );
+			let result;
 
-			console.level = CONSOLE_LEVEL.DEFAULT;
+			try {
+
+				result = ImageUtils.sRGBToLinear( image );
+
+			} finally {
+
+				console._warn = originalWarn;
+
+			}
 
 			assert.strictEqual( result, image, 'the image is passed through untouched' );
+			assert.strictEqual( warnings.length, 1, 'exactly one warning is emitted' );
+			assert.ok( warnings[ 0 ].includes( 'sRGBToLinear' ), 'the warning names the function that could not convert' );
 
 		} );
 

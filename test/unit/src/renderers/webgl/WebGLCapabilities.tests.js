@@ -103,7 +103,18 @@ export default QUnit.module( 'Renderers', () => {
 
 	QUnit.module( 'WebGL', () => {
 
-		QUnit.module( 'WebGLCapabilities', () => {
+		QUnit.module( 'WebGLCapabilities', ( hooks ) => {
+
+			// Several tests below suppress the expected precision/extension
+			// warnings by lowering console.level. That is a process-global set by
+			// the console wrapper, so restoring it inline would be skipped if the
+			// code under test threw first, silently muting warnings for the rest
+			// of the suite. Resetting here runs on both success and failure.
+			hooks.afterEach( () => {
+
+				console.level = CONSOLE_LEVEL.DEFAULT;
+
+			} );
 
 			// INSTANCING
 			QUnit.test( 'Instancing - reads the driver limits off the context', ( assert ) => {
@@ -167,7 +178,6 @@ export default QUnit.module( 'Renderers', () => {
 				const noFloat = create( { precisions: { HIGH_FLOAT: 0, MEDIUM_FLOAT: 0 } } );
 				assert.strictEqual( noFloat.precision, 'lowp', 'with neither available it falls back to lowp' );
 
-				console.level = CONSOLE_LEVEL.DEFAULT;
 
 			} );
 
@@ -197,7 +207,6 @@ export default QUnit.module( 'Renderers', () => {
 				assert.strictEqual( capabilities.getMaxPrecision( 'highp' ), 'lowp', 'highp degrades all the way to lowp' );
 				assert.strictEqual( capabilities.getMaxPrecision( 'mediump' ), 'lowp', 'mediump degrades to lowp' );
 
-				console.level = CONSOLE_LEVEL.DEFAULT;
 
 			} );
 
@@ -219,7 +228,6 @@ export default QUnit.module( 'Renderers', () => {
 				const withoutExtension = create( { parameters: { reversedDepthBuffer: true } } );
 				assert.strictEqual( withoutExtension.reversedDepthBuffer, false, 'without the extension it stays off' );
 
-				console.level = CONSOLE_LEVEL.DEFAULT;
 
 				assert.strictEqual( create( { extensions: [ 'EXT_clip_control' ] } ).reversedDepthBuffer, false, 'it is off unless requested' );
 

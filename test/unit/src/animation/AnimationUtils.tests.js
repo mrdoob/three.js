@@ -17,6 +17,20 @@ import { Vector3 } from '../../../../src/math/Vector3.js';
 import { Quaternion } from '../../../../src/math/Quaternion.js';
 import { AdditiveAnimationBlendMode, NormalAnimationBlendMode } from '../../../../src/constants.js';
 
+// `assert.numEqual` compares with a fixed absolute tolerance of 0.1, which is
+// far wider than float32 rounding error. Quantities below use this instead so a
+// small numerical regression cannot slip through -- for unit quaternions in
+// particular, a 0.1 component tolerance would admit roughly 50 degrees of
+// rotation error.
+function closeTo( assert, actual, expected, message, eps = 1e-5 ) {
+
+	assert.ok(
+		Math.abs( actual - expected ) < eps,
+		`${ message } (expected ${ expected }, got ${ actual }, tolerance ${ eps })`
+	);
+
+}
+
 export default QUnit.module( 'Animation', () => {
 
 	QUnit.module( 'AnimationUtils', () => {
@@ -278,17 +292,29 @@ export default QUnit.module( 'Animation', () => {
 
 		QUnit.test( 'subclip - shifts the result so it starts at t = 0', ( assert ) => {
 
+			// Deliberately built at 1 fps rather than 30. At 30 fps every value
+			// this test asserts (0, 1/30, 1/30) is smaller than the 0.1 tolerance
+			// `assert.numEqual` uses, so the assertions would hold even if the
+			// shift were removed entirely. Whole-second keyframes put the
+			// expected values well clear of any tolerance, and the tight epsilon
+			// below means dropping `track.shift()` from subclip fails this test.
 			const track = new VectorKeyframeTrack(
 				'.position',
-				[ 0 / 30, 1 / 30, 2 / 30, 3 / 30 ],
+				[ 0, 1, 2, 3 ],
 				[ 0, 0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0 ]
 			);
 
-			const clip = subclip( new AnimationClip( 'source', - 1, [ track ] ), 'sub', 2, 4 );
+			const clip = subclip( new AnimationClip( 'source', - 1, [ track ] ), 'sub', 2, 4, 1 );
 
-			assert.numEqual( clip.tracks[ 0 ].times[ 0 ], 0, 'the first kept keyframe lands on t = 0' );
-			assert.numEqual( clip.tracks[ 0 ].times[ 1 ], 1 / 30, 'relative spacing is preserved' );
-			assert.numEqual( clip.duration, 1 / 30, 'the duration is recomputed from the trimmed tracks' );
+			assert.strictEqual( clip.tracks[ 0 ].times.length, 2, 'frames 2 and 3 are kept' );
+
+			closeTo( assert, clip.tracks[ 0 ].times[ 0 ], 0, 'the first kept keyframe lands on t = 0' );
+			closeTo( assert, clip.tracks[ 0 ].times[ 1 ], 1, 'relative spacing is preserved' );
+			closeTo( assert, clip.duration, 1, 'the duration is recomputed from the trimmed tracks' );
+
+			// Negative control: the unshifted keyframe times would be 2 and 3, so
+			// the assertions above genuinely distinguish shifted from unshifted.
+			assert.notStrictEqual( clip.tracks[ 0 ].times[ 0 ], 2, 'the result is not simply the untouched source times' );
 
 		} );
 
@@ -409,11 +435,14 @@ export default QUnit.module( 'Animation', () => {
 			makeClipAdditive( new AnimationClip( 'clip', - 1, [ track ] ) );
 
 			// Track values are stored as Float32Array, so compare component-wise
-			// with a tolerance rather than using the exact Quaternion.equals().
-			const identity = new Quaternion();
+			// rather than using the exact Quaternion.equals(). The epsilon is
+			// tight on purpose: at the 0.1 tolerance `assert.numEqual` uses, a w
+			// component within 0.1 of 1 still admits a rotation error of roughly
+			// 50 degrees, so a visibly wrong result would pass.
+			const identity = new Quaternion().toArray();
 			for ( let i = 0; i < 4; i ++ ) {
 
-				assert.numEqual( track.values[ i ], identity.toArray()[ i ], `the reference keyframe becomes the identity rotation (component ${ i })` );
+				closeTo( assert, track.values[ i ], identity[ i ], `the reference keyframe becomes the identity rotation (component ${ i })` );
 
 			}
 
@@ -421,7 +450,7 @@ export default QUnit.module( 'Animation', () => {
 			const expected = new Quaternion().setFromAxisAngle( new Vector3( 0, 1, 0 ), Math.PI / 4 ).toArray();
 			for ( let i = 0; i < 4; i ++ ) {
 
-				assert.numEqual( track.values[ 4 + i ], expected[ i ], `the later keyframe holds the rotation relative to the reference (component ${ i })` );
+				closeTo( assert, track.values[ 4 + i ], expected[ i ], `the later keyframe holds the rotation relative to the reference (component ${ i })` );
 
 			}
 
@@ -440,12 +469,21 @@ export default QUnit.module( 'Animation', () => {
 			makeClipAdditive( new AnimationClip( 'clip', - 1, [ track ] ) );
 
 			const conjugateOnTheLeft = reference.clone().conjugate().multiply( second ).toArray();
+			const theOtherOrder = second.clone().multiply( reference.clone().conjugate() ).toArray();
 
 			for ( let i = 0; i < 4; i ++ ) {
 
-				assert.numEqual( track.values[ 4 + i ], conjugateOnTheLeft[ i ], `component ${ i } matches conjugate(reference) * value` );
+				closeTo( assert, track.values[ 4 + i ], conjugateOnTheLeft[ i ], `component ${ i } matches conjugate(reference) * value` );
 
 			}
+
+			// The two orders genuinely differ for these axes, so the assertions
+			// above are actually discriminating between them rather than passing
+			// on a case where multiplication happens to commute.
+			assert.ok(
+				conjugateOnTheLeft.some( ( v, i ) => Math.abs( v - theOtherOrder[ i ] ) > 0.1 ),
+				'the two operand orders produce measurably different quaternions for these axes'
+			);
 
 		} );
 

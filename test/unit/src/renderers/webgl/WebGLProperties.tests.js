@@ -140,10 +140,28 @@ export default QUnit.module( 'Renderers', () => {
 			QUnit.test( 'remove - is a no-op for an unknown object', ( assert ) => {
 
 				const properties = new WebGLProperties();
+				const known = {};
 
-				properties.remove( {} );
+				properties.get( known ).value = 1;
 
-				assert.ok( true, 'removing an unregistered object does not throw' );
+				// Stated as an observation rather than assert.ok( true ), which
+				// passes unconditionally and records an assertion that checked
+				// nothing. Removing an unknown object must neither throw nor
+				// disturb what is already stored.
+				let threw = false;
+
+				try {
+
+					properties.remove( {} );
+
+				} catch ( error ) {
+
+					threw = true;
+
+				}
+
+				assert.strictEqual( threw, false, 'removing an unregistered object does not throw' );
+				assert.strictEqual( properties.get( known ).value, 1, 'and leaves registered objects alone' );
 
 			} );
 

@@ -26,7 +26,14 @@ function mockAudio( { frequencies = null } = {} ) {
 			createAnalyser() {
 
 				return {
-					fftSize: 2048,
+					// Deliberately not 2048. A real AnalyserNode does default to
+					// 2048, but mirroring that here would make the "defaults to an
+					// fftSize of 2048" test pass even with the assignment removed
+					// from AudioAnalyser -- the assertion would only be reading
+					// the mock's own preset back. Starting from a sentinel forces
+					// the constructor to actually do the work.
+					fftSize: 0,
+					assignedFftSizes: [],
 					get frequencyBinCount() {
 
 						return this.fftSize / 2;
@@ -66,9 +73,12 @@ export default QUnit.module( 'Audios', () => {
 
 		QUnit.test( 'Instancing - defaults to an fftSize of 2048', ( assert ) => {
 
+			// The mock starts at 0, so this only passes if the constructor
+			// actively assigns its default rather than leaving the node alone.
 			const analyser = new AudioAnalyser( mockAudio() );
 
 			assert.strictEqual( analyser.analyser.fftSize, 2048, 'the default window size is 2048 samples' );
+			assert.strictEqual( analyser.data.length, 1024, 'the data buffer is sized from the assigned default' );
 
 		} );
 

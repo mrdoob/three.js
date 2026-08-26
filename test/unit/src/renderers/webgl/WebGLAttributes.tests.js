@@ -330,8 +330,10 @@ export default QUnit.module( 'Renderers', () => {
 
 			QUnit.test( 'update - merges adjacent ranges into one write', ( assert ) => {
 
-				// Ranges that touch are worth merging too -- it saves a call
-				// without writing anything that was not requested.
+				// Ranges that touch are worth merging -- it saves a call, and in
+				// this exactly-adjacent case writes nothing that was not
+				// requested. Note the merge rule is deliberately wider than this:
+				// see the one-element-gap test below.
 				const gl = mockContext();
 				const attributes = new WebGLAttributes( gl );
 				const attribute = new Float32BufferAttribute( [ 0, 1, 2, 3, 4, 5, 6, 7 ], 1 );
@@ -347,6 +349,57 @@ export default QUnit.module( 'Renderers', () => {
 
 				assert.strictEqual( subData.length, 1, 'the adjacent ranges collapse to a single write' );
 				assert.deepEqual( subData[ 0 ].slice( 4 ), [ 0, 4 ], 'the merged range covers both' );
+
+			} );
+
+			QUnit.test( 'update - bridges a one-element gap between ranges', ( assert ) => {
+
+				// The merge condition is `range.start <= previousRange.start +
+				// previousRange.count + 1`. That trailing `+ 1` is deliberate
+				// (see the comment in WebGLAttributes.js): it bridges a gap of a
+				// single element, trading one extra element in the upload for one
+				// fewer draw call. This is the only case that `+ 1` affects, so
+				// without this test it could be deleted from the source without
+				// failing anything.
+				const gl = mockContext();
+				const attributes = new WebGLAttributes( gl );
+				const attribute = new Float32BufferAttribute( [ 0, 1, 2, 3, 4, 5, 6, 7 ], 1 );
+
+				attributes.update( attribute, gl.ARRAY_BUFFER );
+
+				// Index 2 is requested by neither range.
+				attribute.addUpdateRange( 0, 2 );
+				attribute.addUpdateRange( 3, 2 );
+				attribute.needsUpdate = true;
+				attributes.update( attribute, gl.ARRAY_BUFFER );
+
+				const subData = gl.callsOf( 'bufferSubData' );
+
+				assert.strictEqual( subData.length, 1, 'the one-element gap is bridged into a single write' );
+				assert.deepEqual( subData[ 0 ].slice( 4 ), [ 0, 5 ], 'the merged range spans the gap, covering the unrequested element' );
+
+			} );
+
+			QUnit.test( 'update - keeps ranges separated by more than one element apart', ( assert ) => {
+
+				// A gap of two falls outside the `+ 1` window, so this is the
+				// boundary on the other side of the test above.
+				const gl = mockContext();
+				const attributes = new WebGLAttributes( gl );
+				const attribute = new Float32BufferAttribute( [ 0, 1, 2, 3, 4, 5, 6, 7 ], 1 );
+
+				attributes.update( attribute, gl.ARRAY_BUFFER );
+
+				attribute.addUpdateRange( 0, 2 );
+				attribute.addUpdateRange( 4, 2 );
+				attribute.needsUpdate = true;
+				attributes.update( attribute, gl.ARRAY_BUFFER );
+
+				const subData = gl.callsOf( 'bufferSubData' );
+
+				assert.strictEqual( subData.length, 2, 'a two-element gap is not bridged' );
+				assert.deepEqual( subData[ 0 ].slice( 4 ), [ 0, 2 ], 'the first range is written on its own' );
+				assert.deepEqual( subData[ 1 ].slice( 4 ), [ 4, 2 ], 'the second range is written on its own' );
 
 			} );
 

@@ -199,14 +199,25 @@ export default QUnit.module( 'Renderers', () => {
 
 			QUnit.test( 'update - subscribes to the instanced mesh\'s dispose event exactly once', ( assert ) => {
 
-				const { objects, info } = harness();
+				const { objects, info, calls } = harness();
 				const object = new InstancedMesh( new BufferGeometry(), new MeshBasicMaterial(), 4 );
 
 				objects.update( object );
 				info.render.frame = 1;
 				objects.update( object );
 
-				assert.strictEqual( object._listeners.dispose.length, 1, 'the listener is not added twice' );
+				// Asserted behaviourally rather than by reading the private
+				// _listeners array: a listener subscribed twice would run the
+				// dispose handler twice for a single event, releasing the object
+				// and removing its instance matrix twice over.
+				object.dispatchEvent( { type: 'dispose' } );
+
+				assert.strictEqual( calls.released.length, 1, 'one dispose event releases the object exactly once' );
+				assert.strictEqual(
+					calls.attributesRemove.filter( a => a === object.instanceMatrix ).length,
+					1,
+					'the instance matrix is removed exactly once'
+				);
 
 			} );
 

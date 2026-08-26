@@ -26,6 +26,22 @@ function mockContext() {
 
 			calls.push( [ 'compileShader', shader ] );
 
+		},
+		// Recorded rather than omitted on purpose: the "does not check the
+		// compile status" test asserts these are never called, and an assertion
+		// about a method the mock does not define could never fail -- calling it
+		// would throw a TypeError instead of showing up in `calls`.
+		getShaderParameter( shader, pname ) {
+
+			calls.push( [ 'getShaderParameter', shader, pname ] );
+			return true;
+
+		},
+		getShaderInfoLog( shader ) {
+
+			calls.push( [ 'getShaderInfoLog', shader ] );
+			return '';
+
 		}
 	};
 
@@ -78,14 +94,22 @@ export default QUnit.module( 'Renderers', () => {
 			QUnit.test( 'does not check the compile status', ( assert ) => {
 
 				// Compile errors are surfaced later by WebGLProgram, so this
-				// function must not query or throw on them itself.
+				// function must not query or throw on them itself. The mock
+				// records getShaderParameter/getShaderInfoLog, so if that ever
+				// changed the calls would appear here and fail the assertion.
 				const gl = mockContext();
 
 				WebGLShader( gl, gl.VERTEX_SHADER, 'this is not valid glsl' );
 
-				assert.ok(
-					gl.calls.every( c => c[ 0 ] !== 'getShaderParameter' ),
-					'getShaderParameter is never called'
+				const statusQueries = gl.calls.filter(
+					c => c[ 0 ] === 'getShaderParameter' || c[ 0 ] === 'getShaderInfoLog'
+				);
+
+				assert.deepEqual( statusQueries, [], 'the compile status is never queried' );
+				assert.deepEqual(
+					gl.calls.map( c => c[ 0 ] ),
+					[ 'createShader', 'shaderSource', 'compileShader' ],
+					'only the create, source and compile calls are made'
 				);
 
 			} );

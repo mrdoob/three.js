@@ -81,7 +81,7 @@ export default QUnit.module( 'Renderers', () => {
 
 			QUnit.test( 'get - only registers a geometry once', ( assert ) => {
 
-				const { geometries, info } = harness();
+				const { geometries, info, calls } = harness();
 				const geometry = triangle();
 
 				geometries.get( {}, geometry );
@@ -89,7 +89,15 @@ export default QUnit.module( 'Renderers', () => {
 				geometries.get( {}, geometry );
 
 				assert.strictEqual( info.memory.geometries, 1, 'repeated calls do not inflate the count' );
-				assert.strictEqual( geometry._listeners.dispose.length, 1, 'the dispose listener is only added once' );
+
+				// Asserted behaviourally rather than by reading the private
+				// _listeners array: if the dispose listener had been added once
+				// per get(), a single dispose event would run the handler three
+				// times, releasing three times and driving the count negative.
+				geometry.dispatchEvent( { type: 'dispose' } );
+
+				assert.strictEqual( calls.released.length, 1, 'one dispose event releases binding states exactly once' );
+				assert.strictEqual( info.memory.geometries, 0, 'the count returns to zero rather than going negative' );
 
 			} );
 
