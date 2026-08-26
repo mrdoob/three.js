@@ -675,6 +675,7 @@ class Viewer extends Tab {
 				const onPointerDown = ( e ) => {
 
 					isDragging = true;
+					line.classList.add( 'active' );
 					e.preventDefault();
 
 				};
@@ -700,6 +701,7 @@ class Viewer extends Tab {
 				const onPointerUp = () => {
 
 					isDragging = false;
+					line.classList.remove( 'active' );
 
 				};
 
