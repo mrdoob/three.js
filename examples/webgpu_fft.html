@@ -8,19 +8,6 @@
 		<meta property="og:url" content="https://threejs.org/examples/webgpu_fft.html">
 		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_fft.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
-		<style>
-			.quad-label {
-				position: absolute;
-				top: 0;
-				left: 0;
-				transform: translate( -50%, 0 );
-				font-family: monospace;
-				font-size: 13px;
-				color: #ccc;
-				white-space: nowrap;
-				pointer-events: none;
-			}
-		</style>
 	</head>
 	<body>
 
@@ -37,10 +24,6 @@
 			</small>
 		</div>
 
-		<div id="labelOriginal" class="quad-label">Original Image</div>
-		<div id="labelSpectrum" class="quad-label">Frequency Space</div>
-		<div id="labelReconstructed" class="quad-label">Reconstructed Image</div>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -55,7 +38,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { texture } from 'three/tsl';
+			import { texture, Fn, instanceIndex, uint, uvec2, vec4, storageTexture, textureStore, NodeAccess } from 'three/tsl';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -79,12 +62,15 @@
 			let camera, scene, renderer, controls;
 			let quadOriginal, quadSpectrum, quadReconstructed;
 
-			let fft = null;
+			// One FFT2D instance per color channel -- see FFT2D's own class-level comment on why
+			// full-color support is 3 single-channel instances run in lockstep plus a small custom
+			// combine kernel, rather than a dedicated multi-channel API.
+			let ffts = null;
 			let loadedTexture = null;
 			let textureNode = null;
 			let spectrumTexture = null;
 			let reconstructedTexture = null;
-			let originalLuminance = null; // CPU copy, for the reconstruction-error readout only.
+			let originalChannels = null; // CPU copy ({r, g, b} Float32Arrays), for the round-trip-error console log only.
 
 			// Bumped on every `loadPreset` call and captured by each in-flight one -- lets a call
 			// that's superseded by a newer image selection (e.g. rapid dropdown changes) recognize
@@ -92,11 +78,8 @@
 			// state or GUI/label text.
 			let generation = 0;
 
-			const labelEls = {
-				original: document.getElementById( 'labelOriginal' ),
-				spectrum: document.getElementById( 'labelSpectrum' ),
-				reconstructed: document.getElementById( 'labelReconstructed' )
-			};
+			let labelOriginal, labelSpectrum, labelReconstructed;
+
 			const textureLoader = new THREE.TextureLoader();
 
 			const params = { image: PRESETS[ 0 ].name };
@@ -128,7 +111,16 @@
 				quadSpectrum = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicMaterial() );
 				quadReconstructed = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicMaterial() );
 
-				scene.add( quadOriginal, quadSpectrum, quadReconstructed );
+				// Real 3D objects (a canvas-texture quad each), not an HTML/CSS overlay -- they live
+				// in the same scene as the image quads, so panning/zooming the camera moves and
+				// scales them exactly like the images, with no per-frame screen-space projection
+				// bookkeeping needed. Built once here (their text never changes); only their
+				// position/scale is updated per preset, in `layoutQuads`.
+				labelOriginal = createLabelMesh( 'Original Image' );
+				labelSpectrum = createLabelMesh( 'Frequency Space' );
+				labelReconstructed = createLabelMesh( 'Reconstructed Image' );
+
+				scene.add( quadOriginal, quadSpectrum, quadReconstructed, labelOriginal, labelSpectrum, labelReconstructed );
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -181,7 +173,7 @@
 				// while a later load of the same URL hits the browser's already-fully-decoded image
 				// cache and looks correct. `decode()` is the standard way to await full decode
 				// before the image is used for anything (GPU upload here, and the canvas draw in
-				// `computeLuminanceCPU` below).
+				// `computeChannelsCPU` below).
 				await newTexture.image.decode();
 
 				if ( myGeneration !== generation ) { newTexture.dispose(); return; } // superseded
@@ -208,7 +200,7 @@
 				// Tear down the previous preset's GPU resources before building new ones sized for
 				// this image.
 
-				fft?.dispose();
+				if ( ffts ) { ffts.r.dispose(); ffts.g.dispose(); ffts.b.dispose(); }
 				loadedTexture?.dispose();
 				spectrumTexture?.dispose();
 				reconstructedTexture?.dispose();
@@ -216,7 +208,7 @@
 				loadedTexture = newTexture;
 				textureNode = texture( loadedTexture );
 
-				fft = new FFT2D( width, height );
+				ffts = { r: new FFT2D( width, height ), g: new FFT2D( width, height ), b: new FFT2D( width, height ) };
 
 				spectrumTexture = new THREE.StorageTexture( width, height );
 				reconstructedTexture = new THREE.StorageTexture( width, height );
@@ -241,61 +233,157 @@
 
 				layoutQuads( width, height );
 
-				fft.packTexture( renderer, textureNode );
+				ffts.r.packTexture( renderer, textureNode, 'r' );
+				ffts.g.packTexture( renderer, textureNode, 'g' );
+				ffts.b.packTexture( renderer, textureNode, 'b' );
 
-				// CPU-side luminance copy of the source image, used only to compute the
-				// reconstruction-error readout after an inverse FFT -- not part of the GPU pipeline.
-				originalLuminance = computeLuminanceCPU( newTexture.image, width, height );
+				// CPU-side per-channel copy of the source image, used only to compute the
+				// round-trip-error console log after an inverse FFT -- not part of the GPU pipeline.
+				originalChannels = computeChannelsCPU( newTexture.image, width, height );
 
 				render();
 
 				// The rest of the pipeline (forward FFT -> spectrum, inverse FFT -> reconstruction)
 				// runs automatically -- there's no user-facing step between loading an image and
 				// seeing all 3 quads, so it's just a straight-line continuation of this function
-				// rather than separate button-triggered handlers.
+				// rather than separate button-triggered handlers. `ffts.r/g/b` are always run in
+				// lockstep (same calls, same order) so they stay on the same ping-pong buffer at
+				// every point -- `combineSpectrum`/`combineReconstructed` below rely on that to only
+				// need 2 kernel variants (all-A / all-B) instead of 8.
 
-				fft.computeForward( renderer );
+				ffts.r.computeForward( renderer );
+				ffts.g.computeForward( renderer );
+				ffts.b.computeForward( renderer );
 
-				// Auto-normalize the spectrum's log scale to use the full [0, 1] grayscale range
-				// with no manual tuning: for a non-negative-real input (this image's luminance,
-				// always >= 0), the DC bin (read back here) is *guaranteed* -- by the triangle
-				// inequality applied to the DFT sum -- to have the largest magnitude of any bin, so
-				// normalizing against it always saturates to exactly 1 at the DC peak and never
-				// clips anywhere else. See `FFT2D#unpackSpectrum`'s own comment for the full
-				// argument.
-				const dc = await fft.readBin( renderer, 0 );
+				// Auto-normalize each channel's spectrum log scale to use the full [0, 1] range with
+				// no manual tuning: for a non-negative-real input (a raw color channel, always >= 0),
+				// the DC bin (read back here) is *guaranteed* -- by the triangle inequality applied
+				// to the DFT sum -- to have the largest magnitude of any bin in that channel. See
+				// `FFT2D#unpackSpectrum`'s own comment for the full argument.
+				const [ dcR, dcG, dcB ] = await Promise.all( [ ffts.r.readBin( renderer, 0 ), ffts.g.readBin( renderer, 0 ), ffts.b.readBin( renderer, 0 ) ] );
 
 				if ( myGeneration !== generation ) return; // superseded mid-readback
 
-				const maxMagnitude = Math.hypot( dc.real, dc.imag );
+				const maxMagnitude = {
+					r: Math.hypot( dcR.real, dcR.imag ),
+					g: Math.hypot( dcG.real, dcG.imag ),
+					b: Math.hypot( dcB.real, dcB.imag )
+				};
 
-				fft.unpackSpectrum( renderer, spectrumTexture, maxMagnitude );
+				combineSpectrum( ffts, spectrumTexture, maxMagnitude );
 
 				render();
 
-				fft.computeInverse( renderer );
-				fft.unpackImage( renderer, reconstructedTexture );
+				ffts.r.computeInverse( renderer );
+				ffts.g.computeInverse( renderer );
+				ffts.b.computeInverse( renderer );
 
-				const data = await fft.readData( renderer );
+				combineReconstructed( ffts, reconstructedTexture );
+
+				const [ dataR, dataG, dataB ] = await Promise.all( [ ffts.r.readData( renderer ), ffts.g.readData( renderer ), ffts.b.readData( renderer ) ] );
 
 				if ( myGeneration !== generation ) return; // superseded mid-readback
 
 				let maxDiff = 0;
 				let sumSq = 0;
+				let n = 0;
 
-				for ( let i = 0; i < fft.count; i ++ ) {
+				for ( const [ data, original ] of [ [ dataR, originalChannels.r ], [ dataG, originalChannels.g ], [ dataB, originalChannels.b ] ] ) {
 
-					const diff = data[ i * 2 ] - originalLuminance[ i ];
-					maxDiff = Math.max( maxDiff, Math.abs( diff ) );
-					sumSq += diff * diff;
+					for ( let i = 0; i < ffts.r.count; i ++ ) {
+
+						const diff = data[ i * 2 ] - original[ i ];
+						maxDiff = Math.max( maxDiff, Math.abs( diff ) );
+						sumSq += diff * diff;
+						n ++;
+
+					}
 
 				}
 
-				const rms = Math.sqrt( sumSq / fft.count );
+				const rms = Math.sqrt( sumSq / n );
 
-				console.log( `webgpu_fft: "${ preset.name }" round-trip error vs. original luminance -- max |diff|: ${ maxDiff.toExponential( 3 ) }, RMS: ${ rms.toExponential( 3 ) }.` );
+				console.log( `webgpu_fft: "${ preset.name }" round-trip error vs. original color -- max |diff|: ${ maxDiff.toExponential( 3 ) }, RMS: ${ rms.toExponential( 3 ) }.` );
 
 				render();
+
+			}
+
+			// `ffts.r/g/b` always share the same `current` buffer (see the lockstep comment above),
+			// so each combine kernel only needs 2 variants -- reading all 3 channels' A buffers, or
+			// all 3 B buffers -- selected once per call via `ffts.r.current`.
+			function runCombine( kernels, ffts, renderer ) {
+
+				renderer.compute( ffts.r.current === 'A' ? kernels.allA : kernels.allB );
+
+			}
+
+			// Combines the 3 channels' current (spatial-domain) buffers into one RGBA texture, no
+			// shift or scaling needed -- this is meant to be called right after `computeInverse`.
+			function combineReconstructed( ffts, target ) {
+
+				const { width, count } = ffts.r;
+
+				const writeTex = storageTexture( target ).setAccess( NodeAccess.WRITE_ONLY );
+
+				const build = ( r, g, b ) => Fn( () => {
+
+					const x = instanceIndex.mod( uint( width ) );
+					const y = instanceIndex.div( uint( width ) );
+
+					const value = vec4(
+						r.element( instanceIndex ).x.clamp( 0, 1 ),
+						g.element( instanceIndex ).x.clamp( 0, 1 ),
+						b.element( instanceIndex ).x.clamp( 0, 1 ),
+						1
+					);
+
+					textureStore( writeTex, uvec2( x, y ), value );
+
+				} )().compute( count );
+
+				runCombine( { allA: build( ffts.r.readA, ffts.g.readA, ffts.b.readA ), allB: build( ffts.r.readB, ffts.g.readB, ffts.b.readB ) }, ffts, renderer );
+
+			}
+
+			// Combines the 3 channels' current (frequency-domain) buffers into one color-coded
+			// log-magnitude spectrum -- each channel shows its own quadrant-shifted, independently
+			// auto-normalized log-magnitude in its own color channel. This is meant to be called
+			// right after `computeForward`; see `FFT2D#unpackSpectrum` for the single-channel
+			// equivalent this mirrors (shift math included).
+			function combineSpectrum( ffts, target, maxMagnitude ) {
+
+				const { width, height, count } = ffts.r;
+				const halfW = width >> 1;
+				const halfH = height >> 1;
+
+				const normR = Math.log( 1 + maxMagnitude.r );
+				const normG = Math.log( 1 + maxMagnitude.g );
+				const normB = Math.log( 1 + maxMagnitude.b );
+
+				const writeTex = storageTexture( target ).setAccess( NodeAccess.WRITE_ONLY );
+
+				const build = ( r, g, b ) => Fn( () => {
+
+					const x = instanceIndex.mod( uint( width ) );
+					const y = instanceIndex.div( uint( width ) );
+
+					const sx = x.add( uint( halfW ) ).mod( uint( width ) );
+					const sy = y.add( uint( halfH ) ).mod( uint( height ) );
+					const srcIndex = sy.mul( uint( width ) ).add( sx );
+
+					const value = vec4(
+						r.element( srcIndex ).toVar().length().add( 1 ).log().div( normR ).clamp( 0, 1 ),
+						g.element( srcIndex ).toVar().length().add( 1 ).log().div( normG ).clamp( 0, 1 ),
+						b.element( srcIndex ).toVar().length().add( 1 ).log().div( normB ).clamp( 0, 1 ),
+						1
+					);
+
+					textureStore( writeTex, uvec2( x, y ), value );
+
+				} )().compute( count );
+
+				runCombine( { allA: build( ffts.r.readA, ffts.g.readA, ffts.b.readA ), allB: build( ffts.r.readB, ffts.g.readB, ffts.b.readB ) }, ffts, renderer );
 
 			}
 
@@ -306,7 +394,7 @@
 
 			}
 
-			function computeLuminanceCPU( image, width, height ) {
+			function computeChannelsCPU( image, width, height ) {
 
 				const canvas = document.createElement( 'canvas' );
 				canvas.width = width;
@@ -316,20 +404,20 @@
 				ctx.drawImage( image, 0, 0, width, height );
 
 				const { data } = ctx.getImageData( 0, 0, width, height );
-				const coeffs = THREE.ColorManagement.getLuminanceCoefficients( new THREE.Vector3() );
-				const luminance = new Float32Array( width * height );
+				const count = width * height;
+				const r = new Float32Array( count );
+				const g = new Float32Array( count );
+				const b = new Float32Array( count );
 
-				for ( let i = 0; i < luminance.length; i ++ ) {
+				for ( let i = 0; i < count; i ++ ) {
 
-					const r = data[ i * 4 ] / 255;
-					const g = data[ i * 4 + 1 ] / 255;
-					const b = data[ i * 4 + 2 ] / 255;
-
-					luminance[ i ] = r * coeffs.x + g * coeffs.y + b * coeffs.z;
+					r[ i ] = data[ i * 4 ] / 255;
+					g[ i ] = data[ i * 4 + 1 ] / 255;
+					b[ i ] = data[ i * 4 + 2 ] / 255;
 
 				}
 
-				return luminance;
+				return { r, g, b };
 
 			}
 
@@ -353,12 +441,58 @@
 
 				}
 
+				// Labels scale with the quads (a "real" part of the 3D layout, per-preset aspect
+				// ratio included) and sit just under each one; being ordinary scene objects, panning
+				// and zooming the camera moves/scales them along with everything else, with no
+				// separate screen-space bookkeeping needed (contrast the HTML-overlay approach this
+				// replaced, which needed a manual world-to-screen projection kept in sync by hand).
+				const labelHeight = quadHeight * 0.09;
+				const labelGap = quadHeight * 0.04;
+
+				for ( const [ label, x ] of [ [ labelOriginal, - spacing ], [ labelSpectrum, 0 ], [ labelReconstructed, spacing ] ] ) {
+
+					const labelWidth = labelHeight * label.userData.aspect;
+					label.scale.set( labelWidth, labelHeight, 1 );
+					label.position.set( x, - quadHeight / 2 - labelGap - labelHeight / 2, 0 );
+
+				}
+
 				const margin = 1.2;
 				contentWidth = ( spacing * 2 + quadWidth ) * margin;
-				contentHeight = quadHeight * margin;
+				contentHeight = ( quadHeight + labelGap * 2 + labelHeight * 2 ) * margin;
 
 				controls.target.set( 0, 0, 0 );
 				fitCamera();
+
+			}
+
+			// A canvas-texture quad with the given text -- a "real" 3D label (a scene object, not an
+			// HTML/CSS overlay) so it participates in the same camera transform as everything else.
+			// `userData.aspect` (canvas width / height) is used by `layoutQuads` to size it without
+			// distortion; the mesh's own geometry is a unit (1x1) quad, scaled per-preset instead of
+			// rebuilt, since the text itself never changes.
+			function createLabelMesh( text ) {
+
+				const scale = 4; // supersampled for crisp text at any zoom level
+				const canvas = document.createElement( 'canvas' );
+				canvas.width = 512 * scale;
+				canvas.height = 96 * scale;
+
+				const ctx = canvas.getContext( '2d' );
+				ctx.font = `${ 32 * scale }px monospace`;
+				ctx.fillStyle = '#cccccc';
+				ctx.textAlign = 'center';
+				ctx.textBaseline = 'middle';
+				ctx.fillText( text, canvas.width / 2, canvas.height / 2 );
+
+				const map = new THREE.CanvasTexture( canvas );
+				map.colorSpace = THREE.SRGBColorSpace;
+
+				const material = new THREE.MeshBasicMaterial( { map, transparent: true, depthWrite: false } );
+				const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
+				mesh.userData.aspect = canvas.width / canvas.height;
+
+				return mesh;
 
 			}
 
@@ -388,29 +522,6 @@
 				camera.top = viewHeight / 2;
 				camera.bottom = - viewHeight / 2;
 				camera.updateProjectionMatrix();
-
-				updateLabels();
-
-			}
-
-			const labelProjectionPoint = new THREE.Vector3();
-
-			// Positions the 3 HTML labels just under their quad by projecting a world-space point
-			// (just below the quad's bottom edge) through the camera -- simpler and correct at any
-			// window size/aspect than trying to derive fixed CSS percentages from the quad layout.
-			function updateLabels() {
-
-				const quadHeight = quadOriginal.scale.y;
-				const dropBelow = quadHeight * 0.08;
-
-				for ( const [ label, quad ] of [ [ labelEls.original, quadOriginal ], [ labelEls.spectrum, quadSpectrum ], [ labelEls.reconstructed, quadReconstructed ] ] ) {
-
-					labelProjectionPoint.set( quad.position.x, - quadHeight / 2 - dropBelow, 0 ).project( camera );
-
-					label.style.left = `${ ( labelProjectionPoint.x * 0.5 + 0.5 ) * window.innerWidth }px`;
-					label.style.top = `${ ( 1 - ( labelProjectionPoint.y * 0.5 + 0.5 ) ) * window.innerHeight }px`;
-
-				}
 
 			}
 

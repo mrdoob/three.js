@@ -103,6 +103,14 @@ function buildButterflyStage( { N, lineStride, elementStride, lineCount, pUnifor
  * conjugation identity `ifft(x) = conj( fft( conj(x) ) ) / (width*height)`, rather than shipping a
  * second set of shaders with negated twiddle factors.
  *
+ * Each `FFT2D` instance transforms a single scalar channel (see `packTexture`'s `channel` option:
+ * a combined luminance value, or one raw color channel). To FFT/reconstruct a full-color image,
+ * run 3 instances in lockstep -- one per color channel -- and combine their outputs yourself with
+ * a small custom compute pass reading each instance's `readA`/`readB`/`current` (see
+ * `examples/webgpu_fft.html` for a worked example); there's no dedicated multi-channel API here,
+ * since combining 3 single-channel results into one RGBA output is a one-line `vec4(...)` away and
+ * doesn't need its own abstraction.
+ *
  * ```js
  * const fft = new FFT2D( 64, 64 );
  * fft.setData( renderer, realValues ); // Float32Array, length 64*64
@@ -299,22 +307,24 @@ class FFT2D {
 	}
 
 	/**
-	 * Writes a loaded image's luminance into whichever buffer currently holds the live data (with
-	 * a zero imaginary part), entirely on the GPU -- no CPU readback of the image is involved. The
-	 * texture is sampled with an exact (unfiltered) texel fetch, so it must be exactly `width` by
-	 * `height` in size.
+	 * Writes one scalar channel of a loaded image into whichever buffer currently holds the live
+	 * data (with a zero imaginary part), entirely on the GPU -- no CPU readback of the image is
+	 * involved. The texture is sampled with an exact (unfiltered) texel fetch, so it must be
+	 * exactly `width` by `height` in size.
 	 *
-	 * The compute kernels are built once per distinct `textureNode` and cached, so calling this
-	 * repeatedly with the same node (e.g. once per frame) is cheap.
+	 * The compute kernels are built once per distinct `(textureNode, channel)` pair and cached, so
+	 * calling this repeatedly with the same arguments (e.g. once per frame) is cheap.
 	 *
 	 * @param {Renderer} renderer
 	 * @param {TextureNode} textureNode - A `texture( someLoadedTexture )` TSL node.
+	 * @param {'luminance'|'r'|'g'|'b'} [channel='luminance'] - Which scalar to extract per texel. `'luminance'` combines all 3 color channels; `'r'`/`'g'`/`'b'` extract a single color channel, e.g. for running one `FFT2D` instance per channel to reconstruct in full color (see the class-level comment above).
 	 */
-	packTexture( renderer, textureNode ) {
+	packTexture( renderer, textureNode, channel = 'luminance' ) {
 
-		if ( this._packSource !== textureNode ) {
+		if ( this._packSource !== textureNode || this._packChannel !== channel ) {
 
 			this._packSource = textureNode;
+			this._packChannel = channel;
 
 			const width = this.width;
 
@@ -324,7 +334,7 @@ class FFT2D {
 				const y = instanceIndex.div( uint( width ) );
 
 				const texel = textureNode.load( ivec2( int( x ), int( y ) ) );
-				const value = luminance( texel.rgb );
+				const value = channel === 'luminance' ? luminance( texel.rgb ) : texel[ channel ];
 
 				writeNode.element( instanceIndex ).assign( vec2( value, 0 ) );
 
