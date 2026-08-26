@@ -17,17 +17,17 @@ import {
 	If,
 	atan,
 	cameraProjectionMatrix,
+	cameraViewport,
 	cos,
 	dot,
 	exp,
 	float,
-	highpModelViewMatrix,
 	instanceIndex,
 	max,
+	mediumpModelViewMatrix,
 	min,
 	normalize,
 	positionGeometry,
-	screenSize,
 	sin,
 	sqrt,
 	storage,
@@ -726,11 +726,11 @@ function createMaterialNodes( buffers, sort, localCameraPosition ) {
 
 		splatUv.assign( positionGeometry.xy );
 
-		const viewCenter4 = highpModelViewMatrix.mul( vec4( center, 1 ) ).toVar( 'viewCenter4' );
+		const viewCenter4 = mediumpModelViewMatrix.mul( vec4( center, 1 ) ).toVar( 'viewCenter4' );
 		const viewCenter = viewCenter4.xyz.toVar( 'viewCenter' );
 		const centerClip = cameraProjectionMatrix.mul( viewCenter4 ).toVar( 'centerClip' );
 
-		const m = highpModelViewMatrix;
+		const m = mediumpModelViewMatrix;
 		const r0 = vec3( m[ 0 ].x, m[ 1 ].x, m[ 2 ].x ).toVar( 'r0' );
 		const r1 = vec3( m[ 0 ].y, m[ 1 ].y, m[ 2 ].y ).toVar( 'r1' );
 		const r2 = vec3( m[ 0 ].z, m[ 1 ].z, m[ 2 ].z ).toVar( 'r2' );
@@ -753,7 +753,7 @@ function createMaterialNodes( buffers, sort, localCameraPosition ) {
 		const z = min( viewCenter.z, - 0.01 ).toVar( 'z' );
 		const invZ = float( 1 ).div( z ).toVar( 'invZ' );
 		const invZ2 = invZ.mul( invZ ).toVar( 'invZ2' );
-		const focal = screenSize.mul( 0.5 ).mul( vec2( cameraProjectionMatrix[ 0 ].x, cameraProjectionMatrix[ 1 ].y ) ).toVar( 'focal' );
+		const focal = cameraViewport.zw.mul( 0.5 ).mul( vec2( cameraProjectionMatrix[ 0 ].x, cameraProjectionMatrix[ 1 ].y ) ).toVar( 'focal' );
 
 		const j00 = focal.x.negate().mul( invZ ).toVar( 'j00' );
 		const j11 = focal.y.negate().mul( invZ ).toVar( 'j11' );
@@ -799,7 +799,7 @@ function createMaterialNodes( buffers, sort, localCameraPosition ) {
 		const scale1 = min( sqrt( lambda1 ), MAX_SCREEN_SPACE_SPLAT_SIZE ).toVar( 'scale1' );
 		const scale2 = min( sqrt( lambda2 ), MAX_SCREEN_SPACE_SPLAT_SIZE ).toVar( 'scale2' );
 		const offsetPixels = axis1.mul( positionGeometry.x ).mul( scale1 ).add( axis2.mul( positionGeometry.y ).mul( scale2 ) ).toVar( 'offsetPixels' );
-		const offsetNdc = offsetPixels.mul( 2 ).div( screenSize ).toVar( 'offsetNdc' );
+		const offsetNdc = offsetPixels.mul( 2 ).div( cameraViewport.zw ).toVar( 'offsetNdc' );
 		const clip = centerClip.add( vec4( offsetNdc.mul( centerClip.w ), 0, 0 ) ).toVar( 'clip' );
 
 		const clipLimit = centerClip.w.mul( CLIP_XY ).toVar( 'clipLimit' );
