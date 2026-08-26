@@ -3,8 +3,12 @@ import { Fn, nodeImmutable } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
 
 import { Matrix4 } from '../../math/Matrix4.js';
-import { cameraViewMatrix } from './Camera.js';
+import { builtin } from './BuiltinNode.js';
+import { cameraIndex, cameraViewMatrix } from './Camera.js';
+import { uniformArray } from './UniformArrayNode.js';
 import { Matrix3 } from '../../math/Matrix3.js';
+
+const _modelViewMatrix = /*@__PURE__*/ new Matrix4();
 
 /**
  * This type of node is a specialized version of `Object3DNode`
@@ -150,11 +154,45 @@ export const highpModelViewMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	builder.context.isHighPrecisionModelViewMatrix = true;
 
-	return uniform( 'mat4' ).onObjectUpdate( ( { object, camera } ) => {
+	const camera = builder.camera;
 
-		return object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+	let highpModelViewMatrix;
 
-	} );
+	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
+
+		const matrices = [];
+
+		for ( let i = 0; i < camera.cameras.length; i ++ ) {
+
+			matrices.push( new Matrix4() );
+
+		}
+
+		const modelViewMatrices = uniformArray( matrices ).onObjectUpdate( ( { object, camera } ) => {
+
+			const cameras = camera.cameras;
+
+			for ( let i = 0; i < matrices.length; i ++ ) {
+
+				matrices[ i ].multiplyMatrices( cameras[ i ].matrixWorldInverse, object.matrixWorld );
+
+			}
+
+		} );
+
+		highpModelViewMatrix = modelViewMatrices.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
+
+	} else {
+
+		highpModelViewMatrix = uniform( 'mat4' ).onObjectUpdate( ( { object, camera } ) => {
+
+			return object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+
+		} );
+
+	}
+
+	return highpModelViewMatrix;
 
 } ).once() )().toVar( 'highpModelViewMatrix' );
 
@@ -169,16 +207,52 @@ export const highpModelNormalViewMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	const isHighPrecisionModelViewMatrix = builder.context.isHighPrecisionModelViewMatrix;
 
-	return uniform( 'mat3' ).onObjectUpdate( ( { object, camera } ) => {
+	const camera = builder.camera;
 
-		if ( isHighPrecisionModelViewMatrix !== true ) {
+	let highpModelNormalViewMatrix;
 
-			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
+
+		const matrices = [];
+
+		for ( let i = 0; i < camera.cameras.length; i ++ ) {
+
+			matrices.push( new Matrix3() );
 
 		}
 
-		return object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
+		const normalViewMatrices = uniformArray( matrices ).onObjectUpdate( ( { object, camera } ) => {
 
-	} );
+			const cameras = camera.cameras;
+
+			for ( let i = 0; i < matrices.length; i ++ ) {
+
+				_modelViewMatrix.multiplyMatrices( cameras[ i ].matrixWorldInverse, object.matrixWorld );
+
+				matrices[ i ].getNormalMatrix( _modelViewMatrix );
+
+			}
+
+		} );
+
+		highpModelNormalViewMatrix = normalViewMatrices.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
+
+	} else {
+
+		highpModelNormalViewMatrix = uniform( 'mat3' ).onObjectUpdate( ( { object, camera } ) => {
+
+			if ( isHighPrecisionModelViewMatrix !== true ) {
+
+				object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+
+			}
+
+			return object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
+
+		} );
+
+	}
+
+	return highpModelNormalViewMatrix;
 
 } ).once() )().toVar( 'highpModelNormalViewMatrix' );
