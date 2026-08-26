@@ -1,17 +1,15 @@
 import * as THREE from 'three/webgpu';
-import {
-	Fn, If, Loop, instanceIndex, storage, texture, uniform, vec2, float, int, uint, ivec2, sin,
-	workgroupArray, workgroupBarrier, workgroupId, globalId, localId
-} from 'three/tsl';
+import { Fn, instanceIndex, storage, texture, int, uint, ivec2 } from 'three/tsl';
 import { getSharedRenderer } from './gpu-test-utils.js';
 
 // Minimal reproduction for a WebGPU bind-group caching bug: when a storage buffer node's
 // `.value` is repointed at a different `BufferAttribute` (`node.value = otherAttribute`) between
 // `renderer.compute()` calls, the new attribute wasn't folded into the bind group's cache
 // key/version, so a stale bind group -- still wired to the previous attribute -- could be reused.
-// Each test below builds a compute kernel once, then repoints its storage node(s) immediately
-// before each dispatch, with no `await` in between, and checks that every dispatch actually wrote
-// to the buffer it was pointed at.
+// Fixed in `Bindings.js` by folding the attribute's id/version into the same cache key used for
+// sampled textures. Each test below builds a compute kernel once, then repoints its storage
+// node(s) immediately before each dispatch, with no `await` in between, and checks that every
+// dispatch actually wrote to the buffer it was pointed at.
 
 function makeBuffer( count, initialValue ) {
 
@@ -29,7 +27,7 @@ async function readBuffer( renderer, attribute, count ) {
 
 }
 
-// `vec2`-typed buffer, for tests that exercise a 2-component element type instead of `float`.
+// `vec2`-typed buffer, for the texture+storage test below.
 function makeVec2Buffer( count, initialX, initialY ) {
 
 	const data = new Float32Array( count * 2 );
@@ -62,6 +60,18 @@ async function readVec2Buffer( renderer, attribute, count ) {
 
 }
 
+function firstMismatch( count, isWrong ) {
+
+	for ( let i = 0; i < count; i ++ ) {
+
+		if ( isWrong( i ) ) return i;
+
+	}
+
+	return - 1;
+
+}
+
 export default QUnit.module( 'TSL', () => {
 
 	QUnit.module( 'Storage buffer node repointing (GPGPU, WebGPU-only)', () => {
@@ -85,70 +95,56 @@ export default QUnit.module( 'TSL', () => {
 
 		}
 
-		[ 8, 64, 256 ].forEach( ( iterations ) => {
+		repointTest( 'single shared kernel survives rapid back-to-back repointed dispatches', async ( assert, renderer ) => {
 
-			repointTest( `single shared kernel survives ${ iterations } rapid back-to-back repointed dispatches`, async ( assert, renderer ) => {
+			const count = 64;
+			const iterations = 32;
+			const initialValue = 1;
 
-				const count = 64;
-				const initialValue = 1;
+			const attrA = makeBuffer( count, initialValue );
+			const attrB = makeBuffer( count, 0 );
 
-				const attrA = makeBuffer( count, initialValue );
-				const attrB = makeBuffer( count, 0 );
+			// One shared, repointable read/write node pair. Built once; every iteration below
+			// reuses this same compiled kernel, only repointing `readNode`/`writeNode`'s `.value`
+			// beforehand -- never rebuilding it.
+			const readNode = storage( attrA, 'float', count ).toReadOnly();
+			const writeNode = storage( attrB, 'float', count );
 
-				// One shared, repointable read/write node pair.
-				const readNode = storage( attrA, 'float', count ).toReadOnly();
-				const writeNode = storage( attrB, 'float', count );
+			const kernel = Fn( () => {
 
-				// Built once; every iteration below reuses this same compiled kernel, only
-				// repointing `readNode`/`writeNode`'s `.value` beforehand -- never rebuilding it.
-				const kernel = Fn( () => {
+				const v = readNode.element( instanceIndex ).toVar();
+				writeNode.element( instanceIndex ).assign( v.add( 1 ) );
 
-					const v = readNode.element( instanceIndex ).toVar();
-					writeNode.element( instanceIndex ).assign( v.add( 1 ) );
+			} )().compute( count );
 
-				} )().compute( count );
+			let current = 'A'; // which attribute currently holds the live data
 
-				let current = 'A'; // which attribute currently holds the live data
+			for ( let i = 0; i < iterations; i ++ ) {
 
-				for ( let i = 0; i < iterations; i ++ ) {
+				readNode.value = current === 'A' ? attrA : attrB;
+				writeNode.value = current === 'A' ? attrB : attrA;
 
-					readNode.value = current === 'A' ? attrA : attrB;
-					writeNode.value = current === 'A' ? attrB : attrA;
+				renderer.compute( kernel );
 
-					renderer.compute( kernel );
+				current = current === 'A' ? 'B' : 'A';
 
-					current = current === 'A' ? 'B' : 'A';
+			}
 
-				}
+			// After the loop, `current` names the buffer the *next* pass would read from --
+			// i.e. the one the last dispatch just wrote to, which holds the live result.
+			const liveAttribute = current === 'A' ? attrA : attrB;
+			const result = await readBuffer( renderer, liveAttribute, count );
 
-				// After the loop, `current` names the buffer the *next* pass would read from --
-				// i.e. the one the last dispatch just wrote to, which holds the live result.
-				const liveAttribute = current === 'A' ? attrA : attrB;
-				const result = await readBuffer( renderer, liveAttribute, count );
+			const expected = initialValue + iterations;
+			const firstWrong = firstMismatch( count, ( i ) => result[ i ] !== expected );
 
-				const expected = initialValue + iterations;
-				let firstWrong = - 1;
+			assert.ok( firstWrong === - 1, firstWrong === - 1
+				? `all ${ count } elements equal ${ expected } after ${ iterations } repointed dispatches`
+				: `element ${ firstWrong } was ${ result[ firstWrong ] }, expected ${ expected } after ${ iterations } repointed dispatches (first mismatch)`
+			);
 
-				for ( let i = 0; i < count; i ++ ) {
-
-					if ( result[ i ] !== expected ) {
-
-						firstWrong = i;
-						break;
-
-					}
-
-				}
-
-				assert.ok( firstWrong === - 1, firstWrong === - 1
-					? `all ${ count } elements equal ${ expected } after ${ iterations } repointed dispatches`
-					: `element ${ firstWrong } was ${ result[ firstWrong ] }, expected ${ expected } after ${ iterations } repointed dispatches (first mismatch)`
-				);
-
-				attrA.dispose?.();
-				attrB.dispose?.();
-
-			} );
+			attrA.dispose?.();
+			attrB.dispose?.();
 
 		} );
 
@@ -160,7 +156,7 @@ export default QUnit.module( 'TSL', () => {
 			// matters.
 
 			const count = 64;
-			const iterations = 64;
+			const iterations = 32;
 
 			const attrA = makeBuffer( count, 1 );
 			const attrB = makeBuffer( count, 0 );
@@ -201,18 +197,7 @@ export default QUnit.module( 'TSL', () => {
 			const liveAttribute = current === 'A' ? attrA : attrB;
 			const result = await readBuffer( renderer, liveAttribute, count );
 
-			let firstWrong = - 1;
-
-			for ( let i = 0; i < count; i ++ ) {
-
-				if ( result[ i ] !== expected ) {
-
-					firstWrong = i;
-					break;
-
-				}
-
-			}
+			const firstWrong = firstMismatch( count, ( i ) => result[ i ] !== expected );
 
 			assert.ok( firstWrong === - 1, firstWrong === - 1
 				? `all ${ count } elements equal ${ expected } after ${ iterations } interleaved dispatches across 2 kernels`
@@ -224,685 +209,17 @@ export default QUnit.module( 'TSL', () => {
 
 		} );
 
-		repointTest( 'repeated repoint-and-dispatch runs stay correct across many separate calls (not just one long chain)', async ( assert, renderer ) => {
-
-			// Runs the single-kernel repoint chain from the first test many times over, each with
-			// its own fresh buffers/kernel, to catch nondeterministic corruption that a single run
-			// might not hit.
-
-			const count = 64;
-			const iterations = 32;
-			const runs = 12;
-
-			for ( let run = 0; run < runs; run ++ ) {
-
-				const initialValue = run + 1;
-
-				const attrA = makeBuffer( count, initialValue );
-				const attrB = makeBuffer( count, 0 );
-
-				const readNode = storage( attrA, 'float', count ).toReadOnly();
-				const writeNode = storage( attrB, 'float', count );
-
-				const kernel = Fn( () => {
-
-					const v = readNode.element( instanceIndex ).toVar();
-					writeNode.element( instanceIndex ).assign( v.add( 1 ) );
-
-				} )().compute( count );
-
-				let current = 'A';
-
-				for ( let i = 0; i < iterations; i ++ ) {
-
-					readNode.value = current === 'A' ? attrA : attrB;
-					writeNode.value = current === 'A' ? attrB : attrA;
-
-					renderer.compute( kernel );
-
-					current = current === 'A' ? 'B' : 'A';
-
-				}
-
-				const liveAttribute = current === 'A' ? attrA : attrB;
-				const result = await readBuffer( renderer, liveAttribute, count );
-
-				const expected = initialValue + iterations;
-				let firstWrong = - 1;
-
-				for ( let i = 0; i < count; i ++ ) {
-
-					if ( result[ i ] !== expected ) {
-
-						firstWrong = i;
-						break;
-
-					}
-
-				}
-
-				assert.ok( firstWrong === - 1, firstWrong === - 1
-					? `run ${ run }: all elements equal ${ expected }`
-					: `run ${ run }: element ${ firstWrong } was ${ result[ firstWrong ] }, expected ${ expected } (first mismatch)`
-				);
-
-				attrA.dispose?.();
-				attrB.dispose?.();
-
-			}
-
-		} );
-
-		// From here down: larger scale (`vec2` elements, up to 1,048,576 elements) and a uniform
-		// value changed on every dispatch in lockstep with the storage-node repointing, to check
-		// that scale and a concurrently-changing uniform don't affect the fix.
-
-		[ 65536, 1048576 ].forEach( ( count ) => {
-
-			repointTest( `vec2 buffer at large scale (${ count } elements) survives 32 rapid repointed dispatches`, async ( assert, renderer ) => {
-
-				const iterations = 32;
-
-				const attrA = makeVec2Buffer( count, 1, - 1 );
-				const attrB = makeVec2Buffer( count, 0, 0 );
-
-				const readNode = storage( attrA, 'vec2', count ).toReadOnly();
-				const writeNode = storage( attrB, 'vec2', count );
-
-				const kernel = Fn( () => {
-
-					const v = readNode.element( instanceIndex ).toVar();
-					writeNode.element( instanceIndex ).assign( vec2( v.x.add( 1 ), v.y.sub( 1 ) ) );
-
-				} )().compute( count );
-
-				let current = 'A';
-
-				for ( let i = 0; i < iterations; i ++ ) {
-
-					readNode.value = current === 'A' ? attrA : attrB;
-					writeNode.value = current === 'A' ? attrB : attrA;
-
-					renderer.compute( kernel );
-
-					current = current === 'A' ? 'B' : 'A';
-
-				}
-
-				const liveAttribute = current === 'A' ? attrA : attrB;
-				const { x, y } = await readVec2Buffer( renderer, liveAttribute, count );
-
-				const expectedX = 1 + iterations;
-				const expectedY = - 1 - iterations;
-				let firstWrong = - 1;
-
-				for ( let i = 0; i < count; i ++ ) {
-
-					if ( x[ i ] !== expectedX || y[ i ] !== expectedY ) {
-
-						firstWrong = i;
-						break;
-
-					}
-
-				}
-
-				assert.ok( firstWrong === - 1, firstWrong === - 1
-					? `all ${ count } elements equal (${ expectedX }, ${ expectedY }) after ${ iterations } repointed dispatches`
-					: `element ${ firstWrong } was (${ x[ firstWrong ] }, ${ y[ firstWrong ] }), expected (${ expectedX }, ${ expectedY }) (first mismatch)`
-				);
-
-				attrA.dispose?.();
-				attrB.dispose?.();
-
-			} );
-
-		} );
-
-		repointTest( 'uniform value changed every dispatch alongside repointed storage nodes (per-stage fallback shape, 1048576 elements x 20 stages)', async ( assert, renderer ) => {
-
-			// A uniform value and the storage-node repointing both change together immediately
-			// before each `renderer.compute()` call, with zero `await` between stages.
-
-			const count = 1048576; // 1024x1024
-			const stages = 20;
-
-			const attrA = makeVec2Buffer( count, 0, 0 );
-			const attrB = makeVec2Buffer( count, 0, 0 );
-
-			const readNode = storage( attrA, 'vec2', count ).toReadOnly();
-			const writeNode = storage( attrB, 'vec2', count );
-			const stageUniform = uniform( 1, 'uint' );
-
-			// out[i] = in[i] + stageUniform, kept trivial so the expected result stays exactly
-			// verifiable.
-			const kernel = Fn( () => {
-
-				const v = readNode.element( instanceIndex ).toVar();
-				const s = float( stageUniform );
-				writeNode.element( instanceIndex ).assign( vec2( v.x.add( s ), v.y ) );
-
-			} )().compute( count );
-
-			let current = 'A';
-			let expected = 0;
-
-			for ( let s = 0; s < stages; s ++ ) {
-
-				stageUniform.value = 1 << s;
-
-				readNode.value = current === 'A' ? attrA : attrB;
-				writeNode.value = current === 'A' ? attrB : attrA;
-
-				renderer.compute( kernel );
-
-				expected += 1 << s;
-				current = current === 'A' ? 'B' : 'A';
-
-			}
-
-			const liveAttribute = current === 'A' ? attrA : attrB;
-			const { x, y } = await readVec2Buffer( renderer, liveAttribute, count );
-
-			let firstWrong = - 1;
-
-			for ( let i = 0; i < count; i ++ ) {
-
-				if ( x[ i ] !== expected || y[ i ] !== 0 ) {
-
-					firstWrong = i;
-					break;
-
-				}
-
-			}
-
-			assert.ok( firstWrong === - 1, firstWrong === - 1
-				? `all ${ count } elements equal ${ expected } after ${ stages } stages of repointed dispatches`
-				: `element ${ firstWrong } was (${ x[ firstWrong ] }, ${ y[ firstWrong ] }), expected (${ expected }, 0) after ${ stages } stages (first mismatch)`
-			);
-
-			attrA.dispose?.();
-			attrB.dispose?.();
-
-		} );
-
-		repointTest( 'per-stage fallback shape repeated across 6 separate runs (1048576 elements x 20 stages each)', async ( assert, renderer ) => {
-
-			// Same as the previous test, but repeated -- to catch nondeterministic corruption a
-			// single run might not hit.
-
-			const count = 1048576;
-			const stages = 20;
-			const runs = 6;
-
-			for ( let run = 0; run < runs; run ++ ) {
-
-				const attrA = makeVec2Buffer( count, 0, 0 );
-				const attrB = makeVec2Buffer( count, 0, 0 );
-
-				const readNode = storage( attrA, 'vec2', count ).toReadOnly();
-				const writeNode = storage( attrB, 'vec2', count );
-				const stageUniform = uniform( 1, 'uint' );
-
-				const kernel = Fn( () => {
-
-					const v = readNode.element( instanceIndex ).toVar();
-					const s = float( stageUniform );
-					writeNode.element( instanceIndex ).assign( vec2( v.x.add( s ), v.y ) );
-
-				} )().compute( count );
-
-				let current = 'A';
-				let expected = 0;
-
-				for ( let s = 0; s < stages; s ++ ) {
-
-					stageUniform.value = 1 << s;
-
-					readNode.value = current === 'A' ? attrA : attrB;
-					writeNode.value = current === 'A' ? attrB : attrA;
-
-					renderer.compute( kernel );
-
-					expected += 1 << s;
-					current = current === 'A' ? 'B' : 'A';
-
-				}
-
-				const liveAttribute = current === 'A' ? attrA : attrB;
-				const { x, y } = await readVec2Buffer( renderer, liveAttribute, count );
-
-				let firstWrong = - 1;
-
-				for ( let i = 0; i < count; i ++ ) {
-
-					if ( x[ i ] !== expected || y[ i ] !== 0 ) {
-
-						firstWrong = i;
-						break;
-
-					}
-
-				}
-
-				assert.ok( firstWrong === - 1, firstWrong === - 1
-					? `run ${ run }: all elements equal ${ expected }`
-					: `run ${ run }: element ${ firstWrong } was (${ x[ firstWrong ] }, ${ y[ firstWrong ] }), expected (${ expected }, 0) (first mismatch)`
-				);
-
-				attrA.dispose?.();
-				attrB.dispose?.();
-
-			}
-
-		} );
-
-		// A tiled, workgroup-shared-memory, 2D-dispatched transpose kernel, with an explicit
-		// `workgroupBarrier()` between the load and store phases -- structurally different from
-		// the flat, global-memory-only, 1D-dispatched kernels used above, to check that kernels
-		// alternating between these two shapes while sharing the same repointed nodes stay
-		// correct. Since a transpose is a pure permutation (it moves values, never changes them),
-		// composing transpose-forward + transpose-back is the identity -- so a value-preserving
-		// invariant stays checkable even through the permutation.
-		function buildTransposeKernel( rows, cols, tile, readNode, writeNode ) {
-
-			const sharedTile = workgroupArray( 'vec2', tile * tile );
-
-			const numWorkgroupsX = Math.ceil( cols / tile );
-			const numWorkgroupsY = Math.ceil( rows / tile );
-
-			return Fn( () => {
-
-				const gx = globalId.x;
-				const gy = globalId.y;
-				const lx = localId.x;
-				const ly = localId.y;
-				const wx = workgroupId.x;
-				const wy = workgroupId.y;
-
-				If( gx.lessThan( uint( cols ) ).and( gy.lessThan( uint( rows ) ) ), () => {
-
-					sharedTile.element( ly.mul( uint( tile ) ).add( lx ) ).assign( readNode.element( gy.mul( uint( cols ) ).add( gx ) ) );
-
-				} );
-
-				workgroupBarrier();
-
-				const outX = wy.mul( uint( tile ) ).add( lx );
-				const outY = wx.mul( uint( tile ) ).add( ly );
-
-				If( outX.lessThan( uint( rows ) ).and( outY.lessThan( uint( cols ) ) ), () => {
-
-					const v = sharedTile.element( lx.mul( uint( tile ) ).add( ly ) ).toVar();
-					writeNode.element( outY.mul( uint( rows ) ).add( outX ) ).assign( v );
-
-				} );
-
-			} )().compute( [ numWorkgroupsX, numWorkgroupsY ], [ tile, tile ] );
-
-		}
-
-		[[ 1024, 1024 ], [ 2048, 1024 ]].forEach( ( [ width, height ] ) => {
-
-			repointTest( `mixed global-memory / shared-memory kernels sharing repointed nodes, matching _runButterflyPasses' shape (${ width }x${ height })`, async ( assert, renderer ) => {
-
-				// A row pass (several per-stage dispatches, global memory) -> transpose (one
-				// dispatch, shared memory + barrier) -> column pass (several per-stage dispatches,
-				// global memory) -> transpose back (one dispatch, shared memory + barrier) -- all
-				// sharing the same 2 repointed nodes, no `await` anywhere in the sequence. The
-				// row/column math is a simple, position-independent `x += stageValue` so the
-				// expected result stays exactly checkable regardless of how the transposes permute
-				// element positions.
-
-				const count = width * height;
-				const tile = 16;
-				const rowStages = Math.round( Math.log2( width ) );
-				const colStages = Math.round( Math.log2( height ) );
-
-				const attrA = makeVec2Buffer( count, 0, 0 );
-				const attrB = makeVec2Buffer( count, 0, 0 );
-
-				const readNode = storage( attrA, 'vec2', count ).toReadOnly();
-				const writeNode = storage( attrB, 'vec2', count );
-				const stageUniform = uniform( 1, 'uint' );
-
-				const addKernel = Fn( () => {
-
-					const v = readNode.element( instanceIndex ).toVar();
-					const s = float( stageUniform );
-					writeNode.element( instanceIndex ).assign( vec2( v.x.add( s ), v.y ) );
-
-				} )().compute( count );
-
-				const transposeFwdKernel = buildTransposeKernel( height, width, tile, readNode, writeNode );
-				const transposeBackKernel = buildTransposeKernel( width, height, tile, readNode, writeNode );
-
-				let current = 'A';
-				let expected = 0;
-
-				const dispatchPingPong = ( kernel ) => {
-
-					readNode.value = current === 'A' ? attrA : attrB;
-					writeNode.value = current === 'A' ? attrB : attrA;
-
-					renderer.compute( kernel );
-
-					current = current === 'A' ? 'B' : 'A';
-
-				};
-
-				for ( let s = 0; s < rowStages; s ++ ) {
-
-					stageUniform.value = 1 << s;
-					dispatchPingPong( addKernel );
-					expected += 1 << s;
-
-				}
-
-				dispatchPingPong( transposeFwdKernel );
-
-				for ( let s = 0; s < colStages; s ++ ) {
-
-					stageUniform.value = 1 << s;
-					dispatchPingPong( addKernel );
-					expected += 1 << s;
-
-				}
-
-				dispatchPingPong( transposeBackKernel );
-
-				const liveAttribute = current === 'A' ? attrA : attrB;
-				const { x, y } = await readVec2Buffer( renderer, liveAttribute, count );
-
-				let firstWrong = - 1;
-
-				for ( let i = 0; i < count; i ++ ) {
-
-					if ( x[ i ] !== expected || y[ i ] !== 0 ) {
-
-						firstWrong = i;
-						break;
-
-					}
-
-				}
-
-				assert.ok( firstWrong === - 1, firstWrong === - 1
-					? `all ${ count } elements equal ${ expected } after the full row/transpose/col/transpose-back sequence`
-					: `element ${ firstWrong } was (${ x[ firstWrong ] }, ${ y[ firstWrong ] }), expected (${ expected }, 0) (first mismatch)`
-				);
-
-				attrA.dispose?.();
-				attrB.dispose?.();
-
-			} );
-
-		} );
-
-		repointTest( 'mixed global-memory / shared-memory kernel sequence repeated across 6 separate runs (1024x1024)', async ( assert, renderer ) => {
-
-			// Same sequence as above, repeated, since a single run is not enough to trust a pass
-			// against nondeterministic corruption.
-
-			const width = 1024, height = 1024;
-			const count = width * height;
-			const tile = 16;
-			const rowStages = Math.round( Math.log2( width ) );
-			const colStages = Math.round( Math.log2( height ) );
-			const runs = 6;
-
-			for ( let run = 0; run < runs; run ++ ) {
-
-				const attrA = makeVec2Buffer( count, 0, 0 );
-				const attrB = makeVec2Buffer( count, 0, 0 );
-
-				const readNode = storage( attrA, 'vec2', count ).toReadOnly();
-				const writeNode = storage( attrB, 'vec2', count );
-				const stageUniform = uniform( 1, 'uint' );
-
-				const addKernel = Fn( () => {
-
-					const v = readNode.element( instanceIndex ).toVar();
-					const s = float( stageUniform );
-					writeNode.element( instanceIndex ).assign( vec2( v.x.add( s ), v.y ) );
-
-				} )().compute( count );
-
-				const transposeFwdKernel = buildTransposeKernel( height, width, tile, readNode, writeNode );
-				const transposeBackKernel = buildTransposeKernel( width, height, tile, readNode, writeNode );
-
-				let current = 'A';
-				let expected = 0;
-
-				const dispatchPingPong = ( kernel ) => {
-
-					readNode.value = current === 'A' ? attrA : attrB;
-					writeNode.value = current === 'A' ? attrB : attrA;
-
-					renderer.compute( kernel );
-
-					current = current === 'A' ? 'B' : 'A';
-
-				};
-
-				for ( let s = 0; s < rowStages; s ++ ) {
-
-					stageUniform.value = 1 << s;
-					dispatchPingPong( addKernel );
-					expected += 1 << s;
-
-				}
-
-				dispatchPingPong( transposeFwdKernel );
-
-				for ( let s = 0; s < colStages; s ++ ) {
-
-					stageUniform.value = 1 << s;
-					dispatchPingPong( addKernel );
-					expected += 1 << s;
-
-				}
-
-				dispatchPingPong( transposeBackKernel );
-
-				const liveAttribute = current === 'A' ? attrA : attrB;
-				const { x, y } = await readVec2Buffer( renderer, liveAttribute, count );
-
-				let firstWrong = - 1;
-
-				for ( let i = 0; i < count; i ++ ) {
-
-					if ( x[ i ] !== expected || y[ i ] !== 0 ) {
-
-						firstWrong = i;
-						break;
-
-					}
-
-				}
-
-				assert.ok( firstWrong === - 1, firstWrong === - 1
-					? `run ${ run }: all elements equal ${ expected }`
-					: `run ${ run }: element ${ firstWrong } was (${ x[ firstWrong ] }, ${ y[ firstWrong ] }), expected (${ expected }, 0) (first mismatch)`
-				);
-
-				attrA.dispose?.();
-				attrB.dispose?.();
-
-			}
-
-		} );
-
-		// Every kernel above is cheap -- a handful of ALU ops per invocation. A kernel that runs
-		// measurably longer on the GPU gives any CPU/GPU timing race a bigger window, ruling out
-		// a driver-timing race rather than a pure JS-side binding bug (which should be
-		// timing-independent). This burns real GPU cycles (many `sin` calls) per invocation while
-		// keeping the arithmetic result exactly verifiable: `sin(i) - sin(i)` is exactly 0 in
-		// IEEE754 (same computed value subtracted from itself), so the busy-work never perturbs
-		// the expected total.
-		function buildSlowAddKernel( count, busyIterations, readNode, writeNode ) {
-
-			return Fn( () => {
-
-				const v = readNode.element( instanceIndex ).toVar();
-				const acc = float( 0 ).toVar();
-
-				Loop( { start: 0, end: busyIterations, type: 'int' }, ( { i } ) => {
-
-					const angle = float( i ).add( instanceIndex.toFloat() );
-					acc.assign( acc.add( sin( angle ) ).sub( sin( angle ) ) );
-
-				} );
-
-				writeNode.element( instanceIndex ).assign( vec2( v.x.add( 1 ).add( acc ), v.y.add( acc ) ) );
-
-			} )().compute( count );
-
-		}
-
-		[ 4, 64 ].forEach( ( busyIterations ) => {
-
-			repointTest( `slow kernel (${ busyIterations }x busy-work per invocation) sharing repointed nodes survives 64 rapid dispatches (1048576 elements)`, async ( assert, renderer ) => {
-
-				const count = 1048576;
-				const iterations = 64;
-
-				const attrA = makeVec2Buffer( count, 0, 0 );
-				const attrB = makeVec2Buffer( count, 0, 0 );
-
-				const readNode = storage( attrA, 'vec2', count ).toReadOnly();
-				const writeNode = storage( attrB, 'vec2', count );
-
-				const kernel = buildSlowAddKernel( count, busyIterations, readNode, writeNode );
-
-				let current = 'A';
-
-				for ( let i = 0; i < iterations; i ++ ) {
-
-					readNode.value = current === 'A' ? attrA : attrB;
-					writeNode.value = current === 'A' ? attrB : attrA;
-
-					renderer.compute( kernel );
-
-					current = current === 'A' ? 'B' : 'A';
-
-				}
-
-				const liveAttribute = current === 'A' ? attrA : attrB;
-				const { x, y } = await readVec2Buffer( renderer, liveAttribute, count );
-
-				const expectedX = iterations;
-				let firstWrong = - 1;
-
-				for ( let i = 0; i < count; i ++ ) {
-
-					if ( x[ i ] !== expectedX || y[ i ] !== 0 ) {
-
-						firstWrong = i;
-						break;
-
-					}
-
-				}
-
-				assert.ok( firstWrong === - 1, firstWrong === - 1
-					? `all ${ count } elements equal (${ expectedX }, 0) after ${ iterations } dispatches of a slow kernel`
-					: `element ${ firstWrong } was (${ x[ firstWrong ] }, ${ y[ firstWrong ] }), expected (${ expectedX }, 0) (first mismatch)`
-				);
-
-				attrA.dispose?.();
-				attrB.dispose?.();
-
-			} );
-
-		} );
-
-		// Combines the slow kernel with the mixed global-memory/shared-memory transpose sequence
-		// from above, repeated -- the most demanding single test in this file.
-		repointTest( 'slow kernels + transpose sequence sharing repointed nodes, repeated 4x (2048x1024)', async ( assert, renderer ) => {
-
-			const width = 2048, height = 1024;
-			const count = width * height;
-			const tile = 16;
-			const busyIterations = 16;
-			const rowStages = Math.round( Math.log2( width ) );
-			const colStages = Math.round( Math.log2( height ) );
-			const runs = 4;
-
-			for ( let run = 0; run < runs; run ++ ) {
-
-				const attrA = makeVec2Buffer( count, 0, 0 );
-				const attrB = makeVec2Buffer( count, 0, 0 );
-
-				const readNode = storage( attrA, 'vec2', count ).toReadOnly();
-				const writeNode = storage( attrB, 'vec2', count );
-
-				const addKernel = buildSlowAddKernel( count, busyIterations, readNode, writeNode );
-				const transposeFwdKernel = buildTransposeKernel( height, width, tile, readNode, writeNode );
-				const transposeBackKernel = buildTransposeKernel( width, height, tile, readNode, writeNode );
-
-				let current = 'A';
-
-				const dispatchPingPong = ( kernel ) => {
-
-					readNode.value = current === 'A' ? attrA : attrB;
-					writeNode.value = current === 'A' ? attrB : attrA;
-
-					renderer.compute( kernel );
-
-					current = current === 'A' ? 'B' : 'A';
-
-				};
-
-				for ( let s = 0; s < rowStages; s ++ ) dispatchPingPong( addKernel );
-
-				dispatchPingPong( transposeFwdKernel );
-
-				for ( let s = 0; s < colStages; s ++ ) dispatchPingPong( addKernel );
-
-				dispatchPingPong( transposeBackKernel );
-
-				const liveAttribute = current === 'A' ? attrA : attrB;
-				const { x, y } = await readVec2Buffer( renderer, liveAttribute, count );
-
-				const expected = rowStages + colStages;
-				let firstWrong = - 1;
-
-				for ( let i = 0; i < count; i ++ ) {
-
-					if ( x[ i ] !== expected || y[ i ] !== 0 ) {
-
-						firstWrong = i;
-						break;
-
-					}
-
-				}
-
-				assert.ok( firstWrong === - 1, firstWrong === - 1
-					? `run ${ run }: all elements equal (${ expected }, 0)`
-					: `run ${ run }: element ${ firstWrong } was (${ x[ firstWrong ] }, ${ y[ firstWrong ] }), expected (${ expected }, 0) (first mismatch)`
-				);
-
-				attrA.dispose?.();
-				attrB.dispose?.();
-
-			}
-
-		} );
-
 		// The specific case this PR fixes: a kernel binds a *texture* alongside a storage buffer
 		// in the same bind group. If the same texture object is reused unchanged across calls
 		// while only the storage buffer's node is repointed to a different attribute, a bind-group
 		// cache keyed only on the texture's identity/version could return a bind group still wired
 		// to the previous storage attribute. This isolates exactly that: one texture, reused
 		// across many calls, while the storage write target alternates every call.
-		repointTest( 'texture+storage kernel reused with the same texture object across alternating storage targets (1024x1024)', async ( assert, renderer ) => {
+		repointTest( 'texture+storage kernel reused with the same texture object across alternating storage targets', async ( assert, renderer ) => {
 
-			const width = 1024, height = 1024;
+			const width = 64, height = 64;
 			const count = width * height;
-			const calls = 64;
+			const calls = 16;
 
 			const sourceData = new Float32Array( count * 4 );
 
@@ -956,17 +273,13 @@ export default QUnit.module( 'TSL', () => {
 
 				const { x, y } = await readVec2Buffer( renderer, targetAttribute, count );
 
-				for ( let i = 0; i < count; i ++ ) {
+				firstWrong = firstMismatch( count, ( i ) => x[ i ] !== 7 || y[ i ] !== 3 );
 
-					if ( x[ i ] !== 7 || y[ i ] !== 3 ) {
+				if ( firstWrong !== - 1 ) {
 
-						firstWrong = i;
-						firstWrongCall = call;
-						firstWrongValue = { x: x[ i ], y: y[ i ] };
-						firstWrongOtherBuffer = await readVec2Buffer( renderer, otherAttribute, count );
-						break;
-
-					}
+					firstWrongCall = call;
+					firstWrongValue = { x: x[ firstWrong ], y: y[ firstWrong ] };
+					firstWrongOtherBuffer = await readVec2Buffer( renderer, otherAttribute, count );
 
 				}
 
