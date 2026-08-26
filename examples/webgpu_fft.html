@@ -48,9 +48,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { FFT2D } from 'three/addons/gpgpu/FFT.js';
 
-			// A curated set of power-of-two textures from the shared examples/textures folder --
-			// FFT2D only supports power-of-two width/height (see its own comment for why: it's what
-			// lets the Stockham FFT skip a separate bit-reversal permutation pass).
+			// FFT2D requires power-of-two width/height.
 			const PRESETS = [
 				{ name: 'UV Grid (1024x1024)', url: 'textures/uv_grid_opengl.jpg' },
 				{ name: 'Grid (64x64)', url: 'textures/grid.png' },
@@ -62,13 +60,9 @@
 				{ name: 'Earth (2048x1024)', url: 'textures/land_ocean_ice_cloud_2048.jpg' }
 			];
 
-			// The 3 color channels FFT2D is run on in lockstep, in `packChannel`'s channel-index
-			// order (`0`/`1`/`2`) -- iterated over wherever the same per-channel step (pack,
-			// forward/inverse FFT, DC-bin readback) would otherwise be written out 3 times.
 			const CHANNELS = [ 'r', 'g', 'b' ];
 
-			// Builds a `{ r, g, b }` object by calling `fn(channel)` once per channel -- e.g.
-			// `buildPerChannel( () => new FFT2D( width, height ) )`.
+			// Builds a `{ r, g, b }` object by calling `fn(channel)` once per channel.
 			function buildPerChannel( fn ) {
 
 				const result = {};
@@ -82,21 +76,10 @@
 			let camera, scene, renderer, controls;
 			let quadOriginal, quadSpectrum, quadReconstructed;
 
-			// Everything GPU-side that only depends on `(width, height)` -- never on which image is
-			// loaded -- lives in one size-keyed cache entry: the 3 (one per color channel) `FFT2D`
-			// instances, their complex textures, the display targets, and every compute kernel this
-			// example builds for itself (`pack`/`combine`/`probe` below). Each of those
-			// kernels is genuinely shape-only -- which *texture* they read/write and which channel/
-			// mode/scale they use are all runtime-adjustable (uniforms, and TSL texture nodes whose
-			// `.value` can be repointed at a different texture -- see e.g. `webgpu_compute_rasterizer_
-			// ibl.html`'s `depthSourceTexNode.value = ...` for the same pattern elsewhere in the
-			// examples), so exactly one of each is ever compiled per size, no matter how many presets
-			// of that size get loaded, or how many times forward/inverse runs.
-			//
-			// Only `loadedTexture` (the actual decoded preset image) is deliberately left out of this
-			// cache and freed every `loadPreset` call -- it's the one piece of GPU state that's
-			// legitimately different per image, not per size.
-			const resourceCache = new Map(); // "WxH" -> see `buildResources`
+			// GPU resources that only depend on (width, height), keyed by "WxH" and reused across
+			// presets of the same size: the 3 FFT2D instances (one per channel), their complex
+			// textures, the display targets, and this example's own pack/combine/probe kernels.
+			const resourceCache = new Map();
 
 			function getResources( width, height, sourceTexture ) {
 
@@ -114,10 +97,8 @@
 
 			}
 
-			// A float `StorageTexture` with (at least) 2 channels -- `FFT2D`'s complex-number
-			// currency, `(real, imag)` in `.rg`. Used for the per-channel packed source, the
-			// spectrum, and the reconstruction; `.b`/`.a` are unused (written as `0`/`1` by
-			// `FFT2D#computeForward`/`computeInverse`, per its own contract).
+			// A float StorageTexture with (at least) 2 channels -- FFT2D's complex-number format,
+			// `(real, imag)` in `.rg`.
 			function createComplexTexture( width, height ) {
 
 				const tex = new THREE.StorageTexture( width, height );
@@ -130,12 +111,8 @@
 
 			}
 
-			// Builds everything one `(width, height)` needs: the 3 `FFT2D` instances, their complex
-			// textures, the 2 color display targets, and the 3 example-only compute kernels
-			// (`pack`/`combine`/`probe`) -- see `resourceCache`'s comment for why each kernel is
-			// built exactly once here rather than per call. `sourceTexture` only seeds the pack
-			// kernel's initial texture-node value (immediately overwritten by the real one on every
-			// actual `packChannel` call) -- any correctly-shaped texture would do.
+			// Builds everything one (width, height) needs: 3 FFT2D instances, their complex
+			// textures, the 2 display targets, and the pack/combine/probe kernels.
 			function buildResources( width, height, sourceTexture ) {
 
 				const ffts = buildPerChannel( () => new FFT2D( width, height ) );
@@ -147,9 +124,6 @@
 				const spectrumTexture = new THREE.StorageTexture( width, height );
 				const reconstructedTexture = new THREE.StorageTexture( width, height );
 
-				// Match the source image's exact, unfiltered point-sampling so the 3 quads are
-				// visually comparable pixel-for-pixel (no mipmap/linear-filtering discrepancy when a
-				// texture ends up displayed smaller than its native size on screen).
 				for ( const tex of [ spectrumTexture, reconstructedTexture ] ) {
 
 					tex.magFilter = THREE.NearestFilter;
@@ -169,10 +143,8 @@
 
 			let loadedTexture = null;
 
-			// Bumped on every `loadPreset` call and captured by each in-flight one -- lets a call
-			// that's superseded by a newer image selection (e.g. rapid dropdown changes) recognize
-			// it's stale after an `await` and bail out instead of clobbering the newer preset's
-			// state or GUI/label text.
+			// Bumped on every loadPreset call; an in-flight call whose generation is stale after an
+			// await (superseded by a newer selection) bails out instead of clobbering newer state.
 			let generation = 0;
 
 			let labelOriginal, labelSpectrum, labelReconstructed;
@@ -199,21 +171,12 @@
 				camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 10 );
 				camera.position.z = 5;
 
-				// Materials are (re)created per preset with their `map` set at construction time, via
-				// `setQuadMaterial` below, rather than assigned post-hoc -- reassigning `.map` on an
-				// already-built material doesn't reliably trigger WebGPURenderer's node-graph
-				// rebuild (confirmed: it's flaky, not just cosmetic -- the mesh can keep showing
-				// stale/blank content), and per-preset a fresh material is cheap regardless of
-				// whether its texture is a fresh one or (see `resourceCache`) a reused one.
+				// Rebuilt (not reassigned) per preset in setQuadMaterial -- reassigning `.map` on an
+				// existing material doesn't reliably trigger a WebGPURenderer node-graph rebuild.
 				quadOriginal = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicMaterial() );
 				quadSpectrum = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicMaterial() );
 				quadReconstructed = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicMaterial() );
 
-				// Real 3D objects (a canvas-texture quad each), not an HTML/CSS overlay -- they live
-				// in the same scene as the image quads, so panning/zooming the camera moves and
-				// scales them exactly like the images, with no per-frame screen-space projection
-				// bookkeeping needed. Built once here (their text never changes); only their
-				// position/scale is updated per preset, in `layoutQuads`.
 				labelOriginal = createLabelMesh( 'Original Image' );
 				labelSpectrum = createLabelMesh( 'Frequency Space' );
 				labelReconstructed = createLabelMesh( 'Reconstructed Image' );
@@ -228,18 +191,12 @@
 
 				await renderer.init();
 
-				// Pan (right-drag / two-finger drag) and zoom (scroll / pinch) so people can look at
-				// the 3 textures up close; rotate is disabled since it doesn't make sense for a flat,
-				// front-on 2D view. There's no continuous animation loop here (rendering is
-				// on-demand, triggered after each pipeline step), so `render` is wired to the
-				// controls' own "change" event to keep the view responsive while dragging/zooming.
+				// Rendering is on-demand (no animation loop), so wire render() to the controls'
+				// "change" event to stay responsive while dragging/zooming.
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableRotate = false;
 				controls.screenSpacePanning = true;
 				controls.addEventListener( 'change', render );
-
-				// GUI, via the inspector's built-in parameter panel (see webgpu_ocean.html for the
-				// same `renderer.inspector.createParameters(...)` convention).
 
 				const gui = renderer.inspector.createParameters( 'FFT' );
 
@@ -247,7 +204,7 @@
 
 					const preset = PRESETS.find( ( p ) => p.name === name );
 
-					loadPreset( preset ); // fire-and-forget; see `generation` for why that's safe.
+					loadPreset( preset );
 
 				} );
 
@@ -263,17 +220,12 @@
 
 				const newTexture = await textureLoader.loadAsync( preset.url );
 
-				// `loadAsync` resolves on the underlying <img>'s `load` event, which fires once
-				// bytes have arrived but doesn't guarantee decoding (including any embedded ICC
-				// color profile) has finished -- confirmed source of a real, intermittent bug: the
-				// very first time a given image loads, the GPU texture upload can grab it mid-decode
-				// and show up wrong (e.g. an ICC-profiled image briefly rendering desaturated),
-				// while a later load of the same URL hits the browser's already-fully-decoded image
-				// cache and looks correct. `decode()` is the standard way to await full decode
-				// before the image is used for anything (the GPU upload here).
+				// `loadAsync` resolves once bytes arrive but not necessarily once decoded (including
+				// ICC color profile); without this, the very first load of an image can get uploaded
+				// mid-decode and render wrong (e.g. temporarily desaturated).
 				await newTexture.image.decode();
 
-				if ( myGeneration !== generation ) { newTexture.dispose(); return; } // superseded
+				if ( myGeneration !== generation ) { newTexture.dispose(); return; }
 
 				newTexture.colorSpace = THREE.NoColorSpace;
 				newTexture.flipY = true;
@@ -286,46 +238,23 @@
 				const width = newTexture.image.width;
 				const height = newTexture.image.height;
 
-				// Only the previous preset's *decoded image* is torn down here -- every other GPU
-				// resource (the FFT instances, complex textures, display targets, and this example's
-				// own compute kernels) comes from `getResources`'s size-keyed cache and deliberately
-				// stays alive across presets, so revisiting a size (including the one just left)
-				// reuses everything already built for it instead of paying to rebuild any of it.
-
 				loadedTexture?.dispose();
 				loadedTexture = newTexture;
 
 				const resources = getResources( width, height, loadedTexture );
 				const { ffts, complexSource, complexSpectrum, complexReconstructed, spectrumTexture, reconstructedTexture } = resources;
 
-				// A brand-new material per quad, with `map` set at construction time, replacing the
-				// old one outright (rather than mutating `.map` on the existing material) -- see the
-				// comment at `quadOriginal`'s construction in `init()` for why.
 				setQuadMaterial( quadOriginal, loadedTexture );
 				setQuadMaterial( quadSpectrum, spectrumTexture );
 				setQuadMaterial( quadReconstructed, reconstructedTexture );
 
 				layoutQuads( width, height );
 
-				// Pack each color channel of the loaded image into its own complex source texture
-				// (real = channel value, imag = 0), run its forward FFT, and read back its DC bin
-				// -- 3 independent per-channel steps (each channel's forward FFT only needs that
-				// channel's own packed source, and its DC bin is ready the moment its own forward
-				// FFT finishes), so one loop over `CHANNELS` does all 3 rather than 3 separate
-				// loops. There's no user-facing step between loading an image and seeing all 3
-				// quads, so this is just a straight-line continuation of the function rather than
-				// separate button-triggered handlers.
-				//
-				// The DC-bin magnitudes collected here feed the spectrum's shared log-scale
-				// normalization below: for a non-negative-real input (a raw color channel, always
-				// >= 0), the DC bin is *guaranteed* -- by the triangle inequality applied to the
-				// DFT sum -- to have the largest magnitude of any bin in that channel, and using
-				// one shared scale (the single largest of the 3 channels' DC magnitudes) rather
-				// than normalizing each channel independently preserves each texel's actual R:G:B
-				// ratio (independent per-channel normalization would wash the color balance out
-				// toward white). `readBin` is awaited here (not run concurrently across channels):
-				// all 3 channels share one cached probe kernel/buffer (see `buildProbeKernel`), so
-				// concurrent dispatches would race on it.
+				// Pack + forward-FFT each channel, reading back its DC bin along the way. For a
+				// non-negative-real input the DC bin always has the largest magnitude (triangle
+				// inequality on the DFT sum), so the largest of the 3 feeds a shared log-scale below
+				// -- normalizing per-channel instead would wash out the R:G:B color balance. Awaited
+				// per channel since all 3 share one cached probe kernel/buffer.
 				const dcMagnitudes = [];
 
 				for ( let i = 0; i < CHANNELS.length; i ++ ) {
@@ -340,7 +269,7 @@
 
 				}
 
-				if ( myGeneration !== generation ) return; // superseded mid-readback
+				if ( myGeneration !== generation ) return;
 
 				const maxMagnitude = Math.max( ...dcMagnitudes );
 
@@ -354,21 +283,10 @@
 
 			}
 
-			// --- Example-only helpers -----------------------------------------------------------
-			//
-			// Everything below reads/writes plain textures and has no shared state of its own beyond
-			// what `buildResources` builds once per size -- unlike `FFT2D`, which only ever
-			// transforms complex numbers between two textures it's handed (see FFT.js's class
-			// comment for why packing/display/probing live here instead of on the class). Each
-			// `build*Kernel` function is called exactly once per size (from `buildResources`); the
-			// matching `pack`/`combine`/`readBin` call just re-points that kernel's uniforms/
-			// texture-node values and dispatches it again.
+			// --- Example-only helpers: packing a channel into FFT2D's format, combining channels
+			// back into a displayable image, and reading back a single bin. One kernel is built per
+			// size (in buildResources); each call below just re-points its uniforms/textures.
 
-			// Builds the pack kernel for one size: a single compiled shader shared by all 3 color
-			// channels, which color channel to extract (`'r'`=0/`'g'`=1/`'b'`=2) selected at runtime
-			// by `channelUniform` via `select()` rather than baked in at compile time -- see
-			// `resourceCache`'s comment. `sourceNode.value`/`writeTex.value` are repointed at the
-			// real source/destination textures on every actual `packChannel` call.
 			function buildPackKernel( width, height, initialSourceTexture, initialDestinationTexture ) {
 
 				const sourceNode = texture( initialSourceTexture );
@@ -391,10 +309,8 @@
 
 			}
 
-			// Packs one color channel (`channelIndex`: 0/1/2 for r/g/b) of `sourceTexture` into
-			// `destinationTexture`'s `.rg` channels as a complex number (real = channel value,
-			// imag = 0) -- `FFT2D`'s input format. `sourceTexture` is sampled with an exact
-			// (unfiltered) texel fetch, so it must be exactly as large as `destinationTexture`.
+			// Packs one channel (channelIndex: 0/1/2 for r/g/b) of sourceTexture into
+			// destinationTexture's `.rg` as a complex number (real = channel value, imag = 0).
 			function packChannel( renderer, resources, sourceTexture, destinationTexture, channelIndex ) {
 
 				const { kernel, sourceNode, writeTex, channelUniform } = resources.pack;
@@ -407,14 +323,8 @@
 
 			}
 
-			// Builds the combine kernel for one size: a single compiled shader shared by both the
-			// spectrum and reconstruction views (see `combineChannels`'s comment for what those
-			// views mean) -- every way they differ is a uniform here rather than a separate kernel:
-			// `modeUniform` (0 = linear/real-part, 1 = log-magnitude, blended via `mix()`),
-			// `shiftUniform` (0/1, added into the sample coordinate so it's a no-op when off, instead
-			// of a compile-time branch), and `scaleUniform`. `rNode`/`gNode`/`bNode`/`writeTex` start
-			// out pointed at the spectrum textures/target simply because those exist at this point;
-			// every actual `combineChannels` call repoints all 4 anyway.
+			// Shared kernel for both the spectrum and reconstruction views; everything they differ
+			// in (mode, quadrant shift, scale) is a uniform rather than a separate kernel.
 			function buildCombineKernel( width, height, initialChannels, initialTarget ) {
 
 				const halfW = width >> 1;
@@ -444,11 +354,8 @@
 					const x = instanceIndex.mod( uint( width ) );
 					const y = instanceIndex.div( uint( width ) );
 
-					// Quadrant shift (spectrum view only): read from the bin that, after
-					// wrap-around, is `width/2, height/2` away -- this moves the DC bin (index 0,0)
-					// to the texture center. Adding `halfW/halfH * shiftUniform` is a no-op when
-					// `shiftUniform` is 0, so this is one expression covering both views rather than
-					// a runtime or compile-time branch.
+					// Quadrant shift (spectrum view only): moves the DC bin to the texture center.
+					// A no-op when shiftUniform is 0.
 					const sx = x.add( uint( halfW ).mul( shiftUniform ) ).mod( uint( width ) );
 					const sy = y.add( uint( halfH ).mul( shiftUniform ) ).mod( uint( height ) );
 					const coord = ivec2( int( sx ), int( sy ) );
@@ -468,23 +375,11 @@
 
 			}
 
-			// `ffts.r/g/b`'s 3 complex textures combined into one RGBA display texture -- shared by
-			// the spectrum and reconstruction views, which differ only in what scalar they extract
-			// per texel and how it's scaled:
-			//
-			//  - `mode: 'log'` reads each channel's *magnitude* (`length(real, imag)`) and displays
-			//    `log(1 + magnitude) * scale`, quadrant-shifted so the DC (zero-frequency) bin lands
-			//    at the texture's center -- the conventional way to display a 2D spectrum. Meant to
-			//    be called right after `computeForward`.
-			//  - `mode: 'linear'` reads each channel's *real part* directly and displays
-			//    `real * scale`, unshifted. Meant to be called right after `computeInverse`.
-			//
-			// `scale` is a single number shared by all 3 channels -- e.g. the spectrum view passes
-			// `1 / log(1 + maxDCMagnitude)`, the single largest DC magnitude across R/G/B (see
-			// `readBin`), so its log scale saturates to exactly 1 at the strongest channel's DC
-			// peak without rescaling the other two channels independently, which would distort
-			// each texel's R:G:B ratio (push everything toward white) instead of just brightening
-			// it. The reconstruction view just passes `scale: 1` (already `[0, 1]`-ranged).
+			// Combines the 3 per-channel complex textures into one RGBA display texture.
+			// `mode: 'log'` displays magnitude on a log scale, quadrant-shifted (spectrum view,
+			// call after computeForward); `mode: 'linear'` displays the real part directly
+			// (reconstruction view, call after computeInverse). `scale` is shared across all 3
+			// channels so relative color balance is preserved.
 			function combineChannels( renderer, resources, channels, target, { mode = 'linear', scale = 1, shift = false } = {} ) {
 
 				const { kernel, rNode, gNode, bNode, writeTex, modeUniform, shiftUniform, scaleUniform } = resources.combine;
@@ -501,9 +396,6 @@
 
 			}
 
-			// Builds the single-bin probe kernel for one size, shared across every `readBin` call
-			// for that size (all 3 color channels, every preset) -- `sourceNode.value` and
-			// `indexUniform` are re-pointed/re-set on each actual call instead of rebuilding.
 			function buildProbeKernel( width, initialSourceTexture ) {
 
 				const sourceNode = texture( initialSourceTexture );
@@ -525,9 +417,8 @@
 
 			}
 
-			// Reads back a single complex bin (real, imag) from `sourceTexture` at `index` (a
-			// linear `y * width + x` index), without transferring the whole texture -- used above
-			// to read just the DC bin (`index = 0`) for `combineChannels`'s log-scale normalization.
+			// Reads back a single complex bin (real, imag) from sourceTexture at a linear index,
+			// without transferring the whole texture.
 			async function readBin( renderer, resources, sourceTexture, index = 0 ) {
 
 				const { kernel, sourceNode, indexUniform, probeWrite } = resources.probe;
@@ -552,8 +443,6 @@
 
 			}
 
-			// Content size (world units) of the 3-quad layout, with margin -- kept at module scope
-			// so `fitCamera` can refit on window resize without needing the image dimensions again.
 			let contentWidth = 3;
 			let contentHeight = 1;
 
@@ -572,11 +461,6 @@
 
 				}
 
-				// Labels scale with the quads (a "real" part of the 3D layout, per-preset aspect
-				// ratio included) and sit just under each one; being ordinary scene objects, panning
-				// and zooming the camera moves/scales them along with everything else, with no
-				// separate screen-space bookkeeping needed (contrast the HTML-overlay approach this
-				// replaced, which needed a manual world-to-screen projection kept in sync by hand).
 				const labelHeight = quadHeight * 0.09;
 				const labelGap = quadHeight * 0.04;
 
@@ -597,11 +481,8 @@
 
 			}
 
-			// A canvas-texture quad with the given text -- a "real" 3D label (a scene object, not an
-			// HTML/CSS overlay) so it participates in the same camera transform as everything else.
-			// `userData.aspect` (canvas width / height) is used by `layoutQuads` to size it without
-			// distortion; the mesh's own geometry is a unit (1x1) quad, scaled per-preset instead of
-			// rebuilt, since the text itself never changes.
+			// A canvas-texture quad with the given text, as a real scene object rather than an
+			// HTML/CSS overlay, so it moves with the camera like everything else.
 			function createLabelMesh( text ) {
 
 				const scale = 4; // supersampled for crisp text at any zoom level
@@ -627,8 +508,8 @@
 
 			}
 
-			// Fits an orthographic frustum of `contentWidth` x `contentHeight` world units into the
-			// current window aspect ratio, letterboxing whichever dimension has room to spare.
+			// Fits an orthographic frustum of contentWidth x contentHeight into the window aspect,
+			// letterboxing whichever dimension has room to spare.
 			function fitCamera() {
 
 				const windowAspect = window.innerWidth / window.innerHeight;
