@@ -392,6 +392,12 @@ class Bindings extends DataMap {
 
 				}
 
+				// Fold the attribute's identity/version into the cache key, mirroring the
+				// isSampledTexture branch below.
+
+				cacheKey += attribute.id + ',';
+				version += attribute.version;
+
 			}
 
 			if ( binding.isUniformBuffer ) {
