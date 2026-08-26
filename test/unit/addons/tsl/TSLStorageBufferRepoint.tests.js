@@ -299,7 +299,7 @@ export default QUnit.module( 'TSL', () => {
 
 		[ 65536, 1048576 ].forEach( ( count ) => {
 
-			repointTest( `vec2 buffer at FFT2D scale (${ count } elements) survives 32 rapid repointed dispatches`, async ( assert, renderer ) => {
+			repointTest( `vec2 buffer at large scale (${ count } elements) survives 32 rapid repointed dispatches`, async ( assert, renderer ) => {
 
 				const iterations = 32;
 
@@ -734,15 +734,13 @@ export default QUnit.module( 'TSL', () => {
 
 		} );
 
-		// Every kernel above is cheap -- a handful of ALU ops per invocation. FFT2D's real
-		// butterfly kernels do meaningfully more work per invocation (cos/sin twiddle factors,
-		// several reads/writes), so real dispatches run measurably longer on the GPU. If the
-		// corruption is a genuine race between the CPU re-pointing nodes and what the GPU has
-		// actually consumed -- rather than a pure JS-side binding bug, which should be timing-
-		// independent -- a longer-running kernel gives that race a bigger window. This burns real
-		// GPU cycles (many `sin` calls) per invocation while keeping the arithmetic result exactly
-		// verifiable: `sin(i) - sin(i)` is exactly 0 in IEEE754 (same computed value subtracted
-		// from itself), so the busy-work never perturbs the expected total.
+		// Every kernel above is cheap -- a handful of ALU ops per invocation. A kernel that runs
+		// measurably longer on the GPU gives any CPU/GPU timing race a bigger window, ruling out
+		// a driver-timing race rather than a pure JS-side binding bug (which should be
+		// timing-independent). This burns real GPU cycles (many `sin` calls) per invocation while
+		// keeping the arithmetic result exactly verifiable: `sin(i) - sin(i)` is exactly 0 in
+		// IEEE754 (same computed value subtracted from itself), so the busy-work never perturbs
+		// the expected total.
 		function buildSlowAddKernel( count, busyIterations, readNode, writeNode ) {
 
 			return Fn( () => {
@@ -821,9 +819,7 @@ export default QUnit.module( 'TSL', () => {
 		} );
 
 		// Combines the slow kernel with the mixed global-memory/shared-memory transpose sequence
-		// from above, at hardwood's actual scale, repeated -- the most demanding single test in
-		// this file: real element count, real mixed kernel shapes, and per-invocation duration
-		// closer to the real butterfly math than anything tested so far.
+		// from above, repeated -- the most demanding single test in this file.
 		repointTest( 'slow kernels + transpose sequence sharing repointed nodes, repeated 4x (2048x1024)', async ( assert, renderer ) => {
 
 			const width = 2048, height = 1024;
@@ -896,16 +892,12 @@ export default QUnit.module( 'TSL', () => {
 
 		} );
 
-		// A different untested factor: `_load`/`_store` bind a *texture* alongside a storage
-		// buffer in the same kernel. The WebGPU backend's bind-group cache key is built ONLY from
-		// texture identity/version (`cacheKey += texture.id + ','`, `version += texture.version`
-		// in Bindings.js) -- a storage buffer's attribute changing contributes nothing to that key.
-		// So if the *same* texture object is reused across calls (exactly what happens when
-		// webgpu_fft_2d.html's `resourceCache` reuses `complexSource[c]` across preset switches of
-		// the same size) while only the storage side has been repointed, a cache lookup keyed
-		// purely on the unchanged texture could return a bind group still wired to the *previous*
-		// storage attribute. This isolates exactly that: one texture, reused across many calls,
-		// while the storage write target alternates every call.
+		// The specific case this PR fixes: a kernel binds a *texture* alongside a storage buffer
+		// in the same bind group. If the same texture object is reused unchanged across calls
+		// while only the storage buffer's node is repointed to a different attribute, a bind-group
+		// cache keyed only on the texture's identity/version could return a bind group still wired
+		// to the previous storage attribute. This isolates exactly that: one texture, reused
+		// across many calls, while the storage write target alternates every call.
 		repointTest( 'texture+storage kernel reused with the same texture object across alternating storage targets (1024x1024)', async ( assert, renderer ) => {
 
 			const width = 1024, height = 1024;
@@ -932,9 +924,9 @@ export default QUnit.module( 'TSL', () => {
 			const sourceNode = texture( sourceTexture );
 			const writeNode = storage( attrA, 'vec2', count );
 
-			// texture -> storage, exactly FFT2D._load's shape (2D-indexed texture read, flat
-			// storage write) -- built once, `sourceNode` never repointed (same texture every
-			// call), only `writeNode.value` alternates.
+			// texture -> storage: a 2D-indexed texture read, flat storage write -- built once,
+			// `sourceNode` never repointed (same texture every call), only `writeNode.value`
+			// alternates.
 			const loadKernel = Fn( () => {
 
 				const x = instanceIndex.mod( uint( width ) );
