@@ -179,7 +179,7 @@
 				if ( myGeneration !== generation ) { newTexture.dispose(); return; } // superseded
 
 				newTexture.colorSpace = THREE.NoColorSpace;
-				newTexture.flipY = false;
+				newTexture.flipY = true;
 				newTexture.magFilter = THREE.NearestFilter;
 				newTexture.minFilter = THREE.NearestFilter;
 				newTexture.generateMipmaps = false;

@@ -18,6 +18,23 @@ function isPowerOfTwo( value ) {
 }
 
 /**
+ * The workgroup size used for every kernel here that doesn't otherwise compute its own -- the
+ * per-stage fallback butterfly stage (`buildMultiDispatchStage`) and the plain elementwise passes
+ * (conjugate, `packTexture`, `unpackSpectrum`, `unpackImage`). 256 is the WebGPU spec's
+ * guaranteed-minimum `maxComputeInvocationsPerWorkgroup`/`maxComputeWorkgroupSizeX`, so it's valid
+ * on every conformant device without needing to query real limits (unlike `buildFusedLineStage`/
+ * `buildTransposeStage`, which size themselves off the real device via `getComputeLimits` because
+ * they also have to fit a shared-memory budget, not just an invocation count). It's also a whole
+ * multiple of every real-world subgroup/wave width (32 on NVIDIA/AMD RDNA/Apple/Intel, 64 on AMD
+ * GCN), so every subgroup stays fully packed regardless of vendor -- unlike leaving `.compute()`
+ * to fall back to its own default of `[64]`, which on most hardware leaves 3 out of every 4
+ * subgroups in a workgroup idle for no benefit.
+ *
+ * @type {number}
+ */
+const DEFAULT_WORKGROUP_SIZE = 256;
+
+/**
  * The WebGPU spec's *guaranteed-minimum* compute limits -- every conformant device supports at
  * least this much, so these are the values assumed when the real device's limits can't be read
  * (see `getComputeLimits`). Real hardware is usually far more generous (as of 2026, real-world
@@ -148,7 +165,7 @@ function computeTransposeTileSize( limits ) {
  * @param {Node<uint>} params.pUniform - The per-stage span uniform (doubles every stage, from 1 to N/2).
  * @param {StorageBufferNode} readNode - The buffer this stage reads from.
  * @param {StorageBufferNode} writeNode - The buffer this stage writes to.
- * @returns {Function} A parameterless TSL function ready to `.compute( dispatchCount )`.
+ * @returns {Function} A parameterless TSL function, already `.compute()`-d with `DEFAULT_WORKGROUP_SIZE`.
  */
 function buildMultiDispatchStage( { N, lineStride, elementStride, lineCount, pUniform }, readNode, writeNode ) {
 
@@ -192,7 +209,7 @@ function buildMultiDispatchStage( { N, lineStride, elementStride, lineCount, pUn
 		writeNode.element( j ).assign( out0 );
 		writeNode.element( j2 ).assign( out1 );
 
-	} )().compute( dispatchCount );
+	} )().compute( dispatchCount, [ DEFAULT_WORKGROUP_SIZE ] );
 
 }
 
@@ -518,14 +535,14 @@ class FFT2D {
 			const v = this.readA.element( instanceIndex ).toVar();
 			this.writeB.element( instanceIndex ).assign( vec2( v.x, v.y.negate() ) );
 
-		} )().compute( count );
+		} )().compute( count, [ DEFAULT_WORKGROUP_SIZE ] );
 
 		this._conjugateBtoA = Fn( () => {
 
 			const v = this.readB.element( instanceIndex ).toVar();
 			this.writeA.element( instanceIndex ).assign( vec2( v.x, v.y.negate() ) );
 
-		} )().compute( count );
+		} )().compute( count, [ DEFAULT_WORKGROUP_SIZE ] );
 
 		/**
 		 * Which of the two ping-pong buffers ('A' or 'B') currently holds the live data.
@@ -782,7 +799,7 @@ class FFT2D {
 
 				writeNode.element( instanceIndex ).assign( vec2( value, 0 ) );
 
-			} )().compute( this.count );
+			} )().compute( this.count, [ DEFAULT_WORKGROUP_SIZE ] );
 
 			this._packToA = build( this.writeA );
 			this._packToB = build( this.writeB );
@@ -842,7 +859,7 @@ class FFT2D {
 
 				textureStore( writeTex, uvec2( x, y ), vec4( value, value, value, 1 ) );
 
-			} )().compute( count );
+			} )().compute( count, [ DEFAULT_WORKGROUP_SIZE ] );
 
 			this._spectrumFromA = build( this.readA );
 			this._spectrumFromB = build( this.readB );
@@ -883,7 +900,7 @@ class FFT2D {
 
 				textureStore( writeTex, uvec2( x, y ), vec4( value, value, value, 1 ) );
 
-			} )().compute( count );
+			} )().compute( count, [ DEFAULT_WORKGROUP_SIZE ] );
 
 			this._imageFromA = build( this.readA );
 			this._imageFromB = build( this.readB );
