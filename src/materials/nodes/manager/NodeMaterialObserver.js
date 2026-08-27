@@ -20,6 +20,7 @@ const refreshUniforms = [
 	'color',
 	'dashOffset',
 	'dashSize',
+	'diffuseRoughness',
 	'dispersion',
 	'displacementBias',
 	'displacementMap',
