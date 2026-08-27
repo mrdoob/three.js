@@ -349,9 +349,9 @@ class PhysicalLightingModel extends LightingModel {
 	 * @param {boolean} [transmission=false] - Whether transmission is supported or not.
 	 * @param {boolean} [dispersion=false] - Whether dispersion is supported or not.
 	 * @param {boolean} [retroreflection=false] - Whether retroreflection is supported or not.
-	 * @param {boolean} [roughDiffuse=false] - Whether EON rough diffuse reflection is supported or not.
+	 * @param {boolean} [diffuseRoughness=false] - Whether EON rough diffuse reflection is supported or not.
 	 */
-	constructor( clearcoat = false, sheen = false, iridescence = false, anisotropy = false, transmission = false, dispersion = false, retroreflection = false, roughDiffuse = false ) {
+	constructor( clearcoat = false, sheen = false, iridescence = false, anisotropy = false, transmission = false, dispersion = false, retroreflection = false, diffuseRoughness = false ) {
 
 		super();
 
@@ -417,7 +417,7 @@ class PhysicalLightingModel extends LightingModel {
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.roughDiffuse = roughDiffuse;
+		this.diffuseRoughness = diffuseRoughness;
 
 		/**
 		 * The clear coat radiance.
@@ -680,7 +680,7 @@ class PhysicalLightingModel extends LightingModel {
 
 		}
 
-		const diffuseBRDF = this.roughDiffuse
+		const diffuseBRDF = this.diffuseRoughness
 			? BRDF_EON( { lightDirection, diffuseColor: diffuseColor.rgb, roughness: diffuseRoughness } ).mul( metalness.oneMinus() )
 			: BRDF_Lambert( { diffuseColor: diffuseContribution } );
 
@@ -779,7 +779,7 @@ class PhysicalLightingModel extends LightingModel {
 
 		this.computeMultiscattering( singleScattering, multiScattering, specularF90, specularColor, this.iridescenceF0Dielectric );
 
-		const diffuseBRDF = this.roughDiffuse
+		const diffuseBRDF = this.diffuseRoughness
 			? EON_DirectionalAlbedo( { diffuseColor: diffuseColor.rgb, roughness: diffuseRoughness, dotNV: normalView.dot( positionViewDirection ).clamp() } ).mul( metalness.oneMinus(), 1 / Math.PI )
 			: BRDF_Lambert( { diffuseColor: diffuseContribution } );
 
@@ -857,7 +857,7 @@ class PhysicalLightingModel extends LightingModel {
 		// Diffuse energy conservation uses dielectric path
 		const totalScatteringDielectric = singleScatteringDielectric.add( multiScatteringDielectric );
 
-		const diffuseAlbedo = this.roughDiffuse
+		const diffuseAlbedo = this.diffuseRoughness
 			? EON_DirectionalAlbedo( { diffuseColor: diffuseColor.rgb, roughness: diffuseRoughness, dotNV: normalView.dot( positionViewDirection ).clamp() } ).mul( metalness.oneMinus() )
 			: diffuseContribution;
 
