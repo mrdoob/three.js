@@ -7,6 +7,9 @@ const MESSAGE_ID = 'three-devtools';
 // Relay bridge messages to the background script
 window.addEventListener( 'message', ( event ) => {
 
+	// Only accept messages from the same frame
+	if ( event.source !== window ) return;
+
 	if ( ! event.data || event.data.id !== MESSAGE_ID ) return;
 
 	try {
@@ -25,7 +28,7 @@ window.addEventListener( 'message', ( event ) => {
 chrome.runtime.onMessage.addListener( ( message ) => {
 
 	message.id = MESSAGE_ID;
-	window.postMessage( message, '*' );
+	window.postMessage( message, '/' );
 
 } );
 

@@ -45,7 +45,7 @@
 	// Send a message to the panel (relayed by the content script)
 	function postToPanel( name, detail ) {
 
-		window.postMessage( { id: MESSAGE_ID, name: name, detail: detail }, '*' );
+		window.postMessage( { id: MESSAGE_ID, name: name, detail: detail }, '/' );
 
 	}
 
