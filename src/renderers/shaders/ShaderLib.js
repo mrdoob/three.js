@@ -94,7 +94,6 @@ const ShaderLib = {
 			{
 				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) },
 				roughness: { value: 1.0 },
-				diffuseRoughness: { value: 0.0 },
 				metalness: { value: 0.0 },
 				envMapIntensity: { value: 1 }
 			}
@@ -316,6 +315,7 @@ ShaderLib.physical = {
 			clearcoatRoughness: { value: 0 },
 			clearcoatRoughnessMap: { value: null },
 			clearcoatRoughnessMapTransform: { value: /*@__PURE__*/ new Matrix3() },
+			diffuseRoughness: { value: 0 },
 			dispersion: { value: 0 },
 			retroreflectivity: { value: 0 },
 			iridescence: { value: 0 },
