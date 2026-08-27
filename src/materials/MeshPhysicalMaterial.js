@@ -142,6 +142,18 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.clearcoatNormalMap = null;
 
 		/**
+		 * The red channel of this texture is multiplied against `diffuseRoughness`,
+		 * for per-pixel control over the diffuse roughness.
+		 *
+		 * `diffuseRoughnessMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
+		 *
+		 * @type {?Texture}
+		 * @default null
+		 */
+		this.diffuseRoughnessMap = null;
+
+		/**
 		 * Index-of-refraction for non-metallic materials, from `1.0` to `2.333`.
 		 *
 		 * @type {number}
@@ -597,6 +609,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.clearcoatNormalMap = source.clearcoatNormalMap;
 		this.clearcoatNormalScale.copy( source.clearcoatNormalScale );
 		this.diffuseRoughness = source.diffuseRoughness;
+		this.diffuseRoughnessMap = source.diffuseRoughnessMap;
 
 		this.dispersion = source.dispersion;
 		this.ior = source.ior;

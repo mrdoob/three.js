@@ -704,6 +704,12 @@ class Material extends EventDispatcher {
 		if ( this.clearcoatRoughness !== undefined ) data.clearcoatRoughness = this.clearcoatRoughness;
 		if ( this.diffuseRoughness !== undefined ) data.diffuseRoughness = this.diffuseRoughness;
 
+		if ( this.diffuseRoughnessMap && this.diffuseRoughnessMap.isTexture ) {
+
+			data.diffuseRoughnessMap = this.diffuseRoughnessMap.toJSON( meta ).uuid;
+
+		}
+
 		if ( this.clearcoatMap && this.clearcoatMap.isTexture ) {
 
 			data.clearcoatMap = this.clearcoatMap.toJSON( meta ).uuid;
@@ -1085,6 +1091,7 @@ class Material extends EventDispatcher {
 		if ( json.clearcoatRoughnessMap !== undefined ) this.clearcoatRoughnessMap = textures[ json.clearcoatRoughnessMap ] || null;
 		if ( json.clearcoatNormalMap !== undefined ) this.clearcoatNormalMap = textures[ json.clearcoatNormalMap ] || null;
 		if ( json.clearcoatNormalScale !== undefined ) this.clearcoatNormalScale = new Vector2().fromArray( json.clearcoatNormalScale );
+		if ( json.diffuseRoughnessMap !== undefined ) this.diffuseRoughnessMap = textures[ json.diffuseRoughnessMap ] || null;
 
 		if ( json.iridescenceMap !== undefined ) this.iridescenceMap = textures[ json.iridescenceMap ] || null;
 		if ( json.iridescenceThicknessMap !== undefined ) this.iridescenceThicknessMap = textures[ json.iridescenceThicknessMap ] || null;

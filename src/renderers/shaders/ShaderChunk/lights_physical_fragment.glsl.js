@@ -13,7 +13,15 @@ material.roughness = min( material.roughness, 1.0 );
 
 #ifdef USE_DIFFUSE_ROUGHNESS
 
-	material.diffuseRoughness = saturate( diffuseRoughness );
+	float diffuseRoughnessFactor = diffuseRoughness;
+
+	#ifdef USE_DIFFUSE_ROUGHNESSMAP
+
+		diffuseRoughnessFactor *= texture2D( diffuseRoughnessMap, vDiffuseRoughnessMapUv ).r;
+
+	#endif
+
+	material.diffuseRoughness = saturate( diffuseRoughnessFactor );
 
 #endif
 

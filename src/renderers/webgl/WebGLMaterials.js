@@ -418,6 +418,13 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.diffuseRoughness.value = material.diffuseRoughness;
 
+			if ( material.diffuseRoughnessMap ) {
+
+				uniforms.diffuseRoughnessMap.value = material.diffuseRoughnessMap;
+				refreshTransformUniform( material.diffuseRoughnessMap, uniforms.diffuseRoughnessMapTransform );
+
+			}
+
 		}
 
 		if ( material.sheen > 0 ) {

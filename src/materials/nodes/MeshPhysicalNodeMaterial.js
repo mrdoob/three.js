@@ -71,7 +71,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 		/**
 		 * The diffuse roughness of physical materials is by default inferred from the
-		 * `diffuseRoughness` property. This node property allows to overwrite the
+		 * `diffuseRoughness` and `diffuseRoughnessMap` properties. This node property allows to overwrite the
 		 * default and define the diffuse roughness with a node instead.
 		 *
 		 * If you don't want to overwrite the diffuse roughness but modify the existing
