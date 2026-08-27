@@ -84,6 +84,7 @@ export class RendererInspector extends InspectorBase {
 
 		this._lastFinishTime = 0;
 		this._resolveTimestampPromise = null;
+		this._rAFId = null;
 
 		this.overdraw = false;
 		this._overdrawMaterial = null;
@@ -262,14 +263,32 @@ export class RendererInspector extends InspectorBase {
 
 		this._resolveTimestampPromise = new Promise( ( resolve ) => {
 
-			requestAnimationFrame( async () => {
+			this._rAFId = requestAnimationFrame( async () => {
+
+				this._rAFId = null;
 
 				const renderer = this.getRenderer();
+
+				if ( renderer === null ) {
+
+					this._resolveTimestampPromise = null;
+					resolve();
+					return;
+
+				}
 
 				if ( renderer.backend.hasTimestamp ) {
 
 					await renderer.resolveTimestampsAsync( TimestampQuery.COMPUTE );
 					await renderer.resolveTimestampsAsync( TimestampQuery.RENDER );
+
+					if ( renderer !== this.getRenderer() ) {
+
+						this._resolveTimestampPromise = null;
+						resolve();
+						return;
+
+					}
 
 					const computeFrames = renderer.backend.getTimestampFrames( TimestampQuery.COMPUTE );
 					const renderFrames = renderer.backend.getTimestampFrames( TimestampQuery.RENDER );
@@ -548,6 +567,28 @@ export class RendererInspector extends InspectorBase {
 		currentRender.cpu = performance.now() - currentRender.timestamp;
 
 		this.currentRender = currentRender.parent;
+
+	}
+
+	dispose() {
+
+		if ( this._rAFId !== null ) {
+
+			cancelAnimationFrame( this._rAFId );
+			this._rAFId = null;
+
+		}
+
+		this._resolveTimestampPromise = null;
+
+		if ( this._overdrawMaterial !== null ) {
+
+			this._overdrawMaterial.dispose();
+			this._overdrawMaterial = null;
+
+		}
+
+		super.dispose();
 
 	}
 

@@ -954,6 +954,8 @@ class SSRNode extends TempNode {
 
 				sampleEnvReflection = () => {
 
+					if ( this._importanceEnvironment === null ) return vec3( 0 );
+
 					const envColor = vec3( 0 ).toVar();
 
 					if ( this.envImportanceSampling ) {
