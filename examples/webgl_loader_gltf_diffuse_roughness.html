@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - GLTFloader + Diffuse Roughness</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - GLTFloader + Diffuse Roughness">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_loader_gltf_diffuse_roughness.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_loader_gltf_diffuse_roughness.jpg">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - GLTFLoader + <a href="https://github.com/MiiBond/glTF/tree/mbond/EXT_materials_diffuse_roughness/extensions/2.0/Khronos/KHR_materials_diffuse_roughness" target="_blank" rel="noopener">KHR_materials_diffuse_roughness</a><br />
+			Diffuse roughness parameter sweep from <a href="https://github.com/KhronosGroup/glTF-Sample-Assets/pull/288" target="_blank" rel="noopener">glTF-Sample-Assets</a>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			let camera, scene, renderer, controls;
+			let modelCenter, modelSize;
+
+			const lightSettings = {
+				azimuth: 180,
+				elevation: 0,
+				intensity: 3
+			};
+
+			init().catch( function ( error ) {
+
+				console.error( error );
+
+			} );
+
+			async function init() {
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.NeutralToneMapping;
+				document.body.appendChild( renderer.domElement );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x202124 );
+
+				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 0, - 1 );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+
+				const light = new THREE.DirectionalLight( 0xffffff, lightSettings.intensity );
+				scene.add( light );
+				scene.add( light.target );
+
+				function updateLight() {
+
+					const azimuth = THREE.MathUtils.degToRad( lightSettings.azimuth );
+					const elevation = THREE.MathUtils.degToRad( lightSettings.elevation );
+					const radius = 10;
+
+					light.position.set(
+						radius * Math.sin( azimuth ) * Math.cos( elevation ),
+						radius * Math.sin( elevation ),
+						radius * Math.cos( azimuth ) * Math.cos( elevation )
+					);
+					light.intensity = lightSettings.intensity;
+
+				}
+
+				updateLight();
+
+				const gui = new GUI();
+				gui.add( lightSettings, 'azimuth', - 180, 180, 1 ).onChange( updateLight );
+				gui.add( lightSettings, 'elevation', - 10, 90, 1 ).onChange( updateLight );
+				gui.add( lightSettings, 'intensity', 0, 6, 0.1 ).onChange( updateLight );
+
+				const gltf = await new GLTFLoader()
+					.setPath( 'models/gltf/' )
+					.loadAsync( 'DiffuseRoughnessParameterSweep.glb' );
+
+				// The draft sample asset currently uses clockwise triangle winding.
+				const geometries = new Set();
+
+				gltf.scene.traverse( function ( object ) {
+
+					const geometry = object.geometry;
+
+					if ( geometry === undefined || geometries.has( geometry ) ) return;
+
+					const index = geometry.index;
+
+					for ( let i = 0; i < index.count; i += 3 ) {
+
+						const second = index.getX( i + 1 );
+						index.setX( i + 1, index.getX( i + 2 ) );
+						index.setX( i + 2, second );
+
+					}
+
+					index.needsUpdate = true;
+					geometries.add( geometry );
+
+				} );
+
+				scene.add( gltf.scene );
+
+				const box = new THREE.Box3().setFromObject( gltf.scene );
+				modelCenter = box.getCenter( new THREE.Vector3() );
+				modelSize = box.getSize( new THREE.Vector3() );
+				light.target.position.copy( modelCenter );
+
+				frameModel();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function frameModel() {
+
+				const halfFov = THREE.MathUtils.degToRad( camera.fov * 0.5 );
+				const distance = 1.1 * Math.max(
+					modelSize.y * 0.5 / Math.tan( halfFov ),
+					modelSize.x * 0.5 / ( Math.tan( halfFov ) * camera.aspect )
+				);
+
+				const direction = camera.position.clone().sub( controls.target );
+				if ( direction.lengthSq() === 0 ) direction.set( 0, 0, 1 );
+
+				controls.target.copy( modelCenter );
+				camera.position.copy( modelCenter ).add( direction.normalize().multiplyScalar( distance ) );
+				camera.near = distance / 100;
+				camera.far = distance * 100;
+				camera.updateProjectionMatrix();
+
+				controls.minDistance = distance * 0.35;
+				controls.maxDistance = distance * 3;
+				controls.update();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				frameModel();
+
+			}
+
+			function animate() {
+
+				controls.update();
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

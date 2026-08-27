@@ -90,6 +90,7 @@
 		"webgl_loader_gltf_progressive_lod",
 		"webgl_loader_gltf_avif",
 		"webgl_loader_gltf_compressed",
+		"webgl_loader_gltf_diffuse_roughness",
 		"webgl_loader_gltf_dispersion",
 		"webgl_loader_gltf_instancing",
 		"webgl_loader_gltf_iridescence",
