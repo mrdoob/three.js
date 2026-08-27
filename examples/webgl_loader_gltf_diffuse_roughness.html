@@ -9,6 +9,23 @@
 		<meta property="og:url" content="https://threejs.org/examples/webgl_loader_gltf_diffuse_roughness.html">
 		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_loader_gltf_diffuse_roughness.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			.material-label,
+			.row-label {
+				color: #fff;
+				font: 11px/1.2 Arial, sans-serif;
+				letter-spacing: 0;
+				padding: 2px 4px;
+				background: rgba( 0, 0, 0, 0.7 );
+				border-radius: 2px;
+				white-space: nowrap;
+			}
+
+			.row-label {
+				font-size: 12px;
+				text-align: right;
+			}
+		</style>
 	</head>
 
 	<body>
@@ -33,9 +50,19 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { CSS2DObject, CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 
-			let camera, scene, renderer, controls;
-			let modelCenter, modelSize;
+			let camera, scene, renderer, labelRenderer, controls;
+			let model, modelCenter, modelSize;
+
+			const rowDescriptions = [
+				{ y: 1, desc: 'Control' },
+				{ y: 0, desc: 'spec. 0.95' },
+				{ y: - 1, desc: 'spec. 0.35' },
+				{ y: - 2, desc: 'map R x 1' }
+			];
+			const labeledObjects = [];
+			const rowLabels = [];
 
 			const lightSettings = {
 				azimuth: 180,
@@ -57,6 +84,13 @@
 				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.NeutralToneMapping;
 				document.body.appendChild( renderer.domElement );
+
+				labelRenderer = new CSS2DRenderer();
+				labelRenderer.setSize( window.innerWidth, window.innerHeight );
+				labelRenderer.domElement.style.position = 'absolute';
+				labelRenderer.domElement.style.top = '0';
+				labelRenderer.domElement.style.pointerEvents = 'none';
+				document.body.appendChild( labelRenderer.domElement );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x202124 );
@@ -92,19 +126,25 @@
 				gui.add( lightSettings, 'azimuth', - 180, 180, 1 ).onChange( updateLight );
 				gui.add( lightSettings, 'elevation', - 10, 90, 1 ).onChange( updateLight );
 				gui.add( lightSettings, 'intensity', 0, 6, 0.1 ).onChange( updateLight );
+				if ( camera.aspect < 0.75 ) gui.close();
 
 				const gltf = await new GLTFLoader()
 					.setPath( 'models/gltf/' )
 					.loadAsync( 'DiffuseRoughnessParameterSweep.glb' );
+				model = gltf.scene;
 
 				// The draft sample asset currently uses clockwise triangle winding.
 				const geometries = new Set();
 
-				gltf.scene.traverse( function ( object ) {
+				model.traverse( function ( object ) {
 
 					const geometry = object.geometry;
 
-					if ( geometry === undefined || geometries.has( geometry ) ) return;
+					if ( geometry === undefined ) return;
+
+					addMaterialLabel( object );
+
+					if ( geometries.has( geometry ) ) return;
 
 					const index = geometry.index;
 
@@ -121,11 +161,12 @@
 
 				} );
 
-				scene.add( gltf.scene );
+				addMapTestRow();
+				addRowLabels();
+				updateModelLayout();
+				scene.add( model );
 
-				const box = new THREE.Box3().setFromObject( gltf.scene );
-				modelCenter = box.getCenter( new THREE.Vector3() );
-				modelSize = box.getSize( new THREE.Vector3() );
+				updateModelBounds();
 				light.target.position.copy( modelCenter );
 
 				frameModel();
@@ -134,10 +175,112 @@
 
 			}
 
+			function addMaterialLabel( object, text ) {
+
+				labeledObjects.push( { object, position: object.position.clone() } );
+
+				const element = document.createElement( 'div' );
+				element.className = 'material-label';
+				element.textContent = text || ( object.material.diffuseRoughness === undefined
+					? 'Lambert'
+					: object.material.diffuseRoughness.toFixed( 2 ) );
+
+				const label = new CSS2DObject( element );
+				label.position.set( 0, 0.48, 0 );
+				object.add( label );
+
+			}
+
+			function addMapTestRow() {
+
+				const sources = labeledObjects
+					.map( ( { object } ) => object )
+					.filter( object => object.name.startsWith( '01_' ) );
+
+				for ( const source of sources ) {
+
+					const mapValue = source.material.diffuseRoughness;
+					const map = new THREE.DataTexture( new Uint8Array( [ Math.round( mapValue * 255 ), 0, 0, 255 ] ), 1, 1 );
+					map.needsUpdate = true;
+
+					const material = source.material.clone();
+					material.diffuseRoughness = 1;
+					material.diffuseRoughnessMap = map;
+
+					const object = new THREE.Mesh( source.geometry, material );
+					object.position.set( source.position.x, - 2, source.position.z );
+					model.add( object );
+					addMaterialLabel( object, `R ${ mapValue.toFixed( 2 ) }` );
+
+				}
+
+			}
+
+			function addRowLabels() {
+
+				for ( const { y, desc } of rowDescriptions ) {
+
+					const element = document.createElement( 'div' );
+					element.className = 'row-label';
+					element.textContent = desc;
+
+					const label = new CSS2DObject( element );
+					model.add( label );
+					rowLabels.push( { label, y } );
+
+				}
+
+			}
+
+			function updateModelLayout() {
+
+				const portrait = camera.aspect < 0.75;
+
+				for ( const { object, position } of labeledObjects ) {
+
+					if ( portrait ) {
+
+						object.position.set( position.y, - position.x, position.z );
+
+					} else {
+
+						object.position.copy( position );
+
+					}
+
+				}
+
+				for ( const { label, y } of rowLabels ) {
+
+					if ( portrait ) {
+
+						label.position.set( y, 4.15, 0 );
+						label.center.set( 0.5, 1 );
+
+					} else {
+
+						label.position.set( 4.05, y, 0 );
+						label.center.set( 1, 0.5 );
+
+					}
+
+				}
+
+			}
+
+			function updateModelBounds() {
+
+				const box = new THREE.Box3().setFromObject( model );
+				modelCenter = box.getCenter( new THREE.Vector3() );
+				modelSize = box.getSize( new THREE.Vector3() );
+
+			}
+
 			function frameModel() {
 
 				const halfFov = THREE.MathUtils.degToRad( camera.fov * 0.5 );
-				const distance = 1.1 * Math.max(
+				const framingPadding = camera.aspect < 0.75 ? 1.5 : 1.4;
+				const distance = framingPadding * Math.max(
 					modelSize.y * 0.5 / Math.tan( halfFov ),
 					modelSize.x * 0.5 / ( Math.tan( halfFov ) * camera.aspect )
 				);
@@ -160,7 +303,11 @@
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
+				updateModelLayout();
+				updateModelBounds();
+
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				labelRenderer.setSize( window.innerWidth, window.innerHeight );
 
 				frameModel();
 
@@ -170,6 +317,7 @@
 
 				controls.update();
 				renderer.render( scene, camera );
+				labelRenderer.render( scene, camera );
 
 			}
 
