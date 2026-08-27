@@ -1,29 +1,25 @@
-// This script handles highlighting of Three.js objects in the 3D scene
+/* global HIGHLIGHT_NAME, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT */
+
+// Highlights the object hovered in the panel with a yellow wireframe clone
 
 ( function () {
-
-	'use strict';
 
 	let highlightObject = null;
 
 	function cloneMaterial( material ) {
 
-		// Skip MeshNormalMaterial
-		if ( material.isMeshNormalMaterial ) {
+		// MeshNormalMaterial has no color to override
+		if ( material.isMeshNormalMaterial ) return material;
 
-			return material;
+		const cloned = new material.constructor();
 
-		}
+		if ( material.isShaderMaterial ) {
 
-		// Handle ShaderMaterial and RawShaderMaterial
-		if ( material.isShaderMaterial || material.isRawShaderMaterial ) {
+			// Replace the shaders with a flat yellow output
+			const raw = material.isRawShaderMaterial;
 
-			// Create new material of the same type
-			const cloned = new material.constructor();
-
-			// Override shaders with simple yellow output
-			const vertexShader = `
-				${ material.isRawShaderMaterial ? `attribute vec3 position;
+			cloned.vertexShader = `
+				${ raw ? `attribute vec3 position;
 				uniform mat4 modelViewMatrix;
 				uniform mat4 projectionMatrix;
 				` : '' }void main() {
@@ -31,64 +27,25 @@
 				}
 			`;
 
-			const fragmentShader = `
-				${ material.isRawShaderMaterial ? `precision highp float;
+			cloned.fragmentShader = `
+				${ raw ? `precision highp float;
 				` : '' }void main() {
 					gl_FragColor = vec4( 1.0, 1.0, 0.0, 1.0 );
 				}
 			`;
 
-			cloned.vertexShader = vertexShader;
-			cloned.fragmentShader = fragmentShader;
+		} else {
 
-			// Override with yellow wireframe settings
-			cloned.wireframe = true;
-			cloned.depthTest = false;
-			cloned.depthWrite = false;
-			cloned.transparent = true;
-			cloned.opacity = 1;
-			cloned.toneMapped = false;
-			cloned.fog = false;
-
-			return cloned;
+			if ( cloned.color ) cloned.color.setRGB( 1, 1, 0 );
+			if ( cloned.emissive ) cloned.emissive.setRGB( 1, 1, 0 );
 
 		}
 
-		// Create new material of the same type
-		const cloned = new material.constructor();
-
-		// Set yellow color
-		if ( cloned.color ) {
-
-			cloned.color.r = 1;
-			cloned.color.g = 1;
-			cloned.color.b = 0;
-
-		}
-
-		// If material has emissive, set it to yellow
-		if ( 'emissive' in cloned ) {
-
-			cloned.emissive.r = 1;
-			cloned.emissive.g = 1;
-			cloned.emissive.b = 0;
-
-		}
-
-		// Enable wireframe if the material supports it
-		if ( 'wireframe' in cloned ) {
-
-			cloned.wireframe = true;
-
-		}
-
-		// Render on top, ignoring depth
+		// Yellow wireframe drawn on top of everything
+		cloned.wireframe = true;
 		cloned.depthTest = false;
 		cloned.depthWrite = false;
 		cloned.transparent = true;
-		cloned.opacity = 1;
-
-		// Disable tone mapping and fog
 		cloned.toneMapped = false;
 		cloned.fog = false;
 
@@ -99,70 +56,43 @@
 	function highlight( uuid ) {
 
 		const object = __THREE_DEVTOOLS__.utils.findObjectInScenes( uuid );
-		if ( ! object ) {
 
-			// Object not in scene (e.g., renderer) - hide highlight
-			if ( highlightObject ) highlightObject.visible = false;
+		// Renderers, helpers, the highlight itself and objects without geometry can't be highlighted
+		if ( ! object || object.type.includes( 'Helper' ) || object.name === HIGHLIGHT_NAME || ! object.geometry ) {
+
+			unhighlight();
 			return;
 
 		}
 
-		// Skip helpers, existing highlights, and objects without geometry
-		if ( object.type.includes( 'Helper' ) || object.name === '__THREE_DEVTOOLS_HIGHLIGHT__' || ! object.geometry ) {
-
-			if ( highlightObject ) highlightObject.visible = false;
-			return;
-
-		}
-
-		// Remove old highlight if it exists
-		if ( highlightObject && highlightObject.parent ) {
-
-			highlightObject.parent.remove( highlightObject );
-
-		}
+		if ( highlightObject ) highlightObject.removeFromParent();
 
 		// Clone the object to preserve all properties (skeleton, bindMatrix, etc)
 		highlightObject = object.clone();
-		highlightObject.name = '__THREE_DEVTOOLS_HIGHLIGHT__';
+		highlightObject.name = HIGHLIGHT_NAME;
+		highlightObject.castShadow = false;
+		highlightObject.receiveShadow = false;
+		highlightObject.renderOrder = Infinity;
+		highlightObject.visible = true;
 
-		// Apply yellow wireframe material
 		if ( highlightObject.material ) {
 
-			if ( Array.isArray( highlightObject.material ) ) {
-
-				highlightObject.material = highlightObject.material.map( cloneMaterial );
-
-			} else {
-
-				highlightObject.material = cloneMaterial( highlightObject.material );
-
-			}
+			highlightObject.material = Array.isArray( highlightObject.material )
+				? highlightObject.material.map( cloneMaterial )
+				: cloneMaterial( highlightObject.material );
 
 		}
 
-		// Disable shadows
-		highlightObject.castShadow = false;
-		highlightObject.receiveShadow = false;
-
-		// Render on top of everything
-		highlightObject.renderOrder = Infinity;
-
-		// Disable auto update before adding to scene
+		// Follow the original by sharing its matrixWorld
 		highlightObject.matrixAutoUpdate = false;
 		highlightObject.matrixWorldAutoUpdate = false;
+		highlightObject.matrixWorld = object.matrixWorld;
 
-		// Find the scene and add at root
+		// Add at the scene root
 		let scene = object;
 		while ( scene.parent ) scene = scene.parent;
 
 		scene.add( highlightObject );
-
-		// Reuse the matrixWorld from original object (after adding to scene)
-		highlightObject.matrixWorld = object.matrixWorld;
-
-		// Make sure it's visible
-		highlightObject.visible = true;
 
 	}
 
@@ -177,16 +107,12 @@
 	}
 
 	// Listen for highlight events from bridge.js
-	__THREE_DEVTOOLS__.addEventListener( 'highlight-object', ( event ) => {
+	__THREE_DEVTOOLS__.addEventListener( MESSAGE_HIGHLIGHT_OBJECT, ( event ) => {
 
 		highlight( event.detail.uuid );
 
 	} );
 
-	__THREE_DEVTOOLS__.addEventListener( 'unhighlight-object', () => {
-
-		unhighlight();
-
-	} );
+	__THREE_DEVTOOLS__.addEventListener( MESSAGE_UNHIGHLIGHT_OBJECT, unhighlight );
 
 } )();
