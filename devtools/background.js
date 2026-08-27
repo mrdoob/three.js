@@ -1,55 +1,57 @@
-/* global chrome, importScripts, MESSAGE_ID, MESSAGE_INIT, MESSAGE_REGISTER, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, MESSAGE_COMMITTED */
+/* global chrome, importScripts, MESSAGE_ID, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, EVENT_REGISTER, EVENT_COMMITTED */
 
 importScripts( 'constants.js' );
 
-// Map tab IDs to connections
+// Map tab IDs to devtools panel connections
 const connections = new Map();
 
-// Handle extension icon clicks in the toolbar
+// Panel requests that are forwarded to the page
+const FORWARDABLE_MESSAGES = new Set( [
+	MESSAGE_REQUEST_STATE,
+	MESSAGE_REQUEST_OBJECT_DETAILS,
+	MESSAGE_SCROLL_TO_CANVAS,
+	MESSAGE_HIGHLIGHT_OBJECT,
+	MESSAGE_UNHIGHLIGHT_OBJECT
+] );
+
+// Badge helpers. The tab may already be gone, so errors are ignored.
+function setBadge( tabId, text, color ) {
+
+	chrome.action.setBadgeText( { tabId: tabId, text: text } ).catch( () => {} );
+	chrome.action.setBadgeTextColor( { tabId: tabId, color: '#ffffff' } ).catch( () => {} );
+	chrome.action.setBadgeBackgroundColor( { tabId: tabId, color: color } ).catch( () => {} );
+
+}
+
+function clearBadge( tabId ) {
+
+	chrome.action.setBadgeText( { tabId: tabId, text: '' } ).catch( () => {} );
+
+}
+
+// Toolbar icon click scrolls the page to its first canvas
 chrome.action.onClicked.addListener( ( tab ) => {
 
-	// Send scroll-to-canvas message to the content script (no UUID = scroll to first canvas)
-	chrome.tabs.sendMessage( tab.id, {
-		name: MESSAGE_SCROLL_TO_CANVAS,
-		tabId: tab.id
-	} ).catch( () => {
-
-		// Ignore error - tab might not have the content script injected
-		console.log( 'Could not send scroll-to-canvas message to tab', tab.id );
-
-	} );
+	// No content script in this tab (e.g. chrome:// pages)
+	chrome.tabs.sendMessage( tab.id, { name: MESSAGE_SCROLL_TO_CANVAS } ).catch( () => {} );
 
 } );
 
 // Listen for connections from the devtools panel
-chrome.runtime.onConnect.addListener( port => {
+chrome.runtime.onConnect.addListener( ( port ) => {
 
 	let tabId;
 
-	// Messages that should be forwarded to content script
-	const forwardableMessages = new Set( [
-		MESSAGE_REQUEST_STATE,
-		MESSAGE_REQUEST_OBJECT_DETAILS,
-		MESSAGE_SCROLL_TO_CANVAS,
-		MESSAGE_HIGHLIGHT_OBJECT,
-		MESSAGE_UNHIGHLIGHT_OBJECT
-	] );
-
-	// Listen for messages from the devtools panel
-	port.onMessage.addListener( message => {
+	port.onMessage.addListener( ( message ) => {
 
 		if ( message.name === MESSAGE_INIT ) {
 
 			tabId = message.tabId;
 			connections.set( tabId, port );
 
-		} else if ( forwardableMessages.has( message.name ) && tabId ) {
+		} else if ( FORWARDABLE_MESSAGES.has( message.name ) ) {
 
 			chrome.tabs.sendMessage( tabId, message );
-
-		} else if ( tabId === undefined ) {
-
-			console.warn( 'Background: Message received from panel before init:', message );
 
 		}
 
@@ -58,18 +60,14 @@ chrome.runtime.onConnect.addListener( port => {
 	// Clean up when devtools is closed
 	port.onDisconnect.addListener( () => {
 
-		if ( tabId ) {
-
-			connections.delete( tabId );
-
-		}
+		connections.delete( tabId );
 
 	} );
 
 } );
 
-// Listen for messages from the content script
-chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
+// Messages from the content script
+chrome.runtime.onMessage.addListener( ( message, sender ) => {
 
 	if ( message.scheme ) {
 
@@ -81,104 +79,51 @@ chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
 
 	}
 
-	if ( sender.tab ) {
+	if ( sender.tab === undefined ) return;
 
-		const tabId = sender.tab.id;
+	const tabId = sender.tab.id;
 
-		// If three.js is detected, show a badge
-		if ( message.name === MESSAGE_REGISTER && message.detail && message.detail.revision ) {
+	// If three.js is detected, show its revision as a badge
+	if ( message.name === EVENT_REGISTER ) {
 
-			const revision = String( message.detail.revision );
-			const number = revision.replace( /\D+$/, '' );
-			const isDev = revision.includes( 'dev' );
+		const revision = message.detail.revision;
+		const isDev = revision.includes( 'dev' );
 
-			chrome.action.setBadgeText( { tabId: tabId, text: number } ).catch( () => {
-
-				// Ignore error - tab might have been closed
-
-			} );
-			chrome.action.setBadgeTextColor( { tabId: tabId, color: '#ffffff' } ).catch( () => {
-
-				// Ignore error - tab might have been closed
-
-			} );
-			chrome.action.setBadgeBackgroundColor( { tabId: tabId, color: isDev ? '#ff0098' : '#049ef4' } ).catch( () => {
-
-				// Ignore error - tab might have been closed
-
-			} );
-
-		}
-
-		const port = connections.get( tabId );
-		if ( port ) {
-
-			// Forward the message to the devtools panel
-			try {
-
-				port.postMessage( message );
-				// Send immediate response to avoid "message channel closed" error
-				sendResponse( { received: true } );
-
-			} catch ( e ) {
-
-				console.error( 'Error posting message to devtools:', e );
-				// If the port is broken, clean up the connection
-				connections.delete( tabId );
-
-			}
-
-		}
-
-	}
-
-	return false; // Return false to indicate synchronous handling
-
-} );
-
-// Listen for page navigation events
-chrome.webNavigation.onCommitted.addListener( details => {
-
-	const { tabId, frameId } = details;
-
-	// Clear badge on navigation, only for top-level navigation
-	if ( frameId === 0 ) {
-
-		chrome.action.setBadgeText( { tabId: tabId, text: '' } ).catch( () => {
-
-			// Ignore error - tab might have been closed
-
-		} );
+		setBadge( tabId, revision.replace( /\D+$/, '' ), isDev ? '#ff0098' : '#049ef4' );
 
 	}
 
 	const port = connections.get( tabId );
 
-	if ( port ) {
+	if ( port !== undefined ) {
 
-		port.postMessage( {
-			id: MESSAGE_ID,
-			name: MESSAGE_COMMITTED,
-			frameId: frameId
-		} );
+		// The panel keeps track of which frame each renderer and scene came from
+		message.frameId = sender.frameId;
+
+		try {
+
+			port.postMessage( message );
+
+		} catch ( error ) {
+
+			// Port already disconnected
+
+		}
 
 	}
 
 } );
 
-// Clear badge when a tab is closed
-chrome.tabs.onRemoved.addListener( ( tabId ) => {
+// A navigated frame's renderers and scenes are gone, let the panel drop them
+chrome.webNavigation.onCommitted.addListener( ( { tabId, frameId } ) => {
 
-	chrome.action.setBadgeText( { tabId: tabId, text: '' } ).catch( () => {
+	if ( frameId === 0 ) clearBadge( tabId );
 
-		// Ignore error - tab is already gone
+	const port = connections.get( tabId );
 
-	} );
+	if ( port !== undefined ) {
 
-	// Clean up connection if it exists for the closed tab
-	if ( connections.has( tabId ) ) {
-
-		connections.delete( tabId );
+		port.postMessage( { id: MESSAGE_ID, name: EVENT_COMMITTED, frameId: frameId } );
 
 	}
 
