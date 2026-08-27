@@ -245,12 +245,9 @@
 
 				await renderer.init();
 
-				// Rendering is on-demand (no animation loop), so wire render() to the controls'
-				// "change" event to stay responsive while dragging/zooming.
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableRotate = false;
 				controls.screenSpacePanning = true;
-				controls.addEventListener( 'change', render );
 
 				const gui = renderer.inspector.createParameters( 'FFT' );
 
@@ -270,6 +267,9 @@
 				window.addEventListener( 'resize', onWindowResize );
 
 				await loadPreset( PRESETS[ 0 ] );
+
+				// After the first FFT has painted -- an earlier loop would screenshot an empty canvas.
+				renderer.setAnimationLoop( render );
 
 			}
 
