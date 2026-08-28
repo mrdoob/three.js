@@ -20,9 +20,9 @@ import NodeError from '../core/NodeError.js';
  * per-component - each output lane picks independently based on its own
  * condition component, the same way WGSL's native `select()` and GLSL's
  * `mix( x, y, bvecN )` do - rather than picking one branch for the whole
- * vector. An `elseNode` is required in this case. Vector values must have the
- * same number of components as the condition; scalar values are broadcast
- * when the other value establishes the result width.
+ * vector. Vector values must have the same number of components as the
+ * condition; scalar values are broadcast when the other value establishes
+ * the result width.
  *
  * ```js
  * // per-component: each channel picks independently
@@ -157,8 +157,7 @@ class ConditionalNode extends Node {
 
 		nodeData.nodeProperty = nodeProperty;
 
-		// A vector condition (e.g. a `bvec4`) selects per-component, each
-		// output lane resolving independently - see getVectorSelect().
+		// A vector condition selects per-component - see getVectorSelect().
 		const condType = condNode.getNodeType( builder );
 		const condLength = builder.getTypeLength( condType );
 
@@ -187,10 +186,7 @@ class ConditionalNode extends Node {
 
 			}
 
-			// A missing "else" mirrors the scalar if()-without-else case
-			// below: each lane not selected by `condSnippet` keeps the
-			// result type's zero value, rather than a single well-defined
-			// fallback branch.
+			// No "else": unselected lanes fall back to the type's zero value.
 			let elseSnippet;
 
 			if ( elseNode !== null ) {
@@ -219,10 +215,6 @@ class ConditionalNode extends Node {
 
 			if ( ! needsOutput ) return '';
 
-			// Assign into nodeProperty rather than returning mathSnippet
-			// directly, so a second reference to this node (which hits the
-			// early-return above) gets the real result instead of an
-			// unassigned variable.
 			builder.addFlowCode( `\n${ builder.tab }${ nodeProperty } = ${ mathSnippet };\n\n` );
 
 			return builder.format( nodeProperty, type, output );

@@ -71,10 +71,6 @@ export default QUnit.module( 'TSL', () => {
 			assert.eq( select( equal( float( 1 ), float( 1 ) ), float( 10 ), float( 20 ) ), float( 10 ), 'select(true, 10, 20) picks the "if" branch' );
 			assert.eq( select( equal( float( 1 ), float( 0 ) ), float( 10 ), float( 20 ) ), float( 20 ), 'select(false, 10, 20) picks the "else" branch' );
 
-			// select() (ConditionalNode) with a *vector* condition selects
-			// per-component -- each output lane picks independently, matching
-			// WGSL's native `select()` and GLSL's `bvecN`-selector `mix()`,
-			// not a scalar if/else over the whole vector.
 			const cond = vec3( 1, 0, 1 ).greaterThan( vec3( 0, 0, 0 ) );
 			assert.eq( select( cond, vec3( 1, 2, 3 ), vec3( 100, 200, 300 ) ), vec3( 1, 200, 3 ), 'select() with a vector condition blends per-component' );
 

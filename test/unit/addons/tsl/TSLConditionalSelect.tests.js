@@ -5,8 +5,6 @@ export default QUnit.module( 'TSL', () => {
 
 	QUnit.module( 'Conditional (select)', () => {
 
-		// A vector condition selects per-component: each output lane picks
-		// independently, matching WGSL's native select() and GLSL's mix().
 		gpuTest( 'select() with a vector condition selects per-component, matching WGSL select()/GLSL mix() semantics', ( { assert } ) => {
 
 			const cond = vec4( 1, 0, 1, 0 ).greaterThan( 0.5 ); // bvec4( true, false, true, false )
@@ -81,8 +79,6 @@ export default QUnit.module( 'TSL', () => {
 				uvec3( 1, 20, 3 )
 			);
 
-			// uvec4( 4294967290, ... ) exercises the unsigned-wraparound
-			// case: the subtraction wraps, but the result is still exact.
 			assert.eq(
 				select( vec4( 0, 1, 0, 1 ).greaterThan( 0.5 ), uvec4( 6, 2, 3, 4 ), uvec4( 4294967290, 20, 30, 40 ) ),
 				uvec4( 4294967290, 2, 30, 4 )
@@ -90,8 +86,6 @@ export default QUnit.module( 'TSL', () => {
 
 		} );
 
-		// Reads each result component via a separate assert.eq call, to
-		// cover repeated references to the same select()'d node.
 		gpuTest( 'per-component select() works for boolean vector types (bvec2-4)', ( { assert } ) => {
 
 			const resultBvec4 = select(
@@ -118,7 +112,6 @@ export default QUnit.module( 'TSL', () => {
 
 		} );
 
-		// A scalar condition still selects the whole vector as one unit.
 		gpuTest( 'a scalar condition still selects a vector value wholesale (unaffected by the vector-condition fix)', ( { assert } ) => {
 
 			assert.eq(
@@ -133,10 +126,6 @@ export default QUnit.module( 'TSL', () => {
 
 		} );
 
-		// select() does not require an explicit "else" value. With a scalar
-		// condition, a falsy condition leaves the result at the type's
-		// declared-variable default (zero) instead of throwing or requiring
-		// a third argument.
 		gpuTest( 'select() with a scalar condition does not require an explicit "else" value', ( { assert } ) => {
 
 			assert.eq(
@@ -159,14 +148,9 @@ export default QUnit.module( 'TSL', () => {
 
 		} );
 
-		// select() does not require an explicit "else" value with a vector
-		// condition either. Lanes not selected by the condition keep the
-		// result type's zero value rather than requiring a fallback branch.
 		gpuTest( 'select() with a vector condition does not require an explicit "else" value', ( { assert } ) => {
 
-			// NOTE: vec4's fallback default is Vector4's (0, 0, 0, 1), not
-			// (0, 0, 0, 0) - see NodeBuilder.generateConst(). vec2/vec3
-			// avoid that quirk and fall back to an all-zero vector.
+			// vec4's zero fallback is (0, 0, 0, 1), not (0, 0, 0, 0) - see NodeBuilder.generateConst().
 			assert.eq(
 				select( vec3( 1, 0, 1 ).greaterThan( 0.5 ), vec3( 1, 2, 3 ) ),
 				vec3( 1, 0, 3 ),

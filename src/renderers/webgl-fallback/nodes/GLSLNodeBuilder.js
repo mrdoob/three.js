@@ -323,14 +323,9 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 	/**
 	 * Returns the native snippet for a genuinely per-component vector select.
-	 * GLSL has no vector ternary, so unlike `getTernary()` above, this can't
-	 * use `?:`. For a `float`-component `type`, it uses GLSL ES 3.0's
-	 * `bvecN`-selector overload of `mix()` (`x`/`y` there are this method's
-	 * `elseSnippet`/`ifSnippet`). That overload doesn't exist for `ivecN`/
-	 * `uvecN`/`bvecN`, so those use an exact arithmetic select instead:
-	 * `elseSnippet + mask * ( ifSnippet - elseSnippet )`, where `mask` is
-	 * `condSnippet` cast to a same-width `0`/`1` vector (`bool` round-trips
-	 * through `ivecN` first, since GLSL has no arithmetic on `bool`).
+	 * GLSL has no vector ternary, so `float` types use `mix()`'s `bvecN`-selector
+	 * overload; `int`/`uint`/`bool` types use an arithmetic select instead, since
+	 * that overload doesn't exist for them.
 	 *
 	 * @param {string} condSnippet - The per-component boolean (`bvecN`) condition.
 	 * @param {string} ifSnippet - The vector expression selected where `condSnippet` is `true`.
@@ -361,9 +356,6 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 		}
 
-		// int/uint: componentType names its own vector's constructor 1:1
-		// (getType('ivec4') === 'ivec4'), so this cast doubles as the
-		// same-width int/uint mask constructor `condSnippet` needs.
 		const maskSnippet = `${glslType}( ${condSnippet} )`;
 
 		return `${elseSnippet} + ${maskSnippet} * ( ${ifSnippet} - ${elseSnippet} )`;
