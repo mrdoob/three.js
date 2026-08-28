@@ -225,7 +225,7 @@ Nodes support JSON-based serialization and deserialization, allowing entire node
 
 <page name="Component-Based">
 
-TSL (Three.js Shading Language) elevates shader development from a monolithic script model to a **Component-Based Architecture**, allowing developers to maintain, test, and share individual parts of the shader and rendering pipeline independently, scalably, and without collisions.
+TSL (Three.js Shading Language) elevates shader development from a monolithic script model to a **Component-Based Architecture**, allowing developers to maintain and share individual parts of the shader and rendering pipeline independently, scalably, and without collisions.
 
 ### Architectural Approaches
 
@@ -282,8 +282,8 @@ TSL (Three.js Shading Language) elevates shader development from a monolithic sc
 In TSL, materials and rendering pipelines are built by composing independent node components:
 
 - **Modular Maintenance**: Individual shading components (e.g. lighting, diffuse color, normal evaluation) are maintained independently, avoiding variable name collisions and layout conflicts.
-- **Cross-Pipeline Sharing**: A single node or uniform instance can be connected simultaneously to surface materials, deferred MRT channels, post-processing passes (`pass( scene, camera )`), and compute shaders.
-- **Rendering Orchestration**: Nodes can interact with the broader pipeline by scheduling compute dispatches, requesting viewport textures (`viewportSharedTexture`), and hooking into CPU lifecycle events (`updateBefore`, `update`, `updateAfter`).
+- **Cross-Pipeline Sharing**: A single node or uniform instance can be connected simultaneously to surface materials, deferred MRT channels, post-processing passes `pass( scene, camera )`, and compute shaders.
+- **Rendering Orchestration**: Nodes can interact with the broader pipeline by scheduling compute dispatches, requesting viewport textures `viewportSharedTexture`, and hooking into CPU lifecycle events (`updateBefore`, `update`, `updateAfter`).
 - **Graph Compilation & Optimization**: `NodeBuilder` analyzes the dependency graph, deduplicates repeated expressions, and generates optimized, backend-specific GPU programs.
 
 ```mermaid
@@ -1390,52 +1390,6 @@ model.material.colorNode = positiveValue;
 
 </page>
 
-<page name="Assignments">
-
-TSL variables and parameters inside a custom function `Fn` can be updated dynamically using assignment methods:
-::: api .assign( value: Node | number ) : Node - Assigns a value and returns the node. :::
-
-::: api .addAssign( value: Node | number ) : Node - Adds a value and assigns the result. :::
-
-::: api .subAssign( value: Node | number ) : Node - Subtracts a value and assigns the result. :::
-
-::: api .mulAssign( value: Node | number ) : Node - Multiplies a value and assigns the result. :::
-
-::: api .divAssign( value: Node | number ) : Node - Divides a value and assigns the result. :::
-
-::: api .modAssign( value: Node | number ) : Node - Computes the remainder and assigns the result. :::
-
-::: api .bitAndAssign( value: Node | number ) : Node - Performs bitwise AND and assigns the result. :::
-
-::: api .bitOrAssign( value: Node | number ) : Node - Performs bitwise OR and assigns the result. :::
-
-::: api .bitXorAssign( value: Node | number ) : Node - Performs bitwise XOR and assigns the result. :::
-
-::: api .shiftLeftAssign( value: Node | number ) : Node - Shifts left and assigns the result. :::
-
-::: api .shiftRightAssign( value: Node | number ) : Node - Shifts right and assigns the result. :::
-
-```tsl
-import 'scenes/shaderball';
-import { Fn, vec3 } from 'three/tsl';
-
-// A TSL Fn where arguments act as mutable variables
-const modifyColor = Fn( ( [ color ] ) => {
-
-	// Add blue to the incoming color node directly
-	color.addAssign( vec3( 0.0, 0.0, 1.0 ) );
-
-	return color;
-
-} );
-
-const baseColor = vec3( 0.0, 1.0, 0.0 ); // Green
-
-model.material.colorNode = modifyColor( baseColor ); // Becomes Cyan
-```
-
-</page>
-
 <page name="Function">
 
 It is possible to use classic JS functions or a `Fn()` interface. The main difference is that `Fn()` creates a controllable environment, allowing the use of **stack** where you can use **assign** and **conditional**, while the classic function only allows inline approaches.
@@ -1712,6 +1666,52 @@ model.material.colorNode = createChecker( 8.0 );
   - [Sub-Builds](#sub-builds)
   - [JavaScript Synergy](#javascript-synergy)
 
+
+</page>
+
+<page name="Assignments">
+
+TSL variables and parameters inside a custom function `Fn` can be updated dynamically using assignment methods:
+::: api .assign( value: Node | number ) : Node - Assigns a value and returns the node. :::
+
+::: api .addAssign( value: Node | number ) : Node - Adds a value and assigns the result. :::
+
+::: api .subAssign( value: Node | number ) : Node - Subtracts a value and assigns the result. :::
+
+::: api .mulAssign( value: Node | number ) : Node - Multiplies a value and assigns the result. :::
+
+::: api .divAssign( value: Node | number ) : Node - Divides a value and assigns the result. :::
+
+::: api .modAssign( value: Node | number ) : Node - Computes the remainder and assigns the result. :::
+
+::: api .bitAndAssign( value: Node | number ) : Node - Performs bitwise AND and assigns the result. :::
+
+::: api .bitOrAssign( value: Node | number ) : Node - Performs bitwise OR and assigns the result. :::
+
+::: api .bitXorAssign( value: Node | number ) : Node - Performs bitwise XOR and assigns the result. :::
+
+::: api .shiftLeftAssign( value: Node | number ) : Node - Shifts left and assigns the result. :::
+
+::: api .shiftRightAssign( value: Node | number ) : Node - Shifts right and assigns the result. :::
+
+```tsl
+import 'scenes/shaderball';
+import { Fn, vec3 } from 'three/tsl';
+
+// A TSL Fn where arguments act as mutable variables
+const modifyColor = Fn( ( [ color ] ) => {
+
+	// Add blue to the incoming color node directly
+	color.addAssign( vec3( 0.0, 0.0, 1.0 ) );
+
+	return color;
+
+} );
+
+const baseColor = vec3( 0.0, 1.0, 0.0 ); // Green
+
+model.material.colorNode = modifyColor( baseColor ); // Becomes Cyan
+```
 
 </page>
 
@@ -2014,98 +2014,6 @@ model.material.colorNode = finalColor;
 
 </page>
 
-<page name="Events">
-
-TSL nodes have active CPU-side lifecycles that can execute JavaScript callbacks at specific stages of the rendering pipeline.
-
-Events allow you to synchronize GPU shader variables with CPU calculations, update uniforms per frame or per object, and orchestrate rendering states before or after objects, materials, and render pipelines execute.
-
-Events are registered directly inside a TSL function `Fn()` using event functions (`OnFrameUpdate`, `OnMaterialUpdate`, `OnObjectUpdate`, etc.).
-
-<code name="eventsExample" default="true">Centralized Material Updates</code>
-
-::: api OnFrameUpdate( callback: Function ) : EventNode - Executes a callback once per animation frame on the CPU. :::
-
-::: api OnBeforeFrameUpdate( callback: Function ) : EventNode - Executes a callback before frame node updates begin. :::
-
-::: api OnMaterialUpdate( callback: Function ) : EventNode - Executes a callback when the material is rendered. :::
-
-::: api OnBeforeMaterialUpdate( callback: Function ) : EventNode - Executes a callback before the material is updated. :::
-
-::: api OnObjectUpdate( callback: Function ) : EventNode - Executes a callback each time an individual object using the material is rendered. :::
-
-::: api OnBeforeObjectUpdate( callback: Function ) : EventNode - Executes a callback before each individual object is rendered. :::
-
-::: api OnAfterObjectUpdate( callback: Function ) : EventNode - Executes a callback after an individual object finishes rendering. :::
-
-::: api OnBeforeRenderPipeline( callback: Function ) : EventNode - Executes a callback before the post-processing render pipeline starts. :::
-
-::: api OnAfterRenderPipeline( callback: Function ) : EventNode - Executes a callback after the post-processing render pipeline completes. :::
-
-```tsl eventsExample
-import 'scenes/shaderball';
-import * as THREE from 'three';
-import { uniform, Fn, OnMaterialUpdate, sin, cos, positionLocal, normalView, positionViewDirection } from 'three/tsl';
-
-// Define a self-contained TSL shader function with encapsulated uniforms and lifecycle events
-const energySphere = Fn( () => {
-
-	// Declare uniforms inside the function
-	const baseColor = uniform( new THREE.Color() );
-	const glowColor = uniform( new THREE.Color() );
-	const waveParams = uniform( new THREE.Vector3() ); // ( frequency, animation phase, swirl )
-	const glowIntensity = uniform( 0.0 );
-
-	// Update all material uniforms simultaneously on the CPU in a single callback
-	OnMaterialUpdate( ( { time } ) => {
-
-		const t = time * 0.7;
-
-		// 1. Dynamic harmonic palette cycling across HSL color space
-		baseColor.value.setHSL( ( t * 0.05 + 0.55 ) % 1.0, 0.9, 0.35 );
-		glowColor.value.setHSL( ( t * 0.08 + 0.12 ) % 1.0, 1.0, 0.65 );
-
-		// 2. Synchronize spatial frequency, animation phase, and ripple curvature
-		waveParams.value.set(
-			Math.sin( t * 1.3 ) * 3.0 + 9.0, // frequency
-			t * 2.5, // phase
-			Math.cos( t * 0.8 ) * 0.5 + 1.0 // swirl
-		);
-
-		// 3. Compute pulsating energy burst intensity
-		glowIntensity.value = Math.pow( Math.sin( t * 2.2 ) * 0.5 + 0.5, 3.0 ) * 2.5 + 0.5;
-
-	} );
-
-	// 3D coordinate warping for dynamic energy bands
-	const p = positionLocal.mul( waveParams.x );
-	const ripple = sin( p.y.mul( waveParams.z ).add( waveParams.y ) )
-		.add( cos( p.x.mul( 0.8 ).add( p.z.mul( waveParams.z ) ) ) )
-		.mul( 0.5 )
-		.add( 0.5 );
-
-	// Crisp energy contour rings
-	const bands = sin( ripple.mul( 12.0 ) ).pow( 4.0 );
-
-	// Dynamic Fresnel rim lighting
-	const fresnel = normalView.dot( positionViewDirection ).oneMinus().pow( 3.0 );
-
-	// Composite multi-layered iridescent energy shading
-	const core = ripple.mix( baseColor, glowColor );
-	const energyGlow = glowColor.mul( bands.mul( glowIntensity ).add( fresnel.mul( 2.0 ) ) );
-
-	return core.add( energyGlow );
-
-} );
-
-// Apply the reactive event shader to the material
-model.material.colorNode = energySphere();
-model.material.roughness = 0.2;
-model.material.metalness = 0.9;
-```
-
-</page>
-
 <page name="Control Flow">
 
 <page name="If-Else">
@@ -2367,549 +2275,6 @@ renderPipeline.outputNode = fractalVal.mix( color( 0x050510 ), color( 0x3b82f6 )
 ```
 
 </page>
-
-</page>
-
-<page name="Context Flow">
-
-<page name="Context">
-
-In TSL, `ContextNode` is a cascading configuration and environment system that flows downward through the node graph (Abstract Syntax Tree) during compilation.
-
-It allows materials, render passes, and individual sub-graphs to inject configuration parameters, override global behaviors (such as UV coordinates, shadow sampling, or ambient occlusion), and assign custom variable names without modifying the underlying nodes.
-
-<code name="contextExample" default="true">Context Showcase</code>
-
-::: api context( nodeOrValue, value ) : ContextNode - Wraps a node with contextual dictionary data that flows downward to all child nodes during compilation.
-- **nodeOrValue**: `Node | Object` - The target node to wrap, or the context dictionary object if creating a standalone context wrapper.
-- **value**: `Object` - Key-value dictionary containing contextual parameters and hooks.
-:::
-
-::: api .context( value ) : ContextNode - Method chaining helper to wrap the current node expression with contextual data. :::
-
-### Context Properties
-
-::: api getUV : Function - Callback `( builder ) => Node` to override the UV coordinate used by all textures and UV-dependent nodes in the active sub-tree. :::
-
-::: api getShadow : Function - Callback `( { light, shadowColorNode } ) => Node` to customize or filter shadow calculations across the contextual sub-tree. :::
-
-::: api getAO : Function - Callback `( inputNode, { material } ) => Node` to customize or modulate ambient occlusion evaluation across the sub-tree. :::
-
-### Context Hierarchy Cascade
-
-Context configuration flows downward from the highest level of the rendering engine down to individual node expressions:
-
-```mermaid
-flowchart TD
-    Renderer["<b>WebGPURenderer</b><br/><small><code>renderer.contextNode</code><br/>Global scene context</small>"]
-    Pass["<b>RenderPipeline / PassNode</b><br/><small><code>pass.contextNode</code><br/>Per-pass context</small>"]
-    Material["<b>NodeMaterial</b><br/><small><code>material.contextNode</code><br/>Material-wide context</small>"]
-    SubGraph["<b>ContextNode / Sub-Graph</b><br/><small><code>node.context( { ... } )</code><br/>Scoped expression context</small>"]
-    Target["<b>Target Nodes</b><br/><small>Inherit and evaluate within active context</small>"]
-
-    Renderer --> Pass
-    Pass --> Material
-    Material --> SubGraph
-    SubGraph --> Target
-```
-
-#### Overriding UVs for All Child Textures
-Assigning `getUV` to `material.contextNode` or wrapping an expression automatically redirects texture sampling across the entire sub-tree:
-
-```js
-import * as THREE from 'three';
-import { uv, vec2, time, texture } from 'three/tsl';
-
-const map = new THREE.TextureLoader().load( '../examples/textures/uv_grid_opengl.jpg' );
-map.wrapS = THREE.RepeatWrapping;
-map.wrapT = THREE.RepeatWrapping;
-
-// Dynamic animated and scaled UV coordinates
-const animatedUV = uv().mul( 3.0 ).add( vec2( time.mul( 0.2 ), 0.0 ) );
-
-// All textures in this material automatically use animatedUV instead of standard uv()
-material.contextNode = material.context( {
-	getUV: () => animatedUV
-} );
-
-material.colorNode = texture( map );
-```
-
-```tsl contextExample
-import 'scenes/shaderball';
-import * as THREE from 'three';
-import { uv, time, texture, vec2 } from 'three/tsl';
-
-// Load texture map
-const map = new THREE.TextureLoader().load( '../examples/textures/uv_grid_opengl.jpg' );
-map.wrapS = THREE.RepeatWrapping;
-map.wrapT = THREE.RepeatWrapping;
-
-// 1. Custom animated and scaled UV coordinates
-const animatedUV = uv().mul( 3.0 ).add( vec2( time.mul( 0.2 ), 0.0 ) );
-
-// 2. Wrap material context to redirect getUV for all textures across the material
-model.material.contextNode = uv().context( {
-	getUV: () => animatedUV
-} );
-
-// 3. Texture sampling automatically inherits the contextual animated UVs
-model.material.colorNode = texture( map );
-model.material.roughness = 0.2;
-model.material.metalness = 0.5;
-```
-
-</page>
-
-<page name="setName">
-
-In TSL, **`setName()`** (and `.setName()`) assigns an explicit, readable identifier name to a node expression in the generated shader source code (WGSL or GLSL).
-
-By default, `NodeBuilder` names intermediate variables with auto-incrementing identifiers (e.g. `nodeVar0`, `nodeVar1`, `nodeVar2`). Using `setName()` makes compiled shaders clean, self-documenting, and easy to inspect in browser developer tools (such as Chrome WebGPU DevTools, Spector.js, or RenderDoc).
-
-<code name="setNameExample" default="true">Named Variables Showcase</code>
-
-::: api setName( node, name ) : ContextNode - Assigns an explicit variable name to a node in the generated shader code.
-- **node**: `Node` - The target node to assign an identifier name.
-- **name**: `string` - The identifier name to emit in the compiled shader.
-:::
-
-::: api .setName( name ) : ContextNode - Method chaining helper to assign an explicit variable name to the current node expression. :::
-
-### Generated Code Comparison
-
-```js
-import { uniform, color } from 'three/tsl';
-
-// 1. Without setName: NodeBuilder generates generic uniform identifiers
-const speedA = uniform( 2.0 );
-// Emits uniform buffer member: nodeUniform0: f32
-
-// 2. With setName: NodeBuilder emits clear, self-documenting uniform names
-const speedB = uniform( 2.0 ).setName( 'waveSpeed' );
-// Emits uniform buffer member: waveSpeed: f32
-
-const glowColor = uniform( color( 0x00f0ff ) ).setName( 'glowColor' );
-// Emits uniform buffer member: glowColor: vec3<f32>
-```
-
-> AI: `label()` was previously used for this purpose and is deprecated in favor of `setName()`.
-
-```tsl setNameExample
-import 'scenes/shaderball';
-import { uniform, color, positionLocal, time } from 'three/tsl';
-
-// Define explicit named uniforms for shader inspection
-const speed = uniform( 2.0 ).setName( 'waveSpeed' );
-const frequency = uniform( 10.0 ).setName( 'waveFrequency' );
-const glowColor = uniform( color( 0x00f0ff ) ).setName( 'glowColor' );
-const baseColor = uniform( color( 0x070b1a ) ).setName( 'baseColor' );
-
-// Named intermediate calculation
-const wave = positionLocal.y.mul( frequency ).add( time.mul( speed ) ).sin().abs().setName( 'wavePattern' );
-
-model.material.colorNode = baseColor.add( glowColor.mul( wave ) );
-model.material.roughness = 0.2;
-model.material.metalness = 0.8;
-model.material.emissiveNode = glowColor.mul( wave.pow( 2.0 ) );
-```
-
-</page>
-
-<page name="uniformFlow">
-
-In modern graphics APIs like **WebGPU (WGSL)**, operations that rely on implicit screen-space derivatives (such as `fwidth()`, `dFdx()`, `dFdy()`, or mipmapped texture sampling) require execution within **Uniform Control Flow**.
-
-On the GPU, derivatives are calculated by comparing values between adjacent 2×2 fragment pixels (quads). When calculations with derivatives are placed inside a divergent conditional branch (where adjacent pixels take different execution paths), neighboring quad threads become desynchronized, causing corrupted derivatives and visual artifacts along the boundary.
-
-`uniformFlow( node )` (or `.uniformFlow()`) forces `NodeBuilder` to evaluate all expressions in the root uniform scope across all threads *before* selecting the result.
-
-<code name="uniformFlowExample" default="true">Uniform Flow Showcase</code>
-
-::: api uniformFlow( node ) : ContextNode - Enforces that all child node dependencies execute strictly within uniform control-flow paths.
-- **node**: `Node` - The node whose dependencies must evaluate in uniform control flow.
-:::
-
-::: api .uniformFlow() : ContextNode - Method chaining helper to enforce uniform control-flow execution on the current node expression. :::
-
-### Example
-
-Conditionals compile into dynamic `if/else` branching (evaluated locally). When inside a `uniformFlow()`, the code uses native `select()`, executing both branches instead of only one.
-
-```js
-// 1. Without uniformFlow(): emits dynamic if/else branching
-const resultA = select( condition, valueA, valueB );
-
-// 2. With uniformFlow(): evaluates both branches uniformly before selecting
-const resultB = select( condition, valueA, valueB ).uniformFlow();
-```
-
-> Important: Because `uniformFlow()` evaluates both branches unconditionally to maintain quad thread synchronization, it can impact performance if the branches involve heavy math or expensive texture lookups.
-
-```tsl uniformFlowExample
-import 'scenes/plane';
-import { uv, time, select, fwidth, color, float, fract } from 'three/tsl';
-
-// 1. Dynamic animated division boundary across the plane
-const splitPos = time.mul( 0.4 ).sin().mul( 0.3 ).add( 0.5 );
-const condition = uv().x.greaterThan( splitPos );
-
-// 2. Anti-aliased procedural stripe pattern that relies on fwidth() derivatives
-const stripePattern = ( scale ) => {
-
-	const coord = uv().mul( scale );
-	const f = fract( coord.x );
-	const fw = fwidth( coord.x ); // Screen-space derivative across neighbor pixels in 2x2 quad
-	return f.div( fw.mul( 100.0 ) ).clamp( 0.0, 1.0 );
-
-};
-
-const patternA = stripePattern( float( 10.0 ) );
-const patternB = stripePattern( float( 25.0 ) );
-
-const cyan = color( 0x00f0ff ).mul( patternA );
-const magenta = color( 0xff0055 ).mul( patternB );
-
-// 3. select() with uniformFlow():
-// - WITH uniformFlow(): quad threads evaluate derivatives synchronously in uniform scope (clean boundary)
-// - WITHOUT uniformFlow(): quad threads diverge across the split, corrupting the derivative along the boundary seam
-const finalColor = select( condition, cyan, magenta ).uniformFlow();
-
-// 4. Assign to plane material
-plane.material.colorNode = finalColor.debug();
-```
-
-</page>
-
-<page name="Builtin Context">
-
-TSL provides pre-built context helpers such as **`builtinAOContext()`** and **`builtinShadowContext()`** to quickly modify ambient occlusion and lighting shadow behavior across a material or node sub-graph without manually writing custom `getAO` or `getShadow` context handler objects.
-
-::: api builtinAOContext( aoNode, node = null ) : ContextNode - Intercepts `getAO` to modulate ambient occlusion for non-transparent materials by `aoNode`.
-- **aoNode**: `Node` - The ambient occlusion node to multiply.
-- **node**: `Node` - Optional node expression to wrap with this AO context. Defaults to `null`.
-:::
-
-::: api .builtinAOContext( aoNode ) : ContextNode - Method chaining helper to wrap the current node expression with a built-in AO context. :::
-
-::: api builtinShadowContext( shadowNode, light, node = null ) : ContextNode - Intercepts `getShadow` to modulate the shadow color of a specific light by `shadowNode`.
-- **shadowNode**: `Node` - The shadow modulation node.
-- **light**: `Light` - The target light whose shadow should be modulated.
-- **node**: `Node` - Optional node expression to wrap with this shadow context. Defaults to `null`.
-:::
-
-::: api .builtinShadowContext( shadowNode, light ) : ContextNode - Method chaining helper to wrap the current node expression with a built-in shadow context. :::
-
-### Example
-
-```js
-import { builtinAOContext } from 'three/tsl';
-
-// Modulate global ambient occlusion and shadow for the material
-myPass.contextNode = builtinAOContext( screenSpaceAO ).builtinShadowContext( screenSpaceShadow, dirLight );
-```
-
-</page>
-
-<page name="Override Node">
-
-In TSL, **`overrideNode`** (and `overrideNodes`) provides a mechanism to dynamically intercept and substitute specific target nodes within a node sub-graph, material, or pass during compilation.
-
-This acts as dynamic dependency injection for shaders, allowing you to replace fundamental inputs (such as `positionLocal`, `positionView`, `normalView`, or `positionViewDirection`) without modifying or duplicating existing node graphs.
-
-<code name="overridePosition" default="true">Override position</code>
-
-::: api overrideNode( targetNode, callbackOrNode ) : OverrideContextNode - Overrides a single target node during compilation within a contextual flow.
-- **targetNode**: `Node` - The target node to intercept and replace.
-- **callbackOrNode**: `Function | Node` - A callback `(builder) => Node` returning the replacement, or the replacement `Node` directly.
-:::
-
-::: api overrideNodes( overrides ) : OverrideContextNode - Overrides multiple target nodes simultaneously during compilation.
-- **overrides**: `Array<[Node, Function | Node]> | Map<Node, Function | Node>` - Map or array of pairs mapping target nodes to their respective replacement callbacks or nodes.
-:::
-
-```js
-// Override a single node
-material.contextNode = overrideNode( positionLocal, () => positionLocal.add( vec3( 1, 0, 0 ) ) );
-
-// Override multiple nodes
-material.contextNode = overrideNodes( [
-	[ positionView, customPositionView ],
-	[ normalView, customNormalView ]
-] );
-```
-
-::: api .overrideNode( targetNode, callbackOrNode ) : OverrideContextNode - Method chaining helper to override a single target node for a specific node expression. :::
-
-::: api .overrideNodes( overrides ) : OverrideContextNode - Method chaining helper to override multiple target nodes for a specific node expression. :::
-
-### Compilation Flow
-
-When `OverrideContextNode` wraps a node expression, `NodeBuilder` intercepts references to the target node during compilation and evaluates the replacement node instead.
-
-### Common Use Cases
-
-#### 1. Material-Wide Input Substitution
-Assigning an override to `material.contextNode` replaces the target node across all stages (vertex and fragment) of that material:
-
-```js
-// Displaces vertex positions and keeps fragment calculations in sync
-material.contextNode = overrideNode( positionLocal, () => positionLocal.add( normalLocal.mul( wave ) ) );
-```
-
-#### 2. Deferred Rendering (G-Buffer Resolve)
-In deferred rendering, standard lighting materials require view-space positions and normals. Instead of scene geometry, `overrideNodes()` redirects the material to sample G-Buffer MRT textures:
-
-```js
-// Resolve pass: standard lighting material evaluating from G-Buffer textures
-resolveMaterial.contextNode = overrideNodes( [
-	[ positionView, gBufferPositionView ],
-	[ positionViewDirection, gBufferPositionView.negate().normalize() ],
-	[ normalView, gBufferNormalView ]
-] );
-```
-
-#### 3. Scoped Sub-Graph Substitution
-Calling `.overrideNode()` on a specific node expression restricts the override strictly to that sub-tree:
-
-<code name="subGraphOverride">Sub-graph override</code>
-
-```js
-// Base stripe sub-graph along the Y-axis (horizontal)
-const stripe = positionLocal.y.mul( 14.0 ).sin().abs();
-
-// Branch 1: Standard horizontal stripes
-const branch1 = color( 0x00ffff ).mul( stripe ).isolate();
-
-// Branch 2: Rotated 90° into vertical stripes via swizzling (.yxz)
-const branch2 = color( 0xff8800 ).mul(
-	stripe.overrideNode( positionLocal, () => positionLocal.yxz )
-).isolate();
-
-// Unify both branches into a cross-hatched grid
-material.colorNode = branch1.add( branch2 );
-```
-
-> Note: To evaluate the exact same node multiple times under different contextual parameters in the same graph, use [.isolate()](#isolate) to prevent cache reuse.
-
-```tsl overridePosition
-import 'scenes/shaderball';
-import { overrideNode, positionLocal, normalLocal, time, color } from 'three/tsl';
-
-model.material.colorNode = color( 0x0077ff );
-model.material.roughness = 0.5;
-model.material.metalness = 0.0;
-
-// Override positionLocal dynamically across the material context
-model.material.contextNode = overrideNode( positionLocal, () => {
-
-	// Safe to reference positionLocal inside the callback without infinite recursion
-	const wave = positionLocal.y.mul( 10.0 ).add( time.mul( 3.0 ) ).sin().mul( 0.08 );
-
-	return positionLocal.add( normalLocal.mul( wave ) );
-
-} );
-```
-
-```tsl subGraphOverride
-import 'scenes/shaderball';
-import { color, positionLocal, time } from 'three/tsl';
-
-// Base stripe pattern computed along the Y-axis (horizontal stripes)
-const stripe = positionLocal.y.mul( 14.0 ).add( time.mul( 2.0 ) ).sin().abs();
-
-// Branch 1: Evaluates stripe with standard positionLocal (Horizontal stripes)
-const branch1 = color( 0x00ffff ).mul( stripe ).isolate();
-
-// Branch 2: Swaps coordinates (.yxz) to rotate the pattern 90° into vertical stripes
-const branch2 = color( 0xff8800 ).mul(
-	stripe.overrideNode( positionLocal, () => positionLocal.yxz )
-).isolate();
-
-// Unify: Combines horizontal and vertical stripes into a glowing grid
-model.material.colorNode = branch1.add( branch2 );
-```
-
-</page>
-
-<page name="Isolate">
-
-By default, TSL automatically caches node evaluations. If you use the same node in multiple places, TSL builds it once and reuses the result to avoid redundant GPU calculations.
-
-However, if you want to evaluate the **same node** under different parameters (such as sampling a texture at different UV scales or offsets with `.context()`), the default caching will return the first evaluation and ignore your changes.
-
-`isolate( node )` or `.isolate()` tells TSL to create an **isolated cache scope**, forcing the node to be evaluated fresh without reusing or overwriting existing cache data.
-
-::: api isolate( node: Node ) : IsolateNode - Creates an isolated cache wrapper for a node.
-- **node**: `Node` - The node whose evaluation cache should be isolated.
-:::
-
-::: api .isolate() : IsolateNode - Method chaining helper to create an isolated cache wrapper.
-:::
-
-### Caching vs Isolate
-
-```mermaid
-flowchart TD
-    Node["<b>Base Node</b><br/><small>Shared node graph</small>"]
-    Call1["<b>1st Call</b><br/><small>Initial build & cached</small>"]
-    Call2["<b>2nd Call</b><br/><small>Subsequent evaluation</small>"]
-    Call2A["<code>node.context( ... )</code><br/><small>Reuses 1st cache</small>"]
-    Call2B["<code>node.isolate().context( ... )</code><br/><small>Fresh isolated scope</small>"]
-
-    Node --> Call1
-    Call1 --> Call2
-    Call2 -->|"Standard"| Call2A
-    Call2 -->|"Isolated"| Call2B
-```
-
-### When to Use
-
-Use `isolate()` whenever you need to recreate or re-evaluate a node's code flow under a different context. Because TSL caches and reuses previously built expressions by default, wrapping a node with `.isolate()` allows its entire sub-graph to be built fresh in a separate scope—enabling you to safely apply new contextual parameters.
-
-```tsl
-import 'scenes/shaderball';
-import * as THREE from 'three';
-import { texture, uv, vec2, time } from 'three/tsl';
-
-// Load base texture map
-const map = new THREE.TextureLoader().load( '../examples/textures/uv_grid_opengl.jpg' );
-map.wrapS = THREE.RepeatWrapping;
-map.wrapT = THREE.RepeatWrapping;
-
-const textureNode = texture( map );
-
-// Sample the same textureNode with different UV coordinates using .isolate()
-const sampleLayer = ( scale, offset ) => {
-
-	return textureNode.isolate().context( {
-		getUV: () => uv().mul( scale ).add( offset )
-	} );
-
-};
-
-// Base texture layer with slow horizontal drift
-const baseLayer = sampleLayer( 1.0, vec2( time.mul( 0.05 ), 0.0 ) );
-
-// Detail texture layer with 4x scaling and vertical drift
-const detailLayer = sampleLayer( 4.0, vec2( 0.0, time.mul( 0.1 ) ) );
-
-// Composite layers together on the shaderball material
-const composite = baseLayer.rgb.mul( detailLayer.rgb.add( 0.3 ) );
-
-model.material.colorNode = composite;
-model.material.roughnessNode = detailLayer.r.mul( 0.4 );
-```
-
-</page>
-
-<page name="Sub-Builds">
-
-Calling `.once()` on a `Fn()` creates a **singleton function**: TSL evaluates it once and reuses the result across your shader graph.
-
-**Sub-Builds** solve this by creating scoped compilation layers (like `'POSITION'` or `'NORMAL'`). Passing `.once( [ 'POSITION' ] )` tells TSL to maintain a separate cache for that specific stage instead of reusing a single global value.
-
-::: api Fn().once( subBuilds: Array<string> = null ) : FunctionNode - Configures a TSL function to execute and cache its output node once per build, with optional isolated caching across specified sub-build layers.
-- **subBuilds**: `Array<string>` - (Optional) Array of sub-build layer names (e.g. `[ 'NORMAL', 'VERTEX' ]`) under which the function is cached independently.
-:::
-
-::: api subBuild( node: Node, name: string, type: string = null ) : SubBuildNode - Wraps a node to be built within an isolated sub-build scope (e.g. `'VERTEX'`, `'NORMAL'`, `'POSITION'`).
-- **node**: `Node` - The target node to evaluate inside the sub-build layer.
-- **name**: `string` - The name of the sub-build compilation layer.
-- **type**: `string` - (Optional) The output type of the node.
-:::
-
-::: api builder.getSubBuildProperty( property: string = '', node: Node = null ) : string - Returns a sub-build prefixed property or varying identifier (e.g. `'POSITION_v_positionWorld'`).
-- **property**: `string` - The base property or varying name to prefix.
-- **node**: `Node` - (Optional) Target node used to resolve the closest sub-build scope.
-:::
-
-### How `positionWorld` Works
-
-Here is the core implementation of `positionWorld` in Three.js:
-
-```js
-export const positionWorld = /*@__PURE__*/ ( Fn( ( builder ) => {
-
-	return modelWorldMatrix.mul( positionLocal ).xyz.toVarying( builder.getSubBuildProperty( 'v_positionWorld' ) );
-
-}, 'vec3' ).once( [ 'POSITION' ] ) )();
-```
-
-When `positionWorld` is used in both `material.positionNode` and `material.colorNode`, TSL manages the compilation flow through sub-builds:
-
-1. `material.positionNode`: Runs inside the `'POSITION'` sub-build. `positionWorld` evaluates in the vertex stage and caches it under `'POSITION'` as `'POSITION_v_positionWorld'`.
-2. `material.colorNode`: Runs in the default fragment scope. Because `positionWorld` is only cached for `'POSITION'`, TSL evaluates it again for the fragment stage and outputs `'v_positionWorld'`.
-
-```mermaid
-flowchart TD
-    FnCall["<b>positionWorld</b><br/><small><code>.once( [ 'POSITION' ] )</code></small>"]
-    PosScope["<b>material.positionNode</b><br/><small>Vertex Stage<br/><code>POSITION_v_positionWorld</code></small>"]
-    FragScope["<b>material.colorNode</b><br/><small>Fragment Stage<br/><code>v_positionWorld</code></small>"]
-
-    FnCall -->|"Inside positionNode"| PosScope
-    FnCall -->|"Inside colorNode"| FragScope
-```
-
-<code name="positionWorldSubBuildExample" default="true">Sub-Builds Showcase</code>
-
-```tsl positionWorldSubBuildExample
-import 'scenes/shaderball';
-import { positionLocal, positionWorld, normalLocal, time, color } from 'three/tsl';
-
-// 1. Modify vertex positions using world coordinates
-const wave = positionWorld.y.mul( 6.0 ).add( time.mul( 2.5 ) ).sin().mul( 0.08 );
-model.material.positionNode = positionLocal.add( normalLocal.mul( wave ) );
-
-// 2. Color surface based on the resulting world coordinates in fragment stage
-const waveFactor = positionWorld.y.mul( 6.0 ).add( time.mul( 2.5 ) ).sin().mul( 0.5 ).add( 0.5 );
-const waveColor = color( 0x00aaff ).mix( color( 0xff0066 ), waveFactor );
-
-model.material.colorNode = waveColor;
-model.material.roughness = 0.2;
-```
-
-### Sub-Build API Reference
-
-| API | Type | Description |
-| :--- | :--- | :--- |
-| `Fn( function ).once( subBuilds )` | Method | Caches function evaluation per shader build, partitioned by `subBuilds` array. |
-| `subBuild( node, name, type )` | Node Function | Wraps a node to be evaluated within an isolated sub-build scope. |
-| `builder.subBuildFn` | Property | Identifies the active sub-build layer name currently executing. |
-| `builder.getSubBuildProperty( prop, node )` | Method | Returns a sub-build prefixed identifier (e.g. `'POSITION_v_positionWorld'`). |
-
-#### Related
-- [Isolate](#isolate)
-- [Context](#context)
-- [Function](#function)
-- [Shader Stages](#shader-stages)
-
-</page>
-
-</page>
-
-
-<page name="Atomic">
-
-Atomic operations in TSL allow performing synchronization-safe read-modify-write operations on GPU memory. In WebGPU, atomic operations are performed on elements of storage buffers or workgroup memory declared as atomic variables.
-
-To create an atomic storage buffer in TSL, you declare a `storage()` node and chain the `.toAtomic()` method on it.
-
-Example:
-
-```js
-import * as THREE from 'three';
-import { storage, atomicAdd } from 'three/tsl';
-
-// 1. Create a storage buffer attribute (e.g., 1 unsigned integer for a counter)
-const counterAttr = new THREE.StorageBufferAttribute( new Uint32Array( [ 0 ] ), 1 );
-
-// 2. Define the storage buffer in TSL and mark it as atomic
-const counter = storage( counterAttr, 'uint', 1 ).toAtomic();
-
-// 3. Perform an atomic add operation in your shader (increments the counter and returns the previous value)
-const previousValue = atomicAdd( counter.element( 0 ), 1 );
-```
 
 </page>
 
@@ -3282,240 +2647,122 @@ plane.material.colorNode = texture( storageTex );
 
 </page>
 
-</page>
+<page name="Lifecycle">
 
-<page name="Extending Syntax">
+<page name="Events">
 
-<page name="Raymarching">
+TSL nodes have active CPU-side lifecycles that can execute JavaScript callbacks at specific stages of the rendering pipeline.
 
-In real-world applications, TSL enables developers to create entirely new syntaxes and custom abstractions to accommodate different graphics workflows. Rather than being restricted to a fixed shader language, you can construct custom DSLs (Domain-Specific Languages), modular utility functions, or dedicated shading models that align with the architectural needs of your project.
+Events allow you to synchronize GPU shader variables with CPU calculations, update uniforms per frame or per object, and orchestrate rendering states before or after objects, materials, and render pipelines execute.
 
-This flexibility allows shader logic to be composed dynamically like JavaScript components, making it possible to design clean APIs for complex math, custom material models, or post-processing pipelines.
+Events are registered directly inside a TSL function `Fn()` using event functions (`OnFrameUpdate`, `OnMaterialUpdate`, `OnObjectUpdate`, etc.).
 
-### Raymarching as a TSL Extension
+<code name="eventsExample" default="true">Centralized Material Updates</code>
 
-The `RaymarchingBox` utility is a practical example of how TSL's core syntax was extended to support a specialized volumetric rendering workflow. It abstracts the local ray calculation relative to a bounding volume (from `-0.5` to `0.5`), computes bounding-box intersections, and runs the step-by-step marching loop inside a custom utility.
+::: api OnFrameUpdate( callback: Function ) : EventNode - Executes a callback once per animation frame on the CPU. :::
 
-By wrapping this complex pipeline, the workflow for creating volumetric materials is simplified into a callback interface where you only define what happens at each sample point along the ray.
+::: api OnBeforeFrameUpdate( callback: Function ) : EventNode - Executes a callback before frame node updates begin. :::
 
-<code name="raymarchingExample" default="true">Raymarching Box Example</code>
+::: api OnMaterialUpdate( callback: Function ) : EventNode - Executes a callback when the material is rendered. :::
 
-```tsl raymarchingExample
-import 'scenes/empty';
+::: api OnBeforeMaterialUpdate( callback: Function ) : EventNode - Executes a callback before the material is updated. :::
+
+::: api OnObjectUpdate( callback: Function ) : EventNode - Executes a callback each time an individual object using the material is rendered. :::
+
+::: api OnBeforeObjectUpdate( callback: Function ) : EventNode - Executes a callback before each individual object is rendered. :::
+
+::: api OnAfterObjectUpdate( callback: Function ) : EventNode - Executes a callback after an individual object finishes rendering. :::
+
+::: api OnBeforeRenderPipeline( callback: Function ) : EventNode - Executes a callback before the post-processing render pipeline starts. :::
+
+::: api OnAfterRenderPipeline( callback: Function ) : EventNode - Executes a callback after the post-processing render pipeline completes. :::
+
+```tsl eventsExample
+import 'scenes/shaderball';
 import * as THREE from 'three';
-import { Fn, vec4, vec3, time, If, smoothstep, exp, Break, modelWorldMatrixInverse, triNoise3D, pmremTexture, modelWorldMatrix } from 'three/tsl';
-import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js';
+import { uniform, Fn, OnMaterialUpdate, sin, cos, positionLocal, normalView, positionViewDirection } from 'three/tsl';
 
-// Volumetric cloud density calculator (simplified ellipsoid shape with warping and edge noise erosion)
-const getCloudDensity = Fn( ( [ p ] ) => {
+// Define a self-contained TSL shader function with encapsulated uniforms and lifecycle events
+const energySphere = Fn( () => {
 
-	// 1. Warp coordinate space to deform the geometric boundaries organically (Domain Warping)
-	const warp = triNoise3D( p, 0.5, time.mul( 0.5 ) );
-	const pWarped = p.add( vec3( warp ).sub( 0.5 ).mul( 0.4 ) );
+	// Declare uniforms inside the function
+	const baseColor = uniform( new THREE.Color() );
+	const glowColor = uniform( new THREE.Color() );
+	const waveParams = uniform( new THREE.Vector3() ); // ( frequency, animation phase, swirl )
+	const glowIntensity = uniform( 0.0 );
 
-	// 2. Base Ellipsoid Mask (wider than it is tall to look like a flat cumulus cloud)
-	const baseMask = smoothstep( 0.48, 0.22, pWarped.mul( vec3( 1, 1.3, 1 ) ).length() );
+	// Update all material uniforms simultaneously on the CPU in a single callback
+	OnMaterialUpdate( ( { time } ) => {
 
-	// 3. Volumetric details with slow wind drift
-	const pNoise = pWarped.add( vec3( time.mul( 0.05 ), 0, time.mul( 0.02 ) ) );
-	const noiseVal = triNoise3D( pNoise.mul( 1.2 ), 1.2, time.mul( 0.6 ) );
+		const t = time * 0.7;
 
-	// Erode only the edges of the cloud, keeping the center core solid
-	const shape = baseMask.sub( noiseVal.mul( baseMask.pow( 2 ).oneMinus().mul( 0.48 ) ) );
+		// 1. Dynamic harmonic palette cycling across HSL color space
+		baseColor.value.setHSL( ( t * 0.05 + 0.55 ) % 1.0, 0.9, 0.35 );
+		glowColor.value.setHSL( ( t * 0.08 + 0.12 ) % 1.0, 1.0, 0.65 );
 
-	// Soft threshold to get beautiful rounded boundaries with smooth fade-out
-	return smoothstep( - 0.02, 0.35, shape );
+		// 2. Synchronize spatial frequency, animation phase, and ripple curvature
+		waveParams.value.set(
+			Math.sin( t * 1.3 ) * 3.0 + 9.0, // frequency
+			t * 2.5, // phase
+			Math.cos( t * 0.8 ) * 0.5 + 1.0 // swirl
+		);
 
-} );
-
-const raymarchClouds = Fn( () => {
-
-	const steps = 48;
-
-	const finalColor = vec4( 0 );
-
-	// Direct light source (constant direction from top-right-front, matching the reference image)
-	const lightDir = vec3( 1, 1.2, 0.8 ).normalize();
-	const localLightDir = modelWorldMatrixInverse.mul( vec4( lightDir, 0 ) ).xyz.normalize();
-
-	// Direct light color matching the reference sun light
-	const directLightColor = vec3( 0.5, 1.0, 1.4 );
-
-	RaymarchingBox( steps, ( { positionRay, stepSize } ) => {
-
-		const density = getCloudDensity( positionRay );
-
-		If( density.greaterThan( 0.01 ), () => {
-
-			// Shadow ray: sample density offset towards the light source in local space
-			const shadowPos = positionRay.add( localLightDir.mul( 0.08 ) );
-			const shadowDensity = getCloudDensity( shadowPos );
-
-			// Dual-Lobe Beer's Law for realistic multiple scattering & light penetration
-			const shadowVal = shadowDensity.mul( 10 );
-			const transmittance = exp( shadowVal.negate() ).mul( 0.5 ).add( exp( shadowVal.mul( 0.1 ).negate() ).mul( 0.65 ) );
-
-			// Calculate local normal based on positionRay relative to cloud center
-			const normal = positionRay.normalize();
-
-			// Transform normal to world space so environment directions align correctly with the sky
-			const worldNormal = modelWorldMatrix.mul( vec4( normal, 0 ) ).xyz.normalize();
-
-			// Sample ambient light dynamically in the direction of the world normal from the environment map (IBL)
-			const ambientLightColor = pmremTexture( scene.environment, worldNormal, 0.9 ).rgb.mul( 1.5 );
-
-			// Combine direct light and ambient sky contribution (offset positionRay.y by 0.5 to keep factors positive)
-			const directLight = directLightColor.mul( transmittance );
-			const ambientLight = ambientLightColor.mul( positionRay.y.add( 0.5 ) ).mul( density );
-			const cloudColor = directLight.add( ambientLight );
-
-			// Front-to-back blending with accumulated color (higher opacity for solid volume appearance)
-			const alpha = density.mul( stepSize ).mul( 8 );
-			const colSample = cloudColor.mul( alpha );
-
-			finalColor.rgb.addAssign( finalColor.a.oneMinus().mul( colSample ) );
-			finalColor.a.addAssign( finalColor.a.oneMinus().mul( alpha ) );
-
-			// Early loop termination if cloud gets opaque
-			If( finalColor.a.greaterThanEqual( 0.95 ), () => {
-
-				Break();
-
-			} );
-
-		} );
+		// 3. Compute pulsating energy burst intensity
+		glowIntensity.value = Math.pow( Math.sin( t * 2.2 ) * 0.5 + 0.5, 3.0 ) * 2.5 + 0.5;
 
 	} );
 
-	return finalColor;
+	// 3D coordinate warping for dynamic energy bands
+	const p = positionLocal.mul( waveParams.x );
+	const ripple = sin( p.y.mul( waveParams.z ).add( waveParams.y ) )
+		.add( cos( p.x.mul( 0.8 ).add( p.z.mul( waveParams.z ) ) ) )
+		.mul( 0.5 )
+		.add( 0.5 );
+
+	// Crisp energy contour rings
+	const bands = sin( ripple.mul( 12.0 ) ).pow( 4.0 );
+
+	// Dynamic Fresnel rim lighting
+	const fresnel = normalView.dot( positionViewDirection ).oneMinus().pow( 3.0 );
+
+	// Composite multi-layered iridescent energy shading
+	const core = ripple.mix( baseColor, glowColor );
+	const energyGlow = glowColor.mul( bands.mul( glowIntensity ).add( fresnel.mul( 2.0 ) ) );
+
+	return core.add( energyGlow );
 
 } );
 
-// Create custom cube geometry
-const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-
-// Setup material with raymarched clouds, render the back side, and enable transparency
-const material = new THREE.MeshBasicNodeMaterial();
-material.colorNode = raymarchClouds();
-material.side = THREE.BackSide;
-material.transparent = true;
-
-// Create mesh, scale, position, disable frustum culling, and add to empty scene
-const mesh = new THREE.Mesh( geometry, material );
-mesh.scale.set( 4, 3, 4 );
-mesh.position.y = 1.6;
-mesh.frustumCulled = false;
-scene.add( mesh );
+// Apply the reactive event shader to the material
+model.material.colorNode = energySphere();
+model.material.roughness = 0.2;
+model.material.metalness = 0.9;
 ```
 
 </page>
 
-<page name="Projector Light">
+</page>
 
-TSL allows you to extend not only materials and post-processing, but also lighting.
+<page name="Atomic">
 
-`ProjectorLight` is a specialized light source that projects in a rectangular frustum (similar to a slide or video projector) instead of a standard circular cone.
+Atomic operations in TSL allow performing synchronization-safe read-modify-write operations on GPU memory. In WebGPU, atomic operations are performed on elements of storage buffers or workgroup memory declared as atomic variables.
 
-### Extending Lights with `colorNode`
+To create an atomic storage buffer in TSL, you declare a `storage()` node and chain the `.toAtomic()` method on it.
 
-By assigning a TSL function to `light.colorNode`, you can project custom procedural patterns (such as animated water caustics, gobos, or textures) directly into the light beam. TSL automatically calculates the projected coordinates (`projectorUV`) and passes them into your shader function:
+Example:
 
 ```js
-const projectorLight = new THREE.ProjectorLight();
-projectorLight.colorNode = Fn( ( [ projectorUV ] ) => {
-
-	return projectorUV;
-
-} );
-```
-
-In this example, a procedural caustics shader is pre-rendered once per frame using an offscreen `rtt` (Render-to-Texture) node for optimal performance, and then projected across the 3D scene.
-
-<code name="projectorLightExample" default="true">Projector Light Example</code>
-
-```tsl projectorLightExample
-import 'scenes/empty';
 import * as THREE from 'three';
-import { Fn, color, vec3, mat3, float, time, min, length, smoothstep, mx_noise_float, rtt, uv } from 'three/tsl';
+import { storage, atomicAdd } from 'three/tsl';
 
-// Reference: https://www.shadertoy.com/view/3tlfR7 (adapted from David Hoskins)
+// 1. Create a storage buffer attribute (e.g., 1 unsigned integer for a counter)
+const counterAttr = new THREE.StorageBufferAttribute( new Uint32Array( [ 0 ] ), 1 );
 
-const caustics = Fn( ( [ p, t ] ) => {
+// 2. Define the storage buffer in TSL and mark it as atomic
+const counter = storage( counterAttr, 'uint', 1 ).toAtomic();
 
-	const m = mat3(
-		- 2.0, - 1.0, 2.0,
-		3.0, - 2.0, 1.0,
-		1.0, 2.0, 2.0
-	);
-
-	const n = mx_noise_float( p );
-	const k = vec3( p, t );
-
-	k.assign( k.mul( m ).mul( 0.5 ) );
-	const l = length( float( 0.5 ).sub( k.add( n ).fract() ) );
-
-	k.assign( k.mul( m ).mul( 0.4 ) );
-	l.assign( min( l, length( float( 0.5 ).sub( k.add( n ).fract() ) ) ) );
-
-	k.assign( k.mul( m ).mul( 0.3 ) );
-	l.assign( min( l, length( float( 0.5 ).sub( k.add( n ).fract() ) ) ) );
-
-	return l.pow( 7.0 ).mul( 25.0 );
-
-} );
-
-// 1. In this example, a procedural caustics shader is pre-rendered once per frame using
-// an offscreen rtt (Render-to-Texture) node for optimal performance, and then projected across the 3D scene.
-const causticMap = rtt( caustics( uv().sub( 0.5 ).mul( 6.0 ), time.mul( 0.4 ) ), 512, 512 );
-
-// 2. Procedural water caustics projection sampling from RTT map
-const projectorPattern = Fn( ( [ projectorUV ] ) => {
-
-	const uvCoord = projectorUV.xy;
-
-	// Sample pre-rendered caustic texture
-	const caustic = causticMap.sample( uvCoord );
-
-	// Soft rectangular aperture edge mask (vignette)
-	const edgeMask = smoothstep( 0.5, 0.42, uvCoord.sub( 0.5 ).abs().x ).mul( smoothstep( 0.5, 0.42, uvCoord.sub( 0.5 ).abs().y ) );
-
-	// Cyan aquatic light palette
-	const lightColor = color( 0x5abcd8 ).mul( caustic );
-
-	return lightColor.mul( edgeMask );
-
-} );
-
-// 3. Add sample 3D geometry to catch the projection and cast shadows
-const objectMaterial = new THREE.MeshStandardNodeMaterial( { roughness: 0.3, metalness: 0.1, color: 0xffffff } );
-
-const torusKnot = new THREE.Mesh( new THREE.TorusKnotGeometry( 0.7, 0.25, 128, 32 ), objectMaterial );
-torusKnot.position.set( 0, 1.2, 0 );
-torusKnot.castShadow = true;
-torusKnot.receiveShadow = true;
-scene.add( torusKnot );
-
-// 4. Create ProjectorLight with custom colorNode and shadows
-const projectorLight = new THREE.ProjectorLight( 0xffffff, 500 );
-projectorLight.position.set( 3, 5, 3 );
-projectorLight.target.position.set( 0, 0.5, 0 );
-projectorLight.angle = Math.PI / 5;
-projectorLight.penumbra = 0.4;
-projectorLight.decay = 1.5;
-projectorLight.distance = 0;
-
-// Assign the TSL procedural projection shader
-projectorLight.colorNode = projectorPattern;
-
-// Configure projector shadows
-projectorLight.castShadow = true;
-projectorLight.shadow.mapSize.set( 1024, 1024 );
-projectorLight.shadow.camera.near = 0.5;
-projectorLight.shadow.camera.far = 15;
-projectorLight.shadow.bias = - 0.001;
-
-scene.add( projectorLight );
-scene.add( projectorLight.target );
+// 3. Perform an atomic add operation in your shader (increments the counter and returns the previous value)
+const previousValue = atomicAdd( counter.element( 0 ), 1 );
 ```
 
 </page>
@@ -4750,6 +3997,116 @@ model.material.metalness = 0.2;
 
 </page>
 
+<page name="Projector Light">
+
+TSL allows you to extend not only materials and post-processing, but also lighting.
+
+`ProjectorLight` is a specialized light source that projects in a rectangular frustum (similar to a slide or video projector) instead of a standard circular cone.
+
+### Extending Lights with `colorNode`
+
+By assigning a TSL function to `light.colorNode`, you can project custom procedural patterns (such as animated water caustics, gobos, or textures) directly into the light beam. TSL automatically calculates the projected coordinates (`projectorUV`) and passes them into your shader function:
+
+```js
+const projectorLight = new THREE.ProjectorLight();
+projectorLight.colorNode = Fn( ( [ projectorUV ] ) => {
+
+	return projectorUV;
+
+} );
+```
+
+In this example, a procedural caustics shader is pre-rendered once per frame using an offscreen `rtt` (Render-to-Texture) node for optimal performance, and then projected across the 3D scene.
+
+<code name="projectorLightExample" default="true">Projector Light Example</code>
+
+```tsl projectorLightExample
+import 'scenes/empty';
+import * as THREE from 'three';
+import { Fn, color, vec3, mat3, float, time, min, length, smoothstep, mx_noise_float, rtt, uv } from 'three/tsl';
+
+// Reference: https://www.shadertoy.com/view/3tlfR7 (adapted from David Hoskins)
+
+const caustics = Fn( ( [ p, t ] ) => {
+
+	const m = mat3(
+		- 2.0, - 1.0, 2.0,
+		3.0, - 2.0, 1.0,
+		1.0, 2.0, 2.0
+	);
+
+	const n = mx_noise_float( p );
+	const k = vec3( p, t );
+
+	k.assign( k.mul( m ).mul( 0.5 ) );
+	const l = length( float( 0.5 ).sub( k.add( n ).fract() ) );
+
+	k.assign( k.mul( m ).mul( 0.4 ) );
+	l.assign( min( l, length( float( 0.5 ).sub( k.add( n ).fract() ) ) ) );
+
+	k.assign( k.mul( m ).mul( 0.3 ) );
+	l.assign( min( l, length( float( 0.5 ).sub( k.add( n ).fract() ) ) ) );
+
+	return l.pow( 7.0 ).mul( 25.0 );
+
+} );
+
+// 1. In this example, a procedural caustics shader is pre-rendered once per frame using
+// an offscreen rtt (Render-to-Texture) node for optimal performance, and then projected across the 3D scene.
+const causticMap = rtt( caustics( uv().sub( 0.5 ).mul( 6.0 ), time.mul( 0.4 ) ), 512, 512 );
+
+// 2. Procedural water caustics projection sampling from RTT map
+const projectorPattern = Fn( ( [ projectorUV ] ) => {
+
+	const uvCoord = projectorUV.xy;
+
+	// Sample pre-rendered caustic texture
+	const caustic = causticMap.sample( uvCoord );
+
+	// Soft rectangular aperture edge mask (vignette)
+	const edgeMask = smoothstep( 0.5, 0.42, uvCoord.sub( 0.5 ).abs().x ).mul( smoothstep( 0.5, 0.42, uvCoord.sub( 0.5 ).abs().y ) );
+
+	// Cyan aquatic light palette
+	const lightColor = color( 0x5abcd8 ).mul( caustic );
+
+	return lightColor.mul( edgeMask );
+
+} );
+
+// 3. Add sample 3D geometry to catch the projection and cast shadows
+const objectMaterial = new THREE.MeshStandardNodeMaterial( { roughness: 0.3, metalness: 0.1, color: 0xffffff } );
+
+const torusKnot = new THREE.Mesh( new THREE.TorusKnotGeometry( 0.7, 0.25, 128, 32 ), objectMaterial );
+torusKnot.position.set( 0, 1.2, 0 );
+torusKnot.castShadow = true;
+torusKnot.receiveShadow = true;
+scene.add( torusKnot );
+
+// 4. Create ProjectorLight with custom colorNode and shadows
+const projectorLight = new THREE.ProjectorLight( 0xffffff, 500 );
+projectorLight.position.set( 3, 5, 3 );
+projectorLight.target.position.set( 0, 0.5, 0 );
+projectorLight.angle = Math.PI / 5;
+projectorLight.penumbra = 0.4;
+projectorLight.decay = 1.5;
+projectorLight.distance = 0;
+
+// Assign the TSL procedural projection shader
+projectorLight.colorNode = projectorPattern;
+
+// Configure projector shadows
+projectorLight.castShadow = true;
+projectorLight.shadow.mapSize.set( 1024, 1024 );
+projectorLight.shadow.camera.near = 0.5;
+projectorLight.shadow.camera.far = 15;
+projectorLight.shadow.bias = - 0.001;
+
+scene.add( projectorLight );
+scene.add( projectorLight.target );
+```
+
+</page>
+
 </page>
 
 <page name="Scene">
@@ -5019,6 +4376,7 @@ const vignette = distFromCenter.mul( 1.4 ).oneMinus().clamp();
 // 3. Apply color grading and vignette to the scene pass output
 const postProcess = scenePass.rgb.mul( vignette );
 
+// const renderPipeline = new THREE.RenderPipeline();
 renderPipeline.outputNode = postProcess;
 ```
 
@@ -5030,7 +4388,7 @@ renderPipeline.outputNode = postProcess;
 
 This is essential for deferred rendering pipelines, G-Buffer generation, and advanced screen-space post-processing effects (such as SSAO, SSR, SSGI, Motion Blur, Bloom, and selective masks) without rendering the scene geometry multiple times.
 
-<code name="splitView" default="true">Color vs Normals</code>
+<code name="splitView" default="true">Color, Normals and Positions</code>
 
 ::: api mrt( outputNodes ) : MRTNode - Creates a Multiple Render Target (MRT) node mapping named targets to node expressions.
 - **outputNodes**: `Object<string, Node>` - Dictionary mapping output attachment names (e.g., `output`, `normal`, `position`, `mask`) to their corresponding node expressions.
@@ -5055,26 +4413,315 @@ glowMaterial.mrtNode = mrt( {
 
 ```tsl splitView
 import 'scenes/shaderball';
-import { pass, mrt, output, normalView, screenUV, step } from 'three/tsl';
+import { pass, mrt, output, normalWorld, positionWorld, screenUV, step, mix } from 'three/tsl';
 
 // 1. Create a scene render pass
 const scenePass = pass( scene, camera );
 
-// 2. Configure the pass to output Color and View Normals simultaneously via MRT
+// 2. Configure the pass to output Color, World Normals, and World Positions simultaneously via MRT
 scenePass.setMRT( mrt( {
 	output: output,
-	normal: normalView
+	normal: normalWorld,
+	position: positionWorld
 } ) );
 
 // 3. Retrieve individual MRT texture attachments
 const colorTexture = scenePass.getTextureNode( 'output' );
 const normalTexture = scenePass.getTextureNode( 'normal' );
+const positionTexture = scenePass.getTextureNode( 'position' );
 
-// 4. Display split-screen (Left: Color / Right: View Normals)
-const isRightSide = step( 0.5, screenUV.x );
-const splitScreen = isRightSide.mix( colorTexture, normalTexture );
+// 4. Display split-screen (Left: Color / Center: World Normals / Right: World Positions)
+let splitScreen = colorTexture;
+splitScreen = mix( splitScreen, normalTexture, step( 0.333, screenUV.x ) );
+splitScreen = mix( splitScreen, positionTexture, step( 0.666, screenUV.x ) );
 
+// const renderPipeline = new THREE.RenderPipeline();
 renderPipeline.outputNode = splitScreen;
+```
+
+</page>
+
+<page name="Post-Processing">
+
+TSL provides a suite of modular post-processing nodes to create screen-space effects, image processing passes, and anti-aliasing techniques in WebGPU.
+
+Effects are encapsulated into reusable nodes from `three/addons/tsl/display/` that process render pass outputs `pass( scene, camera )` and can be seamlessly combined and assigned to `renderPipeline.outputNode`.
+
+<code name="bloomExample" default="true">Bloom</code>
+<code name="gaussianBlurExample">Gaussian Blur</code>
+<code name="dofExample">Depth of Field</code>
+<code name="filmExample">Film Grain</code>
+<code name="dotScreenExample">Dot Screen</code>
+<code name="rgbShiftExample">RGB Shift</code>
+<code name="sobelExample">Sobel Edge Detection</code>
+<code name="afterImageExample">After Image</code>
+<code name="radialBlurExample">Radial Blur</code>
+
+::: api bloom( node, strength?, radius?, threshold? ) : BloomNode - Creates a bloom glow effect extracting high-luminance areas.
+- **node**: `Node` - Input texture or pass node.
+- **strength**: `number` - (Optional) Strength / intensity multiplier of the bloom. Defaults to `1`.
+- **radius**: `number` - (Optional) Bloom blur radius. Defaults to `0`.
+- **threshold**: `number` - (Optional) Luminance threshold limit below which pixels do not glow. Defaults to `0`.
+:::
+
+::: api gaussianBlur( node, directionNode?, sigma?, options? ) : GaussianBlurNode - Applies a two-pass separable Gaussian blur filter.
+- **node**: `Node` - Input texture or pass node.
+- **directionNode**: `Node | vec2 | number` - (Optional) Direction vector or radius scale. Defaults to `null`.
+- **sigma**: `number` - (Optional) Standard deviation kernel radius. Defaults to `4`.
+- **options**: `Object` - (Optional) Configuration options (`premultipliedAlpha`, `resolutionScale`).
+:::
+
+::: api radialBlur( node, options? ) : Node - Applies a radial blur centered on the screen.
+- **node**: `Node` - Input texture or pass node.
+- **options**: `Object` - (Optional) Blur options (e.g. `center`, `samples`, `factor`).
+:::
+
+::: api hashBlur( node, blurAmount?, options? ) : Node - Applies a randomized stochastic hash blur to the input.
+- **node**: `Node` - Input texture or pass node.
+- **blurAmount**: `Node | number` - (Optional) Intensity of the blur. Defaults to `0.1`.
+- **options**: `Object` - (Optional) Additional options.
+:::
+
+::: api bilateralBlur( node, options? ) : BilateralBlurNode - Applies an edge-preserving bilateral filter.
+- **node**: `Node` - Input texture or pass node.
+- **options**: `Object` - (Optional) Filter radius, spatial sigma, and range sigma.
+:::
+
+::: api boxBlur( node, options? ) : Node - Applies a fast box blur filter.
+- **node**: `Node` - Input texture or pass node.
+- **options**: `Object` - (Optional) Box blur options.
+:::
+
+::: api lensflare( node, params? ) : LensflareNode - Generates bloom-based anamorphic streaks and lens flares.
+- **node**: `Node` - Input bloom or emissive texture.
+- **params**: `Object` - (Optional) Lensflare parameters.
+:::
+
+::: api dof( node, viewZNode, focusDistance?, focalLength?, bokehScale? ) : DepthOfFieldNode - Creates a realistic bokeh Depth of Field lens blur.
+- **node**: `Node` - Input color texture or pass node.
+- **viewZNode**: `Node` - View-space Z depth buffer node (e.g. `pass.getViewZNode()`).
+- **focusDistance**: `Node | number` - (Optional) Distance to the focal plane in world units. Defaults to `1`.
+- **focalLength**: `Node | number` - (Optional) Lens focal depth range. Defaults to `1`.
+- **bokehScale**: `Node | number` - (Optional) Bokeh blur disc size. Defaults to `1`.
+:::
+
+::: api chromaticAberration( node, strength?, center?, scale? ) : ChromaticAberrationNode - Simulates optical lens dispersion by offsetting color channels radially.
+- **node**: `Node` - Input texture or pass node.
+- **strength**: `Node | number` - (Optional) Chromatic separation strength. Defaults to `1.0`.
+- **center**: `Node | vec2` - (Optional) Center coordinate of dispersion. Defaults to screen center `(0.5, 0.5)`.
+- **scale**: `Node | number` - (Optional) Distortion scale factor. Defaults to `1.1`.
+:::
+
+::: api film( node, intensity?, uvNode? ) : FilmNode - Adds cinematic film grain noise.
+- **node**: `Node` - Input color node or pass.
+- **intensity**: `Node | number` - (Optional) Grain noise intensity factor. Defaults to `null` (full strength).
+- **uvNode**: `Node` - (Optional) Custom or animated UV coordinates node. Defaults to screen `uv()`.
+:::
+
+::: api dotScreen( node, angle?, scale? ) : Node - Generates a halftone dot raster printing pattern.
+- **node**: `Node` - Input color node.
+- **angle**: `Node | number` - (Optional) Grid rotation angle in radians. Defaults to `1.57`.
+- **scale**: `Node | number` - (Optional) Dot grid frequency. Defaults to `1.0`.
+:::
+
+::: api rgbShift( node, amount?, angle? ) : Node - Offsets red and blue channels along a directional vector.
+- **node**: `Node` - Input color node.
+- **amount**: `Node | number` - (Optional) Channel offset distance. Defaults to `0.005`.
+- **angle**: `Node | number` - (Optional) Offset angle in radians. Defaults to `0.0`.
+:::
+
+::: api sobel( node ) : Node - Applies a 3x3 Sobel operator for gradient edge detection.
+- **node**: `Node` - Input color or depth node (typically after tone mapping). Returns `vec3` grayscale edges.
+:::
+
+::: api sharpen( node, sharpness?, denoise? ) : SharpenNode - Enhances edge contrast and image sharpness.
+- **node**: `Node` - Input texture or pass node.
+- **sharpness**: `Node | number` - (Optional) Sharpness strength. Defaults to `0.5`.
+- **denoise**: `Node | number` - (Optional) Denoising threshold to avoid amplifying noise. Defaults to `0.0`.
+:::
+
+::: api afterImage( node, damp? ) : AfterImageNode - Blends previous frames to produce persistent motion blur trails.
+- **node**: `Node` - Input texture or pass node.
+- **damp**: `Node | number` - (Optional) Trail persistence factor between 0 (no trail) and 1 (infinite trail). Defaults to `0.96`.
+:::
+
+::: api lut3D( node, lut, size?, intensity? ) : Node - Color grades the image using a 3D Color Lookup Table.
+- **node**: `Node` - Input color node.
+- **lut**: `Data3DTexture | Texture` - 3D LUT texture.
+- **size**: `number` - (Optional) LUT resolution cube size (e.g. `64`). Defaults to `64`.
+- **intensity**: `Node | number` - (Optional) Blend intensity. Defaults to `1.0`.
+:::
+
+::: api pixelationPass( scene, camera, pixelSize, normalEdgeStrength?, depthEdgeStrength? ) : PixelationPassNode - Renders a stylized pixelated pass with geometric edge outlines.
+- **scene**: `Scene` - Scene to render.
+- **camera**: `Camera` - Active camera.
+- **pixelSize**: `number` - Pixelation block size.
+- **normalEdgeStrength**: `number` - (Optional) Outline strength from normal buffer. Defaults to `0.3`.
+- **depthEdgeStrength**: `number` - (Optional) Outline strength from depth buffer. Defaults to `0.4`.
+:::
+
+::: api transition( nodeA, nodeB, mixTextureNode, mixRatio, threshold?, useTexture? ) : Node - Transitions between two passes using a gradient wipe texture.
+- **nodeA**: `Node` - Initial scene pass node.
+- **nodeB**: `Node` - Destination scene pass node.
+- **mixTextureNode**: `TextureNode` - Wipe / dissolve pattern texture.
+- **mixRatio**: `Node | number` - Progress ratio (0 to 1).
+- **threshold**: `Node | number` - (Optional) Edge softness threshold. Defaults to `0.1`.
+- **useTexture**: `boolean` - (Optional) Whether to sample texture values. Defaults to `true`.
+:::
+
+::: api fxaa( node ) : FXAANode - Computes Fast Approximate Anti-Aliasing (FXAA) in sRGB display space.
+- **node**: `Node` - Input sRGB color node (apply `renderOutput()` before FXAA).
+:::
+
+::: api smaa( node ) : SMAANode - Applies Subpixel Morphological Anti-Aliasing (SMAA) with subpixel pattern reconstruction.
+- **node**: `Node` - Input linear scene pass node.
+- **options**: `Object` - (Optional) Additional options.
+:::
+
+```tsl bloomExample
+import 'scenes/shaderball';
+import { pass } from 'three/tsl';
+import { bloom } from 'three/addons/tsl/display/BloomNode.js';
+
+// 1. Create a scene render pass
+const scenePass = pass( scene, camera );
+
+// 2. Apply Bloom effect to the scene pass and scale intensity
+const bloomPass = bloom( scenePass ).mul( .2 );
+
+// 3. Composite the bloom glow over the scene pass
+// const renderPipeline = new THREE.RenderPipeline();
+renderPipeline.outputNode = scenePass.add( bloomPass );
+```
+
+```tsl gaussianBlurExample
+import 'scenes/shaderball';
+import { pass } from 'three/tsl';
+import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
+
+// 1. Render scene pass
+const scenePass = pass( scene, camera );
+
+// 2. Apply a two-pass Gaussian blur filter
+const blurredPass = gaussianBlur( scenePass, 3 );
+
+// 3. Assign blurred output to render pipeline
+// const renderPipeline = new THREE.RenderPipeline();
+renderPipeline.outputNode = blurredPass;
+```
+
+```tsl dofExample
+import 'scenes/shaderball';
+import { pass } from 'three/tsl';
+import { dof } from 'three/addons/tsl/display/DepthOfFieldNode.js';
+
+// 1. Render scene pass
+const scenePass = pass( scene, camera );
+const colorTexture = scenePass.getTextureNode();
+const viewZTexture = scenePass.getViewZNode();
+
+// 2. Apply Depth of Field bokeh blur focused on the central model
+const focusDistance = 4.5;
+const focalLength = 1.2;
+const bokehScale = 2.5;
+
+const dofPass = dof( colorTexture, viewZTexture, focusDistance, focalLength, bokehScale );
+
+// const renderPipeline = new THREE.RenderPipeline();
+renderPipeline.outputNode = dofPass;
+```
+
+```tsl filmExample
+import 'scenes/shaderball';
+import { pass } from 'three/tsl';
+import { film } from 'three/addons/tsl/display/FilmNode.js';
+
+// 1. Render scene pass
+const scenePass = pass( scene, camera );
+
+// 2. Apply cinematic film grain noise
+const filmPass = film( scenePass );
+
+// const renderPipeline = new THREE.RenderPipeline();
+renderPipeline.outputNode = filmPass;
+```
+
+```tsl dotScreenExample
+import 'scenes/shaderball';
+import { pass } from 'three/tsl';
+import { dotScreen } from 'three/addons/tsl/display/DotScreenNode.js';
+
+// 1. Render scene pass
+const scenePass = pass( scene, camera );
+
+// 2. Apply halftone dot raster screen effect
+const dotPass = dotScreen( scenePass, 1.57, 0.35 );
+
+// const renderPipeline = new THREE.RenderPipeline();
+renderPipeline.outputNode = dotPass;
+```
+
+```tsl rgbShiftExample
+import 'scenes/shaderball';
+import { pass } from 'three/tsl';
+import { rgbShift } from 'three/addons/tsl/display/RGBShiftNode.js';
+
+// 1. Render scene pass
+const scenePass = pass( scene, camera );
+
+// 2. Apply horizontal RGB channel displacement
+const shiftedPass = rgbShift( scenePass, 0.006, 0.0 );
+
+// const renderPipeline = new THREE.RenderPipeline();
+renderPipeline.outputNode = shiftedPass;
+```
+
+```tsl sobelExample
+import 'scenes/shaderball';
+import { pass, renderOutput } from 'three/tsl';
+import { sobel } from 'three/addons/tsl/display/SobelOperatorNode.js';
+
+// 1. Render scene pass
+const scenePass = pass( scene, camera );
+
+// 2. Convert to display space before extracting edges
+const outputPass = renderOutput( scenePass );
+
+// 3. Extract edges using Sobel gradient operator
+const edgePass = sobel( outputPass );
+
+// const renderPipeline = new THREE.RenderPipeline();
+renderPipeline.outputNode = edgePass;
+```
+
+```tsl afterImageExample
+import 'scenes/shaderball';
+import { pass } from 'three/tsl';
+import { afterImage } from 'three/addons/tsl/display/AfterImageNode.js';
+
+// 1. Render scene pass
+const scenePass = pass( scene, camera );
+
+// 2. Retain previous frames to produce an afterimage motion trail
+const trailPass = afterImage( scenePass, 0.94 );
+
+// const renderPipeline = new THREE.RenderPipeline();
+renderPipeline.outputNode = trailPass;
+```
+
+```tsl radialBlurExample
+import 'scenes/shaderball';
+import { pass } from 'three/tsl';
+import { radialBlur } from 'three/addons/tsl/display/radialBlur.js';
+
+// 1. Render scene pass
+const scenePass = pass( scene, camera );
+
+// 2. Apply radial zoom blur expanding from screen center
+const blurredPass = radialBlur( scenePass );
+
+// const renderPipeline = new THREE.RenderPipeline();
+renderPipeline.outputNode = blurredPass;
 ```
 
 </page>
@@ -6577,6 +6224,652 @@ MaterialX standard helper functions for procedural ramps, anti-aliased transitio
 - **low**: `Node | float | number` - Lower bound. Defaults to `0`.
 - **high**: `Node | float | number` - Upper bound. Defaults to `1`.
 :::
+
+</page>
+
+</page>
+
+<page name="Context Flow">
+
+<page name="Context">
+
+In TSL, `ContextNode` is a cascading configuration and environment system that flows downward through the node graph (Abstract Syntax Tree) during compilation.
+
+It allows materials, render passes, and individual sub-graphs to inject configuration parameters, override global behaviors (such as UV coordinates, shadow sampling, or ambient occlusion), and assign custom variable names without modifying the underlying nodes.
+
+<code name="contextExample" default="true">Context Showcase</code>
+
+::: api context( nodeOrValue, value ) : ContextNode - Wraps a node with contextual dictionary data that flows downward to all child nodes during compilation.
+- **nodeOrValue**: `Node | Object` - The target node to wrap, or the context dictionary object if creating a standalone context wrapper.
+- **value**: `Object` - Key-value dictionary containing contextual parameters and hooks.
+:::
+
+::: api .context( value ) : ContextNode - Method chaining helper to wrap the current node expression with contextual data. :::
+
+### Context Properties
+
+::: api getUV : Function - Callback `( builder ) => Node` to override the UV coordinate used by all textures and UV-dependent nodes in the active sub-tree. :::
+
+::: api getShadow : Function - Callback `( { light, shadowColorNode } ) => Node` to customize or filter shadow calculations across the contextual sub-tree. :::
+
+::: api getAO : Function - Callback `( inputNode, { material } ) => Node` to customize or modulate ambient occlusion evaluation across the sub-tree. :::
+
+### Context Hierarchy Cascade
+
+Context configuration flows downward from the highest level of the rendering engine down to individual node expressions:
+
+```mermaid
+flowchart TD
+    Renderer["<b>WebGPURenderer</b><br/><small><code>renderer.contextNode</code><br/>Global scene context</small>"]
+    Pass["<b>RenderPipeline / PassNode</b><br/><small><code>pass.contextNode</code><br/>Per-pass context</small>"]
+    Material["<b>NodeMaterial</b><br/><small><code>material.contextNode</code><br/>Material-wide context</small>"]
+    SubGraph["<b>ContextNode / Sub-Graph</b><br/><small><code>node.context( { ... } )</code><br/>Scoped expression context</small>"]
+    Target["<b>Target Nodes</b><br/><small>Inherit and evaluate within active context</small>"]
+
+    Renderer --> Pass
+    Pass --> Material
+    Material --> SubGraph
+    SubGraph --> Target
+```
+
+#### Overriding UVs for All Child Textures
+Assigning `getUV` to `material.contextNode` or wrapping an expression automatically redirects texture sampling across the entire sub-tree:
+
+```js
+import * as THREE from 'three';
+import { uv, vec2, time, texture } from 'three/tsl';
+
+const map = new THREE.TextureLoader().load( '../examples/textures/uv_grid_opengl.jpg' );
+map.wrapS = THREE.RepeatWrapping;
+map.wrapT = THREE.RepeatWrapping;
+
+// Dynamic animated and scaled UV coordinates
+const animatedUV = uv().mul( 3.0 ).add( vec2( time.mul( 0.2 ), 0.0 ) );
+
+// All textures in this material automatically use animatedUV instead of standard uv()
+material.contextNode = material.context( {
+	getUV: () => animatedUV
+} );
+
+material.colorNode = texture( map );
+```
+
+```tsl contextExample
+import 'scenes/shaderball';
+import * as THREE from 'three';
+import { uv, time, texture, vec2 } from 'three/tsl';
+
+// Load texture map
+const map = new THREE.TextureLoader().load( '../examples/textures/uv_grid_opengl.jpg' );
+map.wrapS = THREE.RepeatWrapping;
+map.wrapT = THREE.RepeatWrapping;
+
+// 1. Custom animated and scaled UV coordinates
+const animatedUV = uv().mul( 3.0 ).add( vec2( time.mul( 0.2 ), 0.0 ) );
+
+// 2. Wrap material context to redirect getUV for all textures across the material
+model.material.contextNode = uv().context( {
+	getUV: () => animatedUV
+} );
+
+// 3. Texture sampling automatically inherits the contextual animated UVs
+model.material.colorNode = texture( map );
+model.material.roughness = 0.2;
+model.material.metalness = 0.5;
+```
+
+</page>
+
+<page name="setName">
+
+In TSL, **`setName()`** (and `.setName()`) assigns an explicit, readable identifier name to a node expression in the generated shader source code (WGSL or GLSL).
+
+By default, `NodeBuilder` names intermediate variables with auto-incrementing identifiers (e.g. `nodeVar0`, `nodeVar1`, `nodeVar2`). Using `setName()` makes compiled shaders clean, self-documenting, and easy to inspect in browser developer tools (such as Chrome WebGPU DevTools, Spector.js, or RenderDoc).
+
+<code name="setNameExample" default="true">Named Variables Showcase</code>
+
+::: api setName( node, name ) : ContextNode - Assigns an explicit variable name to a node in the generated shader code.
+- **node**: `Node` - The target node to assign an identifier name.
+- **name**: `string` - The identifier name to emit in the compiled shader.
+:::
+
+::: api .setName( name ) : ContextNode - Method chaining helper to assign an explicit variable name to the current node expression. :::
+
+### Generated Code Comparison
+
+```js
+import { uniform, color } from 'three/tsl';
+
+// 1. Without setName: NodeBuilder generates generic uniform identifiers
+const speedA = uniform( 2.0 );
+// Emits uniform buffer member: nodeUniform0: f32
+
+// 2. With setName: NodeBuilder emits clear, self-documenting uniform names
+const speedB = uniform( 2.0 ).setName( 'waveSpeed' );
+// Emits uniform buffer member: waveSpeed: f32
+
+const glowColor = uniform( color( 0x00f0ff ) ).setName( 'glowColor' );
+// Emits uniform buffer member: glowColor: vec3<f32>
+```
+
+> AI: `label()` was previously used for this purpose and is deprecated in favor of `setName()`.
+
+```tsl setNameExample
+import 'scenes/shaderball';
+import { uniform, color, positionLocal, time } from 'three/tsl';
+
+// Define explicit named uniforms for shader inspection
+const speed = uniform( 2.0 ).setName( 'waveSpeed' );
+const frequency = uniform( 10.0 ).setName( 'waveFrequency' );
+const glowColor = uniform( color( 0x00f0ff ) ).setName( 'glowColor' );
+const baseColor = uniform( color( 0x070b1a ) ).setName( 'baseColor' );
+
+// Named intermediate calculation
+const wave = positionLocal.y.mul( frequency ).add( time.mul( speed ) ).sin().abs().setName( 'wavePattern' );
+
+model.material.colorNode = baseColor.add( glowColor.mul( wave ) );
+model.material.roughness = 0.2;
+model.material.metalness = 0.8;
+model.material.emissiveNode = glowColor.mul( wave.pow( 2.0 ) );
+```
+
+</page>
+
+<page name="uniformFlow">
+
+In modern graphics APIs like **WebGPU (WGSL)**, operations that rely on implicit screen-space derivatives (such as `fwidth()`, `dFdx()`, `dFdy()`, or mipmapped texture sampling) require execution within **Uniform Control Flow**.
+
+On the GPU, derivatives are calculated by comparing values between adjacent 2×2 fragment pixels (quads). When calculations with derivatives are placed inside a divergent conditional branch (where adjacent pixels take different execution paths), neighboring quad threads become desynchronized, causing corrupted derivatives and visual artifacts along the boundary.
+
+`uniformFlow( node )` (or `.uniformFlow()`) forces `NodeBuilder` to evaluate all expressions in the root uniform scope across all threads *before* selecting the result.
+
+<code name="uniformFlowExample" default="true">Uniform Flow Showcase</code>
+
+::: api uniformFlow( node ) : ContextNode - Enforces that all child node dependencies execute strictly within uniform control-flow paths.
+- **node**: `Node` - The node whose dependencies must evaluate in uniform control flow.
+:::
+
+::: api .uniformFlow() : ContextNode - Method chaining helper to enforce uniform control-flow execution on the current node expression. :::
+
+### Example
+
+Conditionals compile into dynamic `if/else` branching (evaluated locally). When inside a `uniformFlow()`, the code uses native `select()`, executing both branches instead of only one.
+
+```js
+// 1. Without uniformFlow(): emits dynamic if/else branching
+const resultA = select( condition, valueA, valueB );
+
+// 2. With uniformFlow(): evaluates both branches uniformly before selecting
+const resultB = select( condition, valueA, valueB ).uniformFlow();
+```
+
+> Important: Because `uniformFlow()` evaluates both branches unconditionally to maintain quad thread synchronization, it can impact performance if the branches involve heavy math or expensive texture lookups.
+
+```tsl uniformFlowExample
+import 'scenes/plane';
+import { uv, time, select, fwidth, color, float, fract } from 'three/tsl';
+
+// 1. Dynamic animated division boundary across the plane
+const splitPos = time.mul( 0.4 ).sin().mul( 0.3 ).add( 0.5 );
+const condition = uv().x.greaterThan( splitPos );
+
+// 2. Anti-aliased procedural stripe pattern that relies on fwidth() derivatives
+const stripePattern = ( scale ) => {
+
+	const coord = uv().mul( scale );
+	const f = fract( coord.x );
+	const fw = fwidth( coord.x ); // Screen-space derivative across neighbor pixels in 2x2 quad
+	return f.div( fw.mul( 100.0 ) ).clamp( 0.0, 1.0 );
+
+};
+
+const patternA = stripePattern( float( 10.0 ) );
+const patternB = stripePattern( float( 25.0 ) );
+
+const cyan = color( 0x00f0ff ).mul( patternA );
+const magenta = color( 0xff0055 ).mul( patternB );
+
+// 3. select() with uniformFlow():
+// - WITH uniformFlow(): quad threads evaluate derivatives synchronously in uniform scope (clean boundary)
+// - WITHOUT uniformFlow(): quad threads diverge across the split, corrupting the derivative along the boundary seam
+const finalColor = select( condition, cyan, magenta ).uniformFlow();
+
+// 4. Assign to plane material
+plane.material.colorNode = finalColor.debug();
+```
+
+</page>
+
+<page name="Builtin Context">
+
+TSL provides pre-built context helpers such as **`builtinAOContext()`** and **`builtinShadowContext()`** to quickly modify ambient occlusion and lighting shadow behavior across a material or node sub-graph without manually writing custom `getAO` or `getShadow` context handler objects.
+
+::: api builtinAOContext( aoNode, node = null ) : ContextNode - Intercepts `getAO` to modulate ambient occlusion for non-transparent materials by `aoNode`.
+- **aoNode**: `Node` - The ambient occlusion node to multiply.
+- **node**: `Node` - Optional node expression to wrap with this AO context. Defaults to `null`.
+:::
+
+::: api .builtinAOContext( aoNode ) : ContextNode - Method chaining helper to wrap the current node expression with a built-in AO context. :::
+
+::: api builtinShadowContext( shadowNode, light, node = null ) : ContextNode - Intercepts `getShadow` to modulate the shadow color of a specific light by `shadowNode`.
+- **shadowNode**: `Node` - The shadow modulation node.
+- **light**: `Light` - The target light whose shadow should be modulated.
+- **node**: `Node` - Optional node expression to wrap with this shadow context. Defaults to `null`.
+:::
+
+::: api .builtinShadowContext( shadowNode, light ) : ContextNode - Method chaining helper to wrap the current node expression with a built-in shadow context. :::
+
+### Example
+
+```js
+import { builtinAOContext } from 'three/tsl';
+
+// Modulate global ambient occlusion and shadow for the material
+myPass.contextNode = builtinAOContext( screenSpaceAO ).builtinShadowContext( screenSpaceShadow, dirLight );
+```
+
+</page>
+
+<page name="Override Node">
+
+In TSL, **`overrideNode`** (and `overrideNodes`) provides a mechanism to dynamically intercept and substitute specific target nodes within a node sub-graph, material, or pass during compilation.
+
+This acts as dynamic dependency injection for shaders, allowing you to replace fundamental inputs (such as `positionLocal`, `positionView`, `normalView`, or `positionViewDirection`) without modifying or duplicating existing node graphs.
+
+<code name="overridePosition" default="true">Override position</code>
+
+::: api overrideNode( targetNode, callbackOrNode ) : OverrideContextNode - Overrides a single target node during compilation within a contextual flow.
+- **targetNode**: `Node` - The target node to intercept and replace.
+- **callbackOrNode**: `Function | Node` - A callback `(builder) => Node` returning the replacement, or the replacement `Node` directly.
+:::
+
+::: api overrideNodes( overrides ) : OverrideContextNode - Overrides multiple target nodes simultaneously during compilation.
+- **overrides**: `Array<[Node, Function | Node]> | Map<Node, Function | Node>` - Map or array of pairs mapping target nodes to their respective replacement callbacks or nodes.
+:::
+
+```js
+// Override a single node
+material.contextNode = overrideNode( positionLocal, () => positionLocal.add( vec3( 1, 0, 0 ) ) );
+
+// Override multiple nodes
+material.contextNode = overrideNodes( [
+	[ positionView, customPositionView ],
+	[ normalView, customNormalView ]
+] );
+```
+
+::: api .overrideNode( targetNode, callbackOrNode ) : OverrideContextNode - Method chaining helper to override a single target node for a specific node expression. :::
+
+::: api .overrideNodes( overrides ) : OverrideContextNode - Method chaining helper to override multiple target nodes for a specific node expression. :::
+
+### Compilation Flow
+
+When `OverrideContextNode` wraps a node expression, `NodeBuilder` intercepts references to the target node during compilation and evaluates the replacement node instead.
+
+### Common Use Cases
+
+#### 1. Material-Wide Input Substitution
+Assigning an override to `material.contextNode` replaces the target node across all stages (vertex and fragment) of that material:
+
+```js
+// Displaces vertex positions and keeps fragment calculations in sync
+material.contextNode = overrideNode( positionLocal, () => positionLocal.add( normalLocal.mul( wave ) ) );
+```
+
+#### 2. Deferred Rendering (G-Buffer Resolve)
+In deferred rendering, standard lighting materials require view-space positions and normals. Instead of scene geometry, `overrideNodes()` redirects the material to sample G-Buffer MRT textures:
+
+```js
+// Resolve pass: standard lighting material evaluating from G-Buffer textures
+resolveMaterial.contextNode = overrideNodes( [
+	[ positionView, gBufferPositionView ],
+	[ positionViewDirection, gBufferPositionView.negate().normalize() ],
+	[ normalView, gBufferNormalView ]
+] );
+```
+
+#### 3. Scoped Sub-Graph Substitution
+Calling `.overrideNode()` on a specific node expression restricts the override strictly to that sub-tree:
+
+<code name="subGraphOverride">Sub-graph override</code>
+
+```js
+// Base stripe sub-graph along the Y-axis (horizontal)
+const stripe = positionLocal.y.mul( 14.0 ).sin().abs();
+
+// Branch 1: Standard horizontal stripes
+const branch1 = color( 0x00ffff ).mul( stripe ).isolate();
+
+// Branch 2: Rotated 90° into vertical stripes via swizzling (.yxz)
+const branch2 = color( 0xff8800 ).mul(
+	stripe.overrideNode( positionLocal, () => positionLocal.yxz )
+).isolate();
+
+// Unify both branches into a cross-hatched grid
+material.colorNode = branch1.add( branch2 );
+```
+
+> Note: To evaluate the exact same node multiple times under different contextual parameters in the same graph, use [.isolate()](#isolate) to prevent cache reuse.
+
+```tsl overridePosition
+import 'scenes/shaderball';
+import { overrideNode, positionLocal, normalLocal, time, color } from 'three/tsl';
+
+model.material.colorNode = color( 0x0077ff );
+model.material.roughness = 0.5;
+model.material.metalness = 0.0;
+
+// Override positionLocal dynamically across the material context
+model.material.contextNode = overrideNode( positionLocal, () => {
+
+	// Safe to reference positionLocal inside the callback without infinite recursion
+	const wave = positionLocal.y.mul( 10.0 ).add( time.mul( 3.0 ) ).sin().mul( 0.08 );
+
+	return positionLocal.add( normalLocal.mul( wave ) );
+
+} );
+```
+
+```tsl subGraphOverride
+import 'scenes/shaderball';
+import { color, positionLocal, time } from 'three/tsl';
+
+// Base stripe pattern computed along the Y-axis (horizontal stripes)
+const stripe = positionLocal.y.mul( 14.0 ).add( time.mul( 2.0 ) ).sin().abs();
+
+// Branch 1: Evaluates stripe with standard positionLocal (Horizontal stripes)
+const branch1 = color( 0x00ffff ).mul( stripe ).isolate();
+
+// Branch 2: Swaps coordinates (.yxz) to rotate the pattern 90° into vertical stripes
+const branch2 = color( 0xff8800 ).mul(
+	stripe.overrideNode( positionLocal, () => positionLocal.yxz )
+).isolate();
+
+// Unify: Combines horizontal and vertical stripes into a glowing grid
+model.material.colorNode = branch1.add( branch2 );
+```
+
+</page>
+
+<page name="Isolate">
+
+By default, TSL automatically caches node evaluations. If you use the same node in multiple places, TSL builds it once and reuses the result to avoid redundant GPU calculations.
+
+However, if you want to evaluate the **same node** under different parameters (such as sampling a texture at different UV scales or offsets with `.context()`), the default caching will return the first evaluation and ignore your changes.
+
+`isolate( node )` or `.isolate()` tells TSL to create an **isolated cache scope**, forcing the node to be evaluated fresh without reusing or overwriting existing cache data.
+
+::: api isolate( node: Node ) : IsolateNode - Creates an isolated cache wrapper for a node.
+- **node**: `Node` - The node whose evaluation cache should be isolated.
+:::
+
+::: api .isolate() : IsolateNode - Method chaining helper to create an isolated cache wrapper.
+:::
+
+### Caching vs Isolate
+
+```mermaid
+flowchart TD
+    Node["<b>Base Node</b><br/><small>Shared node graph</small>"]
+    Call1["<b>1st Call</b><br/><small>Initial build & cached</small>"]
+    Call2["<b>2nd Call</b><br/><small>Subsequent evaluation</small>"]
+    Call2A["<code>node.context( ... )</code><br/><small>Reuses 1st cache</small>"]
+    Call2B["<code>node.isolate().context( ... )</code><br/><small>Fresh isolated scope</small>"]
+
+    Node --> Call1
+    Call1 --> Call2
+    Call2 -->|"Standard"| Call2A
+    Call2 -->|"Isolated"| Call2B
+```
+
+### When to Use
+
+Use `isolate()` whenever you need to recreate or re-evaluate a node's code flow under a different context. Because TSL caches and reuses previously built expressions by default, wrapping a node with `.isolate()` allows its entire sub-graph to be built fresh in a separate scope—enabling you to safely apply new contextual parameters.
+
+```tsl
+import 'scenes/shaderball';
+import * as THREE from 'three';
+import { texture, uv, vec2, time } from 'three/tsl';
+
+// Load base texture map
+const map = new THREE.TextureLoader().load( '../examples/textures/uv_grid_opengl.jpg' );
+map.wrapS = THREE.RepeatWrapping;
+map.wrapT = THREE.RepeatWrapping;
+
+const textureNode = texture( map );
+
+// Sample the same textureNode with different UV coordinates using .isolate()
+const sampleLayer = ( scale, offset ) => {
+
+	return textureNode.isolate().context( {
+		getUV: () => uv().mul( scale ).add( offset )
+	} );
+
+};
+
+// Base texture layer with slow horizontal drift
+const baseLayer = sampleLayer( 1.0, vec2( time.mul( 0.05 ), 0.0 ) );
+
+// Detail texture layer with 4x scaling and vertical drift
+const detailLayer = sampleLayer( 4.0, vec2( 0.0, time.mul( 0.1 ) ) );
+
+// Composite layers together on the shaderball material
+const composite = baseLayer.rgb.mul( detailLayer.rgb.add( 0.3 ) );
+
+model.material.colorNode = composite;
+model.material.roughnessNode = detailLayer.r.mul( 0.4 );
+```
+
+</page>
+
+<page name="Sub-Builds">
+
+Calling `.once()` on a `Fn()` creates a **singleton function**: TSL evaluates it once and reuses the result across your shader graph.
+
+**Sub-Builds** solve this by creating scoped compilation layers (like `'POSITION'` or `'NORMAL'`). Passing `.once( [ 'POSITION' ] )` tells TSL to maintain a separate cache for that specific stage instead of reusing a single global value.
+
+::: api Fn().once( subBuilds: Array<string> = null ) : FunctionNode - Configures a TSL function to execute and cache its output node once per build, with optional isolated caching across specified sub-build layers.
+- **subBuilds**: `Array<string>` - (Optional) Array of sub-build layer names (e.g. `[ 'NORMAL', 'VERTEX' ]`) under which the function is cached independently.
+:::
+
+::: api subBuild( node: Node, name: string, type: string = null ) : SubBuildNode - Wraps a node to be built within an isolated sub-build scope (e.g. `'VERTEX'`, `'NORMAL'`, `'POSITION'`).
+- **node**: `Node` - The target node to evaluate inside the sub-build layer.
+- **name**: `string` - The name of the sub-build compilation layer.
+- **type**: `string` - (Optional) The output type of the node.
+:::
+
+::: api builder.getSubBuildProperty( property: string = '', node: Node = null ) : string - Returns a sub-build prefixed property or varying identifier (e.g. `'POSITION_v_positionWorld'`).
+- **property**: `string` - The base property or varying name to prefix.
+- **node**: `Node` - (Optional) Target node used to resolve the closest sub-build scope.
+:::
+
+### How `positionWorld` Works
+
+Here is the core implementation of `positionWorld` in Three.js:
+
+```js
+export const positionWorld = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	return modelWorldMatrix.mul( positionLocal ).xyz.toVarying( builder.getSubBuildProperty( 'v_positionWorld' ) );
+
+}, 'vec3' ).once( [ 'POSITION' ] ) )();
+```
+
+When `positionWorld` is used in both `material.positionNode` and `material.colorNode`, TSL manages the compilation flow through sub-builds:
+
+1. `material.positionNode`: Runs inside the `'POSITION'` sub-build. `positionWorld` evaluates in the vertex stage and caches it under `'POSITION'` as `'POSITION_v_positionWorld'`.
+2. `material.colorNode`: Runs in the default fragment scope. Because `positionWorld` is only cached for `'POSITION'`, TSL evaluates it again for the fragment stage and outputs `'v_positionWorld'`.
+
+```mermaid
+flowchart TD
+    FnCall["<b>positionWorld</b><br/><small><code>.once( [ 'POSITION' ] )</code></small>"]
+    PosScope["<b>material.positionNode</b><br/><small>Vertex Stage<br/><code>POSITION_v_positionWorld</code></small>"]
+    FragScope["<b>material.colorNode</b><br/><small>Fragment Stage<br/><code>v_positionWorld</code></small>"]
+
+    FnCall -->|"Inside positionNode"| PosScope
+    FnCall -->|"Inside colorNode"| FragScope
+```
+
+<code name="positionWorldSubBuildExample" default="true">Sub-Builds Showcase</code>
+
+```tsl positionWorldSubBuildExample
+import 'scenes/shaderball';
+import { positionLocal, positionWorld, normalLocal, time, color } from 'three/tsl';
+
+// 1. Modify vertex positions using world coordinates
+const wave = positionWorld.y.mul( 6.0 ).add( time.mul( 2.5 ) ).sin().mul( 0.08 );
+model.material.positionNode = positionLocal.add( normalLocal.mul( wave ) );
+
+// 2. Color surface based on the resulting world coordinates in fragment stage
+const waveFactor = positionWorld.y.mul( 6.0 ).add( time.mul( 2.5 ) ).sin().mul( 0.5 ).add( 0.5 );
+const waveColor = color( 0x00aaff ).mix( color( 0xff0066 ), waveFactor );
+
+model.material.colorNode = waveColor;
+model.material.roughness = 0.2;
+```
+
+### Sub-Build API Reference
+
+| API | Type | Description |
+| :--- | :--- | :--- |
+| `Fn( function ).once( subBuilds )` | Method | Caches function evaluation per shader build, partitioned by `subBuilds` array. |
+| `subBuild( node, name, type )` | Node Function | Wraps a node to be evaluated within an isolated sub-build scope. |
+| `builder.subBuildFn` | Property | Identifies the active sub-build layer name currently executing. |
+| `builder.getSubBuildProperty( prop, node )` | Method | Returns a sub-build prefixed identifier (e.g. `'POSITION_v_positionWorld'`). |
+
+#### Related
+- [Isolate](#isolate)
+- [Context](#context)
+- [Function](#function)
+- [Shader Stages](#shader-stages)
+
+</page>
+
+</page>
+
+<page name="Extending Syntax">
+
+<page name="Raymarching">
+
+In real-world applications, TSL enables developers to create entirely new syntaxes and custom abstractions to accommodate different graphics workflows. Rather than being restricted to a fixed shader language, you can construct custom DSLs (Domain-Specific Languages), modular utility functions, or dedicated shading models that align with the architectural needs of your project.
+
+This flexibility allows shader logic to be composed dynamically like JavaScript components, making it possible to design clean APIs for complex math, custom material models, or post-processing pipelines.
+
+### Raymarching as a TSL Extension
+
+The `RaymarchingBox` utility is a practical example of how TSL's core syntax was extended to support a specialized volumetric rendering workflow. It abstracts the local ray calculation relative to a bounding volume (from `-0.5` to `0.5`), computes bounding-box intersections, and runs the step-by-step marching loop inside a custom utility.
+
+By wrapping this complex pipeline, the workflow for creating volumetric materials is simplified into a callback interface where you only define what happens at each sample point along the ray.
+
+<code name="raymarchingExample" default="true">Raymarching Box Example</code>
+
+```tsl raymarchingExample
+import 'scenes/empty';
+import * as THREE from 'three';
+import { Fn, vec4, vec3, time, If, smoothstep, exp, Break, modelWorldMatrixInverse, triNoise3D, pmremTexture, modelWorldMatrix } from 'three/tsl';
+import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js';
+
+// Volumetric cloud density calculator (simplified ellipsoid shape with warping and edge noise erosion)
+const getCloudDensity = Fn( ( [ p ] ) => {
+
+	// 1. Warp coordinate space to deform the geometric boundaries organically (Domain Warping)
+	const warp = triNoise3D( p, 0.5, time.mul( 0.5 ) );
+	const pWarped = p.add( vec3( warp ).sub( 0.5 ).mul( 0.4 ) );
+
+	// 2. Base Ellipsoid Mask (wider than it is tall to look like a flat cumulus cloud)
+	const baseMask = smoothstep( 0.48, 0.22, pWarped.mul( vec3( 1, 1.3, 1 ) ).length() );
+
+	// 3. Volumetric details with slow wind drift
+	const pNoise = pWarped.add( vec3( time.mul( 0.05 ), 0, time.mul( 0.02 ) ) );
+	const noiseVal = triNoise3D( pNoise.mul( 1.2 ), 1.2, time.mul( 0.6 ) );
+
+	// Erode only the edges of the cloud, keeping the center core solid
+	const shape = baseMask.sub( noiseVal.mul( baseMask.pow( 2 ).oneMinus().mul( 0.48 ) ) );
+
+	// Soft threshold to get beautiful rounded boundaries with smooth fade-out
+	return smoothstep( - 0.02, 0.35, shape );
+
+} );
+
+const raymarchClouds = Fn( () => {
+
+	const steps = 48;
+
+	const finalColor = vec4( 0 );
+
+	// Direct light source (constant direction from top-right-front, matching the reference image)
+	const lightDir = vec3( 1, 1.2, 0.8 ).normalize();
+	const localLightDir = modelWorldMatrixInverse.mul( vec4( lightDir, 0 ) ).xyz.normalize();
+
+	// Direct light color matching the reference sun light
+	const directLightColor = vec3( 0.5, 1.0, 1.4 );
+
+	RaymarchingBox( steps, ( { positionRay, stepSize } ) => {
+
+		const density = getCloudDensity( positionRay );
+
+		If( density.greaterThan( 0.01 ), () => {
+
+			// Shadow ray: sample density offset towards the light source in local space
+			const shadowPos = positionRay.add( localLightDir.mul( 0.08 ) );
+			const shadowDensity = getCloudDensity( shadowPos );
+
+			// Dual-Lobe Beer's Law for realistic multiple scattering & light penetration
+			const shadowVal = shadowDensity.mul( 10 );
+			const transmittance = exp( shadowVal.negate() ).mul( 0.5 ).add( exp( shadowVal.mul( 0.1 ).negate() ).mul( 0.65 ) );
+
+			// Calculate local normal based on positionRay relative to cloud center
+			const normal = positionRay.normalize();
+
+			// Transform normal to world space so environment directions align correctly with the sky
+			const worldNormal = modelWorldMatrix.mul( vec4( normal, 0 ) ).xyz.normalize();
+
+			// Sample ambient light dynamically in the direction of the world normal from the environment map (IBL)
+			const ambientLightColor = pmremTexture( scene.environment, worldNormal, 0.9 ).rgb.mul( 1.5 );
+
+			// Combine direct light and ambient sky contribution (offset positionRay.y by 0.5 to keep factors positive)
+			const directLight = directLightColor.mul( transmittance );
+			const ambientLight = ambientLightColor.mul( positionRay.y.add( 0.5 ) ).mul( density );
+			const cloudColor = directLight.add( ambientLight );
+
+			// Front-to-back blending with accumulated color (higher opacity for solid volume appearance)
+			const alpha = density.mul( stepSize ).mul( 8 );
+			const colSample = cloudColor.mul( alpha );
+
+			finalColor.rgb.addAssign( finalColor.a.oneMinus().mul( colSample ) );
+			finalColor.a.addAssign( finalColor.a.oneMinus().mul( alpha ) );
+
+			// Early loop termination if cloud gets opaque
+			If( finalColor.a.greaterThanEqual( 0.95 ), () => {
+
+				Break();
+
+			} );
+
+		} );
+
+	} );
+
+	return finalColor;
+
+} );
+
+// Create custom cube geometry
+const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+
+// Setup material with raymarched clouds, render the back side, and enable transparency
+const material = new THREE.MeshBasicNodeMaterial();
+material.colorNode = raymarchClouds();
+material.side = THREE.BackSide;
+material.transparent = true;
+
+// Create mesh, scale, position, disable frustum culling, and add to empty scene
+const mesh = new THREE.Mesh( geometry, material );
+mesh.scale.set( 4, 3, 4 );
+mesh.position.y = 1.6;
+mesh.frustumCulled = false;
+scene.add( mesh );
+```
 
 </page>
 
