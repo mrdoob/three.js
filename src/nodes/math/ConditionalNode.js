@@ -2,6 +2,7 @@ import Node from '../core/Node.js';
 import { property } from '../core/PropertyNode.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 import { warn } from '../../utils.js';
+import NodeError from '../core/NodeError.js';
 
 /**
  * Represents a logical `if/else` statement. Can be used as an alternative
@@ -165,13 +166,7 @@ class ConditionalNode extends Node {
 
 			if ( builder.getComponentType( condType ) !== 'bool' ) {
 
-				throw new Error( `TSL: select() requires a boolean condition, received "${ condType }".` );
-
-			}
-
-			if ( elseNode === null ) {
-
-				throw new Error( 'TSL: select() with a vector condition requires an "else" value - a per-component selection has no single well-defined fallback branch.' );
+				throw new NodeError( `TSL: select() requires a boolean condition, received "${ condType }".`, this.stackTrace );
 
 			}
 
@@ -179,24 +174,46 @@ class ConditionalNode extends Node {
 
 			if ( builder.isReference( type ) || ! builder.isVector( vectorType ) || builder.getTypeLength( vectorType ) !== condLength ) {
 
-				throw new Error( `TSL: select() with a vector condition ("${ condType }") requires a vector result of the same width, received "${ type }".` );
+				throw new NodeError( `TSL: select() with a vector condition ("${ condType }") requires a vector result of the same width, received "${ type }".`, this.stackTrace );
 
 			}
 
 			const ifType = ifNode.getNodeType( builder );
-			const elseType = elseNode.getNodeType( builder );
 			const ifLength = builder.getTypeLength( ifType );
-			const elseLength = builder.getTypeLength( elseType );
 
-			if ( ( ifLength !== 1 && ifLength !== condLength ) || ( elseLength !== 1 && elseLength !== condLength ) ) {
+			if ( ifLength !== 1 && ifLength !== condLength ) {
 
-				throw new Error( `TSL: select()'s vector condition ("${ condType }") is incompatible with its if/else values ("${ ifType }", "${ elseType }").` );
+				throw new NodeError( `TSL: select()'s vector condition ("${ condType }") is incompatible with its "if" value ("${ ifType }").`, this.stackTrace );
+
+			}
+
+			// A missing "else" mirrors the scalar if()-without-else case
+			// below: each lane not selected by `condSnippet` keeps the
+			// result type's zero value, rather than a single well-defined
+			// fallback branch.
+			let elseSnippet;
+
+			if ( elseNode !== null ) {
+
+				const elseType = elseNode.getNodeType( builder );
+				const elseLength = builder.getTypeLength( elseType );
+
+				if ( elseLength !== 1 && elseLength !== condLength ) {
+
+					throw new NodeError( `TSL: select()'s vector condition ("${ condType }") is incompatible with its "else" value ("${ elseType }").`, this.stackTrace );
+
+				}
+
+				elseSnippet = elseNode.build( builder, type );
+
+			} else {
+
+				elseSnippet = builder.generateConst( type );
 
 			}
 
 			const condSnippet = condNode.build( builder, condType );
 			const ifSnippet = ifNode.build( builder, type );
-			const elseSnippet = elseNode.build( builder, type );
 
 			const mathSnippet = builder.getVectorSelect( condSnippet, ifSnippet, elseSnippet, type );
 
