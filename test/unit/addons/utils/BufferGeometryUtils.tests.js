@@ -53,9 +53,9 @@ export default QUnit.module( 'Addons', () => {
 
 					const geometry = new BufferGeometry();
 					geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( [
-						0, 0, 0,
-						8, 0, 0,
-						0, 0, 0
+						11, 0, 0,
+						12, 0, 0,
+						11, 0, 0
 					] ), 3 ) );
 
 					const indexedGeometry = BufferGeometryUtils.mergeVertices( geometry, 0 );
