@@ -18,7 +18,11 @@ class Inspector extends RendererInspector {
 
 		super();
 
-		this.nonce = options.nonce ?? document.querySelector( 'script[nonce], style[nonce]' )?.nonce;
+		const {
+			nonce = null
+		} = options;
+
+		this.nonce = nonce;
 
 		// init profiler
 
