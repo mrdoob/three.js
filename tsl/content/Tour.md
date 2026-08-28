@@ -2920,7 +2920,6 @@ const previousValue = atomicAdd( counter.element( 0 ), 1 );
 Functions and methods used to optimize computations by moving them to the vertex shader stage and passing them as interpolated variables to the fragment shader stage.
 
 <code name="vertexStageExample" default="true">Vertex stage example</code>
-
 <code name="varyingExample">Varying example</code>
 
 ### Vertex Stage
@@ -2995,9 +2994,7 @@ GPU compute execution is structured into a hierarchy of execution units:
 - **Subgroups (Warps / Wavefronts)**: Hardware SIMD execution units (e.g. 32 or 64 threads) that can share and reduce data directly via hardware wave intrinsics (`subgroupAdd()`, `subgroupBroadcast()`, `subgroupElect()`) without shared memory overhead.
 
 <code name="computeParticleSystem" default="true">Particle example</code>
-
 <code name="computeGeometry">Compute geometry example</code>
-
 <code name="computeWorkgroup">Workgroup example</code>
 
 ### Functions
@@ -3532,7 +3529,6 @@ scene.add( projectorLight.target );
 Attributes are inputs that are defined per-vertex or per-instance in the geometry of a mesh.
 
 <code name="vertexIndexExample" default="true">Vertex index example</code>
-
 <code name="attributesExample">Attributes example</code>
 
 ### Constants
@@ -3685,7 +3681,6 @@ model.material.colorNode = mapNode.rgb;
 Uniforms are useful to update values of variables like colors, lighting, or transformations without having to recreate the shader program. They are the true variables from a GPU.
 
 <code name="uniformEventUpdate" default="true">Uniform material update example</code>
-
 <code name="uniformInlineUpdate">Uniform inline update example</code>
 
 ::: api uniform( value, type? )
@@ -3741,7 +3736,6 @@ model.material.colorNode = ramp.mul( color( 0x1e90ff ) );
 Uniform groups allow grouping multiple uniforms into a single Uniform Buffer Object (UBO) on the GPU. This improves performance by reducing the number of individual uniform transfers.
 
 <code name="predefinedUniformGroupExample" default="true">Predefined group example</code>
-
 <code name="customUniformGroupExample">Custom group example</code>
 
 ::: api uniform.setGroup( group ) - Assigns the uniform to a specific uniform group.
@@ -4396,11 +4390,8 @@ model.material.colorNode = texture( map, screenUV );
 Viewport nodes return values and textures representing the screen-space viewport area. They are relative to the active viewport region and support physical pixel units, enabling advanced screen-space effects like refraction, depth testing, and volumetric rendering.
 
 <code name="refractionExample" default="true">Glass Refraction</code>
-
 <code name="depthVolumeExample">Depth Refraction</code>
-
 <code name="privateGlassExample">Private Glass</code>
-
 <code name="invertExample">Invert Glass</code>
 
 ::: api viewport : vec4 - Returns the viewport dimension in physical pixel units. :::
@@ -4837,7 +4828,6 @@ model.material.colorNode = color( 0xffaa00 );
 Custom procedural backgrounds and skyboxes assigned directly to `scene.backgroundNode`.
 
 <code name="iblSky" default="true">IBL Atmosphere & Clouds</code>
-
 <code name="auroraSky">3D Aurora & Stars</code>
 
 ::: api scene.backgroundNode : Node - Assign a node to control the scene's background color or texture graph. :::
@@ -5497,9 +5487,7 @@ plane.material.colorNode = texture( map, transformedUV );
 TSL provides utilities for generating pseudo-random values. These are useful for procedural generation, noise, and randomized instanced attributes (e.g., varying speed, size, or color across thousands of particle instances).
 
 <code name="rangeExample" default="true">Instanced Range</code>
-
 <code name="hashExample">Hash Grid</code>
-
 <code name="fireParticles">Realistic Bonfire</code>
 
 ::: api range( min, max ) : Node - Generates a range `attribute` of values between min and max. Attribute randomization is useful when you want to randomize values between instances and not between pixels.
@@ -6601,7 +6589,6 @@ MaterialX standard helper functions for procedural ramps, anti-aliased transitio
 The Three.js **Transpiler** is an AST-driven shader translation system that converts shader code between different shading languages. It allows developers to automatically translate legacy **GLSL** shaders into modern **TSL** (Three.js Shading Language) or native **WGSL** (WebGPU Shading Language).
 
 <code name="glslTFnExample" default="true">glslTFn (Cross-Backend)</code>
-
 <code name="manualTranspileExample">Manual Transpilation</code>
 
 ### Architecture
@@ -6779,9 +6766,7 @@ model.material.colorNode = verticalWavesWGSL( { pos: positionLocal, t: time } );
 Native functions declared with `wgslFn` behave like standard TSL nodes: they accept TSL expressions as inputs, output typed values, and can be composed with other native functions or node materials.
 
 <code name="wgslBasicExample" default="true">Basic WGSL</code>
-
 <code name="wgslIncludesExample">WGSL with Includes</code>
-
 <code name="wgslTextureExample">WGSL Texture Sampling</code>
 
 ### Defining WGSL Functions
