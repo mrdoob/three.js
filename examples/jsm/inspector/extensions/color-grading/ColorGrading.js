@@ -74,7 +74,7 @@ export class ColorGrading extends Extension {
 
 		super( 'Color Grading', options );
 
-		LUT3DStyle.init();
+		LUT3DStyle.init( options.nonce );
 
 		this.params = createDefaultParams();
 		this.lutSize = 32;
@@ -2306,6 +2306,8 @@ export class ColorGrading extends Extension {
 	init( inspector ) {
 
 		super.init( inspector );
+
+		LUT3DStyle.init( inspector?.nonce );
 
 		const renderer = inspector.getRenderer();
 		const rendererComp = this.modulesMap.get( 'renderer' );

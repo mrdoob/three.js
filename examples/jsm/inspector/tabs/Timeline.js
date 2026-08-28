@@ -1253,7 +1253,7 @@ class Timeline extends Tab {
 
 			if ( details[ key ] !== undefined ) {
 
-				parts.push( `<span style="opacity: 0.5">${key}:</span> <span style="color: var(--text-secondary); opacity: 1">${details[ key ]}</span>` );
+				parts.push( `<span class="timeline-detail-key">${key}:</span> <span class="timeline-detail-value">${details[ key ]}</span>` );
 
 			}
 
@@ -1261,7 +1261,7 @@ class Timeline extends Tab {
 
 		if ( parts.length === 0 ) return '';
 
-		return `<span style="font-size: 11px; margin-left: 8px; color: var(--text-secondary); opacity: 1;">{ ${parts.join( '<span style="opacity: 0.5">, </span>' )} }</span>`;
+		return `<span class="timeline-detail-block">{ ${parts.join( '<span class="timeline-detail-sep">, </span>' )} }</span>`;
 
 	}
 
@@ -1357,10 +1357,10 @@ class Timeline extends Tab {
 		const callsSuffix = isCompact ? '' : ' calls';
 		const trianglesSuffix = isCompact ? '' : ' triangles';
 
-		const group = ( c, text ) => `<span style="display:inline-flex;align-items:center;margin-left:12px;flex-shrink:0;"><span style="width:6px;height:6px;border-radius:50%;background-color:${c};margin-right:6px;flex-shrink:0;"></span>${text}</span>`;
+		const group = ( type, text ) => `<span class="timeline-info-group"><span class="timeline-info-dot ${type}"></span>${text}</span>`;
 		const maxTriangles = Math.max( this.baseTriangles, frame.triangles || 0 );
 		const trianglesText = isCompact ? ( frame.triangles || 0 ) : ( frame.triangles || 0 ) + ' / ' + maxTriangles + trianglesSuffix;
-		this.frameInfo.innerHTML = frameLabel + frame.id + group( 'var(--color-fps)', ( frame.fps || 0 ).toFixed( 1 ) + fpsSuffix ) + group( 'var(--color-call)', frame.calls.length + callsSuffix ) + group( 'var(--color-red)', trianglesText );
+		this.frameInfo.innerHTML = frameLabel + frame.id + group( 'fps', ( frame.fps || 0 ).toFixed( 1 ) + fpsSuffix ) + group( 'call', frame.calls.length + callsSuffix ) + group( 'red', trianglesText );
 
 		// Update playhead position
 		const rect = this.graphSlider.getBoundingClientRect();
@@ -1567,7 +1567,7 @@ class Timeline extends Tab {
 			let detailsAndCountHTML = ( call.formatedDetails ? call.formatedDetails : '' );
 			if ( call.count > 1 ) {
 
-				detailsAndCountHTML += ` <span style="opacity: 0.5">( ${call.count} )</span>`;
+				detailsAndCountHTML += ` <span class="timeline-call-count">( ${call.count} )</span>`;
 
 			}
 
