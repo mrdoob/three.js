@@ -1,7 +1,7 @@
 // debugger tools
 // import 'https://greggman.github.io/webgpu-avoid-redundant-state-setting/webgpu-check-redundant-state-setting.js';
 
-import { GPUFeatureName, GPULoadOp, GPUStoreOp, GPUIndexFormat, GPUTextureViewDimension, GPUFeatureMap, GPUShaderStage } from './utils/WebGPUConstants.js';
+import { GPUFeatureName, GPULoadOp, GPUStoreOp, GPUIndexFormat, GPUTextureViewDimension, GPUFeatureMap, GPUShaderStage, GPUDefaultComputeLimits } from './utils/WebGPUConstants.js';
 
 import WGSLNodeBuilder from './nodes/WGSLNodeBuilder.js';
 import Backend from '../common/Backend.js';
@@ -394,6 +394,19 @@ class WebGPUBackend extends Backend {
 	get hasTimestamp() {
 
 		return true;
+
+	}
+
+	/**
+	 * The compute limits of the device. If the device has not been initialized
+	 * yet, the default limits guaranteed by the WebGPU specification are returned.
+	 *
+	 * @type {Object}
+	 * @readonly
+	 */
+	get computeLimits() {
+
+		return this.device !== null ? this.device.limits : GPUDefaultComputeLimits;
 
 	}
 

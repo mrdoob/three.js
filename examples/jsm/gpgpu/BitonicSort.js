@@ -77,20 +77,17 @@ export const getBitonicDisperseIndices = /*@__PURE__*/ Fn( ( [ index, swapSpan ]
 export class BitonicSort {
 
 	/**
-	 * Constructs a new light probe helper.
+	 * A reusable GPGPU Bitonic Sort.
 	 *
-	 * @param {Renderer} renderer - The current scene's renderer.
+	 * Each compute pass executes this.count / 2 invocations that compare two data points
+	 * separated by lane counts that are decreased by a power of 2. When these spans equal the
+	 * workgroupSize, data can be shared within local workgroup buffers and synchronized via
+	 * workgroup barriers, allowing each read/write across spans to exist within the same pass.
+	 *
 	 * @param {StorageBufferNode} dataBuffer - The data buffer to sort.
 	 * @param {Object} [options={}] - Options that modify the bitonic sort.
 	 */
-	constructor( renderer, dataBuffer, options = {} ) {
-
-		/**
-		 * A reference to the renderer.
-		 *
-		 * @type {Renderer}
-		 */
-		this.renderer = renderer;
+	constructor( dataBuffer, options = {} ) {
 
 		/**
 		 * A reference to the StorageBufferNode holding the data that will be sorted  .
@@ -102,38 +99,34 @@ export class BitonicSort {
 		/**
 		 * The size of the data.
 		 *
-		 * @type {StorageBufferNode}
+		 * @type {number}
 		 */
 		this.count = dataBuffer.value.count;
 
 		/**
+		 * The maximum size of each compute dispatch.
 		 *
-		 * The size of each compute dispatch.
 		 * @type {number}
 		 */
-
-		 this.dispatchSize = this.count / 2;
+		this.dispatchSize = this.count / 2;
 
 		/**
 		 * The workgroup size of the compute shaders executed during the sort.
+		 * For practical use cases, one can typically rely on the default workgroup size.
+		 * The final value is alligned with the limits of the device when the sort is first executed.
 		 *
-		 * @type {StorageBufferNode}
+		 * @type {number}
 		*/
-		this.workgroupSize = options.workgroupSize ? Math.min( this.dispatchSize, options.workgroupSize ) : Math.min( this.dispatchSize, 64 );
+		this.workgroupSize = options.workgroupSize ? Math.min( this.dispatchSize, options.workgroupSize ) : this.dispatchSize;
 
 		/**
 		 * A node representing a workgroup scoped buffer that holds locally sorted elements.
+		 * Created when the sort is first executed, once the workgroup size has been alligned with the device.
 		 *
-		 * @type {WorkgroupInfoNode}
+		 * @type {?WorkgroupInfoNode}
+		 * @default null
 		*/
-		this.localStorage = workgroupArray( dataBuffer.nodeType, this.workgroupSize * 2 );
-
-		this._tempArray = new Uint32Array( this.count );
-		for ( let i = 0; i < this.count; i ++ ) {
-
-			this._tempArray[ i ] = 0;
-
-		}
+		this.localStorage = null;
 
 		/**
 		 * A node representing a storage buffer used for transferring the result of the global sort back to the original data buffer.
@@ -149,7 +142,6 @@ export class BitonicSort {
 		*/
 		this.infoStorage = instancedArray( new Uint32Array( [ 1, 2, 2 ] ), 'uint' ).setName( 'BitonicSortInfo' );
 
-
 		/**
 		 * The number of distinct swap operations ('flips' and 'disperses') executed in an in-place
 		 * bitonic sort of the current data buffer.
@@ -160,6 +152,7 @@ export class BitonicSort {
 
 		/**
 		 * The number of steps (i.e prepping and/or executing a swap) needed to fully execute an in-place bitonic sort of the current data buffer.
+		 * Recomputed when the sort is first executed, since it depends on the device alligned workgroup size.
 		 *
 		 * @type {number}
 		*/
@@ -174,57 +167,69 @@ export class BitonicSort {
 
 		/**
 		 * An object containing compute shaders that execute a 'flip' swap within a global address space on elements in the data buffer.
+		 * Created when the sort is first executed, once the workgroup size has been alligned with the device.
 		 *
-		 * @type {Object<string, ComputeNode>}
+		 * @type {?Object<string, ComputeNode>}
+		 * @default null
 		*/
-		this.flipGlobalNodes = {
-			'Data': this._getFlipGlobal( this.dataBuffer, this.tempBuffer ),
-			'Temp': this._getFlipGlobal( this.tempBuffer, this.dataBuffer )
-		};
+		this.flipGlobalNodes = null;
 
 		/**
 		 * An object containing compute shaders that execute a 'disperse' swap within a global address space on elements in the data buffer.
 		 *
-		 * @type {Object<string, ComputeNode>}
+		 * @type {?Object<string, ComputeNode>}
+		 * @default null
 		*/
-		this.disperseGlobalNodes = {
-			'Data': this._getDisperseGlobal( this.dataBuffer, this.tempBuffer ),
-			'Temp': this._getDisperseGlobal( this.tempBuffer, this.dataBuffer )
-		};
+		this.disperseGlobalNodes = null;
 
 		/**
 		 * A compute shader that executes a sequence of flip and disperse swaps within a local address space on elements in the data buffer.
 		 *
-		 * @type {ComputeNode}
+		 * @type {?ComputeNode}
+		 * @default null
 		*/
-		this.swapLocalFn = this._getSwapLocal();
+		this.swapLocalFn = null;
 
 		/**
 		 * A compute shader that executes a sequence of disperse swaps within a local address space on elements in the data buffer.
 		 *
-		 * @type {Object<string, ComputeNode>}
+		 * @type {?Object<string, ComputeNode>}
+		 * @default null
 		*/
-		this.disperseLocalNodes = {
-			'Data': this._getDisperseLocal( this.dataBuffer ),
-			'Temp': this._getDisperseLocal( this.tempBuffer ),
-		};
+		this.disperseLocalNodes = null;
 
 		// Utility functions
 
 		/**
 		 * A compute shader that sets up the algorithm and the swap span for the next swap operation.
 		 *
-		 * @type {ComputeNode}
+		 * @type {?ComputeNode}
+		 * @default null
 		*/
-		this.setAlgoFn = this._getSetAlgoFn();
+		this.setAlgoFn = null;
 
 		/**
 		 * A compute shader that aligns the result of the global swap operation with the current buffer.
 		 *
-		 * @type {ComputeNode}
+		 * @type {?ComputeNode}
+		 * @default null
 		*/
-		this.alignFn = this._getAlignFn();
+		this.alignFn = null;
 
+		/**
+		 * A function that takes a renderer and either runs the bitonic sort or uses the renderer
+		 * information to generate the shaders on the initial compute dispatch.
+		 *
+		 * @type {function(Renderer):void}
+		*/
+		this.compute = this._computeInitial;
+
+		/**
+		 * A function that runs a single step of the bitonic sort.
+		 *
+		 * @type {function(Renderer):void}
+		*/
+		this.computeStep = this._computeStepInitial;
 
 		/**
 		 * A compute shader that resets the algorithm and swap span information.
@@ -318,8 +323,8 @@ export class BitonicSort {
 	 */
 	_globalCompareAndSwapTSL( idxBefore, idxAfter, dataBuffer, tempBuffer ) {
 
-		const data1 = dataBuffer.element( idxBefore );
-		const data2 = dataBuffer.element( idxAfter );
+		const data1 = dataBuffer.element( idxBefore ).toVar();
+		const data2 = dataBuffer.element( idxAfter ).toVar();
 
 		tempBuffer.element( idxBefore ).assign( min( data1, data2 ) );
 		tempBuffer.element( idxAfter ).assign( max( data1, data2 ) );
@@ -617,6 +622,60 @@ export class BitonicSort {
 
 		return fnDef;
 
+	}	/**
+	 * Aligns the workgroup size with the limits of the current device, then creates
+	 * the workgroup storage and compute shaders that depend on it.
+	 *
+	 * @private
+	 * @param {Renderer} renderer - The current scene's renderer.
+	 */
+	_generateComputeShaders( renderer ) {
+
+		const { maxComputeInvocationsPerWorkgroup, maxComputeWorkgroupSizeX } = renderer.backend.computeLimits;
+
+		// A one dimensional workgroup is bound by the total number of invocations per
+		// workgroup as well as by the size of the workgroup's x dimension.
+
+		const maxWorkgroupSize = Math.min( maxComputeInvocationsPerWorkgroup, maxComputeWorkgroupSizeX );
+
+		if ( this.workgroupSize > maxWorkgroupSize ) {
+
+			// Swap spans are powers of two, so the workgroup size has to be one as well.
+
+			this.workgroupSize = 2 ** Math.floor( Math.log2( maxWorkgroupSize ) );
+
+		}
+
+		// Only create the state that depends on the workgroup size once it has been alligned with the device
+
+		this.localStorage = workgroupArray( this.dataBuffer.nodeType, this.workgroupSize * 2 );
+		this.stepCount = this._getStepCount();
+
+		this.flipGlobalNodes = {
+			'Data': this._getFlipGlobal( this.dataBuffer, this.tempBuffer ),
+			'Temp': this._getFlipGlobal( this.tempBuffer, this.dataBuffer )
+		};
+
+		this.disperseGlobalNodes = {
+			'Data': this._getDisperseGlobal( this.dataBuffer, this.tempBuffer ),
+			'Temp': this._getDisperseGlobal( this.tempBuffer, this.dataBuffer )
+		};
+
+		this.swapLocalFn = this._getSwapLocal();
+
+		this.disperseLocalNodes = {
+			'Data': this._getDisperseLocal( this.dataBuffer ),
+			'Temp': this._getDisperseLocal( this.tempBuffer ),
+		};
+
+		this.setAlgoFn = this._getSetAlgoFn();
+		this.alignFn = this._getAlignFn();
+
+		// Reset compute function to default behavior
+
+		this.compute = this._compute;
+		this.computeStep = this._computeStep;
+
 	}
 
 	/**
@@ -624,7 +683,7 @@ export class BitonicSort {
 	 *
 	 * @param {Renderer} renderer - The current scene's renderer.
 	 */
-	computeStep( renderer ) {
+	_computeStep( renderer ) {
 
 		// Swap local only runs once
 		if ( this.currentDispatch === 0 ) {
@@ -698,7 +757,7 @@ export class BitonicSort {
 	 *
 	 * @param {Renderer} renderer - The current scene's renderer.
 	 */
-	compute( renderer ) {
+	_compute( renderer ) {
 
 		this.globalOpsRemaining = 0;
 		this.globalOpsInSpan = 0;
@@ -706,9 +765,34 @@ export class BitonicSort {
 
 		for ( let i = 0; i < this.stepCount; i ++ ) {
 
-			this.computeStep( renderer );
+			this._computeStep( renderer );
 
 		}
+
+	}
+
+	/**
+	 * Resolves our compute data with the current backend device then runs compute.
+	 *
+	 * @param {Renderer} renderer - The current scene's renderer.
+	 */
+	_computeInitial( renderer ) {
+
+		// Generates shaders and sets compute to default
+		this._generateComputeShaders( renderer );
+		this.compute( renderer );
+
+	}
+
+	/**
+	 * Resolves our compute data with the current backend device then runs computeStep.
+	 *
+	 * @param {Renderer} renderer - The current scene's renderer.
+	 */
+	_computeStepInitial( renderer ) {
+
+		this._generateComputeShaders( renderer );
+		this.computeStep( renderer );
 
 	}
 

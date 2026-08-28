@@ -1723,6 +1723,26 @@ export const RenderObjectRefreshType = {
 };
 
 /**
+ * The minimum viable compute limits across all compute capable backends.
+ *
+ * Backends report their actual compute limits via `Backend.computeLimits` and
+ * fall back to these values when the underlying device does not provide them.
+ * Since only the WebGPUBackend currently provides compute limits, these constants
+ * mirror the minimumn guarantees provided by a WebGPU capable device.
+ *
+ * @type {ConstantsMinimumComputeLimits}
+ * @constant
+ */
+export const MinimumComputeLimits = {
+	maxComputeWorkgroupStorageSize: 16384,
+	maxComputeInvocationsPerWorkgroup: 256,
+	maxComputeWorkgroupSizeX: 256,
+	maxComputeWorkgroupSizeY: 256,
+	maxComputeWorkgroupSizeZ: 64,
+	maxComputeWorkgroupsPerDimension: 65535
+};
+
+/**
  * This type represents mouse buttons and interaction types in context of controls.
  *
  * @typedef {Object} ConstantsMouse
@@ -1779,4 +1799,16 @@ export const RenderObjectRefreshType = {
  * @property {number} NONE - No refresh required.
  * @property {number} SHARED - Only shared uniform buffers require an update.
  * @property {number} FULL - The render object requires a full refresh.
+ */
+
+/**
+ * This type represents the compute limits of a backend.
+ *
+ * @typedef {Object} ConstantsMinimumComputeLimits
+ * @property {number} maxComputeWorkgroupStorageSize - The maximum number of bytes used for workgroup storage in a compute stage.
+ * @property {number} maxComputeInvocationsPerWorkgroup - The maximum number of invocations in a single workgroup.
+ * @property {number} maxComputeWorkgroupSizeX - The maximum size of the X dimension of a workgroup.
+ * @property {number} maxComputeWorkgroupSizeY - The maximum size of the Y dimension of a workgroup.
+ * @property {number} maxComputeWorkgroupSizeZ - The maximum size of the Z dimension of a workgroup.
+ * @property {number} maxComputeWorkgroupsPerDimension - The maximum number of workgroups dispatched per dimension.
  */

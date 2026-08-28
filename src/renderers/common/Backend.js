@@ -4,7 +4,7 @@ let _color4 = null;
 import Color4 from './Color4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { createCanvasElement, warnOnce } from '../../utils.js';
-import { REVISION, TimestampQuery } from '../../constants.js';
+import { REVISION, TimestampQuery, MinimumComputeLimits } from '../../constants.js';
 
 /**
  * Most of the rendering related logic is implemented in the
@@ -558,6 +558,19 @@ class Backend {
 	get hasTimestamp() {
 
 		return false;
+
+	}
+
+	/**
+	 * The compute limits of the backend. Backends that can query the limits
+	 * of the underlying device should override this getter.
+	 *
+	 * @type {ConstantsMinimumComputeLimits}
+	 * @readonly
+	 */
+	get computeLimits() {
+
+		return MinimumComputeLimits;
 
 	}
 

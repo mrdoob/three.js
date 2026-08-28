@@ -345,10 +345,78 @@ export const GPUFeatureName = {
 	DualSourceBlending: 'dual-source-blending',
 	Subgroups: 'subgroups',
 	TextureFormatsTier1: 'texture-formats-tier1',
-	TextureFormatsTier2: 'texture-formats-tier2'
+	TextureFormatsTier2: 'texture-formats-tier2',
+	PrimitiveIndex: 'primitive-index',
+	TextureComponentSwizzle: 'texture-component-swizzle',
 };
 
 export const GPUFeatureMap = {
 	'texture-compression-s3tc': 'texture-compression-bc',
 	'texture-compression-etc1': 'texture-compression-etc2'
+};
+
+export const WGSLLanguageFeatures = {
+	ReadOnlyAndReadWriteStorageTextures: 'readonly_and_readwrite_storage_textures',
+	Packed4x8IntegerDotProduct: 'packed_4x8_integer_dot_product',
+	UnrestrictedPointerParameters: 'unrestricted_pointer_parameters',
+	PointerCompositeAccess: 'pointer_composite_access',
+	UniformBufferStandardLayout: 'uniform_buffer_standard_layout',
+	SubgroupID: 'subgroup_id',
+	SubgroupUniformity: 'subgroup_uniformity',
+	TextureAndSamplerLet: 'texture_and_sampler_let',
+	TextureFormatsTier1: 'texture_formats_tier1',
+	LinearIndexing: 'linear_indexing',
+	ImmediateAddressSpace: 'immediate_address_space',
+	FragmentDepth: 'fragment_depth',
+	BufferView: 'buffer_view',
+	SwizzleAssignment: 'swizzle_assignment'
+};
+
+export const GPUDefaultTextureLimits = {
+	maxTextureDimension1D: 8192,
+	maxTextureDimension2D: 8192,
+	maxTextureDimension3D: 2048,
+	maxTextureArrayLayers: 256
+};
+
+export const GPUDefaultResourceLimits = {
+	maxBindGroups: 4,
+	maxBindingsPerBindGroup: 640,
+	maxDynamicUniformBuffersPerPipelineLayout: 8,
+	maxDynamicStorageBuffersPerPipelineLayout: 4,
+	maxColorAttachments: 8,
+	maxColorAttachmentBytesPerSample: 32,
+};
+
+export const GPUDefaultShaderLimits = {
+	maxSampledTexturesPerShaderStage: 16,
+	maxSamplersPerShaderStage: 16,
+	maxStorageBuffersInFragmentStage: 8,
+	maxStorageBuffersInVertexStage: 8,
+	maxStorageBuffersPerShaderStage: 8,
+	maxStorageTexturesInFragmentStage: 4,
+	maxStorageTexturesInVertexStage: 4,
+	maxStorageTexturesPerShaderStage: 4,
+	maxUniformBuffersPerShaderStage: 12,
+	maxInterStageShaderVariables: 16,
+};
+
+export const GPUDefaultBufferLimits = {
+	maxUniformBufferBindingSize: 65536,
+	maxStorageBufferBindingSize: 134217728,
+	minUniformBufferOffsetAlignment: 256,
+	minStorageBufferOffsetAlignment: 256,
+	maxVertexBuffers: 8,
+	maxBufferSize: 268435456,
+	maxVertexAttributes: 16,
+	maxVertexBufferArrayStride: 2048,
+};
+
+export const GPUDefaultComputeLimits = {
+	maxComputeWorkgroupStorageSize: 16384,
+	maxComputeInvocationsPerWorkgroup: 256,
+	maxComputeWorkgroupSizeX: 256,
+	maxComputeWorkgroupSizeY: 256,
+	maxComputeWorkgroupSizeZ: 64,
+	maxComputeWorkgroupsPerDimension: 65535
 };
