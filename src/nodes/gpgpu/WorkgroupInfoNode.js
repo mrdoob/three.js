@@ -73,9 +73,15 @@ class WorkgroupInfoNode extends Node {
 	 *
 	 * @param {string} scope - The address space the buffer is scoped to. Currently only `'Workgroup'` is used.
 	 * @param {string} bufferType - The data type of a 'workgroup' scoped buffer element.
+<<<<<<< HEAD
 	 * @param {number} [count=null] - The number of elements in the array.
 	 */
 	constructor( scope, bufferType, count = null ) {
+=======
+	 * @param {number} [bufferCount=0] - The number of elements in the buffer.
+	 */
+	constructor( scope, bufferType, bufferCount = 0 ) {
+>>>>>>> 377a7cdc29 (rebase shenanigins)
 
 		super( bufferType );
 
@@ -87,12 +93,21 @@ class WorkgroupInfoNode extends Node {
 		this.bufferType = bufferType;
 
 		/**
+<<<<<<< HEAD
 		 * The count of the array variable.
 		 *
 		 * @type {number | null}
 		 * @default 0
 		 */
 		this.count = count;
+=======
+		 * The buffer count.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.bufferCount = bufferCount;
+>>>>>>> 377a7cdc29 (rebase shenanigins)
 
 		/**
 		 * This flag can be used for type testing.
@@ -170,6 +185,7 @@ class WorkgroupInfoNode extends Node {
 
 	}
 
+<<<<<<< HEAD
 	/**
 	 * Returns the number of elements in the node array.
 	 *
@@ -181,6 +197,8 @@ class WorkgroupInfoNode extends Node {
 		return this.count;
 
 	}
+=======
+>>>>>>> 377a7cdc29 (rebase shenanigins)
 
 	/**
 	 * The data type of the array buffer.
@@ -228,7 +246,11 @@ class WorkgroupInfoNode extends Node {
 
 		const name = ( this.name !== '' ) ? this.name : `${this.scope}Array_${this.id}`;
 
+<<<<<<< HEAD
 		return builder.getScopedVariable( name, this.scope.toLowerCase(), this.bufferType, this.count );
+=======
+		return builder.getScopedArray( name, this.scope.toLowerCase(), this.bufferType, this.bufferCount );
+>>>>>>> 377a7cdc29 (rebase shenanigins)
 
 	}
 
