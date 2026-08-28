@@ -995,20 +995,19 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Returns the native snippet for a genuinely per-component vector select:
-	 * `condSnippet` is a `bvecN` (one boolean per output lane), unlike
-	 * {@link NodeBuilder#getTernary}'s single scalar `bool`.
+	 * Returns the native snippet for a per-component vector select. The default
+	 * implementation uses {@link NodeBuilder#getTernary}; renderers can
+	 * override this when their ternary operation does not accept vectors.
 	 *
-	 * @abstract
 	 * @param {string} condSnippet - The per-component boolean (`bvecN`) condition.
 	 * @param {string} ifSnippet - The vector expression selected where `condSnippet` is `true`.
 	 * @param {string} elseSnippet - The vector expression selected where `condSnippet` is `false`.
 	 * @param {string} type - The (vector) type of `ifSnippet`/`elseSnippet`.
 	 * @return {string} The resolved method name.
 	 */
-	getVectorSelect( /* condSnippet, ifSnippet, elseSnippet, type*/ ) {
+	getVectorSelect( condSnippet, ifSnippet, elseSnippet /*, type*/ ) {
 
-		return null;
+		return this.getTernary( condSnippet, ifSnippet, elseSnippet );
 
 	}
 

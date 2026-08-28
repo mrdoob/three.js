@@ -33,6 +33,25 @@ export default QUnit.module( 'TSL', () => {
 				vec4( 10, 2, 30, 4 )
 			);
 
+			assert.eq(
+				select( vec3( 1, 0, 1 ).greaterThan( 0.5 ), vec3( 1, 2, 3 ), 0 ),
+				vec3( 1, 0, 3 ),
+				'a scalar branch is broadcast to the vector result width'
+			);
+
+		} );
+
+		gpuTest( 'a reused vector select is formatted for each requested output type', ( { assert } ) => {
+
+			const result = select(
+				vec3( 1, 0, 1 ).greaterThan( 0.5 ),
+				vec3( 1, 2, 3 ),
+				vec3( 10, 20, 30 )
+			);
+
+			assert.eq( result, vec3( 1, 20, 3 ) );
+			assert.eq( vec4( result ), vec4( 1, 20, 3, 1 ) );
+
 		} );
 
 		gpuTest( 'per-component select() works for integer/unsigned vector types (ivec2-4, uvec2-4)', ( { assert } ) => {

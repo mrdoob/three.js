@@ -19,8 +19,9 @@ import { warn } from '../../utils.js';
  * per-component - each output lane picks independently based on its own
  * condition component, the same way WGSL's native `select()` and GLSL's
  * `mix( x, y, bvecN )` do - rather than picking one branch for the whole
- * vector. An `elseNode` is required in this case, and it must have the same
- * number of components as the condition.
+ * vector. An `elseNode` is required in this case. Vector values must have the
+ * same number of components as the condition; scalar values are broadcast
+ * when the other value establishes the result width.
  *
  * ```js
  * // per-component: each channel picks independently
@@ -143,7 +144,7 @@ class ConditionalNode extends Node {
 
 		if ( nodeData.nodeProperty !== undefined ) {
 
-			return nodeData.nodeProperty;
+			return builder.format( nodeData.nodeProperty, type, output );
 
 		}
 
@@ -162,15 +163,34 @@ class ConditionalNode extends Node {
 
 		if ( condLength > 1 ) {
 
+			if ( builder.getComponentType( condType ) !== 'bool' ) {
+
+				throw new Error( `TSL: select() requires a boolean condition, received "${ condType }".` );
+
+			}
+
 			if ( elseNode === null ) {
 
 				throw new Error( 'TSL: select() with a vector condition requires an "else" value - a per-component selection has no single well-defined fallback branch.' );
 
 			}
 
-			if ( builder.getTypeLength( type ) !== condLength ) {
+			const vectorType = builder.getVectorType( type );
 
-				throw new Error( `TSL: select()'s vector condition ("${ condType }") must have the same number of components as its if/else values ("${ type }").` );
+			if ( builder.isReference( type ) || ! builder.isVector( vectorType ) || builder.getTypeLength( vectorType ) !== condLength ) {
+
+				throw new Error( `TSL: select() with a vector condition ("${ condType }") requires a vector result of the same width, received "${ type }".` );
+
+			}
+
+			const ifType = ifNode.getNodeType( builder );
+			const elseType = elseNode.getNodeType( builder );
+			const ifLength = builder.getTypeLength( ifType );
+			const elseLength = builder.getTypeLength( elseType );
+
+			if ( ( ifLength !== 1 && ifLength !== condLength ) || ( elseLength !== 1 && elseLength !== condLength ) ) {
+
+				throw new Error( `TSL: select()'s vector condition ("${ condType }") is incompatible with its if/else values ("${ ifType }", "${ elseType }").` );
 
 			}
 
