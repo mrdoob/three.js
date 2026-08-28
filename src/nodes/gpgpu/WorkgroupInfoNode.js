@@ -1,6 +1,6 @@
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import Node from '../core/Node.js';
-import { warn } from '../../utils.js';
+import { error, warn } from '../../utils.js';
 import StackTrace from '../core/StackTrace.js';
 
 /**
@@ -208,6 +208,12 @@ class WorkgroupInfoNode extends Node {
 	}
 
 	generate( builder ) {
+
+		if ( builder.shaderStage !== 'compute' ) {
+
+			error( 'TSL: "workgroupArray()" can only be executed within the compute shader stage' );
+
+		}
 
 		const name = ( this.name !== '' ) ? this.name : `${this.scope}Array_${this.id}`;
 

@@ -1,3 +1,4 @@
+import { error } from '../../utils.js';
 import TempNode from '../core/TempNode.js';
 import { nodeProxyIntent } from '../tsl/TSLCore.js';
 
@@ -98,6 +99,12 @@ class SubgroupFunctionNode extends TempNode {
 	generate( builder, output ) {
 
 		const method = this.method;
+
+		if ( builder.shaderStage === 'vertex' ) {
+
+			error( `TSL: "${this.method}" is not supported in the vertex shader stage.` );
+
+		}
 
 		const type = this.getNodeType( builder );
 		const inputType = this.getInputType( builder );
