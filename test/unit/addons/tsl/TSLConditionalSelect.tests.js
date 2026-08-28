@@ -133,6 +133,59 @@ export default QUnit.module( 'TSL', () => {
 
 		} );
 
+		// select() does not require an explicit "else" value. With a scalar
+		// condition, a falsy condition leaves the result at the type's
+		// declared-variable default (zero) instead of throwing or requiring
+		// a third argument.
+		gpuTest( 'select() with a scalar condition does not require an explicit "else" value', ( { assert } ) => {
+
+			assert.eq(
+				select( int( 5 ).greaterThan( int( 3 ) ), float( 7 ) ),
+				float( 7 ),
+				'a true condition still resolves to the "if" value'
+			);
+
+			assert.eq(
+				select( int( 5 ).lessThan( int( 3 ) ), float( 7 ) ),
+				float( 0 ),
+				'a false condition with no "else" falls back to the type\'s zero value'
+			);
+
+			assert.eq(
+				select( int( 5 ).lessThan( int( 3 ) ), vec3( 1, 2, 3 ) ),
+				vec3( 0, 0, 0 ),
+				'a false condition with no "else" falls back to the vector type\'s zero value'
+			);
+
+		} );
+
+		// select() does not require an explicit "else" value with a vector
+		// condition either. Lanes not selected by the condition keep the
+		// result type's zero value rather than requiring a fallback branch.
+		gpuTest( 'select() with a vector condition does not require an explicit "else" value', ( { assert } ) => {
+
+			// NOTE: vec4's fallback default is Vector4's (0, 0, 0, 1), not
+			// (0, 0, 0, 0) - see NodeBuilder.generateConst(). vec2/vec3
+			// avoid that quirk and fall back to an all-zero vector.
+			assert.eq(
+				select( vec3( 1, 0, 1 ).greaterThan( 0.5 ), vec3( 1, 2, 3 ) ),
+				vec3( 1, 0, 3 ),
+				'unselected lanes fall back to zero when no "else" is given'
+			);
+
+			assert.eq(
+				select( vec2( 0, 1 ).greaterThan( 0.5 ), vec2( 5, 6 ) ),
+				vec2( 0, 6 )
+			);
+
+			assert.eq(
+				select( vec3( 1, 1, 1 ).greaterThan( 0.5 ), vec3( 1, 2, 3 ) ),
+				vec3( 1, 2, 3 ),
+				'when every lane is selected, no fallback is needed'
+			);
+
+		} );
+
 	} );
 
 } );
