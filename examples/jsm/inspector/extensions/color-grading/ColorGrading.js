@@ -186,14 +186,14 @@ export class ColorGrading extends Extension {
 
 			if ( this.sceneGradingEnabled ) {
 
-				if ( this.viewContainer ) this.viewContainer.classList.add( 'is-live-active' );
+				this.viewContainer.classList.add( 'is-live-active' );
 				gradingBtn.className = 'lut-dock-btn active';
 				lbl.textContent = 'Live Preview';
 				lbl.className = 'lut-dock-text';
 
 			} else {
 
-				if ( this.viewContainer ) this.viewContainer.classList.remove( 'is-live-active' );
+				this.viewContainer.classList.remove( 'is-live-active' );
 				gradingBtn.className = 'lut-dock-btn';
 				lbl.textContent = 'Live Preview';
 				lbl.className = 'lut-dock-text';
@@ -1813,7 +1813,6 @@ export class ColorGrading extends Extension {
 			version: 2,
 			lutSize: this.lutSize,
 			selectedToneMapping: this.selectedToneMapping,
-			sceneGradingEnabled: this.sceneGradingEnabled,
 			pipelineOrder: [ ...this.pipelineOrder ],
 			modules: modulesData,
 			params: params
@@ -1948,13 +1947,6 @@ export class ColorGrading extends Extension {
 
 		}
 
-		if ( typeof json.sceneGradingEnabled === 'boolean' ) {
-
-			this.sceneGradingEnabled = json.sceneGradingEnabled;
-			this.updateGradingBtnState();
-			this._toggleSceneGrading( this.sceneGradingEnabled );
-
-		}
 
 		if ( Array.isArray( json.pipelineOrder ) && json.pipelineOrder.length > 0 ) {
 
