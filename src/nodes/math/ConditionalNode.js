@@ -14,6 +14,19 @@ import { warn } from '../../utils.js';
  * velocity = position.greaterThanEqual( limit ).select( velocity.negate(), velocity );
  * ```
  *
+ * When the condition is itself a vector (e.g. the `bvec4` produced by
+ * `someVec4.greaterThanEqual( someOtherVec4 )`), `select()` resolves
+ * per-component - each output lane picks independently based on its own
+ * condition component, the same way WGSL's native `select()` and GLSL's
+ * `mix( x, y, bvecN )` do - rather than picking one branch for the whole
+ * vector. An `elseNode` is required in this case, and it must have the same
+ * number of components as the condition.
+ *
+ * ```js
+ * // per-component: each channel picks independently
+ * const clamped = value.greaterThan( vec3( 1.0 ) ).select( vec3( 1.0 ), value );
+ * ```
+ *
  * @augments Node
  */
 class ConditionalNode extends Node {
@@ -141,6 +154,43 @@ class ConditionalNode extends Node {
 		const nodeProperty = needsOutput ? property( type ).build( builder ) : '';
 
 		nodeData.nodeProperty = nodeProperty;
+
+		// A vector condition (e.g. a `bvec4`) selects per-component, each
+		// output lane resolving independently - see getVectorSelect().
+		const condType = condNode.getNodeType( builder );
+		const condLength = builder.getTypeLength( condType );
+
+		if ( condLength > 1 ) {
+
+			if ( elseNode === null ) {
+
+				throw new Error( 'TSL: select() with a vector condition requires an "else" value - a per-component selection has no single well-defined fallback branch.' );
+
+			}
+
+			if ( builder.getTypeLength( type ) !== condLength ) {
+
+				throw new Error( `TSL: select()'s vector condition ("${ condType }") must have the same number of components as its if/else values ("${ type }").` );
+
+			}
+
+			const condSnippet = condNode.build( builder, condType );
+			const ifSnippet = ifNode.build( builder, type );
+			const elseSnippet = elseNode.build( builder, type );
+
+			const mathSnippet = builder.getVectorSelect( condSnippet, ifSnippet, elseSnippet, type );
+
+			if ( ! needsOutput ) return '';
+
+			// Assign into nodeProperty rather than returning mathSnippet
+			// directly, so a second reference to this node (which hits the
+			// early-return above) gets the real result instead of an
+			// unassigned variable.
+			builder.addFlowCode( `\n${ builder.tab }${ nodeProperty } = ${ mathSnippet };\n\n` );
+
+			return builder.format( nodeProperty, type, output );
+
+		}
 
 		const nodeSnippet = condNode.build( builder, 'bool' );
 		const isUniformFlow = builder.context.uniformFlow;

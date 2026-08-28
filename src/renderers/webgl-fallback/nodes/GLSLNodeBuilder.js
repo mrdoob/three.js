@@ -322,6 +322,55 @@ class GLSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
+	 * Returns the native snippet for a genuinely per-component vector select.
+	 * GLSL has no vector ternary, so unlike `getTernary()` above, this can't
+	 * use `?:`. For a `float`-component `type`, it uses GLSL ES 3.0's
+	 * `bvecN`-selector overload of `mix()` (`x`/`y` there are this method's
+	 * `elseSnippet`/`ifSnippet`). That overload doesn't exist for `ivecN`/
+	 * `uvecN`/`bvecN`, so those use an exact arithmetic select instead:
+	 * `elseSnippet + mask * ( ifSnippet - elseSnippet )`, where `mask` is
+	 * `condSnippet` cast to a same-width `0`/`1` vector (`bool` round-trips
+	 * through `ivecN` first, since GLSL has no arithmetic on `bool`).
+	 *
+	 * @param {string} condSnippet - The per-component boolean (`bvecN`) condition.
+	 * @param {string} ifSnippet - The vector expression selected where `condSnippet` is `true`.
+	 * @param {string} elseSnippet - The vector expression selected where `condSnippet` is `false`.
+	 * @param {string} type - The (vector) type of `ifSnippet`/`elseSnippet`.
+	 * @return {string} The resolved method name.
+	 */
+	getVectorSelect( condSnippet, ifSnippet, elseSnippet, type ) {
+
+		const componentType = this.getComponentType( type );
+
+		if ( componentType === 'float' ) {
+
+			return `mix( ${elseSnippet}, ${ifSnippet}, ${condSnippet} )`;
+
+		}
+
+		const glslType = this.getType( type );
+
+		if ( componentType === 'bool' ) {
+
+			const intType = this.getType( this.getTypeFromLength( this.getTypeLength( type ), 'int' ) );
+			const maskSnippet = `${intType}( ${condSnippet} )`;
+			const ifIntSnippet = `${intType}( ${ifSnippet} )`;
+			const elseIntSnippet = `${intType}( ${elseSnippet} )`;
+
+			return `${glslType}( ${elseIntSnippet} + ${maskSnippet} * ( ${ifIntSnippet} - ${elseIntSnippet} ) )`;
+
+		}
+
+		// int/uint: componentType names its own vector's constructor 1:1
+		// (getType('ivec4') === 'ivec4'), so this cast doubles as the
+		// same-width int/uint mask constructor `condSnippet` needs.
+		const maskSnippet = `${glslType}( ${condSnippet} )`;
+
+		return `${elseSnippet} + ${maskSnippet} * ( ${ifSnippet} - ${elseSnippet} )`;
+
+	}
+
+	/**
 	 * Returns the output struct name. Not relevant for GLSL.
 	 *
 	 * @return {string}

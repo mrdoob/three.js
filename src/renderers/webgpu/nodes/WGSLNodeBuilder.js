@@ -2500,6 +2500,23 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Returns the native snippet for a genuinely per-component vector select.
+	 * WGSL's `select()` is natively per-component whenever its selector is a
+	 * `vecN<bool>`, so this is the same call as `getTernary()` above - the
+	 * difference is entirely in what `condSnippet` resolves to.
+	 *
+	 * @param {string} condSnippet - The per-component boolean (`vecN<bool>`) condition.
+	 * @param {string} ifSnippet - The vector expression selected where `condSnippet` is `true`.
+	 * @param {string} elseSnippet - The vector expression selected where `condSnippet` is `false`.
+	 * @return {string} The resolved method name.
+	 */
+	getVectorSelect( condSnippet, ifSnippet, elseSnippet ) {
+
+		return `select( ${elseSnippet}, ${ifSnippet}, ${condSnippet} )`;
+
+	}
+
+	/**
 	 * Returns the WGSL type of the given node data type.
 	 *
 	 * @param {string} type - The node data type.

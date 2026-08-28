@@ -995,6 +995,24 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns the native snippet for a genuinely per-component vector select:
+	 * `condSnippet` is a `bvecN` (one boolean per output lane), unlike
+	 * {@link NodeBuilder#getTernary}'s single scalar `bool`.
+	 *
+	 * @abstract
+	 * @param {string} condSnippet - The per-component boolean (`bvecN`) condition.
+	 * @param {string} ifSnippet - The vector expression selected where `condSnippet` is `true`.
+	 * @param {string} elseSnippet - The vector expression selected where `condSnippet` is `false`.
+	 * @param {string} type - The (vector) type of `ifSnippet`/`elseSnippet`.
+	 * @return {string} The resolved method name.
+	 */
+	getVectorSelect( /* condSnippet, ifSnippet, elseSnippet, type*/ ) {
+
+		return null;
+
+	}
+
+	/**
 	 * Returns a node for the given hash, see {@link NodeBuilder#setHashNode}.
 	 *
 	 * @param {number} hash - The hash of the node.

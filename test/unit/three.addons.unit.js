@@ -16,6 +16,7 @@ import './addons/loaders/USDLoader.tests.js';
 import './addons/exporters/USDZExporter.tests.js';
 import './addons/tsl/WebGLNodesHandler.tests.js';
 import './addons/tsl/GPUTest.tests.js';
+import './addons/tsl/TSLConditionalSelect.tests.js';
 import './addons/tsl/TSLDeterminant.tests.js';
 import './addons/tsl/TSLFaceForward.tests.js';
 import './addons/tsl/TSLGainPcurve.tests.js';
