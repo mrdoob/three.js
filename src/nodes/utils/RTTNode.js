@@ -10,8 +10,11 @@ import { RenderTarget } from '../../core/RenderTarget.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { HalfFloatType } from '../../constants.js';
 import { error } from '../../utils.js';
+import { resetRendererState, restoreRendererState } from '../../renderers/common/RendererUtils.js';
 
 const _size = /*@__PURE__*/ new Vector2();
+
+let _rendererState;
 
 /**
  * `RTTNode` takes another node and uses it with a `QuadMesh` to render into a texture (RTT).
@@ -251,8 +254,6 @@ class RTTNode extends TextureNode {
 
 		//
 
-		const currentRenderTarget = renderer.getRenderTarget();
-
 		if ( this.autoResize === true ) {
 
 			const size = renderer.getDrawingBufferSize( _size );
@@ -286,11 +287,13 @@ class RTTNode extends TextureNode {
 
 		//
 
+		_rendererState = resetRendererState( renderer, _rendererState );
+
 		renderer.setRenderTarget( this.renderTarget );
 
 		this._quadMesh.render( renderer );
 
-		renderer.setRenderTarget( currentRenderTarget );
+		restoreRendererState( renderer, _rendererState );
 
 	}
 
