@@ -74,11 +74,7 @@ export default QUnit.module( 'TSL', () => {
 			// select() (ConditionalNode) with a *vector* condition selects
 			// per-component -- each output lane picks independently, matching
 			// WGSL's native `select()` and GLSL's `bvecN`-selector `mix()`,
-			// not a scalar if/else over the whole vector. (Previously this
-			// pinned the opposite, incorrect behavior: the condition was
-			// coerced down to a single bool and the *entire* if/else value
-			// picked as one unit -- see ConditionalNode.js and
-			// TSLConditionalSelect.tests.js for the fix and its rationale.)
+			// not a scalar if/else over the whole vector.
 			const cond = vec3( 1, 0, 1 ).greaterThan( vec3( 0, 0, 0 ) );
 			assert.eq( select( cond, vec3( 1, 2, 3 ), vec3( 100, 200, 300 ) ), vec3( 1, 200, 3 ), 'select() with a vector condition blends per-component' );
 
