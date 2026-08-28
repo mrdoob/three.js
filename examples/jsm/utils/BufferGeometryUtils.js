@@ -709,8 +709,10 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 			for ( let k = 0; k < itemSize; k ++ ) {
 
-				// double tilde truncates the decimal value
-				hash += `${ ~ ~ ( attribute[ getters[ k ] ]( index ) * hashMultiplier + hashAdditive ) },`;
+				// Math.trunc preserves the full Number range. Bitwise coercion would
+				// wrap quantized values to signed 32-bit integers and cause collisions
+				// for small tolerances.
+				hash += `${ Math.trunc( attribute[ getters[ k ] ]( index ) * hashMultiplier + hashAdditive ) },`;
 
 			}
 
