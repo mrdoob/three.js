@@ -1,4 +1,4 @@
-import { warn } from '../../utils.js';
+import { error, warn } from '../../utils.js';
 import Node from '../core/Node.js';
 
 /**
@@ -93,7 +93,7 @@ class ScopedVariableNode extends Node {
 
 		if ( this.scope === ScopedVariableNode.WORKGROUP_SCOPE && builder.shaderStage !== 'compute' ) {
 
-			warn( `ScopedVariableNode: Workgroup scoped variables are invalid in the ${builder.shaderStage} stage.` );
+			error( `TSL: Workgroup scoped variables are invalid in the ${builder.shaderStage} stage.` );
 
 		}
 
