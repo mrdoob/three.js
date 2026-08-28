@@ -2299,7 +2299,7 @@ export class ColorGrading extends Extension {
 
 		super.init( inspector );
 
-		LUT3DStyle.init( inspector?.nonce );
+		LUT3DStyle.init( inspector.nonce );
 
 		const renderer = inspector.getRenderer();
 		const rendererComp = this.modulesMap.get( 'renderer' );
