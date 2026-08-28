@@ -709,9 +709,7 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 			for ( let k = 0; k < itemSize; k ++ ) {
 
-				// Math.trunc preserves the full Number range. Bitwise coercion would
-				// wrap quantized values to signed 32-bit integers and cause collisions
-				// for small tolerances.
+				// Math.trunc() preserves the full Number range, ~~ would wrap to int32
 				hash += `${ Math.trunc( attribute[ getters[ k ] ]( index ) * hashMultiplier + hashAdditive ) },`;
 
 			}
