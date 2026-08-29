@@ -1163,6 +1163,7 @@ class Renderer {
 
 			await nodes.getForComputeAsync( computeNode );
 
+			nodes.updateBeforeForCompute( computeNode );
 			nodes.updateForCompute( computeNode );
 			bindings.updateForCompute( computeNode );
 
@@ -1171,6 +1172,8 @@ class Renderer {
 
 			pipelines.getForCompute( computeNode, computeBindings, compilationPromises );
 			await Promise.all( compilationPromises );
+
+			nodes.updateAfterForCompute( computeNode );
 
 			loaded ++;
 
@@ -2950,6 +2953,7 @@ class Renderer {
 
 			}
 
+			nodes.updateBeforeForCompute( computeNode );
 			nodes.updateForCompute( computeNode );
 			bindings.updateForCompute( computeNode );
 
@@ -2957,6 +2961,8 @@ class Renderer {
 			const computePipeline = pipelines.getForCompute( computeNode, computeBindings );
 
 			backend.compute( computeNodes, computeNode, computeBindings, computePipeline, dispatchSize );
+
+			nodes.updateAfterForCompute( computeNode );
 
 		}
 

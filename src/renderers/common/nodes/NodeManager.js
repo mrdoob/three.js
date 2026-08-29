@@ -1028,6 +1028,44 @@ class NodeManager extends DataMap {
 	}
 
 	/**
+	 * Triggers the call of `updateBefore()` methods
+	 * for all nodes of the given compute node.
+	 *
+	 * @param {Node} computeNode - The compute node.
+	 */
+	updateBeforeForCompute( computeNode ) {
+
+		const nodeFrame = this.getNodeFrame();
+		const nodeBuilder = this.getForCompute( computeNode );
+
+		for ( const node of nodeBuilder.updateBeforeNodes ) {
+
+			nodeFrame.updateBeforeNode( node );
+
+		}
+
+	}
+
+	/**
+	 * Triggers the call of `updateAfter()` methods
+	 * for all nodes of the given compute node.
+	 *
+	 * @param {Node} computeNode - The compute node.
+	 */
+	updateAfterForCompute( computeNode ) {
+
+		const nodeFrame = this.getNodeFrame();
+		const nodeBuilder = this.getForCompute( computeNode );
+
+		for ( const node of nodeBuilder.updateAfterNodes ) {
+
+			nodeFrame.updateAfterNode( node );
+
+		}
+
+	}
+
+	/**
 	 * Triggers the call of `update()` methods
 	 * for all nodes of the given compute node.
 	 *

@@ -85,15 +85,6 @@ class ComputeNode extends Node {
 		this.name = '';
 
 		/**
-		 * The `updateBeforeType` is set to `NodeUpdateType.OBJECT` since {@link ComputeNode#updateBefore}
-		 * is executed once per object by default.
-		 *
-		 * @type {string}
-		 * @default 'object'
-		 */
-		this.updateBeforeType = NodeUpdateType.OBJECT;
-
-		/**
 		 * A callback executed when the compute node finishes initialization.
 		 *
 		 * @type {?Function}
@@ -174,6 +165,8 @@ class ComputeNode extends Node {
 	}
 
 	setup( builder ) {
+
+		this.updateBeforeType = ( builder.object !== this ) ? NodeUpdateType.FRAME : NodeUpdateType.NONE;
 
 		if ( this.count !== null && this.countNode === null ) {
 

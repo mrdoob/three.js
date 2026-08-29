@@ -57,7 +57,9 @@ class ComputeStats extends ObjectStats {
 
 	constructor( uid, computeNode ) {
 
-		super( uid, computeNode.name );
+		const name = computeNode.name || ( computeNode.isComputeNode ? 'Compute' : 'Compute Group' );
+
+		super( uid, name );
 
 		this.computeNode = computeNode;
 
@@ -75,6 +77,7 @@ export class RendererInspector extends InspectorBase {
 
 		this.currentFrame = null;
 		this.currentRender = null;
+		this.currentCompute = null;
 		this.currentNodes = null;
 		this.lastFrame = null;
 
@@ -95,7 +98,13 @@ export class RendererInspector extends InspectorBase {
 
 	getParent() {
 
-		return this.currentRender || this.getFrame();
+		if ( this.currentCompute !== null && this.currentRender !== null ) {
+
+			return this.currentCompute.timestamp > this.currentRender.timestamp ? this.currentCompute : this.currentRender;
+
+		}
+
+		return this.currentRender || this.currentCompute || this.getFrame();
 
 	}
 
@@ -104,7 +113,8 @@ export class RendererInspector extends InspectorBase {
 		super.begin();
 
 		this.currentFrame = this._createFrame();
-		this.currentRender = this.currentFrame;
+		this.currentRender = null;
+		this.currentCompute = null;
 		this.currentNodes = [];
 
 	}
@@ -127,6 +137,7 @@ export class RendererInspector extends InspectorBase {
 
 		this.currentFrame = null;
 		this.currentRender = null;
+		this.currentCompute = null;
 		this.currentNodes = null;
 
 		this._lastFinishTime = now;
@@ -500,19 +511,10 @@ export class RendererInspector extends InspectorBase {
 
 		const currentCompute = new ComputeStats( uid, computeNode );
 		currentCompute.timestamp = performance.now();
-		currentCompute.parent = this.currentCompute || this.getParent();
+		currentCompute.parent = this.getParent();
 
 		frame.computes.push( currentCompute );
-
-		if ( this.currentRender !== null ) {
-
-			this.currentRender.children.push( currentCompute );
-
-		} else {
-
-			frame.children.push( currentCompute );
-
-		}
+		currentCompute.parent.children.push( currentCompute );
 
 		this.currentCompute = currentCompute;
 
@@ -527,7 +529,7 @@ export class RendererInspector extends InspectorBase {
 		const currentCompute = this.currentCompute;
 		currentCompute.cpu = performance.now() - currentCompute.timestamp;
 
-		this.currentCompute = currentCompute.parent.isComputeStats ? currentCompute.parent : null;
+		this.currentCompute = currentCompute.parent && currentCompute.parent.isComputeStats ? currentCompute.parent : null;
 
 	}
 
@@ -542,16 +544,7 @@ export class RendererInspector extends InspectorBase {
 		currentRender.parent = this.getParent();
 
 		frame.renders.push( currentRender );
-
-		if ( this.currentRender !== null ) {
-
-			this.currentRender.children.push( currentRender );
-
-		} else {
-
-			frame.children.push( currentRender );
-
-		}
+		currentRender.parent.children.push( currentRender );
 
 		this.currentRender = currentRender;
 
@@ -566,7 +559,7 @@ export class RendererInspector extends InspectorBase {
 		const currentRender = this.currentRender;
 		currentRender.cpu = performance.now() - currentRender.timestamp;
 
-		this.currentRender = currentRender.parent;
+		this.currentRender = currentRender.parent && currentRender.parent.isRenderStats ? currentRender.parent : null;
 
 	}
 
