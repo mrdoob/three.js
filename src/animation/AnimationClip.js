@@ -486,7 +486,7 @@ function parseKeyframeTrack( json ) {
 
 	}
 
-	if ( json.settings !== undefined && json.settings.inTangents !== undefined && json.settings.outTangents !== undefined ) {
+	if ( AnimationUtils.hasTangents( json.settings ) ) {
 
 		track.settings = {
 			inTangents: AnimationUtils.convertArray( json.settings.inTangents, Float32Array ),

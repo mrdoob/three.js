@@ -95,7 +95,7 @@ class KeyframeTrack {
 
 			}
 
-			if ( hasTangents( track.settings ) ) {
+			if ( AnimationUtils.hasTangents( track.settings ) ) {
 
 				json.settings = {
 					inTangents: AnimationUtils.convertArray( track.settings.inTangents, Array ),
@@ -329,7 +329,7 @@ class KeyframeTrack {
 
 			}
 
-			if ( hasTangents( this.settings ) ) {
+			if ( AnimationUtils.hasTangents( this.settings ) ) {
 
 				scaleTangentTimes( this.settings.inTangents, timeScale );
 				scaleTangentTimes( this.settings.outTangents, timeScale );
@@ -611,7 +611,7 @@ class KeyframeTrack {
 		// Interpolant argument to constructor is not saved, so copy the factory method directly.
 		track.createInterpolant = this.createInterpolant;
 
-		if ( hasTangents( this.settings ) ) {
+		if ( AnimationUtils.hasTangents( this.settings ) ) {
 
 			track.settings = {
 				inTangents: this.settings.inTangents.slice(),
@@ -623,12 +623,6 @@ class KeyframeTrack {
 		return track;
 
 	}
-
-}
-
-function hasTangents( settings ) {
-
-	return settings !== undefined && settings.inTangents !== undefined && settings.outTangents !== undefined;
 
 }
 
