@@ -76,6 +76,7 @@ export class RendererInspector extends InspectorBase {
 		super();
 
 		this.currentFrame = null;
+		this.currentContext = null;
 		this.currentRender = null;
 		this.currentCompute = null;
 		this.currentNodes = null;
@@ -98,13 +99,7 @@ export class RendererInspector extends InspectorBase {
 
 	getParent() {
 
-		if ( this.currentCompute !== null && this.currentRender !== null ) {
-
-			return this.currentCompute.timestamp > this.currentRender.timestamp ? this.currentCompute : this.currentRender;
-
-		}
-
-		return this.currentRender || this.currentCompute || this.getFrame();
+		return this.currentContext || this.getFrame();
 
 	}
 
@@ -113,6 +108,7 @@ export class RendererInspector extends InspectorBase {
 		super.begin();
 
 		this.currentFrame = this._createFrame();
+		this.currentContext = this.currentFrame;
 		this.currentRender = null;
 		this.currentCompute = null;
 		this.currentNodes = [];
@@ -136,6 +132,7 @@ export class RendererInspector extends InspectorBase {
 		this.lastFrame = frame;
 
 		this.currentFrame = null;
+		this.currentContext = null;
 		this.currentRender = null;
 		this.currentCompute = null;
 		this.currentNodes = null;
@@ -517,6 +514,7 @@ export class RendererInspector extends InspectorBase {
 		currentCompute.parent.children.push( currentCompute );
 
 		this.currentCompute = currentCompute;
+		this.currentContext = currentCompute;
 
 	}
 
@@ -529,6 +527,7 @@ export class RendererInspector extends InspectorBase {
 		const currentCompute = this.currentCompute;
 		currentCompute.cpu = performance.now() - currentCompute.timestamp;
 
+		this.currentContext = currentCompute.parent;
 		this.currentCompute = currentCompute.parent && currentCompute.parent.isComputeStats ? currentCompute.parent : null;
 
 	}
@@ -547,6 +546,7 @@ export class RendererInspector extends InspectorBase {
 		currentRender.parent.children.push( currentRender );
 
 		this.currentRender = currentRender;
+		this.currentContext = currentRender;
 
 	}
 
@@ -559,6 +559,7 @@ export class RendererInspector extends InspectorBase {
 		const currentRender = this.currentRender;
 		currentRender.cpu = performance.now() - currentRender.timestamp;
 
+		this.currentContext = currentRender.parent;
 		this.currentRender = currentRender.parent && currentRender.parent.isRenderStats ? currentRender.parent : null;
 
 	}
