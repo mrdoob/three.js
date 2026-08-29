@@ -58,6 +58,8 @@ const exceptionList = [
 	'webgpu_morphtargets_face',
 	'webgpu_shadowmap_progressive',
 	'webgpu_postprocessing_ssr_denoise',
+	'webgpu_vxgi',
+	'webgpu_vxgi_sponza',
 
 	// Video hangs the CI?
 	'css3d_youtube',
