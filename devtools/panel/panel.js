@@ -1,4 +1,4 @@
-/* global chrome, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, EVENT_RENDERER, EVENT_OBJECT_DETAILS, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_COMMITTED */
+/* global chrome, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, EVENT_REGISTER, EVENT_RENDERER, EVENT_OBJECT_DETAILS, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_COMMITTED */
 
 const STATE_POLLING_INTERVAL = 1000;
 
@@ -7,7 +7,8 @@ const STATE_POLLING_INTERVAL = 1000;
 const state = {
 	scenes: new Map(),
 	renderers: new Map(),
-	objects: new Map()
+	objects: new Map(),
+	revision: null
 };
 
 // Open/closed state of collapsible nodes (uuid -> boolean), kept across rebuilds
@@ -19,6 +20,7 @@ const expanded = new Map();
 // Static DOM from panel.html
 const renderersSection = document.getElementById( 'renderers' );
 const scenesSection = document.getElementById( 'scenes' );
+const notice = document.getElementById( 'notice' );
 
 document.querySelector( '.version' ).textContent = chrome.runtime.getManifest().version;
 
@@ -53,6 +55,7 @@ function poll() {
 
 send( MESSAGE_INIT, { tabId: chrome.devtools.inspectedWindow.tabId } );
 send( MESSAGE_REQUEST_STATE );
+updateNotice();
 
 port.onDisconnect.addListener( () => {
 
@@ -66,6 +69,11 @@ port.onMessage.addListener( ( message ) => {
 	const detail = message.detail;
 
 	switch ( message.name ) {
+
+		case EVENT_REGISTER:
+			state.revision = detail.revision;
+			updateNotice();
+			break;
 
 		case EVENT_RENDERER:
 			detail._frameId = message.frameId;
@@ -168,6 +176,7 @@ function clearState() {
 	state.scenes.clear();
 	state.renderers.clear();
 	state.objects.clear();
+	state.revision = null;
 	openState.clear();
 	expanded.clear();
 
@@ -480,12 +489,12 @@ function toggleDetails( uuid ) {
 
 	} else {
 
-		const image = document.createElement( 'img' );
-		image.className = 'preview';
+		const tile = document.createElement( 'div' );
+		tile.className = 'preview';
 
 		const block = document.createElement( 'div' );
 		block.className = 'properties-list';
-		block.appendChild( image );
+		block.appendChild( tile );
 
 		expanded.set( uuid, block );
 		send( MESSAGE_REQUEST_OBJECT_DETAILS, { uuid: uuid, preview: true } );
@@ -506,7 +515,7 @@ function renderObjectDetails( block, details ) {
 	// A swapped geometry or material changes a type, a name or the number of properties
 	const signature = groups.map( ( [ item, rows ] ) => item.type + item.name + rows.length ).join();
 
-	const image = block.firstChild;
+	const tile = block.firstChild;
 
 	// The first details fill an empty block, any later change is a swapped geometry or material
 	const swapped = block.dataset.signature !== undefined && block.dataset.signature !== signature;
@@ -536,18 +545,22 @@ function renderObjectDetails( block, details ) {
 
 		}
 
-		block.replaceChildren( image, column );
+		block.replaceChildren( tile, column );
 
 	}
 
 	const pickers = block.querySelectorAll( '.picker' );
 	groups.forEach( ( [ , rows ], i ) => updatePropertyPicker( pickers[ i ], rows ) );
 
-	// A preview comes with the details when one was asked for, an object that has none keeps no tile
+	// A preview comes with the details when one was asked for: the image, or the reason there is
+	// none, shown in its place. An object with nothing to draw keeps no tile at all.
 	if ( 'preview' in details ) {
 
-		image.hidden = details.preview === null;
-		if ( details.preview !== null ) image.src = details.preview;
+		const rendered = details.preview !== null && details.preview.startsWith( 'data:' );
+
+		tile.hidden = details.preview === null;
+		tile.style.backgroundImage = rendered ? `url(${details.preview})` : '';
+		tile.textContent = rendered ? '' : details.preview;
 
 	}
 
@@ -568,9 +581,31 @@ function renderSection( section, title, items, render ) {
 
 }
 
+// While there is nothing to show, say whether three.js was found at all
+function updateNotice() {
+
+	notice.hidden = state.renderers.size > 0 || state.scenes.size > 0;
+
+	if ( state.revision === null ) {
+
+		notice.textContent = 'No instance of three.js found in this page.';
+
+	} else if ( parseInt( state.revision ) < 106 ) {
+
+		notice.textContent = `three.js r${state.revision} found, but versions before r106 do not report to the DevTools.`;
+
+	} else {
+
+		notice.textContent = `three.js r${state.revision} found, but it has no renderer or scene yet.`;
+
+	}
+
+}
+
 function updateRenderers() {
 
 	renderSection( renderersSection, 'Renderers', state.renderers, renderRenderer );
+	updateNotice();
 
 }
 
@@ -584,5 +619,6 @@ function updateSceneTree() {
 	}
 
 	renderSection( scenesSection, 'Scenes', state.scenes, renderObject );
+	updateNotice();
 
 }

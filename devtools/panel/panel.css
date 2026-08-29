@@ -33,6 +33,13 @@ body {
 	opacity: 0.5;
 }
 
+/* Shown while there is nothing else to show */
+#notice {
+	padding: 24px 12px;
+	text-align: center;
+	color: light-dark( #666, #aaa );
+}
+
 /* Side by side while both fit, stacked when the panel is narrow */
 .sections-container {
 	display: flex;
@@ -158,13 +165,21 @@ details[open] > summary .tree-toggle::before {
 	font: inherit;
 	max-width: 80px; /* as wide as its longest option otherwise */
 }
-/* The tile is the placeholder too, so the size lives here and preview.js renders to match */
+/* The tile is the placeholder too, so the size lives here and preview.js renders to match.
+   It holds the render as its background, or the reason there is none as text. */
 .preview {
-	display: block;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
 	width: 160px;
 	height: 160px;
+	padding: 0 12px;
 	border-radius: 4px;
-	background: #eee; /* shows until the transparent render arrives, light in both themes */
+	background: #eee center / contain no-repeat; /* light in both themes, the render is transparent */
+	color: #aaa;
+	font-size: 11px;
+	text-align: center;
 }
 
 /* Scroll to canvas button */

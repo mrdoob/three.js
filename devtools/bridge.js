@@ -251,7 +251,17 @@
 
 	// --- Three.js events ---
 
-	devTools.addEventListener( EVENT_REGISTER, ( event ) => postToPanel( EVENT_REGISTER, event.detail ) );
+	// Kept, since the panel may open after three.js registered and asks for the state then
+	let revision = null;
+
+	function register( value ) {
+
+		revision = value;
+		postToPanel( EVENT_REGISTER, { revision: revision } );
+
+	}
+
+	devTools.addEventListener( EVENT_REGISTER, ( event ) => register( event.detail.revision ) );
 
 	devTools.addEventListener( EVENT_OBSERVE, ( event ) => {
 
@@ -280,7 +290,7 @@
 	// Old three.js versions don't register themselves, detect the global instead
 	window.addEventListener( 'load', () => {
 
-		if ( window.THREE && window.THREE.REVISION ) postToPanel( EVENT_REGISTER, { revision: window.THREE.REVISION } );
+		if ( window.THREE && window.THREE.REVISION ) register( window.THREE.REVISION );
 
 	} );
 
@@ -321,6 +331,8 @@
 	} );
 
 	function sendState() {
+
+		if ( revision !== null ) postToPanel( EVENT_REGISTER, { revision: revision } );
 
 		for ( const renderer of observedRenderers ) sendRenderer( renderer );
 

@@ -49,7 +49,7 @@ The highlight and the preview need the renderer, camera and viewport a scene is 
 
 ### State
 
-The panel requests the state when it opens and then once a second, along with the details of the expanded objects. Rendering a preview costs the page a frame, so it is only asked for when a row is expanded and when its geometry or material changes. On each request the bridge resends every renderer (their stats change every frame), and a scene only when its object count changed. Scenes have no `dispose()`, so a scene that stays empty for several requests is removed from the panel, and brought back if it gains children again.
+The panel requests the state when it opens and then once a second, along with the details of the expanded objects. While there is nothing to show it says whether three.js was found, so the bridge repeats the revision three.js registered with on every request (versions before r106 do not register). Rendering a preview costs the page a frame, so it is only asked for when a row is expanded and when its geometry or material changes. On each request the bridge resends every renderer (their stats change every frame), and a scene only when its object count changed. Scenes have no `dispose()`, so a scene that stays empty for several requests is removed from the panel, and brought back if it gains children again.
 
 The background script tags every message with the frame it came from and reports navigations, so the panel drops the renderers and scenes of a navigated frame (all of them for a top-level navigation).
 

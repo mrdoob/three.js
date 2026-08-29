@@ -1,4 +1,5 @@
-// Renders an expanded object with its own material, using a renderer created from the page's own three.js
+// Renders an expanded object with its own material, using a renderer created from the page's own three.js.
+// The preview is the image, or the reason there is none.
 
 ( function () {
 
@@ -143,7 +144,7 @@
 
 		// A ShaderMaterial shares its uniforms with the page's renderer, which wires its light uniforms
 		// into them, so drawing it with another renderer breaks the page
-		if ( [].concat( object.material ).some( material => material.isShaderMaterial ) ) return null;
+		if ( [].concat( object.material ).some( material => material.isShaderMaterial ) ) return 'ShaderMaterial preview not supported';
 
 		// The scene has to have been drawn once, so its renderer and camera are known
 		const view = utils.getSceneView( object );
@@ -170,7 +171,7 @@
 
 			// A material the page's renderer can draw is not always one another renderer can
 			console.warn( 'DevTools: Preview failed:', error );
-			return null;
+			return 'Preview failed';
 
 		}
 
