@@ -95,13 +95,11 @@ class KeyframeTrack {
 
 			}
 
-			if ( track.settings !== undefined ) {
+			if ( track.settings ) {
 
 				json.settings = {
-
-					'inTangents': AnimationUtils.convertArray( track.settings.inTangents, Array ),
-					'outTangents': AnimationUtils.convertArray( track.settings.outTangents, Array )
-
+					inTangents: AnimationUtils.convertArray( track.settings.inTangents, Array ),
+					outTangents: AnimationUtils.convertArray( track.settings.outTangents, Array )
 				};
 
 			}
@@ -328,6 +326,13 @@ class KeyframeTrack {
 			for ( let i = 0, n = times.length; i !== n; ++ i ) {
 
 				times[ i ] *= timeScale;
+
+			}
+
+			if ( this.settings ) {
+
+				scaleTangentTimes( this.settings.inTangents, timeScale );
+				scaleTangentTimes( this.settings.outTangents, timeScale );
 
 			}
 
@@ -607,6 +612,18 @@ class KeyframeTrack {
 		track.createInterpolant = this.createInterpolant;
 
 		return track;
+
+	}
+
+}
+
+function scaleTangentTimes( tangents, timeScale ) {
+
+	if ( tangents === undefined ) return;
+
+	for ( let i = 0, n = tangents.length; i !== n; i += 2 ) {
+
+		tangents[ i ] *= timeScale;
 
 	}
 

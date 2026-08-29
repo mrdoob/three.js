@@ -57,6 +57,22 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
+		QUnit.test( 'scale', ( assert ) => {
+
+			const track = new NumberKeyframeTrack( '.material.opacity', [ 0, 1 ], [ 0, 10 ] );
+			track.settings = {
+				inTangents: new Float32Array( [ 0, 0, 0.75, 8 ] ),
+				outTangents: new Float32Array( [ 0.25, 8, 0, 0 ] )
+			};
+
+			track.scale( 2 );
+
+			assert.smartEqual( Array.from( track.times ), [ 0, 2 ] );
+			assert.smartEqual( Array.from( track.settings.inTangents ), [ 0, 0, 1.5, 8 ] );
+			assert.smartEqual( Array.from( track.settings.outTangents ), [ 0.5, 8, 0, 0 ] );
+
+		} );
+
 		QUnit.test( 'optimize', ( assert ) => {
 
 			const track = new NumberKeyframeTrack( '.material.opacity', [ 0, 1, 2, 3, 4 ], [ 0, 0, 0, 0, 1 ] );

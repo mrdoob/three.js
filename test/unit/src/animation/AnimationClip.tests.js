@@ -40,13 +40,18 @@ export default QUnit.module( 'Animation', () => {
 			const parsedClip = AnimationClip.parse( JSON.parse( JSON.stringify( AnimationClip.toJSON( clip ) ) ) );
 			const parsedTrack = parsedClip.tracks[ 0 ];
 
-			assert.smartEqual( Array.from( parsedTrack.settings.inTangents ), Array.from( track.settings.inTangents ) );
-			assert.smartEqual( Array.from( parsedTrack.settings.outTangents ), Array.from( track.settings.outTangents ) );
-
+			assert.smartEqual(
+				Array.from( parsedTrack.settings.inTangents ), Array.from( track.settings.inTangents ),
+				'Bezier in tangents are restored'
+			);
+			assert.smartEqual(
+				Array.from( parsedTrack.settings.outTangents ), Array.from( track.settings.outTangents ),
+				'Bezier out tangents are restored'
+			);
 			assert.equal(
 				parsedTrack.createInterpolant().evaluate( 0.5 )[ 0 ],
 				track.createInterpolant().evaluate( 0.5 )[ 0 ],
-				'Bezier tangents survive a round trip'
+				'Bezier interpolation is preserved through serialization'
 			);
 
 		} );
