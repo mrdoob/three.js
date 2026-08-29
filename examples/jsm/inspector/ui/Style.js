@@ -1,6 +1,6 @@
 export class Style {
 
-	static init( container ) {
+	static init( container, nonce = null ) {
 
 		const css = /* css */`
 @scope (.three-inspector) {
@@ -1081,6 +1081,7 @@ export class Style {
 
 	.list-item-row {
 		display: grid;
+		grid-template-columns: var(--list-grid-template, none);
 		align-items: center;
 		padding: 4px 8px;
 		border-radius: 3px;
@@ -1172,6 +1173,7 @@ export class Style {
 
 	.list-header {
 		display: grid;
+		grid-template-columns: var(--list-grid-template, none);
 		align-items: center;
 		padding: 4px 8px;
 		font-weight: 600;
@@ -2232,10 +2234,63 @@ export class Style {
 		justify-content: center !important;
 	}
 
+	/* Timeline Info & Details */
+	.timeline-detail-block {
+		font-size: 11px;
+		margin-left: 8px;
+		color: var(--text-secondary);
+		opacity: 1;
+	}
+
+	.timeline-detail-key,
+	.timeline-detail-sep,
+	.timeline-call-count {
+		opacity: 0.5;
+	}
+
+	.timeline-detail-value {
+		color: var(--text-secondary);
+		opacity: 1;
+	}
+
+	.timeline-info-group {
+		display: inline-flex;
+		align-items: center;
+		margin-left: 12px;
+		flex-shrink: 0;
+	}
+
+	.timeline-info-dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		margin-right: 6px;
+		flex-shrink: 0;
+	}
+
+	.timeline-info-dot.fps {
+		background-color: var(--color-fps);
+	}
+
+	.timeline-info-dot.call {
+		background-color: var(--color-call);
+	}
+
+	.timeline-info-dot.red {
+		background-color: var(--color-red);
+	}
+
 }
 `;
 
 		const styleElement = document.createElement( 'style' );
+
+		if ( nonce ) {
+
+			styleElement.nonce = nonce;
+
+		}
+
 		styleElement.textContent = css;
 
 		container.appendChild( styleElement );

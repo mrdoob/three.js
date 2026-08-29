@@ -14,13 +14,19 @@ import { setConsoleFunction, getConsoleFunction, REVISION } from 'three/webgpu';
 
 class Inspector extends RendererInspector {
 
-	constructor() {
+	constructor( options = {} ) {
 
 		super();
 
+		const {
+			nonce = null
+		} = options;
+
+		this.nonce = nonce;
+
 		// init profiler
 
-		const profiler = new Profiler( this );
+		const profiler = new Profiler( this, options );
 		profiler.addEventListener( 'resize', ( e ) => this.dispatchEvent( e ) );
 		profiler.addEventListener( 'orientationchange', ( e ) => this.dispatchEvent( e ) );
 		profiler.addEventListener( 'layoutchange', ( e ) => this.dispatchEvent( e ) );
