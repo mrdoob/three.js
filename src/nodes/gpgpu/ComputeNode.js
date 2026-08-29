@@ -99,6 +99,15 @@ class ComputeNode extends Node {
 		 */
 		this.countNode = null;
 
+		/**
+		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node computes
+		 * once per frame.
+		 *
+		 * @type {string}
+		 * @default 'frame'
+		 */
+		this.updateBeforeType = NodeUpdateType.FRAME;
+
 	}
 
 	/**
@@ -154,6 +163,18 @@ class ComputeNode extends Node {
 	}
 
 	/**
+	 * Returns the update type of {@link Node#updateBefore}.
+	 *
+	 * @param {NodeFrame} [frame] - The current node frame.
+	 * @return {NodeUpdateType} The update type.
+	 */
+	getUpdateBeforeType( frame ) {
+
+		return frame.compute !== this ? this.updateBeforeType : NodeUpdateType.NONE;
+
+	}
+
+	/**
 	 * The method execute the compute for this node.
 	 *
 	 * @param {NodeFrame} frame - A reference to the current node frame.
@@ -165,8 +186,6 @@ class ComputeNode extends Node {
 	}
 
 	setup( builder ) {
-
-		this.updateBeforeType = ( builder.object !== this ) ? NodeUpdateType.FRAME : NodeUpdateType.NONE;
 
 		if ( this.count !== null && this.countNode === null ) {
 
