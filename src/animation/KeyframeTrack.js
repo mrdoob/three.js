@@ -95,6 +95,17 @@ class KeyframeTrack {
 
 			}
 
+			if ( track.settings !== undefined ) {
+
+				json.settings = {
+
+					'inTangents': AnimationUtils.convertArray( track.settings.inTangents, Array ),
+					'outTangents': AnimationUtils.convertArray( track.settings.outTangents, Array )
+
+				};
+
+			}
+
 		}
 
 		json.type = track.ValueTypeName; // mandatory
