@@ -12,6 +12,9 @@ window.addEventListener( 'message', ( event ) => {
 
 	if ( ! event.data || event.data.id !== MESSAGE_ID ) return;
 
+	// Only bridge messages carry a detail, the panel requests relayed below must not bounce back
+	if ( event.data.detail === undefined ) return;
+
 	try {
 
 		chrome.runtime.sendMessage( event.data );

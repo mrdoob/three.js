@@ -4,11 +4,10 @@ Object.assign( globalThis, {
 
 	MESSAGE_ID: 'three-devtools',
 
-	// Name of the highlight clone highlight.js adds to the scene
-	HIGHLIGHT_NAME: '__THREE_DEVTOOLS_HIGHLIGHT__',
+	// Tells the background script which tab this panel inspects
+	MESSAGE_INIT: 'init',
 
 	// Requests from the panel (panel -> background -> content script -> bridge)
-	MESSAGE_INIT: 'init',
 	MESSAGE_REQUEST_STATE: 'request-state',
 	MESSAGE_REQUEST_OBJECT_DETAILS: 'request-object-details',
 	MESSAGE_SCROLL_TO_CANVAS: 'scroll-to-canvas',

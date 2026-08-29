@@ -1,4 +1,4 @@
-/* global chrome, MESSAGE_ID, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, EVENT_RENDERER, EVENT_OBJECT_DETAILS, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_COMMITTED */
+/* global chrome, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, EVENT_RENDERER, EVENT_OBJECT_DETAILS, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_COMMITTED */
 
 const STATE_POLLING_INTERVAL = 1000;
 
@@ -13,17 +13,22 @@ const state = {
 // Open/closed state of collapsible nodes (uuid -> boolean), kept across rebuilds
 const openState = new Map();
 
-// Static DOM elements (created once in initUI)
-let renderersSection = null;
-let scenesSection = null;
-let floatingPanel = null;
+// Objects expanded in the tree (uuid -> its details block, kept across rebuilds so the selection and the image survive)
+const expanded = new Map();
 
-const mousePosition = { x: 0, y: 0 };
+// Objects waiting for a render, so a slow round trip is not asked to repeat it
+const pendingPreviews = new Set();
+
+// Static DOM from panel.html
+const renderersSection = document.getElementById( 'renderers' );
+const scenesSection = document.getElementById( 'scenes' );
+
+document.querySelector( '.version' ).textContent = chrome.runtime.getManifest().version;
 
 // --- Connection ---
 
 const port = chrome.runtime.connect();
-const intervalId = setInterval( () => send( MESSAGE_REQUEST_STATE ), STATE_POLLING_INTERVAL );
+const intervalId = setInterval( poll, STATE_POLLING_INTERVAL );
 
 function send( name, data ) {
 
@@ -40,6 +45,27 @@ function send( name, data ) {
 
 }
 
+function poll() {
+
+	send( MESSAGE_REQUEST_STATE );
+
+	for ( const [ uuid, block ] of expanded ) {
+
+		// Rendering a preview costs the page a frame, so only ask again while the tile is empty
+		requestDetails( uuid, block.firstChild.src === '' && ! pendingPreviews.has( uuid ) );
+
+	}
+
+}
+
+function requestDetails( uuid, preview ) {
+
+	if ( preview ) pendingPreviews.add( uuid );
+
+	send( MESSAGE_REQUEST_OBJECT_DETAILS, { uuid: uuid, preview: preview } );
+
+}
+
 send( MESSAGE_INIT, { tabId: chrome.devtools.inspectedWindow.tabId } );
 send( MESSAGE_REQUEST_STATE );
 
@@ -52,8 +78,6 @@ port.onDisconnect.addListener( () => {
 
 port.onMessage.addListener( ( message ) => {
 
-	if ( message.id !== MESSAGE_ID ) return;
-
 	const detail = message.detail;
 
 	switch ( message.name ) {
@@ -65,7 +89,8 @@ port.onMessage.addListener( ( message ) => {
 			break;
 
 		case EVENT_OBJECT_DETAILS:
-			showFloatingDetails( detail );
+			pendingPreviews.delete( detail.uuid );
+			if ( expanded.has( detail.uuid ) ) renderObjectDetails( expanded.get( detail.uuid ), detail );
 			break;
 
 		case EVENT_SCENE:
@@ -89,15 +114,12 @@ port.onMessage.addListener( ( message ) => {
 
 } );
 
-// Replace the objects of a scene with a new batch from the bridge
-function processSceneBatch( sceneUuid, objects, frameId ) {
+// Drop a scene's objects, except the ones a new batch still lists
+function forgetObjects( sceneUuid, keep = new Set() ) {
 
-	const uuids = new Set( objects.map( object => object.uuid ) );
-
-	// Drop objects that are no longer in the scene
 	state.objects.forEach( ( object, uuid ) => {
 
-		if ( object._sceneUuid === sceneUuid && ! uuids.has( uuid ) ) {
+		if ( object._sceneUuid === sceneUuid && ! keep.has( uuid ) ) {
 
 			state.objects.delete( uuid );
 			openState.delete( uuid );
@@ -105,6 +127,13 @@ function processSceneBatch( sceneUuid, objects, frameId ) {
 		}
 
 	} );
+
+}
+
+// Replace the objects of a scene with a new batch from the bridge
+function processSceneBatch( sceneUuid, objects, frameId ) {
+
+	forgetObjects( sceneUuid, new Set( objects.map( object => object.uuid ) ) );
 
 	for ( const object of objects ) {
 
@@ -123,17 +152,7 @@ function processSceneBatch( sceneUuid, objects, frameId ) {
 function removeScene( sceneUuid ) {
 
 	state.scenes.delete( sceneUuid );
-
-	state.objects.forEach( ( object, uuid ) => {
-
-		if ( object._sceneUuid === sceneUuid ) {
-
-			state.objects.delete( uuid );
-			openState.delete( uuid );
-
-		}
-
-	} );
+	forgetObjects( sceneUuid );
 
 }
 
@@ -166,41 +185,64 @@ function clearState() {
 	state.renderers.clear();
 	state.objects.clear();
 	openState.clear();
-
-	floatingPanel.classList.remove( 'visible' );
+	expanded.clear();
 
 }
 
 // --- Rendering ---
 
-function getObjectIcon( obj ) {
+function getObjectIcon( object ) {
 
-	if ( obj.isScene ) return '🌍';
-	if ( obj.isCamera ) return '📷';
-	if ( obj.isLight ) return '💡';
-	if ( obj.isInstancedMesh ) return '🔸';
-	if ( obj.isMesh ) return '🔷';
-	if ( obj.isGroup ) return '📁';
+	if ( object.isScene ) return '🌍';
+	if ( object.isCamera ) return '📷';
+	if ( object.isLight ) return '💡';
+	if ( object.isInstancedMesh ) return '🔸';
+	if ( object.isMesh ) return '🔷';
+	if ( object.isGroup ) return '📁';
 	return '📦';
 
 }
 
 // Sort order of children in the tree
-function getObjectOrder( obj ) {
+function getObjectOrder( object ) {
 
-	if ( obj.isCamera ) return 1;
-	if ( obj.isLight ) return 2;
-	if ( obj.isGroup ) return 3;
-	if ( obj.isMesh ) return 4;
+	if ( object.isCamera ) return 1;
+	if ( object.isLight ) return 2;
+	if ( object.isGroup ) return 3;
+	if ( object.isMesh ) return 4;
 	return 5;
+
+}
+
+// A dimmer detail after a row's name or a heading's type. Text comes from the page, so it is set as text.
+function appendDetail( element, text ) {
+
+	const detail = document.createElement( 'span' );
+	detail.className = 'object-details';
+	detail.textContent = text;
+
+	element.append( ' ', detail );
 
 }
 
 function createLabel( name, details ) {
 
-	if ( details.length === 0 ) return name;
+	const label = document.createElement( 'span' );
+	label.className = 'label';
+	label.textContent = name;
 
-	return `${name} <span class="object-details">${details.join( ' ・ ' )}</span>`;
+	if ( details.length > 0 ) appendDetail( label, details.join( ' ・ ' ) );
+
+	return label;
+
+}
+
+function formatValue( value ) {
+
+	if ( value === undefined || value === null ) return '–';
+	if ( Array.isArray( value ) ) return value.map( formatValue ).join( ', ' );
+	if ( typeof value === 'number' ) return value.toLocaleString();
+	return value;
 
 }
 
@@ -210,50 +252,68 @@ function createPropertyRow( label, value ) {
 	row.className = 'property-row';
 
 	const labelSpan = document.createElement( 'span' );
-	labelSpan.className = 'property-label';
 	labelSpan.textContent = label;
 
 	const valueSpan = document.createElement( 'span' );
 	valueSpan.className = 'property-value';
-	valueSpan.textContent = ( value === undefined || value === null )
-		? '–'
-		: ( typeof value === 'number' ? value.toLocaleString() : value );
+	valueSpan.textContent = formatValue( value );
 
-	row.appendChild( labelSpan );
-	row.appendChild( valueSpan );
+	row.append( labelSpan, valueSpan );
+
 	return row;
 
 }
 
-// A titled group of property rows
-function createPropertyGroup( title, rows ) {
+// A column of titled property groups ([ title, rows ] pairs)
+function createPropertyColumn( ...groups ) {
 
-	const fragment = document.createDocumentFragment();
+	const column = document.createElement( 'div' );
+	column.className = 'property-column';
 
-	const heading = document.createElement( 'h4' );
-	heading.textContent = title;
-	fragment.appendChild( heading );
+	for ( const [ title, rows ] of groups ) {
 
-	for ( const [ label, value ] of rows ) {
+		const group = document.createElement( 'div' );
+		group.className = 'property-group';
 
-		fragment.appendChild( createPropertyRow( label, value ) );
+		const heading = document.createElement( 'h4' );
+		heading.textContent = title;
+		group.appendChild( heading );
+
+		for ( const [ label, value ] of rows ) group.appendChild( createPropertyRow( label, value ) );
+
+		column.appendChild( group );
 
 	}
 
-	return fragment;
+	return column;
 
 }
 
-function createVectorRow( label, vector ) {
+// A dropdown of an item's properties, the selected one shown beside it
+function createPropertyPicker( rows ) {
 
-	const row = document.createElement( 'div' );
-	row.className = 'vector-row';
+	const select = document.createElement( 'select' );
+	for ( const [ label ] of rows ) select.appendChild( new Option( label ) );
 
-	// Pad label to ensure consistent alignment
-	const paddedLabel = label.padEnd( 16 );
-	row.textContent = `${paddedLabel} ${vector.x.toFixed( 3 )}\t${vector.y.toFixed( 3 )}\t${vector.z.toFixed( 3 )}`;
+	const value = document.createElement( 'span' );
+	value.className = 'property-value';
+	select.addEventListener( 'change', () => value.textContent = select.value );
 
-	return row;
+	const picker = document.createElement( 'div' );
+	picker.className = 'property-row picker';
+	picker.append( select, value );
+
+	return picker;
+
+}
+
+// The options carry the current values, so the selected one is simply select.value
+function updatePropertyPicker( picker, rows ) {
+
+	const select = picker.firstChild;
+
+	rows.forEach( ( [ , value ], i ) => select.options[ i ].value = formatValue( value ) );
+	picker.lastChild.textContent = select.value;
 
 }
 
@@ -272,25 +332,39 @@ function renderRenderer( renderer, container ) {
 		`${info.render.triangles.toLocaleString()} triangles`
 	] );
 
-	const scrollButton = renderer.canvasInDOM
-		? '<button class="scroll-to-canvas-btn" title="Scroll to canvas">🙂</button>'
-		: '<span class="scroll-to-canvas-placeholder" title="Canvas not in DOM">🫥</span>';
+	const toggle = document.createElement( 'span' );
+	toggle.className = 'tree-toggle';
 
 	const summary = document.createElement( 'summary' );
 	summary.className = 'tree-item';
-	summary.innerHTML = `<span class="tree-toggle"></span><span class="label">${label}</span>${scrollButton}`;
-	node.appendChild( summary );
+	summary.append( toggle, label );
 
-	const button = summary.querySelector( '.scroll-to-canvas-btn' );
+	if ( renderer.canvasInDOM ) {
 
-	if ( button !== null ) {
-
+		const button = document.createElement( 'button' );
+		button.className = 'scroll-to-canvas-btn';
+		button.title = 'Scroll to canvas';
+		button.textContent = '🙂';
 		button.addEventListener( 'click', () => send( MESSAGE_SCROLL_TO_CANVAS, { uuid: renderer.uuid } ) );
+
+		summary.appendChild( button );
+
+	} else {
+
+		const placeholder = document.createElement( 'span' );
+		placeholder.className = 'scroll-to-canvas-placeholder';
+		placeholder.title = 'Canvas not in DOM';
+		placeholder.textContent = '🫥';
+
+		summary.appendChild( placeholder );
 
 	}
 
-	const propertiesColumn = document.createElement( 'div' );
-	propertiesColumn.appendChild( createPropertyGroup( 'Properties', [
+	node.appendChild( summary );
+
+	const properties = document.createElement( 'div' );
+	properties.className = 'properties-list';
+	properties.appendChild( createPropertyColumn( [ 'Properties', [
 		[ 'Size', `${props.width}x${props.height}` ],
 		[ 'Alpha', props.alpha ],
 		[ 'Antialias', props.antialias ],
@@ -303,26 +377,18 @@ function renderRenderer( renderer, container ) {
 		[ 'Auto Clear Depth', props.autoClearDepth ],
 		[ 'Auto Clear Stencil', props.autoClearStencil ],
 		[ 'Local Clipping', props.localClipping ]
-	] ) );
-
-	const statsColumn = document.createElement( 'div' );
-	statsColumn.appendChild( createPropertyGroup( 'Render Stats', [
+	]] ) );
+	properties.appendChild( createPropertyColumn( [ 'Render Stats', [
 		[ 'Frame', info.render.frame ],
 		[ 'Draw Calls', info.render.calls ],
 		[ 'Triangles', info.render.triangles ],
 		[ 'Points', info.render.points ],
 		[ 'Lines', info.render.lines ]
-	] ) );
-	statsColumn.appendChild( createPropertyGroup( 'Memory', [
+	]], [ 'Memory', [
 		[ 'Geometries', info.memory.geometries ],
 		[ 'Textures', info.memory.textures ],
 		[ 'Shader Programs', info.memory.programs ]
-	] ) );
-
-	const properties = document.createElement( 'div' );
-	properties.className = 'properties-list';
-	properties.appendChild( propertiesColumn );
-	properties.appendChild( statsColumn );
+	]] ) );
 	node.appendChild( properties );
 
 	container.appendChild( node );
@@ -330,114 +396,178 @@ function renderRenderer( renderer, container ) {
 }
 
 // Render an object and its children
-function renderObject( obj, container, level = 0, parentInvisible = false ) {
+function renderObject( object, container, level = 0, parentInvisible = false ) {
 
-	const children = obj.children
+	// A batch can arrive while the tree is rendering, so a listed child is not always in state yet
+	const children = object.children
 		.map( uuid => state.objects.get( uuid ) )
 		.filter( child => child !== undefined )
 		.sort( ( a, b ) => getObjectOrder( a ) - getObjectOrder( b ) );
 
 	const hasChildren = children.length > 0;
-	const invisible = parentInvisible || obj.visible === false;
+	const invisible = parentInvisible || object.visible === false;
 
-	let name = obj.name || obj.type;
+	let name = object.name || object.type;
 	const details = [];
 
-	if ( obj.isInstancedMesh ) name += ` [${obj.count}]`;
-	if ( obj.isMesh ) details.push( `${obj.geometryType} ${obj.materialType}` );
+	if ( object.isInstancedMesh ) name += ` [${object.count}]`;
+	if ( object.isMesh ) details.push( `${object.geometryType} ${object.materialType}` );
 
-	if ( obj.isScene ) {
+	if ( object.isScene ) {
 
-		let objectCount = 0;
-		let lightCount = 0;
+		const objects = [ ...state.objects.values() ].filter( item => item._sceneUuid === object.uuid && ! item.isScene );
+		const lights = objects.filter( item => item.isLight );
 
-		state.objects.forEach( object => {
-
-			if ( object._sceneUuid !== obj.uuid || object.isScene ) return;
-
-			objectCount ++;
-			if ( object.isLight ) lightCount ++;
-
-		} );
-
-		details.push( `${objectCount} objects` );
-		if ( lightCount > 0 ) details.push( `${lightCount} lights` );
+		details.push( `${objects.length} objects` );
+		if ( lights.length > 0 ) details.push( `${lights.length} lights` );
 
 	}
 
-	const toggle = hasChildren
-		? '<span class="tree-toggle"></span>'
-		: '<span class="tree-toggle-placeholder"></span>';
+	const toggle = document.createElement( 'span' );
+	toggle.className = hasChildren ? 'tree-toggle' : 'tree-toggle-placeholder';
+
+	const icon = document.createElement( 'span' );
+	icon.className = 'icon';
+	icon.textContent = getObjectIcon( object );
+
+	const type = document.createElement( 'span' );
+	type.className = 'type';
+	type.textContent = object.type;
 
 	const item = document.createElement( hasChildren ? 'summary' : 'div' );
 	item.className = 'tree-item';
 	item.style.paddingLeft = `${level * 20}px`;
 	if ( invisible ) item.classList.add( 'invisible' );
-	item.innerHTML = `${toggle}<span class="icon">${getObjectIcon( obj )}</span>
-		<span class="label">${createLabel( name, details )}</span>
-		<span class="type">${obj.type}</span>`;
+	if ( expanded.has( object.uuid ) ) item.classList.add( 'expanded' );
+	item.append( toggle, icon, createLabel( name, details ), type );
 
-	item.addEventListener( 'mouseenter', () => {
+	// The arrow toggles the children, the rest of the row toggles the details
+	item.addEventListener( 'click', ( event ) => {
 
-		send( MESSAGE_REQUEST_OBJECT_DETAILS, { uuid: obj.uuid } );
+		if ( event.target.classList.contains( 'tree-toggle' ) ) return;
 
-		// Only highlight if object and all parents are visible
-		if ( ! invisible ) send( MESSAGE_HIGHLIGHT_OBJECT, { uuid: obj.uuid } );
+		event.preventDefault();
+		toggleDetails( object.uuid );
 
 	} );
 
+	item.addEventListener( 'mouseenter', () => send( MESSAGE_HIGHLIGHT_OBJECT, { uuid: object.uuid } ) );
 	item.addEventListener( 'mouseleave', () => send( MESSAGE_UNHIGHLIGHT_OBJECT ) );
+
+	// Objects with children are a collapsible node, the row being its summary
+	let parent = container;
 
 	if ( hasChildren ) {
 
-		const node = document.createElement( 'details' );
+		parent = document.createElement( 'details' );
 
-		// Default to expanded unless the user has collapsed this node before
-		node.open = openState.get( obj.uuid ) ?? true;
-		node.addEventListener( 'toggle', () => openState.set( obj.uuid, node.open ) );
+		// Default to open unless the user has collapsed this node before
+		parent.open = openState.get( object.uuid ) ?? true;
+		parent.addEventListener( 'toggle', () => openState.set( object.uuid, parent.open ) );
 
-		node.appendChild( item );
+		container.appendChild( parent );
 
-		for ( const child of children ) {
+	}
 
-			renderObject( child, node, level + 1, invisible );
+	parent.appendChild( item );
 
-		}
+	if ( expanded.has( object.uuid ) ) {
 
-		container.appendChild( node );
+		const block = expanded.get( object.uuid );
+		block.style.marginLeft = `${level * 20}px`;
+		parent.appendChild( block );
 
-	} else {
+	}
 
-		container.appendChild( item );
+	for ( const child of children ) {
+
+		renderObject( child, parent, level + 1, invisible );
 
 	}
 
 }
 
-// Build the static DOM shell (called once)
-function initUI() {
+// Expand or collapse an object's details under its row
+function toggleDetails( uuid ) {
 
-	const header = document.createElement( 'div' );
-	header.className = 'header';
-	header.innerHTML = `<a href="https://docs.google.com/forms/d/e/1FAIpQLSdw1QcgXNiECYiPx6k0vSQRiRe0FmByrrojV4fgeL5zzXIiCw/viewform?usp=preview" target="_blank">+</a>
-		<span class="version">${chrome.runtime.getManifest().version}</span>`;
-	document.body.appendChild( header );
+	if ( expanded.has( uuid ) ) {
 
-	const sections = document.createElement( 'div' );
-	sections.className = 'sections-container';
-	document.body.appendChild( sections );
+		expanded.delete( uuid );
 
-	renderersSection = document.createElement( 'div' );
-	renderersSection.className = 'section';
-	sections.appendChild( renderersSection );
+	} else {
 
-	scenesSection = document.createElement( 'div' );
-	scenesSection.className = 'section';
-	sections.appendChild( scenesSection );
+		const image = document.createElement( 'img' );
+		image.className = 'preview';
 
-	floatingPanel = document.createElement( 'div' );
-	floatingPanel.className = 'floating-details';
-	document.body.appendChild( floatingPanel );
+		const block = document.createElement( 'div' );
+		block.className = 'properties-list';
+		block.appendChild( image );
+
+		expanded.set( uuid, block );
+		requestDetails( uuid, true );
+
+	}
+
+	updateSceneTree();
+
+}
+
+// The object rendered with its own material in one column, its transform, geometry and materials in the other.
+// Built once, then only refreshed, so the selections stay and the image does not flicker.
+function renderObjectDetails( block, details ) {
+
+	const groups = details.materials.map( material => [ material, Object.entries( material.properties ) ] );
+	if ( details.geometry !== null ) groups.unshift( [ details.geometry, Object.entries( details.geometry.properties ) ] );
+
+	// A swapped geometry or material changes a type, a name or the number of properties
+	const signature = groups.map( ( [ item, rows ] ) => item.type + item.name + rows.length ).join();
+
+	const image = block.firstChild;
+
+	// The first details fill an empty block, any later change is a swapped geometry or material
+	const swapped = block.dataset.signature !== undefined && block.dataset.signature !== signature;
+
+	if ( block.dataset.signature !== signature ) {
+
+		block.dataset.signature = signature;
+
+		// The render that arrived with these details is of what the object used to be
+		if ( swapped ) requestDetails( details.uuid, true );
+
+		const transform = document.createElement( 'div' );
+		transform.className = 'transform';
+
+		const column = document.createElement( 'div' );
+		column.className = 'property-group object-properties';
+		column.appendChild( transform );
+
+		for ( const [ item, rows ] of groups ) {
+
+			// The type in bold, then the name the page gave it
+			const heading = document.createElement( 'h4' );
+			heading.textContent = item.type;
+			if ( item.name ) appendDetail( heading, item.name );
+
+			column.append( heading, createPropertyPicker( rows ) );
+
+		}
+
+		block.replaceChildren( image, column );
+
+	}
+
+	const pickers = block.querySelectorAll( '.picker' );
+	groups.forEach( ( [ , rows ], i ) => updatePropertyPicker( pickers[ i ], rows ) );
+
+	// Only an object with a geometry can be rendered, the rest keep no tile at all
+	image.hidden = details.geometry === null;
+	if ( details.preview && image.src !== details.preview ) image.src = details.preview;
+
+	block.querySelector( '.transform' ).replaceChildren(
+		createPropertyRow( 'Position', details.position ),
+		createPropertyRow( 'Rotation', details.rotation ),
+		createPropertyRow( 'Scale', details.scale )
+	);
 
 }
 
@@ -456,65 +586,20 @@ function updateRenderers() {
 
 }
 
+// Rebuild the scene tree, forgetting expanded objects that are gone
 function updateSceneTree() {
+
+	for ( const uuid of expanded.keys() ) {
+
+		if ( ! state.objects.has( uuid ) ) {
+
+			expanded.delete( uuid );
+			pendingPreviews.delete( uuid );
+
+		}
+
+	}
 
 	renderSection( scenesSection, 'Scenes', state.scenes, renderObject );
 
 }
-
-// --- Floating details panel ---
-
-function showFloatingDetails( details ) {
-
-	floatingPanel.innerHTML = '';
-	floatingPanel.appendChild( createVectorRow( 'Position', details.position ) );
-	floatingPanel.appendChild( createVectorRow( 'Rotation', details.rotation ) );
-	floatingPanel.appendChild( createVectorRow( 'Scale', details.scale ) );
-
-	floatingPanel.classList.add( 'visible' );
-	updateFloatingPanelPosition();
-
-}
-
-function updateFloatingPanelPosition() {
-
-	if ( ! floatingPanel.classList.contains( 'visible' ) ) return;
-
-	const offset = 15; // Offset from cursor
-	let x = mousePosition.x + offset;
-	let y = mousePosition.y + offset;
-
-	// Prevent panel from going off-screen
-	const panelRect = floatingPanel.getBoundingClientRect();
-	const maxX = window.innerWidth - panelRect.width - 10;
-	const maxY = window.innerHeight - panelRect.height - 10;
-
-	if ( x > maxX ) x = mousePosition.x - panelRect.width - offset;
-	if ( y > maxY ) y = mousePosition.y - panelRect.height - offset;
-
-	floatingPanel.style.left = `${Math.max( 10, x )}px`;
-	floatingPanel.style.top = `${Math.max( 10, y )}px`;
-
-}
-
-// Track mouse position
-document.addEventListener( 'mousemove', ( event ) => {
-
-	mousePosition.x = event.clientX;
-	mousePosition.y = event.clientY;
-	updateFloatingPanelPosition();
-
-} );
-
-// Hide panel when mouse leaves the tree area
-document.addEventListener( 'mouseover', ( event ) => {
-
-	if ( ! event.target.closest( '.tree-item' ) ) {
-
-		floatingPanel.classList.remove( 'visible' );
-
-	}
-
-} );
-
-initUI();
