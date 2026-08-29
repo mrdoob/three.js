@@ -7,16 +7,27 @@
 	const utils = __THREE_DEVTOOLS__.utils;
 
 	let renderer = null;
-	let ready = false;
+	let ready = null;
 	let scene = null;
 
 	// The three.js base class of an instance, found right below the root class that defines rootMethod:
-	// Mesh below Object3D (traverse) for an InstancedMesh, Scene below Object3D for a page's own scene class
+	// Mesh below Object3D (traverse) for a SkinnedMesh, Scene below Object3D for a page's own scene class
 	function getBaseClass( instance, rootMethod ) {
 
 		let prototype = Object.getPrototypeOf( instance );
 
 		while ( ! Object.hasOwn( Object.getPrototypeOf( prototype ), rootMethod ) ) prototype = Object.getPrototypeOf( prototype );
+
+		return prototype.constructor;
+
+	}
+
+	// The class of an instance that defines a method: InstancedMesh for setMatrixAt, LineSegments or Line for computeLineDistances
+	function getClass( instance, method ) {
+
+		let prototype = Object.getPrototypeOf( instance );
+
+		while ( ! Object.hasOwn( prototype, method ) ) prototype = Object.getPrototypeOf( prototype );
 
 		return prototype.constructor;
 
@@ -31,8 +42,8 @@
 		// Scene itself, not a page subclass, since addLights derives Object3D from this class
 		scene = utils.unobserved( () => new ( getBaseClass( view.scene, 'traverse' ) )() );
 
-		// WebGPURenderer initializes asynchronously, previews start with the next request
-		if ( renderer.init ) renderer.init().then( () => ready = true ); else ready = true;
+		// WebGPURenderer initializes asynchronously, the first preview waits for it
+		ready = renderer.init ? renderer.init() : null;
 
 	}
 
@@ -112,34 +123,48 @@
 
 	}
 
-	utils.renderPreview = function ( object ) {
+	// A plain three.js object of the object's kind, so a page subclass's constructor and the object's own
+	// transform stay out of the way. An InstancedMesh keeps a single instance at the origin, so a material
+	// written for instancing still compiles. Skinning and batching are left out, the geometry previews well enough.
+	function createPreviewObject( object ) {
+
+		if ( object.isInstancedMesh ) return new ( getClass( object, 'setMatrixAt' ) )( object.geometry, object.material, 1 );
+
+		const Class = object.isLine ? getClass( object, 'computeLineDistances' ) : getBaseClass( object, 'traverse' );
+
+		return new Class( object.geometry, object.material );
+
+	}
+
+	utils.renderPreview = async function ( object ) {
 
 		// Only meshes, lines and points have something to preview
 		if ( ! object.isMesh && ! object.isLine && ! object.isPoints ) return null;
+
+		// A ShaderMaterial shares its uniforms with the page's renderer, which wires its light uniforms
+		// into them, so drawing it with another renderer breaks the page
+		if ( [].concat( object.material ).some( material => material.isShaderMaterial ) ) return null;
 
 		// The scene has to have been drawn once, so its renderer and camera are known
 		const view = utils.getSceneView( object );
 		if ( view === null ) return null;
 
-		if ( renderer === null ) setup( view );
-		if ( ready === false ) return null;
-
-		renderer.toneMapping = view.renderer.toneMapping;
-		renderer.toneMappingExposure = view.renderer.toneMappingExposure;
-		renderer.outputColorSpace = view.renderer.outputColorSpace;
-
-		scene.clear();
-		addLights( view.scene );
-
-		const geometry = object.geometry;
-		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
-
-		// A plain Mesh, Line or Points, so instancing, skinning and the object's own transform stay out of the way
-		const Class = getBaseClass( object, 'traverse' );
-
 		try {
 
-			return snapshot( new Class( geometry, object.material ), view.camera, geometry.boundingSphere.center, geometry.boundingSphere.radius );
+			if ( renderer === null ) setup( view );
+			await ready;
+
+			renderer.toneMapping = view.renderer.toneMapping;
+			renderer.toneMappingExposure = view.renderer.toneMappingExposure;
+			renderer.outputColorSpace = view.renderer.outputColorSpace;
+
+			scene.clear();
+			addLights( view.scene );
+
+			const geometry = object.geometry;
+			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
+			return snapshot( createPreviewObject( object ), view.camera, geometry.boundingSphere.center, geometry.boundingSphere.radius );
 
 		} catch ( error ) {
 

@@ -16,9 +16,6 @@ const openState = new Map();
 // Objects expanded in the tree (uuid -> its details block, kept across rebuilds so the selection and the image survive)
 const expanded = new Map();
 
-// Objects waiting for a render, so a slow round trip is not asked to repeat it
-const pendingPreviews = new Set();
-
 // Static DOM from panel.html
 const renderersSection = document.getElementById( 'renderers' );
 const scenesSection = document.getElementById( 'scenes' );
@@ -49,20 +46,8 @@ function poll() {
 
 	send( MESSAGE_REQUEST_STATE );
 
-	for ( const [ uuid, block ] of expanded ) {
-
-		// Rendering a preview costs the page a frame, so only ask again while the tile is empty
-		requestDetails( uuid, block.firstChild.src === '' && ! pendingPreviews.has( uuid ) );
-
-	}
-
-}
-
-function requestDetails( uuid, preview ) {
-
-	if ( preview ) pendingPreviews.add( uuid );
-
-	send( MESSAGE_REQUEST_OBJECT_DETAILS, { uuid: uuid, preview: preview } );
+	// A preview costs the page a frame, so it is only asked for on expand and when the geometry or material changes
+	for ( const uuid of expanded.keys() ) send( MESSAGE_REQUEST_OBJECT_DETAILS, { uuid: uuid, preview: false } );
 
 }
 
@@ -89,7 +74,6 @@ port.onMessage.addListener( ( message ) => {
 			break;
 
 		case EVENT_OBJECT_DETAILS:
-			pendingPreviews.delete( detail.uuid );
 			if ( expanded.has( detail.uuid ) ) renderObjectDetails( expanded.get( detail.uuid ), detail );
 			break;
 
@@ -504,7 +488,7 @@ function toggleDetails( uuid ) {
 		block.appendChild( image );
 
 		expanded.set( uuid, block );
-		requestDetails( uuid, true );
+		send( MESSAGE_REQUEST_OBJECT_DETAILS, { uuid: uuid, preview: true } );
 
 	}
 
@@ -532,7 +516,7 @@ function renderObjectDetails( block, details ) {
 		block.dataset.signature = signature;
 
 		// The render that arrived with these details is of what the object used to be
-		if ( swapped ) requestDetails( details.uuid, true );
+		if ( swapped ) send( MESSAGE_REQUEST_OBJECT_DETAILS, { uuid: details.uuid, preview: true } );
 
 		const transform = document.createElement( 'div' );
 		transform.className = 'transform';
@@ -559,9 +543,13 @@ function renderObjectDetails( block, details ) {
 	const pickers = block.querySelectorAll( '.picker' );
 	groups.forEach( ( [ , rows ], i ) => updatePropertyPicker( pickers[ i ], rows ) );
 
-	// Only an object with a geometry can be rendered, the rest keep no tile at all
-	image.hidden = details.geometry === null;
-	if ( details.preview && image.src !== details.preview ) image.src = details.preview;
+	// A preview comes with the details when one was asked for, an object that has none keeps no tile
+	if ( 'preview' in details ) {
+
+		image.hidden = details.preview === null;
+		if ( details.preview !== null ) image.src = details.preview;
+
+	}
 
 	block.querySelector( '.transform' ).replaceChildren(
 		createPropertyRow( 'Position', details.position ),
@@ -591,12 +579,7 @@ function updateSceneTree() {
 
 	for ( const uuid of expanded.keys() ) {
 
-		if ( ! state.objects.has( uuid ) ) {
-
-			expanded.delete( uuid );
-			pendingPreviews.delete( uuid );
-
-		}
+		if ( ! state.objects.has( uuid ) ) expanded.delete( uuid );
 
 	}
 

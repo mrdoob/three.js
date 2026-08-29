@@ -384,20 +384,24 @@
 
 	}
 
-	function sendObjectDetails( uuid, preview ) {
+	async function sendObjectDetails( uuid, preview ) {
 
 		const object = findObjectInScenes( uuid );
 		if ( object === null ) return;
 
-		postToPanel( EVENT_OBJECT_DETAILS, {
+		const details = {
 			uuid: uuid,
 			position: object.position.toArray(),
 			rotation: object.rotation.toArray(),
 			scale: object.scale.toArray(),
 			geometry: object.geometry ? getGeometryData( object.geometry ) : null,
-			materials: object.material ? [].concat( object.material ).map( getMaterialData ) : [],
-			preview: preview ? devTools.utils.renderPreview( object ) : null
-		} );
+			materials: object.material ? [].concat( object.material ).map( getMaterialData ) : []
+		};
+
+		// A preview costs the page a frame, so it comes along only when asked for
+		if ( preview ) details.preview = await devTools.utils.renderPreview( object );
+
+		postToPanel( EVENT_OBJECT_DETAILS, details );
 
 	}
 

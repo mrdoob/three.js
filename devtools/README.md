@@ -25,7 +25,7 @@ three.js has built-in support for the extension: when `window.__THREE_DEVTOOLS__
 - `manifest.json`: injects the page scripts into every frame at `document_start`.
 - `bridge.js`: runs in the page's main world. Creates `window.__THREE_DEVTOOLS__`, collects data from the observed renderers and scenes, and answers the panel's requests.
 - `highlight.js`: runs alongside the bridge. Draws a box around the hovered object in an overlay above the page, projected through the camera and viewport the scene is shown with (one per sub camera of an ArrayCamera).
-- `preview.js`: runs alongside the bridge. Renders an expanded object with its own material, using a renderer created from the page's own three.js, lit by the page's environment and by studio lights of its own (the page's lights on WebGPU).
+- `preview.js`: runs alongside the bridge. Renders an expanded object with its own material, using a renderer created from the page's own three.js, lit by the page's environment and by studio lights of its own (the page's lights on WebGPU). Materials with custom shaders are skipped, their uniforms belong to the page's renderer.
 - `content-script.js`: runs in the isolated world. Relays messages between the bridge and the background script.
 - `background.js`: service worker. Routes messages between the panel and the content script of the inspected tab, and manages the toolbar badge.
 - `devtools.js`: creates the "Three.js" panel.
