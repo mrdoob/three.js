@@ -472,17 +472,30 @@ function parseKeyframeTrack( json ) {
 
 	}
 
+	let track;
+
 	// derived classes can define a static parse method
 	if ( trackType.parse !== undefined ) {
 
-		return trackType.parse( json );
+		track = trackType.parse( json );
 
 	} else {
 
 		// by default, we assume a constructor compatible with the base
-		return new trackType( json.name, json.times, json.values, json.interpolation );
+		track = new trackType( json.name, json.times, json.values, json.interpolation );
 
 	}
+
+	if ( json.settings !== undefined && json.settings.inTangents !== undefined && json.settings.outTangents !== undefined ) {
+
+		track.settings = {
+			inTangents: AnimationUtils.convertArray( json.settings.inTangents, Float32Array ),
+			outTangents: AnimationUtils.convertArray( json.settings.outTangents, Float32Array )
+		};
+
+	}
+
+	return track;
 
 }
 
