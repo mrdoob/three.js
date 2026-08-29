@@ -1,4 +1,4 @@
-/* global chrome, importScripts, MESSAGE_ID, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, EVENT_REGISTER, EVENT_COMMITTED */
+/* global chrome, importScripts, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, EVENT_REGISTER, EVENT_COMMITTED */
 
 importScripts( 'constants.js' );
 
@@ -29,6 +29,24 @@ function clearBadge( tabId ) {
 
 }
 
+// The panel inspecting a tab, if one is open. A port that just closed throws, which is fine.
+function postToPanel( tabId, message ) {
+
+	const port = connections.get( tabId );
+	if ( port === undefined ) return;
+
+	try {
+
+		port.postMessage( message );
+
+	} catch ( error ) {
+
+		// Port already disconnected
+
+	}
+
+}
+
 // Toolbar icon click scrolls the page to its first canvas
 chrome.action.onClicked.addListener( ( tab ) => {
 
@@ -51,7 +69,7 @@ chrome.runtime.onConnect.addListener( ( port ) => {
 
 		} else if ( FORWARDABLE_MESSAGES.has( message.name ) ) {
 
-			chrome.tabs.sendMessage( tabId, message );
+			chrome.tabs.sendMessage( tabId, message ).catch( () => {} );
 
 		}
 
@@ -77,6 +95,8 @@ chrome.runtime.onMessage.addListener( ( message, sender ) => {
 			}
 		} );
 
+		return;
+
 	}
 
 	if ( sender.tab === undefined ) return;
@@ -93,24 +113,9 @@ chrome.runtime.onMessage.addListener( ( message, sender ) => {
 
 	}
 
-	const port = connections.get( tabId );
-
-	if ( port !== undefined ) {
-
-		// The panel keeps track of which frame each renderer and scene came from
-		message.frameId = sender.frameId;
-
-		try {
-
-			port.postMessage( message );
-
-		} catch ( error ) {
-
-			// Port already disconnected
-
-		}
-
-	}
+	// The panel keeps track of which frame each renderer and scene came from
+	message.frameId = sender.frameId;
+	postToPanel( tabId, message );
 
 } );
 
@@ -119,12 +124,6 @@ chrome.webNavigation.onCommitted.addListener( ( { tabId, frameId } ) => {
 
 	if ( frameId === 0 ) clearBadge( tabId );
 
-	const port = connections.get( tabId );
-
-	if ( port !== undefined ) {
-
-		port.postMessage( { id: MESSAGE_ID, name: EVENT_COMMITTED, frameId: frameId } );
-
-	}
+	postToPanel( tabId, { name: EVENT_COMMITTED, frameId: frameId } );
 
 } );

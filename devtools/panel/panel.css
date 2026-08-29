@@ -9,6 +9,7 @@ body {
 	padding: 10px;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 	font-size: 12px;
+	font-variant-numeric: tabular-nums; /* stats and transforms change every poll, so digits must not jitter */
 }
 
 .header {
@@ -22,7 +23,7 @@ body {
 	color: light-dark( #666, #aaa );
 }
 .header a {
-	color: light-dark( #666, #aaa );
+	color: inherit;
 	text-decoration: none;
 }
 .header a:hover {
@@ -32,8 +33,23 @@ body {
 	opacity: 0.5;
 }
 
+/* Shown while there is nothing else to show */
+#notice {
+	padding: 24px 12px;
+	text-align: center;
+	color: light-dark( #666, #aaa );
+}
+
+/* Side by side while both fit, stacked when the panel is narrow */
+.sections-container {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 24px 20px;
+}
 .section {
-	margin-bottom: 24px;
+	flex: 1 1 480px;
+	min-width: 0;
 }
 .section:empty {
 	display: none;
@@ -65,6 +81,9 @@ details > summary {
 .tree-item.invisible {
 	opacity: 0.5;
 }
+.tree-item.expanded {
+	background: light-dark( #dbe9ff, #2b4a6f );
+}
 .tree-item .icon {
 	margin-right: 4px;
 	opacity: 0.7;
@@ -75,9 +94,10 @@ details > summary {
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
-.tree-item .label .object-details {
+.object-details {
 	color: #aaa;
 	margin-left: 4px;
+	font-weight: normal;
 }
 .tree-item .type {
 	margin-left: 8px;
@@ -87,7 +107,7 @@ details > summary {
 
 .tree-toggle,
 .tree-toggle-placeholder {
-	width: 1em;
+	width: 1.5em;
 	margin-right: 2px;
 	text-align: center;
 	flex-shrink: 0;
@@ -101,27 +121,65 @@ details[open] > summary .tree-toggle::before {
 	content: '▼';
 }
 
-/* Renderer properties */
+/* Properties of an expanded renderer or object: content-sized columns, wrapping when the panel is narrow */
 .properties-list {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-	gap: 10px 20px;
-	padding-left: 20px;
-}
-.properties-list h4:not(:first-child) {
-	margin-top: 10px;
-}
-.property-row {
 	display: flex;
-	justify-content: space-between;
-	margin-bottom: 2px;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 12px 16px;
+	padding: 8px 4px 12px 16px;
 }
-.property-label {
-	margin-right: 10px;
-	white-space: nowrap;
+.property-group {
+	display: grid;
+	grid-template-columns: max-content minmax(0, max-content);
+	gap: 2px 16px;
+}
+.property-group h4 {
+	grid-column: 1 / -1;
+	margin: 12px 0 4px;
+}
+.property-group h4:first-child {
+	margin-top: 0;
+}
+.property-column .property-group + .property-group {
+	margin-top: 12px;
+}
+.property-row,
+.transform {
+	display: contents;
 }
 .property-value {
 	text-align: right;
+	overflow-wrap: anywhere;
+}
+
+/* The type headings are wider than their rows, so the value column takes the extra width
+   and every value stays next to the label it belongs to */
+.object-properties {
+	grid-template-columns: max-content minmax(0, 1fr);
+}
+.object-properties .property-value {
+	text-align: left;
+}
+.picker select {
+	font: inherit;
+	max-width: 80px; /* as wide as its longest option otherwise */
+}
+/* The tile is the placeholder too, so the size lives here and preview.js renders to match.
+   It holds the render as its background, or the reason there is none as text. */
+.preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	width: 160px;
+	height: 160px;
+	padding: 0 12px;
+	border-radius: 4px;
+	background: #eee center / contain no-repeat; /* light in both themes, the render is transparent */
+	color: #aaa;
+	font-size: 11px;
+	text-align: center;
 }
 
 /* Scroll to canvas button */
@@ -144,43 +202,4 @@ details[open] > summary .tree-toggle::before {
 	margin-left: 8px;
 	padding: 2px 4px;
 	opacity: 0.3;
-}
-
-/* Floating object details panel */
-.floating-details {
-	position: fixed;
-	z-index: 1000;
-	background: light-dark( #fff, #2a2a2a );
-	border: 1px solid light-dark( #ccc, #555 );
-	border-radius: 6px;
-	padding: 12px;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-	pointer-events: none; /* Prevent interfering with mouse interactions */
-	opacity: 0;
-	transform: translateY(10px);
-	transition: opacity 0.2s ease, transform 0.2s ease;
-}
-.floating-details.visible {
-	opacity: 1;
-	transform: translateY(0);
-}
-.floating-details .vector-row {
-	margin-bottom: 2px;
-	font-family: monospace;
-	font-size: 10px;
-	white-space: pre;
-}
-
-/* Two-column layout for wide panel */
-@media (min-width: 1000px) {
-	.sections-container {
-		display: flex;
-		gap: 20px;
-		align-items: flex-start;
-	}
-	.sections-container .section {
-		flex: 1;
-		min-width: 0;
-		margin-bottom: 0;
-	}
 }
