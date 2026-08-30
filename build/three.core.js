@@ -41729,6 +41729,18 @@ function convertArray( array, type ) {
 }
 
 /**
+ * Returns `true` if the given keyframe track settings hold Bezier tangent data.
+ *
+ * @param {?Object} settings - The settings of a keyframe track.
+ * @return {boolean} Whether both tangent arrays are defined or not.
+ */
+function hasTangents( settings ) {
+
+	return settings !== undefined && settings.inTangents !== undefined && settings.outTangents !== undefined;
+
+}
+
+/**
  * Returns an array by which times and values can be sorted.
  *
  * @param {Array<number>} times - The keyframe time values.
@@ -42107,6 +42119,19 @@ class AnimationUtils {
 	static isTypedArray( object ) {
 
 		return isTypedArray( object );
+
+	}
+
+	/**
+	 * Returns `true` if the given keyframe track settings hold Bezier tangent data.
+	 *
+	 * @static
+	 * @param {?Object} settings - The settings of a keyframe track.
+	 * @return {boolean} Whether both tangent arrays are defined or not.
+	 */
+	static hasTangents( settings ) {
+
+		return hasTangents( settings );
 
 	}
 
@@ -42939,6 +42964,15 @@ class KeyframeTrack {
 
 			}
 
+			if ( hasTangents( track.settings ) ) {
+
+				json.settings = {
+					inTangents: convertArray( track.settings.inTangents, Array ),
+					outTangents: convertArray( track.settings.outTangents, Array )
+				};
+
+			}
+
 		}
 
 		json.type = track.ValueTypeName; // mandatory
@@ -43161,6 +43195,13 @@ class KeyframeTrack {
 			for ( let i = 0, n = times.length; i !== n; ++ i ) {
 
 				times[ i ] *= timeScale;
+
+			}
+
+			if ( hasTangents( this.settings ) ) {
+
+				scaleTangentTimes( this.settings.inTangents, timeScale );
+				scaleTangentTimes( this.settings.outTangents, timeScale );
 
 			}
 
@@ -43439,7 +43480,28 @@ class KeyframeTrack {
 		// Interpolant argument to constructor is not saved, so copy the factory method directly.
 		track.createInterpolant = this.createInterpolant;
 
+		if ( hasTangents( this.settings ) ) {
+
+			track.settings = {
+				inTangents: this.settings.inTangents.slice(),
+				outTangents: this.settings.outTangents.slice()
+			};
+
+		}
+
 		return track;
+
+	}
+
+}
+
+function scaleTangentTimes( tangents, timeScale ) {
+
+	// tangents are [ time, value ] pairs, so only every second entry is a time
+
+	for ( let i = 0, n = tangents.length; i !== n; i += 2 ) {
+
+		tangents[ i ] *= timeScale;
 
 	}
 
@@ -44225,17 +44287,30 @@ function parseKeyframeTrack( json ) {
 
 	}
 
+	let track;
+
 	// derived classes can define a static parse method
 	if ( trackType.parse !== undefined ) {
 
-		return trackType.parse( json );
+		track = trackType.parse( json );
 
 	} else {
 
 		// by default, we assume a constructor compatible with the base
-		return new trackType( json.name, json.times, json.values, json.interpolation );
+		track = new trackType( json.name, json.times, json.values, json.interpolation );
 
 	}
+
+	if ( hasTangents( json.settings ) ) {
+
+		track.settings = {
+			inTangents: convertArray( json.settings.inTangents, Float32Array ),
+			outTangents: convertArray( json.settings.outTangents, Float32Array )
+		};
+
+	}
+
+	return track;
 
 }
 
