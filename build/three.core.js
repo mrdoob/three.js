@@ -21760,13 +21760,6 @@ class Material extends EventDispatcher {
 		if ( this.shininess !== undefined ) data.shininess = this.shininess;
 		if ( this.clearcoat !== undefined ) data.clearcoat = this.clearcoat;
 		if ( this.clearcoatRoughness !== undefined ) data.clearcoatRoughness = this.clearcoatRoughness;
-		if ( this.diffuseRoughness !== undefined ) data.diffuseRoughness = this.diffuseRoughness;
-
-		if ( this.diffuseRoughnessMap && this.diffuseRoughnessMap.isTexture ) {
-
-			data.diffuseRoughnessMap = this.diffuseRoughnessMap.toJSON( meta ).uuid;
-
-		}
 
 		if ( this.clearcoatMap && this.clearcoatMap.isTexture ) {
 
@@ -21991,7 +21984,6 @@ class Material extends EventDispatcher {
 		if ( json.shininess !== undefined ) this.shininess = json.shininess;
 		if ( json.clearcoat !== undefined ) this.clearcoat = json.clearcoat;
 		if ( json.clearcoatRoughness !== undefined ) this.clearcoatRoughness = json.clearcoatRoughness;
-		if ( json.diffuseRoughness !== undefined ) this.diffuseRoughness = json.diffuseRoughness;
 		if ( json.dispersion !== undefined ) this.dispersion = json.dispersion;
 		if ( json.retroreflectivity !== undefined ) this.retroreflectivity = json.retroreflectivity;
 		if ( json.iridescence !== undefined ) this.iridescence = json.iridescence;
@@ -22149,7 +22141,6 @@ class Material extends EventDispatcher {
 		if ( json.clearcoatRoughnessMap !== undefined ) this.clearcoatRoughnessMap = textures[ json.clearcoatRoughnessMap ] || null;
 		if ( json.clearcoatNormalMap !== undefined ) this.clearcoatNormalMap = textures[ json.clearcoatNormalMap ] || null;
 		if ( json.clearcoatNormalScale !== undefined ) this.clearcoatNormalScale = new Vector2().fromArray( json.clearcoatNormalScale );
-		if ( json.diffuseRoughnessMap !== undefined ) this.diffuseRoughnessMap = textures[ json.diffuseRoughnessMap ] || null;
 
 		if ( json.iridescenceMap !== undefined ) this.iridescenceMap = textures[ json.iridescenceMap ] || null;
 		if ( json.iridescenceThicknessMap !== undefined ) this.iridescenceThicknessMap = textures[ json.iridescenceThicknessMap ] || null;
@@ -39086,8 +39077,6 @@ class MeshStandardMaterial extends Material {
  * - Clearcoat: Some materials — like car paints, carbon fiber, and wet surfaces — require
  * a clear, reflective layer on top of another layer that may be irregular or rough.
  * Clearcoat approximates this effect, without the need for a separate transparent surface.
- * - Diffuse roughness: Produces the flatter appearance and enhanced backscattering of
- * rough diffuse surfaces such as clay, concrete, and unpolished materials.
  * - Iridescence: Allows to render the effect where hue varies  depending on the viewing
  * angle and illumination angle. This can be seen on soap bubbles, oil films, or on the
  * wings of many insects.
@@ -39214,18 +39203,6 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		 * @default null
 		 */
 		this.clearcoatNormalMap = null;
-
-		/**
-		 * The red channel of this texture is multiplied against `diffuseRoughness`,
-		 * for per-pixel control over the diffuse roughness.
-		 *
-		 * `diffuseRoughnessMap` represents non-color data. Any texture assigned must have
-		 * `texture.colorSpace = NoColorSpace` (default).
-		 *
-		 * @type {?Texture}
-		 * @default null
-		 */
-		this.diffuseRoughnessMap = null;
 
 		/**
 		 * Index-of-refraction for non-metallic materials, from `1.0` to `2.333`.
@@ -39442,7 +39419,6 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		this._anisotropy = 0;
 		this._clearcoat = 0;
-		this._diffuseRoughness = 0;
 		this._dispersion = 0;
 		this._iridescence = 0;
 		this._retroreflectivity = 0;
@@ -39502,33 +39478,6 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this._clearcoat = value;
 
 	}
-
-	/**
-	 * Roughness of the diffuse layer, from `0.0` to `1.0`. A value of `0.0`
-	 * uses Lambertian diffuse reflection. Values above `0.0` use the EON
-	 * energy-preserving rough diffuse model.
-	 *
-	 * @type {number}
-	 * @default 0
-	 */
-	get diffuseRoughness() {
-
-		return this._diffuseRoughness;
-
-	}
-
-	set diffuseRoughness( value ) {
-
-		if ( this._diffuseRoughness > 0 !== value > 0 ) {
-
-			this.version ++;
-
-		}
-
-		this._diffuseRoughness = value;
-
-	}
-
 	/**
 	 * The intensity of the iridescence layer, simulating RGB color shift based on the angle between
 	 * the surface and the viewer, from `0.0` to `1.0`.
@@ -39682,8 +39631,6 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.clearcoatRoughnessMap = source.clearcoatRoughnessMap;
 		this.clearcoatNormalMap = source.clearcoatNormalMap;
 		this.clearcoatNormalScale.copy( source.clearcoatNormalScale );
-		this.diffuseRoughness = source.diffuseRoughness;
-		this.diffuseRoughnessMap = source.diffuseRoughnessMap;
 
 		this.dispersion = source.dispersion;
 		this.ior = source.ior;
