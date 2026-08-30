@@ -1,6 +1,6 @@
 <html lang="en">
 	<head>
-		<title>three.js webgpu - compute reduction</title>
+		<title>three.js webgpu - compute prefix sum</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,7 +9,7 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
-			<br /> This example demonstrates a prefix sum operation on a buffer of data.
+			<br /> This example demonstrates an exclusive prefix sum operation on a buffer of data that only contains unsigned values of 1.
 			<br /> Reference implementations are translated from the WGSL code present in <a href="https://github.com/b0nes164/GPUPrefixSums/blob/main/GPUPrefixSumsWebGPUapis/SharedShaders/rts.wgsl"><i>GPUPrefixSums</i></a> by <a href="https://github.com/b0nes164">b0nes164</a>
 		</div>
 
@@ -45,13 +45,11 @@
 
 			const effectController = {
 				currentStep: 'Reduce',
-				loggedBuffer: 'Reduction',
+				loggedBuffer: 'Output',
 				displayedBuffer: 'Reduction',
 			};
 
 			const PREFIX_SUM_BUFFER_TYPES = {
-				INPUT: 'Input',
-				REDUCTION: 'Reduction',
 				OUTPUT: 'Output'
 			};
 
@@ -93,12 +91,12 @@
 				await renderer.init();
 
 				// Arguments: renderer/compute engine + buffer attribute holding the data to sum
-				const prefixSumModule = new PrefixSum( inputAttribute );
+				const prefixSumModule = new PrefixSum( inputAttribute, { isInclusive: false } );
 				console.log( prefixSumModule );
 
 				computeReset = Fn( () => {
 
-					const { outputBuffer } = prefixSumModule.storageBuffers;
+					const { outputBuffer } = prefixSumModule._storageBuffers;
 
 					outputBuffer.element( instanceIndex ).assign( vec4( 1, 1, 1, 1 ) );
 
@@ -153,7 +151,7 @@
 
 				};
 
-				scene.add( createDisplayMesh( prefixSumModule.storageBuffers.unvectorizedOutputBuffer ) );
+				scene.add( createDisplayMesh( prefixSumModule._storageBuffers.unvectorizedOutputBuffer ) );
 
 				const animate = () => {
 
@@ -163,13 +161,27 @@
 
 				let prefixSumComplete = false;
 
-				const validateOutput = ( values ) => {
+				const validateOutput = ( values, isInclusive ) => {
+
+					const sumType = isInclusive ? 'Inclusive' : 'Exclusive';
+
+					let validate;
+
+					if ( isInclusive ) {
+
+						validate = ( values, i ) => values[ i ] === i + 1;
+
+					} else {
+
+						validate = ( values, i ) => values[ i ] === i;
+
+					}
 
 					for ( let i = 0; i < size; i ++ ) {
 
-						if ( values[ i ] !== i + 1 ) {
+						if ( ! validate( values, i ) ) {
 
-							console.error( `Prefix sum invalid: element ${ i } is ${ values[ i ] }, expected ${ i + 1 }.` );
+							console.error( `${sumType} Prefix Sum invalid: element ${ i } is ${ values[ i ] } in sum of all 1s buffer.` );
 
 							return;
 
@@ -177,7 +189,7 @@
 
 					}
 
-					console.log( `Prefix sum valid: all ${ size } elements hold their index + 1.` );
+					console.log( `Prefix sum valid: all ${ size } elements hold their index.` );
 
 				};
 
@@ -186,22 +198,7 @@
 				const functionObj = {};
 				functionObj[ logFunctionName ] = async() => {
 
-					let selectedBuffer;
-
-					if ( effectController.loggedBuffer === PREFIX_SUM_BUFFER_TYPES.REDUCTION ) {
-
-						selectedBuffer = prefixSumModule.storageBuffers.reductionBuffer;
-
-					} else if ( effectController.loggedBuffer === PREFIX_SUM_BUFFER_TYPES.INPUT ) {
-
-						selectedBuffer = prefixSumModule.storageBuffers.unvectorizedOutputBuffer;
-
-					} else {
-
-						selectedBuffer = prefixSumModule.storageBuffers.outputBuffer;
-
-					}
-
+					const selectedBuffer = prefixSumModule._storageBuffers.outputBuffer;
 					const values = new Uint32Array( await renderer.getArrayBufferAsync( selectedBuffer.value ) );
 
 					console.log( values );
