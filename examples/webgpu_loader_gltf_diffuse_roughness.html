@@ -20,7 +20,7 @@
 			</div>
 
 			<small>
-				<a href="https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_diffuse_roughness" target="_blank" rel="noopener">KHR_materials_diffuse_roughness</a> parameter sweep from <a href="https://github.com/KhronosGroup/glTF-Sample-Assets/pull/288" target="_blank" rel="noopener">glTF-Sample-Assets</a>
+				<a href="https://github.com/KhronosGroup/glTF/pull/2481" target="_blank" rel="noopener">KHR_materials_diffuse_roughness</a> parameter sweep from <a href="https://github.com/KhronosGroup/glTF-Sample-Assets/pull/288" target="_blank" rel="noopener">glTF-Sample-Assets</a>
 			</small>
 		</div>
 
@@ -47,7 +47,7 @@
 			let model;
 
 			const lightSettings = {
-				azimuth: 180,
+				azimuth: 0,
 				elevation: 0,
 				intensity: 3
 			};
@@ -67,7 +67,7 @@
 				scene.background = new THREE.Color( 0x202124 );
 
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.set( 0, 0, - 1 );
+				camera.position.set( 0, 0, 1 );
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
