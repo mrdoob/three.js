@@ -3464,7 +3464,7 @@ class NodeBuilder {
 
 		const mrt = this.renderer.getMRT();
 
-		return ( mrt && mrt.has( 'velocity' ) ) || getDataFromObject( this.object ).useVelocity === true;
+		return ( mrt && mrt.has( 'velocity' ) ) || ( this.object !== null && getDataFromObject( this.object ).useVelocity === true );
 
 	}
 
