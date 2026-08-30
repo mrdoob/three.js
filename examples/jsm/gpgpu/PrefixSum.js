@@ -402,7 +402,7 @@ export class PrefixSum {
 
 			reductionBuffer.element( invocationSubgroupIndex ).assign( subgroupInclusiveAdd( reductionBuffer.element( invocationSubgroupIndex ) ) );
 
-		} )().compute( this.numWorkgroups, [ this.workgroupSize ] ).setName( 'PrefixSumSpineScanShort' );
+		} )().compute( this.numWorkgroups, [ this.numWorkgroups ] ).setName( 'PrefixSumSpineScanShort' );
 
 	}
 
