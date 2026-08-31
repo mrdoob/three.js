@@ -832,46 +832,46 @@ class VXGIVolume {
 
 			If( triangleIndex.lessThan( triangleCount ), () => {
 
-				const base = triangleIndex.mul( 5 ).toVar();
+				const base = triangleIndex.mul( 5 ).toConst();
 
 				// triangle in sub-voxel space
 
-				const p0 = triangles.element( base ).xyz.sub( boundsMin ).mul( invSubVoxel ).toVar();
-				const p1 = triangles.element( base.add( 1 ) ).xyz.sub( boundsMin ).mul( invSubVoxel ).toVar();
-				const p2 = triangles.element( base.add( 2 ) ).xyz.sub( boundsMin ).mul( invSubVoxel ).toVar();
+				const p0 = triangles.element( base ).xyz.sub( boundsMin ).mul( invSubVoxel ).toConst();
+				const p1 = triangles.element( base.add( 1 ) ).xyz.sub( boundsMin ).mul( invSubVoxel ).toConst();
+				const p2 = triangles.element( base.add( 2 ) ).xyz.sub( boundsMin ).mul( invSubVoxel ).toConst();
 
-				const n = cross( p1.sub( p0 ), p2.sub( p0 ) ).toVar();
-				const an = abs( n ).toVar();
+				const n = cross( p1.sub( p0 ), p2.sub( p0 ) ).toConst();
+				const an = abs( n ).toConst();
 
 				// project along the dominant axis: swizzle so the dominant axis becomes z
 
-				const isZ = an.z.greaterThanEqual( an.x ).and( an.z.greaterThanEqual( an.y ) ).toVar();
-				const isY = isZ.not().and( an.y.greaterThanEqual( an.x ) ).toVar();
+				const isZ = an.z.greaterThanEqual( an.x ).and( an.z.greaterThanEqual( an.y ) ).toConst();
+				const isY = isZ.not().and( an.y.greaterThanEqual( an.x ) ).toConst();
 
 				const swizzle = ( v ) => select( isZ, v.xyz, select( isY, v.zxy, v.yzx ) );
 
-				const q0 = swizzle( p0 ).toVar();
-				const q1 = swizzle( p1 ).toVar();
-				const q2 = swizzle( p2 ).toVar();
-				const nq = swizzle( n ).toVar();
-				const sd = swizzle( subSize ).toVar();
+				const q0 = swizzle( p0 ).toConst();
+				const q1 = swizzle( p1 ).toConst();
+				const q2 = swizzle( p2 ).toConst();
+				const nq = swizzle( n ).toConst();
+				const sd = swizzle( subSize ).toConst();
 
-				const qmin = min( q0, min( q1, q2 ) ).toVar();
-				const qmax = max( q0, max( q1, q2 ) ).toVar();
+				const qmin = min( q0, min( q1, q2 ) ).toConst();
+				const qmax = max( q0, max( q1, q2 ) ).toConst();
 
-				const i0 = int( floor( qmin.x ) ).max( 0 ).toVar();
-				const i1 = int( floor( qmax.x ) ).min( int( sd.x ).sub( 1 ) ).toVar();
-				const j0 = int( floor( qmin.y ) ).max( 0 ).toVar();
-				const j1 = int( floor( qmax.y ) ).min( int( sd.y ).sub( 1 ) ).toVar();
+				const i0 = int( floor( qmin.x ) ).max( 0 ).toConst();
+				const i1 = int( floor( qmax.x ) ).min( int( sd.x ).sub( 1 ) ).toConst();
+				const j0 = int( floor( qmin.y ) ).max( 0 ).toConst();
+				const j1 = int( floor( qmax.y ) ).min( int( sd.y ).sub( 1 ) ).toConst();
 
 				// conservative edge functions
 
-				const areaSign = sign( nq.z ).toVar();
+				const areaSign = sign( nq.z ).toConst();
 
 				const edge = ( a, b ) => {
 
-					const normal = vec2( a.y.sub( b.y ), b.x.sub( a.x ) ).mul( areaSign ).toVar();
-					const bias = float( 0.5 ).mul( abs( normal.x ).add( abs( normal.y ) ) ).toVar();
+					const normal = vec2( a.y.sub( b.y ), b.x.sub( a.x ) ).mul( areaSign ).toConst();
+					const bias = float( 0.5 ).mul( abs( normal.x ).add( abs( normal.y ) ) ).toConst();
 
 					return { a, normal, bias };
 
@@ -881,11 +881,11 @@ class VXGIVolume {
 				const e1 = edge( q1.xy, q2.xy );
 				const e2 = edge( q2.xy, q0.xy );
 
-				const halfExtent = float( 0.5 ).mul( abs( nq.x ).add( abs( nq.y ) ) ).div( abs( nq.z ) ).toVar();
+				const halfExtent = float( 0.5 ).mul( abs( nq.x ).add( abs( nq.y ) ) ).div( abs( nq.z ) ).toConst();
 
 				Loop( { start: i0, end: i1, type: 'int', condition: '<=', name: 'i' }, { start: j0, end: j1, type: 'int', condition: '<=', name: 'j' }, ( { i, j } ) => {
 
-					const c = vec2( float( i ).add( 0.5 ), float( j ).add( 0.5 ) ).toVar();
+					const c = vec2( float( i ).add( 0.5 ), float( j ).add( 0.5 ) ).toConst();
 
 					const inside = dot( e0.normal, c.sub( e0.a ) ).add( e0.bias ).greaterThanEqual( 0 )
 						.and( dot( e1.normal, c.sub( e1.a ) ).add( e1.bias ).greaterThanEqual( 0 ) )
@@ -895,18 +895,18 @@ class VXGIVolume {
 
 						// depth range of the triangle plane within this column
 
-						const wc = q0.z.sub( nq.x.mul( c.x.sub( q0.x ) ).add( nq.y.mul( c.y.sub( q0.y ) ) ).div( nq.z ) ).toVar();
+						const wc = q0.z.sub( nq.x.mul( c.x.sub( q0.x ) ).add( nq.y.mul( c.y.sub( q0.y ) ) ).div( nq.z ) ).toConst();
 
-						const k0 = int( floor( max( wc.sub( halfExtent ), qmin.z ) ) ).max( 0 ).toVar();
-						const k1 = int( floor( min( wc.add( halfExtent ), qmax.z ) ) ).min( int( sd.z ).sub( 1 ) ).toVar();
+						const k0 = int( floor( max( wc.sub( halfExtent ), qmin.z ) ) ).max( 0 ).toConst();
+						const k1 = int( floor( min( wc.add( halfExtent ), qmax.z ) ) ).min( int( sd.z ).sub( 1 ) ).toConst();
 
 						Loop( { start: k0, end: k1, type: 'int', condition: '<=', name: 'k' }, ( { k } ) => {
 
-							const s = select( isZ, ivec3( i, j, k ), select( isY, ivec3( j, k, i ), ivec3( k, i, j ) ) ).toVar();
+							const s = select( isZ, ivec3( i, j, k ), select( isY, ivec3( j, k, i ), ivec3( k, i, j ) ) ).toConst();
 
-							const voxel = uvec3( s.div( 2 ) ).toVar();
-							const bit = uint( s.x.bitAnd( 1 ) ).bitOr( uint( s.y.bitAnd( 1 ) ).shiftLeft( uint( 1 ) ) ).bitOr( uint( s.z.bitAnd( 1 ) ).shiftLeft( uint( 2 ) ) ).toVar();
-							const voxelIndex = voxel.x.add( gx.mul( voxel.y.add( gy.mul( voxel.z ) ) ) ).toVar();
+							const voxel = uvec3( s.div( 2 ) ).toConst();
+							const bit = uint( s.x.bitAnd( 1 ) ).bitOr( uint( s.y.bitAnd( 1 ) ).shiftLeft( uint( 1 ) ) ).bitOr( uint( s.z.bitAnd( 1 ) ).shiftLeft( uint( 2 ) ) ).toConst();
+							const voxelIndex = voxel.x.add( gx.mul( voxel.y.add( gy.mul( voxel.z ) ) ) ).toConst();
 
 							atomicOr( occupancy.element( voxelIndex ), uint( 1 ).shiftLeft( bit ) );
 							triangleIds.element( voxelIndex ).assign( triangleIndex.add( 1 ) );
@@ -934,8 +934,8 @@ class VXGIVolume {
 
 			If( instanceIndex.lessThan( voxelCount ), () => {
 
-				const coords = this._coords( instanceIndex, size ).toVar();
-				const bits = occupancy.element( instanceIndex ).toVar();
+				const coords = this._coords( instanceIndex, size ).toConst();
+				const bits = occupancy.element( instanceIndex ).toConst();
 
 				// per-axis coverage from the 2x2x2 sub-voxel occupancy
 
@@ -973,8 +973,8 @@ class VXGIVolume {
 
 			If( instanceIndex.lessThan( uint( count ) ), () => {
 
-				const coords = this._coords( instanceIndex, size ).toVar();
-				const base = ivec3( coords.mul( uint( 2 ) ) ).toVar();
+				const coords = this._coords( instanceIndex, size ).toConst();
+				const base = ivec3( coords.mul( uint( 2 ) ) ).toConst();
 
 				const children = [];
 
@@ -984,7 +984,7 @@ class VXGIVolume {
 
 						for ( let x = 0; x < 2; x ++ ) {
 
-							children[ x + y * 2 + z * 4 ] = source.load( base.add( ivec3( x, y, z ) ) ).toVar();
+							children[ x + y * 2 + z * 4 ] = source.load( base.add( ivec3( x, y, z ) ) ).toConst();
 
 						}
 
@@ -1033,8 +1033,8 @@ class VXGIVolume {
 
 			If( instanceIndex.lessThan( uint( count ) ), () => {
 
-				const coords = this._coords( instanceIndex, size ).toVar();
-				const base = ivec3( coords.mul( uint( 2 ) ) ).toVar();
+				const coords = this._coords( instanceIndex, size ).toConst();
+				const base = ivec3( coords.mul( uint( 2 ) ) ).toConst();
 
 				let sum = vec4( 0 );
 
@@ -1088,8 +1088,8 @@ class VXGIVolume {
 
 			If( instanceIndex.lessThan( uint( count ) ), () => {
 
-				const coords = this._coords( instanceIndex, size ).toVar();
-				const base = ivec3( coords.mul( uint( 2 ) ) ).toVar();
+				const coords = this._coords( instanceIndex, size ).toConst();
+				const base = ivec3( coords.mul( uint( 2 ) ) ).toConst();
 
 				const offset = ( i ) => ivec3( i & 1, ( i >> 1 ) & 1, ( i >> 2 ) & 1 );
 
@@ -1099,12 +1099,12 @@ class VXGIVolume {
 
 				for ( let i = 0; i < 8; i ++ ) {
 
-					childOpacity.push( opacity.load( base.add( offset( i ) ) ).level( level - 1 ).toVar() );
+					childOpacity.push( opacity.load( base.add( offset( i ) ) ).level( level - 1 ).toConst() );
 
 					if ( level === 1 ) {
 
-						childNormal.push( normals.load( base.add( offset( i ) ) ).xyz.mul( 2 ).sub( 1 ).toVar() );
-						childRadiance.push( radiance.load( base.add( offset( i ) ) ).toVar() );
+						childNormal.push( normals.load( base.add( offset( i ) ) ).xyz.mul( 2 ).sub( 1 ).toConst() );
+						childRadiance.push( radiance.load( base.add( offset( i ) ) ).toConst() );
 
 					}
 
@@ -1160,17 +1160,17 @@ class VXGIVolume {
 
 		const triangles = this._trianglesNode;
 
-		const base = triangleId.sub( 1 ).mul( 5 ).toVar();
-		const a = triangles.element( base ).xyz.toVar();
-		const b = triangles.element( base.add( 1 ) ).xyz.toVar();
-		const c = triangles.element( base.add( 2 ) ).xyz.toVar();
-		const albedo = triangles.element( base.add( 3 ) ).toVar();
-		const emissive = triangles.element( base.add( 4 ) ).xyz.toVar();
+		const base = triangleId.sub( 1 ).mul( 5 ).toConst();
+		const a = triangles.element( base ).xyz.toConst();
+		const b = triangles.element( base.add( 1 ) ).xyz.toConst();
+		const c = triangles.element( base.add( 2 ) ).xyz.toConst();
+		const albedo = triangles.element( base.add( 3 ) ).toConst();
+		const emissive = triangles.element( base.add( 4 ) ).xyz.toConst();
 
 		const normal = normalize( cross( b.sub( a ), c.sub( a ) ) ).toVar();
 		normal.assign( select( albedo.w.equal( 1 ), normal.negate(), normal ) ); // back side
 
-		const position = this.boundsMinNode.add( vec3( coords ).add( 0.5 ).mul( this.voxelSizeNode ) ).toVar();
+		const position = this.boundsMinNode.add( vec3( coords ).add( 0.5 ).mul( this.voxelSizeNode ) ).toConst();
 
 		return { position, normal, albedo: albedo.xyz, side: albedo.w, emissive };
 
@@ -1202,8 +1202,8 @@ class VXGIVolume {
 
 			If( instanceIndex.lessThan( voxelCount ), () => {
 
-				const coords = this._coords( instanceIndex, size ).toVar();
-				const bits = occupancy.element( instanceIndex ).toVar();
+				const coords = this._coords( instanceIndex, size ).toConst();
+				const bits = occupancy.element( instanceIndex ).toConst();
 				const result = vec4( 0 ).toVar();
 				const encodedNormal = normalTexture !== null ? vec4( 0 ).toVar() : null;
 
@@ -1223,10 +1223,10 @@ class VXGIVolume {
 						const type = lightTypes[ i ];
 						const shadowTexture = lightShadows[ i ];
 
-						const l0 = lights.element( i * 4 ).toVar();
-						const l1 = lights.element( i * 4 + 1 ).toVar();
-						const l2 = lights.element( i * 4 + 2 ).toVar();
-						const l3 = lights.element( i * 4 + 3 ).toVar();
+						const l0 = lights.element( i * 4 ).toConst();
+						const l1 = lights.element( i * 4 + 1 ).toConst();
+						const l2 = lights.element( i * 4 + 2 ).toConst();
+						const l3 = lights.element( i * 4 + 3 ).toConst();
 
 						const lightDirection = vec3( 0 ).toVar();
 						const lightDistance = float( 1e10 ).toVar();
@@ -1238,7 +1238,7 @@ class VXGIVolume {
 
 						} else {
 
-							const lightVector = l0.xyz.sub( position ).toVar();
+							const lightVector = l0.xyz.sub( position ).toConst();
 							lightDistance.assign( length( lightVector ) );
 							lightDirection.assign( lightVector.div( lightDistance ) );
 							attenuation.assign( getDistanceAttenuation( { lightDistance, cutoffDistance: l1.w, decayExponent: l2.w } ) );
@@ -1257,7 +1257,7 @@ class VXGIVolume {
 						If( ndl.greaterThan( 0 ).and( attenuation.greaterThan( 0 ) ), () => {
 
 							const visibility = float( 1 ).toVar();
-							const shadowPosition = position.add( normal.mul( voxelSize ) ).toVar();
+							const shadowPosition = position.add( normal.mul( voxelSize ) ).toConst();
 
 							if ( shadowTexture === null ) {
 
@@ -1274,9 +1274,9 @@ class VXGIVolume {
 								const params = shadowParams[ i ];
 								const bias = params.x, near = params.y, far = params.z;
 
-								const lightToVoxel = shadowPosition.sub( l0.xyz ).toVar();
-								const absVector = abs( lightToVoxel ).toVar();
-								const viewZ = max( max( absVector.x, absVector.y ), absVector.z ).toVar();
+								const lightToVoxel = shadowPosition.sub( l0.xyz ).toConst();
+								const absVector = abs( lightToVoxel ).toConst();
+								const viewZ = max( max( absVector.x, absVector.y ), absVector.z ).toConst();
 
 								If( viewZ.greaterThanEqual( near ).and( viewZ.lessThanEqual( far ) ), () => {
 
@@ -1302,11 +1302,11 @@ class VXGIVolume {
 
 								const bias = shadowParams[ i ].x;
 
-								const clip = shadowMatrices[ i ].mul( vec4( shadowPosition, 1 ) ).toVar();
-								const coord = clip.xyz.div( clip.w ).toVar();
-								const uv = vec2( coord.x, coord.y.oneMinus() ).toVar();
+								const clip = shadowMatrices[ i ].mul( vec4( shadowPosition, 1 ) ).toConst();
+								const coord = clip.xyz.div( clip.w ).toConst();
+								const uv = vec2( coord.x, coord.y.oneMinus() ).toConst();
 
-								const inside = uv.x.greaterThanEqual( 0 ).and( uv.x.lessThanEqual( 1 ) ).and( uv.y.greaterThanEqual( 0 ) ).and( uv.y.lessThanEqual( 1 ) ).and( coord.z.greaterThanEqual( 0 ) ).and( coord.z.lessThanEqual( 1 ) ).toVar();
+								const inside = uv.x.greaterThanEqual( 0 ).and( uv.x.lessThanEqual( 1 ) ).and( uv.y.greaterThanEqual( 0 ) ).and( uv.y.lessThanEqual( 1 ) ).and( coord.z.greaterThanEqual( 0 ) ).and( coord.z.lessThanEqual( 1 ) ).toConst();
 
 								If( inside, () => {
 
@@ -1373,37 +1373,37 @@ class VXGIVolume {
 
 			If( instanceIndex.lessThan( voxelCount ), () => {
 
-				const coords = this._coords( instanceIndex, size ).toVar();
-				const bits = occupancy.element( instanceIndex ).toVar();
+				const coords = this._coords( instanceIndex, size ).toConst();
+				const bits = occupancy.element( instanceIndex ).toConst();
 				const result = vec4( 0 ).toVar();
 
 				If( bits.notEqual( uint( 0 ) ), () => {
 
 					const { position, normal, albedo } = this._surface( coords, triangleIds.element( instanceIndex ) );
 
-					const direct = texture3D( directTexture, vec3( coords ).add( 0.5 ).div( vec3( size[ 0 ], size[ 1 ], size[ 2 ] ) ), float( 0 ) ).toVar();
+					const direct = texture3D( directTexture, vec3( coords ).add( 0.5 ).div( vec3( size[ 0 ], size[ 1 ], size[ 2 ] ) ), float( 0 ) ).toConst();
 
 					// tangent frame
 
 					const up = select( abs( normal.y ).lessThan( 0.99 ), vec3( 0, 1, 0 ), vec3( 1, 0, 0 ) );
-					const tangent = normalize( cross( normal, up ) ).toVar();
-					const bitangent = cross( normal, tangent ).toVar();
+					const tangent = normalize( cross( normal, up ) ).toConst();
+					const bitangent = cross( normal, tangent ).toConst();
 
-					const rotation = hash( instanceIndex ).toVar();
+					const rotation = hash( instanceIndex ).toConst();
 					const gathered = vec3( 0 ).toVar();
 
 					Loop( { start: 0, end: BOUNCE_CONE_COUNT, type: 'int', condition: '<', name: 'c' }, ( { c } ) => {
 
 						// cosine-weighted directions, rotated per voxel
 
-						const u1 = float( c ).add( 0.5 ).div( BOUNCE_CONE_COUNT ).toVar();
-						const u2 = fract( float( c ).mul( 0.618034 ).add( rotation ) ).toVar();
-						const sinTheta = sqrt( u1 ).toVar();
-						const cosTheta = sqrt( u1.oneMinus() ).toVar();
-						const phi = u2.mul( PI.mul( 2 ) ).toVar();
+						const u1 = float( c ).add( 0.5 ).div( BOUNCE_CONE_COUNT ).toConst();
+						const u2 = fract( float( c ).mul( 0.618034 ).add( rotation ) ).toConst();
+						const sinTheta = sqrt( u1 ).toConst();
+						const cosTheta = sqrt( u1.oneMinus() ).toConst();
+						const phi = u2.mul( PI.mul( 2 ) ).toConst();
 
-						const direction = normalize( tangent.mul( cos( phi ).mul( sinTheta ) ).add( bitangent.mul( sin( phi ).mul( sinTheta ) ) ).add( normal.mul( cosTheta ) ) ).toVar();
-						const origin = position.add( normal.mul( voxelSize.mul( 1.5 ) ) ).toVar();
+						const direction = normalize( tangent.mul( cos( phi ).mul( sinTheta ) ).add( bitangent.mul( sin( phi ).mul( sinTheta ) ) ).add( normal.mul( cosTheta ) ) ).toConst();
+						const origin = position.add( normal.mul( voxelSize.mul( 1.5 ) ) ).toConst();
 
 						const cone = trace( origin, direction, tanHalfAngle, traceDistance );
 
