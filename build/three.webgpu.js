@@ -9067,6 +9067,50 @@ function builtinAOContext( aoNode, node = null ) {
 }
 
 /**
+ * TSL function for defining a built-in global illumination context for a given node. The AO node
+ * modulates the indirect lighting of the materials, the GI node is added to their irradiance
+ * without being modulated by the AO since it already accounts for occlusion.
+ *
+ * @tsl
+ * @function
+ * @param {Node<float>} aoNode - The ambient occlusion value node to apply.
+ * @param {Node<vec3>} giNode - The indirect diffuse irradiance node to add.
+ * @param {Node} [node=null] - The node whose context should be modified.
+ * @returns {ContextNode}
+ */
+function builtinGIContext( aoNode, giNode, node = null ) {
+
+	// the lighting models multiply the whole indirect diffuse term by the AO, which would occlude
+	// the GI a second time. Dividing the GI by the AO cancels that out so only the environment
+	// lighting is modulated.
+
+	const ao = aoNode.max( 1e-3 );
+
+	return context( node, {
+
+		getAO: ( inputNode, { material } ) => {
+
+			if ( material.transparent === true ) return inputNode;
+
+			return inputNode !== null ? inputNode.mul( ao ) : ao;
+
+		},
+
+		getGI: ( inputNode, { material } ) => {
+
+			if ( material.transparent === true ) return inputNode;
+
+			const gi = giNode.div( ao );
+
+			return inputNode !== null ? inputNode.add( gi ) : gi;
+
+		}
+
+	} );
+
+}
+
+/**
  * TSL function for defining a label context value for a given node.
  *
  * @tsl
@@ -9090,6 +9134,7 @@ addMethodChaining( 'uniformFlow', uniformFlow );
 addMethodChaining( 'setName', setName );
 addMethodChaining( 'builtinShadowContext', ( node, shadowNode, light ) => builtinShadowContext( shadowNode, light, node ) );
 addMethodChaining( 'builtinAOContext', ( node, aoValue ) => builtinAOContext( aoValue, node ) );
+addMethodChaining( 'builtinGIContext', ( node, aoValue, giValue ) => builtinGIContext( aoValue, giValue, node ) );
 
 /**
  * Class for representing shader variables as nodes. Variables are created from
@@ -22425,6 +22470,18 @@ class NodeMaterial extends Material {
 		if ( builder.context.ambientOcclusion ) {
 
 			materialLightsNode.push( new AONode( builder.context.ambientOcclusion ) );
+
+		}
+
+		if ( builder.context.getGI ) {
+
+			const giNode = builder.context.getGI( null, builder );
+
+			if ( giNode !== null ) {
+
+				materialLightsNode.push( new IrradianceNode( giNode ) );
+
+			}
 
 		}
 
@@ -49929,6 +49986,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	bufferAttribute: bufferAttribute,
 	builtin: builtin,
 	builtinAOContext: builtinAOContext,
+	builtinGIContext: builtinGIContext,
 	builtinShadowContext: builtinShadowContext,
 	bumpMap: bumpMap,
 	bvec2: bvec2,
@@ -53116,6 +53174,7 @@ class NodeBuilder {
 		delete context.getOutput;
 		delete context.getTextureLevel;
 		delete context.getAO;
+		delete context.getGI;
 		delete context.getShadow;
 
 		return context;
@@ -88694,6 +88753,7 @@ class WebGPUBackend extends Backend {
 			data.stencilWrite !== material.stencilWrite || data.stencilFunc !== material.stencilFunc ||
 			data.stencilFail !== material.stencilFail || data.stencilZFail !== material.stencilZFail || data.stencilZPass !== material.stencilZPass ||
 			data.stencilFuncMask !== material.stencilFuncMask || data.stencilWriteMask !== material.stencilWriteMask ||
+			data.polygonOffset !== material.polygonOffset || data.polygonOffsetFactor !== material.polygonOffsetFactor || data.polygonOffsetUnits !== material.polygonOffsetUnits ||
 			data.side !== material.side || data.alphaToCoverage !== material.alphaToCoverage ||
 			data.sampleCount !== sampleCount || data.colorSpace !== colorSpace ||
 			data.colorFormat !== colorFormat || data.depthStencilFormat !== depthStencilFormat ||
@@ -88711,6 +88771,7 @@ class WebGPUBackend extends Backend {
 			data.stencilWrite = material.stencilWrite; data.stencilFunc = material.stencilFunc;
 			data.stencilFail = material.stencilFail; data.stencilZFail = material.stencilZFail; data.stencilZPass = material.stencilZPass;
 			data.stencilFuncMask = material.stencilFuncMask; data.stencilWriteMask = material.stencilWriteMask;
+			data.polygonOffset = material.polygonOffset; data.polygonOffsetFactor = material.polygonOffsetFactor; data.polygonOffsetUnits = material.polygonOffsetUnits;
 			data.side = material.side; data.alphaToCoverage = material.alphaToCoverage;
 			data.sampleCount = sampleCount;
 			data.colorSpace = colorSpace;
@@ -88755,7 +88816,8 @@ class WebGPUBackend extends Backend {
 			material.stencilWrite, material.stencilFunc,
 			material.stencilFail, material.stencilZFail, material.stencilZPass,
 			material.stencilFuncMask, material.stencilWriteMask,
-			material.side,
+			material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits,
+			material.side, material.alphaToCoverage,
 			frontFaceCW,
 			utils.getSampleCountRenderContext( renderContext ),
 			utils.getCurrentColorSpace( renderContext ), utils.getCurrentColorFormat( renderContext ), utils.getCurrentDepthStencilFormat( renderContext ),
