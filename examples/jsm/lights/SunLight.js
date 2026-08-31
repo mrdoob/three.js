@@ -92,25 +92,7 @@ class SunLight extends Light {
 
 }
 
-/**
- * Calculates the apparent position of the sun for a given date, time and
- * geographic location, using a low-precision solar position algorithm
- * (accurate to about 0.01° through 2099). `date`'s UTC time is used, so
- * build it with the correct time zone offset already applied.
- *
- * ```js
- * const { elevation, azimuth } = getSunPosition( new Date(), 51.5, - 0.13 ); // London
- * sunLight.position.setFromSphericalCoords( 1, MathUtils.degToRad( 90 - elevation ), MathUtils.degToRad( azimuth ) );
- * ```
- *
- * Reference: {@link https://en.wikipedia.org/wiki/Position_of_the_Sun}
- *
- * @param {Date} date - The date and time to compute the sun position for.
- * @param {number} latitude - The observer's latitude, in degrees (`-90` to `90`).
- * @param {number} longitude - The observer's longitude, in degrees (`-180` to `180`, east positive).
- * @return {{elevation: number, azimuth: number}} The sun's elevation and azimuth, in degrees.
- */
-function getSunPosition( date, latitude, longitude ) {
+function getSolarCoordinates( date ) {
 
 	const jd = date.getTime() / 86400000 + 2440587.5; // Julian date
 	const t = ( jd - 2451545.0 ) / 36525; // centuries since J2000.0
@@ -152,6 +134,12 @@ function getSunPosition( date, latitude, longitude ) {
 		1.25 * eccentricity * eccentricity * Math.sin( 2 * Mrad )
 	);
 
+	return { declination, equationOfTime };
+
+}
+
+function getHorizontalCoordinates( date, latitude, longitude, declination, equationOfTime ) {
+
 	const utcMinutes = date.getUTCHours() * 60 + date.getUTCMinutes() + date.getUTCSeconds() / 60;
 	const trueSolarTime = MathUtils.euclideanModulo( utcMinutes + equationOfTime + 4 * longitude, 1440 );
 
@@ -166,17 +154,42 @@ function getSunPosition( date, latitude, longitude ) {
 	const zenithRad = Math.acos( MathUtils.clamp( cosZenith, - 1, 1 ) );
 
 	// https://en.wikipedia.org/wiki/Solar_azimuth_angle
-	let azimuthRad = Math.acos( MathUtils.clamp(
-		( Math.sin( declination ) - Math.sin( latRad ) * Math.cos( zenithRad ) ) /
-		( Math.cos( latRad ) * Math.sin( zenithRad ) ), - 1, 1
-	) );
-
-	if ( hourAngleRad > 0 ) azimuthRad = Math.PI * 2 - azimuthRad;
+	const azimuthRad = Math.atan2(
+		Math.sin( hourAngleRad ),
+		Math.cos( hourAngleRad ) * Math.sin( latRad ) - Math.tan( declination ) * Math.cos( latRad )
+	);
 
 	return {
 		elevation: 90 - zenithRad * MathUtils.RAD2DEG,
-		azimuth: azimuthRad * MathUtils.RAD2DEG
+		azimuth: MathUtils.euclideanModulo( azimuthRad * MathUtils.RAD2DEG + 180, 360 )
 	};
+
+}
+
+
+/**
+ * Calculates the apparent position of the sun for a given date, time and
+ * geographic location, using a low-precision solar position algorithm
+ * (accurate to about 0.01° through 2099). `date`'s UTC time is used, so
+ * build it with the correct time zone offset already applied.
+ *
+ * ```js
+ * const { elevation, azimuth } = getSunPosition( new Date(), 51.5, - 0.13 ); // London
+ * sunLight.position.setFromSphericalCoords( 1, MathUtils.degToRad( 90 - elevation ), MathUtils.degToRad( azimuth ) );
+ * ```
+ *
+ * Reference: {@link https://en.wikipedia.org/wiki/Position_of_the_Sun}
+ *
+ * @param {Date} date - The date and time to compute the sun position for.
+ * @param {number} latitude - The observer's latitude, in degrees (`-90` to `90`).
+ * @param {number} longitude - The observer's longitude, in degrees (`-180` to `180`, east positive).
+ * @return {{elevation: number, azimuth: number}} The sun's elevation and azimuth, in degrees.
+ */
+function getSunPosition( date, latitude, longitude ) {
+
+	const { declination, equationOfTime } = getSolarCoordinates( date );
+
+	return getHorizontalCoordinates( date, latitude, longitude, declination, equationOfTime );
 
 }
 

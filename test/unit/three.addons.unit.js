@@ -5,6 +5,7 @@ import './addons/utils/ColorUtils.tests.js';
 import './addons/utils/GaussianSplatUtils.tests.js';
 import './addons/math/ColorSpaces.tests.js';
 import './addons/curves/NURBSCurve.tests.js';
+import './addons/lights/SunLight.tests.js';
 import './addons/loaders/FBXLoader.tests.js';
 import './addons/loaders/GLTFLoader.tests.js';
 import './addons/loaders/HDRLoader.tests.js';
