@@ -172,7 +172,7 @@ export const instanceIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.I
 
 /**
  * TSL object that represents the index of the subgroup the current compute invocation belongs to.
- * Subgroup indices only exist local within the workgroups to which they belong.
+ * Subgroup indices are local to the workgroups to which they belong.
  *
  * ```js
  * // Execute 12 compute threads with a workgroup size of 9. Example assumes a subgroup size of 3.
