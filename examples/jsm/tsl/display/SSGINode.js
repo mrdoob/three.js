@@ -459,10 +459,7 @@ class SSGINode extends TempNode {
 			const outVal = abs( value ).mul( float( - 0.156583 ) ).add( HALF_PI );
 			outVal.mulAssign( sqrt( abs( value ).oneMinus() ) );
 
-			const x = value.x.greaterThanEqual( 0 ).ternary( outVal.x, PI.sub( outVal.x ) );
-			const y = value.y.greaterThanEqual( 0 ).ternary( outVal.y, PI.sub( outVal.y ) );
-
-			return vec2( x, y );
+			return value.greaterThanEqual( 0 ).mix( PI.sub( outVal ), outVal );
 
 		} ).setLayout( {
 			name: 'GTAOFastAcos',

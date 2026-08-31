@@ -77,8 +77,7 @@
 
 					const position = particle.add( velocity ).toVar();
 
-					velocity.x = position.x.abs().greaterThanEqual( limit.x ).ternary( velocity.x.negate(), velocity.x );
-					velocity.y = position.y.abs().greaterThanEqual( limit.y ).ternary( velocity.y.negate(), velocity.y );
+					velocity.assign( position.abs().greaterThanEqual( limit ).mix( velocity, velocity.negate() ) );
 
 					position.assign( position.min( limit ).max( limit.negate() ) );
 

@@ -36,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Fn, If, Loop, vec2, vec4, uvec2, uvec4, mat4, uint, float, int, min, max, clamp, ceil, log2, length, dFdx, dFdy, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, instanceIndex, vertexIndex, distance, screenSize, screenCoordinate, time, texture, varyingProperty, sqrt, normalize, cross, sign, positionGeometry, cameraViewMatrix, Discard, context, positionView, positionViewDirection, overrideNodes } from 'three/tsl';
+			import { Fn, If, Loop, vec2, vec3, vec4, bvec3, uvec2, uvec4, mat4, uint, float, int, min, max, clamp, ceil, log2, length, dFdx, dFdy, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, instanceIndex, vertexIndex, distance, screenSize, screenCoordinate, time, texture, varyingProperty, sqrt, normalize, cross, sign, positionGeometry, cameraViewMatrix, Discard, context, positionView, positionViewDirection, overrideNodes } from 'three/tsl';
 
 			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -974,9 +974,7 @@
 											const isTopLeft1 = stepX_w1.lessThan( 0.0 ).or( stepX_w1.equal( 0.0 ).and( stepY_w1.greaterThan( 0.0 ) ) );
 											const isTopLeft2 = stepX_w2.lessThan( 0.0 ).or( stepX_w2.equal( 0.0 ).and( stepY_w2.greaterThan( 0.0 ) ) );
 
-											const bias0 = isTopLeft0.ternary( 0.0, - 1e-5 );
-											const bias1 = isTopLeft1.ternary( 0.0, - 1e-5 );
-											const bias2 = isTopLeft2.ternary( 0.0, - 1e-5 );
+											const biases = bvec3( isTopLeft0, isTopLeft1, isTopLeft2 ).mix( vec3( - 1e-5 ), vec3( 0.0 ) );
 
 											const pStart = vec2( float( startX ).add( 0.5 ), float( startY ).add( 0.5 ) );
 
@@ -984,9 +982,9 @@
 											const row_w1 = edgeFunction( s2, s0, pStart ).toVar();
 											const row_w2 = edgeFunction( s0, s1, pStart ).toVar();
 
-											row_w0.addAssign( bias0 );
-											row_w1.addAssign( bias1 );
-											row_w2.addAssign( bias2 );
+											row_w0.addAssign( biases.x );
+											row_w1.addAssign( biases.y );
+											row_w2.addAssign( biases.z );
 
 											// Incremental Z Math (ALU Optimization)
 											const b0_start = row_w0.div( area );

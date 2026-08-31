@@ -617,10 +617,7 @@ class SMAANode extends TempNode {
 				// favor blending by choosing the line with the maximum weight for each
 				// direction:
 
-				const offset = vec2().toVar();
-
-				offset.x = a.a.greaterThan( a.b ).ternary( a.a, a.b.negate() ); // left vs. right
-				offset.y = a.g.greaterThan( a.r ).ternary( a.g, a.r.negate() ); // top vs. bottom
+				const offset = a.ag.greaterThan( a.br ).mix( a.br.negate(), a.ag ).toVar(); // left vs. right, top vs. bottom
 
 				// Then we go in the direction that has the maximum weight:
 
