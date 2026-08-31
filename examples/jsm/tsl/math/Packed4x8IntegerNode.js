@@ -1,11 +1,12 @@
-import TempNode from '../core/TempNode.js';
-import { nodeProxyIntent } from '../tsl/TSLCore.js';
+import { TempNode } from 'three/webgpu';
+import { nodeProxyIntent } from 'three/tsl';
 
 /**
  * Represents one of the built-in functions provided by WGSL's
  * `packed_4x8_integer_dot_product` language extension.
  *
  * @augments TempNode
+ * @three_import import { dot4I8Packed, dot4U8Packed, pack4xI8, pack4xI8Clamp, pack4xU8, pack4xU8Clamp, unpack4xI8, unpack4xU8 } from 'three/addons/tsl/math/Packed4x8IntegerNode.js';
  */
 class Packed4x8IntegerNode extends TempNode {
 

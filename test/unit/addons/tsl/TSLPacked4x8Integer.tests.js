@@ -1,10 +1,12 @@
 import {
 	int, uint, ivec4, uvec4,
-	bitAnd, shiftRight,
+	bitAnd, shiftRight
+} from 'three/tsl';
+import {
 	dot4I8Packed, dot4U8Packed,
 	pack4xI8, pack4xI8Clamp, pack4xU8, pack4xU8Clamp,
 	unpack4xI8, unpack4xU8
-} from 'three/tsl';
+} from '../../../../examples/jsm/tsl/math/Packed4x8IntegerNode.js';
 import { gpuTest } from './gpu-test-utils.js';
 
 const LANGUAGE_FEATURE = 'packed_4x8_integer_dot_product';
