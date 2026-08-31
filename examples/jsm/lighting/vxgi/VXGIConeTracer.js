@@ -11,22 +11,22 @@ import { float, vec3, vec4, If, Loop, Break, max, min, abs, dot, clamp, log2, ex
 export function intersectVolume( volume, origin, direction ) {
 
 	const boundsMin = volume.boundsMinNode;
-	const boundsMax = boundsMin.add( volume.volumeSizeNode ).toVar();
+	const boundsMax = boundsMin.add( volume.volumeSizeNode ).toConst();
 
 	const safeDirection = vec3(
 		select( abs( direction.x ).lessThan( 1e-6 ), 1e-6, direction.x ),
 		select( abs( direction.y ).lessThan( 1e-6 ), 1e-6, direction.y ),
 		select( abs( direction.z ).lessThan( 1e-6 ), 1e-6, direction.z )
-	).toVar();
+	).toConst();
 
-	const invDirection = float( 1 ).div( safeDirection ).toVar();
-	const t0 = boundsMin.sub( origin ).mul( invDirection ).toVar();
-	const t1 = boundsMax.sub( origin ).mul( invDirection ).toVar();
-	const tNear = min( t0, t1 ).toVar();
-	const tFar = max( t0, t1 ).toVar();
+	const invDirection = float( 1 ).div( safeDirection ).toConst();
+	const t0 = boundsMin.sub( origin ).mul( invDirection ).toConst();
+	const t1 = boundsMax.sub( origin ).mul( invDirection ).toConst();
+	const tNear = min( t0, t1 ).toConst();
+	const tFar = max( t0, t1 ).toConst();
 
-	const tEnter = max( max( tNear.x, tNear.y ), max( tNear.z, 0 ) ).toVar();
-	const tExit = min( min( tFar.x, tFar.y ), tFar.z ).toVar();
+	const tEnter = max( max( tNear.x, tNear.y ), max( tNear.z, 0 ) ).toConst();
+	const tExit = min( min( tFar.x, tFar.y ), tFar.z ).toConst();
 
 	return { tEnter, tExit };
 
@@ -46,12 +46,12 @@ export function intersectVolume( volume, origin, direction ) {
  */
 export function sampleDirectional( volume, directionalNode, uvw, level, direction ) {
 
-	const weights = direction.mul( direction ).toVar();
+	const weights = direction.mul( direction ).toConst();
 
 	// keep the lookup inside its block: clamp x by half a texel of the coarser blended level
 
-	const halfTexel = exp2( level.ceil() ).mul( 0.5 ).div( volume.directionalWidthNode ).toVar();
-	const u = uvw.x.clamp( halfTexel, halfTexel.oneMinus() ).toVar();
+	const halfTexel = exp2( level.ceil() ).mul( 0.5 ).div( volume.directionalWidthNode ).toConst();
+	const u = uvw.x.clamp( halfTexel, halfTexel.oneMinus() ).toConst();
 
 	const result = vec4( 0 ).toVar();
 
@@ -110,15 +110,15 @@ export function createConeTracer( volume, options = {} ) {
 		// cones start one voxel away from their origin so the voxels the origin lies in are not sampled
 
 		const t = max( tEnter, voxelSize ).toVar();
-		const limit = min( tExit, maxDistance ).toVar();
+		const limit = min( tExit, maxDistance ).toConst();
 
 		// interpolation weights of the three directional opacity values (sum to one)
 
-		const directionWeights = direction.mul( direction ).toVar();
+		const directionWeights = direction.mul( direction ).toConst();
 
 		// AO falloff 1 / ( 1 + r / aoDistance )
 
-		const aoFalloff = aoDistance !== null ? select( aoDistance.greaterThan( 0 ), float( 1 ).div( max( aoDistance, 1e-6 ) ), float( 0 ) ).toVar() : null;
+		const aoFalloff = aoDistance !== null ? select( aoDistance.greaterThan( 0 ), float( 1 ).div( max( aoDistance, 1e-6 ) ), float( 0 ) ).toConst() : null;
 
 		If( tExit.greaterThan( t ), () => {
 
@@ -130,17 +130,17 @@ export function createConeTracer( volume, options = {} ) {
 
 				} );
 
-				const diameter = max( t.mul( 2 ).mul( tanHalfAngle ), voxelSize ).toVar();
-				const lod = clamp( log2( diameter.div( voxelSize ) ), 0, maxLevel ).toVar();
-				const position = origin.add( direction.mul( t ) ).toVar();
-				const uvw = position.sub( boundsMin ).div( volumeSize ).toVar();
+				const diameter = max( t.mul( 2 ).mul( tanHalfAngle ), voxelSize ).toConst();
+				const lod = clamp( log2( diameter.div( voxelSize ) ), 0, maxLevel ).toConst();
+				const position = origin.add( direction.mul( t ) ).toConst();
+				const uvw = position.sub( boundsMin ).div( volumeSize ).toConst();
 
-				const opacity = opacityNode.sample( uvw ).level( lod ).toVar();
+				const opacity = opacityNode.sample( uvw ).level( lod ).toConst();
 
 				// directional opacity, corrected for a step that is a fraction of the texel size
 
-				const a = clamp( dot( opacity.xyz, directionWeights ), 0, 1 ).oneMinus().pow( stepScale ).oneMinus().toVar();
-				const weight = a.mul( alpha.oneMinus() ).toVar();
+				const a = clamp( dot( opacity.xyz, directionWeights ), 0, 1 ).oneMinus().pow( stepScale ).oneMinus().toConst();
+				const weight = a.mul( alpha.oneMinus() ).toConst();
 
 				if ( radianceNode !== null ) {
 
@@ -148,7 +148,7 @@ export function createConeTracer( volume, options = {} ) {
 
 					if ( directionalNode === null ) {
 
-						radiance = radianceNode.sample( uvw ).level( lod ).toVar();
+						radiance = radianceNode.sample( uvw ).level( lod ).toConst();
 
 					} else {
 

@@ -476,32 +476,32 @@ class VXGINode extends TempNode {
 
 		const gi = Fn( () => {
 
-			const depth = sampleDepth( uvNode ).toVar();
+			const depth = sampleDepth( uvNode ).toConst();
 
 			depth.greaterThanEqual( 1.0 ).discard();
 
-			const viewPosition = getViewPosition( uvNode, depth, projectionMatrixInverse ).toVar();
-			const worldPosition = this._cameraWorldMatrix.mul( vec4( viewPosition, 1 ) ).xyz.toVar();
-			const viewNormal = sampleNormal( uvNode ).toVar();
-			const worldNormal = normalize( this._cameraWorldMatrix.mul( vec4( viewNormal, 0 ) ).xyz ).toVar();
+			const viewPosition = getViewPosition( uvNode, depth, projectionMatrixInverse ).toConst();
+			const worldPosition = this._cameraWorldMatrix.mul( vec4( viewPosition, 1 ) ).xyz.toConst();
+			const viewNormal = sampleNormal( uvNode ).toConst();
+			const worldNormal = normalize( this._cameraWorldMatrix.mul( vec4( viewNormal, 0 ) ).xyz ).toConst();
 
 			// interleaved gradient noise for both values: its spatial structure converges well under temporal filtering
 
-			const temporalShift = this._frame.mul( TEMPORAL_SHIFT ).toVar();
-			const rotationNoise = interleavedGradientNoise( screenCoordinate.add( temporalShift ) ).toVar();
-			const elevationNoise = interleavedGradientNoise( screenCoordinate.add( temporalShift ).add( vec2( 5.588238, 3.14159 ) ) ).toVar();
+			const temporalShift = this._frame.mul( TEMPORAL_SHIFT ).toConst();
+			const rotationNoise = interleavedGradientNoise( screenCoordinate.add( temporalShift ) ).toConst();
+			const elevationNoise = interleavedGradientNoise( screenCoordinate.add( temporalShift ).add( vec2( 5.588238, 3.14159 ) ) ).toConst();
 
 			// tangent frame
 
 			const up = select( abs( worldNormal.y ).lessThan( 0.99 ), vec3( 0, 1, 0 ), vec3( 1, 0, 0 ) );
-			const tangent = normalize( cross( worldNormal, up ) ).toVar();
-			const bitangent = cross( worldNormal, tangent ).toVar();
+			const tangent = normalize( cross( worldNormal, up ) ).toConst();
+			const bitangent = cross( worldNormal, tangent ).toConst();
 
 			const CONE_COUNT = this.coneCount.toConst();
-			const tanHalfAngle = this.coneAngle.mul( 0.5 ).radians().tan().toVar();
+			const tanHalfAngle = this.coneAngle.mul( 0.5 ).radians().tan().toConst();
 			const traceDistance = volume.traceDistanceNode;
 			const aoDistance = this.aoDistance;
-			const originOffset = worldNormal.mul( voxelSize.mul( this.normalOffset ) ).toVar();
+			const originOffset = worldNormal.mul( voxelSize.mul( this.normalOffset ) ).toConst();
 
 			const color = vec3( 0 ).toVar();
 			const occlusion = float( 0 ).toVar();
@@ -510,14 +510,14 @@ class VXGINode extends TempNode {
 
 				// stratified cosine-weighted directions
 
-				const u1 = float( c ).add( elevationNoise ).div( float( CONE_COUNT ) ).toVar();
-				const u2 = fract( float( c ).mul( 0.618034 ).add( rotationNoise ) ).toVar();
-				const sinTheta = sqrt( u1 ).toVar();
-				const cosTheta = sqrt( u1.oneMinus() ).toVar();
-				const phi = u2.mul( PI.mul( 2 ) ).toVar();
+				const u1 = float( c ).add( elevationNoise ).div( float( CONE_COUNT ) ).toConst();
+				const u2 = fract( float( c ).mul( 0.618034 ).add( rotationNoise ) ).toConst();
+				const sinTheta = sqrt( u1 ).toConst();
+				const cosTheta = sqrt( u1.oneMinus() ).toConst();
+				const phi = u2.mul( PI.mul( 2 ) ).toConst();
 
-				const direction = normalize( tangent.mul( cos( phi ).mul( sinTheta ) ).add( bitangent.mul( sin( phi ).mul( sinTheta ) ) ).add( worldNormal.mul( cosTheta ) ) ).toVar();
-				const origin = worldPosition.add( originOffset ).toVar();
+				const direction = normalize( tangent.mul( cos( phi ).mul( sinTheta ) ).add( bitangent.mul( sin( phi ).mul( sinTheta ) ) ).add( worldNormal.mul( cosTheta ) ) ).toConst();
+				const origin = worldPosition.add( originOffset ).toConst();
 
 				const cone = trace( origin, direction, tanHalfAngle, traceDistance, aoDistance );
 
@@ -538,15 +538,15 @@ class VXGINode extends TempNode {
 			If( this.debug.greaterThan( 0 ), () => {
 
 				const cameraPosition = this._cameraPosition;
-				const direction = normalize( worldPosition.sub( cameraPosition ) ).toVar();
-				const surfaceDistance = worldPosition.sub( cameraPosition ).length().toVar();
-				const level = this.debugLevel.toVar();
-				const texel = voxelSize.mul( exp2( level ) ).toVar();
-				const levelSize = volume.volumeSizeNode.div( texel ).toVar();
+				const direction = normalize( worldPosition.sub( cameraPosition ) ).toConst();
+				const surfaceDistance = worldPosition.sub( cameraPosition ).length().toConst();
+				const level = this.debugLevel.toConst();
+				const texel = voxelSize.mul( exp2( level ) ).toConst();
+				const levelSize = volume.volumeSizeNode.div( texel ).toConst();
 				const boundsMin = volume.boundsMinNode;
 
 				const { tEnter, tExit } = intersectVolume( volume, cameraPosition, direction );
-				const tMax = tExit.min( surfaceDistance ).toVar();
+				const tMax = tExit.min( surfaceDistance ).toConst();
 				const t = tEnter.toVar();
 
 				color.assign( 0 );
@@ -561,7 +561,7 @@ class VXGINode extends TempNode {
 					} );
 
 					const uvw = cameraPosition.add( direction.mul( t ) ).sub( boundsMin ).div( volume.volumeSizeNode );
-					const snapped = floor( uvw.mul( levelSize ) ).add( 0.5 ).div( levelSize ).toVar();
+					const snapped = floor( uvw.mul( levelSize ) ).add( 0.5 ).div( levelSize ).toConst();
 
 					If( this.debug.equal( 1 ), () => {
 
@@ -569,7 +569,7 @@ class VXGINode extends TempNode {
 
 						if ( directional === false ) {
 
-							radiance = volume.radianceNode.sample( snapped ).level( level ).toVar();
+							radiance = volume.radianceNode.sample( snapped ).level( level ).toConst();
 
 						} else {
 
@@ -596,7 +596,7 @@ class VXGINode extends TempNode {
 
 					} ).Else( () => {
 
-						const opacity = volume.opacityNode.sample( snapped ).level( level ).toVar();
+						const opacity = volume.opacityNode.sample( snapped ).level( level ).toConst();
 
 						If( opacity.w.greaterThan( 0.01 ), () => {
 
