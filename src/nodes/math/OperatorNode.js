@@ -670,7 +670,7 @@ export const shiftRight = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '>>' ).se
  * @param {Node} a - The node to increment.
  * @returns {OperatorNode}
  */
-export const incrementBefore = Fn( ( [ a ] ) => {
+export const incrementBefore = /*@__PURE__*/ Fn( ( [ a ] ) => {
 
 	a.addAssign( 1 );
 	return a;
@@ -685,7 +685,7 @@ export const incrementBefore = Fn( ( [ a ] ) => {
  * @param {Node} a - The node to decrement.
  * @returns {OperatorNode}
  */
-export const decrementBefore = Fn( ( [ a ] ) => {
+export const decrementBefore = /*@__PURE__*/ Fn( ( [ a ] ) => {
 
 	a.subAssign( 1 );
 	return a;

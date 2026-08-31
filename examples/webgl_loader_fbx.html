@@ -32,6 +32,7 @@
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
+			import { SunLight } from 'three/addons/lights/SunLight.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -90,7 +91,7 @@
 				hemiLight.position.set( 0, 200, 0 );
 				scene.add( hemiLight );
 
-				const sunLight = new THREE.SunLight( 0xffffff, 5 );
+				const sunLight = new SunLight( 0xffffff, 5 );
 				sunLight.position.set( 0, 200, 100 );
 				sunLight.castShadow = true;
 				scene.add( sunLight );

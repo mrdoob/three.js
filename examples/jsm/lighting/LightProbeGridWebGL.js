@@ -320,8 +320,6 @@ class LightProbeGridWebGL extends Object3D {
 		renderer.getScissor( _currentScissor );
 		const currentScissorTest = renderer.getScissorTest();
 
-		const replacedSunLights = _replaceSunLights( scene );
-
 		// Scene is static across the bake — update once and disable per-render auto updates.
 		const currentMatrixWorldAutoUpdate = scene.matrixWorldAutoUpdate;
 		if ( currentMatrixWorldAutoUpdate === true ) {
@@ -330,6 +328,8 @@ class LightProbeGridWebGL extends Object3D {
 			scene.matrixWorldAutoUpdate = false;
 
 		}
+
+		const replacedSunLights = _replaceSunLights( scene );
 
 		// Disable shadow map auto-update across all passes — lights don't move.
 		// Force a single shadow update on the first render so maps are initialized.

@@ -25,8 +25,8 @@ export default /* glsl */`
 
 		#endif
 
-		uniform mat4 sunShadowMatrix[ NUM_SUN_LIGHT_SHADOWS * 4 ];
-		uniform vec4 sunShadowCascade[ NUM_SUN_LIGHT_SHADOWS * 4 ];
+		uniform mat4 sunShadowMatrix[ NUM_SUN_LIGHT_SHADOWS * 2 ];
+		uniform vec4 sunShadowCascade[ NUM_SUN_LIGHT_SHADOWS * 2 ];
 		varying vec4 vSunShadowWorldPosition;
 		varying vec3 vSunShadowWorldNormal;
 
@@ -301,13 +301,13 @@ export default /* glsl */`
 
 			vec4 shadowWorldPosition = vec4( vSunShadowWorldPosition.xyz + vSunShadowWorldNormal * sunLightShadow.shadowNormalBias, 1.0 );
 			float viewDepth = vSunShadowWorldPosition.w;
-			int cascadeOffset = shadowIndex * 4;
+			int cascadeOffset = shadowIndex * 2;
 
 			float shadow = 1.0;
 
 			// walk the cascades back to front so each fade band can blend with the shadow behind it
 
-			for ( int i = 3; i >= 0; i -- ) {
+			for ( int i = 1; i >= 0; i -- ) {
 
 				// ( begin, end, fade start ) view depths of the cascade
 

@@ -16435,13 +16435,13 @@ class Box3 {
 		}
 
 		// compute box center and extents
-		this.getCenter( _center$1 );
-		_extents.subVectors( this.max, _center$1 );
+		this.getCenter( _center );
+		_extents.subVectors( this.max, _center );
 
 		// translate triangle to aabb origin
-		_v0$1.subVectors( triangle.a, _center$1 );
-		_v1$4.subVectors( triangle.b, _center$1 );
-		_v2$3.subVectors( triangle.c, _center$1 );
+		_v0$1.subVectors( triangle.a, _center );
+		_v1$4.subVectors( triangle.b, _center );
+		_v2$3.subVectors( triangle.c, _center );
 
 		// compute edge vectors for triangle
 		_f0.subVectors( _v1$4, _v0$1 );
@@ -16679,7 +16679,7 @@ const _f0 = /*@__PURE__*/ new Vector3();
 const _f1 = /*@__PURE__*/ new Vector3();
 const _f2 = /*@__PURE__*/ new Vector3();
 
-const _center$1 = /*@__PURE__*/ new Vector3();
+const _center = /*@__PURE__*/ new Vector3();
 const _extents = /*@__PURE__*/ new Vector3();
 const _triangleNormal = /*@__PURE__*/ new Vector3();
 const _testAxis = /*@__PURE__*/ new Vector3();
@@ -41729,6 +41729,18 @@ function convertArray( array, type ) {
 }
 
 /**
+ * Returns `true` if the given keyframe track settings hold Bezier tangent data.
+ *
+ * @param {?Object} settings - The settings of a keyframe track.
+ * @return {boolean} Whether both tangent arrays are defined or not.
+ */
+function hasTangents( settings ) {
+
+	return settings !== undefined && settings.inTangents !== undefined && settings.outTangents !== undefined;
+
+}
+
+/**
  * Returns an array by which times and values can be sorted.
  *
  * @param {Array<number>} times - The keyframe time values.
@@ -42107,6 +42119,19 @@ class AnimationUtils {
 	static isTypedArray( object ) {
 
 		return isTypedArray( object );
+
+	}
+
+	/**
+	 * Returns `true` if the given keyframe track settings hold Bezier tangent data.
+	 *
+	 * @static
+	 * @param {?Object} settings - The settings of a keyframe track.
+	 * @return {boolean} Whether both tangent arrays are defined or not.
+	 */
+	static hasTangents( settings ) {
+
+		return hasTangents( settings );
 
 	}
 
@@ -42939,6 +42964,15 @@ class KeyframeTrack {
 
 			}
 
+			if ( hasTangents( track.settings ) ) {
+
+				json.settings = {
+					inTangents: convertArray( track.settings.inTangents, Array ),
+					outTangents: convertArray( track.settings.outTangents, Array )
+				};
+
+			}
+
 		}
 
 		json.type = track.ValueTypeName; // mandatory
@@ -43161,6 +43195,13 @@ class KeyframeTrack {
 			for ( let i = 0, n = times.length; i !== n; ++ i ) {
 
 				times[ i ] *= timeScale;
+
+			}
+
+			if ( hasTangents( this.settings ) ) {
+
+				scaleTangentTimes( this.settings.inTangents, timeScale );
+				scaleTangentTimes( this.settings.outTangents, timeScale );
 
 			}
 
@@ -43439,7 +43480,28 @@ class KeyframeTrack {
 		// Interpolant argument to constructor is not saved, so copy the factory method directly.
 		track.createInterpolant = this.createInterpolant;
 
+		if ( hasTangents( this.settings ) ) {
+
+			track.settings = {
+				inTangents: this.settings.inTangents.slice(),
+				outTangents: this.settings.outTangents.slice()
+			};
+
+		}
+
 		return track;
+
+	}
+
+}
+
+function scaleTangentTimes( tangents, timeScale ) {
+
+	// tangents are [ time, value ] pairs, so only every second entry is a time
+
+	for ( let i = 0, n = tangents.length; i !== n; i += 2 ) {
+
+		tangents[ i ] *= timeScale;
 
 	}
 
@@ -44225,17 +44287,30 @@ function parseKeyframeTrack( json ) {
 
 	}
 
+	let track;
+
 	// derived classes can define a static parse method
 	if ( trackType.parse !== undefined ) {
 
-		return trackType.parse( json );
+		track = trackType.parse( json );
 
 	} else {
 
 		// by default, we assume a constructor compatible with the base
-		return new trackType( json.name, json.times, json.values, json.interpolation );
+		track = new trackType( json.name, json.times, json.values, json.interpolation );
 
 	}
+
+	if ( hasTangents( json.settings ) ) {
+
+		track.settings = {
+			inTangents: convertArray( json.settings.inTangents, Float32Array ),
+			outTangents: convertArray( json.settings.outTangents, Float32Array )
+		};
+
+	}
+
+	return track;
 
 }
 
@@ -46079,6 +46154,77 @@ class Light extends Object3D {
 
 }
 
+/**
+ * A light source positioned directly above the scene, with color fading from
+ * the sky color to the ground color.
+ *
+ * This light cannot be used to cast shadows.
+ *
+ * ```js
+ * const light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+ * scene.add( light );
+ * ```
+ *
+ * @augments Light
+ */
+class HemisphereLight extends Light {
+
+	/**
+	 * Constructs a new hemisphere light.
+	 *
+	 * @param {(number|Color|string)} [skyColor=0xffffff] - The light's sky color.
+	 * @param {(number|Color|string)} [groundColor=0xffffff] - The light's ground color.
+	 * @param {number} [intensity=1] - The light's strength/intensity.
+	 */
+	constructor( skyColor, groundColor, intensity ) {
+
+		super( skyColor, intensity );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isHemisphereLight = true;
+
+		this.type = 'HemisphereLight';
+
+		this.position.copy( Object3D.DEFAULT_UP );
+		this.updateMatrix();
+
+		/**
+		 * The light's ground color.
+		 *
+		 * @type {Color}
+		 */
+		this.groundColor = new Color( groundColor );
+
+	}
+
+	copy( source, recursive ) {
+
+		super.copy( source, recursive );
+
+		this.groundColor.copy( source.groundColor );
+
+		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		data.object.groundColor = this.groundColor.getHex();
+
+		return data;
+
+	}
+
+}
+
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld = /*@__PURE__*/ new Vector3();
 const _lookTarget = /*@__PURE__*/ new Vector3();
@@ -46597,713 +46743,6 @@ class Camera extends Object3D {
 	clone() {
 
 		return new this.constructor().copy( this );
-
-	}
-
-}
-
-/**
- * Camera that uses [orthographic projection](https://en.wikipedia.org/wiki/Orthographic_projection).
- *
- * In this projection mode, an object's size in the rendered image stays
- * constant regardless of its distance from the camera. This can be useful
- * for rendering 2D scenes and UI elements, amongst other things.
- *
- * ```js
- * const camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
- * scene.add( camera );
- * ```
- *
- * @augments Camera
- */
-class OrthographicCamera extends Camera {
-
-	/**
-	 * Constructs a new orthographic camera.
-	 *
-	 * @param {number} [left=-1] - The left plane of the camera's frustum.
-	 * @param {number} [right=1] - The right plane of the camera's frustum.
-	 * @param {number} [top=1] - The top plane of the camera's frustum.
-	 * @param {number} [bottom=-1] - The bottom plane of the camera's frustum.
-	 * @param {number} [near=0.1] - The camera's near plane.
-	 * @param {number} [far=2000] - The camera's far plane.
-	 */
-	constructor( left = -1, right = 1, top = 1, bottom = -1, near = 0.1, far = 2000 ) {
-
-		super();
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isOrthographicCamera = true;
-
-		this.type = 'OrthographicCamera';
-
-		/**
-		 * The zoom factor of the camera.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.zoom = 1;
-
-		/**
-		 * Represents the frustum window specification. This property should not be edited
-		 * directly but via {@link PerspectiveCamera#setViewOffset} and {@link PerspectiveCamera#clearViewOffset}.
-		 *
-		 * @type {?Object}
-		 * @default null
-		 */
-		this.view = null;
-
-		/**
-		 * The left plane of the camera's frustum.
-		 *
-		 * @type {number}
-		 * @default -1
-		 */
-		this.left = left;
-
-		/**
-		 * The right plane of the camera's frustum.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.right = right;
-
-		/**
-		 * The top plane of the camera's frustum.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.top = top;
-
-		/**
-		 * The bottom plane of the camera's frustum.
-		 *
-		 * @type {number}
-		 * @default -1
-		 */
-		this.bottom = bottom;
-
-		/**
-		 * The camera's near plane. The valid range is greater than `0`
-		 * and less than the current value of {@link OrthographicCamera#far}.
-		 *
-		 * Note that, unlike for the {@link PerspectiveCamera}, `0` is a
-		 * valid value for an orthographic camera's near plane.
-		 *
-		 * @type {number}
-		 * @default 0.1
-		 */
-		this.near = near;
-
-		/**
-		 * The camera's far plane. Must be greater than the
-		 * current value of {@link OrthographicCamera#near}.
-		 *
-		 * @type {number}
-		 * @default 2000
-		 */
-		this.far = far;
-
-		this.updateProjectionMatrix();
-
-	}
-
-	copy( source, recursive ) {
-
-		super.copy( source, recursive );
-
-		this.left = source.left;
-		this.right = source.right;
-		this.top = source.top;
-		this.bottom = source.bottom;
-		this.near = source.near;
-		this.far = source.far;
-
-		this.zoom = source.zoom;
-		this.view = source.view === null ? null : Object.assign( {}, source.view );
-
-		return this;
-
-	}
-
-	/**
-	 * Sets an offset in a larger frustum. This is useful for multi-window or
-	 * multi-monitor/multi-machine setups.
-	 *
-	 * @param {number} fullWidth - The full width of multiview setup.
-	 * @param {number} fullHeight - The full height of multiview setup.
-	 * @param {number} x - The horizontal offset of the subcamera.
-	 * @param {number} y - The vertical offset of the subcamera.
-	 * @param {number} width - The width of subcamera.
-	 * @param {number} height - The height of subcamera.
-	 * @see {@link PerspectiveCamera#setViewOffset}
-	 */
-	setViewOffset( fullWidth, fullHeight, x, y, width, height ) {
-
-		if ( this.view === null ) {
-
-			this.view = {
-				enabled: true,
-				fullWidth: 1,
-				fullHeight: 1,
-				offsetX: 0,
-				offsetY: 0,
-				width: 1,
-				height: 1
-			};
-
-		}
-
-		this.view.enabled = true;
-		this.view.fullWidth = fullWidth;
-		this.view.fullHeight = fullHeight;
-		this.view.offsetX = x;
-		this.view.offsetY = y;
-		this.view.width = width;
-		this.view.height = height;
-
-		this.updateProjectionMatrix();
-
-	}
-
-	/**
-	 * Removes the view offset from the projection matrix.
-	 */
-	clearViewOffset() {
-
-		if ( this.view !== null ) {
-
-			this.view.enabled = false;
-
-		}
-
-		this.updateProjectionMatrix();
-
-	}
-
-	/**
-	 * Updates the camera's projection matrix. Must be called after any change of
-	 * camera properties.
-	 */
-	updateProjectionMatrix() {
-
-		const dx = ( this.right - this.left ) / ( 2 * this.zoom );
-		const dy = ( this.top - this.bottom ) / ( 2 * this.zoom );
-		const cx = ( this.right + this.left ) / 2;
-		const cy = ( this.top + this.bottom ) / 2;
-
-		let left = cx - dx;
-		let right = cx + dx;
-		let top = cy + dy;
-		let bottom = cy - dy;
-
-		if ( this.view !== null && this.view.enabled ) {
-
-			const scaleW = ( this.right - this.left ) / this.view.fullWidth / this.zoom;
-			const scaleH = ( this.top - this.bottom ) / this.view.fullHeight / this.zoom;
-
-			left += scaleW * this.view.offsetX;
-			right = left + scaleW * this.view.width;
-			top -= scaleH * this.view.offsetY;
-			bottom = top - scaleH * this.view.height;
-
-		}
-
-		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far, this.coordinateSystem, this.reversedDepth );
-
-		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
-
-	}
-
-	toJSON( meta ) {
-
-		const data = super.toJSON( meta );
-
-		data.object.zoom = this.zoom;
-		data.object.left = this.left;
-		data.object.right = this.right;
-		data.object.top = this.top;
-		data.object.bottom = this.bottom;
-		data.object.near = this.near;
-		data.object.far = this.far;
-
-		if ( this.view !== null ) data.object.view = Object.assign( {}, this.view );
-
-		return data;
-
-	}
-
-}
-
-const _lightOrientationMatrix = /*@__PURE__*/ new Matrix4();
-const _viewToLightMatrix = /*@__PURE__*/ new Matrix4();
-const _lightDirection = /*@__PURE__*/ new Vector3();
-const _up$1 = /*@__PURE__*/ new Vector3();
-const _center = /*@__PURE__*/ new Vector3();
-
-const _nearCorners = [
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3()
-];
-
-const _farCorners = [
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3()
-];
-
-const _cascadeCorners = [
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3()
-];
-
-// must match the cascade count in the sun shadow shader chunks
-
-const _cascadeCount = 4;
-
-// fraction of each cascade's depth range that blends into the next cascade
-
-const _cascadeFade = 0.1;
-
-/**
- * Represents the shadow configuration of {@link SunLight}, using four
- * cascaded shadow maps (CSM).
- *
- * The shadow camera projection is fitted automatically to slices of the view
- * frustum, up to a distance of `camera.far` (or the view camera's far plane,
- * whichever is smaller), and adjacent cascades blend into each other over a
- * small depth range. `camera.left/right/top/bottom` are ignored.
- *
- * The default `mapSize` is `1024x1024` per cascade.
- *
- * @augments LightShadow
- */
-class SunLightShadow extends LightShadow {
-
-	/**
-	 * Constructs a new sun light shadow.
-	 */
-	constructor() {
-
-		super( new OrthographicCamera( -5, 5, 5, -5, 0.5, 500 ) );
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isSunLightShadow = true;
-
-		this.mapSize.set( 1024, 1024 );
-
-		this._cameras = [];
-		this._matrices = [];
-		this._frustums = [];
-		this._cascadeSplits = new Array( _cascadeCount + 1 ).fill( 0 );
-
-		// per cascade ( begin, end, fade start ) view depths, consumed by the renderer
-
-		this._cascadeData = [];
-
-		this._viewportCount = _cascadeCount;
-		this._frameExtents.set( 2, 2 );
-
-		for ( let i = 0; i < _cascadeCount; i ++ ) {
-
-			this._cameras.push( new OrthographicCamera() );
-			this._matrices.push( new Matrix4() );
-			this._frustums.push( new Frustum() );
-			this._cascadeData.push( new Vector4() );
-
-		}
-
-		while ( this._viewports.length < _cascadeCount ) this._viewports.push( new Vector4() );
-
-	}
-
-	/**
-	 * Returns the shadow camera of the given cascade.
-	 *
-	 * @param {number} [cascadeIndex=0] - The cascade index.
-	 * @return {OrthographicCamera} The shadow camera.
-	 */
-	getCamera( cascadeIndex = 0 ) {
-
-		return this._cameras[ cascadeIndex ];
-
-	}
-
-	/**
-	 * Returns the shadow matrix of the given cascade.
-	 *
-	 * @param {number} [cascadeIndex=0] - The cascade index.
-	 * @return {Matrix4} The shadow matrix.
-	 */
-	getMatrix( cascadeIndex = 0 ) {
-
-		return this._matrices[ cascadeIndex ];
-
-	}
-
-	/**
-	 * Returns the shadow camera frustum of the given cascade. Used internally by
-	 * the renderer to cull objects.
-	 *
-	 * @param {number} [cascadeIndex=0] - The cascade index.
-	 * @return {Frustum} The shadow camera frustum.
-	 */
-	getFrustum( cascadeIndex = 0 ) {
-
-		return this._frustums[ cascadeIndex ];
-
-	}
-
-	/**
-	 * Update the matrices for the cascade cameras and shadows, used internally
-	 * by the renderer.
-	 *
-	 * @param {Light} light - The light for which the shadow is being rendered.
-	 * @param {Camera} viewCamera - The camera the scene is rendered with.
-	 */
-	updateMatrices( light, viewCamera ) {
-
-		if ( viewCamera === undefined ) return;
-
-		// inset the cascade viewports so shadow filtering cannot read across atlas tiles
-
-		const insetX = Math.min( 0.25, ( Math.ceil( this.radius ) + 1 ) / this.mapSize.x );
-		const insetY = Math.min( 0.25, ( Math.ceil( this.radius ) + 1 ) / this.mapSize.y );
-
-		for ( let i = 0; i < _cascadeCount; i ++ ) {
-
-			this._viewports[ i ].set( i % 2 + insetX, Math.floor( i / 2 ) + insetY, 1 - 2 * insetX, 1 - 2 * insetY );
-
-		}
-
-		const resolutionX = this.mapSize.x * ( 1 - 2 * insetX );
-		const resolutionY = this.mapSize.y * ( 1 - 2 * insetY );
-		const resolution = Math.min( resolutionX, resolutionY );
-
-		const camera = this.camera;
-		const cameraNear = viewCamera.near;
-		const cameraFar = Math.max( cameraNear + 1e-6, Math.min( camera.far, viewCamera.far ) );
-
-		// practical split scheme: the average of uniform and logarithmic splits
-
-		const splits = this._cascadeSplits;
-		splits[ 0 ] = cameraNear;
-
-		for ( let i = 1; i < _cascadeCount; i ++ ) {
-
-			const amount = i / _cascadeCount;
-			const uniform = cameraNear + ( cameraFar - cameraNear ) * amount;
-			const logarithmic = cameraNear > 0 ? cameraNear * Math.pow( cameraFar / cameraNear, amount ) : uniform;
-			splits[ i ] = ( uniform + logarithmic ) * 0.5;
-
-		}
-
-		splits[ _cascadeCount ] = cameraFar;
-
-		_lightDirection.setFromMatrixPosition( light.matrixWorld ).negate().normalize();
-
-		_up$1.set( 0, 1, 0 );
-		if ( Math.abs( _up$1.dot( _lightDirection ) ) > 0.99 ) _up$1.set( 0, 0, 1 );
-
-		_lightOrientationMatrix.lookAt( _center.set( 0, 0, 0 ), _lightDirection, _up$1 );
-		_viewToLightMatrix.copy( _lightOrientationMatrix ).transpose().multiply( viewCamera.matrixWorld );
-
-		// view frustum corners in light space; the rotation preserves distances,
-		// so the cascades can be fitted and snapped directly in this space
-
-		const zNear = viewCamera.reversedDepth ? 1 : -1;
-		const inverseProjectionMatrix = viewCamera.projectionMatrixInverse;
-
-		let globalMaxZ = - Infinity;
-
-		for ( let i = 0; i < 4; i ++ ) {
-
-			const x = i === 0 || i === 1 ? 1 : -1;
-			const y = i === 0 || i === 3 ? 1 : -1;
-
-			const nearCorner = _nearCorners[ i ].set( x, y, zNear ).applyMatrix4( inverseProjectionMatrix );
-			const farCorner = _farCorners[ i ];
-
-			if ( viewCamera.isPerspectiveCamera === true ) {
-
-				farCorner.copy( nearCorner ).multiplyScalar( cameraFar / cameraNear );
-
-			} else {
-
-				farCorner.set( nearCorner.x, nearCorner.y, - cameraFar );
-
-			}
-
-			nearCorner.applyMatrix4( _viewToLightMatrix );
-			farCorner.applyMatrix4( _viewToLightMatrix );
-
-			globalMaxZ = Math.max( globalMaxZ, nearCorner.z, farCorner.z );
-
-		}
-
-		// raise the ceiling one shadow range towards the light so casters outside
-		// the view frustum still cast into it
-
-		globalMaxZ += cameraFar;
-
-		const shadowNear = camera.near;
-
-		for ( let i = 0; i < _cascadeCount; i ++ ) {
-
-			// each cascade covers the fade band of the previous one so both can be sampled while blending
-
-			const cascadeNear = i === 0 ? splits[ 0 ] : this._cascadeData[ i - 1 ].z;
-			const cascadeFar = splits[ i + 1 ];
-			const fadeStart = cascadeFar - _cascadeFade * ( cascadeFar - splits[ i ] );
-
-			this._cascadeData[ i ].set( i === 0 ? -1e10 : cascadeNear, cascadeFar, fadeStart, 0 );
-
-			// bounding sphere of the cascade slice for a rotation-stable projection
-
-			const nearAlpha = ( cascadeNear - cameraNear ) / ( cameraFar - cameraNear );
-			const farAlpha = ( cascadeFar - cameraNear ) / ( cameraFar - cameraNear );
-
-			_center.set( 0, 0, 0 );
-
-			for ( let j = 0; j < 4; j ++ ) {
-
-				_cascadeCorners[ j * 2 ].lerpVectors( _nearCorners[ j ], _farCorners[ j ], nearAlpha );
-				_cascadeCorners[ j * 2 + 1 ].lerpVectors( _nearCorners[ j ], _farCorners[ j ], farAlpha );
-				_center.add( _cascadeCorners[ j * 2 ] ).add( _cascadeCorners[ j * 2 + 1 ] );
-
-			}
-
-			_center.multiplyScalar( 1 / 8 );
-
-			let radiusSq = 0;
-			let minZ = Infinity;
-
-			for ( let j = 0; j < 8; j ++ ) {
-
-				radiusSq = Math.max( radiusSq, _cascadeCorners[ j ].distanceToSquared( _center ) );
-				minZ = Math.min( minZ, _cascadeCorners[ j ].z );
-
-			}
-
-			let radius = Math.sqrt( radiusSq );
-
-			// snap to the texel grid to avoid shimmering when the view camera moves
-
-			if ( resolution > 1 ) {
-
-				// pad by half a texel so snapping cannot clip a frustum corner
-				radius /= 1 - 1 / resolution;
-				const texelSizeX = 2 * radius / resolutionX;
-				const texelSizeY = 2 * radius / resolutionY;
-				_center.x = Math.round( _center.x / texelSizeX ) * texelSizeX;
-				_center.y = Math.round( _center.y / texelSizeY ) * texelSizeY;
-
-			}
-
-			// place the near plane at the caster ceiling
-
-			_center.z = globalMaxZ + shadowNear;
-			_center.applyMatrix4( _lightOrientationMatrix );
-
-			const cascadeCamera = this._cameras[ i ];
-			cascadeCamera.position.copy( _center );
-			cascadeCamera.quaternion.setFromRotationMatrix( _lightOrientationMatrix );
-			cascadeCamera.left = - radius;
-			cascadeCamera.right = radius;
-			cascadeCamera.top = radius;
-			cascadeCamera.bottom = - radius;
-			cascadeCamera.near = shadowNear;
-			cascadeCamera.far = globalMaxZ - minZ + 2 * shadowNear;
-			cascadeCamera.coordinateSystem = camera.coordinateSystem;
-			cascadeCamera._reversedDepth = camera.reversedDepth;
-			cascadeCamera.updateProjectionMatrix();
-			cascadeCamera.updateMatrixWorld();
-
-			this._updateMatrix( cascadeCamera, this._matrices[ i ], this._frustums[ i ], this._viewports[ i ] );
-
-		}
-
-	}
-
-}
-
-/**
- * A sun-like light that gets emitted in a specific direction, with rays that
- * are all parallel, and casts cascaded shadow maps via {@link SunLightShadow},
- * suited for lighting large scenes.
- *
- * Unlike {@link DirectionalLight}, the light has no target: like
- * {@link HemisphereLight}, its direction is defined by its position. The
- * light shines from its position towards the origin and points straight
- * down by default.
- *
- * ```js
- * const sun = new SunLight( 0xfff2e3, 3 );
- * sun.position.set( 1, 1, 1 );
- * sun.castShadow = true;
- * scene.add( sun );
- * ```
- *
- * This light is only supported by `WebGLRenderer`. When using `WebGPURenderer`,
- * use {@link DirectionalLight} with `CSMShadowNode` instead.
- *
- * @augments Light
- */
-class SunLight extends Light {
-
-	/**
-	 * Constructs a new sun light.
-	 *
-	 * @param {(number|Color|string)} [color=0xffffff] - The light's color.
-	 * @param {number} [intensity=1] - The light's strength/intensity.
-	 */
-	constructor( color, intensity ) {
-
-		super( color, intensity );
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isSunLight = true;
-
-		this.type = 'SunLight';
-
-		this.position.copy( Object3D.DEFAULT_UP );
-		this.updateMatrix();
-
-		/**
-		 * This property holds the light's shadow configuration.
-		 *
-		 * @type {SunLightShadow}
-		 */
-		this.shadow = new SunLightShadow();
-
-	}
-
-	dispose() {
-
-		super.dispose();
-
-		this.shadow.dispose();
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.shadow = source.shadow.clone();
-
-		return this;
-
-	}
-
-	toJSON( meta ) {
-
-		const data = super.toJSON( meta );
-
-		data.object.shadow = this.shadow.toJSON();
-
-		return data;
-
-	}
-
-}
-
-/**
- * A light source positioned directly above the scene, with color fading from
- * the sky color to the ground color.
- *
- * This light cannot be used to cast shadows.
- *
- * ```js
- * const light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
- * scene.add( light );
- * ```
- *
- * @augments Light
- */
-class HemisphereLight extends Light {
-
-	/**
-	 * Constructs a new hemisphere light.
-	 *
-	 * @param {(number|Color|string)} [skyColor=0xffffff] - The light's sky color.
-	 * @param {(number|Color|string)} [groundColor=0xffffff] - The light's ground color.
-	 * @param {number} [intensity=1] - The light's strength/intensity.
-	 */
-	constructor( skyColor, groundColor, intensity ) {
-
-		super( skyColor, intensity );
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isHemisphereLight = true;
-
-		this.type = 'HemisphereLight';
-
-		this.position.copy( Object3D.DEFAULT_UP );
-		this.updateMatrix();
-
-		/**
-		 * The light's ground color.
-		 *
-		 * @type {Color}
-		 */
-		this.groundColor = new Color( groundColor );
-
-	}
-
-	copy( source, recursive ) {
-
-		super.copy( source, recursive );
-
-		this.groundColor.copy( source.groundColor );
-
-		return this;
-
-	}
-
-	toJSON( meta ) {
-
-		const data = super.toJSON( meta );
-
-		data.object.groundColor = this.groundColor.getHex();
-
-		return data;
 
 	}
 
@@ -48139,6 +47578,248 @@ class PointLight extends Light {
 		data.object.decay = this.decay;
 
 		data.object.shadow = this.shadow.toJSON();
+
+		return data;
+
+	}
+
+}
+
+/**
+ * Camera that uses [orthographic projection](https://en.wikipedia.org/wiki/Orthographic_projection).
+ *
+ * In this projection mode, an object's size in the rendered image stays
+ * constant regardless of its distance from the camera. This can be useful
+ * for rendering 2D scenes and UI elements, amongst other things.
+ *
+ * ```js
+ * const camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
+ * scene.add( camera );
+ * ```
+ *
+ * @augments Camera
+ */
+class OrthographicCamera extends Camera {
+
+	/**
+	 * Constructs a new orthographic camera.
+	 *
+	 * @param {number} [left=-1] - The left plane of the camera's frustum.
+	 * @param {number} [right=1] - The right plane of the camera's frustum.
+	 * @param {number} [top=1] - The top plane of the camera's frustum.
+	 * @param {number} [bottom=-1] - The bottom plane of the camera's frustum.
+	 * @param {number} [near=0.1] - The camera's near plane.
+	 * @param {number} [far=2000] - The camera's far plane.
+	 */
+	constructor( left = -1, right = 1, top = 1, bottom = -1, near = 0.1, far = 2000 ) {
+
+		super();
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isOrthographicCamera = true;
+
+		this.type = 'OrthographicCamera';
+
+		/**
+		 * The zoom factor of the camera.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.zoom = 1;
+
+		/**
+		 * Represents the frustum window specification. This property should not be edited
+		 * directly but via {@link PerspectiveCamera#setViewOffset} and {@link PerspectiveCamera#clearViewOffset}.
+		 *
+		 * @type {?Object}
+		 * @default null
+		 */
+		this.view = null;
+
+		/**
+		 * The left plane of the camera's frustum.
+		 *
+		 * @type {number}
+		 * @default -1
+		 */
+		this.left = left;
+
+		/**
+		 * The right plane of the camera's frustum.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.right = right;
+
+		/**
+		 * The top plane of the camera's frustum.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.top = top;
+
+		/**
+		 * The bottom plane of the camera's frustum.
+		 *
+		 * @type {number}
+		 * @default -1
+		 */
+		this.bottom = bottom;
+
+		/**
+		 * The camera's near plane. The valid range is greater than `0`
+		 * and less than the current value of {@link OrthographicCamera#far}.
+		 *
+		 * Note that, unlike for the {@link PerspectiveCamera}, `0` is a
+		 * valid value for an orthographic camera's near plane.
+		 *
+		 * @type {number}
+		 * @default 0.1
+		 */
+		this.near = near;
+
+		/**
+		 * The camera's far plane. Must be greater than the
+		 * current value of {@link OrthographicCamera#near}.
+		 *
+		 * @type {number}
+		 * @default 2000
+		 */
+		this.far = far;
+
+		this.updateProjectionMatrix();
+
+	}
+
+	copy( source, recursive ) {
+
+		super.copy( source, recursive );
+
+		this.left = source.left;
+		this.right = source.right;
+		this.top = source.top;
+		this.bottom = source.bottom;
+		this.near = source.near;
+		this.far = source.far;
+
+		this.zoom = source.zoom;
+		this.view = source.view === null ? null : Object.assign( {}, source.view );
+
+		return this;
+
+	}
+
+	/**
+	 * Sets an offset in a larger frustum. This is useful for multi-window or
+	 * multi-monitor/multi-machine setups.
+	 *
+	 * @param {number} fullWidth - The full width of multiview setup.
+	 * @param {number} fullHeight - The full height of multiview setup.
+	 * @param {number} x - The horizontal offset of the subcamera.
+	 * @param {number} y - The vertical offset of the subcamera.
+	 * @param {number} width - The width of subcamera.
+	 * @param {number} height - The height of subcamera.
+	 * @see {@link PerspectiveCamera#setViewOffset}
+	 */
+	setViewOffset( fullWidth, fullHeight, x, y, width, height ) {
+
+		if ( this.view === null ) {
+
+			this.view = {
+				enabled: true,
+				fullWidth: 1,
+				fullHeight: 1,
+				offsetX: 0,
+				offsetY: 0,
+				width: 1,
+				height: 1
+			};
+
+		}
+
+		this.view.enabled = true;
+		this.view.fullWidth = fullWidth;
+		this.view.fullHeight = fullHeight;
+		this.view.offsetX = x;
+		this.view.offsetY = y;
+		this.view.width = width;
+		this.view.height = height;
+
+		this.updateProjectionMatrix();
+
+	}
+
+	/**
+	 * Removes the view offset from the projection matrix.
+	 */
+	clearViewOffset() {
+
+		if ( this.view !== null ) {
+
+			this.view.enabled = false;
+
+		}
+
+		this.updateProjectionMatrix();
+
+	}
+
+	/**
+	 * Updates the camera's projection matrix. Must be called after any change of
+	 * camera properties.
+	 */
+	updateProjectionMatrix() {
+
+		const dx = ( this.right - this.left ) / ( 2 * this.zoom );
+		const dy = ( this.top - this.bottom ) / ( 2 * this.zoom );
+		const cx = ( this.right + this.left ) / 2;
+		const cy = ( this.top + this.bottom ) / 2;
+
+		let left = cx - dx;
+		let right = cx + dx;
+		let top = cy + dy;
+		let bottom = cy - dy;
+
+		if ( this.view !== null && this.view.enabled ) {
+
+			const scaleW = ( this.right - this.left ) / this.view.fullWidth / this.zoom;
+			const scaleH = ( this.top - this.bottom ) / this.view.fullHeight / this.zoom;
+
+			left += scaleW * this.view.offsetX;
+			right = left + scaleW * this.view.width;
+			top -= scaleH * this.view.offsetY;
+			bottom = top - scaleH * this.view.height;
+
+		}
+
+		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far, this.coordinateSystem, this.reversedDepth );
+
+		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
+
+	}
+
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		data.object.zoom = this.zoom;
+		data.object.left = this.left;
+		data.object.right = this.right;
+		data.object.top = this.top;
+		data.object.bottom = this.bottom;
+		data.object.near = this.near;
+		data.object.far = this.far;
+
+		if ( this.view !== null ) data.object.view = Object.assign( {}, this.view );
 
 		return data;
 
@@ -50228,12 +49909,6 @@ class ObjectLoader extends Loader {
 			case 'AmbientLight':
 
 				object = new AmbientLight( data.color, data.intensity );
-
-				break;
-
-			case 'SunLight':
-
-				object = new SunLight( data.color, data.intensity );
 
 				break;
 
@@ -60908,4 +60583,4 @@ if ( typeof window !== 'undefined' ) {
 
 }
 
-export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BackSide, BasicDepthPacking, BasicShadowMap, BatchedMesh, BezierInterpolant, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxGeometry, BoxHelper, BufferAttribute, BufferGeometry, BufferGeometryLoader, ByteType, Cache, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CineonToneMapping, CircleGeometry, ClampToEdgeWrapping, Clock, Color, ColorKeyframeTrack, ColorManagement, Compatibility, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeCamera, CubeDepthTexture, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeUVReflectionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderGeometry, Cylindrical, Data3DTexture, DataArrayTexture, DataTexture, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DepthFormat, DepthStencilFormat, DepthTexture, DetachedBindMode, DirectionalLight, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExternalTexture, ExtrudeGeometry, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, Fog, FogExp2, FramebufferTexture, FrontSide, Frustum, FrustumArray, GLBufferAttribute, GLSL1, GLSL3, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HTMLTexture, HalfFloatType, HemisphereLight, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateBezier, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, InvertStencilOp, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry, Layers, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LineSegments, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, Material, MaterialBlending, MaterialLoader, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, NormalAnimationBlendMode, NormalBlending, NormalGAPacking, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, ObjectSpaceNormalMap, OctahedronGeometry, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, Path, PerspectiveCamera, Plane, PlaneGeometry, PlaneHelper, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, R11_EAC_Format, RAD2DEG, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBDepthPacking, RGBFormat, RGBIntegerFormat, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGDepthPacking, RGFormat, RGIntegerFormat, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RedFormat, RedIntegerFormat, ReinhardToneMapping, RenderObjectRefreshType, RenderTarget, RenderTarget3D, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, ReversedDepthFuncs, RingGeometry, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, Scene, ShaderMaterial, ShadowMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, Source, Sphere, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SpotLight, SpotLightHelper, Sprite, SpriteMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, SunLight, TOUCH, TangentSpaceNormalMap, TetrahedronGeometry, Texture, TextureLoader, TextureSource, TextureUtils, Timer, TimestampQuery, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, UniformsUtils, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLCoordinateSystem, WebGLRenderTarget, WebGPUCoordinateSystem, WebXRController, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, cloneUniforms, createCanvasElement, createElementNS, error, getByteLength, getConsoleFunction, getUnlitUniformColorSpace, isTypedArray, log, mergeUniforms, probeAsync, setConsoleFunction, warn, warnOnce, yieldToMain };
+export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BackSide, BasicDepthPacking, BasicShadowMap, BatchedMesh, BezierInterpolant, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxGeometry, BoxHelper, BufferAttribute, BufferGeometry, BufferGeometryLoader, ByteType, Cache, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CineonToneMapping, CircleGeometry, ClampToEdgeWrapping, Clock, Color, ColorKeyframeTrack, ColorManagement, Compatibility, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeCamera, CubeDepthTexture, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeUVReflectionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderGeometry, Cylindrical, Data3DTexture, DataArrayTexture, DataTexture, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DepthFormat, DepthStencilFormat, DepthTexture, DetachedBindMode, DirectionalLight, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExternalTexture, ExtrudeGeometry, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, Fog, FogExp2, FramebufferTexture, FrontSide, Frustum, FrustumArray, GLBufferAttribute, GLSL1, GLSL3, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HTMLTexture, HalfFloatType, HemisphereLight, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateBezier, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, InvertStencilOp, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry, Layers, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, LightShadow, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LineSegments, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, Material, MaterialBlending, MaterialLoader, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, NormalAnimationBlendMode, NormalBlending, NormalGAPacking, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, ObjectSpaceNormalMap, OctahedronGeometry, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, Path, PerspectiveCamera, Plane, PlaneGeometry, PlaneHelper, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, R11_EAC_Format, RAD2DEG, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBDepthPacking, RGBFormat, RGBIntegerFormat, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGDepthPacking, RGFormat, RGIntegerFormat, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RedFormat, RedIntegerFormat, ReinhardToneMapping, RenderObjectRefreshType, RenderTarget, RenderTarget3D, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, ReversedDepthFuncs, RingGeometry, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, Scene, ShaderMaterial, ShadowMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, Source, Sphere, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SpotLight, SpotLightHelper, Sprite, SpriteMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TOUCH, TangentSpaceNormalMap, TetrahedronGeometry, Texture, TextureLoader, TextureSource, TextureUtils, Timer, TimestampQuery, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, UniformsUtils, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLCoordinateSystem, WebGLRenderTarget, WebGPUCoordinateSystem, WebXRController, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, cloneUniforms, createCanvasElement, createElementNS, error, getByteLength, getConsoleFunction, getUnlitUniformColorSpace, isTypedArray, log, mergeUniforms, probeAsync, setConsoleFunction, warn, warnOnce, yieldToMain };

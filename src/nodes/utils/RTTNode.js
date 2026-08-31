@@ -9,8 +9,12 @@ import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { HalfFloatType } from '../../constants.js';
+import { error } from '../../utils.js';
+import { resetRendererState, restoreRendererState } from '../../renderers/common/RendererUtils.js';
 
 const _size = /*@__PURE__*/ new Vector2();
+
+let _rendererState;
 
 /**
  * `RTTNode` takes another node and uses it with a `QuadMesh` to render into a texture (RTT).
@@ -32,13 +36,21 @@ class RTTNode extends TextureNode {
 	 * Constructs a new RTT node.
 	 *
 	 * @param {Node} node - The node to render a texture with.
-	 * @param {?number} [width=null] - The width of the internal render target. If not width is applied, the render target is automatically resized.
+	 * @param {?number} [width=null] - The width of the internal render target. If no width is applied, the render target is automatically resized.
 	 * @param {?number} [height=null] - The height of the internal render target.
-	 * @param {Object} [options={type:HalfFloatType}] - The options for the internal render target.
+	 * @param {Object} [options={}] - The options for the internal render target.
+	 * @param {number} [options.type=HalfFloatType] - The texture type.
+	 * @param {boolean} [options.autoUpdate=true] - Whether the texture should automatically be updated or not.
+	 * @param {number} [options.resolutionScale=1] - The resolution scale.
 	 */
-	constructor( node, width = null, height = null, options = { type: HalfFloatType } ) {
+	constructor( node, width = null, height = null, options = {} ) {
 
-		const renderTarget = new RenderTarget( width, height, options );
+		const {
+			autoUpdate = true,
+			resolutionScale = 1
+		} = options;
+
+		const renderTarget = new RenderTarget( width ?? 1, height ?? 1, { type: HalfFloatType, ...options } );
 
 		super( renderTarget.texture, uv() );
 
@@ -96,7 +108,7 @@ class RTTNode extends TextureNode {
 		 * @type {boolean}
 		 * @default true
 		 */
-		this.autoUpdate = true;
+		this.autoUpdate = autoUpdate;
 
 		/**
 		 * The resolution scale
@@ -105,7 +117,7 @@ class RTTNode extends TextureNode {
 		 * @type {number}
 		 * @default 1
 		 */
-		this._resolutionScale = 1;
+		this._resolutionScale = resolutionScale;
 
 		/**
 		 * The internal quad mesh for RTT.
@@ -116,13 +128,13 @@ class RTTNode extends TextureNode {
 		this._quadMesh = new QuadMesh( new NodeMaterial() );
 
 		/**
-		 * The `updateBeforeType` is set to `NodeUpdateType.RENDER` since the node updates
-		 * the texture once per render in its {@link RTTNode#updateBefore} method.
+		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
+		 * the texture once per frame in its {@link RTTNode#updateBefore} method.
 		 *
 		 * @type {string}
-		 * @default 'render'
+		 * @default 'frame'
 		 */
-		this.updateBeforeType = NodeUpdateType.RENDER;
+		this.updateBeforeType = NodeUpdateType.FRAME;
 
 	}
 
@@ -151,10 +163,10 @@ class RTTNode extends TextureNode {
 	}
 
 	/**
-	 * Sets the size of the internal render target
+	 * Sets the size of the internal render target.
 	 *
 	 * @param {number} width - The width to set.
-	 * @param {number} height - The width to set.
+	 * @param {number} height - The height to set.
 	 */
 	setSize( width, height ) {
 
@@ -199,15 +211,48 @@ class RTTNode extends TextureNode {
 
 	}
 
-	updateBefore( { renderer } ) {
+	/**
+	 * Overwritten since the value is defined by the internal render target.
+	 *
+	 * @param {Texture} value - The texture value.
+	 */
+	set value( value ) {
+
+		if ( this.renderTarget && value !== this.renderTarget.texture ) {
+
+			error( 'TSL: "rtt()" does not allow overwriting the value.' );
+
+		}
+
+	}
+
+	/**
+	 * The texture of the internal render target.
+	 *
+	 * @type {Texture}
+	 */
+	get value() {
+
+		return this.renderTarget ? this.renderTarget.texture : null;
+
+	}
+
+	/**
+	 * Renders the node's output into the internal render target before the main render pass.
+	 * Handles automatic resizing of the render target when `autoResize` is enabled,
+	 * and skips rendering if neither `textureNeedsUpdate` nor `autoUpdate` is true.
+	 *
+	 * @param {NodeFrame} frame - The current node frame, providing access to the renderer and other frame data.
+	 */
+	updateBefore( frame ) {
+
+		const { renderer } = frame;
 
 		if ( this.textureNeedsUpdate === false && this.autoUpdate === false ) return;
 
 		this.textureNeedsUpdate = false;
 
 		//
-
-		const currentRenderTarget = renderer.getRenderTarget();
 
 		if ( this.autoResize === true ) {
 
@@ -230,9 +275,11 @@ class RTTNode extends TextureNode {
 
 		let name = 'RTT';
 
-		if ( this.node.name ) {
+		const callName = this.name || this.node.name;
 
-			name = this.node.name + ' [ ' + name + ' ]';
+		if ( callName ) {
+
+			name = callName + ' [ ' + name + ' ]';
 
 		}
 
@@ -240,11 +287,13 @@ class RTTNode extends TextureNode {
 
 		//
 
+		_rendererState = resetRendererState( renderer, _rendererState );
+
 		renderer.setRenderTarget( this.renderTarget );
 
 		this._quadMesh.render( renderer );
 
-		renderer.setRenderTarget( currentRenderTarget );
+		restoreRendererState( renderer, _rendererState );
 
 	}
 
@@ -258,6 +307,18 @@ class RTTNode extends TextureNode {
 
 	}
 
+	/**
+	 * Frees internal resources. Should be called when the node is no longer in use.
+	 */
+	dispose() {
+
+		this.renderTarget.dispose();
+		this._quadMesh.material.dispose();
+
+		super.dispose();
+
+	}
+
 }
 
 export default RTTNode;
@@ -268,9 +329,12 @@ export default RTTNode;
  * @tsl
  * @function
  * @param {Node} node - The node to render a texture with.
- * @param {?number} [width=null] - The width of the internal render target. If not width is applied, the render target is automatically resized.
+ * @param {?number} [width=null] - The width of the internal render target. If no width is applied, the render target is automatically resized.
  * @param {?number} [height=null] - The height of the internal render target.
- * @param {Object} [options={type:HalfFloatType}] - The options for the internal render target.
+ * @param {Object} [options={}] - The options for the internal render target.
+ * @param {number} [options.type=HalfFloatType] - The texture type.
+ * @param {boolean} [options.autoUpdate=true] - Whether the texture should automatically be updated or not.
+ * @param {number} [options.resolutionScale=1] - The resolution scale.
  * @returns {RTTNode}
  */
 export const rtt = ( node, ...params ) => new RTTNode( nodeObject( node ), ...params );
@@ -281,9 +345,12 @@ export const rtt = ( node, ...params ) => new RTTNode( nodeObject( node ), ...pa
  * @tsl
  * @function
  * @param {Node} node - The node to render a texture with.
- * @param {?number} [width=null] - The width of the internal render target. If not width is applied, the render target is automatically resized.
+ * @param {?number} [width=null] - The width of the internal render target. If no width is applied, the render target is automatically resized.
  * @param {?number} [height=null] - The height of the internal render target.
- * @param {Object} [options={type:HalfFloatType}] - The options for the internal render target.
+ * @param {Object} [options={}] - The options for the internal render target.
+ * @param {number} [options.type=HalfFloatType] - The texture type.
+ * @param {boolean} [options.autoUpdate=true] - Whether the texture should automatically be updated or not.
+ * @param {number} [options.resolutionScale=1] - The resolution scale.
  * @returns {RTTNode}
  */
 export const convertToTexture = ( node, ...params ) => {

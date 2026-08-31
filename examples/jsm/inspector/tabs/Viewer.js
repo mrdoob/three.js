@@ -624,6 +624,7 @@ class Viewer extends Tab {
 
 		this.splitActive = true;
 		this.splitCanvasData = canvasData;
+		this.splitX = 0.5;
 
 		const renderer = this.inspector.getRenderer();
 		const mainCanvas = renderer.domElement;
@@ -674,6 +675,7 @@ class Viewer extends Tab {
 				const onPointerDown = ( e ) => {
 
 					isDragging = true;
+					line.classList.add( 'active' );
 					e.preventDefault();
 
 				};
@@ -699,6 +701,7 @@ class Viewer extends Tab {
 				const onPointerUp = () => {
 
 					isDragging = false;
+					line.classList.remove( 'active' );
 
 				};
 
@@ -756,13 +759,11 @@ class Viewer extends Tab {
 
 		} else {
 
-			const thickness = float( 1 ).div( this.splitUniforms.viewportWidth );
-			const isLine = screenUV.x.sub( this.splitUniforms.splitX ).abs().lessThan( thickness );
 			finalColor = Fn( () => {
 
 				screenUV.x.lessThan( this.splitUniforms.splitX ).discard();
 
-				return isLine.select( vec4( 0.29, 0.29, 0.35, 1.0 ), targetColorCtx );
+				return targetColorCtx;
 
 			} )();
 
@@ -947,6 +948,13 @@ class Viewer extends Tab {
 
 			const mainCanvas = renderer.domElement;
 			const rect = mainCanvas.getBoundingClientRect();
+
+			if ( rect.width <= 0 || rect.height <= 0 ) {
+
+				return;
+
+			}
+
 			const targetParent = document.fullscreenElement || this.profiler.domElement;
 			const parentRect = targetParent.getBoundingClientRect();
 			const localLeft = rect.left - parentRect.left;
@@ -978,7 +986,7 @@ class Viewer extends Tab {
 
 			}
 
-			if ( this.splitCanvasTarget.domElement.width !== rect.width || this.splitCanvasTarget.domElement.height !== rect.height ) {
+			if ( this.splitCanvasTarget.width !== rect.width || this.splitCanvasTarget.height !== rect.height ) {
 
 				this.splitCanvasTarget.setSize( rect.width, rect.height );
 
@@ -1020,7 +1028,7 @@ class Viewer extends Tab {
 
 			if ( ! renderer.backend.isWebGPUBackend ) {
 
-				inspector.resolveConsoleOnce( 'warn', 'Inspector: Viewer is only available with WebGPU.' );
+				// Viewer is only available with WebGPU.
 
 				return;
 
@@ -1311,6 +1319,53 @@ class Viewer extends Tab {
 			}
 
 		}
+
+	}
+
+	dispose() {
+
+		if ( this.splitActive ) {
+
+			this.stopSplitMode();
+
+		}
+
+		if ( this.splitCanvas ) {
+
+			if ( this.splitCanvas.parentElement ) {
+
+				this.splitCanvas.parentElement.removeChild( this.splitCanvas );
+
+			}
+
+			this.splitCanvas = null;
+
+		}
+
+		if ( this.splitCanvasTarget ) {
+
+			this.splitCanvasTarget.dispose();
+			this.splitCanvasTarget = null;
+
+		}
+
+		if ( this.splitMaterial ) {
+
+			this.splitMaterial.dispose();
+			this.splitMaterial = null;
+
+		}
+
+		for ( const canvasData of this.canvasNodes.values() ) {
+
+			canvasData.canvasTarget.dispose();
+			canvasData.material.dispose();
+
+		}
+
+		this.canvasNodes.clear();
+
+		super.dispose();
 
 	}
 
