@@ -43,7 +43,7 @@
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			import { abs, add, instancedBufferAttribute, positionLocal, mod, time, sin, vec3, select, float, screenUV, color } from 'three/tsl';
+			import { abs, add, instancedBufferAttribute, positionLocal, mod, time, sin, vec3, ternary, float, screenUV, color } from 'three/tsl';
 
 			let camera, scene, renderer, controls;
 
@@ -131,8 +131,8 @@
 				const s0 = sin( localTime.add( instanceSeed ) ).mul( 0.25 );
 			
 				const dist = abs( instanceTime.sub( modTime ) ).toConst(); // modTime and instanceTime are in the range [0,1]
-				const wrapDist = select( dist.greaterThan( 0.5 ), dist.oneMinus(), dist ).toConst(); // the normalized distance should wrap around 0/1
-				const s1 = select( wrapDist.greaterThan( 0.1 ), float( 1 ), wrapDist.remap( 0, 0.1, 3, 1 ) ); // compute a scale in a range around the current interpolated value
+				const wrapDist = ternary( dist.greaterThan( 0.5 ), dist.oneMinus(), dist ).toConst(); // the normalized distance should wrap around 0/1
+				const s1 = ternary( wrapDist.greaterThan( 0.1 ), float( 1 ), wrapDist.remap( 0, 0.1, 3, 1 ) ); // compute a scale in a range around the current interpolated value
 			
 				const offset = vec3( instancePosition.x, instancePosition.y.add( s0 ), instancePosition.z ).toConst( 'offset' );
 				material.positionNode = add( positionLocal.mul( s1 ), offset );

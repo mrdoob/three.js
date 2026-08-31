@@ -1,5 +1,5 @@
 import { Vector2, TempNode } from 'three/webgpu';
-import { Fn, uniformArray, select, float, NodeUpdateType, uv, dot, clamp, uniform, convertToTexture, smoothstep, bool, vec2, vec3, If, Loop, max, min, Break, abs } from 'three/tsl';
+import { Fn, uniformArray, ternary, float, NodeUpdateType, uv, dot, clamp, uniform, convertToTexture, smoothstep, bool, vec2, vec3, If, Loop, max, min, Break, abs } from 'three/tsl';
 
 /**
  * Post processing node for applying FXAA. This node requires sRGB input
@@ -162,12 +162,12 @@ class FXAANode extends TempNode {
 
 			const isHorizontal = horizontal.greaterThanEqual( vertical );
 
-			const pLuminance = select( isHorizontal, l.s, l.e );
-			const nLuminance = select( isHorizontal, l.n, l.w );
+			const pLuminance = ternary( isHorizontal, l.s, l.e );
+			const nLuminance = ternary( isHorizontal, l.n, l.w );
 			const pGradient = abs( pLuminance.sub( l.m ) );
 			const nGradient = abs( nLuminance.sub( l.m ) );
 
-			const pixelStep = select( isHorizontal, texSize.y, texSize.x ).toVar();
+			const pixelStep = ternary( isHorizontal, texSize.y, texSize.x ).toVar();
 			const oppositeLuminance = float().toVar();
 			const gradient = float().toVar();
 

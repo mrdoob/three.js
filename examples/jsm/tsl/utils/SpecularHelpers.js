@@ -290,7 +290,7 @@ export const equirectDirPdf = Fn( ( [ direction ] ) => {
 
 	const uvDir = equirectUV( direction );
 	const sinTheta = sin( uvDir.y.mul( Math.PI ) );
-	return sinTheta.abs().lessThan( float( 1e-6 ) ).select(
+	return sinTheta.abs().lessThan( float( 1e-6 ) ).ternary(
 		float( 0 ),
 		float( 1 ).div( float( 2 * Math.PI * Math.PI ).mul( sinTheta ) )
 	);

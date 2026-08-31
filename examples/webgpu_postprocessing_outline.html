@@ -194,7 +194,7 @@
 				const osc = oscSine( period ).mul( .5 ).add( .5 ); // osc [ 0.5, 1.0 ]
 
 				const outlineColor = visibleEdge.mul( visibleEdgeColor ).add( hiddenEdge.mul( hiddenEdgeColor ) ).mul( edgeStrength );
-				const outlinePulse = pulsePeriod.greaterThan( 0 ).select( outlineColor.mul( osc ), outlineColor );
+				const outlinePulse = pulsePeriod.greaterThan( 0 ).ternary( outlineColor.mul( osc ), outlineColor );
 
 				// postprocessing
 

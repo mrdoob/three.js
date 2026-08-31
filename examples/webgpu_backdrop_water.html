@@ -175,7 +175,7 @@
 
 				const depthRefraction = depthTestForRefraction.remapClamp( 0, .1 );
 
-				const finalUV = depthTestForRefraction.lessThan( 0 ).select( screenUV, refractionUV );
+				const finalUV = depthTestForRefraction.lessThan( 0 ).ternary( screenUV, refractionUV );
 
 				const viewportTexture = viewportSharedTexture( finalUV ).toInspector( 'Water / Viewport Texture + Refraction UV' );
 
@@ -241,12 +241,12 @@
 				const waterMask = objectPosition( camera ).y.greaterThan( screenUV.y.sub( .5 ).mul( camera.near ) ).toInspector( 'Post-Processing / Water Mask' );
 
 				const scenePassColorBlurred = gaussianBlur( scenePassColor );
-				scenePassColorBlurred.directionNode = waterMask.select( scenePassDepth, scenePass.getLinearDepthNode().mul( 5 ) ).toInspector( 'Post-Processing / Blur Strength [ Depth ]', ( node ) => node.toFloat() );
+				scenePassColorBlurred.directionNode = waterMask.ternary( scenePassDepth, scenePass.getLinearDepthNode().mul( 5 ) ).toInspector( 'Post-Processing / Blur Strength [ Depth ]', ( node ) => node.toFloat() );
 
 				const vignette = screenUV.distance( .5 ).mul( 1.35 ).clamp().oneMinus().toInspector( 'Post-Processing / Vignette' );
 
 				renderPipeline = new THREE.RenderPipeline( renderer );
-				renderPipeline.outputNode = waterMask.select( scenePassColorBlurred, scenePassColorBlurred.mul( color( 0x74ccf4 ) ).mul( vignette ) );
+				renderPipeline.outputNode = waterMask.ternary( scenePassColorBlurred, scenePassColorBlurred.mul( color( 0x74ccf4 ) ).mul( vignette ) );
 
 				//
 

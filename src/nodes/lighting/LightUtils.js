@@ -17,7 +17,7 @@ export const getDistanceAttenuation = /*@__PURE__*/ Fn( ( { lightDistance, cutof
 	// https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 	const distanceFalloff = lightDistance.pow( decayExponent ).max( 0.01 ).reciprocal();
 
-	return cutoffDistance.greaterThan( 0 ).select(
+	return cutoffDistance.greaterThan( 0 ).ternary(
 		distanceFalloff.mul( lightDistance.div( cutoffDistance ).pow4().oneMinus().clamp().pow2() ),
 		distanceFalloff
 	);

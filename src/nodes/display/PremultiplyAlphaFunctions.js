@@ -34,6 +34,6 @@ export const premultiplyAlpha = /*@__PURE__*/ Fn( ( [ color ] ) => {
  */
 export const unpremultiplyAlpha = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
-	return color.a.equal( 0 ).select( vec4( 0 ), vec4( color.rgb.div( color.a ), color.a ) );
+	return color.a.equal( 0 ).ternary( vec4( 0 ), vec4( color.rgb.div( color.a ), color.a ) );
 
 }, { color: 'vec4', return: 'vec4' } );

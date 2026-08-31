@@ -1,5 +1,5 @@
 import { Fn, float, mat3, vec3, If } from '../tsl/TSLBase.js';
-import { select } from '../math/ConditionalNode.js';
+import { ternary } from '../math/ConditionalNode.js';
 import { clamp, log2, max, min, pow, mix } from '../math/MathNode.js';
 import { mul, sub, div } from '../math/OperatorNode.js';
 
@@ -213,7 +213,7 @@ export const neutralToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 	color = color.mul( exposure );
 
 	const x = min( color.r, min( color.g, color.b ) );
-	const offset = select( x.lessThan( 0.08 ), x.sub( mul( 6.25, x.mul( x ) ) ), 0.04 );
+	const offset = ternary( x.lessThan( 0.08 ), x.sub( mul( 6.25, x.mul( x ) ) ), 0.04 );
 
 	color.subAssign( offset );
 

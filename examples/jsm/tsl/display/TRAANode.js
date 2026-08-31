@@ -557,7 +557,7 @@ class TRAANode extends TempNode {
 			const vUnit = vClip.xyz.div( eClip );
 			const absUnit = vUnit.abs();
 			const maxUnit = max( absUnit.x, absUnit.y, absUnit.z );
-			return maxUnit.greaterThan( 1 ).select(
+			return maxUnit.greaterThan( 1 ).ternary(
 				vec4( pClip, currentColor.a ).add( vClip.div( maxUnit ) ),
 				historyColor
 			);
@@ -692,7 +692,7 @@ class TRAANode extends TempNode {
 
 			}
 
-			currentWeight.assign( hasValidHistory.select( currentWeight.add( motionFactor ).saturate(), 1 ) );
+			currentWeight.assign( hasValidHistory.ternary( currentWeight.add( motionFactor ).saturate(), 1 ) );
 
 			// Perform neighborhood clipping/clamping. We use variance clipping here.
 

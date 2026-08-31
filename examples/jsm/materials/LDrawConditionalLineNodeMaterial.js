@@ -64,7 +64,7 @@ class LDrawConditionalLineMaterial extends NodeMaterial {
 			// from the line segment then the line should not be drawn.
 			const d0 = dot( normalize( norm ), normalize( c0dir ) ).toVar();
 			const d1 = dot( normalize( norm ), normalize( c1dir ) ).toVar();
-			const discardFlag = sign( d0 ).notEqual( sign( d1 ) ).select( float( 1 ), float( 0 ) );
+			const discardFlag = sign( d0 ).notEqual( sign( d1 ) ).ternary( float( 1 ), float( 0 ) );
 
 			varyingProperty( 'float', 'discardFlag' ).assign( discardFlag );
 

@@ -1,6 +1,6 @@
 import Node from './Node.js';
 import StackTrace from '../core/StackTrace.js';
-import { select } from '../math/ConditionalNode.js';
+import { ternary } from '../math/ConditionalNode.js';
 import { ShaderNode, nodeProxy, getCurrentStack, setCurrentStack, nodeObject } from '../tsl/TSLBase.js';
 import { error } from '../../utils.js';
 
@@ -190,7 +190,7 @@ class StackNode extends Node {
 	If( boolNode, method ) {
 
 		const methodNode = new ShaderNode( method );
-		this._currentCond = select( boolNode, methodNode );
+		this._currentCond = ternary( boolNode, methodNode );
 
 		return this.addToStack( this._currentCond );
 
@@ -206,7 +206,7 @@ class StackNode extends Node {
 	ElseIf( boolNode, method ) {
 
 		const methodNode = new ShaderNode( method );
-		const ifNode = select( boolNode, methodNode );
+		const ifNode = ternary( boolNode, methodNode );
 
 		this._currentCond.elseNode = ifNode;
 		this._currentCond = ifNode;
@@ -287,7 +287,7 @@ class StackNode extends Node {
 
 		// build condition
 
-		const condNode = select( caseNode, methodNode );
+		const condNode = ternary( caseNode, methodNode );
 
 		if ( this._currentCond === null ) {
 

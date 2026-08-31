@@ -19,7 +19,7 @@ export const viewportSafeUV = /*@__PURE__*/ Fn( ( [ uv = null ] ) => {
 
 	const depth = linearDepth();
 	const depthDiff = linearDepth( viewportDepthTexture( uv ) ).sub( depth );
-	const finalUV = depthDiff.lessThan( 0 ).select( screenUV, uv );
+	const finalUV = depthDiff.lessThan( 0 ).ternary( screenUV, uv );
 
 	return finalUV;
 

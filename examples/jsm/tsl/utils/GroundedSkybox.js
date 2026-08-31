@@ -26,7 +26,7 @@ export const getGroundProjectedNormal = Fn( ( [ radiusNode, heightNode ] ) => {
 	const c = camPos.dot( camPos ).sub( radiusNode.mul( radiusNode ) ).toConst();
 	const h = b.mul( b ).sub( c ).toConst();
 
-	const intersection = h.greaterThanEqual( 0 ).select( h.sqrt().sub( b ), - 1 );
+	const intersection = h.greaterThanEqual( 0 ).ternary( h.sqrt().sub( b ), - 1 );
 
 	const projected = vec3( 0, 1, 0 ).toVar();
 

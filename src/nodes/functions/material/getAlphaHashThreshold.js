@@ -52,7 +52,7 @@ const getAlphaHashThreshold = /*@__PURE__*/ Fn( ( [ position ] ) => {
 		sub( 1.0, sub( 1.0, x ).mul( sub( 1.0, x ) ).div( mul( 2.0, a ).mul( sub( 1.0, a ) ) ) ) );
 
 	// Find our final, uniformly distributed alpha threshold (ατ)
-	const threshold = x.lessThan( a.oneMinus() ).select( x.lessThan( a ).select( cases.x, cases.y ), cases.z );
+	const threshold = x.lessThan( a.oneMinus() ).ternary( x.lessThan( a ).ternary( cases.x, cases.y ), cases.z );
 
 	// Avoids ατ == 0. Could also do ατ =1-ατ
 	return clamp( threshold, 1.0e-6, 1.0 );

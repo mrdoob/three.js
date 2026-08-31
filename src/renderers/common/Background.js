@@ -105,7 +105,7 @@ class Background extends DataMap {
 				const orthoScale = div( 1.0, cameraProjectionMatrix.element( 1 ).element( 1 ) ).mul( 3.0 );
 
 				// compute vertex position
-				const modifiedPosition = isOrtho.select( positionLocal.mul( orthoScale ), positionLocal );
+				const modifiedPosition = isOrtho.ternary( positionLocal.mul( orthoScale ), positionLocal );
 
 				// by using a w component of 0, the skybox will not translate when the camera moves through the scene
 				const viewPosition = modelViewMatrix.mul( vec4( modifiedPosition, 0.0 ) );

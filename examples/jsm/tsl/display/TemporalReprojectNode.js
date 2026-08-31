@@ -1,4 +1,4 @@
-import { EPSILON, Fn, If, abs, convertToTexture, dFdx, dFdy, dot, exp, float, floor, fwidth, getViewPosition, ivec2, luminance, max, min, mix, nodeObject, normalize, passTexture, screenCoordinate, select, smoothstep, sqrt, struct, texture, textureLoad, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4, velocity, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
+import { EPSILON, Fn, If, abs, convertToTexture, dFdx, dFdy, dot, exp, float, floor, fwidth, getViewPosition, ivec2, luminance, max, min, mix, nodeObject, normalize, passTexture, screenCoordinate, ternary, smoothstep, sqrt, struct, texture, textureLoad, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4, velocity, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
 import { DepthTexture, HalfFloatType, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, TempNode, Vector2, Vector3 } from 'three/webgpu';
 import { ENV_RAY_LENGTH, ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
 
@@ -110,7 +110,7 @@ const clipToAABB = Fn( ( [ history, boxMin, boxMax ] ) => {
 	const absUnit = vUnit.abs();
 	const maxUnit = max( absUnit.x, absUnit.y, absUnit.z );
 
-	return maxUnit.greaterThan( 1 ).select( pClip.add( vClip.div( maxUnit ) ), history );
+	return maxUnit.greaterThan( 1 ).ternary( pClip.add( vClip.div( maxUnit ) ), history );
 
 } ).setLayout( {
 	name: 'clipToAABB',
@@ -200,7 +200,7 @@ const collectNeighborhood = Fn( ( [ beautyTexture, beautyTexel, inputColor, flic
 	// Continuous environment probability: fraction of the 3×3 neighbourhood that missed in screen space
 	// and fell back to env (0 = all hits, 1 = all env), for smooth reflection/environment transitions.
 	const envProbability = rayLengthCount.div( float( 9 ) ).oneMinus();
-	const rayLength = rayLengthCount.lessThan( 0.5 ).select( float( ENV_RAY_LENGTH ), rayLengthSum.div( max( rayLengthCount, float( 1e-4 ) ) ) );
+	const rayLength = rayLengthCount.lessThan( 0.5 ).ternary( float( ENV_RAY_LENGTH ), rayLengthSum.div( max( rayLengthCount, float( 1e-4 ) ) ) );
 	const stdDevRayLength = sqrt( m2RayLength.div( max( rayLengthCount, float( 1.0 ) ) ) ).max( 1e-3 );
 
 	return neighborhoodStruct( mean, stdColor, rayLength, envProbability, stdDevRayLength );
@@ -345,7 +345,7 @@ const sampleHistory4Tap = Fn( ( [
 	const minConf = min( min( tap00.get( 'confidence' ), tap10.get( 'confidence' ) ), min( tap01.get( 'confidence' ), tap11.get( 'confidence' ) ) );
 
 	return historyResultStruct(
-		select( weightSum.greaterThan( 0.01 ), colorSum.div( weightSum ), vec4( inputColor.rgb, float( 1 ) ) ),
+		ternary( weightSum.greaterThan( 0.01 ), colorSum.div( weightSum ), vec4( inputColor.rgb, float( 1 ) ) ),
 		maxConf,
 		minConf
 	);
@@ -853,8 +853,8 @@ class TemporalReprojectNode extends TempNode {
 				const hcHit = hit.get( 'color' ).rgb.max( 0 );
 				const hcSurf = surf.get( 'color' ).rgb.max( 0 );
 
-				const confHit = hitValid.select( hit.get( 'tapConfidence' ), float( 0 ) );
-				const confSurf = surfValid.select( surf.get( 'tapConfidence' ), float( 0 ) );
+				const confHit = hitValid.ternary( hit.get( 'tapConfidence' ), float( 0 ) );
+				const confSurf = surfValid.ternary( surf.get( 'tapConfidence' ), float( 0 ) );
 				const minConfHit = hit.get( 'minConfidence' );
 
 				const reflectionEdgeFactor = neighborhood.get( 'stdDevRayLength' );

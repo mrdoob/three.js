@@ -21,7 +21,7 @@ const T = q1perp.mul( st0.x ).add( q0perp.mul( st1.x ) );
 const B = q1perp.mul( st0.y ).add( q0perp.mul( st1.y ) );
 
 const det = T.dot( T ).max( B.dot( B ) );
-const scale = det.equal( 0.0 ).select( 0.0, det.inverseSqrt() );
+const scale = det.equal( 0.0 ).ternary( 0.0, det.inverseSqrt() );
 
 /**
  * Tangent vector in view space, computed dynamically from geometry and UV derivatives.

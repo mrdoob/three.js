@@ -1,5 +1,5 @@
 import { HalfFloatType, RenderTarget, Vector2, NodeMaterial, RendererUtils, QuadMesh, TempNode, NodeUpdateType } from 'three/webgpu';
-import { Fn, float, vec2, vec3, vec4, ivec2, int, uv, floor, fract, abs, max, min, clamp, saturate, sqrt, select, exp2, nodeObject, passTexture, textureSize, textureLoad, convertToTexture, context } from 'three/tsl';
+import { Fn, float, vec2, vec3, vec4, ivec2, int, uv, floor, fract, abs, max, min, clamp, saturate, sqrt, ternary, exp2, nodeObject, passTexture, textureSize, textureLoad, convertToTexture, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -299,8 +299,8 @@ class FSR1Node extends TempNode {
 			const zro = dirSq.lessThan( 1.0 / 32768.0 ).toConst();
 			const rDirLen = float( 1.0 ).div( sqrt( max( dirSq, float( 1.0 / 32768.0 ) ) ) ).toConst();
 
-			dir.x.assign( select( zro, float( 1.0 ), dir.x ) );
-			dir.mulAssign( select( zro, float( 1.0 ), rDirLen ) );
+			dir.x.assign( ternary( zro, float( 1.0 ), dir.x ) );
+			dir.mulAssign( ternary( zro, float( 1.0 ), rDirLen ) );
 
 			// Shape the kernel based on edge strength.
 
@@ -410,7 +410,7 @@ class FSR1Node extends TempNode {
 			const nzRange = max( max( bL, dL ), max( eL, max( fL, hL ) ) ).sub( min( min( bL, dL ), min( eL, min( fL, hL ) ) ) ).toConst();
 			const nzFactor = float( 1.0 ).sub( abs( nz ).div( max( nzRange, float( 1.0 / 65536.0 ) ) ).saturate().mul( 0.5 ) ).toConst();
 
-			const effectiveLobe = this.denoise.equal( true ).select( lobe.mul( nzFactor ), lobe ).toConst();
+			const effectiveLobe = this.denoise.equal( true ).ternary( lobe.mul( nzFactor ), lobe ).toConst();
 
 			// Resolve: weighted blend of cross neighbors and center.
 

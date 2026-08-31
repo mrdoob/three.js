@@ -66,11 +66,11 @@ export const depthAwareBlend = /*#__PURE__*/ Fn( ( [ baseNode, blendNode, depthN
 
 	} );
 
-	count.assign( count.equal( 0 ).select( 1, count ) );
+	count.assign( count.equal( 0 ).ternary( 1, count ) );
 
 	pushDir.divAssign( count ).normalize();
 
-	const sampleUv = pushDir.length().greaterThan( 0 ).select( uvNode.add( edgeStrength.mul( pushDir.div( resolution ) ) ), uvNode );
+	const sampleUv = pushDir.length().greaterThan( 0 ).ternary( uvNode.add( edgeStrength.mul( pushDir.div( resolution ) ) ), uvNode );
 
 	const bestChoice = blendNode.sample( sampleUv ).r;
 	const baseColor = baseNode.sample( uvNode );

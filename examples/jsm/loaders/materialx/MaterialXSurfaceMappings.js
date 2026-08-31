@@ -565,7 +565,7 @@ function applyOpenPbrSurface( material, inputs, log, nodeName ) {
 	if ( transmissionEnabled && hasNodeValue( transmissionDepthNode ) && isEffectivelyZero( transmissionDepthNode ) === false ) {
 
 		material.thicknessNode = hasNodeValue( inputs.geometry_thin_walled )
-			? inputs.geometry_thin_walled.select( float( 0 ), transmissionDepthNode )
+			? inputs.geometry_thin_walled.ternary( float( 0 ), transmissionDepthNode )
 			: transmissionDepthNode;
 		material.attenuationDistanceNode = transmissionDepthNode;
 

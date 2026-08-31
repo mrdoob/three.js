@@ -9,9 +9,31 @@ import { NoColorSpace, ByteType, ShortType, RGBAIntegerFormat, RGBIntegerFormat,
 import { DataTexture } from '../../../textures/DataTexture.js';
 import { error } from '../../../utils.js';
 
+const createBooleanMixPolyfill = ( type ) => {
+
+	const components = vectorComponents.slice( 0, Number( type.at( - 1 ) ) );
+	const values = components.map( ( component ) => `\t\tcondition.${ component } ? b.${ component } : a.${ component }` ).join( ',\n' );
+
+	return new CodeNode( /* glsl */`${ type } tsl_mix_${ type }( ${ type } a, ${ type } b, bvec${ components.length } condition ) {
+	return ${ type }(
+${ values }
+	);
+}` );
+
+};
+
 const glslPolyfills = {
 	bitcast_int_uint: new CodeNode( /* glsl */'uint tsl_bitcast_int_to_uint ( int x ) { return floatBitsToUint( intBitsToFloat ( x ) ); }' ),
 	bitcast_uint_int: new CodeNode( /* glsl */'uint tsl_bitcast_uint_to_int ( uint x ) { return floatBitsToInt( uintBitsToFloat ( x ) ); }' ),
+	mix_ivec2: createBooleanMixPolyfill( 'ivec2' ),
+	mix_ivec3: createBooleanMixPolyfill( 'ivec3' ),
+	mix_ivec4: createBooleanMixPolyfill( 'ivec4' ),
+	mix_uvec2: createBooleanMixPolyfill( 'uvec2' ),
+	mix_uvec3: createBooleanMixPolyfill( 'uvec3' ),
+	mix_uvec4: createBooleanMixPolyfill( 'uvec4' ),
+	mix_bvec2: createBooleanMixPolyfill( 'bvec2' ),
+	mix_bvec3: createBooleanMixPolyfill( 'bvec3' ),
+	mix_bvec4: createBooleanMixPolyfill( 'bvec4' ),
 	textureGather: new CodeNode( /* glsl */`
 vec4 tsl_textureGather( const int comp, sampler2D map, vec2 coord, ivec2 offset, bool flipY ) {
 	if ( flipY ) offset.y = - offset.y;
@@ -86,6 +108,15 @@ const glslMethods = {
 	bitcast_float_uint: 'floatBitsToUint',
 	bitcast_uint_int: 'tsl_bitcast_uint_to_int',
 	bitcast_int_uint: 'tsl_bitcast_int_to_uint',
+	mix_ivec2: 'tsl_mix_ivec2',
+	mix_ivec3: 'tsl_mix_ivec3',
+	mix_ivec4: 'tsl_mix_ivec4',
+	mix_uvec2: 'tsl_mix_uvec2',
+	mix_uvec3: 'tsl_mix_uvec3',
+	mix_uvec4: 'tsl_mix_uvec4',
+	mix_bvec2: 'tsl_mix_bvec2',
+	mix_bvec3: 'tsl_mix_bvec3',
+	mix_bvec4: 'tsl_mix_bvec4',
 	floatpack_snorm_2x16: 'packSnorm2x16',
 	floatpack_unorm_2x16: 'packUnorm2x16',
 	floatpack_float16_2x16: 'packHalf2x16',
@@ -318,47 +349,6 @@ class GLSLNodeBuilder extends NodeBuilder {
 	getTernary( condSnippet, ifSnippet, elseSnippet ) {
 
 		return `${condSnippet} ? ${ifSnippet} : ${elseSnippet}`;
-
-	}
-
-	/**
-	 * Returns the native snippet for a genuinely per-component vector select.
-	 * GLSL has no vector ternary, so `float` types use `mix()`'s `bvecN`-selector
-	 * overload; `int`/`uint`/`bool` types use an arithmetic select instead, since
-	 * that overload doesn't exist for them.
-	 *
-	 * @param {string} condSnippet - The per-component boolean (`bvecN`) condition.
-	 * @param {string} ifSnippet - The vector expression selected where `condSnippet` is `true`.
-	 * @param {string} elseSnippet - The vector expression selected where `condSnippet` is `false`.
-	 * @param {string} type - The (vector) type of `ifSnippet`/`elseSnippet`.
-	 * @return {string} The resolved method name.
-	 */
-	getVectorSelect( condSnippet, ifSnippet, elseSnippet, type ) {
-
-		const componentType = this.getComponentType( type );
-
-		if ( componentType === 'float' ) {
-
-			return `mix( ${elseSnippet}, ${ifSnippet}, ${condSnippet} )`;
-
-		}
-
-		const glslType = this.getType( type );
-
-		if ( componentType === 'bool' ) {
-
-			const intType = this.getType( this.getTypeFromLength( this.getTypeLength( type ), 'int' ) );
-			const maskSnippet = `${intType}( ${condSnippet} )`;
-			const ifIntSnippet = `${intType}( ${ifSnippet} )`;
-			const elseIntSnippet = `${intType}( ${elseSnippet} )`;
-
-			return `${glslType}( ${elseIntSnippet} + ${maskSnippet} * ( ${ifIntSnippet} - ${elseIntSnippet} ) )`;
-
-		}
-
-		const maskSnippet = `${glslType}( ${condSnippet} )`;
-
-		return `${elseSnippet} + ${maskSnippet} * ( ${ifSnippet} - ${elseSnippet} )`;
 
 	}
 

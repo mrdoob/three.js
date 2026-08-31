@@ -631,7 +631,7 @@ class OutlineNode extends TempNode {
 
 			}
 
-			const depthTest = positionView.z.lessThanEqual( viewZNode ).select( 1, 0 );
+			const depthTest = positionView.z.lessThanEqual( viewZNode ).ternary( 1, 0 );
 			return vec3( 0.0, depthTest, 1.0 );
 
 		};
@@ -667,7 +667,7 @@ class OutlineNode extends TempNode {
 			const a1 = min( c1.g, c2.g );
 			const a2 = min( c3.g, c4.g );
 			const visibilityFactor = min( a1, a2 );
-			const edgeColor = visibilityFactor.oneMinus().greaterThan( 0.001 ).select( this._visibleEdgeColor, this._hiddenEdgeColor );
+			const edgeColor = visibilityFactor.oneMinus().greaterThan( 0.001 ).ternary( this._visibleEdgeColor, this._hiddenEdgeColor );
 			return vec4( edgeColor, 1 ).mul( d );
 
 		} );

@@ -433,7 +433,7 @@
 						const flicker = mx_noise_float( vertexPos.mul( 9.0 ).add( vec3( 0.0, uTime.negate().mul( 2.5 ), uTime.mul( 0.7 ) ) ) ).mul( 0.5 ).add( 0.5 );
 
 						// Baseline emission depends on temperature rate (0 if temperature is 0)
-						const baseEmission = uEmitTemperature.greaterThan( 0.0 ).select( float( 1.0 ), float( 0.0 ) );
+						const baseEmission = uEmitTemperature.greaterThan( 0.0 ).ternary( float( 1.0 ), float( 0.0 ) );
 
 						// Movement-based emission (boost) scales with speed
 						const movementEmission = uTeapotSpeed.mul( uMotionBoost );
@@ -780,13 +780,13 @@
 
 					// Correction factor to cancel the default point light attenuation and apply volumetric/capsule decay
 					// We only cancel the decay when rendering the volume so standard surfaces keep their physical 1/d^2 falloff.
-					const attenuationCorrection = isVolume.equal( 1.0 ).select(
+					const attenuationCorrection = isVolume.equal( 1.0 ).ternary(
 						softAttenuation.div( defaultAttenuation ),
 						float( 1.0 )
 					);
 
 					// Choose intensity based on whether we are shading the volume (smoke) or solid surfaces (reflection)
-					const currentIntensity = isVolume.equal( 1.0 ).select( uPointLightVolumeIntensity, uPointLightSurfaceIntensity );
+					const currentIntensity = isVolume.equal( 1.0 ).ternary( uPointLightVolumeIntensity, uPointLightSurfaceIntensity );
 
 					// 4. Color temperature oscillation: shift color tone slightly over time (uniform for volume)
 					const colorT = uEmitTemperature.div( 8.34 ).mul( 0.5 ).add( 0.20 ).add( uColorNoise ).clamp( 0.0, 1.0 );
@@ -833,7 +833,7 @@
 					const coloredFireProj = hue( saturation( fireColorProj, uSaturation ), uFireHue );
 
 					// Select either uniform fire color (volume) or projected fire color (surface)
-					const finalFireColor = isVolume.equal( 1.0 ).select( coloredFire, coloredFireProj );
+					const finalFireColor = isVolume.equal( 1.0 ).ternary( coloredFire, coloredFireProj );
 
 					// Scale intensity by uEmitTemperature (relative to its default 8.34) using Stefan-Boltzmann law (T^4)
 					// to make it physically correct (radiant energy is proportional to T^4)
@@ -853,7 +853,7 @@
 					const distanceScale = mix( uLightNearIntensity, uLightFarIntensity, smoothstep( 0.0, 1.0, distRatio ) );
 
 					// Apply distance-based scaling only when shading the volumetric smoke
-					const finalScale = isVolume.equal( 1.0 ).select( distanceScale, float( 1.0 ) );
+					const finalScale = isVolume.equal( 1.0 ).ternary( distanceScale, float( 1.0 ) );
 
 					return baseColor.mul( attenuationCorrection ).mul( finalScale );
 

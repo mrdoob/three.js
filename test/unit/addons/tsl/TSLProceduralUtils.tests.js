@@ -30,7 +30,7 @@ export default QUnit.module( 'TSL', () => {
 			assert.closeAbs( unpremultiplyAlpha( vec4( 0.5, 0.25, 0.1, 0.5 ) ), vec4( 1, 0.5, 0.2, 0.5 ), 1e-5, 'unpremultiplyAlpha() divides rgb by a=0.5 -- inverse of the premultiplyAlpha() case above' );
 			assert.closeAbs( unpremultiplyAlpha( vec4( 0.4, 0.8, 1, 1 ) ), vec4( 0.4, 0.8, 1, 1 ), 1e-5, 'unpremultiplyAlpha() with a=1 is a no-op' );
 
-			// a==0 takes the explicit select() branch returning vec4(0) outright,
+			// a==0 takes the explicit ternary() branch returning vec4(0) outright,
 			// rather than evaluating rgb/0 (which would be NaN/Inf on a GPU,
 			// same IEEE-754 hazard the sinc()/pcurve() findings in
 			// tsl-unit-test-findings.md ran into for other functions).

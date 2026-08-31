@@ -39,7 +39,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { instanceIndex, struct, If, uint, int, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, instancedArray, min, max, positionLocal, transformNormalToView, select, globalId } from 'three/tsl';
+			import { instanceIndex, struct, If, uint, int, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, instancedArray, min, max, positionLocal, transformNormalToView, ternary, globalId } from 'three/tsl';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -271,7 +271,7 @@
 				// Helper to get height from the current read buffer
 				const getCurrentHeight = ( index ) => {
 
-					return select( readFromA, heightStorageA.element( index ), heightStorageB.element( index ) );
+					return ternary( readFromA, heightStorageA.element( index ), heightStorageB.element( index ) );
 
 				};
 

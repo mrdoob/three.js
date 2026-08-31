@@ -103,7 +103,7 @@
 					// 1m major tile coordinates with subtle alternating grey checkerboard
 					const cell = p.floor();
 					const checker = cell.x.add( cell.y ).mod( 2.0 ).abs();
-					const tileColor = checker.greaterThan( 0.5 ).select( color( 0x3b3e46 ), color( 0x33363d ) );
+					const tileColor = checker.greaterThan( 0.5 ).ternary( color( 0x3b3e46 ), color( 0x33363d ) );
 
 					// Anti-aliased grid coverage helper using screen-space derivatives (fwidth)
 					const getGridCoverage = ( coord, lineWidthInPixels ) => {
@@ -364,7 +364,7 @@
 					const fogBottomY = groundLevelY;
 					const fogTopY = groundLevelY.add( fogHeight );
 
-					const dirY = rayDir.y.greaterThanEqual( 0.0 ).select( rayDir.y.max( 0.00001 ), rayDir.y.min( - 0.00001 ) );
+					const dirY = rayDir.y.greaterThanEqual( 0.0 ).ternary( rayDir.y.max( 0.00001 ), rayDir.y.min( - 0.00001 ) );
 					const t0 = fogBottomY.sub( cameraPositionUniform.y ).div( dirY );
 					const t1 = fogTopY.sub( cameraPositionUniform.y ).div( dirY );
 

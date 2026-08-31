@@ -109,8 +109,8 @@ export const getNormalFromDepth = /*@__PURE__*/ Fn( ( [ uv, depthTexture, projec
 
 	const ce = getViewPosition( uv, c0, projectionMatrixInverse ).toVar();
 
-	const dpdx = dl.lessThan( dr ).select( ce.sub( getViewPosition( uv.sub( vec2( float( 1 ).div( size.x ), 0 ) ), l1, projectionMatrixInverse ) ), ce.negate().add( getViewPosition( uv.add( vec2( float( 1 ).div( size.x ), 0 ) ), r1, projectionMatrixInverse ) ) );
-	const dpdy = db.lessThan( dt ).select( ce.sub( getViewPosition( uv.add( vec2( 0, float( 1 ).div( size.y ) ) ), b1, projectionMatrixInverse ) ), ce.negate().add( getViewPosition( uv.sub( vec2( 0, float( 1 ).div( size.y ) ) ), t1, projectionMatrixInverse ) ) );
+	const dpdx = dl.lessThan( dr ).ternary( ce.sub( getViewPosition( uv.sub( vec2( float( 1 ).div( size.x ), 0 ) ), l1, projectionMatrixInverse ) ), ce.negate().add( getViewPosition( uv.add( vec2( float( 1 ).div( size.x ), 0 ) ), r1, projectionMatrixInverse ) ) );
+	const dpdy = db.lessThan( dt ).ternary( ce.sub( getViewPosition( uv.add( vec2( 0, float( 1 ).div( size.y ) ) ), b1, projectionMatrixInverse ) ), ce.negate().add( getViewPosition( uv.sub( vec2( 0, float( 1 ).div( size.y ) ) ), t1, projectionMatrixInverse ) ) );
 
 	return normalize( cross( dpdx, dpdy ) );
 

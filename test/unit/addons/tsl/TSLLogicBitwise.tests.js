@@ -1,7 +1,7 @@
 import {
 	float, int, uint, vec3,
 	equal, notEqual, lessThan, greaterThan, lessThanEqual, greaterThanEqual,
-	and, or, not, xor, select,
+	and, or, not, xor, ternary,
 	bitAnd, bitOr, bitXor, bitNot, shiftLeft, shiftRight,
 	increment, decrement, incrementBefore, decrementBefore
 } from 'three/tsl';
@@ -66,13 +66,19 @@ export default QUnit.module( 'TSL', () => {
 
 		} );
 
-		gpuTest( 'select() picks its if/else branch by condition, independent of the branch values', ( { assert } ) => {
+		gpuTest( 'ternary() picks its if/else branch by condition, independent of the branch values', ( { assert } ) => {
 
-			assert.eq( select( equal( float( 1 ), float( 1 ) ), float( 10 ), float( 20 ) ), float( 10 ), 'select(true, 10, 20) picks the "if" branch' );
-			assert.eq( select( equal( float( 1 ), float( 0 ) ), float( 10 ), float( 20 ) ), float( 20 ), 'select(false, 10, 20) picks the "else" branch' );
+			assert.eq( ternary( equal( float( 1 ), float( 1 ) ), float( 10 ), float( 20 ) ), float( 10 ), 'ternary(true, 10, 20) picks the "if" branch' );
+			assert.eq( ternary( equal( float( 1 ), float( 0 ) ), float( 10 ), float( 20 ) ), float( 20 ), 'ternary(false, 10, 20) picks the "else" branch' );
 
-			const cond = vec3( 1, 0, 1 ).greaterThan( vec3( 0, 0, 0 ) );
-			assert.eq( select( cond, vec3( 1, 2, 3 ), vec3( 100, 200, 300 ) ), vec3( 1, 200, 3 ), 'select() with a vector condition blends per-component' );
+			const cond = vec3( 0, 1, 1 ).greaterThan( vec3( 0, 0, 0 ) );
+			assert.eq( ternary( cond, vec3( 1, 2, 3 ), vec3( 100, 200, 300 ) ), vec3( 100, 200, 300 ), 'a vector condition retains automatic conversion to a scalar bool' );
+
+			const allTrue = vec3( 1, 2, 3 ).greaterThan( vec3( 0 ) );
+			assert.eq( ternary( allTrue, vec3( 1, 2, 3 ), vec3( 100, 200, 300 ) ), vec3( 1, 2, 3 ), 'an all-true vector condition picks the "if" branch wholesale' );
+
+			const allFalse = vec3( - 1, - 2, - 3 ).greaterThan( vec3( 0 ) );
+			assert.eq( ternary( allFalse, vec3( 1, 2, 3 ), vec3( 100, 200, 300 ) ), vec3( 100, 200, 300 ), 'an all-false vector condition picks the "else" branch wholesale' );
 
 		} );
 

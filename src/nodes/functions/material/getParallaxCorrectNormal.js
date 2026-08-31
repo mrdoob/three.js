@@ -24,9 +24,9 @@ const getParallaxCorrectNormal = /*@__PURE__*/ Fn( ( [ normal, cubeSize, cubePos
 	const rbmax = cubeSize.mul( 0.5 ).add( cubePos ).sub( positionWorld ).div( nDir ).toVar();
 	const rbmin = cubeSize.mul( - 0.5 ).add( cubePos ).sub( positionWorld ).div( nDir ).toVar();
 	const rbminmax = vec3().toVar();
-	rbminmax.x = nDir.x.greaterThan( float( 0 ) ).select( rbmax.x, rbmin.x );
-	rbminmax.y = nDir.y.greaterThan( float( 0 ) ).select( rbmax.y, rbmin.y );
-	rbminmax.z = nDir.z.greaterThan( float( 0 ) ).select( rbmax.z, rbmin.z );
+	rbminmax.x = nDir.x.greaterThan( float( 0 ) ).ternary( rbmax.x, rbmin.x );
+	rbminmax.y = nDir.y.greaterThan( float( 0 ) ).ternary( rbmax.y, rbmin.y );
+	rbminmax.z = nDir.z.greaterThan( float( 0 ) ).ternary( rbmax.z, rbmin.z );
 
 	const correction = min( rbminmax.x, rbminmax.y, rbminmax.z ).toVar();
 	const boxIntersection = positionWorld.add( nDir.mul( correction ) ).toVar();

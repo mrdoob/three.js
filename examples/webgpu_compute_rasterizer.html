@@ -651,9 +651,9 @@
 											const isTopLeft1 = stepX_w1.lessThan( 0.0 ).or( stepX_w1.equal( 0.0 ).and( stepY_w1.greaterThan( 0.0 ) ) );
 											const isTopLeft2 = stepX_w2.lessThan( 0.0 ).or( stepX_w2.equal( 0.0 ).and( stepY_w2.greaterThan( 0.0 ) ) );
 
-											const bias0 = isTopLeft0.select( 0.0, - 1e-5 );
-											const bias1 = isTopLeft1.select( 0.0, - 1e-5 );
-											const bias2 = isTopLeft2.select( 0.0, - 1e-5 );
+											const bias0 = isTopLeft0.ternary( 0.0, - 1e-5 );
+											const bias1 = isTopLeft1.ternary( 0.0, - 1e-5 );
+											const bias2 = isTopLeft2.ternary( 0.0, - 1e-5 );
 
 											const pStart = vec2( float( startX ).add( 0.5 ), float( startY ).add( 0.5 ) );
 
@@ -945,14 +945,14 @@
 						const w2 = edgeFunction( s0, s1, p );
 
 						// Guard against division by zero for safe execution
-						const safeArea = area.equal( 0.0 ).select( 1.0, area );
+						const safeArea = area.equal( 0.0 ).ternary( 1.0, area );
 						const b0 = w0.div( safeArea );
 						const b1 = w1.div( safeArea );
 						const b2 = w2.div( safeArea );
 
 						// Perspective correct UV interpolation (32-bit floats!)
 						const z_inv = b0.div( p0.w ).add( b1.div( p1.w ) ).add( b2.div( p2.w ) );
-						const safeZInv = z_inv.equal( 0.0 ).select( 1.0, z_inv );
+						const safeZInv = z_inv.equal( 0.0 ).ternary( 1.0, z_inv );
 						const b0_p = b0.div( p0.w ).div( safeZInv );
 						const b1_p = b1.div( p1.w ).div( safeZInv );
 						const b2_p = b2.div( p2.w ).div( safeZInv );
@@ -973,7 +973,7 @@
 						const q2 = float( 1.0 ).div( p2.w );
 
 						const sum_w_q = w0.mul( q0 ).add( w1.mul( q1 ) ).add( w2.mul( q2 ) );
-						const safe_sum_w_q = sum_w_q.equal( 0.0 ).select( 1.0, sum_w_q );
+						const safe_sum_w_q = sum_w_q.equal( 0.0 ).ternary( 1.0, sum_w_q );
 
 						const dUvDx = (
 							dw0_dx.mul( q0 ).mul( t_uv0.sub( uv_interp ) )

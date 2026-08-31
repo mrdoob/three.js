@@ -240,7 +240,7 @@ export default QUnit.module( 'TSL', () => {
 			// cutoffDistance <= 0 skips the windowing term entirely:
 			// distanceFalloff == 1 / max(lightDistance^decayExponent, 0.01).
 			// cutoffDistance is routed through `.toVar()` so it isn't folded
-			// into a compile-time constant -- `select()` still builds the
+			// into a compile-time constant -- `ternary()` still builds the
 			// (untaken) windowed branch too, which divides by cutoffDistance,
 			// and WGSL rejects an exact `x / 0.0` constant fold even in a
 			// branch that never actually runs (see the sinc() singularity

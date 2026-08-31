@@ -1,5 +1,5 @@
 import { int, uint, float, vec3, bool, uvec3, vec2, vec4, If, Fn } from '../tsl/TSLBase.js';
-import { select } from '../math/ConditionalNode.js';
+import { ternary } from '../math/ConditionalNode.js';
 import { add, sub, mul } from '../math/OperatorNode.js';
 import { floor, abs, max, dot, sqrt, clamp, fract } from '../math/MathNode.js';
 import { overloadingFn } from '../utils/FunctionOverloadingNode.js';
@@ -13,7 +13,7 @@ export const mx_select = /*@__PURE__*/ Fn( ( [ b_immutable, t_immutable, f_immut
 	const t = float( t_immutable ).toVar();
 	const b = bool( b_immutable ).toVar();
 
-	return select( b, t, f ).uniformFlow();
+	return ternary( b, t, f ).uniformFlow();
 
 } ).setLayout( {
 	name: 'mx_select',
@@ -30,7 +30,7 @@ export const mx_negate_if = /*@__PURE__*/ Fn( ( [ val_immutable, b_immutable ] )
 	const b = bool( b_immutable ).toVar();
 	const val = float( val_immutable ).toVar();
 
-	return select( b, val.negate(), val ).uniformFlow();
+	return ternary( b, val.negate(), val ).uniformFlow();
 
 } ).setLayout( {
 	name: 'mx_negate_if',

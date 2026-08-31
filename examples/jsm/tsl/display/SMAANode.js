@@ -619,8 +619,8 @@ class SMAANode extends TempNode {
 
 				const offset = vec2().toVar();
 
-				offset.x = a.a.greaterThan( a.b ).select( a.a, a.b.negate() ); // left vs. right
-				offset.y = a.g.greaterThan( a.r ).select( a.g, a.r.negate() ); // top vs. bottom
+				offset.x = a.a.greaterThan( a.b ).ternary( a.a, a.b.negate() ); // left vs. right
+				offset.y = a.g.greaterThan( a.r ).ternary( a.g, a.r.negate() ); // top vs. bottom
 
 				// Then we go in the direction that has the maximum weight:
 
@@ -640,7 +640,7 @@ class SMAANode extends TempNode {
 				const texcoord = vec2( uvNode ).toVar();
 				texcoord.addAssign( sign( offset ).mul( this._invSize ) );
 				const Cop = this.textureNode.sample( texcoord ).toVar();
-				const s = abs( offset.x ).greaterThan( abs( offset.y ) ).select( abs( offset.x ), abs( offset.y ) ).toVar();
+				const s = abs( offset.x ).greaterThan( abs( offset.y ) ).ternary( abs( offset.x ), abs( offset.y ) ).toVar();
 
 				const mixed = mix( C, Cop, s );
 				result.assign( mixed );

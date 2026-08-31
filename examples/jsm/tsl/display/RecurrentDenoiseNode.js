@@ -738,7 +738,7 @@ class RecurrentDenoiseNode extends TempNode {
 
 					// Blend the tap direction toward the polar bias, then restore the Vogel radius and shrink.
 					const skewedDir = mix( sampleDir, polarBias.max( EPSILON ).normalize(), this.adapt.mul( aggressivity )
-						.mul( polarBias.dot( polarBias ).greaterThan( 0.001 ).select( 1, 0 ) ) );
+						.mul( polarBias.dot( polarBias ).greaterThan( 0.001 ).ternary( 1, 0 ) ) );
 					const offset = rotationMatrix.mul( skewedDir.mul( baseOffset.length().mul( radiusShrink ) ) ).toVar();
 
 					// Exact per-sample view-space projection (both paths)
@@ -788,7 +788,7 @@ class RecurrentDenoiseNode extends TempNode {
 						const rayLengthFactor = hdfDiff.mul( this.alphaPhi ).div( viewPosition.z.abs() );
 
 						// Env rays are harder to compare so we accept if this sample is an env ray and there is an env ray in the neighborhood
-						kernelDiff.addAssign( rawNeighborColor.a.greaterThan( ENV_RAY_LENGTH_THRESHOLD ).and( hasEnvRay ).select( 1, rayLengthFactor ) );
+						kernelDiff.addAssign( rawNeighborColor.a.greaterThan( ENV_RAY_LENGTH_THRESHOLD ).and( hasEnvRay ).ternary( 1, rayLengthFactor ) );
 
 					}
 
@@ -824,7 +824,7 @@ class RecurrentDenoiseNode extends TempNode {
 					// Denoising the alpha (accumulation speed), to get smoother disocclusion transitions
 					If( this.smoothDisocclusions, () => {
 
-						const neighborAWeight = neighborColor.a.greaterThan( texel.a ).select( w.mul( 0.33 ), 0 );
+						const neighborAWeight = neighborColor.a.greaterThan( texel.a ).ternary( w.mul( 0.33 ), 0 );
 						denoisedFrame.addAssign( float( 1 ).div( neighborColor.a ).mul( neighborAWeight ) );
 						totalFrameWeight.addAssign( neighborAWeight );
 

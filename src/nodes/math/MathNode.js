@@ -273,11 +273,28 @@ class MathNode extends TempNode {
 
 			} else if ( method === MathNode.MIX ) {
 
+				const cType = c.getNodeType( builder );
+				const isBooleanInterpolation = builder.getComponentType( cType ) === 'bool' && builder.getTypeLength( cType ) > 1;
+
 				params.push(
 					a.build( builder, inputType ),
 					b.build( builder, inputType ),
-					c.build( builder, builder.getTypeLength( c.getNodeType( builder ) ) === 1 ? 'float' : inputType )
+					c.build( builder, isBooleanInterpolation ? cType : builder.getTypeLength( cType ) === 1 ? 'float' : inputType )
 				);
+
+				if ( isBooleanInterpolation ) {
+
+					if ( coordinateSystem === WebGPUCoordinateSystem ) {
+
+						method = 'select';
+
+					} else if ( coordinateSystem === WebGLCoordinateSystem && builder.getComponentType( inputType ) !== 'float' ) {
+
+						method = `mix_${ inputType }`;
+
+					}
+
+				}
 
 			} else {
 
@@ -1041,7 +1058,7 @@ export const lengthSq = ( a ) => dot( a, a );
  * @function
  * @param {Node | number} a - The first parameter.
  * @param {Node | number} b - The second parameter.
- * @param {Node | number} t - The interpolation value.
+ * @param {Node | number} t - The interpolation value. A boolean vector selects the corresponding component from `a` or `b`.
  * @returns {Node}
  */
 export const mix = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.MIX ).setParameterLength( 3 );

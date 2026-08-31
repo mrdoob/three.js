@@ -4,12 +4,12 @@
 
 Represents a logical `if/else` statement. Can be used as an alternative to the `If()`/`Else()` syntax.
 
-The `select()` method is called in a chaining fashion on a condition. The parameter nodes of `select()` determine the outcome of the entire statement.
+The `ternary()` method is called in a chaining fashion on a condition. The parameter nodes of `ternary()` determine the outcome of the entire statement.
 
 ## Code Example
 
 ```js
-velocity = position.greaterThanEqual( limit ).select( velocity.negate(), velocity );
+velocity = position.greaterThanEqual( limit ).ternary( velocity.negate(), velocity );
 ```
 
 ## Constructor

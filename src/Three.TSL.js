@@ -587,6 +587,7 @@ export const tangentView = TSL.tangentView;
 export const tangentViewFrame = TSL.tangentViewFrame;
 export const tangentWorld = TSL.tangentWorld;
 export const tanh = TSL.tanh;
+export const ternary = TSL.ternary;
 export const texture = TSL.texture;
 export const texture3D = TSL.texture3D;
 export const texture3DLevel = TSL.texture3DLevel;

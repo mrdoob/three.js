@@ -8,7 +8,7 @@ const mapRange = TSL.Fn( ( [ x, fromMin, fromMax, toMin, toMax, clmp ] ) => {
 	const factor = x.sub( fromMin ).div( fromMax.sub( fromMin ) );
 	const result = toMin.add( factor.mul( toMax.sub( toMin ) ) );
 
-	return TSL.select( clmp, TSL.max( TSL.min( result, toMax ), toMin ), result );
+	return TSL.ternary( clmp, TSL.max( TSL.min( result, toMax ), toMin ), result );
 
 } );
 
@@ -83,7 +83,7 @@ const voronoi3d = TSL.wgslFn( `
 // 		totalWeight.addAssign(weight);
 // 	} );
 
-// 	res.assign(TSL.select(totalWeight.greaterThan(0.0), res.div(totalWeight), res));
+// 	res.assign(TSL.ternary(totalWeight.greaterThan(0.0), res.div(totalWeight), res));
 
 // 	return TSL.smoothstep(0.0, 1.0, res);
 // } );

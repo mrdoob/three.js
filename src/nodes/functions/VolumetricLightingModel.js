@@ -9,7 +9,7 @@ import { modelRadius } from '../accessors/ModelNode.js';
 import { LTC_Evaluate_Volume } from './BSDF/LTC.js';
 
 const scatteringDensity = property( 'vec3' );
-const linearDepthRay = property( 'float' ); // always assigned a scalar (see `start()`) - not a per-channel value
+const linearDepthRay = property( 'vec3' );
 const outgoingRayLight = property( 'vec3' );
 
 /**

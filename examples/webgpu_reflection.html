@@ -333,10 +333,10 @@
 					// effectors (these are responsible for the blob-like scale effects)
 
 					const dif1 = abs( instanceTime.sub( uniformEffector1 ) ).toConst();
-					let effect = dif1.lessThanEqual( 0.15 ).select( sub( 0.15, dif1 ).mul( sub( 1.7, instanceTime ).mul( 10 ) ), float( 0 ) );
+					let effect = dif1.lessThanEqual( 0.15 ).ternary( sub( 0.15, dif1 ).mul( sub( 1.7, instanceTime ).mul( 10 ) ), float( 0 ) );
 
 					const dif2 = abs( instanceTime.sub( uniformEffector2 ) ).toConst();
-					effect = dif2.lessThanEqual( 0.15 ).select( sub( 0.15, dif2 ).mul( sub( 1.7, instanceTime ).mul( 10 ) ), effect );
+					effect = dif2.lessThanEqual( 0.15 ).ternary( sub( 0.15, dif2 ).mul( sub( 1.7, instanceTime ).mul( 10 ) ), effect );
 
 					// accumulate different vertex animations
 
@@ -371,10 +371,10 @@
 					const instanceTime = instanceData.y;
 
 					const dif1 = abs( instanceTime.sub( uniformEffector1 ) ).toConst();
-					const effect1 = dif1.lessThanEqual( 0.15 ).select( sub( 0.15, dif1 ).mul( sub( 1.7, instanceTime ).mul( 10 ) ), float( 0 ) );
+					const effect1 = dif1.lessThanEqual( 0.15 ).ternary( sub( 0.15, dif1 ).mul( sub( 1.7, instanceTime ).mul( 10 ) ), float( 0 ) );
 
 					const dif2 = abs( instanceTime.sub( uniformEffector2 ) ).toConst();
-					const effect2 = dif2.lessThanEqual( 0.15 ).select( sub( 0.15, dif2 ).mul( sub( 1.7, instanceTime ).mul( 10 ) ), effect1 );
+					const effect2 = dif2.lessThanEqual( 0.15 ).ternary( sub( 0.15, dif2 ).mul( sub( 1.7, instanceTime ).mul( 10 ) ), effect1 );
 
 					return pow2( vec3( effect1, 0, effect2 ) ).mul( instanceColor );
 

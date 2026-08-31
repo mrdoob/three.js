@@ -39,8 +39,8 @@ const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass,
 	const mean = float( 0 ).toVar( 'meanVertical' );
 	const squaredMean = float( 0 ).toVar( 'squareMeanVertical' );
 
-	const uvStride = samples.lessThanEqual( float( 1 ) ).select( float( 0 ), float( 2 ).div( samples.sub( 1 ) ) );
-	const uvStart = samples.lessThanEqual( float( 1 ) ).select( float( 0 ), float( - 1 ) );
+	const uvStride = samples.lessThanEqual( float( 1 ) ).ternary( float( 0 ), float( 2 ).div( samples.sub( 1 ) ) );
+	const uvStart = samples.lessThanEqual( float( 1 ) ).ternary( float( 0 ), float( - 1 ) );
 
 	Loop( { start: int( 0 ), end: int( samples ), type: 'int', condition: '<' }, ( { i } ) => {
 
@@ -86,8 +86,8 @@ const VSMPassHorizontal = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPas
 	const mean = float( 0 ).toVar( 'meanHorizontal' );
 	const squaredMean = float( 0 ).toVar( 'squareMeanHorizontal' );
 
-	const uvStride = samples.lessThanEqual( float( 1 ) ).select( float( 0 ), float( 2 ).div( samples.sub( 1 ) ) );
-	const uvStart = samples.lessThanEqual( float( 1 ) ).select( float( 0 ), float( - 1 ) );
+	const uvStride = samples.lessThanEqual( float( 1 ) ).ternary( float( 0 ), float( 2 ).div( samples.sub( 1 ) ) );
+	const uvStart = samples.lessThanEqual( float( 1 ) ).ternary( float( 0 ), float( - 1 ) );
 
 	Loop( { start: int( 0 ), end: int( samples ), type: 'int', condition: '<' }, ( { i } ) => {
 
@@ -266,7 +266,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		const shadowNode = filterFn( { depthTexture, shadowCoord, shadow, depthLayer } );
 
-		return frustumTest.select( shadowNode, float( 1 ) );
+		return frustumTest.ternary( shadowNode, float( 1 ) );
 
 	}
 

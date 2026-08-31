@@ -200,7 +200,7 @@ class PixelationNode extends TempNode {
 
 			} );
 
-			const strength = dei.greaterThan( 0 ).select( float( 1.0 ).sub( dei.mul( this.depthEdgeStrength ) ), nei.mul( this.normalEdgeStrength ).add( 1 ) );
+			const strength = dei.greaterThan( 0 ).ternary( float( 1.0 ).sub( dei.mul( this.depthEdgeStrength ) ), nei.mul( this.normalEdgeStrength ).add( 1 ) );
 
 			return vec4( texel.mul( strength ).rgb, texel.a );
 
