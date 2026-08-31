@@ -168,6 +168,8 @@
 	"webgpu_postprocessing_ssaa": [ "msaa", "multisampled" ],
 	"webgpu_postprocessing_ssgi": [ "global illumination", "indirect diffuse" ],
 	"webgpu_postprocessing_ssgi_ballpool": [ "community", "physics" ],
+	"webgpu_vxgi": [ "global illumination", "indirect diffuse", "voxel cone tracing" ],
+	"webgpu_vxgi_sponza": [ "global illumination", "indirect diffuse", "voxel cone tracing" ],
 	"webgpu_postprocessing_sss": [ "shadow" ],
 	"webgpu_refraction": [ "water" ],
 	"webgpu_rtt": [ "renderTarget", "texture" ],
