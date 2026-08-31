@@ -253,27 +253,31 @@ export class PrefixSum {
 
 	}
 
+	_workPerInvocationLoop( callback ) {
+
+		const { workPerInvocation } = this;
+
+		Loop( { start: uint( 0 ), end: workPerInvocation, type: 'uint', condition: '<', name: 'currentSubgroupInBlock' }, ( { currentSubgroupInBlock } ) => {
+
+			callback( currentSubgroupInBlock );
+
+		} );
+
+	}
+
 	_workPerInvocationBlock( workgroupCallback, lastWorkgroupCallback ) {
 
-		const { numWorkgroups, workPerInvocation } = this;
+		const { numWorkgroups } = this;
 
 		If( workgroupId.x.lessThan( uint( numWorkgroups ).sub( 1 ) ), () => {
 
-			Loop( { start: uint( 0 ), end: workPerInvocation, type: 'uint', condition: '<', name: 'currentSubgroupInBlock' }, ( { currentSubgroupInBlock } ) => {
-
-				workgroupCallback( currentSubgroupInBlock );
-
-			} );
+			this._workPerInvocationLoop( workgroupCallback );
 
 		} );
 
 		If( workgroupId.x.equal( uint( numWorkgroups ).sub( 1 ) ), () => {
 
-			Loop( { start: uint( 0 ), end: workPerInvocation, type: 'uint', condition: '<', name: 'currentSubgroupInBlock' }, ( { currentSubgroupInBlock } ) => {
-
-				lastWorkgroupCallback( currentSubgroupInBlock );
-
-			} );
+			this._workPerInvocationLoop( lastWorkgroupCallback );
 
 		} );
 
@@ -618,7 +622,7 @@ export class PrefixSum {
 			const laneMask = subgroupSize.sub( 1 ).toVar( 'laneMask' );
 			const clockwiseShift = ( invocationSubgroupIndex.add( laneMask ) ).bitAnd( laneMask ).toVar( 'clockwiseShift' );
 
-			Loop( { start: uint( 0 ), end: uint( workPerInvocation ), type: 'uint', condition: '<', name: 'currentSubgroupInBlock' }, ( { currentSubgroupInBlock } ) => {
+			this._workPerInvocationLoop( ( currentSubgroupInBlock ) => {
 
 				// previous greatest accumulated value
 				const prevAccGreatestValue = subgroupShuffle(
@@ -662,10 +666,33 @@ export class PrefixSum {
 				const outputIndex = startThread.mul( 4 ).add( uint( outputIndexOffset ) ).toVar();
 				const outputValueToWrite = tScan.element( currentSubgroupInBlock ).add( prev ).toVar();
 
-				unvectorizedOutputBuffer.element( outputIndex ).assign( outputValueToWrite.x );
-				unvectorizedOutputBuffer.element( outputIndex.add( 1 ) ).assign( outputValueToWrite.y );
-				unvectorizedOutputBuffer.element( outputIndex.add( 2 ) ).assign( outputValueToWrite.z );
-				unvectorizedOutputBuffer.element( outputIndex.add( 3 ) ).assign( outputValueToWrite.w );
+				// i.e If the sort is exclusive
+				if ( outputIndexOffset > 0 ) {
+
+					unvectorizedOutputBuffer.element( outputIndex ).assign( outputValueToWrite.x );
+					unvectorizedOutputBuffer.element( outputIndex.add( 1 ) ).assign( outputValueToWrite.y );
+					unvectorizedOutputBuffer.element( outputIndex.add( 2 ) ).assign( outputValueToWrite.z );
+
+					// Ensure out of bounds write doesn't happen on last invocation
+					// We can be sure that this only happens on the last invocation
+					// since the write indices are determined by the startThread,
+					// whose value only ever reaches the end on last workgroup -> last subgroup -> last invoke of subgroup
+					If( invocationLocalIndex.notEqual( this.dispatchSize - 1 ), () => {
+
+						unvectorizedOutputBuffer.element( outputIndex.add( 3 ) ).assign( outputValueToWrite.w );
+
+					} );
+
+
+				} else {
+
+					// No need to worry about overwrites for inclsuive
+					unvectorizedOutputBuffer.element( outputIndex ).assign( outputValueToWrite.x );
+					unvectorizedOutputBuffer.element( outputIndex.add( 1 ) ).assign( outputValueToWrite.y );
+					unvectorizedOutputBuffer.element( outputIndex.add( 2 ) ).assign( outputValueToWrite.z );
+					unvectorizedOutputBuffer.element( outputIndex.add( 3 ) ).assign( outputValueToWrite.w );
+
+				}
 
 				startThread.addAssign( subgroupSize );
 
