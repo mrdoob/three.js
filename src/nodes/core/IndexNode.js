@@ -219,7 +219,7 @@ export const invocationSubgroupIndex = /*@__PURE__*/ nodeImmutable( IndexNode, I
  * TSL object that represents the index of a compute invocation within the scope of a workgroup.
  *
  * ```js
- * // Execute 12 compute threads with a workgroup size of 4
+ * // Execute 12 compute threads with a workgroup size of 4.
  * const computeFn = Fn( () => {
  *
  * 	storageBufferOne.element( instanceIndex ).assign( invocationLocalIndex );
