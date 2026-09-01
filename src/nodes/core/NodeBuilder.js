@@ -3505,6 +3505,12 @@ class NodeBuilder {
 
 		}
 
+		if ( fromTypeLength > 4 && fromTypeLength === toTypeLength && fromType !== toType ) {
+
+			return `${ this.getType( toType ) }( ${ snippet } )`;
+
+		}
+
 
 		if ( fromTypeLength > 4 ) { // fromType is matrix-like
 
