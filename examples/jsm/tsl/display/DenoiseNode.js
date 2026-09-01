@@ -57,11 +57,19 @@ class DenoiseNode extends TempNode {
 		this.normalNode = normalNode;
 
 		/**
+		 * The internal noise texture.
+		 *
+		 * @private
+		 * @type {DataTexture}
+		 */
+		this._noiseTexture = generateDefaultNoise();
+
+		/**
 		 * The node represents the internal noise texture.
 		 *
 		 * @type {TextureNode}
 		 */
-		this.noiseNode = texture( generateDefaultNoise() );
+		this.noiseNode = texture( this._noiseTexture );
 
 		/**
 		 * The luma Phi value.
@@ -249,6 +257,18 @@ class DenoiseNode extends TempNode {
 		const outputNode = output();
 
 		return outputNode;
+
+	}
+
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the effect is no longer required.
+	 */
+	dispose() {
+
+		this._noiseTexture.dispose();
+
+		super.dispose();
 
 	}
 
