@@ -3,6 +3,34 @@ import { expression } from '../code/ExpressionNode.js';
 import { nodeArray, Fn, bool } from '../tsl/TSLBase.js';
 import { error } from '../../utils.js';
 
+
+/**
+ * Parameters for the Loop Node.
+ *
+ * @typedef {number | LoopObjectParams | Node<uint> | Node<int> | Node<boolean>} LoopParams
+ */
+
+/**
+ * Utility nodes used in multiple shaders across the reduce-then-scan prefix sum`.
+ *
+ * @typedef {Object} LoopObjectParams
+ * @property {number | Node<uint> | Node<int>} [start] - A number, or Node representation thereof, that represents the loop's initializer value. This value will be modified at the end of each loop iteration. Evaluates to 0 if undefined.
+ * @property {number | Node<uint> | Node<int>} [end] - A number, or Node representation thereof, that represents the condition of the loop. The loop will terminate when the comparison between `start` and `end` evaluates to true. Evaluates to 0 if undefined.
+ * @property {string} [name] - The name of the initializer variable within the shader.
+ * @property {string} [type] - The data type of the initializer variable within the shader. Defaults to 'int'.
+ * @property {'<=' | '<' | '>' | '>=' | '==' | '!='} [condition] - A string that inserts a code snippet into the shader, which specifies which comparison operator will be used to evaluate the relationship between `start` and `end`. If undefined, the condition will be inferred from the existing parameters.
+ * @property {string | number | Function | Node} [update] - A string that inserts a code snippet into the shader, which specifies how the initializer variable will be updated at the end of each iteration of the loop. If undefined, the update snippet will be inferred from the existing parameters.
+ */
+
+/**
+ * The loop body. Invoked with one entry per enclosing loop, keyed by that loop's `name`
+ * (or `i`, `j`, `k`, … when unnamed). A `Node<boolean>` loop contributes no entry.
+ *
+ * @callback LoopBodyCallback
+ * @param {Object<string, Node>} inputs - The loop variables of each enclosing loop.
+ * @returns {void}
+ */
+
 /**
  * This module offers a variety of ways to implement loops in TSL. In it's basic form it's:
  * ```js
@@ -36,7 +64,7 @@ import { error } from '../../utils.js';
  *
  * } );
  * ```
- * The module also provides `Break()` and `Continue()` TSL expression for loop control.
+ * The module also provides `Break()` and `Continue()` TSL expressions for loop control.
  * @augments Node
  */
 class LoopNode extends Node {
@@ -340,13 +368,14 @@ export default LoopNode;
  *
  * @tsl
  * @function
- * @param {...any} params - A list of parameters.
+ * @param {[ ...LoopParams[], LoopBodyCallback ]} params - A list of arguments that contains optional arguments defining the loop's parameters, with the last argument always being a function callback.
  * @returns {LoopNode}
  */
 export const Loop = ( ...params ) => new LoopNode( nodeArray( params, 'int' ) ).toStack();
 
 /**
- * TSL function for creating a `Continue()` expression.
+ * TSL function for creating a `continue` expression into the shader, which transfers control
+ * to the next iteration of the expression's containg loop.
  *
  * @tsl
  * @function
@@ -355,7 +384,8 @@ export const Loop = ( ...params ) => new LoopNode( nodeArray( params, 'int' ) ).
 export const Continue = () => expression( 'continue' ).toStack();
 
 /**
- * TSL function for creating a `Break()` expression.
+ * TSL function for inserting a `break` expression into the shader, which transfers control
+ * to the commands immediately following the expression's containg loop or switch statement.
  *
  * @tsl
  * @function
