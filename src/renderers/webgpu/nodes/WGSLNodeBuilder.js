@@ -2168,8 +2168,6 @@ ${ flowData.code }
 
 				}
 
-				const componentPrefix = this.getComponentTypeFromTexture( texture ).charAt( 0 );
-
 				if ( texture.isCubeTexture === true && texture.isDepthTexture === true ) {
 
 					textureType = 'texture_depth_cube';
@@ -2204,10 +2202,12 @@ ${ flowData.code }
 
 				} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
 
+					const componentPrefix = this.getComponentTypeFromTexture( texture ).charAt( 0 );
 					textureType = `texture_2d_array<${ componentPrefix }32>`;
 
 				} else if ( texture.is3DTexture === true || texture.isData3DTexture === true ) {
 
+					const componentPrefix = this.getComponentTypeFromTexture( texture ).charAt( 0 );
 					textureType = `texture_3d<${ componentPrefix }32>`;
 
 				} else {
