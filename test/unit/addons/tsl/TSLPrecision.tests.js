@@ -6,6 +6,15 @@ export default QUnit.module( 'TSL', () => {
 
 	QUnit.module( 'contextual precision', () => {
 
+		QUnit.test( 'getPrecision reports explicit precision scopes', ( assert ) => {
+
+			assert.strictEqual( float( 1 ).getPrecision(), null, 'nodes use default precision unless a scope is requested' );
+			assert.strictEqual( float( 1 ).add( 2 ).setPrecision( 16 ).getPrecision(), 16, 'setPrecision( 16 ) reports a 16-bit scope' );
+			assert.strictEqual( float( 1 ).add( 2 ).setPrecision( 32 ).getPrecision(), 32, 'setPrecision( 32 ) reports a 32-bit scope' );
+			assert.strictEqual( uniform( 1, 'float' ).setPrecision( 'high' ).getPrecision(), 'high', 'input declaration precision is preserved' );
+
+		} );
+
 		gpuTest( '16-bit context preserves ordinary arithmetic for exactly representable values', ( { assert } ) => {
 
 			assert.closeAbs( float( 1.5 ).add( 2.5 ).setPrecision( 16 ), float( 4.0 ), 1e-3, 'scalar addition' );
@@ -36,6 +45,16 @@ export default QUnit.module( 'TSL', () => {
 
 			assert.closeAbs( fp32, float( 1 ), 1e-3, 'unscoped expression keeps fp32 precision' );
 			assert.closeAbs( fp16ThenFp32, float( 0 ), 1e-3, 'precision context result is promoted before surrounding fp32 math' );
+
+		}, { backends: [ 'webgpu' ], requiredFeatures: [ 'shader-f16' ] } );
+
+		gpuTest( '32-bit context overrides an outer 16-bit context', ( { assert } ) => {
+
+			const fp32Scoped = float( 2048 ).add( 1 ).sub( 2048 ).setPrecision( 32 );
+			const nested = fp32Scoped.setPrecision( 16 );
+
+			assert.closeAbs( fp32Scoped, float( 1 ), 1e-3, 'setPrecision( 32 ) keeps fp32 arithmetic' );
+			assert.closeAbs( nested, float( 1 ), 1e-3, 'inner fp32 scope is preserved inside outer fp16 scope' );
 
 		}, { backends: [ 'webgpu' ], requiredFeatures: [ 'shader-f16' ] } );
 

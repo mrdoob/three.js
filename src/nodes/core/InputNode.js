@@ -115,6 +115,12 @@ class InputNode extends Node {
 
 	}
 
+	getPrecision() {
+
+		return this.computePrecision || this.precision;
+
+	}
+
 	serialize( data ) {
 
 		super.serialize( data );

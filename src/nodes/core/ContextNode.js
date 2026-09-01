@@ -163,7 +163,7 @@ class ContextNode extends Node {
 
 		const previousContext = builder.addContext( this.value );
 		const precision = builder.getContextPrecision();
-		const contextOutput = precision === 16 && output !== null ? builder.getPrecisionType( output, precision ) : output;
+		const contextOutput = precision === 16 && output !== null ? builder.getPrecisionType( output, precision ) : ( precision === 32 && output !== null ? builder.getBaseType( output ) : output );
 
 		const snippet = this.node.build( builder, contextOutput );
 		const snippetType = contextOutput || this.node.getNodeType( builder );
@@ -171,6 +171,12 @@ class ContextNode extends Node {
 		builder.setContext( previousContext );
 
 		return builder.format( snippet, snippetType, output );
+
+	}
+
+	getPrecision() {
+
+		return this.value.precision !== undefined ? this.value.precision : this.node.getPrecision();
 
 	}
 
@@ -232,7 +238,17 @@ export const setName = ( node, name ) => context( node, { nodeName: name } );
  * @param {number} precision - The compute precision to request.
  * @returns {ContextNode}
  */
-export const setPrecision = ( node, precision ) => context( node, { precision } );
+export const setPrecision = ( node, precision ) => {
+
+	if ( precision !== 16 && precision !== 32 ) {
+
+		warn( `TSL: Unsupported precision "${ precision }". Use 16 or 32.` );
+
+	}
+
+	return context( node, { precision } );
+
+};
 
 /**
  * TSL function for defining a built-in shadow context for a given node.

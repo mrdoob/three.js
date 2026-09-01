@@ -485,6 +485,17 @@ class Node extends EventDispatcher {
 	}
 
 	/**
+	 * Returns the precision requested for this node, if any.
+	 *
+	 * @return {?number|string} The requested precision.
+	 */
+	getPrecision() {
+
+		return null;
+
+	}
+
+	/**
 	 * Returns the hash of the node which is used to identify the node. By default it's
 	 * the {@link Node#uuid} however derived node classes might have to overwrite this method
 	 * depending on their implementation.
