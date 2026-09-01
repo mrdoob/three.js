@@ -9,26 +9,12 @@ import {
 } from '../../../../examples/jsm/tsl/math/Packed4x8IntegerNode.js';
 import { gpuTest } from './gpu-test-utils.js';
 
-const LANGUAGE_FEATURE = 'packed_4x8_integer_dot_product';
-const hasLanguageFeature = navigator.gpu?.wgslLanguageFeatures?.has( LANGUAGE_FEATURE ) === true;
-
-function packed4x8Test( name, buildFn ) {
-
-	if ( hasLanguageFeature ) {
-
-		gpuTest( name, buildFn, { backends: [ 'webgpu' ] } );
-
-	} else {
-
-		QUnit.test( name, ( assert ) => {
-
-			assert.ok( true, `SKIPPED: WGSL language feature "${LANGUAGE_FEATURE}" is not available.` );
-
-		} );
-
-	}
-
-}
+// These built-ins map onto WGSL's `packed_4x8_integer_dot_product` language
+// feature only on a WebGPU backend that advertises it - everywhere else
+// (including the WebGL backend exercised below) `Packed4x8IntegerNode` falls
+// back to an emulation built from plain integer bit operations, so the same
+// assertions are expected to hold on both backends. `gpuTest`'s default
+// `backends: [ 'webgpu', 'webgl' ]` covers both.
 
 function byte( value, offset ) {
 
@@ -40,7 +26,7 @@ export default QUnit.module( 'TSL', () => {
 
 	QUnit.module( 'packed 4x8 integer operations', () => {
 
-		packed4x8Test( 'packed integer dot products', ( { assert } ) => {
+		gpuTest( 'packed integer dot products', ( { assert } ) => {
 
 			assert.eq(
 				dot4U8Packed( uint( 0x01020304 ), uint( 0x02040405 ) ),
@@ -59,7 +45,7 @@ export default QUnit.module( 'TSL', () => {
 
 		} );
 
-		packed4x8Test( 'pack4xU8 and pack4xI8 bit layout', ( { assert } ) => {
+		gpuTest( 'pack4xU8 and pack4xI8 bit layout', ( { assert } ) => {
 
 			const packedUnsigned = pack4xU8( uvec4( 1, 2, 3, 4 ) );
 
@@ -77,7 +63,7 @@ export default QUnit.module( 'TSL', () => {
 
 		} );
 
-		packed4x8Test( 'pack4xU8Clamp and pack4xI8Clamp ranges', ( { assert } ) => {
+		gpuTest( 'pack4xU8Clamp and pack4xI8Clamp ranges', ( { assert } ) => {
 
 			const packedUnsigned = pack4xU8Clamp( uvec4( 0, 256, 1000, 255 ) );
 
@@ -95,7 +81,7 @@ export default QUnit.module( 'TSL', () => {
 
 		} );
 
-		packed4x8Test( 'unpack4xU8 and unpack4xI8 extension', ( { assert } ) => {
+		gpuTest( 'unpack4xU8 and unpack4xI8 extension', ( { assert } ) => {
 
 			assert.eq(
 				unpack4xU8( uint( 0x04030201 ) ),
