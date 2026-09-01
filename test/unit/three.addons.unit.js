@@ -19,6 +19,7 @@ import './addons/tsl/GPUTest.tests.js';
 import './addons/tsl/GPUAtomicsStorage.tests.js';
 import './addons/tsl/GPUComputeBuiltins.tests.js';
 import './addons/tsl/GPUBarriers.tests.js';
+import './addons/tsl/GPUSubgroup.tests.js';
 import './addons/tsl/TSLDeterminant.tests.js';
 import './addons/tsl/TSLFaceForward.tests.js';
 import './addons/tsl/TSLGainPcurve.tests.js';
