@@ -280,8 +280,6 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 	getType( type ) {
 
-		type = this.getPrecisionType( type );
-
 		return glslHalfFallbackTypeLib[ type ] || super.getType( type );
 
 	}
@@ -370,12 +368,15 @@ class GLSLNodeBuilder extends NodeBuilder {
 		const flowData = this.flowShaderNode( shaderNode );
 
 		const parameters = [];
+		const previousContext = this.addContext( { precision: null } );
 
 		for ( const input of layout.inputs ) {
 
 			parameters.push( this.getType( input.type ) + ' ' + input.name );
 
 		}
+
+		this.setContext( previousContext );
 
 		//
 

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - ALU stress test</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - ALU stress test">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_alu_stresstest.html">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>ALU Stress Test</span>
+			</div>
+
+			<small>
+				Fullscreen TSL shader with configurable matrix ALU pressure.
+				<br />Cyan is fp32, yellow is fp16.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { Fn, Loop, float, fract, mat3, mul, screenUV, sin, time, uniform, vec3 } from 'three/tsl';
+
+			import Stats from 'three/addons/libs/stats.module.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			let camera, scene, renderer, stats;
+
+			const params = {
+				precision: '32-bit',
+				iterations: 256,
+				resolutionScale: 1
+			};
+
+			const iterations = uniform( params.iterations );
+			const getPrecision = () => params.precision === '16-bit' ? 16 : 32;
+			const precisionScope = ( node ) => node.setPrecision( getPrecision() );
+
+			init();
+
+			async function init() {
+
+				camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0.1, 10 );
+				camera.position.z = 1;
+
+				scene = new THREE.Scene();
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio * params.resolutionScale );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.inspector.domElement );
+
+				await renderer.init();
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				// TSL
+
+				const aluStress = Fn( ( [ seed ] ) => {
+
+					const state = seed.toVar();
+					const accumulator = float( 0 ).toVar();
+
+					Loop( { start: float( 0 ), end: iterations }, () => {
+
+						const a = mat3(
+							state.x.add( 1.11 ), state.y.mul( 0.37 ).add( 0.13 ), state.z.mul( 0.19 ).add( 0.17 ),
+							state.z.mul( 0.29 ).add( 0.23 ), state.x.add( 1.07 ), state.y.mul( 0.31 ).add( 0.11 ),
+							state.y.mul( 0.41 ).add( 0.07 ), state.z.mul( 0.43 ).add( 0.19 ), state.x.add( 1.03 )
+						);
+
+						const b = mat3(
+							state.z.add( 0.91 ), state.x.mul( 0.23 ).add( 0.29 ), state.y.mul( 0.17 ).add( 0.31 ),
+							state.y.mul( 0.37 ).add( 0.05 ), state.z.add( 0.97 ), state.x.mul( 0.13 ).add( 0.41 ),
+							state.x.mul( 0.19 ).add( 0.43 ), state.y.mul( 0.11 ).add( 0.47 ), state.z.add( 0.89 )
+						);
+
+						const mixedMatrix = mul( a, b );
+						const nextState = fract( sin( mul( mixedMatrix, state ) ).mul( 437.58 ) );
+
+						state.assign( nextState );
+						accumulator.addAssign( state.dot( vec3( 0.2126, 0.7152, 0.0722 ) ) );
+
+					} );
+
+					const stressColor = vec3(
+						fract( accumulator.mul( 0.037 ).add( state.x ) ),
+						fract( accumulator.mul( 0.021 ).add( state.y ) ),
+						fract( accumulator.mul( 0.013 ).add( state.z ) )
+					);
+					const precisionProbe = float( 2048 ).add( 1 ).sub( 2048 );
+					const precisionTint = precisionProbe.greaterThan( 0.5 ).select(
+						vec3( 0, 0.85, 1 ),
+						vec3( 1, 0.82, 0 )
+					);
+
+					return stressColor.mul( 0.35 ).add( precisionTint.mul( 0.65 ) );
+
+				} );
+
+				updatePrecisionNodes();
+
+				// debug
+
+				const gui = renderer.inspector.createParameters( 'Parameters' );
+				const precisionOptions = [ '32-bit' ];
+
+				if ( renderer.hasFeature( 'shader-f16' ) ) {
+
+					precisionOptions.push( '16-bit' );
+
+				}
+
+				gui.add( params, 'precision', precisionOptions ).name( 'precision' ).onChange( () => {
+
+					updatePrecisionNodes();
+
+				} );
+				gui.add( params, 'iterations', 1, 1024, 1 ).name( 'iterations' ).onChange( ( value ) => {
+
+					iterations.value = value;
+
+				} );
+				gui.add( params, 'resolutionScale', 0.25, 1, 0.01 ).name( 'resolutionScale' ).onChange( () => {
+
+					updateRendererSize();
+
+				} );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				function updatePrecisionNodes() {
+
+					const seed = vec3(
+						screenUV,
+						time.mul( 0.11 ).add( screenUV.x.mul( 1.7 ) ).add( screenUV.y.mul( 2.3 ) )
+					).setPrecision( 32 );
+
+					scene.backgroundNode = precisionScope( aluStress( seed ) );
+
+				}
+
+			}
+
+			function updateRendererSize() {
+
+				renderer.setPixelRatio( window.devicePixelRatio * params.resolutionScale );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onWindowResize() {
+
+				updateRendererSize();
+
+			}
+
+			function animate() {
+
+				renderer.render( scene, camera );
+				if ( stats ) stats.update();
+
+			}
+
+		</script>
+	</body>
+</html>

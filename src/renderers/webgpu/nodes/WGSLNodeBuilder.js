@@ -1530,12 +1530,15 @@ class WGSLNodeBuilder extends NodeBuilder {
 		const flowData = this.flowShaderNode( shaderNode );
 
 		const parameters = [];
+		const previousContext = this.addContext( { precision: null } );
 
 		for ( const input of layout.inputs ) {
 
 			parameters.push( input.name + ' : ' + this.getType( input.type ) );
 
 		}
+
+		this.setContext( previousContext );
 
 		//
 
@@ -2526,7 +2529,7 @@ ${ flowData.code }
 	 */
 	getType( type ) {
 
-		type = this.getPrecisionType( type );
+		type = this.getVectorType( type );
 
 		if ( wgslHalfFallbackTypeLib[ type ] !== undefined ) {
 

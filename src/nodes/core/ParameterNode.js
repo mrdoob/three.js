@@ -34,6 +34,14 @@ class ParameterNode extends PropertyNode {
 		 */
 		this.isParameterNode = true;
 
+		/**
+		 * Function parameter declarations keep their logical type in precision contexts.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.precisionContext = false;
+
 	}
 
 	/**
@@ -72,9 +80,9 @@ class ParameterNode extends PropertyNode {
 
 	}
 
-	generate() {
+	generate( builder, output ) {
 
-		return this.name;
+		return builder.format( this.name, this.getNodeType( builder ), output );
 
 	}
 

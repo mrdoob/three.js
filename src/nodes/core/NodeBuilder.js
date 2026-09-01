@@ -2264,6 +2264,8 @@ class NodeBuilder {
 
 			//
 
+			type = this.getPrecisionType( type, this.getNodePrecision( node ) );
+
 			const count = node.getArrayCount( this );
 
 			nodeVar = new NodeVar( name, type, readOnly, count );

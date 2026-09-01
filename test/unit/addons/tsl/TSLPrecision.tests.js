@@ -1,5 +1,5 @@
 import { DataTexture, DataUtils, HalfFloatType, NearestFilter, RedFormat } from 'three';
-import { Fn, cos, cross, distance, dot, float, length, mat2, mat3, mat4, mix, mul, normalize, reflect, refract, sin, tan, texture, uniform, vec2, vec3, vec4 } from 'three/tsl';
+import { Fn, Loop, cos, cross, distance, dot, float, length, mat2, mat3, mat4, mix, mul, mx_noise_float, normalize, reflect, refract, sin, tan, texture, uniform, vec2, vec3, vec4 } from 'three/tsl';
 import { gpuTest } from './gpu-test-utils.js';
 
 const HALF_ULP_QUARTER_AT_ONE = 1 / 4096;
@@ -265,6 +265,95 @@ export default QUnit.module( 'TSL', () => {
 			} );
 
 			assertHalfEquals( assert, compute(), float( 0 ), 'whole function call uses fp16 intermediates', 1e-3 );
+
+		}, NATIVE_F16_OPTIONS );
+
+		gpuTest( 'swizzled vector resources convert at a 16-bit operator boundary', ( { assert } ) => {
+
+			const position = uniform( vec3( 1, 0, 1 ), 'vec3' );
+			const offset = uniform( vec2( 2, 3 ), 'vec2' );
+
+			assert.closeAbs( position.xz.add( offset ).setPrecision( 16 ), vec2( 3, 4 ), 1e-3, 'fp32 vector swizzles and uniforms convert before the operator emits code' );
+
+		}, NATIVE_F16_OPTIONS );
+
+		gpuTest( 'Fn call converts swizzled vector inputs and uniforms in a 16-bit context', ( { assert } ) => {
+
+			const offset = uniform( vec2( 2, 3 ), 'vec2' );
+			const compute = Fn( ( [ position ] ) => {
+
+				return position.xz.add( offset );
+
+			} );
+
+			assert.closeAbs( compute( vec3( 1, 0, 1 ) ).setPrecision( 16 ), vec2( 3, 4 ), 1e-3, 'fp32 vector swizzles and uniforms convert at the operator boundary' );
+
+		}, NATIVE_F16_OPTIONS );
+
+		gpuTest( 'Fn call converts nested scalar resource operations in a 16-bit context', ( { assert } ) => {
+
+			const frequency = uniform( vec2( 3, 1 ), 'vec2' );
+			const speed = uniform( 1.25, 'float' );
+			const multiplier = uniform( 0.15, 'float' );
+			const compute = Fn( ( [ position ] ) => {
+
+				return sin( position.x.mul( frequency.x ).add( float( 1 ).mul( speed ) ) ).mul( multiplier );
+
+			} );
+
+			assert.closeAbs( compute( vec3( 1, 0, 1 ) ).setPrecision( 16 ), compute( vec3( 1, 0, 1 ) ).setPrecision( 32 ), 1e-2, 'nested fp32 scalar resource operations convert before mixing with fp16 terms' );
+
+		}, NATIVE_F16_OPTIONS );
+
+		gpuTest( '16-bit addAssign converts a nested 32-bit term', ( { assert } ) => {
+
+			const compute = Fn( () => {
+
+				const sum = float( 1 ).toVar();
+
+				sum.addAssign( float( 1 ).setPrecision( 32 ) );
+
+				return sum;
+
+			} );
+
+			assert.closeAbs( compute().setPrecision( 16 ), float( 2 ), 1e-2, 'nested fp32 addend converts before addAssign in an fp16 scope' );
+
+		}, NATIVE_F16_OPTIONS );
+
+		gpuTest( '16-bit loop addAssign converts a nested 32-bit term', ( { assert } ) => {
+
+			const compute = Fn( () => {
+
+				const elevation = float( 0 ).toVar();
+
+				Loop( { type: 'float', start: float( 1 ), end: float( 2 ), condition: '<' }, ( { i } ) => {
+
+					elevation.addAssign( mx_noise_float( vec2( i, 1.25 ), 1, 0 ).setPrecision( 32 ).div( i.add( 1 ) ) );
+
+				} );
+
+				return elevation;
+
+			} );
+
+			assert.closeAbs( compute().setPrecision( 16 ), compute().setPrecision( 32 ), 1, 'loop addAssign converts nested fp32 noise into the surrounding fp16 temporary' );
+
+		}, NATIVE_F16_OPTIONS );
+
+		gpuTest( 'constructor converts unary uniform operands in a 16-bit context', ( { assert } ) => {
+
+			const shift = uniform( 0.25, 'float' );
+
+			assert.closeAbs( vec3( 0, 0, shift.negate() ).setPrecision( 16 ), vec3( 0, 0, - 0.25 ), 1e-3, 'unary uniform operands convert before entering an fp16 vector constructor' );
+
+		}, NATIVE_F16_OPTIONS );
+
+		gpuTest( 'overloaded functions match precision-lowered vector inputs by base type', ( { assert } ) => {
+
+			const noise = mx_noise_float( vec3( 1.25, 2.5, 3.75 ) );
+
+			assert.closeAbs( noise.setPrecision( 16 ), noise.setPrecision( 32 ), 1, 'hvec3 input selects the vec3 overload instead of the vec2 overload' );
 
 		}, NATIVE_F16_OPTIONS );
 

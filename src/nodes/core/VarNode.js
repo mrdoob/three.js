@@ -153,7 +153,9 @@ class VarNode extends Node {
 
 	generateNodeType( builder ) {
 
-		return this.node.getNodeType( builder );
+		const type = this.node.getNodeType( builder );
+
+		return builder.getBaseType ? builder.getBaseType( type ) : type;
 
 	}
 
@@ -238,7 +240,7 @@ class VarNode extends Node {
 
 	}
 
-	generate( builder ) {
+	generate( builder, output ) {
 
 		const { node, name, readOnly } = this;
 		const { renderer } = builder;
@@ -273,35 +275,51 @@ class VarNode extends Node {
 		}
 
 		const vectorType = builder.getVectorType( nodeType );
-		const snippet = node.build( builder, vectorType );
-
 		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, shouldTreatAsReadOnly );
-
+		const targetType = nodeVar.type;
 		const propertyName = builder.getPropertyName( nodeVar );
+		const nodeData = builder.getDataFromNode( this );
+		const precisionCacheKey = builder.getPrecisionCacheKey ? builder.getPrecisionCacheKey( this ) : 'default';
 
-		let declarationPrefix = propertyName;
+		nodeData.declared = nodeData.declared || {};
 
-		if ( shouldTreatAsReadOnly ) {
+		if ( nodeData.declared[ precisionCacheKey ] !== true ) {
 
-			if ( isWebGPUBackend ) {
+			nodeData.declared[ precisionCacheKey ] = true;
 
-				declarationPrefix = isDeterministic
-					? `const ${ propertyName }`
-					: `let ${ propertyName }`;
+			let snippet = node.build( builder, targetType );
 
-			} else {
+			if ( builder.isPrecisionType && builder.isPrecisionType( targetType ) ) {
 
-				const count = node.getArrayCount( builder );
-
-				declarationPrefix = `const ${ builder.getVar( nodeVar.type, propertyName, count ) }`;
+				snippet = builder.format( snippet, builder.getBaseType( targetType ), targetType );
 
 			}
 
+			let declarationPrefix = propertyName;
+
+			if ( shouldTreatAsReadOnly ) {
+
+				if ( isWebGPUBackend ) {
+
+					declarationPrefix = isDeterministic
+						? `const ${ propertyName }`
+						: `let ${ propertyName }`;
+
+				} else {
+
+					const count = node.getArrayCount( builder );
+
+					declarationPrefix = `const ${ builder.getVar( nodeVar.type, propertyName, count ) }`;
+
+				}
+
+			}
+
+			builder.addLineFlowCode( `${ declarationPrefix } = ${ snippet }`, this );
+
 		}
 
-		builder.addLineFlowCode( `${ declarationPrefix } = ${ snippet }`, this );
-
-		return propertyName;
+		return builder.format( propertyName, targetType, output );
 
 	}
 

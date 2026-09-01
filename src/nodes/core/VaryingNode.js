@@ -57,6 +57,14 @@ class VaryingNode extends Node {
 		this.isVaryingNode = true;
 
 		/**
+		 * Varying declarations keep their logical type in precision contexts.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.precisionContext = false;
+
+		/**
 		 * The interpolation type of the varying data.
 		 *
 		 * @type {?string}
@@ -159,7 +167,7 @@ class VaryingNode extends Node {
 
 	}
 
-	generate( builder ) {
+	generate( builder, output ) {
 
 		const propertyKey = builder.getSubBuildProperty( 'property', builder.currentStack );
 		const properties = builder.getNodeProperties( this );
@@ -187,7 +195,7 @@ class VaryingNode extends Node {
 
 		}
 
-		return builder.getPropertyName( varying );
+		return builder.format( builder.getPropertyName( varying ), this.getNodeType( builder ), output );
 
 	}
 
