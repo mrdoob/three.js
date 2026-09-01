@@ -665,6 +665,8 @@ class SSGINode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this._ssgiRenderTarget.dispose();
 
 		this._material.dispose();

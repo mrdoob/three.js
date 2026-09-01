@@ -748,6 +748,8 @@ class OutlineNode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this.selectedObjects.length = 0;
 
 		this._renderTargetDepthBuffer.dispose();

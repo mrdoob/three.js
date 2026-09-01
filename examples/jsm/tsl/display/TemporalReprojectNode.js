@@ -983,6 +983,8 @@ class TemporalReprojectNode extends TempNode {
 
 	dispose() {
 
+		super.dispose();
+
 		this._previousNormalTexture.dispose();
 
 		if ( this._previousDepthNode.value !== this._historyRenderTarget.depthTexture ) {

@@ -266,9 +266,9 @@ class DenoiseNode extends TempNode {
 	 */
 	dispose() {
 
-		this._noiseTexture.dispose();
-
 		super.dispose();
+
+		this._noiseTexture.dispose();
 
 	}
 

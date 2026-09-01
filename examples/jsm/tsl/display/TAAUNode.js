@@ -791,6 +791,8 @@ class TAAUNode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this._historyRenderTarget.dispose();
 		this._resolveRenderTarget.dispose();
 		this._previousDepthRenderTarget.dispose();

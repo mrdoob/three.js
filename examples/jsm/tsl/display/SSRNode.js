@@ -1317,6 +1317,8 @@ class SSRNode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this._ssrRenderTarget.dispose();
 		this._blurRenderTarget.dispose();
 

@@ -467,6 +467,8 @@ class BloomNode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		for ( let i = 0; i < this._renderTargetsHorizontal.length; i ++ ) {
 
 			this._renderTargetsHorizontal[ i ].dispose();
