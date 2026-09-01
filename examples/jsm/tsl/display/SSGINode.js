@@ -459,7 +459,10 @@ class SSGINode extends TempNode {
 			const outVal = abs( value ).mul( float( - 0.156583 ) ).add( HALF_PI );
 			outVal.mulAssign( sqrt( abs( value ).oneMinus() ) );
 
-			return value.greaterThanEqual( 0 ).mix( PI.sub( outVal ), outVal );
+			const x = value.x.greaterThanEqual( 0 ).select( outVal.x, PI.sub( outVal.x ) );
+			const y = value.y.greaterThanEqual( 0 ).select( outVal.y, PI.sub( outVal.y ) );
+
+			return vec2( x, y );
 
 		} ).setLayout( {
 			name: 'GTAOFastAcos',
@@ -476,8 +479,8 @@ class SSGINode extends TempNode {
 			const THICKNESS = this.thickness.toConst();
 			const BACKFACE_LIGHTING = this.backfaceLighting.toConst();
 
-			const uvDirection = directionIsRight.ternary( vec2( 1, - 1 ), vec2( - 1, 1 ) ); // Port note: Because of different uv conventions, uv-y has a different sign
-			const samplingDirection = directionIsRight.ternary( 1, - 1 );
+			const uvDirection = directionIsRight.select( vec2( 1, - 1 ), vec2( - 1, 1 ) ); // Port note: Because of different uv conventions, uv-y has a different sign
+			const samplingDirection = directionIsRight.select( 1, - 1 );
 
 			const color = vec3( 0 );
 
@@ -495,13 +498,13 @@ class SSGINode extends TempNode {
 
 				const sampleViewPosition = getViewPosition( sampleUV, sampleDepth( sampleUV ), this._cameraProjectionMatrixInverse ).toConst();
 				const pixelToSample = sampleViewPosition.sub( viewPosition ).normalize().toConst();
-				const linearThicknessMultiplier = this.useLinearThickness.ternary( sampleViewPosition.z.negate().div( this._cameraFar ).clamp().mul( 100 ), float( 1 ) );
+				const linearThicknessMultiplier = this.useLinearThickness.select( sampleViewPosition.z.negate().div( this._cameraFar ).clamp().mul( 100 ), float( 1 ) );
 				const pixelToSampleBackface = normalize( sampleViewPosition.sub( linearThicknessMultiplier.mul( viewDir ).mul( THICKNESS ) ).sub( viewPosition ) );
 
 				let frontBackHorizon = vec2( dot( pixelToSample, viewDir ), dot( pixelToSampleBackface, viewDir ) );
 				frontBackHorizon = GTAOFastAcos( clamp( frontBackHorizon, - 1, 1 ) );
 				frontBackHorizon = clamp( div( mul( samplingDirection, frontBackHorizon.negate() ).sub( n.sub( HALF_PI ) ), PI ) ); // Port note: subtract half pi instead of adding it
-				frontBackHorizon = directionIsRight.ternary( frontBackHorizon.yx, frontBackHorizon.xy ); // Front/Back get inverted depending on angle
+				frontBackHorizon = directionIsRight.select( frontBackHorizon.yx, frontBackHorizon.xy ); // Front/Back get inverted depending on angle
 
 				// inline ComputeOccludedBitfield() for easier debugging
 
@@ -510,7 +513,7 @@ class SSGINode extends TempNode {
 
 				const startHorizonInt = uint( frontBackHorizon.mul( float( MAX_RAY ) ) ).toConst();
 				const angleHorizonInt = uint( ceil( maxHorizon.sub( minHorizon ).mul( float( MAX_RAY ) ) ) ).toConst();
-				const angleHorizonBitfield = angleHorizonInt.greaterThan( uint( 0 ) ).ternary( uint( shiftRight( uint( 0xFFFFFFFF ), uint( 32 ).sub( MAX_RAY ).add( MAX_RAY.sub( angleHorizonInt ) ) ) ), uint( 0 ) ).toConst();
+				const angleHorizonBitfield = angleHorizonInt.greaterThan( uint( 0 ) ).select( uint( shiftRight( uint( 0xFFFFFFFF ), uint( 32 ).sub( MAX_RAY ).add( MAX_RAY.sub( angleHorizonInt ) ) ) ), uint( 0 ) ).toConst();
 				let currentOccludedBitfield = angleHorizonBitfield.shiftLeft( startHorizonInt );
 				currentOccludedBitfield = currentOccludedBitfield.bitAnd( globalOccludedBitfield.bitNot() );
 
@@ -536,8 +539,8 @@ class SSGINode extends TempNode {
 
 							let lightNormalDotLightDirection = dot( lightNormalVS, lightDirectionVS.negate() );
 
-							const d = sign( lightNormalDotLightDirection ).lessThan( 0 ).ternary( abs( lightNormalDotLightDirection ).mul( BACKFACE_LIGHTING ), abs( lightNormalDotLightDirection ) );
-							lightNormalDotLightDirection = BACKFACE_LIGHTING.greaterThan( 0 ).and( dot( lightNormalVS, viewDir ).greaterThan( 0 ) ).ternary( d, clamp( lightNormalDotLightDirection ) );
+							const d = sign( lightNormalDotLightDirection ).lessThan( 0 ).select( abs( lightNormalDotLightDirection ).mul( BACKFACE_LIGHTING ), abs( lightNormalDotLightDirection ) );
+							lightNormalDotLightDirection = BACKFACE_LIGHTING.greaterThan( 0 ).and( dot( lightNormalVS, viewDir ).greaterThan( 0 ) ).select( d, clamp( lightNormalDotLightDirection ) );
 
 							color.rgb.addAssign( float( numOccludedZones ).div( float( MAX_RAY ) ).mul( lightColor ).mul( normalDotLightDirection ).mul( lightNormalDotLightDirection ) );
 
@@ -635,7 +638,7 @@ class SSGINode extends TempNode {
 			const maxLuminance = float( 7 ).toConst(); // 7 represent a HDR luminance value
 			const currentLuminance = luminance( color );
 
-			const scale = currentLuminance.greaterThan( maxLuminance ).ternary( maxLuminance.div( currentLuminance ), float( 1 ) );
+			const scale = currentLuminance.greaterThan( maxLuminance ).select( maxLuminance.div( currentLuminance ), float( 1 ) );
 			color.mulAssign( scale );
 
 			aoField.assign( ao );

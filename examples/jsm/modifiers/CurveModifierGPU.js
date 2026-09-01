@@ -14,7 +14,7 @@ import {
 	LinearFilter
 } from 'three';
 
-import { modelWorldMatrix, normalLocal, vec2, vec3, vec4, mat3, varyingProperty, texture, reference, Fn, ternary, positionLocal } from 'three/tsl';
+import { modelWorldMatrix, normalLocal, vec2, vec3, vec4, mat3, varyingProperty, texture, reference, Fn, select, positionLocal } from 'three/tsl';
 
 /**
  * Make a new DataTexture to store the descriptions of the curves.
@@ -132,9 +132,9 @@ function modifyShader( material, uniforms, numberOfCurves ) {
 		const worldPos = modelWorldMatrix.mul( vec4( positionLocal, 1 ) ).toVar();
 
 		const bend = flow.greaterThan( 0 ).toVar();
-		const xWeight = ternary( bend, 0, 1 ).toVar();
+		const xWeight = select( bend, 0, 1 ).toVar();
 
-		const spinePortion = ternary( bend, worldPos.x.add( spineOffset ).div( spineLength ), 0 );
+		const spinePortion = select( bend, worldPos.x.add( spineOffset ).div( spineLength ), 0 );
 		const mt = spinePortion.mul( pathSegment ).add( pathOffset ).mul( textureStacks ).toVar();
 
 		mt.assign( mt.mod( textureStacks ) );

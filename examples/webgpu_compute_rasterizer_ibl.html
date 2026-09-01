@@ -36,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Fn, If, Loop, vec2, vec3, vec4, bvec3, uvec2, uvec4, mat4, uint, float, int, min, max, clamp, ceil, log2, length, dFdx, dFdy, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, instanceIndex, vertexIndex, distance, screenSize, screenCoordinate, time, texture, varyingProperty, sqrt, normalize, cross, sign, positionGeometry, cameraViewMatrix, Discard, context, positionView, positionViewDirection, overrideNodes } from 'three/tsl';
+			import { Fn, If, Loop, vec2, vec4, uvec2, uvec4, mat4, uint, float, int, min, max, clamp, ceil, log2, length, dFdx, dFdy, atomicMax, atomicAdd, atomicStore, atomicLoad, floor, cos, sin, dot, bool, storage, uniform, uniformArray, instanceIndex, vertexIndex, distance, screenSize, screenCoordinate, time, texture, varyingProperty, sqrt, normalize, cross, sign, positionGeometry, cameraViewMatrix, Discard, context, positionView, positionViewDirection, overrideNodes } from 'three/tsl';
 
 			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -974,7 +974,9 @@
 											const isTopLeft1 = stepX_w1.lessThan( 0.0 ).or( stepX_w1.equal( 0.0 ).and( stepY_w1.greaterThan( 0.0 ) ) );
 											const isTopLeft2 = stepX_w2.lessThan( 0.0 ).or( stepX_w2.equal( 0.0 ).and( stepY_w2.greaterThan( 0.0 ) ) );
 
-											const biases = bvec3( isTopLeft0, isTopLeft1, isTopLeft2 ).mix( vec3( - 1e-5 ), vec3( 0.0 ) );
+											const bias0 = isTopLeft0.select( 0.0, - 1e-5 );
+											const bias1 = isTopLeft1.select( 0.0, - 1e-5 );
+											const bias2 = isTopLeft2.select( 0.0, - 1e-5 );
 
 											const pStart = vec2( float( startX ).add( 0.5 ), float( startY ).add( 0.5 ) );
 
@@ -982,9 +984,9 @@
 											const row_w1 = edgeFunction( s2, s0, pStart ).toVar();
 											const row_w2 = edgeFunction( s0, s1, pStart ).toVar();
 
-											row_w0.addAssign( biases.x );
-											row_w1.addAssign( biases.y );
-											row_w2.addAssign( biases.z );
+											row_w0.addAssign( bias0 );
+											row_w1.addAssign( bias1 );
+											row_w2.addAssign( bias2 );
 
 											// Incremental Z Math (ALU Optimization)
 											const b0_start = row_w0.div( area );
@@ -1184,14 +1186,14 @@
 
 						// This vertex's position, normal and uv
 						const vertGlobalIdx = indexBuffer.element( indexOffset.add( localVert ) );
-						const worldPos = localVert.equal( 1 ).ternary( w1, localVert.equal( 2 ).ternary( w2, w0 ) );
+						const worldPos = localVert.equal( 1 ).select( w1, localVert.equal( 2 ).select( w2, w0 ) );
 
 						const worldNormal = normalize( matrixWorld.mul( vec4( normalBuffer.element( vertGlobalIdx ).xyz, 0.0 ) ).xyz );
 
 						const uv0 = uvBuffer.element( i0 );
 						const uv1 = uvBuffer.element( i1 );
 						const uv2 = uvBuffer.element( i2 );
-						const uvVal = localVert.equal( 1 ).ternary( uv1, localVert.equal( 2 ).ternary( uv2, uv0 ) );
+						const uvVal = localVert.equal( 1 ).select( uv1, localVert.equal( 2 ).select( uv2, uv0 ) );
 
 						vInstId.assign( instId );
 						vMegaTriIdx.assign( megaTriIdx );
@@ -1321,14 +1323,14 @@
 					const w2b = edgeFunction( s0, s1, p );
 
 					// Guard against division by zero for safe execution
-					const safeArea = area.equal( 0.0 ).ternary( 1.0, area );
+					const safeArea = area.equal( 0.0 ).select( 1.0, area );
 					const b0 = w0b.div( safeArea );
 					const b1 = w1b.div( safeArea );
 					const b2 = w2b.div( safeArea );
 
 					// Perspective correct interpolation (32-bit floats!)
 					const z_inv = b0.div( p0.w ).add( b1.div( p1.w ) ).add( b2.div( p2.w ) );
-					const safeZInv = z_inv.equal( 0.0 ).ternary( 1.0, z_inv );
+					const safeZInv = z_inv.equal( 0.0 ).select( 1.0, z_inv );
 					const b0_p = b0.div( p0.w ).div( safeZInv );
 					const b1_p = b1.div( p1.w ).div( safeZInv );
 					const b2_p = b2.div( p2.w ).div( safeZInv );
@@ -1360,7 +1362,7 @@
 					const q2 = float( 1.0 ).div( p2.w );
 
 					const sum_w_q = w0b.mul( q0 ).add( w1b.mul( q1 ) ).add( w2b.mul( q2 ) );
-					const safe_sum_w_q = sum_w_q.equal( 0.0 ).ternary( 1.0, sum_w_q );
+					const safe_sum_w_q = sum_w_q.equal( 0.0 ).select( 1.0, sum_w_q );
 
 					const dUvDx = (
 						dw0_dx.mul( q0 ).mul( t_uv0.sub( uv_interp ) )

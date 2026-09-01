@@ -20,7 +20,7 @@ import {
 } from 'three';
 
 import { MeshStandardNodeMaterial } from 'three/webgpu';
-import { attribute, cameraPosition, color, cross, dot, float, floor, Fn, fract, fwidth, hash as ihash, mix, mod, modelWorldMatrixInverse, mx_fractal_noise_float, normalLocal, normalView, normalWorldGeometry, positionLocal, positionView, positionWorld, ternary, smoothstep, step, uint, uv, varying, vec2, vec3, vec4 } from 'three/tsl';
+import { attribute, cameraPosition, color, cross, dot, float, floor, Fn, fract, fwidth, hash as ihash, mix, mod, modelWorldMatrixInverse, mx_fractal_noise_float, normalLocal, normalView, normalWorldGeometry, positionLocal, positionView, positionWorld, select, smoothstep, step, uint, uv, varying, vec2, vec3, vec4 } from 'three/tsl';
 
 import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
 
@@ -1033,7 +1033,7 @@ const interior = /*@__PURE__*/ Fn( () => {
 	// bluer glow — so a lit facade reads as a spread of bulb temperatures, not one flat tint
 	const warmLight = mix( color( 0xffb845 ), color( 0xffe49c ), hash( 27.1, 4.9, 61.7 ) );
 	const coolLight = mix( color( 0xdfe8ff ), color( 0x9fb6ff ), hash( 8.3, 51.2, 17.6 ) );
-	const lightCol = ternary( hash( 44.7, 19.3, 6.1 ).greaterThan( 0.88 ), coolLight, warmLight ); // ~12% of lit rooms run cool
+	const lightCol = select( hash( 44.7, 19.3, 6.1 ).greaterThan( 0.88 ), coolLight, warmLight ); // ~12% of lit rooms run cool
 
 	// depth falloff ( darker toward the back ), and a panel mask on a face given its
 	// two 0..1 coordinates — used for the flat fittings below
@@ -1063,20 +1063,20 @@ const interior = /*@__PURE__*/ Fn( () => {
 	// opposite half of the wall so it never lands on the door
 	const doorX = mix( float( 0.22 ), float( 0.78 ), seed );
 	const door = mix( color( 0x5a4631 ), color( 0x39383c ), step( 0.5, seed2 ) );
-	const picX = ternary( doorX.lessThan( 0.5 ), mix( float( 0.68 ), float( 0.82 ), seed2 ), mix( float( 0.18 ), float( 0.32 ), seed2 ) );
+	const picX = select( doorX.lessThan( 0.5 ), mix( float( 0.68 ), float( 0.82 ), seed2 ), mix( float( 0.18 ), float( 0.32 ), seed2 ) );
 	const picCol = mix( color( 0x2c3a4a ), color( 0x7a5a3a ), hash( 5.1, 9.2, 3.3 ) );
 	let backCol = mix( wallCol, door, rect( q.x, q.y, doorX, 0.33, 0.085, 0.35 ) );
 	backCol = mix( backCol, color( 0x141210 ), rect( q.x, q.y, picX, 0.56, 0.075, 0.085 ) ); // dark frame
 	backCol = mix( backCol, picCol, rect( q.x, q.y, picX, 0.56, 0.055, 0.065 ) ); // the picture
 
-	const shellCol = ternary( onBack, backCol, ternary( onCeil, ceilCol, ternary( onFloor, floorCol, wallCol ) ) );
+	const shellCol = select( onBack, backCol, select( onCeil, ceilCol, select( onFloor, floorCol, wallCol ) ) );
 
 	// fake ambient occlusion: darken the hit toward the room's edges ( where two surfaces
 	// meet ), so the box reads with soft corner shading instead of flat-lit walls. the two
 	// in-plane axes depend on which face the ray exits through ( q is 0..1 inside the room ).
 	const aoBand = 0.15;
 	const aoEdge = ( a ) => smoothstep( 0, aoBand, a ).mul( smoothstep( 0, aoBand, a.oneMinus() ) );
-	const edgeAO = ternary( onBack, aoEdge( q.x ).mul( aoEdge( q.y ) ), ternary( onFloor.or( onCeil ), aoEdge( q.x ).mul( aoEdge( q.z ) ), aoEdge( q.y ).mul( aoEdge( q.z ) ) ) );
+	const edgeAO = select( onBack, aoEdge( q.x ).mul( aoEdge( q.y ) ), select( onFloor.or( onCeil ), aoEdge( q.x ).mul( aoEdge( q.z ) ), aoEdge( q.y ).mul( aoEdge( q.z ) ) ) );
 	const shellAO = mix( float( 0.72 ), float( 1.0 ), edgeAO );
 
 	// --- nearest surface: the shell, then any furniture block that lies closer ----
@@ -1099,7 +1099,7 @@ const interior = /*@__PURE__*/ Fn( () => {
 
 	const consider = ( h, tN, c, emit = 1 ) => {
 
-		const near = h.and( tN.lessThan( bestT ) ); bestCol = ternary( near, c, bestCol ); bestEmit = ternary( near, float( emit ), bestEmit ); bestT = ternary( near, tN, bestT );
+		const near = h.and( tN.lessThan( bestT ) ); bestCol = select( near, c, bestCol ); bestEmit = select( near, float( emit ), bestEmit ); bestT = select( near, tN, bestT );
 
 	};
 
@@ -1110,20 +1110,20 @@ const interior = /*@__PURE__*/ Fn( () => {
 	const tCx = mix( float( - 0.6 ), float( 0.6 ), seed );
 	const tCz = midZ.add( mix( float( - 0.4 ), float( 0.5 ), seed2 ) );
 	const tbl = boxHit( vec3( tCx.sub( 0.6 ), floorY, tCz.sub( 0.35 ) ), vec3( tCx.add( 0.6 ), floorY.add( 0.42 ), tCz.add( 0.35 ) ) );
-	const tblCol = mix( color( 0x4a3526 ), color( 0x6b4a30 ), seed2 ).mul( ternary( tbl.qb.y.greaterThan( 0.94 ), float( 1.25 ), float( 0.8 ) ) );
+	const tblCol = mix( color( 0x4a3526 ), color( 0x6b4a30 ), seed2 ).mul( select( tbl.qb.y.greaterThan( 0.94 ), float( 1.25 ), float( 0.8 ) ) );
 	consider( tbl.hit, tbl.tN, tblCol.mul( falloffAt( tbl.p.z ) ) );
 
 	// a wide low sofa against the back wall, facing the window
 	const sofaCx = mix( halfU.mul( - 0.3 ), halfU.mul( 0.3 ), seed2 );
 	const sofa = boxHit( vec3( sofaCx.sub( 1.1 ), floorY, backZ.sub( 0.95 ) ), vec3( sofaCx.add( 1.1 ), floorY.add( mix( float( 0.8 ), float( 0.9 ), seed ) ), backZ.sub( 0.1 ) ) );
-	const sofaCol = mix( color( 0x5a4a3a ), color( 0x42566a ), seed ).mul( ternary( sofa.qb.y.greaterThan( 0.9 ), float( 1.12 ), float( 0.85 ) ) );
+	const sofaCol = mix( color( 0x5a4a3a ), color( 0x42566a ), seed ).mul( select( sofa.qb.y.greaterThan( 0.9 ), float( 1.12 ), float( 0.85 ) ) );
 	consider( sofa.hit, sofa.tN, sofaCol.mul( falloffAt( sofa.p.z ) ) );
 
 	// tall wardrobes in the back corners — each side stands in some rooms
 	const wardrobe = ( cx, gate, h ) => {
 
 		const w = boxHit( vec3( cx.sub( 0.5 ), floorY, backZ.sub( 0.7 ) ), vec3( cx.add( 0.5 ), floorY.add( h ), backZ.sub( 0.1 ) ) );
-		const c = mix( color( 0x3a2c22 ), color( 0x55473a ), seed ).mul( ternary( w.qb.y.greaterThan( 0.94 ), float( 1.2 ), float( 0.82 ) ) );
+		const c = mix( color( 0x3a2c22 ), color( 0x55473a ), seed ).mul( select( w.qb.y.greaterThan( 0.94 ), float( 1.2 ), float( 0.82 ) ) );
 		consider( w.hit.and( gate ), w.tN, c.mul( falloffAt( w.p.z ) ) );
 
 	};
@@ -1140,11 +1140,11 @@ const interior = /*@__PURE__*/ Fn( () => {
 	const swatch = ( a, b ) => mix( color( a ), color( b ), seed2 );
 	const pick = hash( 22.4, 6.7, 91.2 ).mul( 6 ); // 0..6, one bucket per family
 	let fabric = swatch( 0xcabfa6, 0xd8cdb8 ); // cream
-	fabric = ternary( pick.greaterThan( 1 ), swatch( 0x8a7a64, 0x9b8c72 ), fabric ); // beige / taupe
-	fabric = ternary( pick.greaterThan( 2 ), swatch( 0x706a64, 0x837d76 ), fabric ); // warm grey
-	fabric = ternary( pick.greaterThan( 3 ), swatch( 0x5f7079, 0x6f818b ), fabric ); // dusty blue
-	fabric = ternary( pick.greaterThan( 4 ), swatch( 0x6c7558, 0x79835f ), fabric ); // sage green
-	fabric = ternary( pick.greaterThan( 5 ), swatch( 0x8c5a44, 0x9a6a52 ), fabric ); // faded terracotta
+	fabric = select( pick.greaterThan( 1 ), swatch( 0x8a7a64, 0x9b8c72 ), fabric ); // beige / taupe
+	fabric = select( pick.greaterThan( 2 ), swatch( 0x706a64, 0x837d76 ), fabric ); // warm grey
+	fabric = select( pick.greaterThan( 3 ), swatch( 0x5f7079, 0x6f818b ), fabric ); // dusty blue
+	fabric = select( pick.greaterThan( 4 ), swatch( 0x6c7558, 0x79835f ), fabric ); // sage green
+	fabric = select( pick.greaterThan( 5 ), swatch( 0x8c5a44, 0x9a6a52 ), fabric ); // faded terracotta
 	const drape = ( bMin, bMax, gate ) => {
 
 		const h = boxHit( bMin, bMax );
@@ -1318,7 +1318,7 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 
 	// stone zones: brick + weathering on the building's colour, lightened for
 	// piers / ornament and darkened for window frames
-	const lighten = ternary( partId.equal( PIER ), float( 0.12 ), ternary( isOrnament, float( 0.2 ), float( 0 ) ) );
+	const lighten = select( partId.equal( PIER ), float( 0.12 ), select( isOrnament, float( 0.2 ), float( 0 ) ) );
 	const perBrick = float( 1 ).add( tone ).add( mottle ).add( brickRnd.sub( 0.5 ).mul( 0.14 ) );
 	// per-brick warm/cool shift ( red up / blue down, or vice-versa ) so individual
 	// bricks read as slightly different fired tones, relative to the building's colour
@@ -1330,7 +1330,7 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	// larger-scale grime instead of the wall's streaky soot — confined to those surfaces by a
 	// branch ( roofMask > 0 ), so the fractal never runs on the vertical facade
 	const roofMask = wallFacing.oneMinus();
-	const roofGrime = ternary( roofMask.greaterThan( 0 ), smoothstep( 0.0, 0.55, valueFractal( positionWorld.mul( 0.025 ), 3 ) ).mul( 0.22 ), float( 0 ) );
+	const roofGrime = select( roofMask.greaterThan( 0 ), smoothstep( 0.0, 0.55, valueFractal( positionWorld.mul( 0.025 ), 3 ) ).mul( 0.22 ), float( 0 ) );
 	const stoneColor = mix( masonry, soot, mix( dirt, roofGrime, roofMask ) );
 
 	// glass: the interior-mapped room is the base colour; the smooth, low-roughness
@@ -1384,11 +1384,11 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	const acRough = float( 0.52 ).add( acGrille.mul( 0.08 ) );
 
 	const material = new MeshStandardNodeMaterial();
-	material.colorNode = ternary( isGlass, glassColor, ternary( isFrame, frameColor, ternary( isOrnament, ornamentColor, ternary( isAC, acColor, stoneColor ) ) ) );
-	material.roughnessNode = ternary( isGlass, float( 0.18 ), ternary( isOrnament, float( 0.8 ), ternary( isAC, acRough, rough ) ) ); // glass kept smooth for a sky reflection, but soft enough not to alias over the interior
+	material.colorNode = select( isGlass, glassColor, select( isFrame, frameColor, select( isOrnament, ornamentColor, select( isAC, acColor, stoneColor ) ) ) );
+	material.roughnessNode = select( isGlass, float( 0.18 ), select( isOrnament, float( 0.8 ), select( isAC, acRough, rough ) ) ); // glass kept smooth for a sky reflection, but soft enough not to alias over the interior
 	material.metalnessNode = float( 0 ); // all dielectric — stone, glass and the plastic AC shells
-	material.emissiveNode = ternary( isGlass, room.xyz.mul( room.w ).mul( 4 ).mul( grime.mul( 0.6 ).oneMinus() ), color( 0x000000 ) ); // room.w = emissive weight ( 0 unlit, < 1 behind curtains ), muted further by grime
-	material.normalNode = bumpNormal( ternary( isGlass.or( isFrame ).or( isOrnament ), float( 0 ), ternary( isAC, acRelief, reliefHeight ) ) ); // glass / frames / ornament stay flat; AC has its own louvers
+	material.emissiveNode = select( isGlass, room.xyz.mul( room.w ).mul( 4 ).mul( grime.mul( 0.6 ).oneMinus() ), color( 0x000000 ) ); // room.w = emissive weight ( 0 unlit, < 1 behind curtains ), muted further by grime
+	material.normalNode = bumpNormal( select( isGlass.or( isFrame ).or( isOrnament ), float( 0 ), select( isAC, acRelief, reliefHeight ) ) ); // glass / frames / ornament stay flat; AC has its own louvers
 
 	return material;
 

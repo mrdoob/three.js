@@ -801,7 +801,7 @@ Notice that there are some rules when using this syntax which differentiate TSL 
 Different from `if-else`, a ternary conditional will return a value and can be used outside of `Fn()`.
 
 ```js
-const result = ternary( value.greaterThan( 1 ), 1.0, value );
+const result = select( value.greaterThan( 1 ), 1.0, value );
 ```
 > Equivalent in JavaScript should be: `value > 1 ? 1.0 : value`
 

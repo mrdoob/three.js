@@ -407,7 +407,7 @@ class CSMShadowNode extends ShadowBaseNode {
 
 				cascadeCenter.assign( cascade.x.add( cascade.y ).div( 2.0 ) );
 
-				const closestEdge = linearDepth.lessThan( cascadeCenter ).ternary( cascade.x, cascade.y );
+				const closestEdge = linearDepth.lessThan( cascadeCenter ).select( cascade.x, cascade.y );
 
 				margin.assign( float( 0.25 ).mul( closestEdge.pow( 2.0 ) ) );
 
@@ -434,7 +434,7 @@ class CSMShadowNode extends ShadowBaseNode {
 					if ( i === 0 ) {
 
 						// don't fade at nearest edge
-						ratio = linearDepth.greaterThan( cascadeCenter ).ternary( ratio, 1 );
+						ratio = linearDepth.greaterThan( cascadeCenter ).select( ratio, 1 );
 
 					}
 

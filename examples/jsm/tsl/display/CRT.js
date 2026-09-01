@@ -1,4 +1,4 @@
-import { Fn, float, vec2, vec3, sin, screenUV, mix, clamp, dot, convertToTexture, time, uv, ternary } from 'three/tsl';
+import { Fn, float, vec2, vec3, sin, screenUV, mix, clamp, dot, convertToTexture, time, uv, select } from 'three/tsl';
 import { circle } from './Shape.js';
 
 /**
@@ -49,7 +49,7 @@ export const barrelMask = Fn( ( [ coord ] ) => {
 		.or( coord.y.lessThan( 0.0 ) )
 		.or( coord.y.greaterThan( 1.0 ) );
 
-	return ternary( outOfBounds, float( 0.0 ), float( 1.0 ) );
+	return select( outOfBounds, float( 0.0 ), float( 1.0 ) );
 
 } );
 

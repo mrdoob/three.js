@@ -1,4 +1,4 @@
-import { Fn, uvec2, If, instancedArray, instanceIndex, invocationLocalIndex, Loop, workgroupArray, workgroupBarrier, workgroupId, uint, ternary, min, max } from 'three/tsl';
+import { Fn, uvec2, If, instancedArray, instanceIndex, invocationLocalIndex, Loop, workgroupArray, workgroupBarrier, workgroupId, uint, select, min, max } from 'three/tsl';
 
 const StepType = {
 	NONE: 0,
@@ -603,7 +603,7 @@ export class BitonicSort {
 
 				const nextSwapSpan = currentSwapSpan.div( 2 );
 				currentAlgo.assign(
-					ternary(
+					select(
 						nextSwapSpan.lessThanEqual( uint( workgroupSize * 2 ) ),
 						StepType.DISPERSE_LOCAL,
 						StepType.DISPERSE_GLOBAL

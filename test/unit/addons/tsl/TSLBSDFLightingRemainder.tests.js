@@ -62,7 +62,7 @@ export default QUnit.module( 'TSL', () => {
 			// cutoffDistance is routed through `.toVar()` so it isn't folded into
 			// a compile-time constant -- see the matching note in
 			// TSLBRDF.tests.js's getDistanceAttenuation() coverage for why this
-			// matters on WGSL (an untaken `ternary()` branch that divides by a
+			// matters on WGSL (an untaken `select()` branch that divides by a
 			// literal 0.0 still gets constant-folded and rejected at compile time).
 			const color = [ 1, 1, 1 ];
 			const lightVector = [ 0, 0, 5 ];

@@ -223,7 +223,7 @@ class SharpenNode extends TempNode {
 			const nzRange = max( max( bL, dL ), max( eL, max( fL, hL ) ) ).sub( min( min( bL, dL ), min( eL, min( fL, hL ) ) ) ).toConst();
 			const nzFactor = float( 1.0 ).sub( abs( nz ).div( max( nzRange, float( 1.0 / 65536.0 ) ) ).saturate().mul( 0.5 ) ).toConst();
 
-			const effectiveLobe = this.denoise.equal( true ).ternary( lobe.mul( nzFactor ), lobe ).toConst();
+			const effectiveLobe = this.denoise.equal( true ).select( lobe.mul( nzFactor ), lobe ).toConst();
 
 			// Resolve: weighted blend of cross neighbors and center.
 

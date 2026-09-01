@@ -62,7 +62,7 @@ const trimSegmentAlpha = Fn( ( { start, end } ) => {
 	// we need different nearEstimate formula for reversed and default depth buffer
 	// a is positive with a reversed depth buffer so it can be used for controlling the code flow
 
-	const nearEstimate = a.greaterThan( 0 ).ternary( b.negate().div( a.add( 1 ) ), b.mul( - 0.5 ).div( a ) );
+	const nearEstimate = a.greaterThan( 0 ).select( b.negate().div( a.add( 1 ) ), b.mul( - 0.5 ).div( a ) );
 
 	return nearEstimate.sub( start.z ).div( end.z.sub( start.z ) );
 
@@ -180,7 +180,7 @@ const mvpLine = Fn( ( { material } ) => {
 		const dashScaleNode = material.dashScaleNode ? float( material.dashScaleNode ) : materialLineScale;
 		const offsetNode = material.offsetNode ? float( material.offsetNode ) : materialLineDashOffset;
 
-		let lineDist = positionGeometry.y.lessThan( 0.5 ).ternary( dashScaleNode.mul( distanceStart ), dashScaleNode.mul( distanceEnd ) );
+		let lineDist = positionGeometry.y.lessThan( 0.5 ).select( dashScaleNode.mul( distanceStart ), dashScaleNode.mul( distanceEnd ) );
 		lineDist = lineDist.add( offsetNode );
 
 		lineDistance.assign( lineDist );
@@ -213,18 +213,18 @@ const mvpLine = Fn( ( { material } ) => {
 		const worldUp = worldDir.cross( tmpFwd ).normalize();
 		const worldFwd = worldDir.cross( worldUp );
 
-		worldPos.assign( positionGeometry.y.lessThan( 0.5 ).ternary( start, end ) );
+		worldPos.assign( positionGeometry.y.lessThan( 0.5 ).select( start, end ) );
 
 		// height offset
 		const hw = materialLineWidth.mul( 0.5 );
-		worldPos.addAssign( vec4( positionGeometry.x.lessThan( 0.0 ).ternary( worldUp.mul( hw ), worldUp.mul( hw ).negate() ), 0 ) );
+		worldPos.addAssign( vec4( positionGeometry.x.lessThan( 0.0 ).select( worldUp.mul( hw ), worldUp.mul( hw ).negate() ), 0 ) );
 
 		// don't extend the line if we're rendering dashes because we
 		// won't be rendering the endcaps
 		if ( ! useDash ) {
 
 			// cap extension
-			worldPos.addAssign( vec4( positionGeometry.y.lessThan( 0.5 ).ternary( worldDir.mul( hw ).negate(), worldDir.mul( hw ) ), 0 ) );
+			worldPos.addAssign( vec4( positionGeometry.y.lessThan( 0.5 ).select( worldDir.mul( hw ).negate(), worldDir.mul( hw ) ), 0 ) );
 
 			// add width to the box
 			worldPos.addAssign( vec4( worldFwd.mul( hw ), 0 ) );
@@ -245,7 +245,7 @@ const mvpLine = Fn( ( { material } ) => {
 		// segments overlap neatly
 		const clipPose = vec3().toVar();
 
-		clipPose.assign( positionGeometry.y.lessThan( 0.5 ).ternary( ndcStart, ndcEnd ) );
+		clipPose.assign( positionGeometry.y.lessThan( 0.5 ).select( ndcStart, ndcEnd ) );
 		clip.z.assign( clipPose.z.mul( clip.w ) );
 
 	} else {
@@ -257,7 +257,7 @@ const mvpLine = Fn( ( { material } ) => {
 		offset.x.assign( offset.x.div( aspect ) );
 
 		// sign flip
-		offset.assign( positionGeometry.x.lessThan( 0.0 ).ternary( offset.negate(), offset ) );
+		offset.assign( positionGeometry.x.lessThan( 0.0 ).select( offset.negate(), offset ) );
 
 		// endcaps
 		If( positionGeometry.y.lessThan( 0.0 ), () => {
@@ -277,7 +277,7 @@ const mvpLine = Fn( ( { material } ) => {
 		offset.assign( offset.div( viewport.w.div( screenDPR ) ) );
 
 		// select end
-		clip.assign( positionGeometry.y.lessThan( 0.5 ).ternary( clipStart, clipEnd ) );
+		clip.assign( positionGeometry.y.lessThan( 0.5 ).select( clipStart, clipEnd ) );
 
 		// back to clip space
 		offset.assign( offset.mul( clip.w ) );
@@ -355,7 +355,7 @@ const alphaLine = Fn( ( { material, renderer } ) => {
 		if ( useAlphaToCoverage && renderer.currentSamples > 0 ) {
 
 			const a = vUv.x;
-			const b = vUv.y.greaterThan( 0.0 ).ternary( vUv.y.sub( 1.0 ), vUv.y.add( 1.0 ) );
+			const b = vUv.y.greaterThan( 0.0 ).select( vUv.y.sub( 1.0 ), vUv.y.add( 1.0 ) );
 
 			const len2 = a.mul( a ).add( b.mul( b ) );
 
@@ -372,7 +372,7 @@ const alphaLine = Fn( ( { material, renderer } ) => {
 			If( vUv.y.abs().greaterThan( 1.0 ), () => {
 
 				const a = vUv.x;
-				const b = vUv.y.greaterThan( 0.0 ).ternary( vUv.y.sub( 1.0 ), vUv.y.add( 1.0 ) );
+				const b = vUv.y.greaterThan( 0.0 ).select( vUv.y.sub( 1.0 ), vUv.y.add( 1.0 ) );
 				const len2 = a.mul( a ).add( b.mul( b ) );
 
 				len2.greaterThan( 1.0 ).discard();
@@ -503,7 +503,7 @@ class Line2NodeMaterial extends NodeMaterial {
 			const instanceColorStart = attribute( 'instanceColorStart' );
 			const instanceColorEnd = attribute( 'instanceColorEnd' );
 
-			const instanceColor = positionGeometry.y.lessThan( 0.5 ).ternary( instanceColorStart, instanceColorEnd );
+			const instanceColor = positionGeometry.y.lessThan( 0.5 ).select( instanceColorStart, instanceColorEnd );
 
 			diffuseColor.rgb.mulAssign( instanceColor );
 

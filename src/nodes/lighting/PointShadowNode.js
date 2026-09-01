@@ -72,7 +72,7 @@ export const PointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, s
 
 	// Build a tangent-space coordinate system for applying offsets
 	const absDir = abs( bd3D );
-	const tangent = normalize( cross( bd3D, absDir.x.greaterThan( absDir.z ).ternary( vec3( 0, 1, 0 ), vec3( 1, 0, 0 ) ) ) );
+	const tangent = normalize( cross( bd3D, absDir.x.greaterThan( absDir.z ).select( vec3( 0, 1, 0 ), vec3( 1, 0, 0 ) ) ) );
 	const bitangent = cross( bd3D, tangent );
 
 	// Use IGN to rotate sampling pattern per pixel (phi = IGN * 2π)

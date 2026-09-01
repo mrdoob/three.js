@@ -35,7 +35,7 @@ const aspectRatioUV = /*@__PURE__*/ Fn( ( [ uv, textureNode, canvasAspect ] ) =>
 	// If canvasAspect <= textureAspect:
 	const uvTall = vec2( centered.x, centered.y.div( ratio ) ).add( 0.5 );
 
-	const finalUV = canvasAspect.greaterThan( textureAspect ).ternary( uvWide, uvTall );
+	const finalUV = canvasAspect.greaterThan( textureAspect ).select( uvWide, uvTall );
 
 	const inBounds = step( 0.0, finalUV.x ).mul( step( finalUV.x, 1.0 ) ).mul( step( 0.0, finalUV.y ) ).mul( step( finalUV.y, 1.0 ) );
 

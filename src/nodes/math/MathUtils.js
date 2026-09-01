@@ -1,6 +1,6 @@
 import { sub, mul, div, add } from './OperatorNode.js';
 import { PI, pow, sin, abs } from './MathNode.js';
-import { ternary } from './ConditionalNode.js';
+import { select } from './ConditionalNode.js';
 
 /**
  * A function that remaps the `[0,1]` interval into the `[0,1]` interval.
@@ -26,7 +26,7 @@ export const parabola = ( x, k ) => pow( mul( 4.0, x.mul( sub( 1.0, x ) ) ), k )
  * @param {Node<float>} k - `k=1` is the identity curve,`k<1` produces the classic `gain()` shape, and `k>1` produces "s" shaped curves.
  * @return {Node<float>} The remapped value.
  */
-export const gain = ( x, k ) => ternary(
+export const gain = ( x, k ) => select(
 	x.lessThan( 0.5 ),
 	pow( mul( 2.0, x ), k ).mul( 0.5 ),
 	sub( 1.0, pow( mul( 2.0, sub( 1.0, x ) ), k ).mul( 0.5 ) )

@@ -329,11 +329,11 @@ class TextureNode extends UniformNode {
 
 			if ( this.sampler ) {
 
-				uvNode = this._flipYUniform.ternary( uvNode.flipY(), uvNode );
+				uvNode = this._flipYUniform.select( uvNode.flipY(), uvNode );
 
 			} else {
 
-				uvNode = this._flipYUniform.ternary( uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( uvNode.y ).sub( 1 ) ), uvNode );
+				uvNode = this._flipYUniform.select( uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( uvNode.y ).sub( 1 ) ), uvNode );
 
 			}
 

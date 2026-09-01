@@ -1,7 +1,7 @@
 import { Fn, int, uint, float, vec2, vec3, vec4, If } from '../tsl/TSLBase.js';
 import { cos, sin, abs, min, max, exp, exp2, log, log2, clamp, fract, mix, floor, normalize, cross, dot, sqrt } from '../math/MathNode.js';
 import { mul } from '../math/OperatorNode.js';
-import { ternary } from '../math/ConditionalNode.js';
+import { select } from '../math/ConditionalNode.js';
 import { Loop } from '../utils/LoopNode.js';
 
 const GOLDEN_ANGLE = 2.399963229728653;
@@ -35,11 +35,11 @@ const getFace = /*@__PURE__*/ Fn( ( [ direction ] ) => {
 
 		If( absDirection.x.greaterThan( absDirection.y ), () => {
 
-			face.assign( ternary( direction.x.greaterThan( 0.0 ), 0.0, 3.0 ) );
+			face.assign( select( direction.x.greaterThan( 0.0 ), 0.0, 3.0 ) );
 
 		} ).Else( () => {
 
-			face.assign( ternary( direction.y.greaterThan( 0.0 ), 1.0, 4.0 ) );
+			face.assign( select( direction.y.greaterThan( 0.0 ), 1.0, 4.0 ) );
 
 		} );
 
@@ -47,11 +47,11 @@ const getFace = /*@__PURE__*/ Fn( ( [ direction ] ) => {
 
 		If( absDirection.z.greaterThan( absDirection.y ), () => {
 
-			face.assign( ternary( direction.z.greaterThan( 0.0 ), 2.0, 5.0 ) );
+			face.assign( select( direction.z.greaterThan( 0.0 ), 2.0, 5.0 ) );
 
 		} ).Else( () => {
 
-			face.assign( ternary( direction.y.greaterThan( 0.0 ), 1.0, 4.0 ) );
+			face.assign( select( direction.y.greaterThan( 0.0 ), 1.0, 4.0 ) );
 
 		} );
 
@@ -208,7 +208,7 @@ export const sphericalGaussianBlur = /*@__PURE__*/ Fn( ( { SAMPLES, sigma, outpu
 
 	} ).Else( () => {
 
-		const up = ternary( abs( outputDirection.z ).lessThan( 0.999 ), vec3( 0.0, 0.0, 1.0 ), vec3( 1.0, 0.0, 0.0 ) );
+		const up = select( abs( outputDirection.z ).lessThan( 0.999 ), vec3( 0.0, 0.0, 1.0 ), vec3( 1.0, 0.0, 0.0 ) );
 		const tangent = normalize( cross( up, outputDirection ) ).toVar();
 		const bitangent = cross( outputDirection, tangent ).toVar();
 
@@ -309,7 +309,7 @@ export const ggxConvolution = /*@__PURE__*/ Fn( ( { roughness, mipInt, envMap, N
 	} ).Else( () => {
 
 		// Tangent space basis for VNDF sampling
-		const up = ternary( abs( N.z ).lessThan( 0.999 ), vec3( 0.0, 0.0, 1.0 ), vec3( 1.0, 0.0, 0.0 ) );
+		const up = select( abs( N.z ).lessThan( 0.999 ), vec3( 0.0, 0.0, 1.0 ), vec3( 1.0, 0.0, 0.0 ) );
 		const tangent = normalize( cross( up, N ) ).toVar();
 		const bitangent = cross( N, tangent ).toVar();
 

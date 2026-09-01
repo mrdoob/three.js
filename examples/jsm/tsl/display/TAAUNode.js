@@ -590,7 +590,7 @@ class TAAUNode extends TempNode {
 			const vUnit = vClip.xyz.div( eClip );
 			const absUnit = vUnit.abs();
 			const maxUnit = max( absUnit.x, absUnit.y, absUnit.z );
-			return maxUnit.greaterThan( 1 ).ternary(
+			return maxUnit.greaterThan( 1 ).select(
 				vec4( pClip, currentColor.a ).add( vClip.div( maxUnit ) ),
 				historyColor
 			);
@@ -743,14 +743,14 @@ class TAAUNode extends TempNode {
 			// closer also makes the history stale.
 			const isDepthChanged = closestDepth.sub( previousDepth ).abs().greaterThan( this.depthThreshold );
 			const canLock = isValidUV.and( isDepthChanged.not() );
-			const gatedThinFeature = canLock.ternary( thinFeature, float( 0 ) );
+			const gatedThinFeature = canLock.select( thinFeature, float( 0 ) );
 
-			const decay = isDisocclusion.ternary( 0, 0.5 );
+			const decay = isDisocclusion.select( 0, 0.5 );
 			const lock = max( gatedThinFeature, lockNode.r.mul( decay ) ).saturate();
 			const lockedHistoryColor = mix( clippedHistoryColor, historyColor, lock );
 
 			const currentWeight = float( this.currentFrameWeight ).toVar();
-			currentWeight.assign( hasValidHistory.ternary( currentWeight.add( motionFactor ).saturate(), 1 ) );
+			currentWeight.assign( hasValidHistory.select( currentWeight.add( motionFactor ).saturate(), 1 ) );
 
 			const output = flickerReduction( currentColor, lockedHistoryColor, currentWeight );
 

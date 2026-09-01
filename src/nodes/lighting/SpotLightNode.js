@@ -155,7 +155,7 @@ class SpotLightNode extends AnalyticLightNode {
 
 			const inSpotLightMap = lightCoord.mul( 2. ).sub( 1. ).abs().lessThan( 1. ).all();
 
-			lightColor = inSpotLightMap.ternary( lightColor.mul( projected ), lightColor );
+			lightColor = inSpotLightMap.select( lightColor.mul( projected ), lightColor );
 
 		}
 

@@ -19,10 +19,10 @@ import { Fn, float, positionView, viewportDepthTexture, perspectiveDepthToViewZ,
 const contrastCurve = /*@__PURE__*/ Fn( ( [ input, power ] ) => {
 
 	const aboveHalf = input.greaterThan( 0.5 ).toConst();
-	const folded = aboveHalf.ternary( input.oneMinus(), input ).toConst();
+	const folded = aboveHalf.select( input.oneMinus(), input ).toConst();
 	const output = folded.mul( 2 ).saturate().pow( power ).mul( 0.5 ).toConst();
 
-	return aboveHalf.ternary( output.oneMinus(), output );
+	return aboveHalf.select( output.oneMinus(), output );
 
 } ).setLayout( {
 	name: 'contrastCurve',

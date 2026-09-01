@@ -391,7 +391,7 @@
 
 							// Attraction / Cohesion - move closer
 							const threshDelta = alignmentThresh.oneMinus();
-							const adjustedPercent = threshDelta.equal( 0.0 ).ternary( 1.0, ( percent.sub( alignmentThresh ) ).div( threshDelta ) );
+							const adjustedPercent = threshDelta.equal( 0.0 ).select( 1.0, ( percent.sub( alignmentThresh ) ).div( threshDelta ) );
 
 							const cosRange = cos( adjustedPercent.mul( PI_2 ) );
 							const adj1 = cosRange.mul( - 0.5 );

@@ -37,7 +37,7 @@
 
 			import * as THREE from 'three/webgpu';
 
-			import { Fn, If, Return, instancedArray, instanceIndex, uniform, ternary, attribute, Loop, float, transformNormalToView, cross, triNoise3D, time } from 'three/tsl';
+			import { Fn, If, Return, instancedArray, instanceIndex, uniform, select, attribute, Loop, float, transformNormalToView, cross, triNoise3D, time } from 'three/tsl';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -356,7 +356,7 @@
 						const springId = springListBuffer.element( i ).toVar( 'springId' );
 						const springForce = springForceBuffer.element( springId );
 						const springVertexIds = springVertexIdBuffer.element( springId );
-						const factor = ternary( springVertexIds.x.equal( instanceIndex ), 1.0, - 1.0 );
+						const factor = select( springVertexIds.x.equal( instanceIndex ), 1.0, - 1.0 );
 						force.addAssign( springForce.mul( factor ) );
 
 					} );
@@ -402,7 +402,7 @@
 				springWireframeMaterial.positionNode = Fn( () => {
 
 					const vertexIds = springVertexIdBuffer.element( instanceIndex );
-					const vertexId = ternary( attribute( 'vertexIndex' ).equal( 0 ), vertexIds.x, vertexIds.y );
+					const vertexId = select( attribute( 'vertexIndex' ).equal( 0 ), vertexIds.x, vertexIds.y );
 					return vertexPositionBuffer.element( vertexId );
 
 				} )();

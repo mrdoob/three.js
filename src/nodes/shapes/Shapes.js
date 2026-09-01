@@ -1,4 +1,4 @@
-import { Fn, float, ternary } from '../tsl/TSLBase.js';
+import { Fn, float, select } from '../tsl/TSLBase.js';
 import { lengthSq, smoothstep } from '../math/MathNode.js';
 import { uv } from '../accessors/UV.js';
 
@@ -24,7 +24,7 @@ export const shapeCircle = /*@__PURE__*/ Fn( ( [ coord = uv() ], { renderer, mat
 
 	} else {
 
-		alpha = ternary( len2.greaterThan( 1.0 ), 0, 1 );
+		alpha = select( len2.greaterThan( 1.0 ), 0, 1 );
 
 	}
 

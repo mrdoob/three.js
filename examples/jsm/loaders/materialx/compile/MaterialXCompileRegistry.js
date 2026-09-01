@@ -63,7 +63,7 @@ const SWITCH_MAX_INDEX = 10;
 
 const getDefaultUvNode = ( compileContext ) => compileContext.mxToBottomLeftUvSpace( uv( 0 ) );
 
-const toBooleanMaskNode = ( node ) => toBooleanNode( node ).ternary( float( 1 ), float( 0 ) );
+const toBooleanMaskNode = ( node ) => toBooleanNode( node ).select( float( 1 ), float( 0 ) );
 
 const getTextureAddressMode = ( nodeX, inputName ) => {
 
@@ -128,7 +128,7 @@ const applyTextureAddressModeDefault = ( node, uvNode, addressModes, defaultNode
 
 	}
 
-	return outsideBounds ? outsideBounds.ternary( defaultNode, node ) : node;
+	return outsideBounds ? outsideBounds.select( defaultNode, node ) : node;
 
 };
 
@@ -257,7 +257,7 @@ const compileNormalizeNode = ( nodeX ) => {
 	const lengthSquared = dot( inNode, inNode );
 	const safeLengthSquared = max( lengthSquared, float( 1e-8 ) );
 	const normalized = mul( inNode, div( float( 1 ), sqrt( safeLengthSquared ) ) );
-	return abs( lengthSquared ).lessThan( float( 1e-8 ) ).ternary( zeroNode, normalized );
+	return abs( lengthSquared ).lessThan( float( 1e-8 ) ).select( zeroNode, normalized );
 
 };
 
@@ -270,12 +270,12 @@ const compileRemapNode = ( nodeX ) => {
 	const outHigh = nodeX.getNodeByName( 'outhigh' ) || float( 1 );
 	const denominator = sub( inHigh, inLow );
 	const isDegenerate = abs( denominator ).lessThan( float( 1e-8 ) );
-	const safeDenominator = isDegenerate.ternary( float( 1 ), denominator );
+	const safeDenominator = isDegenerate.select( float( 1 ), denominator );
 	const remapped = add(
 		mul( div( sub( inNode, inLow ), safeDenominator ), sub( outHigh, outLow ) ),
 		outLow,
 	);
-	return isDegenerate.ternary( outLow, remapped );
+	return isDegenerate.select( outLow, remapped );
 
 };
 
@@ -291,17 +291,17 @@ const compileRangeNode = ( nodeX ) => {
 
 	const denominator = sub( inHigh, inLow );
 	const isDegenerate = abs( denominator ).lessThan( float( 1e-8 ) );
-	const safeDenominator = isDegenerate.ternary( float( 1 ), denominator );
+	const safeDenominator = isDegenerate.select( float( 1 ), denominator );
 	const normalized = div( sub( inNode, inLow ), safeDenominator );
 	// Match stdlib range nodegraph semantics:
 	// gamma stage is sign(normalized) * pow(abs(normalized), 1 / gamma).
 	const reciprocalGamma = div( float( 1 ), gamma );
 	const gammaApplied = mul( pow( abs( normalized ), reciprocalGamma ), sign( normalized ) );
 	const remapped = add( mul( gammaApplied, sub( outHigh, outLow ) ), outLow );
-	const result = isDegenerate.ternary( outLow, remapped );
+	const result = isDegenerate.select( outLow, remapped );
 	const clamped = min( max( result, outLow ), outHigh );
 
-	return toBooleanNode( doClamp ).ternary( clamped, result );
+	return toBooleanNode( doClamp ).select( clamped, result );
 
 };
 
@@ -322,7 +322,7 @@ const compileSwitchNode = ( nodeX ) => {
 	for ( let branchIndex = SWITCH_MIN_INDEX + 1; branchIndex <= SWITCH_MAX_INDEX; branchIndex += 1 ) {
 
 		const branchNode = getSwitchBranchNode( nodeX, branchIndex );
-		result = whichNode.equal( float( branchIndex ) ).ternary( branchNode, result );
+		result = whichNode.equal( float( branchIndex ) ).select( branchNode, result );
 
 	}
 
@@ -536,7 +536,7 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 				element( blended, 2 ),
 				element( blended, 3 ),
 			);
-			normalSample = toBooleanNode( flipGNode ).ternary( flippedSample, blended );
+			normalSample = toBooleanNode( flipGNode ).select( flippedSample, blended );
 
 		}
 

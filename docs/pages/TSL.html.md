@@ -3553,7 +3553,7 @@ The second parameter.
 
 **t**
 
-The interpolation value. A boolean vector selects the corresponding component from `a` or `b`.
+The interpolation value.
 
 ### .mixElement( t : Node | number, e1 : Node | number, e2 : Node | number ) : Node
 
@@ -4903,7 +4903,7 @@ Default is `uv()`.
 
 ### .select( condNode : Node, ifNode : Node, elseNode : Node ) : ConditionalNode
 
-Deprecated alias for `ternary()`.
+TSL function for creating a conditional node.
 
 **condNode**
 
@@ -5687,24 +5687,6 @@ Returns the hyperbolic tangent of the parameter.
 **x**
 
 The parameter.
-
-### .ternary( condNode : Node, ifNode : Node, elseNode : Node ) : ConditionalNode
-
-TSL function for creating a conditional node.
-
-**condNode**
-
-The node that defines the condition.
-
-**ifNode**
-
-The node that is evaluate when the condition ends up `true`.
-
-**elseNode**
-
-The node that is evaluate when the condition ends up `false`.
-
-Default is `null`.
 
 ### .texture( value : Texture | TextureNode, uvNode : Node.<(vec2|vec3)>, levelNode : Node.<int>, biasNode : Node.<float> ) : TextureNode
 

@@ -429,7 +429,7 @@ class GTAONode extends TempNode {
 
 		this._ao = Fn( () => {
 
-			const depth = this._resolutionScale.lessThan( 1 ).ternary( sampleCenterDepth( uvNode ), sampleDepth( uvNode ) ).toConst();
+			const depth = this._resolutionScale.lessThan( 1 ).select( sampleCenterDepth( uvNode ), sampleDepth( uvNode ) ).toConst();
 
 			depth.greaterThanEqual( 1.0 ).discard();
 
@@ -485,7 +485,7 @@ class GTAONode extends TempNode {
 				// γ — angle of projN within the slice plane, signed by the tangent direction.
 				const nSin = dot( projN, sliceTangent ).toConst();
 				const nCos = clamp( dot( projN, viewDir ), 0, 1 ).toConst();
-				const signNSin = nSin.greaterThanEqual( 0 ).ternary( float( 1 ), float( - 1 ) );
+				const signNSin = nSin.greaterThanEqual( 0 ).select( float( 1 ), float( - 1 ) );
 				const angleN = signNSin.mul( acos( nCos ) ).toConst();
 
 				const tangentToNormalInSlice = cross( projN, sliceBitangent ).toConst();

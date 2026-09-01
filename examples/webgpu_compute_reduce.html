@@ -194,7 +194,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { instancedArray, Loop, If, vec3, dot, clamp, storage, uvec4, subgroupAdd, uniform, uv, uint, float, Fn, vec2, invocationLocalIndex, invocationSubgroupIndex, uvec2, floor, instanceIndex, workgroupId, workgroupBarrier, workgroupArray, subgroupSize, ternary, countTrailingZeros } from 'three/tsl';
+			import { instancedArray, Loop, If, vec3, dot, clamp, storage, uvec4, subgroupAdd, uniform, uv, uint, float, Fn, vec2, invocationLocalIndex, invocationSubgroupIndex, uvec2, floor, instanceIndex, workgroupId, workgroupBarrier, workgroupArray, subgroupSize, select, countTrailingZeros } from 'three/tsl';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
@@ -665,7 +665,7 @@
 					workgroupBarrier();
 
 					// Thread 0 - subgroupsInWorkgroup will assign a value to total
-					total.assign( ternary( invocationLocalIndex.lessThan( delta ), subgroupSums.element( invocationLocalIndex ), 0 ).uniformFlow() );
+					total.assign( select( invocationLocalIndex.lessThan( delta ), subgroupSums.element( invocationLocalIndex ), 0 ).uniformFlow() );
 					// # of subgroups in workgroup is invariably less than # of threads in subgroup, so subgroupAdd will still sync here
 					total.assign( subgroupAdd( total ) );
 
@@ -687,9 +687,9 @@
 					// If the current rows elements exceed the bounds of the input
 					// Select either 0 or number of elements left,
 					// otherwise, select existing ROW_SIZE
-					const currentRowSize = ternary(
+					const currentRowSize = select(
 						( rowOffset.add( rowSize ) ).greaterThan( inputSize ),
-						ternary( inputSize.greaterThan( rowOffset ), inputSize.sub( rowOffset ), 0 ).uniformFlow(),
+						select( inputSize.greaterThan( rowOffset ), inputSize.sub( rowOffset ), 0 ).uniformFlow(),
 						rowSize,
 					).uniformFlow();
 
@@ -794,7 +794,7 @@
 						}, () => {
 
 							// Ensure index is less than number of available vectors in inputBuffer
-							const val = ternary( startThread.lessThan( uint( vecSize ) ), inputBuffer.element( startThread ), uvec4( 0 ) ).uniformFlow();
+							const val = select( startThread.lessThan( uint( vecSize ) ), inputBuffer.element( startThread ), uvec4( 0 ) ).uniformFlow();
 
 							subgroupReduction.addAssign( dot( val, uvec4( 1 ) ) );
 							startThread.addAssign( subgroupSize );
@@ -864,7 +864,7 @@
 						// Reduce values within the local workgroup memory.
 						// Set toVar to ensure subgroupAdd executes before (not within) the if statement.
 						const t = subgroupAdd(
-							ternary(
+							select(
 								isValidSubgroupIndex,
 								perSubgroupReductionArray.element( subgroupIndex ),
 								0
