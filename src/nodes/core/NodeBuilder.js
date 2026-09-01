@@ -2353,10 +2353,11 @@ class NodeBuilder {
 
 		const { flowCodes, flowCodeBlock } = this.getDataFromNode( node );
 
-		let needsFlowCode = true;
+		// flowCodeBlock is undefined if the node was first built unconditionally at top level
+		let needsFlowCode = flowCodeBlock !== undefined;
 		let nodeBlockHierarchy = nodeBlock;
 
-		while ( nodeBlockHierarchy ) {
+		while ( needsFlowCode && nodeBlockHierarchy ) {
 
 			if ( flowCodeBlock.get( nodeBlockHierarchy ) === true ) {
 
@@ -2370,6 +2371,8 @@ class NodeBuilder {
 		}
 
 		if ( needsFlowCode ) {
+
+			flowCodeBlock.set( nodeBlock, true );
 
 			for ( const flowCode of flowCodes ) {
 
