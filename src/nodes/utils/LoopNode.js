@@ -374,8 +374,7 @@ export default LoopNode;
 export const Loop = ( ...params ) => new LoopNode( nodeArray( params, 'int' ) ).toStack();
 
 /**
- * TSL function for creating a `continue` expression into the shader, which transfers control
- * to the next iteration of the expression's containg loop.
+ * TSL function for creating a `continue` expression into the shader.
  *
  * @tsl
  * @function
@@ -384,7 +383,7 @@ export const Loop = ( ...params ) => new LoopNode( nodeArray( params, 'int' ) ).
 export const Continue = () => expression( 'continue' ).toStack();
 
 /**
- * TSL function for inserting a `break` expression into the current shader.
+ * TSL function for inserting a `break` expression into the shader.
  *
  * @tsl
  * @function
