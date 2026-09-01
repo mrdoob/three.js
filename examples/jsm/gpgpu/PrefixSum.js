@@ -192,6 +192,23 @@ export class PrefixSum {
 		this._utilityNodes.subgroupSizeLog = countTrailingZeros( subgroupSize ).toVar( 'subgroupSizeLog' );
 		this._utilityNodes.spineSize = uint( this.workgroupSize ).shiftRight( this._utilityNodes.subgroupSizeLog ).toVar( 'spineSize' );
 		this._utilityNodes.spineSizeLog = countTrailingZeros( this._utilityNodes.spineSize ).toVar( 'spineSizeLog' );
+		this._utilityNodes.subgroupAlignedSize = this._getSubgroupAlignedSize();
+
+	}
+
+	_getSubgroupAlignedSize() {
+
+		const { spineSizeLog, subgroupSizeLog } = this._utilityNodes;
+
+		return uint( 1 ).shiftLeft(
+			(
+				spineSizeLog.add( subgroupSizeLog ).sub( 1 )
+			).div(
+				subgroupSizeLog
+			).mul(
+				subgroupSizeLog
+			)
+		).toVar( 'subgroupAlignedSize' );
 
 	}
 
@@ -202,20 +219,6 @@ export class PrefixSum {
 		this._computeFunctions.spineScanLongFn = this._getSpineScanLongFn();
 		this._computeFunctions.downsweepFn = this._getDownsweepFn();
 		this._computeFunctions.singleThreadPrefixFn = this._getSingleThreadPrefixFn();
-
-	}
-
-	_getSubgroupAlignedSize() {
-
-		const { spineSizeLog, subgroupSizeLog } = this._utilityNodes;
-
-		// Align size to powers of subgroupSize
-		const squaredSubgroupLog = ( spineSizeLog.add( subgroupSizeLog ).sub( 1 ) );
-		squaredSubgroupLog.divAssign( subgroupSizeLog );
-		squaredSubgroupLog.mulAssign( subgroupSizeLog );
-		const subgroupAlignedSize = ( uint( 1 ).shiftLeft( squaredSubgroupLog ) ).toVar( 'subgroupAlignedSize' );
-
-		return subgroupAlignedSize;
 
 	}
 
@@ -320,7 +323,7 @@ export class PrefixSum {
 
 		const { reductionBuffer, dataBuffer } = this._storageBuffers;
 		const { vecCount, _scalarNode, _vectorNode } = this;
-		const { subgroupSizeLog, subgroupReductionArray, subgroupOffset, workgroupOffset, spineSize } = this._utilityNodes;
+		const { subgroupSizeLog, subgroupReductionArray, subgroupOffset, workgroupOffset, spineSize, subgroupAlignedSize } = this._utilityNodes;
 
 		return Fn( () => {
 
@@ -353,7 +356,7 @@ export class PrefixSum {
 
 			workgroupBarrier();
 
-			const subgroupAlignedSize = this._getSubgroupAlignedSize();
+			//const subgroupAlignedSize = this._getSubgroupAlignedSize();
 			const offset = uint( 0 );
 
 			this._subgroupAlignedSizeBlock( subgroupAlignedSize, () => {
@@ -413,12 +416,12 @@ export class PrefixSum {
 	// Subgroup size agnostic scan of subgroup reduction
 	_subgroupScanReductionBlock( getIndexOffsetFunction = null ) {
 
-		const { subgroupReductionArray, subgroupSizeLog, spineSize } = this._utilityNodes;
+		const { subgroupReductionArray, subgroupSizeLog, spineSize, subgroupAlignedSize } = this._utilityNodes;
 		const { _scalarNode } = this;
 
 		workgroupBarrier();
 
-		const subgroupAlignedSize = this._getSubgroupAlignedSize();
+		//const subgroupAlignedSize = this._getSubgroupAlignedSize();
 
 		const offset0 = uint( 0 ).toVar();
 		const offset1 = uint( 0 ).toVar();
@@ -488,12 +491,12 @@ export class PrefixSum {
 	_getSpineScanLongFn() {
 
 		const { reductionBuffer } = this._storageBuffers;
-		const { subgroupReductionArray, unvectorizedSubgroupOffset } = this._utilityNodes;
+		const { subgroupReductionArray, unvectorizedSubgroupOffset, subgroupAlignedSize } = this._utilityNodes;
 		const { unvectorizedWorkPerInvocation, _scalarNode } = this;
 
 		return Fn( () => {
 
-			const subgroupAlignedSize = this._getSubgroupAlignedSize();
+			//const subgroupAlignedSize = this._getSubgroupAlignedSize();
 			const spineAlignedSize = this._getSpineAlignedSize();
 
 			const t_scan = array( this.type, 16 ).toVar();
@@ -677,7 +680,7 @@ export class PrefixSum {
 					// We can be sure that this only happens on the last invocation
 					// since the write indices are determined by the startThread,
 					// whose value only ever reaches the end on last workgroup -> last subgroup -> last invoke of subgroup
-					If( invocationLocalIndex.notEqual( this.dispatchSize - 1 ), () => {
+					If( outputIndex.lessThan( this.count - 1 ), () => {
 
 						unvectorizedOutputBuffer.element( outputIndex.add( 3 ) ).assign( outputValueToWrite.w );
 
@@ -686,7 +689,7 @@ export class PrefixSum {
 
 				} else {
 
-					// No need to worry about overwrites for inclsuive
+					// No need to worry about overwrites for inclusive
 					unvectorizedOutputBuffer.element( outputIndex ).assign( outputValueToWrite.x );
 					unvectorizedOutputBuffer.element( outputIndex.add( 1 ) ).assign( outputValueToWrite.y );
 					unvectorizedOutputBuffer.element( outputIndex.add( 2 ) ).assign( outputValueToWrite.z );
