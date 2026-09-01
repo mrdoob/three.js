@@ -111,15 +111,6 @@ class ComputeNode extends Node {
 	}
 
 	/**
-	 * Executes the `dispose` event for this node.
-	 */
-	dispose() {
-
-		this.dispatchEvent( { type: 'dispose' } );
-
-	}
-
-	/**
 	 * Sets the {@link ComputeNode#name} property.
 	 *
 	 * @param {string} name - The name of the uniform.

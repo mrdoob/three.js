@@ -409,6 +409,8 @@ class SSAONode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this._aoRenderTarget.dispose();
 		this._blurRenderTarget.dispose();
 

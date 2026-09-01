@@ -596,6 +596,8 @@ class GTAONode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this._aoRenderTarget.dispose();
 
 		this._noiseTexture.dispose();
