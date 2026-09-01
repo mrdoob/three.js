@@ -496,20 +496,44 @@ async function readBuffer( renderer, buffer ) {
 // The canary deliberately reuses one extra reserved row of a caller-supplied
 // buffer (rather than allocating a dedicated buffer, which tipped some call
 // sites over the WebGL2 fallback's tight simultaneously-bound-buffer budget)
-// -- see `gpuTest`'s own comment for where that row lives and why. Currently
-// only wired into `gpuTest`; `gpuFuzzTest` doesn't use this yet -- extending
-// its `count`-many-instances/multi-site addressing to reserve a row safely
-// turned out riskier (a native-WebGPU-only `getArrayBufferAsync()` failure,
-// "Cannot read properties of undefined (reading 'size')", specifically when
-// reusing an unused site/instance for the canary) and needs a more careful
-// follow-up pass rather than shipping alongside this fix.
-const CANARY_VALUE = 12345.6789;
+// -- see `gpuTest`'s own comment for where that row lives and why. Wired
+// into both `gpuTest` and `gpuFuzzTest`.
+//
+// The value itself is generated fresh per test x backend invocation (via
+// `randomCanaryValue()`) rather than reused from one shared module-level
+// constant -- confirmed necessary, not just defensive: a *shared* canary
+// can't tell "this kernel ran" apart from "a different, still-bound kernel
+// ran instead". Root cause, reproduced directly: when a kernel fails to
+// link, the WebGL2 fallback logs the error but does not throw, and then
+// calls `useProgram()` on the broken handle anyway -- which, per the WebGL
+// spec, raises `INVALID_OPERATION` and leaves whatever program was
+// *previously* bound still active, rather than unbinding it. If an earlier
+// test in the same run already linked a valid compute kernel, the following
+// transform-feedback draw silently reruns *that* kernel instead. With one
+// constant canary shared by every kernel in the suite, that stale kernel's
+// own canary write satisfies the check, and its self-consistent (but
+// unrelated) `actual`/`expected` writes pass every assertion vacuously --
+// confirmed by deliberately reproducing a `tsl_bitcast_uint_to_int` return
+// type bug this way: a shader that failed to link at 0 fail every time,
+// until run as the very first webgl kernel of the process (no valid prior
+// program to fall back to), which correctly failed via this exact canary
+// check. A per-invocation random value closes that gap: a stale kernel's
+// own (different) canary can never satisfy what the current test expects to
+// read back.
+function randomCanaryValue() {
 
-function writeCanary( buffer, row ) {
+	// An integer, not an arbitrary float: buffers are float32, and integers
+	// in this range round-trip through float32 exactly, so the readback
+	// comparison below needs no tolerance window to absorb rounding.
+	return 1000 + Math.floor( Math.random() * 9000 );
+
+}
+
+function writeCanary( buffer, row, canaryValue ) {
 
 	If( instanceIndex.equal( row ), () => {
 
-		buffer.element( instanceIndex ).assign( vec4( CANARY_VALUE, 0, 0, 0 ) );
+		buffer.element( instanceIndex ).assign( vec4( canaryValue, 0, 0, 0 ) );
 
 	} );
 
@@ -522,23 +546,18 @@ function writeCanary( buffer, row ) {
 // the same test fails outright (`getBufferSubData: no buffer`). Every caller
 // here already needs to read that same buffer's full data right afterwards
 // anyway, so read once and pass the array to both.
-function assertKernelRan( assert, data, row, name, kind = 'gpuTest' ) {
+function assertKernelRan( assert, data, row, canaryValue, name, kind = 'gpuTest' ) {
 
 	const value = data[ row * 4 ];
-	const ran = Math.abs( value - CANARY_VALUE ) < 1e-3;
+	const ran = value === canaryValue;
 
 	if ( ! ran ) {
 
 		assert.pushResult( {
 			result: false,
 			actual: value,
-			expected: CANARY_VALUE,
-			message: `${ kind } "${ name }": the compute kernel never ran (canary value missing -- ` +
-				`got ${ value }, expected ${ CANARY_VALUE }). This means the shader failed to build ` +
-				'(invalid WGSL/GLSL, most likely a NaN or otherwise malformed literal reaching ' +
-				'generated shader source) -- check the console for the underlying WebGPU/WebGL compile ' +
-				'error. Every assertion below would otherwise have silently compared a never-written 0 ' +
-				'against a never-written 0 and passed regardless of what it claimed to check.'
+			expected: canaryValue,
+			message: `${ kind } "${ name }": compute kernel failed to build (canary mismatch -- got ${ value }, expected ${ canaryValue }).`
 		} );
 
 	}
@@ -596,6 +615,13 @@ export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webg
 		const canaryRow = totalRows - 1;
 		const maxUsableAssertions = maxAssertions - 1;
 
+		// Generated once per test x backend invocation, outside the Fn()
+		// callback below (which can rebuild more than once -- see that
+		// callback's own comment) so every rebuild embeds the same literal
+		// -- see `randomCanaryValue()` for why this can't be a shared
+		// module-level constant.
+		const canaryValue = randomCanaryValue();
+
 		const kernel = Fn( () => {
 
 			// TSL callbacks passed to Fn()/If() are not guaranteed to run
@@ -616,7 +642,7 @@ export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webg
 			// survive to match the actually-compiled kernel.
 			nodes.length = 0;
 
-			writeCanary( actualBuffer, canaryRow );
+			writeCanary( actualBuffer, canaryRow, canaryValue );
 
 			const makeNode = ( kind, tolerance, message ) => ( value1, value2 ) => {
 
@@ -660,7 +686,7 @@ export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webg
 		const actualData = await readBuffer( renderer, actualBuffer );
 		const expectedData = await readBuffer( renderer, expectedBuffer );
 
-		if ( ! assertKernelRan( assert, actualData, canaryRow, name ) ) return;
+		if ( ! assertKernelRan( assert, actualData, canaryRow, canaryValue, name ) ) return;
 
 		nodes.forEach( ( node, id ) => {
 
@@ -740,6 +766,10 @@ export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, ma
 		const canaryRow = count - 1;
 		const maxUsableCount = count - 1;
 
+		// See `gpuTest`'s matching comment: generated once per test x
+		// backend invocation, not a shared module-level constant.
+		const canaryValue = randomCanaryValue();
+
 		for ( let site = 0; site < maxSitesPerInstance; site ++ ) {
 
 			const actualColumns = [];
@@ -759,7 +789,7 @@ export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, ma
 
 		const kernel = Fn( () => {
 
-			writeCanary( actualBuffers[ 0 ][ 0 ], canaryRow );
+			writeCanary( actualBuffers[ 0 ][ 0 ], canaryRow, canaryValue );
 
 			const makeNode = ( kind, tolerance, message ) => ( value1, value2 ) => {
 
@@ -838,7 +868,7 @@ export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, ma
 		actualData[ 0 ] = await Promise.all( actualBuffers[ 0 ].map( ( buf ) => readBuffer( renderer, buf ) ) );
 		expectedData[ 0 ] = await Promise.all( expectedBuffers[ 0 ].map( ( buf ) => readBuffer( renderer, buf ) ) );
 
-		if ( ! assertKernelRan( assert, actualData[ 0 ][ 0 ], canaryRow, name, 'gpuFuzzTest' ) ) return;
+		if ( ! assertKernelRan( assert, actualData[ 0 ][ 0 ], canaryRow, canaryValue, name, 'gpuFuzzTest' ) ) return;
 
 		for ( const node of nodes ) {
 
