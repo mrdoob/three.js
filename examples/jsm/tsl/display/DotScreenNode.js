@@ -1,5 +1,5 @@
 import { TempNode } from 'three/webgpu';
-import { nodeObject, Fn, uv, uniform, vec2, vec3, sin, cos, add, vec4, screenSize } from 'three/tsl';
+import { nodeObject, Fn, uv, vec2, vec3, sin, cos, add, vec4, screenSize } from 'three/tsl';
 
 /**
  * Post processing node for creating dot-screen effect.
@@ -19,8 +19,8 @@ class DotScreenNode extends TempNode {
 	 * Constructs a new dot screen node.
 	 *
 	 * @param {Node} inputNode - The node that represents the input of the effect.
-	 * @param {number} [angle=1.57] - The rotation of the effect in radians.
-	 * @param {number} [scale=1] - The scale of the effect. A higher value means smaller dots.
+	 * @param {number|Node<float>} [angle=1.57] - The rotation of the effect in radians.
+	 * @param {number|Node<float>} [scale=1] - The scale of the effect. A higher value means smaller dots.
 	 */
 	constructor( inputNode, angle = 1.57, scale = 1 ) {
 
@@ -34,18 +34,18 @@ class DotScreenNode extends TempNode {
 		this.inputNode = inputNode;
 
 		/**
-		 * A uniform node that represents the rotation of the effect in radians.
+		 * The rotation of the effect in radians.
 		 *
-		 * @type {UniformNode<float>}
+		 * @type {Node<float>}
 		 */
-		this.angle = uniform( angle );
+		this.angle = nodeObject( angle );
 
 		/**
-		 * A uniform node that represents the scale of the effect. A higher value means smaller dots.
+		 * The scale of the effect. A higher value means smaller dots.
 		 *
-		 * @type {UniformNode<float>}
+		 * @type {Node<float>}
 		 */
-		this.scale = uniform( scale );
+		this.scale = nodeObject( scale );
 
 	}
 
@@ -97,8 +97,8 @@ export default DotScreenNode;
  * @tsl
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
- * @param {number} [angle=1.57] - The rotation of the effect in radians.
- * @param {number} [scale=1] - The scale of the effect. A higher value means smaller dots.
+ * @param {number|Node<float>} [angle=1.57] - The rotation of the effect in radians.
+ * @param {number|Node<float>} [scale=1] - The scale of the effect. A higher value means smaller dots.
  * @returns {DotScreenNode}
  */
 export const dotScreen = ( node, angle, scale ) => new DotScreenNode( nodeObject( node ), angle, scale );
