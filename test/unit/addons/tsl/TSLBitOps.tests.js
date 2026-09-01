@@ -24,6 +24,19 @@ export default QUnit.module( 'TSL', () => {
 
 		} );
 
+		gpuTest( 'bitcast() reinterprets bits between int and uint', ( { assert } ) => {
+
+			// -1's two's-complement bit pattern (0xFFFFFFFF) read as unsigned
+			// is the largest uint32 value.
+			assert.eq( bitcast( int( - 1 ), 'uint' ), uint( 4294967295 ), 'bitcast(-1, "uint") == 0xFFFFFFFF' );
+			assert.eq( bitcast( uint( 4294967295 ), 'int' ), int( - 1 ), 'bitcast(0xFFFFFFFF, "int") == -1' );
+
+			// Round trip: bitcast is lossless reinterpretation, so converting
+			// out and back must recover the exact original value.
+			assert.eq( bitcast( bitcast( int( - 42 ), 'uint' ), 'int' ), int( - 42 ), 'bitcast round trip recovers the exact int' );
+
+		} );
+
 	} );
 
 	QUnit.module( 'bit counting', () => {
