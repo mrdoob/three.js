@@ -177,6 +177,7 @@
 	"webgpu_vxgi": [ "global illumination", "indirect diffuse", "voxel cone tracing" ],
 	"webgpu_vxgi_sponza": [ "global illumination", "indirect diffuse", "voxel cone tracing" ],
 	"webgpu_postprocessing_sss": [ "shadow" ],
+	"webgpu_postprocessing_ssss": [ "subsurface", "scattering" ],
 	"webgpu_refraction": [ "water" ],
 	"webgpu_rtt": [ "renderTarget", "texture" ],
 	"webgpu_rendertarget_2d-array_3d": [ "renderTarget", "2d-array", "3d" ],
