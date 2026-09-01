@@ -25,6 +25,7 @@ import './addons/tsl/TSLBRDF.tests.js';
 import './addons/tsl/TSLDepthConversion.tests.js';
 import './addons/tsl/TSLColorSpaceConversion.tests.js';
 import './addons/tsl/TSLTypeConstructors.tests.js';
+import './addons/tsl/TSLPrecision.tests.js';
 import './addons/tsl/TSLBitOps.tests.js';
 import './addons/tsl/TSLNoise.tests.js';
 import './addons/tsl/TSLMath.tests.js';

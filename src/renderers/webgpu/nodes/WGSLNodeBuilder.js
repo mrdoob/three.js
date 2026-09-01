@@ -73,7 +73,25 @@ const wgslTypeLib = {
 
 	mat2: 'mat2x2<f32>',
 	mat3: 'mat3x3<f32>',
-	mat4: 'mat4x4<f32>'
+	mat4: 'mat4x4<f32>',
+
+	half: 'f16',
+	hvec2: 'vec2<f16>',
+	hvec3: 'vec3<f16>',
+	hvec4: 'vec4<f16>',
+	hmat2: 'mat2x2<f16>',
+	hmat3: 'mat3x3<f16>',
+	hmat4: 'mat4x4<f16>'
+};
+
+const wgslHalfFallbackTypeLib = {
+	half: 'float',
+	hvec2: 'vec2',
+	hvec3: 'vec3',
+	hvec4: 'vec4',
+	hmat2: 'mat2',
+	hmat3: 'mat3',
+	hmat4: 'mat4'
 };
 
 const wgslCodeCache = {};
@@ -359,6 +377,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 		 * @default true
 		 */
 		this.allowGlobalVariables = true;
+
+		this._supports = { ...supports };
 
 	}
 
@@ -2506,6 +2526,22 @@ ${ flowData.code }
 	 */
 	getType( type ) {
 
+		type = this.getPrecisionType( type );
+
+		if ( wgslHalfFallbackTypeLib[ type ] !== undefined ) {
+
+			if ( this.isAvailable( 'shaderF16' ) ) {
+
+				this.enableShaderF16();
+
+			} else {
+
+				type = wgslHalfFallbackTypeLib[ type ];
+
+			}
+
+		}
+
 		return wgslTypeLib[ type ] || type;
 
 	}
@@ -2518,7 +2554,7 @@ ${ flowData.code }
 	 */
 	isAvailable( name ) {
 
-		let result = supports[ name ];
+		let result = this._supports[ name ];
 
 		if ( result === undefined ) {
 
@@ -2530,9 +2566,13 @@ ${ flowData.code }
 
 				result = this.renderer.hasFeature( 'clip-distances' );
 
+			} else if ( name === 'shaderF16' ) {
+
+				result = this.renderer.hasFeature( 'shader-f16' );
+
 			}
 
-			supports[ name ] = result;
+			this._supports[ name ] = result;
 
 		}
 
@@ -2630,6 +2670,9 @@ fn main( ${shaderData.attributes} ) -> VaryingsStruct {
 	_getWGSLFragmentCode( shaderData ) {
 
 		return `${ this.getSignature() }
+// directives
+${shaderData.directives}
+
 // global
 ${ diagnostics }
 

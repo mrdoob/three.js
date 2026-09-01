@@ -150,7 +150,7 @@ class OperatorNode extends TempNode {
 
 			if ( builder.isMatrix( typeA ) ) {
 
-				if ( typeB === 'float' ) {
+				if ( typeB === 'float' || typeB === 'half' ) {
 
 					return typeA; // matrix * scalar = matrix
 
@@ -166,7 +166,7 @@ class OperatorNode extends TempNode {
 
 			} else if ( builder.isMatrix( typeB ) ) {
 
-				if ( typeA === 'float' ) {
+				if ( typeA === 'float' || typeA === 'half' ) {
 
 					return typeB; // scalar * matrix = matrix
 
@@ -238,11 +238,11 @@ class OperatorNode extends TempNode {
 
 			} else if ( builder.isMatrix( typeA ) ) {
 
-				if ( typeB === 'float' ) {
+				if ( typeB === 'float' || typeB === 'half' ) {
 
 					// Keep matrix type for typeA, but ensure typeB stays float
 
-					typeB = 'float';
+					typeB = builder.getComponentType( typeA );
 
 				} else if ( builder.isVector( typeB ) ) {
 
@@ -261,11 +261,11 @@ class OperatorNode extends TempNode {
 
 			} else if ( builder.isMatrix( typeB ) ) {
 
-				if ( typeA === 'float' ) {
+				if ( typeA === 'float' || typeA === 'half' ) {
 
 					// Keep matrix type for typeB, but ensure typeA stays float
 
-					typeA = 'float';
+					typeA = builder.getComponentType( typeB );
 
 				} else if ( builder.isVector( typeA ) ) {
 

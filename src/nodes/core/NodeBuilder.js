@@ -1141,6 +1141,110 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns the current requested compute precision.
+	 *
+	 * @return {?number} The requested precision, or null when default precision is used.
+	 */
+	getContextPrecision() {
+
+		const precision = this.context.precision;
+
+		return typeof precision === 'number' ? precision : null;
+
+	}
+
+	/**
+	 * Returns whether the given type can use shader precision lowering.
+	 *
+	 * @param {?string} type - The type to check.
+	 * @return {boolean} Whether the type is a floating point scalar, vector, or matrix.
+	 */
+	isFloatType( type ) {
+
+		type = this.getVectorType( type );
+
+		return type === 'float' || type === 'half' || /^h?vec[2-4]$/.test( type ) || /^h?mat[2-4]$/.test( type );
+
+	}
+
+	/**
+	 * Returns whether the type is an internal precision-lowered float type.
+	 *
+	 * @param {?string} type - The type to check.
+	 * @return {boolean} Whether the type is an internal half-precision type.
+	 */
+	isPrecisionType( type ) {
+
+		return type === 'half' || /^hvec[2-4]$/.test( type ) || /^hmat[2-4]$/.test( type );
+
+	}
+
+	/**
+	 * Returns the logical fp32 type for an internal precision-lowered type.
+	 *
+	 * @param {string} type - The type to normalize.
+	 * @return {string} The logical type.
+	 */
+	getBaseType( type ) {
+
+		if ( type === 'half' ) return 'float';
+		if ( /^h(vec|mat)[2-4]$/.test( type ) ) return type.slice( 1 );
+
+		return type;
+
+	}
+
+	/**
+	 * Returns the internal type for a requested precision.
+	 *
+	 * @param {string} type - The logical type.
+	 * @param {?number} [precision=this.getContextPrecision()] - The requested precision.
+	 * @return {string} The precision-adjusted type.
+	 */
+	getPrecisionType( type, precision = this.getContextPrecision() ) {
+
+		if ( precision !== 16 || this.isFloatType( type ) === false ) return type;
+
+		type = this.getVectorType( type );
+
+		if ( type === 'float' ) return 'half';
+		if ( /^vec[2-4]$/.test( type ) || /^mat[2-4]$/.test( type ) ) return 'h' + type;
+
+		return type;
+
+	}
+
+	/**
+	 * Returns the precision that should affect a node's generated computation.
+	 *
+	 * @param {Node} node - The node to check.
+	 * @return {?number} The node precision.
+	 */
+	getNodePrecision( node ) {
+
+		if ( node.precisionContext === false ) return null;
+
+		const precision = this.getContextPrecision();
+
+		return precision === 16 ? precision : null;
+
+	}
+
+	/**
+	 * Returns the cache key suffix for precision-dependent generated data.
+	 *
+	 * @param {Node} node - The node to check.
+	 * @return {string} The precision cache key.
+	 */
+	getPrecisionCacheKey( node ) {
+
+		const precision = this.getNodePrecision( node );
+
+		return precision === null ? 'default' : `precision:${ precision }`;
+
+	}
+
+	/**
 	 * Returns the vertexIndex input variable as a native shader string.
 	 *
 	 * @abstract
@@ -1420,16 +1524,17 @@ class NodeBuilder {
 
 		if ( value === null ) {
 
-			if ( type === 'float' || type === 'int' || type === 'uint' ) value = 0;
+			if ( type === 'float' || type === 'int' || type === 'uint' || type === 'half' ) value = 0;
 			else if ( type === 'bool' ) value = false;
 			else if ( type === 'color' ) value = new Color();
-			else if ( type === 'vec2' || type === 'uvec2' || type === 'ivec2' ) value = new Vector2();
-			else if ( type === 'vec3' || type === 'uvec3' || type === 'ivec3' ) value = new Vector3();
-			else if ( type === 'vec4' || type === 'uvec4' || type === 'ivec4' ) value = new Vector4();
+			else if ( type === 'vec2' || type === 'uvec2' || type === 'ivec2' || type === 'hvec2' ) value = new Vector2();
+			else if ( type === 'vec3' || type === 'uvec3' || type === 'ivec3' || type === 'hvec3' ) value = new Vector3();
+			else if ( type === 'vec4' || type === 'uvec4' || type === 'ivec4' || type === 'hvec4' ) value = new Vector4();
 
 		}
 
 		if ( type === 'float' ) return _toFloat( value );
+		if ( type === 'half' ) return `${ this.getType( type ) }( ${ _toFloat( value ) } )`;
 		if ( type === 'int' ) return `${ Math.round( value ) }`;
 		if ( type === 'uint' ) return value >= 0 ? `${ Math.round( value ) }u` : '0u';
 		if ( type === 'bool' ) return value ? 'true' : 'false';
@@ -1632,9 +1737,9 @@ class NodeBuilder {
 	 */
 	getElementType( type ) {
 
-		if ( type === 'mat2' ) return 'vec2';
-		if ( type === 'mat3' ) return 'vec3';
-		if ( type === 'mat4' ) return 'vec4';
+		if ( type === 'mat2' || type === 'hmat2' ) return this.changeComponentType( 'vec2', this.getComponentType( type ) );
+		if ( type === 'mat3' || type === 'hmat3' ) return this.changeComponentType( 'vec3', this.getComponentType( type ) );
+		if ( type === 'mat4' || type === 'hmat4' ) return this.changeComponentType( 'vec4', this.getComponentType( type ) );
 
 		return this.getComponentType( type );
 
@@ -1650,15 +1755,16 @@ class NodeBuilder {
 
 		type = this.getVectorType( type );
 
-		if ( type === 'float' || type === 'bool' || type === 'int' || type === 'uint' ) return type;
+		if ( type === 'float' || type === 'bool' || type === 'int' || type === 'uint' || type === 'half' ) return type;
 
-		const componentType = /(b|i|u|)(vec|mat)([2-4])/.exec( type );
+		const componentType = /(b|i|u|h|)(vec|mat)([2-4])/.exec( type );
 
 		if ( componentType === null ) return null;
 
 		if ( componentType[ 1 ] === 'b' ) return 'bool';
 		if ( componentType[ 1 ] === 'i' ) return 'int';
 		if ( componentType[ 1 ] === 'u' ) return 'uint';
+		if ( componentType[ 1 ] === 'h' ) return 'half';
 
 		return 'float';
 
@@ -1768,7 +1874,7 @@ class NodeBuilder {
 		const vecNum = /vec([2-4])/.exec( vecType );
 
 		if ( vecNum !== null ) return Number( vecNum[ 1 ] );
-		if ( vecType === 'float' || vecType === 'bool' || vecType === 'int' || vecType === 'uint' ) return 1;
+		if ( vecType === 'float' || vecType === 'bool' || vecType === 'int' || vecType === 'uint' || vecType === 'half' ) return 1;
 		if ( /mat2/.test( type ) === true ) return 4;
 		if ( /mat3/.test( type ) === true ) return 9;
 		if ( /mat4/.test( type ) === true ) return 16;
@@ -2128,7 +2234,8 @@ class NodeBuilder {
 	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage, readOnly = false ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
-		const subBuildVariable = this.getSubBuildProperty( 'variable', nodeData.subBuilds );
+		const precisionCacheKey = this.getPrecisionCacheKey( node );
+		const subBuildVariable = this.getSubBuildProperty( 'variable', nodeData.subBuilds ) + ( precisionCacheKey === 'default' ? '' : '_' + precisionCacheKey.replace( ':', '_' ) );
 
 		let nodeVar = nodeData[ subBuildVariable ];
 
@@ -2538,7 +2645,17 @@ class NodeBuilder {
 
 		}
 
-		let fn = cache.get( shaderNode );
+		let shaderNodeCache = cache.get( shaderNode );
+
+		if ( shaderNodeCache === undefined ) {
+
+			shaderNodeCache = {};
+			cache.set( shaderNode, shaderNodeCache );
+
+		}
+
+		const precisionCacheKey = this.getPrecisionCacheKey( shaderNode );
+		let fn = shaderNodeCache[ precisionCacheKey ];
 
 		if ( fn === undefined ) {
 
@@ -2552,7 +2669,7 @@ class NodeBuilder {
 
 			this.currentFunctionNode = previous;
 
-			cache.set( shaderNode, fn );
+			shaderNodeCache[ precisionCacheKey ] = fn;
 
 		}
 

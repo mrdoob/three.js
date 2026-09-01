@@ -98,6 +98,16 @@ const glslMethods = {
 	floatunpack_unorm_4x8: 'tsl_unpackUnorm4x8'
 };
 
+const glslHalfFallbackTypeLib = {
+	half: 'float',
+	hvec2: 'vec2',
+	hvec3: 'vec3',
+	hvec4: 'vec4',
+	hmat2: 'mat2',
+	hmat3: 'mat3',
+	hmat4: 'mat4'
+};
+
 const precisionLib = {
 	low: 'lowp',
 	medium: 'mediump',
@@ -265,6 +275,22 @@ class GLSLNodeBuilder extends NodeBuilder {
 		}
 
 		return glslMethods[ method ] || method;
+
+	}
+
+	getType( type ) {
+
+		type = this.getPrecisionType( type );
+
+		return glslHalfFallbackTypeLib[ type ] || super.getType( type );
+
+	}
+
+	getVar( type, name, count = null ) {
+
+		const qualifier = this.isPrecisionType( type ) ? 'mediump ' : '';
+
+		return qualifier + super.getVar( type, name, count );
 
 	}
 

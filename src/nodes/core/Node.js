@@ -574,32 +574,37 @@ class Node extends EventDispatcher {
 	getNodeType( builder, output = null ) {
 
 		const nodeData = builder.getDataFromNode( this );
+		const precisionCacheKey = builder.getPrecisionCacheKey ? builder.getPrecisionCacheKey( this ) : 'default';
 
 		let type;
 
 		if ( output !== null ) {
 
 			nodeData.typeFromOutput = nodeData.typeFromOutput || {};
+			nodeData.typeFromOutput[ precisionCacheKey ] = nodeData.typeFromOutput[ precisionCacheKey ] || {};
 
-			type = nodeData.typeFromOutput[ output ];
+			type = nodeData.typeFromOutput[ precisionCacheKey ][ output ];
 
 			if ( type === undefined ) {
 
 				type = this.generateNodeType( builder, output );
+				type = builder.getPrecisionType ? builder.getPrecisionType( type, builder.getNodePrecision( this ) ) : type;
 
-				nodeData.typeFromOutput[ output ] = type;
+				nodeData.typeFromOutput[ precisionCacheKey ][ output ] = type;
 
 			}
 
 		} else {
 
-			type = nodeData.type;
+			nodeData.type = nodeData.type || {};
+			type = nodeData.type[ precisionCacheKey ];
 
 			if ( type === undefined ) {
 
 				type = this.generateNodeType( builder );
+				type = builder.getPrecisionType ? builder.getPrecisionType( type, builder.getNodePrecision( this ) ) : type;
 
-				nodeData.type = type;
+				nodeData.type[ precisionCacheKey ] = type;
 
 			}
 
@@ -971,18 +976,22 @@ class Node extends EventDispatcher {
 
 				const type = this.getNodeType( builder );
 				const nodeData = builder.getDataFromNode( this );
+				const precisionCacheKey = builder.getPrecisionCacheKey ? builder.getPrecisionCacheKey( this ) : 'default';
 
-				result = nodeData.snippet;
+				nodeData.snippet = nodeData.snippet || {};
+				nodeData.generated = nodeData.generated || {};
+
+				result = nodeData.snippet[ precisionCacheKey ];
 
 				if ( result === undefined ) {
 
-					if ( nodeData.generated === undefined ) {
+					if ( nodeData.generated[ precisionCacheKey ] === undefined ) {
 
-						nodeData.generated = true;
+						nodeData.generated[ precisionCacheKey ] = true;
 
 						result = this.generate( builder ) || '';
 
-						nodeData.snippet = result;
+						nodeData.snippet[ precisionCacheKey ] = result;
 
 					} else {
 

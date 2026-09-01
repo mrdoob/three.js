@@ -432,7 +432,13 @@ function buildAssertAPI( makeNode ) {
 // one, each gets a `[backend]` suffix so failures say which backend failed.
 // Backend availability is detected at runtime (see getSharedRenderer) rather
 // than assumed, so no static "skip this backend" flag is needed here.
-function declareTest( name, backends, run ) {
+function rendererHasFeature( renderer, feature ) {
+
+	return typeof renderer.hasFeature === 'function' && renderer.hasFeature( feature );
+
+}
+
+function declareTest( name, backends, requiredFeatures, run ) {
 
 	for ( const backend of backends ) {
 
@@ -450,6 +456,15 @@ function declareTest( name, backends, run ) {
 				// practical equivalent: it never fails the build, and the
 				// console.warn from getSharedRenderer explains why.
 				assert.ok( true, `SKIPPED: "${ backend }" backend is not available in this environment.` );
+				return;
+
+			}
+
+			const missingFeature = requiredFeatures.find( feature => rendererHasFeature( renderer, feature ) === false );
+
+			if ( missingFeature !== undefined ) {
+
+				assert.ok( true, `SKIPPED: "${ backend }" backend does not support "${ missingFeature }".` );
 				return;
 
 			}
@@ -576,9 +591,9 @@ function assertKernelRan( assert, data, row, name, kind = 'gpuTest' ) {
  * regression can't slip by unnoticed; narrow it (e.g. `[ 'webgpu' ]`) only
  * for a node that's deliberately WebGPU-only.
  */
-export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webgpu', 'webgl' ] } = {} ) {
+export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webgpu', 'webgl' ], requiredFeatures = [] } = {} ) {
 
-	declareTest( name, backends, async ( assert, renderer ) => {
+	declareTest( name, backends, requiredFeatures, async ( assert, renderer ) => {
 
 		const nodes = [];
 		const totalRows = maxAssertions * MAX_COLUMNS;
@@ -651,7 +666,7 @@ export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webg
 
 			};
 
-			buildFn( { assert: buildAssertAPI( makeNode ) } );
+			buildFn( { assert: buildAssertAPI( makeNode ), renderer, hasFeature: feature => rendererHasFeature( renderer, feature ) } );
 
 		} )().compute( totalRows );
 
@@ -723,9 +738,9 @@ export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webg
  *
  * `backends` (default `[ 'webgpu', 'webgl' ]`) -- see `gpuTest`.
  */
-export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, maxColumnsPerSite = 1, backends = [ 'webgpu', 'webgl' ] } = {} ) {
+export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, maxColumnsPerSite = 1, backends = [ 'webgpu', 'webgl' ], requiredFeatures = [] } = {} ) {
 
-	declareTest( name, backends, async ( assert, renderer ) => {
+	declareTest( name, backends, requiredFeatures, async ( assert, renderer ) => {
 
 		const nodes = []; // one entry per call site (not per instance)
 		const actualBuffers = []; // actualBuffers[site][column]
@@ -818,7 +833,7 @@ export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, ma
 
 				nodes.length = 0;
 
-				buildFn( { instanceIndex, assert: buildAssertAPI( makeNode ) } );
+				buildFn( { instanceIndex, assert: buildAssertAPI( makeNode ), renderer, hasFeature: feature => rendererHasFeature( renderer, feature ) } );
 
 			} );
 

@@ -81,6 +81,16 @@ class ContextNode extends Node {
 	 */
 	generateNodeType( builder ) {
 
+		if ( typeof this.value.precision === 'number' ) {
+
+			const previousContext = builder.addContext( { ...this.value, precision: null } );
+			const type = builder.getBaseType( this.node.getNodeType( builder ) );
+			builder.setContext( previousContext );
+
+			return type;
+
+		}
+
 		return this.node.getNodeType( builder );
 
 	}
@@ -152,12 +162,15 @@ class ContextNode extends Node {
 	generate( builder, output ) {
 
 		const previousContext = builder.addContext( this.value );
+		const precision = builder.getContextPrecision();
+		const contextOutput = precision === 16 && output !== null ? builder.getPrecisionType( output, precision ) : output;
 
-		const snippet = this.node.build( builder, output );
+		const snippet = this.node.build( builder, contextOutput );
+		const snippetType = contextOutput || this.node.getNodeType( builder );
 
 		builder.setContext( previousContext );
 
-		return snippet;
+		return builder.format( snippet, snippetType, output );
 
 	}
 
@@ -209,6 +222,17 @@ export const uniformFlow = ( node ) => context( node, { uniformFlow: true } );
  * @returns {ContextNode}
  */
 export const setName = ( node, name ) => context( node, { nodeName: name } );
+
+/**
+ * TSL function for defining a compute precision context for a given node.
+ *
+ * @tsl
+ * @function
+ * @param {Node} node - The node whose computation precision should be modified.
+ * @param {number} precision - The compute precision to request.
+ * @returns {ContextNode}
+ */
+export const setPrecision = ( node, precision ) => context( node, { precision } );
 
 /**
  * TSL function for defining a built-in shadow context for a given node.
@@ -331,6 +355,7 @@ addMethodChaining( 'context', context );
 addMethodChaining( 'label', label );
 addMethodChaining( 'uniformFlow', uniformFlow );
 addMethodChaining( 'setName', setName );
+addMethodChaining( 'setPrecision', setPrecision );
 addMethodChaining( 'builtinShadowContext', ( node, shadowNode, light ) => builtinShadowContext( shadowNode, light, node ) );
 addMethodChaining( 'builtinAOContext', ( node, aoValue ) => builtinAOContext( aoValue, node ) );
 addMethodChaining( 'builtinGIContext', ( node, aoValue, giValue ) => builtinGIContext( aoValue, giValue, node ) );
