@@ -277,6 +277,22 @@ class GLSLNodeBuilder extends NodeBuilder {
 	 */
 	getBitcastMethod( type, inputType ) {
 
+		// int<->uint conversion -- scalar or any vector length -- is a
+		// bit-preserving reinterpretation under the GLSL spec, so the type
+		// constructor itself (uint(x), uvec4(x), int(x), ivec4(x), ...)
+		// already does exactly what bitcast() needs. Routed here instead of
+		// through the bitcast_X_Y polyfill lookup below, which only has
+		// scalar entries (bitcast_int_uint/bitcast_uint_int) and has no
+		// vector counterpart, e.g. no bitcast_ivec4_uvec4.
+		const inputFamily = this.getComponentType( inputType );
+		const outputFamily = this.getComponentType( type );
+
+		if ( ( inputFamily === 'int' && outputFamily === 'uint' ) || ( inputFamily === 'uint' && outputFamily === 'int' ) ) {
+
+			return this.getType( type );
+
+		}
+
 		return this.getMethod( `bitcast_${ inputType }_${ type }` );
 
 	}
