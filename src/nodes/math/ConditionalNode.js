@@ -2,6 +2,7 @@ import Node from '../core/Node.js';
 import { property } from '../core/PropertyNode.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 import { warn } from '../../utils.js';
+import NodeError from '../core/NodeError.js';
 
 /**
  * Represents a logical `if/else` statement. Can be used as an alternative
@@ -12,6 +13,20 @@ import { warn } from '../../utils.js';
  *
  * ```js
  * velocity = position.greaterThanEqual( limit ).select( velocity.negate(), velocity );
+ * ```
+ *
+ * When the condition is itself a vector (e.g. the `bvec4` produced by
+ * `someVec4.greaterThanEqual( someOtherVec4 )`), `select()` resolves
+ * per-component - each output lane picks independently based on its own
+ * condition component, the same way WGSL's native `select()` and GLSL's
+ * `mix( x, y, bvecN )` do - rather than picking one branch for the whole
+ * vector. Vector values must have the same number of components as the
+ * condition; scalar values are broadcast when the other value establishes
+ * the result width.
+ *
+ * ```js
+ * // per-component: each channel picks independently
+ * const clamped = value.greaterThan( vec3( 1.0 ) ).select( vec3( 1.0 ), value );
  * ```
  *
  * @augments Node
@@ -130,7 +145,7 @@ class ConditionalNode extends Node {
 
 		if ( nodeData.nodeProperty !== undefined ) {
 
-			return nodeData.nodeProperty;
+			return builder.format( nodeData.nodeProperty, type, output );
 
 		}
 
@@ -141,6 +156,70 @@ class ConditionalNode extends Node {
 		const nodeProperty = needsOutput ? property( type ).build( builder ) : '';
 
 		nodeData.nodeProperty = nodeProperty;
+
+		// A vector condition selects per-component - see getVectorSelect().
+		const condType = condNode.getNodeType( builder );
+		const condLength = builder.getTypeLength( condType );
+
+		if ( condLength > 1 ) {
+
+			if ( builder.getComponentType( condType ) !== 'bool' ) {
+
+				throw new NodeError( `TSL: select() requires a boolean condition, received "${ condType }".`, this.stackTrace );
+
+			}
+
+			const vectorType = builder.getVectorType( type );
+
+			if ( builder.isReference( type ) || ! builder.isVector( vectorType ) || builder.getTypeLength( vectorType ) !== condLength ) {
+
+				throw new NodeError( `TSL: select() with a vector condition ("${ condType }") requires a vector result of the same width, received "${ type }".`, this.stackTrace );
+
+			}
+
+			const ifType = ifNode.getNodeType( builder );
+			const ifLength = builder.getTypeLength( ifType );
+
+			if ( ifLength !== 1 && ifLength !== condLength ) {
+
+				throw new NodeError( `TSL: select()'s vector condition ("${ condType }") is incompatible with its "if" value ("${ ifType }").`, this.stackTrace );
+
+			}
+
+			// No "else": unselected lanes fall back to the type's zero value.
+			let elseSnippet;
+
+			if ( elseNode !== null ) {
+
+				const elseType = elseNode.getNodeType( builder );
+				const elseLength = builder.getTypeLength( elseType );
+
+				if ( elseLength !== 1 && elseLength !== condLength ) {
+
+					throw new NodeError( `TSL: select()'s vector condition ("${ condType }") is incompatible with its "else" value ("${ elseType }").`, this.stackTrace );
+
+				}
+
+				elseSnippet = elseNode.build( builder, type );
+
+			} else {
+
+				elseSnippet = builder.generateConst( type );
+
+			}
+
+			const condSnippet = condNode.build( builder, condType );
+			const ifSnippet = ifNode.build( builder, type );
+
+			const mathSnippet = builder.getVectorSelect( condSnippet, ifSnippet, elseSnippet, type );
+
+			if ( ! needsOutput ) return '';
+
+			builder.addFlowCode( `\n${ builder.tab }${ nodeProperty } = ${ mathSnippet };\n\n` );
+
+			return builder.format( nodeProperty, type, output );
+
+		}
 
 		const nodeSnippet = condNode.build( builder, 'bool' );
 		const isUniformFlow = builder.context.uniformFlow;
