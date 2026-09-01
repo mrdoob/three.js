@@ -80,9 +80,9 @@ class ParameterNode extends PropertyNode {
 
 	}
 
-	generate( builder, output ) {
+	generate() {
 
-		return builder.format( this.name, this.getNodeType( builder ), output );
+		return this.name;
 
 	}
 

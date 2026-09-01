@@ -167,7 +167,7 @@ class VaryingNode extends Node {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
 		const propertyKey = builder.getSubBuildProperty( 'property', builder.currentStack );
 		const properties = builder.getNodeProperties( this );
@@ -195,7 +195,7 @@ class VaryingNode extends Node {
 
 		}
 
-		return builder.format( builder.getPropertyName( varying ), this.getNodeType( builder ), output );
+		return builder.getPropertyName( varying );
 
 	}
 
