@@ -28083,6 +28083,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "numSubgroups",
+			"kind": "member"
+		},
+		{
 			"title": "numWorkgroups",
 			"kind": "member"
 		},
@@ -28749,6 +28753,10 @@
 		{
 			"title": "subgroupInclusiveMul",
 			"kind": "function"
+		},
+		{
+			"title": "subgroupIndex",
+			"kind": "member"
 		},
 		{
 			"title": "subgroupMax",

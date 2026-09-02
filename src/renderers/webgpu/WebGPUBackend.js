@@ -115,6 +115,15 @@ class WebGPUBackend extends Backend {
 		this.device = null;
 
 		/**
+		 * WGSL language features advertised by the implementation, or `null`
+		 * before init / when WebGPU is unavailable.
+		 *
+		 * @type {?GPUSupportedWGSLLanguageFeatures}
+		 * @default null
+		 */
+		this.wgslLanguageFeatures = null;
+
+		/**
 		 * A reference to the default render pass descriptor.
 		 *
 		 * @type {?Object}
@@ -294,6 +303,8 @@ class WebGPUBackend extends Backend {
 		};
 
 		this.device = device;
+
+		this.wgslLanguageFeatures = ( typeof navigator !== 'undefined' && navigator.gpu !== undefined && navigator.gpu.wgslLanguageFeatures !== undefined ) ? navigator.gpu.wgslLanguageFeatures : null;
 
 		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
 
@@ -2955,6 +2966,18 @@ class WebGPUBackend extends Backend {
 		if ( GPUFeatureMap[ name ] !== undefined ) name = GPUFeatureMap[ name ];
 
 		return this.device.features.has( name );
+
+	}
+
+	/**
+	 * Checks if the given WGSL language feature is supported.
+	 *
+	 * @param {string} name - The language feature's name.
+	 * @return {boolean} Whether the language feature is supported or not.
+	 */
+	hasLanguageFeature( name ) {
+
+		return this.wgslLanguageFeatures !== null && this.wgslLanguageFeatures.has( name );
 
 	}
 

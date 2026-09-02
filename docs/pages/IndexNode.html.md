@@ -9,10 +9,11 @@ This class represents shader indices of different types. The following predefine
 *   `drawIndex`: The index of a draw call.
 *   `invocationLocalIndex`: The index of a compute invocation within the scope of a workgroup load.
 *   `invocationSubgroupIndex`: The index of a compute invocation within the scope of a subgroup.
+*   `subgroupIndex`: The index of a compute invocation's subgroup within its workgroup.
 
 ## Constructor
 
-### new IndexNode( scope : 'vertex' | 'instance' | 'invocationLocal' | 'invocationGlobal' | 'invocationSubgroup' | 'draw' )
+### new IndexNode( scope : 'vertex' | 'instance' | 'subgroup' | 'invocationLocal' | 'invocationGlobal' | 'invocationSubgroup' | 'draw' )
 
 Constructs a new index node.
 

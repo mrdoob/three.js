@@ -558,6 +558,10 @@ TSL object that represents the vertex normal of the current rendered object in w
 
 TSL object that represents the vertex normal of the current rendered object in world space.
 
+### .numSubgroups : ComputeBuiltinNode.<uint> (constant)
+
+TSL object that represents the number of subgroups in the current workgroup. Maps to WGSL `num_subgroups` when that language feature is available, otherwise `ceil(workgroup_size / subgroup_size)`.
+
 ### .numWorkgroups : ComputeBuiltinNode.<uvec3> (constant)
 
 Represents the number of workgroups dispatched by the compute shader.
@@ -728,6 +732,10 @@ TSL object that represents the shader variable `SpecularF90`.
 ### .specularLobeTanHalfAngle (constant)
 
 GGX inverse-CDF: half-angle tangent enclosing `percent` of the specular lobe volume. `roughness` is perceptual (alpha = roughness²).
+
+### .subgroupIndex : IndexNode (constant)
+
+TSL object that represents the index of the subgroup the current compute invocation belongs to. Maps to WGSL `subgroup_id` when that language feature is available, otherwise `local_invocation_index / subgroup_size`.
 
 ### .subgroupSize : ComputeBuiltinNode.<uint> (constant)
 
