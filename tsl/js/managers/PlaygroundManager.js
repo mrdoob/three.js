@@ -162,6 +162,8 @@ class PlaygroundManager {
 
 	async loadPlaygroundFromHash( hash ) {
 
+		this.tour.lastHandledHash = hash;
+
 		const base64Str = hash.replace( /^playground[=\/]/, '' ).split( '&' )[ 0 ];
 		let decodedCode = '';
 		try {
@@ -418,7 +420,7 @@ class PlaygroundManager {
 		this.renderPlaygroundTabs();
 		this.runPlayground();
 
-		this.updatePlaygroundHash();
+		this.updatePlaygroundHash( false );
 
 	}
 
@@ -460,7 +462,7 @@ class PlaygroundManager {
 		this.renderPlaygroundTabs();
 		this.runPlayground();
 
-		this.updatePlaygroundHash();
+		this.updatePlaygroundHash( true );
 
 	}
 
@@ -499,7 +501,7 @@ class PlaygroundManager {
 		this.renderPlaygroundTabs();
 		this.runPlayground();
 
-		this.updatePlaygroundHash();
+		this.updatePlaygroundHash( true );
 
 	}
 
@@ -552,7 +554,7 @@ class PlaygroundManager {
 
 				this.renderPlaygroundTabs();
 				this.runPlayground();
-				this.updatePlaygroundHash();
+				this.updatePlaygroundHash( true );
 
 			} else {
 
@@ -585,14 +587,25 @@ class PlaygroundManager {
 
 	}
 
-	async updatePlaygroundHash() {
+	async updatePlaygroundHash( pushHistory = false ) {
+
+		if ( ! this.playgroundTabs ) return;
 
 		const encoded = await compressString( JSON.stringify( {
 			tabs: this.playgroundTabs
 		} ) );
-		const revision = THREE.REVISION;
-		const newHash = 'playground=' + encoded + '&release=' + revision;
-		window.location.hash = newHash;
+		const release = THREE.REVISION;
+		const newHash = 'playground=' + encoded + ( release ? '&release=' + release : '' );
+
+		this.tour.lastHandledHash = newHash;
+
+		if ( pushHistory ) {
+
+			this.tour.historyManager.pushState( newHash );
+
+		}
+
+		history.replaceState( null, '', '#' + newHash );
 
 	}
 
@@ -635,7 +648,7 @@ class PlaygroundManager {
 			}
 
 			this.runPlayground();
-			this.updatePlaygroundHash();
+			this.updatePlaygroundHash( true );
 
 		}
 
