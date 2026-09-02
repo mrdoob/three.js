@@ -9,6 +9,8 @@ class PlaygroundManager {
 		this.tour = tour;
 		this.playgroundTabs = null;
 		this.activePlaygroundTabName = null;
+		this.currentExampleName = null;
+		this.initialTabsSnapshot = null;
 
 	}
 
@@ -234,6 +236,12 @@ class PlaygroundManager {
 
 		}
 
+		if ( ! this.initialTabsSnapshot ) {
+
+			this.initialTabsSnapshot = JSON.stringify( this.playgroundTabs );
+
+		}
+
 		// Render the playground tabs UI
 		this.renderPlaygroundTabs();
 
@@ -373,6 +381,7 @@ class PlaygroundManager {
 
 			this.playgroundTabs = [ { name: 'main', code: '// Play here!\n' } ];
 			this.activePlaygroundTabName = 'main';
+			this.initialTabsSnapshot = JSON.stringify( this.playgroundTabs );
 
 		}
 
@@ -1081,23 +1090,19 @@ class PlaygroundManager {
 
 	}
 
+	hasUnsavedChanges() {
+
+		if ( this.tour.projectsManager.currentProjectId ) return false;
+		if ( ! this.playgroundTabs || this.playgroundTabs.length === 0 ) return false;
+		if ( ! this.initialTabsSnapshot ) return false;
+
+		return JSON.stringify( this.playgroundTabs ) !== this.initialTabsSnapshot;
+
+	}
+
 	hasActiveCustomProject() {
 
-		if ( ! this.playgroundTabs || this.playgroundTabs.length === 0 ) return false;
-		if ( this.playgroundTabs.length > 1 ) return true;
-
-		const mainTab = this.playgroundTabs[ 0 ];
-		if ( ! mainTab ) return false;
-		if ( mainTab.name !== 'main' ) return true;
-
-		const code = ( mainTab.code || '' ).trim();
-		if ( ! code || code === '// Tour of TSL' || code === '// Play here!' || code === '// No example available.\nimport \'scenes/empty\';' ) {
-
-			return false;
-
-		}
-
-		return true;
+		return this.hasUnsavedChanges();
 
 	}
 
@@ -1116,6 +1121,8 @@ class PlaygroundManager {
 
 			this.playgroundTabs = [ { name: 'main', code: currentCode } ];
 			this.activePlaygroundTabName = 'main';
+			this.currentExampleName = activePage?.title || activePage?.name || 'Example';
+			this.initialTabsSnapshot = JSON.stringify( this.playgroundTabs );
 
 		}
 
@@ -1134,13 +1141,15 @@ class PlaygroundManager {
 
 	}
 
-	async loadExampleIntoPlayground( code ) {
+	async loadExampleIntoPlayground( code, name = null ) {
 
 		this.tour.projectsManager.setCurrentProjectId( null );
+		this.currentExampleName = name;
 
 		const newCode = code || '// Tour of TSL\n';
 		this.playgroundTabs = [ { name: 'main', code: newCode } ];
 		this.activePlaygroundTabName = 'main';
+		this.initialTabsSnapshot = JSON.stringify( this.playgroundTabs );
 
 		this.togglePlayground( true );
 		this.renderPlaygroundTabs();

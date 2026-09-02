@@ -952,6 +952,7 @@ class Tour {
 
 			const activePage = this.pages[ this.currentPageIndex ];
 			let currentCode = '// Tour of TSL\n';
+			const exampleTitle = activePage?.title || activePage?.name || 'Example';
 
 			if ( activePage && activePage.hasCode ) {
 
@@ -959,24 +960,19 @@ class Tour {
 
 			}
 
-			if ( this.playgroundManager.hasActiveCustomProject() ) {
+			if ( this.playgroundManager.hasUnsavedChanges() ) {
 
 				this.projectsManager.confirmCloseCurrentProject(
 					() => {
 
-						this.playgroundManager.loadExampleIntoPlayground( currentCode );
-
-					},
-					() => {
-
-						this.playgroundManager.loadExampleIntoPlayground( currentCode );
+						this.playgroundManager.loadExampleIntoPlayground( currentCode, exampleTitle );
 
 					}
 				);
 
 			} else {
 
-				this.playgroundManager.loadExampleIntoPlayground( currentCode );
+				this.playgroundManager.loadExampleIntoPlayground( currentCode, exampleTitle );
 
 			}
 

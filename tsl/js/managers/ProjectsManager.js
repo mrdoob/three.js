@@ -179,10 +179,26 @@ class ProjectsManager {
 	saveCurrentProject( name ) {
 
 		const tabs = this.tour.playgroundManager.playgroundTabs || [ { name: 'main', code: '// Tour of TSL\n' } ];
-		const cleanName = ( name || '' ).trim() || this.getNextProjectName();
-
 		const projects = this.getProjects();
-		const existingIndex = projects.findIndex( p => p.name.toLowerCase() === cleanName.toLowerCase() );
+
+		let existingIndex = - 1;
+		if ( this.currentProjectId ) {
+
+			existingIndex = projects.findIndex( p => p.id === this.currentProjectId );
+
+		}
+
+		const defaultName = ( existingIndex !== - 1 ? projects[ existingIndex ].name : null )
+			|| this.tour.playgroundManager.currentExampleName
+			|| this.getNextProjectName();
+
+		const cleanName = ( name || '' ).trim() || defaultName;
+
+		if ( existingIndex === - 1 ) {
+
+			existingIndex = projects.findIndex( p => p.name.toLowerCase() === cleanName.toLowerCase() );
+
+		}
 
 		const now = Date.now();
 		const projectData = {
@@ -204,6 +220,8 @@ class ProjectsManager {
 		}
 
 		this.setCurrentProjectId( projectData.id );
+		this.tour.playgroundManager.currentExampleName = projectData.name;
+		this.tour.playgroundManager.initialTabsSnapshot = JSON.stringify( tabs );
 		this.saveProjectsList( projects );
 		return projectData;
 
@@ -285,8 +303,10 @@ class ProjectsManager {
 		}
 
 		this.setCurrentProjectId( project.id );
+		this.tour.playgroundManager.currentExampleName = project.name;
 		this.tour.playgroundManager.playgroundTabs = JSON.parse( JSON.stringify( project.tabs ) );
 		this.tour.playgroundManager.activePlaygroundTabName = this.tour.playgroundManager.playgroundTabs[ 0 ].name;
+		this.tour.playgroundManager.initialTabsSnapshot = JSON.stringify( this.tour.playgroundManager.playgroundTabs );
 
 		this.tour.playgroundManager.togglePlayground( true );
 		this.tour.playgroundManager.renderPlaygroundTabs();
@@ -878,7 +898,7 @@ class ProjectsManager {
 
 	}
 
-	confirmCloseCurrentProject( onConfirm, onSaveAndConfirm ) {
+	confirmCloseCurrentProject( onSaveAndConfirm ) {
 
 		this.closeConfirmModal();
 
@@ -900,11 +920,10 @@ class ProjectsManager {
 				</button>
 			</div>
 			<div class="tsl-confirm-body">
-				<p>You already have an open project in Playground.<br><br>Do you want to close the current project and load this example?</p>
+				<p>You already have an open project in Playground.<br><br>Do you want to save the current project and load this example?</p>
 			</div>
 			<div class="tsl-confirm-actions">
-				<button id="tsl-confirm-replace-btn" class="tsl-btn tsl-btn-danger">Replace & Open</button>
-				<button id="tsl-confirm-save-btn" class="tsl-btn tsl-btn-primary">Save Current & Open</button>
+				<button id="tsl-confirm-save-btn" class="tsl-btn tsl-btn-primary">Save & Open</button>
 				<button id="tsl-confirm-cancel-btn" class="tsl-btn tsl-btn-secondary">Cancel</button>
 			</div>
 		`;
@@ -922,19 +941,11 @@ class ProjectsManager {
 		modal.querySelector( '.tsl-modal-close-btn' ).onclick = close;
 		modal.querySelector( '#tsl-confirm-cancel-btn' ).onclick = close;
 
-		modal.querySelector( '#tsl-confirm-replace-btn' ).onclick = () => {
-
-			close();
-			if ( onConfirm ) onConfirm();
-
-		};
-
 		modal.querySelector( '#tsl-confirm-save-btn' ).onclick = () => {
 
 			this.saveCurrentProject();
 			close();
 			if ( onSaveAndConfirm ) onSaveAndConfirm();
-			else if ( onConfirm ) onConfirm();
 
 		};
 
