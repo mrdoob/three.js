@@ -179,7 +179,7 @@ export const instanceIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.I
  * const computeFn = Fn( () => {
  *
  * 	storageBufferOne.element( instanceIndex ).assign( subgroupIndex );
- *  storageBufferTwo.element( instanceIndex ).assign( workgroupId.x )
+ * 	storageBufferTwo.element( instanceIndex ).assign( workgroupId.x );
  *
  * } )().compute( 12, [ 9 ] );
  *
@@ -201,7 +201,7 @@ export const subgroupIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.S
  * const computeFn = Fn( () => {
  *
  * 	storageBufferOne.element( instanceIndex ).assign( invocationSubgroupIndex );
- *  storageBufferTwo.element( instanceIndex ).assign( subgroupIndex );
+ * 	storageBufferTwo.element( instanceIndex ).assign( subgroupIndex );
  *
  * } )().compute( 12, [ 12 ] );
  *
