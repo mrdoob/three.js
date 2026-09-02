@@ -731,6 +731,11 @@ class MaterialXNode {
 
 			shaderProperties.setMaterial( material );
 
+			// Keep the raw MaterialX graph reachable for tools that need to
+			// inspect it before the compiled TSL graph loses authoring intent.
+			material.materialXSurfaceShaderNode = shaderProperties;
+			material.materialXDocument = this.materialX;
+
 		}
 
 		return material;
