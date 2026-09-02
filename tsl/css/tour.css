@@ -4533,15 +4533,10 @@ body.loading .app-header {
 }
 
 .tsl-confirm-body p {
-	margin: 0 0 8px;
+	margin: 0;
 	font-size: 14px;
 	line-height: 1.5;
 	color: #e5e7eb;
-}
-
-.tsl-confirm-subtext {
-	font-size: 12px;
-	color: #9ca3af;
 }
 
 .tsl-confirm-actions {

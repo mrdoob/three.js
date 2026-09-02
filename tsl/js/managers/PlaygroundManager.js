@@ -292,7 +292,7 @@ class PlaygroundManager {
 			const thumbWidth = Math.max( 28, ( clientWidth / scrollWidth ) * clientWidth );
 			const maxScroll = scrollWidth - clientWidth;
 			const maxThumbLeft = clientWidth - thumbWidth;
-			const thumbLeft = maxScroll > 0 ? ( scrollLeft / maxScroll ) * maxThumbLeft : 0;
+			const thumbLeft = ( scrollLeft / maxScroll ) * maxThumbLeft;
 
 			thumb.style.width = `${thumbWidth}px`;
 			thumb.style.transform = `translateX(${thumbLeft}px)`;
