@@ -28751,10 +28751,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "subgroupIndex",
-			"kind": "member"
-		},
-		{
 			"title": "subgroupMax",
 			"kind": "function"
 		},

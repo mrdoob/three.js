@@ -729,10 +729,6 @@ TSL object that represents the shader variable `SpecularF90`.
 
 GGX inverse-CDF: half-angle tangent enclosing `percent` of the specular lobe volume. `roughness` is perceptual (alpha = roughness²).
 
-### .subgroupIndex : IndexNode (constant)
-
-TSL object that represents the index of the subgroup the current compute invocation belongs to.
-
 ### .subgroupSize : ComputeBuiltinNode.<uint> (constant)
 
 A device dependent variable that exposes the size of the current invocation's subgroup.

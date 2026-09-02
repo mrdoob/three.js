@@ -570,7 +570,6 @@ export const subgroupExclusiveAdd = TSL.subgroupExclusiveAdd;
 export const subgroupExclusiveMul = TSL.subgroupExclusiveMul;
 export const subgroupInclusiveAdd = TSL.subgroupInclusiveAdd;
 export const subgroupInclusiveMul = TSL.subgroupInclusiveMul;
-export const subgroupIndex = TSL.subgroupIndex;
 export const subgroupMax = TSL.subgroupMax;
 export const subgroupMin = TSL.subgroupMin;
 export const subgroupMul = TSL.subgroupMul;

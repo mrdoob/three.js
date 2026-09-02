@@ -11,7 +11,6 @@ import { varying } from './VaryingNode.js';
  * - `drawIndex`: The index of a draw call.
  * - `invocationLocalIndex`: The index of a compute invocation within the scope of a workgroup load.
  * - `invocationSubgroupIndex`: The index of a compute invocation within the scope of a subgroup.
- * - `subgroupIndex`: The index of a compute invocation's subgroup within its workgroup.
  *
  * @augments Node
  */
@@ -26,7 +25,7 @@ class IndexNode extends Node {
 	/**
 	 * Constructs a new index node.
 	 *
-	 * @param {('vertex'|'instance'|'subgroup'|'invocationLocal'|'invocationGlobal'|'invocationSubgroup'|'draw')} scope - The scope of the index node.
+	 * @param {('vertex'|'instance'|'invocationLocal'|'invocationGlobal'|'invocationSubgroup'|'draw')} scope - The scope of the index node.
 	 */
 	constructor( scope ) {
 
@@ -77,10 +76,6 @@ class IndexNode extends Node {
 
 			propertyName = builder.getInvocationSubgroupIndex();
 
-		} else if ( scope === IndexNode.SUBGROUP ) {
-
-			propertyName = builder.getSubgroupIndex();
-
 		} else {
 
 			throw new Error( 'THREE.IndexNode: Unknown scope: ' + scope );
@@ -109,7 +104,6 @@ class IndexNode extends Node {
 
 IndexNode.VERTEX = 'vertex';
 IndexNode.INSTANCE = 'instance';
-IndexNode.SUBGROUP = 'subgroup';
 IndexNode.INVOCATION_LOCAL = 'invocationLocal';
 IndexNode.INVOCATION_SUBGROUP = 'invocationSubgroup';
 IndexNode.DRAW = 'draw';
@@ -131,14 +125,6 @@ export const vertexIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.VER
  * @type {IndexNode}
  */
 export const instanceIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.INSTANCE );
-
-/**
- * TSL object that represents the index of the subgroup the current compute invocation belongs to.
- *
- * @tsl
- * @type {IndexNode}
- */
-export const subgroupIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.SUBGROUP );
 
 /**
  * TSL object that represents the index of a compute invocation within the scope of a subgroup.
