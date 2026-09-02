@@ -347,7 +347,7 @@ class MaterialXNode {
 		const nodeName = this.name;
 		const materialX = this.materialX;
 
-		materialX.textureLoadPromises.push( new Promise( ( resolveLoad ) => {
+		materialX.pendingResources.push( new Promise( ( resolveLoad ) => {
 
 			loader.load( resolvedURI, ( imageData ) => {
 
@@ -815,7 +815,7 @@ class MaterialXDocument {
 		this.textureLoader.setOptions( { imageOrientation: 'none' } );
 		this.textureLoader.setPath( path );
 		this.textureCache = new Map();
-		this.textureLoadPromises = [];
+		this.pendingResources = [];
 		const bottomLeftUvSpaceHelpers = getBottomLeftUvSpaceHelpers( this.uvSpace );
 
 		this.compileContext = {
@@ -843,6 +843,12 @@ class MaterialXDocument {
 		}
 
 		return uri;
+
+	}
+
+	waitForResources() {
+
+		return Promise.all( this.pendingResources ).then( () => undefined );
 
 	}
 
@@ -889,7 +895,6 @@ class MaterialXDocument {
 			log: this.log.entries,
 			errors: this.log.errors,
 			warnings: this.log.warnings,
-			texturesReady: Promise.all( this.textureLoadPromises ).then( () => undefined ),
 		};
 
 	}

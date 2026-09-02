@@ -40,7 +40,7 @@ class MaterialXLoader extends Loader {
 
 	load( url, onLoad, onProgress, onError, options = {} ) {
 
-		const _onError = function ( e ) {
+		const _onError = ( e ) => {
 
 			if ( onError ) {
 
@@ -52,7 +52,14 @@ class MaterialXLoader extends Loader {
 
 			}
 
+			this.manager.itemError( url );
+			this.manager.itemEnd( url );
+
 		};
+
+		// Keep the LoadingManager active until parsing and dependent resources
+		// have finished, matching the lifecycle used by GLTFLoader.
+		this.manager.itemStart( url );
 
 		new FileLoader( this.manager )
 			.setPath( this.path )
@@ -61,7 +68,17 @@ class MaterialXLoader extends Loader {
 
 				try {
 
-					onLoad( this.parseBuffer( data, url, options ) );
+					const parsed = this._parseBuffer( data, url, options );
+
+					parsed.document.waitForResources().then( () => {
+
+						parsed.result.errors = parsed.log.errors;
+						parsed.result.warnings = parsed.log.warnings;
+						this._throwOnErrors( parsed.log, options );
+						onLoad( parsed.result );
+						this.manager.itemEnd( url );
+
+					} ).catch( _onError );
 
 				} catch ( e ) {
 
@@ -94,6 +111,14 @@ class MaterialXLoader extends Loader {
 
 	parseBuffer( data, url = '', options = {} ) {
 
+		const parsed = this._parseBuffer( data, url, options );
+		this._throwOnErrors( parsed.log, options );
+		return parsed.result;
+
+	}
+
+	_parseBuffer( data, url = '', options = {} ) {
+
 		this.dispose();
 
 		let text;
@@ -122,7 +147,7 @@ class MaterialXLoader extends Loader {
 
 		}
 
-		return this.parse( text, {
+		return this._parse( text, {
 			...options,
 			archiveResolver,
 			path: options.path || getResourcePath( this.path, url )
@@ -132,6 +157,14 @@ class MaterialXLoader extends Loader {
 
 	parse( text, options = {} ) {
 
+		const parsed = this._parse( text, options );
+		this._throwOnErrors( parsed.log, options );
+		return parsed.result;
+
+	}
+
+	_parse( text, options = {} ) {
+
 		const log = new MaterialXLog();
 
 		const document = new MaterialXDocument( this.manager, options.path || this.path, log, options.archiveResolver || null, options.uvSpace );
@@ -139,14 +172,18 @@ class MaterialXLoader extends Loader {
 			interfaceValidator: options.interfaceValidator,
 		} );
 
+		return { document, log, result };
+
+	}
+
+	_throwOnErrors( log, options ) {
+
 		if ( options.throwOnErrors !== false && log.errors.length > 0 ) {
 
 			const details = log.errors.map( ( error ) => error.message ).join( ' ' );
 			throw new Error( `THREE.MaterialXLoader: MaterialX translation failed with ${log.errors.length} error(s). ${details}` );
 
 		}
-
-		return result;
 
 	}
 
