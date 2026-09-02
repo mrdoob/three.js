@@ -2398,11 +2398,17 @@ body.preview-maximized .preview-hide-btn {
 	width: 14px;
 	height: 14px;
 	color: #8e8e93;
+	opacity: 0.35;
 	line-height: 1;
-	transition: color 0.15s;
+	transition: color 0.15s, opacity 0.15s;
+}
+
+.playground-tab:hover .playground-tab-close {
+	opacity: 0.7;
 }
 
 .playground-tab-close:hover {
+	opacity: 1;
 	color: #ff453a;
 }
 
