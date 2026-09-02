@@ -195,7 +195,7 @@ class SubgroupFunctionNode extends TempNode {
 
 	}
 
-	static get SUBGROUP_EXCLUSIVE_AND() {
+	static get SUBGROUP_EXCLUSIVE_ADD() {
 
 		return 'subgroupExclusiveAdd';
 
@@ -375,7 +375,7 @@ export const subgroupInclusiveAdd = /*@__PURE__*/ nodeProxyIntent( SubgroupFunct
  * @param {number} e - The value provided to the exclusive scan by the current invocation.
  * @return {number} The accumulated result of the exclusive scan operation.
  */
-export const subgroupExclusiveAdd = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_EXCLUSIVE_AND ).setParameterLength( 1 );
+export const subgroupExclusiveAdd = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_EXCLUSIVE_ADD ).setParameterLength( 1 );
 
 /**
  * A reduction that multiplies e among all active invocations and returns that result.
