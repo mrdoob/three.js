@@ -60,16 +60,16 @@ export default QUnit.module( 'TSL', () => {
 
 				const shared = workgroupArray( 'uint', workgroupSize );
 
-				// Every invocation writes its own local index into its own
-				// slot, then reads back the value written by local index 0 --
-				// only valid if the plain workgroup array is genuinely shared
-				// across the workgroup's invocations and the barrier actually
-				// orders the write before the read.
-				shared.element( invocationLocalIndex ).assign( invocationLocalIndex );
+				// Every invocation writes a distinct non-zero value into its own
+				// slot, then reads back the value written by its right-hand
+				// neighbor. Using non-zero values ensures this cannot pass from
+				// workgroup memory's default initialization alone.
+				shared.element( invocationLocalIndex ).assign( invocationLocalIndex.add( uint( 1 ) ) );
 
 				workgroupBarrier();
 
-				output.element( instanceIndex ).assign( shared.element( uint( 0 ) ) );
+				const neighborLocalIndex = invocationLocalIndex.add( uint( 1 ) ).mod( uint( workgroupSize ) );
+				output.element( instanceIndex ).assign( shared.element( neighborLocalIndex ) );
 
 			} )().compute( dispatchCount, [ workgroupSize ] );
 
@@ -79,7 +79,10 @@ export default QUnit.module( 'TSL', () => {
 
 			for ( let i = 0; i < dispatchCount; i ++ ) {
 
-				assert.strictEqual( data[ i ], 0, `invocation ${ i }: workgroup-shared slot 0 should read back as 0 (written by local index 0)` );
+				const localIndex = i % workgroupSize;
+				const expected = ( ( localIndex + 1 ) % workgroupSize ) + 1;
+
+				assert.strictEqual( data[ i ], expected, `invocation ${ i }: should read its right neighbor's non-zero value (${ expected })` );
 
 			}
 
