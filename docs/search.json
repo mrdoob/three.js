@@ -28083,10 +28083,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "numSubgroups",
-			"kind": "member"
-		},
-		{
 			"title": "numWorkgroups",
 			"kind": "member"
 		},
