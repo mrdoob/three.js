@@ -19,7 +19,7 @@ marked.use( {
 } );
 
 
-function parseTour( rawMarkdown ) {
+function parseTourConfig( rawMarkdown ) {
 
 	let title = null;
 	const templates = [];
@@ -28,7 +28,7 @@ function parseTour( rawMarkdown ) {
 	const tourRegex = /<tour([^>]*?)>([\s\S]*?)<\/tour>|<tour([^>]*?)\/?>/i;
 	const tourMatch = tourRegex.exec( rawMarkdown );
 
-	let markdownContent = rawMarkdown;
+	let markdown = rawMarkdown;
 
 	if ( tourMatch ) {
 
@@ -109,9 +109,18 @@ function parseTour( rawMarkdown ) {
 
 		}
 
-		markdownContent = rawMarkdown.replace( tourMatch[ 0 ], '' );
+		markdown = rawMarkdown.replace( tourMatch[ 0 ], '' );
 
 	}
+
+	return { title, templates, markdown };
+
+}
+
+
+function parseTour( rawMarkdown ) {
+
+	const { title, templates, markdown } = parseTourConfig( rawMarkdown );
 
 	const pageTree = [];
 
@@ -121,10 +130,10 @@ function parseTour( rawMarkdown ) {
 	let lastIndex = 0;
 	const stack = [];
 
-	while ( ( match = tokenRegex.exec( markdownContent ) ) !== null ) {
+	while ( ( match = tokenRegex.exec( markdown ) ) !== null ) {
 
 		const index = match.index;
-		const textSegment = markdownContent.substring( lastIndex, index );
+		const textSegment = markdown.substring( lastIndex, index );
 
 		if ( stack.length > 0 ) {
 
@@ -187,9 +196,9 @@ function parseTour( rawMarkdown ) {
 	}
 
 	// Add any remaining text
-	if ( lastIndex < markdownContent.length && stack.length > 0 ) {
+	if ( lastIndex < markdown.length && stack.length > 0 ) {
 
-		stack[ stack.length - 1 ].content += markdownContent.substring( lastIndex );
+		stack[ stack.length - 1 ].content += markdown.substring( lastIndex );
 
 	}
 
@@ -1548,4 +1557,4 @@ function tokenizeCodeToElement( codeContent, targetElement ) {
 
 }
 
-export { parseTour, parse, tokenizeInlineCode, tokenizeCodeToElement };
+export { parseTourConfig, parseTour, parse, tokenizeInlineCode, tokenizeCodeToElement };
