@@ -337,12 +337,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 		this.directives = {};
 
 		/**
-		 * A map for managing scope arrays. Only relevant for when using
-		 * {@link WorkgroupInfoNode} in context of compute shaders.
+		 * A map for managing variables scoped to specific address spaces.
+		 * Only relevant for when using {@link ScopedVariableNode} in context of compute shaders.
 		 *
 		 * @type {Map<string,Object>}
 		 */
-		this.scopedArrays = new Map();
+		this.scopedVariables = new Map();
 
 		/**
 		 * A flag that indicates that early returns are allowed.
@@ -1794,25 +1794,25 @@ ${ flowData.code }
 	}
 
 	/**
-	 * This method should be used when a new scoped buffer is used in context of
-	 * compute shaders. It adds the array to the internal data structure which is
-	 * later used to generate the respective WGSL.
+	 * This method should be used when a new scoped array buffer or variable
+	 * is used in context of compute shaders. It adds the scoped variable to an
+	 * internal data structure which is later used to generate the variable's WGSL.
 	 *
 	 * @param {string} name - The array name.
 	 * @param {string} scope - The scope.
 	 * @param {string} bufferType - The buffer type.
-	 * @param {string} bufferCount - The buffer count.
+	 * @param {number|null} bufferCount - The buffer count of the scoped array.
 	 * @return {string} The array name.
 	 */
-	getScopedArray( name, scope, bufferType, bufferCount ) {
+	getScopedVariable( name, scope, type, count = null ) {
 
-		if ( this.scopedArrays.has( name ) === false ) {
+		if ( this.scopedVariables.has( name ) === false ) {
 
-			this.scopedArrays.set( name, {
+			this.scopedVariables.set( name, {
 				name,
 				scope,
-				bufferType,
-				bufferCount
+				type,
+				count
 			} );
 
 		}
@@ -1822,13 +1822,14 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the scoped arrays of the given shader stage as a WGSL string.
+	 * Returns the scoped variables of the given shader stage as a WGSL string.
+	 * Used to construct shader variables with specialized scopes (workgroup/immediate, etc).
 	 *
 	 * @param {string} shaderStage - The shader stage.
 	 * @return {string|undefined} The WGSL snippet that defines the scoped arrays.
 	 * Returns `undefined` when used in the vertex or fragment stage.
 	 */
-	getScopedArrays( shaderStage ) {
+	getScopedVariables( shaderStage ) {
 
 		if ( shaderStage !== 'compute' ) {
 
@@ -1838,11 +1839,9 @@ ${ flowData.code }
 
 		const snippets = [];
 
-		for ( const { name, scope, bufferType, bufferCount } of this.scopedArrays.values() ) {
+		for ( const { name, scope, type, count } of this.scopedVariables.values() ) {
 
-			const type = this.getType( bufferType );
-
-			snippets.push( `var<${scope}> ${name}: array< ${type}, ${bufferCount} >;` );
+			snippets.push( `${ this.getVar( type, name, count, `<${ scope }>` ) };` );
 
 		}
 
@@ -2330,7 +2329,7 @@ ${ flowData.code }
 			stageData.vars = this.getVars( shaderStage, allowGlobal );
 			stageData.codes = this.getCodes( shaderStage );
 			stageData.directives = this.getDirectives( shaderStage );
-			stageData.scopedArrays = this.getScopedArrays( shaderStage );
+			stageData.scopedArrays = this.getScopedVariables( shaderStage );
 
 			//
 
