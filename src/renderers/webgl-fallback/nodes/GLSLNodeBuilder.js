@@ -277,19 +277,29 @@ class GLSLNodeBuilder extends NodeBuilder {
 	 */
 	getBitcastMethod( type, inputType ) {
 
-		// int<->uint conversion -- scalar or any vector length -- is a
+		// int<->uint conversion -- scalar or any matching vector length -- is a
 		// bit-preserving reinterpretation under the GLSL spec, so the type
 		// constructor itself (uint(x), uvec4(x), int(x), ivec4(x), ...)
 		// already does exactly what bitcast() needs. Routed here instead of
 		// through the bitcast_X_Y polyfill lookup below, which only has
 		// scalar entries (bitcast_int_uint/bitcast_uint_int) and has no
 		// vector counterpart, e.g. no bitcast_ivec4_uvec4.
+		//
+		// Lengths must match: GLSL constructors also broadcast (uvec4(int))
+		// and truncate (uint(ivec4) / uvec3(ivec4)), which are conversions,
+		// not bitcasts. WGSL bitcast<> requires equal bit widths, so only
+		// take this path when getTypeLength agrees; mismatched sizes fall
+		// through and fail to compile on both backends.
 		const inputFamily = this.getComponentType( inputType );
 		const outputFamily = this.getComponentType( type );
 
 		if ( ( inputFamily === 'int' && outputFamily === 'uint' ) || ( inputFamily === 'uint' && outputFamily === 'int' ) ) {
 
-			return this.getType( type );
+			if ( this.getTypeLength( inputType ) === this.getTypeLength( type ) ) {
+
+				return this.getType( type );
+
+			}
 
 		}
 
