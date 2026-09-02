@@ -131,38 +131,23 @@ export const vertexIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.VER
  * In these stages, use `instanceIndex` to modify a mesh based on its instance or to select per-instance data.
  *
  * ```js
- * // Create instanced sprites
- * const positionAttribute = new THREE.InstancedBufferAttribute( new Float32Array( positions ), 3 );
- * const material = new THREE.SpriteNodeMaterial();
- * material.positionNode = instancedBufferAttribute( positionAttribute );
- *
- * // Offset the rotation of the sprite instance by the time uniform and the mesh instance's index.
- * material.rotationNode = time.add( instanceIndex ).sin();
- *
- * const particles = new THREE.Sprite( material );
- * particles.count = positionAttribute.count;
+ * // Create instanced mesh
+ * const material = new THREE.BasicNodeMaterial();
+ * // instanceIndex will equal the current mesh's instance index between 0-500
+ * material.positionNode = vec3( instanceIndex.mul(2), instanceIndex.mul( 2 ), 0 );
+ * const mesh = new THREE.InstancedMesh( geometry, material, 500 );
  * ```
  *
  * Within the compute stage, `instanceIndex` will represent the global index of a compute invocation within the 3-dimensional compute workgroup load.
  * In this stage, use `instanceIndex` to modify or select data at a given index within a buffer, or derive values from the index itself.
  *
  * ```js
- * // Write a storage texture with one compute invocation per texel
- * const width = 512, height = 512;
- * const storageTexture = new THREE.StorageTexture( width, height );
+ * const computeFn = Fn() => {
  *
- * const computeTexture = Fn( ( { storageTexture } ) => {
+ * 	// instanceIndex will equal value between 0 - 255
+ * 	storageBuffer.element( instanceIndex ).assign( instanceIndex );posX = instanceIndex.mod( width );
  *
- * 	// Derive 2D texel coordinates from the flat invocation index
- * 	const posX = instanceIndex.mod( width );
- * 	const posY = instanceIndex.div( width );
- * 	const indexUV = uvec2( posX, posY );
- *
- * 	textureStore( storageTexture, indexUV, vec4( 1, 0, 0, 1 ) ).toWriteOnly();
- *
- * } );
- *
- * const computeNode = computeTexture( { storageTexture } ).compute( width * height );
+ * } )().compute(255)
  * ```
  *
  * @tsl
