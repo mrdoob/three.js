@@ -669,13 +669,7 @@ class PlaygroundManager {
 
 				if ( ! tabNames.includes( key ) ) {
 
-					const scriptConfig = this.tour.runner.scripts[ key ];
-					if ( scriptConfig && scriptConfig.instance && scriptConfig.instance.dispose ) {
-
-						scriptConfig.instance.dispose();
-
-					}
-
+					this.tour.runner.invalidateScript( key );
 					delete this.tour.runner.scripts[ key ];
 
 				}
@@ -692,9 +686,9 @@ class PlaygroundManager {
 				const existing = this.tour.runner.scripts[ tab.name ];
 				if ( ! existing || existing.text !== tab.code ) {
 
-					if ( existing && existing.instance && existing.instance.dispose ) {
+					if ( existing ) {
 
-						existing.instance.dispose();
+						this.tour.runner.invalidateScript( tab.name );
 
 					}
 
@@ -702,7 +696,8 @@ class PlaygroundManager {
 						url: null,
 						text: tab.code,
 						instance: null,
-						promise: null
+						promise: null,
+						dependencies: []
 					};
 
 				}

@@ -463,6 +463,70 @@ class CodeRunner extends EventDispatcher {
 
 	}
 
+	invalidateScript( name ) {
+
+		const scriptConfig = this.scripts[ name ];
+		if ( ! scriptConfig ) return;
+
+		if ( scriptConfig.instance ) {
+
+			if ( scriptConfig.instance.dispose ) {
+
+				try {
+
+					scriptConfig.instance.dispose();
+
+				} catch ( e ) {
+
+					console.error( `Error disposing script "${name}":`, e );
+
+				}
+
+			}
+
+			if ( scriptConfig.exportedKeys ) {
+
+				for ( const key of scriptConfig.exportedKeys ) {
+
+					if ( ! LIFECYCLE_METHODS.includes( key ) ) {
+
+						delete this.env[ key ];
+
+					}
+
+				}
+
+			}
+
+			for ( const key of Object.keys( scriptConfig.instance ) ) {
+
+				if ( ! LIFECYCLE_METHODS.includes( key ) ) {
+
+					delete this.env[ key ];
+
+				}
+
+			}
+
+		}
+
+		scriptConfig.instance = null;
+		scriptConfig.promise = null;
+		scriptConfig.exportedKeys = new Set();
+
+		// Cascade invalidation to any script that depends on this script
+		for ( const [ otherName, otherConfig ] of Object.entries( this.scripts ) ) {
+
+			if ( otherName !== name && otherConfig && otherConfig.dependencies && otherConfig.dependencies.includes( name ) ) {
+
+				this.invalidateScript( otherName );
+
+			}
+
+		}
+
+	}
+
 	async load( name ) {
 
 		const scriptConfig = this.scripts[ name ];
@@ -635,6 +699,21 @@ class CodeRunner extends EventDispatcher {
 
 					const wrapperFn = new Function( ...symbols, `${cleanText}\nreturn { ${returnFields.join( ', ' )} };\n//# sourceURL=${name}.js` );
 
+					if ( scriptConfig.exportedKeys ) {
+
+						for ( const key of scriptConfig.exportedKeys ) {
+
+							if ( ! LIFECYCLE_METHODS.includes( key ) ) {
+
+								delete this.env[ key ];
+
+							}
+
+						}
+
+					}
+
+					scriptConfig.exportedKeys = new Set();
 					scriptConfig.instance = wrapperFn( ...values );
 
 					if ( scriptConfig.instance ) {
@@ -642,6 +721,8 @@ class CodeRunner extends EventDispatcher {
 						for ( const key of Object.keys( scriptConfig.instance ) ) {
 
 							if ( ! LIFECYCLE_METHODS.includes( key ) ) {
+
+								scriptConfig.exportedKeys.add( key );
 
 								Object.defineProperty( this.env, key, {
 									get: () => scriptConfig.instance ? scriptConfig.instance[ key ] : undefined,
@@ -696,10 +777,9 @@ class CodeRunner extends EventDispatcher {
 		this.dispatchEvent( { type: 'start' } );
 
 		// Dispose previous main script
-		const prevMain = this.scripts[ '__main__' ];
-		if ( prevMain && prevMain.instance && prevMain.instance.dispose ) {
+		if ( this.scripts[ '__main__' ] ) {
 
-			prevMain.instance.dispose();
+			this.invalidateScript( '__main__' );
 
 		}
 
@@ -848,33 +928,7 @@ class CodeRunner extends EventDispatcher {
 			const removedCustomScripts = prevActiveCustomScripts.filter( name => ! this.activeScriptNames.includes( name ) );
 			for ( const baseName of removedCustomScripts ) {
 
-				const scriptConfig = this.scripts[ baseName ];
-				if ( scriptConfig ) {
-
-					if ( scriptConfig.instance ) {
-
-						if ( scriptConfig.instance.dispose ) {
-
-							scriptConfig.instance.dispose();
-
-						}
-
-						for ( const key of Object.keys( scriptConfig.instance ) ) {
-
-							if ( ! LIFECYCLE_METHODS.includes( key ) ) {
-
-								delete this.env[ key ];
-
-							}
-
-						}
-
-					}
-
-					scriptConfig.instance = null;
-					scriptConfig.promise = null;
-
-				}
+				this.invalidateScript( baseName );
 
 			}
 
@@ -908,13 +962,6 @@ class CodeRunner extends EventDispatcher {
 						if ( ! LIFECYCLE_METHODS.includes( key ) && instance[ key ] !== undefined ) {
 
 							activeModules[ key ] = instance[ key ];
-
-							const desc = Object.getOwnPropertyDescriptor( this.env, key );
-							if ( ! desc || ! desc.get ) {
-
-								this.env[ key ] = instance[ key ];
-
-							}
 
 						}
 
@@ -972,7 +1019,9 @@ class CodeRunner extends EventDispatcher {
 			this.scripts[ '__main__' ] = {
 				url: null,
 				instance: instance,
-				promise: Promise.resolve( instance )
+				promise: Promise.resolve( instance ),
+				dependencies: importedCustomScripts,
+				exportedKeys: new Set( Object.keys( instance || {} ) )
 			};
 			this.activeScriptNames.push( '__main__' );
 
@@ -1058,34 +1107,7 @@ class CodeRunner extends EventDispatcher {
 
 		for ( const baseName of Object.keys( this.scripts ) ) {
 
-			const scriptConfig = this.scripts[ baseName ];
-			if ( scriptConfig && scriptConfig.instance ) {
-
-				if ( scriptConfig.instance.dispose ) {
-
-					try {
-
-						scriptConfig.instance.dispose();
-
-					} catch ( e ) {
-
-						console.error( `Error disposing script ${baseName}:`, e );
-
-					}
-
-				}
-
-				for ( const key of Object.keys( scriptConfig.instance ) ) {
-
-					if ( ! LIFECYCLE_METHODS.includes( key ) ) {
-
-						delete this.env[ key ];
-
-					}
-
-				}
-
-			}
+			this.invalidateScript( baseName );
 
 		}
 
