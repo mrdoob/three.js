@@ -130,7 +130,7 @@
 				renderer.toneMapping = THREE.LinearToneMapping;
 				renderer.toneMappingExposure = .5;
 				renderer.inspector = new Inspector();
-				renderer.setAnimationLoop( render );
+				if ( window.TESTING !== true ) renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 200 );
@@ -208,6 +208,7 @@
 						] );
 
 						addGUI();
+						if ( window.TESTING === true ) renderer.setAnimationLoop( render );
 
 					} );
 
