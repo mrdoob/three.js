@@ -7,7 +7,6 @@ import {
 	mul,
 	normalMap,
 	texture,
-	uv,
 	vec2,
 	vec3,
 	vec4,
@@ -61,7 +60,7 @@ const TEXTURE_ADDRESS_MODES = new Set( [ 'constant', 'clamp', 'periodic', 'mirro
 const SWITCH_MIN_INDEX = 1;
 const SWITCH_MAX_INDEX = 10;
 
-const getDefaultUvNode = ( compileContext ) => compileContext.mxToBottomLeftUvSpace( uv( 0 ) );
+const getDefaultUvNode = ( compileContext ) => compileContext.getTexcoordNode( 0 );
 
 const toBooleanMaskNode = ( node ) => toBooleanNode( node ).select( float( 1 ), float( 0 ) );
 
@@ -344,7 +343,7 @@ const compileTexcoordNode = ( nodeX, compileContext ) => {
 
 	const indexNode = nodeX.getChildByName( 'index' );
 	const index = indexNode ? parseInt( indexNode.value, 10 ) : 0;
-	return compileContext.mxToBottomLeftUvSpace( uv( index ) );
+	return compileContext.getTexcoordNode( index );
 
 };
 
