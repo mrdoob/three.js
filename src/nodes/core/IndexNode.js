@@ -8,6 +8,12 @@ import { varying } from './VaryingNode.js';
  *
  * - `vertexIndex`: The index of a vertex within a mesh.
  * - `instanceIndex`: The index of either a mesh instance or an invocation of a compute shader.
+ *   In compute, this is the linearized global invocation index. Maps to WGSL
+ *   `global_invocation_index` when the `linear_indexing` language feature is
+ *   available, otherwise linearized from `global_invocation_id`.
+ * - `workgroupIndex`: The linearized index of the current workgroup within the
+ *   compute dispatch. Maps to WGSL `workgroup_index` when `linear_indexing` is
+ *   available, otherwise linearized from `workgroup_id`.
  * - `drawIndex`: The index of a draw call.
  * - `invocationLocalIndex`: The index of a compute invocation within the scope of a workgroup load.
  * - `invocationSubgroupIndex`: The index of a compute invocation within the scope of a subgroup.
@@ -26,7 +32,7 @@ class IndexNode extends Node {
 	/**
 	 * Constructs a new index node.
 	 *
-	 * @param {('vertex'|'instance'|'subgroup'|'invocationLocal'|'invocationGlobal'|'invocationSubgroup'|'draw')} scope - The scope of the index node.
+	 * @param {('vertex'|'instance'|'subgroup'|'invocationLocal'|'invocationGlobal'|'invocationSubgroup'|'draw'|'workgroup')} scope - The scope of the index node.
 	 */
 	constructor( scope ) {
 
@@ -81,6 +87,10 @@ class IndexNode extends Node {
 
 			propertyName = builder.getSubgroupIndex();
 
+		} else if ( scope === IndexNode.WORKGROUP ) {
+
+			propertyName = builder.getWorkgroupIndex();
+
 		} else {
 
 			throw new Error( 'THREE.IndexNode: Unknown scope: ' + scope );
@@ -113,6 +123,7 @@ IndexNode.SUBGROUP = 'subgroup';
 IndexNode.INVOCATION_LOCAL = 'invocationLocal';
 IndexNode.INVOCATION_SUBGROUP = 'invocationSubgroup';
 IndexNode.DRAW = 'draw';
+IndexNode.WORKGROUP = 'workgroup';
 
 export default IndexNode;
 
@@ -126,11 +137,22 @@ export const vertexIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.VER
 
 /**
  * TSL object that represents the index of either a mesh instance or an invocation of a compute shader.
+ * In compute shaders this is the linearized global invocation index.
  *
  * @tsl
  * @type {IndexNode}
  */
 export const instanceIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.INSTANCE );
+
+/**
+ * TSL object that represents the linearized index of the current workgroup within the compute dispatch.
+ * Maps to WGSL `workgroup_index` when that language feature is available, otherwise
+ * flattened from `workgroup_id` / `num_workgroups` (or `instanceIndex / workgroupSize` on WebGL).
+ *
+ * @tsl
+ * @type {IndexNode}
+ */
+export const workgroupIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.WORKGROUP );
 
 /**
  * TSL object that represents the index of the subgroup the current compute invocation belongs to.

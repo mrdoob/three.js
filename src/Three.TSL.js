@@ -672,5 +672,6 @@ export const wgslFn = TSL.wgslFn;
 export const workgroupArray = TSL.workgroupArray;
 export const workgroupBarrier = TSL.workgroupBarrier;
 export const workgroupId = TSL.workgroupId;
+export const workgroupIndex = TSL.workgroupIndex;
 export const workingToColorSpace = TSL.workingToColorSpace;
 export const xor = TSL.xor;

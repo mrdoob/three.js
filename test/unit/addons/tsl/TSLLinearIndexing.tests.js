@@ -1,20 +1,21 @@
-import { instanceIndex, uint, workgroupId, numWorkgroups } from 'three/tsl';
-import { globalInvocationIndex, workgroupIndex } from '../../../../examples/jsm/tsl/gpgpu/LinearIndexingNode.js';
-import { gpuTest, gpuFuzzTest } from './gpu-test-utils.js';
+import { instanceIndex, uint, workgroupId, numWorkgroups, workgroupIndex, globalId } from 'three/tsl';
+import { gpuFuzzTest } from './gpu-test-utils.js';
 
 export default QUnit.module( 'TSL', () => {
 
 	QUnit.module( 'linear indexing', () => {
 
-		gpuTest( 'globalInvocationIndex matches instanceIndex', ( { assert } ) => {
+		gpuFuzzTest( 'instanceIndex matches linearized globalId', 256, ( { assert } ) => {
+
+			const expected = globalId.x.add( globalId.y.mul( uint( 64 ) ).mul( numWorkgroups.x ) ).add( globalId.z.mul( uint( 64 ) ).mul( numWorkgroups.x ).mul( numWorkgroups.y ) );
 
 			assert.eq(
-				globalInvocationIndex,
 				instanceIndex,
-				'globalInvocationIndex equals the linearized compute instanceIndex'
+				expected,
+				'instanceIndex equals the 3D globalId linearization'
 			);
 
-		} );
+		}, { backends: [ 'webgpu' ] } );
 
 		gpuFuzzTest( 'workgroupIndex matches 1D instanceIndex / workgroup size', 256, ( { assert } ) => {
 

@@ -337,6 +337,14 @@ class WGSLNodeBuilder extends NodeBuilder {
 		this.directives = {};
 
 		/**
+		 * A dictionary that holds for each shader stage a Set of WGSL
+		 * language-extension `requires` directives.
+		 *
+		 * @type {Object<string,Set<string>>}
+		 */
+		this.requires = {};
+
+		/**
 		 * A map for managing scope arrays. Only relevant for when using
 		 * {@link WorkgroupInfoNode} in context of compute shaders.
 		 *
@@ -1540,7 +1548,11 @@ ${ flowData.code }
 
 	/**
 	 * Contextually returns either the vertex stage instance index builtin
-	 * or the linearized index of an compute invocation within a grid of workgroups.
+	 * or the linearized index of a compute invocation within a grid of workgroups.
+	 *
+	 * Uses WGSL `@builtin(global_invocation_index)` when the `linear_indexing`
+	 * language feature is available, otherwise a private `instanceIndex`
+	 * linearized from `global_invocation_id` in the compute entry point.
 	 *
 	 * @return {string} The instance index.
 	 */
@@ -1552,10 +1564,42 @@ ${ flowData.code }
 
 		}
 
+		if ( this.renderer.backend.hasLanguageFeature( 'linear_indexing' ) ) {
+
+			this.requireDirective( 'linear_indexing' );
+
+			return this.getBuiltin( 'global_invocation_index', 'instanceIndex', 'u32', 'attribute' );
+
+		}
+
 		return 'instanceIndex';
 
 	}
 
+	/**
+	 * Returns the linearized index of the current workgroup within the compute dispatch.
+	 *
+	 * Uses WGSL `@builtin(workgroup_index)` when the `linear_indexing` language
+	 * feature is available, otherwise `workgroup_id` flattened against `num_workgroups`.
+	 *
+	 * @return {string} The workgroup index.
+	 */
+	getWorkgroupIndex() {
+
+		if ( this.renderer.backend.hasLanguageFeature( 'linear_indexing' ) ) {
+
+			this.requireDirective( 'linear_indexing' );
+
+			return this.getBuiltin( 'workgroup_index', 'workgroupIndex', 'u32', 'attribute' );
+
+		}
+
+		this.getBuiltin( 'workgroup_id', 'workgroupId', 'vec3<u32>', 'attribute' );
+		this.getBuiltin( 'num_workgroups', 'numWorkgroups', 'vec3<u32>', 'attribute' );
+
+		return '( workgroupId.x + workgroupId.y * numWorkgroups.x + workgroupId.z * numWorkgroups.x * numWorkgroups.y )';
+
+	}
 
 	/**
 	 * Returns a builtin representing the index of a compute invocation within the scope of a workgroup load.
@@ -1687,10 +1731,23 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Records a WGSL `requires` directive for the given language extension.
+	 *
+	 * @param {string} name - The language extension name.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage to require the extension for.
+	 */
+	requireDirective( name, shaderStage = this.shaderStage ) {
+
+		const stage = this.requires[ shaderStage ] || ( this.requires[ shaderStage ] = new Set() );
+		stage.add( name );
+
+	}
+
+	/**
 	 * Returns the directives of the given shader stage as a WGSL string.
 	 *
 	 * @param {string} shaderStage - The shader stage.
-	 * @return {string} A WGSL snippet that enables the directives of the given stage.
+	 * @return {string} A WGSL snippet that enables and requires the directives of the given stage.
 	 */
 	getDirectives( shaderStage ) {
 
@@ -1702,6 +1759,18 @@ ${ flowData.code }
 			for ( const directive of directives ) {
 
 				snippets.push( `enable ${directive};` );
+
+			}
+
+		}
+
+		const requires = this.requires[ shaderStage ];
+
+		if ( requires !== undefined ) {
+
+			for ( const name of requires ) {
+
+				snippets.push( `requires ${name};` );
 
 			}
 
@@ -2669,15 +2738,26 @@ fn main( ${shaderData.varyings} ) -> ${shaderData.returnType} {
 	_getWGSLComputeCode( shaderData, workgroupSize ) {
 
 		const [ workgroupSizeX, workgroupSizeY, workgroupSizeZ ] = workgroupSize;
+		const useNativeLinearIndex = this.renderer.backend.hasLanguageFeature( 'linear_indexing' );
+
+		const systemDecl = useNativeLinearIndex ? '' : `// system
+var<private> instanceIndex : u32;
+
+`;
+
+		const systemInit = useNativeLinearIndex ? '' : `
+	// system
+	instanceIndex = globalId.x
+		+ globalId.y * ( ${ workgroupSizeX } * numWorkgroups.x )
+		+ globalId.z * ( ${ workgroupSizeX } * numWorkgroups.x ) * ( ${ workgroupSizeY } * numWorkgroups.y );
+
+`;
 
 		return `${ this.getSignature() }
 // directives
 ${ shaderData.directives }
 
-// system
-var<private> instanceIndex : u32;
-
-// locals
+${ systemDecl }// locals
 ${ shaderData.scopedArrays }
 
 // structs
@@ -2697,12 +2777,7 @@ fn main( ${ shaderData.attributes } ) {
 
 	// local vars
 	${ this.allowGlobalVariables ? '' : shaderData.vars }
-
-	// system
-	instanceIndex = globalId.x
-		+ globalId.y * ( ${ workgroupSizeX } * numWorkgroups.x )
-		+ globalId.z * ( ${ workgroupSizeX } * numWorkgroups.x ) * ( ${ workgroupSizeY } * numWorkgroups.y );
-
+${ systemInit }
 	// flow
 	${ shaderData.flow }
 

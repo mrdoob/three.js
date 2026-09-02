@@ -1253,6 +1253,24 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Returns the linearized index of the current workgroup within the compute dispatch.
+	 *
+	 * WebGL has no workgroup builtins; `gl_InstanceID` is already linearized,
+	 * so this is `instanceIndex / workgroupSize`.
+	 *
+	 * @return {string} The workgroup index.
+	 */
+	getWorkgroupIndex() {
+
+		const workgroupSize = this.compute.workgroupSize;
+
+		const size = workgroupSize.reduce( ( acc, curr ) => acc * curr, 1 );
+
+		return `uint( gl_InstanceID ) / ${size}u`;
+
+	}
+
+	/**
 	 * Returns a builtin representing the size of a subgroup within the current shader.
 	 */
 	getSubgroupSize() {
