@@ -19,6 +19,10 @@ const MaterialXLogCodes = {
 		label: 'invalid-value',
 		severity: 'error',
 	},
+	TEXTURE_LOAD_FAILED: {
+		label: 'texture-load-failed',
+		severity: 'error',
+	},
 	UNKNOWN_INPUT: {
 		label: 'unknown-input',
 		severity: 'error',
