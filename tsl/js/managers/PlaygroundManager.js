@@ -273,10 +273,14 @@ class PlaygroundManager {
 
 		}
 
+		let draggedTabName = null;
+
 		this.playgroundTabs.forEach( ( tab ) => {
 
 			const tabEl = document.createElement( 'div' );
 			tabEl.className = 'playground-tab';
+			tabEl.draggable = true;
+
 			if ( tab.name === this.activePlaygroundTabName ) {
 
 				tabEl.classList.add( 'active' );
@@ -305,9 +309,107 @@ class PlaygroundManager {
 
 			}
 
+			let isDragging = false;
+
+			tabEl.ondragstart = ( e ) => {
+
+				draggedTabName = tab.name;
+				isDragging = true;
+				tabEl.classList.add( 'dragging' );
+				e.dataTransfer.effectAllowed = 'move';
+				e.dataTransfer.setData( 'text/plain', tab.name );
+
+			};
+
+			tabEl.ondragend = () => {
+
+				tabEl.classList.remove( 'dragging' );
+				this.tour.dom.tabsBar.querySelectorAll( '.playground-tab' ).forEach( el => {
+
+					el.classList.remove( 'drag-over-left', 'drag-over-right' );
+
+				} );
+				draggedTabName = null;
+				setTimeout( () => {
+
+					isDragging = false;
+
+				}, 0 );
+
+			};
+
+			tabEl.ondragover = ( e ) => {
+
+				e.preventDefault();
+				e.dataTransfer.dropEffect = 'move';
+
+				if ( draggedTabName && draggedTabName !== tab.name ) {
+
+					const rect = tabEl.getBoundingClientRect();
+					const midX = rect.left + rect.width / 2;
+
+					if ( e.clientX < midX ) {
+
+						tabEl.classList.add( 'drag-over-left' );
+						tabEl.classList.remove( 'drag-over-right' );
+
+					} else {
+
+						tabEl.classList.add( 'drag-over-right' );
+						tabEl.classList.remove( 'drag-over-left' );
+
+					}
+
+				}
+
+			};
+
+			tabEl.ondragleave = () => {
+
+				tabEl.classList.remove( 'drag-over-left', 'drag-over-right' );
+
+			};
+
+			tabEl.ondrop = ( e ) => {
+
+				e.preventDefault();
+				tabEl.classList.remove( 'drag-over-left', 'drag-over-right' );
+
+				const sourceName = e.dataTransfer.getData( 'text/plain' ) || draggedTabName;
+				if ( ! sourceName || sourceName === tab.name ) return;
+
+				const fromIndex = this.playgroundTabs.findIndex( t => t.name === sourceName );
+				let toIndex = this.playgroundTabs.findIndex( t => t.name === tab.name );
+
+				if ( fromIndex === - 1 || toIndex === - 1 ) return;
+
+				const rect = tabEl.getBoundingClientRect();
+				const midX = rect.left + rect.width / 2;
+				const isRight = e.clientX >= midX;
+
+				const [ movedTab ] = this.playgroundTabs.splice( fromIndex, 1 );
+
+				toIndex = this.playgroundTabs.findIndex( t => t.name === tab.name );
+				if ( isRight ) {
+
+					toIndex ++;
+
+				}
+
+				this.playgroundTabs.splice( toIndex, 0, movedTab );
+
+				this.renderPlaygroundTabs();
+				this.updatePlaygroundHash( true );
+
+			};
+
 			tabEl.onclick = () => {
 
-				this.activatePlaygroundTab( tab.name );
+				if ( ! isDragging ) {
+
+					this.activatePlaygroundTab( tab.name );
+
+				}
 
 			};
 

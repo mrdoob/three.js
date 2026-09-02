@@ -2373,6 +2373,19 @@ body.preview-maximized .preview-hide-btn {
 	border-bottom: 2px solid #007acc;
 }
 
+.playground-tab.dragging {
+	opacity: 0.4;
+	cursor: grabbing;
+}
+
+.playground-tab.drag-over-left {
+	box-shadow: inset 2px 0 0 0 #007acc;
+}
+
+.playground-tab.drag-over-right {
+	box-shadow: inset -2px 0 0 0 #007acc;
+}
+
 .playground-tab-label {
 	white-space: nowrap;
 }
