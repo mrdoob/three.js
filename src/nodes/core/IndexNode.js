@@ -133,7 +133,7 @@ export const vertexIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.VER
  * ```js
  * // instanceIndex will equal the current mesh's instance index between 0-500
  * const material = new THREE.BasicNodeMaterial();
- * material.positionNode = vec3( instanceIndex.mul( 2 ), instanceIndex.mul( 2 ), 0 );
+ * material.positionNode = vec3( instanceIndex.mod( 10 ), instanceIndex.div( 10 ), 0 );
  * const mesh = new THREE.InstancedMesh( geometry, material, 500 );
  * ```
  *
