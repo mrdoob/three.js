@@ -39,9 +39,11 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { uniform, varying, vec4, add, sub, max, dot, sin, mat3, uint, negate, instancedArray, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, float, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length, vertexIndex } from 'three/tsl';
+			import { uniform, varying, vec4, add, sub, max, dot, sin, mat3, uint, int, ivec3, negate, atomicLoad, instancedArray, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, float, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length, vertexIndex } from 'three/tsl';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import { CountingSort } from 'three/addons/gpgpu/CountingSort.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -55,9 +57,12 @@
 			let pointer, raycaster;
 			let computeVelocity, computePosition, effectController;
 
-			const BIRDS = 8192;
+			const BIRDS = 16384;
 			const SPEED_LIMIT = 9.0;
 			const BOUNDS = 800, BOUNDS_HALF = BOUNDS / 2;
+			const CELL_COUNT = BIRDS;
+
+			let sort;
 
 			// Custom Geometry - using 3 triangles each. No normals currently.
 			class BirdGeometry extends THREE.BufferGeometry {
@@ -112,8 +117,6 @@
 				}
 
 			}
-
-			// TODO: Fix example with WebGL backend
 
 			if ( WebGPU.isAvailable() === false ) {
 
@@ -227,6 +230,40 @@
 					rayDirection: uniform( new THREE.Vector3() ).setName( 'rayDirection' )
 				};
 
+				// Hash cell size equal to bird interaction size or 1
+			
+				const zoneRadiusNode = effectController.separation.add( effectController.alignment ).add( effectController.cohesion );
+				const cellSizeNode = zoneRadiusNode.max( 1.0 );
+
+				const cellOf = ( position ) => ivec3( position.div( cellSizeNode ).floor() );
+
+				// Adapted from https://github.com/silvernio/gpu-life/blob/main/src/countingSort/cell.wgsl
+
+				const hashCell = Fn( ( [ cell ] ) => {
+
+					const bias = uint( 0x80000000 );
+
+					const x = uint( cell.x ).add( bias ).mul( uint( 0x9E3779B1 ) );
+					const y = uint( cell.y ).add( bias ).mul( uint( 0x85EBCA6B ) );
+					const z = uint( cell.z ).add( bias ).mul( uint( 0xC2B2AE35 ) );
+
+					const h = x.add( y ).add( z ).toVar( 'h' );
+
+					h.assign( h.bitXor( h.shiftRight( uint( 16 ) ) ) );
+					h.mulAssign( uint( 0x7FEB352D ) );
+					h.assign( h.bitXor( h.shiftRight( uint( 15 ) ) ) );
+					h.mulAssign( uint( 0x846CA68B ) );
+					h.assign( h.bitXor( h.shiftRight( uint( 16 ) ) ) );
+
+					return h.mod( uint( CELL_COUNT ) );
+
+				} );
+
+				// bird particles sorted by their cell hashes
+			
+				sort = new CountingSort( BIRDS, { binCount: CELL_COUNT } );
+				sort.setBinNode( () => hashCell( cellOf( positionStorage.element( instanceIndex ) ) ) );
+			
 				// Create geometry
 
 				const birdGeometry = new BirdGeometry();
@@ -336,70 +373,94 @@
 					dirToCenter.y.mulAssign( 2.5 );
 					velocity.subAssign( normalize( dirToCenter ).mul( deltaTime ).mul( 5.0 ) );
 
-					Loop( { start: uint( 0 ), end: uint( BIRDS ), type: 'uint', condition: '<' }, ( { i } ) => {
+					// Apply flocking behavior by testing against behavior of birds that
+					// are close and within neighboring cells
 
-						If( i.equal( birdIndex ), () => {
+					const baseCell = cellOf( position ).toVar( 'baseCell' );
 
-							Continue();
+					Loop( { start: int( - 1 ), end: int( 2 ), type: 'int', condition: '<', name: 'dz' }, ( { dz } ) => {
 
-						} );
+						Loop( { start: int( - 1 ), end: int( 2 ), type: 'int', condition: '<', name: 'dy' }, ( { dy } ) => {
 
-						// Cache bird's position and velocity
+							Loop( { start: int( - 1 ), end: int( 2 ), type: 'int', condition: '<', name: 'dx' }, ( { dx } ) => {
 
-						const birdPosition = positionStorage.element( i );
-						const dirToBird = birdPosition.sub( position );
-						const distToBird = length( dirToBird );
+								const cell = hashCell( baseCell.add( ivec3( dx, dy, dz ) ) ).toVar( 'cell' );
 
-						If( distToBird.lessThan( 0.0001 ), () => {
+								const cellEnd = atomicLoad( sort.offsetAtomic.element( cell ) ).toVar( 'cellEnd' );
+								const cellStart = cellEnd.sub( atomicLoad( sort.histogramAtomic.element( cell ) ) ).toVar( 'cellStart' );
 
-							Continue();
+								Loop( { start: cellStart, end: cellEnd, type: 'uint', condition: '<', name: 'slot' }, ( { slot } ) => {
+			
+									const i = sort.orderRead.element( slot ).toVar( 'i' );
 
-						} );
+									If( i.equal( birdIndex ), () => {
 
-						const distToBirdSq = distToBird.mul( distToBird );
+										Continue();
 
-						// Don't apply any changes to velocity if changes if the bird is outsize the zone's radius.
-						If( distToBirdSq.greaterThan( zoneRadiusSq ), () => {
+									} );
 
-							Continue();
+									// Cache bird's position and velocity
 
-						} );
+									const birdPosition = positionStorage.element( i );
+									const dirToBird = birdPosition.sub( position );
+									const distToBird = length( dirToBird );
 
-						// Determine which threshold the bird is flying within and adjust its velocity accordingly
+									If( distToBird.lessThan( 0.0001 ), () => {
 
-						const percent = distToBirdSq.div( zoneRadiusSq );
+										Continue();
 
-						If( percent.lessThan( separationThresh ), () => {
+									} );
 
-							// Separation - Move apart for comfort
-							const velocityAdjust = ( separationThresh.div( percent ).sub( 1.0 ) ).mul( deltaTime );
-							velocity.subAssign( normalize( dirToBird ).mul( velocityAdjust ) );
+									const distToBirdSq = distToBird.mul( distToBird );
 
-						} ).ElseIf( percent.lessThan( alignmentThresh ), () => {
+									// Don't apply any changes to velocity if changes if the bird is outsize the zone's radius.
+									If( distToBirdSq.greaterThan( zoneRadiusSq ), () => {
 
-							// Alignment - fly the same direction
-							const threshDelta = alignmentThresh.sub( separationThresh );
-							const adjustedPercent = ( percent.sub( separationThresh ) ).div( threshDelta );
-							const birdVelocity = velocityStorage.element( i );
+										Continue();
 
-							const cosRange = cos( adjustedPercent.mul( PI_2 ) );
-							const cosRangeAdjust = float( 0.5 ).sub( cosRange.mul( 0.5 ) ).add( 0.5 );
-							const velocityAdjust = cosRangeAdjust.mul( deltaTime );
-							velocity.addAssign( normalize( birdVelocity ).mul( velocityAdjust ) );
+									} );
 
-						} ).Else( () => {
+									// Determine which threshold the bird is flying within and adjust its velocity accordingly
 
-							// Attraction / Cohesion - move closer
-							const threshDelta = alignmentThresh.oneMinus();
-							const adjustedPercent = threshDelta.equal( 0.0 ).select( 1.0, ( percent.sub( alignmentThresh ) ).div( threshDelta ) );
+									const percent = distToBirdSq.div( zoneRadiusSq );
 
-							const cosRange = cos( adjustedPercent.mul( PI_2 ) );
-							const adj1 = cosRange.mul( - 0.5 );
-							const adj2 = adj1.add( 0.5 );
-							const adj3 = float( 0.5 ).sub( adj2 );
+									If( percent.lessThan( separationThresh ), () => {
 
-							const velocityAdjust = adj3.mul( deltaTime );
-							velocity.addAssign( normalize( dirToBird ).mul( velocityAdjust ) );
+										// Separation - Move apart for comfort
+										const velocityAdjust = ( separationThresh.div( percent ).sub( 1.0 ) ).mul( deltaTime );
+										velocity.subAssign( normalize( dirToBird ).mul( velocityAdjust ) );
+
+									} ).ElseIf( percent.lessThan( alignmentThresh ), () => {
+
+										// Alignment - fly the same direction
+										const threshDelta = alignmentThresh.sub( separationThresh );
+										const adjustedPercent = ( percent.sub( separationThresh ) ).div( threshDelta );
+										const birdVelocity = velocityStorage.element( i );
+
+										const cosRange = cos( adjustedPercent.mul( PI_2 ) );
+										const cosRangeAdjust = float( 0.5 ).sub( cosRange.mul( 0.5 ) ).add( 0.5 );
+										const velocityAdjust = cosRangeAdjust.mul( deltaTime );
+										velocity.addAssign( normalize( birdVelocity ).mul( velocityAdjust ) );
+
+									} ).Else( () => {
+
+										// Attraction / Cohesion - move closer
+										const threshDelta = alignmentThresh.oneMinus();
+										const adjustedPercent = threshDelta.equal( 0.0 ).select( 1.0, ( percent.sub( alignmentThresh ) ).div( threshDelta ) );
+
+										const cosRange = cos( adjustedPercent.mul( PI_2 ) );
+										const adj1 = cosRange.mul( - 0.5 );
+										const adj2 = adj1.add( 0.5 );
+										const adj3 = float( 0.5 ).sub( adj2 );
+
+										const velocityAdjust = adj3.mul( deltaTime );
+										velocity.addAssign( normalize( dirToBird ).mul( velocityAdjust ) );
+
+									} );
+
+								} );
+
+							} );
 
 						} );
 
@@ -475,6 +536,8 @@
 				effectController.deltaTime.value = deltaTime;
 				effectController.rayOrigin.value.copy( raycaster.ray.origin );
 				effectController.rayDirection.value.copy( raycaster.ray.direction );
+
+				sort.compute( renderer );
 
 				renderer.compute( computeVelocity );
 				renderer.compute( computePosition );
