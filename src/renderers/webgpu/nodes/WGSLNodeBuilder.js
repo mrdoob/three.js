@@ -337,6 +337,14 @@ class WGSLNodeBuilder extends NodeBuilder {
 		this.directives = {};
 
 		/**
+		 * A dictionary that holds for each shader stage a Set of WGSL
+		 * language-extension `requires` directives.
+		 *
+		 * @type {Object<string,Set<string>>}
+		 */
+		this.requires = {};
+
+		/**
 		 * A map for managing scope arrays. Only relevant for when using
 		 * {@link WorkgroupInfoNode} in context of compute shaders.
 		 *
@@ -1597,13 +1605,52 @@ ${ flowData.code }
 	/**
 	 * Returns a builtin representing the index of a compute invocation's subgroup within its workgroup.
 	 *
+	 * Uses WGSL `@builtin(subgroup_id)` when the `subgroup_id` language feature
+	 * is available, otherwise `local_invocation_index / subgroup_size`.
+	 *
 	 * @return {string} The subgroup index.
 	 */
 	getSubgroupIndex() {
 
 		this.enableSubGroups();
 
-		return this.getBuiltin( 'subgroup_id', 'subgroupIndex', 'u32', 'attribute' );
+		if ( this.renderer.hasFeature( 'subgroups' ) && this.renderer.backend.hasLanguageFeature( 'subgroup_id' ) ) {
+
+			this.requireDirective( 'subgroup_id' );
+
+			return this.getBuiltin( 'subgroup_id', 'subgroupIndex', 'u32', 'attribute' );
+
+		}
+
+		return `( ${ this.getInvocationLocalIndex() } / ${ this.getSubgroupSize() } )`;
+
+	}
+
+	/**
+	 * Returns a builtin representing the number of subgroups in the current workgroup.
+	 *
+	 * Uses WGSL `@builtin(num_subgroups)` when the `subgroup_id` language feature
+	 * is available, otherwise `ceil(workgroup_size / subgroup_size)`.
+	 *
+	 * @return {string} The number of subgroups.
+	 */
+	getNumSubgroups() {
+
+		this.enableSubGroups();
+
+		if ( this.renderer.hasFeature( 'subgroups' ) && this.renderer.backend.hasLanguageFeature( 'subgroup_id' ) ) {
+
+			this.requireDirective( 'subgroup_id' );
+
+			return this.getBuiltin( 'num_subgroups', 'numSubgroups', 'u32', 'attribute' );
+
+		}
+
+		const workgroupSize = this.compute.workgroupSize;
+		const volume = workgroupSize[ 0 ] * workgroupSize[ 1 ] * workgroupSize[ 2 ];
+		const subgroupSize = this.getSubgroupSize();
+
+		return `( ( ${ volume }u + ${ subgroupSize } - 1u ) / ${ subgroupSize } )`;
 
 	}
 
@@ -1687,10 +1734,23 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Records a WGSL `requires` directive for the given language extension.
+	 *
+	 * @param {string} name - The language extension name.
+	 * @param {string} [shaderStage=this.shaderStage] - The shader stage to require the extension for.
+	 */
+	requireDirective( name, shaderStage = this.shaderStage ) {
+
+		const stage = this.requires[ shaderStage ] || ( this.requires[ shaderStage ] = new Set() );
+		stage.add( name );
+
+	}
+
+	/**
 	 * Returns the directives of the given shader stage as a WGSL string.
 	 *
 	 * @param {string} shaderStage - The shader stage.
-	 * @return {string} A WGSL snippet that enables the directives of the given stage.
+	 * @return {string} A WGSL snippet that enables and requires the directives of the given stage.
 	 */
 	getDirectives( shaderStage ) {
 
@@ -1702,6 +1762,18 @@ ${ flowData.code }
 			for ( const directive of directives ) {
 
 				snippets.push( `enable ${directive};` );
+
+			}
+
+		}
+
+		const requires = this.requires[ shaderStage ];
+
+		if ( requires !== undefined ) {
+
+			for ( const name of requires ) {
+
+				snippets.push( `requires ${name};` );
 
 			}
 

@@ -426,6 +426,7 @@ export const normalWorldGeometry = TSL.normalWorldGeometry;
 export const normalize = TSL.normalize;
 export const not = TSL.not;
 export const notEqual = TSL.notEqual;
+export const numSubgroups = TSL.numSubgroups;
 export const numWorkgroups = TSL.numWorkgroups;
 export const objectDirection = TSL.objectDirection;
 export const objectGroup = TSL.objectGroup;

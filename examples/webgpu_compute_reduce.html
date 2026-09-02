@@ -194,7 +194,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { instancedArray, Loop, If, vec3, dot, clamp, storage, uvec4, subgroupAdd, uniform, uv, uint, float, Fn, vec2, invocationLocalIndex, invocationSubgroupIndex, uvec2, floor, instanceIndex, workgroupId, workgroupBarrier, workgroupArray, subgroupSize, select, countTrailingZeros } from 'three/tsl';
+			import { instancedArray, Loop, If, vec3, dot, clamp, storage, uvec4, subgroupAdd, uniform, uv, uint, float, Fn, vec2, invocationLocalIndex, invocationSubgroupIndex, uvec2, floor, instanceIndex, workgroupId, workgroupBarrier, workgroupArray, subgroupSize, subgroupIndex, numSubgroups, select, countTrailingZeros } from 'three/tsl';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
@@ -648,16 +648,14 @@
 				// Assign sum of all values in subgroup to total
 				total.assign( subgroupAdd( total ) );
 
-				const delta = uint( workgroupSize ).div( subgroupSize ).toVar( 'delta' );
-
-				const subgroupMetaRank = invocationLocalIndex.div( subgroupSize );
+				const delta = numSubgroups.toVar( 'delta' );
 
 				Loop( float( delta ).greaterThan( 1.0 ), () => {
 
 					If( invocationSubgroupIndex.equal( 0 ), () => {
 
 						// Each subgroup will populate the subgroupSums array
-						subgroupSums.element( subgroupMetaRank ).assign( total );
+						subgroupSums.element( subgroupIndex ).assign( total );
 
 					} );
 
@@ -743,12 +741,9 @@
 
 					const perSubgroupReductionArray = createSubgroupArray( 'uint', workgroupSize );
 
-					// Get the index of the subgroup within the workgroup
-					const subgroupMetaRank = invocationLocalIndex.div( subgroupSize );
-
 					// Each subgroup block scans across 4 subgroups. So when we move into a new subgroup,
 					// align that subgroups' accesses to the next 4 subgroups
-					const subgroupOffset = subgroupMetaRank.mul( subgroupSize ).mul( workPerThread );
+					const subgroupOffset = subgroupIndex.mul( subgroupSize ).mul( workPerThread );
 					subgroupOffset.addAssign( invocationSubgroupIndex );
 
 					// Per workgroup, offset by number of vectorized elements scanned per workgroup
@@ -811,7 +806,7 @@
 					// Delegate one thread per subgroup to assign each subgroup's reduction to the workgroup array
 					If( invocationSubgroupIndex.equal( uint( 0 ) ), () => {
 
-						perSubgroupReductionArray.element( subgroupMetaRank ).assign( subgroupReduction );
+						perSubgroupReductionArray.element( subgroupIndex ).assign( subgroupReduction );
 
 					} );
 
@@ -857,25 +852,25 @@
 					// we need to iterate over the array again to capture all the data in the workgroup array buffer
 					Loop( { start: subgroupSize, end: alignedSize, condition: '<=', name: 'j', type: 'uint', update: '<<= subgroupSizeLog' }, () => {
 
-						const subgroupIndex = ( ( invocationLocalIndex.add( 1 ) ).shiftLeft( offset ) ).sub( 1 );
+						const spineIndex = ( ( invocationLocalIndex.add( 1 ) ).shiftLeft( offset ) ).sub( 1 );
 
-						const isValidSubgroupIndex = subgroupIndex.lessThan( spineSize ).toVar( 'isValidSubgroupIndex' );
+						const isValidSpineIndex = spineIndex.lessThan( spineSize ).toVar( 'isValidSpineIndex' );
 
 						// Reduce values within the local workgroup memory.
 						// Set toVar to ensure subgroupAdd executes before (not within) the if statement.
 						const t = subgroupAdd(
 							select(
-								isValidSubgroupIndex,
-								perSubgroupReductionArray.element( subgroupIndex ),
+								isValidSpineIndex,
+								perSubgroupReductionArray.element( spineIndex ),
 								0
 							).uniformFlow()
 						).toVar( 't' );
 
 						// Can assign back to workgroupArray since all
 						// subgroup threads work in lockstop for subgroupAdd
-						If( isValidSubgroupIndex, () => {
+						If( isValidSpineIndex, () => {
 
-							perSubgroupReductionArray.element( subgroupIndex ).assign( t );
+							perSubgroupReductionArray.element( spineIndex ).assign( t );
 
 						} );
 

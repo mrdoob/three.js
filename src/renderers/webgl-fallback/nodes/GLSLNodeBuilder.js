@@ -1280,6 +1280,15 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Returns a builtin representing the number of subgroups in the current workgroup.
+	 */
+	getNumSubgroups() {
+
+		error( 'GLSLNodeBuilder: WebGLBackend does not support the numSubgroups node' );
+
+	}
+
+	/**
 	 * Returns the draw index builtin.
 	 *
 	 * @return {?string} The drawIndex shader string. Returns `null` if `WEBGL_multi_draw` isn't supported by the device.

@@ -658,6 +658,23 @@ class Backend {
 	hasFeature( /*name*/ ) {}
 
 	/**
+	 * Checks if the given WGSL language feature is supported by the backend.
+	 *
+	 * Language features are distinct from GPU device features: they are
+	 * advertised on `GPU.wgslLanguageFeatures` and enabled in shaders with
+	 * a `requires` directive rather than `enable`.
+	 *
+	 * @abstract
+	 * @param {string} name - The language feature's name.
+	 * @return {boolean} Whether the language feature is supported or not.
+	 */
+	hasLanguageFeature( /*name*/ ) {
+
+		return false;
+
+	}
+
+	/**
 	 * Returns the drawing buffer size.
 	 *
 	 * @return {Vector2} The drawing buffer size.

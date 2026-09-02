@@ -134,6 +134,8 @@ export const instanceIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.I
 
 /**
  * TSL object that represents the index of the subgroup the current compute invocation belongs to.
+ * Maps to WGSL `subgroup_id` when that language feature is available, otherwise
+ * `local_invocation_index / subgroup_size`.
  *
  * @tsl
  * @type {IndexNode}

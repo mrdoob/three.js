@@ -106,6 +106,12 @@ class ComputeBuiltinNode extends Node {
 
 		if ( builder.shaderStage === 'compute' ) {
 
+			if ( builtinName === 'numSubgroups' ) {
+
+				return builder.format( builder.getNumSubgroups(), nodeType, output );
+
+			}
+
 			return builder.format( builtinName, nodeType, output );
 
 		} else {
@@ -216,6 +222,16 @@ export const globalId = /*@__PURE__*/ computeBuiltin( 'globalId', 'uvec3' );
  * @type {ComputeBuiltinNode<uvec3>}
  */
 export const localId = /*@__PURE__*/ computeBuiltin( 'localId', 'uvec3' );
+
+/**
+ * The number of subgroups in the current workgroup.
+ * Maps to WGSL `num_subgroups` when that language feature is available, otherwise
+ * `ceil(workgroup_size / subgroup_size)`.
+ *
+ * @tsl
+ * @type {ComputeBuiltinNode<uint>}
+ */
+export const numSubgroups = /*@__PURE__*/ computeBuiltin( 'numSubgroups', 'uint' );
 
 /**
  * A device dependent variable that exposes the size of the current invocation's subgroup.
