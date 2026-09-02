@@ -466,7 +466,7 @@ class MaterialXNode {
 
 			}
 
-			node = this.materialX.compileContext.getTexcoordNode( index );
+			node = this.materialX.compileContext.mxToBottomLeftUvSpace( uv( index ) );
 
 		} else {
 
@@ -731,11 +731,6 @@ class MaterialXNode {
 
 			shaderProperties.setMaterial( material );
 
-			// Keep the raw MaterialX graph reachable for tools that need to
-			// inspect it before the compiled TSL graph loses authoring intent.
-			material.materialXSurfaceShaderNode = shaderProperties;
-			material.materialXDocument = this.materialX;
-
 		}
 
 		return material;
@@ -822,7 +817,6 @@ class MaterialXDocument {
 			compileRegistry: COMPILE_REGISTRY,
 			nodeLibrary: MtlXLibrary,
 			...bottomLeftUvSpaceHelpers,
-			getTexcoordNode: ( index = 0 ) => bottomLeftUvSpaceHelpers.mxToBottomLeftUvSpace( uv( index ) ),
 			mxTransformUv: mx_transform_uv,
 			mxHextileCoord,
 			mxHextileComputeBlendWeights,
