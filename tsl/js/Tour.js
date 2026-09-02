@@ -12,6 +12,7 @@ import { HistoryManager } from './managers/HistoryManager.js';
 import { LayoutManager } from './managers/LayoutManager.js';
 import { ConsoleManager } from './managers/ConsoleManager.js';
 import { PlaygroundManager } from './managers/PlaygroundManager.js';
+import { ProjectsManager } from './managers/ProjectsManager.js';
 import { getSVG, compressString } from './utils/TourUtils.js';
 import mermaid from 'mermaid';
 
@@ -82,6 +83,7 @@ class Tour {
 		this.layoutManager = new LayoutManager( this );
 		this.consoleManager = new ConsoleManager( this );
 		this.playgroundManager = new PlaygroundManager( this );
+		this.projectsManager = new ProjectsManager( this );
 
 		this.lastTourPageHash = '';
 		this.lastHandledHash = initialHash;
@@ -940,7 +942,35 @@ class Tour {
 
 		this.dom.previewPlayground.onclick = () => {
 
-			this.dom.playgroundBtn.click();
+			const activePage = this.pages[ this.currentPageIndex ];
+			let currentCode = '// Tour of TSL\n';
+
+			if ( activePage && activePage.hasCode ) {
+
+				currentCode = this.codeEditor ? this.codeEditor.getValue() : activePage.code;
+
+			}
+
+			if ( this.playgroundManager.hasActiveCustomProject() ) {
+
+				this.projectsManager.confirmCloseCurrentProject(
+					() => {
+
+						this.playgroundManager.loadExampleIntoPlayground( currentCode );
+
+					},
+					() => {
+
+						this.playgroundManager.loadExampleIntoPlayground( currentCode );
+
+					}
+				);
+
+			} else {
+
+				this.playgroundManager.loadExampleIntoPlayground( currentCode );
+
+			}
 
 		};
 
@@ -1138,23 +1168,7 @@ class Tour {
 
 				} else {
 
-					const activePage = this.pages[ this.currentPageIndex ];
-					let currentCode = '';
-
-					if ( activePage && ! activePage.hasCode ) {
-
-						currentCode = '// Tour of TSL\n';
-
-					} else {
-
-						currentCode = this.codeEditor ? this.codeEditor.getValue() : '';
-
-					}
-
-					const encoded = await compressString( currentCode );
-					const release = THREE.RELEASE || THREE.REVISION;
-					const newHash = 'playground=' + encoded + ( release ? '&release=' + release : '' );
-					window.location.hash = newHash;
+					await this.playgroundManager.openExistingPlayground();
 
 				}
 

@@ -266,6 +266,109 @@ class PlaygroundManager {
 		this.tour.dom.tabsBar.style.display = 'flex';
 		this.tour.dom.tabsBar.innerHTML = '';
 
+		const scrollWrapper = document.createElement( 'div' );
+		scrollWrapper.className = 'playground-tabs-scroll-wrapper';
+
+		const tabsScrollContainer = document.createElement( 'div' );
+		tabsScrollContainer.className = 'playground-tabs-scroll-container';
+
+		const customScrollbar = document.createElement( 'div' );
+		customScrollbar.className = 'playground-custom-scrollbar';
+		const thumb = document.createElement( 'div' );
+		thumb.className = 'playground-custom-scrollbar-thumb';
+		customScrollbar.appendChild( thumb );
+
+		const updateScrollThumb = () => {
+
+			const { clientWidth, scrollWidth, scrollLeft } = tabsScrollContainer;
+			if ( scrollWidth <= clientWidth + 2 ) {
+
+				customScrollbar.style.display = 'none';
+				return;
+
+			}
+
+			customScrollbar.style.display = 'block';
+			const thumbWidth = Math.max( 28, ( clientWidth / scrollWidth ) * clientWidth );
+			const maxScroll = scrollWidth - clientWidth;
+			const maxThumbLeft = clientWidth - thumbWidth;
+			const thumbLeft = maxScroll > 0 ? ( scrollLeft / maxScroll ) * maxThumbLeft : 0;
+
+			thumb.style.width = `${thumbWidth}px`;
+			thumb.style.transform = `translateX(${thumbLeft}px)`;
+
+		};
+
+		tabsScrollContainer.addEventListener( 'scroll', updateScrollThumb );
+
+		tabsScrollContainer.addEventListener( 'wheel', ( e ) => {
+
+			if ( e.deltaY !== 0 ) {
+
+				e.preventDefault();
+				tabsScrollContainer.scrollLeft += e.deltaY;
+
+			}
+
+		}, { passive: false } );
+
+		// Dragging thumb
+		let isDraggingThumb = false;
+		let startX = 0;
+		let startScrollLeft = 0;
+
+		thumb.onpointerdown = ( e ) => {
+
+			e.stopPropagation();
+			e.preventDefault();
+			isDraggingThumb = true;
+			startX = e.clientX;
+			startScrollLeft = tabsScrollContainer.scrollLeft;
+			thumb.classList.add( 'dragging' );
+			thumb.setPointerCapture( e.pointerId );
+
+		};
+
+		thumb.onpointermove = ( e ) => {
+
+			if ( ! isDraggingThumb ) return;
+			const dx = e.clientX - startX;
+			const { clientWidth, scrollWidth } = tabsScrollContainer;
+			const thumbWidth = thumb.offsetWidth;
+			const maxThumbLeft = clientWidth - thumbWidth;
+			const maxScroll = scrollWidth - clientWidth;
+			if ( maxThumbLeft > 0 ) {
+
+				const scrollDelta = ( dx / maxThumbLeft ) * maxScroll;
+				tabsScrollContainer.scrollLeft = startScrollLeft + scrollDelta;
+
+			}
+
+		};
+
+		thumb.onpointerup = ( e ) => {
+
+			isDraggingThumb = false;
+			thumb.classList.remove( 'dragging' );
+			try {
+
+				thumb.releasePointerCapture( e.pointerId );
+
+			} catch ( _ ) {}
+
+		};
+
+		customScrollbar.onclick = ( e ) => {
+
+			if ( e.target === thumb ) return;
+			const rect = customScrollbar.getBoundingClientRect();
+			const clickX = e.clientX - rect.left;
+			const { clientWidth, scrollWidth } = tabsScrollContainer;
+			const ratio = clickX / clientWidth;
+			tabsScrollContainer.scrollLeft = ratio * ( scrollWidth - clientWidth );
+
+		};
+
 		if ( ! this.playgroundTabs ) {
 
 			this.playgroundTabs = [ { name: 'main', code: '// Play here!\n' } ];
@@ -420,7 +523,7 @@ class PlaygroundManager {
 
 			};
 
-			this.tour.dom.tabsBar.appendChild( tabEl );
+			tabsScrollContainer.appendChild( tabEl );
 
 		} );
 
@@ -434,7 +537,26 @@ class PlaygroundManager {
 
 		};
 
-		this.tour.dom.tabsBar.appendChild( addBtn );
+		tabsScrollContainer.appendChild( addBtn );
+
+		scrollWrapper.appendChild( tabsScrollContainer );
+		scrollWrapper.appendChild( customScrollbar );
+
+		// Create Actions toolbar container pinned to the right
+		const actionsContainer = document.createElement( 'div' );
+		actionsContainer.className = 'playground-tabs-actions';
+
+		// Create Projects button
+		const projectsBtn = document.createElement( 'button' );
+		projectsBtn.className = 'playground-tab-btn playground-projects-btn';
+		projectsBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-upload" style="width: 16px; height: 16px; display: block;"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 9l5 -5l5 5" /><path d="M12 4l0 12" /></svg>';
+		projectsBtn.title = 'Playground Projects (Save, Load & JSON)';
+		projectsBtn.onclick = ( e ) => {
+
+			e.stopPropagation();
+			this.tour.projectsManager.openProjectsModal();
+
+		};
 
 		// Create Clean & Format button
 		const cleanBtn = document.createElement( 'button' );
@@ -485,10 +607,23 @@ class PlaygroundManager {
 
 		};
 
-		this.tour.dom.tabsBar.appendChild( cleanBtn );
-		this.tour.dom.tabsBar.appendChild( undoBtn );
-		this.tour.dom.tabsBar.appendChild( redoBtn );
-		this.tour.dom.tabsBar.appendChild( refreshBtn );
+		actionsContainer.appendChild( projectsBtn );
+		actionsContainer.appendChild( cleanBtn );
+		actionsContainer.appendChild( undoBtn );
+		actionsContainer.appendChild( redoBtn );
+		actionsContainer.appendChild( refreshBtn );
+
+		this.tour.dom.tabsBar.appendChild( scrollWrapper );
+		this.tour.dom.tabsBar.appendChild( actionsContainer );
+
+		const activeTabEl = tabsScrollContainer.querySelector( '.playground-tab.active' );
+		if ( activeTabEl ) {
+
+			activeTabEl.scrollIntoView( { behavior: 'smooth', block: 'nearest', inline: 'nearest' } );
+
+		}
+
+		setTimeout( updateScrollThumb, 0 );
 
 		this.updateUndoRedoButtons();
 
@@ -692,6 +827,8 @@ class PlaygroundManager {
 	async updatePlaygroundHash( pushHistory = false ) {
 
 		if ( ! this.playgroundTabs ) return;
+
+		this.tour.projectsManager.autoSaveCurrentProject();
 
 		const encoded = await compressString( JSON.stringify( {
 			tabs: this.playgroundTabs
@@ -941,6 +1078,81 @@ class PlaygroundManager {
 			this.tour.debugCodeEditor.setValue( 'WebGPURenderer debug.getShaderAsync is not available.' );
 
 		}
+
+	}
+
+	hasActiveCustomProject() {
+
+		if ( ! this.playgroundTabs || this.playgroundTabs.length === 0 ) return false;
+		if ( this.playgroundTabs.length > 1 ) return true;
+
+		const mainTab = this.playgroundTabs[ 0 ];
+		if ( ! mainTab ) return false;
+		if ( mainTab.name !== 'main' ) return true;
+
+		const code = ( mainTab.code || '' ).trim();
+		if ( ! code || code === '// Tour of TSL' || code === '// Play here!' || code === '// No example available.\nimport \'scenes/empty\';' ) {
+
+			return false;
+
+		}
+
+		return true;
+
+	}
+
+	async openExistingPlayground() {
+
+		if ( ! this.playgroundTabs || this.playgroundTabs.length === 0 ) {
+
+			const activePage = this.tour.pages[ this.tour.currentPageIndex ];
+			let currentCode = '// Tour of TSL\n';
+
+			if ( activePage && activePage.hasCode && this.tour.codeEditor ) {
+
+				currentCode = this.tour.codeEditor.getValue();
+
+			}
+
+			this.playgroundTabs = [ { name: 'main', code: currentCode } ];
+			this.activePlaygroundTabName = 'main';
+
+		}
+
+		this.togglePlayground( true );
+		this.renderPlaygroundTabs();
+
+		const activeTab = this.playgroundTabs.find( t => t.name === this.activePlaygroundTabName ) || this.playgroundTabs[ 0 ];
+		if ( this.tour.codeEditor ) {
+
+			this.tour.codeEditor.setValue( activeTab.code );
+
+		}
+
+		this.runPlayground();
+		await this.updatePlaygroundHash( false );
+
+	}
+
+	async loadExampleIntoPlayground( code ) {
+
+		this.tour.projectsManager.setCurrentProjectId( null );
+
+		const newCode = code || '// Tour of TSL\n';
+		this.playgroundTabs = [ { name: 'main', code: newCode } ];
+		this.activePlaygroundTabName = 'main';
+
+		this.togglePlayground( true );
+		this.renderPlaygroundTabs();
+
+		if ( this.tour.codeEditor ) {
+
+			this.tour.codeEditor.setValue( newCode );
+
+		}
+
+		this.runPlayground();
+		await this.updatePlaygroundHash( true );
 
 	}
 
