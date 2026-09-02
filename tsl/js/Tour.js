@@ -1143,7 +1143,7 @@ class Tour {
 
 					if ( activePage && ! activePage.hasCode ) {
 
-						currentCode = '// No example available.\nimport \'scenes/empty\';\n';
+						currentCode = '// Tour of TSL\n';
 
 					} else {
 
