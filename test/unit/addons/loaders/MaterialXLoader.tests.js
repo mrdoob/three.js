@@ -65,6 +65,24 @@ function createDocumentURL() {
 
 }
 
+function hasTextureImage( object, image, visited = new WeakSet(), depth = 0 ) {
+
+	if ( object === null || typeof object !== 'object' || depth > 10 ) return false;
+	if ( object.isTexture === true && object.image === image ) return true;
+	if ( visited.has( object ) ) return false;
+
+	visited.add( object );
+
+	for ( const key of Object.keys( object ) ) {
+
+		if ( hasTextureImage( object[ key ], image, visited, depth + 1 ) ) return true;
+
+	}
+
+	return false;
+
+}
+
 export default QUnit.module( 'Addons', () => {
 
 	QUnit.module( 'Loaders', () => {
@@ -97,10 +115,9 @@ export default QUnit.module( 'Addons', () => {
 				URL.revokeObjectURL( documentURL );
 
 				const material = result.materials.test_material;
-				const texture = material.materialXDocument.textureCache.values().next().value;
 
 				assert.false( 'texturesReady' in result, 'The result does not expose a separate readiness promise.' );
-				assert.strictEqual( texture.image, image, 'The texture image is assigned before the load resolves.' );
+				assert.true( hasTextureImage( material, image ), 'The texture image is assigned before the load resolves.' );
 				assert.ok( progressURLs.includes( 'texture.test' ), 'LoadingManager reports dependent texture progress.' );
 
 			} );
