@@ -202,17 +202,10 @@
 						prefab = ( await new GLTFLoader().loadAsync( './models/gltf/ShaderBall.glb' ) ).scene;
 						await computePrefabTangents();
 
-						for ( const sample of samples ) {
-
-							await addSample( sample, SAMPLE_PATH );
-
-						}
-
-						for ( const sample of localSamples ) {
-
-							await addSample( sample, LOCAL_SAMPLE_PATH );
-
-						}
+						await Promise.all( [
+							...samples.map( ( sample ) => addSample( sample, SAMPLE_PATH ) ),
+							...localSamples.map( ( sample ) => addSample( sample, LOCAL_SAMPLE_PATH ) ),
+						] );
 
 						addGUI();
 
@@ -292,6 +285,7 @@
 			async function addSample( sample, path ) {
 
 				const model = prefab.clone();
+				model.visible = false;
 
 				models.push( model );
 
@@ -325,6 +319,7 @@
 				}
 
 				await renderer.compileAsync( model, camera, scene );
+				model.visible = true;
 
 			}
 
