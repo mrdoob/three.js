@@ -131,10 +131,9 @@ export const vertexIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.VER
  * In these stages, use `instanceIndex` to modify a mesh based on its instance or to select per-instance data.
  *
  * ```js
- * // Create instanced mesh
- * const material = new THREE.BasicNodeMaterial();
  * // instanceIndex will equal the current mesh's instance index between 0-500
- * material.positionNode = vec3( instanceIndex.mul(2), instanceIndex.mul( 2 ), 0 );
+ * const material = new THREE.BasicNodeMaterial();
+ * material.positionNode = vec3( instanceIndex.mul( 2 ), instanceIndex.mul( 2 ), 0 );
  * const mesh = new THREE.InstancedMesh( geometry, material, 500 );
  * ```
  *
@@ -142,12 +141,12 @@ export const vertexIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.VER
  * In this stage, use `instanceIndex` to modify or select data at a given index within a buffer, or derive values from the index itself.
  *
  * ```js
+ * // instanceIndex will equal value between 0 - 255
  * const computeFn = Fn() => {
  *
- * 	// instanceIndex will equal value between 0 - 255
- * 	storageBuffer.element( instanceIndex ).assign( instanceIndex );posX = instanceIndex.mod( width );
+ * 	storageBuffer.element( instanceIndex ).assign( instanceIndex );
  *
- * } )().compute(255)
+ * } )().compute( 255 )
  * ```
  *
  * @tsl
