@@ -483,10 +483,9 @@ export const subgroupAny = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, 
  * @tsl
  * @method
  * @param {number} e - The value to broadcast from the lowest subgroup invocation.
- * @param {number} id - The subgroup invocation to broadcast from.
  * @return {number} The broadcast value.
  */
-export const subgroupBroadcastFirst = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_BROADCAST_FIRST ).setParameterLength( 2 );
+export const subgroupBroadcastFirst = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_BROADCAST_FIRST ).setParameterLength( 1 );
 
 /**
  * Swaps e between invocations in the quad in the X direction.
