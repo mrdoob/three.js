@@ -56,6 +56,7 @@ class Tour {
 		this.tourTitle = title;
 		this.pages = [];
 		this.pageTree = [];
+		this.templates = [];
 		this.currentPageIndex = 0;
 
 		const initialHash = window.location.hash.substring( 1 );
@@ -218,6 +219,13 @@ class Tour {
 			const result = parseTour( text );
 			this.pages = result.pages;
 			this.pageTree = result.pageTree;
+			this.templates = result.templates || [];
+
+			if ( result.title ) {
+
+				this.setTitle( result.title );
+
+			}
 
 			this.init();
 

@@ -1,3 +1,14 @@
+<tour title="Tour of *TSL*">
+
+<template name="Empty Project" default="true">
+```tsl main
+// Tour of TSL
+import 'scenes/empty';
+```
+</template>
+
+</tour>
+
 <page name="Introduction">
 
 <page name="Welcome">

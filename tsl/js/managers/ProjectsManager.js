@@ -121,6 +121,21 @@ class ProjectsManager {
 
 	}
 
+	getDefaultTemplateTabs() {
+
+		const templates = this.tour.templates || [];
+		const defaultTmpl = templates.find( t => t.default === true ) || templates[ 0 ];
+
+		if ( defaultTmpl && Array.isArray( defaultTmpl.tabs ) && defaultTmpl.tabs.length > 0 ) {
+
+			return JSON.parse( JSON.stringify( defaultTmpl.tabs ) );
+
+		}
+
+		return [ { name: 'main', code: '// Tour of TSL\n' } ];
+
+	}
+
 	getNextProjectName() {
 
 		const projects = this.getProjects();
@@ -460,32 +475,139 @@ class ProjectsManager {
 		const bodyContainer = document.createElement( 'div' );
 		bodyContainer.className = 'tsl-projects-body';
 
-		// 1. Empty Project Top Item (Dashed border, pinned at the top)
-		const templateItem = document.createElement( 'div' );
-		templateItem.className = 'tsl-project-item tsl-project-template-item';
-		templateItem.innerHTML = `
-			<div class="tsl-project-info">
-				<div class="tsl-project-name-row">
-					<span class="tsl-project-name">Empty Project</span>
-					<span class="tsl-project-tag-template">Template</span>
+		// 1. Templates / Empty Project Section (top of modal)
+		const templates = this.tour.templates || [];
+
+		// Hidden file input for importing JSON
+		const fileInput = document.createElement( 'input' );
+		fileInput.type = 'file';
+		fileInput.id = 'tsl-project-file-input';
+		fileInput.accept = '.json';
+		fileInput.style.display = 'none';
+		bodyContainer.appendChild( fileInput );
+
+		if ( templates.length > 0 ) {
+
+			templates.forEach( ( tmpl, index ) => {
+
+				const templateItem = document.createElement( 'div' );
+				templateItem.className = 'tsl-project-item tsl-project-template-item';
+				templateItem.innerHTML = `
+					<div class="tsl-project-info">
+						<div class="tsl-project-name-row">
+							<span class="tsl-project-name">${tmpl.name}</span>
+							<span class="tsl-project-tag-template">Template</span>
+						</div>
+						<div class="tsl-project-meta">
+							<span class="tsl-project-date">${tmpl.description || 'Create a project from template'}</span>
+						</div>
+					</div>
+					<div class="tsl-project-item-actions">
+						<button class="tsl-btn tsl-btn-sm tsl-btn-primary tsl-template-new-btn" title="Create a new project from this template">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+							<span>New</span>
+						</button>
+						${index === 0 ? `
+						<button class="tsl-btn tsl-btn-sm tsl-btn-secondary tsl-project-import-btn" title="Import project from JSON file">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-upload" style="width: 12px; height: 12px;"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 9l5 -5l5 5" /><path d="M12 4l0 12" /></svg>
+							<span>Import</span>
+						</button>` : ''}
+					</div>
+				`;
+
+				templateItem.querySelector( '.tsl-template-new-btn' ).onclick = () => {
+
+					const newName = this.getNextProjectName();
+					const tabs = JSON.parse( JSON.stringify( tmpl.tabs && tmpl.tabs.length > 0 ? tmpl.tabs : [ { name: 'main', code: '// Tour of TSL\n' } ] ) );
+					this.tour.playgroundManager.playgroundTabs = tabs;
+					this.tour.playgroundManager.activePlaygroundTabName = tabs[ 0 ].name;
+
+					const newProj = this.saveCurrentProject( newName );
+					this.loadProject( newProj );
+
+				};
+
+				const importBtn = templateItem.querySelector( '.tsl-project-import-btn' );
+				if ( importBtn ) {
+
+					importBtn.onclick = () => {
+
+						fileInput.value = '';
+						fileInput.click();
+
+					};
+
+				}
+
+				bodyContainer.appendChild( templateItem );
+
+			} );
+
+		} else {
+
+			const templateItem = document.createElement( 'div' );
+			templateItem.className = 'tsl-project-item tsl-project-template-item';
+			templateItem.innerHTML = `
+				<div class="tsl-project-info">
+					<div class="tsl-project-name-row">
+						<span class="tsl-project-name">Empty Project</span>
+					</div>
+					<div class="tsl-project-meta">
+						<span class="tsl-project-date">Create a blank project or import from JSON</span>
+					</div>
 				</div>
-				<div class="tsl-project-meta">
-					<span class="tsl-project-date">Create a blank project or import from JSON</span>
+				<div class="tsl-project-item-actions">
+					<button class="tsl-btn tsl-btn-sm tsl-btn-primary tsl-template-new-btn" title="Create and open a new empty project">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+						<span>New</span>
+					</button>
+					<button class="tsl-btn tsl-btn-sm tsl-btn-secondary tsl-project-import-btn" title="Import project from JSON file">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-upload" style="width: 12px; height: 12px;"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 9l5 -5l5 5" /><path d="M12 4l0 12" /></svg>
+						<span>Import</span>
+					</button>
 				</div>
-			</div>
-			<div class="tsl-project-item-actions">
-				<input type="file" id="tsl-project-file-input" accept=".json" style="display: none;" />
-				<button id="tsl-project-new-btn" class="tsl-btn tsl-btn-sm tsl-btn-primary" title="Create and open a new empty project">
-					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-					<span>New</span>
-				</button>
-				<button id="tsl-project-import-btn" class="tsl-btn tsl-btn-sm tsl-btn-secondary" title="Import project from JSON file">
-					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
-					<span>Import</span>
-				</button>
-			</div>
-		`;
-		bodyContainer.appendChild( templateItem );
+			`;
+
+			templateItem.querySelector( '.tsl-template-new-btn' ).onclick = () => {
+
+				const newName = this.getNextProjectName();
+				const emptyTabs = [ { name: 'main', code: '// Tour of TSL\n' } ];
+				this.tour.playgroundManager.playgroundTabs = emptyTabs;
+				this.tour.playgroundManager.activePlaygroundTabName = 'main';
+
+				const newProj = this.saveCurrentProject( newName );
+				this.loadProject( newProj );
+
+			};
+
+			templateItem.querySelector( '.tsl-project-import-btn' ).onclick = () => {
+
+				fileInput.value = '';
+				fileInput.click();
+
+			};
+
+			bodyContainer.appendChild( templateItem );
+
+		}
+
+		fileInput.onchange = async ( e ) => {
+
+			const file = e.target.files[ 0 ];
+			if ( ! file ) return;
+
+			try {
+
+				await this.importProjectJSON( file );
+				renderList();
+
+			} catch ( err ) {
+
+				console.error( 'Failed to import project:', err );
+
+			}
+
+		};
 
 		// 2. Section Header
 		const sectionHeader = document.createElement( 'div' );
@@ -686,49 +808,6 @@ class ProjectsManager {
 		};
 
 		renderList();
-
-		// New Project Action (creates blank project)
-		const newBtn = templateItem.querySelector( '#tsl-project-new-btn' );
-		newBtn.onclick = () => {
-
-			const newName = this.getNextProjectName();
-			const emptyTabs = [ { name: 'main', code: '// Tour of TSL\nimport \'scenes/empty\';\n' } ];
-			this.tour.playgroundManager.playgroundTabs = emptyTabs;
-			this.tour.playgroundManager.activePlaygroundTabName = 'main';
-
-			const newProj = this.saveCurrentProject( newName );
-			this.loadProject( newProj );
-
-		};
-
-		// Import Action
-		const fileInput = templateItem.querySelector( '#tsl-project-file-input' );
-		const importBtn = templateItem.querySelector( '#tsl-project-import-btn' );
-
-		importBtn.onclick = () => {
-
-			fileInput.value = '';
-			fileInput.click();
-
-		};
-
-		fileInput.onchange = async ( e ) => {
-
-			const file = e.target.files[ 0 ];
-			if ( ! file ) return;
-
-			try {
-
-				await this.importProjectJSON( file );
-				renderList();
-
-			} catch ( err ) {
-
-				console.error( 'Failed to import project:', err );
-
-			}
-
-		};
 
 		// Close button Action
 		header.querySelector( '.tsl-modal-close-btn' ).onclick = () => {
