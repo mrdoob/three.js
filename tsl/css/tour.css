@@ -2454,6 +2454,22 @@ body.preview-maximized .preview-hide-btn {
 	box-shadow: inset -2px 0 0 0 #007acc;
 }
 
+.playground-tab.read-only {
+	color: #9d9da6;
+}
+
+.playground-tab-lock-icon {
+	display: inline-flex;
+	align-items: center;
+	margin-right: 6px;
+	color: #8e8e93;
+	flex-shrink: 0;
+}
+
+.playground-tab.active .playground-tab-lock-icon {
+	color: #00aeff;
+}
+
 .playground-tab-label {
 	white-space: nowrap;
 }

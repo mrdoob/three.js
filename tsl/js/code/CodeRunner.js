@@ -1134,4 +1134,4 @@ class CodeRunner extends EventDispatcher {
 
 }
 
-export { CodeRunner };
+export { CodeRunner, parseScript, isStandardModule, resolvePath };

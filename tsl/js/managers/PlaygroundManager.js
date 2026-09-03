@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { CodeCompiler } from '../code/CodeCompiler.js';
+import { parseScript, isStandardModule, resolvePath } from '../code/CodeRunner.js';
 import { compressString, decompressString } from '../utils/TourUtils.js';
 
 class PlaygroundManager {
@@ -154,7 +155,12 @@ class PlaygroundManager {
 
 			}
 
-			if ( this.tour.codeEditor ) this.tour.codeEditor.layout();
+			if ( this.tour.codeEditor ) {
+
+				this.tour.codeEditor.setReadOnly( false );
+				this.tour.codeEditor.layout();
+
+			}
 
 		}
 
@@ -248,6 +254,8 @@ class PlaygroundManager {
 		const activeTab = this.playgroundTabs.find( t => t.name === this.activePlaygroundTabName ) || this.playgroundTabs[ 0 ];
 
 		if ( this.tour.codeEditor ) {
+
+			this.tour.codeEditor.setReadOnly( !! activeTab.readOnly );
 
 			const currentVal = this.tour.codeEditor.getValue();
 			if ( currentVal !== activeTab.code ) {
@@ -399,6 +407,18 @@ class PlaygroundManager {
 
 			}
 
+			if ( tab.readOnly ) {
+
+				tabEl.classList.add( 'read-only' );
+
+				const lockEl = document.createElement( 'span' );
+				lockEl.className = 'playground-tab-lock-icon';
+				lockEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 11px; height: 11px; display: block;"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+				lockEl.title = 'Read-only';
+				tabEl.appendChild( lockEl );
+
+			}
+
 			const labelEl = document.createElement( 'span' );
 			labelEl.className = 'playground-tab-label';
 			labelEl.textContent = tab.name;
@@ -525,12 +545,16 @@ class PlaygroundManager {
 
 			};
 
-			labelEl.ondblclick = ( e ) => {
+			if ( ! tab.readOnly ) {
 
-				e.stopPropagation();
-				this.startRenameTab( tab.name, labelEl );
+				labelEl.ondblclick = ( e ) => {
 
-			};
+					e.stopPropagation();
+					this.startRenameTab( tab.name, labelEl );
+
+				};
+
+			}
 
 			tabsScrollContainer.appendChild( tabEl );
 
@@ -564,6 +588,18 @@ class PlaygroundManager {
 
 			e.stopPropagation();
 			this.tour.projectsManager.openProjectsModal();
+
+		};
+
+		// Create Imported Files button
+		const importedFilesBtn = document.createElement( 'button' );
+		importedFilesBtn.className = 'playground-tab-btn playground-imported-files-btn';
+		importedFilesBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; display: block;"><path d="M10 12.5 8 15l2 2.5"/><path d="m14 12.5 2 2.5-2 2.5"/><path d="M14 2v6h6"/><path d="M4 15V4a2 2 0 0 1 2-2h8.5L20 7.5V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-1"/></svg>';
+		importedFilesBtn.title = 'Imported Files (Read-only)';
+		importedFilesBtn.onclick = async ( e ) => {
+
+			e.stopPropagation();
+			await this.showImportedFiles();
 
 		};
 
@@ -617,6 +653,7 @@ class PlaygroundManager {
 		};
 
 		actionsContainer.appendChild( projectsBtn );
+		actionsContainer.appendChild( importedFilesBtn );
 		actionsContainer.appendChild( cleanBtn );
 		actionsContainer.appendChild( undoBtn );
 		actionsContainer.appendChild( redoBtn );
@@ -643,7 +680,7 @@ class PlaygroundManager {
 		if ( this.activePlaygroundTabName === name ) return;
 
 		const activeTab = this.playgroundTabs.find( t => t.name === this.activePlaygroundTabName );
-		if ( activeTab && this.tour.codeEditor ) {
+		if ( activeTab && ! activeTab.readOnly && this.tour.codeEditor ) {
 
 			activeTab.code = this.tour.codeEditor.getValue();
 
@@ -653,6 +690,8 @@ class PlaygroundManager {
 
 		const newActiveTab = this.playgroundTabs.find( t => t.name === this.activePlaygroundTabName );
 		if ( newActiveTab && this.tour.codeEditor ) {
+
+			this.tour.codeEditor.setReadOnly( !! newActiveTab.readOnly );
 
 			const currentVal = this.tour.codeEditor.getValue();
 			if ( currentVal !== newActiveTab.code ) {
@@ -690,7 +729,7 @@ class PlaygroundManager {
 		const newTabCode = `// Script: ${newTabName}\nexport { };\n`;
 
 		const activeTab = this.playgroundTabs.find( t => t.name === this.activePlaygroundTabName );
-		if ( activeTab && this.tour.codeEditor ) {
+		if ( activeTab && ! activeTab.readOnly && this.tour.codeEditor ) {
 
 			activeTab.code = this.tour.codeEditor.getValue();
 
@@ -701,6 +740,7 @@ class PlaygroundManager {
 
 		if ( this.tour.codeEditor ) {
 
+			this.tour.codeEditor.setReadOnly( false );
 			this.tour.codeEditor.setValue( newTabCode );
 
 		}
@@ -718,7 +758,7 @@ class PlaygroundManager {
 		if ( index === - 1 ) return;
 
 		const activeTab = this.playgroundTabs.find( t => t.name === this.activePlaygroundTabName );
-		if ( activeTab && this.tour.codeEditor ) {
+		if ( activeTab && ! activeTab.readOnly && this.tour.codeEditor ) {
 
 			activeTab.code = this.tour.codeEditor.getValue();
 
@@ -734,6 +774,8 @@ class PlaygroundManager {
 
 		const newActiveTab = this.playgroundTabs.find( t => t.name === this.activePlaygroundTabName ) || this.playgroundTabs[ 0 ];
 		if ( newActiveTab && this.tour.codeEditor ) {
+
+			this.tour.codeEditor.setReadOnly( !! newActiveTab.readOnly );
 
 			const currentVal = this.tour.codeEditor.getValue();
 			if ( currentVal !== newActiveTab.code ) {
@@ -753,7 +795,8 @@ class PlaygroundManager {
 
 	startRenameTab( name, labelEl ) {
 
-		if ( name === 'main' ) return;
+		const tab = this.playgroundTabs?.find( t => t.name === name );
+		if ( name === 'main' || tab?.readOnly ) return;
 
 		const currentName = name;
 		const input = document.createElement( 'input' );
@@ -779,7 +822,7 @@ class PlaygroundManager {
 			if ( newName && isValidIdentifier && isUnique ) {
 
 				const activeTab = this.playgroundTabs.find( t => t.name === this.activePlaygroundTabName );
-				if ( activeTab && this.tour.codeEditor ) {
+				if ( activeTab && ! activeTab.readOnly && this.tour.codeEditor ) {
 
 					activeTab.code = this.tour.codeEditor.getValue();
 
@@ -839,8 +882,9 @@ class PlaygroundManager {
 
 		this.tour.projectsManager.autoSaveCurrentProject();
 
+		const persistTabs = this.playgroundTabs.filter( t => ! t.readOnly );
 		const encoded = await compressString( JSON.stringify( {
-			tabs: this.playgroundTabs
+			tabs: persistTabs
 		} ) );
 		const release = THREE.REVISION;
 		const newHash = 'playground=' + encoded + ( release ? '&release=' + release : '' );
@@ -877,7 +921,8 @@ class PlaygroundManager {
 
 	async cleanAndFormatActiveTab() {
 
-		if ( ! this.tour.codeEditor ) return;
+		const activeTab = this.playgroundTabs?.find( t => t.name === this.activePlaygroundTabName );
+		if ( ! this.tour.codeEditor || ( activeTab && activeTab.readOnly ) ) return;
 
 		const code = this.tour.codeEditor.getValue();
 		const formatted = await CodeCompiler.format( code );
@@ -888,10 +933,10 @@ class PlaygroundManager {
 
 			this.tour.codeEditor.format( formatted );
 
-			const activeTab = this.playgroundTabs.find( t => t.name === this.activePlaygroundTabName );
-			if ( activeTab ) {
+			const currentActiveTab = this.playgroundTabs.find( t => t.name === this.activePlaygroundTabName );
+			if ( currentActiveTab ) {
 
-				activeTab.code = formatted;
+				currentActiveTab.code = formatted;
 
 			}
 
@@ -929,7 +974,7 @@ class PlaygroundManager {
 		// 2. Add or update virtual script configs based on tabs
 		this.playgroundTabs.forEach( tab => {
 
-			if ( tab.name !== 'main' ) {
+			if ( tab.name !== 'main' && ! tab.readOnly ) {
 
 				const existing = this.tour.runner.scripts[ tab.name ];
 				if ( ! existing || existing.text !== tab.code ) {
@@ -1090,13 +1135,138 @@ class PlaygroundManager {
 
 	}
 
+	getImportedCustomScripts() {
+
+		const customImports = new Set();
+		const runnerImports = this.tour.runner ? this.tour.runner.imports : {};
+
+		if ( this.playgroundTabs ) {
+
+			for ( const tab of this.playgroundTabs ) {
+
+				if ( ! tab.readOnly && tab.code ) {
+
+					const { importDeclarations } = parseScript( tab.code );
+					for ( const decl of importDeclarations ) {
+
+						const moduleName = decl.moduleName;
+						if ( ! isStandardModule( moduleName, runnerImports ) ) {
+
+							const importerName = tab.name === 'main' ? '__main__' : tab.name;
+							const resolvedPath = resolvePath( importerName, moduleName );
+							const baseName = resolvedPath.replace( /\.js$/, '' );
+							customImports.add( baseName );
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+		if ( this.tour.runner && this.tour.runner.scripts ) {
+
+			for ( const [ name, scriptConfig ] of Object.entries( this.tour.runner.scripts ) ) {
+
+				if ( scriptConfig && scriptConfig.url && name !== '__main__' ) {
+
+					if ( ! isStandardModule( name, runnerImports ) ) {
+
+						customImports.add( name );
+
+					}
+
+				}
+
+			}
+
+		}
+
+		return Array.from( customImports );
+
+	}
+
+	async showImportedFiles() {
+
+		const importedFiles = this.getImportedCustomScripts();
+		if ( importedFiles.length === 0 ) {
+
+			this.tour.consoleManager.log( 'No custom imported files found in current playground code.' );
+			return;
+
+		}
+
+		let targetTabName = null;
+
+		for ( const name of importedFiles ) {
+
+			let tab = this.playgroundTabs.find( t => t.name === name );
+			if ( ! tab ) {
+
+				let code = this.tour.runner?.scripts?.[ name ]?.text;
+				if ( code === undefined || code === null ) {
+
+					try {
+
+						const response = await fetch( `./js/imports/scripts/${name}.js` );
+						if ( response.ok ) {
+
+							code = await response.text();
+
+						} else {
+
+							console.warn( `Could not fetch imported file: ${name}` );
+							continue;
+
+						}
+
+					} catch ( err ) {
+
+						console.warn( `Error loading imported file ${name}:`, err );
+						continue;
+
+					}
+
+				}
+
+				tab = {
+					name: name,
+					code: code,
+					readOnly: true
+				};
+
+				this.playgroundTabs.push( tab );
+
+			}
+
+			if ( ! targetTabName ) {
+
+				targetTabName = name;
+
+			}
+
+		}
+
+		if ( targetTabName ) {
+
+			this.renderPlaygroundTabs();
+			this.activatePlaygroundTab( targetTabName );
+
+		}
+
+	}
+
 	hasUnsavedChanges() {
 
 		if ( this.tour.projectsManager.currentProjectId ) return false;
 		if ( ! this.playgroundTabs || this.playgroundTabs.length === 0 ) return false;
 		if ( ! this.initialTabsSnapshot ) return false;
 
-		return JSON.stringify( this.playgroundTabs ) !== this.initialTabsSnapshot;
+		const persistTabs = this.playgroundTabs.filter( t => ! t.readOnly );
+		return JSON.stringify( persistTabs ) !== this.initialTabsSnapshot;
 
 	}
 
@@ -1132,6 +1302,7 @@ class PlaygroundManager {
 		const activeTab = this.playgroundTabs.find( t => t.name === this.activePlaygroundTabName ) || this.playgroundTabs[ 0 ];
 		if ( this.tour.codeEditor ) {
 
+			this.tour.codeEditor.setReadOnly( !! activeTab.readOnly );
 			this.tour.codeEditor.setValue( activeTab.code );
 
 		}
@@ -1156,6 +1327,7 @@ class PlaygroundManager {
 
 		if ( this.tour.codeEditor ) {
 
+			this.tour.codeEditor.setReadOnly( false );
 			this.tour.codeEditor.setValue( newCode );
 
 		}

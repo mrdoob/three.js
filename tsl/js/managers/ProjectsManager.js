@@ -54,7 +54,7 @@ class ProjectsManager {
 		}
 
 		// 2. If no currentProjectId is set, check if tabs content matches
-		const currentTabs = this.tour.playgroundManager.playgroundTabs;
+		const currentTabs = ( this.tour.playgroundManager.playgroundTabs || [] ).filter( t => ! t.readOnly );
 		if ( ! currentTabs || ! project.tabs || project.tabs.length !== currentTabs.length ) return false;
 
 		for ( let i = 0; i < project.tabs.length; i ++ ) {
@@ -162,7 +162,7 @@ class ProjectsManager {
 
 		if ( ! this.currentProjectId ) return;
 
-		const tabs = this.tour.playgroundManager.playgroundTabs;
+		const tabs = ( this.tour.playgroundManager.playgroundTabs || [] ).filter( t => ! t.readOnly );
 		if ( ! tabs || tabs.length === 0 ) return;
 
 		const projects = this.getProjects();
@@ -178,7 +178,9 @@ class ProjectsManager {
 
 	saveCurrentProject( name ) {
 
-		const tabs = this.tour.playgroundManager.playgroundTabs || [ { name: 'main', code: '// Tour of TSL\n' } ];
+		const rawTabs = this.tour.playgroundManager.playgroundTabs || [ { name: 'main', code: '// Tour of TSL\n' } ];
+		const tabs = rawTabs.filter( t => ! t.readOnly );
+		if ( tabs.length === 0 ) tabs.push( { name: 'main', code: '// Tour of TSL\n' } );
 		const projects = this.getProjects();
 
 		let existingIndex = - 1;

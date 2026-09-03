@@ -1058,7 +1058,7 @@ class Tour {
 			if ( this.isPlaygroundActive ) {
 
 				const activeTab = this.playgroundManager.playgroundTabs?.find( t => t.name === this.playgroundManager.activePlaygroundTabName );
-				if ( activeTab ) {
+				if ( activeTab && ! activeTab.readOnly ) {
 
 					activeTab.code = currentCode;
 
@@ -1518,6 +1518,7 @@ class Tour {
 		// Update Code Editor
 		if ( this.codeEditor ) {
 
+			this.codeEditor.setReadOnly( false );
 			this.codeEditor.setValue( pageCode );
 
 			const hash = window.location.hash.substring( 1 );
