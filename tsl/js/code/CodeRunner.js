@@ -801,14 +801,10 @@ class CodeRunner extends EventDispatcher {
 					const cleanImportsText = stripImportDeclarations( text, importDeclarations );
 					const { cleanText, exportedSymbols } = processExportDeclarations( cleanImportsText );
 
-					const returnFields = LIFECYCLE_METHODS.map( name => `${name}: typeof ${name} !== 'undefined' ? ${name} : undefined` );
+					const returnFields = [];
 					exportedSymbols.forEach( symbol => {
 
-						if ( ! LIFECYCLE_METHODS.includes( symbol.export ) ) {
-
-							returnFields.push( `get "${symbol.export}"() { return typeof ${symbol.local} !== \'undefined\' ? ${symbol.local} : undefined; }` );
-
-						}
+						returnFields.push( `get "${symbol.export}"() { return typeof ${symbol.local} !== \'undefined\' ? ${symbol.local} : undefined; }` );
 
 					} );
 
@@ -1103,14 +1099,10 @@ class CodeRunner extends EventDispatcher {
 			const strippedImportsCode = stripImportDeclarations( code, importDeclarations );
 			const { cleanText: strippedCode, exportedSymbols } = processExportDeclarations( strippedImportsCode );
 
-			const returnFields = LIFECYCLE_METHODS.map( name => `${name}: typeof ${name} !== 'undefined' ? ${name} : undefined` );
+			const returnFields = [];
 			exportedSymbols.forEach( symbol => {
 
-				if ( ! LIFECYCLE_METHODS.includes( symbol.export ) ) {
-
-					returnFields.push( `get "${symbol.export}"() { return typeof ${symbol.local} !== \'undefined\' ? ${symbol.local} : undefined; }` );
-
-				}
+				returnFields.push( `get "${symbol.export}"() { return typeof ${symbol.local} !== \'undefined\' ? ${symbol.local} : undefined; }` );
 
 			} );
 
