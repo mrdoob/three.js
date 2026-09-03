@@ -483,13 +483,13 @@ class WebGPUTextureUtils {
 		const backend = this.backend;
 		const textureData = backend.get( texture );
 
-		if ( textureData.texture !== undefined && isDefaultTexture === false && texture.isExternalTexture !== true && textureData.externalTexture !== true ) textureData.texture.destroy();
+		if ( textureData.texture !== undefined && isDefaultTexture === false && texture.isExternalTexture !== true && textureData.externalTexture !== true ) backend.destroyResource( textureData.texture );
 
-		if ( textureData.msaaTexture !== undefined ) textureData.msaaTexture.destroy();
+		if ( textureData.msaaTexture !== undefined ) backend.destroyResource( textureData.msaaTexture );
 
 		if ( textureData.msaaTextures !== undefined ) {
 
-			for ( const msaaTexture of textureData.msaaTextures ) msaaTexture.destroy();
+			for ( const msaaTexture of textureData.msaaTextures ) backend.destroyResource( msaaTexture );
 
 		}
 
@@ -537,7 +537,7 @@ class WebGPUTextureUtils {
 
 		let colorBuffer = colorTextureData.texture;
 
-		if ( colorBuffer ) colorBuffer.destroy();
+		if ( colorBuffer ) backend.destroyResource( colorBuffer );
 
 		_textureDescriptor.label = 'colorBuffer';
 		_textureDescriptor.size.width = width;

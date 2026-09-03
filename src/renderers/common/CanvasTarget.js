@@ -161,6 +161,8 @@ class CanvasTarget extends EventDispatcher {
 		// Renderer can't be resized while presenting in XR.
 		if ( this.xr && this.xr.isPresenting ) return;
 
+		this._dispatchBeforeResize();
+
 		this._width = width;
 		this._height = height;
 
@@ -186,6 +188,8 @@ class CanvasTarget extends EventDispatcher {
 
 		// Renderer can't be resized while presenting in XR.
 		if ( this.xr && this.xr.isPresenting ) return;
+
+		this._dispatchBeforeResize();
 
 		this._width = width;
 		this._height = height;
@@ -321,6 +325,17 @@ class CanvasTarget extends EventDispatcher {
 	_dispatchResize() {
 
 		this.dispatchEvent( { type: 'resize' } );
+
+	}
+
+	/**
+	 * Dispatches the before resize event.
+	 *
+	 * @private
+	 */
+	_dispatchBeforeResize() {
+
+		this.dispatchEvent( { type: 'beforeresize' } );
 
 	}
 

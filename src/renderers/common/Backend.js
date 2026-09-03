@@ -629,6 +629,12 @@ class Backend {
 	}
 
 	/**
+	 * Receives all pooled render passes and compute passes and submits them to the device's
+	 * command encoder in a single call. Currently only implemented on the WebGPUBackend.
+	 */
+	submit() {}
+
+	/**
 	 * This method performs a readback operation by moving buffer data from
 	 * a storage buffer attribute from the GPU to the CPU.
 	 *

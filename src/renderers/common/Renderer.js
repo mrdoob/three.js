@@ -149,6 +149,17 @@ class Renderer {
 		 */
 		this.autoClearStencil = true;
 
+
+		/**
+		 * When `autoSubmit` is set to `true`, this property defines whether the renderer's
+		 * backend should automatically submit GPU passes to the command encoder on each
+		 * renderer call.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.autoSubmit = true;
+
 		/**
 		 * Whether the default framebuffer should be transparent or opaque.
 		 *
@@ -283,6 +294,14 @@ class Renderer {
 		this._onCanvasTargetResize = this._onCanvasTargetResize.bind( this );
 
 		/**
+		 * OnCanvasTargetBeforeResize callback function.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
+		this._onCanvasTargetBeforeResize = this._onCanvasTargetBeforeResize.bind( this );
+
+		/**
 		 * The canvas target for rendering.
 		 *
 		 * @private
@@ -290,6 +309,7 @@ class Renderer {
 		 */
 		this._canvasTarget = new CanvasTarget( backend.getDomElement() );
 		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
+		this._canvasTarget.addEventListener( 'beforeresize', this._onCanvasTargetBeforeResize );
 		this._canvasTarget.isDefaultCanvasTarget = true;
 
 		/**
@@ -2784,6 +2804,7 @@ class Renderer {
 	setCanvasTarget( canvasTarget ) {
 
 		this._canvasTarget.removeEventListener( 'resize', this._onCanvasTargetResize );
+		this._canvasTarget.removeEventListener( 'beforeresize', this._onCanvasTargetBeforeResize );
 
 		this._canvasTarget = canvasTarget;
 		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
@@ -2994,6 +3015,20 @@ class Renderer {
 		if ( this._initialized === false ) await this.init();
 
 		this.compute( computeNodes, dispatchSize );
+
+	}
+
+	/**
+	 * Receives all pooled render passes and compute passes and submits them to the device's
+	 * command encoder in a single call.
+	 */
+	submit() {
+
+		if ( ! this.autoSubmit ) {
+
+			this.backend.submit();
+
+		}
 
 	}
 
@@ -3966,6 +4001,18 @@ class Renderer {
 	_onCanvasTargetResize() {
 
 		if ( this._initialized ) this.backend.updateSize();
+
+	}
+
+	/**
+	 * Callback for before the canvas is resized.
+	 * Submits any renderer work done with the previous canvas context.
+	 *
+	 * @private
+	 */
+	_onCanvasTargetBeforeResize() {
+
+		if ( this._initialized ) this.backend.submit();
 
 	}
 

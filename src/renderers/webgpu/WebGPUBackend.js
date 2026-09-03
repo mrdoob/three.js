@@ -6,7 +6,7 @@ import { GPUFeatureName, GPULoadOp, GPUStoreOp, GPUIndexFormat, GPUTextureViewDi
 import WGSLNodeBuilder from './nodes/WGSLNodeBuilder.js';
 import Backend from '../common/Backend.js';
 
-import WebGPUUtils, { submit } from './utils/WebGPUUtils.js';
+import WebGPUUtils from './utils/WebGPUUtils.js';
 import WebGPUAttributeUtils from './utils/WebGPUAttributeUtils.js';
 import WebGPUBindingUtils from './utils/WebGPUBindingUtils.js';
 import WebGPUCapabilities from './utils/WebGPUCapabilities.js';
@@ -188,6 +188,36 @@ class WebGPUBackend extends Backend {
 		this._compatibility = {
 			[ Compatibility.TEXTURE_COMPARE ]: compatibilityTextureCompare
 		};
+
+		/**
+		 * Command buffers finished this frame and awaiting submission. Every render/compute pass,
+		 * whether from a direct render call or from a nested render in an `updateBefore() callback,
+		 * finishes its commandBuffers into this stack. Command buffers should always be pushed in
+		 * from the lowest to highest nested render/compute call.
+		 *
+		 * @private
+		 * @type {Array<GPUCommandBuffer>}
+		 */
+		this._finishedCommandBuffers = [];
+
+		/**
+		 * Whether a microtask has already been scheduled to submit this frame.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._submitScheduled = false;
+
+		/**
+		 * GPU resources whose destruction is deferred until the command buffers that
+		 * reference them have been submitted. Destroying a texture or buffer still
+		 * recorded into an unsubmitted encoder makes the following submit fail validation.
+		 *
+		 * @private
+		 * @type {Array<(GPUTexture|GPUBuffer|GPUQuerySet)>}
+		 */
+		this._resourcesToDestroy = [];
 
 	}
 
@@ -412,6 +442,11 @@ class WebGPUBackend extends Backend {
 	 */
 	async getArrayBufferAsync( attribute, target = null, offset = 0, count = - 1 ) {
 
+		// the readback maps a buffer, so the work that produced its contents has to be
+		// submitted first
+
+		this.submit();
+
 		return await this.attributeUtils.getArrayBufferAsync( attribute, target, offset, count );
 
 	}
@@ -550,7 +585,7 @@ class WebGPUBackend extends Backend {
 
 			if ( textureData.msaaTextures !== undefined ) {
 
-				for ( const texture of textureData.msaaTextures ) texture.destroy();
+				for ( const texture of textureData.msaaTextures ) this.destroyResource( texture );
 
 				textureData.msaaTextures = undefined;
 
@@ -574,7 +609,7 @@ class WebGPUBackend extends Backend {
 
 			if ( textureData.msaaTextures !== undefined ) {
 
-				for ( const texture of textureData.msaaTextures ) texture.destroy();
+				for ( const texture of textureData.msaaTextures ) this.destroyResource( texture );
 
 			}
 
@@ -874,6 +909,106 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
+	 * Returns a command encoder for a pass or copy.
+	 *
+	 * @private
+	 * @param {string} label - A debug label for the command encoder.
+	 * @return {GPUCommandEncoder} The command encoder.
+	 */
+	_acquireCommandEncoder( label ) {
+
+		_commandEncoderDescriptor.label = label;
+
+		const commandEncoder = this.device.createCommandEncoder( _commandEncoderDescriptor );
+
+		_commandEncoderDescriptor.reset();
+
+		return commandEncoder;
+
+	}
+
+	/**
+	 * Finishes a command encoder and queues a submit task.
+	 *
+	 * @private
+	 * @param {GPUCommandEncoder} commandEncoder - The command encoder to finish.
+	 */
+	_finishCommandEncoder( commandEncoder ) {
+
+		this._finishedCommandBuffers.push( commandEncoder.finish() );
+		this._scheduleCommandEncoderSubmit();
+
+	}
+
+	/**
+	 * Schedules a microtask that submits the frame's finished command buffers.
+	 * The microtask runs once the current callback returns to the event loop.
+	 *
+	 * @private
+	 */
+	_scheduleCommandEncoderSubmit() {
+
+		// submit must be sent by user when autoSubmit = false
+
+		if ( this.renderer.autoSubmit && this._submitScheduled === false ) {
+
+			this._submitScheduled = true;
+
+			queueMicrotask( () => this.submit() );
+
+		}
+
+	}
+
+	/**
+	 * Submits the frame's finished command buffers with a single `queue.submit()`, then
+	 * releases any resources whose destruction was deferred.
+	 */
+	submit() {
+
+		this._submitScheduled = false;
+
+		if ( this._finishedCommandBuffers.length > 0 ) {
+
+			this.device.queue.submit( this._finishedCommandBuffers );
+			this._finishedCommandBuffers.length = 0;
+
+		}
+
+		if ( this._resourcesToDestroy.length > 0 ) {
+
+			for ( const resource of this._resourcesToDestroy ) resource.destroy();
+
+			this._resourcesToDestroy.length = 0;
+
+		}
+
+	}
+
+	/**
+	 * Destroys a GPU resource, deferring the destruction whenever an encoder or command
+	 * buffer of the current frame might still reference it. Deferred resources are
+	 * destroyed by {@link WebGPUBackend#submit} directly after the frame is submitted.
+	 *
+	 * @param {?(GPUTexture|GPUBuffer|GPUQuerySet)} resource - The resource to destroy.
+	 */
+	destroyResource( resource ) {
+
+		if ( ! resource ) return;
+
+		if ( this._finishedCommandBuffers.length === 0 ) {
+
+			resource.destroy();
+
+		} else {
+
+			this._resourcesToDestroy.push( resource );
+
+		}
+
+	}
+
+	/**
 	 * This method is executed at the beginning of a render call and prepares
 	 * the WebGPU state for upcoming render calls
 	 *
@@ -892,8 +1027,8 @@ class WebGPUBackend extends Backend {
 
 		if ( occlusionQueryCount > 0 ) {
 
-			if ( renderContextData.currentOcclusionQuerySet ) renderContextData.currentOcclusionQuerySet.destroy();
-			if ( renderContextData.currentOcclusionQueryBuffer ) renderContextData.currentOcclusionQueryBuffer.destroy();
+			this.destroyResource( renderContextData.currentOcclusionQuerySet );
+			this.destroyResource( renderContextData.currentOcclusionQueryBuffer );
 
 			// Get a reference to the array of objects with queries. The renderContextData property
 			// can be changed by another render pass before the buffer.mapAsyc() completes.
@@ -923,7 +1058,7 @@ class WebGPUBackend extends Backend {
 
 			renderContextData.lastOcclusionObject = undefined;
 
-			renderContextData.occlusionQuerySet.destroy();
+			this.destroyResource( renderContextData.occlusionQuerySet );
 			renderContextData.occlusionQuerySet = undefined;
 
 		}
@@ -1077,9 +1212,7 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		_commandEncoderDescriptor.label = 'renderContext_' + renderContext.id;
-		const encoder = device.createCommandEncoder( _commandEncoderDescriptor );
-		_commandEncoderDescriptor.reset();
+		const encoder = this._acquireCommandEncoder( 'renderContext_' + renderContext.id );
 
 		// Layered render targets: prepare bundle encoders for each camera in the array camera.
 
@@ -1516,7 +1649,8 @@ class WebGPUBackend extends Backend {
 
 		} else if ( renderContextData.currentPass ) {
 
-		  renderContextData.currentPass.end();
+			renderContextData.currentPass.end();
+			renderContextData.currentPass = null;
 
 		}
 
@@ -1558,11 +1692,20 @@ class WebGPUBackend extends Backend {
 
 			//
 
+		}
+
+		this._finishCommandEncoder( renderContextData.encoder );
+
+		if ( occlusionQueryCount > 0 ) {
+
+			// occlusion results are read back on the CPU, so the resolve recorded above
+			// must reach the queue before mapAsync()
+
+			this.submit();
+
 			this.resolveOccludedAsync( renderContext );
 
 		}
-
-		submit( this.device, renderContextData.encoder.finish() );
 
 
 		//
@@ -1643,7 +1786,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			currentOcclusionQueryBuffer.destroy();
+			this.destroyResource( currentOcclusionQueryBuffer );
 
 			renderContextData.occluded = occluded;
 
@@ -1713,7 +1856,6 @@ class WebGPUBackend extends Backend {
 	 */
 	clear( color, depth, stencil, renderTargetContext = null ) {
 
-		const device = this.device;
 		const renderer = this.renderer;
 
 		let colorAttachments = [];
@@ -1829,9 +1971,7 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		_commandEncoderDescriptor.label = 'clear';
-		const encoder = device.createCommandEncoder( _commandEncoderDescriptor );
-		_commandEncoderDescriptor.reset();
+		const encoder = this._acquireCommandEncoder( 'clear' );
 
 		const currentPass = encoder.beginRenderPass( {
 			colorAttachments,
@@ -1840,7 +1980,7 @@ class WebGPUBackend extends Backend {
 
 		currentPass.end();
 
-		submit( device, encoder.finish() );
+		this._finishCommandEncoder( encoder );
 
 	}
 
@@ -1865,11 +2005,11 @@ class WebGPUBackend extends Backend {
 
 		this.initTimestampQuery( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ), _computePassDescriptor );
 
-		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( _commandEncoderDescriptor );
+		groupGPU.cmdEncoderGPU = this._acquireCommandEncoder( label );
+
 		groupGPU.passEncoderGPU = groupGPU.cmdEncoderGPU.beginComputePass( _computePassDescriptor );
 		groupGPU.currentPipeline = null;
 
-		_commandEncoderDescriptor.reset();
 		_computePassDescriptor.reset();
 
 	}
@@ -1997,7 +2137,7 @@ class WebGPUBackend extends Backend {
 
 		groupData.passEncoderGPU.end();
 
-		submit( this.device, groupData.cmdEncoderGPU.finish() );
+		this._finishCommandEncoder( groupData.cmdEncoderGPU );
 
 	}
 
@@ -2799,7 +2939,7 @@ class WebGPUBackend extends Backend {
 
 		const uniformBufferData = this.get( uniformBuffer );
 
-		uniformBufferData.buffer.destroy();
+		this.destroyResource( uniformBufferData.buffer );
 
 		this.delete( uniformBuffer );
 
@@ -3016,9 +3156,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		_commandEncoderDescriptor.label = 'copyTextureToTexture_' + srcTexture.id + '_' + dstTexture.id;
-		const encoder = this.device.createCommandEncoder( _commandEncoderDescriptor );
-		_commandEncoderDescriptor.reset();
+		const encoder = this._acquireCommandEncoder( 'copyTextureToTexture_' + srcTexture.id + '_' + dstTexture.id );
 
 		const sourceGPU = this.get( srcTexture ).texture;
 		const destinationGPU = this.get( dstTexture ).texture;
@@ -3049,7 +3187,7 @@ class WebGPUBackend extends Backend {
 		_texelCopyTextureInfoDst.reset();
 		_extent3D.reset();
 
-		submit( this.device, encoder.finish() );
+		this._finishCommandEncoder( encoder );
 
 		if ( dstLevel === 0 && dstTexture.generateMipmaps ) {
 
@@ -3141,9 +3279,7 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
-			_commandEncoderDescriptor.label = 'copyFramebufferToTexture_' + texture.id;
-			encoder = this.device.createCommandEncoder( _commandEncoderDescriptor );
-			_commandEncoderDescriptor.reset();
+			encoder = this._acquireCommandEncoder( 'copyFramebufferToTexture_' + texture.id );
 
 		}
 
@@ -3183,7 +3319,7 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
-			submit( this.device, encoder.finish() );
+			this._finishCommandEncoder( encoder );
 
 		}
 
