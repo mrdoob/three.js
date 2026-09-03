@@ -36,7 +36,7 @@ import { error } from '../../utils.js';
  *
  * } );
  * ```
- * The module also provides `Break()` and `Continue()` TSL expression for loop control.
+ * The module also provides `Break()` and `Continue()` TSL expressions for loop control.
  * @augments Node
  */
 class LoopNode extends Node {
@@ -50,7 +50,7 @@ class LoopNode extends Node {
 	/**
 	 * Constructs a new loop node.
 	 *
-	 * @param {Array<any>} params - Depending on the loop type, array holds different parameterization values for the loop.
+	 * @param {Array<LoopNode~Params|loopBodyCallback>} params - Any number of loop parameters followed by the loop body.
 	 */
 	constructor( params = [] ) {
 
@@ -340,13 +340,13 @@ export default LoopNode;
  *
  * @tsl
  * @function
- * @param {...any} params - A list of parameters.
+ * @param {...(LoopNode~Params|loopBodyCallback)} params - Any number of loop parameters followed by the loop body.
  * @returns {LoopNode}
  */
 export const Loop = ( ...params ) => new LoopNode( nodeArray( params, 'int' ) ).toStack();
 
 /**
- * TSL function for creating a `Continue()` expression.
+ * TSL function for inserting a `continue` expression into the shader.
  *
  * @tsl
  * @function
@@ -355,10 +355,36 @@ export const Loop = ( ...params ) => new LoopNode( nodeArray( params, 'int' ) ).
 export const Continue = () => expression( 'continue' ).toStack();
 
 /**
- * TSL function for creating a `Break()` expression.
+ * TSL function for inserting a `break` expression into the shader.
  *
  * @tsl
  * @function
  * @returns {ExpressionNode}
  */
 export const Break = () => expression( 'break' ).toStack();
+
+/**
+ * The parameters of a loop. A number or int/uint node defines the loop's end value,
+ * a bool node defines a `while` loop and an object allows a more detailed configuration.
+ *
+ * @typedef {number|Node<int>|Node<uint>|Node<bool>|LoopNode~ObjectParams} LoopNode~Params
+ */
+
+/**
+ * A detailed loop configuration.
+ *
+ * @typedef {Object} LoopNode~ObjectParams
+ * @property {number|Node<int>|Node<uint>} [start=0] - The initial value of the loop variable.
+ * @property {number|Node<int>|Node<uint>} [end] - The value the loop variable is compared against. If omitted, the loop counts down from `start - 1` to `0`.
+ * @property {string} [name] - The name of the loop variable. Defaults to `i`, `j`, `k` and so on.
+ * @property {string} [type='int'] - The data type of the loop variable.
+ * @property {('<'|'<='|'>'|'>=')} [condition] - The comparison operator. The loop runs as long as the comparison is true. Inferred from `start` and `end` if not set.
+ * @property {string|number|Function|Node} [update] - Defines how the loop variable is updated after each iteration. Inferred from `condition` and `type` if not set.
+ */
+
+/**
+ * The loop body.
+ *
+ * @callback loopBodyCallback
+ * @param {Object<string, Node>} inputs - The loop variables of the current `Loop()` call, keyed by their name.
+ */
