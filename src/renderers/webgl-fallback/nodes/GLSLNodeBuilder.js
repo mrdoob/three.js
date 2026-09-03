@@ -10,8 +10,6 @@ import { DataTexture } from '../../../textures/DataTexture.js';
 import { error } from '../../../utils.js';
 
 const glslPolyfills = {
-	bitcast_int_uint: new CodeNode( /* glsl */'uint tsl_bitcast_int_to_uint ( int x ) { return floatBitsToUint( intBitsToFloat ( x ) ); }' ),
-	bitcast_uint_int: new CodeNode( /* glsl */'int tsl_bitcast_uint_to_int ( uint x ) { return floatBitsToInt( uintBitsToFloat ( x ) ); }' ),
 	textureGather: new CodeNode( /* glsl */`
 vec4 tsl_textureGather( const int comp, sampler2D map, vec2 coord, ivec2 offset, bool flipY ) {
 	if ( flipY ) offset.y = - offset.y;
@@ -84,8 +82,6 @@ const glslMethods = {
 	bitcast_int_float: 'intBitsToFloat',
 	bitcast_uint_float: 'uintBitsToFloat',
 	bitcast_float_uint: 'floatBitsToUint',
-	bitcast_uint_int: 'tsl_bitcast_uint_to_int',
-	bitcast_int_uint: 'tsl_bitcast_int_to_uint',
 	floatpack_snorm_2x16: 'packSnorm2x16',
 	floatpack_unorm_2x16: 'packUnorm2x16',
 	floatpack_float16_2x16: 'packHalf2x16',
@@ -277,33 +273,19 @@ class GLSLNodeBuilder extends NodeBuilder {
 	 */
 	getBitcastMethod( type, inputType ) {
 
-		// int<->uint conversion -- scalar or any matching vector length -- is a
-		// bit-preserving reinterpretation under the GLSL spec, so the type
-		// constructor itself (uint(x), uvec4(x), int(x), ivec4(x), ...)
-		// already does exactly what bitcast() needs. Routed here instead of
-		// through the bitcast_X_Y polyfill lookup below, which only has
-		// scalar entries (bitcast_int_uint/bitcast_uint_int) and has no
-		// vector counterpart, e.g. no bitcast_ivec4_uvec4.
-		//
-		// Lengths must match: GLSL constructors also broadcast (uvec4(int))
-		// and truncate (uint(ivec4) / uvec3(ivec4)), which are conversions,
-		// not bitcasts. WGSL bitcast<> requires equal bit widths, so only
-		// take this path when getTypeLength agrees; mismatched sizes fall
-		// through and fail to compile on both backends.
-		const inputFamily = this.getComponentType( inputType );
-		const outputFamily = this.getComponentType( type );
+		const inputComponentType = this.getComponentType( inputType );
+		const componentType = this.getComponentType( type );
 
-		if ( ( inputFamily === 'int' && outputFamily === 'uint' ) || ( inputFamily === 'uint' && outputFamily === 'int' ) ) {
+		// integer types support bitcast implicitly via the type constructor
 
-			if ( this.getTypeLength( inputType ) === this.getTypeLength( type ) ) {
+		if ( inputComponentType !== 'float' && componentType !== 'float' &&
+			this.getTypeLength( inputType ) === this.getTypeLength( type ) ) {
 
-				return this.getType( type );
-
-			}
+			return this.getType( type );
 
 		}
 
-		return this.getMethod( `bitcast_${ inputType }_${ type }` );
+		return this.getMethod( `bitcast_${ inputComponentType }_${ componentType }` );
 
 	}
 
