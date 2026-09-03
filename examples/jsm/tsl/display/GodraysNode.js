@@ -593,6 +593,8 @@ class GodraysNode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this._godraysRenderTarget.dispose();
 
 		this._material.dispose();

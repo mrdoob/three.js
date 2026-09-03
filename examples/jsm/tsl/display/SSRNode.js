@@ -954,6 +954,8 @@ class SSRNode extends TempNode {
 
 				sampleEnvReflection = () => {
 
+					if ( this._importanceEnvironment === null ) return vec3( 0 );
+
 					const envColor = vec3( 0 ).toVar();
 
 					if ( this.envImportanceSampling ) {
@@ -1314,6 +1316,8 @@ class SSRNode extends TempNode {
 	 * when the effect is no longer required.
 	 */
 	dispose() {
+
+		super.dispose();
 
 		this._ssrRenderTarget.dispose();
 		this._blurRenderTarget.dispose();

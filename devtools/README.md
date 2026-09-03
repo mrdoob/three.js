@@ -1,98 +1,62 @@
-# Three.js DevTools Extension
+# Three.js DevTools
 
-This Chrome DevTools extension provides debugging capabilities for Three.js applications. It allows you to inspect scenes, objects, materials, and renderers.
+A Chrome DevTools extension for inspecting three.js applications: the scene graph, the objects in it and the renderers drawing it.
 
 ## Installation
 
-1. **Development Mode**:
-   - Open Chrome and navigate to `chrome://extensions/`
-   - Enable "Developer mode" (toggle in the top-right corner)
-   - Click "Load unpacked" and select the `devtools` directory
-   - The extension will now be available in Chrome DevTools when inspecting pages that use Three.js
+1. Open `chrome://extensions/` and enable "Developer mode".
+2. Click "Load unpacked" and select this `devtools` directory.
+3. Open DevTools on a page that uses three.js and select the "Three.js" tab.
 
-2. **Usage**:
-   - Open Chrome DevTools on a page using Three.js (F12 or Right-click > Inspect)
-   - Click on the "Three.js" tab in DevTools
-   - The panel will automatically detect and display Three.js scenes and renderers found on the page.
+The toolbar icon shows the three.js revision found on the page. Clicking it scrolls the page to the first canvas.
 
-## Code Flow Overview
+## Features
 
-### Extension Architecture
+- **Scenes**: a collapsible tree of every scene and its objects, with geometry and material types for meshes, and object and light counts per scene.
+- **Objects**: click an object to expand it: a preview of the object rendered with its own material, its position, rotation and scale, and a dropdown of properties for its geometry and each material. Hovering draws a box around it over the page.
+- **Renderers**: properties, render stats and memory usage of every `WebGLRenderer` and `WebGPURenderer`, with a button to scroll to its canvas.
 
-The extension follows a standard Chrome DevTools extension architecture:
+## How it works
 
-1. **Background Script** (`background.js`): Manages the extension lifecycle and communication ports between the panel and content script.
-2. **DevTools Script** (`devtools.js`): Creates the panel when the DevTools window opens.
-3. **Panel UI** (`panel/panel.html`, `panel/panel.js`, `panel/panel.css`): The DevTools panel interface that displays the data.
-4. **Content Script** (`content-script.js`): Injected into the web page. Relays messages between the background script and the bridge script.
-5. **Bridge Script** (`bridge.js`): Injected into the page's main world via the manifest. Directly interacts with the Three.js instance, detects objects, gathers data, and communicates back via the content script.
+three.js has built-in support for the extension: when `window.__THREE_DEVTOOLS__` exists, it dispatches a `register` event with its revision and an `observe` event for the objects it creates, of which the bridge picks the renderers and scenes.
 
-### Initialization Flow
+### Files
 
-1. When a page loads, Chrome injects `bridge.js` into the page's main world (including iframes).
-2. `bridge.js` creates the `window.__THREE_DEVTOOLS__` global object.
-3. When the DevTools panel is opened, `panel.js` connects to `background.js` (`init`) and immediately requests the current state (`request-state`).
-4. `background.js` relays the state request to `content-script.js`, which posts it to `bridge.js`.
-5. `bridge.js` responds by sending back observed renderer data (`renderer` message) and batched scene data (`scene` message).
-6. Three.js detects `window.__THREE_DEVTOOLS__` and sends registration/observation events to the bridge script as objects are created or the library initializes.
+- `manifest.json`: injects the page scripts into every frame at `document_start`.
+- `bridge.js`: runs in the page's main world. Creates `window.__THREE_DEVTOOLS__`, collects data from the observed renderers and scenes, and answers the panel's requests.
+- `highlight.js`: runs alongside the bridge. Draws a box around the hovered object in an overlay above the page, projected through the camera and viewport the scene is shown with (one per sub camera of an ArrayCamera).
+- `preview.js`: runs alongside the bridge. Renders an expanded object with its own material, using a renderer created from the page's own three.js, lit by the page's environment and by studio lights of its own (the page's lights on WebGPU). Materials with custom shaders are skipped, their uniforms belong to the page's renderer.
+- `content-script.js`: runs in the isolated world. Relays messages between the bridge and the background script.
+- `background.js`: service worker. Routes messages between the panel and the content script of the inspected tab, and manages the toolbar badge.
+- `devtools.js`: creates the "Three.js" panel.
+- `panel/`: the panel UI. Keeps the state received from the bridge and renders it.
+- `constants.js`: the message names, shared by every script except `content-script.js` (see Development).
 
-### Bridge Operation (`bridge.js`)
+### Message flow
 
-The bridge acts as the communication layer between the Three.js instance on the page and the DevTools panel:
+```
+three.js ──dispatchEvent──▶ bridge.js ──postMessage──▶ content-script.js ──runtime.sendMessage──▶ background.js ──port──▶ panel.js
+                            bridge.js ◀──postMessage── content-script.js ◀──tabs.sendMessage──── background.js ◀──port── panel.js
+```
 
-1. **Event Management**: Creates a custom event target (`DevToolsEventTarget`) to manage communication readiness and backlog events before the panel connects.
-2. **Object Tracking**:
-   - `getObjectData()`: Extracts essential data (UUID, type, name, parent, children, etc.) from Three.js objects.
-   - Maintains a local map (`devTools.objects`) of all observed objects.
+The panel opens a port to the background script and identifies the inspected tab (`init`); the background script forwards its requests to that tab's content script.
 
-3. **Initial Observation & Batching**:
-   - When Three.js sends an `observe` event (via `window.__THREE_DEVTOOLS__.dispatchEvent`):
-     - If it's a renderer, its data is collected and sent immediately via a `'renderer'` message.
-     - If it's a scene, the bridge traverses the entire scene graph, collects data for the scene and all descendants, stores them locally, and sends them to the panel in a single `'scene'` batch message.
+Events from the page: `register`, `renderer`, `scene`, `scene-removed`, `object-details`. Requests from the panel: `request-state`, `request-object-details`, `scroll-to-canvas`, `highlight-object`, `unhighlight-object`.
 
-4. **State Request Handling**:
-   - When the panel sends `request-state` (on load/reload), the bridge iterates its known objects and sends back the current renderer data (`'renderer'`) and scene data (`'scene'` batch).
+### Views
 
-5. **Message Handling**:
-   - Listens for messages from the panel (relayed via content script) like `request-state`.
+The highlight and the preview need the renderer, camera and viewport a scene is shown with, which the bridge records in `scene.onAfterRender`. A scene is drawn many times a frame (shadow maps, reflections, post processing), so only a pass to the canvas, or to a texture shaped like it, counts, and since passes are seen as they finish, one rendered from inside another is followed by the pass it served. A pass to the canvas also records its viewport.
 
-### Panel Interface (`panel/`)
+### State
 
-The panel UI provides the visual representation of the Three.js objects:
+The panel requests the state when it opens and then once a second, along with the details of the expanded objects. While there is nothing to show it says whether three.js was found, so the bridge repeats the revision three.js registered with on every request (versions before r106 do not register). Rendering a preview costs the page a frame, so it is only asked for when a row is expanded and when its geometry or material changes. On each request the bridge resends every renderer (their stats change every frame), and a scene only when its object count changed. Scenes have no `dispose()`, so a scene that stays empty for several requests is removed from the panel, and brought back if it gains children again.
 
-1. **Tree View**: Displays hierarchical representation of scenes and objects.
-2. **Renderer Details**: Shows properties and statistics for renderers in a collapsible section.
-
-## Key Features
-
-- **Scene Hierarchy Visualization**: Browse the complete scene graph.
-- **Object Inspection**: View basic object properties (type, name).
-- **Renderer Details**: View properties, render stats, and memory usage for `WebGLRenderer` instances.
-
-## Communication Flow
-
-1. **Panel ↔ Background ↔ Content Script**: Standard extension messaging for panel initialization and state requests (`init`, `request-state`).
-2. **Three.js → Bridge**: Three.js detects `window.__THREE_DEVTOOLS__` and uses its `dispatchEvent` method (sending `'register'`, `'observe'`).
-3. **Bridge → Content Script**: Bridge uses `window.postMessage` to send data (`'register'`, `'renderer'`, `'scene'`, `'update'`) to the content script.
-4. **Content Script → Background**: Content script uses `chrome.runtime.sendMessage` to relay messages from the bridge to the background.
-5. **Background → Panel**: Background script uses the established port connection (`port.postMessage`) to send data to the panel.
-
-## Key Components
-
-- **DevToolsEventTarget**: Custom event system with backlogging for async loading.
-- **Object Observation & Batching**: Efficiently tracks and sends scene graph data.
-- **Renderer Property Display**: Shows detailed statistics for renderers.
-
-## Integration with Three.js
-
-The extension relies on Three.js having built-in support for DevTools. When Three.js detects the presence of `window.__THREE_DEVTOOLS__`, it interacts with it, primarily by dispatching events.
-
-The bridge script listens for these events, organizes the data, and provides it to the DevTools panel.
+The background script tags every message with the frame it came from and reports navigations, so the panel drops the renderers and scenes of a navigated frame (all of them for a top-level navigation).
 
 ## Development
 
-To modify the extension:
+1. Edit the files in this directory.
+2. Reload the extension in `chrome://extensions/`.
+3. Close and reopen DevTools on the inspected page.
 
-1. Edit the relevant files in the `devtools` directory.
-2. Go to `chrome://extensions/`, find the unpacked extension, and click the reload icon.
-3. Close and reopen DevTools on the inspected page to see your changes.
+`bridge.js` and `content-script.js` run in different worlds of the same page and can't share a file: Chrome injects each file only once per frame, so `content-script.js` keeps its own copy of the message id.

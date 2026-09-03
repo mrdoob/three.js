@@ -49,6 +49,22 @@ export default QUnit.module( 'Addons', () => {
 
 				} );
 
+				QUnit.test( 'preserves distinct vertices with zero tolerance', ( assert ) => {
+
+					const geometry = new BufferGeometry();
+					geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( [
+						11, 0, 0,
+						12, 0, 0,
+						11, 0, 0
+					] ), 3 ) );
+
+					const indexedGeometry = BufferGeometryUtils.mergeVertices( geometry, 0 );
+
+					assert.strictEqual( indexedGeometry.getAttribute( 'position' ).count, 2, 'keeps distinct positions' );
+					assert.deepEqual( Array.from( indexedGeometry.index.array ), [ 0, 1, 0 ], 'merges only identical positions' );
+
+				} );
+
 			} );
 
 		} );

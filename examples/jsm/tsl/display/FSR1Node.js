@@ -454,6 +454,8 @@ class FSR1Node extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this._easuRT.dispose();
 		this._rcasRT.dispose();
 

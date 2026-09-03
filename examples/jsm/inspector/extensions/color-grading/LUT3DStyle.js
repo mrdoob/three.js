@@ -4,12 +4,19 @@
 
 export class LUT3DStyle {
 
-	static init() {
+	static init( nonce = null ) {
 
 		if ( document.getElementById( 'lut3d-generator-style' ) ) return;
 
 		const style = document.createElement( 'style' );
 		style.id = 'lut3d-generator-style';
+
+		if ( nonce ) {
+
+			style.nonce = nonce;
+
+		}
+
 		style.textContent = /* css */`
 @scope (.lut-container) {
 
@@ -24,6 +31,7 @@ export class LUT3DStyle {
 		flex-direction: column;
 		gap: 8px;
 		box-sizing: border-box;
+		color-scheme: dark;
 
 		/* Ultra-Subtle Transparent Blueprint / Checkerboard Grid Background */
 		background-color: transparent;
@@ -96,13 +104,16 @@ export class LUT3DStyle {
 		border: none !important;
 		outline: none;
 		cursor: pointer;
+		color-scheme: dark;
 		transition: color 0.15s;
 	}
 
 	.lut-dock-select option,
-	.lut-container select option {
-		background-color: #1e1e24;
-		color: #e0e0e0;
+	.lut-select option,
+	select option,
+	option {
+		background-color: #1e1e24 !important;
+		color: var(--text-primary, #e0e0e0) !important;
 	}
 
 	.lut-dock-select:hover {
@@ -620,7 +631,7 @@ export class LUT3DStyle {
 		flex-shrink: 0;
 	}
 
-	.lut-select, .lut-container select, .lut-toolbar select {
+	.lut-select, .lut-container select, .lut-toolbar select, select {
 		height: 22px;
 		font-family: var(--font-family, sans-serif);
 		font-size: 11px;
@@ -630,8 +641,15 @@ export class LUT3DStyle {
 		padding: 0 4px;
 		outline: none;
 		cursor: pointer;
+		color-scheme: dark;
 		flex-shrink: 1;
 		min-width: 40px;
+	}
+
+	.lut-select option,
+	select option {
+		background-color: #1e1e24 !important;
+		color: var(--text-primary, #e0e0e0) !important;
 	}
 
 	.lut-select-compact {

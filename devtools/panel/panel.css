@@ -9,19 +9,12 @@ body {
 	padding: 10px;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 	font-size: 12px;
-}
-
-hr {
-	color: light-dark( #333, #e0e0e0 );
-}
-
-#scene-tree {
-	width: 100%;
-	height: 100%;
-	overflow: auto;
+	font-variant-numeric: tabular-nums; /* stats and transforms change every poll, so digits must not jitter */
 }
 
 .header {
+	display: flex;
+	justify-content: space-between;
 	padding: 8px 12px;
 	background: light-dark( #f5f5f5, #333 );
 	border-radius: 4px;
@@ -29,27 +22,52 @@ hr {
 	font-family: monospace;
 	color: light-dark( #666, #aaa );
 }
-	.header a {
-		color: light-dark( #666, #aaa );
-		text-decoration: none;
-	}
-	.header a:hover {
-		color: light-dark( #333, #e0e0e0 );
-	}
-
-.section {
-	margin-bottom: 24px;
+.header a {
+	color: inherit;
+	text-decoration: none;
+}
+.header a:hover {
+	color: light-dark( #333, #e0e0e0 );
+}
+.header .version {
+	opacity: 0.5;
 }
 
-	.section h3 {
-		margin: 0 0 8px 0;
-		font-size: 11px;
-		text-transform: uppercase;
-		color: light-dark( #666, #aaa );
-		font-weight: 500;
-		border-bottom: 1px solid light-dark( #eee, #444 );
-		padding-bottom: 4px;
-	}
+/* Shown while there is nothing else to show */
+#notice {
+	padding: 24px 12px;
+	text-align: center;
+	color: light-dark( #666, #aaa );
+}
+
+/* Side by side while both fit, stacked when the panel is narrow */
+.sections-container {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 24px 20px;
+}
+.section {
+	flex: 1 1 480px;
+	min-width: 0;
+}
+.section:empty {
+	display: none;
+}
+.section h3 {
+	margin: 0 0 8px 0;
+	font-size: 11px;
+	text-transform: uppercase;
+	color: light-dark( #666, #aaa );
+	font-weight: 500;
+	border-bottom: 1px solid light-dark( #eee, #444 );
+	padding-bottom: 4px;
+}
+
+/* Collapsible nodes (scene tree and renderers) */
+details > summary {
+	list-style: none;
+}
 
 .tree-item {
 	padding: 4px;
@@ -59,6 +77,12 @@ hr {
 }
 .tree-item:hover {
 	background: light-dark( #f0f0f0, #555 );
+}
+.tree-item.invisible {
+	opacity: 0.5;
+}
+.tree-item.expanded {
+	background: light-dark( #dbe9ff, #2b4a6f );
 }
 .tree-item .icon {
 	margin-right: 4px;
@@ -70,7 +94,7 @@ hr {
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
-.tree-item .label .object-details {
+.object-details {
 	color: #aaa;
 	margin-left: 4px;
 	font-weight: normal;
@@ -81,22 +105,9 @@ hr {
 	font-size: 0.9em;
 }
 
-.children {
-	margin-left: 0;
-}
-
-/* Collapsible scene tree nodes */
-details.tree-node > summary.tree-item {
-	list-style: none;
-}
-details.tree-node > summary.tree-item::-webkit-details-marker {
-	display: none;
-}
-
 .tree-toggle,
 .tree-toggle-placeholder {
-	display: inline-block;
-	width: 1em;
+	width: 1.5em;
 	margin-right: 2px;
 	text-align: center;
 	flex-shrink: 0;
@@ -106,74 +117,69 @@ details.tree-node > summary.tree-item::-webkit-details-marker {
 	font-size: 0.7em;
 	opacity: 0.6;
 }
-details.tree-node[open] > summary.tree-item .tree-toggle::before {
+details[open] > summary .tree-toggle::before {
 	content: '▼';
 }
 
-/* Style for clickable renderer summary */
-.renderer-summary {
-	cursor: pointer;
+/* Properties of an expanded renderer or object: content-sized columns, wrapping when the panel is narrow */
+.properties-list {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 12px 16px;
+	padding: 8px 4px 12px 16px;
 }
-.renderer-summary:hover {
-	background: light-dark( #f0f0f0, #555 );
+.property-group {
+	display: grid;
+	grid-template-columns: max-content minmax(0, max-content);
+	gap: 2px 16px;
+}
+.property-group h4 {
+	grid-column: 1 / -1;
+	margin: 12px 0 4px;
+}
+.property-group h4:first-child {
+	margin-top: 0;
+}
+.property-column .property-group + .property-group {
+	margin-top: 12px;
+}
+.property-row,
+.transform {
+	display: contents;
+}
+.property-value {
+	text-align: right;
+	overflow-wrap: anywhere;
 }
 
-/* Hide default details marker when using custom summary */
-details.renderer-container > summary.renderer-summary { /* Target summary */
-	list-style: none; /* Hide default arrow */
-	cursor: pointer; /* Make the summary div look clickable */
+/* The type headings are wider than their rows, so the value column takes the extra width
+   and every value stays next to the label it belongs to */
+.object-properties {
+	grid-template-columns: max-content minmax(0, 1fr);
 }
-details.renderer-container > summary.renderer-summary::-webkit-details-marker {
-	display: none; /* Hide default arrow in WebKit */
+.object-properties .property-value {
+	text-align: left;
 }
-
-/* Style for the toggle icon */
-.toggle-icon::before {
-	content: '▶'; /* Default: collapsed */
-	display: inline-block;
-	width: 1em;
-	margin-right: 2px;
-	opacity: 0.7;
+.picker select {
+	font: inherit;
+	max-width: 80px; /* as wide as its longest option otherwise */
 }
-details.renderer-container[open] > summary.renderer-summary .toggle-icon::before {
-	content: '▼'; /* Expanded */
-}
-
-/* Floating object details panel */
-.floating-details {
-	position: fixed;
-	z-index: 1000;
-	background: light-dark( #fff, #2a2a2a );
-	border: 1px solid light-dark( #ccc, #555 );
-	border-radius: 6px;
-	padding: 12px;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-	max-width: 300px;
-	min-width: 200px;
+/* The tile is the placeholder too, so the size lives here and preview.js renders to match.
+   It holds the render as its background, or the reason there is none as text. */
+.preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	width: 160px;
+	height: 160px;
+	padding: 0 12px;
+	border-radius: 4px;
+	background: #eee center / contain no-repeat; /* light in both themes, the render is transparent */
+	color: #aaa;
 	font-size: 11px;
-	pointer-events: none; /* Prevent interfering with mouse interactions */
-	opacity: 0;
-	transform: translateY(10px);
-	transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.floating-details.visible {
-	opacity: 1;
-	transform: translateY(0);
-}
-
-.floating-details h4 {
-	margin: 8px 0 4px 0;
-	font-size: 10px;
-	text-transform: uppercase;
-	color: light-dark( #666, #aaa );
-	border-bottom: 1px solid light-dark( #eee, #444 );
-	padding-bottom: 2px;
-}
-
-.floating-details .property-row {
-	margin-bottom: 1px;
-	font-size: 10px;
+	text-align: center;
 }
 
 /* Scroll to canvas button */
@@ -188,38 +194,12 @@ details.renderer-container[open] > summary.renderer-summary .toggle-icon::before
 	opacity: 0.6;
 	transition: opacity 0.2s ease, background 0.2s ease;
 }
-
 .scroll-to-canvas-btn:hover {
 	opacity: 1;
 	background: light-dark( rgba(0,0,0,0.1), rgba(255,255,255,0.1) );
 }
-
 .scroll-to-canvas-placeholder {
-	font-size: 12px;
 	margin-left: 8px;
 	padding: 2px 4px;
 	opacity: 0.3;
-}
-
-/* Two-column layout for wide panel */
-@media (min-width: 1000px) {
-	.sections-container {
-		display: flex;
-		gap: 20px;
-		align-items: flex-start;
-	}
-	
-	.sections-container .section {
-		flex: 1;
-		margin-bottom: 0;
-	}
-	
-	/* Ensure sections have equal width */
-	.sections-container .section:first-child {
-		min-width: 0; /* Allow flexbox to shrink */
-	}
-	
-	.sections-container .section:last-child {
-		min-width: 0; /* Allow flexbox to shrink */
-	}
 }

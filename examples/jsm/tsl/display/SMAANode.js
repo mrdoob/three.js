@@ -675,6 +675,8 @@ class SMAANode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this._renderTargetEdges.dispose();
 		this._renderTargetWeights.dispose();
 		this._renderTargetBlend.dispose();

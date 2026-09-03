@@ -722,6 +722,8 @@ class TRAANode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this._historyRenderTarget.dispose();
 		this._resolveRenderTarget.dispose();
 

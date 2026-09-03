@@ -1,6 +1,6 @@
 export class Style {
 
-	static init( container ) {
+	static init( container, nonce = null ) {
 
 		const css = /* css */`
 @scope (.three-inspector) {
@@ -29,6 +29,7 @@ export class Style {
 		pointer-events: none;
 		z-index: 1000;
 		overflow: hidden;
+		color-scheme: dark;
 	}
 
 	:scope * {
@@ -1080,6 +1081,7 @@ export class Style {
 
 	.list-item-row {
 		display: grid;
+		grid-template-columns: var(--list-grid-template, none);
 		align-items: center;
 		padding: 4px 8px;
 		border-radius: 3px;
@@ -1171,6 +1173,7 @@ export class Style {
 
 	.list-header {
 		display: grid;
+		grid-template-columns: var(--list-grid-template, none);
 		align-items: center;
 		padding: 4px 8px;
 		font-weight: 600;
@@ -1437,6 +1440,7 @@ export class Style {
 		font-family: var(--font-mono);
 		width: 100%;
 		box-sizing: border-box;
+		color-scheme: dark;
 	}
 
 	.param-control input:focus {
@@ -2019,6 +2023,16 @@ export class Style {
 		background-color: rgba(255, 255, 255, 0.05);
 	}
 
+	select {
+		color-scheme: dark;
+	}
+
+	select option,
+	option {
+		background-color: #1e1e24;
+		color: var(--text-primary);
+	}
+
 	.select {
 		background: var(--profiler-background);
 		border: 1px solid var(--profiler-border);
@@ -2029,6 +2043,7 @@ export class Style {
 		font-size: 12px;
 		outline: none;
 		cursor: pointer;
+		color-scheme: dark;
 		appearance: none;
 		-webkit-appearance: none;
 		-moz-appearance: none;
@@ -2099,14 +2114,20 @@ export class Style {
 		position: absolute;
 		top: 0;
 		bottom: 0;
-		width: 4px;
-		margin-left: -2px;
+		width: 1px;
 		left: 50%;
-		background: var(--profiler-border);
+		background-color: transparent;
 		cursor: ew-resize;
 		pointer-events: auto !important;
 		z-index: 10;
 		touch-action: none;
+		transition: background-color 0.15s ease-out;
+	}
+
+	.split-screen-line:hover,
+	.split-screen-line:active,
+	.split-screen-line.active {
+		background-color: var(--color-accent);
 	}
 
 	.split-screen-line::before {
@@ -2114,10 +2135,36 @@ export class Style {
 		position: absolute;
 		top: 0;
 		bottom: 0;
-		left: -10px;
-		width: 24px;
+		left: -12px;
+		width: 25px;
 		background: transparent;
 		cursor: ew-resize;
+	}
+
+	.split-screen-line::after {
+		content: '';
+		position: absolute;
+		top: -1px;
+		bottom: -1px;
+		left: -5px;
+		width: 11px;
+		pointer-events: none;
+		background-image:
+			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M-0.5 -1 L5.5 7 L11.5 -1 Z' fill='rgba(30,30,36,0.85)' stroke='%234a4a5a' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E"),
+			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M-0.5 8 L5.5 0 L11.5 8 Z' fill='rgba(30,30,36,0.85)' stroke='%234a4a5a' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E");
+		background-position: top center, bottom center;
+		background-repeat: no-repeat;
+		opacity: 1;
+		transition: opacity 0.15s ease-out;
+	}
+
+	.split-screen-line:hover::after,
+	.split-screen-line:active::after,
+	.split-screen-line.active::after {
+		opacity: 1;
+		background-image:
+			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M-0.5 -1 L5.5 7 L11.5 -1 Z' fill='%2300aaff' stroke='%2300aaff' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E"),
+			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M-0.5 8 L5.5 0 L11.5 8 Z' fill='%2300aaff' stroke='%2300aaff' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E");
 	}
 
 	/* Grid Mode styles for List component */
@@ -2187,10 +2234,63 @@ export class Style {
 		justify-content: center !important;
 	}
 
+	/* Timeline Info & Details */
+	.timeline-detail-block {
+		font-size: 11px;
+		margin-left: 8px;
+		color: var(--text-secondary);
+		opacity: 1;
+	}
+
+	.timeline-detail-key,
+	.timeline-detail-sep,
+	.timeline-call-count {
+		opacity: 0.5;
+	}
+
+	.timeline-detail-value {
+		color: var(--text-secondary);
+		opacity: 1;
+	}
+
+	.timeline-info-group {
+		display: inline-flex;
+		align-items: center;
+		margin-left: 12px;
+		flex-shrink: 0;
+	}
+
+	.timeline-info-dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		margin-right: 6px;
+		flex-shrink: 0;
+	}
+
+	.timeline-info-dot.fps {
+		background-color: var(--color-fps);
+	}
+
+	.timeline-info-dot.call {
+		background-color: var(--color-call);
+	}
+
+	.timeline-info-dot.red {
+		background-color: var(--color-red);
+	}
+
 }
 `;
 
 		const styleElement = document.createElement( 'style' );
+
+		if ( nonce ) {
+
+			styleElement.nonce = nonce;
+
+		}
+
 		styleElement.textContent = css;
 
 		container.appendChild( styleElement );

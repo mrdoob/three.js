@@ -86,13 +86,6 @@ class SkyMesh extends Mesh {
 		this.sunPosition = uniform( new Vector3() );
 
 		/**
-		 * The up position.
-		 *
-		 * @type {UniformNode<vec3>}
-		 */
-		this.upUniform = uniform( new Vector3( 0, 1, 0 ) );
-
-		/**
 		 * The cloud scale uniform.
 		 *
 		 * @type {UniformNode<float>}
@@ -192,7 +185,7 @@ class SkyMesh extends Mesh {
 
 			// varying sun intensity
 
-			const angle = dot( sunDirection, this.upUniform );
+			const angle = sunDirection.y;
 			const zenithAngleCos = clamp( angle, - 1, 1 );
 			const sunIntensity = EE.mul( max( 0.0, float( 1.0 ).sub( pow( e, cutoffAngle.sub( acos( zenithAngleCos ) ).div( steepness ).negate() ) ) ) );
 			vSunE.assign( sunIntensity );
@@ -247,7 +240,7 @@ class SkyMesh extends Mesh {
 
 			// optical length
 			// cutoff angle at 90 to avoid singularity in next formula.
-			const zenithAngle = acos( max( 0.0, dot( this.upUniform, direction ) ) );
+			const zenithAngle = acos( max( 0.0, direction.y ) );
 			const inverse = float( 1.0 ).div( cos( zenithAngle ).add( float( 0.15 ).mul( pow( float( 93.885 ).sub( zenithAngle.mul( 180.0 ).div( pi ) ), - 1.253 ) ) ) );
 			const sR = rayleighZenithLength.mul( inverse );
 			const sM = mieZenithLength.mul( inverse );
@@ -272,7 +265,7 @@ class SkyMesh extends Mesh {
 			const betaMTheta = vBetaM.mul( mPhase );
 
 			const Lin = pow( vSunE.mul( add( betaRTheta, betaMTheta ).div( add( vBetaR, vBetaM ) ) ).mul( sub( 1.0, Fex ) ), vec3( 1.5 ) );
-			Lin.mulAssign( mix( vec3( 1.0 ), pow( vSunE.mul( add( betaRTheta, betaMTheta ).div( add( vBetaR, vBetaM ) ) ).mul( Fex ), vec3( 1.0 / 2.0 ) ), clamp( pow( sub( 1.0, dot( this.upUniform, vSunDirection ) ), 5.0 ), 0.0, 1.0 ) ) );
+			Lin.mulAssign( mix( vec3( 1.0 ), pow( vSunE.mul( add( betaRTheta, betaMTheta ).div( add( vBetaR, vBetaM ) ) ).mul( Fex ), vec3( 1.0 / 2.0 ) ), clamp( pow( sub( 1.0, vSunDirection.y ), 5.0 ), 0.0, 1.0 ) ) );
 
 			// nightsky
 
