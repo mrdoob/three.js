@@ -14,6 +14,14 @@ marked.use( {
 
 			return false;
 
+		},
+		link( href, title, text ) {
+
+			const targetAttr = href && ! href.startsWith( '#' ) ? ' target="_blank" rel="noopener noreferrer"' : '';
+			const titleAttr = title ? ` title="${title}"` : '';
+
+			return `<a href="${href}"${targetAttr}${titleAttr}>${text}</a>`;
+
 		}
 	}
 } );

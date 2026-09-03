@@ -1456,6 +1456,11 @@ class Tour {
 
 				};
 
+			} else if ( href ) {
+
+				link.setAttribute( 'target', '_blank' );
+				link.setAttribute( 'rel', 'noopener noreferrer' );
+
 			}
 
 		} );

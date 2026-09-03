@@ -440,6 +440,31 @@ class CodeRunner extends EventDispatcher {
 
 	}
 
+	call( methodName, ...args ) {
+
+		for ( const name of this.activeScriptNames ) {
+
+			const scriptConfig = this.scripts[ name ];
+			const instance = scriptConfig ? scriptConfig.instance : null;
+
+			if ( instance && typeof instance[ methodName ] === 'function' ) {
+
+				try {
+
+					instance[ methodName ]( ...args );
+
+				} catch ( e ) {
+
+					console.error( `Error executing "${methodName}" on script "${name}":`, e );
+
+				}
+
+			}
+
+		}
+
+	}
+
 	activateScript( name ) {
 
 		const scriptConfig = this.scripts[ name ];
@@ -524,6 +549,24 @@ class CodeRunner extends EventDispatcher {
 			}
 
 		}
+
+	}
+
+	dispose() {
+
+		for ( const name of [ ...this.activeScriptNames ] ) {
+
+			this.invalidateScript( name );
+
+		}
+
+		if ( this.scripts[ '__main__' ] ) {
+
+			this.invalidateScript( '__main__' );
+
+		}
+
+		this.activeScriptNames = [];
 
 	}
 
@@ -755,20 +798,6 @@ class CodeRunner extends EventDispatcher {
 		}
 
 		return scriptConfig.promise;
-
-	}
-	call( name, ...args ) {
-
-		this.activeScriptNames.forEach( scriptName => {
-
-			const scriptConfig = this.scripts[ scriptName ];
-			if ( scriptConfig && scriptConfig.instance && scriptConfig.instance[ name ] ) {
-
-				scriptConfig.instance[ name ]( ...args );
-
-			}
-
-		} );
 
 	}
 
@@ -1100,19 +1129,6 @@ class CodeRunner extends EventDispatcher {
 			} );
 
 		}
-
-	}
-
-	dispose() {
-
-		for ( const baseName of Object.keys( this.scripts ) ) {
-
-			this.invalidateScript( baseName );
-
-		}
-
-		this.scripts = {};
-		this.activeScriptNames = [];
 
 	}
 
