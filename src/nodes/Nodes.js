@@ -131,6 +131,7 @@ export { default as ConditionalNode } from './math/ConditionalNode.js';
 export { default as MathNode } from './math/MathNode.js';
 export { default as OperatorNode } from './math/OperatorNode.js';
 export { default as PackFloatNode } from './math/PackFloatNode.js';
+export { default as Packed4x8IntegerNode } from './math/Packed4x8IntegerNode.js';
 export { default as UnpackFloatNode } from './math/UnpackFloatNode.js';
 
 // parsers

@@ -36,6 +36,7 @@ import './addons/tsl/TSLBitOps.tests.js';
 import './addons/tsl/TSLNoise.tests.js';
 import './addons/tsl/TSLMath.tests.js';
 import './addons/tsl/TSLPacking.tests.js';
+import './addons/tsl/TSLPacked4x8Integer.tests.js';
 import './addons/tsl/TSLConversion.tests.js';
 import './addons/tsl/TSLVectorMatrix.tests.js';
 import './addons/tsl/TSLMathExtra.tests.js';
