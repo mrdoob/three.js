@@ -618,12 +618,175 @@ class CodeRunner extends EventDispatcher {
 
 					const { importDeclarations, declaredSymbols } = parseScript( text );
 
+					const loadedModules = new Map();
+
+					const importPromises = importDeclarations.map( async ( decl ) => {
+
+						const moduleName = decl.moduleName;
+						const fullMatch = decl.fullMatch;
+
+						let moduleObj = this.imports[ moduleName ];
+						if ( ! moduleObj ) {
+
+							const isStandard = isStandardModule( moduleName, this.imports );
+							if ( ! isStandard ) {
+
+								const resolvedPath = resolvePath( name, moduleName );
+								const baseName = resolvedPath.replace( /\.js$/, '' );
+								if ( ! this.scripts[ baseName ] ) {
+
+									this.scripts[ baseName ] = {
+										url: `./js/imports/scripts/${baseName}.js`,
+										instance: null,
+										promise: null,
+										dependencies: []
+									};
+
+								}
+
+								if ( ! scriptConfig.dependencies.includes( baseName ) ) {
+
+									scriptConfig.dependencies.push( baseName );
+
+								}
+
+								moduleObj = await this.load( baseName );
+
+							} else {
+
+								try {
+
+									moduleObj = await import( moduleName );
+
+								} catch ( err ) {
+
+									const charIndex = text.indexOf( fullMatch );
+									const lineNumber = charIndex !== - 1 ? text.substring( 0, charIndex ).split( '\n' ).length : 1;
+									const error = new Error( `Failed to load import "${moduleName}" in script "${name}.js". Make sure the module path is correct.` );
+									error.customLineNumber = lineNumber;
+									throw error;
+
+								}
+
+							}
+
+						}
+
+						loadedModules.set( decl, moduleObj );
+
+					} );
+
+					if ( importPromises.length > 0 ) {
+
+						await Promise.all( importPromises );
+
+					}
+
 					const symbols = [];
 					const values = [];
 
+					// 1. Process explicit import specifiers (named, namespace, default)
+					for ( const decl of importDeclarations ) {
+
+						const moduleObj = loadedModules.get( decl );
+						if ( moduleObj ) {
+
+							decl.specifiers.forEach( spec => {
+
+								if ( spec.type === 'named' ) {
+
+									if ( ! symbols.includes( spec.local ) ) {
+
+										symbols.push( spec.local );
+										values.push( moduleObj[ spec.imported ] );
+
+									}
+
+								} else if ( spec.type === 'namespace' ) {
+
+									if ( ! symbols.includes( spec.local ) ) {
+
+										symbols.push( spec.local );
+										values.push( moduleObj );
+
+									}
+
+								} else if ( spec.type === 'default' ) {
+
+									if ( ! symbols.includes( spec.local ) ) {
+
+										symbols.push( spec.local );
+										values.push( moduleObj[ 'default' ] );
+
+									}
+
+								}
+
+							} );
+
+						}
+
+					}
+
+					// 2. Collect exported properties from all dependencies (including side-effect imports)
+					const activeModules = {};
+					const collectDependenciesExports = ( depName, visited = new Set() ) => {
+
+						if ( visited.has( depName ) ) return;
+						visited.add( depName );
+
+						const depConfig = this.scripts[ depName ];
+						if ( depConfig ) {
+
+							if ( depConfig.dependencies ) {
+
+								for ( const subDep of depConfig.dependencies ) {
+
+									collectDependenciesExports( subDep, visited );
+
+								}
+
+							}
+
+							if ( depConfig.instance ) {
+
+								for ( const key of Object.keys( depConfig.instance ) ) {
+
+									if ( ! LIFECYCLE_METHODS.includes( key ) && depConfig.instance[ key ] !== undefined ) {
+
+										activeModules[ key ] = depConfig.instance[ key ];
+
+									}
+
+								}
+
+							}
+
+						}
+
+					};
+
+					for ( const dep of scriptConfig.dependencies ) {
+
+						collectDependenciesExports( dep );
+
+					}
+
+					for ( const [ key, obj ] of Object.entries( activeModules ) ) {
+
+						if ( ! symbols.includes( key ) && ! declaredSymbols.has( key ) ) {
+
+							symbols.push( key );
+							values.push( obj );
+
+						}
+
+					}
+
+					// 3. Inject runner environment variables (e.g. renderer) not shadowed by local declarations
 					for ( const [ key, val ] of Object.entries( this.env ) ) {
 
-						if ( ! declaredSymbols.has( key ) ) {
+						if ( ! symbols.includes( key ) && ! declaredSymbols.has( key ) ) {
 
 							symbols.push( key );
 							values.push( val );
@@ -634,97 +797,6 @@ class CodeRunner extends EventDispatcher {
 
 					symbols.push( 'console' );
 					values.push( this.customConsole );
-
-					const importPromises = [];
-
-					importDeclarations.forEach( decl => {
-
-						const moduleName = decl.moduleName;
-						const fullMatch = decl.fullMatch;
-
-						importPromises.push( ( async () => {
-
-							let moduleObj = this.imports[ moduleName ];
-							if ( ! moduleObj ) {
-
-								const isStandard = isStandardModule( moduleName, this.imports );
-								if ( ! isStandard ) {
-
-									const resolvedPath = resolvePath( name, moduleName );
-									const baseName = resolvedPath.replace( /\.js$/, '' );
-									if ( ! this.scripts[ baseName ] ) {
-
-										this.scripts[ baseName ] = {
-											url: `./js/imports/scripts/${baseName}.js`,
-											instance: null,
-											promise: null,
-											dependencies: []
-										};
-
-									}
-
-									if ( ! scriptConfig.dependencies.includes( baseName ) ) {
-
-										scriptConfig.dependencies.push( baseName );
-
-									}
-
-									moduleObj = await this.load( baseName );
-
-								} else {
-
-									try {
-
-										moduleObj = await import( moduleName );
-
-									} catch ( err ) {
-
-										const charIndex = text.indexOf( fullMatch );
-										const lineNumber = charIndex !== - 1 ? text.substring( 0, charIndex ).split( '\n' ).length : 1;
-										const error = new Error( `Failed to load import "${moduleName}" in script "${name}.js". Make sure the module path is correct.` );
-										error.customLineNumber = lineNumber;
-										throw error;
-
-									}
-
-								}
-
-							}
-
-							if ( moduleObj ) {
-
-								decl.specifiers.forEach( spec => {
-
-									if ( spec.type === 'named' ) {
-
-										symbols.push( spec.local );
-										values.push( moduleObj[ spec.imported ] );
-
-									} else if ( spec.type === 'namespace' ) {
-
-										symbols.push( spec.local );
-										values.push( moduleObj );
-
-									} else if ( spec.type === 'default' ) {
-
-										symbols.push( spec.local );
-										values.push( moduleObj[ 'default' ] );
-
-									}
-
-								} );
-
-							}
-
-						} )() );
-
-					} );
-
-					if ( importPromises.length > 0 ) {
-
-						await Promise.all( importPromises );
-
-					}
 
 					const cleanImportsText = stripImportDeclarations( text, importDeclarations );
 					const { cleanText, exportedSymbols } = processExportDeclarations( cleanImportsText );
