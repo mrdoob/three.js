@@ -99,9 +99,7 @@ class SSAAPassNode extends PassNode {
 
 		//
 
-		this._pixelRatio = renderer.getPixelRatio();
-
-		const size = renderer.getSize( _size );
+		const size = renderer.getDrawingBufferSize( _size );
 
 		this.setSize( size.width, size.height );
 		this._sampleRenderTarget.setSize( this.renderTarget.width, this.renderTarget.height );
