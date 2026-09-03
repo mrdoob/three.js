@@ -7,10 +7,6 @@ function WebGLAnimation() {
 
 	function onAnimationFrame( time, frame ) {
 
-		// Request the next frame before running the animation loop. An uncaught
-		// error in the callback then does not stop the animation, and a stop()
-		// call from within the callback cancels the pending request.
-
 		requestId = context.requestAnimationFrame( onAnimationFrame );
 
 		animationLoop( time, frame );
