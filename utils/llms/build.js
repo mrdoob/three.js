@@ -181,7 +181,8 @@ When using TSL, use node-based materials:
 
 ## Core Concepts
 
-- [TSL Specification](https://threejs.org/docs/#api/en/nodes/TSL): Complete shader language reference
+- [TSL Guide](https://threejs.org/tsl/): Three.js Shading Language guide with playground
+- [TSL Reference](https://threejs.org/docs/#TSL): All TSL functions
 - [Animation System](https://threejs.org/manual/#animation-system)
 - [Loading 3D Models](https://threejs.org/manual/#loading-3d-models)
 - [Scene Graph](https://threejs.org/manual/#scenegraph)
