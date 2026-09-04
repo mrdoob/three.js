@@ -205,11 +205,19 @@ export const cubeTexture = ( value = EmptyTexture, uvNode = null, levelNode = nu
 };
 
 /**
- * TSL function for creating a uniform cube texture node.
+ * TSL function for creating a non-mergeable uniform cube texture node.
  *
  * @tsl
  * @function
  * @param {?CubeTexture} [value=EmptyTexture] - The cube texture.
  * @returns {CubeTextureNode}
  */
-export const uniformCubeTexture = ( value = EmptyTexture ) => cubeTextureBase( value );
+export const uniformCubeTexture = ( value = EmptyTexture ) => {
+
+	const textureNode = cubeTextureBase( value );
+
+	textureNode.mergeable = false;
+
+	return textureNode;
+
+};

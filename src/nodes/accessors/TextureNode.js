@@ -155,6 +155,15 @@ class TextureNode extends UniformNode {
 		this.referenceNode = null;
 
 		/**
+		 * The mergeable value is stored in a private property.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default true
+		 */
+		this._mergeable = true;
+
+		/**
 		 * The texture value is stored in a private property.
 		 *
 		 * @private
@@ -193,6 +202,32 @@ class TextureNode extends UniformNode {
 
 	}
 
+	set mergeable( value ) {
+
+		if ( this.referenceNode ) {
+
+			this.referenceNode.mergeable = value;
+
+		} else {
+
+			this._mergeable = value;
+
+		}
+
+	}
+
+	/**
+	 * Whether the uniform may be merged with other uniforms at compile-time.
+	 *
+	 * @type {boolean}
+	 * @default true
+	 */
+	get mergeable() {
+
+		return this.referenceNode ? this.referenceNode.mergeable : this._mergeable;
+
+	}
+
 	set value( value ) {
 
 		if ( this.referenceNode ) {
@@ -219,12 +254,24 @@ class TextureNode extends UniformNode {
 	}
 
 	/**
-	 * Overwritten since the uniform hash is defined by the texture's UUID.
+	 * Overwritten since the uniform hash is defined by the texture's UUID - if mergeable - and the hash of its reference node otherwise.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The uniform hash.
 	 */
 	getUniformHash( /*builder*/ ) {
+
+		if ( this.referenceNode && ! this.referenceNode.mergeable ) {
+
+			return this.referenceNode.getHash();
+
+		}
+
+		if ( ! this._mergeable ) {
+
+			return this.getHash();
+
+		}
 
 		return this.value.uuid;
 
@@ -1011,14 +1058,22 @@ export const texture = ( value = EmptyTexture, uvNode = null, levelNode = null, 
 };
 
 /**
- * TSL function for creating a uniform texture node.
+ * TSL function for creating an non-mergeable uniform texture node.
  *
  * @tsl
  * @function
  * @param {?Texture} value - The texture.
  * @returns {TextureNode}
  */
-export const uniformTexture = ( value = EmptyTexture ) => texture( value );
+export const uniformTexture = ( value = EmptyTexture ) => {
+
+	const textureNode = texture( value );
+
+	textureNode.mergeable = false;
+
+	return textureNode;
+
+};
 
 /**
  * TSL function for creating a texture node that fetches/loads texels without interpolation.
