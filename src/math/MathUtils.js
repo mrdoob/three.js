@@ -280,10 +280,10 @@ function radToDeg( radians ) {
 }
 
 /**
- * Returns `true` if the given number is a power of two.
+ * Returns `true` if the given integer is a power of two.
  *
  * @param {number} value - The value to check.
- * @return {boolean} Whether the given number is a power of two or not.
+ * @return {boolean} Whether the given integer is a power of two or not.
  */
 function isPowerOfTwo( value ) {
 
