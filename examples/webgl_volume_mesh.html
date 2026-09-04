@@ -309,6 +309,7 @@
 				// Reuse the SDF texture from the first volume
 				instancedVolumeMesh.sdfTexture = volumeMeshes[ 0 ].sdfTexture;
 				instancedVolumeMesh.uvTexture = volumeMeshes[ 0 ].uvTexture;
+				instancedVolumeMesh.geometry = volumeMeshes[ 0 ].geometry;
 				instancedVolumeMesh.inverseBoundsMatrix.copy( volumeMeshes[ 0 ].inverseBoundsMatrix );
 
 				// Copy material properties

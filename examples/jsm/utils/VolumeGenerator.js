@@ -1,6 +1,48 @@
-import { Data3DTexture, DataUtils, RGBAFormat, RGFormat, FloatType, HalfFloatType, LinearFilter, Matrix4, Vector3, Vector2, Quaternion, Ray, DoubleSide, Triangle } from 'three';
+import { Data3DTexture, DataUtils, RGBAFormat, RGFormat, FloatType, HalfFloatType, LinearFilter, Matrix4, Vector3, Vector2, Quaternion, Ray, DoubleSide, Triangle, BoxGeometry } from 'three';
+import { ConvexGeometry } from '../geometries/ConvexGeometry.js';
 
 export class VolumeGenerator {
+
+	// Convex hull of the mesh expanded by the margin, in the unit box space of the volume.
+	// Rasterizing it instead of the box skips most rays that would miss the surface.
+	static generateProxy( geometry, inverseBoundsMatrix, margin ) {
+
+		const position = geometry.attributes.position;
+		const points = [];
+
+		for ( let i = 0; i < position.count; i ++ ) {
+
+			points.push( new Vector3().fromBufferAttribute( position, i ) );
+
+		}
+
+		const hull = new ConvexGeometry( points );
+		const center = new Vector3().setFromMatrixPosition( new Matrix4().copy( inverseBoundsMatrix ).invert() );
+
+		// Scale about the center so every face moves outward by at least the margin
+		const hullPosition = hull.attributes.position;
+		const hullNormal = hull.attributes.normal;
+		const vertex = new Vector3();
+		const normal = new Vector3();
+		let minDistance = Infinity;
+
+		for ( let i = 0; i < hullPosition.count; i += 3 ) {
+
+			vertex.fromBufferAttribute( hullPosition, i ).sub( center );
+			normal.fromBufferAttribute( hullNormal, i );
+			minDistance = Math.min( minDistance, Math.abs( normal.dot( vertex ) ) );
+
+		}
+
+		if ( ! ( minDistance > 1e-6 ) ) return new BoxGeometry( 1, 1, 1 );
+
+		const factor = 1 + margin / minDistance;
+		hull.translate( - center.x, - center.y, - center.z ).scale( factor, factor, factor ).translate( center.x, center.y, center.z );
+		hull.applyMatrix4( inverseBoundsMatrix );
+
+		return hull;
+
+	}
 
 	static async generateSDF( sourceMesh, resolution, margin ) {
 

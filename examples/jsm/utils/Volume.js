@@ -19,6 +19,7 @@ export class Volume extends Mesh {
 		this.resolution = params.resolution !== undefined ? params.resolution : 100;
 		this.margin = params.margin !== undefined ? params.margin : 0.05;
 		this.surface = params.surface !== undefined ? params.surface : 0.0;
+		this.proxy = params.proxy !== undefined ? params.proxy : 'hull';
 
 		this.sdfTexture = null;
 		this.uvTexture = null;
@@ -37,6 +38,10 @@ export class Volume extends Mesh {
 		this.sdfTexture = result.sdfTexture;
 		this.uvTexture = result.uvTexture;
 		this.inverseBoundsMatrix = result.inverseBoundsMatrix;
+
+		// Raster geometry the rays start from
+		this.geometry.dispose();
+		this.geometry = this.proxy === 'hull' ? VolumeGenerator.generateProxy( sourceMesh.geometry, this.inverseBoundsMatrix, this.margin ) : new BoxGeometry( 1, 1, 1 );
 
 		// Copy textures from source mesh material if available
 		if ( sourceMesh.material ) {
