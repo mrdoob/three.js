@@ -1,13 +1,13 @@
 import * as THREE from 'three';
 import { CodeCompiler } from '../code/CodeCompiler.js';
 import { parseScript, isStandardModule, resolvePath } from '../code/CodeRunner.js';
-import { compressString, decompressString } from '../utils/TourUtils.js';
+import { compressString, decompressString } from '../utils/GuideUtils.js';
 
 class PlaygroundManager {
 
-	constructor( tour ) {
+	constructor( guide ) {
 
-		this.tour = tour;
+		this.guide = guide;
 		this.playgroundTabs = null;
 		this.activePlaygroundTabName = null;
 		this.currentExampleName = null;
@@ -18,79 +18,79 @@ class PlaygroundManager {
 	togglePlayground( active ) {
 
 		const MOBILE_BREAKPOINT = 768;
-		if ( this.tour.isPlaygroundActive === active ) return;
+		if ( this.guide.isPlaygroundActive === active ) return;
 
-		this.tour.isPlaygroundActive = active;
+		this.guide.isPlaygroundActive = active;
 		document.body.classList.toggle( 'playground-mode', active );
-		this.tour.dom.playgroundBtn.classList.toggle( 'active', active );
+		this.guide.dom.playgroundBtn.classList.toggle( 'active', active );
 
 		if ( active ) {
 
-			if ( this.tour.renderer && this.tour.renderer.domElement.parentElement !== this.tour.dom.previewContainer ) {
+			if ( this.guide.renderer && this.guide.renderer.domElement.parentElement !== this.guide.dom.previewContainer ) {
 
-				this.tour.dom.previewContainer.appendChild( this.tour.renderer.domElement );
-
-			}
-
-			if ( this.tour.resizeObserver ) {
-
-				this.tour.resizeObserver.disconnect();
-				this.tour.resizeObserver.observe( this.tour.dom.previewContainer );
+				this.guide.dom.previewContainer.appendChild( this.guide.renderer.domElement );
 
 			}
 
-			this.tour.isPreviewVisible = true;
+			if ( this.guide.resizeObserver ) {
+
+				this.guide.resizeObserver.disconnect();
+				this.guide.resizeObserver.observe( this.guide.dom.previewContainer );
+
+			}
+
+			this.guide.isPreviewVisible = true;
 			document.body.classList.remove( 'preview-hidden' );
 
 			if ( window.innerWidth < MOBILE_BREAKPOINT ) {
 
 				// Mobile layout: go to workspace-editor mode
 				const editorWorkspace = document.querySelector( '.editor-workspace' );
-				editorWorkspace.insertBefore( this.tour.dom.codeContainer, this.tour.dom.debugContainer );
-				editorWorkspace.appendChild( this.tour.dom.editorConsole );
+				editorWorkspace.insertBefore( this.guide.dom.codeContainer, this.guide.dom.debugContainer );
+				editorWorkspace.appendChild( this.guide.dom.editorConsole );
 
 				document.body.classList.remove( 'collapsed-workspace' );
-				this.tour.dom.contentCol.style.width = '0%';
-				this.tour.dom.contentCol.style.display = 'none';
-				this.tour.dom.editorCol.style.width = '100%';
-				this.tour.dom.editorCol.style.display = 'flex';
-				this.tour.dom.vResizer.style.display = '';
-				this.tour.dom.previewSection.style.height = '';
-				this.tour.dom.previewSection.style.flex = '';
-				this.tour.dom.debugContainer.style.display = 'none';
+				this.guide.dom.contentCol.style.width = '0%';
+				this.guide.dom.contentCol.style.display = 'none';
+				this.guide.dom.editorCol.style.width = '100%';
+				this.guide.dom.editorCol.style.display = 'flex';
+				this.guide.dom.vResizer.style.display = '';
+				this.guide.dom.previewSection.style.height = '';
+				this.guide.dom.previewSection.style.flex = '';
+				this.guide.dom.debugContainer.style.display = 'none';
 
 			} else {
 
 				// Desktop layout: code editor on the left (replacing contentArea), preview taking top half of right column, debug container taking bottom half
-				this.tour.dom.contentArea.style.display = 'none';
-				this.tour.dom.contentCol.appendChild( this.tour.dom.codeContainer );
-				this.tour.dom.contentCol.appendChild( this.tour.dom.editorConsole );
-				this.tour.dom.vResizer.style.display = 'block';
-				this.tour.dom.previewSection.style.height = '50%';
-				this.tour.dom.previewSection.style.flex = '';
-				this.tour.dom.codeContainer.style.height = '';
-				this.tour.dom.debugContainer.style.display = 'flex';
+				this.guide.dom.contentArea.style.display = 'none';
+				this.guide.dom.contentCol.appendChild( this.guide.dom.codeContainer );
+				this.guide.dom.contentCol.appendChild( this.guide.dom.editorConsole );
+				this.guide.dom.vResizer.style.display = 'block';
+				this.guide.dom.previewSection.style.height = '50%';
+				this.guide.dom.previewSection.style.flex = '';
+				this.guide.dom.codeContainer.style.height = '';
+				this.guide.dom.debugContainer.style.display = 'flex';
 
 				// Set column widths to default (50/50) or keep current horizontal split
-				if ( this.tour.isEditorCollapsed ) {
+				if ( this.guide.isEditorCollapsed ) {
 
 					document.body.classList.add( 'collapsed-workspace' );
-					this.tour.dom.hResizer.classList.add( 'collapsed' );
-					this.tour.setResizerToggleIcon( 'chevron-left' );
-					this.tour.dom.contentCol.style.width = '100%';
-					this.tour.dom.contentCol.style.display = 'flex';
-					this.tour.dom.editorCol.style.width = '0%';
-					this.tour.dom.editorCol.style.display = 'flex';
+					this.guide.dom.hResizer.classList.add( 'collapsed' );
+					this.guide.setResizerToggleIcon( 'chevron-left' );
+					this.guide.dom.contentCol.style.width = '100%';
+					this.guide.dom.contentCol.style.display = 'flex';
+					this.guide.dom.editorCol.style.width = '0%';
+					this.guide.dom.editorCol.style.display = 'flex';
 
 				} else {
 
 					document.body.classList.remove( 'collapsed-workspace' );
-					this.tour.dom.hResizer.classList.remove( 'collapsed' );
-					this.tour.setResizerToggleIcon( 'chevron-right' );
-					this.tour.dom.contentCol.style.width = '50%';
-					this.tour.dom.contentCol.style.display = 'flex';
-					this.tour.dom.editorCol.style.width = '50%';
-					this.tour.dom.editorCol.style.display = 'flex';
+					this.guide.dom.hResizer.classList.remove( 'collapsed' );
+					this.guide.setResizerToggleIcon( 'chevron-right' );
+					this.guide.dom.contentCol.style.width = '50%';
+					this.guide.dom.contentCol.style.display = 'flex';
+					this.guide.dom.editorCol.style.width = '50%';
+					this.guide.dom.editorCol.style.display = 'flex';
 
 				}
 
@@ -98,79 +98,79 @@ class PlaygroundManager {
 
 			}
 
-			if ( this.tour.codeEditor ) this.tour.codeEditor.layout();
+			if ( this.guide.codeEditor ) this.guide.codeEditor.layout();
 
 		} else {
 
-			if ( ! this.tour.isContentRendered ) {
+			if ( ! this.guide.isContentRendered ) {
 
-				this.tour.renderPage( this.tour.currentPageIndex || 0 );
+				this.guide.renderPage( this.guide.currentPageIndex || 0 );
 
 			}
 
-			this.tour.dom.debugContainer.style.display = 'none';
-			this.tour.dom.contentArea.style.display = '';
+			this.guide.dom.debugContainer.style.display = 'none';
+			this.guide.dom.contentArea.style.display = '';
 
 			if ( window.innerWidth < MOBILE_BREAKPOINT ) {
 
 				// Restore mobile layout (reader mode by default)
-				this.tour.isEditorCollapsed = true;
+				this.guide.isEditorCollapsed = true;
 				document.body.classList.add( 'collapsed-workspace' );
-				this.tour.dom.contentCol.style.width = '100%';
-				this.tour.dom.contentCol.style.display = 'flex';
-				this.tour.dom.editorCol.style.width = '0%';
-				this.tour.dom.editorCol.style.display = 'none';
+				this.guide.dom.contentCol.style.width = '100%';
+				this.guide.dom.contentCol.style.display = 'flex';
+				this.guide.dom.editorCol.style.width = '0%';
+				this.guide.dom.editorCol.style.display = 'none';
 
 			} else {
 
 				// Restore desktop layout
-				this.tour.dom.contentArea.style.display = '';
+				this.guide.dom.contentArea.style.display = '';
 				const editorWorkspace = document.querySelector( '.editor-workspace' );
-				editorWorkspace.insertBefore( this.tour.dom.codeContainer, this.tour.dom.debugContainer );
-				editorWorkspace.appendChild( this.tour.dom.editorConsole );
-				this.tour.dom.vResizer.style.display = '';
-				this.tour.dom.previewSection.style.height = '';
-				this.tour.dom.previewSection.style.flex = '';
-				this.tour.dom.codeContainer.style.height = '';
+				editorWorkspace.insertBefore( this.guide.dom.codeContainer, this.guide.dom.debugContainer );
+				editorWorkspace.appendChild( this.guide.dom.editorConsole );
+				this.guide.dom.vResizer.style.display = '';
+				this.guide.dom.previewSection.style.height = '';
+				this.guide.dom.previewSection.style.flex = '';
+				this.guide.dom.codeContainer.style.height = '';
 
-				this.tour.layoutManager.updateVResizerIcons( '' );
+				this.guide.layoutManager.updateVResizerIcons( '' );
 
-				if ( this.tour.isEditorCollapsed ) {
+				if ( this.guide.isEditorCollapsed ) {
 
 					document.body.classList.add( 'collapsed-workspace' );
-					this.tour.dom.hResizer.classList.add( 'collapsed' );
-					this.tour.setResizerToggleIcon( 'chevron-left' );
-					this.tour.dom.contentCol.style.width = '100%';
-					this.tour.dom.editorCol.style.width = '0%';
+					this.guide.dom.hResizer.classList.add( 'collapsed' );
+					this.guide.setResizerToggleIcon( 'chevron-left' );
+					this.guide.dom.contentCol.style.width = '100%';
+					this.guide.dom.editorCol.style.width = '0%';
 
 				} else {
 
 					document.body.classList.remove( 'collapsed-workspace' );
-					this.tour.dom.hResizer.classList.remove( 'collapsed' );
-					this.tour.setResizerToggleIcon( 'chevron-right' );
-					this.tour.dom.contentCol.style.width = this.tour.lastContentWidth || '50%';
-					this.tour.dom.editorCol.style.width = '';
+					this.guide.dom.hResizer.classList.remove( 'collapsed' );
+					this.guide.setResizerToggleIcon( 'chevron-right' );
+					this.guide.dom.contentCol.style.width = this.guide.lastContentWidth || '50%';
+					this.guide.dom.editorCol.style.width = '';
 
 				}
 
 			}
 
-			if ( this.tour.codeEditor ) {
+			if ( this.guide.codeEditor ) {
 
-				this.tour.codeEditor.setReadOnly( false );
-				this.tour.codeEditor.layout();
+				this.guide.codeEditor.setReadOnly( false );
+				this.guide.codeEditor.layout();
 
 			}
 
 		}
 
-		this.tour.updateUI();
+		this.guide.updateUI();
 
 	}
 
 	async loadPlaygroundFromHash( hash ) {
 
-		this.tour.lastHandledHash = hash;
+		this.guide.lastHandledHash = hash;
 
 		const base64Str = hash.replace( /^playground[=\/]/, '' ).split( '&' )[ 0 ];
 		let decodedCode = '';
@@ -188,7 +188,7 @@ class PlaygroundManager {
 		// Enable playground layout
 		this.togglePlayground( true );
 
-		this.tour.historyManager.pushState( hash );
+		this.guide.historyManager.pushState( hash );
 
 		let decodedTabs = null;
 		try {
@@ -253,14 +253,14 @@ class PlaygroundManager {
 
 		const activeTab = this.playgroundTabs.find( t => t.name === this.activePlaygroundTabName ) || this.playgroundTabs[ 0 ];
 
-		if ( this.tour.codeEditor ) {
+		if ( this.guide.codeEditor ) {
 
-			this.tour.codeEditor.setReadOnly( !! activeTab.readOnly );
+			this.guide.codeEditor.setReadOnly( !! activeTab.readOnly );
 
-			const currentVal = this.tour.codeEditor.getValue();
+			const currentVal = this.guide.codeEditor.getValue();
 			if ( currentVal !== activeTab.code ) {
 
-				this.tour.codeEditor.setValue( activeTab.code );
+				this.guide.codeEditor.setValue( activeTab.code );
 
 			}
 
@@ -272,15 +272,15 @@ class PlaygroundManager {
 
 	renderPlaygroundTabs() {
 
-		if ( ! this.tour.isPlaygroundActive ) {
+		if ( ! this.guide.isPlaygroundActive ) {
 
-			this.tour.dom.tabsBar.style.display = 'none';
+			this.guide.dom.tabsBar.style.display = 'none';
 			return;
 
 		}
 
-		this.tour.dom.tabsBar.style.display = 'flex';
-		this.tour.dom.tabsBar.innerHTML = '';
+		this.guide.dom.tabsBar.style.display = 'flex';
+		this.guide.dom.tabsBar.innerHTML = '';
 
 		const scrollWrapper = document.createElement( 'div' );
 		scrollWrapper.className = 'playground-tabs-scroll-wrapper';
@@ -456,7 +456,7 @@ class PlaygroundManager {
 			tabEl.ondragend = () => {
 
 				tabEl.classList.remove( 'dragging' );
-				this.tour.dom.tabsBar.querySelectorAll( '.playground-tab' ).forEach( el => {
+				this.guide.dom.tabsBar.querySelectorAll( '.playground-tab' ).forEach( el => {
 
 					el.classList.remove( 'drag-over-left', 'drag-over-right' );
 
@@ -587,7 +587,7 @@ class PlaygroundManager {
 		projectsBtn.onclick = ( e ) => {
 
 			e.stopPropagation();
-			this.tour.projectsManager.openProjectsModal();
+			this.guide.projectsManager.openProjectsModal();
 
 		};
 
@@ -625,7 +625,7 @@ class PlaygroundManager {
 
 			e.stopPropagation();
 
-			await this.tour.refresh();
+			await this.guide.refresh();
 
 		};
 
@@ -659,8 +659,8 @@ class PlaygroundManager {
 		actionsContainer.appendChild( redoBtn );
 		actionsContainer.appendChild( refreshBtn );
 
-		this.tour.dom.tabsBar.appendChild( scrollWrapper );
-		this.tour.dom.tabsBar.appendChild( actionsContainer );
+		this.guide.dom.tabsBar.appendChild( scrollWrapper );
+		this.guide.dom.tabsBar.appendChild( actionsContainer );
 
 		const activeTabEl = tabsScrollContainer.querySelector( '.playground-tab.active' );
 		if ( activeTabEl ) {
@@ -680,23 +680,23 @@ class PlaygroundManager {
 		if ( this.activePlaygroundTabName === name ) return;
 
 		const activeTab = this.playgroundTabs.find( t => t.name === this.activePlaygroundTabName );
-		if ( activeTab && ! activeTab.readOnly && this.tour.codeEditor ) {
+		if ( activeTab && ! activeTab.readOnly && this.guide.codeEditor ) {
 
-			activeTab.code = this.tour.codeEditor.getValue();
+			activeTab.code = this.guide.codeEditor.getValue();
 
 		}
 
 		this.activePlaygroundTabName = name;
 
 		const newActiveTab = this.playgroundTabs.find( t => t.name === this.activePlaygroundTabName );
-		if ( newActiveTab && this.tour.codeEditor ) {
+		if ( newActiveTab && this.guide.codeEditor ) {
 
-			this.tour.codeEditor.setReadOnly( !! newActiveTab.readOnly );
+			this.guide.codeEditor.setReadOnly( !! newActiveTab.readOnly );
 
-			const currentVal = this.tour.codeEditor.getValue();
+			const currentVal = this.guide.codeEditor.getValue();
 			if ( currentVal !== newActiveTab.code ) {
 
-				this.tour.codeEditor.setValue( newActiveTab.code );
+				this.guide.codeEditor.setValue( newActiveTab.code );
 
 			}
 
@@ -728,19 +728,19 @@ class PlaygroundManager {
 		const newTabCode = `// Script: ${newTabName}\nexport { };\n`;
 
 		const activeTab = this.playgroundTabs.find( t => t.name === this.activePlaygroundTabName );
-		if ( activeTab && ! activeTab.readOnly && this.tour.codeEditor ) {
+		if ( activeTab && ! activeTab.readOnly && this.guide.codeEditor ) {
 
-			activeTab.code = this.tour.codeEditor.getValue();
+			activeTab.code = this.guide.codeEditor.getValue();
 
 		}
 
 		this.playgroundTabs.push( { name: newTabName, code: newTabCode } );
 		this.activePlaygroundTabName = newTabName;
 
-		if ( this.tour.codeEditor ) {
+		if ( this.guide.codeEditor ) {
 
-			this.tour.codeEditor.setReadOnly( false );
-			this.tour.codeEditor.setValue( newTabCode );
+			this.guide.codeEditor.setReadOnly( false );
+			this.guide.codeEditor.setValue( newTabCode );
 
 		}
 
@@ -757,9 +757,9 @@ class PlaygroundManager {
 		if ( index === - 1 ) return;
 
 		const activeTab = this.playgroundTabs.find( t => t.name === this.activePlaygroundTabName );
-		if ( activeTab && ! activeTab.readOnly && this.tour.codeEditor ) {
+		if ( activeTab && ! activeTab.readOnly && this.guide.codeEditor ) {
 
-			activeTab.code = this.tour.codeEditor.getValue();
+			activeTab.code = this.guide.codeEditor.getValue();
 
 		}
 
@@ -772,14 +772,14 @@ class PlaygroundManager {
 		}
 
 		const newActiveTab = this.playgroundTabs.find( t => t.name === this.activePlaygroundTabName ) || this.playgroundTabs[ 0 ];
-		if ( newActiveTab && this.tour.codeEditor ) {
+		if ( newActiveTab && this.guide.codeEditor ) {
 
-			this.tour.codeEditor.setReadOnly( !! newActiveTab.readOnly );
+			this.guide.codeEditor.setReadOnly( !! newActiveTab.readOnly );
 
-			const currentVal = this.tour.codeEditor.getValue();
+			const currentVal = this.guide.codeEditor.getValue();
 			if ( currentVal !== newActiveTab.code ) {
 
-				this.tour.codeEditor.setValue( newActiveTab.code );
+				this.guide.codeEditor.setValue( newActiveTab.code );
 
 			}
 
@@ -821,9 +821,9 @@ class PlaygroundManager {
 			if ( newName && isValidIdentifier && isUnique ) {
 
 				const activeTab = this.playgroundTabs.find( t => t.name === this.activePlaygroundTabName );
-				if ( activeTab && ! activeTab.readOnly && this.tour.codeEditor ) {
+				if ( activeTab && ! activeTab.readOnly && this.guide.codeEditor ) {
 
-					activeTab.code = this.tour.codeEditor.getValue();
+					activeTab.code = this.guide.codeEditor.getValue();
 
 				}
 
@@ -879,7 +879,7 @@ class PlaygroundManager {
 
 		if ( ! this.playgroundTabs ) return;
 
-		this.tour.projectsManager.autoSaveCurrentProject();
+		this.guide.projectsManager.autoSaveCurrentProject();
 
 		const persistTabs = this.playgroundTabs.filter( t => ! t.readOnly );
 		const encoded = await compressString( JSON.stringify( {
@@ -888,11 +888,11 @@ class PlaygroundManager {
 		const release = THREE.REVISION;
 		const newHash = 'playground=' + encoded + ( release ? '&release=' + release : '' );
 
-		this.tour.lastHandledHash = newHash;
+		this.guide.lastHandledHash = newHash;
 
 		if ( pushHistory ) {
 
-			this.tour.historyManager.pushState( newHash );
+			this.guide.historyManager.pushState( newHash );
 
 		}
 
@@ -902,35 +902,35 @@ class PlaygroundManager {
 
 	undoPlayground() {
 
-		this.tour.historyManager.undo();
+		this.guide.historyManager.undo();
 
 	}
 
 	redoPlayground() {
 
-		this.tour.historyManager.redo();
+		this.guide.historyManager.redo();
 
 	}
 
 	updateUndoRedoButtons() {
 
-		this.tour.historyManager.updateButtons();
+		this.guide.historyManager.updateButtons();
 
 	}
 
 	async cleanAndFormatActiveTab() {
 
 		const activeTab = this.playgroundTabs?.find( t => t.name === this.activePlaygroundTabName );
-		if ( ! this.tour.codeEditor || ( activeTab && activeTab.readOnly ) ) return;
+		if ( ! this.guide.codeEditor || ( activeTab && activeTab.readOnly ) ) return;
 
-		const code = this.tour.codeEditor.getValue();
+		const code = this.guide.codeEditor.getValue();
 		const formatted = await CodeCompiler.format( code );
 
 		// Set the new formatted value in the editor and update state/hash
-		const currentVal = this.tour.codeEditor.getValue();
+		const currentVal = this.guide.codeEditor.getValue();
 		if ( currentVal !== formatted ) {
 
-			this.tour.codeEditor.format( formatted );
+			this.guide.codeEditor.format( formatted );
 
 			const currentActiveTab = this.playgroundTabs.find( t => t.name === this.activePlaygroundTabName );
 			if ( currentActiveTab ) {
@@ -955,14 +955,14 @@ class PlaygroundManager {
 		const tabNames = this.playgroundTabs.map( t => t.name );
 
 		// 1. Identify virtual scripts that are no longer in tabs (i.e. deleted tabs)
-		for ( const key of Object.keys( this.tour.runner.scripts ) ) {
+		for ( const key of Object.keys( this.guide.runner.scripts ) ) {
 
-			if ( this.tour.runner.scripts[ key ].url === null && key !== '__main__' ) {
+			if ( this.guide.runner.scripts[ key ].url === null && key !== '__main__' ) {
 
 				if ( ! tabNames.includes( key ) ) {
 
-					this.tour.runner.invalidateScript( key );
-					delete this.tour.runner.scripts[ key ];
+					this.guide.runner.invalidateScript( key );
+					delete this.guide.runner.scripts[ key ];
 
 				}
 
@@ -975,9 +975,9 @@ class PlaygroundManager {
 
 			if ( tab.name !== 'main' && ! tab.readOnly ) {
 
-				this.tour.runner.invalidateScript( tab.name );
+				this.guide.runner.invalidateScript( tab.name );
 
-				this.tour.runner.scripts[ tab.name ] = {
+				this.guide.runner.scripts[ tab.name ] = {
 					url: null,
 					text: tab.code,
 					instance: null,
@@ -989,14 +989,14 @@ class PlaygroundManager {
 
 		} );
 
-		this.tour.runner.run( mainTab.code );
+		this.guide.runner.run( mainTab.code );
 
 	}
 
 	getDebugTarget() {
 
 		// 1. Check main script
-		const mainScript = this.tour.runner.scripts[ '__main__' ];
+		const mainScript = this.guide.runner.scripts[ '__main__' ];
 		if ( mainScript && mainScript.instance && typeof mainScript.instance.debug === 'function' ) {
 
 			return mainScript.instance.debug();
@@ -1004,9 +1004,9 @@ class PlaygroundManager {
 		}
 
 		// 2. Check other scripts
-		for ( const scriptName of this.tour.runner.activeScriptNames ) {
+		for ( const scriptName of this.guide.runner.activeScriptNames ) {
 
-			const script = this.tour.runner.scripts[ scriptName ];
+			const script = this.guide.runner.scripts[ scriptName ];
 			if ( script && script.instance && typeof script.instance.debug === 'function' ) {
 
 				return script.instance.debug();
@@ -1021,27 +1021,27 @@ class PlaygroundManager {
 
 	updateDebugWGSL() {
 
-		if ( ! this.tour.isPlaygroundActive ) return;
+		if ( ! this.guide.isPlaygroundActive ) return;
 
 		const debugData = this.getDebugTarget();
 		if ( ! debugData ) {
 
-			this.tour.debugCodeEditor.setValue( 'No debug() function exported or debug target object found.' );
+			this.guide.debugCodeEditor.setValue( 'No debug() function exported or debug target object found.' );
 
 			// Collapse/hide debug container similar to clicking v-resizer-toggle-inverted
-			const previewSection = this.tour.dom.previewSection;
+			const previewSection = this.guide.dom.previewSection;
 			const currentHeight = previewSection.style.height;
 			if ( currentHeight !== '100%' ) {
 
-				this.tour.lastPreviewHeight = currentHeight;
+				this.guide.lastPreviewHeight = currentHeight;
 
 			}
 
 			previewSection.style.height = '100%';
-			this.tour.layoutManager.updateVResizerIcons( '100%' );
+			this.guide.layoutManager.updateVResizerIcons( '100%' );
 
-			this.tour.codeEditor.layout();
-			this.tour.debugCodeEditor.layout();
+			this.guide.codeEditor.layout();
+			this.guide.debugCodeEditor.layout();
 			return;
 
 		}
@@ -1056,70 +1056,70 @@ class PlaygroundManager {
 		} else {
 
 			object = debugData;
-			scene = this.tour.runner.env.scene || this.tour.scene;
-			camera = this.tour.runner.env.camera || this.tour.camera;
+			scene = this.guide.runner.env.scene || this.guide.scene;
+			camera = this.guide.runner.env.camera || this.guide.camera;
 
 		}
 
 		if ( ! scene || ! camera ) {
 
-			this.tour.debugCodeEditor.setValue( 'Invalid debug data. Ensure scene, camera, and object are provided.' );
+			this.guide.debugCodeEditor.setValue( 'Invalid debug data. Ensure scene, camera, and object are provided.' );
 
 			// Collapse/hide debug container
-			const previewSection = this.tour.dom.previewSection;
+			const previewSection = this.guide.dom.previewSection;
 			const currentHeight = previewSection.style.height;
 			if ( currentHeight !== '100%' ) {
 
-				this.tour.lastPreviewHeight = currentHeight;
+				this.guide.lastPreviewHeight = currentHeight;
 
 			}
 
 			previewSection.style.height = '100%';
-			this.tour.layoutManager.updateVResizerIcons( '100%' );
+			this.guide.layoutManager.updateVResizerIcons( '100%' );
 
-			this.tour.codeEditor.layout();
-			this.tour.debugCodeEditor.layout();
+			this.guide.codeEditor.layout();
+			this.guide.debugCodeEditor.layout();
 			return;
 
 		}
 
 		// Restore/expand debug container since we have valid debug data
-		const previewSection = this.tour.dom.previewSection;
+		const previewSection = this.guide.dom.previewSection;
 		const currentHeight = previewSection.style.height;
 		if ( currentHeight === '100%' ) {
 
-			const targetHeight = this.tour.lastPreviewHeight || '50%';
+			const targetHeight = this.guide.lastPreviewHeight || '50%';
 			previewSection.style.height = targetHeight;
-			this.tour.layoutManager.updateVResizerIcons( targetHeight );
+			this.guide.layoutManager.updateVResizerIcons( targetHeight );
 
-			this.tour.codeEditor.layout();
-			this.tour.debugCodeEditor.layout();
+			this.guide.codeEditor.layout();
+			this.guide.debugCodeEditor.layout();
 
 		}
 
-		const targetRenderer = this.tour.debugLanguage === 'GLSL' ? this.tour.webGLRenderer : this.tour.renderer;
+		const targetRenderer = this.guide.debugLanguage === 'GLSL' ? this.guide.webGLRenderer : this.guide.renderer;
 
 		if ( targetRenderer && targetRenderer.debug && typeof targetRenderer.debug.getShaderAsync === 'function' ) {
 
 			targetRenderer.debug.getShaderAsync( scene, camera, object )
 				.then( ( shader ) => {
 
-					const code = this.tour.debugStage === 'vertex'
+					const code = this.guide.debugStage === 'vertex'
 						? ( shader.vertexShader || 'No vertex shader generated.' )
 						: ( shader.fragmentShader || 'No fragment shader generated.' );
 
-					this.tour.debugCodeEditor.setValue( code );
+					this.guide.debugCodeEditor.setValue( code );
 
 				} )
 				.catch( ( err ) => {
 
-					this.tour.debugCodeEditor.setValue( 'Error retrieving shader: ' + err.message );
+					this.guide.debugCodeEditor.setValue( 'Error retrieving shader: ' + err.message );
 
 				} );
 
 		} else {
 
-			this.tour.debugCodeEditor.setValue( 'WebGPURenderer debug.getShaderAsync is not available.' );
+			this.guide.debugCodeEditor.setValue( 'WebGPURenderer debug.getShaderAsync is not available.' );
 
 		}
 
@@ -1128,7 +1128,7 @@ class PlaygroundManager {
 	getImportedCustomScripts() {
 
 		const customImports = new Set();
-		const runnerImports = this.tour.runner ? this.tour.runner.imports : {};
+		const runnerImports = this.guide.runner ? this.guide.runner.imports : {};
 
 		if ( this.playgroundTabs ) {
 
@@ -1157,9 +1157,9 @@ class PlaygroundManager {
 
 		}
 
-		if ( this.tour.runner && this.tour.runner.scripts ) {
+		if ( this.guide.runner && this.guide.runner.scripts ) {
 
-			for ( const [ name, scriptConfig ] of Object.entries( this.tour.runner.scripts ) ) {
+			for ( const [ name, scriptConfig ] of Object.entries( this.guide.runner.scripts ) ) {
 
 				if ( scriptConfig && scriptConfig.url && name !== '__main__' ) {
 
@@ -1184,7 +1184,7 @@ class PlaygroundManager {
 		const importedFiles = this.getImportedCustomScripts();
 		if ( importedFiles.length === 0 ) {
 
-			this.tour.consoleManager.log( 'No custom imported files found in current playground code.' );
+			this.guide.consoleManager.log( 'No custom imported files found in current playground code.' );
 			return;
 
 		}
@@ -1196,7 +1196,7 @@ class PlaygroundManager {
 			let tab = this.playgroundTabs.find( t => t.name === name );
 			if ( ! tab ) {
 
-				let code = this.tour.runner?.scripts?.[ name ]?.text;
+				let code = this.guide.runner?.scripts?.[ name ]?.text;
 				if ( code === undefined || code === null ) {
 
 					try {
@@ -1262,7 +1262,7 @@ class PlaygroundManager {
 
 	hasUnsavedChanges() {
 
-		if ( this.tour.projectsManager.currentProjectId ) return false;
+		if ( this.guide.projectsManager.currentProjectId ) return false;
 		if ( ! this.playgroundTabs || this.playgroundTabs.length === 0 ) return false;
 		if ( ! this.initialTabsSnapshot ) return false;
 
@@ -1281,12 +1281,12 @@ class PlaygroundManager {
 
 		if ( ! this.playgroundTabs || this.playgroundTabs.length === 0 ) {
 
-			const activePage = this.tour.pages[ this.tour.currentPageIndex ];
-			let currentCode = '// Tour of TSL\n';
+			const activePage = this.guide.pages[ this.guide.currentPageIndex ];
+			let currentCode = '// TSL Guide\n';
 
-			if ( activePage && activePage.hasCode && this.tour.codeEditor ) {
+			if ( activePage && activePage.hasCode && this.guide.codeEditor ) {
 
-				currentCode = this.tour.codeEditor.getValue();
+				currentCode = this.guide.codeEditor.getValue();
 
 			}
 
@@ -1301,10 +1301,10 @@ class PlaygroundManager {
 		this.renderPlaygroundTabs();
 
 		const activeTab = this.playgroundTabs.find( t => t.name === this.activePlaygroundTabName ) || this.playgroundTabs[ 0 ];
-		if ( this.tour.codeEditor ) {
+		if ( this.guide.codeEditor ) {
 
-			this.tour.codeEditor.setReadOnly( !! activeTab.readOnly );
-			this.tour.codeEditor.setValue( activeTab.code );
+			this.guide.codeEditor.setReadOnly( !! activeTab.readOnly );
+			this.guide.codeEditor.setValue( activeTab.code );
 
 		}
 
@@ -1315,10 +1315,10 @@ class PlaygroundManager {
 
 	async loadExampleIntoPlayground( code, name = null ) {
 
-		this.tour.projectsManager.setCurrentProjectId( null );
+		this.guide.projectsManager.setCurrentProjectId( null );
 		this.currentExampleName = name;
 
-		const newCode = code || '// Tour of TSL\n';
+		const newCode = code || '// TSL Guide\n';
 		this.playgroundTabs = [ { name: 'main', code: newCode } ];
 		this.activePlaygroundTabName = 'main';
 		this.initialTabsSnapshot = JSON.stringify( this.playgroundTabs );
@@ -1326,10 +1326,10 @@ class PlaygroundManager {
 		this.togglePlayground( true );
 		this.renderPlaygroundTabs();
 
-		if ( this.tour.codeEditor ) {
+		if ( this.guide.codeEditor ) {
 
-			this.tour.codeEditor.setReadOnly( false );
-			this.tour.codeEditor.setValue( newCode );
+			this.guide.codeEditor.setReadOnly( false );
+			this.guide.codeEditor.setValue( newCode );
 
 		}
 

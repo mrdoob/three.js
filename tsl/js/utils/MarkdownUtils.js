@@ -27,7 +27,7 @@ marked.use( {
 } );
 
 
-function parseTour( markdown ) {
+function parseGuide( markdown ) {
 
 	const pageTree = [];
 
@@ -360,8 +360,8 @@ function parse( md ) {
 
 	};
 
-	parseCallouts( 'Important', 'Important', '⚠️', 'tour-important' );
-	parseCallouts( 'Note', 'Note', '📌', 'tour-note' );
+	parseCallouts( 'Important', 'Important', '⚠️', 'guide-important' );
+	parseCallouts( 'Note', 'Note', '📌', 'guide-note' );
 
 	// Helper to parse collapsible accordion callout blocks for AI / LLM (> IA: or > AI: or > LLM:)
 	const parseAccordionCallouts = ( tag, title, icon, className ) => {
@@ -399,7 +399,7 @@ function parse( md ) {
 
 	};
 
-	parseAccordionCallouts( '(?:IA|AI|LLM)', 'AI / LLM Guide', 'sparkles', 'tour-ai' );
+	parseAccordionCallouts( '(?:IA|AI|LLM)', 'AI / LLM Guide', 'sparkles', 'guide-ai' );
 
 	// Group consecutive API blocks
 	const apiBlockRegex = /::: api\s+([^\n]+?)(?:\s*:::\s*(?=\n|$)|(?:\r?\n([\s\S]*?):::))/gi;
@@ -1464,4 +1464,4 @@ function tokenizeCodeToElement( codeContent, targetElement ) {
 
 }
 
-export { parseTour, parse, tokenizeInlineCode, tokenizeCodeToElement };
+export { parseGuide, parse, tokenizeInlineCode, tokenizeCodeToElement };

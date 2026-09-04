@@ -1,6 +1,6 @@
 <html lang="en">
 	<head>
-		<title>Tour of TSL - Interactive Guide</title>
+		<title>TSL Guide</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link rel="shortcut icon" href="../files/favicon_white.ico" media="(prefers-color-scheme: dark)"/>
@@ -12,7 +12,7 @@
 		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 
         <!-- CSS -->
-		<link rel="stylesheet" href="css/tour.css">
+		<link rel="stylesheet" href="css/guide.css">
 
 		<!-- Scripts -->
 		<script type="importmap">
@@ -53,7 +53,7 @@
 					</div>
 				</div>
 				<div class="loading-text-container" style="display: none">
-					<div class="loading-text"><span class="loading-text-light">Tour of </span><span class="loading-text-bold">TSL</span></div>
+					<div class="loading-text"><span class="loading-text-bold">TSL</span><span class="loading-text-light"> Guide</span></div>
 					<div class="loading-subtext">Loading</div>
 				</div>
 			</div>
@@ -105,8 +105,7 @@
 				<!-- Centered Title -->
 				<div class="header-title-container">
 					<div class="header-title-wrapper">
-						<h1 class="header-title"><span class="header-title-prefix">Tour of </span><span class="header-title-accent">TSL</span></h1>
-						<span class="header-subtitle">Three.js Shading Language</span>
+						<h1 class="header-title"><span class="header-title-accent">TSL</span><span class="header-title-prefix"> Guide</span></h1>
 						<span class="header-release" id="threejs-release"></span>
 					</div>
 				</div>
@@ -235,16 +234,16 @@
 
 		<script type="module">
 
-			import { Tour } from './js/Tour.js';
+			import { Guide } from './js/Guide.js';
 
-			const tour = new Tour();
-			tour.onEmptyProject = () => {
+			const guide = new Guide();
+			guide.onEmptyProject = () => {
 
 				return 'import \'scenes/empty\';\n';
 
 			};
 
-			tour.load( 'content/Tour.md' );
+			guide.load( 'content/Guide.md' );
 
 		</script>
 	</body>

@@ -24,7 +24,6 @@ https://www.youtube.com/watch?v=iklqjgIpVG8
 
 ### User Testimonials
 
-https://x.com/mrdoob/status/1886416782673789317
 https://x.com/mustache_dev/status/2010375315218944086
 https://x.com/marcinignac/status/1805550271017144780&short
 https://x.com/mamesoncom/status/1842812329484017950

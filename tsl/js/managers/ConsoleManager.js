@@ -2,9 +2,9 @@ import { setConsoleFunction, getConsoleFunction } from 'three';
 
 class ConsoleManager {
 
-	constructor( tour ) {
+	constructor( guide ) {
 
-		this.tour = tour;
+		this.guide = guide;
 		this.originalConsoleError = console.error;
 		this.originalConsoleWarn = console.warn;
 
@@ -94,7 +94,7 @@ class ConsoleManager {
 
 			if ( eventType === 'error-log' || eventType === 'warn-log' ) {
 
-				this.tour.runner.dispatchEvent( {
+				this.guide.runner.dispatchEvent( {
 					type: eventType,
 					message: displayMessage,
 					line: line,
@@ -104,7 +104,7 @@ class ConsoleManager {
 
 			} else {
 
-				this.tour.runner.dispatchEvent( { type: eventType, message: msg } );
+				this.guide.runner.dispatchEvent( { type: eventType, message: msg } );
 
 			}
 
@@ -184,7 +184,7 @@ class ConsoleManager {
 
 			const displayMessage = ( typeof line === 'number' && line > 0 ) ? `Line ${line}: ${cleanMsg}` : cleanMsg;
 
-			this.tour.runner.dispatchEvent( {
+			this.guide.runner.dispatchEvent( {
 				type: 'error-log',
 				message: displayMessage,
 				line: line,
@@ -232,7 +232,7 @@ class ConsoleManager {
 
 			} ).join( ' ' );
 
-			this.tour.runner.dispatchEvent( { type: 'warn-log', message: msg } );
+			this.guide.runner.dispatchEvent( { type: 'warn-log', message: msg } );
 
 		};
 
@@ -242,10 +242,10 @@ class ConsoleManager {
 
 		this.onStart = () => {
 
-			this.tour.dom.consoleErrorMessage.textContent = '';
-			if ( this.tour.codeEditor ) {
+			this.guide.dom.consoleErrorMessage.textContent = '';
+			if ( this.guide.codeEditor ) {
 
-				this.tour.codeEditor.clearMarkers();
+				this.guide.codeEditor.clearMarkers();
 
 			}
 
@@ -272,9 +272,9 @@ class ConsoleManager {
 			this.appendConsoleLine( event.message, '#fca5a5', event );
 			this.toggleConsole( false );
 
-			if ( event.line !== null && event.line > 0 && this.tour.codeEditor ) {
+			if ( event.line !== null && event.line > 0 && this.guide.codeEditor ) {
 
-				this.tour.codeEditor.setErrorMarker( event.line, event.column, event.errorMsg || event.message );
+				this.guide.codeEditor.setErrorMarker( event.line, event.column, event.errorMsg || event.message );
 
 			}
 
@@ -282,14 +282,14 @@ class ConsoleManager {
 
 		this.onSuccess = () => {
 
-			if ( this.tour.isPlaygroundActive ) {
+			if ( this.guide.isPlaygroundActive ) {
 
-				this.tour.updateDebugWGSL();
-				setTimeout( () => this.tour.updateDebugWGSL(), 500 );
+				this.guide.updateDebugWGSL();
+				setTimeout( () => this.guide.updateDebugWGSL(), 500 );
 
 			}
 
-			if ( ! this.tour.dom.consoleErrorMessage.hasChildNodes() ) {
+			if ( ! this.guide.dom.consoleErrorMessage.hasChildNodes() ) {
 
 				this.toggleConsole( true );
 
@@ -301,9 +301,9 @@ class ConsoleManager {
 
 			this.appendConsoleLine( event.message, '#fca5a5', event );
 
-			if ( event.line !== null && event.line > 0 && this.tour.codeEditor ) {
+			if ( event.line !== null && event.line > 0 && this.guide.codeEditor ) {
 
-				this.tour.codeEditor.setErrorMarker( event.line, event.column, event.error.toString() );
+				this.guide.codeEditor.setErrorMarker( event.line, event.column, event.error.toString() );
 
 			}
 
@@ -311,12 +311,12 @@ class ConsoleManager {
 
 		};
 
-		this.tour.runner.addEventListener( 'start', this.onStart );
-		this.tour.runner.addEventListener( 'log', this.onLog );
-		this.tour.runner.addEventListener( 'warn-log', this.onWarn );
-		this.tour.runner.addEventListener( 'error-log', this.onErrorLog );
-		this.tour.runner.addEventListener( 'success', this.onSuccess );
-		this.tour.runner.addEventListener( 'error', this.onError );
+		this.guide.runner.addEventListener( 'start', this.onStart );
+		this.guide.runner.addEventListener( 'log', this.onLog );
+		this.guide.runner.addEventListener( 'warn-log', this.onWarn );
+		this.guide.runner.addEventListener( 'error-log', this.onErrorLog );
+		this.guide.runner.addEventListener( 'success', this.onSuccess );
+		this.guide.runner.addEventListener( 'error', this.onError );
 
 	}
 
@@ -352,7 +352,7 @@ class ConsoleManager {
 		textSpan.textContent = message;
 		line.appendChild( textSpan );
 
-		if ( clickableEvent && clickableEvent.line !== null && clickableEvent.line > 0 && this.tour.codeEditor ) {
+		if ( clickableEvent && clickableEvent.line !== null && clickableEvent.line > 0 && this.guide.codeEditor ) {
 
 			const jumpBtn = document.createElement( 'button' );
 			jumpBtn.className = 'console-jump-btn';
@@ -365,7 +365,7 @@ class ConsoleManager {
 			jumpBtn.onclick = ( e ) => {
 
 				e.stopPropagation();
-				this.tour.codeEditor.revealLine( clickableEvent.line, clickableEvent.column || 1 );
+				this.guide.codeEditor.revealLine( clickableEvent.line, clickableEvent.column || 1 );
 
 			};
 
@@ -373,18 +373,18 @@ class ConsoleManager {
 
 		}
 
-		this.tour.dom.consoleErrorMessage.appendChild( line );
+		this.guide.dom.consoleErrorMessage.appendChild( line );
 
 		// Instantiate icons if any were added
-		this.tour.createIcons( line );
+		this.guide.createIcons( line );
 
-		while ( this.tour.dom.consoleErrorMessage.childElementCount > 100 ) {
+		while ( this.guide.dom.consoleErrorMessage.childElementCount > 100 ) {
 
-			this.tour.dom.consoleErrorMessage.removeChild( this.tour.dom.consoleErrorMessage.firstChild );
+			this.guide.dom.consoleErrorMessage.removeChild( this.guide.dom.consoleErrorMessage.firstChild );
 
 		}
 
-		this.tour.dom.consoleErrorMessage.scrollTop = this.tour.dom.consoleErrorMessage.scrollHeight;
+		this.guide.dom.consoleErrorMessage.scrollTop = this.guide.dom.consoleErrorMessage.scrollHeight;
 
 		this.updateConsoleButtonsState();
 
@@ -392,8 +392,8 @@ class ConsoleManager {
 
 	toggleConsole( forceState ) {
 
-		const consolePanel = this.tour.dom.editorConsole;
-		const toggleIcon = this.tour.dom.consoleToggleIcon;
+		const consolePanel = this.guide.dom.editorConsole;
+		const toggleIcon = this.guide.dom.consoleToggleIcon;
 
 		const isMinimized = forceState !== undefined ? forceState : ! consolePanel.classList.contains( 'minimized' );
 
@@ -409,11 +409,11 @@ class ConsoleManager {
 
 		}
 
-		this.tour.createIcons( this.tour.dom.consoleToggleBtn );
+		this.guide.createIcons( this.guide.dom.consoleToggleBtn );
 
-		if ( this.tour.codeEditor ) {
+		if ( this.guide.codeEditor ) {
 
-			this.tour.codeEditor.layout();
+			this.guide.codeEditor.layout();
 
 		}
 
@@ -421,30 +421,30 @@ class ConsoleManager {
 
 	clearConsole() {
 
-		this.tour.dom.consoleErrorMessage.textContent = '';
+		this.guide.dom.consoleErrorMessage.textContent = '';
 		this.updateConsoleButtonsState();
 
 	}
 
 	copyConsole() {
 
-		const lines = Array.from( this.tour.dom.consoleErrorMessage.querySelectorAll( '.console-line-text' ) )
+		const lines = Array.from( this.guide.dom.consoleErrorMessage.querySelectorAll( '.console-line-text' ) )
 			.map( span => span.textContent );
 		const text = lines.join( '\n' );
 		if ( ! text ) return;
 
 		navigator.clipboard.writeText( text ).then( () => {
 
-			const btn = this.tour.dom.consoleCopyBtn;
+			const btn = this.guide.dom.consoleCopyBtn;
 			btn.classList.add( 'success' );
 			btn.innerHTML = '<i data-icon="check" style="width: 0.95rem; height: 0.95rem;"></i>';
-			this.tour.createIcons( btn );
+			this.guide.createIcons( btn );
 
 			setTimeout( () => {
 
 				btn.classList.remove( 'success' );
 				btn.innerHTML = '<i data-icon="copy" style="width: 0.95rem; height: 0.95rem;"></i>';
-				this.tour.createIcons( btn );
+				this.guide.createIcons( btn );
 
 			}, 2000 );
 
@@ -454,9 +454,9 @@ class ConsoleManager {
 
 	updateConsoleButtonsState() {
 
-		const hasLogs = this.tour.dom.consoleErrorMessage.childElementCount > 0;
-		const clearBtn = this.tour.dom.consoleClearBtn;
-		const copyBtn = this.tour.dom.consoleCopyBtn;
+		const hasLogs = this.guide.dom.consoleErrorMessage.childElementCount > 0;
+		const clearBtn = this.guide.dom.consoleClearBtn;
+		const copyBtn = this.guide.dom.consoleCopyBtn;
 
 		if ( hasLogs ) {
 
@@ -485,12 +485,12 @@ class ConsoleManager {
 		console.error = this.originalConsoleError;
 		console.warn = this.originalConsoleWarn;
 
-		this.tour.runner.removeEventListener( 'start', this.onStart );
-		this.tour.runner.removeEventListener( 'log', this.onLog );
-		this.tour.runner.removeEventListener( 'warn-log', this.onWarn );
-		this.tour.runner.removeEventListener( 'error-log', this.onErrorLog );
-		this.tour.runner.removeEventListener( 'success', this.onSuccess );
-		this.tour.runner.removeEventListener( 'error', this.onError );
+		this.guide.runner.removeEventListener( 'start', this.onStart );
+		this.guide.runner.removeEventListener( 'log', this.onLog );
+		this.guide.runner.removeEventListener( 'warn-log', this.onWarn );
+		this.guide.runner.removeEventListener( 'error-log', this.onErrorLog );
+		this.guide.runner.removeEventListener( 'success', this.onSuccess );
+		this.guide.runner.removeEventListener( 'error', this.onError );
 
 	}
 
