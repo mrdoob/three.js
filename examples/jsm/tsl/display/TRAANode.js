@@ -568,7 +568,7 @@ class TRAANode extends TempNode {
 			// sample the current and previous colors
 
 			const currentColor = this.beautyNode.sample( uvNode );
-			const historyColor = historyNode.sample( uvNode.sub( offsetUV ) );
+			const historyColor = historyNode.sample( historyUV );
 
 			// increase the weight towards the current frame under motion
 
