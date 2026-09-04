@@ -384,6 +384,7 @@ class SkyMesh extends Mesh {
 
 		material.side = BackSide;
 		material.depthWrite = false;
+		material.fog = false;
 
 		material.vertexNode = vertexNode;
 		material.colorNode = colorNode;
