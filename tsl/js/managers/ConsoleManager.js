@@ -320,6 +320,27 @@ class ConsoleManager {
 
 	}
 
+	log( message ) {
+
+		this.appendConsoleLine( message, '#e2e8f0' );
+		this.toggleConsole( false );
+
+	}
+
+	warn( message ) {
+
+		this.appendConsoleLine( message, '#fde047' );
+		this.toggleConsole( false );
+
+	}
+
+	error( message ) {
+
+		this.appendConsoleLine( message, '#fca5a5' );
+		this.toggleConsole( false );
+
+	}
+
 	appendConsoleLine( message, color, clickableEvent = null ) {
 
 		const line = document.createElement( 'div' );

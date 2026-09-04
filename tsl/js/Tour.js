@@ -54,9 +54,9 @@ class Tour {
 	constructor( title = 'Tour of *TSL*' ) {
 
 		this.tourTitle = title;
+		this.onEmptyProject = null;
 		this.pages = [];
 		this.pageTree = [];
-		this.templates = [];
 		this.currentPageIndex = 0;
 
 		const initialHash = window.location.hash.substring( 1 );
@@ -210,6 +210,18 @@ class Tour {
 
 	}
 
+	getEmptyProjectCode() {
+
+		if ( typeof this.onEmptyProject === 'function' ) {
+
+			return this.onEmptyProject();
+
+		}
+
+		return '// Tour of TSL\n';
+
+	}
+
 	async load( url ) {
 
 		try {
@@ -219,13 +231,6 @@ class Tour {
 			const result = parseTour( text );
 			this.pages = result.pages;
 			this.pageTree = result.pageTree;
-			this.templates = result.templates || [];
-
-			if ( result.title ) {
-
-				this.setTitle( result.title );
-
-			}
 
 			this.init();
 
@@ -960,21 +965,7 @@ class Tour {
 
 			}
 
-			if ( this.playgroundManager.hasUnsavedChanges() ) {
-
-				this.projectsManager.confirmCloseCurrentProject(
-					() => {
-
-						this.playgroundManager.loadExampleIntoPlayground( currentCode, exampleTitle );
-
-					}
-				);
-
-			} else {
-
-				this.playgroundManager.loadExampleIntoPlayground( currentCode, exampleTitle );
-
-			}
+			this.playgroundManager.loadExampleIntoPlayground( currentCode, exampleTitle );
 
 		};
 

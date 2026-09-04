@@ -27,108 +27,7 @@ marked.use( {
 } );
 
 
-function parseTourConfig( rawMarkdown ) {
-
-	let title = null;
-	const templates = [];
-
-	// Extract <tour ...>...</tour> configuration block
-	const tourRegex = /<tour([^>]*?)>([\s\S]*?)<\/tour>|<tour([^>]*?)\/?>/i;
-	const tourMatch = tourRegex.exec( rawMarkdown );
-
-	let markdown = rawMarkdown;
-
-	if ( tourMatch ) {
-
-		const tourAttrString = tourMatch[ 1 ] || tourMatch[ 3 ] || '';
-		const tourInnerContent = tourMatch[ 2 ] || '';
-
-		const attrRegex = /(\w+)\s*=\s*(?:"([^"]*)"|'([^']*)'|(\S+))/gi;
-		let attrMatch;
-		while ( ( attrMatch = attrRegex.exec( tourAttrString ) ) !== null ) {
-
-			const key = attrMatch[ 1 ].toLowerCase();
-			const val = attrMatch[ 2 ] || attrMatch[ 3 ] || attrMatch[ 4 ];
-			if ( key === 'title' || key === 'name' ) {
-
-				title = val.trim();
-
-			}
-
-		}
-
-		// Parse <template name="...">...</template> inside <tour>
-		const templateRegex = /<template([^>]*?)>([\s\S]*?)<\/template>/gi;
-		let tmplMatch;
-		while ( ( tmplMatch = templateRegex.exec( tourInnerContent ) ) !== null ) {
-
-			const tmplAttrString = tmplMatch[ 1 ] || '';
-			const tmplBody = tmplMatch[ 2 ] || '';
-
-			const tmplAttrs = {};
-			let tAttrMatch;
-			const tAttrRegex = /(\w+)\s*=\s*(?:"([^"]*)"|'([^']*)'|(\S+))/gi;
-			while ( ( tAttrMatch = tAttrRegex.exec( tmplAttrString ) ) !== null ) {
-
-				const key = tAttrMatch[ 1 ].toLowerCase();
-				const val = tAttrMatch[ 2 ] || tAttrMatch[ 3 ] || tAttrMatch[ 4 ];
-				tmplAttrs[ key ] = val;
-
-			}
-
-			const tmplName = ( tmplAttrs.name || tmplAttrs.title || 'Empty Project' ).trim();
-
-			// Parse code blocks within template: ```tsl [name] ... ```
-			const tmplTabs = [];
-			const blockRegex = /```tsl(?:\s+([a-zA-Z0-9_-]+))?\r?\n([\s\S]*?)```/gi;
-			let blockMatch;
-
-			while ( ( blockMatch = blockRegex.exec( tmplBody ) ) !== null ) {
-
-				const tabName = ( blockMatch[ 1 ] || 'main' ).trim();
-				const codeText = blockMatch[ 2 ].trim() ? blockMatch[ 2 ] : '// Tour of TSL\n';
-				tmplTabs.push( {
-					name: tabName,
-					code: codeText
-				} );
-
-			}
-
-			if ( tmplTabs.length === 0 ) {
-
-				tmplTabs.push( {
-					name: 'main',
-					code: '// Tour of TSL\n'
-				} );
-
-			}
-
-			let description = tmplAttrs.description !== undefined ? tmplAttrs.description : tmplBody.replace( /```tsl(?:\s+[a-zA-Z0-9_-]*)?\r?\n[\s\S]*?```/gi, '' ).trim();
-			description = description.replace( /\r\n/g, '\n' ).replace( /\n{2,}/g, '\n' ).trim();
-
-			const isDefault = tmplAttrs.default === 'true' || tmplAttrs.default === true;
-
-			templates.push( {
-				name: tmplName,
-				description: description,
-				default: isDefault,
-				tabs: tmplTabs
-			} );
-
-		}
-
-		markdown = rawMarkdown.replace( tourMatch[ 0 ], '' );
-
-	}
-
-	return { title, templates, markdown };
-
-}
-
-
-function parseTour( rawMarkdown ) {
-
-	const { title, templates, markdown } = parseTourConfig( rawMarkdown );
+function parseTour( markdown ) {
 
 	const pageTree = [];
 
@@ -377,7 +276,7 @@ function parseTour( rawMarkdown ) {
 
 	} );
 
-	return { title, templates, pages, pageTree };
+	return { pages, pageTree };
 
 }
 
@@ -1565,4 +1464,4 @@ function tokenizeCodeToElement( codeContent, targetElement ) {
 
 }
 
-export { parseTourConfig, parseTour, parse, tokenizeInlineCode, tokenizeCodeToElement };
+export { parseTour, parse, tokenizeInlineCode, tokenizeCodeToElement };

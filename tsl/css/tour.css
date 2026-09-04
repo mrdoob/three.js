@@ -4562,30 +4562,3 @@ body.loading .app-header {
 		flex: 1;
 	}
 }
-
-/* Confirmation Modal Specifics */
-.tsl-confirm-modal {
-	width: 460px;
-	max-width: 95vw;
-}
-
-.tsl-confirm-body {
-	padding: 20px;
-}
-
-.tsl-confirm-body p {
-	margin: 0;
-	font-size: 14px;
-	line-height: 1.5;
-	color: #e5e7eb;
-}
-
-.tsl-confirm-actions {
-	display: flex;
-	align-items: center;
-	justify-content: flex-end;
-	gap: 10px;
-	padding: 16px 20px;
-	background: #181820;
-	border-top: 1px solid #262630;
-}
