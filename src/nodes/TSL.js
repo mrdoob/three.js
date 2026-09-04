@@ -181,3 +181,4 @@ export { default as getGeometryRoughness } from './functions/material/getGeometr
 export { default as getParallaxCorrectNormal } from './functions/material/getParallaxCorrectNormal.js';
 export { default as getRoughness } from './functions/material/getRoughness.js';
 export { default as getShIrradianceAt } from './functions/material/getShIrradianceAt.js';
+export * from './functions/material/SphericalHarmonics.js';

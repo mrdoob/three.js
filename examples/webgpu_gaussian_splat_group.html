@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - gaussian splat group</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - gaussian splatting group">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_gaussian_splat_group.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_gaussian_splat_group.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			#info > small#license {
+				top: 45px;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Gaussian Splatting Group</span>
+			</div>
+
+			<small id="status">Cross-mesh sorted Gaussian splat rendering via GaussianSplatGroup, by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>. <span id="splatCount"></span></small>
+			<small id="license"></small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { SPZLoader } from 'three/addons/loaders/SPZLoader.js';
+			import { GaussianSplatGroup } from 'three/addons/objects/GaussianSplatGroup.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			let camera, scene, renderer, controls, timer, hitMarker;
+			let group, lionGeometry, tomatoesGeometry;
+			const splatCountElement = document.getElementById( 'splatCount' );
+
+			// one lion + tomatoes pair per instance, arranged in a line and centered on the
+			// origin - lionIds[ i ] / tomatoesIds[ i ] / instanceCenters[ i ] all correspond
+			const lionIds = [];
+			const tomatoesIds = [];
+			const instanceCenters = [];
+			let instanceCount = 1;
+
+			// derived from the first instance's bounding sphere once it has loaded, see init()
+			let instanceSpacing = 1.0;
+
+			const lionLocalPosition = new THREE.Vector3( - 0.12, 0, 0 );
+			const lionQuaternion = new THREE.Quaternion().setFromEuler( new THREE.Euler( Math.PI, 0, 0 ) );
+			const lionScale = new THREE.Vector3( 1, 1, 1 );
+			const lionMatrix = new THREE.Matrix4();
+
+			const tomatoesLocalPosition = new THREE.Vector3( 0.12, 0, 0.05 );
+			const tomatoesQuaternion = new THREE.Quaternion();
+
+			// the tomatoes SPZ scene is modeled roughly 10x larger than the lion scene
+			const tomatoesScale = new THREE.Vector3( 0.06, 0.06, 0.06 );
+			let tomatoesRotationY = 0;
+			const tomatoesMatrix = new THREE.Matrix4();
+			const tmpPosition = new THREE.Vector3();
+			let rotateTomatoes = false;
+			let showLion = true;
+
+			THREE.ColorManagement.workingColorSpace = THREE.SRGBColorSpace;
+
+			const TOMATOES_ROTATION_SPEED = 1.2; // radians/second
+
+			// This should work on my machines.
+			const MAX_INSTANCES = 6;
+
+			const raycaster = new THREE.Raycaster();
+			const pointer = new THREE.Vector2();
+			const CLICK_DRAG_THRESHOLD = 4;
+			const HIT_MARKER_SIZE_RATIO = 1 / 50;
+			let pointerDownX = 0;
+			let pointerDownY = 0;
+
+			init();
+
+			async function init() {
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100 );
+				camera.position.set( 0, 0.35, 3.2 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x07080f );
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.minDistance = 1.2;
+				controls.maxDistance = 8;
+				controls.target.set( 0, 0, 0 );
+				controls.update();
+
+				timer = new THREE.Timer();
+
+				hitMarker = new THREE.Mesh(
+					new THREE.SphereGeometry( 1, 16, 12 ),
+					new THREE.MeshBasicMaterial( { color: 0xff0000, depthTest: false } )
+				);
+				hitMarker.visible = false;
+				scene.add( hitMarker );
+
+				renderer.domElement.addEventListener( 'pointerdown', onPointerDown );
+				renderer.domElement.addEventListener( 'click', onClick );
+
+				const loader = new SPZLoader();
+
+				[ lionGeometry, tomatoesGeometry ] = await Promise.all( [
+					loader.loadAsync( './models/spz/lion.v3.spz' ),
+					loader.loadAsync( './models/spz/tomatoes.v4.spz' )
+				] );
+
+				group = new GaussianSplatGroup( { autoCompact: false, shDegree: 2 } );
+				scene.add( group );
+
+				// build a single instance first so instanceSpacing can be derived from its
+				// bounding sphere before the GUI (which needs instanceSpacing to lay out more
+				// instances) is created
+				setInstanceCount( 1 );
+				group.computeBoundingSphere();
+
+				instanceSpacing = Math.max( group.boundingSphere.radius * 2.2, 0.1 );
+				updateInstanceTransforms();
+				group.computeBoundingSphere();
+
+				fitCameraToGroup( group );
+				updateHitMarkerSize( group );
+				updateSplatCountDisplay();
+
+				const gui = renderer.inspector.createParameters( 'Building' );
+				gui.add( { instanceCount }, 'instanceCount', 1, MAX_INSTANCES, 1 ).name( 'Instance Count' ).onChange( ( value ) => {
+
+					setInstanceCount( value );
+
+					group.computeBoundingSphere();
+					fitCameraToGroup( group );
+					updateHitMarkerSize( group );
+					updateSplatCountDisplay();
+
+				} );
+				gui.add( { rotateTomatoes }, 'rotateTomatoes' ).name( 'Rotate Tomatoes' ).onChange( ( value ) => {
+
+					rotateTomatoes = value;
+
+				} );
+				gui.add( { showLion }, 'showLion' ).name( 'Show Lion' ).onChange( ( value ) => {
+
+					showLion = value;
+
+					for ( const lionId of lionIds ) group.setVisibleAt( lionId, showLion );
+
+					updateSplatCountDisplay();
+
+				} );
+				gui.add( { autoCompact: false }, 'autoCompact' ).name( 'Auto Compact' ).onChange( ( value ) => {
+
+					// Toggle GaussianSplatGroup's buffer-shrinking behavior at runtime: `true`
+					// keeps the shared storage buffers sized to exactly fit the live splat total
+					// on every change, `false` (the default here) only ever grows them - toggling
+					// Show Lion or lowering Instance Count with it off leaves the buffers at their
+					// high-water mark until Compact Now is used - see the class documentation for
+					// the full contract.
+					group.autoCompact = value;
+
+				} );
+				gui.add( { compactNow: () => group.compact() }, 'compactNow' ).name( 'Compact Now' );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			// adds/removes lion+tomatoes instance pairs so lionIds/tomatoesIds match `count`,
+			// then repositions every remaining instance into a line centered on the origin
+			function setInstanceCount( count ) {
+
+				count = THREE.MathUtils.clamp( Math.round( count ), 1, MAX_INSTANCES );
+
+				while ( lionIds.length < count ) {
+
+					lionIds.push( group.addSplat( lionGeometry ) );
+					tomatoesIds.push( group.addSplat( tomatoesGeometry ) );
+
+					if ( showLion === false ) group.setVisibleAt( lionIds[ lionIds.length - 1 ], false );
+
+				}
+
+				while ( lionIds.length > count ) {
+
+					group.deleteSplat( lionIds.pop() );
+					group.deleteSplat( tomatoesIds.pop() );
+
+				}
+
+				instanceCount = count;
+
+				updateInstanceTransforms();
+
+			}
+
+			// recomputes each instance's centered x offset and writes both splat clouds'
+			// transforms - the lion's is static, the tomatoes' also folds in its current rotation
+			function updateInstanceTransforms() {
+
+				instanceCenters.length = 0;
+
+				for ( let i = 0; i < instanceCount; i ++ ) {
+
+					const centerX = ( i - ( instanceCount - 1 ) / 2 ) * instanceSpacing * 0.6;
+					instanceCenters.push( centerX );
+
+					tmpPosition.copy( lionLocalPosition );
+					tmpPosition.x += centerX;
+					lionMatrix.compose( tmpPosition, lionQuaternion, lionScale );
+					group.setMatrixAt( lionIds[ i ], lionMatrix );
+
+					updateTomatoesMatrix( i, centerX );
+
+				}
+
+			}
+
+			function updateTomatoesMatrix( index, centerX ) {
+
+				tmpPosition.copy( tomatoesLocalPosition );
+				tmpPosition.x += centerX;
+				tomatoesMatrix.compose( tmpPosition, tomatoesQuaternion, tomatoesScale );
+				group.setMatrixAt( tomatoesIds[ index ], tomatoesMatrix );
+
+			}
+
+			function fitCameraToGroup( group ) {
+
+				group.updateWorldMatrix( true, false );
+
+				const sphere = group.boundingSphere.clone().applyMatrix4( group.matrixWorld );
+				const radius = Math.max( sphere.radius, 0.01 );
+				const distance = radius / Math.sin( THREE.MathUtils.degToRad( camera.fov ) * 0.5 );
+
+				controls.minDistance = radius * 1.1;
+				controls.maxDistance = radius * 8;
+				controls.target.copy( sphere.center );
+				camera.position.set( 0, 0.15, 1 ).normalize().multiplyScalar( distance * 1.15 ).add( sphere.center );
+				camera.near = Math.max( distance / 1000, 0.001 );
+				camera.far = Math.max( distance * 10, 10 );
+
+				camera.updateProjectionMatrix();
+				controls.update();
+
+			}
+
+			function updateHitMarkerSize( group ) {
+
+				group.updateWorldMatrix( true, false );
+
+				const sphere = group.boundingSphere.clone().applyMatrix4( group.matrixWorld );
+				hitMarker.scale.setScalar( Math.max( sphere.radius * HIT_MARKER_SIZE_RATIO, 0.0001 ) );
+
+			}
+
+			// GaussianSplatGroup.splatCount already sums the live, visible splat total across
+			// every added lion/tomatoes instance, so no manual per-BufferGeometry counting is needed
+			function updateSplatCountDisplay() {
+
+				splatCountElement.textContent = `${ group.splatCount.toLocaleString() } splats`;
+
+			}
+
+			function onPointerDown( event ) {
+
+				pointerDownX = event.clientX;
+				pointerDownY = event.clientY;
+
+			}
+
+			function onClick( event ) {
+
+				// ignore drags (camera orbiting), only treat this as a hit-test click
+				const dx = event.clientX - pointerDownX;
+				const dy = event.clientY - pointerDownY;
+
+				if ( Math.sqrt( dx * dx + dy * dy ) > CLICK_DRAG_THRESHOLD ) return;
+
+				pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+				raycaster.setFromCamera( pointer, camera );
+
+				const hit = raycaster.intersectObject( group )[ 0 ];
+
+				if ( hit ) {
+
+					hitMarker.position.copy( hit.point );
+					hitMarker.visible = true;
+
+				} else {
+
+					hitMarker.visible = false;
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				// init() loads the SPZ assets asynchronously, but the animation loop is
+				// already running by then (renderer.setAnimationLoop is set up before the
+				// await), so skip frames until the splats and group actually exist
+				if ( group === undefined ) return;
+
+				timer.update();
+				const delta = timer.getDelta();
+
+				controls.update();
+
+				if ( rotateTomatoes === true ) {
+
+					// continuously recomposes every tomatoes instance's transform, exercising
+					// GaussianSplatGroup.setMatrixAt()'s cheap per-record transform update every
+					// frame instead of rebuilding the packed layout - the lions' splat ranges are
+					// untouched
+					tomatoesRotationY += delta * TOMATOES_ROTATION_SPEED;
+					tomatoesQuaternion.setFromEuler( new THREE.Euler( 0, tomatoesRotationY, 0 ) );
+
+					for ( let i = 0; i < instanceCount; i ++ ) {
+
+						updateTomatoesMatrix( i, instanceCenters[ i ] );
+
+					}
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
