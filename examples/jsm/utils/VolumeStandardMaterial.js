@@ -11,6 +11,7 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 		this.uniforms = {
 			sdfTex: { value: null },
 			normalStep: { value: new Vector3() },
+			boundsScale: { value: new Vector3( 1, 1, 1 ) },
 			surface: { value: 0 }
 		};
 
@@ -24,6 +25,7 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 			// Add our custom uniforms
 			shader.uniforms.sdfTex = this.uniforms.sdfTex;
 			shader.uniforms.normalStep = this.uniforms.normalStep;
+			shader.uniforms.boundsScale = this.uniforms.boundsScale;
 			shader.uniforms.surface = this.uniforms.surface;
 
 			// Add our defines
@@ -61,6 +63,7 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 
 				uniform sampler3D sdfTex;
 				uniform vec3 normalStep;
+				uniform vec3 boundsScale;
 				uniform mat3 normalMatrix;
 				uniform mat4 modelViewMatrix;
 				uniform mat4 projectionMatrix;
@@ -87,25 +90,29 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 			shader.fragmentShader = shader.fragmentShader.replace(
 				'void main() {',
 				`void main() {
-				// Raymarch from entry point to back face (current fragment) in local space
-				vec3 rayOrigin = vLocalRayOrigin;
-				vec3 rayDirection = normalize( vLocalPosition - vLocalRayOrigin );
+				// Raymarch in bounds space (mesh units), where the SDF distances are measured
+				vec3 rayOrigin = vLocalRayOrigin * boundsScale;
+				vec3 rayDirection = normalize( ( vLocalPosition - vLocalRayOrigin ) * boundsScale );
+				vec3 boundsMin = - 0.5 * boundsScale;
+				vec3 boundsMax = 0.5 * boundsScale;
 
-				// Find intersection with SDF bounds [-0.5, 0.5]
-				vec2 boxIntersectionInfo = rayBoxDist( vec3( - 0.5 ), vec3( 0.5 ), rayOrigin, rayDirection );
-				float distToBox = boxIntersectionInfo.x;
-				float distInsideBox = boxIntersectionInfo.y;
+				// Find intersection with SDF bounds
+				vec2 boxIntersectionInfo = rayBoxDist( boundsMin, boundsMax, rayOrigin, rayDirection );
 
 				// Start from the entry point (or camera if inside)
-				distToBox = max( distToBox, 0.0 );
+				float distToBox = max( boxIntersectionInfo.x, 0.0 );
 
 				// Compute distance to back face (current fragment position)
-				float distToBackFace = length( vLocalPosition - rayOrigin );
+				float distToBackFace = length( vLocalPosition * boundsScale - rayOrigin );
+
+				// Rays that run out of steps within a voxel of the surface still count as hits
+				float voxelSize = max( normalStep.x * boundsScale.x, max( normalStep.y * boundsScale.y, normalStep.z * boundsScale.z ) );
 
 				// Raymarch from entry to back face to find surface in SDF
 				bool intersectsSurface = false;
-				vec3 localPoint = rayOrigin + rayDirection * distToBox;
+				vec3 point = rayOrigin + rayDirection * distToBox;
 				float marchDist = distToBox;
+				float distanceToSurface = 2.0 * voxelSize;
 
 				for ( int i = 0; i < MAX_STEPS; i ++ ) {
 
@@ -114,25 +121,26 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 						break;
 					}
 
-					vec3 sdfUV = localPoint + vec3( 0.5 );
+					vec3 sdfUV = point / boundsScale + vec3( 0.5 );
 					if ( sdfUV.x < 0.0 || sdfUV.x > 1.0 || sdfUV.y < 0.0 || sdfUV.y > 1.0 || sdfUV.z < 0.0 || sdfUV.z > 1.0 ) {
 						break;
 					}
 
-					float distanceToSurface = texture( sdfTex, sdfUV ).r - surface;
+					distanceToSurface = texture( sdfTex, sdfUV ).r - surface;
 					if ( abs( distanceToSurface ) < SURFACE_EPSILON ) {
 						intersectsSurface = true;
 						break;
 					}
 
-					float stepSize = distanceToSurface * 0.5;
-					localPoint += rayDirection * stepSize;
-					marchDist += stepSize;
+					point += rayDirection * distanceToSurface;
+					marchDist += distanceToSurface;
 				}
 
-				if ( !intersectsSurface ) {
+				if ( ! intersectsSurface && abs( distanceToSurface ) > voxelSize ) {
 					discard;
 				}
+
+				vec3 localPoint = point / boundsScale;
 
 				// Write correct depth for the raymarched surface (accounting for instance transform)
 				vec4 viewPos = modelViewMatrix * vInstanceMatrix * vec4( localPoint, 1.0 );
@@ -190,11 +198,9 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 					// Create a tangent space from the SDF normal
 					// We need to construct tangent and bitangent vectors perpendicular to the normal
 					vec3 N = normalize( normal );
-					vec3 T = normalize( cross( N, vec3( 0.0, 1.0, 0.0 ) ) );
-					// If normal is too close to (0,1,0), use a different reference
-					if ( length( T ) < 0.1 ) {
-						T = normalize( cross( N, vec3( 1.0, 0.0, 0.0 ) ) );
-					}
+					// Pick a reference axis that isn't parallel to the normal
+					vec3 reference = abs( N.y ) < 0.9 ? vec3( 0.0, 1.0, 0.0 ) : vec3( 1.0, 0.0, 0.0 );
+					vec3 T = normalize( cross( N, reference ) );
 					vec3 B = normalize( cross( N, T ) );
 					
 					// Apply normal map in tangent space

@@ -78,6 +78,7 @@ export class Volume extends Mesh {
 		// Update custom uniforms
 		this.material.uniforms.sdfTex.value = this.sdfTexture;
 		this.material.uniforms.normalStep.value.set( depth, depth, depth );
+		this.material.uniforms.boundsScale.value.copy( this.scale );
 		this.material.uniforms.surface.value = this.surface;
 
 		// Automatically use scene.environment if available
