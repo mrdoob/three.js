@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - animation - foot ik</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - animation - foot ik">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_animation_foot_ik.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_animation_foot_ik.jpg">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				color: #000;
+			}
+
+			a {
+				color: #2983ff;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - animation - <a href="https://github.com/hh-hang/three-player-controller/tree/master/src/plugins/foot-ik" target="_blank" rel="noopener">foot ik</a> - <a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a><br/>
+			WASD move, Shift sprint, mouse orbit<br/>
+			Soldier model from <a href="https://www.mixamo.com" target="_blank" rel="noopener">https://www.mixamo.com</a>.
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.13/build/index.module.js",
+					"three-player-controller/foot-ik": "https://cdn.jsdelivr.net/npm/three-player-controller@0.5.0/dist/foot-ik.mjs"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Sky } from 'three/addons/objects/Sky.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+			import { MeshBVH, StaticGeometryGenerator } from 'three-mesh-bvh';
+			import { FootIK } from 'three-player-controller/foot-ik';
+
+			const GRAVITY = - 30;
+			const PHYSICS_STEPS = 5;
+			const PLAYER_MODEL_SCALE = 0.5;
+			const CAPSULE_RADIUS = 0.15;
+			const BODY_SEGMENT = 0.6;
+			const RIDE_HEIGHT = 0.2;
+			const COLLIDER_HEIGHT = BODY_SEGMENT + 2 * CAPSULE_RADIUS - RIDE_HEIGHT;
+			const CAPSULE_SEGMENT = COLLIDER_HEIGHT - 2 * CAPSULE_RADIUS;
+			const STEP_SMOOTH_FACTOR = 10;
+			const MIN_FLOOR_NORMAL_Y = Math.cos( 5 * Math.PI / 180 );
+			const LOOK_AT_OFFSET_Y = 0.1;
+			const PI90 = Math.PI / 2;
+
+			let camera, scene, renderer, orbitControls, stats, timer;
+			let player, playerCapsuleHelper, playerModel, collider, footIK, mixer, actions;
+			let sun;
+			let playerIsOnGround = false;
+			let groundSnapHeight = 0;
+			let maxGroundDistance = 0;
+
+			const initialPlayerPosition = new THREE.Vector3( - 7.5, 0, - 3.5 );
+			const playerVelocity = new THREE.Vector3();
+			const upVector = new THREE.Vector3( 0, 1, 0 );
+			const tempVector = new THREE.Vector3();
+			const tempVector2 = new THREE.Vector3();
+			const tempBox = new THREE.Box3();
+			const tempMat = new THREE.Matrix4();
+			const tempSegment = new THREE.Line3();
+			const groundRaycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ) );
+
+			const moveControls = {
+				key: [ 0, 0, 0 ],
+				rotate: new THREE.Quaternion(),
+				current: 'Idle',
+				fadeDuration: 0.25,
+				runVelocity: 2.1,
+				walkVelocity: 0.8,
+				rotateSpeed: 10
+			};
+
+			const playerHost = {
+				scene: null,
+				collider: null,
+				playerCapsule: null,
+				playerModel: null,
+				playerIsOnGround: false,
+				playerModelConfig: {
+					// FootIK distances use a 180-tall baseline; this scene skips that normalize
+					// and scales the ~1.8 model by PLAYER_MODEL_SCALE, so config.scale = PLAYER_MODEL_SCALE * (1.8/180).
+					scale: PLAYER_MODEL_SCALE * 0.01,
+					walkAnim: 'Walk',
+					runAnim: 'Run'
+				},
+				animation: {
+					clips: [],
+					state: null
+				}
+			};
+
+			init();
+
+			function init() {
+
+				timer = new THREE.Timer();
+				timer.connect( document );
+
+				scene = new THREE.Scene();
+				playerHost.scene = scene;
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 0.8;
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.VSMShadowMap;
+				document.body.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.01, 500 );
+
+				orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.enableDamping = true;
+				orbitControls.enablePan = false;
+				orbitControls.maxDistance = 6;
+				orbitControls.maxPolarAngle = PI90 - 0.05;
+
+				scene.add( new THREE.AmbientLight( 0xffffff, 1.8 ) );
+
+				sun = new THREE.DirectionalLight( 0xffffff, 2 );
+				sun.position.set( 6, 10, 7 );
+				sun.castShadow = true;
+				sun.shadow.mapSize.set( 2048, 2048 );
+				sun.shadow.camera.near = 0.5;
+				sun.shadow.camera.far = 35;
+				sun.shadow.camera.left = - 12;
+				sun.shadow.camera.right = 12;
+				sun.shadow.camera.top = 10;
+				sun.shadow.camera.bottom = - 10;
+				sun.shadow.bias = - 0.0005;
+				sun.shadow.radius = 4;
+				scene.add( sun );
+
+				const sky = new Sky();
+				sky.scale.setScalar( 450000 );
+				scene.add( sky );
+
+				const skyUniforms = sky.material.uniforms;
+				skyUniforms[ 'turbidity' ].value = 5;
+				skyUniforms[ 'rayleigh' ].value = 1.5;
+				skyUniforms[ 'mieCoefficient' ].value = 0.003;
+				skyUniforms[ 'mieDirectionalG' ].value = 0.8;
+				skyUniforms[ 'sunPosition' ].value.setFromSphericalCoords(
+					1,
+					THREE.MathUtils.degToRad( 70 ),
+					THREE.MathUtils.degToRad( 210 ),
+				);
+
+				const course = buildTestCourse();
+				scene.add( course );
+				addGroundGrid( scene );
+
+				course.updateMatrixWorld( true );
+
+				const staticGenerator = new StaticGeometryGenerator( course );
+				staticGenerator.attributes = [ 'position' ];
+
+				const mergedGeometry = staticGenerator.generate();
+				mergedGeometry.boundsTree = new MeshBVH( mergedGeometry );
+
+				collider = new THREE.Mesh( mergedGeometry );
+				collider.material.wireframe = true;
+				collider.material.opacity = 0.5;
+				collider.material.transparent = true;
+				collider.visible = false;
+				scene.add( collider );
+				playerHost.collider = collider;
+
+				createPlayerCapsule();
+				loadSoldier();
+
+				window.addEventListener( 'resize', onWindowResize );
+				document.addEventListener( 'keydown', onKeyDown );
+				document.addEventListener( 'keyup', onKeyUp );
+				window.addEventListener( 'blur', () => {
+
+					moveControls.key[ 2 ] = 0;
+					orbitControls.mouseButtons.LEFT = THREE.MOUSE.ROTATE;
+					orbitControls.mouseButtons.RIGHT = THREE.MOUSE.PAN;
+
+				} );
+
+				renderer.setAnimationLoop( animate );
+
+			}
+
+			function createPlayerCapsule() {
+
+				player = new THREE.Group();
+				player.name = 'player';
+				player.capsuleInfo = {
+					radius: CAPSULE_RADIUS,
+					segment: new THREE.Line3(
+						new THREE.Vector3(),
+						new THREE.Vector3( 0, - CAPSULE_SEGMENT, 0 )
+					)
+				};
+
+				recomputeGroundThresholds();
+				initialPlayerPosition.y = groundSnapHeight;
+				player.position.copy( initialPlayerPosition );
+				scene.add( player );
+
+				playerCapsuleHelper = new THREE.Mesh(
+					new RoundedBoxGeometry( CAPSULE_RADIUS * 2, COLLIDER_HEIGHT, CAPSULE_RADIUS * 2, 1, CAPSULE_RADIUS ),
+					new THREE.MeshBasicMaterial( {
+						color: 0xff0000,
+						wireframe: true,
+						transparent: true,
+						opacity: 0.35,
+						depthWrite: false
+					} )
+				);
+				playerCapsuleHelper.name = 'capsule';
+				playerCapsuleHelper.visible = false;
+				playerCapsuleHelper.geometry.translate( 0, - CAPSULE_SEGMENT * 0.5, 0 );
+				player.add( playerCapsuleHelper );
+
+				playerHost.playerCapsule = player;
+
+				camera.position.copy( initialPlayerPosition ).add( new THREE.Vector3( - 1.5, 0.25, 0 ) );
+				orbitControls.target.copy( initialPlayerPosition );
+				orbitControls.target.y -= LOOK_AT_OFFSET_Y;
+				orbitControls.update();
+
+			}
+
+			function recomputeGroundThresholds() {
+
+				const info = player.capsuleInfo;
+				groundSnapHeight = - info.segment.end.y + info.radius + RIDE_HEIGHT;
+				maxGroundDistance = groundSnapHeight + RIDE_HEIGHT;
+
+			}
+
+			function isFlatFloor( hit ) {
+
+				if ( ! hit.face ) return true;
+
+				tempVector.copy( hit.face.normal ).transformDirection( hit.object.matrixWorld );
+				return tempVector.y >= MIN_FLOOR_NORMAL_Y;
+
+			}
+
+			function applyGravity( delta ) {
+
+				playerVelocity.y += delta * GRAVITY;
+				playerIsOnGround = false;
+
+			}
+
+			function snapToGround( groundY, smooth = false, delta = 0 ) {
+
+				playerVelocity.y = 0;
+
+				const dy = groundY - player.position.y;
+
+				if ( smooth && Math.abs( dy ) <= RIDE_HEIGHT ) {
+
+					player.position.y += dy * Math.min( 1, STEP_SMOOTH_FACTOR * delta );
+
+				} else {
+
+					player.position.y = groundY;
+
+				}
+
+				playerIsOnGround = true;
+
+			}
+
+			function loadSoldier() {
+
+				const loader = new GLTFLoader();
+				loader.load( 'models/gltf/Soldier.glb', ( gltf ) => {
+
+					playerModel = gltf.scene;
+					playerModel.rotation.y = Math.PI;
+
+					playerModel.traverse( ( object ) => {
+
+						if ( ! object.isMesh ) return;
+
+						object.castShadow = true;
+						object.receiveShadow = true;
+
+						if ( object.name === 'vanguard_Mesh' ) {
+
+							object.material.metalness = 1.0;
+							object.material.roughness = 0.2;
+							object.material.color.set( 1, 1, 1 );
+							object.material.metalnessMap = object.material.map;
+
+						} else {
+
+							object.material.metalness = 1;
+							object.material.roughness = 0;
+							object.material.transparent = true;
+							object.material.opacity = 0.8;
+							object.material.color.set( 1, 1, 1 );
+
+						}
+
+					} );
+
+					playerModel.scale.setScalar( PLAYER_MODEL_SCALE );
+					const box = new THREE.Box3().setFromObject( playerModel );
+					playerModel.position.y = - CAPSULE_SEGMENT - CAPSULE_RADIUS - RIDE_HEIGHT - box.min.y;
+
+					player.add( playerModel );
+					playerHost.playerModel = playerModel;
+
+					mixer = new THREE.AnimationMixer( playerModel );
+					const animations = gltf.animations;
+					playerHost.animation.clips = animations;
+
+					actions = {
+						Idle: mixer.clipAction( animations.find( ( clip ) => clip.name === 'Idle' ) ?? animations[ 0 ] ),
+						Walk: mixer.clipAction( animations.find( ( clip ) => clip.name === 'Walk' ) ?? animations[ 3 ] ),
+						Run: mixer.clipAction( animations.find( ( clip ) => clip.name === 'Run' ) ?? animations[ 1 ] )
+					};
+
+					for ( const name in actions ) {
+
+						actions[ name ].enabled = true;
+						actions[ name ].setEffectiveTimeScale( 1 );
+						actions[ name ].setEffectiveWeight( name === 'Idle' ? 1 : 0 );
+						actions[ name ].play();
+
+					}
+
+					playerHost.animation.state = actions.Idle;
+
+					footIK = new FootIK( {
+						skeleton: {
+							hips: 'mixamorigHips',
+							legs: {
+								left: {
+									upper: 'mixamorigLeftUpLeg',
+									lower: 'mixamorigLeftLeg',
+									foot: 'mixamorigLeftFoot',
+									toe: 'mixamorigLeftToeBase'
+								},
+								right: {
+									upper: 'mixamorigRightUpLeg',
+									lower: 'mixamorigRightLeg',
+									foot: 'mixamorigRightFoot',
+									toe: 'mixamorigRightToeBase'
+								}
+							}
+						},
+						soleSkinThickness: 1.6,
+					} );
+					footIK.onAttach( playerHost );
+
+					createDebugPanel();
+
+				} );
+
+			}
+
+			function createDebugPanel() {
+
+				const options = footIK.getOptions();
+				const params = {
+					footIKEnabled: options.enabled,
+					footIKDebug: options.debug,
+					playerDebug: false,
+					colliderDebug: false,
+					soleHalfWidth: options.soleHalfWidth,
+					soleToeExtend: options.soleToeExtend,
+					soleHeelExtend: options.soleHeelExtend,
+					soleSkinThickness: options.soleSkinThickness
+				};
+
+				const gui = new GUI();
+
+				const sceneFolder = gui.addFolder( 'Scene' );
+				sceneFolder.add( params, 'playerDebug' ).name( 'Player Capsule' ).onChange( ( value ) => {
+
+					playerCapsuleHelper.visible = value;
+
+				} );
+				sceneFolder.add( params, 'colliderDebug' ).name( 'BVH Collider' ).onChange( ( value ) => {
+
+					collider.visible = value;
+
+				} );
+				sceneFolder.close();
+
+				const debugFolder = gui.addFolder( 'Foot IK Debug' );
+				debugFolder.add( params, 'footIKEnabled' ).name( 'Enabled' ).onChange( ( value ) => {
+
+					footIK.setEnabled( value );
+
+					if ( ! value ) {
+
+						footIK.setDebugEnabled( false );
+
+					} else {
+
+						footIK.setDebugEnabled( params.footIKDebug );
+
+					}
+
+				} );
+				debugFolder.add( params, 'footIKDebug' ).name( 'IK Targets' ).onChange( ( value ) => {
+
+					footIK.setDebugEnabled( value && params.footIKEnabled );
+
+				} );
+				debugFolder.open();
+
+				const soleFolder = gui.addFolder( 'Sole Layout' );
+				soleFolder.add( params, 'soleHalfWidth', 0, 24, 0.1 ).name( 'Half Width' ).onChange( ( value ) => {
+
+					footIK.configure( { soleHalfWidth: value } );
+
+				} );
+				soleFolder.add( params, 'soleToeExtend', 0, 24, 0.1 ).name( 'Toe Extend' ).onChange( ( value ) => {
+
+					footIK.configure( { soleToeExtend: value } );
+
+				} );
+				soleFolder.add( params, 'soleHeelExtend', 0, 24, 0.1 ).name( 'Heel Extend' ).onChange( ( value ) => {
+
+					footIK.configure( { soleHeelExtend: value } );
+
+				} );
+				soleFolder.add( params, 'soleSkinThickness', 0, 16, 0.1 ).name( 'Skin Thickness' ).onChange( ( value ) => {
+
+					footIK.configure( { soleSkinThickness: value } );
+
+				} );
+				soleFolder.close();
+
+			}
+
+			function updateAnimation() {
+
+				// change animation
+
+				const key = moveControls.key;
+				const active = key[ 0 ] !== 0 || key[ 1 ] !== 0;
+				const play = active ? ( key[ 2 ] ? 'Run' : 'Walk' ) : 'Idle';
+
+				if ( ! actions || moveControls.current === play ) return;
+
+				const current = actions[ play ];
+				const old = actions[ moveControls.current ];
+				moveControls.current = play;
+
+				current.reset();
+				current.weight = 1.0;
+				current.stopFading();
+				old.stopFading();
+
+				if ( play !== 'Idle' ) {
+
+					current.time = old.time * ( current.getClip().duration / old.getClip().duration );
+
+				}
+
+				old._scheduleFading( moveControls.fadeDuration, old.getEffectiveWeight(), 0 );
+				current._scheduleFading( moveControls.fadeDuration, current.getEffectiveWeight(), 1 );
+				current.play();
+				playerHost.animation.state = current;
+
+			}
+
+			function updatePlayer( delta ) {
+
+				groundRaycaster.ray.origin.copy( player.position );
+				groundRaycaster.far = maxGroundDistance + 5;
+
+				const hits = collider ? groundRaycaster.intersectObject( collider, false ) : [];
+				const bestHit = hits[ 0 ];
+
+				if ( bestHit ) {
+
+					const targetY = bestHit.point.y + groundSnapHeight;
+					const dist = player.position.y - bestHit.point.y;
+
+					if ( dist > maxGroundDistance ) {
+
+						applyGravity( delta );
+
+					} else if ( playerVelocity.y <= 0 ) {
+
+						if ( playerIsOnGround ) {
+
+							snapToGround( targetY, isFlatFloor( bestHit ), delta );
+
+						} else {
+
+							const predictedY = player.position.y + playerVelocity.y * delta;
+
+							if ( predictedY <= targetY ) {
+
+								snapToGround( targetY );
+
+							} else {
+
+								applyGravity( delta );
+
+							}
+
+						}
+
+					} else {
+
+						applyGravity( delta );
+
+					}
+
+				} else {
+
+					applyGravity( delta );
+
+				}
+
+				player.position.y += playerVelocity.y * delta;
+				playerHost.playerIsOnGround = playerIsOnGround;
+
+				// move the player
+
+				const key = moveControls.key;
+				const angle = orbitControls.getAzimuthalAngle();
+				const speed = moveControls.current === 'Run' ? moveControls.runVelocity : moveControls.walkVelocity;
+
+				if ( key[ 0 ] !== 0 || key[ 1 ] !== 0 ) {
+
+					tempVector.set( key[ 1 ], 0, key[ 0 ] ).applyAxisAngle( upVector, angle ).normalize();
+					player.position.addScaledVector( tempVector, speed * delta );
+
+					const facing = unwrapRad( Math.atan2( tempVector.x, tempVector.z ) );
+					moveControls.rotate.setFromAxisAngle( upVector, facing );
+
+				}
+
+				player.updateMatrixWorld();
+
+				// adjust player position based on collisions
+				const capsuleInfo = player.capsuleInfo;
+				tempBox.makeEmpty();
+				tempMat.copy( collider.matrixWorld ).invert();
+				tempSegment.copy( capsuleInfo.segment );
+
+				// get the position of the capsule in the local space of the collider
+				tempSegment.start.applyMatrix4( player.matrixWorld ).applyMatrix4( tempMat );
+				tempSegment.end.applyMatrix4( player.matrixWorld ).applyMatrix4( tempMat );
+
+				// get the axis aligned bounding box of the capsule
+				tempBox.expandByPoint( tempSegment.start );
+				tempBox.expandByPoint( tempSegment.end );
+				tempBox.min.addScalar( - capsuleInfo.radius );
+				tempBox.max.addScalar( capsuleInfo.radius );
+
+				collider.geometry.boundsTree.shapecast( {
+
+					intersectsBounds: ( box ) => box.intersectsBox( tempBox ),
+
+					intersectsTriangle: ( tri ) => {
+
+						const triPoint = tempVector;
+						const capsulePoint = tempVector2;
+
+						const distance = tri.closestPointToSegment( tempSegment, triPoint, capsulePoint );
+						if ( distance < capsuleInfo.radius ) {
+
+							const depth = capsuleInfo.radius - distance;
+							const direction = capsulePoint.sub( triPoint ).normalize();
+
+							tempSegment.start.addScaledVector( direction, depth );
+							tempSegment.end.addScaledVector( direction, depth );
+
+						}
+
+					}
+
+				} );
+
+				const newPosition = tempVector;
+				newPosition.copy( tempSegment.start ).applyMatrix4( collider.matrixWorld );
+
+				const deltaVector = tempVector2;
+				deltaVector.subVectors( newPosition, player.position );
+
+				const offset = Math.max( 0.0, deltaVector.length() - 1e-5 );
+				deltaVector.normalize().multiplyScalar( offset );
+
+				player.position.add( deltaVector );
+
+				// adjust the camera
+				camera.position.sub( orbitControls.target );
+				orbitControls.target.copy( player.position );
+				orbitControls.target.y -= LOOK_AT_OFFSET_Y;
+				camera.position.add( orbitControls.target );
+
+			}
+
+			function updatePlayerFacing( delta ) {
+
+				const key = moveControls.key;
+
+				if ( key[ 0 ] === 0 && key[ 1 ] === 0 ) return;
+
+				player.quaternion.rotateTowards( moveControls.rotate, moveControls.rotateSpeed * delta );
+
+			}
+
+			function unwrapRad( r ) {
+
+				return Math.atan2( Math.sin( r ), Math.cos( r ) );
+
+			}
+
+			function onKeyDown( event ) {
+
+				const key = moveControls.key;
+
+				switch ( event.code ) {
+
+					case 'ArrowUp': case 'KeyW': key[ 0 ] = - 1; break;
+					case 'ArrowDown': case 'KeyS': key[ 0 ] = 1; break;
+					case 'ArrowLeft': case 'KeyA': key[ 1 ] = - 1; break;
+					case 'ArrowRight': case 'KeyD': key[ 1 ] = 1; break;
+					case 'ShiftLeft': case 'ShiftRight':
+						key[ 2 ] = 1;
+						orbitControls.mouseButtons.LEFT = THREE.MOUSE.PAN;
+						orbitControls.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
+						break;
+
+				}
+
+			}
+
+			function onKeyUp( event ) {
+
+				const key = moveControls.key;
+
+				switch ( event.code ) {
+
+					case 'ArrowUp': case 'KeyW': key[ 0 ] = key[ 0 ] < 0 ? 0 : key[ 0 ]; break;
+					case 'ArrowDown': case 'KeyS': key[ 0 ] = key[ 0 ] > 0 ? 0 : key[ 0 ]; break;
+					case 'ArrowLeft': case 'KeyA': key[ 1 ] = key[ 1 ] < 0 ? 0 : key[ 1 ]; break;
+					case 'ArrowRight': case 'KeyD': key[ 1 ] = key[ 1 ] > 0 ? 0 : key[ 1 ]; break;
+					case 'ShiftLeft': case 'ShiftRight':
+						key[ 2 ] = 0;
+						orbitControls.mouseButtons.LEFT = THREE.MOUSE.ROTATE;
+						orbitControls.mouseButtons.RIGHT = THREE.MOUSE.PAN;
+						break;
+
+				}
+
+			}
+
+			function buildTestCourse() {
+
+				const root = new THREE.Group();
+				const groundMat = new THREE.MeshStandardMaterial( { color: 0xd8d5cf, roughness: 0.9 } );
+				const stairMats = [
+					new THREE.MeshStandardMaterial( { color: 0xb8b0a1, roughness: 0.75 } ),
+					new THREE.MeshStandardMaterial( { color: 0xc3a28f, roughness: 0.75 } ),
+					new THREE.MeshStandardMaterial( { color: 0xa8b4c4, roughness: 0.75 } )
+				];
+				const rampMats = [
+					new THREE.MeshStandardMaterial( { color: 0xadbca8, roughness: 0.8 } ),
+					new THREE.MeshStandardMaterial( { color: 0x9fb7b4, roughness: 0.8 } ),
+					new THREE.MeshStandardMaterial( { color: 0xc0b48c, roughness: 0.8 } )
+				];
+				const obstacleMats = [
+					new THREE.MeshStandardMaterial( { color: 0xe5b73b, roughness: 0.72 } ),
+					new THREE.MeshStandardMaterial( { color: 0x4b4a46, roughness: 0.82 } )
+				];
+				const wallMat = new THREE.MeshStandardMaterial( { color: 0x59636d, roughness: 0.88 } );
+
+				addBox( root, new THREE.Vector3( 0, - 0.06, 0 ), new THREE.Vector3( 20, 0.12, 12 ), groundMat );
+				createBoundaryWalls( root, wallMat );
+
+				createStairs( root, new THREE.Vector3( - 6.5, 0, - 3.5 ), 0.08, stairMats[ 0 ] );
+				createStairs( root, new THREE.Vector3( - 1.2, 0, - 3.5 ), 0.12, stairMats[ 1 ] );
+				createStairs( root, new THREE.Vector3( 4.1, 0, - 3.5 ), 0.16, stairMats[ 2 ] );
+
+				createObstacleCourse( root, - 0.25, obstacleMats );
+
+				createRamp( root, new THREE.Vector3( - 6.1, 0, 3 ), 10, rampMats[ 0 ] );
+				createRamp( root, new THREE.Vector3( - 0.3, 0, 3 ), 18, rampMats[ 1 ] );
+				createRamp( root, new THREE.Vector3( 5.8, 0, 3 ), 28, rampMats[ 2 ] );
+
+				return root;
+
+			}
+
+			function addGroundGrid( root ) {
+
+				const width = 20;
+				const depth = 12;
+				const step = 1;
+				const points = [];
+
+				for ( let x = - width / 2; x <= width / 2 + 0.0001; x += step ) {
+
+					points.push( new THREE.Vector3( x, 0, - depth / 2 ), new THREE.Vector3( x, 0, depth / 2 ) );
+
+				}
+
+				for ( let z = - depth / 2; z <= depth / 2 + 0.0001; z += step ) {
+
+					points.push( new THREE.Vector3( - width / 2, 0, z ), new THREE.Vector3( width / 2, 0, z ) );
+
+				}
+
+				const geometry = new THREE.BufferGeometry().setFromPoints( points );
+				const material = new THREE.LineBasicMaterial( { color: 0xbcb7af } );
+				const grid = new THREE.LineSegments( geometry, material );
+				grid.position.y = 0.004;
+				root.add( grid );
+
+			}
+
+			function createBoundaryWalls( root, material ) {
+
+				const wallHeight = 1;
+				const wallThickness = 0.16;
+				const halfWidth = 10;
+				const halfDepth = 6;
+				const centerY = wallHeight / 2;
+
+				addBox( root, new THREE.Vector3( 0, centerY, - halfDepth ), new THREE.Vector3( halfWidth * 2, wallHeight, wallThickness ), material );
+				addBox( root, new THREE.Vector3( 0, centerY, halfDepth ), new THREE.Vector3( halfWidth * 2, wallHeight, wallThickness ), material );
+				addBox( root, new THREE.Vector3( - halfWidth, centerY, 0 ), new THREE.Vector3( wallThickness, wallHeight, halfDepth * 2 ), material );
+				addBox( root, new THREE.Vector3( halfWidth, centerY, 0 ), new THREE.Vector3( wallThickness, wallHeight, halfDepth * 2 ), material );
+
+			}
+
+			function createStairs( root, start, stepHeight, material ) {
+
+				const stepCount = 7;
+				const stepDepth = 0.42;
+				const width = 1.9;
+
+				for ( let i = 0; i < stepCount; i ++ ) {
+
+					const height = stepHeight * ( i + 1 );
+					addBox(
+						root,
+						new THREE.Vector3( start.x + i * stepDepth, height / 2, start.z ),
+						new THREE.Vector3( stepDepth, height, width ),
+						material
+					);
+
+				}
+
+			}
+
+			function createObstacleCourse( root, centerZ, materials ) {
+
+				const height = 0.14;
+				const depth = 1.7;
+				const widths = [ 0.14, 0.16, 0.18, 0.20, 0.22, 0.24, 0.26, 0.28, 0.30, 0.32 ];
+				const gaps = [ 0.32, 0.58, 0.41, 0.75, 0.36, 0.63, 0.48, 0.71, 0.54 ];
+				const totalWidth = widths.reduce( ( sum, width ) => sum + width, 0 )
+					+ gaps.reduce( ( sum, gap ) => sum + gap, 0 );
+				let cursorX = - totalWidth / 2;
+
+				widths.forEach( ( width, index ) => {
+
+					addBox(
+						root,
+						new THREE.Vector3( cursorX + width / 2, height / 2, centerZ ),
+						new THREE.Vector3( width, height, depth ),
+						materials[ index % materials.length ]
+					);
+					cursorX += width + ( gaps[ index ] ?? 0 );
+
+				} );
+
+			}
+
+			function createRamp( root, position, angleDeg, material ) {
+
+				const length = 3.4;
+				const width = 1.8;
+				const height = Math.tan( THREE.MathUtils.degToRad( angleDeg ) ) * length;
+				const ramp = new THREE.Mesh( createRampGeometry( length, height, width ), material );
+				ramp.position.copy( position );
+				ramp.castShadow = true;
+				ramp.receiveShadow = true;
+				root.add( ramp );
+
+			}
+
+			function createRampGeometry( length, height, width ) {
+
+				const halfLength = length / 2;
+				const halfWidth = width / 2;
+
+				const c0 = [ - halfLength, 0, - halfWidth ];
+				const c1 = [ halfLength, 0, - halfWidth ];
+				const c2 = [ halfLength, height, - halfWidth ];
+				const c3 = [ - halfLength, 0, halfWidth ];
+				const c4 = [ halfLength, 0, halfWidth ];
+				const c5 = [ halfLength, height, halfWidth ];
+
+				const faces = [
+					[ c0, c1, c4, c3 ],
+					[ c1, c2, c5, c4 ],
+					[ c0, c3, c5, c2 ],
+					[ c0, c2, c1 ],
+					[ c3, c4, c5 ]
+				];
+
+				const positions = [];
+				const indices = [];
+
+				for ( let f = 0; f < faces.length; f ++ ) {
+
+					const face = faces[ f ];
+					const start = positions.length / 3;
+
+					for ( let i = 0; i < face.length; i ++ ) {
+
+						positions.push( face[ i ][ 0 ], face[ i ][ 1 ], face[ i ][ 2 ] );
+
+					}
+
+					if ( face.length === 4 ) {
+
+						indices.push( start, start + 1, start + 2, start, start + 2, start + 3 );
+
+					} else {
+
+						indices.push( start, start + 1, start + 2 );
+
+					}
+
+				}
+
+				const geometry = new THREE.BufferGeometry();
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+				geometry.setIndex( indices );
+				geometry.computeVertexNormals();
+				return geometry;
+
+			}
+
+			function addBox( root, position, scale, material ) {
+
+				const mesh = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, 1 ), material );
+				mesh.position.copy( position );
+				mesh.scale.copy( scale );
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				root.add( mesh );
+
+			}
+
+			function animate() {
+
+				timer.update();
+				const delta = Math.min( timer.getDelta(), 0.1 );
+
+				if ( mixer && footIK && collider ) {
+
+					updateAnimation();
+
+					const stepDelta = delta / PHYSICS_STEPS;
+
+					for ( let i = 0; i < PHYSICS_STEPS; i ++ ) {
+
+						updatePlayer( stepDelta );
+
+					}
+
+					updatePlayerFacing( delta );
+
+					footIK.onBeforeAnimationUpdate( delta );
+					mixer.update( delta );
+					footIK.onAfterAnimationUpdate( delta );
+
+				}
+
+				orbitControls.update();
+				renderer.render( scene, camera );
+				stats.update();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+		</script>
+
+	</body>
+</html>

@@ -19,6 +19,7 @@
 	"physics_rapier_joints": [ "community" ],
 	"physics_rapier_character_controller": [ "community" ],
 	"physics_rapier_vehicle_controller": [ "community" ],
+	"webgl_animation_foot_ik": [ "community", "animation", "ik", "three-mesh-bvh" ],
 	"webgl_batch_lod_bvh": [ "community", "accelerate", "performance", "extension", "plugin", "library", "three.ez" ],
 	"webgl_clipping": [ "solid" ],
 	"webgl_clipping_advanced": [ "solid" ],
