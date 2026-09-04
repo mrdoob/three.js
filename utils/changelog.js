@@ -62,8 +62,9 @@ function exec( file, args ) {
 
 function getCommitsBetweenTags( fromTag, toTag ) {
 
-	// Get commits between tags (exclusive fromTag, inclusive toTag), oldest first, excluding merge commits
-	const log = exec( 'git', [ 'log', `${fromTag}..${toTag}`, '--no-merges', '--reverse', '--format=%H|%s|%an' ] );
+	// Get commits between refs (exclusive fromTag, inclusive toTag), oldest first, excluding merge commits
+	// --cherry-pick drops commits already released via cherry-pick onto a release branch (same patch, different hash)
+	const log = exec( 'git', [ 'log', `${fromTag}...${toTag}`, '--right-only', '--cherry-pick', '--no-merges', '--reverse', '--format=%H|%s|%an' ] );
 
 	if ( ! log ) return [];
 
@@ -364,27 +365,40 @@ function validateEnvironment( tag ) {
 
 	if ( ! tag ) {
 
-		console.error( 'Usage: node utils/changelog.js <tag>' );
+		console.error( 'Usage: node utils/changelog.js <tag|branch>' );
 		console.error( 'Example: node utils/changelog.js r185' );
+		console.error( 'Example: node utils/changelog.js dev' );
 		process.exit( 1 );
 
 	}
 
-	// Verify the tag exists
+	// Verify the ref exists
 	const resolved = exec( 'git', [ 'rev-parse', '--verify', tag ] );
 
 	if ( ! resolved ) {
 
-		console.error( `Invalid tag: ${tag}` );
+		console.error( `Invalid tag or branch: ${tag}` );
 		process.exit( 1 );
 
 	}
 
-	// Get the previous tag
-	const version = parseInt( tag.replace( 'r', '' ) );
-	const previousTag = `r${version - 1}`;
+	let previousTag, version;
 
-	const previousResolved = exec( 'git', [ 'rev-parse', '--verify', previousTag ] );
+	if ( /^r\d+$/.test( tag ) ) {
+
+		// Release tag: changes since the previous release
+		version = parseInt( tag.slice( 1 ) );
+		previousTag = `r${version - 1}`;
+
+	} else {
+
+		// Branch or commit: changes since the latest release
+		previousTag = exec( 'git', [ 'tag', '--list', 'r[0-9]*', '--sort=-v:refname' ] ).split( '\n' )[ 0 ];
+		version = parseInt( previousTag.slice( 1 ) ) + 1;
+
+	}
+
+	const previousResolved = previousTag && exec( 'git', [ 'rev-parse', '--verify', previousTag ] );
 
 	if ( ! previousResolved ) {
 
