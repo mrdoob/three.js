@@ -455,16 +455,6 @@ body.preview-hidden .code-modifier-inline-btn.active {
 	color: #ececec;
 }
 
-.header-subtitle {
-	font-size: 0.75rem;
-	color: var(--text-muted);
-	font-weight: 500;
-	letter-spacing: 0.02em;
-	border-left: 1px solid var(--border-color);
-	padding-left: 0.6rem;
-	margin-top: 0.1rem;
-}
-
 .header-release {
 	font-size: 0.75rem;
 	font-weight: 500;
@@ -474,7 +464,6 @@ body.preview-hidden .code-modifier-inline-btn.active {
 	padding-left: 0.6rem;
 	padding-top: 0.1rem;
 	padding-bottom: 0.1rem;
-	margin-left: 0.4rem;
 	margin-top: 0.1rem;
 	user-select: none;
 	display: inline-flex;
@@ -1508,12 +1497,6 @@ body.v-resizer-editor-collapsed .resizer-v-toggle-btn:not(.inverted) {
 	}
 }
 
-@media (max-width: 600px) {
-	.header-subtitle {
-		display: none;
-	}
-}
-
 @media (min-width: 768px) {
 	.content-col {
 		width: 50%;
@@ -2283,15 +2266,6 @@ body.preview-maximized .preview-hide-btn {
 		background-color: var(--border-color) !important;
 	}
 
-	/* Hide subtitle on mobile viewports */
-	.header-subtitle {
-		display: none !important;
-	}
-
-	.header-title-prefix {
-		display: none !important;
-	}
-
 	#copy-code-btn-header {
 		display: flex !important;
 	}
@@ -2778,7 +2752,7 @@ body.preview-maximized .preview-hide-btn {
 	right: 60px;
 }
 
-/* TSL Tour API Parameter Styling */
+/* TSL Guide API Parameter Styling */
 .tsl-api-card {
 	margin: 1.5rem 0;
 	background-color: var(--bg-sidebar);
@@ -3009,8 +2983,8 @@ body.preview-maximized .preview-hide-btn {
 	font-weight: 300;
 }
 
-/* Tour Important Callout Block */
-.tour-important-block {
+/* Guide Important Callout Block */
+.guide-important-block {
 	margin: 1.5rem 0;
 	background-color: rgba(240, 160, 0, 0.04);
 	border: 1px solid rgba(240, 160, 0, 0.15);
@@ -3019,7 +2993,7 @@ body.preview-maximized .preview-hide-btn {
 	padding: 0.85rem 1.25rem;
 }
 
-.tour-important-header {
+.guide-important-header {
 	display: flex;
 	align-items: center;
 	gap: 0.4rem;
@@ -3031,24 +3005,24 @@ body.preview-maximized .preview-hide-btn {
 	letter-spacing: 0.05em;
 }
 
-.tour-important-content {
+.guide-important-content {
 	font-size: 0.9rem;
 	color: #d1d5db;
 	line-height: 1.75;
 }
 
-.tour-important-item {
+.guide-important-item {
 	line-height: 1.75;
 }
 
-.tour-important-divider {
+.guide-important-divider {
 	height: 1px;
 	background: rgba(240, 160, 0, 0.15);
 	margin: 0.65rem 0;
 }
 
-/* Tour Note Callout Block */
-.tour-note-block {
+/* Guide Note Callout Block */
+.guide-note-block {
 	margin: 1.5rem 0;
 	background-color: rgba(0, 170, 255, 0.04);
 	border: 1px solid rgba(0, 170, 255, 0.15);
@@ -3057,7 +3031,7 @@ body.preview-maximized .preview-hide-btn {
 	padding: 0.85rem 1.25rem;
 }
 
-.tour-note-header {
+.guide-note-header {
 	display: flex;
 	align-items: center;
 	gap: 0.4rem;
@@ -3069,24 +3043,24 @@ body.preview-maximized .preview-hide-btn {
 	letter-spacing: 0.05em;
 }
 
-.tour-note-content {
+.guide-note-content {
 	font-size: 0.9rem;
 	color: #d1d5db;
 	line-height: 1.75;
 }
 
-.tour-note-item {
+.guide-note-item {
 	line-height: 1.75;
 }
 
-.tour-note-divider {
+.guide-note-divider {
 	height: 1px;
 	background: rgba(0, 170, 255, 0.15);
 	margin: 0.65rem 0;
 }
 
-/* Tour AI / LLM Accordion Callout Block */
-.tour-ai-accordion {
+/* Guide AI / LLM Accordion Callout Block */
+.guide-ai-accordion {
 	margin: 1.5rem 0;
 	background: linear-gradient(135deg, rgba(168, 85, 247, 0.07) 0%, rgba(99, 102, 241, 0.04) 100%);
 	border: 1px solid rgba(168, 85, 247, 0.25);
@@ -3096,12 +3070,12 @@ body.preview-maximized .preview-hide-btn {
 	transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
-.tour-ai-accordion:hover {
+.guide-ai-accordion:hover {
 	border-color: rgba(168, 85, 247, 0.45);
 	box-shadow: 0 4px 20px -4px rgba(168, 85, 247, 0.15);
 }
 
-.tour-ai-summary {
+.guide-ai-summary {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -3113,29 +3087,29 @@ body.preview-maximized .preview-hide-btn {
 	transition: background 0.15s ease;
 }
 
-.tour-ai-summary::-webkit-details-marker,
-.tour-ai-summary::marker {
+.guide-ai-summary::-webkit-details-marker,
+.guide-ai-summary::marker {
 	display: none;
 }
 
-.tour-ai-summary:hover {
+.guide-ai-summary:hover {
 	background: rgba(168, 85, 247, 0.06);
 }
 
-.tour-ai-summary-left {
+.guide-ai-summary-left {
 	display: flex;
 	align-items: center;
 	gap: 0.55rem;
 }
 
-.tour-ai-icon {
+.guide-ai-icon {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	color: #c084fc;
 }
 
-.tour-ai-badge {
+.guide-ai-badge {
 	font-weight: 700;
 	font-size: 0.85rem;
 	letter-spacing: 0.05em;
@@ -3145,7 +3119,7 @@ body.preview-maximized .preview-hide-btn {
 	-webkit-text-fill-color: transparent;
 }
 
-.tour-ai-hint {
+.guide-ai-hint {
 	font-size: 0.78rem;
 	color: #9ca3af;
 	opacity: 0.65;
@@ -3153,7 +3127,7 @@ body.preview-maximized .preview-hide-btn {
 	font-style: italic;
 }
 
-.tour-ai-chevron {
+.guide-ai-chevron {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -3161,15 +3135,15 @@ body.preview-maximized .preview-hide-btn {
 	transition: transform 0.25s ease;
 }
 
-details.tour-ai-accordion[open] .tour-ai-chevron {
+details.guide-ai-accordion[open] .guide-ai-chevron {
 	transform: rotate(180deg);
 }
 
-details.tour-ai-accordion[open] .tour-ai-hint {
+details.guide-ai-accordion[open] .guide-ai-hint {
 	display: none;
 }
 
-.tour-ai-content {
+.guide-ai-content {
 	padding: 0.85rem 1.25rem 1rem 1.25rem;
 	font-size: 0.9rem;
 	color: #d1d5db;
@@ -3178,12 +3152,12 @@ details.tour-ai-accordion[open] .tour-ai-hint {
 	background: rgba(0, 0, 0, 0.15);
 }
 
-.tour-ai-item {
+.guide-ai-item {
 	line-height: 1.75;
 	margin-bottom: 0.5rem;
 }
 
-.tour-ai-item:last-child {
+.guide-ai-item:last-child {
 	margin-bottom: 0;
 }
 

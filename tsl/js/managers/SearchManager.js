@@ -1,8 +1,8 @@
 class SearchManager {
 
-	constructor( tour ) {
+	constructor( guide ) {
 
-		this.tour = tour;
+		this.guide = guide;
 		this.index = new Map(); // word -> Set of page IDs / node references
 		this.casedVocabulary = new Map(); // lowercase -> original case
 		this.debounceTimeout = null;
@@ -33,7 +33,7 @@ class SearchManager {
 
 		};
 
-		const allNodes = collectAllNodes( this.tour.pageTree || [] );
+		const allNodes = collectAllNodes( this.guide.pageTree || [] );
 
 		allNodes.forEach( node => {
 
@@ -289,7 +289,7 @@ class SearchManager {
 
 		if ( trimmed.length === 0 ) {
 
-			this.tour.dom.tocList.classList.remove( 'search-active' );
+			this.guide.dom.tocList.classList.remove( 'search-active' );
 
 			const cleanTree = ( nodes ) => {
 
@@ -303,17 +303,17 @@ class SearchManager {
 
 			};
 
-			cleanTree( this.tour.pageTree );
-			this.tour.setupTOC( this.tour.pageTree );
+			cleanTree( this.guide.pageTree );
+			this.guide.setupTOC( this.guide.pageTree );
 
 		} else {
 
-			this.tour.dom.tocList.classList.add( 'search-active' );
+			this.guide.dom.tocList.classList.add( 'search-active' );
 
 			const queryLower = trimmed.toLowerCase();
 			const queryTerms = queryLower.split( /\s+/ ).map( t => t.replace( /^[^a-z0-9_]+|[^a-z0-9_]+$/g, '' ) ).filter( Boolean );
 
-			let rankedTree = this.getRankedTree( this.tour.pageTree, trimmed, queryTerms );
+			let rankedTree = this.getRankedTree( this.guide.pageTree, trimmed, queryTerms );
 
 			let suggestion = null;
 			if ( rankedTree.length === 0 ) {
@@ -323,17 +323,17 @@ class SearchManager {
 
 					const suggTrimmed = suggestion.trim().toLowerCase();
 					const suggQueryTerms = suggTrimmed.split( /\s+/ ).map( t => t.replace( /^[^a-z0-9_]+|[^a-z0-9_]+$/g, '' ) ).filter( Boolean );
-					rankedTree = this.getRankedTree( this.tour.pageTree, suggestion, suggQueryTerms );
+					rankedTree = this.getRankedTree( this.guide.pageTree, suggestion, suggQueryTerms );
 
 				}
 
 			}
 
-			this.tour.setupTOC( rankedTree, null, suggestion );
+			this.guide.setupTOC( rankedTree, null, suggestion );
 
 		}
 
-		const sidebarContent = this.tour.dom.sidebar.querySelector( '.sidebar-content' );
+		const sidebarContent = this.guide.dom.sidebar.querySelector( '.sidebar-content' );
 		if ( sidebarContent ) {
 
 			sidebarContent.scrollTop = 0;
@@ -344,7 +344,7 @@ class SearchManager {
 
 	scrollToSearchMatch() {
 
-		const query = this.tour.dom.searchInput.value.trim();
+		const query = this.guide.dom.searchInput.value.trim();
 		if ( query.length === 0 ) return;
 
 		const queryTerms = query.toLowerCase().split( /\s+/ ).map( t => t.replace( /^[^a-z0-9_]+|[^a-z0-9_]+$/g, '' ) ).filter( t => t.length > 0 );
@@ -353,7 +353,7 @@ class SearchManager {
 		let targetElement = null;
 
 		// 1. Prioritize API classes, summaries, signatures, and rows
-		const apiElements = this.tour.dom.contentArea.querySelectorAll( '.tsl-api-class-summary, .tsl-api-class-name, .tsl-api-class-extends-name, .tsl-api-table-row, .tsl-api-signature, .tsl-api-sig-name, .tsl-api-card, .tsl-api-param, .tsl-api-inherited-summary' );
+		const apiElements = this.guide.dom.contentArea.querySelectorAll( '.tsl-api-class-summary, .tsl-api-class-name, .tsl-api-class-extends-name, .tsl-api-table-row, .tsl-api-signature, .tsl-api-sig-name, .tsl-api-card, .tsl-api-param, .tsl-api-inherited-summary' );
 		for ( const el of apiElements ) {
 
 			const text = el.textContent.toLowerCase();
@@ -363,7 +363,7 @@ class SearchManager {
 				targetElement = el.closest( '.tsl-api-table-row' ) || el.closest( '.tsl-api-class-summary' ) || el.closest( '.tsl-api-inherited-summary' ) || el;
 
 				let parent = targetElement.parentElement;
-				while ( parent && parent !== this.tour.dom.contentArea ) {
+				while ( parent && parent !== this.guide.dom.contentArea ) {
 
 					if ( parent.tagName === 'DETAILS' ) {
 
@@ -384,7 +384,7 @@ class SearchManager {
 		// 2. If no API element matched, check general text elements
 		if ( ! targetElement ) {
 
-			const generalElements = this.tour.dom.contentArea.querySelectorAll( 'h1, h2, h3, p, li, td, code, blockquote, .tour-note-block, .tour-important-block, .tour-ai-accordion, .tour-ai-content' );
+			const generalElements = this.guide.dom.contentArea.querySelectorAll( 'h1, h2, h3, p, li, td, code, blockquote, .guide-note-block, .guide-important-block, .guide-ai-accordion, .guide-ai-content' );
 			for ( const el of generalElements ) {
 
 				const text = el.textContent.toLowerCase();
@@ -394,7 +394,7 @@ class SearchManager {
 					targetElement = el;
 
 					let parent = el.parentElement;
-					while ( parent && parent !== this.tour.dom.contentArea ) {
+					while ( parent && parent !== this.guide.dom.contentArea ) {
 
 						if ( parent.tagName === 'DETAILS' ) {
 
@@ -414,9 +414,9 @@ class SearchManager {
 
 		}
 
-		if ( ! targetElement && this.tour.readOnlyEditors ) {
+		if ( ! targetElement && this.guide.readOnlyEditors ) {
 
-			for ( const editor of this.tour.readOnlyEditors ) {
+			for ( const editor of this.guide.readOnlyEditors ) {
 
 				const codeText = ( editor.getValue() || '' ).toLowerCase();
 				const matches = queryTerms.every( term => codeText.includes( term ) );
@@ -433,7 +433,7 @@ class SearchManager {
 
 		if ( targetElement ) {
 
-			const previousFlashes = this.tour.dom.contentArea.querySelectorAll( '.search-match-flash' );
+			const previousFlashes = this.guide.dom.contentArea.querySelectorAll( '.search-match-flash' );
 			previousFlashes.forEach( el => el.classList.remove( 'search-match-flash' ) );
 
 			const observer = new IntersectionObserver( ( entries ) => {
@@ -450,7 +450,7 @@ class SearchManager {
 				} );
 
 			}, {
-				root: this.tour.dom.contentArea,
+				root: this.guide.dom.contentArea,
 				threshold: 0.1
 			} );
 
@@ -467,7 +467,7 @@ class SearchManager {
 		if ( hash.startsWith( 'playground=' ) || hash.startsWith( 'playground/' ) ) return;
 
 		const hashParts = hash.split( '&' );
-		const pageId = hashParts[ 0 ] || ( this.tour.pages[ this.tour.currentPageIndex ] ? this.tour.pages[ this.tour.currentPageIndex ].id : '' );
+		const pageId = hashParts[ 0 ] || ( this.guide.pages[ this.guide.currentPageIndex ] ? this.guide.pages[ this.guide.currentPageIndex ].id : '' );
 		if ( ! pageId ) return;
 
 		let selectedNode = '';
@@ -496,7 +496,7 @@ class SearchManager {
 		}
 
 		history.replaceState( null, null, '#' + newHash );
-		this.tour.lastTourPageHash = newHash;
+		this.guide.lastGuidePageHash = newHash;
 
 	}
 
@@ -518,18 +518,18 @@ class SearchManager {
 
 		if ( searchQuery ) {
 
-			this.tour.dom.searchInput.value = searchQuery;
-			this.tour.dom.searchClear.style.display = 'flex';
-			this.tour.dom.searchContainer.classList.add( 'focused' );
+			this.guide.dom.searchInput.value = searchQuery;
+			this.guide.dom.searchClear.style.display = 'flex';
+			this.guide.dom.searchContainer.classList.add( 'focused' );
 			this.performSearch( searchQuery );
 
 		} else {
 
-			if ( this.tour.dom.searchInput.value ) {
+			if ( this.guide.dom.searchInput.value ) {
 
-				this.tour.dom.searchInput.value = '';
-				this.tour.dom.searchClear.style.display = 'none';
-				this.tour.dom.searchContainer.classList.remove( 'focused' );
+				this.guide.dom.searchInput.value = '';
+				this.guide.dom.searchClear.style.display = 'none';
+				this.guide.dom.searchContainer.classList.remove( 'focused' );
 				this.performSearch( '' );
 
 			}

@@ -1,8 +1,8 @@
 class HistoryManager {
 
-	constructor( tour ) {
+	constructor( guide ) {
 
-		this.tour = tour;
+		this.guide = guide;
 		this.history = [];
 		this.index = - 1;
 		this.isUndoRedoAction = false;
@@ -70,8 +70,8 @@ class HistoryManager {
 
 	updateButtons() {
 
-		const undoBtn = this.tour.dom.tabsBar.querySelector( '.playground-undo-btn' );
-		const redoBtn = this.tour.dom.tabsBar.querySelector( '.playground-redo-btn' );
+		const undoBtn = this.guide.dom.tabsBar.querySelector( '.playground-undo-btn' );
+		const redoBtn = this.guide.dom.tabsBar.querySelector( '.playground-redo-btn' );
 
 		if ( undoBtn ) {
 

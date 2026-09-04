@@ -3,7 +3,7 @@ import * as TSL from 'three/tsl';
 
 import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-import { parseTour, parse, tokenizeCodeToElement } from './utils/MarkdownUtils.js';
+import { parseGuide, parse, tokenizeCodeToElement } from './utils/MarkdownUtils.js';
 import { CodeRunner } from './code/CodeRunner.js';
 import { CodeCompiler } from './code/CodeCompiler.js';
 import { CodeEditor } from './editor/CodeEditor.js';
@@ -13,7 +13,7 @@ import { LayoutManager } from './managers/LayoutManager.js';
 import { ConsoleManager } from './managers/ConsoleManager.js';
 import { PlaygroundManager } from './managers/PlaygroundManager.js';
 import { ProjectsManager } from './managers/ProjectsManager.js';
-import { getSVG, compressString } from './utils/TourUtils.js';
+import { getSVG, compressString } from './utils/GuideUtils.js';
 import mermaid from 'mermaid';
 
 const MOBILE_BREAKPOINT = 768;
@@ -49,11 +49,11 @@ function getTwitterWidgets() {
 
 }
 
-class Tour {
+class Guide {
 
-	constructor( title = 'Tour of *TSL*' ) {
+	constructor( title = '*TSL* Guide' ) {
 
-		this.tourTitle = title;
+		this.guideTitle = title;
 		this.onEmptyProject = null;
 		this.pages = [];
 		this.pageTree = [];
@@ -86,7 +86,7 @@ class Tour {
 		this.playgroundManager = new PlaygroundManager( this );
 		this.projectsManager = new ProjectsManager( this );
 
-		this.lastTourPageHash = '';
+		this.lastGuidePageHash = '';
 		this.lastHandledHash = initialHash;
 		this.debugStage = 'fragment';
 		this.debugLanguage = 'WGSL';
@@ -138,7 +138,7 @@ class Tour {
 
 	setTitle( title ) {
 
-		this.tourTitle = title;
+		this.guideTitle = title;
 
 		const parseParts = ( str ) => {
 
@@ -170,9 +170,9 @@ class Tour {
 
 		};
 
-		const parts = parseParts( this.tourTitle );
+		const parts = parseParts( this.guideTitle );
 
-		const cleanTitle = this.tourTitle.replace( /\*/g, '' );
+		const cleanTitle = this.guideTitle.replace( /\*/g, '' );
 
 		const headerTitleEl = this.dom?.headerTitle || document.querySelector( '.header-title' );
 		if ( headerTitleEl ) {
@@ -204,7 +204,7 @@ class Tour {
 
 		}
 
-		document.title = `${cleanTitle} - Interactive Guide`;
+		document.title = cleanTitle;
 
 		return this;
 
@@ -218,7 +218,7 @@ class Tour {
 
 		}
 
-		return '// Tour of TSL\n';
+		return '// TSL Guide\n';
 
 	}
 
@@ -228,7 +228,7 @@ class Tour {
 
 			const response = await fetch( url );
 			const text = await response.text();
-			const result = parseTour( text );
+			const result = parseGuide( text );
 			this.pages = result.pages;
 			this.pageTree = result.pageTree;
 
@@ -236,7 +236,7 @@ class Tour {
 
 		} catch ( err ) {
 
-			console.error( 'Error loading tour:', err );
+			console.error( 'Error loading guide:', err );
 
 		}
 
@@ -956,7 +956,7 @@ class Tour {
 		this.dom.previewPlayground.onclick = () => {
 
 			const activePage = this.pages[ this.currentPageIndex ];
-			let currentCode = '// Tour of TSL\n';
+			let currentCode = '// TSL Guide\n';
 			const exampleTitle = activePage?.title || activePage?.name || 'Example';
 
 			if ( activePage && activePage.hasCode ) {
@@ -988,7 +988,7 @@ class Tour {
 
 			}
 
-			this.lastTourPageHash = hash;
+			this.lastGuidePageHash = hash;
 
 			const hashParts = hash.split( '&' );
 			const pageId = hashParts[ 0 ];
@@ -1063,9 +1063,9 @@ class Tour {
 				let activeNode = page.defaultNode || '';
 				if ( this.isPlaygroundActive ) {
 
-					if ( this.lastTourPageHash ) {
+					if ( this.lastGuidePageHash ) {
 
-						const lastHashParts = this.lastTourPageHash.split( '&' );
+						const lastHashParts = this.lastGuidePageHash.split( '&' );
 						if ( lastHashParts[ 1 ] ) {
 
 							activeNode = lastHashParts[ 1 ];
@@ -1159,7 +1159,7 @@ class Tour {
 
 				if ( this.isPlaygroundActive ) {
 
-					window.location.hash = this.lastTourPageHash || this.pages[ 0 ].id;
+					window.location.hash = this.lastGuidePageHash || this.pages[ 0 ].id;
 
 				} else {
 
@@ -1207,7 +1207,7 @@ class Tour {
 
 			}
 
-			this.setTitle( this.tourTitle );
+			this.setTitle( this.guideTitle );
 
 			document.body.classList.remove( 'loading' );
 			const loadingScreen = document.getElementById( 'loading-screen' );
@@ -1250,7 +1250,7 @@ class Tour {
 		this.currentPageIndex = index;
 		const page = this.pages[ index ];
 
-		this.lastTourPageHash = page.id + ( activeNodeName ? '&' + activeNodeName : '' );
+		this.lastGuidePageHash = page.id + ( activeNodeName ? '&' + activeNodeName : '' );
 
 		// Reset preview maximized state on page transitions
 		this.isPreviewMaximized = false;
@@ -1421,7 +1421,7 @@ class Tour {
 
 			} else {
 
-				alert( 'You have completed the tour!' );
+				alert( 'You have completed the guide!' );
 
 			}
 
@@ -2736,4 +2736,4 @@ class Tour {
 
 }
 
-export { Tour };
+export { Guide };

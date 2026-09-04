@@ -1,8 +1,8 @@
 class ProjectsManager {
 
-	constructor( tour ) {
+	constructor( guide ) {
 
-		this.tour = tour;
+		this.guide = guide;
 		this.storageKey = 'tsl_playground_saved_projects';
 		this.currentProjectIdKey = 'tsl_playground_current_project_id';
 		this.currentProjectId = localStorage.getItem( this.currentProjectIdKey ) || null;
@@ -43,21 +43,21 @@ class ProjectsManager {
 
 	getDraftProject() {
 
-		const rawTabs = this.tour.playgroundManager.playgroundTabs;
+		const rawTabs = this.guide.playgroundManager.playgroundTabs;
 		const tabs = ( rawTabs && rawTabs.length > 0 )
 			? rawTabs.filter( t => ! t.readOnly )
-			: [ { name: 'main', code: '// Tour of TSL\n' } ];
+			: [ { name: 'main', code: '// TSL Guide\n' } ];
 
 		if ( tabs.length === 0 ) {
 
-			tabs.push( { name: 'main', code: '// Tour of TSL\n' } );
+			tabs.push( { name: 'main', code: '// TSL Guide\n' } );
 
 		}
 
 		let name = 'Draft';
-		if ( this.tour.playgroundManager.currentExampleName ) {
+		if ( this.guide.playgroundManager.currentExampleName ) {
 
-			const cleanName = this.tour.playgroundManager.currentExampleName.replace( /\s*\(Draft\)$/i, '' ).trim();
+			const cleanName = this.guide.playgroundManager.currentExampleName.replace( /\s*\(Draft\)$/i, '' ).trim();
 			if ( cleanName ) {
 
 				name = `${cleanName} (Draft)`;
@@ -91,10 +91,10 @@ class ProjectsManager {
 
 	createNewProject() {
 
-		const code = ( typeof this.tour.onEmptyProject === 'function' )
-			? this.tour.onEmptyProject()
-			: ( this.tour.getEmptyProjectCode ? this.tour.getEmptyProjectCode() : '// Tour of TSL\n' );
-		const emptyTabs = [ { name: 'main', code: code || '// Tour of TSL\n' } ];
+		const code = ( typeof this.guide.onEmptyProject === 'function' )
+			? this.guide.onEmptyProject()
+			: ( this.guide.getEmptyProjectCode ? this.guide.getEmptyProjectCode() : '// TSL Guide\n' );
+		const emptyTabs = [ { name: 'main', code: code || '// TSL Guide\n' } ];
 
 		const name = this.getNextProjectName();
 		const now = Date.now();
@@ -111,35 +111,35 @@ class ProjectsManager {
 		this.saveProjectsList( projects );
 
 		this.setCurrentProjectId( newProject.id );
-		this.tour.playgroundManager.currentExampleName = newProject.name;
-		this.tour.playgroundManager.playgroundTabs = emptyTabs;
-		this.tour.playgroundManager.activePlaygroundTabName = 'main';
-		this.tour.playgroundManager.initialTabsSnapshot = JSON.stringify( emptyTabs );
-		this.tour.playgroundManager.togglePlayground( true );
-		this.tour.playgroundManager.renderPlaygroundTabs();
-		if ( this.tour.codeEditor ) this.tour.codeEditor.setValue( emptyTabs[ 0 ].code );
-		this.tour.playgroundManager.runPlayground();
-		this.tour.playgroundManager.updatePlaygroundHash( true );
+		this.guide.playgroundManager.currentExampleName = newProject.name;
+		this.guide.playgroundManager.playgroundTabs = emptyTabs;
+		this.guide.playgroundManager.activePlaygroundTabName = 'main';
+		this.guide.playgroundManager.initialTabsSnapshot = JSON.stringify( emptyTabs );
+		this.guide.playgroundManager.togglePlayground( true );
+		this.guide.playgroundManager.renderPlaygroundTabs();
+		if ( this.guide.codeEditor ) this.guide.codeEditor.setValue( emptyTabs[ 0 ].code );
+		this.guide.playgroundManager.runPlayground();
+		this.guide.playgroundManager.updatePlaygroundHash( true );
 		this.closeProjectsModal();
 
 	}
 
 	resetDraft() {
 
-		const code = ( typeof this.tour.onEmptyProject === 'function' )
-			? this.tour.onEmptyProject()
-			: ( this.tour.getEmptyProjectCode ? this.tour.getEmptyProjectCode() : '// Tour of TSL\n' );
-		const emptyTabs = [ { name: 'main', code: code || '// Tour of TSL\n' } ];
-		this.tour.playgroundManager.playgroundTabs = emptyTabs;
-		this.tour.playgroundManager.activePlaygroundTabName = 'main';
+		const code = ( typeof this.guide.onEmptyProject === 'function' )
+			? this.guide.onEmptyProject()
+			: ( this.guide.getEmptyProjectCode ? this.guide.getEmptyProjectCode() : '// TSL Guide\n' );
+		const emptyTabs = [ { name: 'main', code: code || '// TSL Guide\n' } ];
+		this.guide.playgroundManager.playgroundTabs = emptyTabs;
+		this.guide.playgroundManager.activePlaygroundTabName = 'main';
 		this.setCurrentProjectId( null );
-		this.tour.playgroundManager.currentExampleName = null;
-		this.tour.playgroundManager.initialTabsSnapshot = JSON.stringify( emptyTabs );
-		this.tour.playgroundManager.togglePlayground( true );
-		this.tour.playgroundManager.renderPlaygroundTabs();
-		if ( this.tour.codeEditor ) this.tour.codeEditor.setValue( emptyTabs[ 0 ].code );
-		this.tour.playgroundManager.runPlayground();
-		this.tour.playgroundManager.updatePlaygroundHash( true );
+		this.guide.playgroundManager.currentExampleName = null;
+		this.guide.playgroundManager.initialTabsSnapshot = JSON.stringify( emptyTabs );
+		this.guide.playgroundManager.togglePlayground( true );
+		this.guide.playgroundManager.renderPlaygroundTabs();
+		if ( this.guide.codeEditor ) this.guide.codeEditor.setValue( emptyTabs[ 0 ].code );
+		this.guide.playgroundManager.runPlayground();
+		this.guide.playgroundManager.updatePlaygroundHash( true );
 
 	}
 
@@ -240,7 +240,7 @@ class ProjectsManager {
 
 		if ( ! this.currentProjectId ) return;
 
-		const tabs = ( this.tour.playgroundManager.playgroundTabs || [] ).filter( t => ! t.readOnly );
+		const tabs = ( this.guide.playgroundManager.playgroundTabs || [] ).filter( t => ! t.readOnly );
 		if ( ! tabs || tabs.length === 0 ) return;
 
 		const projects = this.getProjects();
@@ -256,9 +256,9 @@ class ProjectsManager {
 
 	saveCurrentProject( name ) {
 
-		const rawTabs = this.tour.playgroundManager.playgroundTabs || [ { name: 'main', code: '// Tour of TSL\n' } ];
+		const rawTabs = this.guide.playgroundManager.playgroundTabs || [ { name: 'main', code: '// TSL Guide\n' } ];
 		const tabs = rawTabs.filter( t => ! t.readOnly );
-		if ( tabs.length === 0 ) tabs.push( { name: 'main', code: '// Tour of TSL\n' } );
+		if ( tabs.length === 0 ) tabs.push( { name: 'main', code: '// TSL Guide\n' } );
 		const projects = this.getProjects();
 
 		let existingIndex = - 1;
@@ -269,7 +269,7 @@ class ProjectsManager {
 		}
 
 		const defaultName = ( existingIndex !== - 1 ? projects[ existingIndex ].name : null )
-			|| ( this.tour.playgroundManager.currentExampleName ? this.tour.playgroundManager.currentExampleName.replace( /\s*\(Draft\)$/i, '' ).trim() : null )
+			|| ( this.guide.playgroundManager.currentExampleName ? this.guide.playgroundManager.currentExampleName.replace( /\s*\(Draft\)$/i, '' ).trim() : null )
 			|| this.getNextProjectName();
 
 		const cleanName = ( name || '' ).trim() || defaultName;
@@ -300,8 +300,8 @@ class ProjectsManager {
 		}
 
 		this.setCurrentProjectId( projectData.id );
-		this.tour.playgroundManager.currentExampleName = projectData.name;
-		this.tour.playgroundManager.initialTabsSnapshot = JSON.stringify( tabs );
+		this.guide.playgroundManager.currentExampleName = projectData.name;
+		this.guide.playgroundManager.initialTabsSnapshot = JSON.stringify( tabs );
 		this.saveProjectsList( projects );
 		return projectData;
 
@@ -401,24 +401,24 @@ class ProjectsManager {
 		}
 
 		this.setCurrentProjectId( project.id );
-		this.tour.playgroundManager.currentExampleName = project.name;
-		this.tour.playgroundManager.playgroundTabs = JSON.parse( JSON.stringify( project.tabs ) );
-		this.tour.playgroundManager.activePlaygroundTabName = this.tour.playgroundManager.playgroundTabs[ 0 ].name;
-		this.tour.playgroundManager.initialTabsSnapshot = JSON.stringify( this.tour.playgroundManager.playgroundTabs );
+		this.guide.playgroundManager.currentExampleName = project.name;
+		this.guide.playgroundManager.playgroundTabs = JSON.parse( JSON.stringify( project.tabs ) );
+		this.guide.playgroundManager.activePlaygroundTabName = this.guide.playgroundManager.playgroundTabs[ 0 ].name;
+		this.guide.playgroundManager.initialTabsSnapshot = JSON.stringify( this.guide.playgroundManager.playgroundTabs );
 
-		this.tour.playgroundManager.togglePlayground( true );
-		this.tour.playgroundManager.renderPlaygroundTabs();
+		this.guide.playgroundManager.togglePlayground( true );
+		this.guide.playgroundManager.renderPlaygroundTabs();
 
-		const activeTab = this.tour.playgroundManager.playgroundTabs.find( t => t.name === this.tour.playgroundManager.activePlaygroundTabName ) || this.tour.playgroundManager.playgroundTabs[ 0 ];
+		const activeTab = this.guide.playgroundManager.playgroundTabs.find( t => t.name === this.guide.playgroundManager.activePlaygroundTabName ) || this.guide.playgroundManager.playgroundTabs[ 0 ];
 
-		if ( this.tour.codeEditor ) {
+		if ( this.guide.codeEditor ) {
 
-			this.tour.codeEditor.setValue( activeTab.code );
+			this.guide.codeEditor.setValue( activeTab.code );
 
 		}
 
-		this.tour.playgroundManager.runPlayground();
-		this.tour.playgroundManager.updatePlaygroundHash( true );
+		this.guide.playgroundManager.runPlayground();
+		this.guide.playgroundManager.updatePlaygroundHash( true );
 
 		this.closeProjectsModal();
 
@@ -543,7 +543,7 @@ class ProjectsManager {
 
 					} else if ( Array.isArray( parsed.tabs ) || parsed.name || parsed.code ) {
 
-						const tabs = Array.isArray( parsed.tabs ) ? parsed.tabs : [ { name: 'main', code: parsed.code || '// Tour of TSL\n' } ];
+						const tabs = Array.isArray( parsed.tabs ) ? parsed.tabs : [ { name: 'main', code: parsed.code || '// TSL Guide\n' } ];
 						const name = parsed.name || file.name.replace( /\.json$/i, '' ) || 'Imported Project';
 						const id = `proj_${now}_${Math.random().toString( 36 ).substring( 2, 7 )}`;
 
@@ -650,7 +650,7 @@ class ProjectsManager {
 			topContainer.innerHTML = '';
 
 			const isDraft = ! this.currentProjectId || ! this.getProjects().some( p => p.id === this.currentProjectId );
-			const rawTabs = this.tour.playgroundManager.playgroundTabs || [];
+			const rawTabs = this.guide.playgroundManager.playgroundTabs || [];
 			const tabs = rawTabs.filter( t => ! t.readOnly );
 			const tabBadges = isDraft ? tabs.map( t => `<span class="tsl-project-tab-badge">${t.name}</span>` ).join( '' ) : '';
 
@@ -696,8 +696,8 @@ class ProjectsManager {
 
 				saveBtn.onclick = () => {
 
-					const defaultName = this.tour.playgroundManager.currentExampleName
-						? this.tour.playgroundManager.currentExampleName.replace( /\s*\(Draft\)$/i, '' ).trim()
+					const defaultName = this.guide.playgroundManager.currentExampleName
+						? this.guide.playgroundManager.currentExampleName.replace( /\s*\(Draft\)$/i, '' ).trim()
 						: this.getNextProjectName();
 					this.saveCurrentProject( defaultName );
 					this.closeProjectsModal();
@@ -956,9 +956,9 @@ class ProjectsManager {
 
 		}
 
-		if ( this.tour.codeEditor ) {
+		if ( this.guide.codeEditor ) {
 
-			this.tour.codeEditor.focus();
+			this.guide.codeEditor.focus();
 
 		}
 
