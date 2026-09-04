@@ -14,12 +14,20 @@ marked.use( {
 
 			return false;
 
+		},
+		link( href, title, text ) {
+
+			const targetAttr = href && ! href.startsWith( '#' ) ? ' target="_blank" rel="noopener noreferrer"' : '';
+			const titleAttr = title ? ` title="${title}"` : '';
+
+			return `<a href="${href}"${targetAttr}${titleAttr}>${text}</a>`;
+
 		}
 	}
 } );
 
 
-function parseTour( rawMarkdown ) {
+function parseTour( markdown ) {
 
 	const pageTree = [];
 
@@ -29,10 +37,10 @@ function parseTour( rawMarkdown ) {
 	let lastIndex = 0;
 	const stack = [];
 
-	while ( ( match = tokenRegex.exec( rawMarkdown ) ) !== null ) {
+	while ( ( match = tokenRegex.exec( markdown ) ) !== null ) {
 
 		const index = match.index;
-		const textSegment = rawMarkdown.substring( lastIndex, index );
+		const textSegment = markdown.substring( lastIndex, index );
 
 		if ( stack.length > 0 ) {
 
@@ -95,9 +103,9 @@ function parseTour( rawMarkdown ) {
 	}
 
 	// Add any remaining text
-	if ( lastIndex < rawMarkdown.length && stack.length > 0 ) {
+	if ( lastIndex < markdown.length && stack.length > 0 ) {
 
-		stack[ stack.length - 1 ].content += rawMarkdown.substring( lastIndex );
+		stack[ stack.length - 1 ].content += markdown.substring( lastIndex );
 
 	}
 

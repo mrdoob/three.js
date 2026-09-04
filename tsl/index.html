@@ -238,6 +238,12 @@
 			import { Tour } from './js/Tour.js';
 
 			const tour = new Tour();
+			tour.onEmptyProject = () => {
+
+				return 'import \'scenes/empty\';\n';
+
+			};
+
 			tour.load( 'content/Tour.md' );
 
 		</script>

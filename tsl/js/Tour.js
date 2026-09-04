@@ -12,6 +12,7 @@ import { HistoryManager } from './managers/HistoryManager.js';
 import { LayoutManager } from './managers/LayoutManager.js';
 import { ConsoleManager } from './managers/ConsoleManager.js';
 import { PlaygroundManager } from './managers/PlaygroundManager.js';
+import { ProjectsManager } from './managers/ProjectsManager.js';
 import { getSVG, compressString } from './utils/TourUtils.js';
 import mermaid from 'mermaid';
 
@@ -53,6 +54,7 @@ class Tour {
 	constructor( title = 'Tour of *TSL*' ) {
 
 		this.tourTitle = title;
+		this.onEmptyProject = null;
 		this.pages = [];
 		this.pageTree = [];
 		this.currentPageIndex = 0;
@@ -82,8 +84,10 @@ class Tour {
 		this.layoutManager = new LayoutManager( this );
 		this.consoleManager = new ConsoleManager( this );
 		this.playgroundManager = new PlaygroundManager( this );
+		this.projectsManager = new ProjectsManager( this );
 
 		this.lastTourPageHash = '';
+		this.lastHandledHash = initialHash;
 		this.debugStage = 'fragment';
 		this.debugLanguage = 'WGSL';
 
@@ -203,6 +207,18 @@ class Tour {
 		document.title = `${cleanTitle} - Interactive Guide`;
 
 		return this;
+
+	}
+
+	getEmptyProjectCode() {
+
+		if ( typeof this.onEmptyProject === 'function' ) {
+
+			return this.onEmptyProject();
+
+		}
+
+		return '// Tour of TSL\n';
 
 	}
 
@@ -772,7 +788,8 @@ class Tour {
 			} ) );
 			const release = THREE.RELEASE || THREE.REVISION;
 			const newHash = 'playground=' + encoded + ( release ? '&release=' + release : '' );
-			window.location.hash = newHash;
+			this.lastHandledHash = newHash;
+			history.replaceState( null, '', '#' + newHash );
 
 			const shareUrl = window.location.href;
 
@@ -938,13 +955,26 @@ class Tour {
 
 		this.dom.previewPlayground.onclick = () => {
 
-			this.dom.playgroundBtn.click();
+			const activePage = this.pages[ this.currentPageIndex ];
+			let currentCode = '// Tour of TSL\n';
+			const exampleTitle = activePage?.title || activePage?.name || 'Example';
+
+			if ( activePage && activePage.hasCode ) {
+
+				currentCode = this.codeEditor ? this.codeEditor.getValue() : activePage.code;
+
+			}
+
+			this.playgroundManager.loadExampleIntoPlayground( currentCode, exampleTitle );
 
 		};
 
 		this.onWindowHashChange = () => {
 
 			const hash = window.location.hash.substring( 1 );
+			if ( hash === this.lastHandledHash ) return;
+			this.lastHandledHash = hash;
+
 			if ( hash.startsWith( 'playground=' ) || hash.startsWith( 'playground/' ) ) {
 
 				this.playgroundManager.loadPlaygroundFromHash( hash );
@@ -1018,19 +1048,12 @@ class Tour {
 
 			if ( this.isPlaygroundActive ) {
 
-				const activeTab = this.playgroundManager.playgroundTabs.find( t => t.name === this.playgroundManager.activePlaygroundTabName );
-				if ( activeTab ) {
+				const activeTab = this.playgroundManager.playgroundTabs?.find( t => t.name === this.playgroundManager.activePlaygroundTabName );
+				if ( activeTab && ! activeTab.readOnly ) {
 
 					activeTab.code = currentCode;
 
 				}
-
-				const encoded = await compressString( JSON.stringify( {
-					tabs: this.playgroundManager.playgroundTabs
-				} ) );
-				const release = THREE.RELEASE || THREE.REVISION;
-				const newHash = 'playground=' + encoded + ( release ? '&release=' + release : '' );
-				window.location.hash = newHash;
 
 			}
 
@@ -1110,6 +1133,7 @@ class Tour {
 						if ( this.isPlaygroundActive ) {
 
 							this.runPlayground();
+							await this.playgroundManager.updatePlaygroundHash( true );
 
 						} else {
 
@@ -1139,23 +1163,7 @@ class Tour {
 
 				} else {
 
-					const activePage = this.pages[ this.currentPageIndex ];
-					let currentCode = '';
-
-					if ( activePage && ! activePage.hasCode ) {
-
-						currentCode = '// No example available.\nimport \'scenes/empty\';\n';
-
-					} else {
-
-						currentCode = this.codeEditor ? this.codeEditor.getValue() : '';
-
-					}
-
-					const encoded = await compressString( currentCode );
-					const release = THREE.RELEASE || THREE.REVISION;
-					const newHash = 'playground=' + encoded + ( release ? '&release=' + release : '' );
-					window.location.hash = newHash;
+					await this.playgroundManager.openExistingPlayground();
 
 				}
 
@@ -1439,6 +1447,11 @@ class Tour {
 
 				};
 
+			} else if ( href ) {
+
+				link.setAttribute( 'target', '_blank' );
+				link.setAttribute( 'rel', 'noopener noreferrer' );
+
 			}
 
 		} );
@@ -1496,6 +1509,7 @@ class Tour {
 		// Update Code Editor
 		if ( this.codeEditor ) {
 
+			this.codeEditor.setReadOnly( false );
 			this.codeEditor.setValue( pageCode );
 
 			const hash = window.location.hash.substring( 1 );
