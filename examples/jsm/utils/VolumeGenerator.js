@@ -1,4 +1,4 @@
-import { Data3DTexture, RGBAFormat, FloatType, LinearFilter, Matrix4, Vector3, Vector2, Quaternion, Ray, DoubleSide, Triangle } from 'three';
+import { Data3DTexture, DataUtils, RGBAFormat, RGFormat, FloatType, HalfFloatType, LinearFilter, Matrix4, Vector3, Vector2, Quaternion, Ray, DoubleSide, Triangle } from 'three';
 
 export class VolumeGenerator {
 
@@ -38,11 +38,19 @@ export class VolumeGenerator {
 		console.log( `Generating ${dim}x${dim}x${dim} SDF texture...` );
 
 		// Create a new 3D data texture
-		const sdfTexture = new Data3DTexture( new Float32Array( dim ** 3 * 4 ), dim, dim, dim );
+		// Distance and surface normal, sampled at every raymarch step
+		const sdfTexture = new Data3DTexture( new Uint16Array( dim ** 3 * 4 ), dim, dim, dim );
 		sdfTexture.format = RGBAFormat;
-		sdfTexture.type = FloatType;
+		sdfTexture.type = HalfFloatType;
 		sdfTexture.minFilter = LinearFilter;
 		sdfTexture.magFilter = LinearFilter;
+
+		// Surface UVs, sampled once at the hit
+		const uvTexture = new Data3DTexture( new Float32Array( dim ** 3 * 2 ), dim, dim, dim );
+		uvTexture.format = RGFormat;
+		uvTexture.type = FloatType;
+		uvTexture.minFilter = LinearFilter;
+		uvTexture.magFilter = LinearFilter;
 
 		const point = new Vector3();
 		const target = {
@@ -51,6 +59,7 @@ export class VolumeGenerator {
 			faceIndex: - 1
 		};
 		const uvAttr = geometry.attributes.uv;
+		const normalAttr = geometry.attributes.normal;
 
 		// Reusable objects to avoid allocations in the loop
 		const ray = new Ray();
@@ -69,6 +78,10 @@ export class VolumeGenerator {
 		const uv0 = new Vector2();
 		const uv1 = new Vector2();
 		const uv2 = new Vector2();
+		const n0 = new Vector3();
+		const n1 = new Vector3();
+		const n2 = new Vector3();
+		const normal = new Vector3();
 
 		// Iterate over all pixels and check distance
 		for ( let x = 0; x < dim; x ++ ) {
@@ -123,13 +136,11 @@ export class VolumeGenerator {
 
 					}
 
-					// Set the distance in the texture data
-					sdfTexture.image.data[ index + 0 ] = isInside ? - dist : dist;
-
-					// Get UV from closest point
+					// Surface attributes at the closest point
 					let u = 0, v = 0;
+					normal.set( 0, 0, 0 );
 
-					if ( uvAttr && target.faceIndex !== undefined ) {
+					if ( target.faceIndex !== undefined ) {
 
 						const faceIndex = target.faceIndex;
 						const indexAttr = geometry.index;
@@ -143,19 +154,42 @@ export class VolumeGenerator {
 
 						Triangle.getBarycoord( target.point, v0, v1, v2, barycoord );
 
-						uv0.fromBufferAttribute( uvAttr, i0 );
-						uv1.fromBufferAttribute( uvAttr, i1 );
-						uv2.fromBufferAttribute( uvAttr, i2 );
+						if ( normalAttr ) {
 
-						u = uv0.x * barycoord.x + uv1.x * barycoord.y + uv2.x * barycoord.z;
-						v = uv0.y * barycoord.x + uv1.y * barycoord.y + uv2.y * barycoord.z;
+							n0.fromBufferAttribute( normalAttr, i0 );
+							n1.fromBufferAttribute( normalAttr, i1 );
+							n2.fromBufferAttribute( normalAttr, i2 );
+
+							normal.addScaledVector( n0, barycoord.x ).addScaledVector( n1, barycoord.y ).addScaledVector( n2, barycoord.z ).normalize();
+
+						} else {
+
+							Triangle.getNormal( v0, v1, v2, normal );
+
+						}
+
+						if ( uvAttr ) {
+
+							uv0.fromBufferAttribute( uvAttr, i0 );
+							uv1.fromBufferAttribute( uvAttr, i1 );
+							uv2.fromBufferAttribute( uvAttr, i2 );
+
+							u = uv0.x * barycoord.x + uv1.x * barycoord.y + uv2.x * barycoord.z;
+							v = uv0.y * barycoord.x + uv1.y * barycoord.y + uv2.y * barycoord.z;
+
+						}
 
 					}
 
-					// Store UV in G and B channels
-					sdfTexture.image.data[ index + 1 ] = u;
-					sdfTexture.image.data[ index + 2 ] = v;
-					sdfTexture.image.data[ index + 3 ] = 0; // Alpha unused
+					const data = sdfTexture.image.data;
+					data[ index + 0 ] = DataUtils.toHalfFloat( isInside ? - dist : dist );
+					data[ index + 1 ] = DataUtils.toHalfFloat( normal.x );
+					data[ index + 2 ] = DataUtils.toHalfFloat( normal.y );
+					data[ index + 3 ] = DataUtils.toHalfFloat( normal.z );
+
+					const uvIndex = index / 2;
+					uvTexture.image.data[ uvIndex + 0 ] = u;
+					uvTexture.image.data[ uvIndex + 1 ] = v;
 
 				}
 
@@ -164,10 +198,11 @@ export class VolumeGenerator {
 		}
 
 		sdfTexture.needsUpdate = true;
+		uvTexture.needsUpdate = true;
 
 		console.log( 'SDF generation completed' );
 
-		return { sdfTexture, inverseBoundsMatrix };
+		return { sdfTexture, uvTexture, inverseBoundsMatrix };
 
 	}
 

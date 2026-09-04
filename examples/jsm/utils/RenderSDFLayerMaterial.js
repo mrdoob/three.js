@@ -7,6 +7,7 @@ export class RenderSDFLayerMaterial extends ShaderMaterial {
 		super( {
 			uniforms: {
 				sdfTex: { value: null },
+				uvTex: { value: null },
 				layer: { value: 0 },
 			},
 
@@ -20,29 +21,23 @@ export class RenderSDFLayerMaterial extends ShaderMaterial {
 
 			fragmentShader: /* glsl */`
 				uniform sampler3D sdfTex;
+				uniform sampler3D uvTex;
 				uniform float layer;
 				varying vec2 vUv;
 
 				void main() {
 					vec4 data = texture( sdfTex, vec3( vUv, layer ) );
-					
-					// Display three channels side by side
+					vec2 uv = texture( uvTex, vec3( vUv, layer ) ).rg;
+
+					// Distance, normal and UV side by side
 					vec3 color;
 					if ( vUv.x < 0.33 ) {
-						// Left third: Distance (grayscale, normalized around 0)
-						float dist = data.r;
-						float normalized = dist * 0.5 + 0.5; // Map -1,1 to 0,1
-						color = vec3( normalized );
+						color = vec3( data.r * 0.5 + 0.5 );
 					} else if ( vUv.x < 0.66 ) {
-						// Middle third: U channel (red, fractional part to handle >1 values)
-						float u = fract( data.g );
-						color = vec3( u, 0.0, 0.0 );
+						color = data.gba * 0.5 + 0.5;
 					} else {
-						// Right third: V channel (green, fractional part to handle >1 values)
-						float v = fract( data.b );
-						color = vec3( 0.0, v, 0.0 );
+						color = vec3( fract( uv ), 0.0 );
 					}
-					
 					gl_FragColor = vec4( color, 1.0 );
 
 					#include <colorspace_fragment>

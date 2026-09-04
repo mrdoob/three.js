@@ -10,6 +10,7 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 
 		this.uniforms = {
 			sdfTex: { value: null },
+			uvTex: { value: null },
 			normalStep: { value: new Vector3() },
 			boundsScale: { value: new Vector3( 1, 1, 1 ) },
 			surface: { value: 0 }
@@ -24,6 +25,7 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 
 			// Add our custom uniforms
 			shader.uniforms.sdfTex = this.uniforms.sdfTex;
+			shader.uniforms.uvTex = this.uniforms.uvTex;
 			shader.uniforms.normalStep = this.uniforms.normalStep;
 			shader.uniforms.boundsScale = this.uniforms.boundsScale;
 			shader.uniforms.surface = this.uniforms.surface;
@@ -62,6 +64,7 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 				`#include <common>
 
 				uniform sampler3D sdfTex;
+				uniform sampler3D uvTex;
 				uniform vec3 normalStep;
 				uniform vec3 boundsScale;
 				uniform mat3 normalMatrix;
@@ -73,6 +76,21 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 				varying vec3 vLocalRayOrigin;
 				varying mat4 vInstanceMatrix;
 
+				// Same approach as perturbNormal2Arb(), using the UVs sampled from the volume
+				vec3 perturbNormalSDF( vec3 eye_pos, vec3 surf_norm, vec3 mapN, vec2 uv ) {
+					vec3 q0 = dFdx( eye_pos );
+					vec3 q1 = dFdy( eye_pos );
+					vec2 st0 = dFdx( uv );
+					vec2 st1 = dFdy( uv );
+					vec3 N = surf_norm;
+					vec3 q1perp = cross( q1, N );
+					vec3 q0perp = cross( N, q0 );
+					vec3 T = q1perp * st0.x + q0perp * st1.x;
+					vec3 B = q1perp * st0.y + q0perp * st1.y;
+					float det = max( dot( T, T ), dot( B, B ) );
+					float scale = ( det == 0.0 ) ? 0.0 : inversesqrt( det );
+					return normalize( T * ( mapN.x * scale ) + B * ( mapN.y * scale ) + N * mapN.z );
+				}
 				vec2 rayBoxDist( vec3 boundsMin, vec3 boundsMax, vec3 rayOrigin, vec3 rayDir ) {
 					vec3 t0 = ( boundsMin - rayOrigin ) / rayDir;
 					vec3 t1 = ( boundsMax - rayOrigin ) / rayDir;
@@ -139,16 +157,27 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 				float ndcDepth = clipPos.z / clipPos.w;
 				gl_FragDepth = ndcDepth * 0.5 + 0.5;
 
-				// Compute UV and normal from SDF
-				vec3 sdfUV = localPoint + vec3( 0.5 );
+				// Surface attributes at the hit point
+				vec3 sdfUV = clamp( localPoint + vec3( 0.5 ), 0.0, 1.0 );
 				vec4 sdfData = texture( sdfTex, sdfUV );
-				vec2 sdfTexUv = sdfData.gb;
 
-				// Compute gradient in SDF local space
-				float dx = texture( sdfTex, sdfUV + vec3( normalStep.x, 0.0, 0.0 ) ).r - texture( sdfTex, sdfUV - vec3( normalStep.x, 0.0, 0.0 ) ).r;
-				float dy = texture( sdfTex, sdfUV + vec3( 0.0, normalStep.y, 0.0 ) ).r - texture( sdfTex, sdfUV - vec3( 0.0, normalStep.y, 0.0 ) ).r;
-				float dz = texture( sdfTex, sdfUV + vec3( 0.0, 0.0, normalStep.z ) ).r - texture( sdfTex, sdfUV - vec3( 0.0, 0.0, normalStep.z ) ).r;
-				vec3 sdfNormalLocal = normalize( vec3( dx, dy, dz ) );
+				// Surface UVs of the closest point, filtered linearly
+				vec2 sdfTexUv = texture( uvTex, sdfUV ).rg;
+
+				// Baked surface normal, converted from bounds space to local space (inverse transpose of the bounds scale)
+				vec3 sdfNormalLocal = sdfData.gba * boundsScale;
+
+				if ( dot( sdfNormalLocal, sdfNormalLocal ) < 0.01 ) {
+
+					// Opposite normals cancelled out across a thin shell, fall back to the gradient
+					float dx = texture( sdfTex, sdfUV + vec3( normalStep.x, 0.0, 0.0 ) ).r - texture( sdfTex, sdfUV - vec3( normalStep.x, 0.0, 0.0 ) ).r;
+					float dy = texture( sdfTex, sdfUV + vec3( 0.0, normalStep.y, 0.0 ) ).r - texture( sdfTex, sdfUV - vec3( 0.0, normalStep.y, 0.0 ) ).r;
+					float dz = texture( sdfTex, sdfUV + vec3( 0.0, 0.0, normalStep.z ) ).r - texture( sdfTex, sdfUV - vec3( 0.0, 0.0, normalStep.z ) ).r;
+					sdfNormalLocal = vec3( dx, dy, dz );
+
+				}
+
+				sdfNormalLocal = normalize( sdfNormalLocal );
 
 				// Transform normal from SDF local space to view space (accounting for instance transform)
 				mat3 instanceNormalMatrix = mat3( transpose( inverse( vInstanceMatrix ) ) );
@@ -185,17 +214,9 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 					// Sample the normal map
 					vec3 mapN = texture2D( normalMap, sdfTexUv ).xyz * 2.0 - 1.0;
 					mapN.xy *= normalScale;
-					
-					// Create a tangent space from the SDF normal
-					// We need to construct tangent and bitangent vectors perpendicular to the normal
-					vec3 N = normalize( normal );
-					// Pick a reference axis that isn't parallel to the normal
-					vec3 reference = abs( N.y ) < 0.9 ? vec3( 0.0, 1.0, 0.0 ) : vec3( 1.0, 0.0, 0.0 );
-					vec3 T = normalize( cross( N, reference ) );
-					vec3 B = normalize( cross( N, T ) );
-					
-					// Apply normal map in tangent space
-					normal = normalize( T * mapN.x + B * mapN.y + N * mapN.z );
+
+					// Tangent frame from screen-space derivatives of the raymarched position and UV
+					normal = perturbNormalSDF( viewPos.xyz, normal, mapN, sdfTexUv );
 				#endif`
 			);
 

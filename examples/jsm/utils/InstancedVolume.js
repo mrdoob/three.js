@@ -21,22 +21,21 @@ export class InstancedVolume extends InstancedMesh {
 		this.surface = params.surface !== undefined ? params.surface : 0.0;
 
 		this.sdfTexture = null;
+		this.uvTexture = null;
 		this.inverseBoundsMatrix = new Matrix4();
 
 	}
 
 	async generate( sourceMesh ) {
 
-		// Dispose of the existing SDF texture
-		if ( this.sdfTexture ) {
-
-			this.sdfTexture.dispose();
-
-		}
+		// Dispose of the existing SDF textures
+		if ( this.sdfTexture ) this.sdfTexture.dispose();
+		if ( this.uvTexture ) this.uvTexture.dispose();
 
 		// Generate the SDF using the shared generator
 		const result = await VolumeGenerator.generateSDF( sourceMesh, this.resolution, this.margin );
 		this.sdfTexture = result.sdfTexture;
+		this.uvTexture = result.uvTexture;
 		this.inverseBoundsMatrix = result.inverseBoundsMatrix;
 
 		// Copy textures from source mesh material if available
@@ -80,6 +79,7 @@ export class InstancedVolume extends InstancedMesh {
 
 		// Update custom uniforms
 		this.material.uniforms.sdfTex.value = this.sdfTexture;
+		this.material.uniforms.uvTex.value = this.uvTexture;
 		this.material.uniforms.normalStep.value.set( depth, depth, depth );
 		_boundsMatrix.copy( this.inverseBoundsMatrix ).invert();
 		this.material.uniforms.boundsScale.value.setFromMatrixScale( _boundsMatrix );
@@ -101,6 +101,13 @@ export class InstancedVolume extends InstancedMesh {
 
 			this.sdfTexture.dispose();
 			this.sdfTexture = null;
+
+		}
+
+		if ( this.uvTexture ) {
+
+			this.uvTexture.dispose();
+			this.uvTexture = null;
 
 		}
 

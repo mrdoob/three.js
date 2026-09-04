@@ -308,6 +308,7 @@
 
 				// Reuse the SDF texture from the first volume
 				instancedVolumeMesh.sdfTexture = volumeMeshes[ 0 ].sdfTexture;
+				instancedVolumeMesh.uvTexture = volumeMeshes[ 0 ].uvTexture;
 				instancedVolumeMesh.inverseBoundsMatrix.copy( volumeMeshes[ 0 ].inverseBoundsMatrix );
 
 				// Copy material properties
@@ -416,6 +417,7 @@
 					renderer.setViewport( 0, window.innerHeight - layerSize, layerSize, layerSize );
 
 					layerPass.material.uniforms.sdfTex.value = volumeMeshes[ 0 ].sdfTexture;
+					layerPass.material.uniforms.uvTex.value = volumeMeshes[ 0 ].uvTexture;
 					layerPass.material.uniforms.layer.value = params.layer * ( 1 / params.resolution );
 
 					layerPass.render( renderer );
