@@ -125,6 +125,8 @@ export class VolumeGenerator {
 		const n1 = new Vector3();
 		const n2 = new Vector3();
 		const normal = new Vector3();
+		const faceNormal = new Vector3();
+		const offset = new Vector3();
 
 		// Coarse grid of exact distances. Every voxel gets a Lipschitz lower bound from its surrounding
 		// coarse samples, and only voxels whose bound falls inside the band are queried exactly.
@@ -222,31 +224,7 @@ export class VolumeGenerator {
 
 					const dist = target.distance;
 
-					// Check if the point is inside or outside by raycasting
-					// Skip expensive raycasts for points far from surface (definitely outside)
 					let isInside = false;
-
-					if ( dist < margin ) {
-
-						// If we hit a back face then we're inside
-						let insideCount = 0;
-						ray.origin.copy( point );
-
-						for ( let i = 0; i < 6; i ++ ) {
-
-							ray.direction.copy( directions[ i ] );
-							const hit = bvh.raycastFirst( ray, DoubleSide );
-							if ( hit && hit.face.normal.dot( ray.direction ) > 0.0 ) {
-
-								insideCount ++;
-
-							}
-
-						}
-
-						isInside = insideCount > 3;
-
-					}
 
 					// Surface attributes at the closest point
 					let u = 0, v = 0;
@@ -288,6 +266,43 @@ export class VolumeGenerator {
 
 							u = uv0.x * barycoord.x + uv1.x * barycoord.y + uv2.x * barycoord.z;
 							v = uv0.y * barycoord.x + uv1.y * barycoord.y + uv2.y * barycoord.z;
+
+						}
+
+
+						if ( dist < margin ) {
+
+							// The face normal gives the sign when the closest point lies on the face itself.
+							// On an edge or vertex the offset is not parallel to it, so fall back to raycasts.
+							Triangle.getNormal( v0, v1, v2, faceNormal );
+							const side = offset.subVectors( point, target.point ).dot( faceNormal );
+
+							if ( Math.abs( side ) > 0.9 * dist ) {
+
+								isInside = side < 0;
+
+							} else {
+
+								// If we hit a back face then we're inside
+								let insideCount = 0;
+								ray.origin.copy( point );
+
+								for ( let i = 0; i < 6; i ++ ) {
+
+									ray.direction.copy( directions[ i ] );
+									const hit = bvh.raycastFirst( ray, DoubleSide );
+
+									if ( hit && hit.face.normal.dot( ray.direction ) > 0.0 ) {
+
+										insideCount ++;
+
+									}
+
+								}
+
+								isInside = insideCount > 3;
+
+							}
 
 						}
 
