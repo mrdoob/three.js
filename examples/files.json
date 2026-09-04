@@ -294,6 +294,7 @@
 		"webgl_ubo_arrays",
 		"webgl_volume_cloud",
 		"webgl_volume_instancing",
+		"webgl_volume_mesh",
 		"webgl_volume_perlin",
 		"webgl_worker_offscreencanvas",
 		"webgl_performance"
