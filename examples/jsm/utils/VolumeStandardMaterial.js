@@ -165,6 +165,9 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 					discard;
 				}
 
+				// Land on the surface with the last distance, so the hit does not depend on the path taken
+				point += rayDirection * distanceToSurface;
+
 				vec3 localPoint = point / boundsScale;
 
 				// Write correct depth for the raymarched surface (accounting for instance transform)

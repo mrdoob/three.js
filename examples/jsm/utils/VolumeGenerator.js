@@ -126,6 +126,62 @@ export class VolumeGenerator {
 		const n2 = new Vector3();
 		const normal = new Vector3();
 
+		// Coarse grid of exact distances. Every voxel gets a Lipschitz lower bound from its surrounding
+		// coarse samples, and only voxels whose bound falls inside the band are queried exactly.
+		const coarseStep = 4;
+		const coarseDim = Math.floor( ( dim - 1 ) / coarseStep ) + 1;
+		const coarseDist = new Float32Array( coarseDim ** 3 );
+		const voxelSize = new Vector3().copy( scale ).multiplyScalar( pxWidth );
+		const band = margin + 2 * Math.max( voxelSize.x, voxelSize.y, voxelSize.z );
+
+		for ( let cx = 0; cx < coarseDim; cx ++ ) {
+
+			for ( let cy = 0; cy < coarseDim; cy ++ ) {
+
+				for ( let cz = 0; cz < coarseDim; cz ++ ) {
+
+					point.set(
+						halfWidth + cx * coarseStep * pxWidth - 0.5,
+						halfWidth + cy * coarseStep * pxWidth - 0.5,
+						halfWidth + cz * coarseStep * pxWidth - 0.5
+					).applyMatrix4( matrix );
+
+					bvh.closestPointToPoint( point, target );
+					coarseDist[ cx + coarseDim * ( cy + coarseDim * cz ) ] = target.distance;
+
+				}
+
+			}
+
+		}
+
+		function coarseBound( x, y, z ) {
+
+			const cx0 = Math.floor( x / coarseStep );
+			const cy0 = Math.floor( y / coarseStep );
+			const cz0 = Math.floor( z / coarseStep );
+			const cx1 = Math.min( cx0 + 1, coarseDim - 1 );
+			const cy1 = Math.min( cy0 + 1, coarseDim - 1 );
+			const cz1 = Math.min( cz0 + 1, coarseDim - 1 );
+			let bound = 0;
+
+			for ( let i = 0; i < 8; i ++ ) {
+
+				const cx = ( i & 1 ) ? cx1 : cx0;
+				const cy = ( i & 2 ) ? cy1 : cy0;
+				const cz = ( i & 4 ) ? cz1 : cz0;
+				const dx = ( x - cx * coarseStep ) * voxelSize.x;
+				const dy = ( y - cy * coarseStep ) * voxelSize.y;
+				const dz = ( z - cz * coarseStep ) * voxelSize.z;
+				const d = coarseDist[ cx + coarseDim * ( cy + coarseDim * cz ) ] - Math.sqrt( dx * dx + dy * dy + dz * dz );
+				if ( d > bound ) bound = d;
+
+			}
+
+			return bound;
+
+		}
+
 		// Iterate over all pixels and check distance
 		for ( let x = 0; x < dim; x ++ ) {
 
@@ -150,7 +206,20 @@ export class VolumeGenerator {
 					).applyMatrix4( matrix );
 
 					// Get the distance to the geometry
-					bvh.closestPointToPoint( point, target );
+					// Far voxels keep the lower bound, which is all the raymarch needs there
+					const bound = coarseBound( x, y, z );
+
+					if ( bound > band ) {
+
+						target.distance = bound;
+						target.faceIndex = undefined;
+
+					} else {
+
+						bvh.closestPointToPoint( point, target );
+
+					}
+
 					const dist = target.distance;
 
 					// Check if the point is inside or outside by raycasting
