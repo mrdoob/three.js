@@ -703,7 +703,6 @@ class PlaygroundManager {
 		}
 
 		this.renderPlaygroundTabs();
-		this.runPlayground();
 
 		this.updatePlaygroundHash( false );
 
@@ -976,24 +975,15 @@ class PlaygroundManager {
 
 			if ( tab.name !== 'main' && ! tab.readOnly ) {
 
-				const existing = this.tour.runner.scripts[ tab.name ];
-				if ( ! existing || existing.text !== tab.code ) {
+				this.tour.runner.invalidateScript( tab.name );
 
-					if ( existing ) {
-
-						this.tour.runner.invalidateScript( tab.name );
-
-					}
-
-					this.tour.runner.scripts[ tab.name ] = {
-						url: null,
-						text: tab.code,
-						instance: null,
-						promise: null,
-						dependencies: []
-					};
-
-				}
+				this.tour.runner.scripts[ tab.name ] = {
+					url: null,
+					text: tab.code,
+					instance: null,
+					promise: null,
+					dependencies: []
+				};
 
 			}
 
@@ -1212,9 +1202,20 @@ class PlaygroundManager {
 					try {
 
 						const response = await fetch( `./js/imports/scripts/${name}.js` );
-						if ( response.ok ) {
+						const contentType = response.headers.get( 'content-type' ) || '';
+						if ( response.ok && ! contentType.includes( 'text/html' ) ) {
 
-							code = await response.text();
+							const text = await response.text();
+							if ( ! text.trim().startsWith( '<' ) ) {
+
+								code = text;
+
+							} else {
+
+								console.warn( `Could not fetch imported file: ${name}` );
+								continue;
+
+							}
 
 						} else {
 

@@ -86,6 +86,16 @@ body {
 	font-size: 0.95rem;
 }
 
+.markdown-content img {
+	max-width: 100%;
+	height: auto;
+	border-radius: 8px;
+	margin: 1.25rem 0;
+	display: block;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	background: rgba(0, 0, 0, 0.3);
+}
+
 .markdown-content blockquote {
 	margin: 1.5rem 0;
 	padding: 0.85rem 1.25rem;
@@ -4306,6 +4316,21 @@ body.loading .app-header {
 	color: #00aaff;
 	background: rgba(0, 170, 255, 0.12);
 	border: 1px solid rgba(0, 170, 255, 0.25);
+	padding: 1px 6px;
+	border-radius: 4px;
+	line-height: 1.2;
+}
+
+.tsl-project-tag-draft {
+	display: inline-flex;
+	align-items: center;
+	font-size: 10px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: #f59e0b;
+	background: rgba(245, 158, 11, 0.12);
+	border: 1px solid rgba(245, 158, 11, 0.25);
 	padding: 1px 6px;
 	border-radius: 4px;
 	line-height: 1.2;

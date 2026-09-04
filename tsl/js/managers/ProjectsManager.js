@@ -42,32 +42,96 @@ class ProjectsManager {
 
 	}
 
+	getDraftProject() {
+
+		const rawTabs = this.tour.playgroundManager.playgroundTabs;
+		const tabs = ( rawTabs && rawTabs.length > 0 )
+			? rawTabs.filter( t => ! t.readOnly )
+			: [ { name: 'main', code: '// Tour of TSL\n' } ];
+
+		if ( tabs.length === 0 ) {
+
+			tabs.push( { name: 'main', code: '// Tour of TSL\n' } );
+
+		}
+
+		let name = 'Draft';
+		if ( this.tour.playgroundManager.currentExampleName ) {
+
+			const cleanName = this.tour.playgroundManager.currentExampleName.replace( /\s*\(Draft\)$/i, '' ).trim();
+			if ( cleanName ) {
+
+				name = `${cleanName} (Draft)`;
+
+			}
+
+		}
+
+		return {
+			id: 'draft',
+			isDraft: true,
+			name: name,
+			updatedAt: Date.now(),
+			tabs: JSON.parse( JSON.stringify( tabs ) )
+		};
+
+	}
+
+	getAllDisplayProjects() {
+
+		const savedProjects = this.getProjects();
+		const hasActiveSavedProject = this.currentProjectId && savedProjects.some( p => p.id === this.currentProjectId );
+
+		if ( ! hasActiveSavedProject ) {
+
+			const draft = this.getDraftProject();
+			return [ draft, ...savedProjects ];
+
+		}
+
+		return savedProjects;
+
+	}
+
+	resetDraft() {
+
+		const emptyTabs = [ { name: 'main', code: '// Tour of TSL\n' } ];
+		this.tour.playgroundManager.playgroundTabs = emptyTabs;
+		this.tour.playgroundManager.activePlaygroundTabName = 'main';
+		this.tour.playgroundManager.currentExampleName = null;
+		this.tour.playgroundManager.initialTabsSnapshot = JSON.stringify( emptyTabs );
+		this.setCurrentProjectId( null );
+
+		if ( this.tour.codeEditor ) {
+
+			this.tour.codeEditor.setValue( emptyTabs[ 0 ].code );
+
+		}
+
+		this.tour.playgroundManager.renderPlaygroundTabs();
+		this.tour.playgroundManager.runPlayground();
+		this.tour.playgroundManager.updatePlaygroundHash( true );
+
+	}
+
 	isProjectCurrent( project ) {
 
 		if ( ! project ) return false;
 
-		// 1. If explicit ID is set, ONLY that project is current
+		if ( project.isDraft ) {
+
+			const savedProjects = this.getProjects();
+			return ! this.currentProjectId || ! savedProjects.some( p => p.id === this.currentProjectId );
+
+		}
+
 		if ( this.currentProjectId ) {
 
 			return this.currentProjectId === project.id;
 
 		}
 
-		// 2. If no currentProjectId is set, check if tabs content matches
-		const currentTabs = ( this.tour.playgroundManager.playgroundTabs || [] ).filter( t => ! t.readOnly );
-		if ( ! currentTabs || ! project.tabs || project.tabs.length !== currentTabs.length ) return false;
-
-		for ( let i = 0; i < project.tabs.length; i ++ ) {
-
-			const pt = project.tabs[ i ];
-			const ct = currentTabs[ i ];
-			if ( ! pt || ! ct ) return false;
-			if ( pt.name.toLowerCase() !== ct.name.toLowerCase() ) return false;
-			if ( ( pt.code || '' ).trim() !== ( ct.code || '' ).trim() ) return false;
-
-		}
-
-		return true;
+		return false;
 
 	}
 
@@ -191,7 +255,7 @@ class ProjectsManager {
 		}
 
 		const defaultName = ( existingIndex !== - 1 ? projects[ existingIndex ].name : null )
-			|| this.tour.playgroundManager.currentExampleName
+			|| ( this.tour.playgroundManager.currentExampleName ? this.tour.playgroundManager.currentExampleName.replace( /\s*\(Draft\)$/i, '' ).trim() : null )
 			|| this.getNextProjectName();
 
 		const cleanName = ( name || '' ).trim() || defaultName;
@@ -234,6 +298,13 @@ class ProjectsManager {
 		const cleanName = ( newName || '' ).trim();
 		if ( ! cleanName ) return false;
 
+		if ( id === 'draft' ) {
+
+			this.saveCurrentProject( cleanName );
+			return true;
+
+		}
+
 		const projects = this.getProjects();
 		const project = projects.find( p => p.id === id );
 		if ( ! project ) return false;
@@ -248,15 +319,23 @@ class ProjectsManager {
 
 	deleteProject( id ) {
 
-		if ( this.currentProjectId === id ) {
+		if ( id === 'draft' ) {
 
-			this.setCurrentProjectId( null );
+			return;
 
 		}
+
+		const isDeletingCurrent = ( this.currentProjectId === id );
 
 		let projects = this.getProjects();
 		projects = projects.filter( p => p.id !== id );
 		this.saveProjectsList( projects );
+
+		if ( isDeletingCurrent ) {
+
+			this.resetDraft();
+
+		}
 
 	}
 
@@ -270,22 +349,33 @@ class ProjectsManager {
 			code: t.code
 		} ) );
 
+		const baseName = ( project.name || 'Project' ).replace( /\s*\(Draft\)$/i, '' ).trim();
+		const name = project.isDraft ? this.getNextProjectName() : `${baseName} (Copy)`;
+
 		const newProject = {
 			id,
-			name: `${project.name} (Copy)`,
+			name,
 			createdAt: now,
 			updatedAt: now,
 			tabs: clonedTabs
 		};
 
-		const targetIndex = projects.findIndex( p => p.id === project.id );
-		if ( targetIndex !== - 1 ) {
+		if ( project.isDraft ) {
 
-			projects.splice( targetIndex + 1, 0, newProject );
+			projects.unshift( newProject );
 
 		} else {
 
-			projects.unshift( newProject );
+			const targetIndex = projects.findIndex( p => p.id === project.id );
+			if ( targetIndex !== - 1 ) {
+
+				projects.splice( targetIndex + 1, 0, newProject );
+
+			} else {
+
+				projects.unshift( newProject );
+
+			}
 
 		}
 
@@ -332,11 +422,16 @@ class ProjectsManager {
 
 		if ( ! project ) return;
 
+		const safeTabs = ( project.tabs || [] ).map( t => ( {
+			name: t.name,
+			code: t.code
+		} ) );
+
 		const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent( JSON.stringify( {
-			name: project.name,
+			name: project.name || 'project',
 			version: 1,
 			exportedAt: new Date().toISOString(),
-			tabs: project.tabs
+			tabs: safeTabs
 		}, null, 2 ) );
 
 		const downloadAnchor = document.createElement( 'a' );
@@ -385,6 +480,7 @@ class ProjectsManager {
 
 					const parsed = JSON.parse( e.target.result );
 					let importedCount = 0;
+					let firstImportedProject = null;
 
 					if ( ! parsed || typeof parsed !== 'object' ) {
 
@@ -402,13 +498,15 @@ class ProjectsManager {
 							if ( proj && proj.name && Array.isArray( proj.tabs ) && proj.tabs.length > 0 ) {
 
 								const id = `proj_${now}_${Math.random().toString( 36 ).substring( 2, 7 )}`;
-								projects.unshift( {
+								const newProj = {
 									id,
 									name: proj.name,
 									createdAt: proj.createdAt || now,
 									updatedAt: proj.updatedAt || now,
 									tabs: proj.tabs
-								} );
+								};
+								projects.unshift( newProj );
+								if ( ! firstImportedProject ) firstImportedProject = newProj;
 								importedCount ++;
 
 							}
@@ -422,13 +520,15 @@ class ProjectsManager {
 							if ( proj && Array.isArray( proj.tabs ) && proj.tabs.length > 0 ) {
 
 								const id = `proj_${now}_${Math.random().toString( 36 ).substring( 2, 7 )}`;
-								projects.unshift( {
+								const newProj = {
 									id,
 									name: proj.name || 'Imported Project',
 									createdAt: now,
 									updatedAt: now,
 									tabs: proj.tabs
-								} );
+								};
+								projects.unshift( newProj );
+								if ( ! firstImportedProject ) firstImportedProject = newProj;
 								importedCount ++;
 
 							}
@@ -441,13 +541,15 @@ class ProjectsManager {
 						const name = parsed.name || file.name.replace( /\.json$/i, '' ) || 'Imported Project';
 						const id = `proj_${now}_${Math.random().toString( 36 ).substring( 2, 7 )}`;
 
-						projects.unshift( {
+						const newProj = {
 							id,
 							name,
 							createdAt: now,
 							updatedAt: now,
 							tabs
-						} );
+						};
+						projects.unshift( newProj );
+						firstImportedProject = newProj;
 						importedCount = 1;
 
 					} else {
@@ -457,7 +559,7 @@ class ProjectsManager {
 					}
 
 					this.saveProjectsList( projects );
-					resolve( importedCount );
+					resolve( { importedCount, project: firstImportedProject } );
 
 				} catch ( err ) {
 
@@ -545,13 +647,26 @@ class ProjectsManager {
 
 				templateItem.querySelector( '.tsl-template-new-btn' ).onclick = () => {
 
-					const newName = this.getNextProjectName();
 					const tabs = JSON.parse( JSON.stringify( tmpl.tabs && tmpl.tabs.length > 0 ? tmpl.tabs : [ { name: 'main', code: '// Tour of TSL\n' } ] ) );
 					this.tour.playgroundManager.playgroundTabs = tabs;
 					this.tour.playgroundManager.activePlaygroundTabName = tabs[ 0 ].name;
+					this.setCurrentProjectId( null );
+					this.tour.playgroundManager.currentExampleName = tmpl.name && tmpl.name !== 'Empty Project' ? tmpl.name : null;
+					this.tour.playgroundManager.initialTabsSnapshot = JSON.stringify( tabs );
 
-					const newProj = this.saveCurrentProject( newName );
-					this.loadProject( newProj );
+					this.tour.playgroundManager.togglePlayground( true );
+					this.tour.playgroundManager.renderPlaygroundTabs();
+
+					if ( this.tour.codeEditor ) {
+
+						this.tour.codeEditor.setValue( tabs[ 0 ].code );
+
+					}
+
+					this.tour.playgroundManager.runPlayground();
+					this.tour.playgroundManager.updatePlaygroundHash( true );
+
+					this.closeProjectsModal();
 
 				};
 
@@ -598,13 +713,26 @@ class ProjectsManager {
 
 			templateItem.querySelector( '.tsl-template-new-btn' ).onclick = () => {
 
-				const newName = this.getNextProjectName();
 				const emptyTabs = [ { name: 'main', code: '// Tour of TSL\n' } ];
 				this.tour.playgroundManager.playgroundTabs = emptyTabs;
 				this.tour.playgroundManager.activePlaygroundTabName = 'main';
+				this.setCurrentProjectId( null );
+				this.tour.playgroundManager.currentExampleName = null;
+				this.tour.playgroundManager.initialTabsSnapshot = JSON.stringify( emptyTabs );
 
-				const newProj = this.saveCurrentProject( newName );
-				this.loadProject( newProj );
+				this.tour.playgroundManager.togglePlayground( true );
+				this.tour.playgroundManager.renderPlaygroundTabs();
+
+				if ( this.tour.codeEditor ) {
+
+					this.tour.codeEditor.setValue( emptyTabs[ 0 ].code );
+
+				}
+
+				this.tour.playgroundManager.runPlayground();
+				this.tour.playgroundManager.updatePlaygroundHash( true );
+
+				this.closeProjectsModal();
 
 			};
 
@@ -626,8 +754,16 @@ class ProjectsManager {
 
 			try {
 
-				await this.importProjectJSON( file );
-				renderList();
+				const result = await this.importProjectJSON( file );
+				if ( result && result.project ) {
+
+					this.loadProject( result.project );
+
+				} else {
+
+					renderList();
+
+				}
 
 			} catch ( err ) {
 
@@ -661,7 +797,7 @@ class ProjectsManager {
 		const renderList = ( filterQuery = '' ) => {
 
 			listContainer.innerHTML = '';
-			const allProjects = this.getProjects();
+			const allProjects = this.getAllDisplayProjects();
 
 			// Always pin the current project to the top of the list
 			allProjects.sort( ( a, b ) => {
@@ -679,7 +815,8 @@ class ProjectsManager {
 			const query = filterQuery.toLowerCase().trim();
 			const projects = query ? allProjects.filter( p => p.name.toLowerCase().includes( query ) ) : allProjects;
 
-			countBadge.textContent = `${allProjects.length} saved`;
+			const savedCount = this.getProjects().length;
+			countBadge.textContent = `${savedCount} saved`;
 
 			if ( projects.length === 0 ) {
 
@@ -698,19 +835,21 @@ class ProjectsManager {
 			projects.forEach( project => {
 
 				const isCurrent = this.isProjectCurrent( project );
+				const isDraft = !! project.isDraft;
 				const item = document.createElement( 'div' );
-				item.className = 'tsl-project-item' + ( isCurrent ? ' tsl-project-item-current' : '' );
+				item.className = 'tsl-project-item' + ( isCurrent ? ' tsl-project-item-current' : '' ) + ( isDraft ? ' tsl-project-item-draft' : '' );
 
-				const dateStr = this.formatDate( project.updatedAt );
+				const dateStr = isDraft ? 'Current unsaved draft' : this.formatDate( project.updatedAt );
 
 				const tabBadges = ( project.tabs || [] ).map( t => `<span class="tsl-project-tab-badge">${t.name}</span>` ).join( '' );
 
 				item.innerHTML = `
 					<div class="tsl-project-info">
 						<div class="tsl-project-name-row">
-							<span class="tsl-project-name" title="Double-click to rename">${project.name}</span>
+							<span class="tsl-project-name" title="${isDraft ? 'Double-click to save and rename' : 'Double-click to rename'}">${project.name}</span>
+							${isDraft ? '<span class="tsl-project-tag-draft">Draft</span>' : ''}
 							${isCurrent ? '<span class="tsl-project-tag-active">Current</span>' : ''}
-							<button class="tsl-project-rename-btn" title="Rename">
+							<button class="tsl-project-rename-btn" title="${isDraft ? 'Save as project' : 'Rename'}">
 								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
 							</button>
 						</div>
@@ -720,12 +859,17 @@ class ProjectsManager {
 						</div>
 					</div>
 					<div class="tsl-project-item-actions">
+						${isDraft ? `
+						<button class="tsl-btn tsl-btn-sm tsl-btn-primary tsl-save-draft-btn" title="Save this draft as a project">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+							<span>Save</span>
+						</button>` : ''}
 						${! isCurrent ? `
 						<button class="tsl-btn tsl-btn-sm tsl-btn-primary tsl-load-btn" title="Load project into playground">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width: 12px; height: 12px;"><polygon points="6 3 20 12 6 21 6 3"/></svg>
 							<span>Load</span>
 						</button>` : ''}
-						<button class="tsl-btn tsl-btn-sm tsl-btn-secondary tsl-duplicate-btn" title="Duplicate project">
+						<button class="tsl-btn tsl-btn-sm tsl-btn-secondary tsl-duplicate-btn" title="${isDraft ? 'Duplicate as saved project' : 'Duplicate project'}">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-copy" style="width: 12px; height: 12px;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z"/><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1"/></svg>
 							<span>Duplicate</span>
 						</button>
@@ -733,11 +877,28 @@ class ProjectsManager {
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
 							<span>JSON</span>
 						</button>
+						${! isDraft ? `
 						<button class="tsl-btn tsl-btn-sm tsl-btn-danger tsl-delete-btn" title="Delete project">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-						</button>
+						</button>` : ''}
 					</div>
 				`;
+
+				// Save Draft button
+				const saveDraftBtn = item.querySelector( '.tsl-save-draft-btn' );
+				if ( saveDraftBtn ) {
+
+					saveDraftBtn.onclick = () => {
+
+						const defaultName = this.tour.playgroundManager.currentExampleName
+							? this.tour.playgroundManager.currentExampleName.replace( /\s*\(Draft\)$/i, '' ).trim()
+							: this.getNextProjectName();
+						this.saveCurrentProject( defaultName );
+						renderList();
+
+					};
+
+				}
 
 				// Load button
 				const loadBtn = item.querySelector( '.tsl-load-btn' );
@@ -757,7 +918,17 @@ class ProjectsManager {
 
 					duplicateBtn.onclick = () => {
 
-						this.duplicateProject( project );
+						if ( isDraft ) {
+
+							const defaultName = this.getNextProjectName();
+							this.saveCurrentProject( defaultName );
+
+						} else {
+
+							this.duplicateProject( project );
+
+						}
+
 						renderList();
 
 					};
@@ -771,21 +942,28 @@ class ProjectsManager {
 
 				};
 
-				// Delete button
-				item.querySelector( '.tsl-delete-btn' ).onclick = () => {
+				// Delete button (only for saved projects)
+				const deleteBtn = item.querySelector( '.tsl-delete-btn' );
+				if ( deleteBtn ) {
 
-					this.deleteProject( project.id );
-					renderList();
+					deleteBtn.onclick = () => {
 
-				};
+						this.deleteProject( project.id );
+						renderList();
 
-				// Inline Rename
+					};
+
+				}
+
+				// Inline Rename / Save
 				const startRename = () => {
 
 					const nameSpan = item.querySelector( '.tsl-project-name' );
 					if ( ! nameSpan || item.querySelector( '.tsl-project-rename-input' ) ) return;
 
-					const oldName = project.name;
+					const oldName = isDraft
+						? ( this.tour.playgroundManager.currentExampleName ? this.tour.playgroundManager.currentExampleName.replace( /\s*\(Draft\)$/i, '' ).trim() : this.getNextProjectName() )
+						: project.name;
 					const input = document.createElement( 'input' );
 					input.type = 'text';
 					input.className = 'tsl-project-rename-input';
@@ -801,7 +979,11 @@ class ProjectsManager {
 						if ( isDone ) return;
 						isDone = true;
 						const newName = input.value.trim();
-						if ( newName && newName !== oldName ) {
+						if ( isDraft ) {
+
+							this.saveCurrentProject( newName || oldName );
+
+						} else if ( newName && newName !== oldName ) {
 
 							this.renameProject( project.id, newName );
 

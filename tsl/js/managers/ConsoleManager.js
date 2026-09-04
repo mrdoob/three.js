@@ -42,7 +42,7 @@ class ConsoleManager {
 			if ( stackTrace && stackTrace.stack && stackTrace.stack.length > 0 ) {
 
 				const frame = stackTrace.stack.find( f => f.file === 'playground-eval.js' );
-				if ( frame ) {
+				if ( frame && frame.line && frame.line > 2 ) {
 
 					line = frame.line - 2;
 					column = frame.column;
@@ -80,13 +80,13 @@ class ConsoleManager {
 			}
 
 			let cleanMsg = msg;
-			if ( line !== null ) {
+			if ( line !== null && ! isNaN( line ) && line > 0 ) {
 
 				cleanMsg = cleanMsg.replace( /\s+(?:["']?[a-zA-Z0-9_$]+\(\)["']?\s+at\s+)?["']?[^"'\s]+\.js:\d+["']?/, '' );
 
 			}
 
-			const displayMessage = line !== null ? `Line ${line}: ${cleanMsg}` : cleanMsg;
+			const displayMessage = ( line !== null && ! isNaN( line ) && line > 0 ) ? `Line ${line}: ${cleanMsg}` : cleanMsg;
 
 			let eventType = 'log';
 			if ( type === 'error' ) eventType = 'error-log';
@@ -154,16 +154,26 @@ class ConsoleManager {
 			let match = stack.match( /playground-eval\.js:(\d+):(\d+)/ );
 			if ( match ) {
 
-				line = parseInt( match[ 1 ] ) - 2;
-				column = parseInt( match[ 2 ] );
+				const parsedLine = parseInt( match[ 1 ] ) - 2;
+				if ( parsedLine > 0 ) {
+
+					line = parsedLine;
+					column = parseInt( match[ 2 ] );
+
+				}
 
 			} else {
 
 				match = stack.match( /<anonymous>:(\d+):(\d+)/ );
 				if ( match ) {
 
-					line = parseInt( match[ 1 ] ) - 2;
-					column = parseInt( match[ 2 ] );
+					const parsedLine = parseInt( match[ 1 ] ) - 2;
+					if ( parsedLine > 0 ) {
+
+						line = parsedLine;
+						column = parseInt( match[ 2 ] );
+
+					}
 
 				}
 
@@ -172,7 +182,7 @@ class ConsoleManager {
 			let cleanMsg = msg.split( '\n' )[ 0 ];
 			cleanMsg = cleanMsg.replace( /\s+["']?eval\(\)["']?\s+at\s+["']?[^"'\s]+\.js:\d+["']?/, '' );
 
-			const displayMessage = line !== null ? `Line ${line}: ${cleanMsg}` : cleanMsg;
+			const displayMessage = ( line !== null && ! isNaN( line ) && line > 0 ) ? `Line ${line}: ${cleanMsg}` : cleanMsg;
 
 			this.tour.runner.dispatchEvent( {
 				type: 'error-log',
