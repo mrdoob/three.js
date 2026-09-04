@@ -13,7 +13,9 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 			uvTex: { value: null },
 			normalStep: { value: new Vector3() },
 			boundsScale: { value: new Vector3( 1, 1, 1 ) },
-			surface: { value: 0 }
+			surface: { value: 0 },
+			pixelScale: { value: 0 },
+			pixelOffset: { value: 0 }
 		};
 
 		this.defines = {
@@ -29,6 +31,8 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 			shader.uniforms.normalStep = this.uniforms.normalStep;
 			shader.uniforms.boundsScale = this.uniforms.boundsScale;
 			shader.uniforms.surface = this.uniforms.surface;
+			shader.uniforms.pixelScale = this.uniforms.pixelScale;
+			shader.uniforms.pixelOffset = this.uniforms.pixelOffset;
 
 			// Add our defines
 			shader.defines = shader.defines || {};
@@ -40,7 +44,9 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 				`#include <common>
 				varying vec3 vLocalPosition;
 				varying vec3 vLocalRayOrigin;
-				varying mat4 vInstanceMatrix;`
+				varying mat4 vInstanceMatrix;
+				varying float vBoundsPerWorld;
+				uniform vec3 boundsScale;`
 			);
 
 			shader.vertexShader = shader.vertexShader.replace(
@@ -55,7 +61,9 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 				// Transform camera position to local space (accounting for instance transform)
 				vLocalRayOrigin = ( inverse( modelMatrix * vInstanceMatrix ) * vec4( cameraPosition, 1.0 ) ).xyz;
 				// Vertex position is already in local space
-				vLocalPosition = position;`
+				vLocalPosition = position;
+				// Bounds units per world unit, to size the pixel footprint in the SDF
+				vBoundsPerWorld = boundsScale.x / length( ( modelMatrix * vInstanceMatrix * vec4( 1.0, 0.0, 0.0, 0.0 ) ).xyz );`
 			);
 
 			// Add custom uniforms and functions to fragment shader
@@ -71,6 +79,9 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 				uniform mat4 modelViewMatrix;
 				uniform mat4 projectionMatrix;
 				uniform float surface;
+				uniform float pixelScale;
+				uniform float pixelOffset;
+				varying float vBoundsPerWorld;
 
 				varying vec3 vLocalPosition;
 				varying vec3 vLocalRayOrigin;
@@ -121,6 +132,11 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 				// Rays that run out of steps within a voxel of the surface still count as hits
 				float voxelSize = max( normalStep.x * boundsScale.x, max( normalStep.y * boundsScale.y, normalStep.z * boundsScale.z ) );
 
+				// Pixel footprint at this distance, in bounds units: distant surfaces need less precision and a coarser mip
+				float footprint = ( pixelScale * length( vViewPosition ) + pixelOffset ) * vBoundsPerWorld;
+				float hitEpsilon = max( SURFACE_EPSILON, 0.5 * footprint );
+				float lod = max( log2( footprint / voxelSize ), 0.0 );
+
 				// Raymarch from the entry point to the back face to find the surface in the SDF
 				bool intersectsSurface = false;
 				vec3 point = backPoint - rayDirection * segment;
@@ -135,8 +151,8 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 					}
 
 					vec3 sdfUV = clamp( point / boundsScale + vec3( 0.5 ), 0.0, 1.0 );
-					distanceToSurface = texture( sdfTex, sdfUV ).r - surface;
-					if ( abs( distanceToSurface ) < SURFACE_EPSILON ) {
+					distanceToSurface = textureLod( sdfTex, sdfUV, lod ).r - surface;
+					if ( abs( distanceToSurface ) < hitEpsilon ) {
 						intersectsSurface = true;
 						break;
 					}
@@ -159,7 +175,7 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 
 				// Surface attributes at the hit point
 				vec3 sdfUV = clamp( localPoint + vec3( 0.5 ), 0.0, 1.0 );
-				vec4 sdfData = texture( sdfTex, sdfUV );
+				vec4 sdfData = textureLod( sdfTex, sdfUV, lod );
 
 				// Surface UVs of the closest point, filtered linearly
 				vec2 sdfTexUv = texture( uvTex, sdfUV ).rg;

@@ -1,8 +1,9 @@
-import { InstancedMesh, BoxGeometry, Matrix4, Vector3, Quaternion } from 'three';
+import { InstancedMesh, BoxGeometry, Matrix4, Vector2, Vector3, Quaternion } from 'three';
 import { VolumeStandardMaterial } from './VolumeStandardMaterial.js';
 import { VolumeGenerator } from './VolumeGenerator.js';
 
 const _boundsMatrix = new Matrix4();
+const _size = new Vector2();
 
 export class InstancedVolume extends InstancedMesh {
 
@@ -89,6 +90,12 @@ export class InstancedVolume extends InstancedMesh {
 		_boundsMatrix.copy( this.inverseBoundsMatrix ).invert();
 		this.material.uniforms.boundsScale.value.setFromMatrixScale( _boundsMatrix );
 		this.material.uniforms.surface.value = this.surface;
+
+		// World size of a pixel: scale * view distance + offset
+		renderer.getDrawingBufferSize( _size );
+		const pixel = 2 / ( camera.projectionMatrix.elements[ 5 ] * _size.y );
+		this.material.uniforms.pixelScale.value = camera.isOrthographicCamera ? 0 : pixel;
+		this.material.uniforms.pixelOffset.value = camera.isOrthographicCamera ? pixel : 0;
 
 		// Automatically use scene.environment if available
 		if ( scene.environment && ! this.material.envMap ) {

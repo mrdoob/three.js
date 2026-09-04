@@ -1,4 +1,4 @@
-import { Data3DTexture, DataUtils, RGBAFormat, RGFormat, FloatType, HalfFloatType, LinearFilter, Matrix4, Vector3, Vector2, Quaternion, Ray, DoubleSide, Triangle, BoxGeometry } from 'three';
+import { Data3DTexture, DataUtils, RGBAFormat, RGFormat, FloatType, HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, Vector3, Vector2, Quaternion, Ray, DoubleSide, Triangle, BoxGeometry } from 'three';
 import { ConvexGeometry } from '../geometries/ConvexGeometry.js';
 
 export class VolumeGenerator {
@@ -84,8 +84,9 @@ export class VolumeGenerator {
 		const sdfTexture = new Data3DTexture( new Uint16Array( dim ** 3 * 4 ), dim, dim, dim );
 		sdfTexture.format = RGBAFormat;
 		sdfTexture.type = HalfFloatType;
-		sdfTexture.minFilter = LinearFilter;
+		sdfTexture.minFilter = LinearMipmapLinearFilter;
 		sdfTexture.magFilter = LinearFilter;
+		sdfTexture.generateMipmaps = true;
 
 		// Surface UVs, sampled once at the hit
 		const uvTexture = new Data3DTexture( new Float32Array( dim ** 3 * 2 ), dim, dim, dim );
