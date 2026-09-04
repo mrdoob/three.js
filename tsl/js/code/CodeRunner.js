@@ -235,7 +235,7 @@ function processExportDeclarations( code ) {
 
 				node.specifiers.forEach( spec => {
 
-					const local = spec.local ? spec.local.name : spec.local.value;
+					const local = spec.local ? ( spec.local.name || spec.local.value ) : null;
 					const exported = spec.exported ? ( spec.exported.name || spec.exported.value ) : local;
 					exportedSymbols.push( { local, export: exported } );
 
@@ -679,7 +679,6 @@ class CodeRunner extends EventDispatcher {
 					const importPromises = importDeclarations.map( async ( decl ) => {
 
 						const moduleName = decl.moduleName;
-						const fullMatch = decl.fullMatch;
 
 						let moduleObj = this.imports[ moduleName ];
 						if ( ! moduleObj ) {
@@ -920,7 +919,6 @@ class CodeRunner extends EventDispatcher {
 			for ( const decl of importDeclarations ) {
 
 				const moduleName = decl.moduleName;
-				const fullMatch = decl.fullMatch;
 
 				const isStandard = isStandardModule( moduleName, this.imports );
 				if ( ! isStandard ) {

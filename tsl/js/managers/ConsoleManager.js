@@ -182,7 +182,7 @@ class ConsoleManager {
 			let cleanMsg = msg.split( '\n' )[ 0 ];
 			cleanMsg = cleanMsg.replace( /\s+["']?eval\(\)["']?\s+at\s+["']?[^"'\s]+\.js:\d+["']?/, '' );
 
-			const displayMessage = ( line !== null && ! isNaN( line ) && line > 0 ) ? `Line ${line}: ${cleanMsg}` : cleanMsg;
+			const displayMessage = ( typeof line === 'number' && line > 0 ) ? `Line ${line}: ${cleanMsg}` : cleanMsg;
 
 			this.tour.runner.dispatchEvent( {
 				type: 'error-log',
