@@ -2,6 +2,8 @@ import { InstancedMesh, BoxGeometry, Matrix4, Vector3, Quaternion } from 'three'
 import { VolumeStandardMaterial } from './VolumeStandardMaterial.js';
 import { VolumeGenerator } from './VolumeGenerator.js';
 
+const _boundsMatrix = new Matrix4();
+
 export class InstancedVolume extends InstancedMesh {
 
 	constructor( count, params = {} ) {
@@ -79,7 +81,8 @@ export class InstancedVolume extends InstancedMesh {
 		// Update custom uniforms
 		this.material.uniforms.sdfTex.value = this.sdfTexture;
 		this.material.uniforms.normalStep.value.set( depth, depth, depth );
-		this.material.uniforms.boundsScale.value.copy( this.scale );
+		_boundsMatrix.copy( this.inverseBoundsMatrix ).invert();
+		this.material.uniforms.boundsScale.value.setFromMatrixScale( _boundsMatrix );
 		this.material.uniforms.surface.value = this.surface;
 
 		// Automatically use scene.environment if available

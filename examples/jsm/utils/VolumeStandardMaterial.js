@@ -90,42 +90,33 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 			shader.fragmentShader = shader.fragmentShader.replace(
 				'void main() {',
 				`void main() {
-				// Raymarch in bounds space (mesh units), where the SDF distances are measured
-				vec3 rayOrigin = vLocalRayOrigin * boundsScale;
-				vec3 rayDirection = normalize( ( vLocalPosition - vLocalRayOrigin ) * boundsScale );
-				vec3 boundsMin = - 0.5 * boundsScale;
-				vec3 boundsMax = 0.5 * boundsScale;
+				// Raymarch in bounds space (mesh units), where the SDF distances are measured.
+				// The segment is built from the back face fragment so it stays precise for distant cameras.
+				vec3 cameraPoint = vLocalRayOrigin * boundsScale;
+				vec3 backPoint = vLocalPosition * boundsScale;
+				vec3 rayDirection = normalize( backPoint - cameraPoint );
 
-				// Find intersection with SDF bounds
-				vec2 boxIntersectionInfo = rayBoxDist( boundsMin, boundsMax, rayOrigin, rayDirection );
-
-				// Start from the entry point (or camera if inside)
-				float distToBox = max( boxIntersectionInfo.x, 0.0 );
-
-				// Compute distance to back face (current fragment position)
-				float distToBackFace = length( vLocalPosition * boundsScale - rayOrigin );
+				// Distance from the back face to the entry face, or to the camera if it is inside the box
+				float segment = rayBoxDist( - 0.5 * boundsScale, 0.5 * boundsScale, backPoint, - rayDirection ).y;
+				segment = min( segment, length( backPoint - cameraPoint ) );
 
 				// Rays that run out of steps within a voxel of the surface still count as hits
 				float voxelSize = max( normalStep.x * boundsScale.x, max( normalStep.y * boundsScale.y, normalStep.z * boundsScale.z ) );
 
-				// Raymarch from entry to back face to find surface in SDF
+				// Raymarch from the entry point to the back face to find the surface in the SDF
 				bool intersectsSurface = false;
-				vec3 point = rayOrigin + rayDirection * distToBox;
-				float marchDist = distToBox;
+				vec3 point = backPoint - rayDirection * segment;
+				float marchDist = 0.0;
 				float distanceToSurface = 2.0 * voxelSize;
 
 				for ( int i = 0; i < MAX_STEPS; i ++ ) {
 
 					// Stop if we've reached the back face
-					if ( marchDist >= distToBackFace ) {
+					if ( marchDist >= segment ) {
 						break;
 					}
 
-					vec3 sdfUV = point / boundsScale + vec3( 0.5 );
-					if ( sdfUV.x < 0.0 || sdfUV.x > 1.0 || sdfUV.y < 0.0 || sdfUV.y > 1.0 || sdfUV.z < 0.0 || sdfUV.z > 1.0 ) {
-						break;
-					}
-
+					vec3 sdfUV = clamp( point / boundsScale + vec3( 0.5 ), 0.0, 1.0 );
 					distanceToSurface = texture( sdfTex, sdfUV ).r - surface;
 					if ( abs( distanceToSurface ) < SURFACE_EPSILON ) {
 						intersectsSurface = true;
