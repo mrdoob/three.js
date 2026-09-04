@@ -287,7 +287,7 @@ function radToDeg( radians ) {
  */
 function isPowerOfTwo( value ) {
 
-	return ( value & ( value - 1 ) ) === 0 && value !== 0;
+	return value > 0 && Number.isInteger( value ) && 2 ** Math.round( Math.log2( value ) ) === value;
 
 }
 
