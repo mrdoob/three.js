@@ -1,24 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - sculpt</title>
+		<title>three.js webgpu - sculpt</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 		<style>
-			canvas { cursor: none; }
+			canvas.sculpt-canvas { cursor: none; }
 		</style>
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - sculpt
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Sculpt</span>
+			</div>
+
+			<small>
+				Dynamic-topology mesh sculpting with WebGPU.
+			</small>
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -26,11 +36,13 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 			import { Sculptor } from 'three/addons/misc/Sculptor.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let renderer, scene, camera, controls, sculptor, mesh;
 			let cursorGroup, cursorRing, cursorDot, cursorMaterial;
@@ -81,10 +93,12 @@
 
 				// Renderer
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				renderer.domElement.classList.add( 'sculpt-canvas' );
 				document.body.appendChild( renderer.domElement );
 
 				// Scene
@@ -193,42 +207,53 @@
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.1;
 
-				// GUI
+				// Inspector
 
+				const tools = {
+					Clay: 'clay',
+					Brush: 'brush',
+					Inflate: 'inflate',
+					Smooth: 'smooth',
+					Flatten: 'flatten',
+					Pinch: 'pinch',
+					Crease: 'crease',
+					Drag: 'drag',
+					Scale: 'scale'
+				};
 				const params = {
 					tool: sculptor.getTool(),
 					size: sculptor.getSize(),
 					strength: sculptor.getStrength(),
 					detail: sculptor.getDetail(),
-					negative: sculptor.getNegative(),
-					wireframe: false,
-					export: exportGLTF
+					negative: sculptor.getNegative()
 				};
+				const actions = { export: exportGLTF };
+				const gui = renderer.inspector.createParameters( 'Sculptor' );
 
-				const gui = new GUI();
-
-				gui.add( params, 'tool', [ 'clay', 'brush', 'inflate', 'smooth', 'flatten', 'pinch', 'crease', 'drag', 'scale' ] ).onChange( function ( value ) {
+				gui.add( params, 'tool', tools ).onChange( function ( value ) {
 
 					sculptor.setTool( value );
 					params.size = sculptor.getSize();
 					params.strength = sculptor.getStrength();
 					params.negative = sculptor.getNegative();
-					sizeController.updateDisplay();
-					strengthController.updateDisplay();
-					negativeController.updateDisplay();
-					updateToolControllers();
 
 				} );
 
-				const sizeController = gui.add( params, 'size', 5, 500, 1 ).onChange( function ( value ) {
+				gui.add( params, 'size', 5, 500, 1 ).listen().onChange( function ( value ) {
 
 					sculptor.setSize( value );
 
 				} );
 
-				const strengthController = gui.add( params, 'strength', 0, 1 ).onChange( function ( value ) {
+				gui.add( params, 'strength', 0, 1 ).listen().onChange( function ( value ) {
 
 					sculptor.setStrength( value );
+
+				} );
+
+				gui.add( params, 'negative' ).listen().onChange( function ( value ) {
+
+					sculptor.setNegative( value );
 
 				} );
 
@@ -238,32 +263,12 @@
 
 				} );
 
-				const negativeController = gui.add( params, 'negative' ).onChange( function ( value ) {
+				gui.add( mesh.material, 'wireframe' ).onChange( function () {
 
-					sculptor.setNegative( value );
-
-				} );
-
-				gui.add( params, 'wireframe' ).onChange( function ( value ) {
-
-					mesh.material.wireframe = value;
+					mesh.material.needsUpdate = true;
 
 				} );
-
-				gui.add( params, 'export' );
-
-				function updateToolControllers() {
-
-					const tool = sculptor.getTool();
-					const hasStrength = tool !== 'drag' && tool !== 'scale';
-					const hasNegative = tool !== 'smooth' && hasStrength;
-
-					strengthController.enable( hasStrength );
-					negativeController.enable( hasNegative );
-
-				}
-
-				updateToolControllers();
+				gui.add( actions, 'export' ).name( 'export GLB' );
 
 				// 3D Cursor
 
