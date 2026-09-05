@@ -344,16 +344,29 @@ class MaterialXNode {
 		textureNode.flipY = false;
 		this.materialX.textureCache.set( textureCacheKey, textureNode );
 
-		loader.load( resolvedURI, ( imageData ) => {
+		const nodeName = this.name;
+		const materialX = this.materialX;
 
-			textureNode.image = imageData;
-			textureNode.needsUpdate = true;
+		materialX.pendingResources.push( new Promise( ( resolveLoad ) => {
 
-		}, undefined, () => {
+			loader.load( resolvedURI, ( imageData ) => {
 
-			throw new Error( `Failed to load texture "${resolvedURI}".` );
+				textureNode.image = imageData;
+				textureNode.needsUpdate = true;
+				resolveLoad();
 
-		} );
+			}, undefined, () => {
+
+				materialX.log.add(
+					MaterialXLogCodes.TEXTURE_LOAD_FAILED,
+					`Failed to load texture "${resolvedURI}".`,
+					nodeName,
+				);
+				resolveLoad();
+
+			} );
+
+		} ) );
 
 		return textureNode;
 
@@ -453,7 +466,7 @@ class MaterialXNode {
 
 			}
 
-			node = this.materialX.compileContext.mxToBottomLeftUvSpace( uv( index ) );
+			node = this.materialX.compileContext.getTexcoordNode( index );
 
 		} else {
 
@@ -718,6 +731,11 @@ class MaterialXNode {
 
 			shaderProperties.setMaterial( material );
 
+			// Keep the raw MaterialX graph reachable for tools that need to
+			// inspect it before the compiled TSL graph loses authoring intent.
+			material.materialXSurfaceShaderNode = shaderProperties;
+			material.materialXDocument = this.materialX;
+
 		}
 
 		return material;
@@ -797,12 +815,14 @@ class MaterialXDocument {
 		this.textureLoader.setOptions( { imageOrientation: 'none' } );
 		this.textureLoader.setPath( path );
 		this.textureCache = new Map();
+		this.pendingResources = [];
 		const bottomLeftUvSpaceHelpers = getBottomLeftUvSpaceHelpers( this.uvSpace );
 
 		this.compileContext = {
 			compileRegistry: COMPILE_REGISTRY,
 			nodeLibrary: MtlXLibrary,
 			...bottomLeftUvSpaceHelpers,
+			getTexcoordNode: ( index = 0 ) => bottomLeftUvSpaceHelpers.mxToBottomLeftUvSpace( uv( index ) ),
 			mxTransformUv: mx_transform_uv,
 			mxHextileCoord,
 			mxHextileComputeBlendWeights,
@@ -823,6 +843,12 @@ class MaterialXDocument {
 		}
 
 		return uri;
+
+	}
+
+	waitForResources() {
+
+		return Promise.all( this.pendingResources ).then( () => undefined );
 
 	}
 
