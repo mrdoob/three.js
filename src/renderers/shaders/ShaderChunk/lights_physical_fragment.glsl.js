@@ -11,6 +11,20 @@ material.roughness = max( roughnessFactor, 0.0525 );// 0.0525 corresponds to the
 material.roughness += geometryRoughness;
 material.roughness = min( material.roughness, 1.0 );
 
+#ifdef USE_DIFFUSE_ROUGHNESS
+
+	float diffuseRoughnessFactor = diffuseRoughness;
+
+	#ifdef USE_DIFFUSE_ROUGHNESSMAP
+
+		diffuseRoughnessFactor *= texture2D( diffuseRoughnessMap, vDiffuseRoughnessMapUv ).r;
+
+	#endif
+
+	material.diffuseRoughness = saturate( diffuseRoughnessFactor );
+
+#endif
+
 #ifdef IOR
 
 	material.ior = ior;

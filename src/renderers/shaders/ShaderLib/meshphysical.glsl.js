@@ -95,6 +95,14 @@ uniform float opacity;
 	uniform float clearcoatRoughness;
 #endif
 
+#ifdef USE_DIFFUSE_ROUGHNESS
+	uniform float diffuseRoughness;
+
+	#ifdef USE_DIFFUSE_ROUGHNESSMAP
+		uniform sampler2D diffuseRoughnessMap;
+	#endif
+#endif
+
 #ifdef USE_DISPERSION
 	uniform float dispersion;
 #endif
