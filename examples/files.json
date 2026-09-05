@@ -200,6 +200,7 @@
 		"webgl_renderer_pathtracer",
 		"webgl_refraction",
 		"webgl_rtt",
+		"webgl_sculpt",
 		"webgl_shader",
 		"webgl_shader_lava",
 		"webgl_shaders_ocean",
@@ -475,6 +476,7 @@
 		"webgpu_reversed_depth_buffer",
 		"webgpu_rtt",
 		"webgpu_sandbox",
+		"webgpu_sculpt",
 		"webgpu_shadertoy",
 		"webgpu_shadow_contact",
 		"webgpu_shadowmap",
@@ -566,7 +568,8 @@
 		"webxr_xr_dragging_custom_depth",
 		"webxr_xr_haptics",
 		"webxr_xr_marchingcubes",
-		"webxr_xr_paint"
+		"webxr_xr_paint",
+		"webxr_xr_sculpt"
 	],
 	"games": [
 		"games_fps"

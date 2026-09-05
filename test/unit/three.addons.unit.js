@@ -14,6 +14,7 @@ import './addons/loaders/SPLATLoader.tests.js';
 import './addons/loaders/SPZLoader.tests.js';
 import './addons/loaders/USDLoader.tests.js';
 import './addons/exporters/USDZExporter.tests.js';
+import './addons/misc/Sculptor.tests.js';
 import './addons/tsl/WebGLNodesHandler.tests.js';
 import './addons/tsl/GPUTest.tests.js';
 import './addons/tsl/GPUAtomicsStorage.tests.js';
