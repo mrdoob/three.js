@@ -1,0 +1,17 @@
+services:
+  dev:
+    image: docker.io/library/node:22-bookworm
+    working_dir: /three.js
+    volumes:
+      - .:/three.js
+    ports:
+      - "8080:8080"
+    command: bash -c "npm ci && npm start"
+
+  test:
+    image: ghcr.io/puppeteer/puppeteer:latest
+    user: root
+    working_dir: /three.js
+    volumes:
+      - .:/three.js
+    command: bash -c "npm ci && npm test"
