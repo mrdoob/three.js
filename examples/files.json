@@ -305,6 +305,7 @@
 		"webgl_tsl_instancing"
 	],
 	"webgpu": [
+		"webgpu_alu_stresstest",
 		"webgpu_animation_retargeting",
 		"webgpu_animation_retargeting_readyplayer",
 		"webgpu_backdrop",

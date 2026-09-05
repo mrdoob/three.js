@@ -34,6 +34,8 @@ class ConstNode extends InputNode {
 		 */
 		this.isConstNode = true;
 
+		this.precisionContext = true;
+
 	}
 
 	/**
@@ -52,7 +54,10 @@ class ConstNode extends InputNode {
 
 		const type = this.getNodeType( builder );
 
-		if ( _regNum.test( type ) && _regNum.test( output ) ) {
+		const isNumericType = _regNum.test( type ) || type === 'half';
+		const isNumericOutput = _regNum.test( output ) || output === 'half';
+
+		if ( isNumericType && isNumericOutput ) {
 
 			return builder.generateConst( output, this.value );
 

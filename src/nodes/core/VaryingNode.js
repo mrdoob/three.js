@@ -57,6 +57,14 @@ class VaryingNode extends Node {
 		this.isVaryingNode = true;
 
 		/**
+		 * Varying declarations keep their logical type in precision contexts.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.precisionContext = false;
+
+		/**
 		 * The interpolation type of the varying data.
 		 *
 		 * @type {?string}

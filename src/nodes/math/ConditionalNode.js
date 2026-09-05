@@ -127,10 +127,12 @@ class ConditionalNode extends Node {
 		const type = this.getNodeType( builder );
 
 		const nodeData = builder.getDataFromNode( this );
+		const precisionCacheKey = builder.getPrecisionCacheKey ? builder.getPrecisionCacheKey( this ) : 'default';
+		const nodeProperties = nodeData.nodeProperty || ( nodeData.nodeProperty = {} );
 
-		if ( nodeData.nodeProperty !== undefined ) {
+		if ( nodeProperties[ precisionCacheKey ] !== undefined ) {
 
-			return nodeData.nodeProperty;
+			return nodeProperties[ precisionCacheKey ];
 
 		}
 
@@ -140,7 +142,7 @@ class ConditionalNode extends Node {
 		const needsOutput = output !== 'void';
 		const nodeProperty = needsOutput ? property( type ).build( builder ) : '';
 
-		nodeData.nodeProperty = nodeProperty;
+		nodeProperties[ precisionCacheKey ] = nodeProperty;
 
 		const nodeSnippet = condNode.build( builder, 'bool' );
 		const isUniformFlow = builder.context.uniformFlow;
