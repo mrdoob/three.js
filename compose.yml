@@ -15,3 +15,12 @@ services:
     volumes:
       - .:/three.js
     command: bash -c "npm ci && npm test"
+
+  e2e:
+    image: ghcr.io/puppeteer/puppeteer:latest
+    user: root
+    shm_size: 2gb
+    working_dir: /three.js
+    volumes:
+      - .:/three.js
+    command: bash -c "apt-get update && apt-get install -y mesa-vulkan-drivers && npm ci && npm run test-e2e"
