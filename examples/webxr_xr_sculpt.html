@@ -28,16 +28,16 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { XRButton } from 'three/addons/webxr/XRButton.js';
 			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
-			import { Sculpt } from 'three/addons/sculpt/Sculpt.js';
+			import { Sculptor } from 'three/addons/misc/Sculptor.js';
 
 			let renderer, scene, camera, controls;
 			let controller1, controller2, controllerGrip1, controllerGrip2;
-			let sculpt, mesh;
+			let sculptor, mesh;
 			let cursor1, cursor2;
 
-			const tools = [ 'brush', 'inflate', 'smooth', 'flatten', 'pinch', 'crease' ];
+			const tools = [ 'clay', 'brush', 'inflate', 'smooth', 'flatten', 'pinch', 'crease' ];
 			let toolIndex = 0;
-			let brushRadius = 0.06;
+			const brushRadius = 0.06;
 
 			const _origin = new THREE.Vector3();
 			const _direction = new THREE.Vector3();
@@ -88,7 +88,8 @@
 
 				// Mesh
 
-				const geometry = new THREE.IcosahedronGeometry( 0.3, 5 );
+				// Match the starting edge length to the default topology target.
+				const geometry = new THREE.IcosahedronGeometry( 0.3, 24 );
 				const material = new THREE.MeshStandardMaterial( {
 					color: 0xcc6644,
 					roughness: 0.4,
@@ -98,12 +99,10 @@
 				mesh.position.set( 0, 1, 0 );
 				scene.add( mesh );
 
-				// Sculpt
+				// Sculptor
 
-				sculpt = new Sculpt( mesh, camera, renderer.domElement );
-				sculpt.tool = tools[ toolIndex ];
-				sculpt.intensity = 0.5;
-				sculpt.subdivision = 0.75;
+				sculptor = new Sculptor( mesh, camera )
+					.setTool( tools[ toolIndex ] );
 
 				// Controllers
 
@@ -118,23 +117,48 @@
 				function onSelectEnd() {
 
 					this.userData.isSelecting = false;
-					sculpt.endStroke();
+					sculptor.endStroke();
 
 				}
 
 				function onSqueezeStart() {
 
-					sculpt.negative = ! sculpt.negative;
+					sculptor.setNegative( ! sculptor.getNegative() );
+
+				}
+
+				function onConnected( event ) {
+
+					this.userData.inputSource = event.data;
+					this.userData.thumbMoved = false;
+
+				}
+
+				function onDisconnected() {
+
+					this.userData.inputSource = null;
+					this.userData.thumbMoved = false;
+
+					if ( this.userData.isSelecting ) {
+
+						this.userData.isSelecting = false;
+						sculptor.endStroke();
+
+					}
 
 				}
 
 				controller1 = renderer.xr.getController( 0 );
+				controller1.addEventListener( 'connected', onConnected );
+				controller1.addEventListener( 'disconnected', onDisconnected );
 				controller1.addEventListener( 'selectstart', onSelectStart );
 				controller1.addEventListener( 'selectend', onSelectEnd );
 				controller1.addEventListener( 'squeezestart', onSqueezeStart );
 				scene.add( controller1 );
 
 				controller2 = renderer.xr.getController( 1 );
+				controller2.addEventListener( 'connected', onConnected );
+				controller2.addEventListener( 'disconnected', onDisconnected );
 				controller2.addEventListener( 'selectstart', onSelectStart );
 				controller2.addEventListener( 'selectend', onSelectEnd );
 				controller2.addEventListener( 'squeezestart', onSqueezeStart );
@@ -193,29 +217,33 @@
 
 			function handleController( controller, cursor ) {
 
+				const inputSource = controller.userData.inputSource;
+
+				if ( ! inputSource ) {
+
+					cursor.visible = false;
+					return;
+
+				}
+
 				controller.updateMatrixWorld( true );
 
 				// Get ray from controller
 				_origin.set( 0, 0, 0 ).applyMatrix4( controller.matrixWorld );
 				_direction.set( 0, 0, - 1 ).transformDirection( controller.matrixWorld );
 
-				if ( controller.userData.isSelecting ) {
+				const hit = controller.userData.isSelecting ?
+					sculptor.strokeFromRay( _origin, _direction, brushRadius ) :
+					sculptor.pickFromRay( _origin, _direction, brushRadius );
 
-					const hit = sculpt.strokeFromRay( _origin, _direction, brushRadius );
-					if ( hit ) {
+				if ( hit ) {
 
-						// Show cursor at intersection point (transform from local to world)
-						const ip = sculpt.hitPoint;
-						cursor.position.set( ip[ 0 ], ip[ 1 ], ip[ 2 ] );
-						cursor.position.applyMatrix4( mesh.matrixWorld );
-						cursor.scale.setScalar( brushRadius );
-						cursor.visible = true;
-
-					} else {
-
-						cursor.visible = false;
-
-					}
+					// Show cursor at intersection point (transform from local to world)
+					const hitPoint = sculptor.getHitPoint();
+					cursor.position.set( hitPoint[ 0 ], hitPoint[ 1 ], hitPoint[ 2 ] );
+					cursor.position.applyMatrix4( mesh.matrixWorld );
+					cursor.scale.setScalar( brushRadius );
+					cursor.visible = true;
 
 				} else {
 
@@ -224,31 +252,21 @@
 				}
 
 				// Handle thumbstick for tool cycling
-				const session = renderer.xr.getSession();
-				if ( session ) {
+				if ( inputSource.gamepad ) {
 
-					const sources = session.inputSources;
-					for ( let i = 0; i < sources.length; i ++ ) {
+					const axes = inputSource.gamepad.axes;
+					if ( axes.length >= 4 ) {
 
-						const source = sources[ i ];
-						if ( source.handedness === ( controller === controller1 ? 'left' : 'right' ) ) continue;
-						if ( ! source.gamepad ) continue;
+						const thumbX = axes[ 2 ];
+						if ( ! controller.userData.thumbMoved && Math.abs( thumbX ) > 0.8 ) {
 
-						const axes = source.gamepad.axes;
-						if ( axes.length >= 4 ) {
+							controller.userData.thumbMoved = true;
+							toolIndex = ( toolIndex + ( thumbX > 0 ? 1 : tools.length - 1 ) ) % tools.length;
+							sculptor.setTool( tools[ toolIndex ] );
 
-							const thumbX = axes[ 2 ];
-							if ( ! controller.userData.thumbMoved && Math.abs( thumbX ) > 0.8 ) {
+						} else if ( Math.abs( thumbX ) < 0.3 ) {
 
-								controller.userData.thumbMoved = true;
-								toolIndex = ( toolIndex + ( thumbX > 0 ? 1 : tools.length - 1 ) ) % tools.length;
-								sculpt.tool = tools[ toolIndex ];
-
-							} else if ( Math.abs( thumbX ) < 0.3 ) {
-
-								controller.userData.thumbMoved = false;
-
-							}
+							controller.userData.thumbMoved = false;
 
 						}
 

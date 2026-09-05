@@ -476,6 +476,7 @@
 		"webgpu_reversed_depth_buffer",
 		"webgpu_rtt",
 		"webgpu_sandbox",
+		"webgpu_sculpt",
 		"webgpu_shadertoy",
 		"webgpu_shadow_contact",
 		"webgpu_shadowmap",
