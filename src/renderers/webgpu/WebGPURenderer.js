@@ -1,5 +1,4 @@
 import Renderer from '../common/Renderer.js';
-import WebGLBackend from '../webgl-fallback/WebGLBackend.js';
 import WebGPUBackend from './WebGPUBackend.js';
 import StandardNodeLibrary from './nodes/StandardNodeLibrary.js';
 import { warn } from '../../utils.js';
@@ -39,6 +38,7 @@ class WebGPURenderer extends Renderer {
 	 * @property {boolean} [antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
 	 * @property {number} [samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
 	 * @property {boolean} [forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
+	 * The WebGL 2 backend is loaded on demand during `init()`.
 	 * @property {boolean} [multiview=false] - If set to `true`, the renderer will use multiview during WebXR rendering if supported.
 	 * @property {number} [outputType=undefined] - Texture type for output to canvas. By default, device's preferred format is used; other formats may incur overhead.
 	 * @property {number} [outputBufferType=HalfFloatType] - Defines the type of output buffers. The default `HalfFloatType` is recommend for best
@@ -52,27 +52,17 @@ class WebGPURenderer extends Renderer {
 	 */
 	constructor( parameters = {} ) {
 
-		let BackendClass;
+		const backend = new WebGPUBackend( parameters );
 
-		if ( parameters.forceWebGL ) {
+		parameters.getFallback = async () => {
 
-			BackendClass = WebGLBackend;
+			if ( backend.parameters.forceWebGL !== true ) warn( 'WebGPURenderer: WebGPU is not available, running under WebGL2 backend.' );
 
-		} else {
+			const { WebGLBackend } = await import( '../../Three.WebGPU.Fallback.js' );
 
-			BackendClass = WebGPUBackend;
+			return new WebGLBackend( parameters );
 
-			parameters.getFallback = () => {
-
-				warn( 'WebGPURenderer: WebGPU is not available, running under WebGL2 backend.' );
-
-				return new WebGLBackend( parameters );
-
-			};
-
-		}
-
-		const backend = new BackendClass( parameters );
+		};
 
 		//super( new Proxy( backend, debugHandler ) );
 		super( backend, parameters );
