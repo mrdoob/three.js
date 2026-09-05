@@ -150,6 +150,20 @@ export const samplePreviousDepth = Fn( ( [ previousDepthNode, uv, previousCamera
 
 } );
 
+/**
+ * Computes a sequence of Halton(2, 3) jitter offsets in the range [0, 1].
+ *
+ * @private
+ * @function
+ * @param {number} length - The number of offsets.
+ * @return {Array<Array<number>>} The jitter offsets.
+ */
+export function computeHaltonOffsets( length ) {
+
+	return Array.from( { length }, ( _, index ) => [ halton( index + 1, 2 ), halton( index + 1, 3 ) ] );
+
+}
+
 const currentDepthStruct = struct( {
 	closestDepth: 'float',
 	closestPositionTexel: 'vec2',
@@ -163,3 +177,19 @@ const logarithmicToPerspectiveDepth = ( depth, cameraNearFar ) => {
 	return viewZToPerspectiveDepth( viewZ, near, far );
 
 };
+
+function halton( index, base ) {
+
+	let fraction = 1;
+	let result = 0;
+	while ( index > 0 ) {
+
+		fraction /= base;
+		result += fraction * ( index % base );
+		index = Math.floor( index / base );
+
+	}
+
+	return result;
+
+}

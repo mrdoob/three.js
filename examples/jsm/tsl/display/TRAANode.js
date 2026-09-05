@@ -1,6 +1,6 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture, FloatType } from 'three/webgpu';
 import { float, Fn, max, texture, uniform, uv, vec2, convertToTexture, passTexture, velocity, ivec2, mix, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
-import { clipAABB, flickerReduction, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
+import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -335,7 +335,7 @@ class TRAANode extends TempNode {
 		// update jitter index
 
 		this._jitterIndex ++;
-		this._jitterIndex = this._jitterIndex % ( _haltonOffsets.length - 1 );
+		this._jitterIndex = this._jitterIndex % _haltonOffsets.length;
 
 	}
 
@@ -625,26 +625,7 @@ class TRAANode extends TempNode {
 
 export default TRAANode;
 
-function _halton( index, base ) {
-
-	let fraction = 1;
-	let result = 0;
-	while ( index > 0 ) {
-
-		fraction /= base;
-		result += fraction * ( index % base );
-		index = Math.floor( index / base );
-
-	}
-
-	return result;
-
-}
-
-const _haltonOffsets = /*@__PURE__*/ Array.from(
-	{ length: 32 },
-	( _, index ) => [ _halton( index + 1, 2 ), _halton( index + 1, 3 ) ]
-);
+const _haltonOffsets = /*@__PURE__*/ computeHaltonOffsets( 32 );
 
 /**
  * TSL function for creating a TRAA node for Temporal Reprojection Anti-Aliasing.
