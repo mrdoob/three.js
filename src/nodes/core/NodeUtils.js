@@ -461,6 +461,12 @@ export function getDataFromObject( object ) {
  */
 export function arrayBufferToBase64( arrayBuffer ) {
 
+	if ( typeof Uint8Array.prototype.toBase64 === 'function' ) {
+
+		return new Uint8Array( arrayBuffer ).toBase64();
+
+	}
+
 	let chars = '';
 
 	const array = new Uint8Array( arrayBuffer );
@@ -484,6 +490,12 @@ export function arrayBufferToBase64( arrayBuffer ) {
  * @return {ArrayBuffer} The array buffer.
  */
 export function base64ToArrayBuffer( base64 ) {
+
+	if ( typeof Uint8Array.fromBase64 === 'function' ) {
+
+		return Uint8Array.fromBase64( base64 ).buffer;
+
+	}
 
 	return Uint8Array.from( atob( base64 ), c => c.charCodeAt( 0 ) ).buffer;
 
