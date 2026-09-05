@@ -43,6 +43,17 @@ If you’d like to make a build of the source files (e.g. `build/three.module.js
 
     npm run build
 
+### Containerized alternative (optional)
+
+If you prefer not to install Node.js on your machine, a compose file is provided for Docker and Podman:
+
+    docker compose up -d dev    # dev server at http://localhost:8080, rebuilds on change
+    docker compose run test     # npm test (lint + unit tests) in a clean container
+    docker compose run e2e      # npm run test-e2e (see note above about CI)
+    docker compose down         # stop everything
+
+The ~200 MB Chromium needed by the unit tests stays inside the container image instead of being installed on your machine. The regular `npm ci` workflow above is unaffected.
+
 ## Making changes
 
 When you’ve decided to make changes, start with the following:
