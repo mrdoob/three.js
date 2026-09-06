@@ -113,6 +113,10 @@ class SunShadowNode extends ShadowNode {
 	 */
 	_setupCascades( builder ) {
 
+		// Cascaded shadows can resize their textures, so receiving materials need full node updates.
+
+		builder.observer.hasNode = true;
+
 		const { renderer, camera } = builder;
 		const { shadow } = this;
 
