@@ -114,7 +114,7 @@ class SplitNode extends Node {
 
 	setup( builder ) {
 
-		if ( builder.context.assign !== true && this.components === 'w' ) {
+		if ( this.components === 'w' && builder.context.assign !== true ) {
 
 			const type = builder.getVectorType( this.node.getNodeType( builder ) );
 			const length = builder.getTypeLength( type );
@@ -135,9 +135,9 @@ class SplitNode extends Node {
 
 	generate( builder, output ) {
 
-		const outputNode = builder.getNodeProperties( this ).outputNode;
+		const { outputNode } = builder.getNodeProperties( this );
 
-		if ( outputNode !== null && outputNode !== undefined ) {
+		if ( outputNode ) {
 
 			return outputNode.build( builder, output );
 

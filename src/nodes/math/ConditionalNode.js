@@ -68,12 +68,13 @@ class ConditionalNode extends Node {
 	 */
 	generateNodeType( builder ) {
 
-		const { ifNode, elseNode } = this.getProperties( builder );
+		const properties = this.getProperties( builder );
+		const { ifNode, elseNode } = properties;
 
 		const ifType = ifNode.getNodeType( builder );
 		const elseType = elseNode !== null ? elseNode.getNodeType( builder ) : 'void';
 
-		if ( ( ifType === null || elseType === null ) && builder.getNodeProperties( this ).initialized !== true ) {
+		if ( ( ifType === null || elseType === null ) && properties.initialized !== true ) {
 
 			// Some custom nodes and statement blocks still need setup to resolve a type.
 			builder.flowBuildStage( this, 'setup' );
@@ -81,13 +82,7 @@ class ConditionalNode extends Node {
 
 		}
 
-		if ( builder.getTypeLength( elseType ) > builder.getTypeLength( ifType ) ) {
-
-			return elseType;
-
-		}
-
-		return ifType;
+		return builder.getTypeLength( elseType ) > builder.getTypeLength( ifType ) ? elseType : ifType;
 
 	}
 

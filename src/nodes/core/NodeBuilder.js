@@ -2549,15 +2549,9 @@ class NodeBuilder {
 
 			this.currentFunctionNode = fn;
 
+			// Reference parameters can expose writes even when the return value is unused.
+			fn._isPure = shaderNode.layout.inputs.every( input => /^(?:float|int|uint|bool|[biu]?vec[234]|mat[234])$/.test( input.type ) );
 			fn.code = this.buildFunctionCode( shaderNode );
-
-			// Only value parameters can be discarded with an unused function result.
-			// Pointer and other reference parameters may expose writes to the caller.
-			if ( shaderNode.layout.inputs.some( input => /^(?:float|int|uint|bool|[biu]?vec[234]|mat[234])$/.test( input.type ) === false ) ) {
-
-				fn._isPure = false;
-
-			}
 
 			this.currentFunctionNode = previous;
 
@@ -2673,11 +2667,11 @@ class NodeBuilder {
 
 			flow.result = node.build( this, output );
 
-			if ( buildStage === 'generate' && this.currentFunctionNode !== null ) {
+		}
 
-				this.currentFunctionNode._isPure = isNodePure( this, node, true );
+		if ( this.currentFunctionNode?._isPure === true ) {
 
-			}
+			this.currentFunctionNode._isPure = isNodePure( this, node, true );
 
 		}
 
