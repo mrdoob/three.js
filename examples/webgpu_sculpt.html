@@ -63,8 +63,10 @@
 			function exportGLTF() {
 
 				const exporter = new GLTFExporter();
+				const snapshot = mesh.clone();
+				snapshot.geometry = sculptor.getGeometry();
 
-				exporter.parse( mesh, function ( buffer ) {
+				exporter.parse( snapshot, function ( buffer ) {
 
 					const blob = new Blob( [ buffer ], { type: 'application/octet-stream' } );
 					const objectURL = URL.createObjectURL( blob );

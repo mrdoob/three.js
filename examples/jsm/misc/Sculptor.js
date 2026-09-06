@@ -6,9 +6,11 @@
  */
 
 import {
+	Box3,
 	BufferAttribute,
 	BufferGeometry,
 	Matrix4,
+	Sphere,
 	Vector3,
 	WebGPUCoordinateSystem
 } from 'three';
@@ -109,20 +111,19 @@ function validateSize( value ) {
 
 }
 
-function attributeMatches( attribute, source, length, itemSize ) {
+function attributeMatches( attribute, source, itemSize ) {
 
 	return attribute !== undefined && attribute !== null &&
 		attribute.itemSize === itemSize &&
 		attribute.array.buffer === source.buffer &&
 		attribute.array.byteOffset === source.byteOffset &&
-		attribute.array.length === length;
+		attribute.array.length === source.length;
 
 }
 
-function createVersionedAttribute( source, length, itemSize, previous ) {
+function createVersionedAttribute( source, itemSize, previous ) {
 
-	const array = source.length === length ? source : source.subarray( 0, length );
-	const attribute = new BufferAttribute( array, itemSize );
+	const attribute = new BufferAttribute( source, itemSize );
 
 	// Sculptor explicitly increments the version whenever the CPU data changes.
 	// The default usage avoids unconditional per-frame uploads in WebGPURenderer.
@@ -137,8 +138,6 @@ function createReplacementGeometry( source ) {
 	const geometry = new BufferGeometry();
 	geometry.name = source.name;
 	geometry.userData = source.userData;
-	geometry.drawRange.start = source.drawRange.start;
-	geometry.drawRange.count = source.drawRange.count;
 	geometry.boundingBox = source.boundingBox === null ? null : source.boundingBox.clone();
 	geometry.boundingSphere = source.boundingSphere === null ? null : source.boundingSphere.clone();
 	return geometry;
@@ -288,6 +287,9 @@ function compactDirtyVertices( vertices, vertexCount ) {
  * supported. Picking requires a non-zero uniform world scale without shear.
  * Dynamic topology can replace `mesh.geometry` when its buffers change size;
  * applications should not retain the dedicated geometry or attribute objects.
+ * The buffers retain spare capacity, with `drawRange` limiting rendered triangles.
+ * Use {@link Sculptor#getGeometry} for a compact snapshot suitable for export or
+ * geometry processing. Sculptor maintains the live geometry's bounds and draw range.
  *
  * @three_import import { Sculptor } from 'three/addons/misc/Sculptor.js';
  */
@@ -1174,7 +1176,6 @@ class Sculptor {
 		const sculptMesh = this._sculptMesh;
 		let geometry = this.mesh.geometry;
 		const vertexCount = sculptMesh.getNbVertices();
-		const vertexLength = vertexCount * 3;
 		const indexLength = sculptMesh.getNbTriangles() * 3;
 		const positions = sculptMesh.getVertices();
 		const normals = sculptMesh.getRenderNormals();
@@ -1182,9 +1183,9 @@ class Sculptor {
 		let positionAttribute = geometry.getAttribute( 'position' );
 		let normalAttribute = geometry.getAttribute( 'normal' );
 		let indexAttribute = geometry.getIndex();
-		const replacePosition = attributeMatches( positionAttribute, positions, vertexLength, 3 ) === false;
-		const replaceNormal = attributeMatches( normalAttribute, normals, vertexLength, 3 ) === false;
-		const replaceIndex = attributeMatches( indexAttribute, indices, indexLength, 1 ) === false;
+		const replacePosition = attributeMatches( positionAttribute, positions, 3 ) === false;
+		const replaceNormal = attributeMatches( normalAttribute, normals, 3 ) === false;
+		const replaceIndex = attributeMatches( indexAttribute, indices, 1 ) === false;
 		const replaceGeometry = this._geometrySynced && ( replacePosition || replaceNormal || replaceIndex );
 		let previousGeometry = null;
 		const dirtyVertices = this._dirtyVertices;
@@ -1208,7 +1209,7 @@ class Sculptor {
 
 		if ( replaceGeometry || replacePosition ) {
 
-			positionAttribute = createVersionedAttribute( positions, vertexLength, 3, positionAttribute );
+			positionAttribute = createVersionedAttribute( positions, 3, positionAttribute );
 			geometry.setAttribute( 'position', positionAttribute );
 
 		} else if ( hasDirtyVertices ) {
@@ -1220,7 +1221,7 @@ class Sculptor {
 
 		if ( replaceGeometry || replaceNormal ) {
 
-			normalAttribute = createVersionedAttribute( normals, vertexLength, 3, normalAttribute );
+			normalAttribute = createVersionedAttribute( normals, 3, normalAttribute );
 			geometry.setAttribute( 'normal', normalAttribute );
 
 		} else if ( hasDirtyVertices ) {
@@ -1234,15 +1235,18 @@ class Sculptor {
 
 		if ( replaceGeometry || replaceIndex ) {
 
-			indexAttribute = createVersionedAttribute( indices, indexLength, 1, indexAttribute );
+			indexAttribute = createVersionedAttribute( indices, 1, indexAttribute );
 			geometry.setIndex( indexAttribute );
 
 		} else if ( topologyVersion !== this._lastTopologyVersion ) {
 
 			indexAttribute.clearUpdateRanges();
+			indexAttribute.addUpdateRange( 0, indexLength );
 			indexAttribute.needsUpdate = true;
 
 		}
+
+		geometry.setDrawRange( 0, indexLength );
 
 		if ( previousGeometry !== null ) {
 
@@ -1260,8 +1264,49 @@ class Sculptor {
 	_computeExactBounds() {
 
 		const geometry = this.mesh.geometry;
-		geometry.computeBoundingBox();
-		geometry.computeBoundingSphere();
+		const positions = this._sculptMesh.getVertices();
+		const length = this._sculptMesh.getNbVertices() * 3;
+
+		if ( geometry.boundingBox === null ) geometry.boundingBox = new Box3();
+		if ( geometry.boundingSphere === null ) geometry.boundingSphere = new Sphere();
+
+		const box = geometry.boundingBox;
+		const sphere = geometry.boundingSphere;
+		box.makeEmpty();
+
+		// Spare capacity may contain deleted vertices; only bound the active prefix.
+		for ( let i = 0; i < length; i += 3 ) box.expandByPoint( _v3Temp.fromArray( positions, i ) );
+
+		box.getCenter( sphere.center );
+		let radius2 = 0;
+
+		for ( let i = 0; i < length; i += 3 ) {
+
+			radius2 = Math.max( radius2, sphere.center.distanceToSquared( _v3Temp.fromArray( positions, i ) ) );
+
+		}
+
+		sphere.radius = Math.sqrt( radius2 );
+
+	}
+
+	/**
+	 * Returns a compact copy of the current sculpt geometry, without spare buffer
+	 * capacity. The snapshot is independent of subsequent strokes and can be used
+	 * for export or geometry processing. The caller owns the returned geometry.
+	 *
+	 * @return {BufferGeometry} A new geometry containing the active vertices and triangles.
+	 */
+	getGeometry() {
+
+		const sculptMesh = this._sculptMesh;
+		const vertexLength = sculptMesh.getNbVertices() * 3;
+		const geometry = new BufferGeometry();
+		geometry.name = this.mesh.geometry.name;
+		geometry.setAttribute( 'position', new BufferAttribute( sculptMesh.getVertices().slice( 0, vertexLength ), 3 ) );
+		geometry.setAttribute( 'normal', new BufferAttribute( sculptMesh.getRenderNormals().slice( 0, vertexLength ), 3 ) );
+		geometry.setIndex( new BufferAttribute( sculptMesh.getTriangles().slice( 0, sculptMesh.getNbTriangles() * 3 ), 1 ) );
+		return geometry;
 
 	}
 
