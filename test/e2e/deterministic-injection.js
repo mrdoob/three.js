@@ -44,24 +44,67 @@
 
 	};
 
-	/* Semi-deterministic video */
+	/* Deterministic video */
 
 	const play = HTMLVideoElement.prototype.play;
+	const videos = new Set();
+	let pendingVideos = 0;
+	let pendingFrames = 0;
+	let videoError = null;
 
-	HTMLVideoElement.prototype.play = async function () {
+	HTMLVideoElement.prototype.play = function () {
 
-		play.call( this );
-		this.addEventListener( 'timeupdate', () => this.pause() );
+		// Reload preloaded frames so video textures receive a frame callback.
+		if ( videos.has( this ) === false ) {
 
-		function renew() {
-
+			const time = this.currentTime;
 			this.load();
-			play.call( this );
-			RAF( renew ); // eslint-disable-line no-undef
+			this.currentTime = time;
+
+			if ( 'requestVideoFrameCallback' in this ) {
+
+				pendingFrames ++;
+				this.requestVideoFrameCallback( () => pendingFrames -- );
+
+			}
 
 		}
 
-		RAF( renew ); // eslint-disable-line no-undef
+		this.playbackRate = 0;
+		videos.add( this );
+
+		const promise = play.call( this );
+		pendingVideos ++;
+
+		promise.then( () => {
+
+			this.pause();
+			pendingVideos --;
+
+		}, error => {
+
+			pendingVideos --;
+			videoError = error;
+
+		} );
+
+		return promise;
+
+	};
+
+	window._videosReady = function () {
+
+		if ( videoError !== null ) throw videoError;
+		if ( pendingVideos !== 0 || pendingFrames !== 0 ) return false;
+
+		for ( const video of videos ) {
+
+			if ( video.error !== null ) throw new Error( video.error.message );
+			if ( video.seeking || video.readyState < video.HAVE_CURRENT_DATA ) return false;
+
+		}
+
+		return true;
 
 	};
 

@@ -318,8 +318,18 @@ async function main() {
 
 async function preparePage( page, injection, builds, errorMessages ) {
 
+	// Ignore ambient input from the browser window; scripted DOM clicks still work.
+	const client = await page.createCDPSession();
+	await client.send( 'Input.setIgnoreInputEvents', { ignore: true } );
+
 	await page.evaluateOnNewDocument( injection );
 	await page.setRequestInterception( true );
+
+	page.on( 'pageerror', error => {
+
+		if ( page.file !== undefined ) page.error = `${ page.file }: ${ error.message }`;
+
+	} );
 
 	page.on( 'console', async msg => {
 
@@ -464,6 +474,11 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 				idleTime: idleTime * 1000
 			} );
 
+			await page.waitForFunction( () => window._videosReady(), {
+				polling: 100,
+				timeout: renderTimeout * 1000
+			} );
+
 			await page.evaluate( async ( renderTimeout, parseTime ) => {
 
 				await new Promise( resolve => setTimeout( resolve, parseTime ) );
@@ -500,7 +515,7 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 		} catch ( e ) {
 
-			if ( e.includes && e.includes( 'Render timeout exceeded' ) === false ) {
+			if ( e !== 'Render timeout exceeded' ) {
 
 				throw new Error( `Error happened while rendering file ${ file }: ${ e }` );
 
