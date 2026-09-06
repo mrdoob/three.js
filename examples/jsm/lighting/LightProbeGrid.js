@@ -53,7 +53,6 @@ let _cubeRenderTarget = null;
 let _cubeCamera = null;
 let _cubeKey = '';
 let _batchTarget = null;
-let _batchProbes = - 1;
 
 // Golden-angle increment for the equal-area Fibonacci sphere.
 const GOLDEN_ANGLE = Math.PI * ( 3.0 - Math.sqrt( 5.0 ) );
@@ -170,16 +169,14 @@ function repackNode( batch, textureIndex, resolution, sliceZ ) {
 }
 
 /**
- * Lazily pools the shared cube and batch render targets, recreating them only
- * when their dimensions change.
+ * Lazily pools the shared cube render target.
  *
  * @private
  * @param {number} cubemapSize - Resolution of each cubemap face.
  * @param {number} near - Cube camera near plane.
  * @param {number} far - Cube camera far plane.
- * @param {number} totalProbes - Number of probes (batch target height).
  */
-function ensureBakeTargets( cubemapSize, near, far, totalProbes ) {
+function ensureCubeTarget( cubemapSize, near, far ) {
 
 	const cubeKey = `${ cubemapSize },${ near },${ far }`;
 
@@ -193,11 +190,26 @@ function ensureBakeTargets( cubemapSize, near, far, totalProbes ) {
 
 	}
 
-	if ( _batchTarget === null || _batchProbes !== totalProbes ) {
+}
 
-		if ( _batchTarget !== null ) _batchTarget.dispose();
+/**
+ * Reserves a batch target until an iterator finishes or is closed. Other grids
+ * can bake between its steps without overwriting the captured probe rows.
+ *
+ * @private
+ * @param {number} totalProbes - Number of probes (batch target height).
+ * @return {RenderTarget} The reserved target.
+ */
+function acquireBatchTarget( totalProbes ) {
 
-		_batchTarget = new RenderTarget( 9, totalProbes, {
+	let target = _batchTarget;
+	_batchTarget = null;
+
+	if ( target === null || target.height !== totalProbes ) {
+
+		if ( target !== null ) target.dispose();
+
+		target = new RenderTarget( 9, totalProbes, {
 			type: FloatType,
 			format: RGBAFormat,
 			minFilter: NearestFilter,
@@ -205,9 +217,9 @@ function ensureBakeTargets( cubemapSize, near, far, totalProbes ) {
 			depthBuffer: false
 		} );
 
-		_batchProbes = totalProbes;
-
 	}
+
+	return target;
 
 }
 
@@ -376,6 +388,8 @@ class LightProbeGrid extends Light {
 		 * @default null
 		 */
 		this._renderTarget = null;
+		this._baking = false;
+		this._bakeIntensity = 1;
 
 		this.updateBoundingBox();
 
@@ -434,63 +448,134 @@ class LightProbeGrid extends Light {
 	 */
 	bake( renderer, scene, options = {} ) {
 
-		// The bake is node based, so it needs a WebGPURenderer.
+		const steps = this.bakeSteps( renderer, scene, { ...options, probesPerStep: Infinity } );
+
+		while ( steps.next().done === false ) {
+
+			// Complete every step synchronously.
+
+		}
+
+		this.visible = true;
+
+	}
+
+	/**
+	 * Bakes a limited number of probes each time the returned iterator advances.
+	 * Renderer and scene state are restored before each yield, allowing normal
+	 * rendering between steps. The atlas is updated after each complete bounce
+	 * pass. Keep the captured scene static until completion, or close the iterator
+	 * with `return()` before restarting after a scene change. Only one iterator
+	 * per grid can be active at a time.
+	 *
+	 * @param {WebGPURenderer} renderer - The renderer.
+	 * @param {Scene} scene - The scene to render.
+	 * @param {Object} [options] - The options accepted by {@link LightProbeGrid#bake}.
+	 * @param {number} [options.probesPerStep=8] - Maximum probes captured per step.
+	 * @yields {number} The fraction of probes completed across all passes.
+	 * @return {Generator<number>} The bake iterator.
+	 */
+	* bakeSteps( renderer, scene, options = {} ) {
+
 		if ( renderer.isWebGPURenderer !== true ) {
 
-			throw new Error( 'THREE.LightProbeGrid: .bake() requires a WebGPURenderer. For WebGLRenderer, use LightProbeGridWebGL.' );
+			throw new Error( 'THREE.LightProbeGrid: Baking requires a WebGPURenderer. For WebGLRenderer, use LightProbeGridWebGL.' );
 
 		}
 
-		// The bake issues GPU work immediately, so the renderer must be ready.
 		if ( renderer.initialized === false ) {
 
-			throw new Error( 'THREE.LightProbeGrid: .bake() called before the renderer is initialized. Use "await renderer.init();" first.' );
+			throw new Error( 'THREE.LightProbeGrid: Initialize the renderer with "await renderer.init();" before baking.' );
 
 		}
 
-		// Register the light node with this renderer (idempotent).
+		if ( this._baking ) throw new Error( 'THREE.LightProbeGrid: Close the active bake iterator before starting another bake.' );
+
+		const { bounces = 0, probesPerStep = 8 } = options;
+
+		if ( probesPerStep < 1 || ( probesPerStep !== Infinity && Number.isInteger( probesPerStep ) === false ) ) {
+
+			throw new Error( 'THREE.LightProbeGrid: probesPerStep must be a positive integer.' );
+
+		}
+
 		if ( renderer.library.getLightNodeClass( LightProbeGrid ) === null ) {
 
 			renderer.library.addLight( LightProbeGridNode, LightProbeGrid );
 
 		}
 
-		const { cubemapSize = 8, near = 0.1, far = 100, bounces = 0, sampleCount = 512 } = options;
-
-		const currentInspectorEnabled = renderer.inspector.enabled;
-
-		renderer.inspector.enabled = false;
-
 		this._ensureTextures();
 		this.updateBoundingBox();
 
+		const totalProbes = this.resolution.x * this.resolution.y * this.resolution.z;
+		const batchTarget = acquireBatchTarget( totalProbes );
+		this._baking = true;
+
+		try {
+
+			for ( let pass = 0; pass <= bounces; pass ++ ) {
+
+				for ( let start = 0; start < totalProbes; start += probesPerStep ) {
+
+					const end = Math.min( start + probesPerStep, totalProbes );
+					this._bakeStep( renderer, scene, options, batchTarget, pass, start, end );
+
+					if ( pass < bounces || end < totalProbes ) yield ( pass * totalProbes + end ) / ( ( bounces + 1 ) * totalProbes );
+
+				}
+
+			}
+
+		} finally {
+
+			// Keep one idle batch target. Active iterators retain their own targets.
+			if ( _batchTarget !== null ) _batchTarget.dispose();
+			_batchTarget = batchTarget;
+			this._baking = false;
+
+		}
+
+	}
+
+	/**
+	 * Captures one step and restores all temporary state before returning.
+	 *
+	 * @private
+	 * @param {WebGPURenderer} renderer - The renderer.
+	 * @param {Scene} scene - The captured scene.
+	 * @param {Object} options - Bake options.
+	 * @param {RenderTarget} batchTarget - This bake's projected coefficients.
+	 * @param {number} pass - The current bounce pass.
+	 * @param {number} start - First probe to capture.
+	 * @param {number} end - Exclusive last probe to capture.
+	 */
+	_bakeStep( renderer, scene, options, batchTarget, pass, start, end ) {
+
+		const { cubemapSize = 8, near = 0.1, far = 100, sampleCount = 512 } = options;
 		const res = this.resolution;
 		const nz = res.z;
 		const paddedSlices = nz + 2 * ATLAS_PADDING;
-		const totalProbes = res.x * res.y * res.z;
 
-		// Bind the pooled bake resources to the current textures.
-
-		ensureBakeTargets( cubemapSize, near, far, totalProbes );
-		ensureBakeMaterials( sampleCount, _cubeRenderTarget.texture, _batchTarget.texture );
+		// Other grids may have used the shared cube and materials between steps.
+		ensureCubeTarget( cubemapSize, near, far );
+		ensureBakeMaterials( sampleCount, _cubeRenderTarget.texture, batchTarget.texture );
 		_resolutionUniform.value.copy( res );
 
-		const cubeCamera = _cubeCamera;
-		const batchTarget = _batchTarget;
-		const shMaterial = _shMaterial;
-		const repackMaterials = _repackMaterials;
-		const sliceZ = _sliceZUniform;
-
-		// Save renderer / scene state to restore after the bake.
-
 		const currentRenderTarget = renderer.getRenderTarget();
+		const currentCubeFace = renderer.getActiveCubeFace();
+		const currentMipmapLevel = renderer.getActiveMipmapLevel();
 		const currentAutoClear = renderer.autoClear;
+		const currentXrEnabled = renderer.xr.enabled;
+		const currentInspectorEnabled = renderer.inspector.enabled;
 		const currentMatrixWorldAutoUpdate = scene.matrixWorldAutoUpdate;
+		const currentVisible = this.visible;
+		const currentBakeIntensity = this._bakeIntensity;
 		const shadowLights = [];
 
 		try {
 
-			// Scene is static during the bake: update once, disable auto-update.
+			renderer.inspector.enabled = false;
 
 			if ( currentMatrixWorldAutoUpdate === true ) {
 
@@ -499,8 +584,7 @@ class LightProbeGrid extends Light {
 
 			}
 
-			// Render each shadow map once, not once per cube face.
-
+			// Refresh once per step: normal rendering may use different casters.
 			scene.traverse( ( object ) => {
 
 				if ( object.isLight && object.castShadow && object.shadow ) {
@@ -513,83 +597,48 @@ class LightProbeGrid extends Light {
 
 			} );
 
-			for ( let pass = 0; pass <= bounces; pass ++ ) {
+			// Keep the light layout stable so changing passes does not rebuild shaders.
+			this.visible = true;
+			this._bakeIntensity = pass > 0 ? 1 : 0;
+			_quad.material = _shMaterial;
 
-				// Pass 0 is direct light (grid hidden); each later pass reads the
-				// previous pass as indirect, adding one bounce.
+			for ( let probeIndex = start; probeIndex < end; probeIndex ++ ) {
 
-				this.visible = pass > 0;
+				const ix = probeIndex % res.x;
+				const iy = Math.floor( probeIndex / res.x ) % res.y;
+				const iz = Math.floor( probeIndex / ( res.x * res.y ) );
 
-				// Clear once, then write each probe's row with autoClear off. The
-				// viewport goes on the render target, not the renderer (which ignores
-				// the canvas viewport when one is bound).
-
-				batchTarget.viewport.set( 0, 0, 9, totalProbes );
-				renderer.setRenderTarget( batchTarget );
-				renderer.clear();
-
-				// Phase 1: render cubemaps and project to SH into the batch target.
-
-				_quad.material = shMaterial;
-
-				for ( let iz = 0; iz < res.z; iz ++ ) {
-
-					for ( let iy = 0; iy < res.y; iy ++ ) {
-
-						for ( let ix = 0; ix < res.x; ix ++ ) {
-
-							const probeIndex = ix + iy * res.x + iz * res.x * res.y;
-
-							this.getProbePosition( ix, iy, iz, _position );
-							cubeCamera.position.copy( _position );
-
-							// The cube faces must be cleared per face.
-							renderer.autoClear = true;
-							cubeCamera.update( renderer, scene );
-
-							// Write only this probe's row, preserving the others.
-							renderer.autoClear = false;
-							batchTarget.viewport.set( 0, probeIndex, 9, 1 );
-							renderer.setRenderTarget( batchTarget );
-							_quad.render( renderer );
-
-						}
-
-					}
-
-				}
-
-				// Phase 2: repack the batch into the atlas, padding each sub-volume
-				// with a copy of its first and last data slice.
+				this.getProbePosition( ix, iy, iz, _position );
+				_cubeCamera.position.copy( _position );
 
 				renderer.autoClear = true;
+				_cubeCamera.update( renderer, scene );
 
-				const renderTarget = this._renderTarget;
+				// Every row is overwritten once per pass; preserve the other rows.
+				renderer.autoClear = false;
+				batchTarget.viewport.set( 0, probeIndex, 9, 1 );
+				renderer.setRenderTarget( batchTarget );
+				_quad.render( renderer );
+
+			}
+
+			if ( end === res.x * res.y * res.z ) {
+
+				// Publish only complete passes, with duplicated edge slices for padding.
+				renderer.autoClear = true;
 
 				for ( let t = 0; t < 7; t ++ ) {
 
-					_quad.material = repackMaterials[ t ];
-
+					_quad.material = _repackMaterials[ t ];
 					const base = t * paddedSlices;
 
-					// Data slices.
-					for ( let iz = 0; iz < nz; iz ++ ) {
+					for ( let iz = 0; iz < paddedSlices; iz ++ ) {
 
-						sliceZ.value = iz;
-						renderer.setRenderTarget( renderTarget, base + ATLAS_PADDING + iz );
+						_sliceZUniform.value = Math.max( 0, Math.min( iz - ATLAS_PADDING, nz - 1 ) );
+						renderer.setRenderTarget( this._renderTarget, base + iz );
 						_quad.render( renderer );
 
 					}
-
-					// Leading padding: copy of data slice 0.
-					sliceZ.value = 0;
-					renderer.setRenderTarget( renderTarget, base );
-					_quad.render( renderer );
-
-					// Trailing padding: copy of data slice nz-1.
-					sliceZ.value = nz - 1;
-					renderer.setRenderTarget( renderTarget, base + ATLAS_PADDING + nz );
-					_quad.render( renderer );
 
 				}
 
@@ -597,17 +646,20 @@ class LightProbeGrid extends Light {
 
 		} finally {
 
-			// Restore renderer / scene state (pooled targets and materials kept).
-
-			renderer.setRenderTarget( currentRenderTarget );
+			renderer.setRenderTarget( currentRenderTarget, currentCubeFace, currentMipmapLevel );
 			renderer.autoClear = currentAutoClear;
-			scene.matrixWorldAutoUpdate = currentMatrixWorldAutoUpdate;
-
-			for ( const { light, autoUpdate } of shadowLights ) light.shadow.autoUpdate = autoUpdate;
-
-			this.visible = true;
-
+			renderer.xr.enabled = currentXrEnabled;
 			renderer.inspector.enabled = currentInspectorEnabled;
+			scene.matrixWorldAutoUpdate = currentMatrixWorldAutoUpdate;
+			this.visible = currentVisible;
+			this._bakeIntensity = currentBakeIntensity;
+
+			for ( const { light, autoUpdate } of shadowLights ) {
+
+				light.shadow.autoUpdate = autoUpdate;
+				light.shadow.needsUpdate = true;
+
+			}
 
 		}
 

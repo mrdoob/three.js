@@ -6,6 +6,7 @@ import './addons/utils/GaussianSplatUtils.tests.js';
 import './addons/math/ColorSpaces.tests.js';
 import './addons/curves/NURBSCurve.tests.js';
 import './addons/generators/CityGenerator.tests.js';
+import './addons/lighting/LightProbeGrid.tests.js';
 import './addons/loaders/FBXLoader.tests.js';
 import './addons/loaders/GLTFLoader.tests.js';
 import './addons/loaders/HDRLoader.tests.js';
