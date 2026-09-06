@@ -380,6 +380,7 @@ class Sculptor {
 		this._lastTopologyVersion = - 1;
 		this._dirtyVertices = [];
 		this._geometrySynced = false;
+		this._boundsDirty = false;
 
 		this._prepareGeometry();
 		this._syncGeometry();
@@ -827,7 +828,7 @@ class Sculptor {
 
 		const result = verticesInRadius.slice( 0, count );
 		sculptMesh.updateTopology( faces, affectedVertices );
-		sculptMesh._updateGeometry( faces );
+		sculptMesh._updateGeometry( faces, affectedVertices );
 		this._markVerticesDirty( affectedVertices );
 
 		return result;
@@ -931,22 +932,27 @@ class Sculptor {
 	endStroke() {
 
 		this._sculptMesh.balanceOctree();
-		this._computeExactBounds();
+		if ( this._boundsDirty ) this._computeExactBounds();
 
 	}
 
 	_applyStroke( scaleDelta = 0 ) {
 
+		const tool = this._tool;
+		const strength = this._strength;
+		const deforms = strength !== 0 || tool === 'drag' || tool === 'scale';
+		const remeshes = tool !== 'smooth' && this._detail !== 0;
+
+		if ( deforms === false && remeshes === false ) return;
+
 		const radius2 = this._localRadius2;
 		let pickedVertices = this._pickVerticesInSphere( radius2 );
 		const sculptMesh = this._sculptMesh;
-		const tool = this._tool;
 
-		if ( tool !== 'smooth' ) pickedVertices = this._dynamicTopology( pickedVertices );
-		if ( pickedVertices.length === 0 ) return;
+		if ( remeshes ) pickedVertices = this._dynamicTopology( pickedVertices );
+		if ( deforms === false || pickedVertices.length === 0 ) return;
 
 		const hitPoint = this._hitPoint;
-		const strength = this._strength;
 		const negative = this._negative;
 
 		switch ( tool ) {
@@ -1006,8 +1012,9 @@ class Sculptor {
 		}
 
 		const faces = sculptMesh.getFacesFromVertices( pickedVertices );
-		sculptMesh._updateGeometry( faces );
-		this._markVerticesDirty( sculptMesh.getVerticesFromFaces( faces ) );
+		const affectedVertices = sculptMesh.getVerticesFromFaces( faces );
+		sculptMesh._updateGeometry( faces, affectedVertices );
+		this._markVerticesDirty( affectedVertices );
 
 	}
 
@@ -1147,6 +1154,7 @@ class Sculptor {
 
 		if ( vertices.length === 0 ) return;
 
+		this._boundsDirty = true;
 		const positions = this._sculptMesh.getVertices();
 		const geometry = this.mesh.geometry;
 		const box = geometry.boundingBox;
@@ -1287,6 +1295,7 @@ class Sculptor {
 		}
 
 		sphere.radius = Math.sqrt( radius2 );
+		this._boundsDirty = false;
 
 	}
 

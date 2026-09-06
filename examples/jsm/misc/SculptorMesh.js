@@ -972,10 +972,12 @@ class SculptorMesh {
 
 	}
 
-	_updateGeometry( iFaces ) {
+	_updateGeometry( iFaces, iVerts ) {
+
+		if ( iVerts === undefined && iFaces !== undefined ) iVerts = this.getVerticesFromFaces( iFaces );
 
 		this._updateFacesAabbAndNormal( iFaces );
-		this._updateVerticesNormal( iFaces === undefined ? undefined : this.getVerticesFromFaces( iFaces ) );
+		this._updateVerticesNormal( iVerts );
 		this._updateOctree( iFaces );
 
 	}
