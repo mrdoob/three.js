@@ -10,8 +10,6 @@ import {
 	getMemory
 } from './SculptorUtils.js';
 
-// ---- Internal helpers ----
-
 const OCTREE_MAX_DEPTH = 8;
 const OCTREE_MAX_FACES = 100;
 // A depth-first walk retains at most seven siblings for each level.
@@ -316,7 +314,7 @@ function buildTriangleBuffers( elementCount, sourceIndices, vertexMap, positions
 
 }
 
-// ---- Octree ----
+// Octree
 
 class OctreeCell {
 
@@ -649,9 +647,7 @@ class OctreeCell {
 
 }
 
-// ---- Internal Mesh Data ----
-// This class wraps all the internal sculpting data structures.
-// It mirrors SculptGL's MeshData + MeshDynamic in a single object.
+// Mesh topology and spatial queries
 
 class SculptorMesh {
 
@@ -688,8 +684,6 @@ class SculptorMesh {
 		this._sculptFlag = 1;
 
 	}
-
-	// ---- Mesh data accessors ----
 
 	getNbVertices() {
 
@@ -800,8 +794,7 @@ class SculptorMesh {
 
 		if ( this._tagFlag >= MAX_FLAG ) {
 
-			// Negative active tags are deletion sentinels used by decimation. They
-			// must survive an epoch wrap until the pending deletion is committed.
+			// Preserve pending deletion sentinels across tag rollover.
 			resetTagFlags( this._vertTagFlags, this._nbVertices );
 			resetTagFlags( this._facesTagFlags, this._nbFaces );
 			this._tagFlag = 1;
@@ -849,8 +842,6 @@ class SculptorMesh {
 
 	}
 
-	// ---- Init from Three.js BufferGeometry ----
-
 	initFromGeometry( geometry ) {
 
 		this._tagFlag = 1;
@@ -888,7 +879,6 @@ class SculptorMesh {
 		this._verticesXYZ = new Float32Array( weldedPositions );
 		this._normalsXYZ = new Float32Array( vertexDataLength );
 		this._renderNormalsXYZ = new Float32Array( vertexDataLength );
-
 
 		this._facesABCD = faces;
 		this._trianglesABC = triangles;
@@ -1232,7 +1222,7 @@ class SculptorMesh {
 
 	}
 
-	// ---- Mesh queries (used by Picking, SculptBase, etc.) ----
+	// Mesh queries
 
 	intersectRay( vNear, eyeDir ) {
 
@@ -1397,7 +1387,7 @@ class SculptorMesh {
 
 	}
 
-	// ---- Dynamic topology helpers ----
+	// Dynamic topology
 
 	updateRenderTriangles( iFaces ) {
 

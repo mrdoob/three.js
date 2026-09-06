@@ -15,7 +15,7 @@ import {
 	falloff
 } from './SculptorUtils.js';
 
-// ---- Subdivision ----
+// Subdivision
 
 const SubData = {
 	_mesh: null,
@@ -256,7 +256,6 @@ function subdivide( iTris ) {
 	const nbTrisInit = mesh.getNbTriangles();
 	SubData._verticesMap.clear();
 
-	// Init split
 	let nbTris = iTris.length;
 	const buffer = getMemory( ( 4 + 1 ) * nbTris );
 	let iTrisSubd = new Uint32Array( buffer, 0, nbTris );
@@ -291,14 +290,11 @@ function subdivide( iTris ) {
 
 	}
 
-	// At most one vertex is added for each selected triangle. Packing both
-	// indices into one safe integer avoids allocating edge-key strings in the
-	// subdivision hot path. Extremely large meshes retain the collision-free
-	// string representation.
+	// Reserve one new vertex per selected triangle for collision-free edge keys.
+	// Pack vertex pairs into safe integers; use strings when the range is too large.
 	SubData._edgeKeyStride = mesh.getNbVertices() + iTrisSubd.length + 1;
 	SubData._stringEdgeKeys = SubData._edgeKeyStride > MAX_EDGE_KEY_STRIDE;
 
-	// Subdivide triangles
 	const fAr = mesh.getFaces();
 	mesh.reAllocateArrays( splitArr.length );
 	for ( let i = 0, l = iTrisSubd.length; i < l; ++ i ) {
@@ -313,7 +309,6 @@ function subdivide( iTris ) {
 
 	}
 
-	// Gather new triangles and fill cracks
 	let nbNewTris = mesh.getNbTriangles() - nbTrisInit;
 	let newTriangles = new Uint32Array( nbNewTris );
 	for ( let i = 0; i < nbNewTris; ++ i ) newTriangles[ i ] = nbTrisInit + i;
@@ -325,7 +320,6 @@ function subdivide( iTris ) {
 	iTris.set( temp );
 	iTris.set( newTriangles, nbTris );
 
-	// De-duplicate
 	const ftf = mesh.getFacesTagFlags();
 	const tagFlag = mesh.nextTagFlag();
 	const iTrisMask = new Uint32Array( getMemory( iTris.length * 4 ), 0, iTris.length );
@@ -341,6 +335,7 @@ function subdivide( iTris ) {
 
 	let resultTris = iTrisMask.slice( 0, nbTriMask );
 
+	// Split neighboring faces to close subdivision cracks.
 	const nbTrianglesOld = mesh.getNbTriangles();
 	while ( newTriangles.length > 0 ) {
 
@@ -355,7 +350,7 @@ function subdivide( iTris ) {
 	resultTris.set( temp );
 	for ( let i = 0; i < nbNewTris; ++ i ) resultTris[ nbTriMask + i ] = nbTrianglesOld + i;
 
-	// Smooth new vertices and tag sculpt flag
+	// Smooth neighboring vertices before updating sculpt flags.
 	const nbVNew = mesh.getNbVertices() - nbVertsInit;
 	let vNew = new Uint32Array( nbVNew );
 	for ( let i = 0; i < nbVNew; ++ i ) vNew[ i ] = nbVertsInit + i;
@@ -409,7 +404,7 @@ function subdivisionPass( mesh, iTris, center, radius2, detail2 ) {
 
 }
 
-// ---- Decimation ----
+// Decimation
 
 const DecData = {
 	_mesh: null,
@@ -556,9 +551,8 @@ function decEdgeCollapse( iTri1, iTri2, iv1, iv2, ivOpp1, ivOpp2, iTris ) {
 	const trisOpp1 = vrf[ ivOpp1 ], trisOpp2 = vrf[ ivOpp2 ];
 	if ( ringOpp1.length !== trisOpp1.length || ringOpp2.length !== trisOpp2.length ) return;
 
-	// Collapsing an edge of a tetrahedron would leave two coincident triangles
-	// with opposite winding. Apply this local bound per connected component;
-	// a global vertex count is insufficient for meshes with multiple shells.
+	// A tetrahedron cannot collapse without leaving coincident triangles.
+	// Check local valence to protect disconnected shells.
 	if ( ring1.length === 3 && ring2.length === 3 ) return;
 
 	ring1.sort( sortByIndex );
@@ -566,12 +560,10 @@ function decEdgeCollapse( iTri1, iTri2, iv1, iv2, ivOpp1, ivOpp2, iTris ) {
 
 	if ( hasAtLeastThreeCommonElements( ring1, ring2 ) ) {
 
-		// A 2-2 flip is only manifold when the new diagonal does not already
-		// exist. Otherwise the new edge would be shared by four triangles.
+		// Skip existing diagonals: a flip would leave four triangles sharing an edge.
 		if ( ringOpp1.includes( ivOpp2 ) ) return;
 		DecData._iVertsDecimated.push( iv1, iv2 );
 
-		// Edge flip
 		removeElement( tris1, iTri2 );
 		removeElement( tris2, iTri1 );
 		trisOpp1.push( iTri2 );
@@ -630,7 +622,7 @@ function decEdgeCollapse( iTri1, iTri2, iv1, iv2, ivOpp1, ivOpp2, iTris ) {
 
 	mesh._computeRingVertices( iv1 );
 
-	// Flat smooth
+	// Project the neighbor average onto the tangent plane.
 	let meanX = 0, meanY = 0, meanZ = 0;
 	const nbRing1 = ring1.length;
 	for ( let i = 0; i < nbRing1; ++ i ) {
@@ -795,13 +787,12 @@ function decimate( mesh, iTris, center, radius2, detail2 ) {
 
 	}
 
-	// Apply deletion
+	// Delete highest indices first so swaps preserve pending deletion indices.
 	tidy( DecData._iTrisToDelete );
 	for ( let i = DecData._iTrisToDelete.length - 1; i >= 0; -- i ) decDeleteTriangle( DecData._iTrisToDelete[ i ] );
 	tidy( DecData._iVertsToDelete );
 	for ( let i = DecData._iVertsToDelete.length - 1; i >= 0; -- i ) decDeleteVertex( DecData._iVertsToDelete[ i ] );
 
-	// Get valid modified triangles
 	const iVertsDecimated = DecData._iVertsDecimated;
 	const nbVertices = mesh.getNbVertices();
 	const vtfDec = mesh.getVerticesTagFlags();
@@ -838,7 +829,7 @@ function decimate( mesh, iTris, center, radius2, detail2 ) {
 
 }
 
-// ---- Tool Helpers (shared across all tools) ----
+// Tool helpers
 
 function laplacianSmooth( mesh, iVerts, smoothVerts, vField ) {
 
@@ -983,7 +974,7 @@ function areaCenter( mesh, iVerts ) {
 
 }
 
-// ---- Tool implementations ----
+// Tools
 
 function toolBrush( mesh, iVerts, aNormal, center, radiusSq, strength, negative ) {
 

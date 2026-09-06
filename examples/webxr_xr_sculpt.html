@@ -90,7 +90,6 @@
 
 				// Mesh
 
-				// Match the starting edge length to the default topology target.
 				const geometry = new THREE.IcosahedronGeometry( 0.3, 24 );
 				const material = new THREE.MeshStandardMaterial( {
 					color: 0xcc6644,
@@ -185,7 +184,7 @@
 				controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
 				scene.add( controllerGrip2 );
 
-				// Controller ray lines
+				// Controller rays
 
 				const lineGeometry = new THREE.BufferGeometry().setFromPoints( [
 					new THREE.Vector3( 0, 0, 0 ),
@@ -196,7 +195,7 @@
 				controller1.add( new THREE.Line( lineGeometry, lineMaterial ) );
 				controller2.add( new THREE.Line( lineGeometry, lineMaterial ) );
 
-				// Cursor spheres (show brush intersection on mesh)
+				// Brush cursors
 
 				const cursorGeo = new THREE.SphereGeometry( 1, 16, 12 );
 				const cursorMat = new THREE.MeshBasicMaterial( {
@@ -232,16 +231,17 @@
 
 				const inputSource = controller.userData.inputSource;
 
-				if ( ! inputSource ) {
+				// Pause while tracking is lost; the controller retains its last pose.
+				if ( ! inputSource || controller.visible === false ) {
 
 					cursor.visible = false;
+					controller.userData.nextStrokeTime = null;
 					return;
 
 				}
 
 				controller.updateMatrixWorld( true );
 
-				// Get ray from controller
 				_ray.origin.setFromMatrixPosition( controller.matrixWorld );
 				_ray.direction.set( 0, 0, - 1 ).transformDirection( controller.matrixWorld );
 
@@ -261,7 +261,7 @@
 
 					}
 
-					// Drop excess catch-up work after a pause or a very slow frame.
+					// Bound catch-up work after long frames.
 					if ( time >= controller.userData.nextStrokeTime ) controller.userData.nextStrokeTime = time + strokeInterval;
 
 				}
@@ -270,7 +270,6 @@
 
 				if ( hit ) {
 
-					// Show cursor at intersection point (transform from local to world)
 					sculptor.getHitPoint( cursor.position ).applyMatrix4( mesh.matrixWorld );
 					cursor.scale.setScalar( brushRadius );
 					cursor.visible = true;
@@ -281,7 +280,7 @@
 
 				}
 
-				// Handle thumbstick for tool cycling
+				// Latch thumbstick input until it returns to center.
 				if ( inputSource.gamepad ) {
 
 					const axes = inputSource.gamepad.axes;

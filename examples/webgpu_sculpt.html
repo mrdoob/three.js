@@ -127,8 +127,6 @@
 
 				// Mesh
 
-				// Keep the initial edge length below the default topology target so
-				// the first stroke does not visibly retessellate the whole brush area.
 				const geometry = new THREE.IcosahedronGeometry( 1, 50 );
 				const material = new THREE.MeshStandardMaterial( {
 					color: 0xcc6644,
@@ -142,8 +140,6 @@
 
 				sculptor = new Sculptor( mesh, camera );
 				sculptor.connect( renderer.domElement );
-
-				// Disable orbit controls while sculpting
 
 				sculptor.addEventListener( 'start', function () {
 
@@ -160,7 +156,7 @@
 
 				function handlePointerUp( event ) {
 
-					// Ignore a secondary pointer while the primary stroke is active.
+					// Ignore releases from other pointers during a stroke.
 					if ( sculptor.isSculpting() ) return;
 
 					releasedPointerId = event.pointerId;
@@ -177,8 +173,7 @@
 
 				function handleLostPointerCapture( event ) {
 
-					// A normal pointerup is followed by lostpointercapture. Keep the
-					// hover cursor refreshed above without reusing capture-event coords.
+					// Keep the pointerup cursor; capture-loss coordinates are unreliable.
 					if ( event.pointerId === releasedPointerId ) {
 
 						releasedPointerId = null;
@@ -194,8 +189,7 @@
 				renderer.domElement.addEventListener( 'pointercancel', handlePointerCancel );
 				renderer.domElement.addEventListener( 'lostpointercapture', handleLostPointerCapture );
 
-				// Connect Sculptor before OrbitControls so its start event can disable
-				// orbiting before OrbitControls handles a sculpt press.
+				// Register OrbitControls after Sculptor so sculpt presses can disable orbiting.
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.1;
@@ -263,7 +257,7 @@
 				} );
 				gui.add( actions, 'export' ).name( 'export GLB' );
 
-				// 3D Cursor
+				// Cursor
 
 				cursorMaterial = new THREE.MeshBasicMaterial( {
 					color: 0xcc0000,
@@ -292,8 +286,7 @@
 				} );
 				controls.addEventListener( 'change', function () {
 
-					// Keep the world-space cursor fixed under a stationary pointer while
-					// OrbitControls continues moving the camera through damping.
+					// Keep the cursor under the pointer while damping moves the camera.
 					if ( cursorGroup.visible && sculptor.isSculpting() === false ) updateCursorPosition();
 
 				} );
@@ -309,7 +302,7 @@
 
 					_pointer.set( event.clientX, event.clientY );
 
-					// Hide cursor while orbiting
+					// Hide the cursor while orbiting.
 					if ( event.buttons > 0 && sculptor.isSculpting() === false ) {
 
 						cursorGroup.visible = false;
@@ -339,10 +332,8 @@
 
 						mesh.updateWorldMatrix( true, false );
 
-						// Position in world space
 						sculptor.getHitPoint( cursorGroup.position ).applyMatrix4( mesh.matrixWorld );
 
-						// Orient to the surface normal.
 						_normalMatrix.getNormalMatrix( mesh.matrixWorld );
 						sculptor.getHitNormal( _normal ).applyNormalMatrix( _normalMatrix );
 						cursorGroup.quaternion.setFromUnitVectors( _forward, _normal );
@@ -351,7 +342,7 @@
 
 					} else {
 
-						// No intersection: show ring facing camera at fixed depth
+						// Face the camera when the ray misses the mesh.
 						const rect = renderer.domElement.getBoundingClientRect();
 						const x = ( ( _pointer.x - rect.left ) / rect.width ) * 2 - 1;
 						const offsetX = ( ( _pointer.x + sculptor.getSize() - rect.left ) / rect.width ) * 2 - 1;

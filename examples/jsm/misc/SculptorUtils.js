@@ -4,8 +4,6 @@
  * Licensed under the MIT License; see ./SculptGL.LICENSE.txt.
  */
 
-// ---- Constants and utilities ----
-
 const TRI_INDEX = 4294967295;
 
 const MAX_FLAG = 0x7fffffff;
@@ -73,7 +71,7 @@ function tidy( array ) {
 
 }
 
-// ---- Geometry Helpers ----
+// Geometry helpers
 
 const _edge1 = [ 0, 0, 0 ];
 const _edge2 = [ 0, 0, 0 ];

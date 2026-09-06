@@ -2,7 +2,6 @@
  * Portions adapted from SculptGL by Stéphane Ginier.
  * Copyright (c) 2019 Stéphane GINIER
  * Licensed under the MIT License; see ./SculptGL.LICENSE.txt.
- * Audited against https://github.com/stephomi/sculptgl/tree/8e45dafc0f7906e5238dfffc1a2df742bd25f29d
  */
 
 import {
@@ -160,8 +159,7 @@ function createVersionedAttribute( source, itemSize, previous ) {
 
 	const attribute = new BufferAttribute( source, itemSize );
 
-	// Sculptor explicitly increments the version whenever the CPU data changes.
-	// The default usage avoids unconditional per-frame uploads in WebGPURenderer.
+	// Static usage keeps uploads version-driven in both renderers.
 	if ( previous !== undefined && previous !== null ) attribute.version = previous.version + 1;
 
 	return attribute;
@@ -207,9 +205,7 @@ function addVertexUpdateRanges( attribute, vertices ) {
 	ranges.sort( sortByRangeStart );
 	let writeIndex = 0;
 
-	// A few hundred extra bytes are cheaper than another GPU upload command on
-	// all supported backends. Merge nearby spans, including ranges queued by an
-	// earlier sync that the renderer has not consumed yet.
+	// Merge nearby spans with pending ranges to limit upload calls.
 	for ( let i = 1, l = ranges.length; i < l; i ++ ) {
 
 		const previousRange = ranges[ writeIndex ];
@@ -232,8 +228,7 @@ function addVertexUpdateRanges( attribute, vertices ) {
 
 	if ( ranges.length <= MAX_UPDATE_RANGES ) return;
 
-	// Keeping the largest gaps minimizes the extra data uploaded when limiting
-	// the number of commands. The remaining boundaries are merged in place.
+	// Preserve the largest gaps when limiting the number of upload ranges.
 	const splitIndices = [];
 
 	for ( let i = 1, l = ranges.length; i < l; i ++ ) splitIndices.push( i );
@@ -284,8 +279,7 @@ function compactDirtyVertices( vertices, vertexCount ) {
 
 		const vertex = vertices[ i ];
 
-		// A pointer event can contain several topology generations. Vertices
-		// removed by a later stamp must not become GPU update ranges.
+		// Exclude vertices removed by later stamps in the same pointer event.
 		if ( vertex >= vertexCount ) break;
 		if ( vertex < 0 || vertex === previous ) continue;
 
@@ -300,11 +294,7 @@ function compactDirtyVertices( vertices, vertexCount ) {
 }
 
 /**
- * A dynamic-triangle surface sculptor.
- *
- * It includes Clay, Brush, Inflate, Smooth, Flatten, Pinch, Crease, Drag and
- * Scale with adaptive topology. Features such as symmetry, pressure, alphas,
- * masks, undo/redo and multiresolution meshes are outside its scope.
+ * Sculpts triangle meshes with adaptive topology.
  *
  * ```js
  * const sculptor = new Sculptor( mesh, camera )
@@ -314,28 +304,22 @@ function compactDirtyVertices( vertices, vertexCount ) {
  * sculptor.connect( renderer.domElement );
  * ```
  *
- * The sculptor reads the source geometry, then installs a dedicated
- * `BufferGeometry` on the mesh. Coincident positions and numerical seams are
- * welded, and only the dynamic position, normal and index buffers are retained.
- * The source geometry and other meshes that share it are not modified or
- * disposed. Skinned, instanced, batched and multi-material meshes are not
- * supported. Picking requires a non-zero uniform world scale without shear.
- * Dynamic topology can replace `mesh.geometry` when its buffers change size;
- * applications should not retain the dedicated geometry or attribute objects.
- * The buffers retain spare capacity, with `drawRange` limiting rendered triangles.
- * Use {@link Sculptor#getGeometry} for a compact snapshot suitable for export or
- * geometry processing. Sculptor maintains the live geometry's bounds and draw range.
+ * Replaces `mesh.geometry` with a welded geometry containing positions, normals
+ * and indices. The source geometry is unchanged and is not disposed.
  *
- * Fires `start` when a stroke begins, `change` after geometry is updated, and
- * `end` when the stroke finishes. Pointer and programmatic strokes share one
- * lifecycle; programmatic stamps cannot interrupt a connected pointer stroke.
+ * The mesh must use one material and a non-zero uniform world scale without
+ * shear. Skinned, instanced and batched meshes are not supported.
+ *
+ * Sculptor manages bounds, draw range and spare buffer capacity. Geometry and
+ * attributes may be replaced as capacity changes; do not cache them. Use
+ * {@link Sculptor#getGeometry} for a compact copy for export or geometry processing.
  *
  * @three_import import { Sculptor } from 'three/addons/misc/Sculptor.js';
  */
 class Sculptor extends EventDispatcher {
 
 	/**
-	 * @param {Mesh} mesh - The mesh that will receive a dedicated sculpt geometry.
+	 * @param {Mesh} mesh - The mesh to sculpt.
 	 * @param {Camera} camera - The camera used for pointer picking.
 	 */
 
@@ -393,9 +377,7 @@ class Sculptor extends EventDispatcher {
 		this.domElement = null;
 
 		/**
-		 * Whether connected pointer input can start or update a stroke.
-		 * Programmatic methods such as {@link Sculptor#strokeFromRay} are not
-		 * affected.
+		 * Whether pointer input is enabled. Does not affect programmatic strokes.
 		 *
 		 * @type {boolean}
 		 * @default true
@@ -434,7 +416,7 @@ class Sculptor extends EventDispatcher {
 	}
 
 	/**
-	 * Connects the sculptor to the given DOM element.
+	 * Connects pointer input to a DOM element.
 	 *
 	 * @param {HTMLElement} element - The element receiving pointer events.
 	 */
@@ -461,8 +443,7 @@ class Sculptor extends EventDispatcher {
 	}
 
 	/**
-	 * Disconnects the sculptor from its current DOM element and finishes an
-	 * active stroke.
+	 * Disconnects pointer input and finishes the active stroke.
 	 */
 	disconnect() {
 
@@ -827,24 +808,21 @@ class Sculptor extends EventDispatcher {
 		let faces = sculptMesh.getFacesFromVertices( pickedVertices );
 		const radius2 = this._localRadius2;
 		const hitPoint = this._hitPoint;
-		// Higher detail means shorter target edges, with a finite target at 1.
+		// Keep edge targets non-zero at maximum detail.
 		const edgeMax2 = radius2 * ( 1.1 - detail ) * 0.2;
-		// Stay just below half the split length so a newly divided edge cannot
-		// immediately collapse again because of smoothing or Float32 rounding.
+		// Keep the collapse threshold below half the split length to avoid oscillation.
 		const edgeMin2 = edgeMax2 / TOPOLOGY_HYSTERESIS2;
 
 		faces = subdivisionPass( sculptMesh, faces, hitPoint, radius2, edgeMax2 );
 		faces = decimationPass( sculptMesh, faces, hitPoint, radius2, edgeMin2 );
 
-		// The regular deformation pass updates geometry caches after the tool runs.
-		// Rebuild topology-specific state only when either pass changed connectivity.
+		// Rebuild topology caches only when connectivity changes.
 		if ( sculptMesh.getTopologyVersion() === topologyVersion ) return originalPickedVertices;
 
 		let affectedVertices = sculptMesh.getVerticesFromFaces( faces );
 
-		// Subdivision smooths vertices in the one-ring around new edges. Include
-		// every face incident to those vertices so cached normals, bounds and the
-		// octree cannot retain pre-smoothing data.
+		// Include faces adjacent to smoothed vertices to update their normals,
+		// bounds and octree cells.
 		faces = sculptMesh.getFacesFromVertices( affectedVertices );
 		affectedVertices = sculptMesh.getVerticesFromFaces( faces );
 		const sculptFlags = sculptMesh.getVerticesSculptFlags();
@@ -931,12 +909,11 @@ class Sculptor extends EventDispatcher {
 	}
 
 	/**
-	 * Applies one stamp from a world-space ray, beginning a stroke on the first
-	 * hit. Call {@link Sculptor#endStroke} after the last stamp. Returns `false`
-	 * without changing the current hit when a connected pointer owns the stroke.
+	 * Applies a ray stamp, starting a stroke on a hit. Call
+	 * {@link Sculptor#endStroke} after the last stamp.
 	 *
-	 * Drag and Scale depend on pointer deltas and are unavailable through this
-	 * method.
+	 * Returns `false` without updating the hit during a pointer stroke.
+	 * Drag and Scale require pointer input.
 	 *
 	 * @param {Ray} ray - The world-space ray, with a non-zero direction.
 	 * @param {number} worldRadius - The brush radius in world units.
@@ -961,9 +938,8 @@ class Sculptor extends EventDispatcher {
 	}
 
 	/**
-	 * Begins a stroke and fires `start`. Has no effect if a stroke is already
-	 * active. Pointer input and the first successful ray stamp call this
-	 * automatically; callers may also begin a programmatic stroke explicitly.
+	 * Begins a stroke and fires `start`. Does nothing while a stroke is active.
+	 * Called automatically by pointer input or the first successful ray stamp.
 	 *
 	 * @return {Sculptor} A reference to this sculptor.
 	 */
@@ -978,9 +954,9 @@ class Sculptor extends EventDispatcher {
 	}
 
 	/**
-	 * Finishes the active stroke, releases pointer capture, balances the octree
-	 * and updates exact geometry bounds before firing `end`. Has no effect when
-	 * idle. Connected pointer input calls this automatically on release or cancel.
+	 * Releases pointer capture, balances the octree and updates exact bounds,
+	 * then fires `end`. Does nothing while idle. Called automatically when a
+	 * pointer stroke ends or is cancelled.
 	 *
 	 * @return {Sculptor} A reference to this sculptor.
 	 */
@@ -1282,9 +1258,8 @@ class Sculptor extends EventDispatcher {
 
 		}
 
-		// BufferAttributes cannot be resized after their first upload. Install a new
-		// geometry generation before disposing the old one so every renderer can
-		// release its attributes and attach a fresh disposal listener.
+		// Uploaded buffers cannot resize. Replace the geometry to release its GPU
+		// resources without invalidating the new attributes.
 		if ( replaceGeometry ) {
 
 			previousGeometry = geometry;
@@ -1380,9 +1355,8 @@ class Sculptor extends EventDispatcher {
 	}
 
 	/**
-	 * Returns a compact copy of the current sculpt geometry, without spare buffer
-	 * capacity. The snapshot is independent of subsequent strokes and can be used
-	 * for export or geometry processing. The caller owns the returned geometry.
+	 * Returns an independent copy of the active vertices and triangles, without
+	 * spare capacity. Suitable for export or geometry processing. The caller owns it.
 	 *
 	 * @return {BufferGeometry} A new geometry containing the active vertices and triangles.
 	 */
@@ -1449,7 +1423,7 @@ class Sculptor extends EventDispatcher {
 
 			const pointerSampled = this._sculptStroke( event.clientX, event.clientY );
 
-			// Keep the cursor attached even when movement is below stamp spacing.
+			// Update the cursor between stamps.
 			if ( pointerSampled !== true && this._intersectionRayMesh( event.clientX, event.clientY ) ) this._computePickedNormal();
 
 		}
@@ -1474,9 +1448,7 @@ class Sculptor extends EventDispatcher {
 	}
 
 	/**
-	 * Selects the active sculpting tool.
-	 * The tool's most recently configured size, strength and negative setting
-	 * are restored when switching tools.
+	 * Selects a tool and restores its size, strength and negative setting.
 	 *
 	 * @param {('clay'|'brush'|'inflate'|'smooth'|'flatten'|'pinch'|'crease'|'drag'|'scale')} value - The tool name.
 	 * @return {Sculptor} A reference to this sculptor.
@@ -1540,6 +1512,8 @@ class Sculptor extends EventDispatcher {
 
 	/**
 	 * Sets the strength of the active tool.
+	 * A value of `0` disables deformation, but not adaptive remeshing.
+	 * Drag and Scale use pointer movement instead of this setting.
 	 *
 	 * @param {number} value - A value between 0 and 1.
 	 * @return {Sculptor} A reference to this sculptor.
@@ -1581,8 +1555,7 @@ class Sculptor extends EventDispatcher {
 	}
 
 	/**
-	 * Returns the adaptive-topology detail. A value of `0` freezes the
-	 * topology.
+	 * Returns the adaptive-topology detail. `0` freezes topology.
 	 *
 	 * @return {number} The detail level.
 	 */
@@ -1593,9 +1566,9 @@ class Sculptor extends EventDispatcher {
 	}
 
 	/**
-	 * Sets the adaptive-topology detail. Higher values produce shorter target
-	 * edges. Long edges are split and short edges are collapsed automatically.
-	 * A value of `0` freezes the current topology.
+	 * Sets the adaptive-topology detail. Higher values produce shorter edges
+	 * relative to the brush radius; `0` freezes topology. Remeshing splits long
+	 * edges and collapses short ones, and can alter the surface even at zero strength.
 	 *
 	 * @param {number} value - A value between 0 and 1.
 	 * @return {Sculptor} A reference to this sculptor.
@@ -1656,8 +1629,7 @@ class Sculptor extends EventDispatcher {
 	}
 
 	/**
-	 * Returns the latest brush radius in world units, or `0` when there is no
-	 * hit.
+	 * Returns the brush radius in world units, or `0` without a hit.
 	 *
 	 * @return {number} The brush radius in world units.
 	 */
