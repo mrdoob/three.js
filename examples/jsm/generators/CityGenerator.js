@@ -74,7 +74,15 @@ class CityGenerator {
 
 	build( materials = {} ) {
 
-		this.dispose();
+		for ( const generator of this.generators ) generator.dispose();
+		this.generators.length = 0;
+
+		if ( this.group ) {
+
+			this.group.clear();
+			this.group.dispose();
+
+		}
 
 		const group = new Group();
 		group.name = 'City';
@@ -167,7 +175,7 @@ class CityGenerator {
 
 		}
 
-		if ( slabs.length > 0 ) group.add( this.sidewalk.build( slabs ) );
+		group.add( this.sidewalk.build( slabs ) );
 
 		group.add( this.buildFurniture( random ) );
 
@@ -342,15 +350,11 @@ class CityGenerator {
 		group.add( this.furniture.streetlight.build( lights ) );
 		group.add( this.furniture.trafficlight.build( signals ) );
 		group.add( this.furniture.trashcan.build( cans ) );
-		if ( benches.length ) group.add( this.furniture.bench.build( benches ) );
-		if ( hydrants.length ) group.add( this.furniture.hydrant.build( hydrants ) );
-		if ( trees.length ) group.add( this.furniture.tree.build( trees ) );
-		if ( people.length ) group.add( this.furniture.person.build( people ) );
-		if ( cars.length ) group.add( this.furniture.car.build( cars ) );
-
-		// the instanced furniture spans the whole city, so give each a bounding sphere
-		// over its instances ( instead of the canonical model at the origin ) to cull by
-		group.traverse( ( o ) => o.isInstancedMesh && o.computeBoundingSphere() );
+		group.add( this.furniture.bench.build( benches ) );
+		group.add( this.furniture.hydrant.build( hydrants ) );
+		group.add( this.furniture.tree.build( trees ) );
+		group.add( this.furniture.person.build( people ) );
+		group.add( this.furniture.car.build( cars ) );
 
 		return group;
 

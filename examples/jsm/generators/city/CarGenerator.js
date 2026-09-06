@@ -4,7 +4,6 @@ import {
 	Color,
 	Group,
 	InstancedBufferAttribute,
-	InstancedMesh,
 	InterpolationSamplingMode,
 	InterpolationSamplingType,
 	LatheGeometry,
@@ -17,6 +16,7 @@ import { atan, attribute, color, float, mix, positionGeometry, select, smoothste
 
 import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
 import { LoftGeometry } from '../../geometries/LoftGeometry.js';
+import { createInstances, updateInstances } from './InstancedMeshGenerator.js';
 
 /**
  * A low-poly car fleet: smooth body shells lofted through a row of cross sections,
@@ -52,7 +52,7 @@ class CarGenerator {
 
 	build( cars ) {
 
-		this.dispose();
+		if ( this.mesh && this.mesh.children.some( ( mesh ) => mesh.instanceMatrix.count < cars.length ) ) this.dispose();
 
 		// bucket the fleet by body type for one instanced draw per shell.
 		// the taxi colour always gets the signed sedan;
@@ -68,8 +68,15 @@ class CarGenerator {
 
 		}
 
-		const group = new Group();
-		group.name = 'Cars';
+		if ( this.mesh === null ) {
+
+			this.mesh = new Group();
+			this.mesh.name = 'Cars';
+
+		}
+
+		const group = this.mesh;
+		for ( const mesh of group.children ) updateInstances( mesh, [] );
 		const paint = new Color();
 
 		for ( const [ type, instances ] of buckets ) {
@@ -90,24 +97,28 @@ class CarGenerator {
 
 			}
 
-			const mesh = new InstancedMesh( geometry, material, instances.length );
-			const colors = new Float32Array( instances.length * 3 );
+			let mesh = group.children.find( ( child ) => child.geometry === geometry );
 
-			for ( let i = 0; i < instances.length; i ++ ) {
+			if ( mesh === undefined ) {
 
-				mesh.setMatrixAt( i, instances[ i ].matrix );
-				paint.set( instances[ i ].color ).toArray( colors, i * 3 );
+				mesh = createInstances( geometry, material, cars.length, 'Car' );
+				geometry.setAttribute( 'paintColor', new InstancedBufferAttribute( new Float32Array( mesh.instanceMatrix.count * 3 ), 3 ) );
+				group.add( mesh );
 
 			}
 
-			geometry.setAttribute( 'paintColor', new InstancedBufferAttribute( colors, 3 ) );
-			mesh.castShadow = mesh.receiveShadow = true;
-			mesh.name = 'Car';
-			group.add( mesh );
+			const colors = geometry.getAttribute( 'paintColor' );
+
+			for ( let i = 0; i < instances.length; i ++ ) {
+
+				paint.set( instances[ i ].color ).toArray( colors.array, i * 3 );
+
+			}
+
+			colors.needsUpdate = true;
+			updateInstances( mesh, instances.map( ( car ) => car.matrix ) );
 
 		}
-
-		this.mesh = group;
 
 		return group;
 

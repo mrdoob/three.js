@@ -1,7 +1,6 @@
 import {
 	BoxGeometry,
 	BufferAttribute,
-	InstancedMesh,
 	InterpolationSamplingMode,
 	InterpolationSamplingType
 } from 'three';
@@ -10,6 +9,8 @@ import { MeshStandardNodeMaterial } from 'three/webgpu';
 import { attribute, color, float, floor, fract, mix, mx_fractal_noise_float, positionGeometry, select, sin, varying, vec3 } from 'three/tsl';
 
 import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
+
+import { InstancedMeshGenerator } from './InstancedMeshGenerator.js';
 
 /**
  * A public street bench: timber slats carried on two cast-iron end frames that
@@ -26,44 +27,11 @@ import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
  * scene.add( benches.build( placements ) ); // placements: Matrix4[]
  * ```
  */
-class BenchGenerator {
+class BenchGenerator extends InstancedMeshGenerator {
 
 	constructor( parameters = {} ) {
 
-		this.parameters = Object.assign( {}, BenchGenerator.defaults, parameters );
-
-		this.material = null;
-		this.geometry = null;
-		this.mesh = null;
-
-	}
-
-	build( placements ) {
-
-		this.dispose();
-
-		if ( this.material === null ) this.material = createBenchMaterial();
-		if ( this.geometry === null ) this.geometry = buildBenchGeometry( this.parameters );
-
-		const mesh = new InstancedMesh( this.geometry, this.material, placements.length );
-		for ( let i = 0; i < placements.length; i ++ ) mesh.setMatrixAt( i, placements[ i ] );
-		mesh.castShadow = mesh.receiveShadow = true;
-		mesh.name = 'Benches';
-
-		this.mesh = mesh;
-
-		return mesh;
-
-	}
-
-	dispose() {
-
-		if ( this.geometry ) this.geometry.dispose();
-		if ( this.mesh ) this.mesh.dispose();
-		if ( this.material ) this.material.dispose();
-
-		this.geometry = null;
-		this.mesh = null;
+		super( parameters, buildBenchGeometry, createBenchMaterial, 'Benches' );
 
 	}
 

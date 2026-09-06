@@ -2,7 +2,6 @@ import {
 	BoxGeometry,
 	BufferAttribute,
 	CylinderGeometry,
-	InstancedMesh,
 	InterpolationSamplingMode,
 	InterpolationSamplingType,
 	Quaternion,
@@ -13,6 +12,8 @@ import { MeshStandardNodeMaterial } from 'three/webgpu';
 import { attribute, color, float, select, varying } from 'three/tsl';
 
 import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
+
+import { InstancedMeshGenerator } from './InstancedMeshGenerator.js';
 
 /**
  * A NYC cobra-head streetlight: a tall tapered mast standing at the curb with a
@@ -29,44 +30,11 @@ import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
  * scene.add( lights.build( placements ) ); // placements: Matrix4[]
  * ```
  */
-class StreetlightGenerator {
+class StreetlightGenerator extends InstancedMeshGenerator {
 
 	constructor( parameters = {} ) {
 
-		this.parameters = Object.assign( {}, StreetlightGenerator.defaults, parameters );
-
-		this.material = null;
-		this.geometry = null;
-		this.mesh = null;
-
-	}
-
-	build( placements ) {
-
-		this.dispose();
-
-		if ( this.material === null ) this.material = createStreetlightMaterial();
-		if ( this.geometry === null ) this.geometry = buildStreetlightGeometry( this.parameters );
-
-		const mesh = new InstancedMesh( this.geometry, this.material, placements.length );
-		for ( let i = 0; i < placements.length; i ++ ) mesh.setMatrixAt( i, placements[ i ] );
-		mesh.castShadow = true;
-		mesh.name = 'Streetlights';
-
-		this.mesh = mesh;
-
-		return mesh;
-
-	}
-
-	dispose() {
-
-		if ( this.geometry ) this.geometry.dispose();
-		if ( this.mesh ) this.mesh.dispose();
-		if ( this.material ) this.material.dispose();
-
-		this.geometry = null;
-		this.mesh = null;
+		super( parameters, buildStreetlightGeometry, createStreetlightMaterial, 'Streetlights', false );
 
 	}
 

@@ -2,7 +2,6 @@ import {
 	BoxGeometry,
 	BufferAttribute,
 	CylinderGeometry,
-	InstancedMesh,
 	InterpolationSamplingMode,
 	InterpolationSamplingType,
 	Group,
@@ -18,6 +17,7 @@ import { array, attribute, color, float, fract, instanceIndex, mix, positionGeom
 
 import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
 import { LoftGeometry } from '../../geometries/LoftGeometry.js';
+import { createInstances, updateInstances } from './InstancedMeshGenerator.js';
 
 /**
  * A low-poly pedestrian crowd: each figure is a lathed coat with lofted limbs,
@@ -50,12 +50,20 @@ class PersonGenerator {
 		this.material = null;
 		this.geometries = null;
 		this.mesh = null;
+		this._parametersKey = null;
 
 	}
 
 	build( placements ) {
 
-		this.dispose();
+		const parametersKey = JSON.stringify( this.parameters );
+
+		if ( parametersKey !== this._parametersKey || ( this.mesh && placements.length > this.mesh.children[ 0 ].instanceMatrix.count ) ) {
+
+			this.dispose();
+			this._parametersKey = parametersKey;
+
+		}
 
 		if ( this.material === null ) this.material = createPersonMaterial();
 		if ( this.geometries === null ) {
@@ -84,25 +92,21 @@ class PersonGenerator {
 
 		}
 
-		const group = new Group();
-		group.name = 'People';
+		if ( this.mesh === null ) {
 
-		for ( const pose of [ 'walk', 'stand' ] ) {
-
-			const matrices = buckets[ pose ];
-			if ( matrices.length === 0 ) continue;
-
-			const mesh = new InstancedMesh( this.geometries[ pose ], this.material, matrices.length );
-			for ( let i = 0; i < matrices.length; i ++ ) mesh.setMatrixAt( i, matrices[ i ] );
-			mesh.castShadow = mesh.receiveShadow = true;
-			mesh.name = 'People';
-			group.add( mesh );
+			this.mesh = new Group();
+			this.mesh.name = 'People';
+			this.mesh.add(
+				createInstances( this.geometries.walk, this.material, placements.length, 'People' ),
+				createInstances( this.geometries.stand, this.material, placements.length, 'People' )
+			);
 
 		}
 
-		this.mesh = group;
+		updateInstances( this.mesh.children[ 0 ], buckets.walk );
+		updateInstances( this.mesh.children[ 1 ], buckets.stand );
 
-		return group;
+		return this.mesh;
 
 	}
 
@@ -119,6 +123,7 @@ class PersonGenerator {
 		if ( this.material ) this.material.dispose();
 
 		this.geometries = null;
+		this.material = null;
 		this.mesh = null;
 
 	}

@@ -2,7 +2,6 @@ import {
 	BufferAttribute,
 	CylinderGeometry,
 	IcosahedronGeometry,
-	InstancedMesh,
 	InterpolationSamplingMode,
 	InterpolationSamplingType,
 	RingGeometry,
@@ -13,6 +12,8 @@ import { MeshStandardNodeMaterial } from 'three/webgpu';
 import { attribute, color, float, fract, instanceIndex, mix, mx_fractal_noise_float, mx_noise_float, normalView, normalWorldGeometry, positionGeometry, positionLocal, positionView, positionViewDirection, positionWorld, select, sin, smoothstep, time, varying, vec3 } from 'three/tsl';
 
 import { mergeGeometries, mergeVertices } from '../../utils/BufferGeometryUtils.js';
+
+import { InstancedMeshGenerator } from './InstancedMeshGenerator.js';
 
 /**
  * A young street tree set in a curbside pit: a flared bark trunk rising through a
@@ -32,44 +33,11 @@ import { mergeGeometries, mergeVertices } from '../../utils/BufferGeometryUtils.
  * scene.add( trees.build( placements ) ); // placements: Matrix4[]
  * ```
  */
-class StreetTreeGenerator {
+class StreetTreeGenerator extends InstancedMeshGenerator {
 
 	constructor( parameters = {} ) {
 
-		this.parameters = Object.assign( {}, StreetTreeGenerator.defaults, parameters );
-
-		this.material = null;
-		this.geometry = null;
-		this.mesh = null;
-
-	}
-
-	build( placements ) {
-
-		this.dispose();
-
-		if ( this.material === null ) this.material = createStreetTreeMaterial();
-		if ( this.geometry === null ) this.geometry = buildStreetTreeGeometry( this.parameters );
-
-		const mesh = new InstancedMesh( this.geometry, this.material, placements.length );
-		for ( let i = 0; i < placements.length; i ++ ) mesh.setMatrixAt( i, placements[ i ] );
-		mesh.castShadow = mesh.receiveShadow = true;
-		mesh.name = 'StreetTrees';
-
-		this.mesh = mesh;
-
-		return mesh;
-
-	}
-
-	dispose() {
-
-		if ( this.geometry ) this.geometry.dispose();
-		if ( this.mesh ) this.mesh.dispose();
-		if ( this.material ) this.material.dispose();
-
-		this.geometry = null;
-		this.mesh = null;
+		super( parameters, buildStreetTreeGeometry, createStreetTreeMaterial, 'StreetTrees' );
 
 	}
 

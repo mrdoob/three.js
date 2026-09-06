@@ -2,7 +2,6 @@ import {
 	BufferAttribute,
 	CylinderGeometry,
 	IcosahedronGeometry,
-	InstancedMesh,
 	InterpolationSamplingMode,
 	InterpolationSamplingType
 } from 'three';
@@ -11,6 +10,8 @@ import { MeshStandardNodeMaterial } from 'three/webgpu';
 import { attribute, color, float, Fn, fract, mix, mx_fractal_noise_float, positionGeometry, select, smoothstep, step, uv, varying } from 'three/tsl';
 
 import { mergeGeometries, mergeVertices } from '../../utils/BufferGeometryUtils.js';
+
+import { InstancedMeshGenerator } from './InstancedMeshGenerator.js';
 
 /**
  * The NYC green wire-mesh litter basket: a slightly tapered drum with a heavy top
@@ -24,44 +25,11 @@ import { mergeGeometries, mergeVertices } from '../../utils/BufferGeometryUtils.
  * scene.add( cans.build( placements ) ); // placements: Matrix4[]
  * ```
  */
-class TrashcanGenerator {
+class TrashcanGenerator extends InstancedMeshGenerator {
 
 	constructor( parameters = {} ) {
 
-		this.parameters = Object.assign( {}, TrashcanGenerator.defaults, parameters );
-
-		this.material = null;
-		this.geometry = null;
-		this.mesh = null;
-
-	}
-
-	build( placements ) {
-
-		this.dispose();
-
-		if ( this.material === null ) this.material = createTrashcanMaterial();
-		if ( this.geometry === null ) this.geometry = buildTrashcanGeometry( this.parameters );
-
-		const mesh = new InstancedMesh( this.geometry, this.material, placements.length );
-		for ( let i = 0; i < placements.length; i ++ ) mesh.setMatrixAt( i, placements[ i ] );
-		mesh.castShadow = mesh.receiveShadow = true;
-		mesh.name = 'Trashcans';
-
-		this.mesh = mesh;
-
-		return mesh;
-
-	}
-
-	dispose() {
-
-		if ( this.geometry ) this.geometry.dispose();
-		if ( this.mesh ) this.mesh.dispose();
-		if ( this.material ) this.material.dispose();
-
-		this.geometry = null;
-		this.mesh = null;
+		super( parameters, buildTrashcanGeometry, createTrashcanMaterial, 'Trashcans' );
 
 	}
 
