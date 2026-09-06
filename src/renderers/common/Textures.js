@@ -613,6 +613,8 @@ class Textures extends DataMap {
 
 				for ( const bindGroup of textureData.bindGroups ) {
 
+					bindGroup.needsUpdate = true;
+
 					const bindingsData = this.backend.get( bindGroup );
 
 					bindingsData.groups = undefined;

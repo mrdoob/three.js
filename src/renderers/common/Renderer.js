@@ -3890,6 +3890,10 @@ class Renderer {
 			this._nodes.updateForRender( renderObject );
 			this._bindings.updateSharedForRender( renderObject );
 
+		} else {
+
+			this._bindings.updateInvalidatedForRender( renderObject );
+
 		}
 
 		this._pipelines.updateForRender( renderObject );

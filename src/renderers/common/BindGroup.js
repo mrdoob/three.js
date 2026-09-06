@@ -38,6 +38,14 @@ class BindGroup {
 		 */
 		this.id = _id ++;
 
+		/**
+		 * Whether the bindings must be recreated after a resource is disposed.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.needsUpdate = false;
+
 	}
 
 }

@@ -150,7 +150,7 @@ class Bindings extends DataMap {
 	}
 
 	/**
-	 * Updates only the shared uniform buffers of the given render object.
+	 * Updates shared uniform buffers and invalidated bindings of the given render object.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
 	 */
@@ -159,6 +159,13 @@ class Bindings extends DataMap {
 		const bindings = this.getForRender( renderObject );
 
 		for ( const bindGroup of bindings ) {
+
+			if ( bindGroup.needsUpdate === true ) {
+
+				this._update( bindGroup, bindings );
+				continue;
+
+			}
 
 			for ( const binding of bindGroup.bindings ) {
 
@@ -181,6 +188,23 @@ class Bindings extends DataMap {
 				}
 
 			}
+
+		}
+
+	}
+
+	/**
+	 * Updates disposed resources even when the render object otherwise requires no refresh.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 */
+	updateInvalidatedForRender( renderObject ) {
+
+		const bindings = this.getForRender( renderObject );
+
+		for ( const bindGroup of bindings ) {
+
+			if ( bindGroup.needsUpdate === true ) this._update( bindGroup, bindings );
 
 		}
 
@@ -357,7 +381,7 @@ class Bindings extends DataMap {
 
 		const { backend } = this;
 
-		let needsBindingsUpdate = false;
+		let needsBindingsUpdate = bindGroup.needsUpdate;
 		let cacheBindings = true;
 		let cacheKey = '';
 		let version = 0;
@@ -371,7 +395,7 @@ class Bindings extends DataMap {
 			// every uniforms group is a uniform buffer. So if no update is required,
 			// we move one with the next binding. Otherwise the next if block will update the group.
 
-			if ( updatedGroup === false ) continue;
+			if ( updatedGroup === false && bindGroup.needsUpdate === false ) continue;
 
 			//
 
@@ -497,6 +521,8 @@ class Bindings extends DataMap {
 		if ( needsBindingsUpdate === true ) {
 
 			this.backend.updateBindings( bindGroup, bindings, cacheBindings ? cacheKey : '', version );
+
+			bindGroup.needsUpdate = false;
 
 		}
 
