@@ -139,14 +139,5 @@ export default [
 			ecmaVersion: 2022,
 			sourceType: 'module'
 		}
-	},
-
-	{
-		name: 'tsl rules',
-		files: [ 'tsl/**/*.js' ],
-		languageOptions: {
-			ecmaVersion: 2022,
-			sourceType: 'module'
-		}
 	}
 ];
