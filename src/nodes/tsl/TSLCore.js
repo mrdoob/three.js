@@ -461,7 +461,7 @@ class ShaderCallNodeInternal extends Node {
 
 	generateNodeType( builder ) {
 
-		return this.shaderNode.nodeType || this.getOutputNode( builder ).getNodeType( builder );
+		return this.shaderNode.nodeType || this.shaderNode.layout?.type || this.getOutputNode( builder ).getNodeType( builder );
 
 	}
 

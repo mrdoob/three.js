@@ -10,6 +10,7 @@ import FunctionNode from '../code/FunctionNode.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import { getDataFromObject, getTypeFromLength, getTextureType, hashString } from './NodeUtils.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
+import { isNodePure } from './NodePurity.js';
 
 import {
 	NumberNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
@@ -2550,6 +2551,14 @@ class NodeBuilder {
 
 			fn.code = this.buildFunctionCode( shaderNode );
 
+			// Only value parameters can be discarded with an unused function result.
+			// Pointer and other reference parameters may expose writes to the caller.
+			if ( shaderNode.layout.inputs.some( input => /^(?:float|int|uint|bool|[biu]?vec[234]|mat[234])$/.test( input.type ) === false ) ) {
+
+				fn._isPure = false;
+
+			}
+
 			this.currentFunctionNode = previous;
 
 			cache.set( shaderNode, fn );
@@ -2664,6 +2673,12 @@ class NodeBuilder {
 
 			flow.result = node.build( this, output );
 
+			if ( buildStage === 'setup' && this.currentFunctionNode !== null ) {
+
+				this.currentFunctionNode._isPure = isNodePure( this, node, true );
+
+			}
+
 		}
 
 		flow.vars = this.getVars( this.shaderStage );
@@ -2677,6 +2692,18 @@ class NodeBuilder {
 		this.setBuildStage( previousBuildStage );
 
 		return flow;
+
+	}
+
+	/**
+	 * Whether evaluating a node has no externally visible shader effects.
+	 *
+	 * @param {Node} node - The node to inspect.
+	 * @return {boolean} Whether the node can be omitted when its result is unused.
+	 */
+	isNodePure( node ) {
+
+		return isNodePure( this, node );
 
 	}
 

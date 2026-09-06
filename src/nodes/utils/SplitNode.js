@@ -1,4 +1,5 @@
 import Node from '../core/Node.js';
+import ConstNode from '../core/ConstNode.js';
 import { vectorComponents } from '../core/constants.js';
 
 const _stringVectorComponents = vectorComponents.join( '' );
@@ -111,7 +112,36 @@ class SplitNode extends Node {
 
 	}
 
+	setup( builder ) {
+
+		if ( builder.context.assign !== true && this.components === 'w' ) {
+
+			const type = builder.getVectorType( this.node.getNodeType( builder ) );
+			const length = builder.getTypeLength( type );
+
+			if ( builder.isVector( type ) && ( length === 2 || length === 3 ) && builder.isNodePure( this.node ) ) {
+
+				// Vector expansion supplies alpha independently of the RGB expression.
+				// Fold before setup registers that expression's dependencies.
+				return new ConstNode( 1, builder.getComponentType( type ) );
+
+			}
+
+		}
+
+		return super.setup( builder );
+
+	}
+
 	generate( builder, output ) {
+
+		const outputNode = builder.getNodeProperties( this ).outputNode;
+
+		if ( outputNode !== null && outputNode !== undefined ) {
+
+			return outputNode.build( builder, output );
+
+		}
 
 		const node = this.node;
 		const nodeTypeLength = builder.getTypeLength( node.getNodeType( builder ) );

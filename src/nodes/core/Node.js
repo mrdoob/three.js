@@ -583,7 +583,7 @@ class Node extends EventDispatcher {
 
 			type = nodeData.typeFromOutput[ output ];
 
-			if ( type === undefined ) {
+			if ( type === undefined || type === null ) {
 
 				type = this.generateNodeType( builder, output );
 
@@ -595,7 +595,7 @@ class Node extends EventDispatcher {
 
 			type = nodeData.type;
 
-			if ( type === undefined ) {
+			if ( type === undefined || type === null ) {
 
 				type = this.generateNodeType( builder );
 
