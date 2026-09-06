@@ -1,7 +1,9 @@
 import {
 	BoxGeometry,
+	BufferGeometry,
 	CircleGeometry,
 	Color,
+	Float32BufferAttribute,
 	Group,
 	InstancedBufferAttribute,
 	InterpolationSamplingMode,
@@ -12,7 +14,7 @@ import {
 } from 'three';
 
 import { MeshStandardNodeMaterial } from 'three/webgpu';
-import { atan, attribute, color, float, mix, normalGeometry, positionGeometry, select, smoothstep, uniform, uniformArray, varying, vec2 } from 'three/tsl';
+import { atan, attribute, color, float, mix, normalGeometry, positionGeometry, select, smoothstep, uniform, uniformArray, uv, varying, vec2 } from 'three/tsl';
 
 import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
 import { LoftGeometry } from '../../geometries/LoftGeometry.js';
@@ -20,15 +22,15 @@ import { createInstances, updateInstances } from './InstancedMeshGenerator.js';
 import { part } from './CityGeneratorUtils.js';
 
 /**
- * A low-poly car fleet: smooth body shells lofted through a row of cross sections,
- * with real wheel-arch cutouts, an asymmetric hood / cabin / trunk, alloy wheels,
- * door seams and smoked glazing. Two body types ( sedan and SUV ) are mixed
+ * A low-poly car fleet with lofted bodies, circular wheel arches, curved
+ * windscreens and recessed alloy wheels. Separate cabin panels define the
+ * windows and their frames. Two body types ( sedan and SUV ) are mixed
  * deterministically across the fleet, and the taxi colour gets its own sedan with
  * a roof sign, so a parked row reads as different vehicles rather than one mould.
  *
  * Each geometry is built once per type and shared; cars are grouped by body
  * type with per-instance paint, so each group is a single instanced draw that
- * carves paint, glass, tyres, chrome and lamps out of a baked `partId` plus
+ * assigns paint, glass, tyres and lamps using a baked `partId`, panel UVs and
  * canonical-space masks.
  *
  * The canonical model stands with its wheels on `y = 0`, centred in X / Z, facing
@@ -146,366 +148,329 @@ CarGenerator.defaults = {};
 // the paint colour that gets the roof-signed taxi shell
 CarGenerator.taxiColor = 0xf5c518;
 
-const BODY = 0, WHEEL = 1, HEADLIGHT = 2, TAILLIGHT = 3, TRIM = 4, PLATE = 5, SIGN = 6, MIRROR = 7;
+const BODY = 0, WINDOW = 1, TYRE = 2, ALLOY = 3, TRIM = 4, MIRROR = 5, SIGN = 6, FRONT = 7, REAR = 8;
 
-/*
- * Everything that shapes a body type lives in one spec: the loft stations
- * ( z, bodyHalfW, roofHalfW, yLow, yBelt, yRoof, nose to tail ) plus the
- * canonical-space constants the material masks reuse. Station yLow rises over
- * the axles, cutting real wheel arches into the shell's silhouette.
- */
+// Body sections are [ z, half-width, shoulder height, deck height ]. The cabin
+// has separate base and roof corners, so changing its shape also moves its panes.
 const BODY_SPECS = {
 
 	sedan: {
-		stations: [
-			[ 2.20, 0.79, 0.73, 0.36, 0.65, 0.77 ], // front fascia
-			[ 2.08, 0.87, 0.81, 0.30, 0.73, 0.87 ], // hood lip
-			[ 1.73, 0.90, 0.84, 0.30, 0.79, 0.92 ], // front wheel arch
-			[ 1.61, 0.92, 0.85, 0.59, 0.80, 0.93 ],
-			[ 1.34, 0.92, 0.85, 0.73, 0.82, 0.94 ],
-			[ 1.07, 0.92, 0.85, 0.59, 0.84, 0.95 ],
-			[ 0.95, 0.91, 0.84, 0.29, 0.85, 0.96 ],
-			[ 0.78, 0.91, 0.82, 0.28, 0.86, 0.98 ], // windshield base
-			[ 0.20, 0.91, 0.71, 0.28, 0.88, 1.42 ], // roof front
-			[ - 0.64, 0.91, 0.72, 0.28, 0.89, 1.44 ], // roof rear
-			[ - 0.96, 0.91, 0.82, 0.29, 0.89, 1.04 ], // rear window base
-			[ - 1.08, 0.92, 0.85, 0.59, 0.88, 0.98 ], // rear wheel arch
-			[ - 1.35, 0.92, 0.85, 0.73, 0.86, 0.96 ],
-			[ - 1.62, 0.91, 0.84, 0.59, 0.84, 0.94 ],
-			[ - 1.74, 0.90, 0.83, 0.30, 0.82, 0.92 ],
-			[ - 2.08, 0.87, 0.81, 0.31, 0.76, 0.88 ], // trunk lip
-			[ - 2.20, 0.79, 0.74, 0.37, 0.67, 0.80 ] // rear fascia
+		body: [
+			[ 2.25, 0.79, 0.67, 0.79 ],
+			[ 2.11, 0.89, 0.78, 0.91 ],
+			[ 1.38, 0.94, 0.87, 1.00 ],
+			[ 0.75, 0.92, 0.89, 1.025 ],
+			[ - 0.45, 0.92, 0.91, 1.04 ],
+			[ - 1.38, 0.94, 0.88, 1.06 ],
+			[ - 2.10, 0.89, 0.77, 0.97 ],
+			[ - 2.25, 0.81, 0.70, 0.85 ]
 		],
-		nose: 2.20, tail: - 2.20,
-		wheelRadius: 0.34, wheelZ: 1.345, wheelX: 0.80, hubRadius: 0.22,
-		glassY: 0.97, roofCapY: 1.38, cabin: [ - 1.02, 0.75 ], screens: [ 0.22, - 0.66 ], windowWidths: [ 0.80, 0.70 ],
-		pillars: [[ - 0.29, - 0.21 ]],
-		seams: [ 0.72, - 0.25, - 0.98 ], handles: [ - 0.12, - 0.85 ], handleY: 0.90,
-		mirror: [ 1.02, 0.60 ], lampY: 0.66, tailLampY: 0.70, bumperY: 0.42,
-		sign: false
+		front: { base: [ 0.82, 0.99, 0.78 ], roof: [ 0.69, 1.45, 0.12 ] },
+		rear: { base: [ 0.83, 1.02, - 1.15 ], roof: [ 0.71, 1.47, - 0.72 ] },
+		wheelRadius: 0.35, wheelZ: 1.38, wheelX: 0.83,
+		pillars: [ - 0.30 ], lamps: [ 0.71, 0.76 ],
+		sign: false, rails: false
 	},
 
 	suv: {
-		stations: [
-			[ 2.24, 0.82, 0.76, 0.40, 0.81, 0.94 ], // front fascia
-			[ 2.12, 0.92, 0.86, 0.35, 0.89, 1.04 ], // hood lip
-			[ 1.80, 0.95, 0.87, 0.35, 0.92, 1.07 ], // front wheel arch
-			[ 1.67, 0.96, 0.88, 0.67, 0.94, 1.08 ],
-			[ 1.37, 0.96, 0.88, 0.82, 0.95, 1.09 ],
-			[ 1.07, 0.96, 0.88, 0.67, 0.97, 1.10 ],
-			[ 0.94, 0.95, 0.87, 0.34, 0.98, 1.11 ],
-			[ 0.78, 0.95, 0.86, 0.33, 1.00, 1.14 ], // windshield base
-			[ 0.24, 0.95, 0.77, 0.33, 1.02, 1.70 ], // roof front
-			[ - 0.70, 0.95, 0.78, 0.33, 1.03, 1.73 ],
-			[ - 0.94, 0.95, 0.78, 0.34, 1.03, 1.73 ],
-			[ - 1.07, 0.96, 0.78, 0.67, 1.03, 1.72 ], // rear wheel arch
-			[ - 1.37, 0.96, 0.78, 0.82, 1.02, 1.71 ],
-			[ - 1.67, 0.95, 0.77, 0.67, 1.01, 1.69 ], // roof rear
-			[ - 1.80, 0.94, 0.83, 0.35, 1.00, 1.48 ], // rear window
-			[ - 2.12, 0.91, 0.86, 0.36, 0.96, 1.20 ],
-			[ - 2.24, 0.81, 0.77, 0.42, 0.84, 1.08 ] // tailgate
+		body: [
+			[ 2.30, 0.84, 0.84, 0.99 ],
+			[ 2.15, 0.94, 0.94, 1.10 ],
+			[ 1.40, 0.98, 1.02, 1.17 ],
+			[ 0.76, 0.96, 1.04, 1.19 ],
+			[ - 0.45, 0.96, 1.05, 1.20 ],
+			[ - 1.40, 0.98, 1.03, 1.21 ],
+			[ - 2.16, 0.94, 0.94, 1.16 ],
+			[ - 2.30, 0.84, 0.86, 1.03 ]
 		],
-		nose: 2.24, tail: - 2.24,
-		wheelRadius: 0.385, wheelZ: 1.37, wheelX: 0.83, hubRadius: 0.25,
-		glassY: 1.12, roofCapY: 1.66, cabin: [ - 2.05, 0.75 ], screens: [ 0.26, - 1.68 ], windowWidths: [ 0.84, 0.76 ],
-		pillars: [[ - 0.28, - 0.20 ], [ - 1.06, - 0.98 ]],
-		seams: [ 0.72, - 0.24, - 1.13 ], handles: [ - 0.10, - 0.98 ], handleY: 1.04,
-		mirror: [ 1.17, 0.62 ], lampY: 0.82, tailLampY: 0.93, bumperY: 0.49,
+		front: { base: [ 0.86, 1.15, 0.78 ], roof: [ 0.76, 1.73, 0.18 ] },
+		rear: { base: [ 0.87, 1.15, - 2.12 ], roof: [ 0.77, 1.75, - 1.66 ] },
+		wheelRadius: 0.39, wheelZ: 1.40, wheelX: 0.87,
+		pillars: [ - 0.30, - 1.16 ], lamps: [ 0.91, 0.94 ],
 		sign: false, rails: true
 	}
 
 };
 
-// the taxi is the sedan shell plus a lit roof sign
 BODY_SPECS.taxi = Object.assign( {}, BODY_SPECS.sedan, { sign: true } );
 
-// Twelve points define the sill, shoulder crease and roof crown. The extra
-// longitudinal sections are spent on the wheel arches and cabin profile.
-function carSection( z, bodyHalfW, roofHalfW, yLow, yBelt, yRoof ) {
+function buildBody( spec ) {
 
-	const right = [
-		new Vector3( bodyHalfW * 0.84, yLow, z ),
-		new Vector3( bodyHalfW * 0.98, yLow + ( yBelt - yLow ) * 0.18, z ),
-		new Vector3( bodyHalfW, yBelt, z ),
-		new Vector3( bodyHalfW * 0.97, yBelt + ( yRoof - yBelt ) * 0.10, z ),
-		new Vector3( roofHalfW, yRoof - ( yRoof - yBelt ) * 0.04, z ),
-		new Vector3( roofHalfW * 0.55, yRoof, z )
-	];
+	const profile = spec.body;
+	const radius = spec.wheelRadius + 0.055;
+	const stations = new Set( profile.map( section => section[ 0 ] ) );
 
-	const section = right.slice();
-	for ( let i = right.length - 1; i >= 0; i -- ) {
+	// Sample the arches around the axle, then interpolate the body profile at
+	// those stations. Wheel size and placement no longer need hand-shaped cuts.
+	for ( const axle of [ - spec.wheelZ, spec.wheelZ ] ) {
 
-		const p = right[ i ];
-		section.push( new Vector3( - p.x, p.y, p.z ) );
+		for ( let i = 0; i <= 6; i ++ ) stations.add( axle + radius * Math.cos( i / 6 * Math.PI ) );
 
 	}
 
-	// The sections run nose to tail; reverse their winding for outward normals.
-	return section.reverse();
+	const sections = Array.from( stations ).sort( ( a, b ) => b - a ).map( z => {
+
+		let index = 0;
+		while ( index < profile.length - 2 && z < profile[ index + 1 ][ 0 ] ) index ++;
+
+		const a = profile[ index ], b = profile[ index + 1 ];
+		const t = ( z - a[ 0 ] ) / ( b[ 0 ] - a[ 0 ] );
+		const w = a[ 1 ] + ( b[ 1 ] - a[ 1 ] ) * t;
+		const shoulder = a[ 2 ] + ( b[ 2 ] - a[ 2 ] ) * t;
+		const deck = a[ 3 ] + ( b[ 3 ] - a[ 3 ] ) * t;
+		const distance = Math.abs( Math.abs( z ) - spec.wheelZ );
+		const sill = distance <= radius ? spec.wheelRadius + Math.sqrt( Math.max( 0, radius * radius - distance * distance ) ) : 0.28;
+
+		const right = [
+			new Vector3( w * 0.82, sill, z ),
+			new Vector3( w * 0.97, sill + ( shoulder - sill ) * 0.12, z ),
+			new Vector3( w, shoulder, z ),
+			new Vector3( w * 0.91, deck - 0.025, z ),
+			new Vector3( w * 0.52, deck, z )
+		];
+
+		return [ ...right, ...right.slice().reverse().map( p => new Vector3( - p.x, p.y, p.z ) ) ].reverse();
+
+	} );
+
+	const geometry = part( new LoftGeometry( sections, { capStart: true, capEnd: true } ), BODY );
+	const normals = geometry.attributes.normal;
+	const ids = geometry.attributes.partId;
+	for ( let i = 0; i < normals.count; i ++ ) {
+
+		if ( normals.getZ( i ) > 0.9999 ) ids.setX( i, FRONT );
+		if ( normals.getZ( i ) < - 0.9999 ) ids.setX( i, REAR );
+
+	}
+
+	return geometry;
 
 }
 
-function buildCarGeometry( spec ) {
+// Independent panel vertices preserve the crease at each pillar and roof edge.
+// Their UVs also give the material an exact outline for the window seals.
+function panel( corners, id, curved = false ) {
 
-	const sections = spec.stations.map( s => carSection( ...s ) );
-	const body = new LoftGeometry( sections, { closed: true, capStart: true, capEnd: true } );
+	const geometry = new BufferGeometry();
+	const columns = curved ? 4 : 1, rows = curved ? 2 : 1;
+	const positions = [], uvs = [], indices = [];
+	const normal = corners[ 1 ].clone().sub( corners[ 0 ] ).cross( corners[ 3 ].clone().sub( corners[ 0 ] ) ).normalize();
 
-	// each wheel is one lathed profile: tread with rounded shoulders, a bulged
-	// sidewall stepping down to the rim lip, and the spoke face recessed behind
-	// it. the material splits tyre from alloy by radial distance, so the whole
-	// wheel needs no seams and no separate hub disc
-	const r = spec.wheelRadius;
-	const rim = spec.hubRadius;
-	const w = r * 0.68;
+	for ( let y = 0; y <= rows; y ++ ) {
 
-	const wheelProfile = [
-		new Vector2( r * 0.94, - w * 0.44 ),
-		new Vector2( r, - w * 0.16 ), // tread
-		new Vector2( r, w * 0.16 ),
-		new Vector2( r * 0.94, w * 0.4 ), // outer shoulder
-		new Vector2( rim + 0.02, w * 0.46 ), // sidewall bulge down to the rim
-		new Vector2( rim, w * 0.32 ), // rim lip, stepping inward
-		new Vector2( 0.02, w * 0.32 ) // recessed spoke face
-	];
+		const v = y / rows;
+		for ( let x = 0; x <= columns; x ++ ) {
 
-	const wheels = [];
-	for ( const x of [ - spec.wheelX, spec.wheelX ] ) {
+			const u = x / columns;
+			const p = corners[ 0 ].clone().lerp( corners[ 1 ], u ).lerp( corners[ 3 ].clone().lerp( corners[ 2 ], u ), v );
+			if ( curved ) {
 
-		const side = Math.sign( x );
-		for ( const z of [ - spec.wheelZ, spec.wheelZ ] ) {
+				const arch = 4 * u * ( 1 - u );
+				p.y += arch * v * 0.035;
+				p.addScaledVector( normal, arch * 4 * v * ( 1 - v ) * 0.025 );
 
-			// A dark half-disc closes the wheel well behind the tyre.
-			wheels.push(
-				new LatheGeometry( wheelProfile, 16 ).rotateZ( - side * Math.PI / 2 ).translate( x, r, z ),
-				new CircleGeometry( r + 0.06, 8, 0, Math.PI ).rotateY( side * Math.PI / 2 ).translate( x - side * ( w * 0.5 + 0.02 ), r, z )
-			);
+			}
+
+			p.toArray( positions, positions.length );
+			uvs.push( u, v );
+
+			if ( x < columns && y < rows ) {
+
+				const a = y * ( columns + 1 ) + x, b = a + 1, d = a + columns + 1, c = d + 1;
+				indices.push( a, b, d, b, c, d );
+
+			}
 
 		}
 
 	}
 
-	// painted bumpers wrap each end, a matte grille fills the nose between the
-	// lamps, and each lamp pod is sunk into the fascia so only its face shows
-	const frontBumper = new BoxGeometry( 1.56, 0.12, 0.12 ).translate( 0, spec.bumperY, spec.nose - 0.04 );
-	const rearBumper = new BoxGeometry( 1.56, 0.12, 0.12 ).translate( 0, spec.bumperY, spec.tail + 0.04 );
-	const grille = new BoxGeometry( 0.64, 0.13, 0.04 ).translate( 0, spec.lampY - 0.02, spec.nose + 0.01 );
+	geometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+	geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+	geometry.setIndex( indices );
+	geometry.computeVertexNormals();
+	return part( geometry, id );
 
-	const headlights = mergeGeometries( [
-		new BoxGeometry( 0.38, 0.10, 0.06 ).translate( - 0.48, spec.lampY, spec.nose ),
-		new BoxGeometry( 0.38, 0.10, 0.06 ).translate( 0.48, spec.lampY, spec.nose )
-	] );
+}
 
-	const taillights = mergeGeometries( [
-		new BoxGeometry( 0.38, 0.11, 0.06 ).translate( - 0.46, spec.tailLampY, spec.tail ),
-		new BoxGeometry( 0.38, 0.11, 0.06 ).translate( 0.46, spec.tailLampY, spec.tail )
-	] );
+function buildCarGeometry( spec ) {
 
-	// wing mirrors at the base of the A-pillars, angled slightly into the wind
-	const mirrorHalfW = Math.max( ...spec.stations.map( station => station[ 1 ] ) );
-	const mirrors = mergeGeometries( [
-		new BoxGeometry( 0.15, 0.10, 0.18 ).rotateY( - 0.25 ).translate( - ( mirrorHalfW + 0.06 ), spec.mirror[ 0 ], spec.mirror[ 1 ] ),
-		new BoxGeometry( 0.15, 0.10, 0.18 ).rotateY( 0.25 ).translate( mirrorHalfW + 0.06, spec.mirror[ 0 ], spec.mirror[ 1 ] )
-	] );
+	const parts = [ buildBody( spec ) ];
+	const corner = ( point, side ) => new Vector3( point[ 0 ] * side, point[ 1 ], point[ 2 ] );
+	const fl = corner( spec.front.base, - 1 ), fr = corner( spec.front.base, 1 );
+	const rl = corner( spec.rear.base, - 1 ), rr = corner( spec.rear.base, 1 );
+	const tfl = corner( spec.front.roof, - 1 ), tfr = corner( spec.front.roof, 1 );
+	const trl = corner( spec.rear.roof, - 1 ), trr = corner( spec.rear.roof, 1 );
 
-	// licence plates centred on the bumpers, proud of the face so the two
-	// surfaces never share a plane
-	const plates = mergeGeometries( [
-		new BoxGeometry( 0.32, 0.12, 0.02 ).translate( 0, spec.bumperY + 0.02, spec.nose + 0.035 ),
-		new BoxGeometry( 0.32, 0.12, 0.02 ).translate( 0, spec.bumperY + 0.02, spec.tail - 0.035 )
-	] );
+	parts.push(
+		panel( [ fl, fr, tfr, tfl ], WINDOW, true ),
+		panel( [ rr, rl, trl, trr ], WINDOW, true ),
+		panel( [ fr, rr, trr, tfr ], WINDOW ),
+		panel( [ rl, fl, tfl, trl ], WINDOW )
+	);
 
-	const darkParts = [ ...wheels, grille ];
-	const roofY = Math.max( ...spec.stations.map( station => station[ 5 ] ) );
+	const roof = [ spec.front.roof, spec.rear.roof ].map( ( [ width, y, z ] ) => Array.from( { length: 5 }, ( _, i ) => {
 
-	// low roof rails along an SUV's crown
-	if ( spec.rails ) {
+		const u = i / 4;
+		return new Vector3( ( u * 2 - 1 ) * width, y + 4 * u * ( 1 - u ) * 0.035, z );
 
-		darkParts.push(
-			new BoxGeometry( 0.05, 0.045, 1.6 ).translate( - 0.60, roofY + 0.025, - 0.65 ),
-			new BoxGeometry( 0.05, 0.045, 1.6 ).translate( 0.60, roofY + 0.025, - 0.65 )
-		);
+	} ) );
+	parts.push( part( new LoftGeometry( roof, { closed: false } ), BODY ) );
+
+	const r = spec.wheelRadius;
+	const rim = r * 0.64;
+	const width = r * 0.68;
+	const wheelProfile = [
+		new Vector2( r * 0.93, - width * 0.44 ),
+		new Vector2( r, - width * 0.12 ),
+		new Vector2( r * 0.98, width * 0.27 ),
+		new Vector2( rim + 0.014, width * 0.44 )
+	];
+
+	for ( const side of [ - 1, 1 ] ) {
+
+		for ( const z of [ - spec.wheelZ, spec.wheelZ ] ) {
+
+			const x = side * spec.wheelX;
+			const tyre = new LatheGeometry( wheelProfile, 24 ).rotateZ( - side * Math.PI / 2 ).translate( x, r, z );
+			const lip = new LatheGeometry( [ new Vector2( rim + 0.014, width * 0.44 ), new Vector2( rim, width * 0.29 ) ], 24 ).rotateZ( - side * Math.PI / 2 ).translate( x, r, z );
+			const hub = new CircleGeometry( rim, 24 );
+			hub.attributes.position.setZ( 0, - 0.015 );
+			hub.computeVertexNormals();
+			hub.rotateY( side * Math.PI / 2 ).translate( x + side * width * 0.29, r, z );
+			const well = new CircleGeometry( r + 0.06, 8, 0, Math.PI ).rotateY( side * Math.PI / 2 ).translate( x - side * ( width * 0.5 + 0.02 ), r, z );
+
+			parts.push( part( tyre, TYRE ), part( lip, ALLOY ), part( hub, ALLOY ), part( well, TRIM ) );
+
+		}
+
+		const mirror = new BoxGeometry( 0.16, 0.1, 0.2 ).rotateY( side * 0.2 ).translate( side * ( spec.body[ 2 ][ 1 ] + 0.06 ), spec.front.base[ 1 ] + 0.05, spec.front.base[ 2 ] - 0.16 );
+		parts.push( part( mirror, MIRROR ) );
+
+		if ( spec.rails ) {
+
+			const sections = [ 0.06, 0.13, 0.87, 0.94 ].map( ( t, i ) => {
+
+				const z = tfr.z + ( trr.z - tfr.z ) * t;
+				const roofWidth = tfr.x + ( trr.x - tfr.x ) * t;
+				const y = tfr.y + ( trr.y - tfr.y ) * t + ( 1 - ( 0.63 / roofWidth ) ** 2 ) * 0.035 + ( i === 0 || i === 3 ? 0.005 : 0.05 );
+				const x = side * 0.63;
+				return [ new Vector3( x - 0.022, y - 0.018, z ), new Vector3( x + 0.022, y - 0.018, z ), new Vector3( x + 0.022, y + 0.018, z ), new Vector3( x - 0.022, y + 0.018, z ) ].reverse();
+
+			} );
+			parts.push( part( new LoftGeometry( sections, { capStart: true, capEnd: true } ), TRIM ) );
+
+		}
 
 	}
 
-	const parts = [
-		part( body, BODY ),
-		part( mirrors, MIRROR ),
-		part( mergeGeometries( darkParts ), WHEEL ),
-		part( mergeGeometries( [ frontBumper, rearBumper ] ), TRIM ),
-		part( headlights, HEADLIGHT ),
-		part( taillights, TAILLIGHT ),
-		part( plates, PLATE )
-	];
+	if ( spec.sign ) {
 
-	// the taxi's lit roof sign
-	if ( spec.sign ) parts.push( part( new BoxGeometry( 0.36, 0.1, 0.14 ).translate( 0, roofY + 0.055, - 0.1 ), SIGN ) );
+		const roofY = ( tfr.y + trr.y ) / 2 + 0.04;
+		const section = ( w, d, y ) => [ new Vector3( w, y, d ), new Vector3( - w, y, d ), new Vector3( - w, y, - d ), new Vector3( w, y, - d ) ];
+		const sign = new LoftGeometry( [ section( 0.16, 0.065, roofY + 0.1 ), section( 0.20, 0.095, roofY ) ], { capStart: true, capEnd: true } ).translate( 0, 0, - 0.2 );
+		parts.push( part( sign, SIGN ) );
 
-	// The material uses canonical positions; remove UVs before merging the parts.
-	for ( const geometry of parts ) geometry.deleteAttribute( 'uv' );
+	}
 
 	return mergeGeometries( parts );
 
 }
 
+function roundedRect( point, halfSize, radius ) {
+
+	const q = point.abs().sub( halfSize ).add( radius );
+	const distance = q.max( 0 ).length().add( q.x.max( q.y ).min( 0 ) ).sub( radius );
+	const edge = distance.fwidth().max( 0.001 );
+	return smoothstep( edge, edge.negate(), distance );
+
+}
+
 function createCarMaterial( spec ) {
 
-	// every spec constant enters the shader as a uniform, so all paints and body
-	// types share one compiled pipeline: the whole fleet costs a single shader
-	// compile instead of one per paint/type pairing
-
+	// Dimensions are uniforms, keeping one shader pipeline across body types.
 	const paint = attribute( 'paintColor', 'vec3' );
-	const glassY = uniform( spec.glassY );
-	const roofCapY = uniform( spec.roofCapY );
-	const cabinMin = uniform( spec.cabin[ 0 ] );
-	const cabinMax = uniform( spec.cabin[ 1 ] );
-	const wheelR = uniform( spec.wheelRadius );
-	const wheelZ = uniform( spec.wheelZ );
-	const hubRadius = uniform( spec.hubRadius );
-	const nose = uniform( spec.nose );
-	const screenFrontZ = uniform( spec.screens[ 0 ] );
-	const screenRearZ = uniform( spec.screens[ 1 ] );
-	const windowWidths = uniform( new Vector2( ...spec.windowWidths ) );
-	const bumperY = uniform( spec.bumperY );
-	const handleY = uniform( spec.handleY );
-	const handleZ = uniform( new Vector2( ...spec.handles ) );
-	const seamZ = uniform( new Vector3( ...spec.seams ) );
-
-	// pad to a fixed pillar count so the unrolled loop is identical for all types
-	const pillarBands = spec.pillars.slice();
-	while ( pillarBands.length < 4 ) pillarBands.push( [ 9, 9.001 ] );
-	const pillars = uniformArray( pillarBands.map( ( band ) => new Vector2( ...band ) ) ).setName( 'carPillars' );
+	const axle = uniform( spec.wheelZ );
+	const radius = uniform( spec.wheelRadius );
+	const lamps = uniform( new Vector2( ...spec.lamps ) );
+	const belt = uniform( spec.front.base[ 1 ] );
+	const doorEnd = spec.rails ? spec.pillars[ 1 ] - 0.08 : spec.rear.base[ 2 ] + 0.1;
+	const seams = uniform( new Vector3( spec.front.base[ 2 ] - 0.04, spec.pillars[ 0 ], doorEnd ) );
+	const handles = uniform( new Vector2( spec.pillars[ 0 ] + 0.17, doorEnd + 0.17 ) );
+	const pillars = uniformArray( [ spec.pillars[ 0 ], spec.pillars[ 1 ] ?? 9 ] );
 
 	const partId = varying( attribute( 'partId', 'float' ) ).setInterpolation( InterpolationSamplingType.FLAT, InterpolationSamplingMode.EITHER );
-	const isBody = partId.equal( BODY );
-	const isMirror = partId.equal( MIRROR );
-	const isWheel = partId.equal( WHEEL );
+	const isWindow = partId.equal( WINDOW );
+	const isTyre = partId.equal( TYRE );
+	const isAlloy = partId.equal( ALLOY );
 	const isTrim = partId.equal( TRIM );
-	const isHeadlight = partId.equal( HEADLIGHT );
-	const isTaillight = partId.equal( TAILLIGHT );
-	const isPlate = partId.equal( PLATE );
+	const isMirror = partId.equal( MIRROR );
 	const isSign = partId.equal( SIGN );
-
-	// all the masks below carve the shared shell in canonical model space, so
-	// their constants come from the same spec that placed the loft stations
-
 	const p = positionGeometry;
+	const side = normalGeometry.x.abs().greaterThan( 0.5 );
 
-	// smoked glazing: the greenhouse above the beltline over the cabin span,
-	// interrupted by painted pillar bands and a painted roof cap
-	const onScreens = p.z.greaterThan( screenFrontZ ).or( p.z.lessThan( screenRearZ ) );
-	const paneY = select( onScreens, glassY.sub( 0.04 ), glassY );
-	const overBelt = p.y.greaterThan( paneY ).and( p.y.lessThan( roofCapY ) );
-	const inCabin = p.z.greaterThan( cabinMin ).and( p.z.lessThan( cabinMax ) );
-	let inPillar = null;
-	for ( let i = 0; i < 4; i ++ ) {
+	// Rounded panes and their rubber seals follow the panel UVs. Only the side
+	// panes receive pillars, leaving both windscreens uninterrupted.
+	const paneUV = uv().sub( 0.5 );
+	let glass = roundedRect( paneUV, vec2( 0.455, 0.405 ), 0.035 );
+	let seal = roundedRect( paneUV, vec2( 0.47, 0.43 ), 0.045 );
+	for ( let i = 0; i < 2; i ++ ) {
 
-		const band = pillars.element( i );
-		const inBand = p.z.greaterThan( band.x ).and( p.z.lessThan( band.y ) );
-		inPillar = inPillar === null ? inBand : inPillar.or( inBand );
+		const distance = p.z.sub( pillars.element( i ) ).abs();
+		glass = glass.mul( select( side, smoothstep( 0.043, 0.053, distance ), 1 ) );
+		seal = seal.mul( select( side, smoothstep( 0.026, 0.035, distance ), 1 ) );
 
 	}
 
-	const glassT = p.y.sub( glassY ).div( roofCapY.sub( glassY ) ).clamp();
-	const frontEdge = mix( cabinMax, screenFrontZ, glassT ).sub( 0.045 );
-	const rearEdge = mix( cabinMin, screenRearZ, glassT ).add( 0.045 );
-	const sideWindow = normalGeometry.x.abs().greaterThan( 0.65 ).and( p.y.greaterThan( glassY ) ).and( p.z.lessThan( frontEdge ) ).and( p.z.greaterThan( rearEdge ) ).and( inPillar.not() );
-	const screenWidth = mix( windowWidths.x, windowWidths.y, glassT ).sub( 0.045 );
-	const screenWindow = onScreens.and( p.x.abs().lessThan( screenWidth ) );
-	const cabinGlass = isBody.and( overBelt ).and( inCabin ).and( sideWindow.or( screenWindow ) );
+	const windowColor = mix( mix( paint, color( 0x13191c ), seal ), color( 0x1d2b35 ), glass );
 	const mirrorGlass = isMirror.and( normalGeometry.z.lessThan( - 0.5 ) );
-	const isGlass = cabinGlass.or( mirrorGlass );
+	const glazing = select( isWindow, glass, select( mirrorGlass, 1, 0 ) );
 
-	// tinted glass as a dark mirror: a rubber reveal frames each pane, the tint
-	// deepens toward the belt where the cabin sits behind it, and metal-style
-	// reflectance turns the panes into sky mirrors even under a dim environment
-	const paneEdge = ( a, b ) => smoothstep( 0.05, 0.016, a ).max( smoothstep( 0.05, 0.016, b ) );
-	let reveal = paneEdge( p.y.sub( paneY ), roofCapY.sub( p.y ) ).max( paneEdge( p.z.sub( cabinMin ), cabinMax.sub( p.z ) ) );
-	for ( let i = 0; i < 4; i ++ ) {
+	const wheel = vec2( p.z.abs().sub( axle ), p.y.sub( radius ) );
+	const wheelDistance = wheel.length();
+	const flank = smoothstep( 0.65, 0.85, p.x.abs() );
+	const archShade = smoothstep( radius.add( 0.025 ), radius.add( 0.095 ), wheelDistance );
+	const shading = mix( float( 1 ), archShade.mul( 0.28 ).add( 0.72 ), flank ).mul( smoothstep( 0.25, 0.65, p.y ).mul( 0.3 ).add( 0.7 ) );
 
-		const band = pillars.element( i );
-		reveal = reveal.max( smoothstep( 0.045, 0.015, p.z.sub( band.x ).abs().min( p.z.sub( band.y ).abs() ) ) );
+	let seam = float( 0 );
+	for ( const z of [ seams.x, seams.y, seams.z ] ) seam = seam.max( smoothstep( 0.012, 0.004, p.z.sub( z ).abs() ) );
+	for ( const z of [ handles.x, handles.y ] ) seam = seam.max( roundedRect( vec2( p.z.sub( z ), p.y.sub( belt.sub( 0.10 ) ) ), vec2( 0.06, 0.011 ), 0.006 ) );
+	seam = seam.mul( flank ).mul( smoothstep( 0.36, 0.43, p.y ) ).mul( smoothstep( belt, belt.sub( 0.025 ), p.y ) );
+	let bodyColor = paint.mul( shading ).mul( seam.mul( 0.5 ).oneMinus() );
 
-	}
+	// Lamps, grille, number plates and bumper inlets are inset into the fascia.
+	// The front and rear caps supply their silhouettes without floating boxes.
+	const front = partId.equal( FRONT );
+	const rear = partId.equal( REAR );
+	const end = front.or( rear );
+	const lampY = select( front, lamps.x, lamps.y );
+	const light = roundedRect( vec2( p.x.abs().sub( 0.61 ), p.y.sub( lampY ) ), vec2( 0.19, 0.055 ), 0.018 ).mul( select( end, 1, 0 ) );
+	const grille = roundedRect( vec2( p.x, p.y.sub( lamps.x.sub( 0.025 ) ) ), vec2( 0.30, 0.075 ), 0.025 ).mul( select( front, 1, 0 ) );
+	const intake = roundedRect( vec2( p.x, p.y.sub( lampY.sub( 0.29 ) ) ), vec2( 0.66, 0.045 ), 0.03 ).mul( select( end, 1, 0 ) );
+	const plateY = select( front, lamps.x.sub( 0.20 ), lamps.y.sub( 0.17 ) );
+	const plate = roundedRect( vec2( p.x, p.y.sub( plateY ) ), vec2( 0.155, 0.055 ), 0.008 ).mul( select( end, 1, 0 ) );
+	const slats = p.y.mul( 65 ).fract().step( 0.5 ).mul( 0.35 ).add( 0.65 );
+	bodyColor = mix( bodyColor, color( 0x161a1c ).mul( slats ), grille.max( intake ) );
+	bodyColor = mix( bodyColor, color( 0xd8d9d3 ), plate );
+	bodyColor = mix( bodyColor, select( front, color( 0xd1e4eb ), color( 0x7b1015 ) ), light );
 
-	const glassColor = color( 0x2a323b ).mul( glassT.mul( 0.55 ).add( 0.7 ) ).mul( reveal.mul( 0.7 ).oneMinus() );
-
-	// baked contact shading: the flanks fall into shadow around each wheel arch
-	// and along the rocker panel, and the underbody drops to near black
-	const arch = ( z ) => smoothstep( wheelR.add( 0.02 ), wheelR.add( 0.14 ), vec2( p.z.sub( z ), p.y.sub( wheelR ) ).length() );
-	const onFlank = smoothstep( 0.55, 0.8, p.x.abs() );
-	const arches = arch( wheelZ ).mul( arch( wheelZ.negate() ) ).oneMinus().mul( onFlank );
-	const rocker = smoothstep( 0.55, 0.36, p.y );
-	const shading = arches.max( rocker.mul( 0.85 ) ).clamp( 0, 0.9 ).oneMinus();
-
-	// door seams: thin dark cuts across the flank, with a handle dash behind
-	// the leading edge of each door
-	let seams = float( 0 );
-	for ( const z of [ seamZ.x, seamZ.y, seamZ.z ] ) seams = seams.max( smoothstep( 0.028, 0.008, p.z.sub( z ).abs() ) );
-	for ( const z of [ handleZ.x, handleZ.y ] ) seams = seams.max( smoothstep( 0.016, 0.008, p.y.sub( handleY ).abs() ).mul( smoothstep( 0.055, 0.04, p.z.sub( z ).abs() ) ).mul( 0.7 ) );
-	const seamBand = smoothstep( 0.4, 0.46, p.y ).mul( smoothstep( glassY, glassY.sub( 0.05 ), p.y ) );
-	const seamMask = seams.mul( onFlank ).mul( seamBand ).mul( 0.55 );
-
-	// dark plastic valance across the lower fascias
-	const valance = smoothstep( 0.56, 0.5, p.y ).mul( smoothstep( nose.sub( 0.34 ), nose.sub( 0.22 ), p.z.abs() ) );
-
-	// window gaskets: a dark rubber line where the glazing meets the paint,
-	// running the length of the cabin at the belt and the roof edge
-	const cabinGate = smoothstep( cabinMin.sub( 0.04 ), cabinMin.add( 0.08 ), p.z ).mul( smoothstep( cabinMax.add( 0.04 ), cabinMax.sub( 0.08 ), p.z ) );
-	const gasketLines = smoothstep( 0.022, 0.008, p.y.sub( glassY ).abs() ).max( smoothstep( 0.022, 0.008, p.y.sub( roofCapY ).abs() ) );
-	const gasket = gasketLines.mul( cabinGate ).mul( 0.6 );
-
-	const paintShaded = paint.mul( shading ).mul( seamMask.max( gasket ).oneMinus() );
-	const bodyColor = mix( paintShaded, color( 0x17181a ), valance );
-	const bumperStrip = smoothstep( 0.014, 0.005, p.y.sub( bumperY.add( 0.035 ) ).abs() );
-	const bumperColor = mix( paint.mul( 0.65 ), color( 0xc2c6ca ), bumperStrip );
-
-	// the wheel splits by radial distance from its axle: the recessed face
-	// inside the rim lip is the alloy ( five spokes between a rim ring and a
-	// centre cap, gaps falling to the brake shadow ), everything outside is
-	// tyre rubber with a faint raised-lettering band on the sidewall
-	const wheelPlane = vec2( p.z.abs().sub( wheelZ ), p.y.sub( wheelR ) );
-	const wheelDist = wheelPlane.length();
-	const spokeAngle = atan( wheelPlane.y, wheelPlane.x ).mul( 5 / ( Math.PI * 2 ) );
+	const spokeAngle = atan( wheel.y, wheel.x ).mul( 5 / ( Math.PI * 2 ) );
 	const spokes = smoothstep( 0.62, 0.42, spokeAngle.fract().sub( 0.5 ).abs().mul( 2 ) );
-	const rimRing = smoothstep( hubRadius.sub( 0.045 ), hubRadius.sub( 0.02 ), wheelDist );
-	const hubCap = smoothstep( 0.055, 0.04, wheelDist );
-	const alloy = spokes.max( rimRing ).max( hubCap );
-	const alloyColor = mix( color( 0x0a0a0c ), color( 0x9ea3a8 ), alloy );
-
-	const isAlloy = wheelDist.lessThan( hubRadius );
-	const sidewall = smoothstep( 0.05, 0.015, wheelDist.sub( wheelR.mul( 0.8 ) ).abs() );
-	const tireColor = color( 0x131315 ).mul( sidewall.mul( 0.5 ).add( 1 ) );
-
-	// the grille reads as dark horizontal slats
-	const slats = p.y.mul( 30 ).fract().step( 0.5 ).mul( 0.4 ).oneMinus();
-	const grilleColor = color( 0x1b1c1e ).mul( slats );
-	const wheelColor = select( p.z.greaterThan( nose.sub( 0.2 ) ), grilleColor, select( isAlloy, alloyColor, tireColor ) );
+	const rim = smoothstep( radius.mul( 0.53 ), radius.mul( 0.59 ), wheelDistance );
+	const hub = smoothstep( 0.06, 0.035, wheelDistance );
+	const alloy = mix( color( 0x171b20 ), color( 0xafb6ba ), spokes.max( rim ).max( hub ) );
+	const tyre = color( 0x18191b ).mul( smoothstep( radius.mul( 0.85 ), radius.mul( 0.94 ), wheelDistance ).mul( 0.2 ).add( 0.8 ) );
 
 	const material = new MeshStandardNodeMaterial();
-
-	material.colorNode = select( isWheel, wheelColor,
-		select( isTrim, bumperColor,
-			select( isHeadlight, color( 0xd8d8d2 ),
-				select( isTaillight, color( 0x5a0a0a ),
-					select( isPlate, color( 0xd8d4c4 ),
-						select( isSign, color( 0xf2efe0 ),
-							select( isGlass, glassColor, bodyColor ) ) ) ) ) ) );
-
-	material.roughnessNode = select( isWheel, select( isAlloy, mix( float( 0.55 ), float( 0.3 ), alloy ), float( 0.85 ) ),
-		select( isTrim, float( 0.32 ),
-			select( isPlate.or( isSign ), float( 0.6 ),
-				select( isGlass, float( 0.06 ), mix( float( 0.32 ), float( 0.65 ), valance ) ) ) ) );
-
-	material.metalnessNode = select( isGlass, float( 0.85 ),
-		select( isTrim, bumperStrip.mul( 0.7 ).add( 0.2 ),
-			select( isWheel.and( isAlloy ), float( 0.8 ),
-				select( isBody.or( isMirror ), smoothstep( 0.5, 0.56, p.y ).mul( 0.2 ), float( 0 ) ) ) ) ); // mirror glass, chrome, alloy, metallic paint above the valance
-
-	// lamp lenses: parked cars run dim marker lights, so they read at dusk
-	// without blowing out in daylight ( sunlit white renders near 32 here )
-	material.emissiveNode = select( isHeadlight, color( 0xfff2d8 ).mul( 10 ),
-		select( isTaillight, color( 0xff2211 ).mul( 4 ),
-			select( isSign, color( 0xfff6d8 ).mul( 12 ), color( 0x000000 ) ) ) );
+	material.colorNode = select( isTyre, tyre,
+		select( isAlloy, alloy,
+			select( isTrim, color( 0x202326 ),
+				select( isSign, color( 0xffd66a ),
+					select( isWindow, windowColor,
+						select( mirrorGlass, color( 0x70808a ), bodyColor ) ) ) ) ) );
+	material.roughnessNode = select( isTyre.or( isTrim ), float( 0.85 ), mix( float( 0.32 ), float( 0.055 ), glazing ) );
+	material.metalnessNode = select( isAlloy, float( 0.8 ), select( isTyre.or( isTrim ).or( isSign ), float( 0 ), mix( float( 0.25 ), float( 0.85 ), glazing ) ) );
+	material.emissiveNode = select( front, color( 0xd9efff ).mul( 4 ), color( 0xf00008 ).mul( 1.5 ) ).mul( light ).add( select( isSign, color( 0xffd77b ).mul( 2 ), color( 0x000000 ) ) );
 
 	return material;
 
