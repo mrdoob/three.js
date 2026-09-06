@@ -211,6 +211,26 @@ export default QUnit.module( 'Nodes', () => {
 
 		} );
 
+		QUnit.test( 'preserves native writes to an enclosing shader variable', assert => {
+
+			const builder = createBuilder();
+			const value = property( 'float', 'externalValue' );
+
+			// An existing shader declaration is shared through the global node cache.
+			builder.getVarFromNode( value );
+
+			const write = Fn( () => {
+
+				value.assign( 2 );
+				return vec3( 1 );
+
+			} ).setLayout( { name: 'writeExternalRGB', type: 'vec3', inputs: [] } );
+
+			const flow = builder.flowStagesNode( Fn( () => write().a )() );
+			assert.ok( flow.result.includes( 'writeExternalRGB(' ), 'a captured variable is not treated as function-local' );
+
+		} );
+
 		QUnit.test( 'does not build function arguments just to resolve a declared type', assert => {
 
 			let calls = 0;

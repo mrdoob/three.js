@@ -2673,7 +2673,7 @@ class NodeBuilder {
 
 			flow.result = node.build( this, output );
 
-			if ( buildStage === 'setup' && this.currentFunctionNode !== null ) {
+			if ( buildStage === 'generate' && this.currentFunctionNode !== null ) {
 
 				this.currentFunctionNode._isPure = isNodePure( this, node, true );
 

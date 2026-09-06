@@ -51,7 +51,16 @@ export function isNodePure( builder, root, functionBody = false ) {
 
 		const scope = node.getScope();
 
-		return functionBody && ( scope.constructor === VarNode || scope.constructor === ParameterNode || ( scope.constructor === PropertyNode && scope.varying === false ) );
+		if ( functionBody === false ) return false;
+		if ( scope.constructor === ParameterNode ) return true;
+		if ( scope.constructor !== VarNode && ( scope.constructor !== PropertyNode || scope.varying ) ) return false;
+
+		// Global nodes can already have a variable in an enclosing shader scope.
+		// Only writes to declarations owned by this function can be discarded.
+		const data = builder.getDataFromNode( scope );
+		const variable = data[ builder.getSubBuildProperty( 'variable', data.subBuilds ) ];
+
+		return builder.vars[ builder.shaderStage ]?.includes( variable ) === true;
 
 	}
 
