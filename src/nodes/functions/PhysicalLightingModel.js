@@ -13,10 +13,12 @@ import { positionViewDirection, positionView, positionWorld } from '../accessors
 import { Fn, float, vec2, vec3, vec4, mat3, If } from '../tsl/TSLBase.js';
 import { mix, normalize, refract, length, clamp, log2, log, exp, smoothstep } from '../math/MathNode.js';
 import { div } from '../math/OperatorNode.js';
-import { cameraPosition, cameraProjectionMatrix, cameraViewMatrix, cameraViewport } from '../accessors/Camera.js';
+import { cameraPosition, cameraProjectionMatrix, cameraProjectionMatrixInverse, cameraViewMatrix, cameraViewport } from '../accessors/Camera.js';
 import { modelWorldMatrix } from '../accessors/ModelNode.js';
 import { screenSize } from '../display/ScreenNode.js';
 import { viewportMipTexture, viewportOpaqueMipTexture } from '../display/ViewportTextureNode.js';
+import { viewportDepthTexture } from '../display/ViewportDepthTextureNode.js';
+import { getViewPosition } from '../utils/PostProcessingUtils.js';
 import { textureBicubicLevel } from '../accessors/TextureBicubic.js';
 import { Loop } from '../utils/LoopNode.js';
 import { BackSide } from '../../constants.js';
@@ -69,6 +71,19 @@ const applyIorToRoughness = /*@__PURE__*/ Fn( ( [ roughness, ior ] ) => {
 
 const viewportBackSideTexture = /*@__PURE__*/ viewportMipTexture();
 const viewportFrontSideTexture = /*@__PURE__*/ viewportOpaqueMipTexture();
+const viewportDepth = /*@__PURE__*/ viewportDepthTexture();
+
+// Returns 0 when the refracted sample belongs to an object between the camera and the surface, so the
+// caller can fall back to the unrefracted coordinates. A short blend (a tenth of the transmission
+// distance) avoids a hard seam where objects intersect the volume.
+const getTransmissionDepthGuard = /*@__PURE__*/ Fn( ( [ fragCoord, transmissionDistance ] ) => {
+
+	const uv = fragCoord.mul( cameraViewport.zw ).add( cameraViewport.xy ).div( screenSize );
+	const sampleViewZ = getViewPosition( uv, viewportDepth.sample( uv ), cameraProjectionMatrixInverse ).z;
+
+	return smoothstep( 0.0, transmissionDistance.mul( 0.1 ).max( 1e-4 ), positionView.z.sub( sampleViewZ ) );
+
+} );
 
 const getTransmissionSample = /*@__PURE__*/ Fn( ( [ fragCoord, roughness, ior ], { material } ) => {
 
@@ -112,6 +127,10 @@ const getIBLVolumeRefraction = /*@__PURE__*/ Fn( ( [ n, v, roughness, diffuseCol
 
 	let transmittedLight, transmittance;
 
+	const surfaceNdc = projMatrix.mul( viewMatrix.mul( vec4( position, 1.0 ) ) );
+	const surfaceCoords = vec2( surfaceNdc.xy.div( surfaceNdc.w ) ).add( 1.0 ).div( 2.0 ).toVar();
+	surfaceCoords.assign( vec2( surfaceCoords.x, surfaceCoords.y.oneMinus() ) ); // webgpu
+
 	if ( dispersion ) {
 
 		transmittedLight = vec4().toVar();
@@ -133,6 +152,7 @@ const getIBLVolumeRefraction = /*@__PURE__*/ Fn( ( [ n, v, roughness, diffuseCol
 			refractionCoords.addAssign( 1.0 );
 			refractionCoords.divAssign( 2.0 );
 			refractionCoords.assign( vec2( refractionCoords.x, refractionCoords.y.oneMinus() ) ); // webgpu
+			refractionCoords.assign( mix( surfaceCoords, refractionCoords, getTransmissionDepthGuard( refractionCoords, length( transmissionRay ) ) ) );
 
 			// Sample framebuffer to get pixel the refracted ray hits.
 			const transmissionSample = getTransmissionSample( refractionCoords, roughness, ior );
@@ -157,6 +177,7 @@ const getIBLVolumeRefraction = /*@__PURE__*/ Fn( ( [ n, v, roughness, diffuseCol
 		refractionCoords.addAssign( 1.0 );
 		refractionCoords.divAssign( 2.0 );
 		refractionCoords.assign( vec2( refractionCoords.x, refractionCoords.y.oneMinus() ) ); // webgpu
+		refractionCoords.assign( mix( surfaceCoords, refractionCoords, getTransmissionDepthGuard( refractionCoords, length( transmissionRay ) ) ) );
 
 		// Sample framebuffer to get pixel the refracted ray hits.
 		transmittedLight = getTransmissionSample( refractionCoords, roughness, ior );

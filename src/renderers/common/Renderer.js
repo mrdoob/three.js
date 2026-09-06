@@ -2655,6 +2655,32 @@ class Renderer {
 	}
 
 	/**
+	 * The number of samples of the framebuffer that `copyFramebufferToTexture()` reads from.
+	 * Unlike `currentSamples`, this accounts for the internal frame buffer target that is used
+	 * when tone mapping or color space conversion is active.
+	 *
+	 * @type {number}
+	 * @readonly
+	 */
+	get framebufferSamples() {
+
+		let renderTarget;
+
+		if ( this._currentRenderContext !== null ) {
+
+			renderTarget = this._currentRenderContext.renderTarget;
+
+		} else {
+
+			renderTarget = this._renderTarget || this._getFrameBufferTarget();
+
+		}
+
+		return renderTarget ? renderTarget.samples : this.currentSamples;
+
+	}
+
+	/**
 	 * The current tone mapping of the renderer. When not producing screen output,
 	 * the tone mapping is always `NoToneMapping`.
 	 *
