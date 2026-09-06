@@ -52,79 +52,90 @@ function getSVG( name ) {
 
 }
 
+/**
+ * Converts bytes to URL-safe Base64 without padding (`=`).
+ * Uses `Uint8Array.prototype.toBase64` when available.
+ *
+ * @private
+ * @param {Uint8Array} bytes
+ * @returns {string}
+ */
+function bytesToBase64Url( bytes ) {
+
+	if ( typeof Uint8Array.prototype.toBase64 === 'function' ) {
+
+		return bytes.toBase64( { alphabet: 'base64url', omitPadding: true } );
+
+	}
+
+	const chunks = [];
+	const chunkSize = 8192;
+
+	for ( let i = 0; i < bytes.length; i += chunkSize ) {
+
+		chunks.push( String.fromCharCode.apply( null, bytes.subarray( i, i + chunkSize ) ) );
+
+	}
+
+	return btoa( chunks.join( '' ) )
+		.replace( /\+/g, '-' )
+		.replace( /\//g, '_' )
+		.replace( /=+$/, '' );
+
+}
+
+/**
+ * Converts a URL-safe Base64 string back to bytes (supports unpadded input).
+ * Uses `Uint8Array.fromBase64` when available.
+ *
+ * @private
+ * @param {string} base64url
+ * @returns {Uint8Array}
+ */
+function base64UrlToBytes( base64url ) {
+
+	if ( typeof Uint8Array.fromBase64 === 'function' ) {
+
+		return Uint8Array.fromBase64( base64url, { alphabet: 'base64url' } );
+
+	}
+
+	const normalized = base64url.replace( /-/g, '+' ).replace( /_/g, '/' );
+
+	return Uint8Array.from( atob( normalized ), ( char ) => char.charCodeAt( 0 ) );
+
+}
+
+/**
+ * Compresses a string into a URL-safe Base64 payload using 'deflate'.
+ * Uses native `CompressionStream` (widely available since 2023).
+ *
+ * @param {string} str
+ * @returns {Promise<string>}
+ */
 async function compressString( str ) {
 
-	if ( typeof CompressionStream === 'undefined' ) {
+	const stream = new Blob( [ str ] ).stream().pipeThrough( new CompressionStream( 'deflate' ) );
+	const bytes = await new Response( stream ).bytes();
 
-		return base64Encode( str );
-
-	}
-
-	try {
-
-		const stream = new Blob( [ str ] ).stream();
-		const compressedStream = stream.pipeThrough( new CompressionStream( 'deflate' ) );
-		const response = new Response( compressedStream );
-		const buffer = await response.arrayBuffer();
-
-		const bytes = new Uint8Array( buffer );
-		let binString = '';
-		const chunkSize = 8192;
-		for ( let i = 0; i < bytes.length; i += chunkSize ) {
-
-			binString += String.fromCharCode.apply( null, bytes.subarray( i, i + chunkSize ) );
-
-		}
-
-		return btoa( binString );
-
-	} catch ( err ) {
-
-		return base64Encode( str );
-
-	}
+	return bytesToBase64Url( bytes );
 
 }
 
-async function decompressString( base64 ) {
+/**
+ * Decompresses a URL-safe Base64 payload back into the original string.
+ * Uses native `DecompressionStream` (widely available since 2023).
+ *
+ * @param {string} base64url
+ * @returns {Promise<string>}
+ */
+async function decompressString( base64url ) {
 
-	if ( typeof DecompressionStream === 'undefined' ) {
+	const bytes = base64UrlToBytes( base64url );
+	const stream = new Blob( [ bytes ] ).stream().pipeThrough( new DecompressionStream( 'deflate' ) );
 
-		return base64Decode( base64 );
-
-	}
-
-	try {
-
-		const binString = atob( base64 );
-		const bytes = Uint8Array.from( binString, ( m ) => m.codePointAt( 0 ) );
-		const stream = new Blob( [ bytes ] ).stream();
-		const decompressedStream = stream.pipeThrough( new DecompressionStream( 'deflate' ) );
-		const response = new Response( decompressedStream );
-		return await response.text();
-
-	} catch ( err ) {
-
-		return base64Decode( base64 );
-
-	}
+	return await new Response( stream ).text();
 
 }
 
-function base64Encode( str ) {
-
-	const bytes = new TextEncoder().encode( str );
-	const binString = Array.from( bytes, ( byte ) => String.fromCodePoint( byte ) ).join( '' );
-	return btoa( binString );
-
-}
-
-function base64Decode( base64 ) {
-
-	const binString = atob( base64 );
-	const bytes = Uint8Array.from( binString, ( m ) => m.codePointAt( 0 ) );
-	return new TextDecoder().decode( bytes );
-
-}
-
-export { getSVG, compressString, decompressString, base64Encode, base64Decode };
+export { getSVG, compressString, decompressString };
