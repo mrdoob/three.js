@@ -6,7 +6,6 @@
 
 import {
 	TRI_INDEX,
-	Flags,
 	getMemory,
 	replaceElement,
 	removeElement,
@@ -47,7 +46,6 @@ function subFillTriangle( iTri, iv1, iv2, iv3, ivMid ) {
 	const vrf = mesh.getVerticesRingFace();
 	const pil = mesh.getFacePosInLeaf();
 	const fleaf = mesh.getFaceLeaf();
-	const fstf = mesh.getFacesStateFlags();
 	const fAr = mesh.getFaces();
 
 	let j = iTri * 4;
@@ -63,7 +61,6 @@ function subFillTriangle( iTri, iv1, iv2, iv3, ivMid ) {
 
 	j = iNewTri * 4;
 	fAr[ j ] = ivMid; fAr[ j + 1 ] = iv2; fAr[ j + 2 ] = iv3; fAr[ j + 3 ] = TRI_INDEX;
-	fstf[ iNewTri ] = Flags.STATE;
 	fleaf[ iNewTri ] = leaf;
 	pil[ iNewTri ] = iTrisLeaf.length;
 	vrf[ iv3 ].push( iNewTri );
@@ -130,15 +127,11 @@ function halfEdgeSplit( iTri, iv1, iv2, iv3 ) {
 	const mesh = SubData._mesh;
 	const vAr = mesh.getVertices();
 	const nAr = mesh.getNormals();
-	const cAr = mesh.getColors();
-	const mAr = mesh.getMaterials();
 	const fAr = mesh.getFaces();
 	const pil = mesh.getFacePosInLeaf();
 	const fleaf = mesh.getFaceLeaf();
 	const vrv = mesh.getVerticesRingVert();
 	const vrf = mesh.getVerticesRingFace();
-	const fstf = mesh.getFacesStateFlags();
-	const vstf = mesh.getVerticesStateFlags();
 
 	const vMap = SubData._verticesMap;
 	const key = subEdgeKey( iv1, iv2 );
@@ -159,7 +152,6 @@ function halfEdgeSplit( iTri, iv1, iv2, iv3 ) {
 	const iNewTri = mesh.getNbTriangles();
 	id = iNewTri * 4;
 	fAr[ id ] = ivMid; fAr[ id + 1 ] = iv2; fAr[ id + 2 ] = iv3; fAr[ id + 3 ] = TRI_INDEX;
-	fstf[ iNewTri ] = Flags.STATE;
 
 	vrf[ iv3 ].push( iNewTri );
 	replaceElement( vrf[ iv2 ], iTri, iNewTri );
@@ -187,12 +179,6 @@ function halfEdgeSplit( iTri, iv1, iv2, iv3 ) {
 	const n1n2x = n1x + n2x, n1n2y = n1y + n2y, n1n2z = n1z + n2z;
 	id = ivMid * 3;
 	nAr[ id ] = n1n2x * 0.5; nAr[ id + 1 ] = n1n2y * 0.5; nAr[ id + 2 ] = n1n2z * 0.5;
-	cAr[ id ] = ( cAr[ id1 ] + cAr[ id2 ] ) * 0.5;
-	cAr[ id + 1 ] = ( cAr[ id1 + 1 ] + cAr[ id2 + 1 ] ) * 0.5;
-	cAr[ id + 2 ] = ( cAr[ id1 + 2 ] + cAr[ id2 + 2 ] ) * 0.5;
-	mAr[ id ] = ( mAr[ id1 ] + mAr[ id2 ] ) * 0.5;
-	mAr[ id + 1 ] = ( mAr[ id1 + 1 ] + mAr[ id2 + 1 ] ) * 0.5;
-	mAr[ id + 2 ] = ( mAr[ id1 + 2 ] + mAr[ id2 + 2 ] ) * 0.5;
 
 	let nn1x = n1x, nn1y = n1y, nn1z = n1z;
 	let len = nn1x * nn1x + nn1y * nn1y + nn1z * nn1z;
@@ -233,7 +219,6 @@ function halfEdgeSplit( iTri, iv1, iv2, iv3 ) {
 	vAr[ id + 1 ] = ( v1y + v2y ) * 0.5 + n1n2y * offset;
 	vAr[ id + 2 ] = ( v1z + v2z ) * 0.5 + n1n2z * offset;
 
-	vstf[ ivMid ] = Flags.STATE;
 	vrv[ ivMid ] = [ iv1, iv2, iv3 ];
 	vrf[ ivMid ] = [ iTri, iNewTri ];
 	replaceElement( vrv[ iv1 ], iv2, ivMid );
@@ -248,7 +233,6 @@ function subFindSplit( iTri, checkInsideSphere ) {
 	const mesh = SubData._mesh;
 	const vAr = mesh.getVertices();
 	const fAr = mesh.getFaces();
-	const mAr = mesh.getMaterials();
 	const id = iTri * 4;
 	const ind1 = fAr[ id ] * 3, ind2 = fAr[ id + 1 ] * 3, ind3 = fAr[ id + 2 ] * 3;
 	_subV1[ 0 ] = vAr[ ind1 ]; _subV1[ 1 ] = vAr[ ind1 + 1 ]; _subV1[ 2 ] = vAr[ ind1 + 2 ];
@@ -258,11 +242,10 @@ function subFindSplit( iTri, checkInsideSphere ) {
 	if ( checkInsideSphere && ! triangleInsideSphere( SubData._center, SubData._radius2, _subV1, _subV2, _subV3 ) )
 		return 0;
 
-	const m1 = mAr[ ind1 + 2 ], m2 = mAr[ ind2 + 2 ], m3 = mAr[ ind3 + 2 ];
 	const length1 = sqrDist( _subV1, _subV2 ), length2 = sqrDist( _subV2, _subV3 ), length3 = sqrDist( _subV1, _subV3 );
-	if ( length1 > length2 && length1 > length3 ) return ( m1 + m2 ) * 0.5 * length1 > SubData._edgeMax2 ? 1 : 0;
-	else if ( length2 > length3 ) return ( m2 + m3 ) * 0.5 * length2 > SubData._edgeMax2 ? 2 : 0;
-	else return ( m1 + m3 ) * 0.5 * length3 > SubData._edgeMax2 ? 3 : 0;
+	if ( length1 > length2 && length1 > length3 ) return length1 > SubData._edgeMax2 ? 1 : 0;
+	else if ( length2 > length3 ) return length2 > SubData._edgeMax2 ? 2 : 0;
+	else return length3 > SubData._edgeMax2 ? 3 : 0;
 
 }
 
@@ -468,7 +451,6 @@ function decDeleteTriangle( iTri ) {
 	const fAr = mesh.getFaces();
 	const pil = mesh.getFacePosInLeaf();
 	const fleaf = mesh.getFaceLeaf();
-	const fstf = mesh.getFacesStateFlags();
 
 	const oldPos = pil[ iTri ];
 	const iTrisLeaf = fleaf[ iTri ]._iFaces;
@@ -501,7 +483,6 @@ function decDeleteTriangle( iTri ) {
 	fleaf[ iTri ] = leafLast;
 	pil[ iTri ] = pilLast;
 	ftf[ iTri ] = ftf[ lastPos ];
-	fstf[ iTri ] = fstf[ lastPos ];
 	const j = iTri * 4;
 	fAr[ j ] = iv1; fAr[ j + 1 ] = iv2; fAr[ j + 2 ] = iv3; fAr[ j + 3 ] = TRI_INDEX;
 	fleaf.length = lastPos;
@@ -517,11 +498,8 @@ function decDeleteVertex( iVert ) {
 	const vrf = mesh.getVerticesRingFace();
 	const vAr = mesh.getVertices();
 	const nAr = mesh.getNormals();
-	const cAr = mesh.getColors();
-	const mAr = mesh.getMaterials();
 	const fAr = mesh.getFaces();
 	const vtf = mesh.getVerticesTagFlags();
-	const vstf = mesh.getVerticesStateFlags();
 	const vsctf = mesh.getVerticesSculptFlags();
 
 	const lastPos = mesh.getNbVertices() - 1;
@@ -549,13 +527,10 @@ function decDeleteVertex( iVert ) {
 	vrv[ iVert ] = vrv[ lastPos ].slice();
 	vrf[ iVert ] = vrf[ lastPos ].slice();
 	vtf[ iVert ] = vtf[ lastPos ];
-	vstf[ iVert ] = vstf[ lastPos ];
 	vsctf[ iVert ] = vsctf[ lastPos ];
 	const idLast = lastPos * 3, id = iVert * 3;
 	vAr[ id ] = vAr[ idLast ]; vAr[ id + 1 ] = vAr[ idLast + 1 ]; vAr[ id + 2 ] = vAr[ idLast + 2 ];
 	nAr[ id ] = nAr[ idLast ]; nAr[ id + 1 ] = nAr[ idLast + 1 ]; nAr[ id + 2 ] = nAr[ idLast + 2 ];
-	cAr[ id ] = cAr[ idLast ]; cAr[ id + 1 ] = cAr[ idLast + 1 ]; cAr[ id + 2 ] = cAr[ idLast + 2 ];
-	mAr[ id ] = mAr[ idLast ]; mAr[ id + 1 ] = mAr[ idLast + 1 ]; mAr[ id + 2 ] = mAr[ idLast + 2 ];
 	vrv.length = lastPos;
 	vrf.length = lastPos;
 	mesh.addNbVertice( - 1 );
@@ -567,8 +542,6 @@ function decEdgeCollapse( iTri1, iTri2, iv1, iv2, ivOpp1, ivOpp2, iTris ) {
 	const mesh = DecData._mesh;
 	const vAr = mesh.getVertices();
 	const nAr = mesh.getNormals();
-	const cAr = mesh.getColors();
-	const mAr = mesh.getMaterials();
 	const fAr = mesh.getFaces();
 	const vtf = mesh.getVerticesTagFlags();
 	const ftf = mesh.getFacesTagFlags();
@@ -637,12 +610,6 @@ function decEdgeCollapse( iTri1, iTri2, iv1, iv2, ivOpp1, ivOpp2, iTris ) {
 	}
 
 	nAr[ id ] = nx; nAr[ id + 1 ] = ny; nAr[ id + 2 ] = nz;
-	cAr[ id ] = ( cAr[ id ] + cAr[ id2 ] ) * 0.5;
-	cAr[ id + 1 ] = ( cAr[ id + 1 ] + cAr[ id2 + 1 ] ) * 0.5;
-	cAr[ id + 2 ] = ( cAr[ id + 2 ] + cAr[ id2 + 2 ] ) * 0.5;
-	mAr[ id ] = ( mAr[ id ] + mAr[ id2 ] ) * 0.5;
-	mAr[ id + 1 ] = ( mAr[ id + 1 ] + mAr[ id2 + 1 ] ) * 0.5;
-	mAr[ id + 2 ] = ( mAr[ id + 2 ] + mAr[ id2 + 2 ] ) * 0.5;
 
 	removeElement( tris1, iTri1 ); removeElement( tris1, iTri2 );
 	removeElement( tris2, iTri1 ); removeElement( tris2, iTri2 );
@@ -770,7 +737,6 @@ function decimate( mesh, iTris, center, radius2, detail2 ) {
 	const radius = Math.sqrt( radius2 );
 	const ftf = mesh.getFacesTagFlags();
 	const vAr = mesh.getVertices();
-	const mAr = mesh.getMaterials();
 	const fAr = mesh.getFaces();
 	const cenx = center[ 0 ], ceny = center[ 1 ], cenz = center[ 2 ];
 
@@ -810,20 +776,19 @@ function decimate( mesh, iTris, center, radius2, detail2 ) {
 		dx = v1x - v3x; dy = v1y - v3y; dz = v1z - v3z;
 		const len3 = dx * dx + dy * dy + dz * dz;
 
-		const m1 = mAr[ ind1 + 2 ], m2 = mAr[ ind2 + 2 ], m3 = mAr[ ind3 + 2 ];
 		if ( len1 < len2 && len1 < len3 ) {
 
-			if ( len1 < detail2 * fallOff * ( m1 + m2 ) * 0.5 )
+			if ( len1 < detail2 * fallOff )
 				decDecimateTriangles( iTri, decFindOppositeTriangle( iTri, iv1, iv2 ), dynArr );
 
 		} else if ( len2 < len3 ) {
 
-			if ( len2 < detail2 * fallOff * ( m2 + m3 ) * 0.5 )
+			if ( len2 < detail2 * fallOff )
 				decDecimateTriangles( iTri, decFindOppositeTriangle( iTri, iv2, iv3 ), dynArr );
 
 		} else {
 
-			if ( len3 < detail2 * fallOff * ( m1 + m3 ) * 0.5 )
+			if ( len3 < detail2 * fallOff )
 				decDecimateTriangles( iTri, decFindOppositeTriangle( iTri, iv1, iv3 ), dynArr );
 
 		}
@@ -940,8 +905,8 @@ function laplacianSmooth( mesh, iVerts, smoothVerts, vField ) {
 function smoothTangentVerts( mesh, iVerts, strength ) {
 
 	const vAr = mesh.getVertices();
-	const mAr = mesh.getMaterials();
 	const nAr = mesh.getNormals();
+	const intensity = Math.min( strength, 1.0 );
 	const nbVerts = iVerts.length;
 	const smoothVerts = new Float32Array( getMemory( nbVerts * 4 * 3 ), 0, nbVerts * 3 );
 	laplacianSmooth( mesh, iVerts, smoothVerts );
@@ -957,10 +922,9 @@ function smoothTangentVerts( mesh, iVerts, strength ) {
 		const i3 = i * 3;
 		const smx = smoothVerts[ i3 ], smy = smoothVerts[ i3 + 1 ], smz = smoothVerts[ i3 + 2 ];
 		const d = nx * ( smx - vx ) + ny * ( smy - vy ) + nz * ( smz - vz );
-		const mI = Math.min( strength * mAr[ ind + 2 ], 1.0 );
-		vAr[ ind ] = vx + ( smx - nx * d - vx ) * mI;
-		vAr[ ind + 1 ] = vy + ( smy - ny * d - vy ) * mI;
-		vAr[ ind + 2 ] = vz + ( smz - nz * d - vz ) * mI;
+		vAr[ ind ] = vx + ( smx - nx * d - vx ) * intensity;
+		vAr[ ind + 1 ] = vy + ( smy - ny * d - vy ) * intensity;
+		vAr[ ind + 2 ] = vz + ( smz - nz * d - vz ) * intensity;
 
 	}
 
@@ -988,13 +952,11 @@ function getFrontVertices( mesh, iVertsInRadius, eyeDir ) {
 function areaNormal( mesh, iVerts ) {
 
 	const nAr = mesh.getNormals();
-	const mAr = mesh.getMaterials();
 	let anx = 0, any = 0, anz = 0;
 	for ( let i = 0, l = iVerts.length; i < l; ++ i ) {
 
 		const ind = iVerts[ i ] * 3;
-		const f = mAr[ ind + 2 ];
-		anx += nAr[ ind ] * f; any += nAr[ ind + 1 ] * f; anz += nAr[ ind + 2 ] * f;
+		anx += nAr[ ind ]; any += nAr[ ind + 1 ]; anz += nAr[ ind + 2 ];
 
 	}
 
@@ -1008,14 +970,12 @@ function areaNormal( mesh, iVerts ) {
 function areaCenter( mesh, iVerts ) {
 
 	const vAr = mesh.getVertices();
-	const mAr = mesh.getMaterials();
-	let ax = 0, ay = 0, az = 0, acc = 0;
+	let ax = 0, ay = 0, az = 0;
+	const acc = iVerts.length;
 	for ( let i = 0, l = iVerts.length; i < l; ++ i ) {
 
 		const ind = iVerts[ i ] * 3;
-		const f = mAr[ ind + 2 ];
-		acc += f;
-		ax += vAr[ ind ] * f; ay += vAr[ ind + 1 ] * f; az += vAr[ ind + 2 ] * f;
+		ax += vAr[ ind ]; ay += vAr[ ind + 1 ]; az += vAr[ ind + 2 ];
 
 	}
 
@@ -1028,7 +988,6 @@ function areaCenter( mesh, iVerts ) {
 function toolBrush( mesh, iVerts, aNormal, center, radiusSq, strength, negative ) {
 
 	const vAr = mesh.getVertices();
-	const mAr = mesh.getMaterials();
 	const radius = Math.sqrt( radiusSq );
 	let deform = strength * radius * 0.1;
 	if ( negative ) deform = - deform;
@@ -1040,7 +999,7 @@ function toolBrush( mesh, iVerts, aNormal, center, radiusSq, strength, negative 
 		const dx = vAr[ ind ] - cx, dy = vAr[ ind + 1 ] - cy, dz = vAr[ ind + 2 ] - cz;
 		const dist = Math.sqrt( dx * dx + dy * dy + dz * dz ) / radius;
 		if ( dist >= 1.0 ) continue;
-		const fallOff = falloff( dist ) * mAr[ ind + 2 ] * deform;
+		const fallOff = falloff( dist ) * deform;
 		vAr[ ind ] += anx * fallOff;
 		vAr[ ind + 1 ] += any * fallOff;
 		vAr[ ind + 2 ] += anz * fallOff;
@@ -1052,7 +1011,6 @@ function toolBrush( mesh, iVerts, aNormal, center, radiusSq, strength, negative 
 function toolFlatten( mesh, iVerts, aNormal, aCenter2, center, radiusSq, strength, negative ) {
 
 	const vAr = mesh.getVertices();
-	const mAr = mesh.getMaterials();
 	const radius = Math.sqrt( radiusSq );
 	const cx = center[ 0 ], cy = center[ 1 ], cz = center[ 2 ];
 	const ax = aCenter2[ 0 ], ay = aCenter2[ 1 ], az = aCenter2[ 2 ];
@@ -1067,7 +1025,7 @@ function toolFlatten( mesh, iVerts, aNormal, aCenter2, center, radiusSq, strengt
 		const dx = vx - cx, dy = vy - cy, dz = vz - cz;
 		const dist = Math.sqrt( dx * dx + dy * dy + dz * dz ) / radius;
 		if ( dist >= 1.0 ) continue;
-		const fallOff = falloff( dist ) * distToPlane * strength * mAr[ ind + 2 ];
+		const fallOff = falloff( dist ) * distToPlane * strength;
 		vAr[ ind ] -= anx * fallOff;
 		vAr[ ind + 1 ] -= any * fallOff;
 		vAr[ ind + 2 ] -= anz * fallOff;
@@ -1079,7 +1037,6 @@ function toolFlatten( mesh, iVerts, aNormal, aCenter2, center, radiusSq, strengt
 function toolInflate( mesh, iVerts, center, radiusSq, strength, negative ) {
 
 	const vAr = mesh.getVertices();
-	const mAr = mesh.getMaterials();
 	const nAr = mesh.getNormals();
 	const radius = Math.sqrt( radiusSq );
 	let deform = strength * radius * 0.1;
@@ -1095,7 +1052,6 @@ function toolInflate( mesh, iVerts, center, radiusSq, strength, negative ) {
 		const nx = nAr[ ind ], ny = nAr[ ind + 1 ], nz = nAr[ ind + 2 ];
 		const nLen = Math.sqrt( nx * nx + ny * ny + nz * nz );
 		if ( nLen > 0 ) fallOff /= nLen;
-		fallOff *= mAr[ ind + 2 ];
 		vAr[ ind ] += nx * fallOff;
 		vAr[ ind + 1 ] += ny * fallOff;
 		vAr[ ind + 2 ] += nz * fallOff;
@@ -1107,7 +1063,8 @@ function toolInflate( mesh, iVerts, center, radiusSq, strength, negative ) {
 function toolSmooth( mesh, iVerts, strength ) {
 
 	const vAr = mesh.getVertices();
-	const mAr = mesh.getMaterials();
+	const intensity = Math.min( strength, 1.0 );
+	const intComp = 1.0 - intensity;
 	const nbVerts = iVerts.length;
 	const smoothVerts = new Float32Array( getMemory( nbVerts * 4 * 3 ), 0, nbVerts * 3 );
 	laplacianSmooth( mesh, iVerts, smoothVerts );
@@ -1116,11 +1073,9 @@ function toolSmooth( mesh, iVerts, strength ) {
 		const ind = iVerts[ i ] * 3;
 		const vx = vAr[ ind ], vy = vAr[ ind + 1 ], vz = vAr[ ind + 2 ];
 		const i3 = i * 3;
-		const mI = Math.min( strength * mAr[ ind + 2 ], 1.0 );
-		const intComp = 1.0 - mI;
-		vAr[ ind ] = vx * intComp + smoothVerts[ i3 ] * mI;
-		vAr[ ind + 1 ] = vy * intComp + smoothVerts[ i3 + 1 ] * mI;
-		vAr[ ind + 2 ] = vz * intComp + smoothVerts[ i3 + 2 ] * mI;
+		vAr[ ind ] = vx * intComp + smoothVerts[ i3 ] * intensity;
+		vAr[ ind + 1 ] = vy * intComp + smoothVerts[ i3 + 1 ] * intensity;
+		vAr[ ind + 2 ] = vz * intComp + smoothVerts[ i3 + 2 ] * intensity;
 
 	}
 
@@ -1129,7 +1084,6 @@ function toolSmooth( mesh, iVerts, strength ) {
 function toolPinch( mesh, iVerts, center, radiusSq, strength, negative ) {
 
 	const vAr = mesh.getVertices();
-	const mAr = mesh.getMaterials();
 	const radius = Math.sqrt( radiusSq );
 	const cx = center[ 0 ], cy = center[ 1 ], cz = center[ 2 ];
 	let deform = strength * 0.05;
@@ -1140,7 +1094,7 @@ function toolPinch( mesh, iVerts, center, radiusSq, strength, negative ) {
 		const vx = vAr[ ind ], vy = vAr[ ind + 1 ], vz = vAr[ ind + 2 ];
 		const dx = cx - vx, dy = cy - vy, dz = cz - vz;
 		const dist = Math.sqrt( dx * dx + dy * dy + dz * dz ) / radius;
-		const fallOff = falloff( dist ) * deform * mAr[ ind + 2 ];
+		const fallOff = falloff( dist ) * deform;
 		vAr[ ind ] = vx + dx * fallOff;
 		vAr[ ind + 1 ] = vy + dy * fallOff;
 		vAr[ ind + 2 ] = vz + dz * fallOff;
@@ -1152,7 +1106,6 @@ function toolPinch( mesh, iVerts, center, radiusSq, strength, negative ) {
 function toolCrease( mesh, iVerts, aNormal, center, radiusSq, strength, negative ) {
 
 	const vAr = mesh.getVertices();
-	const mAr = mesh.getMaterials();
 	const radius = Math.sqrt( radiusSq );
 	const cx = center[ 0 ], cy = center[ 1 ], cz = center[ 2 ];
 	const anx = aNormal[ 0 ], any = aNormal[ 1 ], anz = aNormal[ 2 ];
@@ -1166,7 +1119,7 @@ function toolCrease( mesh, iVerts, aNormal, center, radiusSq, strength, negative
 		const dist = Math.sqrt( dx * dx + dy * dy + dz * dz ) / radius;
 		if ( dist >= 1.0 ) continue;
 		const vx = vAr[ ind ], vy = vAr[ ind + 1 ], vz = vAr[ ind + 2 ];
-		const fallOff = falloff( dist ) * mAr[ ind + 2 ];
+		const fallOff = falloff( dist );
 		const brushMod = Math.pow( fallOff, 5 ) * brushFactor;
 		const pinchF = fallOff * deform;
 		vAr[ ind ] = vx + dx * pinchF + anx * brushMod;
@@ -1180,7 +1133,6 @@ function toolCrease( mesh, iVerts, aNormal, center, radiusSq, strength, negative
 function toolDrag( mesh, iVerts, center, radiusSq, dragDir ) {
 
 	const vAr = mesh.getVertices();
-	const mAr = mesh.getMaterials();
 	const radius = Math.sqrt( radiusSq );
 	const cx = center[ 0 ], cy = center[ 1 ], cz = center[ 2 ];
 	const dirx = dragDir[ 0 ], diry = dragDir[ 1 ], dirz = dragDir[ 2 ];
@@ -1190,7 +1142,7 @@ function toolDrag( mesh, iVerts, center, radiusSq, dragDir ) {
 		const vx = vAr[ ind ], vy = vAr[ ind + 1 ], vz = vAr[ ind + 2 ];
 		const dx = vx - cx, dy = vy - cy, dz = vz - cz;
 		const dist = Math.sqrt( dx * dx + dy * dy + dz * dz ) / radius;
-		const fallOff = falloff( dist ) * mAr[ ind + 2 ];
+		const fallOff = falloff( dist );
 		vAr[ ind ] = vx + dirx * fallOff;
 		vAr[ ind + 1 ] = vy + diry * fallOff;
 		vAr[ ind + 2 ] = vz + dirz * fallOff;
@@ -1202,7 +1154,6 @@ function toolDrag( mesh, iVerts, center, radiusSq, dragDir ) {
 function toolScale( mesh, iVerts, center, radiusSq, deltaScale ) {
 
 	const vAr = mesh.getVertices();
-	const mAr = mesh.getMaterials();
 	const radius = Math.sqrt( radiusSq );
 	const cx = center[ 0 ], cy = center[ 1 ], cz = center[ 2 ];
 	const scale = deltaScale * 0.01;
@@ -1212,7 +1163,7 @@ function toolScale( mesh, iVerts, center, radiusSq, deltaScale ) {
 		const vx = vAr[ ind ], vy = vAr[ ind + 1 ], vz = vAr[ ind + 2 ];
 		const dx = vx - cx, dy = vy - cy, dz = vz - cz;
 		const dist = Math.sqrt( dx * dx + dy * dy + dz * dz ) / radius;
-		const fallOff = falloff( dist ) * scale * mAr[ ind + 2 ];
+		const fallOff = falloff( dist ) * scale;
 		vAr[ ind ] = vx + dx * fallOff;
 		vAr[ ind + 1 ] = vy + dy * fallOff;
 		vAr[ ind + 2 ] = vz + dz * fallOff;

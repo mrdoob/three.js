@@ -8,10 +8,7 @@
 
 const TRI_INDEX = 4294967295;
 
-const Flags = Object.freeze( {
-	MAX: 0x7fffffff,
-	STATE: 1
-} );
+const MAX_FLAG = 0x7fffffff;
 
 let _memoryBuffer = new ArrayBuffer( 100000 );
 const _sortByIndex = ( a, b ) => a - b;
@@ -338,7 +335,7 @@ function falloff( dist ) {
 
 export {
 	TRI_INDEX,
-	Flags,
+	MAX_FLAG,
 	getMemory,
 	replaceElement,
 	removeElement,

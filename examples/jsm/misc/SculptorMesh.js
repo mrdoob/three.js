@@ -6,7 +6,7 @@
 
 import {
 	TRI_INDEX,
-	Flags,
+	MAX_FLAG,
 	getMemory
 } from './SculptorUtils.js';
 
@@ -663,8 +663,6 @@ class SculptorMesh {
 		this._verticesXYZ = null;
 		this._normalsXYZ = null;
 		this._renderNormalsXYZ = null;
-		this._colorsRGB = null;
-		this._materialsPBR = null;
 
 		this._facesABCD = null;
 		this._trianglesABC = null;
@@ -681,9 +679,7 @@ class SculptorMesh {
 
 		this._vertTagFlags = null;
 		this._vertSculptFlags = null;
-		this._vertStateFlags = null;
 		this._facesTagFlags = null;
-		this._facesStateFlags = null;
 
 		this._octree = null;
 		this._leavesToUpdate = [];
@@ -691,11 +687,9 @@ class SculptorMesh {
 		this._tagFlag = 1;
 		this._sculptFlag = 1;
 
-		this.isDynamic = true;
-
 	}
 
-	// ---- Accessors matching SculptGL's Mesh interface ----
+	// ---- Mesh data accessors ----
 
 	getNbVertices() {
 
@@ -725,16 +719,6 @@ class SculptorMesh {
 	getRenderNormals() {
 
 		return this._renderNormalsXYZ;
-
-	}
-	getColors() {
-
-		return this._colorsRGB;
-
-	}
-	getMaterials() {
-
-		return this._materialsPBR;
 
 	}
 	getFaces() {
@@ -772,16 +756,6 @@ class SculptorMesh {
 		return this._vertSculptFlags;
 
 	}
-	getVerticesStateFlags() {
-
-		return this._vertStateFlags;
-
-	}
-	getVerticesProxy() {
-
-		return this._verticesXYZ;
-
-	}
 	getFaceNormals() {
 
 		return this._faceNormals;
@@ -812,11 +786,6 @@ class SculptorMesh {
 		return this._facesTagFlags;
 
 	}
-	getFacesStateFlags() {
-
-		return this._facesStateFlags;
-
-	}
 	getTopologyVersion() {
 
 		return this._topologyVersion;
@@ -829,7 +798,7 @@ class SculptorMesh {
 	}
 	nextTagFlag() {
 
-		if ( this._tagFlag >= Flags.MAX ) {
+		if ( this._tagFlag >= MAX_FLAG ) {
 
 			// Negative active tags are deletion sentinels used by decimation. They
 			// must survive an epoch wrap until the pending deletion is committed.
@@ -848,7 +817,7 @@ class SculptorMesh {
 	}
 	nextSculptFlag() {
 
-		if ( this._sculptFlag >= Flags.MAX ) {
+		if ( this._sculptFlag >= MAX_FLAG ) {
 
 			this._vertSculptFlags.fill( 0 );
 			this._sculptFlag = 1;
@@ -919,25 +888,14 @@ class SculptorMesh {
 		this._verticesXYZ = new Float32Array( weldedPositions );
 		this._normalsXYZ = new Float32Array( vertexDataLength );
 		this._renderNormalsXYZ = new Float32Array( vertexDataLength );
-		this._colorsRGB = new Float32Array( vertexDataLength ).fill( 1 );
-		this._materialsPBR = new Float32Array( vertexDataLength );
 
-		for ( let i = 0; i < vertexDataLength; i += 3 ) {
-
-			this._materialsPBR[ i ] = 0.18;
-			this._materialsPBR[ i + 1 ] = 0.08;
-			this._materialsPBR[ i + 2 ] = 1;
-
-		}
 
 		this._facesABCD = faces;
 		this._trianglesABC = triangles;
 		this._vertOnEdge = new Uint8Array( vertexCount );
 		this._vertTagFlags = new Int32Array( vertexCount );
 		this._vertSculptFlags = new Int32Array( vertexCount );
-		this._vertStateFlags = new Int32Array( vertexCount );
 		this._facesTagFlags = new Int32Array( triangleCount );
-		this._facesStateFlags = new Int32Array( triangleCount );
 		this._faceBoxes = new Float32Array( triangleCount * 6 );
 		this._faceNormals = new Float32Array( triangleCount * 3 );
 		this._faceCenters = new Float32Array( triangleCount * 3 );
@@ -1493,12 +1451,11 @@ class SculptorMesh {
 
 	reAllocateArrays( nbAddElements ) {
 
-		let capacity = this._facesStateFlags.length;
+		let capacity = this._facesABCD.length / 4;
 		let requiredCount = this._nbFaces + nbAddElements;
 
 		if ( capacity < requiredCount || capacity > requiredCount * 4 ) {
 
-			this._facesStateFlags = this._resizeArray( this._facesStateFlags, requiredCount );
 			this._facesABCD = this._resizeArray( this._facesABCD, requiredCount * 4 );
 			this._trianglesABC = this._resizeArray( this._trianglesABC, requiredCount * 3 );
 			this._faceBoxes = this._resizeArray( this._faceBoxes, requiredCount * 6 );
@@ -1517,12 +1474,9 @@ class SculptorMesh {
 			this._verticesXYZ = this._resizeArray( this._verticesXYZ, requiredCount * 3 );
 			this._normalsXYZ = this._resizeArray( this._normalsXYZ, requiredCount * 3 );
 			this._renderNormalsXYZ = this._resizeArray( this._renderNormalsXYZ, requiredCount * 3 );
-			this._colorsRGB = this._resizeArray( this._colorsRGB, requiredCount * 3 );
-			this._materialsPBR = this._resizeArray( this._materialsPBR, requiredCount * 3 );
 			this._vertOnEdge = this._resizeArray( this._vertOnEdge, requiredCount );
 			this._vertTagFlags = this._resizeArray( this._vertTagFlags, requiredCount );
 			this._vertSculptFlags = this._resizeArray( this._vertSculptFlags, requiredCount );
-			this._vertStateFlags = this._resizeArray( this._vertStateFlags, requiredCount );
 
 		}
 
