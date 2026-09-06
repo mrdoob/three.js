@@ -149,7 +149,7 @@
 
 				updateSun();
 
-				materials = { building: createBuildingMaterial( city.layout, parameters.seed ) };
+				materials = { building: createBuildingMaterial( city.layout, city.seedNode ) };
 				generateCity();
 
 				// bake the irradiance grid once the city and sun are in place

@@ -8,7 +8,7 @@ import {
 } from 'three';
 
 import { MeshStandardNodeMaterial } from 'three/webgpu';
-import { cameraPosition, color, float, floor, Fn, fract, fwidth, hash, If, mix, mod, mx_fractal_noise_float, mx_noise_float, normalView, positionView, positionWorld, smoothstep, step, uint, varying, vec4 } from 'three/tsl';
+import { cameraPosition, color, float, floor, Fn, fract, fwidth, hash, If, mix, mod, mx_fractal_noise_float, mx_noise_float, normalView, positionView, positionWorld, smoothstep, step, uint, uniform, varying, vec4 } from 'three/tsl';
 
 import { SkyscraperGenerator, createSkyscraperMaterial, buildingPalette } from './city/SkyscraperGenerator.js';
 import { SidewalkGenerator } from './city/SidewalkGenerator.js';
@@ -43,6 +43,14 @@ class CityGenerator {
 		this.parameters = Object.assign( {}, CityGenerator.defaults, parameters );
 		this.layout = cityLayout( this.parameters );
 
+		/**
+		 * The city seed shared by building and proxy materials. Pass this to
+		 * {@link createBuildingMaterial} to update the palette when rebuilding.
+		 *
+		 * @type {UniformNode<uint>}
+		 */
+		this.seedNode = uniform( this.parameters.seed, 'uint' );
+
 		this.generators = [];
 
 		// per-tower box specs recorded during build(), consumed by buildProxy()
@@ -73,6 +81,8 @@ class CityGenerator {
 	}
 
 	build( materials = {} ) {
+
+		this.seedNode.value = this.parameters.seed;
 
 		for ( const generator of this.generators ) generator.dispose();
 		this.generators.length = 0;
@@ -203,7 +213,7 @@ class CityGenerator {
 		// position ), so the GI bleeds the real per-building tints. mid roughness / metalness
 		// give the boxes a soft, part-glazed sky reflection.
 		const material = new MeshStandardNodeMaterial( { roughness: 0.4, metalness: 0.4 } );
-		material.colorNode = buildingColorNode( this.layout, this.parameters.seed );
+		material.colorNode = buildingColorNode( this.layout, this.seedNode );
 		const mesh = new InstancedMesh( new BoxGeometry( 1, 1, 1 ), material, towers.length );
 		mesh.name = 'CityProxy';
 
@@ -530,7 +540,7 @@ function gridLine( coord, period, halfWidth ) {
  * boxes alike.
  *
  * @param {Object} layout - The city layout.
- * @param {number} [seed] - The city seed.
+ * @param {number|Node<uint>} [seed=0] - The city seed or a shared seed node.
  * @return {Node<vec3>} The tower colour.
  */
 function buildingColorNode( layout, seed = 0 ) {
@@ -551,7 +561,8 @@ function buildingColorNode( layout, seed = 0 ) {
 	const lotIZ = floor( gz.sub( blockIZ.mul( periodZ ) ).sub( layout.sidewalkWidth ).div( layout.innerLotZ ) ).clamp( 0, layout.lotsZ - 1 );
 	const cellX = blockIX.mul( layout.lotsX ).add( lotIX );
 	const cellZ = blockIZ.mul( layout.lotsZ ).add( lotIZ );
-	const cellKey = uint( cellX.add( 4096 ) ).mul( uint( 73856093 ) ).bitXor( uint( cellZ.add( 4096 ) ).mul( uint( 19349663 ) ) ).bitXor( uint( ( seed * 2654435761 ) >>> 0 ) ).toVar();
+	const seedHash = typeof seed === 'number' ? uint( ( seed * 2654435761 ) >>> 0 ) : uint( seed ).toVar().mul( uint( 2654435761 ) );
+	const cellKey = uint( cellX.add( 4096 ) ).mul( uint( 73856093 ) ).bitXor( uint( cellZ.add( 4096 ) ).mul( uint( 19349663 ) ) ).bitXor( seedHash ).toVar();
 	const cellHash = ( a, b ) => hash( cellKey.add( uint( Math.round( ( a + b * 7 ) * 100 ) ) ) );
 
 	const pick = cellHash( 127.1, 311.7 );
@@ -566,6 +577,10 @@ function buildingColorNode( layout, seed = 0 ) {
 /**
  * The shared material every tower in a {@link CityGenerator} is dressed with: the per-lot
  * {@link buildingColorNode} resolved once per vertex on a skyscraper material.
+ *
+ * @param {Object} layout - The city layout.
+ * @param {number|Node<uint>} [seed=0] - A fixed seed, or {@link CityGenerator#seedNode} for a changing city.
+ * @return {MeshStandardNodeMaterial} The building material.
  */
 function createBuildingMaterial( layout, seed = 0 ) {
 
