@@ -133,19 +133,6 @@ class SunShadowNode extends ShadowNode {
 
 		}
 
-		const frameExtents = shadow.getFrameExtents();
-		const width = shadow.mapSize.width * frameExtents.x;
-		const height = shadow.mapSize.height * frameExtents.y;
-
-		if ( this.shadowMap !== null && ( this.shadowMap.width !== width || this.shadowMap.height !== height ) ) {
-
-			// the shadow map size is part of the lights cache key, so a resize triggers the rebuild that lands here
-
-			this.shadowMap.dispose();
-			this.shadowMap = null;
-
-		}
-
 		if ( this.shadowMap === null ) {
 
 			const { depthTexture, shadowMap } = this.setupRenderTarget( shadow, builder );
@@ -167,7 +154,7 @@ class SunShadowNode extends ShadowNode {
 			this.shadowMap = shadowMap;
 			this.shadow.map = shadowMap;
 
-			this._atlasSize.set( width, height );
+			this._atlasSize.set( shadowMap.width, shadowMap.height );
 
 		}
 
@@ -260,6 +247,15 @@ class SunShadowNode extends ShadowNode {
 
 		shadow.updateMatrices( light, camera );
 
+		const tileWidth = shadow.mapSize.width;
+		const tileHeight = shadow.mapSize.height;
+		const frameExtents = shadow.getFrameExtents();
+		const width = tileWidth * frameExtents.x;
+		const height = tileHeight * frameExtents.y;
+
+		shadowMap.setSize( width, height );
+		this._atlasSize.set( width, height );
+
 		const currentSceneName = scene.name;
 
 		scene.name = `Shadow Map [ ${ light.name || 'ID: ' + light.id } ]`;
@@ -268,9 +264,6 @@ class SunShadowNode extends ShadowNode {
 
 		renderer.autoClear = false;
 		renderer.clear();
-
-		const tileWidth = shadow.mapSize.width;
-		const tileHeight = shadow.mapSize.height;
 
 		for ( let i = 0; i < _cascadeCount; i ++ ) {
 
