@@ -1,35 +1,36 @@
 import {
 	BoxGeometry,
 	CylinderGeometry,
+	Float32BufferAttribute,
+	InstancedBufferAttribute,
 	InterpolationSamplingMode,
 	InterpolationSamplingType,
 	Group,
 	Matrix4,
+	Quaternion,
 	SphereGeometry,
 	TorusGeometry,
 	Vector3
 } from 'three';
 
 import { MeshStandardNodeMaterial } from 'three/webgpu';
-import { array, attribute, color, float, fract, instanceIndex, mix, positionGeometry, select, sin, smoothstep, uniform, varying } from 'three/tsl';
+import { array, attribute, color, cos, float, fract, mix, normalGeometry, positionGeometry, select, sin, smoothstep, uniform, uv, varying, vec3 } from 'three/tsl';
 
-import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
+import { mergeGeometries, mergeVertices } from '../../utils/BufferGeometryUtils.js';
 import { LoftGeometry } from '../../geometries/LoftGeometry.js';
 import { createInstances, updateInstances } from './InstancedMeshGenerator.js';
 import { part } from './CityGeneratorUtils.js';
 
 /**
- * A low-poly pedestrian crowd with shaped heads, tailored coats and lofted limbs.
- * Sleeves bend at the elbow, legs flex at the knee and shoes meet the ground
- * from heel to toe. Figures share two poses, mid-stride and standing ( the
- * stander carries a bag ). Each placement gets a pose, proportions and clothing
- * deterministically, so a crowd walks out of two instanced draws with no
- * per-instance attributes.
+ * A low-poly pedestrian crowd with shaped heads, jackets and lofted limbs.
+ * Two shared poses stand or walk, with sleeves and trousers swept through
+ * their joints. Each placement gets deterministic proportions and a small
+ * seed attribute for its complexion, hairstyle and outfit, in two instanced draws.
  *
  * The material splits the figure into zones on a baked `partId` and hashes
- * `instanceIndex` per zone, drawing coat, shirt, trousers, skin, hair and shoes
- * from small palettes; canonical-space masks add the collar, the coat's front
- * opening and a shirt V at the chest.
+ * the seed per zone, drawing clothes, skin and hair from small palettes.
+ * Local UVs keep facial features, cuffs and shoe soles attached to their parts
+ * as the figure is posed.
  *
  * The canonical figure stands on `y = 0`, centred in X / Z and ~1.75 m tall,
  * facing `+Z` so a placement turns it to face the road.
@@ -75,7 +76,7 @@ class PersonGenerator {
 
 		// deal each placement a pose and proportions from its index, so the crowd
 		// varies but rebuilding the same city deals the same crowd
-		const buckets = { walk: [], stand: [] };
+		const buckets = { walk: { matrices: [], seeds: [] }, stand: { matrices: [], seeds: [] } };
 		const matrix = new Matrix4();
 
 		for ( let i = 0; i < placements.length; i ++ ) {
@@ -88,7 +89,9 @@ class PersonGenerator {
 			const width = scale * ( 0.9 + h3 * 0.2 );
 			const posed = placements[ i ].clone().multiply( matrix.makeScale( width, scale, width ) );
 
-			buckets[ h1 < 0.65 ? 'walk' : 'stand' ].push( posed );
+			const bucket = buckets[ h1 < 0.65 ? 'walk' : 'stand' ];
+			bucket.matrices.push( posed );
+			bucket.seeds.push( i );
 
 		}
 
@@ -100,11 +103,23 @@ class PersonGenerator {
 				createInstances( this.geometries.walk, this.material, placements.length, 'People' ),
 				createInstances( this.geometries.stand, this.material, placements.length, 'People' )
 			);
+			for ( const mesh of this.mesh.children ) {
+
+				mesh.geometry.setAttribute( 'personSeed', new InstancedBufferAttribute( new Float32Array( mesh.instanceMatrix.count ), 1 ) );
+
+			}
 
 		}
 
-		updateInstances( this.mesh.children[ 0 ], buckets.walk );
-		updateInstances( this.mesh.children[ 1 ], buckets.stand );
+		for ( const [ index, pose ] of [ 'walk', 'stand' ].entries() ) {
+
+			const mesh = this.mesh.children[ index ];
+			const seed = mesh.geometry.attributes.personSeed;
+			seed.array.set( buckets[ pose ].seeds );
+			seed.needsUpdate = true;
+			updateInstances( mesh, buckets[ pose ].matrices );
+
+		}
 
 		return this.mesh;
 
@@ -135,173 +150,205 @@ PersonGenerator.defaults = {
 };
 
 // material-zone codes baked per vertex
-const SKIN = 0, HEAD = 1, COAT = 2, LEGS = 3, SHOES = 4, BAG = 5;
+const SKIN = 0, HEAD = 1, COAT = 2, LEGS = 3, SHOES = 4, BAG = 5, SLEEVE = 6, HANDLE = 7;
 
 // small palettes the material indexes per instance
 const COAT_COLORS = [ 0x2b3a52, 0x33332f, 0x8a6a44, 0x5a2f2f, 0x4f5238, 0x6a6a66, 0x222024, 0x7d3f22 ];
 const SHIRT_COLORS = [ 0xe8e6e0, 0xb8c4d8, 0xcfc8b8, 0x9aa7b8 ];
-const LEG_COLORS = [ 0x22242c, 0x3a3f4a, 0x2e2a26, 0x4a4640, 0x1d1d20 ];
+const LEG_COLORS = [ 0x22242c, 0x35485b, 0x51473d, 0x7c7160, 0x252526 ];
 const SKIN_COLORS = [ 0xc68863, 0xa96f4c, 0x8a5535, 0x6b3d24, 0xd9a077 ];
 const HAIR_COLORS = [ 0x1a1512, 0x3a2a1a, 0x584022, 0x6e6862, 0x2a2624 ];
 
-const _rotation = new Matrix4();
-const _rotationZ = new Matrix4();
+const _down = /*@__PURE__*/ new Vector3( 0, - 1, 0 );
 
-// offsets a joint from its parent: `v` swung about the parent by rotX / rotZ
-function swingJoint( parent, v, rotX, rotZ ) {
+function joint( parent, length, swing, splay ) {
 
-	return v.clone()
-		.applyMatrix4( _rotation.makeRotationX( rotX ).multiply( _rotationZ.makeRotationZ( rotZ ) ) )
-		.add( parent );
+	const vertical = length * Math.cos( splay );
+	return new Vector3( parent.x + length * Math.sin( splay ), parent.y - vertical * Math.cos( swing ), parent.z - vertical * Math.sin( swing ) );
 
 }
 
-// horizontal rings are wound for a downward sweep
-function ring( center, radiusX, radiusZ = radiusX, segments = 6 ) {
+function ring( center, rx, rz, segments = 6, phase = 0 ) {
 
-	const points = [];
-	for ( let i = 0; i < segments; i ++ ) {
+	return Array.from( { length: segments }, ( _, i ) => {
 
-		const a = i / segments * Math.PI * 2;
-		points.push( new Vector3( center.x + Math.cos( a ) * radiusX, center.y, center.z + Math.sin( a ) * radiusZ ) );
+		const a = i / segments * Math.PI * 2 + phase;
+		return new Vector3( center.x + Math.cos( a ) * rx, center.y, center.z + Math.sin( a ) * rz );
 
-	}
+	} );
 
-	return points;
+}
+
+// Rings turn with the limb, keeping the elbow and knee sections round as the
+// pose bends. The radii describe the clothing or anatomy at each joint.
+function limbSections( joints, segments = 6, phase = 0 ) {
+
+	const rotation = new Quaternion();
+	return joints.map( ( [ center, rx, rz ], i ) => {
+
+		const before = joints[ Math.max( 0, i - 1 ) ][ 0 ];
+		const after = joints[ Math.min( joints.length - 1, i + 1 ) ][ 0 ];
+		rotation.setFromUnitVectors( _down, after.clone().sub( before ).normalize() );
+		return ring( new Vector3(), rx, rz, segments, phase ).map( p => p.applyQuaternion( rotation ).add( center ) );
+
+	} );
+
+}
+
+function limb( joints, capEnd = true, segments = 6 ) {
+
+	return new LoftGeometry( limbSections( joints, segments ), { capEnd } );
+
+}
+
+// The chest has broad front and back planes with rounded sides.
+function torsoSection( y, width, depth ) {
+
+	return [
+		new Vector3( width, y, depth * 0.45 ),
+		new Vector3( width * 0.65, y, depth ),
+		new Vector3( - width * 0.65, y, depth ),
+		new Vector3( - width, y, depth * 0.45 ),
+		new Vector3( - width, y, - depth * 0.45 ),
+		new Vector3( - width * 0.65, y, - depth ),
+		new Vector3( width * 0.65, y, - depth ),
+		new Vector3( width, y, - depth * 0.45 )
+	];
+
+}
+
+function hipSection( side ) {
+
+	const profile = [[ 1, 0.5 ], [ - 0.1, 1 ], [ - 0.8, 0.7 ], [ - 1, 0 ], [ - 0.8, - 0.7 ], [ - 0.1, - 1 ], [ 1, - 0.5 ]];
+	const points = profile.map( ( [ x, z ], i ) => new Vector3( side * 0.093 - side * x * 0.093, i === 0 || i === 6 ? 0.82 : 0.89, z * 0.1 ) );
+	return side > 0 ? points.reverse() : points;
 
 }
 
 function buildPersonGeometry( p, pose ) {
 
 	const walking = pose === 'walk';
+	const parts = [];
+	const add = ( geometry, id ) => parts.push( part( geometry, id ) );
 
-	// One surface shapes the crown, brow, nose, jaw and chin. The material adds
-	// the hairline without an overlapping shell.
 	const headProfile = [
-		[ 1.75, 0.014, 0.014, - 0.014 ],
-		[ 1.72, 0.079, 0.074, - 0.012 ],
-		[ 1.675, 0.09, 0.087, - 0.01 ],
-		[ 1.625, 0.085, 0.078, 0.008 ],
-		[ 1.595, 0.078, 0.069, 0.012 ],
-		[ 1.555, 0.066, 0.064, 0.009 ],
-		[ 1.532, 0.041, 0.041, 0.005 ]
+		[ 1.75, 0.014, 0.014, - 0.012 ],
+		[ 1.708, 0.081, 0.081, - 0.01 ],
+		[ 1.656, 0.093, 0.086, 0 ],
+		[ 1.617, 0.086, 0.077, 0.009 ],
+		[ 1.561, 0.072, 0.065, 0.012 ],
+		[ 1.532, 0.045, 0.043, 0.005 ]
 	];
-	const headSections = headProfile.map( ( [ y, rx, rz, z ] ) => ring( new Vector3( 0, y, z ), rx, rz, 8 ) );
-	headSections[ 3 ][ 2 ].z += 0.035;
+	const headSections = headProfile.map( ( [ y, rx, rz, z ] ) => ring( new Vector3( 0, y, z ), rx, rz, 10, Math.PI / 2 ) );
+	headSections[ 3 ][ 0 ].z += 0.022;
 	const head = new LoftGeometry( headSections, { capStart: true, capEnd: true } );
-	const neck = new CylinderGeometry( 0.045, 0.052, 0.1, 5, 1, true ).translate( 0, 1.515, 0 );
 
-	// A broad shoulder line tapers to the waist, then opens out at the hem.
-	const coatProfile = [
-		[ 1.5, 0.055, 0.055 ],
-		[ 1.48, 0.095, 0.062 ],
-		[ 1.425, 0.208, 0.107 ],
-		[ 1.315, 0.19, 0.117 ],
-		[ 1.115, 0.152, 0.1 ],
-		[ 0.965, 0.195, 0.14 ],
-		[ 0.855, 0.196, 0.155 ]
+	// Store the unposed height alongside the loft's angular UV. Face and hair
+	// masks can then follow the head as it turns and tilts.
+	for ( let i = 0; i < head.attributes.position.count; i ++ ) head.attributes.uv.setX( i, head.attributes.position.getY( i ) );
+
+	const heads = [ head ];
+	for ( const side of [ - 1, 1 ] ) heads.push( new SphereGeometry( 1, 4, 2 ).scale( 0.016, 0.026, 0.018 ).translate( side * 0.092, 1.62, - 0.004 ) );
+	for ( const geometry of heads ) geometry.translate( 0, - 1.535, 0 ).rotateY( walking ? 0.14 : - 0.16 ).rotateZ( walking ? - 0.02 : 0.055 ).translate( 0, 1.535, 0 );
+
+	head.computeBoundingBox();
+	const headOffset = 1.75 - head.boundingBox.max.y;
+	for ( const [ index, geometry ] of heads.entries() ) add( geometry.translate( 0, headOffset, 0 ), index === 0 ? HEAD : SKIN );
+	add( new CylinderGeometry( 0.045, 0.052, 0.10, 5, 1, true ).translate( 0, 1.515, 0 ), SKIN );
+
+	const jacket = [
+		[ 1.5, 0.055, 0.052 ],
+		[ 1.425, 0.20, 0.10 ],
+		[ 1.365, 0.195, 0.111 ],
+		[ 1.285, 0.18, 0.115 ],
+		[ 1.095, 0.152, 0.103 ],
+		[ 1.015, 0.166, 0.108 ]
 	];
-	const coat = new LoftGeometry( coatProfile.map( ( [ y, rx, rz ] ) => ring( new Vector3( 0, y, 0 ), rx, rz, 8 ) ), { capEnd: true } );
-
-	// arms swing from the shoulders; each sleeve is one loft bending through the
-	// elbow, with a small lofted hand chained from the wrist
-	const coatParts = [ coat ];
-	const skinParts = [ neck ];
-	const bagParts = [];
+	add( new LoftGeometry( jacket.map( section => torsoSection( ...section ) ), { capEnd: true } ), COAT );
+	const trousers = [];
+	const hips = [];
 
 	for ( const side of [ - 1, 1 ] ) {
 
-		skinParts.push( new SphereGeometry( 1, 4, 2 ).scale( 0.016, 0.027, 0.018 ).translate( side * 0.089, 1.62, - 0.005 ) );
-
-		const swing = walking ? - side * 0.35 : ( side < 0 ? - 0.12 : 0.03 );
-		const shoulder = new Vector3( side * 0.2, 1.425, 0 );
-		const deltoid = swingJoint( shoulder, new Vector3( 0, - 0.075, 0 ), swing, side * 0.09 );
-		const elbow = swingJoint( shoulder, new Vector3( 0, - 0.285, 0 ), swing, side * 0.09 );
-		const wrist = swingJoint( elbow, new Vector3( 0, - 0.245, 0 ), swing - 0.22, side * 0.04 );
-
-		// the sleeve pinches to a tip tucked inside the coat's shoulder slope,
-		// so it emerges like a raglan seam instead of ending in a flat cap
-		coatParts.push( new LoftGeometry( [
-			ring( new Vector3( side * 0.15, 1.43, 0 ), 0.025, 0.035 ),
-			ring( deltoid, 0.067, 0.063 ),
-			ring( elbow, 0.052, 0.047 ),
-			ring( wrist, 0.037, 0.035 )
-		], { capEnd: true } ) );
+		const swing = walking ? - side * 0.35 : ( side < 0 ? - 0.12 : 0.06 );
+		const shoulder = new Vector3( side * 0.197, 1.425, 0.008 );
+		const upperArm = joint( shoulder, 0.075, swing, side * 0.08 );
+		const elbow = joint( shoulder, 0.285, swing, side * 0.08 );
+		const wrist = joint( elbow, 0.255, swing - 0.22, side * 0.03 );
+		add( limb( [
+			[ new Vector3( side * 0.14, 1.415, 0 ), 0.024, 0.035 ],
+			[ upperArm, 0.066, 0.063 ],
+			[ elbow, 0.051, 0.048 ],
+			[ wrist, 0.029, 0.033 ]
+		], false, 5 ), SLEEVE );
 
 		const along = wrist.clone().sub( elbow ).normalize();
 		const hand = wrist.clone().addScaledVector( along, 0.05 );
-		skinParts.push( new LoftGeometry( [
-			ring( wrist, 0.024, 0.029 ),
-			ring( hand, 0.031, 0.04 ),
-			ring( wrist.clone().addScaledVector( along, 0.095 ), 0.021, 0.025 )
-		], { capEnd: true } ) );
+		add( limb( [
+			[ wrist, 0.029, 0.033 ],
+			[ hand, 0.032, 0.039 ],
+			[ wrist.clone().addScaledVector( along, 0.095 ), 0.019, 0.025 ]
+		], true, 5 ), SKIN );
 
 		if ( ! walking && side > 0 ) {
 
-			bagParts.push(
-				new BoxGeometry( 0.075, 0.21, 0.22 ).translate( hand.x, hand.y - 0.195, hand.z ),
-				new TorusGeometry( 0.045, 0.006, 3, 4, Math.PI ).rotateY( Math.PI / 2 ).translate( hand.x, hand.y - 0.085, hand.z )
-			);
+			add( new BoxGeometry( 0.075, 0.21, 0.22 ).translate( hand.x, hand.y - 0.19, hand.z ), BAG );
+			add( new TorusGeometry( 0.045, 0.006, 3, 4, Math.PI ).rotateY( Math.PI / 2 ).translate( hand.x, hand.y - 0.08, hand.z ), HANDLE );
 
 		}
 
-	}
-
-	// legs stride from the hips as single lofts, the knee ring pushed forward
-	// where the gait flexes it; shoes loft from heel to toe under each ankle
-	const legParts = [];
-	const shoeParts = [];
-
-	for ( const side of [ - 1, 1 ] ) {
-
-		// Flat soles and a beveled toe stay readable at a distance. Ground each
-		// shoe after pitching it, then place the ankle at its opening.
 		const shoe = new LoftGeometry( [
 			shoeSection( - 0.075, 0.044, - 0.008 ),
-			shoeSection( 0.025, 0.054, 0.016 ),
-			shoeSection( 0.17, 0.044, - 0.036 )
-		], { capStart: true, capEnd: true } )
-			.rotateX( walking ? ( side < 0 ? - 0.12 : 0.25 ) : 0 )
-			.rotateY( walking ? side * 0.03 : side * 0.16 );
+			shoeSection( 0.015, 0.054, 0.016 ),
+			shoeSection( 0.125, 0.055, - 0.025 ),
+			shoeSection( 0.18, 0.036, - 0.045 )
+		], { capStart: true, capEnd: true } );
 
+		// Shoe UVs retain local height and length, keeping soles and laces aligned
+		// with the foot after its heel or toe is planted on the ground.
+		for ( let i = 0; i < shoe.attributes.position.count; i ++ ) {
+
+			shoe.attributes.uv.setXY( i, shoe.attributes.position.getY( i ), shoe.attributes.position.getZ( i ) );
+
+		}
+
+		shoe.rotateX( walking ? ( side < 0 ? - 0.12 : 0.25 ) : 0 ).rotateY( walking ? side * 0.03 : side * 0.16 );
 		shoe.computeBoundingBox();
 
-		const hip = new Vector3( side * 0.095, 0.945, 0 );
-		const ankle = new Vector3( side * ( walking ? 0.105 : 0.12 ), - shoe.boundingBox.min.y, walking ? - side * 0.235 : ( side < 0 ? 0.06 : - 0.025 ) );
-		const knee = hip.clone().lerp( ankle, 0.51 );
-		knee.z += walking ? ( side > 0 ? 0.095 : 0.015 ) : ( side < 0 ? 0.055 : 0.01 );
-		const calf = knee.clone().lerp( ankle, 0.42 );
+		const hip = new Vector3( side * 0.093, 0.89, 0 );
+		const ankle = new Vector3( side * ( walking ? 0.105 : 0.12 ), - shoe.boundingBox.min.y, walking ? - side * 0.235 : ( side < 0 ? 0.065 : - 0.025 ) );
+		const knee = hip.clone().lerp( ankle, 0.53 );
+		knee.z += walking ? ( side > 0 ? 0.095 : 0.015 ) : ( side < 0 ? 0.06 : 0.01 );
+		const calf = knee.clone().lerp( ankle, 0.40 );
+		const legSections = limbSections( [
+			[ hip, 0.087, 0.092 ],
+			[ knee, 0.062, 0.067 ],
+			[ calf, 0.066, 0.067 ],
+			[ ankle.clone().add( new Vector3( 0, - 0.018, 0 ) ), 0.045, 0.046 ]
+		], 7, Math.PI / 7 + ( side > 0 ? Math.PI : 0 ) );
 
-		legParts.push( new LoftGeometry( [
-			ring( hip, 0.085, 0.093 ),
-			ring( knee, 0.063, 0.064 ),
-			ring( calf, 0.064, 0.066 ),
-			ring( ankle.clone().add( new Vector3( 0, - 0.018, 0 ) ), 0.045, 0.044 )
-		], { capEnd: true } ) );
-
-		shoeParts.push( shoe.translate( ankle.x, ankle.y, ankle.z ) );
+		// The two upper leg loops share their inner edge at the crotch. Their
+		// outer edges together form one loop leading up to the waist.
+		legSections[ 0 ] = hipSection( side );
+		hips.push( legSections[ 0 ] );
+		trousers.push( new LoftGeometry( legSections, { capEnd: true } ) );
+		add( shoe.translate( ankle.x, ankle.y, ankle.z ), SHOES );
 
 	}
 
-	const parts = [
-		part( mergeGeometries( skinParts ), SKIN ),
-		part( head, HEAD ),
-		part( mergeGeometries( coatParts ), COAT ),
-		part( mergeGeometries( legParts ), LEGS ),
-		part( mergeGeometries( shoeParts ), SHOES )
-	];
-
-	if ( bagParts.length > 0 ) parts.push( part( mergeGeometries( bagParts ), BAG ) );
-
-	// The material uses canonical positions; remove UVs before merging the parts.
-	for ( const geometry of parts ) geometry.deleteAttribute( 'uv' );
+	const crotch = [ ...hips[ 0 ], ...hips[ 1 ].slice( 1, 6 ) ];
+	trousers.push( new LoftGeometry( [ ring( new Vector3( 0, 1.04, 0 ), 0.157, 0.1, 12, Math.PI / 2 ), crotch ] ) );
+	const pants = mergeGeometries( trousers );
+	pants.deleteAttribute( 'normal' );
+	pants.deleteAttribute( 'uv' );
+	const joinedPants = mergeVertices( pants );
+	joinedPants.computeVertexNormals();
+	joinedPants.setAttribute( 'uv', new Float32BufferAttribute( new Float32Array( joinedPants.attributes.position.count * 2 ), 2 ) );
+	add( joinedPants, LEGS );
 
 	const geometry = mergeGeometries( parts );
-
-	// scale the canonical 1.75 m figure to the requested height, feet stay on y = 0
-	const s = p.height / 1.75;
-	if ( s !== 1 ) geometry.scale( s, s, s );
-
+	const scale = p.height / 1.75;
+	if ( scale !== 1 ) geometry.scale( scale, scale, scale );
 	return geometry;
 
 }
@@ -325,54 +372,74 @@ function createPersonMaterial( p ) {
 	const isSkin = partId.equal( SKIN );
 	const isHead = partId.equal( HEAD );
 	const isCoat = partId.equal( COAT );
+	const isSleeve = partId.equal( SLEEVE );
 	const isLegs = partId.equal( LEGS );
 	const isShoes = partId.equal( SHOES );
 	const isBag = partId.equal( BAG );
+	const isHandle = partId.equal( HANDLE );
 
-	// per-instance palette picks, each from its own hash lane so coat, shirt,
-	// trousers, skin and hair combine freely across the crowd
-	const lane = ( salt ) => fract( sin( float( instanceIndex ).add( salt ).mul( 12.9898 ) ).mul( 43758.5453 ) );
+	// Use the original placement index, so splitting poses into batches does
+	// not give their first members identical outfits and complexions.
+	const seed = attribute( 'personSeed', 'float' );
+	const lane = ( salt ) => fract( sin( seed.add( salt ).mul( 12.9898 ) ).mul( 43758.5453 ) );
 	const pick = ( colors, salt ) => array( colors.map( c => color( c ) ) ).element( lane( salt ).mul( colors.length ).floor().min( colors.length - 1 ) );
-
 	const q = positionGeometry.mul( uniform( 1.75 / p.height ) );
+	const texcoord = uv();
 
-	// The hairline follows the temples and nape, with a different fringe per
-	// instance. Facial features share the head's surface and add no geometry.
-	const hairline = mix( float( 1.59 ), float( 1.695 ), smoothstep( - 0.025, 0.07, q.z ) ).add( lane( 13.0 ).sub( 0.5 ).mul( 0.018 ) );
-	const hair = smoothstep( hairline.sub( 0.003 ), hairline.add( 0.003 ), q.y );
-	const face = smoothstep( 0.045, 0.075, q.z );
-	const eyes = smoothstep( 0.014, 0.006, q.x.abs().sub( 0.037 ).abs() ).mul( smoothstep( 0.006, 0.002, q.y.sub( 1.656 ).abs() ) ).mul( face );
-	const mouth = smoothstep( 0.031, 0.018, q.x.abs() ).mul( smoothstep( 0.004, 0.001, q.y.sub( 1.585 ).abs() ) ).mul( face );
+	const angle = texcoord.y.mul( Math.PI * 2 );
+	const face = vec3( sin( angle ).mul( 0.09 ), texcoord.x, cos( angle ).mul( 0.09 ) );
+	const style = lane( 13.0 );
+	const hairline = mix( mix( float( 1.55 ), float( 1.61 ), style ), mix( float( 1.67 ), float( 1.71 ), style ), smoothstep( - 0.025, 0.07, face.z ) ).add( face.x.mul( style.sub( 0.5 ) ).mul( 0.35 ) );
+	const hair = smoothstep( hairline.sub( 0.003 ), hairline.add( 0.003 ), face.y );
+	const forward = smoothstep( 0.045, 0.075, face.z );
+	const eyeWidth = smoothstep( 0.013, 0.006, face.x.abs().sub( 0.036 ).abs() );
+	const eyes = eyeWidth.mul( smoothstep( 0.005, 0.0015, face.y.sub( 1.651 ).abs() ) ).mul( forward );
+	const brows = eyeWidth.mul( smoothstep( 0.0035, 0.001, face.y.sub( 1.665 ).abs() ) ).mul( forward );
+	const mouth = smoothstep( 0.030, 0.016, face.x.abs() ).mul( smoothstep( 0.004, 0.001, face.y.sub( 1.58 ).abs() ) ).mul( forward );
 	const skin = pick( SKIN_COLORS, 17.0 );
-	const head = mix( skin.mul( eyes.mul( 0.65 ).add( mouth.mul( 0.25 ) ).oneMinus() ), pick( HAIR_COLORS, 3.0 ), hair );
+	const head = mix( skin.mul( eyes.mul( 0.65 ).add( brows.mul( 0.35 ) ).add( mouth.mul( 0.25 ) ).oneMinus() ), pick( HAIR_COLORS, 3.0 ), hair );
 
-	// tailoring, drawn in the canonical figure's space: a darker collar band, the
-	// coat falling open down the front, and a shirt V at the chest
-	const collar = smoothstep( 1.43, 1.45, q.y ).mul( smoothstep( 1.52, 1.5, q.y ) );
-	const placket = smoothstep( 0.02, 0.008, q.x.abs() ).mul( smoothstep( 0.02, 0.06, q.z ) ).mul( smoothstep( 1.37, 1.33, q.y ) ).mul( smoothstep( 0.8, 0.86, q.y ) );
-	const shirtV = smoothstep( 0.05, 0.06, q.z ).mul( smoothstep( 1.32, 1.36, q.y ) ).mul( smoothstep( 1.49, 1.46, q.y ) ).mul( smoothstep( 0.006, 0.0, q.x.abs().sub( q.y.sub( 1.32 ).mul( 0.42 ) ) ) );
+	const jacket = lane( 89.0 ).greaterThan( 0.42 );
+	const coat = pick( COAT_COLORS, 29.0 );
+	const shirt = pick( SHIRT_COLORS, 71.0 );
+	const front = smoothstep( 0.03, 0.07, q.z );
+	const opening = q.y.sub( 1.33 ).mul( 0.42 );
+	const shirtV = smoothstep( 1.33, 1.35, q.y ).mul( smoothstep( 1.5, 1.48, q.y ) ).mul( smoothstep( 0.004, 0, q.x.abs().sub( opening ) ) ).mul( front );
+	const lapel = smoothstep( 0.025, 0.009, q.x.abs().sub( opening ).abs() ).mul( shirtV.oneMinus() ).mul( smoothstep( 1.32, 1.37, q.y ) ).mul( front );
+	const zipper = smoothstep( 0.008, 0.003, q.x.abs() ).mul( front );
+	const hem = smoothstep( 1.065, 1.035, q.y );
+	const collar = smoothstep( 1.455, 1.48, q.y );
+	const tailored = mix( coat.mul( lapel.mul( 0.25 ).add( zipper.mul( 0.35 ) ).oneMinus() ), shirt, shirtV );
+	const casual = coat.mul( hem.max( collar ).mul( 0.18 ).add( zipper.mul( 0.3 ) ).oneMinus() );
+	const cuff = smoothstep( 0.94, 0.985, texcoord.x );
+	const sleeve = mix( coat, select( jacket, shirt, coat.mul( 0.75 ) ), cuff );
 
-	const coatBase = pick( COAT_COLORS, 29.0 );
-	const coatTailored = mix( coatBase.mul( collar.mul( 0.25 ).add( placket.mul( 0.5 ) ).oneMinus().clamp( 0.4, 1 ) ), pick( SHIRT_COLORS, 71.0 ), shirtV );
+	const sneaker = lane( 5.0 ).greaterThan( 0.4 );
+	const leather = mix( color( 0x201e1c ), color( 0x4a3524 ), lane( 23.0 ) );
+	const upper = select( sneaker, mix( color( 0x252b32 ), color( 0xc8c3b8 ), lane( 31.0 ).step( 0.55 ) ), leather );
+	const sole = smoothstep( - 0.064, - 0.074, texcoord.x );
+	const laceCoord = texcoord.y.mul( 110 );
+	const laces = smoothstep( 0.68, 0.78, laceCoord.fract() ).mul( laceCoord.fwidth().oneMinus().clamp() ).mul( smoothstep( - 0.015, 0.005, texcoord.x ) ).mul( smoothstep( - 0.01, 0.015, texcoord.y ) );
+	const shoe = mix( mix( upper, select( sneaker, color( 0xd5d1c8 ), color( 0x191816 ) ), sole ), color( 0xaba89f ), laces.mul( 0.45 ) );
 
-	// shoes split between black and brown leather
-	const shoes = mix( color( 0x1c1a18 ), color( 0x4a3524 ), lane( 5.0 ).step( 0.45 ) );
+	const bagEdge = texcoord.min( texcoord.oneMinus() );
+	const seam = smoothstep( 0.045, 0.02, bagEdge.x.min( bagEdge.y ) );
+	const flap = smoothstep( 0.02, 0.008, texcoord.y.sub( 0.72 ).abs() );
+	const buckle = smoothstep( 0.06, 0.045, texcoord.x.sub( 0.5 ).abs() ).mul( smoothstep( 0.07, 0.05, texcoord.y.sub( 0.72 ).abs() ) ).mul( select( normalGeometry.x.abs().greaterThan( 0.8 ), 1, 0 ) );
+	const bag = mix( color( 0x49372a ).mul( seam.max( flap ).mul( 0.35 ).oneMinus() ), color( 0x8f8878 ), buckle );
 
 	const material = new MeshStandardNodeMaterial();
-
 	material.colorNode = select( isSkin, skin,
 		select( isHead, head,
-			select( isCoat, coatTailored,
-				select( isLegs, pick( LEG_COLORS, 47.0 ),
-					select( isShoes, shoes,
-						select( isBag, color( 0x3a2c20 ), color( 0xffffff ) ) ) ) ) ) );
-
-	material.roughnessNode = select( isSkin, float( 0.55 ),
-		select( isHead, mix( float( 0.55 ), float( 0.85 ), hair ),
-			select( isShoes.or( isBag ), float( 0.5 ), float( 0.85 ) ) ) ); // leather sheen under matte cloth
-
+			select( isCoat, select( jacket, tailored, casual ),
+				select( isSleeve, sleeve,
+					select( isLegs, pick( LEG_COLORS, 47.0 ),
+						select( isShoes, shoe,
+							select( isBag, bag, color( 0x30261f ) ) ) ) ) ) ) );
+	material.roughnessNode = select( isSkin, float( 0.6 ),
+		select( isHead, mix( float( 0.6 ), float( 0.85 ), hair ),
+			select( isBag.or( isHandle ), float( 0.55 ), float( 0.85 ) ) ) );
 	material.metalness = 0;
-
 	return material;
 
 }
