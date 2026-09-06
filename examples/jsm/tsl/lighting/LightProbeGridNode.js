@@ -1,4 +1,4 @@
-import { AnalyticLightNode, NodeUpdateType, Vector3 } from 'three/webgpu';
+import { AnalyticLightNode, Vector3 } from 'three/webgpu';
 import { array, getShIrradianceAt, normalWorld, positionWorld, texture3D, uniform, vec3 } from 'three/tsl';
 
 // Padding texels at each boundary of every atlas sub-volume.
@@ -71,9 +71,6 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		super( light );
 
-		// Captures and the main view can use different atlases within one frame.
-		this.updateType = NodeUpdateType.RENDER;
-		this._atlas = texture3D( light !== null ? light.texture : null );
 		this._min = uniform( new Vector3() );
 		this._max = uniform( new Vector3() );
 		this._resolution = uniform( new Vector3() );
@@ -86,7 +83,6 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		const light = this.light;
 
-		this._atlas.value = light._bakeTexture || light.texture;
 		this._min.value.copy( light.boundingBox.min );
 		this._max.value.copy( light.boundingBox.max );
 		this._resolution.value.copy( light.resolution );
@@ -116,7 +112,7 @@ class LightProbeGridNode extends AnalyticLightNode {
 		const samplePos = positionWorld.add( normalWorld.mul( spacing ).mul( 0.5 ) );
 		const uvw = samplePos.sub( min ).div( range ).clamp( 0.0, 1.0 ).mul( resMinusOne ).div( res ).add( vec3( 0.5 ).div( res ) );
 
-		const result = evaluateGridIrradiance( this._atlas, uvw, res, normalWorld );
+		const result = evaluateGridIrradiance( texture3D( light.texture ), uvw, res, normalWorld );
 
 		let irradiance = result.mul( this._intensity );
 
