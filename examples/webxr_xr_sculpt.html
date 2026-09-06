@@ -72,7 +72,7 @@
 				// Controls
 
 				controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 1, 0 );
+				controls.target.set( 0, 1.2, - 0.8 );
 				controls.update();
 
 				// Lights
@@ -97,7 +97,7 @@
 					metalness: 0.1
 				} );
 				mesh = new THREE.Mesh( geometry, material );
-				mesh.position.set( 0, 1, 0 );
+				mesh.position.set( 0, 1.2, - 0.8 );
 				scene.add( mesh );
 
 				// Sculptor
