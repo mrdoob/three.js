@@ -9,6 +9,7 @@ import {
 	Box3,
 	BufferAttribute,
 	BufferGeometry,
+	EventDispatcher,
 	Matrix4,
 	Sphere,
 	Vector3,
@@ -57,6 +58,30 @@ const STAMP_SPACING_RATIO = 0.15;
 const TOPOLOGY_HYSTERESIS2 = 2.05 * 2.05;
 const UNIFORM_SCALE_TOLERANCE = 1e-10;
 const CLAY_OFFSET_RATIO = 0.1;
+
+/**
+ * Fires when a pointer or programmatic stroke begins.
+ *
+ * @event Sculptor#start
+ * @type {Object}
+ */
+const _startEvent = { type: 'start' };
+
+/**
+ * Fires after the sculpt geometry has been updated.
+ *
+ * @event Sculptor#change
+ * @type {Object}
+ */
+const _changeEvent = { type: 'change' };
+
+/**
+ * Fires after the active stroke finishes and exact bounds are up to date.
+ *
+ * @event Sculptor#end
+ * @type {Object}
+ */
+const _endEvent = { type: 'end' };
 const sortAscending = ( a, b ) => a - b;
 const sortByRangeStart = ( a, b ) => a.start - b.start;
 
@@ -108,6 +133,16 @@ function validateSize( value ) {
 	}
 
 	return value;
+
+}
+
+function validateRayTool( tool ) {
+
+	if ( tool === 'drag' || tool === 'scale' ) {
+
+		throw new Error( `Sculptor: The ${ tool } tool requires pointer movement and cannot be used with strokeFromRay().` );
+
+	}
 
 }
 
@@ -291,9 +326,13 @@ function compactDirtyVertices( vertices, vertexCount ) {
  * Use {@link Sculptor#getGeometry} for a compact snapshot suitable for export or
  * geometry processing. Sculptor maintains the live geometry's bounds and draw range.
  *
+ * Fires `start` when a stroke begins, `change` after geometry is updated, and
+ * `end` when the stroke finishes. Pointer and programmatic strokes share one
+ * lifecycle; programmatic stamps cannot interrupt a connected pointer stroke.
+ *
  * @three_import import { Sculptor } from 'three/addons/misc/Sculptor.js';
  */
-class Sculptor {
+class Sculptor extends EventDispatcher {
 
 	/**
 	 * @param {Mesh} mesh - The mesh that will receive a dedicated sculpt geometry.
@@ -301,6 +340,8 @@ class Sculptor {
 	 */
 
 	constructor( mesh, camera ) {
+
+		super();
 
 		if ( mesh === undefined || mesh.isMesh !== true || mesh.geometry === undefined || mesh.geometry.isBufferGeometry !== true ) {
 
@@ -389,8 +430,6 @@ class Sculptor {
 		this._onPointerDown = this._onPointerDown.bind( this );
 		this._onPointerMove = this._onPointerMove.bind( this );
 		this._onPointerUp = this._onPointerUp.bind( this );
-		this._onPointerCancel = this._onPointerCancel.bind( this );
-		this._onLostPointerCapture = this._onLostPointerCapture.bind( this );
 
 	}
 
@@ -416,8 +455,8 @@ class Sculptor {
 		element.addEventListener( 'pointerdown', this._onPointerDown );
 		element.addEventListener( 'pointermove', this._onPointerMove );
 		element.addEventListener( 'pointerup', this._onPointerUp );
-		element.addEventListener( 'pointercancel', this._onPointerCancel );
-		element.addEventListener( 'lostpointercapture', this._onLostPointerCapture );
+		element.addEventListener( 'pointercancel', this._onPointerUp );
+		element.addEventListener( 'lostpointercapture', this._onPointerUp );
 
 	}
 
@@ -428,20 +467,15 @@ class Sculptor {
 	disconnect() {
 
 		const element = this.domElement;
+		this.endStroke();
 
 		if ( element === null ) return;
-
-		if ( this._sculpting ) {
-
-			this._finishPointerStroke( this._activePointerId, true );
-
-		}
 
 		element.removeEventListener( 'pointerdown', this._onPointerDown );
 		element.removeEventListener( 'pointermove', this._onPointerMove );
 		element.removeEventListener( 'pointerup', this._onPointerUp );
-		element.removeEventListener( 'pointercancel', this._onPointerCancel );
-		element.removeEventListener( 'lostpointercapture', this._onLostPointerCapture );
+		element.removeEventListener( 'pointercancel', this._onPointerUp );
+		element.removeEventListener( 'lostpointercapture', this._onPointerUp );
 		this.domElement = null;
 		this._cachedRect = null;
 		this._clearHit();
@@ -895,8 +929,9 @@ class Sculptor {
 	}
 
 	/**
-	 * Applies one stamp from a world-space ray. Call {@link Sculptor#endStroke}
-	 * after the last stamp in a programmatic stroke.
+	 * Applies one stamp from a world-space ray, beginning a stroke on the first
+	 * hit. Call {@link Sculptor#endStroke} after the last stamp. Returns `false`
+	 * without changing the current hit when a connected pointer owns the stroke.
 	 *
 	 * Drag and Scale depend on pointer deltas and are unavailable through this
 	 * method.
@@ -908,15 +943,15 @@ class Sculptor {
 	 */
 	strokeFromRay( origin, direction, worldRadius ) {
 
+		if ( this._activePointerId !== null ) return false;
+
 		const tool = this._tool;
-
-		if ( tool === 'drag' || tool === 'scale' ) {
-
-			throw new Error( `Sculptor: The ${ tool } tool requires pointer movement and cannot be used with strokeFromRay().` );
-
-		}
+		validateRayTool( tool );
 
 		if ( this.pickFromRay( origin, direction, worldRadius ) === false ) return false;
+		this.beginStroke();
+		if ( this._sculpting === false ) return false;
+		if ( this._tool !== tool ) validateRayTool( this._tool );
 		this._applyStroke();
 		this._syncGeometry();
 
@@ -925,14 +960,55 @@ class Sculptor {
 	}
 
 	/**
-	 * Finishes a programmatic stroke by balancing the dynamic octree and
-	 * recomputing exact geometry bounds. Connected pointer strokes call this
-	 * method automatically.
+	 * Begins a stroke and fires `start`. Has no effect if a stroke is already
+	 * active. Pointer input and the first successful ray stamp call this
+	 * automatically; callers may also begin a programmatic stroke explicitly.
+	 *
+	 * @return {Sculptor} A reference to this sculptor.
+	 */
+	beginStroke() {
+
+		if ( this._sculpting ) return this;
+
+		this._sculpting = true;
+		this.dispatchEvent( _startEvent );
+		return this;
+
+	}
+
+	/**
+	 * Finishes the active stroke, releases pointer capture, balances the octree
+	 * and updates exact geometry bounds before firing `end`. Has no effect when
+	 * idle. Connected pointer input calls this automatically on release or cancel.
+	 *
+	 * @return {Sculptor} A reference to this sculptor.
 	 */
 	endStroke() {
 
+		if ( this._sculpting === false ) return this;
+
+		const pointerId = this._activePointerId;
+		this._activePointerId = null;
+		this._sculpting = false;
+
+		if ( pointerId !== null && this.domElement !== null && typeof this.domElement.releasePointerCapture === 'function' ) {
+
+			try {
+
+				this.domElement.releasePointerCapture( pointerId );
+
+			} catch {
+
+				// Synthetic events and detached elements may not support capture.
+
+			}
+
+		}
+
 		this._sculptMesh.balanceOctree();
 		if ( this._boundsDirty ) this._computeExactBounds();
+		this.dispatchEvent( _endEvent );
+		return this;
 
 	}
 
@@ -1240,6 +1316,7 @@ class Sculptor {
 		}
 
 		const topologyVersion = sculptMesh.getTopologyVersion();
+		const changed = this._geometrySynced && ( replaceGeometry || hasDirtyVertices || topologyVersion !== this._lastTopologyVersion );
 
 		if ( replaceGeometry || replaceIndex ) {
 
@@ -1266,6 +1343,8 @@ class Sculptor {
 		this._lastTopologyVersion = topologyVersion;
 		this._dirtyVertices.length = 0;
 		this._geometrySynced = true;
+
+		if ( changed ) this.dispatchEvent( _changeEvent );
 
 	}
 
@@ -1328,7 +1407,6 @@ class Sculptor {
 		if ( this._intersectionRayMesh( event.clientX, event.clientY ) === false ) return;
 
 		this._computePickedNormal();
-		this._sculpting = true;
 		this._activePointerId = event.pointerId;
 		this._lastPointerX = event.clientX;
 		this._lastPointerY = event.clientY;
@@ -1346,6 +1424,8 @@ class Sculptor {
 			}
 
 		}
+
+		this.beginStroke();
 
 	}
 
@@ -1375,46 +1455,9 @@ class Sculptor {
 
 	}
 
-	_finishPointerStroke( pointerId, releaseCapture ) {
-
-		if ( this._sculpting === false || pointerId !== this._activePointerId ) return;
-
-		this._activePointerId = null;
-		this._sculpting = false;
-
-		if ( releaseCapture && this.domElement !== null && typeof this.domElement.releasePointerCapture === 'function' ) {
-
-			try {
-
-				this.domElement.releasePointerCapture( pointerId );
-
-			} catch {
-
-				// Synthetic events and detached elements may not support capture.
-
-			}
-
-		}
-
-		this.endStroke();
-
-	}
-
 	_onPointerUp( event ) {
 
-		this._finishPointerStroke( event.pointerId, true );
-
-	}
-
-	_onPointerCancel( event ) {
-
-		this._finishPointerStroke( event.pointerId, false );
-
-	}
-
-	_onLostPointerCapture( event ) {
-
-		this._finishPointerStroke( event.pointerId, false );
+		if ( event.pointerId === this._activePointerId ) this.endStroke();
 
 	}
 
@@ -1564,10 +1607,9 @@ class Sculptor {
 	}
 
 	/**
-	 * Returns whether a connected pointer stroke is active. Programmatic ray
-	 * strokes are controlled by the caller and do not affect this value.
+	 * Returns whether a pointer or programmatic stroke is active.
 	 *
-	 * @return {boolean} Whether a pointer stroke is active.
+	 * @return {boolean} Whether a stroke is active.
 	 */
 	isSculpting() {
 

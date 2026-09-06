@@ -131,26 +131,20 @@
 
 				// Disable orbit controls while sculpting
 
-				renderer.domElement.addEventListener( 'pointerdown', function () {
+				sculptor.addEventListener( 'start', function () {
 
 					releasedPointerId = null;
-
-					// Sculptor's listener was registered first, so its hit state is
-					// available here before OrbitControls sees the press.
-					if ( sculptor.isSculpting() ) controls.enabled = false;
+					controls.enabled = false;
 
 				} );
 
-				function restoreOrbitControls() {
+				sculptor.addEventListener( 'end', function () {
 
-					if ( sculptor.isSculpting() ) return;
 					controls.enabled = true;
 
-				}
+				} );
 
 				function handlePointerUp( event ) {
-
-					restoreOrbitControls();
 
 					// Ignore a secondary pointer while the primary stroke is active.
 					if ( sculptor.isSculpting() ) return;
@@ -163,14 +157,11 @@
 				function handlePointerCancel() {
 
 					releasedPointerId = null;
-					restoreOrbitControls();
 					cursorGroup.visible = false;
 
 				}
 
 				function handleLostPointerCapture( event ) {
-
-					restoreOrbitControls();
 
 					// A normal pointerup is followed by lostpointercapture. Keep the
 					// hover cursor refreshed above without reusing capture-event coords.
@@ -189,8 +180,8 @@
 				renderer.domElement.addEventListener( 'pointercancel', handlePointerCancel );
 				renderer.domElement.addEventListener( 'lostpointercapture', handleLostPointerCapture );
 
-				// Register OrbitControls after the sculpt arbitration listeners so a
-				// sculpt press cannot start an orbit gesture.
+				// Connect Sculptor before OrbitControls so its start event can disable
+				// orbiting before OrbitControls handles a sculpt press.
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.1;
@@ -326,6 +317,13 @@
 				}
 
 				function updateCursorPosition() {
+
+					if ( sculptor.domElement === null ) {
+
+						cursorGroup.visible = false;
+						return;
+
+					}
 
 					const isHovering = sculptor.isSculpting() === false;
 					if ( isHovering ) sculptor.pickFromMouse( _pointer.x, _pointer.y );

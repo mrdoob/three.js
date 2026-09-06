@@ -34,6 +34,7 @@
 			let controller1, controller2, controllerGrip1, controllerGrip2;
 			let sculptor, mesh;
 			let cursor1, cursor2;
+			let activeController = null;
 
 			const tools = [ 'clay', 'brush', 'inflate', 'smooth', 'flatten', 'pinch', 'crease' ];
 			let toolIndex = 0;
@@ -112,19 +113,26 @@
 
 				function onSelectStart() {
 
-					this.userData.isSelecting = true;
+					if ( activeController !== null ) return;
+
+					activeController = this;
 					this.userData.nextStrokeTime = null;
+					sculptor.beginStroke();
 
 				}
 
 				function onSelectEnd() {
 
-					this.userData.isSelecting = false;
+					if ( activeController !== this ) return;
+
+					activeController = null;
 					sculptor.endStroke();
 
 				}
 
 				function onSqueezeStart() {
+
+					if ( activeController !== null ) return;
 
 					sculptor.setNegative( ! sculptor.getNegative() );
 
@@ -142,12 +150,7 @@
 					this.userData.inputSource = null;
 					this.userData.thumbMoved = false;
 
-					if ( this.userData.isSelecting ) {
-
-						this.userData.isSelecting = false;
-						sculptor.endStroke();
-
-					}
+					onSelectEnd.call( this );
 
 				}
 
@@ -166,6 +169,14 @@
 				controller2.addEventListener( 'selectend', onSelectEnd );
 				controller2.addEventListener( 'squeezestart', onSqueezeStart );
 				scene.add( controller2 );
+
+				renderer.xr.addEventListener( 'sessionend', function () {
+
+					activeController = null;
+					sculptor.endStroke();
+					cursor1.visible = cursor2.visible = false;
+
+				} );
 
 				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
 				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
@@ -238,7 +249,7 @@
 				let hit = false;
 				let strokes = 0;
 
-				if ( controller.userData.isSelecting ) {
+				if ( controller === activeController ) {
 
 					if ( controller.userData.nextStrokeTime === null ) controller.userData.nextStrokeTime = time;
 
@@ -283,8 +294,13 @@
 						if ( ! controller.userData.thumbMoved && Math.abs( thumbX ) > 0.8 ) {
 
 							controller.userData.thumbMoved = true;
-							toolIndex = ( toolIndex + ( thumbX > 0 ? 1 : tools.length - 1 ) ) % tools.length;
-							sculptor.setTool( tools[ toolIndex ] );
+
+							if ( activeController === null ) {
+
+								toolIndex = ( toolIndex + ( thumbX > 0 ? 1 : tools.length - 1 ) ) % tools.length;
+								sculptor.setTool( tools[ toolIndex ] );
+
+							}
 
 						} else if ( Math.abs( thumbX ) < 0.3 ) {
 
