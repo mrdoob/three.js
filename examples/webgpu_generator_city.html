@@ -153,9 +153,11 @@
 				materials = { building: createBuildingMaterial( city.layout, city.seedNode ) };
 				generateCity();
 
-				// start baking the irradiance grid once the city and sun are in place
+				// irradiance probes across the city, with the bottom layer just above the road
 
-				bakeProbes();
+				probes = new LightProbeGrid( GRID_SIZE.x, GRID_SIZE.y, GRID_SIZE.z, GRID_PROBES.x, GRID_PROBES.y, GRID_PROBES.z );
+				probes.position.set( 0, GRID_SIZE.y / 2 + 1, 0 );
+				scene.add( probes );
 
 				renderPipeline = new THREE.RenderPipeline( renderer );
 
@@ -176,19 +178,19 @@
 				gui.add( parameters, 'seed', 0, 100, 1 ).debounce( 300 ).onChange( () => {
 
 					generateCity();
-					bakeProbes();
+					resetProbeBake();
 
 				} );
 				gui.add( parameters, 'timeOfDay', 6, 18, 0.1 ).name( 'time of day' ).onChange( () => {
 
 					updateSun();
-					bakeProbes();
+					resetProbeBake();
 
 				} );
 				gui.add( renderer, 'toneMappingExposure', 0.01, 1 ).name( 'exposure' );
 				gui.add( parameters, 'gi' ).name( 'global illumination' ).onChange( ( value ) => {
 
-					if ( probes ) probes.visible = value;
+					probes.visible = value;
 
 				} );
 				gui.add( parameters, 'showProbes' ).name( 'show probes' ).onChange( toggleProbesHelper );
@@ -290,15 +292,7 @@
 
 			}
 
-			function bakeProbes() {
-
-				if ( probes === undefined ) {
-
-					probes = new LightProbeGrid( GRID_SIZE.x, GRID_SIZE.y, GRID_SIZE.z, GRID_PROBES.x, GRID_PROBES.y, GRID_PROBES.z );
-					probes.position.set( 0, GRID_SIZE.y / 2 + 1, 0 ); // bottom probe layer floats just above the road, never in its plane
-					scene.add( probes );
-
-				}
+			function resetProbeBake() {
 
 				bakeIndex = 0;
 				bakePass = 0;
@@ -310,10 +304,8 @@
 				const totalProbes = GRID_PROBES.x * GRID_PROBES.y * GRID_PROBES.z;
 				if ( bakeIndex >= totalProbes ) return;
 
-				// swap the detailed city for its box proxy, and hide the probe spheres and the
-				// sun disc, so each cubemap captures only the boxes, ground and sky fill. the
-				// DirectionalLight supplies the direct sun; a single bounce pass folds the warm
-				// stone back into the shade. the proxy is a single draw, so the bake stays cheap
+				// capture the box proxy, ground and sky without the helper or sun disc.
+				// the directional light supplies sunlight; pass 1 captures the diffuse bounce
 
 				if ( probesHelper ) probesHelper.visible = false;
 				cityGroup.visible = false;
@@ -324,23 +316,29 @@
 
 					// Publish one row per frame. Finish the direct pass before starting
 					// the indirect pass, which reads a snapshot of the completed direct bake.
-					probes.bake( renderer, scene, { cubemapSize: 16, near: 0.1, far: 20000, start: bakeIndex, count: GRID_PROBES.x, pass: bakePass } );
-
-					bakeIndex += GRID_PROBES.x;
-					if ( bakeIndex === totalProbes && bakePass === 0 ) {
-
-						bakeIndex = 0;
-						bakePass = 1;
-
-					}
+					probes.bake( renderer, scene, {
+						cubemapSize: 16,
+						near: 0.1,
+						far: 20000,
+						start: bakeIndex,
+						count: GRID_PROBES.x,
+						pass: bakePass
+					} );
 
 				} finally {
 
 					sky.showSunDisc.value = true;
 					cityProxy.visible = false;
 					cityGroup.visible = true;
-					probes.visible = parameters.gi;
 					if ( probesHelper ) probesHelper.visible = parameters.showProbes;
+
+				}
+
+				bakeIndex += GRID_PROBES.x;
+				if ( bakeIndex === totalProbes && bakePass === 0 ) {
+
+					bakeIndex = 0;
+					bakePass = 1;
 
 				}
 
