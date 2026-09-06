@@ -82,7 +82,9 @@ class ContextNode extends Node {
 	generateNodeType( builder ) {
 
 		const previousContext = builder.addContext( this.value );
+
 		const nodeType = this.node.getNodeType( builder );
+
 		builder.setContext( previousContext );
 
 		return nodeType;

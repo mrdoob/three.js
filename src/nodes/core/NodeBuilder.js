@@ -2549,9 +2549,14 @@ class NodeBuilder {
 
 			this.currentFunctionNode = fn;
 
-			// Reference parameters can expose writes even when the return value is unused.
-			fn._isPure = shaderNode.layout.inputs.every( input => /^(?:float|int|uint|bool|[biu]?vec[234]|mat[234])$/.test( input.type ) );
 			fn.code = this.buildFunctionCode( shaderNode );
+
+			if ( fn._isPure === true ) {
+
+				// Reference parameters can expose writes even when the return value is unused.
+				fn._isPure = shaderNode.layout.inputs.every( input => /^(?:float|int|uint|bool|[biu]?vec[234]|mat[234])$/.test( input.type ) );
+
+			}
 
 			this.currentFunctionNode = previous;
 
@@ -2669,9 +2674,10 @@ class NodeBuilder {
 
 		}
 
-		if ( this.currentFunctionNode?._isPure === true ) {
+		if ( this.currentFunctionNode !== null ) {
 
-			this.currentFunctionNode._isPure = isNodePure( this, node, true );
+			// Inspect the completed body before restoring the enclosing variable scope.
+			this.currentFunctionNode._isPure = isNodePure( this, node, this.vars );
 
 		}
 

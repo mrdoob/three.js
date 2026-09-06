@@ -26,8 +26,7 @@ import FunctionCallNode from '../code/FunctionCallNode.js';
 import { isArrayAsParameter } from './NodeUtils.js';
 import { nodeObject } from '../tsl/TSLCore.js';
 
-// Only built-in expressions whose shader effects are understood can be removed.
-// In particular, arbitrary code, discard, storage writes and custom nodes are kept.
+// Only exact built-in classes are eligible; subclasses may add shader effects.
 const pureLeaves = /*@__PURE__*/ new Set( [
 	ConstNode, UniformNode, AttributeNode, ParameterNode,
 	ModelNode, Object3DNode, ReferenceNode
@@ -37,7 +36,11 @@ const pureExpressions = /*@__PURE__*/ new Set( [
 	OperatorNode, MathNode, VarNode, PropertyNode
 ] );
 const mathMethods = /*@__PURE__*/ new Set( Object.values( MathNode ) );
-const operators = /*@__PURE__*/ new Set( [ '+', '-', '*', '/', '%', '==', '!=', '<', '<=', '>', '>=', '&&', '||', '^^', '&', '|', '^', '<<', '>>', '!', '~' ] );
+const operators = /*@__PURE__*/ new Set( [
+	'+', '-', '*', '/', '%',
+	'==', '!=', '<', '<=', '>', '>=',
+	'&&', '||', '^^', '&', '|', '^', '<<', '>>', '!', '~'
+] );
 const loopConditions = /*@__PURE__*/ new Set( [ '<', '<=', '>', '>=' ] );
 
 /**
@@ -47,29 +50,31 @@ const loopConditions = /*@__PURE__*/ new Set( [ '<', '<=', '>', '>=' ] );
  * @private
  * @param {NodeBuilder} builder - The current node builder.
  * @param {Node} root - The expression to inspect.
- * @param {boolean} [functionBody=false] - Whether inspecting a native function body.
+ * @param {?Object<string,Array<NodeVar>>} [functionVariables=null] - The native function's local variables, by shader stage. Omit for inline expressions.
  * @return {boolean} Whether the expression has no externally visible shader effects.
  */
-export function isNodePure( builder, root, functionBody = false ) {
+export function isNodePure( builder, root, functionVariables = null ) {
 
 	const visited = new Set();
 	const loopInputs = new Set();
 
 	function isLocalVariable( node ) {
 
-		if ( functionBody === false ) return false;
+		if ( functionVariables === null ) return false;
 
 		const scope = node.getScope();
+		const NodeClass = scope.constructor;
 
-		if ( scope.constructor === ParameterNode ) return true;
-		if ( scope.constructor !== VarNode && ( scope.constructor !== PropertyNode || scope.varying ) ) return false;
+		if ( NodeClass === ParameterNode ) return true;
+		if ( NodeClass !== VarNode && NodeClass !== PropertyNode ) return false;
+		if ( NodeClass === PropertyNode && scope.varying ) return false;
 
 		// Global nodes can already have a variable in an enclosing shader scope.
 		// Only writes to declarations owned by this function can be discarded.
 		const data = builder.getDataFromNode( scope );
 		const variable = data[ builder.getSubBuildProperty( 'variable', data.subBuilds ) ];
 
-		return builder.vars[ builder.shaderStage ]?.includes( variable ) === true;
+		return functionVariables[ builder.shaderStage ]?.includes( variable ) === true;
 
 	}
 
@@ -79,7 +84,8 @@ export function isNodePure( builder, root, functionBody = false ) {
 
 		for ( let i = 0; i < inputs.length; i ++ ) {
 
-			const parameter = nodeObject( parameters?.[ isArray ? i : inputs[ i ].name ] );
+			const key = isArray ? i : inputs[ i ].name;
+			const parameter = nodeObject( parameters?.[ key ] );
 
 			if ( parameter === undefined || visit( parameter ) === false ) return false;
 
@@ -100,7 +106,7 @@ export function isNodePure( builder, root, functionBody = false ) {
 	function visitLoop( node ) {
 
 		// Counted loops only mutate local indices. Keep arbitrary update code.
-		if ( functionBody === false || node.params.length < 2 ) return false;
+		if ( functionVariables === null || node.params.length < 2 ) return false;
 
 		for ( let i = 0; i < node.params.length - 1; i ++ ) {
 
@@ -112,11 +118,13 @@ export function isNodePure( builder, root, functionBody = false ) {
 
 			} else {
 
-				if ( param.update !== undefined ) return false;
-				if ( param.condition !== undefined && loopConditions.has( param.condition ) === false ) return false;
-				if ( typeof param.start === 'string' || typeof param.end === 'string' ) return false;
-				if ( param.start?.isNode && visit( param.start ) === false ) return false;
-				if ( param.end?.isNode && visit( param.end ) === false ) return false;
+				const { start, end, condition, update } = param;
+
+				if ( update !== undefined ) return false;
+				if ( condition !== undefined && loopConditions.has( condition ) === false ) return false;
+				if ( typeof start === 'string' || typeof end === 'string' ) return false;
+				if ( start?.isNode && visit( start ) === false ) return false;
+				if ( end?.isNode && visit( end ) === false ) return false;
 
 			}
 
@@ -146,6 +154,21 @@ export function isNodePure( builder, root, functionBody = false ) {
 		if ( visited.has( data ) ) return true;
 		visited.add( data );
 
+		if ( pureExpressions.has( NodeClass ) ) {
+
+			if ( NodeClass === MathNode && mathMethods.has( node.method ) === false ) return false;
+			if ( NodeClass === OperatorNode && operators.has( node.op ) === false ) return false;
+
+			for ( const child of node.getChildren() ) {
+
+				if ( visit( child ) === false ) return false;
+
+			}
+
+			return true;
+
+		}
+
 		if ( node.isShaderCallNodeInternal === true ) {
 
 			if ( node.shaderNode.layout !== null ) {
@@ -169,7 +192,9 @@ export function isNodePure( builder, root, functionBody = false ) {
 
 		if ( NodeClass === FunctionCallNode ) {
 
-			return node.functionNode._isPure === true && visitParameters( node.functionNode.getInputs( builder ), node.parameters );
+			const fn = node.functionNode;
+
+			return fn._isPure === true && visitParameters( fn.getInputs( builder ), node.parameters );
 
 		}
 
@@ -182,6 +207,7 @@ export function isNodePure( builder, root, functionBody = false ) {
 		if ( NodeClass === ConditionalNode ) {
 
 			const { condNode, ifNode, elseNode } = node.getProperties( builder );
+
 			return visit( condNode ) && visit( ifNode ) && visit( elseNode );
 
 		}
@@ -195,8 +221,11 @@ export function isNodePure( builder, root, functionBody = false ) {
 		if ( NodeClass === ContextNode ) {
 
 			const previousContext = builder.addContext( node.value );
+
 			const result = visit( node.node );
+
 			builder.setContext( previousContext );
+
 			return result;
 
 		}
@@ -204,9 +233,13 @@ export function isNodePure( builder, root, functionBody = false ) {
 		if ( NodeClass === IsolateNode ) {
 
 			const previousCache = builder.getCache();
+
 			builder.setCache( builder.getCacheFromNode( node, node.parent ) );
+
 			const result = visit( node.node );
+
 			builder.setCache( previousCache );
+
 			return result;
 
 		}
@@ -214,9 +247,13 @@ export function isNodePure( builder, root, functionBody = false ) {
 		if ( NodeClass === VaryingNode ) {
 
 			const previousStage = builder.shaderStage;
+
 			builder.setShaderStage( 'vertex' );
+
 			const result = visit( node.node );
+
 			builder.setShaderStage( previousStage );
+
 			return result;
 
 		}
@@ -224,8 +261,11 @@ export function isNodePure( builder, root, functionBody = false ) {
 		if ( NodeClass === SubBuildNode ) {
 
 			builder.addSubBuild( node.name );
+
 			const result = visit( node.node );
+
 			builder.removeSubBuild();
+
 			return result;
 
 		}
@@ -233,21 +273,6 @@ export function isNodePure( builder, root, functionBody = false ) {
 		if ( NodeClass === LoopNode ) {
 
 			return visitLoop( node );
-
-		}
-
-		if ( pureExpressions.has( NodeClass ) ) {
-
-			if ( NodeClass === MathNode && mathMethods.has( node.method ) === false ) return false;
-			if ( NodeClass === OperatorNode && operators.has( node.op ) === false ) return false;
-
-			for ( const child of node.getChildren() ) {
-
-				if ( visit( child ) === false ) return false;
-
-			}
-
-			return true;
 
 		}
 
