@@ -463,6 +463,9 @@ class SkyscraperGenerator {
 		if ( this.mesh === null ) return;
 
 		this.mesh.geometry.dispose();
+		this.mesh.dispose();
+		if ( this.material === null ) this.mesh.material.dispose();
+
 		this.mesh = null;
 
 	}

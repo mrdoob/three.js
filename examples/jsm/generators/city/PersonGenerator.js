@@ -115,6 +115,9 @@ class PersonGenerator {
 
 		}
 
+		if ( this.mesh ) this.mesh.traverse( ( object ) => object.dispose() );
+		if ( this.material ) this.material.dispose();
+
 		this.geometries = null;
 		this.mesh = null;
 

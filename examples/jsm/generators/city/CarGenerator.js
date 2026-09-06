@@ -109,6 +109,8 @@ class CarGenerator {
 		for ( const geometry of this.geometries.values() ) geometry.dispose();
 		this.geometries.clear();
 
+		if ( this.mesh ) this.mesh.traverse( ( object ) => object.dispose() );
+
 		for ( const material of this.materials.values() ) material.dispose();
 		this.materials.clear();
 

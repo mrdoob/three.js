@@ -365,6 +365,8 @@ class CityGenerator {
 
 		for ( const key in this.furniture ) this.furniture[ key ].dispose();
 
+		if ( this.group ) this.group.dispose();
+
 		this.group = null;
 
 	}

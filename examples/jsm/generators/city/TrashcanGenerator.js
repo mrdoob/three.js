@@ -57,6 +57,9 @@ class TrashcanGenerator {
 	dispose() {
 
 		if ( this.geometry ) this.geometry.dispose();
+		if ( this.mesh ) this.mesh.dispose();
+		if ( this.material ) this.material.dispose();
+
 		this.geometry = null;
 		this.mesh = null;
 

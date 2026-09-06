@@ -73,7 +73,15 @@ class SidewalkGenerator {
 
 		if ( this.mesh === null ) return;
 
-		this.mesh.traverse( ( o ) => o.geometry && o.geometry.dispose() );
+		this.mesh.traverse( ( object ) => {
+
+			if ( object.geometry ) object.geometry.dispose();
+			object.dispose();
+
+		} );
+
+		this.material.dispose();
+		this.curbMaterial.dispose();
 		this.mesh = null;
 
 	}
