@@ -1,5 +1,5 @@
-import { AnalyticLightNode, Vector3 } from 'three/webgpu';
-import { array, getShIrradianceAt, normalWorld, positionWorld, texture3D, uniform, vec3 } from 'three/tsl';
+import { AnalyticLightNode, NodeUpdateType, Vector3 } from 'three/webgpu';
+import { array, getShIrradianceAt, normalWorld, positionWorld, renderGroup, texture3D, uniform, vec3 } from 'three/tsl';
 
 // Padding texels at each boundary of every atlas sub-volume.
 export const ATLAS_PADDING = 1;
@@ -71,11 +71,14 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		super( light );
 
-		this._min = uniform( new Vector3() );
-		this._max = uniform( new Vector3() );
-		this._resolution = uniform( new Vector3() );
-		this._intensity = uniform( 1 );
-		this._falloff = uniform( 0 );
+		// Captures and the main view can use different atlases within one frame.
+		this.updateType = NodeUpdateType.RENDER;
+		this._atlas = texture3D( light !== null ? light.texture : null );
+		this._min = uniform( new Vector3() ).setGroup( renderGroup );
+		this._max = uniform( new Vector3() ).setGroup( renderGroup );
+		this._resolution = uniform( new Vector3() ).setGroup( renderGroup );
+		this._intensity = uniform( 1 ).setGroup( renderGroup );
+		this._falloff = uniform( 0 ).setGroup( renderGroup );
 
 	}
 
@@ -83,6 +86,7 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		const light = this.light;
 
+		this._atlas.value = light.texture;
 		this._min.value.copy( light.boundingBox.min );
 		this._max.value.copy( light.boundingBox.max );
 		this._resolution.value.copy( light.resolution );
@@ -112,7 +116,7 @@ class LightProbeGridNode extends AnalyticLightNode {
 		const samplePos = positionWorld.add( normalWorld.mul( spacing ).mul( 0.5 ) );
 		const uvw = samplePos.sub( min ).div( range ).clamp( 0.0, 1.0 ).mul( resMinusOne ).div( res ).add( vec3( 0.5 ).div( res ) );
 
-		const result = evaluateGridIrradiance( texture3D( light.texture ), uvw, res, normalWorld );
+		const result = evaluateGridIrradiance( this._atlas, uvw, res, normalWorld );
 
 		let irradiance = result.mul( this._intensity );
 

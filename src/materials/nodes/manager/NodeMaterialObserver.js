@@ -789,9 +789,10 @@ class NodeMaterialObserver {
 				const lightData = renderObjectData.lights[ i ];
 				const currentLightData = lightsData[ i ];
 
-				if ( lightData.map !== currentLightData.map || lightData.cacheVersion !== currentLightData.cacheVersion ||
+				if ( lightData.texture !== currentLightData.texture || lightData.map !== currentLightData.map || lightData.cacheVersion !== currentLightData.cacheVersion ||
 					lightData.shadowMapWidth !== currentLightData.shadowMapWidth || lightData.shadowMapHeight !== currentLightData.shadowMapHeight ) {
 
+					lightData.texture = currentLightData.texture;
 					lightData.map = currentLightData.map;
 					lightData.cacheVersion = currentLightData.cacheVersion;
 					lightData.shadowMapWidth = currentLightData.shadowMapWidth;
@@ -868,6 +869,14 @@ class NodeMaterialObserver {
 				// only add lights that have a map
 
 				data = { map: light.map.version, cacheVersion: this.getTextureData( light.map )._version };
+
+			}
+
+			if ( light.isLightProbeGrid === true ) {
+
+				// Captures and the main view can sample different probe atlases.
+
+				data = { texture: light.texture };
 
 			}
 
