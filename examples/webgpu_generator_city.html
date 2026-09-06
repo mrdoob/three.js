@@ -172,7 +172,7 @@
 				// parameters
 
 				const gui = renderer.inspector.createParameters( 'City' );
-				gui.add( parameters, 'seed', 0, 100, 1 ).onChange( () => {
+				gui.add( parameters, 'seed', 0, 100, 1 ).debounce( 300 ).onChange( () => {
 
 					generateCity();
 					scheduleRebake();
