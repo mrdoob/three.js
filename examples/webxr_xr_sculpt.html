@@ -38,6 +38,8 @@
 			const tools = [ 'clay', 'brush', 'inflate', 'smooth', 'flatten', 'pinch', 'crease' ];
 			let toolIndex = 0;
 			const brushRadius = 0.06;
+			const strokeInterval = 1000 / 90;
+			const maxStrokesPerFrame = 4;
 
 			const _origin = new THREE.Vector3();
 			const _direction = new THREE.Vector3();
@@ -111,6 +113,7 @@
 				function onSelectStart() {
 
 					this.userData.isSelecting = true;
+					this.userData.nextStrokeTime = null;
 
 				}
 
@@ -215,7 +218,7 @@
 
 			}
 
-			function handleController( controller, cursor ) {
+			function handleController( controller, cursor, time ) {
 
 				const inputSource = controller.userData.inputSource;
 
@@ -232,9 +235,28 @@
 				_origin.set( 0, 0, 0 ).applyMatrix4( controller.matrixWorld );
 				_direction.set( 0, 0, - 1 ).transformDirection( controller.matrixWorld );
 
-				const hit = controller.userData.isSelecting ?
-					sculptor.strokeFromRay( _origin, _direction, brushRadius ) :
-					sculptor.pickFromRay( _origin, _direction, brushRadius );
+				let hit = false;
+				let strokes = 0;
+
+				if ( controller.userData.isSelecting ) {
+
+					if ( controller.userData.nextStrokeTime === null ) controller.userData.nextStrokeTime = time;
+
+					// Stamp at a fixed rate, independent of the headset refresh rate.
+					while ( time >= controller.userData.nextStrokeTime && strokes < maxStrokesPerFrame ) {
+
+						hit = sculptor.strokeFromRay( _origin, _direction, brushRadius );
+						controller.userData.nextStrokeTime += strokeInterval;
+						strokes ++;
+
+					}
+
+					// Drop excess catch-up work after a pause or a very slow frame.
+					if ( time >= controller.userData.nextStrokeTime ) controller.userData.nextStrokeTime = time + strokeInterval;
+
+				}
+
+				if ( strokes === 0 ) hit = sculptor.pickFromRay( _origin, _direction, brushRadius );
 
 				if ( hit ) {
 
@@ -276,10 +298,10 @@
 
 			}
 
-			function animate() {
+			function animate( time ) {
 
-				handleController( controller1, cursor1 );
-				handleController( controller2, cursor2 );
+				handleController( controller1, cursor1, time );
+				handleController( controller2, cursor2, time );
 
 				controls.update();
 				renderer.render( scene, camera );
