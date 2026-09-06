@@ -2,6 +2,7 @@ import {
 	Box3,
 	CubeCamera,
 	CubeRenderTarget,
+	Data3DTexture,
 	FloatType,
 	HalfFloatType,
 	Light,
@@ -38,6 +39,10 @@ const _quad = /*@__PURE__*/ new QuadMesh();
 // Reusable temp objects.
 const _position = /*@__PURE__*/ new Vector3();
 const _size = /*@__PURE__*/ new Vector3();
+const _copyRegion = /*@__PURE__*/ new Box3();
+
+// Direct-light captures use a black atlas without changing the light layout.
+let _emptyAtlas = null;
 
 // Bake materials, shared across grids so the shaders compile once, not per bake.
 let _shMaterial = null;
@@ -377,6 +382,11 @@ class LightProbeGrid extends Light {
 		 */
 		this._renderTarget = null;
 
+		// Indirect captures read a snapshot while the live atlas is updated in place.
+		this._bounceTarget = null;
+		this._bouncePass = - 1;
+		this._bakeTexture = null;
+
 		this.updateBoundingBox();
 
 	}
@@ -417,11 +427,16 @@ class LightProbeGrid extends Light {
 	}
 
 	/**
-	 * Bakes all probes by rendering cubemaps at each probe position and
+	 * Bakes probes by rendering cubemaps at each probe position and
 	 * projecting to L2 SH. Optionally iterates additional passes to capture
 	 * indirect bounces: each extra pass samples the previous pass's data as
 	 * indirect light, so a grid added to the scene before baking accumulates
 	 * one bounce per extra pass.
+	 *
+	 * Use `start` and `count` to bake a range and publish its cells immediately.
+	 * Indices advance along X, then Y, then Z. For incremental indirect bounces,
+	 * finish the whole grid for `pass: 0`, then repeat with `pass: 1`, etc. Start
+	 * each pass at index 0 to snapshot the previous pass before updating its cells.
 	 *
 	 * @param {WebGPURenderer} renderer - The renderer.
 	 * @param {Scene} scene - The scene to render.
@@ -431,6 +446,9 @@ class LightProbeGrid extends Light {
 	 * @param {number} [options.far=100] - Far plane for the cube camera.
 	 * @param {number} [options.bounces=0] - Additional bounce passes after the initial direct pass.
 	 * @param {number} [options.sampleCount=512] - Directions integrated when projecting each cubemap to SH.
+	 * @param {number} [options.start=0] - Index of the first probe to bake.
+	 * @param {number} [options.count] - Number of probes to bake. Defaults to the remaining probes.
+	 * @param {number} [options.pass=0] - Starting pass. Zero captures direct light; later passes sample the previous pass. Ranged calls require `bounces: 0`.
 	 */
 	bake( renderer, scene, options = {} ) {
 
@@ -455,19 +473,45 @@ class LightProbeGrid extends Light {
 
 		}
 
-		const { cubemapSize = 8, near = 0.1, far = 100, bounces = 0, sampleCount = 512 } = options;
-
-		const currentInspectorEnabled = renderer.inspector.enabled;
-
-		renderer.inspector.enabled = false;
-
-		this._ensureTextures();
-		this.updateBoundingBox();
-
 		const res = this.resolution;
 		const nz = res.z;
 		const paddedSlices = nz + 2 * ATLAS_PADDING;
 		const totalProbes = res.x * res.y * res.z;
+		const { cubemapSize = 8, near = 0.1, far = 100, bounces = 0, sampleCount = 512, start = 0, count = totalProbes - start, pass: firstPass = 0 } = options;
+		const end = start + count;
+
+		if ( ! Number.isInteger( start ) || ! Number.isInteger( count ) || start < 0 || count < 0 || end > totalProbes ) {
+
+			throw new RangeError( 'THREE.LightProbeGrid: Invalid probe range.' );
+
+		}
+
+		if ( ! Number.isInteger( firstPass ) || firstPass < 0 || ! Number.isInteger( bounces ) || bounces < 0 || ( bounces > 0 && count !== totalProbes ) ) {
+
+			throw new RangeError( 'THREE.LightProbeGrid: Passes must be non-negative integers. For ranged baking, use pass instead of bounces.' );
+
+		}
+
+		if ( count === 0 ) return;
+
+		if ( firstPass > 0 && start > 0 && this._bouncePass !== firstPass ) {
+
+			throw new Error( 'THREE.LightProbeGrid: Start each indirect pass at probe 0.' );
+
+		}
+
+		this._ensureTextures();
+		this.updateBoundingBox();
+
+		if ( _emptyAtlas === null ) {
+
+			_emptyAtlas = new Data3DTexture( new Uint16Array( 4 ), 1, 1, 1 );
+			_emptyAtlas.type = HalfFloatType;
+			_emptyAtlas.minFilter = LinearFilter;
+			_emptyAtlas.magFilter = LinearFilter;
+			_emptyAtlas.needsUpdate = true;
+
+		}
 
 		// Bind the pooled bake resources to the current textures.
 
@@ -484,11 +528,22 @@ class LightProbeGrid extends Light {
 		// Save renderer / scene state to restore after the bake.
 
 		const currentRenderTarget = renderer.getRenderTarget();
+		const currentActiveCubeFace = renderer.getActiveCubeFace();
+		const currentActiveMipmapLevel = renderer.getActiveMipmapLevel();
 		const currentAutoClear = renderer.autoClear;
+		const currentXrEnabled = renderer.xr.enabled;
+		const currentInspectorEnabled = renderer.inspector.enabled;
 		const currentMatrixWorldAutoUpdate = scene.matrixWorldAutoUpdate;
+		const currentVisible = this.visible;
+		const currentBakeTexture = this._bakeTexture;
+		const renderTarget = this._renderTarget;
+		const currentViewport = renderTarget.viewport.clone();
 		const shadowLights = [];
 
 		try {
+
+			renderer.inspector.enabled = false;
+			this.visible = true;
 
 			// Scene is static during the bake: update once, disable auto-update.
 
@@ -513,83 +568,99 @@ class LightProbeGrid extends Light {
 
 			} );
 
-			for ( let pass = 0; pass <= bounces; pass ++ ) {
+			for ( let pass = firstPass; pass <= firstPass + bounces; pass ++ ) {
 
-				// Pass 0 is direct light (grid hidden); each later pass reads the
-				// previous pass as indirect, adding one bounce.
+				// Read a stable previous pass while publishing new cells to the live atlas.
 
-				this.visible = pass > 0;
+				if ( pass === 0 ) {
 
-				// Clear once, then write each probe's row with autoClear off. The
-				// viewport goes on the render target, not the renderer (which ignores
-				// the canvas viewport when one is bound).
+					this._bakeTexture = _emptyAtlas;
+					if ( start === 0 ) this._bouncePass = - 1;
 
-				batchTarget.viewport.set( 0, 0, 9, totalProbes );
-				renderer.setRenderTarget( batchTarget );
-				renderer.clear();
+				} else {
+
+					if ( start === 0 ) {
+
+						if ( this._bounceTarget === null ) this._bounceTarget = renderTarget.clone();
+
+						renderer.initRenderTarget( renderTarget );
+						renderer.initRenderTarget( this._bounceTarget );
+						_copyRegion.min.set( 0, 0, 0 );
+						_copyRegion.max.set( res.x, res.y, renderTarget.depth );
+						renderer.copyTextureToTexture( this.texture, this._bounceTarget.texture, _copyRegion );
+						this._bouncePass = pass;
+
+					}
+
+					this._bakeTexture = this._bounceTarget.texture;
+
+				}
 
 				// Phase 1: render cubemaps and project to SH into the batch target.
 
 				_quad.material = shMaterial;
 
-				for ( let iz = 0; iz < res.z; iz ++ ) {
+				for ( let probeIndex = start; probeIndex < end; probeIndex ++ ) {
 
-					for ( let iy = 0; iy < res.y; iy ++ ) {
+					const ix = probeIndex % res.x;
+					const iy = Math.floor( probeIndex / res.x ) % res.y;
+					const iz = Math.floor( probeIndex / ( res.x * res.y ) );
 
-						for ( let ix = 0; ix < res.x; ix ++ ) {
+					this.getProbePosition( ix, iy, iz, _position );
+					cubeCamera.position.copy( _position );
 
-							const probeIndex = ix + iy * res.x + iz * res.x * res.y;
+					// The cube faces must be cleared per face.
+					renderer.autoClear = true;
+					cubeCamera.update( renderer, scene );
 
-							this.getProbePosition( ix, iy, iz, _position );
-							cubeCamera.position.copy( _position );
-
-							// The cube faces must be cleared per face.
-							renderer.autoClear = true;
-							cubeCamera.update( renderer, scene );
-
-							// Write only this probe's row, preserving the others.
-							renderer.autoClear = false;
-							batchTarget.viewport.set( 0, probeIndex, 9, 1 );
-							renderer.setRenderTarget( batchTarget );
-							_quad.render( renderer );
-
-						}
-
-					}
+					// Write only this probe's row, preserving the others.
+					renderer.autoClear = false;
+					batchTarget.viewport.set( 0, probeIndex, 9, 1 );
+					renderer.setRenderTarget( batchTarget );
+					_quad.render( renderer );
 
 				}
 
 				// Phase 2: repack the batch into the atlas, padding each sub-volume
 				// with a copy of its first and last data slice.
 
-				renderer.autoClear = true;
+				for ( let probeIndex = start; probeIndex < end; ) {
 
-				const renderTarget = this._renderTarget;
+					const ix = probeIndex % res.x;
+					const iy = Math.floor( probeIndex / res.x ) % res.y;
+					const iz = Math.floor( probeIndex / ( res.x * res.y ) );
 
-				for ( let t = 0; t < 7; t ++ ) {
+					// Coalesce complete rows within a slice into one rectangle.
+					const width = Math.min( res.x - ix, end - probeIndex );
+					const height = width === res.x ? Math.min( res.y - iy, Math.floor( ( end - probeIndex ) / res.x ) ) : 1;
+					renderTarget.viewport.set( ix, iy, width, height );
+					sliceZ.value = iz;
 
-					_quad.material = repackMaterials[ t ];
+					for ( let t = 0; t < 7; t ++ ) {
 
-					const base = t * paddedSlices;
+						_quad.material = repackMaterials[ t ];
+						const base = t * paddedSlices;
 
-					// Data slices.
-					for ( let iz = 0; iz < nz; iz ++ ) {
-
-						sliceZ.value = iz;
 						renderer.setRenderTarget( renderTarget, base + ATLAS_PADDING + iz );
 						_quad.render( renderer );
 
+						if ( iz === 0 ) {
+
+							renderer.setRenderTarget( renderTarget, base );
+							_quad.render( renderer );
+
+						}
+
+						if ( iz === nz - 1 ) {
+
+							renderer.setRenderTarget( renderTarget, base + ATLAS_PADDING + nz );
+							_quad.render( renderer );
+
+						}
+
 					}
 
-					// Leading padding: copy of data slice 0.
-					sliceZ.value = 0;
-					renderer.setRenderTarget( renderTarget, base );
-					_quad.render( renderer );
-
-					// Trailing padding: copy of data slice nz-1.
-					sliceZ.value = nz - 1;
-					renderer.setRenderTarget( renderTarget, base + ATLAS_PADDING + nz );
-					_quad.render( renderer );
+					probeIndex += width * height;
 
 				}
 
@@ -599,13 +670,16 @@ class LightProbeGrid extends Light {
 
 			// Restore renderer / scene state (pooled targets and materials kept).
 
-			renderer.setRenderTarget( currentRenderTarget );
+			renderTarget.viewport.copy( currentViewport );
+			renderer.setRenderTarget( currentRenderTarget, currentActiveCubeFace, currentActiveMipmapLevel );
 			renderer.autoClear = currentAutoClear;
+			renderer.xr.enabled = currentXrEnabled;
 			scene.matrixWorldAutoUpdate = currentMatrixWorldAutoUpdate;
 
 			for ( const { light, autoUpdate } of shadowLights ) light.shadow.autoUpdate = autoUpdate;
 
-			this.visible = true;
+			this.visible = currentVisible;
+			this._bakeTexture = currentBakeTexture;
 
 			renderer.inspector.enabled = currentInspectorEnabled;
 
@@ -645,6 +719,14 @@ class LightProbeGrid extends Light {
 	 * Frees GPU resources.
 	 */
 	dispose() {
+
+		if ( this._bounceTarget !== null ) {
+
+			this._bounceTarget.dispose();
+			this._bounceTarget = null;
+			this._bouncePass = - 1;
+
+		}
 
 		if ( this._renderTarget !== null ) {
 

@@ -52,7 +52,8 @@
 			let camera, scene, renderer, controls, timer;
 			let cityGroup, cityProxy, materials, city, renderPipeline;
 			let sky, sun, sunLight, pmremGenerator, envScene, envRenderTarget, cityBounds;
-			let probes, probesHelper, rebakeTimer = null;
+			let probes, probesHelper;
+			let bakeIndex = 0, bakePass = 0;
 
 			// the irradiance grid spans the whole footprint plus the streets, rising to
 			// the mid-rise rooftops. diffuse GI is low frequency, so a coarse grid still
@@ -152,7 +153,7 @@
 				materials = { building: createBuildingMaterial( city.layout, city.seedNode ) };
 				generateCity();
 
-				// bake the irradiance grid once the city and sun are in place
+				// start baking the irradiance grid once the city and sun are in place
 
 				bakeProbes();
 
@@ -175,13 +176,13 @@
 				gui.add( parameters, 'seed', 0, 100, 1 ).debounce( 300 ).onChange( () => {
 
 					generateCity();
-					scheduleRebake();
+					bakeProbes();
 
 				} );
 				gui.add( parameters, 'timeOfDay', 6, 18, 0.1 ).name( 'time of day' ).onChange( () => {
 
 					updateSun();
-					scheduleRebake();
+					bakeProbes();
 
 				} );
 				gui.add( renderer, 'toneMappingExposure', 0.01, 1 ).name( 'exposure' );
@@ -299,6 +300,16 @@
 
 				}
 
+				bakeIndex = 0;
+				bakePass = 0;
+
+			}
+
+			function updateProbes() {
+
+				const totalProbes = GRID_PROBES.x * GRID_PROBES.y * GRID_PROBES.z;
+				if ( bakeIndex >= totalProbes ) return;
+
 				// swap the detailed city for its box proxy, and hide the probe spheres and the
 				// sun disc, so each cubemap captures only the boxes, ground and sky fill. the
 				// DirectionalLight supplies the direct sun; a single bounce pass folds the warm
@@ -309,34 +320,29 @@
 				cityProxy.visible = true;
 				sky.showSunDisc.value = false;
 
-				probes.bake( renderer, scene, { cubemapSize: 16, near: 0.1, far: 20000, bounces: 1 } );
+				try {
 
-				sky.showSunDisc.value = true;
-				cityProxy.visible = false;
-				cityGroup.visible = true;
-				probes.visible = parameters.gi;
+					// Publish one row per frame. Finish the direct pass before starting
+					// the indirect pass, which reads a snapshot of the completed direct bake.
+					probes.bake( renderer, scene, { cubemapSize: 16, near: 0.1, far: 20000, start: bakeIndex, count: GRID_PROBES.x, pass: bakePass } );
 
-				if ( probesHelper ) {
+					bakeIndex += GRID_PROBES.x;
+					if ( bakeIndex === totalProbes && bakePass === 0 ) {
 
-					probesHelper.update();
-					probesHelper.visible = parameters.showProbes;
+						bakeIndex = 0;
+						bakePass = 1;
+
+					}
+
+				} finally {
+
+					sky.showSunDisc.value = true;
+					cityProxy.visible = false;
+					cityGroup.visible = true;
+					probes.visible = parameters.gi;
+					if ( probesHelper ) probesHelper.visible = parameters.showProbes;
 
 				}
-
-			}
-
-			// re-baking walks the whole city cubemap by cubemap, so coalesce the rapid
-			// onChange calls from dragging a slider into a single bake once it settles
-
-			function scheduleRebake() {
-
-				if ( rebakeTimer !== null ) clearTimeout( rebakeTimer );
-				rebakeTimer = setTimeout( () => {
-
-					rebakeTimer = null;
-					bakeProbes();
-
-				}, 300 );
 
 			}
 
@@ -366,6 +372,8 @@
 
 				timer.update();
 				controls.update( timer.getDelta() );
+
+				updateProbes();
 
 				renderPipeline.render();
 
