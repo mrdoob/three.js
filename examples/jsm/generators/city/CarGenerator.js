@@ -3,6 +3,7 @@ import {
 	BufferAttribute,
 	Color,
 	Group,
+	InstancedBufferAttribute,
 	InstancedMesh,
 	InterpolationSamplingMode,
 	InterpolationSamplingType,
@@ -24,8 +25,8 @@ import { LoftGeometry } from '../../geometries/LoftGeometry.js';
  * deterministically across the fleet, and the taxi colour gets its own sedan with
  * a roof sign, so a parked row reads as different vehicles rather than one mould.
  *
- * Each geometry is built once per type and shared; cars are grouped by paint and
- * type so each group is a single instanced draw with one cheap material that
+ * Each geometry is built once per type and shared; cars are grouped by body
+ * type with per-instance paint, so each group is a single instanced draw that
  * carves paint, glass, tyres, chrome and lamps out of a baked `partId` plus
  * canonical-space masks.
  *
@@ -44,7 +45,7 @@ class CarGenerator {
 		this.parameters = Object.assign( {}, CarGenerator.defaults, parameters );
 
 		this.geometries = new Map(); // one shared shell per body type
-		this.materials = new Map(); // one material per paint colour and type
+		this.materials = new Map(); // one material per body type
 		this.mesh = null;
 
 	}
@@ -53,8 +54,8 @@ class CarGenerator {
 
 		this.dispose();
 
-		// bucket the fleet by body type and paint so each pairing becomes a
-		// single instanced draw. the taxi colour always gets the signed sedan;
+		// bucket the fleet by body type for one instanced draw per shell.
+		// the taxi colour always gets the signed sedan;
 		// the rest split deterministically between sedan and SUV
 		const buckets = new Map();
 
@@ -62,17 +63,16 @@ class CarGenerator {
 
 			const car = cars[ i ];
 			const type = car.color === CarGenerator.taxiColor ? 'taxi' : ( ( ( i * 2654435761 ) >>> 0 ) % 100 < 42 ? 'suv' : 'sedan' );
-			const key = type + '|' + car.color;
-
-			if ( ! buckets.has( key ) ) buckets.set( key, { type, color: car.color, matrices: [] } );
-			buckets.get( key ).matrices.push( car.matrix );
+			if ( ! buckets.has( type ) ) buckets.set( type, [] );
+			buckets.get( type ).push( car );
 
 		}
 
 		const group = new Group();
 		group.name = 'Cars';
+		const paint = new Color();
 
-		for ( const [ key, { type, color: paint, matrices } ] of buckets ) {
+		for ( const [ type, instances ] of buckets ) {
 
 			let geometry = this.geometries.get( type );
 			if ( geometry === undefined ) {
@@ -82,16 +82,25 @@ class CarGenerator {
 
 			}
 
-			let material = this.materials.get( key );
+			let material = this.materials.get( type );
 			if ( material === undefined ) {
 
-				material = createCarMaterial( paint, BODY_SPECS[ type ] );
-				this.materials.set( key, material );
+				material = createCarMaterial( BODY_SPECS[ type ] );
+				this.materials.set( type, material );
 
 			}
 
-			const mesh = new InstancedMesh( geometry, material, matrices.length );
-			for ( let i = 0; i < matrices.length; i ++ ) mesh.setMatrixAt( i, matrices[ i ] );
+			const mesh = new InstancedMesh( geometry, material, instances.length );
+			const colors = new Float32Array( instances.length * 3 );
+
+			for ( let i = 0; i < instances.length; i ++ ) {
+
+				mesh.setMatrixAt( i, instances[ i ].matrix );
+				paint.set( instances[ i ].color ).toArray( colors, i * 3 );
+
+			}
+
+			geometry.setAttribute( 'paintColor', new InstancedBufferAttribute( colors, 3 ) );
 			mesh.castShadow = mesh.receiveShadow = true;
 			mesh.name = 'Car';
 			group.add( mesh );
@@ -323,13 +332,13 @@ function buildCarGeometry( spec ) {
 
 }
 
-function createCarMaterial( paintColor, spec ) {
+function createCarMaterial( spec ) {
 
 	// every spec constant enters the shader as a uniform, so all paints and body
 	// types share one compiled pipeline: the whole fleet costs a single shader
 	// compile instead of one per paint/type pairing
 
-	const paint = uniform( new Color( paintColor ) );
+	const paint = attribute( 'paintColor', 'vec3' );
 	const glassY = uniform( spec.glassY );
 	const roofCapY = uniform( spec.roofCapY );
 	const cabinMin = uniform( spec.cabin[ 0 ] );
