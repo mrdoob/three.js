@@ -201,7 +201,7 @@ BODY_SPECS.taxi = Object.assign( {}, BODY_SPECS.sedan, { sign: true } );
 
 function part( geometry, id ) {
 
-	const g = geometry.index ? geometry.toNonIndexed() : geometry;
+	const g = geometry;
 	g.deleteAttribute( 'uv' ); // the material works in canonical space, so drop uvs for a clean merge
 	g.setAttribute( 'partId', new BufferAttribute( new Float32Array( g.attributes.position.count ).fill( id ), 1 ) );
 	return g;

@@ -10,7 +10,7 @@ import {
 import { MeshStandardNodeMaterial } from 'three/webgpu';
 import { attribute, color, float, Fn, fract, mix, mx_fractal_noise_float, positionGeometry, select, smoothstep, step, uv, varying } from 'three/tsl';
 
-import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
+import { mergeGeometries, mergeVertices } from '../../utils/BufferGeometryUtils.js';
 
 /**
  * The NYC green wire-mesh litter basket: a slightly tapered drum with a heavy top
@@ -76,7 +76,7 @@ const MESH = 0, RIM = 1, TRASH = 2;
 
 function part( geometry, id ) {
 
-	const g = geometry.index ? geometry.toNonIndexed() : geometry;
+	const g = geometry.index ? geometry : mergeVertices( geometry );
 	g.setAttribute( 'partId', new BufferAttribute( new Float32Array( g.attributes.position.count ).fill( id ), 1 ) );
 	return g;
 

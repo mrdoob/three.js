@@ -89,7 +89,7 @@ const CROWN_RADIUS = 3.1;
 
 function part( geometry, id ) {
 
-	const g = geometry.index ? geometry.toNonIndexed() : geometry;
+	const g = geometry;
 	g.setAttribute( 'partId', new BufferAttribute( new Float32Array( g.attributes.position.count ).fill( id ), 1 ) );
 	return g;
 

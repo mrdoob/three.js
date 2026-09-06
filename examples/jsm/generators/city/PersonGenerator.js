@@ -139,10 +139,10 @@ const LEG_COLORS = [ 0x22242c, 0x3a3f4a, 0x2e2a26, 0x4a4640, 0x1d1d20 ];
 const SKIN_COLORS = [ 0xc68863, 0xa96f4c, 0x8a5535, 0x6b3d24, 0xd9a077 ];
 const HAIR_COLORS = [ 0x1a1512, 0x3a2a1a, 0x584022, 0x6e6862, 0x2a2624 ];
 
-// tag a geometry with a flat partId and normalize to non-indexed for merging
+// tag a geometry with a flat partId
 function part( geometry, id ) {
 
-	const g = geometry.index ? geometry.toNonIndexed() : geometry;
+	const g = geometry;
 	g.deleteAttribute( 'uv' ); // the material works in canonical space, so drop uvs for a clean merge
 	g.setAttribute( 'partId', new BufferAttribute( new Float32Array( g.attributes.position.count ).fill( id ), 1 ) );
 	return g;

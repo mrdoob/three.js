@@ -78,10 +78,10 @@ HydrantGenerator.defaults = {
 // material-zone codes baked per vertex
 const BODY = 0, CAP = 1;
 
-// tag a geometry with a flat partId and normalize to non-indexed for merging
+// tag a geometry with a flat partId
 function part( geometry, id ) {
 
-	const g = geometry.index ? geometry.toNonIndexed() : geometry;
+	const g = geometry;
 	g.setAttribute( 'partId', new BufferAttribute( new Float32Array( g.attributes.position.count ).fill( id ), 1 ) );
 	return g;
 
