@@ -20,9 +20,10 @@ import {
 } from 'three';
 
 import { MeshStandardNodeMaterial } from 'three/webgpu';
-import { attribute, cameraPosition, color, cross, dot, float, floor, Fn, fract, fwidth, hash as ihash, mix, mod, modelWorldMatrixInverse, mx_fractal_noise_float, normalLocal, normalView, normalWorldGeometry, positionLocal, positionView, positionWorld, select, smoothstep, step, uint, uv, varying, vec2, vec3, vec4 } from 'three/tsl';
+import { attribute, cameraPosition, color, cross, dot, float, floor, Fn, fract, fwidth, hash as ihash, mix, mod, modelWorldMatrixInverse, mx_fractal_noise_float, normalLocal, normalWorldGeometry, positionLocal, positionWorld, select, smoothstep, step, uint, uv, varying, vec2, vec3, vec4 } from 'three/tsl';
 
 import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
+import { bumpNormal } from './CityGeneratorUtils.js';
 
 const _scale = /*@__PURE__*/ new Vector3();
 const _point = /*@__PURE__*/ new Vector3();
@@ -1103,23 +1104,6 @@ function buildFinialGeometry( p ) {
 }
 
 // --- material ------------------------------------------------------------
-
-// derivative-based bump for a procedural, world-space height field. the built-in bumpMap
-// offsets the UV to read its height, so it returns a zero gradient for a height keyed off
-// world position; this feeds the hardware screen-space derivatives of the height into
-// Mikkelsen's surface-gradient method so the relief actually perturbs the normal.
-function bumpNormal( height ) {
-
-	const dpdx = positionView.dFdx();
-	const dpdy = positionView.dFdy();
-	const r1 = dpdy.cross( normalView );
-	const r2 = normalView.cross( dpdx );
-	const det = dpdx.dot( r1 );
-	const grad = det.sign().mul( height.dFdx().mul( r1 ).add( height.dFdy().mul( r2 ) ) );
-
-	return det.abs().mul( normalView ).sub( grad ).normalize();
-
-}
 
 // interior mapping: fakes a furnished room behind each glass pane in the fragment
 // shader — no geometry, no texture. every pane carries the room it looks into ( centre +

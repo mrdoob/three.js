@@ -5,9 +5,10 @@ import {
 	Shape
 } from 'three/webgpu';
 
-import { cameraPosition, color, float, floor, Fn, fract, fwidth, If, mix, mx_noise_float, normalView, normalWorldGeometry, positionView, positionWorld, sin, smoothstep } from 'three/tsl';
+import { cameraPosition, color, float, floor, Fn, fract, fwidth, If, mix, mx_noise_float, normalWorldGeometry, positionWorld, sin, smoothstep } from 'three/tsl';
 
 import { createInstances, updateInstances } from './InstancedMeshGenerator.js';
+import { bumpNormal } from './CityGeneratorUtils.js';
 
 /**
  * Generates the raised sidewalk for a city's blocks: per block, a rounded-corner concrete
@@ -156,23 +157,6 @@ function curbGeometry( width, depth, height, radius, curbWidth, curbLip ) {
 }
 
 // --- material ------------------------------------------------------------
-
-// derivative-based bump for a procedural, world-space height field. the built-in bumpMap
-// offsets the UV to read its height, so it returns a zero gradient for a height keyed off
-// world position; this feeds the hardware screen-space derivatives of the height into
-// Mikkelsen's surface-gradient method so the relief actually perturbs the normal.
-function bumpNormal( height ) {
-
-	const dpdx = positionView.dFdx();
-	const dpdy = positionView.dFdy();
-	const r1 = dpdy.cross( normalView );
-	const r2 = normalView.cross( dpdx );
-	const det = dpdx.dot( r1 );
-	const grad = det.sign().mul( height.dFdx().mul( r1 ).add( height.dFdy().mul( r2 ) ) );
-
-	return det.abs().mul( normalView ).sub( grad ).normalize();
-
-}
 
 // an antialiased line repeated at every multiple of `period` ( the scored joints )
 function gridLine( coord, period, halfWidth ) {

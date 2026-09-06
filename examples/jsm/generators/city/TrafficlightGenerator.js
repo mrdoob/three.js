@@ -1,6 +1,5 @@
 import {
 	BoxGeometry,
-	BufferAttribute,
 	CylinderGeometry,
 	InterpolationSamplingMode,
 	InterpolationSamplingType
@@ -12,6 +11,7 @@ import { attribute, color, float, select, varying } from 'three/tsl';
 import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
 
 import { InstancedMeshGenerator } from './InstancedMeshGenerator.js';
+import { part } from './CityGeneratorUtils.js';
 
 /**
  * A NYC traffic signal: a round pole at the curb with a horizontal mast arm
@@ -52,15 +52,6 @@ const METAL = 0, RED = 1, AMBER = 2, GREEN = 3;
 function lensDisc( y, z, id ) {
 
 	return part( new CylinderGeometry( 0.13, 0.13, 0.08, 12 ).rotateX( Math.PI / 2 ).translate( 0, y, z ), id );
-
-}
-
-// tag a geometry with a flat partId
-function part( geometry, id ) {
-
-	const g = geometry;
-	g.setAttribute( 'partId', new BufferAttribute( new Float32Array( g.attributes.position.count ).fill( id ), 1 ) );
-	return g;
 
 }
 

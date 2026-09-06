@@ -1,6 +1,5 @@
 import {
 	BoxGeometry,
-	BufferAttribute,
 	CylinderGeometry,
 	InterpolationSamplingMode,
 	InterpolationSamplingType,
@@ -18,6 +17,7 @@ import { array, attribute, color, float, fract, instanceIndex, mix, positionGeom
 import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
 import { LoftGeometry } from '../../geometries/LoftGeometry.js';
 import { createInstances, updateInstances } from './InstancedMeshGenerator.js';
+import { part } from './CityGeneratorUtils.js';
 
 /**
  * A low-poly pedestrian crowd: each figure is a lathed coat with lofted limbs,
@@ -143,16 +143,6 @@ const SHIRT_COLORS = [ 0xe8e6e0, 0xb8c4d8, 0xcfc8b8, 0x9aa7b8 ];
 const LEG_COLORS = [ 0x22242c, 0x3a3f4a, 0x2e2a26, 0x4a4640, 0x1d1d20 ];
 const SKIN_COLORS = [ 0xc68863, 0xa96f4c, 0x8a5535, 0x6b3d24, 0xd9a077 ];
 const HAIR_COLORS = [ 0x1a1512, 0x3a2a1a, 0x584022, 0x6e6862, 0x2a2624 ];
-
-// tag a geometry with a flat partId
-function part( geometry, id ) {
-
-	const g = geometry;
-	g.deleteAttribute( 'uv' ); // the material works in canonical space, so drop uvs for a clean merge
-	g.setAttribute( 'partId', new BufferAttribute( new Float32Array( g.attributes.position.count ).fill( id ), 1 ) );
-	return g;
-
-}
 
 const _rotation = new Matrix4();
 const _rotationZ = new Matrix4();
@@ -304,6 +294,9 @@ function buildPersonGeometry( p, pose ) {
 
 	// the stander carries a bag at their right hand
 	if ( ! walking ) parts.push( part( new BoxGeometry( 0.07, 0.2, 0.16 ).translate( 0.27, 0.72, 0.05 ), BAG ) );
+
+	// The material uses canonical positions; remove UVs before merging the parts.
+	for ( const geometry of parts ) geometry.deleteAttribute( 'uv' );
 
 	const geometry = mergeGeometries( parts );
 

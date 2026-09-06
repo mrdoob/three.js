@@ -1,6 +1,5 @@
 import {
 	BoxGeometry,
-	BufferAttribute,
 	CylinderGeometry,
 	InterpolationSamplingMode,
 	InterpolationSamplingType,
@@ -14,6 +13,7 @@ import { attribute, color, float, select, varying } from 'three/tsl';
 import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
 
 import { InstancedMeshGenerator } from './InstancedMeshGenerator.js';
+import { part } from './CityGeneratorUtils.js';
 
 /**
  * A NYC cobra-head streetlight: a tall tapered mast standing at the curb with a
@@ -58,15 +58,6 @@ function strut( a, b, radius, segments = 6 ) {
 	geometry.applyQuaternion( new Quaternion().setFromUnitVectors( new Vector3( 0, 1, 0 ), dir.normalize() ) );
 	geometry.translate( ( a.x + b.x ) / 2, ( a.y + b.y ) / 2, ( a.z + b.z ) / 2 );
 	return geometry;
-
-}
-
-// tag a geometry with a flat partId
-function part( geometry, id ) {
-
-	const g = geometry;
-	g.setAttribute( 'partId', new BufferAttribute( new Float32Array( g.attributes.position.count ).fill( id ), 1 ) );
-	return g;
 
 }
 

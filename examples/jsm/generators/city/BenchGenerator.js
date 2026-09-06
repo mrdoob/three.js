@@ -1,6 +1,5 @@
 import {
 	BoxGeometry,
-	BufferAttribute,
 	InterpolationSamplingMode,
 	InterpolationSamplingType
 } from 'three';
@@ -11,6 +10,7 @@ import { attribute, color, float, floor, fract, mix, mx_fractal_noise_float, pos
 import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
 
 import { InstancedMeshGenerator } from './InstancedMeshGenerator.js';
+import { part } from './CityGeneratorUtils.js';
 
 /**
  * A public street bench: timber slats carried on two cast-iron end frames that
@@ -46,15 +46,6 @@ BenchGenerator.defaults = {
 
 // material-zone codes baked per vertex
 const WOOD = 0, IRON = 1;
-
-// tag a geometry with a flat partId
-function part( geometry, id ) {
-
-	const g = geometry;
-	g.setAttribute( 'partId', new BufferAttribute( new Float32Array( g.attributes.position.count ).fill( id ), 1 ) );
-	return g;
-
-}
 
 function buildBenchGeometry( p ) {
 

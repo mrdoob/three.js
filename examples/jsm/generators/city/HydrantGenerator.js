@@ -1,5 +1,4 @@
 import {
-	BufferAttribute,
 	CylinderGeometry,
 	InterpolationSamplingMode,
 	InterpolationSamplingType,
@@ -12,6 +11,7 @@ import { attribute, color, float, mix, mx_fractal_noise_float, positionGeometry,
 import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
 
 import { InstancedMeshGenerator } from './InstancedMeshGenerator.js';
+import { part } from './CityGeneratorUtils.js';
 
 /**
  * A classic cast-iron fire hydrant: a stout barrel on a flared footing, capped by a
@@ -45,15 +45,6 @@ HydrantGenerator.defaults = {
 
 // material-zone codes baked per vertex
 const BODY = 0, CAP = 1;
-
-// tag a geometry with a flat partId
-function part( geometry, id ) {
-
-	const g = geometry;
-	g.setAttribute( 'partId', new BufferAttribute( new Float32Array( g.attributes.position.count ).fill( id ), 1 ) );
-	return g;
-
-}
 
 function buildHydrantGeometry( p ) {
 

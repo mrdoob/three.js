@@ -1,6 +1,5 @@
 import {
 	BoxGeometry,
-	BufferAttribute,
 	Color,
 	Group,
 	InstancedBufferAttribute,
@@ -17,6 +16,7 @@ import { atan, attribute, color, float, mix, positionGeometry, select, smoothste
 import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
 import { LoftGeometry } from '../../geometries/LoftGeometry.js';
 import { createInstances, updateInstances } from './InstancedMeshGenerator.js';
+import { part } from './CityGeneratorUtils.js';
 
 /**
  * A low-poly car fleet: smooth body shells lofted through a row of cross sections,
@@ -210,15 +210,6 @@ const BODY_SPECS = {
 // the taxi is the sedan shell plus a lit roof sign
 BODY_SPECS.taxi = Object.assign( {}, BODY_SPECS.sedan, { sign: true } );
 
-function part( geometry, id ) {
-
-	const g = geometry;
-	g.deleteAttribute( 'uv' ); // the material works in canonical space, so drop uvs for a clean merge
-	g.setAttribute( 'partId', new BufferAttribute( new Float32Array( g.attributes.position.count ).fill( id ), 1 ) );
-	return g;
-
-}
-
 // one body cross section: a closed 14-point ring traced up the right flank, over a
 // greenhouse of half-width `roofHalfW`, then mirrored down the left flank. The bottom
 // edge wraps shut as the flat underbody. Sweeping these along Z lofts the whole shell.
@@ -338,6 +329,9 @@ function buildCarGeometry( spec ) {
 
 	// the taxi's lit roof sign
 	if ( spec.sign ) parts.push( part( new BoxGeometry( 0.36, 0.1, 0.14 ).translate( 0, 1.46, - 0.1 ), SIGN ) );
+
+	// The material uses canonical positions; remove UVs before merging the parts.
+	for ( const geometry of parts ) geometry.deleteAttribute( 'uv' );
 
 	return mergeGeometries( parts );
 

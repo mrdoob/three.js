@@ -8,7 +8,7 @@ import {
 } from 'three';
 
 import { MeshStandardNodeMaterial } from 'three/webgpu';
-import { cameraPosition, color, float, floor, Fn, fract, fwidth, hash, If, mix, mod, mx_fractal_noise_float, mx_noise_float, normalView, positionView, positionWorld, smoothstep, step, uint, uniform, varying, vec4 } from 'three/tsl';
+import { cameraPosition, color, float, floor, Fn, fract, fwidth, hash, If, mix, mod, mx_fractal_noise_float, mx_noise_float, positionWorld, smoothstep, step, uint, uniform, varying, vec4 } from 'three/tsl';
 
 import { SkyscraperGenerator, createSkyscraperMaterial, buildingPalette } from './city/SkyscraperGenerator.js';
 import { SidewalkGenerator } from './city/SidewalkGenerator.js';
@@ -20,6 +20,7 @@ import { HydrantGenerator } from './city/HydrantGenerator.js';
 import { StreetTreeGenerator } from './city/StreetTreeGenerator.js';
 import { CarGenerator } from './city/CarGenerator.js';
 import { PersonGenerator } from './city/PersonGenerator.js';
+import { bumpNormal } from './city/CityGeneratorUtils.js';
 
 /**
  * Lays out a grid of city blocks and fills each lot with a {@link SkyscraperGenerator}
@@ -495,23 +496,6 @@ function placeYawScale( x, y, z, yaw, scale ) {
 }
 
 // --- road material -------------------------------------------------------
-
-// derivative-based bump for a procedural, world-space height field. the built-in bumpMap
-// offsets the UV to read its height, so it returns a zero gradient for a height keyed off
-// world position; this feeds the hardware screen-space derivatives of the height into
-// Mikkelsen's surface-gradient method so the relief actually perturbs the normal.
-function bumpNormal( height ) {
-
-	const dpdx = positionView.dFdx();
-	const dpdy = positionView.dFdy();
-	const r1 = dpdy.cross( normalView );
-	const r2 = normalView.cross( dpdx );
-	const det = dpdx.dot( r1 );
-	const grad = det.sign().mul( height.dFdx().mul( r1 ).add( height.dFdy().mul( r2 ) ) );
-
-	return det.abs().mul( normalView ).sub( grad ).normalize();
-
-}
 
 // antialiased filled band: 1 where |coord| < halfWidth, edge sized to the
 // pixel footprint ( fwidth ) so thin road paint stays crisp and doesn't shimmer
