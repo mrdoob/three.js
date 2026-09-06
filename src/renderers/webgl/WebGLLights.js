@@ -226,6 +226,7 @@ function WebGLLights( extensions ) {
 
 		let sunLength = 0;
 		let numSunShadows = 0;
+		let numSunShadowCascades = 0;
 		let directionalLength = 0;
 		let pointLength = 0;
 		let spotLength = 0;
@@ -306,15 +307,16 @@ function WebGLLights( extensions ) {
 					state.sunShadow[ numSunShadows ] = shadowUniforms;
 					state.sunShadowMap[ numSunShadows ] = shadowMap;
 
-					// two cascades per sun light, matching the sun shadow shader chunks
+					const cascadeCount = shadow.getViewportCount();
 
-					for ( let j = 0; j < 2; j ++ ) {
+					for ( let j = 0; j < cascadeCount; j ++ ) {
 
-						state.sunShadowMatrix[ numSunShadows * 2 + j ] = shadow.getMatrix( j );
-						state.sunShadowCascade[ numSunShadows * 2 + j ] = shadow._cascadeData[ j ];
+						state.sunShadowMatrix[ numSunShadowCascades + j ] = shadow.getMatrix( j );
+						state.sunShadowCascade[ numSunShadowCascades + j ] = shadow._cascadeData[ j ];
 
 					}
 
+					numSunShadowCascades += cascadeCount;
 					numSunShadows ++;
 
 				}
@@ -510,8 +512,8 @@ function WebGLLights( extensions ) {
 
 			state.sunShadow.length = numSunShadows;
 			state.sunShadowMap.length = numSunShadows;
-			state.sunShadowMatrix.length = numSunShadows * 2;
-			state.sunShadowCascade.length = numSunShadows * 2;
+			state.sunShadowMatrix.length = numSunShadowCascades;
+			state.sunShadowCascade.length = numSunShadowCascades;
 			state.directionalShadow.length = numDirectionalShadows;
 			state.directionalShadowMap.length = numDirectionalShadows;
 			state.directionalShadowMatrix.length = numDirectionalShadows;

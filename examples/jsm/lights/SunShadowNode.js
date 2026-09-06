@@ -12,10 +12,6 @@ import {
 } from 'three/webgpu';
 import { Fn, If, float, mix, normalWorld, positionView, reference, renderGroup, shadowPositionWorld, smoothstep, texture, uniform, vec4 } from 'three/tsl';
 
-// must match the cascade count in SunLightShadow
-
-const _cascadeCount = 2;
-
 let _vsmWarned = false;
 
 /**
@@ -81,7 +77,7 @@ class SunShadowNode extends ShadowNode {
 	/**
 	 * Overwrites the default implementation to size the render target as the cascade atlas.
 	 *
-	 * @param {LightShadow} shadow - The light shadow object.
+	 * @param {SunLightShadow} shadow - The light shadow object.
 	 * @param {NodeBuilder} builder - A reference to the current node builder.
 	 * @return {Object} An object containing the shadow map and depth texture.
 	 */
@@ -105,20 +101,76 @@ class SunShadowNode extends ShadowNode {
 	}
 
 	/**
-	 * Setups the atlas render target and the per-fragment cascade walk.
+	 * Builds the per-fragment cascade blending.
 	 *
 	 * @private
 	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @param {Function} filterFn - The shadow filtering function.
 	 * @return {Node<float>} The shadow value node.
 	 */
-	_setupCascades( builder ) {
+	_setupCascades( builder, filterFn ) {
 
-		// Cascaded shadows can resize their textures, so receiving materials need full node updates.
+		// Full node updates refresh resized atlas bindings, even for stationary objects.
 
 		builder.observer.hasNode = true;
 
+		const { shadow, shadowMap } = this;
+		const depthTexture = shadowMap.depthTexture;
+
+		const shadowIntensity = reference( 'intensity', 'float', shadow ).setGroup( renderGroup );
+		const normalBias = reference( 'normalBias', 'float', shadow ).setGroup( renderGroup );
+
+		// evaluated outside the cascade branches so nodes shared with the rest of
+		// the shader, like the world normal, are not trapped in a branch scope
+
+		const shadowPosition = vec4( shadowPositionWorld.add( normalWorld.mul( normalBias ) ), 1 ).toVar();
+		const viewDepth = positionView.z.negate().toVar();
+
+		const shadowValue = float( 1 ).toVar( 'shadowValue' );
+
+		// walk the cascades back to front so each fade band can blend with the shadow behind it
+
+		for ( let i = shadow.getViewportCount() - 1; i >= 0; i -- ) {
+
+			const shadowMatrix = uniform( 'mat4' ).setGroup( renderGroup ).onRenderUpdate( () => shadow.getMatrix( i ) );
+
+			// ( begin, end, fade start ) view depths of the cascade
+
+			const cascade = uniform( 'vec4' ).setGroup( renderGroup ).onRenderUpdate( () => shadow._cascadeData[ i ] );
+
+			If( viewDepth.greaterThanEqual( cascade.x ).and( viewDepth.lessThan( cascade.y ) ), () => {
+
+				const shadowCoord = this.setupShadowCoord( builder, shadowMatrix.mul( shadowPosition ) );
+
+				const cascadeShadow = this.setupShadowFilter( builder, {
+					filterFn,
+					shadowTexture: shadowMap.texture,
+					depthTexture,
+					shadowCoord,
+					shadow: this._filterShadow,
+					depthLayer: this.depthLayer
+				} );
+
+				shadowValue.assign( mix( cascadeShadow, shadowValue, smoothstep( cascade.z, cascade.y, viewDepth ) ) );
+
+			} );
+
+		}
+
+		return mix( 1, shadowValue, shadowIntensity );
+
+	}
+
+	/**
+	 * Sets up the atlas render target and shadow output node.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @return {Node<float>} The shadow output node.
+	 */
+	setupShadow( builder ) {
+
 		const { renderer, camera } = builder;
-		const { shadow } = this;
+		const { light, shadow } = this;
 
 		let shadowMapType = renderer.shadowMap.type;
 
@@ -137,105 +189,49 @@ class SunShadowNode extends ShadowNode {
 
 		}
 
-		if ( this.shadowMap === null ) {
+		const filterFn = shadow.filterNode || this.getShadowFilterFn( shadowMapType ) || null;
 
-			const { depthTexture, shadowMap } = this.setupRenderTarget( shadow, builder );
+		if ( filterFn === null ) {
 
-			const hasTextureCompare = renderer.hasCompatibility( Compatibility.TEXTURE_COMPARE );
-
-			if ( shadowMapType === PCFShadowMap && hasTextureCompare ) {
-
-				depthTexture.minFilter = LinearFilter;
-				depthTexture.magFilter = LinearFilter;
-
-			} else {
-
-				depthTexture.minFilter = NearestFilter;
-				depthTexture.magFilter = NearestFilter;
-
-			}
-
-			this.shadowMap = shadowMap;
-			this.shadow.map = shadowMap;
-
-			this._atlasSize.set( shadowMap.width, shadowMap.height );
+			throw new Error( 'THREE.SunShadowNode: Shadow map type not supported.' );
 
 		}
+
+		const { depthTexture, shadowMap } = this.setupRenderTarget( shadow, builder );
+		const hasTextureCompare = renderer.hasCompatibility( Compatibility.TEXTURE_COMPARE );
+
+		if ( shadowMapType === PCFShadowMap && hasTextureCompare ) {
+
+			depthTexture.minFilter = LinearFilter;
+			depthTexture.magFilter = LinearFilter;
+
+		} else {
+
+			depthTexture.minFilter = NearestFilter;
+			depthTexture.magFilter = NearestFilter;
+
+		}
+
+		this.shadowMap = shadowMap;
+		shadow.map = shadowMap;
+
+		this._atlasSize.set( shadowMap.width, shadowMap.height );
 
 		// the cascade cameras inherit the coordinate system and depth mode from the shadow camera
 
 		shadow.camera.coordinateSystem = camera.coordinateSystem;
 		shadow.camera._reversedDepth = renderer.reversedDepthBuffer;
 
-		const shadowMap = this.shadowMap;
-		const depthTexture = shadowMap.depthTexture;
+		// rebuild the cascade statements for each shader so their variables
+		// and branches belong to that shader's scope
 
-		const filterFn = shadow.filterNode || this.getShadowFilterFn( shadowMapType ) || null;
+		const node = Fn( ( builder ) => this._setupCascades( builder, filterFn ) )().toVar();
 
-		if ( filterFn === null ) {
-
-			throw new Error( 'THREE.WebGPURenderer: Shadow map type not supported yet.' );
-
-		}
-
-		//
-
-		const shadowIntensity = reference( 'intensity', 'float', shadow ).setGroup( renderGroup );
-		const normalBias = reference( 'normalBias', 'float', shadow ).setGroup( renderGroup );
-
-		// evaluated outside the cascade branches so nodes shared with the rest of
-		// the shader, like the world normal, are not trapped in a branch scope
-
-		const shadowPosition = vec4( shadowPositionWorld.add( normalWorld.mul( normalBias ) ), 1 ).toVar();
-		const viewDepth = positionView.z.negate().toVar();
-
-		const shadowValue = float( 1 ).toVar( 'shadowValue' );
-
-		// walk the cascades back to front so each fade band can blend with the shadow behind it
-
-		for ( let i = _cascadeCount - 1; i >= 0; i -- ) {
-
-			const shadowMatrix = uniform( 'mat4' ).setGroup( renderGroup ).onRenderUpdate( () => shadow.getMatrix( i ) );
-
-			// ( begin, end, fade start ) view depths of the cascade
-
-			const cascade = uniform( 'vec4' ).setGroup( renderGroup ).onRenderUpdate( () => shadow._cascadeData[ i ] );
-
-			If( viewDepth.greaterThanEqual( cascade.x ).and( viewDepth.lessThan( cascade.y ) ), () => {
-
-				const shadowCoord = this.setupShadowCoord( builder, shadowMatrix.mul( shadowPosition ) );
-
-				const cascadeShadow = this.setupShadowFilter( builder, { filterFn, shadowTexture: shadowMap.texture, depthTexture, shadowCoord, shadow: this._filterShadow, depthLayer: this.depthLayer } );
-
-				shadowValue.assign( mix( cascadeShadow, shadowValue, smoothstep( cascade.z, cascade.y, viewDepth ) ) );
-
-			} );
-
-		}
-
-		return mix( 1, shadowValue, shadowIntensity );
-
-	}
-
-	/**
-	 * Setups the shadow output node.
-	 *
-	 * @param {NodeBuilder} builder - A reference to the current node builder.
-	 * @return {Node<float>} The shadow output node.
-	 */
-	setupShadow( /*builder*/ ) {
-
-		// the cascade walk emits statements, so it is wrapped in a function
-		// node that runs again for every shader it is built into, unlike the
-		// reusable expression tree of the base class
-
-		const node = Fn( ( builder ) => this._setupCascades( builder ) )().toVar();
-
-		const inspectName = `${ this.light.type } Shadow [ ${ this.light.name || 'ID: ' + this.light.id } ]`;
+		const inspectName = `${ light.type } Shadow [ ${ light.name || 'ID: ' + light.id } ]`;
 
 		// the cascade cameras are orthographic, so the stored depth is linear already
 
-		return node.toInspector( `${ inspectName } / Depth`, () => texture( this.shadowMap.depthTexture ).r.oneMinus() );
+		return node.toInspector( `${ inspectName } / Depth`, () => texture( depthTexture ).r.oneMinus() );
 
 	}
 
@@ -269,7 +265,9 @@ class SunShadowNode extends ShadowNode {
 		renderer.autoClear = false;
 		renderer.clear();
 
-		for ( let i = 0; i < _cascadeCount; i ++ ) {
+		const cascadeCount = shadow.getViewportCount();
+
+		for ( let i = 0; i < cascadeCount; i ++ ) {
 
 			const viewport = shadow.getViewport( i );
 

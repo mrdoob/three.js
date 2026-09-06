@@ -67,7 +67,11 @@
 
 				let cascade = float( 0 );
 
-				for ( let i = 0; i < 2; i ++ ) cascade = cascade.add( step( cascadeData.element( i ).y, viewDepth ) );
+				for ( let i = 0; i < sunLight.shadow.getViewportCount(); i ++ ) {
+
+					cascade = cascade.add( step( cascadeData.element( i ).y, viewDepth ) );
+
+				}
 
 				const tint = cos( cascade.mul( 1.2 ).add( vec3( 0, 4.2, 2.1 ) ) ).mul( 0.3 ).add( 0.7 );
 
