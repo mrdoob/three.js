@@ -331,22 +331,20 @@
 					}
 
 					const isHovering = sculptor.isSculpting() === false;
-					if ( isHovering ) sculptor.pickFromMouse( _pointer.x, _pointer.y );
+					if ( isHovering ) sculptor.pickFromPointer( _pointer.x, _pointer.y );
 
 					const hasHit = sculptor.hasHit();
 
 					if ( hasHit ) {
 
-						const hitPoint = sculptor.getHitPoint();
-						const hitNormal = sculptor.getHitNormal();
 						mesh.updateWorldMatrix( true, false );
 
 						// Position in world space
-						cursorGroup.position.set( hitPoint[ 0 ], hitPoint[ 1 ], hitPoint[ 2 ] ).applyMatrix4( mesh.matrixWorld );
+						sculptor.getHitPoint( cursorGroup.position ).applyMatrix4( mesh.matrixWorld );
 
 						// Orient to the surface normal.
 						_normalMatrix.getNormalMatrix( mesh.matrixWorld );
-						_normal.set( hitNormal[ 0 ], hitNormal[ 1 ], hitNormal[ 2 ] ).applyNormalMatrix( _normalMatrix );
+						sculptor.getHitNormal( _normal ).applyNormalMatrix( _normalMatrix );
 						cursorGroup.quaternion.setFromUnitVectors( _forward, _normal );
 
 						updateCursorScale( sculptor.getWorldRadius() );

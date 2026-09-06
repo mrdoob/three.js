@@ -869,16 +869,18 @@ class Sculptor extends EventDispatcher {
 
 	}
 
-	_intersectionFromRay( worldOrigin, worldDirection, worldRadius ) {
+	_intersectionFromRay( ray, worldRadius ) {
 
 		validatePositive( 'worldRadius', worldRadius );
 
-		if ( worldOrigin === undefined || worldOrigin.isVector3 !== true || worldDirection === undefined || worldDirection.isVector3 !== true ) {
+		if ( ray === undefined || ray === null || ray.origin?.isVector3 !== true || ray.direction?.isVector3 !== true ) {
 
-			throw new TypeError( 'Sculptor: origin and direction must be Vector3 instances.' );
+			throw new TypeError( 'Sculptor: ray must have Vector3 origin and direction properties.' );
 
 		}
 
+		const worldOrigin = ray.origin;
+		const worldDirection = ray.direction;
 		const directionLengthSq = worldDirection.lengthSq();
 
 		if ( Number.isFinite( worldOrigin.x ) === false || Number.isFinite( worldOrigin.y ) === false || Number.isFinite( worldOrigin.z ) === false ||
@@ -936,19 +938,18 @@ class Sculptor extends EventDispatcher {
 	 * Drag and Scale depend on pointer deltas and are unavailable through this
 	 * method.
 	 *
-	 * @param {Vector3} origin - The ray origin in world space.
-	 * @param {Vector3} direction - The non-zero ray direction in world space.
+	 * @param {Ray} ray - The world-space ray, with a non-zero direction.
 	 * @param {number} worldRadius - The brush radius in world units.
 	 * @return {boolean} Whether the ray hit the mesh.
 	 */
-	strokeFromRay( origin, direction, worldRadius ) {
+	strokeFromRay( ray, worldRadius ) {
 
 		if ( this._activePointerId !== null ) return false;
 
 		const tool = this._tool;
 		validateRayTool( tool );
 
-		if ( this.pickFromRay( origin, direction, worldRadius ) === false ) return false;
+		if ( this.pickFromRay( ray, worldRadius ) === false ) return false;
 		this.beginStroke();
 		if ( this._sculpting === false ) return false;
 		if ( this._tool !== tool ) validateRayTool( this._tool );
@@ -1629,26 +1630,28 @@ class Sculptor extends EventDispatcher {
 	}
 
 	/**
-	 * Returns the current local-space hit position. The returned array is an
-	 * internal, read-only view and is updated by the next pick or stroke.
+	 * Copies the current local-space hit position into the target vector.
+	 * Returns a zero vector when there is no hit.
 	 *
-	 * @return {Array<number>} The local-space hit position.
+	 * @param {Vector3} target - The vector to receive the hit position.
+	 * @return {Vector3} The target vector.
 	 */
-	getHitPoint() {
+	getHitPoint( target ) {
 
-		return this._hitPoint;
+		return target.fromArray( this._hitPoint );
 
 	}
 
 	/**
-	 * Returns the current local-space unit surface normal. The returned array is
-	 * an internal, read-only view and is updated by the next pick or stroke.
+	 * Copies the current local-space unit surface normal into the target vector.
+	 * Returns a zero vector when there is no hit.
 	 *
-	 * @return {Array<number>} The local-space unit surface normal.
+	 * @param {Vector3} target - The vector to receive the surface normal.
+	 * @return {Vector3} The target vector.
 	 */
-	getHitNormal() {
+	getHitNormal( target ) {
 
-		return this._hitNormal;
+		return target.fromArray( this._hitNormal );
 
 	}
 
@@ -1667,14 +1670,13 @@ class Sculptor extends EventDispatcher {
 	/**
 	 * Updates the current hit from a world-space ray without sculpting.
 	 *
-	 * @param {Vector3} origin - The ray origin in world space.
-	 * @param {Vector3} direction - The non-zero ray direction in world space.
+	 * @param {Ray} ray - The world-space ray, with a non-zero direction.
 	 * @param {number} worldRadius - The brush radius in world units.
 	 * @return {boolean} Whether the ray hit the mesh.
 	 */
-	pickFromRay( origin, direction, worldRadius ) {
+	pickFromRay( ray, worldRadius ) {
 
-		if ( this._intersectionFromRay( origin, direction, worldRadius ) === false ) return false;
+		if ( this._intersectionFromRay( ray, worldRadius ) === false ) return false;
 
 		this._computePickedNormal();
 		return true;
@@ -1688,7 +1690,7 @@ class Sculptor extends EventDispatcher {
 	 * @param {number} clientY - Vertical client coordinate in CSS pixels.
 	 * @return {boolean} Whether the pointer ray hit the mesh.
 	 */
-	pickFromMouse( clientX, clientY ) {
+	pickFromPointer( clientX, clientY ) {
 
 		this._cachedRect = null;
 

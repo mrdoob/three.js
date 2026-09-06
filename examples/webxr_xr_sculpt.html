@@ -42,8 +42,7 @@
 			const strokeInterval = 1000 / 90;
 			const maxStrokesPerFrame = 4;
 
-			const _origin = new THREE.Vector3();
-			const _direction = new THREE.Vector3();
+			const _ray = new THREE.Ray();
 
 			init();
 
@@ -243,8 +242,8 @@
 				controller.updateMatrixWorld( true );
 
 				// Get ray from controller
-				_origin.set( 0, 0, 0 ).applyMatrix4( controller.matrixWorld );
-				_direction.set( 0, 0, - 1 ).transformDirection( controller.matrixWorld );
+				_ray.origin.setFromMatrixPosition( controller.matrixWorld );
+				_ray.direction.set( 0, 0, - 1 ).transformDirection( controller.matrixWorld );
 
 				let hit = false;
 				let strokes = 0;
@@ -256,7 +255,7 @@
 					// Stamp at a fixed rate, independent of the headset refresh rate.
 					while ( time >= controller.userData.nextStrokeTime && strokes < maxStrokesPerFrame ) {
 
-						hit = sculptor.strokeFromRay( _origin, _direction, brushRadius );
+						hit = sculptor.strokeFromRay( _ray, brushRadius );
 						controller.userData.nextStrokeTime += strokeInterval;
 						strokes ++;
 
@@ -267,14 +266,12 @@
 
 				}
 
-				if ( strokes === 0 ) hit = sculptor.pickFromRay( _origin, _direction, brushRadius );
+				if ( strokes === 0 ) hit = sculptor.pickFromRay( _ray, brushRadius );
 
 				if ( hit ) {
 
 					// Show cursor at intersection point (transform from local to world)
-					const hitPoint = sculptor.getHitPoint();
-					cursor.position.set( hitPoint[ 0 ], hitPoint[ 1 ], hitPoint[ 2 ] );
-					cursor.position.applyMatrix4( mesh.matrixWorld );
+					sculptor.getHitPoint( cursor.position ).applyMatrix4( mesh.matrixWorld );
 					cursor.scale.setScalar( brushRadius );
 					cursor.visible = true;
 
