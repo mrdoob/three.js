@@ -74,7 +74,7 @@ class LightProbeGridNode extends AnalyticLightNode {
 		this._min = uniform( new Vector3() );
 		this._max = uniform( new Vector3() );
 		this._resolution = uniform( new Vector3() );
-		this._intensity = uniform( 1 ).onRenderUpdate( () => this.light.intensity * this.light._bakeIntensity );
+		this._intensity = uniform( 1 );
 		this._falloff = uniform( 0 );
 
 	}
@@ -86,6 +86,7 @@ class LightProbeGridNode extends AnalyticLightNode {
 		this._min.value.copy( light.boundingBox.min );
 		this._max.value.copy( light.boundingBox.max );
 		this._resolution.value.copy( light.resolution );
+		this._intensity.value = light.intensity;
 		this._falloff.value = light.falloff;
 
 	}

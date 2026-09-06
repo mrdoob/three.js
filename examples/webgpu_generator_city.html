@@ -52,7 +52,7 @@
 			let camera, scene, renderer, controls, timer;
 			let cityGroup, cityProxy, materials, city, renderPipeline;
 			let sky, sun, sunLight, pmremGenerator, envScene, envRenderTarget, cityBounds;
-			let probes, probesHelper, rebakeTimer = null, bakeIterator = null;
+			let probes, probesHelper, rebakeTimer = null;
 
 			// the irradiance grid spans the whole footprint plus the streets, rising to
 			// the mid-rise rooftops. diffuse GI is low frequency, so a coarse grid still
@@ -291,8 +291,6 @@
 
 			function bakeProbes() {
 
-				if ( bakeIterator ) bakeIterator.return();
-
 				if ( probes === undefined ) {
 
 					probes = new LightProbeGrid( GRID_SIZE.x, GRID_SIZE.y, GRID_SIZE.z, GRID_PROBES.x, GRID_PROBES.y, GRID_PROBES.z );
@@ -300,14 +298,6 @@
 					scene.add( probes );
 
 				}
-
-				bakeIterator = probes.bakeSteps( renderer, scene, { cubemapSize: 16, near: 0.1, far: 20000, bounces: 1 } );
-
-			}
-
-			function updateProbes() {
-
-				if ( bakeIterator === null ) return;
 
 				// swap the detailed city for its box proxy, and hide the probe spheres and the
 				// sun disc, so each cubemap captures only the boxes, ground and sky fill. the
@@ -319,27 +309,17 @@
 				cityProxy.visible = true;
 				sky.showSunDisc.value = false;
 
-				try {
+				probes.bake( renderer, scene, { cubemapSize: 16, near: 0.1, far: 20000, bounces: 1 } );
 
-					if ( bakeIterator.next().done ) {
+				sky.showSunDisc.value = true;
+				cityProxy.visible = false;
+				cityGroup.visible = true;
+				probes.visible = parameters.gi;
 
-						bakeIterator = null;
-						if ( probesHelper ) probesHelper.update();
+				if ( probesHelper ) {
 
-					}
-
-				} catch ( error ) {
-
-					bakeIterator = null;
-					throw error;
-
-				} finally {
-
-					sky.showSunDisc.value = true;
-					cityProxy.visible = false;
-					cityGroup.visible = true;
-					probes.visible = parameters.gi;
-					if ( probesHelper ) probesHelper.visible = parameters.showProbes;
+					probesHelper.update();
+					probesHelper.visible = parameters.showProbes;
 
 				}
 
@@ -349,9 +329,6 @@
 			// onChange calls from dragging a slider into a single bake once it settles
 
 			function scheduleRebake() {
-
-				if ( bakeIterator ) bakeIterator.return();
-				bakeIterator = null;
 
 				if ( rebakeTimer !== null ) clearTimeout( rebakeTimer );
 				rebakeTimer = setTimeout( () => {
@@ -390,7 +367,6 @@
 				timer.update();
 				controls.update( timer.getDelta() );
 
-				updateProbes();
 				renderPipeline.render();
 
 			}
