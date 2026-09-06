@@ -1,11 +1,14 @@
 ( function () {
 
+	if ( globalThis._e2eInjected === true ) return;
+	globalThis._e2eInjected = true;
+
 	/* Deterministic random */
 
-	window.Math._random = window.Math.random;
+	Math._random = Math.random;
 
 	let seed = Math.PI / 4;
-	window.Math.random = function () {
+	Math.random = function () {
 
 		const x = Math.sin( seed ++ ) * 10000;
 		return x - Math.floor( x );
@@ -14,12 +17,15 @@
 
 	/* Deterministic timer */
 
-	window.performance._now = performance.now;
+	performance._now = performance.now;
 
 	const now = () => 0; // frameId * 16;
-	window.Date.now = now;
-	window.Date.prototype.getTime = now;
-	window.performance.now = now;
+	Date.now = now;
+	Date.prototype.getTime = now;
+	performance.now = now;
+
+	// Workers keep their render loops running against the frozen clock.
+	if ( typeof window === 'undefined' ) return;
 
 	/* Deterministic RAF */
 

@@ -229,13 +229,14 @@ async function main() {
 
 	/* Prepare injections */
 
-	const buildInjection = ( code ) => code
+	const cleanPage = await fs.readFile( 'test/e2e/clean-page.js', 'utf8' );
+	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
+
+	// Workers do not receive evaluateOnNewDocument scripts.
+	const buildInjection = ( code ) => injection + '\n' + code
 		.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' )
 		// Disables WebGPU timestamp queries to prevent Inspector/Profiler from crashing in E2E software mode
 		.replace( /this\.trackTimestamp\s*=\s*\(\s*parameters\.trackTimestamp\s*===\s*true\s*\);/g, 'Object.defineProperty(this, \'trackTimestamp\', { get: () => false, set: () => {} });' );
-
-	const cleanPage = await fs.readFile( 'test/e2e/clean-page.js', 'utf8' );
-	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
 
 	const builds = {
 		'three.core.js': buildInjection( await fs.readFile( 'build/three.core.js', 'utf8' ) ),
