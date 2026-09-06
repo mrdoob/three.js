@@ -347,7 +347,7 @@ function createCarMaterial( paintColor, spec ) {
 	// pad to a fixed pillar count so the unrolled loop is identical for all types
 	const pillarBands = spec.pillars.slice();
 	while ( pillarBands.length < 4 ) pillarBands.push( [ 9, 9.001 ] );
-	const pillars = uniformArray( pillarBands.map( ( band ) => new Vector2( ...band ) ) );
+	const pillars = uniformArray( pillarBands.map( ( band ) => new Vector2( ...band ) ) ).setName( 'carPillars' );
 
 	const partId = varying( attribute( 'partId', 'float' ) ).setInterpolation( InterpolationSamplingType.FLAT, InterpolationSamplingMode.EITHER );
 	const isBody = partId.equal( BODY );
