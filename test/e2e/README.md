@@ -22,9 +22,9 @@ Merge only those commits that pass the tests, otherwise all next commits will al
 
 Examples render one animation frame by default. For progressive rendering, add an entry to
 `captureFrames` in `puppeteer.js` so both tests and screenshot generation wait for enough frames.
-Time stays frozen while frames advance. Captures using multiple frames have a ten-minute timeout
-and fail if the requested frame count is not reached. Update the count when an example's default
-bake settings change.
+Time stays frozen while frames advance. The render timeout scales with the frame count.
+Captures using multiple frames fail if the requested frame count is not reached. Update the
+count when an example's default bake settings change.
 
 ### How it works
 - ci configs with parallelism
