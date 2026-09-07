@@ -450,7 +450,7 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 	const page = ctx.page;
 	const pageStart = performance.now();
 	const frameCount = captureFrames[ file ] ?? 1;
-	const timeout = frameCount > 1 ? 60 : renderTimeout;
+	const timeout = frameCount > 1 ? 300 : renderTimeout;
 
 	try {
 

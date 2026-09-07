@@ -41,13 +41,6 @@
 
 	function renderFrame() {
 
-		if ( window._renderStarted === false ) {
-
-			requestFrame( renderFrame );
-			return;
-
-		}
-
 		// Callbacks queued during this frame belong to the next one.
 		const handles = Array.from( callbacks.keys() );
 
@@ -97,7 +90,17 @@
 		if ( scheduled === false ) {
 
 			scheduled = true;
-			requestFrame( renderFrame );
+
+			const intervalId = setInterval( function () {
+
+				if ( window._renderStarted === true ) {
+
+					clearInterval( intervalId );
+					renderFrame();
+
+				}
+
+			}, 100 );
 
 		}
 
