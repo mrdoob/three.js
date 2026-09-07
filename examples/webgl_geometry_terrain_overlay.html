@@ -24,6 +24,7 @@
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
 			import { SurfaceOverlayRenderer } from 'three/addons/renderers/SurfaceOverlayRenderer.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 			const parcelTextureUrl = './textures/terrain-overlay-parcel.svg';
 
 			const canvas = document.querySelector( '#viewport' );
@@ -33,6 +34,8 @@
 			renderer.outputColorSpace = THREE.SRGBColorSpace;
 			renderer.toneMapping = THREE.ACESFilmicToneMapping;
 			renderer.toneMappingExposure = 1.1;
+			const stats = new Stats();
+			document.body.appendChild( stats.dom );
 
 			const scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0x9bc4d0 );
@@ -104,6 +107,7 @@
 
 				controls.update();
 				overlay.render( scene, camera );
+				stats.update();
 
 			} );
 
