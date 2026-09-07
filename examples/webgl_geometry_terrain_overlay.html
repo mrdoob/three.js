@@ -12,11 +12,15 @@
 		<style>
 			body { margin: 0; overflow: hidden; background-color: #9bc4d0; }
 			#viewport { display: block; width: 100vw; height: 100vh; }
+			#legend { position: absolute; top: 12px; left: 12px; padding: 10px 12px; border-radius: 3px; background: rgba( 0, 0, 0, 0.55 ); color: #fff; font: 12px/1.6 monospace; pointer-events: none; }
+			#legend b { display: block; margin-bottom: 3px; }
+			#legend i { display: inline-block; width: 14px; height: 4px; margin-right: 6px; vertical-align: middle; }
 		</style>
 	</head>
 	<body>
 		<canvas id="viewport"></canvas>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - GPU terrain vector overlays</div>
+		<div id="legend"><b>Terrain overlays</b><i style="background:#f2bd4a"></i> polygon with hole<br><i style="background:#3cb7ab"></i> solid polygon<br><i style="background:#d8b86a"></i> textured polygon<br><i style="background:#276e8a"></i> 2px route<br><i style="background:#172735"></i> dashed route<br><i style="background:#fff4c1"></i> raycast points</div>
 		<script type="importmap">{ "imports": { "three": "../build/three.module.js", "three/addons/": "./jsm/" } }</script>
 		<script type="module">
 			import * as THREE from 'three';
