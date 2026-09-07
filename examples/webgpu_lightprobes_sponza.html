@@ -39,6 +39,8 @@
 
 			import * as THREE from 'three/webgpu';
 
+			import { SunLight } from 'three/addons/lights/SunLight.js';
+			import { SunLightNode } from 'three/addons/lights/SunLightNode.js';
 			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -53,13 +55,10 @@
 			let probes = null, probesHelper = null;
 			let probeFar, bakeIndex = 0, bakePass = 0;
 			let modelSize = null;
-			let dirLight = null, sky = null;
-
-			const sun = new THREE.Vector3();
+			let sunLight = null, sky = null;
 
 			const _box = new THREE.Box3();
 			const _size = new THREE.Vector3();
-			const _center = new THREE.Vector3();
 
 			const params = {
 				enabled: true,
@@ -75,8 +74,8 @@
 				countY: 7,
 				countZ: 7,
 				bounces: 1,
-				lightAzimuth: 135,
-				lightElevation: 55,
+				lightAzimuth: - 75,
+				lightElevation: 60,
 				lightIntensity: 100.0,
 				shadows: true
 			};
@@ -99,9 +98,12 @@
 				sky.rayleigh.value = 2;
 				sky.mieCoefficient.value = 0.005;
 				sky.mieDirectionalG.value = 0.8;
+				sky.cloudSpeed.value = 0; // keep the clouds static, like the WebGL version
+				sky.showSunDisc.value = false; // the sun is represented by the light
 				scene.add( sky );
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.library.addLight( SunLightNode, SunLight );
 				renderer.setPixelRatio( Math.min( window.devicePixelRatio, 1.5 ) );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -163,36 +165,21 @@
 
 				_box.setFromObject( model );
 				modelSize = _box.getSize( _size ).clone();
-				const modelCenter = _box.getCenter( _center ).clone();
-				const targetY = modelCenter.y + modelSize.y * 0.2;
-				const lightBaseDistance = Math.max( modelSize.x, modelSize.z );
 				probeFar = Math.max( modelSize.x, modelSize.y, modelSize.z ) * 2.0;
 
-				dirLight = new THREE.DirectionalLight( 0xfff2dc, 100.0 );
-				dirLight.target.position.set( modelCenter.x, targetY, modelCenter.z );
-				scene.add( dirLight.target );
-				dirLight.castShadow = true;
-				dirLight.shadow.mapSize.setScalar( 2048 );
-				const shadowExtent = Math.max( modelSize.x, modelSize.z ) * 0.7;
-				dirLight.shadow.camera.left = - shadowExtent;
-				dirLight.shadow.camera.right = shadowExtent;
-				dirLight.shadow.camera.top = shadowExtent;
-				dirLight.shadow.camera.bottom = - shadowExtent;
-				dirLight.shadow.camera.near = 0.1;
-				dirLight.shadow.camera.far = modelSize.y * 4.0;
-				scene.add( dirLight );
+				sunLight = new SunLight( 0xfff2dc, 100.0 );
+				sunLight.castShadow = true;
+				sunLight.shadow.camera.far = 50;
+				sunLight.shadow.mapSize.setScalar( 2048 );
+				scene.add( sunLight );
 
 				function updateLightPosition() {
 
 					const elevation = THREE.MathUtils.degToRad( params.lightElevation );
 					const azimuth = THREE.MathUtils.degToRad( params.lightAzimuth );
 
-					sun.setFromSphericalCoords( 1, Math.PI / 2 - elevation, azimuth );
-					sky.sunPosition.value.copy( sun );
-
-					dirLight.target.position.set( modelCenter.x, targetY, modelCenter.z );
-					dirLight.position.copy( dirLight.target.position ).addScaledVector( sun, lightBaseDistance );
-					dirLight.target.updateMatrixWorld();
+					sunLight.position.setFromSphericalCoords( 1, Math.PI / 2 - elevation, azimuth );
+					sky.sunPosition.value.copy( sunLight.position );
 
 				}
 
@@ -219,7 +206,7 @@
 				} );
 				gui.add( params, 'lightIntensity', 0, 100, 0.1 ).name( 'Light Intensity' ).onChange( ( value ) => {
 
-					dirLight.intensity = value;
+					sunLight.intensity = value;
 					resetProbeBake();
 
 				} );
@@ -380,10 +367,10 @@
 
 			function setShadowsEnabled( enabled ) {
 
-				if ( ! renderer || ! dirLight ) return;
+				if ( ! renderer || ! sunLight ) return;
 
 				renderer.shadowMap.enabled = enabled;
-				dirLight.castShadow = enabled;
+				sunLight.castShadow = enabled;
 
 			}
 
