@@ -450,7 +450,7 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 	const page = ctx.page;
 	const pageStart = performance.now();
 	const frameCount = captureFrames[ file ] ?? 1;
-	const timeout = frameCount > 1 ? 300 : renderTimeout;
+	const timeout = frameCount > 1 ? 600 : renderTimeout;
 
 	try {
 
@@ -509,7 +509,7 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 						if ( renderTimeoutExceeded ) {
 
 							clearInterval( waitingLoop );
-							reject( 'Render timeout exceeded' );
+							reject( frameCount > 1 ? `Render timeout exceeded after ${ window._renderedFrames } of ${ frameCount } frames` : 'Render timeout exceeded' );
 
 						} else if ( window._renderFinished ) {
 

@@ -32,11 +32,10 @@
 	window._renderStarted = false;
 	window._renderFinished = false;
 	window._renderFrames = 1;
+	window._renderedFrames = 0;
 
-	const requestFrame = window.requestAnimationFrame.bind( window );
 	const callbacks = new Map();
 	let callbackId = 0;
-	let frameId = 0;
 	let scheduled = false;
 
 	function renderFrame() {
@@ -65,16 +64,17 @@
 
 		}
 
-		frameId ++;
+		window._renderedFrames ++;
 
-		if ( frameId === window._renderFrames ) {
+		if ( window._renderedFrames === window._renderFrames ) {
 
 			callbacks.clear();
 			window._renderFinished = true;
 
 		} else {
 
-			requestFrame( renderFrame );
+			// Advance frames independently of the browser's repaint cadence.
+			setTimeout( renderFrame, 100 );
 
 		}
 
