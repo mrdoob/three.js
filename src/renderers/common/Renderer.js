@@ -1594,6 +1594,16 @@ class Renderer {
 
 				this._frameBufferTargets.delete( target );
 
+				const quadData = this._quadCache.get( frameBufferTarget.texture );
+
+				if ( quadData !== undefined ) {
+
+					quadData.quad.material.dispose();
+
+					this._quadCache.delete( frameBufferTarget.texture );
+
+				}
+
 			};
 
 			target.addEventListener( 'dispose', dispose );
@@ -1977,20 +1987,6 @@ class Renderer {
 			};
 
 			this._quadCache.set( renderTarget.texture, quadData );
-
-			// dispose logic
-
-			const dispose = () => {
-
-				quad.material.dispose();
-
-				this._quadCache.delete( renderTarget.texture );
-
-				renderTarget.texture.removeEventListener( 'dispose', dispose );
-
-			};
-
-			renderTarget.texture.addEventListener( 'dispose', dispose );
 
 		} else {
 
