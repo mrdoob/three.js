@@ -47,7 +47,6 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 			import { MeshBVH, StaticGeometryGenerator } from 'three-mesh-bvh';
 			import { FootIK } from 'three-player-controller/foot-ik';
@@ -55,8 +54,8 @@
 			const GRAVITY = - 30;
 			const PHYSICS_STEPS = 5;
 			const PLAYER_MODEL_SCALE = 0.5;
-			const CAPSULE_RADIUS = 0.15;
-			const BODY_SEGMENT = 0.6;
+			const CAPSULE_RADIUS = 0.2;
+			const BODY_SEGMENT = 0.5;
 			const RIDE_HEIGHT = 0.2;
 			const COLLIDER_HEIGHT = BODY_SEGMENT + 2 * CAPSULE_RADIUS - RIDE_HEIGHT;
 			const CAPSULE_SEGMENT = COLLIDER_HEIGHT - 2 * CAPSULE_RADIUS;
@@ -232,7 +231,7 @@
 				scene.add( player );
 
 				playerCapsuleHelper = new THREE.Mesh(
-					new RoundedBoxGeometry( CAPSULE_RADIUS * 2, COLLIDER_HEIGHT, CAPSULE_RADIUS * 2, 1, CAPSULE_RADIUS ),
+					new THREE.CapsuleGeometry( CAPSULE_RADIUS, CAPSULE_SEGMENT),
 					new THREE.MeshBasicMaterial( {
 						color: 0xff0000,
 						wireframe: true,
