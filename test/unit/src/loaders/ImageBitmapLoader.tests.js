@@ -110,6 +110,35 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
+		QUnit.test( 'does not mutate options', async ( assert ) => {
+
+			const canvas = document.createElement( 'canvas' );
+			canvas.width = 8;
+			canvas.height = 8;
+
+			const url = canvas.toDataURL( 'image/png' );
+			const options = Object.freeze( { imageOrientation: 'flipY' } );
+			const loader = new ImageBitmapLoader().setOptions( options );
+
+			const enabled = Cache.enabled;
+			Cache.enabled = true;
+
+			try {
+
+				const imageBitmap = await loader.loadAsync( url );
+
+				assert.ok( imageBitmap instanceof ImageBitmap, 'The request resolves with an image bitmap.' );
+				assert.deepEqual( options, { imageOrientation: 'flipY' }, 'The loader does not mutate the options.' );
+
+			} finally {
+
+				Cache.remove( `image-bitmap:${url}` );
+				Cache.enabled = enabled;
+
+			}
+
+		} );
+
 	} );
 
 } );
