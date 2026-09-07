@@ -31,22 +31,83 @@
 
 	window._renderStarted = false;
 	window._renderFinished = false;
+	window._renderFrames = 1;
 
-	window.requestAnimationFrame = function ( cb ) {
+	const requestFrame = window.requestAnimationFrame.bind( window );
+	const callbacks = new Map();
+	let callbackId = 0;
+	let frameId = 0;
+	let scheduled = false;
 
-		if ( window._renderFinished === true ) return;
+	function renderFrame() {
 
-		const intervalId = setInterval( function () {
+		if ( window._renderStarted === false ) {
 
-			if ( window._renderStarted === true ) {
+			requestFrame( renderFrame );
+			return;
 
-				clearInterval( intervalId );
-				window._renderFinished = true;
-				cb( now() );
+		}
+
+		// Callbacks queued during this frame belong to the next one.
+		const handles = Array.from( callbacks.keys() );
+
+		for ( const handle of handles ) {
+
+			const callback = callbacks.get( handle );
+			callbacks.delete( handle );
+
+			if ( callback !== undefined ) {
+
+				try {
+
+					callback( now() );
+
+				} catch ( error ) {
+
+					reportError( error );
+
+				}
 
 			}
 
-		}, 100 );
+		}
+
+		frameId ++;
+
+		if ( frameId === window._renderFrames ) {
+
+			callbacks.clear();
+			window._renderFinished = true;
+
+		} else {
+
+			requestFrame( renderFrame );
+
+		}
+
+	}
+
+	window.requestAnimationFrame = function ( callback ) {
+
+		if ( window._renderFinished === true ) return;
+
+		const handle = ++ callbackId;
+		callbacks.set( handle, callback );
+
+		if ( scheduled === false ) {
+
+			scheduled = true;
+			requestFrame( renderFrame );
+
+		}
+
+		return handle;
+
+	};
+
+	window.cancelAnimationFrame = function ( handle ) {
+
+		callbacks.delete( handle );
 
 	};
 

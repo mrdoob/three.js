@@ -97,6 +97,13 @@ const height = 250;
 const viewScale = 2;
 const jpgQuality = 95;
 
+// Allow incremental probe baking to finish before capturing the examples.
+const captureFrames = {
+	webgl_lightprobes_sponza: 250, // 246 bake frames.
+	webgpu_generator_city: 120, // 112 bake frames.
+	webgpu_lightprobes_sponza: 250
+};
+
 console.red = msg => console.log( `\x1b[31m${msg}\x1b[39m` );
 console.green = msg => console.log( `\x1b[32m${msg}\x1b[39m` );
 console.yellow = msg => console.log( `\x1b[33m${msg}\x1b[39m` );
@@ -442,6 +449,8 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 	const page = ctx.page;
 	const pageStart = performance.now();
+	const frameCount = captureFrames[ file ] ?? 1;
+	const timeout = frameCount > 1 ? 60 : renderTimeout;
 
 	try {
 
@@ -480,12 +489,13 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 				timeout: renderTimeout * 1000
 			} );
 
-			await page.evaluate( async ( renderTimeout, parseTime ) => {
+			await page.evaluate( async ( renderTimeout, parseTime, frameCount ) => {
 
 				await new Promise( resolve => setTimeout( resolve, parseTime ) );
 
 				/* Resolve render promise */
 
+				window._renderFrames = frameCount;
 				window._renderStarted = true;
 
 				await new Promise( function ( resolve, reject ) {
@@ -512,11 +522,11 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 				} );
 
-			}, renderTimeout, page.pageSize / 1024 / 1024 * parseTime * 1000 );
+			}, timeout, page.pageSize / 1024 / 1024 * parseTime * 1000, frameCount );
 
 		} catch ( e ) {
 
-			if ( e !== 'Render timeout exceeded' ) {
+			if ( e !== 'Render timeout exceeded' || frameCount > 1 ) {
 
 				throw new Error( `Error happened while rendering file ${ file }: ${ e }` );
 
