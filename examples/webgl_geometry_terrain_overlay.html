@@ -12,23 +12,18 @@
 		<style>
 			body { margin: 0; overflow: hidden; background-color: #9bc4d0; }
 			#viewport { display: block; width: 100vw; height: 100vh; }
-			#legend { position: absolute; top: 12px; left: 12px; padding: 10px 12px; border-radius: 3px; background: rgba( 0, 0, 0, 0.55 ); color: #fff; font: 12px/1.6 monospace; pointer-events: none; }
-			#legend b { display: block; margin-bottom: 3px; }
-			#legend label { display: block; cursor: pointer; }
-			#legend input { margin: 0 5px 0 0; vertical-align: middle; }
-			#legend i { display: inline-block; width: 14px; height: 4px; margin-right: 6px; vertical-align: middle; }
 		</style>
 	</head>
 	<body>
 		<canvas id="viewport"></canvas>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - GPU terrain vector overlays</div>
-		<div id="legend"><b>Terrain overlays</b><label><input type="checkbox" data-overlay="hole" checked><i style="background:#f2bd4a"></i> polygon with hole</label><label><input type="checkbox" data-overlay="solid" checked><i style="background:#3cb7ab"></i> solid polygon</label><label><input type="checkbox" data-overlay="texture" checked><i style="background:#d8b86a"></i> textured polygon</label><label><input type="checkbox" data-overlay="routes" checked><i style="background:#276e8a"></i> routes</label><label><input type="checkbox" data-overlay="points" checked><i style="background:#fff4c1"></i> raycast points</label></div>
 		<script type="importmap">{ "imports": { "three": "../build/three.module.js", "three/addons/": "./jsm/" } }</script>
 		<script type="module">
 			import * as THREE from 'three';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
 			import { SurfaceOverlayRenderer } from 'three/addons/renderers/SurfaceOverlayRenderer.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			const parcelTextureUrl = './textures/terrain-overlay-parcel.svg';
 
 			const canvas = document.querySelector( '#viewport' );
@@ -66,25 +61,36 @@
 			const overlay = new SurfaceOverlayRenderer( renderer, terrain );
 			const parcelTexture = new THREE.TextureLoader().load( parcelTextureUrl );
 			parcelTexture.colorSpace = THREE.SRGBColorSpace;
-			addOverlays( overlay, parcelTexture );
-
 			const overlayGroups = {
-				hole: overlay._entries.slice( 0, 3 ),
-				solid: [ overlay._entries[ 3 ], overlay._entries[ 5 ] ],
-				texture: [ overlay._entries[ 4 ], overlay._entries[ 6 ], overlay._entries[ 7 ] ],
-				routes: overlay._entries.slice( 8 ),
+				...addOverlays( overlay, parcelTexture ),
 				points: [ groundPoints ]
 			};
 
-			document.querySelectorAll( '#legend input' ).forEach( input => {
+			const visibility = {
+				polygonWithHole: true,
+				solidPolygon: true,
+				texturedPolygon: true,
+				routes: true,
+				raycastPoints: true
+			};
+			const gui = new GUI( { title: 'Terrain overlays' } );
+			const visibilityFolder = gui.addFolder( 'Visibility' );
+			addVisibilityControl( visibilityFolder, visibility, 'polygonWithHole', 'Polygon with hole', overlayGroups.hole );
+			addVisibilityControl( visibilityFolder, visibility, 'solidPolygon', 'Solid polygon', overlayGroups.solid );
+			addVisibilityControl( visibilityFolder, visibility, 'texturedPolygon', 'Textured polygon', overlayGroups.texture );
+			addVisibilityControl( visibilityFolder, visibility, 'routes', 'Routes', overlayGroups.routes );
+			addVisibilityControl( visibilityFolder, visibility, 'raycastPoints', 'Raycast points', overlayGroups.points );
+			visibilityFolder.open();
 
-				input.addEventListener( 'change', () => {
+			function addVisibilityControl( folder, state, property, label, objects ) {
 
-					for ( const object of overlayGroups[ input.dataset.overlay ] ) object.visible = input.checked;
+				folder.add( state, property ).name( label ).onChange( value => {
+
+					for ( const object of objects ) object.visible = value;
 
 				} );
 
-			} );
+			}
 
 			window.addEventListener( 'resize', () => {
 
@@ -187,6 +193,7 @@
 						matrix.makeTranslation( x, 0, z );
 
 					}
+
 					points.setMatrixAt( index, matrix );
 
 				}
@@ -209,64 +216,71 @@
 
 			function addOverlays( overlay, parcelTexture ) {
 
-				overlay.addPolygon( [
+				const hole = [];
+				const solid = [];
+				const texture = [];
+				const routes = [];
+
+				hole.push( overlay.addPolygon( [
 					[ - 37, 0, - 22 ], [ - 10, 0, - 38 ], [ 17, 0, - 30 ], [ 28, 0, - 8 ],
 					[ 12, 0, 15 ], [ - 17, 0, 18 ], [ - 34, 0, 2 ]
 				], {
 					color: 0xf2bd4a,
 					opacity: 0.48,
-					holes: [ [ [ - 6, 0, - 17 ], [ 5, 0, - 16 ], [ 8, 0, - 5 ], [ - 4, 0, - 3 ] ] ]
-				} );
+					holes: [[[ - 6, 0, - 17 ], [ 5, 0, - 16 ], [ 8, 0, - 5 ], [ - 4, 0, - 3 ]]]
+				} ) );
 
-				overlay.addPolyline( [
+				hole.push( overlay.addPolyline( [
 					[ - 37, 0, - 22 ], [ - 10, 0, - 38 ], [ 17, 0, - 30 ], [ 28, 0, - 8 ],
 					[ 12, 0, 15 ], [ - 17, 0, 18 ], [ - 34, 0, 2 ], [ - 37, 0, - 22 ]
-				], { color: 0xff352b, width: 1, opacity: 1 } );
+				], { color: 0xff352b, width: 1, opacity: 1 } ) );
 
-				overlay.addPolyline( [
+				hole.push( overlay.addPolyline( [
 					[ - 6, 0, - 17 ], [ 5, 0, - 16 ], [ 8, 0, - 5 ], [ - 4, 0, - 3 ], [ - 6, 0, - 17 ]
-				], { color: 0xff352b, width: 1, opacity: 1 } );
+				], { color: 0xff352b, width: 1, opacity: 1 } ) );
 
 				// A separate, ordinary polygon makes the hole behavior directly comparable.
-				overlay.addPolygon( [
+				solid.push( overlay.addPolygon( [
 					[ - 60, 0, 6 ], [ - 49, 0, 21 ], [ - 36, 0, 14 ], [ - 40, 0, - 2 ], [ - 55, 0, - 8 ]
-				], { color: 0x3cb7ab, opacity: 0.44 } );
+				], { color: 0x3cb7ab, opacity: 0.44 } ) );
 
-				overlay.addPolygon( [
+				texture.push( overlay.addPolygon( [
 					[ 28, 0, - 47 ], [ 53, 0, - 42 ], [ 57, 0, - 25 ], [ 40, 0, - 18 ], [ 23, 0, - 32 ]
 				], {
 					color: 0xffffff,
 					opacity: 0.82,
 					map: parcelTexture,
-					holes: [ [ [ 36, 0, - 38 ], [ 46, 0, - 36 ], [ 47, 0, - 29 ], [ 37, 0, - 28 ] ] ]
-				} );
+					holes: [[[ 36, 0, - 38 ], [ 46, 0, - 36 ], [ 47, 0, - 29 ], [ 37, 0, - 28 ]]]
+				} ) );
 
-				overlay.addPolyline( [
+				solid.push( overlay.addPolyline( [
 					[ - 60, 0, 6 ], [ - 49, 0, 21 ], [ - 36, 0, 14 ], [ - 40, 0, - 2 ], [ - 55, 0, - 8 ], [ - 60, 0, 6 ]
-				], { color: 0x087e76, width: 1, opacity: 1 } );
+				], { color: 0x087e76, width: 1, opacity: 1 } ) );
 
-				overlay.addPolyline( [
+				texture.push( overlay.addPolyline( [
 					[ 28, 0, - 47 ], [ 53, 0, - 42 ], [ 57, 0, - 25 ], [ 40, 0, - 18 ], [ 23, 0, - 32 ], [ 28, 0, - 47 ]
-				], { color: 0xfff4c1, width: 1, opacity: 1 } );
+				], { color: 0xfff4c1, width: 1, opacity: 1 } ) );
 
-				overlay.addPolyline( [
+				texture.push( overlay.addPolyline( [
 					[ 36, 0, - 38 ], [ 46, 0, - 36 ], [ 47, 0, - 29 ], [ 37, 0, - 28 ], [ 36, 0, - 38 ]
-				], { color: 0xfff4c1, width: 1, opacity: 1 } );
+				], { color: 0xfff4c1, width: 1, opacity: 1 } ) );
 
-				overlay.addPolyline( [
+				routes.push( overlay.addPolyline( [
 					[ - 52, 0, 35 ], [ - 34, 0, 24 ], [ - 19, 0, 31 ], [ - 3, 0, 20 ],
 					[ 15, 0, 24 ], [ 31, 0, 10 ], [ 48, 0, 17 ]
-				], { color: 0x244312, width: 1, opacity: 1 } );
+				], { color: 0x244312, width: 1, opacity: 1 } ) );
 
-				overlay.addPolyline( [
+				routes.push( overlay.addPolyline( [
 					[ - 45, 0, 50 ], [ - 22, 0, 43 ], [ - 7, 0, 48 ], [ 10, 0, 41 ],
 					[ 29, 0, 46 ], [ 48, 0, 36 ]
-				], { color: 0x276e8a, width: 2, opacity: 1 } );
+				], { color: 0x276e8a, width: 2, opacity: 1 } ) );
 
-				overlay.addPolyline( [
+				routes.push( overlay.addPolyline( [
 					[ - 48, 0, - 42 ], [ - 24, 0, - 19 ], [ - 2, 0, - 9 ], [ 14, 0, - 3 ],
 					[ 33, 0, - 18 ], [ 52, 0, - 8 ]
-				], { color: 0x172735, width: 1, dashed: true, dashSize: 3.6, gapSize: 2.4, opacity: 1 } );
+				], { color: 0x172735, width: 1, dashed: true, dashSize: 3.6, gapSize: 2.4, opacity: 1 } ) );
+
+				return { hole, solid, texture, routes };
 
 			}
 

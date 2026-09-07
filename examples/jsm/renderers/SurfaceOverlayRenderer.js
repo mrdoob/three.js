@@ -161,6 +161,7 @@ export class SurfaceOverlayRenderer {
 			dispose();
 
 		};
+
 		this._entries.push( entry );
 		return entry;
 
@@ -230,6 +231,7 @@ export class SurfaceOverlayRenderer {
 					material.needsUpdate = true;
 
 				}
+
 				if ( patch.mapBounds !== undefined && material.uniforms.mapBounds ) material.uniforms.mapBounds.value.copy( getMapBounds( patch.mapBounds, points ) );
 				if ( patch.color !== undefined ) {
 
@@ -238,12 +240,14 @@ export class SurfaceOverlayRenderer {
 					else material.uniforms.fillColor.value.set( patch.color );
 
 				}
+
 				if ( patch.opacity !== undefined ) {
 
 					if ( 'opacity' in material ) material.opacity = patch.opacity;
 					else material.uniforms.opacity.value = patch.opacity;
 
 				}
+
 				if ( patch.width !== undefined && material.uniforms?.lineWidth ) material.uniforms.lineWidth.value = patch.width;
 				if ( patch.visible !== undefined ) object.visible = patch.visible;
 
@@ -496,6 +500,7 @@ class ScreenSpaceLineBatch {
 			throw error;
 
 		}
+
 		return entry;
 
 	}
