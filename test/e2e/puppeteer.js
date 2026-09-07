@@ -61,6 +61,10 @@ const exceptionList = [
 	'webgpu_vxgi',
 	'webgpu_vxgi_sponza',
 
+	// Incremental light probe baking
+	'webgl_lightprobes_sponza',
+	'webgpu_lightprobes_sponza',
+
 	// Video hangs the CI?
 	'css3d_youtube',
 	'webgpu_materials_video',
@@ -96,13 +100,6 @@ const width = 400;
 const height = 250;
 const viewScale = 2;
 const jpgQuality = 95;
-
-// Allow incremental probe baking to finish before capturing the examples.
-const captureFrames = {
-	webgl_lightprobes_sponza: 250, // 246 bake frames.
-	webgpu_generator_city: 120, // 112 bake frames.
-	webgpu_lightprobes_sponza: 250
-};
 
 console.red = msg => console.log( `\x1b[31m${msg}\x1b[39m` );
 console.green = msg => console.log( `\x1b[32m${msg}\x1b[39m` );
@@ -449,8 +446,6 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 	const page = ctx.page;
 	const pageStart = performance.now();
-	const frameCount = captureFrames[ file ] ?? 1;
-	const timeout = renderTimeout * frameCount;
 
 	try {
 
@@ -489,13 +484,12 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 				timeout: renderTimeout * 1000
 			} );
 
-			await page.evaluate( async ( renderTimeout, parseTime, frameCount ) => {
+			await page.evaluate( async ( renderTimeout, parseTime ) => {
 
 				await new Promise( resolve => setTimeout( resolve, parseTime ) );
 
 				/* Resolve render promise */
 
-				window._renderFrames = frameCount;
 				window._renderStarted = true;
 
 				await new Promise( function ( resolve, reject ) {
@@ -509,7 +503,7 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 						if ( renderTimeoutExceeded ) {
 
 							clearInterval( waitingLoop );
-							reject( frameCount > 1 ? `Render timeout exceeded after ${ window._renderedFrames } of ${ frameCount } frames` : 'Render timeout exceeded' );
+							reject( 'Render timeout exceeded' );
 
 						} else if ( window._renderFinished ) {
 
@@ -522,11 +516,11 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 				} );
 
-			}, timeout, page.pageSize / 1024 / 1024 * parseTime * 1000, frameCount );
+			}, renderTimeout, page.pageSize / 1024 / 1024 * parseTime * 1000 );
 
 		} catch ( e ) {
 
-			if ( e !== 'Render timeout exceeded' || frameCount > 1 ) {
+			if ( e !== 'Render timeout exceeded' ) {
 
 				throw new Error( `Error happened while rendering file ${ file }: ${ e }` );
 

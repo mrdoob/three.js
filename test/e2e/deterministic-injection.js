@@ -31,86 +31,22 @@
 
 	window._renderStarted = false;
 	window._renderFinished = false;
-	window._renderFrames = 1;
-	window._renderedFrames = 0;
 
-	const callbacks = new Map();
-	let callbackId = 0;
-	let scheduled = false;
-
-	function renderFrame() {
-
-		// Callbacks queued during this frame belong to the next one.
-		const handles = Array.from( callbacks.keys() );
-
-		for ( const handle of handles ) {
-
-			const callback = callbacks.get( handle );
-			callbacks.delete( handle );
-
-			if ( callback !== undefined ) {
-
-				try {
-
-					callback( now() );
-
-				} catch ( error ) {
-
-					reportError( error );
-
-				}
-
-			}
-
-		}
-
-		window._renderedFrames ++;
-
-		if ( window._renderedFrames === window._renderFrames ) {
-
-			callbacks.clear();
-			window._renderFinished = true;
-
-		} else {
-
-			// Advance frames independently of the browser's repaint cadence.
-			setTimeout( renderFrame, 100 );
-
-		}
-
-	}
-
-	window.requestAnimationFrame = function ( callback ) {
+	window.requestAnimationFrame = function ( cb ) {
 
 		if ( window._renderFinished === true ) return;
 
-		const handle = ++ callbackId;
-		callbacks.set( handle, callback );
+		const intervalId = setInterval( function () {
 
-		if ( scheduled === false ) {
+			if ( window._renderStarted === true ) {
 
-			scheduled = true;
+				clearInterval( intervalId );
+				window._renderFinished = true;
+				cb( now() );
 
-			const intervalId = setInterval( function () {
+			}
 
-				if ( window._renderStarted === true ) {
-
-					clearInterval( intervalId );
-					renderFrame();
-
-				}
-
-			}, 100 );
-
-		}
-
-		return handle;
-
-	};
-
-	window.cancelAnimationFrame = function ( handle ) {
-
-		callbacks.delete( handle );
+		}, 100 );
 
 	};
 
