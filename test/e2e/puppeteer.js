@@ -61,6 +61,11 @@ const exceptionList = [
 	'webgpu_vxgi',
 	'webgpu_vxgi_sponza',
 
+	// Incremental light probe baking
+	'webgl_lightprobes_sponza',
+	'webgpu_generator_city', // Sub-pixel coverage of thin high-contrast geometry edges differs across rasterizers #33817
+	'webgpu_lightprobes_sponza',
+
 	// Video hangs the CI?
 	'css3d_youtube',
 	'webgpu_materials_video',
@@ -72,10 +77,7 @@ const exceptionList = [
 
 	// Webcam
 	'webgl_materials_video_webcam',
-	'webgl_morphtargets_webcam',
-
-	// Sub-pixel coverage of thin high-contrast geometry edges differs across rasterizers #33817
-	'webgpu_generator_city'
+	'webgl_morphtargets_webcam'
 
 ];
 
