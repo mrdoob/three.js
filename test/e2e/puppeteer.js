@@ -63,7 +63,7 @@ const exceptionList = [
 
 	// Incremental light probe baking
 	'webgl_lightprobes_sponza',
-	'webgpu_generator_city',
+	'webgpu_generator_city', // Sub-pixel coverage of thin high-contrast geometry edges differs across rasterizers #33817
 	'webgpu_lightprobes_sponza',
 
 	// Video hangs the CI?
