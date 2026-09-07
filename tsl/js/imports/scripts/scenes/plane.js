@@ -55,16 +55,16 @@ export async function init() {
 
 	scene = new THREE.Scene();
 
-	camera = new THREE.PerspectiveCamera( 45, renderer.domElement.clientWidth / renderer.domElement.clientHeight, 0.1, 100 );
+	camera = new THREE.PerspectiveCamera( 45, renderer.domElement.clientWidth / renderer.domElement.clientHeight, 0.1, 100 ); // eslint-disable-line no-undef
 	camera.position.set( 2, 3, 4 );
 	camera.lookAt( 0, 1.5, 0 );
 
 	defaultPass = pass( scene, camera );
 	defaultAA = smaa( defaultPass );
 
-	renderPipeline = new THREE.RenderPipeline( renderer );
+	renderPipeline = new THREE.RenderPipeline( renderer ); // eslint-disable-line no-undef
 
-	controls = new OrbitControls( camera, renderer.domElement );
+	controls = new OrbitControls( camera, renderer.domElement ); // eslint-disable-line no-undef
 	controls.enableDamping = true;
 	controls.minDistance = 2;
 	controls.maxDistance = 20;
