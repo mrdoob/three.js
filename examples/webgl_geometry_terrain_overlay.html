@@ -14,13 +14,15 @@
 			#viewport { display: block; width: 100vw; height: 100vh; }
 			#legend { position: absolute; top: 12px; left: 12px; padding: 10px 12px; border-radius: 3px; background: rgba( 0, 0, 0, 0.55 ); color: #fff; font: 12px/1.6 monospace; pointer-events: none; }
 			#legend b { display: block; margin-bottom: 3px; }
+			#legend label { display: block; cursor: pointer; }
+			#legend input { margin: 0 5px 0 0; vertical-align: middle; }
 			#legend i { display: inline-block; width: 14px; height: 4px; margin-right: 6px; vertical-align: middle; }
 		</style>
 	</head>
 	<body>
 		<canvas id="viewport"></canvas>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - GPU terrain vector overlays</div>
-		<div id="legend"><b>Terrain overlays</b><i style="background:#f2bd4a"></i> polygon with hole<br><i style="background:#3cb7ab"></i> solid polygon<br><i style="background:#d8b86a"></i> textured polygon<br><i style="background:#276e8a"></i> 2px route<br><i style="background:#172735"></i> dashed route<br><i style="background:#fff4c1"></i> raycast points</div>
+		<div id="legend"><b>Terrain overlays</b><label><input type="checkbox" data-overlay="hole" checked><i style="background:#f2bd4a"></i> polygon with hole</label><label><input type="checkbox" data-overlay="solid" checked><i style="background:#3cb7ab"></i> solid polygon</label><label><input type="checkbox" data-overlay="texture" checked><i style="background:#d8b86a"></i> textured polygon</label><label><input type="checkbox" data-overlay="routes" checked><i style="background:#276e8a"></i> routes</label><label><input type="checkbox" data-overlay="points" checked><i style="background:#fff4c1"></i> raycast points</label></div>
 		<script type="importmap">{ "imports": { "three": "../build/three.module.js", "three/addons/": "./jsm/" } }</script>
 		<script type="module">
 			import * as THREE from 'three';
@@ -58,12 +60,31 @@
 
 			const terrain = createTerrain();
 			scene.add( terrain );
-			scene.add( createGroundPoints( terrain ) );
+			const groundPoints = createGroundPoints( terrain );
+			scene.add( groundPoints );
 
 			const overlay = new SurfaceOverlayRenderer( renderer, terrain );
 			const parcelTexture = new THREE.TextureLoader().load( parcelTextureUrl );
 			parcelTexture.colorSpace = THREE.SRGBColorSpace;
 			addOverlays( overlay, parcelTexture );
+
+			const overlayGroups = {
+				hole: overlay._entries.slice( 0, 3 ),
+				solid: [ overlay._entries[ 3 ], overlay._entries[ 5 ] ],
+				texture: [ overlay._entries[ 4 ], overlay._entries[ 6 ], overlay._entries[ 7 ] ],
+				routes: overlay._entries.slice( 8 ),
+				points: [ groundPoints ]
+			};
+
+			document.querySelectorAll( '#legend input' ).forEach( input => {
+
+				input.addEventListener( 'change', () => {
+
+					for ( const object of overlayGroups[ input.dataset.overlay ] ) object.visible = input.checked;
+
+				} );
+
+			} );
 
 			window.addEventListener( 'resize', () => {
 
