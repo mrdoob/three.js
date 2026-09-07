@@ -79,8 +79,8 @@
 				timer.connect( document );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
-				camera.position.set( - 11.71, 5.17, - 3.03 );
-				camera.rotation.set( 3.09, - 1.17, 3.09, 'XYZ' );
+				camera.position.set( - 11, 5, - 3 );
+				camera.lookAt( - 2, 5, 1 );
 				camera.layers.enable( 1 );
 
 				scene = new THREE.Scene();
@@ -160,7 +160,7 @@
 				const targetY = modelCenter.y + modelSize.y * 0.2;
 				const lightBaseDistance = Math.max( modelSize.x, modelSize.z );
 
-				dirLight = new THREE.DirectionalLight( 0xb9d6ff, 20.0 );
+				dirLight = new THREE.DirectionalLight( 0xfff2dc, 20.0 );
 				dirLight.target.position.set( modelCenter.x, targetY, modelCenter.z );
 				scene.add( dirLight.target );
 				dirLight.castShadow = true;
@@ -174,6 +174,12 @@
 				dirLight.shadow.camera.far = modelSize.y * 4.0;
 				scene.add( dirLight );
 
+				// A subtle ambient light fills areas that end up too dark.
+				// The respective irradiance is modulated by the AO of the GI pass.
+
+				const ambientLight = new THREE.AmbientLight( 0xffffff, 0.5 );
+				scene.add( ambientLight );
+
 				// The point light updates the GI while the building's voxel data stays cached.
 
 				ballCenter.copy( modelCenter );
@@ -181,9 +187,11 @@
 				ballLight = new THREE.PointLight( 0xff6600, 250 );
 				ballLight.position.copy( ballCenter );
 				ballLight.castShadow = true;
-				ballLight.shadow.mapSize.setScalar( 512 );
+				ballLight.shadow.mapSize.setScalar( 1024 );
 				ballLight.shadow.camera.near = 0.1;
 				ballLight.shadow.camera.far = 50;
+				ballLight.shadow.normalBias = 0.01;
+				ballLight.shadow.radius = 3;
 				scene.add( ballLight );
 
 				const ball = new THREE.Mesh(
@@ -195,7 +203,7 @@
 					} )
 				);
 
-				// Layer 1 is visible to the camera but excluded from the voxel volume's default layer 0.
+				// Layer 1 is visible to the camera but excluded from the voxel volume's default layer 0
 
 				ball.layers.set( 1 );
 				ballLight.add( ball );
@@ -280,11 +288,6 @@
 
 				const gui = renderer.inspector.createParameters( 'VXGI Settings' ).close();
 
-				const ballFolder = gui.addFolder( 'Moving Light' );
-				ballFolder.add( ballMotion, 'animate' ).name( 'Animate' );
-				ballFolder.add( ballMotion, 'speed', 0, 2, 0.01 ).name( 'Speed' );
-				ballFolder.add( ballLight, 'intensity', 0, 1000, 1 ).name( 'Intensity' );
-
 				const effectFolder = gui.addFolder( 'Effect Settings' );
 				effectFolder.add( params, 'output', types ).onChange( updatePostprocessing );
 				effectFolder.add( params, 'debug', debugTypes ).name( 'voxel view' ).onChange( updatePostprocessing );
@@ -310,6 +313,10 @@
 					dirLight.intensity = value;
 
 				} );
+				lightingFolder.add( ambientLight, 'intensity', 0, 1, 0.01 ).name( 'Ambient Intensity' );
+				lightingFolder.add( ballMotion, 'animate' ).name( 'Animate' );
+				lightingFolder.add( ballMotion, 'speed', 0, 2, 0.01 ).name( 'Point Light Speed' );
+				lightingFolder.add( ballLight, 'intensity', 0, 1000, 1 ).name( 'Point Light Intensity' );
 
 				function updatePostprocessing() {
 
