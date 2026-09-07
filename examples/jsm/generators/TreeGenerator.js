@@ -145,7 +145,6 @@ function growBranch( tubes, base, dir, length, baseRadius, level, p, random ) {
 			pos: pos.clone(),
 			tangent: tangent.clone(),
 			normal: normal.clone(),
-			binormal: new Vector3().crossVectors( tangent, normal ),
 			radius
 		} );
 
@@ -230,7 +229,7 @@ function ringAt( rings, t ) {
 	const i = Math.floor( f );
 	const frac = f - i;
 	const a = rings[ i ];
-	const b = rings[ Math.min( i + 1, rings.length - 1 ) ];
+	const b = rings[ i + 1 ];
 
 	return {
 		pos: a.pos.clone().lerp( b.pos, frac ),
@@ -259,6 +258,7 @@ function createGeometry( tubes ) {
 	const positions = new Float32Array( vertexCount * 3 );
 	const normals = new Float32Array( vertexCount * 3 );
 	const indices = new ( vertexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
+	const binormal = new Vector3();
 
 	let vertexOffset = 0;
 	let indexOffset = 0;
@@ -267,7 +267,9 @@ function createGeometry( tubes ) {
 
 		let offset = vertexOffset * 3;
 
-		for ( const { pos, normal, binormal, radius } of rings ) {
+		for ( const { pos, tangent, normal, radius } of rings ) {
+
+			binormal.crossVectors( tangent, normal );
 
 			for ( let j = 0; j < radial; j ++ ) {
 

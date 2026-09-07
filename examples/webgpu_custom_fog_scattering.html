@@ -55,7 +55,7 @@
 
 			init();
 
-			async function init() {
+			function init() {
 
 				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.1, 120 );
 				camera.position.set( 0.4, 1.7, 9 ); // ~human eye height
@@ -84,7 +84,26 @@
 
 				const variants = [];
 
-				const generator = new TreeGenerator( treeMaterial );
+				const generator = new TreeGenerator( treeMaterial )
+					.setTaper( 0.94 )
+					.setTaperCurve( 0.85 )
+					.setLevels( 5 )
+					.setBranchAngle( [ 62, 46, 38, 32 ] )
+					.setAngleVariance( 24 )
+					.setLengthRatio( 0.62 )
+					.setLengthVariance( 0.3 )
+					.setBranchLengthFalloff( 0.45 )
+					.setMinLength( 0.04 )
+					.setDroop( 0.08 )
+					.setUpPull( 0.18 )
+					.setGnarl( [ 0.045, 0.13, 0.2, 0.26, 0.3 ] )
+					.setSectionLength( 0.26 )
+					.setRadialSegments( 7 )
+					.setRadiusExponent( 2 )
+					.setMinRadius( 0.0007 )
+					.setRootFlare( 0.5 )
+					.setFlareFrac( 0.12 )
+					.setChildStart( 0.22 );
 
 				for ( let v = 0; v < 10; v ++ ) {
 
@@ -92,26 +111,7 @@
 						.setSeed( v + 1 )
 						.setTrunkLength( 3.4 + v * 0.16 )
 						.setTrunkRadius( 0.065 + v * 0.004 )
-						.setTaper( 0.94 )
-						.setTaperCurve( 0.85 )
-						.setLevels( 5 )
 						.setChildren( [ 7 + v % 3, 4, 3, 1 ] )
-						.setBranchAngle( [ 62, 46, 38, 32 ] )
-						.setAngleVariance( 24 )
-						.setLengthRatio( 0.62 )
-						.setLengthVariance( 0.3 )
-						.setBranchLengthFalloff( 0.45 )
-						.setMinLength( 0.04 )
-						.setDroop( 0.08 )
-						.setUpPull( 0.18 )
-						.setGnarl( [ 0.045, 0.13, 0.2, 0.26, 0.3 ] )
-						.setSectionLength( 0.26 )
-						.setRadialSegments( 7 )
-						.setRadiusExponent( 2 )
-						.setMinRadius( 0.0007 )
-						.setRootFlare( 0.5 )
-						.setFlareFrac( 0.12 )
-						.setChildStart( 0.22 )
 						.setTrunkClear( 0.38 + ( v % 4 ) * 0.05 )
 						.build();
 
@@ -225,16 +225,7 @@
 				gui.add( scattering, 'value', 0, 5 ).name( 'scattering factor' );
 				gui.add( params, 'scatteringEnabled' ).name( 'enable scattering' ).onChange( ( value ) => {
 			
-					if ( value === true ) {
-
-						renderPipeline.outputNode = compositeNode;
-
-					} else {
-
-						renderPipeline.outputNode = scenePassColor;
-
-					}
-
+					renderPipeline.outputNode = value === true ? compositeNode : scenePassColor;
 					renderPipeline.needsUpdate = true;
 
 				} );
