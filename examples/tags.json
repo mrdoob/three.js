@@ -24,6 +24,7 @@
 	"webgl_geometry_nurbs": [ "curve" ],
 	"webgl_geometry_spline_editor": [ "curve" ],
 	"webgl_geometry_terrain": [ "fog" ],
+	"webgl_geometry_terrain_overlay": [ "terrain", "polygon", "polyline", "texture", "raycast" ],
 	"webgl_geometry_text": [ "font" ],
 	"webgl_geometry_text_shapes": [ "font" ],
 	"webgl_geometry_text_stroke": [ "font" ],
