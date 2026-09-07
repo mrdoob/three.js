@@ -1594,13 +1594,13 @@ class Renderer {
 
 				this._frameBufferTargets.delete( target );
 
-				const quadData = this._quadCache.get( frameBufferTarget.texture );
+				const quadData = this._quadCache.get( frameBufferTarget );
 
 				if ( quadData !== undefined ) {
 
 					quadData.quad.material.dispose();
 
-					this._quadCache.delete( frameBufferTarget.texture );
+					this._quadCache.delete( frameBufferTarget );
 
 				}
 
@@ -1970,7 +1970,7 @@ class Renderer {
 
 		const cacheKey = this._nodes.getOutputCacheKey();
 
-		let quadData = this._quadCache.get( renderTarget.texture );
+		let quadData = this._quadCache.get( renderTarget );
 		let quad;
 
 		if ( quadData === undefined ) {
@@ -1986,7 +1986,7 @@ class Renderer {
 				cacheKey
 			};
 
-			this._quadCache.set( renderTarget.texture, quadData );
+			this._quadCache.set( renderTarget, quadData );
 
 		} else {
 
