@@ -46,6 +46,26 @@ export default QUnit.module( 'Textures', () => {
 
 		} );
 
+		QUnit.test( 'dispose does not dispatch for render target textures', ( assert ) => {
+
+			assert.expect( 1 );
+
+			const object = new Texture();
+			let disposed = false;
+
+			object.isRenderTargetTexture = true;
+			object.addEventListener( 'dispose', () => {
+
+				disposed = true;
+
+			} );
+
+			object.dispose();
+
+			assert.strictEqual( disposed, false, 'Render target textures are disposed by their render target.' );
+
+		} );
+
 	} );
 
 } );

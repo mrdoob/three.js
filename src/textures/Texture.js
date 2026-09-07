@@ -646,6 +646,13 @@ class Texture extends EventDispatcher {
 	 */
 	dispose() {
 
+		if ( this.isRenderTargetTexture === true ) {
+
+			warn( 'Texture: Render target textures should be disposed by their render target.' );
+			return;
+
+		}
+
 		/**
 		 * Fires when the texture has been disposed of.
 		 *
