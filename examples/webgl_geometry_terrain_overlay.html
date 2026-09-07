@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - geometry - terrain overlay</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>body { background-color: #9bc4d0; }</style>
+	</head>
+	<body>
+		<canvas id="viewport"></canvas>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - GPU terrain vector overlays</div>
+		<script type="importmap">{ "imports": { "three": "../build/three.module.js", "three/addons/": "./jsm/" } }</script>
+		<script type="module">
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
+			import { SurfaceOverlayRenderer } from 'three/addons/renderers/SurfaceOverlayRenderer.js';
+			const parcelTextureUrl = './textures/terrain-overlay-parcel.svg';
+
+			const canvas = document.querySelector( '#viewport' );
+			const renderer = new THREE.WebGLRenderer( { canvas, antialias: true } );
+			renderer.setPixelRatio( Math.min( window.devicePixelRatio, 2 ) );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.outputColorSpace = THREE.SRGBColorSpace;
+			renderer.toneMapping = THREE.ACESFilmicToneMapping;
+			renderer.toneMappingExposure = 1.1;
+
+			const scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x9bc4d0 );
+			scene.fog = new THREE.FogExp2( 0x9bc4d0, 0.006 );
+
+			const camera = new THREE.PerspectiveCamera( 42, window.innerWidth / window.innerHeight, 0.1, 800 );
+			camera.position.set( 57, 47, 64 );
+
+			const controls = new OrbitControls( camera, canvas );
+			controls.target.set( 0, 4, 0 );
+			controls.maxPolarAngle = Math.PI * 0.98;
+			controls.minDistance = 24;
+			controls.maxDistance = 150;
+			controls.enableDamping = true;
+
+			scene.add( new THREE.HemisphereLight( 0xd9f2ff, 0x31463a, 2.8 ) );
+			const sun = new THREE.DirectionalLight( 0xffefcf, 3.2 );
+			sun.position.set( - 36, 52, 22 );
+			scene.add( sun );
+
+			const terrain = createTerrain();
+			scene.add( terrain );
+			scene.add( createGroundPoints( terrain ) );
+
+			const overlay = new SurfaceOverlayRenderer( renderer, terrain );
+			const parcelTexture = new THREE.TextureLoader().load( parcelTextureUrl );
+			parcelTexture.colorSpace = THREE.SRGBColorSpace;
+			addOverlays( overlay, parcelTexture );
+
+			window.addEventListener( 'resize', () => {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			} );
+
+			renderer.setAnimationLoop( () => {
+
+				controls.update();
+				overlay.render( scene, camera );
+
+			} );
+
+			function createTerrain() {
+
+				const size = 128;
+				const segments = 256;
+				const geometry = new THREE.PlaneGeometry( size, size, segments, segments );
+				geometry.rotateX( - Math.PI / 2 );
+
+				const noise = new ImprovedNoise();
+				const position = geometry.attributes.position;
+				const color = new THREE.Color();
+
+				for ( let index = 0; index < position.count; index ++ ) {
+
+					const x = position.getX( index );
+					const z = position.getZ( index );
+					const y = terrainHeight( noise, x, z );
+					position.setY( index, y );
+					const normalizedHeight = THREE.MathUtils.clamp( ( y + 9 ) / 29, 0, 1 );
+					color.setHSL( 0.29 - normalizedHeight * 0.06, 0.46, 0.16 + normalizedHeight * 0.24 );
+
+					if ( ! geometry.getAttribute( 'color' ) ) geometry.setAttribute( 'color', new THREE.BufferAttribute( new Float32Array( position.count * 3 ), 3 ) );
+					geometry.attributes.color.setXYZ( index, color.r, color.g, color.b );
+
+				}
+
+				geometry.computeVertexNormals();
+				geometry.computeBoundingBox();
+
+				const mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( {
+					vertexColors: true,
+					roughness: 0.82,
+					metalness: 0,
+					flatShading: false,
+					side: THREE.DoubleSide
+				} ) );
+				return mesh;
+
+			}
+
+			function createGroundPoints( terrain ) {
+
+				const coordinates = [
+					[ - 28, - 13 ], [ - 11, - 25 ], [ 4, - 17 ], [ 17, - 5 ], [ - 3, 25 ]
+				];
+				const raycaster = new THREE.Raycaster();
+				const origin = new THREE.Vector3();
+				const direction = new THREE.Vector3( 0, - 1, 0 );
+				const matrix = new THREE.Matrix4();
+				const normalMatrix = new THREE.Matrix3();
+				const normal = new THREE.Vector3();
+				const markerPosition = new THREE.Vector3();
+				const markerRotation = new THREE.Quaternion();
+				const markerNormal = new THREE.Vector3( 0, 0, 1 );
+				const markerScale = new THREE.Vector3( 1, 1, 1 );
+				const points = new THREE.InstancedMesh(
+					new THREE.CircleGeometry( 0.62, 20 ),
+					new THREE.MeshBasicMaterial( {
+						color: 0xfff4c1,
+						depthTest: true,
+						depthWrite: false,
+						toneMapped: false
+					} ),
+					coordinates.length
+				);
+
+				terrain.updateWorldMatrix( true, false );
+				normalMatrix.getNormalMatrix( terrain.matrixWorld );
+
+				for ( let index = 0; index < coordinates.length; index ++ ) {
+
+					const [ x, z ] = coordinates[ index ];
+					origin.set( x, 160, z );
+					raycaster.set( origin, direction );
+					const hit = raycaster.intersectObject( terrain, false )[ 0 ];
+					if ( hit ) {
+
+						normal.copy( hit.face.normal ).applyMatrix3( normalMatrix ).normalize();
+						markerPosition.copy( hit.point ).addScaledVector( normal, 0.025 );
+						markerRotation.setFromUnitVectors( markerNormal, normal );
+						matrix.compose( markerPosition, markerRotation, markerScale );
+
+					} else {
+
+						matrix.makeTranslation( x, 0, z );
+
+					}
+					points.setMatrixAt( index, matrix );
+
+				}
+
+				points.instanceMatrix.needsUpdate = true;
+				points.computeBoundingSphere();
+				return points;
+
+			}
+
+			function terrainHeight( noise, x, z ) {
+
+				const broad = noise.noise( x * 0.026, z * 0.026, 0.5 ) * 10;
+				const ridges = Math.abs( noise.noise( x * 0.062 + 11, z * 0.062, 3.7 ) ) * 8;
+				const detail = noise.noise( x * 0.16, z * 0.16, 9.1 ) * 1.2;
+				const island = Math.max( 0, 1 - Math.hypot( x, z ) / 92 );
+				return broad * island + ridges * island * island + detail - 7;
+
+			}
+
+			function addOverlays( overlay, parcelTexture ) {
+
+				overlay.addPolygon( [
+					[ - 37, 0, - 22 ], [ - 10, 0, - 38 ], [ 17, 0, - 30 ], [ 28, 0, - 8 ],
+					[ 12, 0, 15 ], [ - 17, 0, 18 ], [ - 34, 0, 2 ]
+				], {
+					color: 0xf2bd4a,
+					opacity: 0.48,
+					holes: [ [ [ - 6, 0, - 17 ], [ 5, 0, - 16 ], [ 8, 0, - 5 ], [ - 4, 0, - 3 ] ] ]
+				} );
+
+				overlay.addPolyline( [
+					[ - 37, 0, - 22 ], [ - 10, 0, - 38 ], [ 17, 0, - 30 ], [ 28, 0, - 8 ],
+					[ 12, 0, 15 ], [ - 17, 0, 18 ], [ - 34, 0, 2 ], [ - 37, 0, - 22 ]
+				], { color: 0xff352b, width: 1, opacity: 1 } );
+
+				overlay.addPolyline( [
+					[ - 6, 0, - 17 ], [ 5, 0, - 16 ], [ 8, 0, - 5 ], [ - 4, 0, - 3 ], [ - 6, 0, - 17 ]
+				], { color: 0xff352b, width: 1, opacity: 1 } );
+
+				// A separate, ordinary polygon makes the hole behavior directly comparable.
+				overlay.addPolygon( [
+					[ - 60, 0, 6 ], [ - 49, 0, 21 ], [ - 36, 0, 14 ], [ - 40, 0, - 2 ], [ - 55, 0, - 8 ]
+				], { color: 0x3cb7ab, opacity: 0.44 } );
+
+				overlay.addPolygon( [
+					[ 28, 0, - 47 ], [ 53, 0, - 42 ], [ 57, 0, - 25 ], [ 40, 0, - 18 ], [ 23, 0, - 32 ]
+				], {
+					color: 0xffffff,
+					opacity: 0.82,
+					map: parcelTexture,
+					holes: [ [ [ 36, 0, - 38 ], [ 46, 0, - 36 ], [ 47, 0, - 29 ], [ 37, 0, - 28 ] ] ]
+				} );
+
+				overlay.addPolyline( [
+					[ - 60, 0, 6 ], [ - 49, 0, 21 ], [ - 36, 0, 14 ], [ - 40, 0, - 2 ], [ - 55, 0, - 8 ], [ - 60, 0, 6 ]
+				], { color: 0x087e76, width: 1, opacity: 1 } );
+
+				overlay.addPolyline( [
+					[ 28, 0, - 47 ], [ 53, 0, - 42 ], [ 57, 0, - 25 ], [ 40, 0, - 18 ], [ 23, 0, - 32 ], [ 28, 0, - 47 ]
+				], { color: 0xfff4c1, width: 1, opacity: 1 } );
+
+				overlay.addPolyline( [
+					[ 36, 0, - 38 ], [ 46, 0, - 36 ], [ 47, 0, - 29 ], [ 37, 0, - 28 ], [ 36, 0, - 38 ]
+				], { color: 0xfff4c1, width: 1, opacity: 1 } );
+
+				overlay.addPolyline( [
+					[ - 52, 0, 35 ], [ - 34, 0, 24 ], [ - 19, 0, 31 ], [ - 3, 0, 20 ],
+					[ 15, 0, 24 ], [ 31, 0, 10 ], [ 48, 0, 17 ]
+				], { color: 0x244312, width: 1, opacity: 1 } );
+
+				overlay.addPolyline( [
+					[ - 45, 0, 50 ], [ - 22, 0, 43 ], [ - 7, 0, 48 ], [ 10, 0, 41 ],
+					[ 29, 0, 46 ], [ 48, 0, 36 ]
+				], { color: 0x276e8a, width: 2, opacity: 1 } );
+
+				overlay.addPolyline( [
+					[ - 48, 0, - 42 ], [ - 24, 0, - 19 ], [ - 2, 0, - 9 ], [ 14, 0, - 3 ],
+					[ 33, 0, - 18 ], [ 52, 0, - 8 ]
+				], { color: 0x172735, width: 1, dashed: true, dashSize: 3.6, gapSize: 2.4, opacity: 1 } );
+
+			}
+
+
+		</script>
+	</body>
+</html>
+
