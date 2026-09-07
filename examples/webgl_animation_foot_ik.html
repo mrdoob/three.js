@@ -33,7 +33,7 @@
 					"three": "../build/three.module.js",
 					"three/addons/": "./jsm/",
 					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.13/build/index.module.js",
-					"three-player-controller/foot-ik": "https://cdn.jsdelivr.net/npm/three-player-controller@0.5.0/dist/foot-ik.mjs"
+					"three-player-controller/foot-ik": "https://cdn.jsdelivr.net/npm/three-player-controller@0.6.2/dist/foot-ik.mjs"
 				}
 			}
 		</script>
@@ -62,7 +62,7 @@
 			const CAPSULE_SEGMENT = COLLIDER_HEIGHT - 2 * CAPSULE_RADIUS;
 			const STEP_SMOOTH_FACTOR = 10;
 			const MIN_FLOOR_NORMAL_Y = Math.cos( 5 * Math.PI / 180 );
-			const LOOK_AT_OFFSET_Y = 0.1;
+			const LOOK_AT_OFFSET_Y = 0.2;
 			const PI90 = Math.PI / 2;
 
 			let camera, scene, renderer, orbitControls, stats, timer;
@@ -71,6 +71,7 @@
 			let playerIsOnGround = false;
 			let groundSnapHeight = 0;
 			let maxGroundDistance = 0;
+			let footIKDebugParams;
 
 			const initialPlayerPosition = new THREE.Vector3( - 7.5, 0, - 3.5 );
 			const playerVelocity = new THREE.Vector3();
@@ -88,13 +89,12 @@
 				current: 'Idle',
 				fadeDuration: 0.25,
 				runVelocity: 2.1,
-				walkVelocity: 0.8,
+				walkVelocity: 0.85,
 				rotateSpeed: 10
 			};
 
 			const playerHost = {
 				scene: null,
-				collider: null,
 				playerCapsule: null,
 				playerModel: null,
 				playerIsOnGround: false,
@@ -108,6 +108,11 @@
 				animation: {
 					clips: [],
 					state: null
+				},
+				getColliderMeshes() {
+
+					return [ collider ];
+
 				}
 			};
 
@@ -190,7 +195,6 @@
 				collider.material.transparent = true;
 				collider.visible = false;
 				scene.add( collider );
-				playerHost.collider = collider;
 
 				createPlayerCapsule();
 				loadSoldier();
@@ -357,25 +361,33 @@
 
 					playerHost.animation.state = actions.Idle;
 
-					footIK = new FootIK( {
-						skeleton: {
-							hips: 'mixamorigHips',
-							legs: {
-								left: {
-									upper: 'mixamorigLeftUpLeg',
-									lower: 'mixamorigLeftLeg',
-									foot: 'mixamorigLeftFoot',
-									toe: 'mixamorigLeftToeBase'
-								},
-								right: {
-									upper: 'mixamorigRightUpLeg',
-									lower: 'mixamorigRightLeg',
-									foot: 'mixamorigRightFoot',
-									toe: 'mixamorigRightToeBase'
-								}
+					const skeleton = {
+						hips: 'mixamorigHips',
+						legs: {
+							left: {
+								upper: 'mixamorigLeftUpLeg',
+								lower: 'mixamorigLeftLeg',
+								foot: 'mixamorigLeftFoot',
+								toe: 'mixamorigLeftToeBase'
+							},
+							right: {
+								upper: 'mixamorigRightUpLeg',
+								lower: 'mixamorigRightLeg',
+								foot: 'mixamorigRightFoot',
+								toe: 'mixamorigRightToeBase'
 							}
-						},
+						}
+					};
+
+					footIK = new FootIK( {
+						skeleton,
+						soleHalfWidth: 7,
+						soleToeExtend: 7,
 						soleSkinThickness: 1.6,
+						plantedHeightSpeed: 200,
+						penetrationLiftSpeed: 200,
+						predictivePlacement: true,
+						maxPredictionClearance: 80,
 					} );
 					footIK.onAttach( playerHost );
 
@@ -389,17 +401,44 @@
 
 				const options = footIK.getOptions();
 				const params = {
-					footIKEnabled: options.enabled,
-					footIKDebug: options.debug,
 					playerDebug: false,
 					colliderDebug: false,
+					footIKEnabled: options.enabled,
+					footIKDebug: options.debug,
+					predictivePlacement: options.predictivePlacement,
+					pelvisOffset: 0,
+					leftFootPhase: '',
+					leftFootLand: '--',
+					leftFootIKWeight: 0,
+					leftPrediction: 'disabled',
+					rightFootPhase: '',
+					rightFootLand: '--',
+					rightFootIKWeight: 0,
+					rightPrediction: 'disabled',
+					maxPelvisRaise: options.maxPelvisRaise,
+					maxPelvisDrop: options.maxPelvisDrop,
+					maxFootRaise: options.maxFootRaise,
+					maxFootDrop: options.maxFootDrop,
+					plantedHeightSpeed: options.plantedHeightSpeed,
+					penetrationLiftSpeed: options.penetrationLiftSpeed,
 					soleHalfWidth: options.soleHalfWidth,
 					soleToeExtend: options.soleToeExtend,
 					soleHeelExtend: options.soleHeelExtend,
-					soleSkinThickness: options.soleSkinThickness
+					soleSkinThickness: options.soleSkinThickness,
+					maxPredictionClearance: options.maxPredictionClearance
 				};
 
-				const gui = new GUI();
+				footIKDebugParams = params;
+
+				const applyFootIKOptions = ( patch ) => {
+
+					footIK.configure( patch );
+
+				};
+
+				footIK.setDebugEnabled( params.footIKDebug && params.footIKEnabled );
+
+				const gui = new GUI( { title: 'Foot IK Controls', width: 320 } );
 
 				const sceneFolder = gui.addFolder( 'Scene' );
 				sceneFolder.add( params, 'playerDebug' ).name( 'Player Capsule' ).onChange( ( value ) => {
@@ -414,51 +453,125 @@
 				} );
 				sceneFolder.close();
 
-				const debugFolder = gui.addFolder( 'Foot IK Debug' );
-				debugFolder.add( params, 'footIKEnabled' ).name( 'Enabled' ).onChange( ( value ) => {
+				const footIKFolder = gui.addFolder( 'Foot IK' );
+				footIKFolder.add( params, 'footIKEnabled' ).name( 'Enabled' ).onChange( ( value ) => {
 
 					footIK.setEnabled( value );
-
-					if ( ! value ) {
-
-						footIK.setDebugEnabled( false );
-
-					} else {
-
-						footIK.setDebugEnabled( params.footIKDebug );
-
-					}
+					footIK.setDebugEnabled( value && params.footIKDebug );
 
 				} );
-				debugFolder.add( params, 'footIKDebug' ).name( 'IK Targets' ).onChange( ( value ) => {
+				footIKFolder.add( params, 'footIKDebug' ).name( 'Debug Markers' ).onChange( ( value ) => {
 
 					footIK.setDebugEnabled( value && params.footIKEnabled );
 
 				} );
-				debugFolder.open();
+				footIKFolder.add( params, 'predictivePlacement' ).name( 'Predictive Placement' ).onChange( ( value ) => {
 
-				const soleFolder = gui.addFolder( 'Sole Layout' );
-				soleFolder.add( params, 'soleHalfWidth', 0, 24, 0.1 ).name( 'Half Width' ).onChange( ( value ) => {
-
-					footIK.configure( { soleHalfWidth: value } );
+					footIK.configure( { predictivePlacement: value } );
 
 				} );
-				soleFolder.add( params, 'soleToeExtend', 0, 24, 0.1 ).name( 'Toe Extend' ).onChange( ( value ) => {
 
-					footIK.configure( { soleToeExtend: value } );
+				const footIKRuntimeFolder = footIKFolder.addFolder( 'Runtime' );
+				footIKRuntimeFolder.add( params, 'pelvisOffset' ).name( 'Pelvis Offset' ).decimals( 2 ).listen().disable();
+				footIKRuntimeFolder.add( params, 'leftFootPhase' ).name( 'Left Phase' ).listen().disable();
+				footIKRuntimeFolder.add( params, 'leftFootLand' ).name( 'Left Land' ).listen().disable();
+				footIKRuntimeFolder.add( params, 'leftFootIKWeight' ).name( 'Left IK Weight' ).decimals( 3 ).listen().disable();
+				footIKRuntimeFolder.add( params, 'leftPrediction' ).name( 'Left Prediction' ).listen().disable();
+				footIKRuntimeFolder.add( params, 'rightFootPhase' ).name( 'Right Phase' ).listen().disable();
+				footIKRuntimeFolder.add( params, 'rightFootLand' ).name( 'Right Land' ).listen().disable();
+				footIKRuntimeFolder.add( params, 'rightFootIKWeight' ).name( 'Right IK Weight' ).decimals( 3 ).listen().disable();
+				footIKRuntimeFolder.add( params, 'rightPrediction' ).name( 'Right Prediction' ).listen().disable();
+				footIKRuntimeFolder.close();
+
+				const pelvisFolder = footIKFolder.addFolder( 'Pelvis' );
+				pelvisFolder.add( params, 'maxPelvisRaise', 0, 60, 1 ).name( 'Max Raise' ).decimals( 0 ).onChange( ( value ) => {
+
+					applyFootIKOptions( { maxPelvisRaise: value } );
 
 				} );
-				soleFolder.add( params, 'soleHeelExtend', 0, 24, 0.1 ).name( 'Heel Extend' ).onChange( ( value ) => {
+				pelvisFolder.add( params, 'maxPelvisDrop', 0, 60, 1 ).name( 'Max Drop' ).decimals( 0 ).onChange( ( value ) => {
 
-					footIK.configure( { soleHeelExtend: value } );
+					applyFootIKOptions( { maxPelvisDrop: value } );
 
 				} );
-				soleFolder.add( params, 'soleSkinThickness', 0, 16, 0.1 ).name( 'Skin Thickness' ).onChange( ( value ) => {
+				pelvisFolder.close();
 
-					footIK.configure( { soleSkinThickness: value } );
+				const footReachFolder = footIKFolder.addFolder( 'Foot Reach' );
+				footReachFolder.add( params, 'maxFootRaise', 0, 60, 1 ).name( 'Max Raise' ).decimals( 0 ).onChange( ( value ) => {
+
+					applyFootIKOptions( { maxFootRaise: value } );
+
+				} );
+				footReachFolder.add( params, 'maxFootDrop', 0, 60, 1 ).name( 'Max Drop' ).decimals( 0 ).onChange( ( value ) => {
+
+					applyFootIKOptions( { maxFootDrop: value } );
+
+				} );
+				footReachFolder.add( params, 'plantedHeightSpeed', 50, 500, 1 ).name( 'Planted Speed' ).decimals( 0 ).onChange( ( value ) => {
+
+					applyFootIKOptions( { plantedHeightSpeed: value } );
+
+				} );
+				footReachFolder.add( params, 'penetrationLiftSpeed', 50, 500, 1 ).name( 'Penetration Speed' ).decimals( 0 ).onChange( ( value ) => {
+
+					applyFootIKOptions( { penetrationLiftSpeed: value } );
+
+				} );
+				footReachFolder.close();
+
+				const soleFolder = footIKFolder.addFolder( 'Sole Layout' );
+				soleFolder.add( params, 'soleHalfWidth', 0, 24, 0.1 ).name( 'Half Width' ).decimals( 1 ).onChange( ( value ) => {
+
+					applyFootIKOptions( { soleHalfWidth: value } );
+
+				} );
+				soleFolder.add( params, 'soleToeExtend', 0, 24, 0.1 ).name( 'Toe Extend' ).decimals( 1 ).onChange( ( value ) => {
+
+					applyFootIKOptions( { soleToeExtend: value } );
+
+				} );
+				soleFolder.add( params, 'soleHeelExtend', 0, 24, 0.1 ).name( 'Heel Extend' ).decimals( 1 ).onChange( ( value ) => {
+
+					applyFootIKOptions( { soleHeelExtend: value } );
+
+				} );
+				soleFolder.add( params, 'soleSkinThickness', 0, 16, 0.1 ).name( 'Skin Thickness' ).decimals( 1 ).onChange( ( value ) => {
+
+					applyFootIKOptions( { soleSkinThickness: value } );
 
 				} );
 				soleFolder.close();
+
+				const predictionFolder = footIKFolder.addFolder( 'Prediction' );
+				predictionFolder.add( params, 'maxPredictionClearance', 0, 100, 1 ).name( 'Max Clearance' ).decimals( 0 ).onChange( ( value ) => {
+
+					applyFootIKOptions( { maxPredictionClearance: value } );
+
+				} );
+				predictionFolder.close();
+				footIKFolder.open();
+
+			}
+
+			function updateFootIKDebugPanel() {
+
+				if ( ! footIK ) return;
+
+				footIKDebugParams.pelvisOffset = footIK.getPelvisOffset();
+				footIKDebugParams.leftFootPhase = footIK.getFootPhaseDebugText( 'left' );
+				footIKDebugParams.leftFootLand = formatFootLandTime( footIK.getFootTimeToLand( 'left' ) );
+				footIKDebugParams.leftFootIKWeight = footIK.getFootIKWeight( 'left' );
+				footIKDebugParams.leftPrediction = footIK.getPredictiveFootDebugText( 'left' );
+				footIKDebugParams.rightFootPhase = footIK.getFootPhaseDebugText( 'right' );
+				footIKDebugParams.rightFootLand = formatFootLandTime( footIK.getFootTimeToLand( 'right' ) );
+				footIKDebugParams.rightFootIKWeight = footIK.getFootIKWeight( 'right' );
+				footIKDebugParams.rightPrediction = footIK.getPredictiveFootDebugText( 'right' );
+
+			}
+
+			function formatFootLandTime( value ) {
+
+				return Number.isFinite( value ) ? `${ value.toFixed( 2 ) }s` : '--';
 
 			}
 
@@ -470,7 +583,7 @@
 				const active = key[ 0 ] !== 0 || key[ 1 ] !== 0;
 				const play = active ? ( key[ 2 ] ? 'Run' : 'Walk' ) : 'Idle';
 
-				if ( ! actions || moveControls.current === play ) return;
+				if ( moveControls.current === play ) return;
 
 				const current = actions[ play ];
 				const old = actions[ moveControls.current ];
@@ -499,7 +612,7 @@
 				groundRaycaster.ray.origin.copy( player.position );
 				groundRaycaster.far = maxGroundDistance + 5;
 
-				const hits = collider ? groundRaycaster.intersectObject( collider, false ) : [];
+				const hits = groundRaycaster.intersectObject( collider, false );
 				const bestHit = hits[ 0 ];
 
 				if ( bestHit ) {
@@ -887,7 +1000,7 @@
 				timer.update();
 				const delta = Math.min( timer.getDelta(), 0.1 );
 
-				if ( mixer && footIK && collider ) {
+				if ( footIK ) {
 
 					updateAnimation();
 
@@ -906,6 +1019,8 @@
 					footIK.onAfterAnimationUpdate( delta );
 
 				}
+
+				updateFootIKDebugPanel();
 
 				orbitControls.update();
 				renderer.render( scene, camera );
