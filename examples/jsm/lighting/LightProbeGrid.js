@@ -6,6 +6,7 @@ import {
 	HalfFloatType,
 	Light,
 	LinearFilter,
+	MathUtils,
 	NearestFilter,
 	NodeMaterial,
 	QuadMesh,
@@ -428,9 +429,10 @@ class LightProbeGrid extends Light {
 	 * indirect light, accumulating one bounce per extra pass.
 	 *
 	 * Use `start` and `count` to bake a range and publish its cells immediately.
-	 * Indices advance along X, then Y, then Z. For incremental indirect bounces,
-	 * finish the whole grid for `pass: 0`, then repeat with `pass: 1`, etc. Start
-	 * each pass at index 0 to snapshot the previous pass before updating its cells.
+	 * Indices advance along X, then Z, then Y, filling horizontal layers from bottom
+	 * to top. For incremental indirect bounces, finish the whole grid for `pass: 0`,
+	 * then repeat with `pass: 1`, etc. Start each pass at index 0 to snapshot the
+	 * previous pass before updating its cells.
 	 *
 	 * @param {WebGPURenderer} renderer - The renderer.
 	 * @param {Scene} scene - The scene to render.
@@ -647,16 +649,16 @@ class LightProbeGrid extends Light {
 	 */
 	_captureProbes( renderer, scene, start, end ) {
 
-		const { x: nx, y: ny } = this.resolution;
-		const probesPerSlice = nx * ny;
+		const { x: nx, y: ny, z: nz } = this.resolution;
+		const probesPerLayer = nx * nz;
 
 		_quad.material = _shMaterial;
 
 		for ( let probeIndex = start; probeIndex < end; probeIndex ++ ) {
 
 			const ix = probeIndex % nx;
-			const iy = Math.floor( probeIndex / nx ) % ny;
-			const iz = Math.floor( probeIndex / probesPerSlice );
+			const iy = Math.floor( probeIndex / probesPerLayer );
+			const iz = Math.floor( probeIndex / nx ) % nz;
 
 			this.getProbePosition( ix, iy, iz, _position );
 			_cubeCamera.position.copy( _position );
@@ -665,9 +667,11 @@ class LightProbeGrid extends Light {
 			renderer.autoClear = true;
 			_cubeCamera.update( renderer, scene );
 
-			// Write only this probe's row, preserving the others.
+			// Keep batch rows in texture order (X, Y, Z).
+			const batchRow = ix + iy * nx + iz * nx * ny;
+
 			renderer.autoClear = false;
-			_batchTarget.viewport.set( 0, probeIndex, 9, 1 );
+			_batchTarget.viewport.set( 0, batchRow, 9, 1 );
 			renderer.setRenderTarget( _batchTarget );
 			_quad.render( renderer );
 
@@ -686,54 +690,63 @@ class LightProbeGrid extends Light {
 	_repackProbes( renderer, start, end ) {
 
 		const { x: nx, y: ny, z: nz } = this.resolution;
-		const probesPerSlice = nx * ny;
+		const probesPerLayer = nx * nz;
+		const startY = Math.floor( start / probesPerLayer );
+		const endY = Math.floor( end / probesPerLayer );
 		const paddedSlices = nz + 2 * ATLAS_PADDING;
 		const renderTarget = this._renderTarget;
 
-		for ( let probeIndex = start; probeIndex < end; ) {
+		// Map the horizontal bake range to contiguous rows in each Z slice.
+		for ( let iz = 0; iz < nz; iz ++ ) {
 
-			const ix = probeIndex % nx;
-			const iy = Math.floor( probeIndex / nx ) % ny;
-			const iz = Math.floor( probeIndex / probesPerSlice );
+			const sliceStart = startY * nx + MathUtils.clamp( start % probesPerLayer - iz * nx, 0, nx );
+			const sliceEnd = endY * nx + MathUtils.clamp( end % probesPerLayer - iz * nx, 0, nx );
 
-			// Coalesce complete rows within a slice into one rectangle.
-			const width = Math.min( nx - ix, end - probeIndex );
-			let height = 1;
+			for ( let probeIndex = sliceStart; probeIndex < sliceEnd; ) {
 
-			if ( width === nx ) {
+				const ix = probeIndex % nx;
+				const iy = Math.floor( probeIndex / nx );
 
-				height = Math.min( ny - iy, Math.floor( ( end - probeIndex ) / nx ) );
+				// Coalesce complete rows within a slice into one rectangle.
+				const width = Math.min( nx - ix, sliceEnd - probeIndex );
+				let height = 1;
 
-			}
+				if ( width === nx ) {
 
-			renderTarget.viewport.set( ix, iy, width, height );
-			_sliceZUniform.value = iz;
-
-			for ( let t = 0; t < 7; t ++ ) {
-
-				_quad.material = _repackMaterials[ t ];
-				const base = t * paddedSlices;
-
-				renderer.setRenderTarget( renderTarget, base + ATLAS_PADDING + iz );
-				_quad.render( renderer );
-
-				if ( iz === 0 ) {
-
-					renderer.setRenderTarget( renderTarget, base );
-					_quad.render( renderer );
+					height = Math.min( ny - iy, Math.floor( ( sliceEnd - probeIndex ) / nx ) );
 
 				}
 
-				if ( iz === nz - 1 ) {
+				renderTarget.viewport.set( ix, iy, width, height );
+				_sliceZUniform.value = iz;
 
-					renderer.setRenderTarget( renderTarget, base + ATLAS_PADDING + nz );
+				for ( let t = 0; t < 7; t ++ ) {
+
+					_quad.material = _repackMaterials[ t ];
+					const base = t * paddedSlices;
+
+					renderer.setRenderTarget( renderTarget, base + ATLAS_PADDING + iz );
 					_quad.render( renderer );
+
+					if ( iz === 0 ) {
+
+						renderer.setRenderTarget( renderTarget, base );
+						_quad.render( renderer );
+
+					}
+
+					if ( iz === nz - 1 ) {
+
+						renderer.setRenderTarget( renderTarget, base + ATLAS_PADDING + nz );
+						_quad.render( renderer );
+
+					}
 
 				}
 
-			}
+				probeIndex += width * height;
 
-			probeIndex += width * height;
+			}
 
 		}
 
