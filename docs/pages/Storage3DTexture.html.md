@@ -66,6 +66,18 @@ This defines how the texture is wrapped in the depth direction and corresponds t
 
 ## Methods
 
+### .copy( source : Storage3DTexture ) : Storage3DTexture
+
+Copies the values of the given texture to this instance.
+
+**source**
+
+The texture to copy.
+
+**Overrides:** [Texture#copy](Texture.html#copy)
+
+**Returns:** A reference to this instance.
+
 ### .setSize( width : number, height : number, depth : number )
 
 Sets the size of the storage 3d texture.

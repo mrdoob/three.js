@@ -6,7 +6,7 @@ It visualizes the current selection box with a `div` container element.
 
 ## Import
 
-SelectionHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+SelectionHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { SelectionHelper } from 'three/addons/interactive/SelectionHelper.js';

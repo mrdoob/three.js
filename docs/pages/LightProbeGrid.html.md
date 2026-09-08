@@ -1,31 +1,16 @@
+*Inheritance: EventDispatcher → Object3D → Light →*
+
 # LightProbeGrid
 
 A 3D grid of L2 Spherical Harmonic irradiance probes that provides position-dependent diffuse global illumination.
 
-Note that this class can only be used with [WebGLRenderer](WebGLRenderer.html). A version for [WebGPURenderer](WebGPURenderer.html) will be added at a later point.
+This is the [WebGPURenderer](WebGPURenderer.html) version of `LightProbeGrid`. The grid is a [Light](Light.html), so adding it to the scene applies its baked irradiance to every lit node material automatically. When using [WebGLRenderer](WebGLRenderer.html), import the grid from `LightProbeGridWebGL.js` instead.
 
-All seven packed SH sub-volumes are stored in a **single** RGBA `WebGL3DRenderTarget` using a texture-atlas layout along the Z axis. Each sub-volume occupies `( nz + 2 )` atlas slices: one padding slice at each end (a copy of the nearest edge data slice) to prevent color bleeding when the hardware trilinear filter reads across a sub-volume boundary.
-
-Atlas layout (nz = resolution.z, PADDING = 1):
-
-Total atlas depth = `7 * ( nz + 2 )`.
-
-Baking is fully GPU-resident: cubemap rendering, SH projection, and texture packing all happen on the GPU with zero CPU readback.
-
-## Code Example
-
-```js
-slice   0              : padding  (copy of sub-volume 0, data slice 0)
-  slices  1 … nz         : sub-volume 0 data
-  slice   nz + 1         : padding  (copy of sub-volume 0, data slice nz-1)
-  slice   nz + 2         : padding  (copy of sub-volume 1, data slice 0)
-  slices  nz+3 … 2*nz+2  : sub-volume 1 data
-  …
-```
+The baked data is stored in a single RGBA `RenderTarget3D` atlas that packs the nine L2 SH coefficients into seven sub-volumes stacked along Z. Baking is fully GPU-resident: cubemap rendering, SH projection, and texture packing all happen on the GPU with zero CPU readback.
 
 ## Import
 
-LightProbeGrid is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+LightProbeGrid is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
@@ -79,6 +64,12 @@ The world-space bounding box for the grid. Updated automatically by [LightProbeG
 
 The full depth of the volume along Z.
 
+### .falloff : number
+
+Distance in world units over which the grid contribution fades out past the volume boundary. `0` applies the contribution everywhere (clamped), which matches a single-volume setup. Use a small positive value to blend multiple overlapping grids.
+
+Default is `0`.
+
 ### .height : number
 
 The full height of the volume along Y.
@@ -95,7 +86,7 @@ The number of probes along each axis.
 
 ### .texture : Data3DTexture
 
-The single RGBA atlas 3D texture storing all seven packed SH sub-volumes.
+The single RGBA atlas 3D texture storing all seven packed SH sub-volumes stacked along Z.
 
 Default is `null`.
 
@@ -105,9 +96,13 @@ The full width of the volume along X.
 
 ## Methods
 
-### .bake( renderer : WebGLRenderer, scene : Scene, options : Object )
+### .bake( renderer : WebGPURenderer, scene : Scene, options : Object )
 
-Bakes all probes by rendering cubemaps at each probe position and projecting to L2 SH. Optionally iterates additional passes to capture indirect bounces — each extra pass samples the previous pass's atlas as indirect light, so a grid added to the scene before baking accumulates one bounce per extra pass.
+Bakes probes by rendering cubemaps at each probe position and projecting to L2 SH. Optionally iterates additional passes to capture indirect bounces: each extra pass samples the previous pass's data as indirect light, accumulating one bounce per extra pass.
+
+Use `start` and `count` to bake a range and publish its cells immediately. Indices advance along X, then Z, then Y, filling horizontal layers from bottom to top. For incremental indirect bounces, finish the whole grid for `pass: 0`, then repeat with `pass: 1`, etc. Start each pass at index 0 to snapshot the previous pass before updating its cells.
+
+Shadow-casting instances of `SunLight` are temporarily replaced with equivalent directional lights, since their view-fitted shadow cascades cannot be frozen across probe renders.
 
 **renderer**
 
@@ -141,13 +136,37 @@ Default is `100`.
 
 **bounces**
 
-Additional bounce passes after the initial direct pass.
+Additional bounce passes. Only available when baking the whole grid.
+
+Default is `0`.
+
+**sampleCount**
+
+Directions integrated when projecting each cubemap to SH.
+
+Default is `512`.
+
+**start**
+
+Index of the first probe to bake.
+
+Default is `0`.
+
+**count**
+
+Number of probes to bake. Defaults to the remaining probes.
+
+**pass**
+
+Starting pass. Zero captures direct light; later passes sample the previous pass. Ranged calls require `bounces: 0`.
 
 Default is `0`.
 
 ### .dispose()
 
 Frees GPU resources.
+
+**Overrides:** [Light#dispose](Light.html#dispose)
 
 ### .getProbePosition( ix : number, iy : number, iz : number, target : Vector3 ) : Vector3
 

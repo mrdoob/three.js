@@ -1,29 +1,29 @@
 *Inheritance: EventDispatcher → Object3D → Mesh → InstancedMesh →*
 
-# LightProbeGridHelper
+# LightProbeGridHelperWebGL
 
-Visualizes an [LightProbeGrid](LightProbeGrid.html) by rendering a sphere at each probe position, shaded with the probe's L2 spherical harmonics.
+Visualizes an [LightProbeGridWebGL](LightProbeGridWebGL.html) by rendering a sphere at each probe position, shaded with the probe's L2 spherical harmonics.
 
 Uses a single `InstancedMesh` draw call for all probes.
 
 ## Code Example
 
 ```js
-const helper = new LightProbeGridHelper( probes );
+const helper = new LightProbeGridHelperWebGL( probes );
 scene.add( helper );
 ```
 
 ## Import
 
-LightProbeGridHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+LightProbeGridHelperWebGL is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
-import { LightProbeGridHelper } from 'three/addons/helpers/LightProbeGridHelper.js';
+import { LightProbeGridHelperWebGL } from 'three/addons/helpers/LightProbeGridHelperWebGL.js';
 ```
 
 ## Constructor
 
-### new LightProbeGridHelper( probes : LightProbeGrid, sphereSize : number )
+### new LightProbeGridHelperWebGL( probes : LightProbeGridWebGL, sphereSize : number )
 
 Constructs a new irradiance probe grid helper.
 
@@ -39,7 +39,7 @@ Default is `0.12`.
 
 ## Properties
 
-### .probes : LightProbeGrid
+### .probes : LightProbeGridWebGL
 
 The probe grid to visualize.
 
@@ -57,4 +57,4 @@ Rebuilds instance matrices and UVW attributes from the current probe grid. Call 
 
 ## Source
 
-[examples/jsm/helpers/LightProbeGridHelper.js](https://github.com/mrdoob/three.js/blob/master/examples/jsm/helpers/LightProbeGridHelper.js)
+[examples/jsm/helpers/LightProbeGridHelperWebGL.js](https://github.com/mrdoob/three.js/blob/master/examples/jsm/helpers/LightProbeGridHelperWebGL.js)

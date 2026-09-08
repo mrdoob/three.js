@@ -606,7 +606,7 @@ texture as well as the cube face count of cube textures.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The name of the dimension variable.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="generateTextureGather" translate="no">.<a href="#generateTextureGather">generateTextureGather</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, gatherSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span>, flipYSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="generateTextureGather" translate="no">.<a href="#generateTextureGather">generateTextureGather</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, gatherSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Generates the WGSL snippet for gathering four texels from the given texture.</p>
@@ -661,21 +661,13 @@ texture as well as the cube face count of cube textures.</p>
 										<p>A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
 									</td>
 								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">flipYSnippet</strong>
-									</td>
-									<td class="description last">
-										<p>A WGSL snippet that represents the y-flip. Only used for WebGL.</p>
-									</td>
-								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="generateTextureGatherCompare" translate="no">.<a href="#generateTextureGatherCompare">generateTextureGatherCompare</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, compareSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span>, flipYSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="generateTextureGatherCompare" translate="no">.<a href="#generateTextureGatherCompare">generateTextureGatherCompare</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, compareSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Generates the WGSL snippet for performing a depth comparison on four texels in the given depth texture.</p>
@@ -728,14 +720,6 @@ texture as well as the cube face count of cube textures.</p>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">flipYSnippet</strong>
-									</td>
-									<td class="description last">
-										<p>A WGSL snippet that represents the y-flip. Only used for WebGL.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -814,7 +798,7 @@ texture as well as the cube face count of cube textures.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="generateTextureLevel" translate="no">.<a href="#generateTextureLevel">generateTextureLevel</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span>, shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="generateTextureLevel" translate="no">.<a href="#generateTextureLevel">generateTextureLevel</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Generates the WGSL snippet when sampling textures with explicit mip level.</p>
@@ -867,15 +851,6 @@ texture as well as the cube face count of cube textures.</p>
 									</td>
 									<td class="description last">
 										<p>A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">shaderStage</strong>
-									</td>
-									<td class="description last">
-										<p>The shader stage this code snippet is generated for.</p>
-										<p>Default is <code>this.shaderStage</code>.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -1006,6 +981,46 @@ Since it's a lookup, no sampling or filtering is applied.</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#generateTextureLod">NodeBuilder#generateTextureLod</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generateTextureSize" translate="no">.<a href="#generateTextureSize">generateTextureSize</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the WGSL snippet that resolves the dimensions of the given texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the texture uniform in the shader.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">levelSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents the mip level.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#generateTextureSize">NodeBuilder#generateTextureSize</a></dt>
 						</dl>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet.</dt>
@@ -1241,7 +1256,7 @@ defined in the WGSL source.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Null.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getFloatPackingMethod" translate="no">.<a href="#getFloatPackingMethod">getFloatPackingMethod</a><span class="signature">( encoding : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getFloatPackingMethod" translate="no">.<a href="#getFloatPackingMethod">getFloatPackingMethod</a><span class="signature">( encoding : <span class="param-type">string</span>, layout : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the float packing method name for a given numeric encoding.</p>
@@ -1256,13 +1271,22 @@ defined in the WGSL source.</p>
 										<p>The numeric encoding that describes how the float values are mapped to the integer range.</p>
 									</td>
 								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">layout</strong>
+									</td>
+									<td class="description last">
+										<p>The component layout of the packed integer.</p>
+										<p>Default is <code>'2x16'</code>.</p>
+									</td>
+								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The resolve WGSL float packing method name.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getFloatUnpackingMethod" translate="no">.<a href="#getFloatUnpackingMethod">getFloatUnpackingMethod</a><span class="signature">( encoding : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getFloatUnpackingMethod" translate="no">.<a href="#getFloatUnpackingMethod">getFloatUnpackingMethod</a><span class="signature">( encoding : <span class="param-type">string</span>, layout : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the float unpacking method name for a given numeric encoding.</p>
@@ -1275,6 +1299,15 @@ defined in the WGSL source.</p>
 									</td>
 									<td class="description last">
 										<p>The numeric encoding that describes how the integer values are mapped to the float range.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">layout</strong>
+									</td>
+									<td class="description last">
+										<p>The component layout of the packed integer.</p>
+										<p>Default is <code>'2x16'</code>.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -1478,7 +1511,7 @@ or the linearized index of an compute invocation within a grid of workgroups.</p
 							<dt class="tag-returns"><strong>Returns:</strong> The property name.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getScopedArray" translate="no">.<a href="#getScopedArray">getScopedArray</a><span class="signature">( name : <span class="param-type">string</span>, scope : <span class="param-type">string</span>, bufferType : <span class="param-type">string</span>, bufferCount : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getScopedArray" translate="no">.<a href="#getScopedArray">getScopedArray</a><span class="signature">( name : <span class="param-type">string</span>, scope : <span class="param-type">string</span>, bufferType : <span class="param-type">string</span>, bufferCount : <span class="param-type">string</span>, isAtomic : <span class="param-type">boolean</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method should be used when a new scoped buffer is used in context of
@@ -1517,6 +1550,14 @@ later used to generate the respective WGSL.</p>
 									</td>
 									<td class="description last">
 										<p>The buffer count.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">isAtomic</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the array elements are atomic or not.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -1950,6 +1991,30 @@ and layouts.</p>
 						</dl>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> Returns always <code>false</code> in context of WGSL.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="isReservedKeyword" translate="no">.<a href="#isReservedKeyword">isReservedKeyword</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns whether the given name is a reserved keyword of WGSL.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">name</strong>
+									</td>
+									<td class="description last">
+										<p>The name to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#isReservedKeyword">NodeBuilder#isReservedKeyword</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the name is a reserved keyword or not.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="isSampleCompare" translate="no">.<a href="#isSampleCompare">isSampleCompare</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span><span class="type-signature"> : boolean</span> </h3>

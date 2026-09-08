@@ -15,7 +15,7 @@ const texture = await loader.loadAsync( 'textures/memorial.exr' );
 
 ## Import
 
-EXRLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+EXRLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';

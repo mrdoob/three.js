@@ -6,7 +6,7 @@ This class is an alternative implementation of [FlyControls](FlyControls.html).
 
 ## Import
 
-FirstPersonControls is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+FirstPersonControls is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';

@@ -54,7 +54,7 @@ The name of the uniform group node.
 
 ### .order : number
 
-Influences the internal sorting. TODO: Add details when this property should be changed.
+The sort key that determines the order of this group relative to other uniform groups. Groups with a lower order are placed first. Shared groups typically use a lower order so they precede regular per-object groups.
 
 Default is `1`.
 

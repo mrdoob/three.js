@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>LightProbeGridHelper - Three.js Docs</title>
+	<title>LightProbeGridHelperWebGL - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<script src="../scripts/highlight.min.js"></script>
 	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
@@ -10,24 +10,24 @@
 </head>
 <body>
 		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Mesh.html">Mesh</a> → <a href="InstancedMesh.html">InstancedMesh</a> → </p>
-	<h1 translate="no">LightProbeGridHelper</h1>
+	<h1 translate="no">LightProbeGridHelperWebGL</h1>
 		<section>
 			<header>
-				<div class="class-description"><p>Visualizes an <a href="LightProbeGrid.html">LightProbeGrid</a> by rendering a sphere at each
+				<div class="class-description"><p>Visualizes an <a href="LightProbeGridWebGL.html">LightProbeGridWebGL</a> by rendering a sphere at each
 probe position, shaded with the probe's L2 spherical harmonics.</p>
 <p>Uses a single <code>InstancedMesh</code> draw call for all probes.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre><code class="language-js">const helper = new LightProbeGridHelper( probes );
+				<div translate="no"><pre><code class="language-js">const helper = new LightProbeGridHelperWebGL( probes );
 scene.add( helper );
 </code></pre></div>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">LightProbeGridHelper</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
-				<pre><code class="language-js">import { LightProbeGridHelper } from 'three/addons/helpers/LightProbeGridHelper.js';</code></pre>
+				<p><span translate="no">LightProbeGridHelperWebGL</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { LightProbeGridHelperWebGL } from 'three/addons/helpers/LightProbeGridHelperWebGL.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="LightProbeGridHelper" translate="no">new <a href="#LightProbeGridHelper">LightProbeGridHelper</a><span class="signature">( probes : <span class="param-type"><a href="LightProbeGrid.html">LightProbeGrid</a></span>, sphereSize : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="LightProbeGridHelperWebGL" translate="no">new <a href="#LightProbeGridHelperWebGL">LightProbeGridHelperWebGL</a><span class="signature">( probes : <span class="param-type"><a href="LightProbeGridWebGL.html">LightProbeGridWebGL</a></span>, sphereSize : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new irradiance probe grid helper.</p>
@@ -57,7 +57,7 @@ scene.add( helper );
 				</div>
 				<h2 class="subsection-title">Properties</h2>
 				<div class="member">
-					<h3 class="name" id="probes" translate="no">.<a href="#probes">probes</a><span class="type-signature"> : <a href="LightProbeGrid.html">LightProbeGrid</a></span> </h3>
+					<h3 class="name" id="probes" translate="no">.<a href="#probes">probes</a><span class="type-signature"> : <a href="LightProbeGridWebGL.html">LightProbeGridWebGL</a></span> </h3>
 					<div class="description">
 						<p>The probe grid to visualize.</p>
 					</div>
@@ -82,7 +82,7 @@ Call this after changing <code>probes</code> or after re-baking.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/helpers/LightProbeGridHelper.js" translate="no" target="_blank" rel="noopener">examples/jsm/helpers/LightProbeGridHelper.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/helpers/LightProbeGridHelperWebGL.js" translate="no" target="_blank" rel="noopener">examples/jsm/helpers/LightProbeGridHelperWebGL.js</a>
 				</p>
 			</article>
 		</section>

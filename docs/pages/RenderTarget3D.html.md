@@ -40,12 +40,6 @@ This flag can be used for type testing.
 
 Default is `true`.
 
-### .texture : Data3DTexture
-
-Overwritten with a different texture type.
-
-**Overrides:** [RenderTarget#texture](RenderTarget.html#texture)
-
 ## Source
 
 [src/core/RenderTarget3D.js](https://github.com/mrdoob/three.js/blob/master/src/core/RenderTarget3D.js)

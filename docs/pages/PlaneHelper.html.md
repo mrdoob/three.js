@@ -52,6 +52,8 @@ Default is `1`.
 
 Updates the helper to match the position and direction of the light being visualized.
 
+**Overrides:** [Line#dispose](Line.html#dispose)
+
 ## Source
 
 [src/helpers/PlaneHelper.js](https://github.com/mrdoob/three.js/blob/master/src/helpers/PlaneHelper.js)

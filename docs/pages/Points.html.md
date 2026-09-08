@@ -50,6 +50,18 @@ Default is `undefined`.
 
 ## Methods
 
+### .intersectsFrustum( frustum : Frustum | FrustumArray ) : boolean
+
+Returns `true` if this point cloud intersects the given frustum.
+
+**frustum**
+
+The frustum to test.
+
+**Overrides:** [Object3D#intersectsFrustum](Object3D.html#intersectsFrustum)
+
+**Returns:** Whether this point cloud intersects the given frustum or not.
+
 ### .raycast( raycaster : Raycaster, intersects : Array.<Object> )
 
 Computes intersection points between a casted ray and this point cloud.

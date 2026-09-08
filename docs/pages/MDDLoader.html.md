@@ -32,7 +32,7 @@ mixer.clipAction( clip ).play();
 
 ## Import
 
-MDDLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+MDDLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { MDDLoader } from 'three/addons/loaders/MDDLoader.js';

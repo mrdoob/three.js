@@ -6,7 +6,7 @@ Helper class to manage and display debug visuals for TileShadowNode.
 
 ## Import
 
-TileShadowNodeHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+TileShadowNodeHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { TileShadowNodeHelper } from 'three/addons/tsl/shadows/TileShadowNodeHelper.js';
@@ -25,6 +25,8 @@ The TileShadowNode instance to debug.
 ### .dispose()
 
 Removes all debug objects (planes and helpers) from the scene.
+
+**Overrides:** [Group#dispose](Group.html#dispose)
 
 ### .init()
 

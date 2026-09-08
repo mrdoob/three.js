@@ -28,7 +28,7 @@ Default is `true`.
 
 ### .direct( lightData : Object )
 
-Implements the direct lighting. The specular portion is optional an can be controlled with the [PhongLightingModel#specular](PhongLightingModel.html#specular) flag.
+Implements the direct lighting. The specular portion is optional and can be controlled with the [PhongLightingModel#specular](PhongLightingModel.html#specular) flag.
 
 **lightData**
 

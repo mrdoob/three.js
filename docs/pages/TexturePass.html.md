@@ -15,7 +15,7 @@ composer.addPass( texturePass );
 
 ## Import
 
-TexturePass is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+TexturePass is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { TexturePass } from 'three/addons/postprocessing/TexturePass.js';

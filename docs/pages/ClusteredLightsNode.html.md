@@ -6,7 +6,7 @@ A custom version of `LightsNode` implementing Forward+ clustered shading: the vi
 
 ## Import
 
-ClusteredLightsNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+ClusteredLightsNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { clusteredLights } from 'three/addons/tsl/lighting/ClusteredLightsNode.js';
@@ -41,6 +41,14 @@ Default is `24`.
 Per-cluster light-list capacity.
 
 Default is `64`.
+
+## Methods
+
+### .dispose()
+
+Frees the GPU resources allocated by this node.
+
+**Overrides:** [LightsNode#dispose](LightsNode.html#dispose)
 
 ## Source
 
