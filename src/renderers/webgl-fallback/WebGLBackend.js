@@ -826,6 +826,7 @@ class WebGLBackend extends Backend {
 			if ( descriptor.textures === null ) {
 
 				gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearColor.a );
+				if ( depth ) gl.clearDepth( clearDepth );
 				gl.clear( clear );
 
 			} else {
