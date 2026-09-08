@@ -6,8 +6,11 @@ import TurndownService from 'turndown';
 const packageJson = JSON.parse( fs.readFileSync( 'package.json', 'utf8' ) );
 const version = packageJson.version;
 
-// Read TSL specification
-const tslSpec = fs.readFileSync( 'tsl/content/Guide.md', 'utf8' );
+// Read the TSL guide; its <page> markers split it into site pages, the flat text uses headings instead.
+const tslSpec = fs.readFileSync( 'tsl/content/Guide.md', 'utf8' )
+	.replace( /^<page name="([^"]*)">$/gm, '## $1' )
+	.replace( /^<\/page>\n?/gm, '' )
+	.replace( /\n{3,}/g, '\n\n' );
 
 // Setup Turndown for HTML to Markdown conversion
 const turndown = new TurndownService( {
