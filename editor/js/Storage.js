@@ -50,8 +50,23 @@ function Storage() {
 
 		get: function ( callback ) {
 
+			const start = performance.now();
+
 			const transaction = database.transaction( [ 'states' ], 'readonly' );
 			const objectStore = transaction.objectStore( 'states' );
+
+			transaction.oncomplete = function () {
+
+				console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Retrieved state from IndexedDB. ' + ( performance.now() - start ).toFixed( 2 ) + 'ms' );
+
+			};
+
+			transaction.onerror = function ( event ) {
+
+		        console.error( 'IndexedDB get failed:', event.target.error );
+
+    		};
+
 			const request = objectStore.get( 0 );
 			request.onsuccess = function ( event ) {
 
@@ -67,12 +82,20 @@ function Storage() {
 
 			const transaction = database.transaction( [ 'states' ], 'readwrite' );
 			const objectStore = transaction.objectStore( 'states' );
-			const request = objectStore.put( data, 0 );
-			request.onsuccess = function () {
+
+			transaction.oncomplete = function () {
 
 				console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Saved state to IndexedDB. ' + ( performance.now() - start ).toFixed( 2 ) + 'ms' );
 
 			};
+
+			transaction.onerror = function ( event ) {
+
+				console.error( 'IndexedDB put failed:', event.target.error );
+
+			};
+
+			objectStore.put( data, 0 );
 
 		},
 
@@ -82,12 +105,20 @@ function Storage() {
 
 			const transaction = database.transaction( [ 'states' ], 'readwrite' );
 			const objectStore = transaction.objectStore( 'states' );
-			const request = objectStore.clear();
-			request.onsuccess = function () {
+
+			transaction.oncomplete = function () {
 
 				console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Cleared IndexedDB.' );
 
 			};
+
+			transaction.onerror = function ( event ) {
+
+				console.error( 'IndexedDB clear failed:', event.target.error );
+
+			};
+
+			objectStore.clear();
 
 		}
 
