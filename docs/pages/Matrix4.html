@@ -330,7 +330,6 @@ may not be decomposable, and this method may not be appropriate.</p>
 					<div class="method">
 						<div class="description">
 							<p>Computes and returns the determinant of this matrix.</p>
-<p>Based on the method outlined <a href="http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.html" target="_blank" rel="noopener">here</a>.</p>
 						</div>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The determinant.</dt>
@@ -373,7 +372,7 @@ full 4x4 <a href="Matrix4.html#determinant">Matrix4#determinant</a> but is cheap
 					<h3 class="name name-method" id="extractBasis" translate="no">.<a href="#extractBasis">extractBasis</a><span class="signature">( xAxis : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, yAxis : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, zAxis : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Matrix4.html">Matrix4</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Extracts the basis of this matrix into the three axis vectors provided.</p>
+							<p>Extracts the basis vectors of this matrix into the three vectors provided.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -729,8 +728,6 @@ a zero matrix instead.</p>
 						<div class="description">
 							<p>Sets this matrix as a rotational transformation around the given axis by
 the given angle.</p>
-<p>This is a somewhat controversial but mathematically sound alternative to
-rotating via Quaternions. See the discussion <a href="https://www.gamedev.net/articles/programming/math-and-physics/do-we-really-need-quaternions-r1199" target="_blank" rel="noopener">here</a>.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -1101,7 +1098,7 @@ in this matrix.</p>
 					<h3 class="name name-method" id="scale" translate="no">.<a href="#scale">scale</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Matrix4.html">Matrix4</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Multiplies the columns of this matrix by the given vector.</p>
+							<p>Scales each of the first three columns of this matrix by the corresponding component of the given vector.</p>
 						</div>
 						<table class="params">
 							<tbody>

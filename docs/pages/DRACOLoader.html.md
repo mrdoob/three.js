@@ -23,7 +23,7 @@ loader.dispose();
 
 ## Import
 
-DRACOLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+DRACOLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';

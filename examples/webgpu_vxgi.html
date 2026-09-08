@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - VXGI</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - voxel GI">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_vxgi.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_vxgi.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>VXGI</span>
+			</div>
+
+			<small>Diffuse global illumination using Voxel Cone Tracing.</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { pass, mrt, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, sample, screenUV, builtinGIContext } from 'three/tsl';
+			import { vxgi } from 'three/addons/lighting/vxgi/VXGINode.js';
+			import { traa } from 'three/addons/tsl/display/TRAANode.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			if ( WebGPU.isAvailable() === false ) {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+
+				throw new Error( 'No WebGPU support' );
+
+			}
+
+			let camera, scene, renderer, renderPipeline, controls;
+
+			init();
+
+			async function init() {
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 10, 30 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xaaaaaa );
+
+				renderer = new THREE.WebGPURenderer();
+				// renderer.setPixelRatio( window.devicePixelRatio ); // probably too costly for most hardware
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				//
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 7, 0 );
+				controls.enablePan = true;
+				controls.minDistance = 1;
+				controls.maxDistance = 100;
+				controls.update();
+
+				//
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				const prePass = pass( scene, camera );
+				prePass.name = 'Pre-Pass';
+				prePass.transparent = false;
+
+				prePass.setMRT( mrt( {
+					output: packNormalToRGB( normalView ),
+					velocity: velocity
+				} ) );
+
+				const prePassNormal = sample( ( uv ) => {
+
+					return unpackRGBToNormal( prePass.getTextureNode().sample( uv ) );
+
+				} );
+
+				const prePassDepth = prePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => prePass.getLinearDepthNode() );
+				const prePassVelocity = prePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
+
+				// pre-pass - bandwidth optimization
+
+				const normalTexture = prePass.getTexture( 'output' );
+				normalTexture.type = THREE.UnsignedByteType;
+
+				// gi
+
+				const giPass = vxgi( prePassDepth, prePassNormal, scene, camera, 64 );
+
+				const ao = giPass.getAONode().toInspector( 'VXGI.AO' );
+				const gi = giPass.getGINode().toInspector( 'VXGI.GI' );
+
+				// scene pass: AO and indirect irradiance are injected into the materials' lighting
+
+				const scenePass = pass( scene, camera ).toInspector( 'Color' );
+				const giContext = builtinGIContext( ao.sample( screenUV ).r, gi.sample( screenUV ).rgb );
+				scenePass.contextNode = giContext;
+
+				// traa ( resolves the temporal noise of the cone tracing )
+
+				const traaPass = traa( scenePass, prePassDepth, prePassVelocity, camera );
+				renderPipeline.outputNode = traaPass;
+
+				// Cornell Box inspired scene
+
+				// Walls
+				const wallGeometry = new THREE.PlaneGeometry( 1, 1 );
+
+				// Left wall - red
+				const redWallMaterial = new THREE.MeshPhysicalMaterial( { color: '#ff0000' } );
+				const leftWall = new THREE.Mesh( wallGeometry, redWallMaterial );
+				leftWall.scale.set( 20, 15, 1 );
+				leftWall.rotation.y = Math.PI * 0.5;
+				leftWall.position.set( - 10, 7.5, 0 );
+				leftWall.receiveShadow = true;
+				scene.add( leftWall );
+
+				// Right wall - green
+				const greenWallMaterial = new THREE.MeshPhysicalMaterial( { color: '#00ff00' } );
+				const rightWall = new THREE.Mesh( wallGeometry, greenWallMaterial );
+				rightWall.scale.set( 20, 15, 1 );
+				rightWall.rotation.y = Math.PI * - 0.5;
+				rightWall.position.set( 9.999, 7.5, 0 );
+				rightWall.receiveShadow = true;
+				scene.add( rightWall );
+
+				// White walls and boxes
+				const whiteMaterial = new THREE.MeshPhysicalMaterial( { color: '#fff' } );
+
+				// Floor
+				const floor = new THREE.Mesh( wallGeometry, whiteMaterial );
+				floor.scale.set( 20, 20, 1 );
+				floor.rotation.x = Math.PI * - .5;
+				floor.receiveShadow = true;
+				scene.add( floor );
+
+				// Back wall
+				const backWall = new THREE.Mesh( wallGeometry, whiteMaterial );
+				backWall.scale.set( 15, 20, 1 );
+				backWall.rotation.z = Math.PI * - 0.5;
+				backWall.position.set( 0, 7.5, - 10 );
+				backWall.receiveShadow = true;
+				scene.add( backWall );
+
+				// Ceiling
+				const ceiling = new THREE.Mesh( wallGeometry, whiteMaterial );
+				ceiling.scale.set( 20, 20, 1 );
+				ceiling.rotation.x = Math.PI * 0.5;
+				ceiling.position.set( 0, 14.999, 0 );
+				ceiling.receiveShadow = true;
+				scene.add( ceiling );
+
+				// Boxes
+				const tallBoxGeometry = new THREE.BoxGeometry( 5, 7, 5 );
+				const tallBox = new THREE.Mesh( tallBoxGeometry, whiteMaterial );
+				tallBox.rotation.y = Math.PI * 0.25;
+				tallBox.position.set( - 3, 3.5, - 2 );
+				tallBox.castShadow = true;
+				tallBox.receiveShadow = true;
+				scene.add( tallBox );
+
+				const shortBoxGeometry = new THREE.BoxGeometry( 4, 4, 4 );
+				const shortBox = new THREE.Mesh( shortBoxGeometry, whiteMaterial );
+				shortBox.rotation.y = Math.PI * - 0.1;
+				shortBox.position.set( 4, 2, 4 );
+				shortBox.castShadow = true;
+				shortBox.receiveShadow = true;
+				scene.add( shortBox );
+
+				// Light source geometry (unlit materials are injected as emitters)
+				const lightSourceGeometry = new THREE.CylinderGeometry( 2.5, 2.5, 1, 64 );
+				const lightSourceMaterial = new THREE.MeshBasicMaterial();
+				const lightSource = new THREE.Mesh( lightSourceGeometry, lightSourceMaterial );
+				lightSource.position.y = 15;
+				scene.add( lightSource );
+
+				// Point light
+				const pointLight = new THREE.PointLight( '#ffffff', 100 );
+				pointLight.position.set( 0, 13, 0 );
+				pointLight.distance = 100;
+				pointLight.castShadow = true;
+				pointLight.shadow.mapSize.width = 1024;
+				pointLight.shadow.mapSize.height = 1024;
+				scene.add( pointLight );
+
+				// Ambient light
+				const ambientLight = new THREE.AmbientLight( '#0c0c0c' );
+				scene.add( ambientLight );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				//
+
+				const params = {
+					output: 0,
+					debug: 0,
+					lightX: 0,
+					lightZ: 0
+				};
+
+				const types = { Combined: 0, Direct: 3, AO: 1, GI: 2 };
+				const debugTypes = { Off: 0, Radiance: 1, Opacity: 2 };
+
+				const gui = renderer.inspector.createParameters( 'VXGI Settings' );
+				gui.add( params, 'output', types ).onChange( updatePostprocessing );
+				gui.add( params, 'debug', debugTypes ).name( 'voxel view' ).onChange( updatePostprocessing );
+				gui.add( giPass.debugLevel, 'value', 0, 4, 1 ).name( 'voxel view level' );
+				gui.add( giPass.coneCount, 'value', 2, 8, 1 ).name( 'cone count' );
+				gui.add( giPass.coneAngle, 'value', 10, 90 ).name( 'cone angle' );
+				gui.add( giPass.volume.stepScale, 'value', 0.25, 2 ).name( 'step scale' );
+				gui.add( giPass.volume.maxDistance, 'value', 0, 50 ).name( 'max distance' );
+				gui.add( giPass.normalOffset, 'value', 0, 4 ).name( 'normal offset' );
+				gui.add( giPass.giIntensity, 'value', 0, 4 ).name( 'GI intensity' );
+				gui.add( giPass, 'bounces', 0, 2, 1 ).name( 'bounces' );
+				gui.add( giPass, 'directionalRadiance' ).name( 'directional radiance' );
+				gui.add( giPass, 'useTemporalFiltering' ).name( 'temporal filtering' ).onChange( updatePostprocessing );
+
+				function updatePostprocessing() {
+
+					giPass.debug.value = params.debug;
+
+					if ( params.debug !== 0 ) {
+
+						renderPipeline.outputNode = vec4( gi.rgb, 1 );
+
+					} else if ( params.output === 1 ) {
+
+						renderPipeline.outputNode = vec4( vec3( ao ), 1 );
+
+					} else if ( params.output === 2 ) {
+
+						renderPipeline.outputNode = vec4( gi.rgb, 1 );
+
+					} else if ( params.output === 3 ) {
+
+						renderPipeline.outputNode = scenePass;
+
+					} else {
+
+						renderPipeline.outputNode = giPass.useTemporalFiltering ? traaPass : scenePass;
+
+					}
+
+					// direct lighting only: render the scene without the GI context
+
+					scenePass.contextNode = ( params.output === 3 ) ? null : giContext;
+					scenePass.needsUpdate = true;
+
+					renderPipeline.needsUpdate = true;
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+			}
+
+			function animate() {
+
+				controls.update();
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+	</body>
+</html>

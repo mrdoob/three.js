@@ -4,7 +4,7 @@
  */
 
 /**
- * TODO
+ * Exposure shader that scales the image color by an exposure factor.
  *
  * @constant
  * @type {ShaderMaterial~Shader}

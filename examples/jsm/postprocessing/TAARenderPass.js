@@ -101,7 +101,7 @@ class TAARenderPass extends SSAARenderPass {
 
 		if ( this._holdRenderTarget === null ) {
 
-			this._holdRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, { type: HalfFloatType } );
+			this._holdRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, { type: HalfFloatType, depthBuffer: false } );
 			this._holdRenderTarget.texture.name = 'TAARenderPass.hold';
 
 		}

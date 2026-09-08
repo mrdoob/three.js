@@ -2,7 +2,7 @@
 
 ## Import
 
-Raymarching is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+Raymarching is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js';

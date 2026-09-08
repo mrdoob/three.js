@@ -12,7 +12,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Unbiased Manual Supersampling Anti-Aliasing (SSAA) pass by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Unbiased Manual Supersampling Anti-Aliasing (SSAA) pass by <a href="https://ben3d.ca/" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
 			This example shows how to unbias the rounding errors accumulated using high number of SSAA samples on a 8-bit per channel buffer.<br/><br/>
 			Turn off the "unbiased" feature to see the banding that results from accumulated rounding errors.
 		</div>
@@ -45,7 +45,7 @@
 			let gui, stats;
 
 			const params = {
-				sampleLevel: 4,
+				sampleLevel: 3,
 				unbiased: true,
 				camera: 'perspective',
 				clearColor: 'black',
@@ -174,7 +174,6 @@
 				// postprocessing
 
 				composer = new EffectComposer( renderer );
-				composer.setPixelRatio( 1 ); // ensure pixel ratio is always 1 for performance reasons
 				ssaaRenderPassP = new SSAARenderPass( scene, cameraP );
 				composer.addPass( ssaaRenderPassP );
 				ssaaRenderPassO = new SSAARenderPass( scene, cameraO );
@@ -194,7 +193,7 @@
 
 				cameraP.aspect = aspect;
 				cameraP.setViewOffset( width, height, params.viewOffsetX, 0, width, height );
-				cameraO.updateProjectionMatrix();
+				cameraP.updateProjectionMatrix();
 
 				cameraO.left = - height * aspect;
 				cameraO.right = height * aspect;

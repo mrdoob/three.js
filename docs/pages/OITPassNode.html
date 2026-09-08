@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>OITPassNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → <a href="PassNode.html">PassNode</a> → </p>
+	<h1 translate="no">OITPassNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A render pass node that renders the scene with Order-Independent Transparency
+based on the Weighted Blended OIT technique by McGuire and Bavoil.</p>
+<p>Transparent objects are rendered in a separate pass into two accumulation
+targets (a weighted color sum and the pixel's revealage) which are
+then composited over the rest of the scene. Since the result does not depend
+on the draw order, artifacts from sorting-based transparency like popping or
+incorrectly resolved intersecting geometry are avoided.</p>
+<p>Only transparent materials using <code>NormalBlending</code> and no transmission qualify
+for OIT. All other objects are rendered as usual.</p>
+<p>MSAA is only supported with the WebGPU backend.</p>
+<p>MRT configurations assigned via <code>setMRT()</code> apply to the default pass only.
+OIT-qualified objects contribute to the color output but not to custom
+MRT outputs since a pixel may accumulate multiple transparent surfaces.</p>
+<p>References:</p>
+<ul>
+<li><a href="https://jcgt.org/published/0002/02/09/" target="_blank" rel="noopener">https://jcgt.org/published/0002/02/09/</a></li>
+<li><a href="https://casual-effects.blogspot.com/2014/03/weighted-blended-order-independent.html" target="_blank" rel="noopener">https://casual-effects.blogspot.com/2014/03/weighted-blended-order-independent.html</a></li>
+</ul></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const renderPipeline = new THREE.RenderPipeline( renderer );
+renderPipeline.outputNode = oitPass( scene, camera );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">OITPassNode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { oitPass } from 'three/addons/tsl/display/OITPassNode.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="OITPassNode" translate="no">new <a href="#OITPassNode">OITPassNode</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, options : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new OIT pass node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene to render.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera to render the scene with.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">options</strong>
+									</td>
+									<td class="description last">
+										<p>Options for the internal render target.</p>
+										<p>Default is <code>{}</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isOITPassNode" translate="no">.<a href="#isOITPassNode">isOITPassNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="weightNode" translate="no">.<a href="#weightNode">weightNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The depth-based weight of a transparent fragment, see equations (7) to (9)
+in the paper. When <code>null</code>, equation (9) is used. Must be assigned before
+the first render.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/tsl/display/OITPassNode.js" translate="no" target="_blank" rel="noopener">examples/jsm/tsl/display/OITPassNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

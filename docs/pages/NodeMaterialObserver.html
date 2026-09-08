@@ -289,7 +289,51 @@ monitoring.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The monitoring data.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="needsRefresh" translate="no">.<a href="#needsRefresh">needsRefresh</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span>, nodeFrame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="getTextureData" translate="no">.<a href="#getTextureData">getTextureData</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a texture data structure holding the texture state for
+monitoring.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An object for monitoring the texture.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="hasDynamicInstancing" translate="no">.<a href="#hasDynamicInstancing">hasDynamicInstancing</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given 3D object uses instance buffers with dynamic draw usage.
+Such buffers must be uploaded once per render so the render object requires a full refresh.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given 3D object uses instance buffers with dynamic draw usage or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="needsRefresh" translate="no">.<a href="#needsRefresh">needsRefresh</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span>, nodeFrame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span><span class="type-signature"> : number</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Checks if the given render object requires a refresh.</p>
@@ -315,7 +359,7 @@ monitoring.</p>
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> Whether the given render object requires a refresh or not.</dt>
+							<dt class="tag-returns"><strong>Returns:</strong> The refresh type, see <a href="global.html#RenderObjectRefreshType">RenderObjectRefreshType</a>.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="needsVelocity" translate="no">.<a href="#needsVelocity">needsVelocity</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span> )</span><span class="type-signature"> : boolean</span> </h3>

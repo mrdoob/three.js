@@ -325,6 +325,7 @@ class XRControllerModelFactory {
 
 		const controllerModel = new XRControllerModel();
 		let scene = null;
+		let connectionId = 0; // used to invalidate async operations of previous connections, see #34264
 
 		controller.addEventListener( 'connected', ( event ) => {
 
@@ -332,7 +333,11 @@ class XRControllerModelFactory {
 
 			if ( xrInputSource.targetRayMode !== 'tracked-pointer' || ! xrInputSource.gamepad || xrInputSource.hand ) return;
 
+			const id = ++ connectionId;
+
 			fetchProfile( xrInputSource, this.path, DEFAULT_PROFILE ).then( ( { profile, assetPath } ) => {
+
+				if ( id !== connectionId ) return;
 
 				controllerModel.motionController = new MotionController(
 					xrInputSource,
@@ -340,7 +345,10 @@ class XRControllerModelFactory {
 					assetPath
 				);
 
-				const cachedAsset = this._assetCache[ controllerModel.motionController.assetUrl ];
+				const assetUrl = controllerModel.motionController.assetUrl;
+
+				const cachedAsset = this._assetCache[ assetUrl ];
+
 				if ( cachedAsset ) {
 
 					scene = cachedAsset.scene.clone();
@@ -358,9 +366,11 @@ class XRControllerModelFactory {
 					}
 
 					this.gltfLoader.setPath( '' );
-					this.gltfLoader.load( controllerModel.motionController.assetUrl, ( asset ) => {
+					this.gltfLoader.load( assetUrl, ( asset ) => {
 
-						this._assetCache[ controllerModel.motionController.assetUrl ] = asset;
+						this._assetCache[ assetUrl ] = asset;
+
+						if ( id !== connectionId ) return;
 
 						scene = asset.scene.clone();
 
@@ -372,7 +382,7 @@ class XRControllerModelFactory {
 					null,
 					() => {
 
-						throw new Error( `THREE.XRControllerModelFactory: Asset ${controllerModel.motionController.assetUrl} missing or malformed.` );
+						throw new Error( `THREE.XRControllerModelFactory: Asset ${assetUrl} missing or malformed.` );
 
 					} );
 
@@ -387,6 +397,8 @@ class XRControllerModelFactory {
 		} );
 
 		controller.addEventListener( 'disconnected', () => {
+
+			connectionId ++;
 
 			controllerModel.motionController = null;
 			controllerModel.remove( scene );

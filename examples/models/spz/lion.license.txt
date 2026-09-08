@@ -1,0 +1,6 @@
+Title: Lion
+Author: Renaud (https://superspl.at/user?id=rohls)
+Source: https://superspl.at/scene/56155c3f
+License: CC Attribution (Creative Commons Attribution)
+License URL: http://creativecommons.org/licenses/by/4.0/
+Requirements: Author must be credited. Commercial use is allowed.

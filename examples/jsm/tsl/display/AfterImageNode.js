@@ -231,6 +231,8 @@ class AfterImageNode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this._compRT.dispose();
 		this._oldRT.dispose();
 

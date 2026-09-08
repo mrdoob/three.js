@@ -14,7 +14,7 @@ Note: This lib adds member variables to object's userData member (see prepareBre
 
 ## Import
 
-ConvexObjectBreaker is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+ConvexObjectBreaker is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { ConvexObjectBreaker } from 'three/addons/misc/ConvexObjectBreaker.js';

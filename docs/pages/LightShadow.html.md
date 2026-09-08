@@ -122,6 +122,18 @@ The light shadow to copy.
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 
+### .getCamera( viewportIndex : number ) : Camera
+
+Used internally by the renderer to get the camera that renders the given viewport.
+
+**viewportIndex**
+
+The viewport index.
+
+Default is `0`.
+
+**Returns:** The shadow camera.
+
 ### .getFrameExtents() : Vector2
 
 Returns the frame extends.

@@ -93,6 +93,30 @@ class VolumeSlice {
 		 */
 		this.ctxBuffer;
 
+		/**
+		 * Width of slice in the original coordinate system, corresponds to the width of the buffer canvas.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.iLength = 0;
+
+		/**
+		 * Height of slice in the original coordinate system, corresponds to the height of the buffer canvas.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.jLength = 0;
+
+		/**
+		 * Function that allow the slice to access right data.
+		 *
+		 * @type {?Function}
+		 * @see {@link Volume#extractPerpendicularPlane}
+		 */
+		this.sliceAccess = null;
+
 		this.updateGeometry();
 
 
@@ -119,30 +143,6 @@ class VolumeSlice {
 		 */
 		this.geometryNeedsUpdate = true;
 		this.repaint();
-
-		/**
-		 * Width of slice in the original coordinate system, corresponds to the width of the buffer canvas.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.iLength = 0;
-
-		/**
-		 * Height of slice in the original coordinate system, corresponds to the height of the buffer canvas.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.jLength = 0;
-
-		/**
-		 * Function that allow the slice to access right data.
-		 *
-		 * @type {?Function}
-		 * @see {@link Volume#extractPerpendicularPlane}
-		 */
-		this.sliceAccess = null;
 
 	}
 

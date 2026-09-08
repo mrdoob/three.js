@@ -95,7 +95,7 @@
 				defaultMat.metalnessNode = float( 1 );
 
 				const boxProjectedMat = new THREE.MeshStandardNodeMaterial();
-				boxProjectedMat.envNode = pmremTexture( renderTarget.texture, getParallaxCorrectNormal( reflectVector, vec3( 200, 100, 100 ), vec3( 0, - 50, 0 ) ) );
+				boxProjectedMat.envNode = pmremTexture( renderTarget.texture, getParallaxCorrectNormal( reflectVector, vec3( 200, 200, 100 ), vec3( 0, - 50, 0 ) ) );
 				boxProjectedMat.roughnessNode = texture( rMap ).mul( roughnessUniform );
 				boxProjectedMat.metalnessNode = float( 1 );
 

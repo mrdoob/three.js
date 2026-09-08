@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - order-independent transparency</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - order-independent transparency">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_oit.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_oit.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Order-Independent Transparency</span>
+			</div>
+
+			<small>Weighted Blended OIT resolves intersecting and overlapping transparent surfaces per pixel.</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { pass } from 'three/tsl';
+			import { oitPass } from 'three/addons/tsl/display/OITPassNode.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			let camera, scene, renderer;
+			let renderPipeline, scenePassOIT, scenePass;
+			let spheres, controls;
+
+			const transparentMaterials = [];
+
+			const params = {
+				oit: true,
+				opacity: 0.5
+			};
+
+			init();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 8, 4, 10 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x202020 );
+
+				// lights
+
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444, 1.5 );
+				scene.add( hemiLight );
+
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 2.5 );
+				dirLight.position.set( 4, 10, 6 );
+				scene.add( dirLight );
+
+				// opaque center object
+
+				const torusKnot = new THREE.Mesh(
+					new THREE.TorusKnotGeometry( 1, 0.4, 128, 32 ),
+					new THREE.MeshStandardMaterial( { color: 0xffffff, roughness: 0.2 } )
+				);
+				scene.add( torusKnot );
+
+				// intersecting transparent planes. no draw order can resolve them correctly
+				// with sorting-based transparency
+
+				const planeGeometry = new THREE.PlaneGeometry( 6, 6 );
+				const planeColors = [ 0xff4030, 0x30d060, 0x3070ff ];
+
+				for ( let i = 0; i < planeColors.length; i ++ ) {
+
+					const material = new THREE.MeshStandardMaterial( {
+						color: planeColors[ i ],
+						roughness: 0.5,
+						transparent: true,
+						opacity: params.opacity,
+						side: THREE.DoubleSide
+					} );
+					transparentMaterials.push( material );
+
+					const plane = new THREE.Mesh( planeGeometry, material );
+					plane.rotation.y = ( i / planeColors.length ) * Math.PI;
+					scene.add( plane );
+
+				}
+
+				// orbiting transparent spheres. their sort order flips while they rotate
+				// which results in popping with sorting-based transparency
+
+				spheres = new THREE.Group();
+
+				const sphereGeometry = new THREE.SphereGeometry( 0.8, 32, 16 );
+				const sphereColors = [ 0xffc020, 0xd040d0, 0x40c0d0, 0xa0d040 ];
+
+				for ( let i = 0; i < sphereColors.length; i ++ ) {
+
+					const material = new THREE.MeshStandardMaterial( {
+						color: sphereColors[ i ],
+						roughness: 0.3,
+						transparent: true,
+						opacity: params.opacity
+					} );
+					transparentMaterials.push( material );
+
+					const sphere = new THREE.Mesh( sphereGeometry, material );
+
+					const angle = ( i / sphereColors.length ) * Math.PI * 2;
+					sphere.position.set( Math.cos( angle ) * 2.5, 0, Math.sin( angle ) * 2.5 );
+
+					spheres.add( sphere );
+
+				}
+
+				scene.add( spheres );
+
+				//
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				//
+
+				scenePassOIT = oitPass( scene, camera );
+				scenePass = pass( scene, camera );
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputNode = scenePassOIT;
+
+				//
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.autoRotate = true;
+				controls.enableDamping = true;
+				controls.minDistance = 5;
+				controls.maxDistance = 25;
+
+				//
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+
+				gui.add( params, 'oit' ).onChange( ( value ) => {
+
+					renderPipeline.outputNode = ( value === true ) ? scenePassOIT : scenePass;
+					renderPipeline.needsUpdate = true;
+
+				} );
+
+				gui.add( params, 'opacity', 0, 1 ).onChange( ( value ) => {
+
+					for ( const material of transparentMaterials ) {
+
+						material.opacity = value;
+
+					}
+
+				} );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				controls.update();
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+	</body>
+</html>

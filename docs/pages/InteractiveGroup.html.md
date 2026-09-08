@@ -18,7 +18,7 @@ group.add( mesh1, mesh2, mesh3 );
 
 ## Import
 
-InteractiveGroup is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+InteractiveGroup is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { InteractiveGroup } from 'three/addons/interactive/InteractiveGroup.js';

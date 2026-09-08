@@ -400,6 +400,7 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/scale': 'مقیاس',
 			'sidebar/settings/shortcuts/undo': 'بازگشت به عقب',
 			'sidebar/settings/shortcuts/focus': 'فوکوس',
+			'sidebar/settings/shortcuts/selectAll': 'انتخاب همه',
 
 			'sidebar/history': 'هیستوری',
 			'sidebar/history/clear': 'پاک کردن',
@@ -852,6 +853,7 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/focus': 'Focus',
 			'sidebar/settings/shortcuts/perspective': 'Perspective',
 			'sidebar/settings/shortcuts/orthographic': 'Orthographic',
+			'sidebar/settings/shortcuts/selectAll': 'Select All',
 
 			'sidebar/history': 'History',
 			'sidebar/history/clear': 'Clear',
@@ -1302,6 +1304,7 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/scale': 'Échelle',
 			'sidebar/settings/shortcuts/undo': 'Annuler',
 			'sidebar/settings/shortcuts/focus': 'Focus',
+			'sidebar/settings/shortcuts/selectAll': 'Tout sélectionner',
 
 			'sidebar/history': 'Historique',
 			'sidebar/history/clear': 'Supprimer',
@@ -1752,6 +1755,7 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/scale': '缩放',
 			'sidebar/settings/shortcuts/undo': '撤销',
 			'sidebar/settings/shortcuts/focus': '聚焦',
+			'sidebar/settings/shortcuts/selectAll': '全选',
 
 			'sidebar/history': '历史记录',
 			'sidebar/history/clear': '清空',
@@ -2202,6 +2206,7 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/scale': 'スケール',
 			'sidebar/settings/shortcuts/undo': '元に戻す',
 			'sidebar/settings/shortcuts/focus': 'フォーカス',
+			'sidebar/settings/shortcuts/selectAll': 'すべて選択',
 
 			'sidebar/history': '履歴',
 			'sidebar/history/clear': 'クリア',
@@ -2651,6 +2656,7 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/scale': '스케일',
 			'sidebar/settings/shortcuts/undo': '되돌리기',
 			'sidebar/settings/shortcuts/focus': '포커스',
+			'sidebar/settings/shortcuts/selectAll': '모두 선택',
 
 			'sidebar/history': '기록',
 			'sidebar/history/clear': '지우기',

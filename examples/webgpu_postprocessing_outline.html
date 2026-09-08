@@ -19,7 +19,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Outline</span>
 			</div>
 
-			<small>Outline Pass by <a href="http://eduperiment.com" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a>.</small>
+			<small>Outline Pass by <a href="https://github.com/spidersharma03" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://ben3d.ca/" target="_blank" rel="noopener">Ben Houston</a>.</small>
 		</div>
 
 		<script type="importmap">
@@ -37,6 +37,8 @@
 
 			import * as THREE from 'three/webgpu';
 			import { pass, uniform, time, oscSine } from 'three/tsl';
+			import { SunLight } from 'three/addons/lights/SunLight.js';
+			import { SunLightNode } from 'three/addons/lights/SunLightNode.js';
 			import { outline } from 'three/addons/tsl/display/OutlineNode.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -63,6 +65,7 @@
 				const height = window.innerHeight;
 
 				renderer = new THREE.WebGPURenderer();
+				renderer.library.addLight( SunLightNode, SunLight );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
 				renderer.setAnimationLoop( animate );
@@ -86,18 +89,12 @@
 
 				scene.add( new THREE.AmbientLight( 0xaaaaaa, 0.6 ) );
 
-				const light = new THREE.DirectionalLight( 0xddffdd, 2 );
+				const light = new SunLight( 0xddffdd, 2 );
 				light.position.set( 5, 5, 5 );
 				light.castShadow = true;
 				light.shadow.mapSize.width = 2048;
 				light.shadow.mapSize.height = 2048;
 
-				const d = 10;
-
-				light.shadow.camera.left = - d;
-				light.shadow.camera.right = d;
-				light.shadow.camera.top = d;
-				light.shadow.camera.bottom = - d;
 				light.shadow.camera.far = 25;
 
 				scene.add( light );

@@ -1,6 +1,6 @@
 export class Style {
 
-	static init( container ) {
+	static init( container, nonce = null ) {
 
 		const css = /* css */`
 @scope (.three-inspector) {
@@ -20,6 +20,20 @@ export class Style {
 		--color-call: rgba(255, 185, 34, 1);
 		--font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 		--font-mono: 'Courier New', Courier, monospace;
+
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+		z-index: 1000;
+		overflow: hidden;
+		color-scheme: dark;
+	}
+
+	:scope * {
+		pointer-events: auto;
 	}
 
 	.profiler-panel, .profiler-toggle, .detached-tab-panel,
@@ -33,7 +47,7 @@ export class Style {
 	}
 
 	.profiler-toggle {
-		position: fixed;
+		position: absolute;
 		top: 15px;
 		right: 15px;
 		background-color: rgba(30, 30, 36, 0.85);
@@ -41,7 +55,7 @@ export class Style {
 		border-radius: 12px 6px 6px 12px;
 		color: var(--text-primary);
 		cursor: pointer;
-		z-index: 1001;
+		z-index: 1002;
 		transition: all 0.2s ease-in-out;
 		/*font-size: 14px;*/
 		font-size: 15px;
@@ -68,14 +82,14 @@ export class Style {
 		opacity: 0.5;
 	}
 
-	.profiler-toggle.position-right.panel-open {
+	.profiler-toggle.toggle-left {
 		right: auto;
 		left: 15px;
 		border-radius: 6px 12px 12px 6px;
 		flex-direction: row-reverse;
 	}
 
-	.profiler-toggle.position-right.panel-open .builtin-tabs-container {
+	.profiler-toggle.toggle-left .builtin-tabs-container {
 		border-right: none;
 		border-left: 1px solid #262636;
 	}
@@ -227,7 +241,7 @@ export class Style {
 	}
 
 	.profiler-mini-panel {
-		position: fixed;
+		position: absolute;
 		top: 60px;
 		right: 15px;
 		background-color: rgba(30, 30, 36, 0.85);
@@ -252,7 +266,7 @@ export class Style {
 					transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 	}
 
-	.profiler-mini-panel.position-right.panel-open {
+	.profiler-mini-panel.toggle-left {
 		right: auto;
 		left: 15px;
 	}
@@ -263,20 +277,14 @@ export class Style {
 		transform: translateY(0) scale(1);
 	}
 
-	/* Position toggle and mini-panel at the bottom when maximized */
-	:scope:has(.profiler-panel.maximized) .profiler-toggle,
-	:scope.maximized .profiler-toggle {
-		top: auto !important;
-		bottom: 15px !important;
-		z-index: 10005 !important;
+	.profiler-toggle.toggle-bottom {
+		top: auto;
+		bottom: 15px;
 	}
 
-	:scope:has(.profiler-panel.maximized) .profiler-mini-panel,
-	:scope.maximized .profiler-mini-panel {
-		top: auto !important;
-		bottom: 60px !important;
-		max-height: calc(100vh - 120px) !important;
-		z-index: 10006 !important;
+	.profiler-mini-panel.toggle-bottom {
+		top: auto;
+		bottom: 60px;
 	}
 
 	.profiler-mini-panel::-webkit-scrollbar {
@@ -401,6 +409,8 @@ export class Style {
 		margin-left: 6px;
 		cursor: help;
 		position: relative;
+		vertical-align: middle;
+		top: -1px;
 	}
 
 	.info-icon.active {
@@ -560,7 +570,7 @@ export class Style {
 	}
 
 	.profiler-panel {
-		position: fixed;
+		position: absolute;
 		z-index: 1001 !important;
 		bottom: 0;
 		left: 0;
@@ -589,7 +599,8 @@ export class Style {
 	}
 
 	.profiler-panel.maximized {
-		height: 100vh;
+		height: 100%;
+		z-index: 10000 !important;
 	}
 
 	/* Position-specific styles */
@@ -1070,6 +1081,7 @@ export class Style {
 
 	.list-item-row {
 		display: grid;
+		grid-template-columns: var(--list-grid-template, none);
 		align-items: center;
 		padding: 4px 8px;
 		border-radius: 3px;
@@ -1161,6 +1173,7 @@ export class Style {
 
 	.list-header {
 		display: grid;
+		grid-template-columns: var(--list-grid-template, none);
 		align-items: center;
 		padding: 4px 8px;
 		font-weight: 600;
@@ -1191,6 +1204,7 @@ export class Style {
 
 	.list-children-container.closed {
 		max-height: 0;
+		display: none !important;
 	}
 
 	.item-toggler {
@@ -1426,6 +1440,7 @@ export class Style {
 		font-family: var(--font-mono);
 		width: 100%;
 		box-sizing: border-box;
+		color-scheme: dark;
 	}
 
 	.param-control input:focus {
@@ -1689,7 +1704,7 @@ export class Style {
 	}
 
 	.drag-preview-indicator {
-		position: fixed;
+		position: absolute;
 		background-color: rgba(0, 170, 255, 0.2);
 		border: 2px dashed var(--color-accent);
 		z-index: 999;
@@ -1699,7 +1714,7 @@ export class Style {
 
 	/* Detached Tab Windows */
 	.detached-tab-panel {
-		position: fixed;
+		position: absolute;
 		width: 500px;
 		height: 400px;
 		background: var(--profiler-background);
@@ -2008,6 +2023,16 @@ export class Style {
 		background-color: rgba(255, 255, 255, 0.05);
 	}
 
+	select {
+		color-scheme: dark;
+	}
+
+	select option,
+	option {
+		background-color: #1e1e24;
+		color: var(--text-primary);
+	}
+
 	.select {
 		background: var(--profiler-background);
 		border: 1px solid var(--profiler-border);
@@ -2018,6 +2043,7 @@ export class Style {
 		font-size: 12px;
 		outline: none;
 		cursor: pointer;
+		color-scheme: dark;
 		appearance: none;
 		-webkit-appearance: none;
 		-moz-appearance: none;
@@ -2041,10 +2067,230 @@ export class Style {
 		touch-action: none;
 	}
 
+	.node-canvas-wrapper .node-canvas-split-btn {
+		position: absolute;
+		top: 5px;
+		left: 5px;
+		background: rgba(30, 30, 36, 0.85);
+		border: 1px solid var(--profiler-border);
+		color: var(--text-primary);
+		border-radius: 4px;
+		padding: 4px;
+		cursor: pointer;
+		opacity: 1;
+		transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 10;
+	}
+
+	.node-canvas-wrapper .node-canvas-split-btn:hover {
+		background-color: var(--color-accent);
+		border-color: var(--color-accent);
+		color: white;
+	}
+
+	.node-canvas-wrapper .node-canvas-split-btn.active,
+	.node-canvas-wrapper .node-canvas-fullscreen-btn.active {
+		background-color: var(--color-accent) !important;
+		border-color: var(--color-accent) !important;
+		color: white !important;
+	}
+
+	.split-screen-overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		pointer-events: none !important;
+		z-index: 999;
+		touch-action: none;
+		overflow: hidden;
+	}
+
+	.split-screen-line {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		width: 1px;
+		left: 50%;
+		background-color: transparent;
+		cursor: ew-resize;
+		pointer-events: auto !important;
+		z-index: 10;
+		touch-action: none;
+		transition: background-color 0.15s ease-out;
+	}
+
+	.split-screen-line:hover,
+	.split-screen-line:active,
+	.split-screen-line.active {
+		background-color: var(--color-accent);
+	}
+
+	.split-screen-line::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: -12px;
+		width: 25px;
+		background: transparent;
+		cursor: ew-resize;
+	}
+
+	.split-screen-line::after {
+		content: '';
+		position: absolute;
+		top: -1px;
+		bottom: -1px;
+		left: -5px;
+		width: 11px;
+		pointer-events: none;
+		background-image:
+			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M-0.5 -1 L5.5 7 L11.5 -1 Z' fill='rgba(30,30,36,0.85)' stroke='%234a4a5a' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E"),
+			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M-0.5 8 L5.5 0 L11.5 8 Z' fill='rgba(30,30,36,0.85)' stroke='%234a4a5a' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E");
+		background-position: top center, bottom center;
+		background-repeat: no-repeat;
+		opacity: 1;
+		transition: opacity 0.15s ease-out;
+	}
+
+	.split-screen-line:hover::after,
+	.split-screen-line:active::after,
+	.split-screen-line.active::after {
+		opacity: 1;
+		background-image:
+			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M-0.5 -1 L5.5 7 L11.5 -1 Z' fill='%2300aaff' stroke='%2300aaff' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E"),
+			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M-0.5 8 L5.5 0 L11.5 8 Z' fill='%2300aaff' stroke='%2300aaff' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E");
+	}
+
+	/* Grid Mode styles for List component */
+	.list-scroll-wrapper:has(> .list-container.grid-mode) {
+		width: 100% !important;
+	}
+
+	.list-container.grid-mode {
+		min-width: 0 !important;
+		width: 100% !important;
+		box-sizing: border-box;
+	}
+
+	.list-container.grid-mode .list-header {
+		display: none !important;
+	}
+
+	.list-container.grid-mode .list-children-container {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 15px;
+		padding-left: 0 !important;
+		margin-top: 10px;
+		margin-bottom: 15px;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	.list-container.grid-mode .list-children-container > .list-item-wrapper {
+		display: inline-block;
+		width: 160px;
+		margin: 0;
+	}
+
+	.list-container.grid-mode .list-children-container > .list-item-wrapper > .list-item-row {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: flex-start;
+		/*background-color: var(--profiler-header);
+		border: 1px solid var(--profiler-border);*/
+		border-radius: 6px;
+		padding: 8px;
+		gap: 8px;
+		width: 100%;
+		box-sizing: border-box;
+		grid-template-columns: none !important;
+	}
+
+	.list-container.grid-mode .list-children-container > .list-item-wrapper > .list-item-row > .list-item-cell:first-child {
+		width: 140px;
+		height: 140px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0;
+	}
+
+	.list-container.grid-mode .list-children-container > .list-item-wrapper > .list-item-row > .list-item-cell:not(:first-child) {
+		width: 100%;
+		text-align: center !important;
+		font-size: 11px;
+		font-weight: 500;
+		color: var(--text-primary);
+		white-space: normal;
+		word-break: break-all;
+		justify-content: center !important;
+	}
+
+	/* Timeline Info & Details */
+	.timeline-detail-block {
+		font-size: 11px;
+		margin-left: 8px;
+		color: var(--text-secondary);
+		opacity: 1;
+	}
+
+	.timeline-detail-key,
+	.timeline-detail-sep,
+	.timeline-call-count {
+		opacity: 0.5;
+	}
+
+	.timeline-detail-value {
+		color: var(--text-secondary);
+		opacity: 1;
+	}
+
+	.timeline-info-group {
+		display: inline-flex;
+		align-items: center;
+		margin-left: 12px;
+		flex-shrink: 0;
+	}
+
+	.timeline-info-dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		margin-right: 6px;
+		flex-shrink: 0;
+	}
+
+	.timeline-info-dot.fps {
+		background-color: var(--color-fps);
+	}
+
+	.timeline-info-dot.call {
+		background-color: var(--color-call);
+	}
+
+	.timeline-info-dot.red {
+		background-color: var(--color-red);
+	}
+
 }
 `;
 
 		const styleElement = document.createElement( 'style' );
+
+		if ( nonce ) {
+
+			styleElement.nonce = nonce;
+
+		}
+
 		styleElement.textContent = css;
 
 		container.appendChild( styleElement );

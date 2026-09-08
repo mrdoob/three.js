@@ -14,7 +14,7 @@ References:
 
 ## Import
 
-Water is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+Water is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { Water } from 'three/addons/objects/Water.js';

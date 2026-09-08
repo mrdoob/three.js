@@ -99,112 +99,10 @@ const softLightMix = TSL.Fn( ( [ t, col1, col2 ] ) => {
 
 } );
 
-const noiseFbm = TSL.Fn( ( [ p, detail, roughness, lacunarity, useNormalize ] ) => {
+// single-octave normalized noise — equivalent to fbm with detail = 1
 
-	const fscale = TSL.float( 1.0 ).toVar();
-	const amp = TSL.float( 1.0 ).toVar();
-	const maxamp = TSL.float( 0.0 ).toVar();
-	const sum = TSL.float( 0.0 ).toVar();
-
-	const iterations = detail.floor();
-
-	TSL.Loop( iterations, () => {
-
-		const t = TSL.mx_noise_float( p.mul( fscale ) );
-		sum.addAssign( t.mul( amp ) );
-		maxamp.addAssign( amp );
-		amp.mulAssign( roughness );
-		fscale.mulAssign( lacunarity );
-
-	} );
-
-	const rmd = detail.sub( iterations );
-	const hasRemainder = rmd.greaterThan( 0.001 );
-
-	return TSL.select(
-		hasRemainder,
-		TSL.select(
-			useNormalize.equal( 1 ),
-			( () => {
-
-				const t = TSL.mx_noise_float( p.mul( fscale ) );
-				const sum2 = sum.add( t.mul( amp ) );
-				const maxamp2 = maxamp.add( amp );
-				const normalizedSum = sum.div( maxamp ).mul( 0.5 ).add( 0.5 );
-				const normalizedSum2 = sum2.div( maxamp2 ).mul( 0.5 ).add( 0.5 );
-				return TSL.mix( normalizedSum, normalizedSum2, rmd );
-
-			} )(),
-			( () => {
-
-				const t = TSL.mx_noise_float( p.mul( fscale ) );
-				const sum2 = sum.add( t.mul( amp ) );
-				return TSL.mix( sum, sum2, rmd );
-
-			} )()
-		),
-		TSL.select(
-			useNormalize.equal( 1 ),
-			sum.div( maxamp ).mul( 0.5 ).add( 0.5 ),
-			sum
-		)
-	);
-
-} );
-
-const noiseFbm3d = TSL.Fn( ( [ p, detail, roughness, lacunarity, useNormalize ] ) => {
-
-	const fscale = TSL.float( 1.0 ).toVar();
-
-	const amp = TSL.float( 1.0 ).toVar();
-	const maxamp = TSL.float( 0.0 ).toVar();
-	const sum = TSL.vec3( 0.0 ).toVar();
-
-	const iterations = detail.floor();
-
-	TSL.Loop( iterations, () => {
-
-		const t = TSL.mx_noise_vec3( p.mul( fscale ) );
-		sum.addAssign( t.mul( amp ) );
-		maxamp.addAssign( amp );
-		amp.mulAssign( roughness );
-		fscale.mulAssign( lacunarity );
-
-	} );
-
-	const rmd = detail.sub( iterations );
-	const hasRemainder = rmd.greaterThan( 0.001 );
-
-	return TSL.select(
-		hasRemainder,
-		TSL.select(
-			useNormalize.equal( 1 ),
-			( () => {
-
-				const t = TSL.mx_noise_vec3( p.mul( fscale ) );
-				const sum2 = sum.add( t.mul( amp ) );
-				const maxamp2 = maxamp.add( amp );
-				const normalizedSum = sum.div( maxamp ).mul( 0.5 ).add( 0.5 );
-				const normalizedSum2 = sum2.div( maxamp2 ).mul( 0.5 ).add( 0.5 );
-				return TSL.mix( normalizedSum, normalizedSum2, rmd );
-
-			} )(),
-			( () => {
-
-				const t = TSL.mx_noise_vec3( p.mul( fscale ) );
-				const sum2 = sum.add( t.mul( amp ) );
-				return TSL.mix( sum, sum2, rmd );
-
-			} )()
-		),
-		TSL.select(
-			useNormalize.equal( 1 ),
-			sum.div( maxamp ).mul( 0.5 ).add( 0.5 ),
-			sum
-		)
-	);
-
-} );
+const noise1Norm = TSL.Fn( ( [ p ] ) => TSL.mx_noise_float( p ).mul( 0.5 ).add( 0.5 ) );
+const noise3Norm = TSL.Fn( ( [ p ] ) => TSL.mx_noise_vec3( p ).mul( 0.5 ).add( 0.5 ) );
 
 const woodCenter = TSL.Fn( ( [ p, centerSize ] ) => {
 
@@ -218,7 +116,7 @@ const woodCenter = TSL.Fn( ( [ p, centerSize ] ) => {
 const spaceWarp = TSL.Fn( ( [ p, warpStrength, xyScale, zScale ] ) => {
 
 	const combinedXyz = TSL.vec3( xyScale, xyScale, zScale ).mul( p );
-	const noise = noiseFbm3d( combinedXyz.mul( 1.6 * 1.5 ), TSL.float( 1 ), TSL.float( 0.5 ), TSL.float( 2 ), TSL.int( 1 ) ).sub( 0.5 ).mul( warpStrength );
+	const noise = noise3Norm( combinedXyz.mul( 1.6 * 1.5 ) ).sub( 0.5 ).mul( warpStrength );
 	const pXy = p.mul( TSL.vec3( 1, 1, 0 ) );
 	const normalizedXy = pXy.normalize();
 	const warp = noise.mul( normalizedXy ).add( pXy );
@@ -229,7 +127,7 @@ const spaceWarp = TSL.Fn( ( [ p, warpStrength, xyScale, zScale ] ) => {
 
 const woodRings = TSL.Fn( ( [ w, ringThickness, ringBias, ringSizeVariance, ringVarianceScale, barkThickness ] ) => {
 
-	const rings = noiseFbm( w.mul( ringVarianceScale ), TSL.float( 1 ), TSL.float( 0.5 ), TSL.float( 1 ), TSL.int( 1 ) ).mul( ringSizeVariance ).add( w ).mul( ringThickness ).fract().mul( barkThickness );
+	const rings = noise1Norm( w.mul( ringVarianceScale ) ).mul( ringSizeVariance ).add( w ).mul( ringThickness ).fract().mul( barkThickness );
 
 	const sharpRings = TSL.min( mapRange( rings, 0, ringBias, 0, 1, TSL.bool( true ) ), mapRange( rings, ringBias, 1, 1, 0, TSL.bool( true ) ) );
 
@@ -246,7 +144,7 @@ const woodDetail = TSL.Fn( ( [ warp, p, y, splotchScale ] ) => {
 	const combinedXyz = TSL.vec3( radialCoords.sin(), y, radialCoords.cos().mul( p.z ) );
 	const scaled = TSL.vec3( 0.1, 1.19, 0.05 ).mul( combinedXyz );
 
-	return noiseFbm( scaled.mul( splotchScale ), TSL.float( 1 ), TSL.float( 0.5 ), TSL.float( 2 ), TSL.bool( true ) );
+	return noise1Norm( scaled.mul( splotchScale ) );
 
 } );
 

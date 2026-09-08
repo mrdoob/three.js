@@ -75,6 +75,8 @@ The line part of the arrow helper.
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 
+**Overrides:** [Object3D#dispose](Object3D.html#dispose)
+
 ### .setColor( color : number | Color | string )
 
 Sets the color of the helper.

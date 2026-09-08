@@ -5,11 +5,12 @@ import { getItem, setItem } from '../Inspector.js';
 
 export class Profiler extends EventDispatcher {
 
-	constructor( inspector ) {
+	constructor( inspector, options = {} ) {
 
 		super();
 
 		this.inspector = inspector;
+		this.nonce = options.nonce ?? inspector?.nonce ?? null;
 		this.tabs = {};
 		this.activeTabId = null;
 		this.isResizing = false;
@@ -20,10 +21,15 @@ export class Profiler extends EventDispatcher {
 		this.maxZIndex = 1002; // Track the highest z-index for detached windows (starts at base z-index from CSS)
 		this.nextTabOriginalIndex = 0; // Track the original order of tabs as they are added
 
+		this.horizontalAlign = 'right'; // 'left' or 'right'
+		this.verticalAlign = 'top'; // 'top' or 'bottom'
+
 		this.setupShell();
 		this.setupResizing();
 
-		Style.init( this.domElement );
+		Style.init( this.domElement, this.nonce );
+
+		this.updateWidgetPosition();
 
 		// Setup window resize listener and update mobile status
 		this.setupWindowResizeListener();
@@ -194,6 +200,7 @@ export class Profiler extends EventDispatcher {
 			constrainDetachedWindows();
 			constrainMainPanel();
 			this.checkHeaderScroll();
+			this.notifyLayoutChange();
 
 		} );
 
@@ -254,6 +261,9 @@ export class Profiler extends EventDispatcher {
 
 		this.domElement.classList.add( 'three-inspector' );
 
+		this.domElement.addEventListener( 'keydown', ( e ) => e.stopPropagation() );
+		this.domElement.addEventListener( 'keyup', ( e ) => e.stopPropagation() );
+
 		this.toggleButton = document.createElement( 'button' );
 		this.toggleButton.classList.add( 'profiler-toggle' );
 		this.toggleButton.innerHTML = `
@@ -265,12 +275,18 @@ export class Profiler extends EventDispatcher {
 <span class="toggle-icon">
 	<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-device-ipad-horizontal-search"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11.5 20h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v5.5" /><path d="M9 17h2" /><path d="M18 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M20.2 20.2l1.8 1.8" /></svg>
 	<span class="console-badge-container">
-		<span class="console-badge error" style="display: none;">0</span>
-		<span class="console-badge warn" style="display: none;">0</span>
+		<span class="console-badge error">0</span>
+		<span class="console-badge warn">0</span>
 	</span>
 </span>
 `;
 		this.toggleButton.onclick = () => this.togglePanel();
+
+		const errorBadge = this.toggleButton.querySelector( '.console-badge.error' );
+		errorBadge.style.display = 'none';
+
+		const warnBadge = this.toggleButton.querySelector( '.console-badge.warn' );
+		warnBadge.style.display = 'none';
 
 		this.builtinTabsContainer = this.toggleButton.querySelector( '.builtin-tabs-container' );
 
@@ -492,19 +508,21 @@ export class Profiler extends EventDispatcher {
 			// Maximize based on current position
 			if ( this.position === 'bottom' ) {
 
-				this.panel.style.height = '100vh';
+				this.panel.style.height = '100%';
 				this.panel.style.width = '100%';
 
 			} else if ( this.position === 'right' ) {
 
 				this.panel.style.height = '100%';
-				this.panel.style.width = '100vw';
+				this.panel.style.width = '100%';
 
 			}
 
 			this.maximizeBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>';
 
 		}
+
+		this.updateWidgetPosition();
 
 		this.dispatchEvent( { type: 'resize' } );
 
@@ -591,11 +609,18 @@ export class Profiler extends EventDispatcher {
 
 		}
 
+		// Set profiler reference
+		tab.profiler = this;
+
 		// Update panel size when tabs change
 		this.updatePanelSize();
 
-		// Set profiler reference
-		tab.profiler = this;
+		// If newly added tab matches activeTabId from saved layout, activate it
+		if ( this.activeTabId && tab.id === this.activeTabId ) {
+
+			this.setActiveTab( tab.id );
+
+		}
 
 	}
 
@@ -1688,6 +1713,8 @@ export class Profiler extends EventDispatcher {
 
 		}
 
+		this.updateWidgetPosition();
+
 		this.dispatchEvent( { type: 'resize' } );
 
 		this.saveLayout();
@@ -1720,8 +1747,6 @@ export class Profiler extends EventDispatcher {
 			// Apply right position styles
 			this.panel.classList.remove( 'position-bottom' );
 			this.panel.classList.add( 'position-right' );
-			this.toggleButton.classList.add( 'position-right' );
-			this.miniPanel.classList.add( 'position-right' );
 			this.panel.style.bottom = '';
 			this.panel.style.top = '0';
 			this.panel.style.right = '0';
@@ -1730,7 +1755,7 @@ export class Profiler extends EventDispatcher {
 			// Apply size based on maximized state
 			if ( isMaximized ) {
 
-				this.panel.style.width = '100vw';
+				this.panel.style.width = '100%';
 				this.panel.style.height = '100%';
 
 			} else {
@@ -1750,8 +1775,6 @@ export class Profiler extends EventDispatcher {
 			// Apply bottom position styles
 			this.panel.classList.remove( 'position-right' );
 			this.panel.classList.add( 'position-bottom' );
-			this.toggleButton.classList.remove( 'position-right' );
-			this.miniPanel.classList.remove( 'position-right' );
 			this.panel.style.top = '';
 			this.panel.style.right = '';
 			this.panel.style.bottom = '0';
@@ -1761,7 +1784,7 @@ export class Profiler extends EventDispatcher {
 			if ( isMaximized ) {
 
 				this.panel.style.width = '100%';
-				this.panel.style.height = '100vh';
+				this.panel.style.height = '100%';
 
 			} else {
 
@@ -1771,6 +1794,8 @@ export class Profiler extends EventDispatcher {
 			}
 
 		}
+
+		this.updateWidgetPosition();
 
 		// Re-enable transition after a brief delay
 		setTimeout( () => {
@@ -1994,6 +2019,9 @@ export class Profiler extends EventDispatcher {
 			// Update panel size after loading layout
 			this.updatePanelSize();
 
+			// Update widget position (toggle and mini panel alignment)
+			this.updateWidgetPosition();
+
 			// Ensure initial open state applies to mini panel as well
 			if ( this.panel.classList.contains( 'visible' ) ) {
 
@@ -2111,6 +2139,134 @@ export class Profiler extends EventDispatcher {
 
 		// Update panel size after restoring detached tabs
 		this.updatePanelSize();
+
+	}
+
+	setHorizontalAlign( value ) {
+
+		this.horizontalAlign = value;
+		this.updateWidgetPosition();
+
+		return this;
+
+	}
+
+	setVerticalAlign( value ) {
+
+		this.verticalAlign = value;
+		this.updateWidgetPosition();
+
+		return this;
+
+	}
+
+	updateWidgetPosition() {
+
+		const isVisible = this.panel.classList.contains( 'visible' );
+		const isMaximized = this.panel.classList.contains( 'maximized' );
+		const isRight = this.position === 'right';
+
+		let horizontal = this.horizontalAlign; // 'left' or 'right'
+		let vertical = this.verticalAlign; // 'top' or 'bottom'
+
+		if ( isVisible ) {
+
+			if ( isRight ) {
+
+				// If panel is open on the right:
+				// Toggle should be on the opposite side of 'right' if default is 'right' to avoid overlapping the panel.
+				if ( this.horizontalAlign === 'right' ) {
+
+					horizontal = 'left';
+
+				}
+
+			} else {
+
+				// If panel is open at the bottom:
+				if ( ! isMaximized ) {
+
+					// If default is bottom, we must move to top to avoid overlapping the panel at the bottom.
+					if ( this.verticalAlign === 'bottom' ) {
+
+						vertical = 'top';
+
+					}
+
+				} else {
+
+					// If maximized, move to the opposite vertical position to avoid overlap with header/tabs.
+					vertical = this.verticalAlign === 'top' ? 'bottom' : 'top';
+
+				}
+
+			}
+
+		}
+
+		// Apply horizontal class
+		if ( horizontal === 'left' ) {
+
+			this.toggleButton.classList.add( 'toggle-left' );
+			this.miniPanel.classList.add( 'toggle-left' );
+
+		} else {
+
+			this.toggleButton.classList.remove( 'toggle-left' );
+			this.miniPanel.classList.remove( 'toggle-left' );
+
+		}
+
+		// Apply vertical class
+		if ( vertical === 'bottom' ) {
+
+			this.toggleButton.classList.add( 'toggle-bottom' );
+			this.miniPanel.classList.add( 'toggle-bottom' );
+
+		} else {
+
+			this.toggleButton.classList.remove( 'toggle-bottom' );
+			this.miniPanel.classList.remove( 'toggle-bottom' );
+
+		}
+
+		this.notifyLayoutChange();
+
+	}
+
+	isVertical() {
+
+		return this.position === 'left' || this.position === 'right' ||
+			( this.panel && ( this.panel.classList.contains( 'position-left' ) || this.panel.classList.contains( 'position-right' ) ) );
+
+	}
+
+	notifyLayoutChange() {
+
+		const isVert = this.isVertical();
+
+		this.dispatchEvent( { type: 'orientationchange', position: this.position, isVertical: isVert } );
+		this.dispatchEvent( { type: 'layoutchange', position: this.position, isVertical: isVert } );
+
+	}
+
+	dispose() {
+
+		for ( const tab of Object.values( this.tabs ) ) {
+
+			tab.dispose();
+
+		}
+
+		this.domElement.remove();
+
+		for ( const detachedWindow of this.detachedWindows ) {
+
+			detachedWindow.panel.remove();
+
+		}
+
+		this.toggleGraph.dispose();
 
 	}
 

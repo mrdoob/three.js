@@ -9,7 +9,7 @@
 
 		const re = /^(.*?\/manual\/)(.*?)$/;
 		const [ , baseURL, articlePath ] = re.exec( window.location.href );
-		const href = `${baseURL}#${articlePath.replace( '.html', '' )}`;
+		const href = `${baseURL}#${articlePath.replace( 'pages/', '' ).replace( '.html', '' )}`;
 		window.location.replace( href ); // lgtm[js/client-side-unvalidated-url-redirection]
 
 	}

@@ -1,4 +1,4 @@
-import { toFloatType } from './TranspilerUtils.js';
+import { toFloatType, isBuiltinType } from './TranspilerUtils.js';
 
 export class ASTNode {
 
@@ -436,6 +436,24 @@ export class FunctionCall extends ASTNode {
 
 	}
 
+	getType() {
+
+		if ( isBuiltinType( this.name ) ) {
+
+			return this.name;
+
+		}
+
+		if ( this.linker.reference ) {
+
+			return this.linker.reference.getType();
+
+		}
+
+		return super.getType();
+
+	}
+
 }
 
 export class Return extends ASTNode {
@@ -594,12 +612,13 @@ export class For extends ASTNode {
 
 export class While extends ASTNode {
 
-	constructor( condition, body = [] ) {
+	constructor( condition, body = [], doWhile = false ) {
 
 		super();
 
 		this.condition = condition;
 		this.body = body;
+		this.doWhile = doWhile;
 
 		this.isWhile = true;
 

@@ -32,7 +32,8 @@ function Config() {
 		'settings/shortcuts/undo': 'z',
 		'settings/shortcuts/focus': 'f',
 		'settings/shortcuts/perspective': 'p',
-		'settings/shortcuts/orthographic': 'o'
+		'settings/shortcuts/orthographic': 'o',
+		'settings/shortcuts/selectAll': 'a'
 	};
 
 	if ( window.localStorage[ name ] === undefined ) {

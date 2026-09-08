@@ -108,7 +108,7 @@ class SAOPass extends Pass {
 		 */
 		this.resolution = new Vector2( resolution.x, resolution.y );
 
-		this.saoRenderTarget = new WebGLRenderTarget( this.resolution.x, this.resolution.y, { type: HalfFloatType } );
+		this.saoRenderTarget = new WebGLRenderTarget( this.resolution.x, this.resolution.y, { type: HalfFloatType, depthBuffer: false } );
 		this.blurIntermediateRenderTarget = this.saoRenderTarget.clone();
 
 		const depthTexture = new DepthTexture();

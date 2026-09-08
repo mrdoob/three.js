@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>GLTFGaussianSplatLoaderExtension - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">GLTFGaussianSplatLoaderExtension</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A glTF loader plugin for <code>KHR_gaussian_splatting</code>.</p>
+<p>This plugin must be registered explicitly because <a href="GaussianSplat.html">GaussianSplat</a>
+requires <a href="WebGPURenderer.html">WebGPURenderer</a>.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const loader = new GLTFLoader();
+loader.register( function ( parser ) {
+	return new GLTFGaussianSplatLoaderExtension( parser );
+} );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">GLTFGaussianSplatLoaderExtension</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { GLTFGaussianSplatLoaderExtension } from 'three/addons/loaders/GLTFGaussianSplatLoaderExtension.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="GLTFGaussianSplatLoaderExtension" translate="no">new <a href="#GLTFGaussianSplatLoaderExtension">GLTFGaussianSplatLoaderExtension</a><span class="signature">( parser : <span class="param-type">GLTFParser</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new glTF gaussian splatting extension plugin.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">parser</strong>
+									</td>
+									<td class="description last">
+										<p>The glTF parser.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="loadMesh" translate="no">.<a href="#loadMesh">loadMesh</a><span class="signature">( meshIndex : <span class="param-type">number</span> )</span><span class="type-signature"> : Promise.&lt;(<a href="Group.html">Group</a>|<a href="GaussianSplat.html">GaussianSplat</a>)></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Loads a glTF mesh containing gaussian splat primitives.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">meshIndex</strong>
+									</td>
+									<td class="description last">
+										<p>The mesh index.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The loaded mesh or <code>null</code> when the mesh does not use this extension.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/GLTFGaussianSplatLoaderExtension.js" translate="no" target="_blank" rel="noopener">examples/jsm/loaders/GLTFGaussianSplatLoaderExtension.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -57,7 +57,9 @@ class ComputeStats extends ObjectStats {
 
 	constructor( uid, computeNode ) {
 
-		super( uid, computeNode.name );
+		const name = computeNode.name || ( computeNode.isComputeNode ? 'Compute' : 'Compute Group' );
+
+		super( uid, name );
 
 		this.computeNode = computeNode;
 
@@ -74,7 +76,9 @@ export class RendererInspector extends InspectorBase {
 		super();
 
 		this.currentFrame = null;
+		this.currentContext = null;
 		this.currentRender = null;
+		this.currentCompute = null;
 		this.currentNodes = null;
 		this.lastFrame = null;
 
@@ -84,6 +88,7 @@ export class RendererInspector extends InspectorBase {
 
 		this._lastFinishTime = 0;
 		this._resolveTimestampPromise = null;
+		this._rAFId = null;
 
 		this.overdraw = false;
 		this._overdrawMaterial = null;
@@ -94,19 +99,25 @@ export class RendererInspector extends InspectorBase {
 
 	getParent() {
 
-		return this.currentRender || this.getFrame();
+		return this.currentContext || this.getFrame();
 
 	}
 
 	begin() {
 
+		super.begin();
+
 		this.currentFrame = this._createFrame();
-		this.currentRender = this.currentFrame;
+		this.currentContext = this.currentFrame;
+		this.currentRender = null;
+		this.currentCompute = null;
 		this.currentNodes = [];
 
 	}
 
 	finish() {
+
+		super.finish();
 
 		const now = performance.now();
 
@@ -121,41 +132,28 @@ export class RendererInspector extends InspectorBase {
 		this.lastFrame = frame;
 
 		this.currentFrame = null;
+		this.currentContext = null;
 		this.currentRender = null;
+		this.currentCompute = null;
 		this.currentNodes = null;
 
 		this._lastFinishTime = now;
 
 		if ( this.overdraw === true ) {
 
-			this._renderOverdraw( frame );
+			this._renderOverdraw();
 
 		}
 
 	}
 
-	_renderOverdraw( frame ) {
+	_renderOverdraw() {
+
+		const primaryPass = this.getPrimaryPass();
+
+		if ( primaryPass === null ) return;
 
 		const renderer = this.getRenderer();
-
-		if ( renderer === null ) return;
-
-		// first scene render of the frame; nested shadow / RTT passes come after
-
-		let primary = null;
-
-		for ( const render of frame.renders ) {
-
-			if ( render.scene.isScene === true ) {
-
-				primary = render;
-				break;
-
-			}
-
-		}
-
-		if ( primary === null ) return;
 
 		if ( this._overdrawMaterial === null ) {
 
@@ -165,13 +163,12 @@ export class RendererInspector extends InspectorBase {
 				colorNode: vec3( 0.25 ),
 				blending: AdditiveBlending,
 				depthTest: true,
-				depthWrite: true,
-				toneMapped: false
+				depthWrite: true
 			} );
 
 		}
 
-		const { scene, camera } = primary;
+		const { scene, camera } = primaryPass;
 
 		// raw render against black with no tone mapping, so the count stays linear
 
@@ -225,6 +222,29 @@ export class RendererInspector extends InspectorBase {
 
 	}
 
+	getPrimaryPass() {
+
+		const frame = this.getFrame();
+
+		// first scene render of the frame; nested shadow / RTT passes come after
+
+		let primary = null;
+
+		for ( const render of frame.renders ) {
+
+			if ( render.scene.isScene === true ) {
+
+				primary = render;
+				break;
+
+			}
+
+		}
+
+		return primary;
+
+	}
+
 	getFrame() {
 
 		return this.currentFrame || this.lastFrame;
@@ -251,14 +271,32 @@ export class RendererInspector extends InspectorBase {
 
 		this._resolveTimestampPromise = new Promise( ( resolve ) => {
 
-			requestAnimationFrame( async () => {
+			this._rAFId = requestAnimationFrame( async () => {
+
+				this._rAFId = null;
 
 				const renderer = this.getRenderer();
+
+				if ( renderer === null ) {
+
+					this._resolveTimestampPromise = null;
+					resolve();
+					return;
+
+				}
 
 				if ( renderer.backend.hasTimestamp ) {
 
 					await renderer.resolveTimestampsAsync( TimestampQuery.COMPUTE );
 					await renderer.resolveTimestampsAsync( TimestampQuery.RENDER );
+
+					if ( renderer !== this.getRenderer() ) {
+
+						this._resolveTimestampPromise = null;
+						resolve();
+						return;
+
+					}
 
 					const computeFrames = renderer.backend.getTimestampFrames( TimestampQuery.COMPUTE );
 					const renderFrames = renderer.backend.getTimestampFrames( TimestampQuery.RENDER );
@@ -361,9 +399,9 @@ export class RendererInspector extends InspectorBase {
 
 						}
 
-						const nextFrame = this.getFrameById( frame.frameId + 1 );
+						const previousFrame = this.getFrameById( frame.frameId - 1 );
 
-						if ( nextFrame === null ) continue;
+						if ( previousFrame === null ) continue;
 
 						if ( frame.resolvedCompute === false ) {
 
@@ -446,6 +484,8 @@ export class RendererInspector extends InspectorBase {
 
 	inspect( node ) {
 
+		if ( this.enabled === false ) return;
+
 		const currentNodes = this.currentNodes;
 
 		if ( currentNodes !== null ) {
@@ -468,21 +508,13 @@ export class RendererInspector extends InspectorBase {
 
 		const currentCompute = new ComputeStats( uid, computeNode );
 		currentCompute.timestamp = performance.now();
-		currentCompute.parent = this.currentCompute || this.getParent();
+		currentCompute.parent = this.getParent();
 
 		frame.computes.push( currentCompute );
-
-		if ( this.currentRender !== null ) {
-
-			this.currentRender.children.push( currentCompute );
-
-		} else {
-
-			frame.children.push( currentCompute );
-
-		}
+		currentCompute.parent.children.push( currentCompute );
 
 		this.currentCompute = currentCompute;
+		this.currentContext = currentCompute;
 
 	}
 
@@ -495,7 +527,8 @@ export class RendererInspector extends InspectorBase {
 		const currentCompute = this.currentCompute;
 		currentCompute.cpu = performance.now() - currentCompute.timestamp;
 
-		this.currentCompute = currentCompute.parent.isComputeStats ? currentCompute.parent : null;
+		this.currentContext = currentCompute.parent;
+		this.currentCompute = currentCompute.parent && currentCompute.parent.isComputeStats ? currentCompute.parent : null;
 
 	}
 
@@ -510,18 +543,10 @@ export class RendererInspector extends InspectorBase {
 		currentRender.parent = this.getParent();
 
 		frame.renders.push( currentRender );
-
-		if ( this.currentRender !== null ) {
-
-			this.currentRender.children.push( currentRender );
-
-		} else {
-
-			frame.children.push( currentRender );
-
-		}
+		currentRender.parent.children.push( currentRender );
 
 		this.currentRender = currentRender;
+		this.currentContext = currentRender;
 
 	}
 
@@ -534,7 +559,30 @@ export class RendererInspector extends InspectorBase {
 		const currentRender = this.currentRender;
 		currentRender.cpu = performance.now() - currentRender.timestamp;
 
-		this.currentRender = currentRender.parent;
+		this.currentContext = currentRender.parent;
+		this.currentRender = currentRender.parent && currentRender.parent.isRenderStats ? currentRender.parent : null;
+
+	}
+
+	dispose() {
+
+		if ( this._rAFId !== null ) {
+
+			cancelAnimationFrame( this._rAFId );
+			this._rAFId = null;
+
+		}
+
+		this._resolveTimestampPromise = null;
+
+		if ( this._overdrawMaterial !== null ) {
+
+			this._overdrawMaterial.dispose();
+			this._overdrawMaterial = null;
+
+		}
+
+		super.dispose();
 
 	}
 

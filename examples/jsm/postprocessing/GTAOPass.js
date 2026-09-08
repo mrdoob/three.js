@@ -140,7 +140,7 @@ class GTAOPass extends Pass {
 		this.gtaoNoiseTexture = generateMagicSquareNoise();
 		this.pdNoiseTexture = this._generateNoise();
 
-		this.gtaoRenderTarget = new WebGLRenderTarget( this.width, this.height, { type: HalfFloatType } );
+		this.gtaoRenderTarget = new WebGLRenderTarget( this.width, this.height, { type: HalfFloatType, depthBuffer: false } );
 		this.pdRenderTarget = this.gtaoRenderTarget.clone();
 
 		this.gtaoMaterial = new ShaderMaterial( {

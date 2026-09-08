@@ -44,6 +44,8 @@ This contains the points used to visualize the camera.
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 
+**Overrides:** [LineSegments#dispose](LineSegments.html#dispose)
+
 ### .setColors( frustum : Color, cone : Color, up : Color, target : Color, cross : Color ) : CameraHelper
 
 Defines the colors of the helper.

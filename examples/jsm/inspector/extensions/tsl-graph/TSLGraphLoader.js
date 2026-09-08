@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import * as TSL from 'three/tsl';
 
 const _library = {
+	'three': { ...THREE },
 	'three/tsl': { ...TSL }
 };
 

@@ -99,6 +99,22 @@ Returns the padded type based on the element type.
 
 **Returns:** The padded type.
 
+### .onUpdate( callback : function, updateType : string ) : UniformArrayNode
+
+Composes a user-defined update with the buffer transfer.
+
+**callback**
+
+The update function.
+
+**updateType**
+
+The update type.
+
+**Overrides:** [BufferNode#onUpdate](BufferNode.html#onUpdate)
+
+**Returns:** A reference to this node.
+
 ### .setup( builder : NodeBuilder ) : null
 
 Implement the value buffer creation based on the array data.
@@ -109,15 +125,9 @@ A reference to the current node builder.
 
 **Overrides:** [BufferNode#setup](BufferNode.html#setup)
 
-### .update( frame : NodeFrame )
+### .updateBuffer()
 
-The update makes sure to correctly transfer the data from the (complex) objects in the array to the internal, correctly padded value buffer.
-
-**frame**
-
-A reference to the current node frame.
-
-**Overrides:** [BufferNode#update](BufferNode.html#update)
+The method makes sure to correctly transfer the data from the (complex) objects in the array to the internal, correctly padded value buffer.
 
 ## Source
 

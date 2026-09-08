@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>VXGINode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → </p>
+	<h1 translate="no">VXGINode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Post processing node for voxel based global illumination. The scene is voxelized into a
+<a href="VXGIVolume.html">VXGIVolume</a> and indirect diffuse light and ambient occlusion are gathered per
+pixel with approximate voxel cone tracing.</p>
+<p>The node is a middle path between SSGI and Light Probe Grids:</p>
+<ul>
+<li>Compared to <code>SSGINode</code> it is free of screen-space artifacts and provides noticeably more
+consistent lighting, since off-screen surfaces and thin occluders contribute.
+However, it is less dynamic: objects should stay static, because geometry changes require
+a re-voxelization (<code>needsUpdate = true</code>) which is too expensive for per-frame animation.</li>
+<li>Compared to <code>LightProbeGrid</code> it supports dynamic lighting without a new baking process and
+produces a better overall lighting quality with less light bleeding. However, it is more
+expensive and therefore less suitable for performance restricted use cases.</li>
+</ul>
+<p>The quality/performance of the effect mainly depend on the voxel resolution, the number of cones
+traced per pixel as well as the apeture of the cones.</p>
+<p>Lights and their shadow maps are picked up automatically. Only direct lights are injected.</p>
+<p>References:</p>
+<ul>
+<li><a href="https://research.nvidia.com/publication/2011-09_interactive-indirect-illumination-using-voxel-cone-tracing" target="_blank" rel="noopener">https://research.nvidia.com/publication/2011-09_interactive-indirect-illumination-using-voxel-cone-tracing</a>:
+Crassin et al., Interactive Indirect Illumination Using Voxel Cone Tracing, Pacific Graphics 2011.</li>
+</ul>
+<p>Note: This node can only be used with <code>WebGPURenderer</code> and a WebGPU backend.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">VXGINode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { vxgi } from 'three/addons/lighting/vxgi/VXGINode.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="VXGINode" translate="no">new <a href="#VXGINode">VXGINode</a><span class="signature">( depthNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, normalNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, resolution : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new voxel GI node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">depthNode</strong>
+									</td>
+									<td class="description last">
+										<p>A texture node that represents the scene's depth.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">normalNode</strong>
+									</td>
+									<td class="description last">
+										<p>A texture node that represents the scene's view space normals.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene to voxelize.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera the scene is rendered with.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">resolution</strong>
+									</td>
+									<td class="description last">
+										<p>Number of voxels along the longest axis of the volume. Should not exceed <code>256</code>, higher values exceed the maximum storage buffer size of the voxelizer.</p>
+										<p>Default is <code>128</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="aoDistance" translate="no">.<a href="#aoDistance">aoDistance</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Occlusion is weighted by <code>1 / ( 1 + distance / aoDistance )</code> for AO, so occluders at this
+world-space distance count half. <code>0</code> disables the falloff.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="aoIntensity" translate="no">.<a href="#aoIntensity">aoIntensity</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Power function applied to AO to make it appear darker/lighter.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="aoMinVisibility" translate="no">.<a href="#aoMinVisibility">aoMinVisibility</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The darkest value the ambient occlusion can reach. Lifts creases and contact regions out
+of pure black, which voxel-traced occlusion tends to overestimate at the resolution of
+a voxel. <code>0</code> keeps the full occlusion range.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="bounces" translate="no">.<a href="#bounces">bounces</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Number of cached indirect bounces. See <a href="VXGIVolume.html#bounces">VXGIVolume#bounces</a>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="camera" translate="no">.<a href="#camera">camera</a><span class="type-signature"> : <a href="Camera.html">Camera</a></span> </h3>
+					<div class="description">
+						<p>The camera the scene is rendered with.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="coneAngle" translate="no">.<a href="#coneAngle">coneAngle</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Aperture of the diffuse cones in degrees. Wider cones are faster (fewer steps) but leak
+and over-occlude more, narrow cones are more precise but noisier and take more steps.
+Choose it together with <a href="VXGINode.html#coneCount">VXGINode#coneCount</a>. Should be in the range <code>[10, 90]</code>.</p>
+						<p>Default is <code>40</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="coneCount" translate="no">.<a href="#coneCount">coneCount</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;uint></span> </h3>
+					<div class="description">
+						<p>Number of cones traced per pixel. Should be in the range <code>[2, 8]</code>.</p>
+<p>Mainly defines the quality and precision of the Voxel Cone Tracing. A value of
+<code>2</code> - <code>4</code> is the recommended setting. Use <code>2</code> for performance restricted use cases.</p>
+						<p>Default is <code>3</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="debug" translate="no">.<a href="#debug">debug</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;int></span> </h3>
+					<div class="description">
+						<p>Debug visualization of the volume: <code>0</code> = off, <code>1</code> = radiance voxels, <code>2</code> = per-axis opacity voxels.
+The visualization replaces the GI output.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="debugLevel" translate="no">.<a href="#debugLevel">debugLevel</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The mip level shown by the debug visualization.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="depthNode" translate="no">.<a href="#depthNode">depthNode</a><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="description">
+						<p>A node that represents the scene's depth.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="directionalRadiance" translate="no">.<a href="#directionalRadiance">directionalRadiance</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the coarser radiance levels are filtered directionally to reduce light bleeding
+through thin walls and floors. Off by default since it costs memory and performance.
+See <a href="VXGIVolume.html#directionalRadiance">VXGIVolume#directionalRadiance</a>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="giIntensity" translate="no">.<a href="#giIntensity">giIntensity</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Intensity of the indirect diffuse irradiance.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="lightingNeedsUpdate" translate="no">.<a href="#lightingNeedsUpdate">lightingNeedsUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Set to <code>true</code> to re-inject lighting in the next frame.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="needsUpdate" translate="no">.<a href="#needsUpdate">needsUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Set to <code>true</code> to re-voxelize the scene in the next frame.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#needsUpdate">TempNode#needsUpdate</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="normalNode" translate="no">.<a href="#normalNode">normalNode</a><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="description">
+						<p>A node that represents the scene's normals. If <code>null</code>, normals are reconstructed from depth.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="normalOffset" translate="no">.<a href="#normalOffset">normalOffset</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Offset of the cone origins along the surface normal in voxels. The surface's own voxel
+can extend up to half a voxel above the surface and the trilinear footprint of a sample
+spans another half voxel, so 1.5 voxels avoid self-occlusion in every case.</p>
+						<p>Default is <code>1.5</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="scene" translate="no">.<a href="#scene">scene</a><span class="type-signature"> : <a href="Scene.html">Scene</a></span> </h3>
+					<div class="description">
+						<p>The scene to voxelize.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateBeforeType" translate="no">.<a href="#updateBeforeType">updateBeforeType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The <code>updateBeforeType</code> is set to <code>NodeUpdateType.FRAME</code> since the node renders
+its effect once per frame in <code>updateBefore()</code>.</p>
+						<p>Default is <code>'frame'</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBeforeType">TempNode#updateBeforeType</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="useTemporalFiltering" translate="no">.<a href="#useTemporalFiltering">useTemporalFiltering</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to use temporal filtering or not. Setting this property to <code>true</code> requires the
+usage of <code>TRAANode</code>. Cone directions are then rotated per frame to converge the noise.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="volume" translate="no">.<a href="#volume">volume</a><span class="type-signature"> : <a href="VXGIVolume.html">VXGIVolume</a></span> </h3>
+					<div class="description">
+						<p>The voxel volume. Use it to configure bounds, layers and bounces.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees internal resources. This method should be called
+when the effect is no longer required.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#dispose">TempNode#dispose</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getAONode" translate="no">.<a href="#getAONode">getAONode</a><span class="signature">()</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the AO result of the effect as a texture node.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A texture node that represents the AO result of the effect.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getGINode" translate="no">.<a href="#getGINode">getGINode</a><span class="signature">()</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the GI result of the effect as a texture node. The texture holds the indirect
+diffuse irradiance, ready to be added to the lighting via <code>builtinGIContext()</code>.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A texture node that represents the GI result of the effect.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setSize" translate="no">.<a href="#setSize">setSize</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the size of the effect.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the effect.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the effect.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is used to setup the effect's TSL code.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#setup">TempNode#setup</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is used to render the effect once per frame.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">frame</strong>
+									</td>
+									<td class="description last">
+										<p>The current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBefore">TempNode#updateBefore</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/lighting/vxgi/VXGINode.js" translate="no" target="_blank" rel="noopener">examples/jsm/lighting/vxgi/VXGINode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

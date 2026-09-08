@@ -6,7 +6,7 @@ A Trefoil Knot.
 
 ## Import
 
-TrefoilKnot is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+TrefoilKnot is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { TrefoilKnot } from 'three/addons/curves/CurveExtras.js';

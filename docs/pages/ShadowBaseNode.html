@@ -65,6 +65,53 @@ their requirements.</p></div>
 						</dl>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="disposeShadowMaterial" translate="no">.<a href="#disposeShadowMaterial">disposeShadowMaterial</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Disposes the shadow material for the shadow casting light source.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="getShadowMaterial" translate="no">.<a href="#getShadowMaterial">getShadowMaterial</a><span class="signature">()</span><span class="type-signature"> : <a href="NodeMaterial.html">NodeMaterial</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Retrieves or creates a shadow material for the shadow casting light source.</p>
+<p>This method checks if a shadow material already exists for the provided light in the internal library.
+If not, it creates a new <code>NodeMaterial</code> configured for shadow rendering and stores it for future use.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The shadow material associated with the given light.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getShadowRenderObjectFunction" translate="no">.<a href="#getShadowRenderObjectFunction">getShadowRenderObjectFunction</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span>, shadow : <span class="param-type"><a href="LightShadow.html">LightShadow</a></span> )</span><span class="type-signature"> : function</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a function to render shadow objects in a scene for the given light shadow and renderer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">shadow</strong>
+									</td>
+									<td class="description last">
+										<p>The light shadow object containing shadow properties.</p>
+										<p>Default is <code>this.light.shadow</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A function that renders shadow objects.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="setupShadowPosition" translate="no">.<a href="#setupShadowPosition">setupShadowPosition</a><span class="signature">( object : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">

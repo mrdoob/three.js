@@ -2,7 +2,7 @@
 
 ## Import
 
-SobelOperatorShader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+SobelOperatorShader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { SobelOperatorShader } from 'three/addons/shaders/SobelOperatorShader.js';

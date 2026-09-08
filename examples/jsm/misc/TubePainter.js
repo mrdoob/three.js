@@ -4,6 +4,7 @@ import {
 	Color,
 	DynamicDrawUsage,
 	Matrix4,
+	Matrix3,
 	Mesh,
 	MeshStandardMaterial,
 	Vector3
@@ -46,6 +47,10 @@ function TubePainter() {
 
 	const mesh = new Mesh( geometry, material );
 	mesh.frustumCulled = false;
+
+	const normalMatrix = new Matrix3();
+	const normalMatrix1 = new Matrix3();
+	const normalMatrix2 = new Matrix3();
 
 	//
 
@@ -93,6 +98,8 @@ function TubePainter() {
 		const latSegments = 4;
 		const directionSign = isEndCap ? - 1 : 1;
 
+		normalMatrix.getNormalMatrix( matrix );
+
 		for ( let lat = 0; lat < latSegments; lat ++ ) {
 
 			const phi1 = ( lat / latSegments ) * Math.PI * 0.5;
@@ -130,9 +137,9 @@ function TubePainter() {
 				vector4.set( x4, y4, z2 ).applyMatrix4( matrix ).add( position );
 
 				// First triangle
-				normal.set( x1, y1, z1 ).normalize().transformDirection( matrix );
-				vector.set( x2, y2, z1 ).normalize().transformDirection( matrix );
-				side.set( x3, y3, z2 ).normalize().transformDirection( matrix );
+				normal.set( x1, y1, z1 ).applyNormalMatrix( normalMatrix );
+				vector.set( x2, y2, z1 ).applyNormalMatrix( normalMatrix );
+				side.set( x3, y3, z2 ).applyNormalMatrix( normalMatrix );
 
 				if ( isEndCap ) {
 
@@ -165,9 +172,9 @@ function TubePainter() {
 				// Second triangle
 				if ( r2 > 0.001 ) {
 
-					normal.set( x2, y2, z1 ).normalize().transformDirection( matrix );
-					vector.set( x4, y4, z2 ).normalize().transformDirection( matrix );
-					side.set( x3, y3, z2 ).normalize().transformDirection( matrix );
+					normal.set( x2, y2, z1 ).applyNormalMatrix( normalMatrix );
+					vector.set( x4, y4, z2 ).applyNormalMatrix( normalMatrix );
+					side.set( x3, y3, z2 ).applyNormalMatrix( normalMatrix );
 
 					if ( isEndCap ) {
 
@@ -216,6 +223,8 @@ function TubePainter() {
 		const radius = 0.01 * capSize;
 		const latSegments = 4;
 
+		normalMatrix.getNormalMatrix( matrix );
+
 		let count = endCapStartIndex;
 
 		for ( let lat = 0; lat < latSegments; lat ++ ) {
@@ -255,9 +264,9 @@ function TubePainter() {
 				vector4.set( x4, y4, z2 ).applyMatrix4( matrix ).add( position );
 
 				// Transform normals to world space
-				normal.set( x1, y1, z1 ).normalize().transformDirection( matrix );
-				vector.set( x2, y2, z1 ).normalize().transformDirection( matrix );
-				side.set( x3, y3, z2 ).normalize().transformDirection( matrix );
+				normal.set( x1, y1, z1 ).applyNormalMatrix( normalMatrix );
+				vector.set( x2, y2, z1 ).applyNormalMatrix( normalMatrix );
+				side.set( x3, y3, z2 ).applyNormalMatrix( normalMatrix );
 
 				// First triangle
 				vector1.toArray( positions.array, count * 3 );
@@ -277,9 +286,9 @@ function TubePainter() {
 				// Second triangle
 				if ( r2 > 0.001 ) {
 
-					normal.set( x2, y2, z1 ).normalize().transformDirection( matrix );
-					vector.set( x4, y4, z2 ).normalize().transformDirection( matrix );
-					side.set( x3, y3, z2 ).normalize().transformDirection( matrix );
+					normal.set( x2, y2, z1 ).applyNormalMatrix( normalMatrix );
+					vector.set( x4, y4, z2 ).applyNormalMatrix( normalMatrix );
+					side.set( x3, y3, z2 ).applyNormalMatrix( normalMatrix );
 
 					vector2.toArray( positions.array, count * 3 );
 					vector4.toArray( positions.array, ( count + 1 ) * 3 );
@@ -316,6 +325,9 @@ function TubePainter() {
 		const points1 = getPoints( size1 );
 		const points2 = getPoints( size2 );
 
+		normalMatrix1.getNormalMatrix( matrix1 );
+		normalMatrix2.getNormalMatrix( matrix2 );
+
 		for ( let i = 0, il = points2.length; i < il; i ++ ) {
 
 			const vertex1_2 = points2[ i ];
@@ -336,10 +348,10 @@ function TubePainter() {
 			vector3.toArray( positions.array, ( count + 4 ) * 3 );
 			vector4.toArray( positions.array, ( count + 5 ) * 3 );
 
-			vector1.copy( vertex1_2 ).applyMatrix4( matrix2 ).normalize();
-			vector2.copy( vertex2_2 ).applyMatrix4( matrix2 ).normalize();
-			vector3.copy( vertex2_1 ).applyMatrix4( matrix1 ).normalize();
-			vector4.copy( vertex1_1 ).applyMatrix4( matrix1 ).normalize();
+			vector1.copy( vertex1_2 ).applyNormalMatrix( normalMatrix2 );
+			vector2.copy( vertex2_2 ).applyNormalMatrix( normalMatrix2 );
+			vector3.copy( vertex2_1 ).applyNormalMatrix( normalMatrix1 );
+			vector4.copy( vertex1_1 ).applyNormalMatrix( normalMatrix1 );
 
 			vector1.toArray( normals.array, ( count + 0 ) * 3 );
 			vector2.toArray( normals.array, ( count + 1 ) * 3 );

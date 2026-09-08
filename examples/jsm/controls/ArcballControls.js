@@ -2563,7 +2563,7 @@ class ArcballControls extends Controls {
 	 * Rotates camera around its direction axis passing by a given point by a given angle.
 	 *
 	 * @private
-	 * @param {Vector3} point - The point where the rotation axis is passing trough.
+	 * @param {Vector3} point - The point where the rotation axis is passing through.
 	 * @param {number} angle - Angle in radians.
 	 * @returns {Object} The computed transformation matrix.
 	 */

@@ -2,7 +2,7 @@
 
 ## Import
 
-TriangleBlurShader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+TriangleBlurShader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { TriangleBlurShader } from 'three/addons/shaders/TriangleBlurShader.js';
@@ -42,7 +42,7 @@ A basic blur filter, which convolves the image with a pyramid filter. The pyrami
 
 ## Import
 
-TriangleBlurShader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+TriangleBlurShader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import * as ToonShader from 'three/addons/shaders/ToonShader.js';
@@ -84,7 +84,7 @@ A basic blur filter, which convolves the image with a pyramid filter. The pyrami
 
 ## Import
 
-TriangleBlurShader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+TriangleBlurShader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { TriangleBlurShader } from 'three/addons/shaders/TriangleBlurShader.js';

@@ -16,6 +16,7 @@ The following features from the core specification are supported:
 *   Texture 2D Groups
 *   Color Groups (Vertex Colors)
 *   Metallic Display Properties (PBR)
+*   Beam Lattice
 
 ## Code Example
 
@@ -28,7 +29,7 @@ scene.add( object );
 
 ## Import
 
-ThreeMFLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+ThreeMFLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { ThreeMFLoader } from 'three/addons/loaders/3MFLoader.js';

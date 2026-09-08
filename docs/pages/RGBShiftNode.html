@@ -18,11 +18,11 @@ separates color channels and offsets them from each other.</p></div>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">RGBShiftNode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<p><span translate="no">RGBShiftNode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { rgbShift } from 'three/addons/tsl/display/RGBShiftNode.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="RGBShiftNode" translate="no">new <a href="#RGBShiftNode">RGBShiftNode</a><span class="signature">( textureNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, amount : <span class="param-type">number</span>, angle : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="RGBShiftNode" translate="no">new <a href="#RGBShiftNode">RGBShiftNode</a><span class="signature">( textureNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, amount : <span class="param-type">number | <a href="Node.html">Node</a>.&lt;float></span>, angle : <span class="param-type">number | <a href="Node.html">Node</a>.&lt;float></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new RGB shift node.</p>
@@ -61,13 +61,13 @@ separates color channels and offsets them from each other.</p></div>
 				</div>
 				<h2 class="subsection-title">Properties</h2>
 				<div class="member">
-					<h3 class="name" id="amount" translate="no">.<a href="#amount">amount</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<h3 class="name" id="amount" translate="no">.<a href="#amount">amount</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
 					<div class="description">
 						<p>The amount of the RGB shift.</p>
 					</div>
 				</div>
 				<div class="member">
-					<h3 class="name" id="angle" translate="no">.<a href="#angle">angle</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<h3 class="name" id="angle" translate="no">.<a href="#angle">angle</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
 					<div class="description">
 						<p>Defines in which direction colors are shifted.</p>
 					</div>

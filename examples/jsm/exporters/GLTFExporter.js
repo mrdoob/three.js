@@ -19,8 +19,8 @@ import {
 	RGBAFormat,
 	RepeatWrapping,
 	Scene,
-	Source,
 	SRGBColorSpace,
+	TextureSource,
 	CompressedTexture,
 	Vector3,
 	Quaternion,
@@ -246,7 +246,7 @@ class GLTFExporter {
 	 * Sets the texture utils for this exporter. Only relevant when compressed textures have to be exported.
 	 *
 	 * Depending on whether you use {@link WebGLRenderer} or {@link WebGPURenderer}, you must inject the
-	 * corresponding texture utils {@link WebGLTextureUtils} or {@link WebGPUTextureUtils}.
+	 * corresponding texture utils {@link module:WebGLTextureUtils} or {@link module:WebGPUTextureUtils}.
 	 *
 	 * @param {WebGLTextureUtils|WebGPUTextureUtils} utils - The texture utils.
 	 * @return {GLTFExporter} A reference to this exporter.
@@ -616,7 +616,8 @@ class GLTFWriter {
 			attributesNormalized: new Map(),
 			materials: new Map(),
 			textures: new Map(),
-			images: new Map()
+			images: new Map(),
+			normalMaps: new Map()
 		};
 
 		this.textureUtils = null;
@@ -651,7 +652,8 @@ class GLTFWriter {
 			onlyVisible: true,
 			maxTextureSize: Infinity,
 			animations: [],
-			includeCustomExtensions: false
+			includeCustomExtensions: false,
+			copyright: null
 		}, options );
 
 		if ( this.options.animations.length > 0 ) {
@@ -685,6 +687,8 @@ class GLTFWriter {
 
 		// Update bytelength of the single buffer.
 		if ( json.buffers && json.buffers.length > 0 ) json.buffers[ 0 ].byteLength = blob.size;
+
+		if ( options.copyright ) json.asset.copyright = options.copyright;
 
 		if ( options.binary === true ) {
 
@@ -1029,7 +1033,7 @@ class GLTFWriter {
 
 		const texture = reference.clone();
 
-		texture.source = new Source( canvas );
+		texture.source = new TextureSource( canvas );
 		texture.colorSpace = NoColorSpace;
 		texture.channel = ( metalnessMap || roughnessMap ).channel;
 
@@ -1091,7 +1095,7 @@ class GLTFWriter {
 		context.putImageData( imageData, 0, 0 );
 
 		const texture = normalMap.clone();
-		texture.source = new Source( canvas );
+		texture.source = new TextureSource( canvas );
 
 		return texture;
 
@@ -1750,7 +1754,18 @@ class GLTFWriter {
 
 			if ( flipX || flipY ) {
 
-				normalMap = await this.buildNormalMapTextureAsync( material.normalMap, flipX, flipY );
+				if ( cache.normalMaps.has( material.normalMap ) === false ) cache.normalMaps.set( material.normalMap, {} );
+
+				const cachedVariants = cache.normalMaps.get( material.normalMap );
+				const cacheKey = `${flipX}:${flipY}`;
+
+				if ( cachedVariants[ cacheKey ] === undefined ) {
+
+					cachedVariants[ cacheKey ] = await this.buildNormalMapTextureAsync( material.normalMap, flipX, flipY );
+
+				}
+
+				normalMap = cachedVariants[ cacheKey ];
 
 			}
 
@@ -3821,6 +3836,7 @@ GLTFExporter.Utils = {
  * @property {Array<AnimationClip>|Array<Array<AnimationClip>>} [animations=[]] - List of animations to be included in the export. When exporting a single 3D object or scene, this is a flat list of clips.
  * When exporting an array of multiple scenes, this must be a nested array with one list of clips per scene, matched to the input by index.
  * @property {boolean} [includeCustomExtensions=false] - Export custom glTF extensions defined on an object's `userData.gltfExtensions` property.
+ * @property {string} [copyright=null] - Export with a copyright notice embedded in the glTF.
  **/
 
 /**

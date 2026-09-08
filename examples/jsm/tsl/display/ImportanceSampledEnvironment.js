@@ -8,7 +8,7 @@
  */
 
 import { If, dot, equirectUV, float, luminance, max, normalize, texture, uniform, vec2, vec4 } from 'three/tsl';
-import { ClampToEdgeWrapping, DataTexture, DataUtils, FloatType, HalfFloatType, LinearFilter, RedFormat, RepeatWrapping, Source, Vector2 } from 'three/webgpu';
+import { ClampToEdgeWrapping, DataTexture, DataUtils, FloatType, HalfFloatType, LinearFilter, RedFormat, RepeatWrapping, TextureSource, Vector2 } from 'three/webgpu';
 import { D_GTR, F_Schlick, GeometryTerm, SmithG, equirectDirPdf, misPowerHeuristic } from '../utils/SpecularHelpers.js';
 
 function colorToLuminance( r, g, b ) {
@@ -45,7 +45,7 @@ function binarySearchFindClosestIndexOf( array, targetValue, offset = 0, count =
 function preprocessEnvMap( envMap ) {
 
 	const map = envMap.clone();
-	map.source = new Source( { ...map.image } );
+	map.source = new TextureSource( { ...map.image } );
 	const { width, height, data } = map.image;
 
 	let newData = data;

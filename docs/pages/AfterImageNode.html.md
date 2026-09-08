@@ -6,7 +6,7 @@ Post processing node for creating an after image effect.
 
 ## Import
 
-AfterImageNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+AfterImageNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { afterImage } from 'three/addons/tsl/display/AfterImageNode.js';

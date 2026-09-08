@@ -51,7 +51,7 @@
 
 			let camera, scene, renderer, controls, timer;
 			let terrain, forest, terrainGroup, forestGroup;
-			let sky, sun, sunLight, pmremGenerator, envScene;
+			let sky, sun, sunLight, pmremGenerator, envScene, envRenderTarget;
 
 			const parameters = {
 				elevation: 11, // sun height above the horizon, in degrees ( low = golden hour )
@@ -69,7 +69,6 @@
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 0.62;
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
@@ -95,6 +94,8 @@
 
 				sun = new THREE.Vector3();
 				envScene = new THREE.Scene();
+				sky.showSunDisc.value = false;
+				envScene.add( sky );
 
 				// custom fog. an animated, two-octave triNoise3D haze that settles into
 				// the valley as a level band: solid below `fogBase` ( down under the
@@ -195,7 +196,7 @@
 
 				controls = new FirstPersonControls( camera, renderer.domElement );
 				controls.movementSpeed = 20;
-				controls.lookSpeed = 0.1;
+				controls.lookSpeed = 0.2;
 				controls.lookAt( 0, 5, - 120 ); // face across the valley
 
 				window.addEventListener( 'resize', resize );
@@ -223,13 +224,9 @@
 				sunLight.position.copy( sun ).multiplyScalar( 900 );
 				sunLight.shadow.needsUpdate = true; // the sun moved, so the on-demand shadow map needs one refresh
 
-				// re-bake the sky ( without the sun disc ) into the environment map for IBL.
-				// the sky lives only in envScene; it is never added to the visible scene
-				sky.showSunDisc.value = false;
-				envScene.add( sky );
-				const env = pmremGenerator.fromScene( envScene ).texture;
-				if ( scene.environment ) scene.environment.dispose();
-				scene.environment = env;
+				// Reuse the environment render target when the sun moves.
+				envRenderTarget = pmremGenerator.fromScene( envScene, 0, 0.1, 100, { renderTarget: envRenderTarget } );
+				scene.environment = envRenderTarget.texture;
 
 			}
 

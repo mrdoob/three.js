@@ -18,7 +18,7 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
-			<a href="http://3mf.io" target="_blank" rel="noopener">3MF</a> file with materials
+			<a href="https://3mf.io" target="_blank" rel="noopener">3MF</a> file with materials
 		</div>
 
 		<script type="importmap">
@@ -34,6 +34,7 @@
 
 			import * as THREE from 'three';
 
+			import { SunLight } from 'three/addons/lights/SunLight.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { ThreeMFLoader } from 'three/addons/loaders/3MFLoader.js';
 
@@ -57,19 +58,11 @@
 				hemiLight.position.set( 0, 100, 0 );
 				scene.add( hemiLight );
 
-				const dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
-				dirLight.position.set( - 0, 40, 50 );
-				dirLight.castShadow = true;
-				dirLight.shadow.camera.top = 50;
-				dirLight.shadow.camera.bottom = - 25;
-				dirLight.shadow.camera.left = - 25;
-				dirLight.shadow.camera.right = 25;
-				dirLight.shadow.camera.near = 0.1;
-				dirLight.shadow.camera.far = 200;
-				dirLight.shadow.mapSize.set( 1024, 1024 );
-				scene.add( dirLight );
-
-				// scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
+				const sunLight = new SunLight( 0xffffff, 3 );
+				sunLight.position.set( 0, 40, 50 );
+				sunLight.castShadow = true;
+				sunLight.shadow.camera.far = 100;
+				scene.add( sunLight );
 
 				//
 

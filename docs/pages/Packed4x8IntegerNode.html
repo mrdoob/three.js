@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Packed4x8IntegerNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → </p>
+	<h1 translate="no">Packed4x8IntegerNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Represents one of the built-in functions of WGSL's <code>packed_4x8_integer_dot_product</code>
+language extension. If the extension is not available, the node falls back to an
+emulation with plain integer bit operations.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Packed4x8IntegerNode" translate="no">new <a href="#Packed4x8IntegerNode">Packed4x8IntegerNode</a><span class="signature">( method : <span class="param-type">string</span>, aNode : <span class="param-type"><a href="Node.html">Node</a></span>, bNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a packed 4x8 integer function node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">method</strong>
+									</td>
+									<td class="description last">
+										<p>The WGSL built-in function name.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">aNode</strong>
+									</td>
+									<td class="description last">
+										<p>The first argument.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">bNode</strong>
+									</td>
+									<td class="description last">
+										<p>The optional second argument.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="aNode" translate="no">.<a href="#aNode">aNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The first argument.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="bNode" translate="no">.<a href="#bNode">bNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The optional second argument.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isPacked4x8IntegerNode" translate="no">.<a href="#isPacked4x8IntegerNode">isPacked4x8IntegerNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="method" translate="no">.<a href="#method">method</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The WGSL built-in function name.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/math/Packed4x8IntegerNode.js" translate="no" target="_blank" rel="noopener">src/nodes/math/Packed4x8IntegerNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

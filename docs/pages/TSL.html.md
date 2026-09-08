@@ -258,15 +258,55 @@ TSL object that represents the object's model view in `highp` precision which is
 
 ### .instanceIndex : IndexNode (constant)
 
-TSL object that represents the index of either a mesh instance or an invocation of a compute shader.
+TSL object that contextually represents specific index data depending on the shader stage.
+
+Within the vertex and fragment stages, `instanceIndex` will represent the index of the current mesh instance being evaluated by the shader. In these stages, use `instanceIndex` to modify a mesh based on its instance or to select per-instance data.
+
+```js
+// instanceIndex will equal the current mesh's instance index between 0-500
+const material = new THREE.BasicNodeMaterial();
+material.positionNode = vec3( instanceIndex.mod( 10 ), instanceIndex.div( 10 ), 0 );
+const mesh = new THREE.InstancedMesh( geometry, material, 500 );
+```
+
+Within the compute stage, `instanceIndex` will represent the global index of a compute invocation within the 3-dimensional compute workgroup load. In this stage, use `instanceIndex` to modify or select data at a given index within a buffer, or derive values from the index itself.
+
+```js
+// instanceIndex will equal value between 0 - 255
+const computeFn = Fn() => {
+	storageBuffer.element( instanceIndex ).assign( instanceIndex );
+} )().compute( 255 )
+```
 
 ### .invocationLocalIndex : IndexNode (constant)
 
-TSL object that represents the index of a compute invocation within the scope of a workgroup load.
+TSL object that represents the index of a compute invocation within the scope of a workgroup.
+
+```js
+// Execute 12 compute threads with a workgroup size of 4.
+const computeFn = Fn( () => {
+	storageBufferOne.element( instanceIndex ).assign( invocationLocalIndex );
+	storageBufferTwo.element( instanceIndex ).assign( workgroupId.x );
+} )().compute( 12, [ 4 ] );
+// instanceIndex =  [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ];
+// Buffer One ( Invocation Local Index ) =     [ 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3 ];
+// Buffer Two ( Workgroup ID )           =     [ 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2 ];
+```
 
 ### .invocationSubgroupIndex : IndexNode (constant)
 
 TSL object that represents the index of a compute invocation within the scope of a subgroup.
+
+```js
+// Execute 12 compute threads with a workgroup size of 12. Example assumes a subgroup size of 3.
+const computeFn = Fn( () => {
+	storageBufferOne.element( instanceIndex ).assign( invocationSubgroupIndex );
+	storageBufferTwo.element( instanceIndex ).assign( subgroupIndex );
+} )().compute( 12, [ 12 ] );
+// instanceIndex =  [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ];
+// Buffer One ( Invocation Subgroup Index ) =  [ 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2 ];
+// Buffer Two ( Subgroup Index )            =  [ 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3 ];
+```
 
 ### .ior : PropertyNode.<float> (constant)
 
@@ -360,7 +400,7 @@ TSL object that represents the intensity of environment maps of PBR materials. W
 
 ### .materialEnvRotation : Node.<mat4> (constant)
 
-TSL object that represents the rotation of environment maps. When `material.envMap` is set, the value is `material.envMapRotation`. `scene.environmentRotation` controls the rotation of `scene.environment` instead.
+TSL object that represents the rotation of environment maps. When `material.envMap` is set, the value is `material.envMapRotation`. `scene.environmentRotation` controls the rotation of `scene.environment` or `scene.environmentNode` instead.
 
 ### .materialIOR : Node.<float> (constant)
 
@@ -425,6 +465,10 @@ TSL object that represents the reflectivity of the current material.
 ### .materialRefractionRatio : UniformNode.<float> (constant)
 
 TSL object that represents the refraction ratio of the material used for rendering the current object.
+
+### .materialRetroreflectivity : Node.<float> (constant)
+
+TSL object that represents the retroreflective strength of the current material.
 
 ### .materialRotation : Node.<float> (constant)
 
@@ -669,6 +713,10 @@ Differentiates the per-pixel history UV with hardware screen-space derivatives t
 
 Works for any reprojection (surface-velocity or parallax hit-point) since it differentiates the final history UV, so the same factor applies to both the diffuse and specular paths.
 
+### .retroreflectivity : PropertyNode.<float> (constant)
+
+TSL object that represents the shader variable `Retroreflectivity`.
+
 ### .roughness : PropertyNode.<float> (constant)
 
 TSL object that represents the shader variable `Roughness`.
@@ -685,7 +733,7 @@ Geometrically-weighted 4-tap bilinear history sample.
 
 TSL object that represents the current `x`/`y` pixel position on the screen in physical pixel units.
 
-### .screenDPR : ScreenNode.<float> (constant)
+### .screenDPR : UniformNode.<float> (constant)
 
 TSL object that represents the current DPR.
 
@@ -731,7 +779,18 @@ GGX inverse-CDF: half-angle tangent enclosing `percent` of the specular lobe vol
 
 ### .subgroupIndex : IndexNode (constant)
 
-TSL object that represents the index of the subgroup the current compute invocation belongs to.
+TSL object that represents the index of the subgroup the current compute invocation belongs to. Subgroup indices are local to the workgroups to which they belong.
+
+```js
+// Execute 12 compute threads with a workgroup size of 9. Example assumes a subgroup size of 3.
+const computeFn = Fn( () => {
+	storageBufferOne.element( instanceIndex ).assign( subgroupIndex );
+	storageBufferTwo.element( instanceIndex ).assign( workgroupId.x );
+} )().compute( 12, [ 9 ] );
+// instanceIndex =  [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ];
+// Buffer One ( Subgroup Index ) =  [ 0, 0, 0, 1, 1, 1, 2, 2, 2, 0, 0, 0 ];
+// Buffer Two ( Workgroup ID )   =  [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 ];
+```
 
 ### .subgroupSize : ComputeBuiltinNode.<uint> (constant)
 
@@ -850,7 +909,7 @@ const computeFn = Fn( () => {
 
 ### .Break() : ExpressionNode
 
-TSL function for creating a `Break()` expression.
+TSL function for inserting a `break` expression into the shader.
 
 ### .Const( node : Node, name : string ) : VarNode
 
@@ -866,7 +925,7 @@ The name of the constant in the shader.
 
 ### .Continue() : ExpressionNode
 
-TSL function for creating a `Continue()` expression.
+TSL function for inserting a `continue` expression into the shader.
 
 ### .Discard( conditional : ConditionalNode ) : Node
 
@@ -894,13 +953,13 @@ The parameters for the conditional node.
 
 **Returns:** The conditional node.
 
-### .Loop( …params : any ) : LoopNode
+### .Loop( …params : LoopNode~Params | loopBodyCallback ) : LoopNode
 
 TSL function for creating a loop node.
 
 **params**
 
-A list of parameters.
+Any number of loop parameters followed by the loop body.
 
 ### .Return() : ExpressionNode
 
@@ -937,17 +996,13 @@ The node for which a variable should be created.
 
 The name of the variable in the shader.
 
-### .VarIntent( node : Node, name : string ) : VarNode
+### .VarIntent( node : Node ) : VarNode
 
 TSL function for creating a var intent node.
 
 **node**
 
 The node for which a variable should be created.
-
-**name**
-
-The name of the variable in the shader.
 
 ### .abs( x : Node | number ) : Node
 
@@ -1084,14 +1139,6 @@ A node that represents the scene's normals.
 **camera**
 
 The camera the scene is rendered with.
-
-### .append( node : Node ) : function
-
-**node**
-
-The node to add.
-
-**Deprecated:** since r176. Use [Stack](global.html#Stack) instead.
 
 ### .array( nodeTypeOrValues : string | Array.<Node>, count : number ) : ArrayNode
 
@@ -1403,7 +1450,7 @@ The configuration object.
 
 **position**
 
-Can be used to define the vertex positions in world space.
+Can be used to define the billboard center position directly. When null, the center is derived automatically from `positionWorld`.
 
 Default is `null`.
 
@@ -1416,6 +1463,12 @@ Default is `true`.
 **vertical**
 
 Whether to follow the camera rotation vertically or not.
+
+Default is `false`.
+
+**horizontalRotation**
+
+Whether to rotate around the Y axis to face the camera.
 
 Default is `false`.
 
@@ -1700,6 +1753,24 @@ TSL function for defining a built-in ambient occlusion context for a given node.
 **aoNode**
 
 The ambient occlusion value node to apply.
+
+**node**
+
+The node whose context should be modified.
+
+Default is `null`.
+
+### .builtinGIContext( aoNode : Node.<float>, giNode : Node.<vec3>, node : Node ) : ContextNode
+
+TSL function for defining a built-in global illumination context for a given node. The AO node modulates the indirect lighting of the materials, the GI node is added to their irradiance without being modulated by the AO since it already accounts for occlusion.
+
+**aoNode**
+
+The ambient occlusion value node to apply.
+
+**giNode**
+
+The indirect diffuse irradiance node to add.
 
 **node**
 
@@ -2117,7 +2188,7 @@ The node to render a texture with.
 
 **width**
 
-The width of the internal render target. If not width is applied, the render target is automatically resized.
+The width of the internal render target. If no width is applied, the render target is automatically resized.
 
 Default is `null`.
 
@@ -2131,7 +2202,25 @@ Default is `null`.
 
 The options for the internal render target.
 
-Default is `{type:HalfFloatType}`.
+Default is `{}`.
+
+**type**
+
+The texture type.
+
+Default is `HalfFloatType`.
+
+**autoUpdate**
+
+Whether the texture should automatically be updated or not.
+
+Default is `true`.
+
+**resolutionScale**
+
+The resolution scale.
+
+Default is `1`.
 
 ### .cos( x : Node | number ) : Node
 
@@ -2353,6 +2442,42 @@ Represents an exponential squared fog. This type of fog gives a clear view near 
 
 Defines the fog density.
 
+### .depthAwareBlur( inputNode : Node.<vec4>, depthNode : Node.<float>, directionNode : Node.<vec2>, camera : Camera, sharpness : Node.<float> | number, radius : Node.<float> | number ) : Node.<float>
+
+Applies one pass of a separable, depth-aware (bilateral) blur to a screen-space signal.
+
+The spatial term is a fixed 5-tap gaussian along `directionNode`; the edge-stopping term rejects neighbours whose view-space depth differs from the center, so the signal is smoothed across surfaces but not across silhouettes. Depth rejection is measured relative to `radius`, which keeps it scale invariant. Run it twice (horizontal then vertical) for a full separable blur. Handy for denoising a half-resolution effect such as ambient occlusion.
+
+**inputNode**
+
+The texture node to blur; its red channel is filtered.
+
+**depthNode**
+
+The scene depth texture node.
+
+**directionNode**
+
+One texel step along the blur axis, e.g. `vec2( 1 / width, 0 )`.
+
+**camera**
+
+The camera the scene is rendered with.
+
+**sharpness**
+
+How strongly a depth difference rejects a neighbour.
+
+Default is `2`.
+
+**radius**
+
+The world-space scale the depth rejection is relative to.
+
+Default is `1`.
+
+**Returns:** The blurred value.
+
 ### .depthBase( value : Node.<float> ) : ViewportDepthNode.<float>
 
 TSL function for defining a value for the current fragment's depth.
@@ -2485,7 +2610,35 @@ The first vector.
 
 The second vector.
 
-### .dotScreen( node : Node.<vec4>, angle : number, scale : number ) : DotScreenNode
+### .dot4I8Packed( a : Node.<uint>, b : Node.<uint> ) : Node.<int>
+
+Computes the dot product of four signed 8-bit integer components packed into each input.
+
+**a**
+
+The first packed signed integer vector.
+
+**b**
+
+The second packed signed integer vector.
+
+**Returns:** The dot product.
+
+### .dot4U8Packed( a : Node.<uint>, b : Node.<uint> ) : Node.<uint>
+
+Computes the dot product of four unsigned 8-bit integer components packed into each input.
+
+**a**
+
+The first packed unsigned integer vector.
+
+**b**
+
+The second packed unsigned integer vector.
+
+**Returns:** The dot product.
+
+### .dotScreen( node : Node.<vec4>, angle : number | Node.<float>, scale : number | Node.<float> ) : DotScreenNode
 
 TSL function for creating a dot-screen node for post processing.
 
@@ -2848,39 +3001,15 @@ The camera's projection matrix.
 
 **Returns:** The fragment's screen position expressed as uv coordinates.
 
-### .getShadowMaterial( light : Light ) : NodeMaterial
+### .getScreenPositionFromClip( clipPosition : Node.<vec4> ) : Node.<vec2>
 
-Retrieves or creates a shadow material for the given light source.
+Converts a clip-space position into a screen position expressed as uv coordinates.
 
-This function checks if a shadow material already exists for the provided light. If not, it creates a new `NodeMaterial` configured for shadow rendering and stores it in the `shadowMaterialLib` for future use.
+**clipPosition**
 
-**light**
+The position in clip space.
 
-The light source for which the shadow material is needed. If the light is a point light, a depth node is calculated using the linear shadow distance.
-
-**Returns:** The shadow material associated with the given light.
-
-### .getShadowRenderObjectFunction( renderer : Renderer, shadow : LightShadow, shadowType : number, useVelocity : boolean ) : shadowRenderObjectFunction
-
-Creates a function to render shadow objects in a scene.
-
-**renderer**
-
-The renderer.
-
-**shadow**
-
-The light shadow object containing shadow properties.
-
-**shadowType**
-
-The type of shadow map (e.g., BasicShadowMap).
-
-**useVelocity**
-
-Whether to use velocity data for rendering.
-
-**Returns:** A function that renders shadow objects.
+**Returns:** The screen position expressed as uv coordinates.
 
 ### .getViewPosition( screenPosition : Node.<vec2>, depth : Node.<float>, projectionMatrixInverse : Node.<mat4> ) : Node.<vec3>
 
@@ -3046,7 +3175,7 @@ Increments a node by 1.
 
 The node to increment.
 
-### .inspector( node : Node, name : string, callback : function | null ) : Node
+### .inspect( node : Node, name : string, callback : function | null ) : Node
 
 Creates an inspector node to wrap around a given node for inspection purposes.
 
@@ -3068,13 +3197,9 @@ Default is `null`.
 
 **Returns:** The inspector node.
 
-### .instance( count : number, matrices : InstancedBufferAttribute | StorageInstancedBufferAttribute, colors : InstancedBufferAttribute | StorageInstancedBufferAttribute )
+### .instance( matrices : InstancedBufferAttribute | StorageInstancedBufferAttribute, colors : InstancedBufferAttribute | StorageInstancedBufferAttribute )
 
 TSL function representing the standard instancing vertex shader setup. Transforms positionLocal and normalLocal, and assigns varying color in-place.
-
-**count**
-
-The instance count.
 
 **matrices**
 
@@ -3763,6 +3888,24 @@ TSL function for creating an object 3D node that represents the object's world m
 
 The 3D object.
 
+### .oitPass( scene : Scene, camera : Camera, options : Object ) : OITPassNode
+
+TSL function for creating an OIT pass node.
+
+**scene**
+
+The scene to render.
+
+**camera**
+
+The camera to render the scene with.
+
+**options**
+
+Options for the internal render target.
+
+Default is `{}`.
+
 ### .oneMinus( x : Node | number ) : Node
 
 Return `1` minus the parameter.
@@ -3938,6 +4081,46 @@ Default is `null`.
 
 **Returns:** The created override context node.
 
+### .pack4xI8( value : Node.<ivec4> ) : Node.<uint>
+
+Packs the least significant 8 bits of four signed integers into a `uint`.
+
+**value**
+
+The signed integer vector to pack.
+
+**Returns:** The packed value.
+
+### .pack4xI8Clamp( value : Node.<ivec4> ) : Node.<uint>
+
+Clamps four signed integers to the signed 8-bit range and packs them into a `uint`.
+
+**value**
+
+The signed integer vector to clamp and pack.
+
+**Returns:** The packed value.
+
+### .pack4xU8( value : Node.<uvec4> ) : Node.<uint>
+
+Packs the least significant 8 bits of four unsigned integers into a `uint`.
+
+**value**
+
+The unsigned integer vector to pack.
+
+**Returns:** The packed value.
+
+### .pack4xU8Clamp( value : Node.<uvec4> ) : Node.<uint>
+
+Clamps four unsigned integers to the unsigned 8-bit range and packs them into a `uint`.
+
+**value**
+
+The unsigned integer vector to clamp and pack.
+
+**Returns:** The packed value.
+
 ### .packHalf2x16( value : Node.<vec2> ) : Node
 
 Converts each component of the vec2 to 16-bit floating-point values. The results are packed into a single unsigned integer.
@@ -3964,6 +4147,14 @@ Converts each component of the normalized float to 16-bit integer values. The re
 
 The 2-component vector to be packed
 
+### .packSnorm4x8( value : Node.<vec4> ) : Node
+
+Converts each component of the normalized float to 8-bit integer values. The results are packed into a single unsigned integer.
+
+**value**
+
+The 4-component vector to be packed
+
 ### .packUnorm2x16( value : Node.<vec2> ) : Node
 
 Converts each component of the normalized float to 16-bit integer values. The results are packed into a single unsigned integer. round(clamp(c, 0, +1) \* 65535.0)
@@ -3971,6 +4162,14 @@ Converts each component of the normalized float to 16-bit integer values. The re
 **value**
 
 The 2-component vector to be packed
+
+### .packUnorm4x8( value : Node.<vec4> ) : Node
+
+Converts each component of the normalized float to 8-bit integer values. The results are packed into a single unsigned integer.
+
+**value**
+
+The 4-component vector to be packed
 
 ### .parabola( x : Node.<float>, k : Node.<float> ) : Node.<float>
 
@@ -4723,7 +4922,7 @@ Default is `null`.
 
 **Returns:** A new RetroPassNode instance.
 
-### .rgbShift( node : Node.<vec4>, amount : number, angle : number ) : RGBShiftNode
+### .rgbShift( node : Node.<vec4>, amount : number | Node.<float>, angle : number | Node.<float> ) : RGBShiftNode
 
 TSL function for creating a RGB shift or split effect for post processing.
 
@@ -4743,7 +4942,7 @@ Defines in which direction colors are shifted.
 
 Default is `0`.
 
-### .rotate( positionNode : Node, rotationNode : Node ) : RotateNode
+### .rotate( positionNode : Node, rotationNode : Node, order : string ) : RotateNode
 
 TSL function for creating a rotate node.
 
@@ -4754,6 +4953,12 @@ The position node.
 **rotationNode**
 
 Represents the rotation that is applied to the position node. Depending on whether the position data are 2D or 3D, the rotation is expressed a single float value or an Euler value.
+
+**order**
+
+The Euler rotation order. Only used for 3D rotation.
+
+Default is `'XYZ'`.
 
 ### .rotateUV( uv : Node.<vec2>, rotation : Node.<float>, center : Node.<vec2> ) : Node.<vec2>
 
@@ -4791,7 +4996,7 @@ The node to render a texture with.
 
 **width**
 
-The width of the internal render target. If not width is applied, the render target is automatically resized.
+The width of the internal render target. If no width is applied, the render target is automatically resized.
 
 Default is `null`.
 
@@ -4805,7 +5010,25 @@ Default is `null`.
 
 The options for the internal render target.
 
-Default is `{type:HalfFloatType}`.
+Default is `{}`.
+
+**type**
+
+The texture type.
+
+Default is `HalfFloatType`.
+
+**autoUpdate**
+
+Whether the texture should automatically be updated or not.
+
+Default is `true`.
+
+**resolutionScale**
+
+The resolution scale.
+
+Default is `1`.
 
 ### .sRGBTransferEOTF( color : Node.<vec3> ) : Node.<vec3>
 
@@ -5200,6 +5423,22 @@ The scene to render.
 
 The camera to render the scene with.
 
+### .ssao( depthNode : Node.<float>, normalNode : Node.<vec3>, camera : Camera ) : SSAONode
+
+TSL function for creating a fast screen-space ambient occlusion (SSAO) effect.
+
+**depthNode**
+
+A node that represents the scene's depth.
+
+**normalNode**
+
+A node that represents the scene's normals.
+
+**camera**
+
+The camera the scene is rendered with.
+
 ### .ssgi( beautyNode : TextureNode, depthNode : TextureNode, normalNode : TextureNode, camera : Camera ) : SSGINode
 
 TSL function for creating a SSGI effect.
@@ -5438,9 +5677,13 @@ The value provided to the reduction by the current invocation.
 
 **Returns:** The accumulated result of the reduction operation.
 
-### .subgroupAll() : bool
+### .subgroupAll( e : boolean ) : bool
 
 Returns true if e is true for all active invocations in the subgroup.
+
+**e**
+
+The predicate provided by the current invocation.
 
 **Returns:** The result of the computation.
 
@@ -5454,9 +5697,13 @@ The value provided to the reduction by the current invocation.
 
 **Returns:** The result of the reduction operation.
 
-### .subgroupAny() : bool
+### .subgroupAny( e : boolean ) : bool
 
 Returns true if e is true for any active invocation in the subgroup
+
+**e**
+
+The predicate provided by the current invocation.
 
 **Returns:** The result of the computation.
 
@@ -5486,17 +5733,13 @@ The subgroup invocation to broadcast from.
 
 **Returns:** The broadcast value.
 
-### .subgroupBroadcastFirst( e : number, id : number ) : number
+### .subgroupBroadcastFirst( e : number ) : number
 
 Broadcasts e from the active invocation with the lowest subgroup\_invocation\_id in the subgroup to all other active invocations.
 
 **e**
 
 The value to broadcast from the lowest subgroup invocation.
-
-**id**
-
-The subgroup invocation to broadcast from.
 
 **Returns:** The broadcast value.
 
@@ -5651,6 +5894,22 @@ A reduction that performs a bitwise xor of e among all active invocations and re
 The value provided to the reduction by the current invocation.
 
 **Returns:** The result of the reduction operation.
+
+### .sunShadow( light : SunLight, shadow : SunLightShadow ) : SunShadowNode
+
+TSL function for creating an instance of `SunShadowNode`.
+
+**light**
+
+The shadow casting sun light.
+
+**shadow**
+
+An optional sun light shadow.
+
+Default is `null`.
+
+**Returns:** The created sun shadow node.
 
 ### .taau( beautyNode : TextureNode, depthNode : TextureNode, velocityNode : TextureNode, camera : Camera ) : TAAUNode
 
@@ -5888,11 +6147,13 @@ Default is `null`.
 
 ### .textureStore( value : StorageTexture | StorageTextureNode, uvNode : Node.<(vec2|vec3)>, storeNode : Node ) : StorageTextureNode
 
-TODO: Explain difference to `storageTexture()`.
+TSL function for storing a value in a storage texture.
+
+Unlike [storageTexture](TSL.html#storageTexture), this function also accepts an existing storage texture node and is intended for performing the store operation itself.
 
 **value**
 
-The storage texture.
+The storage texture or storage texture node.
 
 **uvNode**
 
@@ -6252,6 +6513,26 @@ TSL function for creating a uniform texture node.
 
 The texture.
 
+### .unpack4xI8( value : Node.<uint> ) : Node.<ivec4>
+
+Unpacks a `uint` into four sign-extended signed 8-bit integer components.
+
+**value**
+
+The packed value.
+
+**Returns:** The unpacked signed integer vector.
+
+### .unpack4xU8( value : Node.<uint> ) : Node.<uvec4>
+
+Unpacks a `uint` into four zero-extended unsigned 8-bit integer components.
+
+**value**
+
+The packed value.
+
+**Returns:** The unpacked unsigned integer vector.
+
 ### .unpackHalf2x16( value : Node.<uint> ) : Node
 
 Unpacks a 32-bit unsigned integer into two 16-bit values, interpreted as 16-bit floating-point numbers. Returns a vec2 with both values.
@@ -6288,9 +6569,25 @@ Unpacks a 32-bit unsigned integer into two 16-bit values, interpreted as normali
 
 The unsigned integer to be unpacked
 
+### .unpackSnorm4x8( value : Node.<uint> ) : Node
+
+Unpacks a 32-bit unsigned integer into four 8-bit values, interpreted as normalized signed integers. Returns a vec4 with all values.
+
+**value**
+
+The unsigned integer to be unpacked
+
 ### .unpackUnorm2x16( value : Node.<uint> ) : Node
 
 Unpacks a 32-bit unsigned integer into two 16-bit values, interpreted as normalized unsigned integers. Returns a vec2 with both values.
+
+**value**
+
+The unsigned integer to be unpacked
+
+### .unpackUnorm4x8( value : Node.<uint> ) : Node
+
+Unpacks a 32-bit unsigned integer into four 8-bit values, interpreted as normalized unsigned integers. Returns a vec4 with all values.
 
 **value**
 
@@ -6642,6 +6939,32 @@ Rotation angle in radians (typically from IGN \* 2π).
 
 **Returns:** A 2D point on the unit disk.
 
+### .vxgi( depthNode : TextureNode, normalNode : TextureNode, scene : Scene, camera : Camera, resolution : number ) : VXGINode
+
+TSL function for creating a voxel GI effect.
+
+**depthNode**
+
+A texture node that represents the scene's depth.
+
+**normalNode**
+
+A texture node that represents the scene's view space normals.
+
+**scene**
+
+The scene to voxelize.
+
+**camera**
+
+The camera the scene is rendered with.
+
+**resolution**
+
+Number of voxels along the longest axis of the volume. Should not exceed `256`, higher values exceed the maximum storage buffer size of the voxelizer.
+
+Default is `128`.
+
 ### .wgsl( src : string, includes : Array.<Node> ) : CodeNode
 
 TSL function for creating a WGSL code node.
@@ -6780,6 +7103,25 @@ number
 
 A pan interaction.
 
+### .ConstantsRenderObjectRefreshType
+
+Represents the refresh types of render objects.
+
+**NONE**  
+number
+
+No refresh required.
+
+**SHARED**  
+number
+
+Only shared uniform buffers require an update.
+
+**FULL**  
+number
+
+The render object requires a full refresh.
+
 ### .ConstantsTimestampQuery
 
 This type represents the different timestamp query types.
@@ -6826,6 +7168,23 @@ Debug configuration.
 boolean
 
 Whether shader errors should be checked or not.
+
+**diagnostics**  
+Object
+
+Diagnostics configuration for the shader generation.
+
+###### Properties
+
+**keywords**  
+boolean
+
+Whether declaration names that collide with reserved keywords should be renamed or not.
+
+**onNodeBuilderCreated**  
+function
+
+A callback function that is executed after a node builder has been created and before it is built.
 
 **onShaderError**  
 function
@@ -7007,6 +7366,14 @@ XR configuration.
 boolean
 
 Whether to globally enable XR or not.
+
+### .loopBodyCallback( inputs : Object.<string, Node> )
+
+The loop body.
+
+**inputs**
+
+The loop variables of the current `Loop()` call, keyed by their name.
 
 ### .onAnimationCallback( time : DOMHighResTimeStamp, frame : XRFrame )
 
