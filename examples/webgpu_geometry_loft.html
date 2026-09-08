@@ -40,6 +40,8 @@
 			import * as THREE from 'three/webgpu';
 			import { bumpMap, color, cos, float, mix, mx_fractal_noise_float, mx_noise_float, mx_worley_noise_float, positionLocal, screenUV, sin, smoothstep, uv, vec3 } from 'three/tsl';
 
+			import { SunLight } from 'three/addons/lights/SunLight.js';
+			import { SunLightNode } from 'three/addons/lights/SunLightNode.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -53,6 +55,7 @@
 			async function init() {
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.library.addLight( SunLightNode, SunLight );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -120,13 +123,9 @@
 
 				// light
 
-				const light = new THREE.DirectionalLight( 0xffffff, 3 );
+				const light = new SunLight( 0xffffff, 3 );
 				light.position.set( 18, 30, 12 );
 				light.castShadow = true;
-				light.shadow.camera.left = - 60;
-				light.shadow.camera.right = 60;
-				light.shadow.camera.top = 60;
-				light.shadow.camera.bottom = - 60;
 				light.shadow.camera.far = 110;
 				light.shadow.mapSize.set( 4096, 4096 );
 				light.shadow.bias = - 0.0005;
