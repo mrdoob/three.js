@@ -460,13 +460,13 @@ class Guide {
 				const height = Math.floor( entry.contentRect.height );
 				if ( width > 0 && height > 0 ) {
 
-					cancelAnimationFrame( resizeTimeout );
-					resizeTimeout = requestAnimationFrame( () => {
+					clearTimeout( resizeTimeout );
+					resizeTimeout = setTimeout( () => {
 
 						this.renderer.setSize( width, height );
 						this.runner.call( 'resize', width, height );
 
-					} );
+					}, 0 );
 
 				}
 
