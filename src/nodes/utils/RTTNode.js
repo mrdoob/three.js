@@ -14,8 +14,6 @@ import { resetRendererState, restoreRendererState } from '../../renderers/common
 
 const _size = /*@__PURE__*/ new Vector2();
 
-let _rendererState;
-
 /**
  * `RTTNode` takes another node and uses it with a `QuadMesh` to render into a texture (RTT).
  * This module is especially relevant in context of post processing where certain nodes require
@@ -126,6 +124,15 @@ class RTTNode extends TextureNode {
 		 * @type {QuadMesh}
 		 */
 		this._quadMesh = new QuadMesh( new NodeMaterial() );
+
+		/**
+		 * The renderer state saved and restored around the RTT render.
+		 * Kept per instance because nested RTT nodes must not share it.
+		 *
+		 * @private
+		 * @type {Object}
+		 */
+		this._rendererState = {};
 
 		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
@@ -287,13 +294,13 @@ class RTTNode extends TextureNode {
 
 		//
 
-		_rendererState = resetRendererState( renderer, _rendererState );
+		resetRendererState( renderer, this._rendererState );
 
 		renderer.setRenderTarget( this.renderTarget );
 
 		this._quadMesh.render( renderer );
 
-		restoreRendererState( renderer, _rendererState );
+		restoreRendererState( renderer, this._rendererState );
 
 	}
 
