@@ -2253,7 +2253,6 @@ class WebGLBackend extends Backend {
 
 			const isCube = renderTarget.isCubeRenderTarget === true;
 			const isRenderTarget3D = renderTarget.isRenderTarget3D === true;
-			const isRenderTargetArray = renderTarget.depth > 1;
 			const isXRRenderTarget = renderTarget.isXRRenderTarget === true;
 			const _hasExternalTextures = ( isXRRenderTarget === true && renderTarget._hasExternalTextures === true );
 
@@ -2335,7 +2334,7 @@ class WebGLBackend extends Backend {
 
 							multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, attachment, textureData.textureGPU, 0, samples, 0, 2 );
 
-						} else if ( isRenderTarget3D || isRenderTargetArray ) {
+						} else if ( isRenderTarget3D || textureData.glTextureType === gl.TEXTURE_2D_ARRAY ) {
 
 							const layer = this.renderer._activeCubeFace;
 							const mipLevel = this.renderer._activeMipmapLevel;
