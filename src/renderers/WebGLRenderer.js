@@ -1355,9 +1355,11 @@ class WebGLRenderer {
 
 		// Compile
 
-		function prepareMaterial( material, scene, object ) {
+		function prepareMaterial( material, scene, camera, object ) {
 
 			if ( _nodesHandler !== null && material.isNodeMaterial ) _nodesHandler.setObject( object, material );
+
+			if ( _clippingEnabled === true ) clipping.setState( material, camera, false );
 
 			if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
 
@@ -1442,6 +1444,11 @@ class WebGLRenderer {
 			currentRenderState.setupLights();
 			if ( _nodesHandler !== null ) _nodesHandler.updateLights( currentRenderState.state.lightsArray );
 
+			_localClippingEnabled = this.localClippingEnabled;
+			_clippingEnabled = clipping.init( this.clippingPlanes, _localClippingEnabled );
+
+			if ( _clippingEnabled === true ) clipping.setGlobalState( this.clippingPlanes, camera );
+
 			// node materials reference the shadow map when they are built, so it must exist by now
 
 			if ( _nodesHandler !== null ) shadowMap.render( currentRenderState.state.shadowsArray, targetScene, camera );
@@ -1468,14 +1475,14 @@ class WebGLRenderer {
 
 							const material2 = material[ i ];
 
-							prepareMaterial( material2, targetScene, object );
+							prepareMaterial( material2, targetScene, camera, object );
 							materials.add( material2 );
 
 						}
 
 					} else {
 
-						prepareMaterial( material, targetScene, object );
+						prepareMaterial( material, targetScene, camera, object );
 						materials.add( material );
 
 					}
