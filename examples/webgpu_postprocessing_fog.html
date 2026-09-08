@@ -61,6 +61,8 @@
 				vec4
 			} from 'three/tsl';
 
+			import { SunLight } from 'three/addons/lights/SunLight.js';
+			import { SunLightNode } from 'three/addons/lights/SunLightNode.js';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -170,22 +172,17 @@
 				const ambient = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d, 0.5 );
 				scene.add( ambient );
 
-				const dirLight = new THREE.DirectionalLight( 0xffffff, 2.5 );
-				dirLight.position.set( 5, 10, 5 );
-				dirLight.castShadow = true;
-				dirLight.shadow.mapSize.width = 1024;
-				dirLight.shadow.mapSize.height = 1024;
-				dirLight.shadow.camera.near = 1;
-				dirLight.shadow.camera.far = 25;
-				dirLight.shadow.camera.left = - 3;
-				dirLight.shadow.camera.right = 3;
-				dirLight.shadow.camera.top = 3;
-				dirLight.shadow.camera.bottom = - 3;
-				scene.add( dirLight );
+				const sunLight = new SunLight( 0xffffff, 2.5 );
+				sunLight.position.set( 5, 10, 5 );
+				sunLight.castShadow = true;
+				sunLight.shadow.mapSize.set( 2048, 2048 );
+				sunLight.shadow.camera.far = 25;
+				scene.add( sunLight );
 
 				// Renderer
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.library.addLight( SunLightNode, SunLight );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
