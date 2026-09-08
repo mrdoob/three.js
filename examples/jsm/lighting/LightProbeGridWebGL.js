@@ -2,7 +2,6 @@ import {
 	Box3,
 	CubeCamera,
 	Data3DTexture,
-	DirectionalLight,
 	FloatType,
 	HalfFloatType,
 	LinearFilter,
@@ -15,12 +14,13 @@ import {
 	RGBAFormat,
 	Scene,
 	ShaderMaterial,
-	Sphere,
 	Vector3,
 	WebGL3DRenderTarget,
 	WebGLCubeRenderTarget,
 	WebGLRenderTarget
 } from 'three';
+
+import { replaceSunLights, restoreSunLights } from './LightProbeGridUtils.js';
 
 // Shared fullscreen-quad scene / camera
 let _scene = null;
@@ -52,82 +52,6 @@ const _copyRegion = /*@__PURE__*/ new Box3();
 
 // Direct-light captures use a black atlas without changing the light layout.
 let _emptyAtlas = null;
-const _casterBox = /*@__PURE__*/ new Box3();
-const _casterSphere = /*@__PURE__*/ new Sphere();
-const _sunDirection = /*@__PURE__*/ new Vector3();
-
-// SunLight shadow cascades are fitted to the active camera every render, which
-// the frozen shadow maps of a bake cannot provide: each shadow-casting SunLight
-// is swapped for an equivalent DirectionalLight fitted to the shadow casters.
-
-function _replaceSunLights( scene ) {
-
-	const sunLights = [];
-
-	scene.traverse( ( object ) => {
-
-		if ( object.isSunLight === true && object.visible === true && object.castShadow === true ) sunLights.push( object );
-
-	} );
-
-	if ( sunLights.length === 0 ) return null;
-
-	_casterBox.makeEmpty();
-
-	scene.traverse( ( object ) => {
-
-		if ( object.isMesh === true && object.castShadow === true ) _casterBox.expandByObject( object );
-
-	} );
-
-	_casterBox.getBoundingSphere( _casterSphere );
-
-	const center = _casterSphere.center;
-	const radius = Math.max( _casterSphere.radius, 1 );
-
-	const replacements = [];
-
-	for ( const sunLight of sunLights ) {
-
-		const bakeLight = new DirectionalLight( sunLight.color, sunLight.intensity );
-		bakeLight.castShadow = true;
-		bakeLight.shadow.mapSize.copy( sunLight.shadow.mapSize );
-		bakeLight.shadow.camera.left = - radius;
-		bakeLight.shadow.camera.right = radius;
-		bakeLight.shadow.camera.top = radius;
-		bakeLight.shadow.camera.bottom = - radius;
-		bakeLight.shadow.camera.near = radius * 0.5;
-		bakeLight.shadow.camera.far = radius * 3.5;
-
-		_sunDirection.setFromMatrixPosition( sunLight.matrixWorld ).normalize();
-		bakeLight.target.position.copy( center );
-		bakeLight.position.copy( center ).addScaledVector( _sunDirection, radius * 2 );
-
-		scene.add( bakeLight, bakeLight.target );
-		bakeLight.target.updateMatrixWorld();
-		bakeLight.updateMatrixWorld();
-
-		sunLight.visible = false;
-
-		replacements.push( { sunLight, bakeLight } );
-
-	}
-
-	return replacements;
-
-}
-
-function _restoreSunLights( scene, replacements ) {
-
-	for ( const { sunLight, bakeLight } of replacements ) {
-
-		scene.remove( bakeLight, bakeLight.target );
-		bakeLight.dispose();
-		sunLight.visible = true;
-
-	}
-
-}
 
 // Number of padding texels added at each boundary of every sub-volume in the atlas.
 const ATLAS_PADDING = 1;
@@ -386,7 +310,7 @@ class LightProbeGridWebGL extends Object3D {
 
 			}
 
-			replacedSunLights = _replaceSunLights( scene );
+			replacedSunLights = replaceSunLights( scene );
 
 			// Render shadow maps once, not once per cube face.
 
@@ -409,7 +333,7 @@ class LightProbeGridWebGL extends Object3D {
 			renderer.xr.enabled = currentXrEnabled;
 			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
 
-			if ( replacedSunLights !== null ) _restoreSunLights( scene, replacedSunLights );
+			if ( replacedSunLights !== null ) restoreSunLights( scene, replacedSunLights );
 
 			scene.matrixWorldAutoUpdate = currentMatrixWorldAutoUpdate;
 			this.visible = currentVisible;

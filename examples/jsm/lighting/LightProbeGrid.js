@@ -32,6 +32,7 @@ import {
 } from 'three/tsl';
 
 import { LightProbeGridNode, ATLAS_PADDING } from '../tsl/lighting/LightProbeGridNode.js';
+import { replaceSunLights, restoreSunLights } from './LightProbeGridUtils.js';
 
 // Shared fullscreen-quad for the bake passes.
 const _quad = /*@__PURE__*/ new QuadMesh();
@@ -434,6 +435,10 @@ class LightProbeGrid extends Light {
 	 * then repeat with `pass: 1`, etc. Start each pass at index 0 to snapshot the
 	 * previous pass before updating its cells.
 	 *
+	 * Shadow-casting instances of `SunLight` are temporarily replaced with
+	 * equivalent directional lights, since their view-fitted shadow cascades
+	 * cannot be frozen across probe renders.
+	 *
 	 * @param {WebGPURenderer} renderer - The renderer.
 	 * @param {Scene} scene - The scene to render.
 	 * @param {Object} [options] - Bake options.
@@ -531,6 +536,7 @@ class LightProbeGrid extends Light {
 		const renderTarget = this._renderTarget;
 		const currentViewport = renderTarget.viewport.clone();
 		const shadowStates = [];
+		let replacedSunLights = null;
 
 		try {
 
@@ -545,6 +551,8 @@ class LightProbeGrid extends Light {
 				scene.matrixWorldAutoUpdate = false;
 
 			}
+
+			replacedSunLights = replaceSunLights( scene );
 
 			// Render each shadow map once, not once per cube face.
 
@@ -580,6 +588,8 @@ class LightProbeGrid extends Light {
 			scene.matrixWorldAutoUpdate = currentMatrixWorldAutoUpdate;
 
 			for ( const { shadow, autoUpdate } of shadowStates ) shadow.autoUpdate = autoUpdate;
+
+			if ( replacedSunLights !== null ) restoreSunLights( scene, replacedSunLights );
 
 			this.visible = currentVisible;
 			if ( this._bounceGrid !== null ) this._bounceGrid.removeFromParent();
