@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - overlay</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+		<style>
+			body {
+				background-color: #ffffff;
+				color: #333;
+				font-family: 'Roboto', sans-serif;
+				line-height: 1.6;
+			}
+
+			#canvas-bg, #canvas-fg {
+				position: fixed;
+				width: 100vw;
+				height: 100vh;
+				top: 0;
+				left: 0;
+				pointer-events: none;
+			}
+
+			#canvas-bg canvas, #canvas-fg canvas {
+				pointer-events: none;
+			}
+
+			#canvas-bg { z-index: -100; }
+			#canvas-fg { z-index:  100; }
+
+			.content {
+				max-width: 700px;
+				margin: 0 auto;
+				padding: 40px 20px;
+			}
+
+			a { color: #0066cc; }
+		</style>
+	</head>
+	<body>
+		<div id="canvas-bg"></div>
+		<div id="canvas-fg"></div>
+
+		<div class="content">
+			<h1>WebGL Overlay</h1>
+			<p>
+				This example demonstrates a technique for rendering three.js canvases
+				that integrate with scrollable HTML content. 3D elements can appear both
+				in front of and behind HTML elements.
+			</p>
+
+			<h2>How It Works</h2>
+			<p>
+				The overlay system uses two separate WebGL renderers: one positioned behind
+				the HTML content (background) and one in front (foreground). By adjusting
+				the camera's near and far clipping planes for each render pass, objects
+				closer than a threshold depth render in the foreground, while objects
+				further away render in the background.
+			</p>
+			<p>
+				The camera position is synchronized with the scroll position of the page,
+				creating the illusion that the 3D scene exists in the same coordinate
+				space as the HTML document. A forced pixels-per-meter calculation ensures
+				consistent sizing across different viewport dimensions.
+			</p>
+
+			<h2>Element Mapping</h2>
+			<p>
+				HTML elements can be mapped to 3D representations. In this demo, paragraph
+				elements are visualized as wireframe boxes in 3D space, allowing for
+				potential interaction between 3D objects and page content.
+			</p>
+
+			<h2>Applications</h2>
+			<p>
+				This technique enables creative web experiences where 3D graphics seamlessly
+				blend with traditional HTML layouts. Use cases include decorative page
+				elements, interactive visualizations embedded in articles, and immersive
+				scrolling experiences.
+			</p>
+
+			<p>Scroll to see 3D elements interact with the page.</p>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			let camera, scene, rendererBg, rendererFg;
+			let containerBg, containerFg, currentZoom, anchor;
+			let pixelsPerMeter = 100.0;
+			let cameraDepth = 5.0;
+			let isSafari = false;
+
+			const elementBoxes = [];
+			let cube;
+			let contentElement;
+
+			init();
+
+			function init() {
+
+				containerBg = document.getElementById( 'canvas-bg' );
+				containerFg = document.getElementById( 'canvas-fg' );
+				contentElement = document.querySelector( '.content' );
+
+				checkSafari();
+
+				// Scene
+				scene = new THREE.Scene();
+
+				// Camera
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 2.0, 1000 );
+				camera.position.set( 0.0, 0.0, cameraDepth );
+				camera.layers.enableAll();
+				scene.add( camera );
+
+				// Centered Anchor
+				anchor = new THREE.Object3D();
+				anchor.position.set( 0, 0, 0 );
+				scene.add( anchor );
+
+				forcePixelsPerMeter();
+				updateAnchorPosition();
+
+				// Lights
+				const spotLight = new THREE.SpotLight( 0xffffff, Math.PI * 10.0 );
+				spotLight.angle = Math.PI / 5;
+				spotLight.penumbra = 0.2;
+				spotLight.position.set( -2, 3, 3 );
+				spotLight.castShadow = true;
+				spotLight.shadow.camera.near = 1;
+				spotLight.shadow.camera.far = 20;
+				spotLight.shadow.mapSize.width = 1024;
+				spotLight.shadow.mapSize.height = 1024;
+				anchor.add( spotLight );
+
+				const dirLight = new THREE.DirectionalLight( 0x55505a, Math.PI * 10.0 );
+				dirLight.position.set( 0, 3, 0 );
+				dirLight.castShadow = true;
+				dirLight.shadow.camera.near = -10;
+				dirLight.shadow.camera.far = 10;
+				dirLight.shadow.camera.right = 3;
+				dirLight.shadow.camera.left = -3;
+				dirLight.shadow.camera.top = 3;
+				dirLight.shadow.camera.bottom = -3;
+				dirLight.shadow.mapSize.width = 1024;
+				dirLight.shadow.mapSize.height = 1024;
+				anchor.add( dirLight );
+
+				// Grid helpers (background decoration)
+				for ( let i = 0; i < 10; i++ ) {
+
+					const grid = new THREE.GridHelper( 20, 20 );
+					grid.material.opacity = 0.2;
+					grid.material.transparent = true;
+					grid.position.set( 0.0, i * -5.0, 0 );
+					anchor.add( grid );
+
+				}
+
+				// Demo cube (positioned in 3D space relative to content)
+				cube = new THREE.Mesh(
+					new THREE.BoxGeometry( 1, 1, 1 ),
+					new THREE.MeshPhysicalMaterial( { color: 0x00ff00 } )
+				);
+				cube.position.y = -5.0;
+				anchor.add( cube );
+
+				// Background renderer
+				rendererBg = new THREE.WebGLRenderer( { antialias: true } );
+				rendererBg.setPixelRatio( 1.0 );
+				rendererBg.shadowMap.enabled = true;
+				rendererBg.setClearColor( 0x000000, 0 );
+				rendererBg.setAnimationLoop( animate );
+				containerBg.appendChild( rendererBg.domElement );
+
+				// Foreground renderer
+				rendererFg = new THREE.WebGLRenderer( { antialias: true } );
+				rendererFg.setPixelRatio( 1.0 );
+				rendererFg.shadowMap.enabled = true;
+				rendererFg.setClearColor( 0x000000, 0 );
+				containerFg.appendChild( rendererFg.domElement );
+
+				// Create element boxes for paragraph elements
+				computeDivFrames3D();
+
+				// Event listeners
+				window.addEventListener( 'resize', onWindowResize );
+				window.addEventListener( 'orientationchange', onWindowResize );
+				window.addEventListener( 'scroll', () => {
+
+					setScrolledCameraPosition();
+					render();
+
+				} );
+				
+				// Record the current zoom level detecting zoom on mobile
+				if (window.visualViewport) {
+					currentZoom = window.visualViewport.scale;
+				}
+
+				onWindowResize();
+
+			}
+
+			function forcePixelsPerMeter() {
+
+				camera.fov = 2 * Math.atan( window.innerHeight / 
+					( 2 * cameraDepth * pixelsPerMeter ) ) * THREE.MathUtils.RAD2DEG;
+				camera.updateProjectionMatrix();
+
+			}
+
+			function updateAnchorPosition() {
+
+				const rect = contentElement.getBoundingClientRect();
+				const centerX = rect.left + window.scrollX + rect.width * 0.5;
+				anchor.position.x = centerX / pixelsPerMeter;
+
+			}
+
+			function computeDivFrames3D() {
+
+				const elements = document.getElementsByTagName( 'p' );
+
+				for ( let i = 0; i < elements.length; i++ ) {
+
+					const rect = elements[ i ].getBoundingClientRect();
+					const centerX = (( rect.left + window.scrollX + rect.width * 0.5 ) / pixelsPerMeter ) - anchor.position.x;
+					const centerY = ( rect.top + window.scrollY + rect.height * 0.5 ) / - pixelsPerMeter;
+					const halfWidth = rect.width / pixelsPerMeter / 2;
+					const halfHeight = rect.height / pixelsPerMeter / 2;
+					const halfDepth = 0.25;
+
+					if ( i >= elementBoxes.length ) {
+
+						const box = new THREE.Box3();
+						const helper = new THREE.Box3Helper( box, 0x000000 );
+						helper.material.opacity = 0.1;
+						helper.material.transparent = true;
+						anchor.add( helper );
+						elementBoxes.push( { box, helper } );
+
+					}
+
+					elementBoxes[ i ].box.set(
+						new THREE.Vector3( centerX - halfWidth, centerY - halfHeight, - halfDepth ),
+						new THREE.Vector3( centerX + halfWidth, centerY + halfHeight, halfDepth )
+					);
+
+				}
+
+			}
+
+			function checkSafari() {
+
+				// Detect Safari browser
+				isSafari = /^((?!chrome|android).)*safari/i.test( navigator.userAgent );
+
+			}
+
+			function setScrolledCameraPosition() {
+
+				const scrollX = window.scrollX;
+				const scrollY = window.scrollY;
+
+				camera.position.set(
+					( scrollX + window.innerWidth * 0.5 ) / pixelsPerMeter,
+					-( scrollY + window.innerHeight * 0.5 ) / pixelsPerMeter,
+					cameraDepth
+				);
+
+				if ( isSafari ) {
+
+					// Absolute positioning for mobile/iOS
+					containerBg.style.position = 'absolute';
+					containerFg.style.position = 'absolute';
+					containerBg.style.width = '100%';
+					containerFg.style.width = '100%';
+					containerBg.style.height = '100%';
+					containerFg.style.height = '100%';
+					containerBg.style.transform = `translate(${scrollX}px, ${scrollY}px)`;
+					containerFg.style.transform = `translate(${scrollX}px, ${scrollY}px)`;
+
+				} else {
+
+					// Fixed positioning for desktop
+					containerBg.style.position = 'fixed';
+					containerFg.style.position = 'fixed';
+					containerBg.style.width = '100vw';
+					containerFg.style.width = '100vw';
+					containerBg.style.height = '100vh';
+					containerFg.style.height = '100vh';
+					containerBg.style.transform = '';
+					containerFg.style.transform = '';
+
+				}
+
+			}
+
+			function render() {
+
+				// Render background (objects beyond cameraDepth)
+				camera.near = cameraDepth;
+				camera.far = 1000;
+				camera.updateProjectionMatrix();
+				rendererBg.render( scene, camera );
+
+				// Render foreground (objects closer than cameraDepth)
+				camera.near = 2.0;
+				camera.far = cameraDepth + 0.01;
+				camera.updateProjectionMatrix();
+				rendererFg.render( scene, camera );
+
+			}
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				rendererBg.setSize( width, height );
+				rendererFg.setSize( width, height );
+
+				forcePixelsPerMeter();
+				updateAnchorPosition();
+				computeDivFrames3D();
+				setScrolledCameraPosition();
+
+			}
+
+			function animate() {
+
+				// Catch zoom changes on mobile
+				if (window.visualViewport) {
+					if (currentZoom !== window.visualViewport.scale) {
+						onWindowResize();
+					}
+					currentZoom = window.visualViewport.scale;
+				}
+
+				setScrolledCameraPosition();
+				render();
+
+			}
+
+		</script>
+	</body>
+</html>
