@@ -2,7 +2,7 @@
 
 ## Import
 
-RGBShiftShader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+RGBShiftShader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { RGBShiftShader } from 'three/addons/shaders/RGBShiftShader.js';

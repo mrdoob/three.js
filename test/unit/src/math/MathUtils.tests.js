@@ -153,6 +153,8 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( MathUtils.isPowerOfTwo( 2 ), true, '2 is a PoT' );
 			assert.strictEqual( MathUtils.isPowerOfTwo( 3 ), false, '3 is not a PoT' );
 			assert.strictEqual( MathUtils.isPowerOfTwo( 4 ), true, '4 is a PoT' );
+			assert.strictEqual( MathUtils.isPowerOfTwo( 2 ** 40 ), true, 'Large PoT' );
+			assert.strictEqual( MathUtils.isPowerOfTwo( 3 * 2 ** 32 ), false, 'Large non-PoT' );
 
 		} );
 

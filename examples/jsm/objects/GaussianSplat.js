@@ -2,9 +2,11 @@ import {
 	Box3,
 	BufferAttribute,
 	InstancedBufferGeometry,
+	Matrix3,
 	Matrix4,
 	Mesh,
 	NodeMaterial,
+	Ray,
 	Sphere,
 	StorageBufferAttribute,
 	Vector2,
@@ -17,6 +19,7 @@ import {
 	If,
 	atan,
 	cameraProjectionMatrix,
+	cameraViewport,
 	cos,
 	dot,
 	exp,
@@ -27,7 +30,6 @@ import {
 	min,
 	normalize,
 	positionGeometry,
-	screenSize,
 	sin,
 	sqrt,
 	storage,
@@ -52,6 +54,8 @@ const WORKGROUP_SIZE = 256;
 const SORT_DIRECTION_THRESHOLD = 0.9995;
 const KERNEL_2D_SIZE = 0.3;
 const SPLAT_KERNEL_CUTOFF = 2;
+const COVARIANCE_FLATNESS = 1e-4;
+const MIN_RAYCAST_OPACITY = 0.2;
 const MAX_SCREEN_SPACE_SPLAT_SIZE = 1024;
 const CLIP_XY = 1.4;
 
@@ -62,6 +66,13 @@ const _sortDirection = /*@__PURE__*/ new Vector3();
 const _sortDepthRange = /*@__PURE__*/ new Vector2();
 const _worldMatrixInverse = /*@__PURE__*/ new Matrix4();
 const _modelViewMatrix = /*@__PURE__*/ new Matrix4();
+const _inverseMatrix = /*@__PURE__*/ new Matrix4();
+const _ray = /*@__PURE__*/ new Ray();
+const _sphere = /*@__PURE__*/ new Sphere();
+const _covarianceMatrix = /*@__PURE__*/ new Matrix3();
+const _originOffset = /*@__PURE__*/ new Vector3();
+const _mDirection = /*@__PURE__*/ new Vector3();
+const _mOriginOffset = /*@__PURE__*/ new Vector3();
 const _vector = /*@__PURE__*/ new Vector3();
 
 /**
@@ -336,6 +347,51 @@ class GaussianSplat extends Mesh {
 	}
 
 	/**
+	 * Computes intersection points between a casted ray and the splats.
+	 *
+	 * @param {Raycaster} raycaster - The raycaster.
+	 * @param {Array<Object>} intersects - The target array that holds the intersection points.
+	 */
+	raycast( raycaster, intersects ) {
+
+		const matrixWorld = this.matrixWorld;
+
+		// Checking boundingSphere distance to ray
+
+		if ( this.boundingSphere === null ) this.computeBoundingSphere();
+
+		_sphere.copy( this.boundingSphere );
+		_sphere.applyMatrix4( matrixWorld );
+
+		if ( raycaster.ray.intersectsSphere( _sphere ) === false ) return;
+
+		//
+
+		_inverseMatrix.copy( matrixWorld ).invert();
+		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
+
+		// test with bounding box in local space
+
+		if ( this.boundingBox !== null ) {
+
+			if ( _ray.intersectsBox( this.boundingBox ) === false ) return;
+
+		}
+
+		const positionAttribute = this.splatGeometry.getAttribute( 'position' );
+		const covarianceAttribute = this.splatGeometry.getAttribute( 'covariance' );
+		const colorAttribute = this.splatGeometry.getAttribute( 'color' );
+		const count = positionAttribute.count;
+
+		for ( let i = 0; i < count; i ++ ) {
+
+			computeRayIntersection( positionAttribute, covarianceAttribute, colorAttribute, i, matrixWorld, raycaster, intersects, this );
+
+		}
+
+	}
+
+	/**
 	 * Updates the draw order if the camera or mesh orientation has changed enough
 	 * to need a new sort.
 	 *
@@ -427,6 +483,130 @@ class GaussianSplat extends Mesh {
 		} );
 
 	}
+
+}
+
+// Intersects the ray with the ellipsoid the splat's covariance describes, which reduces to a
+// quadratic in t whose smaller root is the near surface.
+function computeRayIntersection( positionAttribute, covarianceAttribute, colorAttribute, index, matrixWorld, raycaster, intersects, object ) {
+
+	// skip faint splats - cheapest possible rejection, a single attribute read
+	if ( colorAttribute.getW( index ) < MIN_RAYCAST_OPACITY ) {
+
+		return;
+
+	}
+
+	// the diagonal of the covariance bounds the splat's drawn extent (same radius used by
+	// computeBoundingBox/computeBoundingSphere); reject rays that don't pass near the splat
+	// at all before doing any of the more expensive matrix work below
+	const c00 = covarianceAttribute.getComponent( index, 0 );
+	const c11 = covarianceAttribute.getComponent( index, 3 );
+	const c22 = covarianceAttribute.getComponent( index, 5 );
+	const maxVariance = Math.max( c00, c11, c22 );
+
+	if ( maxVariance <= 0 ) {
+
+		return;
+
+	}
+
+	const center = _vector.fromBufferAttribute( positionAttribute, index );
+	const boundingRadius = SPLAT_KERNEL_CUTOFF * Math.sqrt( maxVariance );
+
+	if ( _ray.distanceSqToPoint( center ) > boundingRadius * boundingRadius ) {
+
+		return;
+
+	}
+
+	// the attribute holds the upper triangle of the symmetric covariance
+	const c01 = covarianceAttribute.getComponent( index, 1 );
+	const c02 = covarianceAttribute.getComponent( index, 2 );
+	const c12 = covarianceAttribute.getComponent( index, 4 );
+
+	// splats are often flat enough to make the covariance singular, so the thinnest axis is floored
+	// relative to the widest to keep the quadratic solvable
+	const minVariance = maxVariance * COVARIANCE_FLATNESS;
+
+	_covarianceMatrix.set(
+		c00 + minVariance, c01, c02,
+		c01, c11 + minVariance, c12,
+		c02, c12, c22 + minVariance
+	);
+
+	const determinant = _covarianceMatrix.determinant();
+
+	if ( determinant <= 0 ) {
+
+		return;
+
+	}
+
+	// inverse( covariance ), applied below to the ray direction and to the origin offset
+	_covarianceMatrix.invert();
+
+	_mDirection.copy( _ray.direction ).applyMatrix3( _covarianceMatrix );
+
+	// squared length of the ray direction in the ellipsoid's metric; must be positive for a valid covariance
+	const a = _ray.direction.dot( _mDirection );
+
+	if ( a <= 0 ) {
+
+		return;
+
+	}
+
+	_originOffset.copy( _ray.origin ).sub( center );
+	_mOriginOffset.copy( _originOffset ).applyMatrix3( _covarianceMatrix );
+
+	const b = 2 * _originOffset.dot( _mDirection );
+	const c = _originOffset.dot( _mOriginOffset ) - SPLAT_KERNEL_CUTOFF * SPLAT_KERNEL_CUTOFF;
+	const discriminant = b * b - 4 * a * c;
+
+	if ( discriminant < 0 ) {
+
+		return;
+
+	}
+
+	const sqrtDiscriminant = Math.sqrt( discriminant );
+	let t = ( - b - sqrtDiscriminant ) / ( 2 * a );
+
+	// the near surface is behind the origin when the ray starts inside the splat
+	if ( t < 0 ) {
+
+		t = ( - b + sqrtDiscriminant ) / ( 2 * a );
+
+	}
+
+	if ( t < 0 ) {
+
+		return;
+
+	}
+
+	const intersectPoint = new Vector3();
+	_ray.at( t, intersectPoint ).applyMatrix4( matrixWorld );
+
+	const distance = raycaster.ray.origin.distanceTo( intersectPoint );
+	if ( distance < raycaster.near || distance > raycaster.far ) {
+
+		return;
+
+	}
+
+	intersects.push( {
+
+		distance: distance,
+		point: intersectPoint,
+		index: index,
+		face: null,
+		faceIndex: null,
+		barycoord: null,
+		object: object
+
+	} );
 
 }
 
@@ -753,7 +933,7 @@ function createMaterialNodes( buffers, sort, localCameraPosition ) {
 		const z = min( viewCenter.z, - 0.01 ).toVar( 'z' );
 		const invZ = float( 1 ).div( z ).toVar( 'invZ' );
 		const invZ2 = invZ.mul( invZ ).toVar( 'invZ2' );
-		const focal = screenSize.mul( 0.5 ).mul( vec2( cameraProjectionMatrix[ 0 ].x, cameraProjectionMatrix[ 1 ].y ) ).toVar( 'focal' );
+		const focal = cameraViewport.zw.mul( 0.5 ).mul( vec2( cameraProjectionMatrix[ 0 ].x, cameraProjectionMatrix[ 1 ].y ) ).toVar( 'focal' );
 
 		const j00 = focal.x.negate().mul( invZ ).toVar( 'j00' );
 		const j11 = focal.y.negate().mul( invZ ).toVar( 'j11' );
@@ -799,7 +979,7 @@ function createMaterialNodes( buffers, sort, localCameraPosition ) {
 		const scale1 = min( sqrt( lambda1 ), MAX_SCREEN_SPACE_SPLAT_SIZE ).toVar( 'scale1' );
 		const scale2 = min( sqrt( lambda2 ), MAX_SCREEN_SPACE_SPLAT_SIZE ).toVar( 'scale2' );
 		const offsetPixels = axis1.mul( positionGeometry.x ).mul( scale1 ).add( axis2.mul( positionGeometry.y ).mul( scale2 ) ).toVar( 'offsetPixels' );
-		const offsetNdc = offsetPixels.mul( 2 ).div( screenSize ).toVar( 'offsetNdc' );
+		const offsetNdc = offsetPixels.mul( 2 ).div( cameraViewport.zw ).toVar( 'offsetNdc' );
 		const clip = centerClip.add( vec4( offsetNdc.mul( centerClip.w ), 0, 0 ) ).toVar( 'clip' );
 
 		const clipLimit = centerClip.w.mul( CLIP_XY ).toVar( 'clipLimit' );

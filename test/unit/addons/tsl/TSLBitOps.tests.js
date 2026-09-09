@@ -1,4 +1,4 @@
-import { float, int, uint, bitcast, countLeadingZeros, countOneBits, countTrailingZeros, inversesqrt } from 'three/tsl';
+import { float, int, uint, ivec4, uvec4, bitcast, countLeadingZeros, countOneBits, countTrailingZeros, inversesqrt } from 'three/tsl';
 import { gpuTest } from './gpu-test-utils.js';
 
 // Coverage for the generic bitcast() constructor (src/nodes/math/BitcastNode.js
@@ -21,6 +21,39 @@ export default QUnit.module( 'TSL', () => {
 			// Round trip: bitcast is lossless reinterpretation, so converting
 			// out and back must recover the exact original bits.
 			assert.eq( bitcast( bitcast( float( 3.140625 ), 'int' ), 'float' ), float( 3.140625 ), 'bitcast round trip recovers the exact float' );
+
+		} );
+
+		gpuTest( 'bitcast() reinterprets bits between int and uint', ( { assert } ) => {
+
+			// -1's two's-complement bit pattern (0xFFFFFFFF) read as unsigned
+			// is the largest uint32 value.
+			assert.eq( bitcast( int( - 1 ), 'uint' ), uint( 4294967295 ), 'bitcast(-1, "uint") == 0xFFFFFFFF' );
+			assert.eq( bitcast( uint( 4294967295 ), 'int' ), int( - 1 ), 'bitcast(0xFFFFFFFF, "int") == -1' );
+
+			// Round trip: bitcast is lossless reinterpretation, so converting
+			// out and back must recover the exact original value.
+			assert.eq( bitcast( bitcast( int( - 42 ), 'uint' ), 'int' ), int( - 42 ), 'bitcast round trip recovers the exact int' );
+
+		} );
+
+		gpuTest( 'bitcast() reinterprets bits between ivec4 and uvec4', ( { assert } ) => {
+
+			// Each component's two's-complement bit pattern read as unsigned:
+			// -1 -> 0xFFFFFFFF, -2 -> 0xFFFFFFFE, positive values unchanged.
+			assert.eq(
+				bitcast( ivec4( - 1, 1, 2, - 2 ), 'uvec4' ),
+				uvec4( 4294967295, 1, 2, 4294967294 ),
+				'bitcast(ivec4, "uvec4") reinterprets each component'
+			);
+
+			// Round trip: bitcast is lossless reinterpretation, so converting
+			// out and back must recover the exact original vector.
+			assert.eq(
+				bitcast( bitcast( ivec4( - 1, 1, 2, - 2 ), 'uvec4' ), 'ivec4' ),
+				ivec4( - 1, 1, 2, - 2 ),
+				'bitcast round trip recovers the exact ivec4'
+			);
 
 		} );
 

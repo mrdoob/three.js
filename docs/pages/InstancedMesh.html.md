@@ -78,6 +78,8 @@ Computes the bounding sphere of the instanced mesh, and updates [InstancedMesh#b
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 
+**Overrides:** [Mesh#dispose](Mesh.html#dispose)
+
 ### .getColorAt( index : number, color : Color ) : Color
 
 Gets the color of the defined instance.

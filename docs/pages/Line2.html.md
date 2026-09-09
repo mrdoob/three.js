@@ -21,7 +21,7 @@ scene.add( line );
 
 ## Import
 
-Line2 is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+Line2 is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { Line2 } from 'three/addons/lines/Line2.js';

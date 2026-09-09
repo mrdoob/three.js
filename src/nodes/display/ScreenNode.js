@@ -68,27 +68,6 @@ class ScreenNode extends Node {
 	}
 
 	/**
-	 * This method is overwritten since the node's update type depends on the selected scope.
-	 *
-	 * @return {NodeUpdateType} The update type.
-	 */
-	getUpdateType() {
-
-		let updateType = NodeUpdateType.NONE;
-
-		if ( this.scope === ScreenNode.SIZE || this.scope === ScreenNode.VIEWPORT ) {
-
-			updateType = NodeUpdateType.RENDER;
-
-		}
-
-		this.updateType = updateType;
-
-		return updateType;
-
-	}
-
-	/**
 	 * `ScreenNode` implements {@link Node#update} to retrieve viewport and size information
 	 * from the current renderer.
 	 *
@@ -148,6 +127,20 @@ class ScreenNode extends Node {
 			output = vec2( screenCoordinate.div( screenSize ) );
 
 		}
+
+		//
+
+		let updateType = NodeUpdateType.NONE;
+
+		if ( this.scope === ScreenNode.SIZE || this.scope === ScreenNode.VIEWPORT ) {
+
+			updateType = NodeUpdateType.RENDER;
+
+		}
+
+		this.updateType = updateType;
+
+		//
 
 		return output;
 

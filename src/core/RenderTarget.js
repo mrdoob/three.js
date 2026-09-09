@@ -482,6 +482,9 @@ class RenderTarget extends EventDispatcher {
 	 * Frees the GPU-related resources allocated by this instance. Call this
 	 * method whenever this instance is no longer used in your app.
 	 *
+	 * This also frees the resources of the render target's textures. There is
+	 * no need to dispose them separately.
+	 *
 	 * @fires RenderTarget#dispose
 	 */
 	dispose() {

@@ -48,6 +48,16 @@ Returns the [UniformNode#groupNode](UniformNode.html#groupNode).
 
 **Returns:** The uniform group.
 
+### .getSharedNode( builder : NodeBuilder ) : UniformNode
+
+Uniform nodes with the same hash share a single uniform. This method returns the node the shared uniform refers to which is the first node registered for the hash.
+
+**builder**
+
+The current node builder.
+
+**Returns:** The node the shared uniform refers to.
+
 ### .getUniformHash( builder : NodeBuilder ) : string
 
 By default, this method returns the result of [Node#getHash](Node.html#getHash) but derived classes might overwrite this method with a different implementation.

@@ -534,6 +534,8 @@ class DepthOfFieldNode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this._CoCRT.dispose();
 		this._CoCBlurredRT.dispose();
 		this._blur64RT.dispose();

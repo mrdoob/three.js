@@ -45,11 +45,32 @@
 
 			let camera, scene, renderer, controls, timer;
 			let probes = null, probesHelper = null;
+			let probeFar, bakeIndex = 0, bakePass = 0;
 			let modelSize = null;
 			let sunLight = null, sky = null;
-			
+
 			const _box = new THREE.Box3();
 			const _size = new THREE.Vector3();
+
+			const params = {
+				enabled: true,
+				showProbes: false,
+				probeSize: 0.2,
+				boundsX: - 0.5,
+				boundsY: 6,
+				boundsZ: - 0.3,
+				sizeX: 21,
+				sizeY: 11,
+				sizeZ: 9,
+				countX: 10,
+				countY: 7,
+				countZ: 7,
+				bounces: 1,
+				lightAzimuth: - 75,
+				lightElevation: 60,
+				lightIntensity: 100.0,
+				shadows: true
+			};
 
 			init();
 
@@ -85,7 +106,7 @@
 
 				controls = new FirstPersonControls( camera, renderer.domElement );
 				controls.movementSpeed = 2.0;
-				controls.lookSpeed = 0.16;
+				controls.lookSpeed = 0.2;
 
 				const progressBar = document.getElementById( 'progressBar' );
 
@@ -133,36 +154,13 @@
 
 				_box.setFromObject( model );
 				modelSize = _box.getSize( _size ).clone();
-				const probeFar = Math.max( modelSize.x, modelSize.y, modelSize.z ) * 2.0;
-				let rebakeTimer = null;
-				let isBaking = false;
-				let bakeQueued = false;
+				probeFar = Math.max( modelSize.x, modelSize.y, modelSize.z ) * 2.0;
 
 				sunLight = new SunLight( 0xfff2dc, 100.0 );
 				sunLight.castShadow = true;
 				sunLight.shadow.camera.far = 50;
 				sunLight.shadow.mapSize.setScalar( 2048 );
 				scene.add( sunLight );
-
-				const params = {
-					enabled: true,
-					showProbes: false,
-					probeSize: 0.2,
-					boundsX: - 0.5,
-					boundsY: 6,
-					boundsZ: - 0.3,
-					sizeX: 21,
-					sizeY: 11,
-					sizeZ: 9,
-					countX: 10,
-					countY: 7,
-					countZ: 7,
-					bounces: 1,
-					lightAzimuth: - 75,
-					lightElevation: 60,
-					lightIntensity: 100.0,
-					shadows: true
-				};
 
 				function updateLightPosition() {
 
@@ -171,77 +169,6 @@
 
 					sunLight.position.setFromSphericalCoords( 1, Math.PI / 2 - elevation, azimuth );
 					sky.material.uniforms[ 'sunPosition' ].value.copy( sunLight.position );
-
-				}
-
-				function scheduleRebake() {
-
-					if ( rebakeTimer !== null ) clearTimeout( rebakeTimer );
-					rebakeTimer = setTimeout( () => {
-
-						rebakeTimer = null;
-						bakeWithSettings();
-
-					}, 250 );
-
-				}
-
-				async function bakeWithSettings() {
-
-					if ( isBaking ) {
-
-						bakeQueued = true;
-						return;
-
-					}
-
-					isBaking = true;
-
-					do {
-
-						bakeQueued = false;
-
-						if ( probes ) {
-
-							scene.remove( probes );
-							probes.dispose();
-
-						}
-
-						probes = new LightProbeGridWebGL(
-							params.sizeX, params.sizeY, params.sizeZ,
-							params.countX, params.countY, params.countZ
-						);
-						probes.position.set( params.boundsX, params.boundsY, params.boundsZ );
-						// Add to the scene before baking so bounce passes can sample the prior pass's atlas.
-						scene.add( probes );
-						// Hide the helper spheres so they don't appear in the cubemap captures.
-						if ( probesHelper ) probesHelper.visible = false;
-						probes.bake( renderer, scene, {
-							cubemapSize: 32,
-							near: 0.05,
-							far: probeFar,
-							bounces: params.bounces
-						} );
-						probes.visible = params.enabled;
-
-						if ( ! probesHelper ) {
-
-							probesHelper = new LightProbeGridHelperWebGL( probes, params.probeSize );
-							probesHelper.visible = params.showProbes;
-							scene.add( probesHelper );
-
-						} else {
-
-							probesHelper.probes = probes;
-							probesHelper.update();
-							probesHelper.visible = params.showProbes;
-
-						}
-
-					} while ( bakeQueued );
-
-					isBaking = false;
 
 				}
 
@@ -257,32 +184,32 @@
 				gui.add( params, 'lightAzimuth', - 180, 180, 1 ).name( 'Light Azimuth' ).onChange( () => {
 
 					updateLightPosition();
-					scheduleRebake();
+					resetProbeBake();
 
 				} );
 				gui.add( params, 'lightElevation', 5, 85, 1 ).name( 'Light Elevation' ).onChange( () => {
 
 					updateLightPosition();
-					scheduleRebake();
+					resetProbeBake();
 
 				} );
 				gui.add( params, 'lightIntensity', 0, 100, 0.1 ).name( 'Light Intensity' ).onChange( ( value ) => {
 
 					sunLight.intensity = value;
-					scheduleRebake();
+					resetProbeBake();
 
 				} );
 				gui.add( params, 'shadows' ).name( 'Shadows' ).onChange( ( value ) => {
 
 					setShadowsEnabled( value );
-					scheduleRebake();
+					resetProbeBake();
 
 				} );
 
-				gui.add( params, 'countX', 2, 32, 1 ).name( 'Probes X' ).onChange( scheduleRebake );
-				gui.add( params, 'countY', 2, 16, 1 ).name( 'Probes Y' ).onChange( scheduleRebake );
-				gui.add( params, 'countZ', 2, 16, 1 ).name( 'Probes Z' ).onChange( scheduleRebake );
-				gui.add( params, 'bounces', 0, 2, 1 ).name( 'Bounces' ).onChange( scheduleRebake );
+				gui.add( params, 'countX', 2, 32, 1 ).name( 'Probes X' ).onFinishChange( createProbes );
+				gui.add( params, 'countY', 2, 16, 1 ).name( 'Probes Y' ).onFinishChange( createProbes );
+				gui.add( params, 'countZ', 2, 16, 1 ).name( 'Probes Z' ).onFinishChange( createProbes );
+				gui.add( params, 'bounces', 0, 2, 1 ).name( 'Bounces' ).onChange( resetProbeBake );
 
 				gui.add( params, 'showProbes' ).name( 'Show Probes' ).onChange( ( value ) => {
 
@@ -311,9 +238,93 @@
 				} }, 'log' ).name( 'Log Camera' );
 
 				setShadowsEnabled( params.shadows );
-				await bakeWithSettings();
+				createProbes();
 
 				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function createProbes() {
+
+				if ( probesHelper ) {
+
+					scene.remove( probesHelper );
+					probesHelper.dispose();
+					probesHelper = null;
+
+				}
+
+				if ( probes ) {
+
+					scene.remove( probes );
+					probes.dispose();
+
+				}
+
+				probes = new LightProbeGridWebGL(
+					params.sizeX, params.sizeY, params.sizeZ,
+					params.countX, params.countY, params.countZ
+				);
+				probes.position.set( params.boundsX, params.boundsY, params.boundsZ );
+				probes.visible = params.enabled;
+				scene.add( probes );
+
+				resetProbeBake();
+
+			}
+
+			function resetProbeBake() {
+
+				bakeIndex = 0;
+				bakePass = 0;
+
+			}
+
+			function updateProbes() {
+
+				if ( probes === null || bakePass > params.bounces ) return;
+
+				const resolution = probes.resolution;
+				const totalProbes = resolution.x * resolution.y * resolution.z;
+				const count = Math.min( 4, totalProbes - bakeIndex );
+
+				// Keep the helper spheres out of the cubemap captures.
+				if ( probesHelper ) probesHelper.visible = false;
+
+				try {
+
+					// Publish a few probes per frame, finishing each pass before the next bounce.
+					probes.bake( renderer, scene, {
+						cubemapSize: 32,
+						near: 0.05,
+						far: probeFar,
+						start: bakeIndex,
+						count,
+						pass: bakePass
+					} );
+
+				} finally {
+
+					if ( probesHelper ) probesHelper.visible = params.showProbes;
+
+				}
+
+				if ( probesHelper === null ) {
+
+					probesHelper = new LightProbeGridHelperWebGL( probes, params.probeSize );
+					probesHelper.visible = params.showProbes;
+					scene.add( probesHelper );
+
+				}
+
+				bakeIndex += count;
+
+				if ( bakeIndex === totalProbes ) {
+
+					bakeIndex = 0;
+					bakePass ++;
+
+				}
 
 			}
 
@@ -365,6 +376,7 @@
 
 				timer.update( timestamp );
 				controls.update( timer.getDelta() );
+				updateProbes();
 				renderer.render( scene, camera );
 
 			}

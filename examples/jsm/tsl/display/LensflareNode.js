@@ -253,6 +253,8 @@ class LensflareNode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this._renderTarget.dispose();
 		this._material.dispose();
 

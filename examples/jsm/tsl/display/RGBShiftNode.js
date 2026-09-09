@@ -1,5 +1,5 @@
 import { TempNode } from 'three/webgpu';
-import { Fn, uv, uniform, vec2, sin, cos, vec4, convertToTexture } from 'three/tsl';
+import { nodeObject, Fn, uv, vec2, sin, cos, vec4, convertToTexture } from 'three/tsl';
 
 /**
  * Post processing node for shifting/splitting RGB color channels. The effect
@@ -20,8 +20,8 @@ class RGBShiftNode extends TempNode {
 	 * Constructs a new RGB shift node.
 	 *
 	 * @param {TextureNode} textureNode - The texture node that represents the input of the effect.
-	 * @param {number} [amount=0.005] - The amount of the RGB shift.
-	 * @param {number} [angle=0] - Defines the orientation in which colors are shifted.
+	 * @param {number|Node<float>} [amount=0.005] - The amount of the RGB shift.
+	 * @param {number|Node<float>} [angle=0] - Defines the orientation in which colors are shifted.
 	 */
 	constructor( textureNode, amount = 0.005, angle = 0 ) {
 
@@ -37,16 +37,16 @@ class RGBShiftNode extends TempNode {
 		/**
 		 * The amount of the RGB shift.
 		 *
-		 * @type {UniformNode<float>}
+		 * @type {Node<float>}
 		 */
-		this.amount = uniform( amount );
+		this.amount = nodeObject( amount );
 
 		/**
 		 * Defines in which direction colors are shifted.
 		 *
-		 * @type {UniformNode<float>}
+		 * @type {Node<float>}
 		 */
-		this.angle = uniform( angle );
+		this.angle = nodeObject( angle );
 
 	}
 
@@ -89,8 +89,8 @@ export default RGBShiftNode;
  * @tsl
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
- * @param {number} [amount=0.005] - The amount of the RGB shift.
- * @param {number} [angle=0] - Defines in which direction colors are shifted.
+ * @param {number|Node<float>} [amount=0.005] - The amount of the RGB shift.
+ * @param {number|Node<float>} [angle=0] - Defines in which direction colors are shifted.
  * @returns {RGBShiftNode}
  */
 export const rgbShift = ( node, amount, angle ) => new RGBShiftNode( convertToTexture( node ), amount, angle );

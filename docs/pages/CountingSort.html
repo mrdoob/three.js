@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>CountingSort - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">CountingSort</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A reusable GPU counting sort.</p>
+<p>This computes a stable-ish permutation of the integers <code>[0, count)</code> that orders them by an
+arbitrary, user supplied <code>uint</code> key (&quot;bin&quot;) in the range <code>[0, binCount)</code>. It is a good fit for
+approximate ordering of large element counts (hundreds of thousands to millions) where an exact
+comparison sort such as a bitonic sort (see <a href="BitonicSort.html">BitonicSort</a>) would be too slow: a counting
+sort only requires a fixed number of passes (reset, histogram, prefix sum, scatter) regardless of
+<code>count</code>, at the cost of only being accurate to the resolution of <code>binCount</code> - elements that land
+in the same bin end up in an unspecified relative order.</p>
+<p>This class does not compute the sort key itself. Instead, a TSL function is supplied via
+<a href="CountingSort.html#setBinNode">CountingSort#setBinNode</a> that maps the current <code>instanceIndex</code> to a bin, and an equivalent
+plain JavaScript function can be supplied to <a href="CountingSort.html#computeCPU">CountingSort#computeCPU</a> for platforms without
+compute shader support (e.g. the WebGL backend of <a href="WebGPURenderer.html">WebGPURenderer</a>).</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const sort = new CountingSort( count, { binCount: 4096 } );
+sort.setBinNode( () => {
+	// return a `Node&lt;uint>` bin index for `instanceIndex`, e.g. derived from a depth value.
+} );
+sort.compute( renderer );
+// `sort.orderRead` now holds a storage buffer of `count` indices, ordered by bin.
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">CountingSort</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { CountingSort } from 'three/addons/gpgpu/CountingSort.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="CountingSort" translate="no">new <a href="#CountingSort">CountingSort</a><span class="signature">( count : <span class="param-type">number</span>, options : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new counting sort.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">count</strong>
+									</td>
+									<td class="description last">
+										<p>The number of elements to sort.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">options</strong>
+									</td>
+									<td class="description last">
+										<p>Options that modify the counting sort.</p>
+										<p>Default is <code>{}</code>.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">binCount</strong>
+									</td>
+									<td class="description last">
+										<p>The number of bins/buckets the sort key is quantized into. Larger values improve sort accuracy at the cost of a longer (but still single-pass) prefix sum.</p>
+										<p>Default is <code>4096</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">workgroupSize</strong>
+									</td>
+									<td class="description last">
+										<p>The workgroup size of the compute shaders executed during the sort.</p>
+										<p>Default is <code>256</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="binCount" translate="no">.<a href="#binCount">binCount</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The number of bins/buckets the sort key is quantized into.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="binRead" translate="no">.<a href="#binRead">binRead</a><span class="type-signature"> : <a href="StorageBufferNode.html">StorageBufferNode</a></span> </h3>
+					<div class="description">
+						<p>A read-only storage node holding each element's bin, computed during the histogram pass.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="binWrite" translate="no">.<a href="#binWrite">binWrite</a><span class="type-signature"> : <a href="StorageBufferNode.html">StorageBufferNode</a></span> </h3>
+					<div class="description">
+						<p>A writable storage node holding each element's bin.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="count" translate="no">.<a href="#count">count</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The number of elements to sort.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="histogramAtomic" translate="no">.<a href="#histogramAtomic">histogramAtomic</a><span class="type-signature"> : <a href="StorageBufferNode.html">StorageBufferNode</a></span> </h3>
+					<div class="description">
+						<p>An atomic storage node used to accumulate the per-bin histogram.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="offsetAtomic" translate="no">.<a href="#offsetAtomic">offsetAtomic</a><span class="type-signature"> : <a href="StorageBufferNode.html">StorageBufferNode</a></span> </h3>
+					<div class="description">
+						<p>An atomic storage node used both for the exclusive prefix sum of the histogram and, during
+the scatter pass, as a per-bin write cursor.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="orderAttribute" translate="no">.<a href="#orderAttribute">orderAttribute</a><span class="type-signature"> : <a href="StorageBufferAttribute.html">StorageBufferAttribute</a></span> </h3>
+					<div class="description">
+						<p>The buffer attribute holding the sorted order (a permutation of <code>[0, count)</code>). This is
+also the attribute that is kept up to date by <a href="CountingSort.html#computeCPU">CountingSort#computeCPU</a>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="orderRead" translate="no">.<a href="#orderRead">orderRead</a><span class="type-signature"> : <a href="StorageBufferNode.html">StorageBufferNode</a></span> </h3>
+					<div class="description">
+						<p>A read-only storage node for the sorted order buffer.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="orderWrite" translate="no">.<a href="#orderWrite">orderWrite</a><span class="type-signature"> : <a href="StorageBufferNode.html">StorageBufferNode</a></span> </h3>
+					<div class="description">
+						<p>A writable storage node for the sorted order buffer.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="workgroupSize" translate="no">.<a href="#workgroupSize">workgroupSize</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The workgroup size of the compute shaders executed during the sort.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="compute" translate="no">.<a href="#compute">compute</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Executes a complete counting sort on the GPU, updating <a href="CountingSort.html#orderRead">CountingSort#orderRead</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The current scene's renderer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="computeCPU" translate="no">.<a href="#computeCPU">computeCPU</a><span class="signature">( binFn : <span class="param-type">function</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Executes a complete counting sort on the CPU, updating <a href="CountingSort.html#orderAttribute">CountingSort#orderAttribute</a>.
+Intended as a fallback for backends without compute shader support.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">binFn</strong>
+									</td>
+									<td class="description last">
+										<p>A function taking an element index and returning its bin (a plain number in <code>[0, binCount)</code>).</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="enableWebGLBuffers" translate="no">.<a href="#enableWebGLBuffers">enableWebGLBuffers</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Enables the WebGL-specific storage buffer path (PBO + dynamic draw usage) for the order buffer.
+Only needed when <a href="CountingSort.html#computeCPU">CountingSort#computeCPU</a> is used with the WebGL backend of <a href="WebGPURenderer.html">WebGPURenderer</a>.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="setBinNode" translate="no">.<a href="#setBinNode">setBinNode</a><span class="signature">( binNode : <span class="param-type">function</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the TSL function used to compute the bin of the element currently referenced by
+<code>instanceIndex</code>, and (re)builds the compute nodes used by <a href="CountingSort.html#compute">CountingSort#compute</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">binNode</strong>
+									</td>
+									<td class="description last">
+										<p>A parameterless function returning a <code>Node&lt;uint&gt;</code> in <code>[0, binCount)</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/gpgpu/CountingSort.js" translate="no" target="_blank" rel="noopener">examples/jsm/gpgpu/CountingSort.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

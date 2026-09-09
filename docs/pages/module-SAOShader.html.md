@@ -2,7 +2,7 @@
 
 ## Import
 
-SAOShader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+SAOShader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { SAOShader } from 'three/addons/shaders/SAOShader.js';

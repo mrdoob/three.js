@@ -10,17 +10,23 @@ import { Viewer } from './tabs/Viewer.js';
 import { Timeline } from './tabs/Timeline.js';
 import { setText } from './ui/utils.js';
 
-import { setConsoleFunction, REVISION } from 'three/webgpu';
+import { setConsoleFunction, getConsoleFunction, REVISION } from 'three/webgpu';
 
 class Inspector extends RendererInspector {
 
-	constructor() {
+	constructor( options = {} ) {
 
 		super();
 
+		const {
+			nonce = null
+		} = options;
+
+		this.nonce = nonce;
+
 		// init profiler
 
-		const profiler = new Profiler( this );
+		const profiler = new Profiler( this, options );
 		profiler.addEventListener( 'resize', ( e ) => this.dispatchEvent( e ) );
 		profiler.addEventListener( 'orientationchange', ( e ) => this.dispatchEvent( e ) );
 		profiler.addEventListener( 'layoutchange', ( e ) => this.dispatchEvent( e ) );
@@ -70,6 +76,8 @@ class Inspector extends RendererInspector {
 		this.settings = settings;
 		this.once = {};
 		this.extensionsData = new WeakMap();
+		this.previousConsoleFunction = null;
+		this._domObserver = null;
 
 		this.displayCycle = {
 			text: {
@@ -274,66 +282,33 @@ class Inspector extends RendererInspector {
 
 	}
 
-	init() {
-
-		const renderer = this.getRenderer();
-
-		let sign = `THREE.WebGPURenderer: ${ REVISION } [ "`;
-
-		if ( renderer.backend.isWebGPUBackend ) {
-
-			sign += 'WebGPU';
-
-		} else if ( renderer.backend.isWebGLBackend ) {
-
-			sign += 'WebGL2';
-
-		}
-
-		sign += '" ]';
-
-		this.console.addMessage( 'info', sign );
-
-		//
-
-		if ( renderer.inspector.domElement.parentElement === null ) {
-
-			if ( renderer.domElement.parentElement !== null ) {
-
-				renderer.domElement.parentElement.appendChild( renderer.inspector.domElement );
-
-			} else {
-
-				const observer = new MutationObserver( () => {
-
-					if ( renderer.domElement.parentElement !== null ) {
-
-						renderer.domElement.parentElement.appendChild( renderer.inspector.domElement );
-						observer.disconnect();
-
-					}
-
-				} );
-
-				observer.observe( document.body || document.documentElement, { childList: true, subtree: true } );
-
-			}
-
-		}
-
-	}
-
 	setRenderer( renderer ) {
 
 		super.setRenderer( renderer );
 
 		if ( renderer !== null ) {
 
-			setConsoleFunction( this.resolveConsole.bind( this ) );
+			const previousConsoleFunction = getConsoleFunction();
+
+			this.previousConsoleFunction = previousConsoleFunction;
+
+			setConsoleFunction( ( type, message, ...params ) => {
+
+				if ( previousConsoleFunction ) {
+
+					previousConsoleFunction( type, message, ...params );
+
+				}
+
+				this.resolveConsole( type, message, ...params );
+
+			} );
 
 			if ( this.isAvailable ) {
 
-				renderer.init().then( () => {
+				const init = async () => {
+
+					if ( renderer.hasInitialized() === false ) await renderer.init();
 
 					renderer.backend.trackTimestamp = true;
 
@@ -343,11 +318,92 @@ class Inspector extends RendererInspector {
 
 					}
 
-				} );
+					let sign = `THREE.WebGPURenderer: ${ REVISION } [ "`;
+
+					if ( renderer.backend.isWebGPUBackend ) {
+
+						sign += 'WebGPU';
+
+					} else if ( renderer.backend.isWebGLBackend ) {
+
+						sign += 'WebGL2';
+
+					}
+
+					sign += '" ]';
+
+					this.console.addMessage( 'info', sign );
+
+					//
+
+					const domElement = this.domElement;
+
+					if ( domElement.parentElement === null ) {
+
+						if ( renderer.domElement.parentElement !== null ) {
+
+							renderer.domElement.parentElement.appendChild( domElement );
+
+						} else {
+
+							if ( this._domObserver !== null ) {
+
+								this._domObserver.disconnect();
+
+							}
+
+							this._domObserver = new MutationObserver( () => {
+
+								if ( renderer.domElement && renderer.domElement.parentElement !== null ) {
+
+									renderer.domElement.parentElement.appendChild( domElement );
+
+									if ( this._domObserver !== null ) {
+
+										this._domObserver.disconnect();
+										this._domObserver = null;
+
+									}
+
+								}
+
+							} );
+
+							this._domObserver.observe( document.body || document.documentElement, { childList: true, subtree: true } );
+
+						}
+
+					}
+
+				};
+
+				init();
 
 				this.timeline.setRenderer( renderer );
 
 			}
+
+		} else {
+
+			if ( this.previousConsoleFunction ) {
+
+				setConsoleFunction( this.previousConsoleFunction );
+				this.previousConsoleFunction = undefined;
+
+			}
+
+			if ( this._domObserver !== null ) {
+
+				this._domObserver.disconnect();
+				this._domObserver = null;
+
+			}
+
+			this.profiler.dispose();
+
+			this.statsData.clear();
+
+			super.dispose();
 
 		}
 
@@ -572,6 +628,14 @@ class Inspector extends RendererInspector {
 			cycle.time = 0;
 
 		}
+
+	}
+
+	dispose() {
+
+		super.dispose();
+
+		this.setRenderer( null );
 
 	}
 

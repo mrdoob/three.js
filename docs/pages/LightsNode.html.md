@@ -56,6 +56,14 @@ Overwrites the default [Node#customCacheKey](Node.html#customCacheKey) implement
 
 **Returns:** The custom cache key.
 
+### .getBuiltinLights() : Array.<Light>
+
+Returns an array of the scene's lights.
+
+The light variations are shader-dependent; if this array changes, the shader needs to be recreated.
+
+**Returns:** The scene's lights.
+
 ### .getHash( builder : NodeBuilder ) : string
 
 Computes a hash value for identifying the current light nodes setup.

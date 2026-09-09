@@ -59,7 +59,13 @@
 					#if defined( USE_SHADOWMAP ) && NUM_SUN_LIGHT_SHADOWS > 0
 
 						float cascade = 0.0;
-						for ( int i = 0; i < 2; i ++ ) cascade += step( sunShadowCascade[ i ].y, vSunShadowWorldPosition.w );
+
+						for ( int i = 0; i < SUN_LIGHT_CASCADES; i ++ ) {
+
+							cascade += step( sunShadowCascade[ i ].y, vSunShadowWorldPosition.w );
+
+						}
+
 						gl_FragColor.rgb *= 0.7 + 0.3 * cos( cascade * 1.2 + vec3( 0.0, 4.2, 2.1 ) );
 
 					#endif
@@ -117,7 +123,7 @@
 
 				controls = new FirstPersonControls( camera, renderer.domElement );
 				controls.movementSpeed = 40;
-				controls.lookSpeed = 0.05;
+				controls.lookSpeed = 0.2;
 
 				timer = new THREE.Timer();
 				pmremGenerator = new THREE.PMREMGenerator( renderer );

@@ -6,7 +6,7 @@ This class enables a navigation similar to fly modes in DCC tools like Blender. 
 
 ## Import
 
-FlyControls is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+FlyControls is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { FlyControls } from 'three/addons/controls/FlyControls.js';

@@ -43,6 +43,8 @@ The object being visualized.
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 
+**Overrides:** [LineSegments#dispose](LineSegments.html#dispose)
+
 ### .setColors( color1 : Color, color2 : Color ) : SkeletonHelper
 
 Defines the colors of the helper.

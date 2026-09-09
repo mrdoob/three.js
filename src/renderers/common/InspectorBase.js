@@ -84,11 +84,6 @@ class InspectorBase extends EventDispatcher {
 	}
 
 	/**
-	 * Initializes the inspector.
-	 */
-	init() { }
-
-	/**
 	 * Called when a frame begins.
 	 */
 	begin() {
@@ -168,6 +163,17 @@ class InspectorBase extends EventDispatcher {
 	 * @param {Texture} framebufferTexture - The texture associated with the framebuffer.
 	 */
 	copyFramebufferToTexture( /*framebufferTexture*/ ) { }
+
+	/**
+	 * Frees all internal resources of the inspector.
+	 */
+	dispose() {
+
+		if ( this.isRunning === true ) this.finish();
+
+		this.dispatchEvent( { type: 'dispose' } );
+
+	}
 
 }
 

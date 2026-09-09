@@ -825,7 +825,10 @@ class WebGLBackend extends Backend {
 
 			if ( descriptor.textures === null ) {
 
-				gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearColor.a );
+				if ( color ) gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearColor.a );
+				if ( depth ) gl.clearDepth( clearDepth );
+				if ( stencil ) gl.clearStencil( clearStencil );
+
 				gl.clear( clear );
 
 			} else {
@@ -1266,7 +1269,7 @@ class WebGLBackend extends Backend {
 
 			const renderTarget = this._currentContext.renderTarget;
 
-			const pixelRatio = renderTarget !== null ? 1 : this.renderer.getPixelRatio();
+			const pixelRatio = ( renderTarget === null || renderTarget.isPostProcessingRenderTarget === true ) ? this.renderer.getPixelRatio() : 1;
 			const isRenderCameraDepthArray = this._isRenderCameraDepthArray( this._currentContext );
 			const prevActiveCubeFace = this._currentContext.activeCubeFace;
 

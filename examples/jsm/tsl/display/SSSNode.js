@@ -468,6 +468,8 @@ class SSSNode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this._sssRenderTarget.dispose();
 
 		this._material.dispose();

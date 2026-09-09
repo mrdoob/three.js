@@ -259,6 +259,8 @@ class SharpenNode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this._renderTarget.dispose();
 
 		if ( this._material !== null ) this._material.dispose();

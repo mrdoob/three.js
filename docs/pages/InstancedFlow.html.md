@@ -8,7 +8,7 @@ This module can only be used with [WebGLRenderer](WebGLRenderer.html).
 
 ## Import
 
-InstancedFlow is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+InstancedFlow is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { InstancedFlow } from 'three/addons/modifiers/CurveModifier.js';

@@ -68,7 +68,7 @@ When you’ve decided to make changes, start with the following:
 * Not all new features will need a new example. Simpler features could be incorporated into an existing example. Bigger features may be asked to add an example demonstrating the feature.
 * Making changes may require changes to the documentation. To update the docs in other languages, simply copy the English to begin with.
 * It's good to also add an example and screenshot for it, for showing how it's used and for end-to-end testing.
-* If you modify existing code, run relevant examples to check they didn't break and there wasn't performance regress.
+* If you modify existing code, run relevant examples to check they didn't break and there wasn't a performance regression.
 * If you add some assets for the examples (models, textures, sounds, etc), make sure they have a proper license allowing for their use here, less restrictive the better. It is unlikely for large assets to be accepted.
 * If some issue is relevant to the patch/feature, please mention it with a hash (e.g. #2774) in a commit message to get cross-reference in GitHub.
 * If the end-to-end test failed and you are sure that all is correct, follow the instructions it outputs.

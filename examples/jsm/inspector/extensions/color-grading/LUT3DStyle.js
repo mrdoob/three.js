@@ -4,12 +4,19 @@
 
 export class LUT3DStyle {
 
-	static init() {
+	static init( nonce = null ) {
 
 		if ( document.getElementById( 'lut3d-generator-style' ) ) return;
 
 		const style = document.createElement( 'style' );
 		style.id = 'lut3d-generator-style';
+
+		if ( nonce ) {
+
+			style.nonce = nonce;
+
+		}
+
 		style.textContent = /* css */`
 @scope (.lut-container) {
 

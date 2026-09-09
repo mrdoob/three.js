@@ -4,20 +4,20 @@
 
 A loader for Rhinoceros 3D files and objects.
 
-Rhinoceros is a 3D modeler used to create, edit, analyze, document, render, animate, and translate NURBS curves, surfaces, breps, extrusions, point clouds, as well as polygon meshes and SubD objects. `rhino3dm.js` is compiled to WebAssembly from the open source geometry library `openNURBS`. The loader currently uses `rhino3dm.js 8.4.0`.
+Rhinoceros is a 3D modeler used to create, edit, analyze, document, render, animate, and translate NURBS curves, surfaces, breps, extrusions, point clouds, as well as polygon meshes and SubD objects. `rhino3dm.js` is compiled to WebAssembly from the open source geometry library `openNURBS`. The loader currently uses `rhino3dm.js 8.32.1`.
 
 ## Code Example
 
 ```js
 const loader = new Rhino3dmLoader();
-loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@8.17.0/' );
+loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@8.32.1/' );
 const object = await loader.loadAsync( 'models/3dm/Rhino_Logo.3dm' );
 scene.add( object );
 ```
 
 ## Import
 
-Rhino3dmLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+Rhino3dmLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { Rhino3dmLoader } from 'three/addons/loaders/3DMLoader.js';
@@ -34,6 +34,10 @@ Constructs a new Rhino 3DM loader.
 The loading manager.
 
 ## Methods
+
+### ._geometryFromData()
+
+Builds a BufferGeometry from a worker payload. Meshes decoded via the fast path arrive as transferable typed arrays (`format: 'buffers'`) and are assembled directly; everything else falls back to the three.js BufferGeometry JSON produced by `toThreejsJSON()` (older rhino3dm, point clouds, curves, …).
 
 ### .debug()
 
@@ -97,6 +101,16 @@ Executed when errors occur.
 
 **Overrides:** [Loader#parse](Loader.html#parse)
 
+### .parseAsync( data : ArrayBuffer ) : Promise.<Object3D>
+
+Parses the given 3DM data and returns a Promise that resolves with the loaded asset.
+
+**data**
+
+The raw 3DM asset data as an array buffer.
+
+**Returns:** A Promise that resolves with the decoded 3D object.
+
 ### .setLibraryPath( path : string ) : Rhino3dmLoader
 
 Path to a folder containing the JS and WASM libraries.
@@ -104,6 +118,16 @@ Path to a folder containing the JS and WASM libraries.
 **path**
 
 The library path to set.
+
+**Returns:** A reference to this loader.
+
+### .setSubdivisionLevel( level : number ) : Rhino3dmLoader
+
+Sets the number of global subdivisions applied to SubD objects before they are meshed for display. The default is `3`. Large models with many SubD objects may benefit from a lower value to keep vertex counts manageable.
+
+**level**
+
+The subdivision level.
 
 **Returns:** A reference to this loader.
 

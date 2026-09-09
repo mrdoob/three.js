@@ -890,6 +890,8 @@ class RecurrentDenoiseNode extends TempNode {
 
 	dispose() {
 
+		super.dispose();
+
 		this._renderTarget.dispose();
 		this._material.dispose();
 

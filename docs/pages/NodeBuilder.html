@@ -132,6 +132,13 @@ The codes are maintained in an array for each shader stage.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="compute" translate="no">.<a href="#compute">compute</a><span class="type-signature"> : <a href="ComputeNode.html">ComputeNode</a></span> </h3>
+					<div class="description">
+						<p>The compute node, if building for compute.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="computeShader" translate="no">.<a href="#computeShader">computeShader</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
 						<p>The generated compute shader.</p>
@@ -274,6 +281,12 @@ for this 3D object.</p>
 					<h3 class="name" id="parser" translate="no">.<a href="#parser">parser</a><span class="type-signature"> : <a href="NodeParser.html">NodeParser</a></span> </h3>
 					<div class="description">
 						<p>A reference to a node parser.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="renderPipeline" translate="no">.<a href="#renderPipeline">renderPipeline</a><span class="type-signature"> : <a href="RenderPipeline.html">RenderPipeline</a></span> </h3>
+					<div class="description">
+						<p>A reference to the render pipeline.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -1289,6 +1302,43 @@ this method might be used to convert a simple float string <code>&quot;1.0&quot;
 									</td>
 									<td class="description last">
 										<p>Snippet defining the 0-based texture array index to sample.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">levelSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>Snippet defining the mip level.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The generated shader string.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generateTextureSize" translate="no">.<a href="#generateTextureSize">generateTextureSize</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates a texture size shader string for the given texture data.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The texture property name.</p>
 									</td>
 								</tr>
 								<tr>
@@ -2922,6 +2972,29 @@ this method evaluate to <code>true</code>, WebGPU to <code>false</code>.</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the given type is a reference type or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="isReservedKeyword" translate="no">.<a href="#isReservedKeyword">isReservedKeyword</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns whether the given name is a reserved keyword of the backend's
+shading language. Backends override this method to provide their
+language-specific keywords.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">name</strong>
+									</td>
+									<td class="description last">
+										<p>The name to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the name is a reserved keyword or not.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="isVector" translate="no">.<a href="#isVector">isVector</a><span class="signature">( type : <span class="param-type">string</span> )</span><span class="type-signature"> : boolean</span> </h3>

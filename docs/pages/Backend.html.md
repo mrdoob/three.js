@@ -142,7 +142,7 @@ The height of the copy.
 
 **faceIndex**
 
-The face index.
+The cube face, depth slice or array layer index.
 
 **Returns:** A Promise that resolves with a typed array when the copy operation has finished.
 
@@ -190,7 +190,7 @@ Creates the GPU buffer of a shader attribute.
 
 The buffer attribute.
 
-### .createBindings( bindGroup : BindGroup, bindings : Array.<BindGroup>, cacheIndex : number, version : number ) (abstract)
+### .createBindings( bindGroup : BindGroup, bindings : Array.<BindGroup>, cacheKey : string, version : number ) (abstract)
 
 Creates bindings from the given bind group definition.
 
@@ -202,15 +202,15 @@ The bind group.
 
 Array of bind groups.
 
-**cacheIndex**
+**cacheKey**
 
-The cache index.
+The cache key.
 
 **version**
 
 The version.
 
-### .createComputePipeline( computePipeline : ComputePipeline, bindings : Array.<BindGroup> ) (abstract)
+### .createComputePipeline( computePipeline : ComputePipeline, bindings : Array.<BindGroup>, promises : Array.<Promise> ) (abstract)
 
 Creates a compute pipeline for the given compute node.
 
@@ -221,6 +221,12 @@ The compute pipeline.
 **bindings**
 
 The bindings.
+
+**promises**
+
+Optional compilation promises.
+
+Default is `null`.
 
 ### .createDefaultTexture( texture : Texture ) (abstract)
 
@@ -364,7 +370,7 @@ Destroys a uniform buffer.
 
 The uniform buffer.
 
-### .dispose() (abstract)
+### .dispose() (async, abstract)
 
 Frees internal resources.
 
@@ -580,6 +586,10 @@ The render object.
 
 **Returns:** Whether the render pipeline requires an update or not.
 
+### .resetState() (abstract)
+
+Resets the backend's internal state. A no-op for backends without a state cache (e.g. WebGPU).
+
 ### .resolveTimestampsAsync( type : string ) : Promise.<number> (async, abstract)
 
 Resolves the time stamp for the given render context and type.
@@ -638,7 +648,7 @@ Updates a buffer binding.
 
 The buffer binding to update.
 
-### .updateBindings( bindGroup : BindGroup, bindings : Array.<BindGroup>, cacheIndex : number, version : number ) (abstract)
+### .updateBindings( bindGroup : BindGroup, bindings : Array.<BindGroup>, cacheKey : string, version : number ) (abstract)
 
 Updates the given bind group definition.
 
@@ -650,9 +660,9 @@ The bind group.
 
 Array of bind groups.
 
-**cacheIndex**
+**cacheKey**
 
-The cache index.
+The cache key.
 
 **version**
 
@@ -686,7 +696,7 @@ Optional configuration parameter.
 
 Default is `{}`.
 
-### .updateTimeStampUID( abstractRenderContext : RenderContext | ComputeNode )
+### .updateTimeStampUID( abstractRenderContext : RenderContext | ComputeNode | Array.<ComputeNode> )
 
 Updates a unique identifier for the given render context that can be used to allocate resources like occlusion queries or timestamp queries.
 

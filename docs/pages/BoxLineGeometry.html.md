@@ -7,7 +7,7 @@ A special type of box geometry intended for [LineSegments](LineSegments.html).
 ## Code Example
 
 ```js
-const geometry = new THREE.BoxLineGeometry();
+const geometry = new BoxLineGeometry();
 const material = new THREE.LineBasicMaterial( { color: 0x00ff00 } );
 const lines = new THREE.LineSegments( geometry, material );
 scene.add( lines );
@@ -15,7 +15,7 @@ scene.add( lines );
 
 ## Import
 
-BoxLineGeometry is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+BoxLineGeometry is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { BoxLineGeometry } from 'three/addons/geometries/BoxLineGeometry.js';

@@ -7,9 +7,9 @@ function WebGLAnimation() {
 
 	function onAnimationFrame( time, frame ) {
 
-		animationLoop( time, frame );
-
 		requestId = context.requestAnimationFrame( onAnimationFrame );
+
+		animationLoop( time, frame );
 
 	}
 

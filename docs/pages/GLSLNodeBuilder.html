@@ -700,6 +700,46 @@ against a reference value.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The GLSL snippet.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="generateTextureSize" translate="no">.<a href="#generateTextureSize">generateTextureSize</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the GLSL snippet that resolves the dimensions of the given texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the texture uniform in the shader.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">levelSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents the mip level.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#generateTextureSize">NodeBuilder#generateTextureSize</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The GLSL snippet.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="getAttributes" translate="no">.<a href="#getAttributes">getAttributes</a><span class="signature">( shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
@@ -795,7 +835,7 @@ against a reference value.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The GLSL snippet that defines the enabled extensions.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getFloatPackingMethod" translate="no">.<a href="#getFloatPackingMethod">getFloatPackingMethod</a><span class="signature">( encoding : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getFloatPackingMethod" translate="no">.<a href="#getFloatPackingMethod">getFloatPackingMethod</a><span class="signature">( encoding : <span class="param-type">string</span>, layout : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the float packing method name for a given numeric encoding.</p>
@@ -810,13 +850,22 @@ against a reference value.</p>
 										<p>The numeric encoding that describes how the float values are mapped to the integer range.</p>
 									</td>
 								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">layout</strong>
+									</td>
+									<td class="description last">
+										<p>The component layout of the packed integer.</p>
+										<p>Default is <code>'2x16'</code>.</p>
+									</td>
+								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The resolved GLSL float packing method name.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getFloatUnpackingMethod" translate="no">.<a href="#getFloatUnpackingMethod">getFloatUnpackingMethod</a><span class="signature">( encoding : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getFloatUnpackingMethod" translate="no">.<a href="#getFloatUnpackingMethod">getFloatUnpackingMethod</a><span class="signature">( encoding : <span class="param-type">string</span>, layout : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the float unpacking method name for a given numeric encoding.</p>
@@ -829,6 +878,15 @@ against a reference value.</p>
 									</td>
 									<td class="description last">
 										<p>The numeric encoding that describes how the integer values are mapped to the float range.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">layout</strong>
+									</td>
+									<td class="description last">
+										<p>The component layout of the packed integer.</p>
+										<p>Default is <code>'2x16'</code>.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -1249,6 +1307,30 @@ and layouts.</p>
 						</dl>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> Returns always <code>true</code> in context of GLSL.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="isReservedKeyword" translate="no">.<a href="#isReservedKeyword">isReservedKeyword</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns whether the given name is a reserved keyword of GLSL.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">name</strong>
+									</td>
+									<td class="description last">
+										<p>The name to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#isReservedKeyword">NodeBuilder#isReservedKeyword</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the name is a reserved keyword or not.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="needsToWorkingColorSpace" translate="no">.<a href="#needsToWorkingColorSpace">needsToWorkingColorSpace</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span><span class="type-signature"> : boolean</span> </h3>

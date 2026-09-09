@@ -458,13 +458,17 @@ class Textures extends DataMap {
 
 			// dispose
 
-			textureData.onDispose = () => {
+			if ( texture.isRenderTargetTexture !== true ) {
 
-				this._destroyTexture( texture );
+				textureData.onDispose = () => {
 
-			};
+					this._destroyTexture( texture );
 
-			texture.addEventListener( 'dispose', textureData.onDispose );
+				};
+
+				texture.addEventListener( 'dispose', textureData.onDispose );
+
+			}
 
 			// see #34368 why tracking separate remove listeners is required right now
 			// TODO: Re-evaluate how onDispose() is managed in this component

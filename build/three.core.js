@@ -3,7 +3,7 @@
  * Copyright 2010-2026 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '186dev';
+const REVISION = '186';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -2580,14 +2580,14 @@ function radToDeg( radians ) {
 }
 
 /**
- * Returns `true` if the given number is a power of two.
+ * Returns `true` if the given integer is a power of two.
  *
  * @param {number} value - The value to check.
- * @return {boolean} Whether the given number is a power of two or not.
+ * @return {boolean} Whether the given integer is a power of two or not.
  */
 function isPowerOfTwo( value ) {
 
-	return ( value & ( value - 1 ) ) === 0 && value !== 0;
+	return value > 0 && Number.isInteger( value ) && 2 ** Math.round( Math.log2( value ) ) === value;
 
 }
 
@@ -41729,6 +41729,18 @@ function convertArray( array, type ) {
 }
 
 /**
+ * Returns `true` if the given keyframe track settings hold Bezier tangent data.
+ *
+ * @param {?Object} settings - The settings of a keyframe track.
+ * @return {boolean} Whether both tangent arrays are defined or not.
+ */
+function hasTangents( settings ) {
+
+	return settings !== undefined && settings.inTangents !== undefined && settings.outTangents !== undefined;
+
+}
+
+/**
  * Returns an array by which times and values can be sorted.
  *
  * @param {Array<number>} times - The keyframe time values.
@@ -42107,6 +42119,19 @@ class AnimationUtils {
 	static isTypedArray( object ) {
 
 		return isTypedArray( object );
+
+	}
+
+	/**
+	 * Returns `true` if the given keyframe track settings hold Bezier tangent data.
+	 *
+	 * @static
+	 * @param {?Object} settings - The settings of a keyframe track.
+	 * @return {boolean} Whether both tangent arrays are defined or not.
+	 */
+	static hasTangents( settings ) {
+
+		return hasTangents( settings );
 
 	}
 
@@ -42939,6 +42964,15 @@ class KeyframeTrack {
 
 			}
 
+			if ( hasTangents( track.settings ) ) {
+
+				json.settings = {
+					inTangents: convertArray( track.settings.inTangents, Array ),
+					outTangents: convertArray( track.settings.outTangents, Array )
+				};
+
+			}
+
 		}
 
 		json.type = track.ValueTypeName; // mandatory
@@ -43161,6 +43195,13 @@ class KeyframeTrack {
 			for ( let i = 0, n = times.length; i !== n; ++ i ) {
 
 				times[ i ] *= timeScale;
+
+			}
+
+			if ( hasTangents( this.settings ) ) {
+
+				scaleTangentTimes( this.settings.inTangents, timeScale );
+				scaleTangentTimes( this.settings.outTangents, timeScale );
 
 			}
 
@@ -43439,7 +43480,28 @@ class KeyframeTrack {
 		// Interpolant argument to constructor is not saved, so copy the factory method directly.
 		track.createInterpolant = this.createInterpolant;
 
+		if ( hasTangents( this.settings ) ) {
+
+			track.settings = {
+				inTangents: this.settings.inTangents.slice(),
+				outTangents: this.settings.outTangents.slice()
+			};
+
+		}
+
 		return track;
+
+	}
+
+}
+
+function scaleTangentTimes( tangents, timeScale ) {
+
+	// tangents are [ time, value ] pairs, so only every second entry is a time
+
+	for ( let i = 0, n = tangents.length; i !== n; i += 2 ) {
+
+		tangents[ i ] *= timeScale;
 
 	}
 
@@ -44225,17 +44287,30 @@ function parseKeyframeTrack( json ) {
 
 	}
 
+	let track;
+
 	// derived classes can define a static parse method
 	if ( trackType.parse !== undefined ) {
 
-		return trackType.parse( json );
+		track = trackType.parse( json );
 
 	} else {
 
 		// by default, we assume a constructor compatible with the base
-		return new trackType( json.name, json.times, json.values, json.interpolation );
+		track = new trackType( json.name, json.times, json.values, json.interpolation );
 
 	}
+
+	if ( hasTangents( json.settings ) ) {
+
+		track.settings = {
+			inTangents: convertArray( json.settings.inTangents, Float32Array ),
+			outTangents: convertArray( json.settings.outTangents, Float32Array )
+		};
+
+	}
+
+	return track;
 
 }
 
@@ -50396,7 +50471,7 @@ class ImageBitmapLoader extends Loader {
 
 		} ).then( function ( blob ) {
 
-			return createImageBitmap( blob, Object.assign( scope.options, { colorSpaceConversion: 'none' } ) );
+			return createImageBitmap( blob, Object.assign( {}, scope.options, { colorSpaceConversion: 'none' } ) );
 
 		} ).then( function ( imageBitmap ) {
 

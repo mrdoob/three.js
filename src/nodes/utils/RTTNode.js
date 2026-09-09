@@ -10,6 +10,7 @@ import { RenderTarget } from '../../core/RenderTarget.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { HalfFloatType } from '../../constants.js';
 import { error } from '../../utils.js';
+import { resetRendererState, restoreRendererState } from '../../renderers/common/RendererUtils.js';
 
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -47,7 +48,7 @@ class RTTNode extends TextureNode {
 			resolutionScale = 1
 		} = options;
 
-		const renderTarget = new RenderTarget( width, height, { type: HalfFloatType, ...options } );
+		const renderTarget = new RenderTarget( width ?? 1, height ?? 1, { type: HalfFloatType, ...options } );
 
 		super( renderTarget.texture, uv() );
 
@@ -123,6 +124,15 @@ class RTTNode extends TextureNode {
 		 * @type {QuadMesh}
 		 */
 		this._quadMesh = new QuadMesh( new NodeMaterial() );
+
+		/**
+		 * The renderer state saved and restored around the RTT render.
+		 * Kept per instance because nested RTT nodes must not share it.
+		 *
+		 * @private
+		 * @type {Object}
+		 */
+		this._rendererState = {};
 
 		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
@@ -251,8 +261,6 @@ class RTTNode extends TextureNode {
 
 		//
 
-		const currentRenderTarget = renderer.getRenderTarget();
-
 		if ( this.autoResize === true ) {
 
 			const size = renderer.getDrawingBufferSize( _size );
@@ -286,11 +294,13 @@ class RTTNode extends TextureNode {
 
 		//
 
+		resetRendererState( renderer, this._rendererState );
+
 		renderer.setRenderTarget( this.renderTarget );
 
 		this._quadMesh.render( renderer );
 
-		renderer.setRenderTarget( currentRenderTarget );
+		restoreRendererState( renderer, this._rendererState );
 
 	}
 

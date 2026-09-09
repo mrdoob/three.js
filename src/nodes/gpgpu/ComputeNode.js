@@ -85,15 +85,6 @@ class ComputeNode extends Node {
 		this.name = '';
 
 		/**
-		 * The `updateBeforeType` is set to `NodeUpdateType.OBJECT` since {@link ComputeNode#updateBefore}
-		 * is executed once per object by default.
-		 *
-		 * @type {string}
-		 * @default 'object'
-		 */
-		this.updateBeforeType = NodeUpdateType.OBJECT;
-
-		/**
 		 * A callback executed when the compute node finishes initialization.
 		 *
 		 * @type {?Function}
@@ -108,14 +99,14 @@ class ComputeNode extends Node {
 		 */
 		this.countNode = null;
 
-	}
-
-	/**
-	 * Executes the `dispose` event for this node.
-	 */
-	dispose() {
-
-		this.dispatchEvent( { type: 'dispose' } );
+		/**
+		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node computes
+		 * once per frame.
+		 *
+		 * @type {string}
+		 * @default 'frame'
+		 */
+		this.updateBeforeType = NodeUpdateType.FRAME;
 
 	}
 
@@ -159,6 +150,18 @@ class ComputeNode extends Node {
 		this.onInitFunction = callback;
 
 		return this;
+
+	}
+
+	/**
+	 * Returns the update type of {@link Node#updateBefore}.
+	 *
+	 * @param {NodeFrame} [frame] - The current node frame.
+	 * @return {NodeUpdateType} The update type.
+	 */
+	getUpdateBeforeType( frame ) {
+
+		return frame.compute !== this ? this.updateBeforeType : NodeUpdateType.NONE;
 
 	}
 

@@ -14,7 +14,7 @@ map.colorSpace = THREE.SRGBColorSpace; // only for color textures
 
 ## Import
 
-PVRLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+PVRLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { PVRLoader } from 'three/addons/loaders/PVRLoader.js';

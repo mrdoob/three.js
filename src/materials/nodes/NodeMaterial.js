@@ -1015,6 +1015,18 @@ class NodeMaterial extends Material {
 
 		}
 
+		if ( builder.context.getGI ) {
+
+			const giNode = builder.context.getGI( null, builder );
+
+			if ( giNode !== null ) {
+
+				materialLightsNode.push( new IrradianceNode( giNode ) );
+
+			}
+
+		}
+
 		return materialLightsNode;
 
 	}

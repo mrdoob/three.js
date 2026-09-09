@@ -324,6 +324,8 @@ class BilateralBlurNode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this._horizontalRT.dispose();
 		this._verticalRT.dispose();
 

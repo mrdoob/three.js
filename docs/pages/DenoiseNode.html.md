@@ -8,7 +8,7 @@ Reference: [https://openaccess.thecvf.com/content/WACV2021/papers/Khademi\_Self-
 
 ## Import
 
-DenoiseNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+DenoiseNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { denoise } from 'three/addons/tsl/display/DenoiseNode.js';
@@ -83,6 +83,12 @@ Default is `'frame'`.
 **Overrides:** [TempNode#updateBeforeType](TempNode.html#updateBeforeType)
 
 ## Methods
+
+### .dispose()
+
+Frees internal resources. This method should be called when the effect is no longer required.
+
+**Overrides:** [TempNode#dispose](TempNode.html#dispose)
 
 ### .setup( builder : NodeBuilder ) : ShaderCallNodeInternal
 
