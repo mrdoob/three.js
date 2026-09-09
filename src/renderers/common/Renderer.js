@@ -102,8 +102,7 @@ class Renderer {
 			samples = 0,
 			getFallback = null,
 			outputBufferType = HalfFloatType,
-			multiview = false,
-			canvas = true
+			multiview = false
 		} = parameters;
 
 		/**
@@ -291,9 +290,9 @@ class Renderer {
 		 */
 		this._canvasTarget = null;
 
-		if ( canvas !== false ) {
+		if ( parameters.device === undefined ) {
 
-			this._canvasTarget = new CanvasTarget( backend.getDomElement() )
+			this._canvasTarget = new CanvasTarget( backend.getDomElement() );
 			this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
 			this._canvasTarget.isDefaultCanvasTarget = true;
 
