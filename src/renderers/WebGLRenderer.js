@@ -817,7 +817,7 @@ class WebGLRenderer {
 
 			}
 
-			state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ).round() );
+			state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( getTargetPixelRatio() ).round() );
 
 		};
 
@@ -854,7 +854,7 @@ class WebGLRenderer {
 
 			}
 
-			state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ).round() );
+			state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( getTargetPixelRatio() ).round() );
 
 		};
 
