@@ -151,16 +151,17 @@ function isEffectivelyZero( node, epsilon = 1e-6 ) {
 
 }
 
-function isEffectivelyOne( node, epsilon = 1e-6 ) {
+// True when `node` has an authored value that differs from `target` (default 0),
+// i.e. it's worth wiring into the material instead of relying on the default.
+function isMeaningfulNode( node, target = 0 ) {
 
-	return isConstNear( node, 1, epsilon );
+	return hasNodeValue( node ) && isConstNear( node, target ) === false;
 
 }
 
 function isEnabledWeightNode( node ) {
 
-	if ( hasNodeValue( node ) === false ) return false;
-	return isEffectivelyZero( node ) === false;
+	return isMeaningfulNode( node );
 
 }
 
@@ -177,7 +178,7 @@ function setAnisotropy( material, strengthNode, rotationNode ) {
 
 function setTransmissionFlags( material, transmissionNode, opacityNode, allowOpacityTransparency = true ) {
 
-	if ( allowOpacityTransparency && hasNodeValue( opacityNode ) && isEffectivelyOne( opacityNode ) === false ) {
+	if ( allowOpacityTransparency && isMeaningfulNode( opacityNode, 1 ) ) {
 
 		material.transparent = true;
 
@@ -256,20 +257,20 @@ function applyStandardSurface( material, inputs, log, nodeName ) {
 	}
 
 	material.colorNode = colorNode || color( 0.8, 0.8, 0.8 );
-	if ( hasNodeValue( opacityNode ) && isEffectivelyOne( opacityNode ) === false ) {
+	if ( isMeaningfulNode( opacityNode, 1 ) ) {
 
 		material.opacityNode = opacityNode;
 
 	}
 
 	material.roughnessNode = roughnessNode || float( 0.2 );
-	if ( hasNodeValue( inputs.metalness ) && isEffectivelyZero( inputs.metalness ) === false ) {
+	if ( isMeaningfulNode( inputs.metalness ) ) {
 
 		material.metalnessNode = inputs.metalness;
 
 	}
 
-	if ( hasNodeValue( inputs.specular ) && isEffectivelyOne( inputs.specular ) === false ) {
+	if ( isMeaningfulNode( inputs.specular, 1 ) ) {
 
 		material.specularIntensityNode = inputs.specular;
 
@@ -277,7 +278,7 @@ function applyStandardSurface( material, inputs, log, nodeName ) {
 
 	material.specularColorNode = inputs.specular_color || color( 1, 1, 1 );
 	const iorNode = inputs.specular_IOR;
-	if ( hasNodeValue( iorNode ) && isConstNear( iorNode, 1.5 ) === false ) {
+	if ( isMeaningfulNode( iorNode, 1.5 ) ) {
 
 		material.iorNode = iorNode;
 
@@ -289,7 +290,7 @@ function applyStandardSurface( material, inputs, log, nodeName ) {
 
 		material.transmissionNode = transmissionNode;
 		if ( hasNodeValue( transmissionColorNode ) ) material.transmissionColorNode = transmissionColorNode;
-		if ( hasNodeValue( inputs.transmission_depth ) && isEffectivelyZero( inputs.transmission_depth ) === false ) {
+		if ( isMeaningfulNode( inputs.transmission_depth ) ) {
 
 			material.thicknessNode = inputs.transmission_depth;
 
@@ -363,20 +364,20 @@ function applyGltfPbrSurface( material, inputs, log, nodeName ) {
 	if ( hasNodeValue( inputs.occlusion ) ) material.aoNode = inputs.occlusion;
 	material.roughnessNode = inputs.roughness || float( 1 );
 	material.metalnessNode = inputs.metallic || float( 1 );
-	if ( hasNodeValue( inputs.specular ) && isEffectivelyOne( inputs.specular ) === false ) {
+	if ( isMeaningfulNode( inputs.specular, 1 ) ) {
 
 		material.specularIntensityNode = inputs.specular;
 
 	}
 
 	material.specularColorNode = inputs.specular_color || color( 1, 1, 1 );
-	if ( hasNodeValue( inputs.ior ) && isConstNear( inputs.ior, 1.5 ) === false ) {
+	if ( isMeaningfulNode( inputs.ior, 1.5 ) ) {
 
 		material.iorNode = inputs.ior;
 
 	}
 
-	if ( hasNodeValue( opacityNode ) && isEffectivelyOne( opacityNode ) === false ) {
+	if ( isMeaningfulNode( opacityNode, 1 ) ) {
 
 		material.opacityNode = opacityNode;
 
@@ -399,7 +400,7 @@ function applyGltfPbrSurface( material, inputs, log, nodeName ) {
 	if ( clearcoatEnabled ) {
 
 		material.clearcoatNode = inputs.clearcoat;
-		if ( hasNodeValue( inputs.clearcoat_roughness ) && isEffectivelyZero( inputs.clearcoat_roughness ) === false ) {
+		if ( isMeaningfulNode( inputs.clearcoat_roughness ) ) {
 
 			material.clearcoatRoughnessNode = inputs.clearcoat_roughness;
 
@@ -419,13 +420,13 @@ function applyGltfPbrSurface( material, inputs, log, nodeName ) {
 	if ( iridescenceEnabled ) {
 
 		material.iridescenceNode = inputs.iridescence;
-		if ( hasNodeValue( inputs.iridescence_ior ) && isConstNear( inputs.iridescence_ior, 1.3 ) === false ) {
+		if ( isMeaningfulNode( inputs.iridescence_ior, 1.3 ) ) {
 
 			material.iridescenceIORNode = inputs.iridescence_ior;
 
 		}
 
-		if ( hasNodeValue( inputs.iridescence_thickness ) && isConstNear( inputs.iridescence_thickness, 100 ) === false ) {
+		if ( isMeaningfulNode( inputs.iridescence_thickness, 100 ) ) {
 
 			material.iridescenceThicknessNode = inputs.iridescence_thickness;
 
@@ -450,7 +451,7 @@ function applyGltfPbrSurface( material, inputs, log, nodeName ) {
 
 	}
 
-	if ( hasNodeValue( inputs.dispersion ) && isEffectivelyZero( inputs.dispersion ) === false ) {
+	if ( isMeaningfulNode( inputs.dispersion ) ) {
 
 		material.dispersionNode = inputs.dispersion;
 
@@ -486,14 +487,14 @@ function applyOpenPbrSurface( material, inputs, log, nodeName ) {
 	const thinFilmEnabled = isEnabledWeightNode( inputs.thin_film_weight );
 	material.colorNode = mul( baseWeight, baseColor );
 
-	if ( hasNodeValue( inputs.base_metalness ) && isEffectivelyZero( inputs.base_metalness ) === false ) {
+	if ( isMeaningfulNode( inputs.base_metalness ) ) {
 
 		material.metalnessNode = inputs.base_metalness;
 
 	}
 
 	material.roughnessNode = inputs.specular_roughness || float( 0.3 );
-	if ( hasNodeValue( inputs.specular_weight ) && isEffectivelyOne( inputs.specular_weight ) === false ) {
+	if ( isMeaningfulNode( inputs.specular_weight, 1 ) ) {
 
 		material.specularIntensityNode = inputs.specular_weight;
 
@@ -501,7 +502,7 @@ function applyOpenPbrSurface( material, inputs, log, nodeName ) {
 
 	material.specularColorNode = inputs.specular_color || color( 1, 1, 1 );
 	const openPbrIorNode = inputs.specular_ior;
-	if ( hasNodeValue( openPbrIorNode ) && isConstNear( openPbrIorNode, 1.5 ) === false ) {
+	if ( isMeaningfulNode( openPbrIorNode, 1.5 ) ) {
 
 		material.iorNode = openPbrIorNode;
 
@@ -527,7 +528,7 @@ function applyOpenPbrSurface( material, inputs, log, nodeName ) {
 
 		}
 
-		if ( hasNodeValue( inputs.coat_roughness ) && isEffectivelyZero( inputs.coat_roughness ) === false ) {
+		if ( isMeaningfulNode( inputs.coat_roughness ) ) {
 
 			material.clearcoatRoughnessNode = inputs.coat_roughness;
 
@@ -562,7 +563,7 @@ function applyOpenPbrSurface( material, inputs, log, nodeName ) {
 	}
 
 	const transmissionDepthNode = inputs.transmission_depth;
-	if ( transmissionEnabled && hasNodeValue( transmissionDepthNode ) && isEffectivelyZero( transmissionDepthNode ) === false ) {
+	if ( transmissionEnabled && isMeaningfulNode( transmissionDepthNode ) ) {
 
 		material.thicknessNode = hasNodeValue( inputs.geometry_thin_walled )
 			? inputs.geometry_thin_walled.select( float( 0 ), transmissionDepthNode )
@@ -577,13 +578,13 @@ function applyOpenPbrSurface( material, inputs, log, nodeName ) {
 	}
 
 	const transmissionDispersionAbbe = inputs.transmission_dispersion_abbe_number || float( 20 );
-	if ( transmissionEnabled && hasNodeValue( inputs.transmission_dispersion_scale ) && isEffectivelyZero( inputs.transmission_dispersion_scale ) === false ) {
+	if ( transmissionEnabled && isMeaningfulNode( inputs.transmission_dispersion_scale ) ) {
 
 		material.dispersionNode = inputs.transmission_dispersion_scale.mul( float( 20 ) ).div( transmissionDispersionAbbe );
 
 	}
 
-	if ( hasNodeValue( inputs.geometry_opacity ) && isEffectivelyOne( inputs.geometry_opacity ) === false ) {
+	if ( isMeaningfulNode( inputs.geometry_opacity, 1 ) ) {
 
 		material.opacityNode = inputs.geometry_opacity;
 
@@ -594,13 +595,13 @@ function applyOpenPbrSurface( material, inputs, log, nodeName ) {
 	if ( thinFilmEnabled ) {
 
 		material.iridescenceNode = inputs.thin_film_weight;
-		if ( hasNodeValue( inputs.thin_film_thickness ) && isConstNear( inputs.thin_film_thickness, 0.5 ) === false ) {
+		if ( isMeaningfulNode( inputs.thin_film_thickness, 0.5 ) ) {
 
 			material.iridescenceThicknessNode = inputs.thin_film_thickness.mul( float( 1000 ) );
 
 		}
 
-		if ( hasNodeValue( inputs.thin_film_ior ) && isConstNear( inputs.thin_film_ior, 1.4 ) === false ) {
+		if ( isMeaningfulNode( inputs.thin_film_ior, 1.4 ) ) {
 
 			material.iridescenceIORNode = inputs.thin_film_ior;
 
@@ -616,7 +617,7 @@ function applyOpenPbrSurface( material, inputs, log, nodeName ) {
 
 	}
 
-	if ( hasNodeValue( inputs.geometry_opacity ) && isEffectivelyOne( inputs.geometry_opacity ) === false ) material.transparent = true;
+	if ( isMeaningfulNode( inputs.geometry_opacity, 1 ) ) material.transparent = true;
 	if ( transmissionEnabled ) material.transparent = true;
 
 	setTransmissionFlags( material, inputs.transmission_weight, inputs.geometry_opacity );

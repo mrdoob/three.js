@@ -6,6 +6,7 @@ import {
 } from 'three/tsl';
 
 const BOOLEAN_OPERATOR_OPS = new Set( [ '&&', '||', '^^', '!', '==', '!=', '<', '>', '<=', '>=' ] );
+const TEXTURE_ADDRESS_MODES = new Set( [ 'constant', 'clamp', 'periodic', 'mirror' ] );
 
 function normalizeSpaceName( value, fallback = 'world' ) {
 
@@ -48,10 +49,22 @@ function toVec3Channels( input ) {
 
 }
 
+// Normalizes a raw `*addressmode` attribute value, defaulting to `'periodic'`
+// when unset and returning `null` when the value isn't a recognized mode.
+function resolveTextureAddressMode( value ) {
+
+	if ( value === null || value === undefined || value === '' ) return 'periodic';
+
+	const mode = value.trim().toLowerCase();
+	return TEXTURE_ADDRESS_MODES.has( mode ) ? mode : null;
+
+}
+
 export {
 	getComponentCountForType,
 	isBooleanNode,
 	normalizeSpaceName,
+	resolveTextureAddressMode,
 	toBooleanNode,
 	toVec3Channels,
 };
