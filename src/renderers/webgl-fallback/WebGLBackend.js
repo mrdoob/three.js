@@ -381,13 +381,19 @@ class WebGLBackend extends Backend {
 
 		const gl = this.gl;
 
-		this.set( renderTarget.texture, { textureGPU: colorTexture, glInternalFormat: gl.RGBA8 } ); // see #24698 why RGBA8 and not SRGB8_ALPHA8 is used
+		this.set( renderTarget.texture, {
+			textureGPU: colorTexture,
+			glTextureType: this.textureUtils.getGLTextureType( renderTarget.texture ),
+			glInternalFormat: gl.RGBA8 // see #24698 why RGBA8 and not SRGB8_ALPHA8 is used
+		} );
 
 		if ( depthTexture !== null ) {
 
-			const glInternalFormat = renderTarget.stencilBuffer ? gl.DEPTH24_STENCIL8 : gl.DEPTH_COMPONENT24;
-
-			this.set( renderTarget.depthTexture, { textureGPU: depthTexture, glInternalFormat: glInternalFormat } );
+			this.set( renderTarget.depthTexture, {
+				textureGPU: depthTexture,
+				glTextureType: this.textureUtils.getGLTextureType( renderTarget.depthTexture ),
+				glInternalFormat: renderTarget.stencilBuffer ? gl.DEPTH24_STENCIL8 : gl.DEPTH_COMPONENT24
+			} );
 
 			// The multisample_render_to_texture extension doesn't work properly if there
 			// are midframe flushes and an external depth texture.
@@ -2252,8 +2258,6 @@ class WebGLBackend extends Backend {
 			const { depthBuffer, stencilBuffer } = renderTarget;
 
 			const isCube = renderTarget.isCubeRenderTarget === true;
-			const isRenderTarget3D = renderTarget.isRenderTarget3D === true;
-			const isRenderTargetArray = renderTarget.depth > 1;
 			const isXRRenderTarget = renderTarget.isXRRenderTarget === true;
 			const _hasExternalTextures = ( isXRRenderTarget === true && renderTarget._hasExternalTextures === true );
 
@@ -2335,7 +2339,7 @@ class WebGLBackend extends Backend {
 
 							multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, attachment, textureData.textureGPU, 0, samples, 0, 2 );
 
-						} else if ( isRenderTarget3D || isRenderTargetArray ) {
+						} else if ( textureData.glTextureType === gl.TEXTURE_2D_ARRAY || textureData.glTextureType === gl.TEXTURE_3D ) {
 
 							const layer = this.renderer._activeCubeFace;
 							const mipLevel = this.renderer._activeMipmapLevel;
