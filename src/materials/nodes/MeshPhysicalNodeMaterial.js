@@ -1,5 +1,5 @@
-import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, specularColorBlended, specularF90, diffuseColor, metalness, roughness, anisotropy, alphaT, anisotropyT, anisotropyB, ior, transmission, thickness, attenuationDistance, attenuationColor, dispersion, retroreflectivity } from '../../nodes/core/PropertyNode.js';
-import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialSpecularIntensity, materialSpecularColor, materialAnisotropy, materialIOR, materialTransmission, materialThickness, materialAttenuationDistance, materialAttenuationColor, materialDispersion, materialRetroreflectivity } from '../../nodes/accessors/MaterialNode.js';
+import { clearcoat, clearcoatRoughness, diffuseRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, specularColorBlended, specularF90, diffuseColor, metalness, roughness, anisotropy, alphaT, anisotropyT, anisotropyB, ior, transmission, thickness, attenuationDistance, attenuationColor, dispersion, retroreflectivity } from '../../nodes/core/PropertyNode.js';
+import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialDiffuseRoughness, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialSpecularIntensity, materialSpecularColor, materialAnisotropy, materialIOR, materialTransmission, materialThickness, materialAttenuationDistance, materialAttenuationColor, materialDispersion, materialRetroreflectivity } from '../../nodes/accessors/MaterialNode.js';
 import { float, vec2, vec3, If } from '../../nodes/tsl/TSLBase.js';
 import getRoughness from '../../nodes/functions/material/getRoughness.js';
 import { TBNViewMatrix } from '../../nodes/accessors/AccessorsUtils.js';
@@ -68,6 +68,19 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		 * @default null
 		 */
 		this.clearcoatRoughnessNode = null;
+
+		/**
+		 * The diffuse roughness of physical materials is by default inferred from the
+		 * `diffuseRoughness` and `diffuseRoughnessMap` properties. This node property allows to overwrite the
+		 * default and define the diffuse roughness with a node instead.
+		 *
+		 * If you don't want to overwrite the diffuse roughness but modify the existing
+		 * value instead, use {@link materialDiffuseRoughness}.
+		 *
+		 * @type {?Node<float>}
+		 * @default null
+		 */
+		this.diffuseRoughnessNode = null;
 
 		/**
 		 * The clearcoat normal of physical materials is by default inferred from the `clearcoatNormalMap`
@@ -296,6 +309,18 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	}
 
 	/**
+	 * Whether the lighting model should use EON rough diffuse reflection or not.
+	 *
+	 * @type {boolean}
+	 * @default false
+	 */
+	get useDiffuseRoughness() {
+
+		return this.diffuseRoughness > 0 || this.diffuseRoughnessNode !== null;
+
+	}
+
+	/**
 	 * Whether the lighting model should use iridescence or not.
 	 *
 	 * @type {boolean}
@@ -390,7 +415,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	 */
 	setupLightingModel( /*builder*/ ) {
 
-		return new PhysicalLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useAnisotropy, this.useTransmission, this.useDispersion, this.useRetroreflection );
+		return new PhysicalLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useAnisotropy, this.useTransmission, this.useDispersion, this.useRetroreflection, this.useDiffuseRoughness );
 
 	}
 
@@ -402,6 +427,16 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	setupVariants( builder ) {
 
 		super.setupVariants( builder );
+
+		// DIFFUSE ROUGHNESS
+
+		if ( this.useDiffuseRoughness ) {
+
+			const diffuseRoughnessNode = this.diffuseRoughnessNode ? float( this.diffuseRoughnessNode ) : materialDiffuseRoughness;
+
+			diffuseRoughness.assign( diffuseRoughnessNode.clamp() );
+
+		}
 
 		// CLEARCOAT
 

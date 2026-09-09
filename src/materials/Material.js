@@ -702,6 +702,13 @@ class Material extends EventDispatcher {
 		if ( this.shininess !== undefined ) data.shininess = this.shininess;
 		if ( this.clearcoat !== undefined ) data.clearcoat = this.clearcoat;
 		if ( this.clearcoatRoughness !== undefined ) data.clearcoatRoughness = this.clearcoatRoughness;
+		if ( this.diffuseRoughness !== undefined ) data.diffuseRoughness = this.diffuseRoughness;
+
+		if ( this.diffuseRoughnessMap && this.diffuseRoughnessMap.isTexture ) {
+
+			data.diffuseRoughnessMap = this.diffuseRoughnessMap.toJSON( meta ).uuid;
+
+		}
 
 		if ( this.clearcoatMap && this.clearcoatMap.isTexture ) {
 
@@ -926,6 +933,7 @@ class Material extends EventDispatcher {
 		if ( json.shininess !== undefined ) this.shininess = json.shininess;
 		if ( json.clearcoat !== undefined ) this.clearcoat = json.clearcoat;
 		if ( json.clearcoatRoughness !== undefined ) this.clearcoatRoughness = json.clearcoatRoughness;
+		if ( json.diffuseRoughness !== undefined ) this.diffuseRoughness = json.diffuseRoughness;
 		if ( json.dispersion !== undefined ) this.dispersion = json.dispersion;
 		if ( json.retroreflectivity !== undefined ) this.retroreflectivity = json.retroreflectivity;
 		if ( json.iridescence !== undefined ) this.iridescence = json.iridescence;
@@ -1083,6 +1091,7 @@ class Material extends EventDispatcher {
 		if ( json.clearcoatRoughnessMap !== undefined ) this.clearcoatRoughnessMap = textures[ json.clearcoatRoughnessMap ] || null;
 		if ( json.clearcoatNormalMap !== undefined ) this.clearcoatNormalMap = textures[ json.clearcoatNormalMap ] || null;
 		if ( json.clearcoatNormalScale !== undefined ) this.clearcoatNormalScale = new Vector2().fromArray( json.clearcoatNormalScale );
+		if ( json.diffuseRoughnessMap !== undefined ) this.diffuseRoughnessMap = textures[ json.diffuseRoughnessMap ] || null;
 
 		if ( json.iridescenceMap !== undefined ) this.iridescenceMap = textures[ json.iridescenceMap ] || null;
 		if ( json.iridescenceThicknessMap !== undefined ) this.iridescenceThicknessMap = textures[ json.iridescenceThicknessMap ] || null;

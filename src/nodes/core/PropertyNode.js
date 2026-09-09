@@ -180,6 +180,14 @@ export const diffuseColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec4', '
 export const diffuseContribution = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'DiffuseContribution' );
 
 /**
+ * TSL object that represents the shader variable `DiffuseRoughness`.
+ *
+ * @tsl
+ * @type {PropertyNode<float>}
+ */
+export const diffuseRoughness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'DiffuseRoughness' );
+
+/**
  * TSL object that represents the shader variable `EmissiveColor`.
  *
  * @tsl

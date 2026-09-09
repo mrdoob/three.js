@@ -54,6 +54,11 @@ export default /* glsl */`
 	vRoughnessMapUv = ( roughnessMapTransform * vec3( ROUGHNESSMAP_UV, 1 ) ).xy;
 
 #endif
+#ifdef USE_DIFFUSE_ROUGHNESSMAP
+
+	vDiffuseRoughnessMapUv = ( diffuseRoughnessMapTransform * vec3( DIFFUSE_ROUGHNESSMAP_UV, 1 ) ).xy;
+
+#endif
 #ifdef USE_ANISOTROPYMAP
 
 	vAnisotropyMapUv = ( anisotropyMapTransform * vec3( ANISOTROPYMAP_UV, 1 ) ).xy;
