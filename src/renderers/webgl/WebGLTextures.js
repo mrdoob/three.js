@@ -623,7 +623,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		const textureProperties = properties.get( texture );
 
-		if ( texture.isCubeDepthTexture !== true && texture.version > 0 && textureProperties.__version !== texture.version ) {
+		if ( texture.version > 0 && textureProperties.__version !== texture.version ) {
 
 			uploadCubeTexture( textureProperties, texture, slot );
 			return;
@@ -1451,8 +1451,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			const image = cubeImage[ 0 ],
 				glFormat = utils.convert( texture.format, texture.colorSpace ),
-				glType = utils.convert( texture.type ),
-				glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.normalized, texture.colorSpace );
+				glType = utils.convert( texture.type );
+
+			let glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.normalized, texture.colorSpace );
 
 			const useTexStorage = ( texture.isVideoTexture !== true );
 			const allocateMemory = ( sourceProperties.__version === undefined ) || ( forceUpload === true );
@@ -1463,7 +1464,31 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			let mipmaps;
 
-			if ( isCompressed ) {
+			if ( texture.isDepthTexture ) {
+
+				glInternalFormat = getInternalDepthFormat( texture.format === DepthStencilFormat, texture.type );
+
+				//
+
+				if ( allocateMemory ) {
+
+					if ( useTexStorage ) {
+
+						state.texStorage2D( _gl.TEXTURE_CUBE_MAP, 1, glInternalFormat, image.width, image.height );
+
+					} else {
+
+						for ( let i = 0; i < 6; i ++ ) {
+
+							state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, null );
+
+						}
+
+					}
+
+				}
+
+			} else if ( isCompressed ) {
 
 				if ( useTexStorage && allocateMemory ) {
 
@@ -1768,57 +1793,21 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		textureProperties.__renderTarget = renderTarget;
 
 		// upload an empty depth texture with framebuffer size
-		if ( ! textureProperties.__webglTexture ||
-				renderTarget.depthTexture.image.width !== renderTarget.width ||
-				renderTarget.depthTexture.image.height !== renderTarget.height ) {
+		const image = isCube ? renderTarget.depthTexture.image[ 0 ] : renderTarget.depthTexture.image;
 
-			renderTarget.depthTexture.image.width = renderTarget.width;
-			renderTarget.depthTexture.image.height = renderTarget.height;
+		if ( ! textureProperties.__webglTexture ||
+				image.width !== renderTarget.width ||
+				image.height !== renderTarget.height ) {
+
+			image.width = renderTarget.width;
+			image.height = renderTarget.height;
 			renderTarget.depthTexture.needsUpdate = true;
 
 		}
 
 		if ( isCube ) {
 
-			// For cube depth textures, initialize and bind without uploading image data
-			if ( textureProperties.__webglInit === undefined ) {
-
-				textureProperties.__webglInit = true;
-				renderTarget.depthTexture.addEventListener( 'dispose', onTextureDispose );
-
-			}
-
-			// Only create and allocate storage once
-			if ( textureProperties.__webglTexture === undefined ) {
-
-				textureProperties.__webglTexture = _gl.createTexture();
-
-				state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture );
-				setTextureParameters( _gl.TEXTURE_CUBE_MAP, renderTarget.depthTexture );
-
-				// Allocate storage for all 6 faces with correct depth texture format
-				const glFormat = utils.convert( renderTarget.depthTexture.format );
-				const glType = utils.convert( renderTarget.depthTexture.type );
-
-				// Use proper internal format for depth textures
-				let glInternalFormat;
-				if ( renderTarget.depthTexture.format === DepthFormat ) {
-
-					glInternalFormat = _gl.DEPTH_COMPONENT24;
-
-				} else if ( renderTarget.depthTexture.format === DepthStencilFormat ) {
-
-					glInternalFormat = _gl.DEPTH24_STENCIL8;
-
-				}
-
-				for ( let i = 0; i < 6; i ++ ) {
-
-					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
-
-				}
-
-			}
+			setTextureCube( renderTarget.depthTexture, 0 );
 
 		} else {
 
