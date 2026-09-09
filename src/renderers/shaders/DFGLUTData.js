@@ -28,22 +28,17 @@ const DATA = new Uint16Array( [
 	0x3c00, 0x0000, 0x3c00, 0x0001, 0x3bff, 0x0015, 0x3bfb, 0x0059, 0x3bf2, 0x00fd, 0x3bdd, 0x01df, 0x3bb7, 0x031c, 0x3b79, 0x047c, 0x3b1d, 0x05d4, 0x3aa0, 0x06d5, 0x3a08, 0x075a, 0x395d, 0x075e, 0x38aa, 0x06f7, 0x37f4, 0x0648, 0x36ac, 0x0576, 0x3586, 0x049f
 ] );
 
-let lut = null;
+export function createDFGLUT() {
 
-export function getDFGLUT() {
-
-	if ( lut === null ) {
-
-		lut = new DataTexture( DATA, 16, 16, RGFormat, HalfFloatType );
-		lut.name = 'DFG_LUT';
-		lut.minFilter = LinearFilter;
-		lut.magFilter = LinearFilter;
-		lut.wrapS = ClampToEdgeWrapping;
-		lut.wrapT = ClampToEdgeWrapping;
-		lut.generateMipmaps = false;
-		lut.needsUpdate = true;
-
-	}
+	// Pixel data is shared; the texture and its WebGL listeners belong to one renderer.
+	const lut = new DataTexture( DATA, 16, 16, RGFormat, HalfFloatType );
+	lut.name = 'DFG_LUT';
+	lut.minFilter = LinearFilter;
+	lut.magFilter = LinearFilter;
+	lut.wrapS = ClampToEdgeWrapping;
+	lut.wrapT = ClampToEdgeWrapping;
+	lut.generateMipmaps = false;
+	lut.needsUpdate = true;
 
 	return lut;
 

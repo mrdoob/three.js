@@ -54,7 +54,7 @@ import { WebGLMaterials } from './webgl/WebGLMaterials.js';
 import { WebGLUniformsGroups } from './webgl/WebGLUniformsGroups.js';
 import { createCanvasElement, probeAsync, error, warn, log } from '../utils.js';
 import { ColorManagement } from '../math/ColorManagement.js';
-import { getDFGLUT } from './shaders/DFGLUTData.js';
+import { createDFGLUT } from './shaders/DFGLUTData.js';
 
 /**
  * This renderer uses WebGL 2 to display scenes.
@@ -303,6 +303,7 @@ class WebGLRenderer {
 
 		let _isContextLost = false;
 		let _nodesHandler = null;
+		let _dfgLUT = null;
 
 		let _scratchFramebuffer = null;
 		let _srcFramebuffer = null;
@@ -1092,6 +1093,14 @@ class WebGLRenderer {
 			canvas.removeEventListener( 'webglcontextcreationerror', onContextCreationError, false );
 
 			background.dispose();
+			// A global LUT retains every renderer through its texture dispose listeners.
+			// Release this renderer's internal texture before clearing WebGL properties.
+			if ( _dfgLUT !== null ) {
+
+				_dfgLUT.dispose();
+				_dfgLUT = null;
+
+			}
 			renderLists.dispose();
 			renderStates.dispose();
 			properties.dispose();
@@ -2757,7 +2766,8 @@ class WebGLRenderer {
 			// Set DFG LUT for physically-based materials
 			if ( m_uniforms.dfgLUT !== undefined ) {
 
-				m_uniforms.dfgLUT.value = getDFGLUT();
+				if ( _dfgLUT === null ) _dfgLUT = createDFGLUT();
+				m_uniforms.dfgLUT.value = _dfgLUT;
 
 			}
 
