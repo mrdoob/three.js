@@ -945,24 +945,33 @@ function formatApiParameters( argsText ) {
 function parseApiSignature( rawSigText ) {
 
 	const sigText = rawSigText.trim();
-	let funcName = '';
-	let argsText = '';
+	let funcs = null;
 	let constName = '';
 	let retType = '';
 	let rowDesc = '';
 
-	const firstParen = sigText.indexOf( '(' );
-	const lastParen = sigText.lastIndexOf( ')' );
+	const funcsRegex = /^(?<funcName>[\w_$.]+)\((?<argsText>.*?)\)(?<funcChain>(?:\.[\w_$]+\(.*?\))+)?/;
+	const chainedFuncRegex = /\.(?<funcName>[\w_$]+)\((?<argsText>.*?)\)/g;
 
-	const prefixBeforeParen = firstParen !== - 1 ? sigText.substring( 0, firstParen ).trim() : '';
-	const isFunction = firstParen !== - 1 && lastParen > firstParen && /^[\.\w$]+$/i.test( prefixBeforeParen );
+	const funcsMatch = sigText.match( funcsRegex );
+	if ( funcsMatch ) {
 
-	if ( isFunction ) {
+		const { funcName, argsText, funcChain } = funcsMatch.groups;
 
-		funcName = prefixBeforeParen;
-		argsText = sigText.substring( firstParen + 1, lastParen ).trim();
+		funcs = [ { funcName, argsText } ];
 
-		const remainder = sigText.substring( lastParen + 1 ).trim();
+		if ( funcChain ) {
+
+			for ( const match of funcChain.matchAll( chainedFuncRegex ) ) {
+
+				const { funcName, argsText } = match.groups;
+				funcs.push( { funcName, argsText } );
+
+			}
+
+		}
+
+		const remainder = sigText.slice( funcsMatch[ 0 ].length ).trim();
 		if ( remainder ) {
 
 			const afterMatch = remainder.match( /^(?:\s*(?::|->)\s*([^—–\-]+?))?(?:\s*[\-—–]\s*([\s\S]*))?$/ );
@@ -990,15 +999,15 @@ function parseApiSignature( rawSigText ) {
 
 		}
 
+		
 	}
 
-	return { funcName, argsText, constName, retType, rowDesc };
+	return { funcs, constName, retType, rowDesc };
 
 }
 
-function renderSingleApiCard( signature, body ) {
+function renderSig( parsedSig, body ) {
 
-	const parsedSig = parseApiSignature( signature );
 	let returnTypeHtml = '';
 
 	if ( parsedSig.retType ) {
@@ -1010,26 +1019,36 @@ function renderSingleApiCard( signature, body ) {
 	let sigHtml = '';
 	let paramsHtml = '';
 
-	if ( parsedSig.funcName ) {
+	if ( parsedSig.funcs ) {
 
-		const argsHtml = formatSignatureArgs( parsedSig.argsText );
-		const funcNameHtml = formatApiFunctionName( parsedSig.funcName );
+		for ( let i = 0; i < parsedSig.funcs.length; i ++ ) {
 
-		if ( argsHtml ) {
+			const { funcName, argsText } = parsedSig.funcs[ i ];
 
-			sigHtml = `<div class="tsl-api-sig-left"><code>${funcNameHtml}<span class="tsl-sig-paren">( </span>${argsHtml}<span class="tsl-sig-paren"> )</span></code></div>`;
+			const argsHtml = formatSignatureArgs( argsText );
+			const funcNameHtml = formatApiFunctionName( funcName );
 
-		} else {
+			const dotPrefix = i > 0 ? '.' : '';
 
-			sigHtml = `<div class="tsl-api-sig-left"><code>${funcNameHtml}<span class="tsl-sig-paren">()</span></code></div>`;
+			if ( argsHtml ) {
+
+				sigHtml += `${dotPrefix}${funcNameHtml}<span class="tsl-sig-paren">( </span>${argsHtml}<span class="tsl-sig-paren"> )</span>`;
+
+			} else {
+
+				sigHtml += `${dotPrefix}${funcNameHtml}<span class="tsl-sig-paren">()</span>`;
+
+			}
+
+			if ( ! body || ! body.trim() ) {
+
+				paramsHtml += formatApiParameters( argsText );
+
+			}
 
 		}
 
-		if ( ! body || ! body.trim() ) {
-
-			paramsHtml = formatApiParameters( parsedSig.argsText );
-
-		}
+		sigHtml = `<div class="tsl-api-sig-left"><code>${ sigHtml }</code></div>`;
 
 	} else {
 
@@ -1037,6 +1056,15 @@ function renderSingleApiCard( signature, body ) {
 		sigHtml = `<div class="tsl-api-sig-left"><code>${constNameHtml}</code></div>`;
 
 	}
+
+	return { sigHtml, paramsHtml, returnTypeHtml };
+
+}
+
+function renderSingleApiCard( signature, body ) {
+
+	const parsedSig = parseApiSignature( signature );
+	let { sigHtml, paramsHtml, returnTypeHtml } = renderSig( parsedSig, body );
 
 	if ( body ) {
 
@@ -1125,44 +1153,7 @@ function renderApiTableCard( group ) {
 	for ( const block of group ) {
 
 		const parsedSig = parseApiSignature( block.signature );
-		let returnTypeHtml = '';
-
-		if ( parsedSig.retType ) {
-
-			returnTypeHtml = `<div class="tsl-api-sig-right"><span class="tsl-api-return-arrow">:</span> ${formatTypeHtml( parsedSig.retType )}</div>`;
-
-		}
-
-		let sigHtml = '';
-		let paramsHtml = '';
-
-		if ( parsedSig.funcName ) {
-
-			const argsHtml = formatSignatureArgs( parsedSig.argsText );
-			const funcNameHtml = formatApiFunctionName( parsedSig.funcName );
-
-			if ( argsHtml ) {
-
-				sigHtml = `<div class="tsl-api-sig-left"><code>${funcNameHtml}<span class="tsl-sig-paren">( </span>${argsHtml}<span class="tsl-sig-paren"> )</span></code></div>`;
-
-			} else {
-
-				sigHtml = `<div class="tsl-api-sig-left"><code>${funcNameHtml}<span class="tsl-sig-paren">()</span></code></div>`;
-
-			}
-
-			if ( ! block.body || ! block.body.trim() ) {
-
-				paramsHtml = formatApiParameters( parsedSig.argsText );
-
-			}
-
-		} else {
-
-			const constNameHtml = `<span class="tsl-sig-const-name">${parsedSig.constName}</span>`;
-			sigHtml = `<div class="tsl-api-sig-left"><code>${constNameHtml}</code></div>`;
-
-		}
+		let { sigHtml, paramsHtml, returnTypeHtml } = renderSig( parsedSig, block.body );
 
 		if ( block.body ) {
 
