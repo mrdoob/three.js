@@ -1774,28 +1774,18 @@ class Renderer {
 
 		//
 
-		let viewport;
-		let scissor;
-		let scissorTest;
-		let pixelRatio;
+		const canvasTarget = this._canvasTarget;
+
+		const viewport = renderTarget ? renderTarget.viewport : canvasTarget._viewport;
+		const scissor = renderTarget ? renderTarget.scissor : canvasTarget._scissor;
+		const scissorTest = renderTarget ? renderTarget.scissorTest : canvasTarget._scissorTest;
+		const pixelRatio = renderTarget ? 1 : canvasTarget._pixelRatio;
 
 		if ( renderTarget !== null ) {
-
-			viewport = renderTarget.viewport;
-			scissor = renderTarget.scissor;
-			scissorTest = renderTarget.scissorTest;
-			pixelRatio = 1;
 
 			_drawingBufferSize.set( renderTarget.width, renderTarget.height );
 
 		} else {
-
-			const canvasTarget = this._canvasTarget;
-
-			viewport = canvasTarget._viewport;
-			scissor = canvasTarget._scissor;
-			scissorTest = canvasTarget._scissorTest;
-			pixelRatio = canvasTarget._pixelRatio;
 
 			this.getDrawingBufferSize( _drawingBufferSize );
 
