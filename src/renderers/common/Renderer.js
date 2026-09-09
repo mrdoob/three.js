@@ -102,7 +102,8 @@ class Renderer {
 			samples = 0,
 			getFallback = null,
 			outputBufferType = HalfFloatType,
-			multiview = false
+			multiview = false,
+			canvas = true
 		} = parameters;
 
 		/**
@@ -288,9 +289,15 @@ class Renderer {
 		 * @private
 		 * @type {CanvasTarget}
 		 */
-		this._canvasTarget = new CanvasTarget( backend.getDomElement() );
-		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
-		this._canvasTarget.isDefaultCanvasTarget = true;
+		this._canvasTarget = null;
+
+		if ( canvas !== false ) {
+
+			this._canvasTarget = new CanvasTarget( backend.getDomElement() )
+			this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
+			this._canvasTarget.isDefaultCanvasTarget = true;
+
+		}
 
 		/**
 		 * The inspector provides information about the internal renderer state.
@@ -1562,7 +1569,7 @@ class Renderer {
 
 		if ( this.needsFrameBufferTarget === false ) return null;
 
-		const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
+		const { width, height } = this._outputRenderTarget || this.getDrawingBufferSize( _drawingBufferSize );
 		const { depth, stencil } = this;
 
 		// TODO: Unify CanvasTarget and OutputRenderTarget
@@ -1768,21 +1775,32 @@ class Renderer {
 
 		//
 
-		const canvasTarget = this._canvasTarget;
-
-		let viewport = canvasTarget._viewport;
-		let scissor = canvasTarget._scissor;
-		let pixelRatio = canvasTarget._pixelRatio;
+		let viewport;
+		let scissor;
+		let scissorTest;
+		let pixelRatio;
 
 		if ( renderTarget !== null ) {
 
 			viewport = renderTarget.viewport;
 			scissor = renderTarget.scissor;
+			scissorTest = renderTarget.scissorTest;
 			pixelRatio = 1;
 
-		}
+			_drawingBufferSize.set( renderTarget.width, renderTarget.height );
 
-		this.getDrawingBufferSize( _drawingBufferSize );
+		} else {
+
+			const canvasTarget = this._canvasTarget;
+
+			viewport = canvasTarget._viewport;
+			scissor = canvasTarget._scissor;
+			scissorTest = canvasTarget._scissorTest;
+			pixelRatio = canvasTarget._pixelRatio;
+
+			this.getDrawingBufferSize( _drawingBufferSize );
+
+		}
 
 		_screen.set( 0, 0, _drawingBufferSize.width, _drawingBufferSize.height );
 
@@ -1797,7 +1815,7 @@ class Renderer {
 		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
 
 		renderContext.scissorValue.copy( scissor ).multiplyScalar( pixelRatio ).floor();
-		renderContext.scissor = canvasTarget._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
+		renderContext.scissor = scissorTest && renderContext.scissorValue.equals( _screen ) === false;
 		renderContext.scissorValue.width >>= activeMipmapLevel;
 		renderContext.scissorValue.height >>= activeMipmapLevel;
 
