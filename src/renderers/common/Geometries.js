@@ -132,12 +132,22 @@ class Geometries extends DataMap {
 		this.attributeCall = new WeakMap();
 
 		/**
-		 * Stores the event listeners attached to geometries.
+		 * Stores weak references to the geometries with attached
+		 * `dispose` event listeners.
 		 *
 		 * @private
-		 * @type {Map<BufferGeometry,Function>}
+		 * @type {Set<WeakRef<BufferGeometry>>}
 		 */
-		this._geometryDisposeListeners = new Map();
+		this._tracked = new Set();
+
+		/**
+		 * Removes weak references from `_tracked` when their geometry
+		 * has been garbage collected without an explicit `dispose()`.
+		 *
+		 * @private
+		 * @type {FinalizationRegistry}
+		 */
+		this._registry = new FinalizationRegistry( ( ref ) => this._tracked.delete( ref ) );
 
 	}
 
@@ -182,7 +192,7 @@ class Geometries extends DataMap {
 
 		this.info.memory.geometries ++;
 
-		const onDispose = () => {
+		geometryData.onDispose = () => {
 
 			this.info.memory.geometries --;
 
@@ -230,17 +240,20 @@ class Geometries extends DataMap {
 
 			//
 
-			geometry.removeEventListener( 'dispose', onDispose );
+			geometry.removeEventListener( 'dispose', geometryData.onDispose );
 
-			this._geometryDisposeListeners.delete( geometry );
+			this._tracked.delete( geometryData.ref );
+			this._registry.unregister( geometryData.ref );
 
 		};
 
-		geometry.addEventListener( 'dispose', onDispose );
+		geometry.addEventListener( 'dispose', geometryData.onDispose );
 
 		// see #31798 why tracking separate remove listeners is required right now
-		// TODO: Re-evaluate how onDispose() is managed in this component
-		this._geometryDisposeListeners.set( geometry, onDispose );
+		geometryData.ref = new WeakRef( geometry );
+
+		this._tracked.add( geometryData.ref );
+		this._registry.register( geometry, geometryData.ref, geometryData.ref );
 
 	}
 
@@ -400,15 +413,24 @@ class Geometries extends DataMap {
 
 	}
 
+	/**
+	 * Frees internal resources.
+	 */
 	dispose() {
 
-		for ( const [ geometry, onDispose ] of this._geometryDisposeListeners.entries() ) {
+		for ( const ref of this._tracked ) {
 
-			geometry.removeEventListener( 'dispose', onDispose );
+			const geometry = ref.deref();
+
+			if ( geometry === undefined ) continue;
+
+			geometry.removeEventListener( 'dispose', this.get( geometry ).onDispose );
 
 		}
 
-		this._geometryDisposeListeners.clear();
+		this._tracked.clear();
+
+		super.dispose();
 
 	}
 

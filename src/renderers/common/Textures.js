@@ -240,7 +240,6 @@ class Textures extends DataMap {
 			renderTarget.addEventListener( 'dispose', renderTargetData.onDispose );
 
 			// see #34368 why tracking separate remove listeners is required right now
-			// TODO: Re-evaluate how onDispose() is managed in this component
 			renderTargetData.ref = new WeakRef( renderTarget );
 
 			this._tracked.add( renderTargetData.ref );
@@ -471,7 +470,6 @@ class Textures extends DataMap {
 			}
 
 			// see #34368 why tracking separate remove listeners is required right now
-			// TODO: Re-evaluate how onDispose() is managed in this component
 			textureData.ref = new WeakRef( texture );
 
 			this._tracked.add( textureData.ref );
