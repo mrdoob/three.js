@@ -615,7 +615,6 @@ export const transformNormal = TSL.transformNormal;
 export const transformNormalByInverseViewMatrix = TSL.transformNormalByInverseViewMatrix;
 export const transformNormalByViewMatrix = TSL.transformNormalByViewMatrix;
 export const transformNormalToView = TSL.transformNormalToView;
-
 export const transmission = TSL.transmission;
 export const transpose = TSL.transpose;
 export const triNoise3D = TSL.triNoise3D;
