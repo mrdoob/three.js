@@ -41,7 +41,7 @@ function Storage() {
 
 			request.onerror = function ( event ) {
 
-				console.error( 'IndexedDB', event );
+				console.error( 'Storage: IndexedDB', event );
 
 			};
 
@@ -57,9 +57,9 @@ function Storage() {
 
 			transaction.onerror = function ( event ) {
 
-				console.error( 'IndexedDB get failed:', event.target.error );
+				console.error( 'Storage: IndexedDB get failed:', event.target.error );
 
-    		};
+			};
 
 			const request = objectStore.get( 0 );
 			request.onsuccess = function ( event ) {
@@ -101,7 +101,7 @@ function Storage() {
 
 			transaction.onerror = function ( event ) {
 
-				console.error( 'IndexedDB put failed:', event.target.error );
+				console.error( 'Storage: IndexedDB put failed:', event.target.error );
 
 			};
 
@@ -124,7 +124,7 @@ function Storage() {
 
 			transaction.onerror = function ( event ) {
 
-				console.error( 'IndexedDB clear failed:', event.target.error );
+				console.error( 'Storage: IndexedDB clear failed:', event.target.error );
 
 			};
 
