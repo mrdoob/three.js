@@ -169,7 +169,7 @@ export const textureCubeUV = /*@__PURE__*/ Fn( ( [ envMap, sampleDir_immutable, 
 
 } );
 
-const bilinearCubeUV = /*@__PURE__*/ Fn( ( [ envMap, direction_immutable, mipInt_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
+export const bilinearCubeUV = /*@__PURE__*/ Fn( ( [ envMap, direction_immutable, mipInt_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
 
 	const mipInt = float( mipInt_immutable ).toVar();
 	const direction = vec3( direction_immutable );

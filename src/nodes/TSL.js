@@ -151,6 +151,7 @@ export * from './lighting/PointLightNode.js';
 
 // pmrem
 export * from './pmrem/PMREMNode.js';
+export * from './pmrem/PMREMUtils.js';
 
 // procedural
 export * from './procedural/Checker.js';
