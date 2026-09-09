@@ -63,7 +63,7 @@ function Storage() {
 
 			transaction.onerror = function ( event ) {
 
-		        console.error( 'IndexedDB get failed:', event.target.error );
+				console.error( 'IndexedDB get failed:', event.target.error );
 
     		};
 
