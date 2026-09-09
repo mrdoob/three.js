@@ -50,7 +50,7 @@ function Storage() {
 
 		get: function ( callback ) {
 
-			const start = performance.now();
+			const retrievalStart = performance.now();
 
 			const transaction = database.transaction( [ 'states' ], 'readonly' );
 			const objectStore = transaction.objectStore( 'states' );
@@ -64,9 +64,23 @@ function Storage() {
 			const request = objectStore.get( 0 );
 			request.onsuccess = function ( event ) {
 
-				console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Retrieved state from IndexedDB. ' + ( performance.now() - start ).toFixed( 2 ) + 'ms' );
+				const retrievalDuration = performance.now() - retrievalStart;
+
+				const hydrationStart = performance.now();
 
 				callback( event.target.result );
+
+				const hydrationDuration = performance.now() - hydrationStart;
+
+				const restorationDuration = retrievalDuration + hydrationDuration;
+
+				console.log(
+
+					'[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']',
+
+					`Restored state. ${ restorationDuration.toFixed( 2 ) } ms. ( Retrieval: ${ retrievalDuration.toFixed( 2 ) } ms, Hydration: ${ hydrationDuration.toFixed( 2 ) } ms )`
+
+				);
 
 			};
 
