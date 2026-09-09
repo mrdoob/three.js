@@ -55,12 +55,6 @@ function Storage() {
 			const transaction = database.transaction( [ 'states' ], 'readonly' );
 			const objectStore = transaction.objectStore( 'states' );
 
-			transaction.oncomplete = function () {
-
-				console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Retrieved state from IndexedDB. ' + ( performance.now() - start ).toFixed( 2 ) + 'ms' );
-
-			};
-
 			transaction.onerror = function ( event ) {
 
 				console.error( 'IndexedDB get failed:', event.target.error );
@@ -69,6 +63,8 @@ function Storage() {
 
 			const request = objectStore.get( 0 );
 			request.onsuccess = function ( event ) {
+
+				console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Retrieved state from IndexedDB. ' + ( performance.now() - start ).toFixed( 2 ) + 'ms' );
 
 				callback( event.target.result );
 
