@@ -3,6 +3,7 @@ uniform float size;
 uniform float scale;
 
 #include <common>
+#include <batching_pars_vertex>
 #include <color_pars_vertex>
 #include <fog_pars_vertex>
 #include <morphtarget_pars_vertex>
@@ -27,6 +28,7 @@ void main() {
 	#include <color_vertex>
 	#include <morphinstance_vertex>
 	#include <morphcolor_vertex>
+	#include <batching_vertex>
 	#include <begin_vertex>
 	#include <morphtarget_vertex>
 	#include <project_vertex>
