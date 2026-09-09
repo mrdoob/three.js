@@ -581,6 +581,7 @@ export const materialRoughness = /*@__PURE__*/ nodeImmutable( MaterialNode, Mate
 
 /**
  * TSL object that represents the diffuse roughness of the current material.
+ * The value is composed via `diffuseRoughness` * `diffuseRoughnessMap.r`.
  *
  * @tsl
  * @type {Node<float>}
