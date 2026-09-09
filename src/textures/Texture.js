@@ -642,6 +642,10 @@ class Texture extends EventDispatcher {
 	 * Frees the GPU-related resources allocated by this instance. Call this
 	 * method whenever this instance is no longer used in your app.
 	 *
+	 * Textures that belong to a render target are managed by the render target.
+	 * Calling this method on such a texture only dispatches the dispose event but
+	 * does not free any GPU resources. Use {@link RenderTarget#dispose} instead.
+	 *
 	 * @fires Texture#dispose
 	 */
 	dispose() {
