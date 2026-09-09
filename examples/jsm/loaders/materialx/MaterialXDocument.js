@@ -886,6 +886,7 @@ class MaterialXDocument {
 		const materials = rootNode.toMaterials( materialName );
 		return {
 			materials,
+			document: this,
 			log: this.log.entries,
 			errors: this.log.errors,
 			warnings: this.log.warnings,
