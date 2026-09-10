@@ -150,6 +150,7 @@ function mergeGeometries( geometries, useGroups = false ) {
 
 		const geometry = geometries[ i ];
 		let attributesCount = 0;
+		let morphAttributesCount = 0;
 
 		// ensure that all geometries are indexed, or none
 
@@ -206,9 +207,27 @@ function mergeGeometries( geometries, useGroups = false ) {
 
 			}
 
+			if ( geometry.morphAttributes[ name ].length !== geometries[ 0 ].morphAttributes[ name ].length ) {
+
+				console.error( 'THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index ' + i + '. All geometries must have the same number of morph targets for the "' + name + '" morph attribute.' );
+				return null;
+
+			}
+
 			if ( morphAttributes[ name ] === undefined ) morphAttributes[ name ] = [];
 
 			morphAttributes[ name ].push( geometry.morphAttributes[ name ] );
+
+			morphAttributesCount ++;
+
+		}
+
+		// ensure geometries have the same number of morph attributes
+
+		if ( morphAttributesCount !== morphAttributesUsed.size ) {
+
+			console.error( 'THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index ' + i + '. Make sure all geometries have the same number of morph attributes.' );
+			return null;
 
 		}
 
