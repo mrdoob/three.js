@@ -76,6 +76,22 @@ class SubgroupFunctionNode extends TempNode {
 
 	}
 
+	setup( builder ) {
+
+		const renderer = builder.renderer;
+
+		if ( renderer.backend.isWebGPUBackend !== true || ! renderer.hasFeature( 'subgroups' ) ) {
+
+			error( `TSL: "${this.method}" requires the 'subgroups' feature, which is not supported by the current device.` );
+
+		}
+
+		builder.enableSubGroups();
+
+		return super.setup( builder );
+
+	}
+
 	generateNodeType( builder ) {
 
 		const method = this.method;
