@@ -942,6 +942,7 @@ class RenderObject {
 
 			_scratchArray2[ 0 ] = cacheKey;
 			_scratchArray2[ 1 ] = this.camera.cameras.length;
+
 			cacheKey = hashArray( _scratchArray2 );
 
 		}
@@ -950,6 +951,7 @@ class RenderObject {
 
 			_scratchArray2[ 0 ] = cacheKey;
 			_scratchArray2[ 1 ] = 1;
+
 			cacheKey = hashArray( _scratchArray2 );
 
 		}
@@ -957,6 +959,7 @@ class RenderObject {
 		_scratchArray3[ 0 ] = cacheKey;
 		_scratchArray3[ 1 ] = this.renderer.contextNode.id;
 		_scratchArray3[ 2 ] = this.renderer.contextNode.version;
+
 		cacheKey = hashArray( _scratchArray3 );
 
 		return cacheKey;

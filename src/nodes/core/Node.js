@@ -453,8 +453,13 @@ class Node extends EventDispatcher {
 			}
 
 			//
-			_scratchArray2[ 0 ] = hashArray( values );
-			_scratchArray2[ 1 ] = this.customCacheKey();
+
+			const childrenKey = hashArray( values );
+			const customKey = this.customCacheKey();
+
+			_scratchArray2[ 0 ] = childrenKey;
+			_scratchArray2[ 1 ] = customKey;
+
 			this._cacheKey = hashArray( _scratchArray2 );
 			this._cacheKeyVersion = this.version;
 

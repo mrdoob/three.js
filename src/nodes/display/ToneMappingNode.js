@@ -67,6 +67,7 @@ class ToneMappingNode extends TempNode {
 	customCacheKey() {
 
 		_scratchArray1[ 0 ] = this._toneMapping;
+
 		return hashArray( _scratchArray1 );
 
 	}
