@@ -13,7 +13,7 @@ const _parentBuildStage = {
 };
 
 let _nodeId = 0;
-const _scratchArray2 = new Array(2);
+const _scratchArray2 = new Array( 2 );
 
 /**
  * Base class for all nodes.

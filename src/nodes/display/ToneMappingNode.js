@@ -6,7 +6,7 @@ import { NoToneMapping } from '../../constants.js';
 import { hashArray } from '../core/NodeUtils.js';
 import { error } from '../../utils.js';
 
-const _scratchArray1 = new Array(1);
+const _scratchArray1 = new Array( 1 );
 
 /**
  * This node represents a tone mapping operation.

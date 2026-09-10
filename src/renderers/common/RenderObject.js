@@ -2,8 +2,8 @@ import { hashArray, hashString } from '../../nodes/core/NodeUtils.js';
 
 let _id = 0;
 const _protoKeysCache = new WeakMap();
-const _scratchArray2 = new Array(2);
-const _scratchArray3 = new Array(3);
+const _scratchArray2 = new Array( 2 );
+const _scratchArray3 = new Array( 3 );
 
 function getKeys( obj ) {
 
