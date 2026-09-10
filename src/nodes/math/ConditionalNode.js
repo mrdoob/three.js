@@ -68,37 +68,41 @@ class ConditionalNode extends Node {
 	 */
 	generateNodeType( builder ) {
 
-		const { ifNode, elseNode } = builder.getNodeProperties( this );
+		const properties = this.getProperties( builder );
+		const { ifNode, elseNode } = properties;
 
-		if ( ifNode === undefined ) {
+		const ifType = ifNode.getNodeType( builder );
+		const elseType = elseNode !== null ? elseNode.getNodeType( builder ) : 'void';
 
-			// fallback setup
+		if ( ( ifType === null || elseType === null ) && properties.initialized !== true ) {
 
+			// Some custom nodes and statement blocks still need setup to resolve a type.
 			builder.flowBuildStage( this, 'setup' );
-
 			return this.getNodeType( builder );
 
 		}
 
-		const ifType = ifNode.getNodeType( builder );
-
-		if ( elseNode !== null ) {
-
-			const elseType = elseNode.getNodeType( builder );
-
-			if ( builder.getTypeLength( elseType ) > builder.getTypeLength( ifType ) ) {
-
-				return elseType;
-
-			}
-
-		}
-
-		return ifType;
+		return builder.getTypeLength( elseType ) > builder.getTypeLength( ifType ) ? elseType : ifType;
 
 	}
 
 	setup( builder ) {
+
+		this.getProperties( builder );
+
+	}
+
+	/**
+	 * Prepares the branch contexts without building their dependencies.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Object} The branch properties.
+	 */
+	getProperties( builder ) {
+
+		const properties = builder.getNodeProperties( this );
+
+		if ( properties.ifNode !== undefined ) return properties;
 
 		const condNode = this.condNode;
 		const ifNode = this.ifNode.isolate();
@@ -115,10 +119,11 @@ class ConditionalNode extends Node {
 
 		const isUniformFlow = builder.context.uniformFlow;
 
-		const properties = builder.getNodeProperties( this );
 		properties.condNode = condNode;
 		properties.ifNode = isUniformFlow ? ifNode : ifNode.context( { nodeBlock: ifNode } );
 		properties.elseNode = elseNode ? ( isUniformFlow ? elseNode : elseNode.context( { nodeBlock: elseNode } ) ) : null;
+
+		return properties;
 
 	}
 

@@ -2251,7 +2251,7 @@ class Node extends EventDispatcher {
 
 			type = nodeData.typeFromOutput[ output ];
 
-			if ( type === undefined ) {
+			if ( type === undefined || type === null ) {
 
 				type = this.generateNodeType( builder, output );
 
@@ -2263,7 +2263,7 @@ class Node extends EventDispatcher {
 
 			type = nodeData.type;
 
-			if ( type === undefined ) {
+			if ( type === undefined || type === null ) {
 
 				type = this.generateNodeType( builder );
 
@@ -3267,6 +3267,201 @@ class JoinNode extends TempNode {
 
 }
 
+/**
+ * Base class for representing data input nodes.
+ *
+ * @augments Node
+ */
+class InputNode extends Node {
+
+	static get type() {
+
+		return 'InputNode';
+
+	}
+
+	/**
+	 * Constructs a new input node.
+	 *
+	 * @param {any} value - The value of this node. This can be any JS primitive, functions, array buffers or even three.js objects (vector, matrices, colors).
+	 * @param {?string} nodeType - The node type. If no explicit type is defined, the node tries to derive the type from its value.
+	 */
+	constructor( value, nodeType = null ) {
+
+		super( nodeType );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isInputNode = true;
+
+		/**
+		 * The value of this node. This can be any JS primitive, functions, array buffers or even three.js objects (vector, matrices, colors).
+		 *
+		 * @type {any}
+		 */
+		this.value = value;
+
+		/**
+		 * The precision of the value in the shader.
+		 *
+		 * @type {?('low'|'medium'|'high')}
+		 * @default null
+		 */
+		this.precision = null;
+
+	}
+
+	generateNodeType( /*builder*/ ) {
+
+		if ( this.nodeType === null ) {
+
+			return getValueType( this.value );
+
+		}
+
+		return this.nodeType;
+
+	}
+
+	/**
+	 * Returns the input type of the node which is by default the node type. Derived modules
+	 * might overwrite this method and use a fixed type or compute one analytically.
+	 *
+	 * A typical example for different input and node types are textures. The input type of a
+	 * normal RGBA texture is `texture` whereas its node type is `vec4`.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {string} The input type.
+	 */
+	getInputType( builder ) {
+
+		return this.getNodeType( builder );
+
+	}
+
+	/**
+	 * Sets the precision to the given value. The method can be
+	 * overwritten in derived classes if the final precision must be computed
+	 * analytically.
+	 *
+	 * @param {('low'|'medium'|'high')} precision - The precision of the input value in the shader.
+	 * @return {InputNode} A reference to this node.
+	 */
+	setPrecision( precision ) {
+
+		this.precision = precision;
+
+		return this;
+
+	}
+
+	serialize( data ) {
+
+		super.serialize( data );
+
+		data.value = this.value;
+
+		if ( this.value && this.value.toArray ) data.value = this.value.toArray();
+
+		data.valueType = getValueType( this.value );
+		data.nodeType = this.nodeType;
+
+		if ( data.valueType === 'ArrayBuffer' ) data.value = arrayBufferToBase64( data.value );
+
+		data.precision = this.precision;
+
+	}
+
+	deserialize( data ) {
+
+		super.deserialize( data );
+
+		this.nodeType = data.nodeType;
+		this.value = Array.isArray( data.value ) ? getValueFromType( data.valueType, ...data.value ) : data.value;
+
+		this.precision = data.precision || null;
+
+		if ( this.value && this.value.fromArray ) this.value = this.value.fromArray( data.value );
+
+	}
+
+	generate( /*builder, output*/ ) {
+
+		warn( 'Abstract function.' );
+
+	}
+
+}
+
+const _regNum = /float|u?int/;
+
+/**
+ * Class for representing a constant value in the shader.
+ *
+ * @augments InputNode
+ */
+class ConstNode extends InputNode {
+
+	static get type() {
+
+		return 'ConstNode';
+
+	}
+
+	/**
+	 * Constructs a new input node.
+	 *
+	 * @param {any} value - The value of this node. Usually a JS primitive or three.js object (vector, matrix, color).
+	 * @param {?string} nodeType - The node type. If no explicit type is defined, the node tries to derive the type from its value.
+	 */
+	constructor( value, nodeType = null ) {
+
+		super( value, nodeType );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isConstNode = true;
+
+	}
+
+	/**
+	 * Generates the shader string of the value with the current node builder.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {string} The generated value as a shader string.
+	 */
+	generateConst( builder ) {
+
+		return builder.generateConst( this.getNodeType( builder ), this.value );
+
+	}
+
+	generate( builder, output ) {
+
+		const type = this.getNodeType( builder );
+
+		if ( _regNum.test( type ) && _regNum.test( output ) ) {
+
+			return builder.generateConst( output, this.value );
+
+		}
+
+		return builder.format( this.generateConst( builder ), type, output );
+
+	}
+
+}
+
 const _stringVectorComponents = vectorComponents.join( '' );
 
 /**
@@ -3377,7 +3572,36 @@ class SplitNode extends Node {
 
 	}
 
+	setup( builder ) {
+
+		if ( this.components === 'w' && builder.context.assign !== true ) {
+
+			const type = builder.getVectorType( this.node.getNodeType( builder ) );
+			const length = builder.getTypeLength( type );
+
+			if ( builder.isVector( type ) && ( length === 2 || length === 3 ) && builder.isNodePure( this.node ) ) {
+
+				// Vector expansion supplies alpha independently of the RGB expression.
+				// Fold before setup registers that expression's dependencies.
+				return new ConstNode( 1, builder.getComponentType( type ) );
+
+			}
+
+		}
+
+		return super.setup( builder );
+
+	}
+
 	generate( builder, output ) {
+
+		const { outputNode } = builder.getNodeProperties( this );
+
+		if ( outputNode ) {
+
+			return outputNode.build( builder, output );
+
+		}
 
 		const node = this.node;
 		const nodeTypeLength = builder.getTypeLength( node.getNodeType( builder ) );
@@ -3643,201 +3867,6 @@ class FlipNode extends TempNode {
 		}
 
 		return `${ builder.getType( sourceType ) }( ${ snippetValues.join( ', ' ) } )`;
-
-	}
-
-}
-
-/**
- * Base class for representing data input nodes.
- *
- * @augments Node
- */
-class InputNode extends Node {
-
-	static get type() {
-
-		return 'InputNode';
-
-	}
-
-	/**
-	 * Constructs a new input node.
-	 *
-	 * @param {any} value - The value of this node. This can be any JS primitive, functions, array buffers or even three.js objects (vector, matrices, colors).
-	 * @param {?string} nodeType - The node type. If no explicit type is defined, the node tries to derive the type from its value.
-	 */
-	constructor( value, nodeType = null ) {
-
-		super( nodeType );
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isInputNode = true;
-
-		/**
-		 * The value of this node. This can be any JS primitive, functions, array buffers or even three.js objects (vector, matrices, colors).
-		 *
-		 * @type {any}
-		 */
-		this.value = value;
-
-		/**
-		 * The precision of the value in the shader.
-		 *
-		 * @type {?('low'|'medium'|'high')}
-		 * @default null
-		 */
-		this.precision = null;
-
-	}
-
-	generateNodeType( /*builder*/ ) {
-
-		if ( this.nodeType === null ) {
-
-			return getValueType( this.value );
-
-		}
-
-		return this.nodeType;
-
-	}
-
-	/**
-	 * Returns the input type of the node which is by default the node type. Derived modules
-	 * might overwrite this method and use a fixed type or compute one analytically.
-	 *
-	 * A typical example for different input and node types are textures. The input type of a
-	 * normal RGBA texture is `texture` whereas its node type is `vec4`.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {string} The input type.
-	 */
-	getInputType( builder ) {
-
-		return this.getNodeType( builder );
-
-	}
-
-	/**
-	 * Sets the precision to the given value. The method can be
-	 * overwritten in derived classes if the final precision must be computed
-	 * analytically.
-	 *
-	 * @param {('low'|'medium'|'high')} precision - The precision of the input value in the shader.
-	 * @return {InputNode} A reference to this node.
-	 */
-	setPrecision( precision ) {
-
-		this.precision = precision;
-
-		return this;
-
-	}
-
-	serialize( data ) {
-
-		super.serialize( data );
-
-		data.value = this.value;
-
-		if ( this.value && this.value.toArray ) data.value = this.value.toArray();
-
-		data.valueType = getValueType( this.value );
-		data.nodeType = this.nodeType;
-
-		if ( data.valueType === 'ArrayBuffer' ) data.value = arrayBufferToBase64( data.value );
-
-		data.precision = this.precision;
-
-	}
-
-	deserialize( data ) {
-
-		super.deserialize( data );
-
-		this.nodeType = data.nodeType;
-		this.value = Array.isArray( data.value ) ? getValueFromType( data.valueType, ...data.value ) : data.value;
-
-		this.precision = data.precision || null;
-
-		if ( this.value && this.value.fromArray ) this.value = this.value.fromArray( data.value );
-
-	}
-
-	generate( /*builder, output*/ ) {
-
-		warn( 'Abstract function.' );
-
-	}
-
-}
-
-const _regNum = /float|u?int/;
-
-/**
- * Class for representing a constant value in the shader.
- *
- * @augments InputNode
- */
-class ConstNode extends InputNode {
-
-	static get type() {
-
-		return 'ConstNode';
-
-	}
-
-	/**
-	 * Constructs a new input node.
-	 *
-	 * @param {any} value - The value of this node. Usually a JS primitive or three.js object (vector, matrix, color).
-	 * @param {?string} nodeType - The node type. If no explicit type is defined, the node tries to derive the type from its value.
-	 */
-	constructor( value, nodeType = null ) {
-
-		super( value, nodeType );
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isConstNode = true;
-
-	}
-
-	/**
-	 * Generates the shader string of the value with the current node builder.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {string} The generated value as a shader string.
-	 */
-	generateConst( builder ) {
-
-		return builder.generateConst( this.getNodeType( builder ), this.value );
-
-	}
-
-	generate( builder, output ) {
-
-		const type = this.getNodeType( builder );
-
-		if ( _regNum.test( type ) && _regNum.test( output ) ) {
-
-			return builder.generateConst( output, this.value );
-
-		}
-
-		return builder.format( this.generateConst( builder ), type, output );
 
 	}
 
@@ -4409,7 +4438,7 @@ class ShaderCallNodeInternal extends Node {
 
 	generateNodeType( builder ) {
 
-		return this.shaderNode.nodeType || this.getOutputNode( builder ).getNodeType( builder );
+		return this.shaderNode.nodeType || this.shaderNode.layout?.type || this.getOutputNode( builder ).getNodeType( builder );
 
 	}
 
@@ -8631,37 +8660,41 @@ class ConditionalNode extends Node {
 	 */
 	generateNodeType( builder ) {
 
-		const { ifNode, elseNode } = builder.getNodeProperties( this );
+		const properties = this.getProperties( builder );
+		const { ifNode, elseNode } = properties;
 
-		if ( ifNode === undefined ) {
+		const ifType = ifNode.getNodeType( builder );
+		const elseType = elseNode !== null ? elseNode.getNodeType( builder ) : 'void';
 
-			// fallback setup
+		if ( ( ifType === null || elseType === null ) && properties.initialized !== true ) {
 
+			// Some custom nodes and statement blocks still need setup to resolve a type.
 			builder.flowBuildStage( this, 'setup' );
-
 			return this.getNodeType( builder );
 
 		}
 
-		const ifType = ifNode.getNodeType( builder );
-
-		if ( elseNode !== null ) {
-
-			const elseType = elseNode.getNodeType( builder );
-
-			if ( builder.getTypeLength( elseType ) > builder.getTypeLength( ifType ) ) {
-
-				return elseType;
-
-			}
-
-		}
-
-		return ifType;
+		return builder.getTypeLength( elseType ) > builder.getTypeLength( ifType ) ? elseType : ifType;
 
 	}
 
 	setup( builder ) {
+
+		this.getProperties( builder );
+
+	}
+
+	/**
+	 * Prepares the branch contexts without building their dependencies.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Object} The branch properties.
+	 */
+	getProperties( builder ) {
+
+		const properties = builder.getNodeProperties( this );
+
+		if ( properties.ifNode !== undefined ) return properties;
 
 		const condNode = this.condNode;
 		const ifNode = this.ifNode.isolate();
@@ -8678,10 +8711,11 @@ class ConditionalNode extends Node {
 
 		const isUniformFlow = builder.context.uniformFlow;
 
-		const properties = builder.getNodeProperties( this );
 		properties.condNode = condNode;
 		properties.ifNode = isUniformFlow ? ifNode : ifNode.context( { nodeBlock: ifNode } );
 		properties.elseNode = elseNode ? ( isUniformFlow ? elseNode : elseNode.context( { nodeBlock: elseNode } ) ) : null;
+
+		return properties;
 
 	}
 
@@ -8884,7 +8918,13 @@ class ContextNode extends Node {
 	 */
 	generateNodeType( builder ) {
 
-		return this.node.getNodeType( builder );
+		const previousContext = builder.addContext( this.value );
+
+		const nodeType = this.node.getNodeType( builder );
+
+		builder.setContext( previousContext );
+
+		return nodeType;
 
 	}
 
@@ -19715,6 +19755,8 @@ class LoopNode extends Node {
 		}
 
 		const stack = builder.addStack();
+
+		properties.inputs = inputs;
 
 		const fnCall = params[ params.length - 1 ]( inputs );
 
@@ -51949,6 +51991,264 @@ class StructType {
 
 }
 
+// Only exact built-in classes are eligible; subclasses may add shader effects.
+const pureLeaves = /*@__PURE__*/ new Set( [
+	ConstNode, UniformNode, AttributeNode, ParameterNode,
+	ModelNode, Object3DNode, ReferenceNode
+] );
+const pureExpressions = /*@__PURE__*/ new Set( [
+	SplitNode, JoinNode, ConvertNode, ArrayElementNode,
+	OperatorNode, MathNode, VarNode, PropertyNode
+] );
+const mathMethods = /*@__PURE__*/ new Set( Object.values( MathNode ) );
+const operators = /*@__PURE__*/ new Set( [
+	'+', '-', '*', '/', '%',
+	'==', '!=', '<', '<=', '>', '>=',
+	'&&', '||', '^^', '&', '|', '^', '<<', '>>', '!', '~'
+] );
+const loopConditions = /*@__PURE__*/ new Set( [ '<', '<=', '>', '>=' ] );
+
+/**
+ * Whether evaluating an expression can be omitted when its result is unused.
+ * Native functions have their own variable scope; inline functions do not.
+ *
+ * @private
+ * @param {NodeBuilder} builder - The current node builder.
+ * @param {Node} root - The expression to inspect.
+ * @param {?Object<string,Array<NodeVar>>} [functionVariables=null] - The native function's local variables, by shader stage. Omit for inline expressions.
+ * @return {boolean} Whether the expression has no externally visible shader effects.
+ */
+function isNodePure( builder, root, functionVariables = null ) {
+
+	const visited = new Set();
+	const loopInputs = new Set();
+
+	function isLocalVariable( node ) {
+
+		if ( functionVariables === null ) return false;
+
+		const scope = node.getScope();
+		const NodeClass = scope.constructor;
+
+		if ( NodeClass === ParameterNode ) return true;
+		if ( NodeClass !== VarNode && NodeClass !== PropertyNode ) return false;
+		if ( NodeClass === PropertyNode && scope.varying ) return false;
+
+		// Global nodes can already have a variable in an enclosing shader scope.
+		// Only writes to declarations owned by this function can be discarded.
+		const data = builder.getDataFromNode( scope );
+		const variable = data[ builder.getSubBuildProperty( 'variable', data.subBuilds ) ];
+
+		return functionVariables[ builder.shaderStage ]?.includes( variable ) === true;
+
+	}
+
+	function visitParameters( inputs, parameters ) {
+
+		const isArray = Array.isArray( parameters );
+
+		for ( let i = 0; i < inputs.length; i ++ ) {
+
+			const key = isArray ? i : inputs[ i ].name;
+			const parameter = nodeObject( parameters?.[ key ] );
+
+			if ( parameter === undefined || visit( parameter ) === false ) return false;
+
+		}
+
+		return true;
+
+	}
+
+	function visitFunction( shaderNode, parameters ) {
+
+		const fn = builder.buildFunctionNode( shaderNode );
+
+		return fn._isPure === true && visitParameters( shaderNode.layout.inputs, parameters );
+
+	}
+
+	function visitLoop( node ) {
+
+		// Counted loops only mutate local indices. Keep arbitrary update code.
+		if ( functionVariables === null || node.params.length < 2 ) return false;
+
+		for ( let i = 0; i < node.params.length - 1; i ++ ) {
+
+			const param = node.params[ i ];
+
+			if ( param.isNode === true ) {
+
+				if ( param.getNodeType( builder ) === 'bool' || visit( param ) === false ) return false;
+
+			} else {
+
+				const { start, end, condition, update } = param;
+
+				if ( update !== undefined ) return false;
+				if ( condition !== undefined && loopConditions.has( condition ) === false ) return false;
+				if ( typeof start === 'string' || typeof end === 'string' ) return false;
+				if ( start?.isNode && visit( start ) === false ) return false;
+				if ( end?.isNode && visit( end ) === false ) return false;
+
+			}
+
+		}
+
+		const properties = node.getProperties( builder );
+
+		for ( const input of Object.values( properties.inputs ) ) loopInputs.add( input );
+
+		return visit( properties.stackNode ) && visit( properties.returnsNode ) && visit( properties.updateNode );
+
+	}
+
+	function visit( node ) {
+
+		if ( node === null || node === undefined ) return true;
+		if ( node.isNode !== true ) return false;
+		if ( node._beforeNodes !== null ) return false;
+		if ( builder.context.overrideNodes?.has( node ) ) return false;
+
+		const NodeClass = node.constructor;
+
+		if ( pureLeaves.has( NodeClass ) || loopInputs.has( node ) ) return true;
+
+		const data = builder.getDataFromNode( node );
+
+		if ( visited.has( data ) ) return true;
+		visited.add( data );
+
+		if ( pureExpressions.has( NodeClass ) ) {
+
+			if ( NodeClass === MathNode && mathMethods.has( node.method ) === false ) return false;
+			if ( NodeClass === OperatorNode && operators.has( node.op ) === false ) return false;
+
+			for ( const child of node.getChildren() ) {
+
+				if ( visit( child ) === false ) return false;
+
+			}
+
+			return true;
+
+		}
+
+		if ( node.isShaderCallNodeInternal === true ) {
+
+			if ( node.shaderNode.layout !== null ) {
+
+				const rawInputs = node.rawInputs || [];
+				const parameters = isArrayAsParameter( rawInputs ) ? rawInputs : rawInputs[ 0 ];
+
+				return visitFunction( node.shaderNode, parameters );
+
+			}
+
+			return visit( node.getOutputNode( builder ) );
+
+		}
+
+		if ( NodeClass === FunctionOverloadingNode ) {
+
+			return visitFunction( node.getCandidateFn( builder ).shaderNode, node.parametersNodes );
+
+		}
+
+		if ( NodeClass === FunctionCallNode ) {
+
+			const fn = node.functionNode;
+
+			return fn._isPure === true && visitParameters( fn.getInputs( builder ), node.parameters );
+
+		}
+
+		if ( NodeClass === StackNode ) {
+
+			return node.nodes.every( visit ) && visit( node.outputNode );
+
+		}
+
+		if ( NodeClass === ConditionalNode ) {
+
+			const { condNode, ifNode, elseNode } = node.getProperties( builder );
+
+			return visit( condNode ) && visit( ifNode ) && visit( elseNode );
+
+		}
+
+		if ( NodeClass === AssignNode ) {
+
+			return isLocalVariable( node.targetNode ) && visit( node.targetNode ) && visit( node.sourceNode );
+
+		}
+
+		if ( NodeClass === ContextNode ) {
+
+			const previousContext = builder.addContext( node.value );
+
+			const result = visit( node.node );
+
+			builder.setContext( previousContext );
+
+			return result;
+
+		}
+
+		if ( NodeClass === IsolateNode ) {
+
+			const previousCache = builder.getCache();
+
+			builder.setCache( builder.getCacheFromNode( node, node.parent ) );
+
+			const result = visit( node.node );
+
+			builder.setCache( previousCache );
+
+			return result;
+
+		}
+
+		if ( NodeClass === VaryingNode ) {
+
+			const previousStage = builder.shaderStage;
+
+			builder.setShaderStage( 'vertex' );
+
+			const result = visit( node.node );
+
+			builder.setShaderStage( previousStage );
+
+			return result;
+
+		}
+
+		if ( NodeClass === SubBuildNode ) {
+
+			builder.addSubBuild( node.name );
+
+			const result = visit( node.node );
+
+			builder.removeSubBuild();
+
+			return result;
+
+		}
+
+		if ( NodeClass === LoopNode ) {
+
+			return visitLoop( node );
+
+		}
+
+		return false;
+
+	}
+
+	return visit( root );
+
+}
+
 /**
  * Abstract base class for uniforms.
  *
@@ -55238,6 +55538,13 @@ class NodeBuilder {
 
 			fn.code = this.buildFunctionCode( shaderNode );
 
+			if ( fn._isPure === true ) {
+
+				// Reference parameters can expose writes even when the return value is unused.
+				fn._isPure = shaderNode.layout.inputs.every( input => /^(?:float|int|uint|bool|[biu]?vec[234]|mat[234])$/.test( input.type ) );
+
+			}
+
 			this.currentFunctionNode = previous;
 
 			cache.set( shaderNode, fn );
@@ -55354,6 +55661,13 @@ class NodeBuilder {
 
 		}
 
+		if ( this.currentFunctionNode !== null ) {
+
+			// Inspect the completed body before restoring the enclosing variable scope.
+			this.currentFunctionNode._isPure = isNodePure( this, node, this.vars );
+
+		}
+
 		flow.vars = this.getVars( this.shaderStage );
 
 		this.flow = previousFlow;
@@ -55365,6 +55679,18 @@ class NodeBuilder {
 		this.setBuildStage( previousBuildStage );
 
 		return flow;
+
+	}
+
+	/**
+	 * Whether evaluating a node has no externally visible shader effects.
+	 *
+	 * @param {Node} node - The node to inspect.
+	 * @return {boolean} Whether the node can be omitted when its result is unused.
+	 */
+	isNodePure( node ) {
+
+		return isNodePure( this, node );
 
 	}
 

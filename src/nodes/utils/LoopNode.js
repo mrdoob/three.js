@@ -103,6 +103,8 @@ class LoopNode extends Node {
 
 		const stack = builder.addStack();
 
+		properties.inputs = inputs;
+
 		const fnCall = params[ params.length - 1 ]( inputs );
 
 		properties.returnsNode = fnCall.context( { nodeLoop: fnCall } );
