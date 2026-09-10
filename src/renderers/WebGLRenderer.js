@@ -1094,6 +1094,7 @@ class WebGLRenderer {
 			background.dispose();
 			renderLists.dispose();
 			renderStates.dispose();
+			textures.dispose();
 			properties.dispose();
 			environments.dispose();
 			objects.dispose();
