@@ -5,9 +5,15 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 	const geometries = {};
 	const wireframeAttributes = new WeakMap();
 
+	const registry = new FinalizationRegistry( ( id ) => delete geometries[ id ] );
+
 	function onGeometryDispose( event ) {
 
-		const geometry = event.target;
+		destroyGeometry( event.target );
+
+	}
+
+	function destroyGeometry( geometry ) {
 
 		if ( geometry.index !== null ) {
 
@@ -24,6 +30,7 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 		geometry.removeEventListener( 'dispose', onGeometryDispose );
 
 		delete geometries[ geometry.id ];
+		registry.unregister( geometry );
 
 		const attribute = wireframeAttributes.get( geometry );
 
@@ -50,11 +57,12 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 	function get( object, geometry ) {
 
-		if ( geometries[ geometry.id ] === true ) return geometry;
+		if ( geometries[ geometry.id ] !== undefined ) return geometry;
 
 		geometry.addEventListener( 'dispose', onGeometryDispose );
 
-		geometries[ geometry.id ] = true;
+		geometries[ geometry.id ] = new WeakRef( geometry );
+		registry.register( geometry, geometry.id, geometry );
 
 		info.memory.geometries ++;
 
@@ -171,12 +179,26 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 	}
 
+	function dispose() {
+
+		for ( const id in geometries ) {
+
+			const geometry = geometries[ id ].deref();
+
+			if ( geometry !== undefined ) destroyGeometry( geometry );
+
+		}
+
+	}
+
 	return {
 
 		get: get,
 		update: update,
 
-		getWireframeAttribute: getWireframeAttribute
+		getWireframeAttribute: getWireframeAttribute,
+
+		dispose: dispose
 
 	};
 
