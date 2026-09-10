@@ -1,8 +1,5 @@
 import {
 	Texture,
-	RepeatWrapping,
-	ClampToEdgeWrapping,
-	MirroredRepeatWrapping,
 	ImageLoader,
 	ImageBitmapLoader,
 	Matrix3,
@@ -34,7 +31,7 @@ import { parseMaterialXNodeTree, parseMaterialXText } from './parse/MaterialXPar
 import { getSurfaceMapper } from './MaterialXSurfaceMappings.js';
 import { MtlXLibrary } from './MaterialXNodeLibrary.js';
 import { mxHextileCoord, mxHextileComputeBlendWeights } from './MaterialXHextile.js';
-import { toBooleanNode } from './MaterialXUtils.js';
+import { resolveTextureAddressMode, TEXTURE_ADDRESS_MODE_WRAPPING, toBooleanNode } from './MaterialXUtils.js';
 
 const colorSpaceLib = {
 	mx_srgb_texture_to_lin_rec709,
@@ -45,12 +42,6 @@ const IDENTITY_MAT3_VALUES = [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ];
 const IDENTITY_MAT4_VALUES = [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ];
 const MATRIX_INVERSE_EPSILON = 1e-8;
 const COMPILE_REGISTRY = createMaterialXCompileRegistry();
-const TEXTURE_ADDRESS_MODE_WRAPPING = {
-	constant: ClampToEdgeWrapping,
-	clamp: ClampToEdgeWrapping,
-	periodic: RepeatWrapping,
-	mirror: MirroredRepeatWrapping,
-};
 const NODE_CLASS_BY_TYPE = {
 	integer: int,
 	float,
@@ -108,15 +99,6 @@ function isSvgUri( uri ) {
 
 	if ( typeof uri !== 'string' ) return false;
 	return /\.svg(?:$|[?#])/i.test( uri );
-
-}
-
-function normalizeTextureAddressMode( value ) {
-
-	if ( value === null || value === undefined || value === '' ) return 'periodic';
-
-	const mode = value.trim().toLowerCase();
-	return mode in TEXTURE_ADDRESS_MODE_WRAPPING ? mode : null;
 
 }
 
@@ -290,10 +272,20 @@ class MaterialXNode {
 
 	}
 
+	logUnsupportedNode() {
+
+		this.materialX.log.add(
+			MaterialXLogCodes.UNSUPPORTED_NODE,
+			`Unsupported MaterialX node category "${this.element}" on "${this.name}".`,
+			this.name,
+		);
+
+	}
+
 	getTextureAddressMode( inputName ) {
 
 		const rawMode = this.getInputValueByName( inputName );
-		const mode = normalizeTextureAddressMode( rawMode );
+		const mode = resolveTextureAddressMode( rawMode );
 		if ( mode ) return mode;
 
 		this.materialX.log.add(
@@ -397,11 +389,11 @@ class MaterialXNode {
 
 			} else if ( type === 'matrix33' ) {
 
-				node = this.getMatrix( 3 ) || mat3( 1, 0, 0, 0, 1, 0, 0, 0, 1 );
+				node = this.getMatrix( 3 ) || mat3( ...IDENTITY_MAT3_VALUES );
 
 			} else if ( type === 'matrix44' ) {
 
-				node = this.getMatrix( 4 ) || mat4( 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 );
+				node = this.getMatrix( 4 ) || mat4( ...IDENTITY_MAT4_VALUES );
 
 			} else if ( type === 'string' ) {
 
@@ -453,7 +445,7 @@ class MaterialXNode {
 
 			}
 
-			node = this.materialX.compileContext.mxToBottomLeftUvSpace( uv( index ) );
+			node = this.materialX.compileContext.getTexcoordNode( index );
 
 		} else {
 
@@ -463,11 +455,7 @@ class MaterialXNode {
 
 		if ( node === null || node === undefined ) {
 
-			this.materialX.log.add(
-				MaterialXLogCodes.UNSUPPORTED_NODE,
-				`Unsupported MaterialX node category "${this.element}" on "${this.name}".`,
-				this.name,
-			);
+			this.logUnsupportedNode();
 			node = float( 0 );
 
 		}
@@ -649,11 +637,7 @@ class MaterialXNode {
 
 		} else {
 
-			this.materialX.log.add(
-				MaterialXLogCodes.UNSUPPORTED_NODE,
-				`Unsupported MaterialX node category "${this.element}" on "${this.name}".`,
-				this.name,
-			);
+			this.logUnsupportedNode();
 
 		}
 
@@ -803,6 +787,7 @@ class MaterialXDocument {
 			compileRegistry: COMPILE_REGISTRY,
 			nodeLibrary: MtlXLibrary,
 			...bottomLeftUvSpaceHelpers,
+			getTexcoordNode: ( index = 0 ) => bottomLeftUvSpaceHelpers.mxToBottomLeftUvSpace( uv( index ) ),
 			mxTransformUv: mx_transform_uv,
 			mxHextileCoord,
 			mxHextileComputeBlendWeights,
