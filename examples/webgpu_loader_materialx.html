@@ -202,12 +202,18 @@
 						prefab = ( await new GLTFLoader().loadAsync( './models/gltf/ShaderBall.glb' ) ).scene;
 						await computePrefabTangents();
 
-						await Promise.all( [
-							...samples.map( ( sample ) => addSample( sample, SAMPLE_PATH ) ),
-							...localSamples.map( ( sample ) => addSample( sample, LOCAL_SAMPLE_PATH ) ),
-						] );
+						for ( const sample of samples ) {
 
-						addGUI();
+							await addSample( sample, SAMPLE_PATH );
+
+						}
+
+						for ( const sample of localSamples ) {
+
+							await addSample( sample, LOCAL_SAMPLE_PATH );
+
+						}
+
 						if ( window.TESTING === true ) renderer.setAnimationLoop( render );
 
 					} );
@@ -323,49 +329,6 @@
 				model.visible = true;
 
 			}
-
-			function addGUI() {
-
-				const gui = renderer.inspector.createParameters( 'MaterialX Loader' );
-
-				const API = {
-					showCalibrationMesh: true,
-					showPreviewMesh: true
-				};
-
-				gui.add( API, 'showCalibrationMesh' )
-					.name( 'Calibration Mesh' )
-					.onChange( function ( value ) {
-
-						setVisibility( 'Calibration_Mesh', value );
-
-					} );
-
-				gui.add( API, 'showPreviewMesh' )
-					.name( 'Preview Mesh' )
-					.onChange( function ( value ) {
-
-						setVisibility( 'Preview_Mesh', value );
-
-					} );
-
-			}
-
-			function setVisibility( name, visible ) {
-
-				scene.traverse( function ( node ) {
-
-					if ( node.isMesh ) {
-
-						if ( node.name == name ) node.visible = visible;
-
-					}
-
-				} );
-
-			}
-
-			//
 
 			function onWindowResize() {
 
