@@ -16,6 +16,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	const _sources = new WeakMap(); // maps WebglTexture objects to instances of TextureSource
 
+	const _tracked = new Set();
+	const _registry = new FinalizationRegistry( ( ref ) => _tracked.delete( ref ) );
+
 	// cordova iOS (as of 5.0) still uses UIWebView, which provides OffscreenCanvas,
 	// also OffscreenCanvas.getContext("webgl"), but not OffscreenCanvas.getContext("2d")!
 	// Some implementations may only implement OffscreenCanvas partially (e.g. lacking 2d).
@@ -321,12 +324,45 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	//
 
+	function track( object ) {
+
+		const ref = new WeakRef( object );
+
+		properties.get( object ).__ref = ref;
+
+		_tracked.add( ref );
+		_registry.register( object, ref, ref );
+
+	}
+
+	function untrack( object ) {
+
+		const ref = properties.get( object ).__ref;
+
+		if ( ref === undefined ) return;
+
+		_tracked.delete( ref );
+		_registry.unregister( ref );
+
+	}
+
 	function onTextureDispose( event ) {
 
-		const texture = event.target;
+		destroyTexture( event.target );
+
+	}
+
+	function onRenderTargetDispose( event ) {
+
+		destroyRenderTarget( event.target );
+
+	}
+
+	function destroyTexture( texture ) {
 
 		texture.removeEventListener( 'dispose', onTextureDispose );
 
+		untrack( texture );
 		deallocateTexture( texture );
 
 		if ( texture.isVideoTexture ) {
@@ -343,13 +379,37 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
-	function onRenderTargetDispose( event ) {
-
-		const renderTarget = event.target;
+	function destroyRenderTarget( renderTarget ) {
 
 		renderTarget.removeEventListener( 'dispose', onRenderTargetDispose );
 
+		untrack( renderTarget );
 		deallocateRenderTarget( renderTarget );
+
+	}
+
+	function dispose() {
+
+		for ( const ref of _tracked ) {
+
+			const object = ref.deref();
+
+			if ( object === undefined ) continue;
+
+			if ( object.isRenderTarget === true ) {
+
+				destroyRenderTarget( object );
+
+			} else {
+
+				destroyTexture( object );
+
+			}
+
+		}
+
+		_tracked.clear();
+		_htmlTextures.clear();
 
 	}
 
@@ -410,13 +470,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		const renderTargetProperties = properties.get( renderTarget );
 
-		if ( renderTarget.depthTexture ) {
+		if ( renderTargetProperties.__depthDisposeCallback ) renderTargetProperties.__depthDisposeCallback();
 
-			renderTarget.depthTexture.dispose();
+		const depthTexture = renderTarget.depthTexture;
 
-			properties.remove( renderTarget.depthTexture );
+		// only destroy depth texture the render target owns
 
-		}
+		if ( depthTexture && depthTexture.renderTarget === renderTarget ) destroyTexture( depthTexture );
 
 		if ( renderTarget.isWebGLCubeRenderTarget ) {
 
@@ -717,6 +777,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			textureProperties.__webglInit = true;
 
 			texture.addEventListener( 'dispose', onTextureDispose );
+			track( texture );
 
 		}
 
@@ -2009,6 +2070,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const textureProperties = properties.get( texture );
 
 		renderTarget.addEventListener( 'dispose', onRenderTargetDispose );
+		track( renderTarget );
 
 		const textures = renderTarget.textures;
 
@@ -2496,6 +2558,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	this.setupDepthRenderbuffer = setupDepthRenderbuffer;
 	this.setupFrameBufferTexture = setupFrameBufferTexture;
 	this.useMultisampledRTT = useMultisampledRTT;
+	this.dispose = dispose;
 
 	this.isReversedDepthBuffer = function () {
 
