@@ -1,4 +1,10 @@
 import {
+	RepeatWrapping,
+	ClampToEdgeWrapping,
+	MirroredRepeatWrapping,
+} from 'three/webgpu';
+
+import {
 	bool,
 	element,
 	float,
@@ -6,7 +12,12 @@ import {
 } from 'three/tsl';
 
 const BOOLEAN_OPERATOR_OPS = new Set( [ '&&', '||', '^^', '!', '==', '!=', '<', '>', '<=', '>=' ] );
-const TEXTURE_ADDRESS_MODES = new Set( [ 'constant', 'clamp', 'periodic', 'mirror' ] );
+const TEXTURE_ADDRESS_MODE_WRAPPING = {
+	constant: ClampToEdgeWrapping,
+	clamp: ClampToEdgeWrapping,
+	periodic: RepeatWrapping,
+	mirror: MirroredRepeatWrapping,
+};
 
 function normalizeSpaceName( value, fallback = 'world' ) {
 
@@ -56,7 +67,7 @@ function resolveTextureAddressMode( value ) {
 	if ( value === null || value === undefined || value === '' ) return 'periodic';
 
 	const mode = value.trim().toLowerCase();
-	return TEXTURE_ADDRESS_MODES.has( mode ) ? mode : null;
+	return mode in TEXTURE_ADDRESS_MODE_WRAPPING ? mode : null;
 
 }
 
@@ -65,6 +76,7 @@ export {
 	isBooleanNode,
 	normalizeSpaceName,
 	resolveTextureAddressMode,
+	TEXTURE_ADDRESS_MODE_WRAPPING,
 	toBooleanNode,
 	toVec3Channels,
 };

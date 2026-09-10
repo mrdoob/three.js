@@ -1,8 +1,5 @@
 import {
 	Texture,
-	RepeatWrapping,
-	ClampToEdgeWrapping,
-	MirroredRepeatWrapping,
 	ImageLoader,
 	ImageBitmapLoader,
 	Matrix3,
@@ -34,7 +31,7 @@ import { parseMaterialXNodeTree, parseMaterialXText } from './parse/MaterialXPar
 import { getSurfaceMapper } from './MaterialXSurfaceMappings.js';
 import { MtlXLibrary } from './MaterialXNodeLibrary.js';
 import { mxHextileCoord, mxHextileComputeBlendWeights } from './MaterialXHextile.js';
-import { resolveTextureAddressMode, toBooleanNode } from './MaterialXUtils.js';
+import { resolveTextureAddressMode, TEXTURE_ADDRESS_MODE_WRAPPING, toBooleanNode } from './MaterialXUtils.js';
 
 const colorSpaceLib = {
 	mx_srgb_texture_to_lin_rec709,
@@ -45,12 +42,6 @@ const IDENTITY_MAT3_VALUES = [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ];
 const IDENTITY_MAT4_VALUES = [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ];
 const MATRIX_INVERSE_EPSILON = 1e-8;
 const COMPILE_REGISTRY = createMaterialXCompileRegistry();
-const TEXTURE_ADDRESS_MODE_WRAPPING = {
-	constant: ClampToEdgeWrapping,
-	clamp: ClampToEdgeWrapping,
-	periodic: RepeatWrapping,
-	mirror: MirroredRepeatWrapping,
-};
 const NODE_CLASS_BY_TYPE = {
 	integer: int,
 	float,
