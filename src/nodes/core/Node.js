@@ -836,6 +836,34 @@ class Node extends EventDispatcher {
 	}
 
 	/**
+	 * Builds the nodes added with {@link Node#before}. This method must be called by
+	 * `build()` implementations that do not call the build method of the base class.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {?(string|Node)} [output=null] - Can be used to define the output type.
+	 */
+	_buildBeforeNodes( builder, output = null ) {
+
+		if ( this._beforeNodes !== null ) {
+
+			const currentBeforeNodes = this._beforeNodes;
+
+			this._beforeNodes = null;
+
+			for ( const beforeNode of currentBeforeNodes ) {
+
+				beforeNode.build( builder, output );
+
+			}
+
+			this._beforeNodes = currentBeforeNodes;
+
+		}
+
+	}
+
+	/**
 	 * This method performs the build of a node. The behavior and return value depend on the current build stage:
 	 * - **setup**: Prepares the node and its children for the build process. This process can also create new nodes. Returns the node itself or a variant.
 	 * - **analyze**: Analyzes the node hierarchy for optimizations in the code generation stage. Returns `null`.
@@ -857,21 +885,7 @@ class Node extends EventDispatcher {
 
 		//
 
-		if ( this._beforeNodes !== null ) {
-
-			const currentBeforeNodes = this._beforeNodes;
-
-			this._beforeNodes = null;
-
-			for ( const beforeNode of currentBeforeNodes ) {
-
-				beforeNode.build( builder, output );
-
-			}
-
-			this._beforeNodes = currentBeforeNodes;
-
-		}
+		this._buildBeforeNodes( builder, output );
 
 		//
 

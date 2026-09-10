@@ -636,6 +636,8 @@ class ShaderCallNodeInternal extends Node {
 
 	build( builder, output = null ) {
 
+		this._buildBeforeNodes( builder, output );
+
 		let result = null;
 
 		const buildStage = builder.getBuildStage();
