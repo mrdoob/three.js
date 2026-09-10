@@ -30,6 +30,7 @@ import './addons/tsl/TSLRotate.tests.js';
 import './addons/tsl/TSLSinc.tests.js';
 import './addons/tsl/TSLBRDF.tests.js';
 import './addons/tsl/TSLDepthConversion.tests.js';
+import './addons/tsl/TSLCubeTexture.tests.js';
 import './addons/tsl/TSLColorSpaceConversion.tests.js';
 import './addons/tsl/TSLTypeConstructors.tests.js';
 import './addons/tsl/TSLBitOps.tests.js';
