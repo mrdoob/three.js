@@ -1695,7 +1695,6 @@ ${ flowData.code }
 	getDirectives( shaderStage ) {
 
 		const snippets = [];
-
 		const directives = this.directives[ shaderStage ];
 
 		if ( directives !== undefined ) {
