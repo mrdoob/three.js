@@ -1696,12 +1696,6 @@ ${ flowData.code }
 
 		const snippets = [];
 
-		if ( this.renderer.hasFeature( 'subgroups' ) && shaderStage !== 'vertex' ) {
-
-			this.enableDirective( 'subgroups', shaderStage );
-
-		}
-
 		const directives = this.directives[ shaderStage ];
 
 		if ( directives !== undefined ) {
@@ -1871,6 +1865,7 @@ ${ flowData.code }
 
 			if ( this.renderer.hasFeature( 'subgroups' ) ) {
 
+				this.enableDirective( 'subgroups', shaderStage );
 				this.getBuiltin( 'subgroup_size', 'subgroupSize', 'u32', 'attribute' );
 
 			}
