@@ -1716,6 +1716,12 @@ ${ flowData.code }
 	 */
 	enableSubGroups() {
 
+		if ( ! this.renderer.hasFeature( 'subgroups' ) ) {
+
+			error( 'WGSLNodeBuilder: "The \'subgroups\' feature is not supported by the current device.' );
+
+		}
+
 		this.enableDirective( 'subgroups' );
 
 	}
