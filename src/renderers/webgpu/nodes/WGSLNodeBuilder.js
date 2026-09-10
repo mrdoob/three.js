@@ -1839,9 +1839,13 @@ ${ flowData.code }
 
 		const snippets = [];
 
-		for ( const { name, scope, type, count } of this.scopedVariables.values() ) {
+		for ( const { name, scope, type, count, isAtomic } of this.scopedVariables.values() ) {
 
-			snippets.push( `${ this.getVar( type, name, count, `<${ scope }>` ) };` );
+			let resolvedType = this.getType( type );
+
+			if ( isAtomic === true ) resolvedType = `atomic<${type}>`;
+
+			snippets.push( `${ this.getVar( resolvedType, name, count, `<${ scope }>` ) };` );
 
 		}
 

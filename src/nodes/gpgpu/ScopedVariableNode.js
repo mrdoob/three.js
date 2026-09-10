@@ -1,4 +1,4 @@
-import { error, warn } from '../../utils.js';
+import { error } from '../../utils.js';
 import Node from '../core/Node.js';
 
 /**
@@ -48,6 +48,14 @@ class ScopedVariableNode extends Node {
 		 */
 		this.isScopedVariableNode = true;
 
+		/**
+		 * Whether the node is atomic or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.isAtomic = false;
+
 	}
 
 	/**
@@ -65,16 +73,27 @@ class ScopedVariableNode extends Node {
 	}
 
 	/**
-	 * Sets the scope of this node.
+	 * Defines whether the node is atomic or not.
 	 *
-	 * @param {string} scope - The scope to set.
+	 * @param {boolean} value - The atomic flag.
 	 * @return {ScopedVariableNode} A reference to this node.
 	 */
-	setScope( scope ) {
+	setAtomic( value ) {
 
-		this.scope = scope;
+		this.isAtomic = value;
 
 		return this;
+
+	}
+
+	/**
+	 * Convenience method for making this node atomic.
+	 *
+	 * @return {ScopedVariableNode} A reference to this node.
+	 */
+	toAtomic() {
+
+		return this.setAtomic( true );
 
 	}
 
@@ -97,7 +116,13 @@ class ScopedVariableNode extends Node {
 
 		}
 
-		return builder.getScopedVariable( this.getScopedName(), this.scope, this.getNodeType( builder ), this.getArrayCount( builder ) );
+		if ( this.scope === ScopedVariableNode.PRIVATE_SCOPE && this.isAtomic ) {
+
+			error( 'TSL: A private variable cannot hold an atomic type. ' );
+
+		}
+
+		return builder.getScopedVariable( this.getScopedName(), this.scope, this.getNodeType( builder ), this.getArrayCount( builder ), this.isAtomic );
 
 	}
 

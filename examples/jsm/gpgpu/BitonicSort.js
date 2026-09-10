@@ -124,7 +124,7 @@ export class BitonicSort {
 		/**
 		 * A node representing a workgroup scoped buffer that holds locally sorted elements.
 		 *
-		 * @type {WorkgroupInfoNode}
+		 * @type {ScopedArrayNode}
 		*/
 		this.localStorage = workgroupArray( dataBuffer.nodeType, this.workgroupSize * 2 );
 
