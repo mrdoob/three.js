@@ -1,5 +1,6 @@
 import LightingNode from './LightingNode.js';
 import { cubeMapNode } from '../utils/CubeMapNode.js';
+import { materialEnvRotation } from '../accessors/MaterialProperties.js';
 
 /**
  * Represents a basic model for Image-based lighting (IBL). The environment
@@ -38,9 +39,26 @@ class BasicEnvironmentNode extends LightingNode {
 
 	setup( builder ) {
 
+		const { getUV, forceUVContext } = builder.context;
+
 		// environment property is used in the finish() method of BasicLightingModel
 
-		builder.context.environment = cubeMapNode( this.envNode );
+		builder.context.environment = cubeMapNode( this.envNode ).context( {
+			getUV: ( node, builder ) => {
+
+				let uvNode = node.uvNode;
+
+				if ( ( uvNode === null || forceUVContext === true ) && getUV ) {
+
+					uvNode = getUV( node, builder );
+
+				}
+
+				return materialEnvRotation.mul( uvNode || node.getDefaultUV() );
+
+			},
+			forceUVContext: true
+		} );
 
 	}
 
