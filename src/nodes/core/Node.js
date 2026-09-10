@@ -1,5 +1,5 @@
 import { NodeUpdateType } from './constants.js';
-import { hash, hashArray, hashString } from './NodeUtils.js';
+import { hashArray, hashString } from './NodeUtils.js';
 
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { MathUtils } from '../../math/MathUtils.js';
@@ -13,6 +13,7 @@ const _parentBuildStage = {
 };
 
 let _nodeId = 0;
+const _scratchArray2 = new Array(2);
 
 /**
  * Base class for all nodes.
@@ -452,8 +453,9 @@ class Node extends EventDispatcher {
 			}
 
 			//
-
-			this._cacheKey = hash( hashArray( values ), this.customCacheKey() );
+			_scratchArray2[ 0 ] = hashArray( values );
+			_scratchArray2[ 1 ] = this.customCacheKey();
+			this._cacheKey = hashArray( _scratchArray2 );
 			this._cacheKeyVersion = this.version;
 
 		}
