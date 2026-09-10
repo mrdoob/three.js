@@ -946,7 +946,7 @@ function parseApiSignature( rawSigText ) {
 
 	const sigText = rawSigText.trim();
 
-	const funcsRegex = /^(?<funcName>[\w_$]+)\((?<argsText>.*?)\)(?<funcChain>(?:\.[\w_$]+\(.*?\))+)?/;
+	const funcsRegex = /^(?<funcName>[\w_$.]+)\((?<argsText>.*?)\)(?<funcChain>(?:\.[\w_$]+\(.*?\))+)?/;
 	const chainedFuncRegex = /\.(?<funcName>[\w_$]+)\((?<argsText>.*?)\)/g;
 
 	const funcsMatch = sigText.match( funcsRegex );
