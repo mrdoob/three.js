@@ -291,7 +291,13 @@ class TextureNode extends UniformNode {
 	 */
 	getTransformedUV( uvNode ) {
 
-		if ( this._matrixUniform === null ) this._matrixUniform = uniform( this.value.matrix );
+		// the uniform is shared with the base node so nodes derived via sample() and co. don't each declare their own
+
+		const baseNode = this.getBase();
+
+		if ( baseNode._matrixUniform === null ) baseNode._matrixUniform = uniform( baseNode.value.matrix );
+
+		this._matrixUniform = baseNode._matrixUniform;
 
 		return this._matrixUniform.mul( vec3( uvNode, 1 ) ).xy;
 
