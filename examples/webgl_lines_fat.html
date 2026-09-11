@@ -211,7 +211,6 @@
 
 				const param = {
 					'camera type': 'perspective',
-					'camera distance': camera.position.distanceTo( controls.target ),
 					'line type': 0,
 					'world units': false,
 					'width': 10,
@@ -252,19 +251,6 @@
 					controls.object = camera;
 					controls.update();
 					onWindowResize();
-
-				} );
-
-				gui.add( param, 'camera distance', 10, 500 ).onChange( function ( val ) {
-
-					camera.position.sub( controls.target ).setLength( val ).add( controls.target );
-					controls.update();
-
-				} ).listen();
-
-				controls.addEventListener( 'change', function () {
-
-					param[ 'camera distance' ] = camera.position.distanceTo( controls.target );
 
 				} );
 
