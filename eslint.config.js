@@ -149,7 +149,7 @@ export default [
 			'no-restricted-imports': [ 'error', {
 				patterns: [ {
 					group: [ '**/build/*' ],
-					message: 'Tests must import from /src, not /build.'
+					message: 'Tests must import from /src, not /build as build is not guarrented to be fresh.'
 				} ]
 			} ]
 		}
