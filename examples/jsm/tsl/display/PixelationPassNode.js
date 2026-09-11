@@ -46,7 +46,7 @@ class PixelationPassNode extends PassNode {
 		 * @type {Node<float> | number}
 		 * @default 0.3
 		 */
-		this.normalEdgeStrength = normalEdgeStrength;
+		this.normalEdgeStrength = nodeObject( normalEdgeStrength );
 
 		/**
 		 * The depth edge strength.
@@ -54,7 +54,7 @@ class PixelationPassNode extends PassNode {
 		 * @type {Node<float> | number}
 		 * @default 0.4
 		 */
-		this.depthEdgeStrength = depthEdgeStrength;
+		this.depthEdgeStrength = nodeObject( depthEdgeStrength );
 
 		/**
 		 * This flag can be used for type testing.
@@ -103,9 +103,6 @@ class PixelationPassNode extends PassNode {
 		const textureNode = this.getTextureNode( 'output' );
 		const depthNode = this.getTextureNode( 'depth' );
 		const normalNode = this.getTextureNode( 'normal' );
-
-		const normalEdgeStrength = nodeObject( this.normalEdgeStrength );
-		const depthEdgeStrength = nodeObject( this.depthEdgeStrength );
 
 		const uvNodeTexture = textureNode.uvNode || uv();
 		const uvNodeDepth = depthNode.uvNode || uv();
@@ -168,7 +165,7 @@ class PixelationPassNode extends PassNode {
 			const depth = property( 'float', 'depth' );
 			const normal = property( 'vec3', 'normal' );
 
-			If( depthEdgeStrength.greaterThan( 0.0 ).or( normalEdgeStrength.greaterThan( 0.0 ) ), () => {
+			If( this.depthEdgeStrength.greaterThan( 0.0 ).or( this.normalEdgeStrength.greaterThan( 0.0 ) ), () => {
 
 				depth.assign( sampleDepth( 0, 0 ) );
 				normal.assign( sampleNormal( 0, 0 ) );
@@ -177,7 +174,7 @@ class PixelationPassNode extends PassNode {
 
 			const dei = property( 'float', 'dei' );
 
-			If( depthEdgeStrength.greaterThan( 0.0 ), () => {
+			If( this.depthEdgeStrength.greaterThan( 0.0 ), () => {
 
 				dei.assign( depthEdgeIndicator( depth ) );
 
@@ -185,13 +182,13 @@ class PixelationPassNode extends PassNode {
 
 			const nei = property( 'float', 'nei' );
 
-			If( normalEdgeStrength.greaterThan( 0.0 ).and( normal.length().greaterThan( 0 ) ), () => {
+			If( this.normalEdgeStrength.greaterThan( 0.0 ).and( normal.length().greaterThan( 0 ) ), () => {
 
 				nei.assign( normalEdgeIndicator( depth, normal ) );
 
 			} );
 
-			const strength = dei.greaterThan( 0 ).select( float( 1.0 ).sub( dei.mul( depthEdgeStrength ) ), nei.mul( normalEdgeStrength ).add( 1 ) );
+			const strength = dei.greaterThan( 0 ).select( float( 1.0 ).sub( dei.mul( this.depthEdgeStrength ) ), nei.mul( this.normalEdgeStrength ).add( 1 ) );
 
 			return vec4( texel.mul( strength ).rgb, texel.a );
 
