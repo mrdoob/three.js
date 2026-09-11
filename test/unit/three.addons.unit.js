@@ -1,6 +1,5 @@
 
 //addons/utils
-import './addons/lines/LineMaterial.tests.js';
 import './addons/utils/BufferGeometryUtils.tests.js';
 import './addons/utils/ColorUtils.tests.js';
 import './addons/utils/GaussianSplatUtils.tests.js';
