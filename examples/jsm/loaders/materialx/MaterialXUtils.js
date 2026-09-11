@@ -1,4 +1,10 @@
 import {
+	RepeatWrapping,
+	ClampToEdgeWrapping,
+	MirroredRepeatWrapping,
+} from 'three/webgpu';
+
+import {
 	bool,
 	element,
 	float,
@@ -6,6 +12,12 @@ import {
 } from 'three/tsl';
 
 const BOOLEAN_OPERATOR_OPS = new Set( [ '&&', '||', '^^', '!', '==', '!=', '<', '>', '<=', '>=' ] );
+const TEXTURE_ADDRESS_MODE_WRAPPING = {
+	constant: ClampToEdgeWrapping,
+	clamp: ClampToEdgeWrapping,
+	periodic: RepeatWrapping,
+	mirror: MirroredRepeatWrapping,
+};
 
 function normalizeSpaceName( value, fallback = 'world' ) {
 
@@ -48,10 +60,23 @@ function toVec3Channels( input ) {
 
 }
 
+// Normalizes a raw `*addressmode` attribute value, defaulting to `'periodic'`
+// when unset and returning `null` when the value isn't a recognized mode.
+function resolveTextureAddressMode( value ) {
+
+	if ( value === null || value === undefined || value === '' ) return 'periodic';
+
+	const mode = value.trim().toLowerCase();
+	return mode in TEXTURE_ADDRESS_MODE_WRAPPING ? mode : null;
+
+}
+
 export {
 	getComponentCountForType,
 	isBooleanNode,
 	normalizeSpaceName,
+	resolveTextureAddressMode,
+	TEXTURE_ADDRESS_MODE_WRAPPING,
 	toBooleanNode,
 	toVec3Channels,
 };
