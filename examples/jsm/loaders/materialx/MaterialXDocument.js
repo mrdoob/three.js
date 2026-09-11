@@ -336,16 +336,29 @@ class MaterialXNode {
 		textureNode.flipY = false;
 		this.materialX.textureCache.set( textureCacheKey, textureNode );
 
-		loader.load( resolvedURI, ( imageData ) => {
+		const nodeName = this.name;
+		const materialX = this.materialX;
 
-			textureNode.image = imageData;
-			textureNode.needsUpdate = true;
+		materialX.pendingResources.push( new Promise( ( resolveLoad ) => {
 
-		}, undefined, () => {
+			loader.load( resolvedURI, ( imageData ) => {
 
-			throw new Error( `Failed to load texture "${resolvedURI}".` );
+				textureNode.image = imageData;
+				textureNode.needsUpdate = true;
+				resolveLoad();
 
-		} );
+			}, undefined, () => {
+
+				materialX.log.add(
+					MaterialXLogCodes.TEXTURE_LOAD_FAILED,
+					`Failed to load texture "${resolvedURI}".`,
+					nodeName,
+				);
+				resolveLoad();
+
+			} );
+
+		} ) );
 
 		return textureNode;
 
@@ -781,6 +794,7 @@ class MaterialXDocument {
 		this.textureLoader.setOptions( { imageOrientation: 'none' } );
 		this.textureLoader.setPath( path );
 		this.textureCache = new Map();
+		this.pendingResources = [];
 		const bottomLeftUvSpaceHelpers = getBottomLeftUvSpaceHelpers( this.uvSpace );
 
 		this.compileContext = {
@@ -808,6 +822,12 @@ class MaterialXDocument {
 		}
 
 		return uri;
+
+	}
+
+	waitForResources() {
+
+		return Promise.all( this.pendingResources ).then( () => undefined );
 
 	}
 
