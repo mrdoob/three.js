@@ -121,7 +121,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'applies throwOnErrors after dependent textures settle', async ( assert ) => {
+			QUnit.test( 'reports failed dependent textures as warnings, matching GLTFLoader', async ( assert ) => {
 
 				const manager = new LoadingManager();
 				const textureLoader = new ControlledTextureLoader( manager );
@@ -132,27 +132,12 @@ export default QUnit.module( 'Addons', () => {
 				await textureLoader.started;
 				textureLoader.fail( new Error( 'Texture unavailable.' ) );
 
-				await assert.rejects(
-					loadPromise,
-					/Failed to load texture "texture\.test"/,
-					'Texture errors reject the load by default.'
-				);
+				const result = await loadPromise;
 				URL.revokeObjectURL( documentURL );
 
-				const tolerantManager = new LoadingManager();
-				const tolerantTextureLoader = new ControlledTextureLoader( tolerantManager );
-				tolerantManager.addHandler( /\.test$/i, tolerantTextureLoader );
-
-				const tolerantDocumentURL = createDocumentURL();
-				const tolerantLoadPromise = new MaterialXLoader( tolerantManager ).loadAsync( tolerantDocumentURL, { throwOnErrors: false } );
-				await tolerantTextureLoader.started;
-				tolerantTextureLoader.fail( new Error( 'Texture unavailable.' ) );
-
-				const result = await tolerantLoadPromise;
-				URL.revokeObjectURL( tolerantDocumentURL );
-
-				assert.strictEqual( result.errors.length, 1, 'The texture error remains available to the caller.' );
-				assert.strictEqual( result.errors[ 0 ].code, 'texture-load-failed', 'The error uses the structured MaterialX log code.' );
+				assert.strictEqual( result.errors.length, 0, 'A failed texture does not fail the load by default.' );
+				assert.strictEqual( result.warnings.length, 1, 'The texture failure is reported as a warning.' );
+				assert.strictEqual( result.warnings[ 0 ].code, 'texture-load-failed', 'The warning uses the structured MaterialX log code.' );
 
 			} );
 
