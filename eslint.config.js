@@ -143,7 +143,7 @@ export default [
 
 	// tests must import from src, not build
 	{
-		name: 'test rules',
+		name: 'unit test rules',
 		files: [ 'test/unit/**/*.js' ],
 		rules: {
 			'no-restricted-imports': [ 'error', {
