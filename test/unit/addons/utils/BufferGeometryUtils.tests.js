@@ -1,5 +1,6 @@
 import { BufferAttribute, BufferGeometry } from 'three';
 import * as BufferGeometryUtils from '../../../../examples/jsm/utils/BufferGeometryUtils.js';
+import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
 const getGeometry = () => {
 
@@ -44,8 +45,10 @@ export default QUnit.module( 'Addons', () => {
 					const geometry2 = getGeometry();
 					delete geometry2.morphAttributes.position;
 
+					console.level = CONSOLE_LEVEL.OFF;
 					assert.strictEqual( BufferGeometryUtils.mergeGeometries( [ geometry1, geometry2 ] ), null, 'rejects a missing morph attribute' );
 					assert.strictEqual( BufferGeometryUtils.mergeGeometries( [ geometry2, geometry1 ] ), null, 'rejects an unexpected morph attribute' );
+					console.level = CONSOLE_LEVEL.DEFAULT;
 
 				} );
 
@@ -59,7 +62,9 @@ export default QUnit.module( 'Addons', () => {
 						geometry1.morphAttributes.position = Array.from( { length: count1 }, () => geometry1.attributes.position.clone() );
 						geometry2.morphAttributes.position = Array.from( { length: count2 }, () => geometry2.attributes.position.clone() );
 
+						console.level = CONSOLE_LEVEL.OFF;
 						assert.strictEqual( BufferGeometryUtils.mergeGeometries( [ geometry1, geometry2 ] ), null, 'rejects mismatched target counts' );
+						console.level = CONSOLE_LEVEL.DEFAULT;
 
 					} );
 
