@@ -179,7 +179,8 @@ ShaderLib[ 'line' ] = {
 			#ifdef WORLD_UNITS
 
 				vec3 worldDir = normalize( end.xyz - start.xyz );
-				vec3 tmpFwd = normalize( mix( start.xyz, end.xyz, 0.5 ) );
+				// Orthographic camera rays are parallel to the camera-space z axis.
+				vec3 tmpFwd = perspective ? normalize( mix( start.xyz, end.xyz, 0.5 ) ) : vec3( 0.0, 0.0, - 1.0 );
 				vec3 worldUp = normalize( cross( worldDir, tmpFwd ) );
 				vec3 worldFwd = cross( worldDir, worldUp );
 				worldPos = position.y < 0.5 ? start: end;
