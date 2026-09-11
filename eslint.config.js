@@ -144,12 +144,12 @@ export default [
 	// tests must import from src, not build
 	{
 		name: 'test rules',
-		files: [ 'test/**/*.js' ],
+		files: [ 'test/unit/**/*.js' ],
 		rules: {
 			'no-restricted-imports': [ 'error', {
 				patterns: [ {
 					group: [ '**/build/*' ],
-					message: 'Tests must import from /src, not /build as build is not guarrented to be fresh.'
+					message: 'Tests must import from /src, not /build as build is not guaranteed to be fresh.'
 				} ]
 			} ]
 		}
