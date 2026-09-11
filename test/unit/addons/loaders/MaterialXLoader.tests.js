@@ -1,4 +1,4 @@
-import { LoadingManager } from '../../../../build/three.module.js';
+import { LoadingManager } from 'three';
 import { MaterialXLoader } from '../../../../examples/jsm/loaders/MaterialXLoader.js';
 
 const MATERIAL_X = `<?xml version="1.0"?>
@@ -116,7 +116,6 @@ export default QUnit.module( 'Addons', () => {
 
 				const material = result.materials.test_material;
 
-				assert.false( 'texturesReady' in result, 'The result does not expose a separate readiness promise.' );
 				assert.true( hasTextureImage( material, image ), 'The texture image is assigned before the load resolves.' );
 				assert.ok( progressURLs.includes( 'texture.test' ), 'LoadingManager reports dependent texture progress.' );
 

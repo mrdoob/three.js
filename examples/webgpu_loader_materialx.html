@@ -130,7 +130,7 @@
 				renderer.toneMapping = THREE.LinearToneMapping;
 				renderer.toneMappingExposure = .5;
 				renderer.inspector = new Inspector();
-				if ( window.TESTING !== true ) renderer.setAnimationLoop( render );
+				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 200 );
@@ -214,7 +214,7 @@
 
 						}
 
-						if ( window.TESTING === true ) renderer.setAnimationLoop( render );
+						addGUI();
 
 					} );
 
@@ -329,6 +329,49 @@
 				model.visible = true;
 
 			}
+
+			function addGUI() {
+
+				const gui = renderer.inspector.createParameters( 'MaterialX Loader' );
+
+				const API = {
+					showCalibrationMesh: true,
+					showPreviewMesh: true
+				};
+
+				gui.add( API, 'showCalibrationMesh' )
+					.name( 'Calibration Mesh' )
+					.onChange( function ( value ) {
+
+						setVisibility( 'Calibration_Mesh', value );
+
+					} );
+
+				gui.add( API, 'showPreviewMesh' )
+					.name( 'Preview Mesh' )
+					.onChange( function ( value ) {
+
+						setVisibility( 'Preview_Mesh', value );
+
+					} );
+
+			}
+
+			function setVisibility( name, visible ) {
+
+				scene.traverse( function ( node ) {
+
+					if ( node.isMesh ) {
+
+						if ( node.name == name ) node.visible = visible;
+
+					}
+
+				} );
+
+			}
+
+			//
 
 			function onWindowResize() {
 

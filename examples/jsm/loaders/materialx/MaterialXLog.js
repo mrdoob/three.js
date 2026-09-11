@@ -21,7 +21,7 @@ const MaterialXLogCodes = {
 	},
 	TEXTURE_LOAD_FAILED: {
 		label: 'texture-load-failed',
-		severity: 'error',
+		severity: 'warning',
 	},
 	UNKNOWN_INPUT: {
 		label: 'unknown-input',
