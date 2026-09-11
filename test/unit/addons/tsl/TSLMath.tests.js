@@ -25,7 +25,7 @@ export default QUnit.module( 'TSL', () => {
 			assert.closeAbs( sin( float( Math.PI / 2 ) ), float( 1 ), 1e-6, 'sin(PI/2)' );
 			assert.closeAbs( sin( float( Math.PI ) ), float( 0 ), 1e-5, 'sin(PI)' );
 			assert.closeAbs( cos( float( 0 ) ), float( 1 ), 1e-6, 'cos(0)' );
-			assert.closeAbs( cos( float( Math.PI ) ), float( -1 ), 1e-6, 'cos(PI)' );
+			assert.closeAbs( cos( float( Math.PI ) ), float( - 1 ), 1e-6, 'cos(PI)' );
 			assert.closeAbs( cos( float( Math.PI / 3 ) ), float( 0.5 ), 1e-5, 'cos(PI/3)' );
 			assert.closeAbs( tan( float( Math.PI / 4 ) ), float( 1 ), 1e-5, 'tan(PI/4)' );
 			assert.closeAbs( tan( float( 0 ) ), float( 0 ), 1e-6, 'tan(0)' );
@@ -38,10 +38,10 @@ export default QUnit.module( 'TSL', () => {
 			// boundary (rather than beyond it) exercises the real domain edge
 			// without relying on implementation-defined out-of-domain behavior.
 			assert.closeAbs( asin( float( 1 ) ), float( Math.PI / 2 ), 1e-5, 'asin(1)' );
-			assert.closeAbs( asin( float( -1 ) ), float( -Math.PI / 2 ), 1e-5, 'asin(-1)' );
+			assert.closeAbs( asin( float( - 1 ) ), float( - Math.PI / 2 ), 1e-5, 'asin(-1)' );
 			assert.closeAbs( asin( float( 0 ) ), float( 0 ), 1e-6, 'asin(0)' );
 			assert.closeAbs( acos( float( 1 ) ), float( 0 ), 1e-6, 'acos(1)' );
-			assert.closeAbs( acos( float( -1 ) ), float( Math.PI ), 1e-5, 'acos(-1)' );
+			assert.closeAbs( acos( float( - 1 ) ), float( Math.PI ), 1e-5, 'acos(-1)' );
 			assert.closeAbs( acos( float( 0 ) ), float( Math.PI / 2 ), 1e-5, 'acos(0)' );
 
 		} );
@@ -54,8 +54,8 @@ export default QUnit.module( 'TSL', () => {
 			// (deliberately NOT testing atan(0, 0), which is undefined by the
 			// GLSL/WGSL spec and implementation-defined).
 			const cases = [
-				[ 1, 1 ], [ 1, -1 ], [ -1, -1 ], [ -1, 1 ],
-				[ 0, 1 ], [ 1, 0 ], [ 0, -1 ], [ -1, 0 ]
+				[ 1, 1 ], [ 1, - 1 ], [ - 1, - 1 ], [ - 1, 1 ],
+				[ 0, 1 ], [ 1, 0 ], [ 0, - 1 ], [ - 1, 0 ]
 			];
 
 			for ( const [ y, x ] of cases ) {
@@ -88,13 +88,13 @@ export default QUnit.module( 'TSL', () => {
 
 			// Negative-input rounding is where floor/ceil/trunc/fract most
 			// commonly get confused with each other -- exercised explicitly here.
-			assert.eq( floor( float( -1.5 ) ), float( -2 ), 'floor(-1.5)' );
+			assert.eq( floor( float( - 1.5 ) ), float( - 2 ), 'floor(-1.5)' );
 			assert.eq( floor( float( 1.5 ) ), float( 1 ), 'floor(1.5)' );
-			assert.eq( ceil( float( -1.5 ) ), float( -1 ), 'ceil(-1.5)' );
+			assert.eq( ceil( float( - 1.5 ) ), float( - 1 ), 'ceil(-1.5)' );
 			assert.eq( ceil( float( 1.5 ) ), float( 2 ), 'ceil(1.5)' );
-			assert.eq( trunc( float( -1.9 ) ), float( -1 ), 'trunc(-1.9)' );
+			assert.eq( trunc( float( - 1.9 ) ), float( - 1 ), 'trunc(-1.9)' );
 			assert.eq( trunc( float( 1.9 ) ), float( 1 ), 'trunc(1.9)' );
-			assert.closeAbs( fract( float( -1.5 ) ), float( 0.5 ), 1e-5, 'fract(-1.5) == -1.5 - floor(-1.5) == 0.5' );
+			assert.closeAbs( fract( float( - 1.5 ) ), float( 0.5 ), 1e-5, 'fract(-1.5) == -1.5 - floor(-1.5) == 0.5' );
 			assert.closeAbs( fract( float( 2.25 ) ), float( 0.25 ), 1e-5, 'fract(2.25)' );
 
 			// round()'s rounding direction at the exact x.5 midpoint is left
@@ -104,17 +104,17 @@ export default QUnit.module( 'TSL', () => {
 			// between backends/drivers.
 			assert.eq( round( float( 2.4 ) ), float( 2 ), 'round(2.4)' );
 			assert.eq( round( float( 2.6 ) ), float( 3 ), 'round(2.6)' );
-			assert.eq( round( float( -2.4 ) ), float( -2 ), 'round(-2.4)' );
-			assert.eq( round( float( -2.6 ) ), float( -3 ), 'round(-2.6)' );
+			assert.eq( round( float( - 2.4 ) ), float( - 2 ), 'round(-2.4)' );
+			assert.eq( round( float( - 2.6 ) ), float( - 3 ), 'round(-2.6)' );
 
 		} );
 
 		gpuTest( 'sign and abs at zero and negative values', ( { assert } ) => {
 
 			assert.eq( sign( float( 0 ) ), float( 0 ), 'sign(0)' );
-			assert.eq( sign( float( -5 ) ), float( -1 ), 'sign(-5)' );
+			assert.eq( sign( float( - 5 ) ), float( - 1 ), 'sign(-5)' );
 			assert.eq( sign( float( 5 ) ), float( 1 ), 'sign(5)' );
-			assert.eq( abs( float( -3.5 ) ), float( 3.5 ), 'abs(-3.5)' );
+			assert.eq( abs( float( - 3.5 ) ), float( 3.5 ), 'abs(-3.5)' );
 			assert.eq( abs( float( 0 ) ), float( 0 ), 'abs(0)' );
 
 		} );
@@ -124,9 +124,9 @@ export default QUnit.module( 'TSL', () => {
 			assert.eq( min( float( 3 ), float( 1 ) ), float( 1 ), 'min(3,1)' );
 			assert.eq( max( float( 3 ), float( 1 ) ), float( 3 ), 'max(3,1)' );
 			assert.eq( clamp( float( 5 ), float( 0 ), float( 1 ) ), float( 1 ), 'clamp(5,0,1)' );
-			assert.eq( clamp( float( -5 ), float( 0 ), float( 1 ) ), float( 0 ), 'clamp(-5,0,1)' );
+			assert.eq( clamp( float( - 5 ), float( 0 ), float( 1 ) ), float( 0 ), 'clamp(-5,0,1)' );
 			assert.eq( clamp( float( 0.5 ), float( 0 ), float( 1 ) ), float( 0.5 ), 'clamp(0.5,0,1) passes through' );
-			assert.eq( saturate( float( -5 ) ), float( 0 ), 'saturate(-5)' );
+			assert.eq( saturate( float( - 5 ) ), float( 0 ), 'saturate(-5)' );
 			assert.eq( saturate( float( 5 ) ), float( 1 ), 'saturate(5)' );
 
 		} );
@@ -138,14 +138,14 @@ export default QUnit.module( 'TSL', () => {
 			// legally extrapolates. Confirms that's really what happens rather
 			// than silently clamping.
 			assert.closeAbs( mix( float( 0 ), float( 10 ), float( 1.5 ) ), float( 15 ), 1e-4, 'mix(0,10,1.5) extrapolates past b' );
-			assert.closeAbs( mix( float( 0 ), float( 10 ), float( -0.5 ) ), float( -5 ), 1e-4, 'mix(0,10,-0.5) extrapolates before a' );
+			assert.closeAbs( mix( float( 0 ), float( 10 ), float( - 0.5 ) ), float( - 5 ), 1e-4, 'mix(0,10,-0.5) extrapolates before a' );
 
 			assert.eq( step( float( 0.5 ), float( 0.3 ) ), float( 0 ), 'step(edge=0.5, x=0.3) -- x < edge' );
 			assert.eq( step( float( 0.5 ), float( 0.7 ) ), float( 1 ), 'step(edge=0.5, x=0.7) -- x >= edge' );
 			assert.eq( step( float( 0.5 ), float( 0.5 ) ), float( 1 ), 'step(edge=0.5, x=0.5) -- x == edge counts as >= edge' );
 
 			assert.closeAbs( smoothstep( float( 0 ), float( 1 ), float( 0.5 ) ), float( 0.5 ), 1e-5, 'smoothstep midpoint is exactly 0.5' );
-			assert.eq( smoothstep( float( 0 ), float( 1 ), float( -1 ) ), float( 0 ), 'smoothstep clamps below edge0' );
+			assert.eq( smoothstep( float( 0 ), float( 1 ), float( - 1 ) ), float( 0 ), 'smoothstep clamps below edge0' );
 			assert.eq( smoothstep( float( 0 ), float( 1 ), float( 2 ) ), float( 1 ), 'smoothstep clamps above edge1' );
 
 		} );
@@ -189,12 +189,12 @@ export default QUnit.module( 'TSL', () => {
 			// not that unrelated constant-folding path.
 
 			// float path: floored mod, x - y*floor(x/y) -- sign follows the divisor.
-			assert.closeAbs( mod( float( -5 ).toVar(), float( 3 ).toVar() ), float( 1 ), 1e-5, 'mod(-5.0, 3.0) floored == 1' );
-			assert.closeAbs( mod( float( 5 ).toVar(), float( -3 ).toVar() ), float( -1 ), 1e-5, 'mod(5.0, -3.0) floored == -1' );
+			assert.closeAbs( mod( float( - 5 ).toVar(), float( 3 ).toVar() ), float( 1 ), 1e-5, 'mod(-5.0, 3.0) floored == 1' );
+			assert.closeAbs( mod( float( 5 ).toVar(), float( - 3 ).toVar() ), float( - 1 ), 1e-5, 'mod(5.0, -3.0) floored == -1' );
 
 			// integer path: truncated mod (C-style '%') -- sign follows the dividend.
-			assert.eq( mod( int( -5 ).toVar(), int( 3 ).toVar() ), int( -2 ), 'mod(-5, 3) truncated == -2 (differs from the float case above!)' );
-			assert.eq( mod( int( 5 ).toVar(), int( -3 ).toVar() ), int( 2 ), 'mod(5, -3) truncated == 2 (differs from the float case above!)' );
+			assert.eq( mod( int( - 5 ).toVar(), int( 3 ).toVar() ), int( - 2 ), 'mod(-5, 3) truncated == -2 (differs from the float case above!)' );
+			assert.eq( mod( int( 5 ).toVar(), int( - 3 ).toVar() ), int( 2 ), 'mod(5, -3) truncated == 2 (differs from the float case above!)' );
 
 			// Positive operands agree between both codegen paths, as expected.
 			assert.closeAbs( mod( float( 5 ).toVar(), float( 3 ).toVar() ), float( 2 ), 1e-5, 'mod(5.0, 3.0)' );
@@ -211,7 +211,7 @@ export default QUnit.module( 'TSL', () => {
 			// constant fold -- see the `mod()` test above for why that
 			// distinction matters here.
 			assert.eq( int( float( 7.9 ).toVar() ), int( 7 ), 'float -> int cast truncates toward zero' );
-			assert.eq( int( float( -7.9 ).toVar() ), int( -7 ), 'float -> int cast truncates toward zero (negative)' );
+			assert.eq( int( float( - 7.9 ).toVar() ), int( - 7 ), 'float -> int cast truncates toward zero (negative)' );
 
 		} );
 

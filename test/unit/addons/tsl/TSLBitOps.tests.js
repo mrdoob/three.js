@@ -68,7 +68,12 @@ export default QUnit.module( 'TSL', () => {
 			const popcount = ( x ) => {
 
 				let n = 0;
-				while ( x !== 0 ) { n += x & 1; x >>>= 1; }
+				while ( x !== 0 ) {
+
+					n += x & 1; x >>>= 1;
+
+				}
+
 				return n;
 
 			};
@@ -105,7 +110,12 @@ export default QUnit.module( 'TSL', () => {
 
 				if ( x === 0 ) return 32;
 				let n = 0;
-				while ( ( x & 1 ) === 0 ) { n ++; x >>>= 1; }
+				while ( ( x & 1 ) === 0 ) {
+
+					n ++; x >>>= 1;
+
+				}
+
 				return n;
 
 			};
