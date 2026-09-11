@@ -253,10 +253,18 @@ class GaussianBlurNode extends TempNode {
 
 			const diffuseSum = vec4( sampleTexture( uvNode ).mul( gaussianCoefficients[ 0 ] ) ).toVar();
 
-			for ( let i = 1; i < kernelSize; i ++ ) {
+			// adjacent taps are merged into one bilinear fetch at their weighted offset.
+			// not possible with premultiplied alpha since the hardware lerp happens before the multiply.
 
-				const x = float( i );
-				const w = float( gaussianCoefficients[ i ] );
+			const step = this.premultipliedAlpha ? 1 : 2;
+
+			for ( let i = 1; i < kernelSize; i += step ) {
+
+				const wa = gaussianCoefficients[ i ];
+				const wb = ( step === 2 && i + 1 < kernelSize ) ? gaussianCoefficients[ i + 1 ] : 0;
+
+				const x = float( ( i * wa + ( i + 1 ) * wb ) / ( wa + wb ) );
+				const w = float( wa + wb );
 
 				const uvOffset = vec2( direction.mul( invSize.mul( x ) ) ).toVar();
 
