@@ -141,11 +141,9 @@ class ContextNode extends Node {
 
 		const previousContext = builder.addContext( this.value );
 
-		const node = this.node.build( builder );
+		this.node.build( builder );
 
 		builder.setContext( previousContext );
-
-		return node;
 
 	}
 
