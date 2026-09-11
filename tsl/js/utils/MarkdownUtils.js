@@ -1034,7 +1034,7 @@ function renderSingleApiCard( signature, body ) {
 			const { funcName, argsText } = parsedSig.funcs[ i ];
 
 			const argsHtml = formatSignatureArgs( argsText );
-			const funcNameHtml = formatApiFunctionName( funcName );
+			const funcNameHtml = formatApiFunctionName( funcName );debugger
 
 			const dotPrefix = i > 0 ? '.' : '';
 
@@ -1050,7 +1050,7 @@ function renderSingleApiCard( signature, body ) {
 
 			if ( ! body || ! body.trim() ) {
 
-				_paramsHtml.push( formatApiParameters( parsedSig.argsText ) );
+				_paramsHtml.push( formatApiParameters( argsText ) );
 
 			}
 
