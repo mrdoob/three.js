@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js - orthographic world-unit line comparison</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<style>
+			body { margin: 0; background: #151820; color: #eef0f5; font: 15px system-ui, sans-serif; }
+			main { max-width: 1400px; margin: auto; padding: 24px; }
+			h1 { font-size: 24px; margin: 0 0 12px; }
+			p { color: #bdc5d5; line-height: 1.5; }
+			.grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+			article { background: #202530; padding: 14px; border-radius: 8px; }
+			h3 { margin: 0 0 8px; font-size: 16px; }
+			.view { height: 180px; position: relative; }
+			canvas { width: 100%; height: 100%; display: block; }
+			.caption { min-height: 44px; margin-bottom: 0; font-size: 13px; }
+			label { display: inline-flex; gap: 12px; align-items: center; }
+			button { margin-left: 16px; padding: 6px 12px; cursor: pointer; }
+			@media (max-width: 700px) { main { padding: 12px; } .grid { gap: 5px; } article { padding: 8px; } h3 { font-size: 13px; } }
+		</style>
+	</head>
+	<body>
+		<main>
+			<h1>Orthographic world-unit lines: two separate errors</h1>
+			<p><label>Renderer <select id="renderer"><option value="glsl">GLSL / WebGL</option><option value="webgpu">TSL / WebGPU</option><option value="fallback">TSL / WebGL fallback</option></select></label> <span id="backend"></span></p>
+			<p>Each panel shows the same horizontal segment. Gold is rendered coverage; the white outline marks the expected width and endcaps. The camera looks along −Z. Moving the line sideways in camera space should not change its shape.</p>
+			<label>Off-axis position Y <input id="offset" type="range" min="0" max="12" step="0.1" value="8"><output id="value">8.0</output></label>
+			<button id="center">Center line</button><button id="reproduce">Show errors</button>
+			<p><label>World width <input id="width" type="number" min="0.001" max="1" step="0.01" value="0.4"></label> <button id="thin">About 1 CSS pixel</button></p>
+			<h2>1. Dashed material — isolates the original extrusion error</h2>
+			<p>One uninterrupted dash bypasses the solid-line distance test. The original shader makes the off-axis line too thin.</p>
+			<div class="grid" id="dashed"></div>
+			<h2>2. Solid material — exposes the vertex / fragment mismatch</h2>
+			<p>The vertex-only fix expands the geometry correctly, but the fragment shader still measures distance to a perspective ray. Compare the body and both endcaps with the reference.</p>
+			<div class="grid" id="solid"></div>
+
+			<p>Segment: X = −2…2, Z = −2; width is adjustable above. Near = 0.1, far = 100. Expanded geometry stays at least 1.5 units in front of the camera: these errors are not near-plane clipping. The frustum follows Y to keep the line visible, without moving or rotating the camera.</p>
+			<p>The reference uses ordinary filled rectangle / capsule geometry, independent of LineMaterial. Outlines are hidden below 3 CSS pixels so they do not obscure thin lines. MSAA and material alpha-to-coverage are disabled. The corrected column uses the library fragment shader. The original and initial PR columns disable its orthographic correction locally.</p>
+		</main>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../src/Three.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+		<script type="module">
+			import * as THREE from 'three';
+			import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+			import { LineSegments2 } from 'three/addons/lines/LineSegments2.js';
+			import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js';
+			import * as WEBGPU from '../src/Three.WebGPU.js';
+
+			const settings = new URLSearchParams( location.search );
+			const rendererMode = settings.get( 'renderer' ) || 'glsl';
+			const useTSL = rendererMode !== 'glsl';
+			const lineWidth = THREE.MathUtils.clamp( Number( settings.get( 'width' ) || 0.4 ), 0.001, 1 );
+			const radius = lineWidth / 2;
+			const panels = [];
+			const slider = document.querySelector( '#offset' );
+			const descriptions = {
+				original: [ 'Original shader', 'Perspective assumptions in both shader stages.' ],
+				vertex: [ 'Vertex-only fix (initial PR)', 'Parallel extrusion direction; perspective fragment calculation.' ],
+				corrected: [ 'Vertex + fragment fix', 'Parallel extrusion and orthographic fragment coverage.' ],
+				reference: [ 'Expected shape', 'Ordinary mesh geometry, with no line shader.' ]
+			};
+
+			const rows = [
+				{ id: 'dashed', dashed: true, variants: [ 'original', 'vertex', 'corrected', 'reference' ] },
+				{ id: 'solid', dashed: false, variants: [ 'original', 'vertex', 'corrected', 'reference' ] }
+			];
+
+			// Load historical TSL variants in isolated modules, without changing the library.
+			// Resolve their relative imports against the source file before importing the blob.
+			const nodeMaterials = { corrected: WEBGPU.Line2NodeMaterial };
+
+			if ( useTSL ) {
+
+				const sourceURL = new URL( '../src/materials/nodes/Line2NodeMaterial.js', location.href );
+				const response = await fetch( sourceURL );
+				if ( ! response.ok ) throw new Error( 'Unable to load Line2NodeMaterial comparison variants.' );
+				const source = await response.text();
+
+				for ( const variant of [ 'original', 'vertex' ] ) {
+
+					let historical = source.replace( /const orthographic = [^;]+;/, 'const orthographic = float( 0 ).equal( 1 );' );
+					if ( historical === source ) throw new Error( 'The TSL fragment comparison needs updating.' );
+
+					if ( variant === 'original' ) {
+
+						historical = historical.replace( /const tmpFwd = [^;]+;/, 'const tmpFwd = mix( start.xyz, end.xyz, 0.5 ).normalize();' );
+
+					}
+
+					historical = historical.replace( /from '([^']+)'/g, ( match, specifier ) => `from '${ new URL( specifier, sourceURL ).href }'` );
+					const moduleURL = URL.createObjectURL( new Blob( [ historical ], { type: 'application/javascript' } ) );
+
+					try {
+
+						nodeMaterials[ variant ] = ( await import( moduleURL ) ).default;
+
+					} finally {
+
+						URL.revokeObjectURL( moduleURL );
+
+					}
+
+				}
+
+			}
+
+			for ( const { id, dashed, variants } of rows ) {
+
+				for ( const variant of variants ) {
+
+					const article = document.createElement( 'article' );
+					article.innerHTML = `<h3>${ descriptions[ variant ][ 0 ] }</h3><div class="view"></div><p class="caption">${ descriptions[ variant ][ 1 ] }</p>`;
+					document.querySelector( `#${ id }` ).appendChild( article );
+					const view = article.querySelector( '.view' );
+					const renderer = useTSL
+						? new WEBGPU.WebGPURenderer( { antialias: false, forceWebGL: rendererMode === 'fallback' } )
+						: new THREE.WebGLRenderer( { antialias: false } );
+					if ( useTSL ) await renderer.init();
+					document.querySelector( '#backend' ).textContent = useTSL ? `Active backend: ${ renderer.backend.isWebGPUBackend ? 'WebGPU' : 'WebGL fallback' }` : 'Active backend: WebGL';
+					renderer.setPixelRatio( window.devicePixelRatio );
+					renderer.setClearColor( 0x10131a );
+					view.appendChild( renderer.domElement );
+					const scene = new THREE.Scene();
+					const group = new THREE.Group();
+					scene.add( group );
+					const camera = new THREE.OrthographicCamera( - 2.7, 2.7, 1, - 1, 0.1, 100 );
+					const shape = new THREE.Shape();
+
+					if ( dashed ) {
+
+						shape.moveTo( - 2, - radius );
+						shape.lineTo( 2, - radius );
+						shape.lineTo( 2, radius );
+						shape.lineTo( - 2, radius );
+						shape.closePath();
+
+					} else {
+
+						shape.absarc( 2, 0, radius, - Math.PI / 2, Math.PI / 2, false );
+						shape.absarc( - 2, 0, radius, Math.PI / 2, 3 * Math.PI / 2, false );
+						shape.closePath();
+
+					}
+
+					if ( variant === 'reference' ) {
+
+						const mesh = new THREE.Mesh( new THREE.ShapeGeometry( shape, 64 ), new THREE.MeshBasicMaterial( { color: 0xffc857 } ) );
+						mesh.position.z = - 2;
+						group.add( mesh );
+
+					} else {
+
+						const geometry = new LineSegmentsGeometry();
+						geometry.setPositions( [ - 2, 0, - 2, 2, 0, - 2 ] );
+						const Material = useTSL ? nodeMaterials[ variant ] : LineMaterial;
+						const material = new Material( { color: 0xffc857, linewidth: lineWidth, worldUnits: true, dashed, dashSize: 100, gapSize: 0, alphaToCoverage: false } );
+
+						if ( ! useTSL ) {
+
+							const forward = variant === 'original' ? 'normalize( mix( start.xyz, end.xyz, 0.5 ) )' : 'perspective ? normalize( mix( start.xyz, end.xyz, 0.5 ) ) : vec3( 0.0, 0.0, - 1.0 )';
+							material.vertexShader = material.vertexShader.replace( /vec3 tmpFwd = [^;]+;/, `vec3 tmpFwd = ${ forward };` );
+
+							if ( variant !== 'corrected' ) {
+
+								// Preserve the original fragment calculation in the historical views.
+								material.fragmentShader = material.fragmentShader.replace( 'if ( isOrthographic ) {', 'if ( false ) {' );
+
+							}
+
+						}
+
+						const line = new LineSegments2( geometry, material );
+						line.computeLineDistances();
+						// World-unit TSL lines use the renderer viewport directly.
+						if ( useTSL ) line.onBeforeRender = () => {};
+
+						group.add( line );
+
+					}
+
+					const outline = new THREE.Line( new THREE.BufferGeometry().setFromPoints( shape.getPoints( 64 ) ), new THREE.LineBasicMaterial( { color: 0xffffff, transparent: true, opacity: 0.55, depthTest: false } ) );
+					outline.position.z = - 2;
+					outline.renderOrder = 1;
+					group.add( outline );
+					panels.push( { renderer, scene, camera, group, view, outline } );
+
+				}
+
+			}
+
+			function render() {
+
+				const offset = Number( slider.value );
+				document.querySelector( '#value' ).value = offset.toFixed( 1 );
+
+				for ( const { renderer, scene, camera, group, view, outline } of panels ) {
+
+					const width = view.clientWidth;
+					const height = view.clientHeight;
+					outline.visible = lineWidth * width / 5.4 >= 3;
+					renderer.setSize( width, height, false );
+					const halfHeight = 2.7 * height / width;
+					camera.top = offset + halfHeight;
+					camera.bottom = offset - halfHeight;
+					camera.updateProjectionMatrix();
+					group.position.y = offset;
+					renderer.render( scene, camera );
+
+				}
+
+			}
+
+			const widthInput = document.querySelector( '#width' );
+			const rendererInput = document.querySelector( '#renderer' );
+			rendererInput.value = rendererMode;
+			widthInput.value = lineWidth;
+			slider.value = settings.get( 'offset' ) || 8;
+
+			function reload() {
+
+				settings.set( 'width', widthInput.value );
+				settings.set( 'renderer', rendererInput.value );
+				settings.set( 'offset', slider.value );
+				location.search = settings.toString();
+
+			}
+
+			widthInput.addEventListener( 'change', reload );
+			rendererInput.addEventListener( 'change', reload );
+			document.querySelector( '#thin' ).addEventListener( 'click', () => {
+
+				widthInput.value = 5.4 / panels[ 0 ].view.clientWidth;
+				reload();
+
+			} );
+			slider.addEventListener( 'input', render );
+			document.querySelector( '#center' ).addEventListener( 'click', () => {
+
+				slider.value = 0;
+				render();
+
+			} );
+			document.querySelector( '#reproduce' ).addEventListener( 'click', () => {
+
+				slider.value = 8;
+				render();
+
+			} );
+			window.addEventListener( 'resize', render );
+			render();
+		</script>
+	</body>
+</html>

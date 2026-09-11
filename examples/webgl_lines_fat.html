@@ -145,7 +145,19 @@
 
 			function onWindowResize() {
 
-				camera.aspect = window.innerWidth / window.innerHeight;
+				const aspect = window.innerWidth / window.innerHeight;
+
+				if ( camera.isPerspectiveCamera ) {
+
+					camera.aspect = aspect;
+
+				} else {
+
+					camera.left = - camera.top * aspect;
+					camera.right = camera.top * aspect;
+
+				}
+
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -198,6 +210,8 @@
 				gui = new GUI();
 
 				const param = {
+					'camera type': 'perspective',
+					'camera distance': camera.position.distanceTo( controls.target ),
 					'line type': 0,
 					'world units': false,
 					'width': 10,
@@ -206,6 +220,53 @@
 					'dash scale': 1,
 					'dash / gap': 1
 				};
+
+				gui.add( param, 'camera type', [ 'perspective', 'orthographic' ] ).onChange( function ( val ) {
+
+					const previousCamera = camera;
+					const halfFov = THREE.MathUtils.degToRad( 20 );
+
+					if ( val === 'orthographic' ) {
+
+						const halfHeight = camera.position.distanceTo( controls.target ) * Math.tan( halfFov ) / camera.zoom;
+						camera = new THREE.OrthographicCamera( - halfHeight, halfHeight, halfHeight, - halfHeight, 1, 1000 );
+						camera2 = new THREE.OrthographicCamera( - halfHeight, halfHeight, halfHeight, - halfHeight, 1, 1000 );
+
+					} else {
+
+						camera = new THREE.PerspectiveCamera( 40, 1, 1, 1000 );
+						camera2 = new THREE.PerspectiveCamera( 40, 1, 1, 1000 );
+
+					}
+
+					camera.position.copy( previousCamera.position );
+					camera.quaternion.copy( previousCamera.quaternion );
+
+					if ( camera.isPerspectiveCamera ) {
+
+						const distance = previousCamera.top / previousCamera.zoom / Math.tan( halfFov );
+						camera.position.sub( controls.target ).setLength( distance ).add( controls.target );
+
+					}
+
+					controls.object = camera;
+					controls.update();
+					onWindowResize();
+
+				} );
+
+				gui.add( param, 'camera distance', 10, 500 ).onChange( function ( val ) {
+
+					camera.position.sub( controls.target ).setLength( val ).add( controls.target );
+					controls.update();
+
+				} ).listen();
+
+				controls.addEventListener( 'change', function () {
+
+					param[ 'camera distance' ] = camera.position.distanceTo( controls.target );
+
+				} );
 
 				gui.add( param, 'line type', { 'LineGeometry': 0, 'gl.LINE': 1 } ).onChange( function ( val ) {
 
@@ -241,6 +302,7 @@
 					} else {
 
 						widthController.name( 'width (pixels)' ).min( 1 ).max( 10 ).setValue( 10 );
+
 					}
 
 				} );
