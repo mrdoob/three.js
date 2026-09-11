@@ -21,16 +21,16 @@ export default QUnit.module( 'TSL', () => {
 
 		gpuTest( 'packSnorm2x16 <-> unpackSnorm2x16 round trip', ( { assert } ) => {
 
-			const v = vec2( 0.5, - 0.25 );
+			const v = vec2( 0.5, -0.25 );
 			// 16-bit quantization step is 1/32767 -- allow a couple of ULPs.
 			assert.closeAbs( unpackSnorm2x16( packSnorm2x16( v ) ), v, 2e-4, 'mid-range value' );
 
-			const edge = vec2( 1.0, - 1.0 );
+			const edge = vec2( 1.0, -1.0 );
 			assert.closeAbs( unpackSnorm2x16( packSnorm2x16( edge ) ), edge, 2e-4, 'exact +-1 boundary' );
 
 			// Out-of-range input must clamp to the representable range, not wrap.
-			const outOfRange = vec2( 2.0, - 3.0 );
-			assert.closeAbs( unpackSnorm2x16( packSnorm2x16( outOfRange ) ), vec2( 1.0, - 1.0 ), 2e-4, 'out-of-range input clamps to [-1, 1] rather than wrapping' );
+			const outOfRange = vec2( 2.0, -3.0 );
+			assert.closeAbs( unpackSnorm2x16( packSnorm2x16( outOfRange ) ), vec2( 1.0, -1.0 ), 2e-4, 'out-of-range input clamps to [-1, 1] rather than wrapping' );
 
 		} );
 
@@ -42,14 +42,14 @@ export default QUnit.module( 'TSL', () => {
 			assert.closeAbs( unpackUnorm2x16( packUnorm2x16( vec2( 0.0, 1.0 ) ) ), vec2( 0.0, 1.0 ), 2e-4, '0/1 boundaries' );
 
 			// Out-of-range (including negative) input clamps into [0, 1].
-			const outOfRange = vec2( - 1.0, 2.0 );
+			const outOfRange = vec2( -1.0, 2.0 );
 			assert.closeAbs( unpackUnorm2x16( packUnorm2x16( outOfRange ) ), vec2( 0.0, 1.0 ), 2e-4, 'out-of-range input clamps to [0, 1]' );
 
 		} );
 
 		gpuTest( 'packHalf2x16 <-> unpackHalf2x16 round trip', ( { assert } ) => {
 
-			const v = vec2( 123.5, - 0.0009765625 ); // second value is an exact float16 value (2^-10)
+			const v = vec2( 123.5, -0.0009765625 ); // second value is an exact float16 value (2^-10)
 			assert.closeAbs( unpackHalf2x16( packHalf2x16( v ) ), v, 1e-3, 'exact float16-representable values round-trip exactly (within tolerance)' );
 
 			// packHalf2x16's bits themselves, checked against an independent
@@ -60,7 +60,7 @@ export default QUnit.module( 'TSL', () => {
 			// least-significant bits and the second into the 16 most-significant
 			// bits (packHalf2x16 / pack2x16float).
 			const lo = toHalfFloat( 123.5 ) & 0xffff;
-			const hi = toHalfFloat( - 0.0009765625 ) & 0xffff;
+			const hi = toHalfFloat( -0.0009765625 ) & 0xffff;
 			const expectedBits = ( lo | ( hi << 16 ) ) >>> 0;
 
 			assert.eq( packHalf2x16( v ), uint( expectedBits ), 'packHalf2x16(v) matches the bit pattern from DataUtils.toHalfFloat()' );
@@ -69,7 +69,7 @@ export default QUnit.module( 'TSL', () => {
 
 		gpuTest( 'packSnorm4x8 <-> unpackSnorm4x8 round trip', ( { assert } ) => {
 
-			const v = vec4( 1.0, 0.5, - 0.5, - 1.0 );
+			const v = vec4( 1.0, 0.5, -0.5, -1.0 );
 			// 8-bit quantization step is 1/127 -- much coarser than the 16-bit variants.
 			assert.closeAbs( unpackSnorm4x8( packSnorm4x8( v ) ), v, 1e-2, 'full-range value' );
 
@@ -87,9 +87,9 @@ export default QUnit.module( 'TSL', () => {
 			// packNormalToRGB(n) == n * 0.5 + 0.5 -- verified against a
 			// hand-computed value, not merely its own inverse.
 			assert.closeAbs( packNormalToRGB( vec3( 0, 0, 1 ) ), vec3( 0.5, 0.5, 1.0 ), 1e-6, 'packNormalToRGB(+Z) == (0.5, 0.5, 1.0)' );
-			assert.closeAbs( packNormalToRGB( vec3( - 1, - 1, - 1 ) ), vec3( 0, 0, 0 ), 1e-6, 'packNormalToRGB(-1,-1,-1) == black' );
+			assert.closeAbs( packNormalToRGB( vec3( -1, -1, -1 ) ), vec3( 0, 0, 0 ), 1e-6, 'packNormalToRGB(-1,-1,-1) == black' );
 
-			const n = vec3( 0.6, - 0.8, 0.0 ); // a unit vector (0.6^2 + 0.8^2 == 1)
+			const n = vec3( 0.6, -0.8, 0.0 ); // a unit vector (0.6^2 + 0.8^2 == 1)
 			assert.closeAbs( unpackRGBToNormal( packNormalToRGB( n ) ), n, 1e-5, 'round trip recovers the original direction' );
 
 		} );

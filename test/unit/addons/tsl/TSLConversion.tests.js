@@ -44,7 +44,7 @@ export default QUnit.module( 'TSL', () => {
 			// grayscale() has no coefficients parameter -- it always uses
 			// ColorManagement's current working color space (linear-sRGB by
 			// default, whose Rec.709 luminance coefficients match REC709 above).
-			assert.closeAbs( gray, float( 0.2126 ), 2e-3, 'grayscale(red) is red\'s scalar luminance, NOT a vec3' );
+			assert.closeAbs( gray, float( 0.2126 ), 2e-3, "grayscale(red) is red's scalar luminance, NOT a vec3" );
 
 		} );
 
@@ -105,7 +105,7 @@ export default QUnit.module( 'TSL', () => {
 
 			// remapClamp() must clamp the *output* to [outLow, outHigh] for the same input.
 			assert.eq( remapClamp( float( 20 ), float( 0 ), float( 10 ), float( 0 ), float( 1 ) ), float( 1 ), 'remapClamp() clamps past inHigh' );
-			assert.eq( remapClamp( float( - 20 ), float( 0 ), float( 10 ), float( 0 ), float( 1 ) ), float( 0 ), 'remapClamp() clamps below inLow' );
+			assert.eq( remapClamp( float( -20 ), float( 0 ), float( 10 ), float( 0 ), float( 1 ) ), float( 0 ), 'remapClamp() clamps below inLow' );
 
 		} );
 
@@ -114,7 +114,7 @@ export default QUnit.module( 'TSL', () => {
 			const near = float( 0.1 );
 			const far = float( 100 );
 
-			for ( const viewZ of [ - 0.1, - 1, - 10, - 50, - 99.9 ] ) {
+			for ( const viewZ of [ -0.1, -1, -10, -50, -99.9 ] ) {
 
 				const depth = viewZToPerspectiveDepth( float( viewZ ), near, far );
 				const roundTrip = perspectiveDepthToViewZ( depth, near, far );
@@ -129,7 +129,7 @@ export default QUnit.module( 'TSL', () => {
 			const near = float( 0.1 );
 			const far = float( 100 );
 
-			for ( const viewZ of [ - 0.1, - 1, - 10, - 50, - 99.9 ] ) {
+			for ( const viewZ of [ -0.1, -1, -10, -50, -99.9 ] ) {
 
 				const depth = viewZToOrthographicDepth( float( viewZ ), near, far );
 				const roundTrip = orthographicDepthToViewZ( depth, near, far );
@@ -147,11 +147,11 @@ export default QUnit.module( 'TSL', () => {
 			// At viewZ == -near, depth must be exactly 0; at viewZ == -far, depth must be exactly 1
 			// (this is the entire point of the formula -- log2(near/near)/log2(far/near) == 0,
 			// log2(far/near)/log2(far/near) == 1).
-			assert.closeAbs( viewZToLogarithmicDepth( float( - 0.1 ), near, far ), float( 0 ), 1e-4, 'depth at the near plane is 0' );
-			assert.closeAbs( viewZToLogarithmicDepth( float( - 100 ), near, far ), float( 1 ), 1e-4, 'depth at the far plane is 1' );
+			assert.closeAbs( viewZToLogarithmicDepth( float( -0.1 ), near, far ), float( 0 ), 1e-4, 'depth at the near plane is 0' );
+			assert.closeAbs( viewZToLogarithmicDepth( float( -100 ), near, far ), float( 1 ), 1e-4, 'depth at the far plane is 1' );
 
 			// A midpoint (in log space) must land at 0.5.
-			const midViewZ = - Math.sqrt( 0.1 * 100 ); // geometric mean of near/far
+			const midViewZ = -Math.sqrt( 0.1 * 100 ); // geometric mean of near/far
 			assert.closeAbs( viewZToLogarithmicDepth( float( midViewZ ), near, far ), float( 0.5 ), 1e-4, 'the geometric-mean viewZ maps to depth 0.5' );
 
 		} );

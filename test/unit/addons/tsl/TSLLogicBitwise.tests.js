@@ -94,8 +94,8 @@ export default QUnit.module( 'TSL', () => {
 			assert.eq( bitXor( int( 6 ), int( 3 ) ), int( 5 ), '0b0110 ^ 0b0011 == 0b0101 == 5' );
 
 			// bitNot is two's-complement: ~x == -x - 1.
-			assert.eq( bitNot( int( 0 ) ), int( - 1 ), '~0 == -1' );
-			assert.eq( bitNot( int( 5 ) ), int( - 6 ), '~5 == -5-1 == -6' );
+			assert.eq( bitNot( int( 0 ) ), int( -1 ), '~0 == -1' );
+			assert.eq( bitNot( int( 5 ) ), int( -6 ), '~5 == -5-1 == -6' );
 
 		} );
 
