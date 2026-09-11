@@ -19,6 +19,14 @@
       // Construct the new URL and redirect.
       window.location.replace("https://threejs.org/docs/#" + pageName);
     }
+
+    // Check if it matches the old localized manual pattern:
+    // /manual/[lang]/PageName.html
+    match = path.match(/\/manual\/(?:en|fr|ja|ko|ru|zh)\/([^\/\.]+)\.html/);
+
+    if (match && match[1]) {
+      window.location.replace("https://threejs.org/manual/#" + match[1]);
+    }
   </script>
 </head>
 <body>
