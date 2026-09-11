@@ -139,5 +139,19 @@ export default [
 			ecmaVersion: 2022,
 			sourceType: 'module'
 		}
+	},
+
+	// tests must import from src, not build
+	{
+		name: 'test rules',
+		files: [ 'test/**/*.js' ],
+		rules: {
+			'no-restricted-imports': [ 'error', {
+				patterns: [ {
+					group: [ '**/build/*' ],
+					message: 'Tests must import from /src, not /build.'
+				} ]
+			} ]
+		}
 	}
 ];
