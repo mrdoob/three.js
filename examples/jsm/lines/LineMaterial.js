@@ -358,6 +358,19 @@ ShaderLib[ 'line' ] = {
 				vec3 p2 = rayEnd * params.y;
 				vec3 delta = p1 - p2;
 				float len = length( delta );
+
+				if ( isOrthographic ) {
+
+					// Parallel view rays reduce the distance calculation to camera-space XY.
+					vec2 lineDirXY = worldEnd.xy - worldStart.xy;
+					float lengthSq = dot( lineDirXY, lineDirXY );
+					float t = lengthSq > 0.0
+						? clamp( dot( worldPos.xy - worldStart.xy, lineDirXY ) / lengthSq, 0.0, 1.0 )
+						: 0.0;
+					len = length( worldPos.xy - ( worldStart.xy + t * lineDirXY ) );
+
+				}
+
 				float norm = len / linewidth;
 
 				#ifndef USE_DASH
