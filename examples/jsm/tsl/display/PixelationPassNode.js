@@ -114,21 +114,21 @@ class PixelationPassNode extends PassNode {
 		const sampleDepth = ( x, y ) => depthNode.sample( uvNodeDepth.add( vec2( x, y ).mul( invSize ) ) ).r;
 		const sampleNormal = ( x, y ) => normalNode.sample( uvNodeNormal.add( vec2( x, y ).mul( invSize ) ) ).rgb.normalize();
 
-		const depthEdgeIndicator = ( depth ) => {
+		const depthEdgeIndicator = ( depth, depthE, depthW, depthN, depthS ) => {
 
 			const diff = property( 'float', 'diff' );
-			diff.addAssign( clamp( sampleDepth( 1, 0 ).sub( depth ) ) );
-			diff.addAssign( clamp( sampleDepth( - 1, 0 ).sub( depth ) ) );
-			diff.addAssign( clamp( sampleDepth( 0, 1 ).sub( depth ) ) );
-			diff.addAssign( clamp( sampleDepth( 0, - 1 ).sub( depth ) ) );
+			diff.addAssign( clamp( depthE.sub( depth ) ) );
+			diff.addAssign( clamp( depthW.sub( depth ) ) );
+			diff.addAssign( clamp( depthN.sub( depth ) ) );
+			diff.addAssign( clamp( depthS.sub( depth ) ) );
 
 			return floor( smoothstep( 0.01, 0.02, diff ).mul( 2 ) ).div( 2 );
 
 		};
 
-		const neighborNormalEdgeIndicator = ( x, y, depth, normal ) => {
+		const neighborNormalEdgeIndicator = ( x, y, neighborDepth, depth, normal ) => {
 
-			const depthDiff = sampleDepth( x, y ).sub( depth );
+			const depthDiff = neighborDepth.sub( depth );
 			const neighborNormal = sampleNormal( x, y );
 
 			// Edge pixels should yield to faces who's normals are closer to the bias normal.
@@ -145,14 +145,14 @@ class PixelationPassNode extends PassNode {
 
 		};
 
-		const normalEdgeIndicator = ( depth, normal ) => {
+		const normalEdgeIndicator = ( depth, normal, depthE, depthW, depthN, depthS ) => {
 
 			const indicator = property( 'float', 'indicator' );
 
-			indicator.addAssign( neighborNormalEdgeIndicator( 0, - 1, depth, normal ) );
-			indicator.addAssign( neighborNormalEdgeIndicator( 0, 1, depth, normal ) );
-			indicator.addAssign( neighborNormalEdgeIndicator( - 1, 0, depth, normal ) );
-			indicator.addAssign( neighborNormalEdgeIndicator( 1, 0, depth, normal ) );
+			indicator.addAssign( neighborNormalEdgeIndicator( 0, - 1, depthS, depth, normal ) );
+			indicator.addAssign( neighborNormalEdgeIndicator( 0, 1, depthN, depth, normal ) );
+			indicator.addAssign( neighborNormalEdgeIndicator( - 1, 0, depthW, depth, normal ) );
+			indicator.addAssign( neighborNormalEdgeIndicator( 1, 0, depthE, depth, normal ) );
 
 			return step( 0.1, indicator );
 
@@ -165,10 +165,20 @@ class PixelationPassNode extends PassNode {
 			const depth = property( 'float', 'depth' );
 			const normal = property( 'vec3', 'normal' );
 
+			const depthE = float().toVar();
+			const depthW = float().toVar();
+			const depthN = float().toVar();
+			const depthS = float().toVar();
+
 			If( this.depthEdgeStrength.greaterThan( 0.0 ).or( this.normalEdgeStrength.greaterThan( 0.0 ) ), () => {
 
 				depth.assign( sampleDepth( 0, 0 ) );
 				normal.assign( sampleNormal( 0, 0 ) );
+
+				depthE.assign( sampleDepth( 1, 0 ) );
+				depthW.assign( sampleDepth( - 1, 0 ) );
+				depthN.assign( sampleDepth( 0, 1 ) );
+				depthS.assign( sampleDepth( 0, - 1 ) );
 
 			} );
 
@@ -176,7 +186,7 @@ class PixelationPassNode extends PassNode {
 
 			If( this.depthEdgeStrength.greaterThan( 0.0 ), () => {
 
-				dei.assign( depthEdgeIndicator( depth ) );
+				dei.assign( depthEdgeIndicator( depth, depthE, depthW, depthN, depthS ) );
 
 			} );
 
@@ -184,7 +194,7 @@ class PixelationPassNode extends PassNode {
 
 			If( this.normalEdgeStrength.greaterThan( 0.0 ).and( normal.length().greaterThan( 0 ) ), () => {
 
-				nei.assign( normalEdgeIndicator( depth, normal ) );
+				nei.assign( normalEdgeIndicator( depth, normal, depthE, depthW, depthN, depthS ) );
 
 			} );
 
