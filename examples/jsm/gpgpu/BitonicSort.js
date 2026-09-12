@@ -79,18 +79,10 @@ export class BitonicSort {
 	/**
 	 * Constructs a new light probe helper.
 	 *
-	 * @param {Renderer} renderer - The current scene's renderer.
 	 * @param {StorageBufferNode} dataBuffer - The data buffer to sort.
 	 * @param {Object} [options={}] - Options that modify the bitonic sort.
 	 */
-	constructor( renderer, dataBuffer, options = {} ) {
-
-		/**
-		 * A reference to the renderer.
-		 *
-		 * @type {Renderer}
-		 */
-		this.renderer = renderer;
+	constructor( dataBuffer, options = {} ) {
 
 		/**
 		 * A reference to the StorageBufferNode holding the data that will be sorted  .
@@ -112,7 +104,7 @@ export class BitonicSort {
 		 * @type {number}
 		 */
 
-		 this.dispatchSize = this.count / 2;
+		this.dispatchSize = this.count / 2;
 
 		/**
 		 * The workgroup size of the compute shaders executed during the sort.
