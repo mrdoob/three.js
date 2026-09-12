@@ -121,7 +121,7 @@ class Line3 {
 	 *
 	 * @param {number} t - A value between `[0,1]` to represent a position along the line segment.
 	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {Vector3} The delta vector.
+	 * @return {Vector3} The point along the line segment.
 	 */
 	at( t, target ) {
 
