@@ -575,13 +575,16 @@ class TextureNode extends UniformNode {
 		} else {
 
 			const nodeData = builder.getDataFromNode( this );
+			const precisionCacheKey = builder.getPrecisionCacheKey ? builder.getPrecisionCacheKey( this ) : 'default';
 
 			const nodeType = this.getNodeType( builder );
 
-			let propertyName = nodeData.propertyName;
+			const propertyNames = nodeData.propertyName || ( nodeData.propertyName = {} );
+			let propertyName = propertyNames[ precisionCacheKey ];
 
 			if ( propertyName === undefined ) {
 
+				const previousContext = builder.addContext( { precision: null } );
 				const { uvNode, levelNode, biasNode, compareNode, compareStepNode, depthNode, gradNode, gatherNode, offsetNode } = properties;
 
 				const uvSnippet = this.generateUV( builder, uvNode );
@@ -608,6 +611,7 @@ class TextureNode extends UniformNode {
 				propertyName = builder.getPropertyName( nodeVar );
 
 				let snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, finalDepthSnippet, compareSnippet, gradSnippet, gatherSnippet, offsetSnippet, flipYSnippet );
+				builder.setContext( previousContext );
 
 				let snippetType;
 
@@ -641,8 +645,9 @@ class TextureNode extends UniformNode {
 
 				builder.addLineFlowCode( `${propertyName} = ${snippet}`, this );
 
-				nodeData.snippet = snippet;
-				nodeData.propertyName = propertyName;
+				nodeData.snippet = nodeData.snippet || {};
+				nodeData.snippet[ precisionCacheKey ] = snippet;
+				propertyNames[ precisionCacheKey ] = propertyName;
 
 			}
 

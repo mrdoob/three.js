@@ -150,7 +150,7 @@ class OperatorNode extends TempNode {
 
 			if ( builder.isMatrix( typeA ) ) {
 
-				if ( typeB === 'float' ) {
+				if ( typeB === 'float' || typeB === 'half' ) {
 
 					return typeA; // matrix * scalar = matrix
 
@@ -166,7 +166,7 @@ class OperatorNode extends TempNode {
 
 			} else if ( builder.isMatrix( typeB ) ) {
 
-				if ( typeA === 'float' ) {
+				if ( typeA === 'float' || typeA === 'half' ) {
 
 					return typeB; // scalar * matrix = matrix
 
@@ -200,7 +200,7 @@ class OperatorNode extends TempNode {
 
 		const { aNode, bNode } = this;
 
-		const type = this.getNodeType( builder, output );
+		let type = this.getNodeType( builder, output );
 
 		let typeA = null;
 		let typeB = null;
@@ -238,11 +238,11 @@ class OperatorNode extends TempNode {
 
 			} else if ( builder.isMatrix( typeA ) ) {
 
-				if ( typeB === 'float' ) {
+				if ( typeB === 'float' || typeB === 'half' ) {
 
 					// Keep matrix type for typeA, but ensure typeB stays float
 
-					typeB = 'float';
+					typeB = builder.getComponentType( typeA );
 
 				} else if ( builder.isVector( typeB ) ) {
 
@@ -261,11 +261,11 @@ class OperatorNode extends TempNode {
 
 			} else if ( builder.isMatrix( typeB ) ) {
 
-				if ( typeA === 'float' ) {
+				if ( typeA === 'float' || typeA === 'half' ) {
 
 					// Keep matrix type for typeB, but ensure typeA stays float
 
-					typeA = 'float';
+					typeA = builder.getComponentType( typeB );
 
 				} else if ( builder.isVector( typeA ) ) {
 
@@ -287,6 +287,16 @@ class OperatorNode extends TempNode {
 
 			}
 
+			if ( builder.getPrecisionType ) {
+
+				const precision = builder.getContextPrecision() || ( builder.isPrecisionType( output ) ? 16 : null );
+
+				type = builder.getPrecisionType( type, precision );
+				typeA = builder.getPrecisionType( typeA, precision );
+				typeB = typeB !== null ? builder.getPrecisionType( typeB, precision ) : null;
+
+			}
+
 		} else {
 
 			typeA = typeB = type;
@@ -295,6 +305,44 @@ class OperatorNode extends TempNode {
 
 		const a = aNode.build( builder, typeA );
 		const b = bNode ? bNode.build( builder, typeB ) : null;
+
+		const coercePrecisionOperand = ( snippet, fromType, node ) => {
+
+			if ( snippet === null ) return snippet;
+
+			let sourceType = fromType;
+
+			if ( node && node.isVarNode ) {
+
+				sourceType = builder.getVarFromNode( node ).type;
+
+			}
+
+			if ( sourceType !== type ) {
+
+				return builder.format( snippet, sourceType, type );
+
+			}
+
+			// Same TSL type can still disagree with the WGSL declaration for vars and loop iterators.
+			return `${ builder.getType( type ) }( ${ snippet } )`;
+
+		};
+
+		const needsPrecisionCoerce = builder.isFloatType && builder.isFloatType( type ) && (
+			builder.getContextPrecision() === 16 ||
+			( builder.isPrecisionType && ( builder.isPrecisionType( type ) || builder.isPrecisionType( typeA ) || ( typeB !== null && builder.isPrecisionType( typeB ) ) ) )
+		);
+
+		let aSnippet = a;
+		let bSnippet = b;
+
+		if ( needsPrecisionCoerce ) {
+
+			aSnippet = coercePrecisionOperand( a, typeA, aNode );
+			bSnippet = coercePrecisionOperand( b, typeB, bNode );
+
+		}
 
 		const fnOpSnippet = builder.getFunctionOperator( op );
 
@@ -308,11 +356,11 @@ class OperatorNode extends TempNode {
 
 					if ( builder.isVector( typeA ) ) {
 
-						return builder.format( `${ this.getOperatorMethod( builder, output ) }( ${ a }, ${ b } )`, type, output );
+						return builder.format( `${ this.getOperatorMethod( builder, output ) }( ${ aSnippet }, ${ bSnippet } )`, type, output );
 
 					} else {
 
-						return builder.format( `( ${ a } ${ op } ${ b } )`, type, output );
+						return builder.format( `( ${ aSnippet } ${ op } ${ bSnippet } )`, type, output );
 
 					}
 
@@ -320,7 +368,7 @@ class OperatorNode extends TempNode {
 
 					// WGSL
 
-					return builder.format( `( ${ a } ${ op } ${ b } )`, type, output );
+					return builder.format( `( ${ aSnippet } ${ op } ${ bSnippet } )`, type, output );
 
 				}
 
@@ -328,11 +376,11 @@ class OperatorNode extends TempNode {
 
 				if ( builder.isInteger( typeB ) ) {
 
-					return builder.format( `( ${ a } % ${ b } )`, type, output );
+					return builder.format( `( ${ aSnippet } % ${ bSnippet } )`, type, output );
 
 				} else {
 
-					return builder.format( `${ this.getOperatorMethod( builder, type ) }( ${ a }, ${ b } )`, type, output );
+					return builder.format( `${ this.getOperatorMethod( builder, type ) }( ${ aSnippet }, ${ bSnippet } )`, type, output );
 
 				}
 
@@ -340,23 +388,23 @@ class OperatorNode extends TempNode {
 
 				if ( isGLSL && builder.isVector( typeA ) ) {
 
-					return builder.format( `not( ${a} )`, output );
+					return builder.format( `not( ${ aSnippet } )`, output );
 
 				} else {
 
 					// WGSL and scalars on GLSL
 
-					return builder.format( `( ${op} ${a} )`, typeA, output );
+					return builder.format( `( ${ op } ${ aSnippet } )`, typeA, output );
 
 				}
 
 			} else if ( op === '~' ) {
 
-				return builder.format( `( ${op} ${a} )`, typeA, output );
+				return builder.format( `( ${ op } ${ aSnippet } )`, typeA, output );
 
 			} else if ( fnOpSnippet ) {
 
-				return builder.format( `${ fnOpSnippet }( ${ a }, ${ b } )`, type, output );
+				return builder.format( `${ fnOpSnippet }( ${ aSnippet }, ${ bSnippet } )`, type, output );
 
 			} else {
 
@@ -364,15 +412,15 @@ class OperatorNode extends TempNode {
 
 				if ( builder.isMatrix( typeA ) && typeB === 'float' ) {
 
-					return builder.format( `( ${ b } ${ op } ${ a } )`, type, output );
+					return builder.format( `( ${ bSnippet } ${ op } ${ aSnippet } )`, type, output );
 
 				} else if ( typeA === 'float' && builder.isMatrix( typeB ) ) {
 
-					return builder.format( `${ a } ${ op } ${ b }`, type, output );
+					return builder.format( `${ aSnippet } ${ op } ${ bSnippet }`, type, output );
 
 				} else {
 
-					let snippet = `( ${ a } ${ op } ${ b } )`;
+					let snippet = `( ${ aSnippet } ${ op } ${ bSnippet } )`;
 
 					if ( ! isGLSL && type === 'bool' && builder.isVector( typeA ) && builder.isVector( typeB ) ) {
 
@@ -390,17 +438,24 @@ class OperatorNode extends TempNode {
 
 			if ( fnOpSnippet ) {
 
-				return builder.format( `${ fnOpSnippet }( ${ a }, ${ b } )`, type, output );
+				return builder.format( `${ fnOpSnippet }( ${ aSnippet }, ${ bSnippet } )`, type, output );
 
 			} else {
 
-				if ( builder.isMatrix( typeA ) && typeB === 'float' ) {
+				if ( bNode === null && builder.isPrecisionType && builder.isPrecisionType( typeA ) ) {
 
-					return builder.format( `${ b } ${ op } ${ a }`, type, output );
+					const baseTypeA = builder.getBaseType( typeA );
+					const baseA = aNode.build( builder, baseTypeA );
+
+					return builder.format( `( ${ op } ${ baseA } )`, baseTypeA, output || typeA );
+
+				} else if ( builder.isMatrix( typeA ) && typeB === 'float' ) {
+
+					return builder.format( `${ bSnippet } ${ op } ${ aSnippet }`, type, output );
 
 				} else {
 
-					return builder.format( `${ a } ${ op } ${ b }`, type, output );
+					return builder.format( `${ aSnippet } ${ op } ${ bSnippet }`, type, output );
 
 				}
 

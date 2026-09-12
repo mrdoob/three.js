@@ -28,9 +28,9 @@
 // compiles down to a tiny custom Node (AssertWriteNode) whose setup() asks
 // the builder for the real type.
 //
-// Matrix support (mat3/mat4): a single `vec4` row can't hold 9 or 16 floats.
-// A matrix value is represented as `columns` column-vectors (mat3: 3 x vec3,
-// mat4: 4 x vec4 -- see `MATRIX_LAYOUT`/NodeBuilder.getElementType), each
+// Matrix support (mat2/mat3/mat4): a single `vec4` row can't hold all matrix values.
+// A matrix value is represented as `columns` column-vectors (mat2: 2 x vec2,
+// mat3: 3 x vec3, mat4: 4 x vec4 -- see `MATRIX_LAYOUT`/NodeBuilder.getElementType), each
 // zero-padded to a vec4 exactly like a plain vector value. `AssertWriteNode`
 // resolves this layout once real type info exists (`setup(builder)`) and
 // then, for each column, calls a `writeColumn(c, actualVec4, expectedVec4)`
@@ -81,9 +81,10 @@ export const Kind = {
 const SWIZZLE = [ 'x', 'y', 'z', 'w' ];
 
 // Matrix types are represented as `columns` column-vectors of `columnLength`
-// components each (mat3: 3 x vec3, mat4: 4 x vec4) -- see gpu-test-utils.js
+// components each (mat2: 2 x vec2, mat3: 3 x vec3, mat4: 4 x vec4) -- see gpu-test-utils.js
 // file header and NodeBuilder.getTypeLength/getElementType.
 const MATRIX_LAYOUT = {
+	mat2: { columns: 2, columnLength: 2 },
 	mat3: { columns: 3, columnLength: 3 },
 	mat4: { columns: 4, columnLength: 4 }
 };
@@ -113,7 +114,7 @@ function toVec4( value, count ) {
 }
 
 // Resolves how many "columns" a type needs and how long each column is.
-// Vectors/scalars are a single column of their own length; mat3/mat4 are
+// Vectors/scalars are a single column of their own length; matrices are
 // `MATRIX_LAYOUT`-many columns of their own (shorter) length.
 function resolveLayout( type, builder ) {
 
@@ -129,7 +130,7 @@ function resolveLayout( type, builder ) {
 
 	if ( count > 4 ) {
 
-		throw new Error( `gpuTest: type "${ type }" (${ count } components) is not supported -- only scalars, vecN, mat3 and mat4 are.` );
+		throw new Error( `gpuTest: type "${ type }" (${ count } components) is not supported -- only scalars, vecN, mat2, mat3 and mat4 are.` );
 
 	}
 
@@ -140,7 +141,7 @@ function resolveLayout( type, builder ) {
 // A statement node: at real shader-build time (setup(builder), when a real
 // NodeBuilder -- and therefore real type information -- exists) it asks the
 // builder what type `value1`/`value2` resolved to, then hands each column
-// (1 for scalars/vectors, 3 or 4 for mat3/mat4), zero-padded to a vec4, to
+// (1 for scalars/vectors, 2 to 4 for matrices), zero-padded to a vec4, to
 // the caller-supplied `writeColumn(columnIndex, actualVec4, expectedVec4)`.
 // How -- and at what addressing cost -- a column actually gets written to a
 // buffer is entirely up to `writeColumn`; see `gpuTest`/`gpuFuzzTest` for the
@@ -204,7 +205,7 @@ class AssertWriteNode extends Node {
 		// instead of re-evaluating it. `.toVar()` sidesteps this by forcing
 		// the evaluation to happen up front, outside every branch, so each
 		// column's branch only ever *reads* an already-computed variable.
-		// (Recall multi-column values only arise for mat3/mat4 here since
+		// (Recall multi-column values only arise for matrices here since
 		// scalars/vectors are always a single column -- but `.toVar()` is
 		// cheap and correct for those too, so it's applied unconditionally.)
 		const v1 = this.value1.toVar();
@@ -432,7 +433,13 @@ function buildAssertAPI( makeNode ) {
 // one, each gets a `[backend]` suffix so failures say which backend failed.
 // Backend availability is detected at runtime (see getSharedRenderer) rather
 // than assumed, so no static "skip this backend" flag is needed here.
-function declareTest( name, backends, run ) {
+function rendererHasFeature( renderer, feature ) {
+
+	return typeof renderer.hasFeature === 'function' && renderer.hasFeature( feature );
+
+}
+
+function declareTest( name, backends, requiredFeatures, run ) {
 
 	for ( const backend of backends ) {
 
@@ -450,6 +457,15 @@ function declareTest( name, backends, run ) {
 				// practical equivalent: it never fails the build, and the
 				// console.warn from getSharedRenderer explains why.
 				assert.ok( true, `SKIPPED: "${ backend }" backend is not available in this environment.` );
+				return;
+
+			}
+
+			const missingFeature = requiredFeatures.find( feature => rendererHasFeature( renderer, feature ) === false );
+
+			if ( missingFeature !== undefined ) {
+
+				assert.ok( true, `SKIPPED: "${ backend }" backend does not support "${ missingFeature }".` );
 				return;
 
 			}
@@ -575,7 +591,7 @@ function assertKernelRan( assert, data, row, canaryValue, name, kind = 'gpuTest'
  * `maxAssertions * MAX_COLUMNS` rows -- every assertion reserves a fixed
  * `MAX_COLUMNS`-row stride (`row = assertionIndex * MAX_COLUMNS`), and only
  * uses as many of those rows as its resolved type needs (1 for a scalar/
- * vector, up to `MAX_COLUMNS` for a mat3/mat4). Each row is still written
+ * vector, up to `MAX_COLUMNS` for a matrix). Each row is still written
  * only via the bare `instanceIndex` node, guarded by
  * `If( instanceIndex.equal( row ), ... )`, per the file header's WebGL2
  * addressing constraint. This costs a larger (but cheap: still just 2
@@ -583,7 +599,7 @@ function assertKernelRan( assert, data, row, canaryValue, name, kind = 'gpuTest'
  * invocations -- rather than more simultaneously-bound buffers, which is
  * the resource that's actually scarce on the WebGL2 fallback.
  *
- * Supports scalars, vecN and mat3/mat4 -- see the file header's "Matrix
+ * Supports scalars, vecN and mat2/mat3/mat4 -- see the file header's "Matrix
  * support" section.
  *
  * `maxAssertions` (default 64) sizes the backing buffers and dispatch count
@@ -595,9 +611,9 @@ function assertKernelRan( assert, data, row, canaryValue, name, kind = 'gpuTest'
  * regression can't slip by unnoticed; narrow it (e.g. `[ 'webgpu' ]`) only
  * for a node that's deliberately WebGPU-only.
  */
-export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webgpu', 'webgl' ] } = {} ) {
+export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webgpu', 'webgl' ], requiredFeatures = [] } = {} ) {
 
-	declareTest( name, backends, async ( assert, renderer ) => {
+	declareTest( name, backends, requiredFeatures, async ( assert, renderer ) => {
 
 		const nodes = [];
 		const totalRows = maxAssertions * MAX_COLUMNS;
@@ -677,7 +693,7 @@ export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webg
 
 			};
 
-			buildFn( { assert: buildAssertAPI( makeNode ) } );
+			buildFn( { assert: buildAssertAPI( makeNode ), renderer, hasFeature: feature => rendererHasFeature( renderer, feature ) } );
 
 		} )().compute( totalRows );
 
@@ -730,7 +746,7 @@ export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webg
  * `maxSitesPerInstance` (default 4) bounds how many `assert.*` calls buildFn
  * may make per invocation. `maxColumnsPerSite` (default 1) bounds how wide a
  * single site's value may be: 1 covers every scalar/vector type; pass 3 or 4
- * to allow a site to assert on a mat3/mat4. Both knobs spend the same scarce
+ * to allow a site to assert on a matrix. Both knobs spend the same scarce
  * resource -- WebGL2's fallback guarantees only a handful of simultaneously-
  * bound output buffers (spec minimum is 4) -- so `maxSitesPerInstance *
  * maxColumnsPerSite` total buffer pairs is a real budget, not just memory;
@@ -749,9 +765,9 @@ export function gpuTest( name, buildFn, { maxAssertions = 64, backends = [ 'webg
  *
  * `backends` (default `[ 'webgpu', 'webgl' ]`) -- see `gpuTest`.
  */
-export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, maxColumnsPerSite = 1, backends = [ 'webgpu', 'webgl' ] } = {} ) {
+export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, maxColumnsPerSite = 1, backends = [ 'webgpu', 'webgl' ], requiredFeatures = [] } = {} ) {
 
-	declareTest( name, backends, async ( assert, renderer ) => {
+	declareTest( name, backends, requiredFeatures, async ( assert, renderer ) => {
 
 		const nodes = []; // one entry per call site (not per instance)
 		const actualBuffers = []; // actualBuffers[site][column]
@@ -805,7 +821,7 @@ export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, ma
 
 					if ( c >= maxColumnsPerSite ) {
 
-						throw new Error( `gpuFuzzTest "${ name }": a value at site ${ site } needs column ${ c + 1 }, more than maxColumnsPerSite (${ maxColumnsPerSite }); raise that option to assert on wider values (e.g. mat3/mat4).` );
+						throw new Error( `gpuFuzzTest "${ name }": a value at site ${ site } needs column ${ c + 1 }, more than maxColumnsPerSite (${ maxColumnsPerSite }); raise that option to assert on wider values (e.g. matrices).` );
 
 					}
 
@@ -848,7 +864,7 @@ export function gpuFuzzTest( name, count, buildFn, { maxSitesPerInstance = 4, ma
 
 				nodes.length = 0;
 
-				buildFn( { instanceIndex, assert: buildAssertAPI( makeNode ) } );
+				buildFn( { instanceIndex, assert: buildAssertAPI( makeNode ), renderer, hasFeature: feature => rendererHasFeature( renderer, feature ) } );
 
 			} );
 

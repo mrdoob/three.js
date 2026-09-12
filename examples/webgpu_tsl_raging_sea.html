@@ -78,6 +78,13 @@
 				const smallWavesMultiplier = uniform( 0.18 );
 				const normalComputeShift = uniform( 0.01 );
 
+				const params = {
+					precision: '32-bit'
+				};
+
+				const getPrecision = () => params.precision === '16-bit' ? 16 : 32;
+				const precisionScope = ( node ) => node.setPrecision( getPrecision() );
+
 				// TSL functions
 
 				const wavesElevation = Fn( ( [ position ] ) => {
@@ -101,6 +108,7 @@
 						);
 
 						const wave = mx_noise_float( noiseInput, 1, 0 )
+							.setPrecision( 32 )
 							.mul( smallWavesMultiplier )
 							.div( i )
 							.abs();
@@ -113,31 +121,7 @@
 
 				} );
 
-				// position
-
-				const elevation = wavesElevation( positionLocal );
-				const position = positionLocal.add( vec3( 0, elevation, 0 ) );
-
-				material.positionNode = position;
-
-				// normals
-
-				let positionA = positionLocal.add( vec3( normalComputeShift, 0, 0 ) );
-				let positionB = positionLocal.add( vec3( 0, 0, normalComputeShift.negate() ) );
-
-				positionA = positionA.add( vec3( 0, wavesElevation( positionA ), 0 ) );
-				positionB = positionB.add( vec3( 0, wavesElevation( positionB ), 0 ) );
-
-				const toA = positionA.sub( position ).normalize();
-				const toB = positionB.sub( position ).normalize();
-				const normal = toA.cross( toB );
-
-				material.normalNode = transformNormalToView( normal );
-
-				// emissive
-
-				const emissive = elevation.remap( emissiveHigh, emissiveLow ).pow( emissivePower );
-				material.emissiveNode = emissiveColor.mul( emissive );
+				updatePrecisionNodes();
 
 				// mesh
 
@@ -167,6 +151,11 @@
 
 				const gui = renderer.inspector.createParameters( 'Parameters' );
 
+				gui.add( params, 'precision', [ '32-bit', '16-bit' ] ).name( 'precision' ).onChange( () => {
+
+					updatePrecisionNodes();
+
+				} );
 				gui.addColor( { color: material.color.getHex( THREE.SRGBColorSpace ) }, 'color' ).name( 'color' ).onChange( value => material.color.set( value ) );
 				gui.add( material, 'roughness', 0, 1, 0.001 );
 
@@ -190,6 +179,37 @@
 				// events
 
 				window.addEventListener( 'resize', onWindowResize );
+
+				function updatePrecisionNodes() {
+
+					// position
+
+					const elevation = precisionScope( wavesElevation( positionLocal ) );
+					const position = positionLocal.add( vec3( 0, elevation, 0 ) );
+
+					material.positionNode = position;
+
+					// normals
+
+					let positionA = positionLocal.add( vec3( normalComputeShift, 0, 0 ) );
+					let positionB = positionLocal.add( vec3( 0, 0, normalComputeShift.negate() ) );
+
+					positionA = positionA.add( vec3( 0, precisionScope( wavesElevation( positionA ) ), 0 ) );
+					positionB = positionB.add( vec3( 0, precisionScope( wavesElevation( positionB ) ), 0 ) );
+
+					const toA = positionA.sub( position ).normalize();
+					const toB = positionB.sub( position ).normalize();
+					const normal = toA.cross( toB );
+
+					material.normalNode = transformNormalToView( normal );
+
+					// emissive
+
+					const emissive = elevation.remap( emissiveHigh, emissiveLow ).pow( emissivePower );
+					material.emissiveNode = emissiveColor.mul( emissive );
+					material.needsUpdate = true;
+
+				}
 
 			}
 

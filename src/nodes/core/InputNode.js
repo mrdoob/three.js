@@ -35,6 +35,14 @@ class InputNode extends Node {
 		this.isInputNode = true;
 
 		/**
+		 * Input/resource declarations keep their logical type in precision contexts.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.precisionContext = false;
+
+		/**
 		 * The value of this node. This can be any JS primitive, functions, array buffers or even three.js objects (vector, matrices, colors).
 		 *
 		 * @type {any}
@@ -84,14 +92,32 @@ class InputNode extends Node {
 	 * overwritten in derived classes if the final precision must be computed
 	 * analytically.
 	 *
-	 * @param {('low'|'medium'|'high')} precision - The precision of the input value in the shader.
-	 * @return {InputNode} A reference to this node.
+	 * @param {('low'|'medium'|'high')|number} precision - The precision of the input value in the shader.
+	 * @return {InputNode|ContextNode} A reference to this node or a precision context node.
 	 */
 	setPrecision( precision ) {
+
+		if ( typeof precision === 'number' && this.context ) {
+
+			return this.context( { precision } );
+
+		} else if ( typeof precision === 'number' ) {
+
+			this.computePrecision = precision;
+
+			return this;
+
+		}
 
 		this.precision = precision;
 
 		return this;
+
+	}
+
+	getPrecision() {
+
+		return this.computePrecision || this.precision;
 
 	}
 

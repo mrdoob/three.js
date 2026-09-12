@@ -34,6 +34,14 @@ class ParameterNode extends PropertyNode {
 		 */
 		this.isParameterNode = true;
 
+		/**
+		 * Function parameter declarations keep their logical type in precision contexts.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.precisionContext = false;
+
 	}
 
 	/**

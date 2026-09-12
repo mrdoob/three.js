@@ -225,8 +225,17 @@ class MathNode extends TempNode {
 
 		let method = this.method;
 
-		const type = this.getNodeType( builder );
-		const inputType = this.getInputType( builder );
+		let type = this.getNodeType( builder );
+		let inputType = this.getInputType( builder );
+
+		if ( builder.getPrecisionType ) {
+
+			const precision = builder.getContextPrecision() || ( builder.isPrecisionType( output ) ? 16 : null );
+
+			type = builder.getPrecisionType( type, precision );
+			inputType = builder.getPrecisionType( inputType, precision );
+
+		}
 
 		const a = this.aNode;
 		const b = this.bNode;
