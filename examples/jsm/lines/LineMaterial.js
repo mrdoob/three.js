@@ -179,7 +179,7 @@ ShaderLib[ 'line' ] = {
 			#ifdef WORLD_UNITS
 
 				vec3 worldDir = normalize( end.xyz - start.xyz );
-				vec3 tmpFwd = normalize( mix( start.xyz, end.xyz, 0.5 ) );
+				vec3 tmpFwd = perspective ? normalize( mix( start.xyz, end.xyz, 0.5 ) ) : vec3( 0.0, 0.0, - 1.0 );
 				vec3 worldUp = normalize( cross( worldDir, tmpFwd ) );
 				vec3 worldFwd = cross( worldDir, worldUp );
 				worldPos = position.y < 0.5 ? start: end;
@@ -358,6 +358,19 @@ ShaderLib[ 'line' ] = {
 				vec3 p2 = rayEnd * params.y;
 				vec3 delta = p1 - p2;
 				float len = length( delta );
+
+				if ( isOrthographic ) {
+
+					// Parallel view rays reduce the distance calculation to camera-space XY.
+					vec2 lineDirXY = worldEnd.xy - worldStart.xy;
+					float lengthSq = dot( lineDirXY, lineDirXY );
+					float t = lengthSq > 0.0
+						? clamp( dot( worldPos.xy - worldStart.xy, lineDirXY ) / lengthSq, 0.0, 1.0 )
+						: 0.0;
+					len = length( worldPos.xy - ( worldStart.xy + t * lineDirXY ) );
+
+				}
+
 				float norm = len / linewidth;
 
 				#ifndef USE_DASH
