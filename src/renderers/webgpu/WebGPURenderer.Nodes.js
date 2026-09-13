@@ -1,5 +1,4 @@
 import Renderer from '../common/Renderer.js';
-import WebGLBackend from '../webgl-fallback/WebGLBackend.js';
 import WebGPUBackend from './WebGPUBackend.js';
 import BasicNodeLibrary from './nodes/BasicNodeLibrary.js';
 import { warn } from '../../utils.js';
@@ -20,27 +19,17 @@ class WebGPURenderer extends Renderer {
 	 */
 	constructor( parameters = {} ) {
 
-		let BackendClass;
+		const backend = new WebGPUBackend( parameters );
 
-		if ( parameters.forceWebGL ) {
+		parameters.getFallback = async () => {
 
-			BackendClass = WebGLBackend;
+			if ( backend.parameters.forceWebGL !== true ) warn( 'WebGPURenderer: WebGPU is not available, running under WebGL2 backend.' );
 
-		} else {
+			const { WebGLBackend } = await import( '../../Three.WebGPU.Fallback.js' );
 
-			BackendClass = WebGPUBackend;
+			return new WebGLBackend( parameters );
 
-			parameters.getFallback = () => {
-
-				warn( 'WebGPURenderer: WebGPU is not available, running under WebGL2 backend.' );
-
-				return new WebGLBackend( parameters );
-
-			};
-
-		}
-
-		const backend = new BackendClass( parameters );
+		};
 
 		super( backend, parameters );
 

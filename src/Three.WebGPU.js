@@ -3,10 +3,8 @@ export * from './Three.Core.js';
 export * from './materials/nodes/NodeMaterials.js';
 export { default as WebGPURenderer } from './renderers/webgpu/WebGPURenderer.js';
 export { default as WebGPUBackend } from './renderers/webgpu/WebGPUBackend.js';
-export { default as WebGLBackend } from './renderers/webgl-fallback/WebGLBackend.js';
 export { default as Renderer } from './renderers/common/Renderer.js';
 export { default as Backend } from './renderers/common/Backend.js';
-export { default as WebGLCapabilities } from './renderers/webgl-fallback/utils/WebGLCapabilities.js';
 export { default as Lighting } from './renderers/common/Lighting.js';
 export { default as BundleGroup } from './renderers/common/BundleGroup.js';
 export { default as QuadMesh } from './renderers/common/QuadMesh.js';
@@ -32,7 +30,6 @@ export { default as NodeMaterialLoader } from './loaders/nodes/NodeMaterialLoade
 export { default as InspectorBase } from './renderers/common/InspectorBase.js';
 export { default as CanvasTarget } from './renderers/common/CanvasTarget.js';
 export { default as BlendMode } from './renderers/common/BlendMode.js';
-export { default as GLSLNodeBuilder } from './renderers/webgl-fallback/nodes/GLSLNodeBuilder.js';
 export { default as BasicNodeLibrary } from './renderers/webgpu/nodes/BasicNodeLibrary.js';
 export { default as StandardNodeLibrary } from './renderers/webgpu/nodes/StandardNodeLibrary.js';
 export { default as WGSLNodeBuilder } from './renderers/webgpu/nodes/WGSLNodeBuilder.js';

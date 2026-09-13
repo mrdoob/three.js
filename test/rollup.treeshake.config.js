@@ -18,7 +18,7 @@ function filesize() {
 
 					const size = ( chunk.code.length / 1024 ).toFixed( 2 ) + ' KB';
 					const gzipped = ( gzipSync( chunk.code ).length / 1024 ).toFixed( 2 ) + ' KB';
-					const destination = options.file;
+					const destination = options.file || options.dir + '/' + chunk.fileName;
 
 					const lines = [
 						{ label: 'Destination: ', value: destination },
@@ -84,7 +84,9 @@ export default [
 		output: [
 			{
 				format: 'esm',
-				file: 'test/treeshake/index.webgpu.bundle.js'
+				dir: 'test/treeshake',
+				entryFileNames: 'index.webgpu.bundle.js',
+				chunkFileNames: 'index.webgpu.bundle.[name].js'
 			}
 		]
 	},
@@ -98,7 +100,9 @@ export default [
 		output: [
 			{
 				format: 'esm',
-				file: 'test/treeshake/index.webgpu.bundle.min.js'
+				dir: 'test/treeshake',
+				entryFileNames: 'index.webgpu.bundle.min.js',
+				chunkFileNames: 'index.webgpu.bundle.[name].min.js'
 			}
 		]
 	},
@@ -110,7 +114,9 @@ export default [
 		output: [
 			{
 				format: 'esm',
-				file: 'test/treeshake/index.webgpu.nodes.bundle.js'
+				dir: 'test/treeshake',
+				entryFileNames: 'index.webgpu.nodes.bundle.js',
+				chunkFileNames: 'index.webgpu.nodes.bundle.[name].js'
 			}
 		]
 	},
@@ -124,7 +130,9 @@ export default [
 		output: [
 			{
 				format: 'esm',
-				file: 'test/treeshake/index.webgpu.nodes.bundle.min.js'
+				dir: 'test/treeshake',
+				entryFileNames: 'index.webgpu.nodes.bundle.min.js',
+				chunkFileNames: 'index.webgpu.nodes.bundle.[name].min.js'
 			}
 		]
 	}

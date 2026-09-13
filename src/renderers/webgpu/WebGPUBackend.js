@@ -206,6 +206,12 @@ class WebGPUBackend extends Backend {
 
 		const parameters = this.parameters;
 
+		if ( parameters.forceWebGL === true ) {
+
+			throw new Error( 'THREE.WebGPUBackend: WebGL 2 backend requested via "forceWebGL".' );
+
+		}
+
 		// create the device if it is not passed with parameters
 
 		let device;
