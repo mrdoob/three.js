@@ -3,8 +3,10 @@ import { addMethodChaining, nodeObject, vec4 } from '../tsl/TSLCore.js';
 import { rendererReference } from '../accessors/RendererReferenceNode.js';
 
 import { NoToneMapping } from '../../constants.js';
-import { hash } from '../core/NodeUtils.js';
+import { hashArray } from '../core/NodeUtils.js';
 import { error } from '../../utils.js';
+
+const _scratchArray1 = new Array( 1 );
 
 /**
  * This node represents a tone mapping operation.
@@ -64,7 +66,9 @@ class ToneMappingNode extends TempNode {
 	 */
 	customCacheKey() {
 
-		return hash( this._toneMapping );
+		_scratchArray1[ 0 ] = this._toneMapping;
+
+		return hashArray( _scratchArray1 );
 
 	}
 

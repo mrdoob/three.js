@@ -1,7 +1,9 @@
-import { hash, hashString } from '../../nodes/core/NodeUtils.js';
+import { hashArray, hashString } from '../../nodes/core/NodeUtils.js';
 
 let _id = 0;
 const _protoKeysCache = new WeakMap();
+const _scratchArray2 = new Array( 2 );
+const _scratchArray3 = new Array( 3 );
 
 function getKeys( obj ) {
 
@@ -938,17 +940,27 @@ class RenderObject {
 
 		if ( this.camera.isArrayCamera ) {
 
-			cacheKey = hash( cacheKey, this.camera.cameras.length );
+			_scratchArray2[ 0 ] = cacheKey;
+			_scratchArray2[ 1 ] = this.camera.cameras.length;
+
+			cacheKey = hashArray( _scratchArray2 );
 
 		}
 
 		if ( this.object.receiveShadow ) {
 
-			cacheKey = hash( cacheKey, 1 );
+			_scratchArray2[ 0 ] = cacheKey;
+			_scratchArray2[ 1 ] = 1;
+
+			cacheKey = hashArray( _scratchArray2 );
 
 		}
 
-		cacheKey = hash( cacheKey, this.renderer.contextNode.id, this.renderer.contextNode.version );
+		_scratchArray3[ 0 ] = cacheKey;
+		_scratchArray3[ 1 ] = this.renderer.contextNode.id;
+		_scratchArray3[ 2 ] = this.renderer.contextNode.version;
+
+		cacheKey = hashArray( _scratchArray3 );
 
 		return cacheKey;
 
