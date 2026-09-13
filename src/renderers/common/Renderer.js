@@ -662,14 +662,14 @@ class Renderer {
 		this._compilationPromises = null;
 
 		/**
-		 * Whether the renderer is currently precompiling a render object in
-		 * `compileAsync()`.
+		 * The state of the current precompilation in `compileAsync()`.
+		 * `null` when the renderer is not precompiling.
 		 *
 		 * @private
-		 * @type {boolean}
-		 * @default false
+		 * @type {?Object}
+		 * @default null
 		 */
-		this._isPreCompiling = false;
+		this._precompilationState = null;
 
 		/**
 		 * When an override material is in use, this property points to the current
@@ -930,8 +930,17 @@ class Renderer {
 		const outputRenderTarget = this._renderTarget || this._outputRenderTarget;
 		const useXRCamera = this.xr.isPresenting === true && this.isOutputTarget;
 		const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : outputRenderTarget;
-		const renderContext = this._renderContexts.get( renderTarget, this._mrt );
+
+		const activeCubeFace = this._activeCubeFace;
 		const activeMipmapLevel = this._activeMipmapLevel;
+
+		// a state snapshot is taken once at the beginning and reapplied every time precompilation continues
+
+		const precompilationState = { useFrameBufferTarget, renderTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel };
+
+		this._beginPreCompile( precompilationState );
+
+		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth );
 
 		const compilationPromises = [];
 
@@ -1052,40 +1061,51 @@ class Renderer {
 		this._handleObjectFunction = previousHandleObjectFunction;
 		this._compilationPromises = previousCompilationPromises;
 
+		this._finishPreCompile();
+
 		// Process compilation work items sequentially to avoid freezing
 		// Yields between objects to keep animation smooth
 
 		const total = compilationPromises.length;
 		let loaded = 0;
 
+		const yieldPreCompile = async () => {
+
+			this._finishPreCompile();
+
+			await yieldToMain();
+
+			this._beginPreCompile( precompilationState );
+
+		};
+
 		for ( const item of compilationPromises ) {
+
+			const pipelinePromises = [];
 
 			const renderObject = this._objects.get( item.object, item.material, item.scene, item.camera, item.lightsNode, item.renderContext, item.clippingContext, item.passId );
 			renderObject.drawRange = item.object.geometry.drawRange;
 			renderObject.group = item.group;
 
-			// Use async node building to yield to main thread
-			await this._nodes.getForRenderAsync( renderObject );
+			this._beginPreCompile( precompilationState );
 
-			this._isPreCompiling = true; // note: no awaits are allowed when this flag is true otherwise the state leaks outside of this method
+			await this._nodes.getForRenderAsync( renderObject, yieldPreCompile );
 			this._nodes.updateBefore( renderObject );
 			this._geometries.updateForRender( renderObject );
 			this._nodes.updateForRender( renderObject );
 			this._bindings.updateForRender( renderObject );
-			this._isPreCompiling = false;
-
-			// Wait for pipeline creation
-			const pipelinePromises = [];
 			this._pipelines.getForRender( renderObject, pipelinePromises );
+			this._nodes.updateAfter( renderObject );
+
+			this._finishPreCompile();
+
 			if ( pipelinePromises.length > 0 ) {
+
+				// Wait for pipeline creation
 
 				await Promise.all( pipelinePromises );
 
 			}
-
-			this._isPreCompiling = true;
-			this._nodes.updateAfter( renderObject );
-			this._isPreCompiling = false;
 
 			loaded ++;
 
@@ -1099,6 +1119,43 @@ class Renderer {
 			await yieldToMain();
 
 		}
+
+	}
+
+	/**
+	 * Sets up the renderer state for precompiling in `compileAsync()`.
+	 * The state must be restored with `_finishPreCompile()` before yielding to the main thread,
+	 * otherwise it leaks into renders executed in the meantime.
+	 *
+	 * @private
+	 * @param {Object} precompilationState - The precompilation state.
+	 */
+	_beginPreCompile( precompilationState ) {
+
+		const { useFrameBufferTarget, renderTarget } = precompilationState;
+
+		if ( useFrameBufferTarget === true ) this.setRenderTarget( renderTarget );
+
+		this._callDepth ++;
+
+		this._precompilationState = precompilationState;
+
+	}
+
+	/**
+	 * Restores the renderer state after precompiling in `compileAsync()`.
+	 *
+	 * @private
+	 */
+	_finishPreCompile() {
+
+		const { useFrameBufferTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel } = this._precompilationState;
+
+		if ( useFrameBufferTarget === true ) this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
+
+		this._callDepth --;
+
+		this._precompilationState = null;
 
 	}
 

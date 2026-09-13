@@ -3305,9 +3305,10 @@ class NodeBuilder {
 	 * Async version of build() that yields to main thread between shader stages.
 	 * Use this in compileAsync() to prevent blocking the main thread.
 	 *
+	 * @param {Function} [yieldFn=yieldToMain] - The function used to yield to the main thread.
 	 * @return {Promise<NodeBuilder>} A promise that resolves to this node builder.
 	 */
-	async buildAsync() {
+	async buildAsync( yieldFn = yieldToMain ) {
 
 		this.prebuild();
 
@@ -3346,7 +3347,7 @@ class NodeBuilder {
 				}
 
 				// Yield to main thread after each shader stage to prevent blocking
-				await yieldToMain();
+				await yieldFn();
 
 			}
 

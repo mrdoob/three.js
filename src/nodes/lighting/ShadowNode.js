@@ -793,7 +793,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		// do not render shadow maps during precompilation
 
-		if ( frame.renderer._isPreCompiling === true ) return;
+		if ( frame.renderer._precompilationState !== null ) return;
 
 		const { shadow } = this;
 
