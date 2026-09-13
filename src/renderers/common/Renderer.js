@@ -288,9 +288,15 @@ class Renderer {
 		 * @private
 		 * @type {CanvasTarget}
 		 */
-		this._canvasTarget = new CanvasTarget( backend.getDomElement() );
-		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
-		this._canvasTarget.isDefaultCanvasTarget = true;
+		this._canvasTarget = null;
+
+		if ( parameters.device === undefined ) {
+
+			this._canvasTarget = new CanvasTarget( backend.getDomElement() );
+			this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
+			this._canvasTarget.isDefaultCanvasTarget = true;
+
+		}
 
 		/**
 		 * The inspector provides information about the internal renderer state.
@@ -1562,7 +1568,7 @@ class Renderer {
 
 		if ( this.needsFrameBufferTarget === false ) return null;
 
-		const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
+		const { width, height } = this._outputRenderTarget || this.getDrawingBufferSize( _drawingBufferSize );
 		const { depth, stencil } = this;
 
 		// TODO: Unify CanvasTarget and OutputRenderTarget
@@ -1770,19 +1776,20 @@ class Renderer {
 
 		const canvasTarget = this._canvasTarget;
 
-		let viewport = canvasTarget._viewport;
-		let scissor = canvasTarget._scissor;
-		let pixelRatio = canvasTarget._pixelRatio;
+		const viewport = renderTarget ? renderTarget.viewport : canvasTarget._viewport;
+		const scissor = renderTarget ? renderTarget.scissor : canvasTarget._scissor;
+		const scissorTest = renderTarget ? renderTarget.scissorTest : canvasTarget._scissorTest;
+		const pixelRatio = renderTarget ? 1 : canvasTarget._pixelRatio;
 
 		if ( renderTarget !== null ) {
 
-			viewport = renderTarget.viewport;
-			scissor = renderTarget.scissor;
-			pixelRatio = 1;
+			_drawingBufferSize.set( renderTarget.width, renderTarget.height );
+
+		} else {
+
+			this.getDrawingBufferSize( _drawingBufferSize );
 
 		}
-
-		this.getDrawingBufferSize( _drawingBufferSize );
 
 		_screen.set( 0, 0, _drawingBufferSize.width, _drawingBufferSize.height );
 
@@ -1797,7 +1804,7 @@ class Renderer {
 		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
 
 		renderContext.scissorValue.copy( scissor ).multiplyScalar( pixelRatio ).floor();
-		renderContext.scissor = canvasTarget._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
+		renderContext.scissor = scissorTest && renderContext.scissorValue.equals( _screen ) === false;
 		renderContext.scissorValue.width >>= activeMipmapLevel;
 		renderContext.scissorValue.height >>= activeMipmapLevel;
 
