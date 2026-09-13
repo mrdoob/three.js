@@ -945,24 +945,32 @@ function formatApiParameters( argsText ) {
 function parseApiSignature( rawSigText ) {
 
 	const sigText = rawSigText.trim();
-	let funcName = '';
-	let argsText = '';
-	let constName = '';
-	let retType = '';
-	let rowDesc = '';
 
-	const firstParen = sigText.indexOf( '(' );
-	const lastParen = sigText.lastIndexOf( ')' );
+	const funcsRegex = /^(?<funcName>[\w_$.]+)\((?<argsText>.*?)\)(?<funcChain>(?:\.[\w_$]+\(.*?\))+)?/;
+	const chainedFuncRegex = /\.(?<funcName>[\w_$]+)\((?<argsText>.*?)\)/g;
 
-	const prefixBeforeParen = firstParen !== - 1 ? sigText.substring( 0, firstParen ).trim() : '';
-	const isFunction = firstParen !== - 1 && lastParen > firstParen && /^[\.\w$]+$/i.test( prefixBeforeParen );
+	const funcsMatch = sigText.match( funcsRegex );
+	if ( funcsMatch ) {
 
-	if ( isFunction ) {
+		const { funcName, argsText, funcChain } = funcsMatch.groups;
 
-		funcName = prefixBeforeParen;
-		argsText = sigText.substring( firstParen + 1, lastParen ).trim();
+		const funcs = [ { funcName, argsText } ];
 
-		const remainder = sigText.substring( lastParen + 1 ).trim();
+		if ( funcChain ) {
+
+			for ( const match of funcChain.matchAll( chainedFuncRegex ) ) {
+
+				const { funcName, argsText } = match.groups;
+				funcs.push( { funcName, argsText } );
+
+			}
+
+		}
+
+		let retType = '';
+		let rowDesc = '';
+
+		const remainder = sigText.slice( funcsMatch[ 0 ].length ).trim();
 		if ( remainder ) {
 
 			const afterMatch = remainder.match( /^(?:\s*(?::|->)\s*([^—–\-]+?))?(?:\s*[\-—–]\s*([\s\S]*))?$/ );
@@ -975,7 +983,13 @@ function parseApiSignature( rawSigText ) {
 
 		}
 
+		return { funcs, retType, rowDesc };
+
 	} else {
+
+		let constName = '';
+		let retType = '';
+		let rowDesc = '';
 
 		const match = sigText.match( /^([^:—–\-]+?)(?:\s*(?::|->)\s*([^—–\-]+?))?(?:\s*[\-—–]\s*([\s\S]*))?$/ );
 		if ( match ) {
@@ -990,9 +1004,9 @@ function parseApiSignature( rawSigText ) {
 
 		}
 
-	}
+		return { constName, retType, rowDesc };
 
-	return { funcName, argsText, constName, retType, rowDesc };
+	}
 
 }
 
@@ -1010,26 +1024,40 @@ function renderSingleApiCard( signature, body ) {
 	let sigHtml = '';
 	let paramsHtml = '';
 
-	if ( parsedSig.funcName ) {
+	if ( parsedSig.funcs ) {
 
-		const argsHtml = formatSignatureArgs( parsedSig.argsText );
-		const funcNameHtml = formatApiFunctionName( parsedSig.funcName );
+		const _paramsHtml = [];
+		const _sigHtml = [];
 
-		if ( argsHtml ) {
+		for ( let i = 0; i < parsedSig.funcs.length; i ++ ) {
 
-			sigHtml = `<div class="tsl-api-sig-left"><code>${funcNameHtml}<span class="tsl-sig-paren">( </span>${argsHtml}<span class="tsl-sig-paren"> )</span></code></div>`;
+			const { funcName, argsText } = parsedSig.funcs[ i ];
 
-		} else {
+			const argsHtml = formatSignatureArgs( argsText );
+			const funcNameHtml = formatApiFunctionName( funcName );
 
-			sigHtml = `<div class="tsl-api-sig-left"><code>${funcNameHtml}<span class="tsl-sig-paren">()</span></code></div>`;
+			const dotPrefix = i > 0 ? '.' : '';
+
+			if ( argsHtml ) {
+
+				_sigHtml.push( `${dotPrefix}${funcNameHtml}<span class="tsl-sig-paren">( </span>${argsHtml}<span class="tsl-sig-paren"> )</span>` );
+
+			} else {
+
+				_sigHtml.push( `${dotPrefix}${funcNameHtml}<span class="tsl-sig-paren">()</span>` );
+
+			}
+
+			if ( ! body || ! body.trim() ) {
+
+				_paramsHtml.push( formatApiParameters( argsText ) );
+
+			}
 
 		}
 
-		if ( ! body || ! body.trim() ) {
-
-			paramsHtml = formatApiParameters( parsedSig.argsText );
-
-		}
+		sigHtml = `<div class="tsl-api-sig-left"><code>${ _sigHtml.join( '' ) }</code></div>`;
+		paramsHtml = _paramsHtml.join( '' );
 
 	} else {
 
@@ -1118,114 +1146,15 @@ function renderSingleApiCard( signature, body ) {
 
 function renderApiTableCard( group ) {
 
-	let rowsHtml = '';
 	const isRobustGroup = group.some( block => block.body.trim().length > 0 );
 	const rowClass = isRobustGroup ? 'tsl-api-table-row tsl-api-table-row-robust' : 'tsl-api-table-row';
 
-	for ( const block of group ) {
+	const rowsHtml = group.map( block => {
 
-		const parsedSig = parseApiSignature( block.signature );
-		let returnTypeHtml = '';
+		return renderSingleApiCard( block.signature, block.body )
+			.replace( /^(\s*<div class=").*?(">)/, `$1${ rowClass }$2` );
 
-		if ( parsedSig.retType ) {
-
-			returnTypeHtml = `<div class="tsl-api-sig-right"><span class="tsl-api-return-arrow">:</span> ${formatTypeHtml( parsedSig.retType )}</div>`;
-
-		}
-
-		let sigHtml = '';
-		let paramsHtml = '';
-
-		if ( parsedSig.funcName ) {
-
-			const argsHtml = formatSignatureArgs( parsedSig.argsText );
-			const funcNameHtml = formatApiFunctionName( parsedSig.funcName );
-
-			if ( argsHtml ) {
-
-				sigHtml = `<div class="tsl-api-sig-left"><code>${funcNameHtml}<span class="tsl-sig-paren">( </span>${argsHtml}<span class="tsl-sig-paren"> )</span></code></div>`;
-
-			} else {
-
-				sigHtml = `<div class="tsl-api-sig-left"><code>${funcNameHtml}<span class="tsl-sig-paren">()</span></code></div>`;
-
-			}
-
-			if ( ! block.body || ! block.body.trim() ) {
-
-				paramsHtml = formatApiParameters( parsedSig.argsText );
-
-			}
-
-		} else {
-
-			const constNameHtml = `<span class="tsl-sig-const-name">${parsedSig.constName}</span>`;
-			sigHtml = `<div class="tsl-api-sig-left"><code>${constNameHtml}</code></div>`;
-
-		}
-
-		if ( block.body ) {
-
-			const paramLines = block.body.split( '\n' );
-			for ( let line of paramLines ) {
-
-				line = line.trim();
-				if ( ! line ) continue;
-
-				const paramMatch = line.match( /^[\-\*]\s+\*\*([a-zA-Z0-9_./-]+)\*\*\s*:\s*(?:`([^`]+)`|([^\-—–\n]+?))\s*(?:(?:[\u2014\-–]\s*)([\s\S]*))?$/ );
-				if ( paramMatch ) {
-
-					const name = paramMatch[ 1 ].trim();
-					const type = ( paramMatch[ 2 ] !== undefined ? paramMatch[ 2 ] : ( paramMatch[ 3 ] || '' ) ).trim();
-					const desc = paramMatch[ 4 ] ? paramMatch[ 4 ].trim() : '';
-
-					const parsedDesc = marked.parseInline( desc ).replace( /<code>([^<]+)<\/code>/g, ( m, content ) => {
-
-						const trimmed = content.trim();
-						const isQuoted = /^(&#39;|&apos;|&quot;|&#34;|['"])([\s\S]+)\1$/.test( trimmed );
-						if ( isQuoted ) return `<code><span class="tsl-param-type-string">${content}</span></code>`;
-						const isKeyword = trimmed === 'null' || trimmed === 'true' || trimmed === 'false';
-						if ( isKeyword ) return `<code><span class="tsl-param-type-keyword">${content}</span></code>`;
-						return m;
-
-					} );
-
-					const typeHtml = formatTypeHtml( type );
-
-					paramsHtml += `
-			<div class="tsl-param">
-				<div class="tsl-param-header">
-					<span class="tsl-param-name">${name}</span>
-					${typeHtml}
-				</div>
-				${desc ? `<div class="tsl-param-desc">${parsedDesc}</div>` : ''}
-			</div>`;
-
-				}
-
-			}
-
-		}
-
-		let rowDesc = parsedSig.rowDesc;
-		if ( rowDesc ) {
-
-			rowDesc = rowDesc.replace( /^[\-\u2014\u2013\s]*/, '' ).trim();
-			rowDesc = rowDesc.replace( /`([^`]+)`/g, '<code>$1</code>' );
-
-		}
-
-		rowsHtml += `
-		<div class="${rowClass}">
-			<div class="tsl-api-signature">
-				${sigHtml}
-				${returnTypeHtml}
-				${rowDesc ? `<div class="tsl-api-sig-desc">${rowDesc}</div>` : ''}
-			</div>
-			${paramsHtml ? `<div class="tsl-params">${paramsHtml}</div>` : ''}
-		</div>`;
-
-	}
+	} ).join( '' );
 
 	const rawCardHtml = `
 <div class="tsl-api-table-card">
