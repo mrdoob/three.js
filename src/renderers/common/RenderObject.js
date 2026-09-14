@@ -1,7 +1,8 @@
-import { hash, hashString } from '../../nodes/core/NodeUtils.js';
+import { hashArray, hashString } from '../../nodes/core/NodeUtils.js';
 
 let _id = 0;
 const _protoKeysCache = new WeakMap();
+const _cacheKeyValues = [ 0, 0, 0, 0, 0 ];
 
 function getKeys( obj ) {
 
@@ -925,32 +926,24 @@ class RenderObject {
 	 */
 	getDynamicCacheKey() {
 
-		let cacheKey = 0;
+		let environmentKey = 0;
 
 		// `Nodes.getCacheKey()` returns an environment cache key which is not relevant when
 		// the renderer is inside a shadow pass.
 
 		if ( this.material.isShadowPassMaterial !== true ) {
 
-			cacheKey = this._nodes.getCacheKey( this.scene, this.lightsNode );
+			environmentKey = this._nodes.getCacheKey( this.scene, this.lightsNode );
 
 		}
 
-		if ( this.camera.isArrayCamera ) {
+		_cacheKeyValues[ 0 ] = environmentKey;
+		_cacheKeyValues[ 1 ] = this.camera.isArrayCamera ? this.camera.cameras.length : 0;
+		_cacheKeyValues[ 2 ] = this.object.receiveShadow ? 1 : 0;
+		_cacheKeyValues[ 3 ] = this.renderer.contextNode.id;
+		_cacheKeyValues[ 4 ] = this.renderer.contextNode.version;
 
-			cacheKey = hash( cacheKey, this.camera.cameras.length );
-
-		}
-
-		if ( this.object.receiveShadow ) {
-
-			cacheKey = hash( cacheKey, 1 );
-
-		}
-
-		cacheKey = hash( cacheKey, this.renderer.contextNode.id, this.renderer.contextNode.version );
-
-		return cacheKey;
+		return hashArray( _cacheKeyValues );
 
 	}
 
