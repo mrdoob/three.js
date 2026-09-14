@@ -322,25 +322,28 @@ const alphaLine = Fn( ( { material, renderer } ) => {
 
 	if ( useWorldUnits ) {
 
-		// Find the closest points on the view ray and the line segment
-		const rayEnd = worldPos.xyz.normalize().mul( 1e5 );
-		const lineDir = worldEnd.sub( worldStart );
-		const params = closestLineToLine( { p1: worldStart, p2: worldEnd, p3: vec3( 0.0, 0.0, 0.0 ), p4: rayEnd } );
+		const len = float().toVar();
 
-		const p1 = worldStart.add( lineDir.mul( params.x ) );
-		const p2 = rayEnd.mul( params.y );
-		const delta = p1.sub( p2 );
-		const len = delta.length().toVar();
-
-		const orthographic = cameraProjectionMatrix.element( 2 ).element( 3 ).notEqual( - 1.0 );
+		const orthographic = cameraProjectionMatrix.element( 2 ).element( 3 ).notEqual( - 1.0 ).toConst();
 
 		If( orthographic, () => {
 
-			// Parallel view rays reduce the distance calculation to camera-space XY.
-			const lineDirXY = worldEnd.xy.sub( worldStart.xy );
-			const lengthSq = lineDirXY.dot( lineDirXY );
-			const t = lengthSq.greaterThan( 0.0 ).select( worldPos.xy.sub( worldStart.xy ).dot( lineDirXY ).div( lengthSq ).clamp(), 0.0 );
-			len.assign( worldPos.xy.sub( worldStart.xy.add( lineDirXY.mul( t ) ) ).length() );
+			// View rays are parallel to the z axis so the distance reduces to camera-space XY
+			const lineDir = worldEnd.xy.sub( worldStart.xy );
+			const t = worldPos.xy.sub( worldStart.xy ).dot( lineDir ).div( lineDir.dot( lineDir ) ).clamp();
+			len.assign( worldStart.xy.add( lineDir.mul( t ) ).sub( worldPos.xy ).length() );
+
+		} ).Else( () => {
+
+			// Find the closest points on the view ray and the line segment
+			const rayEnd = worldPos.xyz.normalize().mul( 1e5 );
+			const lineDir = worldEnd.sub( worldStart );
+			const params = closestLineToLine( { p1: worldStart, p2: worldEnd, p3: vec3( 0.0, 0.0, 0.0 ), p4: rayEnd } );
+
+			const p1 = worldStart.add( lineDir.mul( params.x ) );
+			const p2 = rayEnd.mul( params.y );
+			const delta = p1.sub( p2 );
+			len.assign( delta.length() );
 
 		} );
 
