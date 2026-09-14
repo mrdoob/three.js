@@ -12944,16 +12944,6 @@ class TextureNode extends UniformNode {
 		this.updateMatrix = false;
 
 		/**
-		 * By default the `update()` method is not executed. Depending on
-		 * whether a uv transformation matrix and/or flipY is applied, `update()`
-		 * is executed per object.
-		 *
-		 * @type {string}
-		 * @default 'none'
-		 */
-		this.updateType = NodeUpdateType.NONE;
-
-		/**
 		 * The reference node.
 		 *
 		 * @type {?Node}
@@ -13098,9 +13088,23 @@ class TextureNode extends UniformNode {
 	 */
 	getTransformedUV( uvNode ) {
 
-		if ( this._matrixUniform === null ) this._matrixUniform = uniform( this.value.matrix );
+		const baseNode = this.getBase();
 
-		return this._matrixUniform.mul( vec3( uvNode, 1 ) ).xy;
+		if ( baseNode._matrixUniform === null ) {
+
+			baseNode._matrixUniform = uniform( baseNode.value.matrix ).onObjectUpdate( () => {
+
+				const texture = baseNode.value;
+
+				if ( texture.matrixAutoUpdate === true ) texture.updateMatrix();
+
+				return texture.matrix;
+
+			} );
+
+		}
+
+		return baseNode._matrixUniform.mul( vec3( uvNode, 1 ) ).xy;
 
 	}
 
@@ -13130,17 +13134,29 @@ class TextureNode extends UniformNode {
 
 		if ( builder.isFlipY() ) {
 
-			if ( this._flipYUniform === null ) this._flipYUniform = uniform( false );
+			const baseNode = this.getBase();
+
+			if ( baseNode._flipYUniform === null ) {
+
+				baseNode._flipYUniform = uniform( false ).onObjectUpdate( () => {
+
+					const texture = baseNode.value;
+
+					return ( texture.image instanceof ImageBitmap && texture.flipY === true ) || texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true || texture.isDepthTexture === true;
+
+				} );
+
+			}
 
 			uvNode = uvNode.toVar();
 
 			if ( this.sampler ) {
 
-				uvNode = this._flipYUniform.select( uvNode.flipY(), uvNode );
+				uvNode = baseNode._flipYUniform.select( uvNode.flipY(), uvNode );
 
 			} else {
 
-				uvNode = this._flipYUniform.select( uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( uvNode.y ).sub( 1 ) ), uvNode );
+				uvNode = baseNode._flipYUniform.select( uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( uvNode.y ).sub( 1 ) ), uvNode );
 
 			}
 
@@ -13191,12 +13207,6 @@ class TextureNode extends UniformNode {
 			}
 
 			uvNode = this.setupUV( builder, uvNode );
-
-			//
-
-			this.updateType = ( this._matrixUniform !== null || this._flipYUniform !== null ) ? NodeUpdateType.OBJECT : NodeUpdateType.NONE;
-
-			//
 
 			return uvNode;
 
@@ -13400,7 +13410,9 @@ class TextureNode extends UniformNode {
 				const gradSnippet = gradNode ? [ gradNode[ 0 ].build( builder, 'vec2' ), gradNode[ 1 ].build( builder, 'vec2' ) ] : null;
 				const gatherSnippet = gatherNode ? gatherNode.build( builder, 'int' ) : null;
 				const offsetSnippet = offsetNode ? this.generateOffset( builder, offsetNode ) : null;
-				const flipYSnippet = this._flipYUniform ? this._flipYUniform.build( builder, 'bool' ) : null;
+
+				const flipYUniform = this.getBase()._flipYUniform;
+				const flipYSnippet = flipYUniform ? flipYUniform.build( builder, 'bool' ) : null;
 
 				let finalDepthSnippet = depthSnippet;
 
@@ -13704,7 +13716,6 @@ class TextureNode extends UniformNode {
 		data.value = this.value.toJSON( data.meta ).uuid;
 		data.sampler = this.sampler;
 		data.updateMatrix = this.updateMatrix;
-		data.updateType = this.updateType;
 
 	}
 
@@ -13715,35 +13726,6 @@ class TextureNode extends UniformNode {
 		this.value = data.meta.textures[ data.value ];
 		this.sampler = data.sampler;
 		this.updateMatrix = data.updateMatrix;
-		this.updateType = data.updateType;
-
-	}
-
-	/**
-	 * The update is used to implement the update of the uv transformation matrix.
-	 */
-	update() {
-
-		const texture = this.value;
-		const matrixUniform = this._matrixUniform;
-
-		if ( matrixUniform !== null ) matrixUniform.value = texture.matrix;
-
-		if ( texture.matrixAutoUpdate === true ) {
-
-			texture.updateMatrix();
-
-		}
-
-		//
-
-		const flipYUniform = this._flipYUniform;
-
-		if ( flipYUniform !== null ) {
-
-			flipYUniform.value = ( ( texture.image instanceof ImageBitmap && texture.flipY === true ) || texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true || texture.isDepthTexture === true );
-
-		}
 
 	}
 
@@ -23263,7 +23245,7 @@ const mvpLine = Fn( ( { material } ) => {
 		// get the offset direction as perpendicular to the view vector
 
 		const worldDir = end.xyz.sub( start.xyz ).normalize();
-		const tmpFwd = mix( start.xyz, end.xyz, 0.5 ).normalize();
+		const tmpFwd = perspective.select( mix( start.xyz, end.xyz, 0.5 ).normalize(), vec3( 0.0, 0.0, -1 ) );
 		const worldUp = worldDir.cross( tmpFwd ).normalize();
 		const worldFwd = worldDir.cross( worldUp );
 
@@ -23376,15 +23358,31 @@ const alphaLine = Fn( ( { material, renderer } ) => {
 
 	if ( useWorldUnits ) {
 
-		// Find the closest points on the view ray and the line segment
-		const rayEnd = worldPos.xyz.normalize().mul( 1e5 );
-		const lineDir = worldEnd.sub( worldStart );
-		const params = closestLineToLine( { p1: worldStart, p2: worldEnd, p3: vec3( 0.0, 0.0, 0.0 ), p4: rayEnd } );
+		const len = float().toVar();
 
-		const p1 = worldStart.add( lineDir.mul( params.x ) );
-		const p2 = rayEnd.mul( params.y );
-		const delta = p1.sub( p2 );
-		const len = delta.length();
+		const orthographic = cameraProjectionMatrix.element( 2 ).element( 3 ).notEqual( -1 ).toConst();
+
+		If( orthographic, () => {
+
+			// View rays are parallel to the z axis so the distance reduces to camera-space XY
+			const lineDir = worldEnd.xy.sub( worldStart.xy );
+			const t = worldPos.xy.sub( worldStart.xy ).dot( lineDir ).div( lineDir.dot( lineDir ) ).clamp();
+			len.assign( worldStart.xy.add( lineDir.mul( t ) ).sub( worldPos.xy ).length() );
+
+		} ).Else( () => {
+
+			// Find the closest points on the view ray and the line segment
+			const rayEnd = worldPos.xyz.normalize().mul( 1e5 );
+			const lineDir = worldEnd.sub( worldStart );
+			const params = closestLineToLine( { p1: worldStart, p2: worldEnd, p3: vec3( 0.0, 0.0, 0.0 ), p4: rayEnd } );
+
+			const p1 = worldStart.add( lineDir.mul( params.x ) );
+			const p2 = rayEnd.mul( params.y );
+			const delta = p1.sub( p2 );
+			len.assign( delta.length() );
+
+		} );
+
 		const norm = len.div( materialLineWidth );
 
 		if ( ! useDash ) {
@@ -30568,6 +30566,7 @@ class ChainMap {
 
 let _id$a = 0;
 const _protoKeysCache = new WeakMap();
+const _cacheKeyValues$1 = [ 0, 0, 0, 0, 0 ];
 
 function getKeys( obj ) {
 
@@ -31491,32 +31490,24 @@ class RenderObject {
 	 */
 	getDynamicCacheKey() {
 
-		let cacheKey = 0;
+		let environmentKey = 0;
 
 		// `Nodes.getCacheKey()` returns an environment cache key which is not relevant when
 		// the renderer is inside a shadow pass.
 
 		if ( this.material.isShadowPassMaterial !== true ) {
 
-			cacheKey = this._nodes.getCacheKey( this.scene, this.lightsNode );
+			environmentKey = this._nodes.getCacheKey( this.scene, this.lightsNode );
 
 		}
 
-		if ( this.camera.isArrayCamera ) {
+		_cacheKeyValues$1[ 0 ] = environmentKey;
+		_cacheKeyValues$1[ 1 ] = this.camera.isArrayCamera ? this.camera.cameras.length : 0;
+		_cacheKeyValues$1[ 2 ] = this.object.receiveShadow ? 1 : 0;
+		_cacheKeyValues$1[ 3 ] = this.renderer.contextNode.id;
+		_cacheKeyValues$1[ 4 ] = this.renderer.contextNode.version;
 
-			cacheKey = hash$1( cacheKey, this.camera.cameras.length );
-
-		}
-
-		if ( this.object.receiveShadow ) {
-
-			cacheKey = hash$1( cacheKey, 1 );
-
-		}
-
-		cacheKey = hash$1( cacheKey, this.renderer.contextNode.id, this.renderer.contextNode.version );
-
-		return cacheKey;
+		return hashArray( _cacheKeyValues$1 );
 
 	}
 
@@ -47699,7 +47690,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		// do not render shadow maps during precompilation
 
-		if ( frame.renderer._isPreCompiling === true ) return;
+		if ( frame.renderer._precompilationState !== null ) return;
 
 		const { shadow } = this;
 
@@ -56172,9 +56163,10 @@ class NodeBuilder {
 	 * Async version of build() that yields to main thread between shader stages.
 	 * Use this in compileAsync() to prevent blocking the main thread.
 	 *
+	 * @param {Function} [yieldFn=yieldToMain] - The function used to yield to the main thread.
 	 * @return {Promise<NodeBuilder>} A promise that resolves to this node builder.
 	 */
-	async buildAsync() {
+	async buildAsync( yieldFn = yieldToMain ) {
 
 		this.prebuild();
 
@@ -56213,7 +56205,7 @@ class NodeBuilder {
 				}
 
 				// Yield to main thread after each shader stage to prevent blocking
-				await yieldToMain();
+				await yieldFn();
 
 			}
 
@@ -57895,10 +57887,10 @@ class NodeManager extends DataMap {
 	 * Returns a node builder state for the given render object.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
-	 * @param {boolean} [useAsync=false] - Whether to use async build with yielding.
+	 * @param {?Function} [yieldFn=null] - If set, the build is async and yields to the main thread via this function.
 	 * @return {NodeBuilderState|Promise<NodeBuilderState>} The node builder state (or Promise if async).
 	 */
-	getForRender( renderObject, useAsync = false ) {
+	getForRender( renderObject, yieldFn = null ) {
 
 		const renderObjectData = this.get( renderObject );
 
@@ -57920,9 +57912,9 @@ class NodeManager extends DataMap {
 
 					try {
 
-						if ( useAsync ) {
+						if ( yieldFn !== null ) {
 
-							await nodeBuilder.buildAsync();
+							await nodeBuilder.buildAsync( yieldFn );
 
 						} else {
 
@@ -57934,9 +57926,9 @@ class NodeManager extends DataMap {
 
 						nodeBuilder = this._createNodeBuilder( renderObject, new NodeMaterial() );
 
-						if ( useAsync ) {
+						if ( yieldFn !== null ) {
 
-							await nodeBuilder.buildAsync();
+							await nodeBuilder.buildAsync( yieldFn );
 
 						} else {
 
@@ -57952,7 +57944,7 @@ class NodeManager extends DataMap {
 
 				};
 
-				if ( useAsync ) {
+				if ( yieldFn !== null ) {
 
 					return buildNodeBuilder().then( ( nodeBuilder ) => {
 
@@ -58016,11 +58008,12 @@ class NodeManager extends DataMap {
 	 * Use this in compileAsync() to prevent blocking the main thread.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
+	 * @param {Function} [yieldFn=yieldToMain] - The function used to yield to the main thread.
 	 * @return {Promise<NodeBuilderState>} A promise that resolves to the node builder state.
 	 */
-	getForRenderAsync( renderObject ) {
+	getForRenderAsync( renderObject, yieldFn = yieldToMain ) {
 
-		const result = this.getForRender( renderObject, true );
+		const result = this.getForRender( renderObject, yieldFn );
 
 		// Ensure we always return a Promise (cache hit returns nodeBuilderState directly)
 		if ( result.then ) {
@@ -62488,14 +62481,14 @@ class Renderer {
 		this._compilationPromises = null;
 
 		/**
-		 * Whether the renderer is currently precompiling a render object in
-		 * `compileAsync()`.
+		 * The state of the current precompilation in `compileAsync()`.
+		 * `null` when the renderer is not precompiling.
 		 *
 		 * @private
-		 * @type {boolean}
-		 * @default false
+		 * @type {?Object}
+		 * @default null
 		 */
-		this._isPreCompiling = false;
+		this._precompilationState = null;
 
 		/**
 		 * When an override material is in use, this property points to the current
@@ -62756,8 +62749,17 @@ class Renderer {
 		const outputRenderTarget = this._renderTarget || this._outputRenderTarget;
 		const useXRCamera = this.xr.isPresenting === true && this.isOutputTarget;
 		const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : outputRenderTarget;
-		const renderContext = this._renderContexts.get( renderTarget, this._mrt );
+
+		const activeCubeFace = this._activeCubeFace;
 		const activeMipmapLevel = this._activeMipmapLevel;
+
+		// a state snapshot is taken once at the beginning and reapplied every time precompilation continues
+
+		const precompilationState = { useFrameBufferTarget, renderTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel };
+
+		this._beginPreCompile( precompilationState );
+
+		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth );
 
 		const compilationPromises = [];
 
@@ -62878,40 +62880,51 @@ class Renderer {
 		this._handleObjectFunction = previousHandleObjectFunction;
 		this._compilationPromises = previousCompilationPromises;
 
+		this._finishPreCompile();
+
 		// Process compilation work items sequentially to avoid freezing
 		// Yields between objects to keep animation smooth
 
 		const total = compilationPromises.length;
 		let loaded = 0;
 
+		const yieldPreCompile = async () => {
+
+			this._finishPreCompile();
+
+			await yieldToMain();
+
+			this._beginPreCompile( precompilationState );
+
+		};
+
 		for ( const item of compilationPromises ) {
+
+			const pipelinePromises = [];
 
 			const renderObject = this._objects.get( item.object, item.material, item.scene, item.camera, item.lightsNode, item.renderContext, item.clippingContext, item.passId );
 			renderObject.drawRange = item.object.geometry.drawRange;
 			renderObject.group = item.group;
 
-			// Use async node building to yield to main thread
-			await this._nodes.getForRenderAsync( renderObject );
+			this._beginPreCompile( precompilationState );
 
-			this._isPreCompiling = true; // note: no awaits are allowed when this flag is true otherwise the state leaks outside of this method
+			await this._nodes.getForRenderAsync( renderObject, yieldPreCompile );
 			this._nodes.updateBefore( renderObject );
 			this._geometries.updateForRender( renderObject );
 			this._nodes.updateForRender( renderObject );
 			this._bindings.updateForRender( renderObject );
-			this._isPreCompiling = false;
-
-			// Wait for pipeline creation
-			const pipelinePromises = [];
 			this._pipelines.getForRender( renderObject, pipelinePromises );
+			this._nodes.updateAfter( renderObject );
+
+			this._finishPreCompile();
+
 			if ( pipelinePromises.length > 0 ) {
+
+				// Wait for pipeline creation
 
 				await Promise.all( pipelinePromises );
 
 			}
-
-			this._isPreCompiling = true;
-			this._nodes.updateAfter( renderObject );
-			this._isPreCompiling = false;
 
 			loaded ++;
 
@@ -62925,6 +62938,43 @@ class Renderer {
 			await yieldToMain();
 
 		}
+
+	}
+
+	/**
+	 * Sets up the renderer state for precompiling in `compileAsync()`.
+	 * The state must be restored with `_finishPreCompile()` before yielding to the main thread,
+	 * otherwise it leaks into renders executed in the meantime.
+	 *
+	 * @private
+	 * @param {Object} precompilationState - The precompilation state.
+	 */
+	_beginPreCompile( precompilationState ) {
+
+		const { useFrameBufferTarget, renderTarget } = precompilationState;
+
+		if ( useFrameBufferTarget === true ) this.setRenderTarget( renderTarget );
+
+		this._callDepth ++;
+
+		this._precompilationState = precompilationState;
+
+	}
+
+	/**
+	 * Restores the renderer state after precompiling in `compileAsync()`.
+	 *
+	 * @private
+	 */
+	_finishPreCompile() {
+
+		const { useFrameBufferTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel } = this._precompilationState;
+
+		if ( useFrameBufferTarget === true ) this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
+
+		this._callDepth --;
+
+		this._precompilationState = null;
 
 	}
 
