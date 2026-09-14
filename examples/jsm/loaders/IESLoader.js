@@ -339,8 +339,7 @@ function IESLamp( text ) {
 
 		for ( let j = 0; j < _self.numVerAngles; ++ j ) {
 
-			_self.candelaValues[ i ][ j ] *= _self.candelaValues[ i ][ j ] * _self.multiplier
-				* _self.ballFactor * _self.blpFactor;
+			_self.candelaValues[ i ][ j ] *= _self.multiplier * _self.ballFactor * _self.blpFactor;
 
 		}
 
