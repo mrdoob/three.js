@@ -89,7 +89,8 @@
 					sky.showSunDisc.value = effectController.showSunDisc;
 
 					const phi = THREE.MathUtils.degToRad( 90 - effectController.elevation );
-					const theta = THREE.MathUtils.degToRad( effectController.azimuth );
+					// -Z is north and azimuth increases clockwise.
+					const theta = THREE.MathUtils.degToRad( 180 - effectController.azimuth );
 
 					sun.setFromSphericalCoords( 1, phi, theta );
 

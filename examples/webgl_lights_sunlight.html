@@ -77,7 +77,11 @@
 
 			function updateSun() {
 
-				sunLight.position.setFromSphericalCoords( 1, THREE.MathUtils.degToRad( 90 - params.elevation ), THREE.MathUtils.degToRad( params.azimuth ) );
+				const phi = THREE.MathUtils.degToRad( 90 - params.elevation );
+				// -Z is north and azimuth increases clockwise.
+				const theta = THREE.MathUtils.degToRad( 180 - params.azimuth );
+
+				sunLight.position.setFromSphericalCoords( 1, phi, theta );
 
 				// the sun light warms up and fades towards the horizon
 
