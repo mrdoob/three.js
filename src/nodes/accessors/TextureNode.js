@@ -593,6 +593,12 @@ class TextureNode extends UniformNode {
 
 				const { uvNode, levelNode, biasNode, compareNode, compareStepNode, depthNode, gradNode, gatherNode, offsetNode } = properties;
 
+				if ( compareNode !== null ) {
+
+					this.getSharedNode( builder )._samplerComparison = true;
+
+				}
+
 				const uvSnippet = this.generateUV( builder, uvNode );
 				const levelSnippet = levelNode ? levelNode.build( builder, 'float' ) : null;
 				const biasSnippet = biasNode ? biasNode.build( builder, 'float' ) : null;
