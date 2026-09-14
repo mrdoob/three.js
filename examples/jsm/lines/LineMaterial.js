@@ -349,25 +349,26 @@ ShaderLib[ 'line' ] = {
 
 			#ifdef WORLD_UNITS
 
-				// Find the closest points on the view ray and the line segment
-				vec3 rayEnd = normalize( worldPos.xyz ) * 1e5;
-				vec3 lineDir = worldEnd - worldStart;
-				vec2 params = closestLineToLine( worldStart, worldEnd, vec3( 0.0, 0.0, 0.0 ), rayEnd );
-
-				vec3 p1 = worldStart + lineDir * params.x;
-				vec3 p2 = rayEnd * params.y;
-				vec3 delta = p1 - p2;
-				float len = length( delta );
+				float len;
 
 				if ( isOrthographic ) {
 
-					// Parallel view rays reduce the distance calculation to camera-space XY.
-					vec2 lineDirXY = worldEnd.xy - worldStart.xy;
-					float lengthSq = dot( lineDirXY, lineDirXY );
-					float t = lengthSq > 0.0
-						? clamp( dot( worldPos.xy - worldStart.xy, lineDirXY ) / lengthSq, 0.0, 1.0 )
-						: 0.0;
-					len = length( worldPos.xy - ( worldStart.xy + t * lineDirXY ) );
+					// View rays are parallel to the z axis so the distance reduces to camera-space XY
+					vec2 lineDir = worldEnd.xy - worldStart.xy;
+					float t = clamp( dot( worldPos.xy - worldStart.xy, lineDir ) / dot( lineDir, lineDir ), 0.0, 1.0 );
+					len = length( worldStart.xy + lineDir * t - worldPos.xy );
+
+				} else {
+
+					// Find the closest points on the view ray and the line segment
+					vec3 rayEnd = normalize( worldPos.xyz ) * 1e5;
+					vec3 lineDir = worldEnd - worldStart;
+					vec2 params = closestLineToLine( worldStart, worldEnd, vec3( 0.0, 0.0, 0.0 ), rayEnd );
+
+					vec3 p1 = worldStart + lineDir * params.x;
+					vec3 p2 = rayEnd * params.y;
+					vec3 delta = p1 - p2;
+					len = length( delta );
 
 				}
 
