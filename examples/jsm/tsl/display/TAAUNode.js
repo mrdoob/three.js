@@ -502,8 +502,11 @@ class TAAUNode extends TempNode {
 	 */
 	setup( builder ) {
 
-		// build the beauty node first so its `updateBefore()` runs before this one
+		// build the inputs first so their `updateBefore()` runs before this one. The beauty node
+		// comes last since its pass might depend on the depth and velocity pass.
 
+		this.depthNode.build( builder );
+		this.velocityNode.build( builder );
 		this.beautyNode.build( builder );
 
 		if ( builder.renderPipeline && ! builder.context.renderPipelineState.viewOffsetOwner ) {
