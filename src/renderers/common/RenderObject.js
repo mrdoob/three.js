@@ -743,9 +743,9 @@ class RenderObject {
 	 */
 	getMaterialCacheKey() {
 
-		const { object, material, renderer } = this;
+		const { object, material, renderer, scene } = this;
 
-		let cacheKey = material.customProgramCacheKey();
+		let cacheKey = this._nodes.getCustomProgramCacheKey( material, scene );
 
 		for ( const property of getKeys( material ) ) {
 
