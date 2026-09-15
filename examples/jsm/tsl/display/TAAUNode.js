@@ -502,6 +502,10 @@ class TAAUNode extends TempNode {
 	 */
 	setup( builder ) {
 
+		this.depthNode.build( builder );
+		this.velocityNode.build( builder );
+		this.beautyNode.build( builder );
+
 		if ( builder.renderPipeline && ! builder.context.renderPipelineState.viewOffsetOwner ) {
 
 			builder.context.renderPipelineState.viewOffsetOwner = this;
