@@ -163,6 +163,9 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( MathUtils.ceilPowerOfTwo( 1 ), 1, 'Closest higher PoT to 1 is 1' );
 			assert.strictEqual( MathUtils.ceilPowerOfTwo( 3 ), 4, 'Closest higher PoT to 3 is 4' );
 			assert.strictEqual( MathUtils.ceilPowerOfTwo( 4 ), 4, 'Closest higher PoT to 4 is 4' );
+			assert.strictEqual( MathUtils.ceilPowerOfTwo( 2 ** 29 ), 2 ** 29, 'Closest higher PoT to a large PoT is itself' );
+			assert.strictEqual( MathUtils.ceilPowerOfTwo( 2 ** 31 ), 2 ** 31, 'Closest higher PoT to a large PoT is itself' );
+			assert.strictEqual( MathUtils.ceilPowerOfTwo( 2 ** 40 + 1 ), 2 ** 41, 'Closest higher PoT to a large non-PoT' );
 
 		} );
 
@@ -171,6 +174,8 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( MathUtils.floorPowerOfTwo( 1 ), 1, 'Closest lower PoT to 1 is 1' );
 			assert.strictEqual( MathUtils.floorPowerOfTwo( 3 ), 2, 'Closest lower PoT to 3 is 2' );
 			assert.strictEqual( MathUtils.floorPowerOfTwo( 4 ), 4, 'Closest lower PoT to 4 is 4' );
+			assert.strictEqual( MathUtils.floorPowerOfTwo( 2 ** 29 ), 2 ** 29, 'Closest lower PoT to a large PoT is itself' );
+			assert.strictEqual( MathUtils.floorPowerOfTwo( 2 ** 48 - 1 ), 2 ** 47, 'Closest lower PoT to a large non-PoT' );
 
 		} );
 

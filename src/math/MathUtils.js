@@ -299,7 +299,14 @@ function isPowerOfTwo( value ) {
  */
 function ceilPowerOfTwo( value ) {
 
-	return Math.pow( 2, Math.ceil( Math.log( value ) / Math.LN2 ) );
+	let result = 2 ** Math.ceil( Math.log2( value ) );
+
+	// the logarithm is only an approximation so the result can be off by one power of two
+
+	if ( result < value ) result *= 2;
+	else if ( result / 2 >= value ) result /= 2;
+
+	return result;
 
 }
 
@@ -311,7 +318,14 @@ function ceilPowerOfTwo( value ) {
  */
 function floorPowerOfTwo( value ) {
 
-	return Math.pow( 2, Math.floor( Math.log( value ) / Math.LN2 ) );
+	let result = 2 ** Math.floor( Math.log2( value ) );
+
+	// the logarithm is only an approximation so the result can be off by one power of two
+
+	if ( result > value ) result /= 2;
+	else if ( result * 2 <= value ) result *= 2;
+
+	return result;
 
 }
 
