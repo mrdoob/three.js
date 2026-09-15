@@ -280,14 +280,6 @@ class TAAUNode extends TempNode {
 		 */
 		this._previousDepthNode = texture( this._previousDepthRenderTarget.depthTexture );
 
-		/**
-		 * Sync the post processing stack with the TAAU node.
-		 *
-		 * @private
-		 * @type {boolean}
-		 */
-		this._needsPostProcessingSync = false;
-
 	}
 
 	/**
@@ -393,13 +385,7 @@ class TAAUNode extends TempNode {
 		this._cameraWorldMatrixInverse.value.copy( this.camera.matrixWorldInverse );
 		this._cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
 
-		// extract input dimensions from the beauty buffer and output
-		// dimensions from the renderer's drawing buffer
-
-		const beautyRenderTarget = ( this.beautyNode.isRTTNode ) ? this.beautyNode.renderTarget : this.beautyNode.passNode.renderTarget;
-
-		const inputWidth = beautyRenderTarget.texture.width;
-		const inputHeight = beautyRenderTarget.texture.height;
+		// the output dimensions are derived from the renderer's drawing buffer
 
 		const drawingBufferSize = renderer.getDrawingBufferSize( _size );
 		const outputWidth = drawingBufferSize.width;
@@ -437,16 +423,6 @@ class TAAUNode extends TempNode {
 			_quadMesh.name = 'TAAU.seed';
 			_quadMesh.render( renderer );
 			renderer.setRenderTarget( null );
-
-		}
-
-		// must run after needsRestart so it does not affect the seed reset
-
-		if ( this._needsPostProcessingSync === true ) {
-
-			this.setViewOffset( inputWidth, inputHeight );
-
-			this._needsPostProcessingSync = false;
 
 		}
 
@@ -502,11 +478,13 @@ class TAAUNode extends TempNode {
 	 */
 	setup( builder ) {
 
+		this.depthNode.build( builder );
+		this.velocityNode.build( builder );
+		this.beautyNode.build( builder );
+
 		if ( builder.renderPipeline && ! builder.context.renderPipelineState.viewOffsetOwner ) {
 
 			builder.context.renderPipelineState.viewOffsetOwner = this;
-
-			this._needsPostProcessingSync = true;
 
 			OnBeforeRenderPipeline( () => {
 
