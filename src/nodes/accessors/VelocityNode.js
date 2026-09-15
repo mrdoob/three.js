@@ -82,7 +82,7 @@ class VelocityNode extends TempNode {
 		 * @type {UniformNode<mat4>}
 		 * @default null
 		 */
-		this.previousCameraViewMatrix = uniform( new Matrix4() );
+		this.previousCameraViewMatrix = uniform( new Matrix4() ).setGroup( renderGroup );
 
 	}
 
