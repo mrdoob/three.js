@@ -561,19 +561,15 @@ class TextureNode extends UniformNode {
 		const properties = builder.getNodeProperties( this );
 		const textureProperty = super.generate( builder, 'property' );
 
+		if ( output === 'samplerComparison' || properties.compareNode !== null ) {
+
+			// make sure the texture node creates a binding with a comparison sampler if necessary
+
+			this.getSharedNode( builder )._samplerComparison = true;
+
+		}
+
 		if ( /^sampler/.test( output ) ) {
-
-			if ( output === 'samplerComparison' ) {
-
-				this._samplerComparison = true;
-
-				// texture nodes with the same texture share a single uniform so it's
-				// important to set the flag on the node the binding refers to as well
-
-				const sharedNode = this.getSharedNode( builder );
-				sharedNode._samplerComparison = true;
-
-			}
 
 			return textureProperty + '_sampler';
 
@@ -592,12 +588,6 @@ class TextureNode extends UniformNode {
 			if ( propertyName === undefined ) {
 
 				const { uvNode, levelNode, biasNode, compareNode, compareStepNode, depthNode, gradNode, gatherNode, offsetNode } = properties;
-
-				if ( compareNode !== null ) {
-
-					this.getSharedNode( builder )._samplerComparison = true;
-
-				}
 
 				const uvSnippet = this.generateUV( builder, uvNode );
 				const levelSnippet = levelNode ? levelNode.build( builder, 'float' ) : null;
