@@ -502,6 +502,10 @@ class TAAUNode extends TempNode {
 	 */
 	setup( builder ) {
 
+		// build the beauty node first so its `updateBefore()` runs before this one
+
+		this.beautyNode.build( builder );
+
 		if ( builder.renderPipeline && ! builder.context.renderPipelineState.viewOffsetOwner ) {
 
 			builder.context.renderPipelineState.viewOffsetOwner = this;
