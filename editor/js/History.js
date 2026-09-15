@@ -40,6 +40,7 @@ class History {
 			lastCmd.updatable &&
 			cmd.updatable &&
 			lastCmd.object === cmd.object &&
+			lastCmd.instanceId === cmd.instanceId &&
 			lastCmd.type === cmd.type &&
 			lastCmd.script === cmd.script &&
 			lastCmd.attributeName === cmd.attributeName;

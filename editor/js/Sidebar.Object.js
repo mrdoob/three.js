@@ -6,6 +6,7 @@ import { UIBoolean } from './libs/ui.three.js';
 import { SetUuidCommand } from './commands/SetUuidCommand.js';
 import { SetValueCommand } from './commands/SetValueCommand.js';
 import { SetPositionCommand } from './commands/SetPositionCommand.js';
+import { SetInstanceMatrixCommand } from './commands/SetInstanceMatrixCommand.js';
 import { SetRotationCommand } from './commands/SetRotationCommand.js';
 import { SetScaleCommand } from './commands/SetScaleCommand.js';
 import { SetColorCommand } from './commands/SetColorCommand.js';
@@ -106,6 +107,13 @@ function SidebarObject( editor ) {
 	objectNameRow.add( objectName );
 
 	container.add( objectNameRow );
+
+	// instance
+
+	const objectInstanceRow = new UIRow().setDisplay( 'none' );
+	const objectInstance = new UIText();
+	objectInstanceRow.add( new UIText( strings.getKey( 'sidebar/object/instance' ) ).setClass( 'Label' ), objectInstance );
+	container.add( objectInstanceRow );
 
 	// position
 
@@ -427,30 +435,73 @@ function SidebarObject( editor ) {
 
 	//
 
-	function update() {
+	function update( event ) {
 
 		const object = editor.selected;
 
 		if ( object !== null ) {
 
-			const newPosition = new THREE.Vector3( objectPositionX.getValue(), objectPositionY.getValue(), objectPositionZ.getValue() );
-			if ( object.position.distanceTo( newPosition ) >= 0.01 ) {
+			const instanceId = editor.selector.instanceId;
 
-				editor.execute( new SetPositionCommand( editor, object, newPosition ) );
+			if ( instanceId !== null ) {
 
-			}
+				const inputs = [ objectPositionX, objectPositionY, objectPositionZ, objectRotationX, objectRotationY, objectRotationZ, objectScaleX, objectScaleY, objectScaleZ ];
+				const index = inputs.findIndex( input => input.dom === event.target );
 
-			const newRotation = new THREE.Euler( objectRotationX.getValue() * THREE.MathUtils.DEG2RAD, objectRotationY.getValue() * THREE.MathUtils.DEG2RAD, objectRotationZ.getValue() * THREE.MathUtils.DEG2RAD );
-			if ( new THREE.Vector3().setFromEuler( object.rotation ).distanceTo( new THREE.Vector3().setFromEuler( newRotation ) ) >= 0.01 ) {
+				if ( index !== - 1 ) {
 
-				editor.execute( new SetRotationCommand( editor, object, newRotation ) );
+					const proxy = editor.selector.instanceProxy;
+					const transform = new THREE.Object3D();
+					transform.position.copy( proxy.position );
+					transform.rotation.copy( proxy.rotation );
+					transform.scale.copy( proxy.scale );
 
-			}
+					const property = [ 'position', 'rotation', 'scale' ][ Math.floor( index / 3 ) ];
+					const axis = [ 'x', 'y', 'z' ][ index % 3 ];
+					const value = inputs[ index ].getValue();
+					transform[ property ][ axis ] = property === 'rotation' ? value * THREE.MathUtils.DEG2RAD : value;
 
-			const newScale = new THREE.Vector3( objectScaleX.getValue(), objectScaleY.getValue(), objectScaleZ.getValue() );
-			if ( object.scale.distanceTo( newScale ) >= 0.01 ) {
+					if ( Number.isFinite( value ) && transform.scale.x > 0 && transform.scale.y > 0 && transform.scale.z > 0 ) {
 
-				editor.execute( new SetScaleCommand( editor, object, newScale ) );
+						transform.updateMatrix();
+						const oldMatrix = new THREE.Matrix4();
+						object.getMatrixAt( instanceId, oldMatrix );
+
+						if ( transform.matrix.elements.some( ( value, i ) => Math.abs( value - oldMatrix.elements[ i ] ) > 1e-6 ) ) {
+
+							editor.execute( new SetInstanceMatrixCommand( editor, object, instanceId, transform.matrix, oldMatrix ) );
+
+						}
+
+					}
+
+					updateUI( object );
+					return;
+
+				}
+
+			} else {
+
+				const newPosition = new THREE.Vector3( objectPositionX.getValue(), objectPositionY.getValue(), objectPositionZ.getValue() );
+				if ( object.position.distanceTo( newPosition ) >= 0.01 ) {
+
+					editor.execute( new SetPositionCommand( editor, object, newPosition ) );
+
+				}
+
+				const newRotation = new THREE.Euler( objectRotationX.getValue() * THREE.MathUtils.DEG2RAD, objectRotationY.getValue() * THREE.MathUtils.DEG2RAD, objectRotationZ.getValue() * THREE.MathUtils.DEG2RAD );
+				if ( new THREE.Vector3().setFromEuler( object.rotation ).distanceTo( new THREE.Vector3().setFromEuler( newRotation ) ) >= 0.01 ) {
+
+					editor.execute( new SetRotationCommand( editor, object, newRotation ) );
+
+				}
+
+				const newScale = new THREE.Vector3( objectScaleX.getValue(), objectScaleY.getValue(), objectScaleZ.getValue() );
+				if ( object.scale.distanceTo( newScale ) >= 0.01 ) {
+
+					editor.execute( new SetScaleCommand( editor, object, newScale ) );
+
+				}
 
 			}
 
@@ -747,17 +798,22 @@ function SidebarObject( editor ) {
 		objectUUID.setValue( object.uuid );
 		objectName.setValue( object.name );
 
-		objectPositionX.setValue( object.position.x );
-		objectPositionY.setValue( object.position.y );
-		objectPositionZ.setValue( object.position.z );
+		const instanceId = editor.selector.instanceId;
+		const transform = instanceId !== null ? editor.selector.instanceProxy : object;
+		objectInstanceRow.setDisplay( instanceId !== null ? '' : 'none' );
+		objectInstance.setValue( instanceId !== null ? String( instanceId ) : '' );
 
-		objectRotationX.setValue( object.rotation.x * THREE.MathUtils.RAD2DEG );
-		objectRotationY.setValue( object.rotation.y * THREE.MathUtils.RAD2DEG );
-		objectRotationZ.setValue( object.rotation.z * THREE.MathUtils.RAD2DEG );
+		objectPositionX.setValue( transform.position.x );
+		objectPositionY.setValue( transform.position.y );
+		objectPositionZ.setValue( transform.position.z );
 
-		objectScaleX.setValue( object.scale.x );
-		objectScaleY.setValue( object.scale.y );
-		objectScaleZ.setValue( object.scale.z );
+		objectRotationX.setValue( transform.rotation.x * THREE.MathUtils.RAD2DEG );
+		objectRotationY.setValue( transform.rotation.y * THREE.MathUtils.RAD2DEG );
+		objectRotationZ.setValue( transform.rotation.z * THREE.MathUtils.RAD2DEG );
+
+		objectScaleX.setValue( transform.scale.x );
+		objectScaleY.setValue( transform.scale.y );
+		objectScaleZ.setValue( transform.scale.z );
 
 		if ( object.fov !== undefined ) {
 

@@ -7,6 +7,7 @@ export { RemoveScriptCommand } from './RemoveScriptCommand.js';
 export { SetColorCommand } from './SetColorCommand.js';
 export { SetGeometryCommand } from './SetGeometryCommand.js';
 export { SetGeometryValueCommand } from './SetGeometryValueCommand.js';
+export { SetInstanceMatrixCommand } from './SetInstanceMatrixCommand.js';
 export { SetMaterialColorCommand } from './SetMaterialColorCommand.js';
 export { SetMaterialCommand } from './SetMaterialCommand.js';
 export { SetMaterialMapCommand } from './SetMaterialMapCommand.js';

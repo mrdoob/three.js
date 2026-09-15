@@ -17,6 +17,7 @@ import { SetPositionCommand } from './commands/SetPositionCommand.js';
 import { SetRotationCommand } from './commands/SetRotationCommand.js';
 import { SetScaleCommand } from './commands/SetScaleCommand.js';
 import { MultiCmdsCommand } from './commands/MultiCmdsCommand.js';
+import { SetInstanceMatrixCommand, setInstanceMatrix } from './commands/SetInstanceMatrixCommand.js';
 
 import { ColorEnvironment } from 'three/addons/environments/ColorEnvironment.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -74,6 +75,8 @@ function Viewport( editor ) {
 	sceneHelpers.add( selectionBox );
 
 	let objectStatesOnDown = [];
+	let instanceStateOnDown = null;
+	let controlClick = false;
 
 	const transformControls = new TransformControls( camera );
 	transformControls.addEventListener( 'axis-changed', function () {
@@ -83,12 +86,41 @@ function Viewport( editor ) {
 	} );
 	transformControls.addEventListener( 'objectChange', function () {
 
+		if ( transformControls.object === selector.instanceProxy && selector.instanceId !== null ) {
+
+			const proxy = selector.instanceProxy;
+			if ( proxy.scale.x <= 0 || proxy.scale.y <= 0 || proxy.scale.z <= 0 ) {
+
+				selector.updateInstance();
+				return;
+
+			}
+
+			proxy.updateMatrix();
+			setInstanceMatrix( editor, editor.selected, selector.instanceId, proxy.matrix );
+			return;
+
+		}
+
 		signals.objectChanged.dispatch( transformControls.object );
 
 	} );
 	transformControls.addEventListener( 'mouseDown', function () {
 
 		const object = transformControls.object;
+		controlClick = true;
+		instanceStateOnDown = null;
+
+		if ( object === selector.instanceProxy && selector.instanceId !== null ) {
+
+			const matrix = new THREE.Matrix4();
+			editor.selected.getMatrixAt( selector.instanceId, matrix );
+			instanceStateOnDown = { object: editor.selected, instanceId: selector.instanceId, matrix };
+			objectStatesOnDown = [];
+			controls.enabled = false;
+			return;
+
+		}
 
 		const objects = ( object === selector.group ) ? selector.selection : [ object ];
 
@@ -103,6 +135,30 @@ function Viewport( editor ) {
 
 	} );
 	transformControls.addEventListener( 'mouseUp', function () {
+
+		if ( instanceStateOnDown !== null ) {
+
+			const state = instanceStateOnDown;
+			const matrix = new THREE.Matrix4();
+			state.object.getMatrixAt( state.instanceId, matrix );
+			if ( matrix.elements.some( ( value, i ) => Math.abs( value - state.matrix.elements[ i ] ) > 1e-6 ) ) {
+
+				const command = new SetInstanceMatrixCommand( editor, state.object, state.instanceId, matrix, state.matrix );
+				// Each drag is a separate action, independent of numeric-input merging.
+				command.updatable = false;
+				editor.execute( command );
+
+			} else {
+
+				setInstanceMatrix( editor, state.object, state.instanceId, state.matrix );
+
+			}
+
+			instanceStateOnDown = null;
+			controls.enabled = true;
+			return;
+
+		}
 
 		if ( transformControls.object !== undefined ) {
 
@@ -199,6 +255,13 @@ function Viewport( editor ) {
 	}
 
 	function handleClick( event ) {
+
+		if ( controlClick ) {
+
+			controlClick = false;
+			return;
+
+		}
 
 		if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) {
 
@@ -455,7 +518,15 @@ function Viewport( editor ) {
 
 		} else if ( object !== null && object !== scene && object !== camera ) {
 
-			box.setFromObject( object, true );
+			if ( selector.instanceId !== null ) {
+
+				selector.getSelectionBox( box );
+
+			} else {
+
+				box.setFromObject( object, true );
+
+			}
 
 			if ( box.isEmpty() === false ) {
 
@@ -463,7 +534,7 @@ function Viewport( editor ) {
 
 			}
 
-			transformControls.attach( object );
+			transformControls.attach( selector.instanceId !== null ? selector.instanceProxy : object );
 
 		}
 
@@ -492,7 +563,11 @@ function Viewport( editor ) {
 
 	signals.objectChanged.add( function ( object ) {
 
-		if ( editor.selected === object ) {
+		if ( selector.instanceId !== null ) {
+
+			selector.getSelectionBox( box );
+
+		} else if ( editor.selected === object ) {
 
 			box.setFromObject( object, true );
 

@@ -59,6 +59,7 @@
     "lint-tsl": "eslint tsl",
     "lint": "npm run lint-core",
     "lint-fix": "npm run lint-core -- --fix && npm run lint-addons -- --fix && npm run lint-examples -- --fix && npm run lint-editor -- --fix && npm run lint-manual -- --fix && npm run lint-test -- --fix && npm run lint-utils -- --fix && npm run lint-tsl -- --fix",
+    "test-editor": "node test/puppeteer.editor.js",
     "test-unit": "node test/unit/puppeteer.unit.js --testPage=UnitTests.html --mode=headless",
     "test-unit-headful": "node test/unit/puppeteer.unit.js --testPage=UnitTests.html --mode=headful",
     "test-unit-addons": "node test/unit/puppeteer.unit.js --testPage=UnitTestsAddons.html --mode=headless",

@@ -19,6 +19,11 @@ class Selector {
 		this.signals = signals;
 
 		this.selection = [];
+		this.instanceId = null;
+		this.instanceProxy = new THREE.Object3D();
+		this.instanceParent = new THREE.Object3D();
+		this.instanceParent.matrixAutoUpdate = false;
+		this.instanceParent.add( this.instanceProxy );
 
 		// an intermediate group used as pivot when transforming multiple objects
 
@@ -32,6 +37,14 @@ class Selector {
 		signals.intersectionsDetected.add( ( intersects, shiftKey ) => {
 
 			if ( intersects.length > 0 ) {
+
+				const hit = intersects[ 0 ];
+				if ( shiftKey !== true && hit.object.isInstancedMesh && hit.instanceId !== undefined ) {
+
+					this.setSelection( [ hit.object ], hit.instanceId );
+					return;
+
+				}
 
 				// Resolve helpers to their actual objects
 
@@ -81,13 +94,15 @@ class Selector {
 
 			} else {
 
-				if ( shiftKey !== true ) this.select( null ); // keep the selection when shift-clicking empty space
+				if ( shiftKey !== true || this.instanceId !== null ) this.select( null );
 
 			}
 
 		} );
 
 		signals.objectChanged.add( ( object ) => {
+
+			if ( this.instanceId !== null ) this.updateInstance();
 
 			if ( this.selection.length < 2 ) return;
 
@@ -102,6 +117,25 @@ class Selector {
 				// a member has been changed independently (e.g. via undo/redo), re-anchor the pivot
 
 				this.updateGroup();
+
+			}
+
+		} );
+
+		signals.objectRemoved.add( ( object ) => {
+
+			if ( this.instanceId === null ) return;
+			let selected = editor.selected;
+			while ( selected !== null ) {
+
+				if ( selected === object ) {
+
+					this.select( null );
+					break;
+
+				}
+
+				selected = selected.parent;
 
 			}
 
@@ -140,6 +174,15 @@ class Selector {
 	}
 
 	getSelectionBox( target ) {
+
+		if ( this.instanceId !== null ) {
+
+			const geometry = this.editor.selected.geometry;
+			if ( geometry.boundingBox === null ) geometry.computeBoundingBox();
+			this.instanceProxy.updateWorldMatrix( true, false );
+			return target.copy( geometry.boundingBox ).applyMatrix4( this.instanceProxy.matrixWorld );
+
+		}
 
 		target.makeEmpty();
 
@@ -182,11 +225,14 @@ class Selector {
 
 	}
 
-	setSelection( objects ) {
+	setSelection( objects, instanceId = null ) {
 
 		const editor = this.editor;
 
 		const hadGroupSelection = this.group.parent !== null;
+		const previousInstanceId = this.instanceId;
+		this.instanceId = instanceId;
+		if ( instanceId === null ) editor.sceneHelpers.remove( this.instanceParent );
 
 		this.selection = objects.slice();
 
@@ -206,14 +252,33 @@ class Selector {
 
 			editor.sceneHelpers.remove( this.group );
 
-			if ( editor.selected === object && hadGroupSelection === false ) return;
+			if ( editor.selected === object && hadGroupSelection === false && previousInstanceId === instanceId ) return;
 
 			editor.selected = object;
+			if ( instanceId !== null ) {
+
+				editor.sceneHelpers.add( this.instanceParent );
+				this.updateInstance();
+
+			}
+
 			editor.config.setKey( 'selected', ( object !== null ) ? object.uuid : null );
 
 			this.signals.objectSelected.dispatch( object );
 
 		}
+
+	}
+
+	updateInstance() {
+
+		const object = this.editor.selected;
+		object.updateWorldMatrix( true, false );
+		// Mirror the owner's world transform without reparenting anything in the scene.
+		this.instanceParent.matrix.copy( object.matrixWorld );
+		object.getMatrixAt( this.instanceId, this.instanceProxy.matrix );
+		this.instanceProxy.matrix.decompose( this.instanceProxy.position, this.instanceProxy.quaternion, this.instanceProxy.scale );
+		this.instanceParent.updateMatrixWorld( true );
 
 	}
 
