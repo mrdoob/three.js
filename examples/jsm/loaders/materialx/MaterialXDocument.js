@@ -352,6 +352,9 @@ class MaterialXNode {
 					textureNode.format = imageData.format;
 					textureNode.type = imageData.type;
 					textureNode.colorSpace = imageData.colorSpace;
+					textureNode.minFilter = imageData.minFilter;
+					textureNode.magFilter = imageData.magFilter;
+					textureNode.generateMipmaps = imageData.generateMipmaps;
 
 				} else {
 
