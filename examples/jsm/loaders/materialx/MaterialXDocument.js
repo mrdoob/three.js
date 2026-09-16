@@ -343,7 +343,22 @@ class MaterialXNode {
 
 			loader.load( resolvedURI, ( imageData ) => {
 
-				textureNode.image = imageData;
+				if ( imageData.isTexture ) {
+
+					// DataTextureLoader-based handlers (e.g. EXRLoader, RGBELoader) resolve
+					// with a fully configured Texture/DataTexture instead of a raw image source.
+					textureNode.image = imageData.image;
+					textureNode.isDataTexture = imageData.isDataTexture;
+					textureNode.format = imageData.format;
+					textureNode.type = imageData.type;
+					textureNode.colorSpace = imageData.colorSpace;
+
+				} else {
+
+					textureNode.image = imageData;
+
+				}
+
 				textureNode.needsUpdate = true;
 				resolveLoad();
 
