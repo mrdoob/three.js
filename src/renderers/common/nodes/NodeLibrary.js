@@ -123,13 +123,30 @@ class NodeLibrary {
 
 	/**
 	 * Returns a light node class definition for a light class definition.
+	 * Unregistered subclasses resolve to the nearest registered ancestor class.
 	 *
-	 * @param {Light.constructor} light - The light class definition.
+	 * @param {Light.constructor} lightClass - The light class definition.
 	 * @return {?AnalyticLightNode.constructor} The light node class definition. Returns `null` if no light node is found.
 	 */
-	getLightNodeClass( light ) {
+	getLightNodeClass( lightClass ) {
 
-		return this.lightNodes.get( light ) || null;
+		let current = lightClass;
+
+		while ( current ) {
+
+			const lightNodeClass = this.lightNodes.get( current );
+
+			if ( lightNodeClass !== undefined ) {
+
+				return lightNodeClass;
+
+			}
+
+			current = Object.getPrototypeOf( current );
+
+		}
+
+		return null;
 
 	}
 
