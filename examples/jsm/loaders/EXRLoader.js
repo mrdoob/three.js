@@ -173,6 +173,7 @@ class EXRLoader extends DataTextureLoader {
 		const logBase = Math.pow( 2.7182818, 2.2 );
 
 		let b44LogTable = null; // lazily initialized for pLinear B44 channels
+		let dwaToLinearTable = null; // lazily initialized for DWA lossy DCT channels
 
 		function reverseLutFromBitmap( bitmap, lut ) {
 
@@ -1324,25 +1325,58 @@ class EXRLoader extends DataTextureLoader {
 
 		}
 
-		function convertToHalf( src, dst, idx ) {
+		const _f32 = new Float32Array( 1 );
+		const _u32 = new Uint32Array( _f32.buffer );
 
-			for ( let i = 0; i < 64; ++ i ) {
+		// float -> half bits with round-to-nearest-even, like Imath's float_to_half
+		// (DataUtils.toHalfFloat truncates, which is what put DWA output 1-5 ulp off OpenEXR).
+		function floatToHalfBits( f ) {
 
-				dst[ idx + i ] = DataUtils.toHalfFloat( toLinear( src[ i ] ) );
+			_f32[ 0 ] = f;
+			const x = _u32[ 0 ];
+			const sign = ( x >>> 16 ) & 0x8000;
+			const a = x & 0x7fffffff;
+
+			if ( a >= 0x47800000 ) return sign | ( a > 0x7f800000 ? 0x7e00 : 0x7c00 ); // overflow, Inf, NaN
+
+			if ( a < 0x38800000 ) { // subnormal or zero in half
+
+				_f32[ 0 ] = Math.abs( f ) + 0.5; // 0.5 = 2^-1: forces rounding to a 2^-24 grid
+				return sign | ( _u32[ 0 ] - 0x3f000000 );
 
 			}
 
+			const r = a + 0xfff + ( ( a >>> 13 ) & 1 );
+			return sign | ( ( r - 0x38000000 ) >>> 13 );
+
 		}
 
-		function toLinear( float ) {
+		function convertToHalf( src, dst, idx ) {
 
-			if ( float <= 1 ) {
+			if ( dwaToLinearTable === null ) {
 
-				return Math.sign( float ) * Math.pow( Math.abs( float ), 2.2 );
+				// Mirrors OpenEXR dwaLookups.cpp: gamma 2.2 below 1, log curve above,
+				// applied to the half bits after rounding so results match bit for bit.
 
-			} else {
+				dwaToLinearTable = new Uint16Array( 65536 );
 
-				return Math.sign( float ) * Math.pow( logBase, Math.abs( float ) - 1.0 );
+				for ( let i = 1; i < 65536; ++ i ) {
+
+					if ( ( i & 0x7c00 ) === 0x7c00 ) continue; // NaN / Inf -> 0
+
+					const h = DataUtils.fromHalfFloat( i );
+					const v = Math.abs( h );
+					const linear = v <= 1 ? Math.pow( v, 2.2 ) : Math.pow( logBase, v - 1 );
+
+					dwaToLinearTable[ i ] = floatToHalfBits( h < 0 ? - linear : linear );
+
+				}
+
+			}
+
+			for ( let i = 0; i < 64; ++ i ) {
+
+				dst[ idx + i ] = dwaToLinearTable[ floatToHalfBits( src[ i ] ) ];
 
 			}
 
