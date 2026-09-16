@@ -1030,7 +1030,7 @@ class EXRLoader extends DataTextureLoader {
 
 					for ( let x = 0; x < width; ++ x ) {
 
-						dataView.setFloat32( offset + x * INT16_SIZE * type, decodeFloat16( halfRow[ x ] ), true );
+						dataView.setFloat32( offset + x * INT16_SIZE * type, DataUtils.fromHalfFloat( halfRow[ x ] ), true );
 
 					}
 
@@ -1147,76 +1147,76 @@ class EXRLoader extends DataTextureLoader {
 
 		function unZigZag( src, dst ) {
 
-			dst[ 0 ] = decodeFloat16( src[ 0 ] );
-			dst[ 1 ] = decodeFloat16( src[ 1 ] );
-			dst[ 2 ] = decodeFloat16( src[ 5 ] );
-			dst[ 3 ] = decodeFloat16( src[ 6 ] );
-			dst[ 4 ] = decodeFloat16( src[ 14 ] );
-			dst[ 5 ] = decodeFloat16( src[ 15 ] );
-			dst[ 6 ] = decodeFloat16( src[ 27 ] );
-			dst[ 7 ] = decodeFloat16( src[ 28 ] );
-			dst[ 8 ] = decodeFloat16( src[ 2 ] );
-			dst[ 9 ] = decodeFloat16( src[ 4 ] );
+			dst[ 0 ] = DataUtils.fromHalfFloat( src[ 0 ] );
+			dst[ 1 ] = DataUtils.fromHalfFloat( src[ 1 ] );
+			dst[ 2 ] = DataUtils.fromHalfFloat( src[ 5 ] );
+			dst[ 3 ] = DataUtils.fromHalfFloat( src[ 6 ] );
+			dst[ 4 ] = DataUtils.fromHalfFloat( src[ 14 ] );
+			dst[ 5 ] = DataUtils.fromHalfFloat( src[ 15 ] );
+			dst[ 6 ] = DataUtils.fromHalfFloat( src[ 27 ] );
+			dst[ 7 ] = DataUtils.fromHalfFloat( src[ 28 ] );
+			dst[ 8 ] = DataUtils.fromHalfFloat( src[ 2 ] );
+			dst[ 9 ] = DataUtils.fromHalfFloat( src[ 4 ] );
 
-			dst[ 10 ] = decodeFloat16( src[ 7 ] );
-			dst[ 11 ] = decodeFloat16( src[ 13 ] );
-			dst[ 12 ] = decodeFloat16( src[ 16 ] );
-			dst[ 13 ] = decodeFloat16( src[ 26 ] );
-			dst[ 14 ] = decodeFloat16( src[ 29 ] );
-			dst[ 15 ] = decodeFloat16( src[ 42 ] );
-			dst[ 16 ] = decodeFloat16( src[ 3 ] );
-			dst[ 17 ] = decodeFloat16( src[ 8 ] );
-			dst[ 18 ] = decodeFloat16( src[ 12 ] );
-			dst[ 19 ] = decodeFloat16( src[ 17 ] );
+			dst[ 10 ] = DataUtils.fromHalfFloat( src[ 7 ] );
+			dst[ 11 ] = DataUtils.fromHalfFloat( src[ 13 ] );
+			dst[ 12 ] = DataUtils.fromHalfFloat( src[ 16 ] );
+			dst[ 13 ] = DataUtils.fromHalfFloat( src[ 26 ] );
+			dst[ 14 ] = DataUtils.fromHalfFloat( src[ 29 ] );
+			dst[ 15 ] = DataUtils.fromHalfFloat( src[ 42 ] );
+			dst[ 16 ] = DataUtils.fromHalfFloat( src[ 3 ] );
+			dst[ 17 ] = DataUtils.fromHalfFloat( src[ 8 ] );
+			dst[ 18 ] = DataUtils.fromHalfFloat( src[ 12 ] );
+			dst[ 19 ] = DataUtils.fromHalfFloat( src[ 17 ] );
 
-			dst[ 20 ] = decodeFloat16( src[ 25 ] );
-			dst[ 21 ] = decodeFloat16( src[ 30 ] );
-			dst[ 22 ] = decodeFloat16( src[ 41 ] );
-			dst[ 23 ] = decodeFloat16( src[ 43 ] );
-			dst[ 24 ] = decodeFloat16( src[ 9 ] );
-			dst[ 25 ] = decodeFloat16( src[ 11 ] );
-			dst[ 26 ] = decodeFloat16( src[ 18 ] );
-			dst[ 27 ] = decodeFloat16( src[ 24 ] );
-			dst[ 28 ] = decodeFloat16( src[ 31 ] );
-			dst[ 29 ] = decodeFloat16( src[ 40 ] );
+			dst[ 20 ] = DataUtils.fromHalfFloat( src[ 25 ] );
+			dst[ 21 ] = DataUtils.fromHalfFloat( src[ 30 ] );
+			dst[ 22 ] = DataUtils.fromHalfFloat( src[ 41 ] );
+			dst[ 23 ] = DataUtils.fromHalfFloat( src[ 43 ] );
+			dst[ 24 ] = DataUtils.fromHalfFloat( src[ 9 ] );
+			dst[ 25 ] = DataUtils.fromHalfFloat( src[ 11 ] );
+			dst[ 26 ] = DataUtils.fromHalfFloat( src[ 18 ] );
+			dst[ 27 ] = DataUtils.fromHalfFloat( src[ 24 ] );
+			dst[ 28 ] = DataUtils.fromHalfFloat( src[ 31 ] );
+			dst[ 29 ] = DataUtils.fromHalfFloat( src[ 40 ] );
 
-			dst[ 30 ] = decodeFloat16( src[ 44 ] );
-			dst[ 31 ] = decodeFloat16( src[ 53 ] );
-			dst[ 32 ] = decodeFloat16( src[ 10 ] );
-			dst[ 33 ] = decodeFloat16( src[ 19 ] );
-			dst[ 34 ] = decodeFloat16( src[ 23 ] );
-			dst[ 35 ] = decodeFloat16( src[ 32 ] );
-			dst[ 36 ] = decodeFloat16( src[ 39 ] );
-			dst[ 37 ] = decodeFloat16( src[ 45 ] );
-			dst[ 38 ] = decodeFloat16( src[ 52 ] );
-			dst[ 39 ] = decodeFloat16( src[ 54 ] );
+			dst[ 30 ] = DataUtils.fromHalfFloat( src[ 44 ] );
+			dst[ 31 ] = DataUtils.fromHalfFloat( src[ 53 ] );
+			dst[ 32 ] = DataUtils.fromHalfFloat( src[ 10 ] );
+			dst[ 33 ] = DataUtils.fromHalfFloat( src[ 19 ] );
+			dst[ 34 ] = DataUtils.fromHalfFloat( src[ 23 ] );
+			dst[ 35 ] = DataUtils.fromHalfFloat( src[ 32 ] );
+			dst[ 36 ] = DataUtils.fromHalfFloat( src[ 39 ] );
+			dst[ 37 ] = DataUtils.fromHalfFloat( src[ 45 ] );
+			dst[ 38 ] = DataUtils.fromHalfFloat( src[ 52 ] );
+			dst[ 39 ] = DataUtils.fromHalfFloat( src[ 54 ] );
 
-			dst[ 40 ] = decodeFloat16( src[ 20 ] );
-			dst[ 41 ] = decodeFloat16( src[ 22 ] );
-			dst[ 42 ] = decodeFloat16( src[ 33 ] );
-			dst[ 43 ] = decodeFloat16( src[ 38 ] );
-			dst[ 44 ] = decodeFloat16( src[ 46 ] );
-			dst[ 45 ] = decodeFloat16( src[ 51 ] );
-			dst[ 46 ] = decodeFloat16( src[ 55 ] );
-			dst[ 47 ] = decodeFloat16( src[ 60 ] );
-			dst[ 48 ] = decodeFloat16( src[ 21 ] );
-			dst[ 49 ] = decodeFloat16( src[ 34 ] );
+			dst[ 40 ] = DataUtils.fromHalfFloat( src[ 20 ] );
+			dst[ 41 ] = DataUtils.fromHalfFloat( src[ 22 ] );
+			dst[ 42 ] = DataUtils.fromHalfFloat( src[ 33 ] );
+			dst[ 43 ] = DataUtils.fromHalfFloat( src[ 38 ] );
+			dst[ 44 ] = DataUtils.fromHalfFloat( src[ 46 ] );
+			dst[ 45 ] = DataUtils.fromHalfFloat( src[ 51 ] );
+			dst[ 46 ] = DataUtils.fromHalfFloat( src[ 55 ] );
+			dst[ 47 ] = DataUtils.fromHalfFloat( src[ 60 ] );
+			dst[ 48 ] = DataUtils.fromHalfFloat( src[ 21 ] );
+			dst[ 49 ] = DataUtils.fromHalfFloat( src[ 34 ] );
 
-			dst[ 50 ] = decodeFloat16( src[ 37 ] );
-			dst[ 51 ] = decodeFloat16( src[ 47 ] );
-			dst[ 52 ] = decodeFloat16( src[ 50 ] );
-			dst[ 53 ] = decodeFloat16( src[ 56 ] );
-			dst[ 54 ] = decodeFloat16( src[ 59 ] );
-			dst[ 55 ] = decodeFloat16( src[ 61 ] );
-			dst[ 56 ] = decodeFloat16( src[ 35 ] );
-			dst[ 57 ] = decodeFloat16( src[ 36 ] );
-			dst[ 58 ] = decodeFloat16( src[ 48 ] );
-			dst[ 59 ] = decodeFloat16( src[ 49 ] );
+			dst[ 50 ] = DataUtils.fromHalfFloat( src[ 37 ] );
+			dst[ 51 ] = DataUtils.fromHalfFloat( src[ 47 ] );
+			dst[ 52 ] = DataUtils.fromHalfFloat( src[ 50 ] );
+			dst[ 53 ] = DataUtils.fromHalfFloat( src[ 56 ] );
+			dst[ 54 ] = DataUtils.fromHalfFloat( src[ 59 ] );
+			dst[ 55 ] = DataUtils.fromHalfFloat( src[ 61 ] );
+			dst[ 56 ] = DataUtils.fromHalfFloat( src[ 35 ] );
+			dst[ 57 ] = DataUtils.fromHalfFloat( src[ 36 ] );
+			dst[ 58 ] = DataUtils.fromHalfFloat( src[ 48 ] );
+			dst[ 59 ] = DataUtils.fromHalfFloat( src[ 49 ] );
 
-			dst[ 60 ] = decodeFloat16( src[ 57 ] );
-			dst[ 61 ] = decodeFloat16( src[ 58 ] );
-			dst[ 62 ] = decodeFloat16( src[ 62 ] );
-			dst[ 63 ] = decodeFloat16( src[ 63 ] );
+			dst[ 60 ] = DataUtils.fromHalfFloat( src[ 57 ] );
+			dst[ 61 ] = DataUtils.fromHalfFloat( src[ 58 ] );
+			dst[ 62 ] = DataUtils.fromHalfFloat( src[ 62 ] );
+			dst[ 63 ] = DataUtils.fromHalfFloat( src[ 63 ] );
 
 		}
 
@@ -1694,7 +1694,7 @@ class EXRLoader extends DataTextureLoader {
 
 									} else {
 
-										const f = decodeFloat16( i );
+										const f = DataUtils.fromHalfFloat( i );
 										b44LogTable[ i ] = ( f <= 0 ) ? 0 : DataUtils.toHalfFloat( 8 * Math.log( f ) );
 
 									}
@@ -2106,24 +2106,6 @@ class EXRLoader extends DataTextureLoader {
 
 		}
 
-		// https://stackoverflow.com/questions/5678432/decompressing-half-precision-floats-in-javascript
-		function decodeFloat16( binary ) {
-
-			const exponent = ( binary & 0x7C00 ) >> 10,
-				fraction = binary & 0x03FF;
-
-			return ( binary >> 15 ? - 1 : 1 ) * (
-				exponent ?
-					(
-						exponent === 0x1F ?
-							fraction ? NaN : Infinity :
-							Math.pow( 2, exponent - 15 ) * ( 1 + fraction / 0x400 )
-					) :
-					6.103515625e-5 * ( fraction / 0x400 )
-			);
-
-		}
-
 		function parseUint16( dataView, offset ) {
 
 			const Uint16 = dataView.getUint16( offset.value, true );
@@ -2136,7 +2118,7 @@ class EXRLoader extends DataTextureLoader {
 
 		function parseFloat16( buffer, offset ) {
 
-			return decodeFloat16( parseUint16( buffer, offset ) );
+			return DataUtils.fromHalfFloat( parseUint16( buffer, offset ) );
 
 		}
 
@@ -2724,7 +2706,7 @@ class EXRLoader extends DataTextureLoader {
 							const aOff = channelOffsets[ alphaChannelIdx ] + sampleIdx * aBps;
 
 							sampleAlpha = aBps === 2
-								? decodeFloat16( pixelView.getUint16( aOff, true ) )
+								? DataUtils.fromHalfFloat( pixelView.getUint16( aOff, true ) )
 								: pixelView.getFloat32( aOff, true );
 
 						}
@@ -2741,7 +2723,7 @@ class EXRLoader extends DataTextureLoader {
 							const dataOff = channelOffsets[ ci ] + sampleIdx * bps;
 
 							const value = bps === 2
-								? decodeFloat16( pixelView.getUint16( dataOff, true ) )
+								? DataUtils.fromHalfFloat( pixelView.getUint16( dataOff, true ) )
 								: pixelView.getFloat32( dataOff, true );
 
 							composited[ cOff ] += value * factor;
@@ -3303,9 +3285,9 @@ class EXRLoader extends DataTextureLoader {
 				for ( let i = 0; i < nPixels; i ++ ) {
 
 					const base = i * 4;
-					const Y = decodeFloat16( byteArray[ base ] );
-					const RY = decodeFloat16( byteArray[ base + 1 ] );
-					const BY = decodeFloat16( byteArray[ base + 2 ] );
+					const Y = DataUtils.fromHalfFloat( byteArray[ base ] );
+					const RY = DataUtils.fromHalfFloat( byteArray[ base + 1 ] );
+					const BY = DataUtils.fromHalfFloat( byteArray[ base + 2 ] );
 					const R = ( 1 + RY ) * Y;
 					const B = ( 1 + BY ) * Y;
 					const G = ( Y - R * 0.2126 - B * 0.0722 ) / 0.7152;
