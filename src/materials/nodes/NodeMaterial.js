@@ -431,7 +431,7 @@ class NodeMaterial extends Material {
 
 		for ( const { property, childNode } of this._getNodeChildren() ) {
 
-			values.push( hashString( property.slice( 0, - 4 ) ), childNode.getCacheKey() );
+			values.push( hashString( property.slice( 0, - 4 ) ), childNode.getCacheKey( true ) );
 
 		}
 
