@@ -1,4 +1,4 @@
-import { DataTexture, FloatType, LoadingManager, RGBAFormat } from 'three';
+import { DataTexture, FloatType, LinearFilter, LoadingManager, RGBAFormat } from 'three';
 import { MaterialXLoader } from '../../../../examples/jsm/loaders/MaterialXLoader.js';
 
 const MATERIAL_X = `<?xml version="1.0"?>
@@ -232,6 +232,8 @@ export default QUnit.module( 'Addons', () => {
 				await textureLoader.started;
 
 				const dataTexture = new DataTexture( new Float32Array( 4 ), 1, 1, RGBAFormat, FloatType );
+				dataTexture.minFilter = LinearFilter;
+				dataTexture.generateMipmaps = false;
 				textureLoader.succeed( dataTexture );
 
 				const result = await loadPromise;
@@ -244,6 +246,8 @@ export default QUnit.module( 'Addons', () => {
 				assert.true( textureNode.isDataTexture, 'isDataTexture is propagated so the renderer uploads raw pixel data.' );
 				assert.strictEqual( textureNode.type, FloatType, 'The texture type (e.g. float) is propagated.' );
 				assert.strictEqual( textureNode.format, RGBAFormat, 'The texture format is propagated.' );
+				assert.strictEqual( textureNode.minFilter, LinearFilter, 'The min filter is propagated.' );
+				assert.false( textureNode.generateMipmaps, 'generateMipmaps is propagated so loaders can opt out of mipmaps.' );
 
 			} );
 
