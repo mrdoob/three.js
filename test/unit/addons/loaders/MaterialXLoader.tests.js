@@ -1,4 +1,4 @@
-import { LoadingManager } from 'three';
+import { DataTexture, FloatType, LoadingManager, RGBAFormat } from 'three';
 import { MaterialXLoader } from '../../../../examples/jsm/loaders/MaterialXLoader.js';
 
 const MATERIAL_X = `<?xml version="1.0"?>
@@ -80,6 +80,25 @@ function hasTextureImage( object, image, visited = new WeakSet(), depth = 0 ) {
 	}
 
 	return false;
+
+}
+
+function findTextureNode( object, image, visited = new WeakSet(), depth = 0 ) {
+
+	if ( object === null || typeof object !== 'object' || depth > 10 ) return null;
+	if ( object.isTexture === true && object.image === image ) return object;
+	if ( visited.has( object ) ) return null;
+
+	visited.add( object );
+
+	for ( const key of Object.keys( object ) ) {
+
+		const found = findTextureNode( object[ key ], image, visited, depth + 1 );
+		if ( found ) return found;
+
+	}
+
+	return null;
 
 }
 
@@ -170,6 +189,32 @@ export default QUnit.module( 'Addons', () => {
 				URL.revokeObjectURL( documentURL );
 
 				assert.true( managerComplete, 'LoadingManager completes after the loader callback.' );
+
+			} );
+
+			QUnit.test( 'propagates DataTexture-style results from handlers like EXRLoader', async ( assert ) => {
+
+				const manager = new LoadingManager();
+				const textureLoader = new ControlledTextureLoader( manager );
+				manager.addHandler( /\.test$/i, textureLoader );
+
+				const documentURL = createDocumentURL();
+				const loadPromise = new MaterialXLoader( manager ).loadAsync( documentURL );
+				await textureLoader.started;
+
+				const dataTexture = new DataTexture( new Float32Array( 4 ), 1, 1, RGBAFormat, FloatType );
+				textureLoader.succeed( dataTexture );
+
+				const result = await loadPromise;
+				URL.revokeObjectURL( documentURL );
+
+				const material = result.materials.test_material;
+				const textureNode = findTextureNode( material, dataTexture.image );
+
+				assert.ok( textureNode, 'The texture node receives the DataTexture image data.' );
+				assert.true( textureNode.isDataTexture, 'isDataTexture is propagated so the renderer uploads raw pixel data.' );
+				assert.strictEqual( textureNode.type, FloatType, 'The texture type (e.g. float) is propagated.' );
+				assert.strictEqual( textureNode.format, RGBAFormat, 'The texture format is propagated.' );
 
 			} );
 
