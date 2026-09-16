@@ -1,8 +1,85 @@
 import { nodeObject } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { getValueType } from '../core/NodeUtils.js';
+import { getMemoryLengthFromType, getValueType } from '../core/NodeUtils.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import BufferNode from './BufferNode.js';
+
+/**
+ * Writes a single value into a buffer at the given offset, using the buffer
+ * layout of the given type.
+ *
+ * @private
+ * @param {TypedArray} buffer - The buffer to write into.
+ * @param {number} offset - The write position in 4-byte elements.
+ * @param {any} data - The value to write (a primitive, vector, color or matrix).
+ * @param {string} type - The data type of the value.
+ */
+function setBufferValue( buffer, offset, data, type ) {
+
+	if ( type === 'float' || type === 'int' || type === 'uint' ) {
+
+		buffer[ offset ] = data;
+		return;
+
+	}
+
+	if ( type === 'color' || data.isColor === true ) {
+
+		buffer[ offset ] = data.r;
+		buffer[ offset + 1 ] = data.g;
+		buffer[ offset + 2 ] = data.b || 0;
+		return;
+
+	}
+
+	if ( type === 'mat2' ) {
+
+		buffer[ offset ] = data.elements[ 0 ];
+		buffer[ offset + 1 ] = data.elements[ 1 ];
+		buffer[ offset + 2 ] = data.elements[ 2 ];
+		buffer[ offset + 3 ] = data.elements[ 3 ];
+		return;
+
+	}
+
+	if ( type === 'mat3' ) {
+
+		buffer[ offset ] = data.elements[ 0 ];
+		buffer[ offset + 1 ] = data.elements[ 1 ];
+		buffer[ offset + 2 ] = data.elements[ 2 ];
+
+		buffer[ offset + 4 ] = data.elements[ 3 ];
+		buffer[ offset + 5 ] = data.elements[ 4 ];
+		buffer[ offset + 6 ] = data.elements[ 5 ];
+
+		buffer[ offset + 8 ] = data.elements[ 6 ];
+		buffer[ offset + 9 ] = data.elements[ 7 ];
+		buffer[ offset + 10 ] = data.elements[ 8 ];
+
+		buffer[ offset + 15 ] = 1;
+		return;
+
+	}
+
+	if ( type === 'mat4' ) {
+
+		for ( let i = 0; i < data.elements.length; i ++ ) {
+
+			buffer[ offset + i ] = data.elements[ i ];
+
+		}
+
+		return;
+
+	}
+
+
+	buffer[ offset ] = data.x;
+	buffer[ offset + 1 ] = data.y;
+	buffer[ offset + 2 ] = data.z || 0;
+	buffer[ offset + 3 ] = data.w || 0;
+
+}
 
 /**
  * Represents the element access on uniform array nodes.
@@ -38,11 +115,25 @@ class UniformArrayElementNode extends ArrayElementNode {
 
 	}
 
+	getMemberType( builder, name ) {
+
+		const structTypeNode = this.uniformArrayNode.structTypeNode;
+
+		if ( structTypeNode ) {
+
+			return structTypeNode.getMemberType( builder, name );
+
+		}
+
+		return 'void';
+
+	}
+
 	generate( builder ) {
 
 		const snippet = super.generate( builder );
 		const type = this.getNodeType( builder );
-		const paddedType = this.node.getPaddedType();
+		const paddedType = this.node._getPaddedType();
 
 		return builder.format( snippet, paddedType, type );
 
@@ -79,9 +170,17 @@ class UniformArrayNode extends BufferNode {
 	 * Constructs a new uniform array node.
 	 *
 	 * @param {Array<any>} value - Array holding the buffer data.
-	 * @param {?string} [elementType=null] - The data type of a buffer element.
+	 * @param {?(string|Struct)} [elementType=null] - The element type (e.g. `'vec3'`).
 	 */
 	constructor( value, elementType = null ) {
+
+		let structTypeNode = null;
+
+		if ( elementType && elementType.isStructTypeNode ) {
+
+			structTypeNode = elementType;
+
+		}
 
 		super( null );
 
@@ -99,7 +198,7 @@ class UniformArrayNode extends BufferNode {
 		 *
 		 * @type {string}
 		 */
-		this.elementType = elementType === null ? getValueType( value[ 0 ] ) : elementType;
+		this.elementType = structTypeNode !== null ? 'struct' : ( elementType === null ? getValueType( value[ 0 ] ) : elementType );
 
 		/**
 		 * The padded type. Uniform buffers must conform to a certain buffer layout
@@ -107,7 +206,7 @@ class UniformArrayNode extends BufferNode {
 		 *
 		 * @type {string}
 		 */
-		this.paddedType = this.getPaddedType();
+		this.paddedType = this._getPaddedType();
 
 		/**
 		 * Overwritten since uniform array nodes are updated per render.
@@ -126,6 +225,14 @@ class UniformArrayNode extends BufferNode {
 		 */
 		this.isArrayBufferNode = true;
 
+		/**
+		 * The uniform buffer struct type.
+		 *
+		 * @type {?StructTypeNode}
+		 * @default null
+		 */
+		this.structTypeNode = structTypeNode;
+
 	}
 
 	/**
@@ -135,7 +242,13 @@ class UniformArrayNode extends BufferNode {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	generateNodeType( /*builder*/ ) {
+	generateNodeType( builder ) {
+
+		if ( this.structTypeNode !== null ) {
+
+			return this.structTypeNode.getNodeType( builder );
+
+		}
 
 		return this.paddedType;
 
@@ -158,7 +271,7 @@ class UniformArrayNode extends BufferNode {
 	 *
 	 * @return {string} The padded type.
 	 */
-	getPaddedType() {
+	_getPaddedType() {
 
 		const elementType = this.elementType;
 
@@ -219,99 +332,34 @@ class UniformArrayNode extends BufferNode {
 	 */
 	updateBuffer() {
 
-		const { array, value } = this;
+		const { array, value, elementType, structTypeNode } = this;
 
-		const elementType = this.elementType;
+		if ( structTypeNode !== null ) {
 
-		if ( elementType === 'float' || elementType === 'int' || elementType === 'uint' ) {
-
-			for ( let i = 0; i < array.length; i ++ ) {
-
-				const index = i * 4;
-
-				value[ index ] = array[ i ];
-
-			}
-
-		} else if ( elementType === 'color' ) {
+			const { membersLayout, structLength } = structTypeNode;
 
 			for ( let i = 0; i < array.length; i ++ ) {
 
-				const index = i * 4;
-				const vector = array[ i ];
+				const index = i * structLength;
+				const element = array[ i ];
 
-				value[ index ] = vector.r;
-				value[ index + 1 ] = vector.g;
-				value[ index + 2 ] = vector.b || 0;
-				//value[ index + 3 ] = vector.a || 0;
+				for ( const member of membersLayout ) {
 
-			}
-
-		} else if ( elementType === 'mat2' ) {
-
-			for ( let i = 0; i < array.length; i ++ ) {
-
-				const index = i * 4;
-				const matrix = array[ i ];
-
-				value[ index ] = matrix.elements[ 0 ];
-				value[ index + 1 ] = matrix.elements[ 1 ];
-				value[ index + 2 ] = matrix.elements[ 2 ];
-				value[ index + 3 ] = matrix.elements[ 3 ];
-
-			}
-
-		} else if ( elementType === 'mat3' ) {
-
-			for ( let i = 0; i < array.length; i ++ ) {
-
-				const index = i * 16;
-				const matrix = array[ i ];
-
-				value[ index ] = matrix.elements[ 0 ];
-				value[ index + 1 ] = matrix.elements[ 1 ];
-				value[ index + 2 ] = matrix.elements[ 2 ];
-
-				value[ index + 4 ] = matrix.elements[ 3 ];
-				value[ index + 5 ] = matrix.elements[ 4 ];
-				value[ index + 6 ] = matrix.elements[ 5 ];
-
-				value[ index + 8 ] = matrix.elements[ 6 ];
-				value[ index + 9 ] = matrix.elements[ 7 ];
-				value[ index + 10 ] = matrix.elements[ 8 ];
-
-				value[ index + 15 ] = 1;
-
-			}
-
-		} else if ( elementType === 'mat4' ) {
-
-			for ( let i = 0; i < array.length; i ++ ) {
-
-				const index = i * 16;
-				const matrix = array[ i ];
-
-				for ( let i = 0; i < matrix.elements.length; i ++ ) {
-
-					value[ index + i ] = matrix.elements[ i ];
+					setBufferValue( value, index + member.offset, element[ member.name ], member.type );
 
 				}
 
 			}
 
-		} else {
+			return;
 
-			for ( let i = 0; i < array.length; i ++ ) {
+		}
 
-				const index = i * 4;
-				const vector = array[ i ];
+		const stride = getMemoryLengthFromType( this.paddedType );
 
-				value[ index ] = vector.x;
-				value[ index + 1 ] = vector.y;
-				value[ index + 2 ] = vector.z || 0;
-				value[ index + 3 ] = vector.w || 0;
+		for ( let i = 0; i < array.length; i ++ ) {
 
-			}
+			setBufferValue( value, i * stride, array[ i ], elementType );
 
 		}
 
@@ -331,7 +379,7 @@ class UniformArrayNode extends BufferNode {
 		let arrayType = Float32Array;
 
 		const paddedType = this.paddedType;
-		const paddedElementLength = builder.getTypeLength( paddedType );
+		const paddedElementLength = this.structTypeNode !== null ? this.structTypeNode.structLength : builder.getTypeLength( paddedType );
 
 		if ( elementType.charAt( 0 ) === 'i' ) arrayType = Int32Array;
 		if ( elementType.charAt( 0 ) === 'u' ) arrayType = Uint32Array;
