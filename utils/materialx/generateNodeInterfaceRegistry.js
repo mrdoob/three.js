@@ -65,7 +65,15 @@ function* walk( directory ) {
 // parser is unnecessary and Node has no built-in DOMParser.
 function* tags( xml ) {
 
-	const withoutComments = xml.replace( /<!--[\s\S]*?-->/g, '' );
+	let withoutComments = xml;
+	let previous;
+	do {
+
+		previous = withoutComments;
+		withoutComments = withoutComments.replace( /<!--[\s\S]*?-->/g, '' );
+
+	} while ( withoutComments !== previous );
+
 	const tagPattern = /<(\/?)([\w:.-]+)((?:\s+[\w:.-]+\s*=\s*"[^"]*")*)\s*(\/?)>/g;
 	const attributePattern = /([\w:.-]+)\s*=\s*"([^"]*)"/g;
 

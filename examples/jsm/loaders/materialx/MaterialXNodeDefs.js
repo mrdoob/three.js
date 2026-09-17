@@ -69,7 +69,11 @@ function resolveNodeDef( nodeX ) {
 	for ( const name of getNodeDefNames( nodeX.element ) ) {
 
 		const nodedef = registryData.nodedefs[ name ];
-		if ( nodeX.type && getOutputType( nodedef ) !== nodeX.type ) continue;
+		const outputType = getOutputType( nodedef );
+		// Multioutput nodedefs (e.g. separate2/3/4) don't declare a single output type to match
+		// against; authored `type` on those instances instead disambiguates the "in" overload,
+		// so let hasExactInputMatch() below do the discrimination.
+		if ( nodeX.type && outputType !== 'multioutput' && outputType !== nodeX.type ) continue;
 		if ( hasExactInputMatch( nodedef, nodeX ) ) return { name, ...nodedef };
 		roughMatch ??= { name, ...nodedef };
 
