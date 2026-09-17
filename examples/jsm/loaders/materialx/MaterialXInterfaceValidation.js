@@ -4,7 +4,6 @@ import { MaterialXLogCodes } from './MaterialXLog.js';
 const SKIP_ELEMENTS = new Set( [ 'materialx', 'input', 'output' ] );
 const CONTAINER_ELEMENTS = new Set( [ 'nodegraph' ] );
 
-const LIBRARY_FALLBACK_OUTPUT = 'out';
 
 function formatElement( nodeX, attrNames, tagName = nodeX.element ) {
 
@@ -42,16 +41,7 @@ function resolveInterface( nodeX ) {
 	if ( nodeDef ) {
 
 		const inputs = Object.fromEntries( Object.entries( nodeDef.inputs ).map( ( [ name, input ] ) => [ name, input.type ] ) );
-		return { source: 'nodedef', name: nodeDef.name, node: nodeDef.node, inputs, outputs: nodeDef.outputs };
-
-	}
-
-	const libraryEntry = MtlXLibrary[ nodeX.element ];
-	if ( libraryEntry ) {
-
-		const inputs = Object.fromEntries( libraryEntry.params.map( ( param ) => [ param, null ] ) );
-		const outputs = nodeX.type ? { [ LIBRARY_FALLBACK_OUTPUT ]: nodeX.type } : {};
-		return { source: 'library', name: nodeX.element, node: nodeX.element, inputs, outputs };
+		return { name: nodeDef.name, node: nodeDef.node, inputs, outputs: nodeDef.outputs };
 
 	}
 
