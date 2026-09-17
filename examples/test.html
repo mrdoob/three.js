@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - uniform array mat2 and mat3</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			.label {
+				color: #fff;
+				font-family: monospace;
+				text-align: center;
+				text-shadow: 0 0 4px #000;
+				pointer-events: none;
+			}
+
+			.label b {
+				display: block;
+				font-size: 16px;
+				margin-bottom: 4px;
+			}
+
+			.label span {
+				font-size: 12px;
+				color: #ccc;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Uniform Array mat2 and mat3</span>
+			</div>
+
+			<small>
+				Expected: mat2 uniform array red, green, blue, mat2 storage buffer red, green, blue.mat3 uniform array and mat3 storage buffer rows both red, green, blue, yellow, cyan, magenta. Backend: <span id="backend"></span>.<br/>
+				Toggle Inspector &gt; Settings &gt; Force WebGL to switch backends. See the console for the buffer layout.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { instanceIndex, instancedArray, uniformArray, vec4 } from 'three/tsl';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			const renderer = new THREE.WebGPURenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.inspector = new Inspector();
+			document.body.appendChild( renderer.domElement );
+
+			const labelRenderer = new CSS2DRenderer();
+			labelRenderer.setSize( window.innerWidth, window.innerHeight );
+			labelRenderer.domElement.style.position = 'absolute';
+			labelRenderer.domElement.style.top = '0px';
+			labelRenderer.domElement.style.pointerEvents = 'none';
+			document.body.appendChild( labelRenderer.domElement );
+
+			await renderer.init();
+
+			const isWebGL = renderer.backend.isWebGLBackend === true;
+			document.getElementById( 'backend' ).textContent = isWebGL ? 'WebGL' : 'WebGPU';
+
+			const scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x222222 );
+
+			const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
+			camera.position.set( 0, 0.5, 17 );
+
+			const controls = new OrbitControls( camera, renderer.domElement );
+			controls.target.set( 0, 0.5, 0 );
+			controls.enableDamping = true;
+			controls.minDistance = 4;
+			controls.maxDistance = 30;
+			controls.update();
+
+			const boxGeometry = new THREE.BoxGeometry( 0.9, 0.9, 0.9 );
+			const cubeRotation = new THREE.Quaternion().setFromEuler( new THREE.Euler( 0.5, 0.5, 0 ) );
+			const cubeScale = new THREE.Vector3( 1, 1, 1 );
+
+			function placeInstance( mesh, index, x, y ) {
+
+				const matrix = new THREE.Matrix4().compose( new THREE.Vector3( x, y, 0 ), cubeRotation, cubeScale );
+				mesh.setMatrixAt( index, matrix );
+
+			}
+
+			function addLabel( title, subtitle, x, y ) {
+
+				const element = document.createElement( 'div' );
+				element.className = 'label';
+				element.innerHTML = `<b>${ title }</b><span>${ subtitle }</span>`;
+
+				const label = new CSS2DObject( element );
+				label.position.set( x, y, 0 );
+				scene.add( label );
+
+			}
+
+			const mat2RowY = 3.4;
+			const mat3RowY = 0;
+			const mat3StorageRowY = - 3.4;
+			const labelOffsetY = 1.1;
+			const spacing = 2;
+			const mat2UniformCenterX = - 3.5;
+			const mat2StorageCenterX = 3.5;
+
+			// Matrix2.elements is column-major, so each mat2 packs rgba as columns ( r, g ) and ( b, a ).
+			const colors = uniformArray( [
+				new THREE.Matrix2().fromArray( [ 1, 0, 0, 1 ] ),
+				new THREE.Matrix2().fromArray( [ 0, 1, 0, 1 ] ),
+				new THREE.Matrix2().fromArray( [ 0, 0, 1, 1 ] )
+			], 'mat2' );
+
+			const colorMatrix = colors.element( instanceIndex );
+
+			const material = new THREE.MeshBasicNodeMaterial();
+			material.colorNode = vec4( colorMatrix[ 0 ], colorMatrix[ 1 ] );
+
+			const mesh = new THREE.InstancedMesh( boxGeometry, material, 3 );
+			placeInstance( mesh, 0, mat2UniformCenterX - spacing, mat2RowY );
+			placeInstance( mesh, 1, mat2UniformCenterX, mat2RowY );
+			placeInstance( mesh, 2, mat2UniformCenterX + spacing, mat2RowY );
+			scene.add( mesh );
+
+			addLabel( 'Color from mat2 uniform array', 'mat2Array[ instanceIndex ] → vec4( column 0, column 1 )', mat2UniformCenterX, mat2RowY + labelOffsetY );
+
+			// WGSL storage layout: a mat2x2 is 4 contiguous floats.
+			const mat2Storage = instancedArray( 3, 'mat2' ).toReadOnly();
+			const mat2StorageArray = mat2Storage.value.array;
+
+			for ( let i = 0; i < 3; i ++ ) {
+
+				mat2StorageArray.set( colors.array[ i ].elements, i * 4 );
+
+			}
+
+			const storageColorMatrix = mat2Storage.element( instanceIndex );
+
+			const storageMaterial = new THREE.MeshBasicNodeMaterial();
+			storageMaterial.colorNode = vec4( storageColorMatrix[ 0 ], storageColorMatrix[ 1 ] );
+
+			const storageMesh = new THREE.InstancedMesh( boxGeometry, storageMaterial, 3 );
+			placeInstance( storageMesh, 0, mat2StorageCenterX - spacing, mat2RowY );
+			placeInstance( storageMesh, 1, mat2StorageCenterX, mat2RowY );
+			placeInstance( storageMesh, 2, mat2StorageCenterX + spacing, mat2RowY );
+			scene.add( storageMesh );
+
+			addLabel( 'Color from mat2 storage buffer', 'mat2Storage[ instanceIndex ] → vec4( column 0, column 1 )', mat2StorageCenterX, mat2RowY + labelOffsetY );
+
+			const colors3 = uniformArray( [
+				new THREE.Matrix3().fromArray( [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ] ),
+				new THREE.Matrix3().fromArray( [ 1, 1, 0, 0, 1, 1, 1, 0, 1 ] )
+			], 'mat3' );
+
+			const colorMatrix3 = colors3.element( instanceIndex.div( 3 ) );
+
+			const material3 = new THREE.MeshBasicNodeMaterial();
+			material3.colorNode = colorMatrix3.element( instanceIndex.mod( 3 ) );
+
+			const mesh3 = new THREE.InstancedMesh( boxGeometry, material3, 6 );
+
+			for ( let i = 0; i < 6; i ++ ) {
+
+				const groupGap = i < 3 ? - 0.4 : 0.4;
+				placeInstance( mesh3, i, ( i - 2.5 ) * spacing + groupGap, mat3RowY );
+
+			}
+
+			scene.add( mesh3 );
+
+			addLabel( 'Color from mat3 uniform array', 'mat3Array[ instanceIndex / 3 ][ instanceIndex % 3 ]', 0, mat3RowY + labelOffsetY );
+
+			// WGSL storage layout: each mat3x3 column is a vec3 padded to 4 floats, 12 floats per matrix.
+			const mat3Storage = instancedArray( 2, 'mat3' ).toReadOnly();
+			const mat3StorageArray = mat3Storage.value.array;
+			const mat3StorageLayout = new Float32Array( 2 * 12 );
+
+			for ( let i = 0; i < 2; i ++ ) {
+
+				const elements = colors3.array[ i ].elements;
+
+				for ( let column = 0; column < 3; column ++ ) {
+
+					mat3StorageLayout.set( elements.slice( column * 3, column * 3 + 3 ), i * 12 + column * 4 );
+
+				}
+
+			}
+
+			mat3StorageArray.set( mat3StorageLayout.subarray( 0, mat3StorageArray.length ) );
+
+			console.log( `mat3 storage buffer: ${ mat3StorageArray.length } floats allocated, WGSL expects ${ mat3StorageLayout.length }` );
+
+			const storageColorMatrix3 = mat3Storage.element( instanceIndex.div( 3 ) );
+
+			const storageMaterial3 = new THREE.MeshBasicNodeMaterial();
+			storageMaterial3.colorNode = storageColorMatrix3.element( instanceIndex.mod( 3 ) );
+
+			const storageMesh3 = new THREE.InstancedMesh( boxGeometry, storageMaterial3, 6 );
+
+			for ( let i = 0; i < 6; i ++ ) {
+
+				const groupGap = i < 3 ? - 0.4 : 0.4;
+				placeInstance( storageMesh3, i, ( i - 2.5 ) * spacing + groupGap, mat3StorageRowY );
+
+			}
+
+			scene.add( storageMesh3 );
+
+			addLabel( 'Color from mat3 storage buffer', 'mat3Storage[ instanceIndex / 3 ][ instanceIndex % 3 ]', 0, mat3StorageRowY + labelOffsetY );
+
+			window.addEventListener( 'resize', onWindowResize );
+
+			await renderer.compileAsync( scene, camera );
+
+			const buffer = colors.value;
+			const floatsPerMat2 = isWebGL ? 8 : 4;
+			const read = ( index ) => index < buffer.length ? buffer[ index ] : 'out of range';
+
+			console.log( `Backend: ${ isWebGL ? 'WebGL (std140)' : 'WebGPU (WGSL)' }` );
+			console.log( 'Buffer written by UniformArrayNode:', Array.from( buffer ) );
+			console.log( `Buffer size: ${ buffer.byteLength } bytes, the shader expects ${ colors.array.length * floatsPerMat2 * 4 } bytes` );
+
+			for ( let i = 0; i < colors.array.length; i ++ ) {
+
+				const offset = i * floatsPerMat2;
+				const columnOffset = floatsPerMat2 / 2;
+
+				console.log( `mat2[ ${ i } ] written:`, colors.array[ i ].elements );
+				console.log( `mat2[ ${ i } ] read by the shader:`, [ read( offset ), read( offset + 1 ), read( offset + columnOffset ), read( offset + columnOffset + 1 ) ] );
+
+			}
+
+			const shader = await renderer.debug.getShaderAsync( scene, camera, mesh );
+			console.log( 'Shader declaration:', shader.fragmentShader.split( '\n' ).filter( ( line ) => /mat2|std140|uniform NodeBuffer|var<uniform>/.test( line ) ).join( '\n' ) );
+
+			renderer.setAnimationLoop( animate );
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				labelRenderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				controls.update();
+
+				renderer.render( scene, camera );
+				labelRenderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
