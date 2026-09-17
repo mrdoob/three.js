@@ -6,7 +6,7 @@ import { expression } from '../code/ExpressionNode.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
 import { nodeProxy, vec3, nodeObject, int, Fn } from '../tsl/TSLBase.js';
 import { step } from '../math/MathNode.js';
-import { getTextureType } from '../core/NodeUtils.js';
+import { getTextureType, hash } from '../core/NodeUtils.js';
 
 import { Compatibility, GreaterCompare, GreaterEqualCompare, IntType, LessCompare, LessEqualCompare, NearestFilter, UnsignedIntType } from '../../constants.js';
 
@@ -216,6 +216,19 @@ class TextureNode extends UniformNode {
 	getUniformHash( /*builder*/ ) {
 
 		return this.value.uuid;
+
+	}
+
+	/**
+	 * Overwritten since the texture's type and filters influence the generated shader code.
+	 *
+	 * @return {number} The custom cache key.
+	 */
+	customCacheKey() {
+
+		const { type, minFilter, magFilter } = this.value;
+
+		return hash( this.id, type, minFilter, magFilter );
 
 	}
 

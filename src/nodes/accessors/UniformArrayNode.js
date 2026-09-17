@@ -235,7 +235,7 @@ class UniformArrayNode extends BufferNode {
 
 	/**
 	 * This method is overwritten since the node type is inferred from the
-	 * {@link UniformArrayNode#paddedType}.
+	 * padded type.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
@@ -248,7 +248,7 @@ class UniformArrayNode extends BufferNode {
 
 		}
 
-		return this.paddedType;
+		return this.getPaddedType( builder );
 
 	}
 
@@ -266,7 +266,7 @@ class UniformArrayNode extends BufferNode {
 
 		if ( elementType === 'mat2' ) {
 
-			paddedType = builder.renderer.backend.isWebGLBackend ? 'vec4' : 'mat2';
+			paddedType = builder.renderer.backend.isWebGLBackend === true ? 'vec4' : 'mat2';
 
 		} else if ( /mat/.test( elementType ) === true ) {
 
