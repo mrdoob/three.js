@@ -130,6 +130,39 @@ class NodeManager extends DataMap {
 		_chainKeys[ 0 ] = null;
 		_chainKeys[ 1 ] = null;
 
+		const nodeFrame = this.nodeFrame;
+
+		// RENDER/FRAME groups mutate uniforms in place (e.g. light direction)
+		// without bumping groupNode.version. Upload once per render/frame id.
+
+		if ( groupNode.updateType === NodeUpdateType.RENDER ) {
+
+			if ( groupData.renderId !== nodeFrame.renderId ) {
+
+				groupData.renderId = nodeFrame.renderId;
+
+				return true;
+
+			}
+
+			return false;
+
+		}
+
+		if ( groupNode.updateType === NodeUpdateType.FRAME ) {
+
+			if ( groupData.frameId !== nodeFrame.frameId ) {
+
+				groupData.frameId = nodeFrame.frameId;
+
+				return true;
+
+			}
+
+			return false;
+
+		}
+
 		if ( groupData.version !== groupNode.version ) {
 
 			groupData.version = groupNode.version;
