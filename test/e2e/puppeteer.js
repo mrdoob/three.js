@@ -2,6 +2,8 @@ import puppeteer from 'puppeteer';
 import { Image } from './image.js';
 import * as fs from 'fs/promises';
 import { createServer } from '../../utils/server.js';
+import { availableParallelism } from 'node:os';
+import browserExamples from './browser-examples.js';
 
 const server = createServer();
 
@@ -92,7 +94,8 @@ const parseTime = 1; // 1 second per megabyte
 
 const networkTimeout = 5; // 5 minutes, set to 0 to disable
 const renderTimeout = 5; // 5 seconds, set to 0 to disable
-const numCIJobs = 5; // GitHub Actions run the script in 5 threads
+const numCIJobs = Number( process.env.E2E_SHARDS || 5 );
+const concurrency = Number( process.env.E2E_CONCURRENCY ) || availableParallelism(); // native captures per process
 
 const width = 400;
 const height = 250;
@@ -103,77 +106,65 @@ console.red = msg => console.log( `\x1b[31m${msg}\x1b[39m` );
 console.green = msg => console.log( `\x1b[32m${msg}\x1b[39m` );
 console.yellow = msg => console.log( `\x1b[33m${msg}\x1b[39m` );
 
-let browser;
+let browser, captureNative;
 
-/* Launch server */
+main().catch( error => {
 
-server.listen( port, main );
+	console.error( error );
+	close( 1 );
 
-process.on( 'SIGINT', async () => {
+} );
+
+process.on( 'SIGINT', () => {
 
 	console.log( '\nInterrupted, cleaning up...' );
-
-	if ( browser ) {
-
-		try {
-
-			await browser.close();
-
-		} catch ( e ) {}
-
-	}
-
-	server.close();
-	process.exit( 1 );
+	close( 1 );
 
 } );
 
 async function main() {
 
-	/* Create output directory */
-
-	try {
-
-		await fs.rm( 'test/e2e/output-screenshots', { recursive: true, force: true } );
-
-	} catch ( e ) {}
-
-	try {
-
-		await fs.mkdir( 'test/e2e/output-screenshots' );
-
-	} catch ( e ) {}
-
 	/* Find files */
 
 	let isMakeScreenshot = false;
+	const isBrowser = process.argv.includes( '--browser' );
+	const nativeOnly = process.argv.includes( '--node' );
+	if ( nativeOnly && isBrowser ) throw new Error( 'Choose either --node or --browser.' );
+	const argv = process.argv.filter( arg => ! [ '--node', '--browser' ].includes( arg ) );
 	let isWebGPU = false;
 
 	let argvIndex = 2;
 
-	if ( process.argv[ argvIndex ] === '--webgpu' ) {
+	if ( argv[ argvIndex ] === '--webgpu' ) {
 
 		isWebGPU = true;
 		argvIndex ++;
 
 	}
 
-	if ( process.argv[ argvIndex ] === '--make' ) {
+	if ( argv[ argvIndex ] === '--make' ) {
 
 		isMakeScreenshot = true;
 		argvIndex ++;
 
 	}
 
-	const exactList = process.argv.slice( argvIndex )
+	const exactList = argv.slice( argvIndex )
 		.map( f => f.replace( '.html', '' ) );
 
 	const isExactList = exactList.length !== 0;
 
 	let files = ( await fs.readdir( 'examples' ) )
 		.filter( s => s.slice( - 5 ) === '.html' && s !== 'index.html' )
-		.map( s => s.slice( 0, s.length - 5 ) )
-		.filter( f => isExactList ? exactList.includes( f ) : ! exceptionList.includes( f ) );
+		.map( s => s.slice( 0, s.length - 5 ) );
+
+	for ( const file of Object.keys( browserExamples ) ) {
+
+		if ( ! files.includes( file ) ) throw new Error( `Unknown browser example: ${ file }` );
+
+	}
+
+	files = files.filter( f => isExactList ? exactList.includes( f ) : ! exceptionList.includes( f ) );
 
 	if ( isExactList ) {
 
@@ -190,19 +181,39 @@ async function main() {
 	}
 
 	if ( isWebGPU ) files = files.filter( f => f.includes( 'webgpu_' ) );
+	if ( ! isExactList && ( nativeOnly || isBrowser ) ) files = files.filter( f => Object.hasOwn( browserExamples, f ) === isBrowser );
 
 	/* CI parallelism */
 
 	if ( 'CI' in process.env ) {
 
-		const CI = parseInt( process.env.CI );
+		const CI = Number( process.env.CI );
+		if ( ! Number.isInteger( numCIJobs ) || numCIJobs < 1 || ! Number.isInteger( CI ) || CI < 0 || CI >= numCIJobs ) throw new Error( 'Invalid CI shard or E2E_SHARDS.' );
 
-		files = files.slice(
-			Math.floor( CI * files.length / numCIJobs ),
-			Math.floor( ( CI + 1 ) * files.length / numCIJobs )
-		);
+		// Browser captures keep their alphabetical order: the shared Chrome carries state from one example to the next and
+		// the baselines were recorded in this order. Native captures are isolated processes, so their shards interleave
+		// to spread the heavy examples.
+		files = isBrowser
+			? files.slice( Math.floor( CI * files.length / numCIJobs ), Math.floor( ( CI + 1 ) * files.length / numCIJobs ) )
+			: files.filter( ( _, i ) => i % numCIJobs === CI );
 
 	}
+
+	/* Create output directory */
+
+	try {
+
+		await fs.rm( 'test/e2e/output-screenshots', { recursive: true, force: true } );
+
+	} catch ( e ) {}
+
+	try {
+
+		await fs.mkdir( 'test/e2e/output-screenshots' );
+
+	} catch ( e ) {}
+
+	captureNative = isBrowser ? null : ( await import( './native.js' ) ).capture;
 
 	/* Launch browser */
 
@@ -240,11 +251,7 @@ async function main() {
 		// Disables WebGPU timestamp queries to prevent Inspector/Profiler from crashing in E2E software mode
 		.replace( /this\.trackTimestamp\s*=\s*\(\s*parameters\.trackTimestamp\s*===\s*true\s*\);/g, 'Object.defineProperty(this, \'trackTimestamp\', { get: () => false, set: () => {} });' );
 
-	const builds = {
-		'three.core.js': buildInjection( await fs.readFile( 'build/three.core.js', 'utf8' ) ),
-		'three.module.js': buildInjection( await fs.readFile( 'build/three.module.js', 'utf8' ) ),
-		'three.webgpu.js': buildInjection( await fs.readFile( 'build/three.webgpu.js', 'utf8' ) )
-	};
+	let builds;
 
 	/* Prepare page */
 
@@ -252,6 +259,12 @@ async function main() {
 
 	const launchPage = async () => {
 
+		if ( ! server.listening ) await new Promise( resolve => server.listen( port, resolve ) );
+		builds ||= {
+			'three.core.js': buildInjection( await fs.readFile( 'build/three.core.js', 'utf8' ) ),
+			'three.module.js': buildInjection( await fs.readFile( 'build/three.module.js', 'utf8' ) ),
+			'three.webgpu.js': buildInjection( await fs.readFile( 'build/three.webgpu.js', 'utf8' ) )
+		};
 		browser = await puppeteer.launch( launchOptions );
 		const page = await browser.newPage();
 		await preparePage( page, injection, builds, errorMessagesCache );
@@ -259,8 +272,21 @@ async function main() {
 
 	};
 
+	let lock = Promise.resolve();
 	const ctx = {
-		page: await launchPage(),
+		page: undefined,
+		launchPage,
+		nativeOnly,
+		native: 0,
+		browser: 0,
+		// The browser page is shared: one capture at a time.
+		lock( task ) {
+
+			const run = lock.then( task );
+			lock = run.catch( () => {} );
+			return run;
+
+		},
 		async restart() {
 
 			// SIGKILL the whole Chrome process tree; browser.close() can hang after a wedged GPU process
@@ -281,14 +307,21 @@ async function main() {
 	/* Loop for each file */
 
 	const failedScreenshots = [];
+	const pool = ( queue, size ) => Promise.all( Array.from( { length: Math.min( size, queue.length ) }, async () => {
 
-	for ( const file of files ) {
+		while ( queue.length ) await checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, queue.shift() );
 
-		await checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file );
+	} ) );
 
-	}
+	// Native captures are separate processes and run in parallel. On Linux, WebGPU captures rasterize on the CPU
+	// (SwiftShader) and keep every core busy on their own, so they run one at a time.
+	const cpuBound = file => captureNative && process.platform === 'linux' && file.startsWith( 'webgpu_' );
+	await pool( files.filter( cpuBound ), 1 );
+	await pool( files.filter( file => ! cpuBound( file ) ), captureNative ? concurrency : 1 );
 
 	/* Finish */
+
+	console.log( `Captured ${ ctx.native } examples with Node, ${ ctx.browser } with Puppeteer.` );
 
 	failedScreenshots.sort();
 	const list = failedScreenshots.join( ' ' );
@@ -315,7 +348,7 @@ async function main() {
 
 	}
 
-	setTimeout( close, 300, failedScreenshots.length );
+	setTimeout( close, browser ? 300 : 0, failedScreenshots.length ? 1 : 0 );
 
 }
 
@@ -440,101 +473,130 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 }
 
-async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file ) {
+async function captureBrowser( ctx, cleanPage, file ) {
 
+	ctx.page ||= await ctx.launchPage();
 	const page = ctx.page;
-	const pageStart = performance.now();
+	page.file = file;
+	page.pageSize = 0;
+	page.error = undefined;
+
+	/* Load target page */
 
 	try {
 
-		page.file = file;
-		page.pageSize = 0;
-		page.error = undefined;
+		await page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
+			waitUntil: 'networkidle0',
+			timeout: networkTimeout * 60000
+		} );
 
-		/* Load target page */
+	} catch ( e ) {
 
-		try {
+		throw new Error( `Error happened while loading file ${ file }: ${ e }` );
 
-			await page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
-				waitUntil: 'networkidle0',
-				timeout: networkTimeout * 60000
+	}
+
+	try {
+
+		/* Render page */
+
+		await page.evaluate( cleanPage );
+
+		await page.waitForNetworkIdle( {
+			timeout: networkTimeout * 60000,
+			idleTime: idleTime * 1000
+		} );
+
+		await page.waitForFunction( () => window._videosReady(), {
+			polling: 100,
+			timeout: renderTimeout * 1000
+		} );
+
+		await page.evaluate( async ( renderTimeout, parseTime ) => {
+
+			await new Promise( resolve => setTimeout( resolve, parseTime ) );
+
+			/* Resolve render promise */
+
+			window._renderStarted = true;
+
+			await new Promise( function ( resolve, reject ) {
+
+				const renderStart = performance._now();
+
+				const waitingLoop = setInterval( function () {
+
+					const renderTimeoutExceeded = ( renderTimeout > 0 ) && ( performance._now() - renderStart > 1000 * renderTimeout );
+
+					if ( renderTimeoutExceeded ) {
+
+						clearInterval( waitingLoop );
+						reject( 'Render timeout exceeded' );
+
+					} else if ( window._renderFinished ) {
+
+						clearInterval( waitingLoop );
+						resolve();
+
+					}
+
+				}, 100 );
+
 			} );
 
-		} catch ( e ) {
+		}, renderTimeout, page.pageSize / 1024 / 1024 * parseTime * 1000 );
 
-			throw new Error( `Error happened while loading file ${ file }: ${ e }` );
+	} catch ( e ) {
+
+		if ( e !== 'Render timeout exceeded' ) {
+
+			throw new Error( `Error happened while rendering file ${ file }: ${ e }` );
+
+		} /* else { // This can mean that the example doesn't use requestAnimationFrame loop
+
+			console.yellow( `Render timeout exceeded in file ${ file }` );
+
+		} */ // TODO: fix this
+
+	}
+
+	const screenshot = await Image.read( await page.screenshot() );
+
+	if ( page.error !== undefined ) throw new Error( page.error );
+
+	return screenshot;
+
+}
+
+async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file ) {
+
+	const pageStart = performance.now();
+	let isNative = Boolean( captureNative );
+
+	try {
+
+		let image;
+		if ( isNative ) {
+
+			image = await captureNative( file, width * viewScale, height * viewScale );
+			if ( image.browser ) {
+
+				if ( ctx.nativeOnly ) throw new Error( `Browser required for ${ file }: ${ image.browser }. Review its classification in test/e2e/browser-examples.js.` );
+				console.log( `Browser required for ${ file }: ${ image.browser }` );
+				isNative = false;
+
+			}
 
 		}
 
-		try {
+		if ( ! isNative ) image = await ctx.lock( () => captureBrowser( ctx, cleanPage, file ).finally( () => {
 
-			/* Render page */
+			if ( ctx.page ) ctx.page.file = undefined; // release lock
 
-			await page.evaluate( cleanPage );
-
-			await page.waitForNetworkIdle( {
-				timeout: networkTimeout * 60000,
-				idleTime: idleTime * 1000
-			} );
-
-			await page.waitForFunction( () => window._videosReady(), {
-				polling: 100,
-				timeout: renderTimeout * 1000
-			} );
-
-			await page.evaluate( async ( renderTimeout, parseTime ) => {
-
-				await new Promise( resolve => setTimeout( resolve, parseTime ) );
-
-				/* Resolve render promise */
-
-				window._renderStarted = true;
-
-				await new Promise( function ( resolve, reject ) {
-
-					const renderStart = performance._now();
-
-					const waitingLoop = setInterval( function () {
-
-						const renderTimeoutExceeded = ( renderTimeout > 0 ) && ( performance._now() - renderStart > 1000 * renderTimeout );
-
-						if ( renderTimeoutExceeded ) {
-
-							clearInterval( waitingLoop );
-							reject( 'Render timeout exceeded' );
-
-						} else if ( window._renderFinished ) {
-
-							clearInterval( waitingLoop );
-							resolve();
-
-						}
-
-					}, 100 );
-
-				} );
-
-			}, renderTimeout, page.pageSize / 1024 / 1024 * parseTime * 1000 );
-
-		} catch ( e ) {
-
-			if ( e !== 'Render timeout exceeded' ) {
-
-				throw new Error( `Error happened while rendering file ${ file }: ${ e }` );
-
-			} /* else { // This can mean that the example doesn't use requestAnimationFrame loop
-
-				console.yellow( `Render timeout exceeded in file ${ file }` );
-
-			} */ // TODO: fix this
-
-		}
-
+		} ) );
+		ctx[ isNative ? 'native' : 'browser' ] ++;
+		const screenshot = image.scale( 1 / viewScale );
 		const pageElapsed = ( performance.now() - pageStart ) / 1000;
-
-		const screenshot = ( await Image.read( await page.screenshot() ) ).scale( 1 / viewScale );
-
-		if ( page.error !== undefined ) throw new Error( page.error );
 
 		if ( isMakeScreenshot ) {
 
@@ -599,32 +661,39 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 	} catch ( e ) {
 
-		if ( String( e ).includes( 'WebGPU Device Lost' ) ) {
+		if ( ! isNative && String( e ).includes( 'WebGPU Device Lost' ) ) {
 
 			console.yellow( `${ e }` );
 			console.yellow( 'Restarting browser...' );
-			await ctx.restart();
+			await ctx.lock( () => ctx.restart() );
 
 		} else {
 
 			console.red( e );
+			await fs.writeFile( `test/e2e/output-screenshots/${ file }-error.txt`, String( e ) );
 			failedScreenshots.push( file );
 
 		}
-
-	} finally {
-
-		page.file = undefined; // release lock
 
 	}
 
 }
 
-function close( exitCode = 1 ) {
+async function close( exitCode = 1 ) {
 
 	console.log( 'Closing...' );
 
-	browser.close();
+	try {
+
+		await browser?.close();
+
+	} catch ( error ) {
+
+		console.error( error );
+		exitCode = 1;
+
+	}
+
 	server.close();
 	process.exit( exitCode );
 

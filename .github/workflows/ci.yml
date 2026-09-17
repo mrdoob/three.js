@@ -40,18 +40,25 @@ jobs:
         run: npm run test-e2e-cov
 
   e2e:
-    name: E2E testing
-    runs-on: ${{ matrix.os }}
+    name: E2E ${{ matrix.renderer }} (${{ matrix.CI }})
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
       contents: read
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest ]
-        CI: [ 0, 1, 2, 3, 4 ]
+        include:
+          - { renderer: Native, CI: 0, shards: 2 }
+          - { renderer: Native, CI: 1, shards: 2 }
+          - { renderer: Puppeteer, CI: 0, shards: 4 }
+          - { renderer: Puppeteer, CI: 1, shards: 4 }
+          - { renderer: Puppeteer, CI: 2, shards: 4 }
+          - { renderer: Puppeteer, CI: 3, shards: 4 }
     env:
       CI: ${{ matrix.CI }}
+      E2E_SHARDS: ${{ matrix.shards }}
+      PUPPETEER_SKIP_DOWNLOAD: ${{ matrix.renderer == 'Native' }}
     steps:
       - name: Git checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -60,7 +67,13 @@ jobs:
         with:
           node-version: 24
           cache: 'npm'
-      - name: Install Vulkan drivers and xvfb
+      - name: Install native graphics drivers
+        if: matrix.renderer == 'Native'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mesa-vulkan-drivers libegl1 libgles2 libgl1-mesa-dri
+      - name: Install browser graphics drivers and xvfb
+        if: matrix.renderer == 'Puppeteer'
         run: |
           sudo apt-get update
           sudo apt-get install -y mesa-vulkan-drivers xvfb
@@ -69,12 +82,16 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: === E2E testing ===
-        run: xvfb-run -a npm run test-e2e
+      - name: Native examples
+        if: matrix.renderer == 'Native'
+        run: npm run test-e2e -- --node
+      - name: Browser examples
+        if: matrix.renderer == 'Puppeteer'
+        run: xvfb-run -a npm run test-e2e -- --browser
       - name: Upload output screenshots
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: always()
         with:
-          name: Output screenshots-${{ matrix.os }}-${{ matrix.CI }}
+          name: Output screenshots-${{ matrix.renderer }}-${{ matrix.CI }}
           path: test/e2e/output-screenshots
           if-no-files-found: ignore
