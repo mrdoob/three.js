@@ -1,6 +1,5 @@
 import { MtlXLibrary } from './MaterialXNodeLibrary.js';
 import { MaterialXLogCodes } from './MaterialXLog.js';
-import registryData from './MaterialXNodeInterfaceRegistry.js';
 
 const SKIP_ELEMENTS = new Set( [ 'materialx', 'input', 'output' ] );
 const CONTAINER_ELEMENTS = new Set( [ 'nodegraph' ] );
@@ -37,78 +36,13 @@ function formatNodeElement( nodeX ) {
 
 }
 
-function scoreNodedefCandidate( candidateName, nodeX ) {
-
-	const candidate = registryData.resolved[ candidateName ];
-	if ( ! candidate ) return - 1;
-
-	let score = 0;
-	const nodeType = nodeX.type;
-	const outputType = candidate.outputs.out || Object.values( candidate.outputs )[ 0 ];
-	if ( nodeType && outputType === nodeType ) {
-
-		score += 4;
-
-	}
-
-	for ( const child of nodeX.children ) {
-
-		if ( child.element !== 'input' ) continue;
-		const expectedType = candidate.inputs[ child.name ];
-		if ( ! expectedType || ! child.type ) continue;
-		if ( expectedType === child.type ) {
-
-			score += 3;
-
-		} else if ( typesCompatible( expectedType, child.type ) ) {
-
-			score += 1;
-
-		} else {
-
-			score -= 2;
-
-		}
-
-	}
-
-	return score;
-
-}
-
 function resolveInterface( nodeX ) {
 
-	const nodedefName = nodeX.getAttribute( 'nodedef' );
-	if ( nodedefName && registryData.resolved[ nodedefName ] ) {
+	const nodeDef = nodeX.nodeDef;
+	if ( nodeDef ) {
 
-		return { source: 'nodedef', name: nodedefName, ...registryData.resolved[ nodedefName ] };
-
-	}
-
-	const candidates = registryData.byNode[ nodeX.element ] || [];
-	if ( candidates.length > 0 ) {
-
-		let selected = candidates[ 0 ];
-		let bestScore = - Infinity;
-
-		for ( const candidateName of candidates ) {
-
-			const score = scoreNodedefCandidate( candidateName, nodeX );
-			if ( score > bestScore ) {
-
-				bestScore = score;
-				selected = candidateName;
-
-			}
-
-		}
-
-		const resolved = registryData.resolved[ selected ];
-		if ( resolved ) {
-
-			return { source: 'nodedef', name: selected, ...resolved };
-
-		}
+		const inputs = Object.fromEntries( Object.entries( nodeDef.inputs ).map( ( [ name, input ] ) => [ name, input.type ] ) );
+		return { source: 'nodedef', name: nodeDef.name, node: nodeDef.node, inputs, outputs: nodeDef.outputs };
 
 	}
 
