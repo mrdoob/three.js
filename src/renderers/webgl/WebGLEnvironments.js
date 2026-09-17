@@ -70,7 +70,7 @@ function WebGLEnvironments( renderer ) {
 
 	function getPMREM( texture ) {
 
-		if ( texture && texture.isTexture ) {
+		if ( texture && texture.isTexture && texture.isPMREMTexture !== true ) {
 
 			const mapping = texture.mapping;
 

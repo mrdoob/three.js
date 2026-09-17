@@ -2220,6 +2220,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				generateMipmap( _gl.TEXTURE_CUBE_MAP );
 
+			} else if ( texture.mipmaps.length > 0 ) {
+
+				// a partial mip chain is only complete if the max level is limited to it
+				_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAX_LEVEL, texture.mipmaps.length - 1 );
+
 			}
 
 			state.unbindTexture();
@@ -2283,6 +2288,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			if ( textureNeedsGenerateMipmaps( texture ) ) {
 
 				generateMipmap( glTextureType );
+
+			} else if ( texture.mipmaps.length > 0 ) {
+
+				// a partial mip chain is only complete if the max level is limited to it
+				_gl.texParameteri( glTextureType, _gl.TEXTURE_MAX_LEVEL, texture.mipmaps.length - 1 );
 
 			}
 

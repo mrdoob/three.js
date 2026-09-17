@@ -1,4 +1,4 @@
-import { BackSide, DoubleSide, CubeUVReflectionMapping, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping, NormalBlending, SRGBTransfer, RGFormat, RG11_EAC_Format, RED_GREEN_RGTC2_Format } from '../../constants.js';
+import { BackSide, DoubleSide, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping, NormalBlending, SRGBTransfer, RGFormat, RG11_EAC_Format, RED_GREEN_RGTC2_Format } from '../../constants.js';
 import { Layers } from '../../core/Layers.js';
 import { WebGLProgram } from './WebGLProgram.js';
 import { WebGLShaderCache } from './WebGLShaderCache.js';
@@ -61,7 +61,6 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 
 		const usePMREM = material.isMeshStandardMaterial || ( material.isMeshLambertMaterial && ! material.envMap ) || ( material.isMeshPhongMaterial && ! material.envMap );
 		const envMap = environments.get( material.envMap || environment, usePMREM );
-		const envMapCubeUVHeight = ( !! envMap ) && ( envMap.mapping === CubeUVReflectionMapping ) ? envMap.image.height : null;
 
 		const shaderID = shaderIDs[ material.type ];
 
@@ -127,6 +126,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 		const HAS_MAP = !! material.map;
 		const HAS_MATCAP = !! material.matcap;
 		const HAS_ENVMAP = !! envMap;
+		const HAS_PMREM = HAS_ENVMAP && envMap.isPMREMTexture === true;
 		const HAS_AOMAP = !! material.aoMap;
 		const HAS_LIGHTMAP = !! material.lightMap;
 		const HAS_BUMPMAP = !! material.bumpMap && material.wireframe === false;
@@ -219,7 +219,8 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			matcap: HAS_MATCAP,
 			envMap: HAS_ENVMAP,
 			envMapMode: HAS_ENVMAP && envMap.mapping,
-			envMapCubeUVHeight: envMapCubeUVHeight,
+			envMapPMREM: HAS_PMREM,
+			envMapMaxLod: HAS_PMREM ? envMap.mipmaps.length - 1 : null, // one prefiltered mip level per entry
 			aoMap: HAS_AOMAP,
 			lightMap: HAS_LIGHTMAP,
 			bumpMap: HAS_BUMPMAP,
@@ -449,7 +450,8 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 		array.push( parameters.precision );
 		array.push( parameters.outputColorSpace );
 		array.push( parameters.envMapMode );
-		array.push( parameters.envMapCubeUVHeight );
+		array.push( parameters.envMapPMREM );
+		array.push( parameters.envMapMaxLod );
 		array.push( parameters.mapUv );
 		array.push( parameters.alphaMapUv );
 		array.push( parameters.lightMapUv );

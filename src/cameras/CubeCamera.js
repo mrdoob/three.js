@@ -201,6 +201,9 @@ class CubeCamera extends Object3D {
 
 		const generateMipmaps = renderTarget.texture.generateMipmaps;
 
+		// the faces are rendered with mipmaps disabled, so make sure the texture is created with its mip chain
+		if ( generateMipmaps === true ) renderer.initRenderTarget( renderTarget );
+
 		renderTarget.texture.generateMipmaps = false;
 
 		// https://github.com/mrdoob/three.js/issues/31413#issuecomment-3095966812

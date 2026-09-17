@@ -1,246 +1,65 @@
 import { Fn, int, uint, float, vec2, vec3, vec4, If } from '../tsl/TSLBase.js';
-import { cos, sin, abs, min, max, exp, exp2, log, log2, clamp, fract, mix, floor, normalize, cross, dot, sqrt } from '../math/MathNode.js';
-import { mul } from '../math/OperatorNode.js';
+import { cos, sin, abs, min, max, exp, log, log2, normalize, cross, dot, sqrt, inverseSqrt } from '../math/MathNode.js';
 import { select } from '../math/ConditionalNode.js';
 import { Loop } from '../utils/LoopNode.js';
+import D_GGX from '../functions/BSDF/D_GGX.js';
 
 const GOLDEN_ANGLE = 2.399963229728653;
 
-// These defines must match with PMREMGenerator
-
-const cubeUV_r0 = /*@__PURE__*/ float( 1.0 );
-const cubeUV_m0 = /*@__PURE__*/ float( - 2.0 );
-const cubeUV_r1 = /*@__PURE__*/ float( 0.8 );
-const cubeUV_m1 = /*@__PURE__*/ float( - 1.0 );
-const cubeUV_r4 = /*@__PURE__*/ float( 0.4 );
-const cubeUV_m4 = /*@__PURE__*/ float( 2.0 );
-const cubeUV_r5 = /*@__PURE__*/ float( 0.305 );
-const cubeUV_m5 = /*@__PURE__*/ float( 3.0 );
-const cubeUV_r6 = /*@__PURE__*/ float( 0.21 );
-const cubeUV_m6 = /*@__PURE__*/ float( 4.0 );
-
-const cubeUV_minMipLevel = /*@__PURE__*/ float( 4.0 );
-const cubeUV_minTileSize = /*@__PURE__*/ float( 16.0 );
-
-// These shader functions convert between the UV coordinates of a single face of
-// a cubemap, the 0-5 integer index of a cube face, and the direction vector for
-// sampling a textureCube (not generally normalized ).
-
-const getFace = /*@__PURE__*/ Fn( ( [ direction ] ) => {
-
-	const absDirection = vec3( abs( direction ) ).toVar();
-	const face = float( - 1.0 ).toVar();
-
-	If( absDirection.x.greaterThan( absDirection.z ), () => {
-
-		If( absDirection.x.greaterThan( absDirection.y ), () => {
-
-			face.assign( select( direction.x.greaterThan( 0.0 ), 0.0, 3.0 ) );
-
-		} ).Else( () => {
-
-			face.assign( select( direction.y.greaterThan( 0.0 ), 1.0, 4.0 ) );
-
-		} );
-
-	} ).Else( () => {
-
-		If( absDirection.z.greaterThan( absDirection.y ), () => {
-
-			face.assign( select( direction.z.greaterThan( 0.0 ), 2.0, 5.0 ) );
-
-		} ).Else( () => {
-
-			face.assign( select( direction.y.greaterThan( 0.0 ), 1.0, 4.0 ) );
-
-		} );
-
-	} );
-
-	return face;
-
-} ).setLayout( {
-	name: 'getFace',
-	type: 'float',
-	inputs: [
-		{ name: 'direction', type: 'vec3' }
-	]
-} );
-
-// RH coordinate system; PMREM face-indexing convention
-const getUV = /*@__PURE__*/ Fn( ( [ direction, face ] ) => {
-
-	const uv = vec2().toVar();
-
-	If( face.equal( 0.0 ), () => {
-
-		uv.assign( vec2( direction.z, direction.y ).div( abs( direction.x ) ) ); // pos x
-
-	} ).ElseIf( face.equal( 1.0 ), () => {
-
-		uv.assign( vec2( direction.x.negate(), direction.z.negate() ).div( abs( direction.y ) ) ); // pos y
-
-	} ).ElseIf( face.equal( 2.0 ), () => {
-
-		uv.assign( vec2( direction.x.negate(), direction.y ).div( abs( direction.z ) ) ); // pos z
-
-	} ).ElseIf( face.equal( 3.0 ), () => {
-
-		uv.assign( vec2( direction.z.negate(), direction.y ).div( abs( direction.x ) ) ); // neg x
-
-	} ).ElseIf( face.equal( 4.0 ), () => {
-
-		uv.assign( vec2( direction.x.negate(), direction.z ).div( abs( direction.y ) ) ); // neg y
-
-	} ).Else( () => {
-
-		uv.assign( vec2( direction.x, direction.y ).div( abs( direction.z ) ) ); // neg z
-
-	} );
-
-	return mul( 0.5, uv.add( 1.0 ) );
-
-} ).setLayout( {
-	name: 'getUV',
-	type: 'vec2',
-	inputs: [
-		{ name: 'direction', type: 'vec3' },
-		{ name: 'face', type: 'float' }
-	]
-} );
-
-const roughnessToMip = /*@__PURE__*/ Fn( ( [ roughness ] ) => {
-
-	const mip = float( 0.0 ).toVar();
-
-	If( roughness.greaterThanEqual( cubeUV_r1 ), () => {
-
-		mip.assign( cubeUV_r0.sub( roughness ).mul( cubeUV_m1.sub( cubeUV_m0 ) ).div( cubeUV_r0.sub( cubeUV_r1 ) ).add( cubeUV_m0 ) );
-
-	} ).ElseIf( roughness.greaterThanEqual( cubeUV_r4 ), () => {
-
-		mip.assign( cubeUV_r1.sub( roughness ).mul( cubeUV_m4.sub( cubeUV_m1 ) ).div( cubeUV_r1.sub( cubeUV_r4 ) ).add( cubeUV_m1 ) );
-
-	} ).ElseIf( roughness.greaterThanEqual( cubeUV_r5 ), () => {
-
-		mip.assign( cubeUV_r4.sub( roughness ).mul( cubeUV_m5.sub( cubeUV_m4 ) ).div( cubeUV_r4.sub( cubeUV_r5 ) ).add( cubeUV_m4 ) );
-
-	} ).ElseIf( roughness.greaterThanEqual( cubeUV_r6 ), () => {
-
-		mip.assign( cubeUV_r5.sub( roughness ).mul( cubeUV_m6.sub( cubeUV_m5 ) ).div( cubeUV_r5.sub( cubeUV_r6 ) ).add( cubeUV_m5 ) );
-
-	} ).Else( () => {
-
-		mip.assign( float( - 2.0 ).mul( log2( mul( 1.16, roughness ) ) ) ); // 1.16 = 1.79^0.25
-
-	} );
-
-	return mip;
-
-} ).setLayout( {
-	name: 'roughnessToMip',
-	type: 'float',
-	inputs: [
-		{ name: 'roughness', type: 'float' }
-	]
-} );
-
-//
-
-export const textureCubeUV = /*@__PURE__*/ Fn( ( [ envMap, sampleDir_immutable, roughness_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
-
-	const roughness = float( roughness_immutable );
-	const sampleDir = vec3( sampleDir_immutable );
-
-	const mip = clamp( roughnessToMip( roughness ), cubeUV_m0, CUBEUV_MAX_MIP );
-	const mipF = fract( mip );
-	const mipInt = floor( mip );
-	const color0 = vec3( bilinearCubeUV( envMap, sampleDir, mipInt, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ) ).toVar();
-
-	If( mipF.notEqual( 0.0 ), () => {
-
-		const color1 = vec3( bilinearCubeUV( envMap, sampleDir, mipInt.add( 1.0 ), CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ) ).toVar();
-
-		color0.assign( mix( color0, color1, mipF ) );
-
-	} );
-
-	return color0;
-
-} );
-
-const bilinearCubeUV = /*@__PURE__*/ Fn( ( [ envMap, direction_immutable, mipInt_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
-
-	const mipInt = float( mipInt_immutable ).toVar();
-	const direction = vec3( direction_immutable );
-	const face = float( getFace( direction ) ).toVar();
-	const filterInt = float( max( cubeUV_minMipLevel.sub( mipInt ), 0.0 ) ).toVar();
-	mipInt.assign( max( mipInt, cubeUV_minMipLevel ) );
-	const faceSize = float( exp2( mipInt ) ).toVar();
-	const uv = vec2( getUV( direction, face ).mul( faceSize.sub( 2.0 ) ).add( 1.0 ) ).toVar();
-
-	If( face.greaterThan( 2.0 ), () => {
-
-		uv.y.addAssign( faceSize );
-		face.subAssign( 3.0 );
-
-	} );
-
-	uv.x.addAssign( face.mul( faceSize ) );
-	uv.x.addAssign( filterInt.mul( mul( 3.0, cubeUV_minTileSize ) ) );
-	uv.y.addAssign( mul( 4.0, exp2( CUBEUV_MAX_MIP ).sub( faceSize ) ) );
-	uv.x.mulAssign( CUBEUV_TEXEL_WIDTH );
-	uv.y.mulAssign( CUBEUV_TEXEL_HEIGHT );
-
-	return envMap.sample( uv ).grad( vec2(), vec2() ); // disable anisotropic filtering
-
-} );
+/**
+ * Returns the mip level of a PMREM that has been prefiltered for the given roughness.
+ * Must match `PMREMGenerator.lodToRoughness()`.
+ *
+ * @tsl
+ * @function
+ * @param {Node<float>} roughness - The roughness.
+ * @param {Node<float>} maxLod - The last mip level of the PMREM.
+ * @return {Node<float>} The mip level.
+ */
+export const roughnessToMip = ( roughness, maxLod ) => {
+
+	roughness = float( roughness );
+
+	return float( maxLod ).mul( roughness ).mul( float( 2.0 ).sub( roughness ) );
+
+};
 
 // Gaussian blur along a golden-angle spiral, importance-sampled by stratified
 // inverse-CDF so every sample carries equal Gaussian weight.
-export const sphericalGaussianBlur = /*@__PURE__*/ Fn( ( { SAMPLES, sigma, outputDirection, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
+export const sphericalGaussianBlur = /*@__PURE__*/ Fn( ( { SAMPLES, sigma, direction, envMap } ) => {
+
+	const outputDirection = vec3( direction ).toVar();
+
+	const up = select( abs( outputDirection.z ).lessThan( 0.999 ), vec3( 0.0, 0.0, 1.0 ), vec3( 1.0, 0.0, 0.0 ) );
+	const tangent = normalize( cross( up, outputDirection ) ).toVar();
+	const bitangent = cross( outputDirection, tangent ).toVar();
+
+	// Truncate the kernel at three standard deviations or at the antipode.
+	const thetaMax = min( sigma.mul( 3.0 ), Math.PI );
+	const truncation = exp( thetaMax.mul( thetaMax ).mul( - 0.5 ).div( sigma.mul( sigma ) ) ).oneMinus().toVar();
 
 	const color = vec3( 0.0 ).toVar();
+	const accumWeight = float( 0.0 ).toVar();
 
-	If( sigma.equal( 0.0 ), () => {
+	Loop( { start: int( 0 ), end: SAMPLES }, ( { i } ) => {
 
-		color.assign( bilinearCubeUV( envMap, outputDirection, mipInt, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ) );
+		// Stratified inverse-CDF sampling of the Gaussian, placed on a golden-angle spiral.
+		const stratum = float( i ).add( 0.5 ).div( float( SAMPLES ) );
+		const theta = sigma.mul( sqrt( log( stratum.mul( truncation ).oneMinus() ).mul( - 2.0 ) ) ).toVar();
+		const phi = float( i ).mul( GOLDEN_ANGLE ).toVar();
 
-	} ).Else( () => {
+		const offset = tangent.mul( cos( phi ) ).add( bitangent.mul( sin( phi ) ) );
+		const sampleDirection = outputDirection.mul( cos( theta ) ).add( offset.mul( sin( theta ) ) );
 
-		const up = select( abs( outputDirection.z ).lessThan( 0.999 ), vec3( 0.0, 0.0, 1.0 ), vec3( 1.0, 0.0, 0.0 ) );
-		const tangent = normalize( cross( up, outputDirection ) ).toVar();
-		const bitangent = cross( outputDirection, tangent ).toVar();
+		// Correct the planar sample density to solid angle.
+		const weight = sin( theta ).div( theta ).toVar();
 
-		// Truncate the kernel at three standard deviations or at the antipode.
-		const thetaMax = min( sigma.mul( 3.0 ), Math.PI );
-		const truncation = exp( thetaMax.mul( thetaMax ).mul( - 0.5 ).div( sigma.mul( sigma ) ) ).oneMinus().toVar();
-
-		const accumWeight = float( 0.0 ).toVar();
-
-		Loop( { start: int( 0 ), end: SAMPLES }, ( { i } ) => {
-
-			// Stratified inverse-CDF sampling of the Gaussian, placed on a golden-angle spiral.
-			const stratum = float( i ).add( 0.5 ).div( float( SAMPLES ) );
-			const theta = sigma.mul( sqrt( log( stratum.mul( truncation ).oneMinus() ).mul( - 2.0 ) ) ).toVar();
-			const phi = float( i ).mul( GOLDEN_ANGLE ).toVar();
-
-			const offset = tangent.mul( cos( phi ) ).add( bitangent.mul( sin( phi ) ) );
-			const sampleDirection = outputDirection.mul( cos( theta ) ).add( offset.mul( sin( theta ) ) );
-
-			// Correct the planar sample density to solid angle.
-			const weight = sin( theta ).div( theta ).toVar();
-
-			color.addAssign( bilinearCubeUV( envMap, sampleDirection, mipInt, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ).mul( weight ) );
-			accumWeight.addAssign( weight );
-
-		} );
-
-		color.divAssign( accumWeight );
+		color.addAssign( envMap.sample( sampleDirection ).level( 0 ).rgb.mul( weight ) );
+		accumWeight.addAssign( weight );
 
 	} );
 
-	return vec4( color, 1.0 );
+	return vec4( color.div( accumWeight ), 1.0 );
 
 } );
 
@@ -266,89 +85,129 @@ const hammersley = /*@__PURE__*/ Fn( ( [ i, N ] ) => {
 
 } );
 
-// GGX VNDF importance sampling (Eric Heitz 2018)
-// "Sampling the GGX Distribution of Visible Normals"
-// https://jcgt.org/published/0007/04/01/
-const importanceSampleGGX_VNDF = /*@__PURE__*/ Fn( ( [ Xi, V, roughness ] ) => {
+// GGX VNDF importance sampling (Eric Heitz 2018), "Sampling the GGX Distribution
+// of Visible Normals", https://jcgt.org/published/0007/04/01/. With V = N the
+// visible normals are a cosine distributed hemisphere stretched by alpha.
+const importanceSampleGGX_VNDF = /*@__PURE__*/ Fn( ( [ Xi, alpha ] ) => {
 
-	const alpha = roughness.mul( roughness ).toConst();
-
-	// Section 4.1: Orthonormal basis
-	const T1 = vec3( 1.0, 0.0, 0.0 ).toConst();
-	const T2 = cross( V, T1 ).toConst();
-
-	// Section 4.2: Parameterization of projected area
 	const r = sqrt( Xi.x ).toConst();
-	const phi = mul( 2.0, 3.14159265359 ).mul( Xi.y ).toConst();
-	const t1 = r.mul( cos( phi ) ).toConst();
-	const t2 = r.mul( sin( phi ) ).toVar();
-	const s = mul( 0.5, V.z.add( 1.0 ) ).toConst();
-	t2.assign( s.oneMinus().mul( sqrt( t1.mul( t1 ).oneMinus() ) ).add( s.mul( t2 ) ) );
+	const phi = float( 2.0 * Math.PI ).mul( Xi.y ).toConst();
 
-	// Section 4.3: Reprojection onto hemisphere
-	const Nh = T1.mul( t1 ).add( T2.mul( t2 ) ).add( V.mul( sqrt( max( 0.0, t1.mul( t1 ).add( t2.mul( t2 ) ).oneMinus() ) ) ) );
-
-	// Section 3.4: Transform back to ellipsoid configuration
-	return normalize( vec3( alpha.mul( Nh.x ), alpha.mul( Nh.y ), max( 0.0, Nh.z ) ) );
+	return normalize( vec3( alpha.mul( r ).mul( cos( phi ) ), alpha.mul( r ).mul( sin( phi ) ), sqrt( Xi.x.oneMinus() ) ) );
 
 } );
 
-// GGX convolution using VNDF importance sampling
-export const ggxConvolution = /*@__PURE__*/ Fn( ( { roughness, mipInt, envMap, N_immutable, GGX_SAMPLES, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
+// GGX convolution using VNDF importance sampling. Each sample reads the mip level of the
+// source cube map that matches its solid angle (filtered importance sampling), which keeps
+// the estimate smooth even for tiny, very bright light sources.
+export const ggxConvolution = /*@__PURE__*/ Fn( ( { roughness, lodBias, envMap, direction, GGX_SAMPLES } ) => {
 
-	const N = vec3( N_immutable ).toVar();
+	const N = vec3( direction ).toVar();
 
 	const prefilteredColor = vec3( 0.0 ).toVar();
-	const totalWeight = float( 0.0 ).toVar();
 
 	// For very low roughness, just sample the environment directly
 	If( roughness.lessThan( 0.001 ), () => {
 
-		prefilteredColor.assign( bilinearCubeUV( envMap, N, mipInt, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ) );
+		prefilteredColor.assign( envMap.sample( N ).level( 0 ).rgb );
 
 	} ).Else( () => {
+
+		const alpha = roughness.mul( roughness ).toConst();
+		const alpha2 = alpha.mul( alpha ).toConst();
 
 		// Tangent space basis for VNDF sampling
 		const up = select( abs( N.z ).lessThan( 0.999 ), vec3( 0.0, 0.0, 1.0 ), vec3( 1.0, 0.0, 0.0 ) );
 		const tangent = normalize( cross( up, N ) ).toVar();
 		const bitangent = cross( N, tangent ).toVar();
 
+		const totalWeight = float( 0.0 ).toVar();
+
 		Loop( { start: uint( 0 ), end: GGX_SAMPLES }, ( { i } ) => {
 
 			const Xi = hammersley( i, GGX_SAMPLES );
 
-			// For PMREM, V = N, so in tangent space V is always (0, 0, 1)
-			const H_tangent = importanceSampleGGX_VNDF( Xi, vec3( 0.0, 0.0, 1.0 ), roughness );
+			const H_tangent = importanceSampleGGX_VNDF( Xi, alpha ).toConst();
 
 			// Transform H back to world space
-			const H = normalize( tangent.mul( H_tangent.x ).add( bitangent.mul( H_tangent.y ) ).add( N.mul( H_tangent.z ) ) );
-			const L = normalize( H.mul( dot( N, H ).mul( 2.0 ) ).sub( N ) );
+			const H = tangent.mul( H_tangent.x ).add( bitangent.mul( H_tangent.y ) ).add( N.mul( H_tangent.z ) );
+			const L = H.mul( dot( N, H ).mul( 2.0 ) ).sub( N ).toConst();
 
-			const NdotL = max( dot( N, L ), 0.0 );
+			const NdotL = dot( N, L ).toConst();
 
 			If( NdotL.greaterThan( 0.0 ), () => {
 
-				// Sample environment at fixed mip level
-				// VNDF importance sampling handles the distribution filtering
-				const sampleColor = bilinearCubeUV( envMap, L, mipInt, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP );
+				// the source mip whose texel matches the sample's solid angle, see lodBias
+				const NdotH = H_tangent.z;
+				const d = NdotH.mul( NdotH ).mul( alpha2.sub( 1.0 ) ).add( 1.0 );
+				const lod = max( log2( d ).add( lodBias ), 0.0 );
 
 				// Weight by NdotL for the split-sum approximation
-				// VNDF PDF naturally accounts for the visible microfacet distribution
-				prefilteredColor.addAssign( sampleColor.mul( NdotL ) );
+				prefilteredColor.addAssign( envMap.sample( L ).level( lod ).rgb.mul( NdotL ) );
 				totalWeight.addAssign( NdotL );
 
 			} );
 
 		} );
 
-		If( totalWeight.greaterThan( 0.0 ), () => {
+		prefilteredColor.divAssign( totalWeight );
 
-			prefilteredColor.assign( prefilteredColor.div( totalWeight ) );
+	} );
+
+	return vec4( prefilteredColor, 1.0 );
+
+} );
+
+// GGX convolution that weights every texel of a small source mip. Noise free and,
+// for the wide lobes of the rough mip levels, cheaper than importance sampling.
+export const ggxIntegration = /*@__PURE__*/ Fn( ( { roughness, sourceLod, sourceSize, envMap, direction } ) => {
+
+	const N = vec3( direction ).toVar();
+
+	const alpha = roughness.mul( roughness ).toConst();
+
+	const texelSize = float( 2.0 ).div( float( sourceSize ) ).toConst();
+
+	const prefilteredColor = vec3( 0.0 ).toVar();
+	const totalWeight = float( 0.0 ).toVar();
+
+	// the texel centers of any cube map are the same set of directions,
+	// so the face orientation doesn't matter here
+	Loop( { start: int( 0 ), end: int( 6 ), name: 'face' }, ( { face } ) => {
+
+		const s = select( face.bitAnd( int( 1 ) ).equal( int( 0 ) ), 1.0, - 1.0 ).toConst();
+
+		Loop( { start: int( 0 ), end: sourceSize, name: 'y' }, ( { y } ) => {
+
+			Loop( { start: int( 0 ), end: sourceSize, name: 'x' }, ( { x } ) => {
+
+				const uv = vec2( x, y ).add( 0.5 ).mul( texelSize ).sub( 1.0 ).toConst();
+				const texelDirection = select( face.lessThan( 2 ), vec3( s, uv ), select( face.lessThan( 4 ), vec3( uv.x, s, uv.y ), vec3( uv, s ) ) ).toConst();
+
+				const invDistance = inverseSqrt( dot( uv, uv ).add( 1.0 ) ).toConst();
+				const L = texelDirection.mul( invDistance ).toConst();
+				const NdotL = dot( N, L ).toConst();
+
+				If( NdotL.greaterThan( 0.0 ), () => {
+
+					const D = D_GGX( { alpha, dotNH: dot( N, normalize( N.add( L ) ) ) } );
+
+					// solid angle of the texel: its area over the cubed distance
+					const solidAngle = texelSize.mul( texelSize ).mul( invDistance.mul( invDistance ).mul( invDistance ) );
+
+					const weight = D.mul( NdotL ).mul( solidAngle ).toConst();
+
+					prefilteredColor.addAssign( envMap.sample( texelDirection ).level( sourceLod ).rgb.mul( weight ) );
+					totalWeight.addAssign( weight );
+
+				} );
+
+			} );
 
 		} );
 
 	} );
 
-	return vec4( prefilteredColor, 1.0 );
+	return vec4( prefilteredColor.div( totalWeight ), 1.0 );
 
 } );

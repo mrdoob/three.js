@@ -1,27 +1,24 @@
 import NodeMaterial from '../../../materials/nodes/NodeMaterial.js';
-import { sphericalGaussianBlur, ggxConvolution } from '../../../nodes/pmrem/PMREMUtils.js';
+import { sphericalGaussianBlur, ggxConvolution, ggxIntegration } from '../../../nodes/pmrem/PMREMUtils.js';
 import { equirectUV } from '../../../nodes/utils/EquirectUV.js';
+import { positionWorldDirection } from '../../../nodes/accessors/Position.js';
 import { uniform } from '../../../nodes/core/UniformNode.js';
 import { texture } from '../../../nodes/accessors/TextureNode.js';
 import { cubeTexture } from '../../../nodes/accessors/CubeTextureNode.js';
-import { float, int, uint } from '../../../nodes/tsl/TSLBase.js';
-import { attribute } from '../../../nodes/core/AttributeNode.js';
+import { int, uint } from '../../../nodes/tsl/TSLBase.js';
 
-import { OrthographicCamera } from '../../../cameras/OrthographicCamera.js';
 import { Color } from '../../../math/Color.js';
+import { floorPowerOfTwo } from '../../../math/MathUtils.js';
 import { Vector3 } from '../../../math/Vector3.js';
-import { BufferGeometry } from '../../../core/BufferGeometry.js';
-import { BufferAttribute } from '../../../core/BufferAttribute.js';
-import { RenderTarget } from '../../../core/RenderTarget.js';
 import { Mesh } from '../../../objects/Mesh.js';
-import { PerspectiveCamera } from '../../../cameras/PerspectiveCamera.js';
-import { MeshBasicMaterial } from '../../../materials/MeshBasicMaterial.js';
 import { BoxGeometry } from '../../../geometries/BoxGeometry.js';
+import { CubeCamera } from '../../../cameras/CubeCamera.js';
+import CubeRenderTarget from '../CubeRenderTarget.js';
 import {
 	CubeReflectionMapping,
 	CubeRefractionMapping,
-	CubeUVReflectionMapping,
 	LinearFilter,
+	LinearMipmapLinearFilter,
 	NoBlending,
 	RGBAFormat,
 	HalfFloatType,
@@ -30,51 +27,40 @@ import {
 } from '../../../constants.js';
 import { warnOnce } from '../../../utils.js';
 
-const LOD_MIN = 4;
+// Smaller inputs are upsampled so that every PMREM has enough mip levels.
+const MIN_SIZE = 256;
 
-// The number of extra mips.
-// Used for scene blur in fromScene() method.
-const EXTRA_LODS = 6;
+// Log2 of the face size of the roughest mip level. Smaller faces can't
+// represent the diffuse irradiance that is stored in this level.
+const LOD_MIN = 3;
 
 // The number of spiral samples per blur pass.
 // Used for scene blur in fromScene() method.
 const BLUR_SAMPLES = 20;
 
-// GGX VNDF importance sampling configuration
+// GGX VNDF importance sampling configuration for the sharp mip levels.
 const GGX_SAMPLES = 256;
 
-const _flatCamera = /*@__PURE__*/ new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-const _cubeCamera = /*@__PURE__*/ new PerspectiveCamera( 90, 1 );
-const _clearColor = /*@__PURE__*/ new Color();
-let _oldTarget = null;
-let _oldActiveCubeFace = 0;
-let _oldActiveMipmapLevel = 0;
+// The rough mip levels integrate every texel of this source mip instead, which is
+// noise free and cheaper than the many samples their wide lobes would need.
+const INTEGRATION_SIZE = 16;
+const INTEGRATION_LEVELS = 3;
 
 const _origin = /*@__PURE__*/ new Vector3();
-const _direction = /*@__PURE__*/ new Vector3();
+const _clearColor = /*@__PURE__*/ new Color();
 
-// maps blur materials to their uniforms dictionary
+// maps materials to their uniforms dictionary
 
 const _uniformsMap = new WeakMap();
-
-// WebGPU Face indices
-const _faceLib = [
-	3, 1, 5,
-	0, 4, 2
-];
-
-const _outputDirection = /*@__PURE__*/ attribute( 'outputDirection' ).normalize();
 
 /**
  * This class generates a Prefiltered, Mipmapped Radiance Environment Map
  * (PMREM) from a cubeMap environment texture. This allows different levels of
- * blur to be quickly accessed based on material roughness. It is packed into a
- * special CubeUV format that allows us to perform custom interpolation so that
- * we can support nonlinear formats such as RGBE. Unlike a traditional mipmap
- * chain, it only goes down to the LOD_MIN level (above), and then creates extra
- * even more filtered 'mips' at the same LOD_MIN resolution, associated with
- * higher roughness levels. In this way we maintain resolution to smoothly
- * interpolate diffuse lighting while limiting sampling computation.
+ * blur to be quickly accessed based on material roughness. The result is a
+ * cube render target whose mip levels hold the environment prefiltered for
+ * increasing roughness values, from a mirror-like level 0 down to a level
+ * that represents roughness 1. The roughness of a mip level is defined by
+ * {@link PMREMGenerator.lodToRoughness}.
  *
  * The prefiltering uses GGX VNDF (Visible Normal Distribution Function)
  * importance sampling based on "Sampling the GGX Distribution of Visible Normals"
@@ -91,19 +77,19 @@ class PMREMGenerator {
 	constructor( renderer ) {
 
 		this._renderer = renderer;
-		this._pingPongRenderTarget = null;
 
-		this._lodMax = 0;
 		this._cubeSize = 0;
-		this._sizeLods = [];
-		this._lodMeshes = [];
+		this._sourceTarget = null;
 
-		this._blurMaterial = null;
-		this._ggxMaterial = null;
+		this._cubeCamera = new CubeCamera( 1, 10, null );
+		this._boxMesh = new Mesh( new BoxGeometry( 5, 5, 5 ), null );
 
 		this._cubemapMaterial = null;
 		this._equirectMaterial = null;
-		this._backgroundBox = null;
+
+		this._blurMaterial = null;
+		this._ggxMaterial = null;
+		this._integrationMaterial = null;
 
 	}
 
@@ -126,8 +112,8 @@ class PMREMGenerator {
 	 * @param {Object} [options={}] - The configuration options.
 	 * @param {number} [options.size=256] - The texture size of the PMREM.
 	 * @param {Vector3} [options.position=origin] - The position of the internal cube camera that renders the scene.
-	 * @param {?RenderTarget} [options.renderTarget=null] - The render target to use.
-	 * @return {RenderTarget} The resulting PMREM.
+	 * @param {?CubeRenderTarget} [options.renderTarget=null] - The render target to use.
+	 * @return {CubeRenderTarget} The resulting PMREM.
 	 * @see {@link PMREMGenerator#fromScene}
 	 */
 	fromScene( scene, sigma = 0, near = 0.1, far = 100, options = {} ) {
@@ -138,6 +124,8 @@ class PMREMGenerator {
 			renderTarget = null,
 		} = options;
 
+		const renderer = this._renderer;
+
 		this._setSize( size );
 
 		if ( this._hasInitialized === false ) {
@@ -146,27 +134,44 @@ class PMREMGenerator {
 
 		}
 
-		_oldTarget = this._renderer.getRenderTarget();
-		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
-		_oldActiveMipmapLevel = this._renderer.getActiveMipmapLevel();
+		const pmremTarget = renderTarget || this._allocateTarget();
+		const sourceTarget = this._getSourceTarget();
 
-		const cubeUVRenderTarget = renderTarget || this._allocateTarget( true );
+		// clear each face with the scene background or the clear color, whatever the app's clear settings are
 
-		this._init( cubeUVRenderTarget );
+		const autoClear = renderer.autoClear;
+		const autoClearColor = renderer.autoClearColor;
+		const autoClearDepth = renderer.autoClearDepth;
+		const autoClearStencil = renderer.autoClearStencil;
+		const background = scene.background;
 
-		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget, position );
+		renderer.autoClear = true;
+		renderer.autoClearColor = true;
+		renderer.autoClearDepth = true;
+		renderer.autoClearStencil = true;
+
+		if ( background === null ) scene.background = renderer.getClearColor( _clearColor );
+
+		const cubeCamera = new CubeCamera( near, far, sourceTarget );
+		cubeCamera.position.copy( position );
+		cubeCamera.update( renderer, scene );
+
+		renderer.autoClear = autoClear;
+		renderer.autoClearColor = autoClearColor;
+		renderer.autoClearDepth = autoClearDepth;
+		renderer.autoClearStencil = autoClearStencil;
+
+		scene.background = background;
 
 		if ( sigma > 0 ) {
 
-			this._blur( cubeUVRenderTarget, 0, 0, sigma );
+			this._blur( pmremTarget, sigma );
 
 		}
 
-		this._applyPMREM( cubeUVRenderTarget );
+		this._applyPMREM( pmremTarget );
 
-		this._cleanup( cubeUVRenderTarget );
-
-		return cubeUVRenderTarget;
+		return pmremTarget;
 
 	}
 
@@ -185,8 +190,8 @@ class PMREMGenerator {
 	 * @param {Object} [options={}] - The configuration options.
 	 * @param {number} [options.size=256] - The texture size of the PMREM.
 	 * @param {Vector3} [options.position=origin] - The position of the internal cube camera that renders the scene.
-	 * @param {?RenderTarget} [options.renderTarget=null] - The render target to use.
-	 * @return {Promise<RenderTarget>} A Promise that resolve with the PMREM when the generation has been finished.
+	 * @param {?CubeRenderTarget} [options.renderTarget=null] - The render target to use.
+	 * @return {Promise<CubeRenderTarget>} A Promise that resolve with the PMREM when the generation has been finished.
 	 * @see {@link PMREMGenerator#fromScene}
 	 */
 	async fromSceneAsync( scene, sigma = 0, near = 0.1, far = 100, options = {} ) {
@@ -206,8 +211,8 @@ class PMREMGenerator {
 	 * is 64 x 32.
 	 *
 	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
-	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
-	 * @return {RenderTarget} The resulting PMREM.
+	 * @param {?CubeRenderTarget} [renderTarget=null] - The render target to use.
+	 * @return {CubeRenderTarget} The resulting PMREM.
 	 * @see {@link PMREMGenerator#fromEquirectangularAsync}
 	 */
 	fromEquirectangular( equirectangular, renderTarget = null ) {
@@ -229,8 +234,8 @@ class PMREMGenerator {
 	 *
 	 * @deprecated
 	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
-	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
-	 * @return {Promise<RenderTarget>} The resulting PMREM.
+	 * @param {?CubeRenderTarget} [renderTarget=null] - The render target to use.
+	 * @return {Promise<CubeRenderTarget>} The resulting PMREM.
 	 * @see {@link PMREMGenerator#fromEquirectangular}
 	 */
 	async fromEquirectangularAsync( equirectangular, renderTarget = null ) {
@@ -250,8 +255,8 @@ class PMREMGenerator {
 	 * size is 16 x 16 per face.
 	 *
 	 * @param {Texture} cubemap - The cubemap texture to be converted.
-	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
-	 * @return {RenderTarget} The resulting PMREM.
+	 * @param {?CubeRenderTarget} [renderTarget=null] - The render target to use.
+	 * @return {CubeRenderTarget} The resulting PMREM.
 	 * @see {@link PMREMGenerator#fromCubemapAsync}
 	 */
 	fromCubemap( cubemap, renderTarget = null ) {
@@ -273,8 +278,8 @@ class PMREMGenerator {
 	 *
 	 * @deprecated
 	 * @param {Texture} cubemap - The cubemap texture to be converted.
-	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
-	 * @return {Promise<RenderTarget>} The resulting PMREM.
+	 * @param {?CubeRenderTarget} [renderTarget=null] - The render target to use.
+	 * @return {Promise<CubeRenderTarget>} The resulting PMREM.
 	 * @see {@link PMREMGenerator#fromCubemap}
 	 */
 	async fromCubemapAsync( cubemap, renderTarget = null ) {
@@ -328,22 +333,41 @@ class PMREMGenerator {
 	 */
 	dispose() {
 
-		this._dispose();
+		if ( this._sourceTarget !== null ) this._sourceTarget.dispose();
 
 		if ( this._cubemapMaterial !== null ) this._cubemapMaterial.dispose();
 		if ( this._equirectMaterial !== null ) this._equirectMaterial.dispose();
-		if ( this._backgroundBox !== null ) {
+		if ( this._blurMaterial !== null ) this._blurMaterial.dispose();
+		if ( this._ggxMaterial !== null ) this._ggxMaterial.dispose();
+		if ( this._integrationMaterial !== null ) this._integrationMaterial.dispose();
 
-			this._backgroundBox.geometry.dispose();
-			this._backgroundBox.material.dispose();
+		this._boxMesh.geometry.dispose();
 
-		}
+	}
+
+	/**
+	 * Returns the roughness a mip level of a PMREM has been prefiltered for.
+	 * The inverse mapping is used by the renderers when sampling a PMREM.
+	 *
+	 * @param {number} lod - The mip level.
+	 * @param {number} maxLod - The last mip level of the PMREM.
+	 * @return {number} The roughness.
+	 */
+	static lodToRoughness( lod, maxLod ) {
+
+		return maxLod > 0 ? 1 - Math.sqrt( 1 - lod / maxLod ) : 0;
 
 	}
 
 	// private interface
 
-	_setSizeFromTexture( texture ) {
+	_setSize( cubeSize ) {
+
+		this._cubeSize = Math.max( MIN_SIZE, floorPowerOfTwo( cubeSize ) );
+
+	}
+
+	_fromTexture( texture, renderTarget ) {
 
 		if ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping ) {
 
@@ -355,313 +379,166 @@ class PMREMGenerator {
 
 		}
 
+		const pmremTarget = renderTarget || this._allocateTarget();
+
+		this._textureToCubemap( texture );
+		this._applyPMREM( pmremTarget );
+
+		return pmremTarget;
+
 	}
 
-	_setSize( cubeSize ) {
+	_allocateTarget() {
 
-		this._lodMax = Math.floor( Math.log2( cubeSize ) );
-		this._cubeSize = Math.pow( 2, this._lodMax );
+		const size = this._cubeSize;
 
-	}
+		const pmremTarget = _createRenderTarget( size, false, false );
 
-	_dispose() {
+		// One entry per prefiltered mip level. The renderer allocates exactly these
+		// levels and, unlike with generateMipmaps, never overwrites them.
 
-		if ( this._blurMaterial !== null ) this._blurMaterial.dispose();
-		if ( this._ggxMaterial !== null ) this._ggxMaterial.dispose();
+		for ( let lod = 0; lod <= Math.log2( size ) - LOD_MIN; lod ++ ) {
 
-		if ( this._pingPongRenderTarget !== null ) this._pingPongRenderTarget.dispose();
-
-		for ( let i = 0; i < this._lodMeshes.length; i ++ ) {
-
-			this._lodMeshes[ i ].geometry.dispose();
+			pmremTarget.texture.mipmaps.push( { width: size >> lod, height: size >> lod } );
 
 		}
 
-	}
+		pmremTarget.texture.name = 'PMREM';
+		pmremTarget.texture.isPMREMTexture = true;
 
-	_cleanup( outputTarget ) {
-
-		this._renderer.setRenderTarget( _oldTarget, _oldActiveCubeFace, _oldActiveMipmapLevel );
-		outputTarget.scissorTest = false;
-		this._setViewport( outputTarget, 0, 0, outputTarget.width, outputTarget.height );
+		return pmremTarget;
 
 	}
 
-	_fromTexture( texture, renderTarget ) {
+	_getSourceTarget() {
 
-		this._setSizeFromTexture( texture );
+		const size = this._cubeSize;
+		const sourceTarget = this._sourceTarget;
 
-		_oldTarget = this._renderer.getRenderTarget();
-		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
-		_oldActiveMipmapLevel = this._renderer.getActiveMipmapLevel();
+		if ( sourceTarget === null || sourceTarget.width !== size ) {
 
-		const cubeUVRenderTarget = renderTarget || this._allocateTarget( false );
-		this._init( cubeUVRenderTarget );
-		this._textureToCubeUV( texture, cubeUVRenderTarget );
-		this._applyPMREM( cubeUVRenderTarget );
-		this._cleanup( cubeUVRenderTarget );
+			if ( sourceTarget !== null ) sourceTarget.dispose();
 
-		return cubeUVRenderTarget;
-
-	}
-
-	_allocateTarget( depthBuffer ) {
-
-		const width = 3 * Math.max( this._cubeSize, 16 * 7 );
-		const height = 4 * this._cubeSize;
-
-		const cubeUVRenderTarget = _createRenderTarget( width, height, depthBuffer );
-
-		return cubeUVRenderTarget;
-
-	}
-
-	_init( renderTarget ) {
-
-		if ( this._pingPongRenderTarget === null || this._pingPongRenderTarget.width !== renderTarget.width || this._pingPongRenderTarget.height !== renderTarget.height ) {
-
-			if ( this._pingPongRenderTarget !== null ) {
-
-				this._dispose();
-
-			}
-
-			this._pingPongRenderTarget = _createRenderTarget( renderTarget.width, renderTarget.height );
-
-			const { _lodMax } = this;
-			( { lodMeshes: this._lodMeshes, sizeLods: this._sizeLods } = _createPlanes( _lodMax ) );
-
-			this._blurMaterial = _getBlurShader( _lodMax, renderTarget.width, renderTarget.height );
-			this._ggxMaterial = _getGGXShader( _lodMax, renderTarget.width, renderTarget.height );
+			this._sourceTarget = _createRenderTarget( size, true, true );
 
 		}
+
+		return this._sourceTarget;
 
 	}
 
 	async _compileMaterial( material ) {
 
-		const mesh = new Mesh( new BufferGeometry(), material );
-		await this._renderer.compile( mesh, _flatCamera );
+		this._boxMesh.material = material;
+		await this._renderer.compile( this._boxMesh, this._cubeCamera.children[ 0 ] );
 
 	}
 
-	_sceneToCubeUV( scene, near, far, cubeUVRenderTarget, position ) {
+	/**
+	 * Renders the box mesh with the given material into all six faces of a cube render target.
+	 *
+	 * @private
+	 * @param {CubeRenderTarget} target - The render target.
+	 * @param {number} lod - The mip level to render into.
+	 * @param {NodeMaterial} material - The material.
+	 */
+	_renderCube( target, lod, material ) {
 
-		const cubeCamera = _cubeCamera;
-		cubeCamera.near = near;
-		cubeCamera.far = far;
+		const boxMesh = this._boxMesh;
+		const cubeCamera = this._cubeCamera;
 
-		// px, py, pz, nx, ny, nz
-		const upSign = [ 1, 1, 1, 1, - 1, 1 ];
-		const forwardSign = [ 1, - 1, 1, - 1, 1, - 1 ];
+		boxMesh.material = material;
 
-		const renderer = this._renderer;
-
-		const originalAutoClear = renderer.autoClear;
-
-		renderer.getClearColor( _clearColor );
-
-		renderer.autoClear = false;
-
-		if ( this._backgroundBox === null ) {
-
-			this._backgroundBox = new Mesh(
-				new BoxGeometry(),
-				new MeshBasicMaterial( {
-					name: 'PMREM.Background',
-					side: BackSide,
-					depthWrite: false,
-					depthTest: false,
-				} )
-			);
-
-		}
-
-		const backgroundBox = this._backgroundBox;
-		const backgroundMaterial = backgroundBox.material;
-
-		let useSolidColor = false;
-
-		const background = scene.background;
-
-		if ( background ) {
-
-			if ( background.isColor ) {
-
-				backgroundMaterial.color.copy( background );
-				scene.background = null;
-				useSolidColor = true;
-
-			}
-
-		} else {
-
-			backgroundMaterial.color.copy( _clearColor );
-			useSolidColor = true;
-
-		}
-
-		renderer.setRenderTarget( cubeUVRenderTarget );
-
-		renderer.clear();
-
-		if ( useSolidColor ) {
-
-			renderer.render( backgroundBox, cubeCamera );
-
-		}
-
-		for ( let i = 0; i < 6; i ++ ) {
-
-			const col = i % 3;
-
-			if ( col === 0 ) {
-
-				cubeCamera.up.set( 0, upSign[ i ], 0 );
-				cubeCamera.position.set( position.x, position.y, position.z );
-				cubeCamera.lookAt( position.x + forwardSign[ i ], position.y, position.z );
-
-			} else if ( col === 1 ) {
-
-				cubeCamera.up.set( 0, 0, upSign[ i ] );
-				cubeCamera.position.set( position.x, position.y, position.z );
-				cubeCamera.lookAt( position.x, position.y + forwardSign[ i ], position.z );
-
-
-			} else {
-
-				cubeCamera.up.set( 0, upSign[ i ], 0 );
-				cubeCamera.position.set( position.x, position.y, position.z );
-				cubeCamera.lookAt( position.x, position.y, position.z + forwardSign[ i ] );
-
-
-			}
-
-			const size = this._cubeSize;
-
-			this._setViewport( cubeUVRenderTarget, col * size, i > 2 ? size : 0, size, size );
-
-			renderer.render( scene, cubeCamera );
-
-		}
-
-		renderer.autoClear = originalAutoClear;
-		scene.background = background;
+		cubeCamera.renderTarget = target;
+		cubeCamera.activeMipmapLevel = lod;
+		cubeCamera.update( this._renderer, boxMesh );
 
 	}
 
-	_textureToCubeUV( texture, cubeUVRenderTarget ) {
+	_textureToCubemap( texture ) {
 
-		const renderer = this._renderer;
+		let material;
 
-		const isCubeTexture = ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping );
-
-		if ( isCubeTexture ) {
+		if ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping ) {
 
 			if ( this._cubemapMaterial === null ) {
 
-				this._cubemapMaterial = _getCubemapMaterial( texture );
+				this._cubemapMaterial = _getCubemapMaterial();
 
 			}
+
+			material = this._cubemapMaterial;
 
 		} else {
 
 			if ( this._equirectMaterial === null ) {
 
-				this._equirectMaterial = _getEquirectMaterial( texture );
+				this._equirectMaterial = _getEquirectMaterial();
 
 			}
 
-		}
-
-		const material = isCubeTexture ? this._cubemapMaterial : this._equirectMaterial;
-		material.fragmentNode.value = texture;
-
-		const mesh = this._lodMeshes[ 0 ];
-		mesh.material = material;
-
-		const size = this._cubeSize;
-		this._setViewport( cubeUVRenderTarget, 0, 0, 3 * size, 2 * size );
-		renderer.setRenderTarget( cubeUVRenderTarget );
-		renderer.render( mesh, _flatCamera );
-
-	}
-
-	_applyPMREM( cubeUVRenderTarget ) {
-
-		const renderer = this._renderer;
-		const autoClear = renderer.autoClear;
-		renderer.autoClear = false;
-
-		const n = this._lodMeshes.length;
-
-		// Use GGX VNDF importance sampling
-		for ( let i = 1; i < n; i ++ ) {
-
-			this._applyGGXFilter( cubeUVRenderTarget, i - 1, i );
+			material = this._equirectMaterial;
 
 		}
 
-		renderer.autoClear = autoClear;
+		_uniformsMap.get( material ).envMap.value = texture;
+
+		this._renderCube( this._getSourceTarget(), 0, material );
 
 	}
 
 	/**
-	 * Applies GGX VNDF importance sampling filter to generate a prefiltered environment map.
-	 * Uses Monte Carlo integration with VNDF importance sampling to accurately represent the
-	 * GGX BRDF for physically-based rendering. Reads from the previous LOD level and
-	 * applies incremental roughness filtering to avoid over-blurring.
+	 * Prefilters the source cubemap into the mip levels of the PMREM. The sharp levels
+	 * integrate the GGX lobe of their roughness with VNDF importance sampling, reading the
+	 * mip level of the source that matches the solid angle of each sample. The rough
+	 * levels weight every texel of a small source mip with the GGX lobe instead.
 	 *
 	 * @private
-	 * @param {RenderTarget} cubeUVRenderTarget
-	 * @param {number} lodIn - Source LOD level to read from
-	 * @param {number} lodOut - Target LOD level to write to
+	 * @param {CubeRenderTarget} pmremTarget - The PMREM.
 	 */
-	_applyGGXFilter( cubeUVRenderTarget, lodIn, lodOut ) {
+	_applyPMREM( pmremTarget ) {
 
-		const renderer = this._renderer;
-		const pingPongRenderTarget = this._pingPongRenderTarget;
+		if ( this._ggxMaterial === null ) {
 
-		const ggxMaterial = this._ggxMaterial;
-		const ggxMesh = this._lodMeshes[ lodOut ];
-		ggxMesh.material = ggxMaterial;
+			this._ggxMaterial = _getGGXMaterial();
+			this._integrationMaterial = _getIntegrationMaterial();
 
-		const ggxUniforms = _uniformsMap.get( ggxMaterial );
+		}
 
-		// Calculate incremental roughness between LOD levels
-		const targetRoughness = lodOut / ( this._lodMeshes.length - 1 );
-		const sourceRoughness = lodIn / ( this._lodMeshes.length - 1 );
-		const incrementalRoughness = Math.sqrt( targetRoughness * targetRoughness - sourceRoughness * sourceRoughness );
+		const size = this._cubeSize;
+		const maxLod = pmremTarget.texture.mipmaps.length - 1;
 
-		// Apply blur strength mapping for better quality across the roughness range
-		const blurStrength = targetRoughness * 1.25;
-		const adjustedRoughness = incrementalRoughness * blurStrength;
+		const ggxUniforms = _uniformsMap.get( this._ggxMaterial );
+		ggxUniforms.envMap.value = this._sourceTarget.texture;
 
-		// Calculate viewport position based on output LOD level
-		const { _lodMax } = this;
-		const outputSize = this._sizeLods[ lodOut ];
-		const x = 3 * outputSize * ( lodOut > _lodMax - LOD_MIN ? lodOut - _lodMax + LOD_MIN : 0 );
-		const y = 4 * ( this._cubeSize - outputSize );
+		const integrationUniforms = _uniformsMap.get( this._integrationMaterial );
+		integrationUniforms.envMap.value = this._sourceTarget.texture;
+		integrationUniforms.sourceLod.value = Math.log2( size / INTEGRATION_SIZE );
 
-		// Read from previous LOD with incremental roughness
-		cubeUVRenderTarget.texture.frame = ( cubeUVRenderTarget.texture.frame || 0 ) + 1;
-		ggxUniforms.envMap.value = cubeUVRenderTarget.texture;
-		ggxUniforms.roughness.value = adjustedRoughness;
-		ggxUniforms.mipInt.value = _lodMax - lodIn; // Sample from input LOD
+		for ( let lod = 0; lod <= maxLod; lod ++ ) {
 
-		this._setViewport( pingPongRenderTarget, x, y, 3 * outputSize, 2 * outputSize );
-		renderer.setRenderTarget( pingPongRenderTarget );
-		renderer.render( ggxMesh, _flatCamera );
+			const roughness = PMREMGenerator.lodToRoughness( lod, maxLod );
 
-		// Copy from pingPong back to cubeUV (simple direct copy)
-		pingPongRenderTarget.texture.frame = ( pingPongRenderTarget.texture.frame || 0 ) + 1;
-		ggxUniforms.envMap.value = pingPongRenderTarget.texture;
-		ggxUniforms.roughness.value = 0.0; // Direct copy
-		ggxUniforms.mipInt.value = _lodMax - lodOut; // Read from the level we just wrote
+			if ( lod > maxLod - INTEGRATION_LEVELS ) {
 
-		this._setViewport( cubeUVRenderTarget, x, y, 3 * outputSize, 2 * outputSize );
-		renderer.setRenderTarget( cubeUVRenderTarget );
-		renderer.render( ggxMesh, _flatCamera );
+				integrationUniforms.roughness.value = roughness;
+
+				this._renderCube( pmremTarget, lod, this._integrationMaterial );
+
+			} else {
+
+				// lod of the source mip whose texel matches a sample's solid angle 1 / ( GGX_SAMPLES * pdf ),
+				// pdf( L ) = D( H ) / 4 for V = N. The shader only adds log2 of the GGX denominator per sample.
+				const alpha2 = Math.pow( roughness, 4 );
+
+				ggxUniforms.roughness.value = roughness;
+				ggxUniforms.lodBias.value = Math.log2( size ) + 0.5 * Math.log2( 6 / ( GGX_SAMPLES * alpha2 ) ) + 0.5;
+
+				this._renderCube( pmremTarget, lod, this._ggxMaterial );
+
+			}
+
+		}
 
 	}
 
@@ -670,281 +547,135 @@ class PMREMGenerator {
 	 * the Gaussian along a spiral kernel (Golden Angle), which distributes samples
 	 * isotropically on the sphere (no pole artifacts).
 	 *
-	 * Used for initial scene blur in fromScene() method when sigma > 0.
+	 * Used for initial scene blur in fromScene() method when sigma > 0. Level 0 of
+	 * the PMREM serves as the intermediate target.
 	 *
 	 * @private
-	 * @param {RenderTarget} cubeUVRenderTarget - The cubemap render target.
-	 * @param {number} lodIn - The input level-of-detail.
-	 * @param {number} lodOut - The output level-of-detail.
+	 * @param {CubeRenderTarget} pmremTarget - The PMREM.
 	 * @param {number} sigma - The blur radius in radians.
 	 */
-	_blur( cubeUVRenderTarget, lodIn, lodOut, sigma ) {
+	_blur( pmremTarget, sigma ) {
 
-		const pingPongRenderTarget = this._pingPongRenderTarget;
+		if ( this._blurMaterial === null ) {
+
+			this._blurMaterial = _getBlurMaterial();
+
+		}
+
+		const material = this._blurMaterial;
+		const uniforms = _uniformsMap.get( material );
+
+		const sourceTarget = this._sourceTarget;
 
 		// Two passes of sigma / sqrt( 2 ) compose to a blur of sigma while squaring
 		// the effective sample count. Sigmas beyond PI are visually indistinguishable
 		// from a uniform blur, so clamp to keep the shader math finite.
-		const blurSigma = Math.min( sigma, Math.PI ) / Math.SQRT2;
+		uniforms.sigma.value = Math.min( sigma, Math.PI ) / Math.SQRT2;
 
-		this._blurPass( cubeUVRenderTarget, pingPongRenderTarget, lodIn, lodOut, blurSigma );
-		this._blurPass( pingPongRenderTarget, cubeUVRenderTarget, lodOut, lodOut, blurSigma );
+		uniforms.envMap.value = sourceTarget.texture;
+		this._renderCube( pmremTarget, 0, material );
 
-	}
-
-	_blurPass( targetIn, targetOut, lodIn, lodOut, sigmaRadians ) {
-
-		const renderer = this._renderer;
-		const blurMaterial = this._blurMaterial;
-
-		const blurMesh = this._lodMeshes[ lodOut ];
-		blurMesh.material = blurMaterial;
-
-		const blurUniforms = _uniformsMap.get( blurMaterial );
-
-		targetIn.texture.frame = ( targetIn.texture.frame || 0 ) + 1;
-
-		blurUniforms.envMap.value = targetIn.texture;
-		blurUniforms.sigma.value = sigmaRadians;
-		blurUniforms.mipInt.value = this._lodMax - lodIn;
-
-		const outputSize = this._sizeLods[ lodOut ];
-		const x = 3 * outputSize * ( lodOut > this._lodMax - LOD_MIN ? lodOut - this._lodMax + LOD_MIN : 0 );
-		const y = 4 * ( this._cubeSize - outputSize );
-
-		this._setViewport( targetOut, x, y, 3 * outputSize, 2 * outputSize );
-		renderer.setRenderTarget( targetOut );
-		renderer.render( blurMesh, _flatCamera );
+		uniforms.envMap.value = pmremTarget.texture;
+		this._renderCube( sourceTarget, 0, material );
 
 	}
-
-	_setViewport( target, x, y, width, height ) {
-
-		if ( this._renderer.isWebGLRenderer ) {
-
-			target.viewport.set( x, target.height - height - y, width, height );
-			target.scissor.set( x, target.height - height - y, width, height );
-
-		} else {
-
-			target.viewport.set( x, y, width, height );
-			target.scissor.set( x, y, width, height );
-
-		}
-
-	}
-
 
 }
 
-function _createPlanes( lodMax ) {
+function _createRenderTarget( size, generateMipmaps, depthBuffer ) {
 
-	const sizeLods = [];
-	const lodMeshes = [];
-
-	let lod = lodMax;
-
-	const totalLods = lodMax - LOD_MIN + 1 + EXTRA_LODS;
-
-	for ( let i = 0; i < totalLods; i ++ ) {
-
-		const sizeLod = Math.pow( 2, lod );
-		sizeLods.push( sizeLod );
-
-		// UVs overshoot the face by one texel to bake the CubeUV border into the directions.
-		const texelSize = 1.0 / ( sizeLod - 2 );
-		const min = - texelSize;
-		const max = 1 + texelSize;
-		const uv1 = [ min, min, max, min, max, max, min, min, max, max, min, max ];
-
-		const cubeFaces = 6;
-		const vertices = 6;
-		const positionSize = 3;
-
-		const position = new Float32Array( positionSize * vertices * cubeFaces );
-		const outputDirection = new Float32Array( positionSize * vertices * cubeFaces );
-
-		for ( let face = 0; face < cubeFaces; face ++ ) {
-
-			const x = ( face % 3 ) * 2 / 3 - 1;
-			const y = face > 2 ? 0 : - 1;
-			const coordinates = [
-				x, y, 0,
-				x + 2 / 3, y, 0,
-				x + 2 / 3, y + 1, 0,
-				x, y, 0,
-				x + 2 / 3, y + 1, 0,
-				x, y + 1, 0
-			];
-
-			const faceIdx = _faceLib[ face ];
-			position.set( coordinates, positionSize * vertices * faceIdx );
-
-			for ( let vertex = 0; vertex < vertices; vertex ++ ) {
-
-				const u = uv1[ vertex * 2 ] * 2 - 1;
-				const v = uv1[ vertex * 2 + 1 ] * 2 - 1;
-
-				// RH coordinate system; PMREM face-indexing convention
-				if ( faceIdx === 0 ) {
-
-					_direction.set( 1, v, u ); // pos x
-
-				} else if ( faceIdx === 1 ) {
-
-					_direction.set( - u, 1, - v ); // pos y
-
-				} else if ( faceIdx === 2 ) {
-
-					_direction.set( - u, v, 1 ); // pos z
-
-				} else if ( faceIdx === 3 ) {
-
-					_direction.set( - 1, v, - u ); // neg x
-
-				} else if ( faceIdx === 4 ) {
-
-					_direction.set( - u, - 1, v ); // neg y
-
-				} else {
-
-					_direction.set( u, v, - 1 ); // neg z
-
-				}
-
-				_direction.toArray( outputDirection, ( faceIdx * vertices + vertex ) * positionSize );
-
-			}
-
-		}
-
-		const planes = new BufferGeometry();
-		planes.setAttribute( 'position', new BufferAttribute( position, positionSize ) );
-		planes.setAttribute( 'outputDirection', new BufferAttribute( outputDirection, positionSize ) );
-		lodMeshes.push( new Mesh( planes, null ) );
-
-		if ( lod > LOD_MIN ) {
-
-			lod --;
-
-		}
-
-	}
-
-	return { lodMeshes, sizeLods };
-
-}
-
-function _createRenderTarget( width, height, depthBuffer ) {
-
-	const params = {
+	return new CubeRenderTarget( size, {
 		magFilter: LinearFilter,
-		minFilter: LinearFilter,
-		generateMipmaps: false,
+		minFilter: LinearMipmapLinearFilter,
+		generateMipmaps: generateMipmaps,
 		type: HalfFloatType,
 		format: RGBAFormat,
 		colorSpace: LinearSRGBColorSpace,
-		depthBuffer
-	};
-
-	const cubeUVRenderTarget = new RenderTarget( width, height, params );
-	cubeUVRenderTarget.texture.mapping = CubeUVReflectionMapping;
-	cubeUVRenderTarget.texture.name = 'PMREM.cubeUv';
-	cubeUVRenderTarget.texture.isPMREMTexture = true;
-	cubeUVRenderTarget.scissorTest = true;
-	return cubeUVRenderTarget;
+		depthBuffer: depthBuffer
+	} );
 
 }
 
-function _getMaterial( type ) {
+function _getMaterial( type, uniforms, fragmentNode ) {
 
 	const material = new NodeMaterial();
+	material.name = `PMREM_${ type }`;
+	material.fragmentNode = fragmentNode;
+	material.side = BackSide;
+	material.blending = NoBlending;
 	material.depthTest = false;
 	material.depthWrite = false;
-	material.blending = NoBlending;
-	material.name = `PMREM_${ type }`;
+
+	_uniformsMap.set( material, uniforms );
 
 	return material;
 
 }
 
-function _getBlurShader( lodMax, width, height ) {
+function _getBlurMaterial() {
 
-	const envMap = texture();
-	const sigma = uniform( 0 );
-	const mipInt = uniform( 0 ); // int
-	const CUBEUV_TEXEL_WIDTH = float( 1 / width );
-	const CUBEUV_TEXEL_HEIGHT = float( 1 / height );
-	const CUBEUV_MAX_MIP = float( lodMax );
-
-	const materialUniforms = {
-		envMap,
-		sigma,
-		mipInt,
-		CUBEUV_TEXEL_WIDTH,
-		CUBEUV_TEXEL_HEIGHT,
-		CUBEUV_MAX_MIP
+	const uniforms = {
+		envMap: cubeTexture(),
+		sigma: uniform( 0 )
 	};
 
-	const material = _getMaterial( 'blur' );
-	material.fragmentNode = sphericalGaussianBlur( {
-		...materialUniforms,
-		outputDirection: _outputDirection,
+	return _getMaterial( 'blur', uniforms, sphericalGaussianBlur( {
+		...uniforms,
+		direction: positionWorldDirection,
 		SAMPLES: int( BLUR_SAMPLES )
-	} );
-
-	_uniformsMap.set( material, materialUniforms );
-
-	return material;
+	} ) );
 
 }
 
-function _getGGXShader( lodMax, width, height ) {
+function _getGGXMaterial() {
 
-	const envMap = texture();
-	const roughness = uniform( 0 );
-	const mipInt = uniform( 0 );
-	const CUBEUV_TEXEL_WIDTH = float( 1 / width );
-	const CUBEUV_TEXEL_HEIGHT = float( 1 / height );
-	const CUBEUV_MAX_MIP = float( lodMax );
-
-	const materialUniforms = {
-		envMap,
-		roughness,
-		mipInt,
-		CUBEUV_TEXEL_WIDTH,
-		CUBEUV_TEXEL_HEIGHT,
-		CUBEUV_MAX_MIP
+	const uniforms = {
+		envMap: cubeTexture(),
+		roughness: uniform( 0 ),
+		lodBias: uniform( 0 )
 	};
 
-	const material = _getMaterial( 'ggx' );
-	material.fragmentNode = ggxConvolution( {
-		...materialUniforms,
-		N_immutable: _outputDirection,
+	return _getMaterial( 'ggx', uniforms, ggxConvolution( {
+		...uniforms,
+		direction: positionWorldDirection,
 		GGX_SAMPLES: uint( GGX_SAMPLES )
-	} );
-
-	_uniformsMap.set( material, materialUniforms );
-
-	return material;
+	} ) );
 
 }
 
-function _getCubemapMaterial( envTexture ) {
+function _getIntegrationMaterial() {
 
-	const material = _getMaterial( 'cubemap' );
-	material.fragmentNode = cubeTexture( envTexture, _outputDirection );
+	const uniforms = {
+		envMap: cubeTexture(),
+		roughness: uniform( 0 ),
+		sourceLod: uniform( 0 ),
+		sourceSize: uniform( INTEGRATION_SIZE, 'int' ) // a uniform so the loops aren't unrolled
+	};
 
-	return material;
+	return _getMaterial( 'integration', uniforms, ggxIntegration( {
+		...uniforms,
+		direction: positionWorldDirection
+	} ) );
 
 }
 
-function _getEquirectMaterial( envTexture ) {
+function _getCubemapMaterial() {
 
-	const material = _getMaterial( 'equirect' );
-	material.fragmentNode = texture( envTexture, equirectUV( _outputDirection ), 0 );
+	const uniforms = {
+		envMap: cubeTexture()
+	};
 
-	return material;
+	return _getMaterial( 'cubemap', uniforms, uniforms.envMap.sample( positionWorldDirection ) );
+
+}
+
+function _getEquirectMaterial() {
+
+	const uniforms = {
+		envMap: texture()
+	};
+
+	return _getMaterial( 'equirect', uniforms, uniforms.envMap.sample( equirectUV( positionWorldDirection ) ).level( 0 ) );
 
 }
 

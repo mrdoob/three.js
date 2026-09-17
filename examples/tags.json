@@ -57,7 +57,6 @@
 	"webgl_materials_channels": [ "normal", "depth", "rgba packing" ],
 	"webgl_materials_cubemap_mipmaps": [ "envmap" ],
 	"webgl_materials_cubemap_render_to_mipmaps": [ "envmap", "renderTarget" ],
-	"webgl_materials_envmaps_fasthdr": [ "ktx2", "basis" ],
 	"webgl_materials_modified": [ "onBeforeCompile" ],
 	"webgl_materials_physical_clearcoat": [ "anisotropy" ],
 	"webgl_materials_physical_transmission": [ "alpha" ],
