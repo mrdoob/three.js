@@ -1,5 +1,27 @@
 import registryData from './MaterialXNodeInterfaceRegistry.js';
 
+// Nodedef names grouped by node category, in registry (alphabetical) order.
+const nodedefNamesByCategory = new Map();
+
+for ( const [ name, nodedef ] of Object.entries( registryData.nodedefs ) ) {
+
+	if ( nodedefNamesByCategory.has( nodedef.node ) === false ) nodedefNamesByCategory.set( nodedef.node, [] );
+	nodedefNamesByCategory.get( nodedef.node ).push( name );
+
+}
+
+/**
+ * Returns the names of the stdlib nodedefs that implement a node category.
+ *
+ * @param {string} category - The node category, e.g. `'multiply'`.
+ * @return {Array<string>} The nodedef names, empty when the category is unknown.
+ */
+function getNodeDefNames( category ) {
+
+	return nodedefNamesByCategory.get( category ) || [];
+
+}
+
 function getOutputType( nodedef ) {
 
 	const outputNames = Object.keys( nodedef.outputs );
@@ -44,7 +66,7 @@ function resolveNodeDef( nodeX ) {
 
 	let roughMatch = null;
 
-	for ( const name of registryData.byNode[ nodeX.element ] || [] ) {
+	for ( const name of getNodeDefNames( nodeX.element ) ) {
 
 		const nodedef = registryData.nodedefs[ name ];
 		if ( nodeX.type && getOutputType( nodedef ) !== nodeX.type ) continue;
@@ -57,4 +79,4 @@ function resolveNodeDef( nodeX ) {
 
 }
 
-export { resolveNodeDef };
+export { resolveNodeDef, getNodeDefNames };

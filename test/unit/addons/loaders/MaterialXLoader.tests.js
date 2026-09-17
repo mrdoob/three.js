@@ -3,6 +3,7 @@ import { MaterialXLoader } from '../../../../examples/jsm/loaders/MaterialXLoade
 import { MtlXLibrary } from '../../../../examples/jsm/loaders/materialx/MaterialXNodeLibrary.js';
 import { createMaterialXCompileRegistry } from '../../../../examples/jsm/loaders/materialx/compile/MaterialXCompileRegistry.js';
 import registryData from '../../../../examples/jsm/loaders/materialx/MaterialXNodeInterfaceRegistry.js';
+import { getNodeDefNames } from '../../../../examples/jsm/loaders/materialx/MaterialXNodeDefs.js';
 
 const MATERIAL_X = `<?xml version="1.0"?>
 <materialx version="1.39">
@@ -207,9 +208,9 @@ export default QUnit.module( 'Addons', () => {
 				const problems = [];
 				let count = 0;
 
-				for ( const [ category, nodedefNames ] of Object.entries( registryData.byNode ) ) {
+				for ( const category of supported ) {
 
-					if ( supported.has( category ) === false ) continue;
+					const nodedefNames = getNodeDefNames( category );
 
 					const outputTypes = new Set( nodedefNames.map( ( name ) => registryData.nodedefs[ name ].outputs.out ).filter( ( type ) => convertible.has( type ) ) );
 
@@ -332,8 +333,8 @@ export default QUnit.module( 'Addons', () => {
 
 				for ( const [ category, entry ] of Object.entries( MtlXLibrary ) ) {
 
-					const nodedefNames = registryData.byNode[ category ];
-					if ( nodedefNames === undefined ) {
+					const nodedefNames = getNodeDefNames( category );
+					if ( nodedefNames.length === 0 ) {
 
 						problems.push( `${category}: no nodedef` );
 						continue;
