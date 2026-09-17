@@ -141,7 +141,7 @@ function WebGLBackground( renderer, environments, state, objects, alpha, premult
 			// note: since the matrix is orthonormal, we can use the more-efficient transpose() in lieu of invert()
 			boxMesh.material.uniforms.backgroundRotation.value.setFromMatrix4( _m1.makeRotationFromEuler( scene.backgroundRotation ) ).transpose();
 
-			if ( background.isCubeTexture && background.isRenderTargetTexture === false ) {
+			if ( background.isRenderTargetTexture === false ) {
 
 				boxMesh.material.uniforms.backgroundRotation.value.premultiply( _m );
 
