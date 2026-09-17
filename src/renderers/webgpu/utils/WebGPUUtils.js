@@ -121,9 +121,9 @@ class WebGPUUtils {
 
 			} else {
 
-				// otherwise use the current samples of the renderer
+				// otherwise match the framebuffer the texture will be copied from (e.g. viewportDepthTexture())
 
-				samples = this.backend.renderer.currentSamples;
+				samples = this.backend.renderer.framebufferSamples;
 
 			}
 
