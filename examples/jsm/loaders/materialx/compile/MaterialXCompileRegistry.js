@@ -38,7 +38,6 @@ import {
 import {
 	getComponentCountForType,
 	normalizeSpaceName,
-	resolveTextureAddressMode,
 	toBooleanNode,
 	toVec3Channels,
 } from '../MaterialXUtils.js';
@@ -61,18 +60,6 @@ const SWITCH_MAX_INDEX = 10;
 
 
 const toBooleanMaskNode = ( node ) => toBooleanNode( node ).select( float( 1 ), float( 0 ) );
-
-const getTextureAddressMode = ( nodeX, inputName ) => {
-
-	const value = nodeX.getInputValueByName( inputName );
-	return resolveTextureAddressMode( value ) ?? 'periodic';
-
-};
-
-const getTextureAddressModes = ( nodeX ) => ( {
-	u: getTextureAddressMode( nodeX, 'uaddressmode' ),
-	v: getTextureAddressMode( nodeX, 'vaddressmode' ),
-} );
 
 const getZeroNodeForType = ( type ) => {
 
@@ -98,7 +85,7 @@ const getTextureInputs = ( nodeX ) => {
 	const uvNode = nodeX.getNodeByName( 'texcoord' );
 	const textureFile = file ? file.getTexture() : null;
 	const defaultNode = nodeX.getNodeByName( 'default' );
-	const addressModes = getTextureAddressModes( nodeX );
+	const addressModes = nodeX.getTextureAddressModes();
 	return { file, uvNode, textureFile, defaultNode, addressModes };
 
 };
@@ -147,7 +134,7 @@ const compileConvertNode = ( nodeX ) => {
 
 	const input = nodeX.getNodeByName( 'in' );
 	const inputElement = nodeX.getChildByName( 'in' );
-	const inputType = inputElement ? inputElement.type : null;
+	const inputType = inputElement && inputElement.type ? inputElement.type : nodeX.getNodeDefInputType( 'in' );
 	const nodeClass = nodeX.getClassFromType( nodeX.type ) || float;
 
 	if ( nodeX.type === 'boolean' ) {
@@ -323,8 +310,7 @@ const compileSwitchNode = ( nodeX ) => {
 
 const compileSpaceInputNode = ( nodeX, objectNode, worldNode ) => {
 
-	const rawSpace = nodeX.getInputValueByName( 'space' ) ?? nodeX.getAttribute( 'space' );
-	const space = normalizeSpaceName( rawSpace, 'object' );
+	const space = normalizeSpaceName( nodeX.getNodeByName( 'space' ), 'object' );
 	return space === 'world' ? worldNode : objectNode;
 
 };
@@ -689,24 +675,25 @@ const compileGltfIridescenceThicknessNode = ( nodeX, compileContext ) => {
 
 const compileTransformMatrixNode = ( nodeX ) => {
 
-	const nodeDefName = nodeX.getAttribute( 'nodedef' );
+	const inputType = nodeX.getNodeDefInputType( 'in' );
+	const matrixType = nodeX.getNodeDefInputType( 'mat' );
 	const inNode = nodeX.getNodeByName( 'in' );
 	const matrixNode = nodeX.getNodeByName( 'mat' );
 
-	if ( nodeDefName === 'ND_transformmatrix_vector2M3' ) {
+	if ( inputType === 'vector2' ) {
 
 		const transformed = mul( matrixNode, vec3( element( inNode, 0 ), element( inNode, 1 ), 1 ) );
 		return vec2( element( transformed, 0 ), element( transformed, 1 ) );
 
 	}
 
-	if ( nodeDefName === 'ND_transformmatrix_vector3' ) {
+	if ( inputType === 'vector3' && matrixType === 'matrix33' ) {
 
 		return mul( matrixNode, vec3( element( inNode, 0 ), element( inNode, 1 ), element( inNode, 2 ) ) );
 
 	}
 
-	if ( nodeDefName === 'ND_transformmatrix_vector3M4' ) {
+	if ( inputType === 'vector3' ) {
 
 		const transformed = mul( matrixNode, vec4( element( inNode, 0 ), element( inNode, 1 ), element( inNode, 2 ), 1 ) );
 		return vec3( element( transformed, 0 ), element( transformed, 1 ), element( transformed, 2 ) );
@@ -721,7 +708,7 @@ const compileCreateMatrixNode = ( nodeX ) => {
 
 	if ( nodeX.type === 'matrix44' ) {
 
-		const vector3Input = nodeX.getAttribute( 'nodedef' ) === 'ND_creatematrix_vector3_matrix44';
+		const vector3Input = nodeX.getNodeDefInputType( 'in1' ) === 'vector3';
 		const toVec4Input = ( name, w ) => {
 
 			const input = nodeX.getNodeByName( name );

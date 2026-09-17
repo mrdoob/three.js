@@ -285,6 +285,38 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
+
+			QUnit.test( 'resolves nodedef overloads without a nodedef attribute', ( assert ) => {
+
+				const document = `<?xml version="1.0"?>
+<materialx version="1.39">
+	<texcoord name="test_uv" type="vector2" />
+	<transformmatrix name="test_transform" type="vector2">
+		<input name="in" type="vector2" nodename="test_uv" />
+		<input name="mat" type="matrix33" value="2,0,0, 0,2,0, 0.5,0.5,1" />
+	</transformmatrix>
+	<creatematrix name="test_matrix" type="matrix44">
+		<input name="in1" type="vector3" value="1,0,0" />
+	</creatematrix>
+	<transformpoint name="test_point" type="vector3" />
+	<convert name="test_convert" type="color3">
+		<input name="in" type="vector2" nodename="test_transform" />
+	</convert>
+	<standard_surface name="test_surface" type="surfaceshader">
+		<input name="base_color" type="color3" nodename="test_convert" />
+	</standard_surface>
+	<surfacematerial name="test_material" type="material">
+		<input name="surfaceshader" type="surfaceshader" nodename="test_surface" />
+	</surfacematerial>
+</materialx>`;
+
+				const result = new MaterialXLoader().parse( document );
+
+				assert.strictEqual( result.errors.length, 0, 'Overloads selected by input types translate without errors.' );
+				assert.strictEqual( result.warnings.length, 0, 'Overloads selected by input types translate without warnings.' );
+
+			} );
+
 		} );
 
 	} );

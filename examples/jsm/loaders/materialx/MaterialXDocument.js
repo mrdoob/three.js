@@ -363,6 +363,14 @@ class MaterialXNode {
 
 	}
 
+	// The declared type of a nodedef input, or `null` when the nodedef does not declare it.
+	getNodeDefInputType( name ) {
+
+		const input = this.nodeDef ? this.nodeDef.inputs[ name ] : undefined;
+		return input ? input.type : null;
+
+	}
+
 	// The nodedef default for an input the document does not author, or `undefined` when
 	// the nodedef declares none (e.g. filenames and shader-typed inputs).
 	getDefaultInputNode( name ) {
@@ -417,7 +425,7 @@ class MaterialXNode {
 
 	getTextureAddressMode( inputName ) {
 
-		const rawMode = this.getInputValueByName( inputName );
+		const rawMode = this.getNodeByName( inputName );
 		const mode = resolveTextureAddressMode( rawMode );
 		if ( mode ) return mode;
 
