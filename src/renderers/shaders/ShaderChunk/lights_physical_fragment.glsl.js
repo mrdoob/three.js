@@ -7,9 +7,7 @@ material.metalness = metalnessFactor;
 vec3 dxy = max( abs( dFdx( nonPerturbedNormal ) ), abs( dFdy( nonPerturbedNormal ) ) );
 float geometryRoughness = max( max( dxy.x, dxy.y ), dxy.z );
 
-material.roughness = max( roughnessFactor, 0.0525 );// 0.0525 corresponds to the base mip of a 256 cubemap.
-material.roughness += geometryRoughness;
-material.roughness = min( material.roughness, 1.0 );
+material.roughness = min( roughnessFactor + geometryRoughness, 1.0 );
 
 #ifdef USE_DIFFUSE_ROUGHNESS
 
@@ -87,9 +85,7 @@ material.roughness = min( material.roughness, 1.0 );
 	#endif
 
 	material.clearcoat = saturate( material.clearcoat ); // Burley clearcoat model
-	material.clearcoatRoughness = max( material.clearcoatRoughness, 0.0525 );
-	material.clearcoatRoughness += geometryRoughness;
-	material.clearcoatRoughness = min( material.clearcoatRoughness, 1.0 );
+	material.clearcoatRoughness = min( material.clearcoatRoughness + geometryRoughness, 1.0 );
 
 #endif
 
