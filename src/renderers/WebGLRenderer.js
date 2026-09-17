@@ -3161,6 +3161,9 @@ class WebGLRenderer {
 
 				framebuffer = framebuffer[ activeCubeFaceIndex ];
 
+				// targets with custom mipmaps keep one framebuffer per level, read level 0
+				if ( Array.isArray( framebuffer ) ) framebuffer = framebuffer[ 0 ];
+
 			}
 
 			if ( framebuffer ) {
@@ -3242,6 +3245,9 @@ class WebGLRenderer {
 			if ( renderTarget.isWebGLCubeRenderTarget && activeCubeFaceIndex !== undefined ) {
 
 				framebuffer = framebuffer[ activeCubeFaceIndex ];
+
+				// targets with custom mipmaps keep one framebuffer per level, read level 0
+				if ( Array.isArray( framebuffer ) ) framebuffer = framebuffer[ 0 ];
 
 			}
 

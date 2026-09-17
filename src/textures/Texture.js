@@ -369,10 +369,11 @@ class Texture extends EventDispatcher {
 		this.pmremVersion = 0;
 
 		/**
-		 * Indicates whether this cube texture is a prefiltered environment map generated
+		 * Indicates whether this texture is a prefiltered cube environment map generated
 		 * by {@link PMREMGenerator}. Such textures are used as they are and not prefiltered again.
 		 *
 		 * @type {boolean}
+		 * @readonly
 		 * @default false
 		 */
 		this.isPMREMTexture = false;
@@ -519,6 +520,7 @@ class Texture extends EventDispatcher {
 
 		this.renderTarget = source.renderTarget;
 		this.isRenderTargetTexture = source.isRenderTargetTexture;
+		this.isPMREMTexture = source.isPMREMTexture;
 		this.isArrayTexture = source.isArrayTexture;
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );

@@ -93,7 +93,7 @@ class PMREMGenerator {
 	 * @param {number} [near=0.1] - The near plane distance.
 	 * @param {number} [far=100] - The far plane distance.
 	 * @param {Object} [options={}] - The configuration options.
-	 * @param {number} [options.size=256] - The texture size of the PMREM.
+	 * @param {number} [options.size=256] - The texture size of the PMREM, rounded down to a power of two and at least 256.
 	 * @param {Vector3} [options.position=origin] - The position of the internal cube camera that renders the scene.
 	 * @return {WebGLCubeRenderTarget} The resulting PMREM.
 	 */
@@ -152,8 +152,7 @@ class PMREMGenerator {
 	/**
 	 * Generates a PMREM from an equirectangular texture, which can be either LDR
 	 * or HDR. The ideal input image size is 1k (1024 x 512), as this matches best
-	 * with the 256 x 256 cubemap output. The minimum supported input image size
-	 * is 64 x 32.
+	 * with the 256 x 256 cubemap output. Smaller inputs are upsampled.
 	 *
 	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
 	 * @param {?WebGLCubeRenderTarget} [renderTarget=null] - The render target to use.
@@ -166,10 +165,9 @@ class PMREMGenerator {
 	}
 
 	/**
-	 * Generates a PMREM from an cubemap texture, which can be either LDR
+	 * Generates a PMREM from a cubemap texture, which can be either LDR
 	 * or HDR. The ideal input cube size is 256 x 256, as this matches best
-	 * with the 256 x 256 cubemap output. The minimum supported input cube
-	 * size is 16 x 16 per face.
+	 * with the 256 x 256 cubemap output. Smaller inputs are upsampled.
 	 *
 	 * @param {Texture} cubemap - The cubemap texture to be converted.
 	 * @param {?WebGLCubeRenderTarget} [renderTarget=null] - The render target to use.
@@ -212,9 +210,8 @@ class PMREMGenerator {
 	}
 
 	/**
-	 * Disposes of the PMREMGenerator's internal memory. Note that PMREMGenerator is a static class,
-	 * so you should not need more than one PMREMGenerator object. If you do, calling dispose() on
-	 * one of them will cause any others to also become unusable.
+	 * Disposes of the PMREMGenerator's internal memory. The PMREMs it returned
+	 * belong to the caller and are not disposed.
 	 */
 	dispose() {
 
@@ -422,12 +419,13 @@ class PMREMGenerator {
 
 			} else {
 
-				// lod of the source mip whose texel matches a sample's solid angle 1 / ( GGX_SAMPLES * pdf ),
-				// pdf( L ) = D( H ) / 4 for V = N. The shader only adds log2 of the GGX denominator per sample.
-				const alpha2 = Math.pow( roughness, 4 );
+				// lod of the source mip whose texel matches a sample's solid angle 1 / ( GGX_SAMPLES * pdf ), with
+				// pdf( L ) = D( H ) / 4 for V = N and half a level toward the blurrier mip to hide residual sample
+				// noise. The shader only adds log2 of the GGX denominator per sample. Level 0 is a plain copy.
+				const lodBias = roughness > 0 ? Math.log2( size ) + 0.5 * Math.log2( 6 / ( GGX_SAMPLES * Math.pow( roughness, 4 ) ) ) + 0.5 : 0;
 
 				ggxUniforms[ 'roughness' ].value = roughness;
-				ggxUniforms[ 'lodBias' ].value = Math.log2( size ) + 0.5 * Math.log2( 6 / ( GGX_SAMPLES * alpha2 ) ) + 0.5;
+				ggxUniforms[ 'lodBias' ].value = lodBias;
 
 				this._renderCube( pmremTarget, lod, this._ggxMaterial );
 

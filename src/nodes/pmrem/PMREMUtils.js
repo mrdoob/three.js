@@ -18,7 +18,7 @@ const GOLDEN_ANGLE = 2.399963229728653;
  */
 export const roughnessToMip = ( roughness, maxLod ) => {
 
-	roughness = float( roughness );
+	roughness = float( roughness ).clamp();
 
 	return float( maxLod ).mul( roughness ).mul( float( 2.0 ).sub( roughness ) );
 

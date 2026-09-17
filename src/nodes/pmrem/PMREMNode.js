@@ -101,7 +101,7 @@ function _getPMREMFromTexture( texture, renderer, generator ) {
  *
  * @private
  * @param {Renderer} renderer - The renderer.
- * @return {WeakMap<Texture, Texture>} The PMREM cache.
+ * @return {WeakMap<Texture, CubeRenderTarget>} The PMREM cache.
  */
 function _getCache( renderer ) {
 
@@ -138,7 +138,7 @@ class PMREMNode extends TempNode {
 	}
 
 	/**
-	 * Constructs a new function overloading node.
+	 * Constructs a new PMREM node.
 	 *
 	 * @param {Texture} value - The input texture.
 	 * @param {Node<vec3>} [uvNode=null] - The uv node.

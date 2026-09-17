@@ -10,7 +10,9 @@ export default /* glsl */`
 		// Mip level of a PMREM prefiltered for the given roughness. Must match PMREMGenerator.lodToRoughness().
 		float roughnessToMip( const in float roughness ) {
 
-			return ENVMAP_MAX_LOD * roughness * ( 2.0 - roughness );
+			float r = clamp( roughness, 0.0, 1.0 );
+
+			return ENVMAP_MAX_LOD * r * ( 2.0 - r );
 
 		}
 
