@@ -1,6 +1,6 @@
 import { nodeObject } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { getMemoryLengthFromType, getValueType } from '../core/NodeUtils.js';
+import { getValueType } from '../core/NodeUtils.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import BufferNode from './BufferNode.js';
 
@@ -248,7 +248,7 @@ class UniformArrayNode extends BufferNode {
 
 		}
 
-		return this.paddedType;
+		return this.getPaddedType( builder );
 
 	}
 
@@ -342,7 +342,7 @@ class UniformArrayNode extends BufferNode {
 
 		}
 
-		const stride = getMemoryLengthFromType( this.paddedType );
+		const stride = ( this.elementType === 'mat4' || this.elementType === 'mat3' ) ? 16 : 4;
 
 		for ( let i = 0; i < array.length; i ++ ) {
 
