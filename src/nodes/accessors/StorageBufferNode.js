@@ -48,17 +48,17 @@ class StorageBufferNode extends BufferNode {
 	 * Constructs a new storage buffer node.
 	 *
 	 * @param {StorageBufferAttribute|StorageInstancedBufferAttribute|BufferAttribute} value - The buffer data.
-	 * @param {?(string|Struct)} [bufferType=null] - The buffer type (e.g. `'vec3'`).
+	 * @param {?(string|Struct)} [elementType=null] - The element type (e.g. `'vec3'`).
 	 * @param {number} [bufferCount=0] - The buffer count.
 	 */
-	constructor( value, bufferType = null, bufferCount = 0 ) {
+	constructor( value, elementType = null, bufferCount = 0 ) {
 
-		let nodeType, structTypeNode = null;
+		let bufferType, structTypeNode = null;
 
-		if ( bufferType && bufferType.isStructTypeNode ) {
+		if ( elementType && elementType.isStructTypeNode ) {
 
-			nodeType = 'struct';
-			structTypeNode = bufferType;
+			bufferType = 'struct';
+			structTypeNode = elementType;
 
 			if ( value.isStorageBufferAttribute || value.isStorageInstancedBufferAttribute ) {
 
@@ -66,18 +66,20 @@ class StorageBufferNode extends BufferNode {
 
 			}
 
-		} else if ( bufferType === null && ( value.isStorageBufferAttribute || value.isStorageInstancedBufferAttribute ) ) {
+		} else if ( elementType === null && ( value.isStorageBufferAttribute || value.isStorageInstancedBufferAttribute ) ) {
 
-			nodeType = getTypeFromLength( value.itemSize );
+			// Three.js will choose a buffer type fitted for the length of the data
+			// (i.e mat2 with 4 elements will be stored as vec4, then converted in the shader)
+			bufferType = getTypeFromLength( value.itemSize );
 			bufferCount = value.count;
 
 		} else {
 
-			nodeType = bufferType;
+			bufferType = elementType;
 
 		}
 
-		super( value, nodeType, bufferCount );
+		super( value, bufferType, bufferCount );
 
 		/**
 		 * This flag can be used for type testing.
@@ -104,6 +106,15 @@ class StorageBufferNode extends BufferNode {
 		 * @default 'readWrite'
 		 */
 		this.access = NodeAccess.READ_WRITE;
+
+		/**
+		 * The type of the buffer elements as they are accessed in the shader. It can differ from
+		 * the buffer type which defines how the elements are represented in memory.
+		 *
+		 * @type {?(string|Struct)}
+		 * @default null
+		 */
+		this.elementType = elementType;
 
 		/**
 		 * Whether the node is atomic or not.
@@ -205,6 +216,26 @@ class StorageBufferNode extends BufferNode {
 	getInputType( /*builder*/ ) {
 
 		return this.value.isIndirectStorageBufferAttribute ? 'indirectStorageBuffer' : 'storageBuffer';
+
+	}
+
+	/**
+	 * This method is overwritten since the element type must not be inferred from the buffer type.
+	 * The buffer can represent its elements with a different type than the one they are accessed
+	 * with (e.g. a `mat2` is represented as a `vec4`).
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {string} The element type.
+	 */
+	getElementType( builder ) {
+
+		if ( this.structTypeNode !== null || this.elementType === null ) {
+
+			return this.getNodeType( builder );
+
+		}
+
+		return this.elementType;
 
 	}
 

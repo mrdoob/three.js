@@ -187,26 +187,27 @@
 
 			addLabel( 'Color from mat3 uniform array', 'mat3Array[ instanceIndex / 3 ][ instanceIndex % 3 ]', 0, mat3RowY + labelOffsetY );
 
-			// WGSL storage layout: each mat3x3 column is a vec3 padded to 4 floats, 12 floats per matrix.
-			const mat3Storage = instancedArray( 2, 'mat3' ).toReadOnly();
-			const mat3StorageArray = mat3Storage.value.array;
-			const mat3StorageLayout = new Float32Array( 2 * 12 );
+			const mat3StorageArray = new Float32Array( colors3.array.length * 12 );
 
-			for ( let i = 0; i < 2; i ++ ) {
+			for ( let i = 0; i < colors3.array.length; i ++ ) {
 
-				const elements = colors3.array[ i ].elements;
+				mat3StorageArray[ i * 12 + 0 ] = 1;
+				mat3StorageArray[ i * 12 + 1 ] = i;
+				mat3StorageArray[ i * 12 + 2 ] = 0;
 
-				for ( let column = 0; column < 3; column ++ ) {
+				mat3StorageArray[ i * 12 + 4 ] = 0;
+				mat3StorageArray[ i * 12 + 5 ] = 1;
+				mat3StorageArray[ i * 12 + 6 ] = i;
 
-					mat3StorageLayout.set( elements.slice( column * 3, column * 3 + 3 ), i * 12 + column * 4 );
-
-				}
+				mat3StorageArray[ i * 12 + 8 ] = i;
+				mat3StorageArray[ i * 12 + 9 ] = 0;
+				mat3StorageArray[ i * 12 + 10 ] = 1;
 
 			}
 
-			mat3StorageArray.set( mat3StorageLayout.subarray( 0, mat3StorageArray.length ) );
+			const mat3Storage = instancedArray( mat3StorageArray, 'mat3' ).toReadOnly();
 
-			console.log( `mat3 storage buffer: ${ mat3StorageArray.length } floats allocated, WGSL expects ${ mat3StorageLayout.length }` );
+			console.log( `mat3 storage buffer: ${ mat3StorageArray.length } floats for ${ colors3.array.length } matrices, WGSL expects ${ colors3.array.length * 12 }` );
 
 			const storageColorMatrix3 = mat3Storage.element( instanceIndex.div( 3 ) );
 
@@ -248,8 +249,17 @@
 
 			}
 
-			const shader = await renderer.debug.getShaderAsync( scene, camera, mesh );
-			console.log( 'Shader declaration:', shader.fragmentShader.split( '\n' ).filter( ( line ) => /mat2|std140|uniform NodeBuffer|var<uniform>/.test( line ) ).join( '\n' ) );
+			const meshShader = await renderer.debug.getShaderAsync( scene, camera, mesh );
+			console.log( 'mesh mat2x2 fragment shader:', meshShader.fragmentShader );
+
+			const storageMeshShader = await renderer.debug.getShaderAsync( scene, camera, storageMesh );
+			console.log( 'storageMesh mat2x2 fragment shader:', storageMeshShader.fragmentShader );
+
+			const mesh3Shader = await renderer.debug.getShaderAsync( scene, camera, mesh3 );
+			console.log( 'mesh mat3x3 fragment shader:', mesh3Shader.fragmentShader );
+
+			const storageMesh3Shader = await renderer.debug.getShaderAsync( scene, camera, storageMesh3 );
+			console.log( 'storageMesh mat3x3 fragment shader:', storageMesh3Shader.fragmentShader );
 
 			renderer.setAnimationLoop( animate );
 

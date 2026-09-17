@@ -107,6 +107,12 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 				snippet = this.node.build( builder );
 
+				if ( isAssignContext !== true ) {
+
+					snippet = builder.format( snippet, this.node.getNodeType( builder ), this.getNodeType( builder ) );
+
+				}
+
 			}
 
 		} else {
