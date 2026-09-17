@@ -598,7 +598,6 @@ const MXElements = [
 	createMXElement( 'max', max, [ 'in1', 'in2' ] ),
 	createMXElement( 'normalize', normalize, [ 'in' ] ),
 	createMXElement( 'magnitude', length, [ 'in' ] ),
-	createMXElement( 'length', length, [ 'in' ] ),
 	createMXElement( 'dot', mx_dot, [ 'in' ] ),
 	createMXElement( 'dotproduct', dot, [ 'in1', 'in2' ] ),
 	createMXElement( 'viewdirection', mx_viewdirection, [ 'space' ] ),

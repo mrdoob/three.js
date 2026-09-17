@@ -363,6 +363,12 @@ class MaterialXNode {
 
 	}
 
+	hasDeclaredOutput( name ) {
+
+		return this.nodeDef !== null && name in this.nodeDef.outputs;
+
+	}
+
 	// The declared type of a nodedef input, or `null` when the nodedef does not declare it.
 	getNodeDefInputType( name ) {
 
@@ -532,7 +538,8 @@ class MaterialXNode {
 		}
 
 		const type = this.type;
-		const channelRequested = this.element !== 'input' && this.element !== 'gltf_colorimage' && isChannelOutput( out );
+		// Channel suffixes (outr, outy, ...) extract a component unless the nodedef declares an output of that name.
+		const channelRequested = this.element !== 'input' && isChannelOutput( out ) && this.hasDeclaredOutput( out ) === false;
 
 		if ( this.isConst ) {
 
@@ -567,17 +574,10 @@ class MaterialXNode {
 
 			}
 
-		} else if ( this.element === 'input' && this.name === 'texcoord' && this.type === 'vector2' ) {
+		} else if ( this.element === 'input' && this.getAttribute( 'defaultgeomprop' ) !== null ) {
 
-			let index = 0;
-			const defaultGeomProp = this.getAttribute( 'defaultgeomprop' );
-			if ( defaultGeomProp && /^UV(\d+)$/.test( defaultGeomProp ) ) {
-
-				index = parseInt( defaultGeomProp.match( /^UV(\d+)$/ )[ 1 ], 10 );
-
-			}
-
-			node = this.materialX.compileContext.getTexcoordNode( index );
+			// An unconnected interface input takes its value from its declared geometric property.
+			node = this.materialX.compileContext.getGeomPropNode( this.getAttribute( 'defaultgeomprop' ) );
 
 		} else {
 

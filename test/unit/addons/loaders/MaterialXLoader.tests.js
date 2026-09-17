@@ -299,6 +299,14 @@ export default QUnit.module( 'Addons', () => {
 		<input name="in1" type="vector3" value="1,0,0" />
 	</creatematrix>
 	<transformpoint name="test_point" type="vector3" />
+	<nodegraph name="test_graph">
+		<input name="graph_normal" type="vector3" defaultgeomprop="Nworld" />
+		<input name="graph_uv" type="vector2" defaultgeomprop="UV1" />
+		<multiply name="graph_scaled" type="vector3">
+			<input name="in1" type="vector3" interfacename="graph_normal" />
+		</multiply>
+		<output name="out" type="vector3" nodename="graph_scaled" />
+	</nodegraph>
 	<convert name="test_convert" type="color3">
 		<input name="in" type="vector2" nodename="test_transform" />
 	</convert>
