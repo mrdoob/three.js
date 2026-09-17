@@ -67,6 +67,7 @@ class Renderer {
 	 * @property {number} [samples=0] - When `antialias` is `true`, `4` samples are used by default. This parameter can set to any other integer value than 0
 	 * to overwrite the default.
 	 * @property {?Function} [getFallback=null] - This callback function can be used to provide a fallback backend, if the primary backend can't be targeted.
+	 * The callback can return the backend directly or as a Promise.
 	 * @property {number} [outputBufferType=HalfFloatType] - Defines the type of output buffers. The default `HalfFloatType` is recommend for best
 	 * quality. To save memory and bandwidth, `UnsignedByteType` might be used. This will reduce rendering quality though.
 	 * @property {boolean} [multiview=false] - If set to `true`, the renderer will use multiview during WebXR rendering if supported.
@@ -805,7 +806,7 @@ class Renderer {
 
 					try {
 
-						this.backend = backend = this._getFallback( error );
+						this.backend = backend = await this._getFallback( error );
 						await backend.init( this );
 
 					} catch ( error ) {
