@@ -24860,11 +24860,7 @@ const getRoughness = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	const geometryRoughness = getGeometryRoughness();
 
-	let roughnessFactor = roughness.max( 0.0525 ); // 0.0525 corresponds to the base mip of a 256 cubemap.
-	roughnessFactor = roughnessFactor.add( geometryRoughness );
-	roughnessFactor = roughnessFactor.min( 1.0 );
-
-	return roughnessFactor;
+	return roughness.add( geometryRoughness ).min( 1.0 );
 
 } );
 
@@ -25021,7 +25017,7 @@ const D_GGX_Anisotropic = /*@__PURE__*/ Fn( ( { alphaT, alphaB, dotNH, dotTH, do
 // GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
 const BRDF_GGX = /*@__PURE__*/ Fn( ( { lightDirection, f0, f90, roughness, f, normalView: normalView$1 = normalView, viewDirection = positionViewDirection, USE_IRIDESCENCE, USE_ANISOTROPY } ) => {
 
-	const alpha = roughness.pow2(); // UE4's roughness
+	const alpha = roughness.max( 0.0525 ).pow2(); // punctual lights need a minimum roughness to show a highlight
 
 	const halfDir = lightDirection.add( viewDirection ).normalize();
 
@@ -25048,8 +25044,10 @@ const BRDF_GGX = /*@__PURE__*/ Fn( ( { lightDirection, f0, f90, roughness, f, no
 		const dotBV = anisotropyB.dot( viewDirection );
 		const dotBH = anisotropyB.dot( halfDir );
 
-		V = V_GGX_SmithCorrelated_Anisotropic( { alphaT, alphaB: alpha, dotTV, dotBV, dotTL, dotBL, dotNV, dotNL } );
-		D = D_GGX_Anisotropic( { alphaT, alphaB: alpha, dotNH, dotTH, dotBH } );
+		const clampedAlphaT = alphaT.max( alpha );
+
+		V = V_GGX_SmithCorrelated_Anisotropic( { alphaT: clampedAlphaT, alphaB: alpha, dotTV, dotBV, dotTL, dotBL, dotNV, dotNL } );
+		D = D_GGX_Anisotropic( { alphaT: clampedAlphaT, alphaB: alpha, dotNH, dotTH, dotBH } );
 
 	} else {
 
