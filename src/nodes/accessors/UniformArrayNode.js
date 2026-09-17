@@ -117,7 +117,7 @@ class UniformArrayElementNode extends ArrayElementNode {
 
 	getMemberType( builder, name ) {
 
-		const structTypeNode = this.uniformArrayNode.structTypeNode;
+		const structTypeNode = this.node.structTypeNode;
 
 		if ( structTypeNode ) {
 
@@ -129,11 +129,17 @@ class UniformArrayElementNode extends ArrayElementNode {
 
 	}
 
-	generate( builder ) {
+	generate( builder, output ) {
 
 		const snippet = super.generate( builder );
 		const type = this.getNodeType( builder );
-		const paddedType = this.node._getPaddedType();
+		const paddedType = this.node.getPaddedType( builder );
+
+		if ( this.node.structTypeNode ) {
+
+			return builder.format( snippet, type, output );
+
+		}
 
 		return builder.format( snippet, paddedType, type );
 
@@ -201,14 +207,6 @@ class UniformArrayNode extends BufferNode {
 		this.elementType = structTypeNode !== null ? 'struct' : ( elementType === null ? getValueType( value[ 0 ] ) : elementType );
 
 		/**
-		 * The padded type. Uniform buffers must conform to a certain buffer layout
-		 * so a separate type is computed to ensure correct buffer size.
-		 *
-		 * @type {string}
-		 */
-		this.paddedType = this._getPaddedType();
-
-		/**
 		 * Overwritten since uniform array nodes are updated per render.
 		 *
 		 * @type {string}
@@ -255,20 +253,9 @@ class UniformArrayNode extends BufferNode {
 	}
 
 	/**
-	 * The data type of the array elements.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {string} The element type.
-	 */
-	getElementType() {
-
-		return this.elementType;
-
-	}
-
-	/**
 	 * Returns the padded type based on the element type.
 	 *
+	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The padded type.
 	 */
 	getPaddedType( builder ) {
@@ -378,7 +365,7 @@ class UniformArrayNode extends BufferNode {
 
 		let arrayType = Float32Array;
 
-		const paddedType = this._getPaddedType( builder );
+		const paddedType = this.getPaddedType( builder );
 		const paddedElementLength = this.structTypeNode !== null ? this.structTypeNode.structLength : builder.getTypeLength( paddedType );
 
 		if ( elementType.charAt( 0 ) === 'i' ) arrayType = Int32Array;
