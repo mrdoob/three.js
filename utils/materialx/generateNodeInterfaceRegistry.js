@@ -29,6 +29,11 @@ const outputPath = path.resolve( path.dirname( fileURLToPath( import.meta.url ) 
 // Only these input attributes affect translation. UI hints are dropped to keep the registry small.
 const INPUT_ATTRIBUTES = [ 'type', 'value', 'defaultgeomprop' ];
 
+// Nodedefs whose output is a closure or light type are left out: the loader translates
+// surface and displacement shaders to materials directly and cannot compile BSDF, EDF or
+// VDF graphs, so their interfaces would only add weight to the registry.
+const EXCLUDED_OUTPUT_TYPES = new Set( [ 'BSDF', 'EDF', 'VDF', 'lightshader', 'volumeshader' ] );
+
 function readVersion( librariesRoot ) {
 
 	const cmake = path.join( librariesRoot, '..', 'CMakeLists.txt' );
@@ -154,6 +159,13 @@ for ( const file of walk( librariesPath ) ) {
 }
 
 const resolved = resolveInheritance( nodedefs );
+
+for ( const [ name, nodedef ] of Object.entries( resolved ) ) {
+
+	if ( Object.values( nodedef.outputs ).some( ( type ) => EXCLUDED_OUTPUT_TYPES.has( type ) ) ) delete resolved[ name ];
+
+}
+
 const byNode = {};
 
 for ( const [ name, nodedef ] of Object.entries( resolved ) ) {
