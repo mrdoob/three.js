@@ -334,13 +334,9 @@ class WebGPUTextureUtils {
 
 		if ( texture.isFramebufferTexture ) {
 
-			const liveContext = backend.renderer._currentRenderContext;
-			const context = ( liveContext && liveContext.textures ) ? liveContext : options.renderTarget;
+			if ( options.renderTarget ) {
 
-			if ( context && context.textures ) {
-
-				const liveTexture = backend.get( context.textures[ 0 ] );
-				options.format = ( liveTexture && liveTexture.format ) ? liveTexture.format : this.backend.utils.getCurrentColorFormat( context );
+				options.format = this.backend.utils.getCurrentColorFormat( options.renderTarget );
 
 			} else {
 
