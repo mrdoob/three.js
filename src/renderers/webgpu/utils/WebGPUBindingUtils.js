@@ -351,7 +351,7 @@ class WebGPUBindingUtils {
 
 					if ( resourceGPU === undefined ) {
 
-						const aspectGPU = GPUTextureAspect.All;
+						const aspectGPU = binding.texture.isDepthTexture ? GPUTextureAspect.DepthOnly : GPUTextureAspect.All;
 
 						let dimensionViewGPU;
 
