@@ -345,16 +345,15 @@ class PMREMGenerator {
 		renderer.toneMapping = NoToneMapping;
 		renderer.autoClear = false;
 
-		// https://github.com/mrdoob/three.js/issues/31413#issuecomment-3095966812
-		const reversedDepthBuffer = renderer.state.buffers.depth.getReversed();
-
-		if ( reversedDepthBuffer ) {
-
-			renderer.setRenderTarget( cubeUVRenderTarget );
-			renderer.clearDepth();
-			renderer.setRenderTarget( null );
-
-		}
+		// The cube faces below are rendered with autoClear disabled, so the depth buffer of the
+		// render target is only ever cleared here. WebGL guarantees that a fresh depth attachment
+		// reads as the default clear depth (1.0), but non-browser contexts (e.g. expo-gl on iOS)
+		// provide no such guarantee and may hand back zero-filled storage, which makes every
+		// fragment fail the depth test and produces a black PMREM. A reversed depth buffer needs
+		// the clear in every environment (#31413). One clear per bake is cheap, so always do it.
+		renderer.setRenderTarget( cubeUVRenderTarget );
+		renderer.clearDepth();
+		renderer.setRenderTarget( null );
 
 		if ( this._backgroundBox === null ) {
 
