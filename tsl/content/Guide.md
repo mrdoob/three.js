@@ -6667,7 +6667,7 @@ Calling `.once()` on a `Fn()` creates a **singleton function**: TSL evaluates it
 
 **Sub-Builds** solve this by creating scoped compilation layers (like `'POSITION'` or `'NORMAL'`). Passing `.once( [ 'POSITION' ] )` tells TSL to maintain a separate cache for that specific stage instead of reusing a single global value.
 
-::: api Fn().once( subBuilds: Array<string> = null ) : FunctionNode - Configures a TSL function to execute and cache its output node once per build, with optional isolated caching across specified sub-build layers.
+::: api fn.once( subBuilds: Array<string> = null ) : FunctionNode - Configures a TSL function, `fn`, to execute and cache its output node once per build, with optional isolated caching across specified sub-build layers.
 - **subBuilds**: `Array<string>` - (Optional) Array of sub-build layer names (e.g. `[ 'NORMAL', 'VERTEX' ]`) under which the function is cached independently.
 :::
 
