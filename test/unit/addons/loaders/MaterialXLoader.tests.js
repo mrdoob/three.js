@@ -325,6 +325,34 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
+
+			QUnit.test( 'node library parameter names are declared by the nodedef registry', ( assert ) => {
+
+				const problems = [];
+
+				for ( const [ category, entry ] of Object.entries( MtlXLibrary ) ) {
+
+					const nodedefNames = registryData.byNode[ category ];
+					if ( nodedefNames === undefined ) {
+
+						problems.push( `${category}: no nodedef` );
+						continue;
+
+					}
+
+					const declared = new Set( nodedefNames.flatMap( ( name ) => Object.keys( registryData.nodedefs[ name ].inputs ) ) );
+					for ( const param of entry.params ) {
+
+						if ( declared.has( param ) === false ) problems.push( `${category}: parameter "${param}" is not a nodedef input` );
+
+					}
+
+				}
+
+				assert.deepEqual( problems, [], 'Every library parameter name matches a nodedef input of its category.' );
+
+			} );
+
 		} );
 
 	} );
