@@ -3100,13 +3100,20 @@ class WebGPUBackend extends Backend {
 
 		const destinationGPU = this.get( texture ).texture;
 
-		if ( sourceGPU.format !== destinationGPU.format ) {
+		const canCopy = sourceGPU !== null && destinationGPU !== undefined &&
+			sourceGPU.format === destinationGPU.format &&
+			sourceGPU.sampleCount === destinationGPU.sampleCount &&
+			sourceGPU.sampleCount === 1;
 
-			error( 'WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match.', sourceGPU.format, destinationGPU.format );
+		if ( canCopy === false ) {
+
+			error( 'WebGPUBackend: copyFramebufferToTexture: Source and destination are not copy-compatible.', sourceGPU && sourceGPU.format, destinationGPU && destinationGPU.format, sourceGPU && sourceGPU.sampleCount, destinationGPU && destinationGPU.sampleCount );
 
 			return;
 
 		}
+
+		const generateMipmaps = texture.generateMipmaps === true && destinationGPU.mipLevelCount > 1;
 
 		if ( this._isRenderCameraDepthArray( renderContext ) === true ) {
 
@@ -3121,7 +3128,7 @@ class WebGPUBackend extends Backend {
 					destinationGPU,
 					rectangle: { x: rectangle.x, y: rectangle.y, z: rectangle.z, w: rectangle.w },
 					// ViewportTextureNode restores this flag before the deferred copy executes.
-					generateMipmaps: texture.generateMipmaps
+					generateMipmaps
 				}
 			} );
 
@@ -3150,7 +3157,7 @@ class WebGPUBackend extends Backend {
 		// mipmaps must be genereated with the same encoder otherwise the copied texture data
 		// might be out-of-sync, see #31768
 
-		this._copyFramebufferToTexture( encoder, texture, sourceGPU, destinationGPU, rectangle );
+		this._copyFramebufferToTexture( encoder, texture, sourceGPU, destinationGPU, rectangle, 0, generateMipmaps );
 
 		if ( renderContextData.currentPass ) {
 
@@ -3158,12 +3165,34 @@ class WebGPUBackend extends Backend {
 
 			for ( let i = 0; i < descriptor.colorAttachments.length; i ++ ) {
 
-				descriptor.colorAttachments[ i ].loadOp = GPULoadOp.Load;
+				const colorAttachment = descriptor.colorAttachments[ i ];
+
+				if ( colorAttachment.resolveTarget ) {
+
+					colorAttachment.view = colorAttachment.resolveTarget;
+					colorAttachment.resolveTarget = undefined;
+
+				}
+
+				colorAttachment.loadOp = GPULoadOp.Load;
 
 			}
 
-			if ( renderContext.depth ) descriptor.depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
-			if ( renderContext.stencil ) descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
+			if ( descriptor.depthStencilAttachment ) {
+
+				const depthAttachment = descriptor.depthStencilAttachment;
+
+				if ( depthAttachment.depthResolveTarget ) {
+
+					depthAttachment.view = depthAttachment.depthResolveTarget;
+					depthAttachment.depthResolveTarget = undefined;
+
+				}
+
+				if ( renderContext.depth ) depthAttachment.depthLoadOp = GPULoadOp.Load;
+				if ( renderContext.stencil ) depthAttachment.stencilLoadOp = GPULoadOp.Load;
+
+			}
 
 			renderContextData.currentPass = encoder.beginRenderPass( descriptor );
 
@@ -3223,7 +3252,7 @@ class WebGPUBackend extends Backend {
 		_texelCopyTextureInfoDst.reset();
 		_extent3D.reset();
 
-		if ( generateMipmaps ) {
+		if ( generateMipmaps === true && destinationGPU.mipLevelCount > 1 ) {
 
 			this.textureUtils.generateMipmaps( texture, encoder );
 
