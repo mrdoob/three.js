@@ -237,8 +237,16 @@ class WebGPUPipelineUtils {
 
 			if ( material.polygonOffset === true && ( primitiveState.topology === GPUPrimitiveTopology.TriangleList ) ) {
 
-				depthStencil.depthBias = material.polygonOffsetUnits;
-				depthStencil.depthBiasSlopeScale = material.polygonOffsetFactor;
+				const reversedDepth = this.backend.parameters.reversedDepthBuffer === true;
+				const sign = reversedDepth ? - 1 : 1;
+
+				// Reversed-Z uses a float depth attachment in [0,1]. WebGPU depthBias
+				// is in framebuffer units, unlike gl.polygonOffset's resolution-scaled
+				// units, so typical Material.polygonOffsetUnits of ±1 would clip.
+				const unitScale = reversedDepth ? 9.5367431640625e-7 : 1; // 2 ** -20
+
+				depthStencil.depthBias = sign * material.polygonOffsetUnits * unitScale;
+				depthStencil.depthBiasSlopeScale = sign * material.polygonOffsetFactor;
 				depthStencil.depthBiasClamp = 0; // three.js does not provide an API to configure this value
 
 			}
