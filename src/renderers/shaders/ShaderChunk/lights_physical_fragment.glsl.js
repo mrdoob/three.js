@@ -7,10 +7,10 @@ material.metalness = metalnessFactor;
 vec3 dxy = max( abs( dFdx( nonPerturbedNormal ) ), abs( dFdy( nonPerturbedNormal ) ) );
 float geometryRoughness = max( max( dxy.x, dxy.y ), dxy.z );
 
-// GGX's lobe width is proportional to roughness squared. Account for the normal variation within a pixel.
-float roughnessFloor = 0.4 * sqrt( geometryRoughness );
+// GGX's lobe width is proportional to roughness squared. Retain the linear floor for large normal variation.
+float roughnessFloor = max( 0.4 * sqrt( geometryRoughness ), geometryRoughness );
 
-material.roughness = min( max( roughnessFactor + geometryRoughness, roughnessFloor ), 1.0 );
+material.roughness = min( max( roughnessFactor, roughnessFloor ), 1.0 );
 
 #ifdef USE_DIFFUSE_ROUGHNESS
 
@@ -88,7 +88,7 @@ material.roughness = min( max( roughnessFactor + geometryRoughness, roughnessFlo
 	#endif
 
 	material.clearcoat = saturate( material.clearcoat ); // Burley clearcoat model
-	material.clearcoatRoughness = min( max( material.clearcoatRoughness + geometryRoughness, roughnessFloor ), 1.0 );
+	material.clearcoatRoughness = min( max( material.clearcoatRoughness, roughnessFloor ), 1.0 );
 
 #endif
 
