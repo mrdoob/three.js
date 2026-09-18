@@ -250,9 +250,11 @@ class PMREMNode extends TempNode {
 	 */
 	updateFromTexture( texture ) {
 
+		const mipmaps = texture.isCompressedCubeTexture ? texture.image[ 0 ].mipmaps : texture.mipmaps;
+
 		this._texture.value = texture;
-		this._maxLod.value = texture.mipmaps.length - 1;
-		this._size.value = texture.mipmaps[ 0 ].width;
+		this._maxLod.value = mipmaps.length - 1;
+		this._size.value = mipmaps[ 0 ].width;
 
 	}
 
