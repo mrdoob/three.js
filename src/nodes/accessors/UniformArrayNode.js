@@ -252,6 +252,18 @@ class UniformArrayNode extends BufferNode {
 
 	}
 
+	getElementType( builder ) {
+
+		if ( this.structTypeNode !== null ) {
+
+			return this.structTypeNode.getNodeType( builder );
+
+		}
+
+		return this.elementType;
+
+	}
+
 	/**
 	 * Returns the padded type based on the element type.
 	 *

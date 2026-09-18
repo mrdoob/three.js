@@ -139,8 +139,6 @@ export const struct = ( membersLayout, name = null ) => {
 
 				values = params[ 0 ];
 
-				console.log( values );
-
 			}
 
 		}

@@ -2126,8 +2126,6 @@ class NodeBuilder {
 			this.structs[ shaderStage ].push( structType );
 			this.types[ shaderStage ][ name ] = node;
 
-			console.log( this.types );
-
 			nodeData.structType = structType;
 
 		}
