@@ -668,6 +668,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.envMap ? '#define ' + envMapModeDefine : '',
 			parameters.envMap ? '#define ' + envMapBlendingDefine : '',
 			parameters.envMapPMREM ? '#define ENVMAP_MAX_LOD ' + parameters.envMapMaxLod + '.0' : '',
+			parameters.envMapPMREM ? '#define ENVMAP_SIZE ' + parameters.envMapSize + '.0' : '',
 			parameters.lightMap ? '#define USE_LIGHTMAP' : '',
 			parameters.aoMap ? '#define USE_AOMAP' : '',
 			parameters.bumpMap ? '#define USE_BUMPMAP' : '',

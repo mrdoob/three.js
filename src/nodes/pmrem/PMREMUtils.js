@@ -14,11 +14,17 @@ const GOLDEN_ANGLE = 2.399963229728653;
  * @function
  * @param {Node<float>} roughness - The roughness.
  * @param {Node<float>} maxLod - The last mip level of the PMREM.
+ * @param {Node<float>} size - The width of the sharpest mip level.
  * @return {Node<float>} The mip level.
  */
-export const roughnessToMip = ( roughness, maxLod ) => {
+export const roughnessToMip = ( roughness, maxLod, size ) => {
 
 	roughness = float( roughness ).clamp();
+
+	// The sharpest level is already blurred by one of its texels, so remove that much of the
+	// GGX lobe: a lobe narrower than a texel reads as a mirror instead of blending into level 1.
+	const texelAngle = float( Math.PI * 0.5 ).div( size );
+	roughness = roughness.pow2().pow2().sub( texelAngle.pow2() ).max( 0.0 ).sqrt().sqrt();
 
 	return float( maxLod ).mul( roughness ).mul( float( 2.0 ).sub( roughness ) );
 

@@ -221,6 +221,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			envMapMode: HAS_ENVMAP && envMap.mapping,
 			envMapPMREM: HAS_PMREM,
 			envMapMaxLod: HAS_PMREM ? envMap.mipmaps.length - 1 : null, // one prefiltered mip level per entry
+			envMapSize: HAS_PMREM ? envMap.mipmaps[ 0 ].width : null,
 			aoMap: HAS_AOMAP,
 			lightMap: HAS_LIGHTMAP,
 			bumpMap: HAS_BUMPMAP,
@@ -452,6 +453,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 		array.push( parameters.envMapMode );
 		array.push( parameters.envMapPMREM );
 		array.push( parameters.envMapMaxLod );
+		array.push( parameters.envMapSize );
 		array.push( parameters.mapUv );
 		array.push( parameters.alphaMapUv );
 		array.push( parameters.lightMapUv );

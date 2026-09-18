@@ -208,6 +208,14 @@ class PMREMNode extends TempNode {
 		this._maxLod = uniform( 0 );
 
 		/**
+		 * A uniform representing the width of the sharpest mip level of the PMREM.
+		 *
+		 * @private
+		 * @type {UniformNode<float>}
+		 */
+		this._size = uniform( 0 );
+
+		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.RENDER`.
 		 *
 		 * @type {string}
@@ -244,6 +252,7 @@ class PMREMNode extends TempNode {
 
 		this._texture.value = texture;
 		this._maxLod.value = texture.mipmaps.length - 1; // one prefiltered mip level per entry
+		this._size.value = texture.mipmaps[ 0 ].width;
 
 	}
 
@@ -310,7 +319,7 @@ class PMREMNode extends TempNode {
 
 		//
 
-		return this._texture.sample( materialEnvRotation.mul( uvNode ) ).level( roughnessToMip( levelNode, this._maxLod ) ).rgb;
+		return this._texture.sample( materialEnvRotation.mul( uvNode ) ).level( roughnessToMip( levelNode, this._maxLod, this._size ) ).rgb;
 
 	}
 
