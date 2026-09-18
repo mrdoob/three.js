@@ -164,15 +164,7 @@ try {
 
 			}
 
-			let binary = '';
-
-			for ( let i = 0; i < bytes.length; i += 8192 ) {
-
-				binary += String.fromCharCode( ...bytes.subarray( i, i + 8192 ) );
-
-			}
-
-			await window.writeFace( face, size, levels, btoa( binary ) );
+			await window.writeFace( face, size, levels, bytes.toBase64() );
 
 		}
 
