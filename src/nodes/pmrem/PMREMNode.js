@@ -24,9 +24,9 @@ function _getPMREMFromTexture( texture, renderer, generator ) {
 
 	const cache = _getCache( renderer );
 
-	let cacheTexture = cache.get( texture );
+	let renderTarget = cache.get( texture );
 
-	const pmremVersion = cacheTexture !== undefined ? cacheTexture.texture.pmremVersion : - 1;
+	const pmremVersion = renderTarget !== undefined ? renderTarget.texture.pmremVersion : - 1;
 
 	if ( pmremVersion !== texture.pmremVersion ) {
 
@@ -36,7 +36,7 @@ function _getPMREMFromTexture( texture, renderer, generator ) {
 
 			if ( isCubeMapReady( image ) ) {
 
-				cacheTexture = generator.fromCubemap( texture, cacheTexture );
+				renderTarget = generator.fromCubemap( texture, renderTarget );
 
 			} else {
 
@@ -49,7 +49,7 @@ function _getPMREMFromTexture( texture, renderer, generator ) {
 
 			if ( isEquirectangularMapReady( image ) ) {
 
-				cacheTexture = generator.fromEquirectangular( texture, cacheTexture );
+				renderTarget = generator.fromEquirectangular( texture, renderTarget );
 
 			} else {
 
@@ -59,7 +59,7 @@ function _getPMREMFromTexture( texture, renderer, generator ) {
 
 		}
 
-		cacheTexture.texture.pmremVersion = texture.pmremVersion;
+		renderTarget.texture.pmremVersion = texture.pmremVersion;
 
 		// add dispose event listener for new PMREMs
 
@@ -86,11 +86,11 @@ function _getPMREMFromTexture( texture, renderer, generator ) {
 
 		//
 
-		cache.set( texture, cacheTexture );
+		cache.set( texture, renderTarget );
 
 	}
 
-	return cacheTexture.texture;
+	return renderTarget.texture;
 
 }
 
@@ -251,7 +251,7 @@ class PMREMNode extends TempNode {
 	updateFromTexture( texture ) {
 
 		this._texture.value = texture;
-		this._maxLod.value = texture.mipmaps.length - 1; // one prefiltered mip level per entry
+		this._maxLod.value = texture.mipmaps.length - 1;
 		this._size.value = texture.mipmaps[ 0 ].width;
 
 	}

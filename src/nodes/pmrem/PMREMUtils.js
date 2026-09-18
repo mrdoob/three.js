@@ -7,7 +7,7 @@ const GOLDEN_ANGLE = 2.399963229728653;
 
 /**
  * Returns the mip level of a PMREM that has been prefiltered for the given roughness.
- * Must match `PMREMGenerator.lodToRoughness()`.
+ * Uses the inverse of `PMREMGenerator.lodToRoughness()`, compensating for base-level filtering.
  *
  * @tsl
  * @function
@@ -20,8 +20,7 @@ export const roughnessToMip = ( roughness, maxLod, size ) => {
 
 	roughness = float( roughness ).clamp();
 
-	// The sharpest level is already blurred by one of its texels, so remove that much of the
-	// GGX lobe: a lobe narrower than a texel reads as a mirror instead of blending into level 1.
+	// Subtract the base level's texel footprint from the GGX lobe.
 	const texelAngle = float( Math.PI * 0.5 ).div( size );
 	roughness = roughness.pow2().pow2().sub( texelAngle.pow2() ).max( 0.0 ).sqrt().sqrt();
 
@@ -29,8 +28,7 @@ export const roughnessToMip = ( roughness, maxLod, size ) => {
 
 };
 
-// Gaussian blur along a golden-angle spiral, importance-sampled by stratified
-// inverse-CDF so every sample carries equal Gaussian weight.
+// Gaussian blur using stratified inverse-CDF samples on a golden-angle spiral.
 export const sphericalGaussianBlur = /*@__PURE__*/ Fn( ( { SAMPLES, sigma, direction, envMap } ) => {
 
 	const outputDirection = vec3( direction ).toVar();
@@ -68,9 +66,7 @@ export const sphericalGaussianBlur = /*@__PURE__*/ Fn( ( { SAMPLES, sigma, direc
 
 } );
 
-// GGX VNDF importance sampling functions
-
-// Van der Corput radical inverse for generating quasi-random sequences
+// Van der Corput radical inverse.
 const radicalInverse_VdC = /*@__PURE__*/ Fn( ( [ bits_immutable ] ) => {
 
 	const bits = uint( bits_immutable ).toVar();
@@ -83,7 +79,7 @@ const radicalInverse_VdC = /*@__PURE__*/ Fn( ( [ bits_immutable ] ) => {
 
 } );
 
-// Hammersley sequence for quasi-Monte Carlo sampling
+// Hammersley sequence.
 const hammersley = /*@__PURE__*/ Fn( ( [ i, N ] ) => {
 
 	return vec2( float( i ).div( float( N ) ), radicalInverse_VdC( i ) );
@@ -130,7 +126,7 @@ export const ggxConvolution = /*@__PURE__*/ Fn( ( { roughness, lodBias, envMap, 
 				const sinTheta = alpha.mul( 2.0 ).mul( sqrt( Xi.x.mul( Xi.x.oneMinus() ) ) ).mul( invQ ).toConst();
 				const L = N.mul( NdotL ).add( tangent.mul( cos( phi ) ).add( bitangent.mul( sin( phi ) ) ).mul( sinTheta ) ).toConst();
 
-				// the source mip whose texel matches the sample's solid angle, see lodBias
+				// Match the source mip to the sample's solid angle; see lodBias.
 				const d = alpha2.mul( invQ );
 				const lod = max( log2( d ).add( lodBias ), 0.0 );
 

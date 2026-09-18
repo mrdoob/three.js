@@ -2222,7 +2222,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else if ( texture.mipmaps.length > 0 ) {
 
-				// a partial mip chain is only complete if the max level is limited to it
+				// Limit the max level to keep partial mip chains complete.
 				_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAX_LEVEL, texture.mipmaps.length - 1 );
 
 			}
@@ -2291,7 +2291,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else if ( texture.mipmaps.length > 0 ) {
 
-				// a partial mip chain is only complete if the max level is limited to it
+				// Limit the max level to keep partial mip chains complete.
 				_gl.texParameteri( glTextureType, _gl.TEXTURE_MAX_LEVEL, texture.mipmaps.length - 1 );
 
 			}

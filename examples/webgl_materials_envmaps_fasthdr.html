@@ -41,15 +41,14 @@
 				'backgroundBlurriness': 0.0
 			};
 
-			let container, stats;
+			let stats;
 			let camera, scene, renderer, controls;
 
 			init();
 
 			async function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+				const container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( params.fov, window.innerWidth / window.innerHeight, .1, 50 );
 				camera.position.set( 7, 0, 0 );
@@ -88,7 +87,6 @@
 					metalness: 1.0,
 					roughness: 0.0,
 				} ) );
-				sphere03.position.z += 0;
 				scene.add( sphere03 );
 
 				const sphere04 = new THREE.Mesh( sphereGeometry, new THREE.MeshStandardMaterial( {
@@ -152,11 +150,7 @@
 					'the sky is on fire': 'the_sky_is_on_fire',
 					'studio small 09': 'studio_small_09',
 					'wide street 01': 'wide_street_01'
-				} ).onChange( () => {
-
-					loadTexture( params.image );
-
-				} );
+				} ).onChange( loadTexture );
 
 				gui.add( params, 'exposure', 0, 2, 0.01 );
 

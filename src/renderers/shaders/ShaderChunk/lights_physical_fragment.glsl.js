@@ -7,7 +7,7 @@ material.metalness = metalnessFactor;
 vec3 dxy = max( abs( dFdx( nonPerturbedNormal ) ), abs( dFdy( nonPerturbedNormal ) ) );
 float geometryRoughness = max( max( dxy.x, dxy.y ), dxy.z );
 
-// GGX's lobe width is proportional to roughness squared. Retain the linear floor for large normal variation.
+// GGX width scales with roughness squared; large normal variation needs a linear floor.
 float roughnessFloor = max( 0.4 * sqrt( geometryRoughness ), geometryRoughness );
 
 material.roughness = min( max( roughnessFactor, roughnessFloor ), 1.0 );

@@ -1274,7 +1274,7 @@ async function createRawTexture( container ) {
 
 	//
 
-	return Promise.resolve( texture );
+	return texture;
 
 }
 

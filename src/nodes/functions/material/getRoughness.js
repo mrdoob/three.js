@@ -7,7 +7,7 @@ const getRoughness = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	const geometryRoughness = getGeometryRoughness();
 
-	// GGX's lobe width is proportional to roughness squared. Retain the linear floor for large normal variation.
+	// GGX width scales with roughness squared; large normal variation needs a linear floor.
 	const roughnessFloor = geometryRoughness.sqrt().mul( 0.4 ).max( geometryRoughness );
 
 	return roughness.max( roughnessFloor ).min( 1.0 );
