@@ -2,8 +2,8 @@
 
 These environments are generated from the original 2K HDRIs using three.js
 `PMREMGenerator`, then encoded as Basis Universal UASTC HDR 4x4 with Zstandard
-supercompression. Each cubemap has six 512 × 512 faces and seven prefiltered
-mip levels, ending at 8 × 8. Their roughness values follow
+level 19 supercompression. Each cubemap has six 512 × 512 faces and seven
+prefiltered mip levels, ending at 8 × 8. Their roughness values follow
 `PMREMGenerator.lodToRoughness()`.
 
 Load with `KTX2Loader` and set `texture.isPMREMTexture = true`. The texture can

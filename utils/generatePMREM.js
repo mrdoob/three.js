@@ -187,6 +187,7 @@ try {
 	// Keep PMREM's convolved mip levels; do not add Basis's -mipmap option.
 	await promisify( execFile )( basisu, [
 		'-hdr_4x4', '-linear', '-tex_type', 'cubemap', '-tex_array',
+		'-ktx2_zstandard_level', '19',
 		'-uastc_level', '3', '-max_threads', '6', '-output_file', outputPath,
 		...faces
 	], { cwd: directory, maxBuffer: 16 * 1024 * 1024 } );
