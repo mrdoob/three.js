@@ -1,13 +1,16 @@
 import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../constants.js';
 import { PMREMGenerator } from '../../extras/PMREMGenerator.js';
+import { CubemapBlurGenerator } from '../../extras/CubemapBlurGenerator.js';
 import { WebGLCubeRenderTarget } from '../WebGLCubeRenderTarget.js';
 
 function WebGLEnvironments( renderer ) {
 
 	let cubeMaps = new WeakMap();
 	let pmremMaps = new WeakMap();
+	let blurMaps = new WeakMap();
 
 	let pmremGenerator = null;
+	let blurGenerator = null;
 
 	function get( texture, usePMREM = false ) {
 
@@ -139,6 +142,74 @@ function WebGLEnvironments( renderer ) {
 
 	}
 
+	// blurred cube map for Scene.backgroundBlurriness, see CubemapBlurGenerator
+
+	function getBlurred( scene ) {
+
+		const { background: texture, backgroundBlurriness: blurriness } = scene;
+
+		if ( texture && texture.isTexture ) {
+
+			const mapping = texture.mapping;
+
+			const isEquirectMap = ( mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping );
+			const isCubeMap = ( mapping === CubeReflectionMapping || mapping === CubeRefractionMapping );
+
+			if ( isEquirectMap || isCubeMap ) {
+
+				let entry = blurMaps.get( scene );
+
+				if ( entry === undefined || entry.texture !== texture || entry.blurriness !== blurriness || entry.pmremVersion !== texture.pmremVersion ) {
+
+					const image = texture.image;
+					const ready = isCubeMap ? ( image && isCubeTextureComplete( image ) ) : ( image && image.height > 0 );
+
+					if ( ! ready ) return null; // image not yet ready. try the conversion next frame
+
+					if ( blurGenerator === null ) blurGenerator = new CubemapBlurGenerator( renderer );
+
+					if ( entry === undefined ) {
+
+						entry = { texture: null, renderTarget: null };
+						blurMaps.set( scene, entry );
+
+						entry.dispose = () => {
+
+							if ( entry.texture !== null ) entry.texture.removeEventListener( 'dispose', entry.dispose );
+							if ( entry.renderTarget !== null ) entry.renderTarget.dispose();
+
+							entry.texture = null;
+							entry.renderTarget = null;
+
+						};
+
+					}
+
+					if ( entry.texture !== texture ) {
+
+						if ( entry.texture !== null ) entry.texture.removeEventListener( 'dispose', entry.dispose );
+
+						entry.texture = texture;
+						texture.addEventListener( 'dispose', entry.dispose );
+
+					}
+
+					entry.renderTarget = blurGenerator.fromTexture( texture, blurriness, entry.renderTarget );
+					entry.blurriness = blurriness;
+					entry.pmremVersion = texture.pmremVersion;
+
+				}
+
+				return entry.renderTarget.texture;
+
+			}
+
+		}
+
+		return texture;
+
+	}
+
 	function mapTextureMapping( texture, mapping ) {
 
 		if ( mapping === EquirectangularReflectionMapping ) {
@@ -208,6 +279,7 @@ function WebGLEnvironments( renderer ) {
 
 		cubeMaps = new WeakMap();
 		pmremMaps = new WeakMap();
+		blurMaps = new WeakMap();
 
 		if ( pmremGenerator !== null ) {
 
@@ -216,10 +288,18 @@ function WebGLEnvironments( renderer ) {
 
 		}
 
+		if ( blurGenerator !== null ) {
+
+			blurGenerator.dispose();
+			blurGenerator = null;
+
+		}
+
 	}
 
 	return {
 		get: get,
+		getBlurred: getBlurred,
 		dispose: dispose
 	};
 
