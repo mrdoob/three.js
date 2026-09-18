@@ -1521,9 +1521,9 @@ class WebGLBackend extends Backend {
 	destroyProgram( program ) {
 
 		const gl = this.gl;
-		const shaderGPU = this.get( program ).shaderGPU;
+		const data = this.get( program );
 
-		gl.deleteShader( shaderGPU );
+		gl.deleteShader( data.shaderGPU );
 
 		this.delete( program );
 
