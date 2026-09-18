@@ -199,8 +199,12 @@
 
 				if ( params.target == 'render-target' ) {
 
+					const exportCamera = camera.clone();
+					exportCamera.aspect = renderTarget.width / renderTarget.height;
+					exportCamera.updateProjectionMatrix();
+
 					renderer.setRenderTarget( renderTarget );
-					renderer.render( scene, camera );
+					renderer.render( scene, exportCamera );
 					renderer.setRenderTarget( null );
 
 					result = await exporter.parse( renderer, renderTarget, { type: exportType, compression: exportCompression } );
