@@ -188,6 +188,8 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 
 		}
 
+		const envMapMipmaps = HAS_PMREM ? ( envMap.isCompressedCubeTexture ? envMap.image[ 0 ].mipmaps : envMap.mipmaps ) : null;
+
 		const parameters = {
 
 			shaderID: shaderID,
@@ -220,8 +222,8 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			envMap: HAS_ENVMAP,
 			envMapMode: HAS_ENVMAP && envMap.mapping,
 			envMapPMREM: HAS_PMREM,
-			envMapMaxLod: HAS_PMREM ? envMap.mipmaps.length - 1 : null, // one prefiltered mip level per entry
-			envMapSize: HAS_PMREM ? envMap.mipmaps[ 0 ].width : null,
+			envMapMaxLod: HAS_PMREM ? envMapMipmaps.length - 1 : null, // one prefiltered mip level per entry
+			envMapSize: HAS_PMREM ? envMapMipmaps[ 0 ].width : null,
 			aoMap: HAS_AOMAP,
 			lightMap: HAS_LIGHTMAP,
 			bumpMap: HAS_BUMPMAP,
