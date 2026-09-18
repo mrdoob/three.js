@@ -555,18 +555,6 @@ function _getGGXMaterial() {
 
 		}
 
-		// GGX VNDF importance sampling (Eric Heitz 2018), "Sampling the GGX Distribution
-		// of Visible Normals", https://jcgt.org/published/0007/04/01/. With V = N the
-		// visible normals are a cosine distributed hemisphere stretched by alpha.
-		vec3 importanceSampleGGX_VNDF( vec2 Xi, float alpha ) {
-
-			float r = sqrt( Xi.x );
-			float phi = 2.0 * PI * Xi.y;
-
-			return normalize( vec3( alpha * r * cos( phi ), alpha * r * sin( phi ), sqrt( 1.0 - Xi.x ) ) );
-
-		}
-
 		void main() {
 
 			vec3 N = normalize( vWorldDirection );
@@ -594,22 +582,21 @@ function _getGGXMaterial() {
 
 				vec2 Xi = hammersley( i, GGX_SAMPLES );
 
-				vec3 H_tangent = importanceSampleGGX_VNDF( Xi, alpha );
-
-				// Transform H back to world space
-				vec3 H = tangent * H_tangent.x + bitangent * H_tangent.y + N * H_tangent.z;
-				vec3 L = 2.0 * dot( N, H ) * H - N;
-
-				float NdotL = dot( N, L );
+				// With V = N, sample the reflected direction directly.
+				float invQ = 1.0 / ( 1.0 - Xi.x + alpha2 * Xi.x );
+				float NdotL = ( 1.0 - Xi.x - alpha2 * Xi.x ) * invQ;
 
 				if ( NdotL > 0.0 ) {
+
+					float phi = 2.0 * PI * Xi.y;
+					float sinTheta = 2.0 * alpha * sqrt( Xi.x * ( 1.0 - Xi.x ) ) * invQ;
+					vec3 L = N * NdotL + ( tangent * cos( phi ) + bitangent * sin( phi ) ) * sinTheta;
 
 					// Filtered importance sampling: read the source mip whose texel solid angle
 					// matches the solid angle covered by this sample, which keeps the estimate
 					// smooth even for tiny, very bright light sources. Only the GGX denominator
 					// varies per sample, the rest of the lod is precomputed in lodBias.
-					float NdotH = H_tangent.z;
-					float d = NdotH * NdotH * ( alpha2 - 1.0 ) + 1.0;
+					float d = alpha2 * invQ;
 					float lod = max( log2( d ) + lodBias, 0.0 );
 
 					// Weight by NdotL for the split-sum approximation

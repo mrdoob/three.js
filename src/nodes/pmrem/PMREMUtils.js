@@ -90,18 +90,6 @@ const hammersley = /*@__PURE__*/ Fn( ( [ i, N ] ) => {
 
 } );
 
-// GGX VNDF importance sampling (Eric Heitz 2018), "Sampling the GGX Distribution
-// of Visible Normals", https://jcgt.org/published/0007/04/01/. With V = N the
-// visible normals are a cosine distributed hemisphere stretched by alpha.
-const importanceSampleGGX_VNDF = /*@__PURE__*/ Fn( ( [ Xi, alpha ] ) => {
-
-	const r = sqrt( Xi.x ).toConst();
-	const phi = float( 2.0 * Math.PI ).mul( Xi.y ).toConst();
-
-	return normalize( vec3( alpha.mul( r ).mul( cos( phi ) ), alpha.mul( r ).mul( sin( phi ) ), sqrt( Xi.x.oneMinus() ) ) );
-
-} );
-
 // GGX convolution using VNDF importance sampling. Each sample reads the mip level of the
 // source cube map that matches its solid angle (filtered importance sampling), which keeps
 // the estimate smooth even for tiny, very bright light sources.
@@ -132,19 +120,18 @@ export const ggxConvolution = /*@__PURE__*/ Fn( ( { roughness, lodBias, envMap, 
 
 			const Xi = hammersley( i, GGX_SAMPLES );
 
-			const H_tangent = importanceSampleGGX_VNDF( Xi, alpha ).toConst();
-
-			// Transform H back to world space
-			const H = tangent.mul( H_tangent.x ).add( bitangent.mul( H_tangent.y ) ).add( N.mul( H_tangent.z ) );
-			const L = H.mul( dot( N, H ).mul( 2.0 ) ).sub( N ).toConst();
-
-			const NdotL = dot( N, L ).toConst();
+			// With V = N, sample the reflected direction directly.
+			const invQ = float( 1.0 ).div( Xi.x.oneMinus().add( alpha2.mul( Xi.x ) ) ).toConst();
+			const NdotL = Xi.x.oneMinus().sub( alpha2.mul( Xi.x ) ).mul( invQ ).toConst();
 
 			If( NdotL.greaterThan( 0.0 ), () => {
 
+				const phi = Xi.y.mul( 2.0 * Math.PI ).toConst();
+				const sinTheta = alpha.mul( 2.0 ).mul( sqrt( Xi.x.mul( Xi.x.oneMinus() ) ) ).mul( invQ ).toConst();
+				const L = N.mul( NdotL ).add( tangent.mul( cos( phi ) ).add( bitangent.mul( sin( phi ) ) ).mul( sinTheta ) ).toConst();
+
 				// the source mip whose texel matches the sample's solid angle, see lodBias
-				const NdotH = H_tangent.z;
-				const d = NdotH.mul( NdotH ).mul( alpha2.sub( 1.0 ) ).add( 1.0 );
+				const d = alpha2.mul( invQ );
 				const lod = max( log2( d ).add( lodBias ), 0.0 );
 
 				// Weight by NdotL for the split-sum approximation
