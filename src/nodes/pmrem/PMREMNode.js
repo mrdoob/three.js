@@ -273,6 +273,12 @@ class PMREMNode extends TempNode {
 
 			} else {
 
+				if ( this._generator === null ) {
+
+					this._generator = new PMREMGenerator( frame.renderer );
+
+				}
+
 				pmrem = _getPMREMFromTexture( texture, frame.renderer, this._generator );
 
 			}
@@ -290,12 +296,6 @@ class PMREMNode extends TempNode {
 	}
 
 	setup( builder ) {
-
-		if ( this._generator === null ) {
-
-			this._generator = new PMREMGenerator( builder.renderer );
-
-		}
 
 		this.updateBefore( builder );
 
