@@ -634,8 +634,6 @@ function _getIntegrationMaterial() {
 		uniform float sourceLod;
 		uniform int sourceSize;
 
-		#include <common>
-
 		void main() {
 
 			vec3 N = normalize( vWorldDirection );
@@ -648,38 +646,28 @@ function _getIntegrationMaterial() {
 			vec3 prefilteredColor = vec3( 0.0 );
 			float totalWeight = 0.0;
 
-			// the texel centers of any cube map are the same set of directions,
-			// so the face orientation doesn't matter here
-			for ( int face = 0; face < 6; face ++ ) {
-
-				float s = ( face % 2 == 0 ) ? 1.0 : - 1.0;
+			// Pair opposite texels: only the one in N's hemisphere contributes.
+			for ( int face = 0; face < 3; face ++ ) {
 
 				for ( int y = 0; y < sourceSize; y ++ ) {
 
 					for ( int x = 0; x < sourceSize; x ++ ) {
 
 						vec2 uv = ( vec2( x, y ) + 0.5 ) * texelSize - 1.0;
-						vec3 texelDirection = face < 2 ? vec3( s, uv ) : ( face < 4 ? vec3( uv.x, s, uv.y ) : vec3( uv, s ) );
+						vec3 texelDirection = face == 0 ? vec3( 1.0, uv ) : ( face == 1 ? vec3( uv.x, 1.0, uv.y ) : vec3( uv, 1.0 ) );
 
 						float invDistance = inversesqrt( 1.0 + dot( uv, uv ) );
-						vec3 L = texelDirection * invDistance;
-						float NdotL = dot( N, L );
+						float NdotL = dot( N, texelDirection );
+						texelDirection *= NdotL < 0.0 ? - 1.0 : 1.0;
+						NdotL = abs( NdotL ) * invDistance;
 
-						if ( NdotL > 0.0 ) {
+						// With V = N, NdotH squared is ( 1 + NdotL ) / 2. Common factors
+						// in the GGX distribution and texel solid angle cancel when normalized.
+						float d = 1.0 + alpha2 + ( alpha2 - 1.0 ) * NdotL;
+						float weight = NdotL * invDistance * invDistance * invDistance / ( d * d );
 
-							float NdotH = dot( N, normalize( N + L ) );
-							float d = NdotH * NdotH * ( alpha2 - 1.0 ) + 1.0;
-							float D = alpha2 / ( PI * d * d );
-
-							// solid angle of the texel: its area over the cubed distance
-							float solidAngle = texelSize * texelSize * invDistance * invDistance * invDistance;
-
-							float weight = D * NdotL * solidAngle;
-
-							prefilteredColor += textureLod( envMap, texelDirection, sourceLod ).rgb * weight;
-							totalWeight += weight;
-
-						}
+						prefilteredColor += textureLod( envMap, texelDirection, sourceLod ).rgb * weight;
+						totalWeight += weight;
 
 					}
 

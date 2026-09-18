@@ -2,7 +2,6 @@ import { Fn, int, uint, float, vec2, vec3, vec4, If } from '../tsl/TSLBase.js';
 import { cos, sin, abs, min, max, exp, log, log2, normalize, cross, dot, sqrt, inverseSqrt } from '../math/MathNode.js';
 import { select } from '../math/ConditionalNode.js';
 import { Loop } from '../utils/LoopNode.js';
-import D_GGX from '../functions/BSDF/D_GGX.js';
 
 const GOLDEN_ANGLE = 2.399963229728653;
 
@@ -171,42 +170,35 @@ export const ggxIntegration = /*@__PURE__*/ Fn( ( { roughness, sourceLod, source
 	const N = vec3( direction ).toVar();
 
 	const alpha = roughness.mul( roughness ).toConst();
+	const alpha2 = alpha.mul( alpha ).toConst();
 
 	const texelSize = float( 2.0 ).div( float( sourceSize ) ).toConst();
 
 	const prefilteredColor = vec3( 0.0 ).toVar();
 	const totalWeight = float( 0.0 ).toVar();
 
-	// the texel centers of any cube map are the same set of directions,
-	// so the face orientation doesn't matter here
-	Loop( { start: int( 0 ), end: int( 6 ), name: 'face' }, ( { face } ) => {
-
-		const s = select( face.bitAnd( int( 1 ) ).equal( int( 0 ) ), 1.0, - 1.0 ).toConst();
+	// Pair opposite texels: only the one in N's hemisphere contributes.
+	Loop( { start: int( 0 ), end: int( 3 ), name: 'face' }, ( { face } ) => {
 
 		Loop( { start: int( 0 ), end: sourceSize, name: 'y' }, ( { y } ) => {
 
 			Loop( { start: int( 0 ), end: sourceSize, name: 'x' }, ( { x } ) => {
 
 				const uv = vec2( x, y ).add( 0.5 ).mul( texelSize ).sub( 1.0 ).toConst();
-				const texelDirection = select( face.lessThan( 2 ), vec3( s, uv ), select( face.lessThan( 4 ), vec3( uv.x, s, uv.y ), vec3( uv, s ) ) ).toConst();
+				const texelDirection = select( face.equal( 0 ), vec3( 1.0, uv ), select( face.equal( 1 ), vec3( uv.x, 1.0, uv.y ), vec3( uv, 1.0 ) ) ).toVar();
 
 				const invDistance = inverseSqrt( dot( uv, uv ).add( 1.0 ) ).toConst();
-				const L = texelDirection.mul( invDistance ).toConst();
-				const NdotL = dot( N, L ).toConst();
+				const NdotL = dot( N, texelDirection ).toVar();
+				texelDirection.mulAssign( select( NdotL.lessThan( 0.0 ), - 1.0, 1.0 ) );
+				NdotL.assign( abs( NdotL ).mul( invDistance ) );
 
-				If( NdotL.greaterThan( 0.0 ), () => {
+				// With V = N, NdotH squared is ( 1 + NdotL ) / 2. Common factors
+				// in the GGX distribution and texel solid angle cancel when normalized.
+				const d = alpha2.add( 1.0 ).add( alpha2.sub( 1.0 ).mul( NdotL ) );
+				const weight = NdotL.mul( invDistance ).mul( invDistance ).mul( invDistance ).div( d.mul( d ) ).toConst();
 
-					const D = D_GGX( { alpha, dotNH: dot( N, normalize( N.add( L ) ) ) } );
-
-					// solid angle of the texel: its area over the cubed distance
-					const solidAngle = texelSize.mul( texelSize ).mul( invDistance.mul( invDistance ).mul( invDistance ) );
-
-					const weight = D.mul( NdotL ).mul( solidAngle ).toConst();
-
-					prefilteredColor.addAssign( envMap.sample( texelDirection ).level( sourceLod ).rgb.mul( weight ) );
-					totalWeight.addAssign( weight );
-
-				} );
+				prefilteredColor.addAssign( envMap.sample( texelDirection ).level( sourceLod ).rgb.mul( weight ) );
+				totalWeight.addAssign( weight );
 
 			} );
 
