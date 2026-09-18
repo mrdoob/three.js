@@ -7607,7 +7607,7 @@ class Texture extends EventDispatcher {
 
 		/**
 		 * Indicates whether this texture is a prefiltered cube environment map generated
-		 * by {@link PMREMGenerator}. Such textures are used as they are and not prefiltered again.
+		 * by {@link PMREMGenerator}.
 		 *
 		 * @type {boolean}
 		 * @readonly
