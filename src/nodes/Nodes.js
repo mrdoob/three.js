@@ -144,6 +144,7 @@ export { default as PMREMNode } from './pmrem/PMREMNode.js';
 export { default as ArrayElementNode } from './utils/ArrayElementNode.js';
 export { default as ConvertNode } from './utils/ConvertNode.js';
 export { default as CubeMapNode } from './utils/CubeMapNode.js';
+export { default as AngularGaussianBlurNode } from './utils/AngularGaussianBlurNode.js';
 export { default as DebugNode } from './utils/DebugNode.js';
 export { default as EventNode } from './utils/EventNode.js';
 export { default as FlipNode } from './utils/FlipNode.js';
