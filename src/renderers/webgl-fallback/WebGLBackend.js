@@ -130,18 +130,18 @@ class WebGLBackend extends Backend {
 		this.utils = null;
 
 		/**
-		 * Dictionary for caching VAOs.
-		 *
-		 * @type {Object<string,WebGLVertexArrayObject>}
-		 */
-		this.vaoCache = {};
-
-		/**
 		 * Dictionary for caching transform feedback objects.
 		 *
 		 * @type {Object<string,WebGLTransformFeedback>}
 		 */
 		this.transformFeedbackCache = {};
+
+		/**
+		 * Dictionary for caching VAOs.
+		 *
+		 * @type {Object<string,WebGLVertexArrayObject>}
+		 */
+		this.vaoCache = {};
 
 		/**
 		 * Controls if `gl.RASTERIZER_DISCARD` should be enabled or not.
@@ -2960,6 +2960,9 @@ class WebGLBackend extends Backend {
 	async dispose() {
 
 		await super.dispose();
+
+		this.transformFeedbackCache = {};
+		this.vaoCache = {};
 
 		if ( this.textureUtils !== null ) this.textureUtils.dispose();
 
