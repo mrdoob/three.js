@@ -17,10 +17,8 @@ import CubeRenderTarget from '../CubeRenderTarget.js';
 import {
 	CubeReflectionMapping,
 	CubeRefractionMapping,
-	LinearFilter,
 	LinearMipmapLinearFilter,
 	NoBlending,
-	RGBAFormat,
 	HalfFloatType,
 	BackSide,
 	LinearSRGBColorSpace
@@ -122,7 +120,7 @@ class PMREMGenerator {
 		}
 
 		const pmremTarget = renderTarget || this._allocateTarget();
-		const sourceTarget = this._getSourceTarget();
+		const sourceTarget = this._getSourceTarget( true );
 
 		if ( sigma > 0 ) {
 
@@ -395,16 +393,16 @@ class PMREMGenerator {
 
 	}
 
-	_getSourceTarget() {
+	_getSourceTarget( depthBuffer = false ) {
 
 		const size = this._cubeSize;
 		const sourceTarget = this._sourceTarget;
 
-		if ( sourceTarget === null || sourceTarget.width !== size ) {
+		if ( sourceTarget === null || sourceTarget.width !== size || ( depthBuffer && sourceTarget.depthBuffer === false ) ) {
 
 			if ( sourceTarget !== null ) sourceTarget.dispose();
 
-			this._sourceTarget = _createRenderTarget( size, true, true );
+			this._sourceTarget = _createRenderTarget( size, true, depthBuffer );
 
 		}
 
@@ -566,11 +564,9 @@ class PMREMGenerator {
 function _createRenderTarget( size, generateMipmaps, depthBuffer ) {
 
 	return new CubeRenderTarget( size, {
-		magFilter: LinearFilter,
 		minFilter: LinearMipmapLinearFilter,
 		generateMipmaps: generateMipmaps,
 		type: HalfFloatType,
-		format: RGBAFormat,
 		colorSpace: LinearSRGBColorSpace,
 		depthBuffer: depthBuffer
 	} );
