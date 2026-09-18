@@ -2664,6 +2664,15 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 		 */
 		this.isWebGLCubeRenderTarget = true;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isCubeRenderTarget = true;
+
 		const image = { width: size, height: size, depth: 1 };
 		const images = [ image, image, image, image, image, image ];
 
@@ -10888,7 +10897,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function getTargetType( texture ) {
 
-		if ( texture.isWebGLCubeRenderTarget ) return _gl.TEXTURE_CUBE_MAP;
+		if ( texture.isCubeRenderTarget ) return _gl.TEXTURE_CUBE_MAP;
 		if ( texture.isWebGL3DRenderTarget ) return _gl.TEXTURE_3D;
 		if ( texture.isWebGLArrayRenderTarget || texture.isCompressedArrayTexture ) return _gl.TEXTURE_2D_ARRAY;
 		return _gl.TEXTURE_2D;
@@ -11244,7 +11253,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( depthTexture && depthTexture.renderTarget === renderTarget ) destroyTexture( depthTexture );
 
-		if ( renderTarget.isWebGLCubeRenderTarget ) {
+		if ( renderTarget.isCubeRenderTarget ) {
 
 			for ( let i = 0; i < 6; i ++ ) {
 
@@ -12606,7 +12615,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	// Setup resources for a Depth Texture for a FBO (needs an extension)
 	function setupDepthTexture( framebuffer, renderTarget, cubeFace ) {
 
-		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
+		const isCube = ( renderTarget.isCubeRenderTarget === true );
 
 		state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
@@ -12684,7 +12693,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	function setupDepthRenderbuffer( renderTarget ) {
 
 		const renderTargetProperties = properties.get( renderTarget );
-		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
+		const isCube = ( renderTarget.isCubeRenderTarget === true );
 
 		// if the bound depth texture has changed
 		if ( renderTargetProperties.__boundDepthTexture !== renderTarget.depthTexture ) {
@@ -12840,7 +12849,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		const textures = renderTarget.textures;
 
-		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
+		const isCube = ( renderTarget.isCubeRenderTarget === true );
 		const isMultipleRenderTargets = ( textures.length > 1 );
 
 		if ( ! isMultipleRenderTargets ) {
@@ -15506,7 +15515,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 	function writeUniformValue( value, data, offset ) {
 
-		// TODO add integer and struct support
+		// TODO add integer vector and struct support
 		if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
 			data[ 0 ] = value;
@@ -15644,7 +15653,8 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 					}
 
 					// the following two properties will be used for partial buffer updates
-					uniform.__data = new Float32Array( info.storage / Float32Array.BYTES_PER_ELEMENT );
+					const ArrayType = uniform.type === 'int' ? Int32Array : uniform.type === 'uint' ? Uint32Array : Float32Array;
+					uniform.__data = new ArrayType( info.storage / Float32Array.BYTES_PER_ELEMENT );
 					uniform.__offset = offset;
 
 					// Update the global offset
@@ -18717,7 +18727,7 @@ class WebGLRenderer {
 		/**
 		 * Sets the active rendertarget.
 		 *
-		 * @param {?WebGLRenderTarget} renderTarget - The render target to set. When `null` is given,
+		 * @param {?RenderTarget} renderTarget - The render target to set. When `null` is given,
 		 * the canvas is set as the active render target instead.
 		 * @param {number} [activeCubeFace=0] - The active cube face when using a cube render target.
 		 * Indicates the z layer to render in to when using 3D or array render targets.
@@ -18798,7 +18808,7 @@ class WebGLRenderer {
 
 				const __webglFramebuffer = properties.get( renderTarget ).__webglFramebuffer;
 
-				if ( renderTarget.isWebGLCubeRenderTarget ) {
+				if ( renderTarget.isCubeRenderTarget ) {
 
 					if ( Array.isArray( __webglFramebuffer[ activeCubeFace ] ) ) {
 
@@ -18912,7 +18922,7 @@ class WebGLRenderer {
 		/**
 		 * Reads the pixel data from the given render target into the given buffer.
 		 *
-		 * @param {WebGLRenderTarget} renderTarget - The render target to read from.
+		 * @param {RenderTarget} renderTarget - The render target to read from.
 		 * @param {number} x - The `x` coordinate of the copy region's origin.
 		 * @param {number} y - The `y` coordinate of the copy region's origin.
 		 * @param {number} width - The width of the copy region.
@@ -18923,16 +18933,16 @@ class WebGLRenderer {
 		 */
 		this.readRenderTargetPixels = function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex, textureIndex = 0 ) {
 
-			if ( ! ( renderTarget && renderTarget.isWebGLRenderTarget ) ) {
+			if ( ! ( renderTarget && renderTarget.isRenderTarget ) ) {
 
-				error( 'WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
+				error( 'WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.RenderTarget.' );
 				return;
 
 			}
 
 			let framebuffer = properties.get( renderTarget ).__webglFramebuffer;
 
-			if ( renderTarget.isWebGLCubeRenderTarget && activeCubeFaceIndex !== undefined ) {
+			if ( renderTarget.isCubeRenderTarget && activeCubeFaceIndex !== undefined ) {
 
 				framebuffer = framebuffer[ activeCubeFaceIndex ];
 
@@ -18998,7 +19008,7 @@ class WebGLRenderer {
 		 * It is recommended to use this version of `readRenderTargetPixels()` whenever possible.
 		 *
 		 * @async
-		 * @param {WebGLRenderTarget} renderTarget - The render target to read from.
+		 * @param {RenderTarget} renderTarget - The render target to read from.
 		 * @param {number} x - The `x` coordinate of the copy region's origin.
 		 * @param {number} y - The `y` coordinate of the copy region's origin.
 		 * @param {number} width - The width of the copy region.
@@ -19010,14 +19020,14 @@ class WebGLRenderer {
 		 */
 		this.readRenderTargetPixelsAsync = async function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex, textureIndex = 0 ) {
 
-			if ( ! ( renderTarget && renderTarget.isWebGLRenderTarget ) ) {
+			if ( ! ( renderTarget && renderTarget.isRenderTarget ) ) {
 
-				throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
+				throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.RenderTarget.' );
 
 			}
 
 			let framebuffer = properties.get( renderTarget ).__webglFramebuffer;
-			if ( renderTarget.isWebGLCubeRenderTarget && activeCubeFaceIndex !== undefined ) {
+			if ( renderTarget.isCubeRenderTarget && activeCubeFaceIndex !== undefined ) {
 
 				framebuffer = framebuffer[ activeCubeFaceIndex ];
 
