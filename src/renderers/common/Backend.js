@@ -247,6 +247,14 @@ class Backend {
 	 */
 	createComputePipeline( /*computePipeline, bindings, promises*/ ) { }
 
+	/**
+	 * Destroys the given pipeline.
+	 *
+	 * @abstract
+	 * @param {Pipeline} pipeline - The pipeline.
+	 */
+	destroyPipeline( /*pipeline*/ ) { }
+
 	// cache key
 
 	/**
