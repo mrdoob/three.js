@@ -24860,7 +24860,10 @@ const getRoughness = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	const geometryRoughness = getGeometryRoughness();
 
-	return roughness.add( geometryRoughness ).min( 1.0 );
+	// GGX's lobe width is proportional to roughness squared. Account for the normal variation within a pixel.
+	const roughnessFloor = geometryRoughness.sqrt().mul( 0.4 );
+
+	return roughness.add( geometryRoughness ).max( roughnessFloor ).min( 1.0 );
 
 } );
 
