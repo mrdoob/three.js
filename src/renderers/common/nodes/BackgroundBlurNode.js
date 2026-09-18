@@ -1,7 +1,11 @@
-import AngularGaussianBlurNode from '../../../nodes/utils/AngularGaussianBlurNode.js';
+import TempNode from '../../../nodes/core/TempNode.js';
+import { cubeTexture } from '../../../nodes/accessors/CubeTextureNode.js';
+import { positionWorldDirection } from '../../../nodes/accessors/Position.js';
+import { cubeTextureBicubic } from '../../../nodes/utils/CubeTextureBicubic.js';
 import { NodeUpdateType } from '../../../nodes/core/constants.js';
 import { nodeObject } from '../../../nodes/tsl/TSLBase.js';
-import CubemapBlurGenerator from '../extras/CubemapBlurGenerator.js';
+import { CubeTexture } from '../../../textures/CubeTexture.js';
+import PMREMGenerator from '../extras/PMREMGenerator.js';
 
 const _cache = new WeakMap();
 
@@ -11,7 +15,7 @@ const _cache = new WeakMap();
  *
  * @private
  * @param {Renderer} renderer - The renderer.
- * @return {{generator: CubemapBlurGenerator, entries: WeakMap<BackgroundBlurNode, Object>}} The cache.
+ * @return {{generator: PMREMGenerator, entries: WeakMap<BackgroundBlurNode, Object>}} The cache.
  */
 function _getCache( renderer ) {
 
@@ -19,7 +23,7 @@ function _getCache( renderer ) {
 
 	if ( rendererCache === undefined ) {
 
-		rendererCache = { generator: new CubemapBlurGenerator( renderer ), entries: new WeakMap() };
+		rendererCache = { generator: new PMREMGenerator( renderer ), entries: new WeakMap() };
 		_cache.set( renderer, rendererCache );
 
 	}
@@ -38,8 +42,7 @@ function _getCache( renderer ) {
  */
 function _getBlurredCubemap( node, renderer ) {
 
-	const { textureNode, amount } = node;
-	const texture = textureNode.value;
+	const { sourceTexture: texture, amount } = node;
 	const { generator, entries } = _getCache( renderer );
 
 	// Cache by node to keep blur amounts independent.
@@ -48,7 +51,7 @@ function _getBlurredCubemap( node, renderer ) {
 	if ( entry === undefined || entry.texture !== texture || entry.amount !== amount || entry.pmremVersion !== texture.pmremVersion ) {
 
 		const image = texture.image;
-		const ready = texture.isCubeTexture ? ( image.length === 6 && ! image.includes( undefined ) ) : ( image && image.height > 0 );
+		const ready = image && ( texture.isCubeTexture ? ( image.length === 6 && ! image.includes( undefined ) ) : image.height > 0 );
 
 		if ( ! ready ) return null;
 
@@ -88,7 +91,10 @@ function _getBlurredCubemap( node, renderer ) {
 
 		}
 
-		entry.renderTarget = generator.fromTexture( texture, amount, entry.renderTarget );
+		const t = amount * 9 - 1;
+		const sigma = ( t < 0 ? Math.max( t + 1, 0 ) : Math.pow( 2, t ) ) / 64;
+
+		entry.renderTarget = generator._fromTextureBlur( texture, sigma, entry.renderTarget );
 		entry.amount = amount;
 		entry.pmremVersion = texture.pmremVersion;
 
@@ -102,9 +108,9 @@ function _getBlurredCubemap( node, renderer ) {
  * Caches the angular Gaussian blur used by scene backgrounds.
  *
  * @private
- * @augments AngularGaussianBlurNode
+ * @augments TempNode
  */
-class BackgroundBlurNode extends AngularGaussianBlurNode {
+class BackgroundBlurNode extends TempNode {
 
 	static get type() {
 
@@ -112,12 +118,21 @@ class BackgroundBlurNode extends AngularGaussianBlurNode {
 
 	}
 
-	constructor( textureNode ) {
+	constructor( sourceTexture ) {
 
-		super( textureNode );
+		super( 'vec3' );
 
+		const image = { width: 1, height: 1 };
+		const texture = new CubeTexture( [ image, image, image, image, image, image ] );
+		texture.isRenderTargetTexture = true;
+
+		this._cubeTextureNode = cubeTexture( texture, null, 0 );
+
+		this.sourceTexture = sourceTexture;
+		this.amount = 0;
 		this.isBackgroundBlurNode = true;
 		this.updateBeforeType = NodeUpdateType.RENDER;
+		this._defaultTexture = texture;
 
 	}
 
@@ -125,7 +140,7 @@ class BackgroundBlurNode extends AngularGaussianBlurNode {
 
 		const renderTarget = _getBlurredCubemap( this, frame.renderer );
 
-		if ( renderTarget !== null ) this._cubeTextureNode.value = renderTarget.texture;
+		this._cubeTextureNode.value = renderTarget !== null ? renderTarget.texture : this._defaultTexture;
 
 	}
 
@@ -133,10 +148,19 @@ class BackgroundBlurNode extends AngularGaussianBlurNode {
 
 		this.updateBefore( builder );
 
-		return this._setupOutput( builder );
+		const uvNode = builder.context.getUV ? builder.context.getUV( this._cubeTextureNode, builder ) : positionWorldDirection;
+
+		return cubeTextureBicubic( this._cubeTextureNode, uvNode );
+
+	}
+
+	dispose() {
+
+		this._defaultTexture.dispose();
+		super.dispose();
 
 	}
 
 }
 
-export const backgroundBlur = ( textureNode ) => nodeObject( new BackgroundBlurNode( textureNode ) );
+export const backgroundBlur = ( texture ) => nodeObject( new BackgroundBlurNode( texture ) );

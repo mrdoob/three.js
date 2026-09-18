@@ -749,17 +749,8 @@ class NodeManager extends DataMap {
 
 				if ( isEnvironmentMap && scene.backgroundBlurriness > 0 ) {
 
-					backgroundNode = this.getCacheNode( 'backgroundBlur', scene, () => backgroundBlur( background.isCubeTexture ? cubeTexture( background ) : texture( background ).setUpdateMatrix( false ) ) );
-
-					if ( backgroundNode.textureNode.value.isCubeTexture === background.isCubeTexture ) {
-
-						backgroundNode.textureNode.value = background;
-
-					} else {
-
-						backgroundNode.textureNode = background.isCubeTexture ? cubeTexture( background ) : texture( background ).setUpdateMatrix( false );
-
-					}
+					backgroundNode = this.getCacheNode( 'backgroundBlur', scene, () => backgroundBlur( background ) );
+					backgroundNode.sourceTexture = background;
 
 				} else {
 

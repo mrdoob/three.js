@@ -1,6 +1,5 @@
 import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../constants.js';
 import { PMREMGenerator } from '../../extras/PMREMGenerator.js';
-import { CubemapBlurGenerator } from '../../extras/CubemapBlurGenerator.js';
 import { WebGLCubeRenderTarget } from '../WebGLCubeRenderTarget.js';
 
 function WebGLEnvironments( renderer ) {
@@ -10,7 +9,6 @@ function WebGLEnvironments( renderer ) {
 	let blurMaps = new WeakMap();
 
 	let pmremGenerator = null;
-	let blurGenerator = null;
 
 	function get( texture, usePMREM = false ) {
 
@@ -142,7 +140,7 @@ function WebGLEnvironments( renderer ) {
 
 	}
 
-	// blurred cube map for Scene.backgroundBlurriness, see CubemapBlurGenerator
+	// Blurred cube map for Scene.backgroundBlurriness.
 
 	function getBlurred( scene ) {
 
@@ -166,7 +164,7 @@ function WebGLEnvironments( renderer ) {
 
 					if ( ! ready ) return null; // image not yet ready. try the conversion next frame
 
-					if ( blurGenerator === null ) blurGenerator = new CubemapBlurGenerator( renderer );
+					if ( pmremGenerator === null ) pmremGenerator = new PMREMGenerator( renderer );
 
 					if ( entry === undefined ) {
 
@@ -194,7 +192,10 @@ function WebGLEnvironments( renderer ) {
 
 					}
 
-					entry.renderTarget = blurGenerator.fromTexture( texture, blurriness, entry.renderTarget );
+					const t = blurriness * 9 - 1;
+					const sigma = ( t < 0 ? Math.max( t + 1, 0 ) : Math.pow( 2, t ) ) / 64;
+
+					entry.renderTarget = pmremGenerator._fromTextureBlur( texture, sigma, entry.renderTarget );
 					entry.blurriness = blurriness;
 					entry.pmremVersion = texture.pmremVersion;
 
@@ -285,13 +286,6 @@ function WebGLEnvironments( renderer ) {
 
 			pmremGenerator.dispose();
 			pmremGenerator = null;
-
-		}
-
-		if ( blurGenerator !== null ) {
-
-			blurGenerator.dispose();
-			blurGenerator = null;
 
 		}
 

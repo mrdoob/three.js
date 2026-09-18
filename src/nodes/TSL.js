@@ -30,7 +30,6 @@ export * from './math/UnpackFloatNode.js';
 export * from './math/TriNoise3D.js';
 
 // utils
-export * from './utils/AngularGaussianBlurNode.js';
 export * from './utils/EquirectUV.js';
 export * from './utils/FunctionOverloadingNode.js';
 export * from './utils/LoopNode.js';
