@@ -5,7 +5,7 @@ import { positionWorldDirection } from '../../../nodes/accessors/Position.js';
 import { uniform } from '../../../nodes/core/UniformNode.js';
 import { texture } from '../../../nodes/accessors/TextureNode.js';
 import { cubeTexture } from '../../../nodes/accessors/CubeTextureNode.js';
-import { int, uint } from '../../../nodes/tsl/TSLBase.js';
+import { Fn, int, uint, vec4 } from '../../../nodes/tsl/TSLBase.js';
 
 import { Color } from '../../../math/Color.js';
 import { floorPowerOfTwo } from '../../../math/MathUtils.js';
@@ -681,7 +681,23 @@ function _getEquirectMaterial() {
 		envMap: texture()
 	};
 
-	return _getMaterial( 'equirect', uniforms, uniforms.envMap.sample( equirectUV( positionWorldDirection ) ).level( 0 ) );
+	const fragmentNode = Fn( () => {
+
+		// Average four subpixel samples to preserve small, bright features.
+		const direction = positionWorldDirection;
+		const dx = direction.dFdx().mul( 0.25 ).toConst();
+		const dy = direction.dFdy().mul( 0.25 ).toConst();
+
+		const color = uniforms.envMap.sample( equirectUV( direction.sub( dx ).sub( dy ).normalize() ) ).level( 0 ).rgb
+			.add( uniforms.envMap.sample( equirectUV( direction.add( dx ).sub( dy ).normalize() ) ).level( 0 ).rgb )
+			.add( uniforms.envMap.sample( equirectUV( direction.sub( dx ).add( dy ).normalize() ) ).level( 0 ).rgb )
+			.add( uniforms.envMap.sample( equirectUV( direction.add( dx ).add( dy ).normalize() ) ).level( 0 ).rgb );
+
+		return vec4( color.mul( 0.25 ), 1.0 );
+
+	} )();
+
+	return _getMaterial( 'equirect', uniforms, fragmentNode );
 
 }
 
