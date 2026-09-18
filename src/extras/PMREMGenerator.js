@@ -111,6 +111,14 @@ class PMREMGenerator {
 		const pmremTarget = this._allocateTarget();
 		const sourceTarget = this._getSourceTarget();
 
+		if ( sigma > 0 ) {
+
+			// Allocate the full mip chain before disabling mipmap generation for the capture.
+			renderer.initRenderTarget( sourceTarget );
+			sourceTarget.texture.generateMipmaps = false;
+
+		}
+
 		// clear each face with the scene background or the clear color, whatever the app's clear settings are
 
 		const autoClear = renderer.autoClear;
@@ -139,6 +147,7 @@ class PMREMGenerator {
 
 		if ( sigma > 0 ) {
 
+			sourceTarget.texture.generateMipmaps = true;
 			this._blur( pmremTarget, sigma );
 
 		}
