@@ -545,6 +545,19 @@ class MaterialXNode {
 
 	}
 
+	getInputTypes() {
+
+		const types = {};
+		for ( const input of this.children ) {
+
+			types[ input.name ] = input.type;
+
+		}
+
+		return types;
+
+	}
+
 	getNodeByName( name ) {
 
 		const child = this.getChildByName( name );
@@ -646,7 +659,7 @@ class MaterialXNode {
 		const mapper = getSurfaceMapper( this.element );
 		if ( mapper ) {
 
-			mapper.apply( material, this.getNodes(), this.materialX.log, this.name );
+			mapper.apply( material, this.getNodes(), this.materialX.log, this.name, this.getInputTypes() );
 
 		} else {
 

@@ -17,6 +17,21 @@ const MATERIAL_X = `<?xml version="1.0"?>
 	</nodegraph>
 </materialx>`;
 
+const MATERIAL_X_DISPLACEMENT = `<?xml version="1.0"?>
+<materialx version="1.39">
+	<surfacematerial name="test_material" type="material">
+		<input name="surfaceshader" type="surfaceshader" nodename="test_surface" />
+		<input name="displacementshader" type="displacementshader" nodename="test_displacement" />
+	</surfacematerial>
+	<standard_surface name="test_surface" type="surfaceshader">
+		<input name="base_color" type="color3" value="0.5, 0.5, 0.5" />
+	</standard_surface>
+	<displacement name="test_displacement" type="displacementshader">
+		<input name="displacement" type="float" value="0.25" />
+		<input name="scale" type="float" value="2.0" />
+	</displacement>
+</materialx>`;
+
 class ControlledTextureLoader {
 
 	constructor( manager ) {
@@ -88,6 +103,20 @@ export default QUnit.module( 'Addons', () => {
 	QUnit.module( 'Loaders', () => {
 
 		QUnit.module( 'MaterialXLoader', () => {
+
+			QUnit.test( 'maps <displacement> onto vertex displacement instead of failing', ( assert ) => {
+
+				const result = new MaterialXLoader().parse( MATERIAL_X_DISPLACEMENT );
+				const material = result.materials.test_material;
+
+				assert.strictEqual( result.errors.length, 0, 'A displacement shader is not an unsupported node.' );
+				assert.ok( material.positionNode, 'The material receives a positionNode.' );
+				assert.ok( material.colorNode, 'The surface shader still applies.' );
+
+				const zero = new MaterialXLoader().parse( MATERIAL_X_DISPLACEMENT.replace( 'value="0.25"', 'value="0"' ) );
+				assert.strictEqual( zero.materials.test_material.positionNode, null, 'Zero displacement leaves the position untouched.' );
+
+			} );
 
 			QUnit.test( 'waits for dependent textures before resolving', async ( assert ) => {
 
