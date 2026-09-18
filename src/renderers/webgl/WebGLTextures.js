@@ -122,7 +122,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function getTargetType( texture ) {
 
-		if ( texture.isWebGLCubeRenderTarget ) return _gl.TEXTURE_CUBE_MAP;
+		if ( texture.isCubeRenderTarget ) return _gl.TEXTURE_CUBE_MAP;
 		if ( texture.isWebGL3DRenderTarget ) return _gl.TEXTURE_3D;
 		if ( texture.isWebGLArrayRenderTarget || texture.isCompressedArrayTexture ) return _gl.TEXTURE_2D_ARRAY;
 		return _gl.TEXTURE_2D;
@@ -478,7 +478,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( depthTexture && depthTexture.renderTarget === renderTarget ) destroyTexture( depthTexture );
 
-		if ( renderTarget.isWebGLCubeRenderTarget ) {
+		if ( renderTarget.isCubeRenderTarget ) {
 
 			for ( let i = 0; i < 6; i ++ ) {
 
@@ -1840,7 +1840,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	// Setup resources for a Depth Texture for a FBO (needs an extension)
 	function setupDepthTexture( framebuffer, renderTarget, cubeFace ) {
 
-		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
+		const isCube = ( renderTarget.isCubeRenderTarget === true );
 
 		state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
@@ -1918,7 +1918,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	function setupDepthRenderbuffer( renderTarget ) {
 
 		const renderTargetProperties = properties.get( renderTarget );
-		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
+		const isCube = ( renderTarget.isCubeRenderTarget === true );
 
 		// if the bound depth texture has changed
 		if ( renderTargetProperties.__boundDepthTexture !== renderTarget.depthTexture ) {
@@ -2074,7 +2074,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		const textures = renderTarget.textures;
 
-		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
+		const isCube = ( renderTarget.isCubeRenderTarget === true );
 		const isMultipleRenderTargets = ( textures.length > 1 );
 
 		if ( ! isMultipleRenderTargets ) {

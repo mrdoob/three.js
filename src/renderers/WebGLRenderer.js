@@ -2942,7 +2942,7 @@ class WebGLRenderer {
 		/**
 		 * Sets the active rendertarget.
 		 *
-		 * @param {?WebGLRenderTarget} renderTarget - The render target to set. When `null` is given,
+		 * @param {?RenderTarget} renderTarget - The render target to set. When `null` is given,
 		 * the canvas is set as the active render target instead.
 		 * @param {number} [activeCubeFace=0] - The active cube face when using a cube render target.
 		 * Indicates the z layer to render in to when using 3D or array render targets.
@@ -3023,7 +3023,7 @@ class WebGLRenderer {
 
 				const __webglFramebuffer = properties.get( renderTarget ).__webglFramebuffer;
 
-				if ( renderTarget.isWebGLCubeRenderTarget ) {
+				if ( renderTarget.isCubeRenderTarget ) {
 
 					if ( Array.isArray( __webglFramebuffer[ activeCubeFace ] ) ) {
 
@@ -3137,7 +3137,7 @@ class WebGLRenderer {
 		/**
 		 * Reads the pixel data from the given render target into the given buffer.
 		 *
-		 * @param {WebGLRenderTarget} renderTarget - The render target to read from.
+		 * @param {RenderTarget} renderTarget - The render target to read from.
 		 * @param {number} x - The `x` coordinate of the copy region's origin.
 		 * @param {number} y - The `y` coordinate of the copy region's origin.
 		 * @param {number} width - The width of the copy region.
@@ -3148,16 +3148,16 @@ class WebGLRenderer {
 		 */
 		this.readRenderTargetPixels = function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex, textureIndex = 0 ) {
 
-			if ( ! ( renderTarget && renderTarget.isWebGLRenderTarget ) ) {
+			if ( ! ( renderTarget && renderTarget.isRenderTarget ) ) {
 
-				error( 'WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
+				error( 'WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.RenderTarget.' );
 				return;
 
 			}
 
 			let framebuffer = properties.get( renderTarget ).__webglFramebuffer;
 
-			if ( renderTarget.isWebGLCubeRenderTarget && activeCubeFaceIndex !== undefined ) {
+			if ( renderTarget.isCubeRenderTarget && activeCubeFaceIndex !== undefined ) {
 
 				framebuffer = framebuffer[ activeCubeFaceIndex ];
 
@@ -3223,7 +3223,7 @@ class WebGLRenderer {
 		 * It is recommended to use this version of `readRenderTargetPixels()` whenever possible.
 		 *
 		 * @async
-		 * @param {WebGLRenderTarget} renderTarget - The render target to read from.
+		 * @param {RenderTarget} renderTarget - The render target to read from.
 		 * @param {number} x - The `x` coordinate of the copy region's origin.
 		 * @param {number} y - The `y` coordinate of the copy region's origin.
 		 * @param {number} width - The width of the copy region.
@@ -3235,14 +3235,14 @@ class WebGLRenderer {
 		 */
 		this.readRenderTargetPixelsAsync = async function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex, textureIndex = 0 ) {
 
-			if ( ! ( renderTarget && renderTarget.isWebGLRenderTarget ) ) {
+			if ( ! ( renderTarget && renderTarget.isRenderTarget ) ) {
 
-				throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
+				throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.RenderTarget.' );
 
 			}
 
 			let framebuffer = properties.get( renderTarget ).__webglFramebuffer;
-			if ( renderTarget.isWebGLCubeRenderTarget && activeCubeFaceIndex !== undefined ) {
+			if ( renderTarget.isCubeRenderTarget && activeCubeFaceIndex !== undefined ) {
 
 				framebuffer = framebuffer[ activeCubeFaceIndex ];
 
