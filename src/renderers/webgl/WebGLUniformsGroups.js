@@ -161,7 +161,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 	function writeUniformValue( value, data, offset ) {
 
-		// TODO add integer and struct support
+		// TODO add integer vector and struct support
 		if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
 			data[ 0 ] = value;
@@ -299,7 +299,8 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 					}
 
 					// the following two properties will be used for partial buffer updates
-					uniform.__data = new Float32Array( info.storage / Float32Array.BYTES_PER_ELEMENT );
+					const ArrayType = uniform.type === 'int' ? Int32Array : uniform.type === 'uint' ? Uint32Array : Float32Array;
+					uniform.__data = new ArrayType( info.storage / Float32Array.BYTES_PER_ELEMENT );
 					uniform.__offset = offset;
 
 					// Update the global offset

@@ -560,7 +560,10 @@ ${ flowData.code }
 
 			}
 
-			this.addLineFlowCode( `${ propertyName } = ${prefix}(${ snippet })${channel}`, storageArrayElementNode );
+			const texelType = this.getTypeFromLength( itemSize, this.getComponentType( prefix ) );
+			const elementType = storageArrayElementNode.getNodeType( this );
+
+			this.addLineFlowCode( `${ propertyName } = ${ this.format( `${prefix}(${ snippet })${channel}`, texelType, elementType ) }`, storageArrayElementNode );
 
 			elementNodeData.propertyName = propertyName;
 

@@ -33,10 +33,10 @@
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			let scene, camera, renderer, exporter, mesh, controls, renderTarget, dataTexture;
+			let scene, camera, renderer, exporter, mesh, controls, environment, renderTarget, dataTexture;
 
 			const params = {
-				target: 'pmrem',
+				target: 'render-target',
 				export: exportFile
 			};
 
@@ -63,15 +63,14 @@
 
 				//
 
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-				pmremGenerator.compileEquirectangularShader();
+				renderTarget = new THREE.WebGLRenderTarget( 1024, 512, { type: THREE.HalfFloatType } );
 
 				hdrLoader.load( 'textures/equirectangular/venice_sunset_1k.hdr', function ( texture ) {
 
 					texture.mapping = THREE.EquirectangularReflectionMapping;
 
-					renderTarget = pmremGenerator.fromEquirectangular( texture );
-					scene.background = renderTarget.texture;
+					environment = texture;
+					scene.background = environment;
 
 				} );
 
@@ -89,7 +88,7 @@
 
 				const gui = new GUI();
 
-				gui.add( params, 'target' ).options( [ 'pmrem', 'data-texture' ] ).onChange( swapScene );
+				gui.add( params, 'target' ).options( [ 'render-target', 'data-texture' ] ).onChange( swapScene );
 				gui.add( params, 'export' ).name( 'Export KTX2' );
 				gui.open();
 
@@ -157,11 +156,11 @@
 
 			function swapScene() {
 
-				if ( params.target == 'pmrem' ) {
+				if ( params.target == 'render-target' ) {
 
 					camera.position.set( 10, 0, 0 );
 					controls.enabled = true;
-					scene.background = renderTarget.texture;
+					scene.background = environment;
 					mesh.visible = false;
 					renderer.toneMapping = THREE.AgXToneMapping;
 
@@ -181,10 +180,23 @@
 
 				let result;
 
-				if ( params.target == 'pmrem' )
+				if ( params.target == 'render-target' ) {
+
+					const exportCamera = camera.clone();
+					exportCamera.aspect = renderTarget.width / renderTarget.height;
+					exportCamera.updateProjectionMatrix();
+
+					renderer.setRenderTarget( renderTarget );
+					renderer.render( scene, exportCamera );
+					renderer.setRenderTarget( null );
+
 					result = await exporter.parse( renderer, renderTarget );
-				else
+
+				} else {
+
 					result = await exporter.parse( dataTexture );
+
+				}
 
 				saveArrayBuffer( result, params.target + '.ktx2' );
 

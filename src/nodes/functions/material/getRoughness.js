@@ -7,11 +7,10 @@ const getRoughness = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	const geometryRoughness = getGeometryRoughness();
 
-	let roughnessFactor = roughness.max( 0.0525 ); // 0.0525 corresponds to the base mip of a 256 cubemap.
-	roughnessFactor = roughnessFactor.add( geometryRoughness );
-	roughnessFactor = roughnessFactor.min( 1.0 );
+	// GGX width scales with roughness squared; large normal variation needs a linear floor.
+	const roughnessFloor = geometryRoughness.sqrt().mul( 0.4 ).max( geometryRoughness );
 
-	return roughnessFactor;
+	return roughness.max( roughnessFloor ).min( 1.0 );
 
 } );
 

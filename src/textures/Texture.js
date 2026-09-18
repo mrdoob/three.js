@@ -103,7 +103,7 @@ class Texture extends EventDispatcher {
 		 * How the texture is applied to the object. The value `UVMapping`
 		 * is the default, where texture or uv coordinates are used to apply the map.
 		 *
-		 * @type {(UVMapping|CubeReflectionMapping|CubeRefractionMapping|EquirectangularReflectionMapping|EquirectangularRefractionMapping|CubeUVReflectionMapping)}
+		 * @type {(UVMapping|CubeReflectionMapping|CubeRefractionMapping|EquirectangularReflectionMapping|EquirectangularRefractionMapping)}
 		 * @default UVMapping
 		*/
 		this.mapping = mapping;
@@ -369,6 +369,16 @@ class Texture extends EventDispatcher {
 		this.pmremVersion = 0;
 
 		/**
+		 * Indicates whether this texture is a prefiltered cube environment map generated
+		 * by {@link PMREMGenerator}.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default false
+		 */
+		this.isPMREMTexture = false;
+
+		/**
 		 * Whether the texture should use one of the 16 bit integer formats which are normalized
 		 * to [0, 1] or [-1, 1] (depending on signed/unsigned) when sampled.
 		 *
@@ -510,6 +520,7 @@ class Texture extends EventDispatcher {
 
 		this.renderTarget = source.renderTarget;
 		this.isRenderTargetTexture = source.isRenderTargetTexture;
+		this.isPMREMTexture = source.isPMREMTexture;
 		this.isArrayTexture = source.isArrayTexture;
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
