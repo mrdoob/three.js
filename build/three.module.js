@@ -514,7 +514,7 @@ const fragment$h = "uniform sampler2D t2D;\nuniform float backgroundIntensity;\n
 
 const vertex$g = "varying vec3 vWorldDirection;\n#include <common>\nvoid main() {\n\tvWorldDirection = transformDirection( position, modelMatrix );\n\t#include <begin_vertex>\n\t#include <project_vertex>\n\tgl_Position.z = gl_Position.w;\n}";
 
-const fragment$g = "uniform float backgroundBlurriness;\nuniform float backgroundIntensity;\nuniform mat3 backgroundRotation;\nvarying vec3 vWorldDirection;\n#include <envmap_common_pars_fragment>\nvoid main() {\n\t#ifdef ENVMAP_TYPE_PMREM\n\t\tvec4 texColor = textureLod( envMap, backgroundRotation * vWorldDirection, roughnessToMip( backgroundBlurriness ) );\n\t#else\n\t\tvec4 texColor = textureCube( envMap, backgroundRotation * vWorldDirection );\n\t#endif\n\ttexColor.rgb *= backgroundIntensity;\n\tgl_FragColor = texColor;\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n}";
+const fragment$g = "uniform samplerCube envMap;\nuniform float backgroundBlurriness;\nuniform float backgroundIntensity;\nuniform mat3 backgroundRotation;\nvarying vec3 vWorldDirection;\n#ifdef ENVMAP_TYPE_CUBE\n\tfloat getFace( vec3 direction ) {\n\t\tvec3 absDirection = abs( direction );\n\t\tfloat face = - 1.0;\n\t\tif ( absDirection.x > absDirection.z ) {\n\t\t\tif ( absDirection.x > absDirection.y )\n\t\t\t\tface = direction.x > 0.0 ? 0.0 : 3.0;\n\t\t\telse\n\t\t\t\tface = direction.y > 0.0 ? 1.0 : 4.0;\n\t\t} else {\n\t\t\tif ( absDirection.z > absDirection.y )\n\t\t\t\tface = direction.z > 0.0 ? 2.0 : 5.0;\n\t\t\telse\n\t\t\t\tface = direction.y > 0.0 ? 1.0 : 4.0;\n\t\t}\n\t\treturn face;\n\t}\n\tvec2 getUV( vec3 direction, float face ) {\n\t\tvec2 uv;\n\t\tif ( face == 0.0 ) {\n\t\t\tuv = vec2( direction.z, direction.y ) / abs( direction.x );\n\t\t} else if ( face == 1.0 ) {\n\t\t\tuv = vec2( - direction.x, - direction.z ) / abs( direction.y );\n\t\t} else if ( face == 2.0 ) {\n\t\t\tuv = vec2( - direction.x, direction.y ) / abs( direction.z );\n\t\t} else if ( face == 3.0 ) {\n\t\t\tuv = vec2( - direction.z, direction.y ) / abs( direction.x );\n\t\t} else if ( face == 4.0 ) {\n\t\t\tuv = vec2( - direction.x, direction.z ) / abs( direction.y );\n\t\t} else {\n\t\t\tuv = vec2( direction.x, direction.y ) / abs( direction.z );\n\t\t}\n\t\treturn 0.5 * ( uv + 1.0 );\n\t}\n\tvec3 cubeFaceDir( float face, vec2 uv ) {\n\t\tvec2 st = 2.0 * uv - 1.0;\n\t\tvec2 over = min( max( abs( st ) - 1.0, 0.0 ), 0.75 );\n\t\tst = clamp( st, - 1.0, 1.0 ) / ( ( 1.0 - over.x ) * ( 1.0 - over.y ) );\n\t\tif ( face == 0.0 ) return vec3( 1.0, st.y, st.x );\n\t\tif ( face == 1.0 ) return vec3( - st.x, 1.0, - st.y );\n\t\tif ( face == 2.0 ) return vec3( - st.x, st.y, 1.0 );\n\t\tif ( face == 3.0 ) return vec3( - 1.0, st.y, - st.x );\n\t\tif ( face == 4.0 ) return vec3( - st.x, - 1.0, st.y );\n\t\treturn vec3( st.x, st.y, - 1.0 );\n\t}\n\tvec4 sampleBlurred( vec3 direction ) {\n\t\tfloat size = float( textureSize( envMap, 0 ).x );\n\t\tfloat face = getFace( direction );\n\t\tvec2 uv = getUV( direction, face );\n\t\tvec2 p = uv * size - 0.5;\n\t\tvec2 i = floor( p );\n\t\tvec2 f = p - i;\n\t\tvec2 f2 = f * f;\n\t\tvec2 f3 = f2 * f;\n\t\tvec2 w0 = ( 1.0 - 3.0 * f + 3.0 * f2 - f3 ) / 6.0;\n\t\tvec2 w1 = ( 4.0 - 6.0 * f2 + 3.0 * f3 ) / 6.0;\n\t\tvec2 w2 = ( 1.0 + 3.0 * f + 3.0 * f2 - 3.0 * f3 ) / 6.0;\n\t\tvec2 w3 = f3 / 6.0;\n\t\tvec2 s0 = w0 + w1;\n\t\tvec2 s1 = w2 + w3;\n\t\tvec2 t0 = ( i - 0.5 + w1 / s0 ) / size;\n\t\tvec2 t1 = ( i + 1.5 + w3 / s1 ) / size;\n\t\tvec4 color = textureCube( envMap, cubeFaceDir( face, vec2( t0.x, t0.y ) ) ) * s0.x * s0.y\n\t\t\t+ textureCube( envMap, cubeFaceDir( face, vec2( t1.x, t0.y ) ) ) * s1.x * s0.y\n\t\t\t+ textureCube( envMap, cubeFaceDir( face, vec2( t0.x, t1.y ) ) ) * s0.x * s1.y\n\t\t\t+ textureCube( envMap, cubeFaceDir( face, vec2( t1.x, t1.y ) ) ) * s1.x * s1.y;\n\t\tvec2 st = abs( 2.0 * uv - 1.0 );\n\t\tfloat texel = 2.0 / size;\n\t\tfloat corner = smoothstep( texel, 2.0 * texel, 1.0 - min( st.x, st.y ) );\n\t\tif ( corner < 1.0 ) color = mix( textureCube( envMap, direction ), color, corner );\n\t\treturn color;\n\t}\n#endif\nvoid main() {\n\tvec3 direction = backgroundRotation * vWorldDirection;\n\t#ifdef ENVMAP_TYPE_PMREM\n\t\tvec4 texColor = textureLod( envMap, direction, 0.0 );\n\t#else\n\t\tvec4 texColor = backgroundBlurriness > 0.0 ? sampleBlurred( direction ) : textureCube( envMap, direction );\n\t#endif\n\ttexColor.rgb *= backgroundIntensity;\n\tgl_FragColor = texColor;\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n}";
 
 const vertex$f = "varying vec3 vWorldDirection;\n#include <common>\nvoid main() {\n\tvWorldDirection = transformDirection( position, modelMatrix );\n\t#include <begin_vertex>\n\t#include <project_vertex>\n\tgl_Position.z = gl_Position.w;\n}";
 
@@ -1345,8 +1345,15 @@ function WebGLBackground( renderer, environments, state, objects, alpha, premult
 
 		if ( background && background.isTexture ) {
 
-			const usePMREM = scene.backgroundBlurriness > 0; // use PMREM if the user wants to blur the background
-			background = environments.get( background, usePMREM );
+			if ( scene.backgroundBlurriness > 0 ) {
+
+				background = environments.getBlurred( scene );
+
+			} else {
+
+				background = environments.get( background );
+
+			}
 
 		}
 
@@ -2820,7 +2827,7 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 }
 
 // Smaller inputs are upsampled so that every PMREM has enough mip levels.
-const MIN_SIZE = 256;
+const MIN_SIZE$1 = 256;
 
 // Log2 of the face size of the roughest mip level. Smaller faces can't
 // represent the diffuse irradiance that is stored in this level.
@@ -3046,7 +3053,7 @@ class PMREMGenerator {
 
 	_setSize( cubeSize ) {
 
-		this._cubeSize = Math.max( MIN_SIZE, floorPowerOfTwo( cubeSize ) );
+		this._cubeSize = Math.max( MIN_SIZE$1, floorPowerOfTwo( cubeSize ) );
 
 	}
 
@@ -3054,7 +3061,7 @@ class PMREMGenerator {
 
 		if ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping ) {
 
-			this._setSize( texture.image.length === 0 ? MIN_SIZE : ( texture.image[ 0 ].width || texture.image[ 0 ].image.width ) );
+			this._setSize( texture.image.length === 0 ? MIN_SIZE$1 : ( texture.image[ 0 ].width || texture.image[ 0 ].image.width ) );
 
 		} else { // Equirectangular
 
@@ -3570,12 +3577,303 @@ function _getCubemapMaterial() {
 
 }
 
+const copyFragment = "#include <common>\n#ifdef USE_ENVMAP\n\tuniform samplerCube envMap;\n\tuniform float flipEnvMap;\n#else\n\tuniform sampler2D envMap;\n#endif\nvarying vec3 vWorldDirection;\nvec3 sampleSource( vec3 direction ) {\n\t#ifdef USE_ENVMAP\n\t\treturn textureCubeLodEXT( envMap, vec3( flipEnvMap * direction.x, direction.yz ), 0.0 ).rgb;\n\t#else\n\t\treturn texture2DLodEXT( envMap, equirectUv( direction ), 0.0 ).rgb;\n\t#endif\n}\nvoid main() {\n\tvec3 dx = dFdx( vWorldDirection ) / float( SUPERSAMPLING );\n\tvec3 dy = dFdy( vWorldDirection ) / float( SUPERSAMPLING );\n\tvec3 origin = vWorldDirection - ( dx + dy ) * 0.5 * float( SUPERSAMPLING - 1 );\n\tvec3 color = vec3( 0.0 );\n\tfor ( int i = 0; i < SUPERSAMPLING; i ++ ) {\n\t\tfor ( int j = 0; j < SUPERSAMPLING; j ++ ) {\n\t\t\tcolor += sampleSource( normalize( origin + float( i ) * dx + float( j ) * dy ) );\n\t\t}\n\t}\n\tgl_FragColor = vec4( color / float( SUPERSAMPLING * SUPERSAMPLING ), 1.0 );\n}";
+
+const blurFragment = "uniform samplerCube envMap;\nuniform float sigma;\nuniform float level;\nuniform float spacing;\nuniform int radius;\nvarying vec3 vWorldDirection;\nvoid main() {\n\tvec3 direction = normalize( vWorldDirection );\n\tvec3 up = abs( direction.z ) < 0.999 ? vec3( 0.0, 0.0, 1.0 ) : vec3( 1.0, 0.0, 0.0 );\n\tvec3 tangent = normalize( cross( up, direction ) );\n\tvec3 bitangent = cross( direction, tangent );\n\tfloat k = - 0.5 / ( sigma * sigma );\n\tvec3 color = vec3( 0.0 );\n\tfloat weightSum = 0.0;\n\tfor ( int i = - radius; i <= radius; i ++ ) {\n\t\tfor ( int j = 0; j <= radius; j ++ ) {\n\t\t\tvec2 offset = vec2( float( i ), float( j ) ) * spacing;\n\t\t\tfloat r2 = dot( offset, offset );\n\t\t\tfloat theta = atan( sqrt( r2 ) );\n\t\t\tfloat weight = exp( k * theta * theta ) * inversesqrt( ( 1.0 + r2 ) * ( 1.0 + r2 ) * ( 1.0 + r2 ) );\n\t\t\tcolor += weight * textureCubeLodEXT( envMap, direction + offset.x * tangent + offset.y * bitangent, level ).rgb;\n\t\t\tweightSum += weight;\n\t\t\tif ( j > 0 ) {\n\t\t\t\tcolor += weight * textureCubeLodEXT( envMap, direction + offset.x * tangent - offset.y * bitangent, level ).rgb;\n\t\t\t\tweightSum += weight;\n\t\t\t}\n\t\t}\n\t}\n\tgl_FragColor = vec4( color / weightSum, 1.0 );\n}";
+
+const sphereFragment = "#include <common>\nuniform samplerCube envMap;\nuniform float sigma;\nvarying vec3 vWorldDirection;\nvoid main() {\n\tvec3 direction = normalize( vWorldDirection );\n\tfloat k = - 0.5 / ( sigma * sigma );\n\tvec3 color = vec3( 0.0 );\n\tfloat weightSum = 0.0;\n\tfor ( int t = 0; t < 3 * SIZE * SIZE; t ++ ) {\n\t\tint axis = t / ( SIZE * SIZE );\n\t\tint texel = t - axis * SIZE * SIZE;\n\t\tvec2 st = ( vec2( float( texel % SIZE ), float( texel / SIZE ) ) + 0.5 ) / float( SIZE ) * 2.0 - 1.0;\n\t\tvec3 d = axis == 0 ? vec3( 1.0, st ) : axis == 1 ? vec3( st.x, 1.0, st.y ) : vec3( st, 1.0 );\n\t\tfloat r2 = dot( d, d );\n\t\tfloat solidAngle = inversesqrt( r2 * r2 * r2 );\n\t\tfloat theta = acos( clamp( dot( direction, d * inversesqrt( r2 ) ), - 1.0, 1.0 ) );\n\t\tfloat weight = exp( k * theta * theta ) * solidAngle;\n\t\tcolor += weight * textureCubeLodEXT( envMap, d, LEVEL ).rgb;\n\t\tweightSum += weight;\n\t\ttheta = PI - theta;\n\t\tweight = exp( k * theta * theta ) * solidAngle;\n\t\tcolor += weight * textureCubeLodEXT( envMap, - d, LEVEL ).rgb;\n\t\tweightSum += weight;\n\t}\n\tgl_FragColor = vec4( color / weightSum, 1.0 );\n}";
+
+// sharp copy of the environment, its mip chain feeds the blur
+const SOURCE_SIZE = 256;
+const SUPERSAMPLING = 4;
+
+// the blurred cube map is sized so sigma spans 1.5 to 3 of its texels, down to this size
+const SIGMA_TEXELS = 3;
+const MIN_SIZE = 16;
+
+// taps at the source texel spacing cover 3.5 sigma, the source level has twice the target's size where available
+const TAP_RADIUS = 12;
+
+// the smallest size blurs too wide for a tangent plane and sums every texel of this source level instead
+const SPHERE_SOURCE_SIZE = 32;
+
+/**
+ * Blurs an environment map with an angular Gaussian into a cube map, the way a real
+ * blur of the background would look. The result is sized to the blur: from 256 faces
+ * for the finest blur down to 16 for the average of the whole map.
+ *
+ * The renderer uses it for {@link Scene#backgroundBlurriness}.
+ *
+ * @private
+ */
+class CubemapBlurGenerator {
+
+	/**
+	 * Constructs a new cubemap blur generator.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 */
+	constructor( renderer ) {
+
+		this._renderer = renderer;
+		this._cache = new WeakMap();
+		this._mesh = new Mesh( new BoxGeometry( 5, 5, 5 ), null );
+		this._cubeCamera = new CubeCamera( 1, 10, null );
+
+		this._source = null;
+		this._sourceTexture = null;
+		this._sourceVersion = -1;
+
+		this._copyMaterial = null;
+		this._blurMaterial = null;
+		this._sphereMaterial = null;
+
+	}
+
+	/**
+	 * Blurs an equirectangular or cube texture. Blurriness `1 / 9` gives a
+	 * sigma of 0.9 degrees, every further `1 / 9` doubles it up to the average of the whole
+	 * map at `1`, below `1 / 9` the blur ramps down to sharp.
+	 *
+	 * @param {Texture} texture - The environment texture.
+	 * @param {number} blurriness - The blurriness in the range `[0,1]`.
+	 * @param {?WebGLCubeRenderTarget} [renderTarget=null] - A previous result to update, replaced when its size does not fit.
+	 * @return {WebGLCubeRenderTarget} The cube render target with the blurred environment.
+	 */
+	fromTexture( texture, blurriness, renderTarget = null ) {
+
+		const renderer = this._renderer;
+
+		const { size, sigma } = _getBlurParameters( blurriness );
+
+		if ( renderTarget !== null && renderTarget.width !== size ) {
+
+			renderTarget.dispose();
+			renderTarget = null;
+
+		}
+
+		const target = renderTarget || _createTarget( size );
+		const cache = this._cache;
+		let entry = cache.get( target );
+
+		if ( entry !== undefined && entry.texture === texture && entry.pmremVersion === texture.pmremVersion && entry.sigma === sigma ) return target;
+
+		const autoClear = renderer.autoClear;
+		renderer.autoClear = false;
+
+		this._copy( texture );
+		this._blur( target, sigma );
+
+		renderer.autoClear = autoClear;
+
+		if ( entry === undefined ) {
+
+			entry = {};
+			cache.set( target, entry );
+
+			target.addEventListener( 'dispose', function onDispose( event ) {
+
+				cache.delete( event.target );
+				event.target.removeEventListener( 'dispose', onDispose );
+
+			} );
+
+		}
+
+		entry.texture = texture;
+		entry.pmremVersion = texture.pmremVersion;
+		entry.sigma = sigma;
+
+		return target;
+
+	}
+
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+	 */
+	dispose() {
+
+		if ( this._source !== null ) this._source.dispose();
+		if ( this._copyMaterial !== null ) this._copyMaterial.dispose();
+		if ( this._blurMaterial !== null ) this._blurMaterial.dispose();
+		if ( this._sphereMaterial !== null ) this._sphereMaterial.dispose();
+
+		this._mesh.geometry.dispose();
+
+	}
+
+	// private interface
+
+	_copy( texture ) {
+
+		if ( this._sourceTexture === texture && this._sourceVersion === texture.pmremVersion ) return;
+
+		if ( this._source === null ) this._source = _createTarget( SOURCE_SIZE, true );
+
+		if ( this._copyMaterial === null ) this._copyMaterial = _createCopyMaterial();
+
+		const uniforms = this._copyMaterial.uniforms;
+
+		uniforms.envMap.value = texture;
+		uniforms.flipEnvMap.value = ( texture.isCubeTexture && texture.isRenderTargetTexture === false ) ? -1 : 1;
+
+		this._render( this._copyMaterial, this._source );
+
+		this._sourceTexture = texture;
+		this._sourceVersion = texture.pmremVersion;
+
+	}
+
+	_blur( target, sigma ) {
+
+		const size = target.width;
+		const sourceSize = Math.min( 2 * size, SOURCE_SIZE );
+
+		// tap spacing is the source texel angle at the face center
+		const spacing = 2 / sourceSize;
+
+		let material;
+
+		if ( size > MIN_SIZE ) {
+
+			if ( this._blurMaterial === null ) this._blurMaterial = _createBlurMaterial();
+
+			material = this._blurMaterial;
+			material.uniforms.radius.value = TAP_RADIUS * sourceSize / size;
+			material.uniforms.level.value = Math.log2( SOURCE_SIZE / sourceSize );
+			material.uniforms.spacing.value = spacing;
+
+		} else {
+
+			if ( this._sphereMaterial === null ) this._sphereMaterial = _createSphereMaterial();
+
+			material = this._sphereMaterial;
+
+		}
+
+		material.uniforms.envMap.value = this._source.texture;
+		material.uniforms.sigma.value = sigma;
+
+		this._render( material, target );
+
+	}
+
+	_render( material, target ) {
+
+		this._mesh.material = material;
+		this._cubeCamera.renderTarget = target;
+		this._cubeCamera.update( this._renderer, this._mesh );
+
+	}
+
+}
+
+function _getBlurParameters( blurriness ) {
+
+	const t = blurriness * 9 - 1;
+	const sigma = ( t < 0 ? Math.max( t + 1, 0 ) : Math.pow( 2, t ) ) / 64;
+	const size = Math.min( Math.max( floorPowerOfTwo( SIGMA_TEXELS * 2 / sigma ), MIN_SIZE ), SOURCE_SIZE );
+	const spacing = 2 / Math.min( 2 * size, SOURCE_SIZE );
+	const texel = 2 / size;
+
+	// Remove the variance added by source interpolation and cubic reconstruction.
+	const bakeSigma = Math.max( Math.sqrt( Math.max( sigma * sigma - texel * texel / 3 - spacing * spacing / 6, 0 ) ), 0.25 * texel );
+
+	return { size, sigma: Math.fround( bakeSigma ) };
+
+}
+
+function _createTarget( size, mipmaps = false ) {
+
+	return new WebGLCubeRenderTarget( size, {
+		type: HalfFloatType,
+		colorSpace: LinearSRGBColorSpace,
+		minFilter: mipmaps ? LinearMipmapLinearFilter : LinearFilter,
+		magFilter: LinearFilter,
+		generateMipmaps: mipmaps,
+		depthBuffer: false
+	} );
+
+}
+
+function _createMaterial( name, defines, uniforms, fragmentShader ) {
+
+	return new ShaderMaterial( {
+
+		name: name,
+		defines: defines,
+		uniforms: uniforms,
+		vertexShader: ShaderLib.cube.vertexShader,
+		fragmentShader: fragmentShader,
+		side: BackSide,
+		blending: NoBlending,
+		depthTest: false,
+		depthWrite: false
+
+	} );
+
+}
+
+function _createCopyMaterial() {
+
+	const material = _createMaterial( 'CubemapBlurCopy', { 'SUPERSAMPLING': SUPERSAMPLING }, {
+
+		'envMap': { value: null },
+		'flipEnvMap': { value: 1 }
+
+	}, copyFragment );
+
+	// Expose cube sources so the renderer selects the cubemap shader.
+	Object.defineProperty( material, 'envMap', {
+
+		get: function () {
+
+			const texture = this.uniforms.envMap.value;
+
+			return ( texture !== null && texture.isCubeTexture ) ? texture : null;
+
+		}
+
+	} );
+
+	return material;
+
+}
+
+function _createBlurMaterial() {
+
+	return _createMaterial( 'CubemapBlur', {}, {
+
+		'envMap': { value: null },
+		'sigma': { value: 0 },
+		'level': { value: 0 },
+		'spacing': { value: 0 },
+		'radius': { value: 0 }
+
+	}, blurFragment );
+
+}
+
+function _createSphereMaterial() {
+
+	return _createMaterial( 'CubemapBlurSphere', { 'SIZE': SPHERE_SOURCE_SIZE, 'LEVEL': Math.log2( SOURCE_SIZE / SPHERE_SOURCE_SIZE ) + '.0' }, {
+
+		'envMap': { value: null },
+		'sigma': { value: 0 }
+
+	}, sphereFragment );
+
+}
+
 function WebGLEnvironments( renderer ) {
 
 	let cubeMaps = new WeakMap();
 	let pmremMaps = new WeakMap();
+	let blurMaps = new WeakMap();
 
 	let pmremGenerator = null;
+	let blurGenerator = null;
 
 	function get( texture, usePMREM = false ) {
 
@@ -3707,6 +4005,74 @@ function WebGLEnvironments( renderer ) {
 
 	}
 
+	// blurred cube map for Scene.backgroundBlurriness, see CubemapBlurGenerator
+
+	function getBlurred( scene ) {
+
+		const { background: texture, backgroundBlurriness: blurriness } = scene;
+
+		if ( texture && texture.isTexture ) {
+
+			const mapping = texture.mapping;
+
+			const isEquirectMap = ( mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping );
+			const isCubeMap = ( mapping === CubeReflectionMapping || mapping === CubeRefractionMapping );
+
+			if ( isEquirectMap || isCubeMap ) {
+
+				let entry = blurMaps.get( scene );
+
+				if ( entry === undefined || entry.texture !== texture || entry.blurriness !== blurriness || entry.pmremVersion !== texture.pmremVersion ) {
+
+					const image = texture.image;
+					const ready = isCubeMap ? ( image && isCubeTextureComplete( image ) ) : ( image && image.height > 0 );
+
+					if ( ! ready ) return null; // image not yet ready. try the conversion next frame
+
+					if ( blurGenerator === null ) blurGenerator = new CubemapBlurGenerator( renderer );
+
+					if ( entry === undefined ) {
+
+						entry = { texture: null, renderTarget: null };
+						blurMaps.set( scene, entry );
+
+						entry.dispose = () => {
+
+							if ( entry.texture !== null ) entry.texture.removeEventListener( 'dispose', entry.dispose );
+							if ( entry.renderTarget !== null ) entry.renderTarget.dispose();
+
+							entry.texture = null;
+							entry.renderTarget = null;
+
+						};
+
+					}
+
+					if ( entry.texture !== texture ) {
+
+						if ( entry.texture !== null ) entry.texture.removeEventListener( 'dispose', entry.dispose );
+
+						entry.texture = texture;
+						texture.addEventListener( 'dispose', entry.dispose );
+
+					}
+
+					entry.renderTarget = blurGenerator.fromTexture( texture, blurriness, entry.renderTarget );
+					entry.blurriness = blurriness;
+					entry.pmremVersion = texture.pmremVersion;
+
+				}
+
+				return entry.renderTarget.texture;
+
+			}
+
+		}
+
+		return texture;
+
+	}
+
 	function mapTextureMapping( texture, mapping ) {
 
 		if ( mapping === EquirectangularReflectionMapping ) {
@@ -3776,6 +4142,7 @@ function WebGLEnvironments( renderer ) {
 
 		cubeMaps = new WeakMap();
 		pmremMaps = new WeakMap();
+		blurMaps = new WeakMap();
 
 		if ( pmremGenerator !== null ) {
 
@@ -3784,10 +4151,18 @@ function WebGLEnvironments( renderer ) {
 
 		}
 
+		if ( blurGenerator !== null ) {
+
+			blurGenerator.dispose();
+			blurGenerator = null;
+
+		}
+
 	}
 
 	return {
 		get: get,
+		getBlurred: getBlurred,
 		dispose: dispose
 	};
 

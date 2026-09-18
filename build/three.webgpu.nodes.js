@@ -23971,7 +23971,7 @@ class CubeRenderTarget extends RenderTarget {
 
 }
 
-const _cache$1 = new WeakMap();
+const _cache$2 = new WeakMap();
 
 /**
  * This node can be used to automatically convert environment maps in the
@@ -24062,9 +24062,9 @@ class CubeMapNode extends TempNode {
 
 					// check for converted cubemap map
 
-					if ( _cache$1.has( texture ) ) {
+					if ( _cache$2.has( texture ) ) {
 
-						const cubeMap = _cache$1.get( texture );
+						const cubeMap = _cache$2.get( texture );
 
 						mapTextureMapping( cubeMap, texture.mapping );
 						this._cubeTexture = cubeMap;
@@ -24083,7 +24083,7 @@ class CubeMapNode extends TempNode {
 							mapTextureMapping( renderTarget.texture, texture.mapping );
 							this._cubeTexture = renderTarget.texture;
 
-							_cache$1.set( texture, renderTarget.texture );
+							_cache$2.set( texture, renderTarget.texture );
 
 							texture.addEventListener( 'dispose', onTextureDispose );
 
@@ -24155,11 +24155,11 @@ function onTextureDispose( event ) {
 
 	texture.removeEventListener( 'dispose', onTextureDispose );
 
-	const renderTarget = _cache$1.get( texture );
+	const renderTarget = _cache$2.get( texture );
 
 	if ( renderTarget !== undefined ) {
 
-		_cache$1.delete( texture );
+		_cache$2.delete( texture );
 
 		renderTarget.dispose();
 
@@ -26621,7 +26621,7 @@ const ggxIntegration = /*@__PURE__*/ Fn( ( { roughness, sourceLod, sourceSize, e
 } );
 
 // Smaller inputs are upsampled so that every PMREM has enough mip levels.
-const MIN_SIZE = 256;
+const MIN_SIZE$1 = 256;
 
 // Log2 of the face size of the roughest mip level. Smaller faces can't
 // represent the diffuse irradiance that is stored in this level.
@@ -26940,7 +26940,7 @@ class PMREMGenerator {
 
 	_setSize( cubeSize ) {
 
-		this._cubeSize = Math.max( MIN_SIZE, floorPowerOfTwo( cubeSize ) );
+		this._cubeSize = Math.max( MIN_SIZE$1, floorPowerOfTwo( cubeSize ) );
 
 	}
 
@@ -26948,7 +26948,7 @@ class PMREMGenerator {
 
 		if ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping ) {
 
-			this._setSize( texture.image.length === 0 ? MIN_SIZE : ( texture.image[ 0 ].width || texture.image[ 0 ].image.width ) );
+			this._setSize( texture.image.length === 0 ? MIN_SIZE$1 : ( texture.image[ 0 ].width || texture.image[ 0 ].image.width ) );
 
 		} else { // Equirectangular
 
@@ -27267,7 +27267,7 @@ function _getEquirectMaterial() {
 
 }
 
-const _cache = new WeakMap();
+const _cache$1 = new WeakMap();
 
 /**
  * Generates a PMREM from the given texture.
@@ -27280,7 +27280,7 @@ const _cache = new WeakMap();
  */
 function _getPMREMFromTexture( texture, renderer, generator ) {
 
-	const cache = _getCache( renderer );
+	const cache = _getCache$1( renderer );
 
 	let renderTarget = cache.get( texture );
 
@@ -27361,14 +27361,14 @@ function _getPMREMFromTexture( texture, renderer, generator ) {
  * @param {Renderer} renderer - The renderer.
  * @return {WeakMap<Texture, CubeRenderTarget>} The PMREM cache.
  */
-function _getCache( renderer ) {
+function _getCache$1( renderer ) {
 
-	let rendererCache = _cache.get( renderer );
+	let rendererCache = _cache$1.get( renderer );
 
 	if ( rendererCache === undefined ) {
 
 		rendererCache = new WeakMap();
-		_cache.set( renderer, rendererCache );
+		_cache$1.set( renderer, rendererCache );
 
 	}
 
@@ -38367,6 +38367,1059 @@ const triNoise3D = /*@__PURE__*/ Fn( ( [ position, speed, time ] ) => {
 } );
 
 /**
+ * Saves the state of the given renderer and stores it into the given state object.
+ *
+ * If not state object is provided, the function creates one.
+ *
+ * @private
+ * @function
+ * @param {Renderer} renderer - The renderer.
+ * @param {Object} [state={}] - The state.
+ * @return {Object} The state.
+ */
+function saveRendererState( renderer, state = {} ) {
+
+	state.toneMapping = renderer.toneMapping;
+	state.toneMappingExposure = renderer.toneMappingExposure;
+	state.outputColorSpace = renderer.outputColorSpace;
+	state.renderTarget = renderer.getRenderTarget();
+	state.activeCubeFace = renderer.getActiveCubeFace();
+	state.activeMipmapLevel = renderer.getActiveMipmapLevel();
+	state.renderObjectFunction = renderer.getRenderObjectFunction();
+	state.pixelRatio = renderer.getPixelRatio();
+	state.mrt = renderer.getMRT();
+	state.clearColor = renderer.getClearColor( state.clearColor || new Color() );
+	state.clearAlpha = renderer.getClearAlpha();
+	state.autoClear = renderer.autoClear;
+	state.scissorTest = renderer.getScissorTest();
+
+	return state;
+
+}
+
+/**
+ * Saves the state of the given renderer and stores it into the given state object.
+ * Besides, the function also resets the state of the renderer to its default values.
+ *
+ * If not state object is provided, the function creates one.
+ *
+ * @private
+ * @function
+ * @param {Renderer} renderer - The renderer.
+ * @param {Object} [state={}] - The state.
+ * @return {Object} The state.
+ */
+function resetRendererState( renderer, state ) {
+
+	state = saveRendererState( renderer, state );
+
+	renderer.setMRT( null );
+	renderer.setRenderObjectFunction( null );
+	renderer.setClearColor( 0x000000, 1 );
+	renderer.autoClear = true;
+
+	return state;
+
+}
+
+/**
+ * Restores the state of the given renderer from the given state object.
+ *
+ * @private
+ * @function
+ * @param {Renderer} renderer - The renderer.
+ * @param {Object} state - The state to restore.
+ */
+function restoreRendererState( renderer, state ) {
+
+	renderer.toneMapping = state.toneMapping;
+	renderer.toneMappingExposure = state.toneMappingExposure;
+	renderer.outputColorSpace = state.outputColorSpace;
+	renderer.setRenderTarget( state.renderTarget, state.activeCubeFace, state.activeMipmapLevel );
+	renderer.setRenderObjectFunction( state.renderObjectFunction );
+	renderer.setPixelRatio( state.pixelRatio );
+	renderer.setMRT( state.mrt );
+	renderer.setClearColor( state.clearColor, state.clearAlpha );
+	renderer.autoClear = state.autoClear;
+	renderer.setScissorTest( state.scissorTest );
+
+}
+
+/**
+ * Saves the state of the given scene and stores it into the given state object.
+ *
+ * If not state object is provided, the function creates one.
+ *
+ * @private
+ * @function
+ * @param {Scene} scene - The scene.
+ * @param {Object} [state={}] - The state.
+ * @return {Object} The state.
+ */
+function saveSceneState( scene, state = {} ) {
+
+	state.background = scene.background;
+	state.backgroundNode = scene.backgroundNode;
+	state.overrideMaterial = scene.overrideMaterial;
+
+	return state;
+
+}
+
+/**
+ * Saves the state of the given scene and stores it into the given state object.
+ * Besides, the function also resets the state of the scene to its default values.
+ *
+ * If not state object is provided, the function creates one.
+ *
+ * @private
+ * @function
+ * @param {Scene} scene - The scene.
+ * @param {Object} [state={}] - The state.
+ * @return {Object} The state.
+ */
+function resetSceneState( scene, state ) {
+
+	state = saveSceneState( scene, state );
+
+	scene.background = null;
+	scene.backgroundNode = null;
+	scene.overrideMaterial = null;
+
+	return state;
+
+}
+
+/**
+ * Restores the state of the given scene from the given state object.
+ *
+ * @private
+ * @function
+ * @param {Scene} scene - The scene.
+ * @param {Object} state - The state to restore.
+ */
+function restoreSceneState( scene, state ) {
+
+	scene.background = state.background;
+	scene.backgroundNode = state.backgroundNode;
+	scene.overrideMaterial = state.overrideMaterial;
+
+}
+
+/**
+ * Saves the state of the given renderer and scene and stores it into the given state object.
+ *
+ * If not state object is provided, the function creates one.
+ *
+ * @private
+ * @function
+ * @param {Renderer} renderer - The renderer.
+ * @param {Scene} scene - The scene.
+ * @param {Object} [state={}] - The state.
+ * @return {Object} The state.
+ */
+function saveRendererAndSceneState( renderer, scene, state = {} ) {
+
+	state = saveRendererState( renderer, state );
+	state = saveSceneState( scene, state );
+
+	return state;
+
+}
+
+/**
+ * Saves the state of the given renderer and scene and stores it into the given state object.
+ * Besides, the function also resets the state of the renderer and scene to its default values.
+ *
+ * If not state object is provided, the function creates one.
+ *
+ * @private
+ * @function
+ * @param {Renderer} renderer - The renderer.
+ * @param {Scene} scene - The scene.
+ * @param {Object} [state={}] - The state.
+ * @return {Object} The state.
+ */
+function resetRendererAndSceneState( renderer, scene, state ) {
+
+	state = resetRendererState( renderer, state );
+	state = resetSceneState( scene, state );
+
+	return state;
+
+}
+
+/**
+ * Restores the state of the given renderer and scene from the given state object.
+ *
+ * @private
+ * @function
+ * @param {Renderer} renderer - The renderer.
+ * @param {Scene} scene - The scene.
+ * @param {Object} state - The state to restore.
+ */
+function restoreRendererAndSceneState( renderer, scene, state ) {
+
+	restoreRendererState( renderer, state );
+	restoreSceneState( scene, state );
+
+}
+
+var RendererUtils = /*#__PURE__*/Object.freeze({
+	__proto__: null,
+	resetRendererAndSceneState: resetRendererAndSceneState,
+	resetRendererState: resetRendererState,
+	resetSceneState: resetSceneState,
+	restoreRendererAndSceneState: restoreRendererAndSceneState,
+	restoreRendererState: restoreRendererState,
+	restoreSceneState: restoreSceneState,
+	saveRendererAndSceneState: saveRendererAndSceneState,
+	saveRendererState: saveRendererState,
+	saveSceneState: saveSceneState
+});
+
+// sharp copy of the environment, its mip chain feeds the blur
+const SOURCE_SIZE = 256;
+const SUPERSAMPLING = 4;
+
+// the blurred cube map is sized so sigma spans 1.5 to 3 of its texels, down to this size
+const SIGMA_TEXELS = 3;
+const MIN_SIZE = 16;
+
+// taps at the source texel spacing cover 3.5 sigma, the source level has twice the target's size where available
+const TAP_RADIUS = 12;
+
+// the smallest size blurs too wide for a tangent plane and sums every texel of this source level instead
+const SPHERE_SOURCE_SIZE = 32;
+
+const _defaultCubeTexture = /*@__PURE__*/ new CubeTexture();
+_defaultCubeTexture.isRenderTargetTexture = true;
+
+/**
+ * Blurs an environment map with an angular Gaussian into a cube map, the way a real
+ * blur of the background would look. The result is sized to the blur: from 256 faces
+ * for the finest blur down to 16 for the average of the whole map.
+ *
+ * The renderer uses it for {@link Scene#backgroundBlurriness}.
+ *
+ * @private
+ */
+class CubemapBlurGenerator {
+
+	/**
+	 * Constructs a new cubemap blur generator.
+	 *
+	 * @param {Renderer} renderer - The renderer.
+	 */
+	constructor( renderer ) {
+
+		this._renderer = renderer;
+		this._cache = new WeakMap();
+		this._mesh = new Mesh( new BoxGeometry( 5, 5, 5 ), null );
+		this._cubeCamera = new CubeCamera( 1, 10, null );
+
+		this._source = null;
+		this._sourceTexture = null;
+		this._sourceVersion = -1;
+
+		this._copyPass = null;
+		this._nodeCopyPass = null;
+		this._blurPass = null;
+		this._spherePass = null;
+		this._rendererState = {};
+
+	}
+
+	/**
+	 * Blurs an equirectangular or cube texture. Blurriness `1 / 9` gives a
+	 * sigma of 0.9 degrees, every further `1 / 9` doubles it up to the average of the whole
+	 * map at `1`, below `1 / 9` the blur ramps down to sharp.
+	 *
+	 * @param {Texture} texture - The environment texture.
+	 * @param {number} blurriness - The blurriness in the range `[0,1]`.
+	 * @param {?CubeRenderTarget} [renderTarget=null] - A previous result to update, replaced when its size does not fit.
+	 * @return {CubeRenderTarget} The cube render target with the blurred environment.
+	 */
+	fromTexture( texture, blurriness, renderTarget = null ) {
+
+		const renderer = this._renderer;
+
+		const { size, sigma } = _getBlurParameters( blurriness );
+
+		if ( renderTarget !== null && renderTarget.width !== size ) {
+
+			renderTarget.dispose();
+			renderTarget = null;
+
+		}
+
+		const target = renderTarget || _createTarget( size );
+		const cache = this._cache;
+		let entry = cache.get( target );
+
+		if ( entry !== undefined && entry.texture === texture && entry.pmremVersion === texture.pmremVersion && entry.sigma === sigma ) return target;
+
+		const currentMRT = renderer.getMRT();
+		const autoClear = renderer.autoClear;
+
+		renderer.setMRT( null );
+		renderer.autoClear = false;
+
+		this._copy( texture );
+		this._blur( target, sigma );
+
+		renderer.setMRT( currentMRT );
+		renderer.autoClear = autoClear;
+
+		if ( entry === undefined ) {
+
+			entry = {};
+			cache.set( target, entry );
+
+			target.addEventListener( 'dispose', function onDispose( event ) {
+
+				cache.delete( event.target );
+				event.target.removeEventListener( 'dispose', onDispose );
+
+			} );
+
+		}
+
+		entry.texture = texture;
+		entry.pmremVersion = texture.pmremVersion;
+		entry.sigma = sigma;
+
+		return target;
+
+	}
+
+	/**
+	 * Captures and blurs an environment texture node on every call.
+	 *
+	 * @param {TextureNode} textureNode - The environment texture node.
+	 * @param {number} amount - The blur amount in the range `[0,1]`.
+	 * @param {?CubeRenderTarget} [renderTarget=null] - A previous result to update.
+	 * @param {?ContextNode} [contextNode=null] - The input's shared context.
+	 * @return {CubeRenderTarget} The blurred environment.
+	 */
+	fromNode( textureNode, amount, renderTarget = null, contextNode = null ) {
+
+		const { size, sigma } = _getBlurParameters( amount );
+
+		if ( renderTarget !== null && renderTarget.width !== size ) {
+
+			renderTarget.dispose();
+			renderTarget = null;
+
+		}
+
+		const target = renderTarget || _createTarget( size );
+		const renderer = this._renderer;
+		const entry = this._cache.get( target );
+
+		if ( entry !== undefined ) entry.texture = null;
+		this._sourceTexture = null;
+		this._sourceVersion = -1;
+
+		resetRendererState( renderer, this._rendererState );
+		renderer.autoClear = false;
+
+		try {
+
+			this._initSource();
+
+			let pass = this._nodeCopyPass;
+
+			if ( pass === null || pass.textureNode !== textureNode || pass.texture !== textureNode.value || pass.material.contextNode !== contextNode ) {
+
+				if ( pass !== null ) pass.material.dispose();
+
+				pass = this._nodeCopyPass = _createNodeCopyPass( textureNode, contextNode );
+
+			}
+
+			this._render( pass.material, this._source );
+			this._blur( target, sigma );
+
+		} finally {
+
+			restoreRendererState( renderer, this._rendererState );
+
+		}
+
+		return target;
+
+	}
+
+	/**
+	 * Frees the generator's internal resources. Output targets are owned by the caller.
+	 */
+	dispose() {
+
+		if ( this._source !== null ) this._source.dispose();
+		if ( this._copyPass !== null ) this._copyPass.material.dispose();
+		if ( this._nodeCopyPass !== null ) this._nodeCopyPass.material.dispose();
+		if ( this._blurPass !== null ) this._blurPass.material.dispose();
+		if ( this._spherePass !== null ) this._spherePass.material.dispose();
+
+		this._mesh.geometry.dispose();
+
+	}
+
+	// private interface
+
+	_initSource() {
+
+		if ( this._source === null ) {
+
+			this._source = _createTarget( SOURCE_SIZE, true );
+
+			// allocate the mip chain now, CubeCamera renders all but the last face with mipmaps off
+			this._renderer.initRenderTarget( this._source );
+
+		}
+
+	}
+
+	_copy( texture ) {
+
+		if ( this._sourceTexture === texture && this._sourceVersion === texture.pmremVersion ) return;
+
+		this._initSource();
+
+		// the sampler node bakes the source type and orientation into the shader
+		let pass = this._copyPass;
+
+		if ( pass === null || pass.texture !== texture ) {
+
+			if ( pass !== null ) pass.material.dispose();
+
+			pass = this._copyPass = _createCopyPass( texture );
+
+		}
+
+		this._render( pass.material, this._source );
+
+		this._sourceTexture = texture;
+		this._sourceVersion = texture.pmremVersion;
+
+	}
+
+	_blur( target, sigma ) {
+
+		const size = target.width;
+		const sourceSize = Math.min( 2 * size, SOURCE_SIZE );
+
+		// tap spacing is the source texel angle at the face center
+		const spacing = 2 / sourceSize;
+
+		let pass;
+
+		if ( size > MIN_SIZE ) {
+
+			if ( this._blurPass === null ) this._blurPass = _createBlurPass();
+
+			pass = this._blurPass;
+			pass.radius.value = TAP_RADIUS * sourceSize / size;
+			pass.level.value = Math.log2( SOURCE_SIZE / sourceSize );
+			pass.spacing.value = spacing;
+
+		} else {
+
+			if ( this._spherePass === null ) this._spherePass = _createSpherePass();
+
+			pass = this._spherePass;
+
+		}
+
+		pass.envMap.value = this._source.texture;
+		pass.sigma.value = sigma;
+
+		this._render( pass.material, target );
+
+	}
+
+	_render( material, target ) {
+
+		this._mesh.material = material;
+		this._cubeCamera.renderTarget = target;
+		this._cubeCamera.update( this._renderer, this._mesh );
+
+	}
+
+}
+
+function _getBlurParameters( blurriness ) {
+
+	const t = blurriness * 9 - 1;
+	const sigma = ( t < 0 ? Math.max( t + 1, 0 ) : Math.pow( 2, t ) ) / 64;
+	const size = Math.min( Math.max( floorPowerOfTwo( SIGMA_TEXELS * 2 / sigma ), MIN_SIZE ), SOURCE_SIZE );
+	const spacing = 2 / Math.min( 2 * size, SOURCE_SIZE );
+	const texel = 2 / size;
+
+	// Remove the variance added by source interpolation and cubic reconstruction.
+	const bakeSigma = Math.max( Math.sqrt( Math.max( sigma * sigma - texel * texel / 3 - spacing * spacing / 6, 0 ) ), 0.25 * texel );
+
+	return { size, sigma: Math.fround( bakeSigma ) };
+
+}
+
+function _createTarget( size, mipmaps = false ) {
+
+	return new CubeRenderTarget( size, {
+		type: HalfFloatType,
+		colorSpace: LinearSRGBColorSpace,
+		minFilter: mipmaps ? LinearMipmapLinearFilter : LinearFilter,
+		magFilter: LinearFilter,
+		generateMipmaps: mipmaps,
+		depthBuffer: false
+	} );
+
+}
+
+function _createMaterial( name ) {
+
+	const material = new NodeMaterial();
+	material.name = name;
+	material.side = BackSide;
+	material.blending = NoBlending;
+	material.depthTest = false;
+	material.depthWrite = false;
+
+	return material;
+
+}
+
+function _createCopyPass( sourceTexture ) {
+
+	// one sampler node for all taps
+	const direction = property( 'vec3', 'sampleDirection' );
+
+	const envMap = sourceTexture.isCubeTexture === true
+		? cubeTexture( sourceTexture, direction, 0 )
+		: texture( sourceTexture, equirectUV( direction ), 0 );
+
+	return { material: _createCopyMaterial( envMap, direction ), texture: sourceTexture };
+
+}
+
+function _createNodeCopyPass( textureNode, contextNode ) {
+
+	const direction = property( 'vec3', 'sampleDirection' );
+	const sourceTexture = textureNode.value;
+	const uvNode = sourceTexture.isCubeTexture === true ? direction : equirectUV( direction );
+
+	let envMap = textureNode.sample( uvNode );
+
+	if ( envMap.levelNode === null && envMap.biasNode === null && envMap.gradNode === null ) {
+
+		envMap = envMap.level( 0 );
+
+	}
+
+	envMap.setUpdateMatrix( textureNode.updateMatrix );
+
+	const material = _createCopyMaterial( envMap, direction );
+	material.contextNode = contextNode;
+	material.fragmentNode = material.fragmentNode.context( { forceUVContext: false } );
+
+	return { material, texture: sourceTexture, textureNode };
+
+}
+
+function _createCopyMaterial( envMap, direction ) {
+
+	const material = _createMaterial( 'CubemapBlurCopy' );
+
+	material.fragmentNode = Fn( () => {
+
+		// Supersample to preserve energy in small HDR highlights.
+		const dx = dFdx( positionWorldDirection ).div( SUPERSAMPLING ).toVar();
+		const dy = dFdy( positionWorldDirection ).div( SUPERSAMPLING ).toVar();
+		const origin = positionWorldDirection.sub( dx.add( dy ).mul( 0.5 * ( SUPERSAMPLING - 1 ) ) ).toVar();
+
+		const color = vec3( 0.0 ).toVar();
+
+		Loop( SUPERSAMPLING, SUPERSAMPLING, ( { i, j } ) => {
+
+			direction.assign( normalize( origin.add( dx.mul( float( i ) ) ).add( dy.mul( float( j ) ) ) ) );
+
+			color.addAssign( envMap.rgb );
+
+		} );
+
+		return vec4( color.div( SUPERSAMPLING * SUPERSAMPLING ), 1.0 );
+
+	} )();
+
+	return material;
+
+}
+
+function _createBlurPass() {
+
+	const envMap = cubeTexture( _defaultCubeTexture );
+	const sigma = uniform( 0 );
+	const level = uniform( 0 );
+	const spacing = uniform( 0 );
+	const radius = uniform( 0, 'int' );
+
+	const material = _createMaterial( 'CubemapBlur' );
+
+	material.fragmentNode = Fn( () => {
+
+		const direction = positionWorldDirection;
+
+		const up = select( abs( direction.z ).lessThan( 0.999 ), vec3( 0.0, 0.0, 1.0 ), vec3( 1.0, 0.0, 0.0 ) );
+		const tangent = normalize( cross( up, direction ) ).toVar();
+		const bitangent = cross( direction, tangent ).toVar();
+
+		const k = float( -0.5 ).div( sigma.mul( sigma ) ).toVar();
+
+		const color = vec3( 0.0 ).toVar();
+		const weightSum = float( 0.0 ).toVar();
+
+		// Weight tangent-plane taps by angular Gaussian and solid angle.
+		// Uniform bounds prevent loop unrolling.
+		const range = { start: radius.negate(), end: radius, condition: '<=' };
+
+		Loop( range, { start: 0, end: radius, condition: '<=' }, ( { i, j } ) => {
+
+			const offset = vec2( float( i ), float( j ) ).mul( spacing ).toVar();
+			const r2 = dot( offset, offset ).toVar();
+
+			const theta = atan( sqrt( r2 ) );
+			const weight = exp( k.mul( theta.mul( theta ) ) ).mul( inverseSqrt( r2.add( 1.0 ).pow( 3.0 ) ) ).toVar();
+
+			const tap = direction.add( tangent.mul( offset.x ) ).add( bitangent.mul( offset.y ) );
+
+			color.addAssign( envMap.sample( tap ).level( level ).rgb.mul( weight ) );
+			weightSum.addAssign( weight );
+
+			// Mirrored taps share Gaussian and solid angle weights.
+			If( j.greaterThan( 0 ), () => {
+
+				const mirroredTap = direction.add( tangent.mul( offset.x ) ).sub( bitangent.mul( offset.y ) );
+				color.addAssign( envMap.sample( mirroredTap ).level( level ).rgb.mul( weight ) );
+				weightSum.addAssign( weight );
+
+			} );
+
+		} );
+
+		return vec4( color.div( weightSum ), 1.0 );
+
+	} )();
+
+	return { material, envMap, sigma, level, spacing, radius };
+
+}
+
+function _createSpherePass() {
+
+	const envMap = cubeTexture( _defaultCubeTexture );
+	const sigma = uniform( 0 );
+	const level = Math.log2( SOURCE_SIZE / SPHERE_SOURCE_SIZE );
+	const n = SPHERE_SOURCE_SIZE;
+
+	const material = _createMaterial( 'CubemapBlurSphere' );
+
+	material.fragmentNode = Fn( () => {
+
+		const direction = positionWorldDirection;
+
+		const k = float( -0.5 ).div( sigma.mul( sigma ) ).toVar();
+
+		const color = vec3( 0.0 ).toVar();
+		const weightSum = float( 0.0 ).toVar();
+
+		// Pair antipodal samples to reuse angle and solid angle calculations.
+		Loop( 3 * n * n, ( { i: t } ) => {
+
+			const axis = t.div( n * n ).toVar();
+			const texel = t.sub( axis.mul( n * n ) ).toVar();
+
+			const st = vec2( float( texel.mod( n ) ), float( texel.div( n ) ) ).add( 0.5 ).div( n ).mul( 2.0 ).sub( 1.0 ).toVar();
+
+			const d = select( axis.equal( 0 ), vec3( 1.0, st ), select( axis.equal( 1 ), vec3( st.x, 1.0, st.y ), vec3( st, 1.0 ) ) ).toVar();
+			const r2 = dot( d, d ).toVar();
+			const solidAngle = inverseSqrt( r2.mul( r2 ).mul( r2 ) ).toVar();
+
+			const theta = acos( clamp( dot( direction, d.mul( inverseSqrt( r2 ) ) ), -1, 1.0 ) ).toVar();
+			const weight = exp( k.mul( theta.mul( theta ) ) ).mul( solidAngle ).toVar();
+
+			color.addAssign( envMap.sample( d ).level( level ).rgb.mul( weight ) );
+			weightSum.addAssign( weight );
+
+			theta.assign( float( Math.PI ).sub( theta ) );
+			weight.assign( exp( k.mul( theta.mul( theta ) ) ).mul( solidAngle ) );
+
+			color.addAssign( envMap.sample( d.negate() ).level( level ).rgb.mul( weight ) );
+			weightSum.addAssign( weight );
+
+		} );
+
+		return vec4( color.div( weightSum ), 1.0 );
+
+	} )();
+
+	return { material, envMap, sigma };
+
+}
+
+// Face order: +X, +Y, +Z, -X, -Y, -Z.
+const getFace = /*@__PURE__*/ Fn( ( [ direction ] ) => {
+
+	const absDirection = vec3( abs( direction ) ).toVar();
+	const face = float( -1 ).toVar();
+
+	If( absDirection.x.greaterThan( absDirection.z ), () => {
+
+		If( absDirection.x.greaterThan( absDirection.y ), () => {
+
+			face.assign( select( direction.x.greaterThan( 0.0 ), 0.0, 3.0 ) );
+
+		} ).Else( () => {
+
+			face.assign( select( direction.y.greaterThan( 0.0 ), 1.0, 4.0 ) );
+
+		} );
+
+	} ).Else( () => {
+
+		If( absDirection.z.greaterThan( absDirection.y ), () => {
+
+			face.assign( select( direction.z.greaterThan( 0.0 ), 2.0, 5.0 ) );
+
+		} ).Else( () => {
+
+			face.assign( select( direction.y.greaterThan( 0.0 ), 1.0, 4.0 ) );
+
+		} );
+
+	} );
+
+	return face;
+
+} ).setLayout( {
+	name: 'getFace',
+	type: 'float',
+	inputs: [
+		{ name: 'direction', type: 'vec3' }
+	]
+} );
+
+const getUV = /*@__PURE__*/ Fn( ( [ direction, face ] ) => {
+
+	const uv = vec2().toVar();
+
+	If( face.equal( 0.0 ), () => {
+
+		uv.assign( vec2( direction.z, direction.y ).div( abs( direction.x ) ) ); // pos x
+
+	} ).ElseIf( face.equal( 1.0 ), () => {
+
+		uv.assign( vec2( direction.x.negate(), direction.z.negate() ).div( abs( direction.y ) ) ); // pos y
+
+	} ).ElseIf( face.equal( 2.0 ), () => {
+
+		uv.assign( vec2( direction.x.negate(), direction.y ).div( abs( direction.z ) ) ); // pos z
+
+	} ).ElseIf( face.equal( 3.0 ), () => {
+
+		uv.assign( vec2( direction.z.negate(), direction.y ).div( abs( direction.x ) ) ); // neg x
+
+	} ).ElseIf( face.equal( 4.0 ), () => {
+
+		uv.assign( vec2( direction.x.negate(), direction.z ).div( abs( direction.y ) ) ); // neg y
+
+	} ).Else( () => {
+
+		uv.assign( vec2( direction.x, direction.y ).div( abs( direction.z ) ) ); // neg z
+
+	} );
+
+	return mul( 0.5, uv.add( 1.0 ) );
+
+} ).setLayout( {
+	name: 'getUV',
+	type: 'vec2',
+	inputs: [
+		{ name: 'direction', type: 'vec3' },
+		{ name: 'face', type: 'float' }
+	]
+} );
+
+// Direction (not normalized) of face coordinates in the getUV convention that may lie past the face
+// edge. The texel grid continues into the neighbouring face at the same texel index along the edge, so
+// coordinates past the edge land on the neighbour's texel centers rather than on the extrapolated face plane.
+const cubeFaceDir = /*@__PURE__*/ Fn( ( [ face, uv ] ) => {
+
+	const st = uv.mul( 2.0 ).sub( 1.0 ).toVar();
+	const over = min$1( max$1( abs( st ).sub( 1.0 ), 0.0 ), 0.75 );
+	st.assign( clamp( st, -1, 1.0 ).div( over.x.oneMinus().mul( over.y.oneMinus() ) ) );
+
+	const d0 = vec3( 1.0, st.y, st.x );
+	const d1 = vec3( st.x.negate(), 1.0, st.y.negate() );
+	const d2 = vec3( st.x.negate(), st.y, 1.0 );
+	const d3 = vec3( -1, st.y, st.x.negate() );
+	const d4 = vec3( st.x.negate(), -1, st.y );
+	const d5 = vec3( st.x, st.y, -1 );
+
+	return select( face.lessThan( 0.5 ), d0, select( face.lessThan( 1.5 ), d1, select( face.lessThan( 2.5 ), d2, select( face.lessThan( 3.5 ), d3, select( face.lessThan( 4.5 ), d4, d5 ) ) ) ) );
+
+} );
+
+/**
+ * Blurs a cube or equirectangular texture node once per frame.
+ * PMREM textures are cube textures and should be passed through `cubeTexture()`.
+ * Explicit 2D UVs select an equirectangular projection of the output.
+ * Texture replacements in update callbacks must retain the input's type and projection.
+ * Use `rtt()` with `autoUpdate: false` to cache a 2D projection of the result.
+ * Call `dispose()` when the effect is no longer needed.
+ *
+ * @augments TempNode
+ */
+class AngularGaussianBlurNode extends TempNode {
+
+	static get type() {
+
+		return 'AngularGaussianBlurNode';
+
+	}
+
+	/**
+	 * Constructs a new angular Gaussian blur node.
+	 *
+	 * @param {TextureNode} textureNode - The environment texture node to blur.
+	 * @param {number} [amount=0] - The blur amount in the range `[0,1]`.
+	 */
+	constructor( textureNode, amount = 0 ) {
+
+		super( 'vec3' );
+
+		/**
+		 * The environment texture node to blur.
+		 *
+		 * @type {TextureNode}
+		 */
+		this.textureNode = textureNode;
+
+		/**
+		 * The blur amount in the range `[0,1]`.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.amount = amount;
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isAngularGaussianBlurNode = true;
+
+		const image = { width: 1, height: 1 };
+
+		/**
+		 * The placeholder used before the first render.
+		 *
+		 * @private
+		 * @type {CubeTexture}
+		 */
+		this._defaultTexture = new CubeTexture( [ image, image, image, image, image, image ] );
+		this._defaultTexture.isRenderTargetTexture = true;
+
+		/**
+		 * The cube texture node sampling the blurred cube map.
+		 *
+		 * @private
+		 * @type {CubeTextureNode}
+		 */
+		this._cubeTextureNode = cubeTexture( this._defaultTexture );
+
+		/**
+		 * The render resources owned by each renderer.
+		 *
+		 * @private
+		 * @type {Map<Renderer, Object>}
+		 */
+		this._rendererData = new Map();
+
+		/**
+		 * Updates the blurred cube map once per frame.
+		 *
+		 * @type {string}
+		 * @default 'frame'
+		 */
+		this.updateBeforeType = NodeUpdateType.FRAME;
+
+	}
+
+	updateBefore( frame ) {
+
+		const textureNode = this.textureNode;
+		const texture = textureNode && textureNode.value;
+
+		if ( ! textureNode || textureNode.isTextureNode !== true || ! texture || texture.isTexture !== true || texture.isDepthTexture === true || texture.isData3DTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true || texture.is3DTexture === true || texture.isArrayTexture === true ) {
+
+			throw new NodeError( 'AngularGaussianBlurNode: Expected a 2D or cube color texture node.', this.stackTrace );
+
+		}
+
+		if ( textureNode.sampler === false || textureNode.gatherNode !== null ) {
+
+			throw new NodeError( 'AngularGaussianBlurNode: Texel loads and texture gathers are not supported.', this.stackTrace );
+
+		}
+
+		if ( ! Number.isFinite( this.amount ) ) {
+
+			throw new NodeError( 'AngularGaussianBlurNode: The amount must be a finite number.', this.stackTrace );
+
+		}
+
+		const data = this._rendererData.get( frame.renderer );
+
+		data.renderTarget = data.generator.fromNode( textureNode, this.amount, data.renderTarget, data.contextNode );
+		this._cubeTextureNode.value = data.renderTarget.texture;
+
+	}
+
+	setup( builder ) {
+
+		const { renderer } = builder;
+		let data = this._rendererData.get( renderer );
+
+		if ( data === undefined ) {
+
+			data = { generator: new CubemapBlurGenerator( renderer ), renderTarget: null, contextNode: null };
+			this._rendererData.set( renderer, data );
+
+		}
+
+		data.contextNode = context( builder.getSharedContext() );
+
+		this._cubeTextureNode.onRenderUpdate( ( { renderer } ) => this._rendererData.get( renderer ).renderTarget?.texture || this._defaultTexture );
+
+		return this._setupOutput( builder );
+
+	}
+
+	/**
+	 * Builds the cubic reconstruction of the blurred cube map.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The node builder.
+	 * @return {Node<vec3>} The reconstructed color.
+	 */
+	_setupOutput( builder ) {
+
+		const blurMap = this._cubeTextureNode;
+		const textureNode = this.textureNode;
+		let uvNode = textureNode.uvNode;
+
+		if ( uvNode !== null && textureNode.isCubeTextureNode !== true ) uvNode = equirectDirection( uvNode );
+
+		if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUV ) {
+
+			uvNode = builder.context.getUV( textureNode, builder );
+
+			if ( uvNode && builder.context.forceUVContext !== true ) uvNode = materialEnvRotation.mul( uvNode );
+
+		}
+
+		if ( ! uvNode ) uvNode = textureNode.isCubeTextureNode === true ? textureNode.getDefaultUV() : positionWorldDirection;
+
+		// The blurred cube map's texels are only a few sigmas wide, bilinear magnification would show its
+		// grid. Cubic B-spline reconstruction: four bilinear taps with the weights folded into the tap positions.
+		return Fn( () => {
+
+			const size = float( textureSize( blurMap, 0 ).x ).toVar();
+
+			const direction = uvNode.toVar();
+			const face = getFace( direction ).toVar();
+			const uv = getUV( direction, face ).toVar();
+
+			// texel i has its center at p = i
+			const p = uv.mul( size ).sub( 0.5 );
+			const i = floor( p ).toVar();
+			const f = p.sub( i ).toVar();
+
+			// cubic B-spline weights of texels i - 1 .. i + 2
+			const f2 = f.mul( f ).toVar();
+			const f3 = f2.mul( f ).toVar();
+			const w0 = float( 1.0 ).sub( f.mul( 3.0 ) ).add( f2.mul( 3.0 ) ).sub( f3 ).div( 6.0 );
+			const w1 = float( 4.0 ).sub( f2.mul( 6.0 ) ).add( f3.mul( 3.0 ) ).div( 6.0 );
+			const w2 = float( 1.0 ).add( f.mul( 3.0 ) ).add( f2.mul( 3.0 ) ).sub( f3.mul( 3.0 ) ).div( 6.0 );
+			const w3 = f3.div( 6.0 );
+
+			// pair the taps: one bilinear fetch between i - 1 and i, one between i + 1 and i + 2
+			const s0 = w0.add( w1 ).toVar();
+			const s1 = w2.add( w3 ).toVar();
+			const t0 = i.sub( 0.5 ).add( w1.div( s0 ) ).div( size ).toVar();
+			const t1 = i.add( 1.5 ).add( w3.div( s1 ) ).div( size ).toVar();
+
+			const tap = ( t ) => blurMap.sample( cubeFaceDir( face, t ) );
+
+			const color = tap( vec2( t0.x, t0.y ) ).mul( s0.x.mul( s0.y ) )
+				.add( tap( vec2( t1.x, t0.y ) ).mul( s1.x.mul( s0.y ) ) )
+				.add( tap( vec2( t0.x, t1.y ) ).mul( s0.x.mul( s1.y ) ) )
+				.add( tap( vec2( t1.x, t1.y ) ).mul( s1.x.mul( s1.y ) ) ).toVar();
+
+			// the grids of the three faces meeting at a corner disagree within a texel or two, blend to bilinear there
+			const st = abs( uv.mul( 2.0 ).sub( 1.0 ) );
+			const texel = float( 2.0 ).div( size );
+			const corner = smoothstep( texel, texel.mul( 2.0 ), min$1( st.x, st.y ).oneMinus() ).toVar();
+
+			If( corner.lessThan( 1.0 ), () => {
+
+				color.assign( mix( blurMap.sample( direction ), color, corner ) );
+
+			} );
+
+			return color;
+
+		} )().context( { forceUVContext: false } );
+
+	}
+
+	/**
+	 * Frees the render targets and materials owned by this effect.
+	 */
+	dispose() {
+
+		for ( const { generator, renderTarget } of this._rendererData.values() ) {
+
+			generator.dispose();
+			if ( renderTarget !== null ) renderTarget.dispose();
+
+		}
+
+		this._rendererData.clear();
+		this._defaultTexture.dispose();
+
+		super.dispose();
+
+	}
+
+}
+
+/**
+ * TSL function for applying an angular Gaussian blur to an environment texture node.
+ *
+ * @tsl
+ * @function
+ * @param {TextureNode} textureNode - The environment texture node to blur.
+ * @param {number} [amount=0] - The blur amount in the range `[0,1]`.
+ * @returns {AngularGaussianBlurNode}
+ */
+const angularGaussianBlur = ( textureNode, amount ) => nodeObject( new AngularGaussianBlurNode( textureNode, amount ) );
+
+/**
  * This class allows to define multiple overloaded versions
  * of the same function. Depending on the parameters of the function
  * call, the node picks the best-fit overloaded version.
@@ -39602,218 +40655,6 @@ class QuadMesh extends Mesh {
 	}
 
 }
-
-/**
- * Saves the state of the given renderer and stores it into the given state object.
- *
- * If not state object is provided, the function creates one.
- *
- * @private
- * @function
- * @param {Renderer} renderer - The renderer.
- * @param {Object} [state={}] - The state.
- * @return {Object} The state.
- */
-function saveRendererState( renderer, state = {} ) {
-
-	state.toneMapping = renderer.toneMapping;
-	state.toneMappingExposure = renderer.toneMappingExposure;
-	state.outputColorSpace = renderer.outputColorSpace;
-	state.renderTarget = renderer.getRenderTarget();
-	state.activeCubeFace = renderer.getActiveCubeFace();
-	state.activeMipmapLevel = renderer.getActiveMipmapLevel();
-	state.renderObjectFunction = renderer.getRenderObjectFunction();
-	state.pixelRatio = renderer.getPixelRatio();
-	state.mrt = renderer.getMRT();
-	state.clearColor = renderer.getClearColor( state.clearColor || new Color() );
-	state.clearAlpha = renderer.getClearAlpha();
-	state.autoClear = renderer.autoClear;
-	state.scissorTest = renderer.getScissorTest();
-
-	return state;
-
-}
-
-/**
- * Saves the state of the given renderer and stores it into the given state object.
- * Besides, the function also resets the state of the renderer to its default values.
- *
- * If not state object is provided, the function creates one.
- *
- * @private
- * @function
- * @param {Renderer} renderer - The renderer.
- * @param {Object} [state={}] - The state.
- * @return {Object} The state.
- */
-function resetRendererState( renderer, state ) {
-
-	state = saveRendererState( renderer, state );
-
-	renderer.setMRT( null );
-	renderer.setRenderObjectFunction( null );
-	renderer.setClearColor( 0x000000, 1 );
-	renderer.autoClear = true;
-
-	return state;
-
-}
-
-/**
- * Restores the state of the given renderer from the given state object.
- *
- * @private
- * @function
- * @param {Renderer} renderer - The renderer.
- * @param {Object} state - The state to restore.
- */
-function restoreRendererState( renderer, state ) {
-
-	renderer.toneMapping = state.toneMapping;
-	renderer.toneMappingExposure = state.toneMappingExposure;
-	renderer.outputColorSpace = state.outputColorSpace;
-	renderer.setRenderTarget( state.renderTarget, state.activeCubeFace, state.activeMipmapLevel );
-	renderer.setRenderObjectFunction( state.renderObjectFunction );
-	renderer.setPixelRatio( state.pixelRatio );
-	renderer.setMRT( state.mrt );
-	renderer.setClearColor( state.clearColor, state.clearAlpha );
-	renderer.autoClear = state.autoClear;
-	renderer.setScissorTest( state.scissorTest );
-
-}
-
-/**
- * Saves the state of the given scene and stores it into the given state object.
- *
- * If not state object is provided, the function creates one.
- *
- * @private
- * @function
- * @param {Scene} scene - The scene.
- * @param {Object} [state={}] - The state.
- * @return {Object} The state.
- */
-function saveSceneState( scene, state = {} ) {
-
-	state.background = scene.background;
-	state.backgroundNode = scene.backgroundNode;
-	state.overrideMaterial = scene.overrideMaterial;
-
-	return state;
-
-}
-
-/**
- * Saves the state of the given scene and stores it into the given state object.
- * Besides, the function also resets the state of the scene to its default values.
- *
- * If not state object is provided, the function creates one.
- *
- * @private
- * @function
- * @param {Scene} scene - The scene.
- * @param {Object} [state={}] - The state.
- * @return {Object} The state.
- */
-function resetSceneState( scene, state ) {
-
-	state = saveSceneState( scene, state );
-
-	scene.background = null;
-	scene.backgroundNode = null;
-	scene.overrideMaterial = null;
-
-	return state;
-
-}
-
-/**
- * Restores the state of the given scene from the given state object.
- *
- * @private
- * @function
- * @param {Scene} scene - The scene.
- * @param {Object} state - The state to restore.
- */
-function restoreSceneState( scene, state ) {
-
-	scene.background = state.background;
-	scene.backgroundNode = state.backgroundNode;
-	scene.overrideMaterial = state.overrideMaterial;
-
-}
-
-/**
- * Saves the state of the given renderer and scene and stores it into the given state object.
- *
- * If not state object is provided, the function creates one.
- *
- * @private
- * @function
- * @param {Renderer} renderer - The renderer.
- * @param {Scene} scene - The scene.
- * @param {Object} [state={}] - The state.
- * @return {Object} The state.
- */
-function saveRendererAndSceneState( renderer, scene, state = {} ) {
-
-	state = saveRendererState( renderer, state );
-	state = saveSceneState( scene, state );
-
-	return state;
-
-}
-
-/**
- * Saves the state of the given renderer and scene and stores it into the given state object.
- * Besides, the function also resets the state of the renderer and scene to its default values.
- *
- * If not state object is provided, the function creates one.
- *
- * @private
- * @function
- * @param {Renderer} renderer - The renderer.
- * @param {Scene} scene - The scene.
- * @param {Object} [state={}] - The state.
- * @return {Object} The state.
- */
-function resetRendererAndSceneState( renderer, scene, state ) {
-
-	state = resetRendererState( renderer, state );
-	state = resetSceneState( scene, state );
-
-	return state;
-
-}
-
-/**
- * Restores the state of the given renderer and scene from the given state object.
- *
- * @private
- * @function
- * @param {Renderer} renderer - The renderer.
- * @param {Scene} scene - The scene.
- * @param {Object} state - The state to restore.
- */
-function restoreRendererAndSceneState( renderer, scene, state ) {
-
-	restoreRendererState( renderer, state );
-	restoreSceneState( scene, state );
-
-}
-
-var RendererUtils = /*#__PURE__*/Object.freeze({
-	__proto__: null,
-	resetRendererAndSceneState: resetRendererAndSceneState,
-	resetRendererState: resetRendererState,
-	resetSceneState: resetSceneState,
-	restoreRendererAndSceneState: restoreRendererAndSceneState,
-	restoreRendererState: restoreRendererState,
-	restoreSceneState: restoreSceneState,
-	saveRendererAndSceneState: saveRendererAndSceneState,
-	saveRendererState: saveRendererState,
-	saveSceneState: saveSceneState
-});
 
 const _size$1 = /*@__PURE__*/ new Vector2();
 
@@ -50635,6 +51476,144 @@ class NodeBuilderState {
 
 }
 
+const _cache = new WeakMap();
+
+/**
+ * Returns the per-renderer generator and cache of blurred cube maps. Render target
+ * textures can't be shared across render contexts.
+ *
+ * @private
+ * @param {Renderer} renderer - The renderer.
+ * @return {{generator: CubemapBlurGenerator, entries: WeakMap<BackgroundBlurNode, Object>}} The cache.
+ */
+function _getCache( renderer ) {
+
+	let rendererCache = _cache.get( renderer );
+
+	if ( rendererCache === undefined ) {
+
+		rendererCache = { generator: new CubemapBlurGenerator( renderer ), entries: new WeakMap() };
+		_cache.set( renderer, rendererCache );
+
+	}
+
+	return rendererCache;
+
+}
+
+/**
+ * Returns the cached blur, updating it when the source or amount changes.
+ *
+ * @private
+ * @param {BackgroundBlurNode} node - The node owning the blurred result.
+ * @param {Renderer} renderer - The renderer.
+ * @return {?CubeRenderTarget} The render target holding the blurred cube map or `null` if the texture is not ready yet.
+ */
+function _getBlurredCubemap( node, renderer ) {
+
+	const { textureNode, amount } = node;
+	const texture = textureNode.value;
+	const { generator, entries } = _getCache( renderer );
+
+	// Cache by node to keep blur amounts independent.
+	let entry = entries.get( node );
+
+	if ( entry === undefined || entry.texture !== texture || entry.amount !== amount || entry.pmremVersion !== texture.pmremVersion ) {
+
+		const image = texture.image;
+		const ready = texture.isCubeTexture ? ( image.length === 6 && ! image.includes( undefined ) ) : ( image && image.height > 0 );
+
+		if ( ! ready ) return null;
+
+		if ( entry === undefined ) {
+
+			entry = { texture: null, renderTarget: null };
+			entries.set( node, entry );
+
+			entry.dispose = () => {
+
+				if ( entry.texture !== null ) entry.texture.removeEventListener( 'dispose', entry.dispose );
+				if ( entry.renderTarget !== null ) entry.renderTarget.dispose();
+
+				entry.texture = null;
+				entry.renderTarget = null;
+
+			};
+
+			const onDispose = ( event ) => {
+
+				entry.dispose();
+				event.target.removeEventListener( 'dispose', onDispose );
+				entries.delete( event.target );
+
+			};
+
+			node.addEventListener( 'dispose', onDispose );
+
+		}
+
+		if ( entry.texture !== texture ) {
+
+			if ( entry.texture !== null ) entry.texture.removeEventListener( 'dispose', entry.dispose );
+
+			entry.texture = texture;
+			texture.addEventListener( 'dispose', entry.dispose );
+
+		}
+
+		entry.renderTarget = generator.fromTexture( texture, amount, entry.renderTarget );
+		entry.amount = amount;
+		entry.pmremVersion = texture.pmremVersion;
+
+	}
+
+	return entry.renderTarget;
+
+}
+
+/**
+ * Caches the angular Gaussian blur used by scene backgrounds.
+ *
+ * @private
+ * @augments AngularGaussianBlurNode
+ */
+class BackgroundBlurNode extends AngularGaussianBlurNode {
+
+	static get type() {
+
+		return 'BackgroundBlurNode';
+
+	}
+
+	constructor( textureNode ) {
+
+		super( textureNode );
+
+		this.isBackgroundBlurNode = true;
+		this.updateBeforeType = NodeUpdateType.RENDER;
+
+	}
+
+	updateBefore( frame ) {
+
+		const renderTarget = _getBlurredCubemap( this, frame.renderer );
+
+		if ( renderTarget !== null ) this._cubeTextureNode.value = renderTarget.texture;
+
+	}
+
+	setup( builder ) {
+
+		this.updateBefore( builder );
+
+		return this._setupOutput( builder );
+
+	}
+
+}
+
+const backgroundBlur = ( textureNode ) => nodeObject( new BackgroundBlurNode( textureNode ) );
+
 /**
  * {@link NodeBuilder} is going to create instances of this class during the build process
  * of nodes. They represent the final shader attributes that are going to be generated
@@ -57346,47 +58325,66 @@ class NodeManager extends DataMap {
 
 			if ( sceneData.background !== background || forceUpdate ) {
 
-				const backgroundNode = this.getCacheNode( 'background', background, () => {
+				const isEnvironmentMap = background.isCubeTexture === true || background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping;
+				let backgroundNode;
 
-					if ( background.isCubeTexture === true || background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping ) {
+				if ( isEnvironmentMap && scene.backgroundBlurriness > 0 ) {
 
-						if ( scene.backgroundBlurriness > 0 || background.isPMREMTexture === true ) {
+					backgroundNode = this.getCacheNode( 'backgroundBlur', scene, () => backgroundBlur( background.isCubeTexture ? cubeTexture( background ) : texture( background ).setUpdateMatrix( false ) ) );
 
-							return pmremTexture( background );
+					if ( backgroundNode.textureNode.value.isCubeTexture === background.isCubeTexture ) {
 
-						} else {
+						backgroundNode.textureNode.value = background;
 
-							let envMap;
+					} else {
 
-							if ( background.isCubeTexture === true ) {
-
-								envMap = cubeTexture( background );
-
-							} else {
-
-								envMap = texture( background );
-
-							}
-
-							return cubeMapNode( envMap );
-
-						}
-
-					} else if ( background.isTexture === true ) {
-
-						return texture( background, screenUV.flipY() ).setUpdateMatrix( true );
-
-					} else if ( background.isColor !== true ) {
-
-						error( 'WebGPUNodes: Unsupported background configuration.', background );
+						backgroundNode.textureNode = background.isCubeTexture ? cubeTexture( background ) : texture( background ).setUpdateMatrix( false );
 
 					}
 
-				}, forceUpdate );
+				} else {
+
+					backgroundNode = this.getCacheNode( 'background', background, () => {
+
+						if ( isEnvironmentMap ) {
+
+							if ( background.isPMREMTexture === true ) {
+
+								return pmremTexture( background );
+
+							} else if ( background.isCubeTexture === true ) {
+
+								return cubeMapNode( cubeTexture( background ) );
+
+							} else {
+
+								return cubeMapNode( texture( background ) );
+
+							}
+
+						} else if ( background.isTexture === true ) {
+
+							return texture( background, screenUV.flipY() ).setUpdateMatrix( true );
+
+						} else if ( background.isColor !== true ) {
+
+							error( 'WebGPUNodes: Unsupported background configuration.', background );
+
+						}
+
+					} );
+
+				}
 
 				sceneData.backgroundNode = backgroundNode;
 				sceneData.background = background;
 				sceneData.backgroundBlurriness = scene.backgroundBlurriness;
+
+			}
+
+			if ( sceneData.backgroundNode && sceneData.backgroundNode.isBackgroundBlurNode === true ) {
+
+				sceneData.backgroundNode.amount = scene.backgroundBlurriness;
 
 			}
 
@@ -57406,18 +58404,17 @@ class NodeManager extends DataMap {
 	 * @param {string} type - The type of object to cache.
 	 * @param {Object} object - The object.
 	 * @param {Function} callback - A callback that produces a node representation for the given object.
-	 * @param {boolean} [forceUpdate=false] - Whether an update should be enforced or not.
 	 * @return {Node} The node representation.
 	 */
-	getCacheNode( type, object, callback, forceUpdate = false ) {
+	getCacheNode( type, object, callback ) {
 
 		const nodeCache = this.cacheLib[ type ] || ( this.cacheLib[ type ] = new WeakMap() );
 
 		let node = nodeCache.get( object );
 
-		if ( node === undefined || forceUpdate ) {
+		if ( node === undefined ) {
 
-			if ( node === undefined && object.isTexture === true ) {
+			if ( object.isTexture === true ) {
 
 				const onTextureDispose = () => {
 
@@ -91016,6 +92013,7 @@ var Three_TSL = /*#__PURE__*/Object.freeze({
 	alphaT: alphaT,
 	ambientOcclusion: ambientOcclusion,
 	and: and,
+	angularGaussianBlur: angularGaussianBlur,
 	anisotropy: anisotropy,
 	anisotropyB: anisotropyB,
 	anisotropyT: anisotropyT,
@@ -91635,4 +92633,4 @@ var Three_TSL = /*#__PURE__*/Object.freeze({
 	xor: xor
 });
 
-export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AtomicFunctionNode, AttributeNode, BackSide, BarrierNode, BasicEnvironmentNode, BasicLightMapNode, BasicShadowMap, BitcastNode, BitcountNode, BlendMode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BuiltinNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CanvasTarget, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, ClippingNode, CodeNode, Color, ColorManagement, ColorSpaceNode, Compatibility, ComputeBuiltinNode, ComputeNode, ConditionalNode, ConstNode, ConstantAlphaFactor, ConstantColorFactor, ContextNode, ConvertNode, CubeCamera, CubeDepthTexture, CubeMapNode, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectRenderPipeline, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, EventDispatcher, EventNode, ExpressionNode, FileLoader, FlipNode, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InputNode, InspectorBase, InspectorNode, InstancedBufferAttribute, InstancedInterleavedBuffer, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, IsolateNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialBlending, MaterialLoader, MaterialNode, MaterialReferenceNode, MathNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeError, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalGAPacking, NormalMapNode, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OperatorNode, OrthographicCamera, OutputStructNode, OverrideContextNode, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, PMREMNode, PackFloatNode, Packed4x8IntegerNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointShadowNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, R11_EAC_Format, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, ReadbackBuffer, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceBaseNode, ReferenceElementNode, ReferenceNode, ReflectorNode, ReinhardToneMapping, RenderObjectRefreshType, RenderOutputNode, RenderPipeline, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, SampleNode, Scene, ScreenNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StackTrace, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTexture3DNode, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubgroupFunctionNode, SubtractEquation, SubtractiveBlending, Three_TSL as TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, TimestampQuery, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnpackFloatNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VelocityNode, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLBackend, WebGLCoordinateSystem, WebGPUBackend, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, WorkgroupInfoNode, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, error, log$1 as log, shaderStages, vectorComponents, warn, warnOnce };
+export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, AngularGaussianBlurNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AtomicFunctionNode, AttributeNode, BackSide, BarrierNode, BasicEnvironmentNode, BasicLightMapNode, BasicShadowMap, BitcastNode, BitcountNode, BlendMode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BuiltinNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CanvasTarget, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, ClippingNode, CodeNode, Color, ColorManagement, ColorSpaceNode, Compatibility, ComputeBuiltinNode, ComputeNode, ConditionalNode, ConstNode, ConstantAlphaFactor, ConstantColorFactor, ContextNode, ConvertNode, CubeCamera, CubeDepthTexture, CubeMapNode, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectRenderPipeline, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, EventDispatcher, EventNode, ExpressionNode, FileLoader, FlipNode, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InputNode, InspectorBase, InspectorNode, InstancedBufferAttribute, InstancedInterleavedBuffer, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, IsolateNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialBlending, MaterialLoader, MaterialNode, MaterialReferenceNode, MathNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeError, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalGAPacking, NormalMapNode, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OperatorNode, OrthographicCamera, OutputStructNode, OverrideContextNode, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, PMREMNode, PackFloatNode, Packed4x8IntegerNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointShadowNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, R11_EAC_Format, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, ReadbackBuffer, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceBaseNode, ReferenceElementNode, ReferenceNode, ReflectorNode, ReinhardToneMapping, RenderObjectRefreshType, RenderOutputNode, RenderPipeline, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, SampleNode, Scene, ScreenNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StackTrace, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTexture3DNode, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubgroupFunctionNode, SubtractEquation, SubtractiveBlending, Three_TSL as TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, TimestampQuery, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnpackFloatNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VelocityNode, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLBackend, WebGLCoordinateSystem, WebGPUBackend, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, WorkgroupInfoNode, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, error, log$1 as log, shaderStages, vectorComponents, warn, warnOnce };
