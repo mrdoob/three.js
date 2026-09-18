@@ -152,14 +152,12 @@ class Geometries extends DataMap {
 	}
 
 	/**
-	 * Returns `true` if the given render object has an initialized geometry.
+	 * Returns `true` if the given geometry is initialized.
 	 *
-	 * @param {RenderObject} renderObject - The render object.
-	 * @return {boolean} Whether if the given render object has an initialized geometry or not.
+	 * @param {BufferGeometry} geometry - The geometry.
+	 * @return {boolean} Whether if the given geometry is initialized or not.
 	 */
-	has( renderObject ) {
-
-		const geometry = renderObject.geometry;
+	has( geometry ) {
 
 		return super.has( geometry ) && this.get( geometry ).initialized === true;
 
@@ -172,20 +170,21 @@ class Geometries extends DataMap {
 	 */
 	updateForRender( renderObject ) {
 
-		if ( this.has( renderObject ) === false ) this.initGeometry( renderObject );
+		const geometry = renderObject.geometry;
+
+		if ( this.has( geometry ) === false ) this.initGeometry( geometry );
 
 		this.updateAttributes( renderObject );
 
 	}
 
 	/**
-	 * Initializes the geometry of the given render object.
+	 * Initializes the given geometry.
 	 *
-	 * @param {RenderObject} renderObject - The render object.
+	 * @param {BufferGeometry} geometry - The geometry.
 	 */
-	initGeometry( renderObject ) {
+	initGeometry( geometry ) {
 
-		const geometry = renderObject.geometry;
 		const geometryData = this.get( geometry );
 
 		geometryData.initialized = true;
@@ -221,20 +220,6 @@ class Geometries extends DataMap {
 			if ( wireframeAttribute !== undefined ) {
 
 				this.attributes.delete( wireframeAttribute );
-
-			}
-
-			// node attributes (TODO: Remove this bit once we support BufferAttribute.dispose())
-
-			const currentAttributes = new Set( Object.values( renderObject.geometry.attributes ) );
-
-			for ( const attribute of renderObject.getAttributes() ) {
-
-				if ( currentAttributes.has( attribute ) === false ) {
-
-					this.attributes.delete( attribute );
-
-				}
 
 			}
 
@@ -410,6 +395,27 @@ class Geometries extends DataMap {
 		}
 
 		return index;
+
+	}
+
+	/**
+	 * Deletes the attributes that are defined via nodes and not on geometry level.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 */
+	deleteNodeAttributes( renderObject ) {
+
+		const currentAttributes = new Set( Object.values( renderObject.geometry.attributes ) );
+
+		for ( const attribute of renderObject.getAttributes() ) {
+
+			if ( currentAttributes.has( attribute ) === false ) {
+
+				this.attributes.delete( attribute );
+
+			}
+
+		}
 
 	}
 

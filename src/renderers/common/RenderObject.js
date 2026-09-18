@@ -337,6 +337,8 @@ class RenderObject {
 		 */
 		this.onGeometryDispose = () => {
 
+			this._geometries.deleteNodeAttributes( this );
+
 			// clear geometry cache attributes
 
 			this.attributes = null;
