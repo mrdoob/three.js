@@ -2826,15 +2826,13 @@ const MIN_SIZE = 256;
 // represent the diffuse irradiance that is stored in this level.
 const LOD_MIN = 3;
 
-// The number of spiral samples per blur pass.
-// Used for scene blur in fromScene() method.
+// Spiral samples per pass of the initial fromScene() blur.
 const BLUR_SAMPLES = 20;
 
-// GGX VNDF importance sampling configuration for the sharp mip levels.
+// GGX VNDF samples for the sharp mip levels.
 const GGX_SAMPLES = 256;
 
-// The rough mip levels integrate every texel of this source mip instead, which is
-// noise free and cheaper than the many samples their wide lobes would need.
+// Integrate a small source mip for the rough levels to avoid sampling noise.
 const INTEGRATION_SIZE = 16;
 const INTEGRATION_LEVELS = 3;
 
@@ -2842,18 +2840,16 @@ const _origin = /*@__PURE__*/ new Vector3();
 const _clearColor = /*@__PURE__*/ new Color();
 
 /**
- * This class generates a Prefiltered, Mipmapped Radiance Environment Map
- * (PMREM) from a cubeMap environment texture. This allows different levels of
- * blur to be quickly accessed based on material roughness. The result is a
- * cube render target whose mip levels hold the environment prefiltered for
- * increasing roughness values, from a mirror-like level 0 down to a level
- * that represents roughness 1. The roughness of a mip level is defined by
- * {@link PMREMGenerator.lodToRoughness}.
+ * Generates a Prefiltered, Mipmapped Radiance Environment Map (PMREM) for
+ * image-based lighting. The result is a cube render target whose mip levels
+ * store GGX-filtered radiance at increasing roughness, from a mirror at level 0
+ * to roughness 1. See {@link PMREMGenerator.lodToRoughness} for the mapping.
  *
- * The prefiltering uses GGX VNDF (Visible Normal Distribution Function)
- * importance sampling based on "Sampling the GGX Distribution of Visible Normals"
- * (Heitz, 2018) to generate environment maps that accurately match the GGX BRDF
- * used in material rendering for physically-based image-based lighting.
+ * Filtering assumes the view direction equals the surface normal. Sharp levels
+ * use GGX visible normal sampling (Heitz, 2018), while rough levels integrate a
+ * lower-resolution source cubemap.
+ *
+ * @see {@link https://jcgt.org/published/0007/04/01/ | Sampling the GGX Distribution of Visible Normals}
  */
 class PMREMGenerator {
 
@@ -2882,10 +2878,8 @@ class PMREMGenerator {
 	}
 
 	/**
-	 * Generates a PMREM from a supplied Scene, which can be faster than using an
-	 * image if networking bandwidth is low. Optional sigma specifies a blur radius
-	 * in radians to be applied to the scene before PMREM generation. Optional near
-	 * and far planes ensure the scene is rendered in its entirety.
+	 * Generates a PMREM from a scene, optionally applying a Gaussian blur before
+	 * GGX filtering.
 	 *
 	 * @param {Scene} scene - The scene to be captured.
 	 * @param {number} [sigma=0] - The blur radius in radians.
@@ -2918,7 +2912,7 @@ class PMREMGenerator {
 
 		}
 
-		// clear each face with the scene background or the clear color, whatever the app's clear settings are
+		// Clear every captured face, independent of the application's clear settings.
 
 		const autoClear = renderer.autoClear;
 		const autoClearColor = renderer.autoClearColor;
@@ -2958,9 +2952,9 @@ class PMREMGenerator {
 	}
 
 	/**
-	 * Generates a PMREM from an equirectangular texture, which can be either LDR
-	 * or HDR. The ideal input image size is 1k (1024 x 512), as this matches best
-	 * with the 256 x 256 cubemap output. Smaller inputs are upsampled.
+	 * Generates a PMREM from an LDR or HDR equirectangular texture. The cube face
+	 * size is one quarter of the image width, rounded down to a power of two and
+	 * at least 256.
 	 *
 	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
 	 * @param {?WebGLCubeRenderTarget} [renderTarget=null] - The render target to use.
@@ -2973,9 +2967,8 @@ class PMREMGenerator {
 	}
 
 	/**
-	 * Generates a PMREM from a cubemap texture, which can be either LDR
-	 * or HDR. The ideal input cube size is 256 x 256, as this matches best
-	 * with the 256 x 256 cubemap output. Smaller inputs are upsampled.
+	 * Generates a PMREM from an LDR or HDR cubemap. The cube face size matches
+	 * the input, rounded down to a power of two and at least 256.
 	 *
 	 * @param {Texture} cubemap - The cubemap texture to be converted.
 	 * @param {?WebGLCubeRenderTarget} [renderTarget=null] - The render target to use.
@@ -3061,7 +3054,7 @@ class PMREMGenerator {
 
 		if ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping ) {
 
-			this._setSize( texture.image.length === 0 ? 16 : ( texture.image[ 0 ].width || texture.image[ 0 ].image.width ) );
+			this._setSize( texture.image.length === 0 ? MIN_SIZE : ( texture.image[ 0 ].width || texture.image[ 0 ].image.width ) );
 
 		} else { // Equirectangular
 
@@ -3084,10 +3077,11 @@ class PMREMGenerator {
 
 		const pmremTarget = _createRenderTarget( size, false, false );
 
-		// One entry per prefiltered mip level. The renderer allocates exactly these
-		// levels and, unlike with generateMipmaps, never overwrites them.
+		// Allocate only the prefiltered mip levels without automatic mipmap generation.
 
-		for ( let lod = 0; lod <= Math.log2( size ) - LOD_MIN; lod ++ ) {
+		const maxLod = Math.log2( size ) - LOD_MIN;
+
+		for ( let lod = 0; lod <= maxLod; lod ++ ) {
 
 			pmremTarget.texture.mipmaps.push( { width: size >> lod, height: size >> lod } );
 
@@ -3142,7 +3136,7 @@ class PMREMGenerator {
 		cubeCamera.renderTarget = target;
 		cubeCamera.activeMipmapLevel = lod;
 
-		// the renderer takes the viewport from the render target, so it has to match the mip level
+		// WebGLRenderer uses the target viewport without scaling it to the active mip.
 
 		const size = target.width >> lod;
 
@@ -3209,11 +3203,11 @@ class PMREMGenerator {
 		const maxLod = pmremTarget.texture.mipmaps.length - 1;
 
 		const ggxUniforms = this._ggxMaterial.uniforms;
-		ggxUniforms[ 'envMap' ].value = this._sourceTarget.texture;
+		ggxUniforms.envMap.value = this._sourceTarget.texture;
 
 		const integrationUniforms = this._integrationMaterial.uniforms;
-		integrationUniforms[ 'envMap' ].value = this._sourceTarget.texture;
-		integrationUniforms[ 'sourceLod' ].value = Math.log2( size / INTEGRATION_SIZE );
+		integrationUniforms.envMap.value = this._sourceTarget.texture;
+		integrationUniforms.sourceLod.value = Math.log2( size / INTEGRATION_SIZE );
 
 		for ( let lod = 0; lod <= maxLod; lod ++ ) {
 
@@ -3221,19 +3215,19 @@ class PMREMGenerator {
 
 			if ( lod > maxLod - INTEGRATION_LEVELS ) {
 
-				integrationUniforms[ 'roughness' ].value = roughness;
+				integrationUniforms.roughness.value = roughness;
 
 				this._renderCube( pmremTarget, lod, this._integrationMaterial );
 
 			} else {
 
-				// lod of the source mip whose texel matches a sample's solid angle 1 / ( GGX_SAMPLES * pdf ), with
-				// pdf( L ) = D( H ) / 4 for V = N and half a level toward the blurrier mip to hide residual sample
-				// noise. The shader only adds log2 of the GGX denominator per sample. Level 0 is a plain copy.
+				// For V = N, pdf( L ) = D( H ) / 4. Match the source texel solid angle to
+				// 1 / ( GGX_SAMPLES * pdf ), with a half-mip bias to reduce sampling noise.
+				// The shader supplies log2 of the GGX denominator.
 				const lodBias = roughness > 0 ? Math.log2( size ) + 0.5 * Math.log2( 6 / ( GGX_SAMPLES * Math.pow( roughness, 4 ) ) ) + 0.5 : 0;
 
-				ggxUniforms[ 'roughness' ].value = roughness;
-				ggxUniforms[ 'lodBias' ].value = lodBias;
+				ggxUniforms.roughness.value = roughness;
+				ggxUniforms.lodBias.value = lodBias;
 
 				this._renderCube( pmremTarget, lod, this._ggxMaterial );
 
@@ -3244,12 +3238,8 @@ class PMREMGenerator {
 	}
 
 	/**
-	 * This is a two-pass Gaussian blur for a cubemap. Each pass importance-samples
-	 * the Gaussian along a spiral kernel (Golden Angle), which distributes samples
-	 * isotropically on the sphere (no pole artifacts).
-	 *
-	 * Used for initial scene blur in fromScene() method when sigma > 0. Level 0 of
-	 * the PMREM serves as the intermediate target.
+	 * Applies the initial fromScene() blur in two passes using a golden-angle
+	 * spiral kernel. Level 0 of the PMREM serves as the intermediate target.
 	 *
 	 * @private
 	 * @param {WebGLCubeRenderTarget} pmremTarget - The PMREM.
@@ -3268,15 +3258,14 @@ class PMREMGenerator {
 
 		const sourceTarget = this._sourceTarget;
 
-		// Two passes of sigma / sqrt( 2 ) compose to a blur of sigma while squaring
-		// the effective sample count. Sigmas beyond PI are visually indistinguishable
-		// from a uniform blur, so clamp to keep the shader math finite.
-		uniforms[ 'sigma' ].value = Math.min( sigma, Math.PI ) / Math.SQRT2;
+		// Split the blur variance between two passes. Clamp sigma to the sphere's
+		// maximum angular distance.
+		uniforms.sigma.value = Math.min( sigma, Math.PI ) / Math.SQRT2;
 
-		uniforms[ 'envMap' ].value = sourceTarget.texture;
+		uniforms.envMap.value = sourceTarget.texture;
 		this._renderCube( pmremTarget, 0, material );
 
-		uniforms[ 'envMap' ].value = pmremTarget.texture;
+		uniforms.envMap.value = pmremTarget.texture;
 		this._renderCube( sourceTarget, 0, material );
 
 	}
@@ -3391,10 +3380,8 @@ function _getGGXMaterial() {
 					float sinTheta = 2.0 * alpha * sqrt( Xi.x * ( 1.0 - Xi.x ) ) * invQ;
 					vec3 L = N * NdotL + ( tangent * cos( phi ) + bitangent * sin( phi ) ) * sinTheta;
 
-					// Filtered importance sampling: read the source mip whose texel solid angle
-					// matches the solid angle covered by this sample, which keeps the estimate
-					// smooth even for tiny, very bright light sources. Only the GGX denominator
-					// varies per sample, the rest of the lod is precomputed in lodBias.
+					// Match the source mip to the sample's solid angle. The terms
+					// independent of the sample are precomputed in lodBias.
 					float d = alpha2 * invQ;
 					float lod = max( log2( d ) + lodBias, 0.0 );
 
@@ -6274,12 +6261,6 @@ function generateShadowMapTypeDefine( parameters ) {
 
 }
 
-function generateEnvMapTypeDefine( parameters ) {
-
-	return parameters.envMapPMREM === true ? 'ENVMAP_TYPE_PMREM' : 'ENVMAP_TYPE_CUBE';
-
-}
-
 const envMapModeDefines = {
 	[ CubeRefractionMapping ]: 'ENVMAP_MODE_REFRACTION'
 };
@@ -6319,7 +6300,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 	let fragmentShader = parameters.fragmentShader;
 
 	const shadowMapTypeDefine = generateShadowMapTypeDefine( parameters );
-	const envMapTypeDefine = generateEnvMapTypeDefine( parameters );
+	const envMapTypeDefine = parameters.envMapPMREM === true ? 'ENVMAP_TYPE_PMREM' : 'ENVMAP_TYPE_CUBE';
 	const envMapModeDefine = generateEnvMapModeDefine( parameters );
 	const envMapBlendingDefine = generateEnvMapBlendingDefine( parameters );
 
@@ -7261,7 +7242,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			envMap: HAS_ENVMAP,
 			envMapMode: HAS_ENVMAP && envMap.mapping,
 			envMapPMREM: HAS_PMREM,
-			envMapMaxLod: HAS_PMREM ? envMapMipmaps.length - 1 : null, // one prefiltered mip level per entry
+			envMapMaxLod: HAS_PMREM ? envMapMipmaps.length - 1 : null,
 			envMapSize: HAS_PMREM ? envMapMipmaps[ 0 ].width : null,
 			aoMap: HAS_AOMAP,
 			lightMap: HAS_LIGHTMAP,
@@ -12992,7 +12973,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else if ( texture.mipmaps.length > 0 ) {
 
-				// a partial mip chain is only complete if the max level is limited to it
+				// Limit the max level to keep partial mip chains complete.
 				_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAX_LEVEL, texture.mipmaps.length - 1 );
 
 			}
@@ -13061,7 +13042,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else if ( texture.mipmaps.length > 0 ) {
 
-				// a partial mip chain is only complete if the max level is limited to it
+				// Limit the max level to keep partial mip chains complete.
 				_gl.texParameteri( glTextureType, _gl.TEXTURE_MAX_LEVEL, texture.mipmaps.length - 1 );
 
 			}
@@ -18941,7 +18922,7 @@ class WebGLRenderer {
 
 				framebuffer = framebuffer[ activeCubeFaceIndex ];
 
-				// targets with custom mipmaps keep one framebuffer per level, read level 0
+				// Custom mip chains store one framebuffer per level; read level 0.
 				if ( Array.isArray( framebuffer ) ) framebuffer = framebuffer[ 0 ];
 
 			}
@@ -19026,7 +19007,7 @@ class WebGLRenderer {
 
 				framebuffer = framebuffer[ activeCubeFaceIndex ];
 
-				// targets with custom mipmaps keep one framebuffer per level, read level 0
+				// Custom mip chains store one framebuffer per level; read level 0.
 				if ( Array.isArray( framebuffer ) ) framebuffer = framebuffer[ 0 ];
 
 			}
