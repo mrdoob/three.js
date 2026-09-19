@@ -50,6 +50,7 @@ const exceptionList = [
 	// Need more time to render
 	'css3d_mixed',
 	'webgl_loader_3dtiles',
+	'webgl_loader_3dtiles_osm',
 	'webgl_loader_texture_lottie',
 	'webgl_morphtargets_face',
 	'webgl_renderer_pathtracer',
