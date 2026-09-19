@@ -62,6 +62,8 @@ class SubBuildNode extends Node {
 
 	build( builder, ...params ) {
 
+		this._buildBeforeNodes( builder, params[ 0 ] );
+
 		builder.addSubBuild( this.name );
 
 		const data = this.node.build( builder, ...params );

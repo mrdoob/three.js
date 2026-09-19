@@ -70,6 +70,8 @@ class IsolateNode extends Node {
 
 	build( builder, ...params ) {
 
+		this._buildBeforeNodes( builder, params[ 0 ] );
+
 		const previousCache = builder.getCache();
 		const cache = builder.getCacheFromNode( this, this.parent );
 
