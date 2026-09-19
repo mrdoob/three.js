@@ -53,6 +53,12 @@ class SampleNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Sets up the node by sampling with the default UV accessor.
 	 *

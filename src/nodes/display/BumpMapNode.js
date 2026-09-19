@@ -88,12 +88,6 @@ class BumpMapNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	setup( builder ) {
 
 		// Screen-space derivatives are unreliable on thin lines, so the bump

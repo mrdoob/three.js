@@ -56,12 +56,6 @@ class SubgroupFunctionNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	getInputType( builder ) {
 
 		const aType = this.aNode ? this.aNode.getNodeType( builder ) : null;

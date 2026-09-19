@@ -59,6 +59,12 @@ class EventNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	setup( builder ) {
 
 		const { eventType, callback } = this;

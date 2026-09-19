@@ -171,6 +171,12 @@ class ShadowBaseNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Retrieves or creates a shadow material for the shadow casting light source.
 	 *

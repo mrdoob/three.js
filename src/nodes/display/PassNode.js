@@ -493,6 +493,12 @@ class PassNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Sets the resolution scale for the pass.
 	 * The resolution scale is a factor that is multiplied with the renderer's width and height.

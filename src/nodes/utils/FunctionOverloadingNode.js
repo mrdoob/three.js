@@ -58,6 +58,12 @@ class FunctionOverloadingNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * This method is overwritten since the node type is inferred from
 	 * the function's return type.

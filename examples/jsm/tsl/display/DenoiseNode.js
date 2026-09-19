@@ -141,12 +141,6 @@ class DenoiseNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	/**
 	 * This method is used to update internal uniforms once per frame.
 	 *

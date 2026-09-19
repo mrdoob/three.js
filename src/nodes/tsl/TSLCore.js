@@ -459,6 +459,12 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generateNodeType( builder ) {
 
 		return this.shaderNode.nodeType || this.getOutputNode( builder ).getNodeType( builder );
@@ -820,6 +826,12 @@ class ShaderNodeInternal extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	setLayout( layout ) {
 
 		this.layout = layout;
@@ -1042,6 +1054,12 @@ class FnNode extends Node {
 		}
 
 		this.isFn = true;
+
+	}
+
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
 
 	}
 

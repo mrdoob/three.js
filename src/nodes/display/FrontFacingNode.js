@@ -35,6 +35,12 @@ class FrontFacingNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generate( builder ) {
 
 		if ( builder.shaderStage !== 'fragment' ) return 'true';

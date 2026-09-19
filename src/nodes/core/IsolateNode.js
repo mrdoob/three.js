@@ -53,6 +53,12 @@ class IsolateNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generateNodeType( builder ) {
 
 		const previousCache = builder.getCache();

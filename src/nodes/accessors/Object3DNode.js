@@ -70,6 +70,12 @@ class Object3DNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Overwritten since the node type is inferred from the scope.
 	 *

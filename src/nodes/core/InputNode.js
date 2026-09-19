@@ -51,6 +51,12 @@ class InputNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generateNodeType( /*builder*/ ) {
 
 		if ( this.nodeType === null ) {

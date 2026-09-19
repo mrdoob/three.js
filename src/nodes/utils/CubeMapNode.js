@@ -79,12 +79,6 @@ class CubeMapNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	updateBefore( frame ) {
 
 		const { renderer, material } = frame;

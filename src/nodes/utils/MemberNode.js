@@ -50,6 +50,12 @@ class MemberNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	hasMember( builder ) {
 
 		if ( this.structNode.isMemberNode ) {

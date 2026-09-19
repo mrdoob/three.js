@@ -225,12 +225,6 @@ class PMREMNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	set value( value ) {
 
 		this._value = value;

@@ -45,12 +45,6 @@ class FunctionCallNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	/**
 	 * Sets the parameters of the function call node.
 	 *

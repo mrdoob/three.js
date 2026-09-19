@@ -120,6 +120,12 @@ class ReferenceNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * When the referred property is array-like, this method can be used
 	 * to access elements via an index node.

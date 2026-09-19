@@ -85,12 +85,6 @@ class OperatorNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	/**
 	 * Returns the operator method name.
 	 *

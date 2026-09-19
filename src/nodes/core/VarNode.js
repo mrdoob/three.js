@@ -92,6 +92,12 @@ class VarNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Sets the intent flag for this node.
 	 *

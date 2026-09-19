@@ -60,6 +60,12 @@ class LoopNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Returns a loop variable name based on an index. The pattern is
 	 * `0` = `i`, `1`= `j`, `2`= `k` and so on.

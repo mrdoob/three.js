@@ -49,6 +49,12 @@ class ArrayElementNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * This method is overwritten since the node type is inferred from the array-like node.
 	 *

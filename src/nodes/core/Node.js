@@ -169,14 +169,14 @@ class Node extends EventDispatcher {
 
 	/**
 	 * Whether this node allows caching its result in a temporary variable.
-	 * Override this method to enable caching for reusable expressions.
+	 * Caching is enabled by default. Override this method to disable it.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {boolean} Whether temporary caching is allowed.
 	 */
 	isAllowedCache( /*builder*/ ) {
 
-		return false;
+		return true;
 
 	}
 

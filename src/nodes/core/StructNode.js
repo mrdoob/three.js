@@ -42,6 +42,12 @@ class StructNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generateNodeType( builder ) {
 
 		return this.structTypeNode.getNodeType( builder );

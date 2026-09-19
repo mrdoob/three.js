@@ -54,12 +54,6 @@ class RotateNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	/**
 	 * Overwrites the default `customCacheKey()` implementation by including the
 	 * Euler order into the cache key.

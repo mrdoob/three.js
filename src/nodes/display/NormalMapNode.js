@@ -69,12 +69,6 @@ class NormalMapNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	setup( builder ) {
 
 		const { normalMapType, scaleNode, unpackNormalMode } = this;

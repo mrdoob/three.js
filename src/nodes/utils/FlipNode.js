@@ -50,12 +50,6 @@ class FlipNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	/**
 	 * This method is overwritten since the node type is inferred from the source node.
 	 *

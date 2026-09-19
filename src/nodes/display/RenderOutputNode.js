@@ -80,12 +80,6 @@ class RenderOutputNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	/**
 	 * Sets the tone mapping type.
 	 *

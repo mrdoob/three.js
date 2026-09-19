@@ -93,12 +93,6 @@ class MathNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	/**
 	 * The input type is inferred from the node types of the input nodes.
 	 *

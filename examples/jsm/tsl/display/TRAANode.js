@@ -246,12 +246,6 @@ class TRAANode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	/**
 	 * Returns the result of the effect as a texture node.
 	 *

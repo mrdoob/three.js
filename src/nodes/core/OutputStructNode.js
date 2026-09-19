@@ -42,6 +42,12 @@ class OutputStructNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generateNodeType( /*builder*/ ) {
 
 		return 'OutputType';

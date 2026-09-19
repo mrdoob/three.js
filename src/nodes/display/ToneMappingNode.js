@@ -56,12 +56,6 @@ class ToneMappingNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	/**
 	 * Overwrites the default `customCacheKey()` implementation by including the tone
 	 * mapping type into the cache key.

@@ -52,12 +52,6 @@ class SobelOperatorNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	/**
 	 * This method is used to update the effect's uniforms once per frame.
 	 *

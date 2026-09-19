@@ -73,12 +73,6 @@ class TransitionNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	/**
 	 * This method is used to setup the effect's TSL code.
 	 *

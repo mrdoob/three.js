@@ -55,6 +55,12 @@ class ScreenNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * This method is overwritten since the node type depends on the selected scope.
 	 *

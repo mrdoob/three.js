@@ -60,6 +60,12 @@ class RangeNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Returns the vector length which is computed based on the range definition.
 	 *

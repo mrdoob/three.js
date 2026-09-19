@@ -55,6 +55,12 @@ class BypassNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generateNodeType( builder ) {
 
 		return this.outputNode.getNodeType( builder );

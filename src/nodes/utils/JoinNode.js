@@ -35,12 +35,6 @@ class JoinNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	/**
 	 * This method is overwritten since the node type must be inferred from the
 	 * joined data length if not explicitly defined.

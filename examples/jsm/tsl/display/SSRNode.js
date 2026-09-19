@@ -483,12 +483,6 @@ class SSRNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	/**
 	 * Non-linear step distribution exponent (compile-time constant). See the backing
 	 * field for details. Assigning a new value recompiles the SSR material.

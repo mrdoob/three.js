@@ -46,6 +46,12 @@ class MaterialNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Returns a cached reference node for the given property and type.
 	 *

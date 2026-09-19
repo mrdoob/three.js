@@ -19,12 +19,6 @@ class DebugNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	generateNodeType( builder ) {
 
 		return this.node.getNodeType( builder );

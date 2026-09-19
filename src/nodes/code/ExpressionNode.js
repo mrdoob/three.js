@@ -35,6 +35,12 @@ class ExpressionNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generate( builder, output ) {
 
 		const type = this.getNodeType( builder );

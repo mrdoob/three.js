@@ -7,7 +7,7 @@ import { warn } from '../../utils.js';
  *
  * The class acts as a base class for many other nodes types.
  *
- * @deprecated Extend Node and override isAllowedCache() instead.
+ * @deprecated Extend Node instead.
  * @augments Node
  */
 class TempNode extends Node {
@@ -36,7 +36,7 @@ class TempNode extends Node {
 		 */
 		this.isTempNode = true;
 
-		warn( 'TempNode: This module has been deprecated. Extend Node and override "isAllowedCache( builder )" instead.' );
+		warn( 'TempNode: This module has been deprecated. Extend Node instead.' );
 
 	}
 

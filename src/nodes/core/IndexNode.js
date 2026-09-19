@@ -50,6 +50,12 @@ class IndexNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generate( builder ) {
 
 		const nodeType = this.getNodeType( builder );

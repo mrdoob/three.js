@@ -31,6 +31,12 @@ class LightingNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 }
 
 export default LightingNode;

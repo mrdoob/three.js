@@ -97,6 +97,12 @@ class StackNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	getElementType( builder ) {
 
 		return this.outputNode ? this.outputNode.getElementType( builder ) : 'void';

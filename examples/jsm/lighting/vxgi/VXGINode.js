@@ -243,12 +243,6 @@ class VXGINode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	/**
 	 * Number of cached indirect bounces. See {@link VXGIVolume#bounces}.
 	 *

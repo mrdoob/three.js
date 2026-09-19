@@ -110,6 +110,12 @@ class ComputeNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Sets the {@link ComputeNode#name} property.
 	 *

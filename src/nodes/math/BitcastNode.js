@@ -60,12 +60,6 @@ class BitcastNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	generateNodeType( builder ) {
 
 		// GLSL aliasing

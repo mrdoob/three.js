@@ -101,12 +101,6 @@ class SharpenNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	/**
 	 * Sets the output size of the effect.
 	 *

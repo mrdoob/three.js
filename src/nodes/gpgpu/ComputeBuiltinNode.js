@@ -37,6 +37,12 @@ class ComputeBuiltinNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * This method is overwritten since hash is derived from the built-in name.
 	 *

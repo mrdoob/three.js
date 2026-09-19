@@ -78,6 +78,12 @@ class UniformGroupNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Marks the uniform group node as needing an update.
 	 * This will trigger the necessary updates in the rendering process.

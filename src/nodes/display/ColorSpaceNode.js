@@ -57,12 +57,6 @@ class ColorSpaceNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	/**
 	 * This method resolves the constants `WORKING_COLOR_SPACE` and
 	 * `OUTPUT_COLOR_SPACE` based on the current configuration of the

@@ -92,12 +92,6 @@ class VelocityNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	/**
 	 * Sets the given projection matrix.
 	 *

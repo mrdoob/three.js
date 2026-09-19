@@ -107,6 +107,12 @@ class ReferenceBaseNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Sets the uniform group for this reference node.
 	 *

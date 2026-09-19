@@ -312,12 +312,6 @@ class SSGINode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	/**
 	 * Returns the AO result of the effect as a texture node.
 	 *

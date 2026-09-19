@@ -84,12 +84,6 @@ class WaterNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	updateFlow( delta ) {
 
 		this.flowConfig.value.x += this.flowSpeed.value * delta; // flowMapOffset0

@@ -437,12 +437,6 @@ class RecurrentDenoiseNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	setSize( width, height ) {
 
 		if ( width === null || height === null ) return;

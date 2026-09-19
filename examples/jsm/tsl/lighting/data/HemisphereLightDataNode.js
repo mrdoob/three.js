@@ -46,6 +46,12 @@ class HemisphereLightDataNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	setLights( lights ) {
 
 		if ( lights.length > this.maxCount ) {

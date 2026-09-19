@@ -610,12 +610,6 @@ class TemporalReprojectNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	getTextureNode() {
 
 		return this._textureNode;

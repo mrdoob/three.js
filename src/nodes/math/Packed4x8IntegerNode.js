@@ -60,12 +60,6 @@ class Packed4x8IntegerNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	getInputType() {
 
 		const method = this.method;

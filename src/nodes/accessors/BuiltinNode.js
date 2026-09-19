@@ -36,6 +36,12 @@ class BuiltinNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Generates the code snippet of the builtin node.
 	 *

@@ -233,12 +233,6 @@ class DepthOfFieldNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	/**
 	 * Sets the size of the effect.
 	 *

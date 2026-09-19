@@ -56,12 +56,6 @@ class UnpackFloatNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	generateNodeType() {
 
 		return this.layout === '4x8' ? 'vec4' : 'vec2';

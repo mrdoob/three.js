@@ -56,12 +56,6 @@ class PackFloatNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	generateNodeType() {
 
 		return 'uint';

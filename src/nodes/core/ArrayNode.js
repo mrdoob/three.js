@@ -59,12 +59,6 @@ class ArrayNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	/**
 	 * Returns the number of elements in the node array.
 	 *

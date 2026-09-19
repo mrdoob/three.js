@@ -78,6 +78,12 @@ class PropertyNode extends Node {
 
 	}
 
+	isAllowedCache( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	getNodeType( builder ) {
 
 		const nodeType = super.getNodeType( builder );

@@ -386,12 +386,6 @@ class OutlineNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
-
-		return true;
-
-	}
-
 	/**
 	 * A mask value that represents the visible edge.
 	 *
