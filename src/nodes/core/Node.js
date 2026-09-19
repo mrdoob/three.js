@@ -973,7 +973,8 @@ class Node extends EventDispatcher {
 
 		} else if ( buildStage === 'generate' ) {
 
-			const allowedCache = this.isCacheable( builder );
+			// References must be generated directly, even if a cached value exists.
+			const allowedCache = this.isCacheable( builder ) && builder.isReference( output ) === false;
 			const type = allowedCache ? builder.getVectorType( this.getNodeType( builder, output ) ) : null;
 			const cacheResult = allowedCache && type !== 'void' && output !== 'void' && nodeData.usageCount > 1;
 			const generateOutput = cacheResult ? type : output;
