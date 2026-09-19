@@ -1,5 +1,5 @@
 import { Frustum, Matrix4, RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType, Vector3, Plane } from 'three/webgpu';
-import { cubeTexture, clamp, viewZToPerspectiveDepth, logarithmicDepthToViewZ, float, Loop, max, Fn, passTexture, uv, dot, uniformArray, If, getViewPosition, uniform, vec4, add, interleavedGradientNoise, screenCoordinate, round, mul, uint, mix, exp, vec3, distance, pow, reference, lightPosition, vec2, bool, texture, perspectiveDepthToViewZ, lightShadowMatrix, context } from 'three/tsl';
+import { cubeTexture, clamp, viewZToPerspectiveDepth, logarithmicDepthToViewZ, float, Loop, max, Fn, passTexture, uv, dot, uniformArray, If, getViewPosition, uniform, vec4, add, interleavedGradientNoise, screenCoordinate, round, mul, uint, mix, exp, vec3, distance, pow, reference, lightPosition, vec2, bool, texture, perspectiveDepthToViewZ, lightShadowMatrix, context, struct } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -188,8 +188,19 @@ class GodraysNode extends TempNode {
 		 */
 		this._shadowCameraFar = reference( 'far', 'float', light.shadow.camera );
 
-		this._fNormals = uniformArray( _DIRECTIONS.map( () => new Vector3() ) );
-		this._fConstants = uniformArray( _DIRECTIONS.map( () => 0 ) );
+		const godraysUniformStruct = struct( {
+			fNormals: { type: 'vec3' },
+			fConstants: { type: 'float' }
+		} );
+
+		/**
+		 * The planes of the shadow box, stored as a struct of a normal
+		 * and a plane constant per frustum side.
+		 *
+		 * @private
+		 * @type {UniformArrayNode}
+		 */
+		this._uniforms = uniformArray( _DIRECTIONS.map( () => ( { fNormals: new Vector3(), fConstants: 0 } ) ), godraysUniformStruct );
 
 		/**
 		 * The light the godrays are rendered for.
@@ -320,8 +331,10 @@ class GodraysNode extends TempNode {
 				_SCRATCH_VECTOR.addScaledVector( direction, shadowCamera.far );
 				plane.setFromNormalAndCoplanarPoint( direction, _SCRATCH_VECTOR );
 
-				this._fNormals.array[ i ].copy( plane.normal );
-				this._fConstants.array[ i ] = plane.constant;
+				const element = this._uniforms.array[ i ];
+
+				element.fNormals.copy( plane.normal );
+				element.fConstants = plane.constant;
 
 			}
 
@@ -334,8 +347,10 @@ class GodraysNode extends TempNode {
 
 				const plane = _SCRATCH_FRUSTUM.planes[ i ];
 
-				this._fNormals.array[ i ].copy( plane.normal ).multiplyScalar( - 1 );
-				this._fConstants.array[ i ] = plane.constant * - 1;
+				const element = this._uniforms.array[ i ];
+
+				element.fNormals.copy( plane.normal ).multiplyScalar( - 1 );
+				element.fConstants = plane.constant * - 1;
 
 			}
 
@@ -353,6 +368,9 @@ class GodraysNode extends TempNode {
 
 		const uvNode = uv();
 		const lightPos = lightPosition( this._light );
+
+		const _planeNormal = ( i ) => this._uniforms.element( i ).get( 'fNormals' );
+		const _planeConstant = ( i ) => this._uniforms.element( i ).get( 'fConstants' );
 
 		const sampleDepth = ( uv ) => {
 
@@ -453,7 +471,7 @@ class GodraysNode extends TempNode {
 
 			Loop( 6, ( { i } ) => {
 
-				inBoxDist.assign( max( inBoxDist, sdPlane( this._cameraPosition, this._fNormals.element( i ), this._fConstants.element( i ) ) ) );
+				inBoxDist.assign( max( inBoxDist, sdPlane( this._cameraPosition, _planeNormal( i ), _planeConstant( i ) ) ) );
 
 			} );
 
@@ -466,11 +484,11 @@ class GodraysNode extends TempNode {
 
 				Loop( 6, ( { i } ) => {
 
-					If( sdPlane( worldPosition, this._fNormals.element( i ), this._fConstants.element( i ) ).greaterThan( 0 ), () => {
+					If( sdPlane( worldPosition, _planeNormal( i ), _planeConstant( i ) ).greaterThan( 0 ), () => {
 
 						const direction = worldPosition.sub( this._cameraPosition ).toConst();
 
-						const t = intersectRayPlane( this._cameraPosition, direction, this._fNormals.element( i ), this._fConstants.element( i ) );
+						const t = intersectRayPlane( this._cameraPosition, direction, _planeNormal( i ), _planeConstant( i ) );
 
 						worldPosition.assign( this._cameraPosition.add( t.mul( direction ) ) );
 
@@ -488,7 +506,7 @@ class GodraysNode extends TempNode {
 
 				Loop( 6, ( { i } ) => {
 
-					const t = intersectRayPlane( this._cameraPosition, direction, this._fNormals.element( i ), this._fConstants.element( i ) );
+					const t = intersectRayPlane( this._cameraPosition, direction, _planeNormal( i ), _planeConstant( i ) );
 
 					If( t.lessThan( minT ).and( t.greaterThan( 0 ) ), () => {
 
@@ -513,7 +531,7 @@ class GodraysNode extends TempNode {
 
 					Loop( 6, ( { i } ) => {
 
-						endInBoxDist.assign( max( endInBoxDist, sdPlane( worldPosition, this._fNormals.element( i ), this._fConstants.element( i ) ) ) );
+						endInBoxDist.assign( max( endInBoxDist, sdPlane( worldPosition, _planeNormal( i ), _planeConstant( i ) ) ) );
 
 					} );
 
@@ -524,9 +542,9 @@ class GodraysNode extends TempNode {
 
 						Loop( 6, ( { i } ) => {
 
-							If( sdPlane( worldPosition, this._fNormals.element( i ), this._fConstants.element( i ) ).greaterThan( 0 ), () => {
+							If( sdPlane( worldPosition, _planeNormal( i ), _planeConstant( i ) ).greaterThan( 0 ), () => {
 
-								const t = intersectRayPlane( startPosition, direction, this._fNormals.element( i ), this._fConstants.element( i ) );
+								const t = intersectRayPlane( startPosition, direction, _planeNormal( i ), _planeConstant( i ) );
 
 								If( t.lessThan( minT ).and( t.greaterThan( 0 ) ), () => {
 

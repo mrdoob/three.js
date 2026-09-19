@@ -35,9 +35,28 @@ class StructNode extends Node {
 
 		super( 'vec3' );
 
+		/**
+		 * The buffer struct type.
+		 *
+		 * @type {StructTypeNode}
+		 * @default null
+		 */
 		this.structTypeNode = structTypeNode;
+
+		/**
+		 * The values in the struct.
+		 *
+		 * @type {any}
+		 */
 		this.values = values;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
 		this.isStructNode = true;
 
 	}
