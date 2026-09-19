@@ -1,12 +1,12 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { nodeProxyIntent } from '../tsl/TSLCore.js';
 /**
  * This node represents an operation that reinterprets the bit representation of a value
  * in one type as a value in another type.
  *
- * @augments TempNode
+ * @augments Node
  */
-class BitcastNode extends TempNode {
+class BitcastNode extends Node {
 
 	static get type() {
 
@@ -57,6 +57,12 @@ class BitcastNode extends TempNode {
 		 * @default true
 		 */
 		this.isBitcastNode = true;
+
+	}
+
+	isAllowedCache( /*builder*/ ) {
+
+		return true;
 
 	}
 

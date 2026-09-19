@@ -1,4 +1,4 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { default as TextureNode/*, texture*/ } from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { context } from '../tsl/TSLBase.js';
@@ -54,6 +54,12 @@ class PassTextureNode extends TextureNode {
 		this.isPassTextureNode = true;
 
 		this.setUpdateMatrix( false );
+
+	}
+
+	isAllowedCache( /*builder*/ ) {
+
+		return true;
 
 	}
 
@@ -177,9 +183,9 @@ class PassMultipleTextureNode extends PassTextureNode {
  * postProcessing.outputNode = scenePass;
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class PassNode extends TempNode {
+class PassNode extends Node {
 
 	static get type() {
 

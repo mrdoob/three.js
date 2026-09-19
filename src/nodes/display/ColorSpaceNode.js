@@ -1,4 +1,4 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { addMethodChaining, mat3, nodeObject, vec4 } from '../tsl/TSLCore.js';
 
 import { SRGBTransfer } from '../../constants.js';
@@ -13,9 +13,9 @@ const OUTPUT_COLOR_SPACE = 'OutputColorSpace';
  * This node represents a color space conversion. Meaning it converts
  * a color value from a source to a target color space.
  *
- * @augments TempNode
+ * @augments Node
  */
-class ColorSpaceNode extends TempNode {
+class ColorSpaceNode extends Node {
 
 	static get type() {
 
@@ -54,6 +54,12 @@ class ColorSpaceNode extends TempNode {
 		 * @type {string}
 		 */
 		this.target = target;
+
+	}
+
+	isAllowedCache( /*builder*/ ) {
+
+		return true;
 
 	}
 

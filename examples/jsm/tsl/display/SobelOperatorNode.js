@@ -1,4 +1,4 @@
-import { Vector2, TempNode, NodeUpdateType } from 'three/webgpu';
+import { Vector2, Node, NodeUpdateType } from 'three/webgpu';
 import { Fn, uv, uniform, convertToTexture, vec2, vec3, vec4, mat3, luminance, add } from 'three/tsl';
 
 /**
@@ -6,10 +6,10 @@ import { Fn, uv, uniform, convertToTexture, vec2, vec3, vec4, mat3, luminance, a
  * A sobel filter should be applied after tone mapping and output color
  * space conversion.
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { sobel } from 'three/addons/tsl/display/SobelOperatorNode.js';
  */
-class SobelOperatorNode extends TempNode {
+class SobelOperatorNode extends Node {
 
 	static get type() {
 
@@ -49,6 +49,12 @@ class SobelOperatorNode extends TempNode {
 		 * @type {UniformNode<vec2>}
 		 */
 		this._invSize = uniform( new Vector2() );
+
+	}
+
+	isAllowedCache( /*builder*/ ) {
+
+		return true;
 
 	}
 

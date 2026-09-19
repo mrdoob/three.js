@@ -1,4 +1,4 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { roughnessToMip } from './PMREMUtils.js';
 import { uniform } from '../core/UniformNode.js';
@@ -127,9 +127,9 @@ function _getCache( renderer ) {
  * material.envNode = pmremTexture( envMap );
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class PMREMNode extends TempNode {
+class PMREMNode extends Node {
 
 	static get type() {
 
@@ -222,6 +222,12 @@ class PMREMNode extends TempNode {
 		 * @default 'render'
 		 */
 		this.updateBeforeType = NodeUpdateType.RENDER;
+
+	}
+
+	isAllowedCache( /*builder*/ ) {
+
+		return true;
 
 	}
 

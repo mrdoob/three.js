@@ -1,4 +1,4 @@
-import TempNode from './TempNode.js';
+import Node from './Node.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 
 /**
@@ -13,9 +13,9 @@ import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
  * const redColor = tintColors.element( 0 );
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class ArrayNode extends TempNode {
+class ArrayNode extends Node {
 
 	static get type() {
 
@@ -56,6 +56,12 @@ class ArrayNode extends TempNode {
 		 * @default true
 		 */
 		this.isArrayNode = true;
+
+	}
+
+	isAllowedCache( /*builder*/ ) {
+
+		return true;
 
 	}
 

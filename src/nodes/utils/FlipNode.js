@@ -1,4 +1,4 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { vectorComponents } from '../core/constants.js';
 
 /**
@@ -14,9 +14,9 @@ import { vectorComponents } from '../core/constants.js';
  * uvNode = uvNode.flipY();
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class FlipNode extends TempNode {
+class FlipNode extends Node {
 
 	static get type() {
 
@@ -47,6 +47,12 @@ class FlipNode extends TempNode {
 		 * @type {string}
 		 */
 		this.components = components;
+
+	}
+
+	isAllowedCache( /*builder*/ ) {
+
+		return true;
 
 	}
 

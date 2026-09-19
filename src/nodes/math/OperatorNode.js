@@ -1,5 +1,5 @@
 import { WebGLCoordinateSystem } from '../../constants.js';
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { addMethodChaining, Fn, int, nodeProxyIntent } from '../tsl/TSLCore.js';
 
 const _vectorOperators = {
@@ -16,9 +16,9 @@ const _vectorOperators = {
  * This node represents basic mathematical and logical operations like addition,
  * subtraction or comparisons (e.g. `equal()`).
  *
- * @augments TempNode
+ * @augments Node
  */
-class OperatorNode extends TempNode {
+class OperatorNode extends Node {
 
 	static get type() {
 
@@ -82,6 +82,12 @@ class OperatorNode extends TempNode {
 		 * @default true
 		 */
 		this.isOperatorNode = true;
+
+	}
+
+	isAllowedCache( /*builder*/ ) {
+
+		return true;
 
 	}
 

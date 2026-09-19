@@ -1,8 +1,8 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 import { log } from '../../utils.js';
 
-class DebugNode extends TempNode {
+class DebugNode extends Node {
 
 	static get type() {
 
@@ -16,6 +16,12 @@ class DebugNode extends TempNode {
 
 		this.node = node;
 		this.callback = callback;
+
+	}
+
+	isAllowedCache( /*builder*/ ) {
+
+		return true;
 
 	}
 

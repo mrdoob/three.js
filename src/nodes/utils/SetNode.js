@@ -1,4 +1,4 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { vectorComponents } from '../core/constants.js';
 
 /**
@@ -10,9 +10,9 @@ import { vectorComponents } from '../core/constants.js';
  * materialLine.colorNode = color( 0, 0, 0 ).setR( float( 1 ) );
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class SetNode extends TempNode {
+class SetNode extends Node {
 
 	static get type() {
 
@@ -51,6 +51,12 @@ class SetNode extends TempNode {
 		 * @type {Node}
 		 */
 		this.targetNode = targetNode;
+
+	}
+
+	isAllowedCache( /*builder*/ ) {
+
+		return true;
 
 	}
 

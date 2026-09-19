@@ -1,4 +1,4 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 import { CubeTexture } from '../../textures/CubeTexture.js';
@@ -12,9 +12,9 @@ const _cache = new WeakMap();
  * This node can be used to automatically convert environment maps in the
  * equirectangular format into the cube map format.
  *
- * @augments TempNode
+ * @augments Node
  */
-class CubeMapNode extends TempNode {
+class CubeMapNode extends Node {
 
 	static get type() {
 
@@ -76,6 +76,12 @@ class CubeMapNode extends TempNode {
 		 * @default 'render'
 		 */
 		this.updateBeforeType = NodeUpdateType.RENDER;
+
+	}
+
+	isAllowedCache( /*builder*/ ) {
+
+		return true;
 
 	}
 

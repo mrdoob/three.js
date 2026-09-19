@@ -1,4 +1,4 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { uv } from '../accessors/UV.js';
 import { normalView } from '../accessors/Normal.js';
 import { positionView } from '../accessors/Position.js';
@@ -51,9 +51,9 @@ const perturbNormalArb = /*@__PURE__*/ Fn( ( inputs ) => {
  * material.normalNode = bumpMap( texture( bumpTex ) );
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class BumpMapNode extends TempNode {
+class BumpMapNode extends Node {
 
 	static get type() {
 
@@ -85,6 +85,12 @@ class BumpMapNode extends TempNode {
 		 * @default null
 		 */
 		this.scaleNode = scaleNode;
+
+	}
+
+	isAllowedCache( /*builder*/ ) {
+
+		return true;
 
 	}
 
