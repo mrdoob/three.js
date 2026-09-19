@@ -50,6 +50,12 @@
 
 	};
 
+	/* Additional variable for ~5 examples */
+
+	window.TESTING = true;
+
+	if ( typeof HTMLVideoElement === 'undefined' ) return;
+
 	/* Deterministic video */
 
 	const play = HTMLVideoElement.prototype.play;
@@ -113,9 +119,5 @@
 		return true;
 
 	};
-
-	/* Additional variable for ~5 examples */
-
-	window.TESTING = true;
 
 }() );
