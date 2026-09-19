@@ -112,7 +112,11 @@ class FunctionOverloadingNode extends Node {
 						const param = params[ i ];
 						const input = inputs[ i ];
 
-						if ( param.getNodeType( builder ) === input.type ) {
+						const paramType = param.getNodeType( builder );
+						const baseParamType = builder.getBaseType ? builder.getBaseType( paramType ) : paramType;
+						const baseInputType = builder.getBaseType ? builder.getBaseType( input.type ) : input.type;
+
+						if ( baseParamType === baseInputType ) {
 
 							currentScore ++;
 

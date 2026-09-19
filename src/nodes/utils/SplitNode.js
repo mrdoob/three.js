@@ -114,7 +114,8 @@ class SplitNode extends Node {
 	generate( builder, output ) {
 
 		const node = this.node;
-		const nodeTypeLength = builder.getTypeLength( node.getNodeType( builder ) );
+		const nodeType = node.getNodeType( builder );
+		const nodeTypeLength = builder.getTypeLength( nodeType );
 
 		let snippet = null;
 
@@ -133,16 +134,19 @@ class SplitNode extends Node {
 			}
 
 			const nodeSnippet = node.build( builder, type );
+			const snippetType = type || nodeType;
 
 			if ( this.components.length === nodeTypeLength && this.components === _stringVectorComponents.slice( 0, this.components.length ) ) {
 
 				// unnecessary swizzle
 
-				snippet = builder.format( nodeSnippet, type, output );
+				snippet = builder.format( nodeSnippet, snippetType, output );
 
 			} else {
 
-				snippet = builder.format( `${nodeSnippet}.${this.components}`, this.getNodeType( builder ), output );
+				const splitType = builder.getTypeFromLength( this.components.length, builder.getComponentType( snippetType ) );
+
+				snippet = builder.format( `${nodeSnippet}.${this.components}`, splitType, output );
 
 			}
 

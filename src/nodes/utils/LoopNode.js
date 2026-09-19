@@ -96,8 +96,9 @@ class LoopNode extends Node {
 
 			const name = ( param.isNode !== true && param.name ) || this.getVarName( i );
 			const type = ( param.isNode !== true && param.type ) || 'int';
+			const loopType = builder.getPrecisionType ? builder.getPrecisionType( type ) : type;
 
-			inputs[ name ] = expression( name, type );
+			inputs[ name ] = expression( name, loopType );
 
 		}
 
@@ -188,6 +189,13 @@ class LoopNode extends Node {
 
 				type = param.type || 'int';
 				name = param.name || this.getVarName( i );
+
+				if ( builder.getPrecisionType ) {
+
+					type = builder.getPrecisionType( type );
+
+				}
+
 				start = param.start;
 				end = param.end;
 				condition = param.condition;

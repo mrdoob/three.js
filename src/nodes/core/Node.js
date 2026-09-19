@@ -485,6 +485,17 @@ class Node extends EventDispatcher {
 	}
 
 	/**
+	 * Returns the precision requested for this node, if any.
+	 *
+	 * @return {?number|string} The requested precision.
+	 */
+	getPrecision() {
+
+		return null;
+
+	}
+
+	/**
 	 * Returns the hash of the node which is used to identify the node. By default it's
 	 * the {@link Node#uuid} however derived node classes might have to overwrite this method
 	 * depending on their implementation.
@@ -574,32 +585,37 @@ class Node extends EventDispatcher {
 	getNodeType( builder, output = null ) {
 
 		const nodeData = builder.getDataFromNode( this );
+		const precisionCacheKey = builder.getPrecisionCacheKey ? builder.getPrecisionCacheKey( this ) : 'default';
 
 		let type;
 
 		if ( output !== null ) {
 
 			nodeData.typeFromOutput = nodeData.typeFromOutput || {};
+			nodeData.typeFromOutput[ precisionCacheKey ] = nodeData.typeFromOutput[ precisionCacheKey ] || {};
 
-			type = nodeData.typeFromOutput[ output ];
+			type = nodeData.typeFromOutput[ precisionCacheKey ][ output ];
 
 			if ( type === undefined ) {
 
 				type = this.generateNodeType( builder, output );
+				type = builder.getPrecisionType ? builder.getPrecisionType( type, builder.getNodePrecision( this ) ) : type;
 
-				nodeData.typeFromOutput[ output ] = type;
+				nodeData.typeFromOutput[ precisionCacheKey ][ output ] = type;
 
 			}
 
 		} else {
 
-			type = nodeData.type;
+			nodeData.type = nodeData.type || {};
+			type = nodeData.type[ precisionCacheKey ];
 
 			if ( type === undefined ) {
 
 				type = this.generateNodeType( builder );
+				type = builder.getPrecisionType ? builder.getPrecisionType( type, builder.getNodePrecision( this ) ) : type;
 
-				nodeData.type = type;
+				nodeData.type[ precisionCacheKey ] = type;
 
 			}
 
@@ -971,18 +987,22 @@ class Node extends EventDispatcher {
 
 				const type = this.getNodeType( builder );
 				const nodeData = builder.getDataFromNode( this );
+				const precisionCacheKey = builder.getPrecisionCacheKey ? builder.getPrecisionCacheKey( this ) : 'default';
 
-				result = nodeData.snippet;
+				nodeData.snippet = nodeData.snippet || {};
+				nodeData.generated = nodeData.generated || {};
+
+				result = nodeData.snippet[ precisionCacheKey ];
 
 				if ( result === undefined ) {
 
-					if ( nodeData.generated === undefined ) {
+					if ( nodeData.generated[ precisionCacheKey ] === undefined ) {
 
-						nodeData.generated = true;
+						nodeData.generated[ precisionCacheKey ] = true;
 
 						result = this.generate( builder ) || '';
 
-						nodeData.snippet = result;
+						nodeData.snippet[ precisionCacheKey ] = result;
 
 					} else {
 

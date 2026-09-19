@@ -94,6 +94,16 @@ const glslMethods = {
 	floatunpack_unorm_4x8: 'tsl_unpackUnorm4x8'
 };
 
+const glslHalfFallbackTypeLib = {
+	half: 'float',
+	hvec2: 'vec2',
+	hvec3: 'vec3',
+	hvec4: 'vec4',
+	hmat2: 'mat2',
+	hmat3: 'mat3',
+	hmat4: 'mat4'
+};
+
 const precisionLib = {
 	low: 'lowp',
 	medium: 'mediump',
@@ -264,6 +274,20 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	getType( type ) {
+
+		return glslHalfFallbackTypeLib[ type ] || super.getType( type );
+
+	}
+
+	getVar( type, name, count = null ) {
+
+		const qualifier = this.isPrecisionType( type ) ? 'mediump ' : '';
+
+		return qualifier + super.getVar( type, name, count );
+
+	}
+
 	/**
 	 * Returns the bitcast method name for a given input and outputType.
 	 *
@@ -352,12 +376,15 @@ class GLSLNodeBuilder extends NodeBuilder {
 		const flowData = this.flowShaderNode( shaderNode );
 
 		const parameters = [];
+		const previousContext = this.addContext( { precision: null } );
 
 		for ( const input of layout.inputs ) {
 
 			parameters.push( this.getType( input.type ) + ' ' + input.name );
 
 		}
+
+		this.setContext( previousContext );
 
 		//
 
