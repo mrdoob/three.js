@@ -10,6 +10,7 @@ import {
 
 import {
 	float,
+	texture,
 	int,
 	bool,
 	sub,
@@ -330,10 +331,10 @@ class MaterialXNode {
 
 		}
 
-		const textureNode = new Texture();
-		textureNode.wrapS = TEXTURE_ADDRESS_MODE_WRAPPING[ addressModes.u ];
-		textureNode.wrapT = TEXTURE_ADDRESS_MODE_WRAPPING[ addressModes.v ];
-		textureNode.flipY = false;
+		const textureNode = texture( new Texture() );
+		textureNode.value.wrapS = TEXTURE_ADDRESS_MODE_WRAPPING[ addressModes.u ];
+		textureNode.value.wrapT = TEXTURE_ADDRESS_MODE_WRAPPING[ addressModes.v ];
+		textureNode.value.flipY = false;
 		this.materialX.textureCache.set( textureCacheKey, textureNode );
 
 		const nodeName = this.name;
@@ -343,8 +344,22 @@ class MaterialXNode {
 
 			loader.load( resolvedURI, ( imageData ) => {
 
-				textureNode.image = imageData;
-				textureNode.needsUpdate = true;
+				if ( imageData.isTexture ) {
+
+					// Keep the texture subtype and upload settings while sharing the node
+					// with every sample compiled before the resource finishes loading.
+					textureNode.value = imageData.clone();
+					textureNode.value.wrapS = TEXTURE_ADDRESS_MODE_WRAPPING[ addressModes.u ];
+					textureNode.value.wrapT = TEXTURE_ADDRESS_MODE_WRAPPING[ addressModes.v ];
+					textureNode.value.flipY = false;
+
+				} else {
+
+					textureNode.value.image = imageData;
+
+				}
+
+				textureNode.value.needsUpdate = true;
 				resolveLoad();
 
 			}, undefined, () => {
