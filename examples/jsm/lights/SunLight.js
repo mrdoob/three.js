@@ -3,8 +3,13 @@ import { SunLightShadow } from './SunLightShadow.js';
 
 /**
  * A sun-like light that gets emitted in a specific direction, with rays that
- * are all parallel, and casts cascaded shadow maps via {@link SunLightShadow},
+ * are all parallel, and casts Cascaded Shadow Maps (CSM) via {@link SunLightShadow},
  * suited for lighting large scenes.
+ *
+ * Please be aware that `SunLight` is not a good fit for small, bounded scenes like
+ * dioramas, single rooms or model-viewers. Small scenes don't benefit from
+ * CSM because most content will be located in the last shadow cascade with the
+ * lowest shadow map resolution.
  *
  * Unlike {@link DirectionalLight}, the light has no target: like
  * {@link HemisphereLight}, its direction is defined by its position. The
