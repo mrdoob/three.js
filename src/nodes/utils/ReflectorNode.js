@@ -337,7 +337,7 @@ class ReflectorBaseNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
+	isCacheable( /*builder*/ ) {
 
 		return false;
 

@@ -35,7 +35,7 @@ class FrontFacingNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
+	isCacheable( /*builder*/ ) {
 
 		return false;
 

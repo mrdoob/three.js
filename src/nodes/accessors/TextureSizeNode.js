@@ -52,7 +52,7 @@ class TextureSizeNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
+	isCacheable( /*builder*/ ) {
 
 		return false;
 

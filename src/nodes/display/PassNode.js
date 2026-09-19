@@ -57,7 +57,7 @@ class PassTextureNode extends TextureNode {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
+	isCacheable( /*builder*/ ) {
 
 		return true;
 
@@ -493,7 +493,7 @@ class PassNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
+	isCacheable( /*builder*/ ) {
 
 		return false;
 

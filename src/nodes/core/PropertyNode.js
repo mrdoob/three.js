@@ -78,7 +78,7 @@ class PropertyNode extends Node {
 
 	}
 
-	isAllowedCache( /*builder*/ ) {
+	isCacheable( /*builder*/ ) {
 
 		return false;
 

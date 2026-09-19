@@ -40,7 +40,7 @@ class TempNode extends Node {
 
 	}
 
-	isAllowedCache( builder ) {
+	isCacheable( builder ) {
 
 		return this.hasDependencies( builder );
 

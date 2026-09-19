@@ -57,7 +57,7 @@ class AssignNode extends Node {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {boolean} Always `false`.
 	 */
-	isAllowedCache( /*builder*/ ) {
+	isCacheable( /*builder*/ ) {
 
 		return false;
 

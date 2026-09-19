@@ -174,7 +174,7 @@ class Node extends EventDispatcher {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {boolean} Whether temporary caching is allowed.
 	 */
-	isAllowedCache( /*builder*/ ) {
+	isCacheable( /*builder*/ ) {
 
 		return true;
 
@@ -973,7 +973,7 @@ class Node extends EventDispatcher {
 
 		} else if ( buildStage === 'generate' ) {
 
-			const allowedCache = this.isAllowedCache( builder );
+			const allowedCache = this.isCacheable( builder );
 			const type = allowedCache ? builder.getVectorType( this.getNodeType( builder, output ) ) : null;
 			const cacheResult = allowedCache && type !== 'void' && output !== 'void' && nodeData.usageCount > 1;
 			const generateOutput = cacheResult ? type : output;
