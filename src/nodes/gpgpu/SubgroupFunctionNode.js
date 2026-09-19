@@ -104,6 +104,13 @@ class SubgroupFunctionNode extends TempNode {
 
 	}
 
+	setup( builder ) {
+
+		// See justification for https://github.com/mrdoob/three.js/pull/33319
+		builder.allowEarlyReturns = false;
+
+	}
+
 	generate( builder, output ) {
 
 		const method = this.method;
