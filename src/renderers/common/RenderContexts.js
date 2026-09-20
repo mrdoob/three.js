@@ -1,6 +1,29 @@
 import RenderContext from './RenderContext.js';
 
 /**
+ * Returns the child map stored under the given key, creating it on first use.
+ *
+ * @private
+ * @param {Map} map - The parent map.
+ * @param {any} key - The key.
+ * @return {Map} The child map.
+ */
+function getChildMap( map, key ) {
+
+	let childMap = map.get( key );
+
+	if ( childMap === undefined ) {
+
+		childMap = new Map();
+		map.set( key, childMap );
+
+	}
+
+	return childMap;
+
+}
+
+/**
  * This module manages the render contexts of the renderer.
  *
  * @private
@@ -22,11 +45,24 @@ class RenderContexts {
 		this.renderer = renderer;
 
 		/**
-		 * A dictionary that manages render contexts.
+		 * Render contexts keyed structurally by attachment configuration, then MRT
+		 * configuration, then call depth. Using nested maps instead of a
+		 * concatenated string avoids building a cache key on every `get()` call
+		 * (which is on the render hot path) while keeping the exact same identity:
+		 * render targets with a compatible attachment configuration share a context,
+		 * and a configuration change yields a new one.
 		 *
-		 * @type {Object<string,RenderContext>}
+		 * @type {Map}
 		 */
-		this._renderContexts = {};
+		this._renderContexts = new Map();
+
+		/**
+		 * Render contexts for the default framebuffer (`renderTarget === null`),
+		 * keyed by MRT configuration and then by call depth.
+		 *
+		 * @type {Map<?MRTNode, Map<number, RenderContext>>}
+		 */
+		this._defaultRenderContexts = new Map();
 
 	}
 
@@ -40,40 +76,43 @@ class RenderContexts {
 	 */
 	get( renderTarget = null, mrt = null, callDepth = 0 ) {
 
-		//
+		// resolve the map keyed by MRT configuration for the given attachment state
 
-		let attachmentState;
+		let mrtStates;
 
 		if ( renderTarget === null ) {
 
-			attachmentState = 'default';
+			mrtStates = this._defaultRenderContexts;
 
 		} else {
 
-			const format = renderTarget.texture.format;
-			const type = renderTarget.texture.type;
-			const count = renderTarget.textures.length;
+			// nest by the same attachment properties the previous string key encoded
 
-			attachmentState = `${ count }:${ format }:${ type }:${ renderTarget.samples }:${ renderTarget.depthBuffer }:${ renderTarget.stencilBuffer }`;
+			const texture = renderTarget.texture;
+
+			let map = getChildMap( this._renderContexts, renderTarget.textures.length );
+			map = getChildMap( map, texture.format );
+			map = getChildMap( map, texture.type );
+			map = getChildMap( map, renderTarget.samples );
+			map = getChildMap( map, renderTarget.depthBuffer );
+			mrtStates = getChildMap( map, renderTarget.stencilBuffer );
 
 		}
 
-		//
+		// map of call depths for the given MRT configuration
 
-		const mrtState = ( mrt !== null ) ? mrt.id : 'default';
+		const callDepthStates = getChildMap( mrtStates, mrt );
 
-		//
+		// render context for the given call depth
 
-		const renderStateKey = attachmentState + '-' + mrtState + '-' + callDepth;
-
-		let renderState = this._renderContexts[ renderStateKey ];
+		let renderState = callDepthStates.get( callDepth );
 
 		if ( renderState === undefined ) {
 
 			renderState = new RenderContext();
 			renderState.mrt = mrt;
 
-			this._renderContexts[ renderStateKey ] = renderState;
+			callDepthStates.set( callDepth, renderState );
 
 		}
 
@@ -91,7 +130,8 @@ class RenderContexts {
 	 */
 	dispose() {
 
-		this._renderContexts = {};
+		this._renderContexts = new Map();
+		this._defaultRenderContexts = new Map();
 
 	}
 
