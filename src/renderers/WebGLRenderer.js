@@ -475,7 +475,7 @@ class WebGLRenderer {
 			programCache = new WebGLPrograms( _this, environments, extensions, capabilities, bindingStates, clipping );
 			materials = new WebGLMaterials( _this, properties );
 			renderLists = new WebGLRenderLists();
-			renderStates = new WebGLRenderStates( extensions );
+			renderStates = new WebGLRenderStates();
 			background = new WebGLBackground( _this, environments, state, objects, _alpha, premultipliedAlpha );
 			shadowMap = new WebGLShadowMap( _this, objects, capabilities );
 			uniformsGroups = new WebGLUniformsGroups( _gl, info, capabilities, state );

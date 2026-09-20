@@ -70,8 +70,7 @@ export * from './interactive/SelectionBox.js';
 export * from './interactive/SelectionHelper.js';
 
 export * from './lights/LightProbeGenerator.js';
-export * from './lights/RectAreaLightTexturesLib.js';
-export * from './lights/RectAreaLightUniformsLib.js';
+export * from './lights/RectAreaLight.js';
 
 export * from './lines/Line2.js';
 export * from './lines/LineGeometry.js';

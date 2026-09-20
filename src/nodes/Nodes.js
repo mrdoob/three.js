@@ -119,7 +119,6 @@ export { default as LightsNode } from './lighting/LightsNode.js';
 export { default as PointLightNode } from './lighting/PointLightNode.js';
 export { default as PointShadowNode } from './lighting/PointShadowNode.js';
 export { default as ProjectorLightNode } from './lighting/ProjectorLightNode.js';
-export { default as RectAreaLightNode } from './lighting/RectAreaLightNode.js';
 export { default as ShadowBaseNode } from './lighting/ShadowBaseNode.js';
 export { default as ShadowNode } from './lighting/ShadowNode.js';
 export { default as SpotLightNode } from './lighting/SpotLightNode.js';

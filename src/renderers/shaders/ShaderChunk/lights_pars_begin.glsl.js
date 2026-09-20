@@ -199,10 +199,9 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 		vec3 halfHeight;
 	};
 
-	// Pre-computed values of LinearTransformedCosine approximation of BRDF
-	// BRDF approximation Texture is 64x64
-	uniform sampler2D ltc_1; // RGBA Float
-	uniform sampler2D ltc_2; // RGBA Float
+	// Generated LTC matrix corrections and GGX amplitude residuals.
+	uniform sampler2D ltc_1; // 64x64 RGBA
+	uniform sampler2D ltc_2; // 32x32 RG
 
 	uniform RectAreaLight rectAreaLights[ NUM_RECT_AREA_LIGHTS ];
 

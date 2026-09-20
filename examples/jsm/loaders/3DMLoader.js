@@ -20,7 +20,6 @@ import {
 	PointLight,
 	Points,
 	PointsMaterial,
-	RectAreaLight,
 	RepeatWrapping,
 	SpotLight,
 	Sprite,
@@ -29,6 +28,7 @@ import {
 	EquirectangularReflectionMapping
 } from 'three';
 
+import { RectAreaLight } from '../lights/RectAreaLight.js';
 import { EXRLoader } from '../loaders/EXRLoader.js';
 
 const _taskCache = new WeakMap();

@@ -1,4 +1,4 @@
-import { RectAreaLight } from '../../../../src/lights/RectAreaLight.js';
+import { RectAreaLight } from '../../../../examples/jsm/lights/RectAreaLight.js';
 
 import { Light } from '../../../../src/lights/Light.js';
 import { runStdLightTests } from '../../utils/qunit-utils.js';
@@ -93,7 +93,7 @@ export default QUnit.module( 'Lights', () => {
 		// OTHERS
 		QUnit.test( 'Standard light tests', ( assert ) => {
 
-			runStdLightTests( assert, lights );
+			runStdLightTests( assert, lights, false );
 
 		} );
 

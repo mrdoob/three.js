@@ -1,22 +1,19 @@
-import AnalyticLightNode from './AnalyticLightNode.js';
-import { texture } from '../accessors/TextureNode.js';
-import { uniform } from '../core/UniformNode.js';
-import { lightViewPosition } from '../accessors/Lights.js';
-import { renderGroup } from '../core/UniformGroupNode.js';
-
-import { Matrix4 } from '../../math/Matrix4.js';
-import { Vector3 } from '../../math/Vector3.js';
-import { NodeUpdateType } from '../core/constants.js';
+import { Matrix4, Vector3 } from 'three';
+import { AnalyticLightNode, NodeUpdateType } from 'three/webgpu';
+import { lightViewPosition, renderGroup, texture, uniform } from 'three/tsl';
 
 const _matrix41 = /*@__PURE__*/ new Matrix4();
 const _matrix42 = /*@__PURE__*/ new Matrix4();
 
-let _ltcLib = null;
-
 /**
- * Module for representing rect area lights as nodes.
+ * Module for representing rect area lights as nodes. Register it with the
+ * renderer's node library to use {@link RectAreaLight} with `WebGPURenderer`:
+ * ```js
+ * renderer.library.addLight( RectAreaLightNode, RectAreaLight );
+ * ```
  *
  * @augments AnalyticLightNode
+ * @three_import import { RectAreaLightNode } from 'three/addons/lights/RectAreaLightNode.js';
  */
 class RectAreaLightNode extends AnalyticLightNode {
 
@@ -86,23 +83,10 @@ class RectAreaLightNode extends AnalyticLightNode {
 
 	}
 
-	setupDirectRectArea( builder ) {
-
-		let ltc_1, ltc_2;
-
-		if ( builder.isAvailable( 'float32Filterable' ) ) {
-
-			ltc_1 = texture( _ltcLib.LTC_FLOAT_1 );
-			ltc_2 = texture( _ltcLib.LTC_FLOAT_2 );
-
-		} else {
-
-			ltc_1 = texture( _ltcLib.LTC_HALF_1 );
-			ltc_2 = texture( _ltcLib.LTC_HALF_2 );
-
-		}
+	setupDirectRectArea( /*builder*/ ) {
 
 		const { colorNode, light } = this;
+		const { ltc1, ltc2 } = light.getLTCTextures();
 
 		const lightPosition = lightViewPosition( light );
 
@@ -111,23 +95,12 @@ class RectAreaLightNode extends AnalyticLightNode {
 			lightPosition,
 			halfWidth: this.halfWidth,
 			halfHeight: this.halfHeight,
-			ltc_1,
-			ltc_2
+			ltc_1: texture( ltc1 ),
+			ltc_2: texture( ltc2 )
 		};
-
-	}
-
-	/**
-	 * Used to configure the internal BRDF approximation texture data.
-	 *
-	 * @param {RectAreaLightTexturesLib} ltc - The BRDF approximation texture data.
-	 */
-	static setLTC( ltc ) {
-
-		_ltcLib = ltc;
 
 	}
 
 }
 
-export default RectAreaLightNode;
+export { RectAreaLightNode };

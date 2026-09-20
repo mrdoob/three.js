@@ -41,7 +41,6 @@ import { SpotLight } from '../lights/SpotLight.js';
 import { PointLight } from '../lights/PointLight.js';
 import { DirectionalLight } from '../lights/DirectionalLight.js';
 import { AmbientLight } from '../lights/AmbientLight.js';
-import { RectAreaLight } from '../lights/RectAreaLight.js';
 import { LightProbe } from '../lights/LightProbe.js';
 import { OrthographicCamera } from '../cameras/OrthographicCamera.js';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
@@ -935,7 +934,8 @@ class ObjectLoader extends Loader {
 
 			case 'RectAreaLight':
 
-				object = new RectAreaLight( data.color, data.intensity, data.width, data.height );
+				warn( 'ObjectLoader: RectAreaLight is not supported.' );
+				object = new Object3D();
 
 				break;
 

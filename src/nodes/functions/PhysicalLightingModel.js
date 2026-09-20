@@ -6,7 +6,7 @@ import EnvironmentBRDF from './BSDF/EnvironmentBRDF.js';
 import F_Schlick from './BSDF/F_Schlick.js';
 import Schlick_to_F0 from './BSDF/Schlick_to_F0.js';
 import BRDF_Sheen from './BSDF/BRDF_Sheen.js';
-import { LTC_Evaluate, LTC_Uv } from './BSDF/LTC.js';
+import { LTC_Evaluate, LTC_Uv, LTC_DecodeMatrix, LTC_AmplitudeUv, LTC_DecodeAmplitude, LTC_PhysicalMass, LTC_EvaluateSpecular } from './BSDF/LTC.js';
 import LightingModel from '../core/LightingModel.js';
 import { diffuseColor, diffuseContribution, diffuseRoughness, specularColor, specularColorBlended, specularF90, roughness, metalness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, ior, thickness, transmission, attenuationDistance, attenuationColor, dispersion, retroreflectivity } from '../core/PropertyNode.js';
 import { normalView, clearcoatNormalView, normalWorld } from '../accessors/Normal.js';
@@ -709,21 +709,18 @@ class PhysicalLightingModel extends LightingModel {
 		const P = positionView.toVar();
 
 		const uv = LTC_Uv( { N, V, roughness } );
+		const dotNV = N.dot( V ).saturate().toVar();
 
 		const t1 = ltc_1.sample( uv ).toVar();
-		const t2 = ltc_2.sample( uv ).toVar();
-
-		const mInv = mat3(
-			vec3( t1.x, 0, t1.y ),
-			vec3( 0, 1, 0 ),
-			vec3( t1.z, 0, t1.w )
-		).toVar();
+		const mInv = LTC_DecodeMatrix( { value: t1, roughness, dotNV } ).toVar();
+		const amplitudeUv = LTC_AmplitudeUv( { roughness, dotNV } );
+		const t2 = LTC_DecodeAmplitude( { value: ltc_2.sample( amplitudeUv ).rg, dotNV } ).div( LTC_PhysicalMass( { mInv } ) ).toVar();
 
 		// LTC Fresnel Approximation by Stephen Hill
 		// http://blog.selfshadow.com/publications/s2016-advances/s2016_ltc_fresnel.pdf
 		const fresnel = specularColorBlended.mul( t2.x ).add( specularF90.sub( specularColorBlended ).mul( t2.y ) ).toVar();
 
-		reflectedLight.directSpecular.addAssign( lightColor.mul( fresnel ).mul( LTC_Evaluate( { N, V, P, mInv, p0, p1, p2, p3 } ) ) );
+		reflectedLight.directSpecular.addAssign( lightColor.mul( fresnel ).mul( LTC_EvaluateSpecular( { N, V, P, mInv, p0, p1, p2, p3 } ) ) );
 
 		reflectedLight.directDiffuse.addAssign( lightColor.mul( diffuseContribution ).mul( LTC_Evaluate( { N, V, P, mInv: mat3( 1, 0, 0, 0, 1, 0, 0, 0, 1 ), p0, p1, p2, p3 } ) ) );
 
@@ -732,20 +729,17 @@ class PhysicalLightingModel extends LightingModel {
 			const Ncc = clearcoatNormalView;
 
 			const uvClearcoat = LTC_Uv( { N: Ncc, V, roughness: clearcoatRoughness } );
+			const dotNVcc = Ncc.dot( V ).saturate().toVar();
 
 			const t1Clearcoat = ltc_1.sample( uvClearcoat );
-			const t2Clearcoat = ltc_2.sample( uvClearcoat );
-
-			const mInvClearcoat = mat3(
-				vec3( t1Clearcoat.x, 0, t1Clearcoat.y ),
-				vec3( 0, 1, 0 ),
-				vec3( t1Clearcoat.z, 0, t1Clearcoat.w )
-			);
+			const mInvClearcoat = LTC_DecodeMatrix( { value: t1Clearcoat, roughness: clearcoatRoughness, dotNV: dotNVcc } ).toVar();
+			const amplitudeUvClearcoat = LTC_AmplitudeUv( { roughness: clearcoatRoughness, dotNV: dotNVcc } );
+			const t2Clearcoat = LTC_DecodeAmplitude( { value: ltc_2.sample( amplitudeUvClearcoat ).rg, dotNV: dotNVcc } ).div( LTC_PhysicalMass( { mInv: mInvClearcoat } ) ).toVar();
 
 			// LTC Fresnel Approximation for clearcoat
 			const fresnelClearcoat = clearcoatF0.mul( t2Clearcoat.x ).add( clearcoatF90.sub( clearcoatF0 ).mul( t2Clearcoat.y ) );
 
-			this.clearcoatSpecularDirect.addAssign( lightColor.mul( fresnelClearcoat ).mul( LTC_Evaluate( { N: Ncc, V, P, mInv: mInvClearcoat, p0, p1, p2, p3 } ) ) );
+			this.clearcoatSpecularDirect.addAssign( lightColor.mul( fresnelClearcoat ).mul( LTC_EvaluateSpecular( { N: Ncc, V, P, mInv: mInvClearcoat, p0, p1, p2, p3 } ) ) );
 
 		}
 

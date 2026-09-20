@@ -23,7 +23,6 @@ import {
 	PointLight,
 	Quaternion,
 	QuaternionKeyframeTrack,
-	RectAreaLight,
 	RepeatWrapping,
 	ShapeUtils,
 	SkinnedMesh,
@@ -37,6 +36,8 @@ import {
 	Vector3,
 	VectorKeyframeTrack
 } from 'three';
+
+import { RectAreaLight } from '../../lights/RectAreaLight.js';
 
 // Pre-compiled regex patterns for performance
 const VARIANT_PATH_REGEX = /^(.+?)\/\{(\w+)=(\w+)\}\/(.+)$/;
