@@ -206,18 +206,18 @@ function runStdGeometryTests( assert, geometries ) {
 //
 
 // Run common light tests.
-function runStdLightTests( assert, lights, jsonRoundtrip = true ) {
+function runStdLightTests( assert, lights ) {
 
 	for ( let i = 0, l = lights.length; i < l; i ++ ) {
 
 		const light = lights[ i ];
 
 		// copy and clone
-		checkLightCopyClone( assert, light, jsonRoundtrip );
+		checkLightCopyClone( assert, light );
 
 		// THREE.Light doesn't get parsed by ObjectLoader as it's only
 		// used as an abstract base class - so we skip the JSON tests
-		if ( jsonRoundtrip && light.type !== 'Light' ) {
+		if ( light.type !== 'Light' ) {
 
 			// json round trip
 			checkLightJsonRoundtrip( assert, light );
@@ -228,7 +228,7 @@ function runStdLightTests( assert, lights, jsonRoundtrip = true ) {
 
 }
 
-function checkLightCopyClone( assert, light, jsonRoundtrip ) {
+function checkLightCopyClone( assert, light ) {
 
 	// copy
 	const newLight = new light.constructor( 0xc0ffee );
@@ -256,7 +256,7 @@ function checkLightCopyClone( assert, light, jsonRoundtrip ) {
 		clone.color.getHex(), light.color.getHex(), 'Clone light is independent from original'
 	);
 
-	if ( jsonRoundtrip && light.type !== 'Light' ) {
+	if ( light.type !== 'Light' ) {
 
 		// json round trip with clone
 		checkLightJsonRoundtrip( assert, clone );
