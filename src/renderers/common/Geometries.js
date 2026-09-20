@@ -95,12 +95,20 @@ class Geometries extends DataMap {
 	/**
 	 * Constructs a new geometry management component.
 	 *
+	 * @param {Backend} backend - The renderer's backend.
 	 * @param {Attributes} attributes - Renderer component for managing attributes.
 	 * @param {Info} info - Renderer component for managing metrics and monitoring data.
 	 */
-	constructor( attributes, info ) {
+	constructor( backend, attributes, info ) {
 
 		super();
+
+		/**
+		 * The renderer's backend.
+		 *
+		 * @type {Backend}
+		 */
+		this.backend = backend;
 
 		/**
 		 * Renderer component for managing attributes.
@@ -416,6 +424,17 @@ class Geometries extends DataMap {
 			}
 
 		}
+
+	}
+
+	/**
+	 * Deletes the vertex state for the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 */
+	deleteVertexState( renderObject ) {
+
+		this.backend.deleteVertexState( renderObject );
 
 	}
 
