@@ -5,6 +5,7 @@ import {
 	HalfFloatType,
 	Light,
 	LinearFilter,
+	NearestFilter,
 	RGBAFormat,
 	RGFormat,
 	UVMapping
@@ -265,8 +266,8 @@ function generateTextures() {
 
 	}
 
-	const ltc1 = new DataTexture( matrixData, 64, 64, RGBAFormat, HalfFloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, LinearFilter, 1 );
-	const ltc2 = new DataTexture( amplitudeData, 64, 64, RGFormat, HalfFloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, LinearFilter, 1 );
+	const ltc1 = new DataTexture( matrixData, 64, 64, RGBAFormat, HalfFloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, NearestFilter, 1 );
+	const ltc2 = new DataTexture( amplitudeData, 64, 64, RGFormat, HalfFloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, NearestFilter, 1 );
 
 	ltc1.needsUpdate = true;
 	ltc2.needsUpdate = true;
