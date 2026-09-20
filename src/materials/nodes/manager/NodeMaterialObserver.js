@@ -265,14 +265,12 @@ class NodeMaterialObserver {
 
 			}
 
-			if ( renderObject.material.transmission > 0 ) {
+			// global data
 
-				const { width, height } = renderObject.context;
+			const { width, height } = renderObject.context;
 
-				data.bufferWidth = width;
-				data.bufferHeight = height;
-
-			}
+			data.bufferWidth = width;
+			data.bufferHeight = height;
 
 			const { environmentIntensity, environmentRotation } = renderObject.scene;
 
@@ -593,18 +591,14 @@ class NodeMaterialObserver {
 
 		}
 
-		if ( materialData.transmission > 0 ) {
+		const { width, height } = renderObject.context;
 
-			const { width, height } = renderObject.context;
+		if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
 
-			if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
+			renderObjectData.bufferWidth = width;
+			renderObjectData.bufferHeight = height;
 
-				renderObjectData.bufferWidth = width;
-				renderObjectData.bufferHeight = height;
-
-				return false;
-
-			}
+			return false;
 
 		}
 
