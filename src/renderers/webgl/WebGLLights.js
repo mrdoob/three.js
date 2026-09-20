@@ -171,6 +171,7 @@ function WebGLLights() {
 			pointLength: - 1,
 			spotLength: - 1,
 			rectAreaLength: - 1,
+			rectAreaLTCShader: '',
 			hemiLength: - 1,
 
 			numSunShadows: - 1,
@@ -201,6 +202,7 @@ function WebGLLights() {
 		rectArea: [],
 		rectAreaLTC1: null,
 		rectAreaLTC2: null,
+		rectAreaLTCShader: '',
 		point: [],
 		pointShadow: [],
 		pointShadowMap: [],
@@ -220,6 +222,7 @@ function WebGLLights() {
 	function setup( lights ) {
 
 		let r = 0, g = 0, b = 0;
+		state.rectAreaLTCShader = '';
 
 		for ( let i = 0; i < 9; i ++ ) state.probe[ i ].set( 0, 0, 0 );
 
@@ -413,6 +416,7 @@ function WebGLLights() {
 
 					state.rectAreaLTC1 = ltc1;
 					state.rectAreaLTC2 = ltc2;
+					state.rectAreaLTCShader = light.getLTCShader();
 
 				}
 
@@ -487,6 +491,7 @@ function WebGLLights() {
 			hash.pointLength !== pointLength ||
 			hash.spotLength !== spotLength ||
 			hash.rectAreaLength !== rectAreaLength ||
+			hash.rectAreaLTCShader !== state.rectAreaLTCShader ||
 			hash.hemiLength !== hemiLength ||
 			hash.numSunShadows !== numSunShadows ||
 			hash.numDirectionalShadows !== numDirectionalShadows ||
@@ -524,6 +529,7 @@ function WebGLLights() {
 			hash.pointLength = pointLength;
 			hash.spotLength = spotLength;
 			hash.rectAreaLength = rectAreaLength;
+			hash.rectAreaLTCShader = state.rectAreaLTCShader;
 			hash.hemiLength = hemiLength;
 
 			hash.numSunShadows = numSunShadows;

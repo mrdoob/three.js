@@ -1,6 +1,7 @@
 import { Matrix4, Vector3 } from 'three';
 import { AnalyticLightNode, NodeUpdateType } from 'three/webgpu';
 import { lightViewPosition, renderGroup, texture, uniform } from 'three/tsl';
+import { LTC_Sample, LTC_EvaluateSpecular } from '../tsl/lighting/RectAreaLightLTC.js';
 
 const _matrix41 = /*@__PURE__*/ new Matrix4();
 const _matrix42 = /*@__PURE__*/ new Matrix4();
@@ -87,6 +88,8 @@ class RectAreaLightNode extends AnalyticLightNode {
 
 		const { colorNode, light } = this;
 		const { ltc1, ltc2 } = light.getLTCTextures();
+		const matrixTexture = texture( ltc1 );
+		const amplitudeTexture = texture( ltc2 );
 
 		const lightPosition = lightViewPosition( light );
 
@@ -95,8 +98,10 @@ class RectAreaLightNode extends AnalyticLightNode {
 			lightPosition,
 			halfWidth: this.halfWidth,
 			halfHeight: this.halfHeight,
-			ltc_1: texture( ltc1 ),
-			ltc_2: texture( ltc2 )
+			ltc: {
+				sample: ( N, V, roughness ) => LTC_Sample( matrixTexture, amplitudeTexture, N, V, roughness ),
+				evaluate: LTC_EvaluateSpecular
+			}
 		};
 
 	}

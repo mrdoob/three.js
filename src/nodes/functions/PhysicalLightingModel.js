@@ -6,7 +6,7 @@ import EnvironmentBRDF from './BSDF/EnvironmentBRDF.js';
 import F_Schlick from './BSDF/F_Schlick.js';
 import Schlick_to_F0 from './BSDF/Schlick_to_F0.js';
 import BRDF_Sheen from './BSDF/BRDF_Sheen.js';
-import { LTC_Evaluate, LTC_Uv, LTC_DecodeMatrix, LTC_AmplitudeUv, LTC_DecodeAmplitude, LTC_PhysicalMass, LTC_EvaluateSpecular } from './BSDF/LTC.js';
+import { LTC_Evaluate } from './BSDF/LTC.js';
 import LightingModel from '../core/LightingModel.js';
 import { diffuseColor, diffuseContribution, diffuseRoughness, specularColor, specularColorBlended, specularF90, roughness, metalness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, ior, thickness, transmission, attenuationDistance, attenuationColor, dispersion, retroreflectivity } from '../core/PropertyNode.js';
 import { normalView, clearcoatNormalView, normalWorld } from '../accessors/Normal.js';
@@ -697,7 +697,7 @@ class PhysicalLightingModel extends LightingModel {
 	 * @param {Object} input - The input data.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	directRectArea( { lightColor, lightPosition, halfWidth, halfHeight, reflectedLight, ltc_1, ltc_2 }, /* builder */ ) {
+	directRectArea( { lightColor, lightPosition, halfWidth, halfHeight, reflectedLight, ltc }, /* builder */ ) {
 
 		const p0 = lightPosition.add( halfWidth ).sub( halfHeight ); // counterclockwise; light shines in local neg z direction
 		const p1 = lightPosition.sub( halfWidth ).sub( halfHeight );
@@ -708,19 +708,13 @@ class PhysicalLightingModel extends LightingModel {
 		const V = positionViewDirection;
 		const P = positionView.toVar();
 
-		const uv = LTC_Uv( { N, V, roughness } );
-		const dotNV = N.dot( V ).saturate().toVar();
-
-		const t1 = ltc_1.sample( uv ).toVar();
-		const mInv = LTC_DecodeMatrix( { value: t1, roughness, dotNV } ).toVar();
-		const amplitudeUv = LTC_AmplitudeUv( { roughness, dotNV } );
-		const t2 = LTC_DecodeAmplitude( { value: ltc_2.sample( amplitudeUv ).rg, dotNV } ).div( LTC_PhysicalMass( { mInv } ) ).toVar();
+		const { mInv, amplitude } = ltc.sample( N, V, roughness );
 
 		// LTC Fresnel Approximation by Stephen Hill
 		// http://blog.selfshadow.com/publications/s2016-advances/s2016_ltc_fresnel.pdf
-		const fresnel = specularColorBlended.mul( t2.x ).add( specularF90.sub( specularColorBlended ).mul( t2.y ) ).toVar();
+		const fresnel = specularColorBlended.mul( amplitude.x ).add( specularF90.sub( specularColorBlended ).mul( amplitude.y ) ).toVar();
 
-		reflectedLight.directSpecular.addAssign( lightColor.mul( fresnel ).mul( LTC_EvaluateSpecular( { N, V, P, mInv, p0, p1, p2, p3 } ) ) );
+		reflectedLight.directSpecular.addAssign( lightColor.mul( fresnel ).mul( ltc.evaluate( { N, V, P, mInv, p0, p1, p2, p3 } ) ) );
 
 		reflectedLight.directDiffuse.addAssign( lightColor.mul( diffuseContribution ).mul( LTC_Evaluate( { N, V, P, mInv: mat3( 1, 0, 0, 0, 1, 0, 0, 0, 1 ), p0, p1, p2, p3 } ) ) );
 
@@ -728,18 +722,12 @@ class PhysicalLightingModel extends LightingModel {
 
 			const Ncc = clearcoatNormalView;
 
-			const uvClearcoat = LTC_Uv( { N: Ncc, V, roughness: clearcoatRoughness } );
-			const dotNVcc = Ncc.dot( V ).saturate().toVar();
-
-			const t1Clearcoat = ltc_1.sample( uvClearcoat );
-			const mInvClearcoat = LTC_DecodeMatrix( { value: t1Clearcoat, roughness: clearcoatRoughness, dotNV: dotNVcc } ).toVar();
-			const amplitudeUvClearcoat = LTC_AmplitudeUv( { roughness: clearcoatRoughness, dotNV: dotNVcc } );
-			const t2Clearcoat = LTC_DecodeAmplitude( { value: ltc_2.sample( amplitudeUvClearcoat ).rg, dotNV: dotNVcc } ).div( LTC_PhysicalMass( { mInv: mInvClearcoat } ) ).toVar();
+			const { mInv: mInvClearcoat, amplitude: amplitudeClearcoat } = ltc.sample( Ncc, V, clearcoatRoughness );
 
 			// LTC Fresnel Approximation for clearcoat
-			const fresnelClearcoat = clearcoatF0.mul( t2Clearcoat.x ).add( clearcoatF90.sub( clearcoatF0 ).mul( t2Clearcoat.y ) );
+			const fresnelClearcoat = clearcoatF0.mul( amplitudeClearcoat.x ).add( clearcoatF90.sub( clearcoatF0 ).mul( amplitudeClearcoat.y ) );
 
-			this.clearcoatSpecularDirect.addAssign( lightColor.mul( fresnelClearcoat ).mul( LTC_EvaluateSpecular( { N: Ncc, V, P, mInv: mInvClearcoat, p0, p1, p2, p3 } ) ) );
+			this.clearcoatSpecularDirect.addAssign( lightColor.mul( fresnelClearcoat ).mul( ltc.evaluate( { N: Ncc, V, P, mInv: mInvClearcoat, p0, p1, p2, p3 } ) ) );
 
 		}
 

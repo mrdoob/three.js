@@ -9,6 +9,7 @@ import {
 	RGFormat,
 	UVMapping
 } from 'three';
+import shader from './RectAreaLightShader.js';
 
 let _ltcTextures = null;
 
@@ -165,6 +166,17 @@ class RectAreaLight extends Light {
 		}
 
 		return _ltcTextures;
+
+	}
+
+	/**
+	 * Returns the LTC shader used by WebGLRenderer.
+	 *
+	 * @return {string} The rectangular area light shader.
+	 */
+	getLTCShader() {
+
+		return shader;
 
 	}
 
