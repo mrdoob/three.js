@@ -105,19 +105,26 @@
 				const colorSnow = uniform( color( '#ffffff' ) );
 				const colorRock = uniform( color( '#bfbd8d' ) );
 
+				const params = {
+					precision: '32-bit'
+				};
+
+				const getPrecision = () => params.precision === '16-bit' ? 16 : 32;
+				const precisionScope = ( node ) => node.setPrecision( getPrecision() );
+
 				const vNormal = varying( vec3() );
 				const vPosition = varying( vec3() );
 
 				const terrainElevation = Fn( ( [ position ] ) => {
 
 					const warpedPosition = position.add( offset ).toVar();
-					warpedPosition.addAssign( mx_noise_float( warpedPosition.mul( positionFrequency ).mul( warpFrequency ), 1, 0 ).mul( warpStrength ) );
+					warpedPosition.addAssign( mx_noise_float( warpedPosition.mul( positionFrequency ).mul( warpFrequency ), 1, 0 ).setPrecision( 32 ).mul( warpStrength ) );
 			
 					const elevation = float( 0 ).toVar();
 					Loop( { type: 'float', start: float( 1 ), end: noiseIterations.toFloat(), condition: '<=' }, ( { i } ) => {
 
 						const noiseInput = warpedPosition.mul( positionFrequency ).mul( i.mul( 2 ) ).add( i.mul( 987 ) );
-						const noise = mx_noise_float( noiseInput, 1, 0 ).div( i.add( 1 ).mul( 2 ) );
+						const noise = mx_noise_float( noiseInput, 1, 0 ).setPrecision( 32 ).div( i.add( 1 ).mul( 2 ) );
 						elevation.addAssign( noise );
 			
 					} );
@@ -129,7 +136,7 @@
 			
 				} );
 
-				material.positionNode = Fn( () => {
+				const terrainPosition = Fn( () => {
 
 					// neighbours positions
 
@@ -139,11 +146,11 @@
 					// elevations
 
 					const position = positionLocal.xyz.toVar();
-					const elevation = terrainElevation( positionLocal.xz );
+					const elevation = precisionScope( terrainElevation( positionLocal.xz ) );
 					position.y.addAssign( elevation );
 			
-					neighbourA.y.addAssign( terrainElevation( neighbourA.xz ) );
-					neighbourB.y.addAssign( terrainElevation( neighbourB.xz ) );
+					neighbourA.y.addAssign( precisionScope( terrainElevation( neighbourA.xz ) ) );
+					neighbourB.y.addAssign( precisionScope( terrainElevation( neighbourB.xz ) ) );
 
 					// compute normal
 
@@ -157,11 +164,9 @@
 
 					return position;
 			
-				} )();
+				} );
 
-				material.normalNode = transformNormalToView( vNormal );
-
-				material.colorNode = Fn( () => {
+				const terrainColor = Fn( () => {
 
 					const finalColor = colorSand.toVar();
 
@@ -177,13 +182,15 @@
 
 					// snow
 
-					const snowThreshold = mx_noise_float( vPosition.xz.mul( 25 ), 1, 0 ).mul( 0.1 ).add( 0.45 );
+					const snowThreshold = mx_noise_float( vPosition.xz.mul( 25 ), 1, 0 ).setPrecision( 32 ).mul( 0.1 ).add( 0.45 );
 					const snowMix = step( snowThreshold, vPosition.y );
 					finalColor.assign( snowMix.mix( finalColor, colorSnow ) );
 
 					return finalColor;
 			
-				} )();
+				} );
+
+				updatePrecisionNodes();
 
 				const geometry = new THREE.PlaneGeometry( 10, 10, 500, 500 );
 				geometry.deleteAttribute( 'uv' );
@@ -298,6 +305,11 @@
 
 				const terrainGui = gui.addFolder( '🏔️ terrain' );
 
+				terrainGui.add( params, 'precision', [ '32-bit', '16-bit' ] ).name( 'precision' ).onChange( () => {
+
+					updatePrecisionNodes();
+
+				} );
 				terrainGui.add( noiseIterations, 'value', 0, 10, 1 ).name( 'noiseIterations' );
 				terrainGui.add( positionFrequency, 'value', 0, 1, 0.001 ).name( 'positionFrequency' );
 				terrainGui.add( strength, 'value', 0, 20, 0.001 ).name( 'strength' );
@@ -350,6 +362,15 @@
 				} );
 
 				window.addEventListener( 'resize', onWindowResize );
+
+				function updatePrecisionNodes() {
+
+					material.positionNode = terrainPosition();
+					material.normalNode = transformNormalToView( vNormal );
+					material.colorNode = terrainColor();
+					material.needsUpdate = true;
+
+				}
 
 			}
 

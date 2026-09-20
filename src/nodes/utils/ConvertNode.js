@@ -88,10 +88,11 @@ class ConvertNode extends Node {
 
 		const node = this.node;
 		const type = this.getNodeType( builder );
+		const inputType = builder.getBaseType ? builder.getBaseType( type ) : type;
 
-		const snippet = node.build( builder, type );
+		const snippet = node.build( builder, inputType );
 
-		return builder.format( snippet, type, output );
+		return builder.format( snippet, inputType, output || type );
 
 	}
 

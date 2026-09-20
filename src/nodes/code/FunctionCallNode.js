@@ -95,7 +95,7 @@ class FunctionCallNode extends TempNode {
 
 	}
 
-	generate( builder ) {
+	generate( builder, output ) {
 
 		const params = [];
 
@@ -106,15 +106,24 @@ class FunctionCallNode extends TempNode {
 
 		const generateInput = ( node, inputNode ) => {
 
-			const type = inputNode.type;
+			const type = builder.getBaseType ? builder.getBaseType( inputNode.type ) : inputNode.type;
 			const pointer = type === 'pointer';
 
-			let output;
+			let snippet;
 
-			if ( pointer ) output = '&' + node.build( builder );
-			else output = node.build( builder, type );
+			if ( pointer ) {
 
-			return output;
+				snippet = '&' + node.build( builder );
+
+			} else {
+
+				const previousContext = builder.addContext( { precision: null } );
+				snippet = node.build( builder, type );
+				builder.setContext( previousContext );
+
+			}
+
+			return snippet;
 
 		};
 
@@ -167,8 +176,10 @@ class FunctionCallNode extends TempNode {
 		}
 
 		const functionName = functionNode.build( builder, 'property' );
+		const type = builder.getBaseType ? builder.getBaseType( functionNode.getNodeType( builder ) ) : functionNode.getNodeType( builder );
+		const targetType = output || this.getNodeType( builder );
 
-		return `${ functionName }( ${ params.join( ', ' ) } )`;
+		return builder.format( `${ functionName }( ${ params.join( ', ' ) } )`, type, targetType );
 
 	}
 
