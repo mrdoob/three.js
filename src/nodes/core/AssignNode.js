@@ -1,4 +1,4 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 import { vectorComponents } from '../core/constants.js';
 
@@ -6,9 +6,9 @@ import { vectorComponents } from '../core/constants.js';
  * These node represents an assign operation. Meaning a node is assigned
  * to another node.
  *
- * @augments TempNode
+ * @augments Node
  */
-class AssignNode extends TempNode {
+class AssignNode extends Node {
 
 	static get type() {
 
@@ -52,12 +52,12 @@ class AssignNode extends TempNode {
 	}
 
 	/**
-	 * Whether this node is used more than once in context of other nodes. This method
-	 * is overwritten since it always returns `false` (assigns are unique).
+	 * Assignments must not be cached in temporary variables.
 	 *
-	 * @return {boolean} A flag that indicates if there is more than one dependency to other nodes. Always `false`.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {boolean} Always `false`.
 	 */
-	hasDependencies() {
+	isCacheable( /*builder*/ ) {
 
 		return false;
 

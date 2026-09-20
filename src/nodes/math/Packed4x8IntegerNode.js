@@ -1,4 +1,4 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { nodeProxyIntent, Fn, uint, int, ivec4, uvec4 } from '../tsl/TSLCore.js';
 import { clamp } from './MathNode.js';
 
@@ -7,9 +7,9 @@ import { clamp } from './MathNode.js';
  * language extension. If the extension is not available, the node falls back to an
  * emulation with plain integer bit operations.
  *
- * @augments TempNode
+ * @augments Node
  */
-class Packed4x8IntegerNode extends TempNode {
+class Packed4x8IntegerNode extends Node {
 
 	static get type() {
 

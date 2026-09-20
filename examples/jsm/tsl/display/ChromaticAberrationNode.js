@@ -1,4 +1,4 @@
-import { TempNode } from 'three/webgpu';
+import { Node } from 'three/webgpu';
 import {
 	nodeObject,
 	Fn,
@@ -13,10 +13,10 @@ import {
  * This effect simulates the color fringing that occurs in real camera lenses
  * by separating and offsetting the red, green, and blue channels.
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { chromaticAberration } from 'three/addons/tsl/display/ChromaticAberrationNode.js';
  */
-class ChromaticAberrationNode extends TempNode {
+class ChromaticAberrationNode extends Node {
 
 	static get type() {
 

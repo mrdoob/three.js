@@ -44,6 +44,12 @@ class InspectorNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Returns the name of the inspector node.
 	 *

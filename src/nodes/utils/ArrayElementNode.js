@@ -6,7 +6,7 @@ import Node from '../core/Node.js';
  *
  * @augments Node
  */
-class ArrayElementNode extends Node { // @TODO: If extending from TempNode it breaks webgpu_compute
+class ArrayElementNode extends Node {
 
 	static get type() {
 
@@ -46,6 +46,12 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 		 * @default true
 		 */
 		this.isArrayElementNode = true;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 

@@ -1,5 +1,5 @@
 import { error } from '../../utils.js';
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { nodeProxyIntent } from '../tsl/TSLCore.js';
 
 
@@ -12,9 +12,9 @@ import { nodeProxyIntent } from '../tsl/TSLCore.js';
  * other graphics APIs, subgroup functions are also referred to as wave intrinsics
  * (DirectX/HLSL) or warp intrinsics (CUDA).
  *
- * @augments TempNode
+ * @augments Node
  */
-class SubgroupFunctionNode extends TempNode {
+class SubgroupFunctionNode extends Node {
 
 	static get type() {
 
