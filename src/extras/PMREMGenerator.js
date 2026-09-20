@@ -1,6 +1,7 @@
 import {
 	CubeReflectionMapping,
 	CubeRefractionMapping,
+	LinearFilter,
 	LinearMipmapLinearFilter,
 	NoBlending,
 	HalfFloatType,
@@ -16,6 +17,7 @@ import { Color } from '../math/Color.js';
 import { floorPowerOfTwo } from '../math/MathUtils.js';
 import { Vector3 } from '../math/Vector3.js';
 import { ShaderChunk } from '../renderers/shaders/ShaderChunk.js';
+import { copyFragment, blurFragment } from '../renderers/shaders/ShaderLib/backgroundBlur.glsl.js';
 import { WebGLCubeRenderTarget } from '../renderers/WebGLCubeRenderTarget.js';
 
 // Smaller inputs are upsampled so that every PMREM has enough mip levels.
@@ -63,6 +65,10 @@ class PMREMGenerator {
 
 		this._cubeSize = 0;
 		this._sourceTarget = null;
+		this._backgroundTexture = null;
+		this._backgroundVersion = - 1;
+		this._backgroundCache = new WeakMap();
+		this._backgroundMaterial = null;
 
 		this._cubeCamera = new CubeCamera( 1, 10, null );
 		this._boxMesh = new Mesh( new BoxGeometry( 5, 5, 5 ), null );
@@ -99,6 +105,7 @@ class PMREMGenerator {
 		const renderer = this._renderer;
 
 		this._setSize( size );
+		this._backgroundTexture = null;
 
 		const pmremTarget = this._allocateTarget();
 		const sourceTarget = this._getSourceTarget( true );
@@ -216,6 +223,7 @@ class PMREMGenerator {
 	dispose() {
 
 		if ( this._sourceTarget !== null ) this._sourceTarget.dispose();
+		if ( this._backgroundMaterial !== null ) this._backgroundMaterial.dispose();
 
 		if ( this._cubemapMaterial !== null ) this._cubemapMaterial.dispose();
 		if ( this._equirectMaterial !== null ) this._equirectMaterial.dispose();
@@ -267,6 +275,98 @@ class PMREMGenerator {
 		this._applyPMREM( pmremTarget );
 
 		return pmremTarget;
+
+	}
+
+	/**
+	 * Blurs an environment into a plain cube texture without GGX filtering.
+	 *
+	 * @private
+	 * @param {Texture} texture - The environment texture.
+	 * @param {number} sigma - The blur radius in radians.
+	 * @param {?WebGLCubeRenderTarget} [renderTarget=null] - A previous result to update.
+	 * @return {WebGLCubeRenderTarget} The blurred environment.
+	 */
+	_fromTextureBlur( texture, sigma, renderTarget = null ) {
+
+		this._setSize( MIN_SIZE );
+
+		const size = Math.min( Math.max( floorPowerOfTwo( 6 / sigma ), 16 ), MIN_SIZE );
+		const sourceSize = Math.min( 2 * size, MIN_SIZE );
+		const spacing = 2 / sourceSize;
+		const texel = 2 / size;
+
+		// Remove the variance added by source interpolation and cubic reconstruction.
+		const bakeSigma = Math.fround( Math.max( Math.sqrt( Math.max( sigma * sigma - texel * texel / 3 - spacing * spacing / 6, 0 ) ), 0.25 * texel ) );
+
+		if ( renderTarget !== null && renderTarget.width !== size ) {
+
+			renderTarget.dispose();
+			renderTarget = null;
+
+		}
+
+		const target = renderTarget || _createRenderTarget( size, false, false, LinearFilter );
+		const cache = this._backgroundCache;
+		const cached = cache.get( target );
+
+		if ( cached !== undefined && cached.texture === texture && cached.pmremVersion === texture.pmremVersion && cached.sigma === bakeSigma ) return target;
+
+		if ( this._backgroundMaterial === null ) {
+
+			this._backgroundMaterial = _getMaterial( 'BackgroundBlur', {
+				'envMap': { value: null },
+				'sigma': { value: 0 },
+				'level': { value: 0 },
+				'spacing': { value: 0 },
+				'radius': { value: 0 }
+			}, blurFragment );
+
+		}
+
+		const renderer = this._renderer;
+		const autoClear = renderer.autoClear;
+		renderer.autoClear = false;
+
+		try {
+
+			if ( this._backgroundTexture !== texture || this._backgroundVersion !== texture.pmremVersion ) {
+
+				this._textureToCubemap( texture, true );
+				this._backgroundTexture = texture;
+				this._backgroundVersion = texture.pmremVersion;
+
+			}
+
+			const uniforms = this._backgroundMaterial.uniforms;
+			uniforms.envMap.value = this._sourceTarget.texture;
+			uniforms.sigma.value = bakeSigma;
+			uniforms.level.value = Math.log2( MIN_SIZE / sourceSize );
+			uniforms.spacing.value = spacing;
+			uniforms.radius.value = size > 16 ? 12 * sourceSize / size : 0;
+
+			this._renderCube( target, 0, this._backgroundMaterial );
+
+		} finally {
+
+			renderer.autoClear = autoClear;
+
+		}
+
+		if ( cached === undefined ) {
+
+			target.addEventListener( 'dispose', function onDispose( event ) {
+
+				cache.delete( event.target );
+				event.target.removeEventListener( 'dispose', onDispose );
+
+			} );
+
+		}
+
+		cache.set( target, { texture, pmremVersion: texture.pmremVersion, sigma: bakeSigma } );
+
+		return target;
 
 	}
 
@@ -347,7 +447,10 @@ class PMREMGenerator {
 
 	}
 
-	_textureToCubemap( texture ) {
+	_textureToCubemap( texture, forceLevelZero = false ) {
+
+		// Lighting captures overwrite the source cached for background blur.
+		this._backgroundTexture = null;
 
 		let material;
 
@@ -375,6 +478,7 @@ class PMREMGenerator {
 		}
 
 		material.uniforms.envMap.value = texture;
+		material.uniforms.forceLevelZero.value = forceLevelZero;
 
 		this._renderCube( this._getSourceTarget(), 0, material );
 
@@ -437,11 +541,10 @@ class PMREMGenerator {
 	}
 
 	/**
-	 * Applies the initial fromScene() blur in two passes using a golden-angle
-	 * spiral kernel. Level 0 of the PMREM serves as the intermediate target.
+	 * Blurs the source cubemap in two passes using a golden-angle spiral kernel.
 	 *
 	 * @private
-	 * @param {WebGLCubeRenderTarget} pmremTarget - The PMREM.
+	 * @param {WebGLCubeRenderTarget} pmremTarget - The intermediate target.
 	 * @param {number} sigma - The blur radius in radians.
 	 */
 	_blur( pmremTarget, sigma ) {
@@ -471,10 +574,10 @@ class PMREMGenerator {
 
 }
 
-function _createRenderTarget( size, generateMipmaps, depthBuffer ) {
+function _createRenderTarget( size, generateMipmaps, depthBuffer, minFilter = LinearMipmapLinearFilter ) {
 
 	return new WebGLCubeRenderTarget( size, {
-		minFilter: LinearMipmapLinearFilter,
+		minFilter: minFilter,
 		generateMipmaps: generateMipmaps,
 		type: HalfFloatType,
 		colorSpace: LinearSRGBColorSpace,
@@ -721,51 +824,23 @@ function _getBlurMaterial() {
 function _getEquirectMaterial() {
 
 	return _getMaterial( 'PMREMEquirectangularToCubemap', {
-		'envMap': { value: null }
-	}, /* glsl */`
-
-		varying vec3 vWorldDirection;
-
-		uniform sampler2D envMap;
-
-		#include <common>
-
-		void main() {
-
-			// Average four subpixel samples to preserve small, bright features.
-			vec3 direction = normalize( vWorldDirection );
-			vec3 dx = dFdx( direction ) * 0.25;
-			vec3 dy = dFdy( direction ) * 0.25;
-
-			vec3 color = textureLod( envMap, equirectUv( normalize( direction - dx - dy ) ), 0.0 ).rgb;
-			color += textureLod( envMap, equirectUv( normalize( direction + dx - dy ) ), 0.0 ).rgb;
-			color += textureLod( envMap, equirectUv( normalize( direction - dx + dy ) ), 0.0 ).rgb;
-			color += textureLod( envMap, equirectUv( normalize( direction + dx + dy ) ), 0.0 ).rgb;
-			gl_FragColor = vec4( color * 0.25, 1.0 );
-
-		}
-	` );
+		'envMap': { value: null },
+		'forceLevelZero': { value: false }
+	}, copyFragment );
 
 }
 
 function _getCubemapMaterial() {
 
-	return _getMaterial( 'PMREMCubemapToCubemap', {
+	const material = _getMaterial( 'PMREMCubemapToCubemap', {
 		'envMap': { value: null },
-		'flipEnvMap': { value: - 1 }
-	}, /* glsl */`
+		'flipEnvMap': { value: - 1 },
+		'forceLevelZero': { value: false }
+	}, copyFragment );
 
-		varying vec3 vWorldDirection;
+	material.defines = { CUBEMAP_SOURCE: '' };
 
-		uniform samplerCube envMap;
-		uniform float flipEnvMap;
-
-		void main() {
-
-			gl_FragColor = vec4( textureCube( envMap, vec3( flipEnvMap * vWorldDirection.x, vWorldDirection.yz ) ).rgb, 1.0 );
-
-		}
-	` );
+	return material;
 
 }
 

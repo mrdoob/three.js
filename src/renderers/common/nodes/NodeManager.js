@@ -3,6 +3,7 @@ import ChainMap from '../ChainMap.js';
 import NodeBuilderState from './NodeBuilderState.js';
 import NodeMaterial from '../../../materials/nodes/NodeMaterial.js';
 import { cubeMapNode } from '../../../nodes/utils/CubeMapNode.js';
+import { backgroundBlur } from './BackgroundBlurNode.js';
 import { NodeFrame, NodeUpdateType, StackTrace } from '../../../nodes/Nodes.js';
 import { renderGroup, cubeTexture, texture, fog, rangeFogFactor, densityFogFactor, reference, pmremTexture, screenUV, uniform } from '../../../nodes/TSL.js';
 import { builtin } from '../../../nodes/accessors/BuiltinNode.js';
@@ -743,47 +744,57 @@ class NodeManager extends DataMap {
 
 			if ( sceneData.background !== background || forceUpdate ) {
 
-				const backgroundNode = this.getCacheNode( 'background', background, () => {
+				const isEnvironmentMap = background.isCubeTexture === true || background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping;
+				let backgroundNode;
 
-					if ( background.isCubeTexture === true || background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping ) {
+				if ( isEnvironmentMap && scene.backgroundBlurriness > 0 ) {
 
-						if ( scene.backgroundBlurriness > 0 || background.isPMREMTexture === true ) {
+					backgroundNode = this.getCacheNode( 'backgroundBlur', scene, () => backgroundBlur( background ) );
+					backgroundNode.sourceTexture = background;
 
-							return pmremTexture( background );
+				} else {
 
-						} else {
+					backgroundNode = this.getCacheNode( 'background', background, () => {
 
-							let envMap;
+						if ( isEnvironmentMap ) {
 
-							if ( background.isCubeTexture === true ) {
+							if ( background.isPMREMTexture === true ) {
 
-								envMap = cubeTexture( background );
+								return pmremTexture( background );
+
+							} else if ( background.isCubeTexture === true ) {
+
+								return cubeMapNode( cubeTexture( background ) );
 
 							} else {
 
-								envMap = texture( background );
+								return cubeMapNode( texture( background ) );
 
 							}
 
-							return cubeMapNode( envMap );
+						} else if ( background.isTexture === true ) {
+
+							return texture( background, screenUV.flipY() ).setUpdateMatrix( true );
+
+						} else if ( background.isColor !== true ) {
+
+							error( 'WebGPUNodes: Unsupported background configuration.', background );
 
 						}
 
-					} else if ( background.isTexture === true ) {
+					} );
 
-						return texture( background, screenUV.flipY() ).setUpdateMatrix( true );
-
-					} else if ( background.isColor !== true ) {
-
-						error( 'WebGPUNodes: Unsupported background configuration.', background );
-
-					}
-
-				}, forceUpdate );
+				}
 
 				sceneData.backgroundNode = backgroundNode;
 				sceneData.background = background;
 				sceneData.backgroundBlurriness = scene.backgroundBlurriness;
+
+			}
+
+			if ( sceneData.backgroundNode && sceneData.backgroundNode.isBackgroundBlurNode === true ) {
+
+				sceneData.backgroundNode.amount = scene.backgroundBlurriness;
 
 			}
 
@@ -803,18 +814,17 @@ class NodeManager extends DataMap {
 	 * @param {string} type - The type of object to cache.
 	 * @param {Object} object - The object.
 	 * @param {Function} callback - A callback that produces a node representation for the given object.
-	 * @param {boolean} [forceUpdate=false] - Whether an update should be enforced or not.
 	 * @return {Node} The node representation.
 	 */
-	getCacheNode( type, object, callback, forceUpdate = false ) {
+	getCacheNode( type, object, callback ) {
 
 		const nodeCache = this.cacheLib[ type ] || ( this.cacheLib[ type ] = new WeakMap() );
 
 		let node = nodeCache.get( object );
 
-		if ( node === undefined || forceUpdate ) {
+		if ( node === undefined ) {
 
-			if ( node === undefined && object.isTexture === true ) {
+			if ( object.isTexture === true ) {
 
 				const onTextureDispose = () => {
 

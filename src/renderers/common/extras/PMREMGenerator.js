@@ -5,7 +5,10 @@ import { positionWorldDirection } from '../../../nodes/accessors/Position.js';
 import { uniform } from '../../../nodes/core/UniformNode.js';
 import { texture } from '../../../nodes/accessors/TextureNode.js';
 import { cubeTexture } from '../../../nodes/accessors/CubeTextureNode.js';
-import { Fn, int, uint, vec4 } from '../../../nodes/tsl/TSLBase.js';
+import { Fn, If, float, int, uint, vec2, vec3, vec4 } from '../../../nodes/tsl/TSLBase.js';
+import { abs, acos, atan, clamp, cross, dot, exp, inverseSqrt, normalize, sqrt } from '../../../nodes/math/MathNode.js';
+import { select } from '../../../nodes/math/ConditionalNode.js';
+import { Loop } from '../../../nodes/utils/LoopNode.js';
 
 import { Color } from '../../../math/Color.js';
 import { floorPowerOfTwo } from '../../../math/MathUtils.js';
@@ -17,6 +20,7 @@ import CubeRenderTarget from '../CubeRenderTarget.js';
 import {
 	CubeReflectionMapping,
 	CubeRefractionMapping,
+	LinearFilter,
 	LinearMipmapLinearFilter,
 	NoBlending,
 	HalfFloatType,
@@ -74,6 +78,9 @@ class PMREMGenerator {
 
 		this._cubeSize = 0;
 		this._sourceTarget = null;
+		this._backgroundTexture = null;
+		this._backgroundVersion = - 1;
+		this._backgroundCache = new WeakMap();
 
 		this._cubeCamera = new CubeCamera( 1, 10, null );
 		this._boxMesh = new Mesh( new BoxGeometry( 5, 5, 5 ), null );
@@ -81,6 +88,7 @@ class PMREMGenerator {
 		this._cubemapMaterial = null;
 		this._equirectMaterial = null;
 
+		this._backgroundBlurMaterials = [];
 		this._blurMaterial = null;
 		this._ggxMaterial = null;
 		this._integrationMaterial = null;
@@ -102,6 +110,8 @@ class PMREMGenerator {
 	 * @return {CubeRenderTarget} The resulting PMREM.
 	 */
 	fromScene( scene, sigma = 0, near = 0.1, far = 100, options = {} ) {
+
+		this._backgroundTexture = null;
 
 		const {
 			size = 256,
@@ -316,6 +326,7 @@ class PMREMGenerator {
 	dispose() {
 
 		if ( this._sourceTarget !== null ) this._sourceTarget.dispose();
+		this._backgroundBlurMaterials.forEach( material => material.dispose() );
 
 		if ( this._cubemapMaterial !== null ) this._cubemapMaterial.dispose();
 		if ( this._equirectMaterial !== null ) this._equirectMaterial.dispose();
@@ -367,6 +378,99 @@ class PMREMGenerator {
 		this._applyPMREM( pmremTarget );
 
 		return pmremTarget;
+
+	}
+
+	/**
+	 * Blurs an environment into a cube texture without GGX filtering.
+	 *
+	 * @private
+	 * @param {Texture} texture - The environment texture.
+	 * @param {number} sigma - The blur radius in radians.
+	 * @param {?CubeRenderTarget} [renderTarget=null] - A previous result to update.
+	 * @return {CubeRenderTarget} The blurred environment, owned by the caller.
+	 */
+	_fromTextureBlur( texture, sigma, renderTarget = null ) {
+
+		this._setSize( 256 );
+
+		const size = Math.min( Math.max( floorPowerOfTwo( 6 / sigma ), 16 ), 256 );
+		const sourceSize = Math.min( 2 * size, 256 );
+		const spacing = 2 / sourceSize;
+		const texel = 2 / size;
+
+		// Remove the variance added by source interpolation and cubic reconstruction.
+		const bakeSigma = Math.fround( Math.max( Math.sqrt( Math.max( sigma * sigma - texel * texel / 3 - spacing * spacing / 6, 0 ) ), 0.25 * texel ) );
+
+		if ( renderTarget !== null && renderTarget.width !== size ) {
+
+			renderTarget.dispose();
+			renderTarget = null;
+
+		}
+
+		const target = renderTarget || _createRenderTarget( size, false, false, LinearFilter );
+		const cache = this._backgroundCache;
+		const cached = cache.get( target );
+
+		if ( cached !== undefined && cached.texture === texture && cached.pmremVersion === texture.pmremVersion && cached.sigma === bakeSigma ) return target;
+
+		const renderer = this._renderer;
+		const currentMRT = renderer.getMRT();
+		const autoClear = renderer.autoClear;
+
+		renderer.setMRT( null );
+		renderer.autoClear = false;
+
+		try {
+
+			const index = size === 16 ? 1 : 0;
+
+			if ( this._backgroundBlurMaterials[ index ] === undefined ) {
+
+				this._backgroundBlurMaterials[ index ] = _getBackgroundBlurMaterial( index === 1 );
+
+			}
+
+			if ( this._backgroundTexture !== texture || this._backgroundVersion !== texture.pmremVersion ) {
+
+				this._textureToCubemap( texture, true );
+				this._backgroundTexture = texture;
+				this._backgroundVersion = texture.pmremVersion;
+
+			}
+
+			const material = this._backgroundBlurMaterials[ index ];
+			const uniforms = _uniformsMap.get( material );
+			uniforms.envMap.value = this._sourceTarget.texture;
+			uniforms.sigma.value = bakeSigma;
+			uniforms.level.value = Math.log2( 256 / sourceSize );
+			uniforms.spacing.value = spacing;
+			uniforms.radius.value = size > 16 ? 12 * sourceSize / size : 0;
+
+			this._renderCube( target, 0, material );
+
+		} finally {
+
+			renderer.setMRT( currentMRT );
+			renderer.autoClear = autoClear;
+
+		}
+
+		if ( cached === undefined ) {
+
+			target.addEventListener( 'dispose', function onDispose( event ) {
+
+				cache.delete( event.target );
+				event.target.removeEventListener( 'dispose', onDispose );
+
+			} );
+
+		}
+
+		cache.set( target, { texture, pmremVersion: texture.pmremVersion, sigma: bakeSigma } );
+
+		return target;
 
 	}
 
@@ -438,33 +542,28 @@ class PMREMGenerator {
 
 	}
 
-	_textureToCubemap( texture ) {
+	_textureToCubemap( texture, forceLevelZero = false ) {
 
-		let material;
+		// Lighting captures overwrite the source cached for background blur.
+		this._backgroundTexture = null;
 
-		if ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping ) {
+		const isCube = texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping;
+		const name = isCube ? '_cubemapMaterial' : '_equirectMaterial';
+		let material = this[ name ];
+		let uniforms = material !== null ? _uniformsMap.get( material ) : null;
 
-			if ( this._cubemapMaterial === null ) {
+		// Background capture bakes the source texture's type and orientation.
+		if ( material === null || ( forceLevelZero || uniforms.forceLevelZero.value ) && uniforms.envMap.value !== texture ) {
 
-				this._cubemapMaterial = _getCubemapMaterial();
+			if ( material !== null ) material.dispose();
 
-			}
-
-			material = this._cubemapMaterial;
-
-		} else {
-
-			if ( this._equirectMaterial === null ) {
-
-				this._equirectMaterial = _getEquirectMaterial();
-
-			}
-
-			material = this._equirectMaterial;
+			material = this[ name ] = isCube ? _getCubemapMaterial() : _getEquirectMaterial();
+			uniforms = _uniformsMap.get( material );
 
 		}
 
-		_uniformsMap.get( material ).envMap.value = texture;
+		uniforms.envMap.value = texture;
+		uniforms.forceLevelZero.value = forceLevelZero;
 
 		this._renderCube( this._getSourceTarget(), 0, material );
 
@@ -561,10 +660,10 @@ class PMREMGenerator {
 
 }
 
-function _createRenderTarget( size, generateMipmaps, depthBuffer ) {
+function _createRenderTarget( size, generateMipmaps, depthBuffer, minFilter = LinearMipmapLinearFilter ) {
 
 	return new CubeRenderTarget( size, {
-		minFilter: LinearMipmapLinearFilter,
+		minFilter: minFilter,
 		generateMipmaps: generateMipmaps,
 		type: HalfFloatType,
 		colorSpace: LinearSRGBColorSpace,
@@ -604,6 +703,98 @@ function _getBlurMaterial() {
 
 }
 
+function _getBackgroundBlurMaterial( spherical ) {
+
+	const uniforms = {
+		envMap: cubeTexture(),
+		sigma: uniform( 0 ),
+		level: uniform( 0 ),
+		spacing: uniform( 0 ),
+		radius: uniform( 0, 'int' )
+	};
+
+	const fragmentNode = Fn( () => {
+
+		const { envMap, sigma, level, spacing, radius } = uniforms;
+		const direction = positionWorldDirection;
+		const k = float( - 0.5 ).div( sigma.mul( sigma ) ).toVar();
+		const color = vec3( 0.0 ).toVar();
+		const weightSum = float( 0.0 ).toVar();
+
+		if ( spherical === false ) {
+
+			const up = select( abs( direction.z ).lessThan( 0.999 ), vec3( 0.0, 0.0, 1.0 ), vec3( 1.0, 0.0, 0.0 ) );
+			const tangent = normalize( cross( up, direction ) ).toVar();
+			const bitangent = cross( direction, tangent ).toVar();
+
+			// Weight tangent-plane taps by angular Gaussian and solid angle.
+			// Uniform bounds prevent loop unrolling.
+			const range = { start: radius.negate(), end: radius, condition: '<=' };
+
+			Loop( range, { start: 0, end: radius, condition: '<=' }, ( { i, j } ) => {
+
+				const offset = vec2( float( i ), float( j ) ).mul( spacing ).toVar();
+				const r2 = dot( offset, offset ).toVar();
+
+				const theta = atan( sqrt( r2 ) );
+				const weight = exp( k.mul( theta.mul( theta ) ) ).mul( inverseSqrt( r2.add( 1.0 ).pow( 3.0 ) ) ).toVar();
+
+				const tap = direction.add( tangent.mul( offset.x ) ).add( bitangent.mul( offset.y ) );
+
+				color.addAssign( envMap.sample( tap ).level( level ).rgb.mul( weight ) );
+				weightSum.addAssign( weight );
+
+				// Mirrored taps share Gaussian and solid angle weights.
+				If( j.greaterThan( 0 ), () => {
+
+					const mirroredTap = direction.add( tangent.mul( offset.x ) ).sub( bitangent.mul( offset.y ) );
+					color.addAssign( envMap.sample( mirroredTap ).level( level ).rgb.mul( weight ) );
+					weightSum.addAssign( weight );
+
+				} );
+
+			} );
+
+		} else {
+
+			const n = 32;
+
+			// Pair antipodal samples to reuse angle and solid angle calculations.
+			Loop( 3 * n * n, ( { i: t } ) => {
+
+				const axis = t.div( n * n ).toVar();
+				const texel = t.sub( axis.mul( n * n ) ).toVar();
+
+				const st = vec2( float( texel.mod( n ) ), float( texel.div( n ) ) ).add( 0.5 ).div( n ).mul( 2.0 ).sub( 1.0 ).toVar();
+
+				const d = select( axis.equal( 0 ), vec3( 1.0, st ), select( axis.equal( 1 ), vec3( st.x, 1.0, st.y ), vec3( st, 1.0 ) ) ).toVar();
+				const r2 = dot( d, d ).toVar();
+				const solidAngle = inverseSqrt( r2.mul( r2 ).mul( r2 ) ).toVar();
+
+				const theta = acos( clamp( dot( direction, d.mul( inverseSqrt( r2 ) ) ), - 1.0, 1.0 ) ).toVar();
+				const weight = exp( k.mul( theta.mul( theta ) ) ).mul( solidAngle ).toVar();
+
+				color.addAssign( envMap.sample( d ).level( 3 ).rgb.mul( weight ) );
+				weightSum.addAssign( weight );
+
+				theta.assign( float( Math.PI ).sub( theta ) );
+				weight.assign( exp( k.mul( theta.mul( theta ) ) ).mul( solidAngle ) );
+
+				color.addAssign( envMap.sample( d.negate() ).level( 3 ).rgb.mul( weight ) );
+				weightSum.addAssign( weight );
+
+			} );
+
+		}
+
+		return vec4( color.div( weightSum ), 1.0 );
+
+	} )();
+
+	return _getMaterial( 'backgroundBlur', uniforms, fragmentNode );
+
+}
+
 function _getGGXMaterial() {
 
 	const uniforms = {
@@ -636,21 +827,56 @@ function _getIntegrationMaterial() {
 
 }
 
+function _getCopyMaterial( name, envMap, lightingNode ) {
+
+	const uniforms = { envMap, forceLevelZero: uniform( false ) };
+
+	const fragmentNode = Fn( () => {
+
+		const color = vec4().toVar();
+
+		If( uniforms.forceLevelZero, () => {
+
+			// Supersample to preserve energy in small HDR highlights.
+			const dx = positionWorldDirection.dFdx().mul( 0.25 ).toVar();
+			const dy = positionWorldDirection.dFdy().mul( 0.25 ).toVar();
+			const origin = positionWorldDirection.sub( dx.add( dy ).mul( 1.5 ) ).toVar();
+			const sum = vec3( 0 ).toVar();
+
+			Loop( 4, 4, ( { i, j } ) => {
+
+				const direction = origin.add( dx.mul( float( i ) ) ).add( dy.mul( float( j ) ) ).normalize();
+				const uv = envMap.isCubeTextureNode ? direction : equirectUV( direction );
+				sum.addAssign( envMap.sample( uv ).level( 0 ).rgb );
+
+			} );
+
+			color.assign( vec4( sum.mul( 1 / 16 ), 1 ) );
+
+		} ).Else( () => {
+
+			color.assign( lightingNode );
+
+		} );
+
+		return color;
+
+	} )();
+
+	return _getMaterial( name, uniforms, fragmentNode );
+
+}
+
 function _getCubemapMaterial() {
 
-	const uniforms = {
-		envMap: cubeTexture()
-	};
-
-	return _getMaterial( 'cubemap', uniforms, uniforms.envMap.sample( positionWorldDirection ) );
+	const envMap = cubeTexture();
+	return _getCopyMaterial( 'cubemap', envMap, envMap.sample( positionWorldDirection ) );
 
 }
 
 function _getEquirectMaterial() {
 
-	const uniforms = {
-		envMap: texture()
-	};
+	const envMap = texture();
 
 	const fragmentNode = Fn( () => {
 
@@ -659,16 +885,16 @@ function _getEquirectMaterial() {
 		const dx = direction.dFdx().mul( 0.25 ).toConst();
 		const dy = direction.dFdy().mul( 0.25 ).toConst();
 
-		const color = uniforms.envMap.sample( equirectUV( direction.sub( dx ).sub( dy ).normalize() ) ).level( 0 ).rgb
-			.add( uniforms.envMap.sample( equirectUV( direction.add( dx ).sub( dy ).normalize() ) ).level( 0 ).rgb )
-			.add( uniforms.envMap.sample( equirectUV( direction.sub( dx ).add( dy ).normalize() ) ).level( 0 ).rgb )
-			.add( uniforms.envMap.sample( equirectUV( direction.add( dx ).add( dy ).normalize() ) ).level( 0 ).rgb );
+		const color = envMap.sample( equirectUV( direction.sub( dx ).sub( dy ).normalize() ) ).level( 0 ).rgb
+			.add( envMap.sample( equirectUV( direction.add( dx ).sub( dy ).normalize() ) ).level( 0 ).rgb )
+			.add( envMap.sample( equirectUV( direction.sub( dx ).add( dy ).normalize() ) ).level( 0 ).rgb )
+			.add( envMap.sample( equirectUV( direction.add( dx ).add( dy ).normalize() ) ).level( 0 ).rgb );
 
 		return vec4( color.mul( 0.25 ), 1.0 );
 
 	} )();
 
-	return _getMaterial( 'equirect', uniforms, fragmentNode );
+	return _getCopyMaterial( 'equirect', envMap, fragmentNode );
 
 }
 
