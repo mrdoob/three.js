@@ -1141,6 +1141,34 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Returns a single const variable statement as a GLSL string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The GLSL snippet that defines a const variable.
+	 */
+	generateConstStatement( type, name, count = null ) {
+
+		return `const ${ this.getVar( type, name, count ) }`;
+
+	}
+
+	/**
+	 * Returns a single variable statement as a GLSL string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The GLSL snippet that defines a variable.
+	 */
+	generateVarStatement( type, name, count = null ) {
+
+		return this.getVar( type, name, count );
+
+	}
+
+	/**
 	 * Returns the varyings of the given shader stage as a GLSL string.
 	 *
 	 * @param {string} shaderStage - The shader stage.

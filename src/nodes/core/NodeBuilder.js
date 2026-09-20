@@ -2254,6 +2254,12 @@ class NodeBuilder {
 	 */
 	isDeterministic( node ) {
 
+		if ( node.isVarNode && node.intent ) {
+
+			node = node.node;
+
+		}
+
 		if ( node.isMathNode ) {
 
 			return this.isDeterministic( node.aNode ) &&
@@ -2909,6 +2915,34 @@ class NodeBuilder {
 	getVar( type, name, count = null ) {
 
 		return `${ count !== null ? this.generateArrayDeclaration( type, count ) : this.getType( type ) } ${ name }`;
+
+	}
+
+	/**
+	 * Returns a single const variable statement as a shader string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The shader string.
+	 */
+	generateConstStatement( type, name, count = null ) {
+
+		return `const ${ this.getVar( type, name, count ) }`;
+
+	}
+
+	/**
+	 * Returns a single variable statement as a shader string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The shader string.
+	 */
+	generateVarStatement( type, name, count = null ) {
+
+		return this.getVar( type, name, count );
 
 	}
 

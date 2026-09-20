@@ -1999,6 +1999,34 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Returns a single const variable statement as a WGSL string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The WGSL snippet that defines a const variable.
+	 */
+	generateConstStatement( type, name/*, count = null*/ ) {
+
+		return `const ${ name }`;
+
+	}
+
+	/**
+	 * Returns a single variable statement as a WGSL string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The WGSL snippet that defines a variable.
+	 */
+	generateVarStatement( type, name/*, count = null*/ ) {
+
+		return `let ${ name }`;
+
+	}
+
+	/**
 	 * Returns the variables of the given shader stage as a WGSL string.
 	 *
 	 * @param {string} shaderStage - The shader stage.
