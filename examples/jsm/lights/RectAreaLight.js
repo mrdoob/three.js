@@ -9,54 +9,99 @@ import {
 	RGFormat,
 	UVMapping
 } from 'three';
-import shader from './RectAreaLightShader.js';
 
 let _ltcTextures = null;
 
-// Degree-five Chebyshev fit to four conditioned LTC matrix parameters.
-// Rows are [ roughness degree ][ view degree ], with four channels per row.
-// The view coordinate used for the fit is atan2( alpha, N.V ).
-// The fields correct width, rotation, shear, and height; LTC_DecodeMatrix
-// reconstructs the inverse matrix after filtering. The fit was derived from
-// the GGX matrices at https://github.com/selfshadow/ltc_code/tree/master/fit/results.
-const _coefficients = [
-	0.09287287, - 0.8723644, 0.04440988, - 0.1659892,
-	- 0.1257902, - 0.8893892, 0.01900267, - 0.003565195,
-	- 0.2149712, - 0.1190478, - 0.01341123, 0.05684938,
-	- 0.08028743, 0.001877317, 0.00598588, - 0.1026004,
-	0.05829235, - 0.02405805, - 0.004423615, 0.03930667,
-	0.03495295, 0.02190838, 0.001594852, 0.02222095,
-	0.4592336, 0.03858897, 0.02637976, - 0.1487379,
-	0.3690477, 0.2957594, 0.01152618, 0.1418197,
-	0.1448468, 0.2130954, - 0.001602693, 0.2438275,
-	0.1197042, 0.1152331, 0.008055037, - 0.03939859,
-	- 0.06036885, - 0.04020091, - 0.001288459, - 0.01253094,
-	- 0.07480288, 0.01545243, - 0.001084004, - 0.02108012,
-	- 0.2730997, - 0.1714615, - 0.04045315, - 0.1990581,
-	- 0.2012329, - 0.1609927, - 0.01746759, - 0.08541539,
-	- 0.04608306, - 0.1478976, 0.01336634, 0.08238445,
-	- 0.1119338, - 0.08665037, - 0.009484556, - 0.0246486,
-	0.04906838, - 0.01994244, 0.004390933, 0.01171335,
-	0.04616626, - 0.00157161, - 0.001590255, 0.0392026,
-	0.05804262, 0.1279031, - 0.03687795, 0.001823102,
-	0.1379226, 0.1223349, - 0.01557628, - 0.01477064,
-	0.07189586, 0.08961224, 0.007899989, 0.03186425,
-	0.03047522, 0.07488051, - 0.003565135, 0.04088651,
-	0.01602782, 0.01670337, 0.002207827, - 0.03140813,
-	- 0.01378466, 0.02137774, - 0.001249338, 0.00999564,
-	- 0.07254682, - 0.008418916, - 0.001158438, - 0.002127278,
-	- 0.05216256, - 0.07400435, 0.0001493712, - 0.03778612,
-	0.00975425, - 0.02129349, - 0.007933463, - 0.01255254,
-	- 0.072776, - 0.04337226, 0.002901734, 0.00608935,
-	- 0.0006401428, - 0.03240272, - 0.0002226738, - 0.01641851,
-	- 0.009071147, - 0.01961639, - 0.0003187947, 0.0104101,
-	0.05219947, 0.02458631, 0.008667499, 0.01444682,
-	- 0.0281031, - 0.04058745, 0.007467084, - 0.01654244,
-	- 0.01743741, 0.008544204, - 0.00828599, - 0.01157857,
-	0.02524217, 0.01871597, 2.007132e-5, 0.01438961,
-	0.005148598, 0.01142116, 0.0002626581, - 0.007968476,
-	0.005444536, 0.009399962, - 0.001412142, 0.0004071666
-];
+// 3,078 quantized Chebyshev coefficients fitted to the original GGX LTC tables.
+// Each cubic patch covers one of six fields: matrix length, angle, shear,
+// height, magnitude and Fresnel amplitude. Small patches preserve sharp lobes.
+// Source: https://github.com/selfshadow/ltc_code/tree/master/fit/results
+//
+// Patch header: channel, x0, x1, y0, y1, nx, ny, exponent + 128 (one byte each).
+// Coefficients follow as signed zigzag varints, scaled by 2^exponent.
+const _coefficients =
+	'AAAEPEAEBGC+qa3AAdPcpgL6iowBrfZ697L7uwHjuaMEkKzmAq+M3wG8+fkB3b+cA5DNzAOB5cQB3uqiAcWvX5qhyAGh6DUAAAQoKwQDZ7rIoBKQnyqV/yGI' +
+	'7A/lrDqB0SiI2x+frRGt7gjG3A2NyArunAUABBAoKwQDcI7PBLABShCNFQYCABEAAAAAAAQkKAQEZ7y1uBT6nS2n5STM9xKL23SyXYw5/UT06w2zqRmU+xL/' +
+	'+gjJ+AWy7gmBvQbsrgIABBAkKAQEcezKAkogCL0OBgIAEQAAAAAAAAAAAEAAAwQDZ4Dy/h++UI4kjg7bnQH4YPQ84mXbD7wQ5hjUVwAAQAMGBANnxOrzH7bO' +
+	'B7DsArsFjbQE/LADouABorkD6UPQNa8L/VkDBBAAMAQEcMCqBiIEAY+dAiUVA6tHFQsCAgYKDAAABC0wBANm/oLbHfCMIoP5Gpy5DYOXqwGhvR7ooxbz0Aqj' +
+	'uQno4A3Jlwrm5wQABBAtMAQDb5S+B6YDpgEesS8QBAAfAQEBAQAQLC8EA2Ka//27COHMVcmjKZnECZSqzBq5ggj1+gODfODyBe+vAd+vAatrAQgKPkACAm+q' +
+	'tBidBoMP0QIAAAQwMwQDZpbumRn0sQ/Dzwm6ogP19s0BxMQFr54E9ogCusEOya8ZkrcQucMGAAQQMDMEA27g1gyuB/QCQO9kLBIGPQIDAAEAEC8xBAJj5K3G' +
+	'vwTxizWthxmpxAWu8OMGh7wCvZkB8SUAAAQgJAQEZoy37S3Yvgmh9gWYsgSPxb8BpcwX7MET59II4YcGnM0F17AC1kmE+gPBnwnsnQil2QUABBAgJAQEb8C9' +
+	'C9wBYhzbMxwOBkkAAAAAAAAAAChALTAEA3HE0QPsLo8HigXxAqwDOwsFCgINAChAKCsEA3G23gPuIIcGrAWjAs4CPw4ABgEBAAggKy0EAnG2nwK+Hs4OkgSB' +
+	'BXAuAwA0QDAzBANxzOcD1BSqAtQBd1oUIAMVFgwAKEAkKAQEcdTlA6AZowWQBe8CkgMfBgkEDAQACwgDAAAENzkEAmaAhqUOwJIIy6sFrKECrZ1wgfkDpusC' +
+	'z70BAAQQNzkEAm7QngeKD4QHrAKtOOIBblAAKEAgJAQEcdDsA/QRpQSEBakCtAIlFgEFBgEBAAMEAAAEHSAEA2f0uNoYpOQHw6kHyugD4/s5kdMGzNEFl/IC' +
+	'iDm3gQGWsAGbpAEABBAdIAQDcIyYBk4iCLcPCAQCDwAAAAEAAj5AAgJknqX+jQPtNtrf9gPjJQAABBsdBAJniKj1GZWZA6btAcVSjZoW8ZkK+oYI24UEAAQQ' +
+	'Gx0EAnCUvQZAHAaJBwICAAIACABABARnnDXQVIIqrAroFPoiohKmBqQ2klSuKNAHj3CRrgHZVLsRAChAHSAEA3Lm+AGuBtkBpAJNUAsKAQAAAAAABDk8BANk' +
+	'gqv2JojeDb26DPLXBpnhswfr1hC+3QrxzQOcyAOtrwuQvAWBsgEABBA5PAQDbqKFBZAi1BHIBeVv0gyiBsABTLoBZAEABAU8QAEEaayCMLO0L90avBABABAp' +
+	'LAQDY7Kpw/YDmaAg+7oPq+QD6rSCDbfnAqGnAfMf4OoC1gK6DO4MARAgKSwEA27c4h7ZaZEk5QamYeEI6wI5AR8JAAEAIAwQBARipPLOtgLXtL8Bn5peoZIV' +
+	'7O3cIqn9ILnREOv8A7rRAYexAqPaAa1T6UbtvgG9wwHjYgAoQBsdBAJxtvQD7gn3Aq4ER0QLCAAKDTxAAwRuvpACqBjOAcuNAdACDP8E+wGWAfEE2gFMAA0Q' +
+	'PEADBG38zgXaQs0Co5oCuAG3B8UN5gLhBesDV9UEAAAEFBcEA2eAs7gckzG6HYIUicAp+60DwL8Dj/0BlrMDvfkG7IkG4YgDAAQQFBcEA3CsjgcyGAbpCgIC' +
+	'AA8AAAAAAAQXGwQEZrz8pTaIoQH5oQPC5QKD+5wByOoIre4J0q0G8DzJ1QS0hQafmAShwwaczQrhnQXiiwEABBAXGwQEcJDlBjgaBvcSAgAAIwAAAAAAAAAA' +
+	'ECgXGwQEcd7FA6Ia8AgmhwekA4ABCxUJBwUDBQMDAChAFxsEBHGg9wP4BpEC4AOVAYoBGRoFCAMCAAIBAwEAECYpBANiyv3YnweTjDDXtha1kQXC/MUZl4AE' +
+	'0dkBiAvM/ATsEOwc5goBECAmKQQDb8afDrspqw7jAsQwowOLARkCCQMAARAoOD4EBG68iSeNugfdqgF8snX3ZMAUI7ULzgZOwQFzpAFtDAEQICAmBARvqMYM' +
+	'qx2XCvcBlnjbBf8BNxghCQEAAAAAAQIDPkABAmvUyI0D9sMDAwQKMDwEBG7G5ggHBwTb3wQ9DQrPDwYaEAwKDAkAECgUFwQDcsbqAcIJqAMYgQJ2IAMDAAAA' +
+	'AChAFBcEA3Ls/AGoAl/UASksFQ4AAAAAABAgMzcEBHCMlAP8Z6QShwLDH/IFvwItAg8TDg0JFAUDChAwPAQEb+y0BMwCeAytrALABJ4BGNsFwAJeBaIBtAEM' +
+	'BwUABDxABARxso0DuwmEAswB7FGZD8ID1gKnB5ULmgOiAoEGpwXkAZoBAwQFPEABBGvWigz32guIDJwLAiAwMEAEBHC8iwHyFacLnwGABeIGpAIEkQRNUhBT' +
+	'bgwJADBADg8EAXOwfxw8CgQAEDA8BARxrPkDqwrLBFepBsMJ2QMTowKpA4sBFFt9GRYEECAwPAQEcZbLA9cYogIG7Q6QDKwElwEv8AVrSUqUAWEGAAAECQ0E' +
+	'BGaUv5U+puYHmZUGjv4C9ZpIpsYLt4sJpNsEwYsDqp4B8X2CQdjwAdv4ApyhAq+XAQAEEAkNBARwruMHEAYCjQgEAgAlAAAAAAAAAAMABDA8BARusOYIKCUU' +
+	'pd8EBQQAmQ9RJgcoQygLAwAEPEAEBGbS8IED5ZkC4MMCscMBt474AqP2ApT+A8WUAriZAp/VAoKSBK33AeTvAcFPuN8B+VcFACAgKAQEbIBSwBQSswWEPN4B' +
+	'jQSnA4ALhQKvATGgATsbAAMKDTxAAwRs3tcH6kKQBPWfBKofALIhwQWeAfUCzwF6Aw0QPEADBG64tgLyGTeVdYAFrQLuBIkB1wGhAUGFAQAAAistAgJmyofC' +
+	'IeGHCffYVM1AAAIIKy0EAm783hA8Aw37LAwDGQAQETxAAQRvtNEBo1HNCqEEABAoDxIEA3KU8wGCBfQBNLkBbiwEAwIAAQAoQA8SBANx6vsD8gJNsgIhEgkQ' +
+	'AQICAAAFBjxAAQRq5pgYi8wX7wXnAwAGCjxABARpxLYznvoCyjqCBe3ZLMr+Ae0Bpwbd3gGzzAGXIHLh5AGzvwHvAYIGAQAEODkEAWOi//23BcQDmwbJIAEA' +
+	'BDk+BARk0J7V8gK9TL0s0RyMxKsPwWmJK/8CrOAMoznHIJcJ8hO1E/8RswoAAAQzNwQEZfClhSfEpQbH8gOg6wGvhogF8+ID+LsD+bgC0ZUE92/ekAKTjgGp' +
+	'qgKMkwOHwQLUggEABBAzNwQEb7L0BNoE+AE26VBYMBI/EAoEBAgIAgEAEB4gBAJmit7bLImuAZlUwxTC6WGFBlmkAQEQIB4gBAJv5oYLnRWrB6cB5hdtJQcA' +
+	'CCASFAQCcqbrAYoCdCaLARQKBAAgMCstBAJxxJsD5j2JBqkB3wKKAQkPADBAKy0EAnKu9AG0CWyWATc8CQQBABAgJAQEYrbisJUG1cMc2YQNmf4CtvWYJaPy' +
+	'ArVD8h627QjeIboywCKRBNsisSvhFwEAECQmBAJjgtSRsAP7mhP5gQnh/wGa56UGuVylIY8FAShAPkAEAnGS+gHh5gHlA9oC0gSeAy0lARAgGB4EBG70khOB' +
+	'H98K8wH26wGFBvEBGyIzGwsAAQAAACA4MzcEBHCI/gWSygH7FrkDtROECqQCBQREEkkNAAQCADhAMzcEBHGW7AOgEbACSD9kQygRHAkDBwwEAwAREjxAAQRw' +
+	'nnSXJpEDoQEAEhY8QAQEboa6BIZFlgHTAdefAaEBN7MDuw6oARrFAb0FrAMwewEgMBAgBARwvMkDsVeDEEX8jQHjH6cECX2ZATIQJwIBAgEwQBAgBARy4int' +
+	'KQEImAyzDDYFGxYECAEEAQEFECAwOAQEbpqJA8eUASLKA47FAZ1o3AnOAbgTiw60Ay84QTgTASAwICwEBHDmxAWFmQGPFg6+Wssc1QEnlQIpMk0JGCQGATBA' +
+	'ICwEBHHufPV9ugEu/g2hDjoeS1YPCgEGAwEAAAQPEgQDZ4TQ9R3c1QP3lAPKlAHFsiCthwGqZb0w4EeF3ALC/gG5KwAEEA8SBANwgL4HJA4CnQgCAgAPAAAA' +
+	'BAACPEACBHKi/gHdAe0C6wKdApsCjQGNAQQCCDxABARxwu4DvwWbAw7HFXyVAi7bCPgKPBaNApQIWAABACAJDAQDYvC84OUBq6B9o909l+oNuNSHF6XGDveU' +
+	'ButwpIMBuiPqO9IjAAAQBgkEA2fcns0fzQz7aYuSAc2WD+qyAbq8A8LPBNEI/WS//QGp2AIAEEAGCQQDcpD+AcgBGAA9PAMLAQIAAQEQHCw4BARvkL4ShTf7' +
+	'DcUByJEC7yDNBgb1AqkGMS6HAWccDAEcKCw4BARw6IcIp3OTCxaSU/McEgjFBQU6Az0qBAIFABAoMAQEbd7rAa4FpgFdoqsBtQGtAVPAHacBWRv8AiUTBwUQ' +
+	'ICgwBARt8tYB2ST/CGy6gQGjKekDtAGUEv0IECK2AYUBFAAAECgNDgQBcqD3AeoCfhwAKEANDgQBdMY/LAMeABAcKCsEA3GqsgLCDPADWOMJhAEwCgEOCAQA' +
+	'HCgoKwQDccb5AugwXmmvBs4BPyUBGBsKAzRAPEAEBHGe+AKQGN8JoAHOEN4LDlzCAtABByY0PBkABSAwOEAEBG668AKnogHoFfEBro0B+S3+BUf+Dk0UAMIB' +
+	'JAsKBQAgABgEBG1IXiADZn4oAzI4EAMSEgQBBQAgGCAEBG3EBoIFmgE/9gS6Ai4zgAEaAwkSAAEBBAASADAEBHLI/wFbMxFRhwFJEyM3GQAHCQAGBBIYADAE' +
+	'BHKS+wGXA0UCwwMBTADPAaEBOQRBByoGAggJMEABBG7qAzkl+wECCQ4wQAQEbJI91iiYBBiTAqUBiQF+kwbjAgcvtwPYAsMCwAEEIDAYMAQEcf6HA8s62QE+' +
+	'qwLkCqACDc4BwgEtUjIwfTYEMEAYMAQEcPKLBOF5rAJAvjLoFfECCtgJjgIXFrABFAsSABAcLTAEA3Go/wH0EtQFXMkKygEuBwIMBAIAHCgtMAQDcebWAqI3' +
+	'MFe3B5QBGgMNCAYGBCBAOEAEBHHyrAOrHKUGVJgt5BuABUnCAziiAQcCDwMAABAcJCgEBHDipgWwE/oFqAGrG4QCWBAdDgYKBgYCAgAcKCQoBARx7o8DwCua' +
+	'AVnrCMwCBxUPDwogExEIEgEAEBYYBAJjuOy0hQLXsATrmwLPTIaX+AWNApIawBkBECAWGAQCcNKGBNcFjQI72gsZBQAAKDo3PAQEceSUA8hNqQdB1wq+CWeL' +
+	'AQkcAxcFDg40ADpANzwEBHHA7gPKEJQBG4kBsAEnGVJLAgoeJQgGBQAQMDkEBG/aywLZD/UH9QGs5gHtFM0J5QHqJMsG6wI1lAOjAUEDBQAQOTwEA3C0owPB' +
+	'MO0U3QK+QfER1wYC4gHbATkWAxwuACQEBHH0qgP1FfUDPcc3whSIAkWHDZAFSjM+EiAAAxwuJDAEBHDq+wSuK+EBzQH3Rp4fWQ1lal9rJhIaDQMFBjxAAQRt' +
+	'loUD1fEC7gX8AwMGCjxABARq6rUZ/IMBqhPkAffMFeChAaoKQZpKrQGrChXwA/sknQbQAQIwQDA4BARwmEfPRfEBbrYFpQYxTD5VpwEkHjhHPQIwQDhABARw' +
+	'xlWJTasHnAGiBN8CkwN+PHWpAWrMASZZIAAWGjxABARvtoED/CgungGNWc8EuQGkAbUHc5MBQi5CPR4AJCg8QAQEcZ7pAYgUVz+7F9ABuQFLxwE/E0CpARse' +
+	'WwIOIDA8BARvsmKuXZ4MhwHKAtICZgiLAREoBQoWCQMCDiA8QAQEbuzBAaC7AagY8QKLB+cGowEIhQKhAXIIJzQqLQEAEBAWBARhhrfu2AbPkwuToAbf/AHw' +
+	'vb518ewD/f4BwTrcxhbHUY1T6S6iWsoYiirQIgEQIBAWBARvhNMGiwiVA2n+c/8BWw8OCQEAAgQCAgA0QDxABARxiNsDsiitBaABigGYAuUDkQEMMm9BCAsT' +
+	'AQIIFAAwBARx+AG0AlgKxgKGA1wAQDQVEw8TABAECA48QAQEcbbSA9ULsgEKzQrqDIQBRbwM8gLlARCsB/UCaTIEDiA8QAQEcZrJA4YFaHnaDvgBrQPOAfgE' +
+	'wQXiASFCgwFUKwQgMAAYBARwxp0Gn40B5wmSAcMEkAPUARB/Xk4RByoZHgQwQAAYBARw2NQD/5YBugZW4AjOBn8NuALWAR8BEgIAAAAABA0OBAFogpioD/KC' +
+	'AeVq5jUABBANDgQBcpD1AQYCAAAhJDxAAwRwqP0C6BXqAfswesoBlwIiZiOHAlMCIDAAGAQEcbIQngPvAR2QENwC6wEZGT0KBBomCwgCIDAYMAQEcN5jqg3n' +
+	'CVnAHkqjAQOxAWsPcjswnwEWABAcICQEBHH89QKmB5oCQKcMXBoCDwQCBgACAgQAHCggJAQEceimA+IkrAFbiQjkAhAHDQ8FCA0PAwQAEBkwMwQDcJStA/wY' +
+	'sAZcyRb2AjwNBhgFBQAZNDAzBANxwuYCynarCKcFyQaSA246BwsCDAMABAAkBARx5MQDBQQA804NDgXZEwUKBRIbHg8BKDQsOAQEcNisBf3HAfMHSs4g1w2I' +
+	'AzXXBv0BLFQBb5MBGQE0QCw4BARxlGyXbLABZdwFuwQDA3mWAjMIQZQBGhUDNDcwPAMEccTOAr4DAdIF6gIGuANMACQgBAM3QDA8BARw5KcF7QvLB8IBrCGu' +
+	'CW0srAhBHgzyAQQLAgMuNwAwBARwrtkF2yC/ARblPpQleQ6xDKAHMRCKAy8vAgM3QAAwBARxqMAC3RdtIK4CuAnXASbCAdYCQwxmAgIBBBggABgEBHHc5AP9' +
+	'Dc8BIMcBowLKARFBhwFPYgcUQRIEGCAYMAQEcbrZA98RowEMowsOVBH5AhA6FjMEEw8AIDASFAQCc5B86gNXFRMUAwAAMEASFAQCcqr+ATKQAUIHAgIEAxAc' +
+	'MDwEBG+o9ASMRYANHuH4AbIqLHnIBIYD4QE4hgKbAQQWAxwoMDwEBHDAuQO6TfYBU4NRrBNUHHz9AQsBAT0OAgQgMDA4BARx/pED/R+1AgeYCv4LSSGsASYU' +
+	'BAoPAAEEMEAwOAQEcbjAAqsqMxCwGcYDTBTCAltRMBwoQQ8BABAxNAQDYvLC0sMJ+8qJAY/cQbGKD5CG2hv5mQ7DzQbzwgGI/gePC+4iuB8BABA0OAQEY8S7' +
+	'kJMF99ForYIyva0Lxv66FefMFK/MCamEAsbHCcm6Ap/AAaE1ywaXNdcwzRIFIDAsOAQEbZL4Aa142g55sp0Bz1CsDLcBzBadCtQBJegBKwIFBTBALDgEBGyS' +
+	'rgHbT5YKdYpvjS/4BUv8ErkGTAeoAkEFAgMABCQtBARwqOAEvgGrAVj3UYkBggFLR8UC8gFrc7oBkQFMAwAELTAEA3Ce3QOYAXtA/RafAXAxKyoVBgAaHTxA' +
+	'AwRw4PUBzBB2uTE3btECCg+OATcUAB0hPEAEBHDqtAKCHkdR6zFeAHGjAZwBMQlKd1lUABAoCQ0EBHGg9AOuA44BGpMDnAE8DA0GAAAAAAAAAChACQ0EBHHy' +
+	'/AO+AhaIASUUFzwABAUEAQIBAwIUIBgwBARxlhaYDU4R2AjuBEYHPWUZEBMJBQsCFBcAGAMEcewDjAEAgAMRC1UXIiJGDQIXIAAYBARx4gb4AlIXqge2AjxU' +
+	'MDVfRgEWFz8AABgODwQBasKG5wPCQ7QU+RYAGDAODwQBc8R8+gIqKQMoNDA8BARx1qsCjh6vAgWTDqYODBMergFICiUJAwADKDQ8QAQEcLCnBJhvGQzVDcYN' +
+	'zANYYawCvgFEGYoBJCIBBAc4PgMEa6Tv7gL5Ak2ShROHAiv2ElUCAgsEAQcQOD4EBGzu2rYBs3eBJZsFqvUIy2TNHcUCsxGHIZsGqAGNB88HMKABAQAgAAQE' +
+	'BGO6nZoRp9kH9ekD/260npoRq/YH/foDgXS0D68MpwjhArwO1BDgCKACABAcHSAEA3GakQPOBcwBKKkHOhQGBwICBAAcKB0gBANxoLkD8B66AVntBNoBCg8T' +
+	'FQcGAQAgBAUEAWSG6vgW4b0K7Z4F35kBAQAgBQkEBGKCt5mVAY+zStOFJaO4CMayvSKPhhPZ6Qjr2wGctgGCJNY79h/pIcdQnUaxHAEKCz5AAQJv1MEYygsB' +
+	'CxA+QAQCboKoMNVE5QNnlBOjAQhtAQMEPkABAmzQsMYBurYBAQQIPkAEAmuAtIoDhdUB0QiPAoJMu7MBYD0FIEAAEAQEa8ICJz8O4AFFJxBKHQkECgUAAAUg' +
+	'QBAgBARsngulBjtI6ArDByY67gKzAjAGQD8QAQUQIDg+BARvmsoDzdcB0hUBjHLFN8AJ5QG2AaQDxQEyHVI9IAUQID5ABAJvio4FnaoCliGjAZgdrQywAj8B' +
+	'ABAYHAQEYsa4utIE5bwM3YwG38UBzI79I6fpAYNHrgy0+AWRG+sW0Qwdhw2PHdMYAQAQHB4EAmSyvtimAbekBJWBApE5pImEA/sPhwGUAwMWKDxABARvpqQE' +
+	'jJAC3hMjuzisArgDDrkDF00/W2FhIAMQETxAAQRugusCx3SBA6sEAxEWPEAEBG641gP+S74CGfttdjsvrwT3ATgVuwNkUAsAAAISFAICadKNqAfxGu/FBa5p' +
+	'AAIIEhQEAm7Enh0CAQKNEwYDBAUwQDg+BARt3v0BuWDuC40B1Fj3FrYCG8oKiQEBAKoBBQgFBTBAPkAEAm6C5wHTQaIIXYwVdx4FAjA8ADAEBHDQKp8YJ07m' +
+	'KJkXGWZ9EhksMhRVCQI8QAAwBARxvgPBAwYCvgPBAwQCAAIDAAACAAAAEBwbHQQCcfKiA94ErAEosQMSBAEAHCgbHQQCcqriAaANRhuLAToEAQUEBzxAAwRx' +
+	'wP4CwQdnhELxBU3RCe4BHLUE1AIYBQcQPEAEBHDw3AT5eTuwAa5K8xSeBvkBhgGuBv0DUJwFtQLFAsgBARAWPkAEAm+6mRevRNECMY4IpQEqKwEWKD5ABAJw' +
+	'rssJ/eABhRNYzgJBJAUFIDAgLAQEbORnvSeiAUiQTKUksAMS0g3ZB5YBC7gBbxYDBTBAICwEBGv4UK0mvAQhsjPBGbYDJagIiQRKB3IxBgEBICgAEAQEcMyj' +
+	'AbkGfQWiowHpBocBADs5DwQVEQcDAShAABAEBHDWUbFOsQX0AfJQ1039BM4BgwF4QisdHAgBACgrPEADBHCssASiG6YB2Sh7wQHvBAtf+wIwTwArLTxAAgRx' +
+	'2rsCqgiNEjCnAUCfAUAALTA8QAMEcOq8Bf4bkQKBI2aLAb0EKo0BaYwBHQAwNDxABARxqo0D5hM4dbkL2gJyH4MCBSZeUy06QwMQHAAYBARxtOMD8wRtTrch' +
+	'ngEdpwGfCE4qHAIMEh4DEBwYMAQEcNaqBeYBjgEa28wB0giOA1rZD+IBWA04XgwEABAcNzwEBHCEkwL0SvwGM4UqzgHpAWYBd1QcEwsEBQAcKDc8BARwxOwD' +
+	'snmsA1GvKioqE22BASAUDAlAAQEoNDg+BARx4ugCzW3bAgioBBwDDzxsAQEKAgABATRAOD4EBHHIbodyogGNAY4C3QEvGb4CdhAQNAIECA==';
 
 /**
  * This class emits light uniformly across the face a rectangular plane.
@@ -169,17 +214,6 @@ class RectAreaLight extends Light {
 
 	}
 
-	/**
-	 * Returns the LTC shader used by WebGLRenderer.
-	 *
-	 * @return {string} The rectangular area light shader.
-	 */
-	getLTCShader() {
-
-		return shader;
-
-	}
-
 	copy( source ) {
 
 		super.copy( source );
@@ -206,11 +240,33 @@ class RectAreaLight extends Light {
 
 function generateTextures() {
 
-	const matrixData = Uint16Array.from( generateMatrixData(), DataUtils.toHalfFloat );
-	const amplitudeData = Uint16Array.from( generateAmplitudeData(), DataUtils.toHalfFloat );
+	const fields = generateFields();
+	const matrixData = new Uint16Array( 64 * 64 * 4 );
+	const amplitudeData = new Uint16Array( 64 * 64 * 2 );
+
+	for ( let i = 0; i < 4096; i ++ ) {
+
+		const alpha = Math.max( ( ( i % 64 ) / 63 ) ** 2, 1e-5 );
+		const length = Math.max( fields[ i ], 1e-12 );
+		const angle = fields[ 4096 + i ];
+		const shear = fields[ 8192 + i ] * 2 * alpha;
+		const height = Math.max( fields[ 12288 + i ], 1e-12 ) * 2 * alpha;
+		const cos = Math.cos( angle );
+		const sin = Math.sin( angle );
+
+		// Store the final inverse matrix so the existing shaders can sample it directly.
+		matrixData[ 4 * i ] = DataUtils.toHalfFloat( length * cos );
+		matrixData[ 4 * i + 1 ] = DataUtils.toHalfFloat( shear * cos - height * sin );
+		matrixData[ 4 * i + 2 ] = DataUtils.toHalfFloat( length * sin );
+		matrixData[ 4 * i + 3 ] = DataUtils.toHalfFloat( shear * sin + height * cos );
+
+		amplitudeData[ 2 * i ] = DataUtils.toHalfFloat( Math.min( 1, Math.max( 0, fields[ 16384 + i ] ) ) );
+		amplitudeData[ 2 * i + 1 ] = DataUtils.toHalfFloat( Math.min( 1, Math.max( 0, fields[ 20480 + i ] ) ) );
+
+	}
 
 	const ltc1 = new DataTexture( matrixData, 64, 64, RGBAFormat, HalfFloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, LinearFilter, 1 );
-	const ltc2 = new DataTexture( amplitudeData, 32, 32, RGFormat, HalfFloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, LinearFilter, 1 );
+	const ltc2 = new DataTexture( amplitudeData, 64, 64, RGFormat, HalfFloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, LinearFilter, 1 );
 
 	ltc1.needsUpdate = true;
 	ltc2.needsUpdate = true;
@@ -219,176 +275,104 @@ function generateTextures() {
 
 }
 
-function generateMatrixData() {
+function generateFields() {
 
-	// X = roughness, Y = sqrt( 1 - N.V ). The shader applies the analytic
-	// normal-view and smooth-surface limits after filtering these residuals.
-	const size = 64;
-	const data = new Float32Array( size * size * 4 );
-	const basisX = new Float64Array( 6 );
-	const basisY = new Float64Array( 6 );
-	const parameters = [ 0, 0, 0, 0 ];
-	// Preserve the fitted domain's grazing endpoint; the shader uses actual N.V.
-	const minViewCosine = Math.cos( 1.57 );
+	const bytes = atob( _coefficients );
+	const fields = new Float64Array( 6 * 4096 );
+	const coefficients = new Float64Array( 16 );
+	const rows = new Float64Array( 4 * 64 );
+	const basisX = new Float64Array( 4 * 64 );
+	const basisY = new Float64Array( 4 * 64 );
+	let offset = 0;
 
-	for ( let y = 0; y < size; y ++ ) {
+	while ( offset < bytes.length ) {
 
-		const nv = Math.max( 1 - ( y / ( size - 1 ) ) ** 2, minViewCosine );
+		const channel = bytes.charCodeAt( offset ++ );
+		const x0 = bytes.charCodeAt( offset ++ );
+		const x1 = bytes.charCodeAt( offset ++ );
+		const y0 = bytes.charCodeAt( offset ++ );
+		const y1 = bytes.charCodeAt( offset ++ );
+		const nx = bytes.charCodeAt( offset ++ );
+		const ny = bytes.charCodeAt( offset ++ );
+		const step = 2 ** ( bytes.charCodeAt( offset ++ ) - 128 );
+		const width = x1 - x0;
+		const height = y1 - y0;
 
-		for ( let x = 0; x < size; x ++ ) {
+		for ( let i = 0; i < nx * ny; i ++ ) {
 
-			const roughness = x / ( size - 1 );
-			const alpha = Math.max( roughness * roughness, 1e-5 );
-			const u = 2 * roughness - 1;
-			const v = 4 * Math.atan2( alpha, nv ) / Math.PI - 1;
+			let code = 0, factor = 1, byte;
 
-			basisX[ 0 ] = basisY[ 0 ] = 1;
-			basisX[ 1 ] = u;
-			basisY[ 1 ] = v;
+			do {
 
-			for ( let i = 2; i < 6; i ++ ) {
+				byte = bytes.charCodeAt( offset ++ );
+				code += ( byte & 127 ) * factor;
+				factor *= 128;
 
-				basisX[ i ] = 2 * u * basisX[ i - 1 ] - basisX[ i - 2 ];
-				basisY[ i ] = 2 * v * basisY[ i - 1 ] - basisY[ i - 2 ];
+			} while ( byte & 128 );
 
-			}
+			coefficients[ i ] = ( code % 2 ? - ( code + 1 ) / 2 : code / 2 ) * step;
 
-			parameters.fill( 0 );
+		}
 
-			for ( let i = 0; i < 6; i ++ ) {
+		computeBasis( basisX, width );
+		computeBasis( basisY, height );
 
-				for ( let j = 0; j < 6; j ++ ) {
+		// Evaluate each patch in two passes, reusing its horizontal polynomials.
+		for ( let y = 0; y < ny; y ++ ) {
 
-					const weight = basisX[ i ] * basisY[ j ];
-					const offset = ( i * 6 + j ) * 4;
+			for ( let x = 0; x < width; x ++ ) {
 
-					for ( let c = 0; c < 4; c ++ ) {
+				let value = 0;
 
-						parameters[ c ] += weight * _coefficients[ offset + c ];
+				for ( let j = 0; j < nx; j ++ ) {
 
-					}
+					value += coefficients[ y * nx + j ] * basisX[ x * 4 + j ];
 
 				}
 
+				rows[ y * width + x ] = value;
+
 			}
 
-			data.set( parameters, ( y * size + x ) * 4 );
+		}
+
+		for ( let y = 0; y < height; y ++ ) {
+
+			for ( let x = 0; x < width; x ++ ) {
+
+				let value = 0;
+
+				for ( let i = 0; i < ny; i ++ ) {
+
+					value += rows[ i * width + x ] * basisY[ y * 4 + i ];
+
+				}
+
+				fields[ channel * 4096 + ( y + y0 ) * 64 + x + x0 ] = value;
+
+			}
 
 		}
 
 	}
 
-	return data;
+	return fields;
 
 }
 
-function generateAmplitudeData() {
+function computeBasis( basis, samples ) {
 
-	// X = roughness, Y = alpha * ( 1 - N.V ) / ( N.V + alpha ).
-	// Store [ R, G - R * ( 1 - N.V )^5 ] so the shader reconstructs the
-	// sharp Fresnel variation from the actual view direction after filtering.
-	const size = 32;
-	const sampleCount = 256;
-	const samples = generateSamples( sampleCount );
-	const data = new Float32Array( size * size * 2 );
+	for ( let i = 0; i < samples; i ++ ) {
 
-	for ( let x = 0; x < size; x ++ ) {
+		const x = samples === 1 ? - 1 : 2 * i / ( samples - 1 ) - 1;
+		const offset = 4 * i;
 
-		const roughness = x / ( size - 1 );
-		const alpha = Math.max( roughness * roughness, 1e-5 );
-
-		for ( let y = 0; y < size; y ++ ) {
-
-			const v = y / ( size - 1 );
-			const nv = alpha * ( 1 - v ) / ( alpha + v );
-			const value = integrateAmplitude( roughness, nv, samples );
-			const f = 1 - nv;
-			const f2 = f * f;
-			const offset = ( y * size + x ) * 2;
-
-			data[ offset ] = value[ 0 ];
-			data[ offset + 1 ] = value[ 1 ] - value[ 0 ] * f2 * f2 * f;
-
-		}
+		basis[ offset ] = 1;
+		basis[ offset + 1 ] = x;
+		basis[ offset + 2 ] = 2 * x * x - 1;
+		basis[ offset + 3 ] = 2 * x * basis[ offset + 2 ] - x;
 
 	}
-
-	return data;
-
-}
-
-function generateSamples( count ) {
-
-	const samples = new Float64Array( count * 3 );
-
-	for ( let i = 0; i < count; i ++ ) {
-
-		// Hammersley points, with a half-sample offset to avoid endpoints.
-		let bits = i >>> 0;
-		bits = ( ( bits << 16 ) | ( bits >>> 16 ) ) >>> 0;
-		bits = ( ( ( bits & 0x00ff00ff ) << 8 ) | ( ( bits & 0xff00ff00 ) >>> 8 ) ) >>> 0;
-		bits = ( ( ( bits & 0x0f0f0f0f ) << 4 ) | ( ( bits & 0xf0f0f0f0 ) >>> 4 ) ) >>> 0;
-		bits = ( ( ( bits & 0x33333333 ) << 2 ) | ( ( bits & 0xcccccccc ) >>> 2 ) ) >>> 0;
-		bits = ( ( ( bits & 0x55555555 ) << 1 ) | ( ( bits & 0xaaaaaaaa ) >>> 1 ) ) >>> 0;
-
-		const radius = Math.sqrt( ( i + 0.5 ) / count );
-		const phi = 2 * Math.PI * ( bits / 4294967296 + 0.5 / count );
-		const t1 = radius * Math.cos( phi );
-
-		samples[ i * 3 ] = t1;
-		samples[ i * 3 + 1 ] = radius * Math.sin( phi );
-		samples[ i * 3 + 2 ] = Math.sqrt( Math.max( 1 - t1 * t1, 0 ) );
-
-	}
-
-	return samples;
-
-}
-
-function integrateAmplitude( roughness, nv, samples ) {
-
-	// GGX visible-normal sampling (Heitz 2018):
-	// https://jcgt.org/published/0007/04/01/paper.pdf
-	// Dividing the cosine-weighted BRDF by the sampling PDF leaves G2 / G1.
-	// Correlated Smith masking gives the bounded weight used below, including
-	// its grazing-view limit at N.V = 0.
-	const count = samples.length / 3;
-	const alpha = Math.max( roughness * roughness, 1e-5 );
-	const alphaSquared = alpha * alpha;
-	const vx = Math.sqrt( Math.max( 1 - nv * nv, 0 ) );
-	const rootV = Math.sqrt( nv * nv + alphaSquared * ( 1 - nv * nv ) );
-	const vhx = alpha * vx / rootV;
-	const vhz = nv / rootV;
-	const blend = 0.5 * ( 1 + vhz );
-	let magnitude = 0;
-	let fresnel = 0;
-
-	for ( let i = 0; i < count; i ++ ) {
-
-		const t1 = samples[ i * 3 ];
-		const t2 = ( 1 - blend ) * samples[ i * 3 + 2 ] + blend * samples[ i * 3 + 1 ];
-		const z = Math.sqrt( Math.max( 1 - t1 * t1 - t2 * t2, 0 ) );
-		const nx = alpha * ( - t2 * vhz + z * vhx );
-		const ny = alpha * t1;
-		const nz = Math.max( t2 * vhx + z * vhz, 0 );
-		const invLength = 1 / Math.sqrt( nx * nx + ny * ny + nz * nz );
-		const hz = nz * invLength;
-		const vh = vx * nx * invLength + nv * hz;
-		const nl = 2 * hz * vh - nv;
-
-		if ( nl <= 0 ) continue;
-
-		const rootL = Math.sqrt( nl * nl + alphaSquared * Math.max( 1 - nl * nl, 0 ) );
-		const weight = ( nv + rootV ) * nl / ( rootV * nl + nv * rootL );
-		const f = 1 - Math.min( Math.max( vh, 0 ), 1 );
-		const f2 = f * f;
-
-		magnitude += weight;
-		fresnel += weight * f2 * f2 * f;
-
-	}
-
-	return [ magnitude / count, fresnel / count ];
 
 }
 

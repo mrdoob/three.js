@@ -352,7 +352,6 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			numSpotLights: lights.spot.length,
 			numSpotLightMaps: lights.spotLightMap.length,
 			numRectAreaLights: lights.rectArea.length,
-			rectAreaLTCShader: lights.rectAreaLTCShader,
 			numHemiLights: lights.hemi.length,
 
 			numSunLightShadows: lights.sunShadowMap.length,
@@ -493,7 +492,6 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 		array.push( parameters.numSpotLightMaps );
 		array.push( parameters.numHemiLights );
 		array.push( parameters.numRectAreaLights );
-		array.push( parameters.rectAreaLTCShader );
 		array.push( parameters.numSunLightShadows );
 		array.push( parameters.numDirLightShadows );
 		array.push( parameters.numPointLightShadows );
