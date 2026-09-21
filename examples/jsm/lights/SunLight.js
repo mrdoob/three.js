@@ -23,10 +23,10 @@ import { SunLightShadow } from './SunLightShadow.js';
  * scene.add( sun );
  * ```
  *
- * When used with `WebGPURenderer`, the light must be registered with the
- * renderer's node library first:
+ * When used with `WebGPURenderer`, the light must be assigned its node
+ * implementation first:
  * ```js
- * renderer.library.addLight( SunLightNode, SunLight );
+ * SunLight.registerNode( SunLightNode );
  * ```
  *
  * @augments Light
