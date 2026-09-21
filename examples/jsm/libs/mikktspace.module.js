@@ -34,6 +34,7 @@
 // Retained for compatibility with the asynchronous WASM implementation.
 export const isReady = true;
 
+// Backwards compatibility. Initialization is no longer required.
 export const ready = Promise.resolve();
 
 /**
