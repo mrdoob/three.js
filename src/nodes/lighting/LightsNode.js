@@ -250,7 +250,7 @@ class LightsNode extends Node {
 
 				if ( lightNode === null ) {
 
-					const lightNodeClass = nodeLibrary.getLightNodeClass( light.constructor );
+					const lightNodeClass = light.lightNode || nodeLibrary.getLightNodeClass( light.constructor );
 
 					if ( lightNodeClass === null ) {
 
