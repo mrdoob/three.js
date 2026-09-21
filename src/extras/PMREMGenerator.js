@@ -105,9 +105,7 @@ class PMREMGenerator {
 
 		if ( sigma > 0 ) {
 
-			// Allocate the full mip chain before disabling mipmap generation for the capture.
-			renderer.initRenderTarget( sourceTarget );
-			sourceTarget.texture.generateMipmaps = false;
+			sourceTarget.texture.mipmapsAutoUpdate = false;
 
 		}
 
@@ -139,7 +137,7 @@ class PMREMGenerator {
 
 		if ( sigma > 0 ) {
 
-			sourceTarget.texture.generateMipmaps = true;
+			sourceTarget.texture.mipmapsAutoUpdate = true;
 			this._blur( pmremTarget, sigma );
 
 		}

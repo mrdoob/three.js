@@ -250,11 +250,22 @@ class Texture extends EventDispatcher {
 		 * Whether to generate mipmaps (if possible) for a texture.
 		 *
 		 * Set this to `false` if you are creating mipmaps manually.
+		 * To temporarily pause updates while keeping mip levels allocated, use
+		 * {@link Texture#mipmapsAutoUpdate} instead.
 		 *
 		 * @type {boolean}
 		 * @default true
 		 */
 		this.generateMipmaps = true;
+
+		/**
+		 * Whether to automatically update generated mipmaps when the texture changes.
+		 * Setting this to `false` does not affect mip level allocation.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.mipmapsAutoUpdate = true;
 
 		/**
 		 * If set to `true`, the alpha channel, if present, is multiplied into the
@@ -513,6 +524,7 @@ class Texture extends EventDispatcher {
 		this.matrix.copy( source.matrix );
 
 		this.generateMipmaps = source.generateMipmaps;
+		this.mipmapsAutoUpdate = source.mipmapsAutoUpdate;
 		this.premultiplyAlpha = source.premultiplyAlpha;
 		this.flipY = source.flipY;
 		this.unpackAlignment = source.unpackAlignment;
@@ -636,6 +648,8 @@ class Texture extends EventDispatcher {
 			unpackAlignment: this.unpackAlignment
 
 		};
+
+		if ( this.mipmapsAutoUpdate === false ) output.mipmapsAutoUpdate = false;
 
 		if ( Object.keys( this.userData ).length > 0 ) output.userData = this.userData;
 

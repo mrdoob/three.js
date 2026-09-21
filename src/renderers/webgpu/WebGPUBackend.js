@@ -1575,7 +1575,7 @@ class WebGPUBackend extends Backend {
 
 				const texture = textures[ i ];
 
-				if ( texture.generateMipmaps === true ) {
+				if ( texture.generateMipmaps === true && texture.mipmapsAutoUpdate === true ) {
 
 					this.textureUtils.generateMipmaps( texture );
 
@@ -3051,7 +3051,7 @@ class WebGPUBackend extends Backend {
 
 		submit( this.device, encoder.finish() );
 
-		if ( dstLevel === 0 && dstTexture.generateMipmaps ) {
+		if ( dstLevel === 0 && dstTexture.generateMipmaps === true && dstTexture.mipmapsAutoUpdate === true ) {
 
 			this.textureUtils.generateMipmaps( dstTexture );
 
@@ -3108,7 +3108,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		const generateMipmaps = texture.generateMipmaps === true && destinationGPU.mipLevelCount > 1;
+		const generateMipmaps = texture.generateMipmaps === true && texture.mipmapsAutoUpdate === true && destinationGPU.mipLevelCount > 1;
 
 		if ( this._isRenderCameraDepthArray( renderContext ) === true ) {
 
@@ -3199,11 +3199,11 @@ class WebGPUBackend extends Backend {
 	 * @param {GPUTexture} sourceGPU - The source GPU texture.
 	 * @param {GPUTexture} destinationGPU - The destination GPU texture.
 	 * @param {Object} rectangle - The source rectangle.
-	 * @param {number} [sourceLayer=0] - The source array layer.
-	 * @param {boolean} [generateMipmaps=texture.generateMipmaps] - Whether mipmaps should be generated.
+	 * @param {number} sourceLayer - The source array layer.
+	 * @param {boolean} generateMipmaps - Whether mipmaps should be generated.
 	 * @private
 	 */
-	_copyFramebufferToTexture( encoder, texture, sourceGPU, destinationGPU, rectangle, sourceLayer = 0, generateMipmaps = texture.generateMipmaps ) {
+	_copyFramebufferToTexture( encoder, texture, sourceGPU, destinationGPU, rectangle, sourceLayer, generateMipmaps ) {
 
 		_texelCopyTextureInfoSrc.texture = sourceGPU;
 		_texelCopyTextureInfoSrc.origin.x = rectangle.x;

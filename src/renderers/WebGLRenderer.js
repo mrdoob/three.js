@@ -3582,7 +3582,7 @@ class WebGLRenderer {
 			state.pixelStorei( _gl.UNPACK_SKIP_IMAGES, currentUnpackSkipImages );
 
 			// Generate mipmaps only when copying level 0
-			if ( dstLevel === 0 && dstTexture.generateMipmaps ) {
+			if ( dstLevel === 0 && dstTexture.generateMipmaps && dstTexture.mipmapsAutoUpdate ) {
 
 				_gl.generateMipmap( glTarget );
 

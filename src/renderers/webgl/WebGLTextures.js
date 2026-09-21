@@ -110,7 +110,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function textureNeedsGenerateMipmaps( texture ) {
 
-		return texture.generateMipmaps;
+		return texture.generateMipmaps && texture.mipmapsAutoUpdate;
 
 	}
 
@@ -298,7 +298,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function getMipLevels( texture, image ) {
 
-		if ( textureNeedsGenerateMipmaps( texture ) === true || ( texture.isFramebufferTexture && texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter ) ) {
+		if ( texture.generateMipmaps === true || ( texture.isFramebufferTexture && texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter ) ) {
 
 			return Math.log2( Math.max( image.width, image.height ) ) + 1;
 
@@ -599,6 +599,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		array.push( texture.format );
 		array.push( texture.type );
 		array.push( texture.generateMipmaps );
+		array.push( texture.mipmapsAutoUpdate );
 		array.push( texture.premultiplyAlpha );
 		array.push( texture.flipY );
 		array.push( texture.unpackAlignment );
@@ -1742,16 +1743,31 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( ! renderTargetProperties.__hasExternalTextures ) {
 
-			const width = Math.max( 1, renderTarget.width >> level );
-			const height = Math.max( 1, renderTarget.height >> level );
+			let maxLevel = level;
 
-			if ( textureTarget === _gl.TEXTURE_3D || textureTarget === _gl.TEXTURE_2D_ARRAY ) {
+			if ( level === 0 && texture.generateMipmaps === true && texture.mipmapsAutoUpdate === false ) {
 
-				state.texImage3D( textureTarget, level, glInternalFormat, width, height, renderTarget.depth, 0, glFormat, glType, null );
+				// Allocate the mip chain without generating its contents.
+				const depth = textureTarget === _gl.TEXTURE_3D ? renderTarget.depth : 1;
+				maxLevel = Math.floor( Math.log2( Math.max( renderTarget.width, renderTarget.height, depth ) ) );
 
-			} else {
+			}
 
-				state.texImage2D( textureTarget, level, glInternalFormat, width, height, 0, glFormat, glType, null );
+			for ( let mipLevel = level; mipLevel <= maxLevel; mipLevel ++ ) {
+
+				const width = Math.max( 1, renderTarget.width >> mipLevel );
+				const height = Math.max( 1, renderTarget.height >> mipLevel );
+
+				if ( textureTarget === _gl.TEXTURE_3D || textureTarget === _gl.TEXTURE_2D_ARRAY ) {
+
+					const depth = textureTarget === _gl.TEXTURE_3D ? Math.max( 1, renderTarget.depth >> mipLevel ) : renderTarget.depth;
+					state.texImage3D( textureTarget, mipLevel, glInternalFormat, width, height, depth, 0, glFormat, glType, null );
+
+				} else {
+
+					state.texImage2D( textureTarget, mipLevel, glInternalFormat, width, height, 0, glFormat, glType, null );
+
+				}
 
 			}
 
@@ -2220,7 +2236,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				generateMipmap( _gl.TEXTURE_CUBE_MAP );
 
-			} else if ( texture.mipmaps.length > 0 ) {
+			} else if ( texture.generateMipmaps === false && texture.mipmaps.length > 0 ) {
 
 				// Limit the max level to keep partial mip chains complete.
 				_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAX_LEVEL, texture.mipmaps.length - 1 );
@@ -2289,7 +2305,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				generateMipmap( glTextureType );
 
-			} else if ( texture.mipmaps.length > 0 ) {
+			} else if ( texture.generateMipmaps === false && texture.mipmaps.length > 0 ) {
 
 				// Limit the max level to keep partial mip chains complete.
 				_gl.texParameteri( glTextureType, _gl.TEXTURE_MAX_LEVEL, texture.mipmaps.length - 1 );
