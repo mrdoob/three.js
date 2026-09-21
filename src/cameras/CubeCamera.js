@@ -199,12 +199,9 @@ class CubeCamera extends Object3D {
 
 		renderer.xr.enabled = false;
 
-		const generateMipmaps = renderTarget.texture.generateMipmaps;
+		const mipmapsAutoUpdate = renderTarget.texture.mipmapsAutoUpdate;
 
-		// Allocate the full mip chain before disabling mipmap generation.
-		if ( generateMipmaps === true ) renderer.initRenderTarget( renderTarget );
-
-		renderTarget.texture.generateMipmaps = false;
+		renderTarget.texture.mipmapsAutoUpdate = false;
 
 		// https://github.com/mrdoob/three.js/issues/31413#issuecomment-3095966812
 
@@ -243,7 +240,7 @@ class CubeCamera extends Object3D {
 		// mipmaps are generated during the last call of render()
 		// at this point, all sides of the cube render target are defined
 
-		renderTarget.texture.generateMipmaps = generateMipmaps;
+		renderTarget.texture.mipmapsAutoUpdate = mipmapsAutoUpdate;
 
 		renderer.setRenderTarget( renderTarget, 5, activeMipmapLevel );
 		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
