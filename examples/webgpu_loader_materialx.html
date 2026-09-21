@@ -322,7 +322,13 @@
 
 				}
 
-				await renderer.compileAsync( model, camera, scene );
+				// Skip double-pass materials until compileAsync() preserves each pass's side.
+				if ( ! ( material.transparent && material.side === THREE.DoubleSide && material.forceSinglePass === false ) ) {
+
+					await renderer.compileAsync( model, camera, scene );
+
+				}
+
 				scene.add( model );
 
 			}
