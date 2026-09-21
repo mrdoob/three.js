@@ -1,7 +1,4 @@
 
-//addons/libs
-import './addons/libs/MikkTSpace.tests.js';
-
 //addons/utils
 import './addons/utils/BufferGeometryUtils.tests.js';
 import './addons/utils/ColorUtils.tests.js';
