@@ -125,6 +125,10 @@ class StructTypeNode extends Node {
 		 * @default true
 		 */
 		this.structLength = calculateLengthAndOffsets( this.membersLayout );
+
+	}
+
+
 	isCacheable( /*builder*/ ) {
 
 		return false;
