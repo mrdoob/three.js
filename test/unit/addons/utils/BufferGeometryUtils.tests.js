@@ -1,4 +1,5 @@
-import { BufferAttribute, BufferGeometry } from 'three';
+import { BufferAttribute, BufferGeometry, InterleavedBuffer, InterleavedBufferAttribute } from 'three';
+import * as MikkTSpace from '../../../../examples/jsm/libs/mikktspace.module.js';
 import * as BufferGeometryUtils from '../../../../examples/jsm/utils/BufferGeometryUtils.js';
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
@@ -36,6 +37,59 @@ export default QUnit.module( 'Addons', () => {
 	QUnit.module( 'Utils', () => {
 
 		QUnit.module( 'BufferGeometryUtils', () => {
+
+			QUnit.module( 'computeMikkTSpaceTangents', () => {
+
+				QUnit.test( 'handles indexed, normalized interleaved attributes and default handedness', ( assert ) => {
+
+					const geometry = new BufferGeometry();
+					const data = new InterleavedBuffer( new Int16Array( [
+						99, 0, 0, 0, 10922, 21845, 21845, 0, 0, 99,
+						99, 32767, - 16384, 0, 10922, 21845, 21845, 32767, 0, 99,
+						99, 32767, 0, - 16384, 10922, 21845, 21845, 32767, 32767, 99,
+						99, 0, 16384, - 16384, 10922, 21845, 21845, 0, 32767, 99
+					] ), 10 );
+					const before = data.array.slice();
+
+					geometry.setAttribute( 'position', new InterleavedBufferAttribute( data, 3, 1, true ) );
+					geometry.setAttribute( 'normal', new InterleavedBufferAttribute( data, 3, 4, true ) );
+					geometry.setAttribute( 'uv', new InterleavedBufferAttribute( data, 2, 7, true ) );
+					geometry.setIndex( [ 0, 1, 2, 0, 2, 3 ] );
+
+					assert.strictEqual( BufferGeometryUtils.computeMikkTSpaceTangents( geometry, MikkTSpace ), geometry, 'updates the original geometry' );
+					assert.strictEqual( geometry.index, null, 'expands indexed triangles' );
+					const tangent = geometry.getAttribute( 'tangent' );
+					assert.strictEqual( tangent.count, 6 );
+					assert.strictEqual( tangent.itemSize, 4 );
+
+					// Independent native C golden, with decoded normalized attribute values.
+					for ( let i = 0; i < tangent.count; i ++ ) {
+
+						assert.ok( Math.abs( tangent.getX( i ) - 0.89442927 ) < 3e-5 && Math.abs( tangent.getY( i ) + 0.44720933 ) < 3e-5 && Math.abs( tangent.getZ( i ) - 0.00001518 ) < 3e-5, `normalized tangent ${i}` );
+						assert.strictEqual( tangent.getW( i ), - 1, `default sign ${i}` );
+
+					}
+
+					assert.deepEqual( data.array, before, 'leaves the source interleaved buffer unchanged' );
+
+				} );
+
+				QUnit.test( 'converts non-Float32 attributes and supports explicit handedness', ( assert ) => {
+
+					const geometry = new BufferGeometry();
+					geometry.setAttribute( 'position', new BufferAttribute( new Float64Array( [ 0, 0, 0, 1, 0, 0, 0, 1, 0 ] ), 3 ) );
+					geometry.setAttribute( 'normal', new BufferAttribute( new Float64Array( [ 0, 0, 1, 0, 0, 1, 0, 0, 1 ] ), 3 ) );
+					geometry.setAttribute( 'uv', new BufferAttribute( new Float64Array( [ 0, 0, 0, 1, 1, 0 ] ), 2 ) );
+
+					BufferGeometryUtils.computeMikkTSpaceTangents( geometry, MikkTSpace, false );
+					assert.deepEqual( Array.from( geometry.getAttribute( 'tangent' ).array ), [ 0, 1, 0, - 1, 0, 1, 0, - 1, 0, 1, 0, - 1 ], 'preserves raw mirrored handedness' );
+
+					BufferGeometryUtils.computeMikkTSpaceTangents( geometry, MikkTSpace, true );
+					assert.deepEqual( Array.from( geometry.getAttribute( 'tangent' ).array ), [ 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1 ], 'explicitly negates mirrored handedness' );
+
+				} );
+
+			} );
 
 			QUnit.module( 'mergeGeometries', () => {
 
