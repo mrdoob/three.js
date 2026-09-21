@@ -2664,15 +2664,6 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 		 */
 		this.isWebGLCubeRenderTarget = true;
 
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isCubeRenderTarget = true;
-
 		const image = { width: size, height: size, depth: 1 };
 		const images = [ image, image, image, image, image, image ];
 
@@ -2906,9 +2897,7 @@ class PMREMGenerator {
 
 		if ( sigma > 0 ) {
 
-			// Allocate the full mip chain before disabling mipmap generation for the capture.
-			renderer.initRenderTarget( sourceTarget );
-			sourceTarget.texture.generateMipmaps = false;
+			sourceTarget.texture.mipmapsAutoUpdate = false;
 
 		}
 
@@ -2940,7 +2929,7 @@ class PMREMGenerator {
 
 		if ( sigma > 0 ) {
 
-			sourceTarget.texture.generateMipmaps = true;
+			sourceTarget.texture.mipmapsAutoUpdate = true;
 			this._blur( pmremTarget, sigma );
 
 		}
@@ -10864,7 +10853,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function getTargetType( texture ) {
 
-		if ( texture.isCubeRenderTarget ) return _gl.TEXTURE_CUBE_MAP;
+		if ( texture.isWebGLCubeRenderTarget ) return _gl.TEXTURE_CUBE_MAP;
 		if ( texture.isWebGL3DRenderTarget ) return _gl.TEXTURE_3D;
 		if ( texture.isWebGLArrayRenderTarget || texture.isCompressedArrayTexture ) return _gl.TEXTURE_2D_ARRAY;
 		return _gl.TEXTURE_2D;
@@ -11220,7 +11209,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( depthTexture && depthTexture.renderTarget === renderTarget ) destroyTexture( depthTexture );
 
-		if ( renderTarget.isCubeRenderTarget ) {
+		if ( renderTarget.isWebGLCubeRenderTarget ) {
 
 			for ( let i = 0; i < 6; i ++ ) {
 
@@ -11341,6 +11330,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		array.push( texture.format );
 		array.push( texture.type );
 		array.push( texture.generateMipmaps );
+		array.push( texture.mipmapsAutoUpdate );
 		array.push( texture.premultiplyAlpha );
 		array.push( texture.flipY );
 		array.push( texture.unpackAlignment );
@@ -12191,7 +12181,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			if ( textureNeedsGenerateMipmaps( texture ) ) {
+			if ( textureNeedsGenerateMipmaps( texture ) && texture.mipmapsAutoUpdate === true ) {
 
 				generateMipmap( textureType );
 
@@ -12452,7 +12442,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			if ( textureNeedsGenerateMipmaps( texture ) ) {
+			if ( textureNeedsGenerateMipmaps( texture ) && texture.mipmapsAutoUpdate === true ) {
 
 				// We assume images for cube map have the same size.
 				generateMipmap( _gl.TEXTURE_CUBE_MAP );
@@ -12582,7 +12572,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	// Setup resources for a Depth Texture for a FBO (needs an extension)
 	function setupDepthTexture( framebuffer, renderTarget, cubeFace ) {
 
-		const isCube = ( renderTarget.isCubeRenderTarget === true );
+		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
 
 		state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
@@ -12660,7 +12650,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	function setupDepthRenderbuffer( renderTarget ) {
 
 		const renderTargetProperties = properties.get( renderTarget );
-		const isCube = ( renderTarget.isCubeRenderTarget === true );
+		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
 
 		// if the bound depth texture has changed
 		if ( renderTargetProperties.__boundDepthTexture !== renderTarget.depthTexture ) {
@@ -12816,7 +12806,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		const textures = renderTarget.textures;
 
-		const isCube = ( renderTarget.isCubeRenderTarget === true );
+		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
 		const isMultipleRenderTargets = ( textures.length > 1 );
 
 		if ( ! isMultipleRenderTargets ) {
@@ -13060,7 +13050,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			const texture = textures[ i ];
 
-			if ( textureNeedsGenerateMipmaps( texture ) ) {
+			if ( textureNeedsGenerateMipmaps( texture ) && texture.mipmapsAutoUpdate === true ) {
 
 				const targetType = getTargetType( renderTarget );
 				const webglTexture = properties.get( texture ).__webglTexture;
@@ -18694,7 +18684,7 @@ class WebGLRenderer {
 		/**
 		 * Sets the active rendertarget.
 		 *
-		 * @param {?RenderTarget} renderTarget - The render target to set. When `null` is given,
+		 * @param {?WebGLRenderTarget} renderTarget - The render target to set. When `null` is given,
 		 * the canvas is set as the active render target instead.
 		 * @param {number} [activeCubeFace=0] - The active cube face when using a cube render target.
 		 * Indicates the z layer to render in to when using 3D or array render targets.
@@ -18775,7 +18765,7 @@ class WebGLRenderer {
 
 				const __webglFramebuffer = properties.get( renderTarget ).__webglFramebuffer;
 
-				if ( renderTarget.isCubeRenderTarget ) {
+				if ( renderTarget.isWebGLCubeRenderTarget ) {
 
 					if ( Array.isArray( __webglFramebuffer[ activeCubeFace ] ) ) {
 
@@ -18889,7 +18879,7 @@ class WebGLRenderer {
 		/**
 		 * Reads the pixel data from the given render target into the given buffer.
 		 *
-		 * @param {RenderTarget} renderTarget - The render target to read from.
+		 * @param {WebGLRenderTarget} renderTarget - The render target to read from.
 		 * @param {number} x - The `x` coordinate of the copy region's origin.
 		 * @param {number} y - The `y` coordinate of the copy region's origin.
 		 * @param {number} width - The width of the copy region.
@@ -18900,16 +18890,16 @@ class WebGLRenderer {
 		 */
 		this.readRenderTargetPixels = function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex, textureIndex = 0 ) {
 
-			if ( ! ( renderTarget && renderTarget.isRenderTarget ) ) {
+			if ( ! ( renderTarget && renderTarget.isWebGLRenderTarget ) ) {
 
-				error( 'WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.RenderTarget.' );
+				error( 'WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
 				return;
 
 			}
 
 			let framebuffer = properties.get( renderTarget ).__webglFramebuffer;
 
-			if ( renderTarget.isCubeRenderTarget && activeCubeFaceIndex !== undefined ) {
+			if ( renderTarget.isWebGLCubeRenderTarget && activeCubeFaceIndex !== undefined ) {
 
 				framebuffer = framebuffer[ activeCubeFaceIndex ];
 
@@ -18975,7 +18965,7 @@ class WebGLRenderer {
 		 * It is recommended to use this version of `readRenderTargetPixels()` whenever possible.
 		 *
 		 * @async
-		 * @param {RenderTarget} renderTarget - The render target to read from.
+		 * @param {WebGLRenderTarget} renderTarget - The render target to read from.
 		 * @param {number} x - The `x` coordinate of the copy region's origin.
 		 * @param {number} y - The `y` coordinate of the copy region's origin.
 		 * @param {number} width - The width of the copy region.
@@ -18987,14 +18977,14 @@ class WebGLRenderer {
 		 */
 		this.readRenderTargetPixelsAsync = async function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex, textureIndex = 0 ) {
 
-			if ( ! ( renderTarget && renderTarget.isRenderTarget ) ) {
+			if ( ! ( renderTarget && renderTarget.isWebGLRenderTarget ) ) {
 
-				throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.RenderTarget.' );
+				throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
 
 			}
 
 			let framebuffer = properties.get( renderTarget ).__webglFramebuffer;
-			if ( renderTarget.isCubeRenderTarget && activeCubeFaceIndex !== undefined ) {
+			if ( renderTarget.isWebGLCubeRenderTarget && activeCubeFaceIndex !== undefined ) {
 
 				framebuffer = framebuffer[ activeCubeFaceIndex ];
 
@@ -19334,7 +19324,7 @@ class WebGLRenderer {
 			state.pixelStorei( _gl.UNPACK_SKIP_IMAGES, currentUnpackSkipImages );
 
 			// Generate mipmaps only when copying level 0
-			if ( dstLevel === 0 && dstTexture.generateMipmaps ) {
+			if ( dstLevel === 0 && dstTexture.generateMipmaps === true && dstTexture.mipmapsAutoUpdate === true ) {
 
 				_gl.generateMipmap( glTarget );
 

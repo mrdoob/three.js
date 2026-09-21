@@ -3839,10 +3839,12 @@ for ( const bool of bools ) boolsCacheMap.set( bool, new ConstNode( bool ) );
 const uintsCacheMap = new Map();
 for ( const uint of uints ) uintsCacheMap.set( uint, new ConstNode( uint, 'uint' ) );
 
-const intsCacheMap = new Map( [ ...uintsCacheMap ].map( el => new ConstNode( el.value, 'int' ) ) );
+const intsCacheMap = new Map();
+for ( const value of uintsCacheMap.keys() ) intsCacheMap.set( value, new ConstNode( value, 'int' ) );
 for ( const int of ints ) intsCacheMap.set( int, new ConstNode( int, 'int' ) );
 
-const floatsCacheMap = new Map( [ ...intsCacheMap ].map( el => new ConstNode( el.value ) ) );
+const floatsCacheMap = new Map();
+for ( const value of intsCacheMap.keys() ) floatsCacheMap.set( value, new ConstNode( value ) );
 for ( const float of floats ) floatsCacheMap.set( float, new ConstNode( float ) );
 for ( const float of floats ) floatsCacheMap.set( - float, new ConstNode( - float ) );
 
@@ -8449,20 +8451,6 @@ class VarNode extends Node {
 	generate( builder ) {
 
 		const { node, name, readOnly } = this;
-		const { renderer } = builder;
-
-		const isWebGPUBackend = renderer.backend.isWebGPUBackend === true;
-
-		let isDeterministic = false;
-		let shouldTreatAsReadOnly = false;
-
-		if ( readOnly ) {
-
-			isDeterministic = builder.isDeterministic( node );
-
-			shouldTreatAsReadOnly = isWebGPUBackend ? readOnly : isDeterministic;
-
-		}
 
 		const nodeType = this.getNodeType( builder );
 
@@ -8483,27 +8471,19 @@ class VarNode extends Node {
 		const vectorType = builder.getVectorType( nodeType );
 		const snippet = node.build( builder, vectorType );
 
-		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, shouldTreatAsReadOnly );
+		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, readOnly );
 
 		const propertyName = builder.getPropertyName( nodeVar );
 
 		let declarationPrefix = propertyName;
 
-		if ( shouldTreatAsReadOnly ) {
+		if ( nodeVar.readOnly ) {
 
-			if ( isWebGPUBackend ) {
+			const count = node.getArrayCount( builder );
 
-				declarationPrefix = isDeterministic
-					? `const ${ propertyName }`
-					: `let ${ propertyName }`;
-
-			} else {
-
-				const count = node.getArrayCount( builder );
-
-				declarationPrefix = `const ${ builder.getVar( nodeVar.type, propertyName, count ) }`;
-
-			}
+			declarationPrefix = builder.isDeterministic( node )
+				? builder.generateConstStatement( nodeVar.type, propertyName, count )
+				: builder.generateVarStatement( nodeVar.type, propertyName, count );
 
 		}
 
@@ -36709,9 +36689,7 @@ class PMREMGenerator {
 
 		if ( sigma > 0 ) {
 
-			// Allocate the full mip chain before disabling mipmap generation for the capture.
-			renderer.initRenderTarget( sourceTarget );
-			sourceTarget.texture.generateMipmaps = false;
+			sourceTarget.texture.mipmapsAutoUpdate = false;
 
 		}
 
@@ -36743,7 +36721,7 @@ class PMREMGenerator {
 
 		if ( sigma > 0 ) {
 
-			sourceTarget.texture.generateMipmaps = true;
+			sourceTarget.texture.mipmapsAutoUpdate = true;
 			this._blur( pmremTarget, sigma );
 
 		}

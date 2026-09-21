@@ -9891,9 +9891,7 @@ class Textures extends DataMap {
 
 					if ( texture.source.dataReady === true ) backend.updateTexture( texture, options );
 
-					const skipAutoGeneration = texture.isStorageTexture === true && texture.mipmapsAutoUpdate === false;
-
-					if ( options.needsMipmaps && texture.mipmaps.length === 0 && ! skipAutoGeneration ) {
+					if ( options.needsMipmaps && texture.mipmaps.length === 0 && texture.mipmapsAutoUpdate === true ) {
 
 						backend.generateMipmaps( texture );
 
@@ -14006,6 +14004,12 @@ class NodeBuilder {
 	 */
 	isDeterministic( node ) {
 
+		if ( node.isVarNode && node.intent ) {
+
+			node = node.node;
+
+		}
+
 		if ( node.isMathNode ) {
 
 			return this.isDeterministic( node.aNode ) &&
@@ -14661,6 +14665,34 @@ class NodeBuilder {
 	getVar( type, name, count = null ) {
 
 		return `${ count !== null ? this.generateArrayDeclaration( type, count ) : this.getType( type ) } ${ name }`;
+
+	}
+
+	/**
+	 * Returns a single const variable statement as a shader string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The shader string.
+	 */
+	generateConstStatement( type, name, count = null ) {
+
+		return `const ${ this.getVar( type, name, count ) }`;
+
+	}
+
+	/**
+	 * Returns a single variable statement as a shader string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The shader string.
+	 */
+	generateVarStatement( type, name, count = null ) {
+
+		return this.getVar( type, name, count );
 
 	}
 
@@ -27279,6 +27311,34 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Returns a single const variable statement as a GLSL string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The GLSL snippet that defines a const variable.
+	 */
+	generateConstStatement( type, name, count = null ) {
+
+		return `const ${ this.getVar( type, name, count ) }`;
+
+	}
+
+	/**
+	 * Returns a single variable statement as a GLSL string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The GLSL snippet that defines a variable.
+	 */
+	generateVarStatement( type, name, count = null ) {
+
+		return this.getVar( type, name, count );
+
+	}
+
+	/**
 	 * Returns the varyings of the given shader stage as a GLSL string.
 	 *
 	 * @param {string} shaderStage - The shader stage.
@@ -32356,7 +32416,7 @@ class WebGLTextureUtils {
 		state.pixelStorei( gl.UNPACK_SKIP_IMAGES, currentUnpackSkipImages );
 
 		// Generate mipmaps only when copying level 0
-		if ( dstLevel === 0 && dstTexture.generateMipmaps ) {
+		if ( dstLevel === 0 && dstTexture.generateMipmaps === true && dstTexture.mipmapsAutoUpdate === true ) {
 
 			gl.generateMipmap( glTextureType );
 
@@ -32455,7 +32515,7 @@ class WebGLTextureUtils {
 
 		}
 
-		if ( texture.generateMipmaps ) this.generateMipmaps( texture );
+		if ( texture.generateMipmaps === true && texture.mipmapsAutoUpdate === true ) this.generateMipmaps( texture );
 
 		this.backend._setFramebuffer( renderContext );
 
@@ -34088,7 +34148,7 @@ class WebGLBackend extends Backend {
 
 				const texture = textures[ i ];
 
-				if ( texture.generateMipmaps ) {
+				if ( texture.generateMipmaps === true && texture.mipmapsAutoUpdate === true ) {
 
 					this.generateMipmaps( texture );
 
@@ -42806,6 +42866,34 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Returns a single const variable statement as a WGSL string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The WGSL snippet that defines a const variable.
+	 */
+	generateConstStatement( type, name/*, count = null*/ ) {
+
+		return `const ${ name }`;
+
+	}
+
+	/**
+	 * Returns a single variable statement as a WGSL string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The WGSL snippet that defines a variable.
+	 */
+	generateVarStatement( type, name/*, count = null*/ ) {
+
+		return `let ${ name }`;
+
+	}
+
+	/**
 	 * Returns the variables of the given shader stage as a WGSL string.
 	 *
 	 * @param {string} shaderStage - The shader stage.
@@ -47982,7 +48070,7 @@ class WebGPUBackend extends Backend {
 
 				const texture = textures[ i ];
 
-				if ( texture.generateMipmaps === true ) {
+				if ( texture.generateMipmaps === true && texture.mipmapsAutoUpdate === true ) {
 
 					this.textureUtils.generateMipmaps( texture );
 
@@ -49458,7 +49546,7 @@ class WebGPUBackend extends Backend {
 
 		submit( this.device, encoder.finish() );
 
-		if ( dstLevel === 0 && dstTexture.generateMipmaps ) {
+		if ( dstLevel === 0 && dstTexture.generateMipmaps === true && dstTexture.mipmapsAutoUpdate === true ) {
 
 			this.textureUtils.generateMipmaps( dstTexture );
 
@@ -49515,7 +49603,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		const generateMipmaps = texture.generateMipmaps === true && destinationGPU.mipLevelCount > 1;
+		const generateMipmaps = texture.generateMipmaps === true && texture.mipmapsAutoUpdate === true && destinationGPU.mipLevelCount > 1;
 
 		if ( this._isRenderCameraDepthArray( renderContext ) === true ) {
 
@@ -50642,15 +50730,6 @@ class StorageTexture extends Texture {
 		 */
 		this.isStorageTexture = true;
 
-		/**
-		 * When `true`, mipmaps will be auto-generated after compute writes.
-		 * When `false`, mipmaps must be written manually via compute shaders.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.mipmapsAutoUpdate = true;
-
 	}
 	/**
 	 * Sets the size of the storage texture.
@@ -50735,6 +50814,17 @@ class Storage3DTexture extends Texture {
 		 * @default true
 		 */
 		this.isStorageTexture = true;
+
+		/**
+		 * Whether the renderer regenerates the mipmaps automatically.
+		 *
+		 * Overwritten and set to `false` by default since the WebGPU backend
+		 * does not support mipmap generation for 3D textures.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.mipmapsAutoUpdate = false;
 
 		/**
 		 * Indicates whether this texture is a 3D texture.
@@ -50839,6 +50929,16 @@ class StorageArrayTexture extends Texture {
 		 * @default true
 		 */
 		this.isStorageTexture = true;
+
+		/**
+		 * Whether the renderer regenerates the mipmaps automatically.
+		 *
+		 * Overwritten and set to `false` by default.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.mipmapsAutoUpdate = false;
 
 	}
 

@@ -3052,7 +3052,7 @@ class Vector2 {
 		 * @readonly
 		 * @default true
 		 */
-		Vector2.prototype.isVector2 = true;
+		this.prototype.isVector2 = true;
 
 	}
 
@@ -4823,7 +4823,7 @@ class Vector3 {
 		 * @readonly
 		 * @default true
 		 */
-		Vector3.prototype.isVector3 = true;
+		this.prototype.isVector3 = true;
 
 	}
 
@@ -6085,7 +6085,7 @@ class Matrix3 {
 		 * @readonly
 		 * @default true
 		 */
-		Matrix3.prototype.isMatrix3 = true;
+		this.prototype.isMatrix3 = true;
 
 	}
 
@@ -7090,7 +7090,7 @@ class TextureSource {
 
 		} else if ( data !== null ) {
 
-			target.set( data.width, data.height, data.depth || 0 );
+			target.set( data.width || 0, data.height || 0, data.depth || 0 );
 
 		} else {
 
@@ -7494,6 +7494,17 @@ class Texture extends EventDispatcher {
 		this.generateMipmaps = true;
 
 		/**
+		 * Whether the renderer regenerates the mipmaps automatically whenever the
+		 * texture is uploaded, rendered to or copied into. Set this to `false` to
+		 * pause the regeneration and write the mip levels yourself. Requires
+		 * {@link Texture#generateMipmaps}.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.mipmapsAutoUpdate = true;
+
+		/**
 		 * If set to `true`, the alpha channel, if present, is multiplied into the
 		 * color channels when the texture is uploaded to the GPU.
 		 *
@@ -7750,6 +7761,7 @@ class Texture extends EventDispatcher {
 		this.matrix.copy( source.matrix );
 
 		this.generateMipmaps = source.generateMipmaps;
+		this.mipmapsAutoUpdate = source.mipmapsAutoUpdate;
 		this.premultiplyAlpha = source.premultiplyAlpha;
 		this.flipY = source.flipY;
 		this.unpackAlignment = source.unpackAlignment;
@@ -7869,6 +7881,7 @@ class Texture extends EventDispatcher {
 			flipY: this.flipY,
 
 			generateMipmaps: this.generateMipmaps,
+			mipmapsAutoUpdate: this.mipmapsAutoUpdate,
 			premultiplyAlpha: this.premultiplyAlpha,
 			unpackAlignment: this.unpackAlignment
 
@@ -8096,7 +8109,7 @@ class Vector4 {
 		 * @readonly
 		 * @default true
 		 */
-		Vector4.prototype.isVector4 = true;
+		this.prototype.isVector4 = true;
 
 	}
 
@@ -9136,6 +9149,7 @@ class RenderTarget extends EventDispatcher {
 	 *
 	 * @typedef {Object} RenderTarget~Options
 	 * @property {boolean} [generateMipmaps=false] - Whether to generate mipmaps or not.
+	 * @property {boolean} [mipmapsAutoUpdate=true] - Whether to regenerate mipmaps automatically after rendering or not.
 	 * @property {number} [magFilter=LinearFilter] - The mag filter.
 	 * @property {number} [minFilter=LinearFilter] - The min filter.
 	 * @property {number} [format=RGBAFormat] - The texture format.
@@ -9421,6 +9435,7 @@ class RenderTarget extends EventDispatcher {
 		if ( options.colorSpace !== undefined ) values.colorSpace = options.colorSpace;
 		if ( options.flipY !== undefined ) values.flipY = options.flipY;
 		if ( options.generateMipmaps !== undefined ) values.generateMipmaps = options.generateMipmaps;
+		if ( options.mipmapsAutoUpdate !== undefined ) values.mipmapsAutoUpdate = options.mipmapsAutoUpdate;
 		if ( options.internalFormat !== undefined ) values.internalFormat = options.internalFormat;
 
 		for ( let i = 0; i < this.textures.length; i ++ ) {
@@ -10050,7 +10065,7 @@ class Matrix4 {
 		 * @readonly
 		 * @default true
 		 */
-		Matrix4.prototype.isMatrix4 = true;
+		this.prototype.isMatrix4 = true;
 
 	}
 
@@ -49784,6 +49799,7 @@ class ObjectLoader extends Loader {
 				if ( data.flipY !== undefined ) texture.flipY = data.flipY;
 
 				if ( data.generateMipmaps !== undefined ) texture.generateMipmaps = data.generateMipmaps;
+				if ( data.mipmapsAutoUpdate !== undefined ) texture.mipmapsAutoUpdate = data.mipmapsAutoUpdate;
 				if ( data.premultiplyAlpha !== undefined ) texture.premultiplyAlpha = data.premultiplyAlpha;
 				if ( data.unpackAlignment !== undefined ) texture.unpackAlignment = data.unpackAlignment;
 				if ( data.compareFunction !== undefined ) texture.compareFunction = data.compareFunction;
@@ -51034,12 +51050,9 @@ class CubeCamera extends Object3D {
 
 		renderer.xr.enabled = false;
 
-		const generateMipmaps = renderTarget.texture.generateMipmaps;
+		const mipmapsAutoUpdate = renderTarget.texture.mipmapsAutoUpdate;
 
-		// Allocate the full mip chain before disabling mipmap generation.
-		if ( generateMipmaps === true ) renderer.initRenderTarget( renderTarget );
-
-		renderTarget.texture.generateMipmaps = false;
+		renderTarget.texture.mipmapsAutoUpdate = false;
 
 		// https://github.com/mrdoob/three.js/issues/31413#issuecomment-3095966812
 
@@ -51078,7 +51091,7 @@ class CubeCamera extends Object3D {
 		// mipmaps are generated during the last call of render()
 		// at this point, all sides of the cube render target are defined
 
-		renderTarget.texture.generateMipmaps = generateMipmaps;
+		renderTarget.texture.mipmapsAutoUpdate = mipmapsAutoUpdate;
 
 		renderer.setRenderTarget( renderTarget, 5, activeMipmapLevel );
 		if ( reversedDepthBuffer && renderer.autoClear === false ) renderer.clearDepth();
@@ -57242,7 +57255,7 @@ class Matrix2 {
 		 * @readonly
 		 * @default true
 		 */
-		Matrix2.prototype.isMatrix2 = true;
+		this.prototype.isMatrix2 = true;
 
 	}
 
