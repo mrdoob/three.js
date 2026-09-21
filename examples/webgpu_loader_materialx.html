@@ -292,11 +292,8 @@
 			async function addSample( sample, path ) {
 
 				const model = prefab.clone();
-				model.visible = false;
 
 				models.push( model );
-
-				scene.add( model );
 
 				updateModelsAlign();
 
@@ -326,7 +323,7 @@
 				}
 
 				await renderer.compileAsync( model, camera, scene );
-				model.visible = true;
+				scene.add( model );
 
 			}
 
