@@ -1,8 +1,8 @@
 import { WebGLLights } from './WebGLLights.js';
 
-function WebGLRenderState( extensions ) {
+function WebGLRenderState() {
 
-	const lights = new WebGLLights( extensions );
+	const lights = new WebGLLights();
 
 	const lightsArray = [];
 	const shadowsArray = [];
@@ -74,7 +74,7 @@ function WebGLRenderState( extensions ) {
 
 }
 
-function WebGLRenderStates( extensions ) {
+function WebGLRenderStates() {
 
 	let renderStates = new WeakMap();
 
@@ -85,14 +85,14 @@ function WebGLRenderStates( extensions ) {
 
 		if ( renderStateArray === undefined ) {
 
-			renderState = new WebGLRenderState( extensions );
+			renderState = new WebGLRenderState();
 			renderStates.set( scene, [ renderState ] );
 
 		} else {
 
 			if ( renderCallDepth >= renderStateArray.length ) {
 
-				renderState = new WebGLRenderState( extensions );
+				renderState = new WebGLRenderState();
 				renderStateArray.push( renderState );
 
 			} else {

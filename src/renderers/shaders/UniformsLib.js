@@ -199,7 +199,6 @@ const UniformsLib = {
 			groundColor: {}
 		} },
 
-		// TODO (abelnation): RectAreaLight BRDF data needs to be moved from example to main src
 		rectAreaLights: { value: [], properties: {
 			color: {},
 			position: {},

@@ -129,7 +129,6 @@ import './src/lights/LightProbe.tests.js';
 import './src/lights/LightShadow.tests.js';
 import './src/lights/PointLight.tests.js';
 import './src/lights/PointLightShadow.tests.js';
-import './src/lights/RectAreaLight.tests.js';
 import './src/lights/SpotLight.tests.js';
 import './src/lights/SpotLightShadow.tests.js';
 

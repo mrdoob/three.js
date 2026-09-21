@@ -22,7 +22,6 @@ import ShadowNodeMaterial from '../../../materials/nodes/ShadowNodeMaterial.js';
 // Lights
 import { PointLight } from '../../../lights/PointLight.js';
 import { DirectionalLight } from '../../../lights/DirectionalLight.js';
-import { RectAreaLight } from '../../../lights/RectAreaLight.js';
 import { SpotLight } from '../../../lights/SpotLight.js';
 import { AmbientLight } from '../../../lights/AmbientLight.js';
 import { HemisphereLight } from '../../../lights/HemisphereLight.js';
@@ -32,7 +31,6 @@ import ProjectorLight from '../../../lights/webgpu/ProjectorLight.js';
 import {
 	PointLightNode,
 	DirectionalLightNode,
-	RectAreaLightNode,
 	SpotLightNode,
 	AmbientLightNode,
 	HemisphereLightNode,
@@ -77,7 +75,6 @@ class StandardNodeLibrary extends NodeLibrary {
 
 		this.addLight( PointLightNode, PointLight );
 		this.addLight( DirectionalLightNode, DirectionalLight );
-		this.addLight( RectAreaLightNode, RectAreaLight );
 		this.addLight( SpotLightNode, SpotLight );
 		this.addLight( AmbientLightNode, AmbientLight );
 		this.addLight( HemisphereLightNode, HemisphereLight );

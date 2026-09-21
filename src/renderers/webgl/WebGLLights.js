@@ -2,7 +2,6 @@ import { Color } from '../../math/Color.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
-import { UniformsLib } from '../shaders/UniformsLib.js';
 import { RGFormat } from '../../constants.js';
 
 function UniformsCache() {
@@ -156,7 +155,7 @@ function shadowCastingAndTexturingLightsFirst( lightA, lightB ) {
 
 }
 
-function WebGLLights( extensions ) {
+function WebGLLights() {
 
 	const cache = new UniformsCache();
 
@@ -408,6 +407,15 @@ function WebGLLights( extensions ) {
 
 			} else if ( light.isRectAreaLight ) {
 
+				if ( rectAreaLength === 0 ) {
+
+					const { ltc1, ltc2 } = light.getLTCTextures();
+
+					state.rectAreaLTC1 = ltc1;
+					state.rectAreaLTC2 = ltc2;
+
+				}
+
 				const uniforms = cache.get( light );
 
 				uniforms.color.copy( color ).multiplyScalar( intensity );
@@ -463,22 +471,6 @@ function WebGLLights( extensions ) {
 				state.hemi[ hemiLength ] = uniforms;
 
 				hemiLength ++;
-
-			}
-
-		}
-
-		if ( rectAreaLength > 0 ) {
-
-			if ( extensions.has( 'OES_texture_float_linear' ) === true ) {
-
-				state.rectAreaLTC1 = UniformsLib.LTC_FLOAT_1;
-				state.rectAreaLTC2 = UniformsLib.LTC_FLOAT_2;
-
-			} else {
-
-				state.rectAreaLTC1 = UniformsLib.LTC_HALF_1;
-				state.rectAreaLTC2 = UniformsLib.LTC_HALF_2;
 
 			}
 

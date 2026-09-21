@@ -41,7 +41,8 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
-			import { RectAreaLightTexturesLib } from 'three/addons/lights/RectAreaLightTexturesLib.js';
+			import { RectAreaLight } from 'three/addons/lights/RectAreaLight.js';
+			import { RectAreaLightNode } from 'three/addons/lights/RectAreaLightNode.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -105,13 +106,12 @@
 
 			function init() {
 
-				THREE.RectAreaLightNode.setLTC( RectAreaLightTexturesLib.init() );
-
 				const LAYER_VOLUMETRIC_LIGHTING = 10;
 
 				timer = new THREE.Timer();
 
 				renderer = new THREE.WebGPURenderer();
+				renderer.library.addLight( RectAreaLightNode, RectAreaLight );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -160,17 +160,17 @@
 
 				// Objects
 
-				rectLight1 = new THREE.RectAreaLight( 0xff0000, 5, 4, 10 );
+				rectLight1 = new RectAreaLight( 0xff0000, 5, 4, 10 );
 				rectLight1.layers.enable( LAYER_VOLUMETRIC_LIGHTING );
 				rectLight1.position.set( - 5, 6, 5 );
 				scene.add( rectLight1 );
 
-				rectLight2 = new THREE.RectAreaLight( 0x00ff00, 5, 4, 10 );
+				rectLight2 = new RectAreaLight( 0x00ff00, 5, 4, 10 );
 				rectLight2.layers.enable( LAYER_VOLUMETRIC_LIGHTING );
 				rectLight2.position.set( 0, 6, 5 );
 				scene.add( rectLight2 );
 
-				rectLight3 = new THREE.RectAreaLight( 0x0000ff, 5, 4, 10 );
+				rectLight3 = new RectAreaLight( 0x0000ff, 5, 4, 10 );
 				rectLight3.layers.enable( LAYER_VOLUMETRIC_LIGHTING );
 				rectLight3.position.set( 5, 6, 5 );
 				scene.add( rectLight3 );

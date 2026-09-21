@@ -32,7 +32,7 @@
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
+import { RectAreaLight } from 'three/addons/lights/RectAreaLight.js';
 import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -40,7 +40,6 @@ function main() {
 
 	const canvas = document.querySelector( '#c' );
 	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
-	RectAreaLightUniformsLib.init();
 
 	const fov = 45;
 	const aspect = 2; // the canvas default
@@ -162,7 +161,7 @@ function main() {
 		const intensity = 5;
 		const width = 12;
 		const height = 4;
-		const light = new THREE.RectAreaLight( color, intensity, width, height );
+		const light = new RectAreaLight( color, intensity, width, height );
 		light.position.set( 0, 10, 0 );
 		light.rotation.x = THREE.MathUtils.degToRad( - 90 );
 		scene.add( light );
