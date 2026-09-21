@@ -209,8 +209,8 @@ class DataTextureLoader extends Loader {
  * @property {number} [wrapS=ClampToEdgeWrapping] - The wrapS value.
  * @property {number} [wrapT=ClampToEdgeWrapping] - The wrapT value.
  * @property {number} [anisotropy=1] - The anisotropy value.
-	 * @property {boolean} [mipmapsEnabled] - Whether to allocate mip levels for the texture.
-	 * @property {boolean} [mipmapsAutoUpdate] - Whether to automatically generate mipmaps.
+ * @property {boolean} [mipmapsEnabled] - Whether to allocate mip levels for the texture.
+ * @property {boolean} [mipmapsAutoUpdate] - Whether to automatically generate mipmaps.
  * @property {string} [colorSpace] - The color space.
  * @property {number} [magFilter] - The mag filter.
  * @property {number} [minFilter] - The min filter.
