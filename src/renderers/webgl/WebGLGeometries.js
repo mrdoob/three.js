@@ -100,7 +100,8 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 		// check whether a 32 bit or 16 bit buffer is required to store the indices
 		// account for PRIMITIVE_RESTART_FIXED_INDEX, #24565
-		const attribute = new ( geometryPosition.count >= 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( Math.ceil( count / 3 ) * 6, 1 );
+		const IndexBufferAttribute = geometryPosition.count >= 65535 ? Uint32BufferAttribute : Uint16BufferAttribute;
+		const attribute = new IndexBufferAttribute( Math.ceil( count / 3 ) * 6, 1 );
 		const indices = attribute.array;
 
 		if ( geometryIndex !== null ) {
@@ -108,38 +109,31 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 			const array = geometryIndex.array;
 			version = geometryIndex.version;
 
-			for ( let i = 0, j = 0, l = array.length; i < l; i += 3 ) {
+			for ( let i = 0, j = 0; i < count; i += 3 ) {
 
 				const a = array[ i + 0 ];
 				const b = array[ i + 1 ];
 				const c = array[ i + 2 ];
 
-				indices[ j ++ ] = a;
-				indices[ j ++ ] = b;
-				indices[ j ++ ] = b;
-				indices[ j ++ ] = c;
-				indices[ j ++ ] = c;
-				indices[ j ++ ] = a;
+				indices[ j ++ ] = a; indices[ j ++ ] = b;
+				indices[ j ++ ] = b; indices[ j ++ ] = c;
+				indices[ j ++ ] = c; indices[ j ++ ] = a;
 
 			}
 
 		} else {
 
-			const array = geometryPosition.array;
 			version = geometryPosition.version;
 
-			for ( let i = 0, j = 0, l = ( array.length / 3 ) - 1; i < l; i += 3 ) {
+			for ( let i = 0, j = 0; i < count; i += 3 ) {
 
 				const a = i + 0;
 				const b = i + 1;
 				const c = i + 2;
 
-				indices[ j ++ ] = a;
-				indices[ j ++ ] = b;
-				indices[ j ++ ] = b;
-				indices[ j ++ ] = c;
-				indices[ j ++ ] = c;
-				indices[ j ++ ] = a;
+				indices[ j ++ ] = a; indices[ j ++ ] = b;
+				indices[ j ++ ] = b; indices[ j ++ ] = c;
+				indices[ j ++ ] = c; indices[ j ++ ] = a;
 
 			}
 
