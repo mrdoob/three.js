@@ -450,7 +450,7 @@ class Bindings extends DataMap {
 
 				}
 
-				if ( texture.isStorageTexture === true && texture.isArrayTexture !== true && texture.is3DTexture !== true && texture.mipmapsAutoUpdate === true ) {
+				if ( texture.isStorageTexture === true && texture.mipmapsAutoUpdate === true ) {
 
 					const textureData = this.get( texture );
 
