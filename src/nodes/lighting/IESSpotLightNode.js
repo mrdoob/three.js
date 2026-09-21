@@ -1,6 +1,27 @@
 import SpotLightNode from './SpotLightNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { vec2 } from '../tsl/TSLBase.js';
+import { atan } from '../math/MathNode.js';
+import { remap } from '../utils/Remap.js';
+import { uniform } from '../core/UniformNode.js';
+import { renderGroup } from '../core/UniformGroupNode.js';
+import { cameraViewMatrix } from '../accessors/Camera.js';
+import { Vector3 } from '../../math/Vector3.js';
+
+// Returns the given axis of the light's local frame in view space.
+const lightViewAxis = ( light, index ) => {
+
+	const axis = uniform( new Vector3() );
+	axis.setGroup( renderGroup )
+		.onRenderUpdate( () => {
+
+			axis.value.setFromMatrixColumn( light.matrixWorld, index ).normalize();
+
+		} );
+
+	return cameraViewMatrix.transformDirection( axis );
+
+};
 
 /**
  * An IES version of the default spot light node.
@@ -49,9 +70,17 @@ class IESSpotLightNode extends SpotLightNode {
 
 		if ( iesMap && iesMap.isTexture === true ) {
 
-			const angle = angleCosine.acos().mul( 1.0 / Math.PI );
+			const light = this.light;
 
-			this._iesTextureNode = texture( iesMap, vec2( angle, 0 ), 0 );
+			const lightDirection = this.getLightVector( builder ).normalize();
+			const lightX = lightViewAxis( light, 0 );
+			const lightY = lightViewAxis( light, 1 );
+
+			// the tilt angle off the light's forward axis and the twist angle around it to sample the IES dimensions
+			const twistAngle = remap( atan( lightDirection.dot( lightY ), lightDirection.dot( lightX ) ), - Math.PI, Math.PI );
+			const tiltAngle = remap( angleCosine.acos(), 0, Math.PI );
+
+			this._iesTextureNode = texture( iesMap, vec2( tiltAngle, twistAngle ), 0 );
 
 			spotAttenuation = this._iesTextureNode.r;
 

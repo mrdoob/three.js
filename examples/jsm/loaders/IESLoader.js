@@ -5,6 +5,7 @@ import {
 	RedFormat,
 	MathUtils,
 	Loader,
+	RepeatWrapping,
 	UnsignedByteType,
 	LinearFilter,
 	HalfFloatType,
@@ -178,9 +179,10 @@ class IESLoader extends Loader {
 		const iesLamp = new IESLamp( text );
 		const data = this._getIESValues( iesLamp, type );
 
-		const texture = new DataTexture( data, 180, 1, RedFormat, type );
+		const texture = new DataTexture( data, 180, 360, RedFormat, type );
 		texture.minFilter = LinearFilter;
 		texture.magFilter = LinearFilter;
+		texture.wrapT = RepeatWrapping;
 		texture.needsUpdate = true;
 
 		return texture;
