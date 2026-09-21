@@ -117,13 +117,13 @@ class NodeLibrary {
 	/**
 	 * Returns a light node class definition for a light class definition.
 	 *
-	 * @deprecated since r186. Read the light node class from `Light.prototype.lightNode` instead.
+	 * @deprecated since r187. Read the light node class from `Light.prototype.lightNode` instead.
 	 * @param {Light.constructor} lightClass - The light class definition.
 	 * @return {?AnalyticLightNode.constructor} The light node class definition. Returns `null` if no light node is found.
 	 */
 	getLightNodeClass( lightClass ) {
 
-		warnOnce( 'NodeLibrary: "getLightNodeClass()" has been deprecated. Read the light node class from the light\'s "lightNode" property instead.' ); // @deprecated r186
+		warnOnce( 'NodeLibrary: "getLightNodeClass()" has been deprecated. Read the light node class from the light\'s "lightNode" property instead.' ); // @deprecated r187
 
 		return lightClass.prototype.lightNode || null;
 
@@ -132,13 +132,13 @@ class NodeLibrary {
 	/**
 	 * Adds a light node class definition for a given light class definition.
 	 *
-	 * @deprecated since r186. Assign the light node class to `Light.prototype.lightNode` instead.
+	 * @deprecated since r187. Assign the light node class to `Light.prototype.lightNode` instead.
 	 * @param {AnalyticLightNode.constructor} lightNodeClass - The light node class definition.
 	 * @param {Light.constructor} lightClass - The light class definition.
 	 */
 	addLight( lightNodeClass, lightClass ) {
 
-		warnOnce( 'NodeLibrary: "addLight()" has been deprecated. Assign the light node class to the light\'s "lightNode" property instead.' ); // @deprecated r186
+		warnOnce( 'NodeLibrary: "addLight()" has been deprecated. Assign the light node class to the light\'s "lightNode" property instead.' ); // @deprecated r187
 
 		lightClass.prototype.lightNode = lightNodeClass;
 
