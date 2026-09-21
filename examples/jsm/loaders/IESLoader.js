@@ -57,7 +57,17 @@ class IESLoader extends Loader {
 
 		const data = new Array( size );
 
+		const maxTheta = iesLamp.horAngles[ iesLamp.numHorAngles - 1 ];
+
 		function interpolateCandelaValues( phi, theta ) {
+
+			if ( maxTheta > 0 && theta > maxTheta ) { // mirror the measured range around the cycle
+
+				theta %= maxTheta * 2;
+
+				if ( theta > maxTheta ) theta = maxTheta * 2 - theta;
+
+			}
 
 			let phiIndex = 0, thetaIndex = 0;
 			let startTheta = 0, endTheta = 0, startPhi = 0, endPhi = 0;
@@ -109,23 +119,24 @@ class IESLoader extends Loader {
 
 		}
 
-		const startTheta = iesLamp.horAngles[ 0 ], endTheta = iesLamp.horAngles[ iesLamp.numHorAngles - 1 ];
+		const endTheta = iesLamp.horAngles[ iesLamp.numHorAngles - 1 ];
 
 		for ( let i = 0; i < size; ++ i ) {
 
-			let theta = i % width;
+			const theta = i % width;
 			const phi = Math.floor( i / width );
 
-			if ( endTheta - startTheta !== 0 && ( theta < startTheta || theta >= endTheta ) ) { // Handle symmetry for hor angles
+			let sampleTheta = theta;
 
-				theta %= endTheta * 2;
+			if ( endTheta > 0 && sampleTheta > endTheta ) { // mirror the measured range around the cycle
 
-				if ( theta > endTheta )
-					theta = endTheta * 2 - theta;
+				sampleTheta %= endTheta * 2;
+
+				if ( sampleTheta > endTheta ) sampleTheta = endTheta * 2 - sampleTheta;
 
 			}
 
-			data[ phi + theta * height ] = interpolateCandelaValues( phi, theta );
+			data[ phi + theta * height ] = interpolateCandelaValues( phi, sampleTheta );
 
 		}
 
@@ -347,8 +358,14 @@ function IESLamp( text ) {
 
 	}
 
+	const baseAngle = _self.horAngles[ 0 ];
+
 	let maxVal = - 1;
 	for ( let i = 0; i < _self.numHorAngles; ++ i ) {
+
+		// Shift the measured range to start at 0 so it can be mirrored across the full
+		// cycle when sampling.
+		_self.horAngles[ i ] -= baseAngle;
 
 		for ( let j = 0; j < _self.numVerAngles; ++ j ) {
 
@@ -356,6 +373,20 @@ function IESLamp( text ) {
 			maxVal = maxVal < value ? value : maxVal;
 
 		}
+
+	}
+
+	// A range wider than a half cycle is asymmetric, so it wraps back around to the
+	// first angle. Contrary to the standard some files skip that final 360 entry
+	// because it repeats the first one, which Blender's Cycles works around the same way
+	// https://github.com/blender/blender/blob/main/intern/cycles/util/ies.cpp
+	const endAngle = _self.horAngles[ _self.numHorAngles - 1 ];
+	if ( endAngle > 180 && endAngle < 360 ) {
+
+		_self.horAngles.push( 360 );
+		_self.candelaValues.push( _self.candelaValues[ 0 ].slice() );
+
+		_self.numHorAngles = _self.horAngles.length;
 
 	}
 
