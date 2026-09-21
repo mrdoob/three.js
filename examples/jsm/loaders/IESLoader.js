@@ -57,22 +57,12 @@ class IESLoader extends Loader {
 
 		const data = new Array( size );
 
-		const maxTheta = iesLamp.horAngles[ iesLamp.numHorAngles - 1 ];
-
 		function interpolateCandelaValues( phi, theta ) {
-
-			if ( maxTheta > 0 && theta > maxTheta ) { // mirror the measured range around the cycle
-
-				theta %= maxTheta * 2;
-
-				if ( theta > maxTheta ) theta = maxTheta * 2 - theta;
-
-			}
 
 			let phiIndex = 0, thetaIndex = 0;
 			let startTheta = 0, endTheta = 0, startPhi = 0, endPhi = 0;
 
-			for ( let i = 0; i < iesLamp.numHorAngles - 1; ++ i ) { // numHorAngles = horAngles.length-1 because of extra padding, so this wont cause an out of bounds error
+			for ( let i = 0; i < iesLamp.numHorAngles - 1; ++ i ) {
 
 				if ( theta < iesLamp.horAngles[ i + 1 ] || i == iesLamp.numHorAngles - 2 ) {
 
