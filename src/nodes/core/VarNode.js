@@ -167,36 +167,7 @@ class VarNode extends Node {
 
 		const data = builder.getDataFromNode( this );
 
-		if ( data.assign === true ) return true;
-
-		const node = this.node;
-
-		if ( node && node.isShaderCallNodeInternal && node.shaderNode.getLayout() === null ) {
-
-			if ( builder.buildStage === 'setup' ) {
-
-				node.build( builder );
-
-			}
-
-			const shaderNodeData = builder.getDataFromNode( node.shaderNode );
-
-			if ( shaderNodeData.hasLoop === true ) {
-
-				if ( builder.fnCall ) {
-
-					const parentData = builder.getDataFromNode( builder.fnCall.shaderNode );
-					parentData.hasLoop = true;
-
-				}
-
-				return true;
-
-			}
-
-		}
-
-		return false;
+		return data.assign;
 
 	}
 
@@ -220,14 +191,18 @@ class VarNode extends Node {
 
 				if ( this.node.isShaderCallNodeInternal && this.node.shaderNode.getLayout() === null ) {
 
-					const shaderNodeData = builder.getDataFromNode( this.node.shaderNode );
+					if ( builder.fnCall && builder.fnCall.shaderNode ) {
 
-					if ( shaderNodeData.hasLoop ) {
+						const shaderNodeData = builder.getDataFromNode( this.node.shaderNode );
 
-						const data = builder.getDataFromNode( this );
-						data.forceDeclaration = true;
+						if ( shaderNodeData.hasLoop ) {
 
-						addBefore = true;
+							const data = builder.getDataFromNode( this );
+							data.forceDeclaration = true;
+
+							addBefore = true;
+
+						}
 
 					}
 
