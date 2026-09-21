@@ -18,7 +18,7 @@ class RenderTarget extends EventDispatcher {
 	 * Render target options.
 	 *
 	 * @typedef {Object} RenderTarget~Options
-	 * @property {boolean} [generateMipmaps=false] - Whether to generate mipmaps or not.
+	 * @property {boolean} [mipmapsEnabled=false] - Whether to allocate mip levels for the render target textures.
 	 * @property {boolean} [mipmapsAutoUpdate=true] - Whether to automatically update generated mipmaps.
 	 * @property {number} [magFilter=LinearFilter] - The mag filter.
 	 * @property {number} [minFilter=LinearFilter] - The min filter.
@@ -57,7 +57,6 @@ class RenderTarget extends EventDispatcher {
 		super();
 
 		options = Object.assign( {
-			generateMipmaps: false,
 			internalFormat: null,
 			minFilter: LinearFilter,
 			depthBuffer: true,
@@ -288,7 +287,6 @@ class RenderTarget extends EventDispatcher {
 
 		const values = {
 			minFilter: LinearFilter,
-			generateMipmaps: false,
 			flipY: false,
 			internalFormat: null
 		};
@@ -304,7 +302,9 @@ class RenderTarget extends EventDispatcher {
 		if ( options.anisotropy !== undefined ) values.anisotropy = options.anisotropy;
 		if ( options.colorSpace !== undefined ) values.colorSpace = options.colorSpace;
 		if ( options.flipY !== undefined ) values.flipY = options.flipY;
-		if ( options.generateMipmaps !== undefined ) values.generateMipmaps = options.generateMipmaps;
+		if ( options.generateMipmaps !== undefined ) values.generateMipmaps = options.generateMipmaps; // @deprecated, r186
+		else values.mipmapsEnabled = false;
+		if ( options.mipmapsEnabled !== undefined ) values.mipmapsEnabled = options.mipmapsEnabled;
 		if ( options.mipmapsAutoUpdate !== undefined ) values.mipmapsAutoUpdate = options.mipmapsAutoUpdate;
 		if ( options.internalFormat !== undefined ) values.internalFormat = options.internalFormat;
 

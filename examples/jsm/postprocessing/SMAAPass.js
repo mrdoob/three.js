@@ -61,7 +61,7 @@ class SMAAPass extends Pass {
 		this._areaTexture.name = 'SMAAPass.area';
 		this._areaTexture.image = areaTextureImage;
 		this._areaTexture.minFilter = LinearFilter;
-		this._areaTexture.generateMipmaps = false;
+		this._areaTexture.mipmapsEnabled = false;
 		this._areaTexture.flipY = false;
 
 		const searchTextureImage = new Image();
@@ -78,7 +78,7 @@ class SMAAPass extends Pass {
 		this._searchTexture.image = searchTextureImage;
 		this._searchTexture.magFilter = NearestFilter;
 		this._searchTexture.minFilter = NearestFilter;
-		this._searchTexture.generateMipmaps = false;
+		this._searchTexture.mipmapsEnabled = false;
 		this._searchTexture.flipY = false;
 
 		// materials - pass 1

@@ -43,7 +43,7 @@ const DFGLUT = /*@__PURE__*/ Fn( ( { roughness, dotNV } ) => {
 		lut.magFilter = LinearFilter;
 		lut.wrapS = ClampToEdgeWrapping;
 		lut.wrapT = ClampToEdgeWrapping;
-		lut.generateMipmaps = false;
+		lut.mipmapsEnabled = false;
 		lut.needsUpdate = true;
 
 	}

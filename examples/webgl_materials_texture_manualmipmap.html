@@ -111,6 +111,8 @@
 
 				const canvas = mipmap( 128, '#f00' );
 				const textureCanvas1 = new THREE.CanvasTexture( canvas );
+				textureCanvas1.mipmapsEnabled = true;
+				textureCanvas1.mipmapsAutoUpdate = false;
 				textureCanvas1.mipmaps[ 0 ] = canvas;
 				textureCanvas1.mipmaps[ 1 ] = mipmap( 64, '#0f0' );
 				textureCanvas1.mipmaps[ 2 ] = mipmap( 32, '#00f' );

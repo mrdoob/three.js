@@ -544,7 +544,7 @@ class WebGLTextureUtils {
 			const mipmaps = texture.mipmaps;
 			const image = options.image;
 
-			for ( let i = 0; i < mipmaps.length; i ++ ) {
+			for ( let i = 0, il = Math.min( mipmaps.length, options.levels ); i < il; i ++ ) {
 
 				const mipmap = mipmaps[ i ];
 
@@ -615,7 +615,7 @@ class WebGLTextureUtils {
 
 				gl.texSubImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height, glFormat, glType, image );
 
-				for ( let j = 0; j < mipmaps.length; j ++ ) {
+				for ( let j = 0, jl = Math.min( mipmaps.length, options.levels - 1 ); j < jl; j ++ ) {
 
 					const mipmap = mipmaps[ j ];
 					const image = getImage( mipmap.images[ i ] );
@@ -690,7 +690,7 @@ class WebGLTextureUtils {
 
 			if ( mipmaps.length > 0 ) {
 
-				for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
+				for ( let i = 0, il = Math.min( mipmaps.length, options.levels ); i < il; i ++ ) {
 
 					const mipmap = mipmaps[ i ];
 
@@ -1049,7 +1049,7 @@ class WebGLTextureUtils {
 		state.pixelStorei( gl.UNPACK_SKIP_IMAGES, currentUnpackSkipImages );
 
 		// Generate mipmaps only when copying level 0
-		if ( dstLevel === 0 && dstTexture.generateMipmaps === true && dstTexture.mipmapsAutoUpdate === true ) {
+		if ( dstLevel === 0 && dstTexture.mipmapsEnabled === true && dstTexture.mipmapsAutoUpdate === true ) {
 
 			gl.generateMipmap( glTextureType );
 
@@ -1148,7 +1148,7 @@ class WebGLTextureUtils {
 
 		}
 
-		if ( texture.generateMipmaps === true && texture.mipmapsAutoUpdate === true ) this.generateMipmaps( texture );
+		if ( texture.mipmapsEnabled === true && texture.mipmapsAutoUpdate === true ) this.generateMipmaps( texture );
 
 		this.backend._setFramebuffer( renderContext );
 

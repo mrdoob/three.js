@@ -63,7 +63,7 @@
 					.setPath( './textures/cube/pisaHDR/' )
 					.load( hdrUrls );
 
-				cube1Texture.generateMipmaps = true;
+				cube1Texture.mipmapsEnabled = true;
 				cube1Texture.minFilter = THREE.LinearMipmapLinearFilter;
 
 				const cube2Urls = [ 'dark-s_px.jpg', 'dark-s_nx.jpg', 'dark-s_py.jpg', 'dark-s_ny.jpg', 'dark-s_pz.jpg', 'dark-s_nz.jpg' ];
@@ -71,7 +71,7 @@
 					.setPath( './textures/cube/MilkyWay/' )
 					.loadAsync( cube2Urls );
 
-				cube2Texture.generateMipmaps = true;
+				cube2Texture.mipmapsEnabled = true;
 				cube2Texture.minFilter = THREE.LinearMipmapLinearFilter;
 
 				scene.environmentNode = mix( pmremTexture( cube2Texture ), pmremTexture( cube1Texture ), oscSine( time.mul( .1 ) ) );

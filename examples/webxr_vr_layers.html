@@ -179,7 +179,7 @@
 				snellenTexture = new THREE.TextureLoader().load( 'textures/snellen.png' );
 				snellenTexture.repeat.x = snellenConfig.cropX;
 				snellenTexture.repeat.y = snellenConfig.cropY;
-				snellenTexture.generateMipmaps = false;
+				snellenTexture.mipmapsEnabled = false;
 				snellenTexture.minFilter = THREE.LinearFilter;
 				const snellenMeshPlain = new THREE.Mesh(
 					new THREE.PlaneGeometry( snellenConfig.widthMeters, snellenConfig.heightMeters ),

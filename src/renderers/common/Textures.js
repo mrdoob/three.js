@@ -355,7 +355,7 @@ class Textures extends DataMap {
 		// Normal textures, compressed cube textures and render targets define base level + mips with their mipmap array
 		// Uncompressed cube textures use their mipmap array only for mips (no base level)
 
-		if ( texture.isCubeTexture && texture.mipmaps.length > 0 && ! isRenderTarget ) options.levels ++;
+		if ( options.needsMipmaps && texture.isCubeTexture && texture.mipmaps.length > 0 && ! isRenderTarget ) options.levels ++;
 
 		//
 
@@ -410,7 +410,7 @@ class Textures extends DataMap {
 
 					if ( texture.source.dataReady === true ) backend.updateTexture( texture, options );
 
-					if ( options.needsMipmaps && texture.mipmaps.length === 0 && texture.mipmapsAutoUpdate === true ) {
+					if ( options.needsMipmaps && texture.mipmapsAutoUpdate === true ) {
 
 						backend.generateMipmaps( texture );
 
@@ -601,7 +601,7 @@ class Textures extends DataMap {
 	 */
 	needsMipmaps( texture ) {
 
-		return texture.generateMipmaps === true || texture.mipmaps.length > 0;
+		return texture.mipmapsEnabled === true;
 
 	}
 

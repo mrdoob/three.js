@@ -1635,7 +1635,7 @@ class Renderer {
 				type: this._outputBufferType,
 				format: RGBAFormat,
 				colorSpace: ColorManagement.workingColorSpace,
-				generateMipmaps: false,
+				mipmapsEnabled: false,
 				minFilter: LinearFilter,
 				magFilter: LinearFilter,
 				samples: this.samples

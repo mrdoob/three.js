@@ -437,7 +437,7 @@ class HDRLoader extends DataTextureLoader {
 			colorSpace: LinearSRGBColorSpace,
 			minFilter: LinearFilter,
 			magFilter: LinearFilter,
-			generateMipmaps: false,
+			mipmapsEnabled: false,
 			flipY: true
 		};
 

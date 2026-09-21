@@ -71,7 +71,7 @@
 
 					const texture = new THREE.CanvasTexture( animation.container );
 					texture.minFilter = THREE.NearestFilter;
-					texture.generateMipmaps = false;
+					texture.mipmapsEnabled = false;
 					texture.colorSpace = THREE.SRGBColorSpace;
 
 					animation.addEventListener( 'enterFrame', function () {

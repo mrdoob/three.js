@@ -77,7 +77,7 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 		this.texture.type = texture.type;
 		this.texture.colorSpace = texture.colorSpace;
 
-		this.texture.generateMipmaps = texture.generateMipmaps;
+		this.texture.mipmapsEnabled = texture.mipmapsEnabled;
 		this.texture.minFilter = texture.minFilter;
 		this.texture.magFilter = texture.magFilter;
 

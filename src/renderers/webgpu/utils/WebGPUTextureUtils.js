@@ -656,7 +656,7 @@ class WebGPUTextureUtils {
 
 			if ( mipmaps.length > 0 ) {
 
-				for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
+				for ( let i = 0, il = Math.min( mipmaps.length, textureDescriptorGPU.mipLevelCount ); i < il; i ++ ) {
 
 					const mipmap = mipmaps[ i ];
 
@@ -765,7 +765,7 @@ class WebGPUTextureUtils {
 
 			if ( mipmaps.length > 0 ) {
 
-				for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
+				for ( let i = 0, il = Math.min( mipmaps.length, textureDescriptorGPU.mipLevelCount ); i < il; i ++ ) {
 
 					const mipmap = mipmaps[ i ];
 
@@ -948,7 +948,7 @@ class WebGPUTextureUtils {
 
 			}
 
-			for ( let j = 0; j < mipmaps.length; j ++ ) {
+			for ( let j = 0, jl = Math.min( mipmaps.length, textureDescriptorGPU.mipLevelCount - 1 ); j < jl; j ++ ) {
 
 				const mipmap = mipmaps[ j ];
 				const image = mipmap.images[ i ];
@@ -1141,7 +1141,7 @@ class WebGPUTextureUtils {
 		const isArrayTexture = textureDescriptorGPU.size.depthOrArrayLayers > 1;
 		const activeLayerUpdates = layerUpdates && layerUpdates.size > 0 ? layerUpdates : null;
 
-		for ( let i = 0; i < mipmaps.length; i ++ ) {
+		for ( let i = 0, il = Math.min( mipmaps.length, textureDescriptorGPU.mipLevelCount ); i < il; i ++ ) {
 
 			const mipmap = mipmaps[ i ];
 

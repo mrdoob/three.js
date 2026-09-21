@@ -796,9 +796,9 @@ class TextureNode extends UniformNode {
 
 		const map = textureNode.value;
 
-		if ( textureNode.generateMipmaps === false && ( map && map.generateMipmaps === false || map.minFilter === NearestFilter || map.magFilter === NearestFilter ) ) {
+		if ( textureNode.mipmapsEnabled === false && ( map && map.mipmapsEnabled === false || map.minFilter === NearestFilter || map.magFilter === NearestFilter ) ) {
 
-			warn( 'TSL: texture().blur() requires mipmaps and sampling. Use .generateMipmaps=true and .minFilter/.magFilter=THREE.LinearFilter in the Texture.' );
+			warn( 'TSL: texture().blur() requires mipmaps and sampling. Use .mipmapsEnabled=true and .minFilter/.magFilter=THREE.LinearFilter in the Texture.' );
 
 			textureNode.biasNode = null;
 

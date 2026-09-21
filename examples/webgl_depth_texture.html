@@ -150,7 +150,7 @@
 				target = new THREE.WebGLRenderTarget( window.innerWidth * dpr, window.innerHeight * dpr );
 				target.texture.minFilter = THREE.NearestFilter;
 				target.texture.magFilter = THREE.NearestFilter;
-				target.texture.generateMipmaps = false;
+				target.texture.mipmapsEnabled = false;
 				target.stencilBuffer = ( format === THREE.DepthStencilFormat ) ? true : false;
 				target.samples = samples;
 

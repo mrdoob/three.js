@@ -469,11 +469,12 @@ class PMREMGenerator {
 
 }
 
-function _createRenderTarget( size, generateMipmaps, depthBuffer ) {
+function _createRenderTarget( size, mipmapsAutoUpdate, depthBuffer ) {
 
 	return new WebGLCubeRenderTarget( size, {
 		minFilter: LinearMipmapLinearFilter,
-		generateMipmaps: generateMipmaps,
+		mipmapsEnabled: true,
+		mipmapsAutoUpdate: mipmapsAutoUpdate,
 		type: HalfFloatType,
 		colorSpace: LinearSRGBColorSpace,
 		depthBuffer: depthBuffer

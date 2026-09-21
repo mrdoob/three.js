@@ -523,7 +523,7 @@ class LightProbeGridWebGL extends Object3D {
 			type: FloatType,
 			minFilter: LinearFilter,
 			magFilter: LinearFilter,
-			generateMipmaps: false,
+			mipmapsEnabled: false,
 			depthBuffer: false
 		} );
 

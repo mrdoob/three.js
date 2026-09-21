@@ -163,7 +163,7 @@ class BloomNode extends Node {
 		 */
 		this._renderTargetBright = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 		this._renderTargetBright.texture.name = 'UnrealBloomPass.bright';
-		this._renderTargetBright.texture.generateMipmaps = false;
+		this._renderTargetBright.texture.mipmapsEnabled = false;
 
 		//
 
@@ -172,14 +172,14 @@ class BloomNode extends Node {
 			const renderTargetHorizontal = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 
 			renderTargetHorizontal.texture.name = 'UnrealBloomPass.h' + i;
-			renderTargetHorizontal.texture.generateMipmaps = false;
+			renderTargetHorizontal.texture.mipmapsEnabled = false;
 
 			this._renderTargetsHorizontal.push( renderTargetHorizontal );
 
 			const renderTargetVertical = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 
 			renderTargetVertical.texture.name = 'UnrealBloomPass.v' + i;
-			renderTargetVertical.texture.generateMipmaps = false;
+			renderTargetVertical.texture.mipmapsEnabled = false;
 
 			this._renderTargetsVertical.push( renderTargetVertical );
 

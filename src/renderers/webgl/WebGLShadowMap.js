@@ -229,7 +229,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 						type: HalfFloatType,
 						minFilter: LinearFilter,
 						magFilter: LinearFilter,
-						generateMipmaps: false
+						mipmapsEnabled: false
 					} );
 					shadow.map.texture.name = light.name + '.shadowMap';
 

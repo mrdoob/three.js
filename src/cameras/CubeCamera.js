@@ -12,7 +12,7 @@ const aspect = 1;
  *
  * ```js
  * // Create cube render target
- * const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 256, { generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
+ * const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 256, { mipmapsEnabled: true, minFilter: THREE.LinearMipmapLinearFilter } );
  *
  * // Create cube camera
  * const cubeCamera = new THREE.CubeCamera( 1, 100000, cubeRenderTarget );

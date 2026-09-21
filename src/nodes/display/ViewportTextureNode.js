@@ -6,6 +6,7 @@ import { screenUV } from './ScreenNode.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { FramebufferTexture } from '../../textures/FramebufferTexture.js';
 import { LinearMipmapLinearFilter } from '../../constants.js';
+import { warnOnce } from '../../utils.js';
 
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -53,12 +54,12 @@ class ViewportTextureNode extends TextureNode {
 		super( framebufferTexture, uvNode, levelNode );
 
 		/**
-		 * Whether to generate mipmaps or not.
+		 * Whether mipmaps are enabled or not.
 		 *
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.generateMipmaps = false;
+		this.mipmapsEnabled = false;
 
 		/**
 		 * The reference framebuffer texture. This is used to store the framebuffer texture
@@ -192,21 +193,44 @@ class ViewportTextureNode extends TextureNode {
 
 		//
 
-		const currentGenerateMipmaps = framebufferTexture.generateMipmaps;
-		framebufferTexture.generateMipmaps = this.generateMipmaps;
+		const currentMipmapsEnabled = framebufferTexture.mipmapsEnabled;
+		framebufferTexture.mipmapsEnabled = this.mipmapsEnabled;
 
 		renderer.copyFramebufferToTexture( framebufferTexture );
 
-		framebufferTexture.generateMipmaps = currentGenerateMipmaps;
+		framebufferTexture.mipmapsEnabled = currentMipmapsEnabled;
 
 	}
 
 	clone() {
 
 		const viewportTextureNode = new this.constructor( this.uvNode, this.levelNode, this.value );
-		viewportTextureNode.generateMipmaps = this.generateMipmaps;
+		viewportTextureNode.mipmapsEnabled = this.mipmapsEnabled;
 
 		return viewportTextureNode;
+
+	}
+
+	/**
+	 * Whether mipmaps are enabled or not.
+	 *
+	 * @deprecated
+	 * @type {boolean}
+	 * @default false
+	 */
+	get generateMipmaps() {
+
+		warnOnce( 'ViewportTextureNode: The "generateMipmaps" property has been renamed to "mipmapsEnabled".' ); // @deprecated r186
+
+		return this.mipmapsEnabled;
+
+	}
+
+	set generateMipmaps( value ) {
+
+		warnOnce( 'ViewportTextureNode: The "generateMipmaps" property has been renamed to "mipmapsEnabled".' ); // @deprecated r186
+
+		this.mipmapsEnabled = value;
 
 	}
 
@@ -236,7 +260,7 @@ export const viewportTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode ).se
  * @param {?Texture} [framebufferTexture=null] - A framebuffer texture holding the viewport data. If not provided, a framebuffer texture is created automatically.
  * @returns {ViewportTextureNode}
  */
-export const viewportMipTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode, null, null, { generateMipmaps: true } ).setParameterLength( 0, 3 );
+export const viewportMipTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode, null, null, { mipmapsEnabled: true } ).setParameterLength( 0, 3 );
 
 // Singleton instances for common usage
 const _singletonOpaqueViewportTextureNode = /*@__PURE__*/ viewportMipTexture();

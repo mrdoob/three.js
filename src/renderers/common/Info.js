@@ -479,7 +479,7 @@ class Info {
 		let size = width * height * depth * bytesPerPixel;
 		const mipmaps = texture.mipmaps;
 
-		if ( mipmaps && mipmaps.length > 0 ) {
+		if ( texture.mipmapsEnabled && mipmaps && mipmaps.length > 0 ) {
 
 			let mipmapSize = 0;
 			for ( let i = 0; i < mipmaps.length; i ++ ) {
@@ -501,7 +501,7 @@ class Info {
 
 			size += mipmapSize;
 
-		} else if ( texture.generateMipmaps ) {
+		} else if ( texture.mipmapsEnabled ) {
 
 			size = size * 1.333; // MiP chain approximation
 

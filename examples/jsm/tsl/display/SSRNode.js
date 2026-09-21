@@ -406,7 +406,14 @@ class SSRNode extends Node {
 		 * @private
 		 * @type {RenderTarget}
 		 */
-		this._blurRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, minFilter: LinearMipmapLinearFilter, magFilter: LinearFilter } );
+		this._blurRenderTarget = new RenderTarget( 1, 1, {
+			depthBuffer: false,
+			type: HalfFloatType,
+			minFilter: LinearMipmapLinearFilter,
+			magFilter: LinearFilter,
+			mipmapsEnabled: true,
+			mipmapsAutoUpdate: false
+		} );
 		this._blurRenderTarget.texture.name = 'SSRNode.Blur';
 		this._blurRenderTarget.texture.mipmaps.push( {}, {}, {}, {}, {} );
 

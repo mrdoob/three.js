@@ -70,7 +70,7 @@
 				const texture = new THREE.TextureLoader().load( 'textures/brick_diffuse.jpg' );
 				texture.minFilter = THREE.NearestFilter;
 				texture.magFilter = THREE.NearestFilter;
-				texture.generateMipmaps = false;
+				texture.mipmapsEnabled = false;
 				texture.colorSpace = THREE.SRGBColorSpace;
 
 				const material2 = new THREE.MeshBasicMaterial( { map: texture } );

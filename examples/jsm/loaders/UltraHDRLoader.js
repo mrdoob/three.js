@@ -493,7 +493,7 @@ class UltraHDRLoader extends Loader {
 			1,
 			LinearSRGBColorSpace
 		);
-		texture.generateMipmaps = true;
+		texture.mipmapsEnabled = true;
 		texture.flipY = true;
 
 		const loader = new FileLoader( this.manager );

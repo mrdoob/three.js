@@ -84,7 +84,7 @@
 				cubeRenderTarget.texture.type = THREE.HalfFloatType;
 				cubeRenderTarget.texture.minFilter = THREE.LinearMipmapLinearFilter;
 				cubeRenderTarget.texture.magFilter = THREE.LinearFilter;
-				cubeRenderTarget.texture.generateMipmaps = true;
+				cubeRenderTarget.texture.mipmapsEnabled = true;
 
 				cubeCamera = new THREE.CubeCamera( 1, 1000, cubeRenderTarget );
 

@@ -2031,7 +2031,7 @@ class WebGLRenderer {
 				const hasHalfFloatSupport = extensions.has( 'EXT_color_buffer_half_float' ) || extensions.has( 'EXT_color_buffer_float' );
 
 				currentRenderState.state.transmissionRenderTarget[ camera.id ] = new WebGLRenderTarget( 1, 1, {
-					generateMipmaps: true,
+					mipmapsEnabled: true,
 					type: hasHalfFloatSupport ? HalfFloatType : UnsignedByteType,
 					minFilter: LinearMipmapLinearFilter,
 					samples: Math.max( 4, capabilities.samples ), // to avoid feedback loops, the transmission render target requires a resolve, see #26177
@@ -3582,7 +3582,7 @@ class WebGLRenderer {
 			state.pixelStorei( _gl.UNPACK_SKIP_IMAGES, currentUnpackSkipImages );
 
 			// Generate mipmaps only when copying level 0
-			if ( dstLevel === 0 && dstTexture.generateMipmaps && dstTexture.mipmapsAutoUpdate ) {
+			if ( dstLevel === 0 && dstTexture.mipmapsEnabled && dstTexture.mipmapsAutoUpdate ) {
 
 				_gl.generateMipmap( glTarget );
 

@@ -35,7 +35,7 @@ class HTMLTexture extends Texture {
 		 * @default true
 		 */
 		this.isHTMLTexture = true;
-		this.generateMipmaps = false;
+		this.mipmapsEnabled = false;
 
 		this.needsUpdate = true;
 

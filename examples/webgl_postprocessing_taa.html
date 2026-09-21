@@ -123,7 +123,7 @@
 				texture.minFilter = THREE.NearestFilter;
 				texture.magFilter = THREE.NearestFilter;
 				texture.anisotropy = 1;
-				texture.generateMipmaps = false;
+				texture.mipmapsEnabled = false;
 				texture.colorSpace = THREE.SRGBColorSpace;
 
 				const material2 = new THREE.MeshBasicMaterial( { map: texture } );

@@ -134,7 +134,7 @@
 				} );
 
 				const storageTexture = new THREE.Storage3DTexture( size, size, size );
-				storageTexture.generateMipmaps = false;
+				storageTexture.mipmapsEnabled = false;
 				storageTexture.name = 'cloud';
 			
 				computeNode = computeCloud( { storageTexture } ).compute( size * size * size ).setName( 'computeCloud' );

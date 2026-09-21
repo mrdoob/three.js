@@ -77,7 +77,7 @@ class HDRCubeTextureLoader extends Loader {
 				texture.colorSpace = LinearSRGBColorSpace;
 				texture.minFilter = LinearFilter;
 				texture.magFilter = LinearFilter;
-				texture.generateMipmaps = false;
+				texture.mipmapsEnabled = false;
 				break;
 
 			case HalfFloatType:
@@ -85,7 +85,7 @@ class HDRCubeTextureLoader extends Loader {
 				texture.colorSpace = LinearSRGBColorSpace;
 				texture.minFilter = LinearFilter;
 				texture.magFilter = LinearFilter;
-				texture.generateMipmaps = false;
+				texture.mipmapsEnabled = false;
 				break;
 
 		}
@@ -117,7 +117,8 @@ class HDRCubeTextureLoader extends Loader {
 						dataTexture.format = texture.format;
 						dataTexture.minFilter = texture.minFilter;
 						dataTexture.magFilter = texture.magFilter;
-						dataTexture.generateMipmaps = texture.generateMipmaps;
+						dataTexture.mipmapsEnabled = texture.mipmapsEnabled;
+						dataTexture.mipmapsAutoUpdate = texture.mipmapsAutoUpdate;
 
 						texture.images[ i ] = dataTexture;
 

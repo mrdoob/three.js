@@ -67,14 +67,14 @@ class FramebufferTexture extends Texture {
 		this.minFilter = NearestFilter;
 
 		/**
-		 * Whether to generate mipmaps (if possible) for a texture.
+		 * Whether to allocate mip levels for the texture.
 		 *
 		 * Overwritten and set to `false` by default.
 		 *
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.generateMipmaps = false;
+		this.mipmapsEnabled = false;
 
 		this.needsUpdate = true;
 

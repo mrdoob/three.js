@@ -115,11 +115,11 @@
 
 				// the render target that will show the shadows in the plane texture
 				renderTarget = new THREE.WebGLRenderTarget( 512, 512 );
-				renderTarget.texture.generateMipmaps = false;
+				renderTarget.texture.mipmapsEnabled = false;
 
 				// the render target that we will use to blur the first render target
 				renderTargetBlur = new THREE.WebGLRenderTarget( 512, 512 );
-				renderTargetBlur.texture.generateMipmaps = false;
+				renderTargetBlur.texture.mipmapsEnabled = false;
 
 
 				// make a plane and make it face up

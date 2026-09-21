@@ -66,14 +66,14 @@ class DataArrayTexture extends Texture {
 		this.wrapR = ClampToEdgeWrapping;
 
 		/**
-		 * Whether to generate mipmaps (if possible) for a texture.
+		 * Whether to allocate mip levels for the texture.
 		 *
 		 * Overwritten and set to `false` by default.
 		 *
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.generateMipmaps = false;
+		this.mipmapsEnabled = false;
 
 		/**
 		 * If set to `true`, the texture is flipped along the vertical axis when

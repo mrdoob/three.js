@@ -104,7 +104,8 @@
 				customizedCubeTexture.colorSpace = THREE.SRGBColorSpace;
 				customizedCubeTexture.minFilter = THREE.LinearMipMapLinearFilter;
 				customizedCubeTexture.magFilter = THREE.LinearFilter;
-				customizedCubeTexture.generateMipmaps = false;
+				customizedCubeTexture.mipmapsEnabled = true;
+				customizedCubeTexture.mipmapsAutoUpdate = false;
 				customizedCubeTexture.needsUpdate = true;
 
 				return customizedCubeTexture;
@@ -141,7 +142,8 @@
 
 					const autoCubeTexture = cubeTexture.clone();
 					autoCubeTexture.mipmaps = [];
-					autoCubeTexture.generateMipmaps = true;
+					autoCubeTexture.mipmapsEnabled = true;
+					autoCubeTexture.mipmapsAutoUpdate = true;
 					autoCubeTexture.needsUpdate = true;
 
 					material.envMap = autoCubeTexture;

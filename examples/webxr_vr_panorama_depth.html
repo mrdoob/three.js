@@ -72,7 +72,7 @@
 
 					texture.colorSpace = THREE.SRGBColorSpace;
 					texture.minFilter = THREE.NearestFilter;
-					texture.generateMipmaps = false;
+					texture.mipmapsEnabled = false;
 					sphere.material.map = texture;
 
 				} );
@@ -80,7 +80,7 @@
 				loader.load( './textures/kandao3_depthmap.jpg', function ( depth ) {
 
 					depth.minFilter = THREE.NearestFilter;
-					depth.generateMipmaps = false;
+					depth.mipmapsEnabled = false;
 					sphere.material.displacementMap = depth;
 
 				} );

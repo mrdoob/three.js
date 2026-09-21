@@ -174,7 +174,7 @@ export class LUTCubeLoader extends Loader {
 		texture3D.wrapS = ClampToEdgeWrapping;
 		texture3D.wrapT = ClampToEdgeWrapping;
 		texture3D.wrapR = ClampToEdgeWrapping;
-		texture3D.generateMipmaps = false;
+		texture3D.mipmapsEnabled = false;
 		texture3D.needsUpdate = true;
 
 		return {

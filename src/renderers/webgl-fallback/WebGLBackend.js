@@ -579,7 +579,7 @@ class WebGLBackend extends Backend {
 
 				const texture = textures[ i ];
 
-				if ( texture.generateMipmaps === true && texture.mipmapsAutoUpdate === true ) {
+				if ( texture.mipmapsEnabled === true && texture.mipmapsAutoUpdate === true ) {
 
 					this.generateMipmaps( texture );
 

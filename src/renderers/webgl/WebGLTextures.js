@@ -110,7 +110,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function textureNeedsGenerateMipmaps( texture ) {
 
-		return texture.generateMipmaps && texture.mipmapsAutoUpdate;
+		return texture.mipmapsEnabled && texture.mipmapsAutoUpdate;
 
 	}
 
@@ -298,15 +298,16 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function getMipLevels( texture, image ) {
 
-		if ( texture.generateMipmaps === true || ( texture.isFramebufferTexture && texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter ) ) {
+		if ( texture.mipmapsEnabled === false ) {
 
-			return Math.log2( Math.max( image.width, image.height ) ) + 1;
+			return 1;
 
 		} else if ( texture.mipmaps !== undefined && texture.mipmaps.length > 0 ) {
 
 			// user-defined mipmaps
 
-			return texture.mipmaps.length;
+			const extraLevel = texture.isCubeTexture && ! texture.isCompressedTexture && ! texture.isRenderTargetTexture ? 1 : 0;
+			return texture.mipmaps.length + extraLevel;
 
 		} else if ( texture.isCompressedTexture && Array.isArray( texture.image ) ) {
 
@@ -314,9 +315,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else {
 
-			// texture without mipmaps (only base level)
-
-			return 1;
+			const depth = texture.isData3DTexture ? image.depth : 1;
+			return Math.floor( Math.log2( Math.max( image.width, image.height, depth ) ) ) + 1;
 
 		}
 
@@ -598,7 +598,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		array.push( texture.internalFormat );
 		array.push( texture.format );
 		array.push( texture.type );
-		array.push( texture.generateMipmaps );
+		array.push( texture.mipmapsEnabled );
 		array.push( texture.mipmapsAutoUpdate );
 		array.push( texture.premultiplyAlpha );
 		array.push( texture.flipY );
@@ -723,6 +723,17 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	};
 
 	function setTextureParameters( textureType, texture ) {
+
+		if ( texture.mipmapsEnabled === false ) {
+
+			_gl.texParameteri( textureType, _gl.TEXTURE_MAX_LEVEL, 0 );
+
+		} else if ( texture.mipmaps !== undefined && texture.mipmaps.length > 0 ) {
+
+			const image = texture.isCubeTexture ? texture.image[ 0 ] : texture.image;
+			_gl.texParameteri( textureType, _gl.TEXTURE_MAX_LEVEL, getMipLevels( texture, image ) - 1 );
+
+		}
 
 		if ( texture.type === FloatType && extensions.has( 'OES_texture_float_linear' ) === false &&
 			( texture.magFilter === LinearFilter || texture.magFilter === LinearMipmapNearestFilter || texture.magFilter === NearestMipmapLinearFilter || texture.magFilter === LinearMipmapLinearFilter ||
@@ -1045,7 +1056,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					}
 
-					for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
+					for ( let i = 0, il = Math.min( mipmaps.length, levels ); i < il; i ++ ) {
 
 						mipmap = mipmaps[ i ];
 
@@ -1064,8 +1075,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 						}
 
 					}
-
-					texture.generateMipmaps = false;
 
 				} else {
 
@@ -1101,7 +1110,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					}
 
-					for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
+					for ( let i = 0, il = Math.min( mipmaps.length, levels ); i < il; i ++ ) {
 
 						mipmap = mipmaps[ i ];
 
@@ -1177,7 +1186,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					}
 
-					for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
+					for ( let i = 0, il = Math.min( mipmaps.length, levels ); i < il; i ++ ) {
 
 						mipmap = mipmaps[ i ];
 
@@ -1400,7 +1409,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					}
 
-					for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
+					for ( let i = 0, il = Math.min( mipmaps.length, levels ); i < il; i ++ ) {
 
 						mipmap = mipmaps[ i ];
 
@@ -1419,8 +1428,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 						}
 
 					}
-
-					texture.generateMipmaps = false;
 
 				} else {
 
@@ -1520,7 +1527,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			const useTexStorage = ( texture.isVideoTexture !== true );
 			const allocateMemory = ( sourceProperties.__version === undefined ) || ( forceUpload === true );
 			const dataReady = source.dataReady;
-			let levels = getMipLevels( texture, image );
+			const levels = getMipLevels( texture, image );
 
 			setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture );
 
@@ -1562,7 +1569,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					mipmaps = cubeImage[ i ].mipmaps;
 
-					for ( let j = 0; j < mipmaps.length; j ++ ) {
+					for ( let j = 0, jl = Math.min( mipmaps.length, levels ); j < jl; j ++ ) {
 
 						const mipmap = mipmaps[ j ];
 
@@ -1618,12 +1625,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				if ( useTexStorage && allocateMemory ) {
 
-					// TODO: Uniformly handle mipmap definitions
-					// Normal textures and compressed cube textures define base level + mips with their mipmap array
-					// Uncompressed cube textures use their mipmap array only for mips (no base level)
-
-					if ( mipmaps.length > 0 ) levels ++;
-
 					const dimensions = getDimensions( cubeImage[ 0 ] );
 
 					state.texStorage2D( _gl.TEXTURE_CUBE_MAP, levels, glInternalFormat, dimensions.width, dimensions.height );
@@ -1648,7 +1649,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						}
 
-						for ( let j = 0; j < mipmaps.length; j ++ ) {
+						for ( let j = 0, jl = Math.min( mipmaps.length, levels - 1 ); j < jl; j ++ ) {
 
 							const mipmap = mipmaps[ j ];
 							const mipmapImage = mipmap.image[ i ].image;
@@ -1685,7 +1686,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						}
 
-						for ( let j = 0; j < mipmaps.length; j ++ ) {
+						for ( let j = 0, jl = Math.min( mipmaps.length, levels - 1 ); j < jl; j ++ ) {
 
 							const mipmap = mipmaps[ j ];
 
@@ -1745,7 +1746,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			let maxLevel = level;
 
-			if ( level === 0 && texture.generateMipmaps === true && texture.mipmapsAutoUpdate === false ) {
+			if ( level === 0 && texture.mipmapsEnabled === true && texture.mipmapsAutoUpdate === false && texture.mipmaps.length === 0 ) {
 
 				// Allocate the mip chain without generating its contents.
 				const depth = textureTarget === _gl.TEXTURE_3D ? renderTarget.depth : 1;
@@ -1982,7 +1983,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				const mipmaps = renderTarget.texture.mipmaps;
 
-				if ( mipmaps && mipmaps.length > 0 ) {
+				if ( renderTarget.texture.mipmapsEnabled && mipmaps.length > 0 ) {
 
 					setupDepthTexture( renderTargetProperties.__webglFramebuffer[ 0 ], renderTarget, 0 );
 
@@ -2025,7 +2026,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				const mipmaps = renderTarget.texture.mipmaps;
 
-				if ( mipmaps && mipmaps.length > 0 ) {
+				if ( renderTarget.texture.mipmapsEnabled && mipmaps.length > 0 ) {
 
 					state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ 0 ] );
 
@@ -2114,7 +2115,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			for ( let i = 0; i < 6; i ++ ) {
 
-				if ( texture.mipmaps && texture.mipmaps.length > 0 ) {
+				if ( texture.mipmapsEnabled && texture.mipmaps.length > 0 ) {
 
 					renderTargetProperties.__webglFramebuffer[ i ] = [];
 
@@ -2134,7 +2135,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else {
 
-			if ( texture.mipmaps && texture.mipmaps.length > 0 ) {
+			if ( texture.mipmapsEnabled && texture.mipmaps.length > 0 ) {
 
 				renderTargetProperties.__webglFramebuffer = [];
 
@@ -2216,7 +2217,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			for ( let i = 0; i < 6; i ++ ) {
 
-				if ( texture.mipmaps && texture.mipmaps.length > 0 ) {
+				if ( texture.mipmapsEnabled && texture.mipmaps.length > 0 ) {
 
 					for ( let level = 0; level < texture.mipmaps.length; level ++ ) {
 
@@ -2235,11 +2236,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			if ( textureNeedsGenerateMipmaps( texture ) ) {
 
 				generateMipmap( _gl.TEXTURE_CUBE_MAP );
-
-			} else if ( texture.generateMipmaps === false && texture.mipmaps.length > 0 ) {
-
-				// Limit the max level to keep partial mip chains complete.
-				_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAX_LEVEL, texture.mipmaps.length - 1 );
 
 			}
 
@@ -2287,7 +2283,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			state.bindTexture( glTextureType, textureProperties.__webglTexture );
 			setTextureParameters( glTextureType, texture );
 
-			if ( texture.mipmaps && texture.mipmaps.length > 0 ) {
+			if ( texture.mipmapsEnabled && texture.mipmaps.length > 0 ) {
 
 				for ( let level = 0; level < texture.mipmaps.length; level ++ ) {
 
@@ -2304,11 +2300,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			if ( textureNeedsGenerateMipmaps( texture ) ) {
 
 				generateMipmap( glTextureType );
-
-			} else if ( texture.generateMipmaps === false && texture.mipmaps.length > 0 ) {
-
-				// Limit the max level to keep partial mip chains complete.
-				_gl.texParameteri( glTextureType, _gl.TEXTURE_MAX_LEVEL, texture.mipmaps.length - 1 );
 
 			}
 
@@ -2385,7 +2376,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				const mipmaps = renderTarget.texture.mipmaps;
 
-				if ( mipmaps && mipmaps.length > 0 ) {
+				if ( renderTarget.texture.mipmapsEnabled && mipmaps.length > 0 ) {
 
 					state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ 0 ] );
 

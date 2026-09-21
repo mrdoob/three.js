@@ -3369,12 +3369,14 @@ class GLTFParser {
 
 			const samplers = json.samplers || {};
 			const sampler = samplers[ textureDef.sampler ] || {};
+			const hasMipmaps = texture.isCompressedTexture || texture.mipmaps.length > 0;
 
 			texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ] || LinearFilter;
 			texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || LinearMipmapLinearFilter;
 			texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || RepeatWrapping;
 			texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || RepeatWrapping;
-			texture.generateMipmaps = ! texture.isCompressedTexture && texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter;
+			texture.mipmapsEnabled = hasMipmaps || ( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter );
+			texture.mipmapsAutoUpdate = ! hasMipmaps;
 
 			parser.associations.set( texture, { textures: textureIndex } );
 

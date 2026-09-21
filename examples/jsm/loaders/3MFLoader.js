@@ -1060,13 +1060,13 @@ class ThreeMFLoader extends Loader {
 					case 'linear':
 						texture.magFilter = LinearFilter;
 						texture.minFilter = LinearFilter;
-						texture.generateMipmaps = false;
+						texture.mipmapsEnabled = false;
 						break;
 
 					case 'nearest':
 						texture.magFilter = NearestFilter;
 						texture.minFilter = NearestFilter;
-						texture.generateMipmaps = false;
+						texture.mipmapsEnabled = false;
 						break;
 
 					default:

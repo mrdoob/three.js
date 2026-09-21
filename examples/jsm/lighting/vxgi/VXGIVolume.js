@@ -549,7 +549,7 @@ class VXGIVolume {
 		texture.name = name;
 		texture.type = type;
 		texture.format = RGBAFormat;
-		texture.generateMipmaps = mipmaps;
+		texture.mipmapsEnabled = mipmaps;
 		texture.mipmapsAutoUpdate = false;
 		texture.minFilter = mipmaps ? LinearMipmapLinearFilter : LinearFilter;
 		texture.magFilter = LinearFilter;

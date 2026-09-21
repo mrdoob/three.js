@@ -52,7 +52,7 @@
 				diffuseMap = await loader.loadAsync( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg' );
 				diffuseMap.colorSpace = THREE.SRGBColorSpace;
 				diffuseMap.minFilter = THREE.LinearFilter;
-				diffuseMap.generateMipmaps = false;
+				diffuseMap.mipmapsEnabled = false;
 
 				const geometry = new THREE.PlaneGeometry( 2, 2 );
 				const material = new THREE.MeshBasicMaterial( { map: diffuseMap } );

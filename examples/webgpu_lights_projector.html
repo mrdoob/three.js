@@ -206,7 +206,7 @@
 						mapTexture = loader.load( 'colors.png' );
 						mapTexture.minFilter = THREE.LinearFilter;
 						mapTexture.magFilter = THREE.LinearFilter;
-						mapTexture.generateMipmaps = false;
+						mapTexture.mipmapsEnabled = false;
 						mapTexture.colorSpace = THREE.SRGBColorSpace;
 
 						projectorLight.map = mapTexture;

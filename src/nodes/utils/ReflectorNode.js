@@ -62,7 +62,7 @@ class ReflectorNode extends TextureNode {
 	 * @param {Object} [parameters={}] - An object holding configuration parameters.
 	 * @param {Object3D} [parameters.target=new Object3D()] - The 3D object the reflector is linked to.
 	 * @param {number} [parameters.resolutionScale=1] - The resolution scale.
-	 * @param {boolean} [parameters.generateMipmaps=false] - Whether mipmaps should be generated or not.
+	 * @param {boolean} [parameters.mipmapsEnabled=false] - Whether mipmaps are enabled or not.
 	 * @param {boolean} [parameters.bounces=true] - Whether reflectors can render other reflector nodes or not.
 	 * @param {boolean} [parameters.depth=false] - Whether depth data should be generated or not.
 	 * @param {number} [parameters.samples] - Anti-Aliasing samples of the internal render-target.
@@ -212,7 +212,7 @@ class ReflectorBaseNode extends Node {
 	 * @param {Object} [parameters={}] - An object holding configuration parameters.
 	 * @param {Object3D} [parameters.target=new Object3D()] - The 3D object the reflector is linked to.
 	 * @param {number} [parameters.resolutionScale=1] - The resolution scale.
-	 * @param {boolean} [parameters.generateMipmaps=false] - Whether mipmaps should be generated or not.
+	 * @param {boolean} [parameters.mipmapsEnabled=false] - Whether mipmaps are enabled or not.
 	 * @param {boolean} [parameters.bounces=true] - Whether reflectors can render other reflector nodes or not.
 	 * @param {boolean} [parameters.depth=false] - Whether depth data should be generated or not.
 	 * @param {number} [parameters.samples] - Anti-Aliasing samples of the internal render-target.
@@ -224,7 +224,7 @@ class ReflectorBaseNode extends Node {
 		const {
 			target = new Object3D(),
 			resolutionScale = 1,
-			generateMipmaps = false,
+			mipmapsEnabled = false,
 			bounces = true,
 			depth = false,
 			samples = 0
@@ -262,12 +262,20 @@ class ReflectorBaseNode extends Node {
 		}
 
 		/**
-		 * Whether mipmaps should be generated or not.
+		 * Whether mipmaps are enabled or not.
 		 *
 		 * @type {boolean}
 		 * @default {false}
 		 */
-		this.generateMipmaps = generateMipmaps;
+		this.mipmapsEnabled = mipmapsEnabled;
+
+		if ( parameters.generateMipmaps !== undefined ) {
+
+			warnOnce( 'ReflectorNode: The "generateMipmaps" parameter has been renamed to "mipmapsEnabled".' ); // @deprecated r186
+
+			if ( parameters.mipmapsEnabled === undefined ) this.mipmapsEnabled = parameters.generateMipmaps;
+
+		}
 
 		/**
 		 * Whether reflectors can render other reflector nodes or not.
@@ -421,10 +429,10 @@ class ReflectorBaseNode extends Node {
 
 			renderTarget = new RenderTarget( 1, 1, { type: HalfFloatType, samples: this.samples } );
 
-			if ( this.generateMipmaps === true ) {
+			if ( this.mipmapsEnabled === true ) {
 
 				renderTarget.texture.minFilter = LinearMipMapLinearFilter;
-				renderTarget.texture.generateMipmaps = true;
+				renderTarget.texture.mipmapsEnabled = true;
 
 			}
 
@@ -595,6 +603,29 @@ class ReflectorBaseNode extends Node {
 	}
 
 	/**
+	 * Whether mipmaps are enabled or not.
+	 *
+	 * @deprecated
+	 * @type {boolean}
+	 * @default false
+	 */
+	get generateMipmaps() {
+
+		warnOnce( 'ReflectorNode: The "generateMipmaps" property has been renamed to "mipmapsEnabled".' ); // @deprecated r186
+
+		return this.mipmapsEnabled;
+
+	}
+
+	set generateMipmaps( value ) {
+
+		warnOnce( 'ReflectorNode: The "generateMipmaps" property has been renamed to "mipmapsEnabled".' ); // @deprecated r186
+
+		this.mipmapsEnabled = value;
+
+	}
+
+	/**
 	 * The resolution scale.
 	 *
 	 * @deprecated
@@ -627,7 +658,7 @@ class ReflectorBaseNode extends Node {
  * @param {Object} [parameters={}] - An object holding configuration parameters.
  * @param {Object3D} [parameters.target=new Object3D()] - The 3D object the reflector is linked to.
  * @param {number} [parameters.resolution=1] - The resolution scale.
- * @param {boolean} [parameters.generateMipmaps=false] - Whether mipmaps should be generated or not.
+ * @param {boolean} [parameters.mipmapsEnabled=false] - Whether mipmaps are enabled or not.
  * @param {boolean} [parameters.bounces=true] - Whether reflectors can render other reflector nodes or not.
  * @param {boolean} [parameters.depth=false] - Whether depth data should be generated or not.
  * @param {number} [parameters.samples] - Anti-Aliasing samples of the internal render-target.

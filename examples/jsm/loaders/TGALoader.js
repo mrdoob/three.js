@@ -526,7 +526,7 @@ class TGALoader extends DataTextureLoader {
 			width: header.width,
 			height: header.height,
 			flipY: true,
-			generateMipmaps: true,
+			mipmapsEnabled: true,
 			minFilter: LinearMipmapLinearFilter,
 
 		};

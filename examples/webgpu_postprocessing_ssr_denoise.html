@@ -218,7 +218,7 @@
 			hdrTexture.mapping = THREE.EquirectangularReflectionMapping;
 			scene.background = hdrTexture;
 			scene.environment = hdrTexture;
-			hdrTexture.generateMipmaps = true;
+			hdrTexture.mipmapsEnabled = true;
 			hdrTexture.needsUpdate = true;
 
 			const directionalLight = new THREE.DirectionalLight( '#ffffff', 20 );

@@ -452,7 +452,8 @@ class KTX2Loader extends Loader {
 
 		texture.minFilter = faces[ 0 ].mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
 		texture.magFilter = LinearFilter;
-		texture.generateMipmaps = false;
+		texture.mipmapsEnabled = true;
+		texture.mipmapsAutoUpdate = false;
 
 		texture.needsUpdate = true;
 		texture.colorSpace = parseColorSpace( container );
@@ -1220,10 +1221,11 @@ async function createRawTexture( container ) {
 		texture = container.pixelDepth === 0
 			? new DataTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight )
 			: new Data3DTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight, container.pixelDepth );
-		texture.mipmaps = mipmaps;
+		texture.mipmaps = container.levelCount === 0 ? [] : mipmaps;
 		texture.minFilter = useMipmaps ? NearestMipmapNearestFilter : NearestFilter;
 		texture.magFilter = NearestFilter;
-		texture.generateMipmaps = container.levelCount === 0;
+		texture.mipmapsEnabled = useMipmaps;
+		texture.mipmapsAutoUpdate = container.levelCount === 0;
 		texture.normalized = NORMALIZED_VK_FORMATS.has( vkFormat );
 
 	} else {

@@ -15,7 +15,7 @@ import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { TextureSource } from './TextureSource.js';
-import { warn } from '../utils.js';
+import { warn, warnOnce } from '../utils.js';
 
 let _textureId = 0;
 
@@ -94,6 +94,8 @@ class Texture extends EventDispatcher {
 
 		/**
 		 * An array holding user-defined mipmaps.
+		 * Set {@link Texture#mipmapsEnabled} to `true` and
+		 * {@link Texture#mipmapsAutoUpdate} to `false` when supplying mipmaps.
 		 *
 		 * @type {Array<Object>}
 		 */
@@ -247,20 +249,22 @@ class Texture extends EventDispatcher {
 		this.matrix = new Matrix3();
 
 		/**
-		 * Whether to generate mipmaps (if possible) for a texture.
+		 * Whether to allocate mip levels for the texture. When enabled, supplied
+		 * mipmaps determine the level count, or a full chain is allocated if supported.
+		 * When disabled, only the base level is allocated.
 		 *
-		 * Set this to `false` if you are creating mipmaps manually.
-		 * To temporarily pause updates while keeping mip levels allocated, use
-		 * {@link Texture#mipmapsAutoUpdate} instead.
+		 * Configure this before the texture is first used. To temporarily pause
+		 * generation, use {@link Texture#mipmapsAutoUpdate} instead.
 		 *
 		 * @type {boolean}
 		 * @default true
 		 */
-		this.generateMipmaps = true;
+		this.mipmapsEnabled = true;
 
 		/**
-		 * Whether to automatically update generated mipmaps when the texture changes.
-		 * Setting this to `false` does not affect mip level allocation.
+		 * Whether to automatically generate mipmaps when the texture changes.
+		 * Requires {@link Texture#mipmapsEnabled}. Set this to `false` when supplying
+		 * or rendering custom mipmaps, or to temporarily pause generation.
 		 *
 		 * @type {boolean}
 		 * @default true
@@ -445,6 +449,27 @@ class Texture extends EventDispatcher {
 	}
 
 	/**
+	 * @deprecated since r186. Use {@link Texture#mipmapsEnabled} and {@link Texture#mipmapsAutoUpdate} instead.
+	 * @type {boolean}
+	 */
+	get generateMipmaps() {
+
+		warnOnce( 'Texture: .generateMipmaps is deprecated. Use .mipmapsEnabled and .mipmapsAutoUpdate instead.' );
+
+		return this.mipmapsEnabled && this.mipmapsAutoUpdate;
+
+	}
+
+	set generateMipmaps( value ) {
+
+		warnOnce( 'Texture: .generateMipmaps is deprecated. Use .mipmapsEnabled and .mipmapsAutoUpdate instead.' );
+
+		this.mipmapsEnabled = value === true || this.mipmaps?.length > 0 || this.isCompressedTexture === true;
+		this.mipmapsAutoUpdate = value;
+
+	}
+
+	/**
 	 * Updates the texture transformation matrix from the properties {@link Texture#offset},
 	 * {@link Texture#repeat}, {@link Texture#rotation}, and {@link Texture#center}.
 	 */
@@ -523,7 +548,7 @@ class Texture extends EventDispatcher {
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
 		this.matrix.copy( source.matrix );
 
-		this.generateMipmaps = source.generateMipmaps;
+		this.mipmapsEnabled = source.mipmapsEnabled;
 		this.mipmapsAutoUpdate = source.mipmapsAutoUpdate;
 		this.premultiplyAlpha = source.premultiplyAlpha;
 		this.flipY = source.flipY;
@@ -643,7 +668,7 @@ class Texture extends EventDispatcher {
 
 			flipY: this.flipY,
 
-			generateMipmaps: this.generateMipmaps,
+			mipmapsEnabled: this.mipmapsEnabled,
 			premultiplyAlpha: this.premultiplyAlpha,
 			unpackAlignment: this.unpackAlignment
 

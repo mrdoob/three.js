@@ -40,7 +40,7 @@ export function getDFGLUT() {
 		lut.magFilter = LinearFilter;
 		lut.wrapS = ClampToEdgeWrapping;
 		lut.wrapT = ClampToEdgeWrapping;
-		lut.generateMipmaps = false;
+		lut.mipmapsEnabled = false;
 		lut.needsUpdate = true;
 
 	}

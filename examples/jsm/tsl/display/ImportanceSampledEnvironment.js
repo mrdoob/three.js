@@ -241,7 +241,7 @@ class EnvMapCDFGenerator {
 		this.marginalWeights.magFilter = LinearFilter;
 		this.marginalWeights.wrapS = ClampToEdgeWrapping;
 		this.marginalWeights.wrapT = ClampToEdgeWrapping;
-		this.marginalWeights.generateMipmaps = false;
+		this.marginalWeights.mipmapsEnabled = false;
 		this.marginalWeights.needsUpdate = true;
 
 		this.conditionalWeights = new DataTexture( conditionalDataArray, width, height );
@@ -251,7 +251,7 @@ class EnvMapCDFGenerator {
 		this.conditionalWeights.magFilter = LinearFilter;
 		this.conditionalWeights.wrapS = ClampToEdgeWrapping;
 		this.conditionalWeights.wrapT = ClampToEdgeWrapping;
-		this.conditionalWeights.generateMipmaps = false;
+		this.conditionalWeights.mipmapsEnabled = false;
 		this.conditionalWeights.needsUpdate = true;
 
 		this.totalSum = totalSumValue;

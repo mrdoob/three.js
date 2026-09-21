@@ -67,7 +67,7 @@ class CompressedTexture extends Texture {
 		this.flipY = false;
 
 		/**
-		 * Whether to generate mipmaps (if possible) for a texture.
+		 * Whether to automatically update mipmaps for the texture.
 		 *
 		 * Overwritten and set to `false` by default since it is not
 		 * possible to generate mipmaps for compressed data. Mipmaps
@@ -77,7 +77,7 @@ class CompressedTexture extends Texture {
 		 * @default false
 		 * @readonly
 		 */
-		this.generateMipmaps = false;
+		this.mipmapsAutoUpdate = false;
 
 	}
 

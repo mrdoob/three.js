@@ -190,7 +190,7 @@ function ensureBakeTargets( cubemapSize, near, far, totalProbes ) {
 
 		if ( _cubeRenderTarget !== null ) _cubeRenderTarget.dispose();
 
-		_cubeRenderTarget = new CubeRenderTarget( cubemapSize, { type: HalfFloatType, generateMipmaps: false } );
+		_cubeRenderTarget = new CubeRenderTarget( cubemapSize, { type: HalfFloatType, mipmapsEnabled: false } );
 		_cubeCamera = new CubeCamera( near, far, _cubeRenderTarget );
 		_cubeKey = cubeKey;
 
@@ -782,7 +782,7 @@ class LightProbeGrid extends Light {
 			format: RGBAFormat,
 			minFilter: LinearFilter,
 			magFilter: LinearFilter,
-			generateMipmaps: false,
+			mipmapsEnabled: false,
 			depthBuffer: false
 		} );
 

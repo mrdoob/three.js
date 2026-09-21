@@ -88,7 +88,7 @@ class HTMLTexture extends CanvasTexture {
 		this.colorSpace = SRGBColorSpace;
 		this.minFilter = LinearFilter;
 		this.magFilter = LinearFilter;
-		this.generateMipmaps = false;
+		this.mipmapsEnabled = false;
 
 		this.scheduleUpdate = null;
 

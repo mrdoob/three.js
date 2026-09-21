@@ -47,14 +47,14 @@ class VideoTexture extends Texture {
 		this.isVideoTexture = true;
 
 		/**
-		 * Whether to generate mipmaps (if possible) for a texture.
+		 * Whether to allocate mip levels for the texture.
 		 *
 		 * Overwritten and set to `false` by default.
 		 *
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.generateMipmaps = false;
+		this.mipmapsEnabled = false;
 
 		/**
 		 * The video frame request callback identifier, which is a positive integer.

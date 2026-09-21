@@ -159,6 +159,8 @@ class DataTextureLoader extends Loader {
 		if ( texData.mipmaps !== undefined ) {
 
 			texture.mipmaps = texData.mipmaps;
+			texture.mipmapsEnabled = true;
+			texture.mipmapsAutoUpdate = false;
 			texture.minFilter = LinearMipmapLinearFilter; // presumably...
 
 		}
@@ -171,7 +173,19 @@ class DataTextureLoader extends Loader {
 
 		if ( texData.generateMipmaps !== undefined ) {
 
-			texture.generateMipmaps = texData.generateMipmaps;
+			texture.generateMipmaps = texData.generateMipmaps; // @deprecated, r186
+
+		}
+
+		if ( texData.mipmapsEnabled !== undefined ) {
+
+			texture.mipmapsEnabled = texData.mipmapsEnabled;
+
+		}
+
+		if ( texData.mipmapsAutoUpdate !== undefined ) {
+
+			texture.mipmapsAutoUpdate = texData.mipmapsAutoUpdate;
 
 		}
 
@@ -195,7 +209,8 @@ class DataTextureLoader extends Loader {
  * @property {number} [wrapS=ClampToEdgeWrapping] - The wrapS value.
  * @property {number} [wrapT=ClampToEdgeWrapping] - The wrapT value.
  * @property {number} [anisotropy=1] - The anisotropy value.
- * @property {boolean} [generateMipmaps] - Whether to generate mipmaps or not.
+	 * @property {boolean} [mipmapsEnabled] - Whether to allocate mip levels for the texture.
+	 * @property {boolean} [mipmapsAutoUpdate] - Whether to automatically generate mipmaps.
  * @property {string} [colorSpace] - The color space.
  * @property {number} [magFilter] - The mag filter.
  * @property {number} [minFilter] - The min filter.

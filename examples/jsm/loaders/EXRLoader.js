@@ -3361,7 +3361,7 @@ class EXRLoader extends DataTextureLoader {
 			type: this.type,
 			minFilter: LinearFilter,
 			magFilter: LinearFilter,
-			generateMipmaps: false,
+			mipmapsEnabled: false,
 			flipY: false,
 		};
 

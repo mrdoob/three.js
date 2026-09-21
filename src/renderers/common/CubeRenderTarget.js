@@ -71,14 +71,14 @@ class CubeRenderTarget extends RenderTarget {
 	fromEquirectangularTexture( renderer, texture ) {
 
 		const currentMinFilter = texture.minFilter;
-		const currentGenerateMipmaps = texture.generateMipmaps;
+		const currentMipmapsEnabled = texture.mipmapsEnabled;
 
-		texture.generateMipmaps = true;
+		texture.mipmapsEnabled = true;
 
 		this.texture.type = texture.type;
 		this.texture.colorSpace = texture.colorSpace;
 
-		this.texture.generateMipmaps = texture.generateMipmaps;
+		this.texture.mipmapsEnabled = texture.mipmapsEnabled;
 		this.texture.minFilter = texture.minFilter;
 		this.texture.magFilter = texture.magFilter;
 
@@ -109,7 +109,7 @@ class CubeRenderTarget extends RenderTarget {
 		renderer.setMRT( currentMRT );
 
 		texture.minFilter = currentMinFilter;
-		texture.generateMipmaps = currentGenerateMipmaps;
+		texture.mipmapsEnabled = currentMipmapsEnabled;
 
 		mesh.geometry.dispose();
 		mesh.material.dispose();
