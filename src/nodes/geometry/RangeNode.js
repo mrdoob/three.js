@@ -7,7 +7,7 @@ import { instanceIndex } from '../core/IndexNode.js';
 import { nodeProxy, float } from '../tsl/TSLBase.js';
 
 import { Vector4 } from '../../math/Vector4.js';
-import { MathUtils } from '../../math/MathUtils.js';
+import { lerp } from '../../math/MathUtils.js';
 import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js';
 
 let min = null;
@@ -169,7 +169,7 @@ class RangeNode extends Node {
 				const minElementValue = min.getComponent( index );
 				const maxElementValue = max.getComponent( index );
 
-				array[ i ] = MathUtils.lerp( minElementValue, maxElementValue, Math.random() );
+				array[ i ] = lerp( minElementValue, maxElementValue, Math.random() );
 
 			}
 

@@ -2,7 +2,7 @@ import { NodeUpdateType } from './constants.js';
 import { hash, hashArray, hashString } from './NodeUtils.js';
 
 import { EventDispatcher } from '../../core/EventDispatcher.js';
-import { MathUtils } from '../../math/MathUtils.js';
+import { generateUUID } from '../../math/MathUtils.js';
 import { warn, error } from '../../utils.js';
 
 import StackTrace from './StackTrace.js';
@@ -207,7 +207,7 @@ class Node extends EventDispatcher {
 
 		if ( this._uuid === null ) {
 
-			this._uuid = MathUtils.generateUUID();
+			this._uuid = generateUUID();
 
 		}
 
