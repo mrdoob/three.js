@@ -50,6 +50,12 @@ class IndexNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generate( builder ) {
 
 		const nodeType = this.getNodeType( builder );

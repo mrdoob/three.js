@@ -45,10 +45,10 @@ let _rendererState;
  *
  * Reference: This Node is a part of [three-good-godrays](https://github.com/Ameobea/three-good-godrays).
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { godrays } from 'three/addons/tsl/display/GodraysNode.js';
  */
-class GodraysNode extends TempNode {
+class GodraysNode extends Node {
 
 	static get type() {
 

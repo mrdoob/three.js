@@ -163,6 +163,14 @@ class Backend {
 	 */
 	draw( /*renderObject, info*/ ) { }
 
+	/**
+	 * Deletes the vertex state for the given render object.
+	 *
+	 * @abstract
+	 * @param {RenderObject} renderObject - The render object.
+	 */
+	deleteVertexState( /*renderObject*/ ) { }
+
 	// compute node
 
 	/**
@@ -246,6 +254,14 @@ class Backend {
 	 * @param {?Array<Promise>} [promises=null] - Optional compilation promises.
 	 */
 	createComputePipeline( /*computePipeline, bindings, promises*/ ) { }
+
+	/**
+	 * Destroys the given pipeline.
+	 *
+	 * @abstract
+	 * @param {Pipeline} pipeline - The pipeline.
+	 */
+	destroyPipeline( /*pipeline*/ ) { }
 
 	// cache key
 

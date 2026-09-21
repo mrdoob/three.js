@@ -871,6 +871,7 @@ function WebGLState( gl, extensions ) {
 				if ( depthBuffer.getReversed() ) {
 
 					factor = - factor;
+					units = - units;
 
 				}
 

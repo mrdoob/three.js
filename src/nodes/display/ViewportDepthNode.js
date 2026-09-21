@@ -61,6 +61,12 @@ class ViewportDepthNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generate( builder ) {
 
 		const { scope } = this;

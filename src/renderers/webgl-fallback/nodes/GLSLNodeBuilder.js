@@ -560,7 +560,10 @@ ${ flowData.code }
 
 			}
 
-			this.addLineFlowCode( `${ propertyName } = ${prefix}(${ snippet })${channel}`, storageArrayElementNode );
+			const texelType = this.getTypeFromLength( itemSize, this.getComponentType( prefix ) );
+			const elementType = storageArrayElementNode.getNodeType( this );
+
+			this.addLineFlowCode( `${ propertyName } = ${ this.format( `${prefix}(${ snippet })${channel}`, texelType, elementType ) }`, storageArrayElementNode );
 
 			elementNodeData.propertyName = propertyName;
 
@@ -1134,6 +1137,34 @@ ${ flowData.code }
 		}
 
 		return '\n' + outputSnippet.join( '\n' ) + '\n\n' + snippets.join( '\n' );
+
+	}
+
+	/**
+	 * Returns a single const variable statement as a GLSL string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The GLSL snippet that defines a const variable.
+	 */
+	generateConstStatement( type, name, count = null ) {
+
+		return `const ${ this.getVar( type, name, count ) }`;
+
+	}
+
+	/**
+	 * Returns a single variable statement as a GLSL string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The GLSL snippet that defines a variable.
+	 */
+	generateVarStatement( type, name, count = null ) {
+
+		return this.getVar( type, name, count );
 
 	}
 

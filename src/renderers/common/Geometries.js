@@ -41,42 +41,46 @@ function getWireframeId( geometry ) {
  */
 function getWireframeIndex( geometry ) {
 
-	const indices = [];
-
 	const geometryIndex = geometry.index;
 	const geometryPosition = geometry.attributes.position;
+	const count = geometryIndex !== null ? geometryIndex.array.length : ( geometryPosition.array.length / 3 ) - 1;
+
+	const IndexBufferAttribute = geometryPosition.count >= 65535 ? Uint32BufferAttribute : Uint16BufferAttribute;
+	const attribute = new IndexBufferAttribute( Math.ceil( count / 3 ) * 6, 1 );
+	const indices = attribute.array;
 
 	if ( geometryIndex !== null ) {
 
 		const array = geometryIndex.array;
 
-		for ( let i = 0, l = array.length; i < l; i += 3 ) {
+		for ( let i = 0, j = 0; i < count; i += 3 ) {
 
 			const a = array[ i + 0 ];
 			const b = array[ i + 1 ];
 			const c = array[ i + 2 ];
 
-			indices.push( a, b, b, c, c, a );
+			indices[ j ++ ] = a; indices[ j ++ ] = b;
+			indices[ j ++ ] = b; indices[ j ++ ] = c;
+			indices[ j ++ ] = c; indices[ j ++ ] = a;
 
 		}
 
 	} else {
 
-		const array = geometryPosition.array;
-
-		for ( let i = 0, l = ( array.length / 3 ) - 1; i < l; i += 3 ) {
+		for ( let i = 0, j = 0; i < count; i += 3 ) {
 
 			const a = i + 0;
 			const b = i + 1;
 			const c = i + 2;
 
-			indices.push( a, b, b, c, c, a );
+			indices[ j ++ ] = a; indices[ j ++ ] = b;
+			indices[ j ++ ] = b; indices[ j ++ ] = c;
+			indices[ j ++ ] = c; indices[ j ++ ] = a;
 
 		}
 
 	}
 
-	const attribute = new ( geometryPosition.count >= 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
 	attribute.version = getWireframeVersion( geometry );
 	attribute.__id = getWireframeId( geometry );
 
@@ -95,12 +99,20 @@ class Geometries extends DataMap {
 	/**
 	 * Constructs a new geometry management component.
 	 *
+	 * @param {Backend} backend - The renderer's backend.
 	 * @param {Attributes} attributes - Renderer component for managing attributes.
 	 * @param {Info} info - Renderer component for managing metrics and monitoring data.
 	 */
-	constructor( attributes, info ) {
+	constructor( backend, attributes, info ) {
 
 		super();
+
+		/**
+		 * The renderer's backend.
+		 *
+		 * @type {Backend}
+		 */
+		this.backend = backend;
 
 		/**
 		 * Renderer component for managing attributes.
@@ -152,14 +164,12 @@ class Geometries extends DataMap {
 	}
 
 	/**
-	 * Returns `true` if the given render object has an initialized geometry.
+	 * Returns `true` if the given geometry is initialized.
 	 *
-	 * @param {RenderObject} renderObject - The render object.
-	 * @return {boolean} Whether if the given render object has an initialized geometry or not.
+	 * @param {BufferGeometry} geometry - The geometry.
+	 * @return {boolean} Whether if the given geometry is initialized or not.
 	 */
-	has( renderObject ) {
-
-		const geometry = renderObject.geometry;
+	has( geometry ) {
 
 		return super.has( geometry ) && this.get( geometry ).initialized === true;
 
@@ -172,20 +182,21 @@ class Geometries extends DataMap {
 	 */
 	updateForRender( renderObject ) {
 
-		if ( this.has( renderObject ) === false ) this.initGeometry( renderObject );
+		const geometry = renderObject.geometry;
+
+		if ( this.has( geometry ) === false ) this.initGeometry( geometry );
 
 		this.updateAttributes( renderObject );
 
 	}
 
 	/**
-	 * Initializes the geometry of the given render object.
+	 * Initializes the given geometry.
 	 *
-	 * @param {RenderObject} renderObject - The render object.
+	 * @param {BufferGeometry} geometry - The geometry.
 	 */
-	initGeometry( renderObject ) {
+	initGeometry( geometry ) {
 
-		const geometry = renderObject.geometry;
 		const geometryData = this.get( geometry );
 
 		geometryData.initialized = true;
@@ -221,20 +232,6 @@ class Geometries extends DataMap {
 			if ( wireframeAttribute !== undefined ) {
 
 				this.attributes.delete( wireframeAttribute );
-
-			}
-
-			// node attributes (TODO: Remove this bit once we support BufferAttribute.dispose())
-
-			const currentAttributes = new Set( Object.values( renderObject.geometry.attributes ) );
-
-			for ( const attribute of renderObject.getAttributes() ) {
-
-				if ( currentAttributes.has( attribute ) === false ) {
-
-					this.attributes.delete( attribute );
-
-				}
 
 			}
 
@@ -410,6 +407,38 @@ class Geometries extends DataMap {
 		}
 
 		return index;
+
+	}
+
+	/**
+	 * Deletes the attributes that are defined via nodes and not on geometry level.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 */
+	deleteNodeAttributes( renderObject ) {
+
+		const currentAttributes = new Set( Object.values( renderObject.geometry.attributes ) );
+
+		for ( const attribute of renderObject.getAttributes() ) {
+
+			if ( currentAttributes.has( attribute ) === false ) {
+
+				this.attributes.delete( attribute );
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * Deletes the vertex state for the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 */
+	deleteVertexState( renderObject ) {
+
+		this.backend.deleteVertexState( renderObject );
 
 	}
 

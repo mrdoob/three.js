@@ -41,6 +41,12 @@ class ConvertNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * This method is overwritten since the implementation tries to infer the best
 	 * matching type from the {@link ConvertNode#convertTo} property.

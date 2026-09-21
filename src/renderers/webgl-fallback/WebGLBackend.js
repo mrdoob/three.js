@@ -3,6 +3,7 @@ import Backend from '../common/Backend.js';
 import { getCacheKey } from '../common/RenderContext.js';
 
 import WebGLAttributeUtils from './utils/WebGLAttributeUtils.js';
+import WebGLVertexArrayUtils from './utils/WebGLVertexArrayUtils.js';
 import WebGLState from './utils/WebGLState.js';
 import WebGLUtils from './utils/WebGLUtils.js';
 import WebGLTextureUtils from './utils/WebGLTextureUtils.js';
@@ -68,6 +69,15 @@ class WebGLBackend extends Backend {
 		this.attributeUtils = null;
 
 		/**
+		 * A reference to a backend module holding vertex array object-related
+		 * utility functions.
+		 *
+		 * @type {?WebGLVertexArrayUtils}
+		 * @default null
+		 */
+		this.vertexArrayUtils = null;
+
+		/**
 		 * A reference to a backend module holding extension-related
 		 * utility functions.
 		 *
@@ -128,13 +138,6 @@ class WebGLBackend extends Backend {
 		 * @default null
 		 */
 		this.utils = null;
-
-		/**
-		 * Dictionary for caching VAOs.
-		 *
-		 * @type {Object<string,WebGLVertexArrayObject>}
-		 */
-		this.vaoCache = {};
 
 		/**
 		 * Dictionary for caching transform feedback objects.
@@ -253,6 +256,7 @@ class WebGLBackend extends Backend {
 		this.extensions = new WebGLExtensions( this );
 		this.capabilities = new WebGLCapabilities( this );
 		this.attributeUtils = new WebGLAttributeUtils( this );
+		this.vertexArrayUtils = new WebGLVertexArrayUtils( this );
 		this.textureUtils = new WebGLTextureUtils( this );
 		this.bufferRenderer = new WebGLBufferRenderer( this );
 
@@ -575,7 +579,7 @@ class WebGLBackend extends Backend {
 
 				const texture = textures[ i ];
 
-				if ( texture.generateMipmaps ) {
+				if ( texture.generateMipmaps === true && texture.mipmapsAutoUpdate === true ) {
 
 					this.generateMipmaps( texture );
 
@@ -935,19 +939,9 @@ class WebGLBackend extends Backend {
 
 		const { programGPU, transformBuffers, attributes } = this.get( pipeline );
 
-		const vaoKey = this._getVaoKey( attributes );
+		const vaoGPU = this.vertexArrayUtils.getVAO( pipeline, attributes );
 
-		const vaoGPU = this.vaoCache[ vaoKey ];
-
-		if ( vaoGPU === undefined ) {
-
-			this.vaoCache[ vaoKey ] = this._createVao( attributes );
-
-		} else {
-
-			state.setVertexState( vaoGPU );
-
-		}
+		state.setVertexState( vaoGPU );
 
 		state.useProgram( programGPU );
 
@@ -1131,27 +1125,7 @@ class WebGLBackend extends Backend {
 
 		// vertex state
 
-		const attributes = renderObject.getAttributes();
-		const attributesData = this.get( attributes );
-
-		let vaoGPU = attributesData.vaoGPU;
-
-		if ( vaoGPU === undefined ) {
-
-			const vaoKey = this._getVaoKey( attributes );
-
-			vaoGPU = this.vaoCache[ vaoKey ];
-
-			if ( vaoGPU === undefined ) {
-
-				vaoGPU = this._createVao( attributes );
-
-				this.vaoCache[ vaoKey ] = vaoGPU;
-				attributesData.vaoGPU = vaoGPU;
-
-			}
-
-		}
+		const vaoGPU = this.vertexArrayUtils.getVAO( renderObject, renderObject.getAttributes() );
 
 		const index = renderObject.getIndex();
 		const indexGPU = ( index !== null ) ? this.get( index ).bufferGPU : null;
@@ -1361,6 +1335,17 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
+	 * Releases the VAO of the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 */
+	deleteVertexState( renderObject ) {
+
+		this.vertexArrayUtils.releaseVAO( renderObject );
+
+	}
+
+	/**
 	 * Explain why always null is returned.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
@@ -1520,6 +1505,11 @@ class WebGLBackend extends Backend {
 	 */
 	destroyProgram( program ) {
 
+		const gl = this.gl;
+		const data = this.get( program );
+
+		gl.deleteShader( data.shaderGPU );
+
 		this.delete( program );
 
 	}
@@ -1585,6 +1575,30 @@ class WebGLBackend extends Backend {
 		}
 
 		this._completeCompile( renderObject, pipeline );
+
+	}
+
+	/**
+	 * Destroys the given pipeline.
+	 *
+	 * @param {Pipeline} pipeline - The pipeline.
+	 */
+	destroyPipeline( pipeline ) {
+
+		const gl = this.gl;
+		const data = this.get( pipeline );
+
+		if ( pipeline.isComputePipeline === true ) {
+
+			// Compute pipeline manage their own VAOs (without render objects)
+
+			this.vertexArrayUtils.releaseVAO( pipeline );
+
+		}
+
+		gl.deleteProgram( data.programGPU );
+
+		this.delete( pipeline );
 
 	}
 
@@ -2317,8 +2331,8 @@ class WebGLBackend extends Backend {
 
 					const { textureGPU } = this.get( textures[ 0 ] );
 
-					const cubeFace = this.renderer._activeCubeFace;
-					const mipLevel = this.renderer._activeMipmapLevel;
+					const cubeFace = descriptor.activeCubeFace;
+					const mipLevel = descriptor.activeMipmapLevel;
 
 					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace, textureGPU, mipLevel );
 
@@ -2341,8 +2355,8 @@ class WebGLBackend extends Backend {
 
 						} else if ( textureData.glTextureType === gl.TEXTURE_2D_ARRAY || textureData.glTextureType === gl.TEXTURE_3D ) {
 
-							const layer = this.renderer._activeCubeFace;
-							const mipLevel = this.renderer._activeMipmapLevel;
+							const layer = descriptor.activeCubeFace;
+							const mipLevel = descriptor.activeMipmapLevel;
 
 							gl.framebufferTextureLayer( gl.FRAMEBUFFER, attachment, textureData.textureGPU, mipLevel, layer );
 
@@ -2354,7 +2368,7 @@ class WebGLBackend extends Backend {
 
 							} else {
 
-								const mipLevel = this.renderer._activeMipmapLevel;
+								const mipLevel = descriptor.activeMipmapLevel;
 
 								gl.framebufferTexture2D( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, mipLevel );
 
@@ -2401,13 +2415,13 @@ class WebGLBackend extends Backend {
 
 							if ( descriptor.depthTexture.isArrayTexture ) {
 
-								const layer = this.renderer._activeCubeFace;
+								const layer = descriptor.activeCubeFace;
 
 								gl.framebufferTextureLayer( gl.FRAMEBUFFER, depthStyle, textureData.textureGPU, 0, layer );
 
 							} else if ( descriptor.depthTexture.isCubeTexture ) {
 
-								const cubeFace = this.renderer._activeCubeFace;
+								const cubeFace = descriptor.activeCubeFace;
 
 								gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace, textureData.textureGPU, 0 );
 
@@ -2434,7 +2448,7 @@ class WebGLBackend extends Backend {
 
 					state.bindFramebuffer( gl.FRAMEBUFFER, fb );
 
-					const layer = this.renderer._activeCubeFace;
+					const layer = descriptor.activeCubeFace;
 
 					const depthData = this.get( descriptor.depthTexture );
 					const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
@@ -2566,94 +2580,6 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Computes the VAO key for the given index and attributes.
-	 *
-	 * @private
-	 * @param {Array<BufferAttribute>} attributes - An array of buffer attributes.
-	 * @return {string} The VAO key.
-	 */
-	_getVaoKey( attributes ) {
-
-		let key = '';
-
-		for ( let i = 0; i < attributes.length; i ++ ) {
-
-			const attributeData = this.get( attributes[ i ] );
-
-			key += ':' + attributeData.id;
-
-		}
-
-		return key;
-
-	}
-
-	/**
-	 * Creates a VAO from the index and attributes.
-	 *
-	 * @private
-	 * @param {Array<BufferAttribute>} attributes - An array of buffer attributes.
-	 * @return {Object} The VAO data.
-	 */
-	_createVao( attributes ) {
-
-		const { gl } = this;
-
-		const vaoGPU = gl.createVertexArray();
-
-		gl.bindVertexArray( vaoGPU );
-
-		for ( let i = 0; i < attributes.length; i ++ ) {
-
-			const attribute = attributes[ i ];
-			const attributeData = this.get( attribute );
-
-			gl.bindBuffer( gl.ARRAY_BUFFER, attributeData.bufferGPU );
-			gl.enableVertexAttribArray( i );
-
-			let stride, offset;
-
-			if ( attribute.isInterleavedBufferAttribute === true ) {
-
-				stride = attribute.data.stride * attributeData.bytesPerElement;
-				offset = attribute.offset * attributeData.bytesPerElement;
-
-			} else {
-
-				stride = 0;
-				offset = 0;
-
-			}
-
-			if ( attributeData.isInteger ) {
-
-				gl.vertexAttribIPointer( i, attribute.itemSize, attributeData.type, stride, offset );
-
-			} else {
-
-				gl.vertexAttribPointer( i, attribute.itemSize, attributeData.type, attribute.normalized, stride, offset );
-
-			}
-
-			if ( attribute.isInstancedBufferAttribute && ! attribute.isInterleavedBufferAttribute ) {
-
-				gl.vertexAttribDivisor( i, attribute.meshPerAttribute );
-
-			} else if ( attribute.isInterleavedBufferAttribute && attribute.data.isInstancedInterleavedBuffer ) {
-
-				gl.vertexAttribDivisor( i, attribute.data.meshPerAttribute );
-
-			}
-
-		}
-
-		gl.bindBuffer( gl.ARRAY_BUFFER, null );
-
-		return vaoGPU;
-
-	}
-
-	/**
 	 * Creates a transform feedback from the given transform buffers.
 	 *
 	 * @private
@@ -2666,7 +2592,9 @@ class WebGLBackend extends Backend {
 
 		for ( let i = 0; i < transformBuffers.length; i ++ ) {
 
-			key += ':' + transformBuffers[ i ].id;
+			const dualAttributeData = transformBuffers[ i ];
+
+			key += ':' + dualAttributeData.id + '|' + dualAttributeData.activeBufferIndex;
 
 		}
 
@@ -2940,6 +2868,9 @@ class WebGLBackend extends Backend {
 
 		await super.dispose();
 
+		this.transformFeedbackCache = {};
+
+		if ( this.vertexArrayUtils !== null ) this.vertexArrayUtils.dispose();
 		if ( this.textureUtils !== null ) this.textureUtils.dispose();
 
 		const extension = this.extensions.get( 'WEBGL_lose_context' );

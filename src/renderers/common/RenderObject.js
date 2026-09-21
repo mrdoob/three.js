@@ -337,6 +337,9 @@ class RenderObject {
 		 */
 		this.onGeometryDispose = () => {
 
+			this._geometries.deleteNodeAttributes( this );
+			this._geometries.deleteVertexState( this );
+
 			// clear geometry cache attributes
 
 			this.attributes = null;
@@ -512,7 +515,14 @@ class RenderObject {
 	 */
 	setGeometry( geometry ) {
 
+		// exchanging the geometry means we must move the dipose handler to the new geometry
+
+		this.geometry.removeEventListener( 'dispose', this.onGeometryDispose );
+
 		this.geometry = geometry;
+
+		this.geometry.addEventListener( 'dispose', this.onGeometryDispose );
+
 		this.attributes = null;
 		this.attributesId = null;
 

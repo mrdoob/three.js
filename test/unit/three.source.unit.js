@@ -265,3 +265,5 @@ import './src/nodes/display/ViewportDepthTextureNode.tests.js';
 
 //src/nodes/core
 import './src/nodes/core/StructTypeNode.js';
+//src/nodes/tsl
+import './src/nodes/tsl/TSLCore.tests.js';

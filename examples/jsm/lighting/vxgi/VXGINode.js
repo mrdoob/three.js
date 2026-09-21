@@ -1,4 +1,4 @@
-import { RenderTarget, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, HalfFloatType, RGBAFormat, RedFormat, UnsignedByteType } from 'three/webgpu';
+import { RenderTarget, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, HalfFloatType, RGBAFormat, RedFormat, UnsignedByteType } from 'three/webgpu';
 import { Fn, NodeUpdateType, uniform, reference, vec2, vec3, vec4, float, uint, uv, mix, passTexture, getViewPosition, getNormalFromDepth, logarithmicDepthToViewZ, viewZToPerspectiveDepth, screenCoordinate, interleavedGradientNoise, normalize, cross, abs, select, sqrt, fract, floor, cos, sin, exp2, pow, PI, Loop, If, Break, property, outputStruct, context } from 'three/tsl';
 
 import { VXGIVolume } from './VXGIVolume.js';
@@ -40,10 +40,10 @@ const _neutralContext = /*@__PURE__*/ context();
  *
  * Note: This node can only be used with `WebGPURenderer` and a WebGPU backend.
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { vxgi } from 'three/addons/lighting/vxgi/VXGINode.js';
  */
-class VXGINode extends TempNode {
+class VXGINode extends Node {
 
 	static get type() {
 
