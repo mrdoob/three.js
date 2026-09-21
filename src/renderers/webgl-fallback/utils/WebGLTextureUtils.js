@@ -1049,7 +1049,7 @@ class WebGLTextureUtils {
 		state.pixelStorei( gl.UNPACK_SKIP_IMAGES, currentUnpackSkipImages );
 
 		// Generate mipmaps only when copying level 0
-		if ( dstLevel === 0 && dstTexture.generateMipmaps ) {
+		if ( dstLevel === 0 && dstTexture.generateMipmaps === true && dstTexture.mipmapsAutoUpdate === true ) {
 
 			gl.generateMipmap( glTextureType );
 
@@ -1148,7 +1148,7 @@ class WebGLTextureUtils {
 
 		}
 
-		if ( texture.generateMipmaps ) this.generateMipmaps( texture );
+		if ( texture.generateMipmaps === true && texture.mipmapsAutoUpdate === true ) this.generateMipmaps( texture );
 
 		this.backend._setFramebuffer( renderContext );
 

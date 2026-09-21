@@ -56,6 +56,16 @@ class StorageArrayTexture extends Texture {
 		 */
 		this.isStorageTexture = true;
 
+		/**
+		 * Whether the renderer regenerates the mipmaps automatically.
+		 *
+		 * Overwritten and set to `false` by default.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.mipmapsAutoUpdate = false;
+
 	}
 
 	/**
