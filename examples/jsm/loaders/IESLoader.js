@@ -118,11 +118,16 @@ class IESLoader extends Loader {
 
 			let sampleTheta = theta;
 
-			if ( endTheta > 0 && sampleTheta > endTheta ) { // mirror the measured range around the cycle
+ 			// mirror the measured range around the cycle,
+ 			if ( endTheta !== 0 && sampleTheta > endTheta ) {
 
 				sampleTheta %= endTheta * 2;
 
-				if ( sampleTheta > endTheta ) sampleTheta = endTheta * 2 - sampleTheta;
+				if ( sampleTheta > endTheta ) {
+
+					sampleTheta = endTheta * 2 - sampleTheta;
+
+				}
 
 			}
 
