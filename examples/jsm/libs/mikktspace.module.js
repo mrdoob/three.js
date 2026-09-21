@@ -78,9 +78,9 @@ function projectAndNormalize( target, offset, x, y, z, nx, ny, nz ) {
 	if ( isNonZero( x, y, z ) ) {
 
 		const s = fround( 1 / vectorLength( x, y, z ) );
-		x = fround( x * s );
-		y = fround( y * s );
-		z = fround( z * s );
+		x *= s;
+		y *= s;
+		z *= s;
 
 	}
 
@@ -343,18 +343,18 @@ function computeFaceDerivatives( triangleVertices, activeTriangleCount, position
 		if ( Math.abs( sl ) > FLOAT_MIN ) {
 
 			const scale = fround( sign / sl );
-			faceDerivatives[ d ] = fround( sx * scale );
-			faceDerivatives[ d + 1 ] = fround( sy * scale );
-			faceDerivatives[ d + 2 ] = fround( sz * scale );
+			faceDerivatives[ d ] = sx * scale;
+			faceDerivatives[ d + 1 ] = sy * scale;
+			faceDerivatives[ d + 2 ] = sz * scale;
 
 		}
 
 		if ( Math.abs( tl ) > FLOAT_MIN ) {
 
 			const scale = fround( sign / tl );
-			faceDerivatives[ d + 3 ] = fround( tx * scale );
-			faceDerivatives[ d + 4 ] = fround( ty * scale );
-			faceDerivatives[ d + 5 ] = fround( tz * scale );
+			faceDerivatives[ d + 3 ] = tx * scale;
+			faceDerivatives[ d + 4 ] = ty * scale;
+			faceDerivatives[ d + 5 ] = tz * scale;
 
 		}
 
@@ -372,16 +372,14 @@ function computeFaceDerivatives( triangleVertices, activeTriangleCount, position
 
 function buildNeighbors( triangleVertices, cornerCount ) {
 
-	// Store each undirected edge's occurrences in ascending face order.
+	// Prepend edges in reverse order so occurrences remain in ascending face order.
 	const neighbors = new Int32Array( cornerCount );
 	neighbors.fill( - 1 );
 	const next = new Int32Array( cornerCount );
-	next.fill( - 1 );
 	const table = new Int32Array( getHashTableSize( cornerCount ) );
-	const tails = new Int32Array( table.length );
 	const mask = table.length - 1;
 
-	for ( let e = 0; e < cornerCount; e ++ ) {
+	for ( let e = cornerCount - 1; e >= 0; e -- ) {
 
 		const base = e - e % 3;
 		const end = base + ( e + 1 ) % 3;
@@ -410,17 +408,8 @@ function buildNeighbors( triangleVertices, cornerCount ) {
 
 		}
 
-		if ( table[ slot ] ) {
-
-			next[ tails[ slot ] ] = e;
-
-		} else {
-
-			table[ slot ] = e + 1;
-
-		}
-
-		tails[ slot ] = e;
+		next[ e ] = table[ slot ] - 1;
+		table[ slot ] = e + 1;
 
 	}
 
@@ -467,8 +456,8 @@ function generateTangentSpaces( triangleVertices, originalTriangles, triangleFla
 	// Construct one connected orientation group at a time. A stack preserves
 	// the reference depth-first order without risking the JS call stack.
 	const assignedCorners = new Uint8Array( cornerCount );
-	const stack = new Int32Array( cornerCount * 2 + 2 );
-	const groupMembers = new Int32Array( cornerCount );
+	const stack = new Int32Array( cornerCount / 3 + 1 );
+	const groupMembers = new Int32Array( cornerCount / 3 );
 	let projectedDerivatives = new Float32Array( 64 * 6 );
 	let cornerAngles = new Float32Array( 64 );
 	let subgroupMembers = new Int32Array( 64 );
@@ -574,7 +563,7 @@ function generateTangentSpaces( triangleVertices, originalTriangles, triangleFla
 			projectAndNormalize( edgeVectors, 0, fround( position[ prev ] - position[ n ] ), fround( position[ prev + 1 ] - position[ n + 1 ] ), fround( position[ prev + 2 ] - position[ n + 2 ] ), nx, ny, nz );
 			projectAndNormalize( edgeVectors, 3, fround( position[ after ] - position[ n ] ), fround( position[ after + 1 ] - position[ n + 1 ] ), fround( position[ after + 2 ] - position[ n + 2 ] ), nx, ny, nz );
 			const cosine = dot( edgeVectors[ 0 ], edgeVectors[ 1 ], edgeVectors[ 2 ], edgeVectors[ 3 ], edgeVectors[ 4 ], edgeVectors[ 5 ] );
-			cornerAngles[ i ] = fround( Math.acos( Math.max( - 1, Math.min( 1, cosine ) ) ) );
+			cornerAngles[ i ] = Math.acos( Math.max( - 1, Math.min( 1, cosine ) ) );
 
 		}
 
