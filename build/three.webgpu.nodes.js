@@ -273,14 +273,12 @@ class NodeMaterialObserver {
 
 			}
 
-			if ( renderObject.material.transmission > 0 ) {
+			// global data
 
-				const { width, height } = renderObject.context;
+			const { width, height } = renderObject.context;
 
-				data.bufferWidth = width;
-				data.bufferHeight = height;
-
-			}
+			data.bufferWidth = width;
+			data.bufferHeight = height;
 
 			const { environmentIntensity, environmentRotation } = renderObject.scene;
 
@@ -601,18 +599,14 @@ class NodeMaterialObserver {
 
 		}
 
-		if ( materialData.transmission > 0 ) {
+		const { width, height } = renderObject.context;
 
-			const { width, height } = renderObject.context;
+		if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
 
-			if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
+			renderObjectData.bufferWidth = width;
+			renderObjectData.bufferHeight = height;
 
-				renderObjectData.bufferWidth = width;
-				renderObjectData.bufferHeight = height;
-
-				return false;
-
-			}
+			return false;
 
 		}
 
@@ -1838,6 +1832,19 @@ class Node extends EventDispatcher {
 	}
 
 	/**
+	 * Whether this node allows caching its result in a temporary variable.
+	 * Caching is enabled by default. Override this method to disable it.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {boolean} Whether temporary caching is allowed.
+	 */
+	isCacheable( /*builder*/ ) {
+
+		return true;
+
+	}
+
+	/**
 	 * Set this property to `true` when the node should be regenerated.
 	 *
 	 * @type {boolean}
@@ -2630,59 +2637,93 @@ class Node extends EventDispatcher {
 
 		} else if ( buildStage === 'generate' ) {
 
-			// If generate has just one argument, it means the output type is not required.
-			// This means that the node does not handle output conversions internally,
-			// so the value is stored in a cache and the builder handles the conversion
-			// for all requested output types.
+			// References must be generated directly, even if a cached value exists.
+			const allowedCache = this.isCacheable( builder ) && builder.isReference( output ) === false;
+			const type = allowedCache ? builder.getVectorType( this.getNodeType( builder, output ) ) : null;
+			const cacheResult = allowedCache && type !== 'void' && output !== 'void' && nodeData.usageCount > 1;
+			const generateOutput = cacheResult ? type : output;
 
-			const isGenerateOnce = this.generate.length < 2;
+			if ( allowedCache && nodeData.propertyName !== undefined ) {
 
-			if ( isGenerateOnce ) {
-
-				const type = this.getNodeType( builder );
-				const nodeData = builder.getDataFromNode( this );
-
-				result = nodeData.snippet;
-
-				if ( result === undefined ) {
-
-					if ( nodeData.generated === undefined ) {
-
-						nodeData.generated = true;
-
-						result = this.generate( builder ) || '';
-
-						nodeData.snippet = result;
-
-					} else {
-
-						warn( 'Node: Recursion detected.', this );
-
-						result = '/* Recursion detected. */';
-
-					}
-
-				} else if ( nodeData.flowCodes !== undefined && builder.context.nodeBlock !== undefined ) {
+				if ( nodeData.flowCodes !== undefined && builder.context.nodeBlock !== undefined ) {
 
 					builder.addFlowCodeHierarchy( this, builder.context.nodeBlock );
 
 				}
 
-				result = builder.format( result, type, output );
+				result = builder.format( nodeData.propertyName, type, output );
 
 			} else {
 
-				result = this.generate( builder, output ) || '';
+				// If generate has just one argument, it means the output type is not required.
+				// This means that the node does not handle output conversions internally,
+				// so the value is stored in a cache and the builder handles the conversion
+				// for all requested output types.
 
-			}
+				const isGenerateOnce = this.generate.length < 2;
 
-			if ( result === '' && output !== null && output !== 'void' && output !== 'OutputType' ) {
+				if ( isGenerateOnce ) {
 
-				// if no snippet is generated, return a default value
+					const type = this.getNodeType( builder );
+					const nodeData = builder.getDataFromNode( this );
 
-				error( `TSL: Invalid generated code, expected a "${ output }".` );
+					result = nodeData.snippet;
 
-				result = builder.generateConst( output );
+					if ( result === undefined ) {
+
+						if ( nodeData.generated === undefined ) {
+
+							nodeData.generated = true;
+
+							result = this.generate( builder ) || '';
+
+							nodeData.snippet = result;
+
+						} else {
+
+							warn( 'Node: Recursion detected.', this );
+
+							result = '/* Recursion detected. */';
+
+						}
+
+					} else if ( nodeData.flowCodes !== undefined && builder.context.nodeBlock !== undefined ) {
+
+						builder.addFlowCodeHierarchy( this, builder.context.nodeBlock );
+
+					}
+
+					result = builder.format( result, type, generateOutput );
+
+				} else {
+
+					result = this.generate( builder, generateOutput ) || '';
+
+				}
+
+				if ( result === '' && generateOutput !== null && generateOutput !== 'void' && generateOutput !== 'OutputType' ) {
+
+					// if no snippet is generated, return a default value
+
+					error( `TSL: Invalid generated code, expected a "${ generateOutput }".` );
+
+					result = builder.generateConst( generateOutput );
+
+				}
+
+				if ( cacheResult ) {
+
+					const nodeVar = builder.getVarFromNode( this, null, type );
+					const propertyName = builder.getPropertyName( nodeVar );
+
+					builder.addLineFlowCode( `${ propertyName } = ${ result }`, this );
+
+					nodeData.snippet = result;
+					nodeData.propertyName = propertyName;
+
+					result = builder.format( propertyName, type, output );
+
+				}
 
 			}
 
@@ -2893,7 +2934,7 @@ Node.captureStackTrace = false;
  *
  * @augments Node
  */
-class ArrayElementNode extends Node { // @TODO: If extending from TempNode it breaks webgpu_compute
+class ArrayElementNode extends Node {
 
 	static get type() {
 
@@ -2933,6 +2974,12 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 		 * @default true
 		 */
 		this.isArrayElementNode = true;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -3015,6 +3062,12 @@ class ConvertNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * This method is overwritten since the implementation tries to infer the best
 	 * matching type from the {@link ConvertNode#convertTo} property.
@@ -3072,98 +3125,13 @@ class ConvertNode extends Node {
 }
 
 /**
- * This module uses cache management to create temporary variables
- * if the node is used more than once to prevent duplicate calculations.
- *
- * The class acts as a base class for many other nodes types.
- *
- * @augments Node
- */
-class TempNode extends Node {
-
-	static get type() {
-
-		return 'TempNode';
-
-	}
-
-	/**
-	 * Constructs a temp node.
-	 *
-	 * @param {?string} nodeType - The node type.
-	 */
-	constructor( nodeType = null ) {
-
-		super( nodeType );
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isTempNode = true;
-
-	}
-
-	/**
-	 * Whether this node is used more than once in context of other nodes.
-	 *
-	 * @param {NodeBuilder} builder - The node builder.
-	 * @return {boolean} A flag that indicates if there is more than one dependency to other nodes.
-	 */
-	hasDependencies( builder ) {
-
-		return builder.getDataFromNode( this ).usageCount > 1;
-
-	}
-
-	build( builder, output ) {
-
-		const buildStage = builder.getBuildStage();
-
-		if ( buildStage === 'generate' ) {
-
-			const type = builder.getVectorType( this.getNodeType( builder, output ) );
-			const nodeData = builder.getDataFromNode( this );
-
-			if ( nodeData.propertyName !== undefined ) {
-
-				return builder.format( nodeData.propertyName, type, output );
-
-			} else if ( type !== 'void' && output !== 'void' && this.hasDependencies( builder ) ) {
-
-				const snippet = super.build( builder, type );
-
-				const nodeVar = builder.getVarFromNode( this, null, type );
-				const propertyName = builder.getPropertyName( nodeVar );
-
-				builder.addLineFlowCode( `${ propertyName } = ${ snippet }`, this );
-
-				nodeData.snippet = snippet;
-				nodeData.propertyName = propertyName;
-
-				return builder.format( nodeData.propertyName, type, output );
-
-			}
-
-		}
-
-		return super.build( builder, output );
-
-	}
-
-}
-
-/**
  * This module is part of the TSL core and usually not used in app level code.
  * It represents a join operation during the shader generation process.
  * For example in can compose/join two single floats into a `vec2` type.
  *
- * @augments TempNode
+ * @augments Node
  */
-class JoinNode extends TempNode {
+class JoinNode extends Node {
 
 	static get type() {
 
@@ -3325,6 +3293,12 @@ class SplitNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Returns the vector length which is computed based on the requested components.
 	 *
@@ -3453,9 +3427,9 @@ class SplitNode extends Node {
  * materialLine.colorNode = color( 0, 0, 0 ).setR( float( 1 ) );
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class SetNode extends TempNode {
+class SetNode extends Node {
 
 	static get type() {
 
@@ -3561,9 +3535,9 @@ class SetNode extends TempNode {
  * uvNode = uvNode.flipY();
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class FlipNode extends TempNode {
+class FlipNode extends Node {
 
 	static get type() {
 
@@ -3696,6 +3670,12 @@ class InputNode extends Node {
 		 * @default null
 		 */
 		this.precision = null;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -3891,6 +3871,12 @@ class MemberNode extends Node {
 		 * @default true
 		 */
 		this.isMemberNode = true;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -4409,6 +4395,12 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generateNodeType( builder ) {
 
 		return this.shaderNode.nodeType || this.getOutputNode( builder ).getNodeType( builder );
@@ -4770,6 +4762,12 @@ class ShaderNodeInternal extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	setLayout( layout ) {
 
 		this.layout = layout;
@@ -4992,6 +4990,12 @@ class FnNode extends Node {
 		}
 
 		this.isFn = true;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -5281,6 +5285,12 @@ class PropertyNode extends Node {
 		 * @default true
 		 */
 		this.global = true;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -5709,6 +5719,12 @@ class UniformGroupNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Marks the uniform group node as needing an update.
 	 * This will trigger the necessary updates in the rendering process.
@@ -6073,9 +6089,9 @@ const uniform = ( value, type ) => {
  * const redColor = tintColors.element( 0 );
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class ArrayNode extends TempNode {
+class ArrayNode extends Node {
 
 	static get type() {
 
@@ -6235,9 +6251,9 @@ addMethodChaining( 'toArray', ( node, count ) => array( Array( count ).fill( nod
  * These node represents an assign operation. Meaning a node is assigned
  * to another node.
  *
- * @augments TempNode
+ * @augments Node
  */
-class AssignNode extends TempNode {
+class AssignNode extends Node {
 
 	static get type() {
 
@@ -6281,12 +6297,12 @@ class AssignNode extends TempNode {
 	}
 
 	/**
-	 * Whether this node is used more than once in context of other nodes. This method
-	 * is overwritten since it always returns `false` (assigns are unique).
+	 * Assignments must not be cached in temporary variables.
 	 *
-	 * @return {boolean} A flag that indicates if there is more than one dependency to other nodes. Always `false`.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {boolean} Always `false`.
 	 */
-	hasDependencies() {
+	isCacheable( /*builder*/ ) {
 
 		return false;
 
@@ -6433,9 +6449,9 @@ addMethodChaining( 'assign', assign );
  * with this module since they use the predefined TSL syntax `wgslFn` and `glslFn` which encapsulate
  * this logic.
  *
- * @augments TempNode
+ * @augments Node
  */
-class FunctionCallNode extends TempNode {
+class FunctionCallNode extends Node {
 
 	static get type() {
 
@@ -6624,9 +6640,9 @@ const _vectorOperators = {
  * This node represents basic mathematical and logical operations like addition,
  * subtraction or comparisons (e.g. `equal()`).
  *
- * @augments TempNode
+ * @augments Node
  */
-class OperatorNode extends TempNode {
+class OperatorNode extends Node {
 
 	static get type() {
 
@@ -7361,9 +7377,9 @@ addMethodChaining( 'decrement', decrement );
  * - Methods with two inputs like `dot`, `cross` or `pow`.
  * - Methods with three inputs like `mix`, `clamp` or `smoothstep`.
  *
- * @augments TempNode
+ * @augments Node
  */
-class MathNode extends TempNode {
+class MathNode extends Node {
 
 	static get type() {
 
@@ -8632,6 +8648,12 @@ class ConditionalNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * This method is overwritten since the node type is inferred from the if/else
 	 * nodes.
@@ -8872,6 +8894,12 @@ class ContextNode extends Node {
 		 * @default {}
 		 */
 		this.value = value;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -9234,6 +9262,12 @@ class VarNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Sets the intent flag for this node.
 	 *
@@ -9558,6 +9592,12 @@ class SubBuildNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generateNodeType( builder ) {
 
 		if ( this.nodeType !== null ) return this.nodeType;
@@ -9674,6 +9714,12 @@ class VaryingNode extends Node {
 		 * @default true
 		 */
 		this.global = true;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -9871,9 +9917,9 @@ const OUTPUT_COLOR_SPACE = 'OutputColorSpace';
  * This node represents a color space conversion. Meaning it converts
  * a color value from a source to a target color space.
  *
- * @augments TempNode
+ * @augments Node
  */
-class ColorSpaceNode extends TempNode {
+class ColorSpaceNode extends Node {
 
 	static get type() {
 
@@ -10191,6 +10237,12 @@ class ReferenceBaseNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Sets the uniform group for this reference node.
 	 *
@@ -10432,9 +10484,9 @@ const rendererReference = ( name, type, renderer = null ) => new RendererReferen
 /**
  * This node represents a tone mapping operation.
  *
- * @augments TempNode
+ * @augments Node
  */
-class ToneMappingNode extends TempNode {
+class ToneMappingNode extends Node {
 
 	static get type() {
 
@@ -11049,6 +11101,12 @@ class IndexNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generate( builder ) {
 
 		const nodeType = this.getNodeType( builder );
@@ -11330,6 +11388,12 @@ class ComputeNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Sets the {@link ComputeNode#name} property.
 	 *
@@ -11581,6 +11645,12 @@ class IsolateNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generateNodeType( builder ) {
 
 		const previousCache = builder.getCache();
@@ -11712,6 +11782,12 @@ class BypassNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generateNodeType( builder ) {
 
 		return this.outputNode.getNodeType( builder );
@@ -11828,6 +11904,12 @@ class ExpressionNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generate( builder, output ) {
 
 		const type = this.getNodeType( builder );
@@ -11938,9 +12020,9 @@ const unpremultiplyAlpha = /*@__PURE__*/ Fn( ( [ color ] ) => {
  * postProcessing.outputNode = outputPass;
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class RenderOutputNode extends TempNode {
+class RenderOutputNode extends Node {
 
 	static get type() {
 
@@ -12068,7 +12150,7 @@ const renderOutput = ( color, toneMapping = null, outputColorSpace = null ) => n
 
 addMethodChaining( 'renderOutput', renderOutput );
 
-class DebugNode extends TempNode {
+class DebugNode extends Node {
 
 	static get type() {
 
@@ -12363,6 +12445,12 @@ class InspectorNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Returns the name of the inspector node.
 	 *
@@ -12482,6 +12570,12 @@ class AttributeNode extends Node {
 		this.global = true;
 
 		this._attributeName = attributeName;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -12671,6 +12765,12 @@ class TextureSizeNode extends Node {
 		 * @default null
 		 */
 		this.levelNode = levelNode;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -14427,6 +14527,12 @@ class BuiltinNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Generates the code snippet of the builtin node.
 	 *
@@ -14497,6 +14603,12 @@ class ScreenNode extends Node {
 		 * @default true
 		 */
 		this.isViewportNode = true;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -15151,6 +15263,12 @@ class Object3DNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Overwritten since the node type is inferred from the scope.
 	 *
@@ -15744,6 +15862,12 @@ class FrontFacingNode extends Node {
 		 * @default true
 		 */
 		this.isFrontFacingNode = true;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -16436,6 +16560,12 @@ class ReferenceNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * When the referred property is array-like, this method can be used
 	 * to access elements via an index node.
@@ -17038,9 +17168,9 @@ const colorToDirection = ( node ) => {
  * material.normalNode = normalMap( texture( normalTex ) );
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class NormalMapNode extends TempNode {
+class NormalMapNode extends Node {
 
 	static get type() {
 
@@ -17218,9 +17348,9 @@ const perturbNormalArb = /*@__PURE__*/ Fn( ( inputs ) => {
  * material.normalNode = bumpMap( texture( bumpTex ) );
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class BumpMapNode extends TempNode {
+class BumpMapNode extends Node {
 
 	static get type() {
 
@@ -17319,6 +17449,12 @@ class MaterialNode extends Node {
 		 * @type {string}
 		 */
 		this.scope = scope;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -18172,6 +18308,12 @@ class EventNode extends Node {
 			this.updateBeforeType = NodeUpdateType.FRAME;
 
 		}
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -19694,6 +19836,12 @@ class LoopNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Returns a loop variable name based on an index. The pattern is
 	 * `0` = `i`, `1`= `j`, `2`= `k` and so on.
@@ -20333,6 +20481,12 @@ class LightingNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 }
 
 /**
@@ -20896,6 +21050,12 @@ class ViewportDepthNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generate( builder ) {
 
 		const { scope } = this;
@@ -21206,6 +21366,12 @@ class ClippingNode extends Node {
 		 * @type {('default'|'hardware'|'alphaToCoverage')}
 		 */
 		this.scope = scope;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -23977,9 +24143,9 @@ const _cache$1 = new WeakMap();
  * This node can be used to automatically convert environment maps in the
  * equirectangular format into the cube map format.
  *
- * @augments TempNode
+ * @augments Node
  */
-class CubeMapNode extends TempNode {
+class CubeMapNode extends Node {
 
 	static get type() {
 
@@ -27385,9 +27551,9 @@ function _getCache( renderer ) {
  * material.envNode = pmremTexture( envMap );
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class PMREMNode extends TempNode {
+class PMREMNode extends Node {
 
 	static get type() {
 
@@ -28925,9 +29091,9 @@ class MeshMatcapNodeMaterial extends NodeMaterial {
 /**
  * Applies a rotation to the given position node.
  *
- * @augments TempNode
+ * @augments Node
  */
-class RotateNode extends TempNode {
+class RotateNode extends Node {
 
 	static get type() {
 
@@ -30489,6 +30655,9 @@ class RenderObject {
 		 */
 		this.onGeometryDispose = () => {
 
+			this._geometries.deleteNodeAttributes( this );
+			this._geometries.deleteVertexState( this );
+
 			// clear geometry cache attributes
 
 			this.attributes = null;
@@ -30664,7 +30833,14 @@ class RenderObject {
 	 */
 	setGeometry( geometry ) {
 
+		// exchanging the geometry means we must move the dipose handler to the new geometry
+
+		this.geometry.removeEventListener( 'dispose', this.onGeometryDispose );
+
 		this.geometry = geometry;
+
+		this.geometry.addEventListener( 'dispose', this.onGeometryDispose );
+
 		this.attributes = null;
 		this.attributesId = null;
 
@@ -31347,6 +31523,7 @@ class RenderObjects {
 
 		renderObject.onDispose = () => {
 
+			this.geometries.deleteVertexState( renderObject );
 			this.pipelines.delete( renderObject );
 			this.bindings.deleteForRender( renderObject );
 			this.nodes.delete( renderObject );
@@ -31684,12 +31861,20 @@ class Geometries extends DataMap {
 	/**
 	 * Constructs a new geometry management component.
 	 *
+	 * @param {Backend} backend - The renderer's backend.
 	 * @param {Attributes} attributes - Renderer component for managing attributes.
 	 * @param {Info} info - Renderer component for managing metrics and monitoring data.
 	 */
-	constructor( attributes, info ) {
+	constructor( backend, attributes, info ) {
 
 		super();
+
+		/**
+		 * The renderer's backend.
+		 *
+		 * @type {Backend}
+		 */
+		this.backend = backend;
 
 		/**
 		 * Renderer component for managing attributes.
@@ -31741,14 +31926,12 @@ class Geometries extends DataMap {
 	}
 
 	/**
-	 * Returns `true` if the given render object has an initialized geometry.
+	 * Returns `true` if the given geometry is initialized.
 	 *
-	 * @param {RenderObject} renderObject - The render object.
-	 * @return {boolean} Whether if the given render object has an initialized geometry or not.
+	 * @param {BufferGeometry} geometry - The geometry.
+	 * @return {boolean} Whether if the given geometry is initialized or not.
 	 */
-	has( renderObject ) {
-
-		const geometry = renderObject.geometry;
+	has( geometry ) {
 
 		return super.has( geometry ) && this.get( geometry ).initialized === true;
 
@@ -31761,20 +31944,21 @@ class Geometries extends DataMap {
 	 */
 	updateForRender( renderObject ) {
 
-		if ( this.has( renderObject ) === false ) this.initGeometry( renderObject );
+		const geometry = renderObject.geometry;
+
+		if ( this.has( geometry ) === false ) this.initGeometry( geometry );
 
 		this.updateAttributes( renderObject );
 
 	}
 
 	/**
-	 * Initializes the geometry of the given render object.
+	 * Initializes the given geometry.
 	 *
-	 * @param {RenderObject} renderObject - The render object.
+	 * @param {BufferGeometry} geometry - The geometry.
 	 */
-	initGeometry( renderObject ) {
+	initGeometry( geometry ) {
 
-		const geometry = renderObject.geometry;
 		const geometryData = this.get( geometry );
 
 		geometryData.initialized = true;
@@ -31810,20 +31994,6 @@ class Geometries extends DataMap {
 			if ( wireframeAttribute !== undefined ) {
 
 				this.attributes.delete( wireframeAttribute );
-
-			}
-
-			// node attributes (TODO: Remove this bit once we support BufferAttribute.dispose())
-
-			const currentAttributes = new Set( Object.values( renderObject.geometry.attributes ) );
-
-			for ( const attribute of renderObject.getAttributes() ) {
-
-				if ( currentAttributes.has( attribute ) === false ) {
-
-					this.attributes.delete( attribute );
-
-				}
 
 			}
 
@@ -31999,6 +32169,38 @@ class Geometries extends DataMap {
 		}
 
 		return index;
+
+	}
+
+	/**
+	 * Deletes the attributes that are defined via nodes and not on geometry level.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 */
+	deleteNodeAttributes( renderObject ) {
+
+		const currentAttributes = new Set( Object.values( renderObject.geometry.attributes ) );
+
+		for ( const attribute of renderObject.getAttributes() ) {
+
+			if ( currentAttributes.has( attribute ) === false ) {
+
+				this.attributes.delete( attribute );
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * Deletes the vertex state for the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 */
+	deleteVertexState( renderObject ) {
+
+		this.backend.deleteVertexState( renderObject );
 
 	}
 
@@ -35851,6 +36053,12 @@ class StackNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	getElementType( builder ) {
 
 		return this.outputNode ? this.outputNode.getElementType( builder ) : 'void';
@@ -36274,6 +36482,12 @@ class StructTypeNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Returns the length of the struct in 4-byte elements (e.g. float or int components).
 	 * The length is calculated by summing the lengths of the struct's members, accounting for memory alignment.
@@ -36377,6 +36591,12 @@ class StructNode extends Node {
 		this.values = values;
 
 		this.isStructNode = true;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -36506,6 +36726,12 @@ class OutputStructNode extends Node {
 		 * @default true
 		 */
 		this.isOutputStructNode = true;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -36949,9 +37175,9 @@ const mrt = /*@__PURE__*/ nodeProxy( MRTNode );
  * This node represents an operation that reinterprets the bit representation of a value
  * in one type as a value in another type.
  *
- * @augments TempNode
+ * @augments Node
  */
-class BitcastNode extends TempNode {
+class BitcastNode extends Node {
 
 	static get type() {
 
@@ -37631,9 +37857,9 @@ const sinc = ( x, k ) => {
 /**
  * This node represents an operation that packs floating-point values of a vector into an unsigned 32-bit integer
  *
- * @augments TempNode
+ * @augments Node
  */
-class PackFloatNode extends TempNode {
+class PackFloatNode extends Node {
 
 	static get type() {
 
@@ -37755,9 +37981,9 @@ const packUnorm4x8 = /*@__PURE__*/ nodeProxyIntent( PackFloatNode, 'unorm', null
  * language extension. If the extension is not available, the node falls back to an
  * emulation with plain integer bit operations.
  *
- * @augments TempNode
+ * @augments Node
  */
-class Packed4x8IntegerNode extends TempNode {
+class Packed4x8IntegerNode extends Node {
 
 	static get type() {
 
@@ -38179,9 +38405,9 @@ const unpack4xU8 = /*@__PURE__*/ nodeProxyIntent( Packed4x8IntegerNode, Packed4x
 /**
  * This node represents an operation that unpacks values from a 32-bit unsigned integer, reinterpreting the results as a floating-point vector
  *
- * @augments TempNode
+ * @augments Node
  */
-class UnpackFloatNode extends TempNode {
+class UnpackFloatNode extends Node {
 
 	static get type() {
 
@@ -38420,6 +38646,12 @@ class FunctionOverloadingNode extends Node {
 		 * @default true
 		 */
 		this.global = true;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -39189,6 +39421,12 @@ class ReflectorBaseNode extends Node {
 		 * @default {false}
 		 */
 		this.hasOutput = false;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -40391,6 +40629,12 @@ class SampleNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Sets up the node by sampling with the default UV accessor.
 	 *
@@ -40608,6 +40852,12 @@ class PointUVNode extends Node {
 		 * @default true
 		 */
 		this.isPointUVNode = true;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -41367,9 +41617,9 @@ const _objectData = new WeakMap();
  * of the previous frame and uses them to compute offsets in NDC space.
  * These offsets represent the final velocity.
  *
- * @augments TempNode
+ * @augments Node
  */
-class VelocityNode extends TempNode {
+class VelocityNode extends Node {
 
 	static get type() {
 
@@ -41967,6 +42217,12 @@ class PassTextureNode extends TextureNode {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return true;
+
+	}
+
 	setup( builder ) {
 
 		const properties = builder.getNodeProperties( this );
@@ -42087,9 +42343,9 @@ class PassMultipleTextureNode extends PassTextureNode {
  * postProcessing.outputNode = scenePass;
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class PassNode extends TempNode {
+class PassNode extends Node {
 
 	static get type() {
 
@@ -42394,6 +42650,12 @@ class PassNode extends TempNode {
 		 * @default true
 		 */
 		this.global = true;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -43502,6 +43764,12 @@ class CodeNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Sets the includes of this code node.
 	 *
@@ -43928,6 +44196,12 @@ class RangeNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Returns the vector length which is computed based on the range definition.
 	 *
@@ -44108,6 +44382,12 @@ class ComputeBuiltinNode extends Node {
 		 * @type {string}
 		 */
 		this._builtinName = builtinName;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -44321,6 +44601,12 @@ class BarrierNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	setup( builder ) {
 
 		builder.allowEarlyReturns = false;
@@ -44530,6 +44816,12 @@ class WorkgroupInfoNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Sets the name of this node.
 	 *
@@ -44721,6 +45013,12 @@ class AtomicFunctionNode extends Node {
 		 * @default true
 		 */
 		this.parents = true;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -44991,9 +45289,9 @@ const atomicXor = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.A
  * other graphics APIs, subgroup functions are also referred to as wave intrinsics
  * (DirectX/HLSL) or warp intrinsics (CUDA).
  *
- * @augments TempNode
+ * @augments Node
  */
-class SubgroupFunctionNode extends TempNode {
+class SubgroupFunctionNode extends Node {
 
 	static get type() {
 
@@ -45836,6 +46134,12 @@ class LightsNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Overwrites the default {@link Node#customCacheKey} implementation by including
 	 * light data into the cache key.
@@ -46329,6 +46633,12 @@ class ShadowBaseNode extends Node {
 		 * @default true
 		 */
 		this.isShadowBaseNode = true;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -55687,6 +55997,65 @@ class NodeFunctionInput {
 NodeFunctionInput.isNodeFunctionInput = true;
 
 /**
+ * This module uses cache management to create temporary variables
+ * if the node is used more than once to prevent duplicate calculations.
+ *
+ * The class acts as a base class for many other nodes types.
+ *
+ * @deprecated Extend Node instead.
+ * @augments Node
+ */
+class TempNode extends Node {
+
+	static get type() {
+
+		return 'TempNode';
+
+	}
+
+	/**
+	 * Constructs a temp node.
+	 *
+	 * @param {?string} nodeType - The node type.
+	 */
+	constructor( nodeType = null ) {
+
+		super( nodeType );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isTempNode = true;
+
+		warn( 'TempNode: This module has been deprecated. Extend Node instead.' );
+
+	}
+
+	isCacheable( builder ) {
+
+		return this.hasDependencies( builder );
+
+	}
+
+	/**
+	 * Whether this node is used more than once in context of other nodes.
+	 *
+	 * @param {NodeBuilder} builder - The node builder.
+	 * @return {boolean} A flag that indicates if there is more than one dependency to other nodes.
+	 */
+	hasDependencies( builder ) {
+
+		return builder.getDataFromNode( this ).usageCount > 1;
+
+	}
+
+}
+
+/**
  * Module for representing ambient lights as nodes.
  *
  * @augments AnalyticLightNode
@@ -61589,7 +61958,7 @@ class Renderer {
 			this._animation = new Animation( this, this._nodes, this.info );
 			this._attributes = new Attributes( backend, this.info );
 			this._background = new Background( this, this._nodes );
-			this._geometries = new Geometries( this._attributes, this.info );
+			this._geometries = new Geometries( backend, this._attributes, this.info );
 			this._textures = new Textures( this, backend, this.info );
 			this._pipelines = new Pipelines( backend, this._nodes, this.info );
 			this._bindings = new Bindings( backend, this._nodes, this._textures, this._attributes, this._pipelines, this.info );
@@ -68143,6 +68512,14 @@ class Backend {
 	 */
 	draw( /*renderObject, info*/ ) { }
 
+	/**
+	 * Deletes the vertex state for the given render object.
+	 *
+	 * @abstract
+	 * @param {RenderObject} renderObject - The render object.
+	 */
+	deleteVertexState( /*renderObject*/ ) { }
+
 	// compute node
 
 	/**
@@ -68849,14 +69226,7 @@ class DualAttributeData {
 		this.version = attributeData.version;
 		this.isInteger = attributeData.isInteger;
 		this.activeBufferIndex = 0;
-		this.baseId = attributeData.id;
-
-	}
-
-
-	get id() {
-
-		return `${ this.baseId }|${ this.activeBufferIndex }`;
+		this.id = attributeData.id;
 
 	}
 
@@ -69177,6 +69547,274 @@ class WebGLAttributeUtils {
 		gl.bindBuffer( bufferType, null );
 
 		return bufferGPU;
+
+	}
+
+}
+
+/**
+ * A WebGL 2 backend utility module for managing vertex array objects (VAOs).
+ *
+ * VAOs are shared between all owners (render objects and compute pipelines)
+ * that use the same GPU buffers and deleted when the last owner releases them.
+ *
+ * @private
+ */
+class WebGLVertexArrayUtils {
+
+	/**
+	 * Constructs a new utility object.
+	 *
+	 * @param {WebGLBackend} backend - The WebGL 2 backend.
+	 */
+	constructor( backend ) {
+
+		/**
+		 * A reference to the WebGL 2 backend.
+		 *
+		 * @type {WebGLBackend}
+		 */
+		this.backend = backend;
+
+		/**
+		 * The VAO cache. Entries are keyed by the IDs of the attribute buffers
+		 * and hold one VAO per combination of active storage buffers as well
+		 * as a usage counter.
+		 *
+		 * @type {Map<string,Object>}
+		 */
+		this.cache = new Map();
+
+	}
+
+	/**
+	 * Returns a VAO for the given attributes.
+	 *
+	 * @param {RenderObject|ComputePipeline} owner - The render object or compute pipeline using the VAO.
+	 * @param {Array<BufferAttribute>} attributes - An array of buffer attributes.
+	 * @return {WebGLVertexArrayObject} The VAO.
+	 */
+	getVAO( owner, attributes ) {
+
+		const backend = this.backend;
+		const ownerData = backend.get( owner );
+
+		if ( this._needsUpdate( ownerData, attributes ) === false ) return ownerData.vaoGPU;
+
+		// determine key, variant and attribute buffers
+
+		let key = '';
+		let variant = '';
+
+		const buffers = [];
+
+		for ( let i = 0; i < attributes.length; i ++ ) {
+
+			const attributeData = backend.get( attributes[ i ] );
+
+			key += ':' + attributeData.id;
+			variant += ':' + ( attributeData.activeBufferIndex || 0 );
+
+			buffers.push( attributeData.bufferGPU );
+
+		}
+
+		// get cache entry
+
+		let entry = this.cache.get( key );
+
+		if ( key !== ownerData.vaoKey ) {
+
+			if ( ownerData.vaoKey !== undefined ) this._releaseEntry( ownerData.vaoKey ); // release old VAO
+
+			if ( entry === undefined ) {
+
+				entry = { vaos: new Map(), usedTimes: 0 };
+
+				this.cache.set( key, entry );
+
+			}
+
+			entry.usedTimes ++;
+
+			ownerData.vaoKey = key;
+
+		}
+
+		// get correct VAO variant (variants are needed for dual buffer attributes)
+
+		let vaoGPU = entry.vaos.get( variant );
+
+		if ( vaoGPU === undefined ) {
+
+			vaoGPU = this._createVAO( attributes );
+
+			entry.vaos.set( variant, vaoGPU );
+
+		}
+
+		ownerData.vaoGPU = vaoGPU;
+		ownerData.vertexBuffers = buffers;
+
+		return vaoGPU;
+
+	}
+
+	/**
+	 * Releases the VAO used by the given owner.
+	 *
+	 * @param {RenderObject|ComputePipeline} owner - The render object or compute pipeline.
+	 */
+	releaseVAO( owner ) {
+
+		const ownerData = this.backend.get( owner );
+
+		if ( ownerData.vaoKey === undefined ) return;
+
+		this._releaseEntry( ownerData.vaoKey );
+
+		ownerData.vaoKey = undefined;
+		ownerData.vaoGPU = undefined;
+		ownerData.vertexBuffers = undefined;
+
+	}
+
+	/**
+	 * Frees internal resources.
+	 */
+	dispose() {
+
+		const { gl } = this.backend;
+
+		for ( const entry of this.cache.values() ) {
+
+			for ( const vaoGPU of entry.vaos.values() ) {
+
+				gl.deleteVertexArray( vaoGPU );
+
+			}
+
+		}
+
+		this.cache.clear();
+
+	}
+
+	/**
+	 * Returns `true` if the given attributes refer to other GPU buffers than
+	 * the VAO of the given owner.
+	 *
+	 * @private
+	 * @param {Object} ownerData - The backend data of the owner.
+	 * @param {Array<BufferAttribute>} attributes - An array of buffer attributes.
+	 * @return {boolean} Whether the owner requires a different VAO or not.
+	 */
+	_needsUpdate( ownerData, attributes ) {
+
+		const buffers = ownerData.vertexBuffers;
+
+		if ( buffers === undefined || buffers.length !== attributes.length ) return true;
+
+		for ( let i = 0; i < attributes.length; i ++ ) {
+
+			if ( this.backend.get( attributes[ i ] ).bufferGPU !== buffers[ i ] ) return true;
+
+		}
+
+		return false;
+
+	}
+
+	/**
+	 * Releases the VAO entry. If possible, the all VAO variants are deleted.
+	 *
+	 * @private
+	 * @param {string} key - The cache key.
+	 */
+	_releaseEntry( key ) {
+
+		const entry = this.cache.get( key );
+
+		entry.usedTimes --;
+
+		if ( entry.usedTimes === 0 ) {
+
+			const { gl } = this.backend;
+
+			for ( const vaoGPU of entry.vaos.values() ) {
+
+				gl.deleteVertexArray( vaoGPU );
+
+			}
+
+			this.cache.delete( key );
+
+		}
+
+	}
+
+	/**
+	 * Creates a VAO from the given attributes.
+	 *
+	 * @private
+	 * @param {Array<BufferAttribute>} attributes - An array of buffer attributes.
+	 * @return {WebGLVertexArrayObject} The VAO.
+	 */
+	_createVAO( attributes ) {
+
+		const { gl, state } = this.backend;
+
+		const vaoGPU = gl.createVertexArray();
+
+		state.setVertexState( vaoGPU );
+
+		for ( let i = 0; i < attributes.length; i ++ ) {
+
+			const attribute = attributes[ i ];
+			const attributeData = this.backend.get( attribute );
+
+			gl.bindBuffer( gl.ARRAY_BUFFER, attributeData.bufferGPU );
+			gl.enableVertexAttribArray( i );
+
+			let stride, offset;
+
+			if ( attribute.isInterleavedBufferAttribute === true ) {
+
+				stride = attribute.data.stride * attributeData.bytesPerElement;
+				offset = attribute.offset * attributeData.bytesPerElement;
+
+			} else {
+
+				stride = 0;
+				offset = 0;
+
+			}
+
+			if ( attributeData.isInteger ) {
+
+				gl.vertexAttribIPointer( i, attribute.itemSize, attributeData.type, stride, offset );
+
+			} else {
+
+				gl.vertexAttribPointer( i, attribute.itemSize, attributeData.type, attribute.normalized, stride, offset );
+
+			}
+
+			if ( attribute.isInstancedBufferAttribute && ! attribute.isInterleavedBufferAttribute ) {
+
+				gl.vertexAttribDivisor( i, attribute.meshPerAttribute );
+
+			} else if ( attribute.isInterleavedBufferAttribute && attribute.data.isInstancedInterleavedBuffer ) {
+
+				gl.vertexAttribDivisor( i, attribute.data.meshPerAttribute );
+
+			}
+
+		}
+
+		gl.bindBuffer( gl.ARRAY_BUFFER, null );
+
+		return vaoGPU;
 
 	}
 
@@ -70174,10 +70812,17 @@ class WebGLState {
 
 			if ( this.currentPolygonOffsetFactor !== factor || this.currentPolygonOffsetUnits !== units ) {
 
-				gl.polygonOffset( factor, units );
-
 				this.currentPolygonOffsetFactor = factor;
 				this.currentPolygonOffsetUnits = units;
+
+				if ( this.currentDepthReversed ) {
+
+					factor = - factor;
+					units = - units;
+
+				}
+
+				gl.polygonOffset( factor, units );
 
 			}
 
@@ -73257,6 +73902,15 @@ class WebGLBackend extends Backend {
 		this.attributeUtils = null;
 
 		/**
+		 * A reference to a backend module holding vertex array object-related
+		 * utility functions.
+		 *
+		 * @type {?WebGLVertexArrayUtils}
+		 * @default null
+		 */
+		this.vertexArrayUtils = null;
+
+		/**
 		 * A reference to a backend module holding extension-related
 		 * utility functions.
 		 *
@@ -73324,13 +73978,6 @@ class WebGLBackend extends Backend {
 		 * @type {Object<string,WebGLTransformFeedback>}
 		 */
 		this.transformFeedbackCache = {};
-
-		/**
-		 * Dictionary for caching VAOs.
-		 *
-		 * @type {Object<string,WebGLVertexArrayObject>}
-		 */
-		this.vaoCache = {};
 
 		/**
 		 * Controls if `gl.RASTERIZER_DISCARD` should be enabled or not.
@@ -73442,6 +74089,7 @@ class WebGLBackend extends Backend {
 		this.extensions = new WebGLExtensions( this );
 		this.capabilities = new WebGLCapabilities( this );
 		this.attributeUtils = new WebGLAttributeUtils( this );
+		this.vertexArrayUtils = new WebGLVertexArrayUtils( this );
 		this.textureUtils = new WebGLTextureUtils( this );
 		this.bufferRenderer = new WebGLBufferRenderer( this );
 
@@ -74124,19 +74772,9 @@ class WebGLBackend extends Backend {
 
 		const { programGPU, transformBuffers, attributes } = this.get( pipeline );
 
-		const vaoKey = this._getVaoKey( attributes );
+		const vaoGPU = this.vertexArrayUtils.getVAO( pipeline, attributes );
 
-		const vaoGPU = this.vaoCache[ vaoKey ];
-
-		if ( vaoGPU === undefined ) {
-
-			this.vaoCache[ vaoKey ] = this._createVao( attributes );
-
-		} else {
-
-			state.setVertexState( vaoGPU );
-
-		}
+		state.setVertexState( vaoGPU );
 
 		state.useProgram( programGPU );
 
@@ -74320,27 +74958,7 @@ class WebGLBackend extends Backend {
 
 		// vertex state
 
-		const attributes = renderObject.getAttributes();
-		const attributesData = this.get( attributes );
-
-		let vaoGPU = attributesData.vaoGPU;
-
-		if ( vaoGPU === undefined ) {
-
-			const vaoKey = this._getVaoKey( attributes );
-
-			vaoGPU = this.vaoCache[ vaoKey ];
-
-			if ( vaoGPU === undefined ) {
-
-				vaoGPU = this._createVao( attributes );
-
-				this.vaoCache[ vaoKey ] = vaoGPU;
-				attributesData.vaoGPU = vaoGPU;
-
-			}
-
-		}
+		const vaoGPU = this.vertexArrayUtils.getVAO( renderObject, renderObject.getAttributes() );
 
 		const index = renderObject.getIndex();
 		const indexGPU = ( index !== null ) ? this.get( index ).bufferGPU : null;
@@ -74546,6 +75164,17 @@ class WebGLBackend extends Backend {
 			this._draw( object, renderer, firstVertex, vertexCount, instanceCount, programGPU );
 
 		}
+
+	}
+
+	/**
+	 * Releases the VAO of the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 */
+	deleteVertexState( renderObject ) {
+
+		this.vertexArrayUtils.releaseVAO( renderObject );
 
 	}
 
@@ -74791,6 +75420,14 @@ class WebGLBackend extends Backend {
 
 		const gl = this.gl;
 		const data = this.get( pipeline );
+
+		if ( pipeline.isComputePipeline === true ) {
+
+			// Compute pipeline manage their own VAOs (without render objects)
+
+			this.vertexArrayUtils.releaseVAO( pipeline );
+
+		}
 
 		gl.deleteProgram( data.programGPU );
 
@@ -75776,94 +76413,6 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Computes the VAO key for the given index and attributes.
-	 *
-	 * @private
-	 * @param {Array<BufferAttribute>} attributes - An array of buffer attributes.
-	 * @return {string} The VAO key.
-	 */
-	_getVaoKey( attributes ) {
-
-		let key = '';
-
-		for ( let i = 0; i < attributes.length; i ++ ) {
-
-			const attributeData = this.get( attributes[ i ] );
-
-			key += ':' + attributeData.id;
-
-		}
-
-		return key;
-
-	}
-
-	/**
-	 * Creates a VAO from the index and attributes.
-	 *
-	 * @private
-	 * @param {Array<BufferAttribute>} attributes - An array of buffer attributes.
-	 * @return {Object} The VAO data.
-	 */
-	_createVao( attributes ) {
-
-		const { gl } = this;
-
-		const vaoGPU = gl.createVertexArray();
-
-		gl.bindVertexArray( vaoGPU );
-
-		for ( let i = 0; i < attributes.length; i ++ ) {
-
-			const attribute = attributes[ i ];
-			const attributeData = this.get( attribute );
-
-			gl.bindBuffer( gl.ARRAY_BUFFER, attributeData.bufferGPU );
-			gl.enableVertexAttribArray( i );
-
-			let stride, offset;
-
-			if ( attribute.isInterleavedBufferAttribute === true ) {
-
-				stride = attribute.data.stride * attributeData.bytesPerElement;
-				offset = attribute.offset * attributeData.bytesPerElement;
-
-			} else {
-
-				stride = 0;
-				offset = 0;
-
-			}
-
-			if ( attributeData.isInteger ) {
-
-				gl.vertexAttribIPointer( i, attribute.itemSize, attributeData.type, stride, offset );
-
-			} else {
-
-				gl.vertexAttribPointer( i, attribute.itemSize, attributeData.type, attribute.normalized, stride, offset );
-
-			}
-
-			if ( attribute.isInstancedBufferAttribute && ! attribute.isInterleavedBufferAttribute ) {
-
-				gl.vertexAttribDivisor( i, attribute.meshPerAttribute );
-
-			} else if ( attribute.isInterleavedBufferAttribute && attribute.data.isInstancedInterleavedBuffer ) {
-
-				gl.vertexAttribDivisor( i, attribute.data.meshPerAttribute );
-
-			}
-
-		}
-
-		gl.bindBuffer( gl.ARRAY_BUFFER, null );
-
-		return vaoGPU;
-
-	}
-
-	/**
 	 * Creates a transform feedback from the given transform buffers.
 	 *
 	 * @private
@@ -75876,7 +76425,9 @@ class WebGLBackend extends Backend {
 
 		for ( let i = 0; i < transformBuffers.length; i ++ ) {
 
-			key += ':' + transformBuffers[ i ].id;
+			const dualAttributeData = transformBuffers[ i ];
+
+			key += ':' + dualAttributeData.id + '|' + dualAttributeData.activeBufferIndex;
 
 		}
 
@@ -76151,8 +76702,8 @@ class WebGLBackend extends Backend {
 		await super.dispose();
 
 		this.transformFeedbackCache = {};
-		this.vaoCache = {};
 
+		if ( this.vertexArrayUtils !== null ) this.vertexArrayUtils.dispose();
 		if ( this.textureUtils !== null ) this.textureUtils.dispose();
 
 		const extension = this.extensions.get( 'WEBGL_lose_context' );
@@ -84889,8 +85440,8 @@ class WebGPUPipelineUtils {
 
 			if ( material.polygonOffset === true && ( primitiveState.topology === GPUPrimitiveTopology.TriangleList ) ) {
 
-				depthStencil.depthBias = material.polygonOffsetUnits;
-				depthStencil.depthBiasSlopeScale = material.polygonOffsetFactor;
+				depthStencil.depthBias = ( this.backend.parameters.reversedDepthBuffer ) ? - material.polygonOffsetUnits : material.polygonOffsetUnits;
+				depthStencil.depthBiasSlopeScale = ( this.backend.parameters.reversedDepthBuffer ) ? - material.polygonOffsetFactor : material.polygonOffsetFactor;
 				depthStencil.depthBiasClamp = 0; // three.js does not provide an API to configure this value
 
 			}
