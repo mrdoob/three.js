@@ -173,6 +173,8 @@
 					}
 				];
 
+				createNoiseGrid( noiseExamples, geometry, font, labelMaterial );
+
 				scene.background = hdrTexture;
 				scene.environment = hdrTexture;
 
@@ -187,6 +189,7 @@
 				particleLight.add( new THREE.PointLight( 0xffffff, 1000 ) );
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setAnimationLoop( render );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.inspector = new Inspector();
@@ -202,12 +205,6 @@
 				new OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
-
-				await renderer.compileAsync( scene, camera );
-				render();
-				renderer.setAnimationLoop( render );
-
-				await createNoiseGrid( noiseExamples, geometry, font, labelMaterial );
 
 			}
 
@@ -246,7 +243,7 @@
 
 			}
 
-			async function createNoiseGrid( noiseExamples, geometry, font, labelMaterial ) {
+			function createNoiseGrid( noiseExamples, geometry, font, labelMaterial ) {
 
 				const columns = 7;
 				const spacingX = 15.5;
@@ -264,9 +261,6 @@
 					const y = rowOffset - row * spacingY;
 					const labelLines = example.label.slice();
 
-					const sample = new THREE.Group();
-					sample.position.set( x, y, 0 );
-
 					const material = new THREE.MeshPhysicalNodeMaterial();
 
 					try {
@@ -281,16 +275,13 @@
 					}
 
 					const mesh = new THREE.Mesh( geometry, material.colorNode ? material : errorMaterial );
-					sample.add( mesh );
+					mesh.position.set( x, y, 0 );
+					group.add( mesh );
+					spheres.push( mesh );
 
 					const label = createLabel( labelLines, font, labelMaterial );
-					label.position.y = - 7.5;
-					sample.add( label );
-
-					await renderer.compileAsync( sample, camera, scene );
-
-					group.add( sample );
-					spheres.push( mesh );
+					label.position.set( x, y - 7.5, 0 );
+					group.add( label );
 
 				}
 
