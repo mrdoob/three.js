@@ -45,15 +45,15 @@ import {
 import { LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping } from '../../../constants.js';
 import { linearToneMapping, reinhardToneMapping, cineonToneMapping, acesFilmicToneMapping, agxToneMapping, neutralToneMapping } from '../../../nodes/display/ToneMappingFunctions.js';
 
-PointLight.prototype.lightNode = PointLightNode;
-DirectionalLight.prototype.lightNode = DirectionalLightNode;
-RectAreaLight.prototype.lightNode = RectAreaLightNode;
-SpotLight.prototype.lightNode = SpotLightNode;
-AmbientLight.prototype.lightNode = AmbientLightNode;
-HemisphereLight.prototype.lightNode = HemisphereLightNode;
-LightProbe.prototype.lightNode = LightProbeNode;
-IESSpotLight.prototype.lightNode = IESSpotLightNode;
-ProjectorLight.prototype.lightNode = ProjectorLightNode;
+PointLight.registerNode( PointLightNode );
+DirectionalLight.registerNode( DirectionalLightNode );
+RectAreaLight.registerNode( RectAreaLightNode );
+SpotLight.registerNode( SpotLightNode );
+AmbientLight.registerNode( AmbientLightNode );
+HemisphereLight.registerNode( HemisphereLightNode );
+LightProbe.registerNode( LightProbeNode );
+IESSpotLight.registerNode( IESSpotLightNode );
+ProjectorLight.registerNode( ProjectorLightNode );
 
 /**
  * This version of a node library represents the standard version

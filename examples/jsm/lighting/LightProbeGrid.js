@@ -810,6 +810,6 @@ class LightProbeGrid extends Light {
 
 }
 
-LightProbeGrid.prototype.lightNode = LightProbeGridNode;
+LightProbeGrid.registerNode( LightProbeGridNode );
 
 export { LightProbeGrid };

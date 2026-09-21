@@ -26,7 +26,7 @@ import { SunLightShadow } from './SunLightShadow.js';
  * When used with `WebGPURenderer`, the light must be assigned its node
  * implementation first:
  * ```js
- * SunLight.prototype.lightNode = SunLightNode;
+ * SunLight.registerNode( SunLightNode );
  * ```
  *
  * @augments Light

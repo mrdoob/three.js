@@ -124,7 +124,7 @@
 				camera.lookAt( - 60, 8, 0 );
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
-				SunLight.prototype.lightNode = SunLightNode;
+				SunLight.registerNode( SunLightNode );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

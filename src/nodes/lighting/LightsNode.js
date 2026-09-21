@@ -249,7 +249,7 @@ class LightsNode extends Node {
 
 				if ( lightNode === null ) {
 
-					const lightNodeClass = light.lightNode;
+					const lightNodeClass = light._lightNode;
 
 					if ( lightNodeClass === undefined ) {
 

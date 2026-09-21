@@ -44,7 +44,7 @@ const canBatchLight = ( light ) => {
 
 const getOrCreateLightNode = ( light ) => {
 
-	const lightNodeClass = light.lightNode;
+	const lightNodeClass = light._lightNode;
 
 	if ( lightNodeClass === undefined ) {
 

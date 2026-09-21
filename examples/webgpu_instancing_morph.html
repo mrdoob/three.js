@@ -145,7 +145,7 @@
 				// renderer
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
-				SunLight.prototype.lightNode = SunLightNode;
+				SunLight.registerNode( SunLightNode );
 				renderer.setAnimationLoop( animate );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
