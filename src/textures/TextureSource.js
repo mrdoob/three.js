@@ -94,9 +94,6 @@ class TextureSource {
 
 		} else if ( data !== null ) {
 
-			// coerce to numbers so undefined dimensions (e.g. a DepthTexture created
-			// without an explicit size) are never written into the target vector's
-			// numeric fields, which would degrade Vector3 write performance app-wide
 			target.set( data.width || 0, data.height || 0, data.depth || 0 );
 
 		} else {
