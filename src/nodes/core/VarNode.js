@@ -277,8 +277,6 @@ class VarNode extends Node {
 
 			const count = node.getArrayCount( builder );
 
-			console.log( builder.isDeterministic( node ) );
-
 			declarationPrefix = builder.isDeterministic( node )
 				? builder.generateConstStatement( nodeVar.type, propertyName, count )
 				: builder.generateVarStatement( nodeVar.type, propertyName, count );
