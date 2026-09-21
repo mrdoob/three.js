@@ -1,6 +1,9 @@
 import './utils/console-wrapper.js';
 import './utils/qunit-utils.js';
 
+// tsl
+import './tsl/TSL.tests.js';
+
 //src
 import './src/constants.tests.js';
 import './src/utils.tests.js';
