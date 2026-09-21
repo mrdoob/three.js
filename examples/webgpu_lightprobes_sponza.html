@@ -103,7 +103,7 @@
 				scene.add( sky );
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
-				renderer.library.addLight( SunLightNode, SunLight );
+				SunLight.prototype.lightNode = SunLightNode;
 				renderer.setPixelRatio( Math.min( window.devicePixelRatio, 1.5 ) );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
